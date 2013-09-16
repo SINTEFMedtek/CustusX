@@ -46,7 +46,7 @@ public:
 	}
 
 	cx::MultiVolume3DRepProducer mBase;
-	std::vector<ssc::ImagePtr> mImages;
+	std::vector<cx::ImagePtr> mImages;
 };
 
 } // namespace cxtest

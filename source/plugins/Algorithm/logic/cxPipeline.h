@@ -52,7 +52,7 @@ public: // optional methods
 	virtual QString getHelp() const;
 
 public: // interface extension
-	virtual ssc::DataPtr getData() const;
+	virtual DataPtr getData() const;
 	virtual void setValueName(const QString name);
 	virtual void setHelp(QString text);
 

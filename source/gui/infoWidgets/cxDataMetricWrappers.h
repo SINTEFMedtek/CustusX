@@ -41,7 +41,7 @@ public:
   virtual ~MetricBase() {}
   virtual QWidget* createWidget() = 0;
   virtual QString getValue() const = 0;
-  virtual ssc::DataPtr getData() const = 0;
+  virtual DataPtr getData() const = 0;
   virtual QString getArguments() const = 0;
   virtual QString getType() const = 0;
 };
@@ -50,11 +50,11 @@ class PointMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit PointMetricWrapper(ssc::PointMetricPtr data);
+  explicit PointMetricWrapper(PointMetricPtr data);
   virtual ~PointMetricWrapper() {}
   virtual QWidget* createWidget();
   virtual QString getValue() const;
-  virtual ssc::DataPtr getData() const;
+  virtual DataPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
 private slots:
@@ -63,9 +63,9 @@ private slots:
   void coordinateChanged();
   void dataChangedSlot();
 private:
-  ssc::PointMetricPtr mData;
-  ssc::StringDataAdapterXmlPtr mSpaceSelector;
-  ssc::Vector3DDataAdapterXmlPtr mCoordinate;
+  PointMetricPtr mData;
+  StringDataAdapterXmlPtr mSpaceSelector;
+  Vector3DDataAdapterXmlPtr mCoordinate;
   bool mInternalUpdate;
 };
 
@@ -73,11 +73,11 @@ class PlaneMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit PlaneMetricWrapper(ssc::PlaneMetricPtr data);
+  explicit PlaneMetricWrapper(PlaneMetricPtr data);
   virtual ~PlaneMetricWrapper() {}
   virtual QWidget* createWidget();
   virtual QString getValue() const;
-  virtual ssc::DataPtr getData() const;
+  virtual DataPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
 private slots:
@@ -86,10 +86,10 @@ private slots:
   void coordinateChanged();
   void dataChangedSlot();
 private:
-  ssc::PlaneMetricPtr mData;
-  ssc::StringDataAdapterXmlPtr mSpaceSelector;
-  ssc::Vector3DDataAdapterXmlPtr mCoordinate;
-  ssc::Vector3DDataAdapterXmlPtr mNormal;
+  PlaneMetricPtr mData;
+  StringDataAdapterXmlPtr mSpaceSelector;
+  Vector3DDataAdapterXmlPtr mCoordinate;
+  Vector3DDataAdapterXmlPtr mNormal;
   bool mInternalUpdate;
 };
 
@@ -97,11 +97,11 @@ class DistanceMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit DistanceMetricWrapper(ssc::DistanceMetricPtr data);
+  explicit DistanceMetricWrapper(DistanceMetricPtr data);
   virtual ~DistanceMetricWrapper() {}
   virtual QWidget* createWidget();
   virtual QString getValue() const;
-  virtual ssc::DataPtr getData() const;
+  virtual DataPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
 
@@ -110,8 +110,8 @@ private slots:
   void dataChangedSlot();
 
 private:
-  ssc::DistanceMetricPtr mData;
-  std::vector<ssc::StringDataAdapterXmlPtr> mPSelector;
+  DistanceMetricPtr mData;
+  std::vector<StringDataAdapterXmlPtr> mPSelector;
   void getAvailableArgumentMetrics(QStringList* uid, std::map<QString,QString>* namemap);
   bool mInternalUpdate;
 };
@@ -120,11 +120,11 @@ class AngleMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit AngleMetricWrapper(ssc::AngleMetricPtr data);
+  explicit AngleMetricWrapper(AngleMetricPtr data);
   virtual ~AngleMetricWrapper() {}
   virtual QWidget* createWidget();
   virtual QString getValue() const;
-  virtual ssc::DataPtr getData() const;
+  virtual DataPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
 
@@ -133,8 +133,8 @@ private slots:
   void dataChangedSlot();
 
 private:
-  ssc::AngleMetricPtr mData;
-  std::vector<ssc::StringDataAdapterXmlPtr> mPSelector;
+  AngleMetricPtr mData;
+  std::vector<StringDataAdapterXmlPtr> mPSelector;
   void getPointMetrics(QStringList* uid, std::map<QString,QString>* namemap);
   bool mInternalUpdate;
 };

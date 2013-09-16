@@ -27,7 +27,7 @@
 
 #include <QObject>
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class Rep> RepPtr;
 typedef boost::weak_ptr<class Rep> RepWeakPtr;
@@ -59,7 +59,7 @@ public:
 	virtual QString getType() const = 0;
 
 	/**
-	 * Do not use this method! It is only used by ssc::View to set up an
+	 * Do not use this method! It is only used by View to set up an
 	 * internal connection between the two.
 	 *
 	 * \param theView The view to add this representation to.
@@ -68,7 +68,7 @@ public:
 	virtual void connectToView(View *theView) = 0;
 
 	/**
-	 * Do not use this method! It is only used by ssc::View to tear down an
+	 * Do not use this method! It is only used by View to tear down an
 	 * internal connection between the two.
 	 *
 	 * \param theView The view to disconnect from.
@@ -104,6 +104,6 @@ public:
 
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCREP_H_*/

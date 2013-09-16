@@ -20,13 +20,13 @@
 #include "sscTransform3D.h"
 #include "vtkForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class GraphicalAxes3D> GraphicalAxes3DPtr;
 typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
 }
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Visualization for one 3D coordinate axis triplet.
@@ -65,9 +65,9 @@ protected:
     vtkRendererPtr mRenderer;
 	const double m_vtkAxisLength;
 
-	ssc::Transform3D m_rMt;
+	Transform3D m_rMt;
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif // CXGRAPHICALAXES3D_H

@@ -26,7 +26,7 @@
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 
 /**\brief A slicer implementation.
@@ -46,11 +46,11 @@ public:
 
 	static SlicePlaneRepPtr New(const QString& uid);
 
-	virtual QString getType() const { return "ssc::SliceRep"; }
+	virtual QString getType() const { return "SliceRep"; }
 	void setImage(ImagePtr image);
 	bool hasImage(ImagePtr image) const;
 	void setSliceProxy(SliceProxyPtr proxy);
-	void setSliceReps( std::vector<ssc::SliceRepSWPtr> slicerReps);
+	void setSliceReps( std::vector<SliceRepSWPtr> slicerReps);
 
 protected:
 	SlicePlaneRep(const QString& uid);
@@ -70,7 +70,7 @@ private:
 	ImagePtr mImage;
 };
 
-} // namespace ssc
+} // namespace cx
 
 
 #endif /*SSCSLICEPLANEREP_H_*/

@@ -42,7 +42,7 @@ namespace cx
  * \date April 26, 2013
  * \author Christian Askeland, SINTEF
  */
-class BasicVideoSource : public ssc::VideoSource
+class BasicVideoSource : public VideoSource
 {
 	Q_OBJECT
 
@@ -79,10 +79,10 @@ public:
 	  * settings an empty input indicates disconnect()
 	  *
 	  */
-	void setInput(ssc::ImagePtr input);
+	void setInput(ImagePtr input);
 	void setInfoString(QString text) { mInfo = text; }
 	void setStatusString(QString text) { mStatus = text; }
-	void deconfigure() { this->setInput(ssc::ImagePtr()); }
+	void deconfigure() { this->setInput(ImagePtr()); }
 	/** Disable internal timeout checking,
 	  * instead set timeout directly.
 	  */
@@ -95,8 +95,8 @@ private:
 	QString mInfo;
 	QString mStatus;
 
-	ssc::ImagePtr mEmptyImage;
-	ssc::ImagePtr mReceivedImage;
+	ImagePtr mEmptyImage;
+	ImagePtr mReceivedImage;
 	vtkImageChangeInformationPtr mRedirecter;
 	bool mTimeout;
 	QTimer* mTimeoutTimer;

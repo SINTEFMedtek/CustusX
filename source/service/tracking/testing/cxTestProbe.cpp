@@ -16,20 +16,20 @@ TestProbe::TestProbe()
 void TestProbe::setUp()
 {
 	// this stuff will be performed just before all tests in this class
-	ssc::MessageManager::initialize();
+	cx::MessageManager::initialize();
 	this->createTestProbe();
 }
 
 void TestProbe::tearDown()
 {
 	// this stuff will be performed just after all tests in this class
-	ssc::MessageManager::shutdown();
+	cx::MessageManager::shutdown();
 }
 
 //Disabled for now. Test will output a warning. Use the test below with the Mock XmlParser instead
 void TestProbe::testConstructorWithDefaultXmlParser()
 {
-	mProbe = cx::Probe::New(mProbeName, mScannerName);
+	mProbe = cx::cxProbe::New(mProbeName, mScannerName);
 
 	CPPUNIT_ASSERT(mProbe);
 	CPPUNIT_ASSERT_MESSAGE("Probe's config id is not empty. It should be since the test probe setup is not present in the config id list",
@@ -59,7 +59,7 @@ void TestProbe::testDigitalVideoSetting()
 void TestProbe::testRTSource()
 {
 	CPPUNIT_ASSERT(!mProbe->getRTSource());
-	ssc::TestVideoSourcePtr videoSource(new ssc::TestVideoSource("TestVideoSourceUid", "TestVideoSource" , 80, 40));
+	cx::TestVideoSourcePtr videoSource(new cx::TestVideoSource("TestVideoSourceUid", "TestVideoSource" , 80, 40));
 	mProbe->setRTSource(videoSource);
 	CPPUNIT_ASSERT(mProbe->getRTSource());
 	CPPUNIT_ASSERT(mProbe->getRTSource()->getUid().compare("TestVideoSourceUid") == 0);
@@ -70,7 +70,7 @@ void TestProbe::testDefaultProbeSector()
 {
 	CPPUNIT_ASSERT(mProbe->getSector());
 	CPPUNIT_ASSERT(mProbe->getProbeData().getUid().compare(mDefaultProbeDataUid) == 0);
-	CPPUNIT_ASSERT(ssc::similar(mProbe->getProbeData().getTemporalCalibration(), mDefaultTemporalCalibration));
+	CPPUNIT_ASSERT(cx::similar(mProbe->getProbeData().getTemporalCalibration(), mDefaultTemporalCalibration));
 }
 
 void TestProbe::testCustomProbeSector()
@@ -78,7 +78,7 @@ void TestProbe::testCustomProbeSector()
 	mProbe->setProbeSector(this->createProbeData());
 	CPPUNIT_ASSERT(mProbe->getSector(mProbeDataUid));
 	CPPUNIT_ASSERT(mProbe->getProbeData(mProbeDataUid).getUid().compare(mProbeDataUid) == 0);
-	CPPUNIT_ASSERT(ssc::similar(mProbe->getProbeData(mProbeDataUid).getTemporalCalibration(), mTemporalCalibration));
+	CPPUNIT_ASSERT(cx::similar(mProbe->getProbeData(mProbeDataUid).getTemporalCalibration(), mTemporalCalibration));
 
 }
 
@@ -89,7 +89,7 @@ void TestProbe::testSetActiveStreamToCustomProbeSector()
 
 	mProbe->setActiveStream(mProbeDataUid);
 	CPPUNIT_ASSERT(mProbe->getProbeData().getUid().compare(mProbeDataUid) == 0);
-	CPPUNIT_ASSERT(ssc::similar(mProbe->getProbeData().getTemporalCalibration(), mTemporalCalibration));
+	CPPUNIT_ASSERT(cx::similar(mProbe->getProbeData().getTemporalCalibration(), mTemporalCalibration));
 
 	mProbe->setActiveStream(mDefaultProbeDataUid);
 	this->testDefaultProbeSector();
@@ -124,22 +124,22 @@ void TestProbe::createTestProbe()
 	ProbeXmlConfigParserPtr mXml;
 	mXml.reset(new ProbeXmlConfigParserMock(xmlFileName));
 	mDefaultRtSourceName = mXml->getRtSourceList(mProbeName, mScannerName)[0];
-	mProbe = cx::Probe::New(mProbeName, mScannerName, mXml);
+	mProbe = cx::cxProbe::New(mProbeName, mScannerName, mXml);
 }
 
 void TestProbe::createParameters()
 {
 	mProbeName = "TestProbe";
 	mScannerName = "TestScanner";
-	ssc::ProbeData probeData;
-	mDefaultProbeDataUid = probeData.getUid(); //Uid set to "default" in ssc::ProbeData()
+	cx::ProbeData probeData;
+	mDefaultProbeDataUid = probeData.getUid(); //Uid set to "default" in ProbeData()
 	mDefaultTemporalCalibration = probeData.getTemporalCalibration();
 	mProbeDataUid = "TestProbeData";
 }
 
-ssc::ProbeData TestProbe::createProbeData()
+cx::ProbeData TestProbe::createProbeData()
 {
-	ssc::ProbeData probeData = mProbe->getProbeData();
+	cx::ProbeData probeData = mProbe->getProbeData();
 	probeData.setUid(mProbeDataUid);
 	mTemporalCalibration = 1000.5;
 	probeData.setTemporalCalibration(mTemporalCalibration);

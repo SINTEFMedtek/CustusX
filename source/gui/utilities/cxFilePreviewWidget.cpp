@@ -80,13 +80,13 @@ void FilePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
 //
 //  if(!mCurrentFile->exists())
 //  {
-////    ssc::messageManager()->sendDebug("File "+absoluteFilePath+" does not exist.");
+////    messageManager()->sendDebug("File "+absoluteFilePath+" does not exist.");
 //    return;
 //  }
 
 //  if(!mCurrentFile->open(QIODevice::ReadOnly))
 //  {
-//    ssc::messageManager()->sendWarning("Could not open file "+absoluteFilePath);
+//    messageManager()->sendWarning("Could not open file "+absoluteFilePath);
 //  }
   if(!this->internalOpenNewFile(absoluteFilePath))
   	return;
@@ -112,7 +112,7 @@ void FilePreviewWidget::saveSlot()
 
   if(!mCurrentFile->open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
-    ssc::messageManager()->sendWarning("Could not open file "+mCurrentFile->fileName());
+    messageManager()->sendWarning("Could not open file "+mCurrentFile->fileName());
     return;
   }
 

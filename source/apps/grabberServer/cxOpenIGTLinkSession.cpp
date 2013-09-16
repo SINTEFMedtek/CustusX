@@ -24,7 +24,7 @@ void OpenIGTLinkSession::run()
   connect(mSocket, SIGNAL(disconnected()), this, SLOT(quit()), Qt::DirectConnection); // quit thread when disconnected
 
   QString clientName = mSocket->peerAddress().toString();
-  ssc::messageManager()->sendInfo("Connected to "+qstring_cast(clientName)+". Session started.");
+  messageManager()->sendInfo("Connected to "+qstring_cast(clientName)+". Session started.");
 
   OpenIGTLinkSender* sender = new OpenIGTLinkSender(mSocket);
   connect(this, SIGNAL(frame(Frame&)), sender, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
@@ -32,7 +32,7 @@ void OpenIGTLinkSession::run()
 
   this->exec();
 
-  ssc::messageManager()->sendInfo("Disconnected from "+qstring_cast(clientName)+". Session ended.");
+  messageManager()->sendInfo("Disconnected from "+qstring_cast(clientName)+". Session ended.");
   delete sender;
   delete mSocket;
 }
@@ -151,7 +151,7 @@ IGTLinkImageMessage::Pointer OpenIGTLinkSender::getLastImageMessageFromQueue()
 
 void OpenIGTLinkSender::errorSlot(QAbstractSocket::SocketError socketError)
 {
-  ssc::messageManager()->sendError("Socket error [Code="+qstring_cast(socketError)+"]\n"+mSocket->errorString());
+  messageManager()->sendError("Socket error [Code="+qstring_cast(socketError)+"]\n"+mSocket->errorString());
 }
 
 //------------------------------------------------------------------------------

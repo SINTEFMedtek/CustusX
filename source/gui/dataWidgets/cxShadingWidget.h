@@ -45,7 +45,7 @@ protected:
   QVBoxLayout* mLayout;
   QCheckBox* mShadingCheckBox;
 
-  //ssc::ImagePtr mCurrentImage;
+  //ImagePtr mCurrentImage;
   bool mInitialized;///< Is TransferFunctionWidget initialized
   ActiveImageProxyPtr mActiveImageProxy;
 };

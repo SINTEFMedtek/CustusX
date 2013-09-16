@@ -20,13 +20,13 @@
 namespace cx
 {
 
-Vector3DWidget::Vector3DWidget(QWidget* parent, ssc::Vector3DDataAdapterPtr data) :
+Vector3DWidget::Vector3DWidget(QWidget* parent, Vector3DDataAdapterPtr data) :
 				QWidget(parent), mData(data)
 {
 	this->setToolTip(data->getHelp());
 }
 
-Vector3DWidget* Vector3DWidget::createSmallHorizontal(QWidget* parent, ssc::Vector3DDataAdapterPtr data)
+Vector3DWidget* Vector3DWidget::createSmallHorizontal(QWidget* parent, Vector3DDataAdapterPtr data)
 {
 	Vector3DWidget* retval = new Vector3DWidget(parent, data);
 
@@ -40,7 +40,7 @@ Vector3DWidget* Vector3DWidget::createSmallHorizontal(QWidget* parent, ssc::Vect
 	return retval;
 }
 
-Vector3DWidget* Vector3DWidget::createVerticalWithSliders(QWidget* parent, ssc::Vector3DDataAdapterPtr data)
+Vector3DWidget* Vector3DWidget::createVerticalWithSliders(QWidget* parent, Vector3DDataAdapterPtr data)
 {
 	Vector3DWidget* retval = new Vector3DWidget(parent, data);
 
@@ -64,7 +64,7 @@ void Vector3DWidget::showDim(int dim, bool visible)
 void Vector3DWidget::addSliderControlsForIndex(QString name, QString help, int index, QBoxLayout* layout)
 {
 	Vector3DComponentDataAdapterPtr component(new Vector3DComponentDataAdapter(mData, index, name, help));
-	mWidgets[index] = new ssc::SpinBoxInfiniteSliderGroupWidget(this, component);
+	mWidgets[index] = new SpinBoxInfiniteSliderGroupWidget(this, component);
 	layout->addWidget(mWidgets[index]);
 
 	mDoubleAdapter[index] = component;
@@ -77,7 +77,7 @@ void Vector3DWidget::addSmallControlsForIndex(QString name, QString help, int in
 {
 	Vector3DComponentDataAdapterPtr component(new Vector3DComponentDataAdapter(mData, index, name, help));
 
-	ssc::ScalarInteractionWidget* widget = new ssc::ScalarInteractionWidget(this, component);
+	ScalarInteractionWidget* widget = new ScalarInteractionWidget(this, component);
 	widget->enableSpinBox();
 	widget->build();
 	mWidgets[index] = widget;

@@ -31,7 +31,7 @@
 #include "sscCoordinateSystemHelpers.h"
 #include "sscProbe.h"
 
-namespace ssc
+namespace cx
 {
 typedef std::map<double, Transform3D> TimedTransformMap;
 typedef boost::shared_ptr<TimedTransformMap> TimedTransformMapPtr;
@@ -130,7 +130,7 @@ public:
 
 	virtual bool isCalibrated() const = 0; ///< a tool may not be calibrated, then no tracking i allowed
 	virtual Transform3D getCalibration_sMt() const = 0; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
-	virtual void setCalibration_sMt(ssc::Transform3D calibration) { Q_UNUSED(calibration); } ///< requests to use the calibration and replaces the tools calibration file
+	virtual void setCalibration_sMt(Transform3D calibration) { Q_UNUSED(calibration); } ///< requests to use the calibration and replaces the tools calibration file
 
 	virtual ProbePtr getProbe() const { return ProbePtr(); } ///< additional information if the tool represents an US Probe. Extends getProbeSector()
 	virtual ProbeData getProbeSector() const = 0; ///< additional information if the tool represents an US Probe. Obsolete - use getProbe()
@@ -144,12 +144,12 @@ public:
 
 	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime) { Q_UNUSED(startTime); Q_UNUSED(stopTime); return TimedTransformMap(); } ///< Get a tools transforms from within a given session
 
-	virtual CoordinateSystem getSensorCoordinateSystem() { return CoordinateSystem(ssc::csSENSOR, this->getUid()); }
-	virtual CoordinateSystem getToolCoordinateSystem() { return CoordinateSystem(ssc::csTOOL, this->getUid()); }
-	virtual CoordinateSystem getToolOffsetCoordinateSystem() { return CoordinateSystem(ssc::csTOOL_OFFSET, this->getUid()); }
+	virtual CoordinateSystem getSensorCoordinateSystem() { return CoordinateSystem(csSENSOR, this->getUid()); }
+	virtual CoordinateSystem getToolCoordinateSystem() { return CoordinateSystem(csTOOL, this->getUid()); }
+	virtual CoordinateSystem getToolOffsetCoordinateSystem() { return CoordinateSystem(csTOOL_OFFSET, this->getUid()); }
 
 #ifdef WIN32
-	typedef ssc::Transform3D Transform3D;
+	typedef Transform3D Transform3D;
 #endif
 
 signals:
@@ -165,6 +165,6 @@ protected:
 	QString mName;
 };
 typedef boost::shared_ptr<Tool> ToolPtr;
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCTOOL_H_*/

@@ -47,13 +47,13 @@ void FilterTimedAlgorithm::postProcessingSlot()
 
 	if (success)
 	{
-		ssc::messageManager()->sendSuccess(QString("Done \"%1\": [%2s]")
+		messageManager()->sendSuccess(QString("Done \"%1\": [%2s]")
 		                                   .arg(mFilter->getName())
 		                                   .arg(this->getSecondsPassedAsString()));
 	}
 	else
 	{
-		ssc::messageManager()->sendWarning(QString("Failed \"%1\": [%2s]")
+		messageManager()->sendWarning(QString("Failed \"%1\": [%2s]")
 		                                   .arg(mFilter->getName())
 		                                   .arg(this->getSecondsPassedAsString()));
 	}

@@ -29,9 +29,9 @@
 #include "sscVolumetricRep.h"
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
-/**Helper class for rendering a time-consuming ssc::Rep
+/**Helper class for rendering a time-consuming Rep
  * in another thread. Construct and start the thread,
  * connect to finished() and use the result in the finished()
  * slot.
@@ -40,11 +40,11 @@ namespace ssc
 class VolumetricRepThreadedRenderer : public QThread
 {
 public:
-	VolumetricRepThreadedRenderer(ssc::VolumetricRepPtr rep):
+	VolumetricRepThreadedRenderer(VolumetricRepPtr rep):
 		QThread(), mRep(rep) {}
 	/**render the rep in a secondary thread.
 	 *
-	 * -using ssc::View crashes (Qt in another thread),
+	 * -using View crashes (Qt in another thread),
 	 * -pure vtk gives a popup window, but seems to work ok.
 	 * -The sleep way gives the rest of the gui a chance to render before rendering
 	 *  the volumetricrep, thus prettying up things a bit. Still the main thread hangs
@@ -63,7 +63,7 @@ public:
 		renderer->AddVolume(mRep->getVtkVolume());
 		window->Render();
 
-	//	ssc::View* view = new ssc::View();
+	//	View* view = new View();
 	//	view->addRep(mRep);
 	//	view->GetRenderWindow()->GetInteractor()->Disable();
 	//	view->GetRenderWindow()->Render();
@@ -97,13 +97,11 @@ ProgressiveLODVolumetricRep::ProgressiveLODVolumetricRep() :
 
 void ProgressiveLODVolumetricRep::resetResampleList()
 {
-	double r = VolumetricRep::computeResampleFactor(mMaxVoxels, mImage);
-
-	mResampleFactors.clear();
-	mResampleFactors.push_back(r);
-	mResampleFactors.push_back(r/2.0);
-	mResampleFactors.push_back(r/4.0);
-	mResampleFactors.push_back(r/8.0);
+	mResampleMaxVoxels.clear();
+	mResampleMaxVoxels.push_back(mMaxVoxels);
+	mResampleMaxVoxels.push_back(mMaxVoxels/2);
+	mResampleMaxVoxels.push_back(mMaxVoxels/4);
+	mResampleMaxVoxels.push_back(mMaxVoxels/8);
 }
 
 
@@ -172,14 +170,14 @@ void ProgressiveLODVolumetricRep::setImage(ImagePtr image)
  */
 VolumetricRepPtr ProgressiveLODVolumetricRep::getNextResampleLevel()
 {
-	if (mResampleFactors.empty())
+	if (mResampleMaxVoxels.empty())
 		return VolumetricRepPtr();
-	double factor = mResampleFactors.back();
-	QString text = "_" + qstring_cast(factor);
-	mResampleFactors.pop_back();
+	long maxVoxels = mResampleMaxVoxels.back();
+	QString text = "_" + qstring_cast(maxVoxels);
+	mResampleMaxVoxels.pop_back();
 
-	VolumetricRepPtr next = ssc::VolumetricRep::New(getUid()+text);
-	next->setResampleFactor(factor);
+	VolumetricRepPtr next = VolumetricRep::New(getUid()+text);
+	next->setMaxVolumeSize(maxVoxels);
 	next->setImage(mImage);
 	return next;
 }
@@ -237,4 +235,4 @@ void ProgressiveLODVolumetricRep::volumetricThreadFinishedSlot()
 }
 
 
-} // namespace ssc
+} // namespace cx

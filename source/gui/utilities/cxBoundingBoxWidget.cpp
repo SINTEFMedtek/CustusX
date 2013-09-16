@@ -32,7 +32,7 @@ BoundingBoxWidget::BoundingBoxWidget(QWidget* parent) :
 	{
 		mRange[i] = new SliderRangeGroupWidget(this);
 		mRange[i]->setName(caption[i]);
-		mRange[i]->setRange(ssc::DoubleRange(-2000, 2000, 1));
+		mRange[i]->setRange(DoubleRange(-2000, 2000, 1));
 		mRange[i]->setDecimals(0);
 		connect(mRange[i], SIGNAL(valueChanged(double,double)), this, SIGNAL(changed()));
 		layout->addWidget(mRange[i]);
@@ -44,23 +44,23 @@ void BoundingBoxWidget::showDim(int dim, bool visible)
 	mRange[dim]->setVisible(visible);
 }
 
-void BoundingBoxWidget::setValue(const ssc::DoubleBoundingBox3D& value, const ssc::DoubleBoundingBox3D& range)
+void BoundingBoxWidget::setValue(const DoubleBoundingBox3D& value, const DoubleBoundingBox3D& range)
 {
 	for (int i=0; i<3; ++i)
 	{
 		mRange[i]->blockSignals(true);
-		mRange[i]->setRange(ssc::DoubleRange(range.begin()[2*i], range.begin()[2*i+1], 1));
+		mRange[i]->setRange(DoubleRange(range.begin()[2*i], range.begin()[2*i+1], 1));
 		mRange[i]->setValue(std::make_pair(  value.begin()[2*i], value.begin()[2*i+1]));
 		mRange[i]->blockSignals(false);
 	}
 }
 
-ssc::DoubleBoundingBox3D BoundingBoxWidget::getValue() const
+DoubleBoundingBox3D BoundingBoxWidget::getValue() const
 {
 	std::pair<double, double> x = mRange[0]->getValue();
 	std::pair<double, double> y = mRange[1]->getValue();
 	std::pair<double, double> z = mRange[2]->getValue();
-	ssc::DoubleBoundingBox3D box(x.first, x.second, y.first, y.second, z.first, z.second);
+	DoubleBoundingBox3D box(x.first, x.second, y.first, y.second, z.first, z.second);
 	return box;
 }
 

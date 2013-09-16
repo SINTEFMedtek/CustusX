@@ -59,22 +59,22 @@ public:
 	 */
 	struct InternalStructure
 	{
-		ssc::Transform3D getCalibrationAsSSC() const;
-		void setCalibration(const ssc::Transform3D& cal);
+		Transform3D getCalibrationAsSSC() const;
+		void setCalibration(const Transform3D& cal);
 		void saveCalibrationToFile();
 
 		bool mIsReference;
 		bool mIsPointer;
 		bool mIsProbe;
-//    ssc::Tool::Type   mType;                  ///< the tools type
+//    Tool::Type   mType;                  ///< the tools type
 		QString mName; ///< the tools name
 		QString mUid; ///< the tools unique id
-		std::vector<ssc::CLINICAL_APPLICATION> mClinicalApplications; ///< the tools clinical application applications
-		ssc::TRACKING_SYSTEM mTrackerType; ///< what product the tool belongs to
+		std::vector<CLINICAL_APPLICATION> mClinicalApplications; ///< the tools clinical application applications
+		TRACKING_SYSTEM mTrackerType; ///< what product the tool belongs to
 		QString mSROMFilename; ///< path to the tools SROM file
 		unsigned int mPortNumber; ///< the port number the tool is connected to
 		unsigned int mChannelNumber; ///< the channel the tool is connected to
-		std::map<int, ssc::Vector3D> mReferencePoints; ///< optional point on the frame, specifying a known reference point, 0,0,0 is default, in sensor space
+		std::map<int, Vector3D> mReferencePoints; ///< optional point on the frame, specifying a known reference point, 0,0,0 is default, in sensor space
 		bool mWireless; ///< whether or not the tool is wireless
 		bool m5DOF; ///< whether or not the tool have 5 DOF
 		igstk::Transform mCalibration; ///< transform read from mCalibrationFilename
@@ -87,9 +87,9 @@ public:
 		QString mInstrumentScannerId; ///< The id of the ultrasound scanner if the instrument is a probe
 		InternalStructure() :
 						mIsReference(false), mIsPointer(false), mIsProbe(false),
-						//mType(ssc::Tool::TOOL_NONE),
+						//mType(Tool::TOOL_NONE),
 						mName(""), mUid(""),
-						mTrackerType(ssc::tsNONE), mSROMFilename(""),
+						mTrackerType(tsNONE), mSROMFilename(""),
 						mPortNumber(UINT_MAX), mChannelNumber(UINT_MAX),
 						mReferencePoints(), mWireless(true),
 						m5DOF(true), mCalibrationFilename(""),
@@ -108,8 +108,8 @@ public:
 	QString getUid();
 
 	igstk::TrackerTool::Pointer getPointer() const; ///< return a pointer to the internal tools base object
-	ssc::TRACKING_SYSTEM getTrackerType();
-//  ssc::Tool::Type getType() const;
+	TRACKING_SYSTEM getTrackerType();
+//  Tool::Type getType() const;
 	bool isReference() const
 	{
 		return mInternalStructure.mIsReference;
@@ -123,11 +123,11 @@ public:
 	void setReference(IgstkToolPtr);
 	void setTracker(TrackerPtr tracker);
 	void setCalibrationTransform(igstk::Transform calibration);
-	void updateCalibration(const ssc::Transform3D& sMt);
+	void updateCalibration(const Transform3D& sMt);
 
 	void printInternalStructure();
 
-	typedef ssc::Transform3D Transform3D;
+	typedef Transform3D Transform3D;
 
 signals:
 	void attachedToTracker(bool);

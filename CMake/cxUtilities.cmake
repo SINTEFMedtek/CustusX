@@ -141,6 +141,8 @@ MACRO(cx_get_git_build_description RESULT)
 		    OUTPUT_VARIABLE ${RESULT}
 		    )
     ENDIF(WIN32)
+	# remove first character - should always be a "v" as first in f.ex. "v3.5.3"
+	string(SUBSTRING ${${RESULT}} 1 -1 ${RESULT})
 ENDMACRO()
 
 ###############################################################################
@@ -163,17 +165,18 @@ ENDMACRO()
 #	${PROJECT_NAME}_VERSION_POSTFIX
 #	${PROJECT_NAME}_VERSION_STRING
 #
-# The same variables are added to the code using add_definitions -D
 ###############################################################################
 MACRO(cx_define_version major minor patch type)
 	set(${PROJECT_NAME}_VERSION_MAJOR  ${major})
 	set(${PROJECT_NAME}_VERSION_MINOR  ${minor})
 	set(${PROJECT_NAME}_VERSION_PATCH  ${patch})
 
+	cx_get_git_build_description(GIT_DESCRIBE)
+
 	if(${type} STREQUAL ALPHA)
-		cx_get_git_build_description(GIT_DESCRIBE)
 		cx_get_today(TODAY_DATE)
-		set(POSTFIX ".alpha.git_${GIT_DESCRIBE}.${TODAY_DATE}")
+		set(GIT_DESCRIBE "${GIT_DESCRIBE}.${TODAY_DATE}")
+		set(POSTFIX ".alpha")
 	elseif(${type} STREQUAL BETA)
 		set(POSTFIX ".beta")
 	elseif(${type} STREQUAL RELEASE)
@@ -183,11 +186,25 @@ MACRO(cx_define_version major minor patch type)
 	endif()
 	
 	#on windows this string contains newlines and whitespaces that needs to be removed
-	STRING(REGEX REPLACE "\r|\n" "" POSTFIX_TEMP ${POSTFIX})
-	STRING(REGEX REPLACE " " "" POSTFIX_CLEAN ${POSTFIX_TEMP})
+	STRING(REGEX REPLACE "\r|\n" "" GIT_DESCRIBE ${GIT_DESCRIBE})
+	STRING(REGEX REPLACE " " "" GIT_DESCRIBE ${GIT_DESCRIBE})
 
-	set(${PROJECT_NAME}_VERSION_POSTFIX ${POSTFIX_CLEAN})
-	set(${PROJECT_NAME}_VERSION_STRING ${major}.${minor}.${patch}${${PROJECT_NAME}_VERSION_POSTFIX})
+	set(${PROJECT_NAME}_VERSION_POSTFIX ${POSTFIX})
+	set(GENERATED_VERSION_STRING ${major}.${minor}.${patch}${POSTFIX})
+#	string(SUBSTRING ${GIT_DESCRIBE} STREQUAL ${GENERATED_VERSION_STRING})
+	string(REGEX MATCH ${GENERATED_VERSION_STRING} MATCHING_STRING ${GIT_DESCRIBE})
+#message(STATUS "MATCHING_STRING " ${MATCHING_STRING})
+	if("${MATCHING_STRING}" STREQUAL "")
+		message("Warning:
+		Version string extracted from git: ${GIT_DESCRIBE}
+		Version string generated: ${GENERATED_VERSION_STRING}
+		The generated string should be contained in the git string.
+		Reverting to generated string, setting dirty tag.")
+		set(${PROJECT_NAME}_VERSION_STRING ${GENERATED_VERSION_STRING}.dirty)
+	else()
+		set(${PROJECT_NAME}_VERSION_STRING ${GIT_DESCRIBE})
+	endif()
+#	set(${PROJECT_NAME}_VERSION_STRING ${major}.${minor}.${patch}${${PROJECT_NAME}_VERSION_POSTFIX})
 
 # no good - leads to full rebuild for every commit. Moved to resource/settings/cxConfig.h
 #	add_definitions(
@@ -198,6 +215,34 @@ MACRO(cx_define_version major minor patch type)
 #	)
 ENDMACRO()
 
+###############################################################################
+#
+###############################################################################
+MACRO(cx_read_version)
+	file(READ ${PROJECT_SOURCE_DIR}/version.ini CX_VERSION_FILE_DATA)
+	#message(STATUS "CX_VERSION_FILE_DATA: " ${CX_VERSION_FILE_DATA})
+	#foreach(VAR ${CX_VERSION_FILE_DATA})
+	#    message(STATUS "CX_VERSION_FILE_DATA line: " ${VAR})
+	#endforeach()
+
+	string(REGEX REPLACE ".*major[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_MAJOR ${CX_VERSION_FILE_DATA})
+	#message(STATUS "VERSION_MAJOR: " ${VERSION_MAJOR})
+	string(REGEX REPLACE ".*minor[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_MINOR ${CX_VERSION_FILE_DATA})
+	#message(STATUS "VERSION_MINOR: " ${VERSION_MINOR})
+	string(REGEX REPLACE ".*patch[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_PATCH ${CX_VERSION_FILE_DATA})
+	#message(STATUS "VERSION_PATCH: " ${VERSION_PATCH})
+	string(REGEX REPLACE ".*type[ ]*=[ ]*([^$]*).*" "\\1" VERSION_TYPE ${CX_VERSION_FILE_DATA})
+	STRING(REGEX REPLACE "(\r?\n)+$" "" VERSION_TYPE "${VERSION_TYPE}")
+	#message(STATUS "VERSION_TYPE: " ${VERSION_TYPE})
+
+#set(CX_VERSION_TYPE ALPHA) # use when releasing an alpha
+#set(CX_VERSION_TYPE BETA) # use when releasing a beta
+#set(CX_VERSION_TYPE RELEASE) # use when releasing a normal release
+#set(CX_VERSION_TYPE ".rc1") # set release candidate during release procedure
+	cx_define_version(${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_PATCH} ${VERSION_TYPE})
+	message(STATUS "Version: ${CustusX3_VERSION_STRING}")
+
+ENDMACRO()
 
 
 ###############################################################################

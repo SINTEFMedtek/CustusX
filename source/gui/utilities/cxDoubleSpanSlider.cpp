@@ -37,7 +37,7 @@ SliderRangeGroupWidget::SliderRangeGroupWidget(QWidget* parent) : QWidget(parent
   //mLabel->setText(mData->getValueName());
   topLayout->addWidget(mLabel);
 
-//  mLowerEdit = new ssc::DoubleLineEdit(this);
+//  mLowerEdit = new DoubleLineEdit(this);
 //  topLayout->addWidget(mLowerEdit);
 //  connect(mLowerEdit, SIGNAL(editingFinished()), this, SLOT(textEditedSlot()));
 
@@ -56,7 +56,7 @@ SliderRangeGroupWidget::SliderRangeGroupWidget(QWidget* parent) : QWidget(parent
   // connect to slider
   connect(mSpanSlider, SIGNAL(doubleSpanChanged(double, double)), this, SLOT(doubleSpanChangedSlot(double, double)));
 
-//  mUpperEdit = new ssc::DoubleLineEdit(this);
+//  mUpperEdit = new DoubleLineEdit(this);
 //  topLayout->addWidget(mUpperEdit);
 //  connect(mUpperEdit, SIGNAL(editingFinished()), this, SLOT(textEditedSlot()));
 
@@ -64,7 +64,7 @@ SliderRangeGroupWidget::SliderRangeGroupWidget(QWidget* parent) : QWidget(parent
   topLayout->addWidget(mUpperEdit);
   connect(mUpperEdit, SIGNAL(valueChanged(double)), this, SLOT(textEditedSlot()));
 
-//  mSlider = new ssc::DoubleSlider(this);
+//  mSlider = new DoubleSlider(this);
 //  mSlider->setOrientation(Qt::Horizontal);
 //  //mSlider->setDoubleRange(mData->getValueRange());
 //  topLayout->addWidget(mSlider);
@@ -74,7 +74,7 @@ SliderRangeGroupWidget::SliderRangeGroupWidget(QWidget* parent) : QWidget(parent
 //  dataChanged();
 }
 
-void SliderRangeGroupWidget::setRange(const ssc::DoubleRange& range)
+void SliderRangeGroupWidget::setRange(const DoubleRange& range)
 {
 //  std::cout << "SliderRangeGroupWidget::setRange " << mLabel->text() << " " << range.min() <<  "," << range.max() << std::endl;
   mSpanSlider->setDoubleRange(range);

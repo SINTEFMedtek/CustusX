@@ -30,7 +30,7 @@ ImageReceiverThread::ImageReceiverThread(QObject* parent) :
 	mLastTimeStamps.reserve(20);
 }
 
-void ImageReceiverThread::addImageToQueue(ssc::ImagePtr imgMsg)
+void ImageReceiverThread::addImageToQueue(ImagePtr imgMsg)
 {
 	if(this->imageComesFromActiveVideoSource(imgMsg))
 		this->reportFPS();
@@ -49,7 +49,7 @@ void ImageReceiverThread::addImageToQueue(ssc::ImagePtr imgMsg)
 	emit imageReceived(); // emit signal outside lock, catch possibly in another thread
 }
 
-void ImageReceiverThread::addSonixStatusToQueue(ssc::ProbeDataPtr msg)
+void ImageReceiverThread::addSonixStatusToQueue(ProbeDataPtr msg)
 {
 	QMutexLocker sentry(&mSonixStatusMutex);
 	mMutexedSonixStatusMessageQueue.push_back(msg);
@@ -57,12 +57,12 @@ void ImageReceiverThread::addSonixStatusToQueue(ssc::ProbeDataPtr msg)
 	emit sonixStatusReceived(); // emit signal outside lock, catch possibly in another thread
 }
 
-ssc::ImagePtr ImageReceiverThread::getLastImageMessage()
+ImagePtr ImageReceiverThread::getLastImageMessage()
 {
 	QMutexLocker sentry(&mImageMutex);
 	if (mMutexedImageMessageQueue.empty())
-		return ssc::ImagePtr();
-	ssc::ImagePtr retval = mMutexedImageMessageQueue.front();
+		return ImagePtr();
+	ImagePtr retval = mMutexedImageMessageQueue.front();
 	mMutexedImageMessageQueue.pop_front();
 
 	// this happens when the main thread is busy. This is bad, but happens a lot during operation.
@@ -73,22 +73,22 @@ ssc::ImagePtr ImageReceiverThread::getLastImageMessage()
 	return retval;
 }
 
-ssc::ProbeDataPtr ImageReceiverThread::getLastSonixStatusMessage()
+ProbeDataPtr ImageReceiverThread::getLastSonixStatusMessage()
 {
 	QMutexLocker sentry(&mSonixStatusMutex);
 	if (mMutexedSonixStatusMessageQueue.empty())
-		return ssc::ProbeDataPtr();
-	ssc::ProbeDataPtr retval = mMutexedSonixStatusMessageQueue.front();
+		return ProbeDataPtr();
+	ProbeDataPtr retval = mMutexedSonixStatusMessageQueue.front();
 	mMutexedSonixStatusMessageQueue.pop_front();
 	return retval;
 }
 
-void ImageReceiverThread::calibrateTimeStamp(ssc::ImagePtr imgMsg)
+void ImageReceiverThread::calibrateTimeStamp(ImagePtr imgMsg)
 {
 	QDateTime timestamp_dt = imgMsg->getAcquisitionTime();
 	double timestamp_ms = timestamp_dt.toMSecsSinceEpoch();
 
-	if (ssc::similar(mLastReferenceTimestampDiff, 0.0, 0.000001))
+	if (similar(mLastReferenceTimestampDiff, 0.0, 0.000001))
 		mLastReferenceTimestampDiff = timestamp_dt.msecsTo(QDateTime::currentDateTime());
 
 	// Start collecting time stamps if 20 sec since last calibration time
@@ -132,12 +132,12 @@ void ImageReceiverThread::reportFPS()
 	}
 }
 
-bool ImageReceiverThread::imageComesFromActiveVideoSource(ssc::ImagePtr imgMsg)
+bool ImageReceiverThread::imageComesFromActiveVideoSource(ImagePtr imgMsg)
 {
 	return imgMsg->getUid().compare(videoService()->getActiveVideoSource()->getUid()) == 0;
 }
 
-bool ImageReceiverThread::imageComesFromSonix(ssc::ImagePtr imgMsg)
+bool ImageReceiverThread::imageComesFromSonix(ImagePtr imgMsg)
 {
 	return imgMsg->getUid().contains("Sonix", Qt::CaseInsensitive);
 }

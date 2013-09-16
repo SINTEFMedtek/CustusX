@@ -72,12 +72,12 @@ protected slots:
   virtual void stoppedSlot(bool) = 0;
 
 protected:
-  virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session) = 0; ///< gets the tracking data from all relevant tool for the given session
-  void setTool(ssc::ToolPtr tool);
-  ssc::ToolPtr getTool();
+  virtual TimedTransformMap getRecording(RecordSessionPtr session) = 0; ///< gets the tracking data from all relevant tool for the given session
+  void setTool(ToolPtr tool);
+  ToolPtr getTool();
 
 private:
-  ssc::ToolPtr mTool;
+  ToolPtr mTool;
 };
 
 /**

@@ -50,7 +50,7 @@
  after including AssertMacros.h
  */
 
-namespace ssc
+namespace cx
 {
 
 ViewContainerBase::ViewContainerBase(QWidget *parent) : mMouseEventTarget(NULL), mMTimeHash(0), mWidget(parent)
@@ -178,13 +178,13 @@ void ViewItem::setRenderer(vtkRendererPtr renderer)
 
 QRect ViewItem::screenGeometry() const
 {
-	return QRect(ssc::View::widget()->mapToGlobal(mGeometry.topLeft()), size());
+	return QRect(View::widget()->mapToGlobal(mGeometry.topLeft()), size());
 }
 
 void ViewItem::setGeometry(const QRect &r)
 {
 	mGeometry = r;
-	QSize size = ssc::View::widget()->size();
+	QSize size = View::widget()->size();
 	double xMin = r.left()/(double)size.width();
 	double xMax = (r.right() + 1)/(double)size.width();
 	double yMin = (size.height() - r.bottom() - 1) / (double)size.height();
@@ -323,4 +323,4 @@ void ViewContainer::resizeEvent( QResizeEvent *event)
 	getGridLayout()->update();
 }
 
-} // namespace ssc
+} // namespace cx

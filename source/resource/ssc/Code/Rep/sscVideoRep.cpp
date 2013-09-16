@@ -38,34 +38,34 @@
 #include "sscVideoSource.h"
 #include "sscViewportListener.h"
 
-namespace ssc
+namespace cx
 {
 
 VideoFixedPlaneRep::VideoFixedPlaneRep(const QString& uid, const QString& name) :
-	ssc::RepImpl(uid, name)
+	RepImpl(uid, name)
 {
 	mRTGraphics.reset(new VideoSourceGraphics());
 	connect(mRTGraphics.get(), SIGNAL(newData()), this, SLOT(newDataSlot()));
 	mRTGraphics->setShowInToolSpace(false);
 	mRTGraphics->setClipToSector(false);
 
-	mInfoText.reset(new ssc::TextDisplay("", Vector3D(1.0, 0.8, 0.0), 16));
+	mInfoText.reset(new TextDisplay("", Vector3D(1.0, 0.8, 0.0), 16));
 	mInfoText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
 	mInfoText->setCentered();
 	mInfoText->setPosition(0.5, 0.05);
 
-	mStatusText.reset(new ssc::TextDisplay("", Vector3D(1.0, 0.8, 0.0), 20));
+	mStatusText.reset(new TextDisplay("", Vector3D(1.0, 0.8, 0.0), 20));
 	mStatusText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
 	mStatusText->setCentered();
 	mStatusText->setPosition(0.5, 0.5);
 	mStatusText->updateText("Not Connected");
 
 	mProbeOrigin.reset(new GraphicalPolyData3D());
-	mProbeOrigin->setColor(ssc::Vector3D(1, 165.0/255.0, 0)); // orange
+	mProbeOrigin->setColor(Vector3D(1, 165.0/255.0, 0)); // orange
 	mProbeSector.reset(new GraphicalPolyData3D());
-	mProbeSector->setColor(ssc::Vector3D(1, 165.0/255.0, 0)); // orange
+	mProbeSector->setColor(Vector3D(1, 165.0/255.0, 0)); // orange
 	mProbeClipRect.reset(new GraphicalPolyData3D());
-	mProbeClipRect->setColor(ssc::Vector3D(1, 0.9, 0)); // yellow
+	mProbeClipRect->setColor(Vector3D(1, 0.9, 0)); // yellow
 
 	mViewportListener.reset(new ViewportListener());
 	mViewportListener->setCallback(boost::bind(&VideoFixedPlaneRep::setCamera, this));
@@ -88,7 +88,7 @@ bool VideoFixedPlaneRep::getShowSector() const
 
 void VideoFixedPlaneRep::updateSector()
 {
-	bool show = mTool && this->getShowSector() && mTool->getProbeSector().getType()!=ssc::ProbeData::tNONE;
+	bool show = mTool && this->getShowSector() && mTool->getProbeSector().getType()!=ProbeData::tNONE;
 
 	mProbeOrigin->getActor()->SetVisibility(show);
 	mProbeSector->getActor()->SetVisibility(show);
@@ -141,7 +141,7 @@ void VideoFixedPlaneRep::setCamera()
 	mRenderer->ResetCamera();
 
 	DoubleBoundingBox3D bounds(mRTGraphics->getActor()->GetBounds());
-	if (ssc::similar(bounds.range()[0], 0.0) || ssc::similar(bounds.range()[1], 0.0))
+	if (similar(bounds.range()[0], 0.0) || similar(bounds.range()[1], 0.0))
 		return;
 
 	double* vpRange = mRenderer->GetAspect();
@@ -162,7 +162,7 @@ void VideoFixedPlaneRep::setCamera()
 }
 
 
-void VideoFixedPlaneRep::addRepActorsToViewRenderer(ssc::View* view)
+void VideoFixedPlaneRep::addRepActorsToViewRenderer(View* view)
 {
 	mView = view;
 	mRenderer = view->getRenderer();
@@ -177,7 +177,7 @@ void VideoFixedPlaneRep::addRepActorsToViewRenderer(ssc::View* view)
 	mProbeSector->setRenderer(view->getRenderer());
 }
 
-void VideoFixedPlaneRep::removeRepActorsFromViewRenderer(ssc::View* view)
+void VideoFixedPlaneRep::removeRepActorsFromViewRenderer(View* view)
 {
 	mRenderer = vtkRendererPtr();
 	view->getRenderer()->RemoveActor(mRTGraphics->getActor());
@@ -190,4 +190,4 @@ void VideoFixedPlaneRep::removeRepActorsFromViewRenderer(ssc::View* view)
 	mViewportListener->stopListen();
 }
 
-} // namespace ssc
+} // namespace cx

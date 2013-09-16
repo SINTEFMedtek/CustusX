@@ -23,12 +23,12 @@
 #include "sscHelperWidgets.h"
 #include "sscLogger.h"
 
-namespace ssc
+namespace cx
 {
 
 ///----------------
 
-LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, ssc::StringDataAdapterPtr dataInterface,
+LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, StringDataAdapterPtr dataInterface,
 	QGridLayout* gridLayout, int row) :
     OptimizedUpdateWidget(parent)
 {
@@ -100,4 +100,4 @@ void LabeledComboBoxWidget::prePaintEvent()
 	mCombo->blockSignals(false);
 }
 
-} // namespace ssc
+} // namespace cx

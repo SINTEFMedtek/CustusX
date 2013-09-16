@@ -41,7 +41,7 @@
 #include "sscImageTF3D.h"
 #include "sscLogger.h"
 
-namespace ssc
+namespace cx
 {
 
 ImageTF3D::ImageTF3D(vtkImageDataPtr base) :

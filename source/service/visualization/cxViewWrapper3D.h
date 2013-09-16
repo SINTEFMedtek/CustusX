@@ -34,7 +34,7 @@ class QAction;
 typedef vtkSmartPointer<class vtkAnnotatedCubeActor> vtkAnnotatedCubeActorPtr;
 typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWidgetPtr;
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class Slices3DRep> Slices3DRepPtr;
 typedef boost::shared_ptr<class CoordinateSystemListener> CoordinateSystemListenerPtr;
@@ -70,11 +70,11 @@ class ViewWrapper3D: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapper3D(int startIndex, ssc::ViewWidget* view);
+	ViewWrapper3D(int startIndex, ViewWidget* view);
 	virtual ~ViewWrapper3D();
-	virtual ssc::ViewWidget* getView();
+	virtual ViewWidget* getView();
 	virtual double getZoom2D() { return -1.0; }
-	virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy);
+	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy);
 	virtual void setViewGroup(ViewGroupDataPtr group);
 	void setStereoType(int type);
 
@@ -90,7 +90,7 @@ private slots:
 	void activeImageChangedSlot();
 	void showRefToolSlot(bool checked);
 	void showToolPathSlot(bool checked);
-	void PickerRepPointPickedSlot(ssc::Vector3D p_r);
+	void PickerRepPointPickedSlot(Vector3D p_r);
 	void centerImageActionSlot();
 	void centerToolActionSlot();
 	void optionChangedSlot();
@@ -103,7 +103,7 @@ private slots:
 
 private:
 	virtual void appendToContextMenu(QMenu& contextMenu);
-	void readDataRepSettings(ssc::RepPtr rep);
+	void readDataRepSettings(RepPtr rep);
 	void updateSlices();
 
 	QAction* createSlicesAction(QString title, QWidget* parent);
@@ -112,30 +112,30 @@ private:
 	void showPointPickerProbe(bool on);
 	void setOrientationAnnotation();
 
-	ssc::RepPtr createDataRep3D(ssc::DataPtr data);
-    ssc::DataMetricRepPtr createDataMetricRep3D(ssc::DataPtr data);
-    virtual void dataAdded(ssc::DataPtr data);
+	RepPtr createDataRep3D(DataPtr data);
+    DataMetricRepPtr createDataMetricRep3D(DataPtr data);
+    virtual void dataAdded(DataPtr data);
 	virtual void dataRemoved(const QString& uid);
 
 	void setTranslucentRenderingToDepthPeeling(bool setDepthPeeling);
 	void initializeMultiVolume3DRepProducer();
 
 	MultiVolume3DRepProducerPtr mMultiVolume3DRepProducer;
-	typedef std::map<QString, ssc::RepPtr> RepMap;
+	typedef std::map<QString, RepPtr> RepMap;
 	RepMap mDataReps;
 	LandmarkRepPtr mLandmarkRep;
-	ssc::PickerRepPtr mPickerRep;
-	ssc::DisplayTextRepPtr mPlaneTypeText;
-	ssc::DisplayTextRepPtr mDataNameText;
+	PickerRepPtr mPickerRep;
+	DisplayTextRepPtr mPlaneTypeText;
+	DisplayTextRepPtr mDataNameText;
 	QString mShowSlicesMode;
 	std::vector<AxisConnectorPtr> mAxis;
 
 	bool mShowAxes; ///< show 3D axes reps for all tools and ref space
-	ssc::Slices3DRepPtr mSlices3DRep;
-	ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
-	ssc::OrientationAnnotation3DRepPtr mAnnotationMarker;
+	Slices3DRepPtr mSlices3DRep;
+	SlicePlanes3DRepPtr mSlicePlanes3DRep;
+	OrientationAnnotation3DRepPtr mAnnotationMarker;
 
-	QPointer<ssc::ViewWidget> mView;
+	QPointer<ViewWidget> mView;
 };
 typedef boost::shared_ptr<ViewWrapper3D> ViewWrapper3DPtr;
 

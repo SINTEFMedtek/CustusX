@@ -21,7 +21,7 @@ DoubleDataAdapterShadingBase::DoubleDataAdapterShadingBase()
 }
 void DoubleDataAdapterShadingBase::activeImageChanged()
 {  
-  mImage = ssc::dataManager()->getActiveImage();
+  mImage = dataManager()->getActiveImage();
   emit changed();
 }
 
@@ -36,7 +36,7 @@ bool DoubleDataAdapterShadingAmbient::setValue(double val)
 { 
   if (!mImage)
     return false;
-  if (ssc::similar(val, mImage->getShadingAmbient()))
+  if (similar(val, mImage->getShadingAmbient()))
     return false;
   mImage->setShadingAmbient(val);
   return true;
@@ -53,7 +53,7 @@ bool DoubleDataAdapterShadingDiffuse::setValue(double val)
 { 
   if (!mImage)
     return false;
-  if (ssc::similar(val, mImage->getShadingDiffuse()))
+  if (similar(val, mImage->getShadingDiffuse()))
     return false;
   mImage->setShadingDiffuse(val);
   return true;
@@ -70,7 +70,7 @@ bool DoubleDataAdapterShadingSpecular::setValue(double val)
 { 
   if (!mImage)
     return false;
-  if (ssc::similar(val, mImage->getShadingSpecular()))
+  if (similar(val, mImage->getShadingSpecular()))
     return false;
   mImage->setShadingSpecular(val);
   return true;
@@ -87,7 +87,7 @@ bool DoubleDataAdapterShadingSpecularPower::setValue(double val)
 { 
   if (!mImage)
     return false;
-  if (ssc::similar(val, mImage->getShadingSpecularPower()))
+  if (similar(val, mImage->getShadingSpecularPower()))
     return false;
   mImage->setShadingSpecularPower(val);
   return true;

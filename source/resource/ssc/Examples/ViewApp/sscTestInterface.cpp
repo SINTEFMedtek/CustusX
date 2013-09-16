@@ -29,7 +29,7 @@
  * \author: Janne Beate Bakeng, SINTEF
  */
 
-namespace ssc
+namespace cx
 {
 TestInterface::TestInterface() :
 	mTestDummyToolAndDummyToolManagerAction(new QAction(tr("Test DummyTool and DummyToolManager"), this)),
@@ -251,4 +251,4 @@ void TestInterface::startRendering()
     mView2->GetInteractor()->AddObserver(vtkCommand::TimerEvent, mCallback);
     mView2->GetInteractor()->CreateTimer(VTKI_TIMER_FIRST);
 }
-}//namespace ssc
+}//namespace cx

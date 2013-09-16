@@ -54,7 +54,7 @@ private slots:
 
 private:
   QPushButton* mCalibrateButton;
-  ssc::LabeledComboBoxWidget* mCalibrateToolComboBox;
+  LabeledComboBoxWidget* mCalibrateToolComboBox;
   QLabel* mReferencePointLabel;
   QPushButton* mTestButton;
   QLabel* mCalibrationLabel;
@@ -69,21 +69,21 @@ private:
 class ToolTipCalibrationCalculator
 {
 public:
-  ToolTipCalibrationCalculator(ssc::ToolPtr tool, ssc::ToolPtr ref, ssc::Vector3D p_t = ssc::Vector3D());
+  ToolTipCalibrationCalculator(ToolPtr tool, ToolPtr ref, Vector3D p_t = Vector3D());
   ~ToolTipCalibrationCalculator();
 
-  ssc::Vector3D get_delta_ref(); ///< how far from the reference point the sampled point is, in pr's coord
-  ssc::Transform3D get_calibration_sMt(); ///<
+  Vector3D get_delta_ref(); ///< how far from the reference point the sampled point is, in pr's coord
+  Transform3D get_calibration_sMt(); ///<
 
 private:
-  ssc::Vector3D get_sampledPoint_t(); ///< the tools sampled point in tool space
-  ssc::Vector3D get_sampledPoint_ref(); ///< the tools sampled point in ref space
-  ssc::Vector3D get_referencePoint_ref(); ///< the ref tools reference point in ref space
-  ssc::Transform3D get_sMt_new(); ///< the new calibration
+  Vector3D get_sampledPoint_t(); ///< the tools sampled point in tool space
+  Vector3D get_sampledPoint_ref(); ///< the tools sampled point in ref space
+  Vector3D get_referencePoint_ref(); ///< the ref tools reference point in ref space
+  Transform3D get_sMt_new(); ///< the new calibration
 
-  ssc::ToolPtr mTool; ///< the tool the sampled point is taken from
-  ssc::ToolPtr mRef; ///< the tool that contains the reference point we are going to calibrate against
-  ssc::Vector3D mP_t; ///< the sampled point we are working on
+  ToolPtr mTool; ///< the tool the sampled point is taken from
+  ToolPtr mRef; ///< the tool that contains the reference point we are going to calibrate against
+  Vector3D mP_t; ///< the sampled point we are working on
 };
 
 /**

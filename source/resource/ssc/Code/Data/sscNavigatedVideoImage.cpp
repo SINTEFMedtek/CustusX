@@ -22,10 +22,10 @@
 #include "sscVideoSource.h"
 #include "sscImageLUT2D.h"
 #include "sscSliceProxy.h"
-namespace ssc
+namespace cx
 {
-NavigatedVideoImage::NavigatedVideoImage(QString uid, ssc::VideoSourcePtr source, ssc::SliceProxyPtr sliceProxy, QString name):
-	ssc::Image(uid, source->getVtkImageData(), name),
+NavigatedVideoImage::NavigatedVideoImage(QString uid, VideoSourcePtr source, SliceProxyPtr sliceProxy, QString name):
+	Image(uid, source->getVtkImageData(), name),
 	mSliceProxy(sliceProxy)
 {
 	mToolPositionX = -1;
@@ -45,7 +45,7 @@ static double computeEffectiveOffset(double offset, double size)
 }
 
 /**
- * Overriden from ssc::Image to make sure this image is allways fixed
+ * Overriden from Image to make sure this image is allways fixed
  * in the slice plane of the given slice proxy and positioned
  * according to the given tool position offset
  */

@@ -12,7 +12,7 @@
 #include "vtkCommand.h"
 #include "sscMessageManager.h"
 
-namespace ssc
+namespace cx
 {
 
 class ViewportObserverPrivate : public vtkCommand
@@ -105,7 +105,7 @@ double ViewportListener::getVpnZoom()
 {
 	if (!mRenderer)
 	{
-		ssc::messageManager()->sendError("No renderer set, using zoom=1");
+		messageManager()->sendError("No renderer set, using zoom=1");
 		return 1;
 	}
 	//  use the focal point and focal point + vup.
@@ -113,9 +113,9 @@ double ViewportListener::getVpnZoom()
 	//  The distance between then in the view plane can
 	//  be used to rescale the text.
 	vtkCameraPtr camera = mRenderer->GetActiveCamera();
-	ssc::Vector3D p_f(camera->GetFocalPoint());
-	ssc::Vector3D vup(camera->GetViewUp());
-	ssc::Vector3D p_fup = p_f+vup;
+	Vector3D p_f(camera->GetFocalPoint());
+	Vector3D vup(camera->GetViewUp());
+	Vector3D p_fup = p_f+vup;
 	mRenderer->WorldToView(p_f[0],p_f[1],p_f[2]);
 	mRenderer->WorldToView(p_fup[0],p_fup[1],p_fup[2]);
 	p_f[2] = 0;

@@ -23,7 +23,7 @@
 #include "sscTime.h"
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
 // --------------------------------------------------------
@@ -469,5 +469,5 @@ RegistrationTransform RegistrationHistory::getCurrentRegistration() const
 	return mTransformCache;
 }
 
-} // end namespace ssc
+} // end namespace cx
 

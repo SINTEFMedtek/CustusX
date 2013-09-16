@@ -25,7 +25,7 @@
 class QGridLayout;
 class QHBoxLayout;
 
-namespace ssc
+namespace cx
 {
 
 /**\brief A widget that floats above the other windows. Used as basis for the floating controls.
@@ -82,7 +82,7 @@ QWidget* addDummyMargin(QWidget* widget);
  *
  * \ingroup sscWidget
  */
-QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
+QWidget* sscCreateDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
 }
 
 #endif

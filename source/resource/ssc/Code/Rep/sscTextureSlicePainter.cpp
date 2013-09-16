@@ -56,7 +56,7 @@
 
 
 //---------------------------------------------------------
-namespace ssc
+namespace cx
 {
 //---------------------------------------------------------
 
@@ -65,8 +65,8 @@ vtkCxxRevisionMacro(TextureSlicePainter, "$Revision: 647 $");
 
 class SingleVolumePainterHelper
 {
-	ssc::GPUImageDataBufferPtr mVolumeBuffer;
-	ssc::GPUImageLutBufferPtr mLutBuffer;
+	GPUImageDataBufferPtr mVolumeBuffer;
+	GPUImageLutBufferPtr mLutBuffer;
 	int mIndex;
 	float mWindow;
 	float mLevel;
@@ -94,11 +94,11 @@ public:
 	{
 
 	}
-	void SetBuffer(ssc::GPUImageDataBufferPtr buffer)
+	void SetBuffer(GPUImageDataBufferPtr buffer)
 	{
 		mVolumeBuffer = buffer;
 	}
-	void SetBuffer(ssc::GPUImageLutBufferPtr buffer)
+	void SetBuffer(GPUImageLutBufferPtr buffer)
 	{
 		mLutBuffer = buffer;
 	}
@@ -380,12 +380,12 @@ bool TextureSlicePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr)
 			&& LoadRequiredExtension(mgr, "GL_EXT_texture_buffer_object"));
 }
 
-void TextureSlicePainter::SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer)
+void TextureSlicePainter::SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer)
 {
 	mInternals->safeIndex(index).SetBuffer(buffer);
 }
 
-void TextureSlicePainter::SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer)
+void TextureSlicePainter::SetLutBuffer(int index, GPUImageLutBufferPtr buffer)
 {
 	mInternals->safeIndex(index).SetBuffer(buffer);
 }

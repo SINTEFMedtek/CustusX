@@ -4,7 +4,7 @@
 #include "sscTransform3D.h"
 #include "sscDefinitions.h"
 
-namespace ssc
+namespace cx
 {
 
 /**\brief A 2D slice plane in 3D.
@@ -88,6 +88,6 @@ private:
 	bool mUseConstrainedViewOffset;
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCSLICECOMPUTER_H_*/

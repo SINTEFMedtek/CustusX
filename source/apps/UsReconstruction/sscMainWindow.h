@@ -31,10 +31,10 @@ private slots:
 
 private:
   cx::ReconstructionWidget* mReconstructionWidget;
-  ssc::ViewWidget* mView;
+  cx::ViewWidget* mView;
 
-  ssc::VolumetricRepPtr mVolumeRep;
-  ssc::AxesRepPtr mAxesRep;
+  cx::VolumetricRepPtr mVolumeRep;
+  cx::AxesRepPtr mAxesRep;
 };
 
 #endif //USTEST_MAINWINDOW_H_

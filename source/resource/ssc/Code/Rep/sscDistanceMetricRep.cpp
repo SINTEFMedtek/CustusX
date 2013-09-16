@@ -29,7 +29,7 @@
 #include <vtkRenderWindow.h>
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
 DistanceMetricRepPtr DistanceMetricRep::New(const QString& uid, const QString& name)
@@ -68,14 +68,14 @@ void DistanceMetricRep::changedSlot()
 
     if (!mGraphicalLine && mView)
 	{
-		mGraphicalLine.reset(new ssc::GraphicalLine3D(mView->getRenderer()));
-//		mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
+		mGraphicalLine.reset(new GraphicalLine3D(mView->getRenderer()));
+//		mText.reset(new CaptionText3D(mView->getRenderer()));
 	}
 
     if (mGraphicalLine)
     {
         mGraphicalLine->setColor(mColor);
-        std::vector<ssc::Vector3D> p = distanceMetric->getEndpoints();
+        std::vector<Vector3D> p = distanceMetric->getEndpoints();
         mGraphicalLine->setValue(p[0], p[1]);
         mGraphicalLine->setStipple(0xF0FF);
     }
@@ -83,7 +83,7 @@ void DistanceMetricRep::changedSlot()
 //	QString text = QString("%1 mm").arg(mMetric->getDistance(), 0, 'f', 1);
 //	if (mShowLabel)
 //		text = mMetric->getName() + " = " + text;
-//	ssc::Vector3D p_mean = (p[0] + p[1]) / 2;
+//	Vector3D p_mean = (p[0] + p[1]) / 2;
 
 //	mText->setColor(mColor);
 //	mText->setText(text);

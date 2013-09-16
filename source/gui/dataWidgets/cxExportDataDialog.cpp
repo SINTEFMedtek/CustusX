@@ -51,7 +51,7 @@ ExportDataDialog::ExportDataDialog(QWidget* parent) :
   mOkButton->setDefault(true);
   mOkButton->setFocus();
 
-//  ssc::messageManager()->sendInfo("Exporting data...");
+//  messageManager()->sendInfo("Exporting data...");
 }
 
 ExportDataDialog::~ExportDataDialog()

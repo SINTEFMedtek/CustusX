@@ -152,13 +152,13 @@ void IGTLinkedImageReceiverThread::run()
 	connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(errorSlot(QAbstractSocket::SocketError)),
 					Qt::DirectConnection);
 
-	ssc::messageManager()->sendInfo("Looking for host: " + this->hostDescription());
+	messageManager()->sendInfo("Looking for host: " + this->hostDescription());
 	mSocket->connectToHost(mAddress, mPort);
 
 	int timeout = 5000;
 	if (!mSocket->waitForConnected(timeout))
 	{
-		ssc::messageManager()->sendWarning("Timeout looking for host " + this->hostDescription());
+		messageManager()->sendWarning("Timeout looking for host " + this->hostDescription());
 		mSocket->disconnectFromHost();
 		return;
 	}
@@ -183,21 +183,21 @@ QString IGTLinkedImageReceiverThread::hostDescription() const
 
 void IGTLinkedImageReceiverThread::hostFoundSlot()
 {
-	ssc::messageManager()->sendInfo("Host found: " + this->hostDescription());
+	messageManager()->sendInfo("Host found: " + this->hostDescription());
 }
 void IGTLinkedImageReceiverThread::connectedSlot()
 {
-	ssc::messageManager()->sendSuccess("Connected to host " + this->hostDescription());
+	messageManager()->sendSuccess("Connected to host " + this->hostDescription());
 	emit connected(true);
 }
 void IGTLinkedImageReceiverThread::disconnectedSlot()
 {
-	ssc::messageManager()->sendInfo("Disconnected to host " + this->hostDescription());
+	messageManager()->sendInfo("Disconnected to host " + this->hostDescription());
 	emit connected(false);
 }
 void IGTLinkedImageReceiverThread::errorSlot(QAbstractSocket::SocketError socketError)
 {
-	ssc::messageManager()->sendError(
+	messageManager()->sendError(
 					"Socket error [Host=" + this->hostDescription() + ", Code=" + socketError + "]\n"
 									+ mSocket->errorString());
 }
@@ -355,7 +355,7 @@ void IGTLinkedImageReceiverThread::addToQueue(IGTLinkImageMessage::Pointer msg)
 	// if us status not sent, do it here
 	if (mUnsentUSStatusMessage)
 	{
-		this->addSonixStatusToQueue(converter.decode(mUnsentUSStatusMessage, msg, ssc::ProbeDataPtr(new ssc::ProbeData())));
+		this->addSonixStatusToQueue(converter.decode(mUnsentUSStatusMessage, msg, ProbeDataPtr(new ProbeData())));
 		mUnsentUSStatusMessage = IGTLinkUSStatusMessage::Pointer();
 	}
 }

@@ -34,7 +34,7 @@ TestUSSavingRecorderController::TestUSSavingRecorderController(QObject* parent) 
 {
 	mRecorder.reset(new cx::USSavingRecorder());
 	mRecorder->setWriteColor(true);
-	mRecorder->set_rMpr(ssc::Transform3D::Identity());
+	mRecorder->set_rMpr(cx::Transform3D::Identity());
 	connect(mRecorder.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(dataSaved(QString)));
 
 	QTimer::singleShot(0, this, SLOT(runOperations()));
@@ -55,7 +55,7 @@ void TestUSSavingRecorderController::runOperations()
 	QTimer::singleShot(0, qApp, SLOT(quit()));
 }
 
-void TestUSSavingRecorderController::setTool(ssc::ToolPtr tool)
+void TestUSSavingRecorderController::setTool(cx::ToolPtr tool)
 {
 	mTool = tool;
 }
@@ -63,7 +63,7 @@ void TestUSSavingRecorderController::setTool(ssc::ToolPtr tool)
 void TestUSSavingRecorderController::addVideoSource(int width, int height)
 {
 	int index = mVideo.size();
-	ssc::TestVideoSourcePtr videoSource(new ssc::TestVideoSource(
+	cx::TestVideoSourcePtr videoSource(new cx::TestVideoSource(
 											QString("videoSource%1").arg(index),
 											QString("Video Source %1").arg(index),
 											80, 40));
@@ -75,7 +75,7 @@ void TestUSSavingRecorderController::startRecord()
 {
 	SSC_LOG("");
 	double start = QDateTime::currentMSecsSinceEpoch();
-	QString uid = QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
+	QString uid = QDateTime::currentDateTime().toString(cx::timestampSecondsFormat());
 	mSession.reset(new cx::RecordSession(uid, start, start, "session_0"));
 	mRecorder->startRecord(mSession, mTool, mVideo);
 }
@@ -135,7 +135,7 @@ void TestUSSavingRecorderController::dataSaved(QString filename)
 void TestUSSavingRecorderController::verifyMemData(QString uid)
 {
 	SSC_LOG("");
-	ssc::USReconstructInputData data = mRecorder->getDataForStream(uid);
+	cx::USReconstructInputData data = mRecorder->getDataForStream(uid);
 	double duration = mSession->getStopTime() - mSession->getStartTime();
 	int minFPS = 10;
 
@@ -161,7 +161,7 @@ void TestUSSavingRecorderController::verifySaveData(QString filename)
 	SSC_LOG("");
 
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
-	ssc::USReconstructInputData hasBeenRead = fileReader->readAllFiles(filename, "");
+	cx::USReconstructInputData hasBeenRead = fileReader->readAllFiles(filename, "");
 
 	CPPUNIT_ASSERT( hasBeenRead.mFilename == filename );
 	CPPUNIT_ASSERT( !hasBeenRead.mFrames.empty() );

@@ -31,7 +31,7 @@
 #include "sscVideoGraphics.h"
 #include "sscVideoSource.h"
 
-namespace ssc
+namespace cx
 {
 
 VideoSourceGraphics::VideoSourceGraphics(bool useMaskFilter)
@@ -39,7 +39,7 @@ VideoSourceGraphics::VideoSourceGraphics(bool useMaskFilter)
 	mClipToSector = true;
 	mPipeline.reset(new VideoGraphics());
 	mShowInToolSpace = true;
-	mImage = ssc::ImagePtr();
+	mImage = ImagePtr();
 }
 
 VideoSourceGraphics::~VideoSourceGraphics()
@@ -61,7 +61,7 @@ ToolPtr VideoSourceGraphics::getTool()
 	return mTool;
 }
 
-ssc::ProbeSector VideoSourceGraphics::getProbeData()
+ProbeSector VideoSourceGraphics::getProbeData()
 {
 	return mProbeData;
 }
@@ -79,7 +79,7 @@ void VideoSourceGraphics::setTool(ToolPtr tool)
 	}
 
 	// accept only tool with a probe sector
-	if (tool && tool->getProbeSector().getType()!=ssc::ProbeData::tNONE)
+	if (tool && tool->getProbeSector().getType()!=ProbeData::tNONE)
 	{
 		mTool = tool;
 	}
@@ -147,7 +147,7 @@ void VideoSourceGraphics::setRealtimeStream(VideoSourcePtr data)
 		if(!mImage)
 		{
 //			mImage = dataManager()->createImage(mDataRedirecter->GetOutput(), "4D US", mData->getName());
-//			ssc::dataManager()->loadData(boost::dynamic_pointer_cast<ssc::Data>(mImage));//Uncomment to test unstable 4D US
+//			dataManager()->loadData(boost::dynamic_pointer_cast<Data>(mImage));//Uncomment to test unstable 4D US
 		}
 	}
 
@@ -158,7 +158,7 @@ void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 {
 	if (!mShowInToolSpace)
 		return;
-	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
 	Transform3D tMu = mProbeData.get_tMu();
 	Transform3D rMu = rMpr * prMt * tMu;
 	mPipeline->setActorUserMatrix(rMu.getVtkMatrix());
@@ -173,7 +173,7 @@ void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 
 void VideoSourceGraphics::receiveVisible(bool visible)
 {
-	ssc::messageManager()->sendWarning("Empty function called...");
+	messageManager()->sendWarning("Empty function called...");
 }
 
 void VideoSourceGraphics::newDataSlot()
@@ -200,4 +200,4 @@ void VideoSourceGraphics::newDataSlot()
 	emit newData();
 }
 
-} // namespace ssc
+} // namespace cx

@@ -35,7 +35,7 @@
 #include "vtkFloatArray.h"
 #include "sscMesh.h"
 
-namespace ssc
+namespace cx
 {
 
 SeansVesselReg::SeansVesselReg()// : mInvertedTransform(false)
@@ -62,12 +62,12 @@ SeansVesselReg::~SeansVesselReg()
  *
  * source is moving and target is fixed
  */
-bool SeansVesselReg::execute(ssc::DataPtr source, ssc::DataPtr target, QString logPath)
+bool SeansVesselReg::execute(DataPtr source, DataPtr target, QString logPath)
 {
 	if (mt_verbose)
 	{
-		ssc::messageManager()->sendDebug("SOURCE: " + source->getUid());
-		ssc::messageManager()->sendDebug("TARGET: " + target->getUid());
+		messageManager()->sendDebug("SOURCE: " + source->getUid());
+		messageManager()->sendDebug("TARGET: " + target->getUid());
 
 		std::cout << "stop Threshold:" << mt_distanceDeltaStopThreshold << endl;
 		std::cout << "sigma:" << mt_sigma << endl;
@@ -87,7 +87,7 @@ bool SeansVesselReg::execute(ssc::DataPtr source, ssc::DataPtr target, QString l
 	if (mt_auto_lts)
 	{
 		context = this->linearRefineAllLTS(context);
-		ssc::messageManager()->sendInfo(QString("Auto LTS: Found best match using %1\%.").arg(context->mLtsRatio));
+		messageManager()->sendInfo(QString("Auto LTS: Found best match using %1\%.").arg(context->mLtsRatio));
 	}
 	else
 	{
@@ -212,7 +212,7 @@ SeansVesselReg::ContextPtr SeansVesselReg::splitContext(ContextPtr context)
 /**Create a context containing data to use during iteration
  *
  */
-SeansVesselReg::ContextPtr SeansVesselReg::createContext(ssc::DataPtr source, ssc::DataPtr target)
+SeansVesselReg::ContextPtr SeansVesselReg::createContext(DataPtr source, DataPtr target)
 {
 	vtkPolyDataPtr targetPolyData = this->convertToPolyData(target);
 	vtkPolyDataPtr inputSourcePolyData = this->convertToPolyData(source);
@@ -463,10 +463,10 @@ vtkAbstractTransformPtr SeansVesselReg::nonLinearRegistration(vtkPointsPtr sorte
 	return tps;
 }
 
-vtkPolyDataPtr SeansVesselReg::convertToPolyData(ssc::DataPtr data)
+vtkPolyDataPtr SeansVesselReg::convertToPolyData(DataPtr data)
 {
-	ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
-	ssc::MeshPtr mesh = boost::dynamic_pointer_cast<ssc::Mesh>(data);
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
 
 	if (image)
 	{
@@ -528,7 +528,7 @@ void SeansVesselReg::print(vtkPointsPtr points)
 {
 	for (int q = 0; q < points->GetNumberOfPoints(); ++q)
 	{
-		ssc::Vector3D p(points->GetPoint(q));
+		Vector3D p(points->GetPoint(q));
 		std::cout << q << "\t" << p[0] << " " << p[1] << " " << p[2] << " " << std::endl;
 	}
 }
@@ -559,7 +559,7 @@ vtkPolyDataPtr SeansVesselReg::crop(vtkPolyDataPtr input, vtkPolyDataPtr fixed, 
 	//  std::cout << "bounds" << std::endl;
 	box->SetBounds(targetBounds);
 	if (mt_verbose)
-		std::cout << "bb: " << ssc::DoubleBoundingBox3D(targetBounds) << std::endl;
+		std::cout << "bb: " << DoubleBoundingBox3D(targetBounds) << std::endl;
 	vtkClipPolyDataPtr clipper = vtkClipPolyDataPtr::New();
 	clipper->SetInput(input);
 	clipper->SetClipFunction(box);
@@ -579,12 +579,12 @@ vtkPolyDataPtr SeansVesselReg::crop(vtkPolyDataPtr input, vtkPolyDataPtr fixed, 
 	return clipper->GetOutput();
 }
 
-ssc::Transform3D SeansVesselReg::getLinearResult(ContextPtr context)
+Transform3D SeansVesselReg::getLinearResult(ContextPtr context)
 {
 	if (!context)
 		context = mLastRun;
 
-	ssc::Transform3D retval = this->getLinearTransform(context->mConcatenation);
+	Transform3D retval = this->getLinearTransform(context->mConcatenation);
 	if (context->mInvertedTransform)
 		retval = retval.inv();
 
@@ -605,9 +605,9 @@ double SeansVesselReg::getResultLtsRatio(ContextPtr context)
 	return context->mLtsRatio;
 }
 
-/**Convert the linear transform part of myContatenation to a ssc::Transform3D
+/**Convert the linear transform part of myContatenation to a Transform3D
  */
-ssc::Transform3D SeansVesselReg::getLinearTransform(vtkGeneralTransformPtr myConcatenation)
+Transform3D SeansVesselReg::getLinearTransform(vtkGeneralTransformPtr myConcatenation)
 {
 	vtkMatrix4x4Ptr l_tempMatrix = vtkMatrix4x4Ptr::New();
 	vtkMatrix4x4Ptr l_resultMatrix = vtkMatrix4x4Ptr::New();
@@ -624,7 +624,7 @@ ssc::Transform3D SeansVesselReg::getLinearTransform(vtkGeneralTransformPtr myCon
 
 	}
 
-	return ssc::Transform3D(l_resultMatrix).inverse();
+	return Transform3D(l_resultMatrix).inverse();
 }
 
 void SeansVesselReg::printOutResults(QString fileNamePrefix, vtkGeneralTransformPtr myConcatenation)
@@ -733,7 +733,7 @@ void SeansVesselReg::printOutResults(QString fileNamePrefix, vtkGeneralTransform
 /**Not used and probably buggy
  *
  */
-ssc::ImagePtr SeansVesselReg::loadMinc(char* p_dataFile)
+ImagePtr SeansVesselReg::loadMinc(char* p_dataFile)
 {
 	time_t sec1 = clock();
 	std::cout << "Reading " << p_dataFile << " -> ";
@@ -759,7 +759,7 @@ ssc::ImagePtr SeansVesselReg::loadMinc(char* p_dataFile)
 	l_dataTransform->Translate(l_dataOrigin);
 	l_dataTransform->Scale(l_dataReader->GetOutput()->GetSpacing());
 
-	ssc::Transform3D rMd(l_dataTransform->GetMatrix());
+	Transform3D rMd(l_dataTransform->GetMatrix());
 
 	// TODO: ensure rMd is correct in CustusX terms
 
@@ -768,8 +768,8 @@ ssc::ImagePtr SeansVesselReg::loadMinc(char* p_dataFile)
 	QString uid(info.completeBaseName() + "_minc_%1");
 	QString name = uid;
 
-	ssc::ImagePtr image = ssc::dataManager()->createImage(l_dataReader->GetOutput(), uid, name);
-	image->get_rMd_History()->addRegistration(ssc::RegistrationTransform(rMd, QDateTime::currentDateTime(),
+	ImagePtr image = dataManager()->createImage(l_dataReader->GetOutput(), uid, name);
+	image->get_rMd_History()->addRegistration(RegistrationTransform(rMd, QDateTime::currentDateTime(),
 		"from Minc file"));
 
 	return image;
@@ -780,14 +780,14 @@ ssc::ImagePtr SeansVesselReg::loadMinc(char* p_dataFile)
  *  unknown parameter: p_neighborhoodFilterThreshold
  *
  */
-vtkPolyDataPtr SeansVesselReg::extractPolyData(ssc::ImagePtr image, int p_neighborhoodFilterThreshold,
+vtkPolyDataPtr SeansVesselReg::extractPolyData(ImagePtr image, int p_neighborhoodFilterThreshold,
 	double p_BoundingBox[6])
 {
 	vtkPolyDataPtr p_thePolyData = vtkPolyDataPtr::New();
 
 	int l_dimensions[3];
 	image->getBaseVtkImageData()->GetDimensions(l_dimensions);
-	ssc::Vector3D spacing(image->getBaseVtkImageData()->GetSpacing());
+	Vector3D spacing(image->getBaseVtkImageData()->GetSpacing());
 
 	//set the transform
 	vtkTransformPtr l_dataTransform = vtkTransformPtr::New();
@@ -921,10 +921,10 @@ vtkPolyDataPtr SeansVesselReg::extractPolyData(ssc::ImagePtr image, int p_neighb
  * from an identity matrix.
  *
  */
-void SeansVesselReg::checkQuality(ssc::Transform3D linearTransform)
+void SeansVesselReg::checkQuality(Transform3D linearTransform)
 {
 	// characterize the input perturbation in angle-axis form:
-	ssc::Vector3D t_delta = linearTransform.matrix().block<3, 1>(0, 3);
+	Vector3D t_delta = linearTransform.matrix().block<3, 1>(0, 3);
 	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(linearTransform.matrix().block<3, 3>(0, 0));
 	double angle = angleAxis.angle();
 
@@ -934,14 +934,14 @@ void SeansVesselReg::checkQuality(ssc::Transform3D linearTransform)
 
 	if (t_delta.length() > 20 || fabs(angle) > 10 / 180.0 * M_PI)
 	{
-		ssc::messageManager()->sendWarning(qualityText);
+		messageManager()->sendWarning(qualityText);
 		QString text = QString(
 						"The registration matrix' angle-axis representation shows a large shift. Retry registration.");
-		ssc::messageManager()->sendWarning(text);
+		messageManager()->sendWarning(text);
 	}
 	else
 	{
-		ssc::messageManager()->sendInfo(qualityText);
+		messageManager()->sendInfo(qualityText);
 	}
 }
 } //namespace cx

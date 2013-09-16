@@ -35,24 +35,24 @@ InteractiveClipper::InteractiveClipper() :
 
 	// create a slice planes proxy containing all slice definitions,
 	// for use with the clipper
-	mSlicePlanesProxy = ssc::SlicePlanesProxyPtr(new ssc::SlicePlanesProxy());
-	mSlicePlanesProxy->addSimpleSlicePlane(ssc::ptSAGITTAL);
-	mSlicePlanesProxy->addSimpleSlicePlane(ssc::ptCORONAL);
-	mSlicePlanesProxy->addSimpleSlicePlane(ssc::ptAXIAL);
-	mSlicePlanesProxy->addSimpleSlicePlane(ssc::ptANYPLANE);
-	mSlicePlanesProxy->addSimpleSlicePlane(ssc::ptSIDEPLANE);
-	mSlicePlanesProxy->addSimpleSlicePlane(ssc::ptRADIALPLANE);
+	mSlicePlanesProxy = SlicePlanesProxyPtr(new SlicePlanesProxy());
+	mSlicePlanesProxy->addSimpleSlicePlane(ptSAGITTAL);
+	mSlicePlanesProxy->addSimpleSlicePlane(ptCORONAL);
+	mSlicePlanesProxy->addSimpleSlicePlane(ptAXIAL);
+	mSlicePlanesProxy->addSimpleSlicePlane(ptANYPLANE);
+	mSlicePlanesProxy->addSimpleSlicePlane(ptSIDEPLANE);
+	mSlicePlanesProxy->addSimpleSlicePlane(ptRADIALPLANE);
 
-	mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
+	mSlicePlaneClipper = SlicePlaneClipper::New();
 	connect(this, SIGNAL(changed()), this, SLOT(changedSlot()));
-	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 
 	this->dominantToolChangedSlot();
 	this->changedSlot();
 }
 
 
-void InteractiveClipper::setSlicePlane(ssc::PLANE_TYPE plane)
+void InteractiveClipper::setSlicePlane(PLANE_TYPE plane)
 {
 	if (mSlicePlaneClipper->getSlicer() && mSlicePlaneClipper->getSlicer()->getComputer().getPlaneType() == plane)
 		return;
@@ -78,10 +78,10 @@ void InteractiveClipper::clearClipPlanesInVolume()
 	mImage->clearPersistentClipPlanes();
 }
 
-ssc::PLANE_TYPE InteractiveClipper::getSlicePlane()
+PLANE_TYPE InteractiveClipper::getSlicePlane()
 {
 	if (!mSlicePlaneClipper->getSlicer())
-		return ssc::ptCOUNT;
+		return ptCOUNT;
 	return mSlicePlaneClipper->getSlicer()->getComputer().getPlaneType();
 }
 
@@ -104,19 +104,19 @@ void InteractiveClipper::invertPlane(bool on)
 	emit changed();
 }
 
-ssc::PLANE_TYPE InteractiveClipper::getPlaneType()
+PLANE_TYPE InteractiveClipper::getPlaneType()
 {
 	if (!mSlicePlaneClipper->getSlicer())
-		return ssc::ptCOUNT;
+		return ptCOUNT;
 	return mSlicePlaneClipper->getSlicer()->getComputer().getPlaneType();
 }
 
-ssc::ImagePtr InteractiveClipper::getImage() const
+ImagePtr InteractiveClipper::getImage() const
 {
 	return mImage;
 }
 
-void InteractiveClipper::setImage(ssc::ImagePtr image)
+void InteractiveClipper::setImage(ImagePtr image)
 {
 	if (mImage)
 		mImage->setInteractiveClipPlane(vtkPlanePtr());
@@ -134,15 +134,15 @@ void InteractiveClipper::changedSlot()
 //		mSlicePlaneClipper->clearVolumes();
 //		mSlicePlaneClipper->addVolume(RepManager::getInstance()->getVolumetricRep(mImage));
 
-		ssc::PLANE_TYPE currentPlane = this->getPlaneType();
+		PLANE_TYPE currentPlane = this->getPlaneType();
 
-		std::vector<ssc::PLANE_TYPE> planes = this->getAvailableSlicePlanes();
+		std::vector<PLANE_TYPE> planes = this->getAvailableSlicePlanes();
 
-		if (!std::count(planes.begin(), planes.end(), currentPlane)) //if (this->getPlaneType()==ssc::ptCOUNT)
+		if (!std::count(planes.begin(), planes.end(), currentPlane)) //if (this->getPlaneType()==ptCOUNT)
 		{
 			if (planes.empty()) // no slices: remove clipping
 			{
-				currentPlane = ssc::ptCOUNT;
+				currentPlane = ptCOUNT;
 			}
 			else
 			{
@@ -162,11 +162,11 @@ void InteractiveClipper::changedSlot()
 
 }
 
-std::vector<ssc::PLANE_TYPE> InteractiveClipper::getAvailableSlicePlanes() const
+std::vector<PLANE_TYPE> InteractiveClipper::getAvailableSlicePlanes() const
 {
-	std::vector<ssc::PLANE_TYPE> retval;
-	ssc::SlicePlanesProxy::DataMap data = mSlicePlanesProxy->getData();
-	for (ssc::SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)
+	std::vector<PLANE_TYPE> retval;
+	SlicePlanesProxy::DataMap data = mSlicePlanesProxy->getData();
+	for (SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)
 	{
 		retval.push_back(iter->first);
 	}
@@ -175,10 +175,10 @@ std::vector<ssc::PLANE_TYPE> InteractiveClipper::getAvailableSlicePlanes() const
 
 void InteractiveClipper::dominantToolChangedSlot()
 {
-	ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
+	ToolPtr dominantTool = toolManager()->getDominantTool();
 
-	ssc::SlicePlanesProxy::DataMap data = mSlicePlanesProxy->getData();
-	for (ssc::SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)
+	SlicePlanesProxy::DataMap data = mSlicePlanesProxy->getData();
+	for (SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)
 	{
 		iter->second.mSliceProxy->setTool(dominantTool);
 	}

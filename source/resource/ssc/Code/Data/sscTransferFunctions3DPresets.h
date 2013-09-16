@@ -29,7 +29,7 @@ class QString;
 class QStringList;
 class QDomDocument;
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class TransferFunctions3DPresets> TransferFunctions3DPresetsPtr;
@@ -47,16 +47,16 @@ class TransferFunctions3DPresets : public Presets
 {
 	Q_OBJECT
 public:
-	TransferFunctions3DPresets(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile);
+	TransferFunctions3DPresets(XmlOptionFile presetFile, XmlOptionFile customFile);
 	virtual ~TransferFunctions3DPresets(){};
 
-	void save(QString name, ssc::ImagePtr image, bool _2D=true, bool _3D=true);
-	void load(QString name, ssc::ImagePtr image, bool _2D=true, bool _3D=true);
+	void save(QString name, ImagePtr image, bool _2D=true, bool _3D=true);
+	void load(QString name, ImagePtr image, bool _2D=true, bool _3D=true);
 
-	void save2D(QString name, ssc::ImagePtr image);
-	void save3D(QString name, ssc::ImagePtr image);
-	void load2D(QString name, ssc::ImagePtr image);
-	void load3D(QString name, ssc::ImagePtr image);
+	void save2D(QString name, ImagePtr image);
+	void save3D(QString name, ImagePtr image);
+	void load2D(QString name, ImagePtr image);
+	void load3D(QString name, ImagePtr image);
 
 //	QStringList getPresetList(QString modality=""); ///< returns a list of the preset names for the given modality
 //	bool isDefaultPreset(QString presetName); ///< Check is the preset is one of the "system presets"
@@ -68,11 +68,11 @@ protected:
 	QStringList generatePresetList(QString modality); ///< internally generate the preset list
 
 private:
-//	ssc::XmlOptionFile getPresetNode(const QString& presetName);
-//	ssc::XmlOptionFile getCustomFile();
+//	XmlOptionFile getPresetNode(const QString& presetName);
+//	XmlOptionFile getCustomFile();
 
-//	ssc::XmlOptionFile mPresetFile;
-//	ssc::XmlOptionFile mCustomFile;
+//	XmlOptionFile mPresetFile;
+//	XmlOptionFile mCustomFile;
 
 	//QDomElement mLastReturnedPreset; //NOT USED?
 };

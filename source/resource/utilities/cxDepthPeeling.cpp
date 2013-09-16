@@ -70,7 +70,7 @@ bool SetupEnvironmentForDepthPeeling(
 {
   if (!renderWindow || !renderer)
   {
-	  ssc::messageManager()->sendWarning("Can't set depth peeling. No render / renderwindow");
+	  cx::messageManager()->sendWarning("Can't set depth peeling. No render / renderwindow");
 	  return false;
   }
 
@@ -104,7 +104,7 @@ bool TurnOffDepthPeeling(
 {
   if (!renderWindow || !renderer)
   {
-	  ssc::messageManager()->sendWarning("Can't turn off depth peeling. No render / renderwindow");
+	  cx::messageManager()->sendWarning("Can't turn off depth peeling. No render / renderwindow");
 	  return false;
   }
 
@@ -135,7 +135,7 @@ bool IsDepthPeelingSupported(vtkSmartPointer<vtkRenderWindow> renderWindow,
 {
   if (!renderWindow || !renderer)
     {
-	  ssc::messageManager()->sendWarning("Can't test depth peeling. No render / renderwindow");
+	  cx::messageManager()->sendWarning("Can't test depth peeling. No render / renderwindow");
 	  return false;
     }
 

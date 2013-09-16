@@ -21,7 +21,7 @@ private:
 	QString mToolToolPath;
 	QString mCurrentToolPath;
 	QString mMeshFileName;
-	ssc::DataPtr mMesh;
+	cx::DataPtr mMesh;
 };
 
 } /* namespace cxtest */

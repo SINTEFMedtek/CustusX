@@ -15,7 +15,7 @@
 #include <QtGui>
 #include "sscForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class DICOMLibAPI> DICOMLibAPIPtr;
 typedef boost::shared_ptr<class Series> SeriesPtr;

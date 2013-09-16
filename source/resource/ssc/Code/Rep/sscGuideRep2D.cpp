@@ -30,7 +30,7 @@
 #include "sscSliceProxy.h"
 #include "sscToolManager.h"
 #include "sscView.h"
-namespace ssc
+namespace cx
 {
 
 GuideRep2DPtr GuideRep2D::New(const QString& uid, const QString& name)
@@ -64,13 +64,13 @@ GuideRep2D::GuideRep2D(const QString& uid, const QString& name) :
 //	return mMetric;
 //}
 
-//void GuideRep2D::addRepActorsToViewRenderer(ssc::View* view)
+//void GuideRep2D::addRepActorsToViewRenderer(View* view)
 //{
 //	mView = view;
 //	this->changedSlot();
 //}
 
-//void GuideRep2D::removeRepActorsFromViewRenderer(ssc::View* view)
+//void GuideRep2D::removeRepActorsFromViewRenderer(View* view)
 //{
 //	mView->getRenderer()->RemoveActor(mCircleActor);
 //	mView = NULL;
@@ -113,8 +113,8 @@ void GuideRep2D::changedSlot()
 	}
 
 	double toolOffset = mSliceProxy->getTool()->getTooltipOffset();
-	Vector3D toolOffsetPosRef = (*ssc::ToolManager::getInstance()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,0,toolOffset));
-	Vector3D toolPosRef = (*ssc::ToolManager::getInstance()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,0,0));
+	Vector3D toolOffsetPosRef = (*ToolManager::getInstance()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,0,toolOffset));
+	Vector3D toolPosRef = (*ToolManager::getInstance()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,0,0));
 
 	Vector3D centerRef = mMetric->getRefCoord() + 0.5*(toolOffsetPosRef - mMetric->getRefCoord());
 	Vector3D position = mSliceProxy->get_sMr() * centerRef;
@@ -146,7 +146,7 @@ void GuideRep2D::changedSlot()
 
 }
 
-void GuideRep2D::setSliceProxy(ssc::SliceProxyPtr sliceProxy)
+void GuideRep2D::setSliceProxy(SliceProxyPtr sliceProxy)
 {
 	if (mSliceProxy)
 		disconnect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(changedSlot()));

@@ -27,7 +27,7 @@
 class QContextMenuEvent;
 class QAction;
 
-namespace ssc
+namespace cx
 {
 /**\brief Widget for displaying status messages.
  *
@@ -38,7 +38,7 @@ namespace ssc
  */
 class ConsoleWidget: public QTextBrowser
 {
-	typedef ssc::Message Message;
+	typedef Message Message;
 
 Q_OBJECT
 
@@ -61,7 +61,7 @@ private:
 
 	QAction* mLineWrappingAction;
 
-	std::map<ssc::MESSAGE_LEVEL, QTextCharFormat> mFormat;
+	std::map<MESSAGE_LEVEL, QTextCharFormat> mFormat;
 };
-} // namespace ssc
+} // namespace cx
 #endif /* SSCCONSOLEWIDGET_H_ */

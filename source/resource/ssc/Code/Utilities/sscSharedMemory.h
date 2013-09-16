@@ -4,7 +4,7 @@
 #include <QSharedMemory>
 #include <QDateTime>
 
-namespace ssc
+namespace cx
 {
 
 /// Implements a circular buffer in shared memory using a client-server model,

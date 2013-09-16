@@ -28,17 +28,17 @@ void TestImageAlgorithms::testResample()
 	QString fname0 = cx::DataLocations::getTestDataPath() + "/testing/ResampleTest.cx3/Images/mra.mhd";
 	QString fname1 = cx::DataLocations::getTestDataPath() + "/testing/ResampleTest.cx3/Images/US_01_20110222T110117_1.mhd";
 
-	/*ssc::DataPtr image = */ssc::dataManager()->loadData(fname0, fname0, ssc::rtAUTO);
-	/*ssc::DataPtr referenceImage = */ssc::dataManager()->loadData(fname1, fname1, ssc::rtAUTO);
-	ssc::ImagePtr image = ssc::dataManager()->getImage(fname0);
-	ssc::ImagePtr referenceImage = ssc::dataManager()->getImage(fname1);
+	/*DataPtr image = */cx::dataManager()->loadData(fname0, fname0, cx::rtAUTO);
+	/*DataPtr referenceImage = */cx::dataManager()->loadData(fname1, fname1, cx::rtAUTO);
+	cx::ImagePtr image = cx::dataManager()->getImage(fname0);
+	cx::ImagePtr referenceImage = cx::dataManager()->getImage(fname1);
 //	std::cout << "referenceImage base: " << referenceImage->getBaseVtkImageData() << std::endl;
 	CPPUNIT_ASSERT(image!=0);
 	CPPUNIT_ASSERT(referenceImage!=0);
 
-  ssc::Transform3D refMi = referenceImage->get_rMd().inv() * image->get_rMd();
+	cx::Transform3D refMi = referenceImage->get_rMd().inv() * image->get_rMd();
 
-  ssc::ImagePtr oriented = ssc::resampleImage(image, refMi);
+  cx::ImagePtr oriented = resampleImage(image, refMi);
 	CPPUNIT_ASSERT(oriented!=0);
   int inMin = image->getBaseVtkImageData()->GetScalarRange()[0];
   int inMax = image->getBaseVtkImageData()->GetScalarRange()[1];
@@ -55,8 +55,8 @@ void TestImageAlgorithms::testResample()
   CPPUNIT_ASSERT(oriented->getTransferFunctions3D()->getVtkImageData() == oriented->getBaseVtkImageData());
   CPPUNIT_ASSERT(oriented->getLookupTable2D()->getVtkImageData() == oriented->getBaseVtkImageData());
 
-  ssc::Transform3D orient_M_ref = oriented->get_rMd().inv() * referenceImage->get_rMd();
-  ssc::DoubleBoundingBox3D bb_crop = transform(orient_M_ref, referenceImage->boundingBox());
+  cx::Transform3D orient_M_ref = oriented->get_rMd().inv() * referenceImage->get_rMd();
+  cx::DoubleBoundingBox3D bb_crop = cx::transform(orient_M_ref, referenceImage->boundingBox());
 
   // increase bb size by margin
   double margin = 5.0;
@@ -69,8 +69,8 @@ void TestImageAlgorithms::testResample()
 
   oriented->setCroppingBox(bb_crop);
 
-  ssc::ImagePtr cropped = cropImage(oriented);
-	CPPUNIT_ASSERT(cropped!=0);
+  cx::ImagePtr cropped = cropImage(oriented);
+  CPPUNIT_ASSERT(cropped!=0);
   int cropMin = cropped->getBaseVtkImageData()->GetScalarRange()[0];
   int cropMax = cropped->getBaseVtkImageData()->GetScalarRange()[1];
   CPPUNIT_ASSERT(cropMin == inMin);
@@ -83,7 +83,7 @@ void TestImageAlgorithms::testResample()
   QString uid = image->getUid() + "_resample%1";
   QString name = image->getName() + " resample%1";
 
-  ssc::ImagePtr resampled = resampleImage(cropped, ssc::Vector3D(referenceImage->getBaseVtkImageData()->GetSpacing()), uid, name);
+  cx::ImagePtr resampled = cx::resampleImage(cropped, cx::Vector3D(referenceImage->getBaseVtkImageData()->GetSpacing()), uid, name);
 	CPPUNIT_ASSERT(resampled!=0);
   outMin = resampled->getBaseVtkImageData()->GetScalarRange()[0];
   outMax = resampled->getBaseVtkImageData()->GetScalarRange()[1];

@@ -19,7 +19,7 @@
 
 #include "sscDummyToolManager.h"
 
-namespace ssc
+namespace cx
 {
 
 //ToolManager* ToolManager::mInstance = NULL;
@@ -225,7 +225,7 @@ void DummyToolManager::addTool(DummyToolPtr tool)
 
 void DummyToolManager::setTooltipOffset(double offset)
 {
-	if (ssc::similar(offset, mToolTipOffset))
+	if (similar(offset, mToolTipOffset))
 		return;
 	mToolTipOffset = offset;
 	emit tooltipOffset(mToolTipOffset);
@@ -236,4 +236,4 @@ double DummyToolManager::getTooltipOffset() const
 }
 
 
-} //namespace ssc
+} //namespace cx

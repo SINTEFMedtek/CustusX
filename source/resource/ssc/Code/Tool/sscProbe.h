@@ -25,7 +25,7 @@
 #include "sscProbeData.h"
 #include "sscForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 /**
  * \brief US Probe interface.
@@ -53,9 +53,9 @@ public:
 	virtual void applyNewConfigurationWithId(QString uid) = 0;
 	virtual void setTemporalCalibration(double val) = 0;
 	virtual void setSoundSpeedCompensationFactor(double val) = 0;
-	virtual void setProbeSector(ssc::ProbeData probeSector) = 0;
-	virtual void setRTSource(ssc::VideoSourcePtr source) = 0;
-	virtual void removeRTSource(ssc::VideoSourcePtr source) = 0;
+	virtual void setProbeSector(ProbeData probeSector) = 0;
+	virtual void setRTSource(VideoSourcePtr source) = 0;
+	virtual void removeRTSource(VideoSourcePtr source) = 0;
 
 	virtual void setActiveStream(QString uid) = 0;
 	virtual QString getActiveStream() const = 0;
@@ -73,6 +73,6 @@ signals:
 typedef boost::shared_ptr<Probe> ProbePtr;
 typedef boost::weak_ptr<Probe> ProbeWeakPtr;
 
-}//namespace ssc
+}//namespace cx
 
 #endif /* SSCPROBE_H_ */

@@ -28,7 +28,7 @@
 #include "sscStringDataAdapter.h"
 #include "sscOptimizedUpdateWidget.h"
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Composite widget for string edit.
@@ -52,6 +52,6 @@ private:
 	StringDataAdapterPtr mData;
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif /* SSCLABELEDLINEEDITWIDGET_H_ */

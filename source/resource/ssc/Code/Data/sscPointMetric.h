@@ -24,7 +24,7 @@
 #include "sscDataReaderWriter.h"
 #include "sscCoordinateSystemListener.h"
 
-namespace ssc
+namespace cx
 {
 /**
  * \file
@@ -34,12 +34,12 @@ namespace ssc
 
 typedef boost::shared_ptr<class PointMetric> PointMetricPtr;
 
-/** \brief ssc::DataReader implementation for PointMetric
+/** \brief DataReader implementation for PointMetric
  *
  * \date Jul 4, 2011
  * \author Christian Askeland, SINTEF
  */
-class PointMetricReader: public ssc::DataReader
+class PointMetricReader: public DataReader
 {
 public:
 	virtual ~PointMetricReader()
@@ -49,7 +49,7 @@ public:
 	{
 		return type == "pointMetric";
 	}
-	virtual ssc::DataPtr load(const QString& uid, const QString& filename);
+	virtual DataPtr load(const QString& uid, const QString& filename);
 };
 
 /**\brief Data class that represents a single point.
@@ -68,28 +68,28 @@ public:
     static PointMetricPtr create(QDomNode node);
     static PointMetricPtr create(QString uid, QString name="");
 
-	void setCoordinate(const ssc::Vector3D& p);
-	ssc::Vector3D getCoordinate() const;
-	void setSpace(ssc::CoordinateSystem space); // use parentframe from ssc::Data
-	ssc::CoordinateSystem getSpace() const; // use parentframe from ssc::Data
+	void setCoordinate(const Vector3D& p);
+	Vector3D getCoordinate() const;
+	void setSpace(CoordinateSystem space); // use parentframe from Data
+	CoordinateSystem getSpace() const; // use parentframe from Data
 	virtual QString getType() const
 	{
 		return "pointMetric";
 	}
-    virtual ssc::Vector3D getRefCoord() const;
+    virtual Vector3D getRefCoord() const;
 	virtual QString getAsSingleLineString() const;
 
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
-	virtual ssc::DoubleBoundingBox3D boundingBox() const;
+	virtual DoubleBoundingBox3D boundingBox() const;
 
 	// additional functionality:
 	// - get coord in space
 	// - rep
 
 private:
-	ssc::Vector3D mCoordinate;
-	ssc::CoordinateSystem mSpace;
+	Vector3D mCoordinate;
+	CoordinateSystem mSpace;
 	CoordinateSystemListenerPtr mSpaceListener;
 };
 

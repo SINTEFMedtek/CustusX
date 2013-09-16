@@ -10,18 +10,18 @@
 
 void TestGPURayCaster::setUp()
 {
-	mRep = ssc::GPURayCastVolumeRep::New("GPURayCastVolumeRep_test");
+	mRep = cx::GPURayCastVolumeRep::New("GPURayCastVolumeRep_test");
 }
 
 void TestGPURayCaster::testSetImages()
 {
 	vtkImageDataPtr data = vtkImageData::New();
-	ssc::ImagePtr image1(new ssc::Image("i1", data));
-	ssc::ImagePtr image2(new ssc::Image("i2", data));
-	ssc::ImagePtr image3(new ssc::Image("i3", data));
-	ssc::ImagePtr image4(new ssc::Image("i4", data));
-	ssc::ImagePtr image5(new ssc::Image("i5", data));
-	std::vector<ssc::ImagePtr> images;
+	cx::ImagePtr image1(new cx::Image("i1", data));
+	cx::ImagePtr image2(new cx::Image("i2", data));
+	cx::ImagePtr image3(new cx::Image("i3", data));
+	cx::ImagePtr image4(new cx::Image("i4", data));
+	cx::ImagePtr image5(new cx::Image("i5", data));
+	std::vector<cx::ImagePtr> images;
 	uint64_t mTime = mRep->mActor->GetMTime();
 	images.push_back(image1);
 	CPPUNIT_ASSERT_EQUAL((size_t)0, mRep->getImages().size());

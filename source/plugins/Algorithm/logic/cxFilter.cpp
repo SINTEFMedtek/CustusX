@@ -26,7 +26,7 @@ Filter::Filter() :
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-FilterGroup::FilterGroup(ssc::XmlOptionFile options) :
+FilterGroup::FilterGroup(XmlOptionFile options) :
     mOptions(options)
 {
 }
@@ -34,7 +34,7 @@ FilterGroup::FilterGroup(ssc::XmlOptionFile options) :
 /**
   * Get the option node for this pipeline
   */
-ssc::XmlOptionFile FilterGroup::getOptions()
+XmlOptionFile FilterGroup::getOptions()
 {
 	return mOptions;
 }
@@ -52,7 +52,7 @@ void FilterGroup::append(FilterPtr filter)
 	mFilters.push_back(filter);
 
 	QString uid = QString("%1_%2").arg(filter->getType()).arg(mFilters.size());
-	ssc::XmlOptionFile node = mOptions.descend(uid);
+	XmlOptionFile node = mOptions.descend(uid);
 	filter->initialize(node.getElement(), uid);
 }
 

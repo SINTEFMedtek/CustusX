@@ -32,7 +32,7 @@ namespace cx
 	typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
 }
 
-namespace ssc
+namespace cx
 {
 
 
@@ -79,17 +79,14 @@ public:
 	virtual ~VolumetricRep();
 
 	static VolumetricRepPtr New(QString uid="") { return wrap_new(new VolumetricRep(), uid); }
-	virtual QString getType() const { return "ssc::VolumetricRep"; }
+	virtual QString getType() const { return "VolumetricRep"; }
 	virtual void setImage(ImagePtr image); ///< set the reps image
 	virtual ImagePtr getImage(); ///< get the reps image
 	virtual bool hasImage(ImagePtr image) const; ///< check if the reps has the image
 	virtual vtkVolumePtr getVtkVolume() { return mVolume; } ///< get the images vtkVolume
-	virtual void setResampleFactor(double factor); ///< set how detailed the image should be
 	void setMaxVolumeSize(long maxVoxels); ///< set max volume size for rendering. Must be set before setImage()
 	void setUseGPUVolumeRayCastMapper();
 	void setUseVolumeTextureMapper();
-
-	static double computeResampleFactor(long maxVoxels, ssc::ImagePtr image);
 
 protected:
 	VolumetricRep();
@@ -102,18 +99,14 @@ protected:
 	long mMaxVoxels; ///< always resample volume below this size.
 
 	ImagePtr mImage;
-	double mResampleFactor;
 	cx::ImageMapperMonitorPtr mMonitor; ///< helper object for visualizing clipping/cropping
 
 private slots:
 	void transformChangedSlot();
 	void vtkImageDataChangedSlot();
-
-private:
-	void updateResampleFactor();
 };
 //---------------------------------------------------------
-} // namespace ssc
+} // namespace cx
 //---------------------------------------------------------
 
 #endif /*SSCVOLUMEREP_H_*/

@@ -29,7 +29,7 @@
 #include "sscForwardDeclarations.h"
 
 //---------------------------------------------------------
-namespace ssc
+namespace cx
 {
 
 typedef vtkSmartPointer<class TextureSlicePainter> TextureSlicePainterPtr;
@@ -55,10 +55,10 @@ public:
 	virtual ~Texture3DSlicerProxy() {}
 	virtual void setShaderFile(QString shaderFile) {}
 	virtual void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp) {}
-	virtual void setImages(std::vector<ssc::ImagePtr> images) {}
-	virtual std::vector<ssc::ImagePtr> getImages() { return std::vector<ssc::ImagePtr>(); }
-	virtual void setSliceProxy(ssc::SliceProxyPtr slicer) {}
-	virtual ssc::SliceProxyPtr getSliceProxy() { return ssc::SliceProxyPtr(); }
+	virtual void setImages(std::vector<ImagePtr> images) {}
+	virtual std::vector<ImagePtr> getImages() { return std::vector<ImagePtr>(); }
+	virtual void setSliceProxy(SliceProxyPtr slicer) {}
+	virtual SliceProxyPtr getSliceProxy() { return SliceProxyPtr(); }
 	virtual void update() {}
 	virtual void setTargetSpaceToR(){}
 	virtual vtkActorPtr getActor() { return vtkActorPtr(); }
@@ -90,13 +90,13 @@ public:
 	virtual ~Texture3DSlicerProxyImpl();
 	void setShaderFile(QString shaderFile);
 	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp); // DEPRECATED: use zoomfactor in View and the object will auto-update
-	void setImages(std::vector<ssc::ImagePtr> images);
-	void setSliceProxy(ssc::SliceProxyPtr slicer);
-	ssc::SliceProxyPtr getSliceProxy() { return mSliceProxy; }
+	void setImages(std::vector<ImagePtr> images);
+	void setSliceProxy(SliceProxyPtr slicer);
+	SliceProxyPtr getSliceProxy() { return mSliceProxy; }
 	void update();
 	void setTargetSpaceToR(); ///< use to draw the slice in 3D r space instead of in 2D s space.
 	vtkActorPtr getActor();
-	std::vector<ssc::ImagePtr> getImages() { return mImages; };
+	std::vector<ImagePtr> getImages() { return mImages; };
 
 protected:
 	Texture3DSlicerProxyImpl();
@@ -113,8 +113,8 @@ private:
 	QString getTCoordName(int index);
 	void setColorAttributes(int i);
 	DoubleBoundingBox3D mBB_s;
-	std::vector<ssc::ImagePtr> mImages;
-	ssc::SliceProxyPtr mSliceProxy;
+	std::vector<ImagePtr> mImages;
+	SliceProxyPtr mSliceProxy;
 //	View* mView;
 	bool mTargetSpaceIsR;
 

@@ -51,7 +51,7 @@ QString ConnectedThresholdImageFilterWidget::defaultWhatsThis() const
 
 void ConnectedThresholdImageFilterWidget::handleFinishedSlot()
 {
-  ssc::ImagePtr segmentedImage = mConnectedThresholdImageFilter.getOutput();
+  ImagePtr segmentedImage = mConnectedThresholdImageFilter.getOutput();
   if(!segmentedImage)
     return;
 
@@ -63,7 +63,7 @@ void ConnectedThresholdImageFilterWidget::segmentSlot()
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
 
   //TODO add user interface
-  ssc::ImagePtr selectedImage = ssc::dataManager()->getActiveImage();
+  ImagePtr selectedImage = dataManager()->getActiveImage();
   float lowerThreshold = 50.0;
   float upperThreshold = 647.0;
   int replaceValue = 150;

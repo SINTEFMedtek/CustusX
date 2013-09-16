@@ -32,7 +32,7 @@ namespace cx
 Image2DProxy::Image2DProxy()
 {
 	mActor = vtkImageActorPtr::New();
-	mImageWithLUTProxy.reset(new ssc::ApplyLUTToImage2DProxy());
+	mImageWithLUTProxy.reset(new ApplyLUTToImage2DProxy());
 }
 
 Image2DProxy::~Image2DProxy()
@@ -50,7 +50,7 @@ vtkImageActorPtr Image2DProxy::getActor()
 	return mActor;
 }
 
-void Image2DProxy::setImage(ssc::ImagePtr image)
+void Image2DProxy::setImage(ImagePtr image)
 {
 
 	if (image==mImage)
@@ -132,21 +132,21 @@ Image2DRep3D::~Image2DRep3D()
 
 //Image2DRep3DPtr Image2DRep3D::New(QString uid)
 //{
-//	return ssc::RepImpl::wrap(new Image2DRep3D(), uid);
+//	return RepImpl::wrap(new Image2DRep3D(), uid);
 //}
 
-void Image2DRep3D::setImage(ssc::ImagePtr image)
+void Image2DRep3D::setImage(ImagePtr image)
 {
 	mProxy->setImage(image);
 }
 
-void Image2DRep3D::addRepActorsToViewRenderer(ssc::View *view)
+void Image2DRep3D::addRepActorsToViewRenderer(View *view)
 {
 	view->getRenderer()->AddActor(mProxy->getActor());
 	mView = view;
 }
 
-void Image2DRep3D::removeRepActorsFromViewRenderer(ssc::View *view)
+void Image2DRep3D::removeRepActorsFromViewRenderer(View *view)
 {
 	view->getRenderer()->RemoveActor(mProxy->getActor());
 	mView = NULL;

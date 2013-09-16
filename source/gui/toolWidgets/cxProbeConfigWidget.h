@@ -54,9 +54,9 @@ private:
 
 	QWidget* mActiveProbeConfigWidget;
 	BoundingBoxWidget* mBBWidget;
-	ssc::Vector3DDataAdapterPtr mOrigin;
+	Vector3DDataAdapterPtr mOrigin;
 	SliderRangeGroupWidget* mDepthWidget;
-	ssc::DoubleDataAdapterXmlPtr mWidth;
+	DoubleDataAdapterXmlPtr mWidth;
 	QCheckBox* mSyncBoxToSector;
 
 	ActiveProbeConfigurationStringDataAdapterPtr mActiveProbeConfig;

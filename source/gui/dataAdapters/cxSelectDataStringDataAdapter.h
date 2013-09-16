@@ -20,9 +20,9 @@
 namespace cx
 {
 
-/** Base class for all DataAdapters that selects a ssc::Data or descendants.
+/** Base class for all DataAdapters that selects a Data or descendants.
  */
-class SelectDataStringDataAdapterBase : public ssc::StringDataAdapter
+class SelectDataStringDataAdapterBase : public StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -37,18 +37,18 @@ public: // optional methods
   virtual QString getHelp() const;
 
 public: // interface extension
-  virtual ssc::DataPtr getData() const;
+  virtual DataPtr getData() const;
   virtual void setValueName(const QString name);
   virtual void setHelp(QString text);
 
 signals:
   void dataChanged(QString);
 protected:
-	/** Construct base with a filter that determined allowed ssc::Data types based
+	/** Construct base with a filter that determined allowed Data types based
 	  * on their getType() return value. The default of ".*" means any type.
 	  */
 	explicit SelectDataStringDataAdapterBase(QString typeRegexp = ".*");
-	std::map<QString, ssc::DataPtr> filterOnType(std::map<QString, ssc::DataPtr> input, QString regexp) const;
+	std::map<QString, DataPtr> filterOnType(std::map<QString, DataPtr> input, QString regexp) const;
 	QString mTypeRegexp;
 	QString mValueName;
 	QString mHelp;
@@ -93,7 +93,7 @@ public: // basic methods
   virtual QString getValue() const;
 
 public: // interface extension
-  ssc::ImagePtr getImage();
+  ImagePtr getImage();
 
 protected:
   SelectImageStringDataAdapter();
@@ -118,12 +118,12 @@ public: // basic methods
   virtual QString getValue() const;
 
 public: // interface extension
-  virtual ssc::DataPtr getData() const;
+  virtual DataPtr getData() const;
 
 protected:
   SelectDataStringDataAdapter();
 private:
-//  ssc::DataPtr mData;
+//  DataPtr mData;
   QString mUid;
 
 };
@@ -145,7 +145,7 @@ public: // basic methods
   virtual QString getValue() const;
 
 public: // interface extension
-  ssc::MeshPtr getMesh();
+  MeshPtr getMesh();
 
 protected:
   SelectMeshStringDataAdapter();

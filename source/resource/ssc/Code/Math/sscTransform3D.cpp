@@ -9,7 +9,7 @@
 #include "vtkForwardDeclarations.h"
 
 // --------------------------------------------------------
-namespace ssc_transform3D_internal
+namespace cx_transform3D_internal
 {
 
 /**provide an array of the transform indices, vtk / row-major ordering
@@ -101,9 +101,9 @@ Eigen::Affine3d fromString(const QString& text, bool* _ok)
 	return retval;
 }
 
-} // namespace ssc_transform3D_internal
+} // namespace cx_transform3D_internal
 
-namespace ssc
+namespace cx
 {
 
 bool similar(const Transform3D& a, const Transform3D& b, double tol)
@@ -219,6 +219,6 @@ Transform3D createTransformIJC(const Vector3D& ivec, const Vector3D& jvec, const
 	return t;
 }
 
-} // namespace ssc
+} // namespace cx
 // --------------------------------------------------------
 

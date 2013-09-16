@@ -36,7 +36,7 @@
 #include <QGridLayout>
 #include "sscOptimizedUpdateWidget.h"
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Widget for the BoolDataAdapter.

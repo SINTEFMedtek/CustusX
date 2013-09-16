@@ -5,7 +5,7 @@
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/extensions/HelperMacros.h>
 
-/**Unit tests for class ssc::SliceComputer
+/**Unit tests for class SliceComputer
  */
 class TestSliceComputer : public CppUnit::TestFixture
 {

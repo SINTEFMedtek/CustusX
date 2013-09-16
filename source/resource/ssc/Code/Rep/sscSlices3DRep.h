@@ -37,7 +37,7 @@
 #include "sscForwardDeclarations.h"
 
 //---------------------------------------------------------
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class Slices3DRep> Slices3DRepPtr;
@@ -58,23 +58,23 @@ typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
  * \ingroup sscRep
  * \ingroup sscRep3D
  */
-class Slices3DRep: public ssc::RepImpl
+class Slices3DRep: public RepImpl
 {
 Q_OBJECT
 public:
 	static Slices3DRepPtr New(const QString& uid);
 	virtual ~Slices3DRep();
-	virtual QString getType() const { return "ssc::Slices3DRep"; }
+	virtual QString getType() const { return "Slices3DRep"; }
 
 	void setShaderFile(QString shaderFile);
-	void setImages(std::vector<ssc::ImagePtr> images);
+	void setImages(std::vector<ImagePtr> images);
 	void addPlane(PLANE_TYPE plane);
 	void setTool(ToolPtr tool);
 
 protected:
 	Slices3DRep(const QString& uid);
-	virtual void addRepActorsToViewRenderer(ssc::View *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+	virtual void addRepActorsToViewRenderer(View *view);
+	virtual void removeRepActorsFromViewRenderer(View *view);
 
 private:
 	View *mView;

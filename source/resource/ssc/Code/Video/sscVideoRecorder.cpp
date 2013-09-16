@@ -29,7 +29,7 @@
 #include "sscTime.h"
 #include "sscMessageManager.h"
 
-namespace ssc
+namespace cx
 {
 
 VideoRecorder::VideoRecorder(VideoSourcePtr source, bool sync) :
@@ -71,8 +71,8 @@ void VideoRecorder::newFrameSlot()
 
 	if (!mSynced)
 	{
-		mSyncShift = ssc::getMilliSecondsSinceEpoch() - timestamp;
-		ssc::messageManager()->sendInfo(QString("VideoRecorder found and corrected sync shift: %1 s").arg(double(mSyncShift)/1000, 6, 'f', 3));
+		mSyncShift = getMilliSecondsSinceEpoch() - timestamp;
+		messageManager()->sendInfo(QString("VideoRecorder found and corrected sync shift: %1 s").arg(double(mSyncShift)/1000, 6, 'f', 3));
 //    std::cout << "RealTimeStreamSourceRecorder SyncShift: " << mSyncShift << std::endl;
 		mSynced = true;
 	}
