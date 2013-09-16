@@ -29,6 +29,9 @@
 #include "cxMultiVolume3DRepProducer.h"
 #include "cxtestMultiVolume3DRepProducerFixture.h"
 
+#include "cxMehdiGPURayCastMultiVolumeRep.h"
+#include "vtkOpenGLGPUMultiVolumeRayCastMapper.h"
+
 namespace cxtest
 {
 
@@ -145,17 +148,15 @@ TEST_CASE("MultiVolume3DRepProducer creates 1 rep using vtkOpenGLGPUMultiVolumeR
 {
 	MultiVolume3DRepProducerFixture fixture;
 
-	unsigned imageCount = 3;
+    unsigned imageCount = 2;
 	fixture.initializeVisualizerAndImages("vtkOpenGLGPUMultiVolumeRayCastMapper", imageCount);
 
 	REQUIRE(fixture.mBase.getAllReps().size() == 1);
 
-	for (unsigned i=0; i<imageCount; ++i)
-	{
-		cx::VolumetricRepPtr rep = fixture.downcastRep<cx::VolumetricRep>(i);
-		REQUIRE(rep);
-		CHECK(dynamic_cast<vtkOpenGLGPUMultiVolumeRayCastMapper*>(rep->getVtkVolume()->GetMapper()));
-	}
+
+    cx::MehdiGPURayCastMultiVolumeRepPtr rep = fixture.downcastRep<cx::MehdiGPURayCastMultiVolumeRep>(0);
+    REQUIRE(rep);
+//		CHECK(dynamic_cast<vtkOpenGLGPUMultiVolumeRayCastMapper*>(rep->getVtkVolume()->GetMapper()));
 }
 #endif //CX_BUILD_MEHDI_VTKMULTIVOLUME
 
