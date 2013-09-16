@@ -32,7 +32,7 @@
 namespace cxtest
 {
 
-TEST_CASE("MultiVolume3DVisualizer emits imageChanged and repChanged signals for 1 added image.", "[unit]")
+TEST_CASE("MultiVolume3DRepProducer emits imageChanged and repChanged signals for 1 added image.", "[unit]")
 {
 	MultiVolume3DRepProducerFixture fixture;
 
@@ -43,7 +43,7 @@ TEST_CASE("MultiVolume3DVisualizer emits imageChanged and repChanged signals for
 	CHECK(imagesChanged.isReceived());
 }
 
-TEST_CASE("MultiVolume3DVisualizer creates 1 rep using vtkVolumeTextureMapper3D for 1 added image.", "[unit]")
+TEST_CASE("MultiVolume3DRepProducer creates 1 rep using vtkVolumeTextureMapper3D for 1 added image.", "[unit]")
 {
 	MultiVolume3DRepProducerFixture fixture;
 
@@ -56,7 +56,7 @@ TEST_CASE("MultiVolume3DVisualizer creates 1 rep using vtkVolumeTextureMapper3D 
 	CHECK(dynamic_cast<vtkVolumeTextureMapper3D*>(rep->getVtkVolume()->GetMapper()));
 }
 
-TEST_CASE("MultiVolume3DVisualizer creates 0 reps using invalid type for 1 added image.", "[unit]")
+TEST_CASE("MultiVolume3DRepProducer creates 0 reps using invalid type for 1 added image.", "[unit]")
 {
 	MultiVolume3DRepProducerFixture fixture;
 	fixture.initializeVisualizerAndImages("invalid type", 1);
@@ -64,7 +64,7 @@ TEST_CASE("MultiVolume3DVisualizer creates 0 reps using invalid type for 1 added
 	REQUIRE(fixture.mBase.getAllReps().size() == 0);
 }
 
-TEST_CASE("MultiVolume3DVisualizer creates 1 rep using vtkGPUVolumeRayCastMapper for 1 added image.", "[unit]")
+TEST_CASE("MultiVolume3DRepProducer creates 1 rep using vtkGPUVolumeRayCastMapper for 1 added image.", "[unit]")
 {
 	MultiVolume3DRepProducerFixture fixture;
 	fixture.initializeVisualizerAndImages("vtkGPUVolumeRayCastMapper", 1);
@@ -76,7 +76,7 @@ TEST_CASE("MultiVolume3DVisualizer creates 1 rep using vtkGPUVolumeRayCastMapper
 	CHECK(dynamic_cast<vtkGPUVolumeRayCastMapper*>(rep->getVtkVolume()->GetMapper()));
 }
 
-TEST_CASE("MultiVolume3DVisualizer creates 1 rep using sscProgressiveLODVolumeTextureMapper3D for 1 added image.", "[unit]")
+TEST_CASE("MultiVolume3DRepProducer creates 1 rep using sscProgressiveLODVolumeTextureMapper3D for 1 added image.", "[unit]")
 {
 	MultiVolume3DRepProducerFixture fixture;
 	fixture.initializeVisualizerAndImages("sscProgressiveLODVolumeTextureMapper3D", 1);
@@ -87,7 +87,7 @@ TEST_CASE("MultiVolume3DVisualizer creates 1 rep using sscProgressiveLODVolumeTe
 	REQUIRE(rep);
 }
 
-TEST_CASE("MultiVolume3DVisualizer creates 1 rep using Image2DRep3D for 1 added 2D image, for any visualizer type.", "[unit]")
+TEST_CASE("MultiVolume3DRepProducer creates 1 rep using Image2DRep3D for 1 added 2D image, for any visualizer type.", "[unit]")
 {
 	MultiVolume3DRepProducerFixture fixture;
 
@@ -103,7 +103,7 @@ TEST_CASE("MultiVolume3DVisualizer creates 1 rep using Image2DRep3D for 1 added 
 	REQUIRE(rep);
 }
 
-TEST_CASE("MultiVolume3DVisualizer creates 3 reps using vtkVolumeTextureMapper3D for 3 added images.", "[unit]")
+TEST_CASE("MultiVolume3DRepProducer creates 3 reps using vtkVolumeTextureMapper3D for 3 added images.", "[unit]")
 {
 	MultiVolume3DRepProducerFixture fixture;
 
@@ -120,7 +120,7 @@ TEST_CASE("MultiVolume3DVisualizer creates 3 reps using vtkVolumeTextureMapper3D
 	}
 }
 
-TEST_CASE("MultiVolume3DVisualizer creates 2 reps using vtkVolumeTextureMapper3D for 3 added and 1 removed image(s).", "[unit]")
+TEST_CASE("MultiVolume3DRepProducer creates 2 reps using vtkVolumeTextureMapper3D for 3 added and 1 removed image(s).", "[unit]")
 {
 	MultiVolume3DRepProducerFixture fixture;
 
@@ -139,5 +139,24 @@ TEST_CASE("MultiVolume3DVisualizer creates 2 reps using vtkVolumeTextureMapper3D
 		CHECK(dynamic_cast<vtkVolumeTextureMapper3D*>(rep->getVtkVolume()->GetMapper()));
 	}
 }
+
+#ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
+TEST_CASE("MultiVolume3DRepProducer creates 1 rep using vtkOpenGLGPUMultiVolumeRayCastMapper for 3 added images.", "[unit]")
+{
+	MultiVolume3DRepProducerFixture fixture;
+
+	unsigned imageCount = 3;
+	fixture.initializeVisualizerAndImages("vtkOpenGLGPUMultiVolumeRayCastMapper", imageCount);
+
+	REQUIRE(fixture.mBase.getAllReps().size() == 1);
+
+	for (unsigned i=0; i<imageCount; ++i)
+	{
+		cx::VolumetricRepPtr rep = fixture.downcastRep<cx::VolumetricRep>(i);
+		REQUIRE(rep);
+		CHECK(dynamic_cast<vtkOpenGLGPUMultiVolumeRayCastMapper*>(rep->getVtkVolume()->GetMapper()));
+	}
+}
+#endif //CX_BUILD_MEHDI_VTKMULTIVOLUME
 
 } // namespace cx
