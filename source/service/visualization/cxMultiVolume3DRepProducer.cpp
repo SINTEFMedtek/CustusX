@@ -60,7 +60,7 @@ QStringList MultiVolume3DRepProducer::getAvailableVisualizers()
 	retval << "vtkGPUVolumeRayCastMapper";
 #endif
 	retval << "sscProgressiveLODVolumeTextureMapper3D";
-	retval << "sscGPURayCastMultiVolume";	
+	retval << "sscGPURayCastMultiVolume";
 #ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
 	retval << "vtkOpenGLGPUMultiVolumeRayCastMapper";
 #endif //CX_BUILD_MEHDI_VTKMULTIVOLUME
