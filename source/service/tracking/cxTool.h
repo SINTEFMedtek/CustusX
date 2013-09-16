@@ -114,7 +114,7 @@ public:
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode& dataNode);
 
-	typedef Transform3D Transform3D;signals:
+signals:
 	void attachedToTracker(bool);
 
 private slots:

@@ -26,8 +26,6 @@ class StatusBar: public QStatusBar
 {
   Q_OBJECT
 
-  typedef Message Message;
-
 public:
   StatusBar(); ///< connects signals and slots
   virtual ~StatusBar(); ///< empty
