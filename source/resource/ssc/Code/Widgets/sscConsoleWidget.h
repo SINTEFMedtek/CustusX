@@ -38,7 +38,7 @@ namespace cx
  */
 class ConsoleWidget: public QTextBrowser
 {
-	typedef Message Message;
+//	typedef Message Message;
 
 Q_OBJECT
 
