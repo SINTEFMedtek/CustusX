@@ -127,8 +127,6 @@ public:
 
 	void printInternalStructure();
 
-	typedef Transform3D Transform3D;
-
 signals:
 	void attachedToTracker(bool);
 	void tracked(bool);

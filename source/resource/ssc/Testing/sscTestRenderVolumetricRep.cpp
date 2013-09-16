@@ -43,18 +43,18 @@ int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
 
-	std::cout << ssc::TestUtilities::GetDataRoot() << std::endl;
-	QString testFile1 = ssc::TestUtilities::ExpandDataFileName("ssc/Person5/person5_t2_unsigned.mhd");
-//	QString testFile1 = ssc::TestUtilities::ExpandDataFileName("Person5/person5_t2_byte.mhd");
-	//QString testFile1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
+    std::cout << cx::TestUtilities::GetDataRoot() << std::endl;
+    QString testFile1 = cx::TestUtilities::ExpandDataFileName("ssc/Person5/person5_t2_unsigned.mhd");
+//	QString testFile1 = cx::TestUtilities::ExpandDataFileName("Person5/person5_t2_byte.mhd");
+    //QString testFile1 = cx::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
 	std::cout << testFile1 << std::endl;
 
-	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->loadImage(testFile1, testFile1, ssc::rtMETAIMAGE);
+    cx::ImagePtr image1 = cx::DataManager::getInstance()->loadImage(testFile1, testFile1, cx::rtMETAIMAGE);
 
 	std::cout << "test" << std::endl;
 	QWidget mainWindow;
 	QHBoxLayout* layout = new QHBoxLayout(&mainWindow);
-	ssc::ViewWidget* view = new ssc::ViewWidget(&mainWindow);
+    cx::ViewWidget* view = new cx::ViewWidget(&mainWindow);
 	view->getRenderWindow()->GetInteractor()->EnableRenderOff();
 	layout->addWidget(view);
 	std::cout << "test2" << std::endl;
@@ -67,8 +67,8 @@ int main(int argc, char **argv)
 	return 1;
 #endif
 
-	//ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(image1->getUid());
-	ssc::ProgressiveLODVolumetricRepPtr rep = ssc::ProgressiveLODVolumetricRep::New(image1->getUid());
+    //cx::VolumetricRepPtr rep = cx::VolumetricRep::New(image1->getUid());
+    cx::ProgressiveLODVolumetricRepPtr rep = cx::ProgressiveLODVolumetricRep::New(image1->getUid());
 
 	rep->setImage(image1);
 	view->setRep(rep);
@@ -90,20 +90,20 @@ int main(int argc, char **argv)
 
 //#define USE_TRANSFORM_RESCLICER
 #ifdef USE_TRANSFORM_RESCLICER
-	// this code is meant for testing the reslicer in ssc::Image
+    // this code is meant for testing the reslicer in cx::Image
 	std::cout << "rotating the image data..." << std::endl;
-	image1->set_rMd(ssc::createTransformRotateZ(1.0*M_PI/8.0).inv());
+    image1->set_rMd(cx::createTransformRotateZ(1.0*M_PI/8.0).inv());
 	doRender(view->getRenderWindow());
-	image1->set_rMd(ssc::createTransformRotateZ(2.0*M_PI/8.0).inv());
+    image1->set_rMd(cx::createTransformRotateZ(2.0*M_PI/8.0).inv());
 	doRender(view->getRenderWindow());
-	image1->set_rMd(ssc::createTransformRotateZ(3.0*M_PI/8.0).inv());
+    image1->set_rMd(cx::createTransformRotateZ(3.0*M_PI/8.0).inv());
 	doRender(view->getRenderWindow());
 #endif
 	std::cout << "Uid       : " << image1->getUid() << std::endl;
 	
 	//QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS*1000, &app, SLOT(quit())); // terminate app after some seconds - this is an automated test!!
 
-	ssc::AcceptanceBoxWidget* acceptanceBox = new ssc::AcceptanceBoxWidget("OK / not OK", &mainWindow);
+    cx::AcceptanceBoxWidget* acceptanceBox = new cx::AcceptanceBoxWidget("OK / not OK", &mainWindow);
 	layout->addWidget(acceptanceBox);
 	
 	app.exec();
