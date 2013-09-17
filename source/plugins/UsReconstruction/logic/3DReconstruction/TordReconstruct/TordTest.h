@@ -5,7 +5,7 @@
 #include "sscReconstructAlgorithm.h"
 
 
-namespace ssc
+namespace cx
 {
 /**
  * \addtogroup sscUSReconstruction
@@ -17,7 +17,7 @@ namespace ssc
  * \brief Tords US test
  */
 
-class TordTest: public ReconstructAlgorithm
+class TordTest : public ReconstructAlgorithm
 {
 public:
 	TordTest();

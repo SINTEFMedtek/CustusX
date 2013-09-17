@@ -3,7 +3,7 @@
 #include <vtkImageData.h>
 #include <QDomElement>
 #include <iostream>
-namespace ssc
+namespace cx
 {
 
 TordTest::TordTest()
@@ -26,7 +26,7 @@ TordTest::reconstruct(ProcessedUSInputDataPtr input,
 	
 	vtkImageDataPtr target = outputData;
 	Eigen::Array3i targetDims(target->GetDimensions());
-	ssc::Vector3D targetSpacing(target->GetSpacing());
+	Vector3D targetSpacing(target->GetSpacing());
 
 
 	// Print dimensions
