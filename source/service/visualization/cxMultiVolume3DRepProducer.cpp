@@ -40,7 +40,6 @@ MultiVolume3DRepProducer::MultiVolume3DRepProducer()
 
 MultiVolume3DRepProducer::~MultiVolume3DRepProducer()
 {
-	this->clearReps();
 }
 
 void MultiVolume3DRepProducer::setView(View* view)

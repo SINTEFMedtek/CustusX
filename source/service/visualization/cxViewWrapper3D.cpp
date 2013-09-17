@@ -159,6 +159,7 @@ ViewWrapper3D::~ViewWrapper3D()
 	if (mView)
 	{
 		mView->removeReps();
+		mMultiVolume3DRepProducer->removeRepsFromView();
 	}
 }
 
