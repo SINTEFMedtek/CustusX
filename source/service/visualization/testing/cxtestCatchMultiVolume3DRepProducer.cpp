@@ -25,6 +25,7 @@
 #include "sscMessageManager.h"
 #include "cxtestDirectSignalListener.h"
 #include "sscImage2DRep3D.h"
+#include "cxConfig.h"
 
 #include "cxMultiVolume3DRepProducer.h"
 #include "cxtestMultiVolume3DRepProducerFixture.h"
@@ -148,16 +149,15 @@ TEST_CASE("MultiVolume3DRepProducer creates 1 rep using vtkOpenGLGPUMultiVolumeR
 {
 	MultiVolume3DRepProducerFixture fixture;
 
-    unsigned imageCount = 2;
+	unsigned imageCount = 3;
 	fixture.initializeVisualizerAndImages("vtkOpenGLGPUMultiVolumeRayCastMapper", imageCount);
 
 	REQUIRE(fixture.mBase.getAllReps().size() == 1);
 
-
-    cx::MehdiGPURayCastMultiVolumeRepPtr rep = fixture.downcastRep<cx::MehdiGPURayCastMultiVolumeRep>(0);
-    REQUIRE(rep);
+	cx::MehdiGPURayCastMultiVolumeRepPtr rep = fixture.downcastRep<cx::MehdiGPURayCastMultiVolumeRep>(0);
+	REQUIRE(rep);
 //		CHECK(dynamic_cast<vtkOpenGLGPUMultiVolumeRayCastMapper*>(rep->getVtkVolume()->GetMapper()));
 }
 #endif //CX_BUILD_MEHDI_VTKMULTIVOLUME
 
-} // namespace cx
+} // namespace cxtest
