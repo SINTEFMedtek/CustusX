@@ -18,7 +18,7 @@ class QDomDocument;
 class QFile;
 class QTextStream;
 
-namespace ssc
+namespace cx
 {
 /**\brief A representation of a MessageManager message.
  *
@@ -82,7 +82,7 @@ public:
   };
 
   void setFormat(Format format); ///< fine-tune messaging format
-  void setAudioSource(ssc::AudioPtr audioSource); ///< define sounds to go with the messages.
+  void setAudioSource(AudioPtr audioSource); ///< define sounds to go with the messages.
   bool hasAudioSource() const;
   void setEnabled(bool enabled); ///< enable/disable messaging.
   bool isEnabled() const;
@@ -143,7 +143,7 @@ private:
   bool mEnabled;
   Format mFormat;
   QString mLogFile;
-  ssc::AudioPtr mAudioSource;
+  AudioPtr mAudioSource;
 
   static MessageManager *mTheInstance; ///< The unique MessageManager.
 };
@@ -152,7 +152,7 @@ private:
  */
 MessageManager* messageManager();
 
-} //namespace ssc
+} //namespace cx
 
 #ifdef SSC_PRINT_CALLER_INFO
 //	#ifndef __PRETTY_FUNCTION__
@@ -175,7 +175,7 @@ MessageManager* messageManager();
 	#define sendDebug(msg) sendDebugWithCallerInfo(msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
 #endif
 
-typedef ssc::Message Message;
+typedef cx::Message Message;
 Q_DECLARE_METATYPE(Message);
 
 

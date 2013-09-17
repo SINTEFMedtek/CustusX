@@ -24,7 +24,7 @@
 #include "sscForwardDeclarations.h"
 #include "sscRepImpl.h"
 
-namespace ssc
+namespace cx
 {
 
 /**\brief NOT IN USE
@@ -39,7 +39,7 @@ class SurfaceRep : public RepImpl
 	Q_OBJECT
 public:
 	static SurfaceRepPtr New(const QString& uid);
-	virtual QString getType() const { return "ssc::SurfaceRep"; }
+	virtual QString getType() const { return "SurfaceRep"; }
 	virtual ~SurfaceRep();
 	void setMesh(MeshPtr mesh);
 	void setImage(ImagePtr image);

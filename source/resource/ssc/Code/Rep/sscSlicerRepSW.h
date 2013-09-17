@@ -25,7 +25,7 @@
 #include "sscForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Display an image slice in 2D.
@@ -46,12 +46,12 @@ class SliceRepSW : public RepImpl
 public:
 	static SliceRepSWPtr New(const QString& uid);
 	virtual ~SliceRepSW();
-	virtual QString getType() const { return "ssc::SliceRepSW"; };
+	virtual QString getType() const { return "SliceRepSW"; };
 	bool hasImage(ImagePtr image) const;
 	void setImage(ImagePtr image);
 	ImagePtr getImage();
 	vtkImageActorPtr getActor();
-	void setSliceProxy(ssc::SliceProxyPtr slicer);
+	void setSliceProxy(SliceProxyPtr slicer);
 	QString getImageUid()const;
 	void update();
 	virtual void printSelf(std::ostream & os, Indent indent);
@@ -66,6 +66,6 @@ private:
 	vtkImageActorPtr mImageActor;
 };
 
-}// namespace ssc
+}// namespace cx
 
 #endif /*SSCSLICERREPSW_H_*/

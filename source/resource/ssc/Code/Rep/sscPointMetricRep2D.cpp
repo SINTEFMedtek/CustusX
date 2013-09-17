@@ -29,7 +29,7 @@
 
 #include "sscSliceProxy.h"
 #include "sscView.h"
-namespace ssc
+namespace cx
 {
 
 PointMetricRep2DPtr PointMetricRep2D::New(const QString& uid, const QString& name)
@@ -50,7 +50,7 @@ void PointMetricRep2D::setDynamicSize(bool on)
 {
 	if (on)
 	{
-		mViewportListener.reset(new ssc::ViewportListener);
+		mViewportListener.reset(new ViewportListener);
 		mViewportListener->setCallback(boost::bind(&PointMetricRep2D::rescale, this));
 	}
 	else
@@ -59,14 +59,14 @@ void PointMetricRep2D::setDynamicSize(bool on)
 	}
 }
 
-void PointMetricRep2D::addRepActorsToViewRenderer(ssc::View* view)
+void PointMetricRep2D::addRepActorsToViewRenderer(View* view)
 {
     if (mViewportListener)
         mViewportListener->startListen(view->getRenderer());
     DataMetricRep::addRepActorsToViewRenderer(view);
 }
 
-void PointMetricRep2D::removeRepActorsFromViewRenderer(ssc::View* view)
+void PointMetricRep2D::removeRepActorsFromViewRenderer(View* view)
 {
     mView->getRenderer()->RemoveActor(mCircleActor);
 	mView->getRenderer()->RemoveActor(mOutlineActor);
@@ -153,7 +153,7 @@ void PointMetricRep2D::changedSlot()
 //	if (!mShowLabel)
 //		mText.reset();
 //	if (!mText && mShowLabel && mView)
-//		mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
+//		mText.reset(new CaptionText3D(mView->getRenderer()));
 //	if (mText)
 //	{
 //		mText->setColor(mColor);
@@ -188,7 +188,7 @@ void PointMetricRep2D::rescale()
 //	mGraphicalPoint->setRadius(sphereSize);
 }
 
-void PointMetricRep2D::setSliceProxy(ssc::SliceProxyPtr sliceProxy)
+void PointMetricRep2D::setSliceProxy(SliceProxyPtr sliceProxy)
 {
 	if (mSliceProxy)
 		disconnect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(changedSlot()));

@@ -25,19 +25,19 @@
 void TestUSSavingRecorder::setUp()
 {
 	cx::removeNonemptyDirRecursively(TestUSSavingRecorderController::getDataPath());
-	ssc::MessageManager::initialize();
+	cx::MessageManager::initialize();
 }
 
 void TestUSSavingRecorder::tearDown()
 {
-	ssc::MessageManager::shutdown();
+	cx::MessageManager::shutdown();
 	cx::removeNonemptyDirRecursively(TestUSSavingRecorderController::getDataPath());
 }
 
 void TestUSSavingRecorder::testOneVideoSource()
 {
 	TestUSSavingRecorderController controller(NULL);
-	controller.setTool(ssc::ToolPtr());
+	controller.setTool(cx::ToolPtr());
 	controller.addVideoSource(80, 40);
 
 	controller.addOperation(boost::bind(&TestUSSavingRecorderController::startRecord, &controller));
@@ -52,7 +52,7 @@ void TestUSSavingRecorder::testOneVideoSource()
 void TestUSSavingRecorder::testOneVideoSourceWithTool()
 {
 	TestUSSavingRecorderController controller(NULL);
-	ssc::DummyToolPtr tool = ssc::DummyToolTestUtilities::createDummyTool(ssc::DummyToolTestUtilities::createProbeDataLinear());
+	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear());
 	controller.setTool(tool);
 	controller.addVideoSource(80, 40);
 
@@ -68,7 +68,7 @@ void TestUSSavingRecorder::testOneVideoSourceWithTool()
 void TestUSSavingRecorder::testOneVideoSourceWithToolAndSave()
 {
 	TestUSSavingRecorderController controller(NULL);
-	ssc::DummyToolPtr tool = ssc::DummyToolTestUtilities::createDummyTool(ssc::DummyToolTestUtilities::createProbeDataLinear());
+	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear());
 	controller.setTool(tool);
 	controller.addVideoSource(80, 40);
 
@@ -85,7 +85,7 @@ void TestUSSavingRecorder::testOneVideoSourceWithToolAndSave()
 void TestUSSavingRecorder::testFourVideoSources()
 {
 	TestUSSavingRecorderController controller(NULL);
-	controller.setTool(ssc::ToolPtr());
+	controller.setTool(cx::ToolPtr());
 	for (unsigned i=0; i<4; ++i)
 		controller.addVideoSource(80, 40);
 
@@ -102,7 +102,7 @@ void TestUSSavingRecorder::testFourVideoSources()
 void TestUSSavingRecorder::testFourVideoSourcesWithToolAndSave()
 {
 	TestUSSavingRecorderController controller(NULL);
-	ssc::DummyToolPtr tool = ssc::DummyToolTestUtilities::createDummyTool(ssc::DummyToolTestUtilities::createProbeDataLinear());
+	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear());
 	controller.setTool(tool);
 	for (unsigned i=0; i<4; ++i)
 		controller.addVideoSource(80, 40);

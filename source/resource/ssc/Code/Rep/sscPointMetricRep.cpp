@@ -23,7 +23,7 @@
 #include "boost/bind.hpp"
 #include "sscLogger.h"
 
-namespace ssc
+namespace cx
 {
 
 PointMetricRepPtr PointMetricRep::New(const QString& uid, const QString& name)
@@ -35,7 +35,7 @@ PointMetricRepPtr PointMetricRep::New(const QString& uid, const QString& name)
 PointMetricRep::PointMetricRep(const QString& uid, const QString& name) :
                 DataMetricRep(uid, name)
 {
-	mViewportListener.reset(new ssc::ViewportListener);
+	mViewportListener.reset(new ViewportListener);
 	mViewportListener->setCallback(boost::bind(&PointMetricRep::rescale, this));
 }
 
@@ -45,13 +45,13 @@ void PointMetricRep::clear()
     mGraphicalPoint.reset();
 }
 
-void PointMetricRep::addRepActorsToViewRenderer(ssc::View *view)
+void PointMetricRep::addRepActorsToViewRenderer(View *view)
 {
     mViewportListener->startListen(view->getRenderer());
     DataMetricRep::addRepActorsToViewRenderer(view);
 }
 
-void PointMetricRep::removeRepActorsFromViewRenderer(ssc::View *view)
+void PointMetricRep::removeRepActorsFromViewRenderer(View *view)
 {
     DataMetricRep::removeRepActorsFromViewRenderer(view);
     mViewportListener->stopListen();
@@ -63,12 +63,12 @@ void PointMetricRep::changedSlot()
 		return;
 
 	if (!mGraphicalPoint && mView && mMetric)
-		mGraphicalPoint.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
+		mGraphicalPoint.reset(new GraphicalPoint3D(mView->getRenderer()));
 
 	if (!mGraphicalPoint)
 		return;
 
-    ssc::Vector3D p0_r = mMetric->getRefCoord();
+    Vector3D p0_r = mMetric->getRefCoord();
 
 	mGraphicalPoint->setValue(p0_r);
 	mGraphicalPoint->setRadius(mGraphicsSize);

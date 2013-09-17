@@ -26,12 +26,12 @@
 #include "sscView.h"
 #include "sscGraphicalPrimitives.h"
 
-namespace ssc
+namespace cx
 {
 
 GraphicalAxes3D::GraphicalAxes3D(vtkRendererPtr renderer) : m_vtkAxisLength(100)
 {
-    mViewportListener.reset(new ssc::ViewportListener);
+    mViewportListener.reset(new ViewportListener);
     mViewportListener->setCallback(boost::bind(&GraphicalAxes3D::rescale, this));
 
     mActor = vtkAxesActorPtr::New();
@@ -153,7 +153,7 @@ void GraphicalAxes3D::rescale()
 
 	// NOTE: vtkAxesActor dislikes small values for SetTotalLength, thus we
 	// keep that value constant at m_vtkAxisLength and instead scale the transform.
-	ssc::Transform3D rMq = m_rMt * createTransformScale(ssc::Vector3D(scale,scale,scale));
+	Transform3D rMq = m_rMt * createTransformScale(Vector3D(scale,scale,scale));
 
 	mActor->SetUserMatrix(rMq.getVtkMatrix());
 
@@ -179,4 +179,4 @@ void GraphicalAxes3D::addCaption(const QString& label, Vector3D pos, Vector3D co
 }
 
 
-} // namespace ssc
+} // namespace cx

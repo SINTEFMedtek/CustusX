@@ -37,7 +37,7 @@ class QDomDocument;
 
 //#define USE_TRANSFORM_RESCLICER
 
-namespace ssc
+namespace cx
 {
 
 /**\brief A volumetric data set.
@@ -146,7 +146,7 @@ public:
 	void setInterpolationType(int val);
 	int getInterpolationType() const;
 
-	vtkImageDataPtr resample(double factor);
+	vtkImageDataPtr resample(long maxVoxels);
 
 signals:
 	void landmarkRemoved(QString uid);
@@ -191,10 +191,12 @@ private:
 	void resetTransferFunction(ImageLUT2DPtr imageLookupTable2D);
 	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D);
 
+	double computeResampleFactor(long maxVoxels);
+
 	ImageTF3DPtr mImageTransferFunctions3D;
 	ImageLUT2DPtr mImageLookupTable2D;
 };
 
-} // end namespace ssc
+} // end namespace cx
 
 #endif /*SSCIMAGE_H_*/

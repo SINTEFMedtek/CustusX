@@ -26,7 +26,7 @@
 #include "sscToolManager.h"
 #include "sscTime.h"
 
-namespace ssc
+namespace cx
 {
 
 ManualTool::ManualTool(ToolManager* manager, const QString& uid, const QString& name) :
@@ -62,7 +62,7 @@ void ManualTool::read3DCrossHairSlot(double toolTipOffset)
  */
 void ManualTool::set_prMt(const Transform3D& prMt)
 {
-	this->set_prMt(prMt, ssc::getMilliSecondsSinceEpoch());
+	this->set_prMt(prMt, getMilliSecondsSinceEpoch());
 }
 
 /**Set tool position and timestamp
@@ -137,7 +137,7 @@ bool ManualTool::isCalibrated() const
 	return false;
 }
 
-ssc::ProbeData ManualTool::getProbeSector() const
+ProbeData ManualTool::getProbeSector() const
 {
 	return mSector;
 }
@@ -159,7 +159,7 @@ void ManualTool::setTooltipOffset(double val)
 	toolManager()->setTooltipOffset(val);
 }
 
-ssc::Transform3D ManualTool::getCalibration_sMt() const
+Transform3D ManualTool::getCalibration_sMt() const
 {
 	return Transform3D::Identity();
 }

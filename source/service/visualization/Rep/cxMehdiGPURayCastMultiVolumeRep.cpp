@@ -26,9 +26,22 @@
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 #include <vtkTransform.h>
+#include "sscGPUImageBuffer.h"
 
 namespace cx
 {
+
+MehdiGPURayCastMultiVolumeRepBase::MehdiGPURayCastMultiVolumeRepBase() :
+	mMaxVoxels(0)
+{
+}
+
+void MehdiGPURayCastMultiVolumeRepBase::setMaxVolumeSize(long maxVoxels)
+{
+	mMaxVoxels = maxVoxels;
+}
+
+///////////////////////////////////////////////////
 
 
 
@@ -42,17 +55,17 @@ MehdiGPURayCastMultiVolumeRep::MehdiGPURayCastMultiVolumeRep() :
 {
 }
 
-void MehdiGPURayCastMultiVolumeRep::addRepActorsToViewRenderer(ssc::View* view)
+void MehdiGPURayCastMultiVolumeRep::addRepActorsToViewRenderer(View* view)
 {
 	view->getRenderer()->AddVolume(mVolume);
 }
 
-void MehdiGPURayCastMultiVolumeRep::removeRepActorsFromViewRenderer(ssc::View* view)
+void MehdiGPURayCastMultiVolumeRep::removeRepActorsFromViewRenderer(View* view)
 {
 	view->getRenderer()->RemoveVolume(mVolume);
 }
 
-void MehdiGPURayCastMultiVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
+void MehdiGPURayCastMultiVolumeRep::setImages(std::vector<ImagePtr> images)
 {
 	if (images==mImages)
 		return;
@@ -103,7 +116,14 @@ void MehdiGPURayCastMultiVolumeRep::setup()
 		property->setImage(mImages[i]);
 		mVolumeProperties.push_back(property);
 
-		mMapper->SetInput(i, mImages[i]->getGrayScaleBaseVtkImageData());
+//		// example code for how to allocate on gpu and return uid:
+//		GPUImageDataBufferPtr dataBuffer = GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
+//			mImages[i]->getBaseVtkImageData());
+		// crashes: must probably initialize gl context.
+//		dataBuffer->allocate();
+//		unsigned int glUint = dataBuffer->getTextureUid();
+
+		mMapper->SetInput(i, mImages[i]->getBaseVtkImageData());
 
 		if (i==0)
 			mVolume->SetProperty( property->getVolumeProperty() );
@@ -128,12 +148,12 @@ void MehdiGPURayCastMultiVolumeRep::transformChangedSlot()
 	if (mImages.empty())
 		return;
 
-	ssc::Transform3D rMd0 = mImages[0]->get_rMd(); // use on first volume
+	Transform3D rMd0 = mImages[0]->get_rMd(); // use on first volume
 
 	for (unsigned i=0; i<mImages.size(); ++i)
 	{
-		ssc::Transform3D rMdi = mImages[i]->get_rMd();
-		ssc::Transform3D d0Mdi = rMd0.inv() * rMdi; // use on additional volumescd
+		Transform3D rMdi = mImages[i]->get_rMd();
+		Transform3D d0Mdi = rMd0.inv() * rMdi; // use on additional volumescd
 
 		if (i==0)
 		{

@@ -4,7 +4,7 @@
 #include "sscTransform3D.h"
 
 // --------------------------------------------------------
-namespace ssc
+namespace cx
 {
 
 /**
@@ -65,8 +65,8 @@ public:
 	boost::array<double, 6> getCompactAxisAngleRep() const;
 	static Frame3D fromCompactAxisAngleRep(const boost::array<double, 6>& rep);
 
-	ssc::Vector3D getEulerXYZ() const;
-	void setEulerXYZ(const ssc::Vector3D& xyz);
+	Vector3D getEulerXYZ() const;
+	void setEulerXYZ(const Vector3D& xyz);
 
 	Frame3D();
 	virtual ~Frame3D();
@@ -83,7 +83,7 @@ std::ostream& operator<<(std::ostream& s, const Frame3D& t);
  * @}
  */
 
-} // namespace ssc
+} // namespace cx
 // --------------------------------------------------------
 
 #endif /*SSCFRAME3D_H_*/

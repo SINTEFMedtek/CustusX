@@ -32,7 +32,7 @@
 #include "sscStringDataAdapter.h"
 #include "sscXmlOptionItem.h"
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
@@ -97,6 +97,6 @@ private:
 // --------------------------------------------------------
 
 
-} // namespace ssc
+} // namespace cx
 
 #endif /* SSCSTRINGDATAADAPTERXML_H_ */

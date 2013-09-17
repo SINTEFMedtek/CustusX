@@ -24,9 +24,9 @@
 #include <QTextStream>
 #include "sscMessageManager.h"
 
-namespace ssc {
+namespace cx {
 
-Presets::Presets(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile)
+Presets::Presets(XmlOptionFile presetFile, XmlOptionFile customFile)
 {
 	mPresetFile = presetFile;
 	mCustomFile = customFile;
@@ -36,7 +36,7 @@ Presets::Presets(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile)
 void Presets::deleteCustomPreset(QString name)
 {
 	mLastCustomPresetRemoved = name;
-	ssc::XmlOptionFile node = this->getPresetNode(name);
+	XmlOptionFile node = this->getPresetNode(name);
 	node.deleteNode();
 }
 
@@ -65,7 +65,7 @@ QStringList Presets::getPresetList(QString tag)
 bool Presets::isDefaultPreset(QString presetName)
 {
 
-	ssc::XmlOptionFile testval = mPresetFile.tryDescend("Preset", "name", presetName);
+	XmlOptionFile testval = mPresetFile.tryDescend("Preset", "name", presetName);
 	if (!testval.isNull())
 		return true;
 	return false;
@@ -76,14 +76,14 @@ QStringList Presets::generatePresetList(QString tag)
 	return QStringList();
 }
 
-ssc::XmlOptionFile Presets::getCustomFile()
+XmlOptionFile Presets::getCustomFile()
 {
 	return mCustomFile;
 }
 
-ssc::XmlOptionFile Presets::getPresetNode(const QString& presetName)
+XmlOptionFile Presets::getPresetNode(const QString& presetName)
 {
-	ssc::XmlOptionFile retval = mPresetFile;
+	XmlOptionFile retval = mPresetFile;
 	retval = retval.tryDescend("Preset", "name", presetName);
 	if (!retval.getDocument().isNull())
 		return retval;
@@ -98,7 +98,7 @@ void Presets::addDefaultPreset(QDomElement& element)
 	this->addPreset(mPresetFile, element);
 }
 
-void Presets::addPreset(ssc::XmlOptionFile& file, QDomElement& element)
+void Presets::addPreset(XmlOptionFile& file, QDomElement& element)
 {
 	QString presetName = element.attribute("name");
 	if(presetName.isEmpty())
@@ -121,4 +121,4 @@ void Presets::print(QDomElement element)
 }
 
 
-} /* namespace ssc */
+} /* namespace cx */

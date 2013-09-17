@@ -53,15 +53,15 @@ int SSC_Logging_Init(const char *logName, const char* applicationPath)
 	openlog( NULL, LOG_CONS | LOG_PERROR, LOG_USER );
 	#endif
 
-	ssc::MessageManager::initialize(); // initialize
-	ssc::messageManager()->setLogFile(logFile);
+	cx::MessageManager::initialize(); // initialize
+	cx::messageManager()->setLogFile(logFile);
 
 	return 0;
 }
 
 void SSC_Logging_Done( void )
 {
-	ssc::MessageManager::shutdown();
+	cx::MessageManager::shutdown();
 	#ifndef WIN32
 		closelog();
 	#endif
@@ -69,7 +69,7 @@ void SSC_Logging_Done( void )
 
 void SSC_Logging( bool on )
 {
-	ssc::messageManager()->setEnabled(on);
+	cx::messageManager()->setEnabled(on);
 }
 
 namespace // unnamed
@@ -84,7 +84,7 @@ namespace // unnamed
 
 void SSC_Log( const char *file, int line, const char *function, const char *format, ... )
 {
-	if (!ssc::messageManager()->isEnabled())
+	if (!cx::messageManager()->isEnabled())
 		return;
 
 	va_list ap;
@@ -93,12 +93,12 @@ void SSC_Log( const char *file, int line, const char *function, const char *form
 	vsnprintf(buf, MAX_LEN_LOG_LINE, format, ap);
 	va_end(ap);
 
-	ssc::messageManager()->sendMessage(buf, ssc::mlINFO, 0, false, mergeSourceInfo(file, line, function));
+	cx::messageManager()->sendMessage(buf, cx::mlINFO, 0, false, mergeSourceInfo(file, line, function));
 }
 
 void SSC_Error( const char *file, int line, const char *function, const char *format, ... )
 {
-	if (!ssc::messageManager()->isEnabled())
+	if (!cx::messageManager()->isEnabled())
 		return;
 
 	va_list ap;
@@ -111,12 +111,12 @@ void SSC_Error( const char *file, int line, const char *function, const char *fo
 	syslog(LOG_CRIT | LOG_USER, "%s: %s", function, buf);
 	#endif
 
-	ssc::messageManager()->sendMessage(buf, ssc::mlERROR, 0, false, mergeSourceInfo(file, line, function));
+	cx::messageManager()->sendMessage(buf, cx::mlERROR, 0, false, mergeSourceInfo(file, line, function));
 }
 
 void SSC_Warning( const char *file, int line, const char *function, const char *format, ... )
 {
-	if (!ssc::messageManager()->isEnabled())
+	if (!cx::messageManager()->isEnabled())
 		return;
 
 	va_list ap;
@@ -128,6 +128,6 @@ void SSC_Warning( const char *file, int line, const char *function, const char *
 	#ifndef WIN32
 	syslog(LOG_WARNING | LOG_USER, "%s : %s", function, buf);
 	#endif
-	ssc::messageManager()->sendMessage(buf, ssc::mlWARNING, 0, false, mergeSourceInfo(file, line, function));
+	cx::messageManager()->sendMessage(buf, cx::mlWARNING, 0, false, mergeSourceInfo(file, line, function));
 }
 

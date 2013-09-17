@@ -26,7 +26,7 @@
 #include <QContextMenuEvent>
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
 ConsoleWidget::ConsoleWidget(QWidget* parent) :
@@ -42,7 +42,7 @@ ConsoleWidget::ConsoleWidget(QWidget* parent) :
 	this->setReadOnly(true);
 	this->createTextCharFormats();
 
-    connect(ssc::messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(printMessage(Message)));
+    connect(messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(printMessage(Message)));
 
 	mLineWrappingAction->setCheckable(true);
 	connect(mLineWrappingAction, SIGNAL(triggered(bool)), this, SLOT(lineWrappingSlot(bool)));
@@ -86,18 +86,18 @@ void ConsoleWidget::printMessage(Message message)
 void ConsoleWidget::lineWrappingSlot(bool checked)
 {
 	this->setLineWrapMode(checked ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
-	//ssc::messageManager()->sendDebug("LineWrapping: " + qstring_cast(checked));
+	//messageManager()->sendDebug("LineWrapping: " + qstring_cast(checked));
 }
 
 void ConsoleWidget::createTextCharFormats()
 {
-	mFormat[ssc::mlINFO].setForeground(Qt::black);
-	mFormat[ssc::mlSUCCESS].setForeground(QColor(60, 179, 113)); // medium sea green
-	mFormat[ssc::mlWARNING].setForeground(QColor(255, 140, 0)); //dark orange
-	mFormat[ssc::mlERROR].setForeground(Qt::red);
-	mFormat[ssc::mlDEBUG].setForeground(QColor(135, 206, 250)); //sky blue
-	mFormat[ssc::mlCERR].setForeground(Qt::red);
-	mFormat[ssc::mlCOUT].setForeground(Qt::darkGray);
+	mFormat[mlINFO].setForeground(Qt::black);
+	mFormat[mlSUCCESS].setForeground(QColor(60, 179, 113)); // medium sea green
+	mFormat[mlWARNING].setForeground(QColor(255, 140, 0)); //dark orange
+	mFormat[mlERROR].setForeground(Qt::red);
+	mFormat[mlDEBUG].setForeground(QColor(135, 206, 250)); //sky blue
+	mFormat[mlCERR].setForeground(Qt::red);
+	mFormat[mlCOUT].setForeground(Qt::darkGray);
 }
 
 void ConsoleWidget::format(Message& message)
@@ -108,4 +108,4 @@ void ConsoleWidget::format(Message& message)
 
 }
 
-}//namespace ssc
+}//namespace cx

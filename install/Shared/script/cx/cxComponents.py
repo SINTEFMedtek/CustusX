@@ -449,8 +449,8 @@ class CustusX3Data(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('ssh://%s'%self.gitRepository(), self.sourceFolder())
     def update(self):
-#        self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag())    
-        self._getBuilder().gitUpdate('master')    
+        self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag())    
+#        self._getBuilder().gitUpdate('master')    
     def configure(self):
         pass
     def build(self):

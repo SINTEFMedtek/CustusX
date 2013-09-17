@@ -97,7 +97,7 @@ void ImageStreamerSonix::initializeSonixSlot()
 	}
 
 	//Don't reinitialize if in freeze state
-	if(!mSonixGrabber->getFreezeState() && ssc::similar(mLastFrameTimestamp, mCurrentFrameTimestamp, 0.001))
+	if(!mSonixGrabber->getFreezeState() && similar(mLastFrameTimestamp, mCurrentFrameTimestamp, 0.001))
 	{
 		std::cout << "initializeSonixSlot() Got no new frame. Reinitializing..." << std::endl;
 		// If sonix exam is closed we need to create a new mSonixGrabber

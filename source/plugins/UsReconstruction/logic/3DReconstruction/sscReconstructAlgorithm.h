@@ -27,7 +27,7 @@
 
 class QDomElement;
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;

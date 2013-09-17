@@ -52,7 +52,7 @@ namespace cx
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class BaseWidget: public ssc::OptimizedUpdateWidget
+class BaseWidget: public OptimizedUpdateWidget
 {
 	Q_OBJECT
 

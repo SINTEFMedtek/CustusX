@@ -41,7 +41,7 @@ public:
 
 	static QString createUniqueFolder(QString patientFolder, QString sessionDescription);
 	static QString createFolder(QString patientFolder, QString sessionDescription);
-	ssc::USReconstructInputData getReconstructData();
+	USReconstructInputData getReconstructData();
 
 	/** Write data to disk. Assume videoRecorder has saved images in another location, reuse filenames from
 	* that object to rewrite into new location.
@@ -51,30 +51,30 @@ public:
 	QString getSessionName() const { return mSessionDescription; }
 
 
-	ssc::USReconstructInputData getReconstructData(cx::ImageDataContainerPtr imageData,
+	USReconstructInputData getReconstructData(cx::ImageDataContainerPtr imageData,
 												   std::vector<double> imageTimestamps,
-	                                               ssc::TimedTransformMap trackerRecordedData,
-	                                               ssc::ToolPtr tool,
+	                                               TimedTransformMap trackerRecordedData,
+	                                               ToolPtr tool,
 	                                               bool writeColor,
-	                                               ssc::Transform3D rMpr);
-	void setReconstructData(ssc::USReconstructInputData data) { mReconstructData = data; }
+	                                               Transform3D rMpr);
+	void setReconstructData(USReconstructInputData data) { mReconstructData = data; }
 
 private:
-	bool writeUSTimestamps(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
-	bool writeUSTransforms(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
-	bool writeTrackerTransforms(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
-	bool writeTrackerTimestamps(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
-	void writeProbeConfiguration(QString reconstructionFolder, QString session, ssc::ProbeData data, QString uid);
-	void writeUSImages(QString path, ImageDataContainerPtr images, bool compression, std::vector<ssc::TimedPosition> pos);
-	void writeMask(QString path, QString session, ssc::ImagePtr mask);
+	bool writeUSTimestamps(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts);
+	bool writeUSTransforms(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts);
+	bool writeTrackerTransforms(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts);
+	bool writeTrackerTimestamps(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts);
+	void writeProbeConfiguration(QString reconstructionFolder, QString session, ProbeData data, QString uid);
+	void writeUSImages(QString path, ImageDataContainerPtr images, bool compression, std::vector<TimedPosition> pos);
+	void writeMask(QString path, QString session, ImagePtr mask);
 	void writeREADMEFile(QString reconstructionFolder, QString session);
 
-	bool writeTransforms(QString filename, std::vector<ssc::TimedPosition> ts, QString type);
+	bool writeTransforms(QString filename, std::vector<TimedPosition> ts, QString type);
 	static bool findNewSubfolder(QString subfolderAbsolutePath);
 	void report();
-	void fillFramePositions(ssc::USReconstructInputData* data) const;
+	void fillFramePositions(USReconstructInputData* data) const;
 
-	ssc::USReconstructInputData mReconstructData;
+	USReconstructInputData mReconstructData;
 	QString mSessionDescription;
 	QStringList mReport;
 };

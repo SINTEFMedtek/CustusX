@@ -61,9 +61,9 @@ VideoConnection::VideoConnection()
 	mConnected = false;
 	mUnsusedProbeDataVector.clear();
 
-	connect(ssc::toolManager(), SIGNAL(configured()),                 this, SLOT(connectVideoToProbe()));
-	connect(ssc::toolManager(), SIGNAL(initialized()),                this, SLOT(connectVideoToProbe()));
-	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectVideoToProbe()));
+	connect(toolManager(), SIGNAL(configured()),                 this, SLOT(connectVideoToProbe()));
+	connect(toolManager(), SIGNAL(initialized()),                this, SLOT(connectVideoToProbe()));
+	connect(toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectVideoToProbe()));
 }
 
 VideoConnection::~VideoConnection()
@@ -148,7 +148,7 @@ void VideoConnection::stopClient()
 		{
 			mClient->terminate();
 			mClient->wait(); // forever or until dead thread
-			ssc::messageManager()->sendWarning(QString("Video Client [%1] did not quit normally - terminated.").arg(mClient->hostDescription()));
+			messageManager()->sendWarning(QString("Video Client [%1] did not quit normally - terminated.").arg(mClient->hostDescription()));
 		}
 
 		disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
@@ -166,9 +166,9 @@ void VideoConnection::disconnectServer()
 	this->stopClient();
 
 	for (unsigned i=0; i<mSources.size(); ++i)
-		mSources[i]->setInput(ssc::ImagePtr());
+		mSources[i]->setInput(ImagePtr());
 
-	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
 	if (tool && tool->getProbe())
 		this->removeSourceFromProbe(tool);
 
@@ -187,8 +187,8 @@ void VideoConnection::clientFinishedSlot()
 
 void VideoConnection::useUnusedProbeDataSlot()
 {
-	disconnect(ToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
-	for (std::vector<ssc::ProbeDataPtr>::const_iterator citer = mUnsusedProbeDataVector.begin(); citer != mUnsusedProbeDataVector.end(); ++citer)
+	disconnect(cxToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+	for (std::vector<ProbeDataPtr>::const_iterator citer = mUnsusedProbeDataVector.begin(); citer != mUnsusedProbeDataVector.end(); ++citer)
 		this->updateStatus(*citer);
 	mUnsusedProbeDataVector.clear();
 }
@@ -197,28 +197,28 @@ void VideoConnection::useUnusedProbeDataSlot()
  *  and store locally. Also reset the old local info with
  *  information from the probe in toolmanager.
  */
-void VideoConnection::updateStatus(ssc::ProbeDataPtr msg)
+void VideoConnection::updateStatus(ProbeDataPtr msg)
 {
-	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
 	if (!tool || !tool->getProbe())
 	{
 		//Don't throw away the ProbeData. Save it until it can be used
 		if (mUnsusedProbeDataVector.empty())
-			connect(ToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+			connect(cxToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
 		mUnsusedProbeDataVector.push_back(msg);
 		return;
 	}
-	ProbePtr probe = boost::dynamic_pointer_cast<Probe>(tool->getProbe());
+	cxProbePtr probe = boost::dynamic_pointer_cast<cxProbe>(tool->getProbe());
 
 	// start with getting a valid data object from the probe, in order to keep
 	// existing values (such as temporal calibration).
 	// Note that the 'active' data is get while the 'uid' data is set.
-	ssc::ProbeData data = probe->getProbeData();
+	ProbeData data = probe->getProbeData();
 
 	data.setUid(msg->getUid());
 	data.setType(msg->getType());
 	data.setSector(msg->getDepthStart(), msg->getDepthEnd(), msg->getWidth());
-	ssc::ProbeData::ProbeImageData image = data.getImage();
+	ProbeData::ProbeImageData image = data.getImage();
 	image.mOrigin_p = msg->getImage().mOrigin_p;
 	image.mSize = msg->getImage().mSize;
 	image.mSpacing = msg->getImage().mSpacing;
@@ -236,14 +236,14 @@ void VideoConnection::startAllSources()
 		mSources[i]->start();
 }
 
-void VideoConnection::removeSourceFromProbe(ssc::ToolPtr tool)
+void VideoConnection::removeSourceFromProbe(ToolPtr tool)
 {
-	ssc::ProbePtr probe = tool->getProbe();
+	ProbePtr probe = tool->getProbe();
 	for (unsigned i=0; i<mSources.size(); ++i)
 		probe->removeRTSource(mSources[i]);
 }
 
-void VideoConnection::updateImage(ssc::ImagePtr message)
+void VideoConnection::updateImage(ImagePtr message)
 {
 	BasicVideoSourcePtr source;
 
@@ -276,9 +276,9 @@ void VideoConnection::updateImage(ssc::ImagePtr message)
 	}
 }
 
-std::vector<ssc::VideoSourcePtr> VideoConnection::getVideoSources()
+std::vector<VideoSourcePtr> VideoConnection::getVideoSources()
 {
-	std::vector<ssc::VideoSourcePtr> retval;
+	std::vector<VideoSourcePtr> retval;
 	std::copy(mSources.begin(), mSources.end(), std::back_inserter(retval));
 	return retval;
 }
@@ -300,11 +300,11 @@ void VideoConnection::setImageToStream(QString uid)
  */
 void VideoConnection::connectVideoToProbe()
 {
-	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
 	if (!tool)
 		return;
 
-	ssc::ProbePtr probe = tool->getProbe();
+	ProbePtr probe = tool->getProbe();
 	if (!probe)
 		return;
 

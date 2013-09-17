@@ -3,7 +3,7 @@
 
 #include <vtkIndent.h>
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Formatting class for debug printing of the ssc library.

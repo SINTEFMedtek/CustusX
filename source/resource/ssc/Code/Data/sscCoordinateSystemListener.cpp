@@ -22,9 +22,9 @@
 #include "sscToolManager.h"
 #include "sscData.h"
 
-namespace ssc {
+namespace cx {
 
-CoordinateSystemListener::CoordinateSystemListener(ssc::CoordinateSystem space) :
+CoordinateSystemListener::CoordinateSystemListener(CoordinateSystem space) :
 	mSpace(space)
 {
 	this->doConnect();
@@ -34,7 +34,7 @@ CoordinateSystemListener::~CoordinateSystemListener()
 {
 }
 
-void CoordinateSystemListener::setSpace(ssc::CoordinateSystem space)
+void CoordinateSystemListener::setSpace(CoordinateSystem space)
 {
 	this->doDisconnect();
 	mSpace = space;
@@ -49,26 +49,26 @@ void CoordinateSystemListener::reconnect()
 	emit changed();
 }
 
-ssc::CoordinateSystem CoordinateSystemListener::getSpace() const
+CoordinateSystem CoordinateSystemListener::getSpace() const
 {
 	return mSpace;
 }
 
 void CoordinateSystemListener::doConnect()
 {
-	if (mSpace.mId == ssc::csDATA)
+	if (mSpace.mId == csDATA)
 	{
-		ssc::DataPtr data = ssc::dataManager()->getData(mSpace.mRefObject);
+		DataPtr data = dataManager()->getData(mSpace.mRefObject);
 		if (data)
 		{
 			connect(data.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
-			connect(ssc::dataManager(), SIGNAL(dataRemoved(QString)), this, SIGNAL(changed()));
+			connect(dataManager(), SIGNAL(dataRemoved(QString)), this, SIGNAL(changed()));
 		}
 	}
 
-	if (mSpace.mId == ssc::csSENSOR || mSpace.mId == ssc::csTOOL || mSpace.mId == ssc::csTOOL_OFFSET)
+	if (mSpace.mId == csSENSOR || mSpace.mId == csTOOL || mSpace.mId == csTOOL_OFFSET)
 	{
-		ssc::ToolPtr tool = ssc::toolManager()->getTool(mSpace.mRefObject);
+		ToolPtr tool = toolManager()->getTool(mSpace.mRefObject);
 		if (tool)
 		{
 			connect(tool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SIGNAL(changed()));
@@ -76,34 +76,34 @@ void CoordinateSystemListener::doConnect()
 
 			if (mSpace.mRefObject == "active")
 			{
-				connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
-				connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
+				connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
+				connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
 			}
-			connect(ssc::toolManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+			connect(toolManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 		}
 	}
 
-	if (mSpace.mId == ssc::csPATIENTREF)
+	if (mSpace.mId == csPATIENTREF)
 	{
-		connect(ssc::toolManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+		connect(toolManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 	}
 }
 
 void CoordinateSystemListener::doDisconnect()
 {
-	if (mSpace.mId == ssc::csDATA)
+	if (mSpace.mId == csDATA)
 	{
-		ssc::DataPtr data = ssc::dataManager()->getData(mSpace.mRefObject);
+		DataPtr data = dataManager()->getData(mSpace.mRefObject);
 		if (data)
 		{
 			disconnect(data.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
-			disconnect(ssc::dataManager(), SIGNAL(dataRemoved(QString)), this, SIGNAL(changed()));
+			disconnect(dataManager(), SIGNAL(dataRemoved(QString)), this, SIGNAL(changed()));
 		}
 	}
 
-	if (mSpace.mId == ssc::csSENSOR || mSpace.mId == ssc::csTOOL || mSpace.mId == ssc::csTOOL_OFFSET)
+	if (mSpace.mId == csSENSOR || mSpace.mId == csTOOL || mSpace.mId == csTOOL_OFFSET)
 	{
-		ssc::ToolPtr tool = ssc::toolManager()->getTool(mSpace.mRefObject);
+		ToolPtr tool = toolManager()->getTool(mSpace.mRefObject);
 		if (tool)
 		{
 			disconnect(tool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SIGNAL(changed()));
@@ -111,17 +111,17 @@ void CoordinateSystemListener::doDisconnect()
 
 			if (mSpace.mRefObject == "active")
 			{
-				disconnect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
-				disconnect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
+				disconnect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
+				disconnect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
 			}
-			disconnect(ssc::toolManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+			disconnect(toolManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 		}
 	}
 
-	if (mSpace.mId == ssc::csPATIENTREF)
+	if (mSpace.mId == csPATIENTREF)
 	{
-		disconnect(ssc::toolManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+		disconnect(toolManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 	}
 }
 
-} //namespace ssc
+} //namespace cx

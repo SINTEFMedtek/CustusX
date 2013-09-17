@@ -30,7 +30,7 @@
     return base->func();                                \
 }
 
-namespace ssc
+namespace cx
 {
 /** \brief Class that holds an unsigned version of a base Image
  *

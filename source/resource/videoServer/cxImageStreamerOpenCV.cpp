@@ -266,7 +266,7 @@ void ImageStreamerOpenCV::send()
 		return;
 	if (!mAvailableImage)
 	{
-//		ssc::messageManager()->sendDebug("dropped resend of frame");
+//		messageManager()->sendDebug("dropped resend of frame");
 		return;
 	}
 	PackagePtr package(new Package());

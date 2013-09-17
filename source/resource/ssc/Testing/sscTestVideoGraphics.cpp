@@ -33,8 +33,8 @@
 
 void TestVideoGraphics::setUp()
 {
-	mMachine = ssc::TestVtkRendering::create();
-	mVideoGraphics.reset(new ssc::VideoGraphics());
+	mMachine = cx::TestVtkRendering::create();
+	mVideoGraphics.reset(new cx::VideoGraphics());
 }
 
 void TestVideoGraphics::tearDown()
@@ -51,13 +51,13 @@ vtkImageDataPtr TestVideoGraphics::readImageData(QString filename, QString descr
 	return retval;
 }
 
-ssc::ProbeData TestVideoGraphics::readProbeData(QString filename)
+cx::ProbeData TestVideoGraphics::readProbeData(QString filename)
 {
 	QString folder = QString("%1%2/").arg(SSC_DATA_ROOT).arg("ssc/test");
-	QString probeDataFilename = ssc::changeExtension(folder+filename, "probedata.xml");
+	QString probeDataFilename = cx::changeExtension(folder+filename, "probedata.xml");
 
-	ssc::ProbeData retval;
-	ssc::XmlOptionFile file = ssc::XmlOptionFile(probeDataFilename, "navnet");
+	cx::ProbeData retval;
+	cx::XmlOptionFile file = cx::XmlOptionFile(probeDataFilename, "navnet");
 	retval.parseXml(file.getElement("configuration"));
 
 //	std::cout << probeDataFilename << " -- " << streamXml2String(retval) << std::endl;
@@ -147,7 +147,7 @@ void TestVideoGraphics::testSector()
 	vtkImageDataPtr videoImage0 = this->readImageData(imageFilename, "input image");
 	vtkImageDataPtr expected = this->readImageData("US_small_sector_masked.png", "input expected");
 
-	ssc::ProbeSector probeSector;
+	cx::ProbeSector probeSector;
 	probeSector.mData = this->readProbeData(imageFilename);
 
 	mVideoGraphics->setClip(probeSector.getSector());

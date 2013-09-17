@@ -36,11 +36,11 @@ typedef boost::shared_ptr<class CameraData> CameraDataPtr;
 /**Define a priority for the input data.
  * High means display on top, low means in the back.
  */
-int getPriority(ssc::DataPtr data);
+int getPriority(DataPtr data);
 
-/**Sorts ssc::DataPtr in default display ordering, using getPriority().
+/**Sorts DataPtr in default display ordering, using getPriority().
  */
-bool dataTypeSort(const ssc::DataPtr data1, const ssc::DataPtr data2);
+bool dataTypeSort(const DataPtr data1, const DataPtr data2);
 
 
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
@@ -53,15 +53,15 @@ Q_OBJECT
 public:
 	ViewGroupData();
 	void requestInitialize();
-	std::vector<ssc::DataPtr> getData() const;
+	std::vector<DataPtr> getData() const;
 	QString getVideoSource() const;
-	void addData(ssc::DataPtr data);
-	void addDataSorted(ssc::DataPtr data); ///< add data in a predefined ordering: CT/MR/SC/US/USA/Mesh/Metrics
+	void addData(DataPtr data);
+	void addDataSorted(DataPtr data); ///< add data in a predefined ordering: CT/MR/SC/US/USA/Mesh/Metrics
 	void setVideoSource(QString uid);
-	bool removeData(ssc::DataPtr data);
+	bool removeData(DataPtr data);
 	void clearData();
-	std::vector<ssc::ImagePtr> getImages() const;
-	std::vector<ssc::MeshPtr> getMeshes() const;
+	std::vector<ImagePtr> getImages() const;
+	std::vector<MeshPtr> getMeshes() const;
 
 	CameraDataPtr getCamera3D() { return mCamera3D; }
 
@@ -71,7 +71,7 @@ public:
 		Options();
 		bool mShowLandmarks;
 		bool mShowPointPickerProbe;
-		ssc::MeshPtr mPickerGlyph;
+		MeshPtr mPickerGlyph;
 	};
 
 	Options getOptions() const;
@@ -89,7 +89,7 @@ signals:
 
 private:
 	QString mVideoSource;
-	std::vector<ssc::DataPtr> mData;
+	std::vector<DataPtr> mData;
 	CameraDataPtr mCamera3D;
 	Options mOptions;
 };

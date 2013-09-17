@@ -29,7 +29,7 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
   mCameraGroupLayout->addWidget(toolBar);
   toolBar->addActions(this->getCameraStyle()->createInteractorStyleActionGroup()->actions());
 
-  QWidget* toolOffsetWidget = new ssc::SliderGroupWidget(this, DoubleDataAdapterActiveToolOffset::create());
+  QWidget* toolOffsetWidget = new SliderGroupWidget(this, DoubleDataAdapterActiveToolOffset::create());
 
   //layout
   this->setLayout(mVerticalLayout);

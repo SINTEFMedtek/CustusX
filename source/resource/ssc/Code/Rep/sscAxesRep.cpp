@@ -32,7 +32,7 @@
 #include "sscGraphicalPrimitives.h"
 #include "cxGraphicalAxes3D.h"
 
-namespace ssc
+namespace cx
 {
 
 AxesRepPtr AxesRep::New(const QString& uid)
@@ -96,4 +96,4 @@ void AxesRep::setTransform(Transform3D rMt)
 }
 
 
-} // namespace ssc
+} // namespace cx

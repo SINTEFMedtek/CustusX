@@ -23,7 +23,7 @@
 #include "sscToolManager.h"
 #include "sscDummyTool.h"
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Implementation of a ToolManager used for testing.
@@ -99,6 +99,6 @@ private:
 	bool mIsTracking;
 };
 
-}//namespace ssc
+}//namespace cx
 
 #endif /* SSCDUMMYTOOLMANAGER_H_ */

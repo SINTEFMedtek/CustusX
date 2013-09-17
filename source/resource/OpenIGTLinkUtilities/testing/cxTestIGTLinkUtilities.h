@@ -22,7 +22,7 @@ public:
 	  */
 	void testDecodeEncodeImage();
 	/**
-	  * Test encode/decode of a ssc::ProbeData.
+	  * Test encode/decode of a ProbeData.
 	  */
 	void testDecodeEncodeProbeData();
 	/**
@@ -52,9 +52,9 @@ public:
 	CPPUNIT_TEST_SUITE_END();
 private:
 	typedef std::vector<std::pair<Eigen::Array3i, Eigen::Array3i> > Val3VectorType;
-	int getValue(ssc::ImagePtr data, int x, int y, int z);
+	int getValue(cx::ImagePtr data, int x, int y, int z);
 	void setValue(vtkImageDataPtr data, int x, int y, int z, unsigned char val);
-	Eigen::Array3i getValue3i(ssc::ImagePtr data, int x, int y, int z);
+	Eigen::Array3i getValue3i(cx::ImagePtr data, int x, int y, int z);
 	void testDecodeEncodeColorImage(Val3VectorType samples, QString colorFormat);
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestIGTLinkUtilities );

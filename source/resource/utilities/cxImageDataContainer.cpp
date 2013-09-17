@@ -42,7 +42,7 @@ vtkImageDataPtr CachedImageData::getImage()
 {
 	if (!mImageData)
 	{
-		mImageData = ssc::MetaImageReader().loadVtkImageData(mFilename);
+		mImageData = MetaImageReader().loadVtkImageData(mFilename);
 	}
 	return mImageData;
 }
@@ -123,8 +123,8 @@ CachedImageDataContainer::~CachedImageDataContainer()
 		for (unsigned i=0; i<mImages.size(); ++i)
 		{
 			QDir().remove(mImages[i]->getFilename());
-			QDir().remove(ssc::changeExtension(mImages[i]->getFilename(), "raw"));
-			QDir().remove(ssc::changeExtension(mImages[i]->getFilename(), "zraw"));
+			QDir().remove(changeExtension(mImages[i]->getFilename(), "raw"));
+			QDir().remove(changeExtension(mImages[i]->getFilename(), "zraw"));
 		}
 	}
 }

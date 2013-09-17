@@ -26,50 +26,50 @@
 namespace cx
 {
 
-void DataManager::initialize()
+void cxDataManager::initialize()
 {
-	setInstance(new DataManager());
+	setInstance(new cxDataManager());
 
 	//	// extra cx data types
-	//	getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new ssc::PointMetricReader()));
-	//	getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new ssc::DistanceMetricReader()));
-	//	getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new ssc::PlaneMetricReader()));
-	//	getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new ssc::AngleMetricReader()));
+	//	getInstance()->mDataReaders.insert(DataReaderPtr(new PointMetricReader()));
+	//	getInstance()->mDataReaders.insert(DataReaderPtr(new DistanceMetricReader()));
+	//	getInstance()->mDataReaders.insert(DataReaderPtr(new PlaneMetricReader()));
+	//	getInstance()->mDataReaders.insert(DataReaderPtr(new AngleMetricReader()));
 }
 
-DataManager* DataManager::getInstance()
+cxDataManager* cxDataManager::getInstance()
 {
-	return dynamic_cast<DataManager*>(ssc::DataManager::getInstance());
+	return dynamic_cast<cxDataManager*>(DataManager::getInstance());
 }
 
-DataManager::DataManager() :
+cxDataManager::cxDataManager() :
 				mDebugMode(false)
 {
 }
 
-DataManager::~DataManager()
+cxDataManager::~cxDataManager()
 {
 }
 
-ssc::PresetTransferFunctions3DPtr DataManager::getPresetTransferFunctions3D() const
+PresetTransferFunctions3DPtr cxDataManager::getPresetTransferFunctions3D() const
 {
 	///< create from filename, create trivial document of type name and root node if no file exists.
-	ssc::XmlOptionFile preset = ssc::XmlOptionFile(
+	XmlOptionFile preset = XmlOptionFile(
 					DataLocations::getRootConfigPath() + "/transferFunctions/presets.xml", "transferFunctions");
-	ssc::XmlOptionFile custom = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend(
+	XmlOptionFile custom = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend(
 					"presetTransferFunctions");
 
 	if (!mPresetTransferFunctions3D)
-		mPresetTransferFunctions3D.reset(new ssc::TransferFunctions3DPresets(preset, custom));
+		mPresetTransferFunctions3D.reset(new TransferFunctions3DPresets(preset, custom));
 
 	return mPresetTransferFunctions3D;
 }
 
-bool DataManager::getDebugMode() const
+bool cxDataManager::getDebugMode() const
 {
 	return mDebugMode;
 }
-void DataManager::setDebugMode(bool on)
+void cxDataManager::setDebugMode(bool on)
 {
 	if (mDebugMode == on)
 		return;

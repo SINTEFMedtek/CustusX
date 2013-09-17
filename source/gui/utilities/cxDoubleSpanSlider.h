@@ -31,9 +31,9 @@ public:
   {
     connect(this, SIGNAL(spanChanged(int,int)), this, SLOT(spanChangedSlot(int,int)));
 //    connect(this, SIGNAL(valueChanged(int)), this, SLOT(valueChangedSlot(int)));
-    this->setDoubleRange(ssc::DoubleRange(0,1,0.1));
+    this->setDoubleRange(DoubleRange(0,1,0.1));
   }
-  void setDoubleRange(const ssc::DoubleRange& range)
+  void setDoubleRange(const DoubleRange& range)
   {
     mRange = range;
     this->setRange(0, mRange.resolution());
@@ -74,7 +74,7 @@ private slots:
   }
 
 private:
-  ssc::DoubleRange mRange;
+  DoubleRange mRange;
 };
 
 /**
@@ -89,7 +89,7 @@ public:
 
   void addToGridLayout(QGridLayout* gridLayout, int row);
   void setName(QString text);
-  void setRange(const ssc::DoubleRange& range);
+  void setRange(const DoubleRange& range);
   void setDecimals(int decimals);
   void setValue(std::pair<double,double> val);
   std::pair<double,double> getValue() const;
@@ -104,8 +104,8 @@ private slots:
 private:
   void dataChanged(std::pair<double,double> val);
   QLabel* mLabel;
-//  ssc::DoubleLineEdit* mLowerEdit;
-//  ssc::DoubleLineEdit* mUpperEdit;
+//  DoubleLineEdit* mLowerEdit;
+//  DoubleLineEdit* mUpperEdit;
   QDoubleSpinBox* mLowerEdit;
   QDoubleSpinBox* mUpperEdit;
   DoubleSpanSlider* mSpanSlider;

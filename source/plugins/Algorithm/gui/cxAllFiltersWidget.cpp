@@ -23,7 +23,7 @@ namespace cx {
 AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
     BaseWidget(parent, "FilterWidget", "Configurable Filter")
 {
-	ssc::XmlOptionFile options = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("filterwidget");
+	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("filterwidget");
 	mFilters.reset(new FilterGroup(options));
 	mFilters->append(FilterPtr(new BinaryThresholdImageFilter()));
 	mFilters->append(FilterPtr(new BinaryThinningImageFilter3DFilter()));
@@ -42,7 +42,7 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
 		names[mFilters->get(i)->getUid()] = mFilters->get(i)->getName();
 	}
 
-	mFilterSelector = ssc::StringDataAdapterXml::initialize("filterSelector",
+	mFilterSelector = StringDataAdapterXml::initialize("filterSelector",
 	                                                        "Filter",
 	                                                        "Select which filter to use.",
 	                                                        availableFilters[0],
@@ -56,7 +56,7 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
 	QHBoxLayout* filterLayout = new QHBoxLayout;
 	topLayout->addLayout(filterLayout);
 
-	filterLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFilterSelector));
+	filterLayout->addWidget(new LabeledComboBoxWidget(this, mFilterSelector));
 
 	//Add detailed button
 	QAction* detailsAction = this->createAction(this,
@@ -130,7 +130,7 @@ void AllFiltersWidget::runFilterSlot()
 		return;
 	if (mThread)
 	{
-		ssc::messageManager()->sendWarning(QString("Last operation on %1 is not finished. Could not start filtering")
+		messageManager()->sendWarning(QString("Last operation on %1 is not finished. Could not start filtering")
 		                                   .arg(mThread->getFilter()->getName()));
 		return;
 	}

@@ -13,8 +13,8 @@ vtkImageDataPtr createRGBATestImage()
 {
 	Eigen::Array3i dim(512,512,1);
 	int components = 4;
-	vtkImageDataPtr retval = ssc::generateVtkImageData(dim,
-	                                                   ssc::Vector3D(0.5,0.6,0.7),
+	vtkImageDataPtr retval = cx::generateVtkImageData(dim,
+													   cx::Vector3D(0.5,0.6,0.7),
 														255, components);
 	int scalarSize = dim[0]*dim[1]*dim[2]*components;
 
@@ -54,14 +54,14 @@ void TestIGTLinkUtilities::testConstructor()
 {
 }
 
-int TestIGTLinkUtilities::getValue(ssc::ImagePtr data, int x, int y, int z)
+int TestIGTLinkUtilities::getValue(cx::ImagePtr data, int x, int y, int z)
 {
 	vtkImageDataPtr volume = data->getGrayScaleBaseVtkImageData();
 	int val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(x,y,z));
 	return val;
 }
 
-Eigen::Array3i TestIGTLinkUtilities::getValue3i(ssc::ImagePtr data, int x, int y, int z)
+Eigen::Array3i TestIGTLinkUtilities::getValue3i(cx::ImagePtr data, int x, int y, int z)
 {
 	vtkImageDataPtr volume = data->getBaseVtkImageData();
 	unsigned char* ptr = reinterpret_cast<unsigned char*>(volume->GetScalarPointer(x,y,z));
@@ -82,8 +82,8 @@ void TestIGTLinkUtilities::testDecodeEncodeImage()
 	values.push_back(std::make_pair(Eigen::Array3i(20,20,2), 6));
 
 	QDateTime time = QDateTime::currentDateTime();
-	vtkImageDataPtr rawImage = ssc::generateVtkImageData(Eigen::Array3i(100, 120, 10),
-													ssc::Vector3D(0.5, 0.6, 0.7),
+	vtkImageDataPtr rawImage = cx::generateVtkImageData(Eigen::Array3i(100, 120, 10),
+													cx::Vector3D(0.5, 0.6, 0.7),
 													0);
 	for (ValVectorType::iterator iter=values.begin(); iter!=values.end(); ++iter)
 	{
@@ -92,18 +92,18 @@ void TestIGTLinkUtilities::testDecodeEncodeImage()
 		this->setValue(rawImage, p[0], p[1], p[2], val);
 	}
 
-	ssc::ImagePtr input(new ssc::Image("my_uid", rawImage));
+	cx::ImagePtr input(new cx::Image("my_uid", rawImage));
 	input->setAcquisitionTime(time);
 
 	cx::IGTLinkConversion converter;
 	cx::IGTLinkImageMessage::Pointer msg = converter.encode(input);
-	ssc::ImagePtr output = converter.decode(msg);
+	cx::ImagePtr output = converter.decode(msg);
 
 	CPPUNIT_ASSERT(output);
 	CPPUNIT_ASSERT(time == output->getAcquisitionTime());
 	CPPUNIT_ASSERT(input->getUid() == output->getUid());
-	CPPUNIT_ASSERT(ssc::similar(Eigen::Array3i(input->getBaseVtkImageData()->GetDimensions()), Eigen::Array3i(output->getBaseVtkImageData()->GetDimensions())));
-	CPPUNIT_ASSERT(ssc::similar(ssc::Vector3D(input->getBaseVtkImageData()->GetSpacing()), ssc::Vector3D(output->getBaseVtkImageData()->GetSpacing())));
+	CPPUNIT_ASSERT(cx::similar(Eigen::Array3i(input->getBaseVtkImageData()->GetDimensions()), Eigen::Array3i(output->getBaseVtkImageData()->GetDimensions())));
+	CPPUNIT_ASSERT(cx::similar(cx::Vector3D(input->getBaseVtkImageData()->GetSpacing()), cx::Vector3D(output->getBaseVtkImageData()->GetSpacing())));
 
 	for (ValVectorType::iterator iter=values.begin(); iter!=values.end(); ++iter)
 	{
@@ -169,52 +169,52 @@ void TestIGTLinkUtilities::testDecodeEncodeColorImage(Val3VectorType values, QSt
 
 	QString coreUid = "my_uid";
 
-	ssc::ImagePtr input(new ssc::Image(QString("%1 [%2]").arg(coreUid).arg(colorFormat), rawImage));
+	cx::ImagePtr input(new cx::Image(QString("%1 [%2]").arg(coreUid).arg(colorFormat), rawImage));
 	input->setAcquisitionTime(time);
 
 	cx::IGTLinkConversion converter;
 	cx::IGTLinkImageMessage::Pointer msg = converter.encode(input);
-	ssc::ImagePtr output = converter.decode(msg);
+	cx::ImagePtr output = converter.decode(msg);
 
 	CPPUNIT_ASSERT(output);
 	CPPUNIT_ASSERT(time == output->getAcquisitionTime());
 	CPPUNIT_ASSERT(coreUid == output->getUid());
-	CPPUNIT_ASSERT(ssc::similar(Eigen::Array3i(input->getBaseVtkImageData()->GetDimensions()), Eigen::Array3i(output->getBaseVtkImageData()->GetDimensions())));
-	CPPUNIT_ASSERT(ssc::similar(ssc::Vector3D(input->getBaseVtkImageData()->GetSpacing()), ssc::Vector3D(output->getBaseVtkImageData()->GetSpacing())));
+	CPPUNIT_ASSERT(cx::similar(Eigen::Array3i(input->getBaseVtkImageData()->GetDimensions()), Eigen::Array3i(output->getBaseVtkImageData()->GetDimensions())));
+	CPPUNIT_ASSERT(cx::similar(cx::Vector3D(input->getBaseVtkImageData()->GetSpacing()), cx::Vector3D(output->getBaseVtkImageData()->GetSpacing())));
 
 	for (Val3VectorType::iterator iter=values.begin(); iter!=values.end(); ++iter)
 	{
 		Eigen::Array3i p = iter->first;
 		Eigen::Array3i val = iter->second;
-//		CPPUNIT_ASSERT(ssc::similar(this->getValue3i(input, p[0], p[1], p[2]), val)); // cannot do this when changing color encoding
-		CPPUNIT_ASSERT(ssc::similar(this->getValue3i(output, p[0], p[1], p[2]), val));
+//		CPPUNIT_ASSERT(similar(this->getValue3i(input, p[0], p[1], p[2]), val)); // cannot do this when changing color encoding
+		CPPUNIT_ASSERT(cx::similar(this->getValue3i(output, p[0], p[1], p[2]), val));
 	}
 }
 
 void TestIGTLinkUtilities::testDecodeEncodeProbeData()
 {
 	// generate probe data input
-	ssc::ProbeDataPtr input(new ssc::ProbeData());
-	input->setType(ssc::ProbeData::tSECTOR);
-	ssc::ProbeData::ProbeImageData imageData = input->getImage();
-	imageData.mOrigin_p = ssc::Vector3D(50,0,0); ///< probe origin in pixel space p. (upper-left corner origin)
-	imageData.mSpacing = ssc::Vector3D(0.5, 0.6, 1.0);
+	cx::ProbeDataPtr input(new cx::ProbeData());
+	input->setType(cx::ProbeData::tSECTOR);
+	cx::ProbeData::ProbeImageData imageData = input->getImage();
+	imageData.mOrigin_p = cx::Vector3D(50,0,0); ///< probe origin in pixel space p. (upper-left corner origin)
+	imageData.mSpacing = cx::Vector3D(0.5, 0.6, 1.0);
 	imageData.mSize = QSize(300, 200);
-	imageData.mClipRect_p = ssc::DoubleBoundingBox3D (0, imageData.mSize.width(), 0, imageData.mSize.height(), 0, 0); ///< sector clipping rect, in addition to the standard sector definition. The probe sector is the intersection of the sector definition and the clip rect.
+	imageData.mClipRect_p = cx::DoubleBoundingBox3D(0, imageData.mSize.width(), 0, imageData.mSize.height(), 0, 0); ///< sector clipping rect, in addition to the standard sector definition. The probe sector is the intersection of the sector definition and the clip rect.
 	input->setImage(imageData);
 	input->setSector(10, 30, M_PI/2, 2);
 
 	// generate an image based on the probe data. Part of the data is sent over this channel.
-	vtkImageDataPtr rawImage = ssc::generateVtkImageData(Eigen::Array3i(imageData.mSize.width(), imageData.mSize.height(), 1),
+	vtkImageDataPtr rawImage = cx::generateVtkImageData(Eigen::Array3i(imageData.mSize.width(), imageData.mSize.height(), 1),
 													imageData.mSpacing,
 													0);
-	ssc::ImagePtr imageInput(new ssc::Image("my_uid", rawImage));
+	cx::ImagePtr imageInput(new cx::Image("my_uid", rawImage));
 
 	// convert the data to igtlink and back
 	cx::IGTLinkConversion converter;
 	cx::IGTLinkUSStatusMessage::Pointer msg = converter.encode(input);
 	cx::IGTLinkImageMessage::Pointer imageMessage = converter.encode(imageInput);
-	ssc::ProbeDataPtr output = converter.decode(msg, imageMessage, ssc::ProbeDataPtr(new ssc::ProbeData()));
+	cx::ProbeDataPtr output = converter.decode(msg, imageMessage, cx::ProbeDataPtr(new cx::ProbeData()));
 
 	// compare input<->output
 	CPPUNIT_ASSERT(input->getType() == output->getType());
@@ -222,9 +222,9 @@ void TestIGTLinkUtilities::testDecodeEncodeProbeData()
 	CPPUNIT_ASSERT(input->getDepthEnd() == output->getDepthEnd());
 	//not supported CPPUNIT_ASSERT(input->getCenterOffset() == output->getCenterOffset());
 	CPPUNIT_ASSERT(input->getWidth() == output->getWidth());
-	CPPUNIT_ASSERT(ssc::similar(input->getImage().mClipRect_p, output->getImage().mClipRect_p)); // only supported for cliprect equal to entire image size.
-	CPPUNIT_ASSERT(ssc::similar(input->getImage().mOrigin_p, output->getImage().mOrigin_p));
-	CPPUNIT_ASSERT(ssc::similar(input->getImage().mSpacing, output->getImage().mSpacing));
+	CPPUNIT_ASSERT(cx::similar(input->getImage().mClipRect_p, output->getImage().mClipRect_p)); // only supported for cliprect equal to entire image size.
+	CPPUNIT_ASSERT(cx::similar(input->getImage().mOrigin_p, output->getImage().mOrigin_p));
+	CPPUNIT_ASSERT(cx::similar(input->getImage().mSpacing, output->getImage().mSpacing));
 	CPPUNIT_ASSERT(input->getImage().mSize.width() == output->getImage().mSize.width());
 	CPPUNIT_ASSERT(input->getImage().mSize.height() == output->getImage().mSize.height());
 	//not supported CPPUNIT_ASSERT(input->getTemporalCalibration() == output->getTemporalCalibration());

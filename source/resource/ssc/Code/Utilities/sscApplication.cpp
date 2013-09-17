@@ -21,7 +21,7 @@
 #include "sscMessageManager.h"
 #include <QThread>
 
-namespace ssc
+namespace cx
 {
 
 Application::Application(int& argc, char** argv) : QApplication(argc, argv)
@@ -41,7 +41,7 @@ void Application::reportException(QString text)
 			threadName = "SECONDARY";
 	}
 
-	ssc::messageManager()->sendError(QString("Exception caught: [%1]\nin thread [%2]").arg(text).arg(threadName));
+	messageManager()->sendError(QString("Exception caught: [%1]\nin thread [%2]").arg(text).arg(threadName));
 }
 
 bool Application::notify(QObject *rec, QEvent *ev)
@@ -63,4 +63,4 @@ bool Application::notify(QObject *rec, QEvent *ev)
 	return false;
 }
 
-} // namespace ssc
+} // namespace cx

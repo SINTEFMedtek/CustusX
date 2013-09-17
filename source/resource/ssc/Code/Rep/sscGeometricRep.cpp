@@ -31,7 +31,7 @@
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
 GeometricRep::GeometricRep(const QString& uid, const QString& name) :
@@ -130,5 +130,5 @@ void GeometricRep::transformChangedSlot()
 
 //---------------------------------------------------------
 }
-// namespace ssc
+// namespace cx
 //---------------------------------------------------------

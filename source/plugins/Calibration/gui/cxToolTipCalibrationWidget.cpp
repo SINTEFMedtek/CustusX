@@ -47,7 +47,7 @@ ToolTipCalibrateWidget::ToolTipCalibrateWidget(QWidget* parent) :
   mTools = SelectToolStringDataAdapter::New();
   mTools->setValueName("Reference tool");
   mTools->setHelp("Select a tool with a known reference point");
-  mCalibrateToolComboBox = new ssc::LabeledComboBoxWidget(this, mTools);
+  mCalibrateToolComboBox = new LabeledComboBoxWidget(this, mTools);
   this->setToolTip(this->defaultWhatsThis());
 
   //toplayout->addWidget(new QLabel("<b>Select a tool with a known reference point:</b>"));
@@ -83,18 +83,18 @@ QString ToolTipCalibrateWidget::defaultWhatsThis() const
 
 void ToolTipCalibrateWidget::calibrateSlot()
 {
-  ssc::ToolPtr refTool = mTools->getTool();
+  ToolPtr refTool = mTools->getTool();
   //Todo, we only allow the reference point with id 1 to be used to calibrate
   //this could be done more dynamic.
   if(!refTool || !refTool->hasReferencePointWithId(1))
     return;
 
-  ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
-  ssc::CoordinateSystem to = ssc::CoordinateSystemHelpers::getT(tool);
-  ssc::Vector3D P_t = ssc::CoordinateSystemHelpers::getDominantToolTipPoint(to);
+  ToolPtr tool = toolManager()->getDominantTool();
+  CoordinateSystem to = CoordinateSystemHelpers::getT(tool);
+  Vector3D P_t = CoordinateSystemHelpers::getDominantToolTipPoint(to);
 
   ToolTipCalibrationCalculator calc(tool, refTool, P_t);
-  ssc::Transform3D calibration = calc.get_calibration_sMt();
+  Transform3D calibration = calc.get_calibration_sMt();
 
   QMessageBox msgBox;
   msgBox.setText("Do you want to overwrite "+tool->getName()+"s calibration file?");
@@ -112,19 +112,19 @@ void ToolTipCalibrateWidget::calibrateSlot()
 
 void ToolTipCalibrateWidget::testCalibrationSlot()
 {
-  ssc::ToolPtr selectedTool = mTools->getTool();
+  ToolPtr selectedTool = mTools->getTool();
   if(!selectedTool || !selectedTool->hasReferencePointWithId(1))
     return;
 
-  ssc::CoordinateSystem to = ssc::CoordinateSystemHelpers::getT(ssc::toolManager()->getDominantTool());
-  ssc::Vector3D sampledPoint = ssc::CoordinateSystemHelpers::getDominantToolTipPoint(to);
+  CoordinateSystem to = CoordinateSystemHelpers::getT(toolManager()->getDominantTool());
+  Vector3D sampledPoint = CoordinateSystemHelpers::getDominantToolTipPoint(to);
 
-  ToolTipCalibrationCalculator calc(ssc::toolManager()->getDominantTool(), selectedTool, sampledPoint);
-  ssc::Vector3D delta_selectedTool = calc.get_delta_ref();
+  ToolTipCalibrationCalculator calc(toolManager()->getDominantTool(), selectedTool, sampledPoint);
+  Vector3D delta_selectedTool = calc.get_delta_ref();
 
   mDeltaLabel->setText("<b>Delta:</b> "+qstring_cast(delta_selectedTool)+" <br> <b>Length:</b>  "+qstring_cast(delta_selectedTool.length()));
 
-  ssc::messageManager()->sendInfo("Delta: "+qstring_cast(delta_selectedTool)+" Length:   "+qstring_cast(delta_selectedTool.length()));
+  messageManager()->sendInfo("Delta: "+qstring_cast(delta_selectedTool)+" Length:   "+qstring_cast(delta_selectedTool.length()));
 }
 
 void ToolTipCalibrateWidget::toolSelectedSlot()
@@ -135,7 +135,7 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
 
   if(mTools->getTool())
   {
-    ToolPtr tool = boost::dynamic_pointer_cast<Tool>(mTools->getTool());
+	cxToolPtr tool = boost::dynamic_pointer_cast<cxTool>(mTools->getTool());
     if(tool && tool->hasReferencePointWithId(1))
     {
       text = "Ref. point: "+qstring_cast(tool->getReferencePoints()[1]);
@@ -143,7 +143,7 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
 //      mTestButton->setEnabled(true);
     }
     else
-    	ssc::messageManager()->sendWarning("Selected tool have no known reference point");
+		messageManager()->sendWarning("Selected tool have no known reference point");
     if(tool)
     {
       mCalibrationLabel->setText("Calibration:\n"+qstring_cast(tool->getCalibration_sMt()));
@@ -156,55 +156,55 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
 
 
 
-ToolTipCalibrationCalculator::ToolTipCalibrationCalculator(ssc::ToolPtr tool, ssc::ToolPtr ref, ssc::Vector3D p_t) :
+ToolTipCalibrationCalculator::ToolTipCalibrationCalculator(ToolPtr tool, ToolPtr ref, Vector3D p_t) :
     mTool(tool), mRef(ref), mP_t(p_t)
 {}
 
 ToolTipCalibrationCalculator::~ToolTipCalibrationCalculator()
 {}
 
-ssc::Vector3D ToolTipCalibrationCalculator::get_delta_ref()
+Vector3D ToolTipCalibrationCalculator::get_delta_ref()
 {
   return get_referencePoint_ref() - get_sampledPoint_ref();
 }
 
-ssc::Transform3D ToolTipCalibrationCalculator::get_calibration_sMt()
+Transform3D ToolTipCalibrationCalculator::get_calibration_sMt()
 {
   return this->get_sMt_new();
 }
 
-ssc::Vector3D ToolTipCalibrationCalculator::get_sampledPoint_t()
+Vector3D ToolTipCalibrationCalculator::get_sampledPoint_t()
 {
   return mP_t;
 }
 
-ssc::Vector3D ToolTipCalibrationCalculator::get_sampledPoint_ref()
+Vector3D ToolTipCalibrationCalculator::get_sampledPoint_ref()
 {
-  ssc::CoordinateSystem csT = ssc::CoordinateSystemHelpers::getT(mTool); //from
-  ssc::CoordinateSystem csRef = ssc::CoordinateSystemHelpers::getT(mRef); //to
+  CoordinateSystem csT = CoordinateSystemHelpers::getT(mTool); //from
+  CoordinateSystem csRef = CoordinateSystemHelpers::getT(mRef); //to
 
-  ssc::Transform3D refMt = ssc::CoordinateSystemHelpers::get_toMfrom(csT, csRef);
+  Transform3D refMt = CoordinateSystemHelpers::get_toMfrom(csT, csRef);
 
-  ssc::Vector3D P_ref = refMt.coord(mP_t);
+  Vector3D P_ref = refMt.coord(mP_t);
 
   return P_ref;
 }
 
-ssc::Vector3D ToolTipCalibrationCalculator::get_referencePoint_ref()
+Vector3D ToolTipCalibrationCalculator::get_referencePoint_ref()
 {
   return mRef->getReferencePoints()[1];
 }
 
-ssc::Transform3D ToolTipCalibrationCalculator::get_sMt_new()
+Transform3D ToolTipCalibrationCalculator::get_sMt_new()
 {
-  ssc::Transform3D sMt_old = mTool->getCalibration_sMt();
+  Transform3D sMt_old = mTool->getCalibration_sMt();
 
-  ssc::CoordinateSystem csT = ssc::CoordinateSystemHelpers::getT(mTool); //to
-  ssc::CoordinateSystem csRef = ssc::CoordinateSystemHelpers::getT(mRef); //from
-  ssc::Transform3D tMref = ssc::CoordinateSystemHelpers::get_toMfrom(csRef, csT);
+  CoordinateSystem csT = CoordinateSystemHelpers::getT(mTool); //to
+  CoordinateSystem csRef = CoordinateSystemHelpers::getT(mRef); //from
+  Transform3D tMref = CoordinateSystemHelpers::get_toMfrom(csRef, csT);
 
-  ssc::Vector3D delta_t = tMref.vector(this->get_delta_ref());
-  ssc::Transform3D T_delta_t = ssc::createTransformTranslate(delta_t);
+  Vector3D delta_t = tMref.vector(this->get_delta_ref());
+  Transform3D T_delta_t = createTransformTranslate(delta_t);
 
   return sMt_old * T_delta_t;
 }

@@ -7,8 +7,8 @@
 
 #include "sscTransform3D.h"
 
-using ssc::Transform3D;
-using ssc::Vector3D;
+using cx::Transform3D;
+using cx::Vector3D;
 
 /**Tests for minor classes in the code/Utilities section
  */

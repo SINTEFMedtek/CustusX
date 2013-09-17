@@ -104,14 +104,14 @@ void CroppingWidget::cropperChangedSlot()
 	mBBWidget->setValue(mInteractiveCropper->getBoundingBox(), mInteractiveCropper->getMaxBoundingBox());
 }
 
-ssc::ImagePtr CroppingWidget::cropClipButtonClickedSlot()
+ImagePtr CroppingWidget::cropClipButtonClickedSlot()
 {
-  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+  ImagePtr image = dataManager()->getActiveImage();
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
 
-  ssc::ImagePtr retval = cropImage(image);
-  ssc::dataManager()->loadData(retval);
-  ssc::dataManager()->saveImage(retval, outputBasePath);
+  ImagePtr retval = cropImage(image);
+  dataManager()->loadData(retval);
+  dataManager()->saveImage(retval, outputBasePath);
   return retval;
 }
 

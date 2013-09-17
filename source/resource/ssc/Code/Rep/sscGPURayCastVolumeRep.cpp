@@ -48,7 +48,7 @@
 #include "sscGPURayCastVolumePainter.h"
 
 //---------------------------------------------------------
-namespace ssc
+namespace cx
 {
 //---------------------------------------------------------
 
@@ -75,7 +75,7 @@ static vtkPolyDataPtr createCube()
 	return cube;
 }
 
-double maxIntensity(ssc::ImagePtr image)
+double maxIntensity(ImagePtr image)
 {
 	return (double)image->getMax()/image->getBaseVtkImageData()->GetScalarTypeMax();
 }
@@ -117,7 +117,7 @@ void GPURayCastVolumeRep::setShaderFolder(QString folder)
 	mPainter->setShaderFolder(folder);
 }
 
-void GPURayCastVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
+void GPURayCastVolumeRep::setImages(std::vector<ImagePtr> images)
 {
 	if (mImages.size() == images.size())
 	{
@@ -150,7 +150,7 @@ void GPURayCastVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
 		connect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData();//
 
-		ssc::GPUImageDataBufferPtr dataBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
+		GPUImageDataBufferPtr dataBuffer = GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
 			inputImage);
 
 		double maxVal = maxIntensity(images[i]);
@@ -189,22 +189,22 @@ void GPURayCastVolumeRep::transformChangedSlot()
 	}
 }
 
-std::vector<ssc::ImagePtr> GPURayCastVolumeRep::getImages()
+std::vector<ImagePtr> GPURayCastVolumeRep::getImages()
 {
 	return mImages;
 }
 
-void GPURayCastVolumeRep::addRepActorsToViewRenderer(ssc::View *view)
+void GPURayCastVolumeRep::addRepActorsToViewRenderer(View *view)
 {
 	view->getRenderer()->AddActor(mActor);
 }
 
-void GPURayCastVolumeRep::removeRepActorsFromViewRenderer(ssc::View *view)
+void GPURayCastVolumeRep::removeRepActorsFromViewRenderer(View *view)
 {
 	view->getRenderer()->RemoveActor(mActor);
 }
 
-void GPURayCastVolumeRep::printSelf(std::ostream & os, ssc::Indent indent)
+void GPURayCastVolumeRep::printSelf(std::ostream & os, Indent indent)
 {
 }
 
@@ -216,8 +216,8 @@ void GPURayCastVolumeRep::updateColorAttributeSlot()
 
 		vtkLookupTablePtr lut = mImages[i]->getTransferFunctions3D()->getLut();
 
-		ssc::GPUImageLutBufferPtr lutBuffer;
-		if (lut) lutBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageLutBuffer(lut->GetTable());
+		GPUImageLutBufferPtr lutBuffer;
+		if (lut) lutBuffer = GPUImageBufferRepository::getInstance()->getGPUImageLutBuffer(lut->GetTable());
 
 		// no lut indicates to the fragment shader that RGBA should be used
 		if (inputImage->GetNumberOfScalarComponents()==1)

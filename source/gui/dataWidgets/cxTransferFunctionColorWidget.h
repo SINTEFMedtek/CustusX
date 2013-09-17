@@ -30,7 +30,7 @@ public:
   virtual ~TransferFunctionColorWidget();
   virtual QString defaultWhatsThis() const;
   
-  void setData(ssc::ImagePtr image, ssc::ImageTFDataPtr tfData);
+  void setData(ImagePtr image, ImageTFDataPtr tfData);
 
 public slots:
   void activeImageTransferFunctionsChangedSlot(); ///< Acts when the image's transfer function is changed
@@ -76,8 +76,8 @@ protected:
   int mCurrentClickX, mCurrentClickY;///< The x coordinate currently selected with the mouse
   int mBorder;///< The size of the border around the transferfunction. The size of the rectangles are mBorder * 2
   
-  ssc::ImagePtr mImage;
-  ssc::ImageTFDataPtr mImageTF;
+  ImagePtr mImage;
+  ImageTFDataPtr mImageTF;
   ActiveImageProxyPtr mActiveImageProxy;
   
   bool isInsideCurrentPoint();///< Checks if a screen coordinate is inside any of the point rectangles. Sets mCurrentPoint.position and mCurrentPoint.value

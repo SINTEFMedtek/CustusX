@@ -16,12 +16,12 @@ namespace cxtest
 
 TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][widget][streaming]")
 {
-	ssc::messageManager()->initialize();
-	cx::DataManager::getInstance()->initialize();
+	cx::messageManager()->initialize();
+	cx::cxDataManager::getInstance()->initialize();
 
-	cx::ToolManager::initializeObject();
-	cx::ToolManager* tm = cx::ToolManager::getInstance();
-	ssc::DummyToolPtr tool = ssc::DummyToolTestUtilities::createDummyTool(ssc::DummyToolTestUtilities::createProbeDataLinear(),tm);
+	cx::cxToolManager::initializeObject();
+	cx::cxToolManager* tm = cx::cxToolManager::getInstance();
+	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear(),tm);
 	tm->runDummyTool(tool);
 	tm->setDominantTool(tool->getUid());
 	waitForQueuedSignal(tm, SIGNAL(trackingStarted()));
@@ -34,9 +34,9 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][widget][streaming]")
 	REQUIRE(widget->canStream(filename, "SimulatedImageStreamer"));
 	delete widget;
 
-//	ssc::DummyToolManager::getInstance()->shutdown();
-	cx::DataManager::getInstance()->shutdown();
-	ssc::messageManager()->shutdown();
+//	DummyToolManager::getInstance()->shutdown();
+	cx::cxDataManager::getInstance()->shutdown();
+	cx::messageManager()->shutdown();
 }
 
 } //namespace cxtest

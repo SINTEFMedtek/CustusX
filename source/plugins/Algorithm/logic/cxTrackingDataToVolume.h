@@ -31,8 +31,8 @@ public:
   TrackingDataToVolume();
   ~TrackingDataToVolume();
 
-  void setInput(ssc::TimedTransformMap map_prMt, int padding=15); ///< the map should contain transforms to tools point [0,0,0] (the tip of the tool)
-  ssc::ImagePtr getOutput(); ///< the generated image in image (d) space
+  void setInput(TimedTransformMap map_prMt, int padding=15); ///< the map should contain transforms to tools point [0,0,0] (the tip of the tool)
+  ImagePtr getOutput(); ///< the generated image in image (d) space
 
 private:
   inline bool rangeCheck(int x, int y, int z, int* extent)
@@ -48,13 +48,13 @@ private:
       return true;
   } ///< Checks that the given x,y,z point is inside the given extent
 
-  ssc::DoubleBoundingBox3D getBoundingBox(ssc::TimedTransformMap& map_prMt);///< Create bounding box around input positions
-  ssc::ImagePtr createEmptyImage(ssc::DoubleBoundingBox3D bounds_pr, double spacing);///< Create an empty sscImage. Creates an unsigned char volume.
-  std::vector<ssc::Vector3D> extractPoints(ssc::TimedTransformMap& map_prMt);///< Extracts the tool point (0,0,0) (aka: the tooltip) in pr space
-  void insertPoints(ssc::ImagePtr image_d, std::vector<ssc::Vector3D> points_pr, int padding_voxels);///< Insert points as dots(value 1) in a volume.
-  void writeVoxelValuesWithPadding(ssc::Vector3D point_voxel, vtkImageDataPtr data_pr, int padding_voxels); ///< Writes values into the voxels and appends a padding around
+  DoubleBoundingBox3D getBoundingBox(TimedTransformMap& map_prMt);///< Create bounding box around input positions
+  ImagePtr createEmptyImage(DoubleBoundingBox3D bounds_pr, double spacing);///< Create an empty sscImage. Creates an unsigned char volume.
+  std::vector<Vector3D> extractPoints(TimedTransformMap& map_prMt);///< Extracts the tool point (0,0,0) (aka: the tooltip) in pr space
+  void insertPoints(ImagePtr image_d, std::vector<Vector3D> points_pr, int padding_voxels);///< Insert points as dots(value 1) in a volume.
+  void writeVoxelValuesWithPadding(Vector3D point_voxel, vtkImageDataPtr data_pr, int padding_voxels); ///< Writes values into the voxels and appends a padding around
 
-  ssc::ImagePtr mImage;
+  ImagePtr mImage;
 };
 
 /**

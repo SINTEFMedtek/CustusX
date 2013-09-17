@@ -24,7 +24,7 @@
 #include <vtkRenderer.h>
 #include "boost/bind.hpp"
 
-namespace ssc
+namespace cx
 {
 
 PlaneMetricRepPtr PlaneMetricRep::New(const QString& uid, const QString& name)
@@ -36,7 +36,7 @@ PlaneMetricRepPtr PlaneMetricRep::New(const QString& uid, const QString& name)
 PlaneMetricRep::PlaneMetricRep(const QString& uid, const QString& name) :
                 DataMetricRep(uid, name)
 {
-	mViewportListener.reset(new ssc::ViewportListener);
+	mViewportListener.reset(new ViewportListener);
 	mViewportListener->setCallback(boost::bind(&PlaneMetricRep::rescale, this));
 }
 
@@ -61,13 +61,13 @@ void PlaneMetricRep::clear()
     mNormal.reset();
 }
 
-void PlaneMetricRep::addRepActorsToViewRenderer(ssc::View *view)
+void PlaneMetricRep::addRepActorsToViewRenderer(View *view)
 {
     mViewportListener->startListen(view->getRenderer());
     DataMetricRep::addRepActorsToViewRenderer(view);
 }
 
-void PlaneMetricRep::removeRepActorsFromViewRenderer(ssc::View *view)
+void PlaneMetricRep::removeRepActorsFromViewRenderer(View *view)
 {
 //	mView = NULL;
 //	mGraphicalPoint.reset();
@@ -83,8 +83,8 @@ void PlaneMetricRep::changedSlot()
 
 	if (!mGraphicalPoint && mView && mMetric)
 	{
-		mGraphicalPoint.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
-		mNormal.reset(new ssc::GraphicalArrow3D(mView->getRenderer()));
+		mGraphicalPoint.reset(new GraphicalPoint3D(mView->getRenderer()));
+		mNormal.reset(new GraphicalArrow3D(mView->getRenderer()));
 		mRect.reset(new Rect3D(mView->getRenderer(), mColor));
 		mRect->setLine(true, 1);
 	}
@@ -109,9 +109,9 @@ void PlaneMetricRep::rescale()
 	if (!mGraphicalPoint)
 		return;
 
-	ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mMetric->getSpace(), ssc::CoordinateSystem(ssc::csREF));
-	ssc::Vector3D p0_r = rM0.coord(mMetric->getCoordinate());
-	ssc::Vector3D n_r = rM0.vector(mMetric->getNormal());
+	Transform3D rM0 = SpaceHelpers::get_toMfrom(mMetric->getSpace(), CoordinateSystem(csREF));
+	Vector3D p0_r = rM0.coord(mMetric->getCoordinate());
+	Vector3D n_r = rM0.vector(mMetric->getNormal());
 
 	double size = mViewportListener->getVpnZoom();
 	double sphereSize = mGraphicsSize / 100 / size;
@@ -124,19 +124,19 @@ void PlaneMetricRep::rescale()
 	mNormal->setValue(p0_r, n_r, sphereSize * 8);
 
 	// draw a rectangle showing the plane:
-	ssc::Vector3D e_z = n_r;
-	ssc::Vector3D k1(1,0,0);
-	ssc::Vector3D k2(0,1,0);
-	ssc::Vector3D e_x;
+	Vector3D e_z = n_r;
+	Vector3D k1(1,0,0);
+	Vector3D k2(0,1,0);
+	Vector3D e_x;
 	if (cross(k2,e_z).length() > cross(k1,e_z).length())
 		e_x = cross(k2,e_z)/cross(k2,e_z).length();
 	else
 		e_x = cross(k1,e_z)/cross(k1,e_z).length();
 
-	ssc::Vector3D e_y = cross(e_z,e_x);
-	ssc::Transform3D rMb = ssc::createTransformIJC(e_x, e_y, p0_r);
+	Vector3D e_y = cross(e_z,e_x);
+	Transform3D rMb = createTransformIJC(e_x, e_y, p0_r);
 	double bb_size = 0.10/size;
-	ssc::DoubleBoundingBox3D bb(-bb_size,bb_size,-bb_size,bb_size,0,0);
+	DoubleBoundingBox3D bb(-bb_size,bb_size,-bb_size,bb_size,0,0);
 	mRect->updatePosition(bb, rMb);
 
 //  double sphereSize = 0.007/size;
@@ -146,7 +146,7 @@ void PlaneMetricRep::rescale()
 //	if (!mShowLabel)
 //		mText.reset();
 //	if (!mText && mShowLabel)
-//		mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
+//		mText.reset(new CaptionText3D(mView->getRenderer()));
 //	if (mText)
 //	{
 //		mText->setColor(mColor);

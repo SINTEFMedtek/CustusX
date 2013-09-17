@@ -106,8 +106,8 @@ void RegistrationHistoryWidget::showEvent(QShowEvent* event)
   QWidget::showEvent(event);
 
   this->reconnectSlot();
-  connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(reconnectSlot()));
-  connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(updateSlot()));
+  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(reconnectSlot()));
+  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(updateSlot()));
 
   updateSlot();
 }
@@ -120,8 +120,8 @@ void RegistrationHistoryWidget::hideEvent(QCloseEvent* event)
   {
     disconnect(mHistories[i].get(), SIGNAL(currentChanged()), this, SLOT(updateSlot()));
   }
-  disconnect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(updateSlot()));
-  disconnect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(reconnectSlot()));
+  disconnect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(updateSlot()));
+  disconnect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(reconnectSlot()));
 }
 
 void RegistrationHistoryWidget::reconnectSlot()
@@ -146,18 +146,18 @@ std::map<QDateTime,QString> RegistrationHistoryWidget::getRegistrationTimes()
 {
   TimeMap retval;
 
-  std::vector<ssc::RegistrationHistoryPtr> allHistories = this->getAllRegistrationHistories();
+  std::vector<RegistrationHistoryPtr> allHistories = this->getAllRegistrationHistories();
 
   retval[QDateTime(QDate(2000,1,1))] = "initial";
 
   for (unsigned i=0; i<allHistories.size(); ++i)
   {
-    std::vector<ssc::RegistrationTransform> current = allHistories[i]->getData();
+    std::vector<RegistrationTransform> current = allHistories[i]->getData();
     for (unsigned j=0; j<current.size(); ++j)
     {
 		retval[current[j].mTimestamp] = QString("%1 [f=%2, m=%3]").arg(current[j].mType).arg(current[j].mFixed).arg(current[j].mMoving);
     }
-    std::vector<ssc::ParentSpace> frames = allHistories[i]->getParentSpaces();
+    std::vector<ParentSpace> frames = allHistories[i]->getParentSpaces();
     for (unsigned j=0; j<frames.size(); ++j)
     {
 		retval[frames[j].mTimestamp] = QString("%1 [val=%2]").arg(frames[j].mType).arg(frames[j].mValue);
@@ -189,7 +189,7 @@ RegistrationHistoryWidget::TimeMap::iterator RegistrationHistoryWidget::findCurr
  */
 QDateTime RegistrationHistoryWidget::getActiveTime()
 {
-  std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
+  std::vector<RegistrationHistoryPtr> raw = getAllRegistrationHistories();
 
   for (unsigned i=0; i<raw.size(); ++i)
   {
@@ -206,10 +206,10 @@ QDateTime RegistrationHistoryWidget::getActiveTime()
  */
 void RegistrationHistoryWidget::setActiveTime(QDateTime active)
 {
-  std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
+  std::vector<RegistrationHistoryPtr> raw = getAllRegistrationHistories();
   for (unsigned i=0; i<raw.size(); ++i)
   {
-//  	std::cout << "RegistrationHistoryWidget::setActiveTime() " << i << "/" << raw.size() << " - " << active.toString(ssc::timestampSecondsFormatNice()) << std::endl;
+//  	std::cout << "RegistrationHistoryWidget::setActiveTime() " << i << "/" << raw.size() << " - " << active.toString(timestampSecondsFormatNice()) << std::endl;
 
     raw[i]->setActiveTime(active);
   }
@@ -218,13 +218,13 @@ void RegistrationHistoryWidget::setActiveTime(QDateTime active)
 /**collect registration histories from the tool manager (patient registration)
  * and images (image registration) and return.
  */
-std::vector<ssc::RegistrationHistoryPtr> RegistrationHistoryWidget::getAllRegistrationHistories()
+std::vector<RegistrationHistoryPtr> RegistrationHistoryWidget::getAllRegistrationHistories()
 {
-  std::vector<ssc::RegistrationHistoryPtr> retval;
-  retval.push_back(ssc::ToolManager::getInstance()->get_rMpr_History());
+  std::vector<RegistrationHistoryPtr> retval;
+  retval.push_back(ToolManager::getInstance()->get_rMpr_History());
 
-  std::map<QString, ssc::DataPtr> data = ssc::DataManager::getInstance()->getData();
-  for (std::map<QString, ssc::DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
+  std::map<QString, DataPtr> data = DataManager::getInstance()->getData();
+  for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
   {
     retval.push_back(iter->second->get_rMd_History());
   }
@@ -242,9 +242,9 @@ void RegistrationHistoryWidget::removeSlot()
   if (!active.isValid()) // if invalid: we are already at head
     return;
 
-  ssc::messageManager()->sendInfo("Removing all registration performed later than " + active.toString(ssc::timestampSecondsFormatNice()) + ".");
+  messageManager()->sendInfo("Removing all registration performed later than " + active.toString(timestampSecondsFormatNice()) + ".");
 
-  std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
+  std::vector<RegistrationHistoryPtr> raw = getAllRegistrationHistories();
   for (unsigned i=0; i<raw.size(); ++i)
   {
     raw[i]->removeNewerThan(active);
@@ -253,12 +253,12 @@ void RegistrationHistoryWidget::removeSlot()
   debugDump();
 }
 
-std::vector<ssc::RegistrationTransform> RegistrationHistoryWidget::mergeHistory(const std::vector<ssc::RegistrationHistoryPtr>& allHistories)
+std::vector<RegistrationTransform> RegistrationHistoryWidget::mergeHistory(const std::vector<RegistrationHistoryPtr>& allHistories)
 {
-  std::vector<ssc::RegistrationTransform> history;
+  std::vector<RegistrationTransform> history;
   for (unsigned i=0; i<allHistories.size(); ++i)
   {
-    std::vector<ssc::RegistrationTransform> current = allHistories[i]->getData();
+    std::vector<RegistrationTransform> current = allHistories[i]->getData();
     std::copy(current.begin(), current.end(), std::back_inserter(history));
   }
   std::sort(history.begin(), history.end());
@@ -287,14 +287,14 @@ void RegistrationHistoryWidget::rewindSlot()
     --current; // ignore the last entry
 
   --current;
-  ssc::messageManager()->sendInfo("Rewind: Setting registration time to " + current->first.toString(ssc::timestampSecondsFormatNice()) + ", [" + current->second + "]");
+  messageManager()->sendInfo("Rewind: Setting registration time to " + current->first.toString(timestampSecondsFormatNice()) + ", [" + current->second + "]");
   this->setActiveTime(current->first);
 //  std::cout << "finished rewind" << std::endl;
 }
 
 QString RegistrationHistoryWidget::debugDump()
 {
-//	std::cout << "RegistrationHistoryWidget::debugDump() " << this->getActiveTime().toString(ssc::timestampSecondsFormatNice()) << std::endl;
+//	std::cout << "RegistrationHistoryWidget::debugDump() " << this->getActiveTime().toString(timestampSecondsFormatNice()) << std::endl;
 
   TimeMap times = this->getRegistrationTimes();
   bool addedBreak = false;
@@ -304,7 +304,7 @@ QString RegistrationHistoryWidget::debugDump()
   if (!this->getActiveTime().isValid())
     ss << "Active time: Current \n";
   else
-    ss << "Active time: " << this->getActiveTime().toString(ssc::timestampSecondsFormatNice()) << "\n";
+    ss << "Active time: " << this->getActiveTime().toString(timestampSecondsFormatNice()) << "\n";
   ss << "</i></p>";
 
   ss << "<p><span style=\"color:blue\">";
@@ -320,7 +320,7 @@ QString RegistrationHistoryWidget::debugDump()
     {
       ss << "<br />";
     }
-    ss << iter->first.toString(ssc::timestampSecondsFormatNice()) << "\t" << iter->second;
+    ss << iter->first.toString(timestampSecondsFormatNice()) << "\t" << iter->second;
   }
   ss << "</span></p>";
 
@@ -346,12 +346,12 @@ void RegistrationHistoryWidget::forwardSlot()
 
   if (current==times.end() || times.rbegin()->first==current->first) // if at end or at the last position, interpret as end
   {
-    ssc::messageManager()->sendInfo("Forward: Setting registration time to current, [" + times.rbegin()->second + "]");
+    messageManager()->sendInfo("Forward: Setting registration time to current, [" + times.rbegin()->second + "]");
     this->setActiveTime(QDateTime());
   }
   else
   {
-    ssc::messageManager()->sendInfo("Forward: Setting registration time to " + current->first.toString(ssc::timestampSecondsFormatNice()) + ", [" + current->second + "]");
+    messageManager()->sendInfo("Forward: Setting registration time to " + current->first.toString(timestampSecondsFormatNice()) + ", [" + current->second + "]");
     this->setActiveTime(current->first);
   }
 }
@@ -362,8 +362,8 @@ void RegistrationHistoryWidget::forwardSlot()
  */
 void RegistrationHistoryWidget::fastForwardSlot()
 {
-  std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-  ssc::messageManager()->sendInfo("Fast Forward: Setting registration time to current.");
+  std::vector<RegistrationHistoryPtr> raw = getAllRegistrationHistories();
+  messageManager()->sendInfo("Fast Forward: Setting registration time to current.");
 
   for (unsigned i=0; i<raw.size(); ++i)
   {
@@ -380,8 +380,8 @@ void RegistrationHistoryWidget::updateSlot()
 {
 //	std::cout << "RegistrationHistoryWidget::updateSlot()" << std::endl;
 
-  std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-  std::vector<ssc::RegistrationTransform> history = mergeHistory(raw);
+  std::vector<RegistrationHistoryPtr> raw = getAllRegistrationHistories();
+  std::vector<RegistrationTransform> history = mergeHistory(raw);
 
   TimeMap times = this->getRegistrationTimes();
   std::map<QDateTime,QString>::iterator current = this->findCurrentActiveIter(times);

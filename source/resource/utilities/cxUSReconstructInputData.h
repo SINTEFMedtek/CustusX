@@ -17,7 +17,7 @@
 #include <vector>
 #include "sscProbeSector.h"
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class USFrameData> USFrameDataPtr;
@@ -47,20 +47,20 @@ struct USReconstructInputData
 {
 	QString mFilename; ///< filename used for current data read
 
-	ssc::USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
-	std::vector<ssc::TimedPosition> mFrames;
-	std::vector<ssc::TimedPosition> mPositions;
-	ssc::ImagePtr mMask;///< Clipping mask for the input data
-	ssc::ProbeSector mProbeData;
+	USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
+	std::vector<TimedPosition> mFrames;
+	std::vector<TimedPosition> mPositions;
+	ImagePtr mMask;///< Clipping mask for the input data
+	ProbeSector mProbeData;
 	QString mProbeUid;
-	ssc::Transform3D rMpr; ///< patient registration
+	Transform3D rMpr; ///< patient registration
 };
 
 /**
  * \}
  */
 
-}//namespace ssc
+}//namespace cx
 
 
 #endif // CXUSRECONSTRUCTINPUTDATA_H

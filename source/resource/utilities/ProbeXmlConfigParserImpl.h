@@ -34,7 +34,7 @@ protected:
 	QList<QDomNode> nodeListToListOfNodes(QDomNodeList list); ///< converts a QDomNodeList to a QList<QDomNode>
 	void addTextElement(QDomElement parent, QString element, QString text);
 
-	ssc::XmlOptionFile mFile;
+	cx::XmlOptionFile mFile;
 };
 
 //------------------------------------------------------------------------------

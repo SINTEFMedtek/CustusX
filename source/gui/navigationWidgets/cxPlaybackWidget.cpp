@@ -40,7 +40,7 @@ PlaybackWidget::PlaybackWidget(QWidget* parent) :
 	mOpen = false;
 	this->setToolTip(this->defaultWhatsThis());
 
-	connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(toolManagerInitializedSlot()));
+	connect(toolManager(), SIGNAL(initialized()), this, SLOT(toolManagerInitializedSlot()));
 
 	mTimer.reset(new PlaybackTime());
 	mTimer->initialize(QDateTime::currentDateTime(), 100000);
@@ -94,12 +94,12 @@ PlaybackWidget::PlaybackWidget(QWidget* parent) :
 	      SLOT(toggleDetailsSlot()),
 	      playButtonsLayout);
 
-	mSpeedAdapter = ssc::DoubleDataAdapterXml::initialize(
+	mSpeedAdapter = DoubleDataAdapterXml::initialize(
 					"speed",
 					"Speed",
-					"Set speed of playback, 0 is normal speed.", 0, ssc::DoubleRange(-5,5,1),0);
+					"Set speed of playback, 0 is normal speed.", 0, DoubleRange(-5,5,1),0);
 	connect(mSpeedAdapter.get(), SIGNAL(changed()), this, SLOT(speedChangedSlot()));
-	playButtonsLayout->addWidget(ssc::createDataWidget(this, mSpeedAdapter));
+	playButtonsLayout->addWidget(sscCreateDataWidget(this, mSpeedAdapter));
 
 	playButtonsLayout->addStretch();
 
@@ -160,20 +160,20 @@ void PlaybackWidget::timeLineWidgetValueChangedSlot()
 
 void PlaybackWidget::toggleOpenSlot()
 {
-	if (cx::ToolManager::getInstance()->isPlaybackMode())
+	if (cx::cxToolManager::getInstance()->isPlaybackMode())
 	{
 //		ToolManager::getInstance()->closePlayBackMode();
-		ToolManager::getInstance()->setPlaybackMode(PlaybackTimePtr());
+		cxToolManager::getInstance()->setPlaybackMode(PlaybackTimePtr());
 		videoService()->setPlaybackMode(PlaybackTimePtr());
 	}
 	else
 	{
-		ToolManager::getInstance()->setPlaybackMode(mTimer);
+		cxToolManager::getInstance()->setPlaybackMode(mTimer);
 		videoService()->setPlaybackMode(mTimer);
 
-		ssc::messageManager()->sendInfo(QString("Started Playback with start time [%1] and end time [%2]")
-						.arg(mTimer->getStartTime().toString(ssc::timestampMilliSecondsFormatNice()))
-						.arg(mTimer->getStartTime().addMSecs(mTimer->getLength()).toString(ssc::timestampMilliSecondsFormatNice())));
+		messageManager()->sendInfo(QString("Started Playback with start time [%1] and end time [%2]")
+						.arg(mTimer->getStartTime().toString(timestampMilliSecondsFormatNice()))
+						.arg(mTimer->getStartTime().addMSecs(mTimer->getLength()).toString(timestampMilliSecondsFormatNice())));
 
 	}
 }
@@ -193,10 +193,10 @@ QColor PlaybackWidget::generateRandomToolColor() const
 	return colors[(gCounter++)%colors.size()];
 }
 
-std::vector<TimelineEvent> PlaybackWidget::convertHistoryToEvents(ssc::ToolPtr tool)
+std::vector<TimelineEvent> PlaybackWidget::convertHistoryToEvents(ToolPtr tool)
 {
 	std::vector<TimelineEvent> retval;
-	ssc::TimedTransformMapPtr history = tool->getPositionHistory();
+	TimedTransformMapPtr history = tool->getPositionHistory();
 	if (!history || history->empty())
 		return retval;
 	double timeout = 200;
@@ -205,7 +205,7 @@ std::vector<TimelineEvent> PlaybackWidget::convertHistoryToEvents(ssc::ToolPtr t
 	currentEvent.mColor = this->generateRandomToolColor(); // QColor::fromHsv(110, 255, 192);
 //	std::cout << "first event start: " << currentEvent.mDescription << " " << currentEvent.mStartTime << " " << history->size() << std::endl;
 
-	for(ssc::TimedTransformMap::iterator iter=history->begin(); iter!=history->end(); ++iter)
+	for(TimedTransformMap::iterator iter=history->begin(); iter!=history->end(); ++iter)
 	{
 		double current = iter->first;
 
@@ -219,17 +219,17 @@ std::vector<TimelineEvent> PlaybackWidget::convertHistoryToEvents(ssc::ToolPtr t
 			currentEvent.mEndTime = current;
 		}
 	}
-	if (!ssc::similar(currentEvent.mEndTime - currentEvent.mStartTime, 0))
+	if (!similar(currentEvent.mEndTime - currentEvent.mStartTime, 0))
 		retval.push_back(currentEvent);
 
 	return retval;
 }
 
-std::vector<TimelineEvent> PlaybackWidget::convertRegistrationHistoryToEvents(ssc::RegistrationHistoryPtr reg)
+std::vector<TimelineEvent> PlaybackWidget::convertRegistrationHistoryToEvents(RegistrationHistoryPtr reg)
 {
 	std::vector<TimelineEvent> events;
 
-	std::vector<ssc::RegistrationTransform> tr = reg->getData();
+	std::vector<RegistrationTransform> tr = reg->getData();
 	for (unsigned i=0; i<tr.size(); ++i)
 	{
 		if (!tr[i].mTimestamp.isValid())
@@ -243,7 +243,7 @@ std::vector<TimelineEvent> PlaybackWidget::convertRegistrationHistoryToEvents(ss
 						tr[i].mTimestamp.toMSecsSinceEpoch()));
 	}
 
-	std::vector<ssc::ParentSpace> ps = reg->getParentSpaces();
+	std::vector<ParentSpace> ps = reg->getParentSpaces();
 
 	return events;
 }
@@ -254,15 +254,15 @@ std::vector<TimelineEvent> PlaybackWidget::createEvents()
 
 	// find all valid regions (i.e. time sequences with tool navigation)
 	TimelineEventVector events;
-	ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
-	for (ssc::ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)
+	ToolManager::ToolMapPtr tools = toolManager()->getTools();
+	for (ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)
 	{
 		TimelineEventVector current = convertHistoryToEvents(iter->second);
 		copy(current.begin(), current.end(), std::back_inserter(events));
 	}
 
-	std::map<QString, ssc::DataPtr> data = ssc::dataManager()->getData();
-	for (std::map<QString, ssc::DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
+	std::map<QString, DataPtr> data = dataManager()->getData();
+	for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
 	{
 		QString desc("loaded " + iter->second->getName());
 		if (iter->second->getAcquisitionTime().isValid())
@@ -271,12 +271,12 @@ std::vector<TimelineEvent> PlaybackWidget::createEvents()
 			events.push_back(TimelineEvent(desc, acqTime));
 		}
 
-		ssc::RegistrationHistoryPtr reg = iter->second->get_rMd_History();
+		RegistrationHistoryPtr reg = iter->second->get_rMd_History();
 		TimelineEventVector current = this->convertRegistrationHistoryToEvents(reg);
 		copy(current.begin(), current.end(), std::back_inserter(events));
 	}
 
-	ssc::RegistrationHistoryPtr reg = ssc::toolManager()->get_rMpr_History();
+	RegistrationHistoryPtr reg = toolManager()->get_rMpr_History();
 	TimelineEventVector current = this->convertRegistrationHistoryToEvents(reg);
 	copy(current.begin(), current.end(), std::back_inserter(events));
 
@@ -298,7 +298,7 @@ std::pair<double,double> PlaybackWidget::findTimeRange(std::vector<TimelineEvent
 		return std::make_pair(now, now+1000);
 	}
 
-	std::pair<double,double> timeRange(ssc::getMilliSecondsSinceEpoch(), 0);
+	std::pair<double,double> timeRange(getMilliSecondsSinceEpoch(), 0);
 //	std::pair<double,double> timeRange(events[0].mStartTime, events[0].mEndTime);
 
 	for (unsigned i=0; i<events.size(); ++i)
@@ -306,8 +306,8 @@ std::pair<double,double> PlaybackWidget::findTimeRange(std::vector<TimelineEvent
 		timeRange.first = std::min(timeRange.first, events[i].mStartTime);
 		timeRange.second = std::max(timeRange.second, events[i].mEndTime);
 //		std::cout << events[i].mDescription  << std::endl;
-//		std::cout << "===start " << QDateTime::fromMSecsSinceEpoch(events[i].mStartTime).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
-//		std::cout << "===  end " << QDateTime::fromMSecsSinceEpoch(events[i].mEndTime).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+//		std::cout << "===start " << QDateTime::fromMSecsSinceEpoch(events[i].mStartTime).toString(timestampMilliSecondsFormatNice()) << std::endl;
+//		std::cout << "===  end " << QDateTime::fromMSecsSinceEpoch(events[i].mEndTime).toString(timestampMilliSecondsFormatNice()) << std::endl;
 //		std::cout << "===start " << events[i].mStartTime << std::endl;
 //		std::cout << "===  end " << events[i].mEndTime << std::endl;
 //		std::cout << "======" << std::endl;
@@ -321,7 +321,7 @@ std::pair<double,double> PlaybackWidget::findTimeRange(std::vector<TimelineEvent
 
 void PlaybackWidget::toolManagerInitializedSlot()
 {
-	if (cx::ToolManager::getInstance()->isPlaybackMode())
+	if (cx::cxToolManager::getInstance()->isPlaybackMode())
 	{
 		mOpenAction->setText("Close Playback");
 		mOpenAction->setIcon(QIcon(":/icons/open_icon_library/png/64x64/others/button-green.png"));
@@ -335,8 +335,8 @@ void PlaybackWidget::toolManagerInitializedSlot()
 
 	std::vector<TimelineEvent> events = this->createEvents();
 	std::pair<double,double> range = this->findTimeRange(events);
-//	std::cout << "===start " << QDateTime::fromMSecsSinceEpoch(range.first).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
-//	std::cout << "===  end " << QDateTime::fromMSecsSinceEpoch(range.second).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+//	std::cout << "===start " << QDateTime::fromMSecsSinceEpoch(range.first).toString(timestampMilliSecondsFormatNice()) << std::endl;
+//	std::cout << "===  end " << QDateTime::fromMSecsSinceEpoch(range.second).toString(timestampMilliSecondsFormatNice()) << std::endl;
 	mTimer->initialize(QDateTime::fromMSecsSinceEpoch(range.first), range.second - range.first);
 
 	//TODO merge into one initializer:

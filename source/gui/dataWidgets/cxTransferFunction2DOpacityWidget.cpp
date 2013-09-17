@@ -27,8 +27,8 @@ TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(QWidget* parent
 
   QGridLayout* gridLayout = new QGridLayout;
   layout->addLayout(gridLayout);
-  new ssc::SliderGroupWidget(this, mDataAlpha,  gridLayout, 2);
-  new ssc::SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
+  new SliderGroupWidget(this, mDataAlpha,  gridLayout, 2);
+  new SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
 
   this->setLayout(layout);
 }
@@ -44,8 +44,8 @@ QString TransferFunction2DOpacityWidget::defaultWhatsThis() const
 
 void TransferFunction2DOpacityWidget::activeImageChangedSlot()
 {
-  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-  ssc::ImageTFDataPtr tf;
+  ImagePtr image = dataManager()->getActiveImage();
+  ImageTFDataPtr tf;
   if (image)
     tf = image->getLookupTable2D();
   else

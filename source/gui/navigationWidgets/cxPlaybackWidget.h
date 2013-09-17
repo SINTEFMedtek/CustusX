@@ -59,10 +59,10 @@ private slots:
 private:
 	virtual QString defaultWhatsThis() const;
 	QString stripLeadingZeros(QString time);
-	std::vector<TimelineEvent> convertHistoryToEvents(ssc::ToolPtr tool);
+	std::vector<TimelineEvent> convertHistoryToEvents(ToolPtr tool);
 	std::vector<TimelineEvent> createEvents();
 	std::pair<double,double> findTimeRange(std::vector<TimelineEvent> events);
-	std::vector<TimelineEvent> convertRegistrationHistoryToEvents(ssc::RegistrationHistoryPtr reg);
+	std::vector<TimelineEvent> convertRegistrationHistoryToEvents(RegistrationHistoryPtr reg);
 	void showDetails();
 	QColor generateRandomToolColor() const;
 	QString convertMillisecsToNiceString(qint64 ms) const;
@@ -74,7 +74,7 @@ private:
 	PlaybackTimePtr mTimer;
 	QAction* mPlayAction;
 	QAction* mOpenAction;
-	ssc::DoubleDataAdapterXmlPtr mSpeedAdapter;
+	DoubleDataAdapterXmlPtr mSpeedAdapter;
 	TimelineWidget* mToolTimelineWidget;
 };
 

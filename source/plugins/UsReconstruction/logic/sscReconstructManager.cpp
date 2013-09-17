@@ -36,7 +36,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-namespace ssc
+namespace cx
 {
 
 
@@ -93,12 +93,12 @@ void ReconstructManager::transferFunctionChangedSlot()
 	//Use angio reconstruction also if only transfer function is set to angio
 	if(mParams->mPresetTFAdapter->getValue() == "US Angio")
 	{
-		ssc::messageManager()->sendDebug("Reconstructing angio (Because of angio transfer function)");
+		messageManager()->sendDebug("Reconstructing angio (Because of angio transfer function)");
 		mParams->mAngioAdapter->setValue(true);
 	}
 	else if(mParams->mPresetTFAdapter->getValue() == "US B-Mode" && mParams->mAngioAdapter->getValue())
 	{
-		ssc::messageManager()->sendDebug("Not reconstructing angio (Because of B-Mode transfer function)");
+		messageManager()->sendDebug("Not reconstructing angio (Because of B-Mode transfer function)");
 		mParams->mAngioAdapter->setValue(false);
 	}
 }
@@ -113,7 +113,7 @@ std::vector<ReconstructCorePtr> ReconstructManager::startReconstruction()
 
 	if (cores.empty())
 	{
-		ssc::messageManager()->sendWarning("Failed to start reconstruction");
+		messageManager()->sendWarning("Failed to start reconstruction");
 		return cores;
 	}
 
@@ -157,7 +157,7 @@ void ReconstructManager::threadFinishedSlot()
 
 void ReconstructManager::clearAll()
 {
-	mOriginalFileData = ssc::USReconstructInputData();
+	mOriginalFileData = USReconstructInputData();
 	mOutputVolumeParams = OutputVolumeParams();
 }
 
@@ -188,7 +188,7 @@ bool ReconstructManager::validInputData() const
 		return false;
 	if(mOriginalFileData.mUsRaw->is4D())
 	{
-		ssc::messageManager()->sendWarning("US reconstructer do not handle 4D US data");
+		messageManager()->sendWarning("US reconstructer do not handle 4D US data");
 		return false;
 	}
 	return true;
@@ -213,17 +213,17 @@ void ReconstructManager::selectData(QString filename, QString calFilesPath)
 {
 	if (filename.isEmpty())
 	{
-		ssc::messageManager()->sendWarning("no file selected");
+		messageManager()->sendWarning("no file selected");
 		return;
 	}
 
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
-	ssc::USReconstructInputData fileData = fileReader->readAllFiles(filename, calFilesPath);
+	USReconstructInputData fileData = fileReader->readAllFiles(filename, calFilesPath);
 	fileData.mFilename = filename;
 	this->selectData(fileData);
 }
 
-void ReconstructManager::selectData(ssc::USReconstructInputData fileData)
+void ReconstructManager::selectData(USReconstructInputData fileData)
 {
 	this->clearAll();
 	mOriginalFileData = fileData;

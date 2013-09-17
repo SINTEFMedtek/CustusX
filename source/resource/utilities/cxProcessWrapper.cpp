@@ -58,11 +58,11 @@ void ProcessWrapper::launch(QString executable, QStringList arguments)
 
 	if (!QFileInfo(executable).exists())
 	{
-		ssc::messageManager()->sendError(QString("Cannot find %1 [%2]").arg(mName).arg(executable));
+		messageManager()->sendError(QString("Cannot find %1 [%2]").arg(mName).arg(executable));
 		return;
 	}
 
-	ssc::messageManager()->sendInfo(QString("Launching %1 %2 with arguments %3").arg(mName).arg(executable).arg(arguments.join(", ")));
+	messageManager()->sendInfo(QString("Launching %1 %2 with arguments %3").arg(mName).arg(executable).arg(arguments.join(", ")));
 
 	if (mProcess->state() == QProcess::NotRunning)
 		mProcess->start(executable, arguments);
@@ -97,29 +97,29 @@ void ProcessWrapper::serverProcessError(QProcess::ProcessError error)
 		msg += "Invalid error";
 	}
 
-	ssc::messageManager()->sendError(msg);
+	messageManager()->sendError(msg);
 }
 
 void ProcessWrapper::serverProcessStateChanged(QProcess::ProcessState newState)
 {
 	if (newState == QProcess::Running)
 	{
-		ssc::messageManager()->sendInfo(QString("%1 running.").arg(mName));
+		messageManager()->sendInfo(QString("%1 running.").arg(mName));
 //		this->delayedAutoConnectServer();
 	}
 	if (newState == QProcess::NotRunning)
 	{
-		ssc::messageManager()->sendInfo(QString("%1 not running.").arg(mName));
+		messageManager()->sendInfo(QString("%1 not running.").arg(mName));
 	}
 	if (newState == QProcess::Starting)
 	{
-		ssc::messageManager()->sendInfo(QString("%1 starting.").arg(mName));
+		messageManager()->sendInfo(QString("%1 starting.").arg(mName));
 	}
 }
 
 void ProcessWrapper::serverProcessReadyRead()
 {
-	ssc::messageManager()->sendInfo(QString(mProcess->readAllStandardOutput()));
+	messageManager()->sendInfo(QString(mProcess->readAllStandardOutput()));
 }
 
 

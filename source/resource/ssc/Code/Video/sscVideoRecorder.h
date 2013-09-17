@@ -36,7 +36,7 @@
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Recorder for a VideoSource.

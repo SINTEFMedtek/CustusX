@@ -75,7 +75,7 @@ public:
 	virtual ~CameraControl();
 
 	QActionGroup* createStandard3DViewActions();
-	void translateByFocusTo(ssc::Vector3D p_r);
+	void translateByFocusTo(Vector3D p_r);
 
 signals:
 
@@ -88,7 +88,7 @@ private:
 	void defineRotateLayout();
 	void definePanLayout();
 
-	QAction* addStandard3DViewAction(QString caption, QString help, ssc::Vector3D viewDirection, QActionGroup* group);
+	QAction* addStandard3DViewAction(QString caption, QString help, Vector3D viewDirection, QActionGroup* group);
 };
 
 /**

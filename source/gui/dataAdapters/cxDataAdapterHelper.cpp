@@ -37,7 +37,7 @@ QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gri
 	if(retval != NULL)
 		return retval;
 
-	retval = ssc::createDataWidget(parent, data, gridLayout, row);
+	retval = sscCreateDataWidget(parent, data, gridLayout, row);
 	return retval;
 }
 

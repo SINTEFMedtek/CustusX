@@ -54,9 +54,9 @@ void LayoutData::ViewData::parseXml(QDomNode node)
 {
 	QDomElement elem = node.toElement();
 	mGroup = elem.attribute("group").toInt();
-	mPlane = string2enum<ssc::PLANE_TYPE> (elem.attribute("type"));
-	//  mType = string2enum<ssc::View::Type>(elem.attribute("view"));
-	mType = static_cast<ssc::View::Type> (elem.attribute("view").toInt());
+	mPlane = string2enum<PLANE_TYPE> (elem.attribute("type"));
+	//  mType = string2enum<View::Type>(elem.attribute("view"));
+	mType = static_cast<View::Type> (elem.attribute("view").toInt());
 	mRegion.pos.row = elem.attribute("row").toInt();
 	mRegion.pos.col = elem.attribute("col").toInt();
 	mRegion.span.row = elem.attribute("rowSpan").toInt();
@@ -93,23 +93,23 @@ void LayoutData::resetUid(const QString& uid)
 /**Allows easy definition of a view inside the layout.
  * region must be inside layout bounds.
  */
-void LayoutData::setView(int group, ssc::PLANE_TYPE type, LayoutRegion region)
+void LayoutData::setView(int group, PLANE_TYPE type, LayoutRegion region)
 {
 	if (!this->merge(region))
 		return;
 	ViewData& view = get(region.pos);
 	view.mGroup = group;
 	view.mPlane = type;
-	view.mType = ssc::View::VIEW_2D;
+	view.mType = View::VIEW_2D;
 }
 
-void LayoutData::setView(int group, ssc::View::Type type, LayoutRegion region)
+void LayoutData::setView(int group, View::Type type, LayoutRegion region)
 {
 	if (!this->merge(region))
 		return;
 	ViewData& view = get(region.pos);
 	view.mGroup = group;
-	view.mPlane = ssc::ptNOPLANE;
+	view.mPlane = ptNOPLANE;
 	view.mType = type;
 }
 
@@ -122,7 +122,7 @@ bool LayoutData::merge(LayoutRegion region)
 {
 	if (region.pos.row + region.span.row > mSize.row || region.pos.col + region.span.col > mSize.col)
 	{
-		ssc::messageManager()->sendError("Attempted to merge a region outside allocated space in LayoutData.");
+		messageManager()->sendError("Attempted to merge a region outside allocated space in LayoutData.");
 		return false;
 	}
 

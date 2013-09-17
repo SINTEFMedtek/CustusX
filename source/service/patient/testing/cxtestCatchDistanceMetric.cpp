@@ -23,8 +23,8 @@ TEST_CASE("DistanceMetric composed of two points gives a correct distance", "[un
 {
     cxtest::MetricFixture fixture;
     double distance = 2;
-//    PointMetricWithInput p0 = fixture.getPointMetricWithInput(ssc::Vector3D(0,0,0));
-//    PointMetricWithInput p1 = fixture.getPointMetricWithInput(ssc::Vector3D(distance,0,0));
+//    PointMetricWithInput p0 = fixture.getPointMetricWithInput(Vector3D(0,0,0));
+//    PointMetricWithInput p1 = fixture.getPointMetricWithInput(Vector3D(distance,0,0));
 //    DistanceMetricWithInput testData = fixture.getDistanceMetricWithInput(distance, p0, p1);
 	cxtest::DistanceMetricWithInput testData = fixture.getDistanceMetricWithInput(distance);
 
@@ -36,9 +36,9 @@ TEST_CASE("DistanceMetric composed of two points gives a correct distance", "[un
 //{
 //    cxtest::MetricFixture fixture;
 //    double distance = 2;
-//    ssc::Vector3D normal(0,0,1);
-//    cxtest::PlaneMetricWithInput p0 = fixture.getPlaneMetricWithInput(ssc::Vector3D(0,0,0), normal);
-//    cxtest::PlaneMetricWithInput p1 = fixture.getPlaneMetricWithInput(ssc::Vector3D(distance,0,0), normal);
+//    Vector3D normal(0,0,1);
+//    cxtest::PlaneMetricWithInput p0 = fixture.getPlaneMetricWithInput(Vector3D(0,0,0), normal);
+//    cxtest::PlaneMetricWithInput p1 = fixture.getPlaneMetricWithInput(Vector3D(distance,0,0), normal);
 //    cxtest::DistanceMetricWithInput testData = fixture.getDistanceMetricWithInput(distance, p0.mMetric, p1.mMetric);
 
 //    CHECK(fixture.inputEqualsMetric(testData));
@@ -48,9 +48,9 @@ TEST_CASE("DistanceMetric composed of a point and plane gives a correct distance
 {
     cxtest::MetricFixture fixture;
     double distance = 2;
-    ssc::Vector3D normal(0,0,1);
-	cxtest::PointMetricWithInput p0 = fixture.getPointMetricWithInput(ssc::Vector3D(0,0, distance));
-	cxtest::PlaneMetricWithInput p1 = fixture.getPlaneMetricWithInput(ssc::Vector3D(0,0,0), normal);
+	cx::Vector3D normal(0,0,1);
+	cxtest::PointMetricWithInput p0 = fixture.getPointMetricWithInput(cx::Vector3D(0,0, distance));
+	cxtest::PlaneMetricWithInput p1 = fixture.getPlaneMetricWithInput(cx::Vector3D(0,0,0), normal);
 
 	cxtest::DistanceMetricWithInput testData = fixture.getDistanceMetricWithInput(distance, p0.mMetric, p1.mMetric);
 	CHECK(fixture.inputEqualsMetric(testData));

@@ -20,7 +20,7 @@ class CompactFilterSetupWidget : public BaseWidget
 	Q_OBJECT
 
 public:
-	CompactFilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options, bool addFrame);
+	CompactFilterSetupWidget(QWidget* parent, XmlOptionFile options, bool addFrame);
 	void setFilter(FilterPtr filter);
 	QString defaultWhatsThis() const;
 
@@ -28,7 +28,7 @@ private slots:
 	void obscuredSlot(bool obscured);
 
 private:
-	ssc::XmlOptionFile mOptions;
+	XmlOptionFile mOptions;
 	FilterPtr mCurrentFilter;
 	OptionsWidget* mOptionsWidget;
 	QGroupBox* mFrame;

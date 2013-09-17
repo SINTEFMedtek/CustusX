@@ -20,16 +20,16 @@
 namespace cx
 {
 
-/**Create a forest representing all ssc::Data objects and their spatial relationships.
+/**Create a forest representing all Data objects and their spatial relationships.
  *
  */
 FrameForest::FrameForest()
 {
 //  std::cout << "Forrest doc2:" << std::endl;
-	ssc::DataManager::DataMap allData = ssc::dataManager()->getData();
+	DataManager::DataMap allData = dataManager()->getData();
 	mDocument.appendChild(mDocument.createElement("root"));
 
-	for (ssc::DataManager::DataMap::iterator iter = allData.begin(); iter != allData.end(); ++iter)
+	for (DataManager::DataMap::iterator iter = allData.begin(); iter != allData.end(); ++iter)
 	{
 		this->insertFrame(iter->second);
 	}
@@ -45,7 +45,7 @@ QDomDocument FrameForest::getDocument()
 
 /** Insert one data in the correct position in the tree
  */
-void FrameForest::insertFrame(ssc::DataPtr data)
+void FrameForest::insertFrame(DataPtr data)
 {
 	QString parentFrame = data->getParentSpace();
 	QString currentFrame = data->getSpace();
@@ -162,14 +162,14 @@ std::vector<QDomNode> FrameForest::getDescendantsAndSelf(QDomNode node)
 /** As getAllNodesFor(QDomNode), but return the nodes as data objects.
  *  Those frames not representing data are discarded.
  */
-std::vector<ssc::DataPtr> FrameForest::getDataFromDescendantsAndSelf(QDomNode node)
+std::vector<DataPtr> FrameForest::getDataFromDescendantsAndSelf(QDomNode node)
 {
 	std::vector<QDomNode> nodes = this->getDescendantsAndSelf(node);
-	std::vector<ssc::DataPtr> retval;
+	std::vector<DataPtr> retval;
 
 	for (unsigned i = 0; i < nodes.size(); ++i)
 	{
-		ssc::DataPtr data = ssc::dataManager()->getData(nodes[i].toElement().tagName());
+		DataPtr data = dataManager()->getData(nodes[i].toElement().tagName());
 		if (data)
 			retval.push_back(data);
 	}
