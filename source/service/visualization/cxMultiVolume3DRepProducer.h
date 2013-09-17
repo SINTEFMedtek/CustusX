@@ -49,6 +49,7 @@ public:
 	std::vector<RepPtr> getAllReps();
 	static QStringList getAvailableVisualizers();
 	static std::map<QString, QString> getAvailableVisualizerDisplayNames();
+	void removeRepsFromView();
 
 signals:
 	void imagesChanged();
@@ -71,7 +72,6 @@ private:
 	void rebuild2DReps();
 	void rebuild3DReps();
 
-	void removeRepsFromView();
 	void addRepsToView();
 
 	ImagePtr removeImageFromVector(QString uid, std::vector<ImagePtr> &images);
