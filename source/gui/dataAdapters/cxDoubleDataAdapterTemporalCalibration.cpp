@@ -13,9 +13,9 @@ namespace cx
 
 DoubleDataAdapterTimeCalibration::DoubleDataAdapterTimeCalibration()
 {
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
-  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(dominantToolChanged())); // for debugging: if initializing a manual tool with probe properties
-  connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(dominantToolChanged()));
+  connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
+  connect(toolManager(), SIGNAL(configured()), this, SLOT(dominantToolChanged())); // for debugging: if initializing a manual tool with probe properties
+  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(dominantToolChanged()));
   this->dominantToolChanged();
 }
 
@@ -25,14 +25,14 @@ void DoubleDataAdapterTimeCalibration::dominantToolChanged()
 
   // ignore tool changes to something non-probeish.
   // This gives the user a chance to use the widget without having to show the probe.
-  ssc::ToolPtr newTool = ssc::toolManager()->getDominantTool();
-  if (!newTool || !newTool->hasType(ssc::Tool::TOOL_US_PROBE))
+  ToolPtr newTool = toolManager()->getDominantTool();
+  if (!newTool || !newTool->hasType(Tool::TOOL_US_PROBE))
     return;
 
   if (mTool)
     disconnect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
 
-  mTool = ssc::toolManager()->getDominantTool();
+  mTool = toolManager()->getDominantTool();
 
   if (mTool)
     connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
@@ -41,9 +41,9 @@ void DoubleDataAdapterTimeCalibration::dominantToolChanged()
   emit changed();
 }
 
-ssc::DoubleDataAdapterPtr DoubleDataAdapterTimeCalibration::New()
+DoubleDataAdapterPtr DoubleDataAdapterTimeCalibration::New()
 {
-  return ssc::DoubleDataAdapterPtr(new DoubleDataAdapterTimeCalibration());
+  return DoubleDataAdapterPtr(new DoubleDataAdapterTimeCalibration());
 }
 
 double DoubleDataAdapterTimeCalibration::getValue() const
@@ -69,9 +69,9 @@ bool DoubleDataAdapterTimeCalibration::setValue(double val)
   return true;
 }
 
-ssc::DoubleRange DoubleDataAdapterTimeCalibration::getValueRange() const
+DoubleRange DoubleDataAdapterTimeCalibration::getValueRange() const
 {
-  return ssc::DoubleRange(-50000,50000,1);
+  return DoubleRange(-50000,50000,1);
 }
 
 }

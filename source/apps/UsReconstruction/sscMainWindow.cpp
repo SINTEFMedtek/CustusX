@@ -12,9 +12,9 @@ MainWindow::MainWindow(QWidget* parent)
   QHBoxLayout* layout = new QHBoxLayout(this);
   std::cout << qApp->applicationFilePath() << std::endl;
 
-  ssc::XmlOptionFile settings(qApp->applicationDirPath()+"/usReconstruct.xml", "usReconstruction");
+  cx::XmlOptionFile settings(qApp->applicationDirPath()+"/usReconstruct.xml", "usReconstruction");
 
-  mReconstructionWidget = new cx::ReconstructionWidget(this, ssc::ReconstructManagerPtr(new ssc::ReconstructManager(settings, "")));
+  mReconstructionWidget = new cx::ReconstructionWidget(this, cx::ReconstructManagerPtr(new cx::ReconstructManager(settings, "")));
   
 #define CA_DEFS
 #ifdef CA_DEFS
@@ -38,10 +38,10 @@ MainWindow::MainWindow(QWidget* parent)
   
   layout->addWidget(mReconstructionWidget);
 
-  mView = new ssc::ViewWidget(this);
+  mView = new cx::ViewWidget(this);
   layout->addWidget(mView, 1);
 
-  connect(ssc::DataManager::getInstance(), SIGNAL(dataLoaded()), this, SLOT(showData()));
+  connect(cx::DataManager::getInstance(), SIGNAL(dataLoaded()), this, SLOT(showData()));
 }
 
 void MainWindow::automaticStart()
@@ -53,23 +53,23 @@ void MainWindow::showData()
 {
   if (!mVolumeRep)
   {
-	mVolumeRep = ssc::VolumetricRep::New();
+	mVolumeRep = cx::VolumetricRep::New();
     mView->addRep(mVolumeRep);
   }
 
-  ssc::ReconstructPreprocessorPtr preprocessor = mReconstructionWidget->reconstructer()->createPreprocessor();
-  std::vector<ssc::ReconstructCorePtr> cores = mReconstructionWidget->reconstructer()->createCores();
+  cx::ReconstructPreprocessorPtr preprocessor = mReconstructionWidget->reconstructer()->createPreprocessor();
+  std::vector<cx::ReconstructCorePtr> cores = mReconstructionWidget->reconstructer()->createCores();
   preprocessor->initializeCores(cores);
-  ssc::ImagePtr data = cores[0]->reconstruct();
+  cx::ImagePtr data = cores[0]->reconstruct();
 
-  //ssc::ImagePtr data = mReconstructionWidget->reconstructer()->getInput();
-  //ssc::ImagePtr data = mReconstructionWidget->reconstructer()->getReconstructer()->createCore()->reconstruct();
+  //ImagePtr data = mReconstructionWidget->reconstructer()->getInput();
+  //ImagePtr data = mReconstructionWidget->reconstructer()->getReconstructer()->createCore()->reconstruct();
   mVolumeRep->setImage(data);
 
   //Test: show axes
   if (!mAxesRep)
   {
-    mAxesRep = ssc::AxesRep::New("AxesRepUID");
+	mAxesRep = cx::AxesRep::New("AxesRepUID");
     mView->addRep(mAxesRep);
   }
 

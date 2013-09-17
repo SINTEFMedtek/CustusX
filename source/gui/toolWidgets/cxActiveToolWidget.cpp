@@ -14,7 +14,7 @@ ActiveToolWidget::ActiveToolWidget(QWidget* parent) :
   this->setObjectName("ActiveToolWidget");
   layout->setMargin(0);
 
-  ssc::LabeledComboBoxWidget*  combo = new ssc::LabeledComboBoxWidget(this, ActiveToolStringDataAdapter::New());
+  LabeledComboBoxWidget*  combo = new LabeledComboBoxWidget(this, ActiveToolStringDataAdapter::New());
   layout->addWidget(combo);
 }
 

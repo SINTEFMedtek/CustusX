@@ -47,9 +47,9 @@ SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegistrationManager
 	entryLayout->setColumnStretch(1, 1);
 
 	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(regManager));
-	new ssc::LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
+	new LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
 	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(regManager));
-	new ssc::LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
+	new LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
 
 	layout->addLayout(entryLayout, 0, 0, 2, 2);
 	layout->addWidget(mRegisterButton, 2, 0);
@@ -86,7 +86,7 @@ void SeansVesselRegistrationWidget::registerSlot()
 //	mManager->doVesselRegistration(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose,
 //		logPath);
 
-	ssc::SeansVesselReg vesselReg;
+	SeansVesselReg vesselReg;
 	vesselReg.mt_auto_lts = true;
 	vesselReg.mt_ltsRatio = mLTSRatioSpinBox->value();
 	vesselReg.mt_doOnlyLinear = mLinearCheckBox->isChecked();
@@ -94,21 +94,21 @@ void SeansVesselRegistrationWidget::registerSlot()
 
 	if (vesselReg.mt_auto_lts)
 	{
-		ssc::messageManager()->sendDebug("Using automatic lts_ratio");
+		messageManager()->sendDebug("Using automatic lts_ratio");
 	}
 	else
 	{
-		ssc::messageManager()->sendDebug("Using lts_ratio: " + qstring_cast(vesselReg.mt_ltsRatio));
+		messageManager()->sendDebug("Using lts_ratio: " + qstring_cast(vesselReg.mt_ltsRatio));
 	}
 
 	bool success = vesselReg.execute(mManager->getMovingData(), mManager->getFixedData(), logPath);
 	if (!success)
 	{
-		ssc::messageManager()->sendWarning("Vessel registration failed.");
+		messageManager()->sendWarning("Vessel registration failed.");
 		return;
 	}
 
-	ssc::Transform3D linearTransform = vesselReg.getLinearResult();
+	Transform3D linearTransform = vesselReg.getLinearResult();
 	std::cout << "v2v linear result:\n" << linearTransform << std::endl;
 	//std::cout << "v2v inverted linear result:\n" << linearTransform.inverse() << std::endl;
 
@@ -117,7 +117,7 @@ void SeansVesselRegistrationWidget::registerSlot()
 	// The registration is performed in space r. Thus, given an old data position rMd, we find the
 	// new one as rM'd = Q * rMd, where Q is the inverted registration output.
 	// Delta is thus equal to Q:
-	ssc::Transform3D delta = linearTransform.inv();
+	Transform3D delta = linearTransform.inv();
 	//std::cout << "delta:\n" << delta << std::endl;
 	mManager->applyImage2ImageRegistration(delta, "Vessel based");
 }
@@ -142,41 +142,41 @@ public:
 		mMovingData = mContext->getMovingPoints();
 		mFixedData = mContext->getFixedPoints();
 
-		ssc::MeshPtr moving(new ssc::Mesh("v2vreg_moving", "v2vreg_moving", mMovingData));
+		MeshPtr moving(new Mesh("v2vreg_moving", "v2vreg_moving", mMovingData));
 		moving->setColor(QColor("red"));
 
-		ssc::MeshPtr fixed(new ssc::Mesh("v2vreg_fixed", "v2vreg_fixed", mFixedData));
+		MeshPtr fixed(new Mesh("v2vreg_fixed", "v2vreg_fixed", mFixedData));
 		fixed->setColor(QColor("green"));
 
 		mPolyLines = vtkPolyDataPtr::New();
-		ssc::MeshPtr lines(new ssc::Mesh("v2vreg_lines", "v2vreg_lines", mPolyLines));
+		MeshPtr lines(new Mesh("v2vreg_lines", "v2vreg_lines", mPolyLines));
 		lines->setColor(QColor("cornflowerblue"));
 
-		ssc::View* view = viewManager()->get3DView();
+		View* view = viewManager()->get3DView();
 
-		m_mRep = ssc::GeometricRep::New(moving->getUid(), moving->getName());
+		m_mRep = GeometricRep::New(moving->getUid(), moving->getName());
 		m_mRep->setMesh(moving);
 		view->addRep(m_mRep);
 
-		m_fRep = ssc::GeometricRep::New(fixed->getUid(), fixed->getName());
+		m_fRep = GeometricRep::New(fixed->getUid(), fixed->getName());
 		m_fRep->setMesh(fixed);
 		view->addRep(m_fRep);
 
-		m_lineRep = ssc::GeometricRep::New(lines->getUid(), lines->getName());
+		m_lineRep = GeometricRep::New(lines->getUid(), lines->getName());
 		m_lineRep->setMesh(lines);
 		view->addRep(m_lineRep);
 
 		this->update();
 
-		ssc::messageManager()->sendInfo("Initialized V2V algorithm (debug). Use Step to iterate.");
+		messageManager()->sendInfo("Initialized V2V algorithm (debug). Use Step to iterate.");
 	}
 	~SeansVesselRegistrationDebugger()
 	{
-		ssc::View* view = viewManager()->get3DView();
+		View* view = viewManager()->get3DView();
 		view->removeRep(m_mRep);
 		view->removeRep(m_fRep);
 		view->removeRep(m_lineRep);
-		ssc::messageManager()->sendInfo("Closed V2V algorithm (debug).");
+		messageManager()->sendInfo("Closed V2V algorithm (debug).");
 	}
 	void stepL()
 	{
@@ -184,7 +184,7 @@ public:
 			return;
 		mRegistrator.performOneRegistration(mContext, true);
 		this->update();
-		ssc::messageManager()->sendInfo(QString("One Linear V2V iteration, metric=%1").arg(mContext->mMetric));
+		messageManager()->sendInfo(QString("One Linear V2V iteration, metric=%1").arg(mContext->mMetric));
 	}
 	void stepNL()
 	{
@@ -192,21 +192,21 @@ public:
 			return;
 		mRegistrator.performOneRegistration(mContext, false);
 		this->update();
-		ssc::messageManager()->sendInfo(QString("One Nonlinear V2V iteration, metric=%1").arg(mContext->mMetric));
+		messageManager()->sendInfo(QString("One Nonlinear V2V iteration, metric=%1").arg(mContext->mMetric));
 	}
 	void apply()
 	{
 		if (!mContext)
 			return;
 
-		ssc::Transform3D linearTransform = mRegistrator.getLinearResult(mContext);
+		Transform3D linearTransform = mRegistrator.getLinearResult(mContext);
 		std::cout << "v2v linear result:\n" << linearTransform << std::endl;
 
 		mRegistrator.checkQuality(linearTransform);
-		ssc::Transform3D delta = linearTransform.inv();
+		Transform3D delta = linearTransform.inv();
 		mManager->applyImage2ImageRegistration(delta, "Vessel based");
 
-		ssc::messageManager()->sendInfo(QString("Applied linear registration from debug iteration."));
+		messageManager()->sendInfo(QString("Applied linear registration from debug iteration."));
 	}
 	void update()
 	{
@@ -227,13 +227,13 @@ public:
 
 		//		// draw lines: slow but nice
 		//		mLines.clear();
-		//		ssc::View* view = viewManager()->get3DView();
+		//		View* view = viewManager()->get3DView();
 		//		for (int i=0; i<mContext->mSortedSourcePoints->GetNumberOfPoints(); ++i)
 		//		{
-		//			ssc::GraphicalLine3DPtr line(new ssc::GraphicalLine3D(view->getRenderer()));
-		//			line->setValue(ssc::Vector3D(mContext->mSortedSourcePoints->GetPoint(i)),
-		//				ssc::Vector3D(mContext->mSortedTargetPoints->GetPoint(i)));
-		//			line->setColor(ssc::Vector3D(1,0,0));
+		//			GraphicalLine3DPtr line(new GraphicalLine3D(view->getRenderer()));
+		//			line->setValue(Vector3D(mContext->mSortedSourcePoints->GetPoint(i)),
+		//				Vector3D(mContext->mSortedTargetPoints->GetPoint(i)));
+		//			line->setColor(Vector3D(1,0,0));
 		//			mLines.push_back(line);
 		//		}
 
@@ -254,13 +254,13 @@ public:
 	}
 
 private:
-	ssc::SeansVesselReg mRegistrator;
-	ssc::SeansVesselReg::ContextPtr mContext;
+	SeansVesselReg mRegistrator;
+	SeansVesselReg::ContextPtr mContext;
 	RegistrationManagerPtr mManager;
 	vtkPolyDataPtr mMovingData, mFixedData;
 	vtkPolyDataPtr mPolyLines;
-	ssc::GeometricRepPtr m_mRep, m_fRep, m_lineRep;
-	//	std::vector<ssc::GraphicalLine3DPtr> mLines;
+	GeometricRepPtr m_mRep, m_fRep, m_lineRep;
+	//	std::vector<GraphicalLine3DPtr> mLines;
 };
 
 void SeansVesselRegistrationWidget::debugInit()

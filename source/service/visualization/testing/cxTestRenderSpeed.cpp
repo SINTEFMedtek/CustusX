@@ -84,7 +84,7 @@ void TestRenderSpeed::create3Dviews(int num)
 	mNumViews += num;
 	for(int i = 0; i < num; ++i)
 	{
-		ssc::ViewWidget* view = new ssc::ViewWidget("testView3D", "testView3D", NULL);
+		cx::ViewWidget* view = new cx::ViewWidget("testView3D", "testView3D", NULL);
 		mViews.push_back(view);
 	}
 }
@@ -94,7 +94,7 @@ void TestRenderSpeed::create2Dviews(int num)
 	mNumViews += num;
 	for(int i = 0; i < num; ++i)
 	{
-		ssc::ViewWidget* view = new ssc::ViewWidget("testView2D", "testView2D", NULL);
+		cx::ViewWidget* view = new cx::ViewWidget("testView2D", "testView2D", NULL);
 		mViews.push_back(view);
 	}
 }
@@ -115,7 +115,7 @@ void TestRenderSpeed::renderNumTimes(int num)
 	mNumRenderings = num;
 	QTime clock;
 	clock.start();
-	std::vector<ssc::ViewWidget*>::iterator iter;
+	std::vector<cx::ViewWidget*>::iterator iter;
 	for(int i = 0; i < mNumRenderings; ++i)
 		for(int v = 0; v < this->getNumViews(); v++)
 			this->renderViewNum(v);
@@ -144,7 +144,7 @@ void TestRenderSpeed::printResult()
 
 void TestRenderSpeed::addViewsToLayout(QLayout* layout)
 {
-	std::vector<ssc::ViewWidget*>::iterator iter;
+	std::vector<cx::ViewWidget*>::iterator iter;
 	for (iter = mViews.begin(); iter != mViews.end(); ++iter)
 		layout->addWidget(*iter);
 }

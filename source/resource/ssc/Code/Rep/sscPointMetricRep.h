@@ -25,7 +25,7 @@
 #include "sscPointMetric.h"
 #include "sscViewportListener.h"
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class PointMetricRep> PointMetricRepPtr;
@@ -47,11 +47,11 @@ public:
 
 	void setPointMetric(PointMetricPtr point);
 	PointMetricPtr getPointMetric();
-	virtual QString getType() const { return "ssc::PointMetricRep"; }
+	virtual QString getType() const { return "PointMetricRep"; }
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::View *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+	virtual void addRepActorsToViewRenderer(View *view);
+	virtual void removeRepActorsFromViewRenderer(View *view);
 
     virtual void clear();
     virtual void rescale();
@@ -63,9 +63,9 @@ private:
 	PointMetricRep(const QString& uid, const QString& name = "");
 	PointMetricRep(); ///< not implemented
 
-	ssc::GraphicalPoint3DPtr mGraphicalPoint;
+	GraphicalPoint3DPtr mGraphicalPoint;
 //	PointMetricPtr mMetric;
-	ssc::ViewportListenerPtr mViewportListener;
+	ViewportListenerPtr mViewportListener;
 };
 
 }

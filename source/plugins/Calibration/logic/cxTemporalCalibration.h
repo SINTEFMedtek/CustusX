@@ -44,20 +44,20 @@ public:
   double calibrate(bool* success);
 
 private:
-  vtkImageDataPtr extractLine_y(ssc::USFrameDataPtr data, int line_index_x, int frame);
-  double findCorrelation(ssc::USFrameDataPtr data, int frame_a, int frame_b, double maxShift, double lastVal);
+  vtkImageDataPtr extractLine_y(USFrameDataPtr data, int line_index_x, int frame);
+  double findCorrelation(USFrameDataPtr data, int frame_a, int frame_b, double maxShift, double lastVal);
   std::vector<double> computeProbeMovement();
-  std::vector<double> resample(std::vector<double> shift, std::vector<ssc::TimedPosition> time, double resolution);
+  std::vector<double> resample(std::vector<double> shift, std::vector<TimedPosition> time, double resolution);
   std::vector<double> computeTrackingMovement();
   double findCorrelationShift(std::vector<double> frames, std::vector<double> tracking, double resolution) const;
   double findLeastSquares(std::vector<double> frames, std::vector<double> tracking, int shift) const;
   double findLSShift(std::vector<double> frames, std::vector<double> tracking, double resolution) const;
   bool checkFrameMovementQuality(std::vector<double> pos);
-  void writePositions(QString title, std::vector<double> pos, std::vector<ssc::TimedPosition> time, double shift);
+  void writePositions(QString title, std::vector<double> pos, std::vector<TimedPosition> time, double shift);
 
   void saveDebugFile();
 
-  ssc::USReconstructInputData mFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
+  USReconstructInputData mFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
   std::vector<vtkImageDataPtr> mProcessedFrames; ///< frame data processed from the input mFileData.
   QString mDebugFolder;
   QString mFilename;

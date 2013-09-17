@@ -90,11 +90,11 @@ private:
   virtual void hideEvent(QHideEvent* event);
   void enablebuttons();
   void setActiveUid(QString uid);
-  ssc::PointMetricPtr addPoint(ssc::Vector3D point, ssc::CoordinateSystem space=ssc::CoordinateSystem(ssc::csREF), QString name="point%1");
-  MetricBasePtr createMetricWrapper(ssc::DataPtr data);
+  PointMetricPtr addPoint(Vector3D point, CoordinateSystem space=CoordinateSystem(csREF), QString name="point%1");
+  MetricBasePtr createMetricWrapper(DataPtr data);
   std::vector<MetricBasePtr> createMetricWrappers();
-  std::vector<ssc::DataPtr> refinePointArguments(std::vector<ssc::DataPtr> args, unsigned argNo);
-  void setManualToolPosition(ssc::Vector3D p_r);
+  std::vector<DataPtr> refinePointArguments(std::vector<DataPtr> args, unsigned argNo);
+  void setManualToolPosition(Vector3D p_r);
   void prePaintEvent();
 
 //  template<class T>

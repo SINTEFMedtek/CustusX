@@ -37,7 +37,7 @@ public:
 
 	void addOperation(boost::function0<void> operation);
 
-	void setTool(ssc::ToolPtr tool);
+	void setTool(cx::ToolPtr tool);
 	void addVideoSource(int width, int height);
 
 	void startRecord();
@@ -57,8 +57,8 @@ private:
 	void verifySaveData(QString filename);
 
 	cx::RecordSessionPtr mSession;
-	ssc::ToolPtr mTool;
-	std::vector<ssc::VideoSourcePtr> mVideo;
+	cx::ToolPtr mTool;
+	std::vector<cx::VideoSourcePtr> mVideo;
 	QStringList mSavedData;
 
 	cx::USSavingRecorderPtr mRecorder;

@@ -33,7 +33,7 @@
 #include "sscTypeConversions.h"
 #include "sscProbeSector.h"
 
-namespace ssc
+namespace cx
 {
 
 ToolRep2D::ToolRep2D(const QString& uid, const QString& name) :
@@ -93,7 +93,7 @@ void ToolRep2D::setViewportData(const Transform3D& vpMs, const DoubleBoundingBox
 
 /**Set a slice proxy representing the plane on which to render.
  */
-void ToolRep2D::setSliceProxy(ssc::SliceProxyPtr slicer)
+void ToolRep2D::setSliceProxy(SliceProxyPtr slicer)
 {
 	if (mSlicer)
 	{
@@ -151,7 +151,7 @@ void ToolRep2D::setMergeOffsetAndToolLine(bool on)
 	setVisibility();
 }
 
-void ToolRep2D::addRepActorsToViewRenderer(ssc::View *view)
+void ToolRep2D::addRepActorsToViewRenderer(View *view)
 {
 	createToolLine(view->getRenderer(), Vector3D(0,0,0));
 	createCrossHair(view->getRenderer() );
@@ -161,7 +161,7 @@ void ToolRep2D::addRepActorsToViewRenderer(ssc::View *view)
 	update();
 }
 
-void ToolRep2D::removeRepActorsFromViewRenderer(ssc::View *view)
+void ToolRep2D::removeRepActorsFromViewRenderer(View *view)
 {
 	cursor.reset();
 	center2Tool.reset();
@@ -198,7 +198,7 @@ void ToolRep2D::update()
 	{
 		prMt = mSlicer->getTool()->get_prMt();
 	}
-	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
 	Transform3D sMr = mSlicer->get_sMr();
 	Transform3D sMt = sMr*rMpr*prMt;
 	Transform3D vpMt = m_vpMs*sMt;

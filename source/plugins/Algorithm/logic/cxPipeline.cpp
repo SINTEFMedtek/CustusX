@@ -88,7 +88,7 @@ QString FusedInputOutputSelectDataStringDataAdapter::getHelp() const
 	        .arg("Output").arg(mBase->getHelp());
 }
 
-ssc::DataPtr FusedInputOutputSelectDataStringDataAdapter::getData() const
+DataPtr FusedInputOutputSelectDataStringDataAdapter::getData() const
 {
 	return mBase->getData();
 }
@@ -183,31 +183,31 @@ void Pipeline::setOption(DataAdapterPtr adapter, QVariant value)
 {
 	if (value.canConvert<bool>())
 	{
-		ssc::BoolDataAdapterPtr specific = boost::dynamic_pointer_cast<ssc::BoolDataAdapter>(adapter);
+		BoolDataAdapterPtr specific = boost::dynamic_pointer_cast<BoolDataAdapter>(adapter);
 		if (specific)
 			specific->setValue(qvariant_cast<bool>(value));
 	}
 	else if (value.canConvert<double>())
 	{
-		ssc::DoubleDataAdapterPtr specific = boost::dynamic_pointer_cast<ssc::DoubleDataAdapter>(adapter);
+		DoubleDataAdapterPtr specific = boost::dynamic_pointer_cast<DoubleDataAdapter>(adapter);
 		if (specific)
 			specific->setValue(qvariant_cast<double>(value));
 	}
 	else if (value.canConvert<QColor>())
 	{
-		ssc::ColorDataAdapterPtr specific = boost::dynamic_pointer_cast<ssc::ColorDataAdapter>(adapter);
+		ColorDataAdapterPtr specific = boost::dynamic_pointer_cast<ColorDataAdapter>(adapter);
 		if (specific)
 			specific->setValue(qvariant_cast<QColor>(value));
 	}
 	else if (value.canConvert<QString>())
 	{
-		ssc::StringDataAdapterPtr specific = boost::dynamic_pointer_cast<ssc::StringDataAdapter>(adapter);
+		StringDataAdapterPtr specific = boost::dynamic_pointer_cast<StringDataAdapter>(adapter);
 		if (specific)
 			specific->setValue(qvariant_cast<QString>(value));
 	}
 	else
 	{
-		ssc::messageManager()->sendWarning(QString("Attempt to set option of type %2 is not supported").arg(value.typeName()));
+		messageManager()->sendWarning(QString("Attempt to set option of type %2 is not supported").arg(value.typeName()));
 	}
 }
 
@@ -317,7 +317,7 @@ void Pipeline::execute(QString uid)
 
 	if (startIndex<0)
 	{
-		ssc::messageManager()->sendWarning(QString("Cannot execute filter %1: No input data set").arg(uid));
+		messageManager()->sendWarning(QString("Cannot execute filter %1: No input data set").arg(uid));
 		return;
 	}
 
@@ -361,7 +361,7 @@ void Pipeline::execute(QString uid)
 
 //	if (startIndex<0)
 //	{
-//		ssc::messageManager()->sendWarning(QString("Cannot execute filter %1: No input data set").arg(uid));
+//		messageManager()->sendWarning(QString("Cannot execute filter %1: No input data set").arg(uid));
 //		return;
 //	}
 

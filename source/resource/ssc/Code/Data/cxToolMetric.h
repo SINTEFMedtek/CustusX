@@ -24,12 +24,12 @@ namespace cx
 
 typedef boost::shared_ptr<class ToolMetric> ToolMetricPtr;
 
-/** \brief ssc::DataReader implementation for ToolMetric
+/** \brief DataReader implementation for ToolMetric
  *
  * \date Aug 16, 2011
  * \author Ole Vegard Solberg, SINTEF
  */
-class ToolMetricReader: public ssc::DataReader
+class ToolMetricReader: public DataReader
 {
 public:
 	virtual ~ToolMetricReader()
@@ -39,7 +39,7 @@ public:
 	{
 		return type == "ToolMetric";
 	}
-	virtual ssc::DataPtr load(const QString& uid, const QString& filename);
+	virtual DataPtr load(const QString& uid, const QString& filename);
 };
 
 /** Metric class containing a snapshot of a tool

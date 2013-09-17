@@ -20,27 +20,27 @@
 namespace cx
 {
 
-AxisConnector::AxisConnector(ssc::CoordinateSystem space)
+AxisConnector::AxisConnector(CoordinateSystem space)
 {
-	mListener.reset(new ssc::CoordinateSystemListener(space));
+	mListener.reset(new CoordinateSystemListener(space));
 	connect(mListener.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
 
-	mRep = ssc::AxesRep::New(space.toString() + "_axis");
-	mRep->setCaption(space.toString(), ssc::Vector3D(1, 0, 0));
+	mRep = AxesRep::New(space.toString() + "_axis");
+	mRep->setCaption(space.toString(), Vector3D(1, 0, 0));
 	mRep->setShowAxesLabels(false);
 	mRep->setFontSize(0.08);
 	mRep->setAxisLength(0.03);
 	this->changedSlot();
 }
 
-void AxisConnector::mergeWith(ssc::CoordinateSystemListenerPtr base)
+void AxisConnector::mergeWith(CoordinateSystemListenerPtr base)
 {
 	mBase = base;
 	connect(mBase.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
 	this->changedSlot();
 }
 
-void AxisConnector::connectTo(ssc::ToolPtr tool)
+void AxisConnector::connectTo(ToolPtr tool)
 {
 	mTool = tool;
 	connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(changedSlot()));
@@ -49,7 +49,7 @@ void AxisConnector::connectTo(ssc::ToolPtr tool)
 
 void AxisConnector::changedSlot()
 {
-	ssc::Transform3D  rMs = ssc::SpaceHelpers::get_toMfrom(mListener->getSpace(), ssc::CoordinateSystem(ssc::csREF));
+	Transform3D  rMs = SpaceHelpers::get_toMfrom(mListener->getSpace(), CoordinateSystem(csREF));
 	mRep->setTransform(rMs);
 
 	mRep->setVisible(true);
@@ -61,8 +61,8 @@ void AxisConnector::changedSlot()
 	// Dont show if equal to base
 	if (mBase)
 	{
-		ssc::Transform3D rMb = ssc::SpaceHelpers::get_toMfrom(mBase->getSpace(), ssc::CoordinateSystem(ssc::csREF));
-		if (ssc::similar(rMb, rMs))
+		Transform3D rMb = SpaceHelpers::get_toMfrom(mBase->getSpace(), CoordinateSystem(csREF));
+		if (similar(rMb, rMs))
 			mRep->setVisible(false);
 	}
 

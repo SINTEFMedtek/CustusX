@@ -27,7 +27,7 @@
 namespace cx
 {
 
-ImageMapperMonitor::ImageMapperMonitor(vtkVolumePtr volume, ssc::ImagePtr image) : mVolume(volume), mImage(image)
+ImageMapperMonitor::ImageMapperMonitor(vtkVolumePtr volume, ImagePtr image) : mVolume(volume), mImage(image)
 {
 	if (!mImage)
 		return;
@@ -89,7 +89,7 @@ void ImageMapperMonitor::cropBoxChangedSlot()
 		return;
 	mapper->SetCropping(mImage->getCropping());
 
-	ssc::DoubleBoundingBox3D bb_d = mImage->getCroppingBox();
+	DoubleBoundingBox3D bb_d = mImage->getCroppingBox();
 
 	mapper->SetCroppingRegionPlanes(bb_d.begin());
 	mapper->Update();

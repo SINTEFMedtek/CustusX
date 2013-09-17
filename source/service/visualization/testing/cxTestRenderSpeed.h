@@ -46,7 +46,7 @@ private:
 		double getAverageRenderTimeInMs();
     int getNumViews();
 
-	std::vector<ssc::ViewWidget*> mViews;
+	std::vector<cx::ViewWidget*> mViews;
 	std::vector<vtkRenderWindowPtr> mVtkRenderWindows;
 	int mNumRenderings;
 	int mRenderTimeInMs;

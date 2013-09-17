@@ -34,10 +34,10 @@ BasicVideoSource::BasicVideoSource(QString uid)
 	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
 
 
-	vtkImageDataPtr emptyImage = ssc::generateVtkImageData(Eigen::Array3i(3,3,3),
-														   ssc::Vector3D(1,1,1),
+	vtkImageDataPtr emptyImage = generateVtkImageData(Eigen::Array3i(3,3,3),
+														   Vector3D(1,1,1),
 														   0);
-	mEmptyImage.reset(new ssc::Image(uid, emptyImage));
+	mEmptyImage.reset(new Image(uid, emptyImage));
 	mReceivedImage = mEmptyImage;
 	mRedirecter->SetInput(mEmptyImage->getBaseVtkImageData());
 
@@ -79,7 +79,7 @@ void BasicVideoSource::timeout()
 	if (mTimeout)
 		return;
 
-	ssc::messageManager()->sendWarning("Timeout!");
+	messageManager()->sendWarning("Timeout!");
 	mTimeout = true;
 	emit newFrame();
 }
@@ -166,7 +166,7 @@ QString BasicVideoSource::getStatusString() const
 }
 
 
-void BasicVideoSource::setInput(ssc::ImagePtr input)
+void BasicVideoSource::setInput(ImagePtr input)
 {
 	bool wasConnected = this->isConnected();
 
@@ -179,7 +179,7 @@ void BasicVideoSource::setInput(ssc::ImagePtr input)
 		if (mReceivedImage)
 		{
 			// create an empty image with the same uid as the stream.
-			mEmptyImage.reset(new ssc::Image(mReceivedImage->getUid(), mEmptyImage->getBaseVtkImageData()));
+			mEmptyImage.reset(new Image(mReceivedImage->getUid(), mEmptyImage->getBaseVtkImageData()));
 		}
 		mReceivedImage = mEmptyImage;
 	}

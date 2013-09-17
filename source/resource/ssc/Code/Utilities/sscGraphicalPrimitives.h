@@ -11,7 +11,7 @@ typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
 typedef vtkSmartPointer<class vtkArcSource> vtkArcSourcePtr;
 typedef vtkSmartPointer<class vtkArrowSource> vtkArrowSourcePtr;
 
-namespace ssc
+namespace cx
 {
 
 /**
@@ -164,7 +164,7 @@ class FollowerText3D
     ~FollowerText3D();
     void setColor(Vector3D color);
     void setText(QString text);
-    void setPosition(ssc::Vector3D pos);
+    void setPosition(Vector3D pos);
 
     void setSize(double val);
     void setSizeInNormalizedViewport(bool on, double size);
@@ -178,7 +178,7 @@ class FollowerText3D
     vtkRendererPtr mRenderer;
     double mSize;
 
-    ssc::ViewportListenerPtr mViewportListener;
+    ViewportListenerPtr mViewportListener;
 };
 typedef boost::shared_ptr<FollowerText3D> FollowerText3DPtr;
 
@@ -194,7 +194,7 @@ public:
 	~CaptionText3D();
 	void setColor(Vector3D color);
 	void setText(QString text);
-	void setPosition(ssc::Vector3D pos);
+	void setPosition(Vector3D pos);
 
 	void setSize(double val);
 	//    void setSizeInNormalizedViewport(bool on, double size);
@@ -207,7 +207,7 @@ private:
 	//    vtkFollowerPtr mFollower;
 	vtkRendererPtr mRenderer;
 
-	//    ssc::ViewportListenerPtr mViewportListener;
+	//    ViewportListenerPtr mViewportListener;
 };
 typedef boost::shared_ptr<CaptionText3D> CaptionText3DPtr;
 

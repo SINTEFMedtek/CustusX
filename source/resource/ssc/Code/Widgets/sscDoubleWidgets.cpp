@@ -31,10 +31,10 @@
 #include "sscMousePadWidget.h"
 #include "sscHelperWidgets.h"
 
-namespace ssc
+namespace cx
 {
 
-ScalarInteractionWidget::ScalarInteractionWidget(QWidget* parent, ssc::DoubleDataAdapterPtr dataInterface) :
+ScalarInteractionWidget::ScalarInteractionWidget(QWidget* parent, DoubleDataAdapterPtr dataInterface) :
     OptimizedUpdateWidget(parent), mSlider(NULL), mSpinBox(NULL), mLabel(NULL), mEdit(NULL), mInfiniteSlider(NULL)
 {
 	mData = dataInterface;
@@ -50,7 +50,7 @@ void ScalarInteractionWidget::enableLabel()
 
 void ScalarInteractionWidget::enableSlider()
 {
-	mSlider = new ssc::DoubleSlider(this);
+	mSlider = new DoubleSlider(this);
     mSlider->setMinimumWidth(50);
     mSlider->setOrientation(Qt::Horizontal);
     connect(mSlider, SIGNAL(doubleValueChanged(double)), this, SLOT(doubleValueChanged(double)));
@@ -75,7 +75,7 @@ void ScalarInteractionWidget::infiniteSliderMouseMoved(QPointF delta)
 
 void ScalarInteractionWidget::enableEdit()
 {
-	mEdit = new ssc::DoubleLineEdit(this);
+	mEdit = new DoubleLineEdit(this);
 	connect(mEdit, SIGNAL(editingFinished()), this, SLOT(textEditedSlot()));
 }
 
@@ -148,7 +148,7 @@ void ScalarInteractionWidget::doubleValueChanged(double val)
 {
 	val = mData->convertDisplay2Internal(val);
 
-	if (ssc::similar(val, mData->getValue()))
+	if (similar(val, mData->getValue()))
 		return;
 
 	mData->setValue(val);
@@ -162,7 +162,7 @@ void ScalarInteractionWidget::textEditedSlot()
 	double defVal = mData->convertInternal2Display(mData->getValue()); // defval in display space
 	double newVal = mData->convertDisplay2Internal(mEdit->getDoubleValue(defVal)); // newval iin internal space
 
-	if (ssc::similar(newVal, mData->getValue()))
+	if (similar(newVal, mData->getValue()))
 		return;
 
 	mData->setValue(newVal);
@@ -267,7 +267,7 @@ QSize DoubleLineEdit::minimumSizeHint() const
 // --------------------------------------------------------
 // --------------------------------------------------------
 
-SliderGroupWidget::SliderGroupWidget(QWidget* parent, ssc::DoubleDataAdapterPtr dataInterface, QGridLayout* gridLayout,
+SliderGroupWidget::SliderGroupWidget(QWidget* parent, DoubleDataAdapterPtr dataInterface, QGridLayout* gridLayout,
 	int row) :
 	ScalarInteractionWidget(parent, dataInterface)
 {
@@ -282,7 +282,7 @@ SliderGroupWidget::SliderGroupWidget(QWidget* parent, ssc::DoubleDataAdapterPtr 
 // --------------------------------------------------------
 // --------------------------------------------------------
 
-SpinBoxGroupWidget::SpinBoxGroupWidget(QWidget* parent, ssc::DoubleDataAdapterPtr dataInterface,
+SpinBoxGroupWidget::SpinBoxGroupWidget(QWidget* parent, DoubleDataAdapterPtr dataInterface,
 	QGridLayout* gridLayout, int row) :
 	ScalarInteractionWidget(parent, dataInterface)
 {
@@ -294,7 +294,7 @@ SpinBoxGroupWidget::SpinBoxGroupWidget(QWidget* parent, ssc::DoubleDataAdapterPt
 
 // --------------------------------------------------------
 
-SpinBoxAndSliderGroupWidget::SpinBoxAndSliderGroupWidget(QWidget* parent, ssc::DoubleDataAdapterPtr dataInterface,
+SpinBoxAndSliderGroupWidget::SpinBoxAndSliderGroupWidget(QWidget* parent, DoubleDataAdapterPtr dataInterface,
 	QGridLayout* gridLayout, int row) :
 	ScalarInteractionWidget(parent, dataInterface)
 {
@@ -308,7 +308,7 @@ SpinBoxAndSliderGroupWidget::SpinBoxAndSliderGroupWidget(QWidget* parent, ssc::D
 // --------------------------------------------------------
 
 SpinBoxInfiniteSliderGroupWidget::SpinBoxInfiniteSliderGroupWidget(QWidget* parent,
-	ssc::DoubleDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) :
+	DoubleDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) :
 	ScalarInteractionWidget(parent, dataInterface)
 {
 	this->enableLabel();
@@ -318,4 +318,4 @@ SpinBoxInfiniteSliderGroupWidget::SpinBoxInfiniteSliderGroupWidget(QWidget* pare
 	this->build(gridLayout, row);
 }
 
-} // namespace ssc
+} // namespace cx

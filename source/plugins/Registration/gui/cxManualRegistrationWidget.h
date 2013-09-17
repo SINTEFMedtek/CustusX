@@ -56,10 +56,10 @@ private:
 	QVBoxLayout* mVerticalLayout;
 	QLabel* mLabel;
 
-	ssc::StringDataAdapterPtr mFixedImage;
-	ssc::StringDataAdapterPtr mMovingImage;
+	StringDataAdapterPtr mFixedImage;
+	StringDataAdapterPtr mMovingImage;
 	Transform3DWidget* mMatrixWidget;
-	ssc::DataPtr mConnectedMovingImage;
+	DataPtr mConnectedMovingImage;
 
 };
 

@@ -36,7 +36,7 @@ class QDomNode;
 #include "vtkForwardDeclarations.h"
 #include "sscImageTFData.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
 

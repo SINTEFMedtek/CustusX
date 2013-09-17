@@ -34,7 +34,7 @@
 #include "sscSliceProxy.h"
 #include "sscVtkHelperClasses.h"
 
-namespace ssc
+namespace cx
 {
 
 CrossHairRep2D::CrossHairRep2D(const QString& uid, const QString& name) :
@@ -65,7 +65,7 @@ void CrossHairRep2D::set_vpMs(const Transform3D& vpMs)
 	update();
 }
 
-void CrossHairRep2D::setSliceProxy(ssc::SliceProxyPtr slicer)
+void CrossHairRep2D::setSliceProxy(SliceProxyPtr slicer)
 {
 	if (mSlicer)
 	{
@@ -83,16 +83,16 @@ void CrossHairRep2D::setSliceProxy(ssc::SliceProxyPtr slicer)
 	update();
 }
 
-void CrossHairRep2D::addRepActorsToViewRenderer(ssc::View *view)
+void CrossHairRep2D::addRepActorsToViewRenderer(View *view)
 {
-	mCursor.reset( new ssc::CrossHair2D(view->getRenderer()) ) ;
+	mCursor.reset( new CrossHair2D(view->getRenderer()) ) ;
 	double bordarOffset = 150.0;
-	ssc::RGBColor color( 1.0, 0.8, 0.0 );
+	RGBColor color( 1.0, 0.8, 0.0 );
 	mCursor->setValue( Vector3D(0,0,0), 100, 100, bordarOffset, color );
 	update();
 }
 
-void CrossHairRep2D::removeRepActorsFromViewRenderer(ssc::View *view)
+void CrossHairRep2D::removeRepActorsFromViewRenderer(View *view)
 {
 	mCursor.reset();
 }
@@ -116,7 +116,7 @@ void CrossHairRep2D::update()
 		return;
 
 	Transform3D prMt = mSlicer->getTool()->get_prMt();
-	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
 	Transform3D sMr = mSlicer->get_sMr();
 
 	if (mCursor)

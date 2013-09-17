@@ -28,7 +28,7 @@
 #include "sscImage.h"
 #include "sscImageLUT2D.h"
 
-namespace ssc
+namespace cx
 {
 
 ImageBlenderProxy::ImageBlenderProxy()

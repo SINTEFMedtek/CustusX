@@ -34,7 +34,7 @@
 namespace cx
 {
 
-ViewWrapperVideo::ViewWrapperVideo(ssc::ViewWidget* view)
+ViewWrapperVideo::ViewWrapperVideo(ViewWidget* view)
 {
 	mView = view;
 	this->connectContextMenu(mView);
@@ -46,10 +46,10 @@ ViewWrapperVideo::ViewWrapperVideo(ssc::ViewWidget* view)
 	double clipDepth = 1.0; // 1mm depth, i.e. all 3D props rendered outside this range is not shown.
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth / 2.0, clipDepth / 2.0);
 
-//	connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SLOT(configureSlot()));
-	connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(connectStream()));
+//	connect(dataManager(), SIGNAL(streamLoaded()), this, SLOT(configureSlot()));
+	connect(toolManager(), SIGNAL(configured()), this, SLOT(connectStream()));
 	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SLOT(connectStream()));
-	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectStream()));
+	connect(toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectStream()));
 
 	addReps();
 
@@ -62,7 +62,7 @@ ViewWrapperVideo::~ViewWrapperVideo()
 		mView->removeReps();
 }
 
-ssc::ViewWidget* ViewWrapperVideo::getView()
+ViewWidget* ViewWrapperVideo::getView()
 {
 	return mView;
 }
@@ -85,7 +85,7 @@ void ViewWrapperVideo::appendToContextMenu(QMenu& contextMenu)
 
 //	QActionGroup sourceGroup = new QActionGroup(&contextMenu);
 	QMenu* sourceMenu = new QMenu("Video Source", &contextMenu);
-	std::vector<ssc::VideoSourcePtr> sources = videoService()->getVideoSources();
+	std::vector<VideoSourcePtr> sources = videoService()->getVideoSources();
 	this->addStreamAction("active", sourceMenu);
 	for (unsigned i=0; i<sources.size(); ++i)
 		this->addStreamAction(sources[i]->getUid(), sourceMenu);
@@ -105,8 +105,8 @@ void ViewWrapperVideo::addStreamAction(QString uid, QMenu* contextMenu)
 {
 	QAction* action = new QAction(uid, contextMenu);
 
-	ssc::VideoSourcePtr selected = this->getSourceFromService(mGroupData->getVideoSource());
-	ssc::VideoSourcePtr current = this->getSourceFromService(uid);
+	VideoSourcePtr selected = this->getSourceFromService(mGroupData->getVideoSource());
+	VideoSourcePtr current = this->getSourceFromService(uid);
 
 	action->setData(QVariant(uid));
 	action->setCheckable(true);
@@ -133,7 +133,7 @@ void ViewWrapperVideo::streamActionSlot()
 	mGroupData->setVideoSource(uid);
 //	this->connectStream();
 
-//	ssc::VideoSourcePtr source = videoService()->getVideoSources();
+//	VideoSourcePtr source = videoService()->getVideoSources();
 }
 
 void ViewWrapperVideo::videoSourceChangedSlot(QString uid)
@@ -146,7 +146,7 @@ void ViewWrapperVideo::connectStream()
 	if (!mGroupData)
 		return;
 //	std::cout << "ViewWrapperVideo::connectStream() selected=" << mViewGroup->getVideoSource()  << std::endl;
-	ssc::VideoSourcePtr source = this->getSourceFromService(mGroupData->getVideoSource());
+	VideoSourcePtr source = this->getSourceFromService(mGroupData->getVideoSource());
 //	if (source)
 //		std::cout << "ViewWrapperVideo::connectStream() " << source->getUid() << std::endl;
 //	else
@@ -157,8 +157,8 @@ void ViewWrapperVideo::connectStream()
 	if (source)
 		uid = source->getUid();
 
-	ssc::ToolPtr newTool;
-	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	ToolPtr newTool;
+	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
 	if (tool && tool->getProbe())
 	{
 		if (tool->getProbe()->getAvailableVideoSources().count(uid))
@@ -176,22 +176,22 @@ void ViewWrapperVideo::connectStream()
 	this->setupRep(source, newTool);
 }
 
-ssc::VideoSourcePtr ViewWrapperVideo::getSourceFromService(QString uid)
+VideoSourcePtr ViewWrapperVideo::getSourceFromService(QString uid)
 {
 	if (uid=="active")
 		return videoService()->getActiveVideoSource();
 
-	std::vector<ssc::VideoSourcePtr> source = videoService()->getVideoSources();
+	std::vector<VideoSourcePtr> source = videoService()->getVideoSources();
 
 	for (unsigned i=0; i< source.size(); ++i)
 	{
 		if (source[i]->getUid()==uid)
 			return source[i];
 	}
-	return ssc::VideoSourcePtr();
+	return VideoSourcePtr();
 }
 
-void ViewWrapperVideo::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool)
+void ViewWrapperVideo::setupRep(VideoSourcePtr source, ToolPtr tool)
 {
 //	std::cout << "ViewWrapperVideo::setupRep() " << source.get() << "  " << source->getUid() << std::endl;
 
@@ -213,7 +213,7 @@ void ViewWrapperVideo::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool)
 
 	if (!mStreamRep)
 	{
-		mStreamRep.reset(new ssc::VideoFixedPlaneRep("rtrep", "rtrep"));
+		mStreamRep.reset(new VideoFixedPlaneRep("rtrep", "rtrep"));
 		mView->addRep(mStreamRep);
 	}
 
@@ -223,7 +223,7 @@ void ViewWrapperVideo::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool)
 	mDataNameText->setText(0, mSource->getName());
 	mStreamRep->setShowSector(settings()->value("showSectorInRTView").toBool());
 
-//	ssc::messageManager()->sendInfo(
+//	messageManager()->sendInfo(
 //					"Setup video rep with source="
 //					+ source->getName() + " and tool="
 //					+ (tool ? tool->getName() : "none"));
@@ -239,13 +239,13 @@ void ViewWrapperVideo::updateSlot()
 void ViewWrapperVideo::addReps()
 {
 	// plane type text rep
-	mPlaneTypeText = ssc::DisplayTextRep::New("planeTypeRep_" + mView->getName(), "");
-	mPlaneTypeText->addText(ssc::Vector3D(0, 1, 0), "RT", ssc::Vector3D(0.98, 0.02, 0.0));
+	mPlaneTypeText = DisplayTextRep::New("planeTypeRep_" + mView->getName(), "");
+	mPlaneTypeText->addText(Vector3D(0, 1, 0), "RT", Vector3D(0.98, 0.02, 0.0));
 	mView->addRep(mPlaneTypeText);
 
 	//data name text rep
-	mDataNameText = ssc::DisplayTextRep::New("dataNameText_" + mView->getName(), "");
-	mDataNameText->addText(ssc::Vector3D(0, 1, 0), "not initialized", ssc::Vector3D(0.02, 0.02, 0.0));
+	mDataNameText = DisplayTextRep::New("dataNameText_" + mView->getName(), "");
+	mDataNameText->addText(Vector3D(0, 1, 0), "not initialized", Vector3D(0.02, 0.02, 0.0));
 	mView->addRep(mDataNameText);
 }
 

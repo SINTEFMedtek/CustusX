@@ -8,7 +8,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "sscGPURayCastVolumeRep.h"
-/**Unit tests for class ssc::GPURayCasterVolumeRep
+/**Unit tests for class GPURayCasterVolumeRep
  */
 class TestGPURayCaster : public CppUnit::TestFixture
 {
@@ -23,7 +23,7 @@ public:
 		CPPUNIT_TEST( testParameters );
 	CPPUNIT_TEST_SUITE_END();
 private:
-	ssc::GPURayCastVolumeRepPtr mRep;
+	cx::GPURayCastVolumeRepPtr mRep;
 
 };
 

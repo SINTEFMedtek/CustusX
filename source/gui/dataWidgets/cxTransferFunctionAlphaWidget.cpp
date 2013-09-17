@@ -41,7 +41,7 @@ QString TransferFunctionAlphaWidget::defaultWhatsThis() const
     "</html>";
 }
 
-void TransferFunctionAlphaWidget::setData(ssc::ImagePtr image, ssc::ImageTFDataPtr tfData)
+void TransferFunctionAlphaWidget::setData(ImagePtr image, ImageTFDataPtr tfData)
 {
   if (( mImage == image )&&( mImageTF==tfData ))
     return;
@@ -182,11 +182,11 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
   }
 
   // Go through each point and draw squares and lines
-  ssc::OpacityMapPtr opacityMap = mImageTF->getOpacityMap();
+  OpacityMapPtr opacityMap = mImageTF->getOpacityMap();
 
   QPoint lastScreenPoint;
   this->mPointRects.clear();
-  for (ssc::IntIntMap::iterator opPoint = opacityMap->begin();
+  for (IntIntMap::iterator opPoint = opacityMap->begin();
        opPoint != opacityMap->end();
        ++opPoint)
   {
@@ -260,8 +260,8 @@ TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::getCurrentA
                      (mPlotArea.bottom() - mouseY) /
                      static_cast<double>(mPlotArea.height()) );
 
-  point.position = ssc::constrainValue(point.position, mImage->getMin(), mImage->getMax());
-  point.value = ssc::constrainValue(point.value, 0, mImage->getMaxAlphaValue());
+  point.position = constrainValue(point.position, mImage->getMin(), mImage->getMax());
+  point.value = constrainValue(point.value, 0, mImage->getMaxAlphaValue());
 
   return point;
 }
@@ -303,9 +303,9 @@ void TransferFunctionAlphaWidget::moveCurrentAlphaPoint(int mouseX, int mouseY)
   }
   else
   {
-    ssc::OpacityMapPtr opacityMap = mImageTF->getOpacityMap();
-    ssc::IntIntMap::iterator prevpoint = opacityMap->find(mCurrentAlphaPoint.position);
-    ssc::IntIntMap::iterator nextpoint = opacityMap->find(mCurrentAlphaPoint.position);
+    OpacityMapPtr opacityMap = mImageTF->getOpacityMap();
+    IntIntMap::iterator prevpoint = opacityMap->find(mCurrentAlphaPoint.position);
+    IntIntMap::iterator nextpoint = opacityMap->find(mCurrentAlphaPoint.position);
     --prevpoint;
     ++nextpoint;
 

@@ -11,7 +11,7 @@
 #include "sscDefinitionStrings.h"
 #include "sscTime.h"
 
-namespace ssc
+namespace cx
 {
 
 
@@ -152,7 +152,6 @@ MessageManager* messageManager() { return MessageManager::getInstance(); }
 MessageManager::MessageManager() :
 	mEnabled(false)
 {
-  typedef ssc::Message Message;
   qRegisterMetaType<Message>("Message");
 }
 
@@ -230,7 +229,7 @@ void MessageManager::setLoggingFolder(QString absoluteLoggingFolderPath)
 	this->setLogFile(absoluteLoggingFolderPath + "/ConsoleLog.txt");
 }
 
-void MessageManager::setAudioSource(ssc::AudioPtr audioSource)
+void MessageManager::setAudioSource(AudioPtr audioSource)
 {
   mAudioSource = audioSource;
 }
@@ -477,4 +476,4 @@ MessageManager::Format::Format() :
 {}
 
 
-} //End namespace ssc
+} //End namespace cx

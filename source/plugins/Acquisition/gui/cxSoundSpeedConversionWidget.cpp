@@ -64,7 +64,7 @@ void SoundSpeedConverterWidget::applySoundSpeedCompensationFactorSlot()
 {
   if(!mProbe)
   {
-    ssc::messageManager()->sendWarning("Don't know which probe to set the sound speed compensation for...");
+    messageManager()->sendWarning("Don't know which probe to set the sound speed compensation for...");
     return;
   }
 
@@ -74,8 +74,8 @@ void SoundSpeedConverterWidget::applySoundSpeedCompensationFactorSlot()
 
 void SoundSpeedConverterWidget::setToolSlot(const QString& uid)
 {
-  ssc::ToolPtr tool = ssc::toolManager()->getTool(uid);
-  ssc::ProbePtr probe = tool->getProbe();
+  ToolPtr tool = toolManager()->getTool(uid);
+  ProbePtr probe = tool->getProbe();
   if(!probe)
     return;
   this->setProbe(probe);
@@ -94,7 +94,7 @@ double SoundSpeedConverterWidget::getWaterSoundSpeed()
   return retval;
 }
 
-void SoundSpeedConverterWidget::setProbe(ssc::ProbePtr probe)
+void SoundSpeedConverterWidget::setProbe(ProbePtr probe)
 {
   mProbe = probe;
   this->updateButtons();

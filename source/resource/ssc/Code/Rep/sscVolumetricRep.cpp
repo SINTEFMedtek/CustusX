@@ -46,7 +46,7 @@
 
 typedef vtkSmartPointer<class vtkGPUVolumeRayCastMapper> vtkGPUVolumeRayCastMapperPtr;
 
-namespace ssc
+namespace cx
 {
 VolumetricRep::VolumetricRep() :
 	VolumetricBaseRep(),
@@ -54,7 +54,6 @@ VolumetricRep::VolumetricRep() :
 	mVolumeProperty(cx::VolumeProperty::create()),
 	mMaxVoxels(0)
 {
-	mResampleFactor = 1.0;
 	this->setUseVolumeTextureMapper();
 	mVolume->SetProperty(mVolumeProperty->getVolumeProperty());
 }
@@ -94,14 +93,6 @@ void VolumetricRep::removeRepActorsFromViewRenderer(View *view)
 	view->getRenderer()->RemoveVolume(mVolume);
 }
 
-/**set a resample factor 0...1. This gives a full-detail image for factor=1,
- * and a more grained image otherwise.
- */
-void VolumetricRep::setResampleFactor(double factor)
-{
-	mResampleFactor = factor;
-}
-
 ImagePtr VolumetricRep::getImage()
 {
 	return mImage;
@@ -116,7 +107,7 @@ void VolumetricRep::setImage(ImagePtr image)
 
 	if (mImage)
 	{
-		mVolumeProperty->setImage(ssc::ImagePtr());
+		mVolumeProperty->setImage(ImagePtr());
 		mImage->disconnectFromRep(mSelf);
 		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
@@ -143,30 +134,6 @@ bool VolumetricRep::hasImage(ImagePtr image) const
 	return (mImage == image);
 }
 
-double VolumetricRep::computeResampleFactor(long maxVoxels, ssc::ImagePtr image)
-{
-	if (maxVoxels==0)
-		return 1.0;
-	if (!image)
-		return 1.0;
-
-	long voxels = image->getBaseVtkImageData()->GetNumberOfPoints();
-	double factor = (double)maxVoxels/(double)voxels;
-	factor = pow(factor, 1.0/3.0);
-	// cubic function leads to trouble for 138M-volume - must downsample to as low as 5-10 Mv in order to succeed on Mac.
-
-	if (factor<0.99)
-	{
-		return factor;
-	}
-	return 1.0;
-}
-
-void VolumetricRep::updateResampleFactor()
-{
-	mResampleFactor = std::min(computeResampleFactor(mMaxVoxels, mImage), mResampleFactor);
-}
-
 /**called when the image is changed internally.
  * re-read the lut and vtkimagedata.
  */
@@ -177,8 +144,7 @@ void VolumetricRep::vtkImageDataChangedSlot()
 		return;
 	}
 
-	this->updateResampleFactor();
-	vtkImageDataPtr volume = mImage->resample(this->mResampleFactor);
+	vtkImageDataPtr volume = mImage->resample(this->mMaxVoxels);
 	mMapper->SetInput(volume);
 
 	transformChangedSlot();
@@ -202,5 +168,5 @@ void VolumetricRep::setMaxVolumeSize(long maxVoxels)
 
 
 //---------------------------------------------------------
-} // namespace ssc
+} // namespace cx
 //---------------------------------------------------------

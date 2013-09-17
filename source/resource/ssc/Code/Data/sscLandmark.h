@@ -34,7 +34,7 @@ class QDomNode;
  *  Created on: Apr 19, 2010
  *      Author: jbake
  */
-namespace ssc
+namespace cx
 {
 
 
@@ -53,7 +53,7 @@ public:
 	~Landmark();
 
 	QString getUid() const;
-	ssc::Vector3D getCoord() const;
+	Vector3D getCoord() const;
 	QDateTime getTimestamp() const;
 
 	void addXml(QDomNode& dataNode);
@@ -61,7 +61,7 @@ public:
 
 private:
 	QString mUid;
-	ssc::Vector3D mCoord; ///< the landmarks coordinate
+	Vector3D mCoord; ///< the landmarks coordinate
 	QDateTime mTimestamp; ///< the time at which the landmark was sample
 };
 typedef std::map<QString, Landmark> LandmarkMap;
@@ -89,6 +89,6 @@ private:
 };
 typedef std::map<QString, LandmarkProperty> LandmarkPropertyMap;
 
-} //namespace ssc
+} //namespace cx
 
 #endif /* SSCLANDMARK_H_ */

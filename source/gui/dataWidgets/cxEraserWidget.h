@@ -52,7 +52,7 @@ private:
 	QCheckBox* mContinousEraseCheckBox;
 	vtkSphereSourcePtr mSphere;
 	QCheckBox* mShowEraserCheckBox;
-	ssc::DoubleDataAdapterXmlPtr mSphereSizeAdapter;
+	DoubleDataAdapterXmlPtr mSphereSizeAdapter;
 	QAction* mDuplicateAction;
 	QAction* mSaveAction;
 	QAction* mRemoveAction;
@@ -64,7 +64,7 @@ private:
 
 	QTimer* mContinousEraseTimer;
 
-	ssc::Vector3D mPreviousCenter;
+	Vector3D mPreviousCenter;
 	double mPreviousRadius;
 
 private slots:

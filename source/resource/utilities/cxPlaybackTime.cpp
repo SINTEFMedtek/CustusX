@@ -40,9 +40,9 @@ void PlaybackTime::initialize(QDateTime start, qint64 length)
 	mStartTime = start;
 	mLength = length;
 
-//	ssc::messageManager()->sendInfo(QString("Initialized PlaybackTime with start time [%1] and end time [%2]")
-//					.arg(mStartTime.toString(ssc::timestampMilliSecondsFormatNice()))
-//					.arg(mStartTime.addMSecs(mLength).toString(ssc::timestampMilliSecondsFormatNice())));
+//	messageManager()->sendInfo(QString("Initialized PlaybackTime with start time [%1] and end time [%2]")
+//					.arg(mStartTime.toString(timestampMilliSecondsFormatNice()))
+//					.arg(mStartTime.addMSecs(mLength).toString(timestampMilliSecondsFormatNice())));
 }
 
 PlaybackTime::~PlaybackTime()
@@ -137,7 +137,7 @@ void PlaybackTime::setTime(QDateTime time)
 
 QDateTime PlaybackTime::getTime() const
 {
-//	std::cout << "gettime " << this->getStartTime().addMSecs(this->getOffset()).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+//	std::cout << "gettime " << this->getStartTime().addMSecs(this->getOffset()).toString(timestampMilliSecondsFormatNice()) << std::endl;
 
 	return this->getStartTime().addMSecs(this->getOffset());
 }
@@ -228,7 +228,7 @@ bool TimelineEvent::isInside(double time, double tol_ms) const
 	double m = mStartTime + w/2;
 	return fabs(time - m) < std::max(w, tol_ms)/2;
 }
-bool TimelineEvent::isSingular() const { return ssc::similar(mEndTime,mStartTime); }
+bool TimelineEvent::isSingular() const { return similar(mEndTime,mStartTime); }
 bool TimelineEvent::isOverlap(const TimelineEvent& rhs) const
 {
 	double w0 = mEndTime - mStartTime;

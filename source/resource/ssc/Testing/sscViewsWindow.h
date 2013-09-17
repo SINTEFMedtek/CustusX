@@ -29,9 +29,9 @@ public:
 
 /**Test class  with convenience methods for defining views.
  * Uses the following reps:
- *  - ssc::ToolRep3D
- *  - ssc::SliceRepSW
- *  - ssc::VolumetricRep
+ *  - ToolRep3D
+ *  - SliceRepSW
+ *  - VolumetricRep
  */
 class ViewsWindow : public QMainWindow
 {
@@ -44,27 +44,27 @@ public:
 	void setDescription(const QString& desc);
 	void define3D(const QString& imageFilename, const ImageParameters* parameters, int r, int c);
 	bool define3DGPU(const QStringList& imageFilenames, const ImageParameters* parameters, int r, int c);
-	void defineSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
-	bool defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
+	void defineSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c);
+	bool defineGPUSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c);
 
 	// was test accepted?
 	bool accepted() const { return mAcceptanceBox->accepted(); }
 	
 	// setup views
-	void insertView(ssc::ViewWidget *view, const QString& uid, const QString& volume, int r, int c);
+	void insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c);
 
 	/// ugly hack
 	bool mDumpSpeedData;
 
 private:
 	void start(bool showSliders);
-	ssc::ImagePtr loadImage(const QString& imageFilename);
+	cx::ImagePtr loadImage(const QString& imageFilename);
 
 	QSlider* mBrightnessSlider;
 	QSlider *mContrastSlider;
 	
-	typedef std::set<ssc::View *> LayoutMap;
-	std::set<ssc::View *> mLayouts;
+	typedef std::set<cx::View *> LayoutMap;
+	std::set<cx::View *> mLayouts;
 	QGridLayout* mSliceLayout;
 	QString mDisplayText;
 	
@@ -74,7 +74,7 @@ private:
 	int mTotalOther;
 	QTime mLastRenderEnd;
 	QString mShaderFolder;
-	ssc::AcceptanceBoxWidget* mAcceptanceBox;
+	cx::AcceptanceBoxWidget* mAcceptanceBox;
 	QTimer mTimer;
 
 public slots:

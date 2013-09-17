@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 {
   Q_INIT_RESOURCE(cxResources);
   
-  ssc::Application app(argc, argv);
+  cx::Application app(argc, argv);
   app.setOrganizationName("SINTEF");
   app.setOrganizationDomain("www.sintef.no");
   app.setApplicationName("CustusX3");

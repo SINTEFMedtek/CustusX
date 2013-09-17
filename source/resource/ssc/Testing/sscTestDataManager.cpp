@@ -10,7 +10,7 @@
 #include "sscImage.h"
 #include "sscTypeConversions.h"
 
-//namespace ssc
+//namespace cx
 //{
 
 /**Test loading images from file and inserting them into DataManager
@@ -18,24 +18,24 @@
  */
 int main(int argc, char **argv)
 {
-	std::cout << ssc::TestUtilities::GetDataRoot() << std::endl;
+	std::cout << cx::TestUtilities::GetDataRoot() << std::endl;
 
-	QString testFile1 = ssc::TestUtilities::ExpandDataFileName("Phantoms/Kaisa/MetaImage/Kaisa.mhd");
-	QString testFile2 = ssc::TestUtilities::ExpandDataFileName("ssc/Person5/person5_t2_unsigned.mhd");
-	QString testFile3 = ssc::TestUtilities::ExpandDataFileName("ssc/Person5/person5_flair_unsigned.mhd");
+	QString testFile1 = cx::TestUtilities::ExpandDataFileName("Phantoms/Kaisa/MetaImage/Kaisa.mhd");
+	QString testFile2 = cx::TestUtilities::ExpandDataFileName("ssc/Person5/person5_t2_unsigned.mhd");
+	QString testFile3 = cx::TestUtilities::ExpandDataFileName("ssc/Person5/person5_flair_unsigned.mhd");
 //	std::cout << testFile1 << std::endl;
 	std::cout << testFile2 << std::endl;
 	//std::cout << testFile3 << std::endl;
 
-//	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->loadImage(testFile1, testFile1, ssc::rtMETAIMAGE);
-	ssc::ImagePtr image2 = ssc::DataManager::getInstance()->loadImage(testFile2, testFile2, ssc::rtMETAIMAGE);
-	ssc::ImagePtr image3 = ssc::DataManager::getInstance()->loadImage(testFile3, testFile3, ssc::rtMETAIMAGE);
+//	ImagePtr image1 = DataManager::getInstance()->loadImage(testFile1, testFile1, rtMETAIMAGE);
+	cx::ImagePtr image2 = cx::DataManager::getInstance()->loadImage(testFile2, testFile2, cx::rtMETAIMAGE);
+	cx::ImagePtr image3 = cx::DataManager::getInstance()->loadImage(testFile3, testFile3, cx::rtMETAIMAGE);
 
 //	QString Uid1 = image1->getUid();
 	QString Uid2 = image2->getUid();
 	QString Uid3 = image3->getUid();
 
-	//ssc::ImagePtr imageTmp = ssc::DataManager::instance()->getImage(Uid1);
+	//ImagePtr imageTmp = DataManager::instance()->getImage(Uid1);
 
 	std::cout << "Uid       : " << image2->getUid() << std::endl;
 	std::cout << "Name      : " << image2->getName() << std::endl;
@@ -62,9 +62,9 @@ int main(int argc, char **argv)
 	std::cout << "Bounds    : " << bounds[0] << "/" << bounds[1] << " / " << bounds[2] << "/" << bounds[3] << " / " << bounds[4] << "/" << bounds[5] << std::endl;
 
 
-	//std::vector<QString> names = ssc::DataManager::instance()->getImageNames();
+	//std::vector<QString> names = DataManager::instance()->getImageNames();
 
 	return 0;
 }
 
-//}//namespace ssc
+//}//namespace cx

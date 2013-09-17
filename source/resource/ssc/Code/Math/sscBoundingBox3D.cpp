@@ -3,7 +3,7 @@
 #include "sscTypeConversions.h"
 
 // --------------------------------------------------------
-namespace ssc
+namespace cx
 {
 //namespace utils
 //{
@@ -228,7 +228,7 @@ std::ostream& operator<<(std::ostream& s, const DoubleBoundingBox3D& data)
 DoubleBoundingBox3D DoubleBoundingBox3D::fromCloud(std::vector<Vector3D> cloud)
 {
 	if (cloud.empty())
-		return ssc::DoubleBoundingBox3D(0, 0, 0, 0, 0, 0);
+		return DoubleBoundingBox3D(0, 0, 0, 0, 0, 0);
 
 	Vector3D a = cloud[0]; // min
 	Vector3D b = cloud[0]; // max
@@ -276,5 +276,5 @@ DoubleBoundingBox3D DoubleBoundingBox3D::unionWith(const DoubleBoundingBox3D& ot
 
 // --------------------------------------------------------
 //} // namespace utils
-} // namespace ssc
+} // namespace cx
 // --------------------------------------------------------

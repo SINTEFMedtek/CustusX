@@ -4,7 +4,7 @@
 #include <iostream>
 #include "sscMD5Check.h"
 
-namespace ssc
+namespace cx
 {
 
 /**

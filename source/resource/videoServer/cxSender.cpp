@@ -54,7 +54,7 @@ void GrabberSenderQTcpSocket::send(IGTLinkUSStatusMessage::Pointer msg)
 	mSocket->write(reinterpret_cast<const char*> (msg->GetPackPointer()), msg->GetPackSize());
 }
 
-void GrabberSenderQTcpSocket::send(ssc::ImagePtr msg)
+void GrabberSenderQTcpSocket::send(ImagePtr msg)
 {
 	if (!this->isReady())
 		return;
@@ -63,7 +63,7 @@ void GrabberSenderQTcpSocket::send(ssc::ImagePtr msg)
 	this->send(converter.encode(msg));
 }
 
-void GrabberSenderQTcpSocket::send(ssc::ProbeDataPtr msg)
+void GrabberSenderQTcpSocket::send(ProbeDataPtr msg)
 {
 	if (!this->isReady())
 		return;

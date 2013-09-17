@@ -5,7 +5,7 @@
 #include "sscVector3D.h"
 #include "vtkForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class Image> ImagePtr;
 
@@ -31,10 +31,10 @@ ImagePtr convertImageToUnsigned(ImagePtr image, vtkImageDataPtr suggestedConvert
 /**
  * Get information about a ssc volume.
  */
-std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::ImagePtr image);
+std::map<std::string, std::string> getDisplayFriendlyInfo(ImagePtr image);
 
-int calculateNumVoxelsWithMaxValue(ssc::ImagePtr image);///<Find number of voxels containing max scalar value
-int calculateNumVoxelsWithMinValue(ssc::ImagePtr image);///<Find number of voxels containing min scalar value
+int calculateNumVoxelsWithMaxValue(ImagePtr image);///<Find number of voxels containing max scalar value
+int calculateNumVoxelsWithMinValue(ImagePtr image);///<Find number of voxels containing min scalar value
 /**
  * \}
  */

@@ -23,7 +23,7 @@
 #include "sscDataMetric.h"
 #include "sscDataReaderWriter.h"
 
-namespace ssc
+namespace cx
 {
 /**
  * \file
@@ -33,12 +33,12 @@ namespace ssc
 
 typedef boost::shared_ptr<class DistanceMetric> DistanceMetricPtr;
 
-/**\brief ssc::DataReader implementation for DistanceMetric
+/**\brief DataReader implementation for DistanceMetric
  *
  * \date Jul 4, 2011
  * \author Christian Askeland, SINTEF
  */
-class DistanceMetricReader: public ssc::DataReader
+class DistanceMetricReader: public DataReader
 {
 public:
 	virtual ~DistanceMetricReader()
@@ -48,7 +48,7 @@ public:
 	{
 		return type == "distanceMetric";
 	}
-	virtual ssc::DataPtr load(const QString& uid, const QString& filename);
+	virtual DataPtr load(const QString& uid, const QString& filename);
 };
 
 /**\brief Data class that represents a distance between two points,
@@ -67,26 +67,26 @@ public:
     static DistanceMetricPtr create(QString uid, QString name="");
 
 	double getDistance() const;
-    std::vector<ssc::Vector3D> getEndpoints() const; ///< return the two endpoints in reference space. None if invalid.
-    virtual ssc::Vector3D getRefCoord() const;
+    std::vector<Vector3D> getEndpoints() const; ///< return the two endpoints in reference space. None if invalid.
+    virtual Vector3D getRefCoord() const;
 	virtual QString getAsSingleLineString() const;
 
     unsigned getArgumentCount() const;
-	void setArgument(int index, ssc::DataPtr p);
-	ssc::DataPtr getArgument(int index);
-	bool validArgument(ssc::DataPtr p) const;
+	void setArgument(int index, DataPtr p);
+	DataPtr getArgument(int index);
+	bool validArgument(DataPtr p) const;
     virtual bool isValid() const;
 
     virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
-	virtual ssc::DoubleBoundingBox3D boundingBox() const;
+	virtual DoubleBoundingBox3D boundingBox() const;
 	virtual QString getType() const
 	{
 		return "distanceMetric";
 	}
 
 private:
-	boost::array<ssc::DataPtr, 2> mArgument;
+	boost::array<DataPtr, 2> mArgument;
 };
 
 /**

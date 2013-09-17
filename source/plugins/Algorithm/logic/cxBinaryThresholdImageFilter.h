@@ -34,9 +34,9 @@ public:
 	virtual bool postProcess();
 
 	// extensions:
-	ssc::DoubleDataAdapterXmlPtr getLowerThresholdOption(QDomElement root);
-	ssc::ColorDataAdapterXmlPtr getColorOption(QDomElement root);
-	ssc::BoolDataAdapterXmlPtr getGenerateSurfaceOption(QDomElement root);
+	DoubleDataAdapterXmlPtr getLowerThresholdOption(QDomElement root);
+	ColorDataAdapterXmlPtr getColorOption(QDomElement root);
+	BoolDataAdapterXmlPtr getGenerateSurfaceOption(QDomElement root);
 
 protected:
 	virtual void createOptions();
@@ -50,7 +50,7 @@ private slots:
 	void thresholdSlot();
 
 private:
-	ssc::DoubleDataAdapterXmlPtr mLowerThresholdOption;
+	DoubleDataAdapterXmlPtr mLowerThresholdOption;
 	vtkImageDataPtr mRawResult;
 	vtkPolyDataPtr mRawContour;
 };

@@ -51,18 +51,18 @@ protected:
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
 	virtual void hideEvent(QHideEvent* event);
 	virtual QString getTargetName() const;
-	virtual ssc::LandmarkMap getTargetLandmarks() const;
-	virtual void setTargetLandmark(QString uid, ssc::Vector3D p_target);
+	virtual LandmarkMap getTargetLandmarks() const;
+	virtual void setTargetLandmark(QString uid, Vector3D p_target);
 	virtual void performRegistration() // no registration in this widget - only definition of pts.
 	{
 	}
     virtual void prePaintEvent(); ///< populates the table widget
     QString getLandmarkName(QString uid);
-	virtual ssc::Transform3D getTargetTransform() const;
-	ssc::PickerRepPtr getPickerRep();
+	virtual Transform3D getTargetTransform() const;
+	PickerRepPtr getPickerRep();
 
 	//gui
-	ssc::StringDataAdapterPtr mActiveImageAdapter;
+	StringDataAdapterPtr mActiveImageAdapter;
 	ImageLandmarksSourcePtr mImageLandmarkSource;
 	DominantToolProxyPtr mDominantToolProxy;
 

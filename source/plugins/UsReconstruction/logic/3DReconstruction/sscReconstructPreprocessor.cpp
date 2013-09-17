@@ -37,7 +37,7 @@
 #include "sscLogger.h"
 #include "cxUSReconstructInputDataAlgoritms.h"
 
-namespace ssc
+namespace cx
 {
 
 ReconstructPreprocessor::ReconstructPreprocessor()
@@ -106,7 +106,7 @@ void ReconstructPreprocessor::calibrateTimeStamps(double offset, double scale)
  */
 void ReconstructPreprocessor::alignTimeSeries()
 {
-    ssc::messageManager()->sendInfo("Generate time calibration based on input time stamps.");
+    messageManager()->sendInfo("Generate time calibration based on input time stamps.");
     double framesSpan = mFileData.mFrames.back().mTime - mFileData.mFrames.front().mTime;
     double positionsSpan = mFileData.mPositions.back().mTime - mFileData.mPositions.front().mTime;
     double scale = framesSpan / positionsSpan;
@@ -142,7 +142,7 @@ void ReconstructPreprocessor::cropInputData()
     mFileData.mProbeData.setData(sector);
 
     vtkImageDataPtr mask = mFileData.mProbeData.getMask();
-    mFileData.mMask = ssc::ImagePtr(new ssc::Image("mask", mask, "mask")) ;
+    mFileData.mMask = ImagePtr(new Image("mask", mask, "mask")) ;
 }
 
 
@@ -162,8 +162,8 @@ void ReconstructPreprocessor::applyTimeCalibration()
     // hence the positive sign. (real use: subtract from frame data)
     //  std::cout << "TIMESHIFT " << timeshift << std::endl;
     //  timeshift = -timeshift;
-    if (!ssc::similar(0.0, timeshift))
-        ssc::messageManager()->sendInfo("Applying reconstruction-time calibration to tracking data: " + qstring_cast(
+    if (!similar(0.0, timeshift))
+        messageManager()->sendInfo("Applying reconstruction-time calibration to tracking data: " + qstring_cast(
             timeshift) + "ms");
     this->calibrateTimeStamps(timeshift, 1.0);
 
@@ -236,7 +236,7 @@ void ReconstructPreprocessor::interpolatePositions()
     {
         int first = iter->first+removeCount;
         int last = first + iter->second.count-1;
-        ssc::messageManager()->sendInfo(QString("Removed input frame [%1-%2]. Time diff=%3").arg(first).arg(last).arg(iter->second.err, 0, 'f', 1));
+        messageManager()->sendInfo(QString("Removed input frame [%1-%2]. Time diff=%3").arg(first).arg(last).arg(iter->second.err, 0, 'f', 1));
         removeCount += iter->second.count;
     }
 
@@ -246,11 +246,11 @@ void ReconstructPreprocessor::interpolatePositions()
         double percent = removed * 100;
         if (percent > 1)
         {
-            ssc::messageManager()->sendWarning("Removed " + QString::number(percent, 'f', 1) + "% of the "+ qstring_cast(startFrames) + " frames.");
+            messageManager()->sendWarning("Removed " + QString::number(percent, 'f', 1) + "% of the "+ qstring_cast(startFrames) + " frames.");
         }
         else
         {
-            ssc::messageManager()->sendInfo("Removed " + QString::number(percent, 'f', 1) + "% of the " + qstring_cast(startFrames) + " frames.");
+            messageManager()->sendInfo("Removed " + QString::number(percent, 'f', 1) + "% of the " + qstring_cast(startFrames) + " frames.");
         }
     }
 }
@@ -290,7 +290,7 @@ void ReconstructPreprocessor::interpolatePositions2()
 	{
 		int first = iter->first+removeCount;
 		int last = first + iter->second.count-1;
-		ssc::messageManager()->sendInfo(QString("Removed input frame [%1-%2]. Time diff=%3").arg(first).arg(last).arg(iter->second.err, 0, 'f', 1));
+		messageManager()->sendInfo(QString("Removed input frame [%1-%2]. Time diff=%3").arg(first).arg(last).arg(iter->second.err, 0, 'f', 1));
 		removeCount += iter->second.count;
 	}
 
@@ -300,11 +300,11 @@ void ReconstructPreprocessor::interpolatePositions2()
 		double percent = removed * 100;
 		if (percent > 1)
 		{
-			ssc::messageManager()->sendWarning("Removed " + QString::number(percent, 'f', 1) + "% of the "+ qstring_cast(startFrames) + " frames.");
+			messageManager()->sendWarning("Removed " + QString::number(percent, 'f', 1) + "% of the "+ qstring_cast(startFrames) + " frames.");
 		}
 		else
 		{
-			ssc::messageManager()->sendInfo("Removed " + QString::number(percent, 'f', 1) + "% of the " + qstring_cast(startFrames) + " frames.");
+			messageManager()->sendInfo("Removed " + QString::number(percent, 'f', 1) + "% of the " + qstring_cast(startFrames) + " frames.");
 		}
 	}
 }
@@ -313,21 +313,21 @@ void ReconstructPreprocessor::interpolatePositions2()
 /**
  * Generate a rectangle (2D) defining ROI in input image space
  */
-std::vector<ssc::Vector3D> ReconstructPreprocessor::generateInputRectangle()
+std::vector<Vector3D> ReconstructPreprocessor::generateInputRectangle()
 {
-    std::vector<ssc::Vector3D> retval(4);
+    std::vector<Vector3D> retval(4);
     if (!mFileData.mMask)
     {
-        ssc::messageManager()->sendError("Reconstructer::generateInputRectangle() + requires mask");
+        messageManager()->sendError("Reconstructer::generateInputRectangle() + requires mask");
         return retval;
     }
     Eigen::Array3i dims = mFileData.mUsRaw->getDimensions();
-    ssc::Vector3D spacing = mFileData.mUsRaw->getSpacing();
+    Vector3D spacing = mFileData.mUsRaw->getSpacing();
 
     Eigen::Array3i maskDims(mFileData.mMask->getBaseVtkImageData()->GetDimensions());
 
     if (( maskDims[0]<dims[0] )||( maskDims[1]<dims[1] ))
-        ssc::messageManager()->sendError(QString("input data (%1) and mask (%2) dim mimatch")
+        messageManager()->sendError(QString("input data (%1) and mask (%2) dim mimatch")
                                          .arg(qstring_cast(dims))
                                          .arg(qstring_cast(maskDims)));
 
@@ -361,10 +361,10 @@ std::vector<ssc::Vector3D> ReconstructPreprocessor::generateInputRectangle()
     ymin += reduceY;
     ymax -= reduceY;
 
-    retval[0] = ssc::Vector3D(xmin * spacing[0], ymin * spacing[1], 0);
-    retval[1] = ssc::Vector3D(xmax * spacing[0], ymin * spacing[1], 0);
-    retval[2] = ssc::Vector3D(xmin * spacing[0], ymax * spacing[1], 0);
-    retval[3] = ssc::Vector3D(xmax * spacing[0], ymax * spacing[1], 0);
+    retval[0] = Vector3D(xmin * spacing[0], ymin * spacing[1], 0);
+    retval[1] = Vector3D(xmax * spacing[0], ymin * spacing[1], 0);
+    retval[2] = Vector3D(xmin * spacing[0], ymax * spacing[1], 0);
+    retval[3] = Vector3D(xmax * spacing[0], ymax * spacing[1], 0);
 
     return retval;
 }
@@ -375,9 +375,9 @@ std::vector<ssc::Vector3D> ReconstructPreprocessor::generateInputRectangle()
  * Pre:  mFrames[i].mPos = prMu
  * Post: mFrames[i].mPos = d'Mu, where d' is an oriented but not translated data space.
  */
-ssc::Transform3D ReconstructPreprocessor::applyOutputOrientation()
+Transform3D ReconstructPreprocessor::applyOutputOrientation()
 {
-    ssc::Transform3D prMdd = Transform3D::Identity();
+    Transform3D prMdd = Transform3D::Identity();
 
     if (mInput.mOrientation == "PatientReference")
     {
@@ -389,11 +389,11 @@ ssc::Transform3D ReconstructPreprocessor::applyOutputOrientation()
     }
     else
     {
-        ssc::messageManager()->sendError("no orientation algorithm selected in reconstruction");
+        messageManager()->sendError("no orientation algorithm selected in reconstruction");
     }
 
     // apply the selected orientation to the frames.
-    ssc::Transform3D ddMpr = prMdd.inv();
+    Transform3D ddMpr = prMdd.inv();
     for (unsigned i = 0; i < mFileData.mFrames.size(); i++)
     {
         // mPos = prMu
@@ -418,12 +418,12 @@ void ReconstructPreprocessor::findExtentAndOutputTransform()
     if (mFileData.mFrames.empty())
         return;
     // A first guess for d'Mu with correct orientation
-    ssc::Transform3D prMdd = this->applyOutputOrientation();
+    Transform3D prMdd = this->applyOutputOrientation();
     //mFrames[i].mPos = d'Mu, d' = only rotation
 
     // Find extent of all frames as a point cloud
-    std::vector<ssc::Vector3D> inputRect = this->generateInputRectangle();
-    std::vector<ssc::Vector3D> outputRect;
+    std::vector<Vector3D> inputRect = this->generateInputRectangle();
+    std::vector<Vector3D> outputRect;
     for (unsigned slice = 0; slice < mFileData.mFrames.size(); slice++)
     {
         Transform3D dMu = mFileData.mFrames[slice].mPos;
@@ -433,11 +433,11 @@ void ReconstructPreprocessor::findExtentAndOutputTransform()
         }
     }
 
-    ssc::DoubleBoundingBox3D extent = ssc::DoubleBoundingBox3D::fromCloud(outputRect);
+    DoubleBoundingBox3D extent = DoubleBoundingBox3D::fromCloud(outputRect);
 
     // Translate dMu to output volume origo
-    ssc::Transform3D T_origo = ssc::createTransformTranslate(extent.corner(0, 0, 0));
-    ssc::Transform3D prMd = prMdd * T_origo; // transform from output space to patref, use when storing volume.
+    Transform3D T_origo = createTransformTranslate(extent.corner(0, 0, 0));
+    Transform3D prMd = prMdd * T_origo; // transform from output space to patref, use when storing volume.
     for (unsigned i = 0; i < mFileData.mFrames.size(); i++)
     {
         mFileData.mFrames[i].mPos = T_origo.inv() * mFileData.mFrames[i].mPos;
@@ -448,8 +448,8 @@ void ReconstructPreprocessor::findExtentAndOutputTransform()
     mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing);
     mOutputVolumeParams.setMaxVolumeSize(mInput.mMaxOutputVolumeSize);
 
-    if (ssc::ToolManager::getInstance())
-        mOutputVolumeParams.m_rMd = (*ssc::ToolManager::getInstance()->get_rMpr()) * prMd;
+    if (ToolManager::getInstance())
+        mOutputVolumeParams.m_rMd = (*ToolManager::getInstance()->get_rMpr()) * prMd;
     else
         mOutputVolumeParams.m_rMd = prMd;
 
@@ -492,4 +492,4 @@ void ReconstructPreprocessor::initialize(ReconstructCore::InputParams input, USR
 }
 
 
-} /* namespace ssc */
+} /* namespace cx */

@@ -30,7 +30,7 @@
 #include <QFileInfo>
 #include "boost/scoped_ptr.hpp"
 
-namespace ssc
+namespace cx
 {
 
 /** Locks a static mutex in the constructor and unlocks it in the desctructor,
@@ -187,7 +187,7 @@ public:
 
 	vtkImageDataPtr loadVtkImageData(QString filename);
 	vtkPolyDataPtr loadVtkPolyData(QString filename);
-//	ssc::DataPtr loadData(QString uid, QString filename);
+//	DataPtr loadData(QString uid, QString filename);
 	DataPtr readData(const QString& uid, const QString& path, const QString& type);
 
 private:
@@ -196,6 +196,6 @@ private:
 	DataReadersType mDataReaders;
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif // SSCDATAREADERWRITER_H

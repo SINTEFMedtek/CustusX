@@ -28,15 +28,15 @@ void TestRegistrationV2V::setUp()
 
 void TestRegistrationV2V::tearDown()
 {
-	ssc::DataManager::shutdown();
+	cx::DataManager::shutdown();
 }
 
 /**return endpoint
  *
  */
-ssc::Vector3D TestRegistrationV2V::append_line(std::vector<ssc::Vector3D>* pts, ssc::Vector3D a, ssc::Vector3D b, double spacing)
+cx::Vector3D TestRegistrationV2V::append_line(std::vector<cx::Vector3D>* pts, cx::Vector3D a, cx::Vector3D b, double spacing)
 {
-	ssc::Vector3D u = (b-a).normal();
+	cx::Vector3D u = (b-a).normal();
 	unsigned N = (unsigned)floor((b-a).length()/spacing + 0.5);
 	for (unsigned i=0; i<N; ++i)
         pts->push_back(a+u*spacing*(i+1));
@@ -46,7 +46,7 @@ ssc::Vector3D TestRegistrationV2V::append_line(std::vector<ssc::Vector3D>* pts, 
 /**return endpoint
  *
  */
-ssc::Vector3D TestRegistrationV2V::append_pt(std::vector<ssc::Vector3D>* pts, ssc::Vector3D a)
+cx::Vector3D TestRegistrationV2V::append_pt(std::vector<cx::Vector3D>* pts, cx::Vector3D a)
 {
 	pts->push_back(a);
 	return a;
@@ -58,15 +58,15 @@ QStringList TestRegistrationV2V::generateTestData()
 	QDir().mkpath(path);
 	QStringList retval;
 	double spacing = 0.1;
-	std::vector<ssc::Vector3D> pts;
-	ssc::Vector3D a, b;
+	std::vector<cx::Vector3D> pts;
+	cx::Vector3D a, b;
 
 	// an Y-fork
 	spacing = 0.1;
-	a = this->append_pt(&pts, ssc::Vector3D(0,0,0));
-	a = this->append_line(&pts, a, ssc::Vector3D(0,0,10), spacing);
-	b = this->append_line(&pts, a, ssc::Vector3D(-3,0,15), spacing);
-	b = this->append_line(&pts, a, ssc::Vector3D( 3,0,15), spacing);
+	a = this->append_pt(&pts, cx::Vector3D(0,0,0));
+	a = this->append_line(&pts, a, cx::Vector3D(0,0,10), spacing);
+	b = this->append_line(&pts, a, cx::Vector3D(-3,0,15), spacing);
+	b = this->append_line(&pts, a, cx::Vector3D( 3,0,15), spacing);
 	retval << this->saveVTKFile(pts, path + "test1.vtk");
 	this->saveVTKFile(pts, path + "test1_b.vtk");
 	//-----------------------------------------------------
@@ -74,15 +74,15 @@ QStringList TestRegistrationV2V::generateTestData()
 	// The Y-fork, with a bend on the beginning.
 	pts.clear();
 	spacing = 0.1;
-	a = this->append_pt(&pts, ssc::Vector3D(0,5,-2));
-	a = this->append_line(&pts, a, ssc::Vector3D(0,0,0), spacing);
-	a = this->append_line(&pts, a, ssc::Vector3D(0,0,10), spacing);
-	b = this->append_line(&pts, a, ssc::Vector3D(-3,0,15), spacing);
-	b = this->append_line(&pts, a, ssc::Vector3D( 3,0,15), spacing);
+	a = this->append_pt(&pts, cx::Vector3D(0,5,-2));
+	a = this->append_line(&pts, a, cx::Vector3D(0,0,0), spacing);
+	a = this->append_line(&pts, a, cx::Vector3D(0,0,10), spacing);
+	b = this->append_line(&pts, a, cx::Vector3D(-3,0,15), spacing);
+	b = this->append_line(&pts, a, cx::Vector3D( 3,0,15), spacing);
 	// a bent line 5 above the Y-fork.
-	a = this->append_pt(&pts, ssc::Vector3D(-5,-5,0));
-	a = this->append_line(&pts, a, ssc::Vector3D(-5,5,8), spacing);
-	a = this->append_line(&pts, a, ssc::Vector3D(-5,5,12), spacing);
+	a = this->append_pt(&pts, cx::Vector3D(-5,-5,0));
+	a = this->append_line(&pts, a, cx::Vector3D(-5,5,8), spacing);
+	a = this->append_line(&pts, a, cx::Vector3D(-5,5,12), spacing);
 	retval << this->saveVTKFile(pts, path + "test2.vtk");
 	this->saveVTKFile(pts, path + "test2_b.vtk");
 	//-----------------------------------------------------
@@ -90,14 +90,14 @@ QStringList TestRegistrationV2V::generateTestData()
 	return retval;
 }
 
-QString TestRegistrationV2V::saveVTKFile(std::vector<ssc::Vector3D> pts, QString filename)
+QString TestRegistrationV2V::saveVTKFile(std::vector<cx::Vector3D> pts, QString filename)
 {
 	vtkPolyDataPtr poly = this->generatePolyData(pts);
 	this->saveVTKFile(poly, filename);
 	return filename;
 }
 
-vtkPolyDataPtr TestRegistrationV2V::generatePolyData(std::vector<ssc::Vector3D> pts)
+vtkPolyDataPtr TestRegistrationV2V::generatePolyData(std::vector<cx::Vector3D> pts)
 {
 	vtkPolyDataPtr mPolyData = vtkPolyDataPtr::New();
 	vtkPointsPtr mPoints = vtkPointsPtr::New();
@@ -132,22 +132,22 @@ void TestRegistrationV2V::saveVTKFile(vtkPolyDataPtr data, QString filename)
 }
 
 
-std::vector<ssc::Transform3D> TestRegistrationV2V::generateTransforms()
+std::vector<cx::Transform3D> TestRegistrationV2V::generateTransforms()
 {
 	// This is a set of perturbations that work on the input dataset.
 	// Larger values cause failure.
 
-	ssc::Transform3D T_center = ssc::createTransformTranslate(ssc::Vector3D(-33,-47,-17)); // from inspection of the datasets
-	ssc::Transform3D T_111 = ssc::createTransformTranslate(ssc::Vector3D(1,1,1));
-	ssc::Transform3D T_110 = ssc::createTransformTranslate(ssc::Vector3D(1,1,0));
-	ssc::Transform3D T_100 = ssc::createTransformTranslate(ssc::Vector3D(1,0,0));
-	ssc::Transform3D T_222 = ssc::createTransformTranslate(ssc::Vector3D(2,2,2));
-	ssc::Transform3D R_x5 = ssc::createTransformRotateX(5 / 180.0 * M_PI);
-	ssc::Transform3D R_xy3 = ssc::createTransformRotateY(3 / 180.0 * M_PI) * ssc::createTransformRotateX(3 / 180.0 * M_PI);
-	ssc::Transform3D R_xy5 = ssc::createTransformRotateY(5 / 180.0 * M_PI) * ssc::createTransformRotateX(5 / 180.0 * M_PI);
+	cx::Transform3D T_center = cx::createTransformTranslate(cx::Vector3D(-33,-47,-17)); // from inspection of the datasets
+	cx::Transform3D T_111 = cx::createTransformTranslate(cx::Vector3D(1,1,1));
+	cx::Transform3D T_110 = cx::createTransformTranslate(cx::Vector3D(1,1,0));
+	cx::Transform3D T_100 = cx::createTransformTranslate(cx::Vector3D(1,0,0));
+	cx::Transform3D T_222 = cx::createTransformTranslate(cx::Vector3D(2,2,2));
+	cx::Transform3D R_x5 = cx::createTransformRotateX(5 / 180.0 * M_PI);
+	cx::Transform3D R_xy3 = cx::createTransformRotateY(3 / 180.0 * M_PI) * cx::createTransformRotateX(3 / 180.0 * M_PI);
+	cx::Transform3D R_xy5 = cx::createTransformRotateY(5 / 180.0 * M_PI) * cx::createTransformRotateX(5 / 180.0 * M_PI);
 
-	std::vector<ssc::Transform3D> pert;
-	pert.push_back(ssc::Transform3D::Identity());
+	std::vector<cx::Transform3D> pert;
+	pert.push_back(cx::Transform3D::Identity());
 	pert.push_back(T_100);
 	pert.push_back(T_110);
 	pert.push_back(T_111);
@@ -160,7 +160,7 @@ std::vector<ssc::Transform3D> TestRegistrationV2V::generateTransforms()
 
 
 	// causes failure in findClosestPoint -> nan
-//	pert.push_back(ssc::createTransformRotateY(120 / 180.0 * M_PI) * ssc::createTransformRotateX(90 / 180.0 * M_PI) * ssc::createTransformTranslate(ssc::Vector3D(90, 50, 0)));
+//	pert.push_back(createTransformRotateY(120 / 180.0 * M_PI) *cx::createTransformRotateX(90 / 180.0 * M_PI) *cx::createTransformTranslate(cx::Vector3D(90, 50, 0)));
 
 	return pert;
 }
@@ -177,7 +177,7 @@ void TestRegistrationV2V::testV2V_synthetic_data()
 //	double tol_dist_hi = 5;
 //	double tol_ang_hi = 5.0/180.0*M_PI;
 
-	std::vector<ssc::Transform3D> pert = this->generateTransforms();
+	std::vector<cx::Transform3D> pert = this->generateTransforms();
 
 	std::cout << std::endl;
 
@@ -232,17 +232,17 @@ void TestRegistrationV2V::testVessel2VesselRegistration()
 	// This is a set of perturbations that work on the input dataset.
 	// Larger values cause failure.
 
-	ssc::Transform3D T_center = ssc::createTransformTranslate(ssc::Vector3D(-33,-47,-17)); // from inspection of the datasets
-	ssc::Transform3D T_111 = ssc::createTransformTranslate(ssc::Vector3D(1,1,1));
-	ssc::Transform3D T_110 = ssc::createTransformTranslate(ssc::Vector3D(1,1,0));
-	ssc::Transform3D T_100 = ssc::createTransformTranslate(ssc::Vector3D(1,0,0));
-	ssc::Transform3D T_222 = ssc::createTransformTranslate(ssc::Vector3D(2,2,2));
-	ssc::Transform3D R_x5 = ssc::createTransformRotateX(5 / 180.0 * M_PI);
-	ssc::Transform3D R_xy3 = ssc::createTransformRotateY(3 / 180.0 * M_PI) * ssc::createTransformRotateX(3 / 180.0 * M_PI);
-	ssc::Transform3D R_xy5 = ssc::createTransformRotateY(5 / 180.0 * M_PI) * ssc::createTransformRotateX(5 / 180.0 * M_PI);
+	cx::Transform3D T_center =cx::createTransformTranslate(cx::Vector3D(-33,-47,-17)); // from inspection of the datasets
+	cx::Transform3D T_111 =cx::createTransformTranslate(cx::Vector3D(1,1,1));
+	cx::Transform3D T_110 =cx::createTransformTranslate(cx::Vector3D(1,1,0));
+	cx::Transform3D T_100 =cx::createTransformTranslate(cx::Vector3D(1,0,0));
+	cx::Transform3D T_222 =cx::createTransformTranslate(cx::Vector3D(2,2,2));
+	cx::Transform3D R_x5 =cx::createTransformRotateX(5 / 180.0 * M_PI);
+	cx::Transform3D R_xy3 =cx::createTransformRotateY(3 / 180.0 * M_PI) *cx::createTransformRotateX(3 / 180.0 * M_PI);
+	cx::Transform3D R_xy5 =cx::createTransformRotateY(5 / 180.0 * M_PI) *cx::createTransformRotateX(5 / 180.0 * M_PI);
 
-	std::vector<ssc::Transform3D> pert;
-	pert.push_back(ssc::Transform3D::Identity());
+	std::vector<cx::Transform3D> pert;
+	pert.push_back(cx::Transform3D::Identity());
 	pert.push_back(T_100);
 	pert.push_back(T_110);
 	pert.push_back(T_111);
@@ -254,8 +254,8 @@ void TestRegistrationV2V::testVessel2VesselRegistration()
 	pert.push_back(T_center * R_xy5 * T_center.inv() * T_222);
 
 	// this set causes two failures
-	ssc::Transform3D T_large1 = ssc::createTransformTranslate(ssc::Vector3D(3, 3, 3));
-	ssc::Transform3D T_large2 = ssc::createTransformTranslate(ssc::Vector3D(0, 0, 5));
+	cx::Transform3D T_large1 =cx::createTransformTranslate(cx::Vector3D(3, 3, 3));
+	cx::Transform3D T_large2 =cx::createTransformTranslate(cx::Vector3D(0, 0, 5));
 	pert.push_back(T_large1);
 	pert.push_back(T_large2);
 //
@@ -264,7 +264,7 @@ void TestRegistrationV2V::testVessel2VesselRegistration()
 //	this->doTestVessel2VesselRegistration(T_large1, fname2, fname1, tol_dist_hi, tol_ang_hi);
 
 	// causes failure in findClosestPoint -> nan
-//	pert.push_back(ssc::createTransformRotateY(120 / 180.0 * M_PI) * ssc::createTransformRotateX(90 / 180.0 * M_PI) * ssc::createTransformTranslate(ssc::Vector3D(90, 50, 0)));
+//	pert.push_back(createTransformRotateY(120 / 180.0 * M_PI) *cx::createTransformRotateX(90 / 180.0 * M_PI) *cx::createTransformTranslate(cx::Vector3D(90, 50, 0)));
 
 	std::cout << std::endl;
 
@@ -294,7 +294,7 @@ void TestRegistrationV2V::testVessel2VesselRegistration()
 }
 
 
-void TestRegistrationV2V::doTestVessel2VesselRegistration(ssc::Transform3D perturbation, QString filenameSource, QString filenameTarget, double tol_dist, double tol_angle)
+void TestRegistrationV2V::doTestVessel2VesselRegistration(cx::Transform3D perturbation, QString filenameSource, QString filenameTarget, double tol_dist, double tol_angle)
 {
 	bool verbose = 0;
 
@@ -304,8 +304,8 @@ void TestRegistrationV2V::doTestVessel2VesselRegistration(ssc::Transform3D pertu
 		std::cout << "======== ====================== ==============" << std::endl;
 	}
 
-	ssc::DataPtr source = ssc::dataManager()->loadData("source_"+filenameSource, filenameSource, ssc::rtAUTO);
-	ssc::DataPtr target = ssc::dataManager()->loadData("target_"+filenameTarget, filenameTarget, ssc::rtAUTO);
+	cx::DataPtr source = cx::dataManager()->loadData("source_"+filenameSource, filenameSource, cx::rtAUTO);
+	cx::DataPtr target = cx::dataManager()->loadData("target_"+filenameTarget, filenameTarget, cx::rtAUTO);
 	CPPUNIT_ASSERT(source!=0);
 	CPPUNIT_ASSERT(target!=0);
 	source->get_rMd_History()->setRegistration(perturbation);
@@ -321,25 +321,25 @@ void TestRegistrationV2V::doTestVessel2VesselRegistration(ssc::Transform3D pertu
 		std::cout << info << std::endl;
 	}
 
-	ssc::SeansVesselReg vesselReg;
+	cx::SeansVesselReg vesselReg;
 	vesselReg.setDebugOutput(verbose);
 	vesselReg.mt_doOnlyLinear = true;
 
 	bool success = vesselReg.execute(source, target, cx::DataLocations::getTestDataPath() + "/Log");
 	CPPUNIT_ASSERT(success);
 
-	ssc::Transform3D linearTransform = vesselReg.getLinearResult();
+	cx::Transform3D linearTransform = vesselReg.getLinearResult();
 
 	// characterize the difference matrix in angle-axis form:
-	ssc::Transform3D diff = linearTransform * perturbation.inv();
-	ssc::Vector3D t_delta = diff.matrix().block<3,1>(0, 3);
+	cx::Transform3D diff = linearTransform * perturbation.inv();
+	cx::Vector3D t_delta = diff.matrix().block<3,1>(0, 3);
 	Eigen::AngleAxisd aa = Eigen::AngleAxisd(diff.matrix().block<3,3>(0, 0));
 	double a = aa.angle();
-	ssc::Vector3D axis = aa.axis();
+	cx::Vector3D axis = aa.axis();
 
 	// characterize the input perturbation in angle-axis form:
-	ssc::Transform3D diff_input = perturbation;
-	ssc::Vector3D t_delta_input = diff_input.matrix().block<3,1>(0, 3);
+	cx::Transform3D diff_input = perturbation;
+	cx::Vector3D t_delta_input = diff_input.matrix().block<3,1>(0, 3);
 	Eigen::AngleAxisd aa_input = Eigen::AngleAxisd(diff_input.matrix().block<3,3>(0, 0));
 	double a_input = aa_input.angle();
 

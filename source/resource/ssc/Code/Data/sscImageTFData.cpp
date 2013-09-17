@@ -38,7 +38,7 @@
 #include "sscLogger.h"
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
 ImageTFData::ImageTFData(vtkImageDataPtr base) :
@@ -230,13 +230,13 @@ void ImageTFData::unsignedCT(bool onLoad)
 
 	this->shift(modify);
 
-//	//	ssc::OpacityMapPtr opacityMap = this->getOpacityMap();
+//	//	OpacityMapPtr opacityMap = this->getOpacityMap();
 //	OpacityMapPtr newOpacipyMap(new IntIntMap());
-//	for (ssc::IntIntMap::iterator it = this->getOpacityMap()->begin(); it != this->getOpacityMap()->end(); ++it)
+//	for (IntIntMap::iterator it = this->getOpacityMap()->begin(); it != this->getOpacityMap()->end(); ++it)
 //		(*newOpacipyMap)[it->first + modify] = it->second;
 
 //	ColorMapPtr newColorMap(new ColorMap());
-//	for (ssc::ColorMap::iterator it = this->getColorMap()->begin(); it != this->getColorMap()->end(); ++it)
+//	for (ColorMap::iterator it = this->getColorMap()->begin(); it != this->getColorMap()->end(); ++it)
 //		(*newColorMap)[it->first + modify] = it->second;
 
 //	mOpacityMapPtr = newOpacipyMap;
@@ -253,13 +253,13 @@ void ImageTFData::shift(int val)
 {
 	int modify = val;
 
-	//	ssc::OpacityMapPtr opacityMap = this->getOpacityMap();
+	//	OpacityMapPtr opacityMap = this->getOpacityMap();
 	OpacityMapPtr newOpacipyMap(new IntIntMap());
-	for (ssc::IntIntMap::iterator it = this->getOpacityMap()->begin(); it != this->getOpacityMap()->end(); ++it)
+	for (IntIntMap::iterator it = this->getOpacityMap()->begin(); it != this->getOpacityMap()->end(); ++it)
 		(*newOpacipyMap)[it->first + modify] = it->second;
 
 	ColorMapPtr newColorMap(new ColorMap());
-	for (ssc::ColorMap::iterator it = this->getColorMap()->begin(); it != this->getColorMap()->end(); ++it)
+	for (ColorMap::iterator it = this->getColorMap()->begin(); it != this->getColorMap()->end(); ++it)
 		(*newColorMap)[it->first + modify] = it->second;
 
 	mOpacityMapPtr = newOpacipyMap;
@@ -281,8 +281,8 @@ void ImageTFData::fixTransferFunctions()
 {
 	//Make sure min and max values for transferfunctions are set
 
-	ssc::OpacityMapPtr opacityMap = this->getOpacityMap();
-	ssc::ColorMapPtr colorMap = this->getColorMap();
+	OpacityMapPtr opacityMap = this->getOpacityMap();
+	ColorMapPtr colorMap = this->getColorMap();
 
 	vtkColorTransferFunctionPtr interpolatedTrFunc = vtkColorTransferFunctionPtr::New();
 	this->fillColorTFFromMap(interpolatedTrFunc);
@@ -295,7 +295,7 @@ void ImageTFData::fixTransferFunctions()
 	{
 		//The optimal solution may be to interpolate/extrapolate the max (min) values from the existing values
 		//However, as most presets usually have all the top values set to white the error of the simpler code below is usually small
-		ssc::IntIntMap::iterator opPoint = opacityMap->end();
+		IntIntMap::iterator opPoint = opacityMap->end();
 		--opPoint;
 		this->addAlphaPoint(this->getScalarMax(), opPoint->second);// Use value of current max element
 	}
@@ -312,7 +312,7 @@ void ImageTFData::fixTransferFunctions()
 	}
 
 	//Remove transfer function points outside range
-	ssc::IntIntMap::iterator opIt = this->getOpacityMap()->begin();
+	IntIntMap::iterator opIt = this->getOpacityMap()->begin();
 	while (opIt != this->getOpacityMap()->end())
 	{
 		int delPoint = 1000000;
@@ -326,7 +326,7 @@ void ImageTFData::fixTransferFunctions()
 			this->removeAlphaPoint(delPoint);
 	}
 
-	ssc::ColorMap::iterator it = this->getColorMap()->begin();
+	ColorMap::iterator it = this->getColorMap()->begin();
 	while (it != this->getColorMap()->end())
 	{
 		int delPoint = 1000000;

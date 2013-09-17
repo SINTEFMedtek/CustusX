@@ -29,7 +29,7 @@
 #include "vtkTextActor.h"
 typedef vtkSmartPointer<vtkTextActor> vtkTextActorPtr;
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class DistanceMetricRep> DistanceMetricRepPtr;
@@ -49,7 +49,7 @@ public:
 	static DistanceMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
 	virtual ~DistanceMetricRep() {}
 
-	virtual QString getType() const { return "ssc::DistanceMetricRep"; }
+	virtual QString getType() const { return "DistanceMetricRep"; }
 
 protected:
     virtual void clear();
@@ -63,7 +63,7 @@ private:
 	DistanceMetricRep(); ///< not implemented
     DistanceMetricPtr getDistanceMetric();
 
-	ssc::GraphicalLine3DPtr mGraphicalLine;
+	GraphicalLine3DPtr mGraphicalLine;
 };
 
 }

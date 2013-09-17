@@ -118,16 +118,16 @@ public:
 	typedef itk::PointSetToPointSetRegistrationMethod<PointSetType, PointSetType> RegistrationType;
 
 	// methods:
-	ssc::Transform3D mResult; ///< transform of movingPointSet
+	cx::Transform3D mResult; ///< transform of movingPointSet
 
-	bool registerPoints(std::vector<ssc::Vector3D> ref, std::vector<ssc::Vector3D> target);
+	bool registerPoints(std::vector<cx::Vector3D> ref, std::vector<cx::Vector3D> target);
 	bool registerPoints(PointSetType::Pointer fixedPointSet, PointSetType::Pointer movingPointSet);
-	PointSetType::Pointer toItk(std::vector<ssc::Vector3D> input);
+	PointSetType::Pointer toItk(std::vector<cx::Vector3D> input);
 	int test();
 
 };
 
-LandmarkTranslation::PointSetType::Pointer LandmarkTranslation::toItk(std::vector<ssc::Vector3D> input)
+LandmarkTranslation::PointSetType::Pointer LandmarkTranslation::toItk(std::vector<cx::Vector3D> input)
 {
 	PointSetType::Pointer pointSet = PointSetType::New();
 	PointsContainer::Pointer pointContainer = PointsContainer::New();
@@ -144,7 +144,7 @@ LandmarkTranslation::PointSetType::Pointer LandmarkTranslation::toItk(std::vecto
 	return pointSet;
 }
 
-bool LandmarkTranslation::registerPoints(std::vector<ssc::Vector3D> ref, std::vector<ssc::Vector3D> target)
+bool LandmarkTranslation::registerPoints(std::vector<cx::Vector3D> ref, std::vector<cx::Vector3D> target)
 {
 	return registerPoints(toItk(ref), toItk(target));
 }
@@ -215,7 +215,7 @@ bool LandmarkTranslation::registerPoints(PointSetType::Pointer fixedPointSet, Po
 		return false;
 	}
 
-	mResult = ssc::Transform3D::Identity();
+	mResult = cx::Transform3D::Identity();
 	for (unsigned i = 0; i < transform->GetNumberOfParameters(); ++i)
 		mResult(i, 3) = transform->GetParameters()[i];
 
@@ -236,30 +236,30 @@ namespace cx
  * @param ok
  * @return
  */
-ssc::Transform3D LandmarkTranslationRegistration::registerPoints(std::vector<ssc::Vector3D> ref,
-				std::vector<ssc::Vector3D> target, bool* ok)
+Transform3D LandmarkTranslationRegistration::registerPoints(std::vector<Vector3D> ref,
+				std::vector<Vector3D> target, bool* ok)
 {
 	if (ref.size() != target.size() || ref.size() == 0)
 	{
 		std::cout << "Different sizes in ref and target: aborting registration." << std::endl;
 		*ok = false;
-		return ssc::Transform3D::Identity();
+		return Transform3D::Identity();
 	}
 
 	// ad-hoc solution for one and two points: itk doesn't handle this for some reason.
 	if (ref.size() == 1)
 	{
-		ssc::Vector3D t = ref[0] - target[0];
+		Vector3D t = ref[0] - target[0];
 		*ok = true;
-		return ssc::createTransformTranslate(t);
+		return createTransformTranslate(t);
 	}
 	if (ref.size() == 2)
 	{
-		ssc::Vector3D rr = (ref[0] + ref[1]) / 2.0;
-		ssc::Vector3D tt = (target[0] + target[1]) / 2.0;
-		ssc::Vector3D t = rr - tt;
+		Vector3D rr = (ref[0] + ref[1]) / 2.0;
+		Vector3D tt = (target[0] + target[1]) / 2.0;
+		Vector3D t = rr - tt;
 		*ok = true;
-		return ssc::createTransformTranslate(t);
+		return createTransformTranslate(t);
 	}
 
 	LandmarkTranslation registrator;

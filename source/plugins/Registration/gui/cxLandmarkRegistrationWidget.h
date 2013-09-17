@@ -62,17 +62,17 @@ protected:
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
 	virtual void hideEvent(QHideEvent* event);
     virtual void prePaintEvent(); ///< populates the table widget
-	virtual ssc::LandmarkMap getTargetLandmarks() const = 0;
+	virtual LandmarkMap getTargetLandmarks() const = 0;
 	virtual void performRegistration() = 0;
-	virtual ssc::Transform3D getTargetTransform() const = 0; ///< Return transform from target space to reference space
-	virtual void setTargetLandmark(QString uid, ssc::Vector3D p_target) = 0;
+	virtual Transform3D getTargetTransform() const = 0; ///< Return transform from target space to reference space
+	virtual void setTargetLandmark(QString uid, Vector3D p_target) = 0;
 	virtual QString getTargetName() const = 0;
-	void setManualToolPosition(ssc::Vector3D p_r);
+	void setManualToolPosition(Vector3D p_r);
     QString getNextLandmark();
     void activateLandmark(QString uid);
 
 //	void nextRow(); ///< jump to the next line in the tablewidget, updates active landmark and highlighted row
-	std::vector<ssc::Landmark> getAllLandmarks() const; ///< get all the landmarks from the image and the datamanager
+	std::vector<Landmark> getAllLandmarks() const; ///< get all the landmarks from the image and the datamanager
 	QString getLandmarkName(QString uid);
 	double getAccuracy(QString uid);
 	double getAvarageAccuracy();
@@ -89,7 +89,7 @@ protected:
 
 private:
 	LandmarkRegistrationWidget(); ///< not implemented
-	ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration
+	ImagePtr mCurrentImage; ///< the image currently used in image registration
 };
 
 /**

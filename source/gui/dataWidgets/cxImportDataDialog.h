@@ -33,7 +33,7 @@ private slots:
   void acceptedSlot();
 private:
   void setInitialGuessForParentFrame();
-  ssc::DataPtr mData;
+  DataPtr mData;
   QString mFilename;
   QLabel* mUidLabel;
   QLabel* mNameLabel;

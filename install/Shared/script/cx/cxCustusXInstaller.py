@@ -58,6 +58,12 @@ class CustusXInstaller:
         'location of source code root'
         self.source_path = path      
         
+    def removePreviousJob(self):
+        'remove all stuff from previous run of the installer'
+        shell.rm_r('%s/CustusX' % self.install_root)
+        shell.rm_r('%s/CustusX*.%s' % (self.installer_path, self._getInstallerPackageSuffix()))
+        shell.removeTree('%s/temp/Install' % self.root_dir)
+        
     def createReleaseFolder(self):
         '''
         Create a folder containing all the files required for a Release.
@@ -124,9 +130,9 @@ class CustusXInstaller:
             self._copyFolder('%s/install/Linux/script/NVIDIA' % self.source_path, targetPath)
             self._copyFolder('%s/install/Linux/script/vga2usb' % self.source_path, targetPath)
             self._copyFile('%s/install/Linux/script/programmer_setup.sh' % self.source_path, targetPath)
-            self._copyFile('%s/install/Linux/script/NDIToolBox_install.sh ' % self.source_path, targetPath)
+            self._copyFile('%s/install/Linux/script/NDIToolBox_install.sh' % self.source_path, targetPath)
             if linux_distro == 'Ubuntu':
-                self._copyFile('%s/install/Linux/script/ubuntu_install_readme.sh' % self.source_path, targetPath)
+                self._copyFile('%s/install/Linux/script/ubuntu_install_readme.txt' % self.source_path, targetPath)
                 self._copyFile('%s/install/Linux/script/ubuntu_ndi_setup.sh' % self.source_path, targetPath)
                 self._copyFile('%s/install/Linux/script/ubuntu_epiphan_setup.sh' % self.source_path, targetPath)
                 self._copyFile('%s/install/Linux/script/ubuntu_install_packages.sh' % self.source_path, targetPath)
@@ -175,8 +181,7 @@ class CustusXInstaller:
             # return name + platform.mac_ver() ??
             return 'Apple'
         elif platform.system() == 'Linux':
-            return name
-            # return name + platform.linux_distribution()[0] ??
+            return platform.linux_distribution()[0]
         else:
             return platform.system()
         

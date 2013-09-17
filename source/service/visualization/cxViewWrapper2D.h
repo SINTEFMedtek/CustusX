@@ -33,7 +33,7 @@
 class QMouseEvent;
 class QWheelEvent;
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class OrientationAnnotationSmartRep> OrientationAnnotationSmartRepPtr;
 }
@@ -55,13 +55,13 @@ class ViewWrapper2D: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapper2D(ssc::ViewWidget* view);
+	ViewWrapper2D(ViewWidget* view);
 	virtual ~ViewWrapper2D();
-	virtual void initializePlane(ssc::PLANE_TYPE plane);
-	virtual ssc::ViewWidget* getView();
+	virtual void initializePlane(PLANE_TYPE plane);
+	virtual ViewWidget* getView();
 	virtual void setZoom2D(SyncedValuePtr value);
 	virtual void setOrientationMode(SyncedValuePtr value);
-	virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy);
+	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy);
 	virtual void setViewGroup(ViewGroupDataPtr group);
 
 	static bool overlayIsEnabled();
@@ -87,48 +87,48 @@ private:
 
 	virtual void appendToContextMenu(QMenu& contextMenu);
 	void addReps();
-	ssc::DoubleBoundingBox3D getViewport() const;
-	ssc::Transform3D get_vpMs() const;
-	ssc::Vector3D qvp2vp(QPoint pos_qvp);
-	void setAxisPos(ssc::Vector3D click_vp);
-	void shiftAxisPos(ssc::Vector3D delta_vp);
+	DoubleBoundingBox3D getViewport() const;
+	Transform3D get_vpMs() const;
+	Vector3D qvp2vp(QPoint pos_qvp);
+	void setAxisPos(Vector3D click_vp);
+	void shiftAxisPos(Vector3D delta_vp);
 
-	ssc::ORIENTATION_TYPE getOrientationType() const;
-	void changeOrientationType(ssc::ORIENTATION_TYPE type);
+	ORIENTATION_TYPE getOrientationType() const;
+	void changeOrientationType(ORIENTATION_TYPE type);
 
-	ssc::Vector3D displayToWorld(ssc::Vector3D p_d) const;
-	ssc::Vector3D viewToDisplay(ssc::Vector3D p_v) const;
+	Vector3D displayToWorld(Vector3D p_d) const;
+	Vector3D viewToDisplay(Vector3D p_v) const;
 
-	virtual void imageAdded(ssc::ImagePtr image);
-	virtual void meshAdded(ssc::MeshPtr mesh);
+	virtual void imageAdded(ImagePtr image);
+	virtual void meshAdded(MeshPtr mesh);
 	virtual void imageRemoved(const QString& uid);
 	virtual void meshRemoved(const QString& uid);
-	virtual void pointMetricAdded(ssc::PointMetricPtr mesh);
+	virtual void pointMetricAdded(PointMetricPtr mesh);
 	virtual void pointMetricRemoved(const QString& uid);
 
-	virtual void dataAdded(ssc::DataPtr data);
+	virtual void dataAdded(DataPtr data);
 	virtual void dataRemoved(const QString& uid);
 
 	void resetMultiSlicer();
-	ssc::Texture3DSlicerRepPtr mMultiSliceRep;
+	Texture3DSlicerRepPtr mMultiSliceRep;
 
-	ssc::GeometricRep2DPtr mPickerGlyphRep;
-	ssc::SliceProxyPtr mSliceProxy;
-	ssc::SliceRepSWPtr mSliceRep;
-	std::map<QString, ssc::GeometricRep2DPtr> mGeometricRep;
-	std::map<QString, ssc::PointMetricRep2DPtr> mPointMetricRep;
-	ssc::ToolRep2DPtr mToolRep2D;
-//  ssc::OrientationAnnotationSmartRepPtr mOrientationAnnotationRep;
-	ssc::OrientationAnnotationSmartRepPtr mOrientationAnnotationRep;
-	ssc::DisplayTextRepPtr mPlaneTypeText;
-	ssc::DisplayTextRepPtr mDataNameText;
-	ssc::SlicePlanes3DMarkerIn2DRepPtr mSlicePlanes3DMarker;
-	QPointer<ssc::ViewWidget> mView;
+	GeometricRep2DPtr mPickerGlyphRep;
+	SliceProxyPtr mSliceProxy;
+	SliceRepSWPtr mSliceRep;
+	std::map<QString, GeometricRep2DPtr> mGeometricRep;
+	std::map<QString, PointMetricRep2DPtr> mPointMetricRep;
+	ToolRep2DPtr mToolRep2D;
+//  OrientationAnnotationSmartRepPtr mOrientationAnnotationRep;
+	OrientationAnnotationSmartRepPtr mOrientationAnnotationRep;
+	DisplayTextRepPtr mPlaneTypeText;
+	DisplayTextRepPtr mDataNameText;
+	SlicePlanes3DMarkerIn2DRepPtr mSlicePlanes3DMarker;
+	QPointer<ViewWidget> mView;
 
 	// sunchronized data
 	SyncedValuePtr mZoom2D;
 	SyncedValuePtr mOrientationMode;
-	ssc::Vector3D mClickPos;
+	Vector3D mClickPos;
 
 	QActionGroup* mOrientationActionGroup;
 

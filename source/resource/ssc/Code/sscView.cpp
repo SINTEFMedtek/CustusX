@@ -50,7 +50,7 @@
  after including AssertMacros.h
  */
 
-namespace ssc
+namespace cx
 {
 
 // set zoom to negative value to signify invalid
@@ -350,7 +350,7 @@ double View::getZoomFactor() const
 	return mZoomFactor;
 }
 
-ssc::DoubleBoundingBox3D View::getViewport_s() const
+DoubleBoundingBox3D View::getViewport_s() const
 {
 	return transform(this->get_vpMs().inv(), this->getViewport());
 }
@@ -367,9 +367,9 @@ Transform3D View::get_vpMs() const
 
 /**return the pixel viewport.
  */
-ssc::DoubleBoundingBox3D View::getViewport() const
+DoubleBoundingBox3D View::getViewport() const
 {
-	return ssc::DoubleBoundingBox3D(0, mSize.width(), 0, mSize.height(), 0, 0);
+	return DoubleBoundingBox3D(0, mSize.width(), 0, mSize.height(), 0, 0);
 }
 
 double View::mmPerPix() const
@@ -381,4 +381,4 @@ double View::mmPerPix() const
 	return retval;
 }
 
-} // namespace ssc
+} // namespace cx

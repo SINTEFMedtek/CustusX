@@ -2,7 +2,7 @@
 #include <math.h>
 #include "sscUtilHelpers.h"
 
-namespace ssc
+namespace cx
 {
 
 DecomposedTransform3D::DecomposedTransform3D()
@@ -14,7 +14,7 @@ DecomposedTransform3D::DecomposedTransform3D()
 
 DecomposedTransform3D::DecomposedTransform3D(Transform3D m)
 {
-	ssc::Frame3D frame = Frame3D::create(m);
+	Frame3D frame = Frame3D::create(m);
 	mAngle = frame.getEulerXYZ();
 	mPos = frame.mPos;
 	frame.mPos = Vector3D(0, 0, 0);
@@ -97,7 +97,7 @@ Frame3D::~Frame3D()
 {
 }
 
-ssc::Vector3D Frame3D::getEulerXYZ() const
+Vector3D Frame3D::getEulerXYZ() const
 {
 	Transform3D t;
 	t = mAngleAxis;
@@ -105,7 +105,7 @@ ssc::Vector3D Frame3D::getEulerXYZ() const
 	return ea;
 }
 
-void Frame3D::setEulerXYZ(const ssc::Vector3D& xyz)
+void Frame3D::setEulerXYZ(const Vector3D& xyz)
 {
 	mAngleAxis = Eigen::AngleAxisd(xyz[0], Vector3D::UnitX()) * Eigen::AngleAxisd(xyz[1], Vector3D::UnitY())
 		* Eigen::AngleAxisd(xyz[2], Vector3D::UnitZ());
@@ -168,7 +168,7 @@ boost::array<double, 6> Frame3D::getCompactAxisAngleRep() const
 
 Frame3D Frame3D::fromCompactAxisAngleRep(const boost::array<double, 6>& rep)
 {
-	ssc::Frame3D retval;
+	Frame3D retval;
 
 	retval.mAngleAxis = Eigen::AngleAxisd(rep[2], unitVector(rep[0], rep[1]));
 	retval.mPos = Vector3D(rep[3], rep[4], rep[5]);
@@ -176,6 +176,6 @@ Frame3D Frame3D::fromCompactAxisAngleRep(const boost::array<double, 6>& rep)
 	return retval;
 }
 
-} // namespace ssc
+} // namespace cx
 // --------------------------------------------------------
 

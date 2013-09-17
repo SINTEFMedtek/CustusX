@@ -28,13 +28,13 @@
 #include "sscStringDataAdapter.h"
 #include "sscOptimizedUpdateWidget.h"
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Composite widget for string selection.
  *
  * Consists of <namelabel, combobox>.
- * Insert a subclass of ssc::StringDataAdStringDataAdapter to connect to data.
+ * Insert a subclass of StringDataAdStringDataAdapter to connect to data.
  *
  * \ingroup sscWidget
  */
@@ -53,6 +53,6 @@ private:
 	StringDataAdapterPtr mData;
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif /* SSCLABELCOMBOBOXWIDGET_H_ */

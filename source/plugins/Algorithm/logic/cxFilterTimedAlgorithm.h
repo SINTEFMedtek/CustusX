@@ -46,8 +46,8 @@ private:
 	virtual bool calculate();
 
 	//  QString       mOutputBasePath;
-	//  std::vector<ssc::DataPtr> mInput;
-	//  std::vector<ssc::DataPtr> mOutput;
+	//  std::vector<DataPtr> mInput;
+	//  std::vector<DataPtr> mOutput;
 	//  QDomElement mOptions;
 	FilterPtr mFilter;
 };

@@ -5,7 +5,7 @@
 #include <QString>
 #include "sscConfig.h"
 
-namespace ssc
+namespace cx
 {
 
 /**
@@ -38,6 +38,6 @@ QString TestUtilities::ExpandDataFileName(QString fileName)
  * \}
  */
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCTESTUTILITIES_H_*/

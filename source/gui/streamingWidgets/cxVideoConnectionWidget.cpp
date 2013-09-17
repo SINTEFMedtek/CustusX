@@ -62,11 +62,11 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 
 	mToptopLayout = new QVBoxLayout(this);
 	mToptopLayout->addLayout(initScriptLayout);
-	mToptopLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mConnectionSelector));
+	mToptopLayout->addWidget(new LabeledComboBoxWidget(this, mConnectionSelector));
 	mToptopLayout->addWidget(frame);
 	mToptopLayout->addWidget(mConnectButton);
 	mToptopLayout->addWidget(mImportStreamImageButton);
-	mToptopLayout->addWidget(createDataWidget(this, mActiveVideoSourceSelector));
+	mToptopLayout->addWidget(sscCreateDataWidget(this, mActiveVideoSourceSelector));
 	mToptopLayout->addStretch();
 
 	this->selectGuiForConnectionMethodSlot();
@@ -79,7 +79,7 @@ QHBoxLayout* VideoConnectionWidget::initializeScriptWidget()
 {
 	QHBoxLayout* initScriptLayout = new QHBoxLayout();
 	initScriptLayout->addWidget(new QLabel("Init script", this));
-	mInitScriptWidget = new ssc::FileSelectWidget(this);
+	mInitScriptWidget = new FileSelectWidget(this);
 	QString path = QDir::cleanPath(DataLocations::getBundlePath() + "/" + getVideoConnectionManager()->getInitScript());
 	QStringList nameFilters;
 	nameFilters << "*.*";
@@ -94,7 +94,7 @@ QHBoxLayout* VideoConnectionWidget::initializeScriptWidget()
 	return initScriptLayout;
 }
 
-ssc::StringDataAdapterXmlPtr VideoConnectionWidget::initializeConnectionSelector()
+StringDataAdapterXmlPtr VideoConnectionWidget::initializeConnectionSelector()
 {
 	return this->getVideoConnectionManager()->getConnectionMethod();
 }
@@ -378,17 +378,17 @@ void VideoConnectionWidget::importStreamImageSlot()
 {
 	if (!this->getVideoConnectionManager())
 	{
-		ssc::messageManager()->sendWarning("No video connection");
+		messageManager()->sendWarning("No video connection");
 		return;
 	}
 	if (!this->getVideoConnectionManager()->isConnected())
 	{
-		ssc::messageManager()->sendWarning("Video is not connected");
+		messageManager()->sendWarning("Video is not connected");
 		return;
 	}
-	ssc::Transform3D rMd = ssc::Transform3D::Identity();
-	ssc::ToolPtr probe = ToolManager::getInstance()->findFirstProbe();
-	ssc::VideoSourcePtr videoSource;
+	Transform3D rMd = Transform3D::Identity();
+	ToolPtr probe = cxToolManager::getInstance()->findFirstProbe();
+	VideoSourcePtr videoSource;
 	if (probe)
 	{
 		videoSource = probe->getProbe()->getRTSource();
@@ -399,12 +399,12 @@ void VideoConnectionWidget::importStreamImageSlot()
 
 	if (!videoSource)
 	{
-		ssc::messageManager()->sendWarning("No Video data source");
+		messageManager()->sendWarning("No Video data source");
 		return;
 	}
 	if (!videoSource->validData())
 	{
-		ssc::messageManager()->sendWarning("No valid video data");
+		messageManager()->sendWarning("No valid video data");
 		return;
 	}
 
@@ -412,7 +412,7 @@ void VideoConnectionWidget::importStreamImageSlot()
 	input = videoSource->getVtkImageData();
 	if (!input)
 	{
-		ssc::messageManager()->sendWarning("No Video data");
+		messageManager()->sendWarning("No Video data");
 		return;
 	}
 	QString filename = generateFilename(videoSource);
@@ -421,23 +421,23 @@ void VideoConnectionWidget::importStreamImageSlot()
 
 }
 
-ssc::Transform3D VideoConnectionWidget::calculate_rMd_ForAProbeImage(ssc::ToolPtr probe)
+Transform3D VideoConnectionWidget::calculate_rMd_ForAProbeImage(ToolPtr probe)
 {
-	ssc::Transform3D rMd = ssc::Transform3D::Identity();
-	ssc::Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
-	ssc::Transform3D prMt = probe->get_prMt();
-	ssc::Transform3D tMu = probe->getProbe()->getSector()->get_tMu();
-	ssc::Transform3D uMv = probe->getProbe()->getSector()->get_uMv();
+	Transform3D rMd = Transform3D::Identity();
+	Transform3D rMpr = *cxToolManager::getInstance()->get_rMpr();
+	Transform3D prMt = probe->get_prMt();
+	Transform3D tMu = probe->getProbe()->getSector()->get_tMu();
+	Transform3D uMv = probe->getProbe()->getSector()->get_uMv();
 	rMd = rMpr * prMt * tMu * uMv;
 	return rMd;
 }
 
-QString VideoConnectionWidget::generateFilename(ssc::VideoSourcePtr videoSource)
+QString VideoConnectionWidget::generateFilename(VideoSourcePtr videoSource)
 {
 	vtkImageDataPtr input = videoSource->getVtkImageData();
 	int* extent = input->GetExtent();
 	QString filename;
-	QString format = ssc::timestampSecondsFormat();
+	QString format = timestampSecondsFormat();
 	if (extent[5] - extent[4] > 0)
 		filename = "3DRTSnapshot_";
 	else
@@ -447,17 +447,17 @@ QString VideoConnectionWidget::generateFilename(ssc::VideoSourcePtr videoSource)
 	return filename;
 }
 
-void VideoConnectionWidget::saveAndImportSnapshot(vtkImageDataPtr input, QString filename, ssc::Transform3D rMd)
+void VideoConnectionWidget::saveAndImportSnapshot(vtkImageDataPtr input, QString filename, Transform3D rMd)
 {
 	vtkImageDataPtr copiedImage = vtkImageDataPtr::New();
 	copiedImage->DeepCopy(input);
-	ssc::ImagePtr output = ssc::dataManager()->createImage(copiedImage, filename, filename);
+	ImagePtr output = dataManager()->createImage(copiedImage, filename, filename);
 	output->get_rMd_History()->setRegistration(rMd);
 	QString folder = patientService()->getPatientData()->getActivePatientFolder();
-	ssc::dataManager()->loadData(output);
-	ssc::dataManager()->saveImage(output, folder);
+	dataManager()->loadData(output);
+	dataManager()->saveImage(output, folder);
 	viewManager()->autoShowData(output);
-	ssc::messageManager()->sendInfo(QString("Saved snapshot %1 from active video source").arg(output->getName()));
+	messageManager()->sendInfo(QString("Saved snapshot %1 from active video source").arg(output->getName()));
 }
 
 } //end namespace cx

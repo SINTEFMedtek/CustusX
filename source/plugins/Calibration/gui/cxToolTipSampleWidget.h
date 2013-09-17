@@ -45,7 +45,7 @@ private slots:
   void coordinateSystemChanged();
 
 private:
-  ssc::CoordinateSystem getSelectedCoordinateSystem();
+  CoordinateSystem getSelectedCoordinateSystem();
 
   QPushButton* mSampleButton;
   QLabel*      mSaveToFileNameLabel;
@@ -53,9 +53,9 @@ private:
   SelectCoordinateSystemStringDataAdapterPtr mCoordinateSystems;
   SelectToolStringDataAdapterPtr mTools;
   SelectDataStringDataAdapterPtr mData;
-  ssc::LabeledComboBoxWidget* mCoordinateSystemComboBox;
-  ssc::LabeledComboBoxWidget* mToolComboBox;
-  ssc::LabeledComboBoxWidget* mDataComboBox;
+  LabeledComboBoxWidget* mCoordinateSystemComboBox;
+  LabeledComboBoxWidget* mToolComboBox;
+  LabeledComboBoxWidget* mDataComboBox;
   bool mTruncateFile;
 };
 

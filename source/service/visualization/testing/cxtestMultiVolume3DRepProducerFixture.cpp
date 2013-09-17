@@ -20,21 +20,21 @@ namespace cxtest
 
 MultiVolume3DRepProducerFixture::MultiVolume3DRepProducerFixture()
 {
-	ssc::MessageManager::initialize();
+	cx::MessageManager::initialize();
 }
 
 MultiVolume3DRepProducerFixture::~MultiVolume3DRepProducerFixture()
 {
-	ssc::MessageManager::shutdown();
+	cx::MessageManager::shutdown();
 }
 
 void MultiVolume3DRepProducerFixture::initializeVisualizerAndImages(QString type, int imageCount)
 {
-//	mBase.setView(new ssc::ViewWidget());
+//	mBase.setView(new ViewWidget());
 	mBase.setVisualizerType(type);
 	for (unsigned i=0; i<imageCount; ++i)
 	{
-		ssc::ImagePtr image = cxtest::Utilities::create3DImage();
+		cx::ImagePtr image = cxtest::Utilities::create3DImage();
 		mBase.addImage(image);
 		mImages.push_back(image);
 	}

@@ -25,7 +25,7 @@
 #include "sscTransform3D.h"
 #include "vtkForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class AxesRep> AxesRepPtr;
 typedef boost::shared_ptr<class GraphicalAxes3D> GraphicalAxes3DPtr;
@@ -45,7 +45,7 @@ public:
 
 	static AxesRepPtr New(const QString& uid);
 
-	virtual QString getType() const { return "ssc::AxesRep"; }
+	virtual QString getType() const { return "AxesRep"; }
 	void setTransform(Transform3D rMt);
 	void setFontSize(double size);
 	void setAxisLength(double length);
@@ -60,6 +60,6 @@ protected:
     GraphicalAxes3DPtr mAxes;
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCAXESREP_H_*/

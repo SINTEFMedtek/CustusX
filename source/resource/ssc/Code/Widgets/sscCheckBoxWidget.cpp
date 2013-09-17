@@ -28,10 +28,10 @@
 #include <QGridLayout>
 #include "sscHelperWidgets.h"
 
-namespace ssc
+namespace cx
 {
 
-CheckBoxWidget::CheckBoxWidget(QWidget* parent, ssc::BoolDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) :
+CheckBoxWidget::CheckBoxWidget(QWidget* parent, BoolDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) :
     OptimizedUpdateWidget(parent)
 {
 	this->setEnabled(dataInterface->getEnabled());

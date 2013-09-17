@@ -37,7 +37,7 @@ bool FileWatcherWidget::internalOpenNewFile(const QString absoluteFilePath)
 
   if(!mCurrentFile->open(QIODevice::ReadOnly))
   {
-    ssc::messageManager()->sendWarning("Could not open file "+absoluteFilePath);
+    messageManager()->sendWarning("Could not open file "+absoluteFilePath);
     //return false; Is this missing???
   }
   return true;

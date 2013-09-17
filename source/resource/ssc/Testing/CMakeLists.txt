@@ -17,8 +17,8 @@ if (BUILD_TESTING)
     include_directories( /opt/local/include )
     
     # test starting the data manager 
-    # - ssc::Image
-    # - ssc::DataManager 
+    # - Image
+    # - DataManager 
     add_executable(TestDataManager sscTestDataManager.cpp)
     target_link_libraries( TestDataManager SSC )	
     set_target_properties(TestDataManager PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
@@ -26,8 +26,8 @@ if (BUILD_TESTING)
 	#SETUP_TARGET_FOR_COVERAGE(CoverageTestDataManager TestDataManager CoverageTestDataManager.xml)
     
 	# test rendering of a 3D volume
-	# - ssc::View
-	# - ssc::ProgressiveLODVolumetricRep
+	# - View
+	# - ProgressiveLODVolumetricRep
     # only working on Linux:
     if(NOT APPLE)
 		add_executable(TestVolumetricRep sscTestRenderVolumetricRep.cpp)
@@ -37,7 +37,7 @@ if (BUILD_TESTING)
     endif()
     
     # test adding a mesh to the datamanager.
-    # - ssc::Mesh
+    # - Mesh
     add_executable(TestMeshAndDataManager sscTestMeshAndDataManager.cpp)
     target_link_libraries( TestMeshAndDataManager SSC )	
     set_target_properties(TestMeshAndDataManager PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
@@ -50,8 +50,8 @@ if (BUILD_TESTING)
     #add_test(TestMeshDMGeoRepView TestMeshDMGeoRepView)
     
     # test fiber bundle rep
-    # - ssc::FiberBundle
-    # - ssc::FiberBundleRep
+    # - FiberBundle
+    # - FiberBundleRep
     add_executable(TestFiberBundleRep sscTestFiberBundleRep.cpp)
     target_link_libraries( TestFiberBundleRep SSC )	
     set_target_properties(TestFiberBundleRep PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")

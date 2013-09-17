@@ -69,9 +69,9 @@ private:
 	QPushButton* mRegisterButton;
 	ElastixManagerPtr mElastixManager;
 
-	ssc::StringDataAdapterPtr mFixedImage;
-	ssc::StringDataAdapterPtr mMovingImage;
-	ssc::FileSelectWidget* mParameterFileWidget0;
+	StringDataAdapterPtr mFixedImage;
+	StringDataAdapterPtr mMovingImage;
+	FileSelectWidget* mParameterFileWidget0;
 	FilePreviewWidget* mFilePreviewWidget;
 	QLineEdit* mExecutableEdit;
 	cx::TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;

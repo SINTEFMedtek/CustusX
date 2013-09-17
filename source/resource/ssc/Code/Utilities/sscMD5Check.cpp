@@ -16,7 +16,7 @@
 #include <openssl/md5.h>
 #include <iostream>
 
-namespace ssc
+namespace cx
 {
 
 /**
@@ -376,7 +376,7 @@ bool CheckMD5InMemory( const char* const pathname, const unsigned char* const da
 #endif
 
 #ifdef WIN32
-namespace ssc
+namespace cx
 {
 //Needed to dynamic linking on Windows
 bool GenerateMD5( const char* const pathname )
@@ -391,6 +391,6 @@ bool CheckMD5InMemory( const char* const pathname, const unsigned char* const da
 {
 	throw "CheckMD5InMemory is not implemented on Windows!";
 }
-} //end namespace ssc
+} //end namespace cx
 #endif
 

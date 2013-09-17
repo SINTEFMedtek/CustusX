@@ -25,7 +25,7 @@
 #include "sscToolManager.h"
 #include "sscSliceComputer.h"
 
-namespace ssc
+namespace cx
 {
 
 SliceProxyPtr SliceProxy::New(const QString& name)
@@ -45,10 +45,10 @@ SliceProxy::SliceProxy() :
 {
 	mAlwaysUseDefaultCenter = false;
 	mUseTooltipOffset = true;
-	connect(ssc::DataManager::getInstance(), SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
+	connect(DataManager::getInstance(), SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
 	connect(dataManager(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
 	//TODO connect to toolmanager rMpr changed
-	mDefaultCenter = ssc::DataManager::getInstance()->getCenter();
+	mDefaultCenter = DataManager::getInstance()->getCenter();
 	this->centerChangedSlot();
 }
 
@@ -87,7 +87,7 @@ void SliceProxy::setTool(ToolPtr tool)
 void SliceProxy::toolTransformAndTimestampSlot(Transform3D prMt, double timestamp)
 {
 	//std::cout << "proxy get transform" << std::endl;
-	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
 	Transform3D rMt = rMpr*prMt;
 //	if (similar(rMt, mCutplane->getToolPosition()))
 //	{
@@ -153,7 +153,7 @@ void SliceProxy::centerChangedSlot()
 	}
 	else if (mTool)
 	{
-		Vector3D c = ssc::DataManager::getInstance()->getCenter();
+		Vector3D c = DataManager::getInstance()->getCenter();
 		mCutplane->setFixedCenter(c);
 		//std::cout << "center changed: " + string_cast(c) << std::endl;
 	}
@@ -186,13 +186,13 @@ void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Ve
 //	//Logger::log("vm.log"," set plane to proxy ");
 //	if (plane == ptSAGITTAL || plane == ptCORONAL || plane == ptAXIAL )
 //	{
-//		setOrientation(ssc::otORTHOGONAL);
-//		setFollowType(ssc::ftFIXED_CENTER);
+//		setOrientation(otORTHOGONAL);
+//		setFollowType(ftFIXED_CENTER);
 //	}
 //	else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE)
 //	{
-//		setOrientation(ssc::otOBLIQUE);
-//		setFollowType(ssc::ftFOLLOW_TOOL);
+//		setOrientation(otOBLIQUE);
+//		setFollowType(ftFOLLOW_TOOL);
 //
 //		setGravity(useGravity, gravityDir);
 //		setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset); // TODO finish this one
@@ -271,4 +271,4 @@ void SliceProxy::printSelf(std::ostream & os, Indent indent)
 	os << std::endl;
 }
 
-} // namespace ssc
+} // namespace cx

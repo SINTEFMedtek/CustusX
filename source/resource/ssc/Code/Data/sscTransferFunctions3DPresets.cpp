@@ -31,16 +31,16 @@
 #include "sscImageLUT2D.h"
 #include <sscImageTFData.h>
 
-namespace ssc
+namespace cx
 {
 
-TransferFunctions3DPresets::TransferFunctions3DPresets(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile) :
+TransferFunctions3DPresets::TransferFunctions3DPresets(XmlOptionFile presetFile, XmlOptionFile customFile) :
 		Presets(presetFile, customFile)
 {
 //	mPresetFile = presetFile;
 //	mCustomFile = customFile;
 
-	//mPresetFile = ssc::XmlOptionFile(DataLocations::getRootConfigPath()+"/transferFunctions/presets.xml", "transferFunctions"); ///< create from filename, create trivial document of type name and root node if no file exists.
+	//mPresetFile = XmlOptionFile(DataLocations::getRootConfigPath()+"/transferFunctions/presets.xml", "transferFunctions"); ///< create from filename, create trivial document of type name and root node if no file exists.
 }
 
 //QStringList TransferFunctions3DPresets::getPresetList(QString modality)
@@ -48,13 +48,13 @@ TransferFunctions3DPresets::TransferFunctions3DPresets(ssc::XmlOptionFile preset
 //	return this->generatePresetList(modality);
 //}
 
-//ssc::XmlOptionFile TransferFunctions3DPresets::getCustomFile()
+//XmlOptionFile TransferFunctions3DPresets::getCustomFile()
 //{
 //	return mCustomFile;
-//	//	return ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(),"CustusX").descend("presetTransferFunctions");
+//	//	return XmlOptionFile(DataLocations::getXmlSettingsFile(),"CustusX").descend("presetTransferFunctions");
 //}
 
-void TransferFunctions3DPresets::save(QString name, ssc::ImagePtr image, bool _2D, bool _3D)
+void TransferFunctions3DPresets::save(QString name, ImagePtr image, bool _2D, bool _3D)
 {
 	if (_2D)
 		this->save2D(name, image);
@@ -63,19 +63,19 @@ void TransferFunctions3DPresets::save(QString name, ssc::ImagePtr image, bool _2
 }
 
 
-void TransferFunctions3DPresets::save2D(QString name, ssc::ImagePtr image)
+void TransferFunctions3DPresets::save2D(QString name, ImagePtr image)
 {
-	ssc::XmlOptionFile file = this->getCustomFile();
+	XmlOptionFile file = this->getCustomFile();
 	file = file.descend("Preset", "name", name);
 
 	//TODO
-//	ssc::XmlOptionFile file = Presets::saveCustom(name);
+//	XmlOptionFile file = Presets::saveCustom(name);
 
 	QDomNode tf2DNode = file.getElement("lookuptable2D");
 	while (tf2DNode.hasChildNodes())
 		tf2DNode.removeChild(tf2DNode.firstChild());
 
-	ssc::ImageLUT2DPtr LUT2D = image->getLookupTable2D();
+	ImageLUT2DPtr LUT2D = image->getLookupTable2D();
 
 	// For unsigned CT: Modify transfer function values temporarily prior to save
 	if ((0 <= image->getMin()) && ("CT" == image->getModality()))
@@ -97,17 +97,17 @@ void TransferFunctions3DPresets::save2D(QString name, ssc::ImagePtr image)
 //	emit changed();
 }
 
-void TransferFunctions3DPresets::save3D(QString name, ssc::ImagePtr image)
+void TransferFunctions3DPresets::save3D(QString name, ImagePtr image)
 {
 	//create the node to be saved
-	ssc::XmlOptionFile file = this->getCustomFile();
+	XmlOptionFile file = this->getCustomFile();
 	file = file.descend("Preset", "name", name);
 
 	QDomNode tf3DNode = file.getElement("transferfunctions");
 	while (tf3DNode.hasChildNodes())
 		tf3DNode.removeChild(tf3DNode.firstChild());
 
-	ssc::ImageTF3DPtr transferFunctions = image->getTransferFunctions3D();
+	ImageTF3DPtr transferFunctions = image->getTransferFunctions3D();
 
 	// For unsigned CT: Modify transfer function values temporarily prior to save
 	if ((0 <= image->getMin()) && ("CT" == image->getModality()))
@@ -139,10 +139,10 @@ void TransferFunctions3DPresets::save3D(QString name, ssc::ImagePtr image)
 //	children.push_back(shadingElement);
 //	std::map<QString, QString> attributes;
 //	attributes["modality"] = image->getModality();
-//	ssc::XmlOptionFile file = Presets::saveCustom(name, attributes, children);
+//	XmlOptionFile file = Presets::saveCustom(name, attributes, children);
 }
 
-void TransferFunctions3DPresets::load(QString name, ssc::ImagePtr image, bool _2D, bool _3D)
+void TransferFunctions3DPresets::load(QString name, ImagePtr image, bool _2D, bool _3D)
 {
 	if (_2D)
 		this->load2D(name, image);
@@ -150,7 +150,7 @@ void TransferFunctions3DPresets::load(QString name, ssc::ImagePtr image, bool _2
 		this->load3D(name, image);
 }
 
-//void PresetTransferFunctions3D::load(QString name, ssc::ImagePtr image, bool _2D, bool _3D)
+//void PresetTransferFunctions3D::load(QString name, ImagePtr image, bool _2D, bool _3D)
 //{
 //	if (_2D)
 //
@@ -161,14 +161,14 @@ void TransferFunctions3DPresets::load(QString name, ssc::ImagePtr image, bool _2
 //  if(name == "Transfer function preset...")
 //  	return;
 //
-//	ssc::ImageTF3DPtr transferFunctions = image->getTransferFunctions3D();
-//	ssc::ImageLUT2DPtr LUT2D = image->getLookupTable2D();
-//	ssc::XmlOptionFile node = this->getPresetNode(name);
+//	ImageTF3DPtr transferFunctions = image->getTransferFunctions3D();
+//	ImageLUT2DPtr LUT2D = image->getLookupTable2D();
+//	XmlOptionFile node = this->getPresetNode(name);
 //
 //	transferFunctions->parseXml(node.getElement().namedItem("transferfunctions"));
 //	LUT2D->parseXml(node.getElement().namedItem("lookuptable2D"));
 //
-//	ssc::Image::ShadingStruct shading = image->getShading();
+//	Image::ShadingStruct shading = image->getShading();
 //	shading.parseXml(node.getElement().namedItem("shading"));
 //	image->setShading(shading);
 //
@@ -186,13 +186,13 @@ void TransferFunctions3DPresets::load(QString name, ssc::ImagePtr image, bool _2
 ////	emit changed();
 //}
 
-void TransferFunctions3DPresets::load2D(QString name, ssc::ImagePtr image)
+void TransferFunctions3DPresets::load2D(QString name, ImagePtr image)
 {
 	//Make sure transfer functions are reset in case something is missing from the preset
 	image->resetTransferFunctions(true, false);
 
-	ssc::ImageLUT2DPtr LUT2D = image->getLookupTable2D();
-	ssc::XmlOptionFile node = this->getPresetNode(name);
+	ImageLUT2DPtr LUT2D = image->getLookupTable2D();
+	XmlOptionFile node = this->getPresetNode(name);
 
 	LUT2D->parseXml(node.getElement().namedItem("lookuptable2D"));
 
@@ -206,17 +206,17 @@ void TransferFunctions3DPresets::load2D(QString name, ssc::ImagePtr image)
 	LUT2D->fixTransferFunctions();
 }
 
-void TransferFunctions3DPresets::load3D(QString name, ssc::ImagePtr image)
+void TransferFunctions3DPresets::load3D(QString name, ImagePtr image)
 {
 	//Make sure transfer functions are reset in case something is missing from the preset
 	image->resetTransferFunctions(false, true);
 
-	ssc::ImageTF3DPtr transferFunctions = image->getTransferFunctions3D();
-	ssc::XmlOptionFile node = this->getPresetNode(name);
+	ImageTF3DPtr transferFunctions = image->getTransferFunctions3D();
+	XmlOptionFile node = this->getPresetNode(name);
 
 	transferFunctions->parseXml(node.getElement().namedItem("transferfunctions"));
 
-	ssc::Image::ShadingStruct shading = image->getShading();
+	Image::ShadingStruct shading = image->getShading();
 	shading.parseXml(node.getElement().namedItem("shading"));
 	image->setShading(shading);
 
@@ -233,9 +233,9 @@ void TransferFunctions3DPresets::load3D(QString name, ssc::ImagePtr image)
 ///** look for a preset with the given name. Create one if not found.
 // *
 // */
-//ssc::XmlOptionFile TransferFunctions3DPresets::getPresetNode(const QString& presetName)
+//XmlOptionFile TransferFunctions3DPresets::getPresetNode(const QString& presetName)
 //{
-//	ssc::XmlOptionFile retval = mPresetFile;
+//	XmlOptionFile retval = mPresetFile;
 //	retval = retval.tryDescend("Preset", "name", presetName);
 //	if (!retval.getDocument().isNull())
 //		return retval;
@@ -264,7 +264,7 @@ QStringList TransferFunctions3DPresets::generatePresetList(QString modality)
 		}
 	}
 
-	ssc::XmlOptionFile customFile = this->getCustomFile();
+	XmlOptionFile customFile = this->getCustomFile();
 	presetNodeList = customFile.getElement().elementsByTagName("Preset");
 	for (int i = 0; i < presetNodeList.count(); ++i)
 	{
@@ -279,7 +279,7 @@ QStringList TransferFunctions3DPresets::generatePresetList(QString modality)
 
 //bool TransferFunctions3DPresets::isDefaultPreset(QString presetName)
 //{
-//	ssc::XmlOptionFile testval = mPresetFile.tryDescend("Preset", "name", presetName);
+//	XmlOptionFile testval = mPresetFile.tryDescend("Preset", "name", presetName);
 //	if (!testval.getDocument().isNull())
 //		return true;
 //	return false;
@@ -289,7 +289,7 @@ void TransferFunctions3DPresets::deletePresetData(QString name, bool _2D, bool _
 {
 	//todo rewrite
 	std::cout << "TODO rewrite TransferFunctions3DPresets::deletePresetData(QString name, bool _2D, bool _3D)" << std::endl;
-	ssc::XmlOptionFile node = this->getPresetNode(name);
+	XmlOptionFile node = this->getPresetNode(name);
 
 	if (_2D)
 		node.descend("lookuptable2D").deleteNode();

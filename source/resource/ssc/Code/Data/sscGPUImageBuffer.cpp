@@ -46,7 +46,7 @@
 
 #include "sscLogger.h"
 
-namespace ssc
+namespace cx
 {
 
 /**Helper class for sharing volume and lut buffers over several renderings
@@ -504,8 +504,8 @@ public:
 		mVolumeBuffer.setMaxBuffers(12);
 		mLutBuffer.setMaxBuffers(15);
 	}
-	BufferQueue<vtkImageDataPtr, ssc::GPUImageDataBuffer> mVolumeBuffer;
-	BufferQueue<vtkUnsignedCharArrayPtr, ssc::GPUImageLutBuffer> mLutBuffer;
+	BufferQueue<vtkImageDataPtr, GPUImageDataBuffer> mVolumeBuffer;
+	BufferQueue<vtkUnsignedCharArrayPtr, GPUImageLutBuffer> mLutBuffer;
 };
 
 GPUImageBufferRepository::GPUImageBufferRepository()
@@ -554,12 +554,12 @@ int GPUImageBufferRepository::getMemoryUsage(int *textures)
 	return mInternal->mVolumeBuffer.getMemoryUsage(textures);
 }
 
-ssc::GPUImageDataBufferPtr GPUImageBufferRepository::getGPUImageDataBuffer(vtkImageDataPtr volume)
+GPUImageDataBufferPtr GPUImageBufferRepository::getGPUImageDataBuffer(vtkImageDataPtr volume)
 {
 	return mInternal->mVolumeBuffer.get(volume);
 }
 
-ssc::GPUImageLutBufferPtr GPUImageBufferRepository::getGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut)
+GPUImageLutBufferPtr GPUImageBufferRepository::getGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut)
 {
 	return mInternal->mLutBuffer.get(lut);
 }
@@ -568,15 +568,15 @@ ssc::GPUImageLutBufferPtr GPUImageBufferRepository::getGPUImageLutBuffer(vtkUnsi
 
 #else
 
-namespace ssc
+namespace cx
 {
 void GPUImageBufferRepository::shutdown() {;}
 void GPUImageBufferRepository::tearDown() {;}
-}//namespace ssc
+}//namespace cx
 
 #endif //WIN32
 
-namespace ssc
+namespace cx
 {
 
 }

@@ -22,12 +22,12 @@
 #include "sscTypeConversions.h"
 #include "sscLogger.h"
 
-namespace ssc
+namespace cx
 {
 
 ///----------------
 
-LabeledLineEditWidget::LabeledLineEditWidget(QWidget* parent, ssc::StringDataAdapterPtr dataInterface,
+LabeledLineEditWidget::LabeledLineEditWidget(QWidget* parent, StringDataAdapterPtr dataInterface,
 	QGridLayout* gridLayout, int row) :
     OptimizedUpdateWidget(parent)
 {
@@ -76,4 +76,4 @@ void LabeledLineEditWidget::prePaintEvent()
 	mLine->blockSignals(false);
 }
 
-} // namespace ssc
+} // namespace cx

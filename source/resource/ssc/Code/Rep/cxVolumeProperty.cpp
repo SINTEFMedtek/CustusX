@@ -56,7 +56,7 @@ vtkVolumePropertyPtr VolumeProperty::getVolumeProperty()
 	return mVolumeProperty;
 }
 
-void VolumeProperty::setImage(ssc::ImagePtr image)
+void VolumeProperty::setImage(ImagePtr image)
 {
 	if (image==mImage)
 	{

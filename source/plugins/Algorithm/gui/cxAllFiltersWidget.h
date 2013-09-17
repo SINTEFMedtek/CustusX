@@ -34,7 +34,7 @@ private slots:
 private:
 	FilterGroupPtr mFilters;
 	FilterPtr mCurrentFilter;
-	ssc::StringDataAdapterXmlPtr mFilterSelector;
+	StringDataAdapterXmlPtr mFilterSelector;
 	FilterTimedAlgorithmPtr mThread;
 
 	FilterSetupWidget* mSetupWidget;

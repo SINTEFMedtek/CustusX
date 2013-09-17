@@ -63,45 +63,45 @@ QString ContourFilter::getHelp() const
 	        "</html>";
 }
 
-ssc::BoolDataAdapterXmlPtr ContourFilter::getReduceResolutionOption(QDomElement root)
+BoolDataAdapterXmlPtr ContourFilter::getReduceResolutionOption(QDomElement root)
 {
-	return ssc::BoolDataAdapterXml::initialize("Reduce input", "",
+	return BoolDataAdapterXml::initialize("Reduce input", "",
 	                                           "Reduce input volumes resolution by a factor of 2 in all directions.", false, root);
 }
 
-ssc::BoolDataAdapterXmlPtr ContourFilter::getSmoothingOption(QDomElement root)
+BoolDataAdapterXmlPtr ContourFilter::getSmoothingOption(QDomElement root)
 {
-	return ssc::BoolDataAdapterXml::initialize("Smoothing", "",
+	return BoolDataAdapterXml::initialize("Smoothing", "",
 	                                           "Smooth the output contour", true, root);
 }
 
-ssc::BoolDataAdapterXmlPtr ContourFilter::getPreserveTopologyOption(QDomElement root)
+BoolDataAdapterXmlPtr ContourFilter::getPreserveTopologyOption(QDomElement root)
 {
-	return ssc::BoolDataAdapterXml::initialize("Preserve mesh topology", "",
+	return BoolDataAdapterXml::initialize("Preserve mesh topology", "",
 	                                           "Preserve mesh topology during reduction", true, root);
 }
 
-ssc::DoubleDataAdapterXmlPtr ContourFilter::getSurfaceThresholdOption(QDomElement root)
+DoubleDataAdapterXmlPtr ContourFilter::getSurfaceThresholdOption(QDomElement root)
 {
-	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Threshold", "",
+	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Threshold", "",
 	                                                                            "Values from this threshold and above will be included",
-	                                                                            100.0, ssc::DoubleRange(-1000, 1000, 1), 0, root);
+	                                                                            100.0, DoubleRange(-1000, 1000, 1), 0, root);
 	retval->setAddSlider(true);
 	return retval;
 }
 
-ssc::DoubleDataAdapterXmlPtr ContourFilter::getDecimationOption(QDomElement root)
+DoubleDataAdapterXmlPtr ContourFilter::getDecimationOption(QDomElement root)
 {
-	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Decimation %", "",
+	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Decimation %", "",
 	                                                                            "Reduce number of triangles in output surface",
-	                                                                            0.2, ssc::DoubleRange(0, 1, 0.01), 0, root);
+	                                                                            0.2, DoubleRange(0, 1, 0.01), 0, root);
 	retval->setInternal2Display(100);
 	return retval;
 }
 
-ssc::ColorDataAdapterXmlPtr ContourFilter::getColorOption(QDomElement root)
+ColorDataAdapterXmlPtr ContourFilter::getColorOption(QDomElement root)
 {
-	return ssc::ColorDataAdapterXml::initialize("Color", "",
+	return ColorDataAdapterXml::initialize("Color", "",
 	                                            "Color of output model.",
 	                                            QColor("green"), root);
 }
@@ -153,7 +153,7 @@ void ContourFilter::setActive(bool on)
 
 void ContourFilter::imageChangedSlot(QString uid)
 {
-	ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
+	ImagePtr image = dataManager()->getImage(uid);
 	if(!image)
 		return;
 
@@ -173,7 +173,7 @@ void ContourFilter::thresholdSlot()
 	//    std::cout << "ContourFilter::thresholdSlot() " << mActive << std::endl;
 	if (mActive)
 	{
-		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(mInputTypes[0]->getData());
+		ImagePtr image = boost::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
 		RepManager::getInstance()->getThresholdPreview()->setPreview(image, mSurfaceThresholdOption->getValue());
 	}
 }
@@ -186,19 +186,19 @@ bool ContourFilter::preProcess()
 
 bool ContourFilter::execute()
 {
-	ssc::ImagePtr input = this->getCopiedInputImage();
+	ImagePtr input = this->getCopiedInputImage();
 	if (!input)
 		return false;
 
 	//    std::cout << "ContourFilter::execute : " << mCopiedOptions.ownerDocument().toString() << std::endl;
 
-	ssc::BoolDataAdapterXmlPtr reduceResolutionOption = this->getReduceResolutionOption(mCopiedOptions);
-	ssc::BoolDataAdapterXmlPtr smoothingOption = this->getSmoothingOption(mCopiedOptions);
-	ssc::BoolDataAdapterXmlPtr preserveTopologyOption = this->getPreserveTopologyOption(mCopiedOptions);
-	ssc::DoubleDataAdapterXmlPtr surfaceThresholdOption = this->getSurfaceThresholdOption(mCopiedOptions);
-	ssc::DoubleDataAdapterXmlPtr decimationOption = this->getDecimationOption(mCopiedOptions);
+	BoolDataAdapterXmlPtr reduceResolutionOption = this->getReduceResolutionOption(mCopiedOptions);
+	BoolDataAdapterXmlPtr smoothingOption = this->getSmoothingOption(mCopiedOptions);
+	BoolDataAdapterXmlPtr preserveTopologyOption = this->getPreserveTopologyOption(mCopiedOptions);
+	DoubleDataAdapterXmlPtr surfaceThresholdOption = this->getSurfaceThresholdOption(mCopiedOptions);
+	DoubleDataAdapterXmlPtr decimationOption = this->getDecimationOption(mCopiedOptions);
 
-	//    ssc::messageManager()->sendInfo(QString("Creating contour from \"%1\"...").arg(input->getName()));
+	//    messageManager()->sendInfo(QString("Creating contour from \"%1\"...").arg(input->getName()));
 
 	mRawResult = this->execute(input->getBaseVtkImageData(),
 	                           surfaceThresholdOption->getValue(),
@@ -289,13 +289,13 @@ bool ContourFilter::postProcess()
 	if (!mRawResult)
 		return false;
 
-	ssc::ImagePtr input = this->getCopiedInputImage();
+	ImagePtr input = this->getCopiedInputImage();
 
 	if (!input)
 		return false;
 
-	ssc::ColorDataAdapterXmlPtr colorOption = this->getColorOption(mOptions);
-	ssc::MeshPtr output = this->postProcess(mRawResult, input, colorOption->getValue());
+	ColorDataAdapterXmlPtr colorOption = this->getColorOption(mOptions);
+	MeshPtr output = this->postProcess(mRawResult, input, colorOption->getValue());
 	mRawResult = NULL;
 
 	if (output)
@@ -304,24 +304,24 @@ bool ContourFilter::postProcess()
 	return true;
 }
 
-ssc::MeshPtr ContourFilter::postProcess(vtkPolyDataPtr contour, ssc::ImagePtr base, QColor color)
+MeshPtr ContourFilter::postProcess(vtkPolyDataPtr contour, ImagePtr base, QColor color)
 {
 	if (!contour || !base)
-		return ssc::MeshPtr();
+		return MeshPtr();
 
 	QString uid = base->getUid() + "_ge%1";
 	QString name = base->getName()+" ge%1";
-	ssc::MeshPtr output = ssc::dataManager()->createMesh(contour, uid, name, "Images");
+	MeshPtr output = dataManager()->createMesh(contour, uid, name, "Images");
 	if (!output)
-		return ssc::MeshPtr();
+		return MeshPtr();
 
 	output->get_rMd_History()->setRegistration(base->get_rMd());
 	output->get_rMd_History()->setParentSpace(base->getUid());
 
 	output->setColor(color);
 
-	ssc::dataManager()->loadData(output);
-	ssc::dataManager()->saveData(output, patientService()->getPatientData()->getActivePatientFolder());
+	dataManager()->loadData(output);
+	dataManager()->saveData(output, patientService()->getPatientData()->getActivePatientFolder());
 
 	return output;
 }

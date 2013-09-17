@@ -20,7 +20,7 @@
 #include "sscOptimizedUpdateWidget.h"
 #include <iostream>
 
-namespace ssc
+namespace cx
 {
 
 
@@ -54,4 +54,4 @@ void OptimizedUpdateWidget::prePaintEventPrivate()
     mModified = false;
 }
 
-} // namespace ssc
+} // namespace cx

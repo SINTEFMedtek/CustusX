@@ -32,7 +32,7 @@
 #include "vtkForwardDeclarations.h"
 class QDomNode;
 
-namespace ssc
+namespace cx
 {
 typedef std::map<int, int> IntIntMap;
 typedef std::map<int, QColor> ColorMap;
