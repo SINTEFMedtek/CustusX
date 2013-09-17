@@ -12,6 +12,8 @@
 //
 // See CustusX_License.txt for more information.
 
+#include "cxConfig.h"
+#ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
 #include "catch.hpp"
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
 
@@ -42,3 +44,6 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[integra
 
 
 } // namespace cxtest
+
+
+#endif //CX_BUILD_MEHDI_VTKMULTIVOLUME

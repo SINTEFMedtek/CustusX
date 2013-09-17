@@ -25,6 +25,7 @@
 #include "sscMessageManager.h"
 #include "cxtestDirectSignalListener.h"
 #include "sscImage2DRep3D.h"
+#include "cxConfig.h"
 
 #include "cxMultiVolume3DRepProducer.h"
 #include "cxtestMultiVolume3DRepProducerFixture.h"
