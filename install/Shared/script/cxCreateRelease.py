@@ -163,7 +163,7 @@ class Version:
         shell.run('git pull')
         shell.run('git add %s' % self._getFileName())
         message = '[script] Updating version file %s to %s' % (self._getFileName(), self.generateTag())
-        shell.run('git commit -m %s' % message)
+        shell.run('git commit -m "%s"' % message)
         shell.run('git push')
 
     def sendTagToGit(self, tag):
@@ -296,7 +296,7 @@ Thus, we get the following pattern:
     
     def _increaseVersion(self, version, type):
         version.increase_version(type)
-        PrintFormatter.printHeader('Increased version to %s' % version.generateTag(), level=3)
+        PrintFormatter.printHeader('Increasing version to %s' % version.generateTag(), level=3)
         version.save()
         version.commitToGit();
         version.writeGitTag()
