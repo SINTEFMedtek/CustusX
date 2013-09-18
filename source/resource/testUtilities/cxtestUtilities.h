@@ -15,6 +15,7 @@
 #ifndef CXTESTUTILITIES_H_
 #define CXTESTUTILITIES_H_
 
+#include <vector>
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
 #include "sscVector3D.h"
@@ -31,8 +32,9 @@ namespace cxtest
 class Utilities
 {
 public:
-	static vtkImageDataPtr create3DVtkImageData(Eigen::Array3i dim = Eigen::Array3i(3,3,3));
-	static cx::ImagePtr create3DImage(Eigen::Array3i dim = Eigen::Array3i(3,3,3));
+	static vtkImageDataPtr create3DVtkImageData(Eigen::Array3i dim = Eigen::Array3i(3,3,3), const unsigned int voxelValue = 100);
+	static cx::ImagePtr create3DImage(Eigen::Array3i dim = Eigen::Array3i(3,3,3), const unsigned int voxelValue = 100);
+	static std::vector<cx::ImagePtr> create3DImages(unsigned int imageCount, Eigen::Array3i dim = Eigen::Array3i(3,3,3), const unsigned int voxelValue = 100);
 };
 
 } /* namespace cxtest */

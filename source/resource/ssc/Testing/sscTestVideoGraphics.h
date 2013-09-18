@@ -21,8 +21,8 @@
 #include "sscTransform3D.h"
 
 #include "sscVideoGraphics.h"
-#include "sscVtkRenderTester.h"
 #include "sscProbeData.h"
+#include "cxtestRenderTester.h"
 
 /** Tests for class VideoGraphics
   *

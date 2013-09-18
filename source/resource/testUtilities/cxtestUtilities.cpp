@@ -22,19 +22,30 @@
 namespace cxtest
 {
 
-vtkImageDataPtr Utilities::create3DVtkImageData(Eigen::Array3i dim)
+vtkImageDataPtr Utilities::create3DVtkImageData(Eigen::Array3i dim, const unsigned int voxelValue)
 {
-	return cx::generateVtkImageData(dim, cx::Vector3D(1,1,1), 2);
+	return cx::generateVtkImageData(dim, cx::Vector3D(1,1,1), voxelValue);
 }
 
-cx::ImagePtr Utilities::create3DImage(Eigen::Array3i dim)
+cx::ImagePtr Utilities::create3DImage(Eigen::Array3i dim, const unsigned int voxelValue)
 {
-	vtkImageDataPtr vtkImageData = create3DVtkImageData(dim);
+	vtkImageDataPtr vtkImageData = create3DVtkImageData(dim, voxelValue);
 	QString unique_string = qstring_cast(reinterpret_cast<long>(vtkImageData.GetPointer()));
 	QString imagesUid = QString("TESTUID_%2_%1").arg(unique_string);
 	cx::ImagePtr image(new cx::Image(imagesUid, vtkImageData));
 
 	return image;
+}
+
+std::vector<cx::ImagePtr> Utilities::create3DImages(unsigned int count, Eigen::Array3i dim, const unsigned int voxelValue)
+{
+	std::vector<cx::ImagePtr> retval;
+	for (unsigned i=0; i<count; ++i)
+	{
+		cx::ImagePtr image = cxtest::Utilities::create3DImage(dim, voxelValue);
+		retval.push_back(image);
+	}
+	return retval;
 }
 
 } /* namespace cxtest */

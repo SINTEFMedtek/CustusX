@@ -127,6 +127,7 @@ cx_add_class_qt_moc(SSC_SOURCE_FILES
 	Utilities/sscApplication
 	Utilities/sscMessageManager
 	Utilities/sscSharedMemory
+        Utilities/cxtestRenderTester
 	)
 
 # library

@@ -13,7 +13,6 @@
 // See CustusX_License.txt for more information.
 
 #include "sscTestVideoGraphics.h"
-#include "sscVtkRenderTester.h"
 
 #include "sscVideoGraphics.h"
 #include <vtkImageActor.h>
@@ -33,7 +32,7 @@
 
 void TestVideoGraphics::setUp()
 {
-	mMachine = cx::TestVtkRendering::create();
+	mMachine = cxtest::RenderTester::create();
 	mVideoGraphics.reset(new cx::VideoGraphics());
 }
 

@@ -24,7 +24,7 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
 
     // std::cout << TestUtilities::GetDataRoot() << std::endl;
-	QString vtkFileName1 = cx::TestUtilities::ExpandDataFileName("DTI/FiberBundleNode.vtk");
+	QString vtkFileName1 = cx::TestUtilities::ExpandDataFileName("ssc/DTI/FiberBundleNode.vtk");
 
 	cx::ViewWidget *view = new cx::ViewWidget();
 	cx::MeshPtr bundle(new cx::VtkFileMesh(vtkFileName1, vtkFileName1, vtkFileName1));
