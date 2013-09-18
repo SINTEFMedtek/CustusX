@@ -12,6 +12,27 @@
 #
 # See CustusX_License.txt for more information.
 
+###############################################################################
+# Make file path absolute if needed. Assuming
+#
+## Input variables:
+#    INPUT_PATH : Path to file.
+#
+## Output variables:
+#    RESULT_PATH : Absolute path to file.
+###############################################################################
+function(cx_make_path_absolute INPUT_PATH RESULT_PATH)
+    if(IS_ABSOLUTE ${INPUT_PATH})
+        set(ABS_SOURCE_FILE
+            ${INPUT_PATH}
+            )
+    else()
+        set(ABS_SOURCE_FILE
+            ${CMAKE_CURRENT_LIST_DIR}/${INPUT_PATH}
+            )
+    endif()
+    set(${RESULT_PATH} ${ABS_SOURCE_FILE} PARENT_SCOPE)
+endfunction()
 
 
 ###############################################################################
@@ -38,7 +59,6 @@ endfunction()
 #
 ###############################################################################
 function( cx_define_option_from_boolean NAME DESCRIPTION)
-	#message(STATUS "testing init value for ${NAME}: " ${BOOLEAN_VALUE})
 	set( BOOLEAN_VALUE False)
 	if( ARGC GREATER 2 )
 		set( BOOLEAN_VALUE ${ARGV2})
@@ -50,7 +70,6 @@ function( cx_define_option_from_boolean NAME DESCRIPTION)
 		option(${NAME} ${DESCRIPTION} OFF)
 	endif()
 endfunction()
-
 
 ###############################################################################
 # Define the following Operating System identifiers both in cmake and cpp:
@@ -191,9 +210,7 @@ MACRO(cx_define_version major minor patch type)
 
 	set(${PROJECT_NAME}_VERSION_POSTFIX ${POSTFIX})
 	set(GENERATED_VERSION_STRING ${major}.${minor}.${patch}${POSTFIX})
-#	string(SUBSTRING ${GIT_DESCRIBE} STREQUAL ${GENERATED_VERSION_STRING})
 	string(REGEX MATCH ${GENERATED_VERSION_STRING} MATCHING_STRING ${GIT_DESCRIBE})
-#message(STATUS "MATCHING_STRING " ${MATCHING_STRING})
 	if("${MATCHING_STRING}" STREQUAL "")
 		message("Warning:
 		Version string extracted from git: ${GIT_DESCRIBE}
@@ -220,25 +237,13 @@ ENDMACRO()
 ###############################################################################
 MACRO(cx_read_version)
 	file(READ ${PROJECT_SOURCE_DIR}/version.ini CX_VERSION_FILE_DATA)
-	#message(STATUS "CX_VERSION_FILE_DATA: " ${CX_VERSION_FILE_DATA})
-	#foreach(VAR ${CX_VERSION_FILE_DATA})
-	#    message(STATUS "CX_VERSION_FILE_DATA line: " ${VAR})
-	#endforeach()
 
 	string(REGEX REPLACE ".*major[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_MAJOR ${CX_VERSION_FILE_DATA})
-	#message(STATUS "VERSION_MAJOR: " ${VERSION_MAJOR})
 	string(REGEX REPLACE ".*minor[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_MINOR ${CX_VERSION_FILE_DATA})
-	#message(STATUS "VERSION_MINOR: " ${VERSION_MINOR})
 	string(REGEX REPLACE ".*patch[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_PATCH ${CX_VERSION_FILE_DATA})
-	#message(STATUS "VERSION_PATCH: " ${VERSION_PATCH})
 	string(REGEX REPLACE ".*type[ ]*=[ ]*([^$]*).*" "\\1" VERSION_TYPE ${CX_VERSION_FILE_DATA})
 	STRING(REGEX REPLACE "(\r?\n)+$" "" VERSION_TYPE "${VERSION_TYPE}")
-	#message(STATUS "VERSION_TYPE: " ${VERSION_TYPE})
 
-#set(CX_VERSION_TYPE ALPHA) # use when releasing an alpha
-#set(CX_VERSION_TYPE BETA) # use when releasing a beta
-#set(CX_VERSION_TYPE RELEASE) # use when releasing a normal release
-#set(CX_VERSION_TYPE ".rc1") # set release candidate during release procedure
 	cx_define_version(${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_PATCH} ${VERSION_TYPE})
 	message(STATUS "Version: ${CustusX3_VERSION_STRING}")
 

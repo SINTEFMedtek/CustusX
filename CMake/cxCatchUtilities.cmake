@@ -56,72 +56,12 @@ endmacro()
 function(cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES)
     
     if(CX_WINDOWS)
-        foreach( SOURCE_FILE ${SOURCES})
-            if(IS_ABSOLUTE ${SOURCE_FILE})
-                set(ABS_SOURCE_FILE
-                    ${SOURCE_FILE}
-                    )
-            else()
-                set(ABS_SOURCE_FILE
-                    ${CMAKE_CURRENT_LIST_DIR}/${SOURCE_FILE}
-                    )
-            endif()
-            set(ABS_SOURCES
-                ${ABS_SOURCES}
-                ${ABS_SOURCE_FILE}
-                )
-        endforeach()
-        set(CX_TEST_CATCH_SOURCES
-            "${CX_TEST_CATCH_SOURCES}"
-            "${ABS_SOURCES}"
-            CACHE INTERNAL
-            "List of all Catch sources.")
-        get_property(inc_dirs DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
-        set(CX_TEST_CATCH_INCLUDE_DIRS
-            "${CX_TEST_CATCH_INCLUDE_DIRS}"
-            "${CMAKE_CURRENT_LIST_DIR}"
-            ${inc_dirs}
-            CACHE INTERNAL
-            "List of all Catch include directories."
-            )
-         set(CX_TEST_CATCH_LINKER_LIBS
-            "${CX_TEST_CATCH_LINKER_LIBS}"
-            ${LIB_TO_TEST}
-            CACHE INTERNAL
-            "List of all libraries Catch needs to link to."
-            )
+        _cx_catch_save_info_in_globals(${LIB_TO_TEST} "${SOURCES}")
     else()
-        message(STATUS "Adding catch test targets based on: ${LIB_TO_TEST}")
-        
-        include_directories(
-            .
-            ${CustusX3_SOURCE_DIR}/source/resource/testUtilities
-            ${CustusX3_SOURCE_DIR}/source/ThirdParty/catch)
-    
-        cx_catch__private_define_platform_specific_linker_options()
-        set(TEST_LIB_NAME "cxtestCatch${LIB_TO_TEST}")
-        add_library(${TEST_LIB_NAME} ${CX_CATCH_SHARED_LIB_TYPE} ${SOURCES} )
-        message(STATUS "          Lib name : ${TEST_LIB_NAME}")
-        target_link_libraries(${TEST_LIB_NAME} ${LIB_TO_TEST} cxtestUtilities )
-        
-        set(CX_TEST_CATCH_GENERATED_LIBRARIES
-            "${TEST_LIB_NAME}" "${CX_TEST_CATCH_GENERATED_LIBRARIES}"
-            CACHE INTERNAL
-            "List of all catch unit test libs that should be added to the master test exe.")
-    
-        set(TEST_EXE_NAME "Catch${LIB_TO_TEST}")
-        message(STATUS "          Exe name : ${TEST_EXE_NAME}")
-    
-        set(cxtest_MAIN ${CustusX3_SOURCE_DIR}/source/resource/testUtilities/cxtestCatchMain.cpp)
-        add_executable(${TEST_EXE_NAME} ${cxtest_MAIN})
-        target_link_libraries(${TEST_EXE_NAME} ${CX_CATCH_PRE_WHOLE_ARCHIVE} ${TEST_LIB_NAME} ${CX_CATCH_POST_WHOLE_ARCHIVE})
+        _cx_catch_add_lib_and_exe(${LIB_TO_TEST} "${SOURCES}")
     endif()
 
-# alternative where the lib is omitted
-#        add_executable(${TEST_EXE_NAME} ${cxtest_MAIN} ${SOURCES})
-#        target_link_libraries(${TEST_EXE_NAME} ${LIB_TO_TEST} cxtestUtilities)
 endfunction()
-
 
 ###############################################################################
 # Add a master exe target for the Catch unit testing framework.
@@ -140,25 +80,109 @@ function(cx_catch_add_master_exe)
     set(cxtest_MAIN ${CustusX3_SOURCE_DIR}/source/resource/testUtilities/cxtestCatchMain.cpp)
 
     if(CX_WINDOWS)
-        message(STATUS "Generating master Catch exe.")
-        include_directories(
-            ${CX_TEST_CATCH_INCLUDE_DIRS}
-        )
-        add_executable(${TEST_EXE_NAME} ${cxtest_MAIN} ${CX_TEST_CATCH_SOURCES})
-        target_link_libraries(${TEST_EXE_NAME} ${CX_TEST_CATCH_LINKER_LIBS} cxtestUtilities)
+        _cx_catch_generate_master_catch_using_sources(${TEST_EXE_NAME} ${cxtest_MAIN})
     else()
-        message(STATUS "Generating master Catch exe containing libs:")
-        foreach( NAME ${CX_TEST_CATCH_GENERATED_LIBRARIES})
-                message(STATUS "    ${NAME}")
-        endforeach()
-        
-        cx_catch__private_define_platform_specific_linker_options()
-        add_executable(${TEST_EXE_NAME} ${cxtest_MAIN} )
-        target_link_libraries(${TEST_EXE_NAME} ${CX_CATCH_PRE_WHOLE_ARCHIVE} ${CX_TEST_CATCH_GENERATED_LIBRARIES} cxtestUtilities ${CX_CATCH_POST_WHOLE_ARCHIVE}  )
+        _cx_catch_generate_master_catch_using_libs(${TEST_EXE_NAME} ${cxtest_MAIN})
     endif()
     
     cx_install_target(${TEST_EXE_NAME})
 
+endfunction()
+
+###############################################################################
+# PRIVATE:
+# Create master Catch using source files. 
+###############################################################################
+function(_cx_catch_generate_master_catch_using_sources EXE_NAME PATH_TO_MAIN)
+    message(STATUS "Generating master Catch exe.")
+    message(STATUS "EXE_NAME: "${EXE_NAME})
+    message(STATUS "PATH_TO_MAIN: "${PATH_TO_MAIN})
+    message(STATUS "CX_TEST_CATCH_LINKER_LIBS: "${CX_TEST_CATCH_LINKER_LIBS})
+    include_directories(
+        ${CX_TEST_CATCH_INCLUDE_DIRS}
+    )
+    add_executable(${EXE_NAME} ${PATH_TO_MAIN} ${CX_TEST_CATCH_SOURCES})
+    target_link_libraries(${EXE_NAME} ${CX_TEST_CATCH_LINKER_LIBS} cxtestUtilities)
+endfunction()
+
+###############################################################################
+# PRIVATE:
+# Create master Catch using testing libraries.
+###############################################################################
+function(_cx_catch_generate_master_catch_using_libs EXE_NAME PATH_TO_MAIN)
+    message(STATUS "Generating master Catch exe containing libs:")
+    foreach( NAME ${CX_TEST_CATCH_GENERATED_LIBRARIES})
+            message(STATUS "    ${NAME}")
+    endforeach()
+    
+    cx_catch__private_define_platform_specific_linker_options()
+    add_executable(${EXE_NAME} ${PATH_TO_MAIN} )
+    target_link_libraries(${EXE_NAME} ${CX_CATCH_PRE_WHOLE_ARCHIVE} ${CX_TEST_CATCH_GENERATED_LIBRARIES} cxtestUtilities ${CX_CATCH_POST_WHOLE_ARCHIVE}  )
+endfunction()
+
+###############################################################################
+# PRIVATE:
+# Save needed information about source files to be able to add them to
+# a master Catch.
+###############################################################################
+function(_cx_catch_save_info_in_globals LIB_TO_TEST SOURCES)
+    foreach( SOURCE_FILE ${SOURCES})
+        cx_make_path_absolute(${SOURCE_FILE} RESULT)
+        set(ABS_SOURCES
+            ${ABS_SOURCES}
+            ${RESULT}
+            )
+    endforeach()
+    set(CX_TEST_CATCH_SOURCES
+        "${CX_TEST_CATCH_SOURCES}"
+        "${ABS_SOURCES}"
+        CACHE INTERNAL
+        "List of all Catch sources.")
+    get_property(inc_dirs DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
+    set(CX_TEST_CATCH_INCLUDE_DIRS
+        "${CX_TEST_CATCH_INCLUDE_DIRS}"
+        "${CMAKE_CURRENT_LIST_DIR}"
+        ${inc_dirs}
+        CACHE INTERNAL
+        "List of all Catch include directories."
+        )
+     set(CX_TEST_CATCH_LINKER_LIBS
+        "${CX_TEST_CATCH_LINKER_LIBS}"
+        ${LIB_TO_TEST}
+        CACHE INTERNAL
+        "List of all libraries Catch needs to link to."
+        )
+endfunction()
+
+###############################################################################
+# PRIVATE:
+# Create testing lib and small catch executable for the incoming lib.
+###############################################################################
+function(_cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES)
+    message(STATUS "Adding catch test targets based on: ${LIB_TO_TEST}")
+    
+    include_directories(
+        .
+        ${CustusX3_SOURCE_DIR}/source/resource/testUtilities
+        ${CustusX3_SOURCE_DIR}/source/ThirdParty/catch)
+
+    cx_catch__private_define_platform_specific_linker_options()
+    set(TEST_LIB_NAME "cxtestCatch${LIB_TO_TEST}")
+    add_library(${TEST_LIB_NAME} ${CX_CATCH_SHARED_LIB_TYPE} ${SOURCES} )
+    message(STATUS "          Lib name : ${TEST_LIB_NAME}")
+    target_link_libraries(${TEST_LIB_NAME} ${LIB_TO_TEST} cxtestUtilities )
+    
+    set(CX_TEST_CATCH_GENERATED_LIBRARIES
+        "${TEST_LIB_NAME}" "${CX_TEST_CATCH_GENERATED_LIBRARIES}"
+        CACHE INTERNAL
+        "List of all catch unit test libs that should be added to the master test exe.")
+
+    set(TEST_EXE_NAME "Catch${LIB_TO_TEST}")
+    message(STATUS "          Exe name : ${TEST_EXE_NAME}")
+
+    set(cxtest_MAIN ${CustusX3_SOURCE_DIR}/source/resource/testUtilities/cxtestCatchMain.cpp)
+    add_executable(${TEST_EXE_NAME} ${cxtest_MAIN})
+    target_link_libraries(${TEST_EXE_NAME} ${CX_CATCH_PRE_WHOLE_ARCHIVE} ${TEST_LIB_NAME} ${CX_CATCH_POST_WHOLE_ARCHIVE})
 endfunction()
 
 
