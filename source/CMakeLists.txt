@@ -16,6 +16,7 @@ cx_initialize_IGSTK()
 cx_initialize_SSC()
 cx_initialize_ISB_GE()
 cx_initialize_TSF()
+cx_initialize_level_set_segmentation()
 
 #------------------------------------------------------------------------------
 # Add subdirectories
