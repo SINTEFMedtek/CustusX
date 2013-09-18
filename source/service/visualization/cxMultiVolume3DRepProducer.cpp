@@ -55,9 +55,9 @@ QStringList MultiVolume3DRepProducer::getAvailableVisualizers()
 {
 	QStringList retval;
 	retval << "vtkVolumeTextureMapper3D";
-#if !defined(__APPLE__) && !defined(WIN32)
+//#if !defined(__APPLE__) && !defined(WIN32)
 	retval << "vtkGPUVolumeRayCastMapper";
-#endif
+//#endif
 	retval << "sscProgressiveLODVolumeTextureMapper3D";
 	retval << "sscGPURayCastMultiVolume";
 #ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME

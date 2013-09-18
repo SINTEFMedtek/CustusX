@@ -125,8 +125,8 @@ class CppBuilder:
             Howto create a patch using git:
             Branch is created like this:
             git checkout v5.8.0
-            git branch cx_mod_for_5-8-0
-            git checkout cx_mod_for_5-8-0
+            git branch VTK-5-8-0.patch_branch
+            git checkout VTK-5-8-0.patch_branch
             ... make you modifications ...
             git commit -am "message"
             git format-patch master --stdout > VTK-5-8-0.patch
