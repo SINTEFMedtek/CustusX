@@ -86,6 +86,7 @@ bool LevelSetFilter::execute() {
 
     std::cout << "Parameters are set to: " << threshold << " "  << epsilon << " " << alpha << std::endl;
 
+    // TODO: Run level set segmentation here
 
     return true;
 }

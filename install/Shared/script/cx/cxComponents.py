@@ -382,6 +382,7 @@ class CustusX3(CppComponent):
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.mDoxygen)            
         add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
         add('CX_USE_TSF:BOOL', True);
+        add('CX_USE_LEVEL_SET:BOOL', False);
         add('CX_USE_ISB_GE:BOOL', True);
         add('SSC_USE_DCMTK:BOOL', False);
         add('SSC_BUILD_EXAMPLES:BOOL', self.controlData.mBuildSSCExamples);
@@ -429,6 +430,25 @@ class TubeSegmentationFramework(CppComponent):
         add = builder.addCMakeOption
         add('USE_C++11', False)
         add('SIPL_USE_GTK', False)
+        builder.configureCMake()
+
+ # ---------------------------------------------------------
+
+class LevelSetSegmentation(CppComponent):
+    def name(self):
+        return "Level-Set-Segmentation"
+    def help(self):
+        return 'Level-Set-Segmentation'
+    def path(self):
+        return self.controlData.getWorkingPath() + "/Level-Set-Segmentation"
+    def _rawCheckout(self):
+        self._getBuilder().gitClone('git@github.com:smistad/Level-Set-Segmentation')
+    def update(self):
+        self._getBuilder().gitUpdate('master', submodules=True)    
+    def configure(self):
+        builder = self._getBuilder()
+        add = builder.addCMakeOption
+        add('sipl_use_gtk', False)
         builder.configureCMake()
         
 # ---------------------------------------------------------

@@ -43,6 +43,7 @@ class LibraryAssembly:
                      cxComponents.ISB_DataStreaming(),
                      cxComponents.UltrasonixSDK(),
                      cxComponents.TubeSegmentationFramework(),
+                     cxComponents.LevelSetSegmentation(),
                      cxComponents.CustusX3(),
                      cxComponents.CustusX3Data()
                      ]

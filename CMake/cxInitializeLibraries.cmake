@@ -98,6 +98,30 @@ macro(cx_initialize_TSF)
 endmacro()
 
 ###############################################################################
+# Initialize Level-Set-Segmentation library
+#
+# Find the package and run the include USE file.
+#
+# Define variables:
+#    CX_USE_LEVEL_SET : cache option
+#
+###############################################################################
+macro(cx_initialize_level_set_segmentation)
+    if(CX_USE_LEVEL_SET)
+        find_package(Level-Set-Segmentation PATHS "${CustusX3_SOURCE_DIR}/../../GPU-Narrow-Band-Level-Set-Segmentation/GPU-Narrow-Band-Level-Set-Segmentation/CMake" REQUIRED)
+    endif()
+
+    IF( Level-Set-Segmentation_FOUND )
+        option(CX_USE_LEVEL_SET "use Level Set Segmentation" ON)
+        ADD_DEFINITIONS(-DCX_USE_LEVEL_SET)
+        include(${Level-Set-Segmentation_USE_FILE})
+    ELSE()
+        option(CX_USE_TSF "use Level Set Segmentation" OFF)
+    ENDIF()
+endmacro()
+
+
+###############################################################################
 # Initialize GEStreamer library
 #
 # Find the package and run the include USE file.
