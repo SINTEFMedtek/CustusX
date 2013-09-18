@@ -36,15 +36,8 @@ typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;
 namespace cxtest
 {
 
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[integration][gui][notmac]")
+void testVolumeRep(cx::RepPtr rep)
 {
-	unsigned int imageCount = 3;
-	std::vector<cx::ImagePtr> mImages = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(3,3,3), 200);
-
-	cx::MehdiGPURayCastMultiVolumeRepPtr rep = cx::MehdiGPURayCastMultiVolumeRep::New("");
-	REQUIRE(rep);
-	rep->setImages(mImages);
-
 	unsigned int viewAxisSize = 30;
 	RenderTesterPtr renderTester = cxtest::RenderTester::create(rep, viewAxisSize);
 
@@ -54,33 +47,29 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[integra
 	unsigned int numNonZeroPixels = renderTester->getNumberOfNonZeroPixels(output);
 	REQUIRE(numNonZeroPixels > 0);
 	REQUIRE(numNonZeroPixels < viewAxisSize*viewAxisSize);
+}
 
-//	QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS*1000, qApp, SLOT(quit()));
-//	qApp->exec();
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[integration][gui][notmac]")
+{
+	unsigned int imageCount = 3;
+	std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(3,3,3), 200);
+
+	cx::MehdiGPURayCastMultiVolumeRepPtr rep = cx::MehdiGPURayCastMultiVolumeRep::New("");
+	REQUIRE(rep);
+	rep->setImages(images);
+
+	testVolumeRep(rep);
 }
 
 TEST_CASE("VolumetricRep can render 1 small volume.", "[unit][gui]")
 {
-	unsigned int imageCount = 1;
-	std::vector<cx::ImagePtr> mImages = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(3,3,3), 200);
+	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(3,3,3), 200);
 
 	cx::VolumetricRepPtr rep = cx::VolumetricRep::New("");
 	REQUIRE(rep);
-	rep->setImage(mImages[0]);
+	rep->setImage(image);
 
-	unsigned int viewAxisSize = 30;
-	RenderTesterPtr renderTester = cxtest::RenderTester::create(rep, viewAxisSize);
-
-	vtkImageDataPtr output = renderTester->renderToImage();
-	REQUIRE(cx::similar(Eigen::Array3i(output->GetDimensions()), Eigen::Array3i(viewAxisSize,viewAxisSize,1)));
-
-	unsigned int numNonZeroPixels = renderTester->getNumberOfNonZeroPixels(output);
-	REQUIRE(numNonZeroPixels > 0);
-	REQUIRE(numNonZeroPixels < viewAxisSize*viewAxisSize);
-
-//	QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS*1000, qApp, SLOT(quit()));
-//	qApp->exec();
-
+	testVolumeRep(rep);
 }
 
 } // namespace cxtest

@@ -35,7 +35,7 @@ if (BUILD_TESTING)
         cxtestMultiVolume3DRepProducerFixture
         cxtestCatchViewRenderSpeed.cpp
         cxTestRenderSpeed
-        cxtestCatchMehdiGPURayCastMultiVolumeRep.cpp
+        cxtestCatchVolumeReps.cpp
         )
 
     cx_catch_add_lib_and_exe(cxVisualizationService "${CXTEST_VISUALIZATIONSERVICE_SOURCES}")
