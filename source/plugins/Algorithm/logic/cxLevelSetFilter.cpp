@@ -3,6 +3,11 @@
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
 #include "cxSelectDataStringDataAdapter.h"
+#include "sscCoordinateSystemHelpers.h"
+#include "sscData.h"
+#include "sscImage.h"
+#include "sscDataManager.h"
+#include <vtkImageData.h>
 
 namespace cx
 {
@@ -20,24 +25,73 @@ QString LevelSetFilter::getType() const
 QString LevelSetFilter::getHelp() const
 {
 	return "<html>"
-	        "<h3>Binary Threshold Image Filter.</h3>"
-	        "<p><i>Segment out areas from the selected image using a threshold.</i></p>"
-	        "<p>This filter produces an output image whose pixels are either one of two values"
-	        "( OutsideValue or InsideValue ), depending on whether the corresponding input"
-	        "image pixels lie between the two thresholds ( LowerThreshold and UpperThreshold )."
-	        "Values equal to either threshold is considered to be between the thresholds.<p>"
+	        "<h3>Level Set Segmentation Filter.</h3>"
 	        "</html>";
 }
 
 
 bool LevelSetFilter::preProcess() {
+    return true;
 }
 
+ssc::Vector3D getSeedPointFromTool(ssc::DataPtr image) {
+    // Retrieve position of tooltip and use it as seed point
+    ssc::Vector3D point = ssc::CoordinateSystemHelpers::getDominantToolTipPoint(
+            ssc::CoordinateSystemHelpers::getD(image)
+    );
+    std::cout << "the selected seed point is: " << point(0) << " " << point(1) << " " << point(2) << "\n";
+
+    return point;
+}
+
+int * getImageSize(ssc::DataPtr inputImage) {
+    ssc::ImagePtr image = ssc::DataManager::getInstance()->getImage(inputImage->getUid());
+    return image->getBaseVtkImageData()->GetDimensions();
+}
+
+bool isSeedPointInsideImage(ssc::Vector3D seedPoint, ssc::DataPtr image) {
+    int * size = getImageSize(image);
+    std::cout << "size of image is: " << size[0] << " " << size[1] << " " << size[2] << "\n";
+    int x = (int)seedPoint(0);
+    int y = (int)seedPoint(1);
+    int z = (int)seedPoint(2);
+    bool result = x >= 0 && y >= 0 && z >= 0
+            && x < size[0] && y < size[1] && z < size[2];
+    return result;
+}
+
+
 bool LevelSetFilter::execute() {
-    // TODO: Retrieve position of tooltip and use it as seed point
+    ssc::DataPtr inputImage = mInputTypes[0].get()->getData();
+    if(!inputImage) {
+        std::cout << "No input data selected" << std::endl;
+        return false;
+    }
+
+    if(inputImage->getType() != "image") {
+        std::cout << "Input data has to be an image" << std::endl;
+        return false;
+    }
+
+    ssc::Vector3D seedPoint = getSeedPointFromTool(inputImage);
+
+    if(!isSeedPointInsideImage(seedPoint, inputImage)) {
+        std::cout << "Seed point is not inside image!" << std::endl;
+        return false;
+    }
+
+    float threshold = getThresholdOption(mOptions)->getValue();
+    float epsilon = getEpsilonOption(mOptions)->getValue();
+    float alpha = getAlphaOption(mOptions)->getValue();
+
+    std::cout << "Parameters are set to: " << threshold << " "  << epsilon << " " << alpha << std::endl;
+
+
+    return true;
 }
 
 bool LevelSetFilter::postProcess() {
+    return true;
 }
 
 void LevelSetFilter::createOptions()
@@ -86,7 +140,7 @@ void LevelSetFilter::setActive(bool on)
 ssc::DoubleDataAdapterXmlPtr LevelSetFilter::getThresholdOption(
         QDomElement root) {
 	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Threshold", "",
-	                                                                            "Select lower threshold for the segmentation", 1, ssc::DoubleRange(0, 100, 1), 0,
+	                                                                            "Select threshold for the segmentation", 1, ssc::DoubleRange(0, 100, 1), 0,
 	                                                                            root);
 	retval->setAddSlider(true);
 	return retval;
@@ -96,7 +150,7 @@ ssc::DoubleDataAdapterXmlPtr LevelSetFilter::getThresholdOption(
 ssc::DoubleDataAdapterXmlPtr LevelSetFilter::getEpsilonOption(
         QDomElement root) {
 	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Epsilon", "",
-	                                                                            "Select lower threshold for the segmentation", 1, ssc::DoubleRange(0, 100, 1), 0,
+	                                                                            "Select epsilon for the segmentation", 1, ssc::DoubleRange(0, 100, 1), 0,
 	                                                                            root);
 	retval->setAddSlider(true);
 	return retval;
@@ -106,7 +160,7 @@ ssc::DoubleDataAdapterXmlPtr LevelSetFilter::getEpsilonOption(
 ssc::DoubleDataAdapterXmlPtr LevelSetFilter::getAlphaOption(
         QDomElement root) {
 	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Alpha", "",
-	                                                                            "Select lower threshold for the segmentation", 0.1, ssc::DoubleRange(0, 1, 0.01), 2,
+	                                                                            "Select alpha for the segmentation", 0.1, ssc::DoubleRange(0, 1, 0.01), 2,
 	                                                                            root);
 	retval->setAddSlider(true);
 	return retval;
