@@ -11,32 +11,37 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-#ifndef SSCVTKRENDERTESTER_H
-#define SSCVTKRENDERTESTER_H
+
+#ifndef CXTESTRENDERTESTER_H
+#define CXTESTRENDERTESTER_H
 
 #include <vtkForwardDeclarations.h>
-#include "boost/shared_ptr.hpp"
+#include <boost/shared_ptr.hpp>
 #include <QString>
+#include "sscRep.h"
 
 typedef vtkSmartPointer<class vtkProp> vtkPropPtr;
 
-namespace cx
+namespace cxtest
 {
 
-
-typedef boost::shared_ptr<class TestVtkRendering> TestVtkRenderingPtr;
+typedef boost::shared_ptr<class RenderTester> RenderTesterPtr;
 
 /** Test actor by rendering and comparing the result to a reference image
-  *
-  * \date april 29, 2013
-  * \author christiana
-  */
-class TestVtkRendering
+	*
+	* \date april 29, 2013
+	* \author christiana
+	*/
+class RenderTester
 {
 public:
-	static TestVtkRenderingPtr create();
+	static RenderTesterPtr create();
+	static RenderTesterPtr create(vtkRenderWindowPtr renderWindow);
+	static RenderTesterPtr create(cx::RepPtr rep, const unsigned int viewAxisSize);
 
-	TestVtkRendering();
+	RenderTester();
+	RenderTester(vtkRenderWindowPtr renderWindow);
+	RenderTester(cx::RepPtr rep, const unsigned int viewAxisSize);
 //	ViewWidget* getView();
 	void addProp(vtkPropPtr prop);
 	void renderToFile(QString filename);
@@ -49,7 +54,8 @@ public:
 	vtkImageDataPtr renderToImage();
 	bool findDifference(vtkImageDataPtr input1, vtkImageDataPtr input2);
 	void enterRunLoop();
-    void setImageErrorThreshold(double value);
+	void setImageErrorThreshold(double value);
+	unsigned int getNumberOfNonZeroPixels(vtkImageDataPtr image);
 
 private:
 	vtkImageDataPtr getImageFromRenderWindow();
@@ -67,6 +73,7 @@ private:
 	int mBorderOffset;
 };
 
-} // namespace cx
+} // namespace cxtest
 
-#endif // SSCVTKRENDERTESTER_H
+
+#endif // CXTESTRENDERTESTER_H

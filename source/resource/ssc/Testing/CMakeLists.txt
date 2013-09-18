@@ -76,10 +76,8 @@ if (BUILD_TESTING)
         sscTestTransform3D.cpp
         sscTestBoundingBox3D.cpp
         sscTestGPURayCaster.cpp
-		sscTestVideoGraphics.h
-		sscTestVideoGraphics.cpp
-		sscVtkRenderTester.h
-		sscVtkRenderTester.cpp
+        sscTestVideoGraphics.h
+        sscTestVideoGraphics.cpp
         ${SSC_TEST_SOURCE_FILES}
         )
         

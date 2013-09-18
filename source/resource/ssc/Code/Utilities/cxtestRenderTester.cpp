@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "sscVtkRenderTester.h"
+#include "cxtestRenderTester.h"
 
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
@@ -25,6 +25,7 @@
 #include <vtkImageClip.h>
 #include <vtkImageDifference.h>
 #include <vtkImageAppendComponents.h>
+#include <vtkRendererCollection.h>
 
 #include "sscBoundingBox3D.h"
 #include "sscView.h"
@@ -41,21 +42,32 @@ typedef vtkSmartPointer<class vtkImageDifference> vtkImageDifferencePtr;
 typedef vtkSmartPointer<class vtkImageClip> vtkImageClipPtr;
 
 
-
-namespace cx
+namespace cxtest
 {
 
 
-TestVtkRenderingPtr TestVtkRendering::create()
+RenderTesterPtr RenderTester::create()
 {
-	return TestVtkRenderingPtr(new TestVtkRendering());
+	return RenderTesterPtr(new RenderTester());
 }
 
-TestVtkRendering::TestVtkRendering()
+RenderTesterPtr RenderTester::create(vtkRenderWindowPtr renderWindow)
+{
+	return RenderTesterPtr(new RenderTester(renderWindow));
+}
+
+RenderTesterPtr RenderTester::create(cx::RepPtr rep, const unsigned int viewAxisSize)
+{
+	return RenderTesterPtr(new RenderTester(rep, viewAxisSize));
+}
+
+RenderTester::RenderTester() :
+	mImageErrorThreshold(100.0),
+	mBorderOffset(2)
 {
 //	mImageErrorThreshold = 1.0;
-	mImageErrorThreshold = 100.0;
-	mBorderOffset = 2;
+//	mImageErrorThreshold = 100.0;
+//	mBorderOffset = 2;
 	//		mView = new ViewWidget(NULL);
 	//		// set some defaults nice for testing:
 	//		this->getView()->setBackgroundColor(QColor::fromRgbF(0.1, 0.4, 0.2));
@@ -71,9 +83,30 @@ TestVtkRendering::TestVtkRendering()
 	mRenderWindow->SetSize(120,120);
 }
 
-void TestVtkRendering::setImageErrorThreshold(double value)
+RenderTester::RenderTester(vtkRenderWindowPtr renderWindow) :
+	mRenderWindow(renderWindow),
+	mRenderer(renderWindow->GetRenderers()->GetFirstRenderer()),
+	mImageErrorThreshold(100.0),
+	mBorderOffset(2)
 {
-    mImageErrorThreshold = value;
+}
+
+RenderTester::RenderTester(cx::RepPtr rep, const unsigned int viewAxisSize) :
+	mImageErrorThreshold(100.0),
+	mBorderOffset(2)
+{
+	cx::ViewWidget* view = new cx::ViewWidget();
+	view->addRep(rep);
+	view->resize(viewAxisSize,viewAxisSize);
+	view->show();
+
+	mRenderWindow = view->getRenderWindow();
+	mRenderer = mRenderWindow->GetRenderers()->GetFirstRenderer();
+}
+
+void RenderTester::setImageErrorThreshold(double value)
+{
+		mImageErrorThreshold = value;
 }
 
 //	ViewWidget* getView()
@@ -81,21 +114,21 @@ void TestVtkRendering::setImageErrorThreshold(double value)
 //		return mView;
 //	}
 
-void TestVtkRendering::addProp(vtkPropPtr prop)
+void RenderTester::addProp(vtkPropPtr prop)
 {
 	mRenderer->AddViewProp(prop);
 	//		this->getView()->getRenderer()->AddProp(prop);
 }
 
-void TestVtkRendering::renderToFile(QString filename)
+void RenderTester::renderToFile(QString filename)
 {
 	vtkImageDataPtr image = this->renderToImage();
 	this->writeToPNG(image, filename);
 }
 
-void TestVtkRendering::alignRenderWindowWithImage(vtkImageDataPtr input)
+void RenderTester::alignRenderWindowWithImage(vtkImageDataPtr input)
 {
-	DoubleBoundingBox3D bounds(input->GetBounds());
+	cx::DoubleBoundingBox3D bounds(input->GetBounds());
 	//		std::cout << "bounds " << bounds << std::endl;
 	mRenderer->ResetCamera(bounds.data());
 
@@ -114,12 +147,12 @@ void TestVtkRendering::alignRenderWindowWithImage(vtkImageDataPtr input)
 	mRenderer->GetActiveCamera()->SetParallelScale((bounds.range()[1])/2);
 }
 
-void TestVtkRendering::resetCamera()
+void RenderTester::resetCamera()
 {
 	mRenderer->ResetCamera();
 }
 
-vtkImageDataPtr TestVtkRendering::renderToImage()
+vtkImageDataPtr RenderTester::renderToImage()
 {
 	//		DoubleBoundingBox3D bounds(mRenderer->ComputeVisiblePropBounds());
 	//		std::cout << "bounds " << bounds << std::endl;
@@ -139,7 +172,7 @@ vtkImageDataPtr TestVtkRendering::renderToImage()
 	return this->getImageFromRenderWindow();
 }
 
-vtkImageDataPtr TestVtkRendering::getImageFromRenderWindow()
+vtkImageDataPtr RenderTester::getImageFromRenderWindow()
 {
 	vtkWindowToImageFilterPtr windowToImageFilter = vtkWindowToImageFilterPtr::New();
 	windowToImageFilter->SetInput(mRenderWindow);
@@ -151,7 +184,7 @@ vtkImageDataPtr TestVtkRendering::getImageFromRenderWindow()
 	return windowToImageFilter->GetOutput();
 }
 
-void TestVtkRendering::writeToPNG(vtkImageDataPtr image, QString filename)
+void RenderTester::writeToPNG(vtkImageDataPtr image, QString filename)
 {
 	vtkPNGWriterPtr pngWriter = vtkPNGWriterPtr::New();
 	pngWriter->SetFileName(filename.toStdString().c_str());
@@ -159,14 +192,14 @@ void TestVtkRendering::writeToPNG(vtkImageDataPtr image, QString filename)
 	pngWriter->Write();
 }
 
-vtkImageDataPtr TestVtkRendering::readFromFile(QString filename)
+vtkImageDataPtr RenderTester::readFromFile(QString filename)
 {
-	return DataReaderWriter().loadVtkImageData(filename);
+	return cx::DataReaderWriter().loadVtkImageData(filename);
 //	if (QFileInfo(filename).)
 //	vtkImageDataPtr load(const QString& filename);
 }
 
-vtkImageDataPtr TestVtkRendering::readFromPNG(QString filename)
+vtkImageDataPtr RenderTester::readFromPNG(QString filename)
 {
 	vtkPNGReaderPtr pngReader = vtkPNGReaderPtr::New();
 	pngReader->SetFileName(filename.toStdString().c_str());
@@ -174,7 +207,7 @@ vtkImageDataPtr TestVtkRendering::readFromPNG(QString filename)
 	return pngReader->GetOutput();
 }
 
-void TestVtkRendering::enterRunLoop()
+void RenderTester::enterRunLoop()
 {
 	// Setup render window interactor
 	vtkRenderWindowInteractorPtr renderWindowInteractor = vtkRenderWindowInteractorPtr::New();
@@ -184,7 +217,7 @@ void TestVtkRendering::enterRunLoop()
 	renderWindowInteractor->Start();
 }
 
-vtkImageDataPtr TestVtkRendering::clipImage(vtkImageDataPtr input)
+vtkImageDataPtr RenderTester::clipImage(vtkImageDataPtr input)
 {
 	vtkImageClipPtr imageClip = vtkImageClipPtr::New();
 	imageClip->SetClipData(1);
@@ -201,7 +234,7 @@ vtkImageDataPtr TestVtkRendering::clipImage(vtkImageDataPtr input)
 	return imageClip->GetOutput();
 }
 
-bool TestVtkRendering::equalExtent(vtkImageDataPtr input1, vtkImageDataPtr input2)
+bool RenderTester::equalExtent(vtkImageDataPtr input1, vtkImageDataPtr input2)
 {
 	int ext1[6], ext2[6];
 	input1->Update();
@@ -215,12 +248,12 @@ bool TestVtkRendering::equalExtent(vtkImageDataPtr input1, vtkImageDataPtr input
 	{
 		return true;
 	}
-	std::cout << "image1 extent: " << IntBoundingBox3D(ext1) << std::endl;
-	std::cout << "image2 extent: " << IntBoundingBox3D(ext2) << std::endl;
+	std::cout << "image1 extent: " << cx::IntBoundingBox3D(ext1) << std::endl;
+	std::cout << "image2 extent: " << cx::IntBoundingBox3D(ext2) << std::endl;
 	return false;
 }
 
-bool TestVtkRendering::hasValidDimensions(vtkImageDataPtr input)
+bool RenderTester::hasValidDimensions(vtkImageDataPtr input)
 {
 	if(!input)
 		return false;
@@ -231,13 +264,13 @@ bool TestVtkRendering::hasValidDimensions(vtkImageDataPtr input)
 }
 
 
-bool TestVtkRendering::equalNumberOfComponents(vtkImageDataPtr image1, vtkImageDataPtr image2)
+bool RenderTester::equalNumberOfComponents(vtkImageDataPtr image1, vtkImageDataPtr image2)
 {
 	return image1->GetNumberOfScalarComponents() == image2->GetNumberOfScalarComponents();
 }
 
 
-vtkImageDataPtr TestVtkRendering::convertToColorImage(vtkImageDataPtr image)
+vtkImageDataPtr RenderTester::convertToColorImage(vtkImageDataPtr image)
 {
 	if (image->GetNumberOfScalarComponents() != 1)
 		return image;
@@ -249,7 +282,7 @@ vtkImageDataPtr TestVtkRendering::convertToColorImage(vtkImageDataPtr image)
 	return merger->GetOutput();
 }
 
-bool TestVtkRendering::findDifference(vtkImageDataPtr input1, vtkImageDataPtr input2)
+bool RenderTester::findDifference(vtkImageDataPtr input1, vtkImageDataPtr input2)
 {
 	if (!this->equalNumberOfComponents(input1, input2))
 	{
@@ -289,4 +322,19 @@ bool TestVtkRendering::findDifference(vtkImageDataPtr input1, vtkImageDataPtr in
 	return minError < mImageErrorThreshold;
 }
 
-} // namespace cx
+
+unsigned int RenderTester::getNumberOfNonZeroPixels(vtkImageDataPtr image)
+{
+	if (!image)
+		return 0;
+	unsigned char* ptr = reinterpret_cast<unsigned char*>(image->GetScalarPointer());
+	unsigned int pixelCount = 0;
+	for (unsigned i = 0; i < image->GetDimensions()[0]*image->GetDimensions()[1]; ++i)
+	{
+		if (ptr[i*image->GetNumberOfScalarComponents()] != 0)
+			++pixelCount;
+	}
+	return pixelCount;
+}
+
+} // namespace cxtest
