@@ -163,8 +163,7 @@ class VTK(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('http://vtk.org/VTK.git')
     def update(self):
-        #self._getBuilder().gitCheckout('v5.8.0', patch='VTK-5-8-0.patch')
-        self._getBuilder().gitCheckout('v5.10.1')
+        self._getBuilder().gitCheckout('v5.10.1', patch='VTK-5-10-1.patch')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption

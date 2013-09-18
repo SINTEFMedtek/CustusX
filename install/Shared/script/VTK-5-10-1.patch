@@ -1,0 +1,29 @@
+From e6a281344d14cd3d2034d59e63816764b032b8b0 Mon Sep 17 00:00:00 2001
+From: Christian Askeland <christian.askeland@sintef.no>
+Date: Wed, 18 Sep 2013 10:06:03 +0200
+Subject: [PATCH] enabled gpu volume rendering for Mac
+
+---
+ VolumeRendering/vtkOpenGLGPUVolumeRayCastMapper.cxx | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/VolumeRendering/vtkOpenGLGPUVolumeRayCastMapper.cxx b/VolumeRendering/vtkOpenGLGPUVolumeRayCastMapper.cxx
+index 1bfa38a..46ae789 100644
+--- a/VolumeRendering/vtkOpenGLGPUVolumeRayCastMapper.cxx
++++ b/VolumeRendering/vtkOpenGLGPUVolumeRayCastMapper.cxx
+@@ -2148,8 +2148,10 @@ void vtkOpenGLGPUVolumeRayCastMapper::LoadExtensions(
+   // Cg compiler about an infinite loop.
+ #ifndef APPLE_SNOW_LEOPARD_BUG
+  #ifdef __APPLE__
+-  this->LoadExtensionsSucceeded=0;
+-  return;
++    // hack: removed by CA/SINTEF/2012.09.25
++    // this renderer now works on MacOSX 10.7+
++    //  this->LoadExtensionsSucceeded=0;
++    //  return;
+  #endif
+ #endif
+ 
+-- 
+1.8.4
+
