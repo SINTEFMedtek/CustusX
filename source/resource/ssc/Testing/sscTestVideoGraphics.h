@@ -58,7 +58,7 @@ private:
 	vtkImageDataPtr  readImageData(QString filename, QString description);
 	cx::ProbeData readProbeData(QString filename);
 	void addImageToRenderer(vtkImageDataPtr image);
-	cx::TestVtkRenderingPtr mMachine;
+	cxtest::RenderTesterPtr mMachine;
 	cx::VideoGraphicsPtr mVideoGraphics;
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestVideoGraphics );
