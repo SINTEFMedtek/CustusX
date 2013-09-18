@@ -17,15 +17,9 @@
 
 #include "catch.hpp"
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
-
-
-#include <QtGui>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkWindowToImageFilter.h>
-#include "sscView.h"
 #include "sscVolumetricRep.h"
-#include "sscVector3D.h"
+
+#include <vtkImageData.h>
 #include "sscImage.h"
 #include "cxtestRenderTester.h"
 #include "cxtestUtilities.h"
@@ -36,7 +30,7 @@ typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;
 namespace cxtest
 {
 
-void testVolumeRep(cx::RepPtr rep)
+void simpleVolumeRepTest(cx::RepPtr rep)
 {
 	unsigned int viewAxisSize = 30;
 	RenderTesterPtr renderTester = cxtest::RenderTester::create(rep, viewAxisSize);
@@ -58,10 +52,10 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[integra
 	REQUIRE(rep);
 	rep->setImages(images);
 
-	testVolumeRep(rep);
+	simpleVolumeRepTest(rep);
 }
 
-TEST_CASE("VolumetricRep can render 1 small volume.", "[unit][gui]")
+TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 small volume.", "[unit][gui]")
 {
 	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(3,3,3), 200);
 
@@ -69,7 +63,19 @@ TEST_CASE("VolumetricRep can render 1 small volume.", "[unit][gui]")
 	REQUIRE(rep);
 	rep->setImage(image);
 
-	testVolumeRep(rep);
+	simpleVolumeRepTest(rep);
+}
+
+TEST_CASE("VolumetricRep using vtkGPUVolumeRayCastMapper can render 1 small volume.", "[integration][gui][notmac]")
+{
+	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(3,3,3), 200);
+
+	cx::VolumetricRepPtr rep = cx::VolumetricRep::New("");
+	REQUIRE(rep);
+	rep->setUseGPUVolumeRayCastMapper();
+	rep->setImage(image);
+
+	simpleVolumeRepTest(rep);
 }
 
 } // namespace cxtest
