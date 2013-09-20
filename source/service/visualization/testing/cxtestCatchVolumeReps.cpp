@@ -99,7 +99,7 @@ TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 large volum
 	REQUIRE(rep);
 	rep->setImage(image);
 
-	simpleVolumeRepTest(rep);
+	simpleVolumeRepTest(rep, 1000);
 }
 
 TEST_CASE("VolumetricRep using vtkGPUVolumeRayCastMapper can render 1 small volume.", "[rep][integration][gui][notmac]")
