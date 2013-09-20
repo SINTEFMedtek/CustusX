@@ -25,6 +25,7 @@
 #include "cxTimedAlgorithm.h"
 #include "cxUSReconstructInputDataAlgoritms.h"
 #include "sscReconstructManager.h"
+#include "TordReconstruct/TordTest.h"
 
 #include "catch.hpp"
 
@@ -54,7 +55,7 @@ public:
 	void testAngioReconstruction();///< Test reconstruction of US angio data (#318)
 	void testThunderGPUReconstruction();///< Test Thunder GPU reconstruction
 	void testDualAngio();
-
+	void testTordTest(); // Test Tord GPU VNN implementation
 private:
 	cx::ReconstructManagerPtr createManager();
 	void validateData(cx::ImagePtr output);
@@ -328,6 +329,14 @@ void ReconstructManagerTestFixture::testDualAngio()
 	this->validateAngioData(cores[1]->getOutput());
 }
 
+void ReconstructManagerTestFixture::testTordTest()
+{
+	cx::ReconstructManagerPtr reconstructer = this->createManager();
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("TordTest");
+	boost::shared_ptr<cx::TordTest> algorithm;
+	algorithm = boost::dynamic_pointer_cast<cx::TordTest>(reconstructer->createAlgorithm());
+	REQUIRE(algorithm);
+}
 
 TEST_CASE("ReconstructManager: Slerp Interpolation", "[usreconstruction][unit]")
 {
@@ -350,6 +359,11 @@ TEST_CASE("ReconstructManager: Dual Angio", "[usreconstruction][integration]")
 	fixture.testDualAngio();
 }
 
+TEST_CASE("ReconstructManager: TordTest", "[usreconstruction][integration][tordtest]")
+{
+	ReconstructManagerTestFixture fixture;
+	fixture.testTordTest();
+}
 
 } // namespace cx
 
