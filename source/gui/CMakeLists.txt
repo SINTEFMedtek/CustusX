@@ -120,6 +120,8 @@ INCLUDE_DIRECTORIES(
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
     .
+    ${CustusX3_SOURCE_DIR}/source/resource/videoServer
+    ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
     ${CustusX3_SOURCE_DIR}/source/service/patient     
     ${CustusX3_SOURCE_DIR}/source/service/tracking     
     ${CustusX3_SOURCE_DIR}/source/service/visualization
