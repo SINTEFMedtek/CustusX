@@ -30,9 +30,8 @@ typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;
 namespace cxtest
 {
 
-void simpleVolumeRepTest(cx::RepPtr rep)
+void simpleVolumeRepTest(cx::RepPtr rep, unsigned int viewAxisSize = 30)
 {
-	unsigned int viewAxisSize = 30;
 	RenderTesterPtr renderTester = cxtest::RenderTester::create(rep, viewAxisSize);
 
 	vtkImageDataPtr output = renderTester->renderToImage();
@@ -78,7 +77,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 large volumes.", "[rep][in
 	REQUIRE(rep);
 	rep->setImages(images);
 
-	simpleVolumeRepTest(rep);
+	simpleVolumeRepTest(rep, 1000);
 }
 
 TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 small volume.", "[rep][unit][gui]")
