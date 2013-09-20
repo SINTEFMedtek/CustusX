@@ -54,7 +54,7 @@ include_directories(
     )
 
 SET( cxPluginUSReconstruction_LIB_FILES
-    SSC
+    cxResource
     sscUS3DReconstruction
     cxResource
     cxPatientService

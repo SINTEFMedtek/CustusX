@@ -41,19 +41,6 @@ SET( SOURCE_FILES
 
 # =========================================================
 
-SET( cxPluginUSReconstructionLogic_LIB_FILES
-    SSC
-    cxUtilities
-#    cxUtilities 
-#    cxSettings
-#    cxUtilities
-#    cxPatientService
-    #thunder 
-#    cxTrackingService
-#    ITKCommon
-    )
-
-
 include_directories(
     .
     )
@@ -130,9 +117,9 @@ add_library( sscUS3DReconstruction ${SOURCE_FILES} )
 
 # Don't try to use OpenCl if we haven't got it
 IF( SSC_USE_OpenCL )
-    target_link_libraries( sscUS3DReconstruction SSC cxResource ${OPENCL_LIBRARIES})
+    target_link_libraries( sscUS3DReconstruction cxResource ${OPENCL_LIBRARIES})
 ELSE()
-    target_link_libraries( sscUS3DReconstruction SSC cxResource)
+    target_link_libraries( sscUS3DReconstruction cxResource)
 ENDIF()
 
 

@@ -21,10 +21,12 @@
 ###########################################################
 
 cmake_minimum_required( VERSION 2.6 )
-
+	
 include_directories(
-    ${CX_SSC_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     )
+
+add_subdirectory(cisst_code)
 
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
@@ -49,5 +51,5 @@ if (BUILD_TESTING)
 	    ${CustusX3_SOURCE_DIR}/source/ThirdParty/catch
 	    )
         add_library( cxtestUtilities ${CX_CATCH_SHARED_LIB_TYPE} ${CX_TESTUTILITIES_SOURCE_FILES} )
-	target_link_libraries(cxtestUtilities SSC)
+	target_link_libraries(cxtestUtilities cxResource)
 endif (BUILD_TESTING)

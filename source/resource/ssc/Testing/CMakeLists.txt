@@ -82,7 +82,6 @@ if (BUILD_TESTING)
         )
         
 
-	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
 	include(cxTestMacros)
 	add_subdirectory(cisst_code)
 

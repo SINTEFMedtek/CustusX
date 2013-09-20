@@ -51,7 +51,6 @@ include_directories(
 include_directories(Rep)
 
 set(cxVisualizationService_LIBS
-    SSC
     cxResource
     cxVideoService
     cxPatientService

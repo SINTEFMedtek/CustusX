@@ -80,7 +80,7 @@ if(CX_APPLE)
 endif()
 
 set( ALL_LINK_LIBRARIES
-	SSC
+	cxResource
 	OpenIGTLink
 	cxOpenIGTLinkUtilities
 	${QT_LIBRARIES})

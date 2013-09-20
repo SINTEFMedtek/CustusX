@@ -32,7 +32,7 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 ADD_LIBRARY ( cxLogicManager ${cxLogicManager_SOURCE} ${MOC_HEADER_FILES} )
 
 target_link_libraries(cxLogicManager
-    SSC
+    cxResource
     cxPatientService
     cxTrackingService
     cxVisualizationService
