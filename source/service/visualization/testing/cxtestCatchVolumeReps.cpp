@@ -37,8 +37,8 @@ void simpleVolumeRepTest(cx::RepPtr rep)
 
 	vtkImageDataPtr output = renderTester->renderToImage();
 //	REQUIRE(cx::similar(Eigen::Array3i(output->GetDimensions()), Eigen::Array3i(viewAxisSize,viewAxisSize,1)));
-    REQUIRE(output->GetDimensions()[0] == viewAxisSize);
-    REQUIRE(output->GetDimensions()[1] == viewAxisSize);
+	REQUIRE(output->GetDimensions()[0] == viewAxisSize);
+	REQUIRE(output->GetDimensions()[1] == viewAxisSize);
 
 	unsigned int numNonZeroPixels = renderTester->getNumberOfNonZeroPixels(output);
 	REQUIRE(numNonZeroPixels > 0);
@@ -59,26 +59,26 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[rep][in
 
 TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 1 small volume.", "[rep][integration][gui][notmac]")
 {
-    unsigned int imageCount = 1;
-    std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(3,3,3), 200);
+	unsigned int imageCount = 1;
+	std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(3,3,3), 200);
 
-    cx::MehdiGPURayCastMultiVolumeRepPtr rep = cx::MehdiGPURayCastMultiVolumeRep::New("");
-    REQUIRE(rep);
-    rep->setImages(images);
+	cx::MehdiGPURayCastMultiVolumeRepPtr rep = cx::MehdiGPURayCastMultiVolumeRep::New("");
+	REQUIRE(rep);
+	rep->setImages(images);
 
-    simpleVolumeRepTest(rep);
+	simpleVolumeRepTest(rep);
 }
 
 TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 large volumes.", "[rep][integration][gui][notmac]")
 {
-    unsigned int imageCount = 3;
-    std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(300,300,300), 200);
+	unsigned int imageCount = 3;
+	std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(300,300,300), 200);
 
-    cx::MehdiGPURayCastMultiVolumeRepPtr rep = cx::MehdiGPURayCastMultiVolumeRep::New("");
-    REQUIRE(rep);
-    rep->setImages(images);
+	cx::MehdiGPURayCastMultiVolumeRepPtr rep = cx::MehdiGPURayCastMultiVolumeRep::New("");
+	REQUIRE(rep);
+	rep->setImages(images);
 
-    simpleVolumeRepTest(rep);
+	simpleVolumeRepTest(rep);
 }
 
 TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 small volume.", "[rep][unit][gui]")
