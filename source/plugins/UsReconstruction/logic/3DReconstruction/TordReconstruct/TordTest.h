@@ -38,6 +38,10 @@ protected:
 	virtual bool initCL(QString kernel_file);
 	virtual bool doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                              vtkImageDataPtr outputData);
+	virtual bool initializeFrameBlocks(unsigned char** framePointers,
+	                                   int numBlocks,
+	                                   ProcessedUSInputDataPtr input_frames);
+
 	/// OpenCL handles
 	cl_kernel mClKernel;
 	std::vector<cl_mem> mVClMemBscan;
