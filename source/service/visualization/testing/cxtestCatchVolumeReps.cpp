@@ -43,7 +43,7 @@ void simpleVolumeRepTest(cx::RepPtr rep)
 	REQUIRE(numNonZeroPixels < viewAxisSize*viewAxisSize);
 }
 
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[integration][gui][notmac]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[rep][integration][gui][notmac]")
 {
 	unsigned int imageCount = 3;
 	std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(3,3,3), 200);
@@ -55,7 +55,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[integra
 	simpleVolumeRepTest(rep);
 }
 
-TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 small volume.", "[unit][gui]")
+TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 small volume.", "[rep][unit][gui]")
 {
 	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(3,3,3), 200);
 
@@ -66,7 +66,7 @@ TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 small volum
 	simpleVolumeRepTest(rep);
 }
 
-TEST_CASE("VolumetricRep using vtkGPUVolumeRayCastMapper can render 1 small volume.", "[integration][gui][notmac]")
+TEST_CASE("VolumetricRep using vtkGPUVolumeRayCastMapper can render 1 small volume.", "[rep][integration][gui][notmac]")
 {
 	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(3,3,3), 200);
 
