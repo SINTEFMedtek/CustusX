@@ -92,6 +92,17 @@ TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 small volum
 	simpleVolumeRepTest(rep);
 }
 
+TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 large volume.", "[rep][integration][gui]")
+{
+	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(300,300,300), 200);
+
+	cx::VolumetricRepPtr rep = cx::VolumetricRep::New("");
+	REQUIRE(rep);
+	rep->setImage(image);
+
+	simpleVolumeRepTest(rep);
+}
+
 TEST_CASE("VolumetricRep using vtkGPUVolumeRayCastMapper can render 1 small volume.", "[rep][integration][gui][notmac]")
 {
 	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(3,3,3), 200);
