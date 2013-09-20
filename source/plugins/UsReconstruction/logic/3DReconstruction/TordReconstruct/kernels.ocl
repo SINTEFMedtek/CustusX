@@ -8,30 +8,53 @@ typedef struct _close_plane
 	float dist;
 	int plane_id;
 } close_plane_t;
-	
+#define MAX_PLANES 3
+
 #define VOXEL(v,x,y,z) v[x + y*volume_xsize + z*volume_ysize*volume_xsize]
 
-void voxel_methods(int volume_xsize,
-                   int volume_ysize,
-                   int volume_zsize,
-                   int in_xsize,
-                   int in_ysize,
-                   int n_planes,
-                   __global unsigned char* in_bscans_b0,
-                   __global unsigned char* in_bscans_b1,
-                   __global unsigned char* in_bscans_b2,
-                   __global unsigned char* in_bscans_b3,
-                   __global unsigned char* in_bscans_b4,
-                   __global unsigned char* in_bscans_b5,
-                   __global unsigned char* in_bscans_b6,
-                   __global unsigned char* in_bscans_b7,
-                   __global unsigned char* in_bscans_b8,
-                   __global unsigned char* in_bscans_b9,
-                   __global float* out_volume,
-                   __global float4* plane_eqs,
-                   __global float4* plane_corners,
-                   float radius,
-                   int method
+
+
+int
+findClosePlanes(close_plane_t *close_planes,
+                __global float4* plane_eqs,
+                int n_planes,
+                float4 voxel,
+                float radius)
+{
+	return 0;
+}
+
+float
+performInterpolation(close_plane_t *close_planes,
+                     int n_close_planes,
+                     __global unsigned char* bscans_blocks[])
+{
+	return 255;
+}
+	
+
+__kernel void
+voxel_methods(int volume_xsize,
+                            int volume_ysize,
+                            int volume_zsize,
+                            int in_xsize,
+                            int in_ysize,
+                            int n_planes,
+                            __global unsigned char* in_bscans_b0,
+                            __global unsigned char* in_bscans_b1,
+                            __global unsigned char* in_bscans_b2,
+                            __global unsigned char* in_bscans_b3,
+                            __global unsigned char* in_bscans_b4,
+                            __global unsigned char* in_bscans_b5,
+                            __global unsigned char* in_bscans_b6,
+                            __global unsigned char* in_bscans_b7,
+                            __global unsigned char* in_bscans_b8,
+                            __global unsigned char* in_bscans_b9,
+                            __global float* out_volume,
+                            __global float4* plane_eqs,
+                            __global float4* plane_corners,
+                            float radius,
+                            int method
 	)
 {
 	int id = get_global_id(0);
@@ -39,7 +62,8 @@ void voxel_methods(int volume_xsize,
 	int z = id % volume_xsize;
 
 	// Aggregate pointers to the bscan blocks into one array for convenience
-	unsigned char *bscans_blocks[] = { in_bscans_b0,
+	
+	__global unsigned char *bscans_blocks[] = { in_bscans_b0,
 	                                   in_bscans_b1,
 	                                   in_bscans_b2,
 	                                   in_bscans_b3,
@@ -57,11 +81,11 @@ void voxel_methods(int volume_xsize,
 	
 	// For most of these algorithms we need to find some set of close planes.
 	// We find all planes that are inside the voxel radius
-	close_plane_t close_planes;
+	close_plane_t *close_planes;
 	int n_close_planes;
 	
 	// Iterate over Y axis
-	for(int y = 0; ypos < volume_ysize; ypos++)
+	for(int y = 0; y < volume_ysize; y++)
 	{
 		float4 voxel = {x, y, z, 0};
 		
@@ -69,8 +93,8 @@ void voxel_methods(int volume_xsize,
 		n_close_planes = findClosePlanes(close_planes, plane_eqs, n_planes, voxel, radius);
 		
 		// Call appropriate method to determine pixel value
-		VOXEL(output_volume,x,y,z) = performInterpolation(close_planes, n_close_planes, bscan_blocks);
+		VOXEL(out_volume,x,y,z) = performInterpolation(close_planes, n_close_planes, bscans_blocks);
 		
 	}
-
+}
 	

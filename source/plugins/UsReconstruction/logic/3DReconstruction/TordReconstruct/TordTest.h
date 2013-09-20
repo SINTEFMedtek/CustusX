@@ -2,8 +2,9 @@
 #ifndef TORD_TEST_H_
 #define TORD_TEST_H_
 
-#include "sscReconstructAlgorithm.h"
 
+#include "sscReconstructAlgorithm.h"
+#include "Thunder/setup.h"
 
 namespace cx
 {
@@ -21,18 +22,28 @@ class TordTest : public ReconstructAlgorithm
 {
 public:
 	TordTest();
-	virtual ~TordTest()
-	{
-	}
+	virtual ~TordTest();
 	virtual QString getName() const
 	{
 		return "TordTest";
 	}
-		
+	
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
 	virtual bool reconstruct(ProcessedUSInputDataPtr input,
 	                         vtkImageDataPtr outputData,
 	                         QDomElement settings);
+
+protected:
+	
+	virtual bool initCL(QString kernel_file);
+	virtual bool doGPUReconstruct(ProcessedUSInputDataPtr input,
+	                              vtkImageDataPtr outputData);
+	/// OpenCL handles
+	cl_kernel mClKernel;
+	std::vector<cl_mem> mVClMemBscan;
+	cl_mem mClMemOutput;
+	ocl_context* moClContext;
+	
 };
 
 }
