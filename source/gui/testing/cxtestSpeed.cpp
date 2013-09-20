@@ -15,8 +15,10 @@
 #include "catch.hpp"
 
 #include <QTimer>
+#include <vtkImageData.h>
 
 #include "sscImage.h"
+#include "sscView.h"
 #include "cxtestSender.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
@@ -24,30 +26,49 @@
 #include "cxDataLocations.h"
 #include "cxSettings.h"
 #include "cxtestJenkinsMeasurement.h"
+#include "cxtestRenderTester.h"
+#include "cxViewManager.h"
 
 
 namespace cxtest
 {
 
-TEST_CASE("Speed: Run CustusX with a minimum render speed", "[speed][gui][integration]")
+void initTest()
 {
-	JenkinsMeasurement jenkins;
-	jenkins.initialize();
-//	cout << "CTEST_FULL_OUTPUT" << endl;
-	// this stuff will be performed just before all tests in this class
 	cx::DataLocations::setTestMode();
 	cx::settings()->setValue("renderingInterval", 4);
+#ifdef __APPLE__
+	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
+#else
+	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
+#endif
+}
+
+void requireVolumeIn3DScene()
+{
+	RenderTesterPtr renderTester = cxtest::RenderTester::create(cx::viewManager()->get3DView()->getRenderWindow());
+	vtkImageDataPtr output = renderTester->renderToImage();
+	int numNonZeroPixels = renderTester->getNumberOfNonZeroPixels(output);
+//	std::cout << "numNonZeroPixels: " << numNonZeroPixels << std::endl;
+	REQUIRE(numNonZeroPixels > 50000);//Expect more than the pointer in the 3D scene
+	REQUIRE(numNonZeroPixels < output->GetDimensions()[0]*output->GetDimensions()[1]);
+}
+
+TEST_CASE("Speed: Run CustusX with a minimum render speed", "[speed][gui][integration]")
+{
+	initTest();
+
+	JenkinsMeasurement jenkins;
+	jenkins.initialize();
 
 	CustusXController custusX(NULL);
 	custusX.mPatientFolder = cx::DataLocations::getTestDataPath() + "/Phantoms/Kaisa/CustusX/Speed_Test_Kaisa.cx3";
 
 	custusX.start();
 	qApp->exec();
+	requireVolumeIn3DScene();
 	custusX.stop();
 
-	// output FPS in a way friendly to the Jenkins measurement plugin:
-//	QString measurement = defineJenkinsMeasurememt("FPS", QString::number(custusX.mMeasuredFPS));
-//	std::cout << measurement << std::endl;
 	jenkins.createOutput("FPS", QString::number(custusX.mMeasuredFPS));
 
 	// TODO: enter this value into config file
@@ -57,12 +78,10 @@ TEST_CASE("Speed: Run CustusX with a minimum render speed", "[speed][gui][integr
 
 TEST_CASE("Speed: Run CustusX with interactive slicing at a minimum render speed", "[speed][gui][integration]")
 {
+	initTest();
+
 	JenkinsMeasurement jenkins;
 	jenkins.initialize();
-
-	// this stuff will be performed just before all tests in this class
-	cx::DataLocations::setTestMode();
-	cx::settings()->setValue("renderingInterval", 4);
 
 	CustusXController custusX(NULL);
 	custusX.mPatientFolder = cx::DataLocations::getTestDataPath() + "/Phantoms/Kaisa/CustusX/Speed_Test_Kaisa.cx3";
@@ -70,6 +89,7 @@ TEST_CASE("Speed: Run CustusX with interactive slicing at a minimum render speed
 
 	custusX.start();
 	qApp->exec();
+	requireVolumeIn3DScene();
 	custusX.stop();
 
 	jenkins.createOutput("FPS_Slicing", QString::number(custusX.mMeasuredFPS));
