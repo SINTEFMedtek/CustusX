@@ -7,7 +7,7 @@ if(BUILD_OPEN_IGTLINK_SERVER)
     include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 
     SET(LINK_LIBRARIES
-            SSC
+            cxResource
             OpenIGTLink
             )
 

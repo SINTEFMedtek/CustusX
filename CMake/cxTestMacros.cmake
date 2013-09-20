@@ -45,8 +45,6 @@ macro(SSC_ADD_CTEST_CPPUNIT_TESTS TEST_NAME CPPUNIT_MAIN SOURCE_FILES LIBRARIES 
 				${SOURCE_FILES}
 				)
 			target_link_libraries(${TEST_NAME} ${LIBRARIES} ${CPPUNIT_LIBRARIES})
-			# sonowand stuff
-			set_target_properties(${TEST_NAME} PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
 		endif()
 
 		# --------------- -------------------------------
@@ -54,14 +52,13 @@ macro(SSC_ADD_CTEST_CPPUNIT_TESTS TEST_NAME CPPUNIT_MAIN SOURCE_FILES LIBRARIES 
 		# --   Use CISST_ADD_TESTS() to convert each CppUnit test to a CTest test.
 
 		# Initialize cisst routines
-		set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/Testing/cisst_code)
+		set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CustusX3_SOURCE_DIR}/source/resource/testUtilities/cisst_code)
 		include(cisstMacros)
 		#add_subdirectory(cisst_code)
 
 		# link all CppUnit tests to the cisstTestsMain library
 		set(MERGE_CTEST_NAME ${TEST_NAME}_CppUnit_CTest)
 		add_executable(${MERGE_CTEST_NAME} ${SOURCE_FILES} )
-		set_target_properties(${MERGE_CTEST_NAME} PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
 		target_link_libraries(${MERGE_CTEST_NAME} cisstTestsMain ${LIBRARIES} ${CPPUNIT_LIBRARIES})
 		# Generate a CTest list of tests
 		CISST_ADD_TESTS(${MERGE_CTEST_NAME})

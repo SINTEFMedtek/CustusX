@@ -29,7 +29,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	dataWidgets/cxTransferFunctionWidget
 	dataWidgets/cxTransferFunctionAlphaWidget
 	dataWidgets/cxTransferFunctionColorWidget
-	dataWidgets/sscDICOMWidget
+#	dataWidgets/sscDICOMWidget
 	dataWidgets/cxEraserWidget
 	dataWidgets/cxDataSelectWidget
 	dataWidgets/cxInfoWidget

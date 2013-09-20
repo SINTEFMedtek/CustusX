@@ -24,13 +24,13 @@ SET( SOURCE_FILES
     BronchoscopyRegistrationMain.cpp
 	) 
 	
-include_directories(${CX_SSC_INCLUDE_DIRECTORIES})
+include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 
 # =========================================================
 # create the target
 add_executable( BronchoscopyRegistration MACOSX_BUNDLE 
     ${SOURCE_FILES} )
-target_link_libraries( BronchoscopyRegistration SSC )
+target_link_libraries( BronchoscopyRegistration cxResource )
 # =========================================================
 
 

@@ -22,7 +22,6 @@ if (BUILD_TESTING)
         cxTestRenderSpeed.cpp
         )
 
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
     include(cxTestMacros)
     # define cppunit tests and ctest tests from same source:
     SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestVisualization cxCppUnitMain.cpp "${CX_CPPUNIT_VISUALIZATIONSERVICE_SOURCES}" cxVisualizationService)

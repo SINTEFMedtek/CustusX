@@ -18,7 +18,7 @@ SET( SOURCE_FILES
     cxMemoryTesterMain.cpp
 	) 
 	
-include_directories(${CX_SSC_INCLUDE_DIRECTORIES})
+include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -31,7 +31,7 @@ add_executable( cxMemoryTester MACOSX_BUNDLE
     ${QT_RESOURCE_FILES} 
     ${MOC_HEADER_FILES} 
     ${SOURCE_FILES} )
-target_link_libraries( cxMemoryTester SSC )
+target_link_libraries( cxMemoryTester cxResource )
 # =========================================================
 
 

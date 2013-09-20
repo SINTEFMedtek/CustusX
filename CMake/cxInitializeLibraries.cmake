@@ -189,16 +189,6 @@ macro(cx_initialize_IGSTK)
 endmacro()
 
 ###############################################################################
-# Initialize SSC library
-# Find the package and run the include USE file.
-###############################################################################
-#macro(cx_initialize_SSC)
-#    find_package(SSC PATHS "${CustusX3_SOURCE_DIR}/source/resource/ssc/CMake" REQUIRED)
-#    include(${SSC_USE_FILE})
-#    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
-#endmacro()
-
-###############################################################################
 # Initialize Code coverage
 #
 # Add option SSC_USE_GCOV and generate variable SSC_GCOV_LIBRARY containing

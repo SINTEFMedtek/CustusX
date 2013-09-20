@@ -25,7 +25,6 @@ if (BUILD_TESTING)
 		${RESOURCE_TEST_SOURCE_FILES}
 		)
   
-	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
 	include(cxTestMacros)
 	# define cppunit tests and ctest tests from same source:
 	SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestResource cxCppUnitMain.cpp "${RESOURCE_TEST_SOURCE_FILES}" cxResource)
