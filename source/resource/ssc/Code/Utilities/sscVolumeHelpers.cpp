@@ -48,8 +48,12 @@ vtkImageDataPtr generateVtkImageData(Eigen::Array3i dim,
 	// A trick to get a full LUT in Image (automatic LUT generation)
 	// Can't seem to fix this by calling Image::resetTransferFunctions() after volume is modified
 	ptr[0] = 255;
+	if (scalarSize > 1)
+		ptr[1] = 0;
 	data->GetScalarRange();// Update internal data in vtkImageData. Seems like it is not possible to update this data after the volume has been changed.
-	ptr[0] = 0;
+	ptr[0] = initValue;
+	if (scalarSize > 1)
+		ptr[1] = initValue;
 
 	data->UpdateInformation(); // update extent etc
 

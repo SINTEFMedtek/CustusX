@@ -114,7 +114,8 @@ set(ALL_LIBRARY_DIRS
 #    ${SSC_BINARY_DIR}/Code
 #    ${SSC_BINARY_DIR}/DICOMLib
 #    ${SSC_BINARY_DIR}/Testing/cisst_code
-    ${CustusX3_BINARY_DIR}
+	${CustusX3_BINARY_DIR}/source/ThirdParty/VTKMultiVolume
+	${CustusX3_BINARY_DIR}
     ${CustusX3_BINARY_DIR}/source
     ${CustusX3_BINARY_DIR}/source/service/patient
     ${CustusX3_BINARY_DIR}/source/service/state
