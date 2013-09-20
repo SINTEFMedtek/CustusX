@@ -3,11 +3,24 @@
 #include <vtkImageData.h>
 #include <QDomElement>
 #include <iostream>
+#include <Thunder/utils.h>
+#include <recConfig.h>
 namespace cx
 {
 
 TordTest::TordTest()
 {
+	// FIXME: Be more clever when determining kernel path
+	initCL(QString(TORD_KERNEL_PATH) + "/kernels.ocl");
+}
+
+TordTest::~TordTest()
+{
+	if(moClContext != NULL)
+	{
+		ocl_release(moClContext);
+		moClContext = NULL;
+	}
 }
 
 std::vector<DataAdapterPtr>
@@ -17,6 +30,47 @@ TordTest::getSettings(QDomElement root)
 	// Add settings here if needed
 	return retval;
 }
+
+bool
+TordTest::initCL(QString kernel_path)
+{
+	// Reusing initialization code from Thunder
+	moClContext = ocl_init("GPU");
+
+	size_t source_len;
+
+	messageManager()->sendInfo(QString("Kernel path: %1").arg(kernel_path));
+	char* s_source = file2string(kernel_path.toLocal8Bit().data(),
+	                             &source_len);
+
+	
+	cl_program clprogram = ocl_create_program(moClContext->context,
+	                                    moClContext->device,
+	                                    s_source, kernel_path);
+	mClKernel = ocl_kernel_build(clprogram,
+	                             moClContext->device, "voxel_methods");
+	return true;
+	
+}
+
+
+
+bool
+TordTest::initializeFrameBlocks(unsigned char** framePointers,
+                                int numBlocks,
+                                ProcessedUSInputDataPtr input_frames)
+{
+	// TODO: Fill me
+}
+
+bool
+TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
+                           vtkImageDataPtr outputData)
+{
+	// TODO: Fill me
+	return true;
+}
+
 
 bool
 TordTest::reconstruct(ProcessedUSInputDataPtr input,
@@ -52,7 +106,6 @@ TordTest::reconstruct(ProcessedUSInputDataPtr input,
 
 	return true;
 }
-
 
 }
 
