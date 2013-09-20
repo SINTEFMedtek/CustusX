@@ -62,7 +62,9 @@ include_directories(
     .
     ${CMAKE_CURRENT_BINARY_DIR}/gui #so that is finds the generated ui files
     ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
-    )
+	${CustusX3_SOURCE_DIR}/source/resource/videoServer
+	${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
+	)
 
 if(CX_WINDOWS)
 	set( WIN_LINK_LIBRARIES
