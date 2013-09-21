@@ -23,7 +23,6 @@
 #include <vtkPolyData.h>
 #include <QDomDocument>
 #include <QColor>
-#include "sscRep.h"
 #include "sscTypeConversions.h"
 #include "sscRegistrationTransform.h"
 #include "sscBoundingBox3D.h"

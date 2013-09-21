@@ -20,7 +20,6 @@
 #include "sscDataManager.h"
 #include "sscImage.h"
 #include "sscAxesRep.h"
-#include "sscSliceRep.h"
 #include "sscVolumetricRep.h"
 #include "sscSliceComputer.h"
 #include "sscVector3D.h"
