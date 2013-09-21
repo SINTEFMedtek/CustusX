@@ -11,24 +11,36 @@ if (BUILD_TESTING)
 		${CustusX3_SOURCE_DIR}/source/resource/utilities
 		${CustusX3_SOURCE_DIR}/source/resource/algorithms
         ${CustusX3_SOURCE_DIR}/source/logic
-		)
-      
+		)        
+
 	# List of all test units
-	QT4_WRAP_CPP( RESOURCE_TEST_SOURCE_FILES
-		)
+	QT4_WRAP_CPP(RESOURCE_TEST_SOURCE_FILES
+        sscViewsWindow.h
+        sscContainerWindow.h)
   
 	set(RESOURCE_TEST_SOURCE_FILES
+        sscTestSliceComputer.cpp
+        sscViewsWindow.cpp 
+        sscContainerWindow.cpp
+        sscTestVisualRendering.cpp
+        sscTestViewContainer.cpp
+        sscTestUtilityClasses.cpp
+        sscTestTransform3D.cpp
+        sscTestBoundingBox3D.cpp
+        sscTestGPURayCaster.cpp
+        sscTestVideoGraphics.h
+        sscTestVideoGraphics.cpp
+
 		cxTest_ImageAlgorithms.h
 		cxTest_ImageAlgorithms.cpp
 		cxTestUSReconstructionFileIO.h
 		cxTestUSReconstructionFileIO.cpp
 		${RESOURCE_TEST_SOURCE_FILES}
 		)
-  
+ 
 	include(cxTestMacros)
 	# define cppunit tests and ctest tests from same source:
 	SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestResource cxCppUnitMain.cpp "${RESOURCE_TEST_SOURCE_FILES}" cxResource)
-	
 	
 	#Catch
         set(RESOURCE_TEST_CATCH_SOURCE_FILES
