@@ -19,7 +19,6 @@
 //#include "sscMesh.h"
 //#include "sscGeometricRep.h"
 #include "sscAxesRep.h"
-#include "sscSliceRep.h"
 
 #include "sscVolumetricRep.h"
 #include "sscSliceComputer.h"

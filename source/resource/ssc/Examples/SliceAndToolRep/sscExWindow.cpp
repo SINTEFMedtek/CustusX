@@ -18,7 +18,6 @@
 #include "sscDataManager.h"
 #include "sscImage.h"
 #include "sscAxesRep.h"
-#include "sscSliceRep.h"
 
 #include "sscVolumetricRep.h"
 //#include "sscGPURayCastVolumetricRep.h"

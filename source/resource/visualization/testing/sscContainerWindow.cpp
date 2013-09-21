@@ -16,7 +16,6 @@
 #include "sscDataManager.h"
 #include "sscImage.h"
 #include "sscAxesRep.h"
-#include "sscSliceRep.h"
 #include "sscImageTF3D.h"
 #include "sscVolumetricRep.h"
 #include "sscSliceComputer.h"
@@ -29,7 +28,7 @@
 #include "sscSlicerRepSW.h"
 #include "sscTexture3DSlicerRep.h"
 #include "sscGPURayCastVolumeRep.h"
-#include "sscViewsWindow.h"
+#include "sscContainerWindow.h"
 #include "sscImageTF3D.h"
 
 using cx::Vector3D;
@@ -49,20 +48,7 @@ namespace {
 	}
 }
 
-vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueRangeMin, double hueRangeMax,
-	double saturationRangeMin, double saturationRangeMax, double valueRangeMin, double valueRangeMax)
-{
-	vtkLookupTablePtr lut = vtkLookupTablePtr::New();
-	lut->SetTableRange(tableRangeMin, tableRangeMax);
-	lut->SetHueRange(hueRangeMin, hueRangeMax);
-	lut->SetSaturationRange(saturationRangeMin, saturationRangeMax);
-	lut->SetValueRange(valueRangeMin, valueRangeMax);
-	lut->Build();
-
-	return lut;
-}
-
-ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(displayText)
+ContainerWindow::ContainerWindow(QString displayText, bool showSliders) : mDisplayText(displayText)
 {
 	mZoomFactor = 1;
 	mDumpSpeedData = false;
@@ -79,29 +65,22 @@ ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(d
 	start(showSliders);
 }
 
-void ViewsWindow::setDescription(const QString& desc)
+void ContainerWindow::setDescription(const QString& desc)
 {
 	mAcceptanceBox->setText(desc);
 }
 
-ViewsWindow::~ViewsWindow()
+ContainerWindow::~ContainerWindow()
 {
 }
 
-bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
-{	
-	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
+void ContainerWindow::containerGPUSlice(cx::ViewItem *view, const QString &uid, const QString &imageFilename, cx::PLANE_TYPE plane)
+{
+	cx::ToolManager *mToolmanager = cx::DummyToolManager::getInstance();
 	cx::ToolPtr tool = mToolmanager->getDominantTool();
 	cx::ImagePtr image = loadImage(imageFilename);
-	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
-
-	if (!view || !view->getRenderWindow() || !view->getRenderWindow()->SupportsOpenGL())
-		return false;
-	if (!cx::Texture3DSlicerRep::isSupported(view->getRenderWindow()))
-		return false;
-
 	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
-	view->GetRenderWindow()->GetInteractor()->Disable();
+	view->getRenderWindow()->GetInteractor()->Disable();
 	view->setZoomFactor(mZoomFactor);
 	mLayouts.insert(view);
 	cx::SliceProxyPtr proxy(new cx::SliceProxy());
@@ -112,35 +91,9 @@ bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 	rep->setSliceProxy(proxy);
 	rep->setImages(std::vector<cx::ImagePtr>(1, image));
 	view->addRep(rep);
-	insertView(view, uid, imageFilename, r, c);
-
-	mTimer.setSingleShot(true);
-	mTimer.setInterval(0);
-	connect(&mTimer, SIGNAL(timeout()), this, SLOT(updateRender()));
-	return true;
 }
 
-void ViewsWindow::defineSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
-{
-	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
-	cx::ToolPtr tool = mToolmanager->getDominantTool();
-	cx::ImagePtr image = loadImage(imageFilename);
-	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
-	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
-	view->GetRenderWindow()->GetInteractor()->Disable();
-	view->setZoomFactor(mZoomFactor);
-	mLayouts.insert(view);
-	cx::SliceProxyPtr proxy(new cx::SliceProxy());
-	proxy->setTool(tool);
-	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
-	cx::SliceRepSWPtr rep = cx::SliceRepSW::New(uid);
-	rep->setImage(image);
-	rep->setSliceProxy(proxy);
-	view->addRep(rep);
-	insertView(view, uid, imageFilename, r, c);
-}
-
-cx::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
+cx::ImagePtr ContainerWindow::loadImage(const QString& imageFilename)
 {
 	QString filename = cx::TestUtilities::ExpandDataFileName(imageFilename);
 	cx::ImagePtr image = cx::DataManager::getInstance()->loadImage(filename, filename, cx::rtMETAIMAGE);
@@ -154,52 +107,38 @@ cx::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 	return image;
 }
 
-void ViewsWindow::insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c)
+void ContainerWindow::setupViewContainer(cx::ViewContainer *view, const QString& uid, const QString& volume, int r, int c)
 {
 	QVBoxLayout *layout = new QVBoxLayout;
-	mSliceLayout->addLayout(layout, r,c);
-
+	mSliceLayout->addLayout(layout, r, c);
 	layout->addWidget(view);
 	layout->addWidget(new QLabel(uid+" "+volume, this));
+	mContainer = view;
 }
 
-void ViewsWindow::define3D(const QString& imageFilename, const ImageParameters* parameters, int r, int c)
+void ContainerWindow::container3D(cx::ViewItem *view, const QString& imageFilename)
 {
-	QString uid = "3D";
-	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
-	mLayouts.insert(view);
-	
 	cx::ImagePtr image = loadImage(imageFilename);
-
-	if (parameters != NULL)
-	{
-		image->getTransferFunctions3D()->setLLR(parameters->llr);
-		image->getTransferFunctions3D()->setAlpha(parameters->alpha);
-		image->getTransferFunctions3D()->setLut(parameters->lut);
-	}
+	mLayouts.insert(view);
 
 	// volume rep
-	cx::VolumetricRepPtr mRepPtr = cx::VolumetricRep::New( image->getUid() );
+	cx::VolumetricRepPtr mRepPtr = cx::VolumetricRep::New(image->getUid());
 	mRepPtr->setMaxVolumeSize(10*1000*1000);
 	mRepPtr->setUseGPUVolumeRayCastMapper(); // if available
-	mRepPtr->setImage(image);	
+	mRepPtr->setImage(image);
 	mRepPtr->setName(image->getName());
 	view->addRep(mRepPtr);
-	
+
 	// Tool 3D rep
 	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
 	cx::ToolPtr tool = mToolmanager->getDominantTool();
-	cx::ToolRep3DPtr toolRep = cx::ToolRep3D::New( tool->getUid(), tool->getName() );
+	cx::ToolRep3DPtr toolRep = cx::ToolRep3D::New(tool->getUid(), tool->getName());
 	toolRep->setTool(tool);
 	view->addRep(toolRep);
-	
-	insertView(view, uid, imageFilename, r, c);
 }
 
-bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImageParameters* parameters, int r, int c)
+void ContainerWindow::containerGPU3D(cx::ViewItem *view, const QStringList& imageFilenames, const ImageParameters* parameters)
 {
-	QString uid = "3D";
-	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
 	mLayouts.insert(view);
 
 	std::vector<cx::ImagePtr> images;
@@ -208,10 +147,6 @@ bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 	for (int i = 0; i < numImages; ++i)
 	{
 		cx::ImagePtr image = loadImage(imageFilenames[i]);
-		if (!image)
-		{
-			return false;
-		}
 		if (parameters != NULL)
 		{
 			image->getTransferFunctions3D()->setLLR(parameters[i].llr);
@@ -222,9 +157,8 @@ bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 	}
 
 	// volume rep
+
 #ifndef WIN32
-	if (!cx::GPURayCastVolumeRep::isSupported(view->getRenderWindow()))
-		return false;
 	cx::GPURayCastVolumeRepPtr mRepPtr = cx::GPURayCastVolumeRep::New( images[0]->getUid() );
 	mRepPtr->setShaderFolder(mShaderFolder);
 	mRepPtr->setImages(images);
@@ -238,13 +172,9 @@ bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 	cx::ToolRep3DPtr toolRep = cx::ToolRep3D::New( tool->getUid(), tool->getName() );
 	toolRep->setTool(tool);
 	view->addRep(toolRep);
-	
-	insertView(view, uid, imageFilenames[0], r, c);
-
-	return true;
 }
 
-void ViewsWindow::start(bool showSliders)
+void ContainerWindow::start(bool showSliders)
 {
 	// Initialize dummy toolmanager.
 	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
@@ -253,7 +183,7 @@ void ViewsWindow::start(bool showSliders)
 	mToolmanager->startTracking();
 
 	cx::ToolPtr tool = mToolmanager->getDominantTool();
-	connect( tool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), &mTimer, SLOT( start()));
+	connect( tool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), this, SLOT( updateRender()));
 
 	//gui controll
 	QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -273,7 +203,7 @@ void ViewsWindow::start(bool showSliders)
 	mainLayout->addLayout(controlLayout); //Buttons
 }
 
-void ViewsWindow::updateRender()
+void ContainerWindow::updateRender()
 {
 	for (std::set<cx::View *>::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
 	{
@@ -294,15 +224,7 @@ void ViewsWindow::updateRender()
 	QTime pre = QTime::currentTime();
 	int other = mLastRenderEnd.msecsTo(pre);
 
-	QSet<vtkRenderWindow *> windowList;
-	for (LayoutMap::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
-	{
-		windowList.insert((*iter)->getRenderWindow().GetPointer());
-	}
-	foreach (vtkRenderWindow *win, windowList)
-	{
-		win->Render();
-	}
+	mContainer->renderAll();
 
 	mLastRenderEnd = QTime::currentTime();
 

@@ -7,6 +7,8 @@
 ##
 ###########################################################
 
+include_directories(${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES})
+
 cx_add_class_qt_moc(cxVisualizationService_SOURCE
     cxViewWrapper2D
     cxViewWrapper3D
@@ -51,7 +53,7 @@ include_directories(
 include_directories(Rep)
 
 set(cxVisualizationService_LIBS
-    cxResource
+    cxResourceVisualization
     cxVideoService
     cxPatientService
     cxTrackingService

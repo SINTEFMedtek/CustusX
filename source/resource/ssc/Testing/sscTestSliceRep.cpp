@@ -16,10 +16,7 @@
 #include "sscTestUtilities.h"
 #include "sscDataManager.h"
 #include "sscImage.h"
-//#include "sscMesh.h"
-//#include "sscGeometricRep.h"
 #include "sscAxesRep.h"
-#include "sscSliceRep.h"
 #include "sscView.h"
 
 

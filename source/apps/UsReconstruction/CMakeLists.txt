@@ -15,7 +15,7 @@ SET( SOURCE_FILES
     sscMainWindow.cpp
     )
 
-include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
+include_directories(${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES})
 include_directories(
     .
     ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/gui

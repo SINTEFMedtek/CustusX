@@ -118,6 +118,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
+include_directories(${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES})
 include_directories(
     .
     ${CustusX3_SOURCE_DIR}/source/resource/videoServer
