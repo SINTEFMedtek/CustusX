@@ -52,6 +52,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	dataAdapters/sscVector3DDataAdapterXml
 	dataAdapters/sscColorDataAdapter.h
 	dataAdapters/sscColorDataAdapterXml
+	dataAdapters/cxVector3DComponentDataAdapter
 
 	logger/sscMessageManager
 

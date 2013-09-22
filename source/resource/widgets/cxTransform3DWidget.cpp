@@ -10,7 +10,9 @@
 #include "sscDoubleDataAdapterXml.h"
 #include "sscDoubleWidgets.h"
 #include <cmath>
-#include "cxTrackPadWidget.h"
+#include "sscMousePadWidget.h"
+
+#include <QtGui>
 
 #include "boost/bind.hpp"
 #include "libQtSignalAdapters/Qt2Func.h"
