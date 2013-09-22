@@ -270,7 +270,7 @@ endfunction()
 # private
 ###############################################################################
 macro(_cx_query_is_full_filename RESULT CLASS_NAME_WITH_PATH)
-	STRING(REGEX MATCH "(\\.h|\\.cpp|\\.cxx|\\.qrc|\\.hxx|\\.hpp)$" VALID_SUFFIX ${CLASS_NAME_WITH_PATH})
+	STRING(REGEX MATCH "(\\.h|\\.cpp|\\.cxx|\\.qrc|\\.hxx|\\.hpp|\\.txx)$" VALID_SUFFIX ${CLASS_NAME_WITH_PATH})
 	if("${VALID_SUFFIX}" STREQUAL "")
 		set(${RESULT} "False")
 	else()

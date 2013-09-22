@@ -25,19 +25,6 @@ extern "C"
 {
 #endif
 
-// standard includes
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <limits.h>
-#include <stdint.h>
-#ifndef __cplusplus
-#include <stdbool.h>
-#endif
-#include <stdio.h>
-
-#include "misc.h"
-
 /**
 * \file
 *
@@ -74,9 +61,9 @@ void SSC_Logging( bool on ); ///< Turn logging on or off.
 * @}
 */
 
-void SSC_Log( const char *file, int line, const char *function, const char *format, ... ) sw__attribute((format (printf, 4, 5))); ///< internal function. use SSC_LOG
-void SSC_Error( const char *file, int line, const char *function, const char *format, ...) sw__attribute((format (printf, 4, 5))); ///< internal function. use SSC_ERROR
-void SSC_Warning( const char *file, int line, const char *function, const char *format, ...) sw__attribute((format (printf, 4, 5))); ///< internal function. use SSC_WARNING
+void SSC_Log( const char *file, int line, const char *function, const char *format, ... ); ///< internal function. use SSC_LOG
+void SSC_Error( const char *file, int line, const char *function, const char *format, ...); ///< internal function. use SSC_ERROR
+void SSC_Warning( const char *file, int line, const char *function, const char *format, ...); ///< internal function. use SSC_WARNING
 
 #ifdef __cplusplus
 }

@@ -2,7 +2,7 @@
 ##               Resource Core library
 ###########################################################
 
-cx_add_class_qt_moc(SSC_SOURCE_FILES
+cx_add_class_qt_moc(cxResource_SOURCE
 	Utilities/sscAcceptanceBoxWidget
 	Data/sscData
 	Data/sscImage
@@ -68,58 +68,104 @@ cx_add_class_qt_moc(SSC_SOURCE_FILES
 	Widgets/cxColorSelectButton
 
 	Utilities/sscApplication
-	Utilities/sscMessageManager
+	logger/sscMessageManager
 	Utilities/sscSharedMemory
+	
+	algorithms/cxTimedAlgorithm.h
+    algorithms/cxThreadedTimedAlgorithm.h
+    algorithms/cxCompositeTimedAlgorithm.h
+    settings/cxSettings.h
+    utilities/cxDisplayTimerWidget.h
+    utilities/cxPlaybackTime.h
+    utilities/cxTimelineWidget.h
+    utilities/cxProcessWrapper.h
+	utilities/cxSavingVideoRecorder.h
+	utilities/cxImageDataContainer.h	
 	)
 
      
 # library
-cx_add_class( SSC_SOURCE_FILES
-    sscForwardDeclarations.h
-    vtkForwardDeclarations.h
-
-
-        Tool/sscProbeSector
-        Tool/sscProbeData
-
-        Widgets/sscXmlOptionItem
-		Widgets/sscDoubleRange.h
-
-        Data/sscDataMetric
-        Data/sscLandmark
-        Data/sscDataReaderWriter
-        Data/sscGPUImageBuffer
-
-        Math/sscBoundingBox3D
-        Math/sscVector3D
-        Math/sscTransform3D
-        Math/sscFrame3D
-
-        Utilities/sscGLHelpers
-        Utilities/sscTime
-        Utilities/sscUtilHelpers
-        Utilities/sscLogger
-        Utilities/sscTypeConversions
-        Utilities/sscSliceComputer
-        Utilities/sscDefinitions.h
-        Utilities/sscDefinitionStrings
-        Utilities/sscCustomMetaImage
-        Utilities/sscMD5Check
-        Utilities/sscSnwInifile
-        Utilities/sscIndent
-        Utilities/sscCoordinateSystemHelpers
-        Utilities/sscViewportListener
-        Utilities/sscVolumeHelpers
-        Utilities/sscPositionStorageFile
-        Utilities/sscTimeKeeper
-        Utilities/sscMeshHelpers
-		Utilities/sscAudio.h
-
-    vesselReg/SeansVesselReg.cxx
-    vesselReg/SeansVesselReg.hxx
-    vesselReg/HackTPSTransform.hxx
+cx_add_class(cxResource_SOURCE
+	sscForwardDeclarations.h
+	cxForwardDeclarations.h
+	vtkForwardDeclarations.h
+	
+	Tool/sscProbeSector
+	Tool/sscProbeData
+	Tool/ProbeXmlConfigParser.h
+	Tool/ProbeXmlConfigParserImpl
+	Tool/ProbeXmlConfigParserMock
+	Tool/cxCreateProbeDataFromConfiguration
+	
+	Widgets/sscXmlOptionItem
+	Widgets/sscDoubleRange.h
+	
+	Data/sscDataMetric
+	Data/sscLandmark
+	Data/sscDataReaderWriter
+	Data/sscGPUImageBuffer
+	
+	Math/sscBoundingBox3D
+	Math/sscVector3D
+	Math/sscTransform3D
+	Math/sscFrame3D
+	
+	utilities/cxRenderTimer
+	utilities/cxUsReconstructionFileMaker
+	utilities/cxUsReconstructionFileReader
+	utilities/cxDisplayTimerWidget
+	utilities/cxTransformFile
+	utilities/cxPlaybackTime
+	utilities/cxTimelineWidget
+	utilities/cxDepthPeeling
+	utilities/cxProcessWrapper
+	utilities/sscUSFrameData
+	utilities/cxSavingVideoRecorder
+	utilities/cxImageDataContainer
+	utilities/cxFileHelpers
+	utilities/cxUSReconstructInputData
+	utilities/cxUSReconstructInputDataAlgoritms
+	utilities/cxStringHelpers
+	utilities/cxUSReconstructInputDataAlgoritms.cpp	
+	utilities/sscGLHelpers
+	utilities/sscTime
+	utilities/sscUtilHelpers
+	utilities/sscTypeConversions
+	utilities/sscSliceComputer
+	utilities/sscDefinitions.h
+	utilities/sscDefinitionStrings
+	utilities/sscCustomMetaImage
+	utilities/sscMD5Check
+	utilities/sscIndent
+	utilities/sscCoordinateSystemHelpers
+	utilities/sscViewportListener
+	utilities/sscVolumeHelpers
+	utilities/sscPositionStorageFile
+	utilities/sscTimeKeeper
+	utilities/sscMeshHelpers
+	
+	logger/sscAudio.h
+	logger/sscLogger
+		
+	algorithms/ItkVtkGlue/itkImageToVTKImageFilter.h
+	algorithms/ItkVtkGlue/itkImageToVTKImageFilter.txx
+	algorithms/ItkVtkGlue/itkVTKImageToImageFilter.h
+	algorithms/ItkVtkGlue/itkVTKImageToImageFilter.txx
+	algorithms/itkBinaryThinningImageFilter3D.h
+	algorithms/itkBinaryThinningImageFilter3D.txx
+	algorithms/sscImageAlgorithms
+	algorithms/cxTimedAlgorithm
+	algorithms/cxThreadedTimedAlgorithm
+	algorithms/cxCompositeTimedAlgorithm
+	algorithms/cxAlgorithmHelpers
+	
+	settings/cxDataLocations
+	settings/cxSettings
+			
+	vesselReg/SeansVesselReg.cxx
+	vesselReg/SeansVesselReg.hxx
+	vesselReg/HackTPSTransform.hxx
     )
-
 
 if(WIN32)
     set( CX_RESOURCE_LIBRARIES ${CX_RESOURCE_LIBRARIES} )
@@ -143,9 +189,6 @@ set( CX_RESOURCE_LIBRARIES ${CX_RESOURCE_LIBRARIES}
     )
 
 
-# =========================================================
-# stuff
-# =========================================================
 # Configure the default SSC_DATA_ROOT for the location of SSCData.
 unset(SSC_DATA_ROOT)
 set (SSC_DATA_ROOT ${CustusX3_SOURCE_DIR}/data CACHE INTERNAL "path to ssc data root")
@@ -155,107 +198,18 @@ configure_file(
   "${CustusX3_SOURCE_DIR}/source/resource/core/utilities/sscConfig.h"
   )
 
-# =========================================================
-
-include_directories( ${SSC_INCLUDE_DIRS} ${SSC_BINARY_DIR} ${QT_INCLUDES} ${Boost_INCLUDE_DIRS} )
-link_directories( ${SSC_LIBRARY_DIRS})
-
-# ============================= beginning of resources file ===========================
-
 # extra definitions:
 add_subdirectory(settings)
-
-SET( CX_QT_MOC_HEADER_FILES
-    algorithms/cxTimedAlgorithm.h
-    algorithms/cxThreadedTimedAlgorithm.h
-    algorithms/cxCompositeTimedAlgorithm.h
-    settings/cxSettings.h
-    utilities/cxDisplayTimerWidget.h
-    utilities/cxPlaybackTime.h
-    utilities/cxTimelineWidget.h
-    utilities/cxProcessWrapper.h
-	utilities/cxSavingVideoRecorder.h
-	utilities/cxImageDataContainer.h
-)
-
-SET ( cxResource_SOURCE
-	cxForwardDeclarations.h
-	${SSC_SOURCE_FILES}
-
-	algorithms/ItkVtkGlue/itkImageToVTKImageFilter.h
-    algorithms/ItkVtkGlue/itkImageToVTKImageFilter.txx
-    algorithms/ItkVtkGlue/itkVTKImageToImageFilter.h
-    algorithms/ItkVtkGlue/itkVTKImageToImageFilter.txx
-    algorithms/itkBinaryThinningImageFilter3D.h
-    algorithms/itkBinaryThinningImageFilter3D.txx
-    algorithms/sscImageAlgorithms.h
-    algorithms/sscImageAlgorithms.cpp
-    algorithms/cxTimedAlgorithm.h
-    algorithms/cxTimedAlgorithm.cpp
-    algorithms/cxThreadedTimedAlgorithm.h
-    algorithms/cxThreadedTimedAlgorithm.cpp
-    algorithms/cxCompositeTimedAlgorithm.h
-    algorithms/cxCompositeTimedAlgorithm.cpp
-    algorithms/cxAlgorithmHelpers.h
-    algorithms/cxAlgorithmHelpers.cpp
-
-    settings/cxDataLocations.cpp
-    settings/cxDataLocations.h
-    settings/cxSettings.h
-    settings/cxSettings.cpp
-
-    utilities/ProbeXmlConfigParser.h
-    utilities/ProbeXmlConfigParserImpl.h
-    utilities/ProbeXmlConfigParserImpl.cpp
-    utilities/ProbeXmlConfigParserMock.h
-    utilities/ProbeXmlConfigParserMock.cpp
-    utilities/cxCreateProbeDataFromConfiguration.h
-    utilities/cxCreateProbeDataFromConfiguration.cpp
-    utilities/cxRenderTimer.h
-    utilities/cxRenderTimer.cpp
-    utilities/cxUsReconstructionFileMaker.h
-    utilities/cxUsReconstructionFileMaker.cpp
-    utilities/cxUsReconstructionFileReader.h
-    utilities/cxUsReconstructionFileReader.cpp
-    utilities/cxDisplayTimerWidget.h
-    utilities/cxDisplayTimerWidget.cpp
-    utilities/cxTransformFile.h
-    utilities/cxTransformFile.cpp
-    utilities/cxPlaybackTime.h
-    utilities/cxPlaybackTime.cpp
-    utilities/cxTimelineWidget.h
-    utilities/cxTimelineWidget.cpp
-    utilities/cxDepthPeeling.h
-    utilities/cxDepthPeeling.cpp
-    utilities/cxProcessWrapper.h
-    utilities/cxProcessWrapper.cpp
-    utilities/sscUSFrameData.h
-    utilities/sscUSFrameData.cpp
-    utilities/cxSavingVideoRecorder.h
-    utilities/cxSavingVideoRecorder.cpp
-    utilities/cxImageDataContainer.h
-    utilities/cxImageDataContainer.cpp
-    utilities/cxFileHelpers.h
-    utilities/cxFileHelpers.cpp
-    utilities/cxUSReconstructInputData.h
-    utilities/cxUSReconstructInputData.cpp
-    utilities/cxUSReconstructInputDataAlgoritms.h
-    utilities/cxUSReconstructInputDataAlgoritms.cpp
-    utilities/cxStringHelpers.h
-    utilities/cxStringHelpers.cpp
-    utilities/cxUSReconstructInputDataAlgoritms.cpp	
-)
 
 unset(CX_RESOURCE_INCLUDE_DIRECTORIES)
 
 set(CX_RESOURCE_INCLUDE_DIRECTORIES
     ${CustusX3_SOURCE_DIR}/source/resource/core/Data
     ${CustusX3_SOURCE_DIR}/source/resource/core/Video
-#    ${CustusX3_SOURCE_DIR}/source/resource/core/Rep
+    ${CustusX3_SOURCE_DIR}/source/resource/core/logger
     ${CustusX3_SOURCE_DIR}/source/resource/core/Tool
     ${CustusX3_SOURCE_DIR}/source/resource/core/Math
     ${CustusX3_SOURCE_DIR}/source/resource/core/Widgets
-#    ${CustusX3_SOURCE_DIR}/source/resource/core/vtkMods
     ${CustusX3_SOURCE_DIR}/source/ThirdParty
     ${CustusX3_SOURCE_DIR}/source/resource/core
     ${CustusX3_SOURCE_DIR}/source/resource/core/algorithms
@@ -266,10 +220,8 @@ set(CX_RESOURCE_INCLUDE_DIRECTORIES
     ${CustusX3_BINARY_DIR}/source/resource/core/settings
     CACHE INTERNAL "Include directories for resource libraries")
 
-
+#include_directories( ${SSC_INCLUDE_DIRS} ${SSC_BINARY_DIR} ${QT_INCLUDES} ${Boost_INCLUDE_DIRS} )
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
-
-QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 set (CX_RESOURCE_LIBRARIES
     ${CX_RESOURCE_LIBRARIES}
@@ -280,7 +232,7 @@ set (CX_RESOURCE_LIBRARIES
     ${Boost_LIBRARIES}
     ${ITK_LIBRARIES})
 
-ADD_LIBRARY ( cxResource ${cxResource_SOURCE} ${MOC_HEADER_FILES})
+ADD_LIBRARY (cxResource ${cxResource_SOURCE})
 target_link_libraries(cxResource ${CX_RESOURCE_LIBRARIES} )
 CX_COTIRE_ADD_LIBRARY( cxResource "${CX_RESOURCE_LIBRARIES}")
 
