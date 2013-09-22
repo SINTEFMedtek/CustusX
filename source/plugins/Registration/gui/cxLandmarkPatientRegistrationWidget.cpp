@@ -19,7 +19,7 @@
 #include "cxDataManager.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "cxRepManager.h"
-#include "Rep/cxLandmarkRep.h"
+#include "cxLandmarkRep.h"
 #include "sscView.h"
 
 namespace cx

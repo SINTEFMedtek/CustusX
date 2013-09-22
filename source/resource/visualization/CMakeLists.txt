@@ -38,6 +38,9 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	Rep3D/sscPlaneMetricRep
 	Rep3D/cxFrameMetricRep
 	Rep3D/cxToolMetricRep
+    Rep3D/cxLandmarkRep
+    Rep3D/sscOrientationAnnotation3DRep
+    Rep3D/sscImage2DRep3D
 
 	Rep2D/sscOrientationAnnotationRep
 	Rep2D/sscSlicerRepSW
@@ -46,6 +49,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	Rep2D/sscGeometricRep2D
 	Rep2D/sscPointMetricRep2D
 	Rep2D/sscGuideRep2D
+    Rep2D/sscOrientationAnnotation2DRep
 
     Primitives/cxImageMapperMonitor
 	Primitives/sscSlicedImageProxy
@@ -59,7 +63,12 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	RepVideo/sscVideoRep
 	)
 
-# library
+if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
+    cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
+        Rep3D/cxMehdiGPURayCastMultiVolumeRep
+        )
+endif()
+
 cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     vtkMods/sscViewRenderWindow
     vtkMods/sscViewQVTKWidget
@@ -144,12 +153,15 @@ set(CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES
     ${CustusX3_SOURCE_DIR}/source/resource/visualization/Primitives
     CACHE INTERNAL "Include directories for resource visualization library")
 
-include_directories(${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES})
+include_directories(${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
+    ${CustusX3_SOURCE_DIR}/source/ThirdParty/VTKMultiVolume
+    )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
-set (CX_RESOURCE_LIBRARIES
-    ${CX_RESOURCE_LIBRARIES}
+set(CX_RESOURCE_VISUALIZATION_LIBRARIES
+    ${CX_RESOURCE_VISUALIZATION_LIBRARIES}
+    cxResource
     QVTK
     ${SSC_GCOV_LIBRARY}
     ${OPENGL_LIBRARIES}
@@ -157,9 +169,15 @@ set (CX_RESOURCE_LIBRARIES
     ${Boost_LIBRARIES}
     ${ITK_LIBRARIES})
 
+if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
+    set(CX_RESOURCE_VISUALIZATION_LIBRARIES
+        ${CX_RESOURCE_VISUALIZATION_LIBRARIES}
+        vtkGPUMultiVolumeRender
+        )
+endif()
+
 ADD_LIBRARY ( cxResourceVisualization ${CX_RESOURCE_VISUALIZATION_FILES})
-target_link_libraries(cxResourceVisualization cxResource )
+target_link_libraries(cxResourceVisualization ${CX_RESOURCE_VISUALIZATION_LIBRARIES} )
 CX_COTIRE_ADD_LIBRARY( cxResourceVisualization "cxResource")
 
 add_subdirectory(testing)
-
