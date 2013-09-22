@@ -24,7 +24,7 @@
  *      Author: christiana
  */
 
-#include <sscCheckBoxWidget.h>
+#include "sscCheckBoxWidget.h"
 #include <QGridLayout>
 #include "sscHelperWidgets.h"
 

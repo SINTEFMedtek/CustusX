@@ -24,7 +24,7 @@
  *      Author: christiana
  */
 
-#include <sscMousePadWidget.h>
+#include "sscMousePadWidget.h"
 #include <QtGui>
 #include "sscVector3D.h"
 

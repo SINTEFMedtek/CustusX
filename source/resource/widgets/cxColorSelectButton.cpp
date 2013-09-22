@@ -5,7 +5,7 @@
  *      \author christiana
  */
 
-#include <cxColorSelectButton.h>
+#include "cxColorSelectButton.h"
 #include <iostream>
 #include <QtGui>
 

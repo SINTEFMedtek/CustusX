@@ -59,6 +59,7 @@ set(SOURCES
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
+    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     .
     ${CMAKE_CURRENT_BINARY_DIR}/gui #so that is finds the generated ui files
     ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
@@ -80,7 +81,7 @@ if(CX_APPLE)
 endif()
 
 set( ALL_LINK_LIBRARIES
-	cxResource
+	cxResourceWidgets
 	OpenIGTLink
 	cxOpenIGTLinkUtilities
 	${QT_LIBRARIES})

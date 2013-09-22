@@ -24,7 +24,7 @@
  *      Author: christiana
  */
 
-#include <sscFileSelectWidget.h>
+#include "sscFileSelectWidget.h"
 #include <QtGui>
 #include "sscTypeConversions.h"
 #include <iostream>

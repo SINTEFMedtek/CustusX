@@ -117,9 +117,10 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
-include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
-include_directories(${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES})
 include_directories(
+    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     .
     ${CustusX3_SOURCE_DIR}/source/resource/videoServer
     ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
@@ -133,12 +134,12 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
     )
     
-set(CX_GUI_LIBRARIES cxLogicManager cxStateService)
+set(CX_GUI_LIBRARIES cxLogicManager cxStateService cxResourceWidgets)
 if (SSC_USE_DCMTK)
     set(CX_GUI_LIBRARIES ${CX_GUI_LIBRARIES} DICOMLib)
 endif (SSC_USE_DCMTK)
     
-add_library( cxGui ${cxGui_SRCS} ${cxGui_MOC_SRCS} )
+add_library( cxGui ${cxGui_SRCS} )
 target_link_libraries( cxGui ${CX_GUI_LIBRARIES} )
 CX_COTIRE_ADD_LIBRARY(cxGui "${CX_GUI_LIBRARIES}")
 

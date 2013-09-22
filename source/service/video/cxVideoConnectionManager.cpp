@@ -18,7 +18,7 @@
 #include "vtkRenderWindow.h"
 #include <QTimer>
 
-#include "sscLabeledComboBoxWidget.h"
+//#include "sscLabeledComboBoxWidget.h"
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "cxSettings.h"
