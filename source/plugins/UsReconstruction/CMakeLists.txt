@@ -42,6 +42,7 @@ SET( SOURCE_FILES
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     .
     ./logic
     ./logic/3DReconstruction

@@ -10,8 +10,6 @@ if (BUILD_TESTING)
         sscTestBoundingBox3D.cpp
 		cxTest_ImageAlgorithms.h
 		cxTest_ImageAlgorithms.cpp
-		cxTestUSReconstructionFileIO.h
-		cxTestUSReconstructionFileIO.cpp
 		${RESOURCE_TEST_SOURCE_FILES}
 		)
  

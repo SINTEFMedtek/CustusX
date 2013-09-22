@@ -66,8 +66,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	utilities/sscAcceptanceBoxWidget
     utilities/cxPlaybackTime.h
     utilities/cxProcessWrapper.h
-	utilities/cxSavingVideoRecorder.h
-	utilities/cxImageDataContainer.h	
+	utilities/cxImageDataContainer
 	)
 
      
@@ -97,19 +96,11 @@ cx_add_class(cxResource_SOURCE
 	utilities/sscXmlOptionItem
 	utilities/sscDoubleRange.h
 	utilities/cxRenderTimer
-	utilities/cxUsReconstructionFileMaker
-	utilities/cxUsReconstructionFileReader
 	utilities/cxTransformFile
 	utilities/cxPlaybackTime
 	utilities/cxProcessWrapper
-	utilities/sscUSFrameData
-	utilities/cxSavingVideoRecorder
-	utilities/cxImageDataContainer
 	utilities/cxFileHelpers
-	utilities/cxUSReconstructInputData
-	utilities/cxUSReconstructInputDataAlgoritms
 	utilities/cxStringHelpers
-	utilities/cxUSReconstructInputDataAlgoritms.cpp	
 	utilities/sscGLHelpers
 	utilities/sscTime
 	utilities/sscUtilHelpers

@@ -18,6 +18,7 @@ SET (cxLogicManager_SOURCE
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
+    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     .
     ${CustusX3_SOURCE_DIR}/source/service/patient     
     ${CustusX3_SOURCE_DIR}/source/service/tracking     
