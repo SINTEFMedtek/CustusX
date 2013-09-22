@@ -20,37 +20,24 @@ cx_add_class_qt_moc(cxVisualizationService_SOURCE
     cxInteractiveCropper
     cxCameraControl
     cxCameraStyle
-    Rep/cxLandmarkRep
-    Rep/sscOrientationAnnotation3DRep
-    Rep/sscOrientationAnnotation2DRep
-    Rep/sscImage2DRep3D
-#    Rep/cxMehdiGPURayCastMultiVolumeRep
     cxRepManager
     cxThresholdPreview
     cxMultiVolume3DRepProducer
     cxViewGroupData
     cxAxisConnector
     )
-if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
-    cx_add_class_qt_moc(cxVisualizationService_SOURCE
-        Rep/cxMehdiGPURayCastMultiVolumeRep
-        )
-endif()
 
 cx_add_class(cxVisualizationService_SOURCE
     cxLayoutData
     )
 
-include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
+    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     .
     ${CustusX3_SOURCE_DIR}/source/service/patient
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/service/video
-    ${CustusX3_SOURCE_DIR}/source/ThirdParty/VTKMultiVolume
     )
-
-include_directories(Rep)
 
 set(cxVisualizationService_LIBS
     cxResourceVisualization
@@ -58,13 +45,6 @@ set(cxVisualizationService_LIBS
     cxPatientService
     cxTrackingService
     )
-
-if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
-    set(cxVisualizationService_LIBS
-        ${cxVisualizationService_LIBS}
-        vtkGPUMultiVolumeRender
-        )
-endif()
 
 ADD_LIBRARY ( cxVisualizationService ${cxVisualizationService_SOURCE} ${MOC_HEADER_FILES})
 target_link_libraries(cxVisualizationService ${cxVisualizationService_LIBS})

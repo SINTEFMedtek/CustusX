@@ -6,8 +6,6 @@
 
 #include <sscImage.h>
 #include <sscTransform3D.h>
-//#include "cxTool.h"
-//#include "Rep/cxLandmarkRep.h"
 #include "cxDominantToolProxy.h"
 
 class QVBoxLayout;

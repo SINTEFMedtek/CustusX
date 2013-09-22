@@ -31,7 +31,7 @@
 #include "cxtestMultiVolume3DRepProducerFixture.h"
 
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
-#include "vtkOpenGLGPUMultiVolumeRayCastMapper.h"
+//#include "vtkOpenGLGPUMultiVolumeRayCastMapper.h"
 
 namespace cxtest
 {
