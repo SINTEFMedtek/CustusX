@@ -3,7 +3,6 @@
 ###########################################################
 
 cx_add_class_qt_moc(cxResource_SOURCE
-	Utilities/sscAcceptanceBoxWidget
 	Data/sscData
 	Data/sscImage
 	Data/sscImageTF3D
@@ -31,8 +30,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Video/sscVideoRecorder
 	Video/sscVideoSourceSHM
 	Video/sscTestVideoSource
-	Video/sscImageImportVideoSource
-
 	Video/sscImageImportVideoSource
         
 	Tool/sscToolManager
@@ -67,15 +64,18 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Widgets/sscColorSelectWidget
 	Widgets/cxColorSelectButton
 
-	Utilities/sscApplication
 	logger/sscMessageManager
-	Utilities/sscSharedMemory
-	
+
+	settings/cxSettings.h
+
 	algorithms/cxTimedAlgorithm.h
     algorithms/cxThreadedTimedAlgorithm.h
     algorithms/cxCompositeTimedAlgorithm.h
-    settings/cxSettings.h
-    utilities/cxDisplayTimerWidget.h
+
+	utilities/sscApplication
+	utilities/sscSharedMemory
+	utilities/sscAcceptanceBoxWidget
+	utilities/cxDisplayTimerWidget.h
     utilities/cxPlaybackTime.h
     utilities/cxTimelineWidget.h
     utilities/cxProcessWrapper.h
