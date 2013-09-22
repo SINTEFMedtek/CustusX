@@ -14,6 +14,7 @@ add_subdirectory(visualization)
 add_subdirectory(videoServer)
 add_subdirectory(OpenIGTLinkUtilities)
 add_subdirectory(testUtilities)
+add_subdirectory(widgets)
 
 
 

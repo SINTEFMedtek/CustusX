@@ -41,28 +41,17 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Tool/sscProbeAdapterRTSource
 	Tool/sscSliceProxy
     
-	Widgets/sscOptimizedUpdateWidget
-	Widgets/sscDataAdapter
-	Widgets/sscDoubleDataAdapter.h
-	Widgets/sscStringDataAdapter.h
-	Widgets/sscDoubleDataAdapterXml
-	Widgets/sscStringDataAdapterXml
-	Widgets/sscBoolDataAdapter.h
-	Widgets/sscBoolDataAdapterXml
-	Widgets/sscConsoleWidget
-	Widgets/sscDoubleWidgets
-	Widgets/sscLabeledComboBoxWidget
-	Widgets/sscLabeledLineEditWidget
-	Widgets/sscCheckBoxWidget
-	Widgets/sscHelperWidgets
-	Widgets/sscFileSelectWidget
-	Widgets/sscVector3DDataAdapter.h
-	Widgets/sscVector3DDataAdapterXml
-	Widgets/sscMousePadWidget
-	Widgets/sscColorDataAdapter.h
-	Widgets/sscColorDataAdapterXml
-	Widgets/sscColorSelectWidget
-	Widgets/cxColorSelectButton
+	dataAdapters/sscDataAdapter
+	dataAdapters/sscDoubleDataAdapter.h
+	dataAdapters/sscStringDataAdapter.h
+	dataAdapters/sscDoubleDataAdapterXml
+	dataAdapters/sscStringDataAdapterXml
+	dataAdapters/sscBoolDataAdapter.h
+	dataAdapters/sscBoolDataAdapterXml
+	dataAdapters/sscVector3DDataAdapter.h
+	dataAdapters/sscVector3DDataAdapterXml
+	dataAdapters/sscColorDataAdapter.h
+	dataAdapters/sscColorDataAdapterXml
 
 	logger/sscMessageManager
 
@@ -75,9 +64,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	utilities/sscApplication
 	utilities/sscSharedMemory
 	utilities/sscAcceptanceBoxWidget
-	utilities/cxDisplayTimerWidget.h
     utilities/cxPlaybackTime.h
-    utilities/cxTimelineWidget.h
     utilities/cxProcessWrapper.h
 	utilities/cxSavingVideoRecorder.h
 	utilities/cxImageDataContainer.h	
@@ -96,10 +83,7 @@ cx_add_class(cxResource_SOURCE
 	Tool/ProbeXmlConfigParserImpl
 	Tool/ProbeXmlConfigParserMock
 	Tool/cxCreateProbeDataFromConfiguration
-	
-	Widgets/sscXmlOptionItem
-	Widgets/sscDoubleRange.h
-	
+		
 	Data/sscDataMetric
 	Data/sscLandmark
 	Data/sscDataReaderWriter
@@ -110,14 +94,13 @@ cx_add_class(cxResource_SOURCE
 	Math/sscTransform3D
 	Math/sscFrame3D
 	
+	utilities/sscXmlOptionItem
+	utilities/sscDoubleRange.h
 	utilities/cxRenderTimer
 	utilities/cxUsReconstructionFileMaker
 	utilities/cxUsReconstructionFileReader
-	utilities/cxDisplayTimerWidget
 	utilities/cxTransformFile
 	utilities/cxPlaybackTime
-	utilities/cxTimelineWidget
-	utilities/cxDepthPeeling
 	utilities/cxProcessWrapper
 	utilities/sscUSFrameData
 	utilities/cxSavingVideoRecorder
@@ -204,17 +187,18 @@ add_subdirectory(settings)
 unset(CX_RESOURCE_INCLUDE_DIRECTORIES)
 
 set(CX_RESOURCE_INCLUDE_DIRECTORIES
+    ${CustusX3_SOURCE_DIR}/source/resource/core
+    ${CustusX3_SOURCE_DIR}/source/resource/core/logger
+    ${CustusX3_SOURCE_DIR}/source/resource/core/Math
     ${CustusX3_SOURCE_DIR}/source/resource/core/Data
     ${CustusX3_SOURCE_DIR}/source/resource/core/Video
-    ${CustusX3_SOURCE_DIR}/source/resource/core/logger
     ${CustusX3_SOURCE_DIR}/source/resource/core/Tool
-    ${CustusX3_SOURCE_DIR}/source/resource/core/Math
-    ${CustusX3_SOURCE_DIR}/source/resource/core/Widgets
-    ${CustusX3_SOURCE_DIR}/source/ThirdParty
-    ${CustusX3_SOURCE_DIR}/source/resource/core
+    ${CustusX3_SOURCE_DIR}/source/resource/core/dataAdapters
     ${CustusX3_SOURCE_DIR}/source/resource/core/algorithms
     ${CustusX3_SOURCE_DIR}/source/resource/core/settings
     ${CustusX3_SOURCE_DIR}/source/resource/core/utilities
+    ${CustusX3_SOURCE_DIR}/source/ThirdParty
+    
     ${CustusX3_BINARY_DIR}/source/resource/core
     ${CustusX3_BINARY_DIR}/source/resource/core/utilities
     ${CustusX3_BINARY_DIR}/source/resource/core/settings

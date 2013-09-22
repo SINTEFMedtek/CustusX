@@ -51,6 +51,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	Rep2D/sscGuideRep2D
     Rep2D/sscOrientationAnnotation2DRep
 
+	Primitives/cxDepthPeeling
     Primitives/cxImageMapperMonitor
 	Primitives/sscSlicedImageProxy
 	Primitives/sscTexture3DSlicerProxy

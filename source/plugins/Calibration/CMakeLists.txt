@@ -50,6 +50,7 @@ SET( SOURCE_FILES
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
+    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     .
     ./logic
     ./gui
@@ -68,6 +69,7 @@ include_directories(
 add_library( cxPluginCalibration ${SOURCE_FILES} )
 set(LINK_LIBRARIES
     cxResource
+    cxResourceWidgets
     cxPluginAcquisition
       )
 target_link_libraries( cxPluginCalibration ${LINK_LIBRARIES} )
