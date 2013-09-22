@@ -3,8 +3,6 @@
 ###########################################################
 
 
-set(QXT_FOLDER "../ThirdParty/qxt")
-
 cx_add_class_qt_moc(cxGui_SRCS
 	infoWidgets/cxMetricManager
 	#----------------------
@@ -12,7 +10,6 @@ cx_add_class_qt_moc(cxGui_SRCS
 	dataAdapters/cxShadingParamsInterfaces
 	dataAdapters/cxToolDataAdapters
 	dataAdapters/cxDoubleDataAdapterTemporalCalibration
-	dataAdapters/cxVector3DComponentDataAdapter
 	dataAdapters/cxDataAdapterHelper
 	dataAdapters/cxSelectDataStringDataAdapter
     #----------------------
@@ -68,23 +65,11 @@ cx_add_class_qt_moc(cxGui_SRCS
 	toolWidgets/cxProbeConfigWidget
     #----------------------
 	utilities/cxAudio
-	utilities/cxDoubleSpanSlider
-	utilities/cxBaseWidget
-	utilities/cxTransform3DWidget
-	utilities/cxSelectionGroupBox
-	utilities/cxVector3DWidget
-	utilities/cxBoundingBoxWidget
-	utilities/cxFileWatcherWidget
-	utilities/cxFilePreviewWidget
-	utilities/cxImagePreviewWidget
 	utilities/cxToolImagePreviewWidget
-	utilities/cxPresetWidget
     #----------------------    
 	cxMainWindow
 	cxSecondaryMainWindow
     #----------------------
-	${QXT_FOLDER}/qxtspanslider_p.h
-	${QXT_FOLDER}/qxtspanslider
 )
 
 
@@ -93,8 +78,6 @@ QT4_ADD_RESOURCES(cxGui_SRCS cxResources.qrc)
 
 cx_add_class(cxGui_SRCS
 	${cxGui_SRCS}
-	utilities/cxTabbedWidget
-	utilities/snwSyntaxHighlighter
 	${cxGui_RCC_SRCS}
 	)
 
@@ -107,7 +90,6 @@ set(SUB_FOLDERS
     streamingWidgets
     toolWidgets
     utilities
-    ${QXT_FOLDER}
     )
 
 # Use the include path and library for Qt that is used by VTK.
