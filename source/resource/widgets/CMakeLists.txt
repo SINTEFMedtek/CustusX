@@ -2,7 +2,6 @@
 ##               Resource Core library
 ###########################################################
 
-include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 
 cx_add_class_qt_moc(CX_RESOURCE_WIDGETS_FILES
 	sscOptimizedUpdateWidget
@@ -28,6 +27,7 @@ set(CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CustusX3_SOURCE_DIR}/source/resource/widgets
     CACHE INTERNAL "Include directories for resource widgets library")
+include_directories(${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES} )
 
 set(CX_RESOURCE_WIDGETS_LIBRARIES
     ${CX_RESOURCE_WIDGETS_LIBRARIES}
