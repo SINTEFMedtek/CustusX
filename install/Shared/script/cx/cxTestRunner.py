@@ -119,7 +119,16 @@ TimeOut: %d
         exe = "Catch"
         if(platform.system() == 'Windows'):
              exe = "Catch.exe"
-        shell.run('%s/%s [%s] --reporter junit --out %s' % (path, exe, tag, outfile), ignoreFailure=True)
+        exclude = self._getExcludeTags()
+        shell.run('%s/%s [%s]~%s --reporter junit --out %s' % (path, exe, tag, exclude, outfile), ignoreFailure=True)
+        
+    def _getExcludeTags(self):
+        if(platform.system() == 'Windows'):
+             return "[not_windows]"
+        if platform.system() == 'Darwin':
+             return "[not_apple]"
+        if platform.system() == 'Linux':
+             return "[not_linux]"
         
     def resetCustusXDataRepo(self, path):
         '''
