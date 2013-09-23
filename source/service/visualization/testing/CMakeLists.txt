@@ -13,6 +13,7 @@ if (BUILD_TESTING)
         ../logic
         ${CustusX3_SOURCE_DIR}/source/service/patient
         ${CustusX3_SOURCE_DIR}/source/service/tracking
+        ${CustusX3_SOURCE_DIR}/source/ThirdParty/VTKMultiVolume
         )
 
     cx_add_class(CX_CPPUNIT_VISUALIZATIONSERVICE_SOURCES
