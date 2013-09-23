@@ -6,9 +6,9 @@ if (BUILD_TESTING)
         sscContainerWindow.h)
   
 	set(RESOURCE_VISUALIZATION_TEST_SOURCE_FILES
-        sscViewsWindow.cpp 
+#        sscViewsWindow.cpp
         sscContainerWindow.cpp
-        sscTestVisualRendering.cpp
+#        sscTestVisualRendering.cpp
         sscTestViewContainer.cpp
         sscTestGPURayCaster.cpp
         sscTestVideoGraphics.h
@@ -17,11 +17,15 @@ if (BUILD_TESTING)
 		)
  
 	include(cxTestMacros)
-	SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestResourceVisualization cxCppUnitMain.cpp "${RESOURCE_VISUALIZATION_TEST_SOURCE_FILES}" cxResourceVisualization)
+#	SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestResourceVisualization cxCppUnitMain.cpp "${RESOURCE_VISUALIZATION_TEST_SOURCE_FILES}" cxResourceVisualization)
 	
 	#Catch
-#        set(RESOURCE_TEST_CATCH_SOURCE_FILES
-#            )
-#        cx_catch_add_lib_and_exe(cxResource "${RESOURCE_TEST_CATCH_SOURCE_FILES}")
+    cx_add_class_qt_moc(RESOURCE_VISUALZATION_TEST_CATCH_SOURCE_FILES
+        sscViewsWindow
+        )
+    cx_add_class(RESOURCE_VISUALZATION_TEST_CATCH_SOURCE_FILES
+        sscTestVisualRendering.cpp
+        )
+        cx_catch_add_lib_and_exe(cxResourceVisualization "${RESOURCE_VISUALZATION_TEST_CATCH_SOURCE_FILES}")
     
 endif (BUILD_TESTING)
