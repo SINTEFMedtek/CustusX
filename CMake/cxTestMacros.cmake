@@ -59,7 +59,7 @@ macro(SSC_ADD_CTEST_CPPUNIT_TESTS TEST_NAME CPPUNIT_MAIN SOURCE_FILES LIBRARIES 
 		# link all CppUnit tests to the cisstTestsMain library
 		set(MERGE_CTEST_NAME ${TEST_NAME}_CppUnit_CTest)
 		add_executable(${MERGE_CTEST_NAME} ${SOURCE_FILES} )
-		target_link_libraries(${MERGE_CTEST_NAME} cisstTestsMain ${LIBRARIES} ${CPPUNIT_LIBRARIES})
+		target_link_libraries(${MERGE_CTEST_NAME} cisstTestsMain cxtestUtilities ${LIBRARIES} ${CPPUNIT_LIBRARIES})
 		# Generate a CTest list of tests
 		CISST_ADD_TESTS(${MERGE_CTEST_NAME})
 

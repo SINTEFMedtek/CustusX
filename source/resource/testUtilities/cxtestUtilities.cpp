@@ -18,9 +18,39 @@
 #include "sscImage.h"
 #include "sscVolumeHelpers.h"
 #include "sscTypeConversions.h"
+#include "cxDataLocations.h"
 
 namespace cxtest
 {
+/*
+// --------------------------------------------------------
+TestDataStorage* TestDataStorage::mInstance = NULL; ///< static member
+// --------------------------------------------------------
+void TestDataStorage::shutdown()
+{
+	delete mInstance;
+	mInstance = NULL;
+}
+TestDataStorage* TestDataStorage::getInstance()
+{
+    if (!mInstance)
+    	mInstance = new TestDataStorage();
+	return mInstance;
+}
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+*/
+
+QString Utilities::getDataRoot(QString suffix)
+{
+	QString root = cx::DataLocations::getTestDataPath();
+	if (suffix.isEmpty())
+		return root;
+	else
+		return QString("%1/%2").arg(root).arg(suffix);
+}
+
 
 vtkImageDataPtr Utilities::create3DVtkImageData(Eigen::Array3i dim, const unsigned int voxelValue)
 {
