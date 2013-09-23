@@ -8,6 +8,8 @@
 #include "cxImageStreamerGE.h"
 #include "sscMessageManager.h"
 
+#include "catch.hpp"
+
 namespace cxtest
 {
 
@@ -141,15 +143,15 @@ void TestGEInterface::testAllStreamsGPUConsecutively()
 void TestGEInterface::testStream(cx::StringMap args)
 {
 	cx::StreamerPtr imageSender = cx::ImageStreamerFactory().getFromArguments(args);
-	CPPUNIT_ASSERT(imageSender);
-	CPPUNIT_ASSERT(imageSender->getType().compare(args["type"]) == 0);
+	REQUIRE(imageSender);
+	REQUIRE(imageSender->getType().compare(args["type"]) == 0);
 
 	cx::DirectlyLinkedSenderPtr grabberBridge(new cx::DirectlyLinkedSender());
 
 	TestSenderController controller(NULL);
 	controller.initialize(grabberBridge);
 
-	CPPUNIT_ASSERT(imageSender->startStreaming(grabberBridge));
+	REQUIRE(imageSender->startStreaming(grabberBridge));
 
 	//	QTimer::singleShot(1*1000,   qApp, SLOT(quit()) );
 	QTimer::singleShot(500,   qApp, SLOT(quit()) );
@@ -160,7 +162,7 @@ void TestGEInterface::testStream(cx::StringMap args)
 	imageSender.reset();
 	grabberBridge.reset();
 
-	CPPUNIT_ASSERT(controller.verify());
+	REQUIRE(controller.verify());
 }
 
 void TestGEInterface::testGEStreamer()
@@ -178,12 +180,12 @@ void TestGEInterface::testGEStreamer()
 //	geStreamer.SetupExportParameters(true, true, true, true);
 
 	//                                         (hostIp, streamPort, commandPort, testMode));
-	CPPUNIT_ASSERT(geStreamer.ConnectToScanner("127.0.0.1", 6543,    -1,         data_streaming::test3D));
-//	CPPUNIT_ASSERT(geStreamer.ConnectToScanner("bhgrouter.hopto.org", 6543,    -1,         data_streaming::noTest));
+	REQUIRE(geStreamer.ConnectToScanner("127.0.0.1", 6543,    -1,         data_streaming::test3D));
+//	REQUIRE(geStreamer.ConnectToScanner("bhgrouter.hopto.org", 6543,    -1,         data_streaming::noTest));
 
 	geStreamer.WaitForImageData();
 	vtkSmartPointer<data_streaming::vtkExportedStreamData> imgExportedStream = geStreamer.GetExportedStreamDataAndMoveToNextFrame();
-	CPPUNIT_ASSERT(imgExportedStream);//Got image?
+	REQUIRE(imgExportedStream);//Got image?
 
 	// Frame geometry
 	data_streaming::frame_geometry frameGeometry = imgExportedStream->GetTissueGeometry();
@@ -192,32 +194,32 @@ void TestGEInterface::testGEStreamer()
 //	std::cout << "vNyquist : " << frameGeometry.vNyquist << std::endl;
 //	std::cout << "width : " << frameGeometry.width << std::endl;
 	//Test mode parameters
-	CPPUNIT_ASSERT(frameGeometry.depthEnd == 100);
-	CPPUNIT_ASSERT(frameGeometry.width == 1);
+	REQUIRE(frameGeometry.depthEnd == 100);
+	REQUIRE(frameGeometry.width == 1);
 
 	// Time stamp
 	igstk::RealTimeClock::TimeStampType timeStamp = imgExportedStream->GetTimeStamp();
 //	std::cout << "timeStamp : " << timeStamp << std::endl;
-//	CPPUNIT_ASSERT(similar(timeStamp, 0, 0.5));
-	CPPUNIT_ASSERT(timeStamp > 1000000);
+//	REQUIRE(similar(timeStamp, 0, 0.5));
+	REQUIRE(timeStamp > 1000000);
 
 
 	vtkSmartPointer<vtkImageData> img = imgExportedStream->GetScanConvertedImage();
-	CPPUNIT_ASSERT(img);//Got scan converted image?
+	REQUIRE(img);//Got scan converted image?
 
 	this->validateBMode3D(img);
 
 	//Skip assert if OpenCL is turned off
 #ifdef DATASTREAMING_USE_OPENCL
-	CPPUNIT_ASSERT(geStreamer.UsingOpenCL());
+	REQUIRE(geStreamer.UsingOpenCL());
 #endif
 
 	/*img = imgExportedStream->GetTissueImage();
-	CPPUNIT_ASSERT(img);//Got image?
+	REQUIRE(img);//Got image?
 	img = imgExportedStream->GetBandwidthImage();
-	CPPUNIT_ASSERT(img);//Got image?
+	REQUIRE(img);//Got image?
 	img = imgExportedStream->GetFrequencyImage();
-	CPPUNIT_ASSERT(img);//Got image?*/
+	REQUIRE(img);//Got image?*/
 
 	geStreamer.DisconnectFromScanner();
 }
@@ -231,7 +233,7 @@ int TestGEInterface::getValue(vtkSmartPointer<vtkImageData> img, int x, int y, i
 void TestGEInterface::validateData(vtkSmartPointer<vtkImageData> img)
 {
 	unsigned char* volumePtr = reinterpret_cast<unsigned char*>(img->GetScalarPointer());
-	CPPUNIT_ASSERT(volumePtr); //Check if the pointer != NULL
+	REQUIRE(volumePtr); //Check if the pointer != NULL
 }
 
 void TestGEInterface::validateBMode3D(vtkSmartPointer<vtkImageData> img)
@@ -240,7 +242,7 @@ void TestGEInterface::validateBMode3D(vtkSmartPointer<vtkImageData> img)
 	std::cout << "dim: " << dim[0] << " " << dim[1] << " " << dim[2] << std::endl;
 	//std::cout << "value in " << dim[0]/3 << " " << dim[1]/3 <<  " " << dim[2]/3 << ": ";
 	std::cout << getValue(img, dim[0]/3,dim[1]/3,dim[2]/3) << std::endl;
-	CPPUNIT_ASSERT( getValue(img, dim[0]/3,dim[1]/3,dim[2]/3) == 100);
+	REQUIRE( getValue(img, dim[0]/3,dim[1]/3,dim[2]/3) == 100);
 }
 
 } //namespace cxtest

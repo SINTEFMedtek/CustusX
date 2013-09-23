@@ -2,9 +2,6 @@
 #define CXTESTGEINTERFACE_H_
 
 #ifdef CX_USE_ISB_GE
-#include <cppunit/extensions/TestFactoryRegistry.h> 
-#include <cppunit/ui/text/TestRunner.h>
-#include <cppunit/extensions/HelperMacros.h>
 #include <vtkSmartPointer.h>
 #include <vtkImageData.h>
 #include "cxImageSenderFactory.h"
@@ -14,7 +11,7 @@ namespace cxtest
 
 /**Unit tests that test the acquisition plugin
  */
-class TestGEInterface : public CppUnit::TestFixture
+class TestGEInterface
 {
 public:
 	void setUp();
@@ -37,24 +34,8 @@ public:
 	void validateBMode3D(vtkSmartPointer<vtkImageData> img);
 	void testStream(cx::StringMap args);///< Grab a short stream
 
-public:
-	CPPUNIT_TEST_SUITE( TestGEInterface );
-//		CPPUNIT_TEST( testConstructor );
-		CPPUNIT_TEST( testStreams );
-		CPPUNIT_TEST( testAllStreamsGPU );
-		CPPUNIT_TEST( testScanConvertedStreamGPU );
-		CPPUNIT_TEST( testTissueStreamGPU );
-		CPPUNIT_TEST( testFrequencyStreamGPU );
-		CPPUNIT_TEST( testBandwidthStreamGPU );
-		CPPUNIT_TEST( testVelocityStreamGPU );
-		CPPUNIT_TEST( testDefaultStreamsGPU );
-		CPPUNIT_TEST( testAllStreamsGPUConsecutively );
-		//Test disabled because this functionality should be included in the tests added to the GEStreamer code
-//		CPPUNIT_TEST( testGEStreamer );
-	CPPUNIT_TEST_SUITE_END();
 private:
 };
-CPPUNIT_TEST_SUITE_REGISTRATION( TestGEInterface );
 
 } //namespace cxtest
 
