@@ -170,7 +170,7 @@ set (SSC_DATA_ROOT ${CustusX3_SOURCE_DIR}/data CACHE INTERNAL "path to ssc data 
   
 configure_file(
   "${CustusX3_SOURCE_DIR}/source/resource/core/utilities/sscConfig.h.in"
-  "${CustusX3_SOURCE_DIR}/source/resource/core/utilities/sscConfig.h"
+  "${CustusX3_BINARY_DIR}/source/resource/core/utilities/sscConfig.h"
   )
 
 # extra definitions:
