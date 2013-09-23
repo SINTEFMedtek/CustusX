@@ -31,6 +31,7 @@
 
 #include "sscViewsWindow.h"
 #include "catch.hpp"
+#include "cxtestRenderTester.h"
 
 using cx::Vector3D;
 using cx::Transform3D;
@@ -105,6 +106,12 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	cx::ViewWidget* view = new cx::ViewWidget(this->centralWidget());
 	this->insertView(view, "dummy", "none", 0, 0);
 	REQUIRE(this->runWidget());
+
+	std::set<cx::View *> views = this->getViews();
+	cxtest::RenderTesterPtr renderTester = cxtest::RenderTester::create((*views.begin())->getRenderWindow());
+	vtkImageDataPtr output = renderTester->renderToImage();
+	unsigned int numNonZeroPixels = renderTester->getNumberOfNonZeroPixels(output);
+	std::cout << "numNonZeroPixels: " << numNonZeroPixels << std::endl;
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
@@ -115,6 +122,12 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	this->define3D(image[0], NULL, 0, 0);
 
 	REQUIRE(this->runWidget());
+
+	std::set<cx::View *> views = this->getViews();
+	cxtest::RenderTesterPtr renderTester = cxtest::RenderTester::create((*views.begin())->getRenderWindow());
+	vtkImageDataPtr output = renderTester->renderToImage();
+	unsigned int numNonZeroPixels = renderTester->getNumberOfNonZeroPixels(output);
+	std::cout << "numNonZeroPixels: " << numNonZeroPixels << std::endl;
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
