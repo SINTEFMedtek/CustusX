@@ -322,8 +322,7 @@ bool RenderTester::findDifference(vtkImageDataPtr input1, vtkImageDataPtr input2
 	return minError < mImageErrorThreshold;
 }
 
-
-unsigned int RenderTester::getNumberOfNonZeroPixels(vtkImageDataPtr image)
+unsigned int RenderTester::getNumberOfPixelsAboveThreshold(vtkImageDataPtr image, int threshold)
 {
 	if (!image)
 		return 0;
@@ -331,10 +330,35 @@ unsigned int RenderTester::getNumberOfNonZeroPixels(vtkImageDataPtr image)
 	unsigned int pixelCount = 0;
 	for (unsigned i = 0; i < image->GetDimensions()[0]*image->GetDimensions()[1]; ++i)
 	{
-		if (ptr[i*image->GetNumberOfScalarComponents()] != 0)
+		if (ptr[i*image->GetNumberOfScalarComponents()] > threshold)
 			++pixelCount;
 	}
 	return pixelCount;
+}
+
+unsigned int RenderTester::getNumberOfNonZeroPixels(vtkImageDataPtr image)
+{
+	return this->getNumberOfPixelsAboveThreshold(image, 0);
+//	if (!image)
+//		return 0;
+//	unsigned char* ptr = reinterpret_cast<unsigned char*>(image->GetScalarPointer());
+//	unsigned int pixelCount = 0;
+//	for (unsigned i = 0; i < image->GetDimensions()[0]*image->GetDimensions()[1]; ++i)
+//	{
+//		if (ptr[i*image->GetNumberOfScalarComponents()] != 0)
+//			++pixelCount;
+//	}
+//	return pixelCount;
+}
+
+double RenderTester::getFractionOfPixelsAboveThreshold(vtkImageDataPtr image, int threshold)
+{
+	unsigned int hits = this->getNumberOfPixelsAboveThreshold(image, threshold);
+	Eigen::Array3i dim(image->GetDimensions());
+	unsigned int totalPixels = dim[0]*dim[1];
+	if (totalPixels==0)
+		return -1;
+	return double(hits)/double(totalPixels);
 }
 
 } // namespace cxtest
