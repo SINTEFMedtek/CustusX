@@ -12,7 +12,7 @@
 #include "vtkCamera.h"
 #include "vtkLookupTable.h"
 
-#include "sscTestUtilities.h"
+#include "cxtestUtilities.h"
 #include "sscDataManager.h"
 #include "sscImage.h"
 #include "sscAxesRep.h"
@@ -141,7 +141,8 @@ void ViewsWindow::defineSlice(const QString& uid, const QString& imageFilename, 
 
 cx::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 {
-	QString filename = cx::TestUtilities::ExpandDataFileName(imageFilename);
+	QString filename = cxtest::Utilities::getDataRoot(imageFilename);
+//	QString filename = cx::TestUtilities::ExpandDataFileName(imageFilename);
 	cx::ImagePtr image = cx::DataManager::getInstance()->loadImage(filename, filename, cx::rtMETAIMAGE);
 	Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);

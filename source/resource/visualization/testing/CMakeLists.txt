@@ -1,5 +1,6 @@
 
 if (BUILD_TESTING)
+	include_directories(${CustusX3_SOURCE_DIR}/source/resource/testUtilities)
 	QT4_WRAP_CPP(RESOURCE_VISUALIZATION_TEST_SOURCE_FILES
         sscViewsWindow.h
         sscContainerWindow.h)

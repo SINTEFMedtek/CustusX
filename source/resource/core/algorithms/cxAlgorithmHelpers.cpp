@@ -86,7 +86,6 @@ itkImageType::ConstPointer AlgorithmHelper::getITKfromVTKImageViaFile(vtkImageDa
   			+ " min: " + qstring_cast(minVal) + " See bug #363 if this needs to be fixed");
 
   QString tempFolder = DataLocations::getCachePath() + "/vtk2itk/";
-//  QString tempFolder = settings()->value("globalPatientDataFolder").toString() + "/NoPatient/temp/";
   QDir().mkpath(tempFolder);
 
   // write to disk

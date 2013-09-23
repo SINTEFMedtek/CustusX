@@ -23,6 +23,19 @@
 namespace cxtest
 {
 
+/*class TestDataStorage
+{
+	static TestDataStorage* getInstance();
+	static void shutdown();
+
+	QString getDataRoot(QString suffix = "");
+	void setDataRoot(QString path);
+
+private:
+	static TestDataStorage* mInstance;
+	QString mDataRoot;
+};*/
+
 /**
  * A collection of functionality used for testing.
  *
@@ -32,6 +45,7 @@ namespace cxtest
 class Utilities
 {
 public:
+	static QString getDataRoot(QString suffix = "");
 	static vtkImageDataPtr create3DVtkImageData(Eigen::Array3i dim = Eigen::Array3i(3,3,3), const unsigned int voxelValue = 100);
 	static cx::ImagePtr create3DImage(Eigen::Array3i dim = Eigen::Array3i(3,3,3), const unsigned int voxelValue = 100);
 	static std::vector<cx::ImagePtr> create3DImages(unsigned int imageCount, Eigen::Array3i dim = Eigen::Array3i(3,3,3), const unsigned int voxelValue = 100);

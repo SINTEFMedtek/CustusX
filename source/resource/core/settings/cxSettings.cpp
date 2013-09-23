@@ -49,7 +49,6 @@ Settings::~Settings()
 void Settings::initialize()
 {
 	QString filename = cx::DataLocations::getSettingsPath() + "/settings.ini";
-	//QString filename = cx::DataLocations::getRootConfigPath() + "/settings/settings.ini";
 	mSettings.reset(new QSettings(filename, QSettings::IniFormat));
 }
 
