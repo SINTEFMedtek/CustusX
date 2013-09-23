@@ -37,22 +37,7 @@ namespace cx
 TransferFunctions3DPresets::TransferFunctions3DPresets(XmlOptionFile presetFile, XmlOptionFile customFile) :
 		Presets(presetFile, customFile)
 {
-//	mPresetFile = presetFile;
-//	mCustomFile = customFile;
-
-	//mPresetFile = XmlOptionFile(DataLocations::getRootConfigPath()+"/transferFunctions/presets.xml", "transferFunctions"); ///< create from filename, create trivial document of type name and root node if no file exists.
 }
-
-//QStringList TransferFunctions3DPresets::getPresetList(QString modality)
-//{
-//	return this->generatePresetList(modality);
-//}
-
-//XmlOptionFile TransferFunctions3DPresets::getCustomFile()
-//{
-//	return mCustomFile;
-//	//	return XmlOptionFile(DataLocations::getXmlSettingsFile(),"CustusX").descend("presetTransferFunctions");
-//}
 
 void TransferFunctions3DPresets::save(QString name, ImagePtr image, bool _2D, bool _3D)
 {

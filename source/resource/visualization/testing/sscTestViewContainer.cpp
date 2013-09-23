@@ -15,7 +15,6 @@
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/extensions/HelperMacros.h>
 
-#include "sscTestUtilities.h"
 #include "sscDataManager.h"
 #include "sscImage.h"
 #include "sscAxesRep.h"
