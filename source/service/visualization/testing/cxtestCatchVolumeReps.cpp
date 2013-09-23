@@ -43,7 +43,7 @@ void simpleVolumeRepTest(cx::RepPtr rep, unsigned int viewAxisSize = 30)
 	REQUIRE(numNonZeroPixels < viewAxisSize*viewAxisSize);
 }
 
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[rep][integration][gui][notmac]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[rep][integration][gui][not_apple]")
 {
 	unsigned int imageCount = 3;
 	std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(3,3,3), 200);
@@ -55,7 +55,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[rep][in
 	simpleVolumeRepTest(rep);
 }
 
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 1 small volume.", "[rep][integration][gui][notmac]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 1 small volume.", "[rep][integration][gui][not_apple]")
 {
 	unsigned int imageCount = 1;
 	std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(3,3,3), 200);
@@ -67,7 +67,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 1 small volume.", "[rep][int
 	simpleVolumeRepTest(rep);
 }
 
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 large volumes.", "[rep][integration][gui][notmac]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 large volumes.", "[rep][integration][gui][not_apple]")
 {
 	unsigned int imageCount = 3;
 	std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(300,300,300), 200);
@@ -101,7 +101,7 @@ TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 large volum
 	simpleVolumeRepTest(rep, 1000);
 }
 
-TEST_CASE("VolumetricRep using vtkGPUVolumeRayCastMapper can render 1 small volume.", "[rep][integration][gui][notmac]")
+TEST_CASE("VolumetricRep using vtkGPUVolumeRayCastMapper can render 1 small volume.", "[rep][integration][gui][not_apple]")
 {
 	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(3,3,3), 200);
 
