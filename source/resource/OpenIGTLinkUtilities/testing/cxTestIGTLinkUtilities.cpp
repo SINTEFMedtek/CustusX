@@ -41,13 +41,10 @@ vtkImageDataPtr createRGBATestImage()
 
 void TestIGTLinkUtilities::setUp()
 {
-//	cx::DataLocations::setTestMode();
-//	cx::LogicManager::initialize();
 }
 
 void TestIGTLinkUtilities::tearDown()
 {
-//	cx::LogicManager::shutdown();
 }
 
 void TestIGTLinkUtilities::testConstructor()

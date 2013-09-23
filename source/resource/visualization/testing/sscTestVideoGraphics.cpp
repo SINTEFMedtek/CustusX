@@ -29,6 +29,7 @@
 #include "sscDummyTool.h"
 #include "sscUtilHelpers.h"
 #include "sscXmlOptionItem.h"
+#include "cxtestUtilities.h"
 
 void TestVideoGraphics::setUp()
 {
@@ -43,7 +44,9 @@ void TestVideoGraphics::tearDown()
 
 vtkImageDataPtr TestVideoGraphics::readImageData(QString filename, QString description)
 {
-	QString folder = QString("%1%2/").arg(SSC_DATA_ROOT).arg("ssc/test");
+	QString folder = cxtest::Utilities::getDataRoot("ssc/test");
+
+//	QString folder = QString("%1%2/").arg(SSC_DATA_ROOT).arg("ssc/test");
 	std::cout << folder << " -------- " << filename << std::endl;
 	vtkImageDataPtr retval = mMachine->readFromFile(folder+filename);
 	CPPUNIT_ASSERT_MESSAGE(("Looking for "+description).toStdString(), retval!=NULL);
@@ -52,7 +55,8 @@ vtkImageDataPtr TestVideoGraphics::readImageData(QString filename, QString descr
 
 cx::ProbeData TestVideoGraphics::readProbeData(QString filename)
 {
-	QString folder = QString("%1%2/").arg(SSC_DATA_ROOT).arg("ssc/test");
+	QString folder = cxtest::Utilities::getDataRoot("ssc/test");
+//	QString folder = QString("%1%2/").arg(SSC_DATA_ROOT).arg("ssc/test");
 	QString probeDataFilename = cx::changeExtension(folder+filename, "probedata.xml");
 
 	cx::ProbeData retval;

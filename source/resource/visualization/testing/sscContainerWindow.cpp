@@ -12,7 +12,7 @@
 #include "vtkCamera.h"
 #include "vtkLookupTable.h"
 
-#include "sscTestUtilities.h"
+#include "cxtestUtilities.h"
 #include "sscDataManager.h"
 #include "sscImage.h"
 #include "sscAxesRep.h"
@@ -95,7 +95,7 @@ void ContainerWindow::containerGPUSlice(cx::ViewItem *view, const QString &uid, 
 
 cx::ImagePtr ContainerWindow::loadImage(const QString& imageFilename)
 {
-	QString filename = cx::TestUtilities::ExpandDataFileName(imageFilename);
+	QString filename = cxtest::Utilities::getDataRoot(imageFilename);
 	cx::ImagePtr image = cx::DataManager::getInstance()->loadImage(filename, filename, cx::rtMETAIMAGE);
 	Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);

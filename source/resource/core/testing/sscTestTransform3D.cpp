@@ -14,11 +14,8 @@
 #include "vtkMatrix4x4.h"
 #include <QStringList>
 
-#include "sscTestUtilities.h"
-#include "sscSliceComputer.h"
 #include "sscVector3D.h"
 #include "sscTransform3D.h"
-#include "sscFrame3D.h"
 #include "sscTypeConversions.h"
 
 using namespace cx;
