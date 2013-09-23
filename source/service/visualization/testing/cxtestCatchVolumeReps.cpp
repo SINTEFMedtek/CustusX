@@ -107,6 +107,7 @@ TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can render 3 small volumes", "[i
 	renderer->AddVolume(volume);
 	renderWindow->AddRenderer(renderer);
 	renderWindow->Render();
+	renderWindow->Render();
 	REQUIRE(true);
 }
 
