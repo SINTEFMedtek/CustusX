@@ -59,6 +59,7 @@ public:
 private:
 	void start(bool showSliders);
 	cx::ImagePtr loadImage(const QString& imageFilename);
+	void fixToolToCenter();
 
 	QSlider* mBrightnessSlider;
 	QSlider *mContrastSlider;

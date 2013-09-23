@@ -30,6 +30,7 @@
 #include "sscGPURayCastVolumeRep.h"
 #include "sscViewsWindow.h"
 #include "sscImageTF3D.h"
+#include "cxDataLocations.h"
 
 using cx::Vector3D;
 using cx::Transform3D;
@@ -69,7 +70,8 @@ ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(d
 	mTotalRender = 0;
 	mTotalOther = 0;
 	mLastRenderEnd = QTime::currentTime();
-	mShaderFolder = qApp->applicationDirPath() + "/../Code/Rep/";
+	mShaderFolder = cx::DataLocations::getShaderPath();
+//	mShaderFolder = qApp->applicationDirPath() + "/../Code/Rep/";
 	
 	QRect screen = qApp->desktop()->screen()->rect();
 	this->setGeometry(QRect(screen.bottomRight()*0.15, screen.bottomRight()*0.85));
@@ -107,7 +109,7 @@ bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 	proxy->setTool(tool);
 	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
 	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(uid);
-	rep->setShaderFile(mShaderFolder + "Texture3DOverlay.frag");
+	rep->setShaderFile(mShaderFolder + "/Texture3DOverlay.frag");
 	rep->setSliceProxy(proxy);
 	rep->setImages(std::vector<cx::ImagePtr>(1, image));
 	view->addRep(rep);
@@ -149,9 +151,16 @@ cx::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 	cx::DataManager::getInstance()->setCenter(center);
 	
 	// side effect: set tool movement box to data box,
-	dummyTool()->setToolPositionMovementBB(transform(image->get_rMd(), image->boundingBox()));
-	
+//	dummyTool()->setToolPositionMovementBB(transform(image->get_rMd(), image->boundingBox()));
+	this->fixToolToCenter();
+
 	return image;
+}
+
+void ViewsWindow::fixToolToCenter()
+{
+	Vector3D c = cx::DataManager::getInstance()->getCenter();
+	dummyTool()->setToolPositionMovement(std::vector<Transform3D>(1, cx::createTransformTranslate(c)));
 }
 
 void ViewsWindow::insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c)
