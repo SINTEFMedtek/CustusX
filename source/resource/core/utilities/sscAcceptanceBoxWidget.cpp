@@ -87,7 +87,7 @@ void AcceptanceBoxWidget::showEvent ( QShowEvent * event )
 	{
 		std::cout << "autofinishing..." << std::endl;
 		// terminate app after some seconds - this is an automated test!!
-		QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS * 1000, this, SLOT(accept()));
+		QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS * 2000, this, SLOT(accept()));
 	}
 }
 

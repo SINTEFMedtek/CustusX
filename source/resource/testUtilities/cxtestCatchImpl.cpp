@@ -13,6 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #define CATCH_CONFIG_RUNNER
+#define CATCH_CONFIG_CONSOLE_WIDTH 300
 #include "catch.hpp"
 
 #include "sscApplication.h"
