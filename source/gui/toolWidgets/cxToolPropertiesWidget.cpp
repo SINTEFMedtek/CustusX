@@ -11,7 +11,7 @@
 #include "sscToolManager.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscTypeConversions.h"
-#include "UsConfigGui.h"
+//#include "UsConfigGui.h"
 #include "cxDataInterface.h"
 #include "cxToolManager.h"
 #include "cxTool.h"
