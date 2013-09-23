@@ -55,6 +55,8 @@ public:
 
 	/// ugly hack
 	bool mDumpSpeedData;
+	std::set<cx::View *> getViews() {return mLayouts; }
+
 
 private:
 	void start(bool showSliders);
