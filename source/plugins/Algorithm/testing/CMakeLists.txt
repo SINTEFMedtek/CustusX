@@ -27,8 +27,11 @@ if(BUILD_TESTING)
 
 	QT4_WRAP_CPP(CXTEST_PLUGINALGORITHM_SOURCES
 		)
-	set(CXTEST_PLUGINALGORITHM_SOURCES ${CXTEST_PLUGINALGORITHM_SOURCES}
-        cxCatchAlgorithm.cpp)
+        cx_add_class(CXTEST_PLUGINALGORITHM_SOURCES ${CXTEST_PLUGINALGORITHM_SOURCES}
+            cxCatchAlgorithm.cpp
+            cxTestTubeSegmentationFramework
+            cxtestCatchTubeSegmentationFramework.cpp
+        )
 
 	cx_catch_add_lib_and_exe(cxPluginAlgorithm "${CXTEST_PLUGINALGORITHM_SOURCES}")
 
@@ -52,8 +55,6 @@ if (BUILD_TESTING)
 
     if (CX_USE_TSF)
         set(CX_TEST_ACQUISITION_SOURCE_FILES
-		    cxTestTubeSegmentationFramework.h
-		    cxTestTubeSegmentationFramework.cpp
 		    cxTestTSFPresets.h
 		    cxTestTSFPresets.cpp
 		    ${CX_TEST_ACQUISITION_SOURCE_FILES}
