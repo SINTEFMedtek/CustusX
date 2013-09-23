@@ -52,11 +52,12 @@ public:
 	
 	// setup views
 	void insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c);
+	bool runWidget();
+	bool quickRunWidget();
 
 	/// ugly hack
 	bool mDumpSpeedData;
-	std::set<cx::View *> getViews() {return mLayouts; }
-
+	double getFractionOfBrightPixelsInView(int viewIndex, int threshold);
 
 private:
 	void start(bool showSliders);
@@ -66,8 +67,7 @@ private:
 	QSlider* mBrightnessSlider;
 	QSlider *mContrastSlider;
 	
-	typedef std::set<cx::View *> LayoutMap;
-	std::set<cx::View *> mLayouts;
+	std::vector<cx::View *> mLayouts;
 	QGridLayout* mSliceLayout;
 	QString mDisplayText;
 	
@@ -78,7 +78,8 @@ private:
 	QTime mLastRenderEnd;
 	QString mShaderFolder;
 	cx::AcceptanceBoxWidget* mAcceptanceBox;
-	QTimer mTimer;
+//	QTimer mTimer;
+	QTimer* mRenderingTimer;
 
 public slots:
 	void updateRender();

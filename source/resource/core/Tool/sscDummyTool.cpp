@@ -196,7 +196,7 @@ void DummyTool::stopTracking()
 {
 	this->stopThread();
 
-	std::cout << "stop tracking" << std::endl;
+//	std::cout << "stop tracking" << std::endl;
 
 	mVisible = false;
 	emit toolVisible(mVisible);
@@ -208,8 +208,9 @@ void DummyTool::setVisible(bool val)
 	emit toolVisible(mVisible);
 }
 void DummyTool::sendTransform()
-{
+{	
 	set_prMt(*getNextTransform());
+//	std::cout << "DummyTool::sendTransform(): " <<  this->get_prMt().coord(Vector3D(0,0,0)) << std::endl;
 }
 
 /** Create a dummy 3D representation with a butt tip

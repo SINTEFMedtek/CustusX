@@ -31,6 +31,7 @@
 #include "sscViewsWindow.h"
 #include "sscImageTF3D.h"
 #include "cxDataLocations.h"
+#include "cxtestRenderTester.h"
 
 using cx::Vector3D;
 using cx::Transform3D;
@@ -73,8 +74,9 @@ ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(d
 	mShaderFolder = cx::DataLocations::getShaderPath();
 //	mShaderFolder = qApp->applicationDirPath() + "/../Code/Rep/";
 	
-	QRect screen = qApp->desktop()->screen()->rect();
-	this->setGeometry(QRect(screen.bottomRight()*0.15, screen.bottomRight()*0.85));
+	QRect screen = qApp->desktop()->screenGeometry(qApp->desktop()->primaryScreen());
+	screen.adjust(screen.width()*0.15, screen.height()*0.15, -screen.width()*0.15, -screen.height()*0.15);
+	this->setGeometry(screen);
 	this->setCentralWidget( new QWidget(this) );
 
 	start(showSliders);
@@ -104,7 +106,6 @@ bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
 	view->GetRenderWindow()->GetInteractor()->Disable();
 	view->setZoomFactor(mZoomFactor);
-	mLayouts.insert(view);
 	cx::SliceProxyPtr proxy(new cx::SliceProxy());
 	proxy->setTool(tool);
 	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
@@ -115,9 +116,9 @@ bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 	view->addRep(rep);
 	insertView(view, uid, imageFilename, r, c);
 
-	mTimer.setSingleShot(true);
-	mTimer.setInterval(0);
-	connect(&mTimer, SIGNAL(timeout()), this, SLOT(updateRender()));
+//	mTimer.setSingleShot(true);
+//	mTimer.setInterval(0);
+//	connect(&mTimer, SIGNAL(timeout()), this, SLOT(updateRender()));
 	return true;
 }
 
@@ -130,7 +131,6 @@ void ViewsWindow::defineSlice(const QString& uid, const QString& imageFilename, 
 	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
 	view->GetRenderWindow()->GetInteractor()->Disable();
 	view->setZoomFactor(mZoomFactor);
-	mLayouts.insert(view);
 	cx::SliceProxyPtr proxy(new cx::SliceProxy());
 	proxy->setTool(tool);
 	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
@@ -151,7 +151,7 @@ cx::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 	cx::DataManager::getInstance()->setCenter(center);
 	
 	// side effect: set tool movement box to data box,
-//	dummyTool()->setToolPositionMovementBB(transform(image->get_rMd(), image->boundingBox()));
+	dummyTool()->setToolPositionMovementBB(transform(image->get_rMd(), image->boundingBox()));
 	this->fixToolToCenter();
 
 	return image;
@@ -168,6 +168,7 @@ void ViewsWindow::insertView(cx::ViewWidget *view, const QString& uid, const QSt
 	QVBoxLayout *layout = new QVBoxLayout;
 	mSliceLayout->addLayout(layout, r,c);
 
+	mLayouts.push_back(view);
 	layout->addWidget(view);
 	layout->addWidget(new QLabel(uid+" "+volume, this));
 }
@@ -176,7 +177,6 @@ void ViewsWindow::define3D(const QString& imageFilename, const ImageParameters* 
 {
 	QString uid = "3D";
 	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
-	mLayouts.insert(view);
 	
 	cx::ImagePtr image = loadImage(imageFilename);
 
@@ -209,7 +209,6 @@ bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 {
 	QString uid = "3D";
 	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
-	mLayouts.insert(view);
 
 	std::vector<cx::ImagePtr> images;
 
@@ -235,7 +234,9 @@ bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 	if (!cx::GPURayCastVolumeRep::isSupported(view->getRenderWindow()))
 		return false;
 	cx::GPURayCastVolumeRepPtr mRepPtr = cx::GPURayCastVolumeRep::New( images[0]->getUid() );
+//	mShaderFolder = "/home/christiana/dev/working/CustusX3/CustusX3/source/resource/visualization/Rep/Shaders/glsl";
 	mRepPtr->setShaderFolder(mShaderFolder);
+	std::cout << "shader folder: " << mShaderFolder.toStdString() << std::endl;
 	mRepPtr->setImages(images);
 	mRepPtr->setName(images[0]->getName());
 	view->addRep(mRepPtr);
@@ -261,8 +262,8 @@ void ViewsWindow::start(bool showSliders)
 	mToolmanager->initialize();
 	mToolmanager->startTracking();
 
-	cx::ToolPtr tool = mToolmanager->getDominantTool();
-	connect( tool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), &mTimer, SLOT( start()));
+//	cx::ToolPtr tool = mToolmanager->getDominantTool();
+//	connect( tool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), &mTimer, SLOT( start()));
 
 	//gui controll
 	QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -280,11 +281,15 @@ void ViewsWindow::start(bool showSliders)
 
 	controlLayout->addStretch();
 	mainLayout->addLayout(controlLayout); //Buttons
+
+	mRenderingTimer = new QTimer(this);
+	mRenderingTimer->start(33);
+	connect(mRenderingTimer, SIGNAL(timeout()), this, SLOT(updateRender()));
 }
 
 void ViewsWindow::updateRender()
 {
-	for (std::set<cx::View *>::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
+	for (std::vector<cx::View *>::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
 	{
 		cx::View *view = *iter;
 
@@ -304,9 +309,9 @@ void ViewsWindow::updateRender()
 	int other = mLastRenderEnd.msecsTo(pre);
 
 	QSet<vtkRenderWindow *> windowList;
-	for (LayoutMap::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
+	for (unsigned i=0; i<mLayouts.size(); ++i)
 	{
-		windowList.insert((*iter)->getRenderWindow().GetPointer());
+		windowList.insert(mLayouts[i]->getRenderWindow().GetPointer());
 	}
 	foreach (vtkRenderWindow *win, windowList)
 	{
@@ -331,3 +336,46 @@ void ViewsWindow::updateRender()
 		}
 	}
 }
+
+double ViewsWindow::getFractionOfBrightPixelsInView(int viewIndex, int threshold)
+{
+	cxtest::RenderTesterPtr renderTester = cxtest::RenderTester::create(mLayouts[viewIndex]->getRenderWindow());
+	vtkImageDataPtr output = renderTester->renderToImage();
+	return renderTester->getFractionOfPixelsAboveThreshold(output, threshold);
+	//	std::cout << "numNonZeroPixels: " << numNonZeroPixels << std::endl;
+
+}
+
+/**show/render/execute input widget.
+ * Return success of execution.
+ */
+bool ViewsWindow::runWidget()
+{
+	this->show();
+#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
+	this->activateWindow();
+	std::cout << "on mac!!!" << std::endl;
+#endif
+	this->raise();
+	this->updateRender();
+	return !qApp->exec() && this->accepted();
+}
+
+/**show/render/execute input widget.
+ * Return success of execution.
+ */
+bool ViewsWindow::quickRunWidget()
+{
+	this->show();
+#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
+	this->activateWindow();
+	std::cout << "on mac!!!" << std::endl;
+#endif
+	this->raise();
+	this->updateRender();
+
+	QTimer::singleShot(30, qApp, SLOT(quit()));
+	return !qApp->exec();// && this->accepted();
+}
+
+
