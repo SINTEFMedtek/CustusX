@@ -36,6 +36,7 @@ if (BUILD_TESTING)
         cxtestCatchViewRenderSpeed.cpp
         cxTestRenderSpeed
         cxtestCatchVolumeReps.cpp
+        cxtestCatchVtkOpenGLGPUMultiVolumeRayCastMapper.cpp
         )
 
     cx_catch_add_lib_and_exe(cxVisualizationService "${CXTEST_VISUALIZATIONSERVICE_SOURCES}")
