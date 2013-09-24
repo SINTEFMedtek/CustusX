@@ -60,10 +60,7 @@ class VisualRenderingFixture : public ViewsWindow
 public:
 	VisualRenderingFixture() : ViewsWindow("Verify that the volumes are rendered correctly.", false)
 	{
-		this->mDumpSpeedData = false;
-		image.push_back("Phantoms/Kaisa/MetaImage/Kaisa.mhd");
-	//	image.push_back("Person5/person5_t2_byte.mhd");
-	//	image.push_back("Person5/person5_mra_byte.mhd");
+		image.push_back("ssc/Person5/person5_t1_unsigned.mhd");
 		image.push_back("ssc/Person5/person5_t2_unsigned.mhd");
 		image.push_back("ssc/Person5/person5_flair_unsigned.mhd");
 		image.push_back("ssc/DTI/dti_eigenvector_rgb.mhd");
@@ -90,34 +87,36 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	this->setDescription("Empty view");
 	cx::ViewWidget* view = new cx::ViewWidget(this->centralWidget());
 	this->insertView(view, "dummy", "none", 0, 0);
-	REQUIRE(this->runWidget());
+//	REQUIRE(this->runWidget());
+	REQUIRE(this->quickRunWidget());
 
 	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) == Approx(0));
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show 3D moving tool+volume",
+				 "Visual rendering: Show 3D volume - vtkGPU render",
 				 "[unit][resource/visualization]")
 {
 	this->setDescription("3D Volume, moving tool");
 	this->define3D(image[0], NULL, 0, 0);
 
-	REQUIRE(this->runWidget());
-	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
+//	REQUIRE(this->runWidget());
+	REQUIRE(this->quickRunWidget());
+	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) > 0.01);
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show 3D moving tool + GPU volume",
+				 "Visual rendering: Show 3D volume - snwGPU multivolume render",
 				 "[unit][resource/visualization][not_apple][broken]")
 {
 	this->setDescription("3D Volume, moving tool, GPU");
 	REQUIRE(this->define3DGPU(QStringList(image[0]), NULL, 0, 0));
 	REQUIRE(this->runWidget());
-	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
+	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) > 0.01);
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show moving tool + 2 GPU volumes",
+				 "Visual rendering: Show 3D 2 volumes - snwGPU multivolume render",
 				 "[unit][resource/visualization][not_apple][broken]")
 {
 	this->setDescription("3D Composites (2 volumes), moving tool");
@@ -134,28 +133,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	REQUIRE(this->define3DGPU(images, parameters, 0, 0));
 
 	REQUIRE(this->runWidget());
-}
-
-TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show moving tool + 2 volumes in ACS+3D_GPU",
-				 "[unit][resource/visualization][not_apple][broken]")
-{
-	this->setDescription("3D Composites (2 volumes) with ACS, moving tool");
-	QStringList images; images << image[1] << image[2];
-	ImageParameters parameters[2];
-
-	parameters[0].llr = 35;
-	parameters[0].alpha = .1;
-
-	parameters[1].llr = 55;
-	parameters[1].alpha = .7;
-	parameters[1].lut = getCreateLut(0, 200, .67, .68, 0, 1, .4, .8);
-
-	this->defineSlice("A", image[0], cx::ptAXIAL, 0, 0);
-	this->defineSlice("C", image[0], cx::ptCORONAL, 1, 0);
-	this->defineSlice("S", image[0], cx::ptSAGITTAL, 0, 1);
-	REQUIRE(this->define3DGPU(images, parameters, 1, 1));
-	REQUIRE(this->runWidget());
+	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
@@ -169,11 +147,12 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 
 	REQUIRE(this->define3DGPU(QStringList(image[3]), &parameters, 0, 0));
 	REQUIRE(this->runWidget());
+	CHECK(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
 				 "Visual rendering: Show 3D volume with lut",
-				 "[unit][resource/visualization][broken]")
+				 "[unit][resource/visualization]")
 {
 	this->setDescription("3D with lut, moving tool");
 
@@ -183,11 +162,12 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 
 	this->define3D(image[0], &parameters, 0, 0);
 
-	REQUIRE(this->runWidget());
+	REQUIRE(this->quickRunWidget());
+	CHECK(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show ACS+3D, moving tool",
+				 "Visual rendering: Show ACS+3D, centered hidden tool",
 				 "[unit][resource/visualization]")
 {
 	this->setDescription("ACS+3D, moving tool");
@@ -195,31 +175,30 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	this->defineSlice("A", image[0], cx::ptAXIAL, 0, 0);
 	this->defineSlice("C", image[0], cx::ptCORONAL, 1, 0);
 	this->defineSlice("S", image[0], cx::ptSAGITTAL, 0, 1);
-//	REQUIRE(this->runWidget());
 	REQUIRE(this->quickRunWidget());
-	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
-	REQUIRE(this->getFractionOfBrightPixelsInView(1,20) > 0.02);
-	REQUIRE(this->getFractionOfBrightPixelsInView(2,20) > 0.02);
-	REQUIRE(this->getFractionOfBrightPixelsInView(3,20) > 0.02);
+
+	CHECK(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
+	CHECK(this->getFractionOfBrightPixelsInView(1,20) > 0.02);
+	CHECK(this->getFractionOfBrightPixelsInView(2,20) > 0.02);
+	CHECK(this->getFractionOfBrightPixelsInView(3,20) > 0.02);
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show AnyDual+3D, moving tool",
-				 "[unit][resource/visualization][broken][current]")
+				 "Visual rendering: Show AnyDual+3D, centered hidden tool",
+				 "[unit][resource/visualization]")
 {
 	this->setDescription("Any+Dual+3D, moving tool");
 	this->define3D(image[0], NULL, 0, 2);
 	this->defineSlice("Any", image[0], cx::ptANYPLANE, 0, 0);
 	this->defineSlice("Dua", image[0], cx::ptSIDEPLANE, 0, 1);
-	REQUIRE(this->runWidget());
 	REQUIRE(this->quickRunWidget());
-	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
-	REQUIRE(this->getFractionOfBrightPixelsInView(1,20) > 0.02);
+	CHECK(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
+	CHECK(this->getFractionOfBrightPixelsInView(1,20) > 0.02);
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show ACS, 3 volumes, moving tool",
-				 "[unit][resource/visualization][broken]")
+				 "Visual rendering: Show ACS, 3 volumes, centered hidden tool",
+				 "[unit][resource/visualization]")
 {
 	this->setDescription("ACS 3 volumes, moving tool");
 
@@ -229,7 +208,12 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 		this->defineSlice("C", image[i], cx::ptCORONAL, 1, i);
 		this->defineSlice("S", image[i], cx::ptSAGITTAL, 2, i);
 	}
-	REQUIRE(this->runWidget());
+	REQUIRE(this->quickRunWidget());
+
+	for (unsigned i = 0; i < 3*3; ++i)
+	{
+		CHECK(this->getFractionOfBrightPixelsInView(i,20) > 0.02);
+	}
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
@@ -245,19 +229,10 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 		REQUIRE(this->defineGPUSlice("S", image[i], cx::ptSAGITTAL, 2, i));
 	}
 	REQUIRE(this->runWidget());
-}
 
-TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show AnyDual, 3 volumes, moving tool",
-				 "[unit][resource/visualization][broken]")
-{
-	this->setDescription("Any+Dual 3 volumes, moving tool");
-
-	for (unsigned i = 0; i < 3; ++i)
+	for (unsigned i = 0; i < 3*3; ++i)
 	{
-		this->defineSlice("Any", image[i], cx::ptANYPLANE, 0, i);
-		this->defineSlice("Dua", image[i], cx::ptSIDEPLANE, 1, i);
+		CHECK(this->getFractionOfBrightPixelsInView(i,20) > 0.02);
 	}
-	REQUIRE(this->runWidget());
 }
 
