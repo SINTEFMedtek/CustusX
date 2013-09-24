@@ -38,7 +38,7 @@ class ViewsWindow : public QMainWindow
 	Q_OBJECT
 
 public:
-	ViewsWindow(QString displayText, bool showSliders);
+	ViewsWindow(QString displayText);
 	virtual ~ViewsWindow();
 	
 	void setDescription(const QString& desc);
@@ -47,8 +47,8 @@ public:
 	void defineSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c);
 	bool defineGPUSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c);
 
-	// was test accepted?
-	bool accepted() const { return mAcceptanceBox->accepted(); }
+//	// was test accepted?
+//	bool accepted() const { return mAcceptanceBox->accepted(); }
 	
 	// setup views
 	void insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c);
@@ -59,7 +59,6 @@ public:
 
 private:
 	void applyParameters(cx::ImagePtr image, const ImageParameters* parameters);
-	void start(bool showSliders);
 	cx::ImagePtr loadImage(const QString& imageFilename);
 	void fixToolToCenter();
 	void prettyZoom(cx::View *view);
@@ -73,7 +72,7 @@ private:
 	
 	double mZoomFactor;
 	QString mShaderFolder;
-	cx::AcceptanceBoxWidget* mAcceptanceBox;
+//	cx::AcceptanceBoxWidget* mAcceptanceBox;
 	QTimer* mRenderingTimer;
 
 public slots:
