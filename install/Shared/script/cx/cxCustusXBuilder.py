@@ -165,6 +165,7 @@ class CustusXBuilder:
                 '--xml-version=2',
                 '-i%s/source/ThirdParty/' % sourceDir,
                 '-i%s/source/resource/ssc_not_in_use/' % sourceDir,
+                '-i%s/source/resource/testUtilities/cisst_code/' % sourceDir,
                 '%s/source 2> %s/cppcheck-result.xml' % (sourceDir, rootDir)
                 ])
 
