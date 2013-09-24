@@ -102,7 +102,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 
 TEST_CASE_METHOD(VisualRenderingFixture,
 				 "Visual rendering: Show 3D volume - snwGPU multivolume render",
-				 "[unit][resource/visualization][not_apple][broken]")
+				 "[unit][resource/visualization][not_apple][not_linux]")
 {
 	this->setDescription("3D Volume, moving tool, GPU");
 	REQUIRE(this->define3DGPU(QStringList(image[0]), NULL, 0, 0));
@@ -112,7 +112,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 
 TEST_CASE_METHOD(VisualRenderingFixture,
 				 "Visual rendering: Show 3D 2 volumes - snwGPU multivolume render",
-				 "[unit][resource/visualization][not_apple][broken]")
+				 "[unit][resource/visualization][not_apple][not_linux]")
 {
 	this->setDescription("3D Composites (2 volumes), moving tool");
 	QStringList images; images << image[1] << image[2];
@@ -133,7 +133,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 
 TEST_CASE_METHOD(VisualRenderingFixture,
 				 "Visual rendering: Show 3D RGB GPU volume",
-				 "[unit][resource/visualization][not_apple][broken]")
+				 "[unit][resource/visualization][not_apple][not_linux]")
 {
 	this->setDescription("3D RGB Volume");
 
@@ -213,7 +213,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 
 TEST_CASE_METHOD(VisualRenderingFixture,
 				 "Visual rendering: Show ACS, 3 GPU volumes, moving tool",
-				 "[unit][resource/visualization][not_apple][broken]")
+				 "[unit][resource/visualization][not_apple][not_linux]")
 {
 	this->setDescription("ACS 3 volumes, moving tool, GPU");
 
