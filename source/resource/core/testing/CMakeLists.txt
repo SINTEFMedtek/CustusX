@@ -4,10 +4,6 @@ if (BUILD_TESTING)
 	)
   
 	set(RESOURCE_TEST_SOURCE_FILES
-        sscTestSliceComputer.cpp
-        sscTestUtilityClasses.cpp
-        sscTestTransform3D.cpp
-        sscTestBoundingBox3D.cpp
 		cxTest_ImageAlgorithms.h
 		cxTest_ImageAlgorithms.cpp
 		${RESOURCE_TEST_SOURCE_FILES}
@@ -19,7 +15,13 @@ if (BUILD_TESTING)
 	#Catch
         set(RESOURCE_TEST_CATCH_SOURCE_FILES
             cxtestCatchStringHelpers.cpp
-            )
+			cxtestCatchSliceComputer.cpp
+			cxtestCatchBoundingBox3D.cpp
+			cxtestCatchFrame.cpp
+			cxtestCatchSharedMemory.cpp
+			cxtestCatchTransform3D.cpp
+			cxtestCatchVector3D.cpp
+			)
         cx_catch_add_lib_and_exe(cxResource "${RESOURCE_TEST_CATCH_SOURCE_FILES}")
     
 endif (BUILD_TESTING)

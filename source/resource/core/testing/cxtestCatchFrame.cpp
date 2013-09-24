@@ -1,54 +1,30 @@
-#define _USE_MATH_DEFINES
-#include "sscTestUtilityClasses.h"
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <sstream>
-#include <math.h>
-
-#include <cppunit/extensions/TestFactoryRegistry.h> 
-#include <cppunit/ui/text/TestRunner.h>
-#include <cppunit/extensions/HelperMacros.h>
-
-#include "sscVector3D.h"
-#include "sscTransform3D.h"
 #include "sscFrame3D.h"
-#include "sscSharedMemory.h"
+#include "catch.hpp"
 
 using namespace cx;
 
-void TestUtilityClasses::setUp()
+namespace
 {
-}
 
-void TestUtilityClasses::tearDown()
-{
-}
-
-void TestUtilityClasses::testTransform3DAccess()
-{
-	Transform3D t = createTransformRotateY(M_PI/4)*createTransformRotateX(M_PI/3)*createTransformTranslate(Vector3D(3,4,5));
-	//const Transform3D ct = t;
-	
-	for (unsigned i=0; i<4; ++i)
-	{
-		for (unsigned j=0; j<4; ++j)
-		{
-			double val = i*4+j;
-			t(i,j) = val;
-			//ct[i][j] = val; // does not compile: ok
-			//double temp = ct[i][j];  // does compile: ok
-			CPPUNIT_ASSERT(similar(val, t(i,j)));
-		}
-	}
-}
-
-void TestUtilityClasses::singleTestFrame(const Transform3D& transform)
+void singleTestFrame(const Transform3D& transform)
 {
 	Frame3D frame = Frame3D::create(transform);
 	Transform3D restored = frame.transform();
-	
+
 	boost::array<double, 6> rep = frame.getCompactAxisAngleRep();
 	Transform3D restored_rep = Frame3D::fromCompactAxisAngleRep(rep).transform();
 
@@ -60,7 +36,7 @@ void TestUtilityClasses::singleTestFrame(const Transform3D& transform)
 		std::cout << transform << std::endl;
 		std::cout << "frame: " << frame << std::endl;
 		std::cout << "axis: " << frame.rotationAxis() << std::endl;
-		std::cout << std::endl;		
+		std::cout << std::endl;
 		std::cout << "restored:" << std::endl;
 		std::cout << restored << std::endl;
 		std::cout << "--------------------------------------" << std::endl;
@@ -72,28 +48,30 @@ void TestUtilityClasses::singleTestFrame(const Transform3D& transform)
 //		std::cout << "frame: " << frame << std::endl;
 //		std::cout << "axis: " << frame.rotationAxis() << std::endl;
 	}
-	
-	CPPUNIT_ASSERT(similar(transform, restored));
-  CPPUNIT_ASSERT(similar(transform, restored_rep));
+
+	CHECK(similar(transform, restored));
+  CHECK(similar(transform, restored_rep));
 }
 
-void TestUtilityClasses::singleTestFrameRotationAxis(const Vector3D& k)
+void singleTestFrameRotationAxis(const Vector3D& k)
 {
 	Frame3D frame;
 	frame.setRotationAxis(k);
-	CPPUNIT_ASSERT(similar(k, frame.rotationAxis()));
-	CPPUNIT_ASSERT(similar(frame.rotationAxis().normal(), frame.rotationAxis()));	
+	CHECK(similar(k, frame.rotationAxis()));
+	CHECK(similar(frame.rotationAxis().normal(), frame.rotationAxis()));
 }
+
+} // namespace
 
 //#define SINGLE_TEST_FRAME(expr) std::cout << "testing: " << # expr << std::endl; singleTestFrame(expr);
 #define SINGLE_TEST_FRAME(expr) singleTestFrame(expr);
 
-void TestUtilityClasses::testFrame()
+TEST_CASE("Frame3D works", "[unit][resource][core]")
 {
 	singleTestFrameRotationAxis((createTransformRotateZ(M_PI/4)).vector(Vector3D(1,0,0)));
 	singleTestFrameRotationAxis((createTransformRotateY(M_PI/4)).vector(Vector3D(1,0,0)));
 	singleTestFrameRotationAxis((createTransformRotateZ(M_PI/4)*createTransformRotateY(M_PI/4)).vector(Vector3D(1,0,0)));
-	
+
 	SINGLE_TEST_FRAME( Transform3D::Identity() );
 	SINGLE_TEST_FRAME( createTransformTranslate(Vector3D(1,0,0)) );
 	SINGLE_TEST_FRAME( createTransformTranslate(Vector3D(4,3,2)) );
@@ -110,45 +88,5 @@ void TestUtilityClasses::testFrame()
 	SINGLE_TEST_FRAME( createTransformRotateZ(M_PI)*createTransformTranslate(Vector3D(3,4,5)) );
 }
 
-void TestUtilityClasses::testVector3D()
-{
-  Vector3D a(1,2,3);
-  Vector3D b(4,5,6);
-  Vector3D e_x(1,0,0);
-  Vector3D e_y(0,1,0);
-  Vector3D e_z(0,0,1);
 
-  CPPUNIT_ASSERT( similar(a,a) );
-  CPPUNIT_ASSERT( !similar(a,b) );
 
-  CPPUNIT_ASSERT( similar( cross(e_x,e_y), e_z ) );
-  CPPUNIT_ASSERT( similar( dot(e_x,e_y), 0 ) );
-  CPPUNIT_ASSERT( similar( dot(e_x,e_x), 1 ) );
-
-  CPPUNIT_ASSERT( a[0]==1 && a[1]==2 && a[2]==3 );
-}
-
-void TestUtilityClasses::testSharedMemory()
-{
-	for (int i = 1; i < 10; i++)
-	{
-		SharedMemoryServer srv("test_", i, 100 * i);
-		SharedMemoryClient cli;
-
-		bool result = cli.attach(srv.key());
-		CPPUNIT_ASSERT( result );
-		CPPUNIT_ASSERT( cli.key() == srv.key() );
-		CPPUNIT_ASSERT( cli.size() == srv.size() );
-		CPPUNIT_ASSERT( cli.buffers() == srv.buffers() );
-		void *dst = srv.buffer();
-		CPPUNIT_ASSERT( dst != NULL );
-		strcpy((char *)dst, "text");
-		srv.release();
-		srv.release();
-		const void *src = cli.buffer();
-		CPPUNIT_ASSERT( src != NULL );
-		CPPUNIT_ASSERT( strncmp((char *)src, "text", 4) == 0 );
-		cli.release();
-		cli.release();
-	}
-}
