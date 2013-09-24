@@ -90,7 +90,6 @@ Available components are:
         p.add_argument('--b32', action='store_true', default=False, help='build 32 bit')
         p.add_argument('--xcode', action='store_true', default=False, help='generate xcode targets (Mac)')
         p.add_argument('--jom', action='store_true', default=False, help='generate jom targets (Windows)')
-#        p.add_argument('--password', '-p', default="", help='password to send to scripts')
         p.add_argument('-d', '--dummy', action='store_true', default=False, help='execute script without calling any shell commands')
         p.add_argument('-t', '--build_type', choices=['Debug','Release','RelWithDebInfo'], help='build type', default='Debug')
         p.add_argument('-s', '--silent_mode', action='store_true', default=False, help='execute script without user interaction')
@@ -98,11 +97,9 @@ Available components are:
         p.add_argument('--coverage', action='store_true', default=False, help='gcov code coverage')
         p.add_argument('--doxygen', action='store_true', default=False, help='build doxygen documentation')
         p.add_argument('-g', '--git_tag', default=None, help='git tag to use when checking out CustusX. None means checkout master branch.')
-#        p.add_argument('--external_dir', default=self.controlData.mExternalDir, help='specify external folder, default=%s'%self.controlData.mExternalDir)
-#        p.add_argument('--working_dir', default=self.controlData.mWorkingDir, help='specify work folder, default=%s'%self.controlData.mWorkingDir)
         rootdir = self.assembly.controlData.getRootDir()
         p.add_argument('--root_dir', default=rootdir, help='specify root folder, default=%s'%rootdir)
-#        p.add_argument('--cmake_args', default="", help='additional arguments to ALL cmake calls')
+                
         p.add_argument('components', nargs='*', help='list of all components to process')
         return p
     
