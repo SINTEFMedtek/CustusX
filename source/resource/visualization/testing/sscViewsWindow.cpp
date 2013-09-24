@@ -65,8 +65,9 @@ vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueR
 	return lut;
 }
 
-ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(displayText)
+ViewsWindow::ViewsWindow(QString displayText)
 {
+	this->setDescription(displayText);
 	mZoomFactor = 1;
 	mShaderFolder = cx::DataLocations::getShaderPath();
 	
@@ -75,11 +76,6 @@ ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(d
 	this->setGeometry(screen);
 	this->setCentralWidget( new QWidget(this) );
 
-	start(showSliders);
-}
-
-void ViewsWindow::start(bool showSliders)
-{
 	// Initialize dummy toolmanager.
 	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
 	mToolmanager->configure();
@@ -97,14 +93,14 @@ void ViewsWindow::start(bool showSliders)
 
 	mainLayout->addLayout(mSliceLayout);//Slice layout
 
-	QHBoxLayout *controlLayout = new QHBoxLayout;
-	controlLayout->addStretch();
+//	QHBoxLayout *controlLayout = new QHBoxLayout;
+//	controlLayout->addStretch();
 
-	mAcceptanceBox = new cx::AcceptanceBoxWidget(mDisplayText, this);
-	controlLayout->addWidget(mAcceptanceBox);
+//	mAcceptanceBox = new cx::AcceptanceBoxWidget(mDisplayText, this);
+//	controlLayout->addWidget(mAcceptanceBox);
 
-	controlLayout->addStretch();
-	mainLayout->addLayout(controlLayout); //Buttons
+//	controlLayout->addStretch();
+//	mainLayout->addLayout(controlLayout); //Buttons
 
 	mRenderingTimer = new QTimer(this);
 	mRenderingTimer->start(33);
@@ -113,7 +109,8 @@ void ViewsWindow::start(bool showSliders)
 
 void ViewsWindow::setDescription(const QString& desc)
 {
-	mAcceptanceBox->setText(desc);
+	this->setWindowTitle(desc);
+//	mAcceptanceBox->setText(desc);
 }
 
 ViewsWindow::~ViewsWindow()
@@ -262,7 +259,6 @@ bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 		return false;
 	cx::GPURayCastVolumeRepPtr mRepPtr = cx::GPURayCastVolumeRep::New( images[0]->getUid() );
 	mRepPtr->setShaderFolder(mShaderFolder);
-	std::cout << "shader folder: " << mShaderFolder.toStdString() << std::endl;
 	mRepPtr->setImages(images);
 	mRepPtr->setName(images[0]->getName());
 	view->addRep(mRepPtr);

@@ -58,18 +58,13 @@ using cx::Transform3D;
 class VisualRenderingFixture : public ViewsWindow
 {
 public:
-	VisualRenderingFixture() : ViewsWindow("Verify that the volumes are rendered correctly.", false)
+	VisualRenderingFixture() : ViewsWindow("")
 	{
 		image.push_back("ssc/Person5/person5_t1_unsigned.mhd");
 		image.push_back("ssc/Person5/person5_t2_unsigned.mhd");
 		image.push_back("ssc/Person5/person5_flair_unsigned.mhd");
 		image.push_back("ssc/DTI/dti_eigenvector_rgb.mhd");
 	}
-
-	~VisualRenderingFixture()
-	{
-	}
-
 	QStringList image;
 };
 
