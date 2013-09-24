@@ -115,7 +115,10 @@ void ViewsWindow::setDescription(const QString& desc)
 
 ViewsWindow::~ViewsWindow()
 {
+	mRenderingTimer->stop();
+	cx::ToolManager::shutdown();
 }
+
 
 bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
 {	
