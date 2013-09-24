@@ -153,8 +153,7 @@ void TestGEInterface::testStream(cx::StringMap args)
 
 	REQUIRE(imageSender->startStreaming(grabberBridge));
 
-	//	QTimer::singleShot(1*1000,   qApp, SLOT(quit()) );
-	QTimer::singleShot(500,   qApp, SLOT(quit()) );
+	QTimer::singleShot(1*1000,   qApp, SLOT(quit()) );
 	qApp->exec();
 
 	imageSender->stopStreaming();
@@ -162,7 +161,7 @@ void TestGEInterface::testStream(cx::StringMap args)
 	imageSender.reset();
 	grabberBridge.reset();
 
-	REQUIRE(controller.verify());
+	controller.verify();
 }
 
 void TestGEInterface::testGEStreamer()
