@@ -15,133 +15,18 @@ namespace cxtest
 
 void TestGEInterface::setUp()
 {
-//	cx::LogicManager::initialize();
 	cx::MessageManager::initialize();
 }
 
 void TestGEInterface::tearDown()
 {
-//	cx::LogicManager::shutdown();
 	cx::MessageManager::shutdown();
-}
-
-void TestGEInterface::testConstructor()
-{
-}
-
-void TestGEInterface::testStreams()
-{
-	std::cout << std::endl << "*** Test GE all streams streams. CPU scanconversion ***" << std::endl;
-	cx::StringMap args;
-	args["type"] = "ISB_GE";
-	args["test"] = "2D";
-	args["useOpenCL"] = "0"; //Test only CPU scan conversion
-	std::cout << std::endl << "--- Test GE 2D scanconverted stream. Auto size ---" << std::endl;
-	this->testStream(args);
-	args["imagesize"] = "500*500";
-	std::cout << std::endl << "--- Test GE 2D scanconverted stream. Defined size ---" << std::endl;
-	this->testStream(args); //set size
-
-	args["test"] = "3D";
-	args["imagesize"] = "auto";
-	std::cout << std::endl << "--- Test GE 3D scanconverted stream. Auto size ---" << std::endl;
-	this->testStream(args); //3D
-	args["imagesize"] = "100*100*100";
-	std::cout << std::endl << "--- Test GE 3D scanconverted stream. Defined size ---" << std::endl;
-	this->testStream(args); //set size
-
-//	args["test"] = "no";
-//	args["ip"] = "bhgrouter.hopto.org";
-//	std::cout << "---Custom test: Connect to simulator" << std::endl;
-//	this->testStream(args);//Custom test
-}
-
-//Test currently needs the simulator to run with doppler, or be conected to the scanner
-void TestGEInterface::testAllStreamsGPU()
-{
-	cx::StringMap args;
-	args["type"] = "ISB_GE";
-	args["test"] = "2D";
-	//args["ip"] = "bhgrouter.hopto.org";
-	//args["test"] = "no";
-	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
-	args["streams"] = "all";
-	std::cout << std::endl << "--- Test GE 2D all streams. GPU scanconversion if possible ---" << std::endl;
-	this->testStream(args);
-
-}
-void TestGEInterface::testScanConvertedStreamGPU()
-{
-	cx::StringMap args;
-	args["type"] = "ISB_GE";
-	args["test"] = "2D";
-	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
-	args["streams"] = "scanconverted";
-	std::cout << std::endl << "--- Test GE 2D scanconverted stream. GPU scanconversion if possible ---" << std::endl;
-	this->testStream(args);
-}
-void TestGEInterface::testTissueStreamGPU()
-{
-	cx::StringMap args;
-	args["type"] = "ISB_GE";
-	args["test"] = "2D";
-	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
-	args["streams"] = "tissue";
-	std::cout << std::endl << "--- Test GE 2D tissue stream. GPU scanconversion if possible ---" << std::endl;
-	this->testStream(args);
-}
-void TestGEInterface::testFrequencyStreamGPU()
-{
-	cx::StringMap args;
-	args["type"] = "ISB_GE";
-	args["test"] = "2D";
-	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
-	args["streams"] = "frequency";
-	std::cout << std::endl << "--- Test GE 2D frequency stream. GPU scanconversion if possible ---" << std::endl;
-	this->testStream(args);
-}
-void TestGEInterface::testBandwidthStreamGPU()
-{
-	cx::StringMap args;
-	args["type"] = "ISB_GE";
-	args["test"] = "2D";
-	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
-	args["streams"] = "bandwidth";
-	std::cout << std::endl << "--- Test GE 2D bandwidth stream. GPU scanconversion if possible ---" << std::endl;
-	this->testStream(args);
-}
-void TestGEInterface::testVelocityStreamGPU()
-{
-	cx::StringMap args;
-	args["type"] = "ISB_GE";
-	args["test"] = "2D";
-	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
-	args["streams"] = "velocity";
-	std::cout << std::endl << "--- Test GE 2D velocity stream. ---" << std::endl;
-	this->testStream(args);
-}
-void TestGEInterface::testDefaultStreamsGPU()
-{
-	cx::StringMap args;
-	args["type"] = "ISB_GE";
-	args["test"] = "2D";
-	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
-	std::cout << std::endl << "--- Test GE 2D default streams. ---" << std::endl;
-	this->testStream(args);
-}
-
-void TestGEInterface::testAllStreamsGPUConsecutively()
-{
-	testAllStreamsGPU();
-	testScanConvertedStreamGPU();
-	testTissueStreamGPU();
-	testFrequencyStreamGPU();
-	testBandwidthStreamGPU();
-	testVelocityStreamGPU();
 }
 
 void TestGEInterface::testStream(cx::StringMap args)
 {
+	TestGEInterface::setUp();
+
 	cx::StreamerPtr imageSender = cx::ImageStreamerFactory().getFromArguments(args);
 	REQUIRE(imageSender);
 	REQUIRE(imageSender->getType().compare(args["type"]) == 0);
@@ -153,8 +38,7 @@ void TestGEInterface::testStream(cx::StringMap args)
 
 	REQUIRE(imageSender->startStreaming(grabberBridge));
 
-	//	QTimer::singleShot(1*1000,   qApp, SLOT(quit()) );
-	QTimer::singleShot(500,   qApp, SLOT(quit()) );
+	QTimer::singleShot(1*1000,   qApp, SLOT(quit()) );
 	qApp->exec();
 
 	imageSender->stopStreaming();
@@ -162,7 +46,9 @@ void TestGEInterface::testStream(cx::StringMap args)
 	imageSender.reset();
 	grabberBridge.reset();
 
-	REQUIRE(controller.verify());
+	controller.verify();
+
+	TestGEInterface::tearDown();
 }
 
 void TestGEInterface::testGEStreamer()
