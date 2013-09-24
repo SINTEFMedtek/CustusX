@@ -32,6 +32,7 @@
 #include "sscImageTF3D.h"
 #include "cxDataLocations.h"
 #include "cxtestRenderTester.h"
+#include "sscLogger.h"
 
 using cx::Vector3D;
 using cx::Transform3D;
@@ -50,6 +51,7 @@ namespace {
 	}
 }
 
+
 vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueRangeMin, double hueRangeMax,
 	double saturationRangeMin, double saturationRangeMax, double valueRangeMin, double valueRangeMax)
 {
@@ -66,13 +68,7 @@ vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueR
 ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(displayText)
 {
 	mZoomFactor = 1;
-	mDumpSpeedData = false;
-	mRenderCount = 0;
-	mTotalRender = 0;
-	mTotalOther = 0;
-	mLastRenderEnd = QTime::currentTime();
 	mShaderFolder = cx::DataLocations::getShaderPath();
-//	mShaderFolder = qApp->applicationDirPath() + "/../Code/Rep/";
 	
 	QRect screen = qApp->desktop()->screenGeometry(qApp->desktop()->primaryScreen());
 	screen.adjust(screen.width()*0.15, screen.height()*0.15, -screen.width()*0.15, -screen.height()*0.15);
@@ -80,6 +76,39 @@ ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(d
 	this->setCentralWidget( new QWidget(this) );
 
 	start(showSliders);
+}
+
+void ViewsWindow::start(bool showSliders)
+{
+	// Initialize dummy toolmanager.
+	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
+	mToolmanager->configure();
+	mToolmanager->initialize();
+	mToolmanager->startTracking();
+
+//	cx::ToolPtr tool = mToolmanager->getDominantTool();
+//	connect( tool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), &mTimer, SLOT( start()));
+
+	//gui controll
+	QVBoxLayout *mainLayout = new QVBoxLayout;
+	this->centralWidget()->setLayout(mainLayout);
+
+	mSliceLayout = new QGridLayout;
+
+	mainLayout->addLayout(mSliceLayout);//Slice layout
+
+	QHBoxLayout *controlLayout = new QHBoxLayout;
+	controlLayout->addStretch();
+
+	mAcceptanceBox = new cx::AcceptanceBoxWidget(mDisplayText, this);
+	controlLayout->addWidget(mAcceptanceBox);
+
+	controlLayout->addStretch();
+	mainLayout->addLayout(controlLayout); //Buttons
+
+	mRenderingTimer = new QTimer(this);
+	mRenderingTimer->start(33);
+	connect(mRenderingTimer, SIGNAL(timeout()), this, SLOT(updateRender()));
 }
 
 void ViewsWindow::setDescription(const QString& desc)
@@ -93,22 +122,15 @@ ViewsWindow::~ViewsWindow()
 
 bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
 {	
-	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
-	cx::ToolPtr tool = mToolmanager->getDominantTool();
+	cx::ViewWidget* view = this->create2DView(imageFilename, r, c);
 	cx::ImagePtr image = loadImage(imageFilename);
-	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
 
 	if (!view || !view->getRenderWindow() || !view->getRenderWindow()->SupportsOpenGL())
 		return false;
 	if (!cx::Texture3DSlicerRep::isSupported(view->getRenderWindow()))
 		return false;
 
-	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
-	view->GetRenderWindow()->GetInteractor()->Disable();
-	view->setZoomFactor(mZoomFactor);
-	cx::SliceProxyPtr proxy(new cx::SliceProxy());
-	proxy->setTool(tool);
-	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
+	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
 	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(uid);
 	rep->setShaderFile(mShaderFolder + "/Texture3DOverlay.frag");
 	rep->setSliceProxy(proxy);
@@ -116,24 +138,15 @@ bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 	view->addRep(rep);
 	insertView(view, uid, imageFilename, r, c);
 
-//	mTimer.setSingleShot(true);
-//	mTimer.setInterval(0);
-//	connect(&mTimer, SIGNAL(timeout()), this, SLOT(updateRender()));
 	return true;
 }
 
 void ViewsWindow::defineSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
 {
-	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
-	cx::ToolPtr tool = mToolmanager->getDominantTool();
+	cx::ViewWidget* view = this->create2DView(imageFilename, r, c);
 	cx::ImagePtr image = loadImage(imageFilename);
-	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
-	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
-	view->GetRenderWindow()->GetInteractor()->Disable();
-	view->setZoomFactor(mZoomFactor);
-	cx::SliceProxyPtr proxy(new cx::SliceProxy());
-	proxy->setTool(tool);
-	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
+
+	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
 	cx::SliceRepSWPtr rep = cx::SliceRepSW::New(uid);
 	rep->setImage(image);
 	rep->setSliceProxy(proxy);
@@ -141,15 +154,39 @@ void ViewsWindow::defineSlice(const QString& uid, const QString& imageFilename, 
 	insertView(view, uid, imageFilename, r, c);
 }
 
+cx::ViewWidget* ViewsWindow::create2DView(const QString& title, int r, int c)
+{
+	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
+
+	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
+	view->GetRenderWindow()->GetInteractor()->Disable();
+	view->setZoomFactor(mZoomFactor);
+
+	return view;
+}
+
+cx::SliceProxyPtr ViewsWindow::createSliceProxy(cx::PLANE_TYPE plane)
+{
+	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
+	cx::ToolPtr tool = mToolmanager->getDominantTool();
+
+	cx::SliceProxyPtr proxy(new cx::SliceProxy());
+	proxy->setTool(tool);
+	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
+	return proxy;
+}
+
 cx::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 {
 	QString filename = cxtest::Utilities::getDataRoot(imageFilename);
-//	QString filename = cx::TestUtilities::ExpandDataFileName(imageFilename);
 	cx::ImagePtr image = cx::DataManager::getInstance()->loadImage(filename, filename, cx::rtMETAIMAGE);
 	Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);
 	cx::DataManager::getInstance()->setCenter(center);
 	
+	if (!image)
+		return cx::ImagePtr();
+
 	// side effect: set tool movement box to data box,
 	dummyTool()->setToolPositionMovementBB(transform(image->get_rMd(), image->boundingBox()));
 	this->fixToolToCenter();
@@ -179,13 +216,7 @@ void ViewsWindow::define3D(const QString& imageFilename, const ImageParameters* 
 	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
 	
 	cx::ImagePtr image = loadImage(imageFilename);
-
-	if (parameters != NULL)
-	{
-		image->getTransferFunctions3D()->setLLR(parameters->llr);
-		image->getTransferFunctions3D()->setAlpha(parameters->alpha);
-		image->getTransferFunctions3D()->setLut(parameters->lut);
-	}
+	this->applyParameters(image, parameters);
 
 	// volume rep
 	cx::VolumetricRepPtr mRepPtr = cx::VolumetricRep::New( image->getUid() );
@@ -194,16 +225,19 @@ void ViewsWindow::define3D(const QString& imageFilename, const ImageParameters* 
 	mRepPtr->setImage(image);	
 	mRepPtr->setName(image->getName());
 	view->addRep(mRepPtr);
-	
-	// Tool 3D rep
-	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
-	cx::ToolPtr tool = mToolmanager->getDominantTool();
-	cx::ToolRep3DPtr toolRep = cx::ToolRep3D::New( tool->getUid(), tool->getName() );
-	toolRep->setTool(tool);
-	view->addRep(toolRep);
-	
+		
 	insertView(view, uid, imageFilename, r, c);
 }
+
+//void ViewsWindow::showTool()
+//{
+//	// Tool 3D rep
+//	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
+//	cx::ToolPtr tool = mToolmanager->getDominantTool();
+//	cx::ToolRep3DPtr toolRep = cx::ToolRep3D::New( tool->getUid(), tool->getName() );
+//	toolRep->setTool(tool);
+//	view->addRep(toolRep);
+//}
 
 bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImageParameters* parameters, int r, int c)
 {
@@ -212,20 +246,13 @@ bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 
 	std::vector<cx::ImagePtr> images;
 
-	double numImages = imageFilenames.size();
-	for (int i = 0; i < numImages; ++i)
+	for (int i = 0; i < imageFilenames.size(); ++i)
 	{
 		cx::ImagePtr image = loadImage(imageFilenames[i]);
 		if (!image)
-		{
 			return false;
-		}
-		if (parameters != NULL)
-		{
-			image->getTransferFunctions3D()->setLLR(parameters[i].llr);
-			image->getTransferFunctions3D()->setAlpha(parameters[i].alpha);
-			image->getTransferFunctions3D()->setLut(parameters[i].lut);
-		}
+
+		this->applyParameters(image, &parameters[i]);
 		images.push_back(image);
 	}
 
@@ -234,107 +261,48 @@ bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 	if (!cx::GPURayCastVolumeRep::isSupported(view->getRenderWindow()))
 		return false;
 	cx::GPURayCastVolumeRepPtr mRepPtr = cx::GPURayCastVolumeRep::New( images[0]->getUid() );
-//	mShaderFolder = "/home/christiana/dev/working/CustusX3/CustusX3/source/resource/visualization/Rep/Shaders/glsl";
 	mRepPtr->setShaderFolder(mShaderFolder);
 	std::cout << "shader folder: " << mShaderFolder.toStdString() << std::endl;
 	mRepPtr->setImages(images);
 	mRepPtr->setName(images[0]->getName());
 	view->addRep(mRepPtr);
 #endif //WIN32
-
-	// Tool 3D rep
-	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
-	cx::ToolPtr tool = mToolmanager->getDominantTool();
-	cx::ToolRep3DPtr toolRep = cx::ToolRep3D::New( tool->getUid(), tool->getName() );
-	toolRep->setTool(tool);
-	view->addRep(toolRep);
 	
 	insertView(view, uid, imageFilenames[0], r, c);
-
 	return true;
 }
 
-void ViewsWindow::start(bool showSliders)
+void ViewsWindow::applyParameters(cx::ImagePtr image, const ImageParameters *parameters)
 {
-	// Initialize dummy toolmanager.
-	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
-	mToolmanager->configure();
-	mToolmanager->initialize();
-	mToolmanager->startTracking();
-
-//	cx::ToolPtr tool = mToolmanager->getDominantTool();
-//	connect( tool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), &mTimer, SLOT( start()));
-
-	//gui controll
-	QVBoxLayout *mainLayout = new QVBoxLayout;
-	this->centralWidget()->setLayout(mainLayout);
-
-	mSliceLayout = new QGridLayout;
-
-	mainLayout->addLayout(mSliceLayout);//Slice layout
-
-	QHBoxLayout *controlLayout = new QHBoxLayout;
-	controlLayout->addStretch();
-	
-	mAcceptanceBox = new cx::AcceptanceBoxWidget(mDisplayText, this);
-	controlLayout->addWidget(mAcceptanceBox);
-
-	controlLayout->addStretch();
-	mainLayout->addLayout(controlLayout); //Buttons
-
-	mRenderingTimer = new QTimer(this);
-	mRenderingTimer->start(33);
-	connect(mRenderingTimer, SIGNAL(timeout()), this, SLOT(updateRender()));
+	if (!parameters)
+		return;
+	image->getTransferFunctions3D()->setLLR(parameters->llr);
+	image->getTransferFunctions3D()->setAlpha(parameters->alpha);
+	image->getTransferFunctions3D()->setLut(parameters->lut);
 }
 
 void ViewsWindow::updateRender()
 {
 	for (std::vector<cx::View *>::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
 	{
-		cx::View *view = *iter;
-
-		if (view->getZoomFactor()<0)
-		  continue;
-
-		cx::DoubleBoundingBox3D bb_s  = view->getViewport_s();
-		double viewportHeightmm = bb_s.range()[1];//viewPortHeightPix*mmPerPix(view);
-		double parallelscale = viewportHeightmm/2/view->getZoomFactor();
-
-		vtkCamera* camera = view->getRenderer()->GetActiveCamera();
-		camera->SetParallelScale(parallelscale);
+		this->prettyZoom(*iter);
 	}
 
-	++mRenderCount;
-	QTime pre = QTime::currentTime();
-	int other = mLastRenderEnd.msecsTo(pre);
-
-	QSet<vtkRenderWindow *> windowList;
 	for (unsigned i=0; i<mLayouts.size(); ++i)
-	{
-		windowList.insert(mLayouts[i]->getRenderWindow().GetPointer());
-	}
-	foreach (vtkRenderWindow *win, windowList)
-	{
-		win->Render();
-	}
+		mLayouts[i]->getRenderWindow()->Render();
+}
 
-	mLastRenderEnd = QTime::currentTime();
+void ViewsWindow::prettyZoom(cx::View *view)
+{
+	if (view->getZoomFactor()<0)
+		return;
 
-	int render = pre.msecsTo(mLastRenderEnd);
-	mTotalRender += render;
-	mTotalOther += other;
+	cx::DoubleBoundingBox3D bb_s  = view->getViewport_s();
+	double viewportHeightmm = bb_s.range()[1];//viewPortHeightPix*mmPerPix(view);
+	double parallelscale = viewportHeightmm/2/view->getZoomFactor();
 
-	if (mDumpSpeedData)
-	{
-		if (mRenderCount%50==0)
-		{
-			std::cout << "averagerender: " << 1.0*mTotalRender/mRenderCount << "/" << 1.0*mTotalOther/mRenderCount << std::endl;
-			std::cout << "fps: " << 1000*(float)mRenderCount/(mTotalRender + mTotalOther) << std::endl;
-			mTotalRender = 0;
-			mTotalOther = 0;
-			mRenderCount = 0;
-		}
-	}
+	vtkCamera* camera = view->getRenderer()->GetActiveCamera();
+	camera->SetParallelScale(parallelscale);
 }
 
 double ViewsWindow::getFractionOfBrightPixelsInView(int viewIndex, int threshold)
@@ -346,36 +314,29 @@ double ViewsWindow::getFractionOfBrightPixelsInView(int viewIndex, int threshold
 
 }
 
-/**show/render/execute input widget.
- * Return success of execution.
- */
 bool ViewsWindow::runWidget()
 {
-	this->show();
-#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
-	this->activateWindow();
-	std::cout << "on mac!!!" << std::endl;
-#endif
-	this->raise();
-	this->updateRender();
-	return !qApp->exec() && this->accepted();
+	return this->runWidget(3000);
+}
+
+bool ViewsWindow::quickRunWidget()
+{
+	return this->runWidget(30);
 }
 
 /**show/render/execute input widget.
  * Return success of execution.
  */
-bool ViewsWindow::quickRunWidget()
+bool ViewsWindow::runWidget(int duration)
 {
 	this->show();
 #ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
 	this->activateWindow();
-	std::cout << "on mac!!!" << std::endl;
 #endif
 	this->raise();
 	this->updateRender();
 
-	QTimer::singleShot(30, qApp, SLOT(quit()));
-	return !qApp->exec();// && this->accepted();
+	QTimer::singleShot(duration, qApp, SLOT(quit()));
+	return !qApp->exec();
 }
-
 

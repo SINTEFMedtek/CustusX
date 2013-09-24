@@ -55,30 +55,25 @@ public:
 	bool runWidget();
 	bool quickRunWidget();
 
-	/// ugly hack
-	bool mDumpSpeedData;
 	double getFractionOfBrightPixelsInView(int viewIndex, int threshold);
 
 private:
+	void applyParameters(cx::ImagePtr image, const ImageParameters* parameters);
 	void start(bool showSliders);
 	cx::ImagePtr loadImage(const QString& imageFilename);
 	void fixToolToCenter();
+	void prettyZoom(cx::View *view);
+	bool runWidget(int duration);
+	cx::SliceProxyPtr createSliceProxy(cx::PLANE_TYPE plane);
+	cx::ViewWidget* create2DView(const QString& title, int r, int c);
 
-	QSlider* mBrightnessSlider;
-	QSlider *mContrastSlider;
-	
 	std::vector<cx::View *> mLayouts;
 	QGridLayout* mSliceLayout;
 	QString mDisplayText;
 	
 	double mZoomFactor;
-	int mRenderCount;
-	int mTotalRender;
-	int mTotalOther;
-	QTime mLastRenderEnd;
 	QString mShaderFolder;
 	cx::AcceptanceBoxWidget* mAcceptanceBox;
-//	QTimer mTimer;
 	QTimer* mRenderingTimer;
 
 public slots:
