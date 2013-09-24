@@ -36,6 +36,8 @@ class CatchCustomXmlNameListParser:
 
     def getTestsForTag(self, tag):
         return [val['text'] for val in self.tests if val['tags'].find(tag)>=0]
+    def getTests(self):
+        return [val['text'] for val in self.tests]
 
 class CatchConsoleNameListParser:
     '''
