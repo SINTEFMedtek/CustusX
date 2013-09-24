@@ -1,6 +1,6 @@
 #include "cxTestSenderController.h"
 
-//#include <cppunit/extensions/HelperMacros.h>
+#include "catch.hpp"
 
 TestSenderController::TestSenderController(QObject* parent) : QObject(parent)
 {
@@ -16,8 +16,8 @@ void TestSenderController::initialize(cx::DirectlyLinkedSenderPtr grabberBridge)
 
 bool TestSenderController::verify()
 {
-//	CPPUNIT_ASSERT(mImageReceived);
-//	CPPUNIT_ASSERT(mStatusReceived)
+	CHECK(mImageReceived);
+	CHECK(mStatusReceived);
 	return mImageReceived && mStatusReceived;
 }
 
