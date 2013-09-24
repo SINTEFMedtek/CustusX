@@ -77,7 +77,6 @@ ViewsWindow::ViewsWindow(QString displayText)
 	this->setCentralWidget( new QWidget(this) );
 
 	// Initialize dummy toolmanager.
-	cx::ToolManager::shutdown();
 	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
 	mToolmanager->configure();
 	mToolmanager->initialize();
