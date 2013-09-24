@@ -283,8 +283,8 @@ void Image::setTransferFunctions3D(ImageTF3DPtr transferFuntion)
 {
 	if(!this->isValidTransferFunction(transferFuntion))
 	{
-		messageManager()->sendWarning("Not a valid 3D transfer function for Image");
-		return;
+//		messageManager()->sendWarning("Not a valid 3D transfer function for Image");
+		fixCorruptTransferFunction(transferFuntion);
 	}
 	this->resetTransferFunction(transferFuntion);
 }
@@ -300,8 +300,8 @@ void Image::setLookupTable2D(ImageLUT2DPtr imageLookupTable2D)
 {
 	if(!this->isValidTransferFunction(imageLookupTable2D))
 	{
-		messageManager()->sendWarning("Not a valid 2D transfer function / lookup table for Image");
-		return;
+//		messageManager()->sendWarning("Not a valid 2D transfer function / lookup table for Image");
+		fixCorruptTransferFunction(imageLookupTable2D);
 	}
 	this->resetTransferFunction(imageLookupTable2D);
 }
@@ -796,6 +796,22 @@ bool Image::isValidTransferFunction(ImageTFDataPtr transferFunction)
 		return false;
 
 	return true;
+}
+
+ImageTFDataPtr Image::fixCorruptTransferFunction(ImageTFDataPtr transferFunction)
+{
+	int scalarMin = this->getMin();
+	int scalarMax = this->getMax();
+
+	if(transferFunction->getWindow() > (scalarMax-scalarMin))
+		transferFunction->setWindow(scalarMax-scalarMin);
+	if(transferFunction->getWindow() < 1)
+		transferFunction->setWindow(1);
+
+	if(transferFunction->getLevel() > scalarMax || transferFunction->getLevel() < scalarMin)
+		transferFunction->setLevel((scalarMax - scalarMin) / 2.0);
+
+	return transferFunction;
 }
 
 vtkImageDataPtr Image::createDummyImageData(int axisSize, int maxVoxelValue)
