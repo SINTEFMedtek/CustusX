@@ -163,7 +163,7 @@ class CustusXBuilder:
         shell.run(['cppcheck',
                 '--enable=all',
                 '--xml-version=2',
-                '-i%s/source/resource/ssc/Code/3rdParty/' % sourceDir,
+                '-i%s/source/ThirdParty/' % sourceDir,
                 '%s/source 2> %s/cppcheck-result.xml' % (sourceDir, rootDir)
                 ])
 
