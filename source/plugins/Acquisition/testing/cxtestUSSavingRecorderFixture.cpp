@@ -12,10 +12,8 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxTestUSSavingRecorderController.h"
-
+#include "cxtestUSSavingRecorderFixture.h"
 #include <QTimer>
-#include <cppunit/extensions/HelperMacros.h>
 
 #include "sscLogger.h"
 #include "sscTypeConversions.h"
@@ -25,13 +23,33 @@
 #include "cxDataLocations.h"
 #include "sscTool.h"
 #include "sscTime.h"
+#include "catch.hpp"
+#include "cxFileHelpers.h"
+#include "sscMessageManager.h"
 
 #ifdef CX_WINDOWS
 #include <windows.h>
 #endif
 
-TestUSSavingRecorderController::TestUSSavingRecorderController(QObject* parent) : QObject(parent)
+namespace cxtest
 {
+
+void USSavingRecorderFixture::setUp()
+{
+	cx::removeNonemptyDirRecursively(this->getDataPath());
+	cx::MessageManager::initialize();
+}
+
+void USSavingRecorderFixture::tearDown()
+{
+	cx::MessageManager::shutdown();
+	cx::removeNonemptyDirRecursively(this->getDataPath());
+}
+
+USSavingRecorderFixture::USSavingRecorderFixture(QObject* parent) : QObject(parent)
+{
+	this->setUp();
+
 	mRecorder.reset(new cx::USSavingRecorder());
 	mRecorder->setWriteColor(true);
 	mRecorder->set_rMpr(cx::Transform3D::Identity());
@@ -40,12 +58,17 @@ TestUSSavingRecorderController::TestUSSavingRecorderController(QObject* parent) 
 	QTimer::singleShot(0, this, SLOT(runOperations()));
 }
 
-void TestUSSavingRecorderController::addOperation(boost::function0<void> operation)
+USSavingRecorderFixture::~USSavingRecorderFixture()
+{
+	this->tearDown();
+}
+
+void USSavingRecorderFixture::addOperation(boost::function0<void> operation)
 {
 	mOperations.push_back(operation);
 }
 
-void TestUSSavingRecorderController::runOperations()
+void USSavingRecorderFixture::runOperations()
 {
 	for (unsigned i=0; i<mOperations.size(); ++i)
 	{
@@ -55,12 +78,12 @@ void TestUSSavingRecorderController::runOperations()
 	QTimer::singleShot(0, qApp, SLOT(quit()));
 }
 
-void TestUSSavingRecorderController::setTool(cx::ToolPtr tool)
+void USSavingRecorderFixture::setTool(cx::ToolPtr tool)
 {
 	mTool = tool;
 }
 
-void TestUSSavingRecorderController::addVideoSource(int width, int height)
+void USSavingRecorderFixture::addVideoSource(int width, int height)
 {
 	int index = mVideo.size();
 	cx::TestVideoSourcePtr videoSource(new cx::TestVideoSource(
@@ -71,7 +94,7 @@ void TestUSSavingRecorderController::addVideoSource(int width, int height)
 	mVideo.push_back(videoSource);
 }
 
-void TestUSSavingRecorderController::startRecord()
+void USSavingRecorderFixture::startRecord()
 {
 	SSC_LOG("");
 	double start = QDateTime::currentMSecsSinceEpoch();
@@ -80,14 +103,14 @@ void TestUSSavingRecorderController::startRecord()
 	mRecorder->startRecord(mSession, mTool, mVideo);
 }
 
-void TestUSSavingRecorderController::stopRecord()
+void USSavingRecorderFixture::stopRecord()
 {
 	SSC_LOG("");
 	mSession->setStopTime(QDateTime::currentMSecsSinceEpoch());
 	mRecorder->stopRecord();
 }
 
-void TestUSSavingRecorderController::wait(int time)
+void USSavingRecorderFixture::wait(int time)
 {
 	SSC_LOG("begin");
 	double stop = QDateTime::currentMSecsSinceEpoch() + time;
@@ -99,7 +122,7 @@ void TestUSSavingRecorderController::wait(int time)
 	SSC_LOG("end");
 }
 
-void TestUSSavingRecorderController::saveAndWaitForCompleted()
+void USSavingRecorderFixture::saveAndWaitForCompleted()
 {
 	SSC_LOG("begin");
 
@@ -120,19 +143,19 @@ void TestUSSavingRecorderController::saveAndWaitForCompleted()
 	SSC_LOG("endwait");
 }
 
-QString TestUSSavingRecorderController::getDataPath()
+QString USSavingRecorderFixture::getDataPath()
 {
 	return cx::DataLocations::getTestDataPath() + "/temp/TestAcqCoreController/";
 }
 
-void TestUSSavingRecorderController::dataSaved(QString filename)
+void USSavingRecorderFixture::dataSaved(QString filename)
 {
 	SSC_LOG("");
 	mSavedData << filename;
 }
 
 
-void TestUSSavingRecorderController::verifyMemData(QString uid)
+void USSavingRecorderFixture::verifyMemData(QString uid)
 {
 	SSC_LOG("");
 	cx::USReconstructInputData data = mRecorder->getDataForStream(uid);
@@ -142,45 +165,44 @@ void TestUSSavingRecorderController::verifyMemData(QString uid)
 	std::cout << "filename " << data.mFilename << std::endl;
 	std::cout << "data.mFrames.size() " << data.mFrames.size() << std::endl;
 
-	CPPUNIT_ASSERT(!data.mFilename.isEmpty());
-	CPPUNIT_ASSERT(data.mFrames.size() > duration/1000*minFPS);
+	CHECK(!data.mFilename.isEmpty());
+	CHECK(data.mFrames.size() > duration/1000*minFPS);
 }
 
-void TestUSSavingRecorderController::verifySaveData()
+void USSavingRecorderFixture::verifySaveData()
 {
 	SSC_LOG("");
 
-	CPPUNIT_ASSERT( mSavedData.size() == mVideo.size() );
+	CHECK( mSavedData.size() == mVideo.size() );
 
 	for (int i=0; i<mSavedData.size(); ++i)
 		this->verifySaveData(mSavedData[i]);
 }
 
-void TestUSSavingRecorderController::verifySaveData(QString filename)
+void USSavingRecorderFixture::verifySaveData(QString filename)
 {
 	SSC_LOG("");
 
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
 	cx::USReconstructInputData hasBeenRead = fileReader->readAllFiles(filename, "");
 
-	CPPUNIT_ASSERT( hasBeenRead.mFilename == filename );
-	CPPUNIT_ASSERT( !hasBeenRead.mFrames.empty() );
-	CPPUNIT_ASSERT( hasBeenRead.mUsRaw->getDimensions()[0] > 0 );
-	CPPUNIT_ASSERT( hasBeenRead.mUsRaw->getDimensions()[1] > 0 );
-	CPPUNIT_ASSERT( hasBeenRead.mUsRaw->getDimensions()[2] > 0 );
+	CHECK( hasBeenRead.mFilename == filename );
+	CHECK( !hasBeenRead.mFrames.empty() );
+	CHECK( hasBeenRead.mUsRaw->getDimensions()[0] > 0 );
+	CHECK( hasBeenRead.mUsRaw->getDimensions()[1] > 0 );
+	CHECK( hasBeenRead.mUsRaw->getDimensions()[2] > 0 );
 
 	if (mTool)
 	{
-		CPPUNIT_ASSERT( !hasBeenRead.mPositions.empty() );
-		CPPUNIT_ASSERT( hasBeenRead.mProbeUid == mTool->getUid() );
-		CPPUNIT_ASSERT( hasBeenRead.mProbeData.mData.getType() == mTool->getProbe()->getProbeData().getType() );
+		CHECK( !hasBeenRead.mPositions.empty() );
+		CHECK( hasBeenRead.mProbeUid == mTool->getUid() );
+		CHECK( hasBeenRead.mProbeData.mData.getType() == mTool->getProbe()->getProbeData().getType() );
 	}
 	else
 	{
-		CPPUNIT_ASSERT( hasBeenRead.mPositions.empty() );
-		CPPUNIT_ASSERT( hasBeenRead.mProbeUid.isEmpty() );
+		CHECK( hasBeenRead.mPositions.empty() );
+		CHECK( hasBeenRead.mProbeUid.isEmpty() );
 	}
 }
 
-
-
+} // namespace cxtest
