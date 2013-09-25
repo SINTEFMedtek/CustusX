@@ -5,48 +5,56 @@
  *      \author christiana
  */
 
-#include "cxTestAcqController.h"
-
-#include <sstream>
-#include <QTextEdit>
-#include <QTimer>
-#include <cppunit/extensions/HelperMacros.h>
+#include "cxtestAcquisitionFixture.h"
 
 #include <vtkImageData.h>
+#include "catch.hpp"
+#include <QApplication>
 
-#include "sscDataManager.h"
 #include "sscDummyTool.h"
-#include "sscTypeConversions.h"
-#include "sscData.h"
-#include "sscConsoleWidget.h"
-#include "sscImage.h"
 #include "cxPatientData.h"
-#include "cxRenderTimer.h"
-#include "cxToolManager.h"
-#include "cxViewManager.h"
-#include "cxStateService.h"
 #include "cxPatientService.h"
 #include "cxDataLocations.h"
-#include "cxVideoConnection.h"
 #include "cxVideoService.h"
 #include "cxVideoConnectionManager.h"
 #include "sscReconstructManager.h"
-#include "sscTime.h"
 #include "sscLogger.h"
 #include "sscUSFrameData.h"
 #include "cxUsReconstructionFileReader.h"
 #include "cxImageDataContainer.h"
 #include "sscStringDataAdapterXml.h"
 #include "cxProbe.h"
+#include "cxToolManager.h"
+#include "cxLogicManager.h"
 
-TestAcqController::TestAcqController(QObject* parent) :
+namespace cxtest
+{
+
+void AcquisitionFixture::setUp()
+{
+	cx::DataLocations::setTestMode();
+	cx::LogicManager::initialize();
+}
+
+void AcquisitionFixture::tearDown()
+{
+	cx::LogicManager::shutdown();
+}
+
+AcquisitionFixture::AcquisitionFixture(QObject* parent) :
 	QObject(parent),
 	mRecordDuration(3000)
 {
+	this->setUp();
 	mNumberOfExpectedStreams = 1;
 }
 
-cx::ReconstructManagerPtr TestAcqController::createReconstructionManager()
+AcquisitionFixture::~AcquisitionFixture()
+{
+	this->tearDown();
+}
+
+cx::ReconstructManagerPtr AcquisitionFixture::createReconstructionManager()
 {
 	mRecordDuration = 3000;
 	cx::XmlOptionFile settings;
@@ -58,11 +66,12 @@ cx::ReconstructManagerPtr TestAcqController::createReconstructionManager()
 	return reconstructer;
 }
 
-void TestAcqController::setupVideo()
+void AcquisitionFixture::setupVideo()
 {
 	SSC_LOG("");
 	cx::videoService()->getVideoConnection()->getConnectionMethod()->setValue(mConnectionMethod);
-	cx::videoService()->getVideoConnection()->setLocalServerExecutable(cx::DataLocations::getBundlePath() + "/../../../apps/OpenIGTLinkServer/OpenIGTLinkServer");
+	cx::videoService()->getVideoConnection()->setLocalServerExecutable(cx::DataLocations::getOpenIGTLinkServer());
+//	cx::videoService()->getVideoConnection()->setLocalServerExecutable(cx::DataLocations::getBundlePath() + "/../../../apps/OpenIGTLinkServer/OpenIGTLinkServer");
 	cx::videoService()->getVideoConnection()->setLocalServerArguments(QString("--type MHDFile --filename %1 %2").arg(mAcqDataFilename).arg(mAdditionalGrabberArg));
 	mVideoSource = cx::videoService()->getActiveVideoSource();
 	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
@@ -71,7 +80,7 @@ void TestAcqController::setupVideo()
 	cx::videoService()->getVideoConnection()->launchAndConnectServer();
 }
 
-void TestAcqController::setupProbe()
+void AcquisitionFixture::setupProbe()
 {
 	SSC_LOG("");
 	cx::DummyToolPtr dummyTool(new cx::DummyTool(cx::cxToolManager::getInstance()));
@@ -80,15 +89,15 @@ void TestAcqController::setupProbe()
 	cx::cxProbePtr probe = cx::cxProbe::New("","");
 	probe->setProbeSector(probedata.second);
 	dummyTool->setProbeSector(probe);
-	CPPUNIT_ASSERT(dummyTool->getProbe());
-	CPPUNIT_ASSERT(dummyTool->getProbe()->isValid());
+	CHECK(dummyTool->getProbe());
+	CHECK(dummyTool->getProbe()->isValid());
 	dummyTool->setVisible(true);
 	// TODO: refactor toolmanager to be runnable in dummy mode (playback might benefit from this too)
 	cx::cxToolManager::getInstance()->runDummyTool(dummyTool);
-	CPPUNIT_ASSERT(dummyTool->getProbe()->getRTSource());
+	CHECK(dummyTool->getProbe()->getRTSource());
 }
 
-void TestAcqController::initialize()
+void AcquisitionFixture::initialize()
 {
 	// select video source: use a small one because old machines cannot handle RT streaming of 1024x768 color data.
 //	mAcqDataFilename = cx::DataLocations::getTestDataPath() +
@@ -113,7 +122,7 @@ void TestAcqController::initialize()
 	connect(cx::toolManager(), SIGNAL(trackingStarted()), this, SLOT(start()));
 }
 
-void TestAcqController::videoConnectedSlot()
+void AcquisitionFixture::videoConnectedSlot()
 {
 	SSC_LOG("");
 
@@ -127,32 +136,32 @@ void TestAcqController::videoConnectedSlot()
 	QTimer::singleShot(50, this, SLOT(setupProbe()));
 }
 
-void TestAcqController::start()
+void AcquisitionFixture::start()
 {
 	SSC_LOG("");
 	mAcquisitionBase->startRecord();
 	QTimer::singleShot(mRecordDuration, this, SLOT(stop()));
 }
 
-void TestAcqController::stop()
+void AcquisitionFixture::stop()
 {
 	SSC_LOG("");
 	mAcquisitionBase->stopRecord();
 }
 
-void TestAcqController::newFrameSlot()
+void AcquisitionFixture::newFrameSlot()
 {
 	// add debug code here if needed.
 }
 
-void TestAcqController::readinessChangedSlot()
+void AcquisitionFixture::readinessChangedSlot()
 {
 	std::cout << QString("Acquisition Ready Status %1: %2")
 	             .arg(mAcquisitionBase->isReady())
 	             .arg(mAcquisitionBase->getInfoText()) << std::endl;
 }
 
-void TestAcqController::acquisitionDataReadySlot()
+void AcquisitionFixture::acquisitionDataReadySlot()
 {
 	SSC_LOG("");
 
@@ -160,7 +169,7 @@ void TestAcqController::acquisitionDataReadySlot()
 	mMemOutputData = mAcquisitionData->getReconstructer()->getSelectedFileData();
 }
 
-void TestAcqController::saveDataCompletedSlot(QString path)
+void AcquisitionFixture::saveDataCompletedSlot(QString path)
 {
 	SSC_LOG("");
 
@@ -173,7 +182,7 @@ void TestAcqController::saveDataCompletedSlot(QString path)
 	mFileOutputData.push_back(fileReader->readAllFiles(path, ""));
 }
 
-void TestAcqController::verifyFileData(cx::USReconstructInputData fileData)
+void AcquisitionFixture::verifyFileData(cx::USReconstructInputData fileData)
 {
 	std::cout << "\tfilename: " << fileData.mFilename << std::endl;
 	std::cout << "\tframe count: " << fileData.mFrames.size() << std::endl;
@@ -184,48 +193,53 @@ void TestAcqController::verifyFileData(cx::USReconstructInputData fileData)
 	double tolerance = 0.1;
 	QString msg;
 
-	CPPUNIT_ASSERT(!fileData.mFilename.isEmpty());
+	CHECK(!fileData.mFilename.isEmpty());
 
 	// check for enough received image frames
 //	int framesPerSecond = 20; // minimum frame rate
 	int framesPerSecond = 10; // minimum frame rate, reduced because tests on old computers have a hard time reaching 10 fps.
 	msg = QString("Frames received: %1. Required: %2fps over %3ms").arg(fileData.mFrames.size()).arg(framesPerSecond).arg(mRecordDuration);
-	CPPUNIT_ASSERT_MESSAGE(string_cast(msg), fileData.mFrames.size() > framesPerSecond*mRecordDuration/1000);
+	INFO(string_cast(msg));
+	CHECK(fileData.mFrames.size() > framesPerSecond*mRecordDuration/1000);
 
 	// check for duration equal to input duration
 	double frame_time_ms = fileData.mFrames.back().mTime - fileData.mFrames.front().mTime;
 	msg = QString("Frames received over period: %1ms. Required: %2ms with a tolerance of %3").arg(frame_time_ms).arg(mRecordDuration).arg(tolerance);
-	CPPUNIT_ASSERT_MESSAGE(string_cast(msg), cx::similar(frame_time_ms, mRecordDuration, tolerance*mRecordDuration));
+	INFO(string_cast(msg));
+	CHECK(cx::similar(frame_time_ms, mRecordDuration, tolerance*mRecordDuration));
 
 	int positionsPerSecond = 10; // minimum tracker pos rate
 	msg = QString("Tracker positions received: %1. Required: %2tps over %3ms").arg(fileData.mPositions.size()).arg(positionsPerSecond).arg(mRecordDuration);
-	CPPUNIT_ASSERT_MESSAGE(string_cast(msg), fileData.mPositions.size() > positionsPerSecond*mRecordDuration/1000);
+	INFO(string_cast(msg));
+	CHECK(fileData.mPositions.size() > positionsPerSecond*mRecordDuration/1000);
 
 	// check for duration equal to input duration
 	double pos_time_ms = fileData.mPositions.back().mTime - fileData.mPositions.front().mTime;
 	msg = QString("Tracker positions received over period: %1ms. Required: %2ms with a tolerance of %3").arg(pos_time_ms).arg(mRecordDuration).arg(tolerance);
-	CPPUNIT_ASSERT_MESSAGE(string_cast(msg), cx::similar(pos_time_ms, mRecordDuration, tolerance*mRecordDuration));
+	INFO(string_cast(msg));
+	CHECK(cx::similar(pos_time_ms, mRecordDuration, tolerance*mRecordDuration));
 
-	CPPUNIT_ASSERT(fileData.mProbeData.mData.getType()!=cx::ProbeData::tNONE);
+	CHECK(fileData.mProbeData.mData.getType()!=cx::ProbeData::tNONE);
 
 	// check content of images
 	cx::ImageDataContainerPtr images = fileData.mUsRaw->getImageContainer();
-	CPPUNIT_ASSERT(images->size() == fileData.mFrames.size());
+	CHECK(images->size() == fileData.mFrames.size());
 	for (unsigned i=0; i<images->size(); ++i)
 	{
-		CPPUNIT_ASSERT(images->get(i));
+		CHECK(images->get(i));
 		Eigen::Array3i dim(images->get(i)->GetDimensions());
-		CPPUNIT_ASSERT(dim[0]==fileData.mProbeData.mData.getImage().mSize.width());
-		CPPUNIT_ASSERT(dim[1]==fileData.mProbeData.mData.getImage().mSize.height());
+		CHECK(dim[0]==fileData.mProbeData.mData.getImage().mSize.width());
+		CHECK(dim[1]==fileData.mProbeData.mData.getImage().mSize.height());
 	}
 }
 
-void TestAcqController::verify()
+void AcquisitionFixture::verify()
 {
-	CPPUNIT_ASSERT(mAcquisition->getNumberOfSavingThreads()==0);
+	CHECK(mAcquisition->getNumberOfSavingThreads()==0);
 
 	QString msg = QString("Got %1 streams, expected %2").arg(mFileOutputData.size()).arg(mNumberOfExpectedStreams);
-	CPPUNIT_ASSERT_MESSAGE(string_cast(msg), mNumberOfExpectedStreams==mFileOutputData.size());
+	INFO(string_cast(msg));
+	CHECK(mNumberOfExpectedStreams==mFileOutputData.size());
 
 	std::cout << " ** Resulting USReconstructInputData memory content:" << std::endl;
 	this->verifyFileData(mMemOutputData);
@@ -236,4 +250,6 @@ void TestAcqController::verify()
 		this->verifyFileData(mFileOutputData[i]);
 	}
 }
+
+} // namespace cxtest
 

@@ -12,8 +12,8 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXTESTUSSAVINGRECORDERCONTROLLER_H
-#define CXTESTUSSAVINGRECORDERCONTROLLER_H
+#ifndef CXTESTUSSAVINGRECORDERFIXTURE_H
+#define CXTESTUSSAVINGRECORDERFIXTURE_H
 
 #include <QApplication>
 #include "boost/function.hpp"
@@ -22,18 +22,22 @@
 #include "cxUSSavingRecorder.h"
 #include "cxUSReconstructInputData.h"
 
+namespace cxtest
+{
+
 /** Helper class for testing cx::USSavingRecorder
  *
  * \ingroup cxTest
  * \date April 17, 2013
  * \author christiana
  */
-class TestUSSavingRecorderController : public QObject
+class USSavingRecorderFixture : public QObject
 {
 	Q_OBJECT
 
 public:
-	TestUSSavingRecorderController(QObject* parent);
+	USSavingRecorderFixture(QObject* parent=NULL);
+	~USSavingRecorderFixture();
 
 	void addOperation(boost::function0<void> operation);
 
@@ -54,6 +58,9 @@ private slots:
 	void dataSaved(QString filename);
 
 private:
+	void setUp();
+	void tearDown();
+
 	void verifySaveData(QString filename);
 
 	cx::RecordSessionPtr mSession;
@@ -65,4 +72,7 @@ private:
 	std::vector<boost::function0<void> > mOperations;
 };
 
-#endif // CXTESTUSSAVINGRECORDERCONTROLLER_H
+} // namespace cxtest
+
+
+#endif // CXTESTUSSAVINGRECORDERFIXTURE_H
