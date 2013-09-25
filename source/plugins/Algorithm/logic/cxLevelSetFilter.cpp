@@ -118,15 +118,20 @@ bool LevelSetFilter::execute() {
         );
         SIPL::int3 size = result->getSize();
         ssc::ImagePtr image = ssc::DataManager::getInstance()->getImage(inputImage->getUid());
+        std::cout << "data ptr to image ptr finished" << std::endl;
         vtkImageDataPtr rawSegmentation = this->convertToVtkImageData((char *)result->getData(), size.x, size.y, size.z, image);
+        std::cout << "convert to image data finished" << std::endl;
+        delete result;
 
         //make contour of segmented volume
         double threshold = 1;/// because the segmented image is 0..1
         vtkPolyDataPtr rawContour = ContourFilter::execute(rawSegmentation, threshold);
+        std::cout << "contour filter finished" << std::endl;
         //add segmentation internally to cx
         QString uidSegmentation = image->getUid() + "_seg%1";
         QString nameSegmentation = image->getName()+"_seg%1";
         ssc::ImagePtr outputSegmentation = ssc::dataManager()->createDerivedImage(rawSegmentation,uidSegmentation, nameSegmentation, image);
+        std::cout << "finished adding seg to cx" << std::endl;
         if (!outputSegmentation)
             return false;
 
@@ -138,10 +143,12 @@ bool LevelSetFilter::execute() {
         //add contour internally to cx
         ssc::MeshPtr contour = ContourFilter::postProcess(rawContour, image, QColor("blue"));
         contour->get_rMd_History()->setRegistration(rMd_i);
+        std::cout << "finished adding contour to cx" << std::endl;
 
         //set output
-        mOutputTypes[2]->setValue(outputSegmentation->getUid());
-        mOutputTypes[3]->setValue(contour->getUid());
+        mOutputTypes[0]->setValue(outputSegmentation->getUid());
+        mOutputTypes[1]->setValue(contour->getUid());
+        std::cout << "finished setting output" << std::endl;
 
         return true;
     } catch(SIPL::SIPLException &e) {
