@@ -12,6 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
+#ifdef CX_USE_ISB_GE
 #include "catch.hpp"
 #include "cxTestGEInterface.h"
 
@@ -154,3 +155,4 @@ TEST_CASE("GEStreamer can stream 3D scanconverted stream with GPU scanconversion
 
 } // namespace cxtest
 
+#endif //CX_USE_ISB_GE
