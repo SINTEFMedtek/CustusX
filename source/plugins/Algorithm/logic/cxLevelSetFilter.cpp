@@ -9,6 +9,8 @@
 #include "sscDataManager.h"
 #include <vtkImageData.h>
 
+#include "levelSet.hpp"
+
 namespace cx
 {
 
@@ -92,6 +94,9 @@ bool LevelSetFilter::execute() {
 }
 
 bool LevelSetFilter::postProcess() {
+
+    // TODO: create contour of segmentation
+
     return true;
 }
 
@@ -119,7 +124,7 @@ void LevelSetFilter::createOutputTypes()
 
 	temp = SelectDataStringDataAdapter::New();
 	temp->setValueName("Output");
-	temp->setHelp("Output thresholded binary image");
+	temp->setHelp("Output segmented binary image");
 	mOutputTypes.push_back(temp);
 
 	temp = SelectDataStringDataAdapter::New();
