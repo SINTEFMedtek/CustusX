@@ -18,13 +18,8 @@
 namespace cxtest
 {
 
-// Test that tests vtkOpenGLGPUMultiVolumeRayCastMapper directly, without using MehdiGPURayCastMultiVolumeRep
-TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can render 3 small volumes", "[integration][gui][not_apple]")
+void testVtkOpenGLGPUMultiVolumeRayCastMapper(std::vector<cx::ImagePtr> images)
 {
-	unsigned int imageCount = 3;
-	std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(3,3,3), 200);
-
-
 	vtkOpenGLGPUMultiVolumeRayCastMapperPtr mapper;
 	mapper = vtkOpenGLGPUMultiVolumeRayCastMapperPtr::New();
 	mapper->setNumberOfAdditionalVolumes(images.size()-1);
@@ -75,6 +70,21 @@ TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can render 3 small volumes", "[i
 	renderWindow->Render();
 	renderWindow->Render();
 	REQUIRE(true);
+}
+
+// Test that tests vtkOpenGLGPUMultiVolumeRayCastMapper directly, without using MehdiGPURayCastMultiVolumeRep
+TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can render 3 small volumes", "[integration][gui][not_apple]")
+{
+	unsigned int imageCount = 3;
+	std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(3,3,3), 200);
+	testVtkOpenGLGPUMultiVolumeRayCastMapper(images);
+}
+
+TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can render 1 small volume", "[integration][gui][not_apple]")
+{
+	unsigned int imageCount = 1;
+	std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(3,3,3), 200);
+	testVtkOpenGLGPUMultiVolumeRayCastMapper(images);
 }
 
 } // namespace cxtest
