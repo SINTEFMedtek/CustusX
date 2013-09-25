@@ -119,6 +119,11 @@ message(STATUS "CX_USE_TSF: "${CX_USE_TSF})
 if (CX_USE_TSF)
     set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} ${OPENCL_LIBRARIES} tubeSegmentationLib OCL-Utilities)
 endif(CX_USE_TSF)
+if (CX_USE_LEVEL_SET)
+    set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} ${OPENCL_LIBRARIES} levelSetSegLib OCL-Utilities)
+endif(CX_USE_LEVEL_SET)
+
+
 
 # =========================================================
 # create the target

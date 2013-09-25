@@ -2,6 +2,11 @@
 
 #ifdef CX_USE_LEVEL_SET
 
+#include "sscTime.h"
+#include "sscMesh.h"
+#include "sscTypeConversions.h"
+#include "sscMessageManager.h"
+#include "sscRegistrationTransform.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
 #include "cxSelectDataStringDataAdapter.h"
@@ -9,7 +14,15 @@
 #include "sscData.h"
 #include "sscImage.h"
 #include "sscDataManager.h"
+#include <vtkImageImport.h>
 #include <vtkImageData.h>
+#include <vtkImageShiftScale.h>
+#include <vtkImageData.h>
+#include "cxContourFilter.h"
+#include "cxDataLocations.h"
+#include "cxPatientService.h"
+#include "cxPatientData.h"
+
 
 #include "levelSet.hpp"
 
@@ -90,10 +103,56 @@ bool LevelSetFilter::execute() {
 
     std::cout << "Parameters are set to: " << threshold << " "  << epsilon << " " << alpha << std::endl;
 
-    // TODO: Run level set segmentation here
+    // Run level set segmentation 
+	std::string filename = (patientService()->getPatientData()->getActivePatientFolder()+"/"+inputImage->getFilePath()).toStdString();
+    SIPL::int3 seed(seedPoint(0), seedPoint(1), seedPoint(2));
+    try {
+        SIPL::Volume<char> * result = runLevelSet(
+                filename.c_str(),
+                seed,
+                10, // seed radius
+                1000, // iterations per narrow band
+                threshold,
+                epsilon,
+                alpha
+        );
+        SIPL::int3 size = result->getSize();
+        ssc::ImagePtr image = ssc::DataManager::getInstance()->getImage(inputImage->getUid());
+        vtkImageDataPtr rawSegmentation = this->convertToVtkImageData((char *)result->getData(), size.x, size.y, size.z, image);
 
-    return true;
+        //make contour of segmented volume
+        double threshold = 1;/// because the segmented image is 0..1
+        vtkPolyDataPtr rawContour = ContourFilter::execute(rawSegmentation, threshold);
+        //add segmentation internally to cx
+        QString uidSegmentation = image->getUid() + "_seg%1";
+        QString nameSegmentation = image->getName()+"_seg%1";
+        ssc::ImagePtr outputSegmentation = ssc::dataManager()->createDerivedImage(rawSegmentation,uidSegmentation, nameSegmentation, image);
+        if (!outputSegmentation)
+            return false;
+
+        ssc::Transform3D rMd_i = image->get_rMd(); //transform from the volumes coordinate system to our reference coordinate system
+        outputSegmentation->get_rMd_History()->setRegistration(rMd_i);
+        ssc::dataManager()->loadData(outputSegmentation);
+        ssc::dataManager()->saveImage(outputSegmentation, patientService()->getPatientData()->getActivePatientFolder());
+
+        //add contour internally to cx
+        ssc::MeshPtr contour = ContourFilter::postProcess(rawContour, image, QColor("blue"));
+        contour->get_rMd_History()->setRegistration(rMd_i);
+
+        //set output
+        mOutputTypes[2]->setValue(outputSegmentation->getUid());
+        mOutputTypes[3]->setValue(contour->getUid());
+
+        return true;
+    } catch(SIPL::SIPLException &e) {
+        return false;
+    } catch(cl::Error &e) {
+        return false;
+    } catch(...) {
+        return false;
+    }
 }
+
 
 bool LevelSetFilter::postProcess() {
 
@@ -144,6 +203,47 @@ void LevelSetFilter::setActive(bool on)
 		RepManager::getInstance()->getThresholdPreview()->removePreview();
 		*/
 }
+
+vtkImageDataPtr LevelSetFilter::convertToVtkImageData(char * data, int size_x, int size_y, int size_z, ssc::ImagePtr input)
+{
+	vtkImageDataPtr retval = this->importRawImageData((void*) data, size_x, size_y, size_z, input, VTK_UNSIGNED_CHAR);
+	return retval;
+}
+
+//From vtkType.h (on Ubuntu 12.04)
+//#define VTK_VOID            0
+//#define VTK_BIT             1
+//#define VTK_CHAR            2
+//#define VTK_SIGNED_CHAR    15
+//#define VTK_UNSIGNED_CHAR   3
+//#define VTK_SHORT           4
+//#define VTK_UNSIGNED_SHORT  5
+//#define VTK_INT             6
+//#define VTK_UNSIGNED_INT    7
+//#define VTK_LONG            8
+//#define VTK_UNSIGNED_LONG   9
+//#define VTK_FLOAT          10
+//#define VTK_DOUBLE         11
+//#define VTK_ID_TYPE        12
+vtkImageDataPtr LevelSetFilter::importRawImageData(void * data, int size_x, int size_y, int size_z, ssc::ImagePtr input, int type)
+{
+	vtkImageImportPtr imageImport = vtkImageImportPtr::New();
+
+	imageImport->SetWholeExtent(0, size_x - 1, 0, size_y - 1, 0, size_z - 1);
+	imageImport->SetDataExtentToWholeExtent();
+	imageImport->SetDataScalarType(type);
+	imageImport->SetNumberOfScalarComponents(1);
+	imageImport->SetDataSpacing(input->getBaseVtkImageData()->GetSpacing());
+	imageImport->SetImportVoidPointer(data);
+	imageImport->GetOutput()->Update();
+	imageImport->Modified();
+
+	vtkImageDataPtr retval = vtkImageDataPtr::New();
+	retval->DeepCopy(imageImport->GetOutput());
+
+	return retval;
+}
+
 
 ssc::DoubleDataAdapterXmlPtr LevelSetFilter::getThresholdOption(
         QDomElement root) {
