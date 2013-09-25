@@ -4,24 +4,27 @@
  *  \date Oct 19, 2010
  *      \author christiana
  */
-#ifndef CXTESTACQCONTROLLER_H_
-#define CXTESTACQCONTROLLER_H_
+#ifndef CXTESTACQUISITIONFIXTURE_H_
+#define CXTESTACQUISITIONFIXTURE_H_
 
-#include <QApplication>
 #include "sscForwardDeclarations.h"
 #include "cxAcquisitionData.h"
 #include "cxUSAcquisition.h"
 #include "cxUSReconstructInputData.h"
 
+namespace cxtest
+{
+
 /**Helper object for automated control of the CustusX application.
  *
  */
-class TestAcqController : public QObject
+class AcquisitionFixture : public QObject
 {
 	Q_OBJECT
 
 public:
-	TestAcqController(QObject* parent);
+	AcquisitionFixture(QObject* parent=NULL);
+	~AcquisitionFixture();
 	void initialize();
 	void verify();
 
@@ -43,6 +46,9 @@ private slots:
 	void setupProbe();
 
 private:
+	void setUp();
+	void tearDown();
+
 	cx::ReconstructManagerPtr createReconstructionManager();
 	void verifyFileData(cx::USReconstructInputData data);
 
@@ -57,5 +63,6 @@ private:
 	cx::AcquisitionPtr mAcquisitionBase;
 };
 
+} // namespace cxtest
 
-#endif /* CXTESTACQCONTROLLER_H_ */
+#endif /* CXTESTACQUISITIONFIXTURE_H_ */
