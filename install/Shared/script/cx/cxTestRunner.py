@@ -133,7 +133,7 @@ TimeOut: %d
         shell.rm_r(outfile)
         exe = self._getCatchExecutable()
         cmd = '%s/%s %s --reporter junit --out %s' % (path, exe, tag, outfile)
-        success = shell.run(cmd, ignoreFailure=True)
+        success = shell.run(cmd, ignoreFailure=False)
         if not success: # a failed catch leaves an empty outfile - remove this to signal failure to jenkins
             PrintFormatter.printInfo('catch failed - removing outfile %s' % outfile)            
             shell.rm_r(outfile)
