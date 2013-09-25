@@ -628,9 +628,9 @@ int vtkGPUMultiVolumeRayCastMapper::ValidateRender(vtkRenderer *ren,
 //			   (Additionalinput[iii]->GetMTime() > this->AdditionalTransformedInput[iii]->GetMTime()));//Mehdi
 		  tmp = (Additionalinput[iii] != this->AdditionalLastInput[iii]);
 		  if (tmp)
-			  tmp = tmp || Additionalinput[iii];
+			  tmp = tmp && Additionalinput[iii];
 		  if (tmp)
-			  tmp = tmp || AdditionalTransformedInput[iii];
+			  tmp = tmp && AdditionalTransformedInput[iii];
 		  if (tmp)
 			  tmp = tmp || (Additionalinput[iii]->GetMTime() > this->AdditionalTransformedInput[iii]->GetMTime());//Ole Vegard
 	  }
