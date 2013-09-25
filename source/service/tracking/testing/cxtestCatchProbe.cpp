@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include "catch.hpp"
-#include "cxTestProbeFixture.h"
+#include "cxtestProbeFixture.h"
 
 #include <QString>
 #include "sscMessageManager.h"
