@@ -146,5 +146,11 @@ TEST_CASE("GEInterface can stream default 2D streams with GPU scanconversion whe
 	helper.testStream(args);
 }
 
+TEST_CASE("GEStreamer can stream 3D scanconverted stream with GPU scanconversion", "[integration]")
+{
+	TestGEInterface helper;
+	helper.testGEStreamer();
+}
+
 } // namespace cxtest
 
