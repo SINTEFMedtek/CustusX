@@ -56,19 +56,19 @@ TEST_CASE("TubeSegmentationFramework PhantomAccUSPreset works", "[integration]")
 	helper.testPhantomAccUSPreset();
 }
 
-TEST_CASE("TubeSegmentationFramework NeuroVesselsMRAPreset works", "[integration]")
+TEST_CASE("TubeSegmentationFramework NeuroVesselsMRAPreset works", "[integration][not_apple]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testNeuroVesselsMRAPreset();
 }
 
-TEST_CASE("TubeSegmentationFramework testNeuroVesselsUSAPreset works", "[integration]")
+TEST_CASE("TubeSegmentationFramework testNeuroVesselsUSAPreset works", "[integration][not_apple]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testNeuroVesselsUSAPreset();
 }
 
-TEST_CASE("TubeSegmentationFramework testLungAirwaysCTPreset works", "[integration]")
+TEST_CASE("TubeSegmentationFramework testLungAirwaysCTPreset works", "[integration][not_apple]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testLungAirwaysCTPreset();

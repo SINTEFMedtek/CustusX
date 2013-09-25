@@ -12,6 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
+#ifdef CX_USE_ISB_GE
 #include "catch.hpp"
 #include "cxTestGEInterface.h"
 
@@ -146,5 +147,12 @@ TEST_CASE("GEInterface can stream default 2D streams with GPU scanconversion whe
 	helper.testStream(args);
 }
 
+TEST_CASE("GEStreamer can stream 3D scanconverted stream with GPU scanconversion", "[integration]")
+{
+	TestGEInterface helper;
+	helper.testGEStreamer();
+}
+
 } // namespace cxtest
 
+#endif //CX_USE_ISB_GE
