@@ -97,6 +97,7 @@ void TestGEInterface::testGEStreamer()
 
 	//Skip assert if OpenCL is turned off
 #ifdef DATASTREAMING_USE_OPENCL
+	std::cout << "Require OpenCL" << std::endl;
 	REQUIRE(geStreamer.UsingOpenCL());
 #endif
 
