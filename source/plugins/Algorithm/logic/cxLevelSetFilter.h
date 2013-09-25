@@ -1,6 +1,7 @@
 #ifndef CXLEVELSETFILTER_H_
 #define CXLEVELSETFILTER_H_
 
+#ifdef CX_USE_LEVEL_SET
 #include "cxFilterImpl.h"
 
 namespace cx
@@ -35,4 +36,5 @@ protected:
 
 } // end namespace
 
+#endif // CX_USE_LEVEL_SET
 #endif /* CXLEVELSETFILTER_H_ */

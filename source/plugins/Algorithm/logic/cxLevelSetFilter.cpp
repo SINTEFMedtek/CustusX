@@ -1,5 +1,7 @@
 #include "cxLevelSetFilter.h"
 
+#ifdef CX_USE_LEVEL_SET
+
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
 #include "cxSelectDataStringDataAdapter.h"
@@ -177,4 +179,4 @@ ssc::DoubleDataAdapterXmlPtr LevelSetFilter::getAlphaOption(
 
 } // end namespace cx
 
-
+#endif

@@ -17,7 +17,9 @@
 #ifdef CX_USE_TSF
 #include "cxTubeSegmentationFilter.h"
 #endif //CX_USE_TSF
+#ifdef CX_USE_LEVEL_SET
 #include "cxLevelSetFilter.h"
+#endif
 
 namespace cx {
 
@@ -34,7 +36,9 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
 #ifdef CX_USE_TSF
 	mFilters->append(FilterPtr(new TubeSegmentationFilter()));
 #endif //CX_USE_TSF
+#ifdef CX_USE_LEVEL_SET
 	mFilters->append(FilterPtr(new LevelSetFilter()));
+#endif
 
 	QStringList availableFilters;
 	std::map<QString,QString> names;
