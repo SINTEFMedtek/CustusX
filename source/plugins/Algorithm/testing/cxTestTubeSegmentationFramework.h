@@ -15,6 +15,7 @@
 #ifndef CXTESTTUBESEGMENTATIONFRAMEWORK_H_
 #define CXTESTTUBESEGMENTATIONFRAMEWORK_H_
 
+#ifdef CX_USE_TSF
 class QString;
 class paramList;
 
@@ -43,4 +44,5 @@ private:
 	void runFilter(QString preset);
 };
 
+#endif //CX_USE_TSF
 #endif /* CXTESTTUBESEGMENTATIONFRAMEWORK_H_ */
