@@ -6,7 +6,6 @@
 
 #ifdef CX_USE_TSF
 #include "cxTSFPresets.h"
-#endif //CX_USE_TSF
 
 namespace cxtest {
 
@@ -37,5 +36,6 @@ protected:
 };
 
 } /* namespace cxtest */
+#endif //CX_USE_TSF
 
 #endif /* CXTESTTSFPRESETSFIXTURE_H_ */

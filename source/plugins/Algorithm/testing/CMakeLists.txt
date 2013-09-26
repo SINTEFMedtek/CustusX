@@ -34,7 +34,9 @@ if(BUILD_TESTING)
 		cxtestTSFPresetsFixture
 		cxtestCatchTSFPresets.cpp
     )
+    set(CXTEST_SOURCES_TO_MOC
+    )
 
-	cx_catch_add_lib_and_exe(cxPluginAlgorithm "${CXTEST_PLUGINALGORITHM_SOURCES}")
+	cx_catch_add_lib_and_exe(cxPluginAlgorithm "${CXTEST_PLUGINALGORITHM_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
 
 endif(BUILD_TESTING)

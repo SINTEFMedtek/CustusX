@@ -26,17 +26,19 @@ if (BUILD_TESTING)
         ..
         )
 
-        cx_add_class_qt_moc(CXTEST_PATIENTSERVICE_SOURCES
-                )
-        cx_add_class(CXTEST_PATIENTSERVICE_SOURCES
-            cxtestCatchPatientService.cpp
-            cxtestCatchFrameMetric.cpp
-            cxtestCatchToolMetric.cpp
-            cxtestCatchDistanceMetric.cpp
-            cxtestMetricFixture
+    set(CXTEST_SOURCES_TO_MOC
+    )
+    cx_add_class_qt_moc(CXTEST_PATIENTSERVICE_SOURCES
             )
+    cx_add_class(CXTEST_PATIENTSERVICE_SOURCES
+        cxtestCatchPatientService.cpp
+        cxtestCatchFrameMetric.cpp
+        cxtestCatchToolMetric.cpp
+        cxtestCatchDistanceMetric.cpp
+        cxtestMetricFixture
+        )
 
-        cx_catch_add_lib_and_exe(cxPatientService "${CXTEST_PATIENTSERVICE_SOURCES}")
+    cx_catch_add_lib_and_exe(cxPatientService "${CXTEST_PATIENTSERVICE_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
 
 endif (BUILD_TESTING)
 

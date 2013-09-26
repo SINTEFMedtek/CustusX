@@ -13,9 +13,12 @@ if(BUILD_TESTING)
 	${CustusX3_SOURCE_DIR}/source/service/tracking
 	)
 
-	QT4_WRAP_CPP(CXTEST_PLUGINREGISTRATION_SOURCES
-		cxElastixSingleThreadedRunner.h
-		)
+    set(CXTEST_SOURCES_TO_MOC
+        cxElastixSingleThreadedRunner.h
+    )
+	#QT4_WRAP_CPP(CXTEST_PLUGINREGISTRATION_SOURCES
+	#	cxElastixSingleThreadedRunner.h
+	#	)
 	set(CXTEST_PLUGINREGISTRATION_SOURCES ${CXTEST_PLUGINREGISTRATION_SOURCES}
 		cxElastixSingleThreadedRunner.h
 		cxElastixSingleThreadedRunner.cpp
@@ -25,6 +28,6 @@ if(BUILD_TESTING)
 		cxtestCatchSeansVesselReg.cpp
 	)
 
-	cx_catch_add_lib_and_exe(cxPluginRegistration "${CXTEST_PLUGINREGISTRATION_SOURCES}")
+	cx_catch_add_lib_and_exe(cxPluginRegistration "${CXTEST_PLUGINREGISTRATION_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
 
 endif(BUILD_TESTING)

@@ -43,6 +43,5 @@ private:
 	paramList loadPreset(QString preset);
 	void runFilter(QString preset);
 };
-
 #endif //CX_USE_TSF
 #endif /* CXTESTTUBESEGMENTATIONFRAMEWORK_H_ */
