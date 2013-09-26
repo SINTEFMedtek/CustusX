@@ -23,31 +23,35 @@ if(BUILD_TESTING)
 	set(CXTEST_PLUGINREGISTRATION_SOURCES ${CXTEST_PLUGINREGISTRATION_SOURCES}
 #		cxElastixSingleThreadedRunner.h
 		cxElastixSingleThreadedRunner.cpp
-		cxtestCatchElastix.cpp)
+		cxtestCatchElastix.cpp
+		cxtestSeansVesselRegFixture.h
+		cxtestSeansVesselRegFixture.cpp
+		cxtestCatchSeansVesselReg.cpp
+	)
 
 	cx_catch_add_lib_and_exe(cxPluginRegistration "${CXTEST_PLUGINREGISTRATION_SOURCES}")
 
 endif(BUILD_TESTING)
 
-if (BUILD_TESTING)      
+#if (BUILD_TESTING)      
   # List of all test units
-  QT4_WRAP_CPP( CX_TEST_REGISTRATION_SOURCE_FILES
+#  QT4_WRAP_CPP( CX_TEST_REGISTRATION_SOURCE_FILES
 #  cxElastixSingleThreadedRunner.h
-   )
-  
-  set(CX_TEST_REGISTRATION_SOURCE_FILES
-  ${CX_TEST_REGISTRATION_SOURCE_FILES}
-  cxTest_RegistrationV2V.h
-  cxTest_RegistrationV2V.cpp
+#   )
+#  
+#  set(CX_TEST_REGISTRATION_SOURCE_FILES
+#  ${CX_TEST_REGISTRATION_SOURCE_FILES}
+#  cxTest_RegistrationV2V.h
+#  cxTest_RegistrationV2V.cpp
 #  cxTest_RegistrationElastix.h
 #  cxTest_RegistrationElastix.cpp
 #  cxElastixSingleThreadedRunner.h
 #  cxElastixSingleThreadedRunner.cpp
-  ${CX_TEST_SOURCE_FILES}
-  )
-  
-	include(cxTestMacros)
+#  ${CX_TEST_SOURCE_FILES}
+#  )
+#  
+#	include(cxTestMacros)
 	# define cppunit tests and ctest tests from same source:
-	SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestRegistration cxCppUnitMain.cpp "${CX_TEST_REGISTRATION_SOURCE_FILES}" cxPluginRegistration)
-
-endif (BUILD_TESTING)
+#	SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestRegistration cxCppUnitMain.cpp "${CX_TEST_REGISTRATION_SOURCE_FILES}" cxPluginRegistration)
+#
+#endif (BUILD_TESTING)
