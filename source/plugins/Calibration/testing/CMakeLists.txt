@@ -11,32 +11,16 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-if (BUILD_TESTING)
-    include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
+if (BUILD_TESTING)    
 
-    include_directories(
-    .
-    ${CustusX3_SOURCE_DIR}/source/service/patient
-    ${CustusX3_SOURCE_DIR}/source/service/tracking
-    ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
+	QT4_WRAP_CPP( CX_TEST_PLUGINCALIBRATION_SOURCE_FILES
+		)
+	set(CX_TEST_PLUGINCALIBRATION_SOURCE_FILES
+		${CX_TEST_PLUGINCALIBRATION_SOURCE_FILES}
+		cxtestTemporalCalibration.cpp
+		)
 
-    ${CustusX3_SOURCE_DIR}/source/plugins/Acquisition/gui
-    ${CustusX3_SOURCE_DIR}/source/plugins/Acquisition/logic
+	cx_catch_add_lib_and_exe(cxPluginCalibration "${CX_TEST_PLUGINCALIBRATION_SOURCE_FILES}")
 
-    ../logic
-    )
-    
-    # List of all test units
-    QT4_WRAP_CPP( CX_TEST_SOURCE_FILES
-        )
-    set(CX_TEST_SOURCE_FILES
-        cxTestAlgorithms.h
-        cxTestAlgorithms.cpp
-        ${CX_TEST_SOURCE_FILES}
-        )
-        
-	include(cxTestMacros)
-	# define cppunit tests and ctest tests from same source:
-	SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestCalibrationPlugin cxCppUnitMain.cpp "${CX_TEST_SOURCE_FILES}" cxPluginCalibration)
 
 endif (BUILD_TESTING)
