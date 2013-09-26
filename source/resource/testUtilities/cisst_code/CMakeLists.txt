@@ -13,7 +13,7 @@
 # 
 # --- end cisst license ---
 
-
+if(NOT CX_WINDOWS)
 
 # backward compatibility
 CMAKE_MINIMUM_REQUIRED(VERSION 2.0)
@@ -33,3 +33,4 @@ SET(CISST_TESTS_MAIN_SRC
 ADD_LIBRARY(cisstTestsMain ${CISST_TESTS_MAIN_SRC})
 target_link_libraries(cisstTestsMain ${CPPUNIT_LIBRARIES} ${QT_LIBRARIES} ${SSC_GCOV_LIBRARY} cxResource)
 
+endif()
