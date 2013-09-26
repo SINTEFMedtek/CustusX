@@ -23,46 +23,18 @@ cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
 if(BUILD_TESTING)
-	# Catch unit test framework stuff:
+    include_directories(
+	    ${CustusX3_SOURCE_DIR}/source/logic/
+	)
 
-	QT4_WRAP_CPP(CXTEST_PLUGINALGORITHM_SOURCES
-		)
-        cx_add_class(CXTEST_PLUGINALGORITHM_SOURCES ${CXTEST_PLUGINALGORITHM_SOURCES}
-            cxCatchAlgorithm.cpp
-            cxTestTubeSegmentationFramework
-            cxtestCatchTubeSegmentationFramework.cpp
-        )
+    cx_add_class(CXTEST_PLUGINALGORITHM_SOURCES ${CXTEST_PLUGINALGORITHM_SOURCES}
+        cxCatchAlgorithm.cpp
+        cxTestTubeSegmentationFramework
+        cxtestCatchTubeSegmentationFramework.cpp
+		cxtestTSFPresetsFixture
+		cxtestCatchTSFPresets.cpp
+    )
 
 	cx_catch_add_lib_and_exe(cxPluginAlgorithm "${CXTEST_PLUGINALGORITHM_SOURCES}")
 
 endif(BUILD_TESTING)
-
-
-if (BUILD_TESTING)
-        include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
-        include_directories(
-		../logic
-	    ${CustusX3_SOURCE_DIR}/source/logic/
-		)
-
-	# List of all test units
-	QT4_WRAP_CPP( CX_TEST_ACQUISITION_SOURCE_FILES
-		)
-
-	set(CX_TEST_ACQUISITION_SOURCE_FILES
-		${CX_TEST_ACQUISITION_SOURCE_FILES}
-		)
-
-    if (CX_USE_TSF)
-        set(CX_TEST_ACQUISITION_SOURCE_FILES
-		    cxTestTSFPresets.h
-		    cxTestTSFPresets.cpp
-		    ${CX_TEST_ACQUISITION_SOURCE_FILES}
-		)
-
-		include(cxTestMacros)
-		# define cppunit tests and ctest tests from same source:
-		SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestTubeSegmentationFramework cxCppUnitMain.cpp "${CX_TEST_ACQUISITION_SOURCE_FILES}" cxPluginAlgorithm)
-    endif(CX_USE_TSF)
-
-endif (BUILD_TESTING)
