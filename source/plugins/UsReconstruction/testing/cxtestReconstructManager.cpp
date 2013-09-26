@@ -28,6 +28,9 @@
 
 #include "catch.hpp"
 
+#include "cxtestUtilities.h"
+#include "sscUSFrameData.h"
+
 namespace cxtest
 {
 
@@ -55,8 +58,9 @@ public:
 	void testThunderGPUReconstruction();///< Test Thunder GPU reconstruction
 	void testDualAngio();
 
-private:
 	cx::ReconstructManagerPtr createManager();
+
+private:
 	void validateData(cx::ImagePtr output);
 	/** Validate the bmode data output from the specific data set used.
 	  */
@@ -348,6 +352,62 @@ TEST_CASE("ReconstructManager: Dual Angio", "[usreconstruction][integration]")
 {
 	ReconstructManagerTestFixture fixture;
 	fixture.testDualAngio();
+}
+
+cx::USReconstructInputData generateSyntheticUSBMode()
+{
+	cx::USReconstructInputData retval;
+	retval.mFilename = "Synthetic_US_BMode";
+	unsigned numFrames = 10;
+	unsigned dim = 5;
+	for (unsigned i=0; i < numFrames; ++i)
+	{
+		cx::TimedPosition frame;
+//		cx::Transform3D transform = cx::Transform3D::Identity();
+		cx::Transform3D transform = cx::createTransformTranslate(cx::Vector3D(0,0,i));
+		frame.mTime = i;
+		frame.mPos = transform;
+		retval.mFrames.push_back(frame);
+		retval.mPositions.push_back(frame);
+	}
+
+	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(dim,dim,numFrames), 200);
+	cx::USFrameDataPtr us;
+	us = cx::USFrameData::create(image);
+	retval.mUsRaw = us;
+//	retval.mProbeData = ;
+//	retval.mMask = cxtest::Utilities::create3DImage(Eigen::Array3i(dim,dim,1), 0);
+//	retval.mMask = mask;
+	retval.mProbeUid = "Synthetic test probe";
+	retval.rMpr = cx::Transform3D::Identity();
+
+	return retval;
+}
+
+TEST_CASE("ReconstructManager: B-Mode with synthetic data", "[usreconstruction][integration][hide]")
+{
+
+	cx::USReconstructInputData inputData = generateSyntheticUSBMode();
+
+	ReconstructManagerTestFixture fixture;
+	cx::ReconstructManagerPtr reconstructer = fixture.createManager();
+	reconstructer->selectData(inputData);
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
+	reconstructer->getParams()->mAngioAdapter->setValue(false);
+	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
+
+	reconstructer->createAlgorithm();
+
+	// run the reconstruction in the main thread
+	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
+	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
+	REQUIRE(cores.size()==1);
+	preprocessor->initializeCores(cores);
+	cores[0]->reconstruct();
+
+	cx::ImagePtr output = cores[0]->getOutput();
+
+	REQUIRE(output);
 }
 
 
