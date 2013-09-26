@@ -30,21 +30,7 @@ macro(cx_initialize_cppunit)
         /usr/include)
 
     if(CX_WINDOWS)
-       find_library(CPPUNIT_LIBRARY cppunit
-           ${CPPUNIT_INCLUDE_DIR}/../lib
-           /usr/local/lib
-           /usr/lib)
-       find_library(CPPUNIT_DEBUG_LIBRARY cppunitd
-           ${CPPUNIT_INCLUDE_DIR}/../lib
-           /usr/local/lib
-           /usr/lib)
-           
-       if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-           set(CPPUNIT_LIBRARIES ${CPPUNIT_DEBUG_LIBRARY})
-       elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-           set(CPPUNIT_LIBRARIES ${CPPUNIT_LIBRARY})
-       endif()
-       
+        #CPP_UNIT not used on Windows
     else(CX_WINDOWS)
         find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib REQUIRED)
     endif(CX_WINDOWS)

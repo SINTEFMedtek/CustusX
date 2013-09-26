@@ -2,7 +2,9 @@
 ##               Resource Layer
 ###########################################################
 
-option(SSC_BUILD_PURE_CPPUNIT_TESTS "build cppunit tests unconnected to the ctest framework. Do not use when doine code coverage" OFF)
+if(NOT CX_WINDOWS)
+    option(SSC_BUILD_PURE_CPPUNIT_TESTS "build cppunit tests unconnected to the ctest framework. Do not use when doine code coverage" OFF)
+endif()
 
 option(SSC_PRINT_CALLER_INFO "Print extra information about messages on the commandline." OFF)
 if(SSC_PRINT_CALLER_INFO)
