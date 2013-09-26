@@ -5,5 +5,5 @@ if(BUILD_TESTING)
 			cxtestUSReconstructionFileFixture.cpp
 			cxtestCatchUSReconstructionFile.cpp
 			)
-		cx_catch_add_lib_and_exe(cxResourceUsReconstructionTypes "${RESOURCE_USRECONSTRUCTIONTYPES_TEST_CATCH_SOURCE_FILES}")
+		cx_catch_add_lib_and_exe(cxResourceUsReconstructionTypes "${RESOURCE_USRECONSTRUCTIONTYPES_TEST_CATCH_SOURCE_FILES}" "")
 endif()
