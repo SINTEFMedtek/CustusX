@@ -76,9 +76,4 @@ set(LINK_LIBRARIES
 target_link_libraries( cxPluginCalibration ${LINK_LIBRARIES} )
 CX_COTIRE_ADD_LIBRARY(cxPluginCalibration "${LINK_LIBRARIES}")
 
-
-# add/remove to suit your own needs.
-#add_subdirectory(logic)
-#add_subdirectory(gui)
-
 add_subdirectory(testing)
