@@ -434,7 +434,7 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   ////
 
   Frame frame;
-  frame.mTimestamp = ssc::getMilliSecondsSinceEpoch()/1000; //resmapling the timestamp because we cannot find convert the original timestamp into epoch time
+  frame.mTimestamp = cx::getMilliSecondsSinceEpoch()/1000; //resmapling the timestamp because we cannot find convert the original timestamp into epoch time
   
   //TODO: Create an enum value that identifies the pixel format
   // Must also be implementd in cxMacGrabber.mm captureOutput() and the different formats handed by

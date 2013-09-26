@@ -22,6 +22,7 @@ function(cx_catch_initialize)
 	unset(CX_TEST_CATCH_SOURCES CACHE)
 	unset(CX_TEST_CATCH_INCLUDE_DIRS CACHE)
 	unset(CX_TEST_CATCH_LINKER_LIBS CACHE)
+	unset(CX_TEST_CATCH_MOC_SOURCES CACHE)
 endfunction()
 
 ###############################################################################
@@ -53,12 +54,12 @@ endmacro()
 #    SOURCES     : List of test source files.
 #
 ###############################################################################
-function(cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES)
+function(cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES)
     
     if(CX_WINDOWS)
-        _cx_catch_save_info_in_globals(${LIB_TO_TEST} "${SOURCES}")
+        _cx_catch_save_info_in_globals(${LIB_TO_TEST} "${SOURCES}" "${MOC_SOURCES}")
     else()
-        _cx_catch_add_lib_and_exe(${LIB_TO_TEST} "${SOURCES}")
+        _cx_catch_add_lib_and_exe(${LIB_TO_TEST} "${SOURCES}" "${MOC_SOURCES}")
     endif()
 
 endfunction()
@@ -95,13 +96,16 @@ endfunction()
 ###############################################################################
 function(_cx_catch_generate_master_catch_using_sources EXE_NAME PATH_TO_MAIN)
     message(STATUS "Generating master Catch exe.")
-    message(STATUS "EXE_NAME: "${EXE_NAME})
-    message(STATUS "PATH_TO_MAIN: "${PATH_TO_MAIN})
-    message(STATUS "CX_TEST_CATCH_LINKER_LIBS: "${CX_TEST_CATCH_LINKER_LIBS})
+    #message(STATUS "----------------------------")
+    #message(STATUS "Include: "${CX_TEST_CATCH_INCLUDE_DIRS})
+    #message(STATUS "----------------------------")
     include_directories(
         ${CX_TEST_CATCH_INCLUDE_DIRS}
     )
-    add_executable(${EXE_NAME} ${PATH_TO_MAIN} ${CX_TEST_CATCH_SOURCES})
+    
+    QT4_WRAP_CPP(MOCCED ${CX_TEST_CATCH_MOC_SOURCES})
+    
+    add_executable(${EXE_NAME} ${PATH_TO_MAIN} ${CX_TEST_CATCH_SOURCES} ${MOCCED})
     target_link_libraries(${EXE_NAME} ${CX_TEST_CATCH_LINKER_LIBS} cxtestUtilities)
 endfunction()
 
@@ -125,7 +129,14 @@ endfunction()
 # Save needed information about source files to be able to add them to
 # a master Catch.
 ###############################################################################
-function(_cx_catch_save_info_in_globals LIB_TO_TEST SOURCES)
+function(_cx_catch_save_info_in_globals LIB_TO_TEST SOURCES MOC_SOURCES)
+    foreach( SOURCE_FILE ${MOC_SOURCES})
+        cx_make_path_absolute(${SOURCE_FILE} RESULT)
+        set(ABS_MOC_SOURCES
+            ${ABS_MOC_SOURCES}
+            ${RESULT}
+            )
+    endforeach()
     foreach( SOURCE_FILE ${SOURCES})
         cx_make_path_absolute(${SOURCE_FILE} RESULT)
         set(ABS_SOURCES
@@ -138,6 +149,11 @@ function(_cx_catch_save_info_in_globals LIB_TO_TEST SOURCES)
         "${ABS_SOURCES}"
         CACHE INTERNAL
         "List of all Catch sources.")
+    set(CX_TEST_CATCH_MOC_SOURCES
+        "${CX_TEST_CATCH_MOC_SOURCES}"
+        "${ABS_MOC_SOURCES}"
+        CACHE INTERNAL
+        "List of all sources that needs to be mocced.")
     get_property(inc_dirs DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
     set(CX_TEST_CATCH_INCLUDE_DIRS
         "${CX_TEST_CATCH_INCLUDE_DIRS}"
@@ -158,7 +174,7 @@ endfunction()
 # PRIVATE:
 # Create testing lib and small catch executable for the incoming lib.
 ###############################################################################
-function(_cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES)
+function(_cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES)
     message(STATUS "Adding catch test targets based on: ${LIB_TO_TEST}")
     
     include_directories(
@@ -168,7 +184,10 @@ function(_cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES)
 
     cx_catch__private_define_platform_specific_linker_options()
     set(TEST_LIB_NAME "cxtestCatch${LIB_TO_TEST}")
-    add_library(${TEST_LIB_NAME} ${CX_CATCH_SHARED_LIB_TYPE} ${SOURCES} )
+
+    QT4_WRAP_CPP(MOCCED ${MOC_SOURCES})
+
+    add_library(${TEST_LIB_NAME} ${CX_CATCH_SHARED_LIB_TYPE} ${SOURCES} ${MOCCED})
     message(STATUS "          Lib name : ${TEST_LIB_NAME}")
     target_link_libraries(${TEST_LIB_NAME} ${LIB_TO_TEST} cxtestUtilities )
     
