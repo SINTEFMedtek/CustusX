@@ -35,7 +35,7 @@ if (BUILD_TESTING)
         cxTestRenderSpeed.cpp
         )
 
-    cx_catch_add_lib_and_exe(cxVisualizationService "${CXTEST_VISUALIZATIONSERVICE_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
+    cx_catch_add_lib_and_exe(cxVisualizationService "${CX_CPPUNIT_VISUALIZATIONSERVICE_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
 
 
 endif (BUILD_TESTING)
