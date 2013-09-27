@@ -50,10 +50,11 @@ struct USReconstructInputData
 	USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
 	std::vector<TimedPosition> mFrames;
 	std::vector<TimedPosition> mPositions;
-	ImagePtr mMask;///< Clipping mask for the input data
 	ProbeSector mProbeData;
 	QString mProbeUid;
 	Transform3D rMpr; ///< patient registration
+
+	vtkImageDataPtr getMask();
 };
 
 /**

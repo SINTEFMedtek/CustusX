@@ -75,13 +75,7 @@ USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName
   retval.mFrames = this->readFrameTimestamps(fileName);
   retval.mPositions = this->readPositions(fileName);
 
-  //mPos is now prMs
-  retval.mMask = this->generateMask(retval);
-  if (!this->readMaskFile(fileName, retval.mMask))
-  {
-  	retval.mMask = this->createMaskFromConfigParams(retval);
-  }
-
+	//mPos is now prMs
   if (!retval.mFrames.empty())
   {
 	  double msecs = (retval.mFrames.rbegin()->mTime - retval.mFrames.begin()->mTime);
@@ -112,9 +106,9 @@ std::pair<QString, ProbeData>  UsReconstructionFileReader::readProbeDataBackward
 	return retval;
 }
 
-ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(USReconstructInputData data)
+/*ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(USReconstructInputData data)
 {
-  vtkImageDataPtr mask = data.mProbeData.getMask();
+	vtkImageDataPtr mask = data.getMask();
   ImagePtr image = ImagePtr(new Image("mask", mask, "mask")) ;
 
   Eigen::Array3i usDim(data.mUsRaw->getDimensions());
@@ -135,7 +129,7 @@ ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(USReconstructInp
       messageManager()->sendError("Spacing: Image: "+ qstring_cast(usSpacing) + ", Mask: " + qstring_cast(Vector3D(mask->GetSpacing())));
   }
   return image;
-}
+}*/
 
 ImagePtr UsReconstructionFileReader::generateMask(USReconstructInputData data)
 {

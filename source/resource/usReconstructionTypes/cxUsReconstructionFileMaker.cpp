@@ -83,11 +83,6 @@ USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageDataCo
 		retval.mProbeData.setData(tool->getProbe()->getProbeData());
 	}
 
-	vtkImageDataPtr mask = retval.mProbeData.getMask();
-	if (mask)
-	{
-		retval.mMask = ImagePtr(new Image("mask", mask, "mask")) ;
-	}
 	if (tool)
 		retval.mProbeUid = tool->getUid();
 
@@ -296,7 +291,7 @@ void UsReconstructionFileMaker::writeUSImages(QString path, ImageDataContainerPt
 	}
 }
 
-void UsReconstructionFileMaker::writeMask(QString path, QString session, ImagePtr mask)
+void UsReconstructionFileMaker::writeMask(QString path, QString session, vtkImageDataPtr mask)
 {
 	QString filename = QString("%1/%2.mask.mhd").arg(path).arg(session);
 	if (!mask)
@@ -306,7 +301,7 @@ void UsReconstructionFileMaker::writeMask(QString path, QString session, ImagePt
 	}
 
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
-	writer->SetInput(mask->getBaseVtkImageData());
+	writer->SetInput(mask);
 	writer->SetFileName(cstring_cast(filename));
 	writer->SetCompression(false);
 	writer->Write();
@@ -430,7 +425,7 @@ QString UsReconstructionFileMaker::writeToNewFolder(QString path, bool compressi
 	this->writeUSTimestamps(path, session, mReconstructData.mFrames);
 	this->writeUSTransforms(path, session, mReconstructData.mFrames);
 	this->writeProbeConfiguration(path, session, mReconstructData.mProbeData.mData, mReconstructData.mProbeUid);
-	this->writeMask(path, session, mReconstructData.mMask);
+	this->writeMask(path, session, mReconstructData.getMask());
 	this->writeREADMEFile(path, session);
 
 	ImageDataContainerPtr imageData = mReconstructData.mUsRaw->getImageContainer();

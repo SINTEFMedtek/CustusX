@@ -99,7 +99,7 @@ bool PNNReconstructAlgorithm::reconstruct(ProcessedUSInputDataPtr input,
 	//unsigned char *inputPointer = static_cast<unsigned char*>( input->GetScalarPointer() );
 	unsigned char *outputPointer = static_cast<unsigned char*> (tempOutput->GetScalarPointer());
 	//unsigned char *outputPointer = static_cast<unsigned char*>(target->GetScalarPointer());
-	unsigned char* maskPointer = static_cast<unsigned char*> (input->getMask()->getBaseVtkImageData()->GetScalarPointer());
+	unsigned char* maskPointer = static_cast<unsigned char*> (input->getMask()->GetScalarPointer());
 
 	// Traverse all input pixels
 	for (int record = 0; record < inputDims[2]; record++)
