@@ -68,16 +68,12 @@ public:
 	QStringList image;
 };
 
-TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Init view",
-				 "[unit][resource/visualization]")
+TEST_CASE_METHOD(VisualRenderingFixture, "Visual rendering: Init view", "[integration][resource][visualization]")
 {
 	REQUIRE(true);
 }
 
-TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Empty view",
-				 "[unit][resource/visualization]")
+TEST_CASE_METHOD(VisualRenderingFixture, "Visual rendering: Empty view", "[integration][resource][visualization]")
 {
 	this->setDescription("Empty view");
 	cx::ViewWidget* view = new cx::ViewWidget(this->centralWidget());
@@ -88,9 +84,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) == Approx(0));
 }
 
-TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show 3D volume - vtkGPU render",
-				 "[unit][resource/visualization]")
+TEST_CASE_METHOD(VisualRenderingFixture, "Visual rendering: Show 3D volume - vtkGPU render", "[integration][resource][visualization]")
 {
 	this->setDescription("3D Volume, moving tool");
 	this->define3D(image[0], NULL, 0, 0);
@@ -100,9 +94,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) > 0.01);
 }
 
-TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show 3D volume - snwGPU multivolume render",
-				 "[unit][resource/visualization][not_apple][not_linux][not_windows]")
+TEST_CASE_METHOD(VisualRenderingFixture, "Visual rendering: Show 3D volume - snwGPU multivolume render", "[integration][resource][visualization][not_apple][not_linux][not_windows]")
 {
 	this->setDescription("3D Volume, moving tool, GPU");
 	REQUIRE(this->define3DGPU(QStringList(image[0]), NULL, 0, 0));
@@ -110,9 +102,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) > 0.01);
 }
 
-TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show 3D 2 volumes - snwGPU multivolume render",
-				 "[unit][resource/visualization][not_apple][not_linux][not_windows]")
+TEST_CASE_METHOD(VisualRenderingFixture, "Visual rendering: Show 3D 2 volumes - snwGPU multivolume render", "[integration][resource][visualization][not_apple][not_linux][not_windows]")
 {
 	this->setDescription("3D Composites (2 volumes), moving tool");
 	QStringList images; images << image[1] << image[2];
@@ -131,9 +121,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
 }
 
-TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show 3D RGB GPU volume",
-				 "[unit][resource/visualization][not_apple][not_linux][not_windows]")
+TEST_CASE_METHOD(VisualRenderingFixture, "Visual rendering: Show 3D RGB GPU volume", "[integration][resource][visualization][not_apple][not_linux][not_windows]")
 {
 	this->setDescription("3D RGB Volume");
 
@@ -145,9 +133,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	CHECK(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
 }
 
-TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show 3D volume with lut",
-				 "[unit][resource/visualization]")
+TEST_CASE_METHOD(VisualRenderingFixture, "Visual rendering: Show 3D volume with lut", "[integration][resource][visualization]")
 {
 	this->setDescription("3D with lut, moving tool");
 
@@ -161,9 +147,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	CHECK(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
 }
 
-TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show ACS+3D, centered hidden tool",
-				 "[unit][resource/visualization]")
+TEST_CASE_METHOD(VisualRenderingFixture, "Visual rendering: Show ACS+3D, centered hidden tool", "[integration][resource][visualization]")
 {
 	this->setDescription("ACS+3D, moving tool");
 	this->define3D(image[0], NULL, 1, 1);
@@ -178,9 +162,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	CHECK(this->getFractionOfBrightPixelsInView(3,20) > 0.02);
 }
 
-TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show AnyDual+3D, centered hidden tool",
-				 "[unit][resource/visualization]")
+TEST_CASE_METHOD(VisualRenderingFixture, "Visual rendering: Show AnyDual+3D, centered hidden tool", "[integration][resource][visualization]")
 {
 	this->setDescription("Any+Dual+3D, moving tool");
 	this->define3D(image[0], NULL, 0, 2);
@@ -191,9 +173,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	CHECK(this->getFractionOfBrightPixelsInView(1,20) > 0.02);
 }
 
-TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show ACS, 3 volumes, centered hidden tool",
-				 "[unit][resource/visualization]")
+TEST_CASE_METHOD(VisualRenderingFixture, "Visual rendering: Show ACS, 3 volumes, centered hidden tool", "[integration][resource][visualization]")
 {
 	this->setDescription("ACS 3 volumes, moving tool");
 
@@ -211,9 +191,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	}
 }
 
-TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show ACS, 3 GPU volumes, moving tool",
-				 "[unit][resource/visualization][not_apple][not_linux][not_windows]")
+TEST_CASE_METHOD(VisualRenderingFixture, "Visual rendering: Show ACS, 3 GPU volumes, moving tool", "[integration][resource/visualization][not_apple][not_linux][not_windows]")
 {
 	this->setDescription("ACS 3 volumes, moving tool, GPU");
 
