@@ -31,6 +31,7 @@
 #include "cxtestUtilities.h"
 #include "sscUSFrameData.h"
 #include "sscDummyTool.h"
+#include "cxImageDataContainer.h"
 
 namespace cxtest
 {
@@ -359,38 +360,46 @@ cx::USReconstructInputData generateSyntheticUSBMode()
 {
 	cx::USReconstructInputData retval;
 	retval.mFilename = "Synthetic_US_BMode";
+
 	unsigned numFrames = 10;
 	unsigned dim = 5;
+	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(dim,dim,numFrames), 100);
+	cx::USFrameDataPtr us;
+	us = cx::USFrameData::create(image);
+	cx::ImageDataContainerPtr images = us->getImageContainer();
+	REQUIRE(images->size() == numFrames);
+
+	retval.mUsRaw = us;
+
+
 	for (unsigned i=0; i < numFrames; ++i)
 	{
 		cx::TimedPosition frame;
 //		cx::Transform3D transform = cx::Transform3D::Identity();
-		cx::Transform3D transform = cx::createTransformTranslate(cx::Vector3D(0,0,i));
+		cx::Transform3D transform = cx::createTransformTranslate(cx::Vector3D(i,0, 0));
 		frame.mTime = i;
 		frame.mPos = transform;
 		retval.mFrames.push_back(frame);
 		retval.mPositions.push_back(frame);
-	}
 
-	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(dim,dim,numFrames), 200);
-	cx::USFrameDataPtr us;
-	us = cx::USFrameData::create(image);
-	retval.mUsRaw = us;
+		unsigned char *imagePointer = static_cast<unsigned char*>(images->get(i)->GetScalarPointer());
+		unsigned int x = i%dim;
+		unsigned y = i%dim;
+		imagePointer[x+y*dim] = 200;
+	}
 
 	cx::ProbeSector probeSector;
 	cx::ProbeData probeData = cx::DummyToolTestUtilities::createProbeDataLinear();
 	probeSector.setData(probeData);
 	retval.mProbeData = probeSector;
 
-//	retval.mMask = cxtest::Utilities::create3DImage(Eigen::Array3i(dim,dim,1), 0);
-//	retval.mMask = mask;
 	retval.mProbeUid = "Synthetic test probe";
 	retval.rMpr = cx::Transform3D::Identity();
 
 	return retval;
 }
 
-TEST_CASE("ReconstructManager: B-Mode with synthetic data", "[usreconstruction][integration]")
+TEST_CASE("ReconstructManager: B-Mode with synthetic data", "[usreconstruction][plugins][unit]")
 {
 	cx::USReconstructInputData inputData = generateSyntheticUSBMode();
 
@@ -414,9 +423,16 @@ TEST_CASE("ReconstructManager: B-Mode with synthetic data", "[usreconstruction][
 
 	REQUIRE(output);
 //	std::cout << "dims: " << Eigen::Array3i(output->getBaseVtkImageData()->GetDimensions()) << std::endl;
+//	std::cout << "Num not zero voxels: " << Utilities::getNumberOfVoxelsAboveThreshold(output->getBaseVtkImageData(), 1) << std::endl;
+
+//	cx::cxDataManager::initialize();
+//	cx::DataLocations::setTestMode();
+//	cx::dataManager()->saveImage(output, cx::DataLocations::getTestDataPath());
+//	std::cout << "Saved test file to: " << cx::DataLocations::getTestDataPath() << "/" << output->getFilePath() << std::endl;
+//	cx::DataManager::shutdown();
 }
 
 
-} // namespace cx
+} // namespace cxtest
 
 
