@@ -38,7 +38,7 @@ void simpleVolumeRepTest(cx::RepPtr rep, unsigned int viewAxisSize = 30)
 	REQUIRE(output->GetDimensions()[0] == viewAxisSize);
 	REQUIRE(output->GetDimensions()[1] == viewAxisSize);
 
-	unsigned int numNonZeroPixels = renderTester->getNumberOfNonZeroPixels(output);
+	unsigned int numNonZeroPixels = cxtest::Utilities::getNumberOfNonZeroVoxels(output);
 	REQUIRE(numNonZeroPixels > 0);
 	REQUIRE(numNonZeroPixels < viewAxisSize*viewAxisSize);
 }
