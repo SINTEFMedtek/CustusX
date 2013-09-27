@@ -30,6 +30,7 @@
 
 #include "cxtestUtilities.h"
 #include "sscUSFrameData.h"
+#include "sscDummyTool.h"
 
 namespace cxtest
 {
@@ -375,7 +376,12 @@ cx::USReconstructInputData generateSyntheticUSBMode()
 	cx::USFrameDataPtr us;
 	us = cx::USFrameData::create(image);
 	retval.mUsRaw = us;
-//	retval.mProbeData = ;
+
+	cx::ProbeSector probeSector;
+	cx::ProbeData probeData = cx::DummyToolTestUtilities::createProbeDataLinear();
+	probeSector.setData(probeData);
+	retval.mProbeData = probeSector;
+
 //	retval.mMask = cxtest::Utilities::create3DImage(Eigen::Array3i(dim,dim,1), 0);
 //	retval.mMask = mask;
 	retval.mProbeUid = "Synthetic test probe";
@@ -384,9 +390,8 @@ cx::USReconstructInputData generateSyntheticUSBMode()
 	return retval;
 }
 
-TEST_CASE("ReconstructManager: B-Mode with synthetic data", "[usreconstruction][integration][hide]")
+TEST_CASE("ReconstructManager: B-Mode with synthetic data", "[usreconstruction][integration]")
 {
-
 	cx::USReconstructInputData inputData = generateSyntheticUSBMode();
 
 	ReconstructManagerTestFixture fixture;
@@ -408,6 +413,7 @@ TEST_CASE("ReconstructManager: B-Mode with synthetic data", "[usreconstruction][
 	cx::ImagePtr output = cores[0]->getOutput();
 
 	REQUIRE(output);
+//	std::cout << "dims: " << Eigen::Array3i(output->getBaseVtkImageData()->GetDimensions()) << std::endl;
 }
 
 
