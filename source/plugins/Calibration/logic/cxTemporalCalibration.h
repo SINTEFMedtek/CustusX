@@ -44,7 +44,7 @@ public:
   double calibrate(bool* success);
 
 private:
-  vtkImageDataPtr extractLine_y(USFrameDataPtr data, int line_index_x, int frame);
+	vtkImageDataPtr extractLine_y(USFrameDataPtr data, int line_index_x, int frame);
   double findCorrelation(USFrameDataPtr data, int frame_a, int frame_b, double maxShift, double lastVal);
   std::vector<double> computeProbeMovement();
   std::vector<double> resample(std::vector<double> shift, std::vector<TimedPosition> time, double resolution);
@@ -63,6 +63,7 @@ private:
   QString mFilename;
   mutable std::stringstream mDebugStream;
   bool mAddRawToDebug;
+	vtkImageDataPtr mMask;
 
 };
 

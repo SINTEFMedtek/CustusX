@@ -49,13 +49,13 @@ typedef boost::shared_ptr<class USFrameData> USFrameDataPtr;
 class ProcessedUSInputData
 {
 public:
-	ProcessedUSInputData(std::vector<vtkImageDataPtr> frames, std::vector<TimedPosition> pos, ImagePtr mask, QString path, QString uid);
+	ProcessedUSInputData(std::vector<vtkImageDataPtr> frames, std::vector<TimedPosition> pos, vtkImageDataPtr mask, QString path, QString uid);
 
 	unsigned char* getFrame(unsigned int index) const;
 	Eigen::Array3i getDimensions() const;
 	Vector3D getSpacing() const;
 	std::vector<TimedPosition> getFrames();
-	ImagePtr getMask();
+	vtkImageDataPtr getMask();
 
 	QString getFilePath();
 	QString getUid();
@@ -63,7 +63,7 @@ public:
 private:
 	std::vector<vtkImageDataPtr> mProcessedImage;
 	std::vector<TimedPosition> mFrames;
-	ImagePtr mMask;///< Clipping mask for the input data
+	vtkImageDataPtr mMask;///< Clipping mask for the input data
 	QString mPath;
 	QString mUid;
 };
