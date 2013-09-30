@@ -61,7 +61,7 @@ class Common(object):
             self.mCMakeGenerator = 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
             self.mBuildSSCExamples = False
             self.mBuildTesting = True
-            self.mUseCotire = True
+            self.mUseCotire = False
         else:
             self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
         if (platform.system() == "Darwin"):

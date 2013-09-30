@@ -18,9 +18,39 @@
 #include "sscImage.h"
 #include "sscVolumeHelpers.h"
 #include "sscTypeConversions.h"
+#include "cxDataLocations.h"
 
 namespace cxtest
 {
+/*
+// --------------------------------------------------------
+TestDataStorage* TestDataStorage::mInstance = NULL; ///< static member
+// --------------------------------------------------------
+void TestDataStorage::shutdown()
+{
+	delete mInstance;
+	mInstance = NULL;
+}
+TestDataStorage* TestDataStorage::getInstance()
+{
+    if (!mInstance)
+    	mInstance = new TestDataStorage();
+	return mInstance;
+}
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+*/
+
+QString Utilities::getDataRoot(QString suffix)
+{
+	QString root = cx::DataLocations::getTestDataPath();
+	if (suffix.isEmpty())
+		return root;
+	else
+		return QString("%1/%2").arg(root).arg(suffix);
+}
+
 
 vtkImageDataPtr Utilities::create3DVtkImageData(Eigen::Array3i dim, const unsigned int voxelValue)
 {
@@ -46,6 +76,45 @@ std::vector<cx::ImagePtr> Utilities::create3DImages(unsigned int count, Eigen::A
 		retval.push_back(image);
 	}
 	return retval;
+}
+
+unsigned int Utilities::getNumberOfVoxelsAboveThreshold(vtkImageDataPtr image, int threshold)
+{
+	if (!image)
+		return 0;
+	unsigned char* ptr = reinterpret_cast<unsigned char*>(image->GetScalarPointer());
+	unsigned int pixelCount = 0;
+	for (unsigned i = 0; i < image->GetDimensions()[0]*image->GetDimensions()[1]*image->GetDimensions()[2]; ++i)
+	{
+		if (ptr[i*image->GetNumberOfScalarComponents()] > threshold)
+			++pixelCount;
+	}
+	return pixelCount;
+}
+
+unsigned int Utilities::getNumberOfNonZeroVoxels(vtkImageDataPtr image)
+{
+	return getNumberOfVoxelsAboveThreshold(image, 0);
+//	if (!image)
+//		return 0;
+//	unsigned char* ptr = reinterpret_cast<unsigned char*>(image->GetScalarPointer());
+//	unsigned int pixelCount = 0;
+//	for (unsigned i = 0; i < image->GetDimensions()[0]*image->GetDimensions()[1]; ++i)
+//	{
+//		if (ptr[i*image->GetNumberOfScalarComponents()] != 0)
+//			++pixelCount;
+//	}
+//	return pixelCount;
+}
+
+double Utilities::getFractionOfVoxelsAboveThreshold(vtkImageDataPtr image, int threshold)
+{
+	unsigned int hits = getNumberOfVoxelsAboveThreshold(image, threshold);
+	Eigen::Array3i dim(image->GetDimensions());
+	unsigned int totalPixels = dim[0]*dim[1];
+	if (totalPixels==0)
+		return -1;
+	return double(hits)/double(totalPixels);
 }
 
 } /* namespace cxtest */

@@ -8,7 +8,6 @@
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "sscSliceProxy.h"
-#include "sscSlicedImageProxy.h"
 #include "sscProbeSector.h"
 #include "sscProbeData.h"
 #include "sscToolManager.h"

@@ -95,6 +95,7 @@ SET( SOURCE_FILES
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 
 include_directories(
+    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     .
     ./logic
     ./gui

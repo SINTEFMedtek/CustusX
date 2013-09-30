@@ -63,7 +63,7 @@ void ReconstructPreprocessor::initializeCores(std::vector<ReconstructCorePtr> co
     {
         ProcessedUSInputDataPtr input(new ProcessedUSInputData(frames[i],
                                                                mFileData.mFrames,
-                                                               mFileData.mMask,
+																															 mFileData.getMask(),
                                                                mFileData.mFilename,
                                                                QFileInfo(mFileData.mFilename).completeBaseName() ));
         cores[i]->initialize(input, this->getOutputVolumeParams());
@@ -140,9 +140,6 @@ void ReconstructPreprocessor::cropInputData()
     imageSector.mSize.setHeight(size[1]);
     sector.setImage(imageSector);
     mFileData.mProbeData.setData(sector);
-
-    vtkImageDataPtr mask = mFileData.mProbeData.getMask();
-    mFileData.mMask = ImagePtr(new Image("mask", mask, "mask")) ;
 }
 
 
@@ -316,7 +313,7 @@ void ReconstructPreprocessor::interpolatePositions2()
 std::vector<Vector3D> ReconstructPreprocessor::generateInputRectangle()
 {
     std::vector<Vector3D> retval(4);
-    if (!mFileData.mMask)
+		if (!mFileData.getMask())
     {
         messageManager()->sendError("Reconstructer::generateInputRectangle() + requires mask");
         return retval;
@@ -324,7 +321,7 @@ std::vector<Vector3D> ReconstructPreprocessor::generateInputRectangle()
     Eigen::Array3i dims = mFileData.mUsRaw->getDimensions();
     Vector3D spacing = mFileData.mUsRaw->getSpacing();
 
-    Eigen::Array3i maskDims(mFileData.mMask->getBaseVtkImageData()->GetDimensions());
+		Eigen::Array3i maskDims(mFileData.getMask()->GetDimensions());
 
     if (( maskDims[0]<dims[0] )||( maskDims[1]<dims[1] ))
         messageManager()->sendError(QString("input data (%1) and mask (%2) dim mimatch")
@@ -336,7 +333,7 @@ std::vector<Vector3D> ReconstructPreprocessor::generateInputRectangle()
     int ymin = maskDims[1];
     int ymax = 0;
 
-    unsigned char* ptr = static_cast<unsigned char*> (mFileData.mMask->getBaseVtkImageData()->GetScalarPointer());
+		unsigned char* ptr = static_cast<unsigned char*> (mFileData.getMask()->GetScalarPointer());
     for (int x = 0; x < maskDims[0]; x++)
         for (int y = 0; y < maskDims[1]; y++)
         {

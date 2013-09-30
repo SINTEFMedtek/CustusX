@@ -20,8 +20,17 @@
 
 #include "cxtestCatchImpl.h"
 
-int main (int argc, char* argv[])
+#ifdef CX_WINDOWS
+#include <windows.h>
+#endif
+
+int main(int argc, char *argv[])
 {
+
+#ifdef CX_WINDOWS
+	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
+#endif
+
 	return cxtest::CatchImpl().run(argc, argv);
 }
 

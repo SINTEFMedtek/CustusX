@@ -44,7 +44,7 @@
 #include "cxPatientService.h"
 #include "cxMetricWidget.h"
 #include "cxViewWrapper.h"
-#include "sscDICOMWidget.h"
+//#include "sscDICOMWidget.h"
 #include "cxPlaybackWidget.h"
 #include "cxEraserWidget.h"
 #include "cxSamplerWidget.h"
@@ -54,7 +54,7 @@
 #include "cxApplicationStateMachine.h"
 #include "cxConfig.h"
 
-#include "sscDICOMLibConfig.h"
+//#include "sscDICOMLibConfig.h"
 
 namespace cx
 {

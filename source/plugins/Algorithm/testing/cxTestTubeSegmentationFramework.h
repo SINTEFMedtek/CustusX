@@ -1,14 +1,25 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 #ifndef CXTESTTUBESEGMENTATIONFRAMEWORK_H_
 #define CXTESTTUBESEGMENTATIONFRAMEWORK_H_
 
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/ui/text/TestRunner.h>
-#include <cppunit/extensions/HelperMacros.h>
-
+#ifdef CX_USE_TSF
 class QString;
 class paramList;
 
-class TestTubeSegmentationFramework : public CppUnit::TestFixture
+class TestTubeSegmentationFramework
 {
 public:
 	void setUp();
@@ -31,24 +42,6 @@ public:
 private:
 	paramList loadPreset(QString preset);
 	void runFilter(QString preset);
-
-public:
-	CPPUNIT_TEST_SUITE( TestTubeSegmentationFramework );
-		CPPUNIT_TEST( testConstructor );
-		CPPUNIT_TEST( testParameters );
-		CPPUNIT_TEST( testLoadParameterFile );
-		CPPUNIT_TEST( testDefaultPreset );
-		CPPUNIT_TEST( testSyntheticVascusynthPreset );
-		CPPUNIT_TEST( testPhantomAccUSPreset );
-		CPPUNIT_TEST( testNeuroVesselsMRAPreset );
-		CPPUNIT_TEST( testNeuroVesselsUSAPreset );
-		CPPUNIT_TEST( testLungAirwaysCTPreset );
-		//TODO make these work
-//		CPPUNIT_TEST( testLiverVesselsCTPreset );
-//		CPPUNIT_TEST( testLiverVesselsMRPreset );
-	CPPUNIT_TEST_SUITE_END();
-
 };
-CPPUNIT_TEST_SUITE_REGISTRATION( TestTubeSegmentationFramework );
-
+#endif //CX_USE_TSF
 #endif /* CXTESTTUBESEGMENTATIONFRAMEWORK_H_ */

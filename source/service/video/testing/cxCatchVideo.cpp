@@ -23,7 +23,7 @@
 #include "cxDataLocations.h"
 #include "cxMHDImageStreamer.h"
 #include "cxSimulatedImageStreamer.h"
-#include "cxToolManager.h"
+#include "sscDummyToolManager.h"
 #include "cxtestSender.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
@@ -46,10 +46,9 @@ cx::DummyImageStreamerPtr createRunningDummyImageStreamer(TestSenderPtr& sender,
 
 cx::SimulatedImageStreamerPtr createRunningSimulatedImageStreamer(TestSenderPtr& sender)
 {
-	cx::cxToolManager::initializeObject();
 	cx::ImagePtr image = cxtest::Utilities::create3DImage();
 	REQUIRE(image);
-	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear(), cx::cxToolManager::getInstance());
+	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear(), cx::DummyToolManager::getInstance());
 	REQUIRE(tool);
 	cx::SimulatedImageStreamerPtr imagestreamer(new cx::SimulatedImageStreamer());
 	REQUIRE(imagestreamer);
@@ -111,6 +110,7 @@ TEST_CASE("SimulatedImageStreamer: Should stream 2D images from a volume given a
 	checkSenderGotImageFromStreamer(sender);
 
 	imagestreamer->stopStreaming();
+	cx::ToolManager::shutdown();
 }
 
 }//namespace cx

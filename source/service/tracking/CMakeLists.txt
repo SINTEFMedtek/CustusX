@@ -47,6 +47,6 @@ include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( cxTrackingService ${cxTrackingService_SOURCE} ${MOC_HEADER_FILES})
-target_link_libraries(cxTrackingService SSC IGSTK cxResource)
+target_link_libraries(cxTrackingService IGSTK cxResource)
 
 ADD_SUBDIRECTORY( testing )

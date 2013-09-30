@@ -34,15 +34,11 @@ include(${OpenIGTLink_USE_FILE})
 #-------------------------------
 # Include directories
 #-------------------------------
-include_directories( ${CX_SSC_INCLUDE_DIRECTORIES} )
+include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 include_directories(
         ${Boost_INCLUDE_DIRS}
         ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
-        ${CustusX3_SOURCE_DIR}/source/resource/settings
-        ${CustusX3_BINARY_DIR}/source/resource/settings
-        ${CustusX3_SOURCE_DIR}/source/resource/utilities
-        ${CustusX3_SOURCE_DIR}/source/resource
-        ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
+     	${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
         )
 
 #-------------------------------
@@ -58,7 +54,6 @@ if(CX_WIN32)
 endif(CX_WIN32)
 
 SET(ALL_LINK_LIBRARIES
-	SSC
 	${BOOST_LIBRARIES}
 	${QT_LIBRARIES}
 	OpenIGTLink
