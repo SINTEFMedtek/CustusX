@@ -39,7 +39,7 @@
 #include <vtkTransform.h>
 #include <vtkCallbackCommand.h>//Mehdi
 #include <cstdlib> //Mehdi
-#include <Windows.h> //Mehdi
+//#include <Windows.h> //Mehdi
 
 #define VTI_FILETYPE 1
 #define MHA_FILETYPE 2
@@ -805,15 +805,15 @@ int main(int argc, char *argv[])
   mapper->AddClippingPlane(0,localPlane);
   renWin->Render();
   renWin->Render();
-  Sleep(2000);
+//  Sleep(2000);
   mapper->AddClippingPlane(1,localPlane);
   renWin->Render();
   renWin->Render();
-  Sleep(2000);
+//  Sleep(2000);
   mapper->RemoveClippingPlane(1);
   renWin->Render();
   renWin->Render();
-  Sleep(2000);
+//  Sleep(2000);
   /*
   while(true)
   {
