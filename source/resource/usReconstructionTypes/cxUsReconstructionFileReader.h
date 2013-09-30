@@ -152,7 +152,7 @@ private:
 	ProbeXmlConfigParser::Configuration readProbeConfiguration(QString calFilesPath, QStringList probeConfigPath);
 	std::pair<QString, ProbeData>  readProbeDataBackwardsCompatible(QString mhdFileName, QString calFilesPath);
 
-	ImagePtr createMaskFromConfigParams(USReconstructInputData data);
+//	ImagePtr createMaskFromConfigParams(USReconstructInputData data);
 	ImagePtr generateMask(USReconstructInputData data);
 };
 

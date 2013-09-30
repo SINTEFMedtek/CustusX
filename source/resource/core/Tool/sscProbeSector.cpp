@@ -49,6 +49,7 @@ namespace cx
 ProbeSector::ProbeSector()
 {
 	mPolyData = vtkPolyDataPtr::New();
+	mData.setType(ProbeData::tNONE);//Init
 }
 
 void ProbeSector::setData(ProbeData data)

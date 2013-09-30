@@ -47,7 +47,7 @@ typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 namespace cx
 {
 
-ProcessedUSInputData::ProcessedUSInputData(std::vector<vtkImageDataPtr> frames, std::vector<TimedPosition> pos, ImagePtr mask, QString path, QString uid) :
+ProcessedUSInputData::ProcessedUSInputData(std::vector<vtkImageDataPtr> frames, std::vector<TimedPosition> pos, vtkImageDataPtr mask, QString path, QString uid) :
 	mProcessedImage(frames),
 	mFrames(pos),
 	mMask(mask),
@@ -87,7 +87,7 @@ std::vector<TimedPosition> ProcessedUSInputData::getFrames()
 	return mFrames;
 }
 
-ImagePtr ProcessedUSInputData::getMask()
+vtkImageDataPtr ProcessedUSInputData::getMask()
 {
 	return mMask;
 }

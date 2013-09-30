@@ -31,7 +31,6 @@
 #include "tsf-config.h"
 #include "SIPL/Exceptions.hpp"
 
-
 #include "catch.hpp"
 
 void TestTubeSegmentationFramework::setUp()
@@ -197,7 +196,7 @@ void TestTubeSegmentationFramework::runFilter(QString preset)
 	{
 		INFO("Post processing data from TSF failed.");
 		REQUIRE(tsf->postProcess());
-}
+	}
 
 	//check output
 	std::vector < cx::SelectDataStringDataAdapterBasePtr > output = tsf->getOutputTypes();

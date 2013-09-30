@@ -76,5 +76,4 @@ TEST_CASE("TubeSegmentationFramework testLungAirwaysCTPreset works", "[integrati
 }
 
 } // namespace cxtest
-
 #endif //CX_USE_TSF

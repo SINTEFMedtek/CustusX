@@ -20,23 +20,22 @@
 #endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
-	include_directories(
-		${CustusX3_SOURCE_DIR}/source/ThirdParty/VTKMultiVolume
-		)
-
-	cx_add_class_qt_moc(CXTEST_VISUALIZATIONSERVICE_SOURCES
+    include_directories(
+        ${CustusX3_SOURCE_DIR}/source/ThirdParty/VTKMultiVolume
         )
-    cx_add_class(CXTEST_VISUALIZATIONSERVICE_SOURCES
+
+    cx_add_class(CX_CPPUNIT_VISUALIZATIONSERVICE_SOURCES
         cxtestCatchMultiVolume3DRepProducer.cpp
         cxtestMultiVolume3DRepProducerFixture
         cxtestCatchViewRenderSpeed.cpp
-        cxTestRenderSpeed
         cxtestCatchVolumeReps.cpp
         cxtestCatchVtkOpenGLGPUMultiVolumeRayCastMapper.cpp
 		cxtestDataTypeSort.cpp
+        cxTestRenderSpeed.h
+        cxTestRenderSpeed.cpp
         )
 
-    cx_catch_add_lib_and_exe(cxVisualizationService "${CXTEST_VISUALIZATIONSERVICE_SOURCES}")
+    cx_catch_add_lib_and_exe(cxVisualizationService "${CX_CPPUNIT_VISUALIZATIONSERVICE_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
 
 
 endif (BUILD_TESTING)
