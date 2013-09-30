@@ -1,46 +1,16 @@
 cmake_minimum_required(VERSION 2.6)
 
 if(BUILD_OPEN_IGTLINK_SERVER)
-
-    #-------------------------------
-    # External libs
-    #-------------------------------
-
-    # Boost
-    #----------
-
-    find_package( Boost REQUIRED )
-
-
-    # OpenIGTLink
-    #----------
     find_package(OpenIGTLink REQUIRED)
     include(${OpenIGTLink_USE_FILE})
 
-    #-------------------------------
-    # Include directories
-    #-------------------------------
-    include_directories( ${CX_SSC_INCLUDE_DIRECTORIES} )
-    include_directories(
-            ${Boost_INCLUDE_DIRS}
-    #        ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
-    #        ${CustusX3_SOURCE_DIR}/source/resource/settings
-    #        ${CustusX3_BINARY_DIR}/source/resource/settings
-    #        ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-            )
-
-    #-------------------------------
-    # Linking
-    #-------------------------------
+    include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 
     SET(LINK_LIBRARIES
-            SSC
+            cxResource
             OpenIGTLink
             )
 
-    #-------------------------------
-    # Creating the executable
-    #-------------------------------
     SET ( cxOpenIGTLinkUtilities_FILES
             cxIGTLinkImageMessage.h
             cxIGTLinkImageMessage.cpp

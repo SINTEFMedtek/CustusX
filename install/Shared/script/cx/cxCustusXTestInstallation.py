@@ -66,7 +66,8 @@ class CustusXTestInstallation:
         self._connectTestDataToInstallation()        
         testRunner = cxTestRunner.TestRunner()
         testRunner.resetCustusXDataRepo(self.getTestDataPath())
-        testRunner.runCatchTestsWrappedInCTestGenerateJUnit('integration', catchPath=appPath, outPath=self.root_dir)
+        tags = testRunner.includeTagsForOS('[integration]')
+        testRunner.runCatchTestsWrappedInCTestGenerateJUnit(tags, catchPath=appPath, outPath=self.root_dir)
 
     def _getInstalledBinaryPath(self):
         'path to binary files / executables in install'

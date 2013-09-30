@@ -270,7 +270,7 @@ endfunction()
 # private
 ###############################################################################
 macro(_cx_query_is_full_filename RESULT CLASS_NAME_WITH_PATH)
-	STRING(REGEX MATCH "(\\.h|\\.cpp|\\.cxx|\\.qrc|\\.hxx|\\.hpp)$" VALID_SUFFIX ${CLASS_NAME_WITH_PATH})
+	STRING(REGEX MATCH "(\\.h|\\.cpp|\\.cxx|\\.qrc|\\.hxx|\\.hpp|\\.txx)$" VALID_SUFFIX ${CLASS_NAME_WITH_PATH})
 	if("${VALID_SUFFIX}" STREQUAL "")
 		set(${RESULT} "False")
 	else()
@@ -342,9 +342,9 @@ function(cx_add_class_qt_moc SOURCE_FILES_ARGUMENT)
 	foreach(CLASS_NAME ${CLASS_NAME_WITH_PATH})
 		_cx_add_header_name(HEADER_NAMES ${CLASS_NAME})
 	endforeach()
+	
 	# optimized: QT4_WRAP_CPP has large overhead: call once.
 	QT4_WRAP_CPP( RESULT_add_class_qt_moc ${HEADER_NAMES} )
 
-        set(${SOURCE_FILES_ARGUMENT} ${${SOURCE_FILES_ARGUMENT}} ${RESULT_add_class_qt_moc} PARENT_SCOPE)
+    set(${SOURCE_FILES_ARGUMENT} ${${SOURCE_FILES_ARGUMENT}} ${RESULT_add_class_qt_moc} PARENT_SCOPE)
 endfunction()
-

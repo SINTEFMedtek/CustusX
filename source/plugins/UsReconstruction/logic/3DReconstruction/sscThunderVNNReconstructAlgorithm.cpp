@@ -174,7 +174,7 @@ bool ThunderVNNReconstructAlgorithm::reconstruct(ProcessedUSInputDataPtr input,
 			data.input_pos_matrices[12 * i + j] = m[j];
 	}
 
-	vtkImageDataPtr input_mask = input->getMask()->getBaseVtkImageData();
+	vtkImageDataPtr input_mask = input->getMask();
 	data.input_mask = static_cast<unsigned char*> (input_mask->GetScalarPointer());
 	//  data.frameMask = frameMask;
 

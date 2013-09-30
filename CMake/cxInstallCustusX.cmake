@@ -95,10 +95,10 @@ ENDIF(APPLE)
 
 
 set(ALL_LIBRARY_DIRS
+    ${ULTERIUS_BIN_DIR}
     ${QT_INCLUDES}
     ${QT_LIBRARY_DIRS}
     ${QT_BINARY_DIR}
-#    ${SSC_INCLUDE_DIRS}
     ${GEStreamer_LIBRARY_DIRS}
     ${VTK_LIBRARY_DIRS}
     ${OpenCV_LIB_DIR}
@@ -109,42 +109,30 @@ set(ALL_LIBRARY_DIRS
     ${DCMTK_DIR}/lib
     ${INCLUDE_DIRECTORIES}
     ${Tube-Segmentation-Framework_LIBRARY_DIRS}
-    ${CustusX3_BINARY_DIR}/source/resource/ssc/Code
-    ${CustusX3_BINARY_DIR}/source/resource/ssc/Testing/cisst_code
-#    ${SSC_BINARY_DIR}/Code
-#    ${SSC_BINARY_DIR}/DICOMLib
-#    ${SSC_BINARY_DIR}/Testing/cisst_code
 	${CustusX3_BINARY_DIR}/source/ThirdParty/VTKMultiVolume
 	${CustusX3_BINARY_DIR}
     ${CustusX3_BINARY_DIR}/source
-    ${CustusX3_BINARY_DIR}/source/service/patient
-    ${CustusX3_BINARY_DIR}/source/service/state
-    ${CustusX3_BINARY_DIR}/source/service/tracking
-    ${CustusX3_BINARY_DIR}/source/service/video
-    ${CustusX3_BINARY_DIR}/source/service/visualization
-    ${CustusX3_BINARY_DIR}/source/resource
-    ${CustusX3_BINARY_DIR}/source/resource/testUtilities
-    ${CustusX3_BINARY_DIR}/source/resource/algorithms
-    ${CustusX3_BINARY_DIR}/source/resource/settings
-    ${CustusX3_BINARY_DIR}/source/resource/utilities
-    ${CustusX3_BINARY_DIR}/source/resource/OpenIGTLinkUtilities
-    ${CustusX3_BINARY_DIR}/source/resource/videoServer
-    ${CustusX3_BINARY_DIR}/source/plugins/Acquisition
-    ${CustusX3_BINARY_DIR}/source/plugins/Acquisition/logic
-    ${CustusX3_BINARY_DIR}/source/plugins/Acquisition/gui
+
+	${CustusX3_BINARY_DIR}/source/resource/core
+	${CustusX3_BINARY_DIR}/source/resource/OpenIGTLinkUtilities
+	${CustusX3_BINARY_DIR}/source/resource/videoServer
+	${CustusX3_BINARY_DIR}/source/resource/usReconstructionTypes
+	${CustusX3_BINARY_DIR}/source/resource/visualization
+	${CustusX3_BINARY_DIR}/source/resource/widgets
+
+	${CustusX3_BINARY_DIR}/source/service/patient
+	${CustusX3_BINARY_DIR}/source/service/state
+	${CustusX3_BINARY_DIR}/source/service/tracking
+	${CustusX3_BINARY_DIR}/source/service/video
+	${CustusX3_BINARY_DIR}/source/service/visualization
+
+	${CustusX3_BINARY_DIR}/source/plugins/Acquisition
     ${CustusX3_BINARY_DIR}/source/plugins/Algorithm
-    ${CustusX3_BINARY_DIR}/source/plugins/Algorithm/logic
-    ${CustusX3_BINARY_DIR}/source/plugins/Algorithm/gui
     ${CustusX3_BINARY_DIR}/source/plugins/Calibration
-    ${CustusX3_BINARY_DIR}/source/plugins/Calibration/logic
-    ${CustusX3_BINARY_DIR}/source/plugins/Calibration/gui
     ${CustusX3_BINARY_DIR}/source/plugins/Registration
-    ${CustusX3_BINARY_DIR}/source/plugins/Registration/logic
-    ${CustusX3_BINARY_DIR}/source/plugins/Registration/gui
     ${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction
-    ${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/logic
     ${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction
-    ${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/gui
+
     ${CustusX3_BINARY_DIR}/source/gui
     ${CustusX3_BINARY_DIR}/source/logic/
     ${CustusX3_BINARY_DIR}/source/apps/grabberServer

@@ -32,9 +32,19 @@ class TestRunner:
     '''
     pass
 
+    def _createCatchBaseFilenameFromTag(self, tag):
+        'generate a namestring usable as the base of a filename for test results based on tag'
+        tagString = self._createFilenameFriendlyStringFromCatchTag(tag)
+        baseName = 'catch.%s.testresults' % tagString
+        return baseName
+
     def runCatchTestsWrappedInCTestGenerateJUnit(self, tag, catchPath, outPath):
-        ctestFile='%s/TestResults_%s.ctest.xml' % (outPath, tag)
-        junitFile='%s/TestResults_%s.junit.xml' % (outPath, tag)
+        baseName = self._createCatchBaseFilenameFromTag(tag)
+        ctestFile='%s/%s.ctest.xml' % (outPath, baseName)
+        junitFile='%s/%s.ctest.junit.xml' % (outPath, baseName)
+        
+        #ctestFile='%s/TestResults_%s.ctest.xml' % (outPath, tag)
+        #junitFile='%s/TestResults_%s.junit.xml' % (outPath, tag)
         self.runCatchTestsWrappedInCTest(catchPath, tag=tag, outFile=ctestFile)
         self.convertCTestFile2JUnit(ctestFile, junitFile)
         return junitFile
@@ -47,20 +57,23 @@ class TestRunner:
         ctest files are generated in path, overwriting existing files.
         ctest-style xml results are written to outFile.
         '''
-        PrintFormatter.printInfo('Run ctest tests with tag [%s]' % tag)
+        PrintFormatter.printInfo('Run ctest tests with tag %s' % tag)
         PrintFormatter.printInfo('Convert catch tests to ctests, i.e. one test per process...')
         tests = self._readCatchTestNames(path, tag=tag)
         self._writeCTestFileForCatchTests('%s/CTestTestfile.cmake'%path, tests)
         self._writeDartConfigurationFile(path)
-        self.runCTest(path, outFile)
+        self.runCTest(path, outfile=outFile)
 
     def _readCatchTestNames(self, path, tag):
-        catchExe = '%s/Catch' % path
+        catchExe = '%s/%s' % (path, self._getCatchExecutable())
+        #fullTags = self.includeTagsForOS(tag)
         shell.changeDir(path)
-        testListResult = shell.evaluate('%s --list-tests --reporter xml' % catchExe)
+        # note: --reporter xml depends on a custom reporter implemented in cxtestCatchImpl.cpp
+        testListResult = shell.evaluate('%s %s --list-tests --reporter xml' % (catchExe, tag))
         parser = cxCatchConsoleNameListParser.CatchCustomXmlNameListParser()
         parser.read(testListResult.stdout)
-        tests = parser.getTestsForTag(tag)
+        #tests = parser.getTestsForTag(tag) no longer necessary - list is already filtered
+        tests = parser.getTests()
         return tests
 
     def _writeCTestFileForCatchTests(self, targetFile, testnames):
@@ -97,10 +110,10 @@ TimeOut: %d
 ''' % (site,buildname,timeout)
         cxUtilities.writeToNewFile(filename=targetFile, text=content)
 
-    def runCTest(self, path, outfile=None):
+    def runCTest(self, path, outpath=None, outfile=None):
         'Run all ctest tests at path and write them in ctest xml format to outfile'
         if not outfile:
-            outfile = '%s/CTestResults.xml' % path
+            outfile = '%s/CTestResults.xml' % outpath
         PrintFormatter.printInfo('Run ctest, results to %s' % outfile)
         shell.changeDir(path)
         shell.rm_r('%s/Testing/' % path, "[0-9]*")
@@ -109,17 +122,39 @@ TimeOut: %d
         temp_dir = shell.head(os.path.join(path, 'Testing', 'TAG'), 1)
         shell.cp(os.path.join(path, 'Testing', temp_dir, 'Test.xml'), '%s' % outfile)
 
-    def runCatch(self, path, tag, outfile=None):
+    def runCatch(self, path, tag, outpath=None, outfile=None):
         'Run all Catch tests at path and write them in junit xml format to outfile'
         if not outfile:
-            outfile = '%s/CatchTestResults.xml' % path
-        PrintFormatter.printInfo('Run catch with tag [%s], results to %s' % (tag, outfile))
+            baseName = self._createCatchBaseFilenameFromTag(tag)
+            outfile = '%s/%s.xml' % (outpath, baseName)
+            #outfile = '%s/CatchTestResults.junit.xml' % path
+        PrintFormatter.printInfo('Run catch with tag %s, results to %s' % (tag, outfile))
         shell.changeDir(path)
         shell.rm_r(outfile)
-        exe = "Catch"
+        exe = self._getCatchExecutable()
+        cmd = '%s/%s %s --reporter junit --out %s' % (path, exe, tag, outfile)
+        #print("PATH:       "+os.environ["PATH"])
+        success = shell.run(cmd, ignoreFailure=False)
+        if not success: # a failed catch leaves an empty outfile - remove this to signal failure to jenkins
+            PrintFormatter.printInfo('catch failed - removing outfile %s' % outfile)            
+            shell.rm_r(outfile)
+        
+    def _getCatchExecutable(self):
         if(platform.system() == 'Windows'):
-             exe = "Catch.exe"
-        shell.run('%s/%s [%s] --reporter junit --out %s' % (path, exe, tag, outfile), ignoreFailure=True)
+             return "Catch.exe"
+        return "Catch"
+                
+    def _getExcludeTags(self):
+        if(platform.system() == 'Windows'):
+             return "~[not_windows]"
+        if platform.system() == 'Darwin':
+             return "~[not_apple]"
+        if platform.system() == 'Linux':
+             return "~[not_linux]"
+         
+    def includeTagsForOS(self, tag):
+        exclude = self._getExcludeTags()
+        return '%s%s' % (tag, exclude) 
         
     def resetCustusXDataRepo(self, path):
         '''
@@ -139,5 +174,14 @@ TimeOut: %d
         PrintFormatter.printInfo('Convert [%s] to [%s]' % (ctestFile, junitFile))
         cxConvertCTest2JUnit.convertCTestFile2JUnit(ctestFile, junitFile)
         
+    def _createFilenameFriendlyStringFromCatchTag(self, tag):
+        # [unit][resource/vis]~[not_mac] ->
+        # unit.resource-vis.exclude_not_mac
+        tag = tag.strip('[]')
+        tag = tag.replace('][','.')
+        tag = tag.replace('/','-')
+        tag = tag.replace(']','.')
+        tag = tag.replace('~[','exclude_')
+        return tag
         
 

@@ -13,9 +13,11 @@ cx_initialize_ITK()
 cx_initialize_OpenIGTLink()
 cx_initialize_IGSTK()
 
-#cx_initialize_SSC()
 cx_initialize_ISB_GE()
 cx_initialize_TSF()
+
+find_package(OpenGL)
+find_package(X11)
 
 #------------------------------------------------------------------------------
 # Add subdirectories

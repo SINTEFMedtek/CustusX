@@ -375,6 +375,7 @@ class CustusX3(CppComponent):
         add('OpenCV_DIR:PATH', self._createSibling(OpenCV).configPath())
         add('ULTERIUS_INCLUDE_DIR:PATH', self._createSibling(UltrasonixSDK).includePath())
         add('ULTERIUS_LIBRARY:FILEPATH', self._createSibling(UltrasonixSDK).libFile())
+        add('ULTERIUS_BIN_DIR:FILEPATH', self._createSibling(UltrasonixSDK).binDir())
         add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).configPath())
         add('GEStreamer_DIR:PATH', self._createSibling(ISB_DataStreaming).configPath())
         # other options
@@ -403,6 +404,8 @@ class UltrasonixSDK(CppComponent):
         return self.path() + "/" + self.sourceFolder() + "/ulterius/inc"
     def libFile(self):
         return self.path() + "/" + self.sourceFolder() + "/ulterius/lib/ulterius.lib"
+    def binDir(self):
+        return self.path() + "/" + self.sourceFolder() + "/bin"
     def path(self):
         return self.controlData.getWorkingPath() + "/UltrasonixSDK"
     def _rawCheckout(self):
