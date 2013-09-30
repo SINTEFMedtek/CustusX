@@ -12,10 +12,6 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
-//#include <cppunit/extensions/TestFactoryRegistry.h>
-//#include <cppunit/ui/text/TestRunner.h>
-//#include <cppunit/extensions/HelperMacros.h>
-
 #include "sscDataManager.h"
 #include "sscImage.h"
 #include "sscAxesRep.h"
@@ -211,4 +207,3 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 		CHECK(this->getFractionOfBrightPixelsInView(i,20) > 0.02);
 	}
 }
-

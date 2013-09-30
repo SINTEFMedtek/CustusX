@@ -11,12 +11,8 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-#ifndef SSCTESTVIDEOGRAPHICS_H
-#define SSCTESTVIDEOGRAPHICS_H
-
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/ui/text/TestRunner.h>
-#include <cppunit/extensions/HelperMacros.h>
+#ifndef CXTESTVIDEOGRAPHICSFIXTURE_H_
+#define CXTESTVIDEOGRAPHICSFIXTURE_H_
 
 #include "sscTransform3D.h"
 
@@ -24,36 +20,20 @@
 #include "sscProbeData.h"
 #include "cxtestRenderTester.h"
 
+namespace cxtest
+{
+
 /** Tests for class VideoGraphics
   *
   * \date april 29, 2013
   * \author christiana
   */
-class TestVideoGraphics : public CppUnit::TestFixture
+class VideoGraphicsFixture
 {
 public:
-	void setUp();
-	void tearDown();
+	VideoGraphicsFixture();
 
-private:
-	void testRenderImage();
-	void testRenderMetaHeaderImage();
-	void testPassSingleMHDImage();
-	void testPassSinglePNGImage();
-	void testMask();
-	void testSector();
-
-public:
-	CPPUNIT_TEST_SUITE( TestVideoGraphics );
-	CPPUNIT_TEST( testRenderImage );
-	CPPUNIT_TEST( testRenderMetaHeaderImage );
-	CPPUNIT_TEST( testPassSingleMHDImage );
-	CPPUNIT_TEST( testPassSinglePNGImage );
-	CPPUNIT_TEST( testMask );
-	CPPUNIT_TEST( testSector );
-	CPPUNIT_TEST_SUITE_END();
-
-private:
+protected:
 	void renderImageAndCompareToExpected(vtkImageDataPtr input, vtkImageDataPtr expected);
 	vtkImageDataPtr  readImageData(QString filename, QString description);
 	cx::ProbeData readProbeData(QString filename);
@@ -61,6 +41,7 @@ private:
 	cxtest::RenderTesterPtr mMachine;
 	cx::VideoGraphicsPtr mVideoGraphics;
 };
-CPPUNIT_TEST_SUITE_REGISTRATION( TestVideoGraphics );
 
-#endif // SSCTESTVIDEOGRAPHICS_H
+} /* namespace cxtest */
+
+#endif /* CXTESTVIDEOGRAPHICSFIXTURE_H_ */
