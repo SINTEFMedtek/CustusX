@@ -3,7 +3,7 @@ if (BUILD_TESTING)
 	include_directories(${CustusX3_SOURCE_DIR}/source/resource/testUtilities)
 
 	QT4_WRAP_CPP(RESOURCE_VISUALIZATION_TEST_SOURCE_FILES
-        sscViewsWindow.h
+#        sscViewsWindow.h
         sscContainerWindow.h
     )
   
@@ -12,8 +12,8 @@ if (BUILD_TESTING)
         sscContainerWindow.cpp
         sscTestViewContainer.cpp
         sscTestGPURayCaster.cpp
-        sscTestVideoGraphics.h
-        sscTestVideoGraphics.cpp
+ #       sscTestVideoGraphics.h
+ #       sscTestVideoGraphics.cpp
 		${RESOURCE_VISUALIZATION_TEST_SOURCE_FILES}
 		)
  
@@ -21,7 +21,9 @@ if (BUILD_TESTING)
         sscViewsWindow
     )
     cx_add_class(RESOURCE_VISUALZATION_TEST_CATCH_SOURCE_FILES
-        sscTestVisualRendering.cpp
+		cxtestVideoGraphicsFixture
+        cxtestVideoGraphics.cpp
+		cxtestVisualRendering.cpp
     )
     cx_catch_add_lib_and_exe(cxResourceVisualization "${RESOURCE_VISUALZATION_TEST_CATCH_SOURCE_FILES}")
     
