@@ -96,18 +96,11 @@ endfunction()
 ###############################################################################
 function(_cx_catch_generate_master_catch_using_sources EXE_NAME PATH_TO_MAIN)
     message(STATUS "Generating master Catch exe.")
-    #message(STATUS "----------------------------")
-    #message(STATUS "Include: "${CX_TEST_CATCH_INCLUDE_DIRS})
-    #message(STATUS "----------------------------")
     include_directories(
         ${CX_TEST_CATCH_INCLUDE_DIRS}
     )
     
     QT4_WRAP_CPP(MOCCED ${CX_TEST_CATCH_MOC_SOURCES})
-    
-    foreach(file ${CX_TEST_CATCH_SOURCES})
-        message(STATUS "${file}")
-    endforeach(file ${CX_TEST_CATCH_SOURCES})
     
     add_executable(${EXE_NAME} ${PATH_TO_MAIN} ${CX_TEST_CATCH_SOURCES} ${MOCCED})
     target_link_libraries(${EXE_NAME} ${CX_TEST_CATCH_LINKER_LIBS} cxtestUtilities)
