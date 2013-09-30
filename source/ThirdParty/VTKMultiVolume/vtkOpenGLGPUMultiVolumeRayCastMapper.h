@@ -61,6 +61,7 @@ class vtkTransform;
 class VTK_VOLUMERENDERING_EXPORT vtkOpenGLGPUMultiVolumeRayCastMapper : public vtkGPUMultiVolumeRayCastMapper
 {
 public:
+  
   static vtkOpenGLGPUMultiVolumeRayCastMapper *New();
   vtkTypeMacro(vtkOpenGLGPUMultiVolumeRayCastMapper,vtkGPUMultiVolumeRayCastMapper);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
@@ -89,7 +90,19 @@ public:
   // \pre headerMessage_exists: headerMessage!=0
   static void PrintError(const char *headerMessage);
 
+  void AddClippingPlane(int vol, vtkPlane *plane);//Mehdi
+  void RemoveClippingPlane(int vol); //Mehdi
+  vtkPlane* GetClippingPlane(int vol); //Mehdi
+
 protected:
+  
+  vtkPlane* ClippingPlane[MAX_NUMBER_OF_ADDITIONAL_VOLUMES+1];//Mehdi
+  int Clipped[MAX_NUMBER_OF_ADDITIONAL_VOLUMES+1];//Mehdi
+  bool ClippedModified[MAX_NUMBER_OF_ADDITIONAL_VOLUMES+1];//Mehdi
+
+  void SetClippingPlane();//Mehdi
+
+
   vtkOpenGLGPUMultiVolumeRayCastMapper();
   ~vtkOpenGLGPUMultiVolumeRayCastMapper();
 
@@ -471,6 +484,7 @@ Mehdi*/
    **/
   //Mehdi vtkSmartPointer<vtkTransform> TextureCoord_1to2;
   vtkSmartPointer<vtkTransform> TextureCoord_1toN[MAX_NUMBER_OF_ADDITIONAL_VOLUMES];//Mehdi
+
 
   float ActualSampleDistance;
   

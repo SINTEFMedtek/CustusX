@@ -623,9 +623,7 @@ int vtkGPUMultiVolumeRayCastMapper::ValidateRender(vtkRenderer *ren,
 		  //-----------------------------------------------------------Mehdi
 		  break;//Mehdi
 		  }
-//		  tmp=((Additionalinput[iii] != this->AdditionalLastInput[iii]) ||
-//			   Additionalinput[iii] || this->AdditionalTransformedInput[iii] ||
-//			   (Additionalinput[iii]->GetMTime() > this->AdditionalTransformedInput[iii]->GetMTime()));//Mehdi
+
 		  tmp = (Additionalinput[iii] != this->AdditionalLastInput[iii]);
 		  if (tmp)
 			  tmp = tmp && Additionalinput[iii];
@@ -633,6 +631,8 @@ int vtkGPUMultiVolumeRayCastMapper::ValidateRender(vtkRenderer *ren,
 			  tmp = tmp && AdditionalTransformedInput[iii];
 		  if (tmp)
 			  tmp = tmp || (Additionalinput[iii]->GetMTime() > this->AdditionalTransformedInput[iii]->GetMTime());//Ole Vegard
+
+		  //tmp=((Additionalinput[iii] != this->AdditionalLastInput[iii]) || (Additionalinput[iii]->GetMTime() > this->AdditionalTransformedInput[iii]->GetMTime()));//Mehdi
 	  }
   }
   // Update the date then make sure we have scalars. Note

@@ -24,6 +24,7 @@
 #include <vtkVolume16Reader.h>
 #include "vtkPiecewiseFunction.h"
 #include "vtkPlanes.h"
+#include "vtkPlane.h"//Mehdi
 #include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -37,7 +38,9 @@
 #include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkTransform.h>
 #include <vtkCallbackCommand.h>//Mehdi
-  
+#include <cstdlib> //Mehdi
+#include <Windows.h> //Mehdi
+
 #define VTI_FILETYPE 1
 #define MHA_FILETYPE 2
 #define V16_FILETYPE 3
@@ -56,19 +59,29 @@ public:
       if (this->Mapper)
         {
         vtkPlanes *planes = vtkPlanes::New();
-        widget->GetPlanes(planes);
-        this->Mapper->SetClippingPlanes(planes);
-        planes->Delete();
+		
+        widget->GetPlanes(planes);		
+        //this->Mapper->SetClippingPlanes(planes);
+		//this->Mapper2->SetClippingPlanes(0,planes);
+		this->Mapper2->AddClippingPlane(0,planes->GetPlane(5));
+		planes->Delete();
+		//printf("\n:-> %f, %f, %f",(plane->GetNormal())[0],(plane->GetNormal())[1],(plane->GetNormal())[2]  );
         }
     }
   void SetMapper(vtkVolumeMapper* m) 
     { this->Mapper = m; }
+  void SetMapper2(vtkOpenGLGPUMultiVolumeRayCastMapper* m) 
+    { this->Mapper2 = m; }
 
 protected:
   vtkBoxWidgetCallback() 
-    { this->Mapper = 0; }
+    { 
+		this->Mapper = 0; 
+		this->Mapper2 = 0; 
+    }
 
   vtkVolumeMapper *Mapper;
+  vtkOpenGLGPUMultiVolumeRayCastMapper *Mapper2;//Mehdi
 };
 
 //------------------------------------------------------------------------------
@@ -77,6 +90,7 @@ protected:
 class vtkTransformBoxWidgetCallback : public vtkCommand
 {
 public:
+
   static vtkTransformBoxWidgetCallback *New(int VolNum) //Mehdi
   { 
 	  return new vtkTransformBoxWidgetCallback(VolNum); //Mehdi
@@ -107,15 +121,32 @@ protected:
   vtkOpenGLGPUMultiVolumeRayCastMapper *Mapper;
 };
 
-
+long unsigned int frameCount=0;
+long double sumFPS=0;
 void CallbackFunction(vtkObject* caller, long unsigned int vtkNotUsed(eventId), void* clientData, void* vtkNotUsed(callData) )
 {
   vtkRenderer* renderer = static_cast<vtkRenderer*>(caller);
- 
+  
   double timeInSeconds = renderer->GetLastRenderTimeInSeconds();
-  double fps = 1.0/timeInSeconds;
+  frameCount++;
+  sumFPS= sumFPS + (1.0/timeInSeconds);
+  /*
+  double fps = sumFPS/(long double)frameCount;
+  
+  #ifdef __linux__
+    std::system ( "clear" );
+  #elif _WIN32 || _WIN64
+    std::system ( "CLS" );
+  #else 
+    std::cerr << "OS not supported" << std::endl;
+  #endif
+  
   std::cout << "FPS: " << fps << std::endl;
- 
+  std::cout << "Frame Count: " << frameCount << std::endl;
+  //std::cout << "Number Of Volumes "<< numberOfAdditionalVolumes+1 << std::endl;
+  std::cout << "Sum fps "<< sumFPS << std::endl;
+  */
+    
 }
 
 
@@ -347,7 +378,7 @@ void ParseArguments(int argc, char *argv[])
 //------------------------------------------------------------------------------
 // CreateTransferFunctions
 //------------------------------------------------------------------------------
-void CreateTransferFunctions( int vol, const VolumeInfo& vi, 
+void CreateTransferFunctions( int vol,const VolumeInfo& vi, 
                               vtkColorTransferFunction* colorFun,                              vtkPiecewiseFunction*     opacityFun,
                               vtkVolumeProperty*        property,
                               vtkOpenGLGPUMultiVolumeRayCastMapper *mapper
@@ -387,20 +418,20 @@ void CreateTransferFunctions( int vol, const VolumeInfo& vi,
     case 2:
 		switch(vol)//Mehdi
 		{
-			case 0:	colorFun->AddRGBSegment(0.0, 0.0, 0.0, 0.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
-			case 1:	colorFun->AddRGBSegment(0.0, 1.0, 0.0, 0.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
-			case 2:	colorFun->AddRGBSegment(0.0, 0.0, 1.0, 0.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
+			case 0:	colorFun->AddRGBSegment(0.0, 1.0, 0.0, 0.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
+			case 1:	colorFun->AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
+			case 2:	colorFun->AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
 			case 3:	colorFun->AddRGBSegment(0.0, 0.0, 0.0, 1.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
 			case 4:	colorFun->AddRGBSegment(0.0, 1.0, 1.0, 0.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
 			case 5:	colorFun->AddRGBSegment(0.0, 0.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
 			case 6:	colorFun->AddRGBSegment(0.0, 1.0, 0.0, 1.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
 			default:colorFun->AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
 		}
+      //colorFun->AddRGBSegment(0.0, 1.0, 0.0, 0.0, 255.0, 1.0, 1.0, 1.0 );//? /*M*/
       opacityFun->AddSegment( vi.opacityLevel - 0.5*vi.opacityWindow, 0.0, 
                               vi.opacityLevel + 0.5*vi.opacityWindow, 1.0 );
       mapper->SetBlendModeToComposite();
       property->ShadeOn();
-
       break;
 
     // CT_Skin
@@ -500,18 +531,26 @@ void CreateTransferFunctions( int vol, const VolumeInfo& vi,
       break;
     }
 }
-
-
+/*
+struct vec3 {
+	float x;
+	float y;
+	float z;
+};
+float findYonPlane(vec3 n, vec3 p0, vec3 point)
+{
+	return   ((n.y*p0.y)-(n.x*(point.x-p0.x))-( n.z*(point.z-p0.z)))/n.y;
+}
+*/
 //------------------------------------------------------------------------------
 // Main
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
-  
+  vtkObject::GlobalWarningDisplayOff();
   // Parse the parameters
   ParseArguments(argc,argv);
 
-  printf("\n%d",numberOfAdditionalVolumes);
 
   // Create the renderer, render window and interactor
   vtkSmartPointer<vtkRenderer>   renderer = vtkRenderer::New();
@@ -656,7 +695,7 @@ int main(int argc, char *argv[])
 
     // Create transfer functions and change properties based on selected
     // options
-    CreateTransferFunctions(vol, vol_info[vol], colorFun[vol], opacityFun[vol], 
+    CreateTransferFunctions(vol,vol_info[vol], colorFun[vol], opacityFun[vol], 
                             property[vol], mapper);
 
     // connect up the volume to the property and the mapper
@@ -671,11 +710,12 @@ int main(int argc, char *argv[])
   
   
   // Add a box widget if the clip option was selected
+  
   vtkSmartPointer<vtkBoxWidget> box = vtkBoxWidget::New();
-  if (clip)
+  if (!clip)
     {
     box->SetInteractor(iren);
-    box->SetPlaceFactor(1.01);
+    box->SetPlaceFactor(1.00);
     if ( vol_info[0].reductionFactor < 1.0 )
       {      
       box->SetInput(resample[0]->GetOutput());
@@ -691,11 +731,13 @@ int main(int argc, char *argv[])
     vtkSmartPointer<vtkBoxWidgetCallback> callback = 
       vtkBoxWidgetCallback::New();
     callback->SetMapper(mapper);
+	callback->SetMapper2(mapper);//Mehdi
     box->AddObserver(vtkCommand::InteractionEvent, callback);
     box->EnabledOn();
     box->GetSelectedFaceProperty()->SetOpacity(0.0);
     }
-
+	
+  /*
   //--------------------------------------------------------------------------------------Mehdi
   // Add a transform box widget if the clip option was not selected
   vtkSmartPointer<vtkBoxWidget> Additionaltransform_box[MAX_NUMBER_OF_ADDITIONAL_VOLUMES];
@@ -724,27 +766,105 @@ int main(int argc, char *argv[])
   Additionaltransform_box[iii]->GetSelectedFaceProperty()->SetOpacity(0.0);
   }
   //--------------------------------------------------------------------------------------Mehdi
-  
+  */
   // Set the default window size
   renWin->SetSize(600,600);
-  renWin->Render();
+
+
+  //renWin->Render();
 
   vtkSmartPointer<vtkInteractorStyleTrackballCamera> interact = 
       vtkInteractorStyleTrackballCamera::New();
+      
   iren->SetInteractorStyle(interact);
-  
   // Add the volume to the scene
   renderer->AddVolume( volume );
   renderer->ResetCamera();
+  /*new*/
+  vtkSmartPointer<vtkCallbackCommand> callbackFrameRate = vtkSmartPointer<vtkCallbackCommand>::New();//Mehdi
+ 
+  callbackFrameRate->SetCallback(CallbackFunction);
+  renderer->AddObserver(vtkCommand::EndEvent, callbackFrameRate);
+  
+ 
+  renderer->GetActiveCamera()->SetViewUp(0,1,0);
+  renderer->GetActiveCamera()->Elevation(-90);
+  renderer->GetActiveCamera()->OrthogonalizeViewUp();
+  
+  
+  vtkPlane* localPlane = vtkPlane::New();
+  double planeOrigin[3]={0.0,0.0,175.0};
+  double planeNormal[3]={0.0,0.0,-1.0};
+  localPlane->SetNormal(planeNormal);
+  localPlane->SetOrigin(planeOrigin);
+  int planeDirection=-1;
+  int rotateDegree=0;
+  int rotateDirection=1;
 
+
+  mapper->AddClippingPlane(0,localPlane);
+  renWin->Render();
+  renWin->Render();
+  Sleep(2000);
+  mapper->AddClippingPlane(1,localPlane);
+  renWin->Render();
+  renWin->Render();
+  Sleep(2000);
+  mapper->RemoveClippingPlane(1);
+  renWin->Render();
+  renWin->Render();
+  Sleep(2000);
+  /*
+  while(true)
+  {
+	if(planeDirection)
+	planeOrigin[2]+=planeDirection;
+	localPlane->SetOrigin(planeOrigin);
+	if (planeOrigin[2]==75) 
+		planeDirection=1;
+	if (planeOrigin[2]==275)
+		planeDirection=-1;
+	mapper->AddClippingPlane(0,localPlane);
+
+	if(rotateDegree==70)
+		rotateDirection=-1;
+	if(rotateDegree==-70)
+		rotateDirection=1;
+	rotateDegree+=rotateDirection;
+		renderer->GetActiveCamera()->Azimuth(rotateDirection);
+	if(rotateDegree==0)
+		Sleep(2000);
+	renWin->Render();
+  }
+  
+	*/
+  
+  
+  /*
+  for (int i = 0; i < 360; i++) 
+  { 
+	renderer->GetActiveCamera()->Azimuth(1);
+	renWin->Render();
+  }
+  */
+   
+  /*new*/
+
+  /*
   vtkSmartPointer<vtkCallbackCommand> callback4 = vtkSmartPointer<vtkCallbackCommand>::New();//Mehdi
  
   callback4->SetCallback(CallbackFunction);
   renderer->AddObserver(vtkCommand::EndEvent, callback4);
-
+*/
   // interact with data
+  
   renWin->Render();
-  iren->Start();
+ // iren->Start();
+  
+  double fps = sumFPS/(long double)frameCount;
+  std::cout << "FPS: " << fps << std::endl;
 
+  printf("\nNumber of Volumes:%i", numberOfAdditionalVolumes+1 );
+  getchar();
   return 0;
 }
