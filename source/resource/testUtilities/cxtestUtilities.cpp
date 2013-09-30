@@ -78,4 +78,43 @@ std::vector<cx::ImagePtr> Utilities::create3DImages(unsigned int count, Eigen::A
 	return retval;
 }
 
+unsigned int Utilities::getNumberOfVoxelsAboveThreshold(vtkImageDataPtr image, int threshold)
+{
+	if (!image)
+		return 0;
+	unsigned char* ptr = reinterpret_cast<unsigned char*>(image->GetScalarPointer());
+	unsigned int pixelCount = 0;
+	for (unsigned i = 0; i < image->GetDimensions()[0]*image->GetDimensions()[1]*image->GetDimensions()[2]; ++i)
+	{
+		if (ptr[i*image->GetNumberOfScalarComponents()] > threshold)
+			++pixelCount;
+	}
+	return pixelCount;
+}
+
+unsigned int Utilities::getNumberOfNonZeroVoxels(vtkImageDataPtr image)
+{
+	return getNumberOfVoxelsAboveThreshold(image, 0);
+//	if (!image)
+//		return 0;
+//	unsigned char* ptr = reinterpret_cast<unsigned char*>(image->GetScalarPointer());
+//	unsigned int pixelCount = 0;
+//	for (unsigned i = 0; i < image->GetDimensions()[0]*image->GetDimensions()[1]; ++i)
+//	{
+//		if (ptr[i*image->GetNumberOfScalarComponents()] != 0)
+//			++pixelCount;
+//	}
+//	return pixelCount;
+}
+
+double Utilities::getFractionOfVoxelsAboveThreshold(vtkImageDataPtr image, int threshold)
+{
+	unsigned int hits = getNumberOfVoxelsAboveThreshold(image, threshold);
+	Eigen::Array3i dim(image->GetDimensions());
+	unsigned int totalPixels = dim[0]*dim[1];
+	if (totalPixels==0)
+		return -1;
+	return double(hits)/double(totalPixels);
+}
+
 } /* namespace cxtest */

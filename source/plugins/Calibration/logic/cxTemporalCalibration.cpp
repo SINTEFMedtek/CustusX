@@ -97,6 +97,7 @@ void correlate(double* x, double* y, double* corr, int maxdelay, int n)
 TemporalCalibration::TemporalCalibration()
 {
 	mAddRawToDebug = false;
+	mMask = vtkImageDataPtr();
 }
 
 void TemporalCalibration::selectData(QString filename)
@@ -431,6 +432,7 @@ std::vector<double> TemporalCalibration::computeProbeMovement()
   double currentMaxShift = 5;
   double lastVal = 0;
 
+	mMask = mFileData.getMask();
   for (int i=0; i<N_frames; ++i)
   {
     double val = this->findCorrelation(mFileData.mUsRaw, 0, i, maxSingleStep, lastVal);
@@ -465,8 +467,8 @@ double TemporalCalibration::findCorrelation(USFrameDataPtr data, int frame_a, in
 
   int dimY = mFileData.mUsRaw->getDimensions()[1];
 
-  vtkImageDataPtr line1 = this->extractLine_y(mFileData.mUsRaw, line_index_x, frame_a);
-  vtkImageDataPtr line2 = this->extractLine_y(mFileData.mUsRaw, line_index_x, frame_b);
+	vtkImageDataPtr line1 = this->extractLine_y(mFileData.mUsRaw, line_index_x, frame_a);
+	vtkImageDataPtr line2 = this->extractLine_y(mFileData.mUsRaw, line_index_x, frame_b);
 
   int N = 2*dimY; //result vector allocate space on both sides of zero
   std::vector<double> result(N, 0);
@@ -504,7 +506,7 @@ vtkImageDataPtr TemporalCalibration::extractLine_y(USFrameDataPtr data, int line
 
   // run the base frame through the mask. Result is source.
   vtkImageMaskPtr maskFilter = vtkImageMaskPtr::New();
-  maskFilter->SetMaskInput(mFileData.mMask->getBaseVtkImageData());
+	maskFilter->SetMaskInput(mMask);
   maskFilter->SetImageInput(base);
   maskFilter->SetMaskedOutputValue(0.0);
   maskFilter->Update();

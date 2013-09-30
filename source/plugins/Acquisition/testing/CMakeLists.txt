@@ -11,10 +11,10 @@ if (BUILD_TESTING)
 		)
 
 
-	QT4_WRAP_CPP( CX_TEST_CATCH_ACQUISITION_SOURCE_FILES
+    set(CX_TEST_CATCH_ACQUISITION_MOC_SOURCE_FILES
 		cxtestUSSavingRecorderFixture.h
 		cxtestAcquisitionFixture.h
-		)
+    )
 	set(CX_TEST_CATCH_ACQUISITION_SOURCE_FILES
 		${CX_TEST_CATCH_ACQUISITION_SOURCE_FILES}
 		cxtestUSSavingRecorder.cpp
@@ -25,6 +25,6 @@ if (BUILD_TESTING)
 		cxtestAcquisition.cpp
 		)
 
-	cx_catch_add_lib_and_exe(cxPluginAcquisition "${CX_TEST_CATCH_ACQUISITION_SOURCE_FILES}")
+	cx_catch_add_lib_and_exe(cxPluginAcquisition "${CX_TEST_CATCH_ACQUISITION_SOURCE_FILES}" "${CX_TEST_CATCH_ACQUISITION_MOC_SOURCE_FILES}")
 
 endif (BUILD_TESTING)

@@ -55,9 +55,6 @@ public:
 	bool findDifference(vtkImageDataPtr input1, vtkImageDataPtr input2);
 	void enterRunLoop();
 	void setImageErrorThreshold(double value);
-	unsigned int getNumberOfPixelsAboveThreshold(vtkImageDataPtr image, int threshold);
-	unsigned int getNumberOfNonZeroPixels(vtkImageDataPtr image);
-	double getFractionOfPixelsAboveThreshold(vtkImageDataPtr image, int threshold);
 
 private:
 	vtkImageDataPtr getImageFromRenderWindow();

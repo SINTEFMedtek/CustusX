@@ -13,14 +13,12 @@ endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)    
 
-	QT4_WRAP_CPP( CX_TEST_PLUGINCALIBRATION_SOURCE_FILES
-		)
 	set(CX_TEST_PLUGINCALIBRATION_SOURCE_FILES
 		${CX_TEST_PLUGINCALIBRATION_SOURCE_FILES}
 		cxtestTemporalCalibration.cpp
 		)
 
-	cx_catch_add_lib_and_exe(cxPluginCalibration "${CX_TEST_PLUGINCALIBRATION_SOURCE_FILES}")
+	cx_catch_add_lib_and_exe(cxPluginCalibration "${CX_TEST_PLUGINCALIBRATION_SOURCE_FILES}" "")
 
 
 endif (BUILD_TESTING)

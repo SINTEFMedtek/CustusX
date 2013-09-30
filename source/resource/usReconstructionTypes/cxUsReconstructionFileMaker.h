@@ -66,7 +66,7 @@ private:
 	bool writeTrackerTimestamps(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts);
 	void writeProbeConfiguration(QString reconstructionFolder, QString session, ProbeData data, QString uid);
 	void writeUSImages(QString path, ImageDataContainerPtr images, bool compression, std::vector<TimedPosition> pos);
-	void writeMask(QString path, QString session, ImagePtr mask);
+	void writeMask(QString path, QString session, vtkImageDataPtr mask);
 	void writeREADMEFile(QString reconstructionFolder, QString session);
 
 	bool writeTransforms(QString filename, std::vector<TimedPosition> ts, QString type);
