@@ -338,7 +338,7 @@ void RenderTester::printFractionOfVoxelsAboveZero(QString desc, vtkImageDataPtr 
 	double fraction = Utilities::getFractionOfVoxelsAboveThreshold(image, 0);
 	std::cout << QString("%1 nonzero amount: %2").arg(desc).arg(fraction) << std::endl;
 
-	QString path = cxtest::Utilities::getDataRoot("temp/"+desc+".png");
+	QString path = cxtest::Utilities::getDataRoot("/"+desc+".png");
 	this->writeToPNG(image, path);
 	std::cout << QString("Save image to %1").arg(path) << std::endl;
 }
