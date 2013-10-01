@@ -73,8 +73,9 @@ class CustusXTestInstallation:
         'path to binary files / executables in install'
         if platform.system() == 'Darwin':
             retval = '%s/CustusX/CustusX.app/Contents/MacOS' % self.install_root
-        if platform.system() == 'Linux':
+        if (platform.system() == 'Linux') or (platform.system() == 'Windows') :
             retval = '%s/CustusX/bin' % self.install_root
+
         return retval        
 
     def _testExecutable(self, path, filename, arguments=''):
