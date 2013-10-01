@@ -56,6 +56,7 @@ public:
 	bool quickRunWidget();
 
 	double getFractionOfBrightPixelsInView(int viewIndex, int threshold);
+	void dumpDebugViewToDisk(QString text, int viewIndex);
 
 private:
 	void applyParameters(cx::ImagePtr image, const ImageParameters* parameters);

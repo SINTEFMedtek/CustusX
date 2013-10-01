@@ -55,16 +55,16 @@ public:
 	bool findDifference(vtkImageDataPtr input1, vtkImageDataPtr input2);
 	void enterRunLoop();
 	void setImageErrorThreshold(double value);
+	void printFractionOfVoxelsAboveZero(QString desc, vtkImageDataPtr image);
+	vtkImageDataPtr getImageFromRenderWindow();
 
 private:
-	vtkImageDataPtr getImageFromRenderWindow();
 	void writeToPNG(vtkImageDataPtr image, QString filename);
 	vtkImageDataPtr clipImage(vtkImageDataPtr input);
 	bool equalExtent(vtkImageDataPtr input1, vtkImageDataPtr input2);
 	bool hasValidDimensions(vtkImageDataPtr input);
 	vtkImageDataPtr convertToColorImage(vtkImageDataPtr image);
 	bool equalNumberOfComponents(vtkImageDataPtr image1, vtkImageDataPtr image2);
-	void printFractionOfVoxelsAboveZero(QString desc, vtkImageDataPtr image);
 
 	//	ViewWidget* mView;
 	vtkRenderWindowPtr mRenderWindow;
