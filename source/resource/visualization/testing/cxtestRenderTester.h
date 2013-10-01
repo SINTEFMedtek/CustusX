@@ -64,6 +64,7 @@ private:
 	bool hasValidDimensions(vtkImageDataPtr input);
 	vtkImageDataPtr convertToColorImage(vtkImageDataPtr image);
 	bool equalNumberOfComponents(vtkImageDataPtr image1, vtkImageDataPtr image2);
+	void printFractionOfVoxelsAboveZero(QString desc, vtkImageDataPtr image);
 
 	//	ViewWidget* mView;
 	vtkRenderWindowPtr mRenderWindow;
