@@ -22,26 +22,6 @@
 
 #ifdef CX_WINDOWS
 #include <windows.h>
-
-//Returns the last Win32 error, in string format. Returns an empty string if there is no error.
-std::string GetLastErrorAsString()
-{
-    //Get the error message, if any.
-    DWORD errorMessageID = ::GetLastError();
-    if(errorMessageID == 0)
-        return "No error message has been recorded";
-
-    LPSTR messageBuffer = nullptr;
-    size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                                 NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), messageBuffer, 0, NULL);
-
-    std::string message(messageBuffer, size);
-
-    //Free the buffer.
-    LocalFree(messageBuffer);
-
-    return message;
-}
 #endif
 
 int main(int argc, char *argv[])
@@ -52,11 +32,6 @@ int main(int argc, char *argv[])
 #endif
 
 	int retval = cxtest::CatchImpl().run(argc, argv);
-
-#ifdef CX_WINDOWS
-	std::string error_msg = GetLastErrorAsString();
-	std::cout << "WINDOWS ERROR: " << error_msg << std::endl;
-#endif
 
 	return retval;
 }
