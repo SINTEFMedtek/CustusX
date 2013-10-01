@@ -24,7 +24,7 @@ findClosePlanes(close_plane_t *close_planes,
 	return 0;
 }
 
-float
+unsigned char
 performInterpolation(close_plane_t *close_planes,
                      int n_close_planes,
                      __global unsigned char* bscans_blocks[])
@@ -35,44 +35,44 @@ performInterpolation(close_plane_t *close_planes,
 
 __kernel void
 voxel_methods(int volume_xsize,
-                            int volume_ysize,
-                            int volume_zsize,
-                            int in_xsize,
-                            int in_ysize,
-                            int n_planes,
-                            __global unsigned char* in_bscans_b0,
-                            __global unsigned char* in_bscans_b1,
-                            __global unsigned char* in_bscans_b2,
-                            __global unsigned char* in_bscans_b3,
-                            __global unsigned char* in_bscans_b4,
-                            __global unsigned char* in_bscans_b5,
-                            __global unsigned char* in_bscans_b6,
-                            __global unsigned char* in_bscans_b7,
-                            __global unsigned char* in_bscans_b8,
-                            __global unsigned char* in_bscans_b9,
-                            __global float* out_volume,
-                            __global float4* plane_eqs,
-                            __global float4* plane_corners,
-                            float radius,
-                            int method
+              int volume_ysize,
+              int volume_zsize,
+              int in_xsize,
+              int in_ysize,
+              int n_planes,
+              __global unsigned char* in_bscans_b0,
+              __global unsigned char* in_bscans_b1,
+              __global unsigned char* in_bscans_b2,
+              __global unsigned char* in_bscans_b3,
+              __global unsigned char* in_bscans_b4,
+              __global unsigned char* in_bscans_b5,
+              __global unsigned char* in_bscans_b6,
+              __global unsigned char* in_bscans_b7,
+              __global unsigned char* in_bscans_b8,
+              __global unsigned char* in_bscans_b9,
+              __global unsigned char* out_volume,
+              __global float4* plane_eqs,
+              __global float4* plane_corners,
+              float radius,
+              int method
 	)
 {
 	int id = get_global_id(0);
-	int x = id / volume_xsize;
-	int z = id % volume_xsize;
+	int x = id % volume_xsize;
+	int z = id / volume_xsize;
 
 	// Aggregate pointers to the bscan blocks into one array for convenience
 	
 	__global unsigned char *bscans_blocks[] = { in_bscans_b0,
-	                                   in_bscans_b1,
-	                                   in_bscans_b2,
-	                                   in_bscans_b3,
-	                                   in_bscans_b4,
-	                                   in_bscans_b5,
-	                                   in_bscans_b6,
-	                                   in_bscans_b7,
-	                                   in_bscans_b8,
-	                                   in_bscans_b9 };
+	                                            in_bscans_b1,
+	                                            in_bscans_b2,
+	                                            in_bscans_b3,
+	                                            in_bscans_b4,
+	                                            in_bscans_b5,
+	                                            in_bscans_b6,
+	                                            in_bscans_b7,
+	                                            in_bscans_b8,
+	                                            in_bscans_b9 };
 	                             
 	// Return if x/z is invalid
 	
@@ -94,6 +94,8 @@ voxel_methods(int volume_xsize,
 		
 		// Call appropriate method to determine pixel value
 		VOXEL(out_volume,x,y,z) = performInterpolation(close_planes, n_close_planes, bscans_blocks);
+		//VOXEL(out_volume, x, y, z) = ((float)z/(float)volume_zsize) * 255;
+		//VOXEL(out_volume, x,y,z) = 1;
 		
 	}
 }
