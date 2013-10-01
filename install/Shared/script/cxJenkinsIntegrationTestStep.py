@@ -78,7 +78,11 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         custusx = assembly.getComponent(cx.cxComponents.CustusX3)
         
         self.cxInstaller.setRootDir(assembly.controlData.getRootDir())
-        self.cxInstaller.setInstallerPath(custusx.buildPath())
+        if platform.system() == 'Windows':
+            #path is not correct for 32bit builds
+            self.cxInstaller.setInstallerPath('%s\\_CPack_Packages\\win64\\NSIS' % custusx.buildPath())
+        else:
+            self.cxInstaller.setInstallerPath(custusx.buildPath())
             
         self.cxInstaller.setSourcePath(custusx.sourcePath())        
 
