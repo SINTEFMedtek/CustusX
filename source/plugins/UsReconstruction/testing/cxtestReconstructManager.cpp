@@ -61,7 +61,6 @@ public:
 	void testThunderGPUReconstruction();///< Test Thunder GPU reconstruction
 	void testDualAngio();
 	void testTordTest(); // Test Tord GPU VNN implementation
-private:
 	cx::ReconstructManagerPtr createManager();
 
 private:
