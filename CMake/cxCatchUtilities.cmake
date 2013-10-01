@@ -56,7 +56,7 @@ endmacro()
 ###############################################################################
 function(cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES)
 	set(ADDITIONAL_LIBS ${ARGV3}) # emulating optional argument
-message(STATUS "========= " ${ADDITIONAL_LIBS} )
+#message(STATUS "========= " ${ADDITIONAL_LIBS} )
 
     if(CX_WINDOWS)
 		_cx_catch_save_info_in_globals(${LIB_TO_TEST} "${SOURCES}" "${MOC_SOURCES}" "${ADDITIONAL_LIBS}")
@@ -172,6 +172,24 @@ function(_cx_catch_save_info_in_globals LIB_TO_TEST SOURCES MOC_SOURCES ADDITION
 endfunction()
 
 ###############################################################################
+#
+# Replacement for add_library().
+# Usage: cx_add_test_library(LIB_NAME source1 source2 ...)
+#
+# Creates a library that can be used within the catch framework.
+# I.e, it is created statically if needed and catch tests can thus
+# be found by the exe.
+#
+###############################################################################
+macro(cx_add_test_library LIB_NAME)
+    set(SOURCE_FILES ${ARGV})
+    list(REMOVE_AT SOURCE_FILES 0) # SOURCE_FILES is now all but the first argument
+    cx_catch__private_define_platform_specific_linker_options()
+    add_library(${LIB_NAME} ${CX_CATCH_SHARED_LIB_TYPE} ${SOURCE_FILES})
+endmacro()
+
+
+###############################################################################
 # PRIVATE:
 # Create testing lib and small catch executable for the incoming lib.
 ###############################################################################
@@ -187,7 +205,9 @@ function(_cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES ADDITIONAL_LI
 
     QT4_WRAP_CPP(MOCCED ${MOC_SOURCES})
 
-    add_library(${TEST_LIB_NAME} ${CX_CATCH_SHARED_LIB_TYPE} ${SOURCES} ${MOCCED})
+
+    cx_add_test_library(${TEST_LIB_NAME} ${SOURCES} ${MOCCED})
+#    add_library(${TEST_LIB_NAME} ${CX_CATCH_SHARED_LIB_TYPE} ${SOURCES} ${MOCCED})
     message(STATUS "          Lib name : ${TEST_LIB_NAME}")
 	target_link_libraries(${TEST_LIB_NAME} ${LIB_TO_TEST} cxtestUtilities ${ADDITIONAL_LIBS})
     
