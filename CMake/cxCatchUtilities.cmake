@@ -55,11 +55,13 @@ endmacro()
 #
 ###############################################################################
 function(cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES)
-    
+	set(ADDITIONAL_LIBS ${ARGV3}) # emulating optional argument
+message(STATUS "========= " ${ADDITIONAL_LIBS} )
+
     if(CX_WINDOWS)
-        _cx_catch_save_info_in_globals(${LIB_TO_TEST} "${SOURCES}" "${MOC_SOURCES}")
+		_cx_catch_save_info_in_globals(${LIB_TO_TEST} "${SOURCES}" "${MOC_SOURCES}" "${ADDITIONAL_LIBS}")
     else()
-        _cx_catch_add_lib_and_exe(${LIB_TO_TEST} "${SOURCES}" "${MOC_SOURCES}")
+		_cx_catch_add_lib_and_exe(${LIB_TO_TEST} "${SOURCES}" "${MOC_SOURCES}" "${ADDITIONAL_LIBS}")
     endif()
 
 endfunction()
@@ -81,7 +83,7 @@ function(cx_catch_add_master_exe)
     set(cxtest_MAIN ${CustusX3_SOURCE_DIR}/source/resource/testUtilities/cxtestCatchMain.cpp)
 
     if(CX_WINDOWS)
-        _cx_catch_generate_master_catch_using_sources(${TEST_EXE_NAME} ${cxtest_MAIN})
+		_cx_catch_generate_master_catch_using_sources(${TEST_EXE_NAME} ${cxtest_MAIN})
     else()
         _cx_catch_generate_master_catch_using_libs(${TEST_EXE_NAME} ${cxtest_MAIN})
     endif()
@@ -127,7 +129,7 @@ endfunction()
 # Save needed information about source files to be able to add them to
 # a master Catch.
 ###############################################################################
-function(_cx_catch_save_info_in_globals LIB_TO_TEST SOURCES MOC_SOURCES)
+function(_cx_catch_save_info_in_globals LIB_TO_TEST SOURCES MOC_SOURCES ADDITIONAL_LIBS)
     foreach( SOURCE_FILE ${MOC_SOURCES})
         cx_make_path_absolute(${SOURCE_FILE} RESULT)
         set(ABS_MOC_SOURCES
@@ -163,6 +165,7 @@ function(_cx_catch_save_info_in_globals LIB_TO_TEST SOURCES MOC_SOURCES)
      set(CX_TEST_CATCH_LINKER_LIBS
         "${CX_TEST_CATCH_LINKER_LIBS}"
         ${LIB_TO_TEST}
+		${ADDITIONAL_LIBS}
         CACHE INTERNAL
         "List of all libraries Catch needs to link to."
         )
@@ -172,9 +175,8 @@ endfunction()
 # PRIVATE:
 # Create testing lib and small catch executable for the incoming lib.
 ###############################################################################
-function(_cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES)
+function(_cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES ADDITIONAL_LIBS)
     message(STATUS "Adding catch test targets based on: ${LIB_TO_TEST}")
-    
     include_directories(
         .
         ${CustusX3_SOURCE_DIR}/source/resource/testUtilities
@@ -187,7 +189,7 @@ function(_cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES)
 
     add_library(${TEST_LIB_NAME} ${CX_CATCH_SHARED_LIB_TYPE} ${SOURCES} ${MOCCED})
     message(STATUS "          Lib name : ${TEST_LIB_NAME}")
-    target_link_libraries(${TEST_LIB_NAME} ${LIB_TO_TEST} cxtestUtilities )
+	target_link_libraries(${TEST_LIB_NAME} ${LIB_TO_TEST} cxtestUtilities ${ADDITIONAL_LIBS})
     
     set(CX_TEST_CATCH_GENERATED_LIBRARIES
         "${TEST_LIB_NAME}" "${CX_TEST_CATCH_GENERATED_LIBRARIES}"
