@@ -7,11 +7,15 @@ if (BUILD_TESTING)
    #     sscContainerWindow.cpp
    #     sscTestViewContainer.cpp
    #     sscTestGPURayCaster.cpp
-	cx_add_class(RESOURCE_VISUALZATION_TEST_UTILITIES_SOURCE_FILES
+#        cx_catch__private_define_platform_specific_linker_options()
+        cx_add_class(RESOURCE_VISUALZATION_TEST_UTILITIES_SOURCE_FILES
 		cxtestRenderTester
 		)
-	add_library(cxResourceVisualizationTestUtilities ${RESOURCE_VISUALZATION_TEST_UTILITIES_SOURCE_FILES})
-	target_link_libraries(cxResourceVisualizationTestUtilities cxResourceVisualization cxtestUtilities)
+#        add_library(cxResourceVisualizationTestUtilities ${CX_CATCH_SHARED_LIB_TYPE} ${RESOURCE_VISUALZATION_TEST_UTILITIES_SOURCE_FILES})
+#        target_link_libraries(cxResourceVisualizationTestUtilities cxResourceVisualization cxtestUtilities)
+
+        cx_add_test_library(cxResourceVisualizationTestUtilities ${RESOURCE_VISUALZATION_TEST_UTILITIES_SOURCE_FILES})
+        target_link_libraries(cxResourceVisualizationTestUtilities cxResourceVisualization cxtestUtilities)
 
 
 	set(CXTEST_SOURCES_TO_MOC
