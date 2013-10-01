@@ -236,6 +236,8 @@ class CustusXInstaller:
             return 'dmg'
         if platform.system() == 'Linux':
             return 'tar.gz'
+        if platform.system() == 'Windows':
+            return 'exe'
         cxUtilities.assertTrue(False, 'suffix not found for OS=%s' % platform.system())
 
     def _installLinuxZip(self, filename):
