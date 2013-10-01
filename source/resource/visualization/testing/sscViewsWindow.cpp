@@ -304,13 +304,19 @@ void ViewsWindow::prettyZoom(cx::View *view)
 	camera->SetParallelScale(parallelscale);
 }
 
+void ViewsWindow::dumpDebugViewToDisk(QString text, int viewIndex)
+{
+	cxtest::RenderTesterPtr renderTester = cxtest::RenderTester::create(mLayouts[viewIndex]->getRenderWindow());
+	vtkImageDataPtr output = renderTester->getImageFromRenderWindow();
+	renderTester->printFractionOfVoxelsAboveZero(text, output);
+}
+
 double ViewsWindow::getFractionOfBrightPixelsInView(int viewIndex, int threshold)
 {
 	cxtest::RenderTesterPtr renderTester = cxtest::RenderTester::create(mLayouts[viewIndex]->getRenderWindow());
 	vtkImageDataPtr output = renderTester->renderToImage();
 	return cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, threshold);
 	//	std::cout << "numNonZeroPixels: " << numNonZeroPixels << std::endl;
-
 }
 
 bool ViewsWindow::runWidget()
