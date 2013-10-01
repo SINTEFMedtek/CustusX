@@ -22,7 +22,8 @@
 if (BUILD_TESTING)
     include_directories(
         ${CustusX3_SOURCE_DIR}/source/ThirdParty/VTKMultiVolume
-        )
+		${CustusX3_SOURCE_DIR}/source/resource/visualization/testing
+		)
 
     cx_add_class(CX_CPPUNIT_VISUALIZATIONSERVICE_SOURCES
         cxtestCatchMultiVolume3DRepProducer.cpp
@@ -35,7 +36,11 @@ if (BUILD_TESTING)
         cxTestRenderSpeed.cpp
         )
 
-    cx_catch_add_lib_and_exe(cxVisualizationService "${CX_CPPUNIT_VISUALIZATIONSERVICE_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
+	cx_catch_add_lib_and_exe(cxVisualizationService
+		"${CX_CPPUNIT_VISUALIZATIONSERVICE_SOURCES}"
+		"${CXTEST_SOURCES_TO_MOC}"
+		"cxResourceVisualizationTestUtilities")
+
 
 
 endif (BUILD_TESTING)
