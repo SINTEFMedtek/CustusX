@@ -33,6 +33,7 @@
 #include "sscUSFrameData.h"
 #include "sscDummyTool.h"
 #include "cxImageDataContainer.h"
+#include "cxUsReconstructionFileMaker.h"
 
 namespace cxtest
 {
@@ -391,6 +392,20 @@ TEST_CASE("ReconstructManager: TordTest", "[usreconstruction][integration][tordt
 	fixture.testTordTest();
 }
 
+void drawLineInImage(vtkImageDataPtr image, int value)
+{
+	unsigned char *imagePointer = static_cast<unsigned char*>(image->GetScalarPointer());
+	unsigned int xDim = image->GetDimensions()[0];
+	unsigned int yDim = image->GetDimensions()[1];
+	unsigned int numFrames = image->GetDimensions()[2];
+	for (unsigned i=0; i < numFrames; ++i)
+	{
+		unsigned int x = i%xDim;
+		unsigned y = i%yDim;
+		imagePointer[x + y*xDim + i*xDim*yDim] = value;
+	}
+}
+
 cx::USReconstructInputData generateSyntheticUSBMode()
 {
 	cx::USReconstructInputData retval;
@@ -399,6 +414,16 @@ cx::USReconstructInputData generateSyntheticUSBMode()
 	unsigned numFrames = 10;
 	unsigned dim = 5;
 	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(dim,dim,numFrames), 100);
+
+	drawLineInImage(image->getBaseVtkImageData(), 200);
+
+//	cx::cxDataManager::initialize();
+//	cx::DataLocations::setTestMode();
+//	image->setFilePath("test.mhd");
+//	cx::dataManager()->saveImage(image, cx::DataLocations::getTestDataPath());
+//	std::cout << "Saved input test file to: " << cx::DataLocations::getTestDataPath() << "/" << image->getFilePath() << std::endl;
+//	cx::DataManager::shutdown();
+
 	cx::USFrameDataPtr us;
 	us = cx::USFrameData::create(image);
 	cx::ImageDataContainerPtr images = us->getImageContainer();
@@ -410,21 +435,21 @@ cx::USReconstructInputData generateSyntheticUSBMode()
 	for (unsigned i=0; i < numFrames; ++i)
 	{
 		cx::TimedPosition frame;
-//		cx::Transform3D transform = cx::Transform3D::Identity();
-		cx::Transform3D transform = cx::createTransformTranslate(cx::Vector3D(i,0, 0));
+		//Need to move along the x-axis. See sscTool.h
+		cx::Transform3D transform = cx::createTransformTranslate(cx::Vector3D(i, 0, 0));
+//		std::cout << "transform: " << transform << std::endl;
 		frame.mTime = i;
 		frame.mPos = transform;
-		retval.mFrames.push_back(frame);
 		retval.mPositions.push_back(frame);
+		retval.mFrames.push_back(frame);
 
-		unsigned char *imagePointer = static_cast<unsigned char*>(images->get(i)->GetScalarPointer());
-		unsigned int x = i%dim;
-		unsigned y = i%dim;
-		imagePointer[x+y*dim] = 200;
+		//TODO: Make sure retval.mFrames have correct values
+//		cx::USReconstructInputDataAlgorithm::interpolateFramePositionsFromTracking(&retval);
+		cx::USReconstructInputDataAlgorithm::transformFramePositionsTo_rMu(&retval);
 	}
 
 	cx::ProbeSector probeSector;
-	cx::ProbeData probeData = cx::DummyToolTestUtilities::createProbeDataLinear();
+	cx::ProbeData probeData = cx::DummyToolTestUtilities::createProbeDataLinear(dim, dim, Eigen::Array2i(dim, dim));
 	probeSector.setData(probeData);
 	retval.mProbeData = probeSector;
 
@@ -457,11 +482,19 @@ TEST_CASE("ReconstructManager: B-Mode with synthetic data", "[usreconstruction][
 	cx::ImagePtr output = cores[0]->getOutput();
 
 	REQUIRE(output);
-//	std::cout << "dims: " << Eigen::Array3i(output->getBaseVtkImageData()->GetDimensions()) << std::endl;
-//	std::cout << "Num not zero voxels: " << Utilities::getNumberOfVoxelsAboveThreshold(output->getBaseVtkImageData(), 1) << std::endl;
+	std::cout << "dims: " << Eigen::Array3i(output->getBaseVtkImageData()->GetDimensions()) << std::endl;
+	std::cout << "Num not zero voxels: " << Utilities::getNumberOfVoxelsAboveThreshold(output->getBaseVtkImageData(), 1) << std::endl;
+	std::cout << "Num mid intensity voxels: " << Utilities::getNumberOfVoxelsAboveThreshold(output->getBaseVtkImageData(), 99) << std::endl;
+	std::cout << "Num high intensity voxels: " << Utilities::getNumberOfVoxelsAboveThreshold(output->getBaseVtkImageData(), 199) << std::endl;
 
 //	cx::cxDataManager::initialize();
 //	cx::DataLocations::setTestMode();
+
+//	cx::UsReconstructionFileMakerPtr fileMaker;
+//	fileMaker.reset(new cx::UsReconstructionFileMaker("testFile"));
+//	fileMaker->setReconstructData(inputData);
+//	fileMaker->writeToNewFolder(cx::DataLocations::getTestDataPath() ,false);
+
 //	cx::dataManager()->saveImage(output, cx::DataLocations::getTestDataPath());
 //	std::cout << "Saved test file to: " << cx::DataLocations::getTestDataPath() << "/" << output->getFilePath() << std::endl;
 //	cx::DataManager::shutdown();
