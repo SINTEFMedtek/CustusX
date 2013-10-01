@@ -337,11 +337,31 @@ void ReconstructManagerTestFixture::testDualAngio()
 
 void ReconstructManagerTestFixture::testTordTest()
 {
+
+	QString filename = cx::DataLocations::getTestDataPath() +
+			"/testing/"
+			"2012-10-24_12-39_Angio_i_US3.cx3/US_Acq/US-Acq_03_20121024T132330.mhd";
+
 	cx::ReconstructManagerPtr reconstructer = this->createManager();
+	reconstructer->selectData(filename);
 	reconstructer->getParams()->mAlgorithmAdapter->setValue("TordTest");
+	reconstructer->getParams()->mAngioAdapter->setValue(false);
+	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
+
+	// set an algorithm-specific parameter
 	boost::shared_ptr<cx::TordTest> algorithm;
 	algorithm = boost::dynamic_pointer_cast<cx::TordTest>(reconstructer->createAlgorithm());
-	REQUIRE(algorithm);
+	REQUIRE(algorithm);// Check if we got the algorithm
+
+	// run the reconstruction in the main thread
+	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
+	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
+	REQUIRE(cores.size()==1);
+	preprocessor->initializeCores(cores);
+	cores[0]->reconstruct();
+	
+	// check validity of output:
+	this->validateBModeData(cores[0]->getOutput());
 }
 
 TEST_CASE("ReconstructManager: Slerp Interpolation", "[usreconstruction][unit]")
