@@ -22,6 +22,7 @@
 
 #ifdef CX_WINDOWS
 #include <windows.h>
+#endif
 
 int main(int argc, char *argv[])
 {
