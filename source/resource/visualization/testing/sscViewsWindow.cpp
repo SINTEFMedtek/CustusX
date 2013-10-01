@@ -320,7 +320,9 @@ bool ViewsWindow::runWidget()
 
 bool ViewsWindow::quickRunWidget()
 {
-	return this->runWidget(30);
+	this->show();
+	this->updateRender();
+	return true;
 }
 
 /**show/render/execute input widget.
