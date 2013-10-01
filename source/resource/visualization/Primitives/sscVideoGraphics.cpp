@@ -78,6 +78,7 @@ VideoGraphics::VideoGraphics()
 	mPlaneActor->SetMapper(mDataSetMapper);
 	mPlaneActor->SetVisibility(false);
 	mPlaneActor->GetProperty()->LightingOff();	// Turning off lighting to remove shadow effects (Fix for #644: 2D ultrasound in 3D scene was too dark)
+//	mPlaneActor->GetProperty()->ShadingOff();
 }
 
 VideoGraphics::~VideoGraphics()
