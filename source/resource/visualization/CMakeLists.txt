@@ -58,7 +58,6 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	Primitives/sscSlicePlaneClipper
 	Primitives/sscToolTracer
     Primitives/cxVolumeProperty
-    Primitives/cxtestRenderTester
 	Primitives/sscVideoSourceGraphics
 
 	RepVideo/sscVideoRep

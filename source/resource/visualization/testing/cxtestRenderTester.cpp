@@ -31,7 +31,7 @@
 #include "sscView.h"
 #include "sscTypeConversions.h"
 #include "sscDataReaderWriter.h"
-
+#include "cxtestUtilities.h"
 
 typedef vtkSmartPointer<class vtkProp> vtkPropPtr;
 typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;
@@ -318,8 +318,30 @@ bool RenderTester::findDifference(vtkImageDataPtr input1, vtkImageDataPtr input2
 		return false;
 	}
 
-	std::cout << QString("Image difference=%1, threshold=%2").arg(minError).arg(mImageErrorThreshold) << std::endl;
-	return minError < mImageErrorThreshold;
+	bool success = minError < mImageErrorThreshold;
+
+	if (!success)
+	{
+		std::cout << QString("Image difference=%1, threshold=%2").arg(minError).arg(mImageErrorThreshold) << std::endl;
+
+		this->printFractionOfVoxelsAboveZero("Input1", input1);
+		this->printFractionOfVoxelsAboveZero("Input2", input2);
+		this->printFractionOfVoxelsAboveZero("Clipped1", clipped1);
+		this->printFractionOfVoxelsAboveZero("Clipped2", clipped2);		
+	}
+
+	return success;
 }
+
+void RenderTester::printFractionOfVoxelsAboveZero(QString desc, vtkImageDataPtr image)
+{
+	double fraction = Utilities::getFractionOfVoxelsAboveThreshold(image, 0);
+	std::cout << QString("%1 nonzero amount: %2").arg(desc).arg(fraction) << std::endl;
+
+	QString path = cxtest::Utilities::getDataRoot("temp/"+desc+".png");
+	this->writeToPNG(image, path);
+	std::cout << QString("Save image to %1").arg(path) << std::endl;
+}
+
 
 } // namespace cxtest
