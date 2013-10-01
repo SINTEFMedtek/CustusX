@@ -62,6 +62,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 //	REQUIRE(this->runWidget());
 	REQUIRE(this->quickRunWidget());
 
+	this->dumpDebugViewToDisk("emptyview", 0);
 	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) == Approx(0));
 }
 
