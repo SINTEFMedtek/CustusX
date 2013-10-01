@@ -33,14 +33,32 @@ public:
 	                         vtkImageDataPtr outputData,
 	                         QDomElement settings);
 
+	typedef struct __frameBlock_t
+	{
+		unsigned char* data;
+		size_t length;
+	} frameBlock_t;
+
 protected:
 	
-	virtual bool initCL(QString kernel_file);
+	virtual bool initCL(QString kernelFile);
 	virtual bool doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                              vtkImageDataPtr outputData);
-	virtual bool initializeFrameBlocks(unsigned char** framePointers,
+
+	/**
+	 * Split the US input into numBlock blocks of whole frames 
+	 * and store them in framePointers.
+	 * \param[out] framePointers Pre-allocated array of numBlocks unsigned char* pointers
+	 *             Data will be returned here
+	 * \param[in] numBlocks Number of blocks to split US input into
+	 * \param[in] inputFrames The input US B-scans
+	 * \return true on success, false otherwise
+	 */
+	virtual bool initializeFrameBlocks(frameBlock_t* framePointers,
 	                                   int numBlocks,
-	                                   ProcessedUSInputDataPtr input_frames);
+	                                   ProcessedUSInputDataPtr inputFrames);
+	virtual void freeFrameBlocks(frameBlock_t* framePointers,
+	                             int numBlock);
 
 	/// OpenCL handles
 	cl_kernel mClKernel;
@@ -49,6 +67,7 @@ protected:
 	ocl_context* moClContext;
 	
 };
+
 
 }
 		
