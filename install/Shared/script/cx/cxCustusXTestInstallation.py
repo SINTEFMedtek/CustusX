@@ -93,6 +93,8 @@ class CustusXTestInstallation:
         Run the given application for a short time, as a quick verification.
         The stdout is not redirected here, i.e. it might be mangled with the python output.
         '''
+        if(platform.system() == 'Windows'):
+            application = application.replace("\\", "/")
         PrintFormatter.printInfo('Running application %s' % application)
         startTime = time.time()
         # On linux, cannot run from shell (http://stackoverflow.com/questions/4789837/how-to-terminate-a-python-subprocess-launched-with-shell-true)
