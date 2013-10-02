@@ -223,10 +223,11 @@ class CustusXInstaller:
         cxUtilities.assertTrue(False, 'suffix not found for OS=%s' % platform.system())
         
     def _installWindowsNSISExe(self, filename):
-        installfolder = '%s' % self.install_root
+        installfolder = '%\CustusX' % self.install_root
+        installFolder = installFolder.replace("\\", "/")
         shell.changeDir(installfolder)
         shell.run('%s /S /D=%s' % (filename, installfolder))
-        PrintFormatter.printInfo('Installed \n\t%s\nto folder \n\t%s ' % (filename, installfolder))
+        PrintFormatter.printInfo('Installed \n\t%s\nto folder \n\t%s ' % (filename, self.install_root))
 
     def _installLinuxZip(self, filename):
         temp_path = '%s/temp/Install' % self.root_dir
