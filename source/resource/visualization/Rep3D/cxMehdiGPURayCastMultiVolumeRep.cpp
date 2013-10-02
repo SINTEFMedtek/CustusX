@@ -80,16 +80,16 @@ void MehdiGPURayCastMultiVolumeRepImageMapperMonitor::applyClipping()
 
 void MehdiGPURayCastMultiVolumeRepImageMapperMonitor::applyCropping()
 {
-	messageManager()->sendWarning("Multivolume Cropping not implemented");
-//		vtkVolumeMapperPtr mapper = this->getMapper();
-//		if (!mapper)
-//			return;
-//		mapper->SetCropping(mImage->getCropping());
+	vtkOpenGLGPUMultiVolumeRayCastMapperPtr mapper = this->getMehdiMapper();
+	if (!mapper)
+		return;
 
-//		DoubleBoundingBox3D bb_d = mImage->getCroppingBox();
+	mapper->SetCropping(mVolumeIndex, mImage->getCropping());
 
-//		mapper->SetCroppingRegionPlanes(bb_d.begin());
-//		mapper->Update();
+	DoubleBoundingBox3D bb_d = mImage->getCroppingBox();
+
+	mapper->SetCroppingRegionPlanes(mVolumeIndex, bb_d.begin());
+	mapper->Update();
 }
 
 
@@ -122,7 +122,6 @@ MehdiGPURayCastMultiVolumeRep::MehdiGPURayCastMultiVolumeRep() :
 void MehdiGPURayCastMultiVolumeRep::addRepActorsToViewRenderer(View* view)
 {
 	view->getRenderer()->AddVolume(mVolume);
-//	view->getRenderer()->Render();
 }
 
 void MehdiGPURayCastMultiVolumeRep::removeRepActorsFromViewRenderer(View* view)
