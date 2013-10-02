@@ -6,6 +6,7 @@
 #include <Thunder/utils.h>
 #include <recConfig.h>
 #include <sscUSFrameData.h>
+
 namespace cx
 {
 
@@ -145,33 +146,37 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	// FIXME: Fill plane eqs
 	size_t nPlanes = input->getDimensions()[2];
 
-	float *planeEqs = new float[nPlanes];
-	float *planeCorners = new float[nPlanes];
-	memset(planeEqs, 0, nPlanes*sizeof(float));
-	memset(planeCorners, 0, nPlanes*sizeof(float));
+	float *planeEqs = new float[nPlanes*4];
+	float *planeCorners = new float[nPlanes*9];
 
+	this->fillPlaneEqs(planeEqs, input);
+	this->fillPlaneCorners(planeCorners, input);
+	messageManager()->sendInfo(QString("Allocating buffer for plane equations, %1 floats").arg(nPlanes*4));
 	cl_mem clPlaneEqs = ocl_create_buffer(moClContext->context,
 	                                      CL_MEM_READ_ONLY,
-	                                      nPlanes*sizeof(float),
+	                                      nPlanes*sizeof(float)*4,
 	                                      planeEqs);
-	
+	messageManager()->sendInfo(QString("Allocating buffer for plane corners, %1 floats").arg(nPlanes*9));
 	cl_mem clPlaneCorners = ocl_create_buffer(moClContext->context,
 	                                      CL_MEM_READ_ONLY,
-	                                      nPlanes*sizeof(float),
+	                                      nPlanes*sizeof(float)*9,
 	                                      planeCorners);
+
+	delete [] planeEqs;
+	delete [] planeCorners;
 
 	// Set kernel args
 	int arg = 0;
-	ocl_check_error(clSetKernelArg(mClKernel,arg++,sizeof(cl_int),&outputDims[0]));
-	ocl_check_error(clSetKernelArg(mClKernel,arg++,sizeof(cl_int),&outputDims[1]));
-	ocl_check_error(clSetKernelArg(mClKernel,arg++,sizeof(cl_int),&outputDims[2]));
-	ocl_check_error(clSetKernelArg(mClKernel,arg++,sizeof(cl_int),&input->getDimensions()[0]));
-	ocl_check_error(clSetKernelArg(mClKernel,arg++,sizeof(cl_int),&input->getDimensions()[1]));
-	ocl_check_error(clSetKernelArg(mClKernel,arg++,sizeof(cl_int),&input->getDimensions()[2]));
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &outputDims[0]));
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &outputDims[1]));
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &outputDims[2]));
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[0]));
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[1]));
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[2]));
 	// The input blocks
 	for(int i = 0; i < numBlocks; i++)
 	{
-		ocl_check_error(clSetKernelArg(mClKernel,arg++,sizeof(cl_mem),&clBlocks[i]));
+		ocl_check_error(clSetKernelArg(mClKernel, arg++,sizeof(cl_mem),&clBlocks[i]));
 	}
 	// The output volume
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clOutputVolume));
@@ -217,6 +222,102 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	return true;
 }
 
+void
+TordTest::fillPlaneEqs(float *planeEqs,
+                       ProcessedUSInputDataPtr input)
+{
+	std::vector<TimedPosition> vecPosition = input->getFrames();
+	
+	// Sanity check on the number of frames
+	if(input->getDimensions()[2] != vecPosition.end() - vecPosition.begin())
+	{
+		messageManager()->sendError(QString("Number of frames %1 != %2 dimension 2 of US input")
+		                            .arg(input->getDimensions()[2])
+		                            .arg(vecPosition.end() - vecPosition.begin()));
+		return;
+	}
+	int i = 0;
+	for(std::vector<TimedPosition>::iterator it = vecPosition.begin();
+	    it != vecPosition.end(); it++)
+	{
+		// FIXME: This should be a separate function.
+		Transform3D pos = it->mPos;
+		// Pos is a transformation matrix. This means that the Z component of its
+		// rotational matrix is a normal vector to the plane.
+		float a, b, c, d;
+		a = pos(0,2);
+		b = pos(1,2);
+		c = pos(2,2);
+
+		d = -(a*pos(0,3) + b*pos(1,3) + c*pos(2,3));
+
+		planeEqs[i++] = a;
+		planeEqs[i++] = b;
+		planeEqs[i++] = c;
+		planeEqs[i++] = d;
+		
+	}
+}
+
+void
+TordTest::fillPlaneCorners(float *planeCorners,
+                           ProcessedUSInputDataPtr input)
+{
+	std::vector<TimedPosition> vecPosition = input->getFrames();
+	
+	// Sanity check on the number of frames
+	if(input->getDimensions()[2] != vecPosition.end() - vecPosition.begin())
+	{
+		messageManager()->sendError(QString("Number of frames %1 != %2 dimension 2 of US input")
+		                            .arg(input->getDimensions()[2])
+		                            .arg(vecPosition.end() - vecPosition.begin()));
+		return;
+	}
+	Eigen::Array3i dims = input->getDimensions();
+	int i = 0;
+	// Corners in image space
+	Vector3D iCorner_0_0, iCorner_x_0, iCorner_0_y;
+	// Corners in volume space
+	Vector3D vCorner_0_0, vCorner_x_0, vCorner_0_y;
+
+	iCorner_0_0(0) = 0.0;
+	iCorner_0_0(1) = 0.0;
+	iCorner_0_0(2) = 0.0;
+	
+	iCorner_x_0(0) = dims[0];
+	iCorner_x_0(1) = 0.0;
+	iCorner_x_0(2) = 0.0;
+
+	iCorner_0_y(0) = 0.0;
+	iCorner_0_y(1) = dims[1];
+	iCorner_0_y(2) = 0.0;
+	
+	for(std::vector<TimedPosition>::iterator it = vecPosition.begin();
+	    it != vecPosition.end();
+	    it++)
+	{
+		// Transform the image space corner positions into volume space
+		// TODO: Maybe the GPU should be doing this?
+		Transform3D pos = it->mPos;
+		vCorner_0_0 = pos * iCorner_0_0;
+		vCorner_x_0 = pos * iCorner_x_0;
+		vCorner_0_y = pos * iCorner_0_y;
+
+		// Now store the result in the output
+		planeCorners[i++] = vCorner_0_0(0);
+		planeCorners[i++] = vCorner_0_0(1);
+		planeCorners[i++] = vCorner_0_0(2);
+
+		planeCorners[i++] = vCorner_x_0(0);
+		planeCorners[i++] = vCorner_x_0(1);
+		planeCorners[i++] = vCorner_x_0(2);
+
+		planeCorners[i++] = vCorner_0_y(0);
+		planeCorners[i++] = vCorner_0_y(1);
+		planeCorners[i++] = vCorner_0_y(2);
+		
+	}
+}
 
 void
 TordTest::freeFrameBlocks(frameBlock_t *framePointers,
