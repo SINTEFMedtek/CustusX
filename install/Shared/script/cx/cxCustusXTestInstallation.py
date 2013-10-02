@@ -54,9 +54,12 @@ class CustusXTestInstallation:
     def testInstallation(self):
         PrintFormatter.printHeader('Test installation', level=2)
         appPath = self._getInstalledBinaryPath()
-        self._testExecutable(appPath, 'CustusX')
-        self._testExecutable(appPath, 'OpenIGTLinkServer')
-        self._testExecutable(appPath, 'Catch', '-h')
+        extension = ''
+        if platform.system() == 'Windows':
+            extension = '.exe'
+        self._testExecutable(appPath, 'CustusX%s' % extension)
+        self._testExecutable(appPath, 'OpenIGTLinkServer%s' % extension)
+        self._testExecutable(appPath, 'Catch%s' % extension, '-h')
         if platform.system() == 'Darwin':
             self._testExecutable(appPath, 'GrabberServer')
                 
@@ -81,8 +84,7 @@ class CustusXTestInstallation:
     def _testExecutable(self, path, filename, arguments=''):
         PrintFormatter.printHeader('Test executable %s' % filename, level=3)
         fullname = '%s/%s' % (path, filename)
-        cxUtilities.assertTrue(os.path.exists(fullname), 
-                        'Checking existence of installed executable %s' % fullname)
+        cxUtilities.assertTrue(os.path.exists(fullname), 'Checking existence of installed executable %s' % fullname)
         cmd = '%s %s' % (fullname, arguments)
         self._runApplicationForDuration(cmd, timeout=3)
 
