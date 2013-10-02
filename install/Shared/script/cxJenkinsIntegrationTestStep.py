@@ -54,8 +54,8 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         p.add_argument('--skip_install', action='store_true', default=False, help='Skip installing the package')
         p.add_argument('--skip_tests', action='store_true', default=False, help='Skip the test step')
         p.add_argument('--b32', action='store_true', default=False, help='Build 32 bit.')
-        p.add_argument('--jom', action='store_true', default=True, help='Use jom to build.')
-        p.add_argument('--static', action='store_true', default=True, help='Link statically.')
+        p.add_argument('--jom', action='store_true', default=False, help='Use jom to build.')
+        p.add_argument('--static', action='store_true', default=False, help='Link statically.')
 
     def _applyArgumentParserArguments(self, options):
         'apply arguments defined in _addArgumentParserArguments()'
