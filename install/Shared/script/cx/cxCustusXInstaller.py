@@ -43,7 +43,7 @@ class CustusXInstaller:
         if platform.system() == 'Linux':
             self.install_root = '%s/Installed' % self.root_dir
         if platform.system() == 'Windows':
-            self.install_root = 'C:\\Program Files (x86)\\'
+            self.install_root = 'C:\\Program Files (x86)'
 
     def getInstalledRoot(self):
         '''
