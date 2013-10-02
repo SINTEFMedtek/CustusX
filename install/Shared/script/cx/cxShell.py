@@ -48,11 +48,12 @@ class Shell (object):
     def setRedirectOutput(self, value):
         self.REDIRECT_OUTPUT = value
 
-    def run(self, cmd, ignoreFailure=False):
+    def run(self, cmd, ignoreFailure=False, convertToString=True):
         '''
         Run a shell script
         '''
-        cmd = self._convertToString(cmd)
+        if(convertToString):
+            cmd = self._convertToString(cmd)
         self._printCommand(cmd)
         if self.DUMMY is False:
             return self._runReal(cmd, ignoreFailure)
@@ -130,8 +131,7 @@ class Shell (object):
         return p.returncode == 0
         
     def _runAndRedirectOutput(self, cmd):
-        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=self.CWD)
-        p.communicate("") # wait for process to complete        
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=self.CWD)        
         for line in self._readFromProcess(p):
             self._printOutput(line.rstrip())
         return p
