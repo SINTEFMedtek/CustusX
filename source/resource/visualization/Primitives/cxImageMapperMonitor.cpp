@@ -23,33 +23,44 @@
 
 #include "sscImage.h"
 #include "sscDataManager.h"
+#include "sscLogger.h"
 
 namespace cx
 {
+
+ImageMapperMonitorPtr ImageMapperMonitor::create(vtkVolumePtr volume, ImagePtr image)
+{
+	ImageMapperMonitorPtr retval(new ImageMapperMonitor(volume, image));
+	retval->init(); // contains virtual functions
+	return retval;
+}
 
 ImageMapperMonitor::ImageMapperMonitor(vtkVolumePtr volume, ImagePtr image) : mVolume(volume), mImage(image)
 {
 	if (!mImage)
 		return;
-
 	connect(mImage.get(), SIGNAL(clipPlanesChanged()), this, SLOT(clipPlanesChangedSlot()));
-	connect(mImage.get(), SIGNAL(cropBoxChanged()), this, SLOT(cropBoxChangedSlot()));
-	this->fillClipPlanes();
-	this->cropBoxChangedSlot();
+	connect(mImage.get(), SIGNAL(cropBoxChanged()), this, SLOT(applyCropping()));
+}
+
+void ImageMapperMonitor::init()
+{
+	this->applyClipping();
+	this->applyCropping();
 }
 
 ImageMapperMonitor::~ImageMapperMonitor()
 {
-	this->clearClipPlanes();
+	this->clearClipping();
 }
 
 void ImageMapperMonitor::clipPlanesChangedSlot()
 {
-	this->clearClipPlanes();
-	this->fillClipPlanes();
+//	this->clearClipping();
+	this->applyClipping();
 }
 
-void ImageMapperMonitor::clearClipPlanes()
+void ImageMapperMonitor::clearClipping()
 {
 	if (!mImage)
 		return;
@@ -61,8 +72,10 @@ void ImageMapperMonitor::clearClipPlanes()
 	mPlanes.clear();
 }
 
-void ImageMapperMonitor::fillClipPlanes()
+void ImageMapperMonitor::applyClipping()
 {
+	this->clearClipping();
+
 	if (!mImage)
 		return;
 
@@ -79,7 +92,7 @@ vtkVolumeMapperPtr ImageMapperMonitor::getMapper()
 	return mapper;
 }
 
-void ImageMapperMonitor::cropBoxChangedSlot()
+void ImageMapperMonitor::applyCropping()
 {
 	if (!mImage)
 		return;

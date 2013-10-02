@@ -17,7 +17,10 @@
 ###########################################################
 
 if (BUILD_TESTING)
-	# Catch unit test framework stuff:
+include_directories(
+	${CustusX3_SOURCE_DIR}/source/resource/testUtilities
+	${CustusX3_SOURCE_DIR}/source/resource/visualization/testing
+	)
 
     set(CXTEST_SOURCES_TO_MOC
         cxTestCustusXController.h
@@ -43,6 +46,10 @@ if (BUILD_TESTING)
 		cxtestTestTransferFunctions.cpp
 	    )
 
-	cx_catch_add_lib_and_exe(cxGui "${CXTEST_GUI_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
+	cx_catch_add_lib_and_exe(cxGui
+		"${CXTEST_GUI_SOURCES}"
+		"${CXTEST_SOURCES_TO_MOC}"
+		"cxResourceVisualizationTestUtilities")
+
 
 endif (BUILD_TESTING)

@@ -53,13 +53,19 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         p.add_argument('--skip_checkout', action='store_true', default=False, help='Skip the checkout of data')
         p.add_argument('--skip_install', action='store_true', default=False, help='Skip installing the package')
         p.add_argument('--skip_tests', action='store_true', default=False, help='Skip the test step')
+        p.add_argument('--b32', action='store_true', default=False, help='Build 32 bit.')
+        p.add_argument('--jom', action='store_true', default=False, help='Use jom to build.')
+        p.add_argument('--static', action='store_true', default=False, help='Link statically.')
 
     def _applyArgumentParserArguments(self, options):
         'apply arguments defined in _addArgumentParserArguments()'
         super(Controller, self)._applyArgumentParserArguments(options)
         data = self.cxBuilder.assembly.controlData        
         data.setBuildType("Release")
-  
+        if(options.jom):
+            data.setCMakeGenerator("NMake Makefiles JOM")
+        data.setBuild32(options.b32)
+        data.setBuildShared(not options.static)
         self._initializeInstallationObject()
  
     def _initializeInstallationObject(self):
@@ -72,7 +78,12 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         custusx = assembly.getComponent(cx.cxComponents.CustusX3)
         
         self.cxInstaller.setRootDir(assembly.controlData.getRootDir())
-        self.cxInstaller.setInstallerPath(custusx.buildPath())        
+        if platform.system() == 'Windows':
+            #path is not correct for 32bit builds
+            self.cxInstaller.setInstallerPath('%s\\_CPack_Packages\\win64\\NSIS' % custusx.buildPath())
+        else:
+            self.cxInstaller.setInstallerPath(custusx.buildPath())
+            
         self.cxInstaller.setSourcePath(custusx.sourcePath())        
 
         self.cxInstallation.setRootDir(assembly.controlData.getRootDir())

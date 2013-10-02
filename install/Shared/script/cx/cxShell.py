@@ -48,11 +48,12 @@ class Shell (object):
     def setRedirectOutput(self, value):
         self.REDIRECT_OUTPUT = value
 
-    def run(self, cmd, ignoreFailure=False):
+    def run(self, cmd, ignoreFailure=False, convertToString=True):
         '''
         Run a shell script
         '''
-        cmd = self._convertToString(cmd)
+        if(convertToString):
+            cmd = self._convertToString(cmd)
         self._printCommand(cmd)
         if self.DUMMY is False:
             return self._runReal(cmd, ignoreFailure)

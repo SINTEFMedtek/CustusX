@@ -25,6 +25,7 @@
 
 namespace cx
 {
+typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
 
 /** Helper class that uses the stored clip planes in a Image to clip it in a mapper.
  *
@@ -36,20 +37,27 @@ class ImageMapperMonitor : public QObject
 {
 	Q_OBJECT
 public:
-	ImageMapperMonitor(vtkVolumePtr volume, ImagePtr image);
+	static ImageMapperMonitorPtr create(vtkVolumePtr volume, ImagePtr image);
 	~ImageMapperMonitor();
+
+protected slots:
+	virtual void applyCropping();
+	virtual void clearClipping();
+	virtual void applyClipping();
 
 private slots:
 	void clipPlanesChangedSlot();
-	void cropBoxChangedSlot();
-private:
+
+protected:
+	ImageMapperMonitor(vtkVolumePtr volume, ImagePtr image);
 	vtkVolumePtr mVolume;
 	ImagePtr mImage;
+	void init();
+
+private:
 	std::vector<vtkPlanePtr> mPlanes;
 	vtkVolumeMapperPtr getMapper();
 
-	void clearClipPlanes();
-	void fillClipPlanes();
 };
 
 } // namespace cx
