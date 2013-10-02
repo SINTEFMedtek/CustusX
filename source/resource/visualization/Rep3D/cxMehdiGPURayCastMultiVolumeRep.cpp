@@ -27,9 +27,73 @@
 #include <vtkMatrix4x4.h>
 #include <vtkTransform.h>
 #include "sscGPUImageBuffer.h"
+#include "sscMessageManager.h"
+#include <vtkPlane.h>
+#include "sscLogger.h"
 
 namespace cx
 {
+
+ImageMapperMonitorPtr MehdiGPURayCastMultiVolumeRepImageMapperMonitor::create(vtkVolumePtr volume, ImagePtr image, int volumeIndex)
+{
+	MehdiGPURayCastMultiVolumeRepImageMapperMonitor* retval = new MehdiGPURayCastMultiVolumeRepImageMapperMonitor(volume, image, volumeIndex);
+	retval->init(); // contains virtual functions
+	return ImageMapperMonitorPtr(retval);
+}
+
+MehdiGPURayCastMultiVolumeRepImageMapperMonitor::MehdiGPURayCastMultiVolumeRepImageMapperMonitor(vtkVolumePtr volume, ImagePtr image, int volumeIndex) :
+	ImageMapperMonitor(volume,image), mVolumeIndex(volumeIndex)
+{
+}
+
+vtkOpenGLGPUMultiVolumeRayCastMapperPtr MehdiGPURayCastMultiVolumeRepImageMapperMonitor::getMehdiMapper()
+{
+	vtkOpenGLGPUMultiVolumeRayCastMapperPtr mapper;
+	mapper = dynamic_cast<vtkOpenGLGPUMultiVolumeRayCastMapper*>(mVolume->GetMapper());
+	return mapper;
+}
+
+void MehdiGPURayCastMultiVolumeRepImageMapperMonitor::clearClipping()
+{
+	vtkOpenGLGPUMultiVolumeRayCastMapperPtr mapper = this->getMehdiMapper();
+	if (!mapper)
+		return;
+	mapper->RemoveClippingPlane(mVolumeIndex);
+}
+
+void MehdiGPURayCastMultiVolumeRepImageMapperMonitor::applyClipping()
+{
+	vtkOpenGLGPUMultiVolumeRayCastMapperPtr mapper = this->getMehdiMapper();
+	if (!mapper)
+		return;
+	std::vector<vtkPlanePtr> planes = mImage->getAllClipPlanes();
+	if (planes.empty())
+	{
+		mapper->RemoveClippingPlane(mVolumeIndex);
+		return;
+	}
+	else
+	{
+		mapper->AddClippingPlane(mVolumeIndex, planes[0]);
+	}
+}
+
+void MehdiGPURayCastMultiVolumeRepImageMapperMonitor::applyCropping()
+{
+	messageManager()->sendWarning("Multivolume Cropping not implemented");
+//		vtkVolumeMapperPtr mapper = this->getMapper();
+//		if (!mapper)
+//			return;
+//		mapper->SetCropping(mImage->getCropping());
+
+//		DoubleBoundingBox3D bb_d = mImage->getCroppingBox();
+
+//		mapper->SetCroppingRegionPlanes(bb_d.begin());
+//		mapper->Update();
+}
+
+
+////////////////////////////////////////////////////
 
 MehdiGPURayCastMultiVolumeRepBase::MehdiGPURayCastMultiVolumeRepBase() :
 	mMaxVoxels(0)
@@ -58,6 +122,7 @@ MehdiGPURayCastMultiVolumeRep::MehdiGPURayCastMultiVolumeRep() :
 void MehdiGPURayCastMultiVolumeRep::addRepActorsToViewRenderer(View* view)
 {
 	view->getRenderer()->AddVolume(mVolume);
+//	view->getRenderer()->Render();
 }
 
 void MehdiGPURayCastMultiVolumeRep::removeRepActorsFromViewRenderer(View* view)
@@ -137,7 +202,7 @@ void MehdiGPURayCastMultiVolumeRep::setup()
 	{
 		connect(mImages[i].get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		connect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-		mMonitors[i].reset(new ImageMapperMonitor(mVolume, mImages[i]));
+		mMonitors[i] = MehdiGPURayCastMultiVolumeRepImageMapperMonitor::create(mVolume, mImages[i], i);
 	}
 
 	mMapper->Update();

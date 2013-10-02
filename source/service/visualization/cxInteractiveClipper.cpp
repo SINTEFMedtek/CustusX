@@ -25,7 +25,7 @@
 #include "sscSliceProxy.h"
 #include "sscImage.h"
 #include "sscToolManager.h"
-
+#include "sscLogger.h"
 namespace cx
 {
 
@@ -44,6 +44,8 @@ InteractiveClipper::InteractiveClipper() :
 	mSlicePlanesProxy->addSimpleSlicePlane(ptRADIALPLANE);
 
 	mSlicePlaneClipper = SlicePlaneClipper::New();
+
+	connect(mSlicePlaneClipper.get(), SIGNAL(slicePlaneChanged()), this, SLOT(changedSlot()));
 	connect(this, SIGNAL(changed()), this, SLOT(changedSlot()));
 	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 
@@ -131,9 +133,6 @@ void InteractiveClipper::changedSlot()
 
 	if (mUseClipper)
 	{
-//		mSlicePlaneClipper->clearVolumes();
-//		mSlicePlaneClipper->addVolume(RepManager::getInstance()->getVolumetricRep(mImage));
-
 		PLANE_TYPE currentPlane = this->getPlaneType();
 
 		std::vector<PLANE_TYPE> planes = this->getAvailableSlicePlanes();
@@ -156,7 +155,6 @@ void InteractiveClipper::changedSlot()
 	}
 	else
 	{
-//		mSlicePlaneClipper->clearVolumes();
 		mImage->setInteractiveClipPlane(vtkPlanePtr());
 	}
 

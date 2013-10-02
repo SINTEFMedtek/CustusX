@@ -20,9 +20,8 @@
 #include "vtkForwardDeclarations.h"
 
 #include "cxConfig.h"
-//#ifndef Q_MOC_RUN
-//#ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
-//#endif
+
+#include "cxImageMapperMonitor.h"
 
 typedef vtkSmartPointer<class vtkOpenGLGPUMultiVolumeRayCastMapper> vtkOpenGLGPUMultiVolumeRayCastMapperPtr;
 
@@ -33,6 +32,21 @@ namespace cx
 typedef boost::shared_ptr<class MehdiGPURayCastMultiVolumeRep> MehdiGPURayCastMultiVolumeRepPtr;
 typedef boost::shared_ptr<class VolumeProperty> VolumePropertyPtr;
 typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
+
+class MehdiGPURayCastMultiVolumeRepImageMapperMonitor : public ImageMapperMonitor
+{
+public:
+	static ImageMapperMonitorPtr create(vtkVolumePtr volume, ImagePtr image, int volumeIndex);
+protected:
+	virtual void clearClipping();
+	virtual void applyClipping();
+	virtual void applyCropping();
+	MehdiGPURayCastMultiVolumeRepImageMapperMonitor(vtkVolumePtr volume, ImagePtr image, int volumeIndex);
+private:
+	vtkOpenGLGPUMultiVolumeRayCastMapperPtr getMehdiMapper();
+	int mVolumeIndex;
+};
+
 
 /** Hack: ensures that the QObject part of MehdiGPURayCastMultiVolumeRep is moced
   * irrespective of the value of CX_BUILD_MEHDI_VTKMULTIVOLUME.
