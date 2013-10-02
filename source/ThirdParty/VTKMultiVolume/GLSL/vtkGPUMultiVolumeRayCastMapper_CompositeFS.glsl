@@ -321,28 +321,31 @@ void trace(void)
 		float scalar[10];
 		
 		//Texture 1
-		//if(isPointOnTheLineZ(end,start,pos))
-		if(clipped[0]==1)
-			clip(0,pos);
-		
-		if(((xMin[0]<pos.x)&&(yMin[0]<pos.y)&&(zMin[0]<pos.z))||(clipped[0]==0))
+		if(all(greaterThanEqual(pos,lowBounds[0]))
+        && all(lessThanEqual(pos,highBounds[0])))
 		{
-
-			value[0]=texture3D(dataSetTexture[0],pos);
-			scalar[0]=scalarFromValue(value[0]);
-			// opacity is the sampled texture value in the 1D opacity texture at scalarValue
- 
-			opacity[0]=texture1D(opacityTexture[0],scalar[0]);//Mehdi
-
-			if(opacity[0].a>0.0)
+			//if(isPointOnTheLineZ(end,start,pos))
+			if(clipped[0]==1)
+				clip(0,pos);
+		
+			if(((xMin[0]<pos.x)&&(yMin[0]<pos.y)&&(zMin[0]<pos.z))||(clipped[0]==0))
 			{
-				color[0]=shade(0,value[0]);
-				color[0]=color[0]*opacity[0].a;
-				destColor=destColor+color[0]*remainOpacity;
-				remainOpacity=remainOpacity*(1.0-opacity[0].a);
+
+				value[0]=texture3D(dataSetTexture[0],pos);
+				scalar[0]=scalarFromValue(value[0]);
+				// opacity is the sampled texture value in the 1D opacity texture at scalarValue
+ 
+				opacity[0]=texture1D(opacityTexture[0],scalar[0]);//Mehdi
+
+				if(opacity[0].a>0.0)
+				{
+					color[0]=shade(0,value[0]);
+					color[0]=color[0]*opacity[0].a;
+					destColor=destColor+color[0]*remainOpacity;
+					remainOpacity=remainOpacity*(1.0-opacity[0].a);
+				}
 			}
 		}
-
     //Texture2 and upper
 		
 		for(int xx = 1;((xx<5)&&(xx < Number_Of_Volumes));xx++)//? //Help 		
@@ -378,9 +381,7 @@ void trace(void)
 
       pos=pos+rayDir;
       t+=1.0;
-      inside=t<tMax && all(greaterThanEqual(pos,lowBounds[0]))
-        && all(lessThanEqual(pos,highBounds[0]))
-        && (remainOpacity>=0.0039); // 1/255=0.0039
+      inside=t<tMax && (remainOpacity>=0.0039); // 1/255=0.0039
       }
   }
   gl_FragColor = destColor;
