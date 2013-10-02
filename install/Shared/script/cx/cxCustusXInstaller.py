@@ -224,10 +224,8 @@ class CustusXInstaller:
         
     def _installWindowsNSISExe(self, filename):
         installfolder = '%s\CustusX' % self.install_root
-        installFolder = installFolder.replace("\\", "/")
-        filename = filename.replace("\\", "/")
         shell.changeDir(installfolder)
-        shell.run('%s /S /D=%s' % (filename, installfolder))
+        shell.run('%s /S /D"=%s"' % (filename, installfolder))
         PrintFormatter.printInfo('Installed \n\t%s\nto folder \n\t%s ' % (filename, self.install_root))
 
     def _installLinuxZip(self, filename):
