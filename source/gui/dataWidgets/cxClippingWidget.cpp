@@ -17,7 +17,7 @@
 #include "cxViewManager.h"
 #include "sscDataManager.h"
 #include "cxSelectDataStringDataAdapter.h"
-
+#include "sscImage.h"
 namespace cx
 {
 
@@ -70,7 +70,6 @@ ClippingWidget::ClippingWidget(QWidget* parent) :
 	mImageAdapter = SelectImageStringDataAdapter::New();
 	LabeledComboBoxWidget* imageCombo = new LabeledComboBoxWidget(this, mImageAdapter);
 	connect(mImageAdapter.get(), SIGNAL(changed()), this, SLOT(imageChangedSlot()));
-//	mImageAdapter->setValue();
 
 	this->setToolTip(this->defaultWhatsThis());
 
@@ -132,6 +131,8 @@ void ClippingWidget::clipperChangedSlot()
 {
 	mUseClipperCheckBox->setChecked(mInteractiveClipper->getUseClipper());
 	mInvertPlaneCheckBox->setChecked(mInteractiveClipper->getInvertPlane());
+	if (mInteractiveClipper->getImage())
+		mImageAdapter->setValue(mInteractiveClipper->getImage()->getUid());
 }
 
 void ClippingWidget::imageChangedSlot()
