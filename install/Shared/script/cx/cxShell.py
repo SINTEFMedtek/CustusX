@@ -130,7 +130,8 @@ class Shell (object):
         return p.returncode == 0
         
     def _runAndRedirectOutput(self, cmd):
-        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=self.CWD)        
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=self.CWD)
+        p.communicate("") # wait for process to complete        
         for line in self._readFromProcess(p):
             self._printOutput(line.rstrip())
         return p
