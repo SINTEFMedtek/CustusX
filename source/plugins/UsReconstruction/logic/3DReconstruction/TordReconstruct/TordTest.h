@@ -5,6 +5,7 @@
 
 #include "sscReconstructAlgorithm.h"
 #include "Thunder/setup.h"
+#include <sscUSFrameData.h>
 
 namespace cx
 {
@@ -59,6 +60,38 @@ protected:
 	                                   ProcessedUSInputDataPtr inputFrames);
 	virtual void freeFrameBlocks(frameBlock_t* framePointers,
 	                             int numBlock);
+
+	/**
+	 * Retrieve the plane equations into the array planeEqs.
+	 * The plane equations look like this: ax + by + cz + d = 0
+	 * This is represented by 4 floats for each plane, stored like this:
+	 * planeEqs[] = [ a0, b0, c0, d0, a1, b1, c1, d1, ... an, bn, cn, dn]
+	 * where n = nPlanes.
+	 * \param[out] planeEqs Pointer to float array of nPlanes*4
+	 *                      elements to store plane equations in
+	 * \param[in] input The US input to extract plane equations from
+	 */	 
+	virtual void fillPlaneEqs(float *planeEqs,
+	                          ProcessedUSInputDataPtr input);
+
+	/**
+	 * Retrieve the positions of the plane corners in 3d space and store them in planeCorners.
+	 * Each plane is stored with 3 corners (the 4th corner is implicitly defined by these),
+	 * and each corner is a 3d point.
+	 * The three stored corners are:
+	 *  Corner 1: (0,0) (Lower left)
+	 *  Corner 2: (x,0) (Lower right)
+	 *  Corner 3: (0,y) (Upper left)
+	 * This yields 9 values per plane, which are stored like this
+	 * planeCorners[] = [p0c1x, p0c1y, p0c1z, p0c2x, p0c2y, p0c2z, p0c3x, p0c3y, p0c3z,
+	 *                   p1c1x, p1c1y, p1c1z, p1c2x, p1c2y, p1c2z, p1c3x, p1c3y, p1c3z, ...]
+	 * where pXcYk = coordinate K of corner Y of plane X.
+	 * \param[out] planeCorners Pointer to float array of nPlanes*9 elements to store corners in
+	 * \param[in] input The US input to extract plane corners from
+	 */
+	virtual void fillPlaneCorners(float *planeCorners,
+	                              ProcessedUSInputDataPtr input);
+	
 
 	/// OpenCL handles
 	cl_kernel mClKernel;
