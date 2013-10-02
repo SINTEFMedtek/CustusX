@@ -223,8 +223,9 @@ class CustusXInstaller:
         cxUtilities.assertTrue(False, 'suffix not found for OS=%s' % platform.system())
         
     def _installWindowsNSISExe(self, filename):
-        installfolder = '%\CustusX' % self.install_root
+        installfolder = '%s\CustusX' % self.install_root
         installFolder = installFolder.replace("\\", "/")
+        filename = filename.replace("\\", "/")
         shell.changeDir(installfolder)
         shell.run('%s /S /D=%s' % (filename, installfolder))
         PrintFormatter.printInfo('Installed \n\t%s\nto folder \n\t%s ' % (filename, self.install_root))
