@@ -60,7 +60,9 @@ public:
 	vtkPlanePtr getClipPlaneCopy();
 	vtkPlanePtr getClipPlane();
 
-	private slots:
+signals:
+	void slicePlaneChanged();
+private slots:
 	void changedSlot();
 private:
 	SlicePlaneClipper();

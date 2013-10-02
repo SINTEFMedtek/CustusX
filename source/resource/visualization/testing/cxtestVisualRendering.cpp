@@ -62,6 +62,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 //	REQUIRE(this->runWidget());
 	REQUIRE(this->quickRunWidget());
 
+	this->dumpDebugViewToDisk("emptyview", 0);
 	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) == Approx(0));
 }
 
@@ -74,6 +75,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 
 //	REQUIRE(this->runWidget());
 	REQUIRE(this->quickRunWidget());
+	this->dumpDebugViewToDisk("3DvtkGPU", 0);
 	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) > 0.01);
 }
 
@@ -148,6 +150,10 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	this->defineSlice("C", image[0], cx::ptCORONAL, 1, 0);
 	this->defineSlice("S", image[0], cx::ptSAGITTAL, 0, 1);
 	REQUIRE(this->quickRunWidget());
+	this->dumpDebugViewToDisk("acs3d0", 0);
+	this->dumpDebugViewToDisk("acs3d1", 1);
+	this->dumpDebugViewToDisk("acs3d2", 2);
+	this->dumpDebugViewToDisk("acs3d3", 3);
 
 	CHECK(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
 	CHECK(this->getFractionOfBrightPixelsInView(1,20) > 0.02);
@@ -164,8 +170,12 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	this->defineSlice("Any", image[0], cx::ptANYPLANE, 0, 0);
 	this->defineSlice("Dua", image[0], cx::ptSIDEPLANE, 0, 1);
 	REQUIRE(this->quickRunWidget());
+	this->dumpDebugViewToDisk("anydual3d0", 0);
+	this->dumpDebugViewToDisk("anydual3d1", 1);
+	this->dumpDebugViewToDisk("anydual3d2", 2);
 	CHECK(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
 	CHECK(this->getFractionOfBrightPixelsInView(1,20) > 0.02);
+	CHECK(this->getFractionOfBrightPixelsInView(2,20) > 0.02);
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,

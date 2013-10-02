@@ -129,6 +129,7 @@ void SlicePlaneClipper::changedSlot()
 		return;
 
 	this->updateClipPlane();
+	emit slicePlaneChanged();
 }
 
 } // namespace cx

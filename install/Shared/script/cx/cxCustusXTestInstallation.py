@@ -54,9 +54,12 @@ class CustusXTestInstallation:
     def testInstallation(self):
         PrintFormatter.printHeader('Test installation', level=2)
         appPath = self._getInstalledBinaryPath()
-        self._testExecutable(appPath, 'CustusX')
-        self._testExecutable(appPath, 'OpenIGTLinkServer')
-        self._testExecutable(appPath, 'Catch', '-h')
+        extension = ''
+        if platform.system() == 'Windows':
+            extension = '.exe'
+        self._testExecutable(appPath, 'CustusX%s' % extension)
+        self._testExecutable(appPath, 'OpenIGTLinkServer%s' % extension)
+        self._testExecutable(appPath, 'Catch%s' % extension, '-h')
         if platform.system() == 'Darwin':
             self._testExecutable(appPath, 'GrabberServer')
                 
@@ -73,15 +76,15 @@ class CustusXTestInstallation:
         'path to binary files / executables in install'
         if platform.system() == 'Darwin':
             retval = '%s/CustusX/CustusX.app/Contents/MacOS' % self.install_root
-        if platform.system() == 'Linux':
+        if (platform.system() == 'Linux') or (platform.system() == 'Windows') :
             retval = '%s/CustusX/bin' % self.install_root
+
         return retval        
 
     def _testExecutable(self, path, filename, arguments=''):
         PrintFormatter.printHeader('Test executable %s' % filename, level=3)
         fullname = '%s/%s' % (path, filename)
-        cxUtilities.assertTrue(os.path.exists(fullname), 
-                        'Checking existence of installed executable %s' % fullname)
+        cxUtilities.assertTrue(os.path.exists(fullname), 'Checking existence of installed executable %s' % fullname)
         cmd = '%s %s' % (fullname, arguments)
         self._runApplicationForDuration(cmd, timeout=3)
 
@@ -90,6 +93,8 @@ class CustusXTestInstallation:
         Run the given application for a short time, as a quick verification.
         The stdout is not redirected here, i.e. it might be mangled with the python output.
         '''
+        if(platform.system() == 'Windows'):
+            application = application.replace("\\", "/")
         PrintFormatter.printInfo('Running application %s' % application)
         startTime = time.time()
         # On linux, cannot run from shell (http://stackoverflow.com/questions/4789837/how-to-terminate-a-python-subprocess-launched-with-shell-true)

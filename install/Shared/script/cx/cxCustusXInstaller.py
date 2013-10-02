@@ -40,8 +40,10 @@ class CustusXInstaller:
         self.root_dir = root_dir
         if platform.system() == 'Darwin':
             self.install_root = '/Applications'
-        if platform.system() == 'Linux':
+        if (platform.system() == 'Linux'):
             self.install_root = '%s/Installed' % self.root_dir
+        if(platform.system() == 'Windows'):
+            self.install_root = '%s\\Installed' % self.root_dir
 
     def getInstalledRoot(self):
         '''
@@ -72,7 +74,6 @@ class CustusXInstaller:
         PrintFormatter.printHeader('create local release folder', level=2)
         targetPath = self._generateReleaseFolderName()
         PrintFormatter.printInfo('Creating folder %s' % targetPath)
-        #os.makedirs(targetPath) - no good - complains if existing.
         shell.run('mkdir -p %s' % targetPath)
         installerFile = self._findInstallerFile()
         self._copyFile(installerFile, targetPath)
@@ -97,7 +98,6 @@ class CustusXInstaller:
         'generate a name for the folder to insert release files into'
         shell.changeDir(self.source_path)
         self._removeLocalTags()    
-#        shell.run('git describe')
         
         output = shell.evaluate('git describe --tags --exact-match')
         if output:
@@ -108,9 +108,6 @@ class CustusXInstaller:
             name = '%s.%s' % (name, self._getDateString())
         name = 'CustusX_%s' % name
 
-#        installerFile = self._findInstallerFile()
-#        suffix = self._getInstallerPackageSuffix()
-#        releaseFolderName = os.path.basename(installerFile).split('.%s'%suffix)[0]
         targetPath = '%s/Release/%s' % (self.installer_path, name)
         return targetPath
     
@@ -163,8 +160,6 @@ class CustusXInstaller:
         PrintFormatter.printHeader('copy/publish package to medtek server', level=2)
         remoteServer = "medtek.sintef.no"
         remoteServerPath = "/Volumes/MedTekDisk/Software/CustusX/AutomatedReleases"
-#        remoteServer = "localhost"
-#        remoteServerPath = "/Users/christiana/tst/AutomatedReleases"
         targetFolder = os.path.split(path)[1]
         source = '%s/*' % path
         target = '%s/%s/%s' % (remoteServerPath, targetFolder, self._getUserFriendlyPlatformName())
@@ -184,12 +179,6 @@ class CustusXInstaller:
             return platform.linux_distribution()[0]
         else:
             return platform.system()
-        
-
-#    def getInstallFolder(self):
-#        git_description = shell.evaluate('git describe --tags')
-#        os_description = 'linux_test'
-#        return 'CustusX.%s.%s' % (git_description, os_description)
 
     def installPackage(self):
         '''
@@ -219,22 +208,29 @@ class CustusXInstaller:
             self._installDMG(filename)
         if platform.system() == 'Linux':
             self._installLinuxZip(filename)
+        if platform.system() == 'Windows':
+            self._installWindowsNSISExe(filename)
     
     def _getInstallerPackagePattern(self):
         suffix = self._getInstallerPackageSuffix()
         return '%s/CustusX*.%s' % (self.installer_path, suffix)
-#        if platform.system() == 'Darwin':
-#            pattern = 'CustusX_*.dmg'
-#        if platform.system() == 'Linux':
-#            pattern = 'CustusX*.tar.gz'
-#        return '%s/%s' % (self.installer_path, pattern)
         
     def _getInstallerPackageSuffix(self):
         if platform.system() == 'Darwin':
             return 'dmg'
         if platform.system() == 'Linux':
             return 'tar.gz'
+        if platform.system() == 'Windows':
+            return 'exe'
         cxUtilities.assertTrue(False, 'suffix not found for OS=%s' % platform.system())
+        
+    def _installWindowsNSISExe(self, filename):
+        installfolder = '%s\CustusX' % self.install_root
+        installfolder = installfolder.replace("/", "\\")
+        filename = filename.replace("/", "\\")
+        cmd = ["%s" % filename, "/S", "/D=%s" % installfolder]
+        shell.run(cmd, convertToString=False)
+        PrintFormatter.printInfo('Installed \n\t%s\nto folder \n\t%s ' % (filename, self.install_root))
 
     def _installLinuxZip(self, filename):
         temp_path = '%s/temp/Install' % self.root_dir

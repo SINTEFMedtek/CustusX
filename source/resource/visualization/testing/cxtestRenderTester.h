@@ -55,9 +55,10 @@ public:
 	bool findDifference(vtkImageDataPtr input1, vtkImageDataPtr input2);
 	void enterRunLoop();
 	void setImageErrorThreshold(double value);
+	void printFractionOfVoxelsAboveZero(QString desc, vtkImageDataPtr image);
+	vtkImageDataPtr getImageFromRenderWindow();
 
 private:
-	vtkImageDataPtr getImageFromRenderWindow();
 	void writeToPNG(vtkImageDataPtr image, QString filename);
 	vtkImageDataPtr clipImage(vtkImageDataPtr input);
 	bool equalExtent(vtkImageDataPtr input1, vtkImageDataPtr input2);

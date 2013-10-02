@@ -881,7 +881,7 @@ vtkImageDataPtr Image::resample(long maxVoxels)
 
 		long voxelsDown = retval->GetNumberOfPoints();
 		long voxelsOrig = this->getBaseVtkImageData()->GetNumberOfPoints();
-		messageManager()->sendInfo("Completed downsampling volume in VolumetricRep: "
+		messageManager()->sendInfo("Created downsampled volume in Image: "
 									 + this->getName()
 									 + " below " + qstring_cast(voxelsDown/1000/1000) + "M. "
 									 + "Ratio: " + QString::number(factor, 'g', 2) + ", "
