@@ -90,15 +90,23 @@ public:
   // \pre headerMessage_exists: headerMessage!=0
   static void PrintError(const char *headerMessage);
 
-  void AddClippingPlane(int vol, vtkPlane *plane);//Mehdi
+  void AddClippingPlane(int vol, vtkPlane *plane); //Mehdi
   void RemoveClippingPlane(int vol); //Mehdi
   vtkPlane* GetClippingPlane(int vol); //Mehdi
+
+  void SetCroppingRegionPlanes(int vol, double xMin, double xMax, double yMin, double yMax, double zMin, double zMax); //Mehdi
+  void SetCroppingRegionPlanes (int vol, double *args); //Mehdi
+  void SetCropping (int vol,int arg);
 
 protected:
   
   vtkPlane* ClippingPlane[MAX_NUMBER_OF_ADDITIONAL_VOLUMES+1];//Mehdi
   int Clipped[MAX_NUMBER_OF_ADDITIONAL_VOLUMES+1];//Mehdi
+  int Cropped[MAX_NUMBER_OF_ADDITIONAL_VOLUMES+1];//Mehdi
   bool ClippedModified[MAX_NUMBER_OF_ADDITIONAL_VOLUMES+1];//Mehdi
+
+  double CroppingLowBounds[MAX_NUMBER_OF_ADDITIONAL_VOLUMES+1][3]; //Mehdi
+  double CroppingHighBounds[MAX_NUMBER_OF_ADDITIONAL_VOLUMES+1][3]; //Mehdi
 
   void SetClippingPlane();//Mehdi
 
