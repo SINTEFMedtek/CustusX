@@ -24,6 +24,15 @@
 namespace cx
 {
 
+ImageStreamerSonix::ImageStreamerSonix() :
+
+	mEmitStatusMessage(false),
+	mLastFrameTimestamp(0.0),
+	mCurrentFrameTimestamp(0.0)
+{
+	mSendTimer = new QTimer;
+}
+
 QString ImageStreamerSonix::getType()
 {
 	return "Sonix";
@@ -42,22 +51,15 @@ QStringList ImageStreamerSonix::getArgumentDescription()
 	return retval;
 }
 
-
-ImageStreamerSonix::ImageStreamerSonix() :
-	mEmitStatusMessage(false),
-	mLastFrameTimestamp(0.0),
-	mCurrentFrameTimestamp(0.0)
-{}
-
 ImageStreamerSonix::~ImageStreamerSonix()
 {
 	mSendTimer->stop();
 	if (mSonixGrabber)
-		{
-			mSonixGrabber->Stop();
-			std::cout << "Releasing Ultrasonix resources" << std::endl;
-			mSonixGrabber->ReleaseSystemResources();
-		}
+	{
+		mSonixGrabber->Stop();
+		std::cout << "Releasing Ultrasonix resources" << std::endl;
+		mSonixGrabber->ReleaseSystemResources();
+	}
 }
 
 
@@ -79,7 +81,6 @@ void ImageStreamerSonix::initialize(StringMap arguments)
 
 	this->mSonixHelper = new SonixHelper();
 
-	mSendTimer = new QTimer;
 	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(initializeSonixSlot()));
 	this->setSendInterval(10000);
 	mSendTimer->setInterval(getSendInterval());
