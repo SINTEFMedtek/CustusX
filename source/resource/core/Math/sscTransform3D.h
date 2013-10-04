@@ -6,6 +6,7 @@
 #include <QString>
 #include "sscVector3D.h"
 
+
 /** implementation functions used the Eigen extensions.
  *
  */
@@ -17,6 +18,7 @@ void fill(Eigen::Affine3d* self, const double* raw);
 vtkMatrix4x4Ptr getVtkMatrix(const Eigen::Affine3d* self);
 std::ostream& put(const Eigen::Affine3d* self, std::ostream& s, int indent, char newline);
 Eigen::Affine3d fromString(const QString& text, bool* _ok);
+vtkTransformPtr getVtkTransform(const Eigen::Affine3d* self);
 }
 
 namespace Eigen
@@ -76,6 +78,12 @@ template<typename _Scalar, int _Dim, int _Mode, int _Options>
 vtkMatrix4x4Ptr Transform<_Scalar, _Dim, _Mode, _Options>::getVtkMatrix() const
 {
 	return cx_transform3D_internal::getVtkMatrix(this);
+}
+
+template<typename _Scalar, int _Dim, int _Mode, int _Options>
+vtkTransformPtr Transform<_Scalar, _Dim, _Mode, _Options>::getVtkTransform() const
+{
+	return cx_transform3D_internal::getVtkTransform(this);
 }
 
 template<typename _Scalar, int _Dim, int _Mode, int _Options>

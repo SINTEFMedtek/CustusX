@@ -4,10 +4,13 @@
 #include <map>
 #include "sscVector3D.h"
 #include "vtkForwardDeclarations.h"
+#include "sscBoundingBox3D.h"
+#include "sscTransform3D.h"
 
 namespace cx
 {
 typedef boost::shared_ptr<class Image> ImagePtr;
+typedef boost::shared_ptr<class Data> DataPtr;
 
 /**
  * \addtogroup sscUtility
@@ -35,6 +38,9 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ImagePtr image);
 
 int calculateNumVoxelsWithMaxValue(ImagePtr image);///<Find number of voxels containing max scalar value
 int calculateNumVoxelsWithMinValue(ImagePtr image);///<Find number of voxels containing min scalar value
+
+DoubleBoundingBox3D findEnclosingBoundingBox(std::vector<DataPtr> data, Transform3D qMr = Transform3D::Identity());
+DoubleBoundingBox3D findEnclosingBoundingBox(std::vector<ImagePtr> data, Transform3D qMr = Transform3D::Identity());
 /**
  * \}
  */

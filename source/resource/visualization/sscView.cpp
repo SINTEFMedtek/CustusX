@@ -89,6 +89,7 @@ ViewWidget::ViewWidget(const QString& uid, const QString& name, QWidget *parent,
 
 ViewWidget::~ViewWidget()
 {
+	this->clear();
 }
 
 QString View::getTypeString() const

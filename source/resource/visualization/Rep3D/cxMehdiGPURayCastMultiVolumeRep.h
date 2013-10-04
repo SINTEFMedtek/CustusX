@@ -29,6 +29,8 @@ typedef vtkSmartPointer<class vtkOpenGLGPUMultiVolumeRayCastMapper> vtkOpenGLGPU
 namespace cx
 {
 
+
+typedef boost::shared_ptr<class ImageEnveloper> ImageEnveloperPtr;
 typedef boost::shared_ptr<class MehdiGPURayCastMultiVolumeRep> MehdiGPURayCastMultiVolumeRepPtr;
 typedef boost::shared_ptr<class VolumeProperty> VolumePropertyPtr;
 typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
@@ -88,6 +90,7 @@ public:
 	virtual QString getType() const { return "MehdiGPURayCastMultiVolumeRep"; }
 
 	void setImages(std::vector<ImagePtr> images);
+	void setBoundingBoxGenerator(ImageEnveloperPtr generator);
 
 protected:
 	MehdiGPURayCastMultiVolumeRep();
@@ -106,7 +109,9 @@ private:
 	vtkOpenGLGPUMultiVolumeRayCastMapperPtr mMapper;
 	std::vector<VolumePropertyPtr> mVolumeProperties;
 	std::vector<ImagePtr> mImages;
+	ImagePtr mReferenceImage;
 	std::vector<ImageMapperMonitorPtr> mMonitors;
+	ImageEnveloperPtr mGenerator;
 };
 
 #endif // CXMEHDIGPURAYCASTMULTIVOLUMEREP_H

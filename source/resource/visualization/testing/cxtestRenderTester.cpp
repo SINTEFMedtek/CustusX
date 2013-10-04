@@ -95,12 +95,12 @@ RenderTester::RenderTester(cx::RepPtr rep, const unsigned int viewAxisSize) :
 	mImageErrorThreshold(100.0),
 	mBorderOffset(2)
 {
-	cx::ViewWidget* view = new cx::ViewWidget();
-	view->addRep(rep);
-	view->resize(viewAxisSize,viewAxisSize);
-	view->show();
+	mView.reset(new cx::ViewWidget());
+	mView->addRep(rep);
+	mView->resize(viewAxisSize,viewAxisSize);
+	mView->show();
 
-	mRenderWindow = view->getRenderWindow();
+	mRenderWindow = mView->getRenderWindow();
 	mRenderer = mRenderWindow->GetRenderers()->GetFirstRenderer();
 }
 
@@ -161,7 +161,10 @@ vtkImageDataPtr RenderTester::renderToImage()
 	//		bounds[3] += 1;
 	//		mRenderWindow->SetSize(bounds.range()[0], bounds.range()[1]);
 	//		mRenderer->GetActiveCamera()->SetParallelScale((bounds.range()[1])/2);
+
+//	std::cout << "RENDER B=======================================" << std::endl;
 	mRenderWindow->Render();
+//	std::cout << "RENDER E=======================================" << std::endl;
 
 //		std::cout << "=======================input1" << std::endl;
 //		mRenderer->GetActiveCamera()->Print(std::cout);

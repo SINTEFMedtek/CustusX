@@ -32,6 +32,7 @@
 #include "sscData.h"
 #include "cxViewWrapper.h"
 #include "sscManualTool.h"
+#include "sscVolumeHelpers.h"
 
 namespace cx
 {
@@ -129,27 +130,7 @@ Vector3D Navigation::findGlobalDataCenter()
  */
 Vector3D Navigation::findDataCenter(std::vector<DataPtr> data)
 {
-	if (data.empty())
-		return Vector3D(0, 0, 0);
-
-	std::vector<Vector3D> corners_r;
-
-	for (unsigned i = 0; i < data.size(); ++i)
-	{
-		Transform3D rMd = data[i]->get_rMd();
-		DoubleBoundingBox3D bb = data[i]->boundingBox();
-
-		corners_r.push_back(rMd.coord(bb.corner(0, 0, 0)));
-		corners_r.push_back(rMd.coord(bb.corner(0, 0, 1)));
-		corners_r.push_back(rMd.coord(bb.corner(0, 1, 0)));
-		corners_r.push_back(rMd.coord(bb.corner(0, 1, 1)));
-		corners_r.push_back(rMd.coord(bb.corner(1, 0, 0)));
-		corners_r.push_back(rMd.coord(bb.corner(1, 0, 1)));
-		corners_r.push_back(rMd.coord(bb.corner(1, 1, 0)));
-		corners_r.push_back(rMd.coord(bb.corner(1, 1, 1)));
-	}
-
-	DoubleBoundingBox3D bb_sigma = DoubleBoundingBox3D::fromCloud(corners_r);
+	DoubleBoundingBox3D bb_sigma = findEnclosingBoundingBox(data, Transform3D::Identity());
 	return bb_sigma.center();
 }
 
