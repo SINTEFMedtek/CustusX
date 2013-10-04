@@ -91,7 +91,10 @@ protected:
 	 */
 	virtual void fillPlaneCorners(float *planeCorners,
 	                              ProcessedUSInputDataPtr input);
-	
+
+	virtual void fillPlaneMatrices(float *planeMatrices,
+	                               ProcessedUSInputDataPtr input);
+	                               
 
 	/// OpenCL handles
 	cl_kernel mClKernel;

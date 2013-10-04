@@ -236,8 +236,10 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clPlaneEqs));
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clPlaneCorners));
 
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clPlaneMatrices));
+		
 	// FIXME: radius
-	float radius = 1.0f;
+	float radius = 2.0f;
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &radius));
 	// FIXME: method
 	int method = 0;
@@ -369,6 +371,36 @@ TordTest::fillPlaneCorners(float *planeCorners,
 		planeCorners[i++] = vCorner_0_y(1);
 		planeCorners[i++] = vCorner_0_y(2);
 		
+	}
+}
+
+void
+TordTest::fillPlaneMatrices(float *planeMatrices,
+                           ProcessedUSInputDataPtr input)
+{
+	std::vector<TimedPosition> vecPosition = input->getFrames();
+	
+	// Sanity check on the number of frames
+	if(input->getDimensions()[2] != vecPosition.end() - vecPosition.begin())
+	{
+		messageManager()->sendError(QString("Number of frames %1 != %2 dimension 2 of US input")
+		                            .arg(input->getDimensions()[2])
+		                            .arg(vecPosition.end() - vecPosition.begin()));
+		return;
+	}
+
+	int i = 0;
+	for(std::vector<TimedPosition>::iterator it = vecPosition.begin();
+	    it != vecPosition.end();
+	    it++)
+	{
+		Transform3D pos = it->mPos;
+	
+		// Now store the result in the output
+		for(int j = 0; j < 16; j++)
+		{
+			planeMatrices[i++] = pos(j/4, j%4);
+		}
 	}
 }
 
