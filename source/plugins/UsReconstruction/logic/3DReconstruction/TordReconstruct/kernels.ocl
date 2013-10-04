@@ -8,7 +8,7 @@ typedef struct _close_plane
 	float dist;
 	int plane_id;
 } close_plane_t;
-#define MAX_PLANES 3
+#define MAX_PLANES 10
 #define N_BLOCKS 10
 
 #define VOXEL(v,x,y,z) v[x + y*volume_xsize + z*volume_ysize*volume_xsize]
@@ -58,9 +58,9 @@ findClosePlanes(close_plane_t *close_planes,
                 float radius)
 {
 	int found = 0;
+	voxel.w = 1;
 	for(int i = 0; i < n_planes; i++)
 	{
-		voxel.w = 1;
 		float dist = plane_dist(voxel, plane_matrices[i]);
 
 		if(fabs(dist) < radius && found < MAX_PLANES)
@@ -100,7 +100,6 @@ getImageData(int plane_id,
 		block = n_big_blocks + (index_into_small_blocks / scans_per_block);
 	}
 	return &bscans_blocks[block][idx_in_block*in_xsize*in_ysize];
-
 }
 
 float4 transform(float16 matrix,
@@ -124,12 +123,16 @@ float4 transform_inv(float16 matrix,
 	float4 col1 = matrix.s159D;
 	float4 col2 = matrix.s26AE;
 	float4 col3 = matrix.s37BF;
-
+	
 	ret.x = dot(voxel,col0) - dot(col3,col0);
 	ret.y = dot(voxel,col1) - dot(col3,col1);
 	ret.z = dot(voxel,col2) - dot(col3,col2);
 	
-	ret.w = 1.0f;
+	/*ret.x = dot(voxel,col0);
+	ret.y = dot(voxel,col1);
+	ret.z = dot(voxel,col2);
+
+	ret -= col3; */
 	return ret;
 }
 
@@ -159,40 +162,17 @@ void printMatrix(float16 matrix)
 void toImgCoord(int* x,
                 int* y,
                 float4 voxel,
-                float4 plane_eq,
-                __global float* corners,
                 float16 plane_matrix,
-                int in_xsize,
-                int in_ysize,
                 float in_xspacing,
-                float in_yspacing)
+                float in_yspacing,
+                int in_ysize)
 {
 	DEBUG_PRINTF("Voxel: %f, %f, %f, %f\n",voxel.x, voxel.y, voxel.z, voxel.w);
-	DEBUG_PRINTF("in_xsize/ysize: %d, %d\n", in_xsize, in_ysize);
-	/*	for(int i = 0; i < 3; i++)
-	{
-		DEBUG_PRINTF("Corner %d: [%f, %f, %f]\n",
-		             i,
-		             corners[3*i + 0],
-		             corners[3*i + 1],
-		             corners[3*i + 2]);
-		             } */
-	#ifdef DEBUG
-	printf("Matrix:\n");
-	printMatrix(plane_matrix);
-	#endif
+
 	float4 transformed_voxel = transform_inv(plane_matrix, voxel);
 
-	DEBUG_PRINTF("Transformed Voxel: %f, %f, %f, %f\n",
-	             transformed_voxel.x,
-	             transformed_voxel.y,
-	             transformed_voxel.z,
-	             transformed_voxel.w);
-	
-	DEBUG_PRINTF("US spacing: %f, %f\n",in_xspacing, in_yspacing);
-
-	*x = voxel.x/in_xspacing;
-	*y = voxel.y/in_yspacing;
+	*x = transformed_voxel.x/in_xspacing;
+	*y = transformed_voxel.y/in_yspacing;
 }
 
 
@@ -222,19 +202,17 @@ performInterpolation(close_plane_t *close_planes,
                      int n_planes
 	)
 {
-	if(n_close_planes == 0) return 0;
+	if(n_close_planes == 0) return 1;
 	// Try a very crude reconstruction - just use the first close plane (lol)
-
 	
 	float4 voxel = close_planes[0].voxel;
 	int plane_id = 0;
 	float lowest_dist = 10.0f;
 		for(int i = 0; i < n_close_planes;  i++)
 	{
-		float dist = plane_dist(voxel,plane_matrices[close_planes[i].plane_id]);
-		if( dist < lowest_dist)
+		if(fabs(close_planes[i].dist) < fabs(lowest_dist))
 		{
-			lowest_dist = dist;
+			lowest_dist = close_planes[i].dist;
 			plane_id = close_planes[i].plane_id;
 		}
 	} 
@@ -251,29 +229,20 @@ performInterpolation(close_plane_t *close_planes,
 	float4 translated_voxel = projectOntoPlane(voxel,
 	                                           plane_matrices[plane_id]);
 	
-	DEBUG_PRINTF("Distance before translation: %f\n",
-	             plane_dist(voxel,
-	                        plane_matrices[plane_id]));
-	DEBUG_PRINTF("Distance after translation: %f\n",
-	             plane_dist(translated_voxel,
-	                        plane_matrices[plane_id]));
 	
 	// And then we get the pixel space coordinates
 	int x, y;
 	toImgCoord(&x,
 	           &y,
-	           translated_voxel,
-	           plane_eqs[plane_id],
-	           &plane_corners[9*plane_id],
+	           voxel,
 	           plane_matrices[plane_id],
-	           in_xsize,
-	           in_ysize,
 	           in_xspacing,
-	           in_yspacing);
-	DEBUG_PRINTF("Pixel: %d, %d, %d\n", x, y, plane_id);
+	           in_yspacing,
+	           in_ysize);
+
 	if(!isValidPixel(x,y, in_xsize, in_ysize))
 	{
-		return 100;
+		return 1;
 	}
 	return image[y*in_xsize + x];
 	//return (unsigned char)(x % 255);
@@ -313,10 +282,11 @@ voxel_methods(int volume_xsize,
               int method
 	)
 {
+
 	int id = get_global_id(0);
 	int x = id % volume_xsize;
 	int z = id / volume_xsize;
-	radius = 0.5f;
+	radius = 1.0f;
 
 	// Aggregate pointers to the bscan blocks into one array for convenience
 	
