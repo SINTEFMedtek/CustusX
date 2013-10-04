@@ -23,6 +23,7 @@ class QStringList;
 #include <QStringList> // can be removed by moving impl of Vector3D::fromString to cpp file, as done with Transform3D.
 #include <vtkSmartPointer.h>
 typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
+typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
 
 // Extensions of the Eigen classes
 // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html

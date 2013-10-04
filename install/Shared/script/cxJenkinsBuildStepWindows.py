@@ -50,6 +50,7 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
         p.add_argument('--b32', action='store_true', default=False, help='Build 32 bit.')
         p.add_argument('--jom', action='store_true', default=True, help='Use jom to build.')
         p.add_argument('--static', action='store_true', default=True, help='Link statically.')
+        p.add_argument('--run_catch_in_ctest', default=None, help='run catch using the input tag string, wrap each test in ctest thus running it as a separate process')
 
     def _applyArgumentParserArguments(self, options):
         'apply arguments defined in _addArgumentParserArguments()'
@@ -67,7 +68,10 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
         if not self.argumentParserArguments.skip_tests:
             self.cxBuilder.runAllTests()
         if not self.argumentParserArguments.skip_package:
-            self.cxBuilder.createInstallerPackage()   
+            self.cxBuilder.createInstallerPackage() 
+        if self.argumentParserArguments.run_catch_in_ctest is not None:
+            print 'running catch in ctest%s' % self.argumentParserArguments.run_catch_in_ctest
+            self.cxBuilder.runCatchTestsWrappedInCTest(self.argumentParserArguments.run_catch_in_ctest)
         self.cxBuilder.finish()
                      
 
