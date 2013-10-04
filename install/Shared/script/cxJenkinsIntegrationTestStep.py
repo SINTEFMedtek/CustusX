@@ -79,8 +79,11 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         
         self.cxInstaller.setRootDir(assembly.controlData.getRootDir())
         if platform.system() == 'Windows':
-            #path is not correct for 32bit builds
-            self.cxInstaller.setInstallerPath('%s\\_CPack_Packages\\win64\\NSIS' % custusx.buildPath())
+            build_path = custusx.buildPath()
+            if "32" in build_path:
+                self.cxInstaller.setInstallerPath('%s\\_CPack_Packages\\win32\\NSIS' % build_path)
+            else:
+                self.cxInstaller.setInstallerPath('%s\\_CPack_Packages\\win64\\NSIS' % build_path)
         else:
             self.cxInstaller.setInstallerPath(custusx.buildPath())
             
