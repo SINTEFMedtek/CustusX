@@ -31,8 +31,10 @@ int main(int argc, char *argv[])
 	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
 #endif
 
-	int retval = cxtest::CatchImpl().run(argc, argv);
+	int error_code = cxtest::CatchImpl().run(argc, argv);
+	if(error_code >0)
+		return 0;
 
-	return retval;
+	return error_code;
 }
 
