@@ -94,6 +94,7 @@ TordTest::initializeFrameBlocks(frameBlock_t* framePointers,
 			memcpy(&(framePointers[block].data[frameInThisBlock*frameSize]),
 			       inputFrames->getFrame(frame),
 			       frameSize);
+
 			frame++;
 		}
 	}	
@@ -207,14 +208,6 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[0]));
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[1]));
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[2]));
-	double *out_origin = outputData->GetOrigin();
-	spacings[0] = out_origin[0];
-	spacings[1] = out_origin[1];
-	spacings[2] = out_origin[2];
-
-	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[0]));
-	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[1]));
-	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[2]));
 	
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[0]));
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[1]));
@@ -256,6 +249,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                                       0,
 	                                       NULL,
 	                                       NULL));
+	
 
 	// Read back data
 	try {
