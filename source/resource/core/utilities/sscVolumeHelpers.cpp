@@ -12,7 +12,6 @@
 #include "sscImage.h"
 #include "sscDataManagerImpl.h"
 
-#include "sscImage.h"
 #include "sscDataManager.h"
 #include "sscUtilHelpers.h"
 #include "sscImageTF3D.h"
@@ -217,5 +216,37 @@ int calculateNumVoxelsWithMinValue(ImagePtr image)
 	return static_cast<int*>(image->getHistogram()->GetOutput()->GetScalarPointer())[0];
 }
 
+DoubleBoundingBox3D findEnclosingBoundingBox(std::vector<DataPtr> data, Transform3D qMr)
+{
+	if (data.empty())
+		return DoubleBoundingBox3D(0, 0, 0, 0, 0, 0);
 
+	std::vector<Vector3D> corners_r;
+
+	for (unsigned i = 0; i < data.size(); ++i)
+	{
+		Transform3D qMd = qMr * data[i]->get_rMd();
+		DoubleBoundingBox3D bb = data[i]->boundingBox();
+
+		corners_r.push_back(qMd.coord(bb.corner(0, 0, 0)));
+		corners_r.push_back(qMd.coord(bb.corner(0, 0, 1)));
+		corners_r.push_back(qMd.coord(bb.corner(0, 1, 0)));
+		corners_r.push_back(qMd.coord(bb.corner(0, 1, 1)));
+		corners_r.push_back(qMd.coord(bb.corner(1, 0, 0)));
+		corners_r.push_back(qMd.coord(bb.corner(1, 0, 1)));
+		corners_r.push_back(qMd.coord(bb.corner(1, 1, 0)));
+		corners_r.push_back(qMd.coord(bb.corner(1, 1, 1)));
+	}
+
+	DoubleBoundingBox3D bb_sigma = DoubleBoundingBox3D::fromCloud(corners_r);
+	return bb_sigma;
+}
+
+DoubleBoundingBox3D findEnclosingBoundingBox(std::vector<ImagePtr> images, Transform3D qMr)
+{
+	std::vector<DataPtr> datas(images.size());
+	for (unsigned i = 0; i < images.size(); ++i)
+		datas[i] = images[i];
+	return findEnclosingBoundingBox(datas, qMr);
+}
 } // namespace cx
