@@ -30,6 +30,7 @@
 #include "sscMessageManager.h"
 #include <vtkPlane.h>
 #include "sscLogger.h"
+#include "cxImageEnveloper.h"
 
 namespace cx
 {
@@ -117,6 +118,7 @@ MehdiGPURayCastMultiVolumeRep::~MehdiGPURayCastMultiVolumeRep()
 MehdiGPURayCastMultiVolumeRep::MehdiGPURayCastMultiVolumeRep() :
 	mVolume(vtkVolumePtr::New())
 {
+	mGenerator = ImageEnveloperImpl::create();
 }
 
 void MehdiGPURayCastMultiVolumeRep::addRepActorsToViewRenderer(View* view)
@@ -161,6 +163,11 @@ void MehdiGPURayCastMultiVolumeRep::vtkImageDataChangedSlot()
 	this->setup();
 }
 
+void MehdiGPURayCastMultiVolumeRep::setBoundingBoxGenerator(ImageEnveloperPtr generator)
+{
+	mGenerator = generator;
+}
+
 void MehdiGPURayCastMultiVolumeRep::setup()
 {
 	mMonitors.resize(mImages.size());
@@ -168,11 +175,19 @@ void MehdiGPURayCastMultiVolumeRep::setup()
 	if (mImages.empty())
 		return;
 
+	mGenerator->setImages(mImages);
+	//mGenerator->setMaxVoxelSize(...);
+//	MultiVolumeBoundingBoxGenerator::Box box = mGenerator->getBox();
+	mReferenceImage = mGenerator->getEnvelopingImage();
+
 	mMapper = vtkOpenGLGPUMultiVolumeRayCastMapperPtr::New();
-	mMapper->setNumberOfAdditionalVolumes(mImages.size()-1);
+	mMapper->setNumberOfAdditionalVolumes(mImages.size());
 	mVolume->SetMapper(mMapper);
 
 	this->transformChangedSlot();
+
+	mMapper->SetInput(0, mReferenceImage->getBaseVtkImageData());
+	//mVolume->SetProperty( property->getVolumeProperty() );
 
 	for (unsigned i=0; i<mImages.size(); ++i)
 	{
@@ -187,13 +202,14 @@ void MehdiGPURayCastMultiVolumeRep::setup()
 //		dataBuffer->allocate();
 //		unsigned int glUint = dataBuffer->getTextureUid();
 
-		mMapper->SetInput(i, mImages[i]->getBaseVtkImageData());
+		// index starts with main volume (and continues into additionalVolumes()), thus +1
+		mMapper->SetInput(i+1, mImages[i]->getBaseVtkImageData());
 
-		if (i==0)
-			mVolume->SetProperty( property->getVolumeProperty() );
-		else if (i>0)
-			mMapper->SetAdditionalProperty(i-1, property->getVolumeProperty() );//Mehdi
-
+//		if (i==0)
+//			mVolume->SetProperty( property->getVolumeProperty() );
+//		else if (i>0)
+//			mMapper->SetAdditionalProperty(i-1, property->getVolumeProperty() );//Mehdi
+		mMapper->SetAdditionalProperty(i, property->getVolumeProperty() );//Mehdi
 	}
 
 	// call after mVolume has been initialized
@@ -212,25 +228,15 @@ void MehdiGPURayCastMultiVolumeRep::transformChangedSlot()
 	if (mImages.empty())
 		return;
 
-	Transform3D rMd0 = mImages[0]->get_rMd(); // use on first volume
+	Transform3D rMd0 = mReferenceImage->get_rMd(); // use on first volume
+	mVolume->SetUserMatrix(rMd0.getVtkMatrix());
 
 	for (unsigned i=0; i<mImages.size(); ++i)
 	{
 		Transform3D rMdi = mImages[i]->get_rMd();
 		Transform3D d0Mdi = rMd0.inv() * rMdi; // use on additional volumescd
 
-		if (i==0)
-		{
-			mVolume->SetUserMatrix(rMd0.getVtkMatrix());
-		}
-		else if (i>0)
-		{
-			vtkTransformPtr transform = vtkTransform::New();
-			transform->SetMatrix(d0Mdi.getVtkMatrix());
-			transform->Update();
-			mMapper->SetAdditionalInputUserTransform(i-1,transform); //Mehdi
-		}
-
+		mMapper->SetAdditionalInputUserTransform(i, d0Mdi.getVtkTransform());
 	}
 }
 

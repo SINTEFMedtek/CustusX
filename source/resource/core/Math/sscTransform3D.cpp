@@ -58,6 +58,14 @@ vtkMatrix4x4Ptr getVtkMatrix(const Eigen::Affine3d* self)
 	return m;
 }
 
+vtkTransformPtr getVtkTransform(const Eigen::Affine3d* self)
+{
+	vtkTransformPtr retval = vtkTransform::New();
+	retval->SetMatrix(self->getVtkMatrix());
+	retval->Update();
+	return retval;
+}
+
 std::ostream& put(const Eigen::Affine3d* self, std::ostream& s, int indent, char newline)
 {
 	QString ind(indent, ' ');

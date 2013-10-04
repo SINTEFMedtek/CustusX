@@ -111,7 +111,7 @@ double Utilities::getFractionOfVoxelsAboveThreshold(vtkImageDataPtr image, int t
 {
 	unsigned int hits = getNumberOfVoxelsAboveThreshold(image, threshold);
 	Eigen::Array3i dim(image->GetDimensions());
-	unsigned int totalPixels = dim[0]*dim[1];
+	unsigned int totalPixels = dim[0]*dim[1]*dim[2];
 	if (totalPixels==0)
 		return -1;
 	return double(hits)/double(totalPixels);
