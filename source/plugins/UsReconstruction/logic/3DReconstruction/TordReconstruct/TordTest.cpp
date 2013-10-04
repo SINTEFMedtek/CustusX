@@ -12,17 +12,11 @@ namespace cx
 
 TordTest::TordTest()
 {
-	// FIXME: Be more clever when determining kernel path
-	initCL(QString(TORD_KERNEL_PATH) + "/kernels.ocl");
 }
 
 TordTest::~TordTest()
 {
-	if(moClContext != NULL)
-	{
-		ocl_release(moClContext);
-		moClContext = NULL;
-	}
+
 }
 
 std::vector<DataAdapterPtr>
@@ -334,7 +328,14 @@ TordTest::reconstruct(ProcessedUSInputDataPtr input,
                       QDomElement settings)
 {
 
-	return 	doGPUReconstruct(input, outputData);
+	initCL(QString(TORD_KERNEL_PATH) + "/kernels.ocl");
+	bool ret = 	doGPUReconstruct(input, outputData);
+	if(moClContext != NULL)
+	{
+		ocl_release(moClContext);
+		moClContext = NULL;
+	}
+	return ret;
 
 	/* vtkImageDataPtr target = outputData;
 	Eigen::Array3i targetDims(target->GetDimensions());
