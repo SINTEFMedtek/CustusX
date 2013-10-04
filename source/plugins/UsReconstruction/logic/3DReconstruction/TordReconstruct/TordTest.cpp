@@ -145,6 +145,28 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 
 	this->fillPlaneEqs(planeEqs, input);
 	this->fillPlaneCorners(planeCorners, input);
+
+
+	// Perform a sanity check on the plane corners - TODO delete this
+	for(int i = 0; i < nPlanes; i++)
+	{
+		for(int j = 0; j < 3; j++)
+		{
+			float dist = 0.0;
+			for(int k = 0; k < 3; k++)
+			{
+				dist += planeEqs[i*4+k] * planeCorners[i*9+j*3 + k];
+			}
+			dist += planeEqs[i*4+3];
+			if(fabs(dist) > 0.1f)
+			{
+				messageManager()->sendError(QString("Corner distance for plane %1 too long: %2!\n")
+				                            .arg(i).arg(dist));
+				return false;
+			}
+		}
+	}
+	
 	messageManager()->sendInfo(QString("Allocating buffer for plane equations, %1 floats").arg(nPlanes*4));
 	cl_mem clPlaneEqs = ocl_create_buffer(moClContext->context,
 	                                      CL_MEM_READ_ONLY,
@@ -152,21 +174,57 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                                      planeEqs);
 	messageManager()->sendInfo(QString("Allocating buffer for plane corners, %1 floats").arg(nPlanes*9));
 	cl_mem clPlaneCorners = ocl_create_buffer(moClContext->context,
-	                                      CL_MEM_READ_ONLY,
-	                                      nPlanes*sizeof(float)*9,
-	                                      planeCorners);
+	                                          CL_MEM_READ_ONLY,
+	                                          nPlanes*sizeof(float)*9,
+	                                          planeCorners);
 
 	delete [] planeEqs;
 	delete [] planeCorners;
+	
 
+	float *planeMatrices = new float[16*nPlanes];
+
+	this->fillPlaneMatrices(planeMatrices, input);
+
+	cl_mem clPlaneMatrices = ocl_create_buffer(moClContext->context,
+	                                           CL_MEM_READ_ONLY,
+	                                           nPlanes*sizeof(float)*16,
+	                                           planeMatrices);
+	                                           
+
+	
 	// Set kernel args
 	int arg = 0;
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &outputDims[0]));
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &outputDims[1]));
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &outputDims[2]));
+	double *out_spacing = outputData->GetSpacing();
+	float spacings[3];
+	spacings[0] = out_spacing[0];
+	spacings[1] = out_spacing[1];
+	spacings[2] = out_spacing[2];
+
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[0]));
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[1]));
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[2]));
+	double *out_origin = outputData->GetOrigin();
+	spacings[0] = out_origin[0];
+	spacings[1] = out_origin[1];
+	spacings[2] = out_origin[2];
+
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[0]));
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[1]));
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[2]));
+	
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[0]));
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[1]));
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[2]));
+	spacings[0] = input->getSpacing()[0];
+	spacings[1] = input->getSpacing()[1];
+	
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[0]));
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[1]));
+	
 	// The input blocks
 	for(int i = 0; i < numBlocks; i++)
 	{
