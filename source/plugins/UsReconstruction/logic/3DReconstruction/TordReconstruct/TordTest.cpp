@@ -295,7 +295,7 @@ TordTest::fillPlaneEqs(float *planeEqs,
 		// FIXME: This should be a separate function.
 		Transform3D pos = it->mPos;
 		// Pos is a transformation matrix. This means that the Z component of its
-		// rotational matrix is a normal vector to the plane.
+		// rotational matrix is a normal unit vector to the plane.
 		float a, b, c, d;
 		a = pos(0,2);
 		b = pos(1,2);
@@ -326,6 +326,7 @@ TordTest::fillPlaneCorners(float *planeCorners,
 		return;
 	}
 	Eigen::Array3i dims = input->getDimensions();
+	Vector3D spacings = input->getSpacing();
 	int i = 0;
 	// Corners in image space
 	Vector3D iCorner_0_0, iCorner_x_0, iCorner_0_y;
@@ -336,19 +337,19 @@ TordTest::fillPlaneCorners(float *planeCorners,
 	iCorner_0_0(1) = 0.0;
 	iCorner_0_0(2) = 0.0;
 	
-	iCorner_x_0(0) = dims[0];
+	iCorner_x_0(0) = dims[0]*spacings(0);
 	iCorner_x_0(1) = 0.0;
 	iCorner_x_0(2) = 0.0;
 
 	iCorner_0_y(0) = 0.0;
-	iCorner_0_y(1) = dims[1];
+	iCorner_0_y(1) = dims[1]*spacings(1);
 	iCorner_0_y(2) = 0.0;
 	
 	for(std::vector<TimedPosition>::iterator it = vecPosition.begin();
 	    it != vecPosition.end();
 	    it++)
 	{
-		// Transform the image space corner positions into volume space
+		// Transform the image space corner positions into world volume space
 		// TODO: Maybe the GPU should be doing this?
 		Transform3D pos = it->mPos;
 		vCorner_0_0 = pos * iCorner_0_0;
