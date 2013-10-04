@@ -13,12 +13,16 @@ typedef struct _close_plane
 
 #define VOXEL(v,x,y,z) v[x + y*volume_xsize + z*volume_ysize*volume_xsize]
 
-
 //#define DEBUG
+
 #ifdef DEBUG
+
 #define DEBUG_PRINTF(...) printf(##__VA_ARGS__)
+
 #else
+
 #define DEBUG_PRINTF(...)
+
 #endif
 
 
@@ -95,7 +99,7 @@ getImageData(int plane_id,
 		idx_in_block = index_into_small_blocks % scans_per_block;
 		block = n_big_blocks + (index_into_small_blocks / scans_per_block);
 	}
-	return &bscans_blocks[block][idx_in_block];
+	return &bscans_blocks[block][idx_in_block*in_xsize*in_ysize];
 
 }
 
@@ -188,7 +192,7 @@ void toImgCoord(int* x,
 	DEBUG_PRINTF("US spacing: %f, %f\n",in_xspacing, in_yspacing);
 
 	*x = voxel.x/in_xspacing;
-	*y = in_ysize - voxel.y/in_yspacing;
+	*y = voxel.y/in_yspacing;
 }
 
 
@@ -220,16 +224,12 @@ performInterpolation(close_plane_t *close_planes,
 {
 	if(n_close_planes == 0) return 0;
 	// Try a very crude reconstruction - just use the first close plane (lol)
-	__global unsigned char* image = getImageData(close_planes[0].plane_id,
-	                                    bscans_blocks,
-	                                    in_xsize,
-	                                    in_ysize,
-	                                    n_planes);
+
 	
 	float4 voxel = close_planes[0].voxel;
 	int plane_id = 0;
 	float lowest_dist = 10.0f;
-	for(int i = 0; i < n_close_planes;  i++)
+		for(int i = 0; i < n_close_planes;  i++)
 	{
 		float dist = plane_dist(voxel,plane_matrices[close_planes[i].plane_id]);
 		if( dist < lowest_dist)
@@ -237,8 +237,13 @@ performInterpolation(close_plane_t *close_planes,
 			lowest_dist = dist;
 			plane_id = close_planes[i].plane_id;
 		}
-	}
+	} 
 			
+		__global unsigned char* image = getImageData(plane_id,
+		                                             bscans_blocks,
+		                                             in_xsize,
+		                                             in_ysize,
+		                                             n_planes); 
 
 	// Now we project the voxel onto the plane by translating the voxel along the
 	// normal vector of the plane.
@@ -284,10 +289,7 @@ voxel_methods(int volume_xsize,
               float volume_xspacing,
               float volume_yspacing,
               float volume_zspacing,
-              float volume_xorigin,
-              float volume_yorigin,
-              float volume_zorigin,
-              int in_xsize,
+               int in_xsize,
               int in_ysize,
               int n_planes,
               float in_xspacing,
@@ -314,7 +316,6 @@ voxel_methods(int volume_xsize,
 	int id = get_global_id(0);
 	int x = id % volume_xsize;
 	int z = id / volume_xsize;
-
 	radius = 0.5f;
 
 	// Aggregate pointers to the bscan blocks into one array for convenience
@@ -344,10 +345,10 @@ voxel_methods(int volume_xsize,
 	for(int y = 0; y < volume_ysize; y++)
 	{
 			// Translate voxel to voxel space
-		float4 voxel = {x * volume_xspacing + volume_xorigin,
-		                y * volume_yspacing + volume_yorigin,
-		                z * volume_zspacing + volume_zorigin,
-		                0};
+		float4 voxel = {x * volume_xspacing,
+		                y * volume_yspacing,
+		                z * volume_zspacing,
+		                1.0f};
 		
 		
 		// Find all planes closer than radius
