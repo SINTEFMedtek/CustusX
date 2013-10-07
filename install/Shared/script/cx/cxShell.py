@@ -18,6 +18,8 @@ import platform
 import shutil
 import re
 import glob
+import argparse        
+
     
 class Shell (object):
     '''
@@ -39,6 +41,20 @@ class Shell (object):
         self.VERBOSE = False
         self.REDIRECT_OUTPUT = False
         self.TERMINATE_ON_ERROR = True
+        
+    def getArgParser(self):
+        p = argparse.ArgumentParser(add_help=False)
+        p.add_argument('-d', '--dummy', action='store_true', 
+                       default=False, dest='DUMMY',
+                       help='execute script without calling any shell commands')
+        p.add_argument('--redirect_output', action='store_true', 
+                       default=False, dest='REDIRECT_OUTPUT',
+                       help='Redirect stout/stderr through python. Not doing this can cause stdout mangling on the Jenkins server.')
+        return p
+
+    def applyCommandLine(self):
+        'read command line and apply the own argparser to self'
+        self.getArgParser().parse_known_args(namespace=self)
         
     def setDummyMode(self, value):
         shell.DUMMY = value
