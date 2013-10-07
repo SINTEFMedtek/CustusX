@@ -182,10 +182,10 @@ class Version:
 class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
     '''
     '''
-    def __init__(self):
-        ''
+#    def __init__(self):
+#        ''
 #        self.cxInstaller = cx.cxCustusXInstaller.CustusXInstaller()
-        super(Controller, self).__init__()
+#        super(Controller, self).__init__()
 
     def getDescription(self):                  
         return '''\
@@ -227,29 +227,48 @@ Thus, we get the following pattern:
     ..... development and alpha releases
 
 '''
-           
-    def _addArgumentParserArguments(self):
-        'subclasses can add parser arguments here'
-        super(Controller, self)._addArgumentParserArguments()
-        p = self.argumentParser
-#        p.add_argument('--beta_release', action='store_true', default=False, help='Create a beta CustusX release with a new patch version number.')
-        #p.add_argument('--alpha_release', action='store_true', default=False, help='Create a beta CustusX release with a new patch version number.')
+        
+    def addArgParsers(self):
+        'subclasses can add argparse instances to self.additionalparsers here'
+        self.controlData().setBuildType("Release")
+        super(Controller, self).addArgParsers()
+#        self.additionalParsers.append(self.controlData().getArgParser_core_build())
+        self.additionalParsers.append(self.getArgParser())
+       
+    def applyArgumentParsers(self):
+        super(Controller, self).applyArgumentParsers()
+#        self.controlData().applyCommandLine() 
+        self.options = self.getArgParser().parse_known_args()[0]
+        print 'Options: ', self.options
+
+    def getArgParser(self):
+        p = argparse.ArgumentParser(add_help=False)
         p.add_argument('-r', '--release_type', choices=['release','beta','alpha'], help='Type of release to create, de general description for more.', default='alpha')
         p.add_argument('-j', '--jenkins_release', action='store_true', default=False, help='Trigger a jenkins release using the generated git tag, publish to release server')
         p.add_argument('-u', '--username', default="user", help='jenkins user')
         p.add_argument('-p', '--password', default="not set", help='jenkins password')
+        return p
+        
+           
+#    def _addArgumentParserArguments(self):
+#        'subclasses can add parser arguments here'
+#        super(Controller, self)._addArgumentParserArguments()
+#        p = self.argumentParser
+##        p.add_argument('--beta_release', action='store_true', default=False, help='Create a beta CustusX release with a new patch version number.')
+#        #p.add_argument('--alpha_release', action='store_true', default=False, help='Create a beta CustusX release with a new patch version number.')
+#        p.add_argument('-r', '--release_type', choices=['release','beta','alpha'], help='Type of release to create, de general description for more.', default='alpha')
+#        p.add_argument('-j', '--jenkins_release', action='store_true', default=False, help='Trigger a jenkins release using the generated git tag, publish to release server')
+#        p.add_argument('-u', '--username', default="user", help='jenkins user')
+#        p.add_argument('-p', '--password', default="not set", help='jenkins password')
 
-    def _applyArgumentParserArguments(self, options):
-        'apply arguments defined in _addArgumentParserArguments()'
-        super(Controller, self)._applyArgumentParserArguments(options)
-
-    def getReleaseType(self):
-        return self.argumentParserArguments.release_type.upper()
+#    def _applyArgumentParserArguments(self, options):
+#        'apply arguments defined in _addArgumentParserArguments()'
+#        super(Controller, self)._applyArgumentParserArguments(options)
 
     def getOptions(self):
-        return self.argumentParserArguments;
+        return self.options;
     def getReleaseType(self):
-        return self.argumentParserArguments.release_type.upper()
+        return self.options.release_type.upper()
     
     def shouldIncreaseVersion(self):
         '''

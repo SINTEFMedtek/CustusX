@@ -29,7 +29,7 @@ import cx.cxComponentAssembly
 import cx.cxCustusXBuilder
 import cx.cxJenkinsBuildScriptBase
 
-class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
+class Controller_DISABLED_USE_MAIN_SCRIPT_INSTEAD(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
     '''
     Controller that builds, tests and deploys CustusX on a windows machine.
     '''
