@@ -26,6 +26,7 @@ if (BUILD_TESTING)
 		cxtestVideoGraphicsFixture
         cxtestVideoGraphics.cpp
 		cxtestVisualRendering.cpp
+                cxtestImageEnveloper.cpp
 		)
   
 	cx_catch_add_lib_and_exe(cxResourceVisualization

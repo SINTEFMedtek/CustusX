@@ -66,7 +66,7 @@ private:
 	vtkImageDataPtr convertToColorImage(vtkImageDataPtr image);
 	bool equalNumberOfComponents(vtkImageDataPtr image1, vtkImageDataPtr image2);
 
-	//	ViewWidget* mView;
+	boost::shared_ptr<cx::ViewWidget> mView;
 	vtkRenderWindowPtr mRenderWindow;
 	vtkRendererPtr mRenderer;
 	double mImageErrorThreshold;
