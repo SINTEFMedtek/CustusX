@@ -234,8 +234,7 @@ performInterpolation(close_plane_t *close_planes,
 	           voxel,
 	           plane_matrices[plane_id],
 	           in_xspacing,
-	           in_yspacing,
-		);
+	           in_yspacing);
 
 	if(!isValidPixel(x,y, in_xsize, in_ysize))
 	{
