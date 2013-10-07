@@ -83,6 +83,7 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     Primitives/sscVideoGraphics
     Primitives/sscGraphicalPrimitives
     Primitives/cxGraphicalAxes3D
+    Primitives/cxImageEnveloper
     )
 
 set( CX_RESOURCE_VISUALIZATION_LIBRARIES ${CX_RESOURCE_VISUALIZATION_LIBRARIES}
