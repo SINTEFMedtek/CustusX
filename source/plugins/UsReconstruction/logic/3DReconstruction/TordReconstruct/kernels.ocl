@@ -164,8 +164,7 @@ void toImgCoord(int* x,
                 float4 voxel,
                 float16 plane_matrix,
                 float in_xspacing,
-                float in_yspacing,
-                int in_ysize)
+                float in_yspacing)
 {
 	DEBUG_PRINTF("Voxel: %f, %f, %f, %f\n",voxel.x, voxel.y, voxel.z, voxel.w);
 
@@ -191,8 +190,6 @@ int isValidPixel(int x, int y, int in_xsize, int in_ysize)
 unsigned char
 performInterpolation(close_plane_t *close_planes,
                      int n_close_planes,
-                     __global float4 *plane_eqs,
-                     __global float *plane_corners,
                      __global float16 *plane_matrices, 
                      __global unsigned char* bscans_blocks[],
                      int in_xsize,
@@ -238,7 +235,7 @@ performInterpolation(close_plane_t *close_planes,
 	           plane_matrices[plane_id],
 	           in_xspacing,
 	           in_yspacing,
-	           in_ysize);
+		);
 
 	if(!isValidPixel(x,y, in_xsize, in_ysize))
 	{
@@ -275,8 +272,6 @@ voxel_methods(int volume_xsize,
               __global unsigned char* in_bscans_b8,
               __global unsigned char* in_bscans_b9,
               __global unsigned char* out_volume,
-              __global float4* plane_eqs,
-              __global float* plane_corners,
               __global float16 *plane_matrices, 
               float radius,
               int method
@@ -327,8 +322,6 @@ voxel_methods(int volume_xsize,
 		// Call appropriate method to determine pixel value
 		VOXEL(out_volume,x,y,z) = performInterpolation(close_planes,
 		                                               n_close_planes,
-		                                               plane_eqs,
-		                                               plane_corners,
 		                                               plane_matrices,
 		                                               bscans_blocks,
 		                                               in_xsize,

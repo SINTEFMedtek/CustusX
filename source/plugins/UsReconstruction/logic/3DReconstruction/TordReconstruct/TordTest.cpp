@@ -141,7 +141,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	// FIXME: Fill plane eqs
 	size_t nPlanes = input->getDimensions()[2];
 
-	float *planeEqs = new float[nPlanes*4];
+	/*	float *planeEqs = new float[nPlanes*4];
 	float *planeCorners = new float[nPlanes*9];
 
 	this->fillPlaneEqs(planeEqs, input);
@@ -182,7 +182,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	delete [] planeEqs;
 	delete [] planeCorners;
 	
-
+	*/
 	float *planeMatrices = new float[16*nPlanes];
 
 	this->fillPlaneMatrices(planeMatrices, input);
@@ -225,10 +225,11 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	}
 	// The output volume
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clOutputVolume));
+	/*
 	// Plane equations
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clPlaneEqs));
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clPlaneCorners));
-
+	*/
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clPlaneMatrices));
 		
 	// FIXME: radius
