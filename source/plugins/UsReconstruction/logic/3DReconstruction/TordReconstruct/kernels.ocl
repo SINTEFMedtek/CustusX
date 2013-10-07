@@ -8,7 +8,7 @@ typedef struct _close_plane
 	float dist;
 	int plane_id;
 } close_plane_t;
-#define MAX_PLANES 10
+#define MAX_PLANES 25
 #define N_BLOCKS 10
 
 #define VOXEL(v,x,y,z) v[x + y*volume_xsize + z*volume_ysize*volume_xsize]
@@ -26,7 +26,7 @@ typedef struct _close_plane
 #endif
 
 
-float plane_dist( float4 voxel, float16 matrix)
+float plane_dist(const float4 voxel, const float16 matrix)
 {
 	//	float4 z_axis = matrix.s89AB;
 	float4 z_axis = matrix.s26AE;
@@ -36,23 +36,24 @@ float plane_dist( float4 voxel, float16 matrix)
 	return dot(z_axis, voxel) - dot(z_axis, trans);
 }
 
-float4 projectOntoPlane(float4 voxel, float16 matrix)
+float4 projectOntoPlane(const float4 voxel, const float16 matrix, const float dist)
 {
-	//float4 z_axis = matrix.s89AB;
 	float4 z_axis = matrix.s26AE;
 	
-	return voxel - (plane_dist(voxel, matrix) * z_axis);
-}
+	return voxel - dist*(voxel * z_axis); 
+} 
+
 
 	
 	
 /** Find all planes that are within radius of voxel.
     Perform a simple linear search for now.
-    May need to optimize this
+    May need to optimize this.
+    It spends ~50% of the time in here!
 */
 int
 findClosePlanes(close_plane_t *close_planes,
-                __global float16* plane_matrices,
+                __global float16* const plane_matrices,
                 int n_planes,
                 float4 voxel,
                 float radius)
@@ -69,6 +70,7 @@ findClosePlanes(close_plane_t *close_planes,
 			close_planes[found].dist = dist;
 			close_planes[found].plane_id = i;
 			found++;
+			if(found == MAX_PLANES) return found;
 		}
 	}
 	return found;
@@ -77,7 +79,7 @@ findClosePlanes(close_plane_t *close_planes,
 
 __global unsigned char*
 getImageData(int plane_id,
-             __global unsigned char* bscans_blocks[],
+             __global const unsigned char* bscans_blocks[],
              int in_xsize,
              int in_ysize,
              int n_planes)
@@ -190,8 +192,8 @@ int isValidPixel(int x, int y, int in_xsize, int in_ysize)
 unsigned char
 performInterpolation(close_plane_t *close_planes,
                      int n_close_planes,
-                     __global float16 *plane_matrices, 
-                     __global unsigned char* bscans_blocks[],
+                     __global const float16  *plane_matrices, 
+                     __global const unsigned char* bscans_blocks[],
                      int in_xsize,
                      int in_ysize,
                      float in_xspacing,
@@ -205,7 +207,7 @@ performInterpolation(close_plane_t *close_planes,
 	float4 voxel = close_planes[0].voxel;
 	int plane_id = 0;
 	float lowest_dist = 10.0f;
-		for(int i = 0; i < n_close_planes;  i++)
+	for(int i = 0; i < n_close_planes;  i++)
 	{
 		if(fabs(close_planes[i].dist) < fabs(lowest_dist))
 		{
@@ -224,7 +226,9 @@ performInterpolation(close_plane_t *close_planes,
 	// normal vector of the plane.
 	
 	float4 translated_voxel = projectOntoPlane(voxel,
-	                                           plane_matrices[plane_id]);
+	                                           plane_matrices[plane_id],
+	                                           close_planes[plane_id].dist);
+	
 	
 	
 	// And then we get the pixel space coordinates
@@ -240,7 +244,7 @@ performInterpolation(close_plane_t *close_planes,
 	{
 		return 1;
 	}
-	return image[y*in_xsize + x];
+	return max((unsigned char)1, image[y*in_xsize + x]);
 	//return (unsigned char)(x % 255);
 	
 	
@@ -308,7 +312,7 @@ voxel_methods(int volume_xsize,
 	// Iterate over Y axis
 	for(int y = 0; y < volume_ysize; y++)
 	{
-			// Translate voxel to voxel space
+		// Transform voxel to volume space
 		float4 voxel = {x * volume_xspacing,
 		                y * volume_yspacing,
 		                z * volume_zspacing,
