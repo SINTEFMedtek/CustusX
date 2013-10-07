@@ -241,6 +241,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 
 	// Global work items:
 	size_t global_work_size = outputDims[0]*outputDims[2];
+	messageManager()->sendInfo(QString("Executing kernel"));
 	ocl_check_error(clEnqueueNDRangeKernel(moClContext->cmd_queue,
 	                                       mClKernel,
 	                                       1,
@@ -266,7 +267,15 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	{
 		messageManager()->sendInfo(QString((std::string("Got exception: ") + except).c_str()));
 	}
-		
+	messageManager()->sendInfo(QString("Done, freeing GPU memory"));
+	// Free the allocated cl memory objects
+	for(int i = 0; i < numBlocks; i++)
+	{
+		ocl_check_error(clReleaseMemObject(clBlocks[i]));
+	}
+	ocl_check_error(clReleaseMemObject(clOutputVolume));
+	ocl_check_error(clReleaseMemObject(clPlaneMatrices));
+	
 	
 	return true;
 }
