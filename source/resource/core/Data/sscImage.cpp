@@ -359,6 +359,11 @@ DoubleBoundingBox3D Image::boundingBox() const
 	return bounds;
 }
 
+Eigen::Array3d Image::getSpacing() const
+{
+	return Eigen::Array3d(mBaseImageData->GetSpacing());
+}
+
 vtkImageAccumulatePtr Image::getHistogram()
 {
 	if (mHistogramPtr.GetPointer() == NULL)

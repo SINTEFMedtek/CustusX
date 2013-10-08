@@ -41,7 +41,7 @@ public:
 
 	virtual void setImages(std::vector<ImagePtr> images) = 0;
 	//virtual Box getBox() const = 0;
-	virtual ImagePtr getEnvelopingImage() = 0;
+	virtual ImagePtr getEnvelopingImage(long maxVoxels = 0) = 0;
 };
 
 typedef boost::shared_ptr<class ImageEnveloperMoc> ImageEnveloperMocPtr;
@@ -53,7 +53,7 @@ public:
 	virtual ~ImageEnveloperMoc() {}
 	virtual void setImages(std::vector<ImagePtr> images);
 	//virtual Box getBox() const;
-	virtual ImagePtr getEnvelopingImage();
+	virtual ImagePtr getEnvelopingImage(long maxVoxels = 0);
 
 private:
 	std::vector<ImagePtr> mImages;
@@ -69,7 +69,8 @@ public:
 
 	virtual void setImages(std::vector<ImagePtr> images);
 	//virtual Box getBox() const;
-	virtual ImagePtr getEnvelopingImage();
+	virtual ImagePtr getEnvelopingImage(long maxVoxels = 0);
+	static Eigen::Array3i getDimFromExtent(Eigen::Array3d extent, Eigen::Array3d spacing);
 
 private:
 	std::vector<ImagePtr> mImages;
@@ -78,13 +79,22 @@ private:
 	{
 		Transform3D m_rMd;
 		Eigen::Array3i mDim;
-		Vector3D mSpacing;
+		Eigen::Array3d mSpacing;
 		QString mParentVolume;
+		double getVolume()
+		{
+			Eigen::Array3d extent = (mDim.cast<double>()-1)* mSpacing;
+			return extent.prod();
+		}
+		long getNumVoxels() { return mDim.prod(); }
 	};
-
+	ImageEnveloperImpl::Parameters reduceToNumberOfVoxels(ImageEnveloperImpl::Parameters box, long maxVoxels);
 	ImageEnveloperImpl::Parameters createEnvelopeParametersFromImage(ImagePtr img);
+	ImageEnveloperImpl::Parameters selectParametersWithSmallestExtent(ImageEnveloperImpl::Parameters a, ImageEnveloperImpl::Parameters b);
+	ImageEnveloperImpl::Parameters selectParametersWithFewestVoxels(ImageEnveloperImpl::Parameters a, ImageEnveloperImpl::Parameters b);
 	ImagePtr createEnvelopeFromParameters(Parameters box);
-//	ImagePtr createEnvelopeFromImage(ImagePtr img);
+	Eigen::Array3d getMinimumSpacingFromAllImages(Transform3D qMr);
+	Eigen::Array3d getTransformedSpacing(Eigen::Array3d spacing, Transform3D qMd);
 };
 
 } // namespace cx
