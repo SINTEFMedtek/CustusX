@@ -55,21 +55,23 @@ class CustusXTestInstallation:
         PrintFormatter.printHeader('Test installation', level=2)
         appPath = self._getInstalledBinaryPath()
      
-        self._testExecutable(appPath, 'Catch%s', '-h')
-        
         if platform.system == 'Linux':
-            self._testExecutable(appPath, 'CustusX%s')
-            self._testExecutable(appPath, 'OpenIGTLinkServer%s')
+            self._testExecutable(appPath, 'Catch', '-h')
+            self._testExecutable(appPath, 'CustusX')
+            self._testExecutable(appPath, 'OpenIGTLinkServer')
             
         if platform.system() == 'Darwin':
-            self._testExecutable(appPath, 'CustusX%s')
-            self._testExecutable(appPath, 'OpenIGTLinkServer%s')
+            self._testExecutable(appPath, 'Catch', '-h')
+            self._testExecutable(appPath, 'CustusX')
+            self._testExecutable(appPath, 'OpenIGTLinkServer')
             self._testExecutable(appPath, 'GrabberServer')
             
         if platform.system() == 'Windows':
             if "32" in appPath: #Win32
+                self._testExecutable(appPath, 'Catch.exe', '-h')
                 self._testExecutable(appPath, 'UltrasonixServer.exe')
             else: #Win64
+                self._testExecutable(appPath, 'Catch.exe', '-h')
                 self._testExecutable(appPath, 'CustusX.exe')
                 self._testExecutable(appPath, 'OpenIGTLinkServer.exe')
                 
