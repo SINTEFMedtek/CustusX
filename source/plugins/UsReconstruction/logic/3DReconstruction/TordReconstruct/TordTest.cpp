@@ -12,6 +12,8 @@ namespace cx
 
 TordTest::TordTest()
 {
+	mMethods.push_back("VNN");
+	mMethods.push_back("VNN2");
 }
 
 TordTest::~TordTest()
@@ -24,8 +26,47 @@ TordTest::getSettings(QDomElement root)
 {
 	std::vector<DataAdapterPtr> retval;
 
-	// Add settings here if needed
+	retval.push_back(this->getMethodOption(root));
+	retval.push_back(this->getRadiusOption(root));
 	return retval;
+}
+
+StringDataAdapterXmlPtr
+TordTest::getMethodOption(QDomElement root)
+{
+	QStringList methods;
+	for(std::vector<QString>::iterator it = mMethods.begin();
+	    it != mMethods.end();
+	    it++)
+	{
+		QString method = *it;
+		methods << method;
+	}
+	return StringDataAdapterXml::initialize("Method",
+	                                        "",
+	                                        "Which algorithm to use for reconstruction",
+	                                        methods[0],
+	                                        methods,
+	                                        root);
+}
+
+
+DoubleDataAdapterXmlPtr
+TordTest::getRadiusOption(QDomElement root)
+{
+	return DoubleDataAdapterXml::initialize("Radius (mm)", "",
+	                                        "Radius of kernel. mm.",
+	                                        1,
+	                                        DoubleRange(0.1, 10, 0.1),
+	                                        1,
+	                                        root);
+}
+int
+TordTest::getMethodID(QDomElement root)
+{
+	return find(mMethods.begin(), mMethods.end(),
+	            this->getMethodOption(root)->getValue()
+		) - mMethods.begin();
 }
 
 bool
@@ -103,7 +144,9 @@ TordTest::initializeFrameBlocks(frameBlock_t* framePointers,
 
 bool
 TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
-                           vtkImageDataPtr outputData)
+                           vtkImageDataPtr outputData,
+                           int method,
+                           float radius)
 {
 	int numBlocks = 10; // FIXME?
 	// Split input US into blocks
@@ -232,11 +275,8 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	*/
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clPlaneMatrices));
 		
-	// FIXME: radius
-	float radius = 2.0f;
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &radius));
 	// FIXME: method
-	int method = 0;
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &method));
 
 	// Global work items:
@@ -424,7 +464,10 @@ TordTest::reconstruct(ProcessedUSInputDataPtr input,
 {
 
 	initCL(QString(TORD_KERNEL_PATH) + "/kernels.ocl");
-	bool ret = 	doGPUReconstruct(input, outputData);
+	int method = getMethodID(settings);
+	float radius = getRadiusOption(settings)->getValue();
+	messageManager()->sendInfo(QString("Method: %1, radius: %2").arg(method).arg(radius));
+	bool ret = 	doGPUReconstruct(input, outputData, method, radius);
 	if(moClContext != NULL)
 	{
 		ocl_release(moClContext);
