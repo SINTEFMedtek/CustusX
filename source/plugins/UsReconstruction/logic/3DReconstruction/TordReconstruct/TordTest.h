@@ -6,6 +6,8 @@
 #include "sscReconstructAlgorithm.h"
 #include "Thunder/setup.h"
 #include <sscUSFrameData.h>
+#include "sscStringDataAdapterXml.h"
+#include "sscDoubleDataAdapterXml.h"
 
 namespace cx
 {
@@ -44,7 +46,9 @@ protected:
 	
 	virtual bool initCL(QString kernelFile);
 	virtual bool doGPUReconstruct(ProcessedUSInputDataPtr input,
-	                              vtkImageDataPtr outputData);
+	                              vtkImageDataPtr outputData,
+	                              int method,
+	                              float radius);
 
 	/**
 	 * Split the US input into numBlock blocks of whole frames 
@@ -94,13 +98,36 @@ protected:
 
 	virtual void fillPlaneMatrices(float *planeMatrices,
 	                               ProcessedUSInputDataPtr input);
-	                               
+
+	/**
+	 * Retrieve the method ID from the settings
+	 * @param root The algorithm settings from the UI
+	 * @return the method ID to use in the OpenCL kernel
+	 */
+	virtual int getMethodID(QDomElement root);
+
+	/**
+	 * Make method option for the UI
+	 * @param root The root of the configuration ui
+	 * @return List of available methods - with the selected one available by ->getValue()
+	 */
+	virtual StringDataAdapterXmlPtr getMethodOption(QDomElement root);
+	
+	/**
+	 * Make radius option for the UI
+	 * @param root The root of the configuration ui
+	 * @return Radius data adapter - with selected value available by ->getValue()
+	 */
+	virtual DoubleDataAdapterXmlPtr getRadiusOption(QDomElement root);
 
 	/// OpenCL handles
 	cl_kernel mClKernel;
 	std::vector<cl_mem> mVClMemBscan;
 	cl_mem mClMemOutput;
 	ocl_context* moClContext;
+
+	// Method names. Indices into this array corresponds to method IDs in the OpenCL Kernel.
+	std::vector<QString> mMethods;
 	
 };
 
