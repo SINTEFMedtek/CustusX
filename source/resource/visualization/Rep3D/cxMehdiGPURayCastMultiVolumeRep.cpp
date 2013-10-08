@@ -118,7 +118,7 @@ MehdiGPURayCastMultiVolumeRep::~MehdiGPURayCastMultiVolumeRep()
 MehdiGPURayCastMultiVolumeRep::MehdiGPURayCastMultiVolumeRep() :
 	mVolume(vtkVolumePtr::New())
 {
-	mGenerator = ImageEnveloperImpl::create();
+	mGenerator = ImageEnveloper::create();
 }
 
 void MehdiGPURayCastMultiVolumeRep::addRepActorsToViewRenderer(View* view)
@@ -178,7 +178,7 @@ void MehdiGPURayCastMultiVolumeRep::setup()
 	mGenerator->setImages(mImages);
 	//mGenerator->setMaxVoxelSize(...);
 //	MultiVolumeBoundingBoxGenerator::Box box = mGenerator->getBox();
-	mReferenceImage = mGenerator->getEnvelopingImage();
+	mReferenceImage = mGenerator->getEnvelopingImage(mMaxVoxels);
 
 	mMapper = vtkOpenGLGPUMultiVolumeRayCastMapperPtr::New();
 	mMapper->setNumberOfAdditionalVolumes(mImages.size());

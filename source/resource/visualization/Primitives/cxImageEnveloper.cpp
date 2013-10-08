@@ -24,63 +24,120 @@
 
 namespace cx
 {
-
-ImageEnveloperMocPtr ImageEnveloperMoc::create()
+ImageEnveloperPtr ImageEnveloper::create()
 {
-	return ImageEnveloperMocPtr(new ImageEnveloperMoc());
+	return ImageEnveloperPtr(new ImageEnveloper());
 }
 
-void ImageEnveloperMoc::setImages(std::vector<ImagePtr> images)
+void ImageEnveloper::setImages(std::vector<ImagePtr> images)
 {
 	mImages = images;
 }
 
-ImagePtr ImageEnveloperMoc::getEnvelopingImage()
+ImagePtr ImageEnveloper::getEnvelopingImage(long maxVoxels)
 {
-	return mImages[0];
-}
+	ImageParameters box = createEnvelopeParametersFromImage(mImages[0]);
+	for(unsigned i = 1; i < mImages.size(); ++i)
+		box = selectParametersWithSmallestExtent(box, createEnvelopeParametersFromImage(mImages[i]));
+//		box = selectParametersWithFewestVoxels(box, createEnvelopeParametersFromImage(mImages[i]));
 
+//	std::cout << "spacing: " << box.mSpacing << std::endl;
+//	std::cout << "dims: " << box.mDim << std::endl;
 
-///--------------------------------------------------------
-
-ImageEnveloperImplPtr ImageEnveloperImpl::create()
-{
-	return ImageEnveloperImplPtr(new ImageEnveloperImpl());
-}
-
-void ImageEnveloperImpl::setImages(std::vector<ImagePtr> images)
-{
-	mImages = images;
-}
-
-ImagePtr ImageEnveloperImpl::getEnvelopingImage()
-{
-	ImagePtr img = mImages[0];
-
-	Parameters box = createEnvelopeParametersFromImage(img);
-
-	ImagePtr retval = createEnvelopeFromParameters(box);
+	box = this->reduceToNumberOfVoxels(box, maxVoxels);
+	ImagePtr retval = this->createEnvelopeFromParameters(box);
 
 	return retval;
 }
 
-ImageEnveloperImpl::Parameters ImageEnveloperImpl::createEnvelopeParametersFromImage(ImagePtr img)
+ImageParameters ImageEnveloper::reduceToNumberOfVoxels(ImageParameters box, long maxVoxels)
 {
-	Parameters retval;
+	if((box.getNumVoxels() < maxVoxels) || maxVoxels == 0)
+		return box;
+
+	double factor = pow( maxVoxels / box.getNumVoxels(), 1/3.0 );
+	box.mDim = box.mDim * factor;
+	box.mSpacing = box.mSpacing / factor;
+
+	if(box.getNumVoxels() < maxVoxels)
+		std::cout << "error" << std::endl;
+
+	return box;
+}
+
+ImageParameters ImageEnveloper::createEnvelopeParametersFromImage(ImagePtr img)
+{
+	ImageParameters retval;
 
 	DoubleBoundingBox3D bb = findEnclosingBoundingBox(mImages, img->get_rMd().inverse());
 
-	//Testvalues
-	retval.mDim = Eigen::Array3i(img->getBaseVtkImageData()->GetDimensions());
-//	retval.m_rMd =
-//	retval.mDim = ;
-	retval.mSpacing = Vector3D(img->getBaseVtkImageData()->GetSpacing());
+	retval.mSpacing = this->getMinimumSpacingFromAllImages(img->get_rMd().inverse());
+//	retval.mDim = this->getDimFromExtent(bb.range().array(), retval.mSpacing.array());
+	retval.setDimFromBounds(bb.range().array());
 	retval.mParentVolume = img->getUid();
-	retval.m_rMd = img->get_rMd();
+
+//	std::cout << "extent: " << bb.range().array() << std::endl;
+//	std::cout << "spacing: " << retval.mSpacing.array() << std::endl;
+
+	Vector3D shift = bb.bottomLeft();
+
+	retval.m_rMd = img->get_rMd() * createTransformTranslate(shift);
 	return retval;
 }
 
-ImagePtr ImageEnveloperImpl::createEnvelopeFromParameters(Parameters box)
+ImageParameters ImageEnveloper::selectParametersWithSmallestExtent(ImageParameters a, ImageParameters b)
+{
+	if (a.getVolume() <= b.getVolume())
+		return a;
+	else
+		return b;
+}
+
+ImageParameters ImageEnveloper::selectParametersWithFewestVoxels(ImageParameters a, ImageParameters b)
+{
+	if (a.getNumVoxels() <= b.getNumVoxels())
+		return a;
+	else
+		return b;
+}
+
+Eigen::Array3d ImageEnveloper::getMinimumSpacingFromAllImages(Transform3D qMr)
+{
+	Eigen::Array3d retval;
+	retval = this->getTransformedSpacing(mImages[0]->getSpacing(), qMr * mImages[0]->get_rMd());
+	for (unsigned i = 1; i < mImages.size(); ++i)
+	{
+		Eigen::Array3d current = this->getTransformedSpacing(mImages[i]->getSpacing(), qMr * mImages[i]->get_rMd());
+		retval = retval.min(current);
+	}
+	return retval;
+}
+
+Eigen::Array3d ImageEnveloper::getTransformedSpacing(Eigen::Array3d spacing, Transform3D qMd)
+{
+	Eigen::Array3d retval;
+
+	//Create spacing vectors in img coord syst (d)
+	Vector3D sx = Vector3D(spacing[0], 0, 0);
+	Vector3D sy = Vector3D(0, spacing[1], 0);
+	Vector3D sz = Vector3D(0, 0, spacing[2]);
+
+	//Transform to q coord syst
+	sx = qMd.vector(sx);
+	sy = qMd.vector(sy);
+	sz = qMd.vector(sz);
+
+	//Find spacing for each axis
+	for (unsigned i = 0; i < 3; ++i)
+	{
+		retval[i] = std::max(sx[i], sy[i]);
+		retval[i] = std::max(retval[i], sz[i]);
+	}
+
+	return retval;
+}
+
+ImagePtr ImageEnveloper::createEnvelopeFromParameters(ImageParameters box)
 {
 	vtkImageDataPtr imageData = generateVtkImageData(box.mDim, box.mSpacing, 0, 1);
 	QString uid = QString("envelope_image_%1").arg(box.mParentVolume);
@@ -91,19 +148,5 @@ ImagePtr ImageEnveloperImpl::createEnvelopeFromParameters(Parameters box)
 	retval->setModality("SC");
 	return retval;
 }
-
-//ImagePtr ImageEnveloperImpl::createEnvelopeFromImage(ImagePtr img)
-//{
-//	vtkImageDataPtr imageData = generateVtkImageData(Eigen::Array3i(img->getBaseVtkImageData()->GetDimensions()),
-//												Vector3D(img->getBaseVtkImageData()->GetSpacing()), 0, 1);
-//	QString uid = QString("envelope_image_%1").arg(img->getUid());
-//	ImagePtr retval(new Image(uid, imageData));
-//	retval->get_rMd_History()->setRegistration(img->get_rMd());
-//	retval->get_rMd_History()->setParentSpace(img->getUid());
-//	retval->setAcquisitionTime(QDateTime::currentDateTime());
-//	retval->setModality("SC");
-//	return retval;
-//}
-
 
 } // namespace cx

@@ -168,7 +168,7 @@ ImagePtr ReconstructCore::generateOutputVolume(vtkImageDataPtr rawOutput)
 	QString name = this->generateImageName(uid);
 
 	ImagePtr image = dataManager()->createImage(rawOutput, uid + "_%1", name + " %1", filePath);
-	image->get_rMd_History()->setRegistration(mOutputVolumeParams.m_rMd);
+	image->get_rMd_History()->setRegistration(mOutputVolumeParams.get_rMd());
 	image->setModality("US");
 	if (mInput.mAngio)
 		image->setImageType("Angio");

@@ -17,10 +17,101 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- * sscReconstructedOutputVolumeParams.cpp
- *
- *  Created on: May 27, 2010
- *      Author: christiana
- */
+#include "sscReconstructedOutputVolumeParams.h"
 
+namespace cx
+{
+
+OutputVolumeParams::OutputVolumeParams() :
+	mExtent(0, 0, 0, 0, 0, 0), mInputSpacing(0), m_rMd(Transform3D::Identity()),
+	mDim(0, 0, 0), mSpacing(0), mMaxVolumeSize(32)
+{
+
+}
+/** Initialize the volue parameters with sensible defaults.
+ */
+OutputVolumeParams::OutputVolumeParams(DoubleBoundingBox3D extent, double inputSpacing) :
+	mExtent(extent), mInputSpacing(inputSpacing), mMaxVolumeSize(32)
+{
+	// Calculate optimal output image spacing and dimensions based on US frame spacing
+	this->setSpacing(mInputSpacing);
+	this->constrainVolumeSize();
+}
+
+unsigned long OutputVolumeParams::getVolumeSize() const
+{
+	return mDim[0] * mDim[1] * mDim[2];;
+}
+
+/** Set a spacing, recalculate dimensions.
+ */
+void OutputVolumeParams::setSpacing(double spacing)
+{
+	mSpacing = spacing;
+	Vector3D v = mExtent.range() / mSpacing;
+	mDim << ::ceil(v[0]), ::ceil(v[1]), ::ceil(v[2]);
+}
+double OutputVolumeParams::getSpacing() const
+{
+	return mSpacing;
+}
+/** Set one of the dimensions explicitly, recalculate other dims and spacing.
+ */
+void OutputVolumeParams::setDim(int index, int val)
+{
+	setSpacing(mExtent.range()[index] / val);
+}
+Eigen::Array3i OutputVolumeParams::getDim() const
+{
+	return mDim;
+}
+/** Increase spacing in order to keep size below a max size
+ */
+void OutputVolumeParams::constrainVolumeSize()
+{
+	this->setSpacing(mInputSpacing); // reset to default values
+
+	// Reduce output volume size if optimal volume size is too large
+	unsigned long volumeSize = getVolumeSize();
+	unsigned long maxVolumeSize = this->getMaxVolumeSize();
+	if (volumeSize > maxVolumeSize)
+	{
+		Vector3D ext = mExtent.range();
+		double newSpacing = pow(ext[0]*ext[1]*ext[2] / double(maxVolumeSize), 1 / 3.0);
+		this->setSpacing(newSpacing);
+	}
+}
+
+void OutputVolumeParams::setMaxVolumeSize(double maxSize)
+{
+	mMaxVolumeSize = maxSize;
+}
+
+unsigned long OutputVolumeParams::getMaxVolumeSize()
+{
+	return mMaxVolumeSize;
+}
+
+
+void OutputVolumeParams::set_rMd(Transform3D rMd)
+{
+	mImage.m_rMd = rMd;
+}
+
+Transform3D OutputVolumeParams::get_rMd()
+{
+	return mImage.m_rMd;
+}
+
+
+DoubleBoundingBox3D OutputVolumeParams::getExtent()
+{
+	return mExtent;
+}
+
+double OutputVolumeParams::getInputSpacing()
+{
+	return mInputSpacing;
+}
+
+} // namespace cx
