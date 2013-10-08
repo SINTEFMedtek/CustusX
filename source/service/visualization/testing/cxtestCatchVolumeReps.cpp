@@ -56,7 +56,7 @@ namespace
 	}
 }// namespace
 
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[rep][unit][gui][not_apple]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[rep][unit][gui][not_apple][hide]")
 {
 	unsigned int imageCount = 3;
 	std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(3,3,3), 200);
@@ -68,13 +68,13 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[rep][un
 	requireRepRender(rep);
 }
 
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 1 small volume.", "[rep][unit][gui][not_apple]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 1 small volume.", "[rep][unit][gui][not_apple][hide]")
 {
 	unsigned int imageCount = 1;
 	std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(3,3,3), 200);
 
 	cx::MehdiGPURayCastMultiVolumeRepPtr rep = cx::MehdiGPURayCastMultiVolumeRep::New("");
-	rep->setBoundingBoxGenerator(cx::ImageEnveloperImpl::create());
+	rep->setBoundingBoxGenerator(cx::ImageEnveloper::create());
 	REQUIRE(rep);
 	rep->setImages(images);
 
