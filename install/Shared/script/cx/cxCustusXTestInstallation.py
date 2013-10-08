@@ -54,14 +54,24 @@ class CustusXTestInstallation:
     def testInstallation(self):
         PrintFormatter.printHeader('Test installation', level=2)
         appPath = self._getInstalledBinaryPath()
-        extension = ''
-        if platform.system() == 'Windows':
-            extension = '.exe'
-        self._testExecutable(appPath, 'CustusX%s' % extension)
-        self._testExecutable(appPath, 'OpenIGTLinkServer%s' % extension)
-        self._testExecutable(appPath, 'Catch%s' % extension, '-h')
+     
+        self._testExecutable(appPath, 'Catch%s', '-h')
+        
+        if platform.system == 'Linux':
+            self._testExecutable(appPath, 'CustusX%s')
+            self._testExecutable(appPath, 'OpenIGTLinkServer%s')
+            
         if platform.system() == 'Darwin':
+            self._testExecutable(appPath, 'CustusX%s')
+            self._testExecutable(appPath, 'OpenIGTLinkServer%s')
             self._testExecutable(appPath, 'GrabberServer')
+            
+        if platform.system() == 'Windows':
+            if "32" in appPath: #Win32
+                self._testExecutable(appPath, 'UltrasonixServer.exe')
+            else: #Win64
+                self._testExecutable(appPath, 'CustusX.exe')
+                self._testExecutable(appPath, 'OpenIGTLinkServer.exe')
                 
     def runIntegrationTests(self):
         PrintFormatter.printHeader('Run integration tests', level=2)
