@@ -227,13 +227,13 @@ void ReconstructionWidget::paramsChangedSlot()
 {
 //	repopulateAlgorithmGroup();
 
-	Vector3D range = mReconstructer->getOutputVolumeParams().mExtent.range();
+	Vector3D range = mReconstructer->getOutputVolumeParams().getExtent().range();
 
 	QString extText =
 		QString("%1,  %2,  %3").arg(range[0], 0, 'f', 1).arg(range[1], 0, 'f', 1).arg(range[2], 0, 'f', 1);
 	mExtentLineEdit->setText(extText);
 
-	mInputSpacingLineEdit->setText(QString("%1").arg(mReconstructer->getOutputVolumeParams().mInputSpacing, 0, 'f', 4));
+	mInputSpacingLineEdit->setText(QString("%1").arg(mReconstructer->getOutputVolumeParams().getInputSpacing(), 0, 'f', 4));
 }
 
 void ReconstructionWidget::reconstructAboutToStartSlot()
