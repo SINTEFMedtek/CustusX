@@ -207,7 +207,7 @@ TEST_CASE("ImageEnveloper: One rotated high-res image inside another", "[unit][r
 	cx::ImagePtr box = enveloper->getEnvelopingImage();
 
 	double extent = size-1;
-	double shift = 1/sqrt(2);
+	double shift = 1/sqrt((double)2);
 	Eigen::Array3d expectedExtent(extent + shift, extent, extent);
 	Eigen::Array3d expectedSpacing(spacing*shift, spacing*shift, spacing);
 	Eigen::Array3i expectedDims = cx::ImageEnveloperImpl::getDimFromExtent(expectedExtent, expectedSpacing);
