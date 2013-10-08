@@ -74,7 +74,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 1 small volume.", "[rep][uni
 	std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(3,3,3), 200);
 
 	cx::MehdiGPURayCastMultiVolumeRepPtr rep = cx::MehdiGPURayCastMultiVolumeRep::New("");
-	rep->setBoundingBoxGenerator(cx::ImageEnveloperMoc::create());
+	rep->setBoundingBoxGenerator(cx::ImageEnveloperImpl::create());
 	REQUIRE(rep);
 	rep->setImages(images);
 
