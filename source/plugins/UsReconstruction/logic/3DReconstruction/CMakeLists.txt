@@ -27,6 +27,7 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 SET( SOURCE_FILES
   ${MOC_HEADER_FILES}
   sscReconstructedOutputVolumeParams.h
+  sscReconstructedOutputVolumeParams.cpp
   sscReconstructAlgorithm.h
   sscThunderVNNReconstructAlgorithm.h
   sscThunderVNNReconstructAlgorithm.cpp

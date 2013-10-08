@@ -95,6 +95,7 @@ public:
 	virtual void setLookupTable2D(ImageLUT2DPtr imageLookupTable2D);
 
 	virtual DoubleBoundingBox3D boundingBox() const; ///< bounding box in image space
+	virtual Eigen::Array3d getSpacing() const;
 	virtual vtkImageAccumulatePtr getHistogram();///< \return The histogram for the image
 	virtual int getMax();	///< \return Return highest used value in the image
 	virtual int getMin();	///< \return Return lowest used value in the image
