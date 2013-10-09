@@ -22,11 +22,11 @@ void Server::start()
 
   if(started)
   {
-    ssc::messageManager()->sendSuccess("Server is listening to port "+qstring_cast(this->serverPort()));
+    messageManager()->sendSuccess("Server is listening to port "+qstring_cast(this->serverPort()));
     emit open();
   }
   else
-    ssc::messageManager()->sendError("Server failed to start: "+qstring_cast(this->errorString()));
+    messageManager()->sendError("Server failed to start: "+qstring_cast(this->errorString()));
 }
 
 void Server::stop()
@@ -35,7 +35,7 @@ void Server::stop()
     return;
 
   this->close(); //TODO undefined behavior????
-  ssc::messageManager()->sendSuccess("Server stopped listening and is closed.");
+  messageManager()->sendSuccess("Server stopped listening and is closed.");
   emit closed();
 }
 
@@ -69,7 +69,7 @@ OpenIGTLinkServer::~OpenIGTLinkServer()
 
 void OpenIGTLinkServer::incomingConnection(int socketDescriptor)
 {
-  ssc::messageManager()->sendInfo("Incoming connection from socket descriptor "+qstring_cast(socketDescriptor));
+  messageManager()->sendInfo("Incoming connection from socket descriptor "+qstring_cast(socketDescriptor));
 
   //create a thread
   OpenIGTLinkSession* session = new OpenIGTLinkSession(socketDescriptor);

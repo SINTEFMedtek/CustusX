@@ -27,7 +27,7 @@ FilterPresetWidget::FilterPresetWidget(QWidget* parent) :
 void FilterPresetWidget::setFilter(FilterPtr filter)
 {
 	if(!filter->hasPresets()){
-		ssc::messageManager()->sendError("Cannot use filter "+filter->getName()+" in the FilterPresetWidget because it does not have any presets.");
+		messageManager()->sendError("Cannot use filter "+filter->getName()+" in the FilterPresetWidget because it does not have any presets.");
 		return;
 	}
 
@@ -51,7 +51,7 @@ void FilterPresetWidget::saveSlot()
 void FilterPresetWidget::deleteSlot()
 {
 	if (mPresets->isDefaultPreset(PresetWidget::getCurrentPreset())) {
-		ssc::messageManager()->sendWarning("It is not possible to delete one of the default presets");
+		messageManager()->sendWarning("It is not possible to delete one of the default presets");
 		return;
 	}
 

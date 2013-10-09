@@ -22,8 +22,8 @@
 namespace cx
 {
 
-PlaybackTool::PlaybackTool(ssc::ToolPtr base, PlaybackTimePtr time) :
-    ssc::Tool("playback_"+base->getUid(), "playback "+base->getName()), mBase(base),
+PlaybackTool::PlaybackTool(ToolPtr base, PlaybackTimePtr time) :
+    Tool("playback_"+base->getUid(), "playback "+base->getName()), mBase(base),
     mTime(time),
     mVisible(false)
 {
@@ -43,12 +43,12 @@ void PlaybackTool::timeChangedSlot()
 	QDateTime time = mTime->getTime();
 	qint64 time_ms = time.toMSecsSinceEpoch();
 
-	ssc::TimedTransformMapPtr positions = mBase->getPositionHistory();
+	TimedTransformMapPtr positions = mBase->getPositionHistory();
 	if (positions->empty())
 		return;
 
 	// find last stored time before current time.
-	ssc::TimedTransformMap::iterator lastSample = positions->lower_bound(time_ms);
+	TimedTransformMap::iterator lastSample = positions->lower_bound(time_ms);
 	if (lastSample!=positions->begin())
 		--lastSample;
 
@@ -73,8 +73,8 @@ void PlaybackTool::timeChangedSlot()
 
 	// Overwrite manual tool pos, set timestamp to 1ms previous.
 	// This makes sure manual tool is not picked as dominant.
-	ToolManager::getInstance()->getManualTool()->set_prMt(m_rMpr, mTimestamp-1);
-	ToolManager::getInstance()->dominantCheckSlot();
+	cxToolManager::getInstance()->getManualTool()->set_prMt(m_rMpr, mTimestamp-1);
+	cxToolManager::getInstance()->dominantCheckSlot();
 }
 
 QString PlaybackTool::getGraphicsFileName() const
@@ -82,7 +82,7 @@ QString PlaybackTool::getGraphicsFileName() const
 	return mBase->getGraphicsFileName();
 }
 
-std::set<ssc::Tool::Type> PlaybackTool::getTypes() const
+std::set<Tool::Type> PlaybackTool::getTypes() const
 {
 	return mBase->getTypes();
 }
@@ -92,7 +92,7 @@ vtkPolyDataPtr PlaybackTool::getGraphicsPolyData() const
 	return mBase->getGraphicsPolyData();
 }
 
-ssc::Transform3D PlaybackTool::get_prMt() const
+Transform3D PlaybackTool::get_prMt() const
 {
 	return m_rMpr;
 }
@@ -117,7 +117,7 @@ bool PlaybackTool::isCalibrated() const
 	return mBase->isCalibrated();
 }
 
-ssc::ProbeData PlaybackTool::getProbeSector() const
+ProbeData PlaybackTool::getProbeSector() const
 {
 	return mBase->getProbeSector();
 }
@@ -139,12 +139,12 @@ void PlaybackTool::setTooltipOffset(double val)
 	mBase->setTooltipOffset(val);
 }
 
-ssc::Transform3D PlaybackTool::getCalibration_sMt() const
+Transform3D PlaybackTool::getCalibration_sMt() const
 {
 	return mBase->getCalibration_sMt();
 }
 
-std::map<int, ssc::Vector3D> PlaybackTool::getReferencePoints() const
+std::map<int, Vector3D> PlaybackTool::getReferencePoints() const
 {
 	return mBase->getReferencePoints();
 }

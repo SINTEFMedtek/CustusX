@@ -26,7 +26,7 @@
 #include "vtkForwardDeclarations.h"
 #include "cxUSReconstructInputData.h"
 
-namespace ssc
+namespace cx
 {
 /**
  *  \class Planes
@@ -39,12 +39,12 @@ namespace ssc
  */
 struct Planes
 {
-	std::vector<ssc::Vector3D> mPoints;
-	ssc::Vector3D mNormal;///< Elements of the plane equation n*r+d = 0
+	std::vector<Vector3D> mPoints;
+	Vector3D mNormal;///< Elements of the plane equation n*r+d = 0
 	double mDistance;///< Elements of the plane equation n*r+d = 0
 };
 
 std::vector<Planes> generate_planes(std::vector<TimedPosition> frameInfo, ImagePtr frameData);
 
-}//namespace ssc
+}//namespace cx
 #endif //SSCRECONSTRUCTHELPER_H_

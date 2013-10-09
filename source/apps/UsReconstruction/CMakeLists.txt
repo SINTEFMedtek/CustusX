@@ -4,9 +4,6 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-find_package(SSC REQUIRED)
-include (${SSC_USE_FILE})
-
 SET( QT_MOC_HEADER_FILES
     sscMainWindow.h
     )
@@ -18,17 +15,14 @@ SET( SOURCE_FILES
     sscMainWindow.cpp
     )
 
-include_directories( 
+include_directories(
+    ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     .
-    ${SNW_INCLUDE_DIRS} 
-    ${SSC_BINARY_DIR} 
     ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/gui
     ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic
     ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction    
-    ${CustusX3_SOURCE_DIR}/source/resource
-    ${CustusX3_SOURCE_DIR}/source/resource/settings
-    ${CustusX3_SOURCE_DIR}/source/resource/utilities
-    ${CustusX3_SOURCE_DIR}/source/resource/algorithms
     ${CustusX3_SOURCE_DIR}/source/gui/utilities
     )	
     

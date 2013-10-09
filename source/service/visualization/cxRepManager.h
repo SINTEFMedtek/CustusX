@@ -20,7 +20,7 @@
 #include <vector>
 #include "sscForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class Rep> RepPtr;
 typedef boost::shared_ptr<class ProgressiveLODVolumetricRep> ProgressiveLODVolumetricRepPtr;
@@ -29,8 +29,8 @@ typedef boost::shared_ptr<class ProgressiveLODVolumetricRep> ProgressiveLODVolum
 namespace cx
 {
 
-typedef std::map<QString, ssc::RepPtr> RepMap;
-typedef std::map<QString, ssc::VolumetricBaseRepPtr> VolumetricRepMap;
+typedef std::map<QString, RepPtr> RepMap;
+typedef std::map<QString, VolumetricBaseRepPtr> VolumetricRepMap;
 typedef boost::shared_ptr<class ThresholdPreview> ThresholdPreviewPtr;
 
 class MessageManager;
@@ -62,7 +62,7 @@ public:
 	ThresholdPreviewPtr getThresholdPreview(); ///< Get the ThresholdPreview object
 
 	template<class REP>
-	static boost::shared_ptr<REP> findFirstRep(std::vector<ssc::RepPtr> reps, ssc::ToolPtr tool)
+	static boost::shared_ptr<REP> findFirstRep(std::vector<RepPtr> reps, ToolPtr tool)
 	{
 		for (unsigned i = 0; i < reps.size(); ++i)
 		{
@@ -76,7 +76,7 @@ public:
 	}
 
 	template<class REP>
-	static boost::shared_ptr<REP> findFirstRep(std::vector<ssc::RepPtr> reps, ssc::DataPtr data)
+	static boost::shared_ptr<REP> findFirstRep(std::vector<RepPtr> reps, DataPtr data)
 	{
 		for (unsigned i = 0; i < reps.size(); ++i)
 		{
@@ -88,7 +88,7 @@ public:
 	}
 
 	template<class REP>
-	static boost::shared_ptr<REP> findFirstRep(std::vector<ssc::RepPtr> reps)
+	static boost::shared_ptr<REP> findFirstRep(std::vector<RepPtr> reps)
 	{
 		for (unsigned i = 0; i < reps.size(); ++i)
 		{
@@ -98,11 +98,6 @@ public:
 		}
 		return boost::shared_ptr<REP>();
 	}
-
-	/**Get a volumetric rep based on which image you want to  display.
-	 * This is useful when creating the rep is expensive and should be done only once.
-	 */
-	ssc::VolumetricBaseRepPtr getVolumetricRep(ssc::ImagePtr image);
 
 	/**Get a previously cached Rep.
 	 *
@@ -138,28 +133,14 @@ public:
 		// create new value, store and return:
 		boost::shared_ptr<REP> retval = REP::New(uid, name);
 		mRepCache.insert(std::make_pair(uid, retval));
-//	  std::cout << "created new cached rep: " << uid << std::endl;
 
 		return retval;
 	}
 
-	/**
-	 * Purge not visible volumes from cache.
-	 * This is because caching of volumetric reps uses a lot of memory (100-200 MB) per volume
-	 */
-	void purgeVolumetricReps();
-
-protected slots:
-	void volumeRemovedSlot(QString uid);
-
 protected:
 	static RepManager* mTheInstance; ///< the only instance of this class
 
-	VolumetricRepMap mVolumetricRepByImageMap; ///< used for caching reps based on image content
-	bool mIsUsingGPU3DMapper;
-	double mMaxRenderSize;
-
-	typedef std::multimap<QString, ssc::RepPtr> RepMultiMap;
+	typedef std::multimap<QString, RepPtr> RepMultiMap;
 	RepMultiMap mRepCache;
 
 private:
@@ -170,7 +151,6 @@ private:
 	ThresholdPreviewPtr mThresholdPreview; ///< Preview a volume with a selected threshold
 };
 
-//RepManager* repManager();
 
 /**
  * @}

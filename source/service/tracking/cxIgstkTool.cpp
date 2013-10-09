@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include <cxIgstkTool.h>
+#include "cxIgstkTool.h"
 
 #include <QDir>
 #include <QDateTime>
@@ -26,15 +26,15 @@
 namespace cx
 {
 
-ssc::Transform3D IgstkTool::InternalStructure::getCalibrationAsSSC() const
+Transform3D IgstkTool::InternalStructure::getCalibrationAsSSC() const
 {
 	vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
 	mCalibration.ExportTransform(*(M.GetPointer()));
-	ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
+	Transform3D sMt = Transform3D::fromVtkMatrix(M);
 	return sMt;
 }
 
-void IgstkTool::InternalStructure::setCalibration(const ssc::Transform3D& cal)
+void IgstkTool::InternalStructure::setCalibration(const Transform3D& cal)
 {
 	mCalibration.ImportTransform(*cal.getVtkMatrix());
 }
@@ -59,15 +59,15 @@ void IgstkTool::InternalStructure::saveCalibrationToFile()
 	TransformFile file(filename);
 	file.write(this->getCalibrationAsSSC());
 //
-////  ssc::Transform3D sMt;
+////  Transform3D sMt;
 ////  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
 ////  mCalibration.ExportTransform(*(M.GetPointer()));
-////  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
-//	ssc::Transform3D sMt = this->getCalibrationAsSSC();
+////  Transform3D sMt = Transform3D::fromVtkMatrix(M);
+//	Transform3D sMt = this->getCalibrationAsSSC();
 //
 //	if (!calibrationFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 //	{
-//		ssc::messageManager()->sendError("Could not open " + mUid + "s calibrationfile: " + calibrationFile.fileName());
+//		messageManager()->sendError("Could not open " + mUid + "s calibrationfile: " + calibrationFile.fileName());
 //		return;
 //	}
 //
@@ -77,17 +77,17 @@ void IgstkTool::InternalStructure::saveCalibrationToFile()
 //
 //	calibrationFile.close();
 
-	ssc::messageManager()->sendInfo("Replaced calibration in " + filename);
+	messageManager()->sendInfo("Replaced calibration in " + filename);
 }
 
-void IgstkTool::updateCalibration(const ssc::Transform3D& cal)
+void IgstkTool::updateCalibration(const Transform3D& cal)
 {
 	//apply the calibration
 	mInternalStructure.mCalibration.ImportTransform(*cal.getVtkMatrix());
 	this->setCalibrationTransform(mInternalStructure.mCalibration);
 
-	ssc::Transform3D sMt = mInternalStructure.getCalibrationAsSSC();
-	ssc::messageManager()->sendInfo("Set " + mInternalStructure.mName + "s calibration to \n" + qstring_cast(sMt));
+	Transform3D sMt = mInternalStructure.getCalibrationAsSSC();
+	messageManager()->sendInfo("Set " + mInternalStructure.mName + "s calibration to \n" + qstring_cast(sMt));
 
 	//write to file
 	mInternalStructure.saveCalibrationToFile();
@@ -115,7 +115,7 @@ IgstkTool::IgstkTool(IgstkTool::InternalStructure internalStructure) :
 	}
 	else
 	{
-		ssc::messageManager()->sendError(mInternalStructure.mUid + " was created with invalid internal structure.");
+		messageManager()->sendError(mInternalStructure.mUid + " was created with invalid internal structure.");
 		mValid = false;
 	}
 }
@@ -139,12 +139,12 @@ igstk::TrackerTool::Pointer IgstkTool::getPointer() const
 	return mTool;
 }
 
-ssc::TRACKING_SYSTEM IgstkTool::getTrackerType()
+TRACKING_SYSTEM IgstkTool::getTrackerType()
 {
 	return mInternalStructure.mTrackerType;
 }
 
-//ssc::Tool::Type IgstkTool::getType() const
+//Tool::Type IgstkTool::getType() const
 //{
 //  return mInternalStructure.mType;
 //}
@@ -220,7 +220,7 @@ void IgstkTool::toolTransformCallback(const itk::EventObject &event)
 		vtkMatrix4x4Ptr vtkMatrix = vtkMatrix4x4Ptr::New();
 		transform.ExportTransform(*vtkMatrix.GetPointer());
 
-		const ssc::Transform3D prMt(vtkMatrix.GetPointer()); //prMt, transform from tool to patientref
+		const Transform3D prMt(vtkMatrix.GetPointer()); //prMt, transform from tool to patientref
 		double timestamp = transform.GetStartTime();
 
 		emit toolTransformAndTimestamp(prMt, timestamp);
@@ -229,7 +229,7 @@ void IgstkTool::toolTransformCallback(const itk::EventObject &event)
 	else if (igstk::TrackerToolConfigurationEvent().CheckEvent(&event))
 	{
 		//this->internalConfigured(true);
-		ssc::messageManager()->sendInfo(QString("Configured [%1] with the tracking system").arg(mInternalStructure.mUid));
+		messageManager()->sendInfo(QString("Configured [%1] with the tracking system").arg(mInternalStructure.mUid));
 	}
 	else if (igstk::TrackerToolAttachmentToTrackerEvent().CheckEvent(&event))
 	{
@@ -242,85 +242,85 @@ void IgstkTool::toolTransformCallback(const itk::EventObject &event)
 	else if (igstk::TrackerToolMadeTransitionToTrackedStateEvent().CheckEvent(&event))
 	{
 		this->internalVisible(true);
-		//ssc::messageManager()->sendInfo(mInternalStructure.mUid+" is visible."); //SPAM
+		//messageManager()->sendInfo(mInternalStructure.mUid+" is visible."); //SPAM
 	}
 	else if (igstk::TrackerToolNotAvailableToBeTrackedEvent().CheckEvent(&event))
 	{
 		this->internalVisible(false);
-		//ssc::messageManager()->sendInfo(mInternalStructure.mUid+" is hidden."); //SPAM
+		//messageManager()->sendInfo(mInternalStructure.mUid+" is hidden."); //SPAM
 	}
 	else if (igstk::ToolTrackingStartedEvent().CheckEvent(&event))
 	{
 		this->internalTracked(true);
-		ssc::messageManager()->sendInfo(mInternalStructure.mUid + " is tracked.");
+		messageManager()->sendInfo(mInternalStructure.mUid + " is tracked.");
 	}
 	else if (igstk::ToolTrackingStoppedEvent().CheckEvent(&event))
 	{
 		this->internalTracked(false);
-		ssc::messageManager()->sendInfo(mInternalStructure.mUid + " is not tracked anymore.");
+		messageManager()->sendInfo(mInternalStructure.mUid + " is not tracked anymore.");
 	}
 	//Failures
 	else if (igstk::InvalidRequestErrorEvent().CheckEvent(&event))
 	{
-		ssc::messageManager()->sendWarning(
+		messageManager()->sendWarning(
 						mInternalStructure.mUid
 										+ " received an invalid request.  This means that the internal igstk trackertool did not accept the request. Do not know which request.");
 	}
 	else if (igstk::TrackerToolConfigurationErrorEvent().CheckEvent(&event))
 	{
-		ssc::messageManager()->sendError(mInternalStructure.mUid + " could not configure with the tracking system.");
+		messageManager()->sendError(mInternalStructure.mUid + " could not configure with the tracking system.");
 	}
 	else if (igstk::InvalidRequestToAttachTrackerToolErrorEvent().CheckEvent(&event))
 	{
-		ssc::messageManager()->sendError(mInternalStructure.mUid + " could not request to attach to tracker.");
+		messageManager()->sendError(mInternalStructure.mUid + " could not request to attach to tracker.");
 	}
 	else if (igstk::InvalidRequestToDetachTrackerToolErrorEvent().CheckEvent(&event))
 	{
-		ssc::messageManager()->sendError(mInternalStructure.mUid + " could not request to detach from tracker.");
+		messageManager()->sendError(mInternalStructure.mUid + " could not request to detach from tracker.");
 	}
 	else if (igstk::TrackerToolAttachmentToTrackerErrorEvent().CheckEvent(&event))
 	{
-		ssc::messageManager()->sendError(mInternalStructure.mUid + " could not attach to tracker.");
+		messageManager()->sendError(mInternalStructure.mUid + " could not attach to tracker.");
 	}
 	else if (igstk::TrackerToolDetachmentFromTrackerErrorEvent().CheckEvent(&event))
 	{
-		ssc::messageManager()->sendError(mInternalStructure.mUid + " could not detach from tracker.");
+		messageManager()->sendError(mInternalStructure.mUid + " could not detach from tracker.");
 	}
 	//Polaris specific failures
 	else if (igstk::InvalidPolarisPortNumberErrorEvent().CheckEvent(&event))
 	{
-		ssc::messageManager()->sendError(
+		messageManager()->sendError(
 						mInternalStructure.mUid + " sendt invalid Polaris port number: "
 										+ qstring_cast(mInternalStructure.mPortNumber) + ".");
 	}
 	else if (igstk::InvalidPolarisSROMFilenameErrorEvent().CheckEvent(&event))
 	{
-		ssc::messageManager()->sendError(
+		messageManager()->sendError(
 						mInternalStructure.mUid + " sendt invalid ROM file: " + mInternalStructure.mSROMFilename);
 	}
 	else if (igstk::InvalidPolarisPartNumberErrorEvent().CheckEvent(&event))
 	{
-		ssc::messageManager()->sendError(mInternalStructure.mUid + " has an invalid part number.");
+		messageManager()->sendError(mInternalStructure.mUid + " has an invalid part number.");
 	}
 	//Aurora specific failures
 	else if (igstk::InvalidAuroraPortNumberErrorEvent().CheckEvent(&event))
 	{
-		ssc::messageManager()->sendError(
+		messageManager()->sendError(
 						mInternalStructure.mUid + " has an invalid port number: "
 										+ qstring_cast(mInternalStructure.mPortNumber) + ".");
 	}
 	else if (igstk::InvalidAuroraSROMFilenameErrorEvent().CheckEvent(&event))
 	{
-		ssc::messageManager()->sendError(
+		messageManager()->sendError(
 						mInternalStructure.mUid + " sendt invalid ROM file: " + mInternalStructure.mSROMFilename);
 	}
 	else if (igstk::InvalidAuroraPartNumberErrorEvent().CheckEvent(&event))
 	{
-		ssc::messageManager()->sendError(mInternalStructure.mUid + " has an invalid part number.");
+		messageManager()->sendError(mInternalStructure.mUid + " has an invalid part number.");
 	}
 	else if (igstk::InvalidAuroraChannelNumberErrorEvent().CheckEvent(&event))
 	{
-		ssc::messageManager()->sendError(
+		messageManager()->sendError(
 						mInternalStructure.mUid + " has an invalid channel number:"
 										+ qstring_cast(mInternalStructure.mChannelNumber) + ".");
 	}
@@ -332,36 +332,36 @@ bool IgstkTool::verifyInternalStructure()
 	QString verificationError("Internal verification of tool " + mInternalStructure.mUid + " failed! REASON: ");
 	if (!mInternalStructure.mIsPointer && !mInternalStructure.mIsReference && !mInternalStructure.mIsProbe)
 	{
-//    ssc::messageManager()->sendError(verificationError+" Tag <tool>::<type> is invalid ["+qstring_cast(mInternalStructure.mType)+"]. Valid types: [pointer, usprobe, reference]");
-		ssc::messageManager()->sendError(
+//    messageManager()->sendError(verificationError+" Tag <tool>::<type> is invalid ["+qstring_cast(mInternalStructure.mType)+"]. Valid types: [pointer, usprobe, reference]");
+		messageManager()->sendError(
 						verificationError
 										+ " Tag <tool>::<type> is invalid, must be one one of pointer/probe/reference ");
 		retval = false;
 	}
 	if (mInternalStructure.mUid.isEmpty())
 	{
-		ssc::messageManager()->sendError(verificationError + " Tag <tool>::<uid> is empty. Give tool a unique id.");
+		messageManager()->sendError(verificationError + " Tag <tool>::<uid> is empty. Give tool a unique id.");
 		retval = false;
 	}
-	if (mInternalStructure.mTrackerType == ssc::tsNONE)
+	if (mInternalStructure.mTrackerType == tsNONE)
 	{
-		ssc::messageManager()->sendError(
+		messageManager()->sendError(
 						verificationError + " Tag <sensor>::<type> is invalid ["
 										+ qstring_cast(mInternalStructure.mTrackerType)
 										+ "]. Valid types: [polaris, spectra, vicra, aurora, micron (NOT SUPPORTED YET)]");
 		retval = false;
 	}
-	if ((mInternalStructure.mTrackerType == ssc::tsAURORA) && (mInternalStructure.mPortNumber >= 4))
+	if ((mInternalStructure.mTrackerType == tsAURORA) && (mInternalStructure.mPortNumber >= 4))
 	{
-		ssc::messageManager()->sendError(
+		messageManager()->sendError(
 						verificationError + " Tag <sensor>::<portnumber> is invalid ["
 										+ qstring_cast(mInternalStructure.mPortNumber)
 										+ "]. Valid numbers: [0, 1, 2, 3]");
 		retval = false;
 	}
-	if ((mInternalStructure.mTrackerType == ssc::tsAURORA) && (mInternalStructure.mChannelNumber >= 1))
+	if ((mInternalStructure.mTrackerType == tsAURORA) && (mInternalStructure.mChannelNumber >= 1))
 	{
-		ssc::messageManager()->sendError(
+		messageManager()->sendError(
 						verificationError + " Tag <sensor>::<channelnumber> is invalid ["
 										+ qstring_cast(mInternalStructure.mChannelNumber) + "]. Valid numbers: [0, 1]");
 		retval = false;
@@ -369,14 +369,14 @@ bool IgstkTool::verifyInternalStructure()
 	QDir dir;
 	if (!mInternalStructure.mSROMFilename.isEmpty() && !dir.exists(mInternalStructure.mSROMFilename))
 	{
-		ssc::messageManager()->sendError(
+		messageManager()->sendError(
 						verificationError + " Tag <sensor>::<rom_file> is invalid [" + mInternalStructure.mSROMFilename
 										+ "]. Valid path: relative path to existing rom file.");
 		retval = false;
 	}
 	if (!mInternalStructure.mCalibrationFilename.isEmpty() && !dir.exists(mInternalStructure.mCalibrationFilename))
 	{
-		ssc::messageManager()->sendError(
+		messageManager()->sendError(
 						verificationError + " Tag <calibration>::<cal_file> is invalid ["
 										+ mInternalStructure.mCalibrationFilename
 										+ "]. Valid path: relative path to existing calibration file.");
@@ -384,12 +384,12 @@ bool IgstkTool::verifyInternalStructure()
 	}
 	if (!mInternalStructure.mTransformSaveFileName.isEmpty() && !dir.exists(mInternalStructure.mTransformSaveFileName))
 	{
-		ssc::messageManager()->sendError(verificationError + " Logging folder is invalid. Contact programmer! :)");
+		messageManager()->sendError(verificationError + " Logging folder is invalid. Contact programmer! :)");
 		retval = false;
 	}
 	if (!mInternalStructure.mLoggingFolderName.isEmpty() && !dir.exists(mInternalStructure.mLoggingFolderName))
 	{
-		ssc::messageManager()->sendError(verificationError + " Logging folder is invalid. Contact programmer! :)");
+		messageManager()->sendError(verificationError + " Logging folder is invalid. Contact programmer! :)");
 		retval = false;
 	}
 
@@ -405,11 +405,11 @@ igstk::TrackerTool::Pointer IgstkTool::buildInternalTool()
 
 	switch (mInternalStructure.mTrackerType)
 	{
-	case ssc::tsNONE:
+	case tsNONE:
 		break;
-	case ssc::tsPOLARIS_SPECTRA:
-	case ssc::tsPOLARIS_VICRA:
-	case ssc::tsPOLARIS:
+	case tsPOLARIS_SPECTRA:
+	case tsPOLARIS_VICRA:
+	case tsPOLARIS:
 		tempPolarisTool = igstk::PolarisTrackerTool::New();
 		tempPolarisTool->AddObserver(igstk::IGSTKEvent(), mToolObserver);
 		if (!mInternalStructure.mWireless) //we only support wireless atm
@@ -420,7 +420,7 @@ igstk::TrackerTool::Pointer IgstkTool::buildInternalTool()
 		tempPolarisTool->SetCalibrationTransform(mInternalStructure.mCalibration);
 		tool = tempPolarisTool;
 		break;
-	case ssc::tsAURORA:
+	case tsAURORA:
 		tempAuroraTool = igstk::AuroraTrackerTool::New();
 		tempAuroraTool->AddObserver(igstk::IGSTKEvent(), mToolObserver);
 		if (mInternalStructure.m5DOF)
@@ -438,7 +438,7 @@ igstk::TrackerTool::Pointer IgstkTool::buildInternalTool()
 		tempAuroraTool->SetCalibrationTransform(mInternalStructure.mCalibration);
 		tool = tempAuroraTool;
 		break;
-	case ssc::tsMICRON:
+	case tsMICRON:
 		//TODO: implement
 		break;
 	default:
@@ -458,7 +458,7 @@ void IgstkTool::internalAttachedToTracker(bool value)
 	if (mAttachedToTracker == value)
 		return;
 	mAttachedToTracker = value;
-	ssc::messageManager()->sendInfo(
+	messageManager()->sendInfo(
 					mInternalStructure.mUid + " is " + (value ? "at" : "de") + "tached " + (value ? "to" : "from")
 									+ " the tracker.");
 	emit attachedToTracker(mAttachedToTracker);

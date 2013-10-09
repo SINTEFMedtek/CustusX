@@ -8,9 +8,6 @@ endif(COMMAND cmake_policy)
 # CX C++ Test App for Qt fun stuff 
 # =========================================================
 
-find_package(SSC REQUIRED)
-include (${SSC_USE_FILE})
-
 SET( MOC_HEADER_FILES
     cxMemoryTester.h
     )
@@ -21,8 +18,9 @@ SET( SOURCE_FILES
     cxMemoryTesterMain.cpp
 	) 
 	
-include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )	
-	
+include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
+
+
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 	
 QT4_ADD_RESOURCES( QT_RESOURCE_FILES resource.qrc )
@@ -33,7 +31,7 @@ add_executable( cxMemoryTester MACOSX_BUNDLE
     ${QT_RESOURCE_FILES} 
     ${MOC_HEADER_FILES} 
     ${SOURCE_FILES} )
-target_link_libraries( cxMemoryTester SSC )
+target_link_libraries( cxMemoryTester cxResource )
 # =========================================================
 
 

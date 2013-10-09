@@ -45,7 +45,7 @@ public:
 	virtual std::vector<SelectDataStringDataAdapterBasePtr> getInputTypes();
 	virtual std::vector<SelectDataStringDataAdapterBasePtr> getOutputTypes();
 	virtual bool hasPresets(){return false;};
-	virtual ssc::PresetsPtr getPresets(){ return ssc::PresetsPtr();};
+	virtual PresetsPtr getPresets(){ return PresetsPtr();};
 	virtual QDomElement generatePresetFromCurrentlySetOptions(QString name){return QDomElement();};
 	virtual void setActive(bool on);
 	virtual bool preProcess();
@@ -58,11 +58,11 @@ protected:
 
 	/** Helper: Return the index'th input type as an image.
 	  * Return zero if not available (as image). */
-	ssc::ImagePtr getCopiedInputImage(int index = 0);
+	ImagePtr getCopiedInputImage(int index = 0);
 	/** Helper:
       * Call if you have an image threshold dataAdapter that need update from an image change.
 	  */
-	void updateThresholdFromImageChange(QString uid, ssc::DoubleDataAdapterXmlPtr threshold);
+	void updateThresholdFromImageChange(QString uid, DoubleDataAdapterXmlPtr threshold);
 
 	virtual void createOptions() = 0;
 	virtual void createInputTypes() = 0;
@@ -74,7 +74,7 @@ protected:
 	QDomElement mOptions;
 
 	// data used by execute - copied for thread safety purposes
-	std::vector<ssc::DataPtr> mCopiedInput;
+	std::vector<DataPtr> mCopiedInput;
 	QDomElement mCopiedOptions;
 	bool mActive;
 

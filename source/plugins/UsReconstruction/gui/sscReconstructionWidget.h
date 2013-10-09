@@ -32,8 +32,8 @@ class ReconstructionWidget: public BaseWidget
 {
 Q_OBJECT
 public:
-	ReconstructionWidget(QWidget* parent, ssc::ReconstructManagerPtr reconstructer);
-	ssc::ReconstructManagerPtr reconstructer()
+	ReconstructionWidget(QWidget* parent, ReconstructManagerPtr reconstructer);
+	ReconstructManagerPtr reconstructer()
 	{
 		return mReconstructer;
 	}
@@ -54,19 +54,19 @@ private slots:
 	void reconstructAboutToStartSlot();
 
 private:
-	ssc::ReconstructManagerPtr mReconstructer;
-//	ssc::ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;
+	ReconstructManagerPtr mReconstructer;
+//	ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;
 
-	ssc::FileSelectWidget* mFileSelectWidget;
+	FileSelectWidget* mFileSelectWidget;
 	QPushButton* mReconstructButton;
 	QPushButton* mReloadButton;
 	QLineEdit* mExtentLineEdit;
 	QLineEdit* mInputSpacingLineEdit;
-	ssc::SpinBoxGroupWidget* mMaxVolSizeWidget;
-	ssc::SpinBoxGroupWidget* mSpacingWidget;
-	ssc::SpinBoxGroupWidget* mDimXWidget;
-	ssc::SpinBoxGroupWidget* mDimYWidget;
-	ssc::SpinBoxGroupWidget* mDimZWidget;
+	SpinBoxGroupWidget* mMaxVolSizeWidget;
+	SpinBoxGroupWidget* mSpacingWidget;
+	SpinBoxGroupWidget* mDimXWidget;
+	SpinBoxGroupWidget* mDimYWidget;
+	SpinBoxGroupWidget* mDimZWidget;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 
 	QFrame* mAlgorithmGroup;

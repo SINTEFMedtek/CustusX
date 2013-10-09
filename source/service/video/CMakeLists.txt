@@ -53,13 +53,12 @@ SET (cxVideoService_SOURCE
     cxSimulatedImageStreamer.cpp
 )
 
+include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
+    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     .
-    ${CustusX3_SOURCE_DIR}/source/resource
-    ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
     ${CustusX3_SOURCE_DIR}/source/resource/videoServer
-    ${CustusX3_SOURCE_DIR}/source/resource/settings
-    ${CustusX3_SOURCE_DIR}/source/resource/utilities
+    ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     )
 
@@ -67,7 +66,7 @@ include_directories(
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( cxVideoService ${cxVideoService_SOURCE} ${MOC_HEADER_FILES} )
-target_link_libraries(cxVideoService SSC cxResource OpenIGTLink cxTrackingService cxGrabber)
+target_link_libraries(cxVideoService cxResource cxResourceUsReconstructionTypes OpenIGTLink cxTrackingService cxGrabber)
 
 add_subdirectory(testing)
 

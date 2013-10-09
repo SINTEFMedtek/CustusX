@@ -49,7 +49,7 @@ IGTLinkConversion::~IGTLinkConversion()
 }
 
 
-IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ssc::ImagePtr image)
+IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ImagePtr image)
 {
 	//	IGTLinkImageMessage::Pointer retval;
 	vtkImageDataPtr rawImage = image->getBaseVtkImageData();
@@ -137,7 +137,7 @@ IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ssc::ImagePtr image)
 	//	return retval;
 }
 
-ssc::ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
+ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 {
 	vtkImageImportPtr imageImport = vtkImageImportPtr::New();
 
@@ -156,7 +156,7 @@ ssc::ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 	message->GetSubVolume(svsize, svoffset);
 //	message->GetOrigin(origin);
 	QString deviceName = message->GetDeviceName();
-//  std::cout << "size : " << ssc::Vector3D(size[0], size[1], size[2]) << std::endl;
+//  std::cout << "size : " << Vector3D(size[0], size[1], size[2]) << std::endl;
 
 	imageImport->SetNumberOfScalarComponents(1);
 
@@ -211,7 +211,7 @@ ssc::ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 
 	imageImport->Modified();
 
-	ssc::ImagePtr retval(new ssc::Image(deviceName, imageImport->GetOutput()));
+	ImagePtr retval(new Image(deviceName, imageImport->GetOutput()));
 	retval->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestampMS));
 	retval = this->decode(retval);
 
@@ -221,13 +221,13 @@ ssc::ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 //	vtkImageDataPtr imageRGB = this->createFilterFormat2RGB(format, imageImport->GetOutput());
 //	imageRGB->Update();
 
-//	ssc::ImagePtr retval(new ssc::Image(deviceName, imageRGB));
+//	ImagePtr retval(new Image(deviceName, imageRGB));
 //	retval->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestampMS));
 
 	return retval;
 }
 
-IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ssc::ProbeDataPtr input)
+IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ProbeDataPtr input)
 {
 	IGTLinkUSStatusMessage::Pointer retval = IGTLinkUSStatusMessage::New();
 
@@ -250,25 +250,25 @@ IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ssc::ProbeDataPtr inpu
 }
 
 //'copied' from OpenIGTLinkRTSource::updateSonixStatus()
-ssc::ProbeDataPtr IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ssc::ProbeDataPtr base)
+ProbeDataPtr IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ProbeDataPtr base)
 {
-	ssc::ProbeDataPtr retval;
+	ProbeDataPtr retval;
 	if (base)
 		 retval = base;
 	else
-		retval = ssc::ProbeDataPtr(new ssc::ProbeData());
+		retval = ProbeDataPtr(new ProbeData());
 
 	if (probeMessage)
 	{
 		// Update the parts of the probe data that is read from the probe message.
-		retval->setType(ssc::ProbeData::TYPE(probeMessage->GetProbeType()));
+		retval->setType(ProbeData::TYPE(probeMessage->GetProbeType()));
 		retval->setSector(
 				probeMessage->GetDepthStart(),
 				probeMessage->GetDepthEnd(),
 				probeMessage->GetWidth(),
 				0);
-		ssc::ProbeData::ProbeImageData imageData = retval->getImage();
-		imageData.mOrigin_p = ssc::Vector3D(probeMessage->GetOrigin());
+		ProbeData::ProbeImageData imageData = retval->getImage();
+		imageData.mOrigin_p = Vector3D(probeMessage->GetOrigin());
 		retval->setImage(imageData);
 		retval->setUid(probeMessage->GetDeviceName());
 	}
@@ -283,17 +283,17 @@ ssc::ProbeDataPtr IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer prob
 		imageMessage->GetDimensions(size);
 		imageMessage->GetSpacing(spacing);
 
-		ssc::ProbeData::ProbeImageData imageData = retval->getImage();
-		imageData.mSpacing = ssc::Vector3D(spacing[0], spacing[1], spacing[2]);
+		ProbeData::ProbeImageData imageData = retval->getImage();
+		imageData.mSpacing = Vector3D(spacing[0], spacing[1], spacing[2]);
 		imageData.mSize = QSize(size[0], size[1]);
-		imageData.mClipRect_p = ssc::DoubleBoundingBox3D(0, imageData.mSize.width(), 0, imageData.mSize.height(), 0, 0);
+		imageData.mClipRect_p = DoubleBoundingBox3D(0, imageData.mSize.width(), 0, imageData.mSize.height(), 0, 0);
 		retval->setImage(imageData);
 	}
 
 	return this->decode(retval);
 }
 
-ssc::ImagePtr IGTLinkConversion::decode(ssc::ImagePtr msg)
+ImagePtr IGTLinkConversion::decode(ImagePtr msg)
 {
 	QString newUid = msg->getUid();
 	QString format = this->extractColorFormat(msg->getUid(), &newUid);
@@ -304,12 +304,12 @@ ssc::ImagePtr IGTLinkConversion::decode(ssc::ImagePtr msg)
 	vtkImageDataPtr copy = vtkImageDataPtr::New();
 	copy->DeepCopy(imageRGB);
 
-	ssc::ImagePtr retval(new ssc::Image(newUid, copy));
+	ImagePtr retval(new Image(newUid, copy));
 	retval->setAcquisitionTime(msg->getAcquisitionTime());
 	return retval;
 }
 
-ssc::ProbeDataPtr IGTLinkConversion::decode(ssc::ProbeDataPtr msg)
+ProbeDataPtr IGTLinkConversion::decode(ProbeDataPtr msg)
 {
 	QString newUid = msg->getUid();
 	QString format = this->extractColorFormat(msg->getUid(), &newUid);

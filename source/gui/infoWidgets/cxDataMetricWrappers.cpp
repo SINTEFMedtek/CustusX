@@ -30,11 +30,11 @@
 namespace cx
 {
 
-PointMetricWrapper::PointMetricWrapper(ssc::PointMetricPtr data) : mData(data)
+PointMetricWrapper::PointMetricWrapper(PointMetricPtr data) : mData(data)
 {
   mInternalUpdate = false;
   connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
+  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* PointMetricWrapper::createWidget()
@@ -47,24 +47,24 @@ QWidget* PointMetricWrapper::createWidget()
   topLayout->addLayout(hLayout);
 
   QString value;// = qstring_cast(mData->getFrame());
-  std::vector<ssc::CoordinateSystem> spaces = ssc::SpaceHelpers::getAvailableSpaces(true);
+  std::vector<CoordinateSystem> spaces = SpaceHelpers::getAvailableSpaces(true);
   QStringList range;
   for (unsigned i=0; i<spaces.size(); ++i)
     range << spaces[i].toString();
 
-  mSpaceSelector = ssc::StringDataAdapterXml::initialize("selectSpace",
+  mSpaceSelector = StringDataAdapterXml::initialize("selectSpace",
       "Space",
       "Select coordinate system to store position in.",
       value,
       range,
       QDomNode());
-  hLayout->addWidget(new ssc::LabeledComboBoxWidget(widget, mSpaceSelector));
+  hLayout->addWidget(new LabeledComboBoxWidget(widget, mSpaceSelector));
 
-  mCoordinate = ssc::Vector3DDataAdapterXml::initialize("selectCoordinate",
+  mCoordinate = Vector3DDataAdapterXml::initialize("selectCoordinate",
       "Coord",
       "Coordinate values.",
-      ssc::Vector3D(0,0,0),
-      ssc::DoubleRange(-1000,1000,0.1),
+      Vector3D(0,0,0),
+      DoubleRange(-1000,1000,0.1),
       1,
       QDomNode());
 //  topLayout->addWidget(Vector3DWidget::createVerticalWithSliders(widget, mCoordinate));
@@ -84,14 +84,12 @@ QWidget* PointMetricWrapper::createWidget()
 
 QString PointMetricWrapper::getValue() const
 {
-  ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mData->getSpace(), ssc::CoordinateSystem(ssc::csREF));
-  ssc::Vector3D p0_r = rM0.coord(mData->getCoordinate());
-//  return "pt_r="+qstring_cast(p0_r);
-  int w=3;
-  return QString("%1 %2 %3").arg(p0_r[0], w, 'f', 1).arg(p0_r[1], w, 'f', 1).arg(p0_r[2], w, 'f', 1);
+//  Transform3D rM0 = SpaceHelpers::get_toMfrom(mData->getSpace(), CoordinateSystem(csREF));
+//  Vector3D p0_r = rM0.coord(mData->getCoordinate());
+  return prettyFormat(mData->getRefCoord(), 1, 3);
 }
 
-ssc::DataPtr PointMetricWrapper::getData() const
+DataPtr PointMetricWrapper::getData() const
 {
   return mData;
 }
@@ -103,10 +101,9 @@ QString PointMetricWrapper::getType() const
 
 QString PointMetricWrapper::getArguments() const
 {
-  ssc::Vector3D p = mData->getCoordinate();
-  int w=1;
-  QString coord = QString("(%1 %2 %3)").arg(p[0], w, 'f', 1).arg(p[1], w, 'f', 1).arg(p[2], w, 'f', 1);
-  if (mData->getSpace().mId==ssc::csREF)
+  Vector3D p = mData->getCoordinate();
+  QString coord = prettyFormat(p, 1, 1);
+  if (mData->getSpace().mId==csREF)
   	coord = ""; // ignore display of coord if in ref space
 
   return mData->getSpace().toString() + " " + coord;
@@ -115,7 +112,7 @@ QString PointMetricWrapper::getArguments() const
 
 void PointMetricWrapper::moveToToolPosition()
 {
-  ssc::Vector3D p = ssc::SpaceHelpers::getDominantToolTipPoint(mData->getSpace(), true);
+  Vector3D p = SpaceHelpers::getDominantToolTipPoint(mData->getSpace(), true);
   mData->setCoordinate(p);
 }
 
@@ -123,8 +120,8 @@ void PointMetricWrapper::spaceSelected()
 {
   if (mInternalUpdate)
     return;
-  ssc::CoordinateSystem space = ssc::CoordinateSystem::fromString(mSpaceSelector->getValue());
-  if (space.mId==ssc::csCOUNT)
+  CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
+  if (space.mId==csCOUNT)
     return;
 //  std::cout << "selected frame " << frame.toString() << std::endl;
   mData->setSpace(space);
@@ -151,11 +148,11 @@ void PointMetricWrapper::dataChangedSlot()
 //---------------------------------------------------------
 
 
-PlaneMetricWrapper::PlaneMetricWrapper(ssc::PlaneMetricPtr data) : mData(data)
+PlaneMetricWrapper::PlaneMetricWrapper(PlaneMetricPtr data) : mData(data)
 {
   mInternalUpdate = false;
   connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
+  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* PlaneMetricWrapper::createWidget()
@@ -168,35 +165,35 @@ QWidget* PlaneMetricWrapper::createWidget()
   topLayout->addLayout(hLayout);
 
   QString value;// = qstring_cast(mData->getFrame());
-  std::vector<ssc::CoordinateSystem> spaces = ssc::SpaceHelpers::getAvailableSpaces(true);
+  std::vector<CoordinateSystem> spaces = SpaceHelpers::getAvailableSpaces(true);
   QStringList range;
   for (unsigned i=0; i<spaces.size(); ++i)
     range << spaces[i].toString();
 
-  mSpaceSelector = ssc::StringDataAdapterXml::initialize("selectSpace",
+  mSpaceSelector = StringDataAdapterXml::initialize("selectSpace",
       "Space",
       "Select coordinate system to store position in.",
       value,
       range,
       QDomNode());
-  hLayout->addWidget(new ssc::LabeledComboBoxWidget(widget, mSpaceSelector));
+  hLayout->addWidget(new LabeledComboBoxWidget(widget, mSpaceSelector));
   connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spaceSelected()));
 
-  mCoordinate = ssc::Vector3DDataAdapterXml::initialize("selectCoordinate",
+  mCoordinate = Vector3DDataAdapterXml::initialize("selectCoordinate",
       "Coord",
       "Coordinate values.",
-      ssc::Vector3D(0,0,0),
-      ssc::DoubleRange(-1000,1000,0.1),
+      Vector3D(0,0,0),
+      DoubleRange(-1000,1000,0.1),
       1,
       QDomNode());
   topLayout->addWidget(Vector3DWidget::createSmallHorizontal(widget, mCoordinate));
   connect(mCoordinate.get(), SIGNAL(valueWasSet()), this, SLOT(coordinateChanged()));
 
-  mNormal = ssc::Vector3DDataAdapterXml::initialize("selectNormal",
+  mNormal = Vector3DDataAdapterXml::initialize("selectNormal",
       "Normal",
       "Normal values.",
-      ssc::Vector3D(1,0,0),
-      ssc::DoubleRange(-1,1,0.1),
+      Vector3D(1,0,0),
+      DoubleRange(-1,1,0.1),
       2,
       QDomNode());
   topLayout->addWidget(Vector3DWidget::createSmallHorizontal(widget, mNormal));
@@ -217,7 +214,7 @@ QString PlaneMetricWrapper::getValue() const
   return "NA";
 }
 
-ssc::DataPtr PlaneMetricWrapper::getData() const
+DataPtr PlaneMetricWrapper::getData() const
 {
   return mData;
 }
@@ -235,24 +232,24 @@ QString PlaneMetricWrapper::getArguments() const
 
 void PlaneMetricWrapper::moveToToolPosition()
 {
-	//  ssc::Vector3D p = ssc::SpaceHelpers::getDominantToolTipPoint(mData->getSpace(), true);
+	//  Vector3D p = SpaceHelpers::getDominantToolTipPoint(mData->getSpace(), true);
 	//  mData->setCoordinate(p);
-//	ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
+//	CoordinateSystem ref = SpaceHelpers::getR();
 
-	ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
+	ToolPtr tool = toolManager()->getDominantTool();
 	if (!tool)
 	{
-		mData->setCoordinate(ssc::Vector3D(0, 0, 0));
-		mData->setNormal(ssc::Vector3D(1, 0, 0));
+		mData->setCoordinate(Vector3D(0, 0, 0));
+		mData->setNormal(Vector3D(1, 0, 0));
 	}
 	else
 	{
-		ssc::CoordinateSystem from(ssc::csTOOL_OFFSET, tool->getUid());
-		ssc::Vector3D point_t = ssc::Vector3D(0, 0, 0);
-		ssc::Transform3D rMto = ssc::CoordinateSystemHelpers::get_toMfrom(from, mData->getSpace());
+		CoordinateSystem from(csTOOL_OFFSET, tool->getUid());
+		Vector3D point_t = Vector3D(0, 0, 0);
+		Transform3D rMto = CoordinateSystemHelpers::get_toMfrom(from, mData->getSpace());
 
-		mData->setCoordinate(rMto.coord(ssc::Vector3D(0, 0, 0)));
-		mData->setNormal(rMto.vector(ssc::Vector3D(0, 0, 1)));
+		mData->setCoordinate(rMto.coord(Vector3D(0, 0, 0)));
+		mData->setNormal(rMto.vector(Vector3D(0, 0, 1)));
 	}
 }
 
@@ -260,8 +257,8 @@ void PlaneMetricWrapper::spaceSelected()
 {
   if (mInternalUpdate)
     return;
-  ssc::CoordinateSystem space = ssc::CoordinateSystem::fromString(mSpaceSelector->getValue());
-  if (space.mId==ssc::csCOUNT)
+  CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
+  if (space.mId==csCOUNT)
     return;
   mData->setSpace(space);
 }
@@ -287,17 +284,17 @@ void PlaneMetricWrapper::dataChangedSlot()
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-DistanceMetricWrapper::DistanceMetricWrapper(ssc::DistanceMetricPtr data) : mData(data)
+DistanceMetricWrapper::DistanceMetricWrapper(DistanceMetricPtr data) : mData(data)
 {
   mInternalUpdate = false;
   connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
+  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
 }
 
 void DistanceMetricWrapper::getAvailableArgumentMetrics(QStringList* uid, std::map<QString,QString>* namemap)
 {
-  std::map<QString, ssc::DataPtr> data = ssc::dataManager()->getData();
-  for (std::map<QString, ssc::DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
+  std::map<QString, DataPtr> data = dataManager()->getData();
+  for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
   {
     if (mData->validArgument(iter->second))
     {
@@ -325,14 +322,14 @@ QWidget* DistanceMetricWrapper::createWidget()
   mPSelector.resize(mData->getArgumentCount());
   for (unsigned i=0; i<mPSelector.size(); ++i)
   {
-    mPSelector[i] = ssc::StringDataAdapterXml::initialize(QString("p%1").arg(i),
+    mPSelector[i] = StringDataAdapterXml::initialize(QString("p%1").arg(i),
         QString("p%1").arg(i),
         QString("line endpoint %1").arg(i),
         mData->getArgument(i) ? mData->getArgument(i)->getUid() : "",
         range,
         QDomNode());
     mPSelector[i]->setDisplayNames(names);
-    hLayout->addWidget(new ssc::LabeledComboBoxWidget(widget, mPSelector[i]));
+    hLayout->addWidget(new LabeledComboBoxWidget(widget, mPSelector[i]));
     connect(mPSelector[i].get(), SIGNAL(valueWasSet()), this, SLOT(pointSelected()));
   }
 
@@ -344,7 +341,7 @@ QString DistanceMetricWrapper::getValue() const
 {
   return QString("%1 mm").arg(mData->getDistance(), 5, 'f', 1);
 }
-ssc::DataPtr DistanceMetricWrapper::getData() const
+DataPtr DistanceMetricWrapper::getData() const
 {
   return mData;
 }
@@ -369,7 +366,7 @@ void DistanceMetricWrapper::pointSelected()
     return;
   for (unsigned i=0; i<mPSelector.size(); ++i)
   {
-    ssc::DataPtr arg = ssc::dataManager()->getData(mPSelector[i]->getValue());
+    DataPtr arg = dataManager()->getData(mPSelector[i]->getValue());
     if (mData->validArgument(arg))
       mData->setArgument(i, arg);
   }
@@ -396,19 +393,19 @@ void DistanceMetricWrapper::dataChangedSlot()
 //---------------------------------------------------------
 
 
-AngleMetricWrapper::AngleMetricWrapper(ssc::AngleMetricPtr data) : mData(data)
+AngleMetricWrapper::AngleMetricWrapper(AngleMetricPtr data) : mData(data)
 {
   mInternalUpdate = false;
   connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
+  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
 }
 
 void AngleMetricWrapper::getPointMetrics(QStringList* uid, std::map<QString,QString>* namemap)
 {
-  std::map<QString, ssc::DataPtr> data = ssc::dataManager()->getData();
-  for (std::map<QString, ssc::DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
+  std::map<QString, DataPtr> data = dataManager()->getData();
+  for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
   {
-    if (boost::dynamic_pointer_cast<ssc::PointMetric>(iter->second))
+    if (boost::dynamic_pointer_cast<PointMetric>(iter->second))
     {
       *uid << iter->first;
       (*namemap)[iter->first] = iter->second->getName();
@@ -433,14 +430,14 @@ QWidget* AngleMetricWrapper::createWidget()
   mPSelector.resize(4);
   for (unsigned i=0; i<mPSelector.size(); ++i)
   {
-    mPSelector[i] = ssc::StringDataAdapterXml::initialize(QString("p%1").arg(i),
+    mPSelector[i] = StringDataAdapterXml::initialize(QString("p%1").arg(i),
         QString("p%1").arg(i),
         QString("p%1").arg(i),
         mData->getArgument(i) ? mData->getArgument(i)->getUid() : "",
         range,
         QDomNode());
     mPSelector[i]->setDisplayNames(names);
-    hLayout->addWidget(new ssc::LabeledComboBoxWidget(widget, mPSelector[i]));
+    hLayout->addWidget(new LabeledComboBoxWidget(widget, mPSelector[i]));
     connect(mPSelector[i].get(), SIGNAL(valueWasSet()), this, SLOT(pointSelected()));
   }
 
@@ -452,7 +449,7 @@ QString AngleMetricWrapper::getValue() const
 {
   return QString("%1*").arg(mData->getAngle()/M_PI*180, 5, 'f', 1);
 }
-ssc::DataPtr AngleMetricWrapper::getData() const
+DataPtr AngleMetricWrapper::getData() const
 {
   return mData;
 }
@@ -476,7 +473,7 @@ void AngleMetricWrapper::pointSelected()
     return;
   for (unsigned i=0; i<mPSelector.size(); ++i)
   {
-	  ssc::PointMetricPtr p = boost::dynamic_pointer_cast<ssc::PointMetric>(ssc::dataManager()->getData(mPSelector[i]->getValue()));
+	  PointMetricPtr p = boost::dynamic_pointer_cast<PointMetric>(dataManager()->getData(mPSelector[i]->getValue()));
     mData->setArgument(i, p);
   }
 }

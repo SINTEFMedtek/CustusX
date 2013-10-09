@@ -19,7 +19,7 @@
 #include "cxForwardDeclarations.h"
 #include "sscTransform3D.h"
 
-namespace ssc
+namespace cx
 {
 class USReconstructInputData;
 }
@@ -62,16 +62,16 @@ public:
 	/**
 	  * Start recording
 	  */
-	void startRecord(RecordSessionPtr session, ssc::ToolPtr tool, std::vector<ssc::VideoSourcePtr> video);
+	void startRecord(RecordSessionPtr session, ToolPtr tool, std::vector<VideoSourcePtr> video);
 	void stopRecord();
 	void cancelRecord();
 
 	void setWriteColor(bool on);
-	void set_rMpr(ssc::Transform3D rMpr);
+	void set_rMpr(Transform3D rMpr);
 	/**
 	  * Retrieve an in-memory data set for the given stream uid.
 	  */
-	ssc::USReconstructInputData getDataForStream(QString streamUid);
+	USReconstructInputData getDataForStream(QString streamUid);
 	/**
 	  * Start saving all data acquired after a start/stop record.
 	  * A separate saveDataCompleted() signal is emitted
@@ -87,17 +87,17 @@ signals:
 private slots:
 	void fileMakerWriteFinished();
 private:
-	std::map<double, ssc::Transform3D> getRecording();
-	void saveStreamSession(ssc::USReconstructInputData reconstructData, QString saveFolder, QString streamSessionName, bool compress);
-	ssc::USReconstructInputData getDataForStream(unsigned videoRecorderIndex);
+	std::map<double, Transform3D> getRecording();
+	void saveStreamSession(USReconstructInputData reconstructData, QString saveFolder, QString streamSessionName, bool compress);
+	USReconstructInputData getDataForStream(unsigned videoRecorderIndex);
 
 	RecordSessionPtr mSession;
 	std::list<QFutureWatcher<QString>*> mSaveThreads;
 	// video and tool used at start of recording:
 	std::vector<SavingVideoRecorderPtr> mVideoRecorder;
-	ssc::ToolPtr mRecordingTool;
+	ToolPtr mRecordingTool;
 	bool mDoWriteColor;
-	ssc::Transform3D m_rMpr;
+	Transform3D m_rMpr;
 };
 typedef boost::shared_ptr<USSavingRecorder> USSavingRecorderPtr;
 

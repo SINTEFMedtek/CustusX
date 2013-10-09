@@ -80,15 +80,15 @@ void DataListWidget::itemSelectionChangedSlot()
   QList<QListWidgetItem*> items = this->selectedItems();
   if (items.empty())
     return;
-  ssc::ImagePtr image = ssc::dataManager()->getImage(items[0]->data(Qt::UserRole).toString());
+  ImagePtr image = dataManager()->getImage(items[0]->data(Qt::UserRole).toString());
   if (image)
-    ssc::dataManager()->setActiveImage(image);
+    dataManager()->setActiveImage(image);
 
 }
 
 void DataListWidget::populateData(QString uid, bool indent, QListWidgetItem* after)
 {
-  ssc::DataPtr data = ssc::dataManager()->getData(uid);
+  DataPtr data = dataManager()->getData(uid);
   if (!data)
     return;
 
@@ -98,7 +98,7 @@ void DataListWidget::populateData(QString uid, bool indent, QListWidgetItem* aft
   if (indent)
     item->setText("    " + item->text());
 
-  if (boost::dynamic_pointer_cast<ssc::Image>(data))
+  if (boost::dynamic_pointer_cast<Image>(data))
     item->setIcon(QIcon(":/icons/volume.png"));
   else
     item->setIcon(QIcon(":/icons/surface.png"));
@@ -142,8 +142,8 @@ AllDataListWidget::AllDataListWidget(QWidget* parent) :
   this->setDragEnabled(true);
 //  this->setAcceptDrops(true); // if we want to back-drag items (for deletion)
 
-  connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(populateAllDataList()));
-  connect(ssc::dataManager(), SIGNAL(dataRemoved(QString)), this, SLOT(populateAllDataList()));
+  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(populateAllDataList()));
+  connect(dataManager(), SIGNAL(dataRemoved(QString)), this, SLOT(populateAllDataList()));
 }
 
 AllDataListWidget::~AllDataListWidget()
@@ -190,9 +190,9 @@ void AllDataListWidget::populateAllDataList()
   this->clear();
 
   //add actions to the actiongroups and the contextmenu
-  std::vector<ssc::DataPtr> sorted = sortOnGroupsAndAcquisitionTime(ssc::dataManager()->getData());
+  std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(dataManager()->getData());
   QString lastDataActionUid = "________________________";
-  for (std::vector<ssc::DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
+  for (std::vector<DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
   {
     QString uid = (*iter)->getUid();
 
@@ -258,7 +258,7 @@ void SelectedDataListWidget::userChangedListSlot()
   mViewGroupData->clearData();
   for (int i=0; i<data.size(); ++i)
   {
-    ssc::DataPtr current = ssc::dataManager()->getData(data[i]);
+    DataPtr current = dataManager()->getData(data[i]);
     if (!current)
       continue;
     mViewGroupData->addData(current);
@@ -373,7 +373,7 @@ void SelectedDataListWidget::deleteSlot()
 {
   if(!mItemToDelete)
   {
-    ssc::messageManager()->sendDebug("Found no item to delete...");
+    messageManager()->sendDebug("Found no item to delete...");
     return;
   }
   this->deleteItemSlot(mItemToDelete);
@@ -397,7 +397,7 @@ void SelectedDataListWidget::contextMenuSlot(const QPoint& point)
   QListWidgetItem* item = this->itemAt(point);
   if(!item)
   {
-    ssc::messageManager()->sendDebug("Found no item to delete...");
+    messageManager()->sendDebug("Found no item to delete...");
   }
   mItemToDelete = item;
 
@@ -411,9 +411,9 @@ void SelectedDataListWidget::populateList()
 {
   this->clear();
 
-  std::vector<ssc::DataPtr> sorted = mViewGroupData->getData();
+  std::vector<DataPtr> sorted = mViewGroupData->getData();
   std::reverse(sorted.begin(), sorted.end());
-  for (std::vector<ssc::DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
+  for (std::vector<DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
   {
     QString uid = (*iter)->getUid();
     this->populateData(uid);

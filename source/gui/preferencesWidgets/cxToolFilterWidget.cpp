@@ -19,7 +19,7 @@ ToolFilterGroupBox::ToolFilterGroupBox(QWidget* parent) :
 
   mApplicationGroupBox = new SelectionGroupBox("Applications", stateService()->getApplication()->getAllApplicationNames(), false, NULL);
   mApplicationGroupBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
-  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", ToolManager::getInstance()->getSupportedTrackingSystems(), true, NULL);
+  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", cxToolManager::getInstance()->getSupportedTrackingSystems(), true, NULL);
   mToolListWidget = new FilteringToolListWidget(NULL);
   connect(mToolListWidget, SIGNAL(toolSelected(QString)), this, SIGNAL(toolSelected(QString)));
 
@@ -41,14 +41,14 @@ ToolFilterGroupBox::ToolFilterGroupBox(QWidget* parent) :
 ToolFilterGroupBox::~ToolFilterGroupBox()
 {}
 
-void ToolFilterGroupBox::setClinicalApplicationSlot(ssc::CLINICAL_APPLICATION clinicalApplication)
+void ToolFilterGroupBox::setClinicalApplicationSlot(CLINICAL_APPLICATION clinicalApplication)
 {
   QStringList selectedApplication;
   selectedApplication << enum2string(clinicalApplication);
   mApplicationGroupBox->setSelected(selectedApplication);
 }
 
-void ToolFilterGroupBox::setTrackingSystemSlot(ssc::TRACKING_SYSTEM trackingSystem)
+void ToolFilterGroupBox::setTrackingSystemSlot(TRACKING_SYSTEM trackingSystem)
 {
   QStringList selectedTrackingSystem;
   selectedTrackingSystem << enum2string(trackingSystem);

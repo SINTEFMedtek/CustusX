@@ -22,7 +22,7 @@ namespace cx
  */
 
 /**
- * Base class for displaying ssc::Data items.
+ * Base class for displaying Data items.
  */
 
 class DataListWidget : public QListWidget

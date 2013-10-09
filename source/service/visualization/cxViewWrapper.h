@@ -22,6 +22,7 @@
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
+#include "cxViewGroupData.h"
 
 typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
 class QMenu;
@@ -38,14 +39,14 @@ typedef boost::shared_ptr<class CameraData> CameraDataPtr;
  * @{
  */
 
-/**Define a priority for the input data.
- * High means display on top, low means in the back.
- */
-int getPriority(ssc::DataPtr data);
+///**Define a priority for the input data.
+// * High means display on top, low means in the back.
+// */
+//int getPriority(DataPtr data);
 
-/**Sorts ssc::DataPtr in default display ordering, using getPriority().
- */
-bool dataTypeSort(const ssc::DataPtr data1, const ssc::DataPtr data2);
+///**Sorts DataPtr in default display ordering, using getPriority().
+// */
+//bool dataTypeSort(const DataPtr data1, const DataPtr data2);
 
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 
@@ -62,56 +63,56 @@ private:
 	void changed();
 };
 
-typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
+//typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 
-/** \brief Container for data shared between all members of a view group
- */
-class ViewGroupData: public QObject
-{
-Q_OBJECT
-public:
-	ViewGroupData();
-	void requestInitialize();
-	std::vector<ssc::DataPtr> getData() const;
-	QString getVideoSource() const;
-	void addData(ssc::DataPtr data);
-	void addDataSorted(ssc::DataPtr data); ///< add data in a predefined ordering: CT/MR/SC/US/USA/Mesh/Metrics
-	void setVideoSource(QString uid);
-	bool removeData(ssc::DataPtr data);
-	void clearData();
-	std::vector<ssc::ImagePtr> getImages() const;
-	std::vector<ssc::MeshPtr> getMeshes() const;
+///** \brief Container for data shared between all members of a view group
+// */
+//class ViewGroupData: public QObject
+//{
+//Q_OBJECT
+//public:
+//	ViewGroupData();
+//	void requestInitialize();
+//	std::vector<DataPtr> getData() const;
+//	QString getVideoSource() const;
+//	void addData(DataPtr data);
+//	void addDataSorted(DataPtr data); ///< add data in a predefined ordering: CT/MR/SC/US/USA/Mesh/Metrics
+//	void setVideoSource(QString uid);
+//	bool removeData(DataPtr data);
+//	void clearData();
+//	std::vector<ImagePtr> getImages() const;
+//	std::vector<MeshPtr> getMeshes() const;
 
-	CameraDataPtr getCamera3D() { return mCamera3D; }
+//	CameraDataPtr getCamera3D() { return mCamera3D; }
 
-	// view options for this group.
-	struct Options
-	{
-		Options();
-		bool mShowLandmarks;
-		bool mShowPointPickerProbe;
-		ssc::MeshPtr mPickerGlyph;
-	};
+//	// view options for this group.
+//	struct Options
+//	{
+//		Options();
+//		bool mShowLandmarks;
+//		bool mShowPointPickerProbe;
+//		MeshPtr mPickerGlyph;
+//	};
 
-	Options getOptions() const;
-	void setOptions(Options options);
+//	Options getOptions() const;
+//	void setOptions(Options options);
 
-private slots:
-    void removeDataSlot(QString uid);
+//private slots:
+//    void removeDataSlot(QString uid);
 
-signals:
-	void dataAdded(QString uid);
-	void dataRemoved(QString uid);
-	void videoSourceChanged(QString uid);
-	void initialized();
-	void optionsChanged();
+//signals:
+//	void dataAdded(QString uid);
+//	void dataRemoved(QString uid);
+//	void videoSourceChanged(QString uid);
+//	void initialized();
+//	void optionsChanged();
 
-private:
-	QString mVideoSource;
-	std::vector<ssc::DataPtr> mData;
-	CameraDataPtr mCamera3D;
-	Options mOptions;
-};
+//private:
+//	QString mVideoSource;
+//	std::vector<DataPtr> mData;
+//	CameraDataPtr mCamera3D;
+//	Options mOptions;
+//};
 
 /**
  * \brief Superclass for ViewWrappers.
@@ -125,9 +126,9 @@ class ViewWrapper: public QObject
 Q_OBJECT
 public:
 	virtual ~ViewWrapper() {}
-	virtual void initializePlane(ssc::PLANE_TYPE plane) {}
-	virtual ssc::ViewWidget* getView() = 0;
-	virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy) = 0;
+	virtual void initializePlane(PLANE_TYPE plane) {}
+	virtual ViewWidget* getView() = 0;
+	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) = 0;
 	virtual void setViewGroup(ViewGroupDataPtr group);
 
 	virtual void setZoom2D(SyncedValuePtr value) {}
@@ -136,7 +137,7 @@ public:
 	virtual void updateView() = 0;
 
 signals:
-	void orientationChanged(ssc::ORIENTATION_TYPE type);
+	void orientationChanged(ORIENTATION_TYPE type);
 
 protected slots:
 	void contextMenuSlot(const QPoint& point);
@@ -147,15 +148,15 @@ protected slots:
 	virtual void videoSourceChangedSlot(QString uid) {}
 
 protected:
-	virtual void dataAdded(ssc::DataPtr data) = 0;
+	virtual void dataAdded(DataPtr data) = 0;
 	virtual void dataRemoved(const QString& uid) = 0;
 
-	void connectContextMenu(ssc::ViewWidget* view);
+	void connectContextMenu(ViewWidget* view);
 	virtual void appendToContextMenu(QMenu& contextMenu) = 0;
 	void addDataAction(QString uid, QMenu* contextMenu);
 	QStringList getAllDataNames() const;
 
-	ViewGroupDataPtr mViewGroup;
+	ViewGroupDataPtr mGroupData;
 
 private:
 	QString mLastDataActionUid;

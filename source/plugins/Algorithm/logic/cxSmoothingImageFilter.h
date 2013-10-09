@@ -41,7 +41,7 @@ public:
 	virtual bool postProcess();
 
 	// extensions:
-	ssc::DoubleDataAdapterXmlPtr getSigma(QDomElement root);
+	DoubleDataAdapterXmlPtr getSigma(QDomElement root);
 
 protected:
 	virtual void createOptions();

@@ -53,6 +53,8 @@
 #include "sscDistanceMetricRep.h"
 #include "sscAngleMetricRep.h"
 #include "sscPlaneMetricRep.h"
+#include "cxFrameMetricRep.h"
+#include "cxToolMetricRep.h"
 #include "sscDataMetricRep.h"
 #include "cxDataLocations.h"
 #include "sscTexture3DSlicerRep.h"
@@ -60,6 +62,7 @@
 #include "sscEnumConverter.h"
 #include "sscManualTool.h"
 #include "sscImage2DRep3D.h"
+#include "sscLogger.h"
 
 #include "sscData.h"
 #include "sscAxesRep.h"
@@ -70,65 +73,21 @@
 #include "sscPointMetric.h"
 
 #include "cxDepthPeeling.h"
+#include "cxAxisConnector.h"
+#include "cxMultiVolume3DRepProducer.h"
+
 
 namespace cx
 {
 
-AxisConnector::AxisConnector(ssc::CoordinateSystem space)
+
+
+ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view)
 {
-	mListener.reset(new ssc::CoordinateSystemListener(space));
-	connect(mListener.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
+	view->getRenderer()->GetActiveCamera()->SetClippingRange(1, 2000);
+	if (!view->getRenderWindow()->GetStereoCapableWindow())
+		view->getRenderWindow()->StereoCapableWindowOn(); // Just set all 3D views 3D capable
 
-	mRep = ssc::AxesRep::New(space.toString() + "_axis");
-	mRep->setCaption(space.toString(), ssc::Vector3D(1, 0, 0));
-	mRep->setShowAxesLabels(false);
-	mRep->setFontSize(0.08);
-	mRep->setAxisLength(0.03);
-	this->changedSlot();
-}
-
-void AxisConnector::mergeWith(ssc::CoordinateSystemListenerPtr base)
-{
-	mBase = base;
-	connect(mBase.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
-	this->changedSlot();
-}
-
-void AxisConnector::connectTo(ssc::ToolPtr tool)
-{
-	mTool = tool;
-	connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(changedSlot()));
-	this->changedSlot();
-}
-
-void AxisConnector::changedSlot()
-{
-	ssc::Transform3D  rMs = ssc::SpaceHelpers::get_toMfrom(mListener->getSpace(), ssc::CoordinateSystem(ssc::csREF));
-	mRep->setTransform(rMs);
-
-	mRep->setVisible(true);
-
-	// if connected to tool: check visibility
-	if (mTool)
-		mRep->setVisible(mTool->getVisible());
-
-	// Dont show if equal to base
-	if (mBase)
-	{
-		ssc::Transform3D rMb = ssc::SpaceHelpers::get_toMfrom(mBase->getSpace(), ssc::CoordinateSystem(ssc::csREF));
-		if (ssc::similar(rMb, rMs))
-			mRep->setVisible(false);
-	}
-
-}
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-
-ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::ViewWidget* view)
-{
 	mShowAxes = false;
 	mView = view;
 	this->connectContextMenu(mView);
@@ -139,38 +98,40 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::ViewWidget* view)
 	view->getRenderer()->GetActiveCamera()->SetParallelProjection(false);
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 
+	this->initializeMultiVolume3DRepProducer();
+
 	mLandmarkRep = LandmarkRep::New("LandmarkRep_" + index);
 	mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
 	mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 
-	mPickerRep = ssc::PickerRep::New("PickerRep_" + index, "PickerRep_" + index);
+	mPickerRep = PickerRep::New("PickerRep_" + index, "PickerRep_" + index);
 
-	connect(mPickerRep.get(), SIGNAL(pointPicked(ssc::Vector3D)), this, SLOT(PickerRepPointPickedSlot(ssc::Vector3D)));
+	connect(mPickerRep.get(), SIGNAL(pointPicked(Vector3D)), this, SLOT(PickerRepPointPickedSlot(Vector3D)));
 	connect(mPickerRep.get(), SIGNAL(dataPicked(QString)), this, SLOT(PickerRepDataPickedSlot(QString)));
 	mPickerRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
 	mPickerRep->setEnabled(false);
 	mView->addRep(mPickerRep);
-	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 	this->dominantToolChangedSlot();
 
 	// plane type text rep
-	mPlaneTypeText = ssc::DisplayTextRep::New("planeTypeRep_" + mView->getName(), "");
-	mPlaneTypeText->addText(ssc::Vector3D(0, 1, 0), "3D", ssc::Vector3D(0.98, 0.02, 0.0));
+	mPlaneTypeText = DisplayTextRep::New("planeTypeRep_" + mView->getName(), "");
+	mPlaneTypeText->addText(Vector3D(0, 1, 0), "3D", Vector3D(0.98, 0.02, 0.0));
 	mView->addRep(mPlaneTypeText);
 
 	//data name text rep
-	mDataNameText = ssc::DisplayTextRep::New("dataNameText_" + mView->getName(), "");
-	mDataNameText->addText(ssc::Vector3D(0, 1, 0), "not initialized", ssc::Vector3D(0.02, 0.02, 0.0));
+	mDataNameText = DisplayTextRep::New("dataNameText_" + mView->getName(), "");
+	mDataNameText->addText(Vector3D(0, 1, 0), "not initialized", Vector3D(0.02, 0.02, 0.0));
 	mView->addRep(mDataNameText);
 
-	connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
-	connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
-	connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
+	connect(toolManager(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
+	connect(toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
+	connect(dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
 	this->toolsAvailableSlot();
 
-	mAnnotationMarker = RepManager::getInstance()->getCachedRep<ssc::OrientationAnnotation3DRep>(
+	mAnnotationMarker = RepManager::getInstance()->getCachedRep<OrientationAnnotation3DRep>(
 					"annotation_" + mView->getName());
-//  mAnnotationMarker = ssc::OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
+//  mAnnotationMarker = OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
 	mAnnotationMarker->setMarkerFilename(
 					DataLocations::getRootConfigPath() + "/models/"
 									+ settings()->value("View3D/annotationModel").toString());
@@ -190,17 +151,32 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::ViewWidget* view)
 	if(settings()->value("View3D/depthPeeling").toBool())
 		this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
 
-//	connect(viewManager()->getClipper().get(), SIGNAL(changed()), this, SLOT(updateView()));
 	this->updateView();
 }
 
 ViewWrapper3D::~ViewWrapper3D()
 {
-//	disconnect(viewManager()->getClipper().get(), SIGNAL(changed()), this, SLOT(updateView()));
 	if (mView)
 	{
 		mView->removeReps();
+		mMultiVolume3DRepProducer->removeRepsFromView();
 	}
+}
+
+void ViewWrapper3D::initializeMultiVolume3DRepProducer()
+{
+	if (!mView)
+		messageManager()->sendError("Missing View in initializeMultiVolume3DRepProducer");
+
+	if (!mMultiVolume3DRepProducer)
+	{
+		mMultiVolume3DRepProducer.reset(new MultiVolume3DRepProducer());
+		connect(mMultiVolume3DRepProducer.get(), SIGNAL(imagesChanged()), this, SLOT(updateView()));
+		mMultiVolume3DRepProducer->setView(mView);
+	}
+
+	mMultiVolume3DRepProducer->setMaxRenderSize(settings()->value("View3D/maxRenderSize").toInt());
+	mMultiVolume3DRepProducer->setVisualizerType(settings()->value("View3D/ImageRender3DVisualizer").toString());
 }
 
 void ViewWrapper3D::settingsChangedSlot(QString key)
@@ -210,15 +186,9 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 		QColor background = settings()->value("backgroundColor").value<QColor>();
 		mView->setBackgroundColor(background);
 	}
-	if (( key=="useGPUVolumeRayCastMapper" )||( key=="maxRenderSize" ))
+	if (( key=="View3D/ImageRender3DVisualizer" )||( key=="View3D/maxRenderSize" ))
 	{
-		// reload volumes from cache
-		std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
-		for (unsigned i = 0; i < images.size(); ++i)
-		{
-			this->dataRemoved(images[i]->getUid());
-			this->dataAdded(images[i]);
-		}
+		this->initializeMultiVolume3DRepProducer();
 	}
 	if (key == "View/showDataText")
 	{
@@ -245,28 +215,26 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 		this->toolsAvailableSlot();
 		mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
 		mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
-		//    mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
-		//    mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 	}
 	if (key == "View3D/depthPeeling")
 		this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
 }
 
-void ViewWrapper3D::PickerRepPointPickedSlot(ssc::Vector3D p_r)
+void ViewWrapper3D::PickerRepPointPickedSlot(Vector3D p_r)
 {
-	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
-	ssc::Vector3D p_pr = rMpr.inv().coord(p_r);
+	Transform3D rMpr = *toolManager()->get_rMpr();
+	Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
-	ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
-	ssc::Vector3D offset = tool->get_prMt().vector(ssc::Vector3D(0, 0, tool->getTooltipOffset()));
+	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
+	Vector3D offset = tool->get_prMt().vector(Vector3D(0, 0, tool->getTooltipOffset()));
 	p_pr -= offset;
 	p_r = rMpr.coord(p_pr);
 
 	// TODO set center here will not do: must handle
-	ssc::dataManager()->setCenter(p_r);
-	ssc::Vector3D p0_pr = tool->get_prMt().coord(ssc::Vector3D(0, 0, 0));
-	tool->set_prMt(ssc::createTransformTranslate(p_pr - p0_pr) * tool->get_prMt());
+	dataManager()->setCenter(p_r);
+	Vector3D p0_pr = tool->get_prMt().coord(Vector3D(0, 0, 0));
+	tool->set_prMt(createTransformTranslate(p_pr - p0_pr) * tool->get_prMt());
 }
 
 void ViewWrapper3D::PickerRepDataPickedSlot(QString uid)
@@ -329,12 +297,12 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
 	showRefTool->setDisabled(true);
 	showRefTool->setCheckable(true);
-	ssc::ToolPtr refTool = ToolManager::getInstance()->getReferenceTool();
+	ToolPtr refTool = cxToolManager::getInstance()->getReferenceTool();
 	if (refTool)
 	{
 		showRefTool->setText("Show " + refTool->getName());
 		showRefTool->setEnabled(true);
-		showRefTool->setChecked(RepManager::findFirstRep<ssc::ToolRep3D>(mView->getReps(), refTool));
+		showRefTool->setChecked(RepManager::findFirstRep<ToolRep3D>(mView->getReps(), refTool));
 		connect(showRefTool, SIGNAL(toggled(bool)), this, SLOT(showRefToolSlot(bool)));
 	}
 
@@ -387,7 +355,7 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 
 	connect(group.get(), SIGNAL(initialized()), this, SLOT(resetCameraActionSlot()));
 	connect(group.get(), SIGNAL(optionsChanged()), this, SLOT(optionChangedSlot()));
-	mView->getRenderer()->SetActiveCamera(mViewGroup->getCamera3D()->getCamera());
+	mView->getRenderer()->SetActiveCamera(mGroupData->getCamera3D()->getCamera());
 
 	// Set eye angle after camera change. Maybe create a cameraChangedSlot instead
 	this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
@@ -397,8 +365,8 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 
 void ViewWrapper3D::showToolPathSlot(bool checked)
 {
-	ssc::ToolRep3DPtr activeRep3D = RepManager::findFirstRep<ssc::ToolRep3D>(mView->getReps(),
-					ssc::toolManager()->getDominantTool());
+	ToolRep3DPtr activeRep3D = RepManager::findFirstRep<ToolRep3D>(mView->getReps(),
+					toolManager()->getDominantTool());
 	if (activeRep3D)
 	{
 		if (activeRep3D->getTracer()->isRunning())
@@ -433,46 +401,46 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		AxisConnectorPtr axis;
 
 		// reference space
-		axis.reset(new AxisConnector(ssc::CoordinateSystem(ssc::csREF)));
+		axis.reset(new AxisConnector(CoordinateSystem(csREF)));
 		axis->mRep->setAxisLength(0.12);
 		axis->mRep->setShowAxesLabels(true);
-		axis->mRep->setCaption("ref", ssc::Vector3D(1, 0, 0));
+		axis->mRep->setCaption("ref", Vector3D(1, 0, 0));
 		axis->mRep->setFontSize(0.03);
 		mAxis.push_back(axis);
 
 		// data spaces
-		std::vector<ssc::DataPtr> data = mViewGroup->getData();
+		std::vector<DataPtr> data = mGroupData->getData();
 		for (unsigned i = 0; i < data.size(); ++i)
 		{
-			axis.reset(new AxisConnector(ssc::CoordinateSystem(ssc::csDATA, data[i]->getUid())));
+			axis.reset(new AxisConnector(CoordinateSystem(csDATA, data[i]->getUid())));
 			axis->mRep->setAxisLength(0.08);
 			axis->mRep->setShowAxesLabels(false);
-			axis->mRep->setCaption(data[i]->getName(), ssc::Vector3D(1, 0, 0));
+			axis->mRep->setCaption(data[i]->getName(), Vector3D(1, 0, 0));
 			axis->mRep->setFontSize(0.03);
 			mAxis.push_back(axis);
 		}
 
 		// tool spaces
-		ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
-		ssc::ToolManager::ToolMapPtr::element_type::iterator iter;
+		ToolManager::ToolMapPtr tools = toolManager()->getTools();
+		ToolManager::ToolMapPtr::element_type::iterator iter;
 		for (iter = tools->begin(); iter != tools->end(); ++iter)
 		{
-			ssc::ToolPtr tool = iter->second;
+			ToolPtr tool = iter->second;
 
-			axis.reset(new AxisConnector(ssc::CoordinateSystem(ssc::csTOOL, tool->getUid())));
+			axis.reset(new AxisConnector(CoordinateSystem(csTOOL, tool->getUid())));
 			axis->mRep->setAxisLength(0.08);
 			axis->mRep->setShowAxesLabels(false);
-			axis->mRep->setCaption("t", ssc::Vector3D(0.7, 1, 0.7));
+			axis->mRep->setCaption("t", Vector3D(0.7, 1, 0.7));
 			axis->mRep->setFontSize(0.03);
 			axis->connectTo(tool);
-			ssc::CoordinateSystemListenerPtr mToolListener = axis->mListener;
+			CoordinateSystemListenerPtr mToolListener = axis->mListener;
 
 			mAxis.push_back(axis);
 
-			axis.reset(new AxisConnector(ssc::CoordinateSystem(ssc::csSENSOR, tool->getUid())));
+			axis.reset(new AxisConnector(CoordinateSystem(csSENSOR, tool->getUid())));
 			axis->mRep->setAxisLength(0.05);
 			axis->mRep->setShowAxesLabels(false);
-			axis->mRep->setCaption("s", ssc::Vector3D(1, 1, 0));
+			axis->mRep->setCaption("s", Vector3D(1, 1, 0));
 			axis->mRep->setFontSize(0.03);
 			axis->connectTo(tool);
 			axis->mergeWith(mToolListener);
@@ -505,10 +473,10 @@ void ViewWrapper3D::resetCameraActionSlot()
 
 void ViewWrapper3D::centerImageActionSlot()
 {
-	if (ssc::dataManager()->getActiveImage())
-		Navigation().centerToData(ssc::dataManager()->getActiveImage());
+	if (dataManager()->getActiveImage())
+		Navigation().centerToData(dataManager()->getActiveImage());
 	else
-		Navigation().centerToView(mViewGroup->getData());
+		Navigation().centerToView(mGroupData->getData());
 }
 
 void ViewWrapper3D::centerToolActionSlot()
@@ -526,26 +494,35 @@ void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
 	mSlicePlanes3DRep->getProxy()->setDrawPlanes(checked);
 }
 
-void ViewWrapper3D::dataAdded(ssc::DataPtr data)
+void ViewWrapper3D::dataAdded(DataPtr data)
 {
 	if (!data)
 		return;
 
-	if (!mDataReps.count(data->getUid()))
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	if (image)
 	{
-		ssc::RepPtr rep = this->createDataRep3D(data);
-		if (!rep)
-			return;
-		mDataReps[data->getUid()] = rep;
-		mView->addRep(rep);
-
-		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
-		if (image)
+		mMultiVolume3DRepProducer->addImage(image);
+	}
+	else
+	{
+		if (!mDataReps.count(data->getUid()))
 		{
-			connect(image.get(), SIGNAL(clipPlanesChanged()), this, SLOT(updateView()));
-			connect(image.get(), SIGNAL(cropBoxChanged()), this, SLOT(updateView()));
+			RepPtr rep = this->createDataRep3D(data);
+			if (!rep)
+				return;
+			mDataReps[data->getUid()] = rep;
+			mView->addRep(rep);
+
+	//			ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	//			if (image)
+	//			{
+	//				connect(image.get(), SIGNAL(clipPlanesChanged()), this, SLOT(updateView()));
+	//				connect(image.get(), SIGNAL(cropBoxChanged()), this, SLOT(updateView()));
+	//			}
 		}
 	}
+
 
 	this->activeImageChangedSlot();
 	this->updateView();
@@ -553,18 +530,12 @@ void ViewWrapper3D::dataAdded(ssc::DataPtr data)
 
 void ViewWrapper3D::dataRemoved(const QString& uid)
 {
-	if (!mDataReps.count(uid))
-		return;
-
-	ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
-	if (image)
+	mMultiVolume3DRepProducer->removeImage(uid);
+	if (mDataReps.count(uid))
 	{
-		disconnect(image.get(), SIGNAL(clipPlanesChanged()), this, SLOT(updateView()));
-		disconnect(image.get(), SIGNAL(cropBoxChanged()), this, SLOT(updateView()));
+		mView->removeRep(mDataReps[uid]);
+		mDataReps.erase(uid);
 	}
-
-	mView->removeRep(mDataReps[uid]);
-	mDataReps.erase(uid);
 
 	this->activeImageChangedSlot();
 	this->updateView();
@@ -573,67 +544,55 @@ void ViewWrapper3D::dataRemoved(const QString& uid)
 /**Construct a 3D standard rep for a given data.
  *
  */
-ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
+RepPtr ViewWrapper3D::createDataRep3D(DataPtr data)
 {
-	if (boost::dynamic_pointer_cast<ssc::Image>(data))
+	if (boost::dynamic_pointer_cast<Mesh>(data))
 	{
-		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
-		if (image->getBaseVtkImageData()->GetDimensions()[2]==1)
-		{
-			cx::Image2DRep3DPtr rep = cx::Image2DRep3D::New(data->getUid()+"image2DRep");
-			rep->setImage(image);
-			return rep;
-		}
-		else
-		{
-			ssc::VolumetricBaseRepPtr rep = RepManager::getInstance()->getVolumetricRep(image);
-			return rep;
-		}
-	}
-	else if (boost::dynamic_pointer_cast<ssc::Mesh>(data))
-	{
-		ssc::GeometricRepPtr rep = ssc::GeometricRep::New(data->getUid() + "_geom3D_rep");
-		rep->setMesh(boost::dynamic_pointer_cast<ssc::Mesh>(data));
+		GeometricRepPtr rep = GeometricRep::New(data->getUid() + "_geom3D_rep");
+		rep->setMesh(boost::dynamic_pointer_cast<Mesh>(data));
 		return rep;
 	}
-	else if (boost::dynamic_pointer_cast<ssc::PointMetric>(data))
-	{
-		ssc::PointMetricRepPtr rep = ssc::PointMetricRep::New(data->getUid() + "_3D_rep");
-		this->readDataRepSettings(rep);
-		rep->setPointMetric(boost::dynamic_pointer_cast<ssc::PointMetric>(data));
-		return rep;
-	}
-	else if (boost::dynamic_pointer_cast<ssc::DistanceMetric>(data))
-	{
-		ssc::DistanceMetricRepPtr rep = ssc::DistanceMetricRep::New(data->getUid() + "_3D_rep");
-		this->readDataRepSettings(rep);
-		rep->setDistanceMetric(boost::dynamic_pointer_cast<ssc::DistanceMetric>(data));
-		return rep;
-	}
-	else if (boost::dynamic_pointer_cast<ssc::AngleMetric>(data))
-	{
-		ssc::AngleMetricRepPtr rep = ssc::AngleMetricRep::New(data->getUid() + "_3D_rep");
-		this->readDataRepSettings(rep);
-		rep->setMetric(boost::dynamic_pointer_cast<ssc::AngleMetric>(data));
-		return rep;
-	}
-	else if (boost::dynamic_pointer_cast<ssc::PlaneMetric>(data))
-	{
-		ssc::PlaneMetricRepPtr rep = ssc::PlaneMetricRep::New(data->getUid() + "_3D_rep");
-		this->readDataRepSettings(rep);
-		rep->setMetric(boost::dynamic_pointer_cast<ssc::PlaneMetric>(data));
-		return rep;
-	}
+    else
+    {
+        DataMetricRepPtr rep = this->createDataMetricRep3D(data);
+        if (rep)
+            return rep;
+    }
 
-	return ssc::RepPtr();
+    return RepPtr();
+}
+
+DataMetricRepPtr ViewWrapper3D::createDataMetricRep3D(DataPtr data)
+{
+    DataMetricRepPtr rep;
+
+    if (boost::dynamic_pointer_cast<PointMetric>(data))
+        rep = PointMetricRep::New(data->getUid() + "_3D_rep");
+    else if (boost::dynamic_pointer_cast<FrameMetric>(data))
+        rep = FrameMetricRep::New(data->getUid() + "_3D_rep");
+	else if (boost::dynamic_pointer_cast<ToolMetric>(data))
+		rep = ToolMetricRep::New(data->getUid() + "_3D_rep");
+	else if (boost::dynamic_pointer_cast<DistanceMetric>(data))
+        rep = DistanceMetricRep::New(data->getUid() + "_3D_rep");
+    else if (boost::dynamic_pointer_cast<AngleMetric>(data))
+        rep = AngleMetricRep::New(data->getUid() + "_3D_rep");
+    else if (boost::dynamic_pointer_cast<PlaneMetric>(data))
+        rep = PlaneMetricRep::New(data->getUid() + "_3D_rep");
+
+    if (rep)
+    {
+        this->readDataRepSettings(rep);
+        rep->setDataMetric(boost::dynamic_pointer_cast<DataMetric>(data));
+    }
+    return rep;
 }
 
 /**helper. Read settings common for all data metric reps.
  *
  */
-void ViewWrapper3D::readDataRepSettings(ssc::RepPtr rep)
+void ViewWrapper3D::readDataRepSettings(RepPtr rep)
 {
-	ssc::DataMetricRepPtr val = boost::dynamic_pointer_cast<ssc::DataMetricRep>(rep);
+	DataMetricRepPtr val = boost::dynamic_pointer_cast<DataMetricRep>(rep);
 	if (!val)
 		return;
 
@@ -657,25 +616,25 @@ void ViewWrapper3D::updateView()
 
 void ViewWrapper3D::activeImageChangedSlot()
 {
-	if(!mViewGroup)
+	if(!mGroupData)
 		return;
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ImagePtr image = dataManager()->getActiveImage();
 
 	// only show landmarks belonging to image visible in this view:
-	std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
+	std::vector<ImagePtr> images = mGroupData->getImages();
 	if (!std::count(images.begin(), images.end(), image))
 		image.reset();
 }
 
 void ViewWrapper3D::showRefToolSlot(bool checked)
 {
-	ssc::ToolPtr refTool = ssc::toolManager()->getReferenceTool();
+	ToolPtr refTool = toolManager()->getReferenceTool();
 	if (!refTool)
 		return;
-	ssc::ToolRep3DPtr refRep = RepManager::findFirstRep<ssc::ToolRep3D>(mView->getReps(), refTool);
+	ToolRep3DPtr refRep = RepManager::findFirstRep<ToolRep3D>(mView->getReps(), refTool);
 	if (!refRep)
 	{
-		refRep = ssc::ToolRep3D::New(refTool->getUid() + "_rep3d_" + this->mView->getUid());
+		refRep = ToolRep3D::New(refTool->getUid() + "_rep3d_" + this->mView->getUid());
 		refRep->setTool(refTool);
 	}
 
@@ -693,24 +652,24 @@ void ViewWrapper3D::updateSlices()
 	if (mSlices3DRep)
 		mView->removeRep(mSlices3DRep);
 	//Simple bug fix of #746: Don't create slices if no volumes exist in 3D scene
-	if (!mViewGroup || mViewGroup->getImages().empty())
+	if (!mGroupData || mGroupData->getImages().empty())
 	{
-		ssc::messageManager()->sendWarning("Need volumes in the 3D scene to create 2D slices");
+		messageManager()->sendWarning("Need volumes in the 3D scene to create 2D slices");
 		return;
 	}
 
-	mSlices3DRep = ssc::Slices3DRep::New("MultiSliceRep_" + mView->getName());
+	mSlices3DRep = Slices3DRep::New("MultiSliceRep_" + mView->getName());
 
-	ssc::PLANE_TYPE type = string2enum<ssc::PLANE_TYPE>(mShowSlicesMode);
-	if (type != ssc::ptCOUNT)
+	PLANE_TYPE type = string2enum<PLANE_TYPE>(mShowSlicesMode);
+	if (type != ptCOUNT)
 	{
 		mSlices3DRep->addPlane(type);
 	}
 	else if (mShowSlicesMode == "ACS")
 	{
-		mSlices3DRep->addPlane(ssc::ptAXIAL);
-		mSlices3DRep->addPlane(ssc::ptSAGITTAL);
-		mSlices3DRep->addPlane(ssc::ptCORONAL);
+		mSlices3DRep->addPlane(ptAXIAL);
+		mSlices3DRep->addPlane(ptSAGITTAL);
+		mSlices3DRep->addPlane(ptCORONAL);
 	}
 	else
 	{
@@ -719,22 +678,22 @@ void ViewWrapper3D::updateSlices()
 	}
 
 	mSlices3DRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
-	if (mViewGroup && !mViewGroup->getImages().empty())
-		mSlices3DRep->setImages(mViewGroup->getImages());
-	mSlices3DRep->setTool(ssc::toolManager()->getDominantTool());
+	if (mGroupData && !mGroupData->getImages().empty())
+		mSlices3DRep->setImages(mGroupData->getImages());
+	mSlices3DRep->setTool(toolManager()->getDominantTool());
 //	return mSlices3DRep;
 	mView->addRep(mSlices3DRep);
 #endif // USE_GLX_SHARED_CONTEXT
 }
 
-ssc::ViewWidget* ViewWrapper3D::getView()
+ViewWidget* ViewWrapper3D::getView()
 {
 	return mView;
 }
 
 void ViewWrapper3D::dominantToolChangedSlot()
 {
-	ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
+	ToolPtr dominantTool = toolManager()->getDominantTool();
 	mPickerRep->setTool(dominantTool);
 	if (mSlices3DRep)
 		mSlices3DRep->setTool(dominantTool);
@@ -742,17 +701,17 @@ void ViewWrapper3D::dominantToolChangedSlot()
 
 void ViewWrapper3D::toolsAvailableSlot()
 {
-	ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
-	ssc::ToolManager::ToolMapPtr::element_type::iterator iter;
+	ToolManager::ToolMapPtr tools = toolManager()->getTools();
+	ToolManager::ToolMapPtr::element_type::iterator iter;
 	for (iter = tools->begin(); iter != tools->end(); ++iter)
 	{
-		ssc::ToolPtr tool = iter->second;
-		if (tool->hasType(ssc::Tool::TOOL_REFERENCE))
+		ToolPtr tool = iter->second;
+		if (tool->hasType(Tool::TOOL_REFERENCE))
 			continue;
 
-		ssc::ToolRep3DPtr toolRep = RepManager::findFirstRep<ssc::ToolRep3D>(mView->getReps(), tool);
+		ToolRep3DPtr toolRep = RepManager::findFirstRep<ToolRep3D>(mView->getReps(), tool);
 
-		if (tool->hasType(ssc::Tool::TOOL_MANUAL) && !settings()->value("showManualTool").toBool())
+		if (tool->hasType(Tool::TOOL_MANUAL) && !settings()->value("showManualTool").toBool())
 		{
 			if (toolRep)
 				mView->removeRep(toolRep);
@@ -762,7 +721,7 @@ void ViewWrapper3D::toolsAvailableSlot()
 
 		if (!toolRep)
 		{
-			toolRep = ssc::ToolRep3D::New(tool->getUid() + "_rep3d_" + this->mView->getUid());
+			toolRep = ToolRep3D::New(tool->getUid() + "_rep3d_" + this->mView->getUid());
 			if (settings()->value("showToolPath").toBool())
 				toolRep->getTracer()->start();
 		}
@@ -778,7 +737,7 @@ void ViewWrapper3D::toolsAvailableSlot()
 
 void ViewWrapper3D::optionChangedSlot()
 {
-	ViewGroupData::Options options = mViewGroup->getOptions();
+	ViewGroupData::Options options = mGroupData->getOptions();
 
 	this->showLandmarks(options.mShowLandmarks);
 	this->showPointPickerProbe(options.mShowPointPickerProbe);
@@ -792,12 +751,10 @@ void ViewWrapper3D::showLandmarks(bool on)
 
 	if (on)
 	{
-		//mView->addRep(mPatientLandmarkRep);
 		mView->addRep(mLandmarkRep);
 	}
 	else
 	{
-		//mView->removeRep(mPatientLandmarkRep);
 		mView->removeRep(mLandmarkRep);
 	}
 }
@@ -807,9 +764,9 @@ void ViewWrapper3D::showPointPickerProbe(bool on)
 	mPickerRep->setEnabled(on);
 }
 
-void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
+void ViewWrapper3D::setSlicePlanesProxy(SlicePlanesProxyPtr proxy)
 {
-	mSlicePlanes3DRep = ssc::SlicePlanes3DRep::New("uid");
+	mSlicePlanes3DRep = SlicePlanes3DRep::New("uid");
 	mSlicePlanes3DRep->setProxy(proxy);
 	mSlicePlanes3DRep->setDynamicLabelSize(true);
 	bool show = settings()->value("showSlicePlanes").toBool();
@@ -877,24 +834,24 @@ void ViewWrapper3D::setTranslucentRenderingToDepthPeeling(bool setDepthPeeling)
 
 		/*if (!IsDepthPeelingSupported(mView->getRenderWindow(), mView->getRenderer(), true))
 		{
-			ssc::messageManager()->sendWarning("GPU do not support depth peeling. Rendering of translucent surfaces is not supported");
+			messageManager()->sendWarning("GPU do not support depth peeling. Rendering of translucent surfaces is not supported");
 			success = false;
 		}
 		else*/ if (!SetupEnvironmentForDepthPeeling(mView->getRenderWindow(), mView->getRenderer(), 100, 0.1))
 		{
-			ssc::messageManager()->sendWarning("Error setting depth peeling");
+			messageManager()->sendWarning("Error setting depth peeling");
 			success = false;
 		}
 		else
 		{
-			ssc::messageManager()->sendInfo("Set GPU depth peeling");
+			messageManager()->sendInfo("Set GPU depth peeling");
 		}
 		if(!success)
 		  settings()->setValue("View3D/depthPeeling", false);
 	} else
 	{
 		if (TurnOffDepthPeeling(mView->getRenderWindow(), mView->getRenderer()))
-			ssc::messageManager()->sendInfo("Depth peeling turned off");
+			messageManager()->sendInfo("Depth peeling turned off");
 	}
 }
 

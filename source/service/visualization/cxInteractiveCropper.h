@@ -52,11 +52,11 @@ class InteractiveCropper: public QObject
 Q_OBJECT
 public:
 	InteractiveCropper();
-	void setView(ssc::ViewWidget* view); ///< adds an interactive box widget to the view. Press 'I' to show
-	ssc::DoubleBoundingBox3D getBoundingBox(); ///< get BB in data space
-	void setBoundingBox(const ssc::DoubleBoundingBox3D& bb_d); ///< set BB in reference space
+	void setView(ViewWidget* view); ///< adds an interactive box widget to the view. Press 'I' to show
+	DoubleBoundingBox3D getBoundingBox(); ///< get BB in data space
+	void setBoundingBox(const DoubleBoundingBox3D& bb_d); ///< set BB in reference space
 	void resetBoundingBox(); ///< set bounding box back to initial size (entire volume)
-	ssc::DoubleBoundingBox3D getMaxBoundingBox();
+	DoubleBoundingBox3D getMaxBoundingBox();
 	bool getUseCropping();
 	bool getShowBoxWidget() const;
 	std::vector<int>  getDimensions();
@@ -73,17 +73,14 @@ private:
 	void boxWasShown(bool val);
 	friend class CropBoxCallback;
 	friend class CropBoxEnableCallback;
-	void setBoxWidgetSize(const ssc::DoubleBoundingBox3D& bb_d);
-	ssc::DoubleBoundingBox3D getBoxWidgetSize();
-	void setCroppingRegion(ssc::DoubleBoundingBox3D bb_d);
+	void setBoxWidgetSize(const DoubleBoundingBox3D& bb_d);
+	DoubleBoundingBox3D getBoxWidgetSize();
+	void setCroppingRegion(DoubleBoundingBox3D bb_d);
 	void updateBoxWidgetInteractor();
 	void initialize();
 
-	vtkVolumeMapperPtr getMapper();
-	ssc::ImagePtr mImage;
-	QPointer<ssc::ViewWidget> mView;
-	//vtkBoxRepresentationPtr mBoxRep;
-	//vtkBoxWidget2Ptr mBoxWidget2;
+	ImagePtr mImage;
+	QPointer<ViewWidget> mView;
 	vtkBoxWidgetPtr mBoxWidget;
 	CropBoxCallbackPtr mCropBoxCallback;
 	CropBoxEnableCallbackPtr mCropBoxEnableCallback;

@@ -57,12 +57,15 @@ set(SOURCES
 		${${LIBNAME}_MOC_SRCS}
 )
 
+include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
-		.
-		${CMAKE_CURRENT_BINARY_DIR}/gui #so that is finds the generated ui files
-		${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
-        ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-)
+    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}/gui #so that is finds the generated ui files
+    ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
+	${CustusX3_SOURCE_DIR}/source/resource/videoServer
+	${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
+	)
 
 if(CX_WINDOWS)
 	set( WIN_LINK_LIBRARIES
@@ -78,7 +81,7 @@ if(CX_APPLE)
 endif()
 
 set( ALL_LINK_LIBRARIES
-	SSC
+	cxResourceWidgets
 	OpenIGTLink
 	cxOpenIGTLinkUtilities
 	${QT_LIBRARIES})

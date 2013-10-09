@@ -10,7 +10,7 @@
 #include "sscDoubleDataAdapter.h"
 #include "sscReconstructManager.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
 class OutputVolumeParams;
@@ -54,7 +54,7 @@ public:
   virtual ~DoubleDataAdapterSpacing() {}
   virtual QString getValueName() const { return "Spacing Out"; }
   virtual QString getHelp() const { return "Output Volume Spacing (mm)"; }
-  DoubleRange getValueRange() const {  return ssc::DoubleRange(0.001,10,0.001); }
+  DoubleRange getValueRange() const {  return DoubleRange(0.001,10,0.001); }
   virtual int getValueDecimals() const { return 3; } ///< number of relevant decimals in value
 
 protected:
@@ -72,7 +72,7 @@ public:
   virtual ~DoubleDataAdapterXDim() {}
   virtual QString getValueName() const { return "X"; }
   virtual QString getHelp() const { return "X dimension"; }
-  DoubleRange getValueRange() const {  return ssc::DoubleRange(1,1000,1); }
+  DoubleRange getValueRange() const {  return DoubleRange(1,1000,1); }
 protected:
   virtual double getValue(OutputVolumeParams* params) const { return params->getDim()[0]; }
   virtual void setValue(OutputVolumeParams* params, double val) { params->setDim(0, val); }
@@ -87,7 +87,7 @@ public:
   virtual ~DoubleDataAdapterYDim() {}
   virtual QString getValueName() const { return "Y"; }
   virtual QString getHelp() const { return "Y dimension"; }
-  DoubleRange getValueRange() const {  return ssc::DoubleRange(1,1000,1); }
+  DoubleRange getValueRange() const {  return DoubleRange(1,1000,1); }
 protected:
   virtual double getValue(OutputVolumeParams* params) const { return params->getDim()[1]; }
   virtual void setValue(OutputVolumeParams* params, double val) { params->setDim(1, val); }
@@ -102,7 +102,7 @@ public:
   virtual ~DoubleDataAdapterZDim() {}
   virtual QString getValueName() const { return "Z"; }
   virtual QString getHelp() const { return "Z dimension"; }
-  DoubleRange getValueRange() const {  return ssc::DoubleRange(1,1000,1); }
+  DoubleRange getValueRange() const {  return DoubleRange(1,1000,1); }
 protected:
   virtual double getValue(OutputVolumeParams* params) const { return params->getDim()[2]; }
   virtual void setValue(OutputVolumeParams* params, double val) { params->setDim(2, val); }
@@ -111,6 +111,6 @@ protected:
 /**
  * @}
  */
-} // namespace ssc
+} // namespace cx
 
 #endif /* SSCRECONSTRUCTOUTPUTVALUEPARAMSINTERFACES_H_ */

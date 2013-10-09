@@ -67,7 +67,7 @@ void ImageServer::incomingConnection(int socketDescriptor)
 
 	if (mSocket != 0)
 	{
-		ssc::messageManager()->sendError("The image server can only handle a single connection.");
+		messageManager()->sendError("The image server can only handle a single connection.");
 		return;
 	}
 
@@ -75,7 +75,7 @@ void ImageServer::incomingConnection(int socketDescriptor)
 	connect(mSocket, SIGNAL(disconnected()), this, SLOT(socketDisconnectedSlot()));
 	mSocket->setSocketDescriptor(socketDescriptor);
 	QString clientName = mSocket->localAddress().toString();
-	ssc::messageManager()->sendInfo("Connected to "+clientName+". Session started.");
+	messageManager()->sendInfo("Connected to "+clientName+". Session started.");
 	SenderPtr sender(new GrabberSenderQTcpSocket(mSocket));
 
 	mImageSender->startStreaming(sender);
@@ -89,7 +89,7 @@ void ImageServer::socketDisconnectedSlot()
 	if (mSocket)
 	{
 		QString clientName = mSocket->localAddress().toString();
-		ssc::messageManager()->sendInfo("Disconnected from "+clientName+". Session ended.");
+		messageManager()->sendInfo("Disconnected from "+clientName+". Session ended.");
 		mSocket->deleteLater();
 	}
 }

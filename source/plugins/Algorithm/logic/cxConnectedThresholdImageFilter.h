@@ -30,9 +30,9 @@ public:
 	ConnectedThresholdImageFilter();
 	virtual ~ConnectedThresholdImageFilter();
 
-	void setInput(ssc::ImagePtr image, QString outputBasePath, float lowerThreshold, float upperThreshold, int replaceValue, itkImageType::IndexType seed);
+	void setInput(ImagePtr image, QString outputBasePath, float lowerThreshold, float upperThreshold, int replaceValue, itkImageType::IndexType seed);
 	virtual void execute() { throw "not implemented!!"; }
-	ssc::ImagePtr getOutput();
+	ImagePtr getOutput();
 
 private slots:
 	virtual void postProcessingSlot();
@@ -41,8 +41,8 @@ private:
 	virtual vtkImageDataPtr calculate();
 
 	QString       mOutputBasePath;
-	ssc::ImagePtr mInput;
-	ssc::ImagePtr mOutput;
+	ImagePtr mInput;
+	ImagePtr mOutput;
 
 	float           mLowerThreshold;
 	float           mUpperTheshold;

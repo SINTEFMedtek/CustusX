@@ -26,8 +26,6 @@ class StatusBar: public QStatusBar
 {
   Q_OBJECT
 
-  typedef ssc::Message Message;
-
 public:
   StatusBar(); ///< connects signals and slots
   virtual ~StatusBar(); ///< empty
@@ -56,7 +54,7 @@ private:
   {
 	  boost::shared_ptr<QAction> mAction;
 	  boost::shared_ptr<QToolButton> mButton;
-	  ssc::ToolPtr mTool;
+	  ToolPtr mTool;
   };
   std::vector<ToolData> mToolData;
 };

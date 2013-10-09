@@ -42,7 +42,7 @@ namespace cx
  * @{
  */
 
-typedef std::map<QString, ssc::ToolPtr> ToolMap;
+typedef std::map<QString, ToolPtr> ToolMap;
 typedef boost::shared_ptr<ToolMap> ToolMapPtr;
 
 class IgstkTool;
@@ -103,10 +103,10 @@ public:
 	/**A trackers internal structure \warning make sure you set all the members to an appropriate value.*/
 	struct InternalStructure
 	{
-		ssc::TRACKING_SYSTEM mType; ///< the trackers type
+		TRACKING_SYSTEM mType; ///< the trackers type
 		QString mLoggingFolderName; ///< path to where log should be saved
 		InternalStructure() :
-						mType(ssc::tsNONE),
+						mType(tsNONE),
 						mLoggingFolderName("")
 		{} ///< set default values for the internal structure
 	};
@@ -114,7 +114,7 @@ public:
 	IgstkTracker(InternalStructure internalStructure);
 	~IgstkTracker();
 
-	ssc::TRACKING_SYSTEM getType() const; ///< returns the trackers type
+	TRACKING_SYSTEM getType() const; ///< returns the trackers type
 	QString getName() const; ///< get the trackers name
 	QString getUid() const; ///< get the tracker unique id
 	TrackerType* getPointer() const; ///< return a pointer to the internal tracker base

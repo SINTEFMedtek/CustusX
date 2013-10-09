@@ -39,9 +39,9 @@ ToolTipSampleWidget::ToolTipSampleWidget(QWidget* parent) :
   mTools = SelectToolStringDataAdapter::New();
   mData = SelectDataStringDataAdapter::New();
 
-  mCoordinateSystemComboBox = new ssc::LabeledComboBoxWidget(this, mCoordinateSystems);
-  mToolComboBox = new ssc::LabeledComboBoxWidget(this, mTools);
-  mDataComboBox = new ssc::LabeledComboBoxWidget(this, mData);
+  mCoordinateSystemComboBox = new LabeledComboBoxWidget(this, mCoordinateSystems);
+  mToolComboBox = new LabeledComboBoxWidget(this, mTools);
+  mDataComboBox = new LabeledComboBoxWidget(this, mData);
 
   toplayout->addWidget(new QLabel("<b>Select coordinate system to sample in: </b>"));
   toplayout->addWidget(mCoordinateSystemComboBox);
@@ -94,13 +94,13 @@ void ToolTipSampleWidget::sampleSlot()
 {
   QFile samplingFile(mSaveToFileNameLabel->text());
 
-  ssc::CoordinateSystem to = this->getSelectedCoordinateSystem();
-  ssc::Vector3D toolPoint = ssc::CoordinateSystemHelpers::getDominantToolTipPoint(to, false);
+  CoordinateSystem to = this->getSelectedCoordinateSystem();
+  Vector3D toolPoint = CoordinateSystemHelpers::getDominantToolTipPoint(to, false);
 
   if(!samplingFile.open(QIODevice::WriteOnly | (mTruncateFile ? QIODevice::Truncate : QIODevice::Append)))
   {
-    ssc::messageManager()->sendWarning("Could not open "+samplingFile.fileName());
-    ssc::messageManager()->sendInfo("Sampled point: "+qstring_cast(toolPoint));
+    messageManager()->sendWarning("Could not open "+samplingFile.fileName());
+    messageManager()->sendInfo("Sampled point: "+qstring_cast(toolPoint));
     return;
   }
   else
@@ -115,23 +115,23 @@ void ToolTipSampleWidget::sampleSlot()
   streamer << sampledPoint;
   streamer << endl;
 
-  ssc::messageManager()->playSampleSound();
-  ssc::messageManager()->sendInfo("Sampled point in "+qstring_cast(to.mId)+" ("+to.mRefObject+") space, result: "+sampledPoint);
+  messageManager()->playSampleSound();
+  messageManager()->sendInfo("Sampled point in "+qstring_cast(to.mId)+" ("+to.mRefObject+") space, result: "+sampledPoint);
 }
 
 void ToolTipSampleWidget::coordinateSystemChanged()
 {
-  switch (string2enum<ssc::COORDINATE_SYSTEM>(mCoordinateSystems->getValue()))
+  switch (string2enum<COORDINATE_SYSTEM>(mCoordinateSystems->getValue()))
   {
-  case ssc::csDATA:
+  case csDATA:
     mDataComboBox->show();
     mToolComboBox->hide();
     break;
-  case ssc::csTOOL:
+  case csTOOL:
     mToolComboBox->show();
     mDataComboBox->hide();
     break;
-  case ssc::csSENSOR:
+  case csSENSOR:
     mToolComboBox->show();
     mDataComboBox->hide();
     break;
@@ -142,22 +142,22 @@ void ToolTipSampleWidget::coordinateSystemChanged()
   };
 }
 
-ssc::CoordinateSystem ToolTipSampleWidget::getSelectedCoordinateSystem()
+CoordinateSystem ToolTipSampleWidget::getSelectedCoordinateSystem()
 {
-  ssc::CoordinateSystem retval(ssc::csCOUNT);
+  CoordinateSystem retval(csCOUNT);
 
-  retval.mId = string2enum<ssc::COORDINATE_SYSTEM>(mCoordinateSystems->getValue());
+  retval.mId = string2enum<COORDINATE_SYSTEM>(mCoordinateSystems->getValue());
 
   switch (retval.mId)
   {
-  case ssc::csDATA:
-    retval = ssc::CoordinateSystemHelpers::getD(mData->getData());
+  case csDATA:
+    retval = CoordinateSystemHelpers::getD(mData->getData());
     break;
-  case ssc::csTOOL:
-    retval = ssc::CoordinateSystemHelpers::getT(mTools->getTool());
+  case csTOOL:
+    retval = CoordinateSystemHelpers::getT(mTools->getTool());
     break;
-  case ssc::csSENSOR:
-    retval = ssc::CoordinateSystemHelpers::getT(mTools->getTool());
+  case csSENSOR:
+    retval = CoordinateSystemHelpers::getT(mTools->getTool());
     break;
   default:
     retval.mRefObject = "";

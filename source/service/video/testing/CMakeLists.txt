@@ -19,12 +19,14 @@
 if (BUILD_TESTING)
 	# Catch unit test framework stuff:
 
-	QT4_WRAP_CPP(CXTEST_VIDEOSERVICE_SOURCES
-		)
+    set(CXTEST_SOURCES_TO_MOC
+    )
+	#QT4_WRAP_CPP(CXTEST_VIDEOSERVICE_SOURCES
+	#	)
 	set(CXTEST_VIDEOSERVICE_SOURCES ${CXTEST_VIDEOSERVICE_SOURCES}
 	    cxCatchVideo.cpp
 	    )
 
-	cx_catch_add_lib_and_exe(cxVideoService "${CXTEST_VIDEOSERVICE_SOURCES}")
+	cx_catch_add_lib_and_exe(cxVideoService "${CXTEST_VIDEOSERVICE_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
 
 endif (BUILD_TESTING)

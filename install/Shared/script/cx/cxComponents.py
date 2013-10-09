@@ -163,8 +163,7 @@ class VTK(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('http://vtk.org/VTK.git')
     def update(self):
-        #self._getBuilder().gitCheckout('v5.8.0', patch='VTK-5-8-0.patch')
-        self._getBuilder().gitCheckout('v5.10.1')
+        self._getBuilder().gitCheckout('v5.10.1', patch='VTK-5-10-1.patch')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -364,7 +363,7 @@ class CustusX3(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/CustusX3.git')
     def update(self):
-        self._getBuilder().gitUpdate(branch='master', submodules=True)    
+        self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag(), submodules=True)    
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -374,17 +373,21 @@ class CustusX3(CppComponent):
         add('IGSTK_DIR:PATH', self._createSibling(IGSTK).configPath())
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
         add('OpenCV_DIR:PATH', self._createSibling(OpenCV).configPath())
-        add('ULTERIUS_INCLUDE_DIR:PATH', self._createSibling(UltrasonixSDK).configPath())
-        add('ULTERIUS_LIBRARY:FILEPATH', self._createSibling(UltrasonixSDK).configPath())
+        add('ULTERIUS_INCLUDE_DIR:PATH', self._createSibling(UltrasonixSDK).includePath())
+        add('ULTERIUS_LIBRARY:FILEPATH', self._createSibling(UltrasonixSDK).libFile())
+        add('ULTERIUS_BIN_DIR:FILEPATH', self._createSibling(UltrasonixSDK).binDir())
         add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).configPath())
         add('Level-Set-Segmentation_DIR:PATH', self._createSibling(LevelSetSegmentation).configPath())
         add('GEStreamer_DIR:PATH', self._createSibling(ISB_DataStreaming).configPath())
         # other options
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.mDoxygen)            
         add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
-        add('CX_USE_TSF:BOOL', True);
-        add('CX_USE_LEVEL_SET:BOOL', False);
-        add('CX_USE_ISB_GE:BOOL', True);
+        turn_on = True;
+        if (platform.system() == 'Windows'):
+            turn_on = False;
+        add('CX_USE_TSF:BOOL', turn_on);
+        add('CX_USE_LEVEL_SET:BOOL', turn_on);
+        add('CX_USE_ISB_GE:BOOL', turn_on);
         add('SSC_USE_DCMTK:BOOL', False);
         add('SSC_BUILD_EXAMPLES:BOOL', self.controlData.mBuildSSCExamples);
         add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
@@ -403,6 +406,8 @@ class UltrasonixSDK(CppComponent):
         return self.path() + "/" + self.sourceFolder() + "/ulterius/inc"
     def libFile(self):
         return self.path() + "/" + self.sourceFolder() + "/ulterius/lib/ulterius.lib"
+    def binDir(self):
+        return self.path() + "/" + self.sourceFolder() + "/bin"
     def path(self):
         return self.controlData.getWorkingPath() + "/UltrasonixSDK"
     def _rawCheckout(self):
@@ -425,7 +430,7 @@ class TubeSegmentationFramework(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/Tube-Segmentation-Framework.git')
     def update(self):
-        self._getBuilder().gitUpdate('master', submodules=True)    
+        self._getBuilder().gitUpdate(branch='master', submodules=True)    
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -467,7 +472,8 @@ class CustusX3Data(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('ssh://%s'%self.gitRepository(), self.sourceFolder())
     def update(self):
-        self._getBuilder().gitUpdate('master')    
+        self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag())    
+#        self._getBuilder().gitUpdate('master')    
     def configure(self):
         pass
     def build(self):

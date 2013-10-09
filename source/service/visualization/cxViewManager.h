@@ -57,7 +57,7 @@ typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
  *
  * \image html cxArchitecture_visualization.png "Overview of ViewManager and Views"
  *
- * The primitive element is the ssc::View. Various derivations of ViewWrapper
+ * The primitive element is the View. Various derivations of ViewWrapper
  * controls each view and fills them with Reps. ViewWrapper2D controls a 2D
  * slice, ViewWrapper3D controls a full 3D scene, ViewWrapperRTSource shows a
  * video stream.
@@ -99,14 +99,14 @@ typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
  */
 class ViewManager: public QObject
 {
-	typedef std::map<QString, View2D*> View2DMap;
-	typedef std::map<QString, View3D*> View3DMap;
-	typedef std::map<QString, ssc::ViewWidget*> ViewMap;
+//	typedef std::map<QString, ViewWidget*> View2DMap;
+//	typedef std::map<QString, ViewWidget*> View3DMap;
+	typedef std::map<QString, ViewWidget*> ViewMap;
 
 Q_OBJECT
 public:
 
-	View3DQPtr get3DView(int group = 0, int index = 0);
+	ViewWidgetQPtr get3DView(int group = 0, int index = 0);
 	std::vector<ViewGroupPtr> getViewGroups() { return mViewGroups; }
 
 //  void fillModelTree(TreeItemPtr root);
@@ -129,7 +129,7 @@ public:
 	  */
 	QWidget* initialize();
 
-	void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
+	void setRegistrationMode(REGISTRATION_STATUS mode);
 
 	QString getActiveLayout() const; ///< returns the active layout
 	void setActiveLayout(const QString& uid); ///< change the layout
@@ -149,13 +149,13 @@ public:
 	CameraStylePtr getCameraStyle() { return mCameraStyle; }
 
 	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
-	void autoShowData(ssc::DataPtr data);
+	void autoShowData(DataPtr data);
 
 	/**
 	 * Return a list of all images used in viewGroups
 	 * Uses a map to remove duplicates
 	 */
-	std::map<QString, ssc::ImagePtr> getVisibleImages();
+	std::map<QString, ImagePtr> getVisibleImages();
 
 signals:
 	void fps(int number); ///< Emits number of frames per second
@@ -184,18 +184,18 @@ protected:
 	void addXml(QDomNode& parentNode); ///< adds xml information about the viewmanager and its variables
 	void parseXml(QDomNode viewmanagerNode); ///< Use a XML node to load data. \param viewmanagerNode A XML data representation of the ViewManager
 
-	View2DMap* get2DViews(); ///< returns all possible 2D views
-	View3DMap* get3DViews(); ///< returns all possible 3D views
+	ViewMap get2DViews(); ///< returns all possible 2D views
+	ViewMap get3DViews(); ///< returns all possible 3D views
 
-	ssc::ViewWidget* getView(const QString& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
-	View2D* get2DView(const QString& uid); ///< returns a 2D view with a given uid
-	View3D* get3DView(const QString& uid); ///< returns a 3D view with a given uid
+	ViewWidget* getView(const QString& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
+//	View2D* get2DView(const QString& uid); ///< returns a 2D view with a given uid
+//	View3D* get3DView(const QString& uid); ///< returns a 3D view with a given uid
 
 	void syncOrientationMode(SyncedValuePtr val);
 	void setStretchFactors(LayoutRegion region, int stretchFactor);
 
 	void activateView(ViewWrapperPtr wrapper, int group, LayoutRegion region);
-	void activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion region);
+	void activate2DView(int group, PLANE_TYPE plane, LayoutRegion region);
 	void activate3DView(int group, LayoutRegion region);
 	void activateRTStreamView(int group, LayoutRegion region);
 	void addDefaultLayouts();
@@ -234,15 +234,15 @@ protected:
 	bool mGlobal2DZoom; ///< controlling whether or not 2D zooming is global
 	bool mGlobalObliqueOrientation; ///< controlling whether or not all 2d views should be oblique or orthogonal
 	SyncedValuePtr mGlobalZoom2DVal;
-	bool mSmartRender; ///< use ssc::ViewWidget::render()
+	bool mSmartRender; ///< use ViewWidget::render()
 	bool mModified; ///< Modified flag tells renderAllViewsSlot() that the views must be updated
 
-	boost::shared_ptr<ViewCache<View2D> > mViewCache2D;
-	boost::shared_ptr<ViewCache<View3D> > mViewCache3D;
-	boost::shared_ptr<ViewCache<ssc::ViewWidget> > mViewCacheRT;
+	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache2D;
+	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache3D;
+	boost::shared_ptr<ViewCache<ViewWidget> > mViewCacheRT;
 	InteractiveClipperPtr mInteractiveClipper;
 	InteractiveCropperPtr mInteractiveCropper;
-	ssc::SlicePlanesProxyPtr mSlicePlanesProxy;
+	SlicePlanesProxyPtr mSlicePlanesProxy;
 
 	CameraStylePtr mCameraStyle;
 

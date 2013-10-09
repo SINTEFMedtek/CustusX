@@ -1,7 +1,6 @@
 #include "cxMeshInfoWidget.h"
 
 #include <QVBoxLayout>
-#include <QColorDialog>
 #include "sscImage.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
@@ -72,7 +71,7 @@ void MeshInfoWidget::meshSelectedSlot()
 	mUidAdapter->setData(mMesh);
 	mColorAdapter->setValue(mMesh->getColor());
 
-	std::map<std::string, std::string> info = ssc::getDisplayFriendlyInfo(mMesh);
+	std::map<std::string, std::string> info = getDisplayFriendlyInfo(mMesh);
 	this->populateTableWidget(info);
 }
 
@@ -80,11 +79,11 @@ void MeshInfoWidget::importTransformSlot()
 {
   if(!mMesh)
     return;
-  ssc::DataPtr parent = ssc::dataManager()->getData(mMesh->getParentSpace());
+  DataPtr parent = dataManager()->getData(mMesh->getParentSpace());
   if (!parent)
     return;
   mMesh->get_rMd_History()->setRegistration(parent->get_rMd());
-  ssc::messageManager()->sendInfo("Assigned rMd from volume [" + parent->getName() + "] to surface [" + mMesh->getName() + "]");
+  messageManager()->sendInfo("Assigned rMd from volume [" + parent->getName() + "] to surface [" + mMesh->getName() + "]");
 }
   
 void MeshInfoWidget::meshChangedSlot()
@@ -109,7 +108,7 @@ void MeshInfoWidget::addWidgets()
 	mSelectMeshWidget->setValueName("Surface: ");
 	connect(mSelectMeshWidget.get(), SIGNAL(changed()), this, SLOT(meshSelectedSlot()));
 
-	ssc::XmlOptionFile options = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("MeshInfoWidget");
+	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("MeshInfoWidget");
 	QString uid("Color");
 	QString name("");
 	QString help("Color of the mesh.");
@@ -118,7 +117,7 @@ void MeshInfoWidget::addWidgets()
 	if(mSelectMeshWidget->getMesh())
 		color = mSelectMeshWidget->getMesh()->getColor();
 
-	mColorAdapter = ssc::ColorDataAdapterXml::initialize(uid, name, help, color, options.getElement());
+	mColorAdapter = ColorDataAdapterXml::initialize(uid, name, help, color, options.getElement());
 	connect(mColorAdapter.get(), SIGNAL(changed()), this, SLOT(setColorSlot()));
 
 	QPushButton* importTransformButton = new QPushButton("Import Transform from Parent", this);
@@ -137,15 +136,15 @@ void MeshInfoWidget::addWidgets()
 	mFrontfaceCullingCheckBox = new QCheckBox("Frontface culling");
 	mFrontfaceCullingCheckBox->setToolTip("Set frontface culling on. Can be used to make transparent meshes work from inside the meshes.");
 	optionsLayout->addWidget(mFrontfaceCullingCheckBox);
-	optionsLayout->addWidget(ssc::createDataWidget(this, mColorAdapter));
+	optionsLayout->addWidget(sscCreateDataWidget(this, mColorAdapter));
 	optionsLayout->addStretch(1);
 
 	int gridLayoutRow = 1;
 
 	gridLayout->addWidget(new DataSelectWidget(this, mSelectMeshWidget), gridLayoutRow++, 0, 1, 2);
-	new ssc::LabeledLineEditWidget(this, mUidAdapter, gridLayout, gridLayoutRow++);
-	new ssc::LabeledLineEditWidget(this, mNameAdapter, gridLayout, gridLayoutRow++);
-	new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, gridLayoutRow++);
+	new LabeledLineEditWidget(this, mUidAdapter, gridLayout, gridLayoutRow++);
+	new LabeledLineEditWidget(this, mNameAdapter, gridLayout, gridLayoutRow++);
+	new LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, gridLayoutRow++);
 	gridLayout->addWidget(optionsWidget, gridLayoutRow++, 0, 1, 2);
 	gridLayout->addWidget(mTableWidget, gridLayoutRow++, 0, 1, 2);
 	gridLayout->addWidget(importTransformButton, gridLayoutRow++, 0, 1, 2);

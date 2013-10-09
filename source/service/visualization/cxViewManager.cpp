@@ -43,8 +43,6 @@
 #include "sscToolManager.h"
 #include "sscSlicePlanes3DRep.h"
 #include "sscSliceProxy.h"
-#include "cxView2D.h"
-#include "cxView3D.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "cxViewWrapper2D.h"
@@ -102,7 +100,7 @@ ViewManager::ViewManager() :
 				mModified(false)
 {
 	mRenderTimer.reset(new CyclicActionTimer("Main Render timer"));
-	mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
+	mSlicePlanesProxy.reset(new SlicePlanesProxy());
 //	mSlicePlanesProxy->getProperties().m3DFontSize = 50;
 
 	connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
@@ -135,9 +133,9 @@ QWidget* ViewManager::initialize()
 
 	mLayout = new QGridLayout;
 	mMainWindowsCentralWidget = new QWidget;
-	mViewCache2D.reset(new ViewCache<View2D>(mMainWindowsCentralWidget,	"View2D"));
-	mViewCache3D.reset(new ViewCache<View3D>(mMainWindowsCentralWidget, "View3D"));
-	mViewCacheRT.reset(new ViewCache<ssc::ViewWidget>(mMainWindowsCentralWidget, "ViewRT"));
+	mViewCache2D.reset(new ViewCache<ViewWidget>(mMainWindowsCentralWidget,	"View2D"));
+	mViewCache3D.reset(new ViewCache<ViewWidget>(mMainWindowsCentralWidget, "View3D"));
+	mViewCacheRT.reset(new ViewCache<ViewWidget>(mMainWindowsCentralWidget, "ViewRT"));
 
 	mLayout->setSpacing(2);
 	mLayout->setMargin(4);
@@ -178,13 +176,13 @@ void ViewManager::updateViews()
 	}
 }
 
-std::map<QString, ssc::ImagePtr> ViewManager::getVisibleImages()
+std::map<QString, ImagePtr> ViewManager::getVisibleImages()
 {
-	std::map<QString, ssc::ImagePtr> retval;
+	std::map<QString, ImagePtr> retval;
 	for(unsigned i=0; i<mViewGroups.size(); ++i)
 	{
 		ViewGroupPtr group = mViewGroups[i];
-		std::vector<ssc::ImagePtr> images = group->getImages();
+		std::vector<ImagePtr> images = group->getImages();
 		for (unsigned j=0; j<images.size(); ++j)
 		{
 			retval[images[j]->getUid()] = images[j];
@@ -227,7 +225,7 @@ InteractiveCropperPtr ViewManager::getCropper()
 	return mInteractiveCropper;
 }
 
-void ViewManager::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
+void ViewManager::setRegistrationMode(REGISTRATION_STATUS mode)
 {
 	ViewGroupDataPtr data = this->getViewGroups()[0]->getData();
 	ViewGroupData::Options options = data->getOptions();
@@ -235,12 +233,12 @@ void ViewManager::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
 	options.mShowLandmarks = false;
 	options.mShowPointPickerProbe = false;
 
-	if (mode == ssc::rsIMAGE_REGISTRATED)
+	if (mode == rsIMAGE_REGISTRATED)
 	{
 		options.mShowLandmarks = true;
 		options.mShowPointPickerProbe = true;
 	}
-	if (mode == ssc::rsPATIENT_REGISTRATED)
+	if (mode == rsPATIENT_REGISTRATED)
 	{
 		options.mShowLandmarks = true;
 		options.mShowPointPickerProbe = false;
@@ -273,7 +271,7 @@ void ViewManager::setActiveView(QString viewUid)
 		return;
 	mActiveView = qstring_cast(viewUid);
 	emit activeViewChanged();
-//  ssc::messageManager()->sendInfo("Active view set to ["+mActiveView + "]");
+//  messageManager()->sendInfo("Active view set to ["+mActiveView + "]");
 }
 
 int ViewManager::getActiveViewGroup() const
@@ -388,7 +386,7 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 		{
 			QString clippedImage = child.toElement().text();
 //			std::cout << "ClippedImage  " << clippedImage << std::endl;
-			mInteractiveClipper->setImage(ssc::dataManager()->getImage(clippedImage));
+			mInteractiveClipper->setImage(dataManager()->getImage(clippedImage));
 		}
 		child = child.nextSibling();
 	}
@@ -432,7 +430,7 @@ void ViewManager::clearSlot()
 
 /**Look for the index'th 3DView in given group.
  */
-View3DQPtr ViewManager::get3DView(int group, int index)
+ViewWidgetQPtr ViewManager::get3DView(int group, int index)
 {
 	int count = 0;
 	std::vector<ViewWidgetQPtr> views = mViewGroups[group]->getViews();
@@ -440,13 +438,13 @@ View3DQPtr ViewManager::get3DView(int group, int index)
 	{
 		if(!views[i])
 			continue;
-		View3DQPtr retval = dynamic_cast<View3D*>(views[i].data());
-		if (!retval)
+//		ViewWidgetQPtr retval = views[i].data();
+		if (views[i]->getType()!=View::VIEW_3D)
 			continue;
 		if (index == count++)
-			return retval;
+			return views[i];
 	}
-	return View3DQPtr();
+	return ViewWidgetQPtr();
 }
 
 /**deactivate the current layout, leaving an empty layout
@@ -489,14 +487,14 @@ void ViewManager::setActiveLayout(const QString& layout)
 	{
 		LayoutData::ViewData view = *iter;
 
-		if (view.mGroup < 0 || view.mPlane == ssc::ptCOUNT)
+		if (view.mGroup < 0 || view.mPlane == ptCOUNT)
 			continue;
 
-		if (view.mPlane == ssc::ptNOPLANE || view.mPlane == ssc::ptCOUNT)
+		if (view.mPlane == ptNOPLANE || view.mPlane == ptCOUNT)
 		{
-			if (view.mType == ssc::ViewWidget::VIEW_3D)
+			if (view.mType == ViewWidget::VIEW_3D)
 				this->activate3DView(view.mGroup, view.mRegion);
-			else if (view.mType == ssc::ViewWidget::VIEW_REAL_TIME)
+			else if (view.mType == ViewWidget::VIEW_REAL_TIME)
 				this->activateRTStreamView(view.mGroup, view.mRegion);
 		}
 		else
@@ -515,7 +513,7 @@ void ViewManager::setActiveLayout(const QString& layout)
 		for (unsigned j = 0; j < wrappers.size(); ++j)
 		{
 			wrappers[j]->setSlicePlanesProxy(mSlicePlanesProxy);
-			foundSlice = foundSlice || wrappers[j]->getView()->getType() == ssc::ViewWidget::VIEW_2D;
+			foundSlice = foundSlice || wrappers[j]->getView()->getType() == ViewWidget::VIEW_2D;
 		}
 		if (foundSlice)
 			break;
@@ -525,7 +523,7 @@ void ViewManager::setActiveLayout(const QString& layout)
 	emit
 	activeLayoutChanged();
 
-	ssc::messageManager()->sendInfo("Layout changed to " + this->getLayoutData(mActiveLayout).getName());
+	messageManager()->sendInfo("Layout changed to " + this->getLayoutData(mActiveLayout).getName());
 }
 
 void ViewManager::setRenderingInterval(int interval)
@@ -559,7 +557,7 @@ void ViewManager::setStretchFactors(LayoutRegion region, int stretchFactor)
 
 void ViewManager::activateView(ViewWrapperPtr wrapper, int group, LayoutRegion region)
 {
-	ssc::ViewWidget* view = wrapper->getView();
+	ViewWidget* view = wrapper->getView();
 	mViewMap[view->getUid()] = view;
 	mViewGroups[group]->addView(wrapper);
 	mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col);
@@ -568,12 +566,11 @@ void ViewManager::activateView(ViewWrapperPtr wrapper, int group, LayoutRegion r
 	view->show();
 }
 
-void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion region)
+void ViewManager::activate2DView(int group, PLANE_TYPE plane, LayoutRegion region)
 {
-	View2D* view = mViewCache2D->retrieveView();
-	// use only default color for 2d views.
-//  QColor background = settings()->value("backgroundColor").value<QColor>();
-//  view->setBackgroundColor(background);
+	ViewWidget* view = mViewCache2D->retrieveView();
+	view->setType(View::VIEW_2D);
+
 	ViewWrapper2DPtr wrapper(new ViewWrapper2D(view));
 	wrapper->initializePlane(plane);
 	this->activateView(wrapper, group, region);
@@ -581,10 +578,8 @@ void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion 
 
 void ViewManager::activate3DView(int group, LayoutRegion region)
 {
-	View3D* view = mViewCache3D->retrieveView();
-//  moved to wrapper
-//  QColor background = settings()->value("backgroundColor").value<QColor>();
-//  view->setBackgroundColor(background);
+	ViewWidget* view = mViewCache3D->retrieveView();
+	view->setType(View::VIEW_3D);
 	ViewWrapper3DPtr wrapper(new ViewWrapper3D(group + 1, view));
 	if (group == 0)
 	{
@@ -596,9 +591,8 @@ void ViewManager::activate3DView(int group, LayoutRegion region)
 
 void ViewManager::activateRTStreamView(int group, LayoutRegion region)
 {
-	ssc::ViewWidget* view = mViewCacheRT->retrieveView();
-//  QColor background = settings()->value("backgroundColor").value<QColor>();
-//  view->setBackgroundColor(background);
+	ViewWidget* view = mViewCacheRT->retrieveView();
+	view->setType(View::VIEW_REAL_TIME);
 	ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view));
 	this->activateView(wrapper, group, region);
 }
@@ -649,41 +643,41 @@ void ViewManager::addDefaultLayouts()
 	{
 		// 3D only
 		LayoutData layout = LayoutData::create("LAYOUT_3D", "3D", 1, 1);
-		layout.setView(0, ssc::ViewWidget::VIEW_3D, LayoutRegion(0, 0));
+		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0));
 		this->addDefaultLayout(layout);
 	}
 	{
 		// 3D ACS
 		LayoutData layout = LayoutData::create("LAYOUT_3D_ACS", "3D ACS", 3, 4);
-		layout.setView(0, ssc::ViewWidget::VIEW_3D, LayoutRegion(0, 0, 3, 3));
-		layout.setView(1, ssc::ptAXIAL, LayoutRegion(0, 3));
-		layout.setView(1, ssc::ptCORONAL, LayoutRegion(1, 3));
-		layout.setView(1, ssc::ptSAGITTAL, LayoutRegion(2, 3));
+		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0, 3, 3));
+		layout.setView(1, ptAXIAL, LayoutRegion(0, 3));
+		layout.setView(1, ptCORONAL, LayoutRegion(1, 3));
+		layout.setView(1, ptSAGITTAL, LayoutRegion(2, 3));
 		this->addDefaultLayout(layout);
 	}
 	{
 		// 3D Any
 		LayoutData layout = LayoutData::create("LAYOUT_3D_AD", "3D AnyDual", 2, 4);
-		layout.setView(0, ssc::ViewWidget::VIEW_3D, LayoutRegion(0, 0, 2, 3));
-		layout.setView(1, ssc::ptANYPLANE, LayoutRegion(0, 3));
-		layout.setView(1, ssc::ptSIDEPLANE, LayoutRegion(1, 3));
+		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0, 2, 3));
+		layout.setView(1, ptANYPLANE, LayoutRegion(0, 3));
+		layout.setView(1, ptSIDEPLANE, LayoutRegion(1, 3));
 		this->addDefaultLayout(layout);
 	}
 	{
 		// 3D ACS in a single view group
 		LayoutData layout = LayoutData::create("LAYOUT_3D_ACS_SINGLE", "3D ACS Connected", 3, 4);
-		layout.setView(0, ssc::ViewWidget::VIEW_3D, LayoutRegion(0, 0, 3, 3));
-		layout.setView(0, ssc::ptAXIAL, LayoutRegion(0, 3));
-		layout.setView(0, ssc::ptCORONAL, LayoutRegion(1, 3));
-		layout.setView(0, ssc::ptSAGITTAL, LayoutRegion(2, 3));
+		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0, 3, 3));
+		layout.setView(0, ptAXIAL, LayoutRegion(0, 3));
+		layout.setView(0, ptCORONAL, LayoutRegion(1, 3));
+		layout.setView(0, ptSAGITTAL, LayoutRegion(2, 3));
 		this->addDefaultLayout(layout);
 	}
 	{
 		// 3D Any in a single view group
 		LayoutData layout = LayoutData::create("LAYOUT_3D_AD_SINGLE", "3D AnyDual Connected", 2, 4);
-		layout.setView(0, ssc::ViewWidget::VIEW_3D, LayoutRegion(0, 0, 2, 3));
-		layout.setView(0, ssc::ptANYPLANE, LayoutRegion(0, 3));
-		layout.setView(0, ssc::ptSIDEPLANE, LayoutRegion(1, 3));
+		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0, 2, 3));
+		layout.setView(0, ptANYPLANE, LayoutRegion(0, 3));
+		layout.setView(0, ptSIDEPLANE, LayoutRegion(1, 3));
 		this->addDefaultLayout(layout);
 	}
 
@@ -693,28 +687,28 @@ void ViewManager::addDefaultLayouts()
 	this->addDefaultLayout(LayoutData::createHeader("LAYOUT_GROUP_Oblique", "Oblique"));
 	{
 		LayoutData layout = LayoutData::create("LAYOUT_OBLIQUE_3DAnyDual_x1", "3D Any Dual x1", 1, 3);
-		layout.setView(0, ssc::ViewWidget::VIEW_3D, LayoutRegion(0, 0));
-		layout.setView(1, ssc::ptANYPLANE, LayoutRegion(0, 1));
-		layout.setView(1, ssc::ptSIDEPLANE, LayoutRegion(0, 2));
+		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0));
+		layout.setView(1, ptANYPLANE, LayoutRegion(0, 1));
+		layout.setView(1, ptSIDEPLANE, LayoutRegion(0, 2));
 		this->addDefaultLayout(layout);
 	}
 	{
 		LayoutData layout = LayoutData::create("LAYOUT_OBLIQUE_3DAnyDual_x2", "3D Any Dual x2", 2, 3);
-		layout.setView(0, ssc::ViewWidget::VIEW_3D, LayoutRegion(0, 0, 2, 1));
-		layout.setView(1, ssc::ptANYPLANE, LayoutRegion(0, 1));
-		layout.setView(1, ssc::ptSIDEPLANE, LayoutRegion(1, 1));
-		layout.setView(2, ssc::ptANYPLANE, LayoutRegion(0, 2));
-		layout.setView(2, ssc::ptSIDEPLANE, LayoutRegion(1, 2));
+		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0, 2, 1));
+		layout.setView(1, ptANYPLANE, LayoutRegion(0, 1));
+		layout.setView(1, ptSIDEPLANE, LayoutRegion(1, 1));
+		layout.setView(2, ptANYPLANE, LayoutRegion(0, 2));
+		layout.setView(2, ptSIDEPLANE, LayoutRegion(1, 2));
 		this->addDefaultLayout(layout);
 	}
 	{
 		LayoutData layout = LayoutData::create("LAYOUT_OBLIQUE_AnyDual_x3", "Any Dual x3", 2, 3);
-		layout.setView(0, ssc::ptANYPLANE, LayoutRegion(0, 0));
-		layout.setView(0, ssc::ptSIDEPLANE, LayoutRegion(1, 0));
-		layout.setView(1, ssc::ptANYPLANE, LayoutRegion(0, 1));
-		layout.setView(1, ssc::ptSIDEPLANE, LayoutRegion(1, 1));
-		layout.setView(2, ssc::ptANYPLANE, LayoutRegion(0, 2));
-		layout.setView(2, ssc::ptSIDEPLANE, LayoutRegion(1, 2));
+		layout.setView(0, ptANYPLANE, LayoutRegion(0, 0));
+		layout.setView(0, ptSIDEPLANE, LayoutRegion(1, 0));
+		layout.setView(1, ptANYPLANE, LayoutRegion(0, 1));
+		layout.setView(1, ptSIDEPLANE, LayoutRegion(1, 1));
+		layout.setView(2, ptANYPLANE, LayoutRegion(0, 2));
+		layout.setView(2, ptSIDEPLANE, LayoutRegion(1, 2));
 		this->addDefaultLayout(layout);
 	}
 
@@ -724,34 +718,34 @@ void ViewManager::addDefaultLayouts()
 	this->addDefaultLayout(LayoutData::createHeader("LAYOUT_GROUP_Orthogonal", "Orthogonal"));
 	{
 		LayoutData layout = LayoutData::create("LAYOUT_ORTHOGONAL_3DACS_x1", "3D ACS x1", 2, 2);
-		layout.setView(0, ssc::ViewWidget::VIEW_3D, LayoutRegion(0, 0));
-		layout.setView(1, ssc::ptAXIAL, LayoutRegion(0, 1));
-		layout.setView(1, ssc::ptCORONAL, LayoutRegion(1, 0));
-		layout.setView(1, ssc::ptSAGITTAL, LayoutRegion(1, 1));
+		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0));
+		layout.setView(1, ptAXIAL, LayoutRegion(0, 1));
+		layout.setView(1, ptCORONAL, LayoutRegion(1, 0));
+		layout.setView(1, ptSAGITTAL, LayoutRegion(1, 1));
 		this->addDefaultLayout(layout);
 	}
 	{
 		LayoutData layout = LayoutData::create("LAYOUT_ORTHOGONAL_3DACS_x2", "3D ACS x2", 3, 3);
-		layout.setView(0, ssc::ViewWidget::VIEW_3D, LayoutRegion(0, 0, 3, 1));
-		layout.setView(1, ssc::ptAXIAL, LayoutRegion(0, 1));
-		layout.setView(1, ssc::ptCORONAL, LayoutRegion(1, 1));
-		layout.setView(1, ssc::ptSAGITTAL, LayoutRegion(2, 1));
-		layout.setView(2, ssc::ptAXIAL, LayoutRegion(0, 2));
-		layout.setView(2, ssc::ptCORONAL, LayoutRegion(1, 2));
-		layout.setView(2, ssc::ptSAGITTAL, LayoutRegion(2, 2));
+		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0, 3, 1));
+		layout.setView(1, ptAXIAL, LayoutRegion(0, 1));
+		layout.setView(1, ptCORONAL, LayoutRegion(1, 1));
+		layout.setView(1, ptSAGITTAL, LayoutRegion(2, 1));
+		layout.setView(2, ptAXIAL, LayoutRegion(0, 2));
+		layout.setView(2, ptCORONAL, LayoutRegion(1, 2));
+		layout.setView(2, ptSAGITTAL, LayoutRegion(2, 2));
 		this->addDefaultLayout(layout);
 	}
 	{
 		LayoutData layout = LayoutData::create("LAYOUT_ORTHOGONAL_3DACS_x3", "ACS x3", 3, 3);
-		layout.setView(0, ssc::ptAXIAL, LayoutRegion(0, 0));
-		layout.setView(0, ssc::ptCORONAL, LayoutRegion(1, 0));
-		layout.setView(0, ssc::ptSAGITTAL, LayoutRegion(2, 0));
-		layout.setView(1, ssc::ptAXIAL, LayoutRegion(0, 1));
-		layout.setView(1, ssc::ptCORONAL, LayoutRegion(1, 1));
-		layout.setView(1, ssc::ptSAGITTAL, LayoutRegion(2, 1));
-		layout.setView(2, ssc::ptAXIAL, LayoutRegion(0, 2));
-		layout.setView(2, ssc::ptCORONAL, LayoutRegion(1, 2));
-		layout.setView(2, ssc::ptSAGITTAL, LayoutRegion(2, 2));
+		layout.setView(0, ptAXIAL, LayoutRegion(0, 0));
+		layout.setView(0, ptCORONAL, LayoutRegion(1, 0));
+		layout.setView(0, ptSAGITTAL, LayoutRegion(2, 0));
+		layout.setView(1, ptAXIAL, LayoutRegion(0, 1));
+		layout.setView(1, ptCORONAL, LayoutRegion(1, 1));
+		layout.setView(1, ptSAGITTAL, LayoutRegion(2, 1));
+		layout.setView(2, ptAXIAL, LayoutRegion(0, 2));
+		layout.setView(2, ptCORONAL, LayoutRegion(1, 2));
+		layout.setView(2, ptSAGITTAL, LayoutRegion(2, 2));
 		this->addDefaultLayout(layout);
 	}
 
@@ -761,14 +755,14 @@ void ViewManager::addDefaultLayouts()
 	this->addDefaultLayout(LayoutData::createHeader("LAYOUT_GROUP_RT", "Realtime Source"));
 	{
 		LayoutData layout = LayoutData::create("LAYOUT_RT_1X1", "RT", 1, 1);
-		layout.setView(0, ssc::ViewWidget::VIEW_REAL_TIME, LayoutRegion(0, 0));
+		layout.setView(0, ViewWidget::VIEW_REAL_TIME, LayoutRegion(0, 0));
 		this->addDefaultLayout(layout);
 	}
 	{
 		LayoutData layout = LayoutData::create("LAYOUT_US_Acquisition", "US Acquisition", 2, 3);
-		layout.setView(0, ssc::ptANYPLANE, LayoutRegion(1, 2, 1, 1));
-		layout.setView(0, ssc::ViewWidget::VIEW_3D, LayoutRegion(0, 2, 1, 1));
-		layout.setView(0, ssc::ViewWidget::VIEW_REAL_TIME, LayoutRegion(0, 0, 2, 2));
+		layout.setView(0, ptANYPLANE, LayoutRegion(1, 2, 1, 1));
+		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 2, 1, 1));
+		layout.setView(0, ViewWidget::VIEW_REAL_TIME, LayoutRegion(0, 0, 2, 2));
 		this->addDefaultLayout(layout);
 	}
 
@@ -777,9 +771,9 @@ void ViewManager::addDefaultLayouts()
 //    layout.resetUid("LAYOUT_ACS_1X3");
 //    layout.setName("ACS 1x3");
 //    layout.resize(1,3);
-//    layout.setView(0, ssc::ptAXIAL,    LayoutRegion(0, 0));
-//    layout.setView(0, ssc::ptCORONAL,  LayoutRegion(0, 1));
-//    layout.setView(0, ssc::ptSAGITTAL, LayoutRegion(0, 2));
+//    layout.setView(0, ptAXIAL,    LayoutRegion(0, 0));
+//    layout.setView(0, ptCORONAL,  LayoutRegion(0, 1));
+//    layout.setView(0, ptSAGITTAL, LayoutRegion(0, 2));
 //    this->addDefaultLayout(layout);
 //  }
 //  {
@@ -787,12 +781,12 @@ void ViewManager::addDefaultLayouts()
 //    layout.resetUid("LAYOUT_ACSACS_2X3");
 //    layout.setName("ACSACS 2x3");
 //    layout.resize(2,3);
-//    layout.setView(0, ssc::ptAXIAL,    LayoutRegion(0, 0));
-//    layout.setView(0, ssc::ptCORONAL,  LayoutRegion(0, 1));
-//    layout.setView(0, ssc::ptSAGITTAL, LayoutRegion(0, 2));
-//    layout.setView(1, ssc::ptAXIAL,    LayoutRegion(1, 0));
-//    layout.setView(1, ssc::ptCORONAL,  LayoutRegion(1, 1));
-//    layout.setView(1, ssc::ptSAGITTAL, LayoutRegion(1, 2));
+//    layout.setView(0, ptAXIAL,    LayoutRegion(0, 0));
+//    layout.setView(0, ptCORONAL,  LayoutRegion(0, 1));
+//    layout.setView(0, ptSAGITTAL, LayoutRegion(0, 2));
+//    layout.setView(1, ptAXIAL,    LayoutRegion(1, 0));
+//    layout.setView(1, ptCORONAL,  LayoutRegion(1, 1));
+//    layout.setView(1, ptSAGITTAL, LayoutRegion(1, 2));
 //    this->addDefaultLayout(layout);
 //  }
 //  {
@@ -800,12 +794,12 @@ void ViewManager::addDefaultLayouts()
 //    layout.resetUid("LAYOUT_Any_2X3");
 //    layout.setName("Any 2x3");
 //    layout.resize(2,3);
-//    layout.setView(0, ssc::ptANYPLANE,  LayoutRegion(0, 0));
-//    layout.setView(0, ssc::ptSIDEPLANE, LayoutRegion(1, 0));
-//    layout.setView(1, ssc::ptANYPLANE,  LayoutRegion(0, 1));
-//    layout.setView(1, ssc::ptSIDEPLANE, LayoutRegion(1, 1));
-//    layout.setView(2, ssc::ptANYPLANE,  LayoutRegion(0, 2));
-//    layout.setView(2, ssc::ptSIDEPLANE, LayoutRegion(1, 2));
+//    layout.setView(0, ptANYPLANE,  LayoutRegion(0, 0));
+//    layout.setView(0, ptSIDEPLANE, LayoutRegion(1, 0));
+//    layout.setView(1, ptANYPLANE,  LayoutRegion(0, 1));
+//    layout.setView(1, ptSIDEPLANE, LayoutRegion(1, 1));
+//    layout.setView(2, ptANYPLANE,  LayoutRegion(0, 2));
+//    layout.setView(2, ptSIDEPLANE, LayoutRegion(1, 2));
 //    this->addDefaultLayout(layout);
 //  }
 //  {
@@ -813,8 +807,8 @@ void ViewManager::addDefaultLayouts()
 //    layout.resetUid("LAYOUT_3DAny_1X2");
 //    layout.setName("3DAny 1x2");
 //    layout.resize(1,2);
-//    layout.setView(0, ssc::ViewWidget::VIEW_3D,   LayoutRegion(0, 0));
-//    layout.setView(0, ssc::ptANYPLANE,  LayoutRegion(0, 1));
+//    layout.setView(0, ViewWidget::VIEW_3D,   LayoutRegion(0, 0));
+//    layout.setView(0, ptANYPLANE,  LayoutRegion(0, 1));
 //    this->addDefaultLayout(layout);
 //  }
 }
@@ -847,7 +841,7 @@ void ViewManager::renderAllViewsSlot()
         if (iter->second->isVisible())
         {
             if (smart)
-                dynamic_cast<ssc::View*>(iter->second)->render(); // render only changed scenegraph (shaky but smooth)
+                dynamic_cast<View*>(iter->second)->render(); // render only changed scenegraph (shaky but smooth)
             else
             {
                 iter->second->getRenderWindow()->Render(); // previous version: renders even when nothing is changed
@@ -867,7 +861,7 @@ void ViewManager::renderAllViewsSlot()
 		emit fps(mRenderTimer->getFPS());
 //        static int counter=0;
 //        if (++counter%3==0)
-//            ssc::messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
+//            messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
         mRenderTimer->reset();
 	}
 //	std::cout << "==============================ViewManager::render" << std::endl;
@@ -1041,7 +1035,7 @@ bool ViewManager::isCustomLayout(const QString& uid) const
 
 void ViewManager::loadGlobalSettings()
 {
-	ssc::XmlOptionFile file = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("viewmanager");
+	XmlOptionFile file = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("viewmanager");
 
 	// load custom layouts:
 	mLayouts.clear();
@@ -1068,9 +1062,9 @@ void ViewManager::loadGlobalSettings()
 
 void ViewManager::saveGlobalSettings()
 {
-	ssc::XmlOptionFile file = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("viewmanager");
+	XmlOptionFile file = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("viewmanager");
 
-	ssc::XmlOptionFile layoutsNode = file.descend("layouts");
+	XmlOptionFile layoutsNode = file.descend("layouts");
 	layoutsNode.removeChildren();
 	for (LayoutDataVector::iterator iter = mLayouts.begin(); iter != mLayouts.end(); ++iter)
 	{
@@ -1093,14 +1087,14 @@ void ViewManager::saveGlobalSettings()
 //  for (unsigned i = 0; i < mViewGroups.size(); ++i)
 //  {
 //    ViewGroupPtr group = mViewGroups[i];
-//    std::vector<ssc::ViewWidget*> views = group->getViews();
+//    std::vector<ViewWidget*> views = group->getViews();
 //    if (views.empty())
 //      continue;
 //    TreeItemPtr groupItem = TreeItemImpl::create(topItem, "group"+qstring_cast(i), "view group", qstring_cast(i));
 //    for (unsigned j=0; j<views.size(); ++j)
 //    {
 //      TreeItemPtr viewItem = TreeItemImpl::create(groupItem, qstring_cast(views[j]->getName()), qstring_cast(views[j]->getTypeString()), "");
-//      std::vector<ssc::RepPtr> reps = views[j]->getReps();
+//      std::vector<RepPtr> reps = views[j]->getReps();
 //      for (unsigned k=0; k<reps.size(); ++k)
 //      {
 //        QString name = reps[k]->getName();
@@ -1110,7 +1104,7 @@ void ViewManager::saveGlobalSettings()
 //      }
 //    }
 //
-//    std::vector<ssc::ImagePtr> images = group->getImages();
+//    std::vector<ImagePtr> images = group->getImages();
 //    for (unsigned j=0; j<images.size(); ++j)
 //    {
 //      TreeItemPtr imageItem = TreeItemImage::create(groupItem, images[j]->getName());
@@ -1153,7 +1147,7 @@ QActionGroup* ViewManager::createInteractorStyleActionGroup()
 //				QString helptext)
 //{
 //	vtkRenderWindowInteractor* interactor = NULL;
-//	ssc::ViewWidget* view = viewManager()->get3DView();
+//	ViewWidget* view = viewManager()->get3DView();
 //	if (view)
 //		interactor = view->getRenderWindow()->GetInteractor();
 
@@ -1177,7 +1171,7 @@ QActionGroup* ViewManager::createInteractorStyleActionGroup()
 
 //	QString uid = theAction->data().toString();
 
-//	ssc::ViewWidget* view = viewManager()->get3DView();
+//	ViewWidget* view = viewManager()->get3DView();
 //	if (!view)
 //		return;
 //	vtkRenderWindowInteractor* interactor = view->getRenderWindow()->GetInteractor();
@@ -1200,10 +1194,10 @@ QActionGroup* ViewManager::createInteractorStyleActionGroup()
 //			interactor->SetInteractorStyle(vtkInteractorStyleFlightPtr::New());
 //	}
 
-//	ssc::messageManager()->sendInfo("Set Interactor: " + uid);
+//	messageManager()->sendInfo("Set Interactor: " + uid);
 //}
 
-void ViewManager::autoShowData(ssc::DataPtr data)
+void ViewManager::autoShowData(DataPtr data)
 {
 	if (settings()->value("Automation/autoShowNewData").toBool())
 	{

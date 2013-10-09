@@ -81,7 +81,7 @@ public slots:
 	 * \param fileName The file name of the imported file(s)
 	 * \param[out] infoText Information about any errors/warnings that occurred during import
 	 */
-	ssc::DataPtr importData(QString fileName, QString &infoText);
+	DataPtr importData(QString fileName, QString &infoText);
 	void savePatient(); ///< Save all application data to XML file
 	void clearPatient();
 	void exportPatient(bool niftiFormat);

@@ -23,7 +23,7 @@
 #include "cxIgstkTrackerThread.h"
 #include "cxTool.h"
 #include "cxIgstkTool.h"
-#include <cxIgstkToolManager.h>
+#include "cxIgstkToolManager.h"
 
 namespace cx
 {

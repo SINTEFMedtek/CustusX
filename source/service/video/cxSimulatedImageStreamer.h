@@ -9,7 +9,7 @@ typedef vtkSmartPointer<class vtkImageMask> vtkImageMaskPtr;
 
 namespace cx
 {
-typedef ssc::Transform3D Transform3D;
+typedef Transform3D Transform3D;
 
 /**
  * SimulatedImageStreamer delivers a stream of 2D images
@@ -28,7 +28,7 @@ public:
 	virtual ~SimulatedImageStreamer();
 
 	void initialize(); ///< initializes with active image and first probe
-	void initialize(ssc::ImagePtr image, ssc::ToolPtr tool);
+	void initialize(ImagePtr image, ToolPtr tool);
 	virtual bool startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
 
@@ -42,18 +42,18 @@ private slots:
 	void setSourceToImageSlot(QString imageUid);
 
 private:
-	void setSourceImage(ssc::ImagePtr image);
-	ssc::ImagePtr getSlice(ssc::ImagePtr source);
+	void setSourceImage(ImagePtr image);
+	ImagePtr getSlice(ImagePtr source);
 	vtkMatrix4x4Ptr calculateSliceAxes();
-	vtkImageDataPtr getSliceUsingProbeDefinition(ssc::ImagePtr source, vtkMatrix4x4Ptr sliceAxes);
+	vtkImageDataPtr getSliceUsingProbeDefinition(ImagePtr source, vtkMatrix4x4Ptr sliceAxes);
 	vtkImageDataPtr maskSlice(vtkImageDataPtr unmaskedSlice);
-	ssc::ImagePtr convertToSscImage(vtkImageDataPtr slice, ssc::ImagePtr volume);
-	vtkImageReslicePtr createReslicer(ssc::ImagePtr source, vtkMatrix4x4Ptr sliceAxes);
-	ssc::Transform3D getTransformFromProbeSectorImageSpaceToImageSpace();
+	ImagePtr convertToSscImage(vtkImageDataPtr slice, ImagePtr volume);
+	vtkImageReslicePtr createReslicer(ImagePtr source, vtkMatrix4x4Ptr sliceAxes);
+	Transform3D getTransformFromProbeSectorImageSpaceToImageSpace();
 
-	ssc::ImagePtr mSourceImage;
-	ssc::ToolPtr mTool;
-	ssc::ImagePtr mImageToSend;
+	ImagePtr mSourceImage;
+	ToolPtr mTool;
+	ImagePtr mImageToSend;
 	vtkImageDataPtr mMask;
 
 };

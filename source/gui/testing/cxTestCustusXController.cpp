@@ -26,12 +26,19 @@
 #include "cxLogicManager.h"
 #include "cxWorkflowStateMachine.h"
 
+
+#include "cxClippingWidget.h"
+#include "cxInteractiveClipper.h"
+#include "cxViewManager.h"
+#include "cxDataManager.h"
+
 CustusXController::CustusXController(QObject* parent) : QObject(parent)
 {
   mTestData += "Test Results:\n";
   mMainWindow = NULL;
   mBaseTime = 1000;
-  mMeasuredFPS = 0;
+	mMeasuredFPS = 0;
+	mEnableSlicing = false;
 }
 void CustusXController::start()
 {
@@ -53,6 +60,9 @@ void CustusXController::start()
 
   QTimer::singleShot(      0,   this, SLOT(initialBeginCheckRenderSlot()) );
   QTimer::singleShot(      0,   this, SLOT(loadPatientSlot()) );
+	if(mEnableSlicing)
+		QTimer::singleShot(      0,   this, SLOT(enableSlicingSlot()) );
+
 }
 void CustusXController::stop()
 {
@@ -66,17 +76,37 @@ void CustusXController::loadPatientSlot()
   cx::stateService()->getWorkflow()->setActiveState("NavigationUid");
   mMainWindow->setGeometry( 0, 0, 2560, 1440);
 
-  if (!ssc::DataManager::getInstance()->getImages().size())
-    return;
+  if (!cx::DataManager::getInstance()->getImages().size())
+		return;
 
-  ssc::ImagePtr image = ssc::DataManager::getInstance()->getImages().begin()->second;
-  ssc::DoubleBoundingBox3D bb_r = transform(image->get_rMd(), image->boundingBox());
+  cx::ImagePtr image = cx::DataManager::getInstance()->getImages().begin()->second;
+  cx::DoubleBoundingBox3D bb_r = transform(image->get_rMd(), image->boundingBox());
 
-  ssc::DataManager::getInstance()->setCenter(bb_r.center());
+  cx::DataManager::getInstance()->setCenter(bb_r.center());
 
-  ssc::DummyToolPtr dummyTool(new ssc::DummyTool(cx::ToolManager::getInstance()));
+  cx::DummyToolPtr dummyTool(new cx::DummyTool(cx::cxToolManager::getInstance()));
   dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
-  cx::ToolManager::getInstance()->runDummyTool(dummyTool);
+  cx::cxToolManager::getInstance()->runDummyTool(dummyTool);
+}
+
+
+void CustusXController::enableSlicingSlot()
+{
+		cx::InteractiveClipperPtr interactiveClipper = cx::viewManager()->getClipper();
+		interactiveClipper->setSlicePlane(cx::ptAXIAL);
+
+	//	ImagePtr image = dataManager()->getActiveImage();
+		std::map<QString, cx::ImagePtr> imageMap = cx::dataManager()->getImages();
+		if(imageMap.size() > 0)
+		{
+			cx::ImagePtr image = imageMap.begin()->second;
+			interactiveClipper->setImage(image);
+			interactiveClipper->useClipper(true);
+//			std::cout << "clip in image: " << image->getName()  << std::endl;
+		}
+		else
+			std::cout << "No images!!!"  << std::endl;
+
 }
 
 void CustusXController::initialBeginCheckRenderSlot()
@@ -110,7 +140,7 @@ void CustusXController::secondEndCheckRenderSlot()
   mMeasuredFPS = cx::viewManager()->getRenderTimer()->getFPS();
 //  mTestData += "\n";
 
-  this->displayResultsSlot();
+	//this->displayResultsSlot();
   QTimer::singleShot(2*1000,   qApp, SLOT(quit()) );
 }
 

@@ -24,8 +24,10 @@
 #include "sscMessageManager.h"
 #include "sscXmlOptionItem.h"
 #include "sscTypeConversions.h"
+#include "cxImageParameters.h"
+#include "sscBoundingBox3D.h"
 
-namespace ssc
+namespace cx
 {
 
 /**
@@ -35,98 +37,58 @@ namespace ssc
 
 /** \brief Helper struct for sending and controlling output volume properties.
  *
- *  \date May 27, 2010
- *  \author christiana
+ * \date May 27, 2010
+ * \author Christian Askeland, SINTEF
+ * \author Ole Vegard Solberg, SINTEF
  */
 class OutputVolumeParams
 {
 public:
-	// constants, set only based on input data
-	ssc::DoubleBoundingBox3D mExtent;
-	double mInputSpacing;
-	ssc::Transform3D m_rMd; ///< transform from output data space to global ref space r
+	OutputVolumeParams();
+	OutputVolumeParams(DoubleBoundingBox3D extent, double inputSpacing);
 
-	OutputVolumeParams() :
-		mExtent(0, 0, 0, 0, 0, 0), mInputSpacing(0), m_rMd(Transform3D::Identity()),
-			mDim(0, 0, 0), mSpacing(0), mMaxVolumeSize(32)
-	{
-	}
-	/** Initialize the volue parameters with sensible defaults.
-	 */
-	OutputVolumeParams(ssc::DoubleBoundingBox3D extent, double inputSpacing) :
-		mExtent(extent), mInputSpacing(inputSpacing), mMaxVolumeSize(32)
-	{
-		// Calculate optimal output image spacing and dimensions based on US frame spacing
-		this->setSpacing(mInputSpacing);
-		this->constrainVolumeSize();
-	}
-
-	unsigned long getVolumeSize() const
-	{
-		return mDim[0] * mDim[1] * mDim[2];;
-	}
+	unsigned long getVolumeSize() const;
 
 	/** Set a spacing, recalculate dimensions.
 	 */
-	void setSpacing(double spacing)
-	{
-		mSpacing = spacing;
-		ssc::Vector3D v = mExtent.range() / mSpacing;
-		mDim << ::ceil(v[0]), ::ceil(v[1]), ::ceil(v[2]);
-	}
-	double getSpacing() const
-	{
-		return mSpacing;
-	}
+	void setSpacing(double spacing);
+	double getSpacing() const;
 	/** Set one of the dimensions explicitly, recalculate other dims and spacing.
 	 */
-	void setDim(int index, int val)
-	{
-		setSpacing(mExtent.range()[index] / val);
-	}
-	Eigen::Array3i getDim() const
-	{
-		return mDim;
-	}
+	void setDim(int index, int val);
+	Eigen::Array3i getDim() const;
 	/** Increase spacing in order to keep size below a max size
 	 */
-	void constrainVolumeSize()
-	{
-		this->setSpacing(mInputSpacing); // reset to default values
+	void constrainVolumeSize();
 
-		// Reduce output volume size if optimal volume size is too large
-		unsigned long volumeSize = getVolumeSize();
-		unsigned long maxVolumeSize = this->getMaxVolumeSize();
-		if (volumeSize > maxVolumeSize)
-		{
-			ssc::Vector3D ext = mExtent.range();
-			double newSpacing = pow(ext[0]*ext[1]*ext[2] / double(maxVolumeSize), 1 / 3.0);
-			this->setSpacing(newSpacing);
-		}
-	}
+	void setMaxVolumeSize(double maxSize);
+	unsigned long getMaxVolumeSize();
 
-	void setMaxVolumeSize(double maxSize)
-	{
-		mMaxVolumeSize = maxSize;
-	}
+	void set_rMd(Transform3D rMd);
+	Transform3D get_rMd();
 
-	unsigned long getMaxVolumeSize()
-	{
-		return mMaxVolumeSize;
-	}
+	DoubleBoundingBox3D getExtent();
+	double getInputSpacing();
 
 private:
 	// controllable data, set only using the setters
 	Eigen::Array3i mDim;
 	double mSpacing;
 	double mMaxVolumeSize;
+
+	// constants, set only based on input data
+	DoubleBoundingBox3D mExtent;
+	double mInputSpacing;
+	Transform3D m_rMd; ///< transform from output data space to global ref space r
+
+	ImageParameters mImage;
 };
 
 /**
  * \}
  */
 
-} // namespace ssc
+} // namespace cx
 
 
 #endif /* SSCRECONSTRUCTEDOUTPUTVOLUMEPARAMS_H_ */

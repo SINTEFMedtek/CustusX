@@ -74,10 +74,14 @@ class CppBuilder:
         runShell('git submodule sync') # from tsf 
         runShell('git submodule update --init --recursive')                    
 
-    def gitUpdate(self, branch='master', submodules=False):
+    def gitUpdate(self, branch='master', tag=None, submodules=False):
         '''
-        pull latest versiono of branch, include submodules if asked.
+        pull latest version of branch, include submodules if asked.
         '''
+        if tag!=None:
+            self.gitCheckout(tag, submodules=submodules)
+            return
+        
         self._changeDirToSource()
 
         runShell('git checkout %s' % branch)
@@ -102,7 +106,7 @@ class CppBuilder:
         runShell('git fetch')
         runShell('git checkout %s' % tag)
         if submodules:
-            self._getBuilder()._gitSubmoduleUpdate()
+            self._gitSubmoduleUpdate()
         
         if patch:       
             self._gitApplyPatch(patch)     
@@ -121,8 +125,8 @@ class CppBuilder:
             Howto create a patch using git:
             Branch is created like this:
             git checkout v5.8.0
-            git branch cx_mod_for_5-8-0
-            git checkout cx_mod_for_5-8-0
+            git branch VTK-5-8-0.patch_branch
+            git checkout VTK-5-8-0.patch_branch
             ... make you modifications ...
             git commit -am "message"
             git format-patch master --stdout > VTK-5-8-0.patch

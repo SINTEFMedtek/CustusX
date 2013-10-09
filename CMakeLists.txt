@@ -20,15 +20,29 @@ include(cxCatchUtilities)
 # Add some compiler flags (preprocessor definitions)
 #------------------------------------------------------------------------------
 
-if(SSC_USE_GCOV)
-	add_definitions(--coverage)
-endif()
+cx_set_os_identifiers()
+
+#if(SSC_USE_GCOV)
+#	add_definitions(--coverage)
+#endif()
+
+# _USE_MATH_DEFINES Must be defined before math.h is included
+if (CX_WINDOWS)
+    add_definitions(-D_USE_MATH_DEFINES)
+endif(CX_WINDOWS)
+
+# TODO check this and try to remove.
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
 
 if(SSC_PRINT_CALLER_INFO)
         add_definitions(-DSSC_PRINT_CALLER_INFO)
 endif()
 
-cx_set_os_identifiers()
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "build shared or static libs")
+
+
 
 message( STATUS "The " ${CMAKE_GENERATOR} " was used." )
 
@@ -36,11 +50,13 @@ message( STATUS "The " ${CMAKE_GENERATOR} " was used." )
 # Set CustusX version
 #------------------------------------------------------------------------------
 
-set(CX_VERSION_TYPE ALPHA) # use when releasing an alpha
+#set(CX_VERSION_TYPE ALPHA) # use when releasing an alpha
 #set(CX_VERSION_TYPE BETA) # use when releasing a beta
 #set(CX_VERSION_TYPE RELEASE) # use when releasing a normal release
 #set(CX_VERSION_TYPE ".rc1") # set release candidate during release procedure
-cx_define_version(3 6 0 CX_VERSION_TYPE)
+cx_read_version()
+#cx_define_version(3 5 3 CX_VERSION_TYPE)
+#message(STATUS "Version: ${CustusX3_VERSION_STRING}")
 
 include(cxCotireMacros)
 CX_COTIRE_INITIALIZE()
@@ -50,6 +66,7 @@ set(CMAKE_BUILD_TYPE:STRING=Debug)
 
 cx_initialize_custusx_install()
 cx_catch_initialize()
+cx_initialize_coverage()
 
 include(Dart)
 
@@ -70,7 +87,7 @@ cx_initialize_opencv()
 #------------------------------------------------------------------------------
 # Add subdirectories
 #------------------------------------------------------------------------------
-add_subdirectory( source/resource/ssc )
+#add_subdirectory( source/resource/ssc )
 add_subdirectory( doc )
 add_subdirectory( source )
 

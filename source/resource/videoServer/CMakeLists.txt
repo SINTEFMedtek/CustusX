@@ -31,43 +31,29 @@ ENDIF(QT_USE_FILE)
 find_package(OpenIGTLink REQUIRED)
 include(${OpenIGTLink_USE_FILE})
 
-# SSC
-#----------
-find_package(SSC PATHS "../../externals/ssc/CMake" REQUIRED)
-include(${SSC_USE_FILE})
-
 #-------------------------------
 # Include directories
 #-------------------------------
+include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 include_directories(
         ${Boost_INCLUDE_DIRS}
         ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
-        ${CustusX3_SOURCE_DIR}/source/resource/settings
-        ${CustusX3_BINARY_DIR}/source/resource/settings
-        ${CustusX3_SOURCE_DIR}/source/resource/utilities
-        ${CustusX3_SOURCE_DIR}/source/resource
-        ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-        #"C:/Program Files/Microsoft SDKs/Windows/v7.1/Samples/multimedia/directshow/baseclasses"
+     	${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
         )
 
 #-------------------------------
 # Linking
 #-------------------------------
-
-#link_directories( "C:/Program Files/Microsoft SDKs/Windows/v7.1/Lib" )
-
 # link to ulterius only on when building 32 bit
 # - ulterius lib is only available on windows as 32 bit
 if(CX_WIN32)
     SET(WIN32_LINK_LIBRARIES
             ${ULTERIUS_LIBRARY}
             vtkOpenIGTUltrasound
-            #STRMBASE
     )
 endif(CX_WIN32)
 
 SET(ALL_LINK_LIBRARIES
-	SSC
 	${BOOST_LIBRARIES}
 	${QT_LIBRARIES}
 	OpenIGTLink

@@ -30,25 +30,12 @@ macro(cx_initialize_cppunit)
         /usr/include)
 
     if(CX_WINDOWS)
-        find_library(CPPUNIT_LIBRARY cppunit
-            ${CPPUNIT_INCLUDE_DIR}/../lib
-            /usr/local/lib
-            /usr/lib)
-        find_library(CPPUNIT_DEBUG_LIBRARY cppunitd
-            ${CPPUNIT_INCLUDE_DIR}/../lib
-            /usr/local/lib
-            /usr/lib)
+        #CPP_UNIT not used on Windows
     else(CX_WINDOWS)
         find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib REQUIRED)
     endif(CX_WINDOWS)
 
-    if(CPPUNIT_INCLUDE_DIR)
-        if(CPPUNIT_LIBRARY)
-            set(CPPUNIT_FOUND "YES")
-            set(CPPUNIT_LIBRARIES ${CPPUNIT_LIBRARY} ${CMAKE_DL_LIBS})
-            set(CPPUNIT_DEBUG_LIBRARIES ${CPPUNIT_DEBUG_LIBRARY} ${CMAKE_DL_LIBS})
-        endif(CPPUNIT_LIBRARY)
-    endif(CPPUNIT_INCLUDE_DIR)
+    include_directories(${CPPUNIT_INCLUDE_DIR})
 endmacro()
 
 ###############################################################################
@@ -156,6 +143,7 @@ endmacro()
 ###############################################################################
 macro(cx_initialize_Boost)
     find_package( Boost REQUIRED )
+    include_directories(${Boost_INCLUDE_DIRS})
 endmacro()
 
 ###############################################################################
@@ -165,6 +153,7 @@ endmacro()
 macro(cx_initialize_QT)
     set(QT_USE_QTXML TRUE)
     set(QT_USE_QTTEST TRUE)
+    set(QT_USE_QTNETWORK 1)
     find_package(Qt4 REQUIRED)
     if(QT_USE_FILE)
         include(${QT_USE_FILE})
@@ -210,12 +199,27 @@ macro(cx_initialize_IGSTK)
 endmacro()
 
 ###############################################################################
-# Initialize SSC library
-# Find the package and run the include USE file.
+# Initialize Code coverage
+#
+# Add option SSC_USE_GCOV and generate variable SSC_GCOV_LIBRARY containing
+# lib to link.
 ###############################################################################
-macro(cx_initialize_SSC)
-    find_package(SSC PATHS "../externals/ssc/CMake" REQUIRED)
-    include(${SSC_USE_FILE})
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
-endmacro()
+macro(cx_initialize_coverage)
+    # code coverage
+    option(SSC_USE_GCOV "add gcov to enable coverage testing" OFF)
+    if(SSC_USE_GCOV)
+        message(STATUS "Building SSC with gcov code coverage support.")
+        set(SSC_GCOV_LIBRARY )
+        if(WIN32)
+            message(ERROR "gcov not supported for WIN32")
+        # needed on apple
+        elseif(APPLE)
+            set( SSC_GCOV_LIBRARY ${SSC_GCOV_LIBRARY} profile_rt )
+        # needed on linux
+        else(WIN32)
+            set( SSC_GCOV_LIBRARY ${SSC_GCOV_LIBRARY} gcov)
+        endif(WIN32)
 
+        add_definitions(--coverage)
+    endif()
+endmacro()

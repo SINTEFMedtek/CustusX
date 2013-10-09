@@ -8,7 +8,6 @@
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "sscSliceProxy.h"
-#include "sscSlicedImageProxy.h"
 #include "sscProbeSector.h"
 #include "sscProbeData.h"
 #include "sscToolManager.h"
@@ -28,12 +27,12 @@ SimulatedImageStreamer::~SimulatedImageStreamer()
 
 void SimulatedImageStreamer::initialize()
 {
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	ImagePtr image = dataManager()->getActiveImage();
+	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
 	this->initialize(image, tool);
 }
 
-void SimulatedImageStreamer::initialize(ssc::ImagePtr image, ssc::ToolPtr tool)
+void SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool)
 {
 	if(!image || !tool)
 	{
@@ -56,7 +55,7 @@ bool SimulatedImageStreamer::startStreaming(SenderPtr sender)
 {
 	if (!this->isInitialized())
 	{
-		ssc::messageManager()->sendError("SimulatedImageStreamer: Failed to start streaming: Not initialized.");
+		messageManager()->sendError("SimulatedImageStreamer: Failed to start streaming: Not initialized.");
 		return false;
 	}
 	mSender = sender;
@@ -84,10 +83,10 @@ void SimulatedImageStreamer::streamSlot()
 
 void SimulatedImageStreamer::generateMaskSlot()
 {
-	ssc::messageManager()->sendDebug("START");
-	ssc::ProbeSectorPtr sector = mTool->getProbe()->getSector();
+	messageManager()->sendDebug("START");
+	ProbeSectorPtr sector = mTool->getProbe()->getSector();
 	mMask = sector->getMask();
-	ssc::messageManager()->sendDebug("END");
+	messageManager()->sendDebug("END");
 	this->sliceSlot();
 }
 
@@ -100,28 +99,28 @@ void SimulatedImageStreamer::sliceSlot()
 
 void SimulatedImageStreamer::setSourceToActiveImageSlot()
 {
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ImagePtr image = dataManager()->getActiveImage();
 	this->setSourceImage(image);
 }
 
 void SimulatedImageStreamer::setSourceToImageSlot(QString imageUid)
 {
-	ssc::ImagePtr image = ssc::dataManager()->getImage(imageUid);
+	ImagePtr image = dataManager()->getImage(imageUid);
 	this->setSourceImage(image);
 }
 
-void SimulatedImageStreamer::setSourceImage(ssc::ImagePtr image)
+void SimulatedImageStreamer::setSourceImage(ImagePtr image)
 {
 	mSourceImage = image;
 	this->sliceSlot();
 }
 
-ssc::ImagePtr SimulatedImageStreamer::getSlice(ssc::ImagePtr source)
+ImagePtr SimulatedImageStreamer::getSlice(ImagePtr source)
 {
 	vtkMatrix4x4Ptr sliceAxes = this->calculateSliceAxes();
 	vtkImageDataPtr framegrabbedSlice = this->getSliceUsingProbeDefinition(source, sliceAxes);
 	vtkImageDataPtr maskedFramedgrabbedSlice = this->maskSlice(framegrabbedSlice);
-	ssc::ImagePtr slice = this->convertToSscImage(maskedFramedgrabbedSlice, source);
+	ImagePtr slice = this->convertToSscImage(maskedFramedgrabbedSlice, source);
 	slice->setLookupTable2D(source->getLookupTable2D());
 	slice->setTransferFunctions3D(source->getTransferFunctions3D());
 
@@ -132,15 +131,15 @@ vtkMatrix4x4Ptr SimulatedImageStreamer::calculateSliceAxes()
 {
 	vtkMatrix4x4Ptr sliceAxes = vtkMatrix4x4Ptr::New();
 
-	ssc::Transform3D dMv = this->getTransformFromProbeSectorImageSpaceToImageSpace();
+	Transform3D dMv = this->getTransformFromProbeSectorImageSpaceToImageSpace();
 	sliceAxes->DeepCopy(dMv.getVtkMatrix());
 
 	return sliceAxes;
 }
 
-vtkImageDataPtr SimulatedImageStreamer::getSliceUsingProbeDefinition(ssc::ImagePtr source, vtkMatrix4x4Ptr sliceAxes)
+vtkImageDataPtr SimulatedImageStreamer::getSliceUsingProbeDefinition(ImagePtr source, vtkMatrix4x4Ptr sliceAxes)
 {
-	ssc::ProbeData probedata = mTool->getProbe()->getProbeData();
+	ProbeData probedata = mTool->getProbe()->getProbeData();
 
 	vtkImageReslicePtr reslicer = this->createReslicer(source, sliceAxes);
 
@@ -162,15 +161,15 @@ vtkImageDataPtr SimulatedImageStreamer::maskSlice(vtkImageDataPtr unmaskedSlice)
 	return maskedSlice;
 }
 
-ssc::ImagePtr SimulatedImageStreamer::convertToSscImage(vtkImageDataPtr slice, ssc::ImagePtr volume)
+ImagePtr SimulatedImageStreamer::convertToSscImage(vtkImageDataPtr slice, ImagePtr volume)
 {
-	ssc::ImagePtr retval = ssc::ImagePtr(new ssc::Image("Simulated US", slice, "Simulated US"));
+	ImagePtr retval = ImagePtr(new Image("Simulated US", slice, "Simulated US"));
 	return retval;
 }
 
-vtkImageReslicePtr SimulatedImageStreamer::createReslicer(ssc::ImagePtr source, vtkMatrix4x4Ptr sliceAxes)
+vtkImageReslicePtr SimulatedImageStreamer::createReslicer(ImagePtr source, vtkMatrix4x4Ptr sliceAxes)
 {
-	ssc::ProbeData probedata = mTool->getProbe()->getProbeData();
+	ProbeData probedata = mTool->getProbe()->getProbeData();
 
 	vtkImageReslicePtr reslicer = vtkImageReslicePtr::New();
 	reslicer->SetInput(source->getBaseVtkImageData());
@@ -187,20 +186,20 @@ vtkImageReslicePtr SimulatedImageStreamer::createReslicer(ssc::ImagePtr source, 
 	return reslicer;
 }
 
-ssc::Transform3D SimulatedImageStreamer::getTransformFromProbeSectorImageSpaceToImageSpace()
+Transform3D SimulatedImageStreamer::getTransformFromProbeSectorImageSpaceToImageSpace()
 {
-	ssc::ProbeData probedata = mTool->getProbe()->getProbeData();
-	ssc::ProbeSector probesector;
+	ProbeData probedata = mTool->getProbe()->getProbeData();
+	ProbeSector probesector;
 	probesector.setData(probedata);
 
-	ssc::Transform3D uMt = probesector.get_tMu().inv();
-	ssc::Transform3D vMu = probesector.get_uMv().inv();
-	ssc::Transform3D vMt = vMu * uMt;
-	ssc::Transform3D tMpr = mTool->get_prMt().inv();
-	ssc::Transform3D prMr = ssc::toolManager()->get_rMpr()->inv();
-	ssc::Transform3D rMd = mSourceImage->get_rMd();
-	ssc::Transform3D vMd = vMt * tMpr * prMr * rMd;
-	ssc::Transform3D dMv = vMd.inv();
+	Transform3D uMt = probesector.get_tMu().inv();
+	Transform3D vMu = probesector.get_uMv().inv();
+	Transform3D vMt = vMu * uMt;
+	Transform3D tMpr = mTool->get_prMt().inv();
+	Transform3D prMr = toolManager()->get_rMpr()->inv();
+	Transform3D rMd = mSourceImage->get_rMd();
+	Transform3D vMd = vMt * tMpr * prMr * rMd;
+	Transform3D dMv = vMd.inv();
 
 	return dMv;
 }

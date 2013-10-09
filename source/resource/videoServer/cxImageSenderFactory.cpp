@@ -50,10 +50,10 @@ StreamerPtr ImageStreamerFactory::getFromArguments(StringMap args)
 	StreamerPtr streamer = this->getImageSender(type);
 
 	if (streamer)
-		ssc::messageManager()->sendSuccess("Created sender of type: "+type);
+		messageManager()->sendSuccess("Created sender of type: "+type);
 	else
 	{
-		ssc::messageManager()->sendError("Failed to create sender based on type: "+type);
+		messageManager()->sendError("Failed to create sender based on type: "+type);
 		return streamer;
 	}
 

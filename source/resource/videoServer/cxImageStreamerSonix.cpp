@@ -24,6 +24,15 @@
 namespace cx
 {
 
+ImageStreamerSonix::ImageStreamerSonix() :
+
+	mEmitStatusMessage(false),
+	mLastFrameTimestamp(0.0),
+	mCurrentFrameTimestamp(0.0)
+{
+	mSendTimer = new QTimer;
+}
+
 QString ImageStreamerSonix::getType()
 {
 	return "Sonix";
@@ -42,22 +51,15 @@ QStringList ImageStreamerSonix::getArgumentDescription()
 	return retval;
 }
 
-
-ImageStreamerSonix::ImageStreamerSonix() :
-	mEmitStatusMessage(false),
-	mLastFrameTimestamp(0.0),
-	mCurrentFrameTimestamp(0.0)
-{}
-
 ImageStreamerSonix::~ImageStreamerSonix()
 {
 	mSendTimer->stop();
 	if (mSonixGrabber)
-		{
-			mSonixGrabber->Stop();
-			std::cout << "Releasing Ultrasonix resources" << std::endl;
-			mSonixGrabber->ReleaseSystemResources();
-		}
+	{
+		mSonixGrabber->Stop();
+		std::cout << "Releasing Ultrasonix resources" << std::endl;
+		mSonixGrabber->ReleaseSystemResources();
+	}
 }
 
 
@@ -65,7 +67,7 @@ void ImageStreamerSonix::initialize(StringMap arguments)
 {
 	std::cout << "Creating sender type Sonix" << std::endl;
 		  
-	ImageStreamer::initialize(arguments);
+	CommandLineStreamer::initialize(arguments);
 	
 	mMaxqueueInfo = 20;
 //	mMaxBufferSize = 19200000; //800(width)*600(height)*4(bytes)*10(images)
@@ -79,9 +81,8 @@ void ImageStreamerSonix::initialize(StringMap arguments)
 
 	this->mSonixHelper = new SonixHelper();
 
-	mSendTimer = new QTimer;
 	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(initializeSonixSlot()));
-	setSendInverval(10000);
+	this->setSendInterval(10000);
 	mSendTimer->setInterval(getSendInterval());
 	mSendTimer->start();
 
@@ -97,7 +98,7 @@ void ImageStreamerSonix::initializeSonixSlot()
 	}
 
 	//Don't reinitialize if in freeze state
-	if(!mSonixGrabber->getFreezeState() && ssc::similar(mLastFrameTimestamp, mCurrentFrameTimestamp, 0.001))
+	if(!mSonixGrabber->getFreezeState() && similar(mLastFrameTimestamp, mCurrentFrameTimestamp, 0.001))
 	{
 		std::cout << "initializeSonixSlot() Got no new frame. Reinitializing..." << std::endl;
 		// If sonix exam is closed we need to create a new mSonixGrabber

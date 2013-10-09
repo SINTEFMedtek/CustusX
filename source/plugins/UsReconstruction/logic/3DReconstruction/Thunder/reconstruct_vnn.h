@@ -37,7 +37,7 @@
  */
 struct reconstruct_data
 {
-	ssc::ProcessedUSInputDataPtr frameData;
+	cx::ProcessedUSInputDataPtr frameData;
 
 	double* input_pos_matrices;
 	unsigned char* input_mask;
