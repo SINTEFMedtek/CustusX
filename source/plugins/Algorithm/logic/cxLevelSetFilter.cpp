@@ -52,22 +52,22 @@ bool LevelSetFilter::preProcess() {
     return true;
 }
 
-ssc::Vector3D getSeedPointFromTool(ssc::DataPtr image) {
+Vector3D getSeedPointFromTool(DataPtr image) {
     // Retrieve position of tooltip and use it as seed point
-    ssc::Vector3D point = ssc::CoordinateSystemHelpers::getDominantToolTipPoint(
-            ssc::CoordinateSystemHelpers::getD(image)
+    Vector3D point = CoordinateSystemHelpers::getDominantToolTipPoint(
+            CoordinateSystemHelpers::getD(image)
     );
     std::cout << "the selected seed point is: " << point(0) << " " << point(1) << " " << point(2) << "\n";
 
     return point;
 }
 
-int * getImageSize(ssc::DataPtr inputImage) {
-    ssc::ImagePtr image = ssc::DataManager::getInstance()->getImage(inputImage->getUid());
+int * getImageSize(DataPtr inputImage) {
+    ImagePtr image = DataManager::getInstance()->getImage(inputImage->getUid());
     return image->getBaseVtkImageData()->GetDimensions();
 }
 
-bool isSeedPointInsideImage(ssc::Vector3D seedPoint, ssc::DataPtr image) {
+bool isSeedPointInsideImage(Vector3D seedPoint, DataPtr image) {
     int * size = getImageSize(image);
     std::cout << "size of image is: " << size[0] << " " << size[1] << " " << size[2] << "\n";
     int x = (int)seedPoint(0);
@@ -80,7 +80,7 @@ bool isSeedPointInsideImage(ssc::Vector3D seedPoint, ssc::DataPtr image) {
 
 
 bool LevelSetFilter::execute() {
-    ssc::DataPtr inputImage = mInputTypes[0].get()->getData();
+    DataPtr inputImage = mInputTypes[0].get()->getData();
     if(!inputImage) {
         std::cout << "No input data selected" << std::endl;
         return false;
@@ -91,7 +91,7 @@ bool LevelSetFilter::execute() {
         return false;
     }
 
-    ssc::Vector3D seedPoint = getSeedPointFromTool(inputImage);
+    Vector3D seedPoint = getSeedPointFromTool(inputImage);
 
     if(!isSeedPointInsideImage(seedPoint, inputImage)) {
         std::cout << "Seed point is not inside image!" << std::endl;
@@ -118,7 +118,7 @@ bool LevelSetFilter::execute() {
                 alpha
         );
         SIPL::int3 size = result->getSize();
-        ssc::ImagePtr image = ssc::DataManager::getInstance()->getImage(inputImage->getUid());
+        ImagePtr image = DataManager::getInstance()->getImage(inputImage->getUid());
         std::cout << "data ptr to image ptr finished" << std::endl;
         vtkImageDataPtr rawSegmentation = this->convertToVtkImageData((char *)result->getData(), size.x, size.y, size.z, image);
         std::cout << "convert to image data finished" << std::endl;
@@ -131,18 +131,18 @@ bool LevelSetFilter::execute() {
         //add segmentation internally to cx
         QString uidSegmentation = image->getUid() + "_seg%1";
         QString nameSegmentation = image->getName()+"_seg%1";
-        ssc::ImagePtr outputSegmentation = ssc::dataManager()->createDerivedImage(rawSegmentation,uidSegmentation, nameSegmentation, image);
+        ImagePtr outputSegmentation = dataManager()->createDerivedImage(rawSegmentation,uidSegmentation, nameSegmentation, image);
         std::cout << "finished adding seg to cx" << std::endl;
         if (!outputSegmentation)
             return false;
 
-        ssc::Transform3D rMd_i = image->get_rMd(); //transform from the volumes coordinate system to our reference coordinate system
+        Transform3D rMd_i = image->get_rMd(); //transform from the volumes coordinate system to our reference coordinate system
         outputSegmentation->get_rMd_History()->setRegistration(rMd_i);
-        ssc::dataManager()->loadData(outputSegmentation);
-        ssc::dataManager()->saveImage(outputSegmentation, patientService()->getPatientData()->getActivePatientFolder());
+        dataManager()->loadData(outputSegmentation);
+        dataManager()->saveImage(outputSegmentation, patientService()->getPatientData()->getActivePatientFolder());
 
         //add contour internally to cx
-        ssc::MeshPtr contour = ContourFilter::postProcess(rawContour, image, QColor("blue"));
+        MeshPtr contour = ContourFilter::postProcess(rawContour, image, QColor("blue"));
         contour->get_rMd_History()->setRegistration(rMd_i);
         std::cout << "finished adding contour to cx" << std::endl;
 
@@ -212,7 +212,7 @@ void LevelSetFilter::setActive(bool on)
 		*/
 }
 
-vtkImageDataPtr LevelSetFilter::convertToVtkImageData(char * data, int size_x, int size_y, int size_z, ssc::ImagePtr input)
+vtkImageDataPtr LevelSetFilter::convertToVtkImageData(char * data, int size_x, int size_y, int size_z, ImagePtr input)
 {
 	vtkImageDataPtr retval = this->importRawImageData((void*) data, size_x, size_y, size_z, input, VTK_UNSIGNED_CHAR);
 	return retval;
@@ -233,7 +233,7 @@ vtkImageDataPtr LevelSetFilter::convertToVtkImageData(char * data, int size_x, i
 //#define VTK_FLOAT          10
 //#define VTK_DOUBLE         11
 //#define VTK_ID_TYPE        12
-vtkImageDataPtr LevelSetFilter::importRawImageData(void * data, int size_x, int size_y, int size_z, ssc::ImagePtr input, int type)
+vtkImageDataPtr LevelSetFilter::importRawImageData(void * data, int size_x, int size_y, int size_z, ImagePtr input, int type)
 {
 	vtkImageImportPtr imageImport = vtkImageImportPtr::New();
 
@@ -253,28 +253,28 @@ vtkImageDataPtr LevelSetFilter::importRawImageData(void * data, int size_x, int 
 }
 
 
-ssc::DoubleDataAdapterXmlPtr LevelSetFilter::getThresholdOption(
+DoubleDataAdapterXmlPtr LevelSetFilter::getThresholdOption(
         QDomElement root) {
-	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Threshold", "",
-	                                                                            "Select threshold for the segmentation", 1, ssc::DoubleRange(-5000, 5000, 0.0000001), 0, root);
+	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Threshold", "",
+	                                                                            "Select threshold for the segmentation", 1, DoubleRange(-5000, 5000, 0.0000001), 0, root);
 	//retval->setAddSlider(true);
 	return retval;
 
 }
 
-ssc::DoubleDataAdapterXmlPtr LevelSetFilter::getEpsilonOption(
+DoubleDataAdapterXmlPtr LevelSetFilter::getEpsilonOption(
         QDomElement root) {
-	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Epsilon", "",
-	                                                                            "Select epsilon for the segmentation", 1, ssc::DoubleRange(-5000, 5000, 0.0000001), 0, root);
+	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Epsilon", "",
+	                                                                            "Select epsilon for the segmentation", 1, DoubleRange(-5000, 5000, 0.0000001), 0, root);
 	//retval->setAddSlider(true);
 	return retval;
 
 }
 
-ssc::DoubleDataAdapterXmlPtr LevelSetFilter::getAlphaOption(
+DoubleDataAdapterXmlPtr LevelSetFilter::getAlphaOption(
         QDomElement root) {
-	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Alpha", "",
-	                                                                            "Select alpha for the segmentation", 0.1, ssc::DoubleRange(0, 1, 0.01), 2,
+	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Alpha", "",
+	                                                                            "Select alpha for the segmentation", 0.1, DoubleRange(0, 1, 0.01), 2,
 	                                                                            root);
 	retval->setAddSlider(true);
 	return retval;

@@ -26,17 +26,17 @@ public:
 	virtual bool postProcess();
 
 	// extensions:
-	ssc::DoubleDataAdapterXmlPtr getThresholdOption(QDomElement root);
-	ssc::DoubleDataAdapterXmlPtr getEpsilonOption(QDomElement root);
-	ssc::DoubleDataAdapterXmlPtr getAlphaOption(QDomElement root);
+	DoubleDataAdapterXmlPtr getThresholdOption(QDomElement root);
+	DoubleDataAdapterXmlPtr getEpsilonOption(QDomElement root);
+	DoubleDataAdapterXmlPtr getAlphaOption(QDomElement root);
 
 protected:
 	virtual void createOptions();
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
 private:
-    vtkImageDataPtr convertToVtkImageData(char * data, int size_x, int size_y, int size_z, ssc::ImagePtr input); ///< converts a char array to a vtkImageDataPtr
-    vtkImageDataPtr importRawImageData(void * data, int size_x, int size_y, int size_z, ssc::ImagePtr input, int type); ///< converts a any array to a vtkImageDataPtr
+    vtkImageDataPtr convertToVtkImageData(char * data, int size_x, int size_y, int size_z, ImagePtr input); ///< converts a char array to a vtkImageDataPtr
+    vtkImageDataPtr importRawImageData(void * data, int size_x, int size_y, int size_z, ImagePtr input, int type); ///< converts a any array to a vtkImageDataPtr
 
 
 }; // end LevelSetFilter class
