@@ -25,6 +25,7 @@ SET( MOC_HEADER_FILES
 	logic/cxSmoothingImageFilter.h
 	logic/cxResampleImageFilter.h
 	logic/cxTubeSegmentationFilter.h
+	logic/cxLevelSetFilter.h
 	logic/cxTSFPresets.h
     gui/cxAlgorithmPlugin.h
     gui/cxConnectedThresholdImageFilterWidget.h
@@ -52,6 +53,8 @@ SET( SOURCE_FILES
 	logic/cxDummyFilter.cpp
 	logic/cxTubeSegmentationFilter.h
 	logic/cxTubeSegmentationFilter.cpp
+	logic/cxLevelSetFilter.h
+	logic/cxLevelSetFilter.cpp
 	logic/cxPipeline.h
 	logic/cxPipeline.cpp
 	logic/cxTrackingDataToVolume.h
@@ -114,6 +117,11 @@ message(STATUS "CX_USE_TSF: "${CX_USE_TSF})
 if (CX_USE_TSF)
     set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} ${OPENCL_LIBRARIES} tubeSegmentationLib OCL-Utilities)
 endif(CX_USE_TSF)
+if (CX_USE_LEVEL_SET)
+    set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} ${OPENCL_LIBRARIES} levelSetSegLib OCL-Utilities)
+endif(CX_USE_LEVEL_SET)
+
+
 
 # =========================================================
 # create the target

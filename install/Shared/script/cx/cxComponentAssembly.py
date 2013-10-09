@@ -42,6 +42,8 @@ class LibraryAssembly:
         self.libraries.append(cxComponents.UltrasonixSDK())
         if (platform.system() != 'Windows'):
             self.libraries.append(cxComponents.TubeSegmentationFramework());
+        if (platform.system() != 'Windows'):
+            self.libraries.append(cxComponents.LevelSetSegmentation());
         self.libraries.append(cxComponents.CustusX3())
         self.libraries.append(cxComponents.CustusX3Data())
         
