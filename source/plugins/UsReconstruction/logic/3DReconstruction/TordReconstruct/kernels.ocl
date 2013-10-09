@@ -60,23 +60,77 @@ findClosePlanes(close_plane_t *close_planes,
                 __global float16* const plane_matrices,
                 int n_planes,
                 float4 voxel,
-                float radius)
+                float radius,
+                int* guess)
 {
 	int found = 0;
-	voxel.w = 1;
-	for(int i = 0; i < n_planes; i++)
-	{
-		float dist = plane_dist(voxel, plane_matrices[i]);
+	float prev_dist = 9999999.9f;
+	float smallest_dist = prev_dist;
 
-		if(fabs(dist) < radius && found < MAX_PLANES)
+	int nextguess = *guess;
+	voxel.w = 1;
+	for(int i = *guess; i < n_planes; i++)
+	{
+		float dist = fplane_dist(voxel, plane_matrices[i]);
+		float abs_dist = fabs(dist);
+		if(abs_dist < radius && found < MAX_PLANES)
 		{
+			
 			close_planes[found].voxel = voxel;
 			close_planes[found].dist = dist;
 			close_planes[found].plane_id = i;
 			found++;
-			if(found == MAX_PLANES) return found;
+			if(smallest_dist > abs_dist)
+			{
+				nextguess = i;
+				smallest_dist = abs_dist;
+			}
+			if(found == MAX_PLANES)
+			{
+				*guess = nextguess;
+				return found;
+			}
+		}
+		if(prev_dist < dist && dist > 2*radius && found)
+		{
+			// If we're at the distance 2*radius and moving further away,
+			// and we have already found something, don't keep going
+			break;
 		}
 	}
+
+	// Do the same thing looking downwards
+	prev_dist = 9999999.9f;
+	for(int i = *guess-1; i >= 0; i--)
+	{
+		float dist = plane_dist(voxel, plane_matrices[i]);
+		float abs_dist = fabs(dist);
+		if(fabs(dist) < radius && found < MAX_PLANES)
+		{
+			
+			close_planes[found].voxel = voxel;
+			close_planes[found].dist = dist;
+			close_planes[found].plane_id = i;
+			found++;
+			if(smallest_dist > dist)
+			{
+				nextguess = i;
+				smallest_dist = dist;
+			}
+			if(found == MAX_PLANES)
+			{
+				*guess = nextguess;
+				return found;
+			}
+		}
+		if(prev_dist < dist && dist > 2*radius && found)
+		{
+			// If we're at the distance 2*radius and moving further away,
+			// and we have already found something, don't keep going
+			break;
+		}
+	}
+	*guess = nextguess;
 	return found;
 }
 
@@ -416,7 +470,7 @@ voxel_methods(int volume_xsize,
 	// We find all planes that are inside the voxel radius
 	close_plane_t close_planes[MAX_PLANES];
 	int n_close_planes;
-	
+	int guess = 0;
 	// Iterate over Y axis
 	for(int y = 0; y < volume_ysize; y++)
 	{
@@ -426,9 +480,10 @@ voxel_methods(int volume_xsize,
 		                z * volume_zspacing,
 		                1.0f};
 		
-		
+
 		// Find all planes closer than radius
-		n_close_planes = findClosePlanes(close_planes, plane_matrices, n_planes, voxel, radius);
+		n_close_planes = findClosePlanes(close_planes, plane_matrices, n_planes, voxel, radius,
+		                                 &guess);
 		
 		// Call appropriate method to determine pixel value
 		VOXEL(out_volume,x,y,z) = performInterpolation(close_planes,
