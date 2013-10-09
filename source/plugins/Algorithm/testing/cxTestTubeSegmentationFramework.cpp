@@ -12,7 +12,6 @@
 #include "cxSelectDataStringDataAdapter.h"
 
 #ifdef CX_USE_TSF
-#include "commons.hpp"
 #include "parameters.hpp"
 #include "tsf-config.h"
 #include "SIPL/Exceptions.hpp"
