@@ -25,6 +25,7 @@
 
 
 #include "levelSet.hpp"
+#include "openCLUtilities.hpp"
 
 namespace cx
 {
@@ -255,9 +256,8 @@ vtkImageDataPtr LevelSetFilter::importRawImageData(void * data, int size_x, int 
 ssc::DoubleDataAdapterXmlPtr LevelSetFilter::getThresholdOption(
         QDomElement root) {
 	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Threshold", "",
-	                                                                            "Select threshold for the segmentation", 1, ssc::DoubleRange(0, 100, 1), 0,
-	                                                                            root);
-	retval->setAddSlider(true);
+	                                                                            "Select threshold for the segmentation", 1, ssc::DoubleRange(-5000, 5000, 0.0000001), 0, root);
+	//retval->setAddSlider(true);
 	return retval;
 
 }
@@ -265,9 +265,8 @@ ssc::DoubleDataAdapterXmlPtr LevelSetFilter::getThresholdOption(
 ssc::DoubleDataAdapterXmlPtr LevelSetFilter::getEpsilonOption(
         QDomElement root) {
 	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Epsilon", "",
-	                                                                            "Select epsilon for the segmentation", 1, ssc::DoubleRange(0, 100, 1), 0,
-	                                                                            root);
-	retval->setAddSlider(true);
+	                                                                            "Select epsilon for the segmentation", 1, ssc::DoubleRange(-5000, 5000, 0.0000001), 0, root);
+	//retval->setAddSlider(true);
 	return retval;
 
 }
