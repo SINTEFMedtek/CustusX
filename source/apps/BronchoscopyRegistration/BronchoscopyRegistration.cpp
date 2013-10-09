@@ -70,14 +70,14 @@ return v;
 std::pair<Eigen::MatrixXd , Eigen::MatrixXd> findPositionsWithSmallesAngleDifference(int percentage , Eigen::VectorXd DAngle , Eigen::MatrixXd trackingPositions , Eigen::MatrixXd nearestCTPositions)
 {
 	Eigen::VectorXd DAngleSorted = sortVector(DAngle);
-	int numberOfPositionsIncluded = floor(DAngle.size() * percentage/100);
+	int numberOfPositionsIncluded = floor((double)(DAngle.size() * percentage/100));
 	Eigen::MatrixXd trackingPositionsIncluded(3 , numberOfPositionsIncluded );
 	Eigen::MatrixXd nearestCTPositionsIncluded(3 , numberOfPositionsIncluded );
 	float maxDAngle = DAngleSorted( numberOfPositionsIncluded );
 	int counter = 0;
 			for (int i = 0; i < DAngle.size(); i++)
 			{
-				if (DAngle(i) <= maxDAngle and counter < numberOfPositionsIncluded)
+				if ((DAngle(i) <= maxDAngle) && (counter < numberOfPositionsIncluded))
 				{
 					trackingPositionsIncluded.col(counter) = trackingPositions.col(i);
 					nearestCTPositionsIncluded.col(counter) = nearestCTPositions.col(i);
@@ -257,7 +257,7 @@ void BronchoscopyRegistration::runBronchoscopyRegistration()
 
 	QString CLname = "/Users/ehofstad/Data/Lunge/LungNav - pilot study/Patient 004/Patient_004_segmented_osirix_20111216T141209_seg1_cl1.vtk";
 //	QString CLname = "/Users/ehofstad/Data/Lunge/LungNav - pilot study/Patient 018/Patient018_SegmentedAirways_Mimics_20130506T152436_seg1_cl1.vtk";
-	ssc::MeshPtr mesh = ssc::dataManager()->loadMesh(CLname, CLname, ssc::rtPOLYDATA);
+	MeshPtr mesh = dataManager()->loadMesh(CLname, CLname, rtPOLYDATA);
 
 	vtkPolyDataPtr poly = mesh->getVtkPolyData();
 	vtkPointsPtr points = poly->GetPoints();

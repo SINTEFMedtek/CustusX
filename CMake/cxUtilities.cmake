@@ -12,6 +12,27 @@
 #
 # See CustusX_License.txt for more information.
 
+###############################################################################
+# Make file path absolute if needed. Assuming
+#
+## Input variables:
+#    INPUT_PATH : Path to file.
+#
+## Output variables:
+#    RESULT_PATH : Absolute path to file.
+###############################################################################
+function(cx_make_path_absolute INPUT_PATH RESULT_PATH)
+    if(IS_ABSOLUTE ${INPUT_PATH})
+        set(ABS_SOURCE_FILE
+            ${INPUT_PATH}
+            )
+    else()
+        set(ABS_SOURCE_FILE
+            ${CMAKE_CURRENT_LIST_DIR}/${INPUT_PATH}
+            )
+    endif()
+    set(${RESULT_PATH} ${ABS_SOURCE_FILE} PARENT_SCOPE)
+endfunction()
 
 
 ###############################################################################
@@ -38,7 +59,6 @@ endfunction()
 #
 ###############################################################################
 function( cx_define_option_from_boolean NAME DESCRIPTION)
-	#message(STATUS "testing init value for ${NAME}: " ${BOOLEAN_VALUE})
 	set( BOOLEAN_VALUE False)
 	if( ARGC GREATER 2 )
 		set( BOOLEAN_VALUE ${ARGV2})
@@ -50,7 +70,6 @@ function( cx_define_option_from_boolean NAME DESCRIPTION)
 		option(${NAME} ${DESCRIPTION} OFF)
 	endif()
 endfunction()
-
 
 ###############################################################################
 # Define the following Operating System identifiers both in cmake and cpp:
@@ -101,10 +120,16 @@ endmacro()
 ###############################################################################
 MACRO(cx_get_today RESULT)
     IF(WIN32)
-        EXECUTE_PROCESS(COMMAND "cmd" " /C date /T" OUTPUT_VARIABLE ${RESULT})
+        EXECUTE_PROCESS(
+            COMMAND "cmd" "/C date /T"
+            OUTPUT_VARIABLE ${RESULT}
+            )
 	ELSEIF(UNIX)
 
-        EXECUTE_PROCESS(COMMAND "date" "+%d/%m/%Y" OUTPUT_VARIABLE ${RESULT})
+        EXECUTE_PROCESS(
+            COMMAND "date" "+%d/%m/%Y" 
+            OUTPUT_VARIABLE ${RESULT}
+            )
         string(REGEX REPLACE "(..)/(..)/(....).*" "\\3-\\2-\\1" ${RESULT} ${${RESULT}})
 #        EXECUTE_PROCESS(COMMAND "date" "+%Y-%m-%d" OUTPUT_VARIABLE ${RESULT})
         ELSE(WIN32)
@@ -122,12 +147,21 @@ ENDMACRO()
 ###############################################################################
 MACRO(cx_get_git_build_description RESULT)
 	find_package(Git REQUIRED)
-	exec_program(
-		"git"
-		${PROJECT_SOURCE_DIR}
-		ARGS "describe --tags"
-		OUTPUT_VARIABLE ${RESULT}
-		)
+	IF(WIN32)
+	    execute_process(
+		    COMMAND "C:/Program Files (x86)/Git/bin/git.exe" describe --tags
+		    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		    OUTPUT_VARIABLE ${RESULT}
+		    )
+	ELSEIF(UNIX)	
+		execute_process(
+		    COMMAND git describe --tags
+		    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		    OUTPUT_VARIABLE ${RESULT}
+		    )
+    ENDIF(WIN32)
+	# remove first character - should always be a "v" as first in f.ex. "v3.5.3"
+	string(SUBSTRING ${${RESULT}} 1 -1 ${RESULT})
 ENDMACRO()
 
 ###############################################################################
@@ -150,17 +184,18 @@ ENDMACRO()
 #	${PROJECT_NAME}_VERSION_POSTFIX
 #	${PROJECT_NAME}_VERSION_STRING
 #
-# The same variables are added to the code using add_definitions -D
 ###############################################################################
 MACRO(cx_define_version major minor patch type)
 	set(${PROJECT_NAME}_VERSION_MAJOR  ${major})
 	set(${PROJECT_NAME}_VERSION_MINOR  ${minor})
 	set(${PROJECT_NAME}_VERSION_PATCH  ${patch})
 
+	cx_get_git_build_description(GIT_DESCRIBE)
+
 	if(${type} STREQUAL ALPHA)
-		cx_get_git_build_description(GIT_DESCRIBE)
 		cx_get_today(TODAY_DATE)
-		set(POSTFIX ".alpha.git_${GIT_DESCRIBE}.${TODAY_DATE}")
+		set(GIT_DESCRIBE "${GIT_DESCRIBE}.${TODAY_DATE}")
+		set(POSTFIX ".alpha")
 	elseif(${type} STREQUAL BETA)
 		set(POSTFIX ".beta")
 	elseif(${type} STREQUAL RELEASE)
@@ -168,9 +203,25 @@ MACRO(cx_define_version major minor patch type)
 	else()
 		set(POSTFIX "."${type})
 	endif()
+	
+	#on windows this string contains newlines and whitespaces that needs to be removed
+	STRING(REGEX REPLACE "\r|\n" "" GIT_DESCRIBE ${GIT_DESCRIBE})
+	STRING(REGEX REPLACE " " "" GIT_DESCRIBE ${GIT_DESCRIBE})
 
-	set(${PROJECT_NAME}_VERSION_POSTFIX "${POSTFIX}")
-	set(${PROJECT_NAME}_VERSION_STRING "${major}.${minor}.${patch}${${PROJECT_NAME}_VERSION_POSTFIX}")
+	set(${PROJECT_NAME}_VERSION_POSTFIX ${POSTFIX})
+	set(GENERATED_VERSION_STRING ${major}.${minor}.${patch}${POSTFIX})
+	string(REGEX MATCH ${GENERATED_VERSION_STRING} MATCHING_STRING ${GIT_DESCRIBE})
+	if("${MATCHING_STRING}" STREQUAL "")
+		message("Warning:
+		Version string extracted from git: ${GIT_DESCRIBE}
+		Version string generated: ${GENERATED_VERSION_STRING}
+		The generated string should be contained in the git string.
+		Reverting to generated string, setting dirty tag.")
+		set(${PROJECT_NAME}_VERSION_STRING ${GENERATED_VERSION_STRING}.dirty)
+	else()
+		set(${PROJECT_NAME}_VERSION_STRING ${GIT_DESCRIBE})
+	endif()
+#	set(${PROJECT_NAME}_VERSION_STRING ${major}.${minor}.${patch}${${PROJECT_NAME}_VERSION_POSTFIX})
 
 # no good - leads to full rebuild for every commit. Moved to resource/settings/cxConfig.h
 #	add_definitions(
@@ -181,3 +232,119 @@ MACRO(cx_define_version major minor patch type)
 #	)
 ENDMACRO()
 
+###############################################################################
+#
+###############################################################################
+MACRO(cx_read_version)
+	file(READ ${PROJECT_SOURCE_DIR}/version.ini CX_VERSION_FILE_DATA)
+
+	string(REGEX REPLACE ".*major[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_MAJOR ${CX_VERSION_FILE_DATA})
+	string(REGEX REPLACE ".*minor[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_MINOR ${CX_VERSION_FILE_DATA})
+	string(REGEX REPLACE ".*patch[ ]*=[ ]*([0-9]+).*" "\\1" VERSION_PATCH ${CX_VERSION_FILE_DATA})
+	string(REGEX REPLACE ".*type[ ]*=[ ]*([^$]*).*" "\\1" VERSION_TYPE ${CX_VERSION_FILE_DATA})
+	STRING(REGEX REPLACE "(\r?\n)+$" "" VERSION_TYPE "${VERSION_TYPE}")
+
+	cx_define_version(${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_PATCH} ${VERSION_TYPE})
+	message(STATUS "Version: ${CustusX3_VERSION_STRING}")
+
+ENDMACRO()
+
+
+###############################################################################
+# Print a cmake list to stdout using lots of wrap.
+#
+# Usage: print_list_verbose(LIST_VAR "Header text")
+###############################################################################
+function(cx_print_list_verbose LIST_VAR HEADER_TEXT)
+	message(STATUS "-----------------------------------------")
+	message(STATUS "---- " ${HEADER_TEXT} " ----")
+	message(STATUS "{" )
+	foreach(VAR ${${LIST_VAR}})
+		message(STATUS "    " ${VAR})
+	endforeach()
+	message(STATUS "}" )
+	message(STATUS "-----------------------------------------" )
+endfunction()
+
+###############################################################################
+# private
+###############################################################################
+macro(_cx_query_is_full_filename RESULT CLASS_NAME_WITH_PATH)
+	STRING(REGEX MATCH "(\\.h|\\.cpp|\\.cxx|\\.qrc|\\.hxx|\\.hpp|\\.txx)$" VALID_SUFFIX ${CLASS_NAME_WITH_PATH})
+	if("${VALID_SUFFIX}" STREQUAL "")
+		set(${RESULT} "False")
+	else()
+		set(${RESULT} "True")
+	endif()
+endmacro()
+
+###############################################################################
+# private
+###############################################################################
+function(_cx_add_one_class SOURCE_FILES CLASS_NAME_WITH_PATH)
+	_cx_query_is_full_filename(IS_FULL_FILENAME ${CLASS_NAME_WITH_PATH})
+	if(${IS_FULL_FILENAME} MATCHES "False")
+		set(RESULT_add_one_class ${CLASS_NAME_WITH_PATH}.h ${CLASS_NAME_WITH_PATH}.cpp)
+	else()
+		set(RESULT_add_one_class ${CLASS_NAME_WITH_PATH})
+	endif()
+
+	set(${SOURCE_FILES} ${${SOURCE_FILES}} ${RESULT_add_one_class} PARENT_SCOPE)
+endfunction()
+
+###############################################################################
+# private
+###############################################################################
+function(_cx_add_header_name SOURCE_FILES CLASS_NAME_WITH_PATH)
+	_cx_query_is_full_filename(IS_FULL_FILENAME ${CLASS_NAME_WITH_PATH})
+	if(${IS_FULL_FILENAME} MATCHES "False")
+		set(RESULT_cx_add_header_name ${CLASS_NAME_WITH_PATH}.h)
+	else()
+		set(RESULT_cx_add_header_name ${CLASS_NAME_WITH_PATH})
+	endif()
+
+	set(${SOURCE_FILES} ${${SOURCE_FILES}} ${RESULT_cx_add_header_name} PARENT_SCOPE) # set retval
+endfunction()
+
+###############################################################################
+# Add classes and files to SOURCE_FILES.
+#
+# First argument:  List to populate with generated files.
+# Other arguments: Classes/files to add to list. Classes will expand to a h and cpp file.
+#                  Either input class names or file names, prepended with folder.
+#
+# Usage: add_class(SOURCE_FILES class1 class2 folder/class3 file1.h ...)
+###############################################################################
+function(cx_add_class SOURCE_FILES_ARGUMENT)
+	set(CLASS_NAME_WITH_PATH ${ARGV})
+	list(REMOVE_AT CLASS_NAME_WITH_PATH 0)
+
+	foreach(CLASS_NAME ${CLASS_NAME_WITH_PATH})
+		_cx_add_one_class(RESULT_add_class ${CLASS_NAME})
+	endforeach()
+
+        set(${SOURCE_FILES_ARGUMENT} ${${SOURCE_FILES_ARGUMENT}} ${RESULT_add_class} PARENT_SCOPE)
+endfunction()
+
+###############################################################################
+# Add Qt moc classes and files to SOURCE_FILES.
+#
+# As add_class(), but the class is run through the Qt Moc system as well.
+###############################################################################
+function(cx_add_class_qt_moc SOURCE_FILES_ARGUMENT)
+	set(CLASS_NAME_WITH_PATH ${ARGV})
+	list(REMOVE_AT CLASS_NAME_WITH_PATH 0)
+
+	foreach(CLASS_NAME ${CLASS_NAME_WITH_PATH})
+		_cx_add_one_class(RESULT_add_class_qt_moc ${CLASS_NAME})
+	endforeach()
+
+	foreach(CLASS_NAME ${CLASS_NAME_WITH_PATH})
+		_cx_add_header_name(HEADER_NAMES ${CLASS_NAME})
+	endforeach()
+	
+	# optimized: QT4_WRAP_CPP has large overhead: call once.
+	QT4_WRAP_CPP( RESULT_add_class_qt_moc ${HEADER_NAMES} )
+
+    set(${SOURCE_FILES_ARGUMENT} ${${SOURCE_FILES_ARGUMENT}} ${RESULT_add_class_qt_moc} PARENT_SCOPE)
+endfunction()

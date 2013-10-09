@@ -56,8 +56,8 @@ typedef boost::shared_ptr<class ImageReceiverThread> ImageReceiverThreadPtr;
  *
  * Subclass to implement for a specific protocol.
  * Supported messages:
- *  - ssc::Image : contains vtkImageData, timestamp, uid, all else is discarded.
- *  - ssc::ProbeData : contains sector and image definition, temporal cal is discarded.
+ *  - Image : contains vtkImageData, timestamp, uid, all else is discarded.
+ *  - ProbeData : contains sector and image definition, temporal cal is discarded.
  *
  * \ingroup cxServiceVideo
  * \date Oct 11, 2012
@@ -69,8 +69,8 @@ Q_OBJECT
 public:
 	ImageReceiverThread(QObject* parent = NULL);
 	virtual ~ImageReceiverThread() {}
-	virtual ssc::ImagePtr getLastImageMessage(); // threadsafe, Threadsafe retrieval of last image message.
-	virtual ssc::ProbeDataPtr getLastSonixStatusMessage(); // threadsafe,Threadsafe retrieval of last status message.
+	virtual ImagePtr getLastImageMessage(); // threadsafe, Threadsafe retrieval of last image message.
+	virtual ProbeDataPtr getLastSonixStatusMessage(); // threadsafe,Threadsafe retrieval of last status message.
 	virtual QString hostDescription() const = 0; // threadsafe
 
 signals:
@@ -88,19 +88,19 @@ protected:
 	 * not synched, e.g. the Ultrasonix scanner
 	 * \param[in] imgMsg Incoming image message
 	 */
-	void addImageToQueue(ssc::ImagePtr imgMsg);
-	void addSonixStatusToQueue(ssc::ProbeDataPtr msg); ///< add the message to a thread-safe queue
-	void calibrateTimeStamp(ssc::ImagePtr imgMsg); ///< Calibrate the time stamps of the incoming message based on the computer clock. Calibration is based on an average of several of the last messages. The calibration is updated every 20-30 sec.
+	void addImageToQueue(ImagePtr imgMsg);
+	void addSonixStatusToQueue(ProbeDataPtr msg); ///< add the message to a thread-safe queue
+	void calibrateTimeStamp(ImagePtr imgMsg); ///< Calibrate the time stamps of the incoming message based on the computer clock. Calibration is based on an average of several of the last messages. The calibration is updated every 20-30 sec.
 
 private:
 	void reportFPS();
-	bool imageComesFromActiveVideoSource(ssc::ImagePtr imgMsg);
-	bool imageComesFromSonix(ssc::ImagePtr imgMsg);
+	bool imageComesFromActiveVideoSource(ImagePtr imgMsg);
+	bool imageComesFromSonix(ImagePtr imgMsg);
 
 	QMutex mImageMutex;
 	QMutex mSonixStatusMutex;
-	std::list<ssc::ImagePtr> mMutexedImageMessageQueue;
-	std::list<ssc::ProbeDataPtr> mMutexedSonixStatusMessageQueue;
+	std::list<ImagePtr> mMutexedImageMessageQueue;
+	std::list<ProbeDataPtr> mMutexedSonixStatusMessageQueue;
 
 	double mLastReferenceTimestampDiff;
 	bool mGeneratingTimeCalibration;

@@ -41,10 +41,10 @@ class ViewWrapperVideo: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapperVideo(ssc::ViewWidget* view);
+	ViewWrapperVideo(ViewWidget* view);
 	virtual ~ViewWrapperVideo();
-	virtual ssc::ViewWidget* getView();
-	virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy) {}
+	virtual ViewWidget* getView();
+	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) {}
 	virtual void updateView() {}
 	virtual void setViewGroup(ViewGroupDataPtr group);
 
@@ -55,24 +55,24 @@ private slots:
 	void streamActionSlot();
 
 protected:
-	virtual void dataAdded(ssc::DataPtr data) {}
+	virtual void dataAdded(DataPtr data) {}
 	virtual void dataRemoved(const QString& uid) {}
 	virtual void videoSourceChangedSlot(QString uid);
 
 private:
-	ssc::VideoSourcePtr getSourceFromService(QString uid);
+	VideoSourcePtr getSourceFromService(QString uid);
 	void addStreamAction(QString uid, QMenu* contextMenu);
 	void loadStream();
 	virtual void appendToContextMenu(QMenu& contextMenu);
 	void addReps();
-	void setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool);
+	void setupRep(VideoSourcePtr source, ToolPtr tool);
 
-	ssc::VideoFixedPlaneRepPtr mStreamRep;
-	ssc::VideoSourcePtr mSource;
-	ssc::DisplayTextRepPtr mPlaneTypeText;
-	ssc::DisplayTextRepPtr mDataNameText;
-	QPointer<ssc::ViewWidget> mView;
-	ssc::ToolPtr mTool;
+	VideoFixedPlaneRepPtr mStreamRep;
+	VideoSourcePtr mSource;
+	DisplayTextRepPtr mPlaneTypeText;
+	DisplayTextRepPtr mDataNameText;
+	QPointer<ViewWidget> mView;
+	ToolPtr mTool;
 };
 typedef boost::shared_ptr<ViewWrapperVideo> ViewWrapperVideoPtr;
 

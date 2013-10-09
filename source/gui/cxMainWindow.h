@@ -11,7 +11,7 @@ class QAction;
 class QMenu;
 class QActionGroup;
 
-namespace ssc
+namespace cx
 {
 class ConsoleWidget;
 }

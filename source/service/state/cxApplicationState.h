@@ -53,7 +53,7 @@ public:
 	virtual QString getName() const;
 	std::vector<ApplicationState*> getChildStates();
 	QAction* createAction(QActionGroup* group);
-	virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const = 0;
+	virtual CLINICAL_APPLICATION getClinicalApplication() const = 0;
 protected slots:
 	void setActionSlot();
 protected:
@@ -74,7 +74,7 @@ public:
 	virtual void onEntry(QEvent * event) {}
 	virtual void onExit(QEvent * event) {}
 	virtual ~ParentApplicationState() {}
-	virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdCOUNT; }
+	virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdCOUNT; }
 };
 
 class LaboratoryApplicationState: public ApplicationState
@@ -82,10 +82,10 @@ class LaboratoryApplicationState: public ApplicationState
 Q_OBJECT
 public:
 	LaboratoryApplicationState(QState* parent) :
-					ApplicationState(parent, enum2string(ssc::mdLABORATORY), enum2string(ssc::mdLABORATORY))
+					ApplicationState(parent, enum2string(mdLABORATORY), enum2string(mdLABORATORY))
 	{}
 	virtual ~LaboratoryApplicationState() {}
-	virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdLABORATORY; }
+	virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdLABORATORY; }
 };
 
 class BronchoscopyApplicationState: public ApplicationState
@@ -93,10 +93,10 @@ class BronchoscopyApplicationState: public ApplicationState
 Q_OBJECT
 public:
 	BronchoscopyApplicationState(QState* parent) :
-					ApplicationState(parent, enum2string(ssc::mdBRONCHOSCOPY), enum2string(ssc::mdBRONCHOSCOPY))
+					ApplicationState(parent, enum2string(mdBRONCHOSCOPY), enum2string(mdBRONCHOSCOPY))
 	{}
 	virtual ~BronchoscopyApplicationState() {}
-	virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdBRONCHOSCOPY; }
+	virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdBRONCHOSCOPY; }
 };
 
 class NeurologyApplicationState: public ApplicationState
@@ -104,10 +104,10 @@ class NeurologyApplicationState: public ApplicationState
 Q_OBJECT
 public:
 	NeurologyApplicationState(QState* parent) :
-					ApplicationState(parent, enum2string(ssc::mdNEUROLOGY), enum2string(ssc::mdNEUROLOGY))
+					ApplicationState(parent, enum2string(mdNEUROLOGY), enum2string(mdNEUROLOGY))
 	{}
 	virtual ~NeurologyApplicationState() {}
-	virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdNEUROLOGY; }
+	virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdNEUROLOGY; }
 };
 
 class LaparoscopyApplicationState: public ApplicationState
@@ -115,10 +115,10 @@ class LaparoscopyApplicationState: public ApplicationState
 Q_OBJECT
 public:
 	LaparoscopyApplicationState(QState* parent) :
-					ApplicationState(parent, enum2string(ssc::mdLAPAROSCOPY), enum2string(ssc::mdLAPAROSCOPY))
+					ApplicationState(parent, enum2string(mdLAPAROSCOPY), enum2string(mdLAPAROSCOPY))
 	{}
 	virtual ~LaparoscopyApplicationState() {}
-	virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdLAPAROSCOPY; }
+	virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdLAPAROSCOPY; }
 };
 
 class EndovascularApplicationState: public ApplicationState
@@ -126,10 +126,10 @@ class EndovascularApplicationState: public ApplicationState
 Q_OBJECT
 public:
 	EndovascularApplicationState(QState* parent) :
-					ApplicationState(parent, enum2string(ssc::mdENDOVASCULAR), enum2string(ssc::mdENDOVASCULAR))
+					ApplicationState(parent, enum2string(mdENDOVASCULAR), enum2string(mdENDOVASCULAR))
 	{}
 	virtual ~EndovascularApplicationState() {}
-	virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdENDOVASCULAR; }
+	virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdENDOVASCULAR; }
 };
 
 /**

@@ -32,7 +32,7 @@
 #include "sscDoubleDataAdapterXml.h"
 #include "sscBoolDataAdapterXml.h"
 
-namespace ssc
+namespace cx
 {
 
 /**

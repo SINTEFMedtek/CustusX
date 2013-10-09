@@ -16,6 +16,8 @@ import os.path
 import getpass
 import platform
 import shutil
+import re
+import glob
     
 class Shell (object):
     '''
@@ -46,11 +48,12 @@ class Shell (object):
     def setRedirectOutput(self, value):
         self.REDIRECT_OUTPUT = value
 
-    def run(self, cmd, ignoreFailure=False):
+    def run(self, cmd, ignoreFailure=False, convertToString=True):
         '''
         Run a shell script
         '''
-        cmd = self._convertToString(cmd)
+        if(convertToString):
+            cmd = self._convertToString(cmd)
         self._printCommand(cmd)
         if self.DUMMY is False:
             return self._runReal(cmd, ignoreFailure)
@@ -73,6 +76,40 @@ class Shell (object):
             os.makedirs(path)
         self.CWD = path
         self._printCommand('cd %s' % path)
+    
+    def head(self, file, n):
+        '''
+        Function that mimics the unix command head -nX.
+        '''
+        open_file = open(file, 'r')
+        lines = open_file.readlines()
+        line = lines[n-1].rstrip()
+        #print 'Line: %s' % line
+        return line
+    
+    def cp(self, src, dst):
+        '''
+        Function that mimics the unix command cp src dst.
+        '''
+        shutil.copy(src, dst)
+        
+    def rm_r(self, path, pattern=""):
+        '''
+        This function mimics rm -rf (unix) for
+        Linux, Mac and Windows. Will work with
+        Unix style pathname pattern expansion. Not regex.
+        '''
+        path = self._convertToString(path)
+        if os.path.isdir(path):
+            dir = path
+            if(pattern == ""):
+                shutil.rmtree(dir)
+            else:
+                matching_files = glob.glob("%s/%s" % (path, pattern))
+                for f in matching_files:
+                    self.rm_r(f)
+        elif os.path.exists(path):
+            os.remove(path)
     
     def removeTree(self, path):
         self._printInfo("Removing folder and contents of %s." % path)
@@ -115,8 +152,9 @@ class Shell (object):
 
     def _checkTerminate(self, process):
         if process.returncode!=0 and self.TERMINATE_ON_ERROR:
-            self._printInfo("Terminating: shell command exited with a nonzero return value [%s]" % process.returncode)
-            quit()
+            test = "Terminating: shell command exited with a nonzero return value [%s]" % process.returncode
+            self._printInfo(test)
+            exit(test)
                
     def _evaluateReal(self, cmd):
         '''

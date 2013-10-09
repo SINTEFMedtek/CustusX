@@ -30,7 +30,7 @@
 #include "sscImage.h"
 #include "sscDoubleDataAdapterXml.h"
 
-namespace ssc
+namespace cx
 {
 PNNReconstructAlgorithm::PNNReconstructAlgorithm()
 {
@@ -47,11 +47,11 @@ DoubleDataAdapterXmlPtr PNNReconstructAlgorithm::getInterpolationStepsOption(QDo
 {
 	DoubleDataAdapterXmlPtr retval;
 	retval = DoubleDataAdapterXml::initialize("interpolationSteps", "Distance (voxels)",
-		"Interpolation steps in voxels", 3, ssc::DoubleRange(1, 10, 1), 0, root);
+		"Interpolation steps in voxels", 3, DoubleRange(1, 10, 1), 0, root);
 	return retval;
 }
 
-void optimizedCoordTransform(ssc::Vector3D* p, boost::array<double, 16> tt)
+void optimizedCoordTransform(Vector3D* p, boost::array<double, 16> tt)
 {
 	double* t = tt.begin();
 	double x = (*p)[0];
@@ -79,7 +79,7 @@ bool PNNReconstructAlgorithm::reconstruct(ProcessedUSInputDataPtr input,
 	Eigen::Array3i inputDims = input->getDimensions();
 
 	Eigen::Array3i targetDims(target->GetDimensions());
-	ssc::Vector3D targetSpacing(target->GetSpacing());
+	Vector3D targetSpacing(target->GetSpacing());
 
 	//Create temporary volume
 	vtkImageDataPtr tempOutput = generateVtkImageData(targetDims, targetSpacing, 0);
@@ -92,14 +92,14 @@ bool PNNReconstructAlgorithm::reconstruct(ProcessedUSInputDataPtr input,
 		messageManager()->sendWarning("inputDims[2] != frameInfo.size()" + qstring_cast(inputDims[2]) + " != "
 			+ qstring_cast(frameInfo.size()));
 
-	ssc::Vector3D inputSpacing(input->getSpacing());
-	ssc::Vector3D outputSpacing(tempOutput->GetSpacing());
+	Vector3D inputSpacing(input->getSpacing());
+	Vector3D outputSpacing(tempOutput->GetSpacing());
 
 	//Get raw data pointers
 	//unsigned char *inputPointer = static_cast<unsigned char*>( input->GetScalarPointer() );
 	unsigned char *outputPointer = static_cast<unsigned char*> (tempOutput->GetScalarPointer());
 	//unsigned char *outputPointer = static_cast<unsigned char*>(target->GetScalarPointer());
-	unsigned char* maskPointer = static_cast<unsigned char*> (input->getMask()->getBaseVtkImageData()->GetScalarPointer());
+	unsigned char* maskPointer = static_cast<unsigned char*> (input->getMask()->GetScalarPointer());
 
 	// Traverse all input pixels
 	for (int record = 0; record < inputDims[2]; record++)
@@ -114,11 +114,11 @@ bool PNNReconstructAlgorithm::reconstruct(ProcessedUSInputDataPtr input,
 			{
 				if (!validPixel(beam, sample, inputDims, maskPointer))
 					continue;
-				ssc::Vector3D inputPoint(beam * inputSpacing[0], sample * inputSpacing[1], 0.0);
-				//ssc::Vector3D outputPoint = frameInfo[record].mPos.coord(inputPoint);
-				ssc::Vector3D outputPoint = inputPoint;
+				Vector3D inputPoint(beam * inputSpacing[0], sample * inputSpacing[1], 0.0);
+				//Vector3D outputPoint = frameInfo[record].mPos.coord(inputPoint);
+				Vector3D outputPoint = inputPoint;
 				optimizedCoordTransform(&outputPoint, recordTransform);
-				//ssc::Vector3D outputVoxel;
+				//Vector3D outputVoxel;
 				int outputVoxelX = static_cast<int> ((outputPoint[0] / outputSpacing[0]) + 0.5);
 				int outputVoxelY = static_cast<int> ((outputPoint[1] / outputSpacing[1]) + 0.5);
 				int outputVoxelZ = static_cast<int> ((outputPoint[2] / outputSpacing[2]) + 0.5);
@@ -223,7 +223,7 @@ vtkImageDataPtr PNNReconstructAlgorithm::createMask(vtkImageDataPtr inputData)
 {
 //	QTime startTime = QTime::currentTime();
 	Eigen::Array3i dim(inputData->GetDimensions());
-	ssc::Vector3D spacing(inputData->GetSpacing());
+	Vector3D spacing(inputData->GetSpacing());
 	vtkImageDataPtr mask = generateVtkImageData(dim, spacing, 0);
 	unsigned char *inputPtr = static_cast<unsigned char*> (inputData->GetScalarPointer());
 	unsigned char *maskPtr = static_cast<unsigned char*> (mask->GetScalarPointer());
@@ -253,7 +253,7 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, vtkImageDataPtr ou
 	Eigen::Array3i outputDims(output->GetDimensions());
 
 	Eigen::Array3i inputDims(input->GetDimensions());
-	//ssc::Vector3D outputDims(output->GetDimensions());
+	//Vector3D outputDims(output->GetDimensions());
 
 
 	unsigned char *inputPointer = static_cast<unsigned char*> (input->GetScalarPointer());
@@ -265,7 +265,7 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, vtkImageDataPtr ou
 			+ qstring_cast(outputDims[1]) + " " + qstring_cast(outputDims[2]) + " input: " + qstring_cast(inputDims[0])
 			+ " " + qstring_cast(inputDims[1]) + " " + qstring_cast(inputDims[2]));
 
-	//ssc::Vector3D spacing(output->GetSpacing());
+	//Vector3D spacing(output->GetSpacing());
 	// Assume output spacing is equal in all directions
 	//int interpolationSteps = static_cast<int>((mInterpolationDistanceOption->getValue() / spacing[0]) + 0.5);
 //	DoubleDataAdapterXmlPtr interpolationStepsOption = this->getInterpolationStepsOption(settings);
@@ -311,7 +311,7 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, vtkImageDataPtr ou
 	int valid = 100*double(ignored)/double(total);
 	int outside = 100*double(removed)/double(total);
 	int holes = 100*double(total-ignored-removed)/double(total);
-	ssc::messageManager()->sendDebug(
+	messageManager()->sendDebug(
 				QString("PNN: Size: %1Mb, Valid voxels: %2\%, Outside mask: %3\%  Filled holes [steps=%4, %5s]: %6\%")
 				.arg(total/1024/1024)
 				.arg(valid)

@@ -50,10 +50,10 @@ namespace cx
 */
 
 /**
- * \brief A graph combining Space dependencies between all ssc::Data.
+ * \brief A graph combining Space dependencies between all Data.
  * \ingroup cxServicePatient
  *
- * Relations between coordinate spaces among ssc::Data are created by
+ * Relations between coordinate spaces among Data are created by
  * this class.
  *
  * The graph consists of several directed acyclic graphs.
@@ -70,13 +70,13 @@ public:
 
 	QDomNode getOldestAncestorNotCommonToRef(QDomNode child, QDomNode ref);
 	std::vector<QDomNode> getDescendantsAndSelf(QDomNode node);
-	std::vector<ssc::DataPtr> getDataFromDescendantsAndSelf(QDomNode node);
+	std::vector<DataPtr> getDataFromDescendantsAndSelf(QDomNode node);
 	QDomDocument getDocument();
 private:
 	bool isRootNode(QDomNode node);
 	QDomNode getNodeAnyway(QString frame);
 	bool isAncestorOf(QDomNode node, QDomNode ancestor);
-	void insertFrame(ssc::DataPtr data);
+	void insertFrame(DataPtr data);
 	QDomDocument mDocument;
 };
 

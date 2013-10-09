@@ -7,8 +7,6 @@
 #include "cxDataLocations.h"
 #include "cxSettings.h"
 //#include "cxForwardDeclarations.h"
-#include "cxView3D.h"
-#include "cxView2D.h"
 
 namespace cxtest
 {
@@ -32,7 +30,7 @@ void TestRenderSpeed::testSingleView()
 	this->create3Dviews(1);
 	this->showViews();
 	this->renderNumTimes(100);
-	this->printResult();
+//	this->printResult();
 //	CPPUNIT_ASSERT(this->getTotalRenderTimeInMs() < 2000);
 }
 
@@ -42,7 +40,7 @@ void TestRenderSpeed::testSeveralViews()
 	this->create2Dviews(8);
 	this->showViews();
 	this->renderNumTimes(100);
-	this->printResult();
+//	this->printResult();
 //	CPPUNIT_ASSERT(this->getTotalRenderTimeInMs() < 5000);
 }
 
@@ -52,7 +50,7 @@ void TestRenderSpeed::testLotsOfViews()
 	this->create2Dviews(80);
 	this->showViews();
 	this->renderNumTimes(10);
-	this->printResult();
+//	this->printResult();
 //	CPPUNIT_ASSERT(this->getTotalRenderTimeInMs() < 5000);
 }
 
@@ -60,14 +58,14 @@ void TestRenderSpeed::testVtkRenderWindow()
 {
 	createVtkRenderWindows(1);
 	this->renderNumTimes(100);
-	this->printResult();
+//	this->printResult();
 }
 
 void TestRenderSpeed::testSeveralVtkRenderWindows()
 {
 	createVtkRenderWindows(10);
 	this->renderNumTimes(100);
-	this->printResult();
+//	this->printResult();
 }
 
 void TestRenderSpeed::createVtkRenderWindows(int num)
@@ -86,7 +84,7 @@ void TestRenderSpeed::create3Dviews(int num)
 	mNumViews += num;
 	for(int i = 0; i < num; ++i)
 	{
-		cx::View3D* view = new cx::View3D("testView3D", "testView3D", NULL);
+		cx::ViewWidget* view = new cx::ViewWidget("testView3D", "testView3D", NULL);
 		mViews.push_back(view);
 	}
 }
@@ -96,7 +94,7 @@ void TestRenderSpeed::create2Dviews(int num)
 	mNumViews += num;
 	for(int i = 0; i < num; ++i)
 	{
-		cx::View2D* view = new cx::View2D("testView2D", "testView2D", NULL);
+		cx::ViewWidget* view = new cx::ViewWidget("testView2D", "testView2D", NULL);
 		mViews.push_back(view);
 	}
 }
@@ -117,7 +115,7 @@ void TestRenderSpeed::renderNumTimes(int num)
 	mNumRenderings = num;
 	QTime clock;
 	clock.start();
-	std::vector<ssc::ViewWidget*>::iterator iter;
+	std::vector<cx::ViewWidget*>::iterator iter;
 	for(int i = 0; i < mNumRenderings; ++i)
 		for(int v = 0; v < this->getNumViews(); v++)
 			this->renderViewNum(v);
@@ -146,14 +144,14 @@ void TestRenderSpeed::printResult()
 
 void TestRenderSpeed::addViewsToLayout(QLayout* layout)
 {
-	std::vector<ssc::ViewWidget*>::iterator iter;
+	std::vector<cx::ViewWidget*>::iterator iter;
 	for (iter = mViews.begin(); iter != mViews.end(); ++iter)
 		layout->addWidget(*iter);
 }
 
 void TestRenderSpeed::addViewsToGridLayout(QGridLayout* layout)
 {
-	int squareNumViews = sqrt(this->getNumViews());
+	int squareNumViews = sqrt((double)this->getNumViews());
 	for (int i = 0; i < this->getNumViews(); i++)
 		layout->addWidget(mViews[i], i / squareNumViews, i % squareNumViews);
 }

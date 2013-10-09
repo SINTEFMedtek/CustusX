@@ -22,7 +22,7 @@ ConnectedThresholdImageFilter::~ConnectedThresholdImageFilter()
 {
 }
 
-void ConnectedThresholdImageFilter::setInput(ssc::ImagePtr image, QString outputBasePath, float lowerThreshold, float upperThreshold, int replaceValue, itkImageType::IndexType seed)
+void ConnectedThresholdImageFilter::setInput(ImagePtr image, QString outputBasePath, float lowerThreshold, float upperThreshold, int replaceValue, itkImageType::IndexType seed)
 {
 	mInput = image;
 	mOutputBasePath = outputBasePath;
@@ -35,7 +35,7 @@ void ConnectedThresholdImageFilter::setInput(ssc::ImagePtr image, QString output
 	this->generate();
 }
 
-ssc::ImagePtr ConnectedThresholdImageFilter::getOutput()
+ImagePtr ConnectedThresholdImageFilter::getOutput()
 {
 	return mOutput;
 }
@@ -49,23 +49,23 @@ void ConnectedThresholdImageFilter::postProcessingSlot()
 	QString uid = mInput->getUid() + "_seg%1";
 	QString name = mInput->getName()+" seg%1";
 
-	//create a ssc::Image
-	mOutput = ssc::dataManager()->createDerivedImage(rawResult,uid, name, mInput);
+	//create a Image
+	mOutput = dataManager()->createDerivedImage(rawResult,uid, name, mInput);
 	if(!mOutput)
 	{
-		ssc::messageManager()->sendError("Segmentation failed.");
+		messageManager()->sendError("Segmentation failed.");
 		return;
 	}
 	mOutput->resetTransferFunctions();
 
 	//load the image into CustusX for visualization
-	ssc::dataManager()->loadData(mOutput);
+	dataManager()->loadData(mOutput);
 
 	//save the data to file
-	ssc::dataManager()->saveImage(mOutput, mOutputBasePath);
+	dataManager()->saveImage(mOutput, mOutputBasePath);
 
 	//let the user know you are finished
-	ssc::messageManager()->sendSuccess("Done segmenting: \"" + mOutput->getName()+"\"");
+	messageManager()->sendSuccess("Done segmenting: \"" + mOutput->getName()+"\"");
 
 	//let the system know you're finished
 	//  emit finished();
@@ -124,8 +124,8 @@ vtkImageDataPtr ConnectedThresholdImageFilter::calculate()
 	}
 	catch( itk::ExceptionObject & excep )
 	{
-		ssc::messageManager()->sendError("Error when setting seed for Connected Threshold Image Filter:");
-		ssc::messageManager()->sendError(qstring_cast(excep.GetDescription()));
+		messageManager()->sendError("Error when setting seed for Connected Threshold Image Filter:");
+		messageManager()->sendError(qstring_cast(excep.GetDescription()));
 	}
 
 	itkImage = thresholdFilter->GetOutput();

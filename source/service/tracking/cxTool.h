@@ -26,7 +26,7 @@
 
 class QStringList;
 
-namespace ssc
+namespace cx
 {
 }
 
@@ -39,7 +39,7 @@ namespace cx
 {
 typedef std::vector<double> DoubleVector;
 typedef boost::shared_ptr<DoubleVector> DoubleVectorPtr;
-typedef std::vector<ssc::Transform3DPtr> Transform3DVector;
+typedef std::vector<Transform3DPtr> Transform3DVector;
 typedef boost::shared_ptr<Transform3DVector> Transform3DVectorPtr;
 typedef boost::shared_ptr<class IgstkTool> IgstkToolPtr;
 
@@ -49,7 +49,7 @@ typedef boost::shared_ptr<class IgstkTool> IgstkToolPtr;
  * @{
  */
 
-typedef boost::shared_ptr<class Probe> ProbePtr;
+typedef boost::shared_ptr<class cxProbe> cxProbePtr;
 
 /**
  * \brief Class representing the tools a navigation system can recognize.
@@ -58,7 +58,7 @@ typedef boost::shared_ptr<class Probe> ProbePtr;
  * \date Nov 6, 2008
  * \author Janne Beate Bakeng, SINTEF
  */
-class Tool: public ssc::Tool
+class cxTool: public Tool
 {
 	Q_OBJECT
 
@@ -77,44 +77,44 @@ public:
 	 TOOL_AURORA_CHANNEL_NUMBER        ///< hardware responds to Aurora channel number
 	 */
 
-	Tool(IgstkToolPtr igstkTool);
-	virtual ~Tool();
+	cxTool(IgstkToolPtr igstkTool);
+	virtual ~cxTool();
 
 	virtual std::set<Type> getTypes() const;
 
 	virtual QString getGraphicsFileName() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
-	virtual ssc::TimedTransformMapPtr getPositionHistory();
-	virtual ssc::Transform3D get_prMt() const;
+	virtual TimedTransformMapPtr getPositionHistory();
+	virtual Transform3D get_prMt() const;
 	virtual bool getVisible() const;
 	virtual bool isInitialized() const;
 	virtual QString getUid() const;
 	virtual QString getName() const;
 	virtual int getIndex() const { return 0; }
-	virtual ssc::ProbeData getProbeSector() const;
-	virtual ssc::ProbePtr getProbe() const;
+	virtual ProbeData getProbeSector() const;
+	virtual ProbePtr getProbe() const;
 	virtual double getTimestamp() const { return 0; } //	TODO
 	virtual double getTooltipOffset() const; ///< get a virtual offset extending from the tool tip.
 	virtual void setTooltipOffset(double val); ///< set a virtual offset extending from the tool tip.
 
 	virtual bool isCalibrated() const; ///< true if calibration is different from identity
-	virtual ssc::Transform3D getCalibration_sMt() const; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
-	virtual void setCalibration_sMt(ssc::Transform3D calibration); ///< requests to use the calibration and replaces the tools calibration file
+	virtual Transform3D getCalibration_sMt() const; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
+	virtual void setCalibration_sMt(Transform3D calibration); ///< requests to use the calibration and replaces the tools calibration file
 	QString getCalibrationFileName() const; ///< returns the path to the tools calibration file
 
-	ssc::TRACKING_SYSTEM getTrackerType(); ///< the type of tracker this tool belongs to
+	TRACKING_SYSTEM getTrackerType(); ///< the type of tracker this tool belongs to
 
-	virtual std::map<int, ssc::Vector3D> getReferencePoints() const; ///< Get the optional reference points from this tool
+	virtual std::map<int, Vector3D> getReferencePoints() const; ///< Get the optional reference points from this tool
 	virtual bool hasReferencePointWithId(int id);
 
-	virtual ssc::TimedTransformMap getSessionHistory(double startTime, double stopTime); ///< Get a tools transforms from within a given session
+	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime); ///< Get a tools transforms from within a given session
 
 	bool isValid() const; ///< whether this tool is constructed correctly or not
 
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode& dataNode);
 
-	typedef ssc::Transform3D Transform3D;signals:
+signals:
 	void attachedToTracker(bool);
 
 private slots:
@@ -123,7 +123,7 @@ private slots:
 	void toolVisibleSlot(bool);
 
 private:
-	Tool() {}  ///< do not use this constructor
+	cxTool() {}  ///< do not use this constructor
 
 	void createPolyData(); ///< creates the polydata either from file or a vtkConeSource
 
@@ -131,9 +131,9 @@ private:
 
 	IgstkToolPtr mTool;
 
-	ssc::TimedTransformMapPtr mPositionHistory;
+	TimedTransformMapPtr mPositionHistory;
 	vtkPolyDataPtr mPolyData; ///< the polydata used to represent the tool graphically
-	ssc::Transform3DPtr m_prMt; ///< the transform from the tool to the patient reference
+	Transform3DPtr m_prMt; ///< the transform from the tool to the patient reference
 
 	bool mValid; ///< whether this tool is constructed correctly or not
 	bool mConfigured; ///< whether or not the tool is properly configured
@@ -144,7 +144,7 @@ private:
 	QTimer mTpsTimer;
 
 };
-typedef boost::shared_ptr<Tool> ToolPtr;
+typedef boost::shared_ptr<cxTool> cxToolPtr;
 
 /**
  * @}

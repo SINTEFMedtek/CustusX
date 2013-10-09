@@ -23,9 +23,9 @@
 #include "cxDataLocations.h"
 #include "cxMHDImageStreamer.h"
 #include "cxSimulatedImageStreamer.h"
-#include "cxToolManager.h"
+#include "sscDummyToolManager.h"
 #include "cxtestSender.h"
-#include "cxtestSignalListener.h"
+#include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
 
 namespace cxtest
@@ -46,10 +46,9 @@ cx::DummyImageStreamerPtr createRunningDummyImageStreamer(TestSenderPtr& sender,
 
 cx::SimulatedImageStreamerPtr createRunningSimulatedImageStreamer(TestSenderPtr& sender)
 {
-	cx::ToolManager::initializeObject();
-	ssc::ImagePtr image = cxtest::Utilities::create3DImage();
+	cx::ImagePtr image = cxtest::Utilities::create3DImage();
 	REQUIRE(image);
-	ssc::DummyToolPtr tool = ssc::DummyToolTestUtilities::createDummyTool(ssc::DummyToolTestUtilities::createProbeDataLinear(), cx::ToolManager::getInstance());
+	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear(), cx::DummyToolManager::getInstance());
 	REQUIRE(tool);
 	cx::SimulatedImageStreamerPtr imagestreamer(new cx::SimulatedImageStreamer());
 	REQUIRE(imagestreamer);
@@ -63,7 +62,7 @@ void checkSenderGotImageFromStreamer(TestSenderPtr sender)
 {
 	cx::PackagePtr package = sender->getSentPackage();
 	REQUIRE(package);
-	ssc::ImagePtr image = package->mImage;
+	cx::ImagePtr image = package->mImage;
 	REQUIRE(image);
 }
 
@@ -74,10 +73,10 @@ TEST_CASE("DummyImageStreamer: File should be read and sent only once", "[stream
 	bool sendTwoStreams = false;
 	cx::ImageStreamerPtr imagestreamer = createRunningDummyImageStreamer(sender, sendTwoStreams, sendImageOnce);
 
-	REQUIRE(waitForSignal(sender.get(), SIGNAL(newPackage())));
+	REQUIRE(waitForQueuedSignal(sender.get(), SIGNAL(newPackage())));
 	checkSenderGotImageFromStreamer(sender);
 
-	REQUIRE_FALSE(waitForSignal(sender.get(), SIGNAL(newPackage())));
+	REQUIRE_FALSE(waitForQueuedSignal(sender.get(), SIGNAL(newPackage())));
 
 	imagestreamer->stopStreaming();
 }
@@ -88,10 +87,10 @@ TEST_CASE("DummyImageStreamer: File should be read and send slices with a given 
 	bool sendTwoStreams = false;
 	cx::ImageStreamerPtr imagestreamer = createRunningDummyImageStreamer(sender,sendTwoStreams);
 
-	REQUIRE(waitForSignal(sender.get(), SIGNAL(newPackage())));
+	REQUIRE(waitForQueuedSignal(sender.get(), SIGNAL(newPackage())));
 	checkSenderGotImageFromStreamer(sender);
 
-	REQUIRE(waitForSignal(sender.get(), SIGNAL(newPackage())));
+	REQUIRE(waitForQueuedSignal(sender.get(), SIGNAL(newPackage())));
 	checkSenderGotImageFromStreamer(sender);
 
 	imagestreamer->stopStreaming();
@@ -104,13 +103,14 @@ TEST_CASE("SimulatedImageStreamer: Should stream 2D images from a volume given a
 
 	cx::SimulatedImageStreamerPtr imagestreamer = createRunningSimulatedImageStreamer(sender);
 
-	REQUIRE(waitForSignal(sender.get(), SIGNAL(newPackage()), 200));
+	REQUIRE(waitForQueuedSignal(sender.get(), SIGNAL(newPackage()), 200));
 	checkSenderGotImageFromStreamer(sender);
 
-	REQUIRE(waitForSignal(sender.get(), SIGNAL(newPackage()), 200));
+	REQUIRE(waitForQueuedSignal(sender.get(), SIGNAL(newPackage()), 200));
 	checkSenderGotImageFromStreamer(sender);
 
 	imagestreamer->stopStreaming();
+	cx::ToolManager::shutdown();
 }
 
 }//namespace cx

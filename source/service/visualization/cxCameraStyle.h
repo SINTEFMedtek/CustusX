@@ -32,10 +32,8 @@ class QActionGroup;
 namespace cx
 {
 
-class View3D;
-
 typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
-using ssc::Transform3D;
+using cx::Transform3D;
 
 /**
  * \file
@@ -77,10 +75,10 @@ private slots:
 	void setInteractionStyleActionSlot();
 
 private:
-	View3D* getView() const;
+	ViewWidgetQPtr getView() const;
 	vtkRendererPtr getRenderer() const;
 	vtkCameraPtr getCamera() const;
-	ssc::ToolRep3DPtr getToolRep() const;
+	ToolRep3DPtr getToolRep() const;
 	bool isToolFollowingStyle(CAMERA_STYLE_TYPE style) const;
 
 	void connectTool();
@@ -93,8 +91,8 @@ private:
 					QString helptext);
 
 	CAMERA_STYLE_TYPE mCameraStyle; ///< the current camerastyle
-	ssc::ToolPtr mFollowingTool; ///< the tool the camera is following
-	ssc::ViewportListenerPtr mViewportListener;
+	ToolPtr mFollowingTool; ///< the tool the camera is following
+	ViewportListenerPtr mViewportListener;
 	bool mBlockCameraUpdate; ///< for breaking a camera update loop
 	QActionGroup* mCameraStyleGroup;
 };

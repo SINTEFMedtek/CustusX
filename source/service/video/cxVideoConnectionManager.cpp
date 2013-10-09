@@ -18,8 +18,7 @@
 #include "vtkRenderWindow.h"
 #include <QTimer>
 
-#include "sscLabeledComboBoxWidget.h"
-#include "sscVideoRep.h"
+//#include "sscLabeledComboBoxWidget.h"
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "cxSettings.h"
@@ -35,12 +34,12 @@ namespace cx
 VideoConnectionManager::VideoConnectionManager()
 {
 	mReconnectInterval = 400;
-	mOptions = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("video");
+	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("video");
 
 	QStringList connectionOptions;
 	QString defaultConnection = "Direct Link";
 	connectionOptions << "Local Server" << "Direct Link" << "Remote Server" << "Simulation Server";
-	mConnectionMethod = ssc::StringDataAdapterXml::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, connectionOptions, mOptions.getElement());
+	mConnectionMethod = StringDataAdapterXml::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, connectionOptions, mOptions.getElement());
 	connect(mConnectionMethod.get(), SIGNAL(changed()), this, SIGNAL(connectionMethodChanged()));
 	mConnectWhenLocalServerRunning = 0;
 	mIniScriptProcess.reset(new ProcessWrapper("Init Script"));
@@ -57,7 +56,7 @@ VideoConnectionManager::~VideoConnectionManager()
 	mVideoConnection->disconnectServer();
 }
 
-ssc::StringDataAdapterXmlPtr VideoConnectionManager::getConnectionMethod()
+StringDataAdapterXmlPtr VideoConnectionManager::getConnectionMethod()
 {
 	return mConnectionMethod;
 }
@@ -175,7 +174,7 @@ void VideoConnectionManager::launchServer()
 {
 	if (!this->useLocalServer())
 	{
-		ssc::messageManager()->sendError("Ignoring Launch local server: Must select local server");
+		messageManager()->sendError("Ignoring Launch local server: Must select local server");
 		return;
 	}
 	QString program = this->getLocalServerExecutable();
@@ -221,7 +220,7 @@ void VideoConnectionManager::launchAndConnectServer()
 	else if (useRemoteServer())
 		this->connectServer();
 	else
-		ssc::messageManager()->sendError("Could not determine which server to launch.");
+		messageManager()->sendError("Could not determine which server to launch.");
 }
 
 void VideoConnectionManager::serverProcessStateChanged(QProcess::ProcessState newState)
@@ -230,7 +229,7 @@ void VideoConnectionManager::serverProcessStateChanged(QProcess::ProcessState ne
 		this->delayedAutoConnectServer();
 }
 
-std::vector<ssc::VideoSourcePtr> VideoConnectionManager::getVideoSources()
+std::vector<VideoSourcePtr> VideoConnectionManager::getVideoSources()
 {
 	return mVideoConnection->getVideoSources();
 }

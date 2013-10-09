@@ -55,11 +55,11 @@ QString SmoothingImageFilter::getHelp() const
 	        "</html>";
 }
 
-ssc::DoubleDataAdapterXmlPtr SmoothingImageFilter::getSigma(QDomElement root)
+DoubleDataAdapterXmlPtr SmoothingImageFilter::getSigma(QDomElement root)
 {
-	return ssc::DoubleDataAdapterXml::initialize("Smoothing sigma", "",
+	return DoubleDataAdapterXml::initialize("Smoothing sigma", "",
 	                                             "Used for smoothing the segmented volume. Measured in units of image spacing.",
-	                                             0.10, ssc::DoubleRange(0, 5, 0.01), 2, root);
+	                                             0.10, DoubleRange(0, 5, 0.01), 2, root);
 }
 
 void SmoothingImageFilter::createOptions()
@@ -89,11 +89,11 @@ void SmoothingImageFilter::createOutputTypes()
 
 bool SmoothingImageFilter::execute()
 {
-	ssc::ImagePtr input = this->getCopiedInputImage();
+	ImagePtr input = this->getCopiedInputImage();
 	if (!input)
 		return false;
 
-	ssc::DoubleDataAdapterXmlPtr sigma = this->getSigma(mCopiedOptions);
+	DoubleDataAdapterXmlPtr sigma = this->getSigma(mCopiedOptions);
 
 	itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(input);
 
@@ -122,21 +122,21 @@ bool SmoothingImageFilter::postProcess()
 	if (!mRawResult)
 		return false;
 
-	ssc::ImagePtr input = this->getCopiedInputImage();
+	ImagePtr input = this->getCopiedInputImage();
 
 	if (!input)
 		return false;
 
 	QString uid = input->getUid() + "_sm%1";
 	QString name = input->getName()+" sm%1";
-	ssc::ImagePtr output = ssc::dataManager()->createDerivedImage(mRawResult,uid, name, input);
+	ImagePtr output = dataManager()->createDerivedImage(mRawResult,uid, name, input);
 	mRawResult = NULL;
 	if (!output)
 		return false;
 
 	//    output->resetTransferFunctions();
-	ssc::dataManager()->loadData(output);
-	ssc::dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
+	dataManager()->loadData(output);
+	dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());

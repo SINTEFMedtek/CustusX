@@ -5,25 +5,23 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
-	include_directories(
-		${CPPUNIT_INCLUDE_DIR}
+        include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
+        include_directories(
 		../logic
 		../logic/3DReconstruction
-		${CustusX3_SOURCE_DIR}/source/resource
 		${CustusX3_SOURCE_DIR}/source/service/patient
 		${CustusX3_SOURCE_DIR}/source/service/tracking
-		${CustusX3_SOURCE_DIR}/source/resource/settings
-		${CustusX3_SOURCE_DIR}/source/resource/utilities
-		${CustusX3_SOURCE_DIR}/source/resource/algorithms
 		)
 
 	# Catch unit test framework stuff:
 
-	QT4_WRAP_CPP(CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES
-		)
+    set(CXTEST_SOURCES_TO_MOC
+    )
+	#QT4_WRAP_CPP(CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES
+	#	)
 	set(CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES ${CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES}
 		cxtestReconstructManager.cpp
 		)
-	cx_catch_add_lib_and_exe(cxPluginUSReconstruction "${CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES}")
+	cx_catch_add_lib_and_exe(cxPluginUSReconstruction "${CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
 
 endif (BUILD_TESTING)

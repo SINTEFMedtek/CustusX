@@ -30,7 +30,7 @@ PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
   mRemoveButton(new QPushButton("Remove", this)),
   mLoadReferencePointsButton(new QPushButton("Load reference points", this))
 {
-  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
+  connect(toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
 
   //table widget
   connect(mTable, SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChanged()));
@@ -122,7 +122,7 @@ void PointSamplingWidget::updateSlot()
   {
     std::vector<QTableWidgetItem*> items(3); // name, coordinates, delta
 
-    ssc::Vector3D coord = mSamples[i].getCoord();
+    Vector3D coord = mSamples[i].getCoord();
 
     items[0] = new QTableWidgetItem(qstring_cast(mSamples[i].getUid()));
 
@@ -167,10 +167,10 @@ void PointSamplingWidget::enablebuttons()
   mAddButton->setEnabled(true);
   mEditButton->setEnabled(mActiveLandmark!="");
   mRemoveButton->setEnabled(mActiveLandmark!="");
-  mLoadReferencePointsButton->setEnabled(ssc::toolManager()->getReferenceTool());
+  mLoadReferencePointsButton->setEnabled(toolManager()->getReferenceTool());
 }
 
-void PointSamplingWidget::addPoint(ssc::Vector3D point)
+void PointSamplingWidget::addPoint(Vector3D point)
 {
   // find unique uid:
   int max = 0;
@@ -180,35 +180,35 @@ void PointSamplingWidget::addPoint(ssc::Vector3D point)
   }
   QString uid = qstring_cast(max+1);
 
-  mSamples.push_back(ssc::Landmark(uid, point));
+  mSamples.push_back(Landmark(uid, point));
   mActiveLandmark = uid;
 
   this->updateSlot();
 }
 
-void PointSamplingWidget::setManualTool(const ssc::Vector3D& p_r)
+void PointSamplingWidget::setManualTool(const Vector3D& p_r)
 {
-  ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
+  ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
 
-  //ssc::Transform3D sMr = mSliceProxy->get_sMr();
-  ssc::Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
-  ssc::Transform3D prMt = tool->get_prMt();
+  //Transform3D sMr = mSliceProxy->get_sMr();
+  Transform3D rMpr = *cxToolManager::getInstance()->get_rMpr();
+  Transform3D prMt = tool->get_prMt();
 
   // find tool position in r
-  ssc::Vector3D tool_t(0,0,tool->getTooltipOffset());
-  ssc::Vector3D tool_r = (rMpr*prMt).coord(tool_t);
+  Vector3D tool_t(0,0,tool->getTooltipOffset());
+  Vector3D tool_r = (rMpr*prMt).coord(tool_t);
 
   // find click position in s.
-  //ssc::Vector3D click_s = get_vpMs().inv().coord(click_vp);
+  //Vector3D click_s = get_vpMs().inv().coord(click_vp);
 
   // compute the new tool position in slice space as a synthesis of the plane part of click and the z part of original.
-  //ssc::Vector3D cross_s(click_s[0], click_s[1], tool_s[2]);
+  //Vector3D cross_s(click_s[0], click_s[1], tool_s[2]);
   // compute the position change and transform to patient.
-  ssc::Vector3D delta_r = p_r - tool_r;
-  ssc::Vector3D delta_pr = rMpr.inv().vector(delta_r);
+  Vector3D delta_r = p_r - tool_r;
+  Vector3D delta_pr = rMpr.inv().vector(delta_r);
 
   // MD is the actual tool movement in patient space, matrix form
-  ssc::Transform3D MD = ssc::createTransformTranslate(delta_pr);
+  Transform3D MD = createTransformTranslate(delta_pr);
   // set new tool position to old modified by MD:
   tool->set_prMt(MD*prMt);
 }
@@ -218,18 +218,18 @@ void PointSamplingWidget::addButtonClickedSlot()
   this->addPoint(this->getSample());
 }
 
-ssc::Vector3D PointSamplingWidget::getSample() const
+Vector3D PointSamplingWidget::getSample() const
 {
 // find current tool position:
-//  ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
+//  ToolPtr tool = toolManager()->getDominantTool();
 //  if (!tool)
-//    return ssc::Vector3D(0,0,0);
-//  ssc::Transform3D prMt = tool->get_prMt();
-//  ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
-//  ssc::Vector3D pos = (rMpr*prMt).coord(ssc::Vector3D(0,0,tool->getTooltipOffset()));
+//    return Vector3D(0,0,0);
+//  Transform3D prMt = tool->get_prMt();
+//  Transform3D rMpr = *toolManager()->get_rMpr();
+//  Vector3D pos = (rMpr*prMt).coord(Vector3D(0,0,tool->getTooltipOffset()));
 
-  ssc::CoordinateSystem ref = ssc::CoordinateSystemHelpers::getR();
-  ssc::Vector3D P_ref = ssc::CoordinateSystemHelpers::getDominantToolTipPoint(ref, true);
+  CoordinateSystem ref = CoordinateSystemHelpers::getR();
+  Vector3D P_ref = CoordinateSystemHelpers::getDominantToolTipPoint(ref, true);
 
   return P_ref;
 }
@@ -240,7 +240,7 @@ void PointSamplingWidget::editButtonClickedSlot()
   {
     if (mSamples[i].getUid()!=mActiveLandmark)
       continue;
-    mSamples[i] = ssc::Landmark(mActiveLandmark, getSample());
+    mSamples[i] = Landmark(mActiveLandmark, getSample());
   }
   updateSlot();
 }
@@ -267,27 +267,27 @@ void PointSamplingWidget::gotoButtonClickedSlot()
 
 void PointSamplingWidget::loadReferencePointsSlot()
 {
-  ssc::ToolPtr refTool = ssc::toolManager()->getReferenceTool();
+  ToolPtr refTool = toolManager()->getReferenceTool();
   if(!refTool) // we only load reference points from reference tools
   {
-    ssc::messageManager()->sendDebug("No reference tool, cannot load reference points into the pointsampler");
+    messageManager()->sendDebug("No reference tool, cannot load reference points into the pointsampler");
     return;
   }
 
-  std::map<int, ssc::Vector3D> referencePoints_s = refTool->getReferencePoints();
+  std::map<int, Vector3D> referencePoints_s = refTool->getReferencePoints();
   if(referencePoints_s.empty())
   {
-    ssc::messageManager()->sendWarning("No referenceppoints in reference tool "+refTool->getName());
+    messageManager()->sendWarning("No referenceppoints in reference tool "+refTool->getName());
     return;
   }
 
-  ssc::CoordinateSystem ref = ssc::CoordinateSystemHelpers::getR();
-  ssc::CoordinateSystem sensor = ssc::CoordinateSystemHelpers::getS(refTool);
+  CoordinateSystem ref = CoordinateSystemHelpers::getR();
+  CoordinateSystem sensor = CoordinateSystemHelpers::getS(refTool);
 
-  std::map<int, ssc::Vector3D>::iterator it = referencePoints_s.begin();
+  std::map<int, Vector3D>::iterator it = referencePoints_s.begin();
   for(; it != referencePoints_s.end(); ++it)
   {
-    ssc::Vector3D P_ref = ssc::CoordinateSystemHelpers::get_toMfrom(sensor, ref).coord(it->second);
+    Vector3D P_ref = CoordinateSystemHelpers::get_toMfrom(sensor, ref).coord(it->second);
     this->addPoint(P_ref);
   }
 }

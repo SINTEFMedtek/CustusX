@@ -68,12 +68,13 @@ void ThresholdPreview::revertTransferFunctions()
     mModifiedImage->setTransferFunctions3D(mTF3D_original);
     mModifiedImage->setShadingOn(mShadingOn_original);
 
-    //Go back to VTK linear interpolation
-	ssc::VolumetricBaseRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(mModifiedImage);
-    if(volumeRep)
-        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToLinear();
-    else
-        ssc::messageManager()->sendError("ThresholdPreview::revertTransferFunctions() can not find VolumetricRep");
+	mModifiedImage->setInterpolationTypeToLinear();
+//    //Go back to VTK linear interpolation
+//	VolumetricBaseRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(mModifiedImage);
+//    if(volumeRep)
+//        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToLinear();
+//    else
+//        messageManager()->sendError("ThresholdPreview::revertTransferFunctions() can not find VolumetricRep");
 
     mTF3D_original.reset();
     mTF2D_original.reset();
@@ -89,7 +90,7 @@ void ThresholdPreview::revertTransferFunctions()
  * \param image The image to modify the transfer function of
  * \param setValue The threshold value to be used
  */
-void ThresholdPreview::setPreview(ssc::ImagePtr image, double setValue)
+void ThresholdPreview::setPreview(ImagePtr image, double setValue)
 {
     if (!image)
         return;
@@ -109,7 +110,7 @@ void ThresholdPreview::setPreview(ssc::ImagePtr image, double setValue)
         mShadingOn_original = image->getShadingOn();
     }
     image->resetTransferFunctions();
-    ssc::ImageTF3DPtr tf3D = image->getTransferFunctions3D();
+    ImageTF3DPtr tf3D = image->getTransferFunctions3D();
     tf3D->removeInitAlphaPoint();
     tf3D->addAlphaPoint(setValue - 1, 0);
     tf3D->addAlphaPoint(setValue, image->getMaxAlphaValue());
@@ -117,18 +118,19 @@ void ThresholdPreview::setPreview(ssc::ImagePtr image, double setValue)
     tf3D->addColorPoint(image->getMax(), Qt::green);
     image->setShadingOn(true);
 
-    ssc::ImageLUT2DPtr lut2D = image->getLookupTable2D();
+    ImageLUT2DPtr lut2D = image->getLookupTable2D();
     lut2D->setFullRangeWinLevel();
     lut2D->addColorPoint(setValue, Qt::green);
     lut2D->addColorPoint(image->getMax(), Qt::green);
     lut2D->setLLR(setValue);
 
     //Remove VTK linear interpolation
-	ssc::VolumetricBaseRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(image);
-    if(volumeRep)
-        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToNearest();
-    else
-        ssc::messageManager()->sendError("ThresholdPreview::setPreview() can not find VolumetricRep");
+	mModifiedImage->setInterpolationTypeToNearest();
+//	VolumetricBaseRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(image);
+//    if(volumeRep)
+//        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToNearest();
+//    else
+//        messageManager()->sendError("ThresholdPreview::setPreview() can not find VolumetricRep");
 }
 
 void ThresholdPreview::removePreview()

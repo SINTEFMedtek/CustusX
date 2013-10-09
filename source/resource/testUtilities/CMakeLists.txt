@@ -21,6 +21,12 @@
 ###########################################################
 
 cmake_minimum_required( VERSION 2.6 )
+	
+include_directories(
+    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
+    )
+
+add_subdirectory(cisst_code)
 
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
@@ -28,26 +34,23 @@ endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
         # link statically on linux, see explanation in cx_catch__private_define_platform_specific_linker_options
-        cx_catch__private_define_platform_specific_linker_options()
+#        cx_catch__private_define_platform_specific_linker_options()
 
-        QT4_WRAP_CPP( CX_TESTUTILITIES_SOURCE_FILES
-            cxtestSignalListener.h
-            cxtestUtilities.h
+        cx_add_class_qt_moc( CX_TESTUTILITIES_SOURCE_FILES
+            cxtestQueuedSignalListener
+            cxtestDirectSignalListener
             )
-	set(CX_TESTUTILITIES_SOURCE_FILES
-            cxtestUtilities.h
-            cxtestUtilities.cpp
-	    cxtestSignalListener.h
-	    cxtestSignalListener.cpp
-	    cxtestCatchImpl.h
-	    cxtestCatchImpl.cpp
+        cx_add_class(CX_TESTUTILITIES_SOURCE_FILES
+            cxtestUtilities
+            cxtestCatchImpl
 	    cxtestCatchExamples.cpp
-            ${CX_TESTUTILITIES_SOURCE_FILES}
+            cxtestJenkinsMeasurement
             )
 	include_directories(
 	    .
 	    ${CustusX3_SOURCE_DIR}/source/ThirdParty/catch
 	    )
-        add_library( cxtestUtilities ${CX_CATCH_SHARED_LIB_TYPE} ${CX_TESTUTILITIES_SOURCE_FILES} )
-	target_link_libraries(cxtestUtilities SSC)
+#        add_library( cxtestUtilities ${CX_CATCH_SHARED_LIB_TYPE} ${CX_TESTUTILITIES_SOURCE_FILES} )
+        cx_add_test_library(cxtestUtilities ${CX_TESTUTILITIES_SOURCE_FILES})
+        target_link_libraries(cxtestUtilities cxResource)
 endif (BUILD_TESTING)

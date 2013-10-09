@@ -27,15 +27,15 @@ namespace cx
 StatusBar::StatusBar() :
 	mRenderingFpsLabel(new QLabel(this)), mGrabbingInfoLabel(new QLabel(this)), mTpsLabel(new QLabel(this))
 {
-	connect(ssc::messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
+	connect(messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
 
-	connect(ssc::toolManager(), SIGNAL(configured()),      this, SLOT(connectToToolSignals()));
-	connect(ssc::toolManager(), SIGNAL(deconfigured()),    this, SLOT(disconnectFromToolSignals()));
-	connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateToolButtons()));
-	connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateToolButtons()));
+	connect(toolManager(), SIGNAL(configured()),      this, SLOT(connectToToolSignals()));
+	connect(toolManager(), SIGNAL(deconfigured()),    this, SLOT(disconnectFromToolSignals()));
+	connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateToolButtons()));
+	connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateToolButtons()));
 
-	connect(ssc::toolManager(), SIGNAL(tps(int)), this, SLOT(tpsSlot(int)));
-	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateToolButtons()));
+	connect(toolManager(), SIGNAL(tps(int)), this, SLOT(tpsSlot(int)));
+	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateToolButtons()));
 
 	connect(viewManager(), SIGNAL(fps(int)), this, SLOT(renderingFpsSlot(int)));
 
@@ -55,13 +55,13 @@ void StatusBar::connectToToolSignals()
 
 	this->addPermanentWidget(mTpsLabel);
 
-	ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
-	for (ssc::ToolManager::ToolMap::iterator it = tools->begin(); it != tools->end(); ++it)
+	ToolManager::ToolMapPtr tools = toolManager()->getTools();
+	for (ToolManager::ToolMap::iterator it = tools->begin(); it != tools->end(); ++it)
 	{
-		ssc::ToolPtr tool = it->second;
-		if (tool->hasType(ssc::Tool::TOOL_MANUAL))
+		ToolPtr tool = it->second;
+		if (tool->hasType(Tool::TOOL_MANUAL))
 			continue;
-		if (tool == ToolManager::getInstance()->getManualTool())
+		if (tool == cxToolManager::getInstance()->getManualTool())
 			continue;
 		connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolButtons()));
 
@@ -101,17 +101,17 @@ void StatusBar::disconnectFromToolSignals()
 
 void StatusBar::activateTool(QString uid)
 {
-	ssc::toolManager()->setDominantTool(uid);
+	toolManager()->setDominantTool(uid);
 }
 
 void StatusBar::updateToolButtons()
 {
-	ssc::ToolPtr dominant = ssc::toolManager()->getDominantTool();
+	ToolPtr dominant = toolManager()->getDominantTool();
 
 	for (unsigned i = 0; i < mToolData.size(); ++i)
 	{
 		ToolData current = mToolData[i];
-		ssc::ToolPtr tool = current.mTool;
+		ToolPtr tool = current.mTool;
 		QString color = this->getToolStyle(tool->getVisible(), tool->isInitialized(), dominant == tool);
 		current.mButton->setStyleSheet(QString("QToolButton { %1; }").arg(color));
 

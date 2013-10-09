@@ -24,9 +24,8 @@
 #include "cxRegistrationManager.h"
 #include "cxViewManager.h"
 #include "cxSettings.h"
-#include "cxView3D.h"
-#include "Rep/cxLandmarkRep.h"
-
+#include "cxLandmarkRep.h"
+#include "sscView.h"
 
 namespace cx
 {
@@ -53,8 +52,8 @@ LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(Reg
 	mRegisterButton->setToolTip("Perform registration");
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
-	mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFixedDataAdapter));
-	mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mMovingDataAdapter));
+	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedDataAdapter));
+	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mMovingDataAdapter));
 	mVerticalLayout->addWidget(mTranslationCheckBox);
 	mVerticalLayout->addWidget(mAvarageAccuracyLabel);
 
@@ -71,8 +70,8 @@ void LandmarkImage2ImageRegistrationWidget::translationCheckBoxChanged()
 
 void LandmarkImage2ImageRegistrationWidget::updateRep()
 {
-	mFixedLandmarkSource->setImage(boost::dynamic_pointer_cast<ssc::Image>(mManager->getFixedData()));
-	mMovingLandmarkSource->setImage(boost::dynamic_pointer_cast<ssc::Image>(mManager->getMovingData()));
+	mFixedLandmarkSource->setImage(boost::dynamic_pointer_cast<Image>(mManager->getFixedData()));
+	mMovingLandmarkSource->setImage(boost::dynamic_pointer_cast<Image>(mManager->getMovingData()));
 }
 
 void LandmarkImage2ImageRegistrationWidget::registerSlot()
@@ -95,14 +94,14 @@ QString LandmarkImage2ImageRegistrationWidget::defaultWhatsThis() const
 void LandmarkImage2ImageRegistrationWidget::showEvent(QShowEvent* event)
 {
 	LandmarkRegistrationWidget::showEvent(event);
-	viewManager()->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
+	viewManager()->setRegistrationMode(rsIMAGE_REGISTRATED);
 
 	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0, 0)->getReps());
 	if (rep)
 	{
 		rep->setPrimarySource(mFixedLandmarkSource);
 		rep->setSecondarySource(mMovingLandmarkSource);
-		rep->setSecondaryColor(ssc::Vector3D(0, 0.9, 0.5));
+		rep->setSecondaryColor(Vector3D(0, 0.9, 0.5));
 	}
 }
 
@@ -119,21 +118,21 @@ void LandmarkImage2ImageRegistrationWidget::hideEvent(QHideEvent* event)
 			rep->setSecondarySource(LandmarksSourcePtr());
 		}
 	}
-	viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
+	viewManager()->setRegistrationMode(rsNOT_REGISTRATED);
 }
 
 void LandmarkImage2ImageRegistrationWidget::prePaintEvent()
 {
 }
 
-ssc::LandmarkMap LandmarkImage2ImageRegistrationWidget::getTargetLandmarks() const
+LandmarkMap LandmarkImage2ImageRegistrationWidget::getTargetLandmarks() const
 {
-	ssc::ImagePtr moving = boost::dynamic_pointer_cast<ssc::Image>(mManager->getMovingData());
+	ImagePtr moving = boost::dynamic_pointer_cast<Image>(mManager->getMovingData());
 
 	if (moving)
 		return moving->getLandmarks();
 	else
-		return ssc::LandmarkMap();
+		return LandmarkMap();
 }
 
 void LandmarkImage2ImageRegistrationWidget::performRegistration()
@@ -145,24 +144,24 @@ void LandmarkImage2ImageRegistrationWidget::performRegistration()
 /** Return transform from target space to reference space
  *
  */
-ssc::Transform3D LandmarkImage2ImageRegistrationWidget::getTargetTransform() const
+Transform3D LandmarkImage2ImageRegistrationWidget::getTargetTransform() const
 {
 	if (!mManager->getMovingData())
-		return ssc::Transform3D::Identity();
+		return Transform3D::Identity();
 	return mManager->getMovingData()->get_rMd();
 }
 
-void LandmarkImage2ImageRegistrationWidget::setTargetLandmark(QString uid, ssc::Vector3D p_target)
+void LandmarkImage2ImageRegistrationWidget::setTargetLandmark(QString uid, Vector3D p_target)
 {
-	ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(mManager->getMovingData());
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(mManager->getMovingData());
 	if (!image)
 		return;
-	image->setLandmark(ssc::Landmark(uid, p_target));
+	image->setLandmark(Landmark(uid, p_target));
 }
 
 QString LandmarkImage2ImageRegistrationWidget::getTargetName() const
 {
-	ssc::DataPtr image = mManager->getMovingData();
+	DataPtr image = mManager->getMovingData();
 	if (!image)
 		return "None";
 	return image->getName();

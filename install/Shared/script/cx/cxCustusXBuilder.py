@@ -49,31 +49,32 @@ class CustusXBuilder:
     def runAllTests(self):
         PrintFormatter.printHeader('Run all tests', level=2)
         self.clearTestData()
-        self._runCatchTests()
+        self._runCatchUnitTests()
         self._runCTestTests()
-        #self.runCatchTestsWrappedInCTest('speed')
-
     
     def _runCTestTests(self):
         PrintFormatter.printHeader('Run ctest tests', level=3)
         # Run all tests and write them in xml format to ./CTestResults.xml
         custusx = self._createComponent(cxComponents.CustusX3)
-        outfile = '%s/CTestResults.xml' % custusx.buildPath()
-        cxTestRunner.TestRunner().runCTest(custusx.buildPath(), outfile)
+        cxTestRunner.TestRunner().runCTest(custusx.buildPath(), outpath=custusx.buildPath())
 
-    def _runCatchTests(self):
-        PrintFormatter.printHeader('Run catch tests', level=3)
-        # Run all Catch tests and write them in xml format to ./CatchTestResults.xml
+    def _runCatchUnitTests(self):
+        tags = cxTestRunner.TestRunner().includeTagsForOS('[unit]')
+        self.runCatchTests(tags)
+
+    def runCatchTests(self, tag):
+        PrintFormatter.printHeader('Run catch tests using tag %s' % tag, level=3)
+        # Run all Catch tests and write them in xml format to ./Catch.<tagname>.TestResults.xml
         custusx = self._createComponent(cxComponents.CustusX3)
         catchDir = '%s/source/testing' % custusx.buildPath()
-        outfile = '%s/CatchTestResults.xml' % custusx.buildPath()
-        cxTestRunner.TestRunner().runCatch(catchDir, tag='unit', outfile=outfile)
-
+        outpath=custusx.buildPath()
+        cxTestRunner.TestRunner().runCatch(catchDir, tag=tag, outpath=outpath)
+        
     def runCatchTestsWrappedInCTest(self, tag):
         PrintFormatter.printHeader('Run catch tests wrapped in ctest', level=2)
         custusx = self._createComponent(cxComponents.CustusX3)
         appPath = '%s/source/testing' % custusx.buildPath()
-        outpath = self.assembly.controlData.getRootDir()
+        outpath=custusx.buildPath()
         testRunner = cxTestRunner.TestRunner()
         testRunner.runCatchTestsWrappedInCTestGenerateJUnit(tag, appPath, outpath)
 
@@ -81,13 +82,14 @@ class CustusXBuilder:
         PrintFormatter.printHeader('Package the build', level=2)
         custusx = self._createComponent(cxComponents.CustusX3)
         shell.changeDir(custusx.buildPath())
-        # cleanup old - can be refactored to use python methods...
-        shell.run('rm -r -f *.dmg')
-        shell.run('rm -r -f *.tar.gz')
-        # create new
-        shell.run('make package')
-        #shell.run('cpack --verbose') # same as make package, given that make has been run, but more verbose
-
+        shell.rm_r(custusx.buildPath(), "*.exe")
+        shell.rm_r(custusx.buildPath(), "*.dmg")
+        shell.rm_r(custusx.buildPath(), "*.tar.gz")
+        if platform.system() == 'Windows':
+            shell.run('jom package')
+        else:
+            shell.run('make package')
+        
     def publishDoxygen(self):
         PrintFormatter.printHeader('copy/publish doxygen to medtek server (link from wiki)', level=2)
         remoteServerPath = "/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/custusx_doxygen"
@@ -162,8 +164,10 @@ class CustusXBuilder:
         shell.run(['cppcheck',
                 '--enable=all',
                 '--xml-version=2',
-                '-i%s/externals/ssc/Code/3rdParty/' % sourceDir,
-                '%s/source %s/externals/ssc/Code/ 2> %s/cppcheck-result.xml' % (sourceDir, sourceDir, rootDir)
+                '-i%s/source/ThirdParty/' % sourceDir,
+                '-i%s/source/resource/ssc_not_in_use/' % sourceDir,
+                '-i%s/source/resource/testUtilities/cisst_code/' % sourceDir,
+                '%s/source 2> %s/cppcheck-result.xml' % (sourceDir, rootDir)
                 ])
 
     def runLineCounter(self):
@@ -175,7 +179,7 @@ class CustusXBuilder:
                 '--duplicates --wide --details',
                 '%s >%s/sloccount_raw.sc' % (sourceDir, rootDir)
                 ])
-        shell.run(['%s/testing/jenkins/clean_sloccount.py' % sourceDir,
+        shell.run(['%s/install/Shared/script/clean_sloccount.py' % sourceDir,
                 '--remove="3rdParty/ config/ install/ /data/"',
                 '%s/sloccount_raw.sc %s/sloccount.sc' % (rootDir, rootDir) 
                 ])

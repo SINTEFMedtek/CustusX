@@ -16,41 +16,105 @@
 
 #include "vtkImageData.h"
 #include "sscImage.h"
+#include "sscVolumeHelpers.h"
+#include "sscTypeConversions.h"
+#include "cxDataLocations.h"
 
 namespace cxtest
 {
-
-vtkImageDataPtr Utilities::create3DVtkImageData()
+/*
+// --------------------------------------------------------
+TestDataStorage* TestDataStorage::mInstance = NULL; ///< static member
+// --------------------------------------------------------
+void TestDataStorage::shutdown()
 {
-	vtkImageDataPtr vtkImageData = vtkImageDataPtr::New();
+	delete mInstance;
+	mInstance = NULL;
+}
+TestDataStorage* TestDataStorage::getInstance()
+{
+    if (!mInstance)
+    	mInstance = new TestDataStorage();
+	return mInstance;
+}
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+*/
 
-	vtkImageData->SetDimensions(10, 10, 10);
-	vtkImageData->SetNumberOfScalarComponents(1);
-
-	int* dims = vtkImageData->GetDimensions();
-
-	for (int z  = 0; z < dims[2]; z++)
-	{
-		for (int y = 0; y < dims[1]; y++)
-		{
-			for (int x = 0; x < dims[0]; x++)
-			{
-				vtkImageData->SetScalarComponentFromDouble(x, y, z, 0, 2.0);
-			}
-		}
-	}
-//	vtkImageData->Print(std::cout);
-
-	return vtkImageData;
+QString Utilities::getDataRoot(QString suffix)
+{
+	QString root = cx::DataLocations::getTestDataPath();
+	if (suffix.isEmpty())
+		return root;
+	else
+		return QString("%1/%2").arg(root).arg(suffix);
 }
 
-ssc::ImagePtr Utilities::create3DImage()
+
+vtkImageDataPtr Utilities::create3DVtkImageData(Eigen::Array3i dim, const unsigned int voxelValue)
 {
-	QString imagesUid("TESTUID");
-	vtkImageDataPtr vtkImageData = create3DVtkImageData();
-	ssc::ImagePtr image(new ssc::Image(imagesUid, vtkImageData));
+	return cx::generateVtkImageData(dim, cx::Vector3D(1,1,1), voxelValue);
+}
+
+cx::ImagePtr Utilities::create3DImage(Eigen::Array3i dim, const unsigned int voxelValue)
+{
+	vtkImageDataPtr vtkImageData = create3DVtkImageData(dim, voxelValue);
+	QString unique_string = qstring_cast(reinterpret_cast<long>(vtkImageData.GetPointer()));
+	QString imagesUid = QString("TESTUID_%2_%1").arg(unique_string);
+	cx::ImagePtr image(new cx::Image(imagesUid, vtkImageData));
 
 	return image;
+}
+
+std::vector<cx::ImagePtr> Utilities::create3DImages(unsigned int count, Eigen::Array3i dim, const unsigned int voxelValue)
+{
+	std::vector<cx::ImagePtr> retval;
+	for (unsigned i=0; i<count; ++i)
+	{
+		cx::ImagePtr image = cxtest::Utilities::create3DImage(dim, voxelValue);
+		retval.push_back(image);
+	}
+	return retval;
+}
+
+unsigned int Utilities::getNumberOfVoxelsAboveThreshold(vtkImageDataPtr image, int threshold)
+{
+	if (!image)
+		return 0;
+	unsigned char* ptr = reinterpret_cast<unsigned char*>(image->GetScalarPointer());
+	unsigned int pixelCount = 0;
+	for (unsigned i = 0; i < image->GetDimensions()[0]*image->GetDimensions()[1]*image->GetDimensions()[2]; ++i)
+	{
+		if (ptr[i*image->GetNumberOfScalarComponents()] > threshold)
+			++pixelCount;
+	}
+	return pixelCount;
+}
+
+unsigned int Utilities::getNumberOfNonZeroVoxels(vtkImageDataPtr image)
+{
+	return getNumberOfVoxelsAboveThreshold(image, 0);
+//	if (!image)
+//		return 0;
+//	unsigned char* ptr = reinterpret_cast<unsigned char*>(image->GetScalarPointer());
+//	unsigned int pixelCount = 0;
+//	for (unsigned i = 0; i < image->GetDimensions()[0]*image->GetDimensions()[1]; ++i)
+//	{
+//		if (ptr[i*image->GetNumberOfScalarComponents()] != 0)
+//			++pixelCount;
+//	}
+//	return pixelCount;
+}
+
+double Utilities::getFractionOfVoxelsAboveThreshold(vtkImageDataPtr image, int threshold)
+{
+	unsigned int hits = getNumberOfVoxelsAboveThreshold(image, threshold);
+	Eigen::Array3i dim(image->GetDimensions());
+	unsigned int totalPixels = dim[0]*dim[1]*dim[2];
+	if (totalPixels==0)
+		return -1;
+	return double(hits)/double(totalPixels);
 }
 
 } /* namespace cxtest */

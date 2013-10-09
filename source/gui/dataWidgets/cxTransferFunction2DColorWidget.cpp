@@ -33,8 +33,8 @@ TransferFunction2DColorWidget::TransferFunction2DColorWidget(QWidget* parent) :
 
   QGridLayout* gridLayout = new QGridLayout;
   layout->addLayout(gridLayout);
-  new ssc::SliderGroupWidget(this, mDataWindow, gridLayout, 0);
-  new ssc::SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
+  new SliderGroupWidget(this, mDataWindow, gridLayout, 0);
+  new SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
 
   this->setLayout(layout);
 }
@@ -50,8 +50,8 @@ QString TransferFunction2DColorWidget::defaultWhatsThis() const
 
 void TransferFunction2DColorWidget::activeImageChangedSlot()
 {
-  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-  ssc::ImageTFDataPtr tf;
+  ImagePtr image = dataManager()->getActiveImage();
+  ImageTFDataPtr tf;
   if (image)
     tf = image->getLookupTable2D();
   else

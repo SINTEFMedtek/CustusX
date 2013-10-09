@@ -10,12 +10,10 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
+include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
+    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     .
-    ${CustusX3_SOURCE_DIR}/source/resource
-    ${CustusX3_SOURCE_DIR}/source/resource/settings
-    ${CustusX3_SOURCE_DIR}/source/resource/utilities
-    ${CustusX3_SOURCE_DIR}/source/resource/algorithms    
     ${CustusX3_SOURCE_DIR}/source/plugins/USReconstruction/logic/3DReconstruction
 
     )
@@ -29,6 +27,7 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 SET( SOURCE_FILES
   ${MOC_HEADER_FILES}
   sscReconstructedOutputVolumeParams.h
+  sscReconstructedOutputVolumeParams.cpp
   sscReconstructAlgorithm.h
   sscThunderVNNReconstructAlgorithm.h
   sscThunderVNNReconstructAlgorithm.cpp
@@ -43,19 +42,6 @@ SET( SOURCE_FILES
       )
 
 # =========================================================
-
-SET( cxPluginUSReconstructionLogic_LIB_FILES
-    SSC
-    cxUtilities
-#    cxUtilities 
-#    cxSettings
-#    cxUtilities
-#    cxPatientService
-    #thunder 
-#    cxTrackingService
-#    ITKCommon
-    )
-
 
 include_directories(
     .
@@ -131,13 +117,18 @@ endif (SSC_USE_OpenCL)
 # create the target
 add_library( sscUS3DReconstruction ${SOURCE_FILES} )
 
+set(sscUS3DReconstruction_LIBRARIES
+    cxResource
+    cxResourceUsReconstructionTypes
+    )
 # Don't try to use OpenCl if we haven't got it
-IF( SSC_USE_OpenCL )
-    target_link_libraries( sscUS3DReconstruction SSC cxResource ${OPENCL_LIBRARIES})
-ELSE()
-    target_link_libraries( sscUS3DReconstruction SSC cxResource)
-ENDIF()
+if( SSC_USE_OpenCL )
+    set(sscUS3DReconstruction_LIBRARIES
+        ${sscUS3DReconstruction_LIBRARIES}
+        ${OPENCL_LIBRARIES})
+endif()
 
+target_link_libraries( sscUS3DReconstruction ${sscUS3DReconstruction_LIBRARIES})
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/recConfig.h.in"

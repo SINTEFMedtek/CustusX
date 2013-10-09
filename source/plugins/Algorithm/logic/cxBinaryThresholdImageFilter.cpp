@@ -47,26 +47,26 @@ QString BinaryThresholdImageFilter::getHelp() const
 	        "</html>";
 }
 
-ssc::DoubleDataAdapterXmlPtr BinaryThresholdImageFilter::getLowerThresholdOption(QDomElement root)
+DoubleDataAdapterXmlPtr BinaryThresholdImageFilter::getLowerThresholdOption(QDomElement root)
 {
-	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Threshold", "",
-	                                                                            "Select lower threshold for the segmentation", 1, ssc::DoubleRange(0, 100, 1), 0,
+	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Threshold", "",
+	                                                                            "Select lower threshold for the segmentation", 1, DoubleRange(0, 100, 1), 0,
 	                                                                            root);
 	retval->setAddSlider(true);
 	return retval;
 }
 
-ssc::BoolDataAdapterXmlPtr BinaryThresholdImageFilter::getGenerateSurfaceOption(QDomElement root)
+BoolDataAdapterXmlPtr BinaryThresholdImageFilter::getGenerateSurfaceOption(QDomElement root)
 {
-	ssc::BoolDataAdapterXmlPtr retval = ssc::BoolDataAdapterXml::initialize("Generate Surface", "",
+	BoolDataAdapterXmlPtr retval = BoolDataAdapterXml::initialize("Generate Surface", "",
 	                                                                        "Generate a surface of the output volume", true,
 	                                                                            root);
 	return retval;
 }
 
-ssc::ColorDataAdapterXmlPtr BinaryThresholdImageFilter::getColorOption(QDomElement root)
+ColorDataAdapterXmlPtr BinaryThresholdImageFilter::getColorOption(QDomElement root)
 {
-	return ssc::ColorDataAdapterXml::initialize("Color", "",
+	return ColorDataAdapterXml::initialize("Color", "",
 	                                            "Color of output model.",
 	                                            QColor("green"), root);
 }
@@ -124,7 +124,7 @@ void BinaryThresholdImageFilter::thresholdSlot()
 {
 	if (mActive)
 	{
-		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(mInputTypes[0]->getData());
+		ImagePtr image = boost::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
 		RepManager::getInstance()->getThresholdPreview()->setPreview(image,
 		                                                             mLowerThresholdOption->getValue());
 	}
@@ -139,12 +139,12 @@ bool BinaryThresholdImageFilter::preProcess()
 
 bool BinaryThresholdImageFilter::execute()
 {
-	ssc::ImagePtr input = this->getCopiedInputImage();
+	ImagePtr input = this->getCopiedInputImage();
 	if (!input)
 		return false;
 
-	ssc::DoubleDataAdapterXmlPtr lowerThreshold = this->getLowerThresholdOption(mCopiedOptions);
-	ssc::BoolDataAdapterXmlPtr generateSurface = this->getGenerateSurfaceOption(mCopiedOptions);
+	DoubleDataAdapterXmlPtr lowerThreshold = this->getLowerThresholdOption(mCopiedOptions);
+	BoolDataAdapterXmlPtr generateSurface = this->getGenerateSurfaceOption(mCopiedOptions);
 
 	itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(input);
 
@@ -189,21 +189,21 @@ bool BinaryThresholdImageFilter::postProcess()
 	if (!mRawResult)
 		return false;
 
-	ssc::ImagePtr input = this->getCopiedInputImage();
+	ImagePtr input = this->getCopiedInputImage();
 
 	if (!input)
 		return false;
 
 	QString uid = input->getUid() + "_seg%1";
 	QString name = input->getName()+" seg%1";
-	ssc::ImagePtr output = ssc::dataManager()->createDerivedImage(mRawResult,uid, name, input);
+	ImagePtr output = dataManager()->createDerivedImage(mRawResult,uid, name, input);
 	mRawResult = NULL;
 	if (!output)
 		return false;
 
 	output->resetTransferFunctions();
-	ssc::dataManager()->loadData(output);
-	ssc::dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
+	dataManager()->loadData(output);
+	dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());
@@ -211,8 +211,8 @@ bool BinaryThresholdImageFilter::postProcess()
 	// set contour output
 	if (mRawContour!=NULL)
 	{
-		ssc::ColorDataAdapterXmlPtr colorOption = this->getColorOption(mOptions);
-		ssc::MeshPtr contour = ContourFilter::postProcess(mRawContour, output, colorOption->getValue());
+		ColorDataAdapterXmlPtr colorOption = this->getColorOption(mOptions);
+		MeshPtr contour = ContourFilter::postProcess(mRawContour, output, colorOption->getValue());
 		mOutputTypes[1]->setValue(contour->getUid());
 		mRawContour = vtkPolyDataPtr();
 	}

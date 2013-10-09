@@ -17,14 +17,23 @@
 ###########################################################
 
 if (BUILD_TESTING)
-	# Catch unit test framework stuff:
+include_directories(
+	${CustusX3_SOURCE_DIR}/source/resource/testUtilities
+	${CustusX3_SOURCE_DIR}/source/resource/visualization/testing
+	)
 
-	QT4_WRAP_CPP(CXTEST_GUI_SOURCES
-		cxTestCustusXController.h
-		cxtestTestVideoConnectionWidget.h
-		cxtestTestTransferFunctionColorWidget.h
-		)
-	set(CXTEST_GUI_SOURCES ${CXTEST_GUI_SOURCES}
+    set(CXTEST_SOURCES_TO_MOC
+        cxTestCustusXController.h
+        cxtestTestVideoConnectionWidget.h
+        cxtestTestTransferFunctionColorWidget.h
+    )
+
+	#QT4_WRAP_CPP(CXTEST_GUI_SOURCES
+	#	cxTestCustusXController.h
+	#	cxtestTestVideoConnectionWidget.h
+	#	cxtestTestTransferFunctionColorWidget.h
+	#	)
+	set(CXTEST_GUI_SOURCES #${CXTEST_GUI_SOURCES}
 		cxTestCustusXController.cpp
 		cxtestSpeed.cpp
 		cxtestCatchStreamingWidgets.cpp
@@ -37,6 +46,10 @@ if (BUILD_TESTING)
 		cxtestTestTransferFunctions.cpp
 	    )
 
-	cx_catch_add_lib_and_exe(cxGui "${CXTEST_GUI_SOURCES}")
+	cx_catch_add_lib_and_exe(cxGui
+		"${CXTEST_GUI_SOURCES}"
+		"${CXTEST_SOURCES_TO_MOC}"
+		"cxResourceVisualizationTestUtilities")
+
 
 endif (BUILD_TESTING)

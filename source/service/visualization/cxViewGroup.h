@@ -42,17 +42,17 @@ typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 class Navigation
 {
 public:
-	void centerToData(ssc::DataPtr image);
-	void centerToView(const std::vector<ssc::DataPtr>& images);
+	void centerToData(DataPtr image);
+	void centerToView(const std::vector<DataPtr>& images);
 	void centerToGlobalDataCenter();
 	void centerToTooltip();
 
 private:
-	ssc::Vector3D findViewCenter(const std::vector<ssc::DataPtr>& images);
-	ssc::Vector3D findGlobalDataCenter();
-	ssc::Vector3D findDataCenter(std::vector<ssc::DataPtr> data);
+	Vector3D findViewCenter(const std::vector<DataPtr>& images);
+	Vector3D findGlobalDataCenter();
+	Vector3D findDataCenter(std::vector<DataPtr> data);
 
-	void centerManualTool(ssc::Vector3D& p_r);
+	void centerManualTool(Vector3D& p_r);
 
 };
 
@@ -79,8 +79,8 @@ public:
 	virtual void parseXml(QDomNode dataNode); ///< load internal state info from dataNode
 	void clearPatientData();
 	double getZoom2D();
-	std::vector<ssc::ImagePtr> getImages();
-//  ssc::SlicePlanesProxyPtr getSlicePlanesProxy() { return mSlicePlanesProxy; }
+	std::vector<ImagePtr> getImages();
+//  SlicePlanesProxyPtr getSlicePlanesProxy() { return mSlicePlanesProxy; }
 
 	void setGlobal2DZoom(bool use, SyncedValuePtr val);
 	void syncOrientationMode(SyncedValuePtr val);
@@ -115,7 +115,7 @@ protected:
 
 	ViewGroupDataPtr mViewGroupData;
 	std::vector<ViewWrapperPtr> mViewWrappers;
-//  ssc::SlicePlanesProxyPtr mSlicePlanesProxy;
+//  SlicePlanesProxyPtr mSlicePlanesProxy;
 };
 
 bool isViewWrapper2D(ViewWrapperPtr wrapper);

@@ -45,7 +45,7 @@ public:
 	ElastixManager(RegistrationManagerPtr regManager);
 	virtual ~ElastixManager();
 
-	ssc::BoolDataAdapterXmlPtr getDisplayProcessMessages() { return mDisplayProcessMessages; }
+	BoolDataAdapterXmlPtr getDisplayProcessMessages() { return mDisplayProcessMessages; }
 	ElastixExecuterPtr getExecuter() { return mExecuter; }
 	ElastixParametersPtr getParameters() { return mParameters; }
 
@@ -62,8 +62,8 @@ private:
 
 	RegistrationManagerPtr mRegistrationManager;
 	ElastixParametersPtr mParameters;
-	ssc::XmlOptionFile mOptions;
-	ssc::BoolDataAdapterXmlPtr mDisplayProcessMessages;
+	XmlOptionFile mOptions;
+	BoolDataAdapterXmlPtr mDisplayProcessMessages;
 	ElastixExecuterPtr mExecuter;
 };
 typedef boost::shared_ptr<ElastixManager> ElastixManagerPtr;

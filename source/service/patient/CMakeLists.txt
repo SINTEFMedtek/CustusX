@@ -28,15 +28,14 @@ SET ( cxPatientService_SOURCE
 )
 
 include_directories(
-    .
-    ${CustusX3_SOURCE_DIR}/source/resource/settings
-    ${CustusX3_BINARY_DIR}/source/resource/settings
-    ${CustusX3_SOURCE_DIR}/source/resource/utilities
+    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( cxPatientService ${cxPatientService_SOURCE} ${MOC_HEADER_FILES})
-target_link_libraries(cxPatientService SSC cxResource)
+target_link_libraries(cxPatientService cxResource)
+
+add_subdirectory(testing)
 
 

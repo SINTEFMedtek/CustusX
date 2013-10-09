@@ -26,7 +26,7 @@ namespace cx
 PrepareVesselsWidget::PrepareVesselsWidget(RegistrationManagerPtr regManager, QWidget* parent) :
     RegistrationBaseWidget(regManager, parent, "PrepareVesselsWidget", "PrepareVesselsWidget")
 {  
-    ssc::XmlOptionFile options = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("registration").descend("PrepareVesselsWidget");
+    XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("registration").descend("PrepareVesselsWidget");
   // fill the pipeline with filters:
   mPipeline.reset(new Pipeline());
   FilterGroupPtr filters(new FilterGroup(options.descend("pipeline")));
@@ -45,7 +45,7 @@ PrepareVesselsWidget::PrepareVesselsWidget(RegistrationManagerPtr regManager, QW
   mPipelineWidget = new PipelineWidget(NULL, mPipeline);
   mLayout->addWidget(mPipelineWidget);
 
-  mColorDataAdapter = ssc::ColorDataAdapterXml::initialize("Color", "",
+  mColorDataAdapter = ColorDataAdapterXml::initialize("Color", "",
                                               "Color of all generated data.",
                                               QColor("green"), options.getElement());
   connect(mColorDataAdapter.get(), SIGNAL(changed()), this, SLOT(setColorSlot()));
@@ -61,7 +61,7 @@ PrepareVesselsWidget::PrepareVesselsWidget(RegistrationManagerPtr regManager, QW
   buttonsLayout->addWidget(fixedButton);
   buttonsLayout->addWidget(movingButton);
 
-    mLayout->addWidget(ssc::createDataWidget(this, mColorDataAdapter));
+	mLayout->addWidget(sscCreateDataWidget(this, mColorDataAdapter));
   mLayout->addWidget(mPipelineWidget);
   mLayout->addStretch();
   mLayout->addLayout(buttonsLayout);
@@ -78,14 +78,14 @@ void PrepareVesselsWidget::setColorSlot()
 
 void PrepareVesselsWidget::toMovingSlot()
 {
-    ssc::DataPtr data = mPipeline->getNodes().back()->getData();
+    DataPtr data = mPipeline->getNodes().back()->getData();
   if (data)
     mManager->setMovingData(data);
 }
 
 void PrepareVesselsWidget::toFixedSlot()
 {
-  ssc::DataPtr data = mPipeline->getNodes().back()->getData();
+  DataPtr data = mPipeline->getNodes().back()->getData();
   if (data)
     mManager->setFixedData(data);
 }

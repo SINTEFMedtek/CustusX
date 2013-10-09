@@ -6,8 +6,6 @@
 
 #include <sscImage.h>
 #include <sscTransform3D.h>
-//#include "cxTool.h"
-//#include "Rep/cxLandmarkRep.h"
 #include "cxDominantToolProxy.h"
 
 class QVBoxLayout;
@@ -22,8 +20,8 @@ class QSpinBox;
 
 namespace cx
 {
-typedef ssc::Transform3D Transform3D;
-typedef boost::shared_ptr<ssc::Vector3D> Vector3DPtr;
+typedef Transform3D Transform3D;
+typedef boost::shared_ptr<Vector3D> Vector3DPtr;
 
 /**
  * \file
@@ -62,9 +60,9 @@ protected:
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
 	virtual void hideEvent(QHideEvent* event);
     virtual void prePaintEvent(); ///< populates the table widget
-    virtual ssc::LandmarkMap getTargetLandmarks() const;
-	virtual ssc::Transform3D getTargetTransform() const;
-	virtual void setTargetLandmark(QString uid, ssc::Vector3D p_target);
+    virtual LandmarkMap getTargetLandmarks() const;
+	virtual Transform3D getTargetTransform() const;
+	virtual void setTargetLandmark(QString uid, Vector3D p_target);
 	virtual QString getTargetName() const;
 	virtual void performRegistration();
 

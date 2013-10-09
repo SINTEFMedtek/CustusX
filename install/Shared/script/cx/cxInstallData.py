@@ -60,8 +60,8 @@ class Common(object):
         if (platform.system() == 'Windows'):
             self.mCMakeGenerator = 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
             self.mBuildSSCExamples = False
-            self.mBuildTesting = False
-            self.mUseCotire = True
+            self.mBuildTesting = True
+            self.mUseCotire = False
         else:
             self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
         if (platform.system() == "Darwin"):
@@ -69,6 +69,7 @@ class Common(object):
         self.mBuildExAndTest = False
         self.mCoverage = False
         self.mDoxygen = False
+        self.mGitTag = None # if none, use branch master
 
     def printSettings(self):
         print ''
@@ -87,6 +88,7 @@ class Common(object):
         print '    Coverage:', self.mCoverage
         print '    Threads:', self.threads
         print '    32 bit:', self.m32bit
+        print '    git tag:', self.mGitTag
         print '    OpenCL:', self.mUseOpenCL
         print ''
 
@@ -163,6 +165,11 @@ class Common(object):
             return 'ON'
         else:
             return 'OFF'
+        
+    def getGitTag(self):
+        if self.mGitTag == "":
+            return None
+        return self.mGitTag
 
 # ---------------------------------------------------------
 

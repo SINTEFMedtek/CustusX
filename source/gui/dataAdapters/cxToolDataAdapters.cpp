@@ -24,8 +24,8 @@ namespace cx
 
 ActiveToolStringDataAdapter::ActiveToolStringDataAdapter()
 {
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
-  connect(ssc::toolManager(), SIGNAL(configured()), this, SIGNAL(changed()));
+  connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
+  connect(toolManager(), SIGNAL(configured()), this, SIGNAL(changed()));
 }
 
 QString ActiveToolStringDataAdapter::getValueName() const
@@ -34,19 +34,19 @@ QString ActiveToolStringDataAdapter::getValueName() const
 }
 bool ActiveToolStringDataAdapter::setValue(const QString& value)
 {
-  ssc::ToolPtr newTool = ssc::toolManager()->getTool(value);
+  ToolPtr newTool = toolManager()->getTool(value);
   if (!newTool)
 	  return false;
-  if(newTool == ssc::toolManager()->getDominantTool())
+  if(newTool == toolManager()->getDominantTool())
     return false;
-  ssc::toolManager()->setDominantTool(newTool->getUid());
+  toolManager()->setDominantTool(newTool->getUid());
   return true;
 }
 QString ActiveToolStringDataAdapter::getValue() const
 {
-  if (!ssc::toolManager()->getDominantTool())
+  if (!toolManager()->getDominantTool())
     return "";
-  return qstring_cast(ssc::toolManager()->getDominantTool()->getUid());
+  return qstring_cast(toolManager()->getDominantTool()->getUid());
 }
 QString ActiveToolStringDataAdapter::getHelp() const
 {
@@ -54,7 +54,7 @@ QString ActiveToolStringDataAdapter::getHelp() const
 }
 QStringList ActiveToolStringDataAdapter::getValueRange() const
 {
-  std::vector<QString> uids = ssc::toolManager()->getToolUids();
+  std::vector<QString> uids = toolManager()->getToolUids();
   QStringList retval;
   //retval << ""; //Don't add "no tool" choice
   for (unsigned i=0; i<uids.size(); ++i)
@@ -63,7 +63,7 @@ QStringList ActiveToolStringDataAdapter::getValueRange() const
 }
 QString ActiveToolStringDataAdapter::convertInternal2Display(QString internal)
 {
-  ssc::ToolPtr tool = ssc::toolManager()->getTool(internal);
+  ToolPtr tool = toolManager()->getTool(internal);
   if (!tool)
     return "<no tool>";
   return qstring_cast(tool->getName());
@@ -82,9 +82,9 @@ QString ActiveToolStringDataAdapter::convertInternal2Display(QString internal)
 
 ActiveProbeConfigurationStringDataAdapter::ActiveProbeConfigurationStringDataAdapter()
 {
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
-  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(dominantToolChanged())); // for debugging: if initializing a manual tool with probe properties
-  connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(dominantToolChanged()));
+  connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
+  connect(toolManager(), SIGNAL(configured()), this, SLOT(dominantToolChanged())); // for debugging: if initializing a manual tool with probe properties
+  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(dominantToolChanged()));
   this->dominantToolChanged();
 }
 
@@ -94,7 +94,7 @@ void ActiveProbeConfigurationStringDataAdapter::dominantToolChanged()
 //		<< ToolManager::getInstance()->findFirstProbe().get() << std::endl;
 	// ignore tool changes to something non-probeish.
 	// This gives the user a chance to use the widget without having to show the probe.
-	ssc::ToolPtr newTool = ToolManager::getInstance()->findFirstProbe();
+	ToolPtr newTool = cxToolManager::getInstance()->findFirstProbe();
 	if (!newTool || !newTool->getProbe())
 		return;
 

@@ -44,7 +44,7 @@
 #include "cxPatientService.h"
 #include "cxMetricWidget.h"
 #include "cxViewWrapper.h"
-#include "sscDICOMWidget.h"
+//#include "sscDICOMWidget.h"
 #include "cxPlaybackWidget.h"
 #include "cxEraserWidget.h"
 #include "cxSamplerWidget.h"
@@ -54,7 +54,7 @@
 #include "cxApplicationStateMachine.h"
 #include "cxConfig.h"
 
-#include "sscDICOMLibConfig.h"
+//#include "sscDICOMLibConfig.h"
 
 namespace cx
 {
@@ -75,8 +75,8 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	this->createToolBars();
 	this->setStatusBar(new StatusBar());
 
-	ssc::messageManager()->setLoggingFolder(DataLocations::getRootConfigPath());
-	ssc::messageManager()->setAudioSource(ssc::AudioPtr(new Audio()));
+	messageManager()->setLoggingFolder(DataLocations::getRootConfigPath());
+	messageManager()->setAudioSource(AudioPtr(new AudioImpl()));
 
 	connect(stateService()->getApplication().get(), SIGNAL(activeStateChanged()), this,
 		SLOT(onApplicationStateChangedSlot()));
@@ -96,12 +96,12 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	this->addAsDockWidget(new VolumePropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new MeshInfoWidget(this), "Properties");
 #ifdef SSC_USE_DCMTK
-	this->addAsDockWidget(new ssc::DICOMWidget(this), "Utility");
+	this->addAsDockWidget(new DICOMWidget(this), "Utility");
 #endif // SSC_USE_DCMTK
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
 	this->addAsDockWidget(new ToolPropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new NavigationWidget(this), "Properties");
-	this->addAsDockWidget(new ssc::ConsoleWidget(this), "Utility");
+	this->addAsDockWidget(new ConsoleWidget(this), "Utility");
 	this->addAsDockWidget(new FrameTreeWidget(this), "Browsing");
 	this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
 
@@ -278,10 +278,10 @@ void MainWindow::createActions()
 	mDebugModeAction = new QAction(tr("&Debug Mode"), this);
 	mDebugModeAction->setShortcut(tr("Ctrl+D"));
 	mDebugModeAction->setCheckable(true);
-	mDebugModeAction->setChecked(DataManager::getInstance()->getDebugMode());
+	mDebugModeAction->setChecked(cxDataManager::getInstance()->getDebugMode());
 	mDebugModeAction->setStatusTip(tr("Set debug mode, this enables lots of weird stuff."));
-	connect(mDebugModeAction, SIGNAL(triggered(bool)), DataManager::getInstance(), SLOT(setDebugMode(bool)));
-	connect(DataManager::getInstance(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
+	connect(mDebugModeAction, SIGNAL(triggered(bool)), cxDataManager::getInstance(), SLOT(setDebugMode(bool)));
+	connect(cxDataManager::getInstance(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
 	connect(mDebugModeAction, SIGNAL(toggled(bool)), this, SLOT(toggleDebugModeSlot(bool)));
 
 	mFullScreenAction = new QAction(tr("Fullscreen"), this);
@@ -352,11 +352,11 @@ void MainWindow::createActions()
 	mConfigureToolsAction->setChecked(true);
 
 	connect(mConfigureToolsAction, SIGNAL(triggered()), this, SLOT(configureSlot()));
-	connect(mInitializeToolsAction, SIGNAL(triggered()), ssc::toolManager(), SLOT(initialize()));
+	connect(mInitializeToolsAction, SIGNAL(triggered()), toolManager(), SLOT(initialize()));
 	connect(mTrackingToolsAction, SIGNAL(triggered()), this, SLOT(toggleTrackingSlot()));
-	connect(mSaveToolsPositionsAction, SIGNAL(triggered()), ssc::toolManager(), SLOT(saveToolsSlot()));
-	connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateTrackingActionSlot()));
-	connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateTrackingActionSlot()));
+	connect(mSaveToolsPositionsAction, SIGNAL(triggered()), toolManager(), SLOT(saveToolsSlot()));
+	connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateTrackingActionSlot()));
+	connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateTrackingActionSlot()));
 	this->updateTrackingActionSlot();
 
 	mNewLayoutAction = new QAction(tr("New Layout"), this);
@@ -433,7 +433,7 @@ void MainWindow::saveScreenShot(QPixmap pixmap)
 {
 	QString folder = patientService()->getPatientData()->getActivePatientFolder() + "/Screenshots/";
 	QDir().mkpath(folder);
-	QString format = ssc::timestampSecondsFormat();
+	QString format = timestampSecondsFormat();
 	QString filename = QDateTime::currentDateTime().toString(format) + ".png";
 
 	QtConcurrent::run(boost::bind(&MainWindow::saveScreenShotThreaded, this, pixmap.toImage(), folder + "/" + filename));
@@ -445,8 +445,8 @@ void MainWindow::saveScreenShot(QPixmap pixmap)
 void MainWindow::saveScreenShotThreaded(QImage pixmap, QString filename)
 {
 	pixmap.save(filename, "png");
-	ssc::messageManager()->sendInfo("Saved screenshot to " + filename);
-	ssc::messageManager()->playScreenShotSound();
+	messageManager()->sendInfo("Saved screenshot to " + filename);
+	messageManager()->playScreenShotSound();
 }
 
 void MainWindow::toggleStreamingSlot()
@@ -473,8 +473,8 @@ void MainWindow::updateStreamingActionSlot()
 
 void MainWindow::centerToImageCenterSlot()
 {
-	if (ssc::dataManager()->getActiveImage())
-		Navigation().centerToData(ssc::dataManager()->getActiveImage());
+	if (dataManager()->getActiveImage())
+		Navigation().centerToData(dataManager()->getActiveImage());
 	else if (!viewManager()->getViewGroups().empty())
 		Navigation().centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
 	else
@@ -501,7 +501,7 @@ void MainWindow::updatePointPickerActionSlot()
 
 void MainWindow::updateTrackingActionSlot()
 {
-	if (ssc::toolManager()->isTracking())
+	if (toolManager()->isTracking())
 	{
 		mTrackingToolsAction->setIcon(QIcon(":/icons/polaris-green.png"));
 		mTrackingToolsAction->setText("Stop Tracking");
@@ -515,10 +515,10 @@ void MainWindow::updateTrackingActionSlot()
 
 void MainWindow::toggleTrackingSlot()
 {
-	if (ssc::toolManager()->isTracking())
-		ssc::toolManager()->stopTracking();
+	if (toolManager()->isTracking())
+		toolManager()->stopTracking();
 	else
-		ssc::toolManager()->startTracking();
+		toolManager()->startTracking();
 }
 
 namespace
@@ -537,7 +537,7 @@ void MainWindow::newPatientSlot()
 	if (!QDir().exists(patientDatafolder))
 	{
 		QDir().mkdir(patientDatafolder);
-		ssc::messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder);
+		messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder);
 	}
 
 	QString timestamp = QDateTime::currentDateTime().toString(timestampFormatFolderFriendly()) + "_";
@@ -568,14 +568,14 @@ void MainWindow::clearPatientSlot()
 {
 	patientService()->getPatientData()->clearPatient();
 	patientService()->getPatientData()->writeRecentPatientData();
-	ssc::messageManager()->sendWarning("Cleared current patient data");
+	messageManager()->sendWarning("Cleared current patient data");
 }
 
 void MainWindow::savePatientFileSlot()
 {
 	if (patientService()->getPatientData()->getActivePatientFolder().isEmpty())
 	{
-		ssc::messageManager()->sendWarning("No patient selected, select or create patient before saving!");
+		messageManager()->sendWarning("No patient selected, select or create patient before saving!");
 		this->newPatientSlot();
 		return;
 	}
@@ -651,7 +651,7 @@ void MainWindow::loadPatientFileSlot()
 	if (!QDir().exists(patientDatafolder))
 	{
 		QDir().mkdir(patientDatafolder);
-		ssc::messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder);
+		messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder);
 	}
 	// Open file dialog
 	QString choosenDir = QFileDialog::getExistingDirectory(this, tr("Select patient"), patientDatafolder,
@@ -683,7 +683,7 @@ void MainWindow::importDataSlot()
 		folder, tr("Image/Mesh (*.mhd *.mha *.stl *.vtk *.mnc)"));
 	if (fileName.empty())
 	{
-		ssc::messageManager()->sendInfo("Import canceled");
+		messageManager()->sendInfo("Import canceled");
 		return;
 	}
 
@@ -949,7 +949,7 @@ void MainWindow::preferencesSlot()
 
 void MainWindow::quitSlot()
 {
-	ssc::messageManager()->sendInfo("Shutting down CustusX");
+	messageManager()->sendInfo("Shutting down CustusX");
 	viewManager()->deactivateCurrentLayout();
 
 	patientService()->getPatientData()->autoSave();
@@ -957,21 +957,21 @@ void MainWindow::quitSlot()
 	settings()->setValue("mainWindow/geometry", saveGeometry());
 	settings()->setValue("mainWindow/windowState", saveState());
 	settings()->sync();
-	ssc::messageManager()->sendInfo("Closing: Save geometry and window state");
+	messageManager()->sendInfo("Closing: Save geometry and window state");
 
 	qApp->quit();
 }
 
 void MainWindow::deleteDataSlot()
 {
-	if (!ssc::dataManager()->getActiveImage())
+	if (!dataManager()->getActiveImage())
 		return;
-	ssc::dataManager()->removeData(ssc::dataManager()->getActiveImage()->getUid());
+	dataManager()->removeData(dataManager()->getActiveImage()->getUid());
 }
 
 void MainWindow::configureSlot()
 {
-	ssc::toolManager()->configure();
+	toolManager()->configure();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

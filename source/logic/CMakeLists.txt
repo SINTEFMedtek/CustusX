@@ -16,12 +16,10 @@ SET (cxLogicManager_SOURCE
     cxLogicManager.cpp
 )
 
+include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
+    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     .
-    ${CustusX3_SOURCE_DIR}/source/resource
-    ${CustusX3_SOURCE_DIR}/source/resource/utilities
-    ${CustusX3_SOURCE_DIR}/source/resource/settings
-
     ${CustusX3_SOURCE_DIR}/source/service/patient     
     ${CustusX3_SOURCE_DIR}/source/service/tracking     
     ${CustusX3_SOURCE_DIR}/source/service/visualization
@@ -35,7 +33,7 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 ADD_LIBRARY ( cxLogicManager ${cxLogicManager_SOURCE} ${MOC_HEADER_FILES} )
 
 target_link_libraries(cxLogicManager
-    SSC
+    cxResource
     cxPatientService
     cxTrackingService
     cxVisualizationService

@@ -58,16 +58,16 @@ typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPt
  * \image html cxArchitecture_rtstream.png "VideoService and Video Pipeline"
  *
  * The diagram displays all major classes concerned with realtime streaming.
- * ssc::VideoSource is the core interface that provides connection to a realtime
+ * VideoSource is the core interface that provides connection to a realtime
  * streaming source.
  *
- * ssc::VideoSource has to main users: Rendering to screen and recording to disk.
+ * VideoSource has to main users: Rendering to screen and recording to disk.
  * VideoGraphics contains the visualization functionality that the Reps uses
- * when rendering in the Views.  VideoGraphics needs a ssc::Probe to provide
- * position information. ssc::Probe also wraps the ssc::VideoSource with its
- * own ssc::ProbeAdapterVideoSource (using the adapter pattern) in order to add
+ * when rendering in the Views.  VideoGraphics needs a Probe to provide
+ * position information. Probe also wraps the VideoSource with its
+ * own ProbeAdapterVideoSource (using the adapter pattern) in order to add
  * special information not known to the VideoSource, such as pixel spacing. The
- * recording functionality is not shown. ssc::VideoSourceRecorder handles this
+ * recording functionality is not shown. VideoSourceRecorder handles this
  * on the basic level.
  *
  * VideoConnectionManager manages the connection to the streaming source. The
@@ -92,12 +92,12 @@ public:
 
 	VideoConnectionManagerPtr getVideoConnection();
 	USAcquisitionVideoPlaybackPtr getUSAcquisitionVideoPlayback();
-	ssc::VideoSourcePtr getActiveVideoSource();
+	VideoSourcePtr getActiveVideoSource();
 	void setActiveVideoSource(QString uid);
 	void setPlaybackMode(PlaybackTimePtr controller);
 	/** Get all existing video sources.
 	  */
-	std::vector<ssc::VideoSourcePtr> getVideoSources();
+	std::vector<VideoSourcePtr> getVideoSources();
 
 signals:
 	/** Emitted when a video source is set to active,
@@ -106,7 +106,7 @@ signals:
 	void activeVideoSourceChanged();
 
 private slots:
-	/** Autoselect the active ssc::VideoSource
+	/** Autoselect the active VideoSource
 	  *
 	  * Call when video source configuration has changed. The active
 	  * Video source will automatically be determined by calling
@@ -123,7 +123,7 @@ private:
 	VideoService(VideoService const&); // not implemented
 	VideoService& operator=(VideoService const&); // not implemented
 
-	/** Find the best guess for active ssc::VideoSource
+	/** Find the best guess for active VideoSource
 	  *
 	  * Select from the following in that priority:
 	  *  - playback sources
@@ -136,11 +136,11 @@ private:
 	  * to that group.
 	  *
 	  */
-	ssc::VideoSourcePtr getGuessForActiveVideoSource(ssc::VideoSourcePtr old);
+	VideoSourcePtr getGuessForActiveVideoSource(VideoSourcePtr old);
 
 	VideoConnectionManagerPtr mVideoConnection;
-	ssc::VideoSourcePtr mActiveVideoSource;
-	ssc::VideoSourcePtr mEmptyVideoSource;
+	VideoSourcePtr mActiveVideoSource;
+	VideoSourcePtr mEmptyVideoSource;
 	USAcquisitionVideoPlaybackPtr mUSAcquisitionVideoPlayback;
 };
 

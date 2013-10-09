@@ -1,3 +1,17 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 /*
  * cxMetricWidget.h
  *
@@ -21,6 +35,7 @@
 #include "sscStringDataAdapterXml.h"
 #include "sscVector3DDataAdapterXml.h"
 #include "cxDataMetricWrappers.h"
+#include "cxFrameMetric.h"
 
 class QVBoxLayout;
 class QTableWidget;
@@ -53,22 +68,33 @@ protected slots:
   void loadReferencePointsSlot();
 
   void addPointButtonClickedSlot();
+  void addFrameButtonClickedSlot();
+  void addToolButtonClickedSlot();
   void addPlaneButtonClickedSlot();
   void addAngleButtonClickedSlot();
   void addDistanceButtonClickedSlot();
   void cellChangedSlot(int row, int col);
   virtual void cellClickedSlot(int row, int column);
+  void exportMetricsButtonClickedSlot();
+
+protected:
+  QAction* mPointMetricAction;
+  QAction* mFrameMetricAction;
+  QAction* mToolMetricAction;
+  QAction* mExportFramesAction;
+
+  void exportMetricsToFile(QString filename);
 
 private:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event);
   void enablebuttons();
   void setActiveUid(QString uid);
-  ssc::PointMetricPtr addPoint(ssc::Vector3D point, ssc::CoordinateSystem space=ssc::CoordinateSystem(ssc::csREF), QString name="point%1");
-  MetricBasePtr createMetricWrapper(ssc::DataPtr data);
+  PointMetricPtr addPoint(Vector3D point, CoordinateSystem space=CoordinateSystem(csREF), QString name="point%1");
+  MetricBasePtr createMetricWrapper(DataPtr data);
   std::vector<MetricBasePtr> createMetricWrappers();
-  std::vector<ssc::DataPtr> refinePointArguments(std::vector<ssc::DataPtr> args, unsigned argNo);
-  void setManualToolPosition(ssc::Vector3D p_r);
+  std::vector<DataPtr> refinePointArguments(std::vector<DataPtr> args, unsigned argNo);
+  void setManualToolPosition(Vector3D p_r);
   void prePaintEvent();
 
 //  template<class T>

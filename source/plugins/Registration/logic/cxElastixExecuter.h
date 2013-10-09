@@ -57,8 +57,8 @@ public:
 	void setDisplayProcessMessages(bool on);
 
 	bool setInput(QString application,
-	         ssc::DataPtr fixed,
-	         ssc::DataPtr moving,
+	         DataPtr fixed,
+	         DataPtr moving,
 	         QString outdir,
 	         QStringList parameterfiles);
 	virtual void execute();
@@ -70,7 +70,7 @@ public:
 	 * Read the descriptions in writeInitTransformToElastixfile() and
 	 * getAffineResult_mmMff for a full discussion.
 	 */
-	ssc::Transform3D getAffineResult_mMf(bool* ok = 0) ;
+	Transform3D getAffineResult_mMf(bool* ok = 0) ;
 	QString getNonlinearResultVolume(bool* ok = 0);
 
 private slots:
@@ -83,11 +83,11 @@ private:
 	/** Write the initial (pre-registration) mMf transform to
 	 *  disk as required by elastix.
 	 */
-	QString writeInitTransformToElastixfile(ssc::DataPtr fixed, ssc::DataPtr moving, QString outdir);
+	QString writeInitTransformToElastixfile(DataPtr fixed, DataPtr moving, QString outdir);
 	/** Write the initial (pre-registration) mMf transform to
 	 *  disk in a .cal file that contains only the 16 matrix numbers.
 	 */
-	QString writeInitTransformToCalfile(ssc::DataPtr fixed, ssc::DataPtr moving, QString outdir);
+	QString writeInitTransformToCalfile(DataPtr fixed, DataPtr moving, QString outdir);
 	/** Find the TransformParameters.i.txt file with the
 	 *  highest i. All other transform files can be found from
 	 *  this one.
@@ -111,19 +111,19 @@ private:
 	 * for the full result.
 	 *
 	 */
-	ssc::Transform3D getAffineResult_mmMff(bool* ok = 0) ;
+	Transform3D getAffineResult_mmMff(bool* ok = 0) ;
 	/** Return the transform present within the mhd file pointed to by the
 	 * input volume.
 	 *
-	 * This is part of the normal rMd transform within ssc::Data, but required
+	 * This is part of the normal rMd transform within Data, but required
 	 * because elastiX reads and uses it.
 	 */
-	ssc::Transform3D getFileTransform_ddMd(ssc::DataPtr volume);
+	Transform3D getFileTransform_ddMd(DataPtr volume);
 
 	QString mLastOutdir;
 	QProcess* mProcess;
-	ssc::DataPtr mFixed;
-	ssc::DataPtr mMoving;
+	DataPtr mFixed;
+	DataPtr mMoving;
 };
 
 /**Reader class for an Elastix-style parameter file.
@@ -140,8 +140,8 @@ public:
 	int readParameterInt(QString key) ;
 	std::vector<double> readParameterDoubleVector(QString key) ;
 //	void writeParameter(QString key, QStringList value);
-	ssc::Transform3D readEulerTransform() ;
-	ssc::Transform3D readAffineTransform();
+	Transform3D readEulerTransform() ;
+	Transform3D readAffineTransform();
 
 private:
 	QString readParameterRawValue(QString key);
@@ -151,16 +151,16 @@ private:
 
 /**Class encapsulating the math conversions
  * between the ElastiX "EulerTransform" representation
- * and the ssc::Transform3D representation.
+ * and the Transform3D representation.
  */
 class ElastixEulerTransform
 {
 public:
-	ssc::Vector3D mAngles_xyz;
-	ssc::Vector3D mTranslation;
-	ssc::Vector3D mCenterOfRotation;
+	Vector3D mAngles_xyz;
+	Vector3D mTranslation;
+	Vector3D mCenterOfRotation;
 
-	static ElastixEulerTransform create(ssc::Vector3D angles_xyz, ssc::Vector3D translation, ssc::Vector3D centerOfRotation)
+	static ElastixEulerTransform create(Vector3D angles_xyz, Vector3D translation, Vector3D centerOfRotation)
 	{
 		ElastixEulerTransform retval;
 		retval.mAngles_xyz = angles_xyz;
@@ -168,55 +168,55 @@ public:
 		retval.mCenterOfRotation = centerOfRotation;
 		return retval;
 	}
-	static ElastixEulerTransform create(ssc::Transform3D M, ssc::Vector3D centerOfRotation)
+	static ElastixEulerTransform create(Transform3D M, Vector3D centerOfRotation)
 	{
 		ElastixEulerTransform retval;
 		retval.mAngles_xyz = M.matrix().block<3, 3> (0, 0).eulerAngles(0, 1, 2);
 		retval.mCenterOfRotation = centerOfRotation;
 
-		ssc::Transform3D R = retval.getRotationMatrix();
-		ssc::Transform3D C = ssc::createTransformTranslate(retval.mCenterOfRotation);
+		Transform3D R = retval.getRotationMatrix();
+		Transform3D C = createTransformTranslate(retval.mCenterOfRotation);
 		// solve M = T*Tc*R*Tc.inv() with respect to T:
-		ssc::Transform3D T = M*C*R.inv()*C.inv();
+		Transform3D T = M*C*R.inv()*C.inv();
 
 		retval.mTranslation = T.matrix().block<3, 1> (0, 3);
-//		retval.mCenterOfRotation = ssc::Vector3D(0,0,0);
+//		retval.mCenterOfRotation = Vector3D(0,0,0);
 		return retval;
 	}
-	ssc::Transform3D toMatrix() const
+	Transform3D toMatrix() const
 	{
-		ssc::Transform3D T = ssc::createTransformTranslate(mTranslation);
-		ssc::Transform3D C = ssc::createTransformTranslate(mCenterOfRotation);
-		ssc::Transform3D R = this->getRotationMatrix();
-		ssc::Transform3D Q = T*C*R*C.inv();
+		Transform3D T = createTransformTranslate(mTranslation);
+		Transform3D C = createTransformTranslate(mCenterOfRotation);
+		Transform3D R = this->getRotationMatrix();
+		Transform3D Q = T*C*R*C.inv();
 		return Q;
 	}
 	static void test()
 	{
 		std::cout << "==========TEST==============" << std::endl;
-		ssc::Transform3D M = ssc::createTransformRotateX(M_PI/3)*ssc::createTransformRotateY(M_PI/4)*ssc::createTransformTranslate(ssc::Vector3D(0,2,3));
+		Transform3D M = createTransformRotateX(M_PI/3)*createTransformRotateY(M_PI/4)*createTransformTranslate(Vector3D(0,2,3));
 
-		ElastixEulerTransform E = ElastixEulerTransform::create(M, ssc::Vector3D(30,40,50));
-		ssc::Transform3D Q = E.toMatrix();
+		ElastixEulerTransform E = ElastixEulerTransform::create(M, Vector3D(30,40,50));
+		Transform3D Q = E.toMatrix();
 
 		std::cout << "M\n" << M << std::endl;
 		std::cout << "Q\n" << Q << std::endl;
-		ssc::Transform3D diff = Q*M.inv();
+		Transform3D diff = Q*M.inv();
 		std::cout << "Q*M.inv\n" << diff << std::endl;
-		if (!ssc::similar(ssc::Transform3D::Identity(), diff))
-			ssc::messageManager()->sendError("assertion failure in ElastixEulerTransform");
+		if (!similar(Transform3D::Identity(), diff))
+			messageManager()->sendError("assertion failure in ElastixEulerTransform");
 	}
 private:
 	ElastixEulerTransform() {}
 
-	ssc::Transform3D getRotationMatrix() const
+	Transform3D getRotationMatrix() const
 	{
 		Eigen::Matrix3d m;
 		m =	Eigen::AngleAxisd(mAngles_xyz[0], Eigen::Vector3d::UnitX())
 		  * Eigen::AngleAxisd(mAngles_xyz[1], Eigen::Vector3d::UnitY())
 		  * Eigen::AngleAxisd(mAngles_xyz[2], Eigen::Vector3d::UnitZ());
 
-		ssc::Transform3D R = ssc::Transform3D::Identity();
+		Transform3D R = Transform3D::Identity();
 		R.matrix().block<3, 3> (0, 0) = m;
 		return R;
 	}

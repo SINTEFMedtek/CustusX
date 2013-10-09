@@ -48,15 +48,15 @@ SET( SOURCE_FILES
 # =========================================================
 
 
+include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
+    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     .
     ./logic
     ./gui
-    ${CustusX3_SOURCE_DIR}/source/resource
     ${CustusX3_SOURCE_DIR}/source/service/patient
     ${CustusX3_SOURCE_DIR}/source/service/tracking
-    ${CustusX3_SOURCE_DIR}/source/resource/settings
-    ${CustusX3_SOURCE_DIR}/source/resource/utilities
     ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
     ${CustusX3_SOURCE_DIR}/source/plugins/Acquisition/gui
     ${CustusX3_SOURCE_DIR}/source/plugins/Acquisition/logic
@@ -70,14 +70,10 @@ include_directories(
 add_library( cxPluginCalibration ${SOURCE_FILES} )
 set(LINK_LIBRARIES
     cxResource
+    cxResourceWidgets
     cxPluginAcquisition
       )
 target_link_libraries( cxPluginCalibration ${LINK_LIBRARIES} )
 CX_COTIRE_ADD_LIBRARY(cxPluginCalibration "${LINK_LIBRARIES}")
-
-
-# add/remove to suit your own needs.
-#add_subdirectory(logic)
-#add_subdirectory(gui)
 
 add_subdirectory(testing)

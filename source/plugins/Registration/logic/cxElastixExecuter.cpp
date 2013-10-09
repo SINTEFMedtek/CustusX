@@ -61,8 +61,8 @@ void ElastixExecuter::setDisplayProcessMessages(bool on)
 
 
 bool ElastixExecuter::setInput(QString application,
-				ssc::DataPtr fixed,
-				ssc::DataPtr moving,
+				DataPtr fixed,
+				DataPtr moving,
 				QString outdir,
 				QStringList parameterfiles)
 {
@@ -72,13 +72,13 @@ bool ElastixExecuter::setInput(QString application,
 
 	if (!fixed || !moving)
 	{
-		ssc::messageManager()->sendWarning("Failed to start elastiX registration, fixed or missing image missing.");
+		messageManager()->sendWarning("Failed to start elastiX registration, fixed or missing image missing.");
 		return false;
 	}
 
 	if (mProcess->state() != QProcess::NotRunning)
 	{
-		ssc::messageManager()->sendWarning("Failed to start elastiX registration, process already running");
+		messageManager()->sendWarning("Failed to start elastiX registration, process already running");
 		return false;
 	}
 
@@ -100,7 +100,7 @@ bool ElastixExecuter::setInput(QString application,
 		cmd << "-p" << parameterfiles[i];
 
 	QString commandLine = cmd.join(" ");
-	ssc::messageManager()->sendInfo(QString("Executing registration with command line: [%1]").arg(commandLine));
+	messageManager()->sendInfo(QString("Executing registration with command line: [%1]").arg(commandLine));
 
 	mProcess->start(commandLine);
 	return true;
@@ -123,8 +123,8 @@ bool ElastixExecuter::isRunning() const
 }
 
 QString ElastixExecuter::writeInitTransformToElastixfile(
-	ssc::DataPtr fixed,
-	ssc::DataPtr moving,
+	DataPtr fixed,
+	DataPtr moving,
 	QString outdir)
 {
 	// elastiX uses the transforms present in the mhd files. If the mhd info is up to date
@@ -140,16 +140,16 @@ QString ElastixExecuter::writeInitTransformToElastixfile(
 	//               -->
 	// 		T0 = mmMm*mMr*rMf*fMff
 	//
-	ssc::Transform3D rMf = fixed->get_rMd();
-	ssc::Transform3D rMm = moving->get_rMd();
-	ssc::Transform3D ffMf = this->getFileTransform_ddMd(mFixed);
-	ssc::Transform3D mmMm = this->getFileTransform_ddMd(mMoving);
-//	ssc::Transform3D mMf = rMm.inv() * rMf;
+	Transform3D rMf = fixed->get_rMd();
+	Transform3D rMm = moving->get_rMd();
+	Transform3D ffMf = this->getFileTransform_ddMd(mFixed);
+	Transform3D mmMm = this->getFileTransform_ddMd(mMoving);
+//	Transform3D mMf = rMm.inv() * rMf;
 	// -->
 	// The remainder transform, not stored in mhd files, must be sent to elastiX:
-	ssc::Transform3D T0 = mmMm*rMm.inv()*rMf*ffMf.inv();
+	Transform3D T0 = mmMm*rMm.inv()*rMf*ffMf.inv();
 
-//	ssc::Transform3D mMf = moving->get_rMd().inv() * fixed->get_rMd();
+//	Transform3D mMf = moving->get_rMd().inv() * fixed->get_rMd();
 	ElastixEulerTransform E = ElastixEulerTransform::create(T0, fixed->boundingBox().center());
 
 	QString elastiXText = QString(""
@@ -165,7 +165,7 @@ QString ElastixExecuter::writeInitTransformToElastixfile(
 		"// EulerTransform specific\n"
 		"(CenterOfRotationPoint %4)\n"
 		"(ComputeZYX \"false\")\n"
-		"").arg(QDateTime::currentDateTime().toString(ssc::timestampSecondsFormatNice()),
+		"").arg(QDateTime::currentDateTime().toString(timestampSecondsFormatNice()),
 			qstring_cast(E.mAngles_xyz),
 			qstring_cast(E.mTranslation),
 			qstring_cast(E.mCenterOfRotation));
@@ -173,18 +173,18 @@ QString ElastixExecuter::writeInitTransformToElastixfile(
 	QFile initTransformFile(outdir+"/t0.txt");
 	if (!initTransformFile.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
-		ssc::messageManager()->sendWarning(QString("Failed to open file %1 for writing.").arg(initTransformFile.fileName()));
+		messageManager()->sendWarning(QString("Failed to open file %1 for writing.").arg(initTransformFile.fileName()));
 	}
 	initTransformFile.write(elastiXText.toAscii());
 	return initTransformFile.fileName();
 }
 
 QString ElastixExecuter::writeInitTransformToCalfile(
-	ssc::DataPtr fixed,
-	ssc::DataPtr moving,
+	DataPtr fixed,
+	DataPtr moving,
 	QString outdir)
 {
-	ssc::Transform3D mMf = moving->get_rMd().inv() * fixed->get_rMd();
+	Transform3D mMf = moving->get_rMd().inv() * fixed->get_rMd();
 
 	TransformFile file(outdir+"/moving_M_fixed_initial.cal");
 	file.write(mMf);
@@ -194,7 +194,7 @@ QString ElastixExecuter::writeInitTransformToCalfile(
 
 void ElastixExecuter::processReadyRead()
 {
-	ssc::messageManager()->sendInfo(QString(mProcess->readAllStandardOutput()));
+	messageManager()->sendInfo(QString(mProcess->readAllStandardOutput()));
 }
 
 void ElastixExecuter::processError(QProcess::ProcessError error)
@@ -226,13 +226,13 @@ void ElastixExecuter::processError(QProcess::ProcessError error)
 		msg += "Invalid error";
 	}
 
-	ssc::messageManager()->sendError(msg);
+	messageManager()->sendError(msg);
 }
 
 void ElastixExecuter::processFinished(int code, QProcess::ExitStatus status)
 {
 	if (status == QProcess::CrashExit)
-		ssc::messageManager()->sendError("Registration process crashed");
+		messageManager()->sendError("Registration process crashed");
 }
 
 
@@ -245,17 +245,17 @@ void ElastixExecuter::processStateChanged(QProcess::ProcessState newState)
 
 	if (newState == QProcess::Running)
 	{
-//		ssc::messageManager()->sendInfo(msg + " running.");
+//		messageManager()->sendInfo(msg + " running.");
 		emit started(0);
 	}
 	if (newState == QProcess::NotRunning)
 	{
 		emit finished();
-//		ssc::messageManager()->sendInfo(msg + " not running.");
+//		messageManager()->sendInfo(msg + " not running.");
 	}
 	if (newState == QProcess::Starting)
 	{
-//		ssc::messageManager()->sendInfo(msg + " starting.");
+//		messageManager()->sendInfo(msg + " starting.");
 	}
 }
 
@@ -272,27 +272,27 @@ QString ElastixExecuter::findMostRecentTransformOutputFile() const
 	return retval;
 }
 
-ssc::Transform3D ElastixExecuter::getFileTransform_ddMd(ssc::DataPtr volume)
+Transform3D ElastixExecuter::getFileTransform_ddMd(DataPtr volume)
 {
 	QString patFolder = patientService()->getPatientData()->getActivePatientFolder();
-	ssc::CustomMetaImagePtr reader = ssc::CustomMetaImage::create(patFolder+"/"+volume->getFilePath());
-	ssc::Transform3D ddMd = reader->readTransform();
+	CustomMetaImagePtr reader = CustomMetaImage::create(patFolder+"/"+volume->getFilePath());
+	Transform3D ddMd = reader->readTransform();
 	return ddMd;
 }
 
-ssc::Transform3D ElastixExecuter::getAffineResult_mMf(bool* ok)
+Transform3D ElastixExecuter::getAffineResult_mMf(bool* ok)
 {
-	ssc::Transform3D mmMff = this->getAffineResult_mmMff(ok);
-	ssc::Transform3D ffMf = this->getFileTransform_ddMd(mFixed);
-	ssc::Transform3D mmMm = this->getFileTransform_ddMd(mMoving);
+	Transform3D mmMff = this->getAffineResult_mmMff(ok);
+	Transform3D ffMf = this->getFileTransform_ddMd(mFixed);
+	Transform3D mmMm = this->getFileTransform_ddMd(mMoving);
 
 	return mmMm.inv() * mmMff * ffMf;
 }
 
-ssc::Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
+Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 {
 	QString filename = this->findMostRecentTransformOutputFile();
-	ssc::Transform3D mMf = ssc::Transform3D::Identity();
+	Transform3D mMf = Transform3D::Identity();
 
 	if (filename.isEmpty())
 	{
@@ -304,7 +304,7 @@ ssc::Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 
 		if (ok && !*ok)
 		{
-			ssc::messageManager()->sendWarning("Failed to read registration results.");
+			messageManager()->sendWarning("Failed to read registration results.");
 		}
 
 		return mMf;
@@ -317,7 +317,7 @@ ssc::Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 		bool useDirectionCosines = file.readParameterBool("UseDirectionCosines");
 		if (useDirectionCosines)
 		{
-			ssc::messageManager()->sendWarning("Elastix UseDirectionCosines is not supported. Result is probably wrong.");
+			messageManager()->sendWarning("Elastix UseDirectionCosines is not supported. Result is probably wrong.");
 		}
 
 		QString transformType = file.readParameterString("Transform");
@@ -325,7 +325,7 @@ ssc::Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 		{
 			if (ok)
 				*ok = true;
-			ssc::Transform3D mQf = file.readEulerTransform();
+			Transform3D mQf = file.readEulerTransform();
 			// concatenate transforms:
 			mMf = mQf * mMf;
 		}
@@ -333,7 +333,7 @@ ssc::Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 		{
 			if (ok)
 				*ok = true;
-			ssc::Transform3D mQf = file.readAffineTransform();
+			Transform3D mQf = file.readAffineTransform();
 			// concatenate transforms:
 			mMf = mQf * mMf;
 		}
@@ -342,7 +342,7 @@ ssc::Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 			// accept invalid transforms, but emit warning.
 //			if (ok)
 //				*ok = false;
-			ssc::messageManager()->sendWarning(QString("TransformType [%1] is not supported by CustusX. Registration result from %2 ignored.").arg(transformType).arg(filename));
+			messageManager()->sendWarning(QString("TransformType [%1] is not supported by CustusX. Registration result from %2 ignored.").arg(transformType).arg(filename));
 		}
 
 		filename = file.readParameterString("InitialTransformParametersFileName");
@@ -379,7 +379,7 @@ QString ElastixExecuter::getNonlinearResultVolume(bool* ok)
 
 	if ((transform=="BSplineTransform") || (transform=="SplineKernelTransform"))
 	{
-		ssc::messageManager()->sendInfo(QString("Reading result file %1 created with transform %2").arg(retval).arg(transform));
+		messageManager()->sendInfo(QString("Reading result file %1 created with transform %2").arg(retval).arg(transform));
 		return retval;
 	}
 	else
@@ -399,45 +399,45 @@ QString ElastixExecuter::getNonlinearResultVolume(bool* ok)
 
 
 
-ssc::Transform3D ElastixParameterFile::readEulerTransform()
+Transform3D ElastixParameterFile::readEulerTransform()
 {
 	QString transformType = this->readParameterString("Transform");
 	if (transformType!="EulerTransform")
-		ssc::messageManager()->sendError("Assert failure: attempting to read EulerTransform");
+		messageManager()->sendError("Assert failure: attempting to read EulerTransform");
 
 	int numberOfParameters = this->readParameterInt("NumberOfParameters");
 	if (numberOfParameters!=6)
 	{
-		ssc::messageManager()->sendWarning(QString("Expected 6 Euler parameters, got %1").arg(numberOfParameters));
-		return ssc::Transform3D::Identity();
+		messageManager()->sendWarning(QString("Expected 6 Euler parameters, got %1").arg(numberOfParameters));
+		return Transform3D::Identity();
 	}
 	std::vector<double> tp = this->readParameterDoubleVector("TransformParameters");
 	std::vector<double> cor = this->readParameterDoubleVector("CenterOfRotationPoint");
 
 	ElastixEulerTransform E = ElastixEulerTransform::create(
-		ssc::Vector3D(tp[0], tp[1], tp[2]),
-		ssc::Vector3D(tp[3], tp[4], tp[5]),
-		ssc::Vector3D(cor[0], cor[1], cor[2]));
+		Vector3D(tp[0], tp[1], tp[2]),
+		Vector3D(tp[3], tp[4], tp[5]),
+		Vector3D(cor[0], cor[1], cor[2]));
 
 	return E.toMatrix();
 }
 
-ssc::Transform3D ElastixParameterFile::readAffineTransform()
+Transform3D ElastixParameterFile::readAffineTransform()
 {
 	QString transformType = this->readParameterString("Transform");
 	if (transformType!="AffineTransform")
-		ssc::messageManager()->sendError("Assert failure: attempting to read AffineTransform");
+		messageManager()->sendError("Assert failure: attempting to read AffineTransform");
 
 	int numberOfParameters = this->readParameterInt("NumberOfParameters");
 	if (numberOfParameters!=12)
 	{
-		ssc::messageManager()->sendWarning(QString("Expected 12 Euler parameters, got %1").arg(numberOfParameters));
-		return ssc::Transform3D::Identity();
+		messageManager()->sendWarning(QString("Expected 12 Euler parameters, got %1").arg(numberOfParameters));
+		return Transform3D::Identity();
 	}
 	std::vector<double> tp = this->readParameterDoubleVector("TransformParameters");
 //	std::vector<double> cor = this->readParameterDoubleVector("CenterOfRotationPoint");
 
-	ssc::Transform3D M = ssc::Transform3D::Identity();
+	Transform3D M = Transform3D::Identity();
 
 	for (int r=0; r<3; ++r)
 		for (int c=0; c<3; ++c)
@@ -452,7 +452,7 @@ ElastixParameterFile::ElastixParameterFile(QString filename) : mFile(filename)
 {
 	if (!mFile.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
-		ssc::messageManager()->sendWarning(QString("Can't open ElastiX result file %1").arg(filename));
+		messageManager()->sendWarning(QString("Can't open ElastiX result file %1").arg(filename));
 	}
 	mText = QString(mFile.readAll());
 //	std::cout << "Loaded text from " << filename << ":\n" << mText << std::endl;

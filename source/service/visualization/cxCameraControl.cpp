@@ -25,7 +25,7 @@
 #include "vtkCamera.h"
 #include "vtkSmartPointer.h"
 #include "cxViewManager.h"
-#include "cxView3D.h"
+#include "sscView.h"
 
 namespace cx
 {
@@ -59,9 +59,9 @@ void CameraData::addXml(QDomNode dataNode) const
 	if (!mCamera)
 		return;
 
-	this->addTextElement(dataNode, "position", qstring_cast(ssc::Vector3D(mCamera->GetPosition())));
-	this->addTextElement(dataNode, "focalPoint", qstring_cast(ssc::Vector3D(mCamera->GetFocalPoint())));
-	this->addTextElement(dataNode, "viewUp", qstring_cast(ssc::Vector3D(mCamera->GetViewUp())));
+	this->addTextElement(dataNode, "position", qstring_cast(Vector3D(mCamera->GetPosition())));
+	this->addTextElement(dataNode, "focalPoint", qstring_cast(Vector3D(mCamera->GetFocalPoint())));
+	this->addTextElement(dataNode, "viewUp", qstring_cast(Vector3D(mCamera->GetViewUp())));
 	this->addTextElement(dataNode, "nearClip", qstring_cast(mCamera->GetClippingRange()[0]));
 	this->addTextElement(dataNode, "farClip", qstring_cast(mCamera->GetClippingRange()[1]));
 	this->addTextElement(dataNode, "parallelScale", qstring_cast(mCamera->GetParallelScale()));
@@ -69,15 +69,15 @@ void CameraData::addXml(QDomNode dataNode) const
 
 void CameraData::parseXml(QDomNode dataNode)
 {
-	ssc::Vector3D vup = ssc::Vector3D::fromString(dataNode.namedItem("viewUp").toElement().text());
-	if (ssc::similar(vup.length(), 0.0))
+	Vector3D vup = Vector3D::fromString(dataNode.namedItem("viewUp").toElement().text());
+	if (similar(vup.length(), 0.0))
 		return; // ignore reading if undefined data
 
 	this->getCamera();
 
-	ssc::Vector3D position = ssc::Vector3D::fromString(dataNode.namedItem("position").toElement().text());
-	ssc::Vector3D focalPoint = ssc::Vector3D::fromString(dataNode.namedItem("focalPoint").toElement().text());
-	ssc::Vector3D viewUp = ssc::Vector3D::fromString(dataNode.namedItem("viewUp").toElement().text());
+	Vector3D position = Vector3D::fromString(dataNode.namedItem("position").toElement().text());
+	Vector3D focalPoint = Vector3D::fromString(dataNode.namedItem("focalPoint").toElement().text());
+	Vector3D viewUp = Vector3D::fromString(dataNode.namedItem("viewUp").toElement().text());
 	double nearClip = dataNode.namedItem("nearClip").toElement().text().toDouble();
 	double farClip = dataNode.namedItem("farClip").toElement().text().toDouble();
 	double parallelScale = dataNode.namedItem("parallelScale").toElement().text().toDouble();
@@ -110,15 +110,15 @@ CameraControl::~CameraControl()
  * (i.e. keep pos of camera constant relative to focus).
  *
  */
-void CameraControl::translateByFocusTo(ssc::Vector3D p_r)
+void CameraControl::translateByFocusTo(Vector3D p_r)
 {
 	vtkCameraPtr camera = this->getCamera();
 	if (!camera)
 		return;
 
-	ssc::Vector3D f(camera->GetFocalPoint());
-	ssc::Vector3D p(camera->GetPosition());
-	ssc::Vector3D delta = p_r - f;
+	Vector3D f(camera->GetFocalPoint());
+	Vector3D p(camera->GetPosition());
+	Vector3D delta = p_r - f;
 	f += delta;
 	p += delta;
 	camera->SetFocalPoint(f.begin());
@@ -128,19 +128,19 @@ void CameraControl::translateByFocusTo(ssc::Vector3D p_r)
 QActionGroup* CameraControl::createStandard3DViewActions()
 {
 	QActionGroup* group = new QActionGroup(this);
-	this->addStandard3DViewAction("A", "Anterior View", ssc::Vector3D(0, 1, 0), group);
-	this->addStandard3DViewAction("P", "Posterior View", ssc::Vector3D(0, -1, 0), group);
-	this->addStandard3DViewAction("S", "Superior View", ssc::Vector3D(0, 0, -1), group);
-	this->addStandard3DViewAction("I", "Inferior View", ssc::Vector3D(0, 0, 1), group);
-	this->addStandard3DViewAction("L", "Left View", ssc::Vector3D(-1, 0, 0), group);
-	this->addStandard3DViewAction("R", "Right View", ssc::Vector3D(1, 0, 0), group);
-	this->addStandard3DViewAction("O", "Orthogonal View", ssc::Vector3D(-1, 1, -1).normal(), group);
+	this->addStandard3DViewAction("A", "Anterior View", Vector3D(0, 1, 0), group);
+	this->addStandard3DViewAction("P", "Posterior View", Vector3D(0, -1, 0), group);
+	this->addStandard3DViewAction("S", "Superior View", Vector3D(0, 0, -1), group);
+	this->addStandard3DViewAction("I", "Inferior View", Vector3D(0, 0, 1), group);
+	this->addStandard3DViewAction("L", "Left View", Vector3D(-1, 0, 0), group);
+	this->addStandard3DViewAction("R", "Right View", Vector3D(1, 0, 0), group);
+	this->addStandard3DViewAction("O", "Orthogonal View", Vector3D(-1, 1, -1).normal(), group);
 	return group;
 }
 
 /** Add one layout as an action to the layout menu.
  */
-QAction* CameraControl::addStandard3DViewAction(QString caption, QString help, ssc::Vector3D viewDirection,
+QAction* CameraControl::addStandard3DViewAction(QString caption, QString help, Vector3D viewDirection,
 	QActionGroup* group)
 {
 	QAction* action = new QAction(help, group);
@@ -175,7 +175,7 @@ void CameraControl::setStandard3DViewActionSlot()
 	QAction* action = dynamic_cast<QAction*> (sender());
 	if (!action)
 		return;
-	ssc::Vector3D viewDirection = ssc::Vector3D::fromString(action->data().toString());
+	Vector3D viewDirection = Vector3D::fromString(action->data().toString());
 
 	vtkRendererPtr renderer = this->getRenderer();
 	if (!renderer)
@@ -184,15 +184,15 @@ void CameraControl::setStandard3DViewActionSlot()
 
 	renderer->ResetCamera();
 
-	ssc::Vector3D focus(camera->GetFocalPoint());
-	ssc::Vector3D pos = focus - 500 * viewDirection;
-	ssc::Vector3D vup(0, 0, 1);
-	//ssc::Vector3D dir = (focus-direction).normal();
+	Vector3D focus(camera->GetFocalPoint());
+	Vector3D pos = focus - 500 * viewDirection;
+	Vector3D vup(0, 0, 1);
+	//Vector3D dir = (focus-direction).normal();
 
-	ssc::Vector3D left = ssc::cross(vup, viewDirection);
-	if (ssc::similar(left.length(), 0.0))
-		left = ssc::Vector3D(1, 0, 0);
-	vup = ssc::cross(viewDirection, left).normal();
+	Vector3D left = cross(vup, viewDirection);
+	if (similar(left.length(), 0.0))
+		left = Vector3D(1, 0, 0);
+	vup = cross(viewDirection, left).normal();
 
 	camera->SetPosition(pos.begin());
 	camera->SetViewUp(vup.begin());

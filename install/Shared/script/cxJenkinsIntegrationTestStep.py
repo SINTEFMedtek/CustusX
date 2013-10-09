@@ -30,6 +30,7 @@ import cx.cxComponents
 import cx.cxComponentAssembly
 import cx.cxCustusXBuilder
 import cx.cxJenkinsBuildScriptBase
+import cx.cxCustusXInstaller
 import cx.cxCustusXTestInstallation
 
 
@@ -38,6 +39,7 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
     '''
     def __init__(self):
         ''
+        self.cxInstaller = cx.cxCustusXInstaller.CustusXInstaller()
         self.cxInstallation = cx.cxCustusXTestInstallation.CustusXTestInstallation()
         super(Controller, self).__init__()
 
@@ -51,13 +53,19 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         p.add_argument('--skip_checkout', action='store_true', default=False, help='Skip the checkout of data')
         p.add_argument('--skip_install', action='store_true', default=False, help='Skip installing the package')
         p.add_argument('--skip_tests', action='store_true', default=False, help='Skip the test step')
+        p.add_argument('--b32', action='store_true', default=False, help='Build 32 bit.')
+        p.add_argument('--jom', action='store_true', default=False, help='Use jom to build.')
+        p.add_argument('--static', action='store_true', default=False, help='Link statically.')
 
     def _applyArgumentParserArguments(self, options):
         'apply arguments defined in _addArgumentParserArguments()'
         super(Controller, self)._applyArgumentParserArguments(options)
         data = self.cxBuilder.assembly.controlData        
         data.setBuildType("Release")
-  
+        if(options.jom):
+            data.setCMakeGenerator("NMake Makefiles JOM")
+        data.setBuild32(options.b32)
+        data.setBuildShared(not options.static)
         self._initializeInstallationObject()
  
     def _initializeInstallationObject(self):
@@ -66,17 +74,30 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         from the build process.
         '''
         assembly = self.cxBuilder.assembly                
-        self.cxInstallation.setRootDir(assembly.controlData.getRootDir())
         custusxdata = assembly.getComponent(cx.cxComponents.CustusX3Data)
-        self.cxInstallation.setTestDataPath(custusxdata.sourcePath())
         custusx = assembly.getComponent(cx.cxComponents.CustusX3)
-        self.cxInstallation.setInstallerPath(custusx.buildPath())        
+        
+        self.cxInstaller.setRootDir(assembly.controlData.getRootDir())
+        if platform.system() == 'Windows':
+            build_path = custusx.buildPath()
+            if "32" in build_path:
+                self.cxInstaller.setInstallerPath('%s\\_CPack_Packages\\win32\\NSIS' % build_path)
+            else:
+                self.cxInstaller.setInstallerPath('%s\\_CPack_Packages\\win64\\NSIS' % build_path)
+        else:
+            self.cxInstaller.setInstallerPath(custusx.buildPath())
+            
+        self.cxInstaller.setSourcePath(custusx.sourcePath())        
+
+        self.cxInstallation.setRootDir(assembly.controlData.getRootDir())
+        self.cxInstallation.setTestDataPath(custusxdata.sourcePath())
+        self.cxInstallation.setInstalledRoot(self.cxInstaller.getInstalledRoot())        
 
     def run(self):
         if not self.argumentParserArguments.skip_checkout:
             self._checkoutComponents()
         if not self.argumentParserArguments.skip_install:
-            self.cxInstallation.installPackage()
+            self.cxInstaller.installPackage()
         if not self.argumentParserArguments.skip_tests:
             self.cxInstallation.testInstallation()
             self.cxInstallation.runIntegrationTests()

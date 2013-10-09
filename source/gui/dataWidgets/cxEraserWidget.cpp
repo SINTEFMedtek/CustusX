@@ -38,7 +38,6 @@
 #include "sscImage.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
-#include "cxView3D.h"
 #include "cxInteractiveCropper.h"
 #include "cxViewManager.h"
 #include "cxToolManager.h"
@@ -90,9 +89,9 @@ EraserWidget::EraserWidget(QWidget* parent) :
 
 
 	double sphereRadius = 10;
-	mSphereSizeAdapter = ssc::DoubleDataAdapterXml::initialize("SphereSize", "Sphere Size", "Radius of Eraser Sphere", sphereRadius, ssc::DoubleRange(1,200,1), 0, QDomNode());
+	mSphereSizeAdapter = DoubleDataAdapterXml::initialize("SphereSize", "Sphere Size", "Radius of Eraser Sphere", sphereRadius, DoubleRange(1,200,1), 0, QDomNode());
 	connect(mSphereSizeAdapter.get(), SIGNAL(changed()), this, SLOT(sphereSizeChangedSlot()));
-	mSphereSize = new ssc::SpinBoxAndSliderGroupWidget(this, mSphereSizeAdapter);
+	mSphereSize = new SpinBoxAndSliderGroupWidget(this, mSphereSizeAdapter);
 	layout->addWidget(mSphereSize);
 
 	layout->addStretch();
@@ -139,13 +138,13 @@ void EraserWidget::toggleContinous(bool on)
 
 void EraserWidget::continousRemoveSlot()
 {
-	ssc::Transform3D rMd = viewManager()->getViewGroups().front()->getData()->getOptions().mPickerGlyph->get_rMd();
-	ssc::Vector3D c(mSphere->GetCenter());
+	Transform3D rMd = viewManager()->getViewGroups().front()->getData()->getOptions().mPickerGlyph->get_rMd();
+	Vector3D c(mSphere->GetCenter());
 	c = rMd.coord(c);
 	double r = mSphere->GetRadius();
 
 	// optimization: dont remove if idle
-	if (ssc::similar(mPreviousCenter, c) && ssc::similar(mPreviousRadius, r))
+	if (similar(mPreviousCenter, c) && similar(mPreviousRadius, r))
 		return;
 
 	this->removeSlot();
@@ -153,13 +152,13 @@ void EraserWidget::continousRemoveSlot()
 
 void EraserWidget::duplicateSlot()
 {
-	ssc::ImagePtr original = ssc::dataManager()->getActiveImage();
+	ImagePtr original = dataManager()->getActiveImage();
 	QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
 
-	ssc::ImagePtr duplicate = duplicateImage(original);
-	ssc::dataManager()->loadData(duplicate);
-	ssc::dataManager()->saveImage(duplicate, outputBasePath);
-	ssc::dataManager()->setActiveImage(duplicate);
+	ImagePtr duplicate = duplicateImage(original);
+	dataManager()->loadData(duplicate);
+	dataManager()->saveImage(duplicate, outputBasePath);
+	dataManager()->setActiveImage(duplicate);
 
 	// replace viz of original with duplicate
 	std::vector<ViewGroupPtr> viewGroups = viewManager()->getViewGroups();
@@ -182,43 +181,43 @@ void EraserWidget::sphereSizeChangedSlot()
  */
 void EraserWidget::saveSlot()
 {
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ImagePtr image = dataManager()->getActiveImage();
 	QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
 
-	ssc::dataManager()->saveImage(image, outputBasePath);
+	dataManager()->saveImage(image, outputBasePath);
 }
 
 
 template <class TYPE>
 void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 {
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ImagePtr image = dataManager()->getActiveImage();
 	vtkImageDataPtr img = image->getBaseVtkImageData();
 
 //	std::cout << "starting" << std::endl;
 
 	Eigen::Array3i dim(img->GetDimensions());
-	ssc::Vector3D spacing(img->GetSpacing());
+	Vector3D spacing(img->GetSpacing());
 
-	ssc::Transform3D rMd = viewManager()->getViewGroups().front()->getData()->getOptions().mPickerGlyph->get_rMd();
-	ssc::Vector3D c(mSphere->GetCenter());
+	Transform3D rMd = viewManager()->getViewGroups().front()->getData()->getOptions().mPickerGlyph->get_rMd();
+	Vector3D c(mSphere->GetCenter());
 	c = rMd.coord(c);
 	double r = mSphere->GetRadius();
 	mPreviousCenter = c;
 	mPreviousRadius = r;
 
-	ssc::DoubleBoundingBox3D bb_r(c[0]-r, c[0]+r, c[1]-r, c[1]+r, c[2]-r, c[2]+r);
+	DoubleBoundingBox3D bb_r(c[0]-r, c[0]+r, c[1]-r, c[1]+r, c[2]-r, c[2]+r);
 
-	ssc::Transform3D dMr = image->get_rMd().inv();
-	ssc::Transform3D rawMd = ssc::createTransformScale(spacing).inv();
-	ssc::Transform3D rawMr = rawMd * dMr;
-	ssc::Vector3D c_d = dMr.coord(c);
-	double r_d = dMr.vector(r * ssc::Vector3D::UnitX()).length();
+	Transform3D dMr = image->get_rMd().inv();
+	Transform3D rawMd = createTransformScale(spacing).inv();
+	Transform3D rawMr = rawMd * dMr;
+	Vector3D c_d = dMr.coord(c);
+	double r_d = dMr.vector(r * Vector3D::UnitX()).length();
 	c = rawMr.coord(c);
-	r = rawMr.vector(r * ssc::Vector3D::UnitX()).length();
-	ssc::DoubleBoundingBox3D bb0_raw = ssc::transform(rawMr, bb_r);
-//	ssc::IntBoundingBox3D bb1_raw(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
-	ssc::IntBoundingBox3D bb1_raw(0, dim[0], 0, dim[1], 0, dim[2]);
+	r = rawMr.vector(r * Vector3D::UnitX()).length();
+	DoubleBoundingBox3D bb0_raw = transform(rawMr, bb_r);
+//	IntBoundingBox3D bb1_raw(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
+	IntBoundingBox3D bb1_raw(0, dim[0], 0, dim[1], 0, dim[2]);
 
 //	std::cout << "     sphere: " << bb0_raw << std::endl;
 //	std::cout << "        raw: " << bb1_raw << std::endl;
@@ -231,7 +230,7 @@ void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 
 //	std::cout << "clip in raw: " << bb1_raw << std::endl;
 	//	double r=50;
-	//	ssc::Vector3D c(200,200,200);
+	//	Vector3D c(200,200,200);
 	for (int x = bb1_raw[0]; x < bb1_raw[1]; ++x)
 		for (int y = bb1_raw[2]; y < bb1_raw[3]; ++y)
 			for (int z = bb1_raw[4]; z < bb1_raw[5]; ++z)
@@ -239,9 +238,9 @@ void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 				int index = x + y * dim[0] + z * dim[0] * dim[1];
 //				volumePointer[index] = replaceVal;
 
-//				if ((ssc::Vector3D(x, y, z) - c).length() < r)
+//				if ((Vector3D(x, y, z) - c).length() < r)
 //					volumePointer[index] = replaceVal;
-				if ((ssc::Vector3D(x*spacing[0], y*spacing[1], z*spacing[2]) - c_d).length() < r_d)
+				if ((Vector3D(x*spacing[0], y*spacing[1], z*spacing[2]) - c_d).length() < r_d)
 					volumePointer[index] = replaceVal;
 			}
 }
@@ -271,16 +270,16 @@ void EraserWidget::removeSlot()
 
 #if 0
 	// experimental clipping of mesh - has no effect...
-	std::map<QString,ssc::MeshPtr> meshes = ssc::dataManager()->getMeshes();
+	std::map<QString,MeshPtr> meshes = dataManager()->getMeshes();
 	if (!meshes.empty())
 	{
-		ssc::MeshPtr mesh = meshes.begin()->second;
+		MeshPtr mesh = meshes.begin()->second;
 
-		ssc::Vector3D c(mEraserSphere->GetCenter());
+		Vector3D c(mEraserSphere->GetCenter());
 		double r = mEraserSphere->GetRadius();
-		ssc::Transform3D dMr = mesh->get_rMd().inv();
-		ssc::Vector3D c_d = dMr.coord(c);
-		double r_d = dMr.vector(r * ssc::Vector3D::UnitX()).length();
+		Transform3D dMr = mesh->get_rMd().inv();
+		Vector3D c_d = dMr.coord(c);
+		double r_d = dMr.vector(r * Vector3D::UnitX()).length();
 		vtkSphere* sphere = vtkSphere::New();
 		sphere->SetRadius(r_d);
 		sphere->SetCenter(c_d.data());
@@ -296,7 +295,7 @@ void EraserWidget::removeSlot()
 	}
 #endif
 
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ImagePtr image = dataManager()->getActiveImage();
 	vtkImageDataPtr img = image->getBaseVtkImageData();
 
 	if (img->GetScalarType()==VTK_CHAR)
@@ -312,8 +311,8 @@ void EraserWidget::removeSlot()
 	if (img->GetScalarType()==VTK_INT)
 		this->eraseVolume(static_cast<int*> (img->GetScalarPointer()), VTK_INT_MIN);
 
-	ssc::ImageLUT2DPtr tf2D = image->getLookupTable2D();
-	ssc::ImageTF3DPtr tf3D = image->getTransferFunctions3D();
+	ImageLUT2DPtr tf2D = image->getLookupTable2D();
+	ImageTF3DPtr tf3D = image->getTransferFunctions3D();
 
 	img->Modified();
 	image->setVtkImageData(img);
@@ -337,7 +336,7 @@ void EraserWidget::toggleShowEraser(bool on)
 
 		double a = mSphereSizeAdapter->getValue();
 		mSphere->SetRadius(a);
-		ssc::MeshPtr glyph = viewGroups.front()->getData()->getOptions().mPickerGlyph;
+		MeshPtr glyph = viewGroups.front()->getData()->getOptions().mPickerGlyph;
 		glyph->setVtkPolyData(mSphere->GetOutput());
 		glyph->setColor(QColor(255, 204, 0)); // same as tool
 		glyph->setIsWireframe(true);

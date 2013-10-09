@@ -32,20 +32,21 @@
 #include "sscData.h"
 #include "cxViewWrapper.h"
 #include "sscManualTool.h"
+#include "sscVolumeHelpers.h"
 
 namespace cx
 {
 
 /**Place the global center to the center of the image.
  */
-void Navigation::centerToData(ssc::DataPtr image)
+void Navigation::centerToData(DataPtr image)
 {
 	if (!image)
 		return;
-	ssc::Vector3D p_r = image->get_rMd().coord(image->boundingBox().center());
+	Vector3D p_r = image->get_rMd().coord(image->boundingBox().center());
 
 	// set center to calculated position
-	ssc::dataManager()->setCenter(p_r);
+	dataManager()->setCenter(p_r);
 	CameraControl().translateByFocusTo(p_r);
 	this->centerManualTool(p_r);
 }
@@ -53,13 +54,13 @@ void Navigation::centerToData(ssc::DataPtr image)
 /**Place the global center to the mean center of
  * all the images in a view(wrapper).
  */
-void Navigation::centerToView(const std::vector<ssc::DataPtr>& images)
+void Navigation::centerToView(const std::vector<DataPtr>& images)
 {
-	ssc::Vector3D p_r = findViewCenter(images);
+	Vector3D p_r = findViewCenter(images);
 	std::cout << "center ToView: " << images.size() << " - " << p_r << std::endl;
 
 	// set center to calculated position
-	ssc::dataManager()->setCenter(p_r);
+	dataManager()->setCenter(p_r);
 	CameraControl().translateByFocusTo(p_r);
 	this->centerManualTool(p_r);
 //  std::cout << "Centered to view." << std::endl;
@@ -70,13 +71,13 @@ void Navigation::centerToView(const std::vector<ssc::DataPtr>& images)
  */
 void Navigation::centerToGlobalDataCenter()
 {
-	if (ssc::dataManager()->getData().empty())
+	if (dataManager()->getData().empty())
 		return;
 
-	ssc::Vector3D p_r = this->findGlobalDataCenter();
+	Vector3D p_r = this->findGlobalDataCenter();
 
 	// set center to calculated position
-	ssc::dataManager()->setCenter(p_r);
+	dataManager()->setCenter(p_r);
 	CameraControl().translateByFocusTo(p_r);
 	this->centerManualTool(p_r);
 //  std::cout << "Centered to all images." << std::endl;
@@ -87,19 +88,19 @@ void Navigation::centerToGlobalDataCenter()
  */
 void Navigation::centerToTooltip()
 {
-	ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
-	ssc::Vector3D p_pr = tool->get_prMt().coord(ssc::Vector3D(0, 0, tool->getTooltipOffset()));
-	ssc::Vector3D p_r = ssc::toolManager()->get_rMpr()->coord(p_pr);
+	ToolPtr tool = toolManager()->getDominantTool();
+	Vector3D p_pr = tool->get_prMt().coord(Vector3D(0, 0, tool->getTooltipOffset()));
+	Vector3D p_r = toolManager()->get_rMpr()->coord(p_pr);
 
 	// set center to calculated position
-	ssc::dataManager()->setCenter(p_r);
+	dataManager()->setCenter(p_r);
 	CameraControl().translateByFocusTo(p_r);
 }
 
 /**Find the center of all images in the view(wrapper), defined as the mean of
  * all the images center.
  */
-ssc::Vector3D Navigation::findViewCenter(const std::vector<ssc::DataPtr>& images)
+Vector3D Navigation::findViewCenter(const std::vector<DataPtr>& images)
 {
 	return this->findDataCenter(images);
 }
@@ -107,14 +108,14 @@ ssc::Vector3D Navigation::findViewCenter(const std::vector<ssc::DataPtr>& images
 /**Find the center of all images, defined as the mean of
  * all the images center.
  */
-ssc::Vector3D Navigation::findGlobalDataCenter()
+Vector3D Navigation::findGlobalDataCenter()
 {
-	ssc::DataManager::DataMap images = ssc::dataManager()->getData();
+	DataManager::DataMap images = dataManager()->getData();
 	if (images.empty())
-		return ssc::Vector3D(0, 0, 0);
+		return Vector3D(0, 0, 0);
 
-	ssc::DataManager::DataMap::iterator iter;
-	std::vector<ssc::DataPtr> dataVector;
+	DataManager::DataMap::iterator iter;
+	std::vector<DataPtr> dataVector;
 
 	for (iter = images.begin(); iter != images.end(); ++iter)
 	{
@@ -127,40 +128,20 @@ ssc::Vector3D Navigation::findGlobalDataCenter()
 /**Find the center of the images, defined as the center
  * of the smallest bounding box enclosing the images.
  */
-ssc::Vector3D Navigation::findDataCenter(std::vector<ssc::DataPtr> data)
+Vector3D Navigation::findDataCenter(std::vector<DataPtr> data)
 {
-	if (data.empty())
-		return ssc::Vector3D(0, 0, 0);
-
-	std::vector<ssc::Vector3D> corners_r;
-
-	for (unsigned i = 0; i < data.size(); ++i)
-	{
-		ssc::Transform3D rMd = data[i]->get_rMd();
-		ssc::DoubleBoundingBox3D bb = data[i]->boundingBox();
-
-		corners_r.push_back(rMd.coord(bb.corner(0, 0, 0)));
-		corners_r.push_back(rMd.coord(bb.corner(0, 0, 1)));
-		corners_r.push_back(rMd.coord(bb.corner(0, 1, 0)));
-		corners_r.push_back(rMd.coord(bb.corner(0, 1, 1)));
-		corners_r.push_back(rMd.coord(bb.corner(1, 0, 0)));
-		corners_r.push_back(rMd.coord(bb.corner(1, 0, 1)));
-		corners_r.push_back(rMd.coord(bb.corner(1, 1, 0)));
-		corners_r.push_back(rMd.coord(bb.corner(1, 1, 1)));
-	}
-
-	ssc::DoubleBoundingBox3D bb_sigma = ssc::DoubleBoundingBox3D::fromCloud(corners_r);
+	DoubleBoundingBox3D bb_sigma = findEnclosingBoundingBox(data, Transform3D::Identity());
 	return bb_sigma.center();
 }
 
-void Navigation::centerManualTool(ssc::Vector3D& p_r)
+void Navigation::centerManualTool(Vector3D& p_r)
 {
 	// move the manual tool to the same position. (this is a side effect... do we want it?)
-	ssc::ManualToolPtr manual = ToolManager::getInstance()->getManualTool();
-	ssc::Vector3D p_pr = ssc::toolManager()->get_rMpr()->inv().coord(p_r);
-	ssc::Transform3D prM0t = manual->get_prMt(); // modify old pos in order to keep orientation
-	ssc::Vector3D t_pr = prM0t.coord(ssc::Vector3D(0, 0, manual->getTooltipOffset()));
-	ssc::Transform3D prM1t = ssc::createTransformTranslate(p_pr - t_pr) * prM0t;
+	ManualToolPtr manual = cxToolManager::getInstance()->getManualTool();
+	Vector3D p_pr = toolManager()->get_rMpr()->inv().coord(p_r);
+	Transform3D prM0t = manual->get_prMt(); // modify old pos in order to keep orientation
+	Vector3D t_pr = prM0t.coord(Vector3D(0, 0, manual->getTooltipOffset()));
+	Transform3D prM1t = createTransformTranslate(p_pr - t_pr) * prM0t;
 
 	manual->set_prMt(prM1t);
 //  std::cout << "center manual tool" << std::endl;
@@ -171,7 +152,7 @@ void Navigation::centerManualTool(ssc::Vector3D& p_r)
 
 ViewGroup::ViewGroup()
 {
-//  mRegistrationMode = ssc::rsNOT_REGISTRATED;
+//  mRegistrationMode = rsNOT_REGISTRATED;
 	mZoom2D.mLocal = SyncedValue::create(1.0);
 	mZoom2D.activateGlobal(false);
 
@@ -186,7 +167,7 @@ ViewGroup::~ViewGroup()
 
 //void ViewGroup::setSlicePlanesProxy()
 //{
-//  mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
+//  mSlicePlanesProxy.reset(new SlicePlanesProxy());
 //}
 
 /**Add one view wrapper and setup the necessary connections.
@@ -265,21 +246,21 @@ void ViewGroup::syncOrientationMode(SyncedValuePtr val)
 
 void ViewGroup::mouseClickInViewGroupSlot()
 {
-	std::vector<ssc::ImagePtr> images = mViewGroupData->getImages();
+	std::vector<ImagePtr> images = mViewGroupData->getImages();
 	if (images.empty())
 	{
 		//Don't remove active image too easily
-		//ssc::dataManager()->setActiveImage(ssc::ImagePtr());
+		//dataManager()->setActiveImage(ImagePtr());
 	}
 	else
 	{
-		if (!std::count(images.begin(), images.end(), ssc::dataManager()->getActiveImage()))
+		if (!std::count(images.begin(), images.end(), dataManager()->getActiveImage()))
 		{
-			ssc::dataManager()->setActiveImage(images.front());
+			dataManager()->setActiveImage(images.front());
 		}
 	}
 
-	ViewWidgetQPtr view = static_cast<ssc::ViewWidget*>(this->sender());
+	ViewWidgetQPtr view = static_cast<ViewWidget*>(this->sender());
 	if (view)
 		viewManager()->setActiveView(view->getUid());
 }
@@ -291,14 +272,14 @@ std::vector<ViewWidgetQPtr> ViewGroup::getViews() const
 
 void ViewGroup::activateManualToolSlot()
 {
-	ToolManager::getInstance()->dominantCheckSlot();
+	cxToolManager::getInstance()->dominantCheckSlot();
 }
 
 void ViewGroup::addXml(QDomNode& dataNode)
 {
 	QDomDocument doc = dataNode.ownerDocument();
 
-	std::vector<ssc::DataPtr> data = mViewGroupData->getData();
+	std::vector<DataPtr> data = mViewGroupData->getData();
 
 	for (unsigned i = 0; i < data.size(); ++i)
 	{
@@ -333,11 +314,11 @@ void ViewGroup::parseXml(QDomNode dataNode)
 	for (QDomElement elem = dataNode.firstChildElement("data"); !elem.isNull(); elem = elem.nextSiblingElement("data"))
 	{
 		QString uid = elem.text();
-		ssc::DataPtr data = ssc::dataManager()->getData(uid);
+		DataPtr data = dataManager()->getData(uid);
 
 		mViewGroupData->addData(data);
 		if (!data)
-			ssc::messageManager()->sendError("Couldn't find the data: [" + uid + "] in the datamanager.");
+			messageManager()->sendError("Couldn't find the data: [" + uid + "] in the datamanager.");
 	}
 
 	mViewGroupData->getCamera3D()->parseXml(dataNode.namedItem("camera3D"));
@@ -348,7 +329,7 @@ void ViewGroup::parseXml(QDomNode dataNode)
 	if (ok)
 		this->setZoom2D(zoom2Ddouble);
 	else
-		ssc::messageManager()->sendError("Couldn't convert the zoomfactor to a double: " + qstring_cast(zoom2D) + "");
+		messageManager()->sendError("Couldn't convert the zoomfactor to a double: " + qstring_cast(zoom2D) + "");
 
 //  QDomElement slicePlanes3DNode = dataNode.namedItem("slicePlanes3D").toElement();
 //  mSlicePlanesProxy->setVisible(slicePlanes3DNode.attribute("use").toInt());
@@ -357,7 +338,7 @@ void ViewGroup::parseXml(QDomNode dataNode)
 
 }
 
-std::vector<ssc::ImagePtr> ViewGroup::getImages()
+std::vector<ImagePtr> ViewGroup::getImages()
 {
 	return mViewGroupData->getImages();
 }

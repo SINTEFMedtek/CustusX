@@ -8,9 +8,6 @@ endif(COMMAND cmake_policy)
 # CX C++ Test App for Qt fun stuff 
 # =========================================================
 
-find_package(SSC REQUIRED)
-include (${SSC_USE_FILE})
-
 # library
 SET( SOURCE_FILES
     #BronchoscopyRegistrationMain.h
@@ -27,13 +24,13 @@ SET( SOURCE_FILES
     BronchoscopyRegistrationMain.cpp
 	) 
 	
-include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )	
-		
+include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
+
 # =========================================================
 # create the target
 add_executable( BronchoscopyRegistration MACOSX_BUNDLE 
     ${SOURCE_FILES} )
-target_link_libraries( BronchoscopyRegistration SSC )
+target_link_libraries( BronchoscopyRegistration cxResource )
 # =========================================================
 
 

@@ -46,9 +46,9 @@ protected:
 	virtual void createOutputTypes();
 
 private:
-	ssc::StringDataAdapterPtr getStringOption(QDomElement root);
-	ssc::DoubleDataAdapterPtr getDoubleOption(QDomElement root);
-	ssc::BoolDataAdapterPtr getBoolOption(QDomElement root);
+	StringDataAdapterPtr getStringOption(QDomElement root);
+	DoubleDataAdapterPtr getDoubleOption(QDomElement root);
+	BoolDataAdapterPtr getBoolOption(QDomElement root);
 };
 
 } // namespace cx

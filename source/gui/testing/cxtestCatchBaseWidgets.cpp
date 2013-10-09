@@ -1,3 +1,16 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
 #include "catch.hpp"
 
 #include "cxLogicManager.h"
@@ -10,6 +23,7 @@
 //#include "cxDataSelectWidget.h" //special case
 #include "cxEraserWidget.h"
 #include "cxFrameTreeWidget.h"
+#include "cxMetricWidget.h"
 #include "cxNavigationWidget.h"
 #include "cxOverlayWidget.h"
 #include "cxPlaybackWidget.h"
@@ -107,6 +121,7 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 //	testAndDeleteBaseWidgetChild(new cx::DataSelectWidget(testParent));//special case: Needs a SelectDataStringDataAdapterBasePtr moc object
 	testAndDeleteBaseWidgetChild(new cx::EraserWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::FrameTreeWidget(testParent));
+	testAndDeleteBaseWidgetChild(new cx::MetricWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::NavigationWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::OverlayWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::PlaybackWidget(testParent));

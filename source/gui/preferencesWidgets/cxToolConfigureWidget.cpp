@@ -20,7 +20,7 @@ namespace cx
 
 ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
     QGroupBox(parent),
-    mClinicalApplication(ssc::mdCOUNT),
+    mClinicalApplication(mdCOUNT),
     mConfigFilesComboBox(new QComboBox()),
     mConfigFilePathLineEdit(new QLineEdit()),
     mConfigFileLineEdit(new QLineEdit()),
@@ -35,10 +35,10 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
   mApplicationGroupBox = new SelectionGroupBox("Applications", stateService()->getApplication()->getAllApplicationNames(), true, NULL);
   mApplicationGroupBox->setEnabledButtons(false); //< application application is determined by the application state chosen elsewhere in the system
   mApplicationGroupBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
-  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", ToolManager::getInstance()->getSupportedTrackingSystems(), true, NULL);
+  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", cxToolManager::getInstance()->getSupportedTrackingSystems(), true, NULL);
   mToolListWidget = new ConfigToolListWidget(NULL);
 
-  this->setClinicalApplicationSlot(string2enum<ssc::CLINICAL_APPLICATION>(stateService()->getApplication()->getActiveStateName()));
+  this->setClinicalApplicationSlot(string2enum<CLINICAL_APPLICATION>(stateService()->getApplication()->getActiveStateName()));
 
   QGroupBox* toolGroupBox = new QGroupBox();
   toolGroupBox->setTitle("Tools");
@@ -89,7 +89,7 @@ void ToolConfigureGroupBox::setCurrentlySelectedCofiguration(QString configAbsol
   if(currentIndex < 0)
   {
     currentIndex = 0;
-    ssc::messageManager()->sendWarning("Tool configuration doesn't exist: " + cleanPath);
+    messageManager()->sendWarning("Tool configuration doesn't exist: " + cleanPath);
   }
   mConfigFilesComboBox->setCurrentIndex(currentIndex);
 }
@@ -109,7 +109,7 @@ QString ToolConfigureGroupBox::requestSaveConfigurationSlot()
     return retval;
 
   // deconfigure toolmanager in order to be able to reread config data
-  ToolManager::getInstance()->deconfigure();
+  cxToolManager::getInstance()->deconfigure();
 
   ConfigurationFileParser::Configuration config = this->getCurrentConfiguration();
   ConfigurationFileParser::saveConfiguration(config);
@@ -121,7 +121,7 @@ QString ToolConfigureGroupBox::requestSaveConfigurationSlot()
   return retval;
 }
 
-void ToolConfigureGroupBox::setClinicalApplicationSlot(ssc::CLINICAL_APPLICATION clinicalApplication)
+void ToolConfigureGroupBox::setClinicalApplicationSlot(CLINICAL_APPLICATION clinicalApplication)
 {
   mClinicalApplication = clinicalApplication;
   this->setTitle("Tool configurations for "+enum2string(mClinicalApplication));
@@ -141,7 +141,7 @@ void ToolConfigureGroupBox::configChangedSlot()
 	if (mConfigFilesComboBox->currentText().contains("<new config>"))
 	{
 		selectedApplications << enum2string(mClinicalApplication); // just want a default
-		selectedTrackingSystems << enum2string(ssc::tsPOLARIS); //just want a default
+		selectedTrackingSystems << enum2string(tsPOLARIS); //just want a default
 		suggestDefaultNames = true;
 
 		absoluteConfigFilePath = DataLocations::getRootConfigPath()
@@ -153,7 +153,7 @@ void ToolConfigureGroupBox::configChangedSlot()
 	{
 		ConfigurationFileParser parser(absoluteConfigFilePath);
 
-		ssc::CLINICAL_APPLICATION application = parser.getApplicationapplication();
+		CLINICAL_APPLICATION application = parser.getApplicationapplication();
 		selectedApplications << enum2string(application);
 
 		std::vector<IgstkTracker::InternalStructure> trackers = parser.getTrackers();
@@ -284,12 +284,12 @@ ConfigurationFileParser::Configuration ToolConfigureGroupBox::getCurrentConfigur
   QString filename = mConfigFileLineEdit->text();
   QString filepath = mConfigFilePathLineEdit->text();
   retval.mFileName = filepath+"/"+filename;
-  retval.mClinical_app = string2enum<ssc::CLINICAL_APPLICATION>(mApplicationGroupBox->getSelected()[0]);
+  retval.mClinical_app = string2enum<CLINICAL_APPLICATION>(mApplicationGroupBox->getSelected()[0]);
 
   QStringList selectedTools = mToolListWidget->getTools();
   QString referencePath = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
 
-  ssc::TRACKING_SYSTEM selectedTracker = string2enum<ssc::TRACKING_SYSTEM>(mTrackingSystemGroupBox->getSelected()[0]);
+  TRACKING_SYSTEM selectedTracker = string2enum<TRACKING_SYSTEM>(mTrackingSystemGroupBox->getSelected()[0]);
 
   ConfigurationFileParser::ToolFilesAndReferenceVector toolfilesAndRefVector;
   QFile configFile(retval.mFileName);

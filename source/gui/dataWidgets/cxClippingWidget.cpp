@@ -17,7 +17,7 @@
 #include "cxViewManager.h"
 #include "sscDataManager.h"
 #include "cxSelectDataStringDataAdapter.h"
-
+#include "sscImage.h"
 namespace cx
 {
 
@@ -33,7 +33,7 @@ QString ClipPlaneStringDataAdapter::getValueName() const
 }
 bool ClipPlaneStringDataAdapter::setValue(const QString& value)
 {
-	ssc::PLANE_TYPE plane = string2enum<ssc::PLANE_TYPE> (value);
+	PLANE_TYPE plane = string2enum<PLANE_TYPE> (value);
 	if (plane == mInteractiveClipper->getSlicePlane())
 		return false;
 	mInteractiveClipper->setSlicePlane(plane);
@@ -49,7 +49,7 @@ QString ClipPlaneStringDataAdapter::getHelp() const
 }
 QStringList ClipPlaneStringDataAdapter::getValueRange() const
 {
-	std::vector<ssc::PLANE_TYPE> planes = mInteractiveClipper->getAvailableSlicePlanes();
+	std::vector<PLANE_TYPE> planes = mInteractiveClipper->getAvailableSlicePlanes();
 	QStringList retval;
 	//retval << ""; // removed this. No idea why we need an empty entry.
 	for (unsigned i = 0; i < planes.size(); ++i)
@@ -68,9 +68,8 @@ ClippingWidget::ClippingWidget(QWidget* parent) :
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));
 
 	mImageAdapter = SelectImageStringDataAdapter::New();
-	ssc::LabeledComboBoxWidget* imageCombo = new ssc::LabeledComboBoxWidget(this, mImageAdapter);
+	LabeledComboBoxWidget* imageCombo = new LabeledComboBoxWidget(this, mImageAdapter);
 	connect(mImageAdapter.get(), SIGNAL(changed()), this, SLOT(imageChangedSlot()));
-//	mImageAdapter->setValue();
 
 	this->setToolTip(this->defaultWhatsThis());
 
@@ -82,7 +81,7 @@ ClippingWidget::ClippingWidget(QWidget* parent) :
 	QVBoxLayout* activeClipLayout = new QVBoxLayout(activeClipGroupBox);
 
 	mPlaneAdapter = ClipPlaneStringDataAdapter::New(mInteractiveClipper);
-	ssc::LabeledComboBoxWidget* combo = new ssc::LabeledComboBoxWidget(this, mPlaneAdapter);
+	LabeledComboBoxWidget* combo = new LabeledComboBoxWidget(this, mPlaneAdapter);
 
 	mUseClipperCheckBox = new QCheckBox("Use Clipper");
 	mUseClipperCheckBox->setToolTip("Turn on interactive clipping for the selected volume.");
@@ -132,11 +131,13 @@ void ClippingWidget::clipperChangedSlot()
 {
 	mUseClipperCheckBox->setChecked(mInteractiveClipper->getUseClipper());
 	mInvertPlaneCheckBox->setChecked(mInteractiveClipper->getInvertPlane());
+	if (mInteractiveClipper->getImage())
+		mImageAdapter->setValue(mInteractiveClipper->getImage()->getUid());
 }
 
 void ClippingWidget::imageChangedSlot()
 {
-	mInteractiveClipper->setImage(ssc::dataManager()->getImage(mImageAdapter->getValue()));
+	mInteractiveClipper->setImage(dataManager()->getImage(mImageAdapter->getValue()));
 }
 
 void ClippingWidget::clearButtonClickedSlot()
