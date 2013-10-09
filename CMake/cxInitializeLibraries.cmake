@@ -72,7 +72,7 @@ macro(cx_initialize_TSF)
     # TSF (Tube-Segmentation-Framework)
     #----------
     if(CX_USE_TSF)
-        find_package(Tube-Segmentation-Framework PATHS "${CustusX3_SOURCE_DIR}/../../Tube-Segmentation-Framework/Tube-Segmentation-Framework/CMake" REQUIRED)
+        find_package(Tube-Segmentation-Framework PATHS "${CustusX3_SOURCE_DIR}/../../Tube-Segmentation-Framework/build_Debug" REQUIRED)
     endif()
 
     IF( Tube-Segmentation-Framework_FOUND )
@@ -83,6 +83,30 @@ macro(cx_initialize_TSF)
         option(CX_USE_TSF "use TSF (Tube-Segmentation-Framework)" OFF)
     ENDIF()
 endmacro()
+
+###############################################################################
+# Initialize Level-Set-Segmentation library
+#
+# Find the package and run the include USE file.
+#
+# Define variables:
+#    CX_USE_LEVEL_SET : cache option
+#
+###############################################################################
+macro(cx_initialize_level_set_segmentation)
+    if(CX_USE_LEVEL_SET)
+        find_package(Level-Set-Segmentation PATHS "${CustusX3_SOURCE_DIR}/../../Level-Set-Segmentation/build_Debug" REQUIRED)
+    endif()
+
+    IF( Level-Set-Segmentation_FOUND )
+        option(CX_USE_LEVEL_SET "use Level Set Segmentation" ON)
+        ADD_DEFINITIONS(-DCX_USE_LEVEL_SET)
+        include(${Level-Set-Segmentation_USE_FILE})
+    ELSE()
+        option(CX_USE_LEVEL_SET "use Level Set Segmentation" OFF)
+    ENDIF()
+endmacro()
+
 
 ###############################################################################
 # Initialize GEStreamer library
