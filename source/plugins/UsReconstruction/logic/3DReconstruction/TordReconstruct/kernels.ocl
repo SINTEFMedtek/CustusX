@@ -114,8 +114,10 @@ findClosePlanes(close_plane_t *close_planes,
 			} 
 		}
 
-		
-		int2 term_dists = {abs_dists.x > 3.0f*radius, abs_dists.y > 3.0f*radius };
+		// FIXME: The constant here represents a tradeoff between
+		// guaranteeing to find all relevant planes, and performance (terminating earlier).
+		// This should be investigate further.
+		int2 term_dists = {abs_dists.x > 5.0f*radius, abs_dists.y > 5.0f*radius };
 
 		int2 term_boundaries = {idx.x == n_planes-1, idx.y == 0};
 				
