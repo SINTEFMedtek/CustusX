@@ -232,8 +232,8 @@ void toImgCoord(int* x,
 
 	float4 transformed_voxel = transform_inv(plane_matrix, voxel);
 
-	*x = transformed_voxel.x/in_xspacing;
-	*y = transformed_voxel.y/in_yspacing;
+	*x = ((transformed_voxel.x/in_xspacing) + 0.5);
+	*y = ((transformed_voxel.y/in_yspacing) + 0.5);
 }
 
 
