@@ -6,7 +6,6 @@ typedef struct _close_plane
 {
 	float dist;
 	int plane_id;
-	int4 pad;
 } close_plane_t;
 
 #define MAX_PLANES 24
@@ -29,7 +28,7 @@ typedef struct _close_plane
 
 #endif
 
-
+/*
 float plane_dist(const float4 voxel, const float16 matrix)
 {
 	//	float4 z_axis = matrix.s89AB;
@@ -39,15 +38,18 @@ float plane_dist(const float4 voxel, const float16 matrix)
 	//	voxel.w = 1;
 	return dot(z_axis, voxel) - dot(z_axis, trans);
 }
+*/
 
+#define plane_dist(voxel, matrix) (dot(matrix.s26AE,voxel) - dot(matrix.s26AE, matrix.s37BF))
+/*
 float4 projectOntoPlane(const float4 voxel, const float16 matrix, const float dist)
 {
 	float4 z_axis = matrix.s26AE;
 	
 	return voxel - dist*(voxel * z_axis); 
-} 
+	} */
 
-
+#define projectOntoPlane(voxel, matrix, dist) (voxel - dist*(voxel * matrix.s26AE))
 	
 	
 /** Find all planes that are within radius of voxel.
@@ -95,7 +97,7 @@ findClosePlanes(close_plane_t *close_planes,
 			{
 				smallest_idx = idx.x;
 				smallest_dist = abs_dists.x;
-			}
+			} 
 		}
 
 		if(!done.y && abs_dists.y < radius)
@@ -108,7 +110,7 @@ findClosePlanes(close_plane_t *close_planes,
 			{
 				smallest_idx = idx.y;
 				smallest_dist = abs_dists.y;
-			}
+			} 
 		}
 
 
@@ -124,7 +126,7 @@ findClosePlanes(close_plane_t *close_planes,
 		*/
 	
 	}
-
+	
 	*guess = smallest_idx;
 	return found;
 }
