@@ -234,6 +234,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                                           CL_MEM_READ_ONLY,
 	                                           nPlanes*sizeof(float)*16,
 	                                           planeMatrices);
+
 	                                           
 
 	
@@ -274,20 +275,27 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clPlaneCorners));
 	*/
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clPlaneMatrices));
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float)*4*nPlanes, NULL));
 		
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &radius));
 	// FIXME: method
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &method));
 
 	// Global work items:
-	size_t global_work_size = outputDims[0]*outputDims[2];
+	size_t local_work_size = 128;
+	
+	size_t global_work_size = (outputDims[0]*outputDims[2]);
+	                           
+	if(global_work_size % local_work_size)
+		global_work_size = ((global_work_size/local_work_size) + 1)*local_work_size;
+	
 	messageManager()->sendInfo(QString("Executing kernel"));
 	ocl_check_error(clEnqueueNDRangeKernel(moClContext->cmd_queue,
 	                                       mClKernel,
 	                                       1,
 	                                       NULL,
 	                                       &global_work_size,
-	                                       NULL,
+	                                       &local_work_size,
 	                                       0,
 	                                       NULL,
 	                                       NULL));
