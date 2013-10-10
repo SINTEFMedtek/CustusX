@@ -4,12 +4,12 @@
 
 typedef struct _close_plane
 {
-	float4 voxel;
 	float dist;
 	int plane_id;
+	int4 pad;
 } close_plane_t;
 
-#define MAX_PLANES 25
+#define MAX_PLANES 24
 #define N_BLOCKS 10
 
 #define METHOD_VNN 0
@@ -64,70 +64,80 @@ findClosePlanes(close_plane_t *close_planes,
                 int* guess)
 {
 	int found = 0;
-	float prev_dist = 9999999.9f;
-	float smallest_dist = prev_dist;
+
+	float smallest_dist = 999999.0f;
 
 	int nextguess = *guess;
 	voxel.w = 1;
-	for(int i = *guess; i < n_planes; i++)
+	int done_up = 0, done_down = 0;
+	float prev_dist_up  = 999999.0f;
+	float prev_dist_down  = 999999.0f;
+	for(int i = 0; !done_up || !done_down; i++)
 	{
-		float dist = fplane_dist(voxel, plane_matrices[i]);
-		float abs_dist = fabs(dist);
-		if(abs_dist < radius && found < MAX_PLANES)
+		
+		
+		if(!done_up)
 		{
-			
-			close_planes[found].voxel = voxel;
-			close_planes[found].dist = dist;
-			close_planes[found].plane_id = i;
-			found++;
-			if(smallest_dist > abs_dist)
-			{
-				nextguess = i;
-				smallest_dist = abs_dist;
-			}
-			if(found == MAX_PLANES)
-			{
-				*guess = nextguess;
-				return found;
-			}
-		}
-		if(prev_dist < dist && dist > 2*radius && found)
-		{
-			// If we're at the distance 2*radius and moving further away,
-			// and we have already found something, don't keep going
-			break;
-		}
-	}
+			int idx = *guess + i;
 
-	// Do the same thing looking downwards
-	prev_dist = 9999999.9f;
-	for(int i = *guess-1; i >= 0; i--)
-	{
-		float dist = plane_dist(voxel, plane_matrices[i]);
-		float abs_dist = fabs(dist);
-		if(fabs(dist) < radius && found < MAX_PLANES)
-		{
-			
-			close_planes[found].voxel = voxel;
-			close_planes[found].dist = dist;
-			close_planes[found].plane_id = i;
-			found++;
-			if(smallest_dist > dist)
+			float dist = plane_dist(voxel, plane_matrices[idx]);
+			float abs_dist = fabs(dist);
+			if(abs_dist < radius)
 			{
-				nextguess = i;
-				smallest_dist = dist;
+				close_planes->dist = dist;
+				close_planes->plane_id = idx;
+				close_planes++;
+				found++;
+				if(smallest_dist > abs_dist)
+				{
+					nextguess = idx;
+					smallest_dist = abs_dist;
+				}
+				if(found == MAX_PLANES)
+				{
+					*guess = nextguess;
+					return found;
+				}
 			}
-			if(found == MAX_PLANES)
+			if((abs_dist - prev_dist_up > 2.0f && found) || idx == n_planes-1)
 			{
-				*guess = nextguess;
-				return found;
+				// If we're at the distance 2*radius and moving further away,
+				// and we have already found something, don't keep going
+				done_up = 1;
 			}
+			prev_dist_up = abs_dist;
 		}
-		if(prev_dist < dist && dist > 2*radius && found)
-		{
-			// If we're at the distance 2*radius and moving further away,
-			// and we have already found something, don't keep going
-			break;
+	
+
+		// Do the same thing looking downwards
+		if(!done_down) {
+			int idx = *guess - i;
+			float dist = plane_dist(voxel, plane_matrices[idx]);
+			float abs_dist = fabs(dist);
+			if(abs_dist < radius)
+			{	
+				close_planes->dist = dist;
+				close_planes->plane_id = idx;
+				close_planes++;
+				found++;
+				if(smallest_dist > dist)
+				{
+					nextguess = idx;
+					smallest_dist = abs_dist;
+				}
+				if(found == MAX_PLANES)
+				{
+					*guess = nextguess;
+					return found;
+				}
+			}
+			if((abs_dist - prev_dist_down > 2.0f && found) || idx == 0)
+			{
+				// If we're at the distance 2*radius and moving further away,
+				// and we have already found something, don't keep going
+				done_down = 1;
+			}
+			prev_dist_down = abs_dist;
 		}
 	}
 	*guess = nextguess;
@@ -257,13 +267,14 @@ performInterpolation_vnn(close_plane_t *close_planes,
                          int in_ysize,
                          float in_xspacing,
                          float in_yspacing,
+                         float4 voxel,
                          int n_planes)
 {
                                       
 
 	if(n_close_planes == 0) return 1;
 	
-	float4 voxel = close_planes[0].voxel;
+
 	int plane_id = 0;
 	float lowest_dist = 10.0f;
 	int close_plane_id = 0;
@@ -312,20 +323,20 @@ performInterpolation_vnn(close_plane_t *close_planes,
 
 unsigned char
 performInterpolation_vnn2(close_plane_t *close_planes,
-                        int n_close_planes,
-                        __global const float16  *plane_matrices, 
-                        __global const unsigned char* bscans_blocks[],
-                        int in_xsize,
-                        int in_ysize,
-                        float in_xspacing,
-                        float in_yspacing,
-                        int n_planes)
+                          int n_close_planes,
+                          __global const float16  *plane_matrices, 
+                          __global const unsigned char* bscans_blocks[],
+                          int in_xsize,
+                          int in_ysize,
+                          float in_xspacing,
+                          float in_yspacing,
+                          float4 voxel,
+                          int n_planes)
 {
                                       
 
 	if(n_close_planes == 0) return 1;
 	
-	float4 voxel = close_planes[0].voxel;
 
 	float scale = 0.0f;
 	
@@ -382,6 +393,7 @@ performInterpolation(close_plane_t *close_planes,
                      int in_ysize,
                      float in_xspacing,
                      float in_yspacing,
+                     float4 voxel,
                      int n_planes,
                      int method
 	)
@@ -390,25 +402,27 @@ performInterpolation(close_plane_t *close_planes,
 	if(method == METHOD_VNN)
 	{
 		value = performInterpolation_vnn(close_planes,
-		                                n_close_planes,
-		                                plane_matrices,
-		                                bscans_blocks,
-		                                in_xsize,
-		                                in_ysize,
-		                                in_xspacing,
-		                                in_yspacing,
-		                                n_planes);
+		                                 n_close_planes,
+		                                 plane_matrices,
+		                                 bscans_blocks,
+		                                 in_xsize,
+		                                 in_ysize,
+		                                 in_xspacing,
+		                                 in_yspacing,
+		                                 voxel,
+		                                 n_planes);
 	} else if (method == METHOD_VNN2)
 	{
 		value = performInterpolation_vnn2(close_planes,
-		                                n_close_planes,
-		                                plane_matrices,
-		                                bscans_blocks,
-		                                in_xsize,
-		                                in_ysize,
-		                                in_xspacing,
-		                                in_yspacing,
-		                                n_planes);
+		                                  n_close_planes,
+		                                  plane_matrices,
+		                                  bscans_blocks,
+		                                  in_xsize,
+		                                  in_ysize,
+		                                  in_xspacing,
+		                                  in_yspacing,
+		                                  voxel,
+		                                  n_planes);
 	}
 	return max((unsigned char)1,value);
 }
@@ -494,6 +508,7 @@ voxel_methods(int volume_xsize,
 		                                               in_ysize,
 		                                               in_xspacing,
 		                                               in_yspacing,
+		                                               voxel,
 		                                               n_planes,
 		                                               method);
 		//VOXEL(out_volume, x, y, z) = ((float)z/(float)volume_zsize) * 255;
