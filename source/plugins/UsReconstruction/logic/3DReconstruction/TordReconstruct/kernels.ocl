@@ -49,9 +49,9 @@ float4 projectOntoPlane(const float4 voxel, const float16 matrix, const float di
 	return voxel - dist*(voxel * z_axis); 
 	} */
 
-#define projectOntoPlane(voxel, matrix, dist) (voxel - dist*(voxel * matrix.s26AE))
+#define projectOntoPlane(voxel, matrix, dist) (voxel - dist*(matrix.s26AE))
 
-#define projectOntoPlaneEq(voxel, eq, dist) (voxel - dist*(voxel * eq))
+#define projectOntoPlaneEq(voxel, eq, dist) (voxel - dist*(eq))
 	
 /** Find all planes that are within radius of voxel.
     Perform a simple linear search for now.
@@ -289,18 +289,18 @@ performInterpolation_vnn(close_plane_t *close_planes,
 
 	// Now we project the voxel onto the plane by translating the voxel along the
 	// normal vector of the plane.
-	
-	/*	float4 translated_voxel = projectOntoPlaneEq(voxel,
-	                                             plane_eqs[plane_id],
-	                                             close_planes[close_plane_id].dist);
-	*/
+	//	voxel.w = 1.0f;
+	float4 translated_voxel = projectOntoPlane(voxel,
+	                                           plane_matrices[plane_id],
+	                                           close_planes[close_plane_id].dist);
+	translated_voxel.w = 1.0f;
 	
 	
 	// And then we get the pixel space coordinates
 	int x, y;
 	toImgCoord(&x,
 	           &y,
-	           voxel,
+	           translated_voxel,
 	           plane_matrices[plane_id],
 	           in_xspacing,
 	           in_yspacing);
@@ -349,12 +349,12 @@ performInterpolation_vnn2(close_plane_t *close_planes,
 
 		// Now we project the voxel onto the plane by translating the voxel along the
 		// normal vector of the plane.
-	
+		voxel.w = 1.0f;
 		float4 translated_voxel = projectOntoPlaneEq(voxel,
 		                                             plane_eqs[plane_id],
 		                                             close_planes[i].dist);
 	
-	
+		translated_voxel.w = 1.0f;
 		// And then we get the pixel space coordinates
 		int x, y;
 		toImgCoord(&x,
