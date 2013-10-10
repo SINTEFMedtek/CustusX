@@ -8,7 +8,7 @@ typedef struct _close_plane
 	int plane_id;
 } close_plane_t;
 
-#define MAX_PLANES 24
+#define MAX_PLANES 8
 #define N_BLOCKS 10
 
 #define METHOD_VNN 0
@@ -50,7 +50,8 @@ float4 projectOntoPlane(const float4 voxel, const float16 matrix, const float di
 	} */
 
 #define projectOntoPlane(voxel, matrix, dist) (voxel - dist*(voxel * matrix.s26AE))
-	
+
+#define projectOntoPlaneEq(voxel, eq, dist) (voxel - dist*(voxel * eq))
 	
 /** Find all planes that are within radius of voxel.
     Perform a simple linear search for now.
@@ -59,33 +60,31 @@ float4 projectOntoPlane(const float4 voxel, const float16 matrix, const float di
 */
 int
 findClosePlanes(close_plane_t *close_planes,
+                __local float4* const plane_eqs,
                 __global float16* const plane_matrices,
-                int n_planes,
-                float4 voxel,
-                float radius,
+                const int n_planes,
+                const float4 voxel,
+                const float radius,
                 int* guess)
 {
 
 	int found = 0;
-	voxel.w = 1;
 	int2 done = {0,0};
 	int smallest_idx = *guess;
-	float2 dists; // .x = dist_up, .y = dist_down
-	float2 abs_dists; // .x = abs_dist_up, .y = abs_dist_down,
+
+
 	//	float2 prev_dists; // .x = abs_prev_dist_up, .y = abs_prev_dist_down
 	float smallest_dist = 99999.9f;
 
 	
 	for(int i = 0; !done.x || !done.y ; i++)
 	{
-		int2 idx;
-		idx.x = *guess + i;
-		idx.y = *guess - i;
-		dists.x = plane_dist(voxel,plane_matrices[idx.x]);
-		dists.y = plane_dist(voxel,plane_matrices[idx.y]);
-		//	prev_dists = abs_dists;
-		abs_dists.x = fabs(dists.x);
-		abs_dists.y = fabs(dists.y);
+		int2 idx = {*guess + i, *guess - i};
+		float2 dists = {dot(voxel, plane_eqs[idx.x]), dot(voxel, plane_eqs[idx.y])};
+		//	dists.x = plane_dist(voxel, plane_matrices[idx.x]);
+		//  dists.y = plane_dist(voxel, plane_matrices[idx.y]);
+		float2 abs_dists = {fabs(dists.x), fabs(dists.y)}; // .x = abs_dist_up, .y = abs_dist_down,
+
 
 		if(!done.x && abs_dists.x < radius)
 		{			
@@ -113,8 +112,8 @@ findClosePlanes(close_plane_t *close_planes,
 			} 
 		}
 
-
-		int2 term_dists = {abs_dists.x > 2.0f*radius, abs_dists.y > 2.0f*radius };
+		
+		int2 term_dists = {abs_dists.x > 3.0f*radius, abs_dists.y > 3.0f*radius };
 
 		int2 term_boundaries = {idx.x == n_planes-1, idx.y == 0};
 				
@@ -250,7 +249,8 @@ int isValidPixel(int x, int y, int in_xsize, int in_ysize)
 unsigned char
 performInterpolation_vnn(close_plane_t *close_planes,
                          int n_close_planes,
-                         __global const float16  *plane_matrices, 
+                         __global const float16  *plane_matrices,
+                         __local const float4 *plane_eqs,
                          __global const unsigned char* bscans_blocks[],
                          int in_xsize,
                          int in_ysize,
@@ -286,8 +286,8 @@ performInterpolation_vnn(close_plane_t *close_planes,
 	// Now we project the voxel onto the plane by translating the voxel along the
 	// normal vector of the plane.
 	
-	float4 translated_voxel = projectOntoPlane(voxel,
-	                                           plane_matrices[plane_id],
+	float4 translated_voxel = projectOntoPlaneEq(voxel,
+	                                           plane_eqs[plane_id],
 	                                           close_planes[close_plane_id].dist);
 	
 	
@@ -314,7 +314,8 @@ performInterpolation_vnn(close_plane_t *close_planes,
 unsigned char
 performInterpolation_vnn2(close_plane_t *close_planes,
                           int n_close_planes,
-                          __global const float16  *plane_matrices, 
+                          __global const float16  *plane_matrices,
+                          __local const float4 *plane_eqs,
                           __global const unsigned char* bscans_blocks[],
                           int in_xsize,
                           int in_ysize,
@@ -345,9 +346,9 @@ performInterpolation_vnn2(close_plane_t *close_planes,
 		// Now we project the voxel onto the plane by translating the voxel along the
 		// normal vector of the plane.
 	
-		float4 translated_voxel = projectOntoPlane(voxel,
-		                                           plane_matrices[plane_id],
-		                                           close_planes[i].dist);
+		float4 translated_voxel = projectOntoPlaneEq(voxel,
+		                                             plane_eqs[plane_id],
+		                                             close_planes[i].dist);
 	
 	
 		// And then we get the pixel space coordinates
@@ -377,7 +378,8 @@ performInterpolation_vnn2(close_plane_t *close_planes,
 unsigned char
 performInterpolation(close_plane_t *close_planes,
                      int n_close_planes,
-                     __global const float16  *plane_matrices, 
+                     __global const float16  *plane_matrices,
+                     __local const float4 *plane_eqs,
                      __global const unsigned char* bscans_blocks[],
                      int in_xsize,
                      int in_ysize,
@@ -394,6 +396,7 @@ performInterpolation(close_plane_t *close_planes,
 		value = performInterpolation_vnn(close_planes,
 		                                 n_close_planes,
 		                                 plane_matrices,
+		                                 plane_eqs,
 		                                 bscans_blocks,
 		                                 in_xsize,
 		                                 in_ysize,
@@ -406,6 +409,7 @@ performInterpolation(close_plane_t *close_planes,
 		value = performInterpolation_vnn2(close_planes,
 		                                  n_close_planes,
 		                                  plane_matrices,
+		                                  plane_eqs,
 		                                  bscans_blocks,
 		                                  in_xsize,
 		                                  in_ysize,
@@ -416,7 +420,28 @@ performInterpolation(close_plane_t *close_planes,
 	}
 	return max((unsigned char)1,value);
 }
-	
+
+
+
+void
+prepare_plane_eqs(__global float16 *plane_matrices,
+                 int n_planes,
+                 __local float4 *plane_eqs)
+{
+	int id = get_local_id(0);
+	int max_local_id = get_local_size(0);
+	const int n_planes_pr_thread = (n_planes / max_local_id) + 1;
+	for(int i = 0; i < n_planes_pr_thread; i++)
+	{
+		int idx = i + n_planes_pr_thread * id;
+		if(idx >= n_planes) break;
+		plane_eqs[idx].xyz = plane_matrices[idx].s26A;
+		plane_eqs[idx].w = -dot(plane_matrices[idx].s26AE, plane_matrices[idx].s37BF);
+	}
+
+	barrier(CLK_LOCAL_MEM_FENCE);
+}
+                 
 
 __kernel void
 voxel_methods(int volume_xsize,
@@ -442,7 +467,8 @@ voxel_methods(int volume_xsize,
               __global unsigned char* in_bscans_b8,
               __global unsigned char* in_bscans_b9,
               __global unsigned char* out_volume,
-              __global float16 *plane_matrices, 
+              __global float16 *plane_matrices,
+              __local float4 *plane_eqs,
               float radius,
               int method
 	)
@@ -482,29 +508,34 @@ voxel_methods(int volume_xsize,
 	// Find the plane closest to the initial voxel
 	float smallest_dist = 99999999.9f;
 	float dist;
+	prepare_plane_eqs(plane_matrices, n_planes, plane_eqs);
 	for(int i = 0; i < n_planes; i++)
 	{
-		dist = fabs(plane_dist(voxel,plane_matrices[i]));
+		dist = fabs(dot(voxel,plane_eqs[i]));
+		//dist = fabs(plane_dist(voxel,plane_matrices[i]));
 		if(dist < smallest_dist)
 		{
 			smallest_dist = dist;
 			guess = i;
 		}
 	}
+
+
 	
 	// Iterate over Y axis
 	for(int y = 0; y < volume_ysize; y++)
 	{
-		voxel.y += volume_yspacing;
+		voxel.y = y*volume_yspacing;
 
 		// Find all planes closer than radius
-		n_close_planes = findClosePlanes(close_planes, plane_matrices, n_planes, voxel, radius,
+		n_close_planes = findClosePlanes(close_planes, plane_eqs, plane_matrices, n_planes, voxel, radius,
 		                                 &guess);
 		
 		// Call appropriate method to determine pixel value
 		VOXEL(out_volume,x,y,z) = performInterpolation(close_planes,
 		                                               n_close_planes,
 		                                               plane_matrices,
+		                                               plane_eqs,
 		                                               bscans_blocks,
 		                                               in_xsize,
 		                                               in_ysize,
