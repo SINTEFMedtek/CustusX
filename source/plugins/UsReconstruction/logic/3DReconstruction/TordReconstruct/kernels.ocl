@@ -63,84 +63,69 @@ findClosePlanes(close_plane_t *close_planes,
                 float radius,
                 int* guess)
 {
+
 	int found = 0;
-
-	float smallest_dist = 999999.0f;
-
-	int nextguess = *guess;
 	voxel.w = 1;
-	int done_up = 0, done_down = 0;
-	float prev_dist_up  = 999999.0f;
-	float prev_dist_down  = 999999.0f;
-	for(int i = 0; !done_up || !done_down; i++)
-	{
-		
-		
-		if(!done_up)
-		{
-			int idx = *guess + i;
+	int2 done = {0,0};
+	int smallest_idx = *guess;
+	float2 dists; // .x = dist_up, .y = dist_down
+	float2 abs_dists; // .x = abs_dist_up, .y = abs_dist_down,
+	//	float2 prev_dists; // .x = abs_prev_dist_up, .y = abs_prev_dist_down
+	float smallest_dist = 99999.9f;
 
-			float dist = plane_dist(voxel, plane_matrices[idx]);
-			float abs_dist = fabs(dist);
-			if(abs_dist < radius)
-			{
-				close_planes->dist = dist;
-				close_planes->plane_id = idx;
-				close_planes++;
-				found++;
-				if(smallest_dist > abs_dist)
-				{
-					nextguess = idx;
-					smallest_dist = abs_dist;
-				}
-				if(found == MAX_PLANES)
-				{
-					*guess = nextguess;
-					return found;
-				}
-			}
-			if((abs_dist - prev_dist_up > 2.0f && found) || idx == n_planes-1)
-			{
-				// If we're at the distance 2*radius and moving further away,
-				// and we have already found something, don't keep going
-				done_up = 1;
-			}
-			prev_dist_up = abs_dist;
-		}
 	
+	for(int i = 0; !done.x || !done.y ; i++)
+	{
+		int2 idx;
+		idx.x = *guess + i;
+		idx.y = *guess - i;
+		dists.x = plane_dist(voxel,plane_matrices[idx.x]);
+		dists.y = plane_dist(voxel,plane_matrices[idx.y]);
+		//	prev_dists = abs_dists;
+		abs_dists.x = fabs(dists.x);
+		abs_dists.y = fabs(dists.y);
 
-		// Do the same thing looking downwards
-		if(!done_down) {
-			int idx = *guess - i;
-			float dist = plane_dist(voxel, plane_matrices[idx]);
-			float abs_dist = fabs(dist);
-			if(abs_dist < radius)
-			{	
-				close_planes->dist = dist;
-				close_planes->plane_id = idx;
-				close_planes++;
-				found++;
-				if(smallest_dist > dist)
-				{
-					nextguess = idx;
-					smallest_dist = abs_dist;
-				}
-				if(found == MAX_PLANES)
-				{
-					*guess = nextguess;
-					return found;
-				}
-			}
-			if((abs_dist - prev_dist_down > 2.0f && found) || idx == 0)
+		if(!done.x && abs_dists.x < radius)
+		{			
+			close_planes->dist = dists.x;
+			close_planes->plane_id = idx.x;
+			close_planes++;
+			found++;
+			if(smallest_dist > abs_dists.x)
 			{
-				// If we're at the distance 2*radius and moving further away,
-				// and we have already found something, don't keep going
-				done_down = 1;
+				smallest_idx = idx.x;
+				smallest_dist = abs_dists.x;
 			}
-			prev_dist_down = abs_dist;
 		}
+
+		if(!done.y && abs_dists.y < radius)
+		{
+			close_planes->dist = dists.y;
+			close_planes->plane_id = idx.y;
+			close_planes++;
+			found++;
+			if(smallest_dist > abs_dists.y)
+			{
+				smallest_idx = idx.y;
+				smallest_dist = abs_dists.y;
+			}
+		}
+
+
+		int2 term_dists = {abs_dists.x > 2.0f*radius, abs_dists.y > 2.0f*radius };
+
+		int2 term_boundaries = {idx.x == n_planes-1, idx.y == 0};
+				
+		done = done + (found >= MAX_PLANES) + term_dists + term_boundaries;
+		
+		/*
+		done.x = done.x || (abs_dists.x - prev_dists.x > 2.0f) || idx.x == n_planes-1 || found >= MAX_PLANES;
+		done.y = done.y || (abs_dists.y - prev_dists.y > 2.0f) || idx.y == 0 || found >= MAX_PLANES;
+		*/
+	
 	}
-	*guess = nextguess;
+
+	*guess = smallest_idx;
 	return found;
 }
 
@@ -206,6 +191,7 @@ float4 transform_inv(float16 matrix,
 	return ret;
 }
 
+/*
 void printMatrix(float16 matrix)
 {
 	printf("[ %f, %f, %f, %f\n   %f, %f, %f, %f\n   %f, %f, %f, %f\n   %f, %f, %f, %f\n",
@@ -226,6 +212,7 @@ void printMatrix(float16 matrix)
 	       matrix.sE,
 	       matrix.sF);
 }
+*/
 	       
 
 
@@ -288,11 +275,11 @@ performInterpolation_vnn(close_plane_t *close_planes,
 		}
 	} 
 			
-		__global unsigned char* image = getImageData(plane_id,
-		                                             bscans_blocks,
-		                                             in_xsize,
-		                                             in_ysize,
-		                                             n_planes); 
+	const __global unsigned char* image = getImageData(plane_id,
+	                                                   bscans_blocks,
+	                                                   in_xsize,
+	                                                   in_ysize,
+	                                                   n_planes); 
 
 	// Now we project the voxel onto the plane by translating the voxel along the
 	// normal vector of the plane.
@@ -317,6 +304,7 @@ performInterpolation_vnn(close_plane_t *close_planes,
 		return 1;
 	}
 	return max((unsigned char)1, image[y*in_xsize + x]);
+	//return n_close_planes;
 	//return (unsigned char)(x % 255);
 }
 
@@ -345,7 +333,7 @@ performInterpolation_vnn2(close_plane_t *close_planes,
 	{
 
 		int plane_id = close_planes[i].plane_id;
-		__global unsigned char* image = getImageData(close_planes[i].plane_id,
+		const __global unsigned char* image = getImageData(close_planes[i].plane_id,
 		                                             bscans_blocks,
 		                                             in_xsize,
 		                                             in_ysize,
@@ -464,7 +452,7 @@ voxel_methods(int volume_xsize,
 
 	// Aggregate pointers to the bscan blocks into one array for convenience
 	
-	__global unsigned char *bscans_blocks[] = { in_bscans_b0,
+	const __global unsigned char *bscans_blocks[] = { in_bscans_b0,
 	                                            in_bscans_b1,
 	                                            in_bscans_b2,
 	                                            in_bscans_b3,
@@ -485,15 +473,27 @@ voxel_methods(int volume_xsize,
 	close_plane_t close_planes[MAX_PLANES];
 	int n_close_planes;
 	int guess = 0;
+	float4 voxel = {x * volume_xspacing,
+	                0.0f,
+	                z * volume_zspacing,
+	                1.0f};
+	// Find the plane closest to the initial voxel
+	float smallest_dist = 99999999.9f;
+	float dist;
+	for(int i = 0; i < n_planes; i++)
+	{
+		dist = fabs(plane_dist(voxel,plane_matrices[i]));
+		if(dist < smallest_dist)
+		{
+			smallest_dist = dist;
+			guess = i;
+		}
+	}
+	
 	// Iterate over Y axis
 	for(int y = 0; y < volume_ysize; y++)
 	{
-		// Transform voxel to volume space
-		float4 voxel = {x * volume_xspacing,
-		                y * volume_yspacing,
-		                z * volume_zspacing,
-		                1.0f};
-		
+		voxel.y += volume_yspacing;
 
 		// Find all planes closer than radius
 		n_close_planes = findClosePlanes(close_planes, plane_matrices, n_planes, voxel, radius,
