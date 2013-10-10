@@ -20,7 +20,7 @@ typedef struct _close_plane
 
 #ifdef DEBUG
 
-#define DEBUG_PRINTF(...) printf(##__VA_ARGS__)
+#define DEBUG_PRINTF(...) if((get_global_id(0) % 5000) == 0) printf(##__VA_ARGS__)
 
 #else
 
@@ -76,10 +76,12 @@ findClosePlanes(close_plane_t *close_planes,
 	//	float2 prev_dists; // .x = abs_prev_dist_up, .y = abs_prev_dist_down
 	float smallest_dist = 99999.9f;
 
-	
+	if(*guess == 0) *guess = 1;
+
 	for(int i = 0; !done.x || !done.y ; i++)
 	{
-		int2 idx = {*guess + i, *guess - i};
+		int2 idx = {*guess + i, *guess - i - 1};
+
 		float2 dists = {dot(voxel, plane_eqs[idx.x]), dot(voxel, plane_eqs[idx.y])};
 		//	dists.x = plane_dist(voxel, plane_matrices[idx.x]);
 		//  dists.y = plane_dist(voxel, plane_matrices[idx.y]);
@@ -124,9 +126,10 @@ findClosePlanes(close_plane_t *close_planes,
 		done.y = done.y || (abs_dists.y - prev_dists.y > 2.0f) || idx.y == 0 || found >= MAX_PLANES;
 		*/
 	
-	}
+	} 
 	
 	*guess = smallest_idx;
+
 	return found;
 }
 
@@ -192,7 +195,7 @@ float4 transform_inv(float16 matrix,
 	return ret;
 }
 
-/*
+
 void printMatrix(float16 matrix)
 {
 	printf("[ %f, %f, %f, %f\n   %f, %f, %f, %f\n   %f, %f, %f, %f\n   %f, %f, %f, %f\n",
@@ -213,8 +216,8 @@ void printMatrix(float16 matrix)
 	       matrix.sE,
 	       matrix.sF);
 }
-*/
-	       
+
+	      
 
 
 void toImgCoord(int* x,
@@ -224,7 +227,6 @@ void toImgCoord(int* x,
                 float in_xspacing,
                 float in_yspacing)
 {
-	DEBUG_PRINTF("Voxel: %f, %f, %f, %f\n",voxel.x, voxel.y, voxel.z, voxel.w);
 
 	float4 transformed_voxel = transform_inv(plane_matrix, voxel);
 
@@ -267,11 +269,13 @@ performInterpolation_vnn(close_plane_t *close_planes,
 	int plane_id = 0;
 	float lowest_dist = 10.0f;
 	int close_plane_id = 0;
+
 	for(int i = 0; i < n_close_planes;  i++)
 	{
-		if(fabs(close_planes[i].dist) < fabs(lowest_dist))
+		float fabs_dist = fabs(close_planes[i].dist);
+		if(fabs_dist < lowest_dist)
 		{
-			lowest_dist = close_planes[i].dist;
+			lowest_dist = fabs_dist;
 			plane_id = close_planes[i].plane_id;
 			close_plane_id = i;
 		}
@@ -286,10 +290,10 @@ performInterpolation_vnn(close_plane_t *close_planes,
 	// Now we project the voxel onto the plane by translating the voxel along the
 	// normal vector of the plane.
 	
-	float4 translated_voxel = projectOntoPlaneEq(voxel,
-	                                           plane_eqs[plane_id],
-	                                           close_planes[close_plane_id].dist);
-	
+	/*	float4 translated_voxel = projectOntoPlaneEq(voxel,
+	                                             plane_eqs[plane_id],
+	                                             close_planes[close_plane_id].dist);
+	*/
 	
 	
 	// And then we get the pixel space coordinates
@@ -431,6 +435,7 @@ prepare_plane_eqs(__global float16 *plane_matrices,
 	int id = get_local_id(0);
 	int max_local_id = get_local_size(0);
 	const int n_planes_pr_thread = (n_planes / max_local_id) + 1;
+
 	for(int i = 0; i < n_planes_pr_thread; i++)
 	{
 		int idx = i + n_planes_pr_thread * id;
@@ -438,7 +443,6 @@ prepare_plane_eqs(__global float16 *plane_matrices,
 		plane_eqs[idx].xyz = plane_matrices[idx].s26A;
 		plane_eqs[idx].w = -dot(plane_matrices[idx].s26AE, plane_matrices[idx].s37BF);
 	}
-
 	barrier(CLK_LOCAL_MEM_FENCE);
 }
                  
@@ -491,14 +495,10 @@ voxel_methods(int volume_xsize,
 	                                            in_bscans_b8,
 	                                            in_bscans_b9 };
 	                             
-	// Return if x/z is invalid
-	
-	if(z >= volume_zsize) return;
-	if(x >= volume_xsize) return;
-	
+		
 	// For most of these algorithms we need to find some set of close planes.
 	// We find all planes that are inside the voxel radius
-	close_plane_t close_planes[MAX_PLANES];
+	close_plane_t close_planes[MAX_PLANES+1];
 	int n_close_planes;
 	int guess = 0;
 	float4 voxel = {x * volume_xspacing,
@@ -508,7 +508,17 @@ voxel_methods(int volume_xsize,
 	// Find the plane closest to the initial voxel
 	float smallest_dist = 99999999.9f;
 	float dist;
+	
 	prepare_plane_eqs(plane_matrices, n_planes, plane_eqs);
+	
+
+	
+	// Return if x/z is invalid
+	
+	if(z >= volume_zsize) return;
+	if(x >= volume_xsize) return;
+	
+	
 	for(int i = 0; i < n_planes; i++)
 	{
 		dist = fabs(dot(voxel,plane_eqs[i]));
@@ -518,7 +528,7 @@ voxel_methods(int volume_xsize,
 			smallest_dist = dist;
 			guess = i;
 		}
-	}
+	} 
 
 
 	
@@ -528,11 +538,18 @@ voxel_methods(int volume_xsize,
 		voxel.y = y*volume_yspacing;
 
 		// Find all planes closer than radius
-		n_close_planes = findClosePlanes(close_planes, plane_eqs, plane_matrices, n_planes, voxel, radius,
-		                                 &guess);
-		
+
+			n_close_planes = findClosePlanes(close_planes,
+		                                 plane_eqs,
+		                                 plane_matrices,
+		                                 n_planes,
+		                                 voxel,
+		                                 radius,
+		                                 &guess); 
+
+
 		// Call appropriate method to determine pixel value
-		VOXEL(out_volume,x,y,z) = performInterpolation(close_planes,
+			VOXEL(out_volume,x,y,z) = performInterpolation(close_planes,
 		                                               n_close_planes,
 		                                               plane_matrices,
 		                                               plane_eqs,
@@ -544,6 +561,8 @@ voxel_methods(int volume_xsize,
 		                                               voxel,
 		                                               n_planes,
 		                                               method);
+		
+			//VOXEL(out_volume, x, y, z) = x;
 		//VOXEL(out_volume, x, y, z) = ((float)z/(float)volume_zsize) * 255;
 		//VOXEL(out_volume, x,y,z) = 1;
 		
