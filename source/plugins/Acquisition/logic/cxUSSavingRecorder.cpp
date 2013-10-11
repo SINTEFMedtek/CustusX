@@ -114,7 +114,7 @@ USReconstructInputData USSavingRecorder::getDataForStream(unsigned videoRecorder
 
 	SavingVideoRecorderPtr videoRecorder = mVideoRecorder[videoRecorderIndex];
 	videoRecorder->completeSave(); // just in case - should have been done earlier.
-	TimedTransformMap trackerRecordedData = this->getRecording();
+	TimedTransformMap trackerRecordedData = RecordSession::getToolHistory(mRecordingTool, mSession);
 
 	CachedImageDataContainerPtr imageData = videoRecorder->getImageData();
 	std::vector<double> imageTimestamps = videoRecorder->getTimestamps();
@@ -136,7 +136,7 @@ void USSavingRecorder::startSaveData(QString baseFolder, bool compressImages)
 	if (!mSession)
 		return;
 
-	TimedTransformMap trackerRecordedData = this->getRecording();
+	TimedTransformMap trackerRecordedData = RecordSession::getToolHistory(mRecordingTool, mSession);
 
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 	{
@@ -197,21 +197,6 @@ void USSavingRecorder::fileMakerWriteFinished()
 		iter = mSaveThreads.erase(iter);
 		emit saveDataCompleted(result);
 	}
-}
-
-std::map<double, Transform3D> USSavingRecorder::getRecording()
-{
-	TimedTransformMap retval;
-
-	if(mRecordingTool && mSession)
-		retval = mRecordingTool->getSessionHistory(mSession->getStartTime(), mSession->getStopTime());
-
-	if(retval.empty() && mSession)
-	{
-		messageManager()->sendError("Could not find any tracking data from session "+mSession->getUid()+". Volume data only will be written.");
-	}
-
-	return retval;
 }
 
 }

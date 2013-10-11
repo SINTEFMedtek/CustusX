@@ -16,6 +16,8 @@ namespace cx
 * @{
 */
 
+typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
+
 /**
  * \class RecordSessionWidget
  *
