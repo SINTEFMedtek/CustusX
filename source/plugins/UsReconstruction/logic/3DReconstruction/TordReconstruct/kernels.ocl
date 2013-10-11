@@ -34,41 +34,30 @@ typedef struct _close_plane
 
 #endif
 
-/*
-float plane_dist(const float4 voxel, const float16 matrix)
-{
-	//	float4 z_axis = matrix.s89AB;
-	float4 z_axis = matrix.s26AE;
-		z_axis.w = 0.0f;
-	float4 trans = matrix.s37BF;
-	//	voxel.w = 1;
-	return dot(z_axis, voxel) - dot(z_axis, trans);
-}
-*/
 
 #define plane_dist(voxel, matrix) (dot(matrix.s26AE,voxel) - dot(matrix.s26AE, matrix.s37BF))
-/*
-float4 projectOntoPlane(const float4 voxel, const float16 matrix, const float dist)
-{
-	float4 z_axis = matrix.s26AE;
-	
-	return voxel - dist*(voxel * z_axis); 
-	} */
 
 #define projectOntoPlane(voxel, matrix, dist) (voxel - dist*(matrix.s26AE))
 
 #define projectOntoPlaneEq(voxel, eq, dist) (voxel - dist*(eq))
-	
-/** Find all planes that are within radius of voxel.
-    Perform a simple linear search for now.
-    May need to optimize this.
-    It spends ~50% of the time in here!
+
+#define isValidPixel(x, y, in_xsize, in_ysize) (x >= 0 && x < in_xsize && y >= 0 && y < in_ysize)
+
+
+/**
+ * Find planes that are within radius of voxel.
+ * Search in both directions in the plane array, starting at guess
+ * The assumption is that as you move away from the guess,
+ * the distance to this voxel will increase. That assumption may not always be true, for instance
+ * if the US probe was swept back and forth.
+ * 
 */
+#if PLANE_METHOD == PLANE_HEURISTIC
+#define FIND_CLOSE_PLANES(a, b, c, d, e, f) findClosePlanes(a, b, c, d, e, f)
 int
 findClosePlanes(close_plane_t *close_planes,
                 __local float4* const plane_eqs,
                 __global float16* const plane_matrices,
-                const int n_planes,
                 const float4 voxel,
                 const float radius,
                 int* guess)
@@ -125,12 +114,12 @@ findClosePlanes(close_plane_t *close_planes,
 		// This should be investigate further.
 		int2 term_dists = {abs_dists.x > 5.0f*radius, abs_dists.y > 5.0f*radius };
 
-		int2 term_boundaries = {idx.x == n_planes-1, idx.y == 0};
+		int2 term_boundaries = {idx.x == N_PLANES-1, idx.y == 0};
 				
 		done = done + (found >= MAX_PLANES) + term_dists + term_boundaries;
 		
 		/*
-		done.x = done.x || (abs_dists.x - prev_dists.x > 2.0f) || idx.x == n_planes-1 || found >= MAX_PLANES;
+		done.x = done.x || (abs_dists.x - prev_dists.x > 2.0f) || idx.x == N_PLANES-1 || found >= MAX_PLANES;
 		done.y = done.y || (abs_dists.y - prev_dists.y > 2.0f) || idx.y == 0 || found >= MAX_PLANES;
 		*/
 	
@@ -140,12 +129,13 @@ findClosePlanes(close_plane_t *close_planes,
 
 	return found;
 }
+#endif
 
-
+#if PLANE_METHOD == PLANE_CLOSEST
+#define FIND_CLOSE_PLANES(a, b, c, d, e, f) findClosestPlanes(a, b, c, d, e, f)
 int findClosestPlanes(close_plane_t *close_planes_ret,
                       __local float4* const plane_eqs,
                       __global float16* const plane_matrices,
-                      const int n_planes,
                       const float4 voxel,
                       const float radius,
                       int *guess)
@@ -157,7 +147,7 @@ int findClosestPlanes(close_plane_t *close_planes_ret,
 	close_plane_t orig_ptr[MAX_PLANES_2];
 	close_plane_t *close_planes = orig_ptr;
 	float dist, abs_dist;
-	for(int i = 0; i < n_planes && found < MAX_PLANES_2; i++)
+	for(int i = 0; i < N_PLANES && found < MAX_PLANES_2; i++)
 	{
 		dist = dot(plane_eqs[i], voxel);
 		abs_dist = fabs(dist);
@@ -197,16 +187,16 @@ int findClosestPlanes(close_plane_t *close_planes_ret,
 	}
 	return found2;
 }
+#endif
 
 __global const unsigned char*
 getImageData(int plane_id,
              __global const unsigned char* bscans_blocks[],
              int in_xsize,
-             int in_ysize,
-             int n_planes)
+             int in_ysize)
 {
-	int scans_per_block = n_planes / N_BLOCKS;
-	int n_big_blocks = n_planes % N_BLOCKS;
+	int scans_per_block = N_PLANES / N_BLOCKS;
+	int n_big_blocks = N_PLANES % N_BLOCKS;
 	int block, idx_in_block;
 	// Check if plane is in one of the big blocks
 	if(plane_id < n_big_blocks * (scans_per_block+1))
@@ -353,21 +343,12 @@ float bilinearInterpolation(float x,
 	
 }
 
-#define isValidPixel(x, y, in_xsize, in_ysize) (x >= 0 && x < in_xsize && y >= 0 && y < in_ysize)
-/*
-int isValidPixel(int x, int y, int in_xsize, int in_ysize)
-{
-	if(x < 0 || x >= in_xsize)
-	{
-		return 0;
-	}
-	if( y < 0 || y >= in_ysize)
-	{
-		return 0;
-	}
-	return 1;
-}
-*/
+
+
+#if METHOD == METHOD_VNN
+#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i ,j) \
+	performInterpolation_vnn(a, b, c, d, e, f, g, h, i, j)
+
 unsigned char
 performInterpolation_vnn(close_plane_t *close_planes,
                          int n_close_planes,
@@ -378,14 +359,12 @@ performInterpolation_vnn(close_plane_t *close_planes,
                          int in_ysize,
                          float in_xspacing,
                          float in_yspacing,
-                         float4 voxel,
-                         int n_planes)
+                         float4 voxel)
 {
                                       
 
 	if(n_close_planes == 0) return 1;
 	
-
 	int plane_id = 0;
 	float lowest_dist = 10.0f;
 	int close_plane_id = 0;
@@ -404,8 +383,7 @@ performInterpolation_vnn(close_plane_t *close_planes,
 	const __global unsigned char* image = getImageData(plane_id,
 	                                                   bscans_blocks,
 	                                                   in_xsize,
-	                                                   in_ysize,
-	                                                   n_planes); 
+	                                                   in_ysize); 
 
 	// Now we project the voxel onto the plane by translating the voxel along the
 	// normal vector of the plane.
@@ -414,7 +392,7 @@ performInterpolation_vnn(close_plane_t *close_planes,
 	                                           plane_matrices[plane_id],
 	                                           close_planes[close_plane_id].dist);
 	translated_voxel.w = 1.0f;
-	
+
 	
 	// And then we get the pixel space coordinates
 	int x, y;
@@ -429,12 +407,16 @@ performInterpolation_vnn(close_plane_t *close_planes,
 	{
 		return 1;
 	}
+
 	return max((unsigned char)1, image[y*in_xsize + x]);
 	//return n_close_planes;
 	//return (unsigned char)(x % 255);
 }
+#endif
 
-
+#if METHOD == METHOD_VNN2
+#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i ,j) \
+	performInterpolation_vnn2(a, b, c, d, e, f, g, h, i, j)
 unsigned char
 performInterpolation_vnn2(close_plane_t *close_planes,
                           int n_close_planes,
@@ -445,8 +427,7 @@ performInterpolation_vnn2(close_plane_t *close_planes,
                           int in_ysize,
                           float in_xspacing,
                           float in_yspacing,
-                          float4 voxel,
-                          int n_planes)
+                          float4 voxel)
 {
                                       
 
@@ -463,8 +444,7 @@ performInterpolation_vnn2(close_plane_t *close_planes,
 		const __global unsigned char* image = getImageData(close_planes[i].plane_id,
 		                                             bscans_blocks,
 		                                             in_xsize,
-		                                             in_ysize,
-		                                             n_planes);
+		                                             in_ysize);
 
 
 		// Now we project the voxel onto the plane by translating the voxel along the
@@ -498,7 +478,11 @@ performInterpolation_vnn2(close_plane_t *close_planes,
 	return (unsigned char) (val / scale);
 	
 }
+#endif
 
+#if METHOD == METHOD_DW
+#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i ,j) \
+	performInterpolation_dw(a, b, c, d, e, f, g, h, i, j)
 
 unsigned char
 performInterpolation_dw(close_plane_t *close_planes,
@@ -510,8 +494,7 @@ performInterpolation_dw(close_plane_t *close_planes,
                           int in_ysize,
                           float in_xspacing,
                           float in_yspacing,
-                          float4 voxel,
-                          int n_planes)
+                        float4 voxel)
 {
                                       
 
@@ -528,8 +511,7 @@ performInterpolation_dw(close_plane_t *close_planes,
 		const __global unsigned char* image = getImageData(close_planes[i].plane_id,
 		                                             bscans_blocks,
 		                                             in_xsize,
-		                                             in_ysize,
-		                                             n_planes);
+		                                                   in_ysize);
 
 
 		// Now we project the voxel onto the plane by translating the voxel along the
@@ -571,83 +553,22 @@ performInterpolation_dw(close_plane_t *close_planes,
 	return (unsigned char) (val / scale);
 	
 }
-
-
-unsigned char
-performInterpolation(close_plane_t *close_planes,
-                     int n_close_planes,
-                     __global const float16  *plane_matrices,
-                     __local const float4 *plane_eqs,
-                     __global const unsigned char* bscans_blocks[],
-                     int in_xsize,
-                     int in_ysize,
-                     float in_xspacing,
-                     float in_yspacing,
-                     float4 voxel,
-                     int n_planes,
-                     int method
-	)
-{
-	unsigned char value = 0;
-	if(method == METHOD_VNN)
-	{
-		value = performInterpolation_vnn(close_planes,
-		                                 n_close_planes,
-		                                 plane_matrices,
-		                                 plane_eqs,
-		                                 bscans_blocks,
-		                                 in_xsize,
-		                                 in_ysize,
-		                                 in_xspacing,
-		                                 in_yspacing,
-		                                 voxel,
-		                                 n_planes);
-	} else if (method == METHOD_VNN2)
-	{
-		value = performInterpolation_vnn2(close_planes,
-		                                  n_close_planes,
-		                                  plane_matrices,
-		                                  plane_eqs,
-		                                  bscans_blocks,
-		                                  in_xsize,
-		                                  in_ysize,
-		                                  in_xspacing,
-		                                  in_yspacing,
-		                                  voxel,
-		                                  n_planes);
-	}
-	else if(method == METHOD_DW)
-	{
-		value = performInterpolation_dw(close_planes,
-		                                  n_close_planes,
-		                                  plane_matrices,
-		                                  plane_eqs,
-		                                  bscans_blocks,
-		                                  in_xsize,
-		                                  in_ysize,
-		                                  in_xspacing,
-		                                  in_yspacing,
-		                                  voxel,
-		                                  n_planes);
-	}
-	return max((unsigned char)1,value);
-}
+#endif
 
 
 
 void
 prepare_plane_eqs(__global float16 *plane_matrices,
-                 int n_planes,
                  __local float4 *plane_eqs)
 {
 	int id = get_local_id(0);
 	int max_local_id = get_local_size(0);
-	const int n_planes_pr_thread = (n_planes / max_local_id) + 1;
+	const int n_planes_pr_thread = (N_PLANES / max_local_id) + 1;
 
 	for(int i = 0; i < n_planes_pr_thread; i++)
 	{
 		int idx = i + n_planes_pr_thread * id;
-		if(idx >= n_planes) break;
+		if(idx >= N_PLANES) break;
 		plane_eqs[idx].xyz = plane_matrices[idx].s26A;
 		plane_eqs[idx].w = -dot(plane_matrices[idx].s26AE, plane_matrices[idx].s37BF);
 	}
@@ -662,9 +583,8 @@ voxel_methods(int volume_xsize,
               float volume_xspacing,
               float volume_yspacing,
               float volume_zspacing,
-               int in_xsize,
+              int in_xsize,
               int in_ysize,
-              int n_planes,
               float in_xspacing,
               float in_yspacing,
               // TODO: Wouldn't it be kind of nice if the bscans was an image sampler object?
@@ -681,9 +601,7 @@ voxel_methods(int volume_xsize,
               __global unsigned char* out_volume,
               __global float16 *plane_matrices,
               __local float4 *plane_eqs,
-              float radius,
-              int method,
-              int plane_method             
+              float radius  
 	)
 {
 
@@ -718,7 +636,7 @@ voxel_methods(int volume_xsize,
 	float smallest_dist = 99999999.9f;
 	float dist;
 	
-	prepare_plane_eqs(plane_matrices, n_planes, plane_eqs);
+	prepare_plane_eqs(plane_matrices, plane_eqs);
 	
 
 	
@@ -728,7 +646,7 @@ voxel_methods(int volume_xsize,
 	if(x >= volume_xsize) return;
 	
 	
-	for(int i = 0; i < n_planes; i++)
+	for(int i = 0; i < N_PLANES; i++)
 	{
 		dist = fabs(dot(voxel,plane_eqs[i]));
 		//dist = fabs(plane_dist(voxel,plane_matrices[i]));
@@ -747,46 +665,32 @@ voxel_methods(int volume_xsize,
 		voxel.y = y*volume_yspacing;
 		
 		// Find all planes closer than radius
-		if(plane_method == PLANE_CLOSEST)
-		{
-			n_close_planes = findClosestPlanes(close_planes,
-			                                   plane_eqs,
-			                                   plane_matrices,
-			                                   n_planes,
-			                                   voxel,
-			                                   radius,
-			                                   &guess);
-		}
-		else if(plane_method == PLANE_HEURISTIC) {
-			n_close_planes = findClosePlanes(close_planes,
-			                                   plane_eqs,
-			                                   plane_matrices,
-			                                   n_planes,
-			                                   voxel,
-			                                   radius,
-			                                   &guess);
-		}
 
+		n_close_planes = FIND_CLOSE_PLANES(close_planes,
+		                                   plane_eqs,
+		                                   plane_matrices,
+		                                   voxel,
+		                                   radius,
+		                                   &guess);
+		
 
 
 		// Call appropriate method to determine pixel value
-			VOXEL(out_volume,x,y,z) = performInterpolation(close_planes,
-		                                               n_close_planes,
-		                                               plane_matrices,
-		                                               plane_eqs,
-		                                               bscans_blocks,
-		                                               in_xsize,
-		                                               in_ysize,
-		                                               in_xspacing,
-		                                               in_yspacing,
-		                                               voxel,
-		                                               n_planes,
-		                                               method);
+		VOXEL(out_volume,x,y,z) = PERFORM_INTERPOLATION(close_planes,
+		                                                n_close_planes,
+		                                                plane_matrices,
+		                                                plane_eqs,
+		                                                bscans_blocks,
+		                                                in_xsize,
+		                                                in_ysize,
+		                                                in_xspacing,
+		                                                in_yspacing,
+		                                                voxel);
 		
-			//VOXEL(out_volume, x, y, z) = x;
+		//VOXEL(out_volume, x, y, z) = x;
 		//VOXEL(out_volume, x, y, z) = ((float)z/(float)volume_zsize) * 255;
 		//VOXEL(out_volume, x,y,z) = 1;
-		
+			
 	}
 }
 	
