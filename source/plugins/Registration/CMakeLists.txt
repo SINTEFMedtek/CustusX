@@ -36,6 +36,7 @@ SET( MOC_HEADER_FILES
     gui/cxElastixSyntaxHighlighter.h
     gui/cxWirePhantomWidget.h
     gui/cxPatientOrientationWidget.h
+    gui/cxBronchoscopyRegistrationWidget.h
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -52,7 +53,13 @@ SET( SOURCE_FILES
    logic/cxElastixExecuter.cpp
    logic/cxElastixParameters.h
    logic/cxElastixParameters.cpp
-
+   logic/cxBronchoscopyRegistration.h
+   logic/cxBronchoscopyRegistration.cpp
+   logic/cxBranch.h
+   logic/cxBranch.cpp
+   logic/cxBranchList.h
+   logic/cxBranchList.cpp
+    
    gui/cxRegistrationPlugin.h
    gui/cxRegistrationPlugin.cpp
    gui/cxRegistrationBaseWidget.h
@@ -95,6 +102,8 @@ SET( SOURCE_FILES
     gui/cxWirePhantomWidget.cpp
 	gui/cxPatientOrientationWidget.h
     gui/cxPatientOrientationWidget.cpp
+    gui/cxBronchoscopyRegistrationWidget.h
+    gui/cxBronchoscopyRegistrationWidget.cpp
     )
 
 # =========================================================
@@ -123,6 +132,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/gui/utilities
     ${CustusX3_SOURCE_DIR}/source/gui/dataAdapters
     ${CustusX3_SOURCE_DIR}/source/gui/infoWidgets
+    ${CustusX3_SOURCE_DIR}/source/gui/dataWidgets
     )
 
 

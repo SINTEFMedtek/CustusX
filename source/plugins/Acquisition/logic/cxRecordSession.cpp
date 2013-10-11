@@ -18,6 +18,7 @@
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "sscTime.h"
+#include "sscTool.h"
 
 namespace cx
 {
@@ -84,6 +85,21 @@ void RecordSession::parseXml(QDomNode& parentNode)
 	mStartTime = parentNode.namedItem("start").toElement().text().toInt(&ok);
 	mStopTime = parentNode.namedItem("stop").toElement().text().toInt(&ok);
 	mDescription = parentNode.namedItem("description").toElement().text();
+}
+
+TimedTransformMap RecordSession::getToolHistory(ToolPtr tool, RecordSessionPtr session)
+{
+	TimedTransformMap retval;
+
+	if(tool && session)
+		retval = tool->getSessionHistory(session->getStartTime(), session->getStopTime());
+
+	if(retval.empty() && session)
+	{
+		messageManager()->sendError("Could not find any tracking data from session "+session->getUid()+". Volume data only will be written.");
+	}
+
+	return retval;
 }
 
 }//namespace cx
