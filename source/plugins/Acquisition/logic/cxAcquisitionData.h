@@ -44,6 +44,7 @@ class AcquisitionData : public QObject
 	Q_OBJECT
 
 public:
+	AcquisitionData();
 	AcquisitionData(ReconstructManagerPtr reconstructer);
 	virtual ~AcquisitionData();
 

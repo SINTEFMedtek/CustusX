@@ -22,12 +22,12 @@ import cx.cxInstallData
 import cx.cxComponents
 import cx.cxComponentAssembly
 import cx.cxCustusXBuilder
-import cx.cxJenkinsBuildScriptBase
+import cx.cxBuildScript
 import cx.cxCustusXInstaller
 import cx.cxCustusXTestInstallation
 
 
-class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
+class Controller(cx.cxBuildScript.BuildScript):
     '''
     '''
     def __init__(self):
@@ -38,19 +38,26 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
     def getDescription(self):                  
         return 'Jenkins script for creating a release folder and publishing it.'
            
-    def _addArgumentParserArguments(self):
-        'subclasses can add parser arguments here'
-        super(Controller, self)._addArgumentParserArguments()
-        p = self.argumentParser
-        p.add_argument('--skip_publish_release', action='store_true', default=False, help='Skip the publish release to server step')
+    def addArgParsers(self):
+        self.controlData().setBuildType("Release")
+        shell.setRedirectOutput(True)
 
-    def _applyArgumentParserArguments(self, options):
-        'apply arguments defined in _addArgumentParserArguments()'
-        super(Controller, self)._applyArgumentParserArguments(options)
-        data = self.cxBuilder.assembly.controlData        
-        data.setBuildType("Release")
-  
+        super(Controller, self).addArgParsers()
+        self.additionalParsers.append(self.getArgParser())
+
+    def applyArgumentParsers(self, arguments):
+        arguments = super(Controller, self).applyArgumentParsers(arguments)
+        (self.options, arguments) = self.getArgParser().parse_known_args(arguments)
+        print 'Options: ', self.options
+
         self._initializeInstallationObject()
+        return arguments
+
+    def getArgParser(self):
+        p = argparse.ArgumentParser(add_help=False)
+        p.add_argument('--skip_publish_release', action='store_true', default=False, 
+                       help='Skip the publish release to server step')
+        return p
  
     def _initializeInstallationObject(self):
         '''
@@ -67,7 +74,7 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
 
     def run(self):
         folder = self.cxInstaller.createReleaseFolder()
-        if not self.argumentParserArguments.skip_publish_release:
+        if not self.options.skip_publish_release:
             self.cxInstaller.publishReleaseFolder(folder)
         self.cxBuilder.finish()
     
