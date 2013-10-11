@@ -12,6 +12,7 @@
     
 import os
 import os.path
+#import argparse
     
 def writeToNewFile(filename, text):
     '''
@@ -44,3 +45,15 @@ def getPathToModule():
     modulePath = os.path.dirname(moduleFile)
     modulePath = os.path.abspath(modulePath)
     return modulePath
+
+#def argparse_add_boolean_argument(argparser, name, default, dest, help):
+#    '''
+#    Variant of argparse.ArgumentParser.add_argument().
+#    Add a zero-argument option to enable/disable the attribute 'dest',
+#    depending on its default value.
+#    '''
+#    print 'Adding option', name, default
+#    if default==True:
+#        argparser.add_argument('--skip_%s'%name, action='store_false', dest=dest, help=help)
+#    else:
+#        argparser.add_argument('--%s'%name, action='store_true', dest=dest, help=help)
