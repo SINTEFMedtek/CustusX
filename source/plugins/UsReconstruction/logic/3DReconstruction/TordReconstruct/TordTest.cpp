@@ -123,7 +123,11 @@ TordTest::getPlaneMethodID(QDomElement root)
 }
 
 bool
-TordTest::initCL(QString kernelPath, int nPlanes)
+TordTest::initCL(QString kernelPath,
+                 int nMaxPlanes,
+                 int nPlanes,
+                 int method,
+                 int planeMethod)
 {
 	// Reusing initialization code from Thunder
 	moClContext = ocl_init("GPU");
@@ -139,7 +143,7 @@ TordTest::initCL(QString kernelPath, int nPlanes)
 	                                    moClContext->device,
 	                                    sSource, kernelPath); */
 
-	cl_program clprogram = this->buildCLProgram(sSource, nPlanes, kernelPath);
+	cl_program clprogram = this->buildCLProgram(sSource, nMaxPlanes, nPlanes, method, planeMethod, kernelPath);
 	mClKernel = ocl_kernel_build(clprogram,
 	                             moClContext->device, "voxel_methods");
 	return true;
@@ -147,7 +151,12 @@ TordTest::initCL(QString kernelPath, int nPlanes)
 }
 
 cl_program
-TordTest::buildCLProgram(const char* program_src, int nPlanes, QString kernelPath)
+TordTest::buildCLProgram(const char* program_src,
+                         int nMaxPlanes,
+                         int nPlanes,
+                         int method,
+                         int planeMethod,
+                         QString kernelPath)
 {
 	cl_program retval;
 	cl_int err;
@@ -158,8 +167,8 @@ TordTest::buildCLProgram(const char* program_src, int nPlanes, QString kernelPat
 	                                   &err);
 
 	ocl_check_error(err);
-	QString define = "-D MAX_PLANES=%1";
-	define = define.arg(nPlanes);
+	QString define = "-D MAX_PLANES=%1 -D N_PLANES=%2 -D METHOD=%3 -D PLANE_METHOD=%4";
+	define = define.arg(nMaxPlanes).arg(nPlanes).arg(method).arg(planeMethod);
 	err = clBuildProgram(retval, 0, NULL, define.toStdString().c_str(), 0, 0);
 
 	
@@ -244,9 +253,7 @@ TordTest::initializeFrameBlocks(frameBlock_t* framePointers,
 bool
 TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
                            vtkImageDataPtr outputData,
-                           int method,
-                           float radius,
-                           int plane_method)
+                           float radius)
 {
 	int numBlocks = 10; // FIXME?
 	// Split input US into blocks
@@ -315,7 +322,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[0]));
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[1]));
-	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[2]));
+
 	spacings[0] = input->getSpacing()[0];
 	spacings[1] = input->getSpacing()[1];
 	
@@ -339,8 +346,6 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 		
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &radius));
 
-	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &method));
-	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &plane_method));
 
 	// Global work items:
 	size_t local_work_size = 128;
@@ -534,13 +539,25 @@ TordTest::reconstruct(ProcessedUSInputDataPtr input,
 {
 
 	int nClosePlanes = getMaxPlanesOption(settings)->getValue();
-	initCL(QString(TORD_KERNEL_PATH) + "/kernels.ocl", nClosePlanes);
+
 	int method = getMethodID(settings);
 	float radius = getRadiusOption(settings)->getValue();
 	int planeMethod = getPlaneMethodID(settings);
-	messageManager()->sendInfo(QString("Method: %1, radius: %2, planeMethod: %3, nClosePlanes: %4 ").arg(method).arg(radius).arg(planeMethod).arg(nClosePlanes));
+	messageManager()->sendInfo(
+		QString("Method: %1, radius: %2, planeMethod: %3, nClosePlanes: %4, nPlanes: %5 ")
+		.arg(method)
+		.arg(radius)
+		.arg(planeMethod)
+		.arg(nClosePlanes)
+		.arg(input->getDimensions()[2]));
 
-	bool ret = 	doGPUReconstruct(input, outputData, method, radius, planeMethod );
+	initCL(QString(TORD_KERNEL_PATH) + "/kernels.ocl",
+	       nClosePlanes,
+	       input->getDimensions()[2],
+	       method,
+	       planeMethod
+		);
+	bool ret = 	doGPUReconstruct(input, outputData, radius );
 	if(moClContext != NULL)
 	{
 		ocl_release(moClContext);

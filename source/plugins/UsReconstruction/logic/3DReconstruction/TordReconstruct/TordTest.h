@@ -45,13 +45,22 @@ public:
 
 protected:
 	
-	virtual bool initCL(QString kernelFile, int nPlanes);
-	virtual cl_program buildCLProgram(const char* program_src, int nPlanes, QString kernelPath);
+	virtual bool initCL(QString kernelFile,
+	                    int nMaxPlanes,
+	                    int nPlanes,
+	                    int method,
+	                    int planeMethod);
+	
+	virtual cl_program buildCLProgram(const char* program_src, 
+	                                  int nMaxPlanes,
+	                                  int nPlanes,
+	                                  int method,
+	                                  int planeMethod,
+	                                  QString kernelPath);
+	
 	virtual bool doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                              vtkImageDataPtr outputData,
-	                              int method,
-	                              float radius,
-	                              int plane_method);
+	                              float radius);
 
 	/**
 	 * Split the US input into numBlock blocks of whole frames 
