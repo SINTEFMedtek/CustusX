@@ -9,6 +9,8 @@ typedef struct _close_plane
 } close_plane_t;
 
 #define MAX_PLANES 8
+#define MAX_PLANES_2 100
+
 #define N_BLOCKS 10
 
 #define METHOD_VNN 0
@@ -136,6 +138,62 @@ findClosePlanes(close_plane_t *close_planes,
 	return found;
 }
 
+
+int findClosestPlanes(close_plane_t *close_planes_ret,
+                      __local float4* const plane_eqs,
+                      __global float16* const plane_matrices,
+                      const int n_planes,
+                      const float4 voxel,
+                      const float radius,
+                      int *guess)
+{
+	// Find all close planes closer than radius.
+	// Assume MAX_PLANES_2 is huge, so we have room for them all
+
+	int found = 0;
+	close_plane_t orig_ptr[MAX_PLANES_2];
+	close_plane_t *close_planes = orig_ptr;
+	float dist, abs_dist;
+	for(int i = 0; i < n_planes && found < MAX_PLANES_2; i++)
+	{
+		dist = dot(plane_eqs[i], voxel);
+		abs_dist = fabs(dist);
+		if(abs_dist < radius)
+		{
+			found++;
+			close_planes->plane_id = i;
+			close_planes->dist = dist;
+			close_planes++;
+		}
+	}
+	close_planes = orig_ptr;
+	// Now pick the best MAX_PLANES and put them in close_planes_ret
+	int found2 = 0;
+	int done = 0;
+	for(int i = 0; i < MAX_PLANES && !done; i++)
+	{
+		float smallest_dist = 99999.0f;
+		int smallest_idx = -1;
+		for(int j = 0; j < found; j++)
+		{
+			if(fabs(close_planes[j].dist) < smallest_dist)
+			{
+				smallest_dist = fabs(close_planes[j].dist);
+				smallest_idx = j;
+			}
+		}
+		if(smallest_idx == -1)
+		{
+			done = 1;
+			break;
+		}
+		found2++;
+		close_planes_ret[i] = close_planes[smallest_idx];
+		// Bigger than initial smallest_dist
+		close_planes[smallest_idx].dist = 999999.0f;
+	}
+	return found2;
+}
 
 __global const unsigned char*
 getImageData(int plane_id,
@@ -686,13 +744,13 @@ voxel_methods(int volume_xsize,
 
 		// Find all planes closer than radius
 
-			n_close_planes = findClosePlanes(close_planes,
-		                                 plane_eqs,
-		                                 plane_matrices,
-		                                 n_planes,
-		                                 voxel,
-		                                 radius,
-		                                 &guess); 
+		n_close_planes = findClosestPlanes(close_planes,
+		                                   plane_eqs,
+		                                   plane_matrices,
+		                                   n_planes,
+		                                   voxel,
+		                                   radius,
+		                                   &guess); 
 
 
 		// Call appropriate method to determine pixel value
