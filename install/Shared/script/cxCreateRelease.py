@@ -25,7 +25,7 @@ import cx.cxInstallData
 import cx.cxComponents
 import cx.cxComponentAssembly
 import cx.cxCustusXBuilder
-import cx.cxJenkinsBuildScriptBase
+import cx.cxBuildScript
 #import cx.cxCustusXInstaller
 #import cx.cxCustusXTestInstallation
 
@@ -179,7 +179,7 @@ class Version:
         
 
 
-class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
+class Controller(cx.cxBuildScript.BuildScript):
     '''
     '''
 #    def __init__(self):
@@ -231,15 +231,18 @@ Thus, we get the following pattern:
     def addArgParsers(self):
         'subclasses can add argparse instances to self.additionalparsers here'
         self.controlData().setBuildType("Release")
+        shell.setRedirectOutput(True)
+        
         super(Controller, self).addArgParsers()
 #        self.additionalParsers.append(self.controlData().getArgParser_core_build())
         self.additionalParsers.append(self.getArgParser())
        
-    def applyArgumentParsers(self):
-        super(Controller, self).applyArgumentParsers()
+    def applyArgumentParsers(self, arguments):
+        arguments = super(Controller, self).applyArgumentParsers(arguments)
 #        self.controlData().applyCommandLine() 
-        self.options = self.getArgParser().parse_known_args()[0]
+        (self.options, arguments) = self.getArgParser().parse_known_args(arguments)
         print 'Options: ', self.options
+        return arguments
 
     def getArgParser(self):
         p = argparse.ArgumentParser(add_help=False)

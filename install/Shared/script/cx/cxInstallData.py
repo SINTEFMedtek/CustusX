@@ -39,6 +39,7 @@ import getpass
 import platform
 import argparse
 import pprint
+import cxArgParse
     
 class Common(object):
     '''
@@ -54,11 +55,12 @@ class Common(object):
         self.mISBpassword = ""
 #        self._buildShared = True   # build as shared or static libraries
         self.static = False # build as shared or static libraries
+        self.jom = False
         if platform.system() == 'Windows':
             self.static = True
+            self.jom = True
         self.setBuildType("Debug") 
         self.threads = 1
-        self.jom = False
         self.xcode = False
         
         self.mBuildSSCExamples = True
@@ -102,7 +104,7 @@ class Common(object):
         print ''
 
     def getArgParser_root_dir(self):
-        p = argparse.ArgumentParser(add_help=False)
+        p = cxArgParse.ArgumentParser(add_help=False)
         p.add_argument('--root_dir', default=self.root_dir, help='specify root folder, default=%s' % self.root_dir)
         p.add_argument('--print_control_data', action='store_true', default=False, help='Print all control data at startup')
         return p
@@ -118,37 +120,38 @@ class Common(object):
 #        p.add_argument('--xcode', action='store_true', default=False, help='generate xcode targets (Mac)')
 
     def getArgParser_core_build(self):
-        p = argparse.ArgumentParser(add_help=False)
-        p.add_argument('-i', '--isb_password', default="not set", dest='mISBpassword', help='password for ISB GE Connection module')
+        p = cxArgParse.ArgumentParser(add_help=False)
+        p.add_argument('-i', '--isb_password', default="not set", metavar='PASSWORD', dest='mISBpassword', help='password for ISB GE Connection module')
         p.add_argument('-j', '--threads', type=int, default=1, dest='threads', help='number of make threads')
-        p.add_argument('-g', '--git_tag', default=None, dest='mGitTag', help='git tag to use when checking out CustusX. None means checkout master branch.')
+        p.add_argument('-g', '--git_tag', default=None, metavar='TAG', dest='mGitTag', help='git tag to use when checking out CustusX. None means checkout master branch.')
         p.add_argument('-t', '--build_type', default=self.build_type, dest='build_type', choices=self._getAllowedBuildTypes(), help='build type')
-        p.add_argument('--b32', action='store_true', default=self.m32bit, dest='m32bit', help='Build 32 bit.')
-        p.add_argument('--static', action='store_true', default=self.static, dest='static', help='Link statically')
+        p.add_boolean_inverter('--b32', default=self.m32bit, dest='m32bit', help='Build 32 bit.')
+        p.add_boolean_inverter('--static', default=self.static, dest='static', help='Link statically.')        
         if platform.system() == 'Windows':
-            p.add_argument('--jom', action='store_true', default=True, help='Use jom to build.')
+            p.add_boolean_inverter('--jom', default=self.jom, dest='jom', help='Use jom to build.')
         if platform.system() == 'Darwin':
-            p.add_argument('--xcode', action='store_true', default=False, help='generate xcode targets')
+            p.add_boolean_inverter('--xcode', default=self.xcode, dest='xcode', help='generate xcode targets')
         return p
 
     def getArgParser_extended_build(self):
-        p = argparse.ArgumentParser(add_help=False)
-        p.add_argument('--coverage', action='store_true', default=False, dest='mCoverage', help='gcov code coverage')
-        p.add_argument('--doxygen', action='store_true', default=False, dest='mDoxygen', help='build doxygen documentation')
+        p = cxArgParse.ArgumentParser(add_help=False)
+        p.add_boolean_inverter('--coverage', default=self.mCoverage, dest='mCoverage', help='gcov code coverage')
+        p.add_boolean_inverter('--doxygen', default=self.mDoxygen, dest='mDoxygen', help='build doxygen documentation')
         return p
 
-    def applyCommandLine(self):
-        self.getArgParser_root_dir().parse_known_args(namespace=self)
-        self.getArgParser_core_build().parse_known_args(namespace=self)
-        self.getArgParser_extended_build().parse_known_args(namespace=self)
+    def applyCommandLine(self, arguments):
+        arguments = self.getArgParser_root_dir().parse_known_args(args=arguments, namespace=self)[1]
+        arguments = self.getArgParser_core_build().parse_known_args(args=arguments, namespace=self)[1]
+        arguments = self.getArgParser_extended_build().parse_known_args(args=arguments, namespace=self)[1]
         #data.setRootDir(options.root_dir)
         #data.mISBpassword = options.isb_password
         #data.threads = options.threads
         #data.mGitTag = options.git_tag
         #pass
         if self.print_control_data:
-            self.printSettings()
+            #self.printSettings()
             pprint.pprint(vars(self))
+        return arguments
 
     def getCMakeGenerator(self):
         if self.xcode:

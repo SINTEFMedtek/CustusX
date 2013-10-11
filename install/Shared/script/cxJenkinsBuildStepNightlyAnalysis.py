@@ -24,9 +24,9 @@ import cx.cxInstallData
 import cx.cxComponents
 import cx.cxComponentAssembly
 import cx.cxCustusXBuilder
-import cx.cxJenkinsBuildScriptBase
+import cx.cxBuildScript
 
-class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
+class Controller(cx.cxBuildScript.BuildScript):
     '''
     '''
     def __init__(self):
@@ -46,19 +46,21 @@ Generates coverage and other reports.'
         'subclasses can add argparse instances to self.additionalparsers here'
         self.controlData().setBuildType("Debug")        
         self.controlData().mCoverage = True
+        shell.setRedirectOutput(True)
 
         super(Controller, self).addArgParsers()
         self.additionalParsers.append(self.controlData().getArgParser_core_build())
 
-    def applyArgumentParsers(self):
-        super(Controller, self).applyArgumentParsers()
-        self.controlData().applyCommandLine() 
+    def applyArgumentParsers(self, arguments):
+        arguments = super(Controller, self).applyArgumentParsers(arguments)
+        #self.controlData().applyCommandLine() 
+        return arguments
 
     def run(self):
         self.cxBuilder.buildAllComponents()
         #self.cxBuilder.clearTestData()
         self.cxBuilder.resetCoverage()
-        self.cxBuilder.runAllTests()
+        self.cxBuilder.runUnitTests()
         self.cxBuilder.generateCoverageReport()
         self.cxBuilder.runCppCheck()
         self.cxBuilder.runLineCounter()
