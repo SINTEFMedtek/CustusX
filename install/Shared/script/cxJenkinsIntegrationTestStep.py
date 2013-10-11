@@ -29,12 +29,12 @@ import cx.cxInstallData
 import cx.cxComponents
 import cx.cxComponentAssembly
 import cx.cxCustusXBuilder
-import cx.cxJenkinsBuildScriptBase
+import cx.cxBuildScript
 import cx.cxCustusXInstaller
 import cx.cxCustusXTestInstallation
 
 
-class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
+class Controller(cx.cxBuildScript.BuildScript):
     '''
     '''
     def __init__(self):
@@ -45,29 +45,32 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
 
     def getDescription(self):                  
         return 'Jenkins script for testing an installed CustusX.'
-           
-    def _addArgumentParserArguments(self):
-        'subclasses can add parser arguments here'
-        super(Controller, self)._addArgumentParserArguments()
-        p = self.argumentParser
+       
+    def addArgParsers(self):
+        'subclasses can add argparse instances to self.additionalparsers here'
+        self.controlData().setBuildType("Release")
+        shell.setRedirectOutput(True)
+
+        super(Controller, self).addArgParsers()
+        
+        self.additionalParsers.append(self.controlData().getArgParser_core_build())
+        self.additionalParsers.append(self.getArgParser())
+
+    def applyArgumentParsers(self, arguments):
+        arguments = super(Controller, self).applyArgumentParsers(arguments)
+        #self.controlData().applyCommandLine() 
+        (self.options, arguments) = self.getArgParser().parse_known_args(arguments)
+        print 'Options: ', self.options
+        self._initializeInstallationObject()
+        return arguments
+
+    def getArgParser(self):
+        p = argparse.ArgumentParser(add_help=False)
         p.add_argument('--skip_checkout', action='store_true', default=False, help='Skip the checkout of data')
         p.add_argument('--skip_install', action='store_true', default=False, help='Skip installing the package')
         p.add_argument('--skip_tests', action='store_true', default=False, help='Skip the test step')
-        p.add_argument('--b32', action='store_true', default=False, help='Build 32 bit.')
-        p.add_argument('--jom', action='store_true', default=False, help='Use jom to build.')
-        p.add_argument('--static', action='store_true', default=False, help='Link statically.')
-
-    def _applyArgumentParserArguments(self, options):
-        'apply arguments defined in _addArgumentParserArguments()'
-        super(Controller, self)._applyArgumentParserArguments(options)
-        data = self.cxBuilder.assembly.controlData        
-        data.setBuildType("Release")
-        if(options.jom):
-            data.setCMakeGenerator("NMake Makefiles JOM")
-        data.setBuild32(options.b32)
-        data.setBuildShared(not options.static)
-        self._initializeInstallationObject()
- 
+        return p      
+            
     def _initializeInstallationObject(self):
         '''
         Initialize CustusXInstallation object with data 
@@ -94,13 +97,16 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         self.cxInstallation.setInstalledRoot(self.cxInstaller.getInstalledRoot())        
 
     def run(self):
-        if not self.argumentParserArguments.skip_checkout:
+        options = self.options
+        
+        if not options.skip_checkout:
             self._checkoutComponents()
-        if not self.argumentParserArguments.skip_install:
+        if not options.skip_install:
             self.cxInstaller.installPackage()
-        if not self.argumentParserArguments.skip_tests:
+        if not options.skip_tests:
             self.cxInstallation.testInstallation()
             self.cxInstallation.runIntegrationTests()
+        
         self.cxBuilder.finish()
     
     def _checkoutComponents(self):

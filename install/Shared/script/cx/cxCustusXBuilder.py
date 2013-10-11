@@ -44,10 +44,13 @@ class CustusXBuilder:
     def clearTestData(self):
         PrintFormatter.printHeader('Clearing all old test data', level=3)
         cxData = self._createComponent(cxComponents.CustusX3Data)
-        cxTestRunner.TestRunner().resetCustusXDataRepo(cxData.sourcePath())
+        custusx = self._createComponent(cxComponents.CustusX3)
+        testRunner = cxTestRunner.TestRunner()
+        testRunner.resetCustusXDataRepo(cxData.sourcePath())        
+        testRunner.removeResultFiles(outPath=custusx.buildPath())
     
-    def runAllTests(self):
-        PrintFormatter.printHeader('Run all tests', level=2)
+    def runUnitTests(self):
+        PrintFormatter.printHeader('Run all unit tests', level=2)
         self.clearTestData()
         self._runCatchUnitTests()
         self._runCTestTests()
