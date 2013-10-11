@@ -18,6 +18,8 @@ import platform
 import shutil
 import re
 import glob
+import argparse        
+import cxArgParse
     
 class Shell (object):
     '''
@@ -39,6 +41,23 @@ class Shell (object):
         self.VERBOSE = False
         self.REDIRECT_OUTPUT = False
         self.TERMINATE_ON_ERROR = True
+        
+    def getArgParser(self):
+        p = cxArgParse.ArgumentParser(add_help=False)
+        p.add_argument('-d', '--dummy', action='store_true', 
+                       dest='DUMMY',
+                       help='execute script without calling any shell commands')
+
+        p.add_boolean_inverter('--redirect_output', default=self.REDIRECT_OUTPUT, dest='REDIRECT_OUTPUT',
+                               help='Redirect stout/stderr through python. Not doing this can cause stdout mangling on the Jenkins server.')
+
+        return p
+
+    def applyCommandLine(self, arguments):
+        'read command line and apply the own argparser to self'
+        arguments = self.getArgParser().parse_known_args(args=arguments, namespace=self)[1]
+        print 'CommandLine: ', vars(self)
+        return arguments
         
     def setDummyMode(self, value):
         shell.DUMMY = value
@@ -100,6 +119,12 @@ class Shell (object):
         Unix style pathname pattern expansion. Not regex.
         '''
         path = self._convertToString(path)
+        
+        info = 'Running rm_f on %s' % path
+        if len(pattern)!=0:
+            info = info + ', pattern=%s' % pattern
+        self._printInfo(info)
+
         if os.path.isdir(path):
             dir = path
             if(pattern == ""):
