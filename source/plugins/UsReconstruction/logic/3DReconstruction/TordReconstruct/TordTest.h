@@ -9,6 +9,7 @@
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
 
+
 namespace cx
 {
 /**
@@ -44,11 +45,13 @@ public:
 
 protected:
 	
-	virtual bool initCL(QString kernelFile);
+	virtual bool initCL(QString kernelFile, int nPlanes);
+	virtual cl_program buildCLProgram(const char* program_src, int nPlanes, QString kernelPath);
 	virtual bool doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                              vtkImageDataPtr outputData,
 	                              int method,
-	                              float radius);
+	                              float radius,
+	                              int plane_method);
 
 	/**
 	 * Split the US input into numBlock blocks of whole frames 
@@ -106,6 +109,14 @@ protected:
 	 */
 	virtual int getMethodID(QDomElement root);
 
+	
+	/**
+	 * Retrieve the plane method ID from the settings
+	 * @param root The algorithm settings from the UI
+	 * @return the plane method ID to use in the OpenCL kernel
+	 */
+	virtual int getPlaneMethodID(QDomElement root);
+
 	/**
 	 * Make method option for the UI
 	 * @param root The root of the configuration ui
@@ -120,6 +131,21 @@ protected:
 	 */
 	virtual DoubleDataAdapterXmlPtr getRadiusOption(QDomElement root);
 
+	
+	/**
+	 * Make plane method option for the UI
+	 * @param root The root of the configuration ui
+	 * @return List of available methods - with the selected one available by ->getValue()
+	 */
+	virtual StringDataAdapterXmlPtr getPlaneMethodOption(QDomElement root);
+	/**
+	 * Make plane method option for the UI
+	 * @param root The root of the configuration ui
+	 * @return List of available methods - with the selected one available by ->getValue()
+	 */
+	virtual DoubleDataAdapterXmlPtr getMaxPlanesOption(QDomElement root);
+
+	
 	/// OpenCL handles
 	cl_kernel mClKernel;
 	std::vector<cl_mem> mVClMemBscan;
@@ -128,6 +154,7 @@ protected:
 
 	// Method names. Indices into this array corresponds to method IDs in the OpenCL Kernel.
 	std::vector<QString> mMethods;
+	std::vector<QString> mPlaneMethods;
 	
 };
 

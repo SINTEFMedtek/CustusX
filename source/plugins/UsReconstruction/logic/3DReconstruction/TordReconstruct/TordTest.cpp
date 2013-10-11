@@ -15,6 +15,9 @@ TordTest::TordTest()
 	mMethods.push_back("VNN");
 	mMethods.push_back("VNN2");
 	mMethods.push_back("DW");
+	mPlaneMethods.push_back("Heuristic");
+	mPlaneMethods.push_back("Closest");
+	
 }
 
 TordTest::~TordTest()
@@ -29,6 +32,8 @@ TordTest::getSettings(QDomElement root)
 
 	retval.push_back(this->getMethodOption(root));
 	retval.push_back(this->getRadiusOption(root));
+	retval.push_back(this->getPlaneMethodOption(root));
+	retval.push_back(this->getMaxPlanesOption(root));
 	return retval;
 }
 
@@ -52,6 +57,28 @@ TordTest::getMethodOption(QDomElement root)
 }
 
 
+
+
+StringDataAdapterXmlPtr
+TordTest::getPlaneMethodOption(QDomElement root)
+{
+	QStringList methods;
+	for(std::vector<QString>::iterator it = mPlaneMethods.begin();
+	    it != mPlaneMethods.end();
+	    it++)
+	{
+		QString method = *it;
+		methods << method;
+	}
+	return StringDataAdapterXml::initialize("Plane method",
+	                                        "",
+	                                        "Which method to use for finding close planes",
+	                                        methods[0],
+	                                        methods,
+	                                        root);
+}
+
+
 DoubleDataAdapterXmlPtr
 TordTest::getRadiusOption(QDomElement root)
 {
@@ -62,6 +89,22 @@ TordTest::getRadiusOption(QDomElement root)
 	                                        1,
 	                                        root);
 }
+
+
+DoubleDataAdapterXmlPtr
+TordTest::getMaxPlanesOption(QDomElement root)
+{
+	return DoubleDataAdapterXml::initialize("nPlanes", "",
+	                                     "Number of planes to include in closest planes",
+	                                     8,
+	                                     DoubleRange(1, 200, 1),
+	                                     0,
+	                                     root);
+}
+
+
+
+
 int
 TordTest::getMethodID(QDomElement root)
 {
@@ -70,8 +113,17 @@ TordTest::getMethodID(QDomElement root)
 		) - mMethods.begin();
 }
 
+
+int
+TordTest::getPlaneMethodID(QDomElement root)
+{
+	return find(mPlaneMethods.begin(), mPlaneMethods.end(),
+	            this->getPlaneMethodOption(root)->getValue()
+		) - mPlaneMethods.begin();
+}
+
 bool
-TordTest::initCL(QString kernelPath)
+TordTest::initCL(QString kernelPath, int nPlanes)
 {
 	// Reusing initialization code from Thunder
 	moClContext = ocl_init("GPU");
@@ -83,14 +135,60 @@ TordTest::initCL(QString kernelPath)
 	                             &sourceLen);
 
 	
-	cl_program clprogram = ocl_create_program(moClContext->context,
+	/*	cl_program clprogram = ocl_create_program(moClContext->context,
 	                                    moClContext->device,
-	                                    sSource, kernelPath);
+	                                    sSource, kernelPath); */
+
+	cl_program clprogram = this->buildCLProgram(sSource, nPlanes, kernelPath);
 	mClKernel = ocl_kernel_build(clprogram,
 	                             moClContext->device, "voxel_methods");
 	return true;
 	
 }
+
+cl_program
+TordTest::buildCLProgram(const char* program_src, int nPlanes, QString kernelPath)
+{
+	cl_program retval;
+	cl_int err;
+	retval = clCreateProgramWithSource(moClContext->context,
+	                                   1,
+	                                   (const char **) &program_src,
+	                                   0,
+	                                   &err);
+
+	ocl_check_error(err);
+	QString define = "-D MAX_PLANES=%1";
+	define = define.arg(nPlanes);
+	err = clBuildProgram(retval, 0, NULL, define.toStdString().c_str(), 0, 0);
+
+	
+	if (err != CL_SUCCESS)
+	{
+		size_t len;
+		char buffer[512 * 512];
+		memset(buffer, 0, 512 * 512);
+		printf("OpenCL ERROR: Failed to build program on device %p. Error code: %d\n",
+		       moClContext->device, err);
+		printf("Build log for program %s:\n", kernelPath.toStdString().c_str());
+
+		clGetProgramBuildInfo(retval, // the program object being queried
+			moClContext->device, // the device for which the OpenCL code was built
+			CL_PROGRAM_BUILD_LOG, // specifies that we want the build log
+			sizeof(char) * 512 * 512, // the size of the buffer
+			buffer, // on return, holds the build log
+			&len); // on return, the actual size in bytes of the data returned
+
+		printf("%lu %s\n", len, buffer);
+		for (uint i = 0; i < len; i++)
+			printf("%c", buffer[i]);
+		printf("\n");
+		exit(1);
+	}
+	return retval;
+
+}
+
 
 bool
 TordTest::initializeFrameBlocks(frameBlock_t* framePointers,
@@ -147,7 +245,8 @@ bool
 TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
                            vtkImageDataPtr outputData,
                            int method,
-                           float radius)
+                           float radius,
+                           int plane_method)
 {
 	int numBlocks = 10; // FIXME?
 	// Split input US into blocks
@@ -183,50 +282,10 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                                          NULL);
 
 	// FIXME: Fill plane eqs
+
 	size_t nPlanes = input->getDimensions()[2];
 
-	/*	float *planeEqs = new float[nPlanes*4];
-	float *planeCorners = new float[nPlanes*9];
 
-	this->fillPlaneEqs(planeEqs, input);
-	this->fillPlaneCorners(planeCorners, input);
-
-
-	// Perform a sanity check on the plane corners - TODO delete this
-	for(int i = 0; i < nPlanes; i++)
-	{
-		for(int j = 0; j < 3; j++)
-		{
-			float dist = 0.0;
-			for(int k = 0; k < 3; k++)
-			{
-				dist += planeEqs[i*4+k] * planeCorners[i*9+j*3 + k];
-			}
-			dist += planeEqs[i*4+3];
-			if(fabs(dist) > 0.1f)
-			{
-				messageManager()->sendError(QString("Corner distance for plane %1 too long: %2!\n")
-				                            .arg(i).arg(dist));
-				return false;
-			}
-		}
-	}
-	
-	messageManager()->sendInfo(QString("Allocating buffer for plane equations, %1 floats").arg(nPlanes*4));
-	cl_mem clPlaneEqs = ocl_create_buffer(moClContext->context,
-	                                      CL_MEM_READ_ONLY,
-	                                      nPlanes*sizeof(float)*4,
-	                                      planeEqs);
-	messageManager()->sendInfo(QString("Allocating buffer for plane corners, %1 floats").arg(nPlanes*9));
-	cl_mem clPlaneCorners = ocl_create_buffer(moClContext->context,
-	                                          CL_MEM_READ_ONLY,
-	                                          nPlanes*sizeof(float)*9,
-	                                          planeCorners);
-
-	delete [] planeEqs;
-	delete [] planeCorners;
-	
-	*/
 	float *planeMatrices = new float[16*nPlanes];
 
 	this->fillPlaneMatrices(planeMatrices, input);
@@ -279,8 +338,9 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float)*4*nPlanes, NULL));
 		
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &radius));
-	// FIXME: method
+
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &method));
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &plane_method));
 
 	// Global work items:
 	size_t local_work_size = 128;
@@ -466,50 +526,27 @@ TordTest::freeFrameBlocks(frameBlock_t *framePointers,
 		delete [] framePointers[i].data;
 	}
 }
+
 bool
 TordTest::reconstruct(ProcessedUSInputDataPtr input,
                       vtkImageDataPtr outputData,
                       QDomElement settings)
 {
 
-	initCL(QString(TORD_KERNEL_PATH) + "/kernels.ocl");
+	int nClosePlanes = getMaxPlanesOption(settings)->getValue();
+	initCL(QString(TORD_KERNEL_PATH) + "/kernels.ocl", nClosePlanes);
 	int method = getMethodID(settings);
 	float radius = getRadiusOption(settings)->getValue();
-	messageManager()->sendInfo(QString("Method: %1, radius: %2").arg(method).arg(radius));
-	bool ret = 	doGPUReconstruct(input, outputData, method, radius);
+	int planeMethod = getPlaneMethodID(settings);
+	messageManager()->sendInfo(QString("Method: %1, radius: %2, planeMethod: %3, nClosePlanes: %4 ").arg(method).arg(radius).arg(planeMethod).arg(nClosePlanes));
+
+	bool ret = 	doGPUReconstruct(input, outputData, method, radius, planeMethod );
 	if(moClContext != NULL)
 	{
 		ocl_release(moClContext);
 		moClContext = NULL;
 	}
 	return ret;
-
-	/* vtkImageDataPtr target = outputData;
-	Eigen::Array3i targetDims(target->GetDimensions());
-	Vector3D targetSpacing(target->GetSpacing());
-
-	// Print dimensions
-	QString info = QString("Target dims: %1 %2 %3").arg(targetDims[0]).arg(targetDims[1]).arg(targetDims[2]);
-	messageManager()->sendInfo(info);
-
-
-	// Iterate over outputData and fill volume with 255-s
-
-	unsigned char *outputPointer  = static_cast<unsigned char*>(outputData->GetScalarPointer());
-	for(int dim0 = 0; dim0 < targetDims[0]; dim0++)
-	{
-		for(int dim1 = 0; dim1 < targetDims[1]; dim1++)
-		{
-			for(int dim2 = 0; dim2 < targetDims[2]; dim2++)
-			{
-				unsigned int idx = dim0 + dim1*targetDims[0] + dim2*targetDims[0]*targetDims[1];
-				outputPointer[idx] = 255;
-			
-			} // dim2
-		} // dim1
-	} // dim0
-
-	return true; */
 }
 
 }
