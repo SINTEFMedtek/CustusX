@@ -70,29 +70,7 @@ class Controller(cx.cxBuildScript.BuildScript):
         p.add_argument('--skip_install', action='store_true', default=False, help='Skip installing the package')
         p.add_argument('--skip_tests', action='store_true', default=False, help='Skip the test step')
         return p      
-           
-#    def _addArgumentParserArguments(self):
-#        'subclasses can add parser arguments here'
-#        super(Controller, self)._addArgumentParserArguments()
-#        p = self.argumentParser
-#        p.add_argument('--skip_checkout', action='store_true', default=False, help='Skip the checkout of data')
-#        p.add_argument('--skip_install', action='store_true', default=False, help='Skip installing the package')
-#        p.add_argument('--skip_tests', action='store_true', default=False, help='Skip the test step')
-#        p.add_argument('--b32', action='store_true', default=False, help='Build 32 bit.')
-#        p.add_argument('--jom', action='store_true', default=False, help='Use jom to build.')
-#        p.add_argument('--static', action='store_true', default=False, help='Link statically.')
-
-#    def _applyArgumentParserArguments(self, options):
-#        'apply arguments defined in _addArgumentParserArguments()'
-#        super(Controller, self)._applyArgumentParserArguments(options)
-#        data = self.cxBuilder.assembly.controlData        
-#        data.setBuildType("Release")
-#        if(options.jom):
-#            data.setCMakeGenerator("NMake Makefiles JOM")
-#        data.setBuild32(options.b32)
-#        data.setBuildShared(not options.static)
-#        self._initializeInstallationObject()
- 
+            
     def _initializeInstallationObject(self):
         '''
         Initialize CustusXInstallation object with data 
@@ -120,6 +98,7 @@ class Controller(cx.cxBuildScript.BuildScript):
 
     def run(self):
         options = self.options
+        
         if not options.skip_checkout:
             self._checkoutComponents()
         if not options.skip_install:
@@ -127,6 +106,7 @@ class Controller(cx.cxBuildScript.BuildScript):
         if not options.skip_tests:
             self.cxInstallation.testInstallation()
             self.cxInstallation.runIntegrationTests()
+        
         self.cxBuilder.finish()
     
     def _checkoutComponents(self):

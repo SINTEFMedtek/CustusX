@@ -10,7 +10,7 @@
 # Default values:
 # - change the class Common
 #
-# default folder setup (feel free to modify)
+# default folder setup
 #
 # --root---external---ITK---ITK
 #    |         |       |----build_Debug  
@@ -21,7 +21,7 @@
 #    |                 |----build_Debug  
 #    |                 |----build_Release
 #    |                 |----build32_Debug
-#    |-----workspace
+#    |-----working
 #              |------CustusX---CustusX
 #                      |--------build_Debug  
 #                      |--------build_Release
@@ -48,12 +48,9 @@ class Common(object):
     '''
     def __init__(self):
         self.root_dir = None
-        
         self.m32bit = False
-        
         self._initPaths()
-        self.mISBpassword = ""
-#        self._buildShared = True   # build as shared or static libraries
+        self.isb_password = ""
         self.static = False # build as shared or static libraries
         self.jom = False
         if platform.system() == 'Windows':
@@ -62,32 +59,28 @@ class Common(object):
         self.setBuildType("Debug") 
         self.threads = 1
         self.xcode = False
-        
         self.mBuildSSCExamples = True
         self.mBuildTesting = True
         self.mUseCotire = False
         self.mUseOpenCL = True
         self.mOSX_DEPLOYMENT_TARGET = "10.6" # Deploy for OSX 10.6 Snow Leopard and later
         if (platform.system() == 'Windows'):
-#            self.mCMakeGenerator = 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
             self.mBuildSSCExamples = False
             self.mBuildTesting = True
             self.mUseCotire = False
-#        else:
-#            self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
         if (platform.system() == "Darwin"):
             self.mUseOpenCL = False # Turn off OpenCL for Mac as Jenkins tests are run on olevs mac, and OpenCL code don't work there yet
         self.mBuildExAndTest = False
         self.mCoverage = False
         self.mDoxygen = False
-        self.mGitTag = None # if none, use branch master
+        self.git_tag = None # if none, use branch master
 
     def printSettings(self):
         print ''
         print 'Settings:'
         print '    User:', getpass.getuser()
         print '    platform:', platform.system()
-        print '    ISBpassword:', self.mISBpassword
+        print '    ISBpassword:', self.isb_password
         print '    RootDir:', self.getRootDir()
         print '    ExternalDir:', self.getExternalPath()
         print '    WorkingDir:', self.getWorkingPath()
@@ -99,7 +92,7 @@ class Common(object):
         print '    Coverage:', self.mCoverage
         print '    Threads:', self.threads
         print '    32 bit:', self.m32bit
-        print '    git tag:', self.mGitTag
+        print '    git tag:', self.git_tag
         print '    OpenCL:', self.mUseOpenCL
         print ''
 
@@ -109,21 +102,11 @@ class Common(object):
         p.add_argument('--print_control_data', action='store_true', default=False, help='Print all control data at startup')
         return p
 
-#from cxInstaller:
-#        p.add_argument('-i', '--isb_password', default="not set", help='password for ISB GE Connection module')
-#        p.add_argument('-j', '--threads', type=int, default=1, help='number of make threads')
-#        p.add_argument('-g', '--git_tag', default=None, help='git tag to use when checking out CustusX. None means checkout master branch.')
-#        p.add_argument('-t', '--build_type', choices=['Debug','Release','RelWithDebInfo'], help='build type', default='Debug')
-#        p.add_argument('--b32', action='store_true', default=False, help='build 32 bit')
-#        p.add_argument('--static', action='store_true', default=False, help='build static libraries')
-#        p.add_argument('--jom', action='store_true', default=False, help='generate jom targets (Windows)')
-#        p.add_argument('--xcode', action='store_true', default=False, help='generate xcode targets (Mac)')
-
     def getArgParser_core_build(self):
         p = cxArgParse.ArgumentParser(add_help=False)
-        p.add_argument('-i', '--isb_password', default="not set", metavar='PASSWORD', dest='mISBpassword', help='password for ISB GE Connection module')
+        p.add_argument('-i', '--isb_password', default="not set", metavar='PASSWORD', dest='isb_password', help='password for ISB GE Connection module')
         p.add_argument('-j', '--threads', type=int, default=1, dest='threads', help='number of make threads')
-        p.add_argument('-g', '--git_tag', default=None, metavar='TAG', dest='mGitTag', help='git tag to use when checking out CustusX. None means checkout master branch.')
+        p.add_argument('-g', '--git_tag', default=None, metavar='TAG', dest='git_tag', help='git tag to use when checking out CustusX. None means checkout master branch.')
         p.add_argument('-t', '--build_type', default=self.build_type, dest='build_type', choices=self._getAllowedBuildTypes(), help='build type')
         p.add_boolean_inverter('--b32', default=self.m32bit, dest='m32bit', help='Build 32 bit.')
         p.add_boolean_inverter('--static', default=self.static, dest='static', help='Link statically.')        
@@ -143,11 +126,6 @@ class Common(object):
         arguments = self.getArgParser_root_dir().parse_known_args(args=arguments, namespace=self)[1]
         arguments = self.getArgParser_core_build().parse_known_args(args=arguments, namespace=self)[1]
         arguments = self.getArgParser_extended_build().parse_known_args(args=arguments, namespace=self)[1]
-        #data.setRootDir(options.root_dir)
-        #data.mISBpassword = options.isb_password
-        #data.threads = options.threads
-        #data.mGitTag = options.git_tag
-        #pass
         if self.print_control_data:
             #self.printSettings()
             pprint.pprint(vars(self))
@@ -161,9 +139,6 @@ class Common(object):
         if platform.system() == 'Windows':
             return 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
         return "Eclipse CDT4 - Unix Makefiles" 
-
-#    def setCMakeGenerator(self, value):
-#        self.mCMakeGenerator = value    
     
     def setBuild32(self, value):
         self.m32bit = value        
@@ -176,9 +151,6 @@ class Common(object):
         if value not in allowedValues:
             raise Exception("Error: %s is not a valid build type. Chose one of %s" % (value, allowedValues))
         self.build_type = value
-#        self._buildExternalsType = "Release" # used for all non-cx libs, this because we want speed even in debug...
-#        if(platform.system() == 'Windows'): #Windows do not allow linking between different build types
-#            self._buildExternalsType = self._buildType            
     
     def getBuildShared(self):
         return not self.static # self._buildShared
@@ -186,7 +158,7 @@ class Common(object):
         return self.build_type
     
     def getBuildExternalsType(self):
-        if(platform.system() == 'Windows'): #Windows do not allow linking between different build types
+        if(platform.system() == 'Windows'): # Windows do not allow linking between different build types
             return self.build_type            
         return "Release" # used for all non-cx libs, this because we want speed even in debug...
     
@@ -230,23 +202,11 @@ class Common(object):
         self._externalFolder = "external"
         # working dir: Used as base dir for Custus and other of our 'own' projects
         self._workingFolder = "working"
-
-#    def _convertOnOffToBool(self, value):
-#        if value == True or value == 'ON':
-#            return True
-#        else:
-#            return False
-
-#    def _convertBoolToOnOff(self, value):
-#        if value == True or value == 'ON':
-#            return 'ON'
-#        else:
-#            return 'OFF'
         
     def getGitTag(self):
-        if self.mGitTag == "":
+        if self.git_tag == "":
             return None
-        return self.mGitTag
+        return self.git_tag
 
 # ---------------------------------------------------------
 

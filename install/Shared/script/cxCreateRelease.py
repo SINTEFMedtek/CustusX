@@ -182,11 +182,6 @@ class Version:
 class Controller(cx.cxBuildScript.BuildScript):
     '''
     '''
-#    def __init__(self):
-#        ''
-#        self.cxInstaller = cx.cxCustusXInstaller.CustusXInstaller()
-#        super(Controller, self).__init__()
-
     def getDescription(self):                  
         return '''\
 Jenkins script for creating a new release and publishing it.
@@ -229,17 +224,14 @@ Thus, we get the following pattern:
 '''
         
     def addArgParsers(self):
-        'subclasses can add argparse instances to self.additionalparsers here'
         self.controlData().setBuildType("Release")
         shell.setRedirectOutput(True)
         
         super(Controller, self).addArgParsers()
-#        self.additionalParsers.append(self.controlData().getArgParser_core_build())
         self.additionalParsers.append(self.getArgParser())
        
     def applyArgumentParsers(self, arguments):
         arguments = super(Controller, self).applyArgumentParsers(arguments)
-#        self.controlData().applyCommandLine() 
         (self.options, arguments) = self.getArgParser().parse_known_args(arguments)
         print 'Options: ', self.options
         return arguments
@@ -252,24 +244,6 @@ Thus, we get the following pattern:
         p.add_argument('-p', '--password', default="not set", help='jenkins password')
         return p
         
-           
-#    def _addArgumentParserArguments(self):
-#        'subclasses can add parser arguments here'
-#        super(Controller, self)._addArgumentParserArguments()
-#        p = self.argumentParser
-##        p.add_argument('--beta_release', action='store_true', default=False, help='Create a beta CustusX release with a new patch version number.')
-#        #p.add_argument('--alpha_release', action='store_true', default=False, help='Create a beta CustusX release with a new patch version number.')
-#        p.add_argument('-r', '--release_type', choices=['release','beta','alpha'], help='Type of release to create, de general description for more.', default='alpha')
-#        p.add_argument('-j', '--jenkins_release', action='store_true', default=False, help='Trigger a jenkins release using the generated git tag, publish to release server')
-#        p.add_argument('-u', '--username', default="user", help='jenkins user')
-#        p.add_argument('-p', '--password', default="not set", help='jenkins password')
-
-#    def _applyArgumentParserArguments(self, options):
-#        'apply arguments defined in _addArgumentParserArguments()'
-#        super(Controller, self)._applyArgumentParserArguments(options)
-
-    def getOptions(self):
-        return self.options;
     def getReleaseType(self):
         return self.options.release_type.upper()
     
@@ -294,7 +268,7 @@ Thus, we get the following pattern:
         else:
             publish_tag = ""            
 
-        if self.getOptions().jenkins_release:
+        if self.options.jenkins_release:
             self.jenkins_publish_release(publish_tag)
             
         self.cxBuilder.finish()
@@ -328,8 +302,8 @@ Thus, we get the following pattern:
         PrintFormatter.printHeader('Trigger jenkins build for tag %s' % tag, level=3)
 
         self.jenkins = Jenkins()
-        self.jenkins.username = self.getOptions().username
-        self.jenkins.password = self.getOptions().password
+        self.jenkins.username = self.options.username
+        self.jenkins.password = self.options.password
         self.jenkins.jobname = 'CustusX_release_ubuntu'
         self.jenkins.initializeJenkins()
         

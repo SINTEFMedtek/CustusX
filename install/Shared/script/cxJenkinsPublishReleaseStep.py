@@ -39,18 +39,11 @@ class Controller(cx.cxBuildScript.BuildScript):
         return 'Jenkins script for creating a release folder and publishing it.'
            
     def addArgParsers(self):
-        'subclasses can add argparse instances to self.additionalparsers here'
         self.controlData().setBuildType("Release")
         shell.setRedirectOutput(True)
 
         super(Controller, self).addArgParsers()
         self.additionalParsers.append(self.getArgParser())
-
-#    def _addArgumentParserArguments(self):
-#        'subclasses can add parser arguments here'
-#        super(Controller, self)._addArgumentParserArguments()
-#        p = self.argumentParser
-#        p.add_argument('--skip_publish_release', action='store_true', default=False, help='Skip the publish release to server step')
 
     def applyArgumentParsers(self, arguments):
         arguments = super(Controller, self).applyArgumentParsers(arguments)
@@ -65,13 +58,6 @@ class Controller(cx.cxBuildScript.BuildScript):
         p.add_argument('--skip_publish_release', action='store_true', default=False, 
                        help='Skip the publish release to server step')
         return p
-
-#    def _applyArgumentParserArguments(self, options):
-#        'apply arguments defined in _addArgumentParserArguments()'
-#        super(Controller, self)._applyArgumentParserArguments(options)
-#        data = self.cxBuilder.assembly.controlData        
-#        data.setBuildType("Release")  
-#        self._initializeInstallationObject()
  
     def _initializeInstallationObject(self):
         '''

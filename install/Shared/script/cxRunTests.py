@@ -26,15 +26,10 @@ from cx.cxPrintFormatter import PrintFormatter
 class Controller(cx.cxBuildScript.BuildScript):
     '''
     '''
-    def __init__(self):
-        ''
-        super(Controller, self).__init__()
-
     def getDescription(self):                  
-        return 'Jenkins script for build, test and deployment of CustusX and dependents.'
+        return 'Run CustusX tests, using mainly the catch and ctest frameworks.'
        
     def addArgParsers(self):
-        'subclasses can add argparse instances to self.additionalparsers here'
         self.controlData().setBuildType("Release")
         shell.setRedirectOutput(False)
 

@@ -122,7 +122,7 @@ class Shell (object):
         
         info = 'Running rm_f on %s' % path
         if len(pattern)!=0:
-            info = info + 'pattern=%s' % pattern
+            info = info + ', pattern=%s' % pattern
         self._printInfo(info)
 
         if os.path.isdir(path):
