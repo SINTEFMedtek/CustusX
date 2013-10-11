@@ -14,6 +14,7 @@ TordTest::TordTest()
 {
 	mMethods.push_back("VNN");
 	mMethods.push_back("VNN2");
+	mMethods.push_back("DW");
 }
 
 TordTest::~TordTest()
