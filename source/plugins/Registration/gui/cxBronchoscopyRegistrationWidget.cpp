@@ -13,6 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include "cxBronchoscopyRegistrationWidget.h"
+#include <vtkPolyData.h>
 #include "sscTransform3D.h"
 #include "cxDataSelectWidget.h"
 #include "sscToolManager.h"
@@ -28,6 +29,7 @@
 #include "sscView.h"
 #include "sscToolRep3D.h"
 #include "sscToolTracer.h"
+#include "cxBronchoscopyRegistration.h"
 
 
 namespace cx
@@ -73,17 +75,21 @@ QString BronchoscopyRegistrationWidget::defaultWhatsThis() const
 
 void BronchoscopyRegistrationWidget::registerSlot()
 {
-	Transform3D old_rMpr = *toolManager()->get_rMpr();
+	Transform3D old_rMpr = *toolManager()->get_rMpr();//input?
 
-	mSelectMeshWidget->getMesh()->getVtkPolyData();//Gi denne som input til BronchoscopyRegistration kode
+	vtkPolyDataPtr centerline = mSelectMeshWidget->getMesh()->getVtkPolyData();//input
 
 
 	ToolPtr tool = toolManager()->getDominantTool();
 	RecordSessionPtr session = mAquisition->getLatestSession();
 	TimedTransformMap trackerRecordedData = RecordSession::getToolHistory(tool, session);//input
 
-	//    Transform3D new_rMpr = mMatrixWidget->getMatrix();// Erstatt mMatrixWidget med matrise fra BronchoscopyRegistration kode
-	Transform3D new_rMpr = old_rMpr;
+	BronchoscopyRegistration reg;
+	Transform3D new_rMpr = Transform3D(reg.runBronchoscopyRegistration(centerline,trackerRecordedData));
+
+
+
+//	Transform3D new_rMpr = old_rMpr;//output
 	mManager->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
 
 
