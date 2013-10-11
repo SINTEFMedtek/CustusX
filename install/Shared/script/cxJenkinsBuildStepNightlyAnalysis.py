@@ -29,21 +29,12 @@ import cx.cxBuildScript
 class Controller(cx.cxBuildScript.BuildScript):
     '''
     '''
-    def __init__(self):
-        ''
-        super(Controller, self).__init__()
-
-#        data = self.cxBuilder.assembly.controlData
-#        data.setBuildType("Debug")        
-#        data.mCoverage = True
-
     def getDescription(self):                  
         return '\
 Jenkins script for build, test and deployment of CustusX and dependents. \
 Generates coverage and other reports.'
     
     def addArgParsers(self):
-        'subclasses can add argparse instances to self.additionalparsers here'
         self.controlData().setBuildType("Debug")        
         self.controlData().mCoverage = True
         shell.setRedirectOutput(True)
@@ -51,14 +42,12 @@ Generates coverage and other reports.'
         super(Controller, self).addArgParsers()
         self.additionalParsers.append(self.controlData().getArgParser_core_build())
 
-    def applyArgumentParsers(self, arguments):
-        arguments = super(Controller, self).applyArgumentParsers(arguments)
-        #self.controlData().applyCommandLine() 
-        return arguments
+#    def applyArgumentParsers(self, arguments):
+#        arguments = super(Controller, self).applyArgumentParsers(arguments)
+#        return arguments
 
     def run(self):
         self.cxBuilder.buildAllComponents()
-        #self.cxBuilder.clearTestData()
         self.cxBuilder.resetCoverage()
         self.cxBuilder.runUnitTests()
         self.cxBuilder.generateCoverageReport()

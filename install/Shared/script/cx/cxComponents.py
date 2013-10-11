@@ -347,10 +347,10 @@ class ISB_DataStreaming(CppComponent):
         '''
         return login info to be added as arguments to the svn co and up calls.
         '''
-        if self.controlData.mISBpassword == "":
+        if self.controlData.isb_password == "":
             return '--username sintef'
         else:
-            return '--non-interactive --username sintef --password %s' % self.controlData.mISBpassword
+            return '--non-interactive --username sintef --password %s' % self.controlData.isb_password
     # ---------------------------------------------------------
 
 class CustusX3(CppComponent):
