@@ -13,7 +13,8 @@
 // See CustusX_License.txt for more information.
 
 #include "cxProcessWrapper.h"
-#include <QtCore>
+#include <QDir>
+#include <QFileInfo>
 #include "cxDataLocations.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
@@ -21,20 +22,22 @@
 namespace cx
 {
 
-ProcessWrapper::ProcessWrapper(QString name, QObject* parent) : QObject(parent), mName(name)
+ProcessWrapper::ProcessWrapper(QString name, QObject* parent) :
+		QObject(parent), mName(name), mLastExecutablePath("")
 {
 	mProcess = new QProcess(this);
-	connect(mProcess, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
-	connect(mProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(serverProcessError(QProcess::ProcessError)));
+	connect(mProcess, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(processStateChanged(QProcess::ProcessState)));
+	connect(mProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
+	connect(mProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished(int, QProcess::ExitStatus)));
 
-	connect(mProcess, SIGNAL(readyRead()), this, SLOT(serverProcessReadyRead()));
+	connect(mProcess, SIGNAL(readyRead()), this, SLOT(processReadyRead()));
 	mProcess->setProcessChannelMode(QProcess::MergedChannels);
 	mProcess->setReadChannel(QProcess::StandardOutput);
 }
 
 ProcessWrapper::~ProcessWrapper()
 {
-	disconnect(mProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(serverProcessError(QProcess::ProcessError)));
+	disconnect(mProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
 	mProcess->close();
 }
 
@@ -59,16 +62,46 @@ void ProcessWrapper::launch(QString executable, QStringList arguments)
 	if (!QFileInfo(executable).exists())
 	{
 		messageManager()->sendError(QString("Cannot find %1 [%2]").arg(mName).arg(executable));
-		return;
+		//return;
 	}
 
 	messageManager()->sendInfo(QString("Launching %1 %2 with arguments %3").arg(mName).arg(executable).arg(arguments.join(", ")));
 
 	if (mProcess->state() == QProcess::NotRunning)
+	{
 		mProcess->start(executable, arguments);
+		mLastExecutablePath = executable;
+	}
 }
 
-void ProcessWrapper::serverProcessError(QProcess::ProcessError error)
+void ProcessWrapper::requestTerminateSlot()
+{
+	mProcess->terminate();
+	messageManager()->sendInfo(QString("Requesting termination of %1 %2").arg(mName).arg(mLastExecutablePath));
+}
+
+void ProcessWrapper::processReadyRead()
+{
+	messageManager()->sendInfo(QString(mProcess->readAllStandardOutput()));
+}
+
+void ProcessWrapper::processStateChanged(QProcess::ProcessState newState)
+{
+	if (newState == QProcess::Running)
+	{
+		messageManager()->sendInfo(QString("%1 running.").arg(mName));
+	}
+	if (newState == QProcess::NotRunning)
+	{
+		messageManager()->sendInfo(QString("%1 not running.").arg(mName));
+	}
+	if (newState == QProcess::Starting)
+	{
+		messageManager()->sendInfo(QString("%1 starting.").arg(mName));
+	}
+}
+
+void ProcessWrapper::processError(QProcess::ProcessError error)
 {
 	QString msg;
 	msg += QString("%1 reported an error: ").arg(mName);
@@ -100,29 +133,14 @@ void ProcessWrapper::serverProcessError(QProcess::ProcessError error)
 	messageManager()->sendError(msg);
 }
 
-void ProcessWrapper::serverProcessStateChanged(QProcess::ProcessState newState)
+void ProcessWrapper::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-	if (newState == QProcess::Running)
-	{
-		messageManager()->sendInfo(QString("%1 running.").arg(mName));
-//		this->delayedAutoConnectServer();
-	}
-	if (newState == QProcess::NotRunning)
-	{
-		messageManager()->sendInfo(QString("%1 not running.").arg(mName));
-	}
-	if (newState == QProcess::Starting)
-	{
-		messageManager()->sendInfo(QString("%1 starting.").arg(mName));
-	}
+	QString msg = QString("%1 %2 exited with exit status %3. (%1 last exit code was %4.)").arg(mName).arg(mLastExecutablePath).arg(exitStatus).arg(exitCode);
+	if(exitStatus == 0)
+		messageManager()->sendSuccess(msg);
+	else
+		messageManager()->sendError(msg);
 }
-
-void ProcessWrapper::serverProcessReadyRead()
-{
-	messageManager()->sendInfo(QString(mProcess->readAllStandardOutput()));
-}
-
-
 
 
 }

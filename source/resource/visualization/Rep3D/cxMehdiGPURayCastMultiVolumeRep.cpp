@@ -118,7 +118,7 @@ MehdiGPURayCastMultiVolumeRep::~MehdiGPURayCastMultiVolumeRep()
 MehdiGPURayCastMultiVolumeRep::MehdiGPURayCastMultiVolumeRep() :
 	mVolume(vtkVolumePtr::New())
 {
-	mGenerator = ImageEnveloperImpl::create();
+	mGenerator = ImageEnveloper::create();
 }
 
 void MehdiGPURayCastMultiVolumeRep::addRepActorsToViewRenderer(View* view)

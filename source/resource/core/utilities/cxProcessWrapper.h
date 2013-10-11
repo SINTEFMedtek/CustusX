@@ -1,4 +1,4 @@
-// This file is part of CustusX, an Image Guided Therapy Application.
+	// This file is part of CustusX, an Image Guided Therapy Application.
 //
 // Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
 //
@@ -32,10 +32,12 @@ namespace cx
 
 typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
 
-/**Wraps a QProcess and performs some common operations.
+/**
+ * Wraps a QProcess and supplies a interface that integrates nicely with the rest of CustusX.
  *
  *  \date Oct 19, 2012
- *  \author christiana
+ *  \author Christian Askeland, SINTEF
+ *  \author Janne Beate Bakeng, SINTEF
  */
 class ProcessWrapper : public QObject
 {
@@ -45,17 +47,24 @@ public:
 	virtual ~ProcessWrapper();
 
 	QProcess* getProcess();
+	/**
+	 *
+	 */
 	void launch(QString executable, QStringList arguments = QStringList());
 
+public slots:
+	void requestTerminateSlot();
 
 private slots:
-	void serverProcessReadyRead();
-	void serverProcessStateChanged(QProcess::ProcessState newState);
-	void serverProcessError(QProcess::ProcessError error);
+	void processReadyRead();
+	void processStateChanged(QProcess::ProcessState newState);
+	void processError(QProcess::ProcessError error);
+	void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
 	QProcess* mProcess;
 	QString mName;
+	QString mLastExecutablePath; //the path to the last executable that was launched
 };
 
 }
