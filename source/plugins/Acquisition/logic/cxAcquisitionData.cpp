@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include <cxAcquisitionData.h>
+#include "cxAcquisitionData.h"
 
 //#include "cxAcquisitionManager.h"
 #include <vector>
@@ -26,6 +26,8 @@
 
 namespace cx
 {
+AcquisitionData::AcquisitionData()
+{}
 
 AcquisitionData::AcquisitionData(ReconstructManagerPtr reconstructer) :
 	mReconstructer(reconstructer)
