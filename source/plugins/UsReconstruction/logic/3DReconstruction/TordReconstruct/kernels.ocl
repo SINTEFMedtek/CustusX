@@ -8,7 +8,7 @@ typedef struct _close_plane
 	int plane_id;
 } close_plane_t;
 
-#define MAX_PLANES 8
+//#define MAX_PLANES 8
 #define MAX_PLANES_2 100
 
 #define N_BLOCKS 10
@@ -16,6 +16,9 @@ typedef struct _close_plane
 #define METHOD_VNN 0
 #define METHOD_VNN2 1
 #define METHOD_DW 2
+
+#define PLANE_HEURISTIC 0
+#define PLANE_CLOSEST 1
 
 #define VOXEL(v,x,y,z) v[x + y*volume_xsize + z*volume_ysize*volume_xsize]
 
@@ -679,7 +682,8 @@ voxel_methods(int volume_xsize,
               __global float16 *plane_matrices,
               __local float4 *plane_eqs,
               float radius,
-              int method
+              int method,
+              int plane_method             
 	)
 {
 
@@ -741,16 +745,28 @@ voxel_methods(int volume_xsize,
 	for(int y = 0; y < volume_ysize; y++)
 	{
 		voxel.y = y*volume_yspacing;
-
+		
 		// Find all planes closer than radius
+		if(plane_method == PLANE_CLOSEST)
+		{
+			n_close_planes = findClosestPlanes(close_planes,
+			                                   plane_eqs,
+			                                   plane_matrices,
+			                                   n_planes,
+			                                   voxel,
+			                                   radius,
+			                                   &guess);
+		}
+		else if(plane_method == PLANE_HEURISTIC) {
+			n_close_planes = findClosePlanes(close_planes,
+			                                   plane_eqs,
+			                                   plane_matrices,
+			                                   n_planes,
+			                                   voxel,
+			                                   radius,
+			                                   &guess);
+		}
 
-		n_close_planes = findClosestPlanes(close_planes,
-		                                   plane_eqs,
-		                                   plane_matrices,
-		                                   n_planes,
-		                                   voxel,
-		                                   radius,
-		                                   &guess); 
 
 
 		// Call appropriate method to determine pixel value
