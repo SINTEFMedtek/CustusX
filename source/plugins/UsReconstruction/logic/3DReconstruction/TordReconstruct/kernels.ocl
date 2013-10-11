@@ -13,6 +13,7 @@ typedef struct _close_plane
 
 #define METHOD_VNN 0
 #define METHOD_VNN2 1
+#define METHOD_DW 2
 
 #define VOXEL(v,x,y,z) v[x + y*volume_xsize + z*volume_ysize*volume_xsize]
 
@@ -72,15 +73,15 @@ findClosePlanes(close_plane_t *close_planes,
 	int2 done = {0,0};
 	int smallest_idx = *guess;
 
-
+	
 	//	float2 prev_dists; // .x = abs_prev_dist_up, .y = abs_prev_dist_down
 	float smallest_dist = 99999.9f;
 
 	if(*guess == 0) *guess = 1;
-
+	const int tmp_guess = *guess;
 	for(int i = 0; !done.x || !done.y ; i++)
 	{
-		int2 idx = {*guess + i, *guess - i - 1};
+		int2 idx = {tmp_guess + i, tmp_guess - i - 1};
 
 		float2 dists = {dot(voxel, plane_eqs[idx.x]), dot(voxel, plane_eqs[idx.y])};
 		//	dists.x = plane_dist(voxel, plane_matrices[idx.x]);
@@ -197,6 +198,19 @@ float4 transform_inv(float16 matrix,
 	return ret;
 }
 
+float2 transform_inv_xy(float16 matrix, float4 voxel)
+{
+	float2 ret;
+	float4 col0 = matrix.s048C;
+	float4 col1 = matrix.s159D;
+	float4 col3 = matrix.s37BF;
+
+	ret.x = dot(voxel,col0) - dot(col3,col0);
+	ret.y = dot(voxel,col1) - dot(col3,col1);
+	return ret;
+}
+
+
 
 void printMatrix(float16 matrix)
 {
@@ -230,13 +244,56 @@ void toImgCoord(int* x,
                 float in_yspacing)
 {
 
-	float4 transformed_voxel = transform_inv(plane_matrix, voxel);
+	float2 transformed_voxel = transform_inv_xy(plane_matrix, voxel);
 
 	*x = ((transformed_voxel.x/in_xspacing) + 0.5);
 	*y = ((transformed_voxel.y/in_yspacing) + 0.5);
 }
 
 
+void toImgCoord_float(float* x,
+                float* y,
+                float4 voxel,
+                float16 plane_matrix,
+                float in_xspacing,
+                float in_yspacing)
+{
+
+	float2 transformed_voxel = transform_inv_xy(plane_matrix, voxel);
+
+	*x = ((transformed_voxel.x/in_xspacing));
+	*y = ((transformed_voxel.y/in_yspacing));
+}
+
+
+
+float bilinearInterpolation(float x,
+                            float y,
+                            const __global unsigned char* image,
+                            int in_xsize)
+{
+
+	// SOURCE: https://en.wikipedia.org/w/index.php?title=Bilinear_interpolation&oldid=574742881 (need better source for report)
+	
+	int2 pos = {x, y};
+	float2 offset = {x - pos.x, y - pos.y};
+	// Lower left, lower right, upper right, upper left
+	float4 values = { image[pos.x + pos.y*in_xsize],
+	                  image[pos.x+1 + pos.y*in_xsize],
+	                  image[pos.x + 1 + (pos.y+1)*in_xsize],
+	                  image[pos.x + (pos.y+1)*in_xsize] };
+
+	float4 weights = { (1.0f - offset.x)*(1.0f - offset.y), // Lower left
+	                   (offset.x)*(1.0f - offset.y), // Lower right
+	                   (offset.x)*(offset.y), // Upper right
+	                   (1.0f - offset.x)*(offset.y) };// Upper left
+
+	return dot(values, weights);
+	
+}
+
+#define isValidPixel(x, y, in_xsize, in_ysize) (x >= 0 && x < in_xsize && y >= 0 && y < in_ysize)
+/*
 int isValidPixel(int x, int y, int in_xsize, int in_ysize)
 {
 	if(x < 0 || x >= in_xsize)
@@ -249,7 +306,7 @@ int isValidPixel(int x, int y, int in_xsize, int in_ysize)
 	}
 	return 1;
 }
-
+*/
 unsigned char
 performInterpolation_vnn(close_plane_t *close_planes,
                          int n_close_planes,
@@ -370,9 +427,83 @@ performInterpolation_vnn2(close_plane_t *close_planes,
 		{
 			continue;
 		}
+		
+		float dist_inv = 1.0f/fabs(close_planes[i].dist);
+		scale += dist_inv;
+		val += (image[y*in_xsize + x] * dist_inv);
+	}		
+
+	
+	return (unsigned char) (val / scale);
+	
+}
+
+
+unsigned char
+performInterpolation_dw(close_plane_t *close_planes,
+                          int n_close_planes,
+                          __global const float16  *plane_matrices,
+                          __local const float4 *plane_eqs,
+                          __global const unsigned char* bscans_blocks[],
+                          int in_xsize,
+                          int in_ysize,
+                          float in_xspacing,
+                          float in_yspacing,
+                          float4 voxel,
+                          int n_planes)
+{
+                                      
+
+	if(n_close_planes == 0) return 1;
+	
+
+	float scale = 0.0f;
+	
+	float val = 0;
+	for(int i = 0; i < n_close_planes; i++)
+	{
+
+		int plane_id = close_planes[i].plane_id;
+		const __global unsigned char* image = getImageData(close_planes[i].plane_id,
+		                                             bscans_blocks,
+		                                             in_xsize,
+		                                             in_ysize,
+		                                             n_planes);
+
+
+		// Now we project the voxel onto the plane by translating the voxel along the
+		// normal vector of the plane.
+		voxel.w = 1.0f;
+		float4 translated_voxel = projectOntoPlaneEq(voxel,
+		                                             plane_eqs[plane_id],
+		                                             close_planes[i].dist);
+	
+		translated_voxel.w = 1.0f;
+		// And then we get the pixel space coordinates
+		float x, y;
+		toImgCoord_float(&x,
+		           &y,
+		           translated_voxel,
+		           plane_matrices[plane_id],
+		           in_xspacing,
+		           in_yspacing);
+
+
+		
+		if(!isValidPixel(x,y, in_xsize, in_ysize) 
+		   || !isValidPixel(x+1, y, in_xsize, in_ysize)
+		   || !isValidPixel(x+1, y+1, in_xsize, in_ysize)
+		   || !isValidPixel(x, y+1, in_xsize, in_ysize)
+			)
+		{
+			continue;
+		}
+		
+		float interpolated_value = bilinearInterpolation(x, y, image, in_xsize);
+			
 		float dist = fabs(close_planes[i].dist);
 		scale += 1.0f/dist;
-		val += (image[y*in_xsize + x] * 1.0f/dist);
+		val += (interpolated_value * 1.0f/dist);
 	}		
 
 	
@@ -413,6 +544,20 @@ performInterpolation(close_plane_t *close_planes,
 	} else if (method == METHOD_VNN2)
 	{
 		value = performInterpolation_vnn2(close_planes,
+		                                  n_close_planes,
+		                                  plane_matrices,
+		                                  plane_eqs,
+		                                  bscans_blocks,
+		                                  in_xsize,
+		                                  in_ysize,
+		                                  in_xspacing,
+		                                  in_yspacing,
+		                                  voxel,
+		                                  n_planes);
+	}
+	else if(method == METHOD_DW)
+	{
+		value = performInterpolation_dw(close_planes,
 		                                  n_close_planes,
 		                                  plane_matrices,
 		                                  plane_eqs,
