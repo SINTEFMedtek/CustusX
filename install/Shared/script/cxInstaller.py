@@ -52,18 +52,17 @@ from cx.cxShell import *
 import cx.cxInstallData
 import cx.cxComponents
 import cx.cxComponentAssembly
+from cx.cxPrintFormatter import PrintFormatter
 
-import cx.cxJenkinsBuildScriptBase
+import cx.cxBuildScript
 
-class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
+class Controller(cx.cxBuildScript.BuildScript):
     '''
     '''
 
     def getDescription(self):                  
         return '''
 Installer script for CustusX and its components.
-All components given as arguments will be installed.
-If no arguments are given, all components will be chosen.
 
 Available components are:
    %s.
@@ -71,29 +70,31 @@ Available components are:
        
     def addArgParsers(self):
         'subclasses can add argparse instances to self.additionalparsers here'
-        self.controlData().setBuildType("Release")
+        self.controlData().setBuildType("Debug")
+        shell.setRedirectOutput(False)
+        
         super(Controller, self).addArgParsers()
         self.additionalParsers.append(self.controlData().getArgParser_core_build())
         self.additionalParsers.append(self.controlData().getArgParser_extended_build())
         self.additionalParsers.append(self.getArgParser())
        
-    def applyArgumentParsers(self):
-        super(Controller, self).applyArgumentParsers()
-        self.controlData().applyCommandLine() 
-        self.options = self.getArgParser().parse_known_args()[0]
+    def applyArgumentParsers(self, arguments):
+        arguments = super(Controller, self).applyArgumentParsers(arguments)
+        (self.options, arguments) = self.getArgParser().parse_known_args(arguments)
         print 'Options: ', self.options
+        return arguments
 
     def getArgParser(self):
         p = argparse.ArgumentParser(add_help=False)
 
-        p.add_argument('--checkout', '--co', action='store_true', default=False, help='checkout all selected components')
-        p.add_argument('--configure_clean', action='store_true', default=False, help='delete build folder(s), configure all selected components')
-        p.add_argument('--configure', '--conf', action='store_true', default=False, help='configure all selected components')
-        p.add_argument('-b', '--build', '--make', action='store_true', default=False, help='build all selected components')
-        p.add_argument('-a', '--all', action='store_true', default=False, help='select all components')
-        p.add_argument('-f', '--full', action='store_true', default=False, help='checkout, configure, make')
-        p.add_argument('-c', '--clean', action='store_true', default=False, help='make clean')
-        p.add_argument('-s', '--silent_mode', action='store_true', default=False, help='execute script without user interaction')
+        p.add_argument('--checkout', '--co', action='store_true', help='checkout all selected components')
+        p.add_argument('--configure_clean', action='store_true', help='delete build folder(s), configure all selected components')
+        p.add_argument('--configure', '--conf', action='store_true', help='configure all selected components')
+        p.add_argument('-b', '--build', '--make', action='store_true', help='build all selected components')
+        p.add_argument('-a', '--all', action='store_true', help='select all components')
+        p.add_argument('-f', '--full', action='store_true', help='checkout, configure, make')
+        p.add_argument('-c', '--clean', action='store_true', help='make clean')
+        p.add_argument('-s', '--silent_mode', action='store_true', help='execute script without user interaction')
         p.add_argument('components', nargs='*', help='list of all components to process')
 
         # moved to shell
@@ -138,6 +139,7 @@ Available components are:
 
         # display help if no components selected
         if len(assembly.getSelectedLibraries())==0:
+            PrintFormatter.printInfo("No libraries selected, exiting...")
             self.argumentParser.print_help()
             return
 

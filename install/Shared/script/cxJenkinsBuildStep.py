@@ -28,9 +28,9 @@ import cx.cxInstallData
 import cx.cxComponents
 import cx.cxComponentAssembly
 import cx.cxCustusXBuilder
-import cx.cxJenkinsBuildScriptBase
+import cx.cxBuildScript
 
-class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
+class Controller(cx.cxBuildScript.BuildScript):
     '''
     '''
     def __init__(self):
@@ -41,66 +41,32 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         return 'Jenkins script for build, test and deployment of CustusX and dependents.'
        
     def addArgParsers(self):
-        'subclasses can add argparse instances to self.additionalparsers here'
         self.controlData().setBuildType("Release")
+        shell.setRedirectOutput(True)
+
         super(Controller, self).addArgParsers()
         self.additionalParsers.append(self.controlData().getArgParser_core_build())
         self.additionalParsers.append(self.getArgParser())
        
-#    def _addArgumentParserArguments(self):
-#        'subclasses can add parser arguments here'
-#        super(Controller, self)._addArgumentParserArguments()
-#        p = self.argumentParser
-#        p.add_argument('--skip_build', action='store_true', default=False, help='Skip the checkout, configure, build step.')
-#        p.add_argument('--skip_tests', action='store_true', default=False, help='Skip the test step')
-#        p.add_argument('--skip_package', action='store_true', default=False, help='Skip creating the installer')        
-
-#        p.add_argument('--run_catch', default=None, help='run catch using the input tag string')
-#        p.add_argument('--run_catch_in_ctest', default=None, help='run catch using the input tag string, wrap each test in ctest thus running it as a separate process')        
-#        p.add_argument('-t', '--build_type', choices=['Debug','Release','RelWithDebInfo'], help='build type', default='Release')
-
-    def applyArgumentParsers(self):
-        super(Controller, self).applyArgumentParsers()
-        self.controlData().applyCommandLine() 
-        self.options = self.getArgParser().parse_known_args()[0]
+    def applyArgumentParsers(self, arguments):
+        arguments = super(Controller, self).applyArgumentParsers(arguments)
+        (self.options, arguments) = self.getArgParser().parse_known_args(arguments)
         print 'Options: ', self.options
-
-#    def _applyArgumentParserArguments(self, options):
-#        'apply arguments defined in _addArgumentParserArguments()'
-#        super(Controller, self)._applyArgumentParserArguments(options)
-#        data = self.cxBuilder.assembly.controlData        
-#        data.setBuildType(options.build_type)
-#        data.setBuildType("Release")
+        return arguments
 
     def getArgParser(self):
         p = argparse.ArgumentParser(add_help=False)
         p.add_argument('--skip_build', action='store_true', default=False, help='Skip the checkout, configure, build step.')
         p.add_argument('--skip_tests', action='store_true', default=False, help='Skip the test step')
         p.add_argument('--skip_package', action='store_true', default=False, help='Skip creating the installer')        
-
-        p.add_argument('--run_catch', default=None, help='run catch using the input tag string')
-        p.add_argument('--run_catch_in_ctest', default=None, help='run catch using the input tag string, wrap each test in ctest thus running it as a separate process')        
         return p
 
     def run(self):
-        #options = self.argumentParserArguments
-        options = self.options
-#        print "vars ", self.options
-        
-#        print 'options.run_catch', options.run_catch
-#        print 'options.run_catch_in_ctest', options.run_catch_in_ctest
-        
+        options = self.options        
         if not options.skip_build:
             self.cxBuilder.buildAllComponents()
         if not options.skip_tests:
-            #self.cxBuilder.clearTestData()
-            self.cxBuilder.runAllTests()
-        if options.run_catch is not None:
-            print 'running catch %s' % options.run_catch
-            self.cxBuilder.runCatchTests(options.run_catch)
-        if options.run_catch_in_ctest is not None:
-            print 'running catch in ctest%s' % options.run_catch_in_ctest
-            self.cxBuilder.runCatchTestsWrappedInCTest(options.run_catch_in_ctest)
+            self.cxBuilder.runUnitTests()
         if not options.skip_package:
             self.cxBuilder.createInstallerPackage()   
         self.cxBuilder.finish()
