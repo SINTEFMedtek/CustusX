@@ -55,11 +55,10 @@ SET( SOURCE_FILES
    logic/cxElastixParameters.cpp
    logic/cxBronchoscopyRegistration.h
    logic/cxBronchoscopyRegistration.cpp
-    logic/cxBranch.h
-    logic/cxBranch.cpp
-    logic/cxBranchList.h
-    logic/cxBranchList.cpp
-
+   logic/cxBranch.h
+   logic/cxBranch.cpp
+   logic/cxBranchList.h
+   logic/cxBranchList.cpp
     
    gui/cxRegistrationPlugin.h
    gui/cxRegistrationPlugin.cpp
