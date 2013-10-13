@@ -1,62 +1,39 @@
 #!/usr/bin/env python
 
 #####################################################
-# Unix jenkins script
+# Jenkins script
 # Author: Christian Askeland, SINTEF Medical Technology
 # Date:   2013.05.16
 #
 # Description:
 #
-#   Experimental!
 #   Build part of jenkins CI
-#
 #       Download, build, and test CustusX
 #       Publish unit tests
 #       Publish doxygen doc to medtek.sintef.no
 #
-#
 #####################################################
 
-import logging
-import time    
-import subprocess
-import sys
-import argparse        
-
-from cx.cxShell import *
+import cx.cxJenkinsBuildScriptBase
 import cx.cxInstallData
-import cx.cxComponents
-import cx.cxComponentAssembly
 import cx.cxCustusXBuilder
-import cx.cxBuildScript
+from cx.cxShell import *
 
-class Controller(cx.cxBuildScript.BuildScript):
-    '''
-    '''
+class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
     def getDescription(self):                  
         return '\
 Jenkins script for build, test and deployment of CustusX and dependents. \
 Generates doxygen docs and publishes them onto medtek.sintef.no'
-    
-    def addArgParsers(self):
-        'subclasses can add argparse instances to self.additionalparsers here'
-        self.controlData().setBuildType("Release")
+            
+    def setDefaults(self):                
+        super(Controller, self).setDefaults()
         self.controlData().mDoxygen = True
-        shell.setRedirectOutput(True)
 
-        super(Controller, self).addArgParsers()
-        self.additionalParsers.append(self.controlData().getArgParser_core_build())
-
-#    def applyArgumentParsers(self, arguments):
-#        arguments = super(Controller, self).applyArgumentParsers(arguments)
-#        return arguments    
-    
     def run(self):
-        self.cxBuilder.buildAllComponents()
-        self.cxBuilder.runUnitTests()
+        self.createUnitTestedPackageStep()
         self.cxBuilder.publishDoxygen()
-        self.cxBuilder.createInstallerPackage()
-                        
+        self.cxBuilder.finish()     
+                                
 if __name__ == '__main__':
     controller = Controller()
     controller.run()

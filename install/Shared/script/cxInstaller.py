@@ -68,10 +68,12 @@ Available components are:
    %s.
 ''' % '\n   '.join(self.cxBuilder.assembly.getLibnames())
        
-    def addArgParsers(self):
+    def setDefaults(self):                
+        super(Controller, self).setDefaults()
         self.controlData().setBuildType("Debug")
         shell.setRedirectOutput(False)
-        
+
+    def addArgParsers(self):        
         super(Controller, self).addArgParsers()
         self.additionalParsers.append(self.controlData().getArgParser_core_build())
         self.additionalParsers.append(self.controlData().getArgParser_extended_build())
