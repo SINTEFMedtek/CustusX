@@ -43,7 +43,8 @@ class JenkinsBuildScriptBase(cx.cxBuildScript.BuildScript):
            
     def addArgParsers(self):
         super(JenkinsBuildScriptBase, self).addArgParsers()
-
+        self.additionalParsers.append(self.controlData().getArgParser_core_build())
+        
     def applyArgumentParsers(self, arguments):
         arguments = super(JenkinsBuildScriptBase, self).applyArgumentParsers(arguments)
 
