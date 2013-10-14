@@ -225,7 +225,7 @@ Thus, we get the following pattern:
         
     def addArgParsers(self):
         self.controlData().setBuildType("Release")
-        shell.setRedirectOutput(True)
+        shell.setRedirectOutput(False)
         
         super(Controller, self).addArgParsers()
         self.additionalParsers.append(self.getArgParser())
@@ -239,7 +239,7 @@ Thus, we get the following pattern:
     def getArgParser(self):
         p = argparse.ArgumentParser(add_help=False)
         p.add_argument('-r', '--release_type', choices=['release','beta','alpha'], help='Type of release to create, de general description for more.', default='alpha')
-        p.add_argument('-j', '--jenkins_release', action='store_true', default=False, help='Trigger a jenkins release using the generated git tag, publish to release server')
+        p.add_argument(      '--jenkins_release', action='store_true', default=False, help='Trigger a jenkins release using the generated git tag, publish to release server')
         p.add_argument('-u', '--username', default="user", help='jenkins user')
         p.add_argument('-p', '--password', default="not set", help='jenkins password')
         return p

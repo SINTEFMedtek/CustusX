@@ -12,8 +12,9 @@ if (BUILD_TESTING)
 		cxtestCatchSharedMemory.cpp
 		cxtestCatchTransform3D.cpp
 		cxtestCatchVector3D.cpp
-		cxtestCatchImageAlgorithms.cpp
-		cxtestCatchProcessWrapper.cpp
+                cxtestCatchImageAlgorithms.cpp
+                cxtestImageParameters.cpp
+                cxtestCatchProcessWrapper.cpp
 		)
 
     cx_catch_add_lib_and_exe(cxResource "${RESOURCE_TEST_CATCH_SOURCE_FILES}" "${CXTEST_SOURCES_TO_MOC}")
