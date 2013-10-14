@@ -33,19 +33,39 @@ public:
 	ImageParameters(Eigen::Array3i dim, cx::Vector3D spacing, QString parent, cx::Transform3D rMd);
 
 	Transform3D m_rMd;
+	QString mParentVolume;
+
+	double getVolume();
+	unsigned long getNumVoxels() const { return mDim.prod(); }
+
+	void setDimKeepBoundsAlignSpacing(Eigen::Array3d bounds);
+	void limitVoxelsKeepBounds(unsigned long maxVolumeSize);
+	void setSpacingKeepDim(Eigen::Array3d spacing);
+	void changeToUniformSpacing();
+
+
+//	void setDimFromBounds(Eigen::Array3d bounds);
+//	Eigen::Array3d getBounds();
+//	void reduceToNumberOfVoxels(unsigned long maxVolumeSize);
+//	void setSpacingKeepBounds(double spacing);
+
+//	//void fitDimAndSpacingToBounds(Eigen::Array3d bounds);
+//	void reduceBelowNumberOfVoxelsKeepBounds(unsigned long maxVolumeSize);
+//	void setDimKeepBounds(Eigen::Array3d bounds);
+//	void setSpacingAlignBounds(Eigen::Array3i spacing);
+//	void setSpacing(Eigen::Array3i spacing);
+
+
+	Eigen::Array3i getDim() const;
+	Eigen::Array3d getSpacing() const;
+	Eigen::Array3d getBounds();
+
+private:
 	Eigen::Array3i mDim;
 	Eigen::Array3d mSpacing;
-	QString mParentVolume;
-	double getVolume()
-	{
-		Eigen::Array3d extent = (mDim.cast<double>()-1)* mSpacing;
-		return extent.prod();
-	}
-	long getNumVoxels() { return mDim.prod(); }
 
-//	static Eigen::Array3i getDimFromExtent(Eigen::Array3d extent, Eigen::Array3d spacing);
-
-	void setDimFromBounds(Eigen::Array3d bounds);
+	void alignSpacingKeepDim(Eigen::Array3d bounds);
+	void setDimFromExtent(Eigen::Array3i extent);
 };
 
 }// namespace cx
