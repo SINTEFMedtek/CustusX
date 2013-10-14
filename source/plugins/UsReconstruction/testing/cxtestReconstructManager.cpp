@@ -178,22 +178,11 @@ void ReconstructManagerTestFixture::validateData(cx::ImagePtr output)
 void ReconstructManagerTestFixture::validateAngioData(cx::ImagePtr angioOut)
 {
 	this->validateData(angioOut);
-//	std::cout << "angioOut spacing: " << angioOut->getSpacing() << std::endl;
-//	std::cout << "angioOut dim: " << Eigen::Array3i(angioOut->getBaseVtkImageData()->GetDimensions()) << std::endl;
-//	std::cout << "angioOut rMd: " << std::endl << angioOut->get_rMd() << std::endl;
-//	std::cout << "angioOut bounds: " << std::endl << cx::DoubleBoundingBox3D(angioOut->getBaseVtkImageData()->GetBounds()) << std::endl;
 
 	CHECK(angioOut->getImageType().contains("Angio"));
 
 	// this is the wire phantom cross: fire samples along one line and one on the other.
 	// visible in bmode, invisible in angio.
-//	CHECK(this->getValue(angioOut, 38, 144, 146) == 1);
-//	CHECK(this->getValue(angioOut, 94, 145, 132) == 1);
-//	CHECK(this->getValue(angioOut, 145, 149, 129) == 1);
-//	CHECK(this->getValue(angioOut, 237, 158, 118) == 1);
-//	CHECK(this->getValue(angioOut, 278, 158, 110) == 1);
-//	CHECK(this->getValue(angioOut, 242, 146, 202) == 1	);
-
 	CHECK(this->getValue(angioOut, 38, 146, 146) == 1);
 	CHECK(this->getValue(angioOut, 94, 148, 135) == 1);
 	CHECK(this->getValue(angioOut, 144, 152, 130) == 1);
@@ -205,11 +194,9 @@ void ReconstructManagerTestFixture::validateAngioData(cx::ImagePtr angioOut)
 	CHECK(this->getValue(angioOut, 242, 125, 200) == 1);
 	CHECK(this->getValue(angioOut, 233, 138, 141) == 1);
 	// one sample in a flash and a black sample just outside it.
-	//CHECK(this->getValue(angioOut, 143, 152, 170)  > 1);
 	CHECK(this->getValue(angioOut, 143, 152, 172)  > 1); // correction
 	CHECK(this->getValue(angioOut, 179, 142, 170) == 1); //
 	// two samples in a flash and three black samples just outside it.
-//	CHECK(this->getValue(angioOut, 343,  94,  84) > 240 );
 	CHECK(this->getValue(angioOut, 334,  96,  86) > 200 );
 	CHECK(this->getValue(angioOut, 319,  95,  85) > 200 );
 	CHECK(this->getValue(angioOut, 316, 105,  72) == 1);

@@ -43,19 +43,6 @@ public:
 	void setSpacingKeepDim(Eigen::Array3d spacing);
 	void changeToUniformSpacing();
 
-
-//	void setDimFromBounds(Eigen::Array3d bounds);
-//	Eigen::Array3d getBounds();
-//	void reduceToNumberOfVoxels(unsigned long maxVolumeSize);
-//	void setSpacingKeepBounds(double spacing);
-
-//	//void fitDimAndSpacingToBounds(Eigen::Array3d bounds);
-//	void reduceBelowNumberOfVoxelsKeepBounds(unsigned long maxVolumeSize);
-//	void setDimKeepBounds(Eigen::Array3d bounds);
-//	void setSpacingAlignBounds(Eigen::Array3i spacing);
-//	void setSpacing(Eigen::Array3i spacing);
-
-
 	Eigen::Array3i getDim() const;
 	Eigen::Array3d getSpacing() const;
 	Eigen::Array3d getBounds();

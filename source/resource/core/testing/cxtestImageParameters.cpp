@@ -28,7 +28,6 @@ TEST_CASE("ImageParameters empty constructor init all variables", "[unit]")
 
 TEST_CASE("ImageParameters: Constructed from bounds and spacing gives correct dim", "[unit]")
 {
-//	ImageParameters params(dim, spacing, parent, transform);
 	cx::ImageParameters params;
 
 	params.setSpacingKeepDim(Eigen::Array3d(1,0.1,1));
@@ -102,13 +101,11 @@ TEST_CASE("ImageParameters: Existing functionality in OutputVolumeParams is kept
 	// input data taken from test "ReconstructManager: Angio Reconstruction"
 	double inputSpacing = 0.0641024;
 	long maxVolumeSize = 32;
-//	long maxVolumeSize = 3200000000;
 	Eigen::Array3d bounds(42.9099, 40.7953, 31.0081);
 
 	// OutputVolumeParams Constructor
 	params.setSpacingKeepDim(Eigen::Array3d(inputSpacing,inputSpacing,inputSpacing));
 	params.setDimKeepBoundsAlignSpacing(bounds);
-//	params.setSpacingKeepBounds(inputSpacing);
 	params.limitVoxelsKeepBounds(maxVolumeSize);
 
 	{
@@ -118,9 +115,6 @@ TEST_CASE("ImageParameters: Existing functionality in OutputVolumeParams is kept
 	}
 
 	maxVolumeSize = 3.35544e+07;
-
-	// OutputVolumeParams setMaxVolumeSize()
-//	params.setSpacingKeepBounds(inputSpacing);
 
 	params.setSpacingKeepDim(Eigen::Array3d(inputSpacing,inputSpacing,inputSpacing));
 	params.setDimKeepBoundsAlignSpacing(bounds);
