@@ -36,48 +36,21 @@ Eigen::Array3i ImageParameters::getDim() const
 {
 	return mDim;
 }
+
 Eigen::Array3d ImageParameters::getSpacing() const
 {
 	return mSpacing;
 }
+
 Eigen::Array3d ImageParameters::getBounds()
 {
 	return (mDim - 1).cast<double>() * mSpacing;
 }
 
-/*void ImageParameters::setDimFromBounds(Eigen::Array3d bounds)
-{
-	Eigen::Array3d dim = bounds / mSpacing;
-//	dim += 1;
-	mDim = ceil(dim).cast<int>();
-	mDim += 1;
-//	return ceil(dim).cast<int>();
-}
-
-
-void ImageParameters::reduceToNumberOfVoxels(unsigned long maxVolumeSize)
-{
-	if (this->getNumVoxels() <= maxVolumeSize)
-		return;
-
-	Eigen::Array3d bounds = this->getBounds();
-	double newSpacing = pow(bounds.prod() / double(maxVolumeSize), 1 / 3.0);
-	this->setSpacingKeepBounds(newSpacing);
-}
-
-void ImageParameters::setSpacingKeepBounds(double spacing)
-{
-	Eigen::Array3d bounds = this->getBounds();
-	this->mSpacing = Eigen::Array3d(spacing, spacing, spacing);
-	this->setDimFromBounds(bounds);
-}*/
-
 double ImageParameters::getVolume()
 {
-//	Eigen::Array3d extent = (mDim.cast<double>()-1)* mSpacing;
 	return this->getBounds().prod();
 }
-
 
 void ImageParameters::setDimKeepBoundsAlignSpacing(Eigen::Array3d bounds)
 {
@@ -89,9 +62,6 @@ void ImageParameters::setDimKeepBoundsAlignSpacing(Eigen::Array3d bounds)
 
 void ImageParameters::alignSpacingKeepDim(Eigen::Array3d bounds)
 {
-
-//	mSpacing = bounds / (mDim.cast<double>()-1);
-
 	for (unsigned i = 0; i < 3; ++i)
 	{
 		//Set spacing to 1 if one of the axes is degenerated
@@ -101,36 +71,11 @@ void ImageParameters::alignSpacingKeepDim(Eigen::Array3d bounds)
 			mSpacing[i] = bounds[i] / double(mDim[i]-1);
 	}
 }
-/*
-void ImageParameters::limitVoxelsKeepBounds(unsigned long maxVolumeSize)
-{
-	if (this->getNumVoxels() <= maxVolumeSize)
-		return;
 
-	Eigen::Array3d bounds = this->getBounds();
-	double maxExtentSize = pow(pow(maxVolumeSize, 1/3.0) -1, 3);
-	double newSpacing = pow(bounds.prod() / maxExtentSize, 1 / 3.0);
-
-	mSpacing = Eigen::Array3d(newSpacing, newSpacing, newSpacing);
-	Eigen::Array3d dim = bounds / mSpacing;
-	mDim = dim.cast<int>();
-	mDim += 1;
-	this->alignSpacing(bounds);
-
-
-//	this->setSpacingKeepDim(Eigen::Array3d(newSpacing, newSpacing, newSpacing));
-//	this->setDimKeepBoundsAlignSpacing(bounds);
-}
-*/
 void ImageParameters::setSpacingKeepDim(Eigen::Array3d spacing)
 {
 	mSpacing = spacing;
 }
-
-/*void ImageParameters::convertToUniformSpacing()
-{
-
-}*/
 
 void ImageParameters::setDimFromExtent(Eigen::Array3i extent)
 {
