@@ -5,15 +5,17 @@
  *      Author: ehofstad
  */
 
-#include "BronchoscopyRegistration.h"
+#include "cxBronchoscopyRegistration.h"
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataWriter.h>
 #include <vtkCellArray.h>
-#include "vtkMatrix4x4.h"
-#include "vtkLinearTransform.h"
-#include "vtkLandmarkTransform.h"
+#include <vtkMatrix4x4.h>
+#include <vtkLinearTransform.h>
+#include <vtkLandmarkTransform.h>
 #include "sscTransform3D.h"
+#include "sscVector3D.h"
+#include "sscMessageManager.h"
 
 namespace cx
 {
@@ -30,6 +32,8 @@ M4Vector excludeClosePositions(M4Vector Tnavigation)
 //		tracking position of more than 1 mm.
 {
 	M4Vector TnavigationIncluded;
+	if(Tnavigation.empty())
+		return TnavigationIncluded;
 	TnavigationIncluded.push_back(Tnavigation[0]); // first position is always included
 	int numberOfIncluded = 0;
 	int numberOfPos = Tnavigation.size();
@@ -253,32 +257,43 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 
 
 
-void BronchoscopyRegistration::runBronchoscopyRegistration()
+Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDataPtr centerline, TimedTransformMap trackingData)
 {
-	const char * filenameNavigation = "/Users/ehofstad/Data/Lunge/LungNav - pilot study/Patient 004/Navigation bronchoscope removed bad fit.csv";
+//	const char * filenameNavigation = "/Users/ehofstad/Data/Lunge/LungNav - pilot study/Patient 004/Navigation bronchoscope removed bad fit.csv";
 //	const char * filenameNavigation = "/Users/ehofstad/Data/Lunge/LungNav - pilot study/Patient 018/Navigation_RemovedBadFit.csv";
-	const char * filenameDirection = "/Users/ehofstad/Data/Lunge/LungNav - pilot study/Patient 004/Fast registration - pointer direction.csv";
+//	const char * filenameDirection = "/Users/ehofstad/Data/Lunge/LungNav - pilot study/Patient 004/Fast registration - pointer direction.csv";
 //	const char * filenameDirection = "/Users/ehofstad/Data/Lunge/LungNav - pilot study/Patient 018/Direction2.csv";
 
-	PositionData* posData = new PositionData();
-	std::pair< M4Vector, Eigen::Matrix4d > loadPosResult = posData->loadBronchoscopeTracking(filenameNavigation, filenameDirection);
-	M4Vector Tnavigation = loadPosResult.first;
-	Eigen::Matrix4d TtoCTcoordinates = loadPosResult.second;
+	//PositionData* posData = new PositionData();
+	//std::pair< M4Vector, Eigen::Matrix4d > loadPosResult = posData->loadBronchoscopeTracking(filenameNavigation, filenameDirection);
 
-	QString CLname = "/Users/ehofstad/Data/Lunge/LungNav - pilot study/Patient 004/Patient_004_segmented_osirix_20111216T141209_seg1_cl1.vtk";
+	if(trackingData.empty())
+		messageManager()->sendError("BronchoscopyRegistration::runBronchoscopyRegistration(): No tracking data");
+
+
+//	M4Vector Tnavigation = loadPosResult.first;
+	M4Vector Tnavigation;
+	for(TimedTransformMap::iterator iter=trackingData.begin(); iter!=trackingData.end(); ++iter)
+	{
+		Tnavigation.push_back(iter->second.	matrix());
+	}
+
+//	Eigen::Matrix4d TtoCTcoordinates = loadPosResult.second;
+
+//	QString CLname = "/Users/ehofstad/Data/Lunge/LungNav - pilot study/Patient 004/Patient_004_segmented_osirix_20111216T141209_seg1_cl1.vtk";
 //	QString CLname = "/Users/ehofstad/Data/Lunge/LungNav - pilot study/Patient 018/Patient018_SegmentedAirways_Mimics_20130506T152436_seg1_cl1.vtk";
-	MeshPtr mesh = dataManager()->loadMesh(CLname, CLname, rtPOLYDATA);
+//	MeshPtr mesh = dataManager()->loadMesh(CLname, CLname, rtPOLYDATA);
 
-	vtkPolyDataPtr poly = mesh->getVtkPolyData();
-	vtkPointsPtr points = poly->GetPoints();
+//	vtkPolyDataPtr poly = mesh->getVtkPolyData();
+	vtkPointsPtr points = centerline->GetPoints();
 
-	int N = poly->GetNumberOfPoints();
+	int N = centerline->GetNumberOfPoints();
 	Eigen::MatrixXd CLpoints(3,N);
 
 	for(vtkIdType i = 0; i < N; i++)
 	    {
 	    double p[3];
-	    poly->GetPoint(i,p);
+		centerline->GetPoint(i,p);
 	    CLpoints(0,i) = p[0]; CLpoints(1,i) = p[1]; CLpoints(2,i) = p[2];
 	    }
 
@@ -291,7 +306,8 @@ void BronchoscopyRegistration::runBronchoscopyRegistration()
 
 	Eigen::Matrix4d regMatrix = registrationAlgorithm(branches, Tnavigation);
 
-	Eigen::Matrix4d regMatrixForCustusX = regMatrix * TtoCTcoordinates.inverse();
+	//Eigen::Matrix4d regMatrixForCustusX = regMatrix * TtoCTcoordinates.inverse();
+	Eigen::Matrix4d regMatrixForCustusX = regMatrix;
 
 	std::cout << "regMatrix: " << std::endl;
 	for (int i = 0; i < 4; i++)
@@ -312,6 +328,8 @@ void BronchoscopyRegistration::runBronchoscopyRegistration()
 	}
 	std::cout << "totalNumberOfPoints: " << totalNumberOfPoints << std::endl;
 	branches->~BranchList();
+
+	return regMatrixForCustusX;
 
 }
 

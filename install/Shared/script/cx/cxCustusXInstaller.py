@@ -62,9 +62,11 @@ class CustusXInstaller:
         
     def removePreviousJob(self):
         'remove all stuff from previous run of the installer'
+        PrintFormatter.printHeader('Removing files from previous install', 3);
         shell.rm_r('%s/CustusX' % self.install_root)
         shell.rm_r('%s/CustusX*.%s' % (self.installer_path, self._getInstallerPackageSuffix()))
         shell.removeTree('%s/temp/Install' % self.root_dir)
+        shell.removeTree('%s/CustusX' % self.install_root)
         
     def createReleaseFolder(self):
         '''

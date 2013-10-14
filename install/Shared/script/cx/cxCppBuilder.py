@@ -51,9 +51,9 @@ class CppBuilder:
         self._changeDirToBuild()
         #self._changeDirToBuild()
         if(platform.system() == 'Windows'):
-            if(self.controlData.mCMakeGenerator == 'Eclipse CDT4 - NMake Makefiles'):
+            if(self.controlData.getCMakeGenerator() == 'Eclipse CDT4 - NMake Makefiles'):
                 runShell('nmake')
-            if(self.controlData.mCMakeGenerator == 'NMake Makefiles JOM'):
+            if(self.controlData.getCMakeGenerator() == 'NMake Makefiles JOM'):
                 runShell('''jom -k -j%s''' % str(self.controlData.threads))
         else:
             # the export DYLD... line is a hack to get shared linking to work on MacOS with vtk5.6
@@ -152,9 +152,9 @@ class CppBuilder:
         self._changeDirToBuild()
         #self._changeDirToBuild()
         if(platform.system() == 'Windows'):
-            if(self.controlData.mCMakeGenerator == 'Eclipse CDT4 - NMake Makefiles'):
+            if(self.controlData.getCMakeGenerator() == 'Eclipse CDT4 - NMake Makefiles'):
                 runShell('nmake -clean')
-            if(self.controlData.mCMakeGenerator == 'NMake Makefiles JOM'):
+            if(self.controlData.getCMakeGenerator() == 'NMake Makefiles JOM'):
                 runShell('jom -clean')
         else:
             runShell('make clean')
@@ -164,7 +164,7 @@ class CppBuilder:
 
     def configureCMake(self, options=""):        
         self._addDefaultCmakeOptions()                
-        generator = self.controlData.mCMakeGenerator
+        generator = self.controlData.getCMakeGenerator()
         optionsFromAssembly = self._assembleOptions()
         self._printOptions()        
         cmd = 'cmake -G"%s" %s %s %s'
