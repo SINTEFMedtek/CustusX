@@ -104,22 +104,22 @@ class Common(object):
 
     def getArgParser_core_build(self):
         p = cxArgParse.ArgumentParser(add_help=False)
-        p.add_argument('-i', '--isb_password', default="not set", metavar='PASSWORD', dest='isb_password', help='password for ISB GE Connection module')
-        p.add_argument('-j', '--threads', type=int, default=1, dest='threads', help='number of make threads')
-        p.add_argument('-g', '--git_tag', default=None, metavar='TAG', dest='git_tag', help='git tag to use when checking out CustusX. None means checkout master branch.')
-        p.add_argument('-t', '--build_type', default=self.build_type, dest='build_type', choices=self._getAllowedBuildTypes(), help='build type')
+        p.add_argument('-i', '--isb_password', default="not set", metavar='PASSWORD', dest='isb_password', help='Password for ISB GE Connection module')
+        p.add_argument('-j', '--threads', type=int, default=1, dest='threads', help='Number of make threads')
+        p.add_argument('-g', '--git_tag', default=None, metavar='TAG', dest='git_tag', help='Git tag to use when checking out CustusX. None means checkout master branch.')
+        p.add_argument('-t', '--build_type', default=self.build_type, dest='build_type', choices=self._getAllowedBuildTypes(), help='Build type')
         p.add_boolean_inverter('--b32', default=self.m32bit, dest='m32bit', help='Build 32 bit.')
         p.add_boolean_inverter('--static', default=self.static, dest='static', help='Link statically.')        
         if platform.system() == 'Windows':
             p.add_boolean_inverter('--jom', default=self.jom, dest='jom', help='Use jom to build.')
         if platform.system() == 'Darwin':
-            p.add_boolean_inverter('--xcode', default=self.xcode, dest='xcode', help='generate xcode targets')
+            p.add_boolean_inverter('--xcode', default=self.xcode, dest='xcode', help='Generate xcode targets')
         return p
 
     def getArgParser_extended_build(self):
         p = cxArgParse.ArgumentParser(add_help=False)
         p.add_boolean_inverter('--coverage', default=self.mCoverage, dest='mCoverage', help='gcov code coverage')
-        p.add_boolean_inverter('--doxygen', default=self.mDoxygen, dest='mDoxygen', help='build doxygen documentation')
+        p.add_boolean_inverter('--doxygen', default=self.mDoxygen, dest='mDoxygen', help='Build doxygen documentation')
         return p
 
     def applyCommandLine(self, arguments):

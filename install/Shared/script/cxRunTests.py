@@ -22,7 +22,6 @@ import cx.cxCustusXBuilder
 import cx.cxBuildScript
 from cx.cxPrintFormatter import PrintFormatter
 
-
 class Controller(cx.cxBuildScript.BuildScript):
     '''
     '''
