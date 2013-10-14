@@ -55,7 +55,7 @@ public:
 	double getSpacing() const;
 	/** Set one of the dimensions explicitly, recalculate other dims and spacing.
 	 */
-	void setDim(int index, int val);
+	void setDim(int index, int newDim);
 	Eigen::Array3i getDim() const;
 	/** Increase spacing in order to keep size below a max size
 	 */
@@ -72,16 +72,14 @@ public:
 
 private:
 	// controllable data, set only using the setters
-	Eigen::Array3i mDim;
-	double mSpacing;
 	double mMaxVolumeSize;
 
 	// constants, set only based on input data
-	DoubleBoundingBox3D mExtent;
 	double mInputSpacing;
-	Transform3D m_rMd; ///< transform from output data space to global ref space r
 
 	ImageParameters mImage;
+
+	void suggestSpacingKeepBounds(double spacing);
 };
 
 /**

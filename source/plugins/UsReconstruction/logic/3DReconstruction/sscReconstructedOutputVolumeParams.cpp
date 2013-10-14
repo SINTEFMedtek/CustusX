@@ -23,63 +23,62 @@ namespace cx
 {
 
 OutputVolumeParams::OutputVolumeParams() :
-	mExtent(0, 0, 0, 0, 0, 0), mInputSpacing(0), m_rMd(Transform3D::Identity()),
-	mDim(0, 0, 0), mSpacing(0), mMaxVolumeSize(32)
+	mInputSpacing(0),
+	mMaxVolumeSize(32*1000)
 {
 
 }
 /** Initialize the volue parameters with sensible defaults.
  */
 OutputVolumeParams::OutputVolumeParams(DoubleBoundingBox3D extent, double inputSpacing) :
-	mExtent(extent), mInputSpacing(inputSpacing), mMaxVolumeSize(32)
+	mInputSpacing(inputSpacing), mMaxVolumeSize(32*1000)
 {
-	// Calculate optimal output image spacing and dimensions based on US frame spacing
-	this->setSpacing(mInputSpacing);
+	mImage.setSpacingKeepDim(Eigen::Array3d(inputSpacing, inputSpacing, inputSpacing));
+	mImage.setDimKeepBoundsAlignSpacing(extent.range());
+
 	this->constrainVolumeSize();
 }
 
 unsigned long OutputVolumeParams::getVolumeSize() const
 {
-	return mDim[0] * mDim[1] * mDim[2];;
+	return mImage.getNumVoxels();
 }
 
 /** Set a spacing, recalculate dimensions.
  */
 void OutputVolumeParams::setSpacing(double spacing)
 {
-	mSpacing = spacing;
-	Vector3D v = mExtent.range() / mSpacing;
-	mDim << ::ceil(v[0]), ::ceil(v[1]), ::ceil(v[2]);
+	this->suggestSpacingKeepBounds(spacing);
 }
 double OutputVolumeParams::getSpacing() const
 {
-	return mSpacing;
+	return mImage.getSpacing()[0];
 }
 /** Set one of the dimensions explicitly, recalculate other dims and spacing.
  */
-void OutputVolumeParams::setDim(int index, int val)
+void OutputVolumeParams::setDim(int index, int newDim)
 {
-	setSpacing(mExtent.range()[index] / val);
+	double newSpacing = mImage.getBounds()[index] / (newDim);
+	this->setSpacing(newSpacing);
 }
 Eigen::Array3i OutputVolumeParams::getDim() const
 {
-	return mDim;
+	return mImage.getDim();
 }
 /** Increase spacing in order to keep size below a max size
  */
 void OutputVolumeParams::constrainVolumeSize()
 {
-	this->setSpacing(mInputSpacing); // reset to default values
+	this->suggestSpacingKeepBounds(mInputSpacing);
+	mImage.limitVoxelsKeepBounds(this->getMaxVolumeSize());
+	mImage.changeToUniformSpacing();
+}
 
-	// Reduce output volume size if optimal volume size is too large
-	unsigned long volumeSize = getVolumeSize();
-	unsigned long maxVolumeSize = this->getMaxVolumeSize();
-	if (volumeSize > maxVolumeSize)
-	{
-		Vector3D ext = mExtent.range();
-		double newSpacing = pow(ext[0]*ext[1]*ext[2] / double(maxVolumeSize), 1 / 3.0);
-		this->setSpacing(newSpacing);
-	}
+void OutputVolumeParams::suggestSpacingKeepBounds(double spacing)
+{
+	Eigen::Array3d bounds = mImage.getBounds();
+	mImage.setSpacingKeepDim(Eigen::Array3d(spacing, spacing, spacing));
+	mImage.setDimKeepBoundsAlignSpacing(bounds);
 }
 
 void OutputVolumeParams::setMaxVolumeSize(double maxSize)
@@ -106,7 +105,7 @@ Transform3D OutputVolumeParams::get_rMd()
 
 DoubleBoundingBox3D OutputVolumeParams::getExtent()
 {
-	return mExtent;
+	return DoubleBoundingBox3D(Vector3D::Zero(), mImage.getBounds());
 }
 
 double OutputVolumeParams::getInputSpacing()
