@@ -36,7 +36,7 @@ cx::Vector3D getSpacing(cx::ImagePtr input)
 
 cx::ImagePtr createExpectedImage(cx::ImageParameters params)
 {
-	vtkImageDataPtr imageData = cx::generateVtkImageData(params.mDim, params.mSpacing, 0, 1);
+	vtkImageDataPtr imageData = cx::generateVtkImageData(params.getDim(), params.getSpacing(), 0, 1);
 
 	cx::ImagePtr retval(new cx::Image("expected_image", imageData));
 	retval->get_rMd_History()->setRegistration(params.m_rMd);
@@ -233,8 +233,8 @@ TEST_CASE("ImageEnveloper: One rotated high-res image inside another", "[unit][r
 //	Eigen::Array3i expectedDims = cx::ImageEnveloper::getDimFromExtent(expectedExtent, expectedSpacing);
 
 	cx::ImageParameters expectedParameters;
-	expectedParameters.mSpacing = Eigen::Array3d(spacing*shift, spacing*shift, spacing);
-	expectedParameters.setDimFromBounds(Eigen::Array3d(extent + shift, extent, extent));
+	expectedParameters.setSpacingKeepDim(Eigen::Array3d(spacing*shift, spacing*shift, spacing));
+	expectedParameters.setDimKeepBoundsAlignSpacing(Eigen::Array3d(extent + shift, extent, extent));
 	expectedParameters.mParentVolume = images[0]->getUid();
 	expectedParameters.m_rMd = cx::createTransformTranslate(cx::Vector3D(-shift,0,0));
 
