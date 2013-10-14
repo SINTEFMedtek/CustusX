@@ -188,6 +188,12 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 	Eigen::MatrixXd CTOrientations;
 	Eigen::MatrixXd trackingPositions(3 , Tnavigation.size());
 	Eigen::MatrixXd trackingOrientations(3, Tnavigation.size());
+	Eigen::Matrix4d TtoCTcoordinates;
+
+	TtoCTcoordinates << 0, -1, 0, 0,
+						-1, 0, 0, 0,
+						0, 0, -1, 0,
+						0, 0, 0, 1;
 
 	std::vector<Branch*> branchVector = branches->getBranches();
 	CTPositions = branchVector[0]->getPositions();
@@ -207,9 +213,19 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 
 	for (int i = 0; i < Tnavigation.size(); i++)
 	{
+		Tnavigation[i] = TtoCTcoordinates.inverse() * Tnavigation[i];
 		trackingPositions.block(0 , i , 3 , 1) = Tnavigation[i].topRightCorner(3 , 1);
 		trackingOrientations.block(0 , i , 3 , 1) = Tnavigation[i].block(0 , 2 , 3 , 1);
 	}
+
+	//debug start
+	std::cout << "Tracking data: " << Tnavigation[1] << std::endl;
+	std::cout << "Tracking position: " << trackingPositions.row(0) << std::endl;
+	std::cout << "Tracking orientation: " << trackingOrientations.row(0) << std::endl;
+	std::cout << "CT position: " << CTPositions.row(0) << std::endl;
+	std::cout << "CT orientation: " << CTOrientations.row(0) << std::endl;
+	//debug end
+
 
 	//Adjusting points for centeroids
 	Eigen::Vector3d translation = CTPositions.rowwise().mean() - trackingPositions.rowwise().mean();
@@ -309,10 +325,6 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDat
 	//Eigen::Matrix4d regMatrixForCustusX = regMatrix * TtoCTcoordinates.inverse();
 	Eigen::Matrix4d regMatrixForCustusX = regMatrix;
 
-	std::cout << "regMatrix: " << std::endl;
-	for (int i = 0; i < 4; i++)
-		std::cout << regMatrix.row(i) << std::endl;
-
 	std::cout << "regMatrixForCustusX: " << std::endl;
 		for (int i = 0; i < 4; i++)
 			std::cout << regMatrixForCustusX.row(i) << std::endl;
@@ -322,12 +334,13 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDat
 
 	int totalNumberOfPoints = 0;
 	std::cout << "Number of branches: " << BL.size() << std::endl;
-	for (int i = 0; i < BL.size(); i++)
-	{
-		totalNumberOfPoints += BL[i]->getPositions().cols();
-	}
-	std::cout << "totalNumberOfPoints: " << totalNumberOfPoints << std::endl;
-	branches->~BranchList();
+
+//	for (int i = 0; i < BL.size(); i++)
+//	{
+//		totalNumberOfPoints += BL[i]->getPositions().cols();
+//	}
+//	std::cout << "totalNumberOfPoints: " << totalNumberOfPoints << std::endl;
+//	branches->~BranchList();
 
 	return regMatrixForCustusX;
 
