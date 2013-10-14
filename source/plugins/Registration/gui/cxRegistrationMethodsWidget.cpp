@@ -28,6 +28,7 @@
 #include "cxPatientOrientationWidget.h"
 
 #include "cxPrepareVesselsWidget.h"
+#include "cxBronchoscopyRegistrationWidget.h"
 
 namespace cx
 {
@@ -165,10 +166,11 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regM
   this->addTab(landmarkRegistrationsWidget, "Landmark");
   this->addTab(fastRegistrationsWidget, "Fast");
   this->addTab(manRegWidget, "Manual");
-  this->addTab(new ElastixWidget(regManager), "ElastiX");
+  this->addTab(new ElastixWidget(regManager, this), "ElastiX");
   this->addTab(image2imageWidget, "Vessel");
   this->addTab(patientOrientationWidget, "Patient Orientation");
   this->addTab(imageAndPlateRegistrationWidget, "Plate");
+  this->addTab(new BronchoscopyRegistrationWidget(regManager, this), "Bronchoscopy");
 
   connect(mTabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChangedSlot(int)));
   mTabWidget->setCurrentIndex(settings()->value("registration/tabIndex").toInt());

@@ -3,16 +3,9 @@
 #####################################################
 # Unix jenkins script
 # Author: Christian Askeland, SINTEF Medical Technology
-# Date:   2013.05.16
+# Date:   2013.09.08
 #
 # Description:
-#
-#   Continous integration build: run every time the repo changes.
-#   Experimental!
-#   Build part of jenkins CI
-#
-#       Download, build, and test CustusX
-#       Publish unit tests
 #
 #
 #####################################################
@@ -24,74 +17,104 @@ import sys
 import argparse        
 
 from cx.cxShell import *
+from cx.cxPrintFormatter import PrintFormatter
 import cx.cxInstallData
 import cx.cxComponents
 import cx.cxComponentAssembly
 import cx.cxCustusXBuilder
+import cx.cxBuildScript
+import cx.cxCustusXInstaller
+import cx.cxCustusXTestInstallation
 
-class JenkinsBuildScriptBaseBase(object):
+
+class JenkinsBuildScriptBase(cx.cxBuildScript.BuildScript):
     '''
-    Base for all scripts working on CustusX
+    Base script for all jenkins scripts. 
+    All jenkins operations is included here, subclasses can pick elements.
     '''
     def __init__(self):
         ''
-        shell.setRedirectOutput(True)
-        
-        self.cxBuilder = cx.cxCustusXBuilder.CustusXBuilder()
-        self.argumentParser = self._createArgumentParser()
-        self._addArgumentParserArguments()
-        
-        self.argumentParserArguments = self.argumentParser.parse_args()
-        self._applyArgumentParserArguments(self.argumentParserArguments)
-       
-    def run(self):
-        raise "Not Implemented"      
-    
-    def getDescription(self):                  
-        return 'Jenkins script for operating on CustusX'
-    
-    def _addArgumentParserArguments(self):
-        'subclasses can add parser arguments here'
-        p = self.argumentParser
-        p.add_argument('--root_dir', default=None, help='specify root folder, default=None')
-        p.add_argument('-d', '--dummy', action='store_true', default=False, help='execute script without calling any shell commands')
-        p.add_argument('--skip_redirect', action='store_true', default=False, help='skip redirecting stout/stderr through python. This can cause stout mangling on the Jenkins server.')
-        pass
-
-    def _createArgumentParser(self):        
-        return argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description=self.getDescription())
-
-    def _applyArgumentParserArguments(self, options):
-        'apply arguments defined in _addArgumentParserArguments()'
-        shell.setDummyMode(options.dummy)
-        data = self.cxBuilder.assembly.controlData        
-        data.setRootDir(options.root_dir)
-        shell.setRedirectOutput(not options.skip_redirect)
-
-class JenkinsBuildScriptBase(JenkinsBuildScriptBaseBase):
-    '''
-    Base for all scripts working on the full build of all components
-    '''
-    def __init__(self):
         super(JenkinsBuildScriptBase, self).__init__()
+     
+    def setDefaults(self):                
+        super(JenkinsBuildScriptBase, self).setDefaults()
+        self.controlData().setBuildType("Release")
+        shell.setRedirectOutput(True)
            
-    def getDescription(self):                  
-        return 'Jenkins script for build, test and deployment of CustusX and dependents.'
-    
-    def _addArgumentParserArguments(self):
-        'subclasses can add parser arguments here'
-        super(JenkinsBuildScriptBase, self)._addArgumentParserArguments()
-        p = self.argumentParser
-        p.add_argument('-i', '--isb_password', default="not set", help='password for ISB GE Connection module')
-        p.add_argument('-j', '--threads', type=int, default=1, help='number of make threads')
-        p.add_argument('-g', '--git_tag', default=None, help='git tag to use when checking out CustusX. None means checkout master branch.')
-        pass
-
-    def _applyArgumentParserArguments(self, options):
-        'apply arguments defined in _addArgumentParserArguments()'
-        super(JenkinsBuildScriptBase, self)._applyArgumentParserArguments(options)
-        data = self.cxBuilder.assembly.controlData        
-        data.mISBpassword = options.isb_password
-        data.threads = options.threads
-        data.mGitTag = options.git_tag
+    def addArgParsers(self):
+        super(JenkinsBuildScriptBase, self).addArgParsers()
+        self.additionalParsers.append(self.controlData().getArgParser_core_build())
         
+    def applyArgumentParsers(self, arguments):
+        arguments = super(JenkinsBuildScriptBase, self).applyArgumentParsers(arguments)
+
+        self._initializeInstallationObjects()
+        return arguments
+ 
+    def _initializeInstallationObjects(self):
+        '''
+        Initialize Installer and Installation objects 
+        with data from the build process.
+        '''
+        assembly = self.cxBuilder.assembly                
+        custusxdata = assembly.getComponent(cx.cxComponents.CustusX3Data)
+        custusx = assembly.getComponent(cx.cxComponents.CustusX3)
+        
+        self.cxInstaller = cx.cxCustusXInstaller.CustusXInstaller()
+        self.cxInstaller.setRootDir(assembly.controlData.getRootDir())
+        self.cxInstaller.setInstallerPath(self.cxBuilder.getInstallerPackagePath())
+        self.cxInstaller.setSourcePath(custusx.sourcePath())        
+
+        self.cxInstallation = cx.cxCustusXTestInstallation.CustusXTestInstallation()
+        self.cxInstallation.setRootDir(assembly.controlData.getRootDir())
+        self.cxInstallation.setTestDataPath(custusxdata.sourcePath())
+        self.cxInstallation.setInstalledRoot(self.cxInstaller.getInstalledRoot()) 
+
+    def resetInstallerStep(self):
+        self.cxBuilder.removePreviousInstaller()
+        self.cxInstaller.removePreviousJob()
+
+    def createUnitTestedPackageStep(self, 
+                                    skip_build=False, 
+                                    skip_unit_tests=False, 
+                                    skip_package=False):
+        if not skip_build:
+            self.cxBuilder.buildAllComponents()
+        if not skip_unit_tests:
+            self.cxBuilder.runUnitTests()
+        if not skip_package:
+            self.cxBuilder.createInstallerPackage()   
+        
+    def integrationTestPackageStep(self, 
+                                   skip_extra_install_step_checkout=False, 
+                                   skip_install=False, 
+                                   skip_installation_test=False, 
+                                   skip_integration_test=False):
+        if not skip_extra_install_step_checkout:
+            self.checkoutCustusXAndData()
+        if not skip_install:
+            self.cxInstaller.installPackage()
+        if not skip_installation_test:            
+            self.cxInstallation.testInstallation()
+        if not skip_integration_test:
+            self.cxInstallation.runIntegrationTests()
+
+    def createReleaseStep(self, 
+                          skip_publish_release=False):
+        folder = self.cxInstaller.createReleaseFolder()
+        if not skip_publish_release:
+            self.cxInstaller.publishReleaseFolder(folder)
+    
+    def checkoutCustusXAndData(self):
+        'checkout only CustusX and data. Required if the first build step was not run, f.ex. during integration tests'
+        assembly = self.cxBuilder.assembly
+        PrintFormatter.printHeader('Checkout CustusX3 and CustusX3Data', level=2)
+        custusx = assembly.getComponent(cx.cxComponents.CustusX3)
+        cxdata = assembly.getComponent(cx.cxComponents.CustusX3Data)
+
+        assembly.selectLibraries([custusx.name(), cxdata.name()])
+        assembly.process(checkout=True)
+    
+if __name__ == '__main__':
+    controller = Controller()
+    controller.run()

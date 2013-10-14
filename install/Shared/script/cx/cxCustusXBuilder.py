@@ -44,10 +44,13 @@ class CustusXBuilder:
     def clearTestData(self):
         PrintFormatter.printHeader('Clearing all old test data', level=3)
         cxData = self._createComponent(cxComponents.CustusX3Data)
-        cxTestRunner.TestRunner().resetCustusXDataRepo(cxData.sourcePath())
+        custusx = self._createComponent(cxComponents.CustusX3)
+        testRunner = cxTestRunner.TestRunner()
+        testRunner.resetCustusXDataRepo(cxData.sourcePath())        
+        testRunner.removeResultFiles(outPath=custusx.buildPath())
     
-    def runAllTests(self):
-        PrintFormatter.printHeader('Run all tests', level=2)
+    def runUnitTests(self):
+        PrintFormatter.printHeader('Run all unit tests', level=2)
         self.clearTestData()
         self._runCatchUnitTests()
         self._runCTestTests()
@@ -80,15 +83,32 @@ class CustusXBuilder:
 
     def createInstallerPackage(self):
         PrintFormatter.printHeader('Package the build', level=2)
+        self.removePreviousInstaller()
         custusx = self._createComponent(cxComponents.CustusX3)
         shell.changeDir(custusx.buildPath())
-        shell.rm_r(custusx.buildPath(), "*.exe")
-        shell.rm_r(custusx.buildPath(), "*.dmg")
-        shell.rm_r(custusx.buildPath(), "*.tar.gz")
         if platform.system() == 'Windows':
             shell.run('jom package')
         else:
             shell.run('make package')
+            
+    def removePreviousInstaller(self):
+        PrintFormatter.printHeader('Removing previous installer', 3);
+        custusx = self._createComponent(cxComponents.CustusX3)
+        shell.rm_r(custusx.buildPath(), "*.exe")
+        shell.rm_r(custusx.buildPath(), "*.dmg")
+        shell.rm_r(custusx.buildPath(), "*.tar.gz")
+            
+    def getInstallerPackagePath(self):
+        'return path to dmg, tar or msi installer file'
+        custusx = self._createComponent(cxComponents.CustusX3)
+        if platform.system() == 'Windows':
+            build_path = custusx.buildPath()
+            if "32" in build_path:
+                return '%s\\_CPack_Packages\\win32\\NSIS' % build_path
+            else:
+                return '%s\\_CPack_Packages\\win64\\NSIS' % build_path
+        else:
+            return custusx.buildPath()
         
     def publishDoxygen(self):
         PrintFormatter.printHeader('copy/publish doxygen to medtek server (link from wiki)', level=2)

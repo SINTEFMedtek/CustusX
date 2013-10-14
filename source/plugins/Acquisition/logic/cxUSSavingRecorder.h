@@ -87,7 +87,7 @@ signals:
 private slots:
 	void fileMakerWriteFinished();
 private:
-	std::map<double, Transform3D> getRecording();
+//	std::map<double, Transform3D> getToolHistory(ToolPtr tool, RecordSessionPtr session);
 	void saveStreamSession(USReconstructInputData reconstructData, QString saveFolder, QString streamSessionName, bool compress);
 	USReconstructInputData getDataForStream(unsigned videoRecorderIndex);
 

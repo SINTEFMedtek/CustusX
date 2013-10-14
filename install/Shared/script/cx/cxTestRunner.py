@@ -37,14 +37,15 @@ class TestRunner:
         tagString = self._createFilenameFriendlyStringFromCatchTag(tag)
         baseName = 'catch.%s.testresults' % tagString
         return baseName
+    
+    def removeResultFiles(self, outPath):
+        shell.rm_r(outPath, 'catch.*.testresults*.xml')
 
     def runCatchTestsWrappedInCTestGenerateJUnit(self, tag, catchPath, outPath):
         baseName = self._createCatchBaseFilenameFromTag(tag)
         ctestFile='%s/%s.ctest.xml' % (outPath, baseName)
         junitFile='%s/%s.ctest.junit.xml' % (outPath, baseName)
         
-        #ctestFile='%s/TestResults_%s.ctest.xml' % (outPath, tag)
-        #junitFile='%s/TestResults_%s.junit.xml' % (outPath, tag)
         self.runCatchTestsWrappedInCTest(catchPath, tag=tag, outFile=ctestFile)
         self.convertCTestFile2JUnit(ctestFile, junitFile)
         return junitFile
@@ -175,6 +176,11 @@ TimeOut: %d
         cxConvertCTest2JUnit.convertCTestFile2JUnit(ctestFile, junitFile)
         
     def _createFilenameFriendlyStringFromCatchTag(self, tag):
+        # if tag contains name specifier, keep only the last part, usually the tag part
+        if ' ' in tag:
+            tag = tag.split(' ')[-1]
+        tag = tag.replace('*','-')
+        tag = tag.replace('?','-')
         # [unit][resource/vis]~[not_mac] ->
         # unit.resource-vis.exclude_not_mac
         tag = tag.strip('[]')
@@ -183,5 +189,3 @@ TimeOut: %d
         tag = tag.replace(']','.')
         tag = tag.replace('~[','exclude_')
         return tag
-        
-
