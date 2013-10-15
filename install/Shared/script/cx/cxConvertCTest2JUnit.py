@@ -12,14 +12,17 @@
 #
 # Prerequisites:
 #   run "sudo pip install lxml" to install required py module.
+#   mac
+#   sudo easy_install pip
 #   Ubuntu: sudo apt-get install -y python-pip libxml2-dev libxslt-dev 
 #
 #################################################             
 
+import cxUtilities
+cxUtilities.try_lxml_import()
 from lxml import etree
 import StringIO
 import sys
-import cxUtilities
 
 def transformXML(sourceXml, xlsTransform):
     '''

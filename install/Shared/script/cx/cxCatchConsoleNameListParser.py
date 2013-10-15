@@ -13,7 +13,8 @@
 import sys
 import re
 import pprint
-import lxml
+import cxUtilities
+cxUtilities.try_lxml_import()
 
 class CatchCustomXmlNameListParser:
     '''
