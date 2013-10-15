@@ -179,7 +179,7 @@ void VideoConnectionManager::launchServer()
 	}
 	QString program = this->getLocalServerExecutable();
 	QStringList arguments = this->getLocalServerArguments().split(" ");
-	mLocalVideoServerProcess->launch(program, arguments);
+	mLocalVideoServerProcess->launchWithRelativePath(program, arguments);
 }
 
 void VideoConnectionManager::connectServer()
@@ -256,7 +256,7 @@ bool VideoConnectionManager::isConnected() const
 
 void VideoConnectionManager::runScript()
 {
-	mIniScriptProcess->launch(this->getInitScript());
+	mIniScriptProcess->launchWithRelativePath(this->getInitScript());
 }
 
 bool VideoConnectionManager::localVideoServerIsRunning()

@@ -47,10 +47,11 @@ public:
 	virtual ~ProcessWrapper();
 
 	QProcess* getProcess();
-	/**
-	 *
-	 */
-	void launch(QString executable, QStringList arguments = QStringList());
+
+	void launchWithRelativePath(QString executable, QStringList arguments = QStringList());
+	void launch(QString executable, QStringList argument = QStringList());
+
+	bool isRunning();
 
 public slots:
 	void requestTerminateSlot();
@@ -62,6 +63,7 @@ private slots:
 	void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
+	void internalLaunch(QString executable, QStringList arguments);
 	QProcess* mProcess;
 	QString mName;
 	QString mLastExecutablePath; //the path to the last executable that was launched

@@ -69,6 +69,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
     utilities/cxPlaybackTime.h
     utilities/cxProcessWrapper.h
 	utilities/cxImageDataContainer
+	utilities/cxVLCRecorder
 	)
 
      
