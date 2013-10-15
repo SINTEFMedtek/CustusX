@@ -144,6 +144,7 @@ TordTest::initCL(QString kernelPath,
 	                                    sSource, kernelPath); */
 
 	cl_program clprogram = this->buildCLProgram(sSource, nMaxPlanes, nPlanes, method, planeMethod, kernelPath);
+	if(clprogram == NULL) return false;
 	mClKernel = ocl_kernel_build(clprogram,
 	                             moClContext->device, "voxel_methods");
 	return true;
@@ -192,7 +193,7 @@ TordTest::buildCLProgram(const char* program_src,
 		for (uint i = 0; i < len; i++)
 			printf("%c", buffer[i]);
 		printf("\n");
-		exit(1);
+		return NULL;
 	}
 	return retval;
 
@@ -551,12 +552,12 @@ TordTest::reconstruct(ProcessedUSInputDataPtr input,
 		.arg(nClosePlanes)
 		.arg(input->getDimensions()[2]));
 
-	initCL(QString(TORD_KERNEL_PATH) + "/kernels.ocl",
+	if(!initCL(QString(TORD_KERNEL_PATH) + "/kernels.ocl",
 	       nClosePlanes,
 	       input->getDimensions()[2],
 	       method,
 	       planeMethod
-		);
+		   )) return false;
 	bool ret = 	doGPUReconstruct(input, outputData, radius );
 	if(moClContext != NULL)
 	{
