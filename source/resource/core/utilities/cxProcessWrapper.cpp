@@ -65,19 +65,26 @@ void ProcessWrapper::launch(QString executable, QStringList arguments)
 		//return;
 	}
 
-	messageManager()->sendInfo(QString("Launching %1 %2 with arguments %3").arg(mName).arg(executable).arg(arguments.join(", ")));
+	messageManager()->sendInfo(QString("Launching %1 %2 with arguments %3").arg(mName).arg(executable).arg(arguments.join(" ")));
 
 	if (mProcess->state() == QProcess::NotRunning)
 	{
 		mProcess->start(executable, arguments);
+		mProcess->waitForStarted();
 		mLastExecutablePath = executable;
 	}
+}
+
+bool ProcessWrapper::isRunning()
+{
+	return mProcess->pid() != 0;
 }
 
 void ProcessWrapper::requestTerminateSlot()
 {
 	mProcess->terminate();
 	messageManager()->sendInfo(QString("Requesting termination of %1 %2").arg(mName).arg(mLastExecutablePath));
+	mProcess->waitForFinished();
 }
 
 void ProcessWrapper::processReadyRead()

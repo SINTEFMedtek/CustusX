@@ -47,10 +47,8 @@ public:
 	virtual ~ProcessWrapper();
 
 	QProcess* getProcess();
-	/**
-	 *
-	 */
-	void launch(QString executable, QStringList arguments = QStringList());
+	void launch(QString executable, QStringList argument = QStringList());
+	bool isRunning();
 
 public slots:
 	void requestTerminateSlot();
