@@ -38,15 +38,17 @@ class ImageEnveloper
 {
 public:
 	static ImageEnveloperPtr create();
-	ImageEnveloper() {}
+	ImageEnveloper();
 	virtual ~ImageEnveloper() {}
 
 	virtual void setImages(std::vector<ImagePtr> images);
 	//virtual Box getBox() const;
-	virtual ImagePtr getEnvelopingImage(long maxVoxels = 0);
+	virtual ImagePtr getEnvelopingImage();
+	void setMaxEnvelopeVoxels(long maxVoxels);
 
 private:
 	std::vector<ImagePtr> mImages;
+	long mMaxEnvelopeVoxels;
 
 	ImageParameters reduceToNumberOfVoxels(ImageParameters box, long maxVoxels);
 	ImageParameters createEnvelopeParametersFromImage(ImagePtr img);

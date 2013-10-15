@@ -21,7 +21,7 @@
 #include "cxRegistrationManager.h"
 #include "cxAcquisitionData.h"
 #include "cxSelectDataStringDataAdapter.h"
-//#include "cxTrackedCenterlineWidget.h"
+#include "cxTrackedCenterlineWidget.h"
 #include "cxRecordSessionWidget.h"
 #include "cxRecordSession.h"
 #include "cxRepManager.h"
@@ -30,6 +30,7 @@
 #include "sscToolRep3D.h"
 #include "sscToolTracer.h"
 #include "cxBronchoscopyRegistration.h"
+#include "sscMessageManager.h"
 
 
 namespace cx
@@ -49,19 +50,19 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegistrationManag
 	AcquisitionDataPtr mAcquisitionData;
 	mAcquisitionData.reset(new AcquisitionData());
 
-	mAquisition.reset(new Acquisition(mAcquisitionData, this));
+    mAquisition.reset(new Acquisition(mAcquisitionData, this));
 
-	connect(mAquisition.get(), SIGNAL(started()), this, SLOT(acquisitionStarted()));
-	connect(mAquisition.get(), SIGNAL(stopped()), this, SLOT(acquisitionStopped()));
-	connect(mAquisition.get(), SIGNAL(cancelled()), this, SLOT(acquisitionStopped()));
+    connect(mAquisition.get(), SIGNAL(started()), this, SLOT(acquisitionStarted()));
+    connect(mAquisition.get(), SIGNAL(stopped()), this, SLOT(acquisitionStopped()));
+    connect(mAquisition.get(), SIGNAL(cancelled()), this, SLOT(acquisitionStopped()));
 
-//	TrackedCenterlineWidget* trackedCenterLine = new TrackedCenterlineWidget(mAcquisitionData, this);
+//    mTrackedCenterLine = new TrackedCenterlineWidget(mAcquisitionData, this);
 
-	mRecordSessionWidget.reset(new RecordSessionWidget(mAquisition, this, "Bronchoscope path"));
+    mRecordSessionWidget.reset(new RecordSessionWidget(mAquisition, this, "Bronchoscope path"));
 
 	mVerticalLayout->addWidget(new DataSelectWidget(this, mSelectMeshWidget));
-//	mVerticalLayout->addWidget(trackedCenterLine);
-	mVerticalLayout->addWidget(mRecordSessionWidget.get());
+//    mVerticalLayout->addWidget(mTrackedCenterLine);
+    mVerticalLayout->addWidget(mRecordSessionWidget.get());
 	mVerticalLayout->addWidget(mRegisterButton);
 
 	mVerticalLayout->addStretch();
@@ -77,30 +78,47 @@ void BronchoscopyRegistrationWidget::registerSlot()
 {
 	Transform3D old_rMpr = *toolManager()->get_rMpr();//input?
 
+    if(!mSelectMeshWidget->getMesh())
+    {
+        messageManager()->sendError("No centerline");
+        return;
+    }
 	vtkPolyDataPtr centerline = mSelectMeshWidget->getMesh()->getVtkPolyData();//input
 
-
-	ToolPtr tool = toolManager()->getDominantTool();
+    if(!mTool)
+    {
+        messageManager()->sendError("No tool");
+    }
+    std::cout << "Tool tame: " << mTool->getName() << std::endl;
 	RecordSessionPtr session = mAquisition->getLatestSession();
-	TimedTransformMap trackerRecordedData = RecordSession::getToolHistory(tool, session);//input
+    if(!session)
+        messageManager()->sendError("No session");
+
+    TimedTransformMap trackerRecordedData = RecordSession::getToolHistory(mTool, session);//input
+//    TimedTransformMap trackerRecordedData = mTrackedCenterLine->getRecording();
+
+    if(trackerRecordedData.size() == 0)
+    {
+        messageManager()->sendError("No positions");
+        return;
+    }
 
 	BronchoscopyRegistration reg;
 	Transform3D new_rMpr = Transform3D(reg.runBronchoscopyRegistration(centerline,trackerRecordedData));
 
-
-
 //	Transform3D new_rMpr = old_rMpr;//output
 	mManager->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
 
-
-
-	ToolRep3DPtr activeRep3D = getActiveToolRepIn3DView();
+    ToolRep3DPtr activeRep3D = getToolRepIn3DView(mTool);
 	activeRep3D->getTracer()->clear();
 }
 
 void BronchoscopyRegistrationWidget::acquisitionStarted()
 {
-	ToolRep3DPtr activeRep3D = getActiveToolRepIn3DView();
+    std::cout << "acquisitionStarted" << std::endl;
+
+    mTool = toolManager()->getDominantTool();
+    ToolRep3DPtr activeRep3D = this->getToolRepIn3DView(mTool);
 	if (!activeRep3D)
 		return;
 
@@ -108,18 +126,18 @@ void BronchoscopyRegistrationWidget::acquisitionStarted()
 }
 void BronchoscopyRegistrationWidget::acquisitionStopped()
 {
-	ToolRep3DPtr activeRep3D = getActiveToolRepIn3DView();
+    std::cout << "acquisitionStopped" << std::endl;
+    ToolRep3DPtr activeRep3D = this->getToolRepIn3DView(mTool);
 	if (!activeRep3D)
 		return;
 
 	activeRep3D->getTracer()->stop();
 }
 
-ToolRep3DPtr BronchoscopyRegistrationWidget::getActiveToolRepIn3DView()
+ToolRep3DPtr BronchoscopyRegistrationWidget::getToolRepIn3DView(ToolPtr tool)
 {
 	ViewWidgetQPtr view = viewManager()->get3DView();
-	ToolRep3DPtr retval = RepManager::findFirstRep<ToolRep3D>(view->getReps(),
-																   toolManager()->getDominantTool());
+    ToolRep3DPtr retval = RepManager::findFirstRep<ToolRep3D>(view->getReps(),tool);
 	return retval;
 }
 
