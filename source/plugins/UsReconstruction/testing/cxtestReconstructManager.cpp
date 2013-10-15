@@ -183,21 +183,22 @@ void ReconstructManagerTestFixture::validateAngioData(cx::ImagePtr angioOut)
 
 	// this is the wire phantom cross: fire samples along one line and one on the other.
 	// visible in bmode, invisible in angio.
-	CHECK(this->getValue(angioOut, 38, 144, 146) == 1);
-	CHECK(this->getValue(angioOut, 94, 145, 132) == 1);
-	CHECK(this->getValue(angioOut, 145, 149, 129) == 1);
-	CHECK(this->getValue(angioOut, 237, 158, 118) == 1);
-	CHECK(this->getValue(angioOut, 278, 158, 110) == 1);
-	CHECK(this->getValue(angioOut, 242, 146, 202) == 1	);
+	CHECK(this->getValue(angioOut, 38, 146, 146) == 1);
+	CHECK(this->getValue(angioOut, 94, 148, 135) == 1);
+	CHECK(this->getValue(angioOut, 144, 152, 130) == 1);
+	CHECK(this->getValue(angioOut, 237, 161, 119) == 1);
+	CHECK(this->getValue(angioOut, 278, 160, 113) == 1);
+	CHECK(this->getValue(angioOut, 248, 149, 200) == 1);
+
 	// black points at random positions outside cross
 	CHECK(this->getValue(angioOut, 242, 125, 200) == 1);
 	CHECK(this->getValue(angioOut, 233, 138, 141) == 1);
 	// one sample in a flash and a black sample just outside it.
-	CHECK(this->getValue(angioOut, 143, 152, 170)  > 1);
-	CHECK(this->getValue(angioOut, 179, 142, 170) == 1);
+	CHECK(this->getValue(angioOut, 143, 152, 172)  > 1); // correction
+	CHECK(this->getValue(angioOut, 179, 142, 170) == 1); //
 	// two samples in a flash and three black samples just outside it.
-	CHECK(this->getValue(angioOut, 343,  94,  84) > 240 );
-	CHECK(this->getValue(angioOut, 319,  92,  84) > 240 );
+	CHECK(this->getValue(angioOut, 334,  96,  86) > 200 );
+	CHECK(this->getValue(angioOut, 319,  95,  85) > 200 );
 	CHECK(this->getValue(angioOut, 316, 105,  72) == 1);
 	CHECK(this->getValue(angioOut, 317,  98,  44) == 1);
 	CHECK(this->getValue(angioOut, 316, 108,  65) == 1);
@@ -211,21 +212,22 @@ void ReconstructManagerTestFixture::validateBModeData(cx::ImagePtr bmodeOut)
 
 	// this is the wire phantom cross: fire samples along one line and one on the other.
 	// visible in bmode, invisible in angio.
-	CHECK(this->getValue(bmodeOut, 38, 144, 146) > 200);
-	CHECK(this->getValue(bmodeOut, 94, 145, 132) > 200);
-	CHECK(this->getValue(bmodeOut, 145, 149, 129) > 200);
-	CHECK(this->getValue(bmodeOut, 237, 158, 118) > 200);
-	CHECK(this->getValue(bmodeOut, 278, 158, 110) > 200);
-	CHECK(this->getValue(bmodeOut, 242, 146, 202) > 200);
+	CHECK(this->getValue(bmodeOut, 38, 146, 146) > 200);
+	CHECK(this->getValue(bmodeOut, 94, 148, 135) > 200);
+	CHECK(this->getValue(bmodeOut, 144, 152, 130) > 200);
+	CHECK(this->getValue(bmodeOut, 237, 161, 119) > 200);
+	CHECK(this->getValue(bmodeOut, 278, 160, 113) > 200);
+	CHECK(this->getValue(bmodeOut, 248, 149, 200) > 200);
+
 	// black points at random positions outside cross
 	CHECK(this->getValue(bmodeOut, 242, 125, 200) == 1);
 	CHECK(this->getValue(bmodeOut, 233, 138, 141) == 1);
 	// one sample in a flash and a black sample just outside it.
-	CHECK(this->getValue(bmodeOut, 143, 152, 170)  > 1);
-	CHECK(this->getValue(bmodeOut, 179, 142, 170) == 1);
+	CHECK(this->getValue(bmodeOut, 143, 152, 172)  > 1); // correction
+	CHECK(this->getValue(bmodeOut, 179, 142, 170) == 1); //
 	// two samples in a flash and three black samples just outside it.
-	CHECK(this->getValue(bmodeOut, 343,  94,  84) > 240 );
-	CHECK(this->getValue(bmodeOut, 319,  92,  84) > 240 );
+	CHECK(this->getValue(bmodeOut, 334,  96,  86) > 200 );
+	CHECK(this->getValue(bmodeOut, 319,  95,  85) > 200 );
 	CHECK(this->getValue(bmodeOut, 316, 105,  72) == 1);
 	CHECK(this->getValue(bmodeOut, 317,  98,  44) == 1);
 	CHECK(this->getValue(bmodeOut, 316, 108,  65) == 1);
@@ -447,10 +449,10 @@ TEST_CASE("ReconstructManager: B-Mode with synthetic data", "[usreconstruction][
 	cx::ImagePtr output = cores[0]->getOutput();
 
 	REQUIRE(output);
-	std::cout << "dims: " << Eigen::Array3i(output->getBaseVtkImageData()->GetDimensions()) << std::endl;
-	std::cout << "Num not zero voxels: " << Utilities::getNumberOfVoxelsAboveThreshold(output->getBaseVtkImageData(), 1) << std::endl;
-	std::cout << "Num mid intensity voxels: " << Utilities::getNumberOfVoxelsAboveThreshold(output->getBaseVtkImageData(), 99) << std::endl;
-	std::cout << "Num high intensity voxels: " << Utilities::getNumberOfVoxelsAboveThreshold(output->getBaseVtkImageData(), 199) << std::endl;
+//	std::cout << "dims: " << Eigen::Array3i(output->getBaseVtkImageData()->GetDimensions()) << std::endl;
+//	std::cout << "Num not zero voxels: " << Utilities::getNumberOfVoxelsAboveThreshold(output->getBaseVtkImageData(), 1) << std::endl;
+//	std::cout << "Num mid intensity voxels: " << Utilities::getNumberOfVoxelsAboveThreshold(output->getBaseVtkImageData(), 99) << std::endl;
+//	std::cout << "Num high intensity voxels: " << Utilities::getNumberOfVoxelsAboveThreshold(output->getBaseVtkImageData(), 199) << std::endl;
 
 //	cx::cxDataManager::initialize();
 //	cx::DataLocations::setTestMode();
