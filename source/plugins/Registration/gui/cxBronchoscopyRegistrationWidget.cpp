@@ -77,6 +77,8 @@ QString BronchoscopyRegistrationWidget::defaultWhatsThis() const
 void BronchoscopyRegistrationWidget::registerSlot()
 {
 	Transform3D old_rMpr = *toolManager()->get_rMpr();//input?
+    std::cout << "rMpr: " << std::endl;
+    std::cout << old_rMpr << std::endl;
 
     if(!mSelectMeshWidget->getMesh())
     {
@@ -89,24 +91,24 @@ void BronchoscopyRegistrationWidget::registerSlot()
     {
         messageManager()->sendError("No tool");
     }
-    std::cout << "Tool tame: " << mTool->getName() << std::endl;
+    std::cout << "Tool name: " << mTool->getName() << std::endl;
 	RecordSessionPtr session = mAquisition->getLatestSession();
     if(!session)
         messageManager()->sendError("No session");
 
-    TimedTransformMap trackerRecordedData = RecordSession::getToolHistory(mTool, session);//input
+    TimedTransformMap trackerRecordedData_prMt = RecordSession::getToolHistory_prMt(mTool, session);//input
 //    TimedTransformMap trackerRecordedData = mTrackedCenterLine->getRecording();
 
-    if(trackerRecordedData.size() == 0)
+    if(trackerRecordedData_prMt.size() == 0)
     {
         messageManager()->sendError("No positions");
         return;
     }
 
 	BronchoscopyRegistration reg;
-	Transform3D new_rMpr = Transform3D(reg.runBronchoscopyRegistration(centerline,trackerRecordedData));
+    Transform3D new_rMpr = Transform3D(reg.runBronchoscopyRegistration(centerline,trackerRecordedData_prMt,old_rMpr));
 
-//	Transform3D new_rMpr = old_rMpr;//output
+    new_rMpr = new_rMpr*old_rMpr;//output
 	mManager->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
 
     ToolRep3DPtr activeRep3D = getToolRepIn3DView(mTool);
