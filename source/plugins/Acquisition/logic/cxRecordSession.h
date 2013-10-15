@@ -59,7 +59,7 @@ public:
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode& dataNode);
 
-	static TimedTransformMap getToolHistory(ToolPtr tool, RecordSessionPtr session);
+	static TimedTransformMap getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session);
 
 protected:
 
