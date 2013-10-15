@@ -54,6 +54,26 @@ typedef struct _close_plane
 */
 #if PLANE_METHOD == PLANE_HEURISTIC
 #define FIND_CLOSE_PLANES(a, b, c, d, e, f) findClosePlanes(a, b, c, d, e, f)
+
+int findHighestIdx(close_plane_t *planes, int n)
+{
+	int maxidx;
+	float maxval = -1.0f;
+	for(int i = 0; i < n; i++)
+	{
+		float abs = fabs(planes->dist);
+		if(abs > maxval)
+		{
+			maxidx = i;
+			maxval = abs;
+		}
+		planes++;
+	}
+	return maxidx;
+}
+	
+
+
 int
 findClosePlanes(close_plane_t *close_planes,
                 __local float4* const plane_eqs,
@@ -66,7 +86,8 @@ findClosePlanes(close_plane_t *close_planes,
 	int found = 0;
 	int2 done = {0,0};
 	int smallest_idx = *guess;
-
+	int max_idx = 0;
+	float max_dist = radius;
 	
 	//	float2 prev_dists; // .x = abs_prev_dist_up, .y = abs_prev_dist_down
 	float smallest_dist = 99999.9f;
@@ -83,31 +104,40 @@ findClosePlanes(close_plane_t *close_planes,
 		float2 abs_dists = {fabs(dists.x), fabs(dists.y)}; // .x = abs_dist_up, .y = abs_dist_down,
 
 
-		if(!done.x && abs_dists.x < radius)
+		if(!done.x && abs_dists.x < max_dist)
 		{			
-			close_planes->dist = dists.x;
-			close_planes->plane_id = idx.x;
-			close_planes++;
+			close_planes[max_idx].dist = dists.x;
+			close_planes[max_idx].plane_id = idx.x;
 			found++;
+			if(found >= MAX_PLANES)
+			{
+				max_idx = findHighestIdx(close_planes, MAX_PLANES);
+				max_dist = fabs(close_planes[max_idx].dist);
+			}
 			if(smallest_dist > abs_dists.x)
 			{
-				smallest_idx = idx.x;
 				smallest_dist = abs_dists.x;
-			} 
+				smallest_idx = idx.x;
+			}
 		}
 
-		if(!done.y && abs_dists.y < radius)
+		if(!done.y && abs_dists.y < max_dist)
 		{
-			close_planes->dist = dists.y;
-			close_planes->plane_id = idx.y;
-			close_planes++;
+			close_planes[max_idx].dist = dists.y;
+			close_planes[max_idx].plane_id = idx.y;
 			found++;
+			if(found >= MAX_PLANES)
+			{
+				max_idx = findHighestIdx(close_planes, MAX_PLANES);
+				max_dist = fabs(close_planes[max_idx].dist);
+			}
 			if(smallest_dist > abs_dists.y)
 			{
-				smallest_idx = idx.y;
 				smallest_dist = abs_dists.y;
-			} 
+				smallest_idx = idx.y;
+			}
 		}
+
 
 		// FIXME: The constant here represents a tradeoff between
 		// guaranteeing to find all relevant planes, and performance (terminating earlier).
