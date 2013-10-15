@@ -62,9 +62,8 @@ void VLCRecorder::waitForFinished()
 
 void VLCRecorder::startRecording(QString saveFile)
 {
-	QStringList args = this->getVLCArguements(saveFile);
 	if(this->hasVLCApplication())
-		mCommandLine->launch(mVLCPath, args);
+		mCommandLine->launch(mVLCPath+" -I hotkeys -vvv screen:// \":sout=#transcode{vcodec=h264,vb=800,fps=10,scale=1,acodec=none}:duplicate{dst=standard{access=,mux=mp4,dst="+saveFile+"}}\"");
 }
 
 void VLCRecorder::stopRecording()
@@ -90,7 +89,7 @@ QString VLCRecorder::getVLCDefaultLocation()
 {
 	QString defaultLocation("");
 #ifdef CX_WINDOWS
-	defaultLocation = "";
+	defaultLocation = "TODO";
 #endif
 #ifdef CX_APPLE
 	defaultLocation = "/Applications/VLC.app/Contents/MacOS/VLC";
@@ -100,26 +99,5 @@ QString VLCRecorder::getVLCDefaultLocation()
 #endif
 	return defaultLocation;
 }
-
-QStringList VLCRecorder::getVLCArguements(QString saveFile)
-{
-	QStringList list;
-	list << "--intf";
-	list << "hotkeys";
-	list << "-vvv";
-	list << "screen://";
-	list << "\':sout=#transcode{vcodec=h264,vb=800,fps=10,scale=1,acodec=none}:standard{access=file,mux=mp4,dst=/Users/jbake/Desktop/video/file.mp4}\'";
-//	list << "--sout-standard-access='file'";
-//	list << "--sout-standard-mux='mp4'";
-//	list << "--sout-standard-dst='/Users/jbake/Desktop/video/file.mp4'";
-//	list << "--sout-transcode-vcodec='h264'";
-//	list << "--sout-transcode-vb=800";
-//	list << "--sout-transcode-fps=10";
-//	list << "--sout-transcode-scale=1";
-//	list << "--sout-transcode-acodec='none'";
-
-	return list;
-}
-
 
 } /* namespace cx */
