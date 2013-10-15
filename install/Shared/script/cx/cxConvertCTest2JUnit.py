@@ -19,7 +19,6 @@
 #################################################             
 
 import cxUtilities
-#from lxml import etree
 import StringIO
 import sys
 
@@ -28,8 +27,8 @@ def transformXML(sourceXml, xlsTransform):
     Transform the source xml string using the 
     xls transform string, return result.
     '''  
-    cxUtilities.try_lxml_import()
-      
+    lxml = cxUtilities.try_lxml_import()
+  
     xmldoc = lxml.etree.parse(StringIO.StringIO(sourceXml))
     xslt_root = lxml.etree.XML(xlsTransform)
     transform = lxml.etree.XSLT(xslt_root)
