@@ -44,7 +44,6 @@ private:
 	void setVLCPath(QString path);
 	bool isValidVLC(QString vlcPath);
 	QString getVLCDefaultLocation();
-	QStringList getVLCArguements(QString saveFile);
 
 	ProcessWrapperPtr mCommandLine;
 	QString mVLCPath;

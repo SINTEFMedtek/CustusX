@@ -29,8 +29,8 @@ ProcessWrapper::ProcessWrapper(QString name, QObject* parent) :
 	connect(mProcess, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(processStateChanged(QProcess::ProcessState)));
 	connect(mProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
 	connect(mProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished(int, QProcess::ExitStatus)));
-
 	connect(mProcess, SIGNAL(readyRead()), this, SLOT(processReadyRead()));
+
 	mProcess->setProcessChannelMode(QProcess::MergedChannels);
 	mProcess->setReadChannel(QProcess::StandardOutput);
 }
@@ -46,13 +46,8 @@ QProcess* ProcessWrapper::getProcess()
 	return mProcess;
 }
 
-void ProcessWrapper::launch(QString executable, QStringList arguments)
+void ProcessWrapper::launchWithRelativePath(QString executable, QStringList arguments)
 {
-	if (executable.isEmpty())
-		return;
-	if (mProcess->state() != QProcess::NotRunning)
-		return;
-
 	if (!QFileInfo(executable).isAbsolute())
 		executable = DataLocations::getBundlePath() + "/" + executable;
 
@@ -60,19 +55,17 @@ void ProcessWrapper::launch(QString executable, QStringList arguments)
 	executable = QDir::cleanPath(executable);
 
 	if (!QFileInfo(executable).exists())
-	{
 		messageManager()->sendError(QString("Cannot find %1 [%2]").arg(mName).arg(executable));
-		//return;
-	}
 
-	messageManager()->sendInfo(QString("Launching %1 %2 with arguments %3").arg(mName).arg(executable).arg(arguments.join(" ")));
+	this->launch(executable, arguments);
+}
 
-	if (mProcess->state() == QProcess::NotRunning)
-	{
-		mProcess->start(executable, arguments);
-		mProcess->waitForStarted();
-		mLastExecutablePath = executable;
-	}
+void ProcessWrapper::launch(QString executable, QStringList arguments)
+{
+	if (executable.isEmpty() || this->isRunning())
+		return;
+
+	this->internalLaunch(executable, arguments);
 }
 
 bool ProcessWrapper::isRunning()
@@ -149,5 +142,20 @@ void ProcessWrapper::processFinished(int exitCode, QProcess::ExitStatus exitStat
 		messageManager()->sendError(msg);
 }
 
+void ProcessWrapper::internalLaunch(QString executable, QStringList arguments)
+{
+	if(this->isRunning())
+		return;
+
+	messageManager()->sendInfo(QString("Launching %1 %2 with arguments: %3").arg(mName).arg(executable).arg(arguments.join(" ")));
+
+	if(arguments.isEmpty())
+		mProcess->start(executable);
+	else
+		mProcess->start(executable, arguments);
+
+	mProcess->waitForStarted();
+	mLastExecutablePath = executable;
+}
 
 }
