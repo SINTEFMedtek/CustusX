@@ -18,6 +18,7 @@
 #include <QPushButton>
 #include "cxRegistrationBaseWidget.h"
 //#include "sscStringDataAdapter.h"
+#include "cxTrackedCenterlineWidget.h"
 
 namespace cx
 {
@@ -60,7 +61,10 @@ private:
 	RecordSessionWidgetPtr mRecordSessionWidget;
 	SelectMeshStringDataAdapterPtr mSelectMeshWidget;
 	QPushButton* mRegisterButton;
-	ToolRep3DPtr getActiveToolRepIn3DView();
+    ToolPtr mTool;
+//    TrackedCenterlineWidget* mTrackedCenterLine;
+
+    ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
 
 };
 

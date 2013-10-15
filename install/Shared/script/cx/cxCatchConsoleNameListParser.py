@@ -13,7 +13,8 @@
 import sys
 import re
 import pprint
-import lxml
+import cxUtilities
+#cxUtilities.try_lxml_import()
 
 class CatchCustomXmlNameListParser:
     '''
@@ -22,6 +23,9 @@ class CatchCustomXmlNameListParser:
     Format is specified by the custusX CatchImpl class,
     i.e. an addon to the original catch.
     '''
+    def __init__(self):
+        cxUtilities.try_lxml_import()
+        
     def read(self, text):
         self.tests = []
         root = lxml.etree.fromstring(text)
