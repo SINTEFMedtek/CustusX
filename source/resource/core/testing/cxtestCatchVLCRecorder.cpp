@@ -27,14 +27,14 @@ TEST_CASE("VLCRecorder can be constructed", "[unit][resource][core][VLCRecorder]
 	cx::messageManager()->shutdown();
 }
 
-TEST_CASE("VLCRecorder can find VLC application", "[unit][resource][core][VLCRecorder][VLC]")
+TEST_CASE("VLCRecorder can find VLC application", "[unit][resource][core][VLCRecorder][VLC][hide]")
 {
 	cx::messageManager()->initialize();
 	CHECK(cx::vlc()->hasVLCApplication());
 	cx::messageManager()->shutdown();
 }
 
-TEST_CASE("VLCRecorder can record", "[integration][resource][core][VLCRecorder][VLC]")
+TEST_CASE("VLCRecorder can record", "[integration][resource][core][VLCRecorder][VLC][hide]")
 {
 	//TODO this test does not fail even if vlc fails.... needs to be fixed.
 
