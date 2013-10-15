@@ -87,7 +87,7 @@ void RecordSession::parseXml(QDomNode& parentNode)
 	mDescription = parentNode.namedItem("description").toElement().text();
 }
 
-TimedTransformMap RecordSession::getToolHistory(ToolPtr tool, RecordSessionPtr session)
+TimedTransformMap RecordSession::getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session)
 {
 	TimedTransformMap retval;
 
