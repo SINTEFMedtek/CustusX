@@ -219,11 +219,11 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 	}
 
 	//debug start
-	std::cout << "Tracking data: " << Tnavigation[1] << std::endl;
-	std::cout << "Tracking position: " << trackingPositions.row(0) << std::endl;
-	std::cout << "Tracking orientation: " << trackingOrientations.row(0) << std::endl;
-	std::cout << "CT position: " << CTPositions.row(0) << std::endl;
-	std::cout << "CT orientation: " << CTOrientations.row(0) << std::endl;
+//    std::cout << "Tracking data: " << Tnavigation[0] << std::endl;
+//	std::cout << "Tracking position: " << trackingPositions.row(0) << std::endl;
+//	std::cout << "Tracking orientation: " << trackingOrientations.row(0) << std::endl;
+//	std::cout << "CT position: " << CTPositions.row(0) << std::endl;
+//	std::cout << "CT orientation: " << CTOrientations.row(0) << std::endl;
 	//debug end
 
 
