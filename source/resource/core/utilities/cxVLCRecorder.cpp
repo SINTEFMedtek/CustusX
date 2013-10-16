@@ -64,6 +64,8 @@ void VLCRecorder::startRecording(QString saveFile)
 {
 	if(this->hasVLCApplication())
 		mCommandLine->launch(mVLCPath+" -I hotkeys -vvv screen:// \":sout=#transcode{vcodec=h264,vb=800,fps=10,scale=1,acodec=none}:duplicate{dst=standard{access=,mux=mp4,dst="+saveFile+"}}\"");
+	else
+		messageManager()->sendError("VLC not found.");
 }
 
 void VLCRecorder::stopRecording()
