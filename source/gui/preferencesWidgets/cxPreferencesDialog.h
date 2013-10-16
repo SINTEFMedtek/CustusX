@@ -1,6 +1,8 @@
 #ifndef CXPREFERANCESDIALOG_H_
 #define CXPREFERANCESDIALOG_H_
 
+#include "cxPreferenceTab.h"
+#include "cxGeneralTab.h"
 #include <QDialog>
 #include "sscDoubleDataAdapterXml.h"
 #include "sscBoolDataAdapterXml.h"
@@ -36,97 +38,6 @@ class ToolConfigureGroupBox;
  * \addtogroup cxGUI
  * @{
  */
-
-class PreferencesTab : public QWidget
-{
-  Q_OBJECT
-public:
-  PreferencesTab(QWidget *parent = 0);
-
-  virtual void init() = 0;
-
-public slots:
-  virtual void saveParametersSlot() = 0;
-
-signals:
-  void savedParameters();
-
-protected:
-  QVBoxLayout* mTopLayout;
-};
-
-/**
- * \class GeneralTab
- *
- * \brief Tab for general settings in the system
- *
- * \date Jan 25, 2010
- * \author Frank Lindseth, SINTEF
- * \author Ole Vegard Solberg, SINTEF
- */
-class GeneralTab : public PreferencesTab
-{
-  Q_OBJECT
-
-public:
-  GeneralTab(QWidget *parent = 0);
-  virtual ~GeneralTab();
-  void init();
-
-public slots:
-  void saveParametersSlot();
-  
-private slots:
-  void browsePatientDataFolderSlot();
-
-  void currentApplicationChangedSlot(int index);
-  void applicationStateChangedSlot();
-
-private:
-  void setApplicationComboBox();
-
-  QComboBox* mPatientDataFolderComboBox;
-
-  QComboBox* mToolConfigFolderComboBox;
-  QComboBox* mChooseApplicationComboBox;
-
-  QString mGlobalPatientDataFolder;
-};
-
-/**
- * \class PerformanceTab
- *
- * \brief Configure performance tab in preferences dialog
- *
- * \date Mar 8, 2010
- * \author Ole Vegard Solberg, SINTEF
- */
-class PerformanceTab : public PreferencesTab
-{
-    Q_OBJECT
-
-public:
-  PerformanceTab(QWidget *parent = 0);
-  void init();
-  
-public slots:
-  void saveParametersSlot();
-
-protected:
-  QSpinBox* mRenderingIntervalSpinBox;
-  QLabel* mRenderingRateLabel;
-  QCheckBox* mSmartRenderCheckBox;
-  QCheckBox* mGPU2DRenderCheckBox;
-//  QCheckBox* mGPU3DDepthPeelingCheckBox;
-  QCheckBox* mShadingCheckBox;
-  QGridLayout *mMainLayout;
-  DoubleDataAdapterXmlPtr mMaxRenderSize;
-  DoubleDataAdapterXmlPtr mStillUpdateRate;
-  StringDataAdapterXmlPtr m3DVisualizer;
-
-private slots:
-  void renderingIntervalSlot(int interval);
-};
 
 class VisualizationTab : public PreferencesTab
 {

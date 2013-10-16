@@ -114,7 +114,7 @@ USReconstructInputData USSavingRecorder::getDataForStream(unsigned videoRecorder
 
 	SavingVideoRecorderPtr videoRecorder = mVideoRecorder[videoRecorderIndex];
 	videoRecorder->completeSave(); // just in case - should have been done earlier.
-	TimedTransformMap trackerRecordedData = RecordSession::getToolHistory(mRecordingTool, mSession);
+	TimedTransformMap trackerRecordedData = RecordSession::getToolHistory_prMt(mRecordingTool, mSession);
 
 	CachedImageDataContainerPtr imageData = videoRecorder->getImageData();
 	std::vector<double> imageTimestamps = videoRecorder->getTimestamps();
@@ -136,7 +136,7 @@ void USSavingRecorder::startSaveData(QString baseFolder, bool compressImages)
 	if (!mSession)
 		return;
 
-	TimedTransformMap trackerRecordedData = RecordSession::getToolHistory(mRecordingTool, mSession);
+	TimedTransformMap trackerRecordedData = RecordSession::getToolHistory_prMt(mRecordingTool, mSession);
 
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 	{

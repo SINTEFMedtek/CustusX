@@ -95,6 +95,7 @@ protected slots:
 
 	void shootScreen();
 	void shootWindow();
+	void recordFullscreen();
 
 	//debug mode
 	void toggleDebugModeSlot(bool checked);
@@ -139,6 +140,7 @@ private:
 
 	QAction* mShootScreenAction;
 	QAction* mShootWindowAction;
+	QAction* mRecordFullscreenAction;
 
 	QAction* mNewPatientAction;///< Action for creating a new patient
 	QAction* mLoadFileAction;///< Action for loading all data from file

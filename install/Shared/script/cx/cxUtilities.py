@@ -12,7 +12,32 @@
     
 import os
 import os.path
-#import argparse
+import platform
+import sys
+
+def try_lxml_import():
+    '''
+    lxml is not bundled with the standard Python installation.
+    This function attempts to load it, and outputs a howto
+    it the load fails.
+    
+    The lxml module is returned. Assign it to a 
+    local variable lxml in order to use it!
+    '''
+    try:
+        import lxml.etree
+        return lxml
+    except ImportError:
+        print "Error: Module lxml not found."
+        if platform.system() == 'Darwin':
+            print "Try to install lxml using:"
+            print "    sudo easy_install pip"
+            print "    sudo pip install lxml"
+        elif platform.system() == 'Linux':
+            print "Try to install lxml using:"
+            print "    sudo apt-get install -y python-pip libxml2-dev libxslt-dev"
+        raise
+    
     
 def writeToNewFile(filename, text):
     '''
