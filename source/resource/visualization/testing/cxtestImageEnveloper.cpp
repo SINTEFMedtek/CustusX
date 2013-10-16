@@ -24,6 +24,9 @@
 namespace cxtest
 {
 
+namespace  {
+
+
 Eigen::Array3i getDim(cx::ImagePtr input)
 {
 	return Eigen::Array3i(input->getBaseVtkImageData()->GetDimensions());
@@ -73,8 +76,11 @@ void checkImages(cx::ImagePtr input, cx::ImagePtr expected)
 		CHECK(cx::similar(getSpacing(input), getSpacing(expected)));
 	}
 	CHECK(input->getParentSpace() == expected->getParentSpace());
-	CHECK(cxtest::Utilities::getFractionOfVoxelsAboveThreshold(input->getBaseVtkImageData(), 0) == Approx(0));
+	// removed: image is not necessarily black. The size is what matters.
+	//CHECK(cxtest::Utilities::getFractionOfVoxelsAboveThreshold(input->getBaseVtkImageData(), 0) == Approx(0));
 }
+
+} // namespace
 
 
 TEST_CASE("ImageEnveloper: One image", "[unit][resource][visualization]")
@@ -88,9 +94,9 @@ TEST_CASE("ImageEnveloper: One image", "[unit][resource][visualization]")
 	cx::ImagePtr box = enveloper->getEnvelopingImage();
 
 	cx::ImageParameters expectedImageParameters(Eigen::Array3i(size, size, size),
-																							getSpacing(image),
-																							image->getUid(),
-																							image->get_rMd());
+												getSpacing(image),
+												image->getUid(),
+												image->get_rMd());
 
 	cx::ImagePtr expected = createExpectedImage(expectedImageParameters);
 	checkImages(box, expected);
