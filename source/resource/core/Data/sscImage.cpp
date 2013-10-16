@@ -105,7 +105,7 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& nam
 {
 	mInterpolationType = VTK_LINEAR_INTERPOLATION;
 	mUseCropping = false;
-	mCroppingBox_d = DoubleBoundingBox3D(0, 0, 0, 0, 0, 0);
+	mCroppingBox_d = this->getInitialBoundingBox();
 
 	//  mShading.on = false;
 	//  mShading.ambient = 0.2;
@@ -117,6 +117,10 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& nam
 	mImageTransferFunctions3D.reset();
 }
 
+DoubleBoundingBox3D Image::getInitialBoundingBox() const
+{
+	return DoubleBoundingBox3D(-1, -1, -1, -1, -1, -1);
+}
 
 ImagePtr Image::getUnsigned(ImagePtr self)
 {
@@ -656,7 +660,7 @@ void Image::setCropping(bool on)
 		return;
 
 	mUseCropping = on;
-	if (similar(mCroppingBox_d, DoubleBoundingBox3D(0, 0, 0, 0, 0, 0)))
+	if (similar(mCroppingBox_d, this->getInitialBoundingBox()))
 		mCroppingBox_d = this->boundingBox();
 	emit cropBoxChanged();
 }

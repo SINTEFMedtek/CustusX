@@ -41,6 +41,8 @@ public:
 	static ImageMapperMonitorPtr create(vtkVolumePtr volume, ImagePtr image, int volumeIndex);
 protected:
 	virtual void clearClipping();
+	/** Warning: The mapper supports only one plane. Only the first plane from Image is used for clip.
+	  */
 	virtual void applyClipping();
 	virtual void applyCropping();
 	MehdiGPURayCastMultiVolumeRepImageMapperMonitor(vtkVolumePtr volume, ImagePtr image, int volumeIndex);
@@ -83,6 +85,7 @@ private slots:
  */
 class MehdiGPURayCastMultiVolumeRep: public MehdiGPURayCastMultiVolumeRepBase
 {
+	Q_OBJECT
 public:
 	static MehdiGPURayCastMultiVolumeRepPtr New(QString uid="") { return wrap_new(new MehdiGPURayCastMultiVolumeRep(), uid); }
 	virtual ~MehdiGPURayCastMultiVolumeRep();
@@ -90,14 +93,13 @@ public:
 	virtual QString getType() const { return "MehdiGPURayCastMultiVolumeRep"; }
 
 	void setImages(std::vector<ImagePtr> images);
-	void setBoundingBoxGenerator(ImageEnveloperPtr generator);
 
 protected:
 	MehdiGPURayCastMultiVolumeRep();
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
 
-//private slots:
+private slots:
 	void transformChangedSlot();
 	void vtkImageDataChangedSlot();
 
@@ -108,6 +110,7 @@ private:
 	vtkVolumePtr mVolume;
 	vtkOpenGLGPUMultiVolumeRayCastMapperPtr mMapper;
 	std::vector<VolumePropertyPtr> mVolumeProperties;
+	VolumePropertyPtr mReferenceProperty;
 	std::vector<ImagePtr> mImages;
 	ImagePtr mReferenceImage;
 	std::vector<ImageMapperMonitorPtr> mMonitors;
