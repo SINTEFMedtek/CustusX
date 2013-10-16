@@ -20,6 +20,10 @@
 #include "cxDataLocations.h"
 #include "cxVLCRecorder.h"
 
+#ifdef CX_WINDOWS
+#include <windows.h>
+#endif
+
 TEST_CASE("VLCRecorder can be constructed", "[unit][resource][core][VLCRecorder][VLC]")
 {
 	cx::messageManager()->initialize();
@@ -27,14 +31,14 @@ TEST_CASE("VLCRecorder can be constructed", "[unit][resource][core][VLCRecorder]
 	cx::messageManager()->shutdown();
 }
 
-TEST_CASE("VLCRecorder can find VLC application", "[unit][resource][core][VLCRecorder][VLC]")
+TEST_CASE("VLCRecorder can find VLC application", "[unit][resource][core][VLCRecorder][VLC][hide]")
 {
 	cx::messageManager()->initialize();
 	CHECK(cx::vlc()->hasVLCApplication());
 	cx::messageManager()->shutdown();
 }
 
-TEST_CASE("VLCRecorder can record", "[integration][resource][core][VLCRecorder][VLC]")
+TEST_CASE("VLCRecorder can record", "[integration][resource][core][VLCRecorder][VLC][hide]")
 {
 	//TODO this test does not fail even if vlc fails.... needs to be fixed.
 
