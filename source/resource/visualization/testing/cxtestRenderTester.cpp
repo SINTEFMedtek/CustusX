@@ -102,6 +102,9 @@ RenderTester::RenderTester(cx::RepPtr rep, const unsigned int viewAxisSize) :
 
 	mRenderWindow = mView->getRenderWindow();
 	mRenderer = mRenderWindow->GetRenderers()->GetFirstRenderer();
+
+	mRenderWindow->SetSize(viewAxisSize,viewAxisSize);
+
 }
 
 void RenderTester::setImageErrorThreshold(double value)
@@ -109,15 +112,9 @@ void RenderTester::setImageErrorThreshold(double value)
 		mImageErrorThreshold = value;
 }
 
-//	ViewWidget* getView()
-//	{
-//		return mView;
-//	}
-
 void RenderTester::addProp(vtkPropPtr prop)
 {
 	mRenderer->AddViewProp(prop);
-	//		this->getView()->getRenderer()->AddProp(prop);
 }
 
 void RenderTester::renderToFile(QString filename)
@@ -129,13 +126,7 @@ void RenderTester::renderToFile(QString filename)
 void RenderTester::alignRenderWindowWithImage(vtkImageDataPtr input)
 {
 	cx::DoubleBoundingBox3D bounds(input->GetBounds());
-	//		std::cout << "bounds " << bounds << std::endl;
 	mRenderer->ResetCamera(bounds.data());
-
-//	std::cout << "bounds " << bounds << std::endl;
-//	std::cout << "spacing " << Vector3D(input->GetSpacing()) << std::endl;
-//	std::cout << "extent " << IntBoundingBox3D(input->GetExtent()) << std::endl;
-//	std::cout << "dim " << Eigen::Array3i(input->GetDimensions()) << std::endl;
 
 	Eigen::Array3i dim(input->GetDimensions());
 	mRenderWindow->SetSize(dim[0], dim[1]);
@@ -154,33 +145,18 @@ void RenderTester::resetCamera()
 
 vtkImageDataPtr RenderTester::renderToImage()
 {
-	//		DoubleBoundingBox3D bounds(mRenderer->ComputeVisiblePropBounds());
-	//		std::cout << "bounds " << bounds << std::endl;
-	//		mRenderer->ResetCamera(bounds.data());
-	//		bounds[1] += 1;
-	//		bounds[3] += 1;
-	//		mRenderWindow->SetSize(bounds.range()[0], bounds.range()[1]);
-	//		mRenderer->GetActiveCamera()->SetParallelScale((bounds.range()[1])/2);
-
-//	std::cout << "RENDER B=======================================" << std::endl;
 	mRenderWindow->Render();
-//	std::cout << "RENDER E=======================================" << std::endl;
-
-//		std::cout << "=======================input1" << std::endl;
-//		mRenderer->GetActiveCamera()->Print(std::cout);
-
-	//		this->getView()->getRenderer()->ResetCamera();
-	//		this->getView()->getRenderWindow()->Render();
-
+	// extra render, as suggested by http://read.pudn.com/downloads115/ebook/487640/VTK/Common/Testing/Cxx/vtkRegressionTestImage.h__.htm
+	// tests show that black windows appear less often with two renders.
+	mRenderWindow->Render();
 	return this->getImageFromRenderWindow();
 }
 
 vtkImageDataPtr RenderTester::getImageFromRenderWindow()
 {
 	vtkWindowToImageFilterPtr windowToImageFilter = vtkWindowToImageFilterPtr::New();
+	windowToImageFilter->SetReadFrontBuffer(false); // might give less interference from other windows...?
 	windowToImageFilter->SetInput(mRenderWindow);
-	//		windowToImageFilter->SetInput(this->getView()->getRenderWindow());
-
 	windowToImageFilter->Modified();
 	windowToImageFilter->Update();
 
@@ -198,8 +174,6 @@ void RenderTester::writeToPNG(vtkImageDataPtr image, QString filename)
 vtkImageDataPtr RenderTester::readFromFile(QString filename)
 {
 	return cx::DataReaderWriter().loadVtkImageData(filename);
-//	if (QFileInfo(filename).)
-//	vtkImageDataPtr load(const QString& filename);
 }
 
 vtkImageDataPtr RenderTester::readFromPNG(QString filename)
