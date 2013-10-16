@@ -56,3 +56,18 @@ TEST_CASE("ProcessWrapper can check git version", "[unit][resource][core][Proces
 
 	cx::MessageManager::shutdown();
 }
+
+TEST_CASE("ProcessWrapper can run VLC", "[unit][resource][core][ProcessWrapper][VLC]")
+{
+	cx::MessageManager::initialize();
+
+	cx::ProcessWrapperPtr exe(new cx::ProcessWrapper());
+	exe->launch("/Applications/VLC.app/Contents/MacOS/VLC", QStringList("--version"));
+
+	REQUIRE(exe->getProcess());
+	exe->getProcess()->waitForFinished();
+
+	CHECK(exe->getProcess()->exitStatus() == 0);
+
+	cx::MessageManager::shutdown();
+}
