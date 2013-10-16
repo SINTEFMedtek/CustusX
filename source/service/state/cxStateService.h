@@ -136,6 +136,7 @@ private:
 	void fillDefaultSettings();
 	template<class T>
 	void fillDefault(QString name, T value);
+
 	QString getDefaultGrabberServer();
 	QString checkGrabberServerExist(QString path, QString filename, QString args);
 	QString getDefaultGrabberInitScript();
