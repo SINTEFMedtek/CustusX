@@ -163,6 +163,11 @@ class CustusXBuilder:
                       "/external_code/*",
                       "/Library/*",
                       "/usr/*",
+                      "/usr/include/*",
+                      "/working/*",
+                      "/working/Tube-Segmentation-Framework/*", 
+                      "/working/ISB_DataStreaming/*", 
+                      "/working/Level-Set-Segmentation/*", 
                       "/moc*.cxx",
                       "/CustusX3/build_*",
                       "/Examples/*"]
