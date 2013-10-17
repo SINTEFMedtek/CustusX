@@ -25,7 +25,11 @@
 #include "cxTimedAlgorithm.h"
 #include "cxUSReconstructInputDataAlgoritms.h"
 #include "sscReconstructManager.h"
-#include "TordReconstruct/TordTest.h"
+
+#include "recConfig.h"
+#ifdef SSC_USE_OpenCL
+	#include "TordReconstruct/TordTest.h"
+#endif // SSC_USE_OpenCL
 
 #include "catch.hpp"
 
@@ -61,7 +65,10 @@ public:
 	void testAngioReconstruction();///< Test reconstruction of US angio data (#318)
 	void testThunderGPUReconstruction();///< Test Thunder GPU reconstruction
 	void testDualAngio();
+#ifdef SSC_USE_OpenCL
 	void testTordTest(); // Test Tord GPU VNN implementation
+#endif // SSC_USE_OpenCL
+
 	cx::ReconstructManagerPtr createManager();
 
 private:
@@ -338,6 +345,7 @@ void ReconstructManagerTestFixture::testDualAngio()
 	this->validateAngioData(cores[1]->getOutput());
 }
 
+#ifdef SSC_USE_OpenCL
 void ReconstructManagerTestFixture::testTordTest()
 {
 
@@ -366,6 +374,8 @@ void ReconstructManagerTestFixture::testTordTest()
 	// check validity of output:
 	this->validateBModeData(cores[0]->getOutput());
 }
+#endif // SSC_USE_OpenCL
+
 
 TEST_CASE("ReconstructManager: Slerp Interpolation", "[usreconstruction][unit]")
 {
@@ -388,11 +398,13 @@ TEST_CASE("ReconstructManager: Dual Angio", "[usreconstruction][integration]")
 	fixture.testDualAngio();
 }
 
+#ifdef SSC_USE_OpenCL
 TEST_CASE("ReconstructManager: TordTest", "[usreconstruction][integration][tordtest]")
 {
 	ReconstructManagerTestFixture fixture;
 	fixture.testTordTest();
 }
+#endif // SSC_USE_OpenCL
 
 void drawLineInImage(vtkImageDataPtr image, int value)
 {
