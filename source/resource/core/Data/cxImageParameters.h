@@ -47,6 +47,8 @@ public:
 	Eigen::Array3d getSpacing() const;
 	Eigen::Array3d getBounds();
 
+	void print(std::ostream& s, vtkIndent indent);
+
 private:
 	Eigen::Array3i mDim;
 	Eigen::Array3d mSpacing;

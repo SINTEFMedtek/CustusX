@@ -39,13 +39,7 @@ class CppBuilder:
     
     def reset(self):
         'delete build folder(s)'
-#        self._changeDirToBase()
         shell.removeTree(self.mBuildPath)
-#        if(platform.system() == 'Windows'):
-#            #runShell('echo WANT TO REMOVE FOLDER %s/%s' % (self.path(), self.buildFolder()))
-#            runShell('rd /S /Q "%s/%s"' % (self.path(), self.buildFolder()))
-#        else:
-#            runShell('rm -R -f %s/%s' % (self.path(), self.buildFolder()))
             
     def build(self):
         self._changeDirToBuild()

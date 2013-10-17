@@ -20,6 +20,7 @@
 #include "sscRegistrationTransform.h"
 #include "sscTypeConversions.h"
 #include "sscBoundingBox3D.h"
+#include "sscImageTF3D.h"
 
 
 namespace cx
@@ -48,7 +49,7 @@ ImagePtr ImageEnveloper::getEnvelopingImage()
 {
 	ImageParameters box = this->createEnvelopeParametersFromImage(mImages[0]);
 	for(unsigned i = 1; i < mImages.size(); ++i)
-		box = selectParametersWithSmallestExtent(box, createEnvelopeParametersFromImage(mImages[i]));
+		box = selectParametersWithSmallestExtent(box, this->createEnvelopeParametersFromImage(mImages[i]));
 
 	box.limitVoxelsKeepBounds(mMaxEnvelopeVoxels);
 
@@ -70,6 +71,7 @@ ImageParameters ImageEnveloper::createEnvelopeParametersFromImage(ImagePtr img)
 	Vector3D shift = bb.bottomLeft();
 
 	retval.m_rMd = img->get_rMd() * createTransformTranslate(shift);
+
 	return retval;
 }
 
@@ -118,8 +120,8 @@ Eigen::Array3d ImageEnveloper::getTransformedSpacing(Eigen::Array3d spacing, Tra
 	//Find spacing for each axis
 	for (unsigned i = 0; i < 3; ++i)
 	{
-		retval[i] = std::max(sx[i], sy[i]);
-		retval[i] = std::max(retval[i], sz[i]);
+		retval[i] = std::max(fabs(sx[i]), fabs(sy[i]));
+		retval[i] = std::max(retval[i], fabs(sz[i]));
 	}
 
 	return retval;
@@ -127,14 +129,26 @@ Eigen::Array3d ImageEnveloper::getTransformedSpacing(Eigen::Array3d spacing, Tra
 
 ImagePtr ImageEnveloper::createEnvelopeFromParameters(ImageParameters box)
 {
-	vtkImageDataPtr imageData = generateVtkImageData(box.getDim(), box.getSpacing(), 0, 1);
+	int maxRange = this->getMaxScalarRange();
+
+	vtkImageDataPtr imageData = generateVtkImageDataUnsignedShort(box.getDim(), box.getSpacing(), maxRange, 1);
+
 	QString uid = QString("envelope_image_%1").arg(box.mParentVolume);
 	ImagePtr retval(new Image(uid, imageData));
 	retval->get_rMd_History()->setRegistration(box.m_rMd);
 	retval->get_rMd_History()->setParentSpace(box.mParentVolume);
 	retval->setAcquisitionTime(QDateTime::currentDateTime());
 	retval->setModality("SC");
+
 	return retval;
+}
+
+int ImageEnveloper::getMaxScalarRange()
+{
+	int maxRange = 0;
+	for (unsigned i=0; i<mImages.size(); ++i)
+		maxRange = std::max<int>(maxRange, mImages[i]->getBaseVtkImageData()->GetScalarRange()[1]);
+	return maxRange;
 }
 
 } // namespace cx

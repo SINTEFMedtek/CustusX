@@ -42,7 +42,6 @@ public:
 	virtual ~ImageEnveloper() {}
 
 	virtual void setImages(std::vector<ImagePtr> images);
-	//virtual Box getBox() const;
 	virtual ImagePtr getEnvelopingImage();
 	void setMaxEnvelopeVoxels(long maxVoxels);
 
@@ -57,6 +56,7 @@ private:
 	ImagePtr createEnvelopeFromParameters(ImageParameters box);
 	Eigen::Array3d getMinimumSpacingFromAllImages(Transform3D qMr);
 	Eigen::Array3d getTransformedSpacing(Eigen::Array3d spacing, Transform3D qMd);
+	int getMaxScalarRange();
 };
 
 } // namespace cx

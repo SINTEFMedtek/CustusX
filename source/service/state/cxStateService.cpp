@@ -197,14 +197,9 @@ void StateService::fillDefault(QString name, T value)
  */
 QString StateService::checkGrabberServerExist(QString path, QString filename, QString args)
 {
-//	std::cout << "checking [" << path << "] [" << filename << "] [" << args << "]" << std::endl;
 	path = QDir::cleanPath(path);
-//	std::cout << "  cleaned [" << path << "]" << std::endl;
 	if (QDir(path).exists(filename))
-	{
-//		std::cout << "  found [" << filename << "]" << std::endl;
 		return QDir(DataLocations::getBundlePath()).relativeFilePath(path + "/" + filename) + " " + args;
-	}
 
 	return "";
 }
