@@ -319,7 +319,7 @@ void trace(void)
 		
 		vec4 value[10];
 		float scalar[10];
-		
+		/*
 		//Texture 1
 		if(all(greaterThanEqual(pos,lowBounds[0]))
         && all(lessThanEqual(pos,highBounds[0])))
@@ -346,6 +346,7 @@ void trace(void)
 				}
 			}
 		}
+		*/
     //Texture2 and upper
 		
 		for(int xx = 1;((xx<5)&&(xx < Number_Of_Volumes));xx++)//? //Help 		

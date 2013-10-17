@@ -13,6 +13,7 @@
 // See CustusX_License.txt for more information.
 #include "cxImageParameters.h"
 #include "sscMessageManager.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -167,6 +168,16 @@ void ImageParameters::changeToUniformSpacing()
 	mSpacing = Eigen::Array3d(spacing,spacing,spacing);
 	Eigen::Array3i e = (b/s).cast<int>();
 	this->setDimFromExtent(e);
+}
+
+void ImageParameters::print(std::ostream& s, vtkIndent indent)
+{
+	s << indent << "Dim: " << mDim << std::endl;
+	s << indent << "Spacing: " << mSpacing << std::endl;
+	s << indent << "Bounds: " << this->getBounds() << std::endl;
+	s << indent << "NumVoxels: " << this->getNumVoxels() << std::endl;
+	s << indent << "Parent Volume: " << mParentVolume << std::endl;
+	s << indent << "rMd:\n" << m_rMd << std::endl;
 }
 
 

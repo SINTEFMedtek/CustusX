@@ -192,6 +192,7 @@ private:
 	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D);
 	void resetTransferFunction(ImageLUT2DPtr imageLookupTable2D);
 	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D);
+	DoubleBoundingBox3D getInitialBoundingBox() const;
 
 	double computeResampleFactor(long maxVoxels);
 

@@ -18,7 +18,12 @@ typedef boost::shared_ptr<class Data> DataPtr;
  */
 
 vtkImageDataPtr generateVtkImageData(Eigen::Array3i dim, Vector3D spacing, const unsigned char initValue, int components = 1);
+vtkImageDataPtr generateVtkImageDataUnsignedShort(Eigen::Array3i dim,
+									 Vector3D spacing,
+									 const unsigned short initValue,
+									 int components = 1);
 vtkImageDataPtr generateVtkImageDataDouble(Eigen::Array3i dim, Vector3D spacing, double initValue);
+void fillShortImageDataWithGradient(vtkImageDataPtr data, int maxValue);
 
 /**
   * Convert an Image to its unsigned version.
