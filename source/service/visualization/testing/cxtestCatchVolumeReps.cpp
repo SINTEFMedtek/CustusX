@@ -33,160 +33,209 @@ typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;
 namespace cxtest
 {
 
-namespace
+namespace {
+double repRenderAndGetNonZeroFraction(cx::RepPtr rep, int viewAxisSize=30)
 {
-	double repRenderAndGetNonZeroFraction(cx::RepPtr rep, unsigned int viewAxisSize = 30)
+	RenderTesterPtr renderTester = cxtest::RenderTester::create(rep, viewAxisSize);
+
+	vtkImageDataPtr output = renderTester->renderToImage();
+//	REQUIRE(cx::similar(Eigen::Array3i(output->GetDimensions()), Eigen::Array3i(viewAxisSize,viewAxisSize,1)));
+//	REQUIRE(output->GetDimensions()[0] == viewAxisSize);
+//	REQUIRE(output->GetDimensions()[1] == viewAxisSize);
+
+	double retval = cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, 0);
+	renderTester->writeToPNG(output, "output.png");
+	return retval;
+}
+} // namespace
+
+class MehdiGPURayCastMultiVolumeRepFixture
+{
+public:
+
+	MehdiGPURayCastMultiVolumeRepFixture() :
+		mImageCount(1),
+		mAxisSize(3),
+		mViewAxisSize(30)
 	{
-		RenderTesterPtr renderTester = cxtest::RenderTester::create(rep, viewAxisSize);
-
-		vtkImageDataPtr output = renderTester->renderToImage();
-	//	REQUIRE(cx::similar(Eigen::Array3i(output->GetDimensions()), Eigen::Array3i(viewAxisSize,viewAxisSize,1)));
-		REQUIRE(output->GetDimensions()[0] == viewAxisSize);
-		REQUIRE(output->GetDimensions()[1] == viewAxisSize);
-
-		double retval = cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, 0);
-		return retval;
+		cx::MessageManager::initialize();
+	}
+	~MehdiGPURayCastMultiVolumeRepFixture()
+	{
+		cx::MessageManager::shutdown();
 	}
 
-	void requireRepRender(cx::RepPtr rep, unsigned int viewAxisSize = 30)
+	double renderAndGetNonZeroFraction()
 	{
-		double fraction = repRenderAndGetNonZeroFraction(rep, viewAxisSize);
+		return repRenderAndGetNonZeroFraction(mRep, mViewAxisSize);
+	}
+
+	void requireRepRender()
+	{
+		double fraction = renderAndGetNonZeroFraction();
 		REQUIRE(fraction > 0);
 		REQUIRE(fraction < 1);
 	}
-}// namespace
 
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[rep][unit][gui][not_apple][hide]")
+	void setNumberOfImages(int count)
+	{
+		mImageCount = count;
+	}
+
+	void setImageAxisSize(int size)
+	{
+		mAxisSize = size;
+	}
+
+	void setViewAxisSize(int size)
+	{
+		mViewAxisSize = size;
+	}
+
+	void createRep()
+	{
+		mImages = cxtest::Utilities::create3DImages(mImageCount, Eigen::Array3i(mAxisSize,mAxisSize,mAxisSize), 200);
+
+		mRep = cx::MehdiGPURayCastMultiVolumeRep::New("");
+		mRep->setImages(mImages);
+	}
+
+public:
+	std::vector<cx::ImagePtr> mImages;
+	cx::MehdiGPURayCastMultiVolumeRepPtr mRep;
+private:
+	int mImageCount;
+	int mAxisSize;
+	unsigned int mViewAxisSize;
+};
+
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 1 small volume.", "[rep][unit][visualization][not_apple]")
 {
-	unsigned int imageCount = 3;
-	std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(3,3,3), 200);
+	MehdiGPURayCastMultiVolumeRepFixture fixture;
+	fixture.setNumberOfImages(1);
+	fixture.setImageAxisSize(3);
+	fixture.createRep();
 
-	cx::MehdiGPURayCastMultiVolumeRepPtr rep = cx::MehdiGPURayCastMultiVolumeRep::New("");
-	REQUIRE(rep);
-	rep->setImages(images);
-
-	requireRepRender(rep);
+	fixture.requireRepRender();
 }
 
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 1 small volume.", "[rep][unit][gui][not_apple][hide]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[rep][unit][visualization][not_apple]")
 {
-	unsigned int imageCount = 1;
-	std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(3,3,3), 200);
+	MehdiGPURayCastMultiVolumeRepFixture fixture;
+	fixture.setNumberOfImages(3);
+	fixture.setImageAxisSize(3);
+	fixture.createRep();
 
-	cx::MehdiGPURayCastMultiVolumeRepPtr rep = cx::MehdiGPURayCastMultiVolumeRep::New("");
-	rep->setBoundingBoxGenerator(cx::ImageEnveloper::create());
-	REQUIRE(rep);
-	rep->setImages(images);
-
-	requireRepRender(rep);
+	fixture.requireRepRender();
 }
 
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 large volumes.", "[rep][integration][gui][not_apple]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 large volumes.", "[rep][integration][visualization][not_apple]")
 {
-	unsigned int imageCount = 3;
-	std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(imageCount, Eigen::Array3i(300,300,300), 200);
+	MehdiGPURayCastMultiVolumeRepFixture fixture;
+	fixture.setNumberOfImages(3);
+	fixture.setImageAxisSize(300);
+	fixture.setViewAxisSize(1000);
+	fixture.createRep();
 
-	cx::MehdiGPURayCastMultiVolumeRepPtr rep = cx::MehdiGPURayCastMultiVolumeRep::New("");
-	REQUIRE(rep);
-	rep->setImages(images);
-
-	requireRepRender(rep, 1000);
+	fixture.requireRepRender();
 }
 
 // vtk emits PreRender end ERROR (x502) Invalid operation when this is run after another mehdi test.
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can crop 1 small volume.", "[rep][unit][gui][not_apple][hide]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can crop 1 small volume.", "[rep][unit][visualization][not_apple]")
 {
-	unsigned int size = 10;
-	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(size,size,size), 200);
+	MehdiGPURayCastMultiVolumeRepFixture fixture;
+	fixture.setNumberOfImages(1);
+	fixture.setImageAxisSize(10);
+	fixture.createRep();
 
-	cx::MehdiGPURayCastMultiVolumeRepPtr rep = cx::MehdiGPURayCastMultiVolumeRep::New("");
-	REQUIRE(rep);
-
+	cx::ImagePtr image = fixture.mImages[0];
 	cx::DoubleBoundingBox3D bb = image->boundingBox();
 	bb[5] = bb[4] + bb.range()[2]/2.0;
-
 	image->setCroppingBox(bb);
 	image->setCropping(true);
-	rep->setImages(std::vector<cx::ImagePtr>(1, image));
 
-	requireRepRender(rep);
-
-	bb = cx::DoubleBoundingBox3D(0,0,0,0,0,0);
-	image->setCroppingBox(bb);
-	REQUIRE(repRenderAndGetNonZeroFraction(rep) == Approx(0.0));
+	fixture.requireRepRender();
 }
 
 // vtk emits PreRender end ERROR (x502) Invalid operation when this is run after another mehdi test.
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip 1 small volume.", "[rep][unit][gui][not_apple][hide]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can crop completely 1 small volume.", "[rep][unit][visualization][not_apple]")
 {
-	unsigned int size = 10;
-	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(size,size,size), 200);
+	MehdiGPURayCastMultiVolumeRepFixture fixture;
+	fixture.setNumberOfImages(1);
+	fixture.setImageAxisSize(10);
+	fixture.createRep();
 
-	cx::MehdiGPURayCastMultiVolumeRepPtr rep = cx::MehdiGPURayCastMultiVolumeRep::New("");
-	REQUIRE(rep);
+	cx::DoubleBoundingBox3D bb = cx::DoubleBoundingBox3D(0,0,0,0,0,0);
 
+	cx::ImagePtr image = fixture.mImages[0];
+	image->setCropping(true);
+	image->setCroppingBox(bb);
+
+	REQUIRE(fixture.renderAndGetNonZeroFraction() == Approx(0.0));
+}
+
+// vtk emits PreRender end ERROR (x502) Invalid operation when this is run after another mehdi test.
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip 1 small volume.", "[rep][unit][visualization][not_apple]")
+{
+	MehdiGPURayCastMultiVolumeRepFixture fixture;
+	fixture.setNumberOfImages(1);
+	fixture.setImageAxisSize(10);
+	fixture.createRep();
+
+	cx::ImagePtr image = fixture.mImages[0];
 	vtkPlanePtr plane = vtkPlanePtr::New();
 	plane->SetNormal(0,0,-1);
 	plane->SetOrigin(image->boundingBox().center().data());
-
 	image->setInteractiveClipPlane(plane);
 
-	rep->setImages(std::vector<cx::ImagePtr>(1, image));
-
-	requireRepRender(rep);
+	fixture.requireRepRender();
 }
 
 // vtk emits PreRender end ERROR (x502) Invalid operation when this is run after another mehdi test.
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can remove 1 small volume with clipper.", "[rep][unit][gui][not_apple][hide]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can remove 1 small volume with clipper.", "[rep][unit][visualization][not_apple]")
 {
-	unsigned int size = 10;
-	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(size,size,size), 200);
+	MehdiGPURayCastMultiVolumeRepFixture fixture;
+	fixture.setNumberOfImages(1);
+	fixture.setImageAxisSize(10);
+	fixture.createRep();
 
-	cx::MehdiGPURayCastMultiVolumeRepPtr rep = cx::MehdiGPURayCastMultiVolumeRep::New("");
-	REQUIRE(rep);
-
+	cx::ImagePtr image = fixture.mImages[0];
 	vtkPlanePtr plane = vtkPlanePtr::New();
 	plane->SetNormal(0,0,-1);
 	plane->SetOrigin(0,0,0);
 	image->setInteractiveClipPlane(plane);
-	rep->setImages(std::vector<cx::ImagePtr>(1, image));
-	REQUIRE(repRenderAndGetNonZeroFraction(rep) == Approx(0.0));
+
+	REQUIRE(fixture.renderAndGetNonZeroFraction() == Approx(0.0));
 }
 
 // vtk emits PreRender end ERROR (x502) Invalid operation when this is run - in second part.
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip partially and fully 1 small volume.", "[rep][unit][gui][not_apple][hide]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip partially and fully 1 small volume.", "[rep][unit][visualization][not_apple]")
 {
-	cx::MessageManager::initialize();
-	unsigned int size = 10;
-	std::vector<cx::ImagePtr> images = cxtest::Utilities::create3DImages(2, Eigen::Array3i(size,size,size), 200);
-
-	cx::MehdiGPURayCastMultiVolumeRepPtr rep = cx::MehdiGPURayCastMultiVolumeRep::New("");
-	REQUIRE(rep);
+	MehdiGPURayCastMultiVolumeRepFixture fixture;
+	fixture.setNumberOfImages(2);
+	fixture.setImageAxisSize(10);
+	fixture.setViewAxisSize(500);
+	fixture.createRep();
 
 	vtkPlanePtr plane = vtkPlanePtr::New();
 	plane->SetNormal(0,0,-1);
-	plane->SetOrigin(images[0]->boundingBox().center().data());
+	plane->SetOrigin(fixture.mImages[0]->boundingBox().center().data());
 
-	images[0]->setInteractiveClipPlane(plane);
-	images[1]->setInteractiveClipPlane(plane);
+	fixture.mImages[0]->setInteractiveClipPlane(plane);
+	fixture.mImages[1]->setInteractiveClipPlane(plane);
 
-	rep->setImages(images);
-
-	requireRepRender(rep);
+	fixture.requireRepRender();
 
 	plane->SetOrigin(0,0,0);
-	images[0]->setInteractiveClipPlane(plane);
-	images[1]->setInteractiveClipPlane(plane);
-	rep->setImages(images);
+	fixture.mImages[0]->setInteractiveClipPlane(plane);
+	fixture.mImages[1]->setInteractiveClipPlane(plane);
 	// vtk emits PreRender end ERROR (x502) Invalid operation here
 	// caused by clipping/cropping code not properly cleaned up in previous render???
-	double nonZero = repRenderAndGetNonZeroFraction(rep, 500);
+	double nonZero = fixture.renderAndGetNonZeroFraction();
 	REQUIRE(nonZero == Approx(0.0));
-	usleep(1000000);
-	cx::MessageManager::shutdown();
 }
 
-TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 small volume.", "[rep][unit][gui]")
+TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 small volume.", "[rep][unit][visualization]")
 {
 	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(3,3,3), 200);
 
@@ -194,10 +243,12 @@ TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 small volum
 	REQUIRE(rep);
 	rep->setImage(image);
 
-	requireRepRender(rep);
+	double fraction = repRenderAndGetNonZeroFraction(rep);
+	REQUIRE(fraction > 0);
+	REQUIRE(fraction < 1);
 }
 
-TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 large volume.", "[rep][integration][gui]")
+TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 large volume.", "[rep][integration][visualization]")
 {
 	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(300,300,300), 200);
 
@@ -205,10 +256,12 @@ TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 large volum
 	REQUIRE(rep);
 	rep->setImage(image);
 
-	requireRepRender(rep, 1000);
+	double fraction = repRenderAndGetNonZeroFraction(rep, 1000);
+	REQUIRE(fraction > 0);
+	REQUIRE(fraction < 1);
 }
 
-TEST_CASE("VolumetricRep using vtkGPUVolumeRayCastMapper can render 1 small volume.", "[rep][unit][gui][not_apple]")
+TEST_CASE("VolumetricRep using vtkGPUVolumeRayCastMapper can render 1 small volume.", "[rep][unit][visualization][not_apple]")
 {
 	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(3,3,3), 200);
 
@@ -217,7 +270,9 @@ TEST_CASE("VolumetricRep using vtkGPUVolumeRayCastMapper can render 1 small volu
 	rep->setUseGPUVolumeRayCastMapper();
 	rep->setImage(image);
 
-	requireRepRender(rep);
+	double fraction = repRenderAndGetNonZeroFraction(rep);
+	REQUIRE(fraction > 0);
+	REQUIRE(fraction < 1);
 }
 
 } // namespace cxtest
