@@ -9,6 +9,9 @@
 ###########################################################
 
 
+cx_initialize_opencl()
+
+
 
 SET( MOC_HEADER_FILES
   logic/sscReconstructManager.h
