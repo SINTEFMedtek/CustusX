@@ -18,12 +18,14 @@
 // See sscLicense.txt for more information.
 
 #include "sscReconstructCore.h"
-
+#include "recConfig.h"
 #include <vtkImageData.h>
 #include "sscDataManager.h"
 #include "sscToolManager.h"
 #include "sscThunderVNNReconstructAlgorithm.h"
-#include "TordReconstruct/TordTest.h"
+#ifdef SSC_USE_OpenCL
+	#include "TordReconstruct/TordTest.h"
+#endif // SSC_USE_OpenCL
 #include "sscPNNReconstructAlgorithm.h"
 #include "sscTime.h"
 #include "sscTypeConversions.h"
@@ -76,10 +78,12 @@ ReconstructAlgorithmPtr ReconstructCore::createAlgorithm(QString name)
 	}
 	else if (name == "PNN")
 		retval = ReconstructAlgorithmPtr(new PNNReconstructAlgorithm());
+#ifdef SSC_USE_OpenCL
 	else if (name == "TordTest")
 	{
 		retval = ReconstructAlgorithmPtr(new TordTest());
 	}
+#endif // SSC_USE_OpenCL
 	else
 		retval.reset();
 

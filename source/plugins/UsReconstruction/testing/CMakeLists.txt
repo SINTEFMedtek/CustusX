@@ -9,6 +9,7 @@ if (BUILD_TESTING)
         include_directories(
 		../logic
 		../logic/3DReconstruction
+		${CustusX3_BINARY_DIR}/source/service/patient
 		${CustusX3_SOURCE_DIR}/source/service/patient
 		${CustusX3_SOURCE_DIR}/source/service/tracking
 		)
