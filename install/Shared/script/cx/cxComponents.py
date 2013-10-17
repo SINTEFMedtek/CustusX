@@ -390,6 +390,7 @@ class CustusX3(CppComponent):
             self.forceConnectSublibraries()
         builder.configureCMake()
     def forceConnectSublibraries(self):
+        builder = self._getBuilder()
         add = builder.addCMakeOption
         add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
         add('CX_USE_LEVEL_SET:BOOL', platform.system() == 'Linux')
