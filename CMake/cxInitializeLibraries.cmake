@@ -60,6 +60,30 @@ endmacro()
 
 
 ###############################################################################
+# Initialize openCL library
+#
+# Define variables:
+#    CX_USE_OpenCV : cache option
+#
+###############################################################################
+macro(cx_initialize_opencl)
+	if(SSC_USE_OpenCL)
+		find_package( OpenCL REQUIRED)
+	else()
+		find_package( OpenCL QUIET)
+	endif()
+	IF( OPENCL_FOUND )
+		option(SSC_USE_OpenCL "Use OpenCL" ON)
+	ELSE()
+		option(SSC_USE_OpenCL "Use OpenCL" OFF)
+	ENDIF()
+
+	if(OPENCL_FOUND)
+		include_directories(${OPENCL_INCLUDE_DIRS})
+	endif()
+endmacro()
+
+###############################################################################
 # Initialize Tube-Segmentation-Framework library
 #
 # Find the package and run the include USE file.
