@@ -32,8 +32,13 @@ int main(int argc, char *argv[])
 #endif
 
 	int error_code = cxtest::CatchImpl().run(argc, argv);
-	if(error_code >0)
-		return 0;
+//	if(error_code >0)
+//		return 0;
+
+//	int* fail = NULL;
+//	*fail = 5;
+//	return 2;
+//	return -1;
 
 	return error_code;
 }
