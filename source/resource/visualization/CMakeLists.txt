@@ -61,7 +61,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	Primitives/sscVideoSourceGraphics
 
 	RepVideo/sscVideoRep
-	)
+        )
 
 if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
     cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES

@@ -134,11 +134,17 @@ TimeOut: %d
         shell.rm_r(outfile)
         exe = self._getCatchExecutable()
         cmd = '%s/%s %s --reporter junit --out %s' % (path, exe, tag, outfile)
-        #print("PATH:       "+os.environ["PATH"])
-        success = shell.run(cmd, ignoreFailure=False)
-        if not success: # a failed catch leaves an empty outfile - remove this to signal failure to jenkins
-            PrintFormatter.printInfo('catch failed - removing outfile %s' % outfile)            
+        result = shell.run(cmd, ignoreFailure=True)
+        if result.returncode >= 0:
+            PrintFormatter.printInfo('catch reported %s failing tests' % result.returncode)                        
+        if result.returncode < 0:
+            PrintFormatter.printInfo('catch failed with returncode %s' % result.returncode)            
+            PrintFormatter.printInfo('Removing outfile %s' % outfile)            
             shell.rm_r(outfile)
+            PrintFormatter.printHeader('Analyzing catch failure', 2)            
+            PrintFormatter.printInfo('Running catch tests wrapped in ctest.')            
+            PrintFormatter.printInfo('This should identify crashing tests.')            
+            self.runCatchTestsWrappedInCTestGenerateJUnit(tag, path, outpath)
         
     def _getCatchExecutable(self):
         if(platform.system() == 'Windows'):

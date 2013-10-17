@@ -20,21 +20,16 @@ import re
 import glob
 import argparse        
 import cxArgParse
-    
+import cxShellCommand        
+
+      
+
 class Shell (object):
     '''
     Superclass for platform specific shells like:
     -cmd (Windows)
     -bash (Mac & Linux)
     '''
-    class EvaluateValue:
-        'used as return value from shell command'
-        def __init__(self, stdout='', returncode=0):
-            self.stdout = stdout
-            self.returncode = returncode
-        def __nonzero__(self):
-            'makes type convertible to bool - evaluate to True when zero retcode.'
-            return self.returncode == 0
             
     def __init__(self):
         self.DUMMY = False
@@ -67,27 +62,30 @@ class Shell (object):
     def setRedirectOutput(self, value):
         self.REDIRECT_OUTPUT = value
 
-    def run(self, cmd, ignoreFailure=False, convertToString=True):
+    def run(self, cmd, ignoreFailure=False, convertToString=True, keep_output=False):
         '''
-        Run a shell script
+        Run a shell script, return success/failure in a ShellCommand.ReturnValue object.
+        If keep_output is true, include full output from the command as well.
         '''
         if(convertToString):
             cmd = self._convertToString(cmd)
         self._printCommand(cmd)
-        if self.DUMMY is False:
-            return self._runReal(cmd, ignoreFailure)
+        if self.DUMMY is True:
+            return ShellCommandDummy().run()
+                        
+        command = cxShellCommand.ShellCommandReal(cmd,
+                        cwd=self.CWD, 
+                        terminate_on_error=self.TERMINATE_ON_ERROR and not ignoreFailure,
+                        redirect_output=self.REDIRECT_OUTPUT,
+                        keep_output=keep_output)
+        return command.run()
 
-    def evaluate(self, cmd):
+    def evaluate(self, cmd, convertToString=True):
         '''
-        This function takes shell commands and returns stdout.
-        An error means that None is returned.
+        This function executes shell commands and returns ShellCommand.ReturnValue
+        object describing the results, containing full text output and return code.
         '''
-        cmd = self._convertToString(cmd)
-        self._printCommand(cmd)
-        if self.DUMMY is False:
-            return self._evaluateReal(cmd)
-        else:
-            return Shell.EvaluateValue()
+        return self.run(cmd, ignoreFailure=True, convertToString=convertToString, keep_output=True)
 
     def changeDir(self, path):
         path = path.replace("\\", "/")
@@ -142,72 +140,10 @@ class Shell (object):
             if os.path.exists(path):
                 shutil.rmtree(path, False)
 
-    def _runReal(self, cmd, ignoreFailure):
-        '''
-        This function runs shell,
-        return true if success
-        '''
-        if self.REDIRECT_OUTPUT:
-            p = self._runAndRedirectOutput(cmd)
-        else:
-            p = self._runDirectly(cmd)            
-        if not ignoreFailure:
-            self._checkTerminate(p)
-        return p.returncode == 0
-        
-    def _runAndRedirectOutput(self, cmd):
-        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=self.CWD)        
-        for line in self._readFromProcess(p):
-            self._printOutput(line.rstrip())
-        return p
-
-    def _readFromProcess(self, process):
-        'return an iterable object that reads all stdout from process until completed'
-        while True:
-            retcode = process.poll()
-            for line in process.stdout:
-                yield line
-            if retcode is not None:
-                break
-        
-    def _runDirectly(self, cmd):
-        p = subprocess.Popen(cmd, shell=True, cwd=self.CWD)
-        p.communicate("") # wait for process to complete
-        return p
-
-    def _checkTerminate(self, process):
-        if process.returncode!=0 and self.TERMINATE_ON_ERROR:
-            test = "Terminating: shell command exited with a nonzero return value [%s]" % process.returncode
-            self._printInfo(test)
-            exit(test)
-               
-    def _evaluateReal(self, cmd):
-        '''
-        This function takes shell commands and returns stdout.
-        An error means that None is returned.
-        '''
-        retval = []
-        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=self.CWD)
-        for line in self._readFromProcess(p):
-            self._printOutput(line.rstrip())
-            retval.append(line) 
-        #print "pre..:%s" % p.returncode
-        #if p.returncode != 0:
-        #    return None
-        #print "*****".join(retval)
-        #return "".join(retval) 
-        return Shell.EvaluateValue(stdout="".join(retval), returncode=p.returncode)
-
-                    
     def _printInfo(self, text):
         print '[shell info] %s' % text
     def _printCommand(self, text):
         print '[shell cmd] %s' % text
-    def _printOutput(self, text):
-        if self.REDIRECT_OUTPUT:
-            print '[shell ###] %s' % text
-        else:
-            print '%s' % text
 
     @staticmethod
     def create():
