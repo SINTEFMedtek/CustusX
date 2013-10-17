@@ -62,18 +62,19 @@ class Common(object):
         self.mBuildSSCExamples = True
         self.mBuildTesting = True
         self.mUseCotire = False
-        self.mUseOpenCL = True
+        self.mGEStreamerUseOpenCL = True
         self.mOSX_DEPLOYMENT_TARGET = "10.6" # Deploy for OSX 10.6 Snow Leopard and later
         if (platform.system() == 'Windows'):
             self.mBuildSSCExamples = False
             self.mBuildTesting = True
             self.mUseCotire = False
         if (platform.system() == "Darwin"):
-            self.mUseOpenCL = False # Turn off OpenCL for Mac as Jenkins tests are run on olevs mac, and OpenCL code don't work there yet
+            self.mGEStreamerUseOpenCL = False # Turn off OpenCL for Mac as Jenkins tests are run on olevs mac, and OpenCL code don't work there yet
         self.mBuildExAndTest = False
         self.mCoverage = False
         self.mDoxygen = False
         self.git_tag = None # if none, use branch master
+        self.force_connect_sublibraries = False
 
     def printSettings(self):
         print ''
@@ -93,7 +94,8 @@ class Common(object):
         print '    Threads:', self.threads
         print '    32 bit:', self.m32bit
         print '    git tag:', self.git_tag
-        print '    OpenCL:', self.mUseOpenCL
+        print '    GEStreamerOpenCL:', self.mGEStreamerUseOpenCL
+        print '    force_connect_sublibraries:', self.force_connect_sublibraries
         print ''
 
     def getArgParser_root_dir(self):
@@ -114,6 +116,7 @@ class Common(object):
             p.add_boolean_inverter('--jom', default=self.jom, dest='jom', help='Use jom to build.')
         if platform.system() == 'Darwin':
             p.add_boolean_inverter('--xcode', default=self.xcode, dest='xcode', help='Generate xcode targets')
+        p.add_boolean_inverter('--force_connect_sublibraries', default=self.force_connect_sublibraries, dest='force_connect_sublibraries', help='Force libs such as gestreamer and tsf to be connected to cx, during configuration step.')        
         return p
 
     def getArgParser_extended_build(self):
