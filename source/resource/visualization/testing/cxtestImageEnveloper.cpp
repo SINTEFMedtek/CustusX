@@ -85,7 +85,6 @@ void checkImages(cx::ImagePtr input, cx::ImagePtr expected)
 
 TEST_CASE("ImageEnveloper: One image", "[unit][resource][visualization]")
 {
-	throw "fail";
 	unsigned int size = 3;
 	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(size,size,size), 200);
 
