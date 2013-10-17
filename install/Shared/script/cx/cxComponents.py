@@ -340,7 +340,7 @@ class ISB_DataStreaming(CppComponent):
         add('DATASTREAMING_USE_HDF:BOOL', False)
         add('DATASTREAMING_USE_TRACKING:BOOL', False)
         add('DATASTREAMING_USE_SC_DICOM_LOADERS:BOOL', False)
-        add('DATASTREAMING_USE_OPENCL:BOOL', self.controlData.mUseOpenCL)
+        add('DATASTREAMING_USE_OPENCL:BOOL', self.controlData.mGEStreamerUseOpenCL)
         add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
         builder.configureCMake()
     def _svn_login_info(self):
@@ -381,23 +381,20 @@ class CustusX3(CppComponent):
         add('GEStreamer_DIR:PATH', self._createSibling(ISB_DataStreaming).configPath())
         # other options
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.mDoxygen)            
-        add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
-        turn_on = True;
-        if (platform.system() == 'Windows'):
-            turn_on = False;
-        add('CX_USE_TSF:BOOL', turn_on);
-        if (platform.system() == 'Linux'):
-            add('CX_USE_LEVEL_SET:BOOL', True);
-        else:
-            add('CX_USE_LEVEL_SET:BOOL', False)
-        add('CX_USE_ISB_GE:BOOL', turn_on);
-        add('SSC_USE_DCMTK:BOOL', False);
         add('SSC_BUILD_EXAMPLES:BOOL', self.controlData.mBuildSSCExamples);
         add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
         add('COTIRE_ADD_UNITY_BUILDS:BOOL', self.controlData.mUseCotire);
         add('COTIRE_ENABLE_PRECOMPILED_HEADERS:BOOL', self.controlData.mUseCotire);
         add('SSC_USE_GCOV:BOOL', self.controlData.mCoverage);
+        if self.controlData.force_connect_sublibraries:
+            self.forceConnectSublibraries()
         builder.configureCMake()
+    def forceConnectSublibraries(self):
+        add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
+        add('CX_USE_LEVEL_SET:BOOL', platform.system() == 'Linux')
+        add('CX_USE_TSF:BOOL', platform.system() != 'Windows');
+        add('CX_USE_ISB_GE:BOOL', platform.system() != 'Windows');
+        add('SSC_USE_DCMTK:BOOL', False);
 # ---------------------------------------------------------
 
 class UltrasonixSDK(CppComponent):
