@@ -23,6 +23,7 @@
 #include "sscDataManager.h"
 #include "sscToolManager.h"
 #include "sscThunderVNNReconstructAlgorithm.h"
+#include "TordReconstruct/TordTest.h"
 #include "sscPNNReconstructAlgorithm.h"
 #include "sscTime.h"
 #include "sscTypeConversions.h"
@@ -75,6 +76,10 @@ ReconstructAlgorithmPtr ReconstructCore::createAlgorithm(QString name)
 	}
 	else if (name == "PNN")
 		retval = ReconstructAlgorithmPtr(new PNNReconstructAlgorithm());
+	else if (name == "TordTest")
+	{
+		retval = ReconstructAlgorithmPtr(new TordTest());
+	}
 	else
 		retval.reset();
 

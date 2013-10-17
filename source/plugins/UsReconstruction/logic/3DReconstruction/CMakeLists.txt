@@ -114,6 +114,20 @@ if (SSC_USE_OpenCL)
 #    ENDIF (APPLE)    
 endif (SSC_USE_OpenCL)
 
+# Include Tords stuff
+
+include_directories(
+	TordReconstruct
+	${OPENCL_INCLUDE_DIRS}
+	)
+SET( SOURCE_FILES
+	${SOURCE_FILES}
+	TordReconstruct/TordTest.cpp
+	TordReconstruct/TordTest.h
+	TordReconstruct/kernels.ocl
+	)
+SET(TORD_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/TordReconstruct)
+
 # create the target
 add_library( sscUS3DReconstruction ${SOURCE_FILES} )
 

@@ -25,6 +25,7 @@
 #include "cxTimedAlgorithm.h"
 #include "cxUSReconstructInputDataAlgoritms.h"
 #include "sscReconstructManager.h"
+#include "TordReconstruct/TordTest.h"
 
 #include "catch.hpp"
 
@@ -60,7 +61,7 @@ public:
 	void testAngioReconstruction();///< Test reconstruction of US angio data (#318)
 	void testThunderGPUReconstruction();///< Test Thunder GPU reconstruction
 	void testDualAngio();
-
+	void testTordTest(); // Test Tord GPU VNN implementation
 	cx::ReconstructManagerPtr createManager();
 
 private:
@@ -337,6 +338,34 @@ void ReconstructManagerTestFixture::testDualAngio()
 	this->validateAngioData(cores[1]->getOutput());
 }
 
+void ReconstructManagerTestFixture::testTordTest()
+{
+
+	QString filename = cx::DataLocations::getTestDataPath() +
+			"/testing/"
+			"2012-10-24_12-39_Angio_i_US3.cx3/US_Acq/US-Acq_03_20121024T132330.mhd";
+
+	cx::ReconstructManagerPtr reconstructer = this->createManager();
+	reconstructer->selectData(filename);
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("TordTest");
+	reconstructer->getParams()->mAngioAdapter->setValue(false);
+	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
+
+	// set an algorithm-specific parameter
+	boost::shared_ptr<cx::TordTest> algorithm;
+	algorithm = boost::dynamic_pointer_cast<cx::TordTest>(reconstructer->createAlgorithm());
+	REQUIRE(algorithm);// Check if we got the algorithm
+
+	// run the reconstruction in the main thread
+	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
+	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
+	REQUIRE(cores.size()==1);
+	preprocessor->initializeCores(cores);
+	cores[0]->reconstruct();
+	
+	// check validity of output:
+	this->validateBModeData(cores[0]->getOutput());
+}
 
 TEST_CASE("ReconstructManager: Slerp Interpolation", "[usreconstruction][unit]")
 {
@@ -348,7 +377,7 @@ TEST_CASE("ReconstructManager: Angio Reconstruction", "[usreconstruction][integr
 	ReconstructManagerTestFixture fixture;
 	fixture.testAngioReconstruction();
 }
-TEST_CASE("ReconstructManager: ThunderGPU Reconstruction", "[usreconstruction][integration]")
+TEST_CASE("ReconstructManager: ThunderGPU Reconstruction", "[usreconstruction][integration][thunder]")
 {
 	ReconstructManagerTestFixture fixture;
 	fixture.testThunderGPUReconstruction();
@@ -357,6 +386,12 @@ TEST_CASE("ReconstructManager: Dual Angio", "[usreconstruction][integration]")
 {
 	ReconstructManagerTestFixture fixture;
 	fixture.testDualAngio();
+}
+
+TEST_CASE("ReconstructManager: TordTest", "[usreconstruction][integration][tordtest]")
+{
+	ReconstructManagerTestFixture fixture;
+	fixture.testTordTest();
 }
 
 void drawLineInImage(vtkImageDataPtr image, int value)
@@ -466,7 +501,6 @@ TEST_CASE("ReconstructManager: B-Mode with synthetic data", "[usreconstruction][
 //	std::cout << "Saved test file to: " << cx::DataLocations::getTestDataPath() << "/" << output->getFilePath() << std::endl;
 //	cx::DataManager::shutdown();
 }
-
 
 } // namespace cxtest
 
