@@ -44,14 +44,140 @@ typedef struct _close_plane
 #define isValidPixel(x, y, in_xsize, in_ysize) (x >= 0 && x < in_xsize && y >= 0 && y < in_ysize)
 
 
-/**
- * Find planes that are within radius of voxel.
- * Search in both directions in the plane array, starting at guess
- * The assumption is that as you move away from the guess,
- * the distance to this voxel will increase. That assumption may not always be true, for instance
- * if the US probe was swept back and forth.
- * 
-*/
+// Declare all the functions, as Apple seems to need that
+#if PLANE_METHOD == PLANE_HEURISTIC
+int
+findHighestIdx(close_plane_t *planes,
+               int n);
+int
+findClosePlanes(close_plane_t *close_planes,
+                __local float4* const plane_eqs,
+                __global float16* const plane_matrices,
+                const float4 voxel,
+                const float radius,
+                int* guess);
+#endif
+
+__global const unsigned char*
+getImageData(int plane_id,
+             __global const unsigned char* bscans_blocks[],
+             int in_xsize,
+             int in_ysize);
+
+float4
+transform(float16 matrix,
+                 float4 voxel);
+
+float4
+transform_inv(float16 matrix,
+                     float4 voxel);
+
+float2
+transform_inv_xy(float16 matrix, float4 voxel);
+
+void
+printMatrix(float16 matrix);
+
+void
+toImgCoord(int* x,
+           int* y,
+           float4 voxel,
+           float16 plane_matrix,
+           float in_xspacing,
+           float in_yspacing);
+
+void
+toImgCoord_float(float* x,
+                 float* y,
+                 float4 voxel,
+                 float16 plane_matrix,
+                 float in_xspacing,
+                 float in_yspacing);
+
+float
+bilinearInterpolation(float x,
+                      float y,
+                      const __global unsigned char* image,
+                      int in_xsize);
+
+#if METHOD == METHOD_VNN
+unsigned char
+performInterpolation_vnn(close_plane_t *close_planes,
+                         int n_close_planes,
+                         __global const float16  *plane_matrices,
+                         __local const float4 *plane_eqs,
+                         __global const unsigned char* bscans_blocks[],
+                         int in_xsize,
+                         int in_ysize,
+                         float in_xspacing,
+                         float in_yspacing,
+                         float4 voxel);
+
+#endif
+
+#if METHOD == METHOD_VNN2
+
+unsigned char
+performInterpolation_vnn2(close_plane_t *close_planes,
+                          int n_close_planes,
+                          __global const float16  *plane_matrices,
+                          __local const float4 *plane_eqs,
+                          __global const unsigned char* bscans_blocks[],
+                          int in_xsize,
+                          int in_ysize,
+                          float in_xspacing,
+                          float in_yspacing,
+                          float4 voxel);
+#endif
+
+#if METHOD == METHOD_DW
+
+unsigned char
+performInterpolation_dw(close_plane_t *close_planes,
+                        int n_close_planes,
+                        __global const float16  *plane_matrices,
+                        __local const float4 *plane_eqs,
+                        __global const unsigned char* bscans_blocks[],
+                        int in_xsize,
+                        int in_ysize,
+                        float in_xspacing,
+                        float in_yspacing,
+                        float4 voxel)
+#endif
+
+
+void
+prepare_plane_eqs(__global float16 *plane_matrices,
+                  __local float4 *plane_eqs);
+
+__kernel void
+voxel_methods(int volume_xsize,
+              int volume_ysize,
+              int volume_zsize,
+              float volume_xspacing,
+              float volume_yspacing,
+              float volume_zspacing,
+              int in_xsize,
+              int in_ysize,
+              float in_xspacing,
+              float in_yspacing,
+              // TODO: Wouldn't it be kind of nice if the bscans was an image sampler object?
+              __global unsigned char* in_bscans_b0,
+              __global unsigned char* in_bscans_b1,
+              __global unsigned char* in_bscans_b2,
+              __global unsigned char* in_bscans_b3,
+              __global unsigned char* in_bscans_b4,
+              __global unsigned char* in_bscans_b5,
+              __global unsigned char* in_bscans_b6,
+              __global unsigned char* in_bscans_b7,
+              __global unsigned char* in_bscans_b8,
+              __global unsigned char* in_bscans_b9,
+              __global unsigned char* out_volume,
+              __global float16 *plane_matrices,
+              __local float4 *plane_eqs,
+              float radius);
+	
+
 #if PLANE_METHOD == PLANE_HEURISTIC
 #define FIND_CLOSE_PLANES(a, b, c, d, e, f) findClosePlanes(a, b, c, d, e, f)
 
@@ -75,6 +201,14 @@ int findHighestIdx(close_plane_t *planes, int n)
 	
 
 
+/**
+ * Find planes that are within radius of voxel.
+ * Search in both directions in the plane array, starting at guess
+ * The assumption is that as you move away from the guess,
+ * the distance to this voxel will increase. That assumption may not always be true, for instance
+ * if the US probe was swept back and forth.
+ * 
+*/
 int
 findClosePlanes(close_plane_t *close_planes,
                 __local float4* const plane_eqs,
@@ -265,6 +399,7 @@ float4 transform(float16 matrix,
 	return ret;
 
 }
+
 float4 transform_inv(float16 matrix,
                      float4 voxel)
 {
@@ -523,14 +658,14 @@ performInterpolation_vnn2(close_plane_t *close_planes,
 
 unsigned char
 performInterpolation_dw(close_plane_t *close_planes,
-                          int n_close_planes,
-                          __global const float16  *plane_matrices,
-                          __local const float4 *plane_eqs,
-                          __global const unsigned char* bscans_blocks[],
-                          int in_xsize,
-                          int in_ysize,
-                          float in_xspacing,
-                          float in_yspacing,
+                        int n_close_planes,
+                        __global const float16  *plane_matrices,
+                        __local const float4 *plane_eqs,
+                        __global const unsigned char* bscans_blocks[],
+                        int in_xsize,
+                        int in_ysize,
+                        float in_xspacing,
+                        float in_yspacing,
                         float4 voxel)
 {
                                       
