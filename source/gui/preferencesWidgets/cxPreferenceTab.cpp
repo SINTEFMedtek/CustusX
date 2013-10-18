@@ -9,6 +9,7 @@
 #include "cxSettings.h"
 #include "cxViewManager.h"
 #include "cxMultiVolume3DRepProducer.h"
+#include "sscConfig.h"
 
 namespace cx
 {
