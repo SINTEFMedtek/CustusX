@@ -17,7 +17,7 @@ namespace cx
 // PreferencesTab
 //------------------------------------------------------------------------------
 
-PreferencesTab::PreferencesTab(QWidget *parent) :
+PreferenceTab::PreferenceTab(QWidget *parent) :
     QWidget(parent)
     //settings()(settings())
 {
@@ -34,7 +34,7 @@ PreferencesTab::PreferencesTab(QWidget *parent) :
 // PerformanceTab
 //------------------------------------------------------------------------------
 PerformanceTab::PerformanceTab(QWidget *parent) :
-    PreferencesTab(parent)
+		PreferenceTab(parent)
 {
 	mRenderingIntervalSpinBox = NULL;
 	mRenderingRateLabel = NULL;
