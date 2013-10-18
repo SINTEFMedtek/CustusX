@@ -30,7 +30,7 @@ namespace cx
 {
 
 VisualizationTab::VisualizationTab(QWidget *parent) :
-    PreferencesTab(parent), mStereoTypeActionGroup(NULL)
+		PreferenceTab(parent), mStereoTypeActionGroup(NULL)
 {
 	mMainLayout = NULL;
 	mStereoTypeComboBox = NULL;
@@ -181,7 +181,7 @@ void VisualizationTab::setBackgroundColorSlot(QColor color)
 // AutomationTab
 //------------------------------------------------------------------------------
 AutomationTab::AutomationTab(QWidget *parent) :
-    PreferencesTab(parent)
+		PreferenceTab(parent)
 {
 	mAutoSelectDominantToolCheckBox = NULL;
 	mAutoStartTrackingCheckBox = NULL;
@@ -267,7 +267,7 @@ void AutomationTab::saveParametersSlot()
 // UltrasoundTab
 //------------------------------------------------------------------------------
 VideoTab::VideoTab(QWidget *parent) :
-    PreferencesTab(parent)
+		PreferenceTab(parent)
 {
 	  mAcquisitionNameLineEdit = NULL;
 	  mMainLayout = NULL;
@@ -318,7 +318,7 @@ void VideoTab::saveParametersSlot()
 //------------------------------------------------------------------------------
 
 ToolConfigTab::ToolConfigTab(QWidget* parent) :
-    PreferencesTab(parent),
+		PreferenceTab(parent),
     mFilePreviewWidget(new FilePreviewWidget(this)),
     mImagePreviewWidget(new ToolImagePreviewWidget(this))
 {
@@ -466,7 +466,7 @@ void PreferencesDialog::applySlot()
   emit applied();
 }
 
-void PreferencesDialog::addTab(PreferencesTab* widget, QString name)
+void PreferencesDialog::addTab(PreferenceTab* widget, QString name)
 {
   widget->init();
   connect(mButtonBox, SIGNAL(accepted()), widget, SLOT(saveParametersSlot()));
@@ -492,7 +492,7 @@ void PreferencesDialog::addTab(PreferencesTab* widget, QString name)
 // UltrasoundTab
 //------------------------------------------------------------------------------
 DebugTab::DebugTab(QWidget *parent) :
-    PreferencesTab(parent)
+		PreferenceTab(parent)
 {
 	mIGSTKDebugLoggingCheckBox = NULL;
 	mManualToolPhysicalPropertiesCheckBox = NULL;
