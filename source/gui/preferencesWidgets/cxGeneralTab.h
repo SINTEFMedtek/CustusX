@@ -17,7 +17,7 @@ namespace cx
  * \author Ole Vegard Solberg, SINTEF
  * \author Frank Lindseth, SINTEF
  */
-class GeneralTab : public PreferencesTab
+class GeneralTab : public PreferenceTab
 {
   Q_OBJECT
 

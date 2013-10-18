@@ -387,11 +387,12 @@ class CustusX3(CppComponent):
         add('COTIRE_ENABLE_PRECOMPILED_HEADERS:BOOL', self.controlData.mUseCotire);
         add('SSC_USE_GCOV:BOOL', self.controlData.mCoverage);
         if self.controlData.force_connect_sublibraries:
-            self.forceConnectSublibraries()
+            self.forceConnectSublibraries(add)
         builder.configureCMake()
-    def forceConnectSublibraries(self):
-        builder = self._getBuilder()
-        add = builder.addCMakeOption
+    def forceConnectSublibraries(self, add):
+        print 'CustusX force connect sublibraries.'
+        #builder = self._getBuilder()
+        #add = builder.addCMakeOption
         add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
         add('CX_USE_LEVEL_SET:BOOL', platform.system() == 'Linux')
         add('CX_USE_TSF:BOOL', platform.system() != 'Windows');
