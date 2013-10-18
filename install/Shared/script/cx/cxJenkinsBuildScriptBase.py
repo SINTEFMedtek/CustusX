@@ -39,6 +39,7 @@ class JenkinsBuildScriptBase(cx.cxBuildScript.BuildScript):
     def setDefaults(self):                
         super(JenkinsBuildScriptBase, self).setDefaults()
         self.controlData().setBuildType("Release")
+        self.controlData().force_connect_sublibraries = True
         shell.setRedirectOutput(True)
            
     def addArgParsers(self):
