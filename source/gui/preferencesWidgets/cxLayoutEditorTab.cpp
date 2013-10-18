@@ -11,7 +11,7 @@ namespace cx
 {
 
 LayoutEditorTab::LayoutEditorTab(QWidget* parent) :
-  PreferencesTab(parent),
+	PreferenceTab(parent),
   mLayoutEditorWidget(new LayoutEditorWidget(this)),
   mLayoutLabel(new QLabel("Custom layouts: ")),
   mLayoutList(new QComboBox()),

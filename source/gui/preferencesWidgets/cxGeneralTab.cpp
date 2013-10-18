@@ -12,7 +12,7 @@ namespace cx
 {
 
 GeneralTab::GeneralTab(QWidget *parent) :
-    PreferencesTab(parent)
+		PreferenceTab(parent)
 {
 	mPatientDataFolderComboBox = NULL;
 	mToolConfigFolderComboBox = NULL;

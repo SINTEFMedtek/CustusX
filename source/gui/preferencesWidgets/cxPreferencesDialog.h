@@ -39,7 +39,7 @@ class ToolConfigureGroupBox;
  * @{
  */
 
-class VisualizationTab : public PreferencesTab
+class VisualizationTab : public PreferenceTab
 {
     Q_OBJECT
 public:
@@ -87,7 +87,7 @@ private slots:
  * \date Jan 27, 2011
  * \author Christian Askeland, SINTEF
  */
-class AutomationTab : public PreferencesTab
+class AutomationTab : public PreferenceTab
 {
   Q_OBJECT
 
@@ -119,7 +119,7 @@ protected:
  * \date Jan 27, 2011
  * \author Christian Askeland, SINTEF
  */
-class VideoTab : public PreferencesTab
+class VideoTab : public PreferenceTab
 {
   Q_OBJECT
 
@@ -165,7 +165,7 @@ protected:
  * \date Mar 22, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class ToolConfigTab : public PreferencesTab
+class ToolConfigTab : public PreferenceTab
 {
   Q_OBJECT
 
@@ -213,7 +213,7 @@ private slots:
   void applySlot();
 
 protected:
-  void addTab(PreferencesTab* widget, QString name);
+  void addTab(PreferenceTab* widget, QString name);
 
   QActionGroup* mActionGroup;
   QStackedWidget* mTabWidget;
@@ -227,7 +227,7 @@ protected:
  * \date Jan 24, 2012
  * \author Christian Askeland, SINTEF
  */
-class DebugTab : public PreferencesTab
+class DebugTab : public PreferenceTab
 {
   Q_OBJECT
 

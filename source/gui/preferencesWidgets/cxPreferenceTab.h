@@ -13,11 +13,11 @@ class QVBoxLayout;
 namespace cx
 {
 
-class PreferencesTab : public QWidget
+class PreferenceTab : public QWidget
 {
   Q_OBJECT
 public:
-  PreferencesTab(QWidget *parent = 0);
+	PreferenceTab(QWidget *parent = 0);
 
   virtual void init() = 0;
 
@@ -39,7 +39,7 @@ protected:
  * \date Mar 8, 2010
  * \author Ole Vegard Solberg, SINTEF
  */
-class PerformanceTab : public PreferencesTab
+class PerformanceTab : public PreferenceTab
 {
     Q_OBJECT
 
