@@ -76,7 +76,7 @@ public:
 	virtual void setVtkImageData(const vtkImageDataPtr& data);
 
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
-	virtual vtkImageDataPtr getGrayScaleBaseVtkImageData(); ///< as getBaseVtkImageData(), but constrained to 1 component if multicolor.
+	virtual vtkImageDataPtr getGrayScaleVtkImageData(); ///< as getBaseVtkImageData(), but constrained to 1 component if multicolor.
 	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the reference coordinate space
 	virtual LandmarkMap getLandmarks(); ///< \return all landmarks defined on the image.
 	/** Return a version of this, containing image data and transfer functions converted to unsigned.
@@ -195,6 +195,8 @@ private:
 	DoubleBoundingBox3D getInitialBoundingBox() const;
 
 	double computeResampleFactor(long maxVoxels);
+	void ConvertBaseGrayScaleImageDataImageToGrayScale();
+	void ConvertBaseGrayScaleImageDataImageTo8Bit();
 
 	ImageTF3DPtr mImageTransferFunctions3D;
 	ImageLUT2DPtr mImageLookupTable2D;

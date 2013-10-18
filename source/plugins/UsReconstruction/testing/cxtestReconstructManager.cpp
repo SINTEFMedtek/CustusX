@@ -170,7 +170,7 @@ void ReconstructManagerTestFixture::validateData(cx::ImagePtr output)
 	REQUIRE(output->getModality().contains("US"));
 	REQUIRE( output->getRange() != 0);//Just check if the output volume is empty
 
-	vtkImageDataPtr volume = output->getGrayScaleBaseVtkImageData();
+	vtkImageDataPtr volume = output->getGrayScaleVtkImageData();
 	unsigned char* volumePtr = reinterpret_cast<unsigned char*>(volume->GetScalarPointer());
 	REQUIRE(volumePtr); //Check if the pointer != NULL
 }
@@ -235,7 +235,7 @@ void ReconstructManagerTestFixture::validateBModeData(cx::ImagePtr bmodeOut)
 
 int ReconstructManagerTestFixture::getValue(cx::ImagePtr data, int x, int y, int z)
 {
-	vtkImageDataPtr volume = data->getGrayScaleBaseVtkImageData();
+	vtkImageDataPtr volume = data->getGrayScaleVtkImageData();
 	int val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(x,y,z));
 	return val;
 }
