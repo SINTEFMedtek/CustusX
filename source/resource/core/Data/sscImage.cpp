@@ -31,6 +31,7 @@
 #include <vtkImageChangeInformation.h>
 #include <vtkImageClip.h>
 #include <vtkImageIterator.h>
+#include <vtkImageCast.h>
 #include "sscImageTF3D.h"
 #include "sscBoundingBox3D.h"
 #include "sscImageLUT2D.h"
@@ -254,7 +255,10 @@ void Image::setVtkImageData(const vtkImageDataPtr& data)
 	emit vtkImageDataChanged();
 }
 
-vtkImageDataPtr Image::getGrayScaleBaseVtkImageData()
+//Create if needed
+//vtkImageDataPtr Image::get8bitGrayScaleVtkImageData()
+
+vtkImageDataPtr Image::getGrayScaleVtkImageData()
 {
 	if (mBaseGrayScaleImageData)
 	{
@@ -263,18 +267,34 @@ vtkImageDataPtr Image::getGrayScaleBaseVtkImageData()
 
 	mBaseGrayScaleImageData = getBaseVtkImageData();
 
-	// if the volume is color, run it through a luminance filter in order to get a
-	// finning grayscale representation.
-	if (mBaseGrayScaleImageData->GetNumberOfScalarComponents() > 2) // color
+	this->ConvertBaseGrayScaleImageDataImageToGrayScale();
+//	this->ConvertBaseGrayScaleImageDataImageTo8Bit();// Move to get8bitGrayScaleVtkImageData()
+
+	mBaseGrayScaleImageData->Update();
+	return mBaseGrayScaleImageData;
+}
+
+void Image::ConvertBaseGrayScaleImageDataImageToGrayScale()
+{
+	if (mBaseGrayScaleImageData->GetNumberOfScalarComponents() > 2)
 	{
 		vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
 		luminance->SetInput(mBaseGrayScaleImageData);
 		mBaseGrayScaleImageData = luminance->GetOutput();
 	}
-
-	mBaseGrayScaleImageData->Update();
-	return mBaseGrayScaleImageData;
 }
+
+void Image::ConvertBaseGrayScaleImageDataImageTo8Bit()
+{
+	if (mBaseGrayScaleImageData->GetScalarSize() > 8)
+		{
+			vtkImageCastPtr imageCast = vtkImageCastPtr::New();
+			imageCast->SetInput(mBaseGrayScaleImageData);
+			imageCast->SetOutputScalarTypeToUnsignedChar();
+			mBaseGrayScaleImageData = imageCast->GetOutput();
+		}
+}
+
 
 ImageTF3DPtr Image::getTransferFunctions3D()
 {
@@ -374,7 +394,7 @@ vtkImageAccumulatePtr Image::getHistogram()
 	{
 		mHistogramPtr = vtkImageAccumulatePtr::New();
 //		mHistogramPtr->SetInput(mBaseImageData);
-		mHistogramPtr->SetInput(this->getGrayScaleBaseVtkImageData());
+		mHistogramPtr->SetInput(this->getGrayScaleVtkImageData());
 		mHistogramPtr->IgnoreZeroOn(); // required for Sonowand CT volumes, where data are placed between 31K and 35K.
 		// Set up only a 1D histogram for now, so y and z values are set to 0
 		mHistogramPtr->SetComponentExtent(0, this->getRange(), 0, 0, 0, 0);
@@ -872,7 +892,7 @@ int Image::getInterpolationType() const
 vtkImageDataPtr Image::resample(long maxVoxels)
 {
 	// also use grayscale as vtk is incapable of rendering 3component color.
-	vtkImageDataPtr retval = this->getGrayScaleBaseVtkImageData();
+	vtkImageDataPtr retval = this->getGrayScaleVtkImageData();
 
 	double factor = computeResampleFactor(maxVoxels);
 
