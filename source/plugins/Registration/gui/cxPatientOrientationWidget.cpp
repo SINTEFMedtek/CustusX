@@ -68,20 +68,15 @@ PatientOrientationWidget::~PatientOrientationWidget()
 
 QString PatientOrientationWidget::defaultWhatsThis() const
 {
-  return "<html>"
-      "<h3>Set patient orientation using the navigation tool.</h3>"
-      "<p>"
-		"<p>"
-		"Only orientation of the reference space is changed - data is not moved."
-		"</p>"
-      "Align the Polaris tool so that the tools tip points towards the patients feet and the "
-      "markers face the same way as the patients nose. Click the button. Verify that the "
-      "figure in the upper left corner of the 3D view is correcly aligned."
-      "</p>"
-      "<p>"
-      "<b>Tip:</b> If the patient is orientated with the nose down towards the table, try using <i>back face</i>."
-      "</p>"
-      "</html>";
+	return "<html>"
+			"<h3>Set patient orientation using the navigation tool.</h3>"
+			"<p><b>Prerequisite:</b> Image registration.</p>"
+			"<p>Only orientation of the reference space is changed - data is not moved.</p>"
+			"Align the Polaris tool so that the tools tip points towards the patients feet and the "
+			"markers face the same way as the patients nose. Click the button. Verify that the "
+			"figure in the upper left corner of the 3D view is correcly aligned.</p>"
+			"<p><b>Tip:</b> If the patient is orientated with the nose down towards the table, try using <i>back face</i>.</p>"
+			"</html>";
 }
 
 //void PatientOrientationWidget::patientOrientationFrontFaceSlot()
