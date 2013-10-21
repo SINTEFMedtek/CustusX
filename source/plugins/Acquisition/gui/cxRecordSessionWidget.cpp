@@ -21,24 +21,32 @@ RecordSessionWidget::RecordSessionWidget(AcquisitionPtr base, QWidget* parent, Q
     mCancelButton(new QPushButton(QIcon(":/icons/open_icon_library/png/64x64/actions/process-stop-7.png"), "Cancel")),
     mDescriptionLine(new QLineEdit(defaultDescription))
 {
-  QVBoxLayout* layout = new QVBoxLayout(this);
-  layout->setMargin(0);
-  mDescriptionLabel = new QLabel("Description:");
-  layout->addWidget(mInfoLabel);
-  layout->addWidget(mDescriptionLabel);
-  layout->addWidget(mDescriptionLine);
-  layout->addWidget(mStartStopButton);
-  layout->addWidget(mCancelButton);
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	layout->setMargin(0);
+	mDescriptionLabel = new QLabel("Description:");
+	layout->addWidget(mInfoLabel);
+	layout->addWidget(mDescriptionLabel);
+	layout->addWidget(mDescriptionLine);
 
-  connect(mBase.get(), SIGNAL(stateChanged()), this, SLOT(recordStateChangedSlot()));
-  connect(mBase.get(), SIGNAL(readinessChanged()), this, SLOT(readinessChangedSlot()));
+	QHBoxLayout* buttonLayout = new QHBoxLayout();
 
-  mStartStopButton->setCheckable(true);
-  connect(mStartStopButton, SIGNAL(clicked(bool)), this, SLOT(startStopSlot(bool)));
-  connect(mCancelButton, SIGNAL(clicked(bool)), this, SLOT(cancelSlot()));
+	int buttonheight = mStartStopButton->sizeHint().height()*2.5;
+	mStartStopButton->setMinimumHeight(buttonheight);
+	mCancelButton->setMinimumHeight(buttonheight);
 
-  this->recordStateChangedSlot();
-  this->readinessChangedSlot();
+	buttonLayout->addWidget(mStartStopButton);
+	buttonLayout->addWidget(mCancelButton);
+	layout->addLayout(buttonLayout);
+
+	connect(mBase.get(), SIGNAL(stateChanged()), this, SLOT(recordStateChangedSlot()));
+	connect(mBase.get(), SIGNAL(readinessChanged()), this, SLOT(readinessChangedSlot()));
+
+	mStartStopButton->setCheckable(true);
+	connect(mStartStopButton, SIGNAL(clicked(bool)), this, SLOT(startStopSlot(bool)));
+	connect(mCancelButton, SIGNAL(clicked(bool)), this, SLOT(cancelSlot()));
+
+	this->recordStateChangedSlot();
+	this->readinessChangedSlot();
 }
 
 QString RecordSessionWidget::defaultWhatsThis() const
