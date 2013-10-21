@@ -144,7 +144,7 @@ public:
 	virtual bool getVisible() const;
 	virtual QString getUid() const;
 	virtual QString getName() const;
-	virtual int getIndex() const{return 0;};
+	virtual int getIndex() const{return 0;}
 	virtual bool isCalibrated() const;
 	virtual ProbePtr getProbe() const
 	{
@@ -165,8 +165,6 @@ public:
 		emit toolProbeSector();
 	}
 	virtual double getTimestamp() const { return getMilliSecondsSinceEpoch(); }
-	virtual TimedTransformMapPtr getPositionHistory() { return mPositionHistory; }
-	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime);
 
 	void startTracking(int interval=33);
 	void stopTracking();
@@ -196,7 +194,6 @@ private:
 	Transform3D* getNextTransform();
 	void createLinearMovement(std::vector<Transform3D>* retval, Transform3D* T_in, const Transform3D& R, const Vector3D& a, const Vector3D& b, double step) const;
 
-	TimedTransformMapPtr mPositionHistory;
 	vtkPolyDataPtr mPolyData;
 	bool mVisible;
 	Transform3D m_prMt;
