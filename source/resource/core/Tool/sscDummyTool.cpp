@@ -57,7 +57,6 @@ int DummyTool::mTransformCount = 0;
 
 
 DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
-    mPositionHistory(new TimedTransformMap()),
 	mVisible(false),
 	m_prMt(Transform3D::Identity()),
 	mTransformSaveFileName("DummyToolsAreToDumbToSaveThemselves"),
@@ -95,15 +94,6 @@ void DummyTool::setToolPositionMovementBB(const DoubleBoundingBox3D& bb)
 std::vector<Transform3D> DummyTool::getToolPositionMovement()
 {
 	return mTransforms;
-}
-
-TimedTransformMap DummyTool::getSessionHistory(double startTime, double stopTime)
-{
-	TimedTransformMap::iterator startIt = mPositionHistory->lower_bound(startTime);
-	TimedTransformMap::iterator stopIt = mPositionHistory->upper_bound(stopTime);
-
-	TimedTransformMap retval(startIt, stopIt);
-	return retval;
 }
 
 /**Use this to override the default movement pattern in the tool.

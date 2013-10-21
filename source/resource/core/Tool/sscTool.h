@@ -52,16 +52,16 @@ class Tool: public QObject
 	Q_OBJECT
 public:
 	Tool() :
-		mUid(""), mName("")
+		mUid(""), mName(""), mPositionHistory(new TimedTransformMap())
 	{
 	}
 	Tool(const QString& uid, const QString& name = "") :
-		mUid(uid), mName(name)
+		mUid(uid), mName(name), mPositionHistory(new TimedTransformMap())
 	{
 		if (name.isEmpty())
 			mName = uid;
 	}
-	;
+
 	virtual ~Tool()
 	{
 	}
@@ -114,7 +114,7 @@ public:
 
 	//	/**Saves the tools internal buffers of transforms and timestamps to file.
 	//	 */
-	virtual TimedTransformMapPtr getPositionHistory() { return TimedTransformMapPtr(); }
+	virtual TimedTransformMapPtr getPositionHistory() { return mPositionHistory; }
 	//	virtual void saveTransformsAndTimestamps() = 0;
 	//	/**Which file to use when calling saveTransformsAndTimestamps().
 	//	 */
@@ -142,7 +142,14 @@ public:
 	virtual std::map<int, Vector3D> getReferencePoints() const { return std::map<int, Vector3D>(); } ///< Get the optional reference points from this tool
 	virtual bool hasReferencePointWithId(int id) { Q_UNUSED(id); return false; }
 
-	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime) { Q_UNUSED(startTime); Q_UNUSED(stopTime); return TimedTransformMap(); } ///< Get a tools transforms from within a given session
+	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime)
+	{
+		TimedTransformMap::iterator startIt = mPositionHistory->lower_bound(startTime);
+		TimedTransformMap::iterator stopIt = mPositionHistory->upper_bound(stopTime);
+
+		TimedTransformMap retval(startIt, stopIt);
+		return retval;
+	}
 
 	virtual CoordinateSystem getSensorCoordinateSystem() { return CoordinateSystem(csSENSOR, this->getUid()); }
 	virtual CoordinateSystem getToolCoordinateSystem() { return CoordinateSystem(csTOOL, this->getUid()); }
@@ -163,6 +170,7 @@ signals:
 protected:
 	QString mUid;
 	QString mName;
+	TimedTransformMapPtr mPositionHistory;
 };
 typedef boost::shared_ptr<Tool> ToolPtr;
 } // namespace cx
