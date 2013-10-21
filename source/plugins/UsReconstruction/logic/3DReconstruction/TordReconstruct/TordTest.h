@@ -19,45 +19,105 @@ namespace cx
 
 
 /**
- * \brief Tords US test
+ * \brief OpenCL Implementation of three 3D Reconstruction algorithms
+ *
+ * This class contains the OpenCL boilerplate code necessary for using
+ * the TordTest set of reconstruction algorithms.
+ * As seen from CustusX, this is one algorithm - but the actual algorithm used
+ * is selectable by the DataAdapter given by getMethodOption() -
+ * which is also included in getSettings().
+ * The algorithms share a lot of common code, both CL boilerplate code as well as
+ * actual OpenCL kernel code.
  */
-
 class TordTest : public ReconstructAlgorithm
 {
 public:
 	TordTest();
 	virtual ~TordTest();
+
+	/**
+	 * Return the name of the algorithm
+	 */
 	virtual QString getName() const
 	{
 		return "TordTest";
 	}
-	
+	/**
+	 * Return a set of DataAdapters describing the algorithm settings.
+	 * @param root The root element of the settings for this algorithm
+	 * @return A vector containing all the settings for this algorithm
+	 */
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
+
+	/**
+	 * Reconstruction entry point.
+	 * @param input The processed input US data
+	 * @param outputData The volume will be stored here
+	 * @param settings The selected algorithms settings
+	 */
 	virtual bool reconstruct(ProcessedUSInputDataPtr input,
 	                         vtkImageDataPtr outputData,
 	                         QDomElement settings);
 
+
+protected:
+
+	/**
+	 * A representation of a Frame block in CPU memory.
+	 * Since OpenCL has an upper limit on how big memory objects can be, we need to
+	 * partition the input US images into several blocks. This struct represents
+	 * one such block
+	 */
 	typedef struct __frameBlock_t
 	{
 		unsigned char* data;
 		size_t length;
 	} frameBlock_t;
 
-protected:
-	
+	/**
+	 * Initialize OpenCL.
+	 * This function initializes OpenCL and builds the kernel with the given parameters.
+	 * Note that these parameters are set at compile time and not kernel run time.
+	 * Uses buildCLProgram() to build the kernel.
+	 * @param kernelFile Path to the OpenCL kernel source
+	 * @param nMaxPlanes The MAX_PLANES parameter of the kernel, i.e. max value of how many planes to include in the reconstruction of one voxel
+	 * @param nPlanes Number of image planes in the input data set
+	 * @param method The method ID. See kernels.ocl for more information
+	 * @param planeMethod the plane method ID. See kernels.ocl for more information
+	 * @return True on success
+	 * @sa buildCLProgram
+	 */
 	virtual bool initCL(QString kernelFile,
 	                    int nMaxPlanes,
 	                    int nPlanes,
 	                    int method,
 	                    int planeMethod);
 	
+	/**
+	 * Build the OpenCL kernel
+	 * @param program_src The kernel source code
+	 * @param nMaxPlanes The MAX_PLANES parameter of the kernel, i.e. max value of how many planes to include in the reconstruction of one voxel
+	 * @param nPlanes Number of image planes in the input data set
+	 * @param method The method ID. See kernels.ocl for more information
+	 * @param planeMethod the plane method ID. See kernels.ocl for more information
+	 * @param kernelPath The path of the kernel source code
+	 * @return True on suc
+	 */
 	virtual cl_program buildCLProgram(const char* program_src, 
 	                                  int nMaxPlanes,
 	                                  int nPlanes,
 	                                  int method,
 	                                  int planeMethod,
 	                                  QString kernelPath);
-	
+	/**
+	 * Perform GPU Reconstruction.
+	 * This function initializes the CL memory objects, calls the kernel and reads back the result,
+	 * which is stored in outputData. 
+	 * @param input The input US data
+	 * @param outputData The output volume is stored here
+	 * @param radius The radius of the kernel - i.e. how far away to look for image planes to use
+	 * @return true on success
+	 */	 
 	virtual bool doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                              vtkImageDataPtr outputData,
 	                              float radius);
@@ -74,40 +134,30 @@ protected:
 	virtual bool initializeFrameBlocks(frameBlock_t* framePointers,
 	                                   int numBlocks,
 	                                   ProcessedUSInputDataPtr inputFrames);
+	/**
+	 * Free a set of frame blocks allocated by initializeFrameBlocks
+	 * Does not free the actual frameBlock_t structure, but the data pointer is free'd.
+	 * You still have to free the frameBlocks!
+	 * @param framePointers Pointer to first element in array of frame blocks
+	 * @param numBlocks number of blocks in the array
+	 */
 	virtual void freeFrameBlocks(frameBlock_t* framePointers,
 	                             int numBlock);
+	
 
 	/**
-	 * Retrieve the plane equations into the array planeEqs.
-	 * The plane equations look like this: ax + by + cz + d = 0
-	 * This is represented by 4 floats for each plane, stored like this:
-	 * planeEqs[] = [ a0, b0, c0, d0, a1, b1, c1, d1, ... an, bn, cn, dn]
-	 * where n = nPlanes.
-	 * \param[out] planeEqs Pointer to float array of nPlanes*4
-	 *                      elements to store plane equations in
-	 * \param[in] input The US input to extract plane equations from
-	 */	 
-	virtual void fillPlaneEqs(float *planeEqs,
-	                          ProcessedUSInputDataPtr input);
-
-	/**
-	 * Retrieve the positions of the plane corners in 3d space and store them in planeCorners.
-	 * Each plane is stored with 3 corners (the 4th corner is implicitly defined by these),
-	 * and each corner is a 3d point.
-	 * The three stored corners are:
-	 *  Corner 1: (0,0) (Lower left)
-	 *  Corner 2: (x,0) (Lower right)
-	 *  Corner 3: (0,y) (Upper left)
-	 * This yields 9 values per plane, which are stored like this
-	 * planeCorners[] = [p0c1x, p0c1y, p0c1z, p0c2x, p0c2y, p0c2z, p0c3x, p0c3y, p0c3z,
-	 *                   p1c1x, p1c1y, p1c1z, p1c2x, p1c2y, p1c2z, p1c3x, p1c3y, p1c3z, ...]
-	 * where pXcYk = coordinate K of corner Y of plane X.
-	 * \param[out] planeCorners Pointer to float array of nPlanes*9 elements to store corners in
-	 * \param[in] input The US input to extract plane corners from
+	 * Fill the supplied array of floats with the values from the transformation matrices
+	 * in input.
+	 * The data is stored like this:
+	 *  [ a b c d
+	 *    e f g h    -> [ a b c d e f g h i j k l m n o p ]
+	 *    i j k l
+	 *    m n o p ]
+	 * I.e: 16 floats per image plane, row major.
+	 * @param planeMatrices Pointer to array of 16*number of image planes
+	 *                       floats where the matrices will be stored
+	 * @param input The US data - which also has position data
 	 */
-	virtual void fillPlaneCorners(float *planeCorners,
-	                              ProcessedUSInputDataPtr input);
-
 	virtual void fillPlaneMatrices(float *planeMatrices,
 	                               ProcessedUSInputDataPtr input);
 
@@ -147,8 +197,9 @@ protected:
 	 * @return List of available methods - with the selected one available by ->getValue()
 	 */
 	virtual StringDataAdapterXmlPtr getPlaneMethodOption(QDomElement root);
+	
 	/**
-	 * Make plane method option for the UI
+	 * Make max planes option for the UI
 	 * @param root The root of the configuration ui
 	 * @return List of available methods - with the selected one available by ->getValue()
 	 */
