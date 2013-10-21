@@ -56,9 +56,6 @@ TordTest::getMethodOption(QDomElement root)
 	                                        root);
 }
 
-
-
-
 StringDataAdapterXmlPtr
 TordTest::getPlaneMethodOption(QDomElement root)
 {
@@ -78,7 +75,6 @@ TordTest::getPlaneMethodOption(QDomElement root)
 	                                        root);
 }
 
-
 DoubleDataAdapterXmlPtr
 TordTest::getRadiusOption(QDomElement root)
 {
@@ -89,7 +85,6 @@ TordTest::getRadiusOption(QDomElement root)
 	                                        1,
 	                                        root);
 }
-
 
 DoubleDataAdapterXmlPtr
 TordTest::getMaxPlanesOption(QDomElement root)
@@ -102,9 +97,6 @@ TordTest::getMaxPlanesOption(QDomElement root)
 	                                     root);
 }
 
-
-
-
 int
 TordTest::getMethodID(QDomElement root)
 {
@@ -112,7 +104,6 @@ TordTest::getMethodID(QDomElement root)
 	            this->getMethodOption(root)->getValue()
 		) - mMethods.begin();
 }
-
 
 int
 TordTest::getPlaneMethodID(QDomElement root)
@@ -138,13 +129,15 @@ TordTest::initCL(QString kernelPath,
 	char* sSource = file2string(kernelPath.toLocal8Bit().data(),
 	                             &sourceLen);
 
-	
-	/*	cl_program clprogram = ocl_create_program(moClContext->context,
-	                                    moClContext->device,
-	                                    sSource, kernelPath); */
+	cl_program clprogram = this->buildCLProgram(sSource,
+	                                            nMaxPlanes,
+	                                            nPlanes,
+	                                            method,
+	                                            planeMethod,
+	                                            kernelPath);
 
-	cl_program clprogram = this->buildCLProgram(sSource, nMaxPlanes, nPlanes, method, planeMethod, kernelPath);
 	if(clprogram == NULL) return false;
+
 	mClKernel = ocl_kernel_build(clprogram,
 	                             moClContext->device, "voxel_methods");
 	return true;
@@ -168,10 +161,11 @@ TordTest::buildCLProgram(const char* program_src,
 	                                   &err);
 
 	ocl_check_error(err);
+
 	QString define = "-D MAX_PLANES=%1 -D N_PLANES=%2 -D METHOD=%3 -D PLANE_METHOD=%4";
 	define = define.arg(nMaxPlanes).arg(nPlanes).arg(method).arg(planeMethod);
-	err = clBuildProgram(retval, 0, NULL, define.toStdString().c_str(), 0, 0);
 
+	err = clBuildProgram(retval, 0, NULL, define.toStdString().c_str(), 0, 0);
 	
 	if (err != CL_SUCCESS)
 	{
@@ -199,7 +193,6 @@ TordTest::buildCLProgram(const char* program_src,
 
 }
 
-
 bool
 TordTest::initializeFrameBlocks(frameBlock_t* framePointers,
                                 int numBlocks,
@@ -209,23 +202,33 @@ TordTest::initializeFrameBlocks(frameBlock_t* framePointers,
 	Eigen::Array3i dims = inputFrames->getDimensions();
 	size_t frameSize = dims[0]*dims[1];
 	size_t numFrames = dims[2];
-	messageManager()->sendInfo(QString("Input dims: %1 %2 %3").arg(dims[0]).arg(dims[1]).arg(dims[2]));
+	messageManager()->sendInfo(QString("Input dims: %1 %2 %3")
+	                           .arg(dims[0])
+	                           .arg(dims[1])
+	                           .arg(dims[2]));
 
-	
-	// Find out how many frames needs to be in each block
+		// Find out how many frames needs to be in each block
 	size_t framesPerBlock = numFrames / numBlocks;
-	messageManager()->sendInfo(QString("Frames: %1 Blocks: %2 Frames per block: %3").arg(numFrames).arg(numBlocks).arg(framesPerBlock));
+	messageManager()->sendInfo(QString("Frames: %1 Blocks: %2 Frames per block: %3")
+	                           .arg(numFrames)
+	                           .arg(numBlocks)
+	                           .arg(framesPerBlock));
+	
 	// Some blocks will need to contain one extra frame
 	// (numFrames and numBlocks is probably not evenly divisible)
 	size_t numBigBlocks = numFrames % numBlocks;
-	messageManager()->sendInfo(QString("Allocating %1 big blocks").arg(numBigBlocks));
+	messageManager()->sendInfo(QString("Allocating %1 big blocks")
+	                           .arg(numBigBlocks));
+
 	// Allocate the big blocks
 	for(unsigned int block = 0; block < numBigBlocks; block++)
 	{
 		framePointers[block].length = (1+framesPerBlock)*frameSize;
 		framePointers[block].data = new unsigned char[framePointers[block].length];
 	}
-	messageManager()->sendInfo(QString("Allocating %1 small blocks").arg(numBlocks-numBigBlocks));
+	messageManager()->sendInfo(QString("Allocating %1 small blocks")
+	                           .arg(numBlocks-numBigBlocks));
+
 	// Then the small ones
 	for(int block = numBigBlocks; block < numBlocks; block++)
 	{
@@ -265,6 +268,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	// Allocate CL memory for each frame block
 	cl_mem *clBlocks = new cl_mem[numBlocks];
 	messageManager()->sendInfo("Allocating CL input block buffers");
+
 	for(int i = 0; i < numBlocks; i++)
 	{
 		clBlocks[i] = ocl_create_buffer(moClContext->context,
@@ -273,6 +277,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 		                                inputBlocks[i].data);
 		                                
 	}
+
 	// Free the local frameblock buffers
 	this->freeFrameBlocks(inputBlocks, numBlocks);
 	delete [] inputBlocks;
@@ -283,16 +288,16 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	
 	size_t outputVolumeSize =
 		outputDims[0]*outputDims[1]*outputDims[2]*sizeof(unsigned char);
-	messageManager()->sendInfo(QString("Allocating CL output buffer, size %1").arg(outputVolumeSize));
+
+	messageManager()->sendInfo(QString("Allocating CL output buffer, size %1")
+	                           .arg(outputVolumeSize));
 	cl_mem clOutputVolume = ocl_create_buffer(moClContext->context,
 	                                          CL_MEM_WRITE_ONLY,
 	                                          outputVolumeSize,
 	                                          NULL);
 
-	// FIXME: Fill plane eqs
-
+	// Fill the plane matrices
 	size_t nPlanes = input->getDimensions()[2];
-
 
 	float *planeMatrices = new float[16*nPlanes];
 
@@ -308,26 +313,37 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	
 	// Set kernel args
 	int arg = 0;
+	// volume_xsize
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &outputDims[0]));
+	// volume_ysize
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &outputDims[1]));
+	// volume_zsize
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &outputDims[2]));
+	
 	double *out_spacing = outputData->GetSpacing();
 	float spacings[3];
 	spacings[0] = out_spacing[0];
 	spacings[1] = out_spacing[1];
 	spacings[2] = out_spacing[2];
-
-	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[0]));
-	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[1]));
-	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[2]));
 	
-	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[0]));
-	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[1]));
+	// volume_xspacing
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[0]));
+	// volume_yspacing
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[1]));
+	// volume_zspacing
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[2]));
 
+	// in_xsize
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[0]));
+	// in_ysize
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[1]));
+	
 	spacings[0] = input->getSpacing()[0];
 	spacings[1] = input->getSpacing()[1];
-	
+
+	// in_xspacing
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[0]));
+	// in_yspacing
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[1]));
 	
 	// The input blocks
@@ -335,16 +351,16 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	{
 		ocl_check_error(clSetKernelArg(mClKernel, arg++,sizeof(cl_mem),&clBlocks[i]));
 	}
-	// The output volume
+	
+	// out_volume
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clOutputVolume));
-	/*
-	// Plane equations
-	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clPlaneEqs));
-	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clPlaneCorners));
-	*/
+	// plane_matrices
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clPlaneMatrices));
+
+	// plane_eqs (local CL memory, will be calculated by the kernel)
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float)*4*nPlanes, NULL));
-		
+
+	// radius
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &radius));
 
 
@@ -352,9 +368,11 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	size_t local_work_size = 128;
 	
 	size_t global_work_size = (outputDims[0]*outputDims[2]);
-	                           
+
+	// Round global_work_size up to nearest multiple of local_work_size
 	if(global_work_size % local_work_size)
 		global_work_size = ((global_work_size/local_work_size) + 1)*local_work_size;
+
 	
 	messageManager()->sendInfo(QString("Executing kernel"));
 	ocl_check_error(clEnqueueNDRangeKernel(moClContext->cmd_queue,
@@ -382,7 +400,9 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	{
 		messageManager()->sendInfo(QString((std::string("Got exception: ") + except).c_str()));
 	}
+
 	messageManager()->sendInfo(QString("Done, freeing GPU memory"));
+
 	// Free the allocated cl memory objects
 	for(int i = 0; i < numBlocks; i++)
 	{
@@ -391,106 +411,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	ocl_check_error(clReleaseMemObject(clOutputVolume));
 	ocl_check_error(clReleaseMemObject(clPlaneMatrices));
 	
-	
 	return true;
-}
-
-void
-TordTest::fillPlaneEqs(float *planeEqs,
-                       ProcessedUSInputDataPtr input)
-{
-	std::vector<TimedPosition> vecPosition = input->getFrames();
-	
-	// Sanity check on the number of frames
-	if(input->getDimensions()[2] != vecPosition.end() - vecPosition.begin())
-	{
-		messageManager()->sendError(QString("Number of frames %1 != %2 dimension 2 of US input")
-		                            .arg(input->getDimensions()[2])
-		                            .arg(vecPosition.end() - vecPosition.begin()));
-		return;
-	}
-	int i = 0;
-	for(std::vector<TimedPosition>::iterator it = vecPosition.begin();
-	    it != vecPosition.end(); it++)
-	{
-		// FIXME: This should be a separate function.
-		Transform3D pos = it->mPos;
-		// Pos is a transformation matrix. This means that the Z component of its
-		// rotational matrix is a normal unit vector to the plane.
-		float a, b, c, d;
-		a = pos(0,2);
-		b = pos(1,2);
-		c = pos(2,2);
-
-		d = -(a*pos(0,3) + b*pos(1,3) + c*pos(2,3));
-
-		planeEqs[i++] = a;
-		planeEqs[i++] = b;
-		planeEqs[i++] = c;
-		planeEqs[i++] = d;
-		
-	}
-}
-
-void
-TordTest::fillPlaneCorners(float *planeCorners,
-                           ProcessedUSInputDataPtr input)
-{
-	std::vector<TimedPosition> vecPosition = input->getFrames();
-	
-	// Sanity check on the number of frames
-	if(input->getDimensions()[2] != vecPosition.end() - vecPosition.begin())
-	{
-		messageManager()->sendError(QString("Number of frames %1 != %2 dimension 2 of US input")
-		                            .arg(input->getDimensions()[2])
-		                            .arg(vecPosition.end() - vecPosition.begin()));
-		return;
-	}
-	Eigen::Array3i dims = input->getDimensions();
-	Vector3D spacings = input->getSpacing();
-	int i = 0;
-	// Corners in image space
-	Vector3D iCorner_0_0, iCorner_x_0, iCorner_0_y;
-	// Corners in volume space
-	Vector3D vCorner_0_0, vCorner_x_0, vCorner_0_y;
-
-	iCorner_0_0(0) = 0.0;
-	iCorner_0_0(1) = 0.0;
-	iCorner_0_0(2) = 0.0;
-	
-	iCorner_x_0(0) = dims[0]*spacings(0);
-	iCorner_x_0(1) = 0.0;
-	iCorner_x_0(2) = 0.0;
-
-	iCorner_0_y(0) = 0.0;
-	iCorner_0_y(1) = dims[1]*spacings(1);
-	iCorner_0_y(2) = 0.0;
-	
-	for(std::vector<TimedPosition>::iterator it = vecPosition.begin();
-	    it != vecPosition.end();
-	    it++)
-	{
-		// Transform the image space corner positions into world volume space
-		// TODO: Maybe the GPU should be doing this?
-		Transform3D pos = it->mPos;
-		vCorner_0_0 = pos * iCorner_0_0;
-		vCorner_x_0 = pos * iCorner_x_0;
-		vCorner_0_y = pos * iCorner_0_y;
-
-		// Now store the result in the output
-		planeCorners[i++] = vCorner_0_0(0);
-		planeCorners[i++] = vCorner_0_0(1);
-		planeCorners[i++] = vCorner_0_0(2);
-
-		planeCorners[i++] = vCorner_x_0(0);
-		planeCorners[i++] = vCorner_x_0(1);
-		planeCorners[i++] = vCorner_x_0(2);
-
-		planeCorners[i++] = vCorner_0_y(0);
-		planeCorners[i++] = vCorner_0_y(1);
-		planeCorners[i++] = vCorner_0_y(2);
-		
-	}
 }
 
 void
@@ -558,12 +479,15 @@ TordTest::reconstruct(ProcessedUSInputDataPtr input,
 	       method,
 	       planeMethod
 		   )) return false;
-	bool ret = 	doGPUReconstruct(input, outputData, radius );
+
+	bool ret = doGPUReconstruct(input, outputData, radius );
+
 	if(moClContext != NULL)
 	{
 		ocl_release(moClContext);
 		moClContext = NULL;
 	}
+	
 	return ret;
 }
 
