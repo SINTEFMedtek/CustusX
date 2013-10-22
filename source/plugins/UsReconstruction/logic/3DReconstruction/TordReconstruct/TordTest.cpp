@@ -308,7 +308,14 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                                           nPlanes*sizeof(float)*16,
 	                                           planeMatrices);
 
-	                                           
+	// US Probe mask
+
+	cl_mem clMask = ocl_create_buffer(moClContext->context,
+	                                  CL_MEM_READ_ONLY,
+	                                  sizeof(cl_uchar)*
+	                                  input->getDimensions()[0]*input->getDimensions()[1],
+	                                  input->getMask()->GetScalarPointer());
+	
 
 	
 	// Set kernel args
@@ -356,6 +363,10 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clOutputVolume));
 	// plane_matrices
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clPlaneMatrices));
+
+
+	// US Probe mask
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clMask));	
 
 	// plane_eqs (local CL memory, will be calculated by the kernel)
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float)*4*nPlanes, NULL));
@@ -410,6 +421,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	}
 	ocl_check_error(clReleaseMemObject(clOutputVolume));
 	ocl_check_error(clReleaseMemObject(clPlaneMatrices));
+	ocl_check_error(clReleaseMemObject(clMask));
 	
 	return true;
 }
