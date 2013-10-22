@@ -20,10 +20,13 @@ bool ProcessWrapperFixture::canLaunchGit_Version()
 
 #if defined CX_WINDOWS
 	exe->launch("\"C:\\Program Files (x86)\\Git\\cmd\\git.cmd\"", QStringList("--version"));
-#elif defined CX_LINUX
-	exe->launch("/usr/bin/git", QStringList("--version"));
-#elif defined CX_APPLE
-	exe->launch("/opt/local/bin/git", QStringList("--version"));
+#else
+	QString location1 = "/usr/bin/git";
+	QString location2 = "/opt/local/bin/git";
+	if(QFile::exists(location1))
+		exe->launch(location1, QStringList("--version"));
+	else if(QFile::exists(location2))
+		exe->launch(location2, QStringList("--version"));
 #endif
 
 	return getResultFromFinishedExecution(exe);
