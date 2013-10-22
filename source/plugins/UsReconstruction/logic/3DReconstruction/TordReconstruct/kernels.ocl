@@ -42,13 +42,11 @@
 
 #define projectOntoPlaneEq(voxel, eq, dist) (voxel - dist*(eq))
 
-#define isValidPixel(x, y, mask, in_xsize, in_ysize) ((x) >= 0 \
-                                                      && (x) < in_xsize \
-                                                      && (y) >= 0 \
-                                                      && (y) < in_ysize \
-                                                      && mask[in_xsize*(y) + (x)])
-
+#define isInside(x, size) ((x) >= 0 && (x) < (size))
+#define isNotMasked(x, y, mask, xsize) ((mask)[(x) + (y)*(xsize)] > 0)
+                                     
 #define VOXEL(v,x,y,z) v[x + y*volume_xsize + z*volume_ysize*volume_xsize]
+
 
 /**************/
 /* End macros */
@@ -73,6 +71,14 @@ typedef struct _close_plane
 /********************/
 
 // Declare all the functions, as Apple seems to need that
+
+
+int isValidPixel(int x,
+                 int y,
+                 const __global unsigned char* mask,
+                 int in_xsize,
+                 int in_ysize);
+
 #if PLANE_METHOD == PLANE_HEURISTIC
 int
 findHighestIdx(close_plane_t *planes,
@@ -181,7 +187,7 @@ performInterpolation_dw(close_plane_t *close_planes,
                         float in_xspacing,
                         float in_yspacing,
                         __global const unsigned char* mask,
-                        float4 voxel)
+                        float4 voxel);
 #endif
 
 void
@@ -221,6 +227,20 @@ voxel_methods(int volume_xsize,
 /******************/
 /* End prototypes */
 /******************/
+
+
+
+int isValidPixel(int x,
+                 int y,
+                 const __global unsigned char* mask,
+                 int in_xsize,
+                 int in_ysize)
+{
+	return (isInside(x, in_xsize)
+	        && isInside(y, in_ysize)
+	        && isNotMasked(x, y, mask, in_xsize));
+
+}
 
 #if PLANE_METHOD == PLANE_HEURISTIC
 #define FIND_CLOSE_PLANES(a, b, c, d, e, f) findClosestPlanes_heuristic(a, b, c, d, e, f)
