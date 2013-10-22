@@ -789,7 +789,7 @@ performInterpolation_vnn2(close_plane_t *close_planes,
 	}		
 
 	
-	return (unsigned char) (val / scale);
+	return max((unsigned char)1, (unsigned char) (val / scale));
 	
 }
 #endif
@@ -869,7 +869,7 @@ performInterpolation_dw(close_plane_t *close_planes,
 	}		
 
 	
-	return (unsigned char) (val / scale);
+	return max((unsigned char)1, (unsigned char) (val / scale));
 	
 }
 #endif
