@@ -1,0 +1,90 @@
+#include "cxProcessReporter.h"
+
+#include "sscLogger.h"
+#include "sscMessageManager.h"
+
+namespace cx
+{
+ProcessReporter::ProcessReporter(QProcess* process, QString name) :
+		mName(name)
+{
+	SSC_ASSERT(process);
+	mProcess = process;
+
+	connect(mProcess, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(processStateChanged(QProcess::ProcessState)));
+	connect(mProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
+	connect(mProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished(int, QProcess::ExitStatus)));
+	connect(mProcess, SIGNAL(readyRead()), this, SLOT(processReadyRead()));
+}
+
+ProcessReporter::~ProcessReporter()
+{
+	disconnect(mProcess, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(processStateChanged(QProcess::ProcessState)));
+	disconnect(mProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
+	disconnect(mProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished(int, QProcess::ExitStatus)));
+	disconnect(mProcess, SIGNAL(readyRead()), this, SLOT(processReadyRead()));
+}
+
+void ProcessReporter::processReadyRead()
+{
+	messageManager()->sendInfo(QString(mProcess->readAllStandardOutput()));
+}
+
+void ProcessReporter::processStateChanged(QProcess::ProcessState newState)
+{
+	if (newState == QProcess::Running)
+	{
+		messageManager()->sendInfo(QString("%1 running.").arg(mName));
+	}
+	if (newState == QProcess::NotRunning)
+	{
+		messageManager()->sendInfo(QString("%1 not running.").arg(mName));
+	}
+	if (newState == QProcess::Starting)
+	{
+		messageManager()->sendInfo(QString("%1 starting.").arg(mName));
+	}
+}
+
+void ProcessReporter::processError(QProcess::ProcessError error)
+{
+	QString msg;
+	msg += QString("%1 reported an error: ").arg(mName);
+
+	switch (error)
+	{
+	case QProcess::FailedToStart:
+		msg += "Failed to start";
+		break;
+	case QProcess::Crashed:
+		msg += "Crashed";
+		break;
+	case QProcess::Timedout:
+		msg += "Timed out";
+		break;
+	case QProcess::WriteError:
+		msg += "Write Error";
+		break;
+	case QProcess::ReadError:
+		msg += "Read Error";
+		break;
+	case QProcess::UnknownError:
+		msg += "Unknown Error";
+		break;
+	default:
+		msg += "Invalid error";
+	}
+
+	messageManager()->sendError(msg);
+}
+
+void ProcessReporter::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+	QString msg = QString("%1 exited with exit status %3. (%1 last exit code was %4.)").arg(mName).arg(exitStatus).arg(exitCode);
+	if(exitStatus == 0)
+		messageManager()->sendSuccess(msg);
+	else
+		messageManager()->sendError(msg);
+}
+
+} /* namespace cx */
