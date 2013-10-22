@@ -63,6 +63,7 @@ private slots:
 	void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
+	QString getExecutableInBundlesAbsolutePath(QString exeInBundle);
 	void internalLaunch(QString executable, QStringList arguments);
 	QProcess* mProcess;
 	QString mName;

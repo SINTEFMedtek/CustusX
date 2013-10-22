@@ -48,16 +48,9 @@ QProcess* ProcessWrapper::getProcess()
 
 void ProcessWrapper::launchWithRelativePath(QString executable, QStringList arguments)
 {
-	if (!QFileInfo(executable).isAbsolute())
-		executable = DataLocations::getBundlePath() + "/" + executable;
+	QString absolutePathToExe = this->getExecutableInBundlesAbsolutePath(executable);
 
-	executable = executable.trimmed();
-	executable = QDir::cleanPath(executable);
-
-	if (!QFileInfo(executable).exists())
-		messageManager()->sendError(QString("Cannot find %1 [%2]").arg(mName).arg(executable));
-
-	this->launch(executable, arguments);
+	this->launch(absolutePathToExe, arguments);
 }
 
 void ProcessWrapper::launch(QString executable, QStringList arguments)
@@ -142,6 +135,22 @@ void ProcessWrapper::processFinished(int exitCode, QProcess::ExitStatus exitStat
 		messageManager()->sendError(msg);
 }
 
+QString ProcessWrapper::getExecutableInBundlesAbsolutePath(QString exeInBundle)
+{
+	QString absolutePathToExe = exeInBundle;
+
+	if (!QFileInfo(absolutePathToExe).isAbsolute())
+		absolutePathToExe = DataLocations::getBundlePath() + "/" + absolutePathToExe;
+
+	absolutePathToExe = absolutePathToExe.trimmed();
+	absolutePathToExe = QDir::cleanPath(absolutePathToExe);
+
+	if (!QFileInfo(absolutePathToExe).exists())
+		messageManager()->sendError(QString("Cannot find %1 [%2]").arg(mName).arg(absolutePathToExe));
+
+	return absolutePathToExe;
+}
+
 void ProcessWrapper::internalLaunch(QString executable, QStringList arguments)
 {
 	if(this->isRunning())
@@ -154,8 +163,6 @@ void ProcessWrapper::internalLaunch(QString executable, QStringList arguments)
 	else
 		mProcess->start(executable, arguments);
 
-	//This is a bug
-//	mProcess->waitForStarted();
 	mLastExecutablePath = executable;
 }
 
