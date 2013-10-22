@@ -15,6 +15,8 @@ if (BUILD_TESTING)
         cxtestImageParameters.cpp
 		cxtestCatchImageAlgorithms.cpp
 		cxtestCatchProcessWrapper.cpp
+		cxtestProcessWrapperFixture.h
+		cxtestProcessWrapperFixture.cpp
 		cxtestCatchVLCRecorder.cpp
 		)
 

@@ -13,7 +13,7 @@ namespace cx
 {
 
 GeneralTab::GeneralTab(QWidget *parent) :
-    PreferencesTab(parent), mVLCPath("")
+		PreferenceTab(parent), mVLCPath("")
 {
 	mPatientDataFolderComboBox = NULL;
 	mVLCPathComboBox = NULL;

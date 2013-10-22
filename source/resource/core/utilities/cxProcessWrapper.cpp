@@ -154,7 +154,8 @@ void ProcessWrapper::internalLaunch(QString executable, QStringList arguments)
 	else
 		mProcess->start(executable, arguments);
 
-	mProcess->waitForStarted();
+	//This is a bug
+//	mProcess->waitForStarted();
 	mLastExecutablePath = executable;
 }
 
