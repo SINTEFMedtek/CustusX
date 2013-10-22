@@ -31,19 +31,23 @@ public slots:
 
 private slots:
   void browsePatientDataFolderSlot();
+  void browseVLCPathSlot();
 
   void currentApplicationChangedSlot(int index);
   void applicationStateChangedSlot();
 
 private:
   void setApplicationComboBox();
+  void searchForVLC(QStringList searchPaths = QStringList());
 
   QComboBox* mPatientDataFolderComboBox;
+  QComboBox* mVLCPathComboBox;
 
   QComboBox* mToolConfigFolderComboBox;
   QComboBox* mChooseApplicationComboBox;
 
   QString mGlobalPatientDataFolder;
+  QString mVLCPath;
 };
 } /* namespace cx */
 #endif /* CXGENERALTAB_H_ */

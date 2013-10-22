@@ -31,6 +31,8 @@ public:
 	void waitForStarted();
 	void waitForFinished();
 
+	QString getVLCPath();
+
 public slots:
 	void startRecording(QString saveFile);
 	void stopRecording();

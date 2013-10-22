@@ -60,6 +60,11 @@ void VLCRecorder::waitForFinished()
 	mCommandLine->getProcess()->waitForFinished();
 }
 
+QString VLCRecorder::getVLCPath()
+{
+	return mVLCPath;
+}
+
 void VLCRecorder::startRecording(QString saveFile)
 {
 	if(this->hasVLCApplication())
