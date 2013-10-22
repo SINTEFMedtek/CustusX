@@ -16,7 +16,11 @@
 
 #include <QProcess>
 #include "cxProcessWrapper.h"
+#include "cxtestProcessWrapperFixture.h"
 #include "sscMessageManager.h"
+
+namespace cxtest
+{
 
 TEST_CASE("ProcessWrapper can be constructed", "[unit][resource][core][ProcessWrapper]")
 {
@@ -26,48 +30,20 @@ TEST_CASE("ProcessWrapper can be constructed", "[unit][resource][core][ProcessWr
 
 TEST_CASE("ProcessWrapper can handle launching of not existing executables", "[unit][resource][core][ProcessWrapper]")
 {
-	cx::MessageManager::initialize();
-
-	cx::ProcessWrapperPtr exe(new cx::ProcessWrapper());
-	exe->launch("dummy");
-
-	REQUIRE(exe->getProcess());
-	exe->getProcess()->waitForFinished();
-
-	CHECK(exe->getProcess()->exitCode() == 0);
-
-	cx::MessageManager::shutdown();
+	bool success = ProcessWrapperFixture::canLaunchNotExistingExecutable();
+	CHECK_FALSE(success);
 }
 
-TEST_CASE("ProcessWrapper can check git version", "[unit][resource][core][ProcessWrapper]")
+TEST_CASE("ProcessWrapper can check git -version", "[unit][resource][core][ProcessWrapper]")
 {
-	cx::MessageManager::initialize();
-
-	cx::ProcessWrapperPtr exe(new cx::ProcessWrapper());
-	//TODO win/linux
-	//Windows: exe->launch("\"C:\\Program Files (x86)\\Git\\cmd\\git.cmd\"", QStringList("--version"));
-	//Linux: exe->launch("", QStringList("--version"));
-	exe->launch("/opt/local/bin/git", QStringList("--version"));
-
-	REQUIRE(exe->getProcess());
-	exe->getProcess()->waitForFinished();
-
-	CHECK(exe->getProcess()->exitStatus() == 0);
-
-	cx::MessageManager::shutdown();
+	bool success = ProcessWrapperFixture::canLaunchGit_Version();
+	CHECK(success);
 }
 
-TEST_CASE("ProcessWrapper can run VLC", "[unit][resource][core][ProcessWrapper][VLC]")
+TEST_CASE("ProcessWrapper can run VLC -version", "[unit][resource][core][ProcessWrapper][VLC]")
 {
-	cx::MessageManager::initialize();
-
-	cx::ProcessWrapperPtr exe(new cx::ProcessWrapper());
-	exe->launch("/Applications/VLC.app/Contents/MacOS/VLC", QStringList("--version"));
-
-	REQUIRE(exe->getProcess());
-	exe->getProcess()->waitForFinished();
-
-	CHECK(exe->getProcess()->exitStatus() == 0);
-
-	cx::MessageManager::shutdown();
+	bool success = ProcessWrapperFixture::canLaunchVLC_Version();
+	CHECK(success);
 }
+
+} //namespace cxtest
