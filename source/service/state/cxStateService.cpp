@@ -28,6 +28,7 @@
 #include "cxViewWrapper3D.h"
 #include "cxDataLocations.h"
 #include "cxConfig.h"
+#include "cxVLCRecorder.h"
 
 namespace cx
 {
@@ -290,6 +291,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("renderingInterval", 33);
 	this->fillDefault("backgroundColor", QColor("black"));
 	this->fillDefault("globalPatientDataFolder", QDir::homePath() + "/Patients");
+	this->fillDefault("vlcPath", vlc()->getVLCPath());
 	this->fillDefault("globalApplicationName", enum2string(mdLABORATORY));
 	this->fillDefault("globalPatientNumber", 1);
 	this->fillDefault("Ultrasound/acquisitionName", "US-Acq");
