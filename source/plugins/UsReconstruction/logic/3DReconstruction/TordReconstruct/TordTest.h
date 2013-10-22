@@ -59,6 +59,34 @@ public:
 	                         vtkImageDataPtr outputData,
 	                         QDomElement settings);
 
+	/**
+	 * Make method option for the UI
+	 * @param root The root of the configuration ui
+	 * @return List of available methods - with the selected one available by ->getValue()
+	 */
+	virtual StringDataAdapterXmlPtr getMethodOption(QDomElement root);
+	
+	/**
+	 * Make radius option for the UI
+	 * @param root The root of the configuration ui
+	 * @return Radius data adapter - with selected value available by ->getValue()
+	 */
+	virtual DoubleDataAdapterXmlPtr getRadiusOption(QDomElement root);
+
+	
+	/**
+	 * Make plane method option for the UI
+	 * @param root The root of the configuration ui
+	 * @return List of available methods - with the selected one available by ->getValue()
+	 */
+	virtual StringDataAdapterXmlPtr getPlaneMethodOption(QDomElement root);
+	
+	/**
+	 * Make max planes option for the UI
+	 * @param root The root of the configuration ui
+	 * @return List of available methods - with the selected one available by ->getValue()
+	 */
+	virtual DoubleDataAdapterXmlPtr getMaxPlanesOption(QDomElement root);
 
 protected:
 
@@ -176,36 +204,6 @@ protected:
 	 */
 	virtual int getPlaneMethodID(QDomElement root);
 
-	/**
-	 * Make method option for the UI
-	 * @param root The root of the configuration ui
-	 * @return List of available methods - with the selected one available by ->getValue()
-	 */
-	virtual StringDataAdapterXmlPtr getMethodOption(QDomElement root);
-	
-	/**
-	 * Make radius option for the UI
-	 * @param root The root of the configuration ui
-	 * @return Radius data adapter - with selected value available by ->getValue()
-	 */
-	virtual DoubleDataAdapterXmlPtr getRadiusOption(QDomElement root);
-
-	
-	/**
-	 * Make plane method option for the UI
-	 * @param root The root of the configuration ui
-	 * @return List of available methods - with the selected one available by ->getValue()
-	 */
-	virtual StringDataAdapterXmlPtr getPlaneMethodOption(QDomElement root);
-	
-	/**
-	 * Make max planes option for the UI
-	 * @param root The root of the configuration ui
-	 * @return List of available methods - with the selected one available by ->getValue()
-	 */
-	virtual DoubleDataAdapterXmlPtr getMaxPlanesOption(QDomElement root);
-
-	
 	/// OpenCL handles
 	cl_kernel mClKernel;
 	std::vector<cl_mem> mVClMemBscan;
