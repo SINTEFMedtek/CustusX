@@ -50,14 +50,14 @@ bool VLCRecorder::isRecording()
 	return mCommandLine->isRunning();
 }
 
-void VLCRecorder::waitForStarted()
+bool VLCRecorder::waitForStarted()
 {
-	mCommandLine->getProcess()->waitForStarted();
+	return mCommandLine->getProcess()->waitForStarted();
 }
 
-void VLCRecorder::waitForFinished()
+bool VLCRecorder::waitForFinished()
 {
-	mCommandLine->getProcess()->waitForFinished();
+	return mCommandLine->getProcess()->waitForFinished();
 }
 
 QString VLCRecorder::getVLCPath()
@@ -68,7 +68,7 @@ QString VLCRecorder::getVLCPath()
 void VLCRecorder::startRecording(QString saveFile)
 {
 	if(this->hasVLCApplication())
-		mCommandLine->launch(mVLCPath+" -I hotkeys -vvv screen:// \":sout=#transcode{vcodec=h264,vb=800,fps=10,scale=1,acodec=none}:duplicate{dst=standard{access=,mux=mp4,dst="+saveFile+"}}\"");
+		mCommandLine->launch(mVLCPath+this->getVLCDefaultArguments(saveFile));
 	else
 		messageManager()->sendError("VLC not found.");
 }
@@ -105,6 +105,21 @@ QString VLCRecorder::getVLCDefaultLocation()
 	defaultLocation = "/usr/bin/vlc";
 #endif
 	return defaultLocation;
+}
+
+QString VLCRecorder::getVLCDefaultArguments(QString saveFile)
+{
+	QString defaultArguements("");
+#ifdef CX_WINDOWS
+	defaultArguements = "TODO";
+#endif
+#ifdef CX_APPLE
+	defaultArguements = " -I hotkeys -vvv screen:// \":sout=#transcode{vcodec=h264,vb=800,fps=10,scale=1,acodec=none}:duplicate{dst=standard{access=file,mux=mp4,dst="+saveFile+"}}\"";
+#endif
+#ifdef CX_LINUX
+	defaultArguements = " -I hotkeys -vvv screen:// \":sout=#transcode{vcodec=h264,vb=0,fps=10,scale=0,acodec=none}:duplicate{dst=standard{access=file,mux=mp4,dst="+saveFile+"}}\"";
+#endif
+	return defaultArguements;
 }
 
 } /* namespace cx */

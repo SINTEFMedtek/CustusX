@@ -68,6 +68,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	utilities/sscAcceptanceBoxWidget
     utilities/cxPlaybackTime.h
     utilities/cxProcessWrapper.h
+	utilities/cxProcessReporter
 	utilities/cxImageDataContainer
 	utilities/cxVLCRecorder
 	)

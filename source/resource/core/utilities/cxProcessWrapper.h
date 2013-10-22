@@ -20,6 +20,7 @@
 #include <QStringList>
 #include <QString>
 #include <QProcess>
+#include "cxProcessReporter.h"
 
 namespace cx
 {
@@ -56,20 +57,15 @@ public:
 public slots:
 	void requestTerminateSlot();
 
-private slots:
-	void processReadyRead();
-	void processStateChanged(QProcess::ProcessState newState);
-	void processError(QProcess::ProcessError error);
-	void processFinished(int exitCode, QProcess::ExitStatus exitStatus);
-
 private:
 	QString getExecutableInBundlesAbsolutePath(QString exeInBundle);
 	void internalLaunch(QString executable, QStringList arguments);
+
 	QProcess* mProcess;
+	ProcessReporterPtr mReporter;
 	QString mName;
 	QString mLastExecutablePath; //the path to the last executable that was launched
 };
-
 }
 
 #endif /* CXPROCESSWRAPPER_H_ */
