@@ -28,8 +28,8 @@ public:
 
 	bool isRecording();
 
-	void waitForStarted();
-	void waitForFinished();
+	bool waitForStarted();
+	bool waitForFinished();
 
 	QString getVLCPath();
 
@@ -46,6 +46,7 @@ private:
 	void setVLCPath(QString path);
 	bool isValidVLC(QString vlcPath);
 	QString getVLCDefaultLocation();
+	QString getVLCDefaultArguments(QString saveFile);
 
 	ProcessWrapperPtr mCommandLine;
 	QString mVLCPath;

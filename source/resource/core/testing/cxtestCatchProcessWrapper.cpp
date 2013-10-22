@@ -34,7 +34,7 @@ TEST_CASE("ProcessWrapper can handle launching of not existing executables", "[u
 	CHECK_FALSE(success);
 }
 
-TEST_CASE("ProcessWrapper can check git -version", "[unit][resource][core][ProcessWrapper]")
+TEST_CASE("ProcessWrapper can check git -version", "[unit][resource][core][ProcessWrapper][git]")
 {
 	bool success = ProcessWrapperFixture::canLaunchGit_Version();
 	CHECK(success);

@@ -38,7 +38,7 @@ TEST_CASE("VLCRecorder can find VLC application", "[unit][resource][core][VLCRec
 	cx::messageManager()->shutdown();
 }
 
-TEST_CASE("VLCRecorder can record", "[integration][resource][core][VLCRecorder][VLC][hide]")
+TEST_CASE("VLCRecorder can record", "[integration][resource][core][VLCRecorder][VLC][hide][jb]")
 {
 	//TODO this test does not fail even if vlc fails.... needs to be fixed.
 
@@ -48,7 +48,7 @@ TEST_CASE("VLCRecorder can record", "[integration][resource][core][VLCRecorder][
 	QString path = cx::DataLocations::getTestDataPath() + "/testing/VLC/";
 	QDir().mkpath(path);
 	cx::vlc()->startRecording(path+"screen_video.mp4");
-	cx::vlc()->waitForStarted();
+	CHECK(cx::vlc()->waitForStarted());
 
 	CHECK(cx::vlc()->isRecording());
 
