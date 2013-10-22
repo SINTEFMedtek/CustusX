@@ -358,12 +358,38 @@ void ReconstructManagerTestFixture::testTordTest()
 	reconstructer->getParams()->mAlgorithmAdapter->setValue("TordTest");
 	reconstructer->getParams()->mAngioAdapter->setValue(false);
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
-
-	// set an algorithm-specific parameter
+	
 	boost::shared_ptr<cx::TordTest> algorithm;
 	algorithm = boost::dynamic_pointer_cast<cx::TordTest>(reconstructer->createAlgorithm());
 	REQUIRE(algorithm);// Check if we got the algorithm
 
+	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "TordTest");
+	algorithm->getRadiusOption(algo)->setValue(1.0);
+
+	// First test with VNN
+	algorithm->getMethodOption(algo)->setValue("VNN");
+	algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
+	algorithm->getMaxPlanesOption(algo)->setValue(1);
+	
+	SECTION("VNN2")
+	{
+		algorithm->getMethodOption(algo)->setValue("VNN2");
+		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(algo)->setValue(8);
+	}
+	SECTION("DW")
+	{
+		algorithm->getMethodOption(algo)->setValue("DW");
+		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(algo)->setValue(8);
+	}
+	SECTION("Closest")
+	{
+		algorithm->getMethodOption(algo)->setValue("VNN");
+		algorithm->getPlaneMethodOption(algo)->setValue("Closest");
+		algorithm->getMaxPlanesOption(algo)->setValue(8);
+	}
+	
 	// run the reconstruction in the main thread
 	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
 	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
