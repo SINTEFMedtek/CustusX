@@ -42,9 +42,11 @@
 
 #define projectOntoPlaneEq(voxel, eq, dist) (voxel - dist*(eq))
 
-#define isValidPixel(x, y, in_xsize, in_ysize) (x >= 0 && x < in_xsize && y >= 0 && y < in_ysize)
-
+#define isInside(x, size) ((x) >= 0 && (x) < (size))
+#define isNotMasked(x, y, mask, xsize) ((mask)[(x) + (y)*(xsize)] > 0)
+                                     
 #define VOXEL(v,x,y,z) v[x + y*volume_xsize + z*volume_ysize*volume_xsize]
+
 
 /**************/
 /* End macros */
@@ -69,6 +71,14 @@ typedef struct _close_plane
 /********************/
 
 // Declare all the functions, as Apple seems to need that
+
+
+int isValidPixel(int x,
+                 int y,
+                 const __global unsigned char* mask,
+                 int in_xsize,
+                 int in_ysize);
+
 #if PLANE_METHOD == PLANE_HEURISTIC
 int
 findHighestIdx(close_plane_t *planes,
@@ -146,6 +156,7 @@ performInterpolation_vnn(close_plane_t *close_planes,
                          int in_ysize,
                          float in_xspacing,
                          float in_yspacing,
+                         __global const unsigned char* mask,
                          float4 voxel);
 #endif
 
@@ -160,6 +171,7 @@ performInterpolation_vnn2(close_plane_t *close_planes,
                           int in_ysize,
                           float in_xspacing,
                           float in_yspacing,
+                          __global const unsigned char* mask,
                           float4 voxel);
 #endif
 
@@ -174,7 +186,8 @@ performInterpolation_dw(close_plane_t *close_planes,
                         int in_ysize,
                         float in_xspacing,
                         float in_yspacing,
-                        float4 voxel)
+                        __global const unsigned char* mask,
+                        float4 voxel);
 #endif
 
 void
@@ -205,6 +218,7 @@ voxel_methods(int volume_xsize,
               __global unsigned char* in_bscans_b9,
               __global unsigned char* out_volume,
               __global float16 *plane_matrices,
+              __global unsigned char* mask,
               __local float4 *plane_eqs,
               float radius);
 	
@@ -213,6 +227,20 @@ voxel_methods(int volume_xsize,
 /******************/
 /* End prototypes */
 /******************/
+
+
+
+int isValidPixel(int x,
+                 int y,
+                 const __global unsigned char* mask,
+                 int in_xsize,
+                 int in_ysize)
+{
+	return (isInside(x, in_xsize)
+	        && isInside(y, in_ysize)
+	        && isNotMasked(x, y, mask, in_xsize));
+
+}
 
 #if PLANE_METHOD == PLANE_HEURISTIC
 #define FIND_CLOSE_PLANES(a, b, c, d, e, f) findClosestPlanes_heuristic(a, b, c, d, e, f)
@@ -571,8 +599,8 @@ void toImgCoord_int(int* x,
 
 	float2 transformed_voxel = transform_inv_xy(plane_matrix, voxel);
 
-	*x = ((transformed_voxel.x/in_xspacing) + 0.5);
-	*y = ((transformed_voxel.y/in_yspacing) + 0.5);
+	*x = ((transformed_voxel.x/in_xspacing) + 0.5f);
+	*y = ((transformed_voxel.y/in_yspacing) + 0.5f);
 }
 
 /**
@@ -624,8 +652,8 @@ float bilinearInterpolation(float x,
 
 
 #if METHOD == METHOD_VNN
-#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i ,j) \
-	performInterpolation_vnn(a, b, c, d, e, f, g, h, i, j)
+#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i , j, k)	  \
+	performInterpolation_vnn(a, b, c, d, e, f, g, h, i, j, k)
 
 /**
  * Perform interpolation using the Voxel Nearest Neighbour method.
@@ -643,6 +671,7 @@ performInterpolation_vnn(close_plane_t *close_planes,
                          int in_ysize,
                          float in_xspacing,
                          float in_yspacing,
+                         __global const unsigned char* mask,
                          float4 voxel)
 {
 	if(n_close_planes == 0) return 1;
@@ -685,7 +714,7 @@ performInterpolation_vnn(close_plane_t *close_planes,
 	               in_xspacing,
 	               in_yspacing);
 
-	if(!isValidPixel(x,y, in_xsize, in_ysize))
+	if(!isValidPixel(x,y, mask, in_xsize, in_ysize))
 	{
 		return 1;
 	}
@@ -696,8 +725,8 @@ performInterpolation_vnn(close_plane_t *close_planes,
 #endif
 
 #if METHOD == METHOD_VNN2
-#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i ,j) \
-	performInterpolation_vnn2(a, b, c, d, e, f, g, h, i, j)
+#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i ,j, k)	  \
+	performInterpolation_vnn2(a, b, c, d, e, f, g, h, i, j, k)
 
 /**
  * Perform interpolation using the VNN2 method. For each close plane, add (1/dist)*closest_pixel_value to the sum.
@@ -713,6 +742,7 @@ performInterpolation_vnn2(close_plane_t *close_planes,
                           int in_ysize,
                           float in_xspacing,
                           float in_yspacing,
+                          __global const unsigned char* mask,
                           float4 voxel)
 {
 	if(n_close_planes == 0) return 1;
@@ -748,7 +778,7 @@ performInterpolation_vnn2(close_plane_t *close_planes,
 		               in_xspacing,
 		               in_yspacing);
 		
-		if(!isValidPixel(x,y, in_xsize, in_ysize))
+		if(!isValidPixel(x,y, mask, in_xsize, in_ysize))
 		{
 			continue;
 		}
@@ -759,14 +789,14 @@ performInterpolation_vnn2(close_plane_t *close_planes,
 	}		
 
 	
-	return (unsigned char) (val / scale);
+	return max((unsigned char)1, (unsigned char) (val / scale));
 	
 }
 #endif
 
 #if METHOD == METHOD_DW
-#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i ,j) \
-	performInterpolation_dw(a, b, c, d, e, f, g, h, i, j)
+#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i ,j, k)	  \
+	performInterpolation_dw(a, b, c, d, e, f, g, h, i, j, k)
 
 /**
  * Perform interpolation using the DW method. Works the same as VNN2, but instead of taking the closest pixel on each image plane,
@@ -782,6 +812,7 @@ performInterpolation_dw(close_plane_t *close_planes,
                         int in_ysize,
                         float in_xspacing,
                         float in_yspacing,
+                        __global const unsigned char* mask,
                         float4 voxel)
 {
                                       
@@ -821,10 +852,10 @@ performInterpolation_dw(close_plane_t *close_planes,
 
 
 		
-		if(!isValidPixel(x,y, in_xsize, in_ysize) 
-		   || !isValidPixel(x+1, y, in_xsize, in_ysize)
-		   || !isValidPixel(x+1, y+1, in_xsize, in_ysize)
-		   || !isValidPixel(x, y+1, in_xsize, in_ysize)
+		if(!isValidPixel(x,y, mask, in_xsize, in_ysize) 
+		   || !isValidPixel(x+1, y, mask, in_xsize, in_ysize)
+		   || !isValidPixel(x+1, y+1, mask, in_xsize, in_ysize)
+		   || !isValidPixel(x, y+1, mask, in_xsize, in_ysize)
 			)
 		{
 			continue;
@@ -838,7 +869,7 @@ performInterpolation_dw(close_plane_t *close_planes,
 	}		
 
 	
-	return (unsigned char) (val / scale);
+	return max((unsigned char)1, (unsigned char) (val / scale));
 	
 }
 #endif
@@ -908,6 +939,7 @@ voxel_methods(int volume_xsize,
               __global unsigned char* in_bscans_b9,
               __global unsigned char* out_volume,
               __global float16 *plane_matrices,
+              __global unsigned char *mask,
               __local float4 *plane_eqs,
               float radius  
 	)
@@ -993,6 +1025,7 @@ voxel_methods(int volume_xsize,
 		                                                in_ysize,
 		                                                in_xspacing,
 		                                                in_yspacing,
+		                                                mask,
 		                                                voxel);
 		
 		//VOXEL(out_volume, x, y, z) = x;
