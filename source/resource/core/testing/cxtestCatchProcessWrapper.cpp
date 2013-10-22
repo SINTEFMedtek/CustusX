@@ -40,7 +40,7 @@ TEST_CASE("ProcessWrapper can check git -version", "[unit][resource][core][Proce
 	CHECK(success);
 }
 
-TEST_CASE("ProcessWrapper can run VLC -version", "[unit][resource][core][ProcessWrapper][VLC]")
+TEST_CASE("ProcessWrapper can run VLC -version", "[unit][resource][core][ProcessWrapper][VLC][hide]")
 {
 	bool success = ProcessWrapperFixture::canLaunchVLC_Version();
 	CHECK(success);
