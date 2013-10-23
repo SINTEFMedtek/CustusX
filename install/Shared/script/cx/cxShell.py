@@ -89,10 +89,14 @@ class Shell (object):
         '''
         return self.run(cmd, ignoreFailure=True, convertToString=convertToString, keep_output=True)
 
-    def changeDir(self, path):
+    def makeDirs(self, path):
         path = path.replace("\\", "/")
         if not os.path.exists(path):
             os.makedirs(path)
+
+    def changeDir(self, path):
+        path = path.replace("\\", "/")
+        self.makeDirs(path)
         self.CWD = path
         self._printCommand('cd %s' % path)
     
@@ -110,6 +114,8 @@ class Shell (object):
         '''
         Function that mimics the unix command cp src dst.
         '''
+        destpath = os.path.dirname(dst)
+        self.makeDirs(destpath)
         shutil.copy(src, dst)
         
     def rm_r(self, path, pattern=""):

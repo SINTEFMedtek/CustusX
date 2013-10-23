@@ -32,6 +32,11 @@ class TestRunner:
     '''
     pass
 
+    def generateOutpath(self, basePath):
+        path = '%s/test_results' % basePath
+        shell.makeDirs(path)
+        return path
+
     def _createCatchBaseFilenameFromTag(self, tag):
         'generate a namestring usable as the base of a filename for test results based on tag'
         tagString = self._createFilenameFriendlyStringFromCatchTag(tag)
