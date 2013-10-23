@@ -31,13 +31,15 @@ class ShellCommandReal(ShellCommand):
                  cwd,
                  terminate_on_error=True, 
                  redirect_output=False, 
-                 keep_output=False):
+                 keep_output=False,
+                 TEST_add_win_env=False):
         self.command = command
         self.cwd = cwd
         
         self.redirect_output = redirect_output
         self.keep_output = keep_output
         self.terminate_on_error = terminate_on_error
+        self.TEST_add_win_env = TEST_add_win_env
     
     def run(self):
         '''
@@ -45,6 +47,9 @@ class ShellCommandReal(ShellCommand):
          - evaluates to false if call failed.
          - contains output and returncode for more detailed results
         '''
+        if self.TEST_add_win_env == True:
+            self.command = "C:\\Dev\\CustusX_environment\\cxVars_x64.bat && " + self.command
+        
         if  self.redirect_output or self.keep_output:
             p = self._runAndRedirectOutput(self.command)
         else:        

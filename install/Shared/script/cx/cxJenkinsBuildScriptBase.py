@@ -32,9 +32,9 @@ class JenkinsBuildScriptBase(cx.cxBuildScript.BuildScript):
     Base script for all jenkins scripts. 
     All jenkins operations is included here, subclasses can pick elements.
     '''
-    def __init__(self):
-        ''
-        super(JenkinsBuildScriptBase, self).__init__()
+#    def __init__(self):
+#        ''
+#        super(JenkinsBuildScriptBase, self).__init__()
      
     def setDefaults(self):                
         super(JenkinsBuildScriptBase, self).setDefaults()
