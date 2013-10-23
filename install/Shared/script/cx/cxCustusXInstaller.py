@@ -24,7 +24,7 @@ import cxInstallData
 import cxComponents
 import cxComponentAssembly
 import shlex
-import cxTestRunner
+#import cxTestRunner
 import cxUtilities
 import datetime
 

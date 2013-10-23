@@ -44,10 +44,15 @@ class CustusXBuilder:
     def clearTestData(self):
         PrintFormatter.printHeader('Clearing all old test data', level=3)
         cxData = self._createComponent(cxComponents.CustusX3Data)
-        custusx = self._createComponent(cxComponents.CustusX3)
+        #custusx = self._createComponent(cxComponents.CustusX3)
         testRunner = cxTestRunner.TestRunner()
-        testRunner.resetCustusXDataRepo(cxData.sourcePath())        
-        testRunner.removeResultFiles(outPath=custusx.buildPath())
+        testRunner.resetCustusXDataRepo(cxData.sourcePath())  
+        testRunner.removeResultFiles(outPath=self._getTestResultsPath())
+        #testRunner.removeResultFiles(outPath=custusx.buildPath())
+    
+    def _getTestResultsPath(self):
+        testRunner = cxTestRunner.TestRunner()
+        return testRunner.generateOutpath(self.assembly.controlData.getRootDir())
     
     def runUnitTests(self):
         PrintFormatter.printHeader('Run all unit tests', level=2)
@@ -59,7 +64,7 @@ class CustusXBuilder:
         PrintFormatter.printHeader('Run ctest tests', level=3)
         # Run all tests and write them in xml format to ./CTestResults.xml
         custusx = self._createComponent(cxComponents.CustusX3)
-        cxTestRunner.TestRunner().runCTest(custusx.buildPath(), outpath=custusx.buildPath())
+        cxTestRunner.TestRunner().runCTest(custusx.buildPath(), outpath=self._getTestResultsPath())
 
     def _runCatchUnitTests(self):
         tags = cxTestRunner.TestRunner().includeTagsForOS('[unit]')
@@ -70,14 +75,14 @@ class CustusXBuilder:
         # Run all Catch tests and write them in xml format to ./Catch.<tagname>.TestResults.xml
         custusx = self._createComponent(cxComponents.CustusX3)
         catchDir = '%s/source/testing' % custusx.buildPath()
-        outpath=custusx.buildPath()
+        outpath = self._getTestResultsPath()
         cxTestRunner.TestRunner().runCatch(catchDir, tag=tag, outpath=outpath)
         
     def runCatchTestsWrappedInCTest(self, tag):
         PrintFormatter.printHeader('Run catch tests wrapped in ctest', level=2)
         custusx = self._createComponent(cxComponents.CustusX3)
         appPath = '%s/source/testing' % custusx.buildPath()
-        outpath=custusx.buildPath()
+        outpath = self._getTestResultsPath()
         testRunner = cxTestRunner.TestRunner()
         testRunner.runCatchTestsWrappedInCTestGenerateJUnit(tag, appPath, outpath)
 
