@@ -13,10 +13,20 @@
 #define METHOD_VNN 0
 #define METHOD_VNN2 1
 #define METHOD_DW 2
+#define METHOD_MEDIAN 3
 
 // Plane searching methods
 #define PLANE_HEURISTIC 0
 #define PLANE_CLOSEST 1
+
+
+// Median method specific constants
+#define MEDIAN_SIZE 5
+
+#define MEDIAN_METHOD_INCLUDE_ALL 0
+#define MEDIAN_METHOD_ON_PLANE 1
+
+#define MEDIAN_METHOD MEDIAN_METHOD_ON_PLANE
 
 /*****************/
 /* End constants */
@@ -43,7 +53,8 @@
 #define projectOntoPlaneEq(voxel, eq, dist) (voxel - dist*(eq))
 
 #define isInside(x, size) ((x) >= 0 && (x) < (size))
-#define isNotMasked(x, y, mask, xsize) ((mask)[(x) + (y)*(xsize)] > 0)
+//#define isNotMasked(x, y, mask, xsize) ((mask)[(x) + (y)*(xsize)] > 0)
+#define isNotMasked(x, y, mask, xsize) 1
                                      
 #define VOXEL(v,x,y,z) v[x + y*volume_xsize + z*volume_ysize*volume_xsize]
 
@@ -61,6 +72,12 @@ typedef struct _close_plane
 	float dist;
 	int plane_id;
 } close_plane_t;
+
+typedef struct _pixel
+{
+	unsigned char intensity;
+	float dist;
+} pixel_t;
 
 /***************/
 /* End structs */
@@ -188,6 +205,21 @@ performInterpolation_dw(close_plane_t *close_planes,
                         float in_yspacing,
                         __global const unsigned char* mask,
                         float4 voxel);
+#endif
+
+#if METHOD == METHOD_MEDIAN
+unsigned char
+performInterpolation_median(close_plane_t *close_planes,
+                            int n_close_planes,
+                            __global const float16  *plane_matrices,
+                            __local const float4 *plane_eqs,
+                            __global const unsigned char* bscans_blocks[],
+                            int in_xsize,
+                            int in_ysize,
+                            float in_xspacing,
+                            float in_yspacing,
+                            __global const unsigned char* mask,
+                            float4 voxel);
 #endif
 
 void
@@ -893,7 +925,223 @@ performInterpolation_dw(close_plane_t *close_planes,
 }
 #endif
 
+#if METHOD == METHOD_MEDIAN
+#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i ,j, k)	  \
+	performInterpolation_median(a, b, c, d, e, f, g, h, i, j, k)
 
+void siftDown(pixel_t *pixels,
+              int start,
+              int end)
+{
+	int root = start;
+	int swap;
+	int child;
+	pixel_t tmp;
+#define swap(a, b) tmp = a; a = b; b = tmp
+	while(root*2 + 1 <= end)
+	{
+		child = root*2+1;
+		swap = root;
+		if(pixels[swap].intensity < pixels[child].intensity)
+		{
+			swap = child;
+		}
+		if(child+1 <= end && pixels[swap].intensity < pixels[child+1].intensity)
+		{
+			swap = child+1;
+		}
+		if(swap != root)
+		{
+			swap(pixels[root], pixels[swap]);
+			root = swap;
+		}
+		else
+		{
+			return;
+		}
+	}
+}
+	
+void heapify(pixel_t *pixels,
+             int n)
+{
+	int start = (n - 2) / 2;
+
+	while(start >= 0)
+	{
+		siftDown(pixels, start, n - 1);
+		start--;
+	}
+}
+	
+
+// Implement heapsort
+void sort(pixel_t *pixels,
+          int n)
+{
+	pixel_t tmp;
+#define swap(a, b) tmp = a; a = b; b = tmp
+	heapify(pixels, n);
+	int end = n-1;
+	while(end > 0)
+	{
+		swap(pixels[end], pixels[0]);
+		end--;
+		siftDown(pixels, 0, end);
+	}
+}
+
+#define WEIGHT_FUNCTION(x) (1.0f/(x.dist*x.dist))
+// Find the weighted median of an unsorted array of pixels
+pixel_t weighted_median(pixel_t *pixels,
+                        int n_pixels)
+{
+	// Sort the pixels
+	sort(pixels, n_pixels);
+	// Compute the sum of the weights
+	float sum_weight = 0.0f;
+	for(int i = 0; i < n_pixels; i++)
+	{
+		sum_weight += WEIGHT_FUNCTION(pixels[i]);
+	}
+	// Find the first index for which sum is greater than sum_weight/2
+	const float sum_weight_half = sum_weight / 2;
+	float sum = 0.0f;
+	int idx = 0;
+	for(idx = 0; idx < n_pixels; idx++)
+	{
+		sum += WEIGHT_FUNCTION(pixels[idx]);
+		if(sum >= sum_weight_half)
+		{
+			break;
+		}
+	}
+	return pixels[idx];
+	
+}
+
+/**
+ * Perform interpolation using a weighted median method.
+ */
+unsigned char
+performInterpolation_median(close_plane_t *close_planes,
+                            int n_close_planes,
+                            __global const float16  *plane_matrices,
+                            __local const float4 *plane_eqs,
+                            __global const unsigned char* bscans_blocks[],
+                            int in_xsize,
+                            int in_ysize,
+                            float in_xspacing,
+                            float in_yspacing,
+                            __global const unsigned char* mask,
+                            float4 voxel)
+{
+	// First, find all the relevant pixels
+#if MEDIAN_METHOD == MEDIAN_METHOD_INCLUDE_ALL
+	pixel_t pixels[MAX_PLANES*MEDIAN_SIZE*MEDIAN_SIZE];
+#elif MEDIAN_METHOD == MEDIAN_METHOD_ON_PLANE
+	pixel_t pixels[MAX_PLANES];
+#endif
+	int pos = 0;
+	for(int i = 0; i < n_close_planes; i++)
+	{
+		const int plane_id = close_planes[i].plane_id;
+		const __global unsigned char* image = getImageData(plane_id,
+		                                             bscans_blocks,
+		                                             in_xsize,
+		                                             in_ysize);
+
+		// Project onto plane
+		voxel.w = 1.0f;
+		float4 translated_voxel = projectOntoPlaneEq(voxel,
+		                                             plane_eqs[plane_id],
+		                                             close_planes[i].dist);
+		translated_voxel.w = 1.0f;
+
+		int x, y;
+		toImgCoord_int(&x,
+		               &y,
+		               translated_voxel,
+		               plane_matrices[plane_id],
+		               in_xspacing,
+		               in_yspacing);
+
+#if MEDIAN_METHOD == MEDIAN_METHOD_INCLUDE_ALL
+		
+		for(int j = -MEDIAN_SIZE/2; j < MEDIAN_SIZE/2; j++)
+		{
+			for(int k = -MEDIAN_SIZE/2; k < MEDIAN_SIZE/2; k++)
+			{
+				int _x = x + j;
+				int _y = y + k;
+				if(!isValidPixel(_x, _y, mask, in_xsize, in_ysize))
+				{
+					continue;
+				}
+				pixels[pos].intensity = image[_y*in_xsize + _x];
+
+
+				// We know the distance in the direction normal to the plane.
+				// Since this is a pixel _on_ the plane, pretend the distance along the
+				// normal is one cathete, and the distance on the image plane is another catethe.
+				// The distance is then the hypotenuse.
+
+				float dist_x = j*in_xspacing;
+				float dist_y = k*in_yspacing;
+				float sq_x = dist_x*dist_x;
+				float sq_y = dist_y*dist_y;
+
+				float along_plane_dist = sqrt(sq_x + sq_y);
+				pixels[pos].dist = sqrt(close_planes[i].dist*close_planes[i].dist +
+				                        along_plane_dist*along_plane_dist);
+				pos++;
+			}
+		}
+		
+#elif MEDIAN_METHOD == MEDIAN_METHOD_ON_PLANE
+		pixel_t pixels_on_plane[MEDIAN_SIZE*MEDIAN_SIZE];
+		int ppos = 0;
+		for(int j = -MEDIAN_SIZE/2; j < MEDIAN_SIZE/2; j++)
+		{
+			for(int k = -MEDIAN_SIZE/2; k < MEDIAN_SIZE/2; k++)
+			{
+				int _x = x + j;
+				int _y = y + k;
+				if(!isValidPixel(_x, _y, mask, in_xsize, in_ysize))
+				{
+					continue;
+				}
+				pixels_on_plane[ppos].intensity = image[_y*in_xsize + _x];
+
+				// We know the distance in the direction normal to the plane.
+				// Since this is a pixel _on_ the plane, pretend the distance along the
+				// normal is one cathete, and the distance on the image plane is another catethe.
+				// The distance is then the hypotenuse.
+
+				pixels_on_plane[ppos].dist = close_planes[i].dist;
+				ppos++;
+			}
+		}
+		sort(pixels_on_plane, ppos);
+		if(ppos > 0)
+		{
+			pixels[pos] = pixels_on_plane[ppos/2];
+			pos++;
+		}
+				
+#endif
+		
+	}
+	
+	if(pos == 0)
+	{
+		return 1;
+	}
+	return max((unsigned char)1, weighted_median(pixels, pos).intensity);
+	
+}
+
+#endif
 /**
  * Build the plane equations from the matrices and store them in local memory
  */
