@@ -36,20 +36,11 @@ TEST_CASE("VLCRecorder can find VLC application", "[unit][resource][core][VLCRec
 	CHECK(cx::vlc()->hasVLCApplication());
 }
 
-TEST_CASE("VLCRecorder can record for 3 seconds", "[integration][resource][core][VLCRecorder][VLC]")
+TEST_CASE("VLCRecorder can record for 7 seconds", "[integration][resource][core][VLCRecorder][VLC]")
 {
 	VLCRecorderFixture vlc;
 
-	vlc.checkThatVLCCanRecordTheScreen(3);
-
-	vlc.checkIsMovieFilePlayable();
-}
-
-TEST_CASE("VLCRecorder can record for 15 seconds", "[integration][resource][core][VLCRecorder][VLC]")
-{
-	VLCRecorderFixture vlc;
-
-	vlc.checkThatVLCCanRecordTheScreen(15);
+	vlc.checkThatVLCCanRecordTheScreen(7);
 
 	vlc.checkIsMovieFilePlayable();
 }
