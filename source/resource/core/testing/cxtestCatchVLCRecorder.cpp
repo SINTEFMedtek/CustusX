@@ -14,54 +14,44 @@
 
 #include "catch.hpp"
 
-#include <QDir>
-#include <QTimer>
-#include "sscMessageManager.h"
-#include "cxDataLocations.h"
 #include "cxVLCRecorder.h"
+#include "cxtestVLCRecorderFixture.h"
 
 #ifdef CX_WINDOWS
 #include <windows.h>
 #endif
 
+namespace cxtest
+{
+
 TEST_CASE("VLCRecorder can be constructed", "[unit][resource][core][VLCRecorder][VLC]")
 {
-	cx::messageManager()->initialize();
-	CHECK(cx::vlc());
-	cx::messageManager()->shutdown();
+	VLCRecorderFixture fix;
+	REQUIRE(cx::vlc());
 }
 
-TEST_CASE("VLCRecorder can find VLC application", "[unit][resource][core][VLCRecorder][VLC][hide]")
+TEST_CASE("VLCRecorder can find VLC application", "[unit][resource][core][VLCRecorder][VLC]")
 {
-	cx::messageManager()->initialize();
+	VLCRecorderFixture fix;
 	CHECK(cx::vlc()->hasVLCApplication());
-	cx::messageManager()->shutdown();
 }
 
-TEST_CASE("VLCRecorder can record", "[integration][resource][core][VLCRecorder][VLC][hide][jb]")
+TEST_CASE("VLCRecorder can record for 3 seconds", "[integration][resource][core][VLCRecorder][VLC]")
 {
-	//TODO this test does not fail even if vlc fails.... needs to be fixed.
+	VLCRecorderFixture vlc;
 
-	cx::messageManager()->initialize();
+	vlc.checkThatVLCCanRecordTheScreen(3);
 
-	CHECK_FALSE(cx::vlc()->isRecording());
-	QString path = cx::DataLocations::getTestDataPath() + "/testing/VLC/";
-	QDir().mkpath(path);
-	cx::vlc()->startRecording(path+"screen_video.mp4");
-	CHECK(cx::vlc()->waitForStarted());
-
-	CHECK(cx::vlc()->isRecording());
-
-#ifndef CX_WINDOWS
-		sleep(15); //seconds
-#else
-		Sleep(15000); //milliseconds
-#endif
-
-	cx::vlc()->stopRecording();
-
-	cx::vlc()->waitForFinished();
-	CHECK_FALSE(cx::vlc()->isRecording());
-
-	cx::messageManager()->shutdown();
+	vlc.checkIsMovieFilePlayable();
 }
+
+TEST_CASE("VLCRecorder can record for 15 seconds", "[integration][resource][core][VLCRecorder][VLC]")
+{
+	VLCRecorderFixture vlc;
+
+	vlc.checkThatVLCCanRecordTheScreen(15);
+
+	vlc.checkIsMovieFilePlayable();
+}
+
+} //namespace cxtest

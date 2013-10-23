@@ -117,4 +117,13 @@ double Utilities::getFractionOfVoxelsAboveThreshold(vtkImageDataPtr image, int t
 	return double(hits)/double(totalPixels);
 }
 
+void Utilities::sleep_sec(int seconds)
+{
+#ifndef CX_WINDOWS
+		sleep(seconds); //seconds
+#else
+		Sleep(seconds*1000); //milliseconds
+#endif
+}
+
 } /* namespace cxtest */
