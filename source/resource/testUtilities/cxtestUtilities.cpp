@@ -20,6 +20,10 @@
 #include "sscTypeConversions.h"
 #include "cxDataLocations.h"
 
+#ifdef CX_WINDOWS
+	#include <Windows.h>
+#endif
+
 namespace cxtest
 {
 /*
