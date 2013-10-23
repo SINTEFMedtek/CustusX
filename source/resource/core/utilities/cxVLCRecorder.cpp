@@ -117,7 +117,7 @@ QString VLCRecorder::getVLCDefaultArguments(QString saveFile)
 	defaultArguements = " -I hotkeys -vvv screen:// \":sout=#transcode{vcodec=h264,vb=800,fps=10,scale=1,acodec=none}:duplicate{dst=standard{access=file,mux=mp4,dst="+saveFile+"}}\"";
 #endif
 #ifdef CX_LINUX
-	defaultArguements = " -I hotkeys -vvv screen:// \":sout=#transcode{vcodec=h264,vb=0,fps=10,scale=0,acodec=none}:duplicate{dst=standard{access=file,mux=mp4,dst="+saveFile+"}}\"";
+	defaultArguements = " -I hotkeys -vvv screen:// :screen-fps=10.000000 :live-caching=300 \":sout=#transcode{vcodec=h264,vb=0,fps=10,scale=0,acodec=none}:file{dst="+saveFile+"}\" :sout-keep";
 #endif
 	return defaultArguements;
 }

@@ -37,7 +37,7 @@ bool ProcessWrapperFixture::canLaunchVLC_Version()
 	cx::ProcessWrapperPtr exe(new cx::ProcessWrapper());
 
 #if defined CX_WINDOWS
-	exe->launch("\"C:\\Program Files (x86)\\Git\\cmd\\git.cmd\"", QStringList("--version"));
+	exe->launch("\"C:\\Program Files (x86)\\vlc.exe"", QStringList("--version"));
 #elif defined CX_LINUX
 	exe->launch("/usr/bin/vlc", QStringList("--version"));
 #elif defined CX_APPLE
