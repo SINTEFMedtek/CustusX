@@ -21,12 +21,13 @@
 
 
 // Median method specific constants
-#define MEDIAN_SIZE 5
+#define MEDIAN_SIZE 1
 
 #define MEDIAN_METHOD_INCLUDE_ALL 0
 #define MEDIAN_METHOD_ON_PLANE 1
+#define MEDIAN_METHOD_BILINEAR_ON_PLANE 2
 
-#define MEDIAN_METHOD MEDIAN_METHOD_ON_PLANE
+#define MEDIAN_METHOD MEDIAN_METHOD_BILINEAR_ON_PLANE
 
 /*****************/
 /* End constants */
@@ -901,11 +902,13 @@ performInterpolation_dw(close_plane_t *close_planes,
 		           in_yspacing);
 
 
-		
-		if(!isValidPixel(x,y, mask, in_xsize, in_ysize) 
-		   || !isValidPixel(x+1, y, mask, in_xsize, in_ysize)
-		   || !isValidPixel(x+1, y+1, mask, in_xsize, in_ysize)
-		   || !isValidPixel(x, y+1, mask, in_xsize, in_ysize)
+		int ix, iy;
+		ix = x;
+		iy = y;
+		if(!isValidPixel(ix,iy, mask, in_xsize, in_ysize) 
+		   || !isValidPixel(ix+1, iy, mask, in_xsize, in_ysize)
+		   || !isValidPixel(ix+1, iy+1, mask, in_xsize, in_ysize)
+		   || !isValidPixel(ix, iy+1, mask, in_xsize, in_ysize)
 			)
 		{
 			continue;
@@ -991,7 +994,7 @@ void sort(pixel_t *pixels,
 	}
 }
 
-#define WEIGHT_FUNCTION(x) (1.0f/(x.dist*x.dist))
+#define WEIGHT_FUNCTION(x) (1.0f - fabs(x.dist))
 // Find the weighted median of an unsorted array of pixels
 pixel_t weighted_median(pixel_t *pixels,
                         int n_pixels)
@@ -1041,7 +1044,11 @@ performInterpolation_median(close_plane_t *close_planes,
 	pixel_t pixels[MAX_PLANES*MEDIAN_SIZE*MEDIAN_SIZE];
 #elif MEDIAN_METHOD == MEDIAN_METHOD_ON_PLANE
 	pixel_t pixels[MAX_PLANES];
+#elif MEDIAN_METHOD == MEDIAN_METHOD_BILINEAR_ON_PLANE
+	pixel_t pixels[MAX_PLANES];
 #endif
+
+	
 	int pos = 0;
 	for(int i = 0; i < n_close_planes; i++)
 	{
@@ -1058,6 +1065,9 @@ performInterpolation_median(close_plane_t *close_planes,
 		                                             close_planes[i].dist);
 		translated_voxel.w = 1.0f;
 
+
+#if MEDIAN_METHOD == MEDIAN_METHOD_INCLUDE_ALL
+		
 		int x, y;
 		toImgCoord_int(&x,
 		               &y,
@@ -1065,12 +1075,9 @@ performInterpolation_median(close_plane_t *close_planes,
 		               plane_matrices[plane_id],
 		               in_xspacing,
 		               in_yspacing);
-
-#if MEDIAN_METHOD == MEDIAN_METHOD_INCLUDE_ALL
-		
-		for(int j = -MEDIAN_SIZE/2; j < MEDIAN_SIZE/2; j++)
+		for(int j = -MEDIAN_SIZE/2; j <= MEDIAN_SIZE/2; j++)
 		{
-			for(int k = -MEDIAN_SIZE/2; k < MEDIAN_SIZE/2; k++)
+			for(int k = -MEDIAN_SIZE/2; k <= MEDIAN_SIZE/2; k++)
 			{
 				int _x = x + j;
 				int _y = y + k;
@@ -1098,12 +1105,48 @@ performInterpolation_median(close_plane_t *close_planes,
 			}
 		}
 		
+#elif MEDIAN_METHOD == MEDIAN_METHOD_BILINEAR_ON_PLANE
+		float x, y;
+		toImgCoord_float(&x,
+		                 &y,
+		                 translated_voxel,
+		                 plane_matrices[plane_id],
+		                 in_xspacing,
+		                 in_yspacing);
+
+		
+		int ix, iy;
+		ix = x;
+		iy = y;
+		if(!isValidPixel(ix,iy, mask, in_xsize, in_ysize) 
+		   || !isValidPixel(ix+1, iy, mask, in_xsize, in_ysize)
+		   || !isValidPixel(ix+1, iy+1, mask, in_xsize, in_ysize)
+		   || !isValidPixel(ix, iy+1, mask, in_xsize, in_ysize)
+				)
+			{
+			continue;
+		}
+		pixels[pos].intensity = bilinearInterpolation(x,
+		                                              y,
+		                                              image,
+		                                              in_xsize);
+		pixels[pos++].dist = close_planes[i].dist;
+		
 #elif MEDIAN_METHOD == MEDIAN_METHOD_ON_PLANE
+		
+		int x, y;
+		toImgCoord_int(&x,
+		               &y,
+		               translated_voxel,
+		               plane_matrices[plane_id],
+		               in_xspacing,
+		               in_yspacing);
+		
 		pixel_t pixels_on_plane[MEDIAN_SIZE*MEDIAN_SIZE];
 		int ppos = 0;
-		for(int j = -MEDIAN_SIZE/2; j < MEDIAN_SIZE/2; j++)
+		for(int j = -MEDIAN_SIZE/2; j <= MEDIAN_SIZE/2; j++)
 		{
-			for(int k = -MEDIAN_SIZE/2; k < MEDIAN_SIZE/2; k++)
+			for(int k = -MEDIAN_SIZE/2; k <= MEDIAN_SIZE/2; k++)
 			{
 				int _x = x + j;
 				int _y = y + k;
@@ -1112,11 +1155,6 @@ performInterpolation_median(close_plane_t *close_planes,
 					continue;
 				}
 				pixels_on_plane[ppos].intensity = image[_y*in_xsize + _x];
-
-				// We know the distance in the direction normal to the plane.
-				// Since this is a pixel _on_ the plane, pretend the distance along the
-				// normal is one cathete, and the distance on the image plane is another catethe.
-				// The distance is then the hypotenuse.
 
 				pixels_on_plane[ppos].dist = close_planes[i].dist;
 				ppos++;
