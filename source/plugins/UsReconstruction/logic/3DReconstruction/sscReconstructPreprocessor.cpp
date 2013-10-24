@@ -123,7 +123,7 @@ void ReconstructPreprocessor::cropInputData()
 {
     //IntBoundingBox3D
     ProbeData sector = mFileData.mProbeData.mData;
-    ProbeData::ProbeImageData imageSector = sector.getImage();
+		ProbeData::ProbeImageData imageSector = sector.getImage();
     IntBoundingBox3D cropbox(imageSector.mClipRect_p.begin());
     Eigen::Vector3i shift = cropbox.corner(0,0,0).cast<int>();
     Eigen::Vector3i size = cropbox.range().cast<int>() + Eigen::Vector3i(1,1,0); // convert from extent format to size format by adding 1
@@ -137,7 +137,7 @@ void ReconstructPreprocessor::cropInputData()
         imageSector.mOrigin_p[i] -= shift[i];
     }
     imageSector.mSize.setWidth(size[0]);
-    imageSector.mSize.setHeight(size[1]);
+		imageSector.mSize.setHeight(size[1]);
     sector.setImage(imageSector);
     mFileData.mProbeData.setData(sector);
 }
@@ -313,7 +313,8 @@ void ReconstructPreprocessor::interpolatePositions2()
 std::vector<Vector3D> ReconstructPreprocessor::generateInputRectangle()
 {
     std::vector<Vector3D> retval(4);
-		if (!mFileData.getMask())
+		vtkImageDataPtr mask = mFileData.getMask();
+		if (!mask)
     {
         messageManager()->sendError("Reconstructer::generateInputRectangle() + requires mask");
         return retval;
@@ -321,7 +322,7 @@ std::vector<Vector3D> ReconstructPreprocessor::generateInputRectangle()
     Eigen::Array3i dims = mFileData.mUsRaw->getDimensions();
     Vector3D spacing = mFileData.mUsRaw->getSpacing();
 
-		Eigen::Array3i maskDims(mFileData.getMask()->GetDimensions());
+		Eigen::Array3i maskDims(mask->GetDimensions());
 
     if (( maskDims[0]<dims[0] )||( maskDims[1]<dims[1] ))
         messageManager()->sendError(QString("input data (%1) and mask (%2) dim mimatch")
@@ -333,7 +334,7 @@ std::vector<Vector3D> ReconstructPreprocessor::generateInputRectangle()
     int ymin = maskDims[1];
     int ymax = 0;
 
-		unsigned char* ptr = static_cast<unsigned char*> (mFileData.getMask()->GetScalarPointer());
+		unsigned char* ptr = static_cast<unsigned char*> (mask->GetScalarPointer());
     for (int x = 0; x < maskDims[0]; x++)
         for (int y = 0; y < maskDims[1]; y++)
         {

@@ -89,6 +89,9 @@ void RecordSession::parseXml(QDomNode& parentNode)
 
 TimedTransformMap RecordSession::getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session)
 {
+	if(!tool)
+		messageManager()->sendError("RecordSession::getToolHistory_prMt(): Tool missing.");
+
 	TimedTransformMap retval;
 
 	if(tool && session)
