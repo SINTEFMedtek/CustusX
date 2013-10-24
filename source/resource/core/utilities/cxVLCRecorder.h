@@ -37,6 +37,8 @@ public slots:
 	void startRecording(QString saveFile);
 	void stopRecording();
 
+	void play(QString moviePath);
+
 private:
 	VLCRecorder();
 	virtual ~VLCRecorder();
@@ -46,7 +48,7 @@ private:
 	void setVLCPath(QString path);
 	bool isValidVLC(QString vlcPath);
 	QString getVLCDefaultLocation();
-	QString getVLCDefaultArguments(QString saveFile);
+	QString getVLCDefaultRecorderArguments(QString saveFile);
 
 	ProcessWrapperPtr mCommandLine;
 	QString mVLCPath;

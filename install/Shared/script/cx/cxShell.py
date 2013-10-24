@@ -36,6 +36,7 @@ class Shell (object):
         self.VERBOSE = False
         self.REDIRECT_OUTPUT = False
         self.TERMINATE_ON_ERROR = True
+        self.TEST_add_win_env = False
         
     def getArgParser(self):
         p = cxArgParse.ArgumentParser(add_help=False)
@@ -77,7 +78,8 @@ class Shell (object):
                         cwd=self.CWD, 
                         terminate_on_error=self.TERMINATE_ON_ERROR and not ignoreFailure,
                         redirect_output=self.REDIRECT_OUTPUT,
-                        keep_output=keep_output)
+                        keep_output=keep_output,
+                        TEST_add_win_env = self.TEST_add_win_env)
         return command.run()
 
     def evaluate(self, cmd, convertToString=True):
@@ -87,10 +89,14 @@ class Shell (object):
         '''
         return self.run(cmd, ignoreFailure=True, convertToString=convertToString, keep_output=True)
 
-    def changeDir(self, path):
+    def makeDirs(self, path):
         path = path.replace("\\", "/")
         if not os.path.exists(path):
             os.makedirs(path)
+
+    def changeDir(self, path):
+        path = path.replace("\\", "/")
+        self.makeDirs(path)
         self.CWD = path
         self._printCommand('cd %s' % path)
     
@@ -108,6 +114,8 @@ class Shell (object):
         '''
         Function that mimics the unix command cp src dst.
         '''
+        destpath = os.path.dirname(dst)
+        self.makeDirs(destpath)
         shutil.copy(src, dst)
         
     def rm_r(self, path, pattern=""):

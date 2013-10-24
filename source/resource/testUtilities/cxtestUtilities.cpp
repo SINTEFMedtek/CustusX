@@ -20,6 +20,10 @@
 #include "sscTypeConversions.h"
 #include "cxDataLocations.h"
 
+#ifdef CX_WINDOWS
+	#include <Windows.h>
+#endif
+
 namespace cxtest
 {
 /*
@@ -115,6 +119,15 @@ double Utilities::getFractionOfVoxelsAboveThreshold(vtkImageDataPtr image, int t
 	if (totalPixels==0)
 		return -1;
 	return double(hits)/double(totalPixels);
+}
+
+void Utilities::sleep_sec(int seconds)
+{
+#ifndef CX_WINDOWS
+		sleep(seconds); //seconds
+#else
+		Sleep(seconds*1000); //milliseconds
+#endif
 }
 
 } /* namespace cxtest */
