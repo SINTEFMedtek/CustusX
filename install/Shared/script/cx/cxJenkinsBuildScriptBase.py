@@ -32,9 +32,9 @@ class JenkinsBuildScriptBase(cx.cxBuildScript.BuildScript):
     Base script for all jenkins scripts. 
     All jenkins operations is included here, subclasses can pick elements.
     '''
-    def __init__(self):
-        ''
-        super(JenkinsBuildScriptBase, self).__init__()
+#    def __init__(self):
+#        ''
+#        super(JenkinsBuildScriptBase, self).__init__()
      
     def setDefaults(self):                
         super(JenkinsBuildScriptBase, self).setDefaults()
@@ -61,10 +61,11 @@ class JenkinsBuildScriptBase(cx.cxBuildScript.BuildScript):
         custusxdata = assembly.getComponent(cx.cxComponents.CustusX3Data)
         custusx = assembly.getComponent(cx.cxComponents.CustusX3)
         
-        self.cxInstaller = cx.cxCustusXInstaller.CustusXInstaller()
-        self.cxInstaller.setRootDir(assembly.controlData.getRootDir())
-        self.cxInstaller.setInstallerPath(self.cxBuilder.getInstallerPackagePath())
-        self.cxInstaller.setSourcePath(custusx.sourcePath())        
+        self.cxInstaller = self.cxBuilder.createInstallerObject()
+        #self.cxInstaller = cx.cxCustusXInstaller.CustusXInstaller()
+        #self.cxInstaller.setRootDir(assembly.controlData.getRootDir())
+        #self.cxInstaller.setInstallerPath(self.cxBuilder.getInstallerPackagePath())
+        #self.cxInstaller.setSourcePath(custusx.sourcePath())        
 
         self.cxInstallation = cx.cxCustusXTestInstallation.CustusXTestInstallation()
         self.cxInstallation.setRootDir(assembly.controlData.getRootDir())

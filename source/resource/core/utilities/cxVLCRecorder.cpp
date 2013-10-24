@@ -68,7 +68,7 @@ QString VLCRecorder::getVLCPath()
 void VLCRecorder::startRecording(QString saveFile)
 {
 	if(this->hasVLCApplication())
-		mCommandLine->launch(mVLCPath+this->getVLCDefaultArguments(saveFile));
+		mCommandLine->launch(mVLCPath+this->getVLCDefaultRecorderArguments(saveFile));
 	else
 		messageManager()->sendError("VLC not found.");
 }
@@ -76,6 +76,11 @@ void VLCRecorder::startRecording(QString saveFile)
 void VLCRecorder::stopRecording()
 {
 	mCommandLine->requestTerminateSlot();
+}
+
+void VLCRecorder::play(QString moviePath)
+{
+	mCommandLine->launch(mVLCPath+" "+moviePath+" vlc://quit");
 }
 
 void VLCRecorder::setVLCPath(QString path)
@@ -96,7 +101,7 @@ QString VLCRecorder::getVLCDefaultLocation()
 {
 	QString defaultLocation("");
 #ifdef CX_WINDOWS
-	defaultLocation = "TODO";
+	defaultLocation = "\"C:\Program Files (x86)\VideoLAN\VLC\vlc.exe\"";
 #endif
 #ifdef CX_APPLE
 	defaultLocation = "/Applications/VLC.app/Contents/MacOS/VLC";
@@ -107,17 +112,17 @@ QString VLCRecorder::getVLCDefaultLocation()
 	return defaultLocation;
 }
 
-QString VLCRecorder::getVLCDefaultArguments(QString saveFile)
+QString VLCRecorder::getVLCDefaultRecorderArguments(QString saveFile)
 {
 	QString defaultArguements("");
 #ifdef CX_WINDOWS
-	defaultArguements = "TODO";
+	defaultArguements = " -I hotkeys screen:// :screen-fps=10.000000 :live-caching=300 \":sout=#transcode{vcodec=h264,vb=0,fps=10,scale=0,acodec=none}:file{dst="+saveFile+"}\" :sout-keep";
 #endif
 #ifdef CX_APPLE
-	defaultArguements = " -I hotkeys -vvv screen:// \":sout=#transcode{vcodec=h264,vb=800,fps=10,scale=1,acodec=none}:duplicate{dst=standard{access=file,mux=mp4,dst="+saveFile+"}}\"";
+	defaultArguements = " -I hotkeys screen:// \":sout=#transcode{vcodec=h264,vb=800,fps=10,scale=1,acodec=none}:duplicate{dst=standard{access=file,mux=mp4,dst="+saveFile+"}}\"";
 #endif
 #ifdef CX_LINUX
-	defaultArguements = " -I hotkeys -vvv screen:// :screen-fps=10.000000 :live-caching=300 \":sout=#transcode{vcodec=h264,vb=0,fps=10,scale=0,acodec=none}:file{dst="+saveFile+"}\" :sout-keep";
+	defaultArguements = " -I hotkeys screen:// :screen-fps=10.000000 :live-caching=300 \":sout=#transcode{vcodec=h264,vb=0,fps=10,scale=0,acodec=none}:file{dst="+saveFile+"}\" :sout-keep";
 #endif
 	return defaultArguements;
 }
