@@ -37,7 +37,8 @@ class Shell (object):
         self.REDIRECT_OUTPUT = False
         self.TERMINATE_ON_ERROR = True
         self.TEST_add_win_env = False
-        
+        self.count = 0
+
     def getArgParser(self):
         p = cxArgParse.ArgumentParser(add_help=False)
         p.add_argument('-d', '--dummy', action='store_true', 
@@ -117,15 +118,22 @@ class Shell (object):
         destpath = os.path.dirname(dst)
         self.makeDirs(destpath)
         shutil.copy(src, dst)
-        
+
     def rm_r(self, path, pattern=""):
+        path = self._convertToString(path)
+        # extract filename component from path is possible.
+        if len(pattern)==0 and not os.path.isdir(path):
+            pattern = os.path.basename(path)
+            path = os.path.dirname(path)            
+        # run rm_r recursively on all files in pathS
+        self._rm_r_recursive(path, pattern)
+
+    def _rm_r_recursive(self, path, pattern=""):
         '''
         This function mimics rm -rf (unix) for
         Linux, Mac and Windows. Will work with
         Unix style pathname pattern expansion. Not regex.
-        '''
-        path = self._convertToString(path)
-        
+        '''        
         info = 'Running rm_f on %s' % path
         if len(pattern)!=0:
             info = info + ', pattern=%s' % pattern
@@ -138,7 +146,7 @@ class Shell (object):
             else:
                 matching_files = glob.glob("%s/%s" % (path, pattern))
                 for f in matching_files:
-                    self.rm_r(f)
+                    self._rm_r_recursive(f)
         elif os.path.exists(path):
             os.remove(path)
     
