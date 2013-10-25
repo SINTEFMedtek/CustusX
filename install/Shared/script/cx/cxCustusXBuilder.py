@@ -96,13 +96,14 @@ class CustusXBuilder:
             shell.run('jom package')
         else:
             shell.run('make package')
+
         self._movePackageToStandardLocation()        
 
     def _movePackageToStandardLocation(self):
         installer = self.createInstallerObject(installer_path=self._getInitialInstallerPackagePath())
         #filepattern = installer.getInstallerPackagePattern()
         source = installer.findInstallerFile()
-        dest = self._getStandardInstallerPackagePath()
+        dest = '%s/%s' % (self._getStandardInstallerPackagePath(), os.path.basename(source))
         PrintFormatter.printInfo('Copying package files from [%s] to [%s]'%(source,dest))
         shell.cp(source, dest)
 
