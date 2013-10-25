@@ -188,7 +188,7 @@ class Common(object):
     def getBuildFolder(self):
         retval = []
         self._appendToBuildFolder(retval, self._addLongOrShortPathID("build", "b"))
-        self._appendToBuildFolder(retval, self._addLongOrShortPathID('_'+self.build_type, self.build_type))
+        self._appendToBuildFolder(retval, self.build_type)
         self._appendToBuildFolder(retval, self._addLongOrShortPathID("static", "s", add_only_if=self.static))
         self._appendToBuildFolder(retval, self._addLongOrShortPathID("32", "32", add_only_if=self.m32bit), delimiter='')
         self._appendToBuildFolder(retval, self._addLongOrShortPathID("xcode", "x", add_only_if=self.xcode))
