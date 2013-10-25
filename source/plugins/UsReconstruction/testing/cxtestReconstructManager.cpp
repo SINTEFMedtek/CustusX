@@ -31,6 +31,8 @@
 	#include "TordReconstruct/TordTest.h"
 #endif // SSC_USE_OpenCL
 
+#include "cxSimpleSyntheticVolume.h"
+
 #include "catch.hpp"
 
 #include "cxtestUtilities.h"
@@ -544,6 +546,55 @@ TEST_CASE("ReconstructManager: B-Mode with synthetic data", "[usreconstruction][
 //	cx::dataManager()->saveImage(output, cx::DataLocations::getTestDataPath());
 //	std::cout << "Saved test file to: " << cx::DataLocations::getTestDataPath() << "/" << output->getFilePath() << std::endl;
 //	cx::DataManager::shutdown();
+}
+
+TEST_CASE("US Reconstruction: With generated synthetic data","[usreconstruction][synthetic]")
+{
+	Eigen::Array3i dims(100, 100, 100);
+	cx::cxSimpleSyntheticVolume volume(dims);
+	cx::TordTest algorithm;
+
+	QDomElement root;
+
+	// FIXME: This doesn't work!
+	algorithm.getMethodOption(root)->setValue("DW");
+	algorithm.getPlaneMethodOption(root)->setValue("Heuristic");
+	algorithm.getMaxPlanesOption(root)->setValue(8);
+	algorithm.getRadiusOption(root)->setValue(1);
+
+	std::vector<cx::Transform3D> planes;
+
+	for(int i = 0; i < 100; i++)
+	{
+		cx::Transform3D transform = cx::Transform3D::Identity();
+		cx::Vector3D translation(0,0,i);
+		transform.translation() = translation;
+		transform.rotate(Eigen::AngleAxisd((double)(i-50)/100 *M_PI/8, Eigen::Vector3d::UnitY()));
+		planes.push_back(transform);
+	}
+	Eigen::Array2f pixelSpacing(0.5f, 0.5f);
+	Eigen::Array2i us_dims(200, 200);
+	std::cout << "Starting samping\n";
+	cx::ProcessedUSInputDataPtr usData = volume.sampleUsData(planes,
+	                                                     pixelSpacing,
+	                                                     us_dims);
+	std::cout << "Done sampling\n";
+
+	REQUIRE(usData);
+	vtkImageDataPtr outputData = vtkImageDataPtr::New();
+	outputData->SetExtent(0, 99, 0, 99, 0, 99);
+	outputData->SetSpacing(1, 1, 1);
+	std::cout << "Reconstructing\n";
+	algorithm.reconstruct(usData,
+	                      outputData,
+	                      root);
+	std::cout << "Reconstruction done\n";
+
+	float sse = volume.computeRMSError(outputData);
+
+	std::cout << "RMS value: " << sse << std::endl;
+	REQUIRE(sse < 1.0f);
+
 }
 
 } // namespace cxtest
