@@ -64,7 +64,9 @@ class Common(object):
         self.mUseCotire = False
         self.mGEStreamerUseOpenCL = True
         self.mOSX_DEPLOYMENT_TARGET = "10.6" # Deploy for OSX 10.6 Snow Leopard and later
+        self.short_pathnames = False
         if (platform.system() == 'Windows'):
+            self.short_pathnames = True
             self.mBuildSSCExamples = False
             self.mBuildTesting = True
             self.mUseCotire = False
@@ -75,7 +77,6 @@ class Common(object):
         self.mDoxygen = False
         self.git_tag = None # if none, use branch master
         self.force_connect_sublibraries = False
-        self.short_pathnames = False
 
     def printSettings(self):
         print ''
