@@ -75,6 +75,7 @@ class Common(object):
         self.mDoxygen = False
         self.git_tag = None # if none, use branch master
         self.force_connect_sublibraries = False
+        self.short_pathnames = False
 
     def printSettings(self):
         print ''
@@ -96,6 +97,7 @@ class Common(object):
         print '    git tag:', self.git_tag
         print '    GEStreamerOpenCL:', self.mGEStreamerUseOpenCL
         print '    force_connect_sublibraries:', self.force_connect_sublibraries
+        print '    short_pathnames:', self.short_pathnames
         print ''
 
     def getArgParser_root_dir(self):
@@ -117,6 +119,7 @@ class Common(object):
         if platform.system() == 'Darwin':
             p.add_boolean_inverter('--xcode', default=self.xcode, dest='xcode', help='Generate xcode targets')
         p.add_boolean_inverter('--force_connect_sublibraries', default=self.force_connect_sublibraries, dest='force_connect_sublibraries', help='Force libs such as gestreamer and tsf to be connected to cx, during configuration step.')        
+        p.add_boolean_inverter('--short_pathnames', default=self.short_pathnames, dest='short_pathnames', help='Create shorter pathnames where possible. Workaround for the path length limitation on Windows.')        
         return p
 
     def getArgParser_extended_build(self):
@@ -173,38 +176,52 @@ class Common(object):
         return self.root_dir
     
     def getWorkingPath(self):
-        return "%s/%s" % (self.root_dir, self._workingFolder)
+        return "%s/%s" % (self.root_dir, self._getWorkingFolder())
     
     def getExternalPath(self):
-        return "%s/%s" % (self.root_dir, self._externalFolder)                        
+        return "%s/%s" % (self.root_dir, self._getExternalFolder())                        
     
     def setBuildShared(self, value):
         self.static = not value
-        #self._buildShared = value
     
     def getBuildFolder(self):
-        retval = 'build'
-        retval = retval + '_' + self.build_type
-        #if not self._buildShared:
-        if self.static == True:
-            retval = retval + "_static"
-        if self.m32bit == True:
-            retval = retval + "32"
-        if self.xcode == True:
-            retval = retval + "_xcode"
-        if self.jom == True:
-            retval = retval + "_jom"
-        return retval
+        retval = []
+        self._appendToBuildFolder(retval, self._addLongOrShortPathID("build", "b"))
+        self._appendToBuildFolder(retval, self._addLongOrShortPathID('_'+self.build_type, self.build_type))
+        self._appendToBuildFolder(retval, self._addLongOrShortPathID("static", "s", add_only_if=self.static))
+        self._appendToBuildFolder(retval, self._addLongOrShortPathID("32", "32", add_only_if=self.m32bit), delimiter='')
+        self._appendToBuildFolder(retval, self._addLongOrShortPathID("xcode", "x", add_only_if=self.xcode))
+        self._appendToBuildFolder(retval, self._addLongOrShortPathID("jom", "j", add_only_if=self.jom))
+        return ''.join(retval)
+    
+    def _appendToBuildFolder(self, retval, value, delimiter='_'):
+        if len(value)==0:
+            return
+        if len(retval)>0:
+            retval.append(delimiter)
+        retval.append(value)
+
+    def _addLongOrShortPathID(self, long_name, short_name, add_only_if=True):
+        if not add_only_if:
+            return ""
+        if self.short_pathnames:
+            return short_name
+        else:
+            return long_name
             
     def _initPaths(self):                
         if platform.system() == 'Windows':
             self.root_dir = "C:/Dev"
         else:
             self.root_dir = os.path.expanduser("~") + "/dev" #+ getpass.getuser() - use new default
-        # external dir: Used as base dir for all externals, such as VTK, ITK, ...
-        self._externalFolder = "external"
-        # working dir: Used as base dir for Custus and other of our 'own' projects
-        self._workingFolder = "working"
+        
+    def _getExternalFolder(self):
+        '''external dir: Used as base dir for all externals, such as VTK, ITK, ...'''
+        return self._addLongOrShortPathID("external", "ext")
+
+    def _getWorkingFolder(self):
+        ''' working dir: Used as base dir for Custus and other of our 'own' projects '''
+        return "working"
         
     def getGitTag(self):
         if self.git_tag == "":
