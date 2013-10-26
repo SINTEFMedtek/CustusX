@@ -132,8 +132,7 @@ TimeOut: %d
         'Run all Catch tests at path and write them in junit xml format to outfile'
         if not outfile:
             baseName = self._createCatchBaseFilenameFromTag(tag)
-            outfile = '%s/%s.xml' % (outpath, baseName)
-            #outfile = '%s/CatchTestResults.junit.xml' % path
+            outfile = '%s/%s.junit.xml' % (outpath, baseName)
         PrintFormatter.printInfo('Run catch with tag %s, results to %s' % (tag, outfile))
         shell.changeDir(path)
         shell.rm_r(outfile)
@@ -158,11 +157,11 @@ TimeOut: %d
                 
     def _getExcludeTags(self):
         if(platform.system() == 'Windows'):
-             return "~[not_windows]~[hide]"
+             return "~[not_windows]~[hide]~[unstable]"
         if platform.system() == 'Darwin':
-             return "~[not_apple]~[hide]"
+             return "~[not_apple]~[hide]~[unstable]"
         if platform.system() == 'Linux':
-             return "~[not_linux]~[hide]"
+             return "~[not_linux]~[hide]~[unstable]"
          
     def includeTagsForOS(self, tag):
         exclude = self._getExcludeTags()
@@ -198,5 +197,5 @@ TimeOut: %d
         tag = tag.replace('][','.')
         tag = tag.replace('/','-')
         tag = tag.replace(']','.')
-        tag = tag.replace('~[','exclude_')
+        tag = tag.replace('~[','ex_')
         return tag
