@@ -59,13 +59,20 @@ class CustusXBuilder:
         PrintFormatter.printHeader('Run all unit tests', level=2)
         self.clearTestData()
         self._runCatchUnitTests()
-        self._runCTestTests()
+        self._runCTestUnitTests()
     
-    def _runCTestTests(self):
+    def _runCTestUnitTests(self):
         PrintFormatter.printHeader('Run ctest tests', level=3)
-        # Run all tests and write them in xml format to ./CTestResults.xml
+        # Run all tests and write them in xml format to ctest.unit.*.xml,
+        # ctest.xml means ctest format, junit.xml means junit format
         custusx = self._createComponent(cxComponents.CustusX3)
-        cxTestRunner.TestRunner().runCTest(custusx.buildPath(), outpath=self._getTestResultsPath())
+        testRunner = cxTestRunner.TestRunner()
+        basename = 'ctest.unit.testresults'
+        outpath = self._getTestResultsPath()
+        ctestfile = '%s/%s.ctest.xml' % (outpath, basename)
+        testRunner.runCTest(custusx.buildPath(), outfile=ctestfile)
+        junitfile='%s/%s.junit.xml' % (outpath, basename)
+        testRunner.convertCTestFile2JUnit(ctestfile, junitfile)
 
     def _runCatchUnitTests(self):
         tags = cxTestRunner.TestRunner().includeTagsForOS('[unit]')
