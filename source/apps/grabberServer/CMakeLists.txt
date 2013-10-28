@@ -81,9 +81,9 @@ if(CX_APPLE)
 endif()
 
 set( ALL_LINK_LIBRARIES
-	cxResourceWidgets
-	OpenIGTLink
-	cxOpenIGTLinkUtilities
+        cxResourceWidgets
+        OpenIGTLink
+        cxOpenIGTLinkUtilities
 	${QT_LIBRARIES})
 
 #------------------------------------------------------------------------------
