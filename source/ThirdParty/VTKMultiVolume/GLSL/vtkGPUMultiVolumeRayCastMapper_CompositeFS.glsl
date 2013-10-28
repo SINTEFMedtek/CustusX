@@ -15,25 +15,21 @@
 
 // Fragment program part with ray cast and composite method.
 
-#version 110
+uniform sampler3D dataSetTexture[4]; //Mehdi
+uniform sampler1D opacityTexture[4]; //Mehdi
+
+uniform mat4 P1toPN[3];
 
 
-uniform sampler3D dataSetTexture[10]; //Mehdi
-uniform sampler1D opacityTexture[10]; //Mehdi
-
-
-uniform mat4 P1toPN[9];
-
-
-uniform vec3 lowBounds[10]; //Mehdi 
-uniform vec3 highBounds[10]; //Mehdi 
+uniform vec3 lowBounds[4]; //Mehdi
+uniform vec3 highBounds[4]; //Mehdi
 
 
 uniform int Number_Of_Volumes;
 
 // Entry position (global scope)
 vec3 pos;
-vec3 posX[9];
+vec3 posX[3];
 
 
 
@@ -87,12 +83,6 @@ void clip (int i, vec3 pos)
 	xMin[i]=-10.0;
 	yMin[i]=-10.0;
 	zMin[i]=-10.0;
-	/*
-	ClippingplanesNormal[0]=vec3(1.0,1.0,-1.0);
-	ClippingplanesOrigins[0]=vec3(.5,.5,.5);
-	ClippingplanesNormal[1]=vec3(1.0,1.0,0.0);
-	ClippingplanesOrigins[1]=vec3(.5,.5,.5);
-	*/
 
 	float partX=ClippingplanesNormal[i].x*(pos.x-ClippingplanesOrigins[i].x);
 	float partY=ClippingplanesNormal[i].y*(pos.y-ClippingplanesOrigins[i].y);
@@ -293,8 +283,8 @@ void trace(void)
   vec4 destColor=initialColor();
   float remainOpacity=1.0-destColor.a;
   
-  vec4 color[10];
-  vec4 opacity[10];
+  vec4 color[4];
+  vec4 opacity[4];
   
 
   
@@ -309,81 +299,111 @@ void trace(void)
   // We NEED two nested while loops. It is trick to work around hardware
   // limitation about the maximum number of loops.
   
-  while(inside)
-  {  
-    while(inside)
-      {
-
-     	for(int iii=0;iii<Number_Of_Volumes-1;iii++) //Mehdi
-			posX[iii] = vec3(P1toPN[iii]*vec4(pos,1)); //Mehdi
-		
-		vec4 value[10];
-		float scalar[10];
-		
-		//Texture 1
-		if(all(greaterThanEqual(pos,lowBounds[0]))
-        && all(lessThanEqual(pos,highBounds[0])))
+	while(inside)
+	{
+		while(inside)
 		{
-			//if(isPointOnTheLineZ(end,start,pos))
-			if(clipped[0]==1)
-				clip(0,pos);
+			for(int iii=0;iii<Number_Of_Volumes-1;iii++) //Mehdi
+				posX[iii] = vec3(P1toPN[iii]*vec4(pos,1)); //Mehdi
 		
-			if(((xMin[0]<pos.x)&&(yMin[0]<pos.y)&&(zMin[0]<pos.z))||(clipped[0]==0))
+				vec4 value[10];
+				float scalar[10];
+		
+			//Texture 1
+			if(all(greaterThanEqual(pos,lowBounds[0]))
+			&& all(lessThanEqual(pos,highBounds[0])))
 			{
+				//if(isPointOnTheLineZ(end,start,pos))
+				if(clipped[0]==1)
+					clip(0,pos);
+		
+				if(((xMin[0]<pos.x)&&(yMin[0]<pos.y)&&(zMin[0]<pos.z))||(clipped[0]==0))
+				{
 
-				value[0]=texture3D(dataSetTexture[0],pos);
-				scalar[0]=scalarFromValue(value[0]);
-				// opacity is the sampled texture value in the 1D opacity texture at scalarValue
+					value[0]=texture3D(dataSetTexture[0],pos);
+					scalar[0]=scalarFromValue(value[0]);
+					// opacity is the sampled texture value in the 1D opacity texture at scalarValue
  
-				opacity[0]=texture1D(opacityTexture[0],scalar[0]);//Mehdi
+					opacity[0]=texture1D(opacityTexture[0],scalar[0]);//Mehdi
 
-				if(opacity[0].a>0.0)
-				{
-					color[0]=shade(0,value[0]);
-					color[0]=color[0]*opacity[0].a;
-					destColor=destColor+color[0]*remainOpacity;
-					remainOpacity=remainOpacity*(1.0-opacity[0].a);
-				}
-			}
-		}
-    //Texture2 and upper
-		
-		for(int xx = 1;((xx<5)&&(xx < Number_Of_Volumes));xx++)//? //Help 		
-		{
-
-			if (all(greaterThanEqual(posX[xx-1],lowBounds[xx]))
-			&& all(lessThanEqual(posX[xx-1],highBounds[xx])))
-			{
-				
-				if(clipped[xx]==1)
-					clip(xx,posX[xx-1]);
-				
-				if(((xMin[xx]<posX[xx-1].x)&&(yMin[xx]<posX[xx-1].y)&&(zMin[xx]<posX[xx-1].z))||(clipped[xx]==0))
-				{
-					value[xx]=texture3D(dataSetTexture[xx],posX[xx-1]);
-					scalar[xx]=scalarFromValue(value[xx]);
-        
-					// opacity is the sampled texture value in the 1D opacity texture at
-					// scalarValue
-					opacity[xx]= texture1D(opacityTexture[xx],scalar[xx]);
-
-					if(opacity[xx].a>0.0)
+					if(opacity[0].a>0.0)
 					{
-						color[xx]=shade(xx,value[xx]);
-						color[xx]=color[xx]*opacity[xx].a;
-						destColor=destColor+color[xx]*remainOpacity;
-						remainOpacity=remainOpacity*(1.0-opacity[xx].a);
+						color[0]=shade(0,value[0]);
+						color[0]=color[0]*opacity[0].a;
+						destColor=destColor+color[0]*remainOpacity;
+						remainOpacity=remainOpacity*(1.0-opacity[0].a);
 					}
 				}
 			}
+		
+			//Texture2 and upper
+		
+			int xx=1;
+		
+			while(xx<Number_Of_Volumes)	
+			{
+		
+				if (all(greaterThanEqual(posX[xx-1],lowBounds[xx]))
+				&& all(lessThanEqual(posX[xx-1],highBounds[xx])))
+				{
 				
-		}
+					if(clipped[xx]==1)
+						clip(xx,posX[xx-1]);
+				
+					if(((xMin[xx]<posX[xx-1].x)&&(yMin[xx]<posX[xx-1].y)&&(zMin[xx]<posX[xx-1].z))||(clipped[xx]==0))
+					{
+				                     
+						#ifdef __APPLE__
 
-      pos=pos+rayDir;
-      t+=1.0;
-      inside=t<tMax && (remainOpacity>=0.0039); // 1/255=0.0039
-      }
-  }
-  gl_FragColor = destColor;
-  gl_FragColor.a = 1.0-remainOpacity;
+							if(xx==1)
+								value[1]=texture3D(dataSetTexture[1],posX[0]);
+							if(xx==2)
+								value[2]=texture3D(dataSetTexture[2],posX[1]);
+							if(xx==3)
+								value[3]=texture3D(dataSetTexture[3],posX[2]);
+						#else
+							value[xx]=texture3D(dataSetTexture[xx],posX[xx-1]);
+						#endif
+                                      	
+						scalar[xx]=scalarFromValue(value[xx]);
+        
+						// opacity is the sampled texture value in the 1D opacity texture at
+						// scalarValue
+					
+						#ifdef __APPLE__
+						
+							if(xx==1)
+								opacity[1]= texture1D(opacityTexture[1],scalar[1]);     	
+							if(xx==2)
+								opacity[2]= texture1D(opacityTexture[2],scalar[2]);
+							if(xx==3)
+								opacity[3]= texture1D(opacityTexture[3],scalar[3]);
+						#else
+							opacity[xx]= texture1D(opacityTexture[xx],scalar[xx]);
+						#endif
+					
+	
+						if(opacity[xx].a>0.0)
+						{
+					
+							color[xx]=shade(xx,value[xx]);
+							color[xx]=color[xx]*opacity[xx].a;
+							destColor=destColor+color[xx]*remainOpacity;
+							remainOpacity=remainOpacity*(1.0-opacity[xx].a);
+						}
+					}
+				}
+				
+				xx+=1;
+			}
+
+			pos=pos+rayDir;
+			t+=1.0;
+			inside=t<tMax && (remainOpacity>=0.0039); // 1/255=0.0039
+		}
+	}
+	
+	gl_FragColor = destColor;
+	gl_FragColor.a = 1.0-remainOpacity;
+
 }
