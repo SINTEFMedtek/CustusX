@@ -548,12 +548,16 @@ TEST_CASE("ReconstructManager: B-Mode with synthetic data", "[usreconstruction][
 //	cx::DataManager::shutdown();
 }
 
+#ifdef SSC_USE_OpenCL
 TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction][synthetic][hide]")
 {
+	
 	Eigen::Array3i dims(100, 100, 100);
 	cx::cxSimpleSyntheticVolume volume(dims);
 	cx::TordTest algorithm;
 
+	// FIXME: This should probably use the ReconstructManager somehow
+	
 	QDomDocument domDoc;
 	QDomElement root = domDoc.createElement("TordTest");
 
@@ -617,6 +621,7 @@ TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction
 	REQUIRE(sse < 15.0f);
 
 }
+#endif
 
 } // namespace cxtest
 
