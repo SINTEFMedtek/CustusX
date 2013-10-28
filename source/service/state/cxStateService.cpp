@@ -28,6 +28,7 @@
 #include "cxViewWrapper3D.h"
 #include "cxDataLocations.h"
 #include "cxConfig.h"
+#include "cxVLCRecorder.h"
 
 namespace cx
 {
@@ -197,14 +198,9 @@ void StateService::fillDefault(QString name, T value)
  */
 QString StateService::checkGrabberServerExist(QString path, QString filename, QString args)
 {
-//	std::cout << "checking [" << path << "] [" << filename << "] [" << args << "]" << std::endl;
 	path = QDir::cleanPath(path);
-//	std::cout << "  cleaned [" << path << "]" << std::endl;
 	if (QDir(path).exists(filename))
-	{
-//		std::cout << "  found [" << filename << "]" << std::endl;
 		return QDir(DataLocations::getBundlePath()).relativeFilePath(path + "/" + filename) + " " + args;
-	}
 
 	return "";
 }
@@ -295,6 +291,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("renderingInterval", 33);
 	this->fillDefault("backgroundColor", QColor("black"));
 	this->fillDefault("globalPatientDataFolder", QDir::homePath() + "/Patients");
+	this->fillDefault("vlcPath", vlc()->getVLCPath());
 	this->fillDefault("globalApplicationName", enum2string(mdLABORATORY));
 	this->fillDefault("globalPatientNumber", 1);
 	this->fillDefault("Ultrasound/acquisitionName", "US-Acq");

@@ -26,7 +26,6 @@
 #include "cxFilterTimedAlgorithm.h"
 #include "cxSelectDataStringDataAdapter.h"
 
-#include "commons.hpp"
 #include "parameters.hpp"
 #include "tsf-config.h"
 #include "SIPL/Exceptions.hpp"

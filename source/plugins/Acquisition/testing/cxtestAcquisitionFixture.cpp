@@ -193,7 +193,7 @@ void AcquisitionFixture::verifyFileData(cx::USReconstructInputData fileData)
 	double tolerance = 0.1;
 	QString msg;
 
-	CHECK(!fileData.mFilename.isEmpty());
+	REQUIRE(!fileData.mFilename.isEmpty());
 
 	// check for enough received image frames
 //	int framesPerSecond = 20; // minimum frame rate

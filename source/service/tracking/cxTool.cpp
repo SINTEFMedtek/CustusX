@@ -33,7 +33,7 @@ namespace cx
 {
 
 cxTool::cxTool(IgstkToolPtr igstkTool) :
-				mTool(igstkTool), mPositionHistory(new TimedTransformMap()), mPolyData(NULL), m_prMt(
+				mTool(igstkTool), mPolyData(NULL), m_prMt(
 								new Transform3D(Transform3D::Identity())), mValid(false), mConfigured(false), mTracked(
 								false)
 {
@@ -85,11 +85,6 @@ QString cxTool::getGraphicsFileName() const
 vtkPolyDataPtr cxTool::getGraphicsPolyData() const
 {
 	return mPolyData;
-}
-
-TimedTransformMapPtr cxTool::getPositionHistory()
-{
-	return mPositionHistory;
 }
 
 ProbePtr cxTool::getProbe() const
@@ -213,15 +208,6 @@ std::map<int, Vector3D> cxTool::getReferencePoints() const
 bool cxTool::hasReferencePointWithId(int id)
 {
   return this->getReferencePoints().count(id);
-}
-
-TimedTransformMap cxTool::getSessionHistory(double startTime, double stopTime)
-{
-	TimedTransformMap::iterator startIt = mPositionHistory->lower_bound(startTime);
-	TimedTransformMap::iterator stopIt = mPositionHistory->upper_bound(stopTime);
-
-	TimedTransformMap retval(startIt, stopIt);
-	return retval;
 }
 
 void cxTool::addXml(QDomNode& dataNode)

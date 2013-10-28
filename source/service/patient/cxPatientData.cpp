@@ -50,7 +50,6 @@ QDomElement getElementForced(QDomNode root, QString path)
 {
 	QStringList pathList = path.split("/");
 	QDomElement current = root.toElement();
-//	std::cout << "getElementForced " << pathList.join(" - ") << std::endl;
 
 	if (current.isNull())
 		return current;
@@ -58,11 +57,9 @@ QDomElement getElementForced(QDomNode root, QString path)
 	for (int i = 0; i < pathList.size(); ++i)
 	{
 		QDomElement next = current.namedItem(pathList[i]).toElement();
-//		std::cout << "  getElementForced (" << current.tagName() << ")" << pathList[i] << " " << !bool(next.isNull()) << std::endl;
 
 		if (next.isNull())
 		{
-//			std::cout << "  getElementForced - adding element " << pathList[i] << " to " << current.tagName() << std::endl;
 			next = root.ownerDocument().createElement(pathList[i]);
 			current.appendChild(next);
 		}
@@ -74,8 +71,10 @@ QDomElement getElementForced(QDomNode root, QString path)
 }
 
 PatientData::PatientData()
-{
-}
+{}
+
+PatientData::~PatientData()
+{}
 
 QString PatientData::getActivePatientFolder() const
 {
@@ -84,8 +83,27 @@ QString PatientData::getActivePatientFolder() const
 
 bool PatientData::isPatientValid() const
 {
-	//messageManager()->sendDebug("PatientData::isPatientValid: "+string_cast(!mActivePatientFolder.isEmpty()));
 	return !mActivePatientFolder.isEmpty() && (mActivePatientFolder != this->getNullFolder());
+}
+
+QDomElement PatientData::getCurrentWorkingElement(QString path)
+{
+	return getElementForced(mWorkingDocument.documentElement(), path);
+}
+
+QDomDocument PatientData::getCurrentWorkingDocument()
+{
+	return mWorkingDocument;
+}
+
+QString PatientData::generateFilePath(QString folderName, QString ending)
+{
+	QString folder = this->getActivePatientFolder() + "/" +folderName + "/";
+	QDir().mkpath(folder);
+	QString format = timestampSecondsFormat();
+	QString filename = QDateTime::currentDateTime().toString(format) + "." + ending;
+
+	return folder+filename;
 }
 
 void PatientData::setActivePatient(const QString& activePatientFolder)
@@ -113,6 +131,7 @@ void PatientData::newPatient(QString choosenDir)
 void PatientData::clearPatient()
 {
 	dataManager()->clear();
+	//TODO
 //  toolManager()->clear();
 //  viewManager()->clear();
 //  registrationManager()->clear();
@@ -183,16 +202,12 @@ void PatientData::startupLoadPatient()
 	if (folder.isEmpty())
 		return;
 
-//	messageManager()->sendInfo("Startup Load patient: " + folder);
 	this->loadPatient(folder);
 }
 
-
-//void PatientData::loadPatientFileSlot()
 void PatientData::loadPatient(QString choosenDir)
 {
 	this->clearPatient();
-	//messageManager()->sendDebug("loadPatient() choosenDir: "+string_cast(choosenDir));
 	if (choosenDir == QString::null)
 		return; // On cancel
 
@@ -214,14 +229,6 @@ void PatientData::loadPatient(QString choosenDir)
 		}
 		file.close();
 	}
-	// This feature has been a hassle, and never used. Removed.
-//	else //User have created the directory create xml file and folders
-//	{
-//		//TODO: Ask the user if he want to convert the folder
-//		messageManager()->sendInfo(
-//						"Found no CX3 data in folder: " + choosenDir + " Converting the folder to a patent folder...");
-//		createPatientFolders(choosenDir);
-//	}
 
 	this->setActivePatient(choosenDir);
 }
@@ -236,11 +243,7 @@ void PatientData::savePatient()
 {
 
 	if (mActivePatientFolder.isEmpty())
-	{
-//    messageManager()->sendWarning("No patient selected, select or create patient before saving!");
-//    this->newPatientSlot();
 		return;
-	}
 
 	//Gather all the information that needs to be saved
 	QDomDocument doc;
@@ -254,21 +257,17 @@ void PatientData::savePatient()
 		QTextStream stream(&file);
 		stream << doc.toString(4);
 		file.close();
-//		messageManager()->sendInfo("Created " + file.fileName());
 	}
 	else
 	{
 		messageManager()->sendError("Could not open " + file.fileName() + " Error: " + file.errorString());
 	}
 
-//  toolManager()->savePositionHistory();
-
 	// save position transforms into the mhd files.
 	// This hack ensures data files can be used in external programs without an explicit export.
 	DataManager::ImagesMap images = dataManager()->getImages();
 	for (DataManager::ImagesMap::iterator iter = images.begin(); iter != images.end(); ++iter)
 	{
-		//dataManager()->saveImage(iter->second, targetFolder);
 		CustomMetaImagePtr customReader = CustomMetaImage::create(
 						mActivePatientFolder + "/" + iter->second->getFilePath());
 		customReader->setTransform(iter->second->get_rMd());
@@ -342,10 +341,7 @@ bool PatientData::copyFile(QString source, QString dest, QString &infoText)
 	QDir().mkpath(info.path());
 
 	QFile toFile(dest);
-	if (QFile(source).copy(toFile.fileName()))
-	{
-		//messageMan()->sendInfo("File copied to new location: "+pathToNewFile.toStdString());
-	}
+	QFile(source).copy(toFile.fileName());
 	if (!toFile.flush())
 	{
 		QString text = "Failed to copy file: " + source;
@@ -366,24 +362,24 @@ bool PatientData::copyFile(QString source, QString dest, QString &infoText)
 	return true;
 }
 
-bool PatientData::copyAllSimilarFiles(QString fileName, QString destFolder, QString &infoText)
-{
-	QDir sourceFolder(QFileInfo(fileName).path());
-	QStringList filter;
-	filter << QFileInfo(fileName).completeBaseName() + ".*";
-	QStringList sourceFiles = sourceFolder.entryList(filter, QDir::Files);
+//bool PatientData::copyAllSimilarFiles(QString fileName, QString destFolder, QString &infoText)
+//{
+//	QDir sourceFolder(QFileInfo(fileName).path());
+//	QStringList filter;
+//	filter << QFileInfo(fileName).completeBaseName() + ".*";
+//	QStringList sourceFiles = sourceFolder.entryList(filter, QDir::Files);
 
-	for (int i = 0; i < sourceFiles.size(); ++i)
-	{
-		QString sourceFile = sourceFolder.path() + "/" + sourceFiles[i];
-		QString destFile = destFolder + "/" + QFileInfo(sourceFiles[i]).fileName();
-		QString text;
-		this->copyFile(sourceFile, destFile, text);
-		infoText.append(text);
-	}
+//	for (int i = 0; i < sourceFiles.size(); ++i)
+//	{
+//		QString sourceFile = sourceFolder.path() + "/" + sourceFiles[i];
+//		QString destFile = destFolder + "/" + QFileInfo(sourceFiles[i]).fileName();
+//		QString text;
+//		this->copyFile(sourceFile, destFile, text);
+//		infoText.append(text);
+//	}
 
-	return true;
-}
+//	return true;
+//}
 
 DataPtr PatientData::importData(QString fileName, QString &infoText)
 {
@@ -429,10 +425,8 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 
 	data->setFilePath(patientDataDir.relativeFilePath(pathToNewFile)); // Update file path
 
-	this->copyAllSimilarFiles(fileName, patientsImageFolder, infoText);
-//  messageManager()->sendDebug("Data is now copied into the patient folder!");
-
-//	this->autoSave();
+	dataManager()->saveData(data, mActivePatientFolder);
+//	this->copyAllSimilarFiles(fileName, patientsImageFolder, infoText);
 
 	// remove redundant line breaks
 	infoText = infoText.split("<br>", QString::SkipEmptyParts).join("<br>");
@@ -442,7 +436,6 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 
 void PatientData::createPatientFolders(QString choosenDir)
 {
-	//messageManager()->sendDebug("PatientData::createPatientFolders() called");
 	if (!choosenDir.endsWith(".cx3"))
 		choosenDir.append(".cx3");
 
@@ -548,7 +541,6 @@ void PatientData::readLoadDoc(QDomDocument& doc, QString patientFolder)
 		dataManager()->parseXml(dataManagerNode, patientFolder);
 	}
 
-//	std::cout << "PatientData::readLoadDoc" << std::endl;
 	emit
 	isLoading();
 

@@ -22,26 +22,27 @@
 #include "sscTime.h"
 
 typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
-typedef vtkSmartPointer<class vtkImageShiftScale> vtkImageShiftScalePtr;
 
 namespace cx
 {
 
-vtkImageDataPtr generateVtkImageData(Eigen::Array3i dim,
-                                     Vector3D spacing,
-                                     const unsigned char initValue,
-                                     int components)
+namespace {
+template<class TYPE, int TYPE_FROM_VTK>
+vtkImageDataPtr generateVtkImageDataGeneric(Eigen::Array3i dim,
+									 Vector3D spacing,
+									 const TYPE initValue,
+									 int components)
 {
 	vtkImageDataPtr data = vtkImageDataPtr::New();
 	data->SetSpacing(spacing[0], spacing[1], spacing[2]);
 	data->SetExtent(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
-	data->SetScalarTypeToUnsignedChar();
+	data->SetScalarType(TYPE_FROM_VTK);
 	data->SetNumberOfScalarComponents(components);
 	data->AllocateScalars();
 
 	int scalarSize = dim[0]*dim[1]*dim[2]*components;
 
-	unsigned char* ptr = reinterpret_cast<unsigned char*>(data->GetScalarPointer());
+	TYPE* ptr = reinterpret_cast<TYPE*>(data->GetScalarPointer());
 	std::fill(ptr, ptr+scalarSize, initValue);
 
 	// A trick to get a full LUT in Image (automatic LUT generation)
@@ -60,36 +61,60 @@ vtkImageDataPtr generateVtkImageData(Eigen::Array3i dim,
 
 	return data;
 }
+} // namespace
+
+vtkImageDataPtr generateVtkImageData(Eigen::Array3i dim,
+                                     Vector3D spacing,
+                                     const unsigned char initValue,
+                                     int components)
+{
+	return generateVtkImageDataGeneric<unsigned char, VTK_UNSIGNED_CHAR>(dim, spacing, initValue, components);
+}
+
+vtkImageDataPtr generateVtkImageDataUnsignedShort(Eigen::Array3i dim,
+									 Vector3D spacing,
+									 const unsigned short initValue,
+									 int components)
+{
+	return generateVtkImageDataGeneric<unsigned short, VTK_UNSIGNED_SHORT>(dim, spacing, initValue, components);
+}
 
 vtkImageDataPtr generateVtkImageDataDouble(Eigen::Array3i dim,
                                            Vector3D spacing,
                                            double initValue)
 {
-	vtkImageDataPtr data = vtkImageDataPtr::New();
-	data->SetSpacing(spacing[0], spacing[1], spacing[2]);
-	data->SetExtent(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
-	data->SetScalarTypeToDouble();
-	data->SetNumberOfScalarComponents(1);
+	return generateVtkImageDataGeneric<double, VTK_DOUBLE>(dim, spacing, initValue, 1);
+}
 
-	int scalarSize = dim[0]*dim[1]*dim[2];
+void fillShortImageDataWithGradient(vtkImageDataPtr data, int maxValue)
+{
+	Eigen::Array3i dim(data->GetDimensions());
 
-	double *rawchars = (double*)malloc((scalarSize+1)*8);
-	std::fill(rawchars,rawchars+scalarSize, initValue);
+	unsigned short* ptr = reinterpret_cast<unsigned short*>(data->GetScalarPointer());
 
-	vtkDoubleArrayPtr array = vtkDoubleArrayPtr::New();
-	array->SetNumberOfComponents(1);
-	//TODO: Whithout the +1 the volume is black
-	array->SetArray(rawchars, scalarSize+1, 0); // take ownership
-	data->GetPointData()->SetScalars(array);
+	int scalarSize = dim[0]*dim[1]*dim[2]*1;
+	for (int z=0; z<dim[2]; ++z)
+		for (int y=0; y<dim[1]; ++y)
+			for (int x=0; x<dim[0]; ++x)
+			{
+				int mod = maxValue;
+				int val = int((double(z)/dim[2]*mod*6))%mod;// + y%255 + x/255;
+				if (val < mod/3)
+					val = 0;
+				ptr[z*dim[0]*dim[1] + y*dim[0] + x] = val;
+			}
 
-	// A trick to get a full LUT in Image (automatic LUT generation)
-	// Can't seem to fix this by calling Image::resetTransferFunctions() after volume is modified
-	rawchars[0] = 255;
-	data->GetScalarRange();// Update internal data in vtkImageData. Seems like it is not possible to update this data after the volume has been changed.
-	rawchars[0] = 0;
+	//	unsigned char* ptr = reinterpret_cast<unsigned char*>(imageData->GetScalarPointer());
 
-
-	return data;
+	//	int scalarSize = dim[0]*dim[1]*dim[2]*1;
+	//	for (int z=0; z<dim[2]; ++z)
+	//		for (int y=0; y<dim[1]; ++y)
+	//			for (int x=0; x<dim[0]; ++x)
+	//			{
+	//				int val = int((double(z)/dim[2]*255*6))%255;// + y%255 + x/255;
+	//				val = val/3;
+	//				ptr[z*dim[0]*dim[1] + y*dim[0] + x] = val;
+	//			}
 }
 
 /**Convert the input image to the smallest unsigned format.
