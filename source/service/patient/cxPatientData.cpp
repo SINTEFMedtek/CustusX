@@ -362,24 +362,24 @@ bool PatientData::copyFile(QString source, QString dest, QString &infoText)
 	return true;
 }
 
-bool PatientData::copyAllSimilarFiles(QString fileName, QString destFolder, QString &infoText)
-{
-	QDir sourceFolder(QFileInfo(fileName).path());
-	QStringList filter;
-	filter << QFileInfo(fileName).completeBaseName() + ".*";
-	QStringList sourceFiles = sourceFolder.entryList(filter, QDir::Files);
+//bool PatientData::copyAllSimilarFiles(QString fileName, QString destFolder, QString &infoText)
+//{
+//	QDir sourceFolder(QFileInfo(fileName).path());
+//	QStringList filter;
+//	filter << QFileInfo(fileName).completeBaseName() + ".*";
+//	QStringList sourceFiles = sourceFolder.entryList(filter, QDir::Files);
 
-	for (int i = 0; i < sourceFiles.size(); ++i)
-	{
-		QString sourceFile = sourceFolder.path() + "/" + sourceFiles[i];
-		QString destFile = destFolder + "/" + QFileInfo(sourceFiles[i]).fileName();
-		QString text;
-		this->copyFile(sourceFile, destFile, text);
-		infoText.append(text);
-	}
+//	for (int i = 0; i < sourceFiles.size(); ++i)
+//	{
+//		QString sourceFile = sourceFolder.path() + "/" + sourceFiles[i];
+//		QString destFile = destFolder + "/" + QFileInfo(sourceFiles[i]).fileName();
+//		QString text;
+//		this->copyFile(sourceFile, destFile, text);
+//		infoText.append(text);
+//	}
 
-	return true;
-}
+//	return true;
+//}
 
 DataPtr PatientData::importData(QString fileName, QString &infoText)
 {
@@ -425,7 +425,8 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 
 	data->setFilePath(patientDataDir.relativeFilePath(pathToNewFile)); // Update file path
 
-	this->copyAllSimilarFiles(fileName, patientsImageFolder, infoText);
+	dataManager()->saveData(data, mActivePatientFolder);
+//	this->copyAllSimilarFiles(fileName, patientsImageFolder, infoText);
 
 	// remove redundant line breaks
 	infoText = infoText.split("<br>", QString::SkipEmptyParts).join("<br>");
