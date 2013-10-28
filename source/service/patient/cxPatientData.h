@@ -114,7 +114,7 @@ private:
 	 * \param destFolder Destination of copy operation
 	 * \param[out] infoText Information about any errors/warnings that occurred during copy
 	 */
-	bool copyAllSimilarFiles(QString fileName, QString destFolder, QString &infoText);
+//	bool copyAllSimilarFiles(QString fileName, QString destFolder, QString &infoText);
 	static QString getVersionName();
 
 	//Patient
