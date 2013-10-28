@@ -62,7 +62,7 @@ protected:
 
 	int getValue(cx::ImagePtr data, int x, int y, int z)
 	{
-		vtkImageDataPtr volume = data->getGrayScaleBaseVtkImageData();
+		vtkImageDataPtr volume = data->getGrayScaleVtkImageData();
 		int val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(x,y,z));
 		return val;
 	}

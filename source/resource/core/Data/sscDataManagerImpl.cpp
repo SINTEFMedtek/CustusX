@@ -728,7 +728,7 @@ ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, QString uid, QString
  */
 ImagePtr DataManagerImpl::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath)
 {
-	ImagePtr retval = createImage(data, uid, name, filePath);
+	ImagePtr retval = this->createImage(data, uid, name, filePath);
 	retval->get_rMd_History()->setRegistration(parentImage->get_rMd());
 	retval->get_rMd_History()->setParentSpace(parentImage->getUid());
 	ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy(retval->getBaseVtkImageData());

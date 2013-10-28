@@ -53,6 +53,8 @@ public:
 	static unsigned int getNumberOfVoxelsAboveThreshold(vtkImageDataPtr image, int threshold);
 	static unsigned int getNumberOfNonZeroVoxels(vtkImageDataPtr image);
 	static double getFractionOfVoxelsAboveThreshold(vtkImageDataPtr image, int threshold);
+
+	static void sleep_sec(int seconds);
 };
 
 } /* namespace cxtest */

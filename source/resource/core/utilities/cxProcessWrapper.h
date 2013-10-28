@@ -1,4 +1,4 @@
-// This file is part of CustusX, an Image Guided Therapy Application.
+	// This file is part of CustusX, an Image Guided Therapy Application.
 //
 // Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
 //
@@ -20,6 +20,7 @@
 #include <QStringList>
 #include <QString>
 #include <QProcess>
+#include "cxProcessReporter.h"
 
 namespace cx
 {
@@ -32,10 +33,12 @@ namespace cx
 
 typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
 
-/**Wraps a QProcess and performs some common operations.
+/**
+ * Wraps a QProcess and supplies a interface that integrates nicely with the rest of CustusX.
  *
  *  \date Oct 19, 2012
- *  \author christiana
+ *  \author Christian Askeland, SINTEF
+ *  \author Janne Beate Bakeng, SINTEF
  */
 class ProcessWrapper : public QObject
 {
@@ -45,19 +48,24 @@ public:
 	virtual ~ProcessWrapper();
 
 	QProcess* getProcess();
-	void launch(QString executable, QStringList arguments = QStringList());
 
+	void launchWithRelativePath(QString executable, QStringList arguments = QStringList());
+	void launch(QString executable, QStringList argument = QStringList());
 
-private slots:
-	void serverProcessReadyRead();
-	void serverProcessStateChanged(QProcess::ProcessState newState);
-	void serverProcessError(QProcess::ProcessError error);
+	bool isRunning();
+
+public slots:
+	void requestTerminateSlot();
 
 private:
-	QProcess* mProcess;
-	QString mName;
-};
+	QString getExecutableInBundlesAbsolutePath(QString exeInBundle);
+	void internalLaunch(QString executable, QStringList arguments);
 
+	QProcess* mProcess;
+	ProcessReporterPtr mReporter;
+	QString mName;
+	QString mLastExecutablePath; //the path to the last executable that was launched
+};
 }
 
 #endif /* CXPROCESSWRAPPER_H_ */

@@ -299,9 +299,21 @@ void trace(void)
   // We NEED two nested while loops. It is trick to work around hardware
   // limitation about the maximum number of loops.
   
-	while(inside)
-	{
-		while(inside)
+  while(inside)
+  {  
+    while(inside)
+      {
+
+     	for(int iii=0;iii<Number_Of_Volumes-1;iii++) //Mehdi
+			posX[iii] = vec3(P1toPN[iii]*vec4(pos,1)); //Mehdi
+		
+		vec4 value[10];
+		float scalar[10];
+		/*
+		//Texture 1
+		if(all(greaterThanEqual(pos,lowBounds[0]))
+        && all(lessThanEqual(pos,highBounds[0])))
+
 		{
 			for(int iii=0;iii<Number_Of_Volumes-1;iii++) //Mehdi
 				posX[iii] = vec3(P1toPN[iii]*vec4(pos,1)); //Mehdi
@@ -335,6 +347,10 @@ void trace(void)
 					}
 				}
 			}
+		}
+		*/
+    //Texture2 and upper
+
 		
 			//Texture2 and upper
 		

@@ -20,6 +20,7 @@
 #include "sscRegistrationTransform.h"
 #include "sscTypeConversions.h"
 #include "sscBoundingBox3D.h"
+#include "sscImageTF3D.h"
 
 
 namespace cx
@@ -29,40 +30,32 @@ ImageEnveloperPtr ImageEnveloper::create()
 	return ImageEnveloperPtr(new ImageEnveloper());
 }
 
+ImageEnveloper::ImageEnveloper() : mMaxEnvelopeVoxels(10*1000*1000)
+{
+
+}
+
+void ImageEnveloper::setMaxEnvelopeVoxels(long maxVoxels)
+{
+	mMaxEnvelopeVoxels = maxVoxels;
+}
+
 void ImageEnveloper::setImages(std::vector<ImagePtr> images)
 {
 	mImages = images;
 }
 
-ImagePtr ImageEnveloper::getEnvelopingImage(long maxVoxels)
+ImagePtr ImageEnveloper::getEnvelopingImage()
 {
-	ImageParameters box = createEnvelopeParametersFromImage(mImages[0]);
+	ImageParameters box = this->createEnvelopeParametersFromImage(mImages[0]);
 	for(unsigned i = 1; i < mImages.size(); ++i)
-		box = selectParametersWithSmallestExtent(box, createEnvelopeParametersFromImage(mImages[i]));
-//		box = selectParametersWithFewestVoxels(box, createEnvelopeParametersFromImage(mImages[i]));
+		box = selectParametersWithSmallestExtent(box, this->createEnvelopeParametersFromImage(mImages[i]));
 
-//	std::cout << "spacing: " << box.mSpacing << std::endl;
-//	std::cout << "dims: " << box.mDim << std::endl;
+	box.limitVoxelsKeepBounds(mMaxEnvelopeVoxels);
 
-	box = this->reduceToNumberOfVoxels(box, maxVoxels);
 	ImagePtr retval = this->createEnvelopeFromParameters(box);
 
 	return retval;
-}
-
-ImageParameters ImageEnveloper::reduceToNumberOfVoxels(ImageParameters box, long maxVoxels)
-{
-	if((box.getNumVoxels() < maxVoxels) || maxVoxels == 0)
-		return box;
-
-	double factor = pow( maxVoxels / box.getNumVoxels(), 1/3.0 );
-	box.mDim = box.mDim * factor;
-	box.mSpacing = box.mSpacing / factor;
-
-	if(box.getNumVoxels() < maxVoxels)
-		std::cout << "error" << std::endl;
-
-	return box;
 }
 
 ImageParameters ImageEnveloper::createEnvelopeParametersFromImage(ImagePtr img)
@@ -71,17 +64,14 @@ ImageParameters ImageEnveloper::createEnvelopeParametersFromImage(ImagePtr img)
 
 	DoubleBoundingBox3D bb = findEnclosingBoundingBox(mImages, img->get_rMd().inverse());
 
-	retval.mSpacing = this->getMinimumSpacingFromAllImages(img->get_rMd().inverse());
-//	retval.mDim = this->getDimFromExtent(bb.range().array(), retval.mSpacing.array());
-	retval.setDimFromBounds(bb.range().array());
+	retval.setSpacingKeepDim(this->getMinimumSpacingFromAllImages(img->get_rMd().inverse()));
+	retval.setDimKeepBoundsAlignSpacing(bb.range().array());
 	retval.mParentVolume = img->getUid();
-
-//	std::cout << "extent: " << bb.range().array() << std::endl;
-//	std::cout << "spacing: " << retval.mSpacing.array() << std::endl;
 
 	Vector3D shift = bb.bottomLeft();
 
 	retval.m_rMd = img->get_rMd() * createTransformTranslate(shift);
+
 	return retval;
 }
 
@@ -130,8 +120,8 @@ Eigen::Array3d ImageEnveloper::getTransformedSpacing(Eigen::Array3d spacing, Tra
 	//Find spacing for each axis
 	for (unsigned i = 0; i < 3; ++i)
 	{
-		retval[i] = std::max(sx[i], sy[i]);
-		retval[i] = std::max(retval[i], sz[i]);
+		retval[i] = std::max(fabs(sx[i]), fabs(sy[i]));
+		retval[i] = std::max(retval[i], fabs(sz[i]));
 	}
 
 	return retval;
@@ -139,14 +129,26 @@ Eigen::Array3d ImageEnveloper::getTransformedSpacing(Eigen::Array3d spacing, Tra
 
 ImagePtr ImageEnveloper::createEnvelopeFromParameters(ImageParameters box)
 {
-	vtkImageDataPtr imageData = generateVtkImageData(box.mDim, box.mSpacing, 0, 1);
+	int maxRange = this->getMaxScalarRange();
+
+	vtkImageDataPtr imageData = generateVtkImageDataUnsignedShort(box.getDim(), box.getSpacing(), maxRange, 1);
+
 	QString uid = QString("envelope_image_%1").arg(box.mParentVolume);
 	ImagePtr retval(new Image(uid, imageData));
 	retval->get_rMd_History()->setRegistration(box.m_rMd);
 	retval->get_rMd_History()->setParentSpace(box.mParentVolume);
 	retval->setAcquisitionTime(QDateTime::currentDateTime());
 	retval->setModality("SC");
+
 	return retval;
+}
+
+int ImageEnveloper::getMaxScalarRange()
+{
+	int maxRange = 0;
+	for (unsigned i=0; i<mImages.size(); ++i)
+		maxRange = std::max<int>(maxRange, mImages[i]->getBaseVtkImageData()->GetScalarRange()[1]);
+	return maxRange;
 }
 
 } // namespace cx

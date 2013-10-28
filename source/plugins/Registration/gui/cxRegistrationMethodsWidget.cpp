@@ -28,6 +28,7 @@
 #include "cxPatientOrientationWidget.h"
 
 #include "cxPrepareVesselsWidget.h"
+#include "cxBronchoscopyRegistrationWidget.h"
 
 namespace cx
 {
@@ -55,11 +56,12 @@ FastRegistrationsWidget::FastRegistrationsWidget(QWidget* parent, QString object
 
 QString FastRegistrationsWidget::defaultWhatsThis() const
 {
-  return "<html>"
-      "<h3>Fast and approximate registration.</h3>"
-      "<p>This is a method designed to be quick and easy, it uses a tools orientation and a landmarks translation to determine where the image is relative to the patient.</p>"
-      "<p><i>Choose a step to continue.</i></p>"
-      "</html>";
+	return "<html>"
+			"<h3>Fast and approximate registration.</h3>"
+			"<p><b>Prerequisite:</b> Correctly oriented DICOM axes.</p>"
+			"<p>This is a method designed to be quick and easy, it uses a tools orientation and a landmarks translation to determine where the image is relative to the patient.</p>"
+			"<p><i>Choose a step to continue.</i></p>"
+			"</html>";
 }
 
 //------------------------------------------------------------------------------
@@ -165,10 +167,11 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regM
   this->addTab(landmarkRegistrationsWidget, "Landmark");
   this->addTab(fastRegistrationsWidget, "Fast");
   this->addTab(manRegWidget, "Manual");
-  this->addTab(new ElastixWidget(regManager), "ElastiX");
+  this->addTab(new ElastixWidget(regManager, this), "ElastiX");
   this->addTab(image2imageWidget, "Vessel");
   this->addTab(patientOrientationWidget, "Patient Orientation");
   this->addTab(imageAndPlateRegistrationWidget, "Plate");
+  this->addTab(new BronchoscopyRegistrationWidget(regManager, this), "Bronchoscopy");
 
   connect(mTabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChangedSlot(int)));
   mTabWidget->setCurrentIndex(settings()->value("registration/tabIndex").toInt());

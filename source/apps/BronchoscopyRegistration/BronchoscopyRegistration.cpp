@@ -144,28 +144,38 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
 
 
 
-std::vector<Eigen::MatrixXd::Index> dsearch2n(Eigen::MatrixXd pos1, Eigen::MatrixXd pos2, Eigen::MatrixXd ori1, Eigen::MatrixXd ori2)
-{
-	Eigen::MatrixXd::Index index;
-	std::vector<Eigen::MatrixXd::Index> indexVector;
-	for (int i = 0; i < pos1.cols(); i++)
-	{
-		Eigen::VectorXf D(pos2.cols());
-		for (int j = 0; j < pos2.cols(); j++)
-		{
-			float p0 = ( pos2(0,j) - pos1(0,i) ) * ( pos2(0,j) - pos1(0,i) );
-			float p1 = ( pos2(1,j) - pos1(1,i) ) * ( pos2(1,j) - pos1(1,i) );
-			float p2 = ( pos2(2,j) - pos1(2,i) ) * ( pos2(2,j) - pos1(2,i) );
-			float o0 = fmod( std::abs( ori2(0,j) - ori1(0,i) ) , 2 ) * fmod( std::abs( ori2(0,j) - ori1(0,i) ) , 2 );
-			float o1 = fmod( std::abs( ori2(1,j) - ori1(1,i) ) , 2 ) * fmod( std::abs( ori2(1,j) - ori1(1,i) ) , 2 );
-			float o2 = fmod( std::abs( ori2(2,j) - ori1(2,i) ) , 2 ) * fmod( std::abs( ori2(2,j) - ori1(2,i) ) , 2 );
-			D(j) = sqrt(p0+p1+p2) + 100 * sqrt(o0+01+02);
-		}
-		D.minCoeff(&index);
-		indexVector.push_back(index);
-	}
-	return indexVector;
-}
+    std::vector<Eigen::MatrixXd::Index> dsearch2n(Eigen::MatrixXd pos1, Eigen::MatrixXd pos2, Eigen::MatrixXd ori1, Eigen::MatrixXd ori2)
+    {
+        Eigen::MatrixXd::Index index;
+        std::vector<Eigen::MatrixXd::Index> indexVector;
+        
+        for (int i = 0; i < pos1.cols(); i++)
+        {
+            Eigen::VectorXd D(pos2.cols());
+            Eigen::VectorXd P(pos2.cols());
+            Eigen::VectorXd O(pos2.cols());
+            Eigen::VectorXd R(pos2.cols());
+            
+            for (int j = 0; j < pos2.cols(); j++)
+            {
+                float p0 = ( pos2(0,j) - pos1(0,i) );
+                float p1 = ( pos2(1,j) - pos1(1,i) );
+                float p2 = ( pos2(2,j) - pos1(2,i) );
+                float o0 = fmod( ori2(0,j) - ori1(0,i) , 2 );
+                float o1 = fmod( ori2(1,j) - ori1(1,i) , 2 );
+                float o2 = fmod( ori2(2,j) - ori1(2,i) , 2 );
+                
+                P(j) = sqrt( p0*p0 + p1*p1 + p2*p2 );
+                O(j) = sqrt( o0*o0 + o1*o1 + o2*o2 );
+                R(j) = P(j) / O(j);
+            }
+            float alpha = sqrt( R.mean() );
+            D = P + alpha * O;
+            D.minCoeff(&index);
+            indexVector.push_back(index);
+        }
+        return indexVector;
+    }
 
 Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation)
 {
@@ -218,10 +228,10 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 			nearestCTPositions.col(i) = CTPositions.col(indexVector[i]);
 			nearestCTOrientations.col(i) = CTOrientations.col(indexVector[i]);
 			//DAngle(i) = ( trackingOrientations.col(i) - nearestCTOrientations.col(i) ).squaredNorm();
-			float o0 = fmod( std::abs( trackingOrientations(0,i) - nearestCTOrientations(0,i) ) , 2 );
-			float o1 = fmod( std::abs( trackingOrientations(1,i) - nearestCTOrientations(1,i) ) , 2 );
-			float o2 = fmod( std::abs( trackingOrientations(2,i) - nearestCTOrientations(2,i) ) , 2 );
-			DAngle(i) = sqrt(o0*o0+01*o1+02*o2);
+			float o0 = fmod( trackingOrientations(0,i) - nearestCTOrientations(0,i) , 2 );
+			float o1 = fmod( trackingOrientations(1,i) - nearestCTOrientations(1,i) , 2 );
+			float o2 = fmod( trackingOrientations(2,i) - nearestCTOrientations(2,i) , 2 );
+			DAngle(i) = sqrt(o0*o0+o1*o1+o2*o2);
 		}
 
 		std::pair<Eigen::MatrixXd , Eigen::MatrixXd> result = findPositionsWithSmallesAngleDifference(70 , DAngle , trackingPositions , nearestCTPositions);

@@ -32,19 +32,25 @@ class TestRunner:
     '''
     pass
 
+    def generateOutpath(self, basePath):
+        path = '%s/test_results' % basePath
+        shell.makeDirs(path)
+        return path
+
     def _createCatchBaseFilenameFromTag(self, tag):
         'generate a namestring usable as the base of a filename for test results based on tag'
         tagString = self._createFilenameFriendlyStringFromCatchTag(tag)
         baseName = 'catch.%s.testresults' % tagString
         return baseName
+    
+    def removeResultFiles(self, outPath):
+        shell.rm_r(outPath, 'catch.*.testresults*.xml')
 
     def runCatchTestsWrappedInCTestGenerateJUnit(self, tag, catchPath, outPath):
         baseName = self._createCatchBaseFilenameFromTag(tag)
         ctestFile='%s/%s.ctest.xml' % (outPath, baseName)
         junitFile='%s/%s.ctest.junit.xml' % (outPath, baseName)
         
-        #ctestFile='%s/TestResults_%s.ctest.xml' % (outPath, tag)
-        #junitFile='%s/TestResults_%s.junit.xml' % (outPath, tag)
         self.runCatchTestsWrappedInCTest(catchPath, tag=tag, outFile=ctestFile)
         self.convertCTestFile2JUnit(ctestFile, junitFile)
         return junitFile
@@ -126,18 +132,23 @@ TimeOut: %d
         'Run all Catch tests at path and write them in junit xml format to outfile'
         if not outfile:
             baseName = self._createCatchBaseFilenameFromTag(tag)
-            outfile = '%s/%s.xml' % (outpath, baseName)
-            #outfile = '%s/CatchTestResults.junit.xml' % path
+            outfile = '%s/%s.junit.xml' % (outpath, baseName)
         PrintFormatter.printInfo('Run catch with tag %s, results to %s' % (tag, outfile))
         shell.changeDir(path)
         shell.rm_r(outfile)
         exe = self._getCatchExecutable()
         cmd = '%s/%s %s --reporter junit --out %s' % (path, exe, tag, outfile)
-        #print("PATH:       "+os.environ["PATH"])
-        success = shell.run(cmd, ignoreFailure=False)
-        if not success: # a failed catch leaves an empty outfile - remove this to signal failure to jenkins
-            PrintFormatter.printInfo('catch failed - removing outfile %s' % outfile)            
+        result = shell.run(cmd, ignoreFailure=True)
+        if result.returncode >= 0:
+            PrintFormatter.printInfo('catch reported %s failing tests' % result.returncode)                        
+        if result.returncode < 0:
+            PrintFormatter.printInfo('catch failed with returncode %s' % result.returncode)            
+            PrintFormatter.printInfo('Removing outfile %s' % outfile)            
             shell.rm_r(outfile)
+            PrintFormatter.printHeader('Analyzing catch failure', 2)            
+            PrintFormatter.printInfo('Running catch tests wrapped in ctest.')            
+            PrintFormatter.printInfo('This should identify crashing tests.')            
+            self.runCatchTestsWrappedInCTestGenerateJUnit(tag, path, outpath)
         
     def _getCatchExecutable(self):
         if(platform.system() == 'Windows'):
@@ -146,11 +157,11 @@ TimeOut: %d
                 
     def _getExcludeTags(self):
         if(platform.system() == 'Windows'):
-             return "~[not_windows]~[hide]"
+             return "~[not_windows]~[hide]~[unstable]"
         if platform.system() == 'Darwin':
-             return "~[not_apple]~[hide]"
+             return "~[not_apple]~[hide]~[unstable]"
         if platform.system() == 'Linux':
-             return "~[not_linux]~[hide]"
+             return "~[not_linux]~[hide]~[unstable]"
          
     def includeTagsForOS(self, tag):
         exclude = self._getExcludeTags()
@@ -175,13 +186,16 @@ TimeOut: %d
         cxConvertCTest2JUnit.convertCTestFile2JUnit(ctestFile, junitFile)
         
     def _createFilenameFriendlyStringFromCatchTag(self, tag):
+        # if tag contains name specifier, keep only the last part, usually the tag part
+        if ' ' in tag:
+            tag = tag.split(' ')[-1]
+        tag = tag.replace('*','-')
+        tag = tag.replace('?','-')
         # [unit][resource/vis]~[not_mac] ->
         # unit.resource-vis.exclude_not_mac
         tag = tag.strip('[]')
         tag = tag.replace('][','.')
         tag = tag.replace('/','-')
         tag = tag.replace(']','.')
-        tag = tag.replace('~[','exclude_')
+        tag = tag.replace('~[','ex_')
         return tag
-        
-

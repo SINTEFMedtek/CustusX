@@ -19,7 +19,7 @@ namespace cx
 * \date Apr 29, 2011
 * \author Janne Beate Bakeng, SINTEF
 */
-class LayoutEditorTab : public PreferencesTab
+class LayoutEditorTab : public PreferenceTab
 {
   Q_OBJECT
 

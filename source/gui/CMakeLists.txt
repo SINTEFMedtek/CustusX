@@ -26,7 +26,6 @@ cx_add_class_qt_moc(cxGui_SRCS
 	dataWidgets/cxTransferFunctionWidget
 	dataWidgets/cxTransferFunctionAlphaWidget
 	dataWidgets/cxTransferFunctionColorWidget
-#	dataWidgets/sscDICOMWidget
 	dataWidgets/cxEraserWidget
 	dataWidgets/cxDataSelectWidget
 	dataWidgets/cxInfoWidget
@@ -43,7 +42,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	infoWidgets/cxDataMetricWrappers
 	infoWidgets/cxSamplerWidget
 	infoWidgets/cxFrameMetricWrapper
-        infoWidgets/cxToolMetricWrapper
+    infoWidgets/cxToolMetricWrapper
     #----------------------
 	navigationWidgets/cxNavigationWidget
 	navigationWidgets/cxTrackPadWidget
@@ -55,6 +54,8 @@ cx_add_class_qt_moc(cxGui_SRCS
 	preferencesWidgets/cxToolConfigureWidget
 	preferencesWidgets/cxLayoutEditorWidget
 	preferencesWidgets/cxLayoutEditorTab
+	preferencesWidgets/cxGeneralTab
+	preferencesWidgets/cxPreferenceTab
     #----------------------
 	streamingWidgets/cxVideoConnectionWidget
 	streamingWidgets/cxSimulateUSWidget

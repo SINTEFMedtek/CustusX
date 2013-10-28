@@ -1,4 +1,4 @@
-// This file is part of CustusX, an Image Guided Therapy Application.
+	// This file is part of CustusX, an Image Guided Therapy Application.
 //
 // Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
 //

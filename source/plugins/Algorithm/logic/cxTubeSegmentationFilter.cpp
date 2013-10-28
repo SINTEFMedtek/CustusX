@@ -26,8 +26,7 @@
 #include "cxPatientData.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxTSFPresets.h"
-
-typedef vtkSmartPointer<class vtkImageShiftScale> vtkImageShiftScalePtr;
+#include "vtkForwardDeclarations.h"
 
 namespace cx {
 
