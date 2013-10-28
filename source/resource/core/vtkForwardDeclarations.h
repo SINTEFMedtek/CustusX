@@ -70,6 +70,7 @@ typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr;
 typedef vtkSmartPointer<class vtkImageAppendComponents > vtkImageAppendComponentsPtr;
 typedef vtkSmartPointer<class vtkImageBlend> vtkImageBlendPtr;
 typedef vtkSmartPointer<class vtkImageCast> vtkImageCastPtr;
+typedef vtkSmartPointer<class vtkImageShiftScale> vtkImageShiftScalePtr;
 typedef vtkSmartPointer<class vtkImageChangeInformation> vtkImageChangeInformationPtr;
 typedef vtkSmartPointer<class vtkImageClip> vtkImageClipPtr;
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
