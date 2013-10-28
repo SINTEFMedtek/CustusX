@@ -29,9 +29,9 @@
 #include "recConfig.h"
 #ifdef SSC_USE_OpenCL
 	#include "TordReconstruct/TordTest.h"
+  #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #endif // SSC_USE_OpenCL
 
-#include "cxSimpleSyntheticVolume.h"
 
 #include "catch.hpp"
 
