@@ -24,7 +24,7 @@ import cxInstallData
 import cxComponents
 import cxComponentAssembly
 import shlex
-import cxTestRunner
+#import cxTestRunner
 import cxUtilities
 import datetime
 
@@ -77,7 +77,7 @@ class CustusXInstaller:
         targetPath = self._generateReleaseFolderName()
         PrintFormatter.printInfo('Creating folder %s' % targetPath)
         shell.run('mkdir -p %s' % targetPath)
-        installerFile = self._findInstallerFile()
+        installerFile = self.findInstallerFile()
         self._copyFile(installerFile, targetPath)
         self.copyReleaseFiles(targetPath)                        
         return targetPath
@@ -188,11 +188,11 @@ class CustusXInstaller:
         based on root_dir if necessary.
         '''
         PrintFormatter.printHeader('Install package', level=3)
-        file = self._findInstallerFile()
+        file = self.findInstallerFile()
         PrintFormatter.printInfo('Installing file %s' % file)
         self._installFile(file)
         
-    def _findInstallerFile(self):
+    def findInstallerFile(self):
         '''
         Find the full name of the installer file.
         '''

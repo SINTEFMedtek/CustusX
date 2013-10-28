@@ -23,6 +23,7 @@ import cxInstallData
 import cxComponents
 import cxComponentAssembly
 import cxTestRunner
+import cxCustusXInstaller
 
 class CustusXBuilder:
     '''
@@ -44,22 +45,34 @@ class CustusXBuilder:
     def clearTestData(self):
         PrintFormatter.printHeader('Clearing all old test data', level=3)
         cxData = self._createComponent(cxComponents.CustusX3Data)
-        custusx = self._createComponent(cxComponents.CustusX3)
+        #custusx = self._createComponent(cxComponents.CustusX3)
         testRunner = cxTestRunner.TestRunner()
-        testRunner.resetCustusXDataRepo(cxData.sourcePath())        
-        testRunner.removeResultFiles(outPath=custusx.buildPath())
+        testRunner.resetCustusXDataRepo(cxData.sourcePath())  
+        testRunner.removeResultFiles(outPath=self._getTestResultsPath())
+        #testRunner.removeResultFiles(outPath=custusx.buildPath())
+    
+    def _getTestResultsPath(self):
+        testRunner = cxTestRunner.TestRunner()
+        return testRunner.generateOutpath(self.assembly.controlData.getRootDir())
     
     def runUnitTests(self):
         PrintFormatter.printHeader('Run all unit tests', level=2)
         self.clearTestData()
         self._runCatchUnitTests()
-        self._runCTestTests()
+        self._runCTestUnitTests()
     
-    def _runCTestTests(self):
+    def _runCTestUnitTests(self):
         PrintFormatter.printHeader('Run ctest tests', level=3)
-        # Run all tests and write them in xml format to ./CTestResults.xml
+        # Run all tests and write them in xml format to ctest.unit.*.xml,
+        # ctest.xml means ctest format, junit.xml means junit format
         custusx = self._createComponent(cxComponents.CustusX3)
-        cxTestRunner.TestRunner().runCTest(custusx.buildPath(), outpath=custusx.buildPath())
+        testRunner = cxTestRunner.TestRunner()
+        basename = 'ctest.unit.testresults'
+        outpath = self._getTestResultsPath()
+        ctestfile = '%s/%s.ctest.xml' % (outpath, basename)
+        testRunner.runCTest(custusx.buildPath(), outfile=ctestfile)
+        junitfile='%s/%s.junit.xml' % (outpath, basename)
+        testRunner.convertCTestFile2JUnit(ctestfile, junitfile)
 
     def _runCatchUnitTests(self):
         tags = cxTestRunner.TestRunner().includeTagsForOS('[unit]')
@@ -70,14 +83,14 @@ class CustusXBuilder:
         # Run all Catch tests and write them in xml format to ./Catch.<tagname>.TestResults.xml
         custusx = self._createComponent(cxComponents.CustusX3)
         catchDir = '%s/source/testing' % custusx.buildPath()
-        outpath=custusx.buildPath()
+        outpath = self._getTestResultsPath()
         cxTestRunner.TestRunner().runCatch(catchDir, tag=tag, outpath=outpath)
         
     def runCatchTestsWrappedInCTest(self, tag):
         PrintFormatter.printHeader('Run catch tests wrapped in ctest', level=2)
         custusx = self._createComponent(cxComponents.CustusX3)
         appPath = '%s/source/testing' % custusx.buildPath()
-        outpath=custusx.buildPath()
+        outpath = self._getTestResultsPath()
         testRunner = cxTestRunner.TestRunner()
         testRunner.runCatchTestsWrappedInCTestGenerateJUnit(tag, appPath, outpath)
 
@@ -90,16 +103,47 @@ class CustusXBuilder:
             shell.run('jom package')
         else:
             shell.run('make package')
-            
+
+        self._movePackageToStandardLocation()        
+
+    def _movePackageToStandardLocation(self):
+        installer = self.createInstallerObject(installer_path=self._getInitialInstallerPackagePath())
+        #filepattern = installer.getInstallerPackagePattern()
+        source = installer.findInstallerFile()
+        dest = '%s/%s' % (self._getStandardInstallerPackagePath(), os.path.basename(source))
+        PrintFormatter.printInfo('Copying package files from [%s] to [%s]'%(source,dest))
+        shell.cp(source, dest)
+
+    def createInstallerObject(self, installer_path=None):    
+        custusx = self.assembly.getComponent(cxComponents.CustusX3)
+        retval = cxCustusXInstaller.CustusXInstaller()
+        retval.setRootDir(self.assembly.controlData.getRootDir())
+        if installer_path==None:
+            installer_path = self._getStandardInstallerPackagePath()
+        retval.setInstallerPath(installer_path)
+        retval.setSourcePath(custusx.sourcePath())  
+        return retval      
+    
     def removePreviousInstaller(self):
         PrintFormatter.printHeader('Removing previous installer', 3);
-        custusx = self._createComponent(cxComponents.CustusX3)
-        shell.rm_r(custusx.buildPath(), "*.exe")
-        shell.rm_r(custusx.buildPath(), "*.dmg")
-        shell.rm_r(custusx.buildPath(), "*.tar.gz")
+
+        initialInstaller = self.createInstallerObject(installer_path=self._getInitialInstallerPackagePath())
+        shell.rm_r(initialInstaller._getInstallerPackagePattern())
+        
+        standardInstaller = self.createInstallerObject()
+        shell.rm_r(standardInstaller._getInstallerPackagePattern())
+        
+        #custusx = self._createComponent(cxComponents.CustusX3)
+        #shell.rm_r(custusx.buildPath(), "*.exe")
+        #shell.rm_r(custusx.buildPath(), "*.dmg")
+        #shell.rm_r(custusx.buildPath(), "*.tar.gz")
             
-    def getInstallerPackagePath(self):
-        'return path to dmg, tar or msi installer file'
+    def _getStandardInstallerPackagePath(self):
+        'return the path to the installer package after it has been moved to a standard location'
+        return '%s/package_artefacts' % self.assembly.controlData.getRootDir()
+
+    def _getInitialInstallerPackagePath(self): # getInstallerPackagePath
+        'return the path to the installer package as generated by cmake'
         custusx = self._createComponent(cxComponents.CustusX3)
         if platform.system() == 'Windows':
             build_path = custusx.buildPath()
