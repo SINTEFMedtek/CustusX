@@ -2,6 +2,7 @@
 
 #include <QFileInfo>
 #include "sscMessageManager.h"
+#include <QProcess>
 
 namespace cx
 {
@@ -50,14 +51,14 @@ bool VLCRecorder::isRecording()
 	return mCommandLine->isRunning();
 }
 
-bool VLCRecorder::waitForStarted()
+bool VLCRecorder::waitForStarted(int msecs)
 {
-	return mCommandLine->getProcess()->waitForStarted();
+	return mCommandLine->getProcess()->waitForStarted(msecs);
 }
 
-bool VLCRecorder::waitForFinished()
+bool VLCRecorder::waitForFinished(int msecs)
 {
-	return mCommandLine->getProcess()->waitForFinished();
+	return mCommandLine->getProcess()->waitForFinished(msecs);
 }
 
 QString VLCRecorder::getVLCPath()
@@ -68,19 +69,23 @@ QString VLCRecorder::getVLCPath()
 void VLCRecorder::startRecording(QString saveFile)
 {
 	if(this->hasVLCApplication())
-		mCommandLine->launch(mVLCPath+this->getVLCDefaultRecorderArguments(saveFile));
+		mCommandLine->launch("\""+mVLCPath+"\""+this->getVLCDefaultRecorderArguments(saveFile));
 	else
 		messageManager()->sendError("VLC not found.");
 }
 
 void VLCRecorder::stopRecording()
 {
+#ifndef CX_WINDOWS
 	mCommandLine->requestTerminateSlot();
+#else
+	QProcess::startDetached("\""+mVLCPath+"\" vlc://quit");
+#endif
 }
 
 void VLCRecorder::play(QString moviePath)
 {
-	mCommandLine->launch(mVLCPath+" "+moviePath+" vlc://quit");
+	mCommandLine->launch("\""+mVLCPath+"\" "+moviePath+" vlc://quit");
 }
 
 void VLCRecorder::setVLCPath(QString path)
@@ -101,7 +106,7 @@ QString VLCRecorder::getVLCDefaultLocation()
 {
 	QString defaultLocation("");
 #ifdef CX_WINDOWS
-	defaultLocation = "\"C:\Program Files (x86)\VideoLAN\VLC\vlc.exe\"";
+	defaultLocation = "C:/Program Files (x86)/VideoLAN/VLC/vlc.exe";
 #endif
 #ifdef CX_APPLE
 	defaultLocation = "/Applications/VLC.app/Contents/MacOS/VLC";
@@ -116,7 +121,8 @@ QString VLCRecorder::getVLCDefaultRecorderArguments(QString saveFile)
 {
 	QString defaultArguements("");
 #ifdef CX_WINDOWS
-	defaultArguements = " -I hotkeys screen:// :screen-fps=10.000000 :live-caching=300 \":sout=#transcode{vcodec=h264,vb=0,fps=10,scale=0,acodec=none}:file{dst="+saveFile+"}\" :sout-keep";
+	saveFile = saveFile.replace("/", "\\");
+	defaultArguements = " -I hotkeys screen:// :screen-fps=10.000000 :live-caching=300 :sout=#transcode{vcodec=h264,acodec=none}:file{dst="+saveFile+"} :sout-keep ";
 #endif
 #ifdef CX_APPLE
 	defaultArguements = " -I hotkeys screen:// \":sout=#transcode{vcodec=h264,vb=800,fps=10,scale=1,acodec=none}:duplicate{dst=standard{access=file,mux=mp4,dst="+saveFile+"}}\"";

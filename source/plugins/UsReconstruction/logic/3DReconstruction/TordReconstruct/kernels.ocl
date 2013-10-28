@@ -236,10 +236,24 @@ int isValidPixel(int x,
                  int in_xsize,
                  int in_ysize)
 {
+#ifndef DEBUG
 	return (isInside(x, in_xsize)
 	        && isInside(y, in_ysize)
 	        && isNotMasked(x, y, mask, in_xsize));
-
+#else
+	if((isInside(x, in_xsize)
+	    && isInside(y, in_ysize)
+	    && isNotMasked(x, y, mask, in_xsize)))
+	{
+		return 1;
+	}
+	else {
+		DEBUG_PRINTF("Pixel %d, %d is not valid! Sizes: %d, %d\n",
+		             x, y, in_xsize, in_ysize);
+		return 0;
+	}
+#endif
+ 
 }
 
 #if PLANE_METHOD == PLANE_HEURISTIC

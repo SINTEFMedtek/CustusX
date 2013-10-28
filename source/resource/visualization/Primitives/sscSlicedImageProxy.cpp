@@ -33,6 +33,7 @@
 #include "sscSliceProxy.h"
 #include "sscImageLUT2D.h"
 #include "sscTypeConversions.h"
+#include "sscLogger.h"
 
 namespace cx
 {
@@ -143,7 +144,15 @@ void SlicedImageProxy::setSliceProxy(SliceProxyPtr slicer)
 
 void SlicedImageProxy::transferFunctionsChangedSlot()
 {
-	mImageWithLUTProxy->setInput(mImage->getBaseVtkImageData(), mImage->getLookupTable2D()->getOutputLookupTable());
+	mReslicer->SetInput(mImage->getBaseVtkImageData());
+	mReslicer->SetBackgroundLevel(mImage->getMin());
+
+	vtkImageDataPtr input = mReslicer->GetOutput();
+	// if input is 2D - use directly
+	if (mImage->getBaseVtkImageData()->GetDimensions()[2]==1)
+		input = mImage->getBaseVtkImageData();
+
+	mImageWithLUTProxy->setInput(input, mImage->getLookupTable2D()->getOutputLookupTable());
 }
 
 void SlicedImageProxy::setImage(ImagePtr image)
@@ -166,15 +175,7 @@ void SlicedImageProxy::setImage(ImagePtr image)
 
 	if (mImage)
 	{
-		mReslicer->SetInput(mImage->getBaseVtkImageData());
-		mReslicer->SetBackgroundLevel(mImage->getMin());
-
-		vtkImageDataPtr input = mReslicer->GetOutput();
-		// if input is 2D - use directly
-		if (mImage->getBaseVtkImageData()->GetDimensions()[2]==1)
-			input = mImage->getBaseVtkImageData();
-
-		mImageWithLUTProxy->setInput(input, mImage->getLookupTable2D()->getOutputLookupTable());
+		this->transferFunctionsChangedSlot();
 	}
 	else // no image
 	{
@@ -204,7 +205,6 @@ void SlicedImageProxy::update()
 		rMs = mSlicer->get_sMr().inv();
 	Transform3D iMr = mImage->get_rMd().inv();
 	Transform3D M = iMr * rMs;
-	//	std::cout << "iMs, "<< mSlicer->getName() <<"\n" << M << std::endl;
 
 	mMatrixAxes->DeepCopy(M.getVtkMatrix());
 }

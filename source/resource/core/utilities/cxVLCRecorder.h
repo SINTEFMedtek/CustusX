@@ -28,8 +28,8 @@ public:
 
 	bool isRecording();
 
-	bool waitForStarted();
-	bool waitForFinished();
+	bool waitForStarted(int msecs = 30000);
+	bool waitForFinished(int msecs = 30000);
 
 	QString getVLCPath();
 
