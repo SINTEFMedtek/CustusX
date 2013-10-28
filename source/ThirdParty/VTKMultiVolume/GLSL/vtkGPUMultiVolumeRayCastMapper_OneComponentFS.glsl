@@ -17,19 +17,32 @@
 // the case of a one-component dataset.
 // The functions are used in composite mode.
 
-#version 110
+
 
 // "value" is a sample of the dataset.
 // Think of "value" as an object.
 
-uniform sampler1D colorTexture[10];//Mehdi
+uniform sampler1D colorTexture[4];//Mehdi
 
 float scalarFromValue(vec4 value)
 {
-  return value.x;
+	return value.x;
 }
 
 vec4 colorFromValue(int volNumber,vec4 value) //Mehdi
 {
-  return texture1D(colorTexture[volNumber],value.x);//Mehdi
+ 
+	#ifdef __APPLE__ 
+		if (volNumber==0)
+			return texture1D(colorTexture[0],value.x);//Mehdi      
+		if (volNumber==1)
+			return texture1D(colorTexture[1],value.x);//Mehdi 
+		if (volNumber==2)
+			return texture1D(colorTexture[2],value.x);//Mehdi
+		if (volNumber==3)
+			return texture1D(colorTexture[3],value.x);//Mehdi
+	#else
+		return texture1D(colorTexture[volNumber],value.x);//Mehdi
+	#endif
+
 }

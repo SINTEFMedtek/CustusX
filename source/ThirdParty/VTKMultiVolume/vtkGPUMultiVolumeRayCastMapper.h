@@ -27,7 +27,7 @@
 #include "vtkVolumeMapper.h"
 
 
-#define MAX_NUMBER_OF_ADDITIONAL_VOLUMES 6 //Mehdi //?
+#define MAX_NUMBER_OF_ADDITIONAL_VOLUMES 3 //Mehdi //?
 //#define NUMBER_OF_ADDITIONAL_VOLUMES 3 //Mehdi //?
 
 class vtkVolumeProperty;
