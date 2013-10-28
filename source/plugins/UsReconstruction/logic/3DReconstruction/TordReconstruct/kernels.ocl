@@ -796,8 +796,12 @@ performInterpolation_vnn2(close_plane_t *close_planes,
 		{
 			continue;
 		}
+		float dist = fabs(close_planes[i].dist);
 		
-		float dist_inv = 1.0f/fabs(close_planes[i].dist);
+		if(dist < 0.001f)
+			dist = 0.001f;
+		float dist_inv = 1.0f/dist;
+		
 		scale += dist_inv;
 		val += (image[y*in_xsize + x] * dist_inv);
 	}		
@@ -878,6 +882,7 @@ performInterpolation_dw(close_plane_t *close_planes,
 		float interpolated_value = bilinearInterpolation(x, y, image, in_xsize);
 			
 		float dist = fabs(close_planes[i].dist);
+		if(dist < 0.001f) dist = 0.001f;
 		scale += 1.0f/dist;
 		val += (interpolated_value * 1.0f/dist);
 	}		
