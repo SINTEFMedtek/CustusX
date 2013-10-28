@@ -69,7 +69,7 @@ void PerformanceTab::init()
   mMaxRenderSize->setInternal2Display(1.0/Mb);
 
   double stillUpdateRate = settings()->value("stillUpdateRate").value<double>();
-  mStillUpdateRate = DoubleDataAdapterXml::initialize("StillUpdateRate", "Still Update Rate", "Still Update Rate in vtkRenderWindow. Restart needed.", stillUpdateRate, DoubleRange(0.0001, 20, 0.0001), 4, QDomNode());
+	mStillUpdateRate = DoubleDataAdapterXml::initialize("StillUpdateRate", "Still Update Rate", "Still Update Rate in vtkRenderWindow. Changing this may change render quality. Restart needed.", stillUpdateRate, DoubleRange(0.0001, 20, 0.0001), 4, QDomNode());
 
   mSmartRenderCheckBox = new QCheckBox("Smart Render");
   mSmartRenderCheckBox->setChecked(settings()->value("smartRender", true).toBool());
