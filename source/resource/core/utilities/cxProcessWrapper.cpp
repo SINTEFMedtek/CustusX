@@ -59,7 +59,6 @@ void ProcessWrapper::launch(QString executable, QStringList arguments)
 
 bool ProcessWrapper::isRunning()
 {
-//	return mProcess->pid() != 0;
 	return mProcess->state() == QProcess::Running;
 }
 

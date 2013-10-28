@@ -15,6 +15,7 @@ VLCRecorderFixture::VLCRecorderFixture() :
 		mMoviePath("")
 {
 	cx::messageManager()->initialize();
+	cx::vlc()->getInstance();
 }
 
 VLCRecorderFixture::~VLCRecorderFixture()
