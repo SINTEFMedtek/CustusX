@@ -91,11 +91,9 @@ macro(cx_initialize_custusx_install)
                 ${CPACK_PACKAGE_EXECUTABLES}
                 "GrabberServer" "GrabberServer")
         endif()
-        if(BUILD_OPEN_IGTLINK_SERVER)
-            set(CPACK_PACKAGE_EXECUTABLES
-                ${CPACK_PACKAGE_EXECUTABLES}
-                "${OpenIGTLinkServerName}" "${OpenIGTLinkServerName}")
-        endif()
+        set(CPACK_PACKAGE_EXECUTABLES
+            ${CPACK_PACKAGE_EXECUTABLES}
+            "${OpenIGTLinkServerName}" "${OpenIGTLinkServerName}")
         set(CPACK_NSIS_MENU_LINKS "doc/Windows_Install_ReadMe.rtf" "README")
     endif (CX_WINDOWS)
 
@@ -329,8 +327,7 @@ function(cxCreateConfigurationDescription)
 	cx_assert_variable_exists(${SSC_USE_GCOV})
 	cx_assert_variable_exists(${CX_USE_TSF})
 	cx_assert_variable_exists(${SSC_USE_OpenCL})
-	cx_assert_variable_exists(${BUILD_GRABBER_SERVER})
-	cx_assert_variable_exists(${BUILD_OPEN_IGTLINK_SERVER})
+        cx_assert_variable_exists(${BUILD_GRABBER_SERVER})
 	cx_assert_variable_exists(${CX_USE_ISB_GE})
 	cx_assert_variable_exists(${CX_USE_OpenCV})
 	# this text can be inserted into the about box with some effort...
@@ -359,8 +356,7 @@ Configuration for CustusX ${CustusX3_VERSION_STRING}
 		Tube-Segmentation-Toolkit: ${CX_USE_TSF}
 		SSC Thunder OpenCL US Reconstruction: ${SSC_USE_OpenCL}
 		Grabber Servers:
-			Mac QuickTime Grabber Server: ${BUILD_GRABBER_SERVER}
-			IGTLink Grabber Server: ${BUILD_OPEN_IGTLINK_SERVER}
+                        Mac QuickTime Grabber Server: ${BUILD_GRABBER_SERVER}
 				ISB GE Scanner Grabber Interface: ${CX_USE_ISB_GE}
 				OpenCV Grabber Interface: ${CX_USE_OpenCV}
 

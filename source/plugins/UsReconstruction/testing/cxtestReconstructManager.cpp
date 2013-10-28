@@ -490,7 +490,8 @@ cx::USReconstructInputData generateSyntheticUSBMode()
 	}
 
 	cx::ProbeSector probeSector;
-	cx::ProbeData probeData = cx::DummyToolTestUtilities::createProbeDataLinear(dim, dim, Eigen::Array2i(dim, dim));
+	double probeSize = dim-1;
+	cx::ProbeData probeData = cx::DummyToolTestUtilities::createProbeDataLinear(probeSize, probeSize, Eigen::Array2i(dim, dim));
 	probeSector.setData(probeData);
 	retval.mProbeData = probeSector;
 
@@ -503,6 +504,10 @@ cx::USReconstructInputData generateSyntheticUSBMode()
 TEST_CASE("ReconstructManager: B-Mode with synthetic data", "[usreconstruction][plugins][unit]")
 {
 	cx::USReconstructInputData inputData = generateSyntheticUSBMode();
+
+	CHECK(inputData.getMask()->GetDimensions()[0] == inputData.mUsRaw->getDimensions()[0]);
+	CHECK(inputData.getMask()->GetDimensions()[1] == inputData.mUsRaw->getDimensions()[1]);
+//	CHECK(inputData.getMask()->GetDimensions()[2] == inputData.mUsRaw->getDimensions()[2]);
 
 	ReconstructManagerTestFixture fixture;
 	cx::ReconstructManagerPtr reconstructer = fixture.createManager();
