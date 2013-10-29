@@ -42,6 +42,7 @@ typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPt
 typedef boost::shared_ptr<class ActiveVideoSourceStringDataAdapter> ActiveVideoSourceStringDataAdapterPtr;
 
 class SimulateUSWidget;
+class FileInputWidget;
 
 /**
  * \brief GUI for setting up a connection to a video stream
@@ -68,7 +69,6 @@ protected slots:
 	void toggleConnectServer();
 	void serverProcessStateChanged(QProcess::ProcessState newState);
 	void serverStatusChangedSlot();
-	void browseLocalServerSlot();
 	void importStreamImageSlot();
 	void selectGuiForConnectionMethodSlot();
 	void initScriptSelected(QString filename);
@@ -76,7 +76,7 @@ protected slots:
 protected:
 	void connectServer();
 	void disconnectServer();
-	QHBoxLayout* initializeScriptWidget();
+	void initializeScriptWidget();
 	StringDataAdapterXmlPtr initializeConnectionSelector();
 	ActiveVideoSourceStringDataAdapterPtr initializeActiveVideoSourceSelector();
 	QFrame* wrapStackedWidgetInAFrame();
@@ -101,10 +101,9 @@ protected:
 	QPushButton* mConnectButton;
 	QPushButton* mImportStreamImageButton;
 	QVBoxLayout* mToptopLayout;
-	FileSelectWidget* mInitScriptWidget;
+	FileInputWidget* mInitScriptWidget;
 	QComboBox* mAddressEdit;
 	QLineEdit* mPortEdit;
-	QLineEdit* mLocalServerEdit;
 	QLineEdit* mLocalServerArguments;
 	QPushButton* mLaunchServerButton;
 	QComboBox* mDirectLinkArguments;
@@ -112,6 +111,7 @@ protected:
 	StringDataAdapterXmlPtr mConnectionSelector;
 	ActiveVideoSourceStringDataAdapterPtr mActiveVideoSourceSelector;
 	SimulateUSWidget* mSimulationWidget;
+	FileInputWidget* mLocalServerFile;
 
 };
 
