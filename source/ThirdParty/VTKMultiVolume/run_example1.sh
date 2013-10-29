@@ -1,3 +1,3 @@
 #optirun64 
 
-Build_64/Debug/vtkGPUMultiVolumeRenderDemo -MHA DataExample/stent8.mhd -CompositeShadeRamp 300 300 -NextVol  -MHA DataExample/skull.mhd -CompositeShadeRamp 100 100 -NextVol -MHA DataExample/skull.mhd -CompositeShadeRamp 100 100 -FrameRate 0.1
+./vtkGPUMultiVolumeRenderDemo.app/Contents/MacOS/vtkGPUMultiVolumeRenderDemo -MHA /Users/dev/dev/working/CustusX3/CustusX3/data/ssc/Person5/person5_angio_unsigned.mhd -CompositeShadeRamp 100 100 -NextVol  -MHA /Users/dev/dev/working/CustusX3/CustusX3/data/ssc/Person5/person5_angio_unsigned.mhd -CompositeShadeRamp 500 500 -FrameRate 0.1
