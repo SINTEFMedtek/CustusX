@@ -50,24 +50,7 @@ vec4 colorFromValue(int volNumber,vec4 value);
 void initShade();
 vec4 shade(int volNumber, vec4 value);
 
-/*
 
-float findXonPlane(vec3 n, vec3 p0, vec3 point)
-{
-	return   ((n.x*p0.x)-(n.y*(point.y-p0.y))-( n.z*(point.z-p0.z)))/n.x;
-}
-
-float findYonPlane(vec3 n, vec3 p0, vec3 point)
-{
-	return   ((n.y*p0.y)-(n.x*(point.x-p0.x))-( n.z*(point.z-p0.z)))/n.y;
-}
-
-float findZonPlane(vec3 n, vec3 p0, vec3 point)
-{
-	return   ((n.z*p0.z)-(n.x*(point.x-p0.x))-( n.y*(point.y-p0.y)))/n.z;
-}
-
-*/
 
 float xMin[10];
 float yMin[10];
@@ -153,125 +136,6 @@ void clip (int i, vec3 pos)
 		
 }
 
-/*
-vec3 x;
-int intersectWithLine(vec3 p1, vec3 p2, vec3 n, vec3 p0)
-{
-  float t;
-  float num, den;
-  float fabsden, fabstolerance;
-
-  // Compute line vector
-  // 
-  vec3 p21;
-  p21.x = p2.x - p1.x;
-  p21.y = p2.y - p1.y;
-  p21.z = p2.z - p1.z;
-
-  // Compute denominator.  If ~0, line and plane are parallel.
-  // 
-  num = dot(n,p0) - ( n.x*p1.x + n.y*p1.y + n.z*p1.z ) ;
-  den = n.x*p21.x + n.y*p21.y + n.z*p21.z;
-  //
-  // If denominator with respect to numerator is "zero", then the line and
-  // plane are considered parallel. 
-  //
-
-  // trying to avoid an expensive call to fabs()
-  if (den < 0.0)
-    {
-    fabsden = -den;
-    }
-  else
-    {
-    fabsden = den;
-    }
-  if (num < 0.0)
-    {
-    fabstolerance = -num*0.001;
-    }
-  else
-    {
-    fabstolerance = num*0.001;
-    }
-  if ( fabsden <= fabstolerance )
-    {
-    t = 999.0;
-    return 0;
-    }
-
-  // valid intersection
-  t = num / den;
-
-  x.x = p1.x + t*p21.x;
-  x.y = p1.y + t*p21.y;
-  x.z = p1.z + t*p21.z;
-
-  if ( t >= 0.0 && t <= 1.0 )
-    {
-    return 1;
-    }
-  else
-    {
-    return 0;
-    }
-}
-
-vec3 end;
-vec3 start;
-void findRaySegment(void)
-{
-	end=pos;
-	start=pos;
-	for (float tt=0.0;tt<=tMax;tt+=1.0)
-		end=end+rayDir;
-	//vec3 x=vec3(0.0,0.0,0.0);
-	if (intersectWithLine(start, end, vec3(0.0,0.0,-1.0), vec3(0.5,0.5,0.3))==1)
-		end=x;
-	else 
-		discard;
-
-
-}
-bool isPointOnTheLineZ(vec3 p1, vec3 p2, vec3 p)
-{
-	
-	if (p2.z>p1.z)
-	{
-		if ( (p.z>=p1.z)&&(p2.z>=p.z) )
-		{
-			
-			return true;
-		}
-		else
-		{
-			//gl_FragColor = vec4(1.0,0.0,0.0,0.0);
-			return false;
-		}
-	}
-	
-	if (p2.z<p1.z)
-	{
-		if ( (p.z>=p2.z)&&(p1.z>=p.z) )
-		{			
-			
-			return false;
-		}
-		else
-		{
-			//gl_FragColor = vec4(0.0,1.0,0.0,0.0);
-			return true;
-		}
-	}
-
-	if (p1.z==p2.z)
-	{
-		//gl_FragColor = vec4(0.0,0.0,1.0,0.0);
-		return false;
-	}
-	
-}
-*/
 
 
 void trace(void)
@@ -309,19 +173,10 @@ void trace(void)
 		
 		vec4 value[10];
 		float scalar[10];
-		/*
-		//Texture 1
-		if(all(greaterThanEqual(pos,lowBounds[0]))
-        && all(lessThanEqual(pos,highBounds[0])))
-
-		{
-			for(int iii=0;iii<Number_Of_Volumes-1;iii++) //Mehdi
-				posX[iii] = vec3(P1toPN[iii]*vec4(pos,1)); //Mehdi
 		
-				vec4 value[10];
-				float scalar[10];
 		
 			//Texture 1
+			/*
 			if(all(greaterThanEqual(pos,lowBounds[0]))
 			&& all(lessThanEqual(pos,highBounds[0])))
 			{
@@ -347,11 +202,8 @@ void trace(void)
 					}
 				}
 			}
-		}
-		*/
-    //Texture2 and upper
-
-		
+			*/
+				
 			//Texture2 and upper
 		
 			int xx=1;
@@ -412,7 +264,7 @@ void trace(void)
 				
 				xx+=1;
 			}
-
+			
 			pos=pos+rayDir;
 			t+=1.0;
 			inside=t<tMax && (remainOpacity>=0.0039); // 1/255=0.0039
