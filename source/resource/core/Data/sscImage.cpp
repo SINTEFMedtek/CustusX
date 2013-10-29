@@ -24,7 +24,6 @@
 #include <vtkImageReslice.h>
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
-#include <vtkImageLuminance.h>
 #include <vtkPlane.h>
 #include <vtkPlanes.h>
 #include <vtkImageResample.h>
@@ -255,8 +254,12 @@ void Image::setVtkImageData(const vtkImageDataPtr& data)
 	emit vtkImageDataChanged();
 }
 
-//Create if needed
-//vtkImageDataPtr Image::get8bitGrayScaleVtkImageData()
+vtkImageDataPtr Image::get8bitGrayScaleVtkImageData()
+{
+	double windowWidth = mImageLookupTable2D->getWindow();
+	double windowLevel = mImageLookupTable2D->getLevel();
+	return convertImageDataTo8Bit(this->getGrayScaleVtkImageData(), windowWidth, windowLevel);
+}
 
 vtkImageDataPtr Image::getGrayScaleVtkImageData()
 {
@@ -265,38 +268,9 @@ vtkImageDataPtr Image::getGrayScaleVtkImageData()
 		return mBaseGrayScaleImageData;
 	}
 
-	mBaseGrayScaleImageData = getBaseVtkImageData();
-
-	this->ConvertBaseGrayScaleImageDataImageToGrayScale();
-//	this->ConvertBaseGrayScaleImageDataImageTo8Bit();// Move to get8bitGrayScaleVtkImageData()
-
-	mBaseGrayScaleImageData->Update();
+	mBaseGrayScaleImageData = convertImageDataToGrayScale(this->getBaseVtkImageData());
 	return mBaseGrayScaleImageData;
 }
-
-void Image::ConvertBaseGrayScaleImageDataImageToGrayScale()
-{
-	if (mBaseGrayScaleImageData->GetNumberOfScalarComponents() > 2)
-	{
-		vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
-		luminance->SetInput(mBaseGrayScaleImageData);
-		mBaseGrayScaleImageData = luminance->GetOutput();
-	}
-}
-
-void Image::ConvertBaseGrayScaleImageDataImageTo8Bit()
-{
-	if (mBaseGrayScaleImageData->GetScalarSize() > 8)
-		{
-		// Use vtkImageShiftScale instead
-//			vtkImageCastPtr imageCast = vtkImageCastPtr::New();
-			vtkImageShiftScalePtr imageCast = vtkImageShiftScalePtr::New();
-			imageCast->SetInput(mBaseGrayScaleImageData);
-			imageCast->SetOutputScalarTypeToUnsignedChar();
-			mBaseGrayScaleImageData = imageCast->GetOutput();
-		}
-}
-
 
 ImageTF3DPtr Image::getTransferFunctions3D()
 {
