@@ -48,8 +48,9 @@ DoubleBoundingBox3D findEnclosingBoundingBox(std::vector<DataPtr> data, Transfor
 DoubleBoundingBox3D findEnclosingBoundingBox(std::vector<ImagePtr> data, Transform3D qMr = Transform3D::Identity());
 
 
-vtkImageDataPtr convertImageDataImageToGrayScale(vtkImageDataPtr image);
-vtkImageDataPtr convertImageDataImageTo8Bit(vtkImageDataPtr image, double windowWidth, double windowLevel);
+vtkImageDataPtr convertImageDataToGrayScale(vtkImageDataPtr image);
+
+vtkImageDataPtr convertImageDataTo8Bit(vtkImageDataPtr image, double windowWidth, double windowLevel);///< Have never been used or tested. Create a test for it
 
 
 
