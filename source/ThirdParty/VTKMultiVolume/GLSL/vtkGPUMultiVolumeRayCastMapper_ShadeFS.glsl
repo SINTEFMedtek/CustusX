@@ -154,17 +154,30 @@ vec4 shade(int volNumber, vec4 value)
 		  g2.y=texture3D(dataSetTexture[3],posX[2]-yvec[3]).x;
 		  g2.z=texture3D(dataSetTexture[3],posX[2]-zvec[3]).x;
 		}
+	}
 #else
-	posX[volNumber-1] = vec3(P1toPN[volNumber-1]*vec4(pos,1));
+	if (volNumber!=0)
+	{
+		posX[volNumber-1] = vec3(P1toPN[volNumber-1]*vec4(pos,1));
 		
-	g1.x=texture3D(dataSetTexture[volNumber],posX[volNumber-1]+xvec[volNumber]).x;
-	g1.y=texture3D(dataSetTexture[volNumber],posX[volNumber-1]+yvec[volNumber]).x;
-	g1.z=texture3D(dataSetTexture[volNumber],posX[volNumber-1]+zvec[volNumber]).x;
-	g2.x=texture3D(dataSetTexture[volNumber],posX[volNumber-1]-xvec[volNumber]).x;
-	g2.y=texture3D(dataSetTexture[volNumber],posX[volNumber-1]-yvec[volNumber]).x;
-	g2.z=texture3D(dataSetTexture[volNumber],posX[volNumber-1]-zvec[volNumber]).x;
+		g1.x=texture3D(dataSetTexture[volNumber],posX[volNumber-1]+xvec[volNumber]).x;
+		g1.y=texture3D(dataSetTexture[volNumber],posX[volNumber-1]+yvec[volNumber]).x;
+		g1.z=texture3D(dataSetTexture[volNumber],posX[volNumber-1]+zvec[volNumber]).x;
+		g2.x=texture3D(dataSetTexture[volNumber],posX[volNumber-1]-xvec[volNumber]).x;
+		g2.y=texture3D(dataSetTexture[volNumber],posX[volNumber-1]-yvec[volNumber]).x;
+		g2.z=texture3D(dataSetTexture[volNumber],posX[volNumber-1]-zvec[volNumber]).x;
+	}
+	else
+	{
+		g1.x=texture3D(dataSetTexture[0],pos+xvec[0]).x;
+		g1.y=texture3D(dataSetTexture[0],pos+yvec[0]).x;
+		g1.z=texture3D(dataSetTexture[0],pos+zvec[0]).x;
+		g2.x=texture3D(dataSetTexture[0],pos-xvec[0]).x;
+		g2.y=texture3D(dataSetTexture[0],pos-yvec[0]).x;
+		g2.z=texture3D(dataSetTexture[0],pos-zvec[0]).x;
+	}
 #endif
-}
+
   // g1-g2 is  the gradient in texture coordinates
   // the result is the normalized gradient in eye coordinates.
   
