@@ -77,7 +77,7 @@ public:
 
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
 	virtual vtkImageDataPtr getGrayScaleVtkImageData(); ///< as getBaseVtkImageData(), but constrained to 1 component if multicolor.
-	virtual vtkImageDataPtr get8bitGrayScaleVtkImageData();
+	virtual vtkImageDataPtr get8bitGrayScaleVtkImageData();///< Have never been used or tested. Create a test for it
 	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the reference coordinate space
 	virtual LandmarkMap getLandmarks(); ///< \return all landmarks defined on the image.
 	/** Return a version of this, containing image data and transfer functions converted to unsigned.

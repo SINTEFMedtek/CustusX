@@ -276,7 +276,7 @@ DoubleBoundingBox3D findEnclosingBoundingBox(std::vector<ImagePtr> images, Trans
 	return findEnclosingBoundingBox(datas, qMr);
 }
 
-vtkImageDataPtr convertImageDataImageToGrayScale(vtkImageDataPtr image)
+vtkImageDataPtr convertImageDataToGrayScale(vtkImageDataPtr image)
 {
 	vtkImageDataPtr retval = image;
 	if (image->GetNumberOfScalarComponents() > 2)
@@ -289,7 +289,7 @@ vtkImageDataPtr convertImageDataImageToGrayScale(vtkImageDataPtr image)
 	return retval;
 }
 
-vtkImageDataPtr convertImageDataImageTo8Bit(vtkImageDataPtr image, double windowWidth, double windowLevel)
+vtkImageDataPtr convertImageDataTo8Bit(vtkImageDataPtr image, double windowWidth, double windowLevel)
 {
 	vtkImageDataPtr retval = image;
 	if (image->GetScalarSize() > 8)

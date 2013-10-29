@@ -258,12 +258,7 @@ vtkImageDataPtr USFrameData::toGrayscale(vtkImageDataPtr input) const
 	if (input->GetNumberOfScalarComponents() == 1) // already gray
 		return input;
 
-//	vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
-//	luminance->SetInput(input);
-//	vtkImageDataPtr outData = luminance->GetOutput();
-//	outData->Update();
-
-	vtkImageDataPtr outData = convertImageDataImageToGrayScale(input);
+	vtkImageDataPtr outData = convertImageDataToGrayScale(input);
 
 	vtkImageDataPtr copy = vtkImageDataPtr::New();
 	copy->DeepCopy(outData);

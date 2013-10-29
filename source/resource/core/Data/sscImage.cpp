@@ -258,7 +258,7 @@ vtkImageDataPtr Image::get8bitGrayScaleVtkImageData()
 {
 	double windowWidth = mImageLookupTable2D->getWindow();
 	double windowLevel = mImageLookupTable2D->getLevel();
-	return convertImageDataImageTo8Bit(this->getGrayScaleVtkImageData(), windowWidth, windowLevel);
+	return convertImageDataTo8Bit(this->getGrayScaleVtkImageData(), windowWidth, windowLevel);
 }
 
 vtkImageDataPtr Image::getGrayScaleVtkImageData()
@@ -268,7 +268,7 @@ vtkImageDataPtr Image::getGrayScaleVtkImageData()
 		return mBaseGrayScaleImageData;
 	}
 
-	mBaseGrayScaleImageData = convertImageDataImageToGrayScale(this->getBaseVtkImageData());
+	mBaseGrayScaleImageData = convertImageDataToGrayScale(this->getBaseVtkImageData());
 	return mBaseGrayScaleImageData;
 }
 
