@@ -65,10 +65,6 @@ public:
 	virtual ImagePtr getImage(const QString& uid) const;
 	virtual std::map<QString, ImagePtr> getImages() const;
 
-	virtual std::map<QString, QString> getImageUidsAndNames() const;
-	virtual std::vector<QString> getImageNames() const;
-	virtual std::vector<QString> getImageUids() const;
-
 	void loadData(DataPtr data);
 	DataPtr loadData(const QString& uid, const QString& path, READER_TYPE type);
     virtual void saveData(DataPtr data, const QString& basePath); ///< Save data to file
@@ -80,10 +76,6 @@ public:
 	virtual void saveMesh(MeshPtr mesh, const QString& basePath);///< Save mesh to file \param mesh to save \param basePath Absolute path to patient data folder
 	virtual MeshPtr getMesh(const QString& uid) const;
 	virtual std::map<QString, MeshPtr> getMeshes() const;
-
-	virtual std::map<QString, QString> getMeshUidsWithNames() const;
-	virtual std::vector<QString> getMeshUids() const;
-	virtual std::vector<QString> getMeshNames() const;
 
 	// global data (move to separate class if list grows)
 	virtual Vector3D getCenter() const;
@@ -99,7 +91,7 @@ public:
 	virtual void setLandmarkActive(QString uid, bool active);
 	virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const;
 	virtual void clear(); ///< remove all stuff from manager
-	virtual void removeData(const QString& uid);
+	virtual void removeData(const QString& uid, QString basePath);
 
 	//virtual MeshPtr getActiveMesh() const; ///< used for system state
 	//virtual void setActiveMesh(MeshPtr activeMesh); ///< used for system state
@@ -126,6 +118,7 @@ protected:
 	CLINICAL_APPLICATION mClinicalApplication;
 //	typedef std::set<DataReaderPtr> DataReadersType;
 //	DataReadersType mDataReaders;
+	void deleteFiles(DataPtr data, QString basePath);
 
 	//state
 	ImagePtr mActiveImage;
