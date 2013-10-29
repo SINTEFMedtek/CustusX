@@ -193,7 +193,7 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ImagePtr image)
 		return retval;
 
 	//image
-	retval["Filepath"] = image->getFilePath().toStdString();
+	retval["Filename"] = image->getFilename().toStdString();
 	retval["Coordinate system"] = image->getCoordinateSystem().toString().toStdString();
 	retval["Image type"] = image->getImageType().toStdString();
 	retval["Scalar minimum"] = string_cast(image->getMin());

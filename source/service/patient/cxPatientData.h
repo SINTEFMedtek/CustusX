@@ -76,6 +76,7 @@ public slots:
 	 * \param[out] infoText Information about any errors/warnings that occurred during import
 	 */
 	DataPtr importData(QString fileName, QString &infoText);
+	void removeData(QString uid);
 	void savePatient(); ///< Save all application data to XML file
 	void clearPatient();
 	void exportPatient(bool niftiFormat);

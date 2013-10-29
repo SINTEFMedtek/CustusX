@@ -59,10 +59,10 @@ void Data::setName(const QString& name)
 	mName = name;
 }
 
-void Data::setFilePath(const QString& filePath)
-{
-	mFilePath = filePath;
-}
+//void Data::setFilePath(const QString& filePath)
+//{
+//	mFilePath = filePath;
+//}
 
 void Data::setRegistrationStatus(REGISTRATION_STATUS regStat)
 {
@@ -79,10 +79,10 @@ QString Data::getName() const
 	return mName;
 }
 
-QString Data::getFilePath() const
-{
-	return mFilePath;
-}
+//QString Data::getFilePath() const
+//{
+//	return mFilePath;
+//}
 
 REGISTRATION_STATUS Data::getRegistrationStatus() const
 {
@@ -138,7 +138,7 @@ void Data::addXml(QDomNode& dataNode)
 	dataNode.toElement().setAttribute("type", this->getType());
 
 	QDomElement filePathNode = doc.createElement("filePath");
-	filePathNode.appendChild(doc.createTextNode(mFilePath));
+	filePathNode.appendChild(doc.createTextNode(this->getFilename()));
 	dataNode.appendChild(filePathNode);
 
 	QDomElement acqTimeNode = doc.createElement("acqusitionTime");
