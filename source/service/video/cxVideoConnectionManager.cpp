@@ -27,6 +27,7 @@
 #include "cxProcessWrapper.h"
 #include "cxVideoConnection.h"
 #include "sscStringDataAdapterXml.h"
+#include "sscLogger.h"
 
 namespace cx
 {
@@ -256,6 +257,8 @@ bool VideoConnectionManager::isConnected() const
 
 void VideoConnectionManager::runScript()
 {
+	if (this->getInitScript().isEmpty())
+		return;
 	mIniScriptProcess->launchWithRelativePath(this->getInitScript());
 }
 
