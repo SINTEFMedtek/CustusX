@@ -385,8 +385,6 @@ void USFrameData::setPurgeInputDataAfterInitialize(bool value)
 
 std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::vector<bool> angio)
 {
-//	TimeKeeper timer;
-//	std::cout << "USFrameData::initializeFrames start " << mReducedToFull.size() << std::endl;
 	std::vector<std::vector<vtkImageDataPtr> > raw(angio.size());
 
 	for (unsigned i=0; i<raw.size(); ++i)
@@ -397,27 +395,14 @@ std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::ve
 	// apply cropping and angio
 	for (unsigned i=0; i<mReducedToFull.size(); ++i)
 	{
-//		timer.printElapsedms("inbetween");
-//		timer.reset();
 		SSC_ASSERT(mImageContainer->size()>mReducedToFull[i]);
 		vtkImageDataPtr current = mImageContainer->get(mReducedToFull[i]);
-//		timer.printElapsedms("\tload image\t");
-//		timer.reset();
-
-//		std::cout << "i="<<i<< ", " << Eigen::Array3i(current->GetDimensions()) << std::endl;
 
 		if (mCropbox.range()[0]!=0)
 			current = this->cropImage(current, mCropbox);
 
-//		std::cout << "i="<<i<< ", " << Eigen::Array3i(current->GetDimensions()) << std::endl;
-
-//		timer.printElapsedms("\t\t\tcrop\t");
-//		timer.reset();
-
 		// optimization: grayFrame is used in both calculations: compute once
 		vtkImageDataPtr grayFrame = this->toGrayscale(current);
-//		timer.printElapsedms("\t\t\tgray\t");
-//		timer.reset();
 
 		for (unsigned j=0; j<angio.size(); ++j)
 		{
@@ -426,28 +411,15 @@ std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::ve
 			{
 				vtkImageDataPtr angioFrame = this->useAngio(current, grayFrame);
 				raw[j][i] = angioFrame;
-//				timer.printElapsedms("\t\t\tangio\t");
-//				timer.reset();
-//				std::cout << "i="<<i<< ", " << Eigen::Array3i(angioFrame->GetDimensions()) << std::endl;
 			}
 			else
 			{
-//				vtkImageDataPtr grayFrame = this->toGrayscale(current);
 				raw[j][i] = grayFrame;
-//				timer.printElapsedms("\t\t\tgray\t");
-//				timer.reset();
-//				std::cout << "i="<<i<< ", " << Eigen::Array3i(grayFrame->GetDimensions()) << std::endl;
 			}
 		}
 
-//		timer.printElapsedms("\t\t\tprocess\t");
-//		timer.reset();
-
 		if (mPurgeInput)
 			mImageContainer->purge(mReducedToFull[i]);
-
-//		timer.printElapsedms("\t\t\tinit\t");
-//		timer.reset();
 	}
 
 	if (mPurgeInput)

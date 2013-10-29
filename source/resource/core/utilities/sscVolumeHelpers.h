@@ -46,6 +46,13 @@ int calculateNumVoxelsWithMinValue(ImagePtr image);///<Find number of voxels con
 
 DoubleBoundingBox3D findEnclosingBoundingBox(std::vector<DataPtr> data, Transform3D qMr = Transform3D::Identity());
 DoubleBoundingBox3D findEnclosingBoundingBox(std::vector<ImagePtr> data, Transform3D qMr = Transform3D::Identity());
+
+
+vtkImageDataPtr convertImageDataImageToGrayScale(vtkImageDataPtr image);
+vtkImageDataPtr convertImageDataImageTo8Bit(vtkImageDataPtr image, double windowWidth, double windowLevel);
+
+
+
 /**
  * \}
  */
