@@ -27,7 +27,6 @@
 #include "sscCustomMetaImage.h"
 #include "sscMesh.h"
 
-#include "cxFileCopied.h"
 #include "cxSettings.h"
 
 #include <vtkPolyData.h>
@@ -269,7 +268,7 @@ void PatientData::savePatient()
 	for (DataManager::ImagesMap::iterator iter = images.begin(); iter != images.end(); ++iter)
 	{
 		CustomMetaImagePtr customReader = CustomMetaImage::create(
-						mActivePatientFolder + "/" + iter->second->getFilePath());
+						mActivePatientFolder + "/" + iter->second->getFilename());
 		customReader->setTransform(iter->second->get_rMd());
 	}
 
@@ -391,11 +390,11 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 		return DataPtr();
 	}
 
-	QString patientsImageFolder = mActivePatientFolder + "/Images/";
+//	QString patientsImageFolder = mActivePatientFolder + "/Images/";
 
 	QFileInfo fileInfo(fileName);
 	QString fileType = fileInfo.suffix();
-	QString pathToNewFile = patientsImageFolder + fileInfo.fileName();
+//	QString pathToNewFile = patientsImageFolder + fileInfo.fileName();
 	QFile fromFile(fileName);
 	QString strippedFilename = changeExtension(fileInfo.fileName(), "");
 	QString uid = strippedFilename + "_" + QDateTime::currentDateTime().toString(timestampSecondsFormat());
@@ -411,19 +410,19 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 	// Read files before copy
 	DataPtr data = dataManager()->loadData(uid, fileName, rtAUTO);
 	if (!data)
-		{
-			QString text = "Error with data file: " + fileName + " Import canceled.";
-			messageManager()->sendWarning(text);
-			infoText = "<font color=red>" + text + "</font>";
-			return DataPtr();
-		}
+	{
+		QString text = "Error with data file: " + fileName + " Import canceled.";
+		messageManager()->sendWarning(text);
+		infoText = "<font color=red>" + text + "</font>";
+		return DataPtr();
+	}
 	data->setAcquisitionTime(QDateTime::currentDateTime());
 
 	data->setShadingOn(true);
 
-	QDir patientDataDir(mActivePatientFolder);
+//	QDir patientDataDir(mActivePatientFolder);
 
-	data->setFilePath(patientDataDir.relativeFilePath(pathToNewFile)); // Update file path
+//	data->setFilePath(patientDataDir.relativeFilePath(pathToNewFile)); // Update file path
 
 	dataManager()->saveData(data, mActivePatientFolder);
 //	this->copyAllSimilarFiles(fileName, patientsImageFolder, infoText);
@@ -432,6 +431,11 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 	infoText = infoText.split("<br>", QString::SkipEmptyParts).join("<br>");
 
 	return data;
+}
+
+void PatientData::removeData(QString uid)
+{
+	dataManager()->removeData(uid, this->getActivePatientFolder());
 }
 
 void PatientData::createPatientFolders(QString choosenDir)

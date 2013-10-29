@@ -66,7 +66,7 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(MeshPtr mesh)
 		return retval;
 
 	//mesh
-	retval["Filepath"] = mesh->getFilePath().toStdString();
+	retval["Filename"] = mesh->getFilename().toStdString();
 	retval["Coordinate system"] = mesh->getCoordinateSystem().toString().toStdString();
 	retval["Name"] = mesh->getName().toStdString();
 	retval["Parent space"] = mesh->getParentSpace().toStdString();

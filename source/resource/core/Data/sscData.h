@@ -63,14 +63,14 @@ public:
 
 	void setUid(const QString& uid);
 	void setName(const QString& name);
-	void setFilePath(const QString& filePath);///< Set current file path to file
+//	void setFilePath(const QString& filePath);///< Set current file path to file
 	void setAcquisitionTime(QDateTime time);
 	void setRegistrationStatus(REGISTRATION_STATUS regStat);
 	virtual RegistrationHistoryPtr get_rMd_History();
 
 	virtual QString getUid() const; ///< \return unique id for this instance
 	virtual QString getName() const; /// \return a descriptive name for this instance
-	virtual QString getFilePath() const; ///< \return the corresponding file path
+//	virtual QString getFilePath() const; ///< \return the corresponding file path
 	virtual REGISTRATION_STATUS getRegistrationStatus() const; ///< \return what kind of registration that has been performed on this data object.
 	virtual Transform3D get_rMd() const; ///< \return the transform M_rd from the data object's space (d) to the reference space (r).
 	virtual void setShadingOn(bool on);
@@ -82,6 +82,8 @@ public:
 	{
         return "data";
 	}
+
+	virtual QString getFilename() const { return ""; }
 
 	virtual QString getSpace();
 	virtual QString getParentSpace();
@@ -107,7 +109,7 @@ protected slots:
 protected:
 	QString mUid;
 	QString mName;
-	QString mFilePath;
+//	QString mFilePath;
 	QDateTime mAcquisitionTime;
 
 	REGISTRATION_STATUS mRegistrationStatus;
