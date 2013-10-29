@@ -89,6 +89,9 @@ if (SSC_USE_OpenCL)
 	SET( SOURCE_FILES
 		${SOURCE_FILES}
 		TordReconstruct/TordTest.cpp
+		TordReconstruct/cxSyntheticVolume.h
+		TordReconstruct/cxSyntheticVolume.cpp
+		TordReconstruct/cxSimpleSyntheticVolume.h
 		TordReconstruct/TordTest.h
 		TordReconstruct/kernels.ocl
 		)

@@ -31,7 +31,7 @@
 #include <vtkImageChangeInformation.h>
 #include <vtkImageClip.h>
 #include <vtkImageIterator.h>
-#include <vtkImageCast.h>
+#include <vtkImageShiftScale.h>
 #include "sscImageTF3D.h"
 #include "sscBoundingBox3D.h"
 #include "sscImageLUT2D.h"
@@ -288,7 +288,9 @@ void Image::ConvertBaseGrayScaleImageDataImageTo8Bit()
 {
 	if (mBaseGrayScaleImageData->GetScalarSize() > 8)
 		{
-			vtkImageCastPtr imageCast = vtkImageCastPtr::New();
+		// Use vtkImageShiftScale instead
+//			vtkImageCastPtr imageCast = vtkImageCastPtr::New();
+			vtkImageShiftScalePtr imageCast = vtkImageShiftScalePtr::New();
 			imageCast->SetInput(mBaseGrayScaleImageData);
 			imageCast->SetOutputScalarTypeToUnsignedChar();
 			mBaseGrayScaleImageData = imageCast->GetOutput();
