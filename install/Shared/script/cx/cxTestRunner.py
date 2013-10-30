@@ -157,11 +157,11 @@ TimeOut: %d
                 
     def _getExcludeTags(self):
         if(platform.system() == 'Windows'):
-             return "~[not_windows]~[hide]~[unstable]"
+             return "~[not_windows]~[hide]"
         if platform.system() == 'Darwin':
-             return "~[not_apple]~[hide]~[unstable]"
+             return "~[not_apple]~[hide]"
         if platform.system() == 'Linux':
-             return "~[not_linux]~[hide]~[unstable]"
+             return "~[not_linux]~[hide]"
          
     def includeTagsForOS(self, tag):
         exclude = self._getExcludeTags()

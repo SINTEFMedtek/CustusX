@@ -53,6 +53,7 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
         runs.add_argument('--reset_installer', action='store_true', default=False, help='Remove installer files and current installation')
         runs.add_argument('--create_unit_tested_package', action='store_true', default=False, help='run checkout/configure/build, unit test, package')
         runs.add_argument('--integration_test_package', action='store_true', default=False, help='install package, installation tests, integration tests')
+        runs.add_argument('--unstable_test_package', action='store_true', default=False, help='install package, unstable tests')
         runs.add_argument('--create_release', action='store_true', default=False, help='create release folder, publish to server')
 
         skips = p.add_argument_group('Skip options')
@@ -84,6 +85,9 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
                                             skip_install=options.skip_install,
                                             skip_installation_test=options.skip_installation_test,            
                                             skip_integration_test=options.skip_integration_test)
+        if options.unstable_test_package:
+            self.unstableTestPackageStep(skip_extra_install_step_checkout=options.skip_extra_install_step_checkout,
+                                            skip_install=options.skip_install)
         if options.create_release:
             self.createReleaseStep(skip_publish_release=options.skip_publish_release)
         self.cxBuilder.finish()
