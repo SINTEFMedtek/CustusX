@@ -52,7 +52,7 @@ bool LevelSetFilter::preProcess() {
     return true;
 }
 
-Vector3D getSeedPointFromTool(DataPtr image) {
+Vector3D LevelSetFilter::getSeedPointFromTool(DataPtr image) {
     // Retrieve position of tooltip and use it as seed point
     Vector3D point = CoordinateSystemHelpers::getDominantToolTipPoint(
             CoordinateSystemHelpers::getD(image)
@@ -67,7 +67,7 @@ int * getImageSize(DataPtr inputImage) {
     return image->getBaseVtkImageData()->GetDimensions();
 }
 
-bool isSeedPointInsideImage(Vector3D seedPoint, DataPtr image) {
+bool LevelSetFilter::isSeedPointInsideImage(Vector3D seedPoint, DataPtr image) {
     int * size = getImageSize(image);
     std::cout << "size of image is: " << size[0] << " " << size[1] << " " << size[2] << "\n";
     int x = (int)seedPoint(0);
