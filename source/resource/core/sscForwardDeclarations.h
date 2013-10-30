@@ -89,7 +89,6 @@ typedef boost::shared_ptr<class VideoSource> VideoSourcePtr;
 typedef boost::shared_ptr<class View> ViewPtr;
 typedef boost::shared_ptr<class VolumetricBaseRep> VolumetricBaseRepPtr;
 typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
-typedef boost::shared_ptr<class VtkFileMesh> VtkFileMeshPtr;
 
 class LabeledComboBoxWidget;
 

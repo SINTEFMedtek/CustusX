@@ -44,7 +44,6 @@
 #include "cxPatientService.h"
 #include "cxMetricWidget.h"
 #include "cxViewWrapper.h"
-//#include "sscDICOMWidget.h"
 #include "cxPlaybackWidget.h"
 #include "cxEraserWidget.h"
 #include "cxSamplerWidget.h"
@@ -53,8 +52,7 @@
 #include "cxWorkflowStateMachine.h"
 #include "cxApplicationStateMachine.h"
 #include "cxConfig.h"
-
-//#include "sscDICOMLibConfig.h"
+#include "cxVLCRecorder.h"
 
 namespace cx
 {
@@ -311,9 +309,13 @@ void MainWindow::createActions()
 	mShootWindowAction->setStatusTip(tr("Save an image of the application to the patient folder."));
 	connect(mShootWindowAction, SIGNAL(triggered()), this, SLOT(shootWindow()));
 
+	mRecordFullscreenAction = new QAction(tr("Record Fullscreen"), this);
+	mRecordFullscreenAction->setShortcut(tr("F8"));
+	mRecordFullscreenAction->setStatusTip(tr("Record a video of the full screen."));
+	connect(mRecordFullscreenAction, SIGNAL(triggered()), this, SLOT(recordFullscreen()));
+
 	//data
-	mImportDataAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-import-2.png"), tr(
-		"&Import data"), this);
+	mImportDataAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-import-2.png"), tr("&Import data"), this);
 	mImportDataAction->setShortcut(tr("Ctrl+I"));
 	mImportDataAction->setStatusTip(tr("Import image data"));
 
@@ -345,8 +347,7 @@ void MainWindow::createActions()
 	mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
 	mStartStreamingAction->setShortcut(tr("Ctrl+V"));
 	connect(mStartStreamingAction, SIGNAL(triggered()), this, SLOT(toggleStreamingSlot()));
-	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this,
-		SLOT(updateStreamingActionSlot()));
+	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(updateStreamingActionSlot()));
 	this->updateStreamingActionSlot();
 
 	mConfigureToolsAction->setChecked(true);
@@ -403,6 +404,17 @@ void MainWindow::shootWindow()
 	this->saveScreenShot(QPixmap::grabWindow(this->winId()));
 }
 
+void MainWindow::recordFullscreen()
+{
+	QString path = patientService()->getPatientData()->generateFilePath("Screenshots", "mp4");
+
+	if(vlc()->isRecording())
+		vlc()->stopRecording();
+	else
+		vlc()->startRecording(path);
+
+}
+
 void MainWindow::toggleDebugModeSlot(bool checked)
 {
 	QActionGroup* debugActionGroup;
@@ -428,15 +440,10 @@ void MainWindow::toggleDebugModeSlot(bool checked)
 			}
 		}
 }
-
 void MainWindow::saveScreenShot(QPixmap pixmap)
 {
-	QString folder = patientService()->getPatientData()->getActivePatientFolder() + "/Screenshots/";
-	QDir().mkpath(folder);
-	QString format = timestampSecondsFormat();
-	QString filename = QDateTime::currentDateTime().toString(format) + ".png";
-
-	QtConcurrent::run(boost::bind(&MainWindow::saveScreenShotThreaded, this, pixmap.toImage(), folder + "/" + filename));
+	QString path = patientService()->getPatientData()->generateFilePath("Screenshots", "png");
+	QtConcurrent::run(boost::bind(&MainWindow::saveScreenShotThreaded, this, pixmap.toImage(), path));
 }
 
 /**Intended to be called in a separate thread.
@@ -815,6 +822,7 @@ void MainWindow::createMenus()
 	mFileMenu->addAction(mDebugModeAction);
 	mFileMenu->addAction(mShootScreenAction);
 	mFileMenu->addAction(mShootWindowAction);
+	mFileMenu->addAction(mRecordFullscreenAction);
 	mFileMenu->addSeparator();
 	mFileMenu->addAction(mShowControlPanelAction);
 	mFileMenu->addAction(mQuitAction);
@@ -966,7 +974,10 @@ void MainWindow::deleteDataSlot()
 {
 	if (!dataManager()->getActiveImage())
 		return;
-	dataManager()->removeData(dataManager()->getActiveImage()->getUid());
+	QString text = QString("Do you really want to delete data %1?").arg(dataManager()->getActiveImage()->getName());
+	if (QMessageBox::question(this, "Data delete", text, QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel))!=QMessageBox::Ok)
+		return;
+	patientService()->getPatientData()->removeData(dataManager()->getActiveImage()->getUid());
 }
 
 void MainWindow::configureSlot()

@@ -18,7 +18,12 @@ typedef boost::shared_ptr<class Data> DataPtr;
  */
 
 vtkImageDataPtr generateVtkImageData(Eigen::Array3i dim, Vector3D spacing, const unsigned char initValue, int components = 1);
+vtkImageDataPtr generateVtkImageDataUnsignedShort(Eigen::Array3i dim,
+									 Vector3D spacing,
+									 const unsigned short initValue,
+									 int components = 1);
 vtkImageDataPtr generateVtkImageDataDouble(Eigen::Array3i dim, Vector3D spacing, double initValue);
+void fillShortImageDataWithGradient(vtkImageDataPtr data, int maxValue);
 
 /**
   * Convert an Image to its unsigned version.
@@ -41,6 +46,14 @@ int calculateNumVoxelsWithMinValue(ImagePtr image);///<Find number of voxels con
 
 DoubleBoundingBox3D findEnclosingBoundingBox(std::vector<DataPtr> data, Transform3D qMr = Transform3D::Identity());
 DoubleBoundingBox3D findEnclosingBoundingBox(std::vector<ImagePtr> data, Transform3D qMr = Transform3D::Identity());
+
+
+vtkImageDataPtr convertImageDataToGrayScale(vtkImageDataPtr image);
+
+vtkImageDataPtr convertImageDataTo8Bit(vtkImageDataPtr image, double windowWidth, double windowLevel);///< Have never been used or tested. Create a test for it
+
+
+
 /**
  * \}
  */

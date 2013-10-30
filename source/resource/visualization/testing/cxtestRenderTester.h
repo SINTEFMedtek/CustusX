@@ -49,6 +49,7 @@ public:
 	void resetCamera();
 	void alignRenderWindowWithImage(vtkImageDataPtr input);
 
+	void writeToPNG(vtkImageDataPtr image, QString filename);
 	vtkImageDataPtr readFromPNG(QString filename);
 	vtkImageDataPtr readFromFile(QString filename);
 	vtkImageDataPtr renderToImage();
@@ -59,7 +60,6 @@ public:
 	vtkImageDataPtr getImageFromRenderWindow();
 
 private:
-	void writeToPNG(vtkImageDataPtr image, QString filename);
 	vtkImageDataPtr clipImage(vtkImageDataPtr input);
 	bool equalExtent(vtkImageDataPtr input1, vtkImageDataPtr input2);
 	bool hasValidDimensions(vtkImageDataPtr input);

@@ -20,13 +20,14 @@ ProbeData DummyToolTestUtilities::createProbeData(ProbeData::TYPE type, double d
 {
 	ProbeData retval;
 	retval.setType(type);
+	Eigen::Array2i extent = frameSize - 1;
 	retval.setSector(0, depth, width, 0);
 
-	Vector3D imageSpacing(width/frameSize[0], depth/frameSize[1], 1.0);
+	Vector3D imageSpacing(width/extent[0], depth/extent[1], 1.0);
 	ProbeData::ProbeImageData image = retval.getImage();
 	image.mOrigin_p = Vector3D(frameSize[0]/2,0,0);
 	image.mSpacing = imageSpacing;
-	image.mClipRect_p = DoubleBoundingBox3D(0, frameSize[0], 0, frameSize[1], 0, 0);
+	image.mClipRect_p = DoubleBoundingBox3D(0, extent[0], 0, extent[1], 0, 0);
 	image.mSize = QSize(frameSize[0], frameSize[1]);
 	retval.setImage(image);
 
@@ -57,7 +58,6 @@ int DummyTool::mTransformCount = 0;
 
 
 DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
-    mPositionHistory(new TimedTransformMap()),
 	mVisible(false),
 	m_prMt(Transform3D::Identity()),
 	mTransformSaveFileName("DummyToolsAreToDumbToSaveThemselves"),
@@ -95,15 +95,6 @@ void DummyTool::setToolPositionMovementBB(const DoubleBoundingBox3D& bb)
 std::vector<Transform3D> DummyTool::getToolPositionMovement()
 {
 	return mTransforms;
-}
-
-TimedTransformMap DummyTool::getSessionHistory(double startTime, double stopTime)
-{
-	TimedTransformMap::iterator startIt = mPositionHistory->lower_bound(startTime);
-	TimedTransformMap::iterator stopIt = mPositionHistory->upper_bound(stopTime);
-
-	TimedTransformMap retval(startIt, stopIt);
-	return retval;
 }
 
 /**Use this to override the default movement pattern in the tool.

@@ -72,6 +72,7 @@ void ManualTool::set_prMt(const Transform3D& prMt, double timestamp)
 	QMutexLocker locker(&mMutex);
 	mTimestamp = timestamp;
 	m_prMt = prMt;
+	(*mPositionHistory)[timestamp] = m_prMt;
 	locker.unlock();
 
 	emit toolTransformAndTimestamp(prMt, mTimestamp);

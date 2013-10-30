@@ -58,21 +58,15 @@ class PatientData: public QObject
 Q_OBJECT
 public:
 	PatientData();
-	virtual ~PatientData()
-	{
-	}
+	virtual ~PatientData();
 
 	QString getActivePatientFolder() const;
 	bool isPatientValid() const;
 
-	QDomElement getCurrentWorkingElement(QString path)
-	{
-		return getElementForced(mWorkingDocument.documentElement(), path);
-	}
-	QDomDocument getCurrentWorkingDocument()
-	{
-		return mWorkingDocument;
-	} // use only during save/load.
+	QDomElement getCurrentWorkingElement(QString path);
+	QDomDocument getCurrentWorkingDocument();  ///< use only during save/load.
+
+	QString generateFilePath(QString folderName, QString ending); ///< Creates the folder in the active patient and returns the path to a (not existing) filename generated using the current timestamp
 
 public slots:
 	void newPatient(QString choosenDir);
@@ -82,6 +76,7 @@ public slots:
 	 * \param[out] infoText Information about any errors/warnings that occurred during import
 	 */
 	DataPtr importData(QString fileName, QString &infoText);
+	void removeData(QString uid);
 	void savePatient(); ///< Save all application data to XML file
 	void clearPatient();
 	void exportPatient(bool niftiFormat);
@@ -120,7 +115,7 @@ private:
 	 * \param destFolder Destination of copy operation
 	 * \param[out] infoText Information about any errors/warnings that occurred during copy
 	 */
-	bool copyAllSimilarFiles(QString fileName, QString destFolder, QString &infoText);
+//	bool copyAllSimilarFiles(QString fileName, QString destFolder, QString &infoText);
 	static QString getVersionName();
 
 	//Patient

@@ -15,7 +15,6 @@ include_directories(
     ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     .
     ${CustusX3_SOURCE_DIR}/source/plugins/USReconstruction/logic/3DReconstruction
-
     )
 
 SET( MOC_HEADER_FILES
@@ -47,42 +46,26 @@ include_directories(
     .
     )
 
-
-
 # openCL
 #----------
-if (SSC_USE_OpenCL)
+#if (SSC_USE_OpenCL)
+#    find_package( OpenCL REQUIRED)
+#else ()
+#    find_package( OpenCL QUIET)
+#endif ()
 
-    find_package( OpenCL REQUIRED)
-else ()
-    find_package( OpenCL QUIET)
-endif ()
+#IF( OPENCL_FOUND )
+#    option(SSC_USE_OpenCL "Use OpenCL" ON)
+#ELSE()
+#    option(SSC_USE_OpenCL "Use OpenCL" OFF)
+#ENDIF()
 
-IF( OPENCL_FOUND )
-    option(SSC_USE_OpenCL "Use OpenCL" ON)
-ELSE()
-    option(SSC_USE_OpenCL "Use OpenCL" OFF)
-ENDIF()
-
-#message(STATUS OPENCL_FOUND: ${OPENCL_FOUND})
-#message(STATUS SSC_USE_OpenCL: ${SSC_USE_OpenCL})
-#message(STATUS OPENCL_INCLUDE_DIRS: ${OPENCL_INCLUDE_DIRS})
-#message(STATUS OPENCL_LIBRARIES: ${OPENCL_LIBRARIES})
-get_filename_component(OPENCL_LIBRARY_DIRS ${OPENCL_LIBRARIES} PATH)
-#message(STATUS OPENCL_LIBRARY_DIRS: ${OPENCL_LIBRARY_DIRS})
-
-# 
-#FIND_LIBRARY(OPENCL_LIBRARIES OpenCL)
-#IF( OPENCL_LIBRARIES )
-#    option(USE_US_RECONSTRUCTION_THUNDER "use us reconstruction library Thunder" ON)
-#ELSE( OPENCL_LIBRARIES )
-#    option(USE_US_RECONSTRUCTION_THUNDER "use us reconstruction library Thunder" OFF)
-#ENDIF( OPENCL_LIBRARIES )
+#get_filename_component(OPENCL_LIBRARY_DIRS ${OPENCL_LIBRARIES} PATH)
 
 # Thunder requires OpenCL - make it optional            
 if (SSC_USE_OpenCL)
     include_directories( Thunder
-        ${OPENCL_INCLUDE_DIRS}
+#        ${OPENCL_INCLUDE_DIRS}
     )
     SET( SOURCE_FILES
       ${SOURCE_FILES}    
@@ -97,21 +80,23 @@ if (SSC_USE_OpenCL)
       Thunder/kernels.ocl    
       )
     set(THUNDER_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Thunder)
-    
-#    IF (APPLE) # mac
-#      FIND_LIBRARY(OPENCL_LIBRARIES OpenCL DOC "OpenCL lib for OSX")
-#      FIND_PATH(OPENCL_INCLUDE_DIR OpenCL/cl.h DOC "Include for OpenCL on OSX")
-#    ELSEIF (WIN32) # windows
-#      FIND_PATH(OPENCL_INCLUDE_DIR CL/cl.h )
-#      FIND_LIBRARY(OPENCL_LIBRARIES opencl64 )
-#      IF( OPENCL_LIBRARIES )
-#          FIND_LIBRARY(OPENCL_LIBRARIES opencl32 )
-#      ENDIF( OPENCL_LIBRARIES )
-#      INCLUDE_DIRECTORIES( ${OPENCL_INCLUDE_DIR} )
-#    ELSE (APPLE) # i.e. linux and similar
-#    	FIND_PATH(OPENCL_INCLUDE_DIR CL/cl.h )
-#    	FIND_LIBRARY(OPENCL_LIBRARIES OpenCL )
-#    ENDIF (APPLE)    
+
+	# Include Tords stuff
+	include_directories(
+		TordReconstruct
+		${OPENCL_INCLUDE_DIRS}
+		)
+	SET( SOURCE_FILES
+		${SOURCE_FILES}
+		TordReconstruct/TordTest.cpp
+		TordReconstruct/cxSyntheticVolume.h
+		TordReconstruct/cxSyntheticVolume.cpp
+		TordReconstruct/cxSimpleSyntheticVolume.h
+		TordReconstruct/TordTest.h
+		TordReconstruct/kernels.ocl
+		)
+   SET(TORD_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/TordReconstruct)
+
 endif (SSC_USE_OpenCL)
 
 # create the target

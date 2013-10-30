@@ -41,6 +41,8 @@
 #include "cxToolManager.h"
 #include "cxViewManager.h"
 #include "cxSimulateUSWidget.h"
+#include "cxFileInputWidget.h"
+#include "sscLogger.h"
 
 namespace cx
 {
@@ -48,11 +50,13 @@ namespace cx
 VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 		BaseWidget(parent, "IGTLinkWidget", "Video Connection"), mSimulationWidget(NULL)
 {
+	mInitScriptWidget=NULL;
+
 	connect(this->getVideoConnectionManager().get(), SIGNAL(connected(bool)), this, SLOT(serverStatusChangedSlot()));
 	connect(this->getVideoConnectionManager().get(), SIGNAL(connectionMethodChanged()), this, SLOT(selectGuiForConnectionMethodSlot()));
 	connect(this->getServerProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
 
-	QHBoxLayout* initScriptLayout = this->initializeScriptWidget();
+	this->initializeScriptWidget();
 	mConnectionSelector = this->initializeConnectionSelector();
 	mStackedWidget = this->initializeStackedWidget();
 	QFrame* frame = this->wrapStackedWidgetInAFrame();
@@ -61,7 +65,7 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 	mActiveVideoSourceSelector = this->initializeActiveVideoSourceSelector();
 
 	mToptopLayout = new QVBoxLayout(this);
-	mToptopLayout->addLayout(initScriptLayout);
+	mToptopLayout->addWidget(mInitScriptWidget);
 	mToptopLayout->addWidget(new LabeledComboBoxWidget(this, mConnectionSelector));
 	mToptopLayout->addWidget(frame);
 	mToptopLayout->addWidget(mConnectButton);
@@ -75,23 +79,15 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 VideoConnectionWidget::~VideoConnectionWidget()
 {}
 
-QHBoxLayout* VideoConnectionWidget::initializeScriptWidget()
+void VideoConnectionWidget::initializeScriptWidget()
 {
-	QHBoxLayout* initScriptLayout = new QHBoxLayout();
-	initScriptLayout->addWidget(new QLabel("Init script", this));
-	mInitScriptWidget = new FileSelectWidget(this);
-	QString path = QDir::cleanPath(DataLocations::getBundlePath() + "/" + getVideoConnectionManager()->getInitScript());
-	QStringList nameFilters;
-	nameFilters << "*.*";
-	mInitScriptWidget->setNameFilter(nameFilters);
-	if (!getVideoConnectionManager()->getInitScript().isEmpty())
-		mInitScriptWidget->setFilename(path);
-
-	connect(mInitScriptWidget, SIGNAL(fileSelected(QString)), this, SLOT(initScriptSelected(QString)));
-	mInitScriptWidget->setSizePolicy(QSizePolicy::Expanding, mInitScriptWidget->sizePolicy().verticalPolicy());
-	initScriptLayout->addWidget(mInitScriptWidget);
-
-	return initScriptLayout;
+	mInitScriptWidget = new FileInputWidget(this);
+	mInitScriptWidget->setDescription("Init script");
+	mInitScriptWidget->setBasePath(DataLocations::getBundlePath());
+	mInitScriptWidget->setFilename(getVideoConnectionManager()->getInitScript());
+	mInitScriptWidget->setHelp("A script that will be run prior to starting the server. Useful for grabber-specific initialization");
+	mInitScriptWidget->setBrowseHelp("Select an init script");
+	mInitScriptWidget->setUseRelativePath(true);
 }
 
 StringDataAdapterXmlPtr VideoConnectionWidget::initializeConnectionSelector()
@@ -142,26 +138,30 @@ QWidget* VideoConnectionWidget::createLocalServerWidget()
 	QWidget* retval = new QWidget();
 	QGridLayout* layout = new QGridLayout(retval);
 	layout->setMargin(0);
-	layout->addWidget(new QLabel("Local Server", this), 0, 0);
-	mLocalServerEdit = new QLineEdit(this);
-	mLocalServerEdit->setText(getVideoConnectionManager()->getLocalServerExecutable());
-	mLocalServerEdit->setToolTip(ImageServer::getArgumentHelpText("<executable>"));
-	layout->addWidget(mLocalServerEdit, 0, 1);
-	QAction* browseLocalServerAction = new QAction(QIcon(":/icons/open.png"), "Browse", this);
-	browseLocalServerAction->setStatusTip("Select a local server application");
-	connect(browseLocalServerAction, SIGNAL(triggered()), this, SLOT(browseLocalServerSlot()));
-	QToolButton* button = new QToolButton();
-	button->setDefaultAction(browseLocalServerAction);
-	layout->addWidget(button, 0, 2);
-	layout->addWidget(new QLabel("Arguments", this), 1, 0);
+	int line=0;
+
+	mLocalServerFile = new FileInputWidget(this);
+	mLocalServerFile->setDescription("Local Server");
+	mLocalServerFile->setBasePath(DataLocations::getBundlePath());
+	mLocalServerFile->setUseRelativePath(true);
+	mLocalServerFile->setFilename(getVideoConnectionManager()->getLocalServerExecutable());
+	mLocalServerFile->setHelp(ImageServer::getArgumentHelpText("<executable>"));
+	mLocalServerFile->setBrowseHelp("Select a local server application");
+	layout->addWidget(mLocalServerFile, line, 0, 1, 2);
+
+	++line;
+	layout->addWidget(new QLabel("Arguments", this), line, 0);
 	mLocalServerArguments = new QLineEdit(this);
 	mLocalServerArguments->setToolTip(ImageServer::getArgumentHelpText("<executable>"));
 	mLocalServerArguments->setText(getVideoConnectionManager()->getLocalServerArguments());
-	layout->addWidget(mLocalServerArguments, 1, 1);
+	layout->addWidget(mLocalServerArguments, line, 1);
+
+	++line;
 	mLaunchServerButton = new QPushButton("Launch Local Server", this);
 	connect(mLaunchServerButton, SIGNAL(clicked()), this, SLOT(toggleLaunchServer()));
 	mLaunchServerButton->setToolTip("Launch/Close the selected server without connecting to it.");
-	layout->addWidget(mLaunchServerButton, 2, 0, 2, 0);
+	layout->addWidget(mLaunchServerButton, line, 0, 2, 0);
+
 	return retval;
 }
 
@@ -255,14 +255,6 @@ void VideoConnectionWidget::updateDirectLinkArgumentHistory()
 	mDirectLinkArguments->blockSignals(false);
 }
 
-void VideoConnectionWidget::browseLocalServerSlot()
-{
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Select Server"), "~");
-	if (fileName.isEmpty())
-		return;
-
-	mLocalServerEdit->setText(fileName);
-}
 void VideoConnectionWidget::launchServer()
 {
 	this->writeSettings();
@@ -299,6 +291,8 @@ void VideoConnectionWidget::toggleConnectServer()
 
 void VideoConnectionWidget::writeSettings()
 {
+	this->getVideoConnectionManager()->setInitScript(mInitScriptWidget->getFilename());
+
 	if (this->getVideoConnectionManager()->useDirectLink())
 	{
 		this->getVideoConnectionManager()->setLocalServerArguments(mDirectLinkArguments->currentText());
@@ -306,7 +300,7 @@ void VideoConnectionWidget::writeSettings()
 	}
 	else if (this->getVideoConnectionManager()->useLocalServer())
 	{
-		this->getVideoConnectionManager()->setLocalServerExecutable(mLocalServerEdit->text());
+		this->getVideoConnectionManager()->setLocalServerExecutable(mLocalServerFile->getFilename());
 		this->getVideoConnectionManager()->setLocalServerArguments(mLocalServerArguments->text());
 	}
 	else if (this->getVideoConnectionManager()->useRemoteServer())

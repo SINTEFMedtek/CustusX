@@ -21,6 +21,8 @@
 #include "sscHelperWidgets.h"
 #include "cxDataInterface.h"
 #include "cxSelectDataStringDataAdapter.h"
+#include "cxPatientData.h"
+#include "cxPatientService.h"
 
 namespace cx
 {
@@ -139,7 +141,7 @@ void DataSelectWidget::requestEraseData()
     if (!mData->getData())
         return;
 
-    dataManager()->removeData(mData->getData()->getUid());
+	patientService()->getPatientData()->removeData(mData->getData()->getUid());
 }
 
 void DataSelectWidget::setRemoveIcon()

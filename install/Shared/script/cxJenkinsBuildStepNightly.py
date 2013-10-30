@@ -1,58 +1,39 @@
 #!/usr/bin/env python
 
 #####################################################
-# Unix jenkins script
+# Jenkins script
 # Author: Christian Askeland, SINTEF Medical Technology
 # Date:   2013.05.16
 #
 # Description:
 #
-#   Experimental!
 #   Build part of jenkins CI
-#
 #       Download, build, and test CustusX
 #       Publish unit tests
 #       Publish doxygen doc to medtek.sintef.no
 #
-#
 #####################################################
 
-import logging
-import time    
-import subprocess
-import sys
-import argparse        
-
-from cx.cxShell import *
-import cx.cxInstallData
-import cx.cxComponents
-import cx.cxComponentAssembly
-import cx.cxCustusXBuilder
 import cx.cxJenkinsBuildScriptBase
+import cx.cxInstallData
+import cx.cxCustusXBuilder
+from cx.cxShell import *
 
 class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
-    '''
-    '''
-    def __init__(self):
-        ''
-        super(Controller, self).__init__()
-        
-        data = self.cxBuilder.assembly.controlData
-        data.setBuildType("Release")        
-        data.mDoxygen = True
-
     def getDescription(self):                  
         return '\
 Jenkins script for build, test and deployment of CustusX and dependents. \
 Generates doxygen docs and publishes them onto medtek.sintef.no'
-    
+            
+    def setDefaults(self):                
+        super(Controller, self).setDefaults()
+        self.controlData().mDoxygen = True
+
     def run(self):
-        self.cxBuilder.buildAllComponents()
-        #self.cxBuilder.clearTestData()
-        self.cxBuilder.runAllTests()
+        self.createUnitTestedPackageStep()
         self.cxBuilder.publishDoxygen()
-        self.cxBuilder.createInstallerPackage()
-                        
+        self.cxBuilder.finish()     
+                                
 if __name__ == '__main__':
     controller = Controller()
     controller.run()

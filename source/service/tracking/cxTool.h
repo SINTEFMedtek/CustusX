@@ -84,7 +84,6 @@ public:
 
 	virtual QString getGraphicsFileName() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
-	virtual TimedTransformMapPtr getPositionHistory();
 	virtual Transform3D get_prMt() const;
 	virtual bool getVisible() const;
 	virtual bool isInitialized() const;
@@ -106,8 +105,6 @@ public:
 
 	virtual std::map<int, Vector3D> getReferencePoints() const; ///< Get the optional reference points from this tool
 	virtual bool hasReferencePointWithId(int id);
-
-	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime); ///< Get a tools transforms from within a given session
 
 	bool isValid() const; ///< whether this tool is constructed correctly or not
 
@@ -131,7 +128,6 @@ private:
 
 	IgstkToolPtr mTool;
 
-	TimedTransformMapPtr mPositionHistory;
 	vtkPolyDataPtr mPolyData; ///< the polydata used to represent the tool graphically
 	Transform3DPtr m_prMt; ///< the transform from the tool to the patient reference
 

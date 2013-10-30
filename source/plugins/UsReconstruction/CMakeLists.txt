@@ -9,6 +9,9 @@
 ###########################################################
 
 
+cx_initialize_opencl()
+
+
 
 SET( MOC_HEADER_FILES
   logic/sscReconstructManager.h
@@ -47,6 +50,7 @@ include_directories(
     ./logic
     ./logic/3DReconstruction
     ./gui
+	${CMAKE_CURRENT_BINARY_DIR}/logic/3DReconstruction
     ${CustusX3_SOURCE_DIR}/source/service/patient
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/service/visualization

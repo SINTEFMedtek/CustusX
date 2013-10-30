@@ -29,245 +29,8 @@
 namespace cx
 {
 
-//==============================================================================
-// PreferencesTab
-//------------------------------------------------------------------------------
-
-PreferencesTab::PreferencesTab(QWidget *parent) :
-    QWidget(parent)
-    //settings()(settings())
-{
-  mTopLayout = new QVBoxLayout;
-
-  QVBoxLayout* vtopLayout = new QVBoxLayout;
-  vtopLayout->addLayout(mTopLayout);
-  vtopLayout->setMargin(0);
-  vtopLayout->addStretch();
-  this->setLayout(vtopLayout);
-}
-//==============================================================================
-// GeneralTab
-//------------------------------------------------------------------------------
-
-GeneralTab::GeneralTab(QWidget *parent) :
-    PreferencesTab(parent)
-{
-	mPatientDataFolderComboBox = NULL;
-	mToolConfigFolderComboBox = NULL;
-	mChooseApplicationComboBox = NULL;
-}
-
-void GeneralTab::init()
-{
-  mGlobalPatientDataFolder = settings()->value("globalPatientDataFolder").toString();
-
-  connect(stateService()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationStateChangedSlot()));
-
-  // patientDataFolder
-  QLabel* patientDataFolderLabel = new QLabel(tr("Patient data folder:"));
-
-  mPatientDataFolderComboBox = new QComboBox;
-  mPatientDataFolderComboBox->addItem( mGlobalPatientDataFolder);
-
-  QAction* browsePatientFolderAction = new QAction(QIcon(":/icons/open.png"), tr("B&rowse..."), this);
-  connect(browsePatientFolderAction, SIGNAL(triggered()), this, SLOT(browsePatientDataFolderSlot()));
-  QToolButton* browsePatientFolderButton = new QToolButton(this);
-  browsePatientFolderButton->setDefaultAction(browsePatientFolderAction);
-  
-  // Choose application name
-  QLabel* chooseApplicationLabel = new QLabel(tr("Choose application:"));
-  mChooseApplicationComboBox = new QComboBox();
-  setApplicationComboBox();
-  connect(mChooseApplicationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(currentApplicationChangedSlot(int)));
-  this->applicationStateChangedSlot();
-  
-  // Layout
-  QGridLayout *mainLayout = new QGridLayout;
-  mainLayout->addWidget(patientDataFolderLabel, 0, 0);
-  mainLayout->addWidget(mPatientDataFolderComboBox, 0, 1);
-  mainLayout->addWidget(browsePatientFolderButton, 0, 2);
-  
-  mainLayout->addWidget(chooseApplicationLabel, 8, 0);
-  mainLayout->addWidget(mChooseApplicationComboBox, 8, 1);
- 
-  mTopLayout->addLayout(mainLayout);
-}
-
-GeneralTab::~GeneralTab()
-{}
-
-void GeneralTab::browsePatientDataFolderSlot()
-{
-  mGlobalPatientDataFolder = QFileDialog::getExistingDirectory(this, 
-                                                     tr("Find Patient Data Folder"), 
-                                                     mGlobalPatientDataFolder,
-                                                     QFileDialog::ShowDirsOnly);
-  if( !mGlobalPatientDataFolder.isEmpty() ) {
-    mPatientDataFolderComboBox->addItem( mGlobalPatientDataFolder );
-    mPatientDataFolderComboBox->setCurrentIndex( mPatientDataFolderComboBox->currentIndex() + 1 );
-  }
-}
-
-void GeneralTab::setApplicationComboBox()
-{
-  mChooseApplicationComboBox->blockSignals(true);
-  mChooseApplicationComboBox->clear();
-  QList<QAction*> actions = stateService()->getApplication()->getActionGroup()->actions();
-  for (int i=0; i<actions.size(); ++i)
-  {
-    mChooseApplicationComboBox->insertItem(i, QIcon(), actions[i]->text(), actions[i]->data());
-    if (actions[i]->isChecked())
-      mChooseApplicationComboBox->setCurrentIndex(i);
-  }
-
-  mChooseApplicationComboBox->blockSignals(false);
-}
-
-void GeneralTab::applicationStateChangedSlot()
-{
-  mChooseApplicationComboBox->blockSignals(true);
-  QList<QAction*> actions = stateService()->getApplication()->getActionGroup()->actions();
-  for (int i=0; i<actions.size(); ++i)
-  {
-    if (actions[i]->isChecked())
-      mChooseApplicationComboBox->setCurrentIndex(i);
-  }
-
-  mChooseApplicationComboBox->blockSignals(false);
-
-}
-  
-void GeneralTab::currentApplicationChangedSlot(int index)
-{
-  QList<QAction*> actions = stateService()->getApplication()->getActionGroup()->actions();
-  if (index<0 || index>=actions.size())
-    return;
-  actions[index]->trigger();
-}
-  
-void GeneralTab::saveParametersSlot()
-{
-  // currentPatientDataFolder
-  settings()->setValue("globalPatientDataFolder", mGlobalPatientDataFolder);
-  
-  settings()->sync();
-
-  emit savedParameters();
-}
-  
-//==============================================================================
-// PerformanceTab
-//------------------------------------------------------------------------------
-PerformanceTab::PerformanceTab(QWidget *parent) :
-    PreferencesTab(parent)
-{
-	mRenderingIntervalSpinBox = NULL;
-	mRenderingRateLabel = NULL;
-	mSmartRenderCheckBox = NULL;
-	mGPU2DRenderCheckBox = NULL;
-	mShadingCheckBox = NULL;
-	mMainLayout = NULL;
-}
-
-void PerformanceTab::init()
-{
-  int renderingInterval = settings()->value("renderingInterval").toInt();
-  
-  QLabel* renderingIntervalLabel = new QLabel(tr("Rendering interval"));
-  
-  mRenderingIntervalSpinBox = new QSpinBox;
-  mRenderingIntervalSpinBox->setSuffix("ms");
-  mRenderingIntervalSpinBox->setMinimum(4);
-  mRenderingIntervalSpinBox->setMaximum(1000);
-  mRenderingIntervalSpinBox->setValue(renderingInterval);
-  connect(mRenderingIntervalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(renderingIntervalSlot(int)));
-  
-  mRenderingRateLabel = new QLabel("");
-  this->renderingIntervalSlot(renderingInterval);
-
-  double Mb = pow(10.0,6);
-  bool ok = true;
-  double maxRenderSize = settings()->value("View3D/maxRenderSize").toDouble(&ok);
-  if (!ok)
-    maxRenderSize = 10 * Mb;
-  mMaxRenderSize = DoubleDataAdapterXml::initialize("MaxRenderSize", "Max Render Size (Mb)", "Maximum size of volumes used in volume rendering. Applies to new volumes.", maxRenderSize, DoubleRange(1*Mb,300*Mb,1*Mb), 0, QDomNode());
-  mMaxRenderSize->setInternal2Display(1.0/Mb);
-
-  double stillUpdateRate = settings()->value("stillUpdateRate").value<double>();
-  mStillUpdateRate = DoubleDataAdapterXml::initialize("StillUpdateRate", "Still Update Rate", "Still Update Rate in vtkRenderWindow. Restart needed.", stillUpdateRate, DoubleRange(0.0001, 20, 0.0001), 4, QDomNode());
-
-  mSmartRenderCheckBox = new QCheckBox("Smart Render");
-  mSmartRenderCheckBox->setChecked(settings()->value("smartRender", true).toBool());
-  mSmartRenderCheckBox->setToolTip("Render only when scene has changed, plus once per second.");
-
-  m3DVisualizer = StringDataAdapterXml::initialize("ImageRender3DVisualizer",
-	  "3D Renderer",
-	  "Select 3D visualization method for images",
-	  settings()->value("View3D/ImageRender3DVisualizer").toString(),
-	  MultiVolume3DRepProducer::getAvailableVisualizers(),
-	  QDomNode());
-  m3DVisualizer->setDisplayNames(MultiVolume3DRepProducer::getAvailableVisualizerDisplayNames());
-
-  bool useGPU2DRender = settings()->value("useGPU2DRendering").toBool();
-	mGPU2DRenderCheckBox = new QCheckBox("Use GPU 2D Renderer");
-	mGPU2DRenderCheckBox->setChecked(useGPU2DRender);
-	mGPU2DRenderCheckBox->setToolTip("Use a GPU-based 2D renderer instead of the software-based one, if available.");
-
-#ifndef USE_GLX_SHARED_CONTEXT
-	mGPU2DRenderCheckBox->setChecked(false);
-	mGPU2DRenderCheckBox->setEnabled(false);
-#endif
-
-//  bool useGPU3DDepthPeeling = settings()->value("View3D/depthPeeling").toBool();
-//	mGPU3DDepthPeelingCheckBox = new QCheckBox("Use GPU 3D depth peeling");
-//	mGPU3DDepthPeelingCheckBox->setChecked(useGPU3DDepthPeeling);
-//	mGPU3DDepthPeelingCheckBox->setToolTip("Use a GPU-based 3D depth peeling to correctly visualize translucent surfaces.");
-
-  //Layout
-  mMainLayout = new QGridLayout;
-  mMainLayout->addWidget(renderingIntervalLabel, 0, 0);
-  new SpinBoxGroupWidget(this, mMaxRenderSize, mMainLayout, 1);
-  mMainLayout->addWidget(mRenderingIntervalSpinBox, 0, 1);
-  mMainLayout->addWidget(mRenderingRateLabel, 0, 2);
-  mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
-  mMainLayout->addWidget(mGPU2DRenderCheckBox, 5, 0);
-  new SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 7);
-  mMainLayout->addWidget(sscCreateDataWidget(this, m3DVisualizer), 8, 0, 1, 2);
-
-  mMainLayout->setColumnStretch(0, 0.6);
-  mMainLayout->setColumnStretch(1, 0.6);
-  mMainLayout->setColumnStretch(2, 0.3);
-
-  mTopLayout->addLayout(mMainLayout);
-}
-
-void PerformanceTab::renderingIntervalSlot(int interval)
-{    
-  mRenderingRateLabel->setText(QString("%1 fps").arg(1000.0/interval, 0, 'f', 1));
-} 
-
-void PerformanceTab::saveParametersSlot()
-{
-  settings()->setValue("renderingInterval", mRenderingIntervalSpinBox->value());
-  settings()->setValue("useGPU2DRendering", mGPU2DRenderCheckBox->isChecked());
-  settings()->setValue("View3D/maxRenderSize",     mMaxRenderSize->getValue());
-  settings()->setValue("smartRender",       mSmartRenderCheckBox->isChecked());
-  settings()->setValue("stillUpdateRate",   mStillUpdateRate->getValue());
-//  settings()->setValue("View3D/depthPeeling", mGPU3DDepthPeelingCheckBox->isChecked());
-  settings()->setValue("View3D/ImageRender3DVisualizer",   m3DVisualizer->getValue());
-}
-
-//==============================================================================
-// View3DTab
-//------------------------------------------------------------------------------
-
-
-//------------------------------------------------------------------------------
-
-
-
 VisualizationTab::VisualizationTab(QWidget *parent) :
-    PreferencesTab(parent), mStereoTypeActionGroup(NULL)
+		PreferenceTab(parent), mStereoTypeActionGroup(NULL)
 {
 	mMainLayout = NULL;
 	mStereoTypeComboBox = NULL;
@@ -418,7 +181,7 @@ void VisualizationTab::setBackgroundColorSlot(QColor color)
 // AutomationTab
 //------------------------------------------------------------------------------
 AutomationTab::AutomationTab(QWidget *parent) :
-    PreferencesTab(parent)
+		PreferenceTab(parent)
 {
 	mAutoSelectDominantToolCheckBox = NULL;
 	mAutoStartTrackingCheckBox = NULL;
@@ -504,7 +267,7 @@ void AutomationTab::saveParametersSlot()
 // UltrasoundTab
 //------------------------------------------------------------------------------
 VideoTab::VideoTab(QWidget *parent) :
-    PreferencesTab(parent)
+		PreferenceTab(parent)
 {
 	  mAcquisitionNameLineEdit = NULL;
 	  mMainLayout = NULL;
@@ -555,7 +318,7 @@ void VideoTab::saveParametersSlot()
 //------------------------------------------------------------------------------
 
 ToolConfigTab::ToolConfigTab(QWidget* parent) :
-    PreferencesTab(parent),
+		PreferenceTab(parent),
     mFilePreviewWidget(new FilePreviewWidget(this)),
     mImagePreviewWidget(new ToolImagePreviewWidget(this))
 {
@@ -703,7 +466,7 @@ void PreferencesDialog::applySlot()
   emit applied();
 }
 
-void PreferencesDialog::addTab(PreferencesTab* widget, QString name)
+void PreferencesDialog::addTab(PreferenceTab* widget, QString name)
 {
   widget->init();
   connect(mButtonBox, SIGNAL(accepted()), widget, SLOT(saveParametersSlot()));
@@ -729,7 +492,7 @@ void PreferencesDialog::addTab(PreferencesTab* widget, QString name)
 // UltrasoundTab
 //------------------------------------------------------------------------------
 DebugTab::DebugTab(QWidget *parent) :
-    PreferencesTab(parent)
+		PreferenceTab(parent)
 {
 	mIGSTKDebugLoggingCheckBox = NULL;
 	mManualToolPhysicalPropertiesCheckBox = NULL;

@@ -76,7 +76,8 @@ public:
 	virtual void setVtkImageData(const vtkImageDataPtr& data);
 
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
-	virtual vtkImageDataPtr getGrayScaleBaseVtkImageData(); ///< as getBaseVtkImageData(), but constrained to 1 component if multicolor.
+	virtual vtkImageDataPtr getGrayScaleVtkImageData(); ///< as getBaseVtkImageData(), but constrained to 1 component if multicolor.
+	virtual vtkImageDataPtr get8bitGrayScaleVtkImageData();///< Have never been used or tested. Create a test for it
 	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the reference coordinate space
 	virtual LandmarkMap getLandmarks(); ///< \return all landmarks defined on the image.
 	/** Return a version of this, containing image data and transfer functions converted to unsigned.
@@ -149,6 +150,7 @@ public:
 	int getInterpolationType() const;
 
 	vtkImageDataPtr resample(long maxVoxels);
+	virtual QString getFilename() const;
 
 signals:
 	void landmarkRemoved(QString uid);
@@ -192,6 +194,7 @@ private:
 	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D);
 	void resetTransferFunction(ImageLUT2DPtr imageLookupTable2D);
 	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D);
+	DoubleBoundingBox3D getInitialBoundingBox() const;
 
 	double computeResampleFactor(long maxVoxels);
 

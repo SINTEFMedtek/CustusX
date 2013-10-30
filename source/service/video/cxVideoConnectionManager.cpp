@@ -27,6 +27,7 @@
 #include "cxProcessWrapper.h"
 #include "cxVideoConnection.h"
 #include "sscStringDataAdapterXml.h"
+#include "sscLogger.h"
 
 namespace cx
 {
@@ -179,7 +180,7 @@ void VideoConnectionManager::launchServer()
 	}
 	QString program = this->getLocalServerExecutable();
 	QStringList arguments = this->getLocalServerArguments().split(" ");
-	mLocalVideoServerProcess->launch(program, arguments);
+	mLocalVideoServerProcess->launchWithRelativePath(program, arguments);
 }
 
 void VideoConnectionManager::connectServer()
@@ -256,7 +257,9 @@ bool VideoConnectionManager::isConnected() const
 
 void VideoConnectionManager::runScript()
 {
-	mIniScriptProcess->launch(this->getInitScript());
+	if (this->getInitScript().isEmpty())
+		return;
+	mIniScriptProcess->launchWithRelativePath(this->getInitScript());
 }
 
 bool VideoConnectionManager::localVideoServerIsRunning()
