@@ -33,8 +33,10 @@ vec4 colorFromValue(int volNumber,vec4 value) //Mehdi
 {
  
 	#ifdef __APPLE__ 
+	/*
 		if (volNumber==0)
 			return texture1D(colorTexture[0],value.x);//Mehdi      
+	*/
 		if (volNumber==1)
 			return texture1D(colorTexture[1],value.x);//Mehdi 
 		if (volNumber==2)

@@ -547,7 +547,7 @@ float findYonPlane(vec3 n, vec3 p0, vec3 point)
 //------------------------------------------------------------------------------
 int main(int argc, char *argv[])
 {
-  //vtkObject::GlobalWarningDisplayOff();
+  vtkObject::GlobalWarningDisplayOff();
   // Parse the parameters
   ParseArguments(argc,argv);
 
@@ -841,13 +841,13 @@ int main(int argc, char *argv[])
 	*/
   
   
-  /*
+  
   for (int i = 0; i < 360; i++) 
   { 
 	renderer->GetActiveCamera()->Azimuth(1);
 	renWin->Render();
   }
-  */
+  
    
   /*new*/
 
@@ -859,8 +859,8 @@ int main(int argc, char *argv[])
 */
   // interact with data
   
-  renWin->Render();
-  iren->Start();
+  //renWin->Render();
+  //iren->Start();
   
   double fps = sumFPS/(long double)frameCount;
   std::cout << "FPS: " << fps << std::endl;
