@@ -63,7 +63,7 @@ Vector3D LevelSetFilter::getSeedPointFromTool(DataPtr image) {
 }
 
 int * getImageSize(DataPtr inputImage) {
-    ImagePtr image = DataManager::getInstance()->getImage(inputImage->getUid());
+    ImagePtr image = boost::dynamic_pointer_cast<Image>(inputImage);
     return image->getBaseVtkImageData()->GetDimensions();
 }
 

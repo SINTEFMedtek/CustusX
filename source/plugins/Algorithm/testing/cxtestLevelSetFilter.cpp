@@ -6,32 +6,16 @@
 #include "cxToolManager.h"
 #include "sscManualTool.h"
 #include "sscData.h"
+#include "sscImage.h"
+#include "cxtestUtilities.h"
 
 namespace cxtest {
-
-/*
-DataPtr createDummyData(void * data, int size_x, int size_y, int size_z) {
-	vtkImageImportPtr imageImport = vtkImageImportPtr::New();
-
-	imageImport->SetWholeExtent(0, size_x - 1, 0, size_y - 1, 0, size_z - 1);
-	imageImport->SetDataExtentToWholeExtent();
-	imageImport->SetDataScalarType(type);
-	imageImport->SetNumberOfScalarComponents(1);
-	imageImport->SetImportVoidPointer(data);
-	imageImport->GetOutput()->Update();
-	imageImport->Modified();
-
-	vtkImageDataPtr retval = vtkImageDataPtr::New();
-	retval->DeepCopy(imageImport->GetOutput());
-}
-*/
 
 TEST_CASE("LevelSetFilter: getSeedPointFromTool", "[unit][plugins][Algorithm][LevelSetFilter]") 
 {
     cx::cxToolManager::initializeObject();
     cx::cxToolManager * toolmanager = cx::cxToolManager::getInstance();
     cx::ManualToolPtr tool = toolmanager->getManualTool();
-    std::cout << " test" << std::endl;
     cx::Vector3D toolTipPoint;
     toolTipPoint.setRandom();
     tool->set_prMt(cx::createTransformTranslate(toolTipPoint));
@@ -46,7 +30,14 @@ TEST_CASE("LevelSetFilter: getSeedPointFromTool", "[unit][plugins][Algorithm][Le
 
 TEST_CASE("LevelSetFilter: isSeedPointInsideImage", "[unit][plugins][Algorithm][LevelSetFilter]")
 {
+    cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(10,10,10), 1);
+    cx::Vector3D point;
+    point.setOnes();
 
+    CHECK(cx::LevelSetFilter::isSeedPointInsideImage(point, image));
+
+    point(1) = 12;
+    CHECK_FALSE(cx::LevelSetFilter::isSeedPointInsideImage(point, image));
 }
 
 }; // end cxtest namespace
