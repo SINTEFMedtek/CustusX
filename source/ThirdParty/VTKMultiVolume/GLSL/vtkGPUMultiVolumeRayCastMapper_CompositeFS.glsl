@@ -56,16 +56,20 @@ float xMin[10];
 float yMin[10];
 float zMin[10];
 
+vec3 clipMin[10];
+
 uniform	vec3 ClippingplanesNormal[10];
 uniform	vec3 ClippingplanesOrigins[10];
 uniform int clipped[10];
 
 void clip (int i, vec3 pos)
 {
-	
+	/*
 	xMin[i]=-10.0;
 	yMin[i]=-10.0;
 	zMin[i]=-10.0;
+	*/
+	clipMin[i]=vec3(-10.0, -10.0, -10.0);
 
 	float partX=ClippingplanesNormal[i].x*(pos.x-ClippingplanesOrigins[i].x);
 	float partY=ClippingplanesNormal[i].y*(pos.y-ClippingplanesOrigins[i].y);
@@ -79,18 +83,17 @@ void clip (int i, vec3 pos)
 		//temp=findXonPlane(ClippingplanesNormal[i], ClippingplanesOrigins[i], pos);
 		if(temp>pos.x)
 		{
-			if(temp>xMin[i])
-				xMin[i]=temp;
+			if(temp>clipMin[i].x)
+				clipMin[i].x=temp;
 
-		}
-		
+		}		
 		else
 		{
-			if(temp<xMin[i])
-				xMin[i]=temp;
+			if(temp<clipMin[i].x)
+				clipMin[i].x=temp;
 
 		}
-		if (ClippingplanesNormal[i].x<0.0) xMin[i]=-xMin[i];
+		if (ClippingplanesNormal[i].x<0.0) clipMin[i].x=-clipMin[i].x;
 
 	}
 	if(ClippingplanesNormal[i].y!=0.0)
@@ -99,18 +102,18 @@ void clip (int i, vec3 pos)
 		//temp=findYonPlane(ClippingplanesNormal[i], ClippingplanesOrigins[i], pos);
 		if(temp>pos.y)
 		{
-			if(temp>yMin[i])
-				yMin[i]=temp;
+			if(temp>clipMin[i].y)
+				clipMin[i].y=temp;
 
 		}
 		
 		else
 		{
-			if(temp<=yMin[i])
-				yMin[i]=temp;
+			if(temp<=clipMin[i].y)
+				clipMin[i].y=temp;
 
 		}
-		if (ClippingplanesNormal[i].y<0.0) yMin[i]=-yMin[i];
+		if (ClippingplanesNormal[i].y<0.0) clipMin[i].y=-clipMin[i].y;
 	}
 	
 	if(ClippingplanesNormal[i].z!=0.0)
@@ -119,18 +122,18 @@ void clip (int i, vec3 pos)
 		//temp=findZonPlane(ClippingplanesNormal[i], ClippingplanesOrigins[i], pos);
 		if(temp>pos.z)
 		{
-			if(temp>zMin[i])
-				zMin[i]=temp;
+			if(temp>clipMin[i].z)
+				clipMin[i].z=temp;
 
 		}
 		
 		else
 		{
-			if(temp<=zMin[i])
-				zMin[i]=temp;
+			if(temp<=clipMin[i].z)
+				clipMin[i].z=temp;
 
 		}
-		if (ClippingplanesNormal[i].z<0.0) zMin[i]=-zMin[i];
+		if (ClippingplanesNormal[i].z<0.0) clipMin[i].z=-clipMin[i].z;
 	}
 		
 		
@@ -214,10 +217,11 @@ void trace(void)
 				&& all(lessThanEqual(posX[xx-1],highBounds[xx])))
 				{
 				
-					//if(clipped[xx]==1)
-						//clip(xx,posX[xx-1]);
+					if(clipped[xx]==1)
+						clip(xx,posX[xx-1]);
 				
 					//if(((xMin[xx]<posX[xx-1].x)&&(yMin[xx]<posX[xx-1].y)&&(zMin[xx]<posX[xx-1].z))||(clipped[xx]==0))
+					if(all(lessThan(clipMin[xx],posX[xx-1]))||(clipped[xx]==0))
 					{
 				                    
 						#ifdef __APPLE__
