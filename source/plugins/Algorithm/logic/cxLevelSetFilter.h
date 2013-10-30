@@ -45,6 +45,8 @@ private:
 
 }; // end LevelSetFilter class
 
+typedef boost::shared_ptr<class LevelSetFilter> LevelSetFilterPtr;
+
 } // end namespace
 
 #endif // CX_USE_LEVEL_SET
