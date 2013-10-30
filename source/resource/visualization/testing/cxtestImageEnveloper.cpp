@@ -24,6 +24,9 @@
 namespace cxtest
 {
 
+namespace  {
+
+
 Eigen::Array3i getDim(cx::ImagePtr input)
 {
 	return Eigen::Array3i(input->getBaseVtkImageData()->GetDimensions());
@@ -36,7 +39,7 @@ cx::Vector3D getSpacing(cx::ImagePtr input)
 
 cx::ImagePtr createExpectedImage(cx::ImageParameters params)
 {
-	vtkImageDataPtr imageData = cx::generateVtkImageData(params.mDim, params.mSpacing, 0, 1);
+	vtkImageDataPtr imageData = cx::generateVtkImageData(params.getDim(), params.getSpacing(), 0, 1);
 
 	cx::ImagePtr retval(new cx::Image("expected_image", imageData));
 	retval->get_rMd_History()->setRegistration(params.m_rMd);
@@ -73,8 +76,11 @@ void checkImages(cx::ImagePtr input, cx::ImagePtr expected)
 		CHECK(cx::similar(getSpacing(input), getSpacing(expected)));
 	}
 	CHECK(input->getParentSpace() == expected->getParentSpace());
-	CHECK(cxtest::Utilities::getFractionOfVoxelsAboveThreshold(input->getBaseVtkImageData(), 0) == Approx(0));
+	// removed: image is not necessarily black. The size is what matters.
+	//CHECK(cxtest::Utilities::getFractionOfVoxelsAboveThreshold(input->getBaseVtkImageData(), 0) == Approx(0));
 }
+
+} // namespace
 
 
 TEST_CASE("ImageEnveloper: One image", "[unit][resource][visualization]")
@@ -88,9 +94,9 @@ TEST_CASE("ImageEnveloper: One image", "[unit][resource][visualization]")
 	cx::ImagePtr box = enveloper->getEnvelopingImage();
 
 	cx::ImageParameters expectedImageParameters(Eigen::Array3i(size, size, size),
-																							getSpacing(image),
-																							image->getUid(),
-																							image->get_rMd());
+												getSpacing(image),
+												image->getUid(),
+												image->get_rMd());
 
 	cx::ImagePtr expected = createExpectedImage(expectedImageParameters);
 	checkImages(box, expected);
@@ -233,8 +239,8 @@ TEST_CASE("ImageEnveloper: One rotated high-res image inside another", "[unit][r
 //	Eigen::Array3i expectedDims = cx::ImageEnveloper::getDimFromExtent(expectedExtent, expectedSpacing);
 
 	cx::ImageParameters expectedParameters;
-	expectedParameters.mSpacing = Eigen::Array3d(spacing*shift, spacing*shift, spacing);
-	expectedParameters.setDimFromBounds(Eigen::Array3d(extent + shift, extent, extent));
+	expectedParameters.setSpacingKeepDim(Eigen::Array3d(spacing*shift, spacing*shift, spacing));
+	expectedParameters.setDimKeepBoundsAlignSpacing(Eigen::Array3d(extent + shift, extent, extent));
 	expectedParameters.mParentVolume = images[0]->getUid();
 	expectedParameters.m_rMd = cx::createTransformTranslate(cx::Vector3D(-shift,0,0));
 

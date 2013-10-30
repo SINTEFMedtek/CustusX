@@ -49,7 +49,7 @@ TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Pass MHD Image to
 	this->renderImageAndCompareToExpected(videoImage0, videoImage0);
 }
 
-TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Test Mask", "[unit][resource][visualization]")
+TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Test Mask", "[unit][resource][visualization][unstable]")
 {
 	vtkImageDataPtr videoImage0 = this->readImageData("testImage01.png", "input image");
 	vtkImageDataPtr mask = this->readImageData("testImage01_sectormask.png", "input mask");

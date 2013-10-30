@@ -16,8 +16,11 @@
 #define CXRecordSession_H_
 
 #include <QString>
+#include <map>
 #include "boost/shared_ptr.hpp"
 //#include "cxToolManager.h"
+#include "cxForwardDeclarations.h"
+#include "sscTransform3D.h"
 
 class QDomNode;
 
@@ -28,6 +31,9 @@ namespace cx
  * \addtogroup cxPluginAcquisition
  * @{
  */
+
+typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
+typedef std::map<double, Transform3D> TimedTransformMap;
 
 /**
  * RecordSession
@@ -53,6 +59,8 @@ public:
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode& dataNode);
 
+	static TimedTransformMap getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session);
+
 protected:
 
 	QString mUid;
@@ -60,8 +68,6 @@ protected:
 	double mStopTime;
 	QString mDescription;
 };
-
-typedef boost::shared_ptr<RecordSession> RecordSessionPtr;
 
 /**
  * @}

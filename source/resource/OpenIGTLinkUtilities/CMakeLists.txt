@@ -1,19 +1,18 @@
 cmake_minimum_required(VERSION 2.6)
 
-if(BUILD_OPEN_IGTLINK_SERVER)
-    find_package(OpenIGTLink REQUIRED)
-    include(${OpenIGTLink_USE_FILE})
+find_package(OpenIGTLink REQUIRED)
+include(${OpenIGTLink_USE_FILE})
 
-    include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
+include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 
-    SET(LINK_LIBRARIES
-            cxResource
-            OpenIGTLink
-            )
+SET(LINK_LIBRARIES
+        cxResource
+        OpenIGTLink
+    )
 
-    SET ( cxOpenIGTLinkUtilities_FILES
-            cxIGTLinkImageMessage.h
-            cxIGTLinkImageMessage.cpp
+SET ( cxOpenIGTLinkUtilities_FILES
+        cxIGTLinkImageMessage.h
+        cxIGTLinkImageMessage.cpp
         cxIGTLinkUSStatusMessage.h
         cxIGTLinkUSStatusMessage.cpp
         igtl_us_status.h
@@ -22,14 +21,13 @@ if(BUILD_OPEN_IGTLINK_SERVER)
         cxIGTLinkConversion.cpp
     )
 
-    add_library( cxOpenIGTLinkUtilities
-        ${cxOpenIGTLinkUtilities_FILES}
-        ${MOC_HEADER_FILES}
-        )
-    target_link_libraries(cxOpenIGTLinkUtilities
-        ${LINK_LIBRARIES}
-        )
+add_library( cxOpenIGTLinkUtilities
+    ${cxOpenIGTLinkUtilities_FILES}
+    ${MOC_HEADER_FILES}
+    )
+target_link_libraries(cxOpenIGTLinkUtilities
+    ${LINK_LIBRARIES}
+    )
 
-    add_subdirectory(testing)
+add_subdirectory(testing)
 
-endif(BUILD_OPEN_IGTLINK_SERVER)

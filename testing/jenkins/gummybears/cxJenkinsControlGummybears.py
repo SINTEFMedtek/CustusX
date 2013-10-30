@@ -45,6 +45,7 @@ import argparse
 from cxPowerControl import PowerControl
 from jenkinsapi import api
 import datetime
+import urllib2
 
 class JenkinsGummyBears():
     '''
@@ -54,7 +55,7 @@ class JenkinsGummyBears():
     def __init__(self):
         self.hostname = 'http://christiana-ubuntu-desktop:8080'
         self.username = 'christiana'
-        self.jobname = 'CustusX'
+        self.jobnames = ['CustusX_unit', 'CustusX_integration']
         self.password = 'not set'
         self.debug_counter = 0
         self.lamp = PowerControl()
@@ -95,17 +96,24 @@ class JenkinsGummyBears():
         '''
 	    Set the gummy bears and print status, once
         '''
-        self._printStatus()
-        self._setGummyBears()
+        try:
+            self._printStatus()
+            self._setGummyBears()
+        except urllib2.HTTPError as e:
+            print 'Exception caught:'
+            print e
+            waittime = 5
+            print 'Retrying in %is...' % waittime
+            time.sleep(waittime)
 
-    def getJob(self):
+    def getJob(self, name):
         '''
 	    Return the active job.
 	    NOTE:
         Call this for every use, otherwise the 
         build values will not be updated.
         '''
-        return self.jenkins.get_job(self.jobname)
+        return self.jenkins.get_job(name)
 
     def _printConfigInfo(self):
         ''
@@ -116,8 +124,10 @@ class JenkinsGummyBears():
     def _printSetupInfo(self):
         ''
         print '  Authorization: ', self.jenkins.get_jenkins_auth()
-        print '  Available jobs: ', self.jenkins.get_jobs_list()
-        print '  Connected to job: ', self.getJob()
+        print '  Available jobs:'
+        print self._generateIndentedText(self.jenkins.get_jobs_list(), 6)
+        print '  Connected to jobs:'
+        print self._generateIndentedText([str(self.getJob(name)) for name in self.jobnames], 6)
 
     def _printStatus(self):
         text = self._generateStatusText()
@@ -128,43 +138,60 @@ class JenkinsGummyBears():
         print text
 
     def _getTimeLineString(self):
-	return 'Time: %s' % datetime.datetime.now().isoformat(' ')
+        return 'Time: %s' % datetime.datetime.now().isoformat(' ')
 
     def _generateStatusText(self):
-        job = self.getJob()
+        retval = []
+        for jobname in self.jobnames:
+            job = self.getJob(jobname)
+            retval.append(self._generateStatusTextForJob(job))
+        return '\n'.join(retval)
+
+    def _generateStatusTextForJob(self, job):
         lastBuild = job.get_last_build()
         completedBuild = job.get_last_completed_build()
         text = ''
         text = [
-		'Checking last build: %s' % lastBuild,
-		'        Running: %s' % lastBuild.is_running(),
-		'        Status:  %s' % lastBuild.get_status(),
-		'Checking last completed build: %s' % completedBuild,
-		'        Good: %s' % completedBuild.is_good(),
-		'        Status:  %s' % completedBuild.get_status()
+        'Status for job: %s' % str(job),
+        '    Last build: %s ' % lastBuild,
+        '        Running: %s' % lastBuild.is_running(),
+        '    Last completed build: %s ' % completedBuild,
+        '        Good: %s' % completedBuild.is_good(),
+        '        Status:  %s' % completedBuild.get_status()
 		]
-        indent = '    '
-        for i in range(len(text)):
-            text[i] = '%s%s' % (indent, text[i])
-        text = '\n'.join(text)
-        return text
+        return self._generateIndentedText(text, 4)
+    
+    def _generateIndentedText(self, lines, indent):
+        ind = ' ' * indent
+        indented = ['%s%s' % (ind, line) for line in lines]
+        return  '\n'.join(indented)
 
     def _setGummyBears(self):
         '''
         Light the {green, yellow, red} gummy bears
         according to input from the last jenkins build.
         '''
-        job = self.getJob()
-        lastBuild = job.get_last_build()
-        completedBuild = job.get_last_completed_build()
-
-        green = completedBuild.is_good()
-        yellow = lastBuild.is_running()
-        red = not completedBuild.is_good()
+        green = self._allCompletedJobsAreGood()
+        yellow = self._anyJobsAreRunning()
+        red = not green
         
         self.lamp.switchGreen(green)
         self.lamp.switchYellow(yellow)
         self.lamp.switchRed(red)
+        
+    def _anyJobsAreRunning(self):
+        for jobname in self.jobnames:
+            lastBuild = self.jenkins.get_job(jobname).get_last_build()
+            if lastBuild.is_running():
+                return True
+        return False
+    
+    def _allCompletedJobsAreGood(self):
+        for jobname in self.jobnames:
+            completedBuild = self.jenkins.get_job(jobname).get_last_completed_build()
+            if not completedBuild.is_good():
+                return False
+        return True
 
     def _dummySetGummyBears(self):
         '''

@@ -24,13 +24,13 @@
 #include <vtkImageReslice.h>
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
-#include <vtkImageLuminance.h>
 #include <vtkPlane.h>
 #include <vtkPlanes.h>
 #include <vtkImageResample.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkImageClip.h>
 #include <vtkImageIterator.h>
+#include <vtkImageShiftScale.h>
 #include "sscImageTF3D.h"
 #include "sscBoundingBox3D.h"
 #include "sscImageLUT2D.h"
@@ -105,7 +105,7 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& nam
 {
 	mInterpolationType = VTK_LINEAR_INTERPOLATION;
 	mUseCropping = false;
-	mCroppingBox_d = DoubleBoundingBox3D(0, 0, 0, 0, 0, 0);
+	mCroppingBox_d = this->getInitialBoundingBox();
 
 	//  mShading.on = false;
 	//  mShading.ambient = 0.2;
@@ -117,6 +117,10 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& nam
 	mImageTransferFunctions3D.reset();
 }
 
+DoubleBoundingBox3D Image::getInitialBoundingBox() const
+{
+	return DoubleBoundingBox3D(-1, -1, -1, -1, -1, -1);
+}
 
 ImagePtr Image::getUnsigned(ImagePtr self)
 {
@@ -250,25 +254,21 @@ void Image::setVtkImageData(const vtkImageDataPtr& data)
 	emit vtkImageDataChanged();
 }
 
-vtkImageDataPtr Image::getGrayScaleBaseVtkImageData()
+vtkImageDataPtr Image::get8bitGrayScaleVtkImageData()
+{
+	double windowWidth = mImageLookupTable2D->getWindow();
+	double windowLevel = mImageLookupTable2D->getLevel();
+	return convertImageDataTo8Bit(this->getGrayScaleVtkImageData(), windowWidth, windowLevel);
+}
+
+vtkImageDataPtr Image::getGrayScaleVtkImageData()
 {
 	if (mBaseGrayScaleImageData)
 	{
 		return mBaseGrayScaleImageData;
 	}
 
-	mBaseGrayScaleImageData = getBaseVtkImageData();
-
-	// if the volume is color, run it through a luminance filter in order to get a
-	// finning grayscale representation.
-	if (mBaseGrayScaleImageData->GetNumberOfScalarComponents() > 2) // color
-	{
-		vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
-		luminance->SetInput(mBaseGrayScaleImageData);
-		mBaseGrayScaleImageData = luminance->GetOutput();
-	}
-
-	mBaseGrayScaleImageData->Update();
+	mBaseGrayScaleImageData = convertImageDataToGrayScale(this->getBaseVtkImageData());
 	return mBaseGrayScaleImageData;
 }
 
@@ -370,7 +370,7 @@ vtkImageAccumulatePtr Image::getHistogram()
 	{
 		mHistogramPtr = vtkImageAccumulatePtr::New();
 //		mHistogramPtr->SetInput(mBaseImageData);
-		mHistogramPtr->SetInput(this->getGrayScaleBaseVtkImageData());
+		mHistogramPtr->SetInput(this->getGrayScaleVtkImageData());
 		mHistogramPtr->IgnoreZeroOn(); // required for Sonowand CT volumes, where data are placed between 31K and 35K.
 		// Set up only a 1D histogram for now, so y and z values are set to 0
 		mHistogramPtr->SetComponentExtent(0, this->getRange(), 0, 0, 0, 0);
@@ -656,7 +656,7 @@ void Image::setCropping(bool on)
 		return;
 
 	mUseCropping = on;
-	if (similar(mCroppingBox_d, DoubleBoundingBox3D(0, 0, 0, 0, 0, 0)))
+	if (similar(mCroppingBox_d, this->getInitialBoundingBox()))
 		mCroppingBox_d = this->boundingBox();
 	emit cropBoxChanged();
 }
@@ -847,6 +847,11 @@ vtkImageDataPtr Image::createDummyImageData(int axisSize, int maxVoxelValue)
 	return dummyImageData;
 }
 
+QString Image::getFilename() const
+{
+	return QString("Images/%1.mhd").arg(this->getUid());
+}
+
 void Image::setInterpolationTypeToNearest()
 {
 	this->setInterpolationType(VTK_NEAREST_INTERPOLATION);
@@ -868,7 +873,7 @@ int Image::getInterpolationType() const
 vtkImageDataPtr Image::resample(long maxVoxels)
 {
 	// also use grayscale as vtk is incapable of rendering 3component color.
-	vtkImageDataPtr retval = this->getGrayScaleBaseVtkImageData();
+	vtkImageDataPtr retval = this->getGrayScaleVtkImageData();
 
 	double factor = computeResampleFactor(maxVoxels);
 

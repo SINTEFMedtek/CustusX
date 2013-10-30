@@ -542,7 +542,7 @@ void MetricWidget::removeButtonClickedSlot()
 		nextUid = nextItem->data(Qt::UserRole).toString();
 	}
 
-	dataManager()->removeData(mActiveLandmark);
+	patientService()->getPatientData()->removeData(mActiveLandmark);
 
 	if (!nextUid.isEmpty())
 		this->setActiveUid(nextUid);

@@ -3,7 +3,6 @@
 ###########################################################
 
 SET( CX_QT_MOC_HEADER_FILES
-    cxFileCopied.h
     cxPatientData.h
     cxPatientService.h
 	cxDataManager.h
@@ -15,8 +14,6 @@ SET ( cxPatientService_SOURCE
 	cxDataManager.cpp
 	cxPatientData.h
     cxPatientData.cpp
-    cxFileCopied.h
-    cxFileCopied.cpp
     cxPatientService.h
     cxPatientService.cpp
     cxFrameForest.h
