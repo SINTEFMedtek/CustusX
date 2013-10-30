@@ -162,9 +162,7 @@ void trace(void)
 
   // We NEED two nested while loops. It is trick to work around hardware
   // limitation about the maximum number of loops.
-  
-  while(inside)
-  {  
+
     while(inside)
       {
 
@@ -209,18 +207,19 @@ void trace(void)
 			int xx=1;
 		
 			while(xx<Number_Of_Volumes)	
+			//for(int xx=1; (xx<4)&&(xx<Number_Of_Volumes); xx++)
 			{
 		
 				if (all(greaterThanEqual(posX[xx-1],lowBounds[xx]))
 				&& all(lessThanEqual(posX[xx-1],highBounds[xx])))
 				{
 				
-					if(clipped[xx]==1)
-						clip(xx,posX[xx-1]);
+					//if(clipped[xx]==1)
+						//clip(xx,posX[xx-1]);
 				
-					if(((xMin[xx]<posX[xx-1].x)&&(yMin[xx]<posX[xx-1].y)&&(zMin[xx]<posX[xx-1].z))||(clipped[xx]==0))
+					//if(((xMin[xx]<posX[xx-1].x)&&(yMin[xx]<posX[xx-1].y)&&(zMin[xx]<posX[xx-1].z))||(clipped[xx]==0))
 					{
-				                     
+				                    
 						#ifdef __APPLE__
 
 							if(xx==1)
@@ -267,9 +266,11 @@ void trace(void)
 			
 			pos=pos+rayDir;
 			t+=1.0;
-			inside=t<tMax && (remainOpacity>=0.0039); // 1/255=0.0039
+			inside=(t<tMax) && (remainOpacity>=0.0039) 
+			&& (all(greaterThanEqual(pos,lowBounds[0]))
+			&& all(lessThanEqual(pos,highBounds[0]))); // 1/255=0.0039
 		}
-	}
+	
 	
 	gl_FragColor = destColor;
 	gl_FragColor.a = 1.0-remainOpacity;
