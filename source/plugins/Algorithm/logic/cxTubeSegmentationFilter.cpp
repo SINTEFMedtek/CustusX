@@ -119,7 +119,7 @@ bool TubeSegmentationFilter::execute()
     		return false;
 
 	mParameters = this->getParametersFromOptions();
-	std::string filename = (patientService()->getPatientData()->getActivePatientFolder()+"/"+input->getFilePath()).toStdString();
+	std::string filename = (patientService()->getPatientData()->getActivePatientFolder()+"/"+input->getFilename()).toStdString();
 
 	try {
 		std::cout << "=================TSF START====================" << std::endl;

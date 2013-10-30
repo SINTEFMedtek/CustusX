@@ -105,7 +105,7 @@ bool LevelSetFilter::execute() {
     std::cout << "Parameters are set to: " << threshold << " "  << epsilon << " " << alpha << std::endl;
 
     // Run level set segmentation 
-	std::string filename = (patientService()->getPatientData()->getActivePatientFolder()+"/"+inputImage->getFilePath()).toStdString();
+	std::string filename = (patientService()->getPatientData()->getActivePatientFolder()+"/"+inputImage->getFilename()).toStdString();
     SIPL::int3 seed(seedPoint(0), seedPoint(1), seedPoint(2));
     try {
         SIPL::Volume<char> * result = runLevelSet(

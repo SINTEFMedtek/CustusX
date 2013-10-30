@@ -847,6 +847,11 @@ vtkImageDataPtr Image::createDummyImageData(int axisSize, int maxVoxelValue)
 	return dummyImageData;
 }
 
+QString Image::getFilename() const
+{
+	return QString("Images/%1.mhd").arg(this->getUid());
+}
+
 void Image::setInterpolationTypeToNearest()
 {
 	this->setInterpolationType(VTK_NEAREST_INTERPOLATION);

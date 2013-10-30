@@ -101,6 +101,15 @@ class JenkinsBuildScriptBase(cx.cxBuildScript.BuildScript):
         if not skip_integration_test:
             self.cxInstallation.runIntegrationTests()
 
+    def unstableTestPackageStep(self, 
+                                   skip_extra_install_step_checkout=False, 
+                                   skip_install=False):
+        if not skip_extra_install_step_checkout:
+            self.checkoutCustusXAndData()
+        if not skip_install:
+            self.cxInstaller.installPackage()
+        self.cxInstallation.runUnstableTests()
+
     def createReleaseStep(self, 
                           skip_publish_release=False):
         folder = self.cxInstaller.createReleaseFolder()

@@ -75,7 +75,7 @@ class CustusXBuilder:
         testRunner.convertCTestFile2JUnit(ctestfile, junitfile)
 
     def _runCatchUnitTests(self):
-        tags = cxTestRunner.TestRunner().includeTagsForOS('[unit]')
+        tags = cxTestRunner.TestRunner().includeTagsForOS('[unit]~[unstable]')
         self.runCatchTests(tags)
 
     def runCatchTests(self, tag):

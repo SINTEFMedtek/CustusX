@@ -150,6 +150,7 @@ public:
 	int getInterpolationType() const;
 
 	vtkImageDataPtr resample(long maxVoxels);
+	virtual QString getFilename() const;
 
 signals:
 	void landmarkRemoved(QString uid);
