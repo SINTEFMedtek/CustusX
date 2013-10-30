@@ -57,11 +57,6 @@
 namespace cx
 {
 
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
 void DataManagerImpl::initialize()
 {
 	setInstance(new DataManagerImpl());
@@ -70,13 +65,6 @@ void DataManagerImpl::initialize()
 DataManagerImpl::DataManagerImpl()
 {
 	mClinicalApplication = mdLABORATORY;
-	//  mClinicalApplication = mdLAPAROSCOPY;
-//	mDataReaders.insert(DataReaderPtr(new MetaImageReader()));
-//	mDataReaders.insert(DataReaderPtr(new MincImageReader()));
-//	mDataReaders.insert(DataReaderPtr(new PolyDataMeshReader()));
-//	mDataReaders.insert(DataReaderPtr(new StlMeshReader()));
-	//	mCenter = Vector3D(0,0,0);
-	//	mActiveImage.reset();
 	this->clear();
 }
 
@@ -88,16 +76,12 @@ void DataManagerImpl::clear()
 {
 	mData.clear();
 	mCenter = Vector3D(0, 0, 0);
-	//mClinicalApplication = mdLABORATORY; must be set explicitly
-	//mMeshes.clear();
 	mActiveImage.reset();
 	mLandmarkProperties.clear();
 
 	emit centerChanged();
 	emit activeImageChanged("");
-//	emit activeImageTransferFunctionsChanged();
 	emit landmarkPropertiesChanged();
-	//emit clinicalApplicationChanged();
 	emit dataLoaded();
 }
 
@@ -142,22 +126,7 @@ void DataManagerImpl::setActiveImage(ImagePtr activeImage)
 	if (mActiveImage == activeImage)
 		return;
 
-//	if (mActiveImage)
-//	{
-//		disconnect(mActiveImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
-		//disconnect(mActiveImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-//		disconnect(mActiveImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
-//	}
-
 	mActiveImage = activeImage;
-
-//	if (mActiveImage)
-//	{
-//		connect(mActiveImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
-		//connect(mActiveImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-//		connect(mActiveImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
-//	}
-//	this->vtkImageDataChangedSlot();//don't use?
 
 	QString uid = "";
 	if (mActiveImage)
@@ -272,14 +241,16 @@ void DataManagerImpl::saveImage(ImagePtr image, const QString& basePath)
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
 	writer->SetInput(image->getBaseVtkImageData());
 	writer->SetFileDimensionality(3);
-	QString filename = basePath + "/" + image->getFilePath();
+//	QString filename = basePath + "/" + image->getFilePath();
+	QString filename = basePath + "/Images/" + image->getUid() + ".mhd";
 	writer->SetFileName(cstring_cast(filename));
 	QDir().mkpath(QFileInfo(filename).path());
 
-	//Rename ending from .mhd to .raw
-	QStringList splitName = qstring_cast(filename).split(".");
-	splitName[splitName.size() - 1] = "raw";
-	QString rawfilename = splitName.join(".");
+	QString rawfilename = image->getUid() + ".raw";
+//        //Rename ending from .mhd to .raw
+//	QStringList splitName = qstring_cast(filename).split(".");
+//	splitName[splitName.size() - 1] = "raw";
+//	QString rawfilename = splitName.join(".");
 
 	writer->SetRAWFileName(cstring_cast(rawfilename));
 	writer->SetCompression(false);
@@ -335,16 +306,10 @@ void DataManagerImpl::saveMesh(MeshPtr mesh, const QString& basePath)
 	vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();
 	writer->SetInput(mesh->getVtkPolyData());
 	//writer->SetFileDimensionality(3);
-	QString filename = basePath + "/" + mesh->getFilePath();
+//	QString filename = basePath + "/" + mesh->getFilePath();
+	QString filename = basePath + "/Images/" + mesh->getUid() + ".vtk";
 	writer->SetFileName(cstring_cast(filename));
 
-	//  //Rename ending from .mhd to .raw
-	//  QStringList splitName = qstring_cast(filename).split(".");
-	//  splitName[splitName.size() - 1] = "raw";
-	//  filename = splitName.join(".");
-
-	//writer->SetRAWFileName(filename.c_str());
-	//writer->SetCompression(false);
 	writer->Update();
 	writer->Write();
 }
@@ -399,36 +364,6 @@ std::map<QString, ImagePtr> DataManagerImpl::getImages() const
 	return retval;
 }
 
-std::map<QString, QString> DataManagerImpl::getImageUidsAndNames() const
-{
-	std::map<QString, ImagePtr> images = this->getImages();
-
-	std::map<QString, QString> retval;
-	for (ImagesMap::const_iterator iter = images.begin(); iter != images.end(); ++iter)
-		retval[iter->first] = iter->second->getName();
-	return retval;
-}
-
-std::vector<QString> DataManagerImpl::getImageNames() const
-{
-	std::map<QString, ImagePtr> images = this->getImages();
-
-	std::vector<QString> retval;
-	for (ImagesMap::const_iterator iter = images.begin(); iter != images.end(); ++iter)
-		retval.push_back(iter->second->getName());
-	return retval;
-}
-
-std::vector<QString> DataManagerImpl::getImageUids() const
-{
-	std::map<QString, ImagePtr> images = this->getImages();
-
-	std::vector<QString> retval;
-	for (ImagesMap::const_iterator iter = images.begin(); iter != images.end(); ++iter)
-		retval.push_back(iter->first);
-	return retval;
-}
-
 MeshPtr DataManagerImpl::getMesh(const QString& uid) const
 {
 	return boost::dynamic_pointer_cast<Mesh>(this->getData(uid));
@@ -444,35 +379,6 @@ std::map<QString, MeshPtr> DataManagerImpl::getMeshes() const
 			continue;
 		retval[iter->first] = mesh;
 	}
-	return retval;
-}
-
-std::map<QString, QString> DataManagerImpl::getMeshUidsWithNames() const
-{
-	std::map<QString, MeshPtr> meshes = getMeshes();
-
-	std::map<QString, QString> retval;
-	for (MeshMap::const_iterator iter = meshes.begin(); iter != meshes.end(); ++iter)
-		retval[iter->first] = iter->second->getName();
-	return retval;
-}
-std::vector<QString> DataManagerImpl::getMeshUids() const
-{
-	std::map<QString, MeshPtr> meshes = this->getMeshes();
-
-	std::vector<QString> retval;
-	for (MeshMap::const_iterator iter = meshes.begin(); iter != meshes.end(); ++iter)
-		retval.push_back(iter->first);
-	return retval;
-}
-
-std::vector<QString> DataManagerImpl::getMeshNames() const
-{
-	std::map<QString, MeshPtr> meshes = this->getMeshes();
-
-	std::vector<QString> retval;
-	for (MeshMap::const_iterator iter = meshes.begin(); iter != meshes.end(); ++iter)
-		retval.push_back(iter->second->getName());
 	return retval;
 }
 
@@ -619,7 +525,7 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 		return DataPtr();
 	}
 
-	DataPtr data = this->readData(uid, path, type);
+	DataPtr data = this->readData(uid, path, type);	
 
 	if (!data)
 	{
@@ -629,49 +535,27 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 
 	if (!name.isEmpty())
 		data->setName(name);
-	data->setFilePath(relativePath.path());
-	//  data->parseXml(node);
+//	data->setFilePath(relativePath.path());
 
 	this->loadData(data);
 
+	// conversion for change in format 2013-10-29
+	QString newPath = rootPath+"/"+data->getFilename();
+	if (path != newPath)
+	{
+		messageManager()->sendWarning(QString("Detected old data format, converting from %1 to %2").arg(path).arg(newPath));
+		this->saveData(data, rootPath);
+	}
+
 	return data;
 }
-//
-//READER_TYPE DataManagerImpl::getReaderType(QString fileType)
-//{
-//  if (fileType.compare("mhd", Qt::CaseInsensitive) == 0 || fileType.compare("mha", Qt::CaseInsensitive) == 0)
-//  {
-//    return rtMETAIMAGE;
-//  }
-//  else if (fileType.compare("mnc", Qt::CaseInsensitive) == 0)
-//  {
-//    return rtMINCIMAGE;
-//  }
-//  else if (fileType.compare("stl", Qt::CaseInsensitive) == 0)
-//  {
-//    return rtSTL;
-//  }
-//  else if (fileType.compare("vtk", Qt::CaseInsensitive) == 0)
-//  {
-//    return rtPOLYDATA;
-//  }
-//  return rtCOUNT;
-//}
 
 void DataManagerImpl::vtkImageDataChangedSlot()
 {
 	QString uid = "";
 	if (mActiveImage)
 		uid = mActiveImage->getUid();
-
-//	emit activeImageChanged(uid);
-//	messageManager()->sendInfo("Active image set to " + qstring_cast(uid));
 }
-
-//void DataManagerImpl::transferFunctionsChangedSlot()
-//{
-//	emit activeImageTransferFunctionsChanged();
-//}
 
 CLINICAL_APPLICATION DataManagerImpl::getClinicalApplication() const
 {
@@ -716,9 +600,6 @@ ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, QString uid, QString
 
 	ImagePtr retval = ImagePtr(new Image(uid, data, name));
 	retval->setAcquisitionTime(QDateTime::currentDateTime());
-
-	QString filename = filePath + "/" + uid + ".mhd";
-	retval->setFilePath(filename);
 
 	return retval;
 }
@@ -790,23 +671,49 @@ MeshPtr DataManagerImpl::createMesh(vtkPolyDataPtr data, QString uid, QString na
 	MeshPtr retval = MeshPtr(new Mesh(uid, name, data));
 	retval->setAcquisitionTime(QDateTime::currentDateTime());
 
-	QString filename = filePath + "/" + uid + ".vtk";
-	retval->setFilePath(filename);
-
 	return retval;
 }
 
-void DataManagerImpl::removeData(const QString& uid)
+void DataManagerImpl::removeData(const QString& uid, QString basePath)
 {
 	if (this->getActiveImage() && this->getActiveImage()->getUid() == uid)
 		this->setActiveImage(ImagePtr());
 
+	DataPtr data = this->getData(uid);
+
 	mData.erase(uid);
+
+	this->deleteFiles(data, basePath);
 
 	emit dataRemoved(uid);
 	emit dataLoaded(); // this should alert everybody interested in the data as a collection.
 	messageManager()->sendInfo("Removed data [" + uid + "].");
 }
+
+void DataManagerImpl::deleteFiles(DataPtr data, QString basePath)
+{
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	QStringList files;
+	if (!data->getFilename().isEmpty())
+		files << QDir(basePath).absoluteFilePath(data->getFilename());
+
+	if (image)
+	{
+		files <<  changeExtension(files[0], "raw");
+	}
+
+	for (int i=0; i<files.size(); ++i)
+	{
+		if (!QFileInfo(files[i]).exists())
+			continue;
+		messageManager()->sendInfo(QString("Removing %1 from disk").arg(files[i]));
+		QFile(files[i]).remove();
+	}
+}
+
+
+
+
 
 } // namespace cx
 

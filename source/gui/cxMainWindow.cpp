@@ -974,7 +974,10 @@ void MainWindow::deleteDataSlot()
 {
 	if (!dataManager()->getActiveImage())
 		return;
-	dataManager()->removeData(dataManager()->getActiveImage()->getUid());
+	QString text = QString("Do you really want to delete data %1?").arg(dataManager()->getActiveImage()->getName());
+	if (QMessageBox::question(this, "Data delete", text, QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel))!=QMessageBox::Ok)
+		return;
+	patientService()->getPatientData()->removeData(dataManager()->getActiveImage()->getUid());
 }
 
 void MainWindow::configureSlot()

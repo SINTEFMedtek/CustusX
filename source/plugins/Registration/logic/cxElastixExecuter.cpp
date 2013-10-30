@@ -92,8 +92,8 @@ bool ElastixExecuter::setInput(QString application,
 
 	QStringList cmd;
 	cmd << application;
-	cmd << "-f" << patientService()->getPatientData()->getActivePatientFolder()+"/"+fixed->getFilePath();
-	cmd << "-m" << patientService()->getPatientData()->getActivePatientFolder()+"/"+moving->getFilePath();
+	cmd << "-f" << patientService()->getPatientData()->getActivePatientFolder()+"/"+fixed->getFilename();
+	cmd << "-m" << patientService()->getPatientData()->getActivePatientFolder()+"/"+moving->getFilename();
 	cmd << "-out" << outdir;
 	cmd << "-t0" << initFilename;
 	for (int i=0; i<parameterfiles.size(); ++i)
@@ -275,7 +275,7 @@ QString ElastixExecuter::findMostRecentTransformOutputFile() const
 Transform3D ElastixExecuter::getFileTransform_ddMd(DataPtr volume)
 {
 	QString patFolder = patientService()->getPatientData()->getActivePatientFolder();
-	CustomMetaImagePtr reader = CustomMetaImage::create(patFolder+"/"+volume->getFilePath());
+	CustomMetaImagePtr reader = CustomMetaImage::create(patFolder+"/"+volume->getFilename());
 	Transform3D ddMd = reader->readTransform();
 	return ddMd;
 }

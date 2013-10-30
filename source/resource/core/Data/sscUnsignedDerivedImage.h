@@ -52,7 +52,7 @@ public:
     virtual RegistrationHistoryPtr get_rMd_History() { CALL_IN_WEAK_PTR(mBase, get_rMd_History, RegistrationHistoryPtr()); }
 //    virtual QString getUid() const                   { CALL_IN_WEAK_PTR(mBase, getUid, QString()); }
     virtual QString getName() const                  { CALL_IN_WEAK_PTR(mBase, getName, QString()); }
-    virtual QString getFilePath() const              { CALL_IN_WEAK_PTR(mBase, getFilePath, QString()); }
+	virtual QString getFilename() const              { CALL_IN_WEAK_PTR(mBase, getFilename, QString()); }
     virtual REGISTRATION_STATUS getRegistrationStatus() const { CALL_IN_WEAK_PTR(mBase, getRegistrationStatus, REGISTRATION_STATUS()); }
     virtual Transform3D get_rMd() const              { CALL_IN_WEAK_PTR(mBase, get_rMd, Transform3D()); }
     virtual Image::ShadingStruct getShading() const  { CALL_IN_WEAK_PTR(mBase, getShading, Image::ShadingStruct()); }
