@@ -99,4 +99,51 @@ TEST_CASE("Speed: Run CustusX with interactive slicing at a minimum render speed
 	REQUIRE(custusX.mMeasuredFPS > minimumFPS);
 }
 
+TEST_CASE("Speed: Multi volume renderer", "[speed][gui][integration][hide]")
+{
+	initTest();
+	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
+
+	JenkinsMeasurement jenkins;
+	jenkins.initialize();
+
+	CustusXController custusX(NULL);
+	custusX.mPatientFolder = cx::DataLocations::getTestDataPath() + "/Phantoms/Kaisa/CustusX/Speed_Test_Kaisa.cx3";
+
+	custusX.start();
+	qApp->exec();
+	requireVolumeIn3DScene();
+	custusX.stop();
+
+	jenkins.createOutput("FPS_MultiVolume", QString::number(custusX.mMeasuredFPS));
+
+	// TODO: enter this value into config file
+	double minimumFPS = 0;
+	REQUIRE(custusX.mMeasuredFPS > minimumFPS);
+}
+
+TEST_CASE("Speed: Multi volume renderer and interactive slicing", "[speed][gui][integration][hide]")
+{
+	initTest();
+	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
+
+	JenkinsMeasurement jenkins;
+	jenkins.initialize();
+
+	CustusXController custusX(NULL);
+	custusX.mPatientFolder = cx::DataLocations::getTestDataPath() + "/Phantoms/Kaisa/CustusX/Speed_Test_Kaisa.cx3";
+	custusX.mEnableSlicing = true;
+
+	custusX.start();
+	qApp->exec();
+	requireVolumeIn3DScene();
+	custusX.stop();
+
+	jenkins.createOutput("FPS_Slicing", QString::number(custusX.mMeasuredFPS));
+
+	// TODO: enter this value into config file
+	double minimumFPS = 0;
+	REQUIRE(custusX.mMeasuredFPS > minimumFPS);
+}
+
 }//namespace cx
