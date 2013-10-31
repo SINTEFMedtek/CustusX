@@ -79,6 +79,16 @@ QString Data::getName() const
 	return mName;
 }
 
+QString Data::getFilename() const
+{
+	return mFilename;
+}
+void Data::setFilename(QString val)
+{
+	mFilename = val;
+}
+
+
 //QString Data::getFilePath() const
 //{
 //	return mFilePath;
