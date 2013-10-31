@@ -201,8 +201,8 @@ void trace(void)
 		
 			int xx=1;
 		
-			while(xx<Number_Of_Volumes)	
-			//for(int xx=1; (xx<4)&&(xx<Number_Of_Volumes); xx++)
+		//	while(xx<Number_Of_Volumes)	
+			for(int xx=1; (xx<4)&&(xx<Number_Of_Volumes); xx++)
 			{
 		
 				if (all(greaterThanEqual(posX[xx-1],lowBounds[xx]))
@@ -257,7 +257,7 @@ void trace(void)
 					}
 				}
 				
-				xx+=1;
+			//	xx+=1;
 			}
 			
 			pos=pos+rayDir;
