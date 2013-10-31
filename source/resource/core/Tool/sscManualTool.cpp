@@ -30,10 +30,9 @@ namespace cx
 {
 
 ManualTool::ManualTool(ToolManager* manager, const QString& uid, const QString& name) :
-	Tool(uid,name), mMutex(QMutex::Recursive)
+	Tool(uid,name)
 {
 	mTimestamp = 0;
-	m_prMt = Transform3D::Identity();
 	mVisible = false;
 	read3DCrossHairSlot(0);
 	connect(manager, SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
@@ -69,14 +68,8 @@ void ManualTool::set_prMt(const Transform3D& prMt)
  */
 void ManualTool::set_prMt(const Transform3D& prMt, double timestamp)
 {
-	QMutexLocker locker(&mMutex);
 	mTimestamp = timestamp;
-	m_prMt = prMt;
-	(*mPositionHistory)[timestamp] = m_prMt;
-	locker.unlock();
-
-	emit toolTransformAndTimestamp(prMt, mTimestamp);
-
+	Tool::set_prMt(prMt, timestamp);
 }
 
 QString ManualTool::getGraphicsFileName() const
@@ -97,15 +90,8 @@ vtkPolyDataPtr ManualTool::getGraphicsPolyData() const
 	return mCrossHair->GetOutput();
 }
 
-Transform3D ManualTool::get_prMt() const
-{
-	QMutexLocker locker(&mMutex);
-	return m_prMt;
-}
-
 bool ManualTool::getVisible() const
 {
-	QMutexLocker locker(&mMutex);
 	return mVisible;
 }
 
@@ -126,7 +112,6 @@ QString ManualTool::getName() const
 
 void ManualTool::setVisible(bool vis)
 {
-	QMutexLocker locker(&mMutex);
 	if (mVisible==vis)
 	  return;
 	mVisible = vis;
