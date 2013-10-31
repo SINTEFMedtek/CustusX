@@ -123,7 +123,7 @@ void testElastix()
 	REQUIRE(compareTransforms(result, solution) == true);
 }
 
-TEST_CASE("ElastiX should register kaisa to a translated+resampled version of same", "[pluginRegistration][integration]"){
+TEST_CASE("ElastiX should register kaisa to a translated+resampled version of same", "[pluginRegistration][integration][unstable]"){
 	testElastix();
 }
 
