@@ -130,6 +130,7 @@ TEST_CASE("ElastiX should register kaisa to a translated+resampled version of sa
 	REQUIRE(fixture.compareTransforms(result, solution) == true);
 }
 
+
 } // namespace cxtest
 
 
