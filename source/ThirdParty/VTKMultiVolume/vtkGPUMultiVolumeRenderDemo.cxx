@@ -842,7 +842,7 @@ int main(int argc, char *argv[])
   
   
   
-  for (int i = 0; i < 360; i++) 
+  for (int i = 0; i < 90; i++) 
   { 
 	renderer->GetActiveCamera()->Azimuth(1);
 	renWin->Render();
