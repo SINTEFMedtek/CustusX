@@ -3,6 +3,7 @@
 
 #ifdef CX_USE_LEVEL_SET
 #include "cxFilterImpl.h"
+#include "sscVector3D.h"
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
@@ -30,6 +31,9 @@ public:
 	DoubleDataAdapterXmlPtr getEpsilonOption(QDomElement root);
 	DoubleDataAdapterXmlPtr getAlphaOption(QDomElement root);
 
+	static Vector3D getSeedPointFromTool(DataPtr image);
+	static bool isSeedPointInsideImage(Vector3D, DataPtr);
+
 protected:
 	virtual void createOptions();
 	virtual void createInputTypes();
@@ -40,6 +44,8 @@ private:
 
 
 }; // end LevelSetFilter class
+
+typedef boost::shared_ptr<class LevelSetFilter> LevelSetFilterPtr;
 
 } // end namespace
 

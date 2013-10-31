@@ -52,11 +52,13 @@ class Tool: public QObject
 	Q_OBJECT
 public:
 	Tool() :
-		mUid(""), mName(""), mPositionHistory(new TimedTransformMap())
+		mUid(""), mName(""), mPositionHistory(new TimedTransformMap()),
+		m_prMt(Transform3D::Identity())
 	{
 	}
 	Tool(const QString& uid, const QString& name = "") :
-		mUid(uid), mName(name), mPositionHistory(new TimedTransformMap())
+		mUid(uid), mName(name), mPositionHistory(new TimedTransformMap()),
+		m_prMt(Transform3D::Identity())
 	{
 		if (name.isEmpty())
 			mName = uid;
@@ -119,7 +121,7 @@ public:
 	//	/**Which file to use when calling saveTransformsAndTimestamps().
 	//	 */
 	//	virtual void setTransformSaveFile(const QString& filename) = 0;
-	virtual Transform3D get_prMt() const = 0; ///< \return transform from tool to patient ref space
+//	virtual Transform3D get_prMt() const = 0; ///< \return transform from tool to patient ref space
 
 	virtual bool getVisible() const = 0; ///< \return the visibility status of the tool
 	virtual bool isInitialized() const	{ return true; }
@@ -151,6 +153,11 @@ public:
 		return retval;
 	}
 
+	virtual Transform3D get_prMt() const
+	{
+		return m_prMt;
+	}
+
 	virtual CoordinateSystem getSensorCoordinateSystem() { return CoordinateSystem(csSENSOR, this->getUid()); }
 	virtual CoordinateSystem getToolCoordinateSystem() { return CoordinateSystem(csTOOL, this->getUid()); }
 	virtual CoordinateSystem getToolOffsetCoordinateSystem() { return CoordinateSystem(csTOOL_OFFSET, this->getUid()); }
@@ -171,6 +178,14 @@ protected:
 	QString mUid;
 	QString mName;
 	TimedTransformMapPtr mPositionHistory;
+	Transform3D m_prMt; ///< the transform from the tool to the patient reference
+
+	virtual void set_prMt(const Transform3D& prMt, double timestamp)
+	{
+		m_prMt = prMt;
+		(*mPositionHistory)[timestamp] = m_prMt;
+		emit toolTransformAndTimestamp(m_prMt, timestamp);
+	}
 };
 typedef boost::shared_ptr<Tool> ToolPtr;
 } // namespace cx
