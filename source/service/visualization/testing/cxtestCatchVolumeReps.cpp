@@ -235,7 +235,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip partially and fully 1 small vo
 	REQUIRE(nonZero == Approx(0.0));
 }
 
-TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 small volume.", "[rep][unit][visualization]")
+TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 small volume.", "[rep][unit][visualization][unstable]")
 {
 	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(3,3,3), 200);
 
