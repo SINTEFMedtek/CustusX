@@ -209,7 +209,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can remove 1 small volume with clipper.
 }
 
 // vtk emits PreRender end ERROR (x502) Invalid operation when this is run - in second part.
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip partially and fully 1 small volume.", "[rep][unit][visualization]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip partially and fully 1 small volume.", "[rep][unit][visualization][unstable]")
 {
 	MehdiGPURayCastMultiVolumeRepFixture fixture;
 	fixture.setNumberOfImages(2);
