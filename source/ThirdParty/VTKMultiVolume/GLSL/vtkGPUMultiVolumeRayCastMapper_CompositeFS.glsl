@@ -52,10 +52,6 @@ vec4 shade(int volNumber, vec4 value);
 
 
 
-float xMin[10];
-float yMin[10];
-float zMin[10];
-
 vec3 clipMin[10];
 
 uniform	vec3 ClippingplanesNormal[10];
@@ -64,11 +60,7 @@ uniform int clipped[10];
 
 void clip (int i, vec3 pos)
 {
-	/*
-	xMin[i]=-10.0;
-	yMin[i]=-10.0;
-	zMin[i]=-10.0;
-	*/
+	
 	clipMin[i]=vec3(-10.0, -10.0, -10.0);
 
 	float partX=ClippingplanesNormal[i].x*(pos.x-ClippingplanesOrigins[i].x);
@@ -209,8 +201,8 @@ void trace(void)
 		
 			int xx=1;
 		
-			while(xx<Number_Of_Volumes)	
-			//for(int xx=1; (xx<4)&&(xx<Number_Of_Volumes); xx++)
+		//	while(xx<Number_Of_Volumes)	
+			for(int xx=1; (xx<4)&&(xx<Number_Of_Volumes); xx++)
 			{
 		
 				if (all(greaterThanEqual(posX[xx-1],lowBounds[xx]))
@@ -265,12 +257,12 @@ void trace(void)
 					}
 				}
 				
-				xx+=1;
+			//	xx+=1;
 			}
 			
 			pos=pos+rayDir;
 			t+=1.0;
-			inside=(t<tMax) && (remainOpacity>=0.0039) 
+			inside=(t<tMax) && (remainOpacity>=0.0039)
 			&& (all(greaterThanEqual(pos,lowBounds[0]))
 			&& all(lessThanEqual(pos,highBounds[0]))); // 1/255=0.0039
 		}

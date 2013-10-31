@@ -365,7 +365,7 @@ DataPtr DataReaderWriter::readData(const QString& uid, const QString& path, cons
 	{
 		QFileInfo fileInfo(qstring_cast(path));
 		current->setName(changeExtension(fileInfo.fileName(), ""));
-//		current->setFilePath(path); // need path even when not set explicitly: nice for testing
+		current->setFilename(path); // need path even when not set explicitly: nice for testing
 	}
 	return current;
 }

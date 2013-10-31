@@ -33,9 +33,8 @@ namespace cx
 {
 
 cxTool::cxTool(IgstkToolPtr igstkTool) :
-				mTool(igstkTool), mPolyData(NULL), m_prMt(
-								new Transform3D(Transform3D::Identity())), mValid(false), mConfigured(false), mTracked(
-								false)
+				mTool(igstkTool), mPolyData(NULL),
+				mValid(false), mConfigured(false), mTracked(false)
 {
 	Tool::mUid = mTool->getInternalStructure().mUid;
 	Tool::mName = mTool->getInternalStructure().mName;
@@ -90,11 +89,6 @@ vtkPolyDataPtr cxTool::getGraphicsPolyData() const
 ProbePtr cxTool::getProbe() const
 {
 	return mProbe;
-}
-
-Transform3D cxTool::get_prMt() const
-{
-	return *m_prMt;
 }
 
 bool cxTool::getVisible() const
@@ -235,10 +229,7 @@ void cxTool::parseXml(QDomNode& dataNode)
 
 void cxTool::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)
 {
-	m_prMt = Transform3DPtr(new Transform3D(matrix));
-	(*mPositionHistory)[timestamp] = *m_prMt;
-
-	emit toolTransformAndTimestamp((*m_prMt), timestamp);
+	Tool::set_prMt(matrix, timestamp);
 }
 
 void cxTool::calculateTpsSlot()
