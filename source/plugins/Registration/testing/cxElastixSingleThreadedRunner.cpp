@@ -32,6 +32,7 @@ ElastixSingleThreadedRunner::ElastixSingleThreadedRunner()
 	connect(mExecuter.get(), SIGNAL(finished()), this, SLOT(executionFinishedSlot()));
 	connect(mExecuter.get(), SIGNAL(aboutToStart()), this, SLOT(preprocessExecuter()));
 	mCompleted = false;
+	mFailed = false;
 }
 
 ElastixSingleThreadedRunner::~ElastixSingleThreadedRunner()
@@ -61,7 +62,8 @@ bool ElastixSingleThreadedRunner::registerLinear(
 		qApp->processEvents();
 
 	*result = m_mMf;
-	return true;
+
+	return !mFailed;
 }
 
 void ElastixSingleThreadedRunner::preprocessExecuter()
@@ -73,9 +75,10 @@ void ElastixSingleThreadedRunner::executionFinishedSlot()
 	bool ok = false;
 	m_mMf = mExecuter->getAffineResult_mMf(&ok);
 	mCompleted = true;
+	mFailed = !ok;
 
-	if (!ok)
-		return;
+//	if (!ok)
+//		return;
 
 //	std::cout << "ElastixSingleThreadedRunner::executionFinishedSlot(), Linear Result mMf: \n" << mMf << std::endl;
 

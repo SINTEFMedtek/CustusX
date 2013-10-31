@@ -50,6 +50,7 @@ private slots:
 private:
 	ElastixExecuterPtr mExecuter;
 	bool mCompleted;
+	bool mFailed;
 	Transform3D m_mMf;
 
 };
