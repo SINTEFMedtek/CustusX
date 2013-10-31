@@ -311,7 +311,7 @@ MeshPtr ContourFilter::postProcess(vtkPolyDataPtr contour, ImagePtr base, QColor
 
 	QString uid = base->getUid() + "_ge%1";
 	QString name = base->getName()+" ge%1";
-	MeshPtr output = dataManager()->createMesh(contour, uid, name, "Images");
+	MeshPtr output = dataManager()->createMesh(contour, uid, name, "");
 	if (!output)
 		return MeshPtr();
 

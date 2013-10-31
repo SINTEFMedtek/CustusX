@@ -83,7 +83,8 @@ public:
         return "data";
 	}
 
-	virtual QString getFilename() const { return ""; }
+	virtual QString getFilename() const;
+	virtual void setFilename(QString val);
 
 	virtual QString getSpace();
 	virtual QString getParentSpace();
@@ -109,7 +110,7 @@ protected slots:
 protected:
 	QString mUid;
 	QString mName;
-//	QString mFilePath;
+	QString mFilename;
 	QDateTime mAcquisitionTime;
 
 	REGISTRATION_STATUS mRegistrationStatus;
