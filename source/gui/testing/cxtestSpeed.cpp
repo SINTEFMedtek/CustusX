@@ -99,7 +99,7 @@ TEST_CASE("Speed: Run CustusX with interactive slicing at a minimum render speed
 	REQUIRE(custusX.mMeasuredFPS > minimumFPS);
 }
 
-TEST_CASE("Speed: Multi volume renderer", "[speed][gui][integration]")
+TEST_CASE("Speed: Multi volume renderer", "[speed][gui][integration][not_windows]")
 {
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
@@ -123,7 +123,7 @@ TEST_CASE("Speed: Multi volume renderer", "[speed][gui][integration]")
 	REQUIRE(true);
 }
 
-TEST_CASE("Speed: Multi volume renderer and interactive slicing", "[speed][gui][integration]")
+TEST_CASE("Speed: Multi volume renderer and interactive slicing", "[speed][gui][integration][not_windows]")
 {
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
