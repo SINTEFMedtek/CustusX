@@ -70,6 +70,7 @@ void AcquisitionFixture::setupVideo()
 {
 	SSC_LOG("");
 	cx::videoService()->getVideoConnection()->getConnectionMethod()->setValue(mConnectionMethod);
+	REQUIRE(!cx::DataLocations::getOpenIGTLinkServer().isEmpty());
 	cx::videoService()->getVideoConnection()->setLocalServerExecutable(cx::DataLocations::getOpenIGTLinkServer());
 //	cx::videoService()->getVideoConnection()->setLocalServerExecutable(cx::DataLocations::getBundlePath() + "/../../../apps/OpenIGTLinkServer/OpenIGTLinkServer");
 	cx::videoService()->getVideoConnection()->setLocalServerArguments(QString("--type MHDFile --filename %1 %2").arg(mAcqDataFilename).arg(mAdditionalGrabberArg));
