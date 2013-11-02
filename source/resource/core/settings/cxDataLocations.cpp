@@ -200,7 +200,7 @@ QString DataLocations::getOpenIGTLinkServer()
 
 	//Windows fix
 	//Check if some of this code is duplicated in StateService::getDefaultGrabberServer()
-	filename = "OpenIGTLinkServer";
+	filename = "OpenIGTLinkServer.exe";
 	path = QString("%1/%2").arg(appPath).arg(filename); // installed version
 	if (QFileInfo(path).exists())
 		return path;
