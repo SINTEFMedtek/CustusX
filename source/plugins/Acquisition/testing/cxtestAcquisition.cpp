@@ -12,7 +12,7 @@ TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Create fixture", "[in
 /** Run a full acquisition from MHD source local server using OpenIGTLink.
   * Save data and evaluate results.
   */
-TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Stream one MDHSource from LocalServer and save to disk", "[integration][plugins][Acquisition][unstable]")
+TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Stream one MDHSource from LocalServer and save to disk", "[integration][plugins][Acquisition]")
 {
 	this->mConnectionMethod = "Local Server";
 	this->mNumberOfExpectedStreams = 1;
