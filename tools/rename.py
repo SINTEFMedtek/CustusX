@@ -220,7 +220,10 @@ class CppFilePair:
             rename_include_header_file(target_file, self.old_header_file_abs_path, self.get_header_extension(), new_base_name)            
     
     def update_cmakelists(self, new_base_name, target_files):
-        old_base_name = os.path.basename(self.old_header_file_abs_path)
+        if self.old_header_file_abs_path:
+            old_base_name = os.path.basename(self.old_header_file_abs_path)
+        else:
+            old_base_name = os.path.basename(self.old_source_file_abs_path)            
         old_base_name = os.path.splitext(old_base_name)[0]
         for target_file in target_files:
             find_and_replace_text_in_file(target_file, regex_pattern=old_base_name, replace_with_text=new_base_name)
@@ -288,14 +291,16 @@ class CppFileRenamer():
 class FileRepository():
     def __init__(self, root_dir):
         self.root_dir = root_dir
-        self.cpp_files = self._find_all_matching(self._get_cppfiles_regexp())
+        #self.cpp_files = self._find_all_matching(self._get_cppfiles_regexp())
         self.cmakelists = self._find_all_matching(self._get_cmakelists_regexp())
     
     def get_cpp_files(self):
-        return self.cpp_files
+        return self._find_all_matching(self._get_cppfiles_regexp())
+        #return self.cpp_files
 
     def get_cmakelists(self):
-        return self.cmakelists
+        return self._find_all_matching(self._get_cmakelists_regexp())
+        #return self.cmakelists
     
     def get_ssc_header_files(self):
         return self._find_all_matching(self._get_sscfiles_regexp())
@@ -324,12 +329,16 @@ class FileRepository():
 def rename_ssc_to_cx(file_repository):
     ssc_files = file_repository.get_ssc_header_files();
     for ssc_file in ssc_files:
+        if not os.path.exists(ssc_file):
+            continue
         file_pair = CppFilePair(ssc_file)
         pattern = r'(.*)ssc([a-zA-Z_0-9]*\.[a-zA-Z_0-9]*)$'
 #        print ssc_file
 #        match = re.match(pattern, ssc_file)
 #        print match.group(1)
         cx_file = re.sub(pattern, r'\1cx\2', ssc_file)
+        cx_file = os.path.basename(cx_file)
+        cx_file = os.path.splitext(cx_file)[0]
         print "%s -> %s" % (ssc_file, cx_file)
         renamer = CppFileRenamer(file_pair, cx_file, file_repository)
         renamer.rename()
@@ -352,8 +361,8 @@ def main():
     file_repository = FileRepository(args.root_dir)
     logger.setRootPath(os.path.abspath(args.root_dir))
 
-#    rename_ssc_to_cx(file_repository)
-#    return
+    rename_ssc_to_cx(file_repository)
+    return
     
     file_pair = CppFilePair(args.header_file)
     renamer = CppFileRenamer(file_pair, args.new_name, file_repository)
