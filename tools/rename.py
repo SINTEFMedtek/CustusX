@@ -290,9 +290,9 @@ class CppFileRenamer():
 
 class FileRepository():
     def __init__(self, root_dir):
-        self.root_dir = root_dir
+        self.root_dir = os.path.abspath(root_dir)
         #self.cpp_files = self._find_all_matching(self._get_cppfiles_regexp())
-        self.cmakelists = self._find_all_matching(self._get_cmakelists_regexp())
+        #self.cmakelists = self._find_all_matching(self._get_cmakelists_regexp())
     
     def get_cpp_files(self):
         return self._find_all_matching(self._get_cppfiles_regexp())
