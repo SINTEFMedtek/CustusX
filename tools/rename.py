@@ -59,7 +59,7 @@ def rename_file_keep_extension(abs_file_path, new_base_name):
     return new_abs_file_path
 
 def find_include_guard_id(header_file):
-    search_regex = '^#ifndef (\S*._H_)$'
+    search_regex = '^#ifndef (\S*._H_?)$'
     matcher = re.compile(search_regex)
     with open(header_file, 'r') as f:
         for line in f.readlines():
