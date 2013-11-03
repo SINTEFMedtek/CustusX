@@ -31,12 +31,32 @@ import difflib
 class Logger:
     def __init__(self):
         pass
+    def setVerbosityLevel(self, level):
+        '''
+        0 = quiet
+        1 = errors 
+        2 = warnings
+        3 = status
+        '''
+        self.verbosity_level = level
     def setRootPath(self, root_path):
         self.root_path = root_path
     def logFileLine(self, file, line, message):
+        if self.verbosity_level < 3:
+            return
         rel = os.path.relpath(file, self.root_path)
         print '  [%s:%s]    %s' % (rel, line, message)
     def log(self, message):
+        if self.verbosity_level < 3:
+            return
+        print message
+    def error(self, message):
+        if self.verbosity_level < 1:
+            return
+        print message
+    def warning(self, message):
+        if self.verbosity_level < 2:
+            return
         print message
 logger = Logger()
     
@@ -72,13 +92,11 @@ def rename_include_guard(header_file, new_base_name):
     if not include_guard_regex:
         logger.logFileLine(header_file, 0, "No include guard found")
         return 
-#    print 'found include guard id = ', id    
     new_include_guard = (new_base_name+"_H_").upper()
-    print '**', header_file, include_guard_regex, new_include_guard
     find_and_replace_text_in_file(header_file, include_guard_regex, new_include_guard)
     
 def rename_include_header_file(source_file, old_header_file_abs_path, header_extension, new_base_name):
-    include_header_regex = '#include \"'+os.path.basename(old_header_file_abs_path)+'\"'
+    include_header_regex = '#include (\"|<)'+os.path.basename(old_header_file_abs_path)+'(\"|>)'
     new_include_header = '#include "'+new_base_name+header_extension+'"'
     find_and_replace_text_in_file(source_file, include_header_regex, new_include_header)
     return
@@ -174,7 +192,7 @@ class CppFilePair:
         has_header = self._is_file(self.get_header_file()) 
         has_source = self._is_file(self.get_source_file())
         if not has_header and not has_source:
-            print 'At least one of source/header must be present for rename to %s' % new_base_name
+            logger.error('At least one of source/header must be present for rename to %s' % new_base_name)
             return False
         if has_header:
             if not self.validate_target_not_exists(self.get_header_file(), new_base_name):
@@ -206,7 +224,7 @@ class CppFilePair:
     def validate_target_not_exists(self, old_file, new_base_name):
         new_file = get_renamed_filename(old_file, new_base_name)
         if os.path.exists(new_file):
-            print 'Error: %s already exists. Cannot rename to existing file' % new_file
+            logger.error('Error: %s already exists. Cannot rename to existing file' % new_file)
             return False
         return True
     
@@ -239,7 +257,7 @@ class CppFilePair:
     def _find_header_file(self, file):
         list = self._find_files_in_folder(file.get_folder_path(), file.get_base_name(), self.header_extensions)
         if(len(list) < 1):
-            print "Could not find a header file %s/%s." % (file.get_folder_path(), file.get_base_name())
+            logger.warning("Could not find a header file %s/%s." % (file.get_folder_path(), file.get_base_name()))
             return None
         header = os.path.normpath(file.get_folder_path()+"/"+list[0])
         return header
@@ -247,7 +265,7 @@ class CppFilePair:
     def _find_source_file(self, file):
         list = self._find_files_in_folder(file.get_folder_path(), file.get_base_name(), self.source_extensions)
         if(len(list) < 1):
-            print "Could not find a source file  %s/%s." % (file.get_folder_path(), file.get_base_name())
+            logger.warning("Could not find a source file  %s/%s." % (file.get_folder_path(), file.get_base_name()))
             return None
         source = os.path.normpath(file.get_folder_path()+"/"+list[0])
         return source
@@ -333,13 +351,10 @@ def rename_ssc_to_cx(file_repository):
             continue
         file_pair = CppFilePair(ssc_file)
         pattern = r'(.*)ssc([a-zA-Z_0-9]*\.[a-zA-Z_0-9]*)$'
-#        print ssc_file
-#        match = re.match(pattern, ssc_file)
-#        print match.group(1)
         cx_file = re.sub(pattern, r'\1cx\2', ssc_file)
         cx_file = os.path.basename(cx_file)
         cx_file = os.path.splitext(cx_file)[0]
-        print "%s -> %s" % (ssc_file, cx_file)
+        logger.log("%s -> %s" % (ssc_file, cx_file))
         renamer = CppFileRenamer(file_pair, cx_file, file_repository)
         renamer.rename()
     pass
@@ -352,7 +367,8 @@ def main():
     argv_parser.add_argument("new_name", help="New base name for the header file. ex: something", type=str)
     argv_parser.add_argument("--root_dir", help="root directory, work on all files inside", type=str)
     argv_parser.add_argument("-d", "--debug", action = "store_true", help="Used for debugging the script")
-    
+    argv_parser.add_argument("-v", "--verbosity", default=2, help="Verbosity level: 0=quiet, 1=errors, 2=warnings, 3=status")
+    #argv_parser.add_argument('--verbose', '-v', action='count', help='Verbosity: -v: errors+warning, -vv: ')
     args = argv_parser.parse_args()
     
     if(args.debug):
@@ -360,6 +376,7 @@ def main():
     
     file_repository = FileRepository(args.root_dir)
     logger.setRootPath(os.path.abspath(args.root_dir))
+    logger.setVerbosityLevel(args.verbose)
 
     rename_ssc_to_cx(file_repository)
     return
