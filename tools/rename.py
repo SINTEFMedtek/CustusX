@@ -367,7 +367,7 @@ def main():
     argv_parser.add_argument("new_name", help="New base name for the header file. ex: something", type=str)
     argv_parser.add_argument("--root_dir", help="root directory, work on all files inside", type=str)
     argv_parser.add_argument("-d", "--debug", action = "store_true", help="Used for debugging the script")
-    argv_parser.add_argument("-v", "--verbosity", default=2, help="Verbosity level: 0=quiet, 1=errors, 2=warnings, 3=status")
+    argv_parser.add_argument("-v", "--verbosity", default=2, type=int, help="Verbosity level: 0=quiet, 1=errors, 2=warnings, 3=status")
     #argv_parser.add_argument('--verbose', '-v', action='count', help='Verbosity: -v: errors+warning, -vv: ')
     args = argv_parser.parse_args()
     
@@ -376,7 +376,7 @@ def main():
     
     file_repository = FileRepository(args.root_dir)
     logger.setRootPath(os.path.abspath(args.root_dir))
-    logger.setVerbosityLevel(args.verbose)
+    logger.setVerbosityLevel(args.verbosity)
 
     rename_ssc_to_cx(file_repository)
     return
