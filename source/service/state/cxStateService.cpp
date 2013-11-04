@@ -214,7 +214,14 @@ QString StateService::getOpenIGTLinkServer()
 	filename = "OpenIGTLinkServer.exe";
 	postfix = "--in_width 800 --in_height 600";
 #endif
-	return this->getGrabberServer(filename, "OpenIGTLinkServer", postfix);
+	QString retval = this->getGrabberServer(filename, filename, postfix);
+
+#ifdef WIN32
+	if(retval.isEmpty())
+		retval = this->getGrabberServer(filename, "UltrasonixServer.exe", postfix);
+#endif
+
+	return retval;
 }
 
 /**Return the location of external video grabber application that
@@ -243,12 +250,12 @@ QString StateService::getGrabberServer(QString filename, QString relativePath, Q
 {
 
 	QString result;
-/*#ifdef __APPLE__
+#ifdef __APPLE__
 	// run from installed folder
 	result = this->checkGrabberServerExist(qApp->applicationDirPath(), filename, postfix);
 	if (!result.isEmpty())
 		return result;
-#endif*/
+#endif
 	// run from installed folder
 	result = this->checkGrabberServerExist(DataLocations::getBundlePath(), filename, postfix);
 	if (!result.isEmpty())
@@ -258,7 +265,6 @@ QString StateService::getGrabberServer(QString filename, QString relativePath, Q
 	if (!result.isEmpty())
 		return result;
 	// run from test folders
-//	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../apps/" + relativePath, filename, postfix);
 	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../apps/" + relativePath, filename, postfix);
 	if (!result.isEmpty())
 		return result;

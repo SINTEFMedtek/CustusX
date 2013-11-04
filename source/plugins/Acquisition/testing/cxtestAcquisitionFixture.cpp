@@ -71,6 +71,7 @@ void AcquisitionFixture::setupVideo()
 {
 	SSC_LOG("");
 	cx::videoService()->getVideoConnection()->getConnectionMethod()->setValue(mConnectionMethod);
+	INFO("bundle path: "+cx::DataLocations::getBundlePath());
 	REQUIRE(!cx::stateService()->getOpenIGTLinkServer().isEmpty());
 	cx::videoService()->getVideoConnection()->setLocalServerExecutable(cx::stateService()->getOpenIGTLinkServer());
 	cx::videoService()->getVideoConnection()->setLocalServerArguments(QString("--type MHDFile --filename %1 %2").arg(mAcqDataFilename).arg(mAdditionalGrabberArg));
