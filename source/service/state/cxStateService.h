@@ -128,6 +128,8 @@ public:
 	void saveDesktop(Desktop desktop);
 	void resetDesktop();
 
+	QString getOpenIGTLinkServer();
+
 private:
 	StateService();
 	virtual ~StateService();
@@ -138,6 +140,7 @@ private:
 	void fillDefault(QString name, T value);
 
 	QString getDefaultGrabberServer();
+	QString getGrabberServer(QString filename, QString relativePath, QString postfix);
 	QString checkGrabberServerExist(QString path, QString filename, QString args);
 	QString getDefaultGrabberInitScript();
 
