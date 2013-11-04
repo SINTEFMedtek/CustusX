@@ -182,40 +182,4 @@ QString DataLocations::getTSFPath()
 }
 #endif
 
-QString DataLocations::getOpenIGTLinkServer()
-{
-	QString filename = "OpenIGTLinkServer";
-	QString appPath = qApp->applicationDirPath();
-	QString path;
-
-	path = QString("%1/%2").arg(appPath).arg(filename); // installed version
-	if (QFileInfo(path).exists())
-		return path;
-	path = QString("%1/../apps/OpenIGTLinkServer/%2").arg(appPath).arg(filename); // <root>/source/testing/<catch>
-	if (QFileInfo(path).exists())
-		return path;
-	path = QString("%1/../../../apps/OpenIGTLinkServer/%2").arg(appPath).arg(filename); // <root>/source/plugins/Acquisition/testing/<catch>
-	if (QFileInfo(path).exists())
-		return path;
-
-	//Windows fix
-	//Check if some of this code is duplicated in StateService::getDefaultGrabberServer()
-	filename = "UltrasonixServer.exe";
-	path = QString("%1/%2").arg(appPath).arg(filename); // installed version
-	if (QFileInfo(path).exists())
-		return path;
-	filename = "OpenIGTLinkServer.exe";
-	path = QString("%1/%2").arg(appPath).arg(filename); // installed version
-	if (QFileInfo(path).exists())
-		return path;
-	path = QString("%1/../apps/OpenIGTLinkServer/%2").arg(appPath).arg(filename); // <root>/source/testing/<catch>
-	if (QFileInfo(path).exists())
-		return path;
-	path = QString("%1/../../../apps/OpenIGTLinkServer/%2").arg(appPath).arg(filename); // <root>/source/plugins/Acquisition/testing/<catch>
-	if (QFileInfo(path).exists())
-		return path;
-
-	return ""; // failure
-}
-
 } // namespace cx

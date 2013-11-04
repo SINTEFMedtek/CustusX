@@ -39,8 +39,7 @@ public:
   static QString getAppDataPath(); ///< return path to global configuration data.
   static QString getSettingsPath(); ///< return path where settings are to be stored.
   static QString getXmlSettingsFile(); ///< return a filename for a xml file containing global custusX data (equal to settings above)
-  static QString getCachePath(); ///< return path to a folder that is used during execution, will be cleared at start and stop.
-  static QString getOpenIGTLinkServer(); ///< return full name of executable
+	static QString getCachePath(); ///< return path to a folder that is used during execution, will be cleared at start and stop.
 #ifdef CX_USE_TSF
   static QString getTSFPath(); ///< return path to a folder where files needed for tube segmentation framework are located
 #endif
