@@ -218,7 +218,7 @@ QString StateService::getOpenIGTLinkServer()
 
 #ifdef WIN32
 	if(retval.isEmpty())
-		retval = this->getGrabberServer(filename, "UltrasonixServer.exe", postfix);
+		retval = this->getGrabberServer(filename, "UltrasonixServer.exe", "");
 #endif
 
 	return retval;
