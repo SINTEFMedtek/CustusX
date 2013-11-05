@@ -385,6 +385,13 @@ void ReconstructManagerTestFixture::testTordTest()
 		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
 		algorithm->getMaxPlanesOption(algo)->setValue(8);
 	}
+	SECTION("Anisotropic")
+	{
+		algorithm->getMethodOption(algo)->setValue("Anisotropic");
+		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(algo)->setValue(8);
+	}
+
 	SECTION("Closest")
 	{
 		algorithm->getMethodOption(algo)->setValue("VNN");
@@ -582,6 +589,14 @@ TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction
 	{
 		std::cerr << "Testing DW\n";
 		algorithm.getMethodOption(root)->setValue("DW");
+		algorithm.getPlaneMethodOption(root)->setValue("Heuristic");
+		algorithm.getMaxPlanesOption(root)->setValue(8);
+		algorithm.getRadiusOption(root)->setValue(1);
+	}
+	SECTION("Anisotropic")
+	{
+		std::cerr << "Testing Anisotropic\n";
+		algorithm.getMethodOption(root)->setValue("Anisotropic");
 		algorithm.getPlaneMethodOption(root)->setValue("Heuristic");
 		algorithm.getMaxPlanesOption(root)->setValue(8);
 		algorithm.getRadiusOption(root)->setValue(1);
