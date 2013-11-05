@@ -215,8 +215,7 @@ QStringList StateService::getOpenIGTLinkServer()
 	filename = "OpenIGTLinkServer.exe";
 	postfix = "--in_width 800 --in_height 600";
 #endif
-	QStringList retval = this->getGrabberServer(filename, filename, postfix);
-	return retval;
+	return this->getGrabberServer(filename, filename, postfix);
 }
 
 /**Return the location of external video grabber application that
@@ -238,7 +237,15 @@ QStringList StateService::getDefaultGrabberServer()
 #else
 	filename = "OpenIGTLinkServer";
 #endif
-	return this->getGrabberServer(filename, relativePath, postfix);
+	QStringList retval =  this->getGrabberServer(filename, relativePath, postfix);
+
+	// Only UltrasonixServer.exe is available in 32 bit Windows
+#ifdef WIN32
+	if(retval.isEmpty())
+		retval = this->getGrabberServer(filename, "UltrasonixServer.exe", "");
+#endif
+
+	return retval;
 }
 
 QStringList StateService::getGrabberServer(QString filename, QString relativePath, QString postfix)
