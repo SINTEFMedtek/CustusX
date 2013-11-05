@@ -26,6 +26,7 @@
 #include "cxProbe.h"
 #include "cxToolManager.h"
 #include "cxLogicManager.h"
+#include "cxStateService.h"
 
 namespace cxtest
 {
@@ -70,10 +71,11 @@ void AcquisitionFixture::setupVideo()
 {
 	SSC_LOG("");
 	cx::videoService()->getVideoConnection()->getConnectionMethod()->setValue(mConnectionMethod);
-	REQUIRE(!cx::DataLocations::getOpenIGTLinkServer().isEmpty());
-	cx::videoService()->getVideoConnection()->setLocalServerExecutable(cx::DataLocations::getOpenIGTLinkServer());
-//	cx::videoService()->getVideoConnection()->setLocalServerExecutable(cx::DataLocations::getBundlePath() + "/../../../apps/OpenIGTLinkServer/OpenIGTLinkServer");
-	cx::videoService()->getVideoConnection()->setLocalServerArguments(QString("--type MHDFile --filename %1 %2").arg(mAcqDataFilename).arg(mAdditionalGrabberArg));
+	INFO("bundle path: "+cx::DataLocations::getBundlePath());
+	REQUIRE(!cx::stateService()->getOpenIGTLinkServer().isEmpty());
+	cx::videoService()->getVideoConnection()->setLocalServerExecutable(cx::stateService()->getOpenIGTLinkServer()[0]);
+	cx::videoService()->getVideoConnection()->setLocalServerArguments(
+				QString("%1 --type MHDFile --filename %2 %3").arg(cx::stateService()->getOpenIGTLinkServer()[1]).arg(mAcqDataFilename).arg(mAdditionalGrabberArg));
 	mVideoSource = cx::videoService()->getActiveVideoSource();
 	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
 

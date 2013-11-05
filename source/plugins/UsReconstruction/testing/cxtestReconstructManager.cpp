@@ -601,8 +601,10 @@ TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction
 	Eigen::Array2i us_dims(200, 200);
 	std::cout << "Starting samping\n";
 	cx::ProcessedUSInputDataPtr usData = volume.sampleUsData(planes,
-	                                                     pixelSpacing,
-	                                                     us_dims);
+	                                                         pixelSpacing,
+	                                                         us_dims,
+	                                                         0.0,
+	                                                         0.0);
 	std::cout << "Done sampling\n";
 
 	REQUIRE(usData);
