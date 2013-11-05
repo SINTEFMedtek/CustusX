@@ -13,21 +13,21 @@
 #define METHOD_VNN 0
 #define METHOD_VNN2 1
 #define METHOD_DW 2
-#define METHOD_MEDIAN 3
+#define METHOD_ANISOTROPIC 3
 
 // Plane searching methods
 #define PLANE_HEURISTIC 0
 #define PLANE_CLOSEST 1
 
 
-// Median method specific constants
-#define MEDIAN_SIZE 1
+// Anisotropic method specific constants
+#define ANISOTROPIC_SIZE 1
 
-#define MEDIAN_METHOD_INCLUDE_ALL 0
-#define MEDIAN_METHOD_ON_PLANE 1
-#define MEDIAN_METHOD_BILINEAR_ON_PLANE 2
+#define ANISOTROPIC_METHOD_INCLUDE_ALL 0
+#define ANISOTROPIC_METHOD_ON_PLANE 1
+#define ANISOTROPIC_METHOD_BILINEAR_ON_PLANE 2
 
-#define MEDIAN_METHOD MEDIAN_METHOD_BILINEAR_ON_PLANE
+#define ANISOTROPIC_METHOD ANISOTROPIC_METHOD_BILINEAR_ON_PLANE
 
 /*****************/
 /* End constants */
@@ -229,9 +229,9 @@ performInterpolation_dw(close_plane_t *close_planes,
                         float4 voxel);
 #endif
 
-#if METHOD == METHOD_MEDIAN
+#if METHOD == METHOD_ANISOTROPIC
 unsigned char
-performInterpolation_median(close_plane_t *close_planes,
+performInterpolation_anisotropic(close_plane_t *close_planes,
                             int n_close_planes,
                             __global const float16  *plane_matrices,
                             __local const float4 *plane_eqs,
@@ -999,9 +999,9 @@ performInterpolation_dw(close_plane_t *close_planes,
 }
 #endif
 
-#if METHOD == METHOD_MEDIAN
+#if METHOD == METHOD_ANISOTROPIC
 #define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i ,j, k)	  \
-	performInterpolation_median(a, b, c, d, e, f, g, h, i, j, k)
+	performInterpolation_anisotropic(a, b, c, d, e, f, g, h, i, j, k)
 
 void siftDown(pixel_t *pixels,
               int start,
@@ -1095,10 +1095,10 @@ pixel_t weighted_median(pixel_t *pixels,
 }
 
 /**
- * Perform interpolation using a weighted median method.
+ * Perform interpolation using an anisotropic filter
  */
 unsigned char
-performInterpolation_median(close_plane_t *close_planes,
+performInterpolation_anisotropic(close_plane_t *close_planes,
                             int n_close_planes,
                             __global const float16  *plane_matrices,
                             __local const float4 *plane_eqs,
@@ -1111,11 +1111,11 @@ performInterpolation_median(close_plane_t *close_planes,
                             float4 voxel)
 {
 	// First, find all the relevant pixels
-#if MEDIAN_METHOD == MEDIAN_METHOD_INCLUDE_ALL
-	pixel_t pixels[MAX_PLANES*MEDIAN_SIZE*MEDIAN_SIZE];
-#elif MEDIAN_METHOD == MEDIAN_METHOD_ON_PLANE
+#if ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_INCLUDE_ALL
+	pixel_t pixels[MAX_PLANES*ANISOTROPIC_SIZE*ANISOTROPIC_SIZE];
+#elif ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_ON_PLANE
 	pixel_t pixels[MAX_PLANES];
-#elif MEDIAN_METHOD == MEDIAN_METHOD_BILINEAR_ON_PLANE
+#elif ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_BILINEAR_ON_PLANE
 	pixel_t pixels[MAX_PLANES];
 #endif
 
@@ -1137,7 +1137,7 @@ performInterpolation_median(close_plane_t *close_planes,
 		translated_voxel.w = 1.0f;
 
 
-#if MEDIAN_METHOD == MEDIAN_METHOD_INCLUDE_ALL
+#if ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_INCLUDE_ALL
 		
 		int x, y;
 		toImgCoord_int(&x,
@@ -1146,9 +1146,9 @@ performInterpolation_median(close_plane_t *close_planes,
 		               plane_matrices[plane_id],
 		               in_xspacing,
 		               in_yspacing);
-		for(int j = -MEDIAN_SIZE/2; j <= MEDIAN_SIZE/2; j++)
+		for(int j = -ANISOTROPIC_SIZE/2; j <= ANISOTROPIC_SIZE/2; j++)
 		{
-			for(int k = -MEDIAN_SIZE/2; k <= MEDIAN_SIZE/2; k++)
+			for(int k = -ANISOTROPIC_SIZE/2; k <= ANISOTROPIC_SIZE/2; k++)
 			{
 				int _x = x + j;
 				int _y = y + k;
@@ -1176,7 +1176,7 @@ performInterpolation_median(close_plane_t *close_planes,
 			}
 		}
 		
-#elif MEDIAN_METHOD == MEDIAN_METHOD_BILINEAR_ON_PLANE
+#elif ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_BILINEAR_ON_PLANE
 		float x, y;
 		toImgCoord_float(&x,
 		                 &y,
@@ -1203,7 +1203,7 @@ performInterpolation_median(close_plane_t *close_planes,
 		                                              in_xsize);
 		pixels[pos++].dist = close_planes[i].dist;
 		
-#elif MEDIAN_METHOD == MEDIAN_METHOD_ON_PLANE
+#elif ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_ON_PLANE
 		
 		int x, y;
 		toImgCoord_int(&x,
@@ -1213,11 +1213,11 @@ performInterpolation_median(close_plane_t *close_planes,
 		               in_xspacing,
 		               in_yspacing);
 		
-		pixel_t pixels_on_plane[MEDIAN_SIZE*MEDIAN_SIZE];
+		pixel_t pixels_on_plane[ANISOTROPIC_SIZE*ANISOTROPIC_SIZE];
 		int ppos = 0;
-		for(int j = -MEDIAN_SIZE/2; j <= MEDIAN_SIZE/2; j++)
+		for(int j = -ANISOTROPIC_SIZE/2; j <= ANISOTROPIC_SIZE/2; j++)
 		{
-			for(int k = -MEDIAN_SIZE/2; k <= MEDIAN_SIZE/2; k++)
+			for(int k = -ANISOTROPIC_SIZE/2; k <= ANISOTROPIC_SIZE/2; k++)
 			{
 				int _x = x + j;
 				int _y = y + k;
