@@ -25,6 +25,7 @@ cx_add_class_qt_moc(cxVisualizationService_SOURCE
     cxMultiVolume3DRepProducer
     cxViewGroupData
     cxAxisConnector
+	cxLayoutWidget
     )
 
 cx_add_class(cxVisualizationService_SOURCE
