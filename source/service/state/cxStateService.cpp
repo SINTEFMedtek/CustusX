@@ -196,17 +196,18 @@ void StateService::fillDefault(QString name, T value)
  *  If found, return filename with args relative to bundle dir.
  *
  */
-QString StateService::checkGrabberServerExist(QString path, QString filename, QString args)
+QStringList StateService::checkGrabberServerExist(QString path, QString filename, QString args)
 {
+	QStringList retval;
 	path = QDir::cleanPath(path);
 	if (QDir(path).exists(filename))
-		return QDir(DataLocations::getBundlePath()).relativeFilePath(path + "/" + filename) + " " + args;
+		retval << QDir(DataLocations::getBundlePath()).relativeFilePath(path + "/" + filename) << args;
 
-	return "";
+	return retval;
 }
 
 
-QString StateService::getOpenIGTLinkServer()
+QStringList StateService::getOpenIGTLinkServer()
 {
 	QString filename = "OpenIGTLinkServer";
 	QString postfix = "";
@@ -214,13 +215,7 @@ QString StateService::getOpenIGTLinkServer()
 	filename = "OpenIGTLinkServer.exe";
 	postfix = "--in_width 800 --in_height 600";
 #endif
-	QString retval = this->getGrabberServer(filename, filename, postfix);
-
-#ifdef WIN32
-	if(retval.isEmpty())
-		retval = this->getGrabberServer(filename, "UltrasonixServer.exe", "");
-#endif
-
+	QStringList retval = this->getGrabberServer(filename, filename, postfix);
 	return retval;
 }
 
@@ -228,7 +223,7 @@ QString StateService::getOpenIGTLinkServer()
  * can be used as a local server controlled by CustusX.
  *
  */
-QString StateService::getDefaultGrabberServer()
+QStringList StateService::getDefaultGrabberServer()
 {
 	QString filename;
 	QString relativePath = "OpenIGTLinkServer";
@@ -246,10 +241,10 @@ QString StateService::getDefaultGrabberServer()
 	return this->getGrabberServer(filename, relativePath, postfix);
 }
 
-QString StateService::getGrabberServer(QString filename, QString relativePath, QString postfix)
+QStringList StateService::getGrabberServer(QString filename, QString relativePath, QString postfix)
 {
 
-	QString result;
+	QStringList result;
 #ifdef __APPLE__
 	// run from installed folder
 	result = this->checkGrabberServerExist(qApp->applicationDirPath(), filename, postfix);
@@ -269,7 +264,7 @@ QString StateService::getGrabberServer(QString filename, QString relativePath, Q
 	if (!result.isEmpty())
 		return result;
 
-	return "";
+	return result;
 }
 
 QString StateService::getDefaultGrabberInitScript()
@@ -317,7 +312,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View3D/labelSize", 2.5);
 	this->fillDefault("View3D/showOrientationAnnotation", true);
 
-	QStringList grabber = this->getDefaultGrabberServer().split(" ");
+	QStringList grabber = this->getDefaultGrabberServer();
 //	std::cout << "def grabber: " << grabber.join("--") << std::endl;
 	this->fillDefault("IGTLink/localServer", grabber[0]);
 	grabber.pop_front();
