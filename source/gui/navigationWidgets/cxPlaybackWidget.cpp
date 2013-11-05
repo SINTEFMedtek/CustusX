@@ -170,7 +170,8 @@ void PlaybackWidget::toggleOpenSlot()
 	{
 		cxToolManager::getInstance()->setPlaybackMode(mTimer);
 		videoService()->setPlaybackMode(mTimer);
-
+		if (!cx::cxToolManager::getInstance()->isPlaybackMode())
+			return;
 		messageManager()->sendInfo(QString("Started Playback with start time [%1] and end time [%2]")
 						.arg(mTimer->getStartTime().toString(timestampMilliSecondsFormatNice()))
 						.arg(mTimer->getStartTime().addMSecs(mTimer->getLength()).toString(timestampMilliSecondsFormatNice())));
