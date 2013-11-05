@@ -53,6 +53,7 @@
 #include "cxApplicationStateMachine.h"
 #include "cxConfig.h"
 #include "cxVLCRecorder.h"
+#include "cxSecondaryViewLayoutWindow.h"
 
 namespace cx
 {
@@ -66,7 +67,8 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 
 	mCameraControl.reset(new CameraControl(this));
 
-	this->setCentralWidget(viewManager()->initialize());
+	viewManager()->initialize();
+	this->setCentralWidget(viewManager()->getLayoutWidget(0));
 
 	this->createActions();
 	this->createMenus();
@@ -264,6 +266,8 @@ void MainWindow::createActions()
 
 	mShowControlPanelAction = new QAction("Show Control Panel", this);
 	connect(mShowControlPanelAction, SIGNAL(triggered()), this, SLOT(showControlPanelActionSlot()));
+	mSecondaryViewLayoutWindowAction = new QAction("Show Secondary View Layout Window", this);
+	connect(mSecondaryViewLayoutWindowAction, SIGNAL(triggered()), this, SLOT(showSecondaryViewLayoutWindowActionSlot()));
 
 	// Application
 	mAboutAction = new QAction(tr("&About"), this); // About burde gitt About CustusX, det gj√∏r det ikke av en eller annen grunn???
@@ -651,6 +655,45 @@ void MainWindow::showControlPanelActionSlot()
 	mControlPanel->show();
 }
 
+void print(QString header, QRect r)
+{
+	std::cout << header << "  (" << r.left() << ", " << r.top() << ", " << r.width() << ", " << r.height() << ")"<< std::endl;
+}
+
+void MainWindow::showSecondaryViewLayoutWindowActionSlot()
+{
+	if (!mSecondaryViewLayoutWindow)
+		mSecondaryViewLayoutWindow = new SecondaryViewLayoutWindow(this);
+
+	QDesktopWidget* desktop = QApplication::desktop();
+	print(QString("def screen:"), desktop->screenGeometry());
+	print(QString("screen 0:"), desktop->screenGeometry(0));
+
+	mSecondaryViewLayoutWindow->show();
+
+	if (desktop->screenCount()>1)
+	{
+		print(QString("screen 1:"), desktop->screenGeometry(1));
+		int bestScreen = 1;
+		for (int i=2; i<desktop->screenCount(); ++i)
+		{
+			print(QString("screen %1:").arg(i), desktop->screenGeometry(i));
+			QRect last = desktop->screenGeometry(bestScreen);
+			QRect current = desktop->screenGeometry(i);
+			if (current.height()*current.width() < last.height()*last.width())
+				bestScreen = i;
+
+		}
+
+		std::cout << "Displaying secondary view layout on screen " << bestScreen << std::endl;
+		QRect rect = desktop->screenGeometry(bestScreen);
+		print(QString("using rect:"), rect);
+		 mSecondaryViewLayoutWindow->setGeometry(rect);
+		 //mSecondaryViewLayoutWindow->setWindowState(mSecondaryViewLayoutWindow->windowState() | Qt::WindowFullScreen);
+	}
+
+}
+
 void MainWindow::loadPatientFileSlot()
 {
 	QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
@@ -825,6 +868,8 @@ void MainWindow::createMenus()
 	mFileMenu->addAction(mRecordFullscreenAction);
 	mFileMenu->addSeparator();
 	mFileMenu->addAction(mShowControlPanelAction);
+	mFileMenu->addAction(mSecondaryViewLayoutWindowAction);
+
 	mFileMenu->addAction(mQuitAction);
 
 	//workflow
