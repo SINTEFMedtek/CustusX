@@ -903,7 +903,7 @@ performInterpolation_vnn2(close_plane_t *close_planes,
 		
 		if(dist < 0.001f)
 			dist = 0.001f;
-		float weight = VNN2_WEIGHT(dist)
+		float weight = VNN2_WEIGHT(dist);
 		
 		scale += weight;
 		val += (image[y*in_xsize + x] * weight);
