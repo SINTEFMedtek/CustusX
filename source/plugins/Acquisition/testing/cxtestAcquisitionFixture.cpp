@@ -73,8 +73,9 @@ void AcquisitionFixture::setupVideo()
 	cx::videoService()->getVideoConnection()->getConnectionMethod()->setValue(mConnectionMethod);
 	INFO("bundle path: "+cx::DataLocations::getBundlePath());
 	REQUIRE(!cx::stateService()->getOpenIGTLinkServer().isEmpty());
-	cx::videoService()->getVideoConnection()->setLocalServerExecutable(cx::stateService()->getOpenIGTLinkServer());
-	cx::videoService()->getVideoConnection()->setLocalServerArguments(QString("--type MHDFile --filename %1 %2").arg(mAcqDataFilename).arg(mAdditionalGrabberArg));
+	cx::videoService()->getVideoConnection()->setLocalServerExecutable(cx::stateService()->getOpenIGTLinkServer()[0]);
+	cx::videoService()->getVideoConnection()->setLocalServerArguments(
+				QString("%1 --type MHDFile --filename %2 %3").arg(cx::stateService()->getOpenIGTLinkServer()[1]).arg(mAcqDataFilename).arg(mAdditionalGrabberArg));
 	mVideoSource = cx::videoService()->getActiveVideoSource();
 	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
 
