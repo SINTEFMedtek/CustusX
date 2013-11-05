@@ -15,7 +15,7 @@ TordTest::TordTest()
 	mMethods.push_back("VNN");
 	mMethods.push_back("VNN2");
 	mMethods.push_back("DW");
-	mMethods.push_back("Median");
+	mMethods.push_back("Anisotropic");
 	mPlaneMethods.push_back("Heuristic");
 	mPlaneMethods.push_back("Closest");
 	
