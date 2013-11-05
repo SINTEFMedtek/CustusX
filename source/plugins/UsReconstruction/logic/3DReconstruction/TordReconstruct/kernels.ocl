@@ -42,6 +42,7 @@
 
 #ifdef DEBUG
 #define DEBUG_PRINTF(...) if((get_global_id(0) % 5000) == 0) printf(##__VA_ARGS__)
+//#define DEBUG_PRINTF(...) printf(##__VA_ARGS__)
 #else
 #define DEBUG_PRINTF(...)
 #endif
@@ -59,6 +60,23 @@
                                      
 #define VOXEL(v,x,y,z) v[x + y*volume_xsize + z*volume_ysize*volume_xsize]
 
+#define WEIGHT_INV(x) (1.0f/fabs(x))
+#define WEIGHT_INV2(x) (1.0f/fabs(x*x))
+#define WEIGHT_INV4(x) (1.0f/fabs(x*x*x*x))
+#define WEIGHT_SUB(x) (1.0f - fabs(x))
+
+// Gaussian weight function
+#define WEIGHT_GAUSS_SIGMA (0.05f)
+
+#define WEIGHT_GAUSS_SQRT_2PI 2.506628275f
+
+#define WEIGHT_GAUSS_NONEXP_PART(sigma) (1.0f/(sigma*WEIGHT_GAUSS_SQRT_2PI))
+#define WEIGHT_GAUSS_EXP_PART(dist, sigma) exp(-(dist*dist)/(2*sigma*sigma))
+
+#define WEIGHT_GAUSS(x, sigma) (WEIGHT_GAUSS_NONEXP_PART(sigma)*WEIGHT_GAUSS_EXP_PART(x, sigma))
+
+#define DW_WEIGHT(x) WEIGHT_INV(x)
+#define VNN2_WEIGHT(x) WEIGHT_INV(x)
 
 /**************/
 /* End macros */
@@ -162,6 +180,9 @@ bilinearInterpolation(float x,
                       float y,
                       const __global unsigned char* image,
                       int in_xsize);
+
+pixel_t anisotropicFilter(const pixel_t *pixels,
+                          int n_planes);
 
 #if METHOD == METHOD_VNN
 unsigned char
@@ -771,6 +792,55 @@ performInterpolation_vnn(close_plane_t *close_planes,
 }
 #endif
 
+
+pixel_t anisotropicFilter(const pixel_t *pixels,
+                          int n_planes)
+{
+	// Calculate the variance
+
+	float mean_value = 0.0f;
+	for(int i = 0; i < n_planes; i++)
+	{
+		mean_value += pixels[i].intensity;
+	}
+	mean_value = mean_value / n_planes;
+
+	float variance = 0.0f;
+	for(int i = 0; i < n_planes; i++)
+	{
+		float tmp = pixels[i].intensity - mean_value;
+		variance += tmp*tmp;
+	}
+	variance = variance / n_planes;
+
+	// We want high variance regions to have a sharp weight function
+	// and small variance regions to have a smooth weight function.
+
+	if(variance < 0.1f) variance = 0.1f;
+	float gauss_sigma = 10.0f / sqrt(variance);
+
+	if(gauss_sigma < 0.1f) gauss_sigma = 0.1f;
+	if(variance > 0.1f && mean_value> 10.0f)
+		DEBUG_PRINTF("Mean: %f, variance: %f, sigma: %f\n", mean_value, variance, gauss_sigma);
+
+
+	float sum_weights = 0.0f;
+	float sum = 0.0f;
+	// Use the resulting gauss sigma to calcualte weights
+	for(int i = 0; i < n_planes; i++)
+	{
+		float weight = WEIGHT_GAUSS(pixels[i].dist, gauss_sigma);
+		sum += pixels[i].intensity*weight;
+		sum_weights += weight;
+	}
+
+	pixel_t ret;
+	ret.dist = 0.0f;
+	ret.intensity = sum / sum_weights;
+	return ret;
+}
+
+
 #if METHOD == METHOD_VNN2
 #define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i ,j, k)	  \
 	performInterpolation_vnn2(a, b, c, d, e, f, g, h, i, j, k)
@@ -833,10 +903,10 @@ performInterpolation_vnn2(close_plane_t *close_planes,
 		
 		if(dist < 0.001f)
 			dist = 0.001f;
-		float dist_inv = 1.0f/(dist*dist);
+		float weight = VNN2_WEIGHT(dist)
 		
-		scale += dist_inv;
-		val += (image[y*in_xsize + x] * dist_inv);
+		scale += weight;
+		val += (image[y*in_xsize + x] * weight);
 	}		
 
 	
@@ -918,8 +988,9 @@ performInterpolation_dw(close_plane_t *close_planes,
 			
 		float dist = fabs(close_planes[i].dist);
 		if(dist < 0.001f) dist = 0.001f;
-		scale += 1.0f/(dist*dist);
-		val += (interpolated_value * 1.0f/(dist*dist));
+		float weight = DW_WEIGHT(dist);
+		scale += weight;
+		val += (interpolated_value * weight);
 	}		
 
 	
@@ -1175,8 +1246,10 @@ performInterpolation_median(close_plane_t *close_planes,
 	{
 		return 1;
 	}
-	return max((unsigned char)1, weighted_median(pixels, pos).intensity);
 	
+	//return max((unsigned char)1, weighted_median(pixels, pos).intensity);
+	return max((unsigned char)1, anisotropicFilter(pixels, pos).intensity);
+
 }
 
 #endif
