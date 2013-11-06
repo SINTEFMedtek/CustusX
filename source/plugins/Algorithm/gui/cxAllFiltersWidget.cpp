@@ -14,6 +14,7 @@
 #include "cxSmoothingImageFilter.h"
 #include "cxResampleImageFilter.h"
 #include "cxFilterPresetWidget.h"
+#include "cxDilationFilter.h"
 #ifdef CX_USE_TSF
 #include "cxTubeSegmentationFilter.h"
 #endif //CX_USE_TSF
@@ -33,6 +34,7 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
 	mFilters->append(FilterPtr(new ContourFilter()));
 	mFilters->append(FilterPtr(new SmoothingImageFilter()));
 	mFilters->append(FilterPtr(new ResampleImageFilter()));
+	mFilters->append(FilterPtr(new DilationFilter()));
 #ifdef CX_USE_TSF
 	mFilters->append(FilterPtr(new TubeSegmentationFilter()));
 #endif //CX_USE_TSF
