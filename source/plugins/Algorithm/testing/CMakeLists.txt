@@ -35,6 +35,7 @@ if(BUILD_TESTING)
 		cxtestTSFPresetsFixture
 		cxtestCatchTSFPresets.cpp
         cxtestLevelSetFilter.cpp
+        cxtestDilationFilter.cpp
     )
     set(CXTEST_SOURCES_TO_MOC
     )
