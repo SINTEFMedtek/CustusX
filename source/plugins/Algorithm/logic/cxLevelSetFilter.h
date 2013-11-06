@@ -33,6 +33,7 @@ public:
 
 	static Vector3D getSeedPointFromTool(DataPtr image);
 	static bool isSeedPointInsideImage(Vector3D, DataPtr);
+	QDomElement getmOptions();
 
 protected:
 	virtual void createOptions();

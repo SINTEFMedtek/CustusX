@@ -16,6 +16,7 @@
 #include "sscDataAdapter.h"
 #include "sscDoubleDataAdapter.h"
 #include "sscRegistrationTransform.h"
+#include "sscDoubleDataAdapterXml.h"
 
 namespace cxtest {
 
@@ -60,7 +61,7 @@ TEST_CASE("LevelSetFilter: execute", "[integration][plugins][Algorithm][LevelSet
 	REQUIRE(lsf);
 	lsf->getInputTypes();
 	lsf->getOutputTypes();
-	std::vector<DataAdapterPtr> options = lsf->getOptions();
+	lsf->getOptions();
 
     //create a new patient
 	QString filename = cx::DataLocations::getTestDataPath()+ "/testing/TubeSegmentationFramework/Default.mhd";
@@ -86,20 +87,15 @@ TEST_CASE("LevelSetFilter: execute", "[integration][plugins][Algorithm][LevelSet
 	}
 
 	// set seedpoint, threshold, epsilon and alpha
-	/*
-	cx::cxToolManager::initializeObject();
-    cx::cxToolManager * toolmanager = cx::cxToolManager::getInstance();
-    toolmanager->setDominantTool(data->getUid());
-    */
 	cx::Vector3D seedPoint;
 	seedPoint(0) = 34;
 	seedPoint(1) = 29;
 	seedPoint(2) = 50;
 	setSeedPoint(seedPoint);
-	cx::Vector3D point = cx::LevelSetFilter::getSeedPointFromTool(data);
-	boost::dynamic_pointer_cast<cx::DoubleDataAdapter>(options[0])->setValue(60);
-	boost::dynamic_pointer_cast<cx::DoubleDataAdapter>(options[1])->setValue(100);
-	boost::dynamic_pointer_cast<cx::DoubleDataAdapter>(options[2])->setValue(0.1);
+	// TODO: the three lines below are not working properly. The options are not set!
+	lsf->getThresholdOption(lsf->getmOptions())->setValue(60);
+	lsf->getEpsilonOption(lsf->getmOptions())->setValue(100);
+	lsf->getAlphaOption(lsf->getmOptions())->setValue(0.1);
 	// Execute
 	{
 		INFO("Preprocessing LevelSetFilter failed.");
