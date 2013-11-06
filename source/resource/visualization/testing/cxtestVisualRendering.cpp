@@ -81,7 +81,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 
 TEST_CASE_METHOD(VisualRenderingFixture,
 				 "Visual rendering: Show 3D volume - snwGPU multivolume render",
-				 "[unit][resource][visualization][not_apple][not_windows][ca_special]")
+				 "[unit][resource][visualization][not_apple][not_windows]")
 {
 	this->setDescription("3D Volume, moving tool, GPU");
 	REQUIRE(this->define3DGPU(QStringList(image[0]), NULL, 0, 0));
@@ -202,8 +202,20 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show ACS, 3 GPU volumes, moving tool",
+				 "Visual rendering: Show Axial GPU slice",
 				 "[unit][resource][visualization][not_apple][not_windows][ca_special]")
+{
+	this->setDescription("A  volumes, moving tool, GPU");
+
+	REQUIRE(this->defineGPUSlice("A", image[0], cx::ptAXIAL, 0, 0));
+	REQUIRE(this->quickRunWidget());
+
+	CHECK(this->getFractionOfBrightPixelsInView(0,20) > 0.02);
+}
+
+TEST_CASE_METHOD(VisualRenderingFixture,
+				 "Visual rendering: Show ACS, 3 GPU volumes, moving tool",
+				 "[unit][resource][visualization][not_apple][not_windows]")
 {
 	this->setDescription("ACS 3 volumes, moving tool, GPU");
 
