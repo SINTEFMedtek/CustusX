@@ -97,6 +97,8 @@
 namespace cxtest
 {
 
+namespace
+{
 void testAndDeleteBaseWidgetChild(cx::BaseWidget* widget)
 {
 	REQUIRE(widget);
@@ -107,10 +109,22 @@ void testAndDeleteBaseWidgetChild(cx::BaseWidget* widget)
 	delete widget;
 }
 
-TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[unit][gui][widget]")
+void init()
 {
+
 	cx::LogicManager::initialize();
 	cx::viewManager()->initialize();
+}
+void shutdown()
+{
+	cx::viewManager()->destroyInstance();
+	cx::LogicManager::shutdown();
+}
+}
+
+TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[unit][gui][widget]")
+{
+	init();
 	QWidget* testParent = new QWidget();
 
 	testAndDeleteBaseWidgetChild(new cx::ActiveToolWidget(testParent));
@@ -165,8 +179,14 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 //	testAndDeleteBaseWidgetChild(new cx::RegistrationMethodsWidget(testParent));
 
 	delete testParent;
-	cx::viewManager()->destroyInstance();
-	cx::LogicManager::shutdown();
+	shutdown();
+}
+
+TEST_CASE("VideoConnectionWidget is correctly constructed", "[unit][gui][widget]")
+{
+	init();
+	testAndDeleteBaseWidgetChild(new cx::VideoConnectionWidget(NULL));
+	shutdown();
 }
 
 } //namespace cxtest
