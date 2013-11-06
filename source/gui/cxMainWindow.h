@@ -58,6 +58,7 @@ protected slots:
 	void clearPatientSlot();///< clear current patient (debug)
 
 	void showControlPanelActionSlot();
+	void showSecondaryViewLayoutWindowActionSlot();
 
 	// application
 	void onApplicationStateChangedSlot();
@@ -148,6 +149,7 @@ private:
 	QAction* mClearPatientAction;
 	QAction* mExportPatientAction;
 	QAction* mShowControlPanelAction;
+	QAction* mSecondaryViewLayoutWindowAction;
 
 	QActionGroup* mStandard3DViewActions; ///< actions for setting camera in fixed direction.
 	QAction* mShowPointPickerAction;
@@ -192,6 +194,7 @@ private:
 
 	//widgets
 	class SecondaryMainWindow* mControlPanel;
+	class SecondaryViewLayoutWindow* mSecondaryViewLayoutWindow;
 
 	//Preferences
 	CameraControlPtr mCameraControl;
