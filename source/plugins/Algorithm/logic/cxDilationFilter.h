@@ -21,6 +21,8 @@ public:
 
 	// extensions:
 	DoubleDataAdapterXmlPtr getDilationRadiusOption(QDomElement root);
+	ColorDataAdapterXmlPtr getColorOption(QDomElement root);
+	BoolDataAdapterXmlPtr getGenerateSurfaceOption(QDomElement root);
 
 protected:
 	virtual void createOptions();
