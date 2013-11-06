@@ -1,6 +1,8 @@
 #include "cxDilationFilter.h"
 
 #include "sscDoubleDataAdapterXml.h"
+#include "sscColorDataAdapterXml.h"
+#include "sscBoolDataAdapterXml.h"
 #include "sscStringDataAdapterXml.h"
 #include "cxSelectDataStringDataAdapter.h"
 
@@ -47,10 +49,27 @@ DoubleDataAdapterXmlPtr DilationFilter::getDilationRadiusOption(QDomElement root
 	return retval;
 }
 
+BoolDataAdapterXmlPtr DilationFilter::getGenerateSurfaceOption(QDomElement root)
+{
+	BoolDataAdapterXmlPtr retval = BoolDataAdapterXml::initialize("Generate Surface", "",
+	                                                                        "Generate a surface of the output volume", true,
+	                                                                            root);
+	return retval;
+}
+
+ColorDataAdapterXmlPtr DilationFilter::getColorOption(QDomElement root)
+{
+	return ColorDataAdapterXml::initialize("Color", "",
+	                                            "Color of output model.",
+	                                            QColor("green"), root);
+}
+
+
 void DilationFilter::createOptions()
 {
-	mDilationRadiusOption = this->getDilationRadiusOption(mOptions);
-	mOptionsAdapters.push_back(mDilationRadiusOption);
+	mOptionsAdapters.push_back(this->getDilationRadiusOption(mOptions));
+	mOptionsAdapters.push_back(this->getGenerateSurfaceOption(mOptions));
+	mOptionsAdapters.push_back(this->getColorOption(mOptions));
 }
 
 void DilationFilter::createInputTypes()
@@ -131,8 +150,12 @@ bool DilationFilter::execute() {
 
 	mRawResult =  rawResult;
 
-	double threshold = 1;/// because the segmented image is 0..1
-	mRawContour = ContourFilter::execute(mRawResult, threshold);
+	BoolDataAdapterXmlPtr generateSurface = this->getGenerateSurfaceOption(mCopiedOptions);
+	if (generateSurface->getValue())
+	{
+        double threshold = 1;/// because the segmented image is 0..1
+        mRawContour = ContourFilter::execute(mRawResult, threshold);
+	}
 
     return true;
 }
@@ -163,7 +186,8 @@ bool DilationFilter::postProcess() {
 	// set contour output
 	if (mRawContour!=NULL)
 	{
-		MeshPtr contour = ContourFilter::postProcess(mRawContour, output, QColor("red"));
+		ColorDataAdapterXmlPtr colorOption = this->getColorOption(mOptions);
+		MeshPtr contour = ContourFilter::postProcess(mRawContour, output, colorOption->getValue());
 		mOutputTypes[1]->setValue(contour->getUid());
 		mRawContour = vtkPolyDataPtr();
 	}
