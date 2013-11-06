@@ -84,11 +84,11 @@ public:
 	 */
 	void clearUsedViews()
 	{
-		for (unsigned i = 0; i < mUsed.size(); ++i)
-		{
-			mUsed[i]->hide();
-			mCentralWidget->layout()->removeWidget(mUsed[i]);
-		}
+//		for (unsigned i = 0; i < mUsed.size(); ++i)
+//		{
+//			mUsed[i]->hide();
+//			mCentralWidget->layout()->removeWidget(mUsed[i]);
+//		}
 
 		std::copy(mUsed.begin(), mUsed.end(), back_inserter(mCached));
 		mUsed.clear();

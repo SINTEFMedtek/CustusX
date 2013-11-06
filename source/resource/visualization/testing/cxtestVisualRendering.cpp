@@ -81,7 +81,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 
 TEST_CASE_METHOD(VisualRenderingFixture,
 				 "Visual rendering: Show 3D volume - snwGPU multivolume render",
-				 "[unit][resource][visualization][not_apple][not_windows]")
+				 "[unit][resource][visualization][not_apple][not_windows][unstable]")
 {
 	this->setDescription("3D Volume, moving tool, GPU");
 	REQUIRE(this->define3DGPU(QStringList(image[0]), NULL, 0, 0));

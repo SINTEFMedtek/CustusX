@@ -118,6 +118,9 @@ void cxToolManager::setPlaybackMode(PlaybackTimePtr controller)
 	if (!this->isConfigured())
 		this->configure();
 
+	if (!mTrackerThread)
+		return;
+
 	// wait for connection to complete
 	for (unsigned i=0; i<100; ++i)
 	{
