@@ -176,6 +176,10 @@ void LevelSetFilter::createOptions()
 	mOptionsAdapters.push_back(this->getAlphaOption(mOptions));
 }
 
+QDomElement LevelSetFilter::getmOptions() {
+    return this->mOptions;
+}
+
 void LevelSetFilter::createInputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
