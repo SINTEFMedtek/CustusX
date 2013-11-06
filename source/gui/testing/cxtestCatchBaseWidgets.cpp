@@ -139,7 +139,7 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 	testAndDeleteBaseWidgetChild(new cx::TransferFunctionColorWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::TransferFunctionWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::Transform3DWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::VideoConnectionWidget(testParent));
+//	testAndDeleteBaseWidgetChild(new cx::VideoConnectionWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::TransferFunction2DWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::TransferFunction3DWidget(testParent));
 
