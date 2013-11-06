@@ -20,7 +20,7 @@ public:
 	virtual bool postProcess();
 
 	// extensions:
-	DoubleDataAdapterXmlPtr getDilationAmountOption(QDomElement root);
+	DoubleDataAdapterXmlPtr getDilationRadiusOption(QDomElement root);
 
 protected:
 	virtual void createOptions();
@@ -28,7 +28,7 @@ protected:
 	virtual void createOutputTypes();
 
 private:
-	DoubleDataAdapterXmlPtr mDilationAmountOption;
+	DoubleDataAdapterXmlPtr mDilationRadiusOption;
 	vtkImageDataPtr mRawResult;
 	vtkPolyDataPtr mRawContour;
 };
