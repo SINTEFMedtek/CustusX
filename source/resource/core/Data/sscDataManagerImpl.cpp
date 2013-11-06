@@ -243,6 +243,8 @@ void DataManagerImpl::saveImage(ImagePtr image, const QString& basePath)
 	writer->SetFileDimensionality(3);
 //	QString filename = basePath + "/" + image->getFilePath();
 	QString filename = basePath + "/Images/" + image->getUid() + ".mhd";
+//	image->setFilename(filename);
+	image->setFilename(QDir(basePath).relativeFilePath(filename));
 	writer->SetFileName(cstring_cast(filename));
 	QDir().mkpath(QFileInfo(filename).path());
 
@@ -308,6 +310,8 @@ void DataManagerImpl::saveMesh(MeshPtr mesh, const QString& basePath)
 	//writer->SetFileDimensionality(3);
 //	QString filename = basePath + "/" + mesh->getFilePath();
 	QString filename = basePath + "/Images/" + mesh->getUid() + ".vtk";
+//	mesh->setFilename(filename);
+	mesh->setFilename(QDir(basePath).relativeFilePath(filename));
 	writer->SetFileName(cstring_cast(filename));
 
 	writer->Update();
@@ -535,7 +539,7 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 
 	if (!name.isEmpty())
 		data->setName(name);
-//	data->setFilePath(relativePath.path());
+	data->setFilename(relativePath.path());
 
 	this->loadData(data);
 
@@ -600,6 +604,7 @@ ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, QString uid, QString
 
 	ImagePtr retval = ImagePtr(new Image(uid, data, name));
 	retval->setAcquisitionTime(QDateTime::currentDateTime());
+	retval->setFilename(filePath);
 
 	return retval;
 }
@@ -670,6 +675,7 @@ MeshPtr DataManagerImpl::createMesh(vtkPolyDataPtr data, QString uid, QString na
 
 	MeshPtr retval = MeshPtr(new Mesh(uid, name, data));
 	retval->setAcquisitionTime(QDateTime::currentDateTime());
+	retval->setFilename(filePath);
 
 	return retval;
 }

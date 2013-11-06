@@ -12,7 +12,7 @@ TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Create fixture", "[in
 /** Run a full acquisition from MHD source local server using OpenIGTLink.
   * Save data and evaluate results.
   */
-TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Stream one MDHSource from LocalServer and save to disk", "[integration][plugins][Acquisition]")
+TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Stream one MDHSource from LocalServer and save to disk", "[integration][plugins][Acquisition][not_win32]")
 {
 	this->mConnectionMethod = "Local Server";
 	this->mNumberOfExpectedStreams = 1;
@@ -25,7 +25,7 @@ TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Stream one MDHSource 
 /** Run a full acquisition from MHD source direct link.
   * Save data and evaluate results.
   */
-TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Stream one MDHSource from DirectLink and save to disk", "[integration][plugins][Acquisition]")
+TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Stream one MDHSource from DirectLink and save to disk", "[integration][plugins][Acquisition][not_win32]")
 {
 	this->mConnectionMethod = "Direct Link";
 	this->mNumberOfExpectedStreams = 1;
@@ -38,7 +38,7 @@ TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Stream one MDHSource 
 /** Test the MHD file source using the --secondary option,
   * i.e. sending two streams and saving them to disk.
   */
-TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Stream two MDHSources from DirectLink and save to disk", "[integration][plugins][Acquisition]")
+TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Stream two MDHSources from DirectLink and save to disk", "[integration][plugins][Acquisition][not_win32]")
 {
 	this->mConnectionMethod = "Direct Link";
 	this->mAdditionalGrabberArg = "--secondary";
