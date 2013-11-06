@@ -103,7 +103,6 @@ bool DilationFilter::execute() {
 	typedef itk::BinaryBallStructuringElement<unsigned char,3> StructuringElementType;
     StructuringElementType structuringElement;
     structuringElement.SetRadius(radiusInVoxels);
-    std::cout << structuringElement.GetRadius() << std::endl;
     structuringElement.CreateStructuringElement();
 
 	// Dilation
@@ -134,32 +133,25 @@ bool DilationFilter::execute() {
 
 	double threshold = 1;/// because the segmented image is 0..1
 	mRawContour = ContourFilter::execute(mRawResult, threshold);
-	std::cout << "finished" << std::endl;
 
     return true;
 }
 
 bool DilationFilter::postProcess() {
-	if (!mRawResult) {
-	    std::cout << "asdasd" << std::endl;
+	if (!mRawResult)
 		return false;
-	}
 
 	ImagePtr input = this->getCopiedInputImage();
 
-	if (!input) {
-	    std::cout << "asdasd2" << std::endl;
+	if (!input)
 		return false;
-	}
 
 	QString uid = input->getUid() + "_seg%1";
 	QString name = input->getName()+" seg%1";
 	ImagePtr output = dataManager()->createDerivedImage(mRawResult,uid, name, input);
 	mRawResult = NULL;
-	if (!output) {
-	    std::cout << "asdasd3" << std::endl;
+	if (!output)
 		return false;
-	}
 
 	output->resetTransferFunctions();
 	dataManager()->loadData(output);
