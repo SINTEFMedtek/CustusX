@@ -14,7 +14,6 @@ public:
 	virtual QString getType() const;
 	virtual QString getName() const;
 	virtual QString getHelp() const;
-	virtual void setActive(bool on);
 
 	bool preProcess();
 	virtual bool execute();
