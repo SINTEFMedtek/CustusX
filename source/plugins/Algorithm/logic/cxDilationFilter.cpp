@@ -33,6 +33,8 @@ QString DilationFilter::getHelp() const
 {
 	return "<html>"
 	        "<h3>Dilation Filter.</h3>"
+	        "<p>This filter dilates a binary volume with a given radius in mm.<p>"
+	        "<p>The dilation is performed using a ball structuring element<p>"
 	        "</html>";
 }
 
