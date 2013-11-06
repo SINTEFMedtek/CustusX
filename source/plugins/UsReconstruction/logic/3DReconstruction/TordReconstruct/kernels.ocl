@@ -13,10 +13,21 @@
 #define METHOD_VNN 0
 #define METHOD_VNN2 1
 #define METHOD_DW 2
+#define METHOD_ANISOTROPIC 3
 
 // Plane searching methods
 #define PLANE_HEURISTIC 0
 #define PLANE_CLOSEST 1
+
+
+// Anisotropic method specific constants
+#define ANISOTROPIC_SIZE 1
+
+#define ANISOTROPIC_METHOD_INCLUDE_ALL 0
+#define ANISOTROPIC_METHOD_ON_PLANE 1
+#define ANISOTROPIC_METHOD_BILINEAR_ON_PLANE 2
+
+#define ANISOTROPIC_METHOD ANISOTROPIC_METHOD_BILINEAR_ON_PLANE
 
 /*****************/
 /* End constants */
@@ -31,6 +42,7 @@
 
 #ifdef DEBUG
 #define DEBUG_PRINTF(...) if((get_global_id(0) % 5000) == 0) printf(##__VA_ARGS__)
+//#define DEBUG_PRINTF(...) printf(##__VA_ARGS__)
 #else
 #define DEBUG_PRINTF(...)
 #endif
@@ -43,10 +55,28 @@
 #define projectOntoPlaneEq(voxel, eq, dist) (voxel - dist*(eq))
 
 #define isInside(x, size) ((x) >= 0 && (x) < (size))
-#define isNotMasked(x, y, mask, xsize) ((mask)[(x) + (y)*(xsize)] > 0)
+//#define isNotMasked(x, y, mask, xsize) ((mask)[(x) + (y)*(xsize)] > 0)
+#define isNotMasked(x, y, mask, xsize) 1
                                      
 #define VOXEL(v,x,y,z) v[x + y*volume_xsize + z*volume_ysize*volume_xsize]
 
+#define WEIGHT_INV(x) (1.0f/fabs(x))
+#define WEIGHT_INV2(x) (1.0f/fabs(x*x))
+#define WEIGHT_INV4(x) (1.0f/fabs(x*x*x*x))
+#define WEIGHT_SUB(x) (1.0f - fabs(x))
+
+// Gaussian weight function
+#define WEIGHT_GAUSS_SIGMA (0.05f)
+
+#define WEIGHT_GAUSS_SQRT_2PI 2.506628275f
+
+#define WEIGHT_GAUSS_NONEXP_PART(sigma) (1.0f/(sigma*WEIGHT_GAUSS_SQRT_2PI))
+#define WEIGHT_GAUSS_EXP_PART(dist, sigma) exp(-(dist*dist)/(2*sigma*sigma))
+
+#define WEIGHT_GAUSS(x, sigma) (WEIGHT_GAUSS_NONEXP_PART(sigma)*WEIGHT_GAUSS_EXP_PART(x, sigma))
+
+#define DW_WEIGHT(x) WEIGHT_INV(x)
+#define VNN2_WEIGHT(x) WEIGHT_INV(x)
 
 /**************/
 /* End macros */
@@ -61,6 +91,12 @@ typedef struct _close_plane
 	float dist;
 	int plane_id;
 } close_plane_t;
+
+typedef struct _pixel
+{
+	unsigned char intensity;
+	float dist;
+} pixel_t;
 
 /***************/
 /* End structs */
@@ -145,6 +181,9 @@ bilinearInterpolation(float x,
                       const __global unsigned char* image,
                       int in_xsize);
 
+pixel_t anisotropicFilter(const pixel_t *pixels,
+                          int n_planes);
+
 #if METHOD == METHOD_VNN
 unsigned char
 performInterpolation_vnn(close_plane_t *close_planes,
@@ -188,6 +227,21 @@ performInterpolation_dw(close_plane_t *close_planes,
                         float in_yspacing,
                         __global const unsigned char* mask,
                         float4 voxel);
+#endif
+
+#if METHOD == METHOD_ANISOTROPIC
+unsigned char
+performInterpolation_anisotropic(close_plane_t *close_planes,
+                            int n_close_planes,
+                            __global const float16  *plane_matrices,
+                            __local const float4 *plane_eqs,
+                            __global const unsigned char* bscans_blocks[],
+                            int in_xsize,
+                            int in_ysize,
+                            float in_xspacing,
+                            float in_yspacing,
+                            __global const unsigned char* mask,
+                            float4 voxel);
 #endif
 
 void
@@ -406,7 +460,7 @@ findClosestPlanes_heuristic(close_plane_t *close_planes,
 		// FIXME: The constant here represents a tradeoff between
 		// guaranteeing to find all relevant planes, and performance (terminating earlier).
 		// This should be investigate further.
-		int2 term_dists = {abs_dists.x > 2.0f*radius, abs_dists.y > 2.0f*radius };
+		int2 term_dists = {abs_dists.x > 5.0f*radius, abs_dists.y > 5.0f*radius };
 
 		int2 term_boundaries = {idx.x == N_PLANES-1, idx.y == 0};
 				
@@ -738,6 +792,55 @@ performInterpolation_vnn(close_plane_t *close_planes,
 }
 #endif
 
+
+pixel_t anisotropicFilter(const pixel_t *pixels,
+                          int n_planes)
+{
+	// Calculate the variance
+
+	float mean_value = 0.0f;
+	for(int i = 0; i < n_planes; i++)
+	{
+		mean_value += pixels[i].intensity;
+	}
+	mean_value = mean_value / n_planes;
+
+	float variance = 0.0f;
+	for(int i = 0; i < n_planes; i++)
+	{
+		float tmp = pixels[i].intensity - mean_value;
+		variance += tmp*tmp;
+	}
+	variance = variance / n_planes;
+
+	// We want high variance regions to have a sharp weight function
+	// and small variance regions to have a smooth weight function.
+
+	if(variance < 0.1f) variance = 0.1f;
+	float gauss_sigma = 10.0f / sqrt(variance);
+
+	if(gauss_sigma < 0.1f) gauss_sigma = 0.1f;
+	if(variance > 0.1f && mean_value> 10.0f)
+		DEBUG_PRINTF("Mean: %f, variance: %f, sigma: %f\n", mean_value, variance, gauss_sigma);
+
+
+	float sum_weights = 0.0f;
+	float sum = 0.0f;
+	// Use the resulting gauss sigma to calcualte weights
+	for(int i = 0; i < n_planes; i++)
+	{
+		float weight = WEIGHT_GAUSS(pixels[i].dist, gauss_sigma);
+		sum += pixels[i].intensity*weight;
+		sum_weights += weight;
+	}
+
+	pixel_t ret;
+	ret.dist = 0.0f;
+	ret.intensity = sum / sum_weights;
+	return ret;
+}
+
+
 #if METHOD == METHOD_VNN2
 #define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i ,j, k)	  \
 	performInterpolation_vnn2(a, b, c, d, e, f, g, h, i, j, k)
@@ -800,10 +903,10 @@ performInterpolation_vnn2(close_plane_t *close_planes,
 		
 		if(dist < 0.001f)
 			dist = 0.001f;
-		float dist_inv = 1.0f/dist;
+		float weight = VNN2_WEIGHT(dist);
 		
-		scale += dist_inv;
-		val += (image[y*in_xsize + x] * dist_inv);
+		scale += weight;
+		val += (image[y*in_xsize + x] * weight);
 	}		
 
 	
@@ -869,11 +972,13 @@ performInterpolation_dw(close_plane_t *close_planes,
 		           in_yspacing);
 
 
-		
-		if(!isValidPixel(x,y, mask, in_xsize, in_ysize) 
-		   || !isValidPixel(x+1, y, mask, in_xsize, in_ysize)
-		   || !isValidPixel(x+1, y+1, mask, in_xsize, in_ysize)
-		   || !isValidPixel(x, y+1, mask, in_xsize, in_ysize)
+		int ix, iy;
+		ix = x;
+		iy = y;
+		if(!isValidPixel(ix,iy, mask, in_xsize, in_ysize) 
+		   || !isValidPixel(ix+1, iy, mask, in_xsize, in_ysize)
+		   || !isValidPixel(ix+1, iy+1, mask, in_xsize, in_ysize)
+		   || !isValidPixel(ix, iy+1, mask, in_xsize, in_ysize)
 			)
 		{
 			continue;
@@ -883,8 +988,9 @@ performInterpolation_dw(close_plane_t *close_planes,
 			
 		float dist = fabs(close_planes[i].dist);
 		if(dist < 0.001f) dist = 0.001f;
-		scale += 1.0f/dist;
-		val += (interpolated_value * 1.0f/dist);
+		float weight = DW_WEIGHT(dist);
+		scale += weight;
+		val += (interpolated_value * weight);
 	}		
 
 	
@@ -893,7 +999,260 @@ performInterpolation_dw(close_plane_t *close_planes,
 }
 #endif
 
+#if METHOD == METHOD_ANISOTROPIC
+#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i ,j, k)	  \
+	performInterpolation_anisotropic(a, b, c, d, e, f, g, h, i, j, k)
 
+void siftDown(pixel_t *pixels,
+              int start,
+              int end)
+{
+	int root = start;
+	int swap;
+	int child;
+	pixel_t tmp;
+#define swap(a, b) tmp = a; a = b; b = tmp
+	while(root*2 + 1 <= end)
+	{
+		child = root*2+1;
+		swap = root;
+		if(pixels[swap].intensity < pixels[child].intensity)
+		{
+			swap = child;
+		}
+		if(child+1 <= end && pixels[swap].intensity < pixels[child+1].intensity)
+		{
+			swap = child+1;
+		}
+		if(swap != root)
+		{
+			swap(pixels[root], pixels[swap]);
+			root = swap;
+		}
+		else
+		{
+			return;
+		}
+	}
+}
+	
+void heapify(pixel_t *pixels,
+             int n)
+{
+	int start = (n - 2) / 2;
+
+	while(start >= 0)
+	{
+		siftDown(pixels, start, n - 1);
+		start--;
+	}
+}
+	
+
+// Implement heapsort
+void sort(pixel_t *pixels,
+          int n)
+{
+	pixel_t tmp;
+#define swap(a, b) tmp = a; a = b; b = tmp
+	heapify(pixels, n);
+	int end = n-1;
+	while(end > 0)
+	{
+		swap(pixels[end], pixels[0]);
+		end--;
+		siftDown(pixels, 0, end);
+	}
+}
+
+#define WEIGHT_FUNCTION(x) (1.0f - fabs(x.dist))
+// Find the weighted median of an unsorted array of pixels
+pixel_t weighted_median(pixel_t *pixels,
+                        int n_pixels)
+{
+	// Sort the pixels
+	sort(pixels, n_pixels);
+	// Compute the sum of the weights
+	float sum_weight = 0.0f;
+	for(int i = 0; i < n_pixels; i++)
+	{
+		sum_weight += WEIGHT_FUNCTION(pixels[i]);
+	}
+	// Find the first index for which sum is greater than sum_weight/2
+	const float sum_weight_half = sum_weight / 2;
+	float sum = 0.0f;
+	int idx = 0;
+	for(idx = 0; idx < n_pixels; idx++)
+	{
+		sum += WEIGHT_FUNCTION(pixels[idx]);
+		if(sum >= sum_weight_half)
+		{
+			break;
+		}
+	}
+	return pixels[idx];
+	
+}
+
+/**
+ * Perform interpolation using an anisotropic filter
+ */
+unsigned char
+performInterpolation_anisotropic(close_plane_t *close_planes,
+                            int n_close_planes,
+                            __global const float16  *plane_matrices,
+                            __local const float4 *plane_eqs,
+                            __global const unsigned char* bscans_blocks[],
+                            int in_xsize,
+                            int in_ysize,
+                            float in_xspacing,
+                            float in_yspacing,
+                            __global const unsigned char* mask,
+                            float4 voxel)
+{
+	// First, find all the relevant pixels
+#if ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_INCLUDE_ALL
+	pixel_t pixels[MAX_PLANES*ANISOTROPIC_SIZE*ANISOTROPIC_SIZE];
+#elif ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_ON_PLANE
+	pixel_t pixels[MAX_PLANES];
+#elif ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_BILINEAR_ON_PLANE
+	pixel_t pixels[MAX_PLANES];
+#endif
+
+	
+	int pos = 0;
+	for(int i = 0; i < n_close_planes; i++)
+	{
+		const int plane_id = close_planes[i].plane_id;
+		const __global unsigned char* image = getImageData(plane_id,
+		                                             bscans_blocks,
+		                                             in_xsize,
+		                                             in_ysize);
+
+		// Project onto plane
+		voxel.w = 1.0f;
+		float4 translated_voxel = projectOntoPlaneEq(voxel,
+		                                             plane_eqs[plane_id],
+		                                             close_planes[i].dist);
+		translated_voxel.w = 1.0f;
+
+
+#if ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_INCLUDE_ALL
+		
+		int x, y;
+		toImgCoord_int(&x,
+		               &y,
+		               translated_voxel,
+		               plane_matrices[plane_id],
+		               in_xspacing,
+		               in_yspacing);
+		for(int j = -ANISOTROPIC_SIZE/2; j <= ANISOTROPIC_SIZE/2; j++)
+		{
+			for(int k = -ANISOTROPIC_SIZE/2; k <= ANISOTROPIC_SIZE/2; k++)
+			{
+				int _x = x + j;
+				int _y = y + k;
+				if(!isValidPixel(_x, _y, mask, in_xsize, in_ysize))
+				{
+					continue;
+				}
+				pixels[pos].intensity = image[_y*in_xsize + _x];
+
+
+				// We know the distance in the direction normal to the plane.
+				// Since this is a pixel _on_ the plane, pretend the distance along the
+				// normal is one cathete, and the distance on the image plane is another catethe.
+				// The distance is then the hypotenuse.
+
+				float dist_x = j*in_xspacing;
+				float dist_y = k*in_yspacing;
+				float sq_x = dist_x*dist_x;
+				float sq_y = dist_y*dist_y;
+
+				float along_plane_dist = sqrt(sq_x + sq_y);
+				pixels[pos].dist = sqrt(close_planes[i].dist*close_planes[i].dist +
+				                        along_plane_dist*along_plane_dist);
+				pos++;
+			}
+		}
+		
+#elif ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_BILINEAR_ON_PLANE
+		float x, y;
+		toImgCoord_float(&x,
+		                 &y,
+		                 translated_voxel,
+		                 plane_matrices[plane_id],
+		                 in_xspacing,
+		                 in_yspacing);
+
+		
+		int ix, iy;
+		ix = x;
+		iy = y;
+		if(!isValidPixel(ix,iy, mask, in_xsize, in_ysize) 
+		   || !isValidPixel(ix+1, iy, mask, in_xsize, in_ysize)
+		   || !isValidPixel(ix+1, iy+1, mask, in_xsize, in_ysize)
+		   || !isValidPixel(ix, iy+1, mask, in_xsize, in_ysize)
+				)
+			{
+			continue;
+		}
+		pixels[pos].intensity = bilinearInterpolation(x,
+		                                              y,
+		                                              image,
+		                                              in_xsize);
+		pixels[pos++].dist = close_planes[i].dist;
+		
+#elif ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_ON_PLANE
+		
+		int x, y;
+		toImgCoord_int(&x,
+		               &y,
+		               translated_voxel,
+		               plane_matrices[plane_id],
+		               in_xspacing,
+		               in_yspacing);
+		
+		pixel_t pixels_on_plane[ANISOTROPIC_SIZE*ANISOTROPIC_SIZE];
+		int ppos = 0;
+		for(int j = -ANISOTROPIC_SIZE/2; j <= ANISOTROPIC_SIZE/2; j++)
+		{
+			for(int k = -ANISOTROPIC_SIZE/2; k <= ANISOTROPIC_SIZE/2; k++)
+			{
+				int _x = x + j;
+				int _y = y + k;
+				if(!isValidPixel(_x, _y, mask, in_xsize, in_ysize))
+				{
+					continue;
+				}
+				pixels_on_plane[ppos].intensity = image[_y*in_xsize + _x];
+
+				pixels_on_plane[ppos].dist = close_planes[i].dist;
+				ppos++;
+			}
+		}
+		sort(pixels_on_plane, ppos);
+		if(ppos > 0)
+		{
+			pixels[pos] = pixels_on_plane[ppos/2];
+			pos++;
+		}
+				
+#endif
+		
+	}
+	
+	if(pos == 0)
+	{
+		return 1;
+	}
+	
+	//return max((unsigned char)1, weighted_median(pixels, pos).intensity);
+	return max((unsigned char)1, anisotropicFilter(pixels, pos).intensity);
+
+}
+
+#endif
 /**
  * Build the plane equations from the matrices and store them in local memory
  */

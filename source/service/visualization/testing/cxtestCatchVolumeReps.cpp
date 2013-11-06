@@ -158,7 +158,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can crop 1 small volume.", "[rep][unit]
 }
 
 // vtk emits PreRender end ERROR (x502) Invalid operation when this is run after another mehdi test.
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can crop completely 1 small volume.", "[rep][unit][visualization]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can crop completely 1 small volume.", "[rep][unit][visualization][unstable]")
 {
 	MehdiGPURayCastMultiVolumeRepFixture fixture;
 	fixture.setNumberOfImages(1);
@@ -192,7 +192,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip 1 small volume.", "[rep][unit]
 }
 
 // vtk emits PreRender end ERROR (x502) Invalid operation when this is run after another mehdi test.
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can remove 1 small volume with clipper.", "[rep][unit][visualization]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can remove 1 small volume with clipper.", "[rep][unit][visualization][unstable]")
 {
 	MehdiGPURayCastMultiVolumeRepFixture fixture;
 	fixture.setNumberOfImages(1);
@@ -209,7 +209,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can remove 1 small volume with clipper.
 }
 
 // vtk emits PreRender end ERROR (x502) Invalid operation when this is run - in second part.
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip partially and fully 1 small volume.", "[rep][unit][visualization]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip partially and fully 1 small volume.", "[rep][unit][visualization][unstable]")
 {
 	MehdiGPURayCastMultiVolumeRepFixture fixture;
 	fixture.setNumberOfImages(2);
@@ -235,7 +235,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip partially and fully 1 small vo
 	REQUIRE(nonZero == Approx(0.0));
 }
 
-TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 small volume.", "[rep][unit][visualization]")
+TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 small volume.", "[rep][unit][visualization][unstable]")
 {
 	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(3,3,3), 200);
 

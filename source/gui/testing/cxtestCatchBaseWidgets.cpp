@@ -97,6 +97,8 @@
 namespace cxtest
 {
 
+namespace
+{
 void testAndDeleteBaseWidgetChild(cx::BaseWidget* widget)
 {
 	REQUIRE(widget);
@@ -107,10 +109,22 @@ void testAndDeleteBaseWidgetChild(cx::BaseWidget* widget)
 	delete widget;
 }
 
-TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[unit][gui][widget]")
+void init()
 {
+
 	cx::LogicManager::initialize();
 	cx::viewManager()->initialize();
+}
+void shutdown()
+{
+	cx::viewManager()->destroyInstance();
+	cx::LogicManager::shutdown();
+}
+}
+
+TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[unit][gui][widget]")
+{
+	init();
 	QWidget* testParent = new QWidget();
 
 	testAndDeleteBaseWidgetChild(new cx::ActiveToolWidget(testParent));
@@ -132,28 +146,8 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 	testAndDeleteBaseWidgetChild(new cx::SimulateUSWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::ToolPropertiesWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::TrackPadWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::TransferFunction2DColorWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::TransferFunction2DOpacityWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::TransferFunctionWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::TransferFunctionAlphaWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::TransferFunctionColorWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::TransferFunctionWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::Transform3DWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::VideoConnectionWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::TransferFunction2DWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::TransferFunction3DWidget(testParent));
 
-	//cxFileWatcherWidgets
-	testAndDeleteBaseWidgetChild(new cx::FilePreviewWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::ImagePreviewWidget(testParent));
-
-	//cxInfoWidgets
-	testAndDeleteBaseWidgetChild(new cx::VolumeInfoWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::MeshInfoWidget(testParent));
-
-	//cxTabbedWidgets
-	testAndDeleteBaseWidgetChild(new cx::ImagePropertiesWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::VolumePropertiesWidget(testParent));
 
 	//cxTabbedWidgets in plugins
 //	testAndDeleteBaseWidgetChild(new cx::CalibrationMethodsWidget(testParent));
@@ -165,8 +159,55 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 //	testAndDeleteBaseWidgetChild(new cx::RegistrationMethodsWidget(testParent));
 
 	delete testParent;
-	cx::viewManager()->destroyInstance();
-	cx::LogicManager::shutdown();
+	shutdown();
+}
+
+TEST_CASE("VideoConnectionWidget is correctly constructed", "[unit][gui][widget]")
+{
+	init();
+	testAndDeleteBaseWidgetChild(new cx::VideoConnectionWidget(NULL));
+	shutdown();
+}
+
+TEST_CASE("FileWatcherWidgets are correctly constructed", "[unit][gui][widget]")
+{
+	init();
+	//cxFileWatcherWidgets
+	testAndDeleteBaseWidgetChild(new cx::FilePreviewWidget(NULL));
+	testAndDeleteBaseWidgetChild(new cx::ImagePreviewWidget(NULL));
+	shutdown();
+}
+
+TEST_CASE("TabbedWidgets are correctly constructed", "[unit][gui][widget]")
+{
+	init();
+	//cxTabbedWidgets
+	testAndDeleteBaseWidgetChild(new cx::ImagePropertiesWidget(NULL));
+	testAndDeleteBaseWidgetChild(new cx::VolumePropertiesWidget(NULL));
+	shutdown();
+}
+
+TEST_CASE("InfoWidgets are correctly constructed", "[unit][gui][widget]")
+{
+	init();
+	//cxInfoWidgets
+	testAndDeleteBaseWidgetChild(new cx::VolumeInfoWidget(NULL));
+	testAndDeleteBaseWidgetChild(new cx::MeshInfoWidget(NULL));
+	shutdown();
+}
+
+TEST_CASE("TransferFunction widgets are correctly constructed", "[unit][gui][widget]")
+{
+	init();
+	testAndDeleteBaseWidgetChild(new cx::TransferFunction2DColorWidget(NULL));
+	testAndDeleteBaseWidgetChild(new cx::TransferFunction2DOpacityWidget(NULL));
+	testAndDeleteBaseWidgetChild(new cx::TransferFunctionWidget(NULL));
+	testAndDeleteBaseWidgetChild(new cx::TransferFunctionAlphaWidget(NULL));
+	testAndDeleteBaseWidgetChild(new cx::TransferFunctionColorWidget(NULL));
+	testAndDeleteBaseWidgetChild(new cx::TransferFunctionWidget(NULL));
+	testAndDeleteBaseWidgetChild(new cx::TransferFunction2DWidget(NULL));
+	testAndDeleteBaseWidgetChild(new cx::TransferFunction3DWidget(NULL));
+	shutdown();
 }
 
 } //namespace cxtest

@@ -1,13 +1,30 @@
 #include "cxSyntheticVolume.h"
 #include "vtkImageData.h"
+#include <cstdlib>
+#include <time.h>
+
+double noiseValue(double noiseSigma,
+                         double noiseMean)
+{
+	double random_value_1 = (rand()+1.0)/(RAND_MAX+1.0);
+	double random_value_2 = (rand()+1.0)/(RAND_MAX+1.0);
+
+	double random_normal = sqrt(-2*log(random_value_1)) * cos(2*M_PI*random_value_2);
+
+	return random_normal*noiseSigma + noiseMean;
+}
 
 namespace cx {
 
 ProcessedUSInputDataPtr
 cxSyntheticVolume::sampleUsData(const std::vector<Transform3D>& planes,
                                 const Eigen::Array2f& pixelSpacing,
-                                const Eigen::Array2i& sliceDimension) const
+                                const Eigen::Array2i& sliceDimension,
+                                const double noiseSigma,
+                                const unsigned char noiseMean) const
 {
+	// Seed the random number generator
+	srand(time(NULL));
 
 	std::vector<TimedPosition> positions;
 	std::vector<vtkImageDataPtr> images;
@@ -27,17 +44,37 @@ cxSyntheticVolume::sampleUsData(const std::vector<Transform3D>& planes,
 		{
 			for(unsigned int py = 0; py < sliceDimension[1]; py++)
 			{
+
 				// Transform it to volume space
 				const Vector3D img_coords(pixelSpacing[0]*px, pixelSpacing[1]*py, 0.0);
 				const Vector3D volume_coords = plane*img_coords;
 
 				// Evaluate volume at that position
-				const unsigned char val = this->evaluate(volume_coords[0],
-				                                         volume_coords[1],
-				                                         volume_coords[2]);
+				const unsigned char val =
+					this->evaluate(volume_coords[0],
+					               volume_coords[1],
+					               volume_coords[2]);
+
+				const double noise_val = noiseValue(noiseSigma, noiseMean);
+
+				const int noised_val = noise_val + val;
+
+				unsigned char final_val;
+				if(noised_val < 0)
+				{
+					final_val = 0;
+				}
+				else if(noised_val > 255)
+				{
+					final_val = 255;
+				}
+				else
+				{
+					final_val = (unsigned char)noised_val;
+				}
 
 				// Store that value in the US slice
-				us_data[px + py*sliceDimension[0]] = val;
+				us_data[px + py*sliceDimension[0]] = final_val;
 			}
 		}
 

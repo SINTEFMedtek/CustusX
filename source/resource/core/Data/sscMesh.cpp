@@ -43,11 +43,6 @@ Mesh::~Mesh()
 {
 }
 
-QString Mesh::getFilename() const
-{
-	return QString("Images/%1.vtk").arg(this->getUid());
-}
-
 void Mesh::setIsWireframe(bool on)
 {
 	mWireframe = on;

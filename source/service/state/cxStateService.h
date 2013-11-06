@@ -128,6 +128,8 @@ public:
 	void saveDesktop(Desktop desktop);
 	void resetDesktop();
 
+	QStringList getOpenIGTLinkServer();
+
 private:
 	StateService();
 	virtual ~StateService();
@@ -137,8 +139,9 @@ private:
 	template<class T>
 	void fillDefault(QString name, T value);
 
-	QString getDefaultGrabberServer();
-	QString checkGrabberServerExist(QString path, QString filename, QString args);
+	QStringList getDefaultGrabberServer();
+	QStringList getGrabberServer(QString filename, QString relativePath, QString postfix);
+	QStringList checkGrabberServerExist(QString path, QString filename, QString args);
 	QString getDefaultGrabberInitScript();
 
 	static StateService* mTheInstance; ///< the only instance of this class
