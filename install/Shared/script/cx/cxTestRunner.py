@@ -65,7 +65,7 @@ class TestRunner:
         self._writeCTestFileForCatchTests(ctestfile, tests)
         self._writeDartConfigurationFile(path)
         self.runCTest(path, outfile=outFile)
-        shell_rm_r(ctestfile)
+        shell.rm_r(ctestfile)
 
     def runCTest(self, path, outpath=None, outfile=None):
         'Run all ctest tests at path and write them in ctest xml format to outfile'
