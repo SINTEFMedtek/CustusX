@@ -4,7 +4,7 @@
 
 #include "catch.hpp"
 
-TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Create fixture", "[integration][plugins][Acquisition]")
+TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Create fixture", "[integration][plugins][Acquisition][not_win32]")
 {
 	CHECK(true);
 }

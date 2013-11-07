@@ -67,7 +67,7 @@ double calculateFPS(bool slicing)
 
 }
 
-TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration]")
+TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][not_win32]")
 {
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
@@ -83,7 +83,7 @@ TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration]")
 	REQUIRE(fps > minimumFPS);
 }
 
-TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration]")
+TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration][not_win32]")
 {
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
@@ -99,7 +99,7 @@ TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration]"
 	REQUIRE(fps > minimumFPS);
 }
 
-TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integration]")
+TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integration][not_win32]")
 {
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
