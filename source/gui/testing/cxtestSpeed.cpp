@@ -116,7 +116,7 @@ TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integra
 }
 
 
-TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper renderer", "[speed][gui][integration][not_windows]")
+TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper renderer", "[speed][gui][integration][not_win32][not_win64]")
 {
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
@@ -133,7 +133,7 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper renderer", "[speed][gui][
 	REQUIRE(true);
 }
 
-TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper with slicing", "[speed][gui][integration][not_windows]")
+TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper with slicing", "[speed][gui][integration][not_win32][not_win64]")
 {
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
