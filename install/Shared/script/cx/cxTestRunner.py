@@ -61,9 +61,11 @@ class TestRunner:
         PrintFormatter.printInfo('Run ctest tests with tag %s' % tag)
         PrintFormatter.printInfo('Convert catch tests to ctests, i.e. one test per process...')
         tests = self._readCatchTestNames(path, tag=tag)
-        self._writeCTestFileForCatchTests('%s/CTestTestfile.cmake'%path, tests)
+        ctestfile = '%s/CTestTestfile.cmake'%path
+        self._writeCTestFileForCatchTests(ctestfile, tests)
         self._writeDartConfigurationFile(path)
         self.runCTest(path, outfile=outFile)
+        shell_rm_r(ctestfile)
 
     def runCTest(self, path, outpath=None, outfile=None):
         'Run all ctest tests at path and write them in ctest xml format to outfile'
