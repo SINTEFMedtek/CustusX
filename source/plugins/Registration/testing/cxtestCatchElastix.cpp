@@ -97,7 +97,7 @@ public:
 
 
 
-TEST_CASE("ElastiX should register kaisa to a translated+resampled version of same", "[pluginRegistration][integration][unstable]")
+TEST_CASE("ElastiX should register kaisa to a translated+resampled version of same", "[pluginRegistration][integration][not_win32][not_win64]")
 {
 	ElastiXFixture fixture;
 
