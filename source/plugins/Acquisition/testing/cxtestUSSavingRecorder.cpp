@@ -79,7 +79,7 @@ TEST_CASE_METHOD(cxtest::USSavingRecorderFixture, "USSavingRecorder: Use 4 Video
 		this->verifyMemData(QString("videoSource%1").arg(i));
 }
 
-TEST_CASE_METHOD(cxtest::USSavingRecorderFixture, "USSavingRecorder: Use 4 VideoSources with Tool and save", "[integration][plugins][Acquisition]")
+TEST_CASE_METHOD(cxtest::USSavingRecorderFixture, "'USSavingRecorder: Use 4 VideoSources with Tool and save", "[integration][plugins][Acquisition][unstable]")
 {
 	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear());
 	this->setTool(tool);
