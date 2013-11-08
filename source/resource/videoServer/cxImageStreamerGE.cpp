@@ -398,7 +398,7 @@ ProbeDataPtr ImageStreamerGE::getFrameStatus(QString uid, data_streaming::frame_
 
 	// Set start and end of sector in mm from origin
 	// Set width of sector in mm for LINEAR, width of sector in radians for SECTOR.
-	retval->setSector(mFrameGeometry.depthStart, mFrameGeometry.depthEnd, mFrameGeometry.width);
+	retval->setSector(geometry.depthStart, geometry.depthEnd, geometry.width);
 	retval->setImage(imageData);
 
 	retval->setUid(uid);
