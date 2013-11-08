@@ -82,19 +82,11 @@ public:
 	virtual ImagePtr getImage(const QString& uid) const = 0;
 	virtual std::map<QString, ImagePtr> getImages() const = 0;
 
-	virtual std::map<QString, QString> getImageUidsAndNames() const = 0;
-	virtual std::vector<QString> getImageNames() const = 0;
-	virtual std::vector<QString> getImageUids() const = 0;
-
 	// meshes
 	virtual void saveMesh(MeshPtr mesh, const QString& basePath) = 0; ///< Save mesh to file
 	virtual MeshPtr loadMesh(const QString& uid, const QString& fileName, READER_TYPE notused) = 0;
 	virtual MeshPtr getMesh(const QString& uid) const = 0;
 	virtual std::map<QString, MeshPtr> getMeshes() const = 0;
-
-	virtual std::map<QString, QString> getMeshUidsWithNames() const = 0;
-	virtual std::vector<QString> getMeshUids() const = 0;
-	virtual std::vector<QString> getMeshNames() const = 0;
 
 	// data
 	virtual void loadData(DataPtr data) = 0;
@@ -152,7 +144,7 @@ public:
 	{
 		return MeshPtr();
 	}
-	virtual void removeData(const QString& uid)
+	virtual void removeData(const QString& uid, QString basePath)
 	{
 	} ///< remove data from datamanger, emit signal
 

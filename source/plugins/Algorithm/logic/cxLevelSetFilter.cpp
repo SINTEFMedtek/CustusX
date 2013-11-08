@@ -52,7 +52,7 @@ bool LevelSetFilter::preProcess() {
     return true;
 }
 
-Vector3D getSeedPointFromTool(DataPtr image) {
+Vector3D LevelSetFilter::getSeedPointFromTool(DataPtr image) {
     // Retrieve position of tooltip and use it as seed point
     Vector3D point = CoordinateSystemHelpers::getDominantToolTipPoint(
             CoordinateSystemHelpers::getD(image)
@@ -63,11 +63,11 @@ Vector3D getSeedPointFromTool(DataPtr image) {
 }
 
 int * getImageSize(DataPtr inputImage) {
-    ImagePtr image = DataManager::getInstance()->getImage(inputImage->getUid());
+    ImagePtr image = boost::dynamic_pointer_cast<Image>(inputImage);
     return image->getBaseVtkImageData()->GetDimensions();
 }
 
-bool isSeedPointInsideImage(Vector3D seedPoint, DataPtr image) {
+bool LevelSetFilter::isSeedPointInsideImage(Vector3D seedPoint, DataPtr image) {
     int * size = getImageSize(image);
     std::cout << "size of image is: " << size[0] << " " << size[1] << " " << size[2] << "\n";
     int x = (int)seedPoint(0);
@@ -105,7 +105,7 @@ bool LevelSetFilter::execute() {
     std::cout << "Parameters are set to: " << threshold << " "  << epsilon << " " << alpha << std::endl;
 
     // Run level set segmentation 
-	std::string filename = (patientService()->getPatientData()->getActivePatientFolder()+"/"+inputImage->getFilePath()).toStdString();
+	std::string filename = (patientService()->getPatientData()->getActivePatientFolder()+"/"+inputImage->getFilename()).toStdString();
     SIPL::int3 seed(seedPoint(0), seedPoint(1), seedPoint(2));
     try {
         SIPL::Volume<char> * result = runLevelSet(
@@ -174,6 +174,10 @@ void LevelSetFilter::createOptions()
 	mOptionsAdapters.push_back(this->getThresholdOption(mOptions));
 	mOptionsAdapters.push_back(this->getEpsilonOption(mOptions));
 	mOptionsAdapters.push_back(this->getAlphaOption(mOptions));
+}
+
+QDomElement LevelSetFilter::getmOptions() {
+    return this->mOptions;
 }
 
 void LevelSetFilter::createInputTypes()

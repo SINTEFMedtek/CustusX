@@ -419,7 +419,7 @@ void CreateTransferFunctions( int vol,const VolumeInfo& vi,
 		switch(vol)//Mehdi
 		{
 			case 0:	colorFun->AddRGBSegment(0.0, 1.0, 0.0, 0.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
-			case 1:	colorFun->AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
+            case 1:	colorFun->AddRGBSegment(0.0, 0.0, 1.0, 0.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
 			case 2:	colorFun->AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
 			case 3:	colorFun->AddRGBSegment(0.0, 0.0, 0.0, 1.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
 			case 4:	colorFun->AddRGBSegment(0.0, 1.0, 1.0, 0.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
@@ -712,7 +712,7 @@ int main(int argc, char *argv[])
   // Add a box widget if the clip option was selected
   
   vtkSmartPointer<vtkBoxWidget> box = vtkBoxWidget::New();
-  if (!clip)
+  if (clip)
     {
     box->SetInteractor(iren);
     box->SetPlaceFactor(1.00);
@@ -737,7 +737,7 @@ int main(int argc, char *argv[])
     box->GetSelectedFaceProperty()->SetOpacity(0.0);
     }
 	
-  /*
+
   //--------------------------------------------------------------------------------------Mehdi
   // Add a transform box widget if the clip option was not selected
   vtkSmartPointer<vtkBoxWidget> Additionaltransform_box[MAX_NUMBER_OF_ADDITIONAL_VOLUMES];
@@ -766,7 +766,7 @@ int main(int argc, char *argv[])
   Additionaltransform_box[iii]->GetSelectedFaceProperty()->SetOpacity(0.0);
   }
   //--------------------------------------------------------------------------------------Mehdi
-  */
+
   // Set the default window size
   renWin->SetSize(600,600);
 
@@ -800,7 +800,7 @@ int main(int argc, char *argv[])
   int planeDirection=-1;
   int rotateDegree=0;
   int rotateDirection=1;
-
+/*
 
   mapper->AddClippingPlane(0,localPlane);
   renWin->Render();
@@ -814,6 +814,7 @@ int main(int argc, char *argv[])
   renWin->Render();
   renWin->Render();
 //  Sleep(2000);
+*/
   /*
   while(true)
   {
@@ -840,13 +841,13 @@ int main(int argc, char *argv[])
 	*/
   
   
-  /*
-  for (int i = 0; i < 360; i++) 
+  
+  for (int i = 0; i < 90; i++) 
   { 
 	renderer->GetActiveCamera()->Azimuth(1);
 	renWin->Render();
   }
-  */
+  
    
   /*new*/
 
@@ -858,8 +859,8 @@ int main(int argc, char *argv[])
 */
   // interact with data
   
-  renWin->Render();
- // iren->Start();
+  //renWin->Render();
+  //iren->Start();
   
   double fps = sumFPS/(long double)frameCount;
   std::cout << "FPS: " << fps << std::endl;

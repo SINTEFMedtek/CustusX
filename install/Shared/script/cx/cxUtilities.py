@@ -71,6 +71,30 @@ def getPathToModule():
     modulePath = os.path.abspath(modulePath)
     return modulePath
 
+class PlatformInfo:
+    '''
+    Describes the operating system.
+    Defines a unique string for the target os.
+    '''
+    def __init__(self, platform_system, is32bit):
+        self.platform_system = platform_system
+        self.is32bit = is32bit
+    def __str__(self):
+        return self.getTargetPlatform()
+        
+    def get_target_platform(self):
+        if self.platform_system == 'Linux':
+            return 'linux'
+        elif self.platform_system == 'Darwin':
+            return 'apple'
+        elif self.platform_system == 'Windows':
+            if self.is32bit:
+                return 'win32'
+            else:
+                return 'win64' 
+        else:
+            return 'unknown_platform'               
+
 #def argparse_add_boolean_argument(argparser, name, default, dest, help):
 #    '''
 #    Variant of argparse.ArgumentParser.add_argument().

@@ -67,10 +67,14 @@ class JenkinsBuildScriptBase(cx.cxBuildScript.BuildScript):
         #self.cxInstaller.setInstallerPath(self.cxBuilder.getInstallerPackagePath())
         #self.cxInstaller.setSourcePath(custusx.sourcePath())        
 
-        self.cxInstallation = cx.cxCustusXTestInstallation.CustusXTestInstallation()
-        self.cxInstallation.setRootDir(assembly.controlData.getRootDir())
-        self.cxInstallation.setTestDataPath(custusxdata.sourcePath())
-        self.cxInstallation.setInstalledRoot(self.cxInstaller.getInstalledRoot()) 
+        self.cxInstallation = cx.cxCustusXTestInstallation.CustusXTestInstallation(
+                target_platform=self.controlData().getTargetPlatform(),                                                                    
+                root_dir=assembly.controlData.getRootDir(),
+                install_root=self.cxInstaller.getInstalledRoot(),
+                test_data_path=custusxdata.sourcePath())
+#        self.cxInstallation.setRootDir(assembly.controlData.getRootDir())
+#        self.cxInstallation.setTestDataPath(custusxdata.sourcePath())
+#        self.cxInstallation.setInstalledRoot(self.cxInstaller.getInstalledRoot()) 
 
     def resetInstallerStep(self):
         self.cxBuilder.removePreviousInstaller()
@@ -100,6 +104,15 @@ class JenkinsBuildScriptBase(cx.cxBuildScript.BuildScript):
             self.cxInstallation.testInstallation()
         if not skip_integration_test:
             self.cxInstallation.runIntegrationTests()
+
+    def unstableTestPackageStep(self, 
+                                   skip_extra_install_step_checkout=False, 
+                                   skip_install=False):
+        if not skip_extra_install_step_checkout:
+            self.checkoutCustusXAndData()
+        if not skip_install:
+            self.cxInstaller.installPackage()
+        self.cxInstallation.runUnstableTests()
 
     def createReleaseStep(self, 
                           skip_publish_release=False):

@@ -50,50 +50,57 @@ namespace cxtest
  * \author christiana
  */
 
-void setUp()
+class ElastiXFixture
 {
-	cx::MessageManager::initialize();
-	cx::cxDataManager::initialize();
-}
+public:
+	ElastiXFixture()
+	{
+		cx::MessageManager::initialize();
+		cx::cxDataManager::initialize();
+	}
 
-void tearDown()
+	~ElastiXFixture()
+	{
+		cx::DataManager::shutdown();
+		cx::MessageManager::shutdown();
+	}
+	bool compareTransforms(cx::Transform3D result, cx::Transform3D solution)
+	{
+		std::cout << "result\n" << result << std::endl;
+		std::cout << "solution\n" << solution << std::endl;
+
+		cx::Transform3D diff = solution * result.inv();
+
+		std::cout << "diff\n" << diff << std::endl;
+
+		cx::Vector3D t_delta = diff.matrix().block<3, 1>(0, 3);
+		Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(diff.matrix().block<3, 3>(0, 0));
+		double angle = angleAxis.angle();
+
+		cx::Vector3D shift = diff.coord(cx::Vector3D(0,0,0));
+
+
+		QString res = QString(""
+			"Shift vector (r):\t%1\n"
+			"Accuracy |v|:\t%2mm\n"
+			"Angle:       \t%3*\n"
+			"")
+			.arg(qstring_cast(shift))
+			.arg(shift.length(), 6, 'f', 2)
+			.arg(angle / M_PI * 180.0, 6, 'f', 2);
+
+		std::cout << res << std::endl;
+
+		return (fabs(angle/M_PI*180.0) < 0.1) && (shift.length() < 0.1);
+	}
+};
+
+
+
+TEST_CASE("ElastiX should register kaisa to a translated+resampled version of same", "[pluginRegistration][integration][not_win32][not_win64]")
 {
-	cx::DataManager::shutdown();
-	cx::MessageManager::shutdown();
-}
+	ElastiXFixture fixture;
 
-bool compareTransforms(cx::Transform3D result, cx::Transform3D solution)
-{
-	std::cout << "result\n" << result << std::endl;
-	std::cout << "solution\n" << solution << std::endl;
-
-	cx::Transform3D diff = solution * result.inv();
-
-	std::cout << "diff\n" << diff << std::endl;
-
-	cx::Vector3D t_delta = diff.matrix().block<3, 1>(0, 3);
-	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(diff.matrix().block<3, 3>(0, 0));
-	double angle = angleAxis.angle();
-
-	cx::Vector3D shift = diff.coord(cx::Vector3D(0,0,0));
-
-
-	QString res = QString(""
-		"Shift vector (r):\t%1\n"
-		"Accuracy |v|:\t%2mm\n"
-		"Angle:       \t%3*\n"
-		"")
-		.arg(qstring_cast(shift))
-		.arg(shift.length(), 6, 'f', 2)
-		.arg(angle / M_PI * 180.0, 6, 'f', 2);
-
-	std::cout << res << std::endl;
-
-	return (fabs(angle/M_PI*180.0) < 0.1) && (shift.length() < 0.1);
-}
-
-void testElastix()
-{
 	QString kaisa_padded_fname = cx::DataLocations::getTestDataPath() + "/testing/elastiX/kaisa_padded.mhd";
 	QString kaisa_resliced_fname = cx::DataLocations::getTestDataPath() + "/testing/elastiX/kaisa_resliced.mhd";
 	QString kaisa_resliced_linear_fname = cx::DataLocations::getTestDataPath() + "/testing/elastiX/kaisa_resliced_linear.mhd";
@@ -118,13 +125,9 @@ void testElastix()
 	parameters->getCurrentPreset()->setValue(elastixPreset);
 
 	cx::ElastixSingleThreadedRunner runner;
-	runner.registerLinear(kaisa_padded, kaisa_resliced_linear, parameters, &result);
+	REQUIRE(runner.registerLinear(kaisa_padded, kaisa_resliced_linear, parameters, &result));
 
-	REQUIRE(compareTransforms(result, solution) == true);
-}
-
-TEST_CASE("ElastiX should register kaisa to a translated+resampled version of same", "[pluginRegistration][integration]"){
-	testElastix();
+	REQUIRE(fixture.compareTransforms(result, solution) == true);
 }
 
 

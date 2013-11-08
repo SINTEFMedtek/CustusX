@@ -14,8 +14,6 @@
 
 #include "cxViewManager.h"
 
-//#include "sscView.h"
-
 #include <QGridLayout>
 #include <QWidget>
 #include <QTimer>
@@ -29,11 +27,6 @@
 #include "sscGLHelpers.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
-//#include "vtkRenderWindowInteractor.h"
-//#include "vtkInteractorStyleUnicam.h"
-//#include "vtkInteractorStyleTrackballCamera.h"
-//#include "vtkInteractorStyleTrackballActor.h"
-//#include "vtkInteractorStyleFlight.h"
 #include "cxLayoutData.h"
 
 #include "sscVolumetricRep.h"
@@ -58,13 +51,10 @@
 #include "sscImage.h"
 #include "cxCameraStyle.h"
 #include "cxRenderTimer.h"
+#include "cxLayoutWidget.h"
 
 namespace cx
 {
-
-// --------------------------------------------------------
-// --------------------------------------------------------
-// --------------------------------------------------------
 
 ViewManager *ViewManager::mTheInstance = NULL;
 ViewManager* viewManager()
@@ -92,8 +82,8 @@ void ViewManager::destroyInstance()
 }
 
 ViewManager::ViewManager() :
-				mLayout(NULL),
-				mMainWindowsCentralWidget(NULL),
+//				mLayout(NULL),
+//				mMainWindowsCentralWidget(NULL),
 				mRenderingTimer(NULL),
 				mGlobal2DZoom(true),
 				mGlobalObliqueOrientation(false),
@@ -127,19 +117,26 @@ ViewManager::~ViewManager()
 {
 }
 
-QWidget* ViewManager::initialize()
+
+void ViewManager::initialize()
 {
 	mCameraStyle.reset(new CameraStyle()); // uses the global viewmanager() instance - must be created after creation of this.
 
-	mLayout = new QGridLayout;
-	mMainWindowsCentralWidget = new QWidget;
-	mViewCache2D.reset(new ViewCache<ViewWidget>(mMainWindowsCentralWidget,	"View2D"));
-	mViewCache3D.reset(new ViewCache<ViewWidget>(mMainWindowsCentralWidget, "View3D"));
-	mViewCacheRT.reset(new ViewCache<ViewWidget>(mMainWindowsCentralWidget, "ViewRT"));
+	mLayoutWidgets.resize(2);
+	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
+	{
+		mLayoutWidgets[i] = new LayoutWidget;
+	}
 
-	mLayout->setSpacing(2);
-	mLayout->setMargin(4);
-	mMainWindowsCentralWidget->setLayout(mLayout);
+//	mLayout = new QGridLayout;
+//	mMainWindowsCentralWidget = new QWidget;
+	mViewCache2D.reset(new ViewCache<ViewWidget>(mLayoutWidgets[0],	"View2D"));
+	mViewCache3D.reset(new ViewCache<ViewWidget>(mLayoutWidgets[0], "View3D"));
+	mViewCacheRT.reset(new ViewCache<ViewWidget>(mLayoutWidgets[0], "ViewRT"));
+
+//	mLayout->setSpacing(2);
+//	mLayout->setMargin(4);
+//	mMainWindowsCentralWidget->setLayout(mLayout);
 
 	mInteractiveCropper.reset(new InteractiveCropper());
 	mInteractiveClipper.reset(new InteractiveClipper());
@@ -157,9 +154,13 @@ QWidget* ViewManager::initialize()
 	mGlobalZoom2DVal = SyncedValue::create(1);
 	this->setGlobal2DZoom(mGlobal2DZoom);
 
-	return mMainWindowsCentralWidget;
+//	return mMainWindowsCentralWidget;
 }
 
+QWidget *ViewManager::getLayoutWidget(int index)
+{
+	return mLayoutWidgets[index];
+}
 
 void ViewManager::setModifiedSlot()
 {
@@ -456,12 +457,15 @@ void ViewManager::deactivateCurrentLayout()
 	mViewCacheRT->clearUsedViews();
 	mViewMap.clear();
 
+	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
+		mLayoutWidgets[i]->clearViews();
+
 	for (unsigned i = 0; i < mViewGroups.size(); ++i)
 	{
 		mViewGroups[i]->removeViews();
 	}
 
-	this->setStretchFactors(LayoutRegion(0, 0, 10, 10), 0);
+//	this->setStretchFactors(LayoutRegion(0, 0, 10, 10), 0);
 	this->setActiveView("");
 	mSlicePlanesProxy->clearViewports();
 }
@@ -482,26 +486,17 @@ void ViewManager::setActiveLayout(const QString& layout)
 	this->deactivateCurrentLayout();
 
 //  std::cout << streamXml2String(next) << std::endl;
+//	LayoutData additional = LayoutData::create("additional", "additional", 2, 1);
 
-	for (LayoutData::iterator iter = next.begin(); iter != next.end(); ++iter)
-	{
-		LayoutData::ViewData view = *iter;
+//	if ()
+//	additional.setView(0, View::VIEW_3D, LayoutRegion(0, 0));
+//	additional.setView(0, ptSAGITTAL, LayoutRegion(1, 0));
 
-		if (view.mGroup < 0 || view.mPlane == ptCOUNT)
-			continue;
+	this->activateViews(mLayoutWidgets[0], next);
 
-		if (view.mPlane == ptNOPLANE || view.mPlane == ptCOUNT)
-		{
-			if (view.mType == ViewWidget::VIEW_3D)
-				this->activate3DView(view.mGroup, view.mRegion);
-			else if (view.mType == ViewWidget::VIEW_REAL_TIME)
-				this->activateRTStreamView(view.mGroup, view.mRegion);
-		}
-		else
-		{
-			this->activate2DView(view.mGroup, view.mPlane, view.mRegion);
-		}
-	}
+	LayoutData secondary = this->getLayoutData(mSecondaryActiveLayout);
+	if (!secondary.getUid().isEmpty())
+		this->activateViews(mLayoutWidgets[1], secondary);
 
 	// Set the same proxy in all wrappers, but stop adding after the
 	// first group with 2D views are found.
@@ -520,10 +515,41 @@ void ViewManager::setActiveLayout(const QString& layout)
 	}
 
 	mActiveLayout = layout;
-	emit
-	activeLayoutChanged();
+	emit activeLayoutChanged();
 
 	messageManager()->sendInfo("Layout changed to " + this->getLayoutData(mActiveLayout).getName());
+}
+
+void ViewManager::setSecondaryLayout(QString layout)
+{
+	mSecondaryActiveLayout = layout;
+
+	QString current = mActiveLayout;
+	mActiveLayout = "";
+	this->setActiveLayout(current);
+}
+
+void ViewManager::activateViews(LayoutWidget *widget, LayoutData next)
+{
+	for (LayoutData::iterator iter = next.begin(); iter != next.end(); ++iter)
+	{
+		LayoutData::ViewData view = *iter;
+
+		if (view.mGroup < 0 || view.mPlane == ptCOUNT)
+			continue;
+
+		if (view.mPlane == ptNOPLANE || view.mPlane == ptCOUNT)
+		{
+			if (view.mType == ViewWidget::VIEW_3D)
+				this->activate3DView(widget, view.mGroup, view.mRegion);
+			else if (view.mType == ViewWidget::VIEW_REAL_TIME)
+				this->activateRTStreamView(widget, view.mGroup, view.mRegion);
+		}
+		else
+		{
+			this->activate2DView(widget, view.mGroup, view.mPlane, view.mRegion);
+		}
+	}
 }
 
 void ViewManager::setRenderingInterval(int interval)
@@ -539,44 +565,27 @@ void ViewManager::setRenderingInterval(int interval)
 	mRenderingTimer->start(interval);
 }
 
-/** Set the stretch factors of columns and rows in mLayout.
- */
-void ViewManager::setStretchFactors(LayoutRegion region, int stretchFactor)
-{
-	// set stretch factors for the affected cols to 1 in order to get even distribution
-	for (int i = region.pos.col; i < region.pos.col + region.span.col; ++i)
-	{
-		mLayout->setColumnStretch(i, stretchFactor);
-	}
-	// set stretch factors for the affected rows to 1 in order to get even distribution
-	for (int i = region.pos.row; i < region.pos.row + region.span.row; ++i)
-	{
-		mLayout->setRowStretch(i, stretchFactor);
-	}
-}
-
-void ViewManager::activateView(ViewWrapperPtr wrapper, int group, LayoutRegion region)
+void ViewManager::activateView(LayoutWidget* widget, ViewWrapperPtr wrapper, int group, LayoutRegion region)
 {
 	ViewWidget* view = wrapper->getView();
 	mViewMap[view->getUid()] = view;
 	mViewGroups[group]->addView(wrapper);
-	mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col);
-	this->setStretchFactors(region, 1);
+	widget->addView(view, region);
 
 	view->show();
 }
 
-void ViewManager::activate2DView(int group, PLANE_TYPE plane, LayoutRegion region)
+void ViewManager::activate2DView(LayoutWidget* widget, int group, PLANE_TYPE plane, LayoutRegion region)
 {
 	ViewWidget* view = mViewCache2D->retrieveView();
 	view->setType(View::VIEW_2D);
 
 	ViewWrapper2DPtr wrapper(new ViewWrapper2D(view));
 	wrapper->initializePlane(plane);
-	this->activateView(wrapper, group, region);
+	this->activateView(widget, wrapper, group, region);
 }
 
-void ViewManager::activate3DView(int group, LayoutRegion region)
+void ViewManager::activate3DView(LayoutWidget* widget, int group, LayoutRegion region)
 {
 	ViewWidget* view = mViewCache3D->retrieveView();
 	view->setType(View::VIEW_3D);
@@ -586,15 +595,15 @@ void ViewManager::activate3DView(int group, LayoutRegion region)
 		mInteractiveCropper->setView(view);
 	}
 
-	this->activateView(wrapper, group, region);
+	this->activateView(widget, wrapper, group, region);
 }
 
-void ViewManager::activateRTStreamView(int group, LayoutRegion region)
+void ViewManager::activateRTStreamView(LayoutWidget *widget, int group, LayoutRegion region)
 {
 	ViewWidget* view = mViewCacheRT->retrieveView();
 	view->setType(View::VIEW_REAL_TIME);
 	ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view));
-	this->activateView(wrapper, group, region);
+	this->activateView(widget, wrapper, group, region);
 }
 
 void ViewManager::addDefaultLayout(LayoutData data)
@@ -765,52 +774,6 @@ void ViewManager::addDefaultLayouts()
 		layout.setView(0, ViewWidget::VIEW_REAL_TIME, LayoutRegion(0, 0, 2, 2));
 		this->addDefaultLayout(layout);
 	}
-
-//  {
-//    LayoutData layout;
-//    layout.resetUid("LAYOUT_ACS_1X3");
-//    layout.setName("ACS 1x3");
-//    layout.resize(1,3);
-//    layout.setView(0, ptAXIAL,    LayoutRegion(0, 0));
-//    layout.setView(0, ptCORONAL,  LayoutRegion(0, 1));
-//    layout.setView(0, ptSAGITTAL, LayoutRegion(0, 2));
-//    this->addDefaultLayout(layout);
-//  }
-//  {
-//    LayoutData layout;
-//    layout.resetUid("LAYOUT_ACSACS_2X3");
-//    layout.setName("ACSACS 2x3");
-//    layout.resize(2,3);
-//    layout.setView(0, ptAXIAL,    LayoutRegion(0, 0));
-//    layout.setView(0, ptCORONAL,  LayoutRegion(0, 1));
-//    layout.setView(0, ptSAGITTAL, LayoutRegion(0, 2));
-//    layout.setView(1, ptAXIAL,    LayoutRegion(1, 0));
-//    layout.setView(1, ptCORONAL,  LayoutRegion(1, 1));
-//    layout.setView(1, ptSAGITTAL, LayoutRegion(1, 2));
-//    this->addDefaultLayout(layout);
-//  }
-//  {
-//    LayoutData layout;
-//    layout.resetUid("LAYOUT_Any_2X3");
-//    layout.setName("Any 2x3");
-//    layout.resize(2,3);
-//    layout.setView(0, ptANYPLANE,  LayoutRegion(0, 0));
-//    layout.setView(0, ptSIDEPLANE, LayoutRegion(1, 0));
-//    layout.setView(1, ptANYPLANE,  LayoutRegion(0, 1));
-//    layout.setView(1, ptSIDEPLANE, LayoutRegion(1, 1));
-//    layout.setView(2, ptANYPLANE,  LayoutRegion(0, 2));
-//    layout.setView(2, ptSIDEPLANE, LayoutRegion(1, 2));
-//    this->addDefaultLayout(layout);
-//  }
-//  {
-//    LayoutData layout;
-//    layout.resetUid("LAYOUT_3DAny_1X2");
-//    layout.setName("3DAny 1x2");
-//    layout.resize(1,2);
-//    layout.setView(0, ViewWidget::VIEW_3D,   LayoutRegion(0, 0));
-//    layout.setView(0, ptANYPLANE,  LayoutRegion(0, 1));
-//    this->addDefaultLayout(layout);
-//  }
 }
 
 void ViewManager::renderAllViewsSlot()
@@ -1079,123 +1042,10 @@ void ViewManager::saveGlobalSettings()
 	file.save();
 }
 
-//void ViewManager::fillModelTree(TreeItemPtr root)
-//{
-//  //TreeItemPtr item;
-//  TreeItemPtr topItem = TreeItemImpl::create(root, "view groups", "", "");
-//
-//  for (unsigned i = 0; i < mViewGroups.size(); ++i)
-//  {
-//    ViewGroupPtr group = mViewGroups[i];
-//    std::vector<ViewWidget*> views = group->getViews();
-//    if (views.empty())
-//      continue;
-//    TreeItemPtr groupItem = TreeItemImpl::create(topItem, "group"+qstring_cast(i), "view group", qstring_cast(i));
-//    for (unsigned j=0; j<views.size(); ++j)
-//    {
-//      TreeItemPtr viewItem = TreeItemImpl::create(groupItem, qstring_cast(views[j]->getName()), qstring_cast(views[j]->getTypeString()), "");
-//      std::vector<RepPtr> reps = views[j]->getReps();
-//      for (unsigned k=0; k<reps.size(); ++k)
-//      {
-//        QString name = reps[k]->getName();
-//        if (name.isEmpty())
-//          name = reps[k]->getType();
-//        TreeItemImpl::create(viewItem, qstring_cast(name), qstring_cast(reps[k]->getType()), "");
-//      }
-//    }
-//
-//    std::vector<ImagePtr> images = group->getImages();
-//    for (unsigned j=0; j<images.size(); ++j)
-//    {
-//      TreeItemPtr imageItem = TreeItemImage::create(groupItem, images[j]->getName());
-//    }
-//  }
-//}
-
 QActionGroup* ViewManager::createInteractorStyleActionGroup()
 {
 	return mCameraStyle->createInteractorStyleActionGroup();
-//	QActionGroup* camGroup = new QActionGroup(this);
-//	camGroup->setExclusive(true);
-
-//	this->addInteractorStyleAction("Normal Camera", camGroup,
-//	                               "vtkInteractorStyleTrackballCamera",
-//	                               QIcon(":/icons/camera-n.png"),
-//	                               "Set 3D interaction to the normal camera-oriented style.");
-//	this->addInteractorStyleAction("Tool", camGroup,
-//	                               "cxInteractorStyleTool",
-//	                               QIcon(":/icons/camera-t.png"),
-//	                               "Camera following tool.");
-//	this->addInteractorStyleAction("Angled Tool", camGroup,
-//	                               "cxInteractorStyleAngledTool",
-//	                               QIcon(":/icons/camera-at.png"),
-//	                               "Camera following tool (Placed at an angle of 20 degrees).");
-//	this->addInteractorStyleAction("Unicam", camGroup,
-//	                               "vtkInteractorStyleUnicam",
-//	                               QIcon(":/icons/camera-u.png"),
-//	                               "Set 3D interaction to a single-button style, useful for touch screens.");
-
-////	this->addInteractorStyleAction("Object", camGroup, "vtkInteractorStyleTrackballActor",
-////					QIcon(":/icons/camera-o.png"), "Set 3D interaction to a object-oriented style.");
-////	this->addInteractorStyleAction("Flight", camGroup, "vtkInteractorStyleFlight", QIcon(":/icons/camera-f.png"),
-////					"Set 3D interaction to a flight style.");
-
-//	return camGroup;
 }
-
-//void ViewManager::addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QIcon icon,
-//				QString helptext)
-//{
-//	vtkRenderWindowInteractor* interactor = NULL;
-//	ViewWidget* view = viewManager()->get3DView();
-//	if (view)
-//		interactor = view->getRenderWindow()->GetInteractor();
-
-////	std::cout << "add interact" << std::endl;
-//	QAction* action = new QAction(caption, group);
-//	action->setIcon(icon);
-//	action->setCheckable(true);
-//	action->setData(className);
-//	action->setToolTip(helptext);
-//	action->setWhatsThis(helptext);
-//	if (interactor)
-//		action->setChecked(QString(interactor->GetInteractorStyle()->GetClassName()) == className);
-//	connect(action, SIGNAL(triggered(bool)), this, SLOT(setInteractionStyleActionSlot()));
-//}
-
-//void ViewManager::setInteractionStyleActionSlot()
-//{
-//	QAction* theAction = static_cast<QAction*>(sender());
-//	if(!theAction)
-//		return;
-
-//	QString uid = theAction->data().toString();
-
-//	ViewWidget* view = viewManager()->get3DView();
-//	if (!view)
-//		return;
-//	vtkRenderWindowInteractor* interactor = view->getRenderWindow()->GetInteractor();
-
-//	if (uid.startsWith("cx"))
-//	{
-//		// reset to default vtk interactor
-//		interactor->SetInteractorStyle(vtkInteractorStyleTrackballCameraPtr::New());
-
-//	}
-//	else
-//	{
-//		if (uid=="vtkInteractorStyleTrackballCamera")
-//			interactor->SetInteractorStyle(vtkInteractorStyleTrackballCameraPtr::New());
-//		else if (uid=="vtkInteractorStyleUnicam")
-//			interactor->SetInteractorStyle(vtkInteractorStyleUnicamPtr::New());
-//	//  else if (uid=="vtkInteractorStyleTrackballActor")
-//	//    interactor->SetInteractorStyle(vtkInteractorStyleTrackballActorPtr::New());
-//		else if (uid=="vtkInteractorStyleFlight")
-//			interactor->SetInteractorStyle(vtkInteractorStyleFlightPtr::New());
-//	}
-
-//	messageManager()->sendInfo("Set Interactor: " + uid);
-//}
 
 void ViewManager::autoShowData(DataPtr data)
 {

@@ -80,7 +80,7 @@ TEST_CASE("MultiVolume3DRepProducer creates 1 rep using vtkGPUVolumeRayCastMappe
 	CHECK(dynamic_cast<vtkGPUVolumeRayCastMapper*>(rep->getVtkVolume()->GetMapper()));
 }
 
-TEST_CASE("MultiVolume3DRepProducer creates 1 rep using sscProgressiveLODVolumeTextureMapper3D for 1 added image.", "[unit][not_windows]")
+TEST_CASE("MultiVolume3DRepProducer creates 1 rep using sscProgressiveLODVolumeTextureMapper3D for 1 added image.", "[unit][not_win32][not_win64]")
 {
 	MultiVolume3DRepProducerFixture fixture;
 	fixture.initializeVisualizerAndImages("sscProgressiveLODVolumeTextureMapper3D", 1);

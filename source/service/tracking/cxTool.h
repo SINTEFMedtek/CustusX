@@ -84,7 +84,6 @@ public:
 
 	virtual QString getGraphicsFileName() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
-	virtual Transform3D get_prMt() const;
 	virtual bool getVisible() const;
 	virtual bool isInitialized() const;
 	virtual QString getUid() const;
@@ -129,7 +128,6 @@ private:
 	IgstkToolPtr mTool;
 
 	vtkPolyDataPtr mPolyData; ///< the polydata used to represent the tool graphically
-	Transform3DPtr m_prMt; ///< the transform from the tool to the patient reference
 
 	bool mValid; ///< whether this tool is constructed correctly or not
 	bool mConfigured; ///< whether or not the tool is properly configured

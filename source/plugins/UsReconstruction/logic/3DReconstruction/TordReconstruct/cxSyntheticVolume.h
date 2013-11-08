@@ -20,7 +20,7 @@ namespace cx {
 
 class cxSyntheticVolume {
 public:
-	
+
 	cxSyntheticVolume(const Eigen::Array3i& dimensions)
 	{
 		mDims = dimensions;
@@ -32,7 +32,7 @@ public:
 	{
 		return mDims;
 	}
-	
+
 	/**
 	 * Sample a set of ultrasound slices.
 	 * The planes to use are defined by planes. The Transform3D-s represent the transform
@@ -44,26 +44,30 @@ public:
 	 *               for the desired slices.
 	 * @param pixelSpacing The size of each pixel in the ultrasonic image.
 	 * @param sliceDimension The size in pixels of each ultrasound image.
+	 * @param noiseSigma The sigma of the noise distribution on each image
+	 * @param noiseMean The sigma of the noise distribution on each image
 	 */
 	virtual ProcessedUSInputDataPtr
 	sampleUsData(const std::vector<Transform3D>& planes,
 	             const Eigen::Array2f& pixelSpacing,
-	             const Eigen::Array2i& sliceDimension) const;
+	             const Eigen::Array2i& sliceDimension,
+	             const double noiseSigma,
+	             const unsigned char noiseMean) const;
 
 	/**
 	 * Evaluate the volume at position (x, y, z).
 	 * The coordinates are given in volume space.
-	 */	 
+	 */
 	virtual unsigned char
 	evaluate(const float x,
 	         const float y,
 	         const float z) const = 0;
 
 	virtual float computeRMSError(vtkImageDataPtr vol);
-	
+
 protected:
 	Eigen::Array3i mDims;
-	
+
 };
 
 }

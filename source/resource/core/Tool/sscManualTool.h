@@ -52,7 +52,6 @@ public:
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual void saveTransformsAndTimestamps(){}
 	virtual void setTransformSaveFile(const QString& filename){}
-	virtual Transform3D get_prMt() const;
 	virtual bool getVisible() const;
 	virtual QString getUid() const;
 	virtual QString getName() const;
@@ -80,10 +79,7 @@ private:
 	vtkSTLReaderPtr mSTLReader;
 	vtkCursor3DPtr mCrossHair;
 
-	// mutex-protected mutable data
 	bool mVisible;
-	Transform3D m_prMt;
-	mutable QMutex mMutex;
 	double mTimestamp;
 };
 

@@ -315,7 +315,7 @@ class IGSTK(CppComponent):
 
 class ISB_DataStreaming(CppComponent):
     def name(self):
-        self.mCurrentRevision = "450"
+        self.mCurrentRevision = "470"
         return "ISB_DataStreaming"
     def help(self):
         return 'ISB GE Digital Interface stuff'
@@ -453,7 +453,7 @@ class LevelSetSegmentation(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:smistad/Level-Set-Segmentation')
     def update(self):
-        self._getBuilder().gitUpdate('master', submodules=True)    
+        self._getBuilder().gitCheckout('0558190d667be653dae7d2ca65bdece6c84d0f7e', submodules=True)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
