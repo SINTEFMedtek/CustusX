@@ -8,6 +8,7 @@
 #include <vtkImageClip.h>
 #include <vtkImageShiftScale.h>
 #include <vtkImageAccumulate.h>
+#include <vtkImageLuminance.h>
 
 #include "sscImage.h"
 #include "sscDataManagerImpl.h"
@@ -22,7 +23,6 @@
 #include "sscTime.h"
 
 typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
-typedef vtkSmartPointer<class vtkImageShiftScale> vtkImageShiftScalePtr;
 
 namespace cx
 {
@@ -194,7 +194,7 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ImagePtr image)
 		return retval;
 
 	//image
-	retval["Filepath"] = image->getFilePath().toStdString();
+	retval["Filename"] = image->getFilename().toStdString();
 	retval["Coordinate system"] = image->getCoordinateSystem().toString().toStdString();
 	retval["Image type"] = image->getImageType().toStdString();
 	retval["Scalar minimum"] = string_cast(image->getMin());
@@ -275,4 +275,42 @@ DoubleBoundingBox3D findEnclosingBoundingBox(std::vector<ImagePtr> images, Trans
 		datas[i] = images[i];
 	return findEnclosingBoundingBox(datas, qMr);
 }
+
+vtkImageDataPtr convertImageDataToGrayScale(vtkImageDataPtr image)
+{
+	vtkImageDataPtr retval = image;
+	if (image->GetNumberOfScalarComponents() > 2)
+	{
+		vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
+		luminance->SetInput(image);
+		retval = luminance->GetOutput();
+		retval->Update();
+	}
+	return retval;
+}
+
+vtkImageDataPtr convertImageDataTo8Bit(vtkImageDataPtr image, double windowWidth, double windowLevel)
+{
+	vtkImageDataPtr retval = image;
+	if (image->GetScalarSize() > 8)
+		{
+			vtkImageShiftScalePtr imageCast = vtkImageShiftScalePtr::New();
+			imageCast->SetInput(image);
+
+//			double scalarMax = windowWidth/2.0 + windowLevel;
+			double scalarMin = windowWidth/2.0 - windowLevel;
+
+			double addToScalarValue = -scalarMin;
+			double multiplyToScalarValue = 255/windowWidth;
+
+			imageCast->SetShift(addToScalarValue);
+			imageCast->SetScale(multiplyToScalarValue);
+			imageCast->SetOutputScalarTypeToUnsignedChar();
+			imageCast->ClampOverflowOn();
+			retval = imageCast->GetOutput();
+			retval->Update();
+		}
+	return retval;
+}
+
 } // namespace cx

@@ -33,15 +33,12 @@
 namespace cxtest
 {
 
+namespace
+{
 void initTest()
 {
 	cx::DataLocations::setTestMode();
 	cx::settings()->setValue("renderingInterval", 4);
-#ifdef __APPLE__
-	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
-#else
-	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
-#endif
 }
 
 void requireVolumeIn3DScene()
@@ -54,49 +51,103 @@ void requireVolumeIn3DScene()
 	REQUIRE(numNonZeroPixels < output->GetDimensions()[0]*output->GetDimensions()[1]);
 }
 
-TEST_CASE("Speed: Run CustusX with a minimum render speed", "[speed][gui][integration]")
+double calculateFPS(bool slicing)
 {
-	initTest();
-
-	JenkinsMeasurement jenkins;
-	jenkins.initialize();
-
 	CustusXController custusX(NULL);
 	custusX.mPatientFolder = cx::DataLocations::getTestDataPath() + "/Phantoms/Kaisa/CustusX/Speed_Test_Kaisa.cx3";
+	custusX.mEnableSlicing = slicing;
 
 	custusX.start();
 	qApp->exec();
 	requireVolumeIn3DScene();
 	custusX.stop();
 
-	jenkins.createOutput("FPS", QString::number(custusX.mMeasuredFPS));
-
-	// TODO: enter this value into config file
-	double minimumFPS = 5;
-	REQUIRE(custusX.mMeasuredFPS > minimumFPS);
+	return custusX.mMeasuredFPS;
 }
 
-TEST_CASE("Speed: Run CustusX with interactive slicing at a minimum render speed", "[speed][gui][integration]")
+}
+
+TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][not_win32]")
 {
 	initTest();
+	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
 
 	JenkinsMeasurement jenkins;
 	jenkins.initialize();
 
-	CustusXController custusX(NULL);
-	custusX.mPatientFolder = cx::DataLocations::getTestDataPath() + "/Phantoms/Kaisa/CustusX/Speed_Test_Kaisa.cx3";
-	custusX.mEnableSlicing = true;
-
-	custusX.start();
-	qApp->exec();
-	requireVolumeIn3DScene();
-	custusX.stop();
-
-	jenkins.createOutput("FPS_Slicing", QString::number(custusX.mMeasuredFPS));
+	int fps = calculateFPS(false);
+	jenkins.createOutput("FPS_vtkVolumeTextureMapper3D", QString::number(fps));
 
 	// TODO: enter this value into config file
 	double minimumFPS = 5;
-	REQUIRE(custusX.mMeasuredFPS > minimumFPS);
+	REQUIRE(fps > minimumFPS);
+}
+
+TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration][not_win32]")
+{
+	initTest();
+	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
+
+	JenkinsMeasurement jenkins;
+	jenkins.initialize();
+
+	int fps = calculateFPS(false);
+	jenkins.createOutput("FPS_vtkGPUVolumeRayCastMapper", QString::number(fps));
+
+	// TODO: enter this value into config file
+	double minimumFPS = 5;
+	REQUIRE(fps > minimumFPS);
+}
+
+TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integration][not_win32]")
+{
+	initTest();
+	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
+
+	JenkinsMeasurement jenkins;
+	jenkins.initialize();
+
+	int fps = calculateFPS(false);
+	jenkins.createOutput("FPS_vtkGPUVolumeRayCastMapper_Slicing", QString::number(fps));
+
+	// TODO: enter this value into config file
+	double minimumFPS = 5;
+	REQUIRE(fps > minimumFPS);
+}
+
+
+TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper renderer", "[speed][gui][integration][not_win32][not_win64]")
+{
+	initTest();
+	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
+
+	JenkinsMeasurement jenkins;
+	jenkins.initialize();
+
+	int fps = calculateFPS(false);
+	jenkins.createOutput("FPS_vtkOpenGLGPUMultiVolumeRayCastMapper", QString::number(fps));
+
+	// TODO: enter this value into config file
+	double minimumFPS = 5;
+//	REQUIRE(fps > minimumFPS);
+	REQUIRE(true);
+}
+
+TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper with slicing", "[speed][gui][integration][not_win32][not_win64]")
+{
+	initTest();
+	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
+
+	JenkinsMeasurement jenkins;
+	jenkins.initialize();
+
+	int fps = calculateFPS(false);
+	jenkins.createOutput("FPS_vtkOpenGLGPUMultiVolumeRayCastMapper_Slicing", QString::number(fps));
+
+	// TODO: enter this value into config file
+	double minimumFPS = 5;
+//	REQUIRE(fps > minimumFPS);
+	REQUIRE(true);
 }
 
 }//namespace cx

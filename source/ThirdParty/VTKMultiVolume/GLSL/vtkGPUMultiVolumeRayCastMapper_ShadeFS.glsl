@@ -16,15 +16,13 @@
 // shading.
 // The functions are used in composite mode.
 
-#version 110
-
 // "value" is a sample of the dataset.
 // Think of "value" as an object.
 
 // from 1- vs 4-component shader.
 vec4 colorFromValue(int volNumber,vec4 value);
 
-uniform sampler3D dataSetTexture[10]; // need neighbors for gradient
+uniform sampler3D dataSetTexture[4]; // need neighbors for gradient
 
 
 // Change-of-coordinate matrix from eye space to texture space
@@ -41,14 +39,14 @@ uniform vec3 cellScale;
 
 // Entry position (global scope), updated in the loop
 vec3 pos;
-vec3 posX[9];
+vec3 posX[3];
 
 
 // Incremental vector in texture space (global scope)
 vec3 rayDir;
 
-uniform mat4 P1toPN[9]; //Mehdi
-uniform mat4 PNtoP1[9]; //Mehdi
+uniform mat4 P1toPN[3]; //Mehdi
+uniform mat4 PNtoP1[3]; //Mehdi
 
 uniform int Number_Of_Volumes;
 
@@ -72,34 +70,34 @@ vec4 hPos; // homogeneous position
 void initShade()
 {
   
-  xvec[0]=vec3(cellStep.x,0.0,0.0); // 0.01
-  yvec[0]=vec3(0.0,cellStep.y,0.0);
-  zvec[0]=vec3(0.0,0.0,cellStep.z);
+	xvec[0]=vec3(cellStep.x,0.0,0.0); // 0.01
+	yvec[0]=vec3(0.0,cellStep.y,0.0);
+	zvec[0]=vec3(0.0,0.0,cellStep.z);
   
-  for(int iii=1;iii<Number_Of_Volumes;iii++)
-  {
-     xvec[iii] = vec3(P1toPN[iii-1]*vec4(xvec[0],0));
-     yvec[iii] = vec3(P1toPN[iii-1]*vec4(yvec[0],0));  
-     zvec[iii] = vec3(P1toPN[iii-1]*vec4(zvec[0],0));
-  } 
+	for(int iii=1;iii<Number_Of_Volumes;iii++)
+	{
+		xvec[iii] = vec3(P1toPN[iii-1]*vec4(xvec[0],0));
+		yvec[iii] = vec3(P1toPN[iii-1]*vec4(yvec[0],0));  
+		zvec[iii] = vec3(P1toPN[iii-1]*vec4(zvec[0],0));
+	} 
   
-  // Reverse ray direction in eye space
-  wReverseRayDir=eyeToTexture3*rayDir;
-  wReverseRayDir=wReverseRayDir*minusOne;
-  wReverseRayDir=normalize(wReverseRayDir);
+	// Reverse ray direction in eye space
+	wReverseRayDir=eyeToTexture3*rayDir;
+	wReverseRayDir=wReverseRayDir*minusOne;
+	wReverseRayDir=normalize(wReverseRayDir);
   
-  // Directonal light: w==0
-  if(gl_LightSource[0].position.w==0.0)
-    {
-    ldir=gl_LightSource[0].position.xyz;
-    ldir=normalize(ldir);
-    h=normalize(ldir+wReverseRayDir);
-    }
-  else
-    {
-    lightPos=gl_LightSource[0].position.xyz/gl_LightSource[0].position.w;
-    hPos.w=1.0; // used later
-    }
+	// Directonal light: w==0
+	if(gl_LightSource[0].position.w==0.0)
+	{
+		ldir=gl_LightSource[0].position.xyz;
+		ldir=normalize(ldir);
+		h=normalize(ldir+wReverseRayDir);
+	}
+	else
+	{
+		lightPos=gl_LightSource[0].position.xyz/gl_LightSource[0].position.w;
+		hPos.w=1.0; // used later
+	}
 }
 
 // ----------------------------------------------------------------------------
@@ -111,26 +109,67 @@ vec4 shade(int volNumber, vec4 value)
   float att;
   float spot;
   
-if(volNumber==0)
-{
-  g1.x=texture3D(dataSetTexture[0],pos+xvec[0]).x;
-  g1.y=texture3D(dataSetTexture[0],pos+yvec[0]).x;
-  g1.z=texture3D(dataSetTexture[0],pos+zvec[0]).x;
-  g2.x=texture3D(dataSetTexture[0],pos-xvec[0]).x;
-  g2.y=texture3D(dataSetTexture[0],pos-yvec[0]).x;
-  g2.z=texture3D(dataSetTexture[0],pos-zvec[0]).x;
-}
-else
-{
-  posX[volNumber-1] = vec3(P1toPN[volNumber-1]*vec4(pos,1));
+#ifdef __APPLE__
+  /*
+	if(volNumber==0)
+	{
+	  g1.x=texture3D(dataSetTexture[0],pos+xvec[0]).x;
+	  g1.y=texture3D(dataSetTexture[0],pos+yvec[0]).x;
+	  g1.z=texture3D(dataSetTexture[0],pos+zvec[0]).x;
+	  g2.x=texture3D(dataSetTexture[0],pos-xvec[0]).x;
+	  g2.y=texture3D(dataSetTexture[0],pos-yvec[0]).x;
+	  g2.z=texture3D(dataSetTexture[0],pos-zvec[0]).x;
+	}
+	else
+	*/
+	{
+	if(volNumber==1)
+		{
+		  posX[0] = vec3(P1toPN[0]*vec4(pos,1));
+		
+		  g1.x=texture3D(dataSetTexture[1],posX[0]+xvec[1]).x;
+		  g1.y=texture3D(dataSetTexture[1],posX[0]+yvec[1]).x;
+		  g1.z=texture3D(dataSetTexture[1],posX[0]+zvec[1]).x;
+		  g2.x=texture3D(dataSetTexture[1],posX[0]-xvec[1]).x;
+		  g2.y=texture3D(dataSetTexture[1],posX[0]-yvec[1]).x;
+		  g2.z=texture3D(dataSetTexture[1],posX[0]-zvec[1]).x;
+		}
+	if(volNumber==2)
+		{
+		  posX[1] = vec3(P1toPN[1]*vec4(pos,1));
+		
+		  g1.x=texture3D(dataSetTexture[2],posX[1]+xvec[2]).x;
+		  g1.y=texture3D(dataSetTexture[2],posX[1]+yvec[2]).x;
+		  g1.z=texture3D(dataSetTexture[2],posX[1]+zvec[2]).x;
+		  g2.x=texture3D(dataSetTexture[2],posX[1]-xvec[2]).x;
+		  g2.y=texture3D(dataSetTexture[2],posX[1]-yvec[2]).x;
+		  g2.z=texture3D(dataSetTexture[2],posX[1]-zvec[2]).x;
+		}
+	if(volNumber==3)
+		{
+		  posX[2] = vec3(P1toPN[2]*vec4(pos,1));
+		
+		  g1.x=texture3D(dataSetTexture[3],posX[2]+xvec[3]).x;
+		  g1.y=texture3D(dataSetTexture[3],posX[2]+yvec[3]).x;
+		  g1.z=texture3D(dataSetTexture[3],posX[2]+zvec[3]).x;
+		  g2.x=texture3D(dataSetTexture[3],posX[2]-xvec[3]).x;
+		  g2.y=texture3D(dataSetTexture[3],posX[2]-yvec[3]).x;
+		  g2.z=texture3D(dataSetTexture[3],posX[2]-zvec[3]).x;
+		}
+	}
+#else
 
-  g1.x=texture3D(dataSetTexture[volNumber],posX[volNumber-1]+xvec[volNumber]).x;
-  g1.y=texture3D(dataSetTexture[volNumber],posX[volNumber-1]+yvec[volNumber]).x;
-  g1.z=texture3D(dataSetTexture[volNumber],posX[volNumber-1]+zvec[volNumber]).x;
-  g2.x=texture3D(dataSetTexture[volNumber],posX[volNumber-1]-xvec[volNumber]).x;
-  g2.y=texture3D(dataSetTexture[volNumber],posX[volNumber-1]-yvec[volNumber]).x;
-  g2.z=texture3D(dataSetTexture[volNumber],posX[volNumber-1]-zvec[volNumber]).x;
-}
+		posX[volNumber-1] = vec3(P1toPN[volNumber-1]*vec4(pos,1));
+		
+		g1.x=texture3D(dataSetTexture[volNumber],posX[volNumber-1]+xvec[volNumber]).x;
+		g1.y=texture3D(dataSetTexture[volNumber],posX[volNumber-1]+yvec[volNumber]).x;
+		g1.z=texture3D(dataSetTexture[volNumber],posX[volNumber-1]+zvec[volNumber]).x;
+		g2.x=texture3D(dataSetTexture[volNumber],posX[volNumber-1]-xvec[volNumber]).x;
+		g2.y=texture3D(dataSetTexture[volNumber],posX[volNumber-1]-yvec[volNumber]).x;
+		g2.z=texture3D(dataSetTexture[volNumber],posX[volNumber-1]-zvec[volNumber]).x;
+
+#endif
+
   // g1-g2 is  the gradient in texture coordinates
   // the result is the normalized gradient in eye coordinates.
   

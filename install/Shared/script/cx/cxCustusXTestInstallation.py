@@ -33,20 +33,29 @@ class CustusXTestInstallation:
     Represents one installed version of CustusX,
     along with functionality for testing it.
     '''
-    def __init__(self):
-        pass
-
-    def setRootDir(self, root_dir):
-        'root dir for user data. Test results can be placed here.'
+    def __init__(self, target_platform, root_dir, install_root, test_data_path):
+        '''
+        target_platform: cxUtilities.PlatformInfo instance describing target platform
+        root_dir: root dir for user data. Test results can be placed here.
+        install_root: path to base of installed package, i.e. where the CustusX folder is located.
+        test_data_path: location of test data
+        '''
+        self.target_platform = target_platform
         self.root_dir = root_dir
-
-    def setInstalledRoot(self, install_root):
-        'path to base of installed package, i.e. where the CustusX folder is located.'
         self.install_root = install_root
+        self.test_data_path = test_data_path
 
-    def setTestDataPath(self, path):
-        'location of test data'
-        self.test_data_path = path
+#    def setRootDir(self, root_dir):
+#        'root dir for user data. Test results can be placed here.'
+#        self.root_dir = root_dir
+
+#    def setInstalledRoot(self, install_root):
+#        'path to base of installed package, i.e. where the CustusX folder is located.'
+#        self.install_root = install_root
+
+#    def setTestDataPath(self, path):
+#        'location of test data'
+#        self.test_data_path = path
         
     def getTestDataPath(self):
         return self.test_data_path
@@ -54,34 +63,41 @@ class CustusXTestInstallation:
     def testInstallation(self):
         PrintFormatter.printHeader('Test installation', level=2)
         appPath = self._getInstalledBinaryPath()
+        target = self.target_platform.get_target_platform()
      
-        if platform.system == 'Linux':
+        if target == 'linux':
             self._testExecutable(appPath, 'Catch', '-h')
             self._testExecutable(appPath, 'CustusX')
             self._testExecutable(appPath, 'OpenIGTLinkServer')
-            
-        if platform.system() == 'Darwin':
+        elif target == 'apple':
             self._testExecutable(appPath, 'Catch', '-h')
             self._testExecutable(appPath, 'CustusX')
             self._testExecutable(appPath, 'OpenIGTLinkServer')
             self._testExecutable(appPath, 'GrabberServer')
-            
-        if platform.system() == 'Windows':
-            if "32" in appPath: #Win32
-                self._testExecutable(appPath, 'Catch.exe', '-h')
-                self._testExecutable(appPath, 'UltrasonixServer.exe')
-            else: #Win64
-                self._testExecutable(appPath, 'Catch.exe', '-h')
-                self._testExecutable(appPath, 'CustusX.exe')
-                self._testExecutable(appPath, 'OpenIGTLinkServer.exe')
+        elif target == 'win32':
+            self._testExecutable(appPath, 'Catch.exe', '-h')
+            self._testExecutable(appPath, 'UltrasonixServer.exe')
+        elif target == 'win64':
+            self._testExecutable(appPath, 'Catch.exe', '-h')
+            self._testExecutable(appPath, 'CustusX.exe')
+            self._testExecutable(appPath, 'OpenIGTLinkServer.exe')
+        else:
+            PrintFormatter.printInfo('Error in Test Installation: Unknown platform  %s.' % target)
                 
+    def runUnstableTests(self):
+        PrintFormatter.printHeader('Run unstable tests', level=2)
+        self._runCatchTestsWrappedInCTestOnInstalled('[unstable]')
+
     def runIntegrationTests(self):
         PrintFormatter.printHeader('Run integration tests', level=2)
+        self._runCatchTestsWrappedInCTestOnInstalled('[integration]~[unstable]')
+
+    def _runCatchTestsWrappedInCTestOnInstalled(self, tags):
         appPath = self._getInstalledBinaryPath()
         self._connectTestDataToInstallation()        
-        testRunner = cxTestRunner.TestRunner()
+        testRunner = cxTestRunner.TestRunner(self.target_platform)
         testRunner.resetCustusXDataRepo(self.getTestDataPath())
-        tags = testRunner.includeTagsForOS('[integration]')
+        tags = testRunner.includeTagsForOS(tags)
         outPath = testRunner.generateOutpath(self.root_dir)
         testRunner.runCatchTestsWrappedInCTestGenerateJUnit(tags, catchPath=appPath, outPath=outPath)
 

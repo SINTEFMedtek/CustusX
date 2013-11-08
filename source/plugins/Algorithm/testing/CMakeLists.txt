@@ -25,6 +25,7 @@ endif(COMMAND cmake_policy)
 if(BUILD_TESTING)
     include_directories(
 	    ${CustusX3_SOURCE_DIR}/source/logic/
+	    ${CustusX3_SOURCE_DIR}/source/service/tracking/
 	)
 
     cx_add_class(CXTEST_PLUGINALGORITHM_SOURCES ${CXTEST_PLUGINALGORITHM_SOURCES}
@@ -33,6 +34,7 @@ if(BUILD_TESTING)
         cxtestCatchTubeSegmentationFramework.cpp
 		cxtestTSFPresetsFixture
 		cxtestCatchTSFPresets.cpp
+        cxtestLevelSetFilter.cpp
     )
     set(CXTEST_SOURCES_TO_MOC
     )

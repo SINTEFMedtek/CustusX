@@ -46,13 +46,13 @@ class CustusXBuilder:
         PrintFormatter.printHeader('Clearing all old test data', level=3)
         cxData = self._createComponent(cxComponents.CustusX3Data)
         #custusx = self._createComponent(cxComponents.CustusX3)
-        testRunner = cxTestRunner.TestRunner()
+        testRunner = self._getTestRunner()
         testRunner.resetCustusXDataRepo(cxData.sourcePath())  
         testRunner.removeResultFiles(outPath=self._getTestResultsPath())
         #testRunner.removeResultFiles(outPath=custusx.buildPath())
     
     def _getTestResultsPath(self):
-        testRunner = cxTestRunner.TestRunner()
+        testRunner = self._getTestRunner()
         return testRunner.generateOutpath(self.assembly.controlData.getRootDir())
     
     def runUnitTests(self):
@@ -66,7 +66,7 @@ class CustusXBuilder:
         # Run all tests and write them in xml format to ctest.unit.*.xml,
         # ctest.xml means ctest format, junit.xml means junit format
         custusx = self._createComponent(cxComponents.CustusX3)
-        testRunner = cxTestRunner.TestRunner()
+        testRunner = self._getTestRunner()
         basename = 'ctest.unit.testresults'
         outpath = self._getTestResultsPath()
         ctestfile = '%s/%s.ctest.xml' % (outpath, basename)
@@ -74,8 +74,11 @@ class CustusXBuilder:
         junitfile='%s/%s.junit.xml' % (outpath, basename)
         testRunner.convertCTestFile2JUnit(ctestfile, junitfile)
 
+    def _getTestRunner(self):
+        return cxTestRunner.TestRunner(target_platform=self.assembly.controlData.getTargetPlatform())
+
     def _runCatchUnitTests(self):
-        tags = cxTestRunner.TestRunner().includeTagsForOS('[unit]')
+        tags = self._getTestRunner().includeTagsForOS('[unit]~[unstable]')
         self.runCatchTests(tags)
 
     def runCatchTests(self, tag):
@@ -84,14 +87,14 @@ class CustusXBuilder:
         custusx = self._createComponent(cxComponents.CustusX3)
         catchDir = '%s/source/testing' % custusx.buildPath()
         outpath = self._getTestResultsPath()
-        cxTestRunner.TestRunner().runCatch(catchDir, tag=tag, outpath=outpath)
+        self._getTestRunner().runCatch(catchDir, tag=tag, outpath=outpath)
         
     def runCatchTestsWrappedInCTest(self, tag):
         PrintFormatter.printHeader('Run catch tests wrapped in ctest', level=2)
         custusx = self._createComponent(cxComponents.CustusX3)
         appPath = '%s/source/testing' % custusx.buildPath()
         outpath = self._getTestResultsPath()
-        testRunner = cxTestRunner.TestRunner()
+        testRunner = self._getTestRunner()
         testRunner.runCatchTestsWrappedInCTestGenerateJUnit(tag, appPath, outpath)
 
     def createInstallerPackage(self):
@@ -147,7 +150,8 @@ class CustusXBuilder:
         custusx = self._createComponent(cxComponents.CustusX3)
         if platform.system() == 'Windows':
             build_path = custusx.buildPath()
-            if "32" in build_path:
+            if self.assembly.controlData.m32bit:
+#            if "32" in build_path:
                 return '%s\\_CPack_Packages\\win32\\NSIS' % build_path
             else:
                 return '%s\\_CPack_Packages\\win64\\NSIS' % build_path

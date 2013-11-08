@@ -36,6 +36,7 @@ namespace cx
 {
 class LayoutData;
 class LayoutRegion;
+class LayoutWidget;
 class ViewWrapper;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
@@ -127,12 +128,14 @@ public:
 	/** Initialize the widget and fill with the default view layout.
 	  * Return the top widget, it should be added to the calling gui.
 	  */
-	QWidget* initialize();
+	void initialize();
+	QWidget* getLayoutWidget(int index=0);
 
 	void setRegistrationMode(REGISTRATION_STATUS mode);
 
 	QString getActiveLayout() const; ///< returns the active layout
 	void setActiveLayout(const QString& uid); ///< change the layout
+	void setSecondaryLayout(QString layout);
 
 	ViewWrapperPtr getActiveView() const; ///< returns the active view
 	int getActiveViewGroup() const;
@@ -192,12 +195,12 @@ protected:
 //	View3D* get3DView(const QString& uid); ///< returns a 3D view with a given uid
 
 	void syncOrientationMode(SyncedValuePtr val);
-	void setStretchFactors(LayoutRegion region, int stretchFactor);
+//	void setStretchFactors(LayoutRegion region, int stretchFactor);
 
-	void activateView(ViewWrapperPtr wrapper, int group, LayoutRegion region);
-	void activate2DView(int group, PLANE_TYPE plane, LayoutRegion region);
-	void activate3DView(int group, LayoutRegion region);
-	void activateRTStreamView(int group, LayoutRegion region);
+	void activateView(LayoutWidget* widget, ViewWrapperPtr wrapper, int group, LayoutRegion region);
+	void activate2DView(LayoutWidget *widget, int group, PLANE_TYPE plane, LayoutRegion region);
+	void activate3DView(LayoutWidget *widget, int group, LayoutRegion region);
+	void activateRTStreamView(LayoutWidget *widget, int group, LayoutRegion region);
 	void addDefaultLayouts();
 	unsigned findLayoutData(const QString uid) const;
 	void addDefaultLayout(LayoutData data);
@@ -209,6 +212,7 @@ protected:
 	void loadGlobalSettings();
 	void saveGlobalSettings();
 	void updateViews();
+	void activateViews(LayoutWidget *widget, LayoutData next);
 
 	static ViewManager* mTheInstance; ///< the only instance of this class
 
@@ -217,8 +221,10 @@ protected:
 	std::vector<QString> mDefaultLayouts;
 
 	QString mActiveLayout; ///< the active layout (type)
-	QGridLayout* mLayout; ///< the layout
-	QPointer<QWidget> mMainWindowsCentralWidget; ///< should not be used after stealCentralWidget has been called, because then MainWindow owns it!!!
+	QString mSecondaryActiveLayout; ///< additional layout used for secondary screen.
+//	QGridLayout* mLayout; ///< the layout
+//	QPointer<QWidget> mMainWindowsCentralWidget; ///< should not be used after stealCentralWidget has been called, because then MainWindow owns it!!!
+	std::vector<QPointer<LayoutWidget> > mLayoutWidgets;
 
 	QString mActiveView; ///< the active view
 	ViewMap mViewMap; ///< a map of all the views

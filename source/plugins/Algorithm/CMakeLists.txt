@@ -27,6 +27,7 @@ SET( MOC_HEADER_FILES
 	logic/cxTubeSegmentationFilter.h
 	logic/cxLevelSetFilter.h
 	logic/cxTSFPresets.h
+	logic/cxDilationFilter.h
     gui/cxAlgorithmPlugin.h
     gui/cxConnectedThresholdImageFilterWidget.h
     gui/cxTimedAlgorithmProgressBar.h
@@ -55,6 +56,8 @@ SET( SOURCE_FILES
 	logic/cxTubeSegmentationFilter.cpp
 	logic/cxLevelSetFilter.h
 	logic/cxLevelSetFilter.cpp
+	logic/cxDilationFilter.h
+	logic/cxDilationFilter.cpp
 	logic/cxPipeline.h
 	logic/cxPipeline.cpp
 	logic/cxTrackingDataToVolume.h

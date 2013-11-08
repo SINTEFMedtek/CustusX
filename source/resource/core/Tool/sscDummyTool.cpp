@@ -59,7 +59,6 @@ int DummyTool::mTransformCount = 0;
 
 DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
 	mVisible(false),
-	m_prMt(Transform3D::Identity()),
 	mTransformSaveFileName("DummyToolsAreToDumbToSaveThemselves"),
 	mTimer(new QTimer()),
 	mThread(NULL)
@@ -130,10 +129,7 @@ void DummyTool::setTransformSaveFile(const QString& filename)
 {
 	mTransformSaveFileName = filename;
 }
-Transform3D DummyTool::get_prMt() const
-{
-	return m_prMt;
-}
+
 bool DummyTool::getVisible() const
 {
 	return mVisible;
@@ -372,29 +368,8 @@ Transform3D* DummyTool::getNextTransform()
 
 void DummyTool::set_prMt(const Transform3D& prMt)
 {
-//    TimeKeeper timer;
-//    static int count=0;
-
-	m_prMt = prMt;
-
-//	// use ms since Epoch (AD1970)
-//	QDateTime time = QDateTime::currentDateTime();
-//	boost::uint64_t ts = (boost::uint64_t)(time.toTime_t())*1000 + time.time().msec();
-//	double timestamp = static_cast<double>(ts);
 	double timestamp = this->getTimestamp();
-	(*mPositionHistory)[timestamp] = m_prMt;
-
-	//check:
-//	std::cout << "check: " << time.toString("yyyyMMdd'T'hhmmss:zzz").toStdString() << std::endl;
-//	std::cout << "DummyTool::set_prMt " << QDateTime::currentDateTime().toString("mm:ss:zzz").toStdString() << std::endl;
-//	messageManager()->sendDebug("DummyTool:: emit toolTransformAndTimestamp()");
-
-//    std::cout << "start emit tool pos" << std::endl;
-
-	emit toolTransformAndTimestamp(m_prMt, timestamp);
-
-//    if (++count%100==0)
-//        timer.printElapsedms("emit tool pos");
+	Tool::set_prMt(prMt, timestamp);
 }
 
 double DummyTool::getTooltipOffset() const 

@@ -36,8 +36,6 @@ class Shell (object):
         self.VERBOSE = False
         self.REDIRECT_OUTPUT = False
         self.TERMINATE_ON_ERROR = True
-        self.TEST_add_win_env = False
-        self.count = 0
 
     def getArgParser(self):
         p = cxArgParse.ArgumentParser(add_help=False)
@@ -79,8 +77,7 @@ class Shell (object):
                         cwd=self.CWD, 
                         terminate_on_error=self.TERMINATE_ON_ERROR and not ignoreFailure,
                         redirect_output=self.REDIRECT_OUTPUT,
-                        keep_output=keep_output,
-                        TEST_add_win_env = self.TEST_add_win_env)
+                        keep_output=keep_output)
         return command.run()
 
     def evaluate(self, cmd, convertToString=True):

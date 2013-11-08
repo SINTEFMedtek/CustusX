@@ -13,7 +13,7 @@
 #include "vtkLookupTable.h"
 
 #include "cxtestUtilities.h"
-#include "sscDataManager.h"
+#include "sscDataManagerImpl.h"
 #include "sscImage.h"
 #include "sscAxesRep.h"
 #include "sscImageTF3D.h"
@@ -67,10 +67,12 @@ vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueR
 
 ViewsWindow::ViewsWindow(QString displayText)
 {
+	cx::DataManagerImpl::initialize();
+
 	this->setDescription(displayText);
 	mZoomFactor = 1;
 	mShaderFolder = cx::DataLocations::getShaderPath();
-	
+	mRemaindingRenderings = -1;
 	QRect screen = qApp->desktop()->screenGeometry(qApp->desktop()->primaryScreen());
 	screen.adjust(screen.width()*0.15, screen.height()*0.15, -screen.width()*0.15, -screen.height()*0.15);
 	this->setGeometry(screen);
@@ -82,9 +84,6 @@ ViewsWindow::ViewsWindow(QString displayText)
 	mToolmanager->initialize();
 	mToolmanager->startTracking();
 
-//	cx::ToolPtr tool = mToolmanager->getDominantTool();
-//	connect( tool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), &mTimer, SLOT( start()));
-
 	//gui controll
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	this->centralWidget()->setLayout(mainLayout);
@@ -92,15 +91,6 @@ ViewsWindow::ViewsWindow(QString displayText)
 	mSliceLayout = new QGridLayout;
 
 	mainLayout->addLayout(mSliceLayout);//Slice layout
-
-//	QHBoxLayout *controlLayout = new QHBoxLayout;
-//	controlLayout->addStretch();
-
-//	mAcceptanceBox = new cx::AcceptanceBoxWidget(mDisplayText, this);
-//	controlLayout->addWidget(mAcceptanceBox);
-
-//	controlLayout->addStretch();
-//	mainLayout->addLayout(controlLayout); //Buttons
 
 	mRenderingTimer = new QTimer(this);
 	mRenderingTimer->start(33);
@@ -110,13 +100,13 @@ ViewsWindow::ViewsWindow(QString displayText)
 void ViewsWindow::setDescription(const QString& desc)
 {
 	this->setWindowTitle(desc);
-//	mAcceptanceBox->setText(desc);
 }
 
 ViewsWindow::~ViewsWindow()
 {
 	mRenderingTimer->stop();
 	cx::ToolManager::shutdown();
+	cx::DataManager::shutdown();
 }
 
 
@@ -229,16 +219,6 @@ void ViewsWindow::define3D(const QString& imageFilename, const ImageParameters* 
 	insertView(view, uid, imageFilename, r, c);
 }
 
-//void ViewsWindow::showTool()
-//{
-//	// Tool 3D rep
-//	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
-//	cx::ToolPtr tool = mToolmanager->getDominantTool();
-//	cx::ToolRep3DPtr toolRep = cx::ToolRep3D::New( tool->getUid(), tool->getName() );
-//	toolRep->setTool(tool);
-//	view->addRep(toolRep);
-//}
-
 bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImageParameters* parameters, int r, int c)
 {
 	QString uid = "3D";
@@ -288,13 +268,25 @@ void ViewsWindow::updateRender()
 	}
 
 	for (unsigned i=0; i<mLayouts.size(); ++i)
+	{
 		mLayouts[i]->getRenderWindow()->Render();
+	}
+
+	if (mRemaindingRenderings>=0)
+	{
+		--mRemaindingRenderings;
+		if (mRemaindingRenderings<0)
+			QTimer::singleShot(0, qApp, SLOT(quit()));
+	}
 }
 
 void ViewsWindow::prettyZoom(cx::View *view)
 {
 	if (view->getZoomFactor()<0)
+	{
+		view->getRenderer()->ResetCamera();
 		return;
+	}
 
 	cx::DoubleBoundingBox3D bb_s  = view->getViewport_s();
 	double viewportHeightmm = bb_s.range()[1];//viewPortHeightPix*mmPerPix(view);
@@ -316,12 +308,18 @@ double ViewsWindow::getFractionOfBrightPixelsInView(int viewIndex, int threshold
 	cxtest::RenderTesterPtr renderTester = cxtest::RenderTester::create(mLayouts[viewIndex]->getRenderWindow());
 	vtkImageDataPtr output = renderTester->renderToImage();
 	return cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, threshold);
-	//	std::cout << "numNonZeroPixels: " << numNonZeroPixels << std::endl;
 }
 
 bool ViewsWindow::runWidget()
 {
-	return this->runWidget(3000);
+	this->show();
+#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
+	this->activateWindow();
+#endif
+	this->raise();
+	this->updateRender();
+	mRemaindingRenderings = 5;
+	return !qApp->exec();
 }
 
 bool ViewsWindow::quickRunWidget()

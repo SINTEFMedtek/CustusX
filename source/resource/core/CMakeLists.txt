@@ -13,7 +13,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Data/sscRegistrationTransform
 	Data/sscDataManagerImpl
 	Data/sscMesh
-	Data/sscVtkFileMesh
+#	Data/sscVtkFileMesh
 	Data/sscPresets
 	Data/sscTransferFunctions3DPresets
 	Data/sscPointMetric
