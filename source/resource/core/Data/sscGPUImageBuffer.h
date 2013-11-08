@@ -84,20 +84,25 @@ class GPUImageLutBuffer
 {
 public:
 	virtual ~GPUImageLutBuffer() {}
-	/**Allocate resources for the lookup table and the volume on the GPU.
-	 * Prerequisite: SetImage and SetcolorTable has been called.
+	/** Allocate resources for the lookup table and the volume on the GPU.
+	 *  Prerequisite: SetImage and SetcolorTable has been called.
 	 *
-	 * Call this from inside a PrepareForRendering() methods in vtk.
+	 *  Call this from inside a PrepareForRendering() methods in vtk.
 	 */
 	virtual void allocate() = 0;
-	/**Activate and bind the volume and lut buffers inside the texture units
-	 * GL_TEXTURE<2X> and GL_TEXTURE<2X+1>.
-	 * Use during RenderInternal()
+	/** If data is changed, send data to GPU.
+	  */
+	virtual void updateTexture() = 0;
+	/** Activate and bind the volume and lut buffers inside the texture units
+	 *  GL_TEXTURE<2X> and GL_TEXTURE<2X+1>.
+	 *  Use during RenderInternal()
 	 */
 	virtual void bind(int textureUnitIndex) = 0;
 	/**Size of lut. Used by fragment shader.
 	 */
 	virtual int getLutSize() const = 0;
+
+	virtual void debugEnableCrossplatform(bool on) = 0;
 };
 
 typedef boost::shared_ptr<GPUImageLutBuffer> GPUImageLutBufferPtr;
