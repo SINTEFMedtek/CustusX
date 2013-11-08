@@ -120,6 +120,10 @@ public:
 	}
 	void initializeRendering()
 	{
+		if (mLutBuffer)
+		{
+			mLutBuffer->allocate();
+		}
 		if (mVolumeBuffer)
 		{
 			mVolumeBuffer->allocate();
@@ -129,7 +133,7 @@ public:
 	{
 		if (mLutBuffer)
 		{
-			mLutBuffer->allocate();
+			mLutBuffer->updateTexture();
 		}
 		if (mVolumeBuffer)
 		{

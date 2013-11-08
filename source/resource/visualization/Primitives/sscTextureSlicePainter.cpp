@@ -54,6 +54,8 @@
 #include "sscTypeConversions.h"
 #include "sscGLHelpers.h"
 
+#define DEBUG_ENABLE_CROSS_PLATFORM false
+//#define DEBUG_ENABLE_CROSS_PLATFORM true
 
 //---------------------------------------------------------
 namespace cx
@@ -101,6 +103,8 @@ public:
 	void SetBuffer(GPUImageLutBufferPtr buffer)
 	{
 		mLutBuffer = buffer;
+		mLutBuffer->debugEnableCrossplatform(DEBUG_ENABLE_CROSS_PLATFORM);
+
 	}
 	void SetColorAttribute(float window, float level, float llr,float alpha)
 	{
@@ -112,27 +116,21 @@ public:
 	void initializeRendering()
 	{
 		if (mVolumeBuffer)
-		{
 			mVolumeBuffer->allocate();
-		}
+		if (mLutBuffer)
+			mLutBuffer->allocate();
 	}
 	void eachPrepareRendering()
 	{
 		if (mLutBuffer)
-		{
-			mLutBuffer->allocate();
-		}
+			mLutBuffer->updateTexture();
 		if (mVolumeBuffer)
-		{
 			mVolumeBuffer->updateTexture();
-		}
 	}
 	void eachRenderInternal(vtkSmartPointer<vtkShaderProgram2> shader)
 	{
 		if (!mVolumeBuffer)
-		{
 			return;
-		}
 
 		mVolumeBuffer->bind(mIndex);
 
@@ -161,11 +159,8 @@ class TextureSlicePainter::vtkInternals
 {
 public:
 	Display* mCurrentContext;
-
 	vtkWeakPointer<vtkRenderWindow> LastContext;
-
 	vtkSmartPointer<vtkShaderProgram2> Shader;
-
 	std::vector<SingleVolumePainterHelper> mElement;
 
 	SingleVolumePainterHelper& safeIndex(int index)
@@ -209,7 +204,13 @@ void TextureSlicePainter::setShaderFile(QString shaderFile)
 }
 
 QString TextureSlicePainter::loadShaderFile(QString shaderFile)
-{
+{	
+	if (DEBUG_ENABLE_CROSS_PLATFORM)
+	{
+		QFileInfo org(shaderFile);
+		shaderFile = org.absolutePath() + "/crosstest.frag";
+	}
+
 	QFile fp(shaderFile);
 	if (fp.exists())
 	{
@@ -300,10 +301,10 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 			vtkErrorMacro("Pass Two failed.");
 			abort();
 		}
-		if (!mInternals->Shader->IsValid())
-		{
-			vtkErrorMacro(<<" validation of the program failed: "<< mInternals->Shader->GetLastValidateLog());
-		}
+//		if (!mInternals->Shader->IsValid())
+//		{
+//			vtkErrorMacro(<<" validation of the program failed: "<< mInternals->Shader->GetLastValidateLog());
+//		}
 	}
 
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -343,6 +344,11 @@ void TextureSlicePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor,
 
 	mInternals->Shader->Use();
 
+	if (!mInternals->Shader->IsValid())
+	{
+		vtkErrorMacro(<<" validation of the program failed: "<< mInternals->Shader->GetLastValidateLog());
+	}
+
 	this->Superclass::RenderInternal(renderer, actor, typeflags, forceCompileOnly);
 
 	mInternals->Shader->Restore();
@@ -374,10 +380,19 @@ bool TextureSlicePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr)
 //	{
 //		std::cout<<"GL_MAX_TEXTURE_COORDS="<<value[0]<<" . Number of texture coordinate sets. Min is 2."<<std::endl;
 //	}
-	return (LoadRequiredExtension(mgr, "GL_VERSION_2_0")
-			&& LoadRequiredExtension(mgr, "GL_VERSION_1_5")
-			&& LoadRequiredExtension(mgr, "GL_ARB_vertex_buffer_object")
-			&& LoadRequiredExtension(mgr, "GL_EXT_texture_buffer_object"));
+	if (DEBUG_ENABLE_CROSS_PLATFORM)
+	{
+		return (LoadRequiredExtension(mgr, "GL_VERSION_2_0")
+				&& LoadRequiredExtension(mgr, "GL_VERSION_1_5")
+				&& LoadRequiredExtension(mgr, "GL_ARB_vertex_buffer_object"));
+	}
+	else
+	{
+		return (LoadRequiredExtension(mgr, "GL_VERSION_2_0")
+				&& LoadRequiredExtension(mgr, "GL_VERSION_1_5")
+				&& LoadRequiredExtension(mgr, "GL_ARB_vertex_buffer_object")
+				&& LoadRequiredExtension(mgr, "GL_EXT_texture_buffer_object"));
+	}
 }
 
 void TextureSlicePainter::SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer)
