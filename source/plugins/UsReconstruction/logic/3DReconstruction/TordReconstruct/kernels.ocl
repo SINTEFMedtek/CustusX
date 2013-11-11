@@ -59,7 +59,7 @@
 #define isInside(x, size) ((x) >= 0 && (x) < (size))
 //#define isNotMasked(x, y, mask, xsize) ((mask)[(x) + (y)*(xsize)] > 0)
 #define isNotMasked(x, y, mask, xsize) 1
-                                     
+
 #define VOXEL(v,x,y,z) v[x + y*volume_xsize + z*volume_ysize*volume_xsize]
 
 #define WEIGHT_INV(x) (1.0f/fabs(x))
@@ -1005,97 +1005,6 @@ performInterpolation_dw(close_plane_t *close_planes,
 #if METHOD == METHOD_ANISOTROPIC
 #define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i ,j, k)	  \
 	performInterpolation_anisotropic(a, b, c, d, e, f, g, h, i, j, k)
-
-void siftDown(pixel_t *pixels,
-              int start,
-              int end)
-{
-	int root = start;
-	int swap;
-	int child;
-	pixel_t tmp;
-#define swap(a, b) tmp = a; a = b; b = tmp
-	while(root*2 + 1 <= end)
-	{
-		child = root*2+1;
-		swap = root;
-		if(pixels[swap].intensity < pixels[child].intensity)
-		{
-			swap = child;
-		}
-		if(child+1 <= end && pixels[swap].intensity < pixels[child+1].intensity)
-		{
-			swap = child+1;
-		}
-		if(swap != root)
-		{
-			swap(pixels[root], pixels[swap]);
-			root = swap;
-		}
-		else
-		{
-			return;
-		}
-	}
-}
-	
-void heapify(pixel_t *pixels,
-             int n)
-{
-	int start = (n - 2) / 2;
-
-	while(start >= 0)
-	{
-		siftDown(pixels, start, n - 1);
-		start--;
-	}
-}
-	
-
-// Implement heapsort
-void sort(pixel_t *pixels,
-          int n)
-{
-	pixel_t tmp;
-#define swap(a, b) tmp = a; a = b; b = tmp
-	heapify(pixels, n);
-	int end = n-1;
-	while(end > 0)
-	{
-		swap(pixels[end], pixels[0]);
-		end--;
-		siftDown(pixels, 0, end);
-	}
-}
-
-#define WEIGHT_FUNCTION(x) (1.0f - fabs(x.dist))
-// Find the weighted median of an unsorted array of pixels
-pixel_t weighted_median(pixel_t *pixels,
-                        int n_pixels)
-{
-	// Sort the pixels
-	sort(pixels, n_pixels);
-	// Compute the sum of the weights
-	float sum_weight = 0.0f;
-	for(int i = 0; i < n_pixels; i++)
-	{
-		sum_weight += WEIGHT_FUNCTION(pixels[i]);
-	}
-	// Find the first index for which sum is greater than sum_weight/2
-	const float sum_weight_half = sum_weight / 2;
-	float sum = 0.0f;
-	int idx = 0;
-	for(idx = 0; idx < n_pixels; idx++)
-	{
-		sum += WEIGHT_FUNCTION(pixels[idx]);
-		if(sum >= sum_weight_half)
-		{
-			break;
-		}
-	}
-	return pixels[idx];
-	
-}
 
 /**
  * Perform interpolation using an anisotropic filter
