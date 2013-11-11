@@ -813,15 +813,13 @@ pixel_t anisotropicFilter(const pixel_t *pixels,
 		float tmp = pixels[i].intensity - mean_value;
 		variance += tmp*tmp;
 	}
-	variance = variance / n_planes;
 
 	// We want high variance regions to have a sharp weight function
 	// and small variance regions to have a smooth weight function.
 
-	if(variance < 0.1f) variance = 0.1f;
-	float gauss_sigma = 10.0f / sqrt(variance);
+	variance = max(0.1f, variance / n_planes);
+	float gauss_sigma = max(0.1f, 10.0f / sqrt(variance));
 
-	if(gauss_sigma < 0.1f) gauss_sigma = 0.1f;
 	if(variance > 0.1f && mean_value> 10.0f)
 		DEBUG_PRINTF("Mean: %f, variance: %f, sigma: %f\n", mean_value, variance, gauss_sigma);
 
@@ -1171,7 +1169,6 @@ performInterpolation_anisotropic(close_plane_t *close_planes,
 				float sq_x = dist_x*dist_x;
 				float sq_y = dist_y*dist_y;
 
-				float along_plane_dist = sqrt(sq_x + sq_y);
 				pixels[pos].dist = sqrt(close_planes[i].dist*close_planes[i].dist + sq_x + sq_y);
 				pos++;
 			}
