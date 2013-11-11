@@ -805,20 +805,22 @@ pixel_t anisotropicFilter(const pixel_t *pixels,
 	{
 		mean_value += pixels[i].intensity;
 	}
+
 	mean_value = mean_value / n_planes;
 
 	float variance = 0.0f;
 	for(int i = 0; i < n_planes; i++)
 	{
 		float tmp = pixels[i].intensity - mean_value;
-		variance  = mad(tmp,tmp, variance);
-	}
+		variance  += mad(tmp, tmp, variance);
+ 	}
 
 	// We want high variance regions to have a sharp weight function
 	// and small variance regions to have a smooth weight function.
 
-	variance = max(0.1f, variance / n_planes);
-	float gauss_sigma = max(0.1f, 10.0f / sqrt(variance));
+
+	variance = clamp(variance/(n_planes-1), 1.0f, 10000.0f);
+	float gauss_sigma = mean_value/sqrt(variance);
 
 #ifdef DEBUG
 	if(variance > 0.1f && mean_value> 10.0f)
