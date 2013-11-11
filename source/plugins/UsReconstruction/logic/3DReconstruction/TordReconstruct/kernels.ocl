@@ -29,7 +29,7 @@
 #define ANISOTROPIC_METHOD_GAUSSIAN_ON_PLANE 2
 
 
-#define ANISOTROPIC_METHOD ANISOTROPIC_METHOD_INCLUDE_ALL
+#define ANISOTROPIC_METHOD ANISOTROPIC_METHOD_BILINEAR_ON_PLANE
 
 /*****************/
 /* End constants */
@@ -462,7 +462,7 @@ findClosestPlanes_heuristic(close_plane_t *close_planes,
 		// FIXME: The constant here represents a tradeoff between
 		// guaranteeing to find all relevant planes, and performance (terminating earlier).
 		// This should be investigate further.
-		int2 term_dists = {abs_dists.x > 5.0f*radius, abs_dists.y > 5.0f*radius };
+		int2 term_dists = {abs_dists.x > 3.0f*radius, abs_dists.y > 3.0f*radius };
 
 		int2 term_boundaries = {idx.x == N_PLANES-1, idx.y == 0};
 				
@@ -544,7 +544,7 @@ int findClosestPlanes_exact(close_plane_t *close_planes_ret,
 		}
 		close_planes_ret[i] = close_planes[smallest_idx];
 		// Bigger than initial smallest_dist
-		close_planes[smallest_idx].dist = 999999.0f;
+		close_planes[smallest_idx].dist = INFINITY;
 	}
 	return min(MAX_PLANES, found);
 }
@@ -704,7 +704,7 @@ float bilinearInterpolation(float x,
 	
 	int2 pos = {x, y};
 	float2 offset = {x - pos.x, y - pos.y};
-
+	
 	float4 values = { image[pos.x + pos.y*in_xsize],        // Lower left
 	                  image[pos.x+1 + pos.y*in_xsize],      // Lower right
 	                  image[pos.x + 1 + (pos.y+1)*in_xsize],// Upper right
@@ -811,7 +811,7 @@ pixel_t anisotropicFilter(const pixel_t *pixels,
 	for(int i = 0; i < n_planes; i++)
 	{
 		float tmp = pixels[i].intensity - mean_value;
-		variance += tmp*tmp;
+		variance  = mad(tmp,tmp, variance);
 	}
 
 	// We want high variance regions to have a sharp weight function
@@ -820,9 +820,10 @@ pixel_t anisotropicFilter(const pixel_t *pixels,
 	variance = max(0.1f, variance / n_planes);
 	float gauss_sigma = max(0.1f, 10.0f / sqrt(variance));
 
+#ifdef DEBUG
 	if(variance > 0.1f && mean_value> 10.0f)
-		DEBUG_PRINTF("Mean: %f, variance: %f, sigma: %f\n", mean_value, variance, gauss_sigma);
-
+		DEBUG_PRINTF("Mean: %f, variance: %f, sigma: %f\n", mean_value, variance, gauss_sigma); 
+#endif
 
 	float sum_weights = 0.0f;
 	float sum = 0.0f;
@@ -830,7 +831,7 @@ pixel_t anisotropicFilter(const pixel_t *pixels,
 	for(int i = 0; i < n_planes; i++)
 	{
 		float weight = WEIGHT_GAUSS(pixels[i].dist, gauss_sigma);
-		sum += pixels[i].intensity*weight;
+		sum = mad(pixels[i].intensity,weight, sum);
 		sum_weights += weight;
 	}
 
@@ -1116,7 +1117,7 @@ performInterpolation_anisotropic(close_plane_t *close_planes,
 #elif ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_BILINEAR_ON_PLANE
 	pixel_t pixels[MAX_PLANES];
 #elif ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_GAUSSIAN_ON_PLANE
-	pixel_t pixels[MAX_PLANES*ANISOTROPIC_GAUSSIAN_SIZE*ANISOTROPIC_GAUSSIAN_SIZE];
+	pixel_t pixels[MAX_PLANES];
 #endif
 
 	
@@ -1146,8 +1147,10 @@ performInterpolation_anisotropic(close_plane_t *close_planes,
 		               plane_matrices[plane_id],
 		               in_xspacing,
 		               in_yspacing);
+		
 		for(int j = -ANISOTROPIC_SIZE/2; j <= ANISOTROPIC_SIZE/2; j++)
 		{
+			#pragma unroll
 			for(int k = -ANISOTROPIC_SIZE/2; k <= ANISOTROPIC_SIZE/2; k++)
 			{
 				int _x = x + j;
@@ -1168,7 +1171,7 @@ performInterpolation_anisotropic(close_plane_t *close_planes,
 				float dist_y = k*in_yspacing;
 				float sq_x = dist_x*dist_x;
 				float sq_y = dist_y*dist_y;
-
+				
 				pixels[pos].dist = sqrt(close_planes[i].dist*close_planes[i].dist + sq_x + sq_y);
 				pos++;
 			}
@@ -1225,8 +1228,8 @@ performInterpolation_anisotropic(close_plane_t *close_planes,
 					continue;
 				}
 
-				float weight = WEIGHT_GAUSS(sqrt((float)(xmaskpos*xmaskpos + ymaskpos*ymaskpos)), 0.5f);
-				gauss_value += weight * image[xpos + ypos*in_xsize];
+				float weight = WEIGHT_GAUSS(hypot((float)xmaskpos, (float)ymaskpos), 0.5f);
+				gauss_value = mad(weight,image[xpos + ypos*in_xsize], gauss_value);
 				gauss_weight_sum += weight;
 			}
 		}
