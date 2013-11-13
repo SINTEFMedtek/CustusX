@@ -30,18 +30,13 @@ class TestRunner:
     Utilities for runnit tests,
     based on the catch, cppunit and ctest frameworks.
     '''
-    pass
+    def __init__(self, target_platform):
+        self.target_platform = target_platform
 
     def generateOutpath(self, basePath):
         path = '%s/test_results' % basePath
         shell.makeDirs(path)
         return path
-
-    def _createCatchBaseFilenameFromTag(self, tag):
-        'generate a namestring usable as the base of a filename for test results based on tag'
-        tagString = self._createFilenameFriendlyStringFromCatchTag(tag)
-        baseName = 'catch.%s.testresults' % tagString
-        return baseName
     
     def removeResultFiles(self, outPath):
         shell.rm_r(outPath, 'catch.*.testresults*.xml')
@@ -66,9 +61,73 @@ class TestRunner:
         PrintFormatter.printInfo('Run ctest tests with tag %s' % tag)
         PrintFormatter.printInfo('Convert catch tests to ctests, i.e. one test per process...')
         tests = self._readCatchTestNames(path, tag=tag)
-        self._writeCTestFileForCatchTests('%s/CTestTestfile.cmake'%path, tests)
+        ctestfile = '%s/CTestTestfile.cmake'%path
+        self._writeCTestFileForCatchTests(ctestfile, tests)
         self._writeDartConfigurationFile(path)
         self.runCTest(path, outfile=outFile)
+        shell.rm_r(ctestfile)
+
+    def runCTest(self, path, outpath=None, outfile=None):
+        'Run all ctest tests at path and write them in ctest xml format to outfile'
+        if not outfile:
+            outfile = '%s/CTestResults.xml' % outpath
+        PrintFormatter.printInfo('Run ctest, results to %s' % outfile)
+        shell.changeDir(path)
+        shell.rm_r('%s/Testing/' % path, "[0-9]*")
+        shell.rm_r(outfile)
+        shell.run('ctest -D ExperimentalTest --no-compress-output', ignoreFailure=True)
+        temp_dir = shell.head(os.path.join(path, 'Testing', 'TAG'), 1)
+        shell.cp(os.path.join(path, 'Testing', temp_dir, 'Test.xml'), '%s' % outfile)
+
+    def runCatch(self, path, tag, outpath=None, outfile=None):
+        'Run all Catch tests at path and write them in junit xml format to outfile'
+        if not outfile:
+            baseName = self._createCatchBaseFilenameFromTag(tag)
+            outfile = '%s/%s.junit.xml' % (outpath, baseName)
+        PrintFormatter.printInfo('Run catch with tag %s, results to %s' % (tag, outfile))
+        shell.changeDir(path)
+        shell.rm_r(outfile)
+        exe = self._getCatchExecutable()
+        cmd = '%s/%s %s --reporter junit --out %s' % (path, exe, tag, outfile)
+        result = shell.run(cmd, ignoreFailure=True)
+        if result.returncode >= 0:
+            PrintFormatter.printInfo('catch reported %s failing tests' % result.returncode)                        
+        if result.returncode < 0:
+            PrintFormatter.printInfo('catch failed with returncode %s' % result.returncode)            
+            PrintFormatter.printInfo('Removing outfile %s' % outfile)            
+            shell.rm_r(outfile)
+            PrintFormatter.printHeader('Analyzing catch failure', 2)            
+            PrintFormatter.printInfo('Running catch tests wrapped in ctest.')            
+            PrintFormatter.printInfo('This should identify crashing tests.')            
+            self.runCatchTestsWrappedInCTestGenerateJUnit(tag, path, outpath)
+
+    def includeTagsForOS(self, tag):
+        exclude = self._getExcludeTags()
+        return '%s%s' % (tag, exclude) 
+        
+    def resetCustusXDataRepo(self, path):
+        '''
+        Reset the test data git repo,
+        and delete the temp subfolder.
+        This matches the structure of the CustusX git data repo.
+        '''
+        PrintFormatter.printInfo('Reset/Clear Data repository...')
+        # clear local modifications in the data folder - the tests might cause these changes
+        shell.changeDir(path)
+        shell.run('git fetch --all')
+        shell.run('git reset --hard')
+        tempDir = "%s/temp" % path
+        shell.removeTree(tempDir)
+        
+    def convertCTestFile2JUnit(self, ctestFile, junitFile):
+        PrintFormatter.printInfo('Convert [%s] to [%s]' % (ctestFile, junitFile))
+        cxConvertCTest2JUnit.convertCTestFile2JUnit(ctestFile, junitFile)
+
+    def _createCatchBaseFilenameFromTag(self, tag):
+        'generate a namestring usable as the base of a filename for test results based on tag'
+        tagString = self._createFilenameFriendlyStringFromCatchTag(tag)
+        baseName = 'catch.%s.testresults' % tagString
+        return baseName
 
     def _readCatchTestNames(self, path, tag):
         catchExe = '%s/%s' % (path, self._getCatchExecutable())
@@ -115,40 +174,6 @@ BuildName: %s
 TimeOut: %d
 ''' % (site,buildname,timeout)
         cxUtilities.writeToNewFile(filename=targetFile, text=content)
-
-    def runCTest(self, path, outpath=None, outfile=None):
-        'Run all ctest tests at path and write them in ctest xml format to outfile'
-        if not outfile:
-            outfile = '%s/CTestResults.xml' % outpath
-        PrintFormatter.printInfo('Run ctest, results to %s' % outfile)
-        shell.changeDir(path)
-        shell.rm_r('%s/Testing/' % path, "[0-9]*")
-        shell.rm_r(outfile)
-        shell.run('ctest -D ExperimentalTest --no-compress-output', ignoreFailure=True)
-        temp_dir = shell.head(os.path.join(path, 'Testing', 'TAG'), 1)
-        shell.cp(os.path.join(path, 'Testing', temp_dir, 'Test.xml'), '%s' % outfile)
-
-    def runCatch(self, path, tag, outpath=None, outfile=None):
-        'Run all Catch tests at path and write them in junit xml format to outfile'
-        if not outfile:
-            baseName = self._createCatchBaseFilenameFromTag(tag)
-            outfile = '%s/%s.junit.xml' % (outpath, baseName)
-        PrintFormatter.printInfo('Run catch with tag %s, results to %s' % (tag, outfile))
-        shell.changeDir(path)
-        shell.rm_r(outfile)
-        exe = self._getCatchExecutable()
-        cmd = '%s/%s %s --reporter junit --out %s' % (path, exe, tag, outfile)
-        result = shell.run(cmd, ignoreFailure=True)
-        if result.returncode >= 0:
-            PrintFormatter.printInfo('catch reported %s failing tests' % result.returncode)                        
-        if result.returncode < 0:
-            PrintFormatter.printInfo('catch failed with returncode %s' % result.returncode)            
-            PrintFormatter.printInfo('Removing outfile %s' % outfile)            
-            shell.rm_r(outfile)
-            PrintFormatter.printHeader('Analyzing catch failure', 2)            
-            PrintFormatter.printInfo('Running catch tests wrapped in ctest.')            
-            PrintFormatter.printInfo('This should identify crashing tests.')            
-            self.runCatchTestsWrappedInCTestGenerateJUnit(tag, path, outpath)
         
     def _getCatchExecutable(self):
         if(platform.system() == 'Windows'):
@@ -156,35 +181,9 @@ TimeOut: %d
         return "Catch"
                 
     def _getExcludeTags(self):
-        if(platform.system() == 'Windows'):
-             return "~[not_windows]~[hide]"
-        if platform.system() == 'Darwin':
-             return "~[not_apple]~[hide]"
-        if platform.system() == 'Linux':
-             return "~[not_linux]~[hide]"
-         
-    def includeTagsForOS(self, tag):
-        exclude = self._getExcludeTags()
-        return '%s%s' % (tag, exclude) 
-        
-    def resetCustusXDataRepo(self, path):
-        '''
-        Reset the test data git repo,
-        and delete the temp subfolder.
-        This matches the structure of the CustusX git data repo.
-        '''
-        PrintFormatter.printInfo('Reset/Clear Data repository...')
-        # clear local modifications in the data folder - the tests might cause these changes
-        shell.changeDir(path)
-        shell.run('git fetch --all')
-        shell.run('git reset --hard')
-        tempDir = "%s/temp" % path
-        shell.removeTree(tempDir)
-        
-    def convertCTestFile2JUnit(self, ctestFile, junitFile):
-        PrintFormatter.printInfo('Convert [%s] to [%s]' % (ctestFile, junitFile))
-        cxConvertCTest2JUnit.convertCTestFile2JUnit(ctestFile, junitFile)
-        
+        target = self.target_platform.get_target_platform()
+        return '~[not_%s]~[hide]' % target
+                 
     def _createFilenameFriendlyStringFromCatchTag(self, tag):
         # if tag contains name specifier, keep only the last part, usually the tag part
         if ' ' in tag:

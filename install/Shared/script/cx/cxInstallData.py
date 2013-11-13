@@ -40,7 +40,8 @@ import platform
 import argparse
 import pprint
 import cxArgParse
-    
+import cxUtilities
+        
 class Common(object):
     '''
     Container for common data.
@@ -149,6 +150,9 @@ class Common(object):
     
     def setBuild32(self, value):
         self.m32bit = value        
+                        
+    def getTargetPlatform(self):
+        return cxUtilities.PlatformInfo(platform.system(), self.m32bit)
     
     def _getAllowedBuildTypes(self):
         return ['Debug', 'Release', 'RelWithDebInfo', 'MinSizeRel']
