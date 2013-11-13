@@ -122,7 +122,7 @@ void shutdown()
 }
 }
 
-TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[unit][gui][widget]")
+TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[unit][gui][widget][not_win32]")
 {
 	init();
 	QWidget* testParent = new QWidget();
@@ -162,14 +162,14 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 	shutdown();
 }
 
-TEST_CASE("VideoConnectionWidget is correctly constructed", "[unit][gui][widget]")
+TEST_CASE("VideoConnectionWidget is correctly constructed", "[unit][gui][widget][not_win32]")
 {
 	init();
 	testAndDeleteBaseWidgetChild(new cx::VideoConnectionWidget(NULL));
 	shutdown();
 }
 
-TEST_CASE("FileWatcherWidgets are correctly constructed", "[unit][gui][widget]")
+TEST_CASE("FileWatcherWidgets are correctly constructed", "[unit][gui][widget][not_win32]")
 {
 	init();
 	//cxFileWatcherWidgets
@@ -178,7 +178,7 @@ TEST_CASE("FileWatcherWidgets are correctly constructed", "[unit][gui][widget]")
 	shutdown();
 }
 
-TEST_CASE("TabbedWidgets are correctly constructed", "[unit][gui][widget]")
+TEST_CASE("TabbedWidgets are correctly constructed", "[unit][gui][widget][not_win32]")
 {
 	init();
 	//cxTabbedWidgets
@@ -187,7 +187,7 @@ TEST_CASE("TabbedWidgets are correctly constructed", "[unit][gui][widget]")
 	shutdown();
 }
 
-TEST_CASE("InfoWidgets are correctly constructed", "[unit][gui][widget]")
+TEST_CASE("InfoWidgets are correctly constructed", "[unit][gui][widget][not_win32]")
 {
 	init();
 	//cxInfoWidgets
@@ -196,7 +196,7 @@ TEST_CASE("InfoWidgets are correctly constructed", "[unit][gui][widget]")
 	shutdown();
 }
 
-TEST_CASE("TransferFunction widgets are correctly constructed", "[unit][gui][widget]")
+TEST_CASE("TransferFunction widgets are correctly constructed", "[unit][gui][widget][not_win32]")
 {
 	init();
 	testAndDeleteBaseWidgetChild(new cx::TransferFunction2DColorWidget(NULL));
