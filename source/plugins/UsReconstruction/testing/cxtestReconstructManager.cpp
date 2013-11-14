@@ -422,7 +422,7 @@ TEST_CASE("ReconstructManager: Angio Reconstruction", "[usreconstruction][integr
 	ReconstructManagerTestFixture fixture;
 	fixture.testAngioReconstruction();
 }
-TEST_CASE("ReconstructManager: ThunderGPU Reconstruction", "[usreconstruction][integration][thunder]")
+TEST_CASE("ReconstructManager: ThunderGPU Reconstruction", "[usreconstruction][integration][thunder][not_win32]")
 {
 	ReconstructManagerTestFixture fixture;
 	fixture.testThunderGPUReconstruction();
