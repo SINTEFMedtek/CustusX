@@ -191,10 +191,10 @@ char* file2string(const char* filename, size_t * final_length) {
 cl_kernel ocl_kernel_build(cl_program program, cl_device_id device, const char * kernel_name) {
 	cl_int err;
 	cl_kernel kernel = clCreateKernel(program, kernel_name, &err);
-	if (err != CL_SUCCESS) {
+	//	if (err != CL_SUCCESS) {
 		size_t len;
 		char buffer[2048];
-		printf("ERROR: Failed to build kernel %s on device %p. Error code: %d\n", kernel_name, device, err);
+		//printf("ERROR: Failed to build kernel %s on device %p. Error code: %d\n", kernel_name, device, err);
 
 		clGetProgramBuildInfo(
 			program,              // the program object being queried
@@ -208,8 +208,8 @@ cl_kernel ocl_kernel_build(cl_program program, cl_device_id device, const char *
 		for (int i = 0; i < 2048; i++)
 			printf("%c", buffer[i]);
 		printf("\n");
-		exit(1);
-	}
+		//		exit(1);
+		//	}
 	return kernel;
 }
 
