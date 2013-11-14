@@ -376,9 +376,17 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &radius));
 
 
-	// Global work items:
-	size_t local_work_size = 128;
-	
+	size_t local_work_size;
+	// Find the optimal local work size
+	ocl_check_error(clGetKernelWorkGroupInfo(mClKernel,
+	                                         moClContext->device,
+	                                         CL_KERNEL_WORK_GROUP_SIZE,
+	                                         sizeof(size_t),
+	                                         &local_work_size,
+	                                         NULL));
+
+	messageManager()->sendInfo(QString("Using %1 as local workgroup size").arg(local_work_size));
+	// Global work items:	
 	size_t global_work_size = (outputDims[0]*outputDims[2]);
 
 	// Round global_work_size up to nearest multiple of local_work_size
