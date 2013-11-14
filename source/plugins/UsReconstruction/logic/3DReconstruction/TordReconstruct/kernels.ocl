@@ -123,23 +123,23 @@ int isValidPixel(int x,
 int
 findHighestIdx(close_plane_t *planes,
                int n);
-int
+int2
 findClosestPlanes_heuristic(close_plane_t *close_planes,
                             __local float4* const plane_eqs,
                             __global float16* const plane_matrices,
                             const float4 voxel,
                             const float radius,
-                            int* guess);
+                            int guess);
 #endif
 
 #if PLANE_METHOD == PLANE_EXACT
-int
+int2
 findClosestPlanes_exact(close_plane_t *close_planes,
                         __local float4* const plane_eqs,
                         __global float16* const plane_matrices,
                         const float4 voxel,
                         const float radius,
-                        int* guess);
+                        int guess);
 
 #endif
 
@@ -357,13 +357,13 @@ findHighestIdx(close_plane_t *planes,
  * provided no plane with distance greater than
  * 2x radius is found before any of the MAX_PLANES closest planes.
  */
-int
+int2
 findClosestPlanes_heuristic(close_plane_t *close_planes,
                             __local float4* const plane_eqs,
                             __global float16* const plane_matrices,
                             const float4 voxel,
                             const float radius,
-                            int* guess)
+                            int guess)
 {
 
 	// Number of planes found so far
@@ -373,7 +373,7 @@ findClosestPlanes_heuristic(close_plane_t *close_planes,
 	int2 done = {0,0};
 
 	// The index of the plane with the smallest distance found so far
-	int smallest_idx = *guess;
+	int smallest_idx = guess;
 
 	// The smallest distance found so far
 	float smallest_dist = 99999.9f;
@@ -386,10 +386,10 @@ findClosestPlanes_heuristic(close_plane_t *close_planes,
 
 	// If guess is 0, we will try to access data for plane id -1, which does not exist.
 	// Assume plane 1 is close enough in that case
-	if(*guess == 0) *guess = 1;
+	if(guess == 0) guess = 1;
 
 	// We won't be changing the guess, but the compiler wouldn't know that
-	const int tmp_guess = *guess;
+	const int tmp_guess = guess;
 	BOUNDS_CHECK(tmp_guess, 1, N_PLANES);
 
 	for(int i = 0; !done.x || !done.y ; i++)
@@ -478,16 +478,18 @@ findClosestPlanes_heuristic(close_plane_t *close_planes,
 
 	}
 
-	// Update next guess
-	*guess = smallest_idx;
+
 	#ifdef DEBUG
 	for(int i = 0; i < min(found, MAX_PLANES); i++)
 	{
 		BOUNDS_CHECK(close_planes[i].plane_id, 0, N_PLANES);
 	}
 	#endif
-
-	return min(found, MAX_PLANES);
+	
+	int2 ret;
+	ret.x = min(found, MAX_PLANES);
+	ret.y = smallest_idx;
+	return ret;
 }
 #endif
 
@@ -502,12 +504,12 @@ findClosestPlanes_heuristic(close_plane_t *close_planes,
  * It works by first finding MAX_PLANES_WITHIN_RADIUS planes closer than radius,
  * and then picking the best MAX_PLANES planes by a variant of selection sort
  */
-int findClosestPlanes_exact(close_plane_t *close_planes_ret,
+int2 findClosestPlanes_exact(close_plane_t *close_planes_ret,
                       __local float4* const plane_eqs,
                       __global float16* const plane_matrices,
                       const float4 voxel,
                       const float radius,
-                      int *guess)
+                      int guess)
 {
 
 	// How many planes closer than radius we have found so far
@@ -560,7 +562,10 @@ int findClosestPlanes_exact(close_plane_t *close_planes_ret,
 		// Bigger than initial smallest_dist
 		close_planes[smallest_idx].dist = INFINITY;
 	}
-	return min(MAX_PLANES, found);
+	int2 ret;
+	ret.x = min(MAX_PLANES, found);
+	ret.y = 0;
+	return ret;
 }
 #endif
 
@@ -1311,7 +1316,7 @@ voxel_methods(int volume_xsize,
 	}
 
 
-
+	int2 close_planes_ret;
 	// Iterate over Y axis
 	for(int y = 0; y < volume_ysize; y++)
 	{
@@ -1322,13 +1327,14 @@ voxel_methods(int volume_xsize,
 
 		// Find all planes closer than radius
 
-		n_close_planes = FIND_CLOSE_PLANES(close_planes,
-		                                   plane_eqs,
-		                                   plane_matrices,
-		                                   voxel,
-		                                   radius,
-		                                   &guess);
-
+		close_planes_ret = FIND_CLOSE_PLANES(close_planes,
+		                                       plane_eqs,
+		                                       plane_matrices,
+		                                       voxel,
+		                                       radius,
+		                                       guess);
+		n_close_planes = close_planes_ret.x;
+		guess = close_planes_ret.y;
 
 
 		// Call appropriate method to determine pixel value
