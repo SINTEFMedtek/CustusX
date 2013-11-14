@@ -1011,7 +1011,6 @@ performInterpolation_anisotropic(close_plane_t *close_planes,
 
 		for(int j = -ANISOTROPIC_SIZE/2; j <= ANISOTROPIC_SIZE/2; j++)
 		{
-			#pragma unroll
 			for(int k = -ANISOTROPIC_SIZE/2; k <= ANISOTROPIC_SIZE/2; k++)
 			{
 				int _x = x + j;
