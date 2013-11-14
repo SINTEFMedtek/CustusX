@@ -384,8 +384,19 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                                         sizeof(size_t),
 	                                         &local_work_size,
 	                                         NULL));
+	
 
 	messageManager()->sendInfo(QString("Using %1 as local workgroup size").arg(local_work_size));
+	cl_ulong local_mem_size;
+	// Print local memory usage for debugging purposes
+	ocl_check_error(clGetKernelWorkGroupInfo(mClKernel,
+	                                         moClContext->device,
+	                                         CL_KERNEL_LOCAL_MEM_SIZE,
+	                                         sizeof(cl_ulong),
+	                                         &local_mem_size,
+	                                         NULL));
+
+	messageManager()->sendInfo(QString("Kernel is using %1 bytes of local memory\n").arg(local_mem_size));
 	// Global work items:	
 	size_t global_work_size = (outputDims[0]*outputDims[2]);
 
