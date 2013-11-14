@@ -40,7 +40,7 @@ TEST_CASE("VLCRecorder can record for 7 seconds", "[integration][resource][core]
 {
 	VLCRecorderFixture vlc;
 
-	vlc.checkThatVLCCanRecordTheScreen(7);
+	vlc.checkThatVLCCanRecordTheScreen(10);
 
 	vlc.checkIsMovieFilePlayable();
 }
