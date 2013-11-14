@@ -275,7 +275,7 @@ public:
 			return;
 		}
 
-		glActiveTexture(GL_TEXTURE8);
+		glActiveTexture(GL_TEXTURE6);
 
 		//glEnable( vtkgl::TEXTURE_3D );
 		glGenTextures(1, &textureId);
@@ -293,7 +293,7 @@ public:
 		}
 		mMTime = mTable->GetMTime();
 
-		vtkgl::ActiveTexture(GL_TEXTURE8);
+		glActiveTexture(GL_TEXTURE6);
 		//vtkgl::ActiveTexture(getGLTextureForLut(textureUnitIndex)); //TODO is this OK?
 		this->sendDataToGL();
 
@@ -317,27 +317,30 @@ public:
 
 		if (mDebugEnableCrossplatform)
 		{
-			glEnable(GL_TEXTURE_1D);
+//			glEnable(GL_TEXTURE_1D);
 			glBindTexture(GL_TEXTURE_1D, textureId);
 			glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+			glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+
 			report_gl_error();
 //			glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA,
 //						 lut.size() * sizeof(float), 0,
 //						 GL_RGBA, GL_UNSIGNED_BYTE, &(*lut.begin()));
 
-			#define TEX_SIZE 1024
+			#define TEX_SIZE 256
 
 			float texTable[TEX_SIZE];
 			for (unsigned i=0; i<TEX_SIZE; ++i)
-				texTable[i] = 1.0;
-//				texTable[i] = double(i)/TEX_SIZE;
-			glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB16,
+//				texTable[i] = 1.0;
+				texTable[i] = double(i)/(TEX_SIZE-1);
+			glTexImage1D(GL_TEXTURE_1D, 0,GL_ALPHA16,
 						 TEX_SIZE, 0,
-						 GL_RGB, GL_FLOAT, texTable);
+						 GL_ALPHA, GL_FLOAT, texTable);
 			report_gl_error();
 
-			glDisable(GL_TEXTURE_1D);
-			glBindTexture(GL_TEXTURE_1D, 0);
+//			glDisable(GL_TEXTURE_1D);
+//			glBindTexture(GL_TEXTURE_1D, 0);
 			report_gl_error();
 		}
 		else
