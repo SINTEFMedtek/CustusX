@@ -40,11 +40,12 @@
 /* Begin macros */
 /****************/
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 #define DEBUG_PRINTF(...) if((get_global_id(0) % 5000) == 0) printf(##__VA_ARGS__)
 //#define DEBUG_PRINTF(...) printf(##__VA_ARGS__)
+#define BOUNDS_CHECK(x, min, max) if(x < min || x >= max) printf("%s out of range: %d min: %d max: %d\n", #x, x, min, max)
 #else
 #define DEBUG_PRINTF(...)
 #endif
@@ -69,7 +70,7 @@
 
 // Gaussian weight function
 #define WEIGHT_GAUSS_SIGMA (0.05f)
-
+ 
 #define WEIGHT_GAUSS_SQRT_2PI 2.506628275f
 
 #define WEIGHT_GAUSS_NONEXP_PART(sigma) (1.0f/(sigma*WEIGHT_GAUSS_SQRT_2PI))
@@ -304,8 +305,8 @@ int isValidPixel(int x,
 		return 1;
 	}
 	else {
-		DEBUG_PRINTF("Pixel %d, %d is not valid! Sizes: %d, %d\n",
-		             x, y, in_xsize, in_ysize);
+		//		DEBUG_PRINTF("Pixel %d, %d is not valid! Sizes: %d, %d\n",
+		//           x, y, in_xsize, in_ysize);
 		return 0;
 	}
 #endif
@@ -338,7 +339,8 @@ findHighestIdx(close_plane_t *planes,
 		}
 		planes++;
 	}
-	DEBUG_PRINTF("New maxidx: %d maxdist = %f\n", maxidx, maxval);
+	//	DEBUG_PRINTF("New maxidx: %d maxdist = %f\n", maxidx, maxval);
+	BOUNDS_CHECK(maxidx, 0, MAX_PLANES);
 	return maxidx;
 }
 
@@ -387,12 +389,13 @@ findClosestPlanes_heuristic(close_plane_t *close_planes,
 
 	// We won't be changing the guess, but the compiler wouldn't know that
 	const int tmp_guess = *guess;
-
+	BOUNDS_CHECK(tmp_guess, 1, N_PLANES);
 
 	for(int i = 0; !done.x || !done.y ; i++)
 	{
 		// Compute the indices of the planes we want to look at.
 		int2 idx = {tmp_guess + i, tmp_guess - i - 1};
+
 
 		// Compute the distances to those planes
 		float2 dists = {dot(voxel, plane_eqs[idx.x]), dot(voxel, plane_eqs[idx.y])};
@@ -403,6 +406,8 @@ findClosestPlanes_heuristic(close_plane_t *close_planes,
 		// Check if the plane is closer than the one farthest away we have included so far
 		if(!done.x && abs_dists.x < max_dist)
 		{
+			BOUNDS_CHECK(idx.x, 0, N_PLANES);
+			BOUNDS_CHECK(max_idx, 0, MAX_PLANES);
 			// If yes, swap out the one with the longest distance for this plane
 			close_planes[max_idx].dist = dists.x;
 			close_planes[max_idx].plane_id = idx.x;
@@ -433,6 +438,8 @@ findClosestPlanes_heuristic(close_plane_t *close_planes,
 		// Check if the plane is closer than the one farthest away we have included so far
 		if(!done.y && abs_dists.y < max_dist)
 		{
+			BOUNDS_CHECK(idx.y, 0, N_PLANES);
+			BOUNDS_CHECK(max_idx, 0, MAX_PLANES);
 			// If yes, swap out the one with the longest distance for this plane
 			close_planes[max_idx].dist = dists.y;
 			close_planes[max_idx].plane_id = idx.y;
@@ -472,6 +479,12 @@ findClosestPlanes_heuristic(close_plane_t *close_planes,
 
 	// Update next guess
 	*guess = smallest_idx;
+	#ifdef DEBUG
+	for(int i = 0; i < min(found, MAX_PLANES); i++)
+	{
+		BOUNDS_CHECK(close_planes[i].plane_id, 0, N_PLANES);
+	}
+	#endif
 
 	return min(found, MAX_PLANES);
 }
@@ -568,6 +581,7 @@ getImageData(int plane_id,
 		// It's in a big block
 		block = plane_id / (scans_per_block+1);
 		idx_in_block = plane_id % (scans_per_block+1);
+		BOUNDS_CHECK(idx_in_block, 0, scans_per_block+1);
 	}
 	else
 	{
@@ -575,7 +589,10 @@ getImageData(int plane_id,
 		int index_into_small_blocks = plane_id - (n_big_blocks * (scans_per_block+1));
 		idx_in_block = index_into_small_blocks % scans_per_block;
 		block = n_big_blocks + (index_into_small_blocks / scans_per_block);
+		BOUNDS_CHECK(idx_in_block, 0, scans_per_block);
 	}
+	BOUNDS_CHECK(block, 0, 10);
+
 	return &bscans_blocks[block][idx_in_block*in_xsize*in_ysize];
 }
 
@@ -761,7 +778,7 @@ performInterpolation_vnn(close_plane_t *close_planes,
 			close_plane_id = i;
 		}
 	}
-
+	BOUNDS_CHECK(plane_id, 0, N_PLANES);
 	const __global unsigned char* image = getImageData(plane_id,
 	                                                   bscans_blocks,
 	                                                   in_xsize,
@@ -788,7 +805,8 @@ performInterpolation_vnn(close_plane_t *close_planes,
 	{
 		return 1;
 	}
-
+	BOUNDS_CHECK(x, 0, in_xsize);
+	BOUNDS_CHECK(y, 0, in_ysize);
 	return max((unsigned char)1, image[y*in_xsize + x]);
 
 }
@@ -1011,7 +1029,6 @@ performInterpolation_anisotropic(close_plane_t *close_planes,
 
 		for(int j = -ANISOTROPIC_SIZE/2; j <= ANISOTROPIC_SIZE/2; j++)
 		{
-			#pragma unroll
 			for(int k = -ANISOTROPIC_SIZE/2; k <= ANISOTROPIC_SIZE/2; k++)
 			{
 				int _x = x + j;
@@ -1237,7 +1254,10 @@ voxel_methods(int volume_xsize,
 	int id = get_global_id(0);
 	int x = id % volume_xsize;
 	int z = id / volume_xsize;
-
+	#ifdef DEBUG
+	if(id == 5000)
+		BOUNDS_CHECK(id, 0, 1);
+	#endif
 	// Aggregate pointers to the bscan blocks into one array for convenience
 
 	const __global unsigned char *bscans_blocks[] = { in_bscans_b0,
@@ -1273,6 +1293,9 @@ voxel_methods(int volume_xsize,
 
 	if(z >= volume_zsize) return;
 	if(x >= volume_xsize) return;
+	BOUNDS_CHECK(x, 0, volume_xsize);
+	BOUNDS_CHECK(z, 0, volume_zsize);
+
 
 
 	for(int i = 0; i < N_PLANES; i++)
@@ -1291,6 +1314,9 @@ voxel_methods(int volume_xsize,
 	// Iterate over Y axis
 	for(int y = 0; y < volume_ysize; y++)
 	{
+		BOUNDS_CHECK(z, 0, volume_xsize);
+
+
 		voxel.y = y*volume_yspacing;
 
 		// Find all planes closer than radius
