@@ -25,6 +25,9 @@
 #include "cxTimedAlgorithm.h"
 #include "cxUSReconstructInputDataAlgoritms.h"
 #include "sscReconstructManager.h"
+#include "sscDataAdapter.h"
+#include "sscStringDataAdapterXml.h"
+#include "sscDoubleDataAdapterXml.h"
 
 #include "recConfig.h"
 #ifdef SSC_USE_OpenCL
@@ -508,6 +511,63 @@ cx::USReconstructInputData generateSyntheticUSBMode()
 	retval.rMpr = cx::Transform3D::Identity();
 
 	return retval;
+}
+
+TEST_CASE("ReconstructManager: Reconstructing using TordTest Anisotropic on syntetic data", "[usreconstruction][plugins][unit][tordtest][hide]")
+{
+	cx::USReconstructInputData inputData = generateSyntheticUSBMode();
+
+	CHECK(inputData.getMask()->GetDimensions()[0] == inputData.mUsRaw->getDimensions()[0]);
+	CHECK(inputData.getMask()->GetDimensions()[1] == inputData.mUsRaw->getDimensions()[1]);
+//	CHECK(inputData.getMask()->GetDimensions()[2] == inputData.mUsRaw->getDimensions()[2]);
+
+	ReconstructManagerTestFixture fixture;
+	cx::ReconstructManagerPtr reconstructer = fixture.createManager();
+	reconstructer->selectData(inputData);
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("TordTest");
+
+	std::vector<DataAdapterPtr> options = reconstructer->getAlgoOptions();
+	std::vector<DataAdapterPtr>::iterator it;
+	for(it = options.begin(); it != options.end(); ++it)
+	{
+		if(it->get()->getValueName() == "Method")
+		{
+			cx::StringDataAdapterXmlPtr x = boost::dynamic_pointer_cast<cx::StringDataAdapterXml>(*it);
+			x->setValue("Anisotropic");
+		}
+		if(it->get()->getValueName() == "PlaneMethod")
+		{
+			cx::StringDataAdapterXmlPtr x = boost::dynamic_pointer_cast<cx::StringDataAdapterXml>(*it);
+			x->setValue("Heuristic");
+		}
+		if(it->get()->getValueName() == "MaxPlanes")
+		{
+			cx::DoubleDataAdapterXmlPtr x = boost::dynamic_pointer_cast<cx::DoubleDataAdapterXml>(*it);
+			x->setValue(8);
+		}
+		if(it->get()->getValueName() == "Radius")
+		{
+			cx::DoubleDataAdapterXmlPtr x = boost::dynamic_pointer_cast<cx::DoubleDataAdapterXml>(*it);
+			x->setValue(1);
+		}
+	}
+
+
+	reconstructer->getParams()->mAngioAdapter->setValue(false);
+	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
+
+	reconstructer->createAlgorithm();
+
+	// run the reconstruction in the main thread
+	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
+	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
+	REQUIRE(cores.size()==1);
+	preprocessor->initializeCores(cores);
+	cores[0]->reconstruct();
+
+	cx::ImagePtr output = cores[0]->getOutput();
+
+	REQUIRE(output);
 }
 
 TEST_CASE("ReconstructManager: B-Mode with synthetic data", "[usreconstruction][plugins][unit]")
