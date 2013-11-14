@@ -399,8 +399,8 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	messageManager()->sendInfo(QString("Kernel is using %1 bytes of local memory\n").arg(local_mem_size));
 	// Global work items:	
 	size_t global_work_size = (outputDims[0]*outputDims[2]);
-	// TEST
-	local_work_size = 16;
+	//TEST
+	local_work_size = 32;
 	// Round global_work_size up to nearest multiple of local_work_size
 	if(global_work_size % local_work_size)
 		global_work_size = ((global_work_size/local_work_size) + 1)*local_work_size;
