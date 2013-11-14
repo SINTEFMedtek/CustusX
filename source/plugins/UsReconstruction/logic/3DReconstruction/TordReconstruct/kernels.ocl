@@ -658,6 +658,7 @@ float2 transform_inv_xy(float16 matrix, float4 voxel)
 /**
  * Print a matrix - useful for debugging
  */
+#ifdef DEBUG
 void printMatrix(float16 matrix)
 {
 	printf("[ %f, %f, %f, %f\n   %f, %f, %f, %f\n   %f, %f, %f, %f\n   %f, %f, %f, %f\n",
@@ -678,6 +679,7 @@ void printMatrix(float16 matrix)
 	       matrix.sE,
 	       matrix.sF);
 }
+#endif
 
 /**
  * Transform to integer image coordinates - i.e. pixel coordinates
