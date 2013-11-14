@@ -85,7 +85,7 @@ void VLCRecorder::stopRecording()
 
 void VLCRecorder::play(QString moviePath)
 {
-	mCommandLine->launch("\""+mVLCPath+"\" "+moviePath+" vlc://quit");
+	mCommandLine->launch("\""+mVLCPath+"\" "+moviePath+" --play-and-exit");
 }
 
 void VLCRecorder::setVLCPath(QString path)
