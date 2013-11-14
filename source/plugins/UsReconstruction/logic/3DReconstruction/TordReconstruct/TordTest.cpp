@@ -404,7 +404,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                                       0,
 	                                       NULL,
 	                                       NULL));
-	
+	ocl_check_error(clFinish(moClContext->cmd_queue));
 
 	// Read back data
 	try {
