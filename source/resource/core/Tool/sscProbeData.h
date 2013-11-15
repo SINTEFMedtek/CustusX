@@ -68,18 +68,32 @@ namespace cx
  *
  * Associated image:
  *
- *            x                   coordinate space v: origin upper left corner
+ *            x                   coordinate space v: origin upper left corner, spacing in mm
  *      v*---->
  *       |
- *       | ' ' ' ' ' ' ' ' ' ' '  size: pixel dimensions (width, height)
- *      y. '                   '  spacing: pixel size (width, height)
- *         '         *         '  origin_u: calibration center in space u, dimensions mm. origin of t space.
- *         '                   '
- *      y^ '                   '
+ *       | ' ' ' ' ' ' ' ' ' ' '
+ *      y. '                   '  spacing in mm
+ *         '    y<--t@         '  @ = point called origin: calibration center = origin of t space.
+ *         '         |         '  (See also sscTool.h for definition of t space)
+ *      y^ '        z.         '
  *       | '                   '
  *       | ' ' ' ' ' ' ' ' ' ' '
  *      u*---->                  coordinate space u: origin lower left corner
  *            x
+ *
+ *
+ *
+ *            x                   coordinate space p: origin upper left corner, spacing in pixels
+ *      p*---->
+ *       |
+ *       | ' ' ' ' ' ' ' ' ' ' '  size: pixel dimensions (width, height)
+ *      y. '                   '
+ *         '                   '
+ *         '                   '
+ *         '                   '
+ *         '                   '
+ *         ' ' ' ' ' ' ' ' ' ' '
+ *
  *
  * \endverbatim
  *
@@ -88,21 +102,6 @@ namespace cx
 class ProbeData
 {
 public: 
-	struct ProbeImageData
-	{
-		ProbeImageData();
-		Vector3D getOrigin_u() const; ///< probe origin in image space u. (lower-left corner origin)
-		DoubleBoundingBox3D getClipRect_u() const; ///< sector clipping rect in image space u. (lower-left corner origin)
-		Vector3D mOrigin_p; ///< probe origin in pixel space p. (upper-left corner origin)
-		Vector3D mSpacing;
-		DoubleBoundingBox3D mClipRect_p; ///< sector clipping rect, in addition to the standard sector definition. The probe sector is the intersection of the sector definition and the clip rect.
-		QSize mSize;
-		Vector3D transform_p_to_u(const Vector3D& q_p) const;
-
-		void addXml(QDomNode dataNode) const; ///< write to xml
-		void parseXml(QDomNode dataNode);///< load from xml
-	};
-
 	enum TYPE { tNONE=0,   ///< undefined
 				tSECTOR=1, ///< US beam is emitted radially in a flat cone. 
 				tLINEAR=2  ///< US beam is emitted straight forward.
@@ -110,8 +109,10 @@ public:
 
 public:
 	ProbeData(TYPE type = tNONE);
-	void addXml(QDomNode dataNode) const; ///< write to xml
-	void parseXml(QDomNode dataNode);///< load from xml
+	void addXml(QDomNode dataNode) const;
+	void parseXml(QDomNode dataNode);
+	void addImageXml(QDomNode dataNode) const;
+	void parseImageXml(QDomNode dataNode);
 
 	TYPE getType() const;
 	double getDepthStart() const;
@@ -119,13 +120,11 @@ public:
 	double getWidth() const;
 	double getTemporalCalibration() const;
 	double getCenterOffset() const;
-	ProbeImageData getImage() const;
 	void resample(QSize mSize); ///< Set a new image size. Resample all other parameters to match this new image size, keeping sizes in millimeters fixed.
 	QString getUid() const;
 
 	void setTemporalCalibration(double value);
 	void setType(TYPE type);
-	void setImage(ProbeImageData value);
 	void setSector(double depthStart, double depthEnd, double width, double centerOffset = 0);
 	void setUid(QString uid);
 	QString getUid();
@@ -134,6 +133,15 @@ public:
 	void updateSectorFromClipRect();
 	void applySoundSpeedCompensationFactor(double factor);///< Compensate for soundspeed for linear probes
 
+	//ProbeImageData variables
+	Vector3D mOrigin_p; ///< probe origin in space p, measured in pixels. (upper-left corner origin)
+	Vector3D mSpacing;//(_p)
+	DoubleBoundingBox3D mClipRect_p; ///< sector clipping rect, in addition to the standard sector definition. The probe sector is the intersection of the sector definition and the clip rect.
+	QSize mSize;//_p
+
+	Vector3D getOrigin_u() const; ///< probe origin in image space u. (lower-left corner origin)
+	DoubleBoundingBox3D getClipRect_u() const; ///< sector clipping rect in image space u. (lower-left corner origin)
+
 private:
 	TYPE mType; ///< type of probe
 	double mDepthStart; ///< start of sector, mm
@@ -141,9 +149,11 @@ private:
 	double mWidth; ///< width of sector in radians (SECTOR) or millimeters (LINEAR).
 	double mTemporalCalibration;
 	double mCenterOffset; ///< Offset of center point for sectors, mm
-	ProbeImageData mImage;
 	double mSoundSpeedCompensationFactor; ///< The used sound speed compensation factor
 	QString mUid; ///<  the uid of the stream data this probe data applies to.
+
+	//ProbeImageData
+	Vector3D transform_p_to_u(const Vector3D& q_p) const;
 };
 
 typedef boost::shared_ptr<ProbeData> ProbeDataPtr;
