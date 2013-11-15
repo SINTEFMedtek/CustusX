@@ -111,8 +111,6 @@ public:
 	ProbeData(TYPE type = tNONE);
 	void addXml(QDomNode dataNode) const;
 	void parseXml(QDomNode dataNode);
-	void addImageXml(QDomNode dataNode) const;
-	void parseImageXml(QDomNode dataNode);
 
 	TYPE getType() const;
 	double getDepthStart() const;
@@ -127,7 +125,6 @@ public:
 	void setType(TYPE type);
 	void setSector(double depthStart, double depthEnd, double width, double centerOffset = 0);
 	void setUid(QString uid);
-	QString getUid();
 
 	void updateClipRectFromSector();
 	void updateSectorFromClipRect();
@@ -141,6 +138,7 @@ public:
 
 	Vector3D getOrigin_u() const; ///< probe origin in image space u. (lower-left corner origin)
 	DoubleBoundingBox3D getClipRect_u() const; ///< sector clipping rect in image space u. (lower-left corner origin)
+	DoubleBoundingBox3D getClipRect(CoordinateSystem coord) const; ///< sector clipping rect in image space u. (lower-left corner origin)
 
 private:
 	TYPE mType; ///< type of probe
@@ -154,6 +152,8 @@ private:
 
 	//ProbeImageData
 	Vector3D transform_p_to_u(const Vector3D& q_p) const;
+	void addImageXml(QDomNode dataNode) const;
+	void parseImageXml(QDomNode dataNode);
 };
 
 typedef boost::shared_ptr<ProbeData> ProbeDataPtr;

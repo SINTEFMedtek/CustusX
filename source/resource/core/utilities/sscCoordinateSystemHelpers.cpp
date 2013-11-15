@@ -36,7 +36,7 @@ bool operator==(const CoordinateSystem& lhs, const CoordinateSystem& rhs)
 
 // --------------------------------------------------------
 
-std::vector<CoordinateSystem> CoordinateSystemHelpers::getAvailableSpaces(bool compact)
+std::vector<CoordinateSystem> CoordinateSystemHelpers::getSpacesToPresentInGUI()
 {
 	std::vector<CoordinateSystem> retval;
 	retval.push_back(CoordinateSystem(csREF));
@@ -46,47 +46,15 @@ std::vector<CoordinateSystem> CoordinateSystemHelpers::getAvailableSpaces(bool c
 	retval.push_back(CoordinateSystem(csDATA, "active"));
 	retval.push_back(CoordinateSystem(csDATA_VOXEL, "active"));
 
-	if (!compact)
-	{
-		std::set<QString> dataSpaces;
-		std::map<QString, DataPtr> data = dataManager()->getData();
-		for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
-		{
-			dataSpaces.insert(iter->second->getSpace());
-	//		dataSpaces.insert(iter->second->getParentSpace()); // system only handle spaces identical to data.
-		}
-		dataSpaces.erase("");
-		for (std::set<QString>::iterator iter=dataSpaces.begin(); iter!=dataSpaces.end(); ++iter)
-		{
-			retval.push_back(CoordinateSystem(csDATA, *iter));
-		}
-		for (std::set<QString>::iterator iter=dataSpaces.begin(); iter!=dataSpaces.end(); ++iter)
-		{
-			retval.push_back(CoordinateSystem(csDATA_VOXEL, *iter));
-		}
-	}
-
 	// alias for the currently active tool:
 	retval.push_back(CoordinateSystem(csTOOL, "active"));
 	retval.push_back(CoordinateSystem(csSENSOR, "active"));
 	retval.push_back(CoordinateSystem(csTOOL_OFFSET, "active"));
 
-	if (!compact)
-	{
-		std::map<QString, ToolPtr> tools = *toolManager()->getTools();
-		for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
-		{
-			retval.push_back(CoordinateSystem(csTOOL, iter->first));
-		}
-		for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
-		{
-			retval.push_back(CoordinateSystem(csSENSOR, iter->first));
-		}
-		for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
-		{
-			retval.push_back(CoordinateSystem(csTOOL_OFFSET, iter->first));
-		}
-	}
+	// active: alias for the currently active image
+	retval.push_back(CoordinateSystem(csIMAGE_V, "active"));
+	retval.push_back(CoordinateSystem(csIMAGE_U, "active"));
+	retval.push_back(CoordinateSystem(csIMAGE_PIXEL, "active"));
 
 	return retval;
 }
@@ -95,26 +63,6 @@ Vector3D CoordinateSystemHelpers::getDominantToolTipPoint(CoordinateSystem to, b
 {
     Transform3D toMfrom = CoordinateSystemHelpers::getDominantToolTipTransform(to, useOffset);
     return toMfrom.coord(Vector3D(0,0,0));
-
-//    ToolPtr tool = toolManager()->getDominantTool();
-//	if (!tool)
-//		return Vector3D(0,0,0);
-////
-////	QString dominantToolUid = tool->getUid();
-////
-////	CoordinateSystem from(csTOOL, dominantToolUid);
-
-//	CoordinateSystem from = getToolCoordinateSystem(tool);
-
-//	Vector3D point_t;
-//	if(useOffset)
-//		point_t = Vector3D(0,0,tool->getTooltipOffset());
-//	else
-//		point_t = Vector3D(0,0,0);
-
-//	Vector3D P_to = CoordinateSystemHelpers::get_toMfrom(from, to).coord(point_t);
-
-//	return P_to;
 }
 
 CoordinateSystem CoordinateSystemHelpers::getToolCoordinateSystem(ToolPtr tool)
@@ -177,6 +125,9 @@ Transform3D CoordinateSystemHelpers::get_rMfrom(CoordinateSystem from)
 		break;
 	case csDATA_VOXEL:
 		rMfrom = get_rMdv(from.mRefObject);
+		break;
+	case csIMAGE_PIXEL:
+		rMfrom = get_rMp(from.mRefObject);
 		break;
 	default:
 
@@ -256,8 +207,14 @@ CoordinateSystem CoordinateSystemHelpers::getPr()
 
 CoordinateSystem CoordinateSystemHelpers::getR()
 {
-	CoordinateSystem pr(csREF);
-	return pr;
+	CoordinateSystem r(csREF);
+	return r;
+}
+
+CoordinateSystem CoordinateSystemHelpers::getP()
+{
+	CoordinateSystem p(csIMAGE_PIXEL);
+	return p;
 }
 
 Transform3D CoordinateSystemHelpers::get_rMr()
@@ -359,6 +316,38 @@ Transform3D CoordinateSystemHelpers::get_rMs(QString uid)
 	Transform3D rMs = rMpr * prMt * tMs;
 
 	return rMs; //ref_M_s
+}
+
+Transform3D CoordinateSystemHelpers::get_rMv(QString uid)
+{
+
+}
+
+Transform3D CoordinateSystemHelpers::get_rMu(QString uid)
+{
+
+}
+
+Transform3D CoordinateSystemHelpers::get_rMp(QString uid)
+{
+	ToolPtr tool = toolManager()->getTool(uid);
+	if(!tool)
+	{
+		messageManager()->sendWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
+		return Transform3D::Identity();
+	}
+	ProbePtr probe = tool->getProbe();
+	if(!probe)
+	{
+		messageManager()->sendWarning("Tool with uid: "+uid+" is not a probe. Can not find transform to unknown coordinate system, returning identity!");
+		return Transform3D::Identity();
+	}
+
+	Transform3D rMv = get_rMv(uid);
+	Transform3D vMp = probe->get_vMp();
+	Transform3D rMp = rMv * vMp;
+
+	return rMp;
 }
 
 } //namespace cx
