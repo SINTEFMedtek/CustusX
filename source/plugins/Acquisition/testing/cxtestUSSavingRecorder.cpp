@@ -63,7 +63,7 @@ TEST_CASE_METHOD(cxtest::USSavingRecorderFixture, "USSavingRecorder: Use one Vid
 	this->verifySaveData();
 }
 
-TEST_CASE_METHOD(cxtest::USSavingRecorderFixture, "USSavingRecorder: Use 4 VideoSources", "[integration][plugins][Acquisition]")
+TEST_CASE_METHOD(cxtest::USSavingRecorderFixture, "USSavingRecorder: Use 4 VideoSources", "[integration][plugins][Acquisition][unstable]")
 {
 	this->setTool(cx::ToolPtr());
 	for (unsigned i=0; i<4; ++i)

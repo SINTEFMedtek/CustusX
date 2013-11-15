@@ -179,8 +179,8 @@ vtkImageReslicePtr SimulatedImageStreamer::createReslicer(ImagePtr source, vtkMa
 	reslicer->SetResliceAxes(sliceAxes);
 	reslicer->AutoCropOutputOn();
 	reslicer->SetOutputOrigin(0,0,0);
-	reslicer->SetOutputExtent(0, probedata.getImage().mSize.width()-1, 0, probedata.getImage().mSize.height()-1, 0, 0);
-	reslicer->SetOutputSpacing(probedata.getImage().mSpacing.data());
+	reslicer->SetOutputExtent(0, probedata.mSize.width()-1, 0, probedata.mSize.height()-1, 0, 0);
+	reslicer->SetOutputSpacing(probedata.mSpacing.data());
 	reslicer->Update();
 
 	return reslicer;

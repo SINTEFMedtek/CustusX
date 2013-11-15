@@ -105,10 +105,6 @@ void ReconstructManager::transferFunctionChangedSlot()
 
 std::vector<ReconstructCorePtr> ReconstructManager::startReconstruction()
 {
-	cx::CompositeTimedAlgorithmPtr serial(new cx::CompositeTimedAlgorithm("US Reconstruction"));
-	cx::CompositeParallelTimedAlgorithmPtr parallel(new cx::CompositeParallelTimedAlgorithm());
-
-	ReconstructPreprocessorPtr preprocessor = this->createPreprocessor();
 	std::vector<ReconstructCorePtr> cores = this->createCores();
 
 	if (cores.empty())
@@ -117,14 +113,16 @@ std::vector<ReconstructCorePtr> ReconstructManager::startReconstruction()
 		return cores;
 	}
 
-	serial->append(ThreadedTimedReconstructPreprocessor::create(preprocessor, cores));
-	serial->append(parallel);
-	for (unsigned i=0; i<cores.size(); ++i)
-		parallel->append(ThreadedTimedReconstructCore::create(cores[i]));
+	cx::CompositeTimedAlgorithmPtr algorithm = this->assembleReconstructionPipeline(cores);
 
-	this->launch(serial);
+	this->launch(algorithm);
 
 	return cores;
+}
+
+std::set<cx::TimedAlgorithmPtr> ReconstructManager::getThreadedReconstruction()
+{
+	return mThreadedReconstruction;
 }
 
 void ReconstructManager::launch(cx::TimedAlgorithmPtr thread)
@@ -146,9 +144,7 @@ void ReconstructManager::threadFinishedSlot()
 			iter = mThreadedReconstruction.begin();
 		}
 		else
-		{
 			++iter;
-		}
 	}
 
 	if (mThreadedReconstruction.empty())
@@ -194,6 +190,39 @@ bool ReconstructManager::validInputData() const
 	return true;
 }
 
+cx::CompositeTimedAlgorithmPtr ReconstructManager::assembleReconstructionPipeline(std::vector<ReconstructCorePtr> cores)
+{
+	cx::CompositeSerialTimedAlgorithmPtr pipeline(new cx::CompositeSerialTimedAlgorithm("US Reconstruction"));
+
+	ReconstructPreprocessorPtr preprocessor = this->createPreprocessor();
+	pipeline->append(ThreadedTimedReconstructPreprocessor::create(preprocessor, cores));
+
+	cx::CompositeTimedAlgorithmPtr temp = pipeline;
+	if(this->canCoresRunInParallel(cores))
+	{
+		cx::CompositeParallelTimedAlgorithmPtr parallel(new cx::CompositeParallelTimedAlgorithm());
+		pipeline->append(parallel);
+		temp = parallel;
+		messageManager()->sendDebug("Running reconstruction cores in parallel.");
+	}
+
+	for (unsigned i=0; i<cores.size(); ++i)
+		temp->append(ThreadedTimedReconstructCore::create(cores[i]));
+
+	return pipeline;
+}
+
+bool ReconstructManager::canCoresRunInParallel(std::vector<ReconstructCorePtr> cores)
+{
+	bool parallelizable = true;
+
+	std::vector<ReconstructCorePtr>::iterator it;
+	for(it = cores.begin(); it != cores.end(); ++it)
+		parallelizable = parallelizable && (it->get()->getInputParams().mAlgorithmUid == "PNN");
+
+	return parallelizable;
+}
+
 ReconstructParamsPtr ReconstructManager::getParams()
 {
 	return mParams;
@@ -204,9 +233,19 @@ std::vector<DataAdapterPtr> ReconstructManager::getAlgoOptions()
 	return mAlgoOptions;
 }
 
+XmlOptionFile ReconstructManager::getSettings()
+{
+	return mSettings;
+}
+
 QString ReconstructManager::getSelectedFilename() const
 {
 	return mOriginalFileData.mFilename;
+}
+
+USReconstructInputData ReconstructManager::getSelectedFileData()
+{
+	return mOriginalFileData;
 }
 
 void ReconstructManager::selectData(QString filename, QString calFilesPath)
