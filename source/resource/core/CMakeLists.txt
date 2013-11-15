@@ -170,7 +170,19 @@ set( CX_RESOURCE_LIBRARIES ${CX_RESOURCE_LIBRARIES}
 # Configure the default SSC_DATA_ROOT for the location of SSCData.
 unset(SSC_DATA_ROOT)
 set (SSC_DATA_ROOT ${CustusX3_SOURCE_DIR}/data CACHE INTERNAL "path to ssc data root")
-  
+
+# Configure the USE_GLX_SHARED_CONTEXT - used in sscConfig.h
+if(X11_FOUND)
+    if(APPLE)
+        option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" OFF)
+    else(APPLE)
+        option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" ON)
+    endif(APPLE)
+    include_directories( ${X11_INCLUDE_DIR} ) # needed by Mac 10.8+
+else(X11_FOUND)
+    option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" OFF)
+endif(X11_FOUND)
+
 configure_file(
   "${CustusX3_SOURCE_DIR}/source/resource/core/utilities/sscConfig.h.in"
   "${CustusX3_BINARY_DIR}/source/resource/core/utilities/sscConfig.h"
