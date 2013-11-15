@@ -22,6 +22,21 @@
 namespace cx
 {
 
+class CompositeTimedAlgorithm : public TimedBaseAlgorithm
+{
+public:
+	CompositeTimedAlgorithm(QString name);
+	virtual void append(TimedAlgorithmPtr child);
+	virtual void clear() = 0;
+
+protected:
+	std::vector<TimedAlgorithmPtr> mChildren;
+};
+typedef boost::shared_ptr<CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
+
+
+
+
 /**Composition of several TimedBaseAlgorithms executing in a sequence.
  *
  * Usage: Append all algorithms as children then execute. All children
@@ -29,26 +44,28 @@ namespace cx
  *
  * \ingroup cxResourceAlgorithms
  * \date Jun 27, 2012
- * \author christiana
+ * \author Christian Askeland
  */
-class CompositeTimedAlgorithm : public TimedBaseAlgorithm
+class CompositeSerialTimedAlgorithm : public CompositeTimedAlgorithm
 {
 	Q_OBJECT
+
 public:
-	explicit CompositeTimedAlgorithm(QString name="composite");
+	explicit CompositeSerialTimedAlgorithm(QString name="composite");
+	virtual void clear();
+
 	virtual QString getProduct() const;
-	void append(TimedAlgorithmPtr child);
-	void clear();
 	virtual void execute();
 	virtual bool isFinished() const;
     virtual bool isRunning() const;
+
 private slots:
 	void jumpToNextChild();
+
 private:
-	std::vector<TimedAlgorithmPtr> mChildren;
 	int mCurrent;
 };
-typedef boost::shared_ptr<CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
+typedef boost::shared_ptr<CompositeSerialTimedAlgorithm> CompositeSerialTimedAlgorithmPtr;
 
 
 
@@ -59,23 +76,24 @@ typedef boost::shared_ptr<CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
  *
  * \ingroup cxResourceAlgorithms
  * \date Nov 06, 2012
- * \author christiana
+ * \author Christian Askeland
  */
-class CompositeParallelTimedAlgorithm : public TimedBaseAlgorithm
+class CompositeParallelTimedAlgorithm : public CompositeTimedAlgorithm
 {
 	Q_OBJECT
+
 public:
 	CompositeParallelTimedAlgorithm(QString name="parallel");
+	virtual void clear();
+
 	virtual QString getProduct() const;
-	void append(TimedAlgorithmPtr child);
-	void clear();
 	virtual void execute();
 	virtual bool isFinished() const;
     virtual bool isRunning() const;
+
 private slots:
 	void oneFinished();
-private:
-	std::vector<TimedAlgorithmPtr> mChildren;
+
 };
 typedef boost::shared_ptr<CompositeParallelTimedAlgorithm> CompositeParallelTimedAlgorithmPtr;
 

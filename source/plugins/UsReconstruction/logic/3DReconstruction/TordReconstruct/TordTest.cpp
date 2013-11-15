@@ -376,11 +376,31 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &radius));
 
 
-	// Global work items:
-	size_t local_work_size = 128;
+	size_t local_work_size;
+	// Find the optimal local work size
+	ocl_check_error(clGetKernelWorkGroupInfo(mClKernel,
+	                                         moClContext->device,
+	                                         CL_KERNEL_WORK_GROUP_SIZE,
+	                                         sizeof(size_t),
+	                                         &local_work_size,
+	                                         NULL));
 	
-	size_t global_work_size = (outputDims[0]*outputDims[2]);
 
+	messageManager()->sendInfo(QString("Using %1 as local workgroup size").arg(local_work_size));
+	cl_ulong local_mem_size;
+	// Print local memory usage for debugging purposes
+	ocl_check_error(clGetKernelWorkGroupInfo(mClKernel,
+	                                         moClContext->device,
+	                                         CL_KERNEL_LOCAL_MEM_SIZE,
+	                                         sizeof(cl_ulong),
+	                                         &local_mem_size,
+	                                         NULL));
+
+	messageManager()->sendInfo(QString("Kernel is using %1 bytes of local memory\n").arg(local_mem_size));
+	// Global work items:	
+	size_t global_work_size = (outputDims[0]*outputDims[2]);
+	//TEST
+	local_work_size = 32;
 	// Round global_work_size up to nearest multiple of local_work_size
 	if(global_work_size % local_work_size)
 		global_work_size = ((global_work_size/local_work_size) + 1)*local_work_size;
@@ -396,7 +416,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                                       0,
 	                                       NULL,
 	                                       NULL));
-	
+	ocl_check_error(clFinish(moClContext->cmd_queue));
 
 	// Read back data
 	try {
