@@ -58,17 +58,17 @@ USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName
   std::pair<QString, ProbeData>  probeDataFull = this->readProbeDataBackwardsCompatible(changeExtension(fileName, "mhd"), calFilesPath);
   ProbeData  probeData = probeDataFull.second;
   // override spacing with spacing from image file. This is because the raw spacing from probe calib might have been changed by changing the sound speed.
-  bool spacingOK = similar(probeData.getImage().mSpacing[0], retval.mUsRaw->getSpacing()[0], 0.001)
-  	  	  	  	&& similar(probeData.getImage().mSpacing[1], retval.mUsRaw->getSpacing()[1], 0.001);
+	bool spacingOK = similar(probeData.mSpacing[0], retval.mUsRaw->getSpacing()[0], 0.001)
+								&& similar(probeData.mSpacing[1], retval.mUsRaw->getSpacing()[1], 0.001);
   if (!spacingOK)
   {
       messageManager()->sendWarning(""
     	  "Mismatch in spacing values from calibration and recorded image.\n"
     	  "This might be valid if the sound speed was changed prior to recording.\n"
-    	  "Probe definition: "+ qstring_cast(probeData.getImage().mSpacing) + ", Acquired Image: " + qstring_cast(retval.mUsRaw->getSpacing())
+				"Probe definition: "+ qstring_cast(probeData.mSpacing) + ", Acquired Image: " + qstring_cast(retval.mUsRaw->getSpacing())
     	  );
   }
-  probeData.getImage().mSpacing = Vector3D(retval.mUsRaw->getSpacing());
+	probeData.mSpacing = Vector3D(retval.mUsRaw->getSpacing());
   retval.mProbeData.setData(probeData);
   retval.mProbeUid = probeDataFull.first;
 
