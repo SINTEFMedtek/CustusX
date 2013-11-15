@@ -216,12 +216,12 @@ function(_cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES ADDITIONAL_LI
         CACHE INTERNAL
         "List of all catch unit test libs that should be added to the master test exe.")
 
-    set(TEST_EXE_NAME "Catch${LIB_TO_TEST}")
-    message(STATUS "          Exe name : ${TEST_EXE_NAME}")
+#    set(TEST_EXE_NAME "Catch${LIB_TO_TEST}")
+#    message(STATUS "          Exe name : ${TEST_EXE_NAME}")
 
-    set(cxtest_MAIN ${CustusX3_SOURCE_DIR}/source/resource/testUtilities/cxtestCatchMain.cpp)
-    add_executable(${TEST_EXE_NAME} ${cxtest_MAIN})
-    target_link_libraries(${TEST_EXE_NAME} ${CX_CATCH_PRE_WHOLE_ARCHIVE} ${TEST_LIB_NAME} ${CX_CATCH_POST_WHOLE_ARCHIVE})
+#    set(cxtest_MAIN ${CustusX3_SOURCE_DIR}/source/resource/testUtilities/cxtestCatchMain.cpp)
+#    add_executable(${TEST_EXE_NAME} ${cxtest_MAIN})
+#    target_link_libraries(${TEST_EXE_NAME} ${CX_CATCH_PRE_WHOLE_ARCHIVE} ${TEST_LIB_NAME} ${CX_CATCH_POST_WHOLE_ARCHIVE})
 endfunction()
 
 
