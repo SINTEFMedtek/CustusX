@@ -36,6 +36,7 @@
 #include <vtkUniformVariables.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLRenderWindow.h>
+#include "sscLogger.h"
 
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
@@ -127,6 +128,19 @@ public:
 		if (mVolumeBuffer)
 			mVolumeBuffer->updateTexture();
 	}
+	void setUniformiArray(vtkUniformVariables* uniforms, QString name, int val)
+	{
+		QString fullName = QString("%1[%2]").arg(name).arg(mIndex);
+		std::cout << "setting: " << fullName << " = " << val << std::endl;
+		uniforms->SetUniformi(cstring_cast(fullName), 1, &val);
+	}
+	void setUniformfArray(vtkUniformVariables* uniforms, QString name, float val)
+	{
+		QString fullName = QString("%1[%2]").arg(name).arg(mIndex);
+		std::cout << "setting: " << fullName << " = " << val << std::endl;
+		uniforms->SetUniformf(cstring_cast(fullName), 1, &val);
+	}
+
 	void eachRenderInternal(vtkSmartPointer<vtkShaderProgram2> shader)
 	{
 		if (!mVolumeBuffer)
@@ -144,13 +158,29 @@ public:
 			lutSize = mLutBuffer->getLutSize();
 		}
 
-		shader->GetUniformVariables()->SetUniformi(cstring_cast("texture"+qstring_cast(mIndex)), 1, &texture);
-		shader->GetUniformVariables()->SetUniformi(cstring_cast("lut"+qstring_cast(mIndex)), 1, &lut);
-		shader->GetUniformVariables()->SetUniformi(cstring_cast("lutsize"+qstring_cast(mIndex)), 1, &lutSize);
-		shader->GetUniformVariables()->SetUniformf(cstring_cast("llr"+qstring_cast(mIndex)), 1, &mLLR);
-		shader->GetUniformVariables()->SetUniformf(cstring_cast("level"+qstring_cast(mIndex)), 1, &mLevel);
-		shader->GetUniformVariables()->SetUniformf(cstring_cast("window"+qstring_cast(mIndex)), 1, &mWindow);
-		shader->GetUniformVariables()->SetUniformf(cstring_cast("alpha"+qstring_cast(mIndex)), 1, &mAlpha);
+		if (DEBUG_ENABLE_CROSS_PLATFORM)
+		{
+			std::cout << "lut" << mIndex << std::endl;
+			vtkUniformVariables* uniforms = shader->GetUniformVariables();
+			this->setUniformiArray(uniforms, "texture", texture);
+			this->setUniformiArray(uniforms, "lut", lut);
+			this->setUniformiArray(uniforms, "lutsize", lutSize);
+			this->setUniformfArray(uniforms, "llr", mLLR);
+			this->setUniformfArray(uniforms, "level", mLevel);
+			this->setUniformfArray(uniforms, "window", mWindow);
+			this->setUniformfArray(uniforms, "alpha", mAlpha);
+		}
+		else
+		{
+			shader->GetUniformVariables()->SetUniformi(cstring_cast("texture"+qstring_cast(mIndex)), 1, &texture);
+			shader->GetUniformVariables()->SetUniformi(cstring_cast("lut"+qstring_cast(mIndex)), 1, &lut);
+			shader->GetUniformVariables()->SetUniformi(cstring_cast("lutsize"+qstring_cast(mIndex)), 1, &lutSize);
+			shader->GetUniformVariables()->SetUniformf(cstring_cast("llr"+qstring_cast(mIndex)), 1, &mLLR);
+			shader->GetUniformVariables()->SetUniformf(cstring_cast("level"+qstring_cast(mIndex)), 1, &mLevel);
+			shader->GetUniformVariables()->SetUniformf(cstring_cast("window"+qstring_cast(mIndex)), 1, &mWindow);
+			shader->GetUniformVariables()->SetUniformf(cstring_cast("alpha"+qstring_cast(mIndex)), 1, &mAlpha);
+		}
+
 		report_gl_error();
 	}
 };
@@ -245,6 +275,7 @@ void TextureSlicePainter::ReleaseGraphicsResources(vtkWindow* win)
 
 void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* actor)
 {
+	report_gl_error();
 	if (!CanRender(renderer, actor))
 	{
 		mInternals->ClearGraphicsResources();
@@ -278,8 +309,11 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 
 	if (!mInternals->Shader)
 	{
+		report_gl_error();
 		GL_TRACE("Loading 2D shaders");
 		mSource = this->loadShaderFile(mShaderFile);
+		int layers = mInternals->mElement.size();
+		mSource = mSource.replace("${LAYERS}", QString("%1").arg(layers));
 
 		vtkShaderProgram2Ptr pgm = vtkShaderProgram2Ptr::New();
 		pgm->SetContext(static_cast<vtkOpenGLRenderWindow *> (renWin));

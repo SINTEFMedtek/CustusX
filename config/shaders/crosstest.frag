@@ -1,7 +1,17 @@
 #version 120
 //#extension GL_EXT_gpu_shader4 : enable
 //#pragma debug(on)
-uniform int layers;
+const int layers = ${LAYERS};
+
+uniform sampler3D texture[layers];
+uniform sampler1D lut[layers];
+uniform int lutsize[layers];
+uniform float window[layers];
+uniform float level[layers];
+uniform float llr[layers];
+uniform float alpha[layers];
+
+/*uniform int layers;
 uniform sampler3D texture0,texture1,texture2,texture3,texture4;
 uniform sampler1D lut0,lut1,lut2,lut3,lut4;
 uniform int lutsize0,lutsize1,lutsize2,lutsize3,lutsize4;
@@ -9,10 +19,11 @@ uniform float window0,window1,window2,window3,window4;
 uniform float level0,level1,level2,level3,level4;
 uniform float llr0,llr1,llr2,llr3,llr4;	// low level reject
 uniform float alpha0,alpha1,alpha2,alpha3,alpha4;	// low level reject
+ */
 //in vec4 gl_TexCoord[10];
 vec3 bounds_lo = vec3(0.0,0.0,0.0);
 vec3 bounds_hi = vec3(1.0,1.0,1.0);
-varying vec4 gl_TexCoord[8];
+varying vec4 gl_TexCoord[2*layers];
 
 bool clampMe(int index)
 {
@@ -20,15 +31,15 @@ bool clampMe(int index)
 	return any(lessThan(coord, bounds_lo)) || any(greaterThan(coord, bounds_hi));
 }
 
-float windowLevel(float x, float window, float level)
+float windowLevel(float x, float window_, float level_)
 {
-	return (x-level)/window  + 0.5;
+	return (x-level_)/window_  + 0.5;
 }
 
 /** Map Luminance volume layer N through a window/level/llr + lut
  *
  */
-vec4 applyLutLayerN(in vec4 base,in int index,in int lutsize,in sampler1D lut,in sampler3D texture,in float window,in float level,in float llr,in float alpha)
+vec4 applyLutLayerN(in vec4 base,in int index)
 {
 	if (clampMe(2*index)) // ignore drawing outside texture
 	{
@@ -36,16 +47,16 @@ vec4 applyLutLayerN(in vec4 base,in int index,in int lutsize,in sampler1D lut,in
 	}
 
 	// get volume intensity value (same in all of rgb)
-	float idx = texture3D(texture, gl_TexCoord[2*index].xyz).r;
+	float idx = texture3D(texture[index], gl_TexCoord[2*index].xyz).r;
 
 	// ignore drawing below llr
-	if (idx < llr)
+	if (idx < llr[index])
 	{
 		return base;
 	}
 
 	// apply window+level transform
-	idx = windowLevel(idx, window, level);
+	idx = windowLevel(idx, window[index], level[index]);
 
 	// map through lookup table - interpolated
 	idx = clamp(idx, 0.0, 1.0);
@@ -55,22 +66,32 @@ vec4 applyLutLayerN(in vec4 base,in int index,in int lutsize,in sampler1D lut,in
 //	vec4 c1 = texelFetchBuffer(lut, p0+1);
 //	vec4 col = mix(c0,c1,pos-p0); // interpolate lut.
 
-	vec4 val = texture1D(lut, idx);
+	vec4 val = texture1D(lut[index], idx);
 
 	vec4 col = vec4(0.0, 0.0, 0.0, 1.0); // interpolate lut.
 //	col.r = idx;
-	col.r = val.a;
 
-	col.a = alpha;
+//    if (index==0)
+        col = val;
+//    else
+//        col.b = val.r;
 
-	col =  mix(base, col, alpha);
+/*
+    if (index==0)
+        col.r = val.a;
+    else
+        col.b = val.a;
+*/
+	col.a = alpha[index];
+
+	col =  mix(base, col, alpha[index]);
 	return col;
 }
 
 /** Map RGBA layer N through a window/level/llr
  *
  */
-vec4 applyRGBALayerN(in vec4 base,in int index,in sampler3D texture,in float window,in float level,in float llr,in float alpha)
+vec4 applyRGBALayerN(in vec4 base,in int index)
 {
 	if (clampMe(2*index)) // ignore drawing outside texture
 	{
@@ -78,36 +99,36 @@ vec4 applyRGBALayerN(in vec4 base,in int index,in sampler3D texture,in float win
 	}
 
 	// get rgb color from texture
-	vec4 col = texture3D(texture, gl_TexCoord[2*index].xyz);
+	vec4 col = texture3D(texture[index], gl_TexCoord[2*index].xyz);
 
 	// ignore drawing below llr
-	if (all(lessThan(col.rgb, vec3(llr))))
+	if (all(lessThan(col.rgb, vec3(llr[index]))))
 	{
 		return base;
 	}
 
 	// apply window+level transform to each component
-	col.r = windowLevel(col.r, window, level);
-	col.g = windowLevel(col.g, window, level);
-	col.b = windowLevel(col.b, window, level);
-	col.a = alpha;
+	col.r = windowLevel(col.r, window[index], level[index]);
+	col.g = windowLevel(col.g, window[index], level[index]);
+	col.b = windowLevel(col.b, window[index], level[index]);
+	col.a = alpha[index];
 
-	col =  mix(base, col, alpha);
+	col =  mix(base, col, alpha[index]);
 	return col;
 }
 
 /** Apply colors from layer N. Decide if it is type luminance or rgb.
  *
  */
-vec4 applyLayerN(in vec4 base,in int index,in int lutsize,in sampler1D lut,in sampler3D texture,in float window,in float level,in float llr,in float alpha)
+vec4 applyLayerN(in vec4 base, in int index)
 {
-	if (lutsize>0)
+	if (lutsize[index]>0)
 	{
-		return applyLutLayerN(base,index,lutsize,lut,texture,window,level,llr,alpha);
+		return applyLutLayerN(base,index);
 	}
 	else
 	{
-		return applyRGBALayerN(base,index,texture,window,level,llr,alpha);
+		return applyRGBALayerN(base,index);
 	}
 }
 
@@ -119,8 +140,12 @@ void main()
     
 //    col = applyLutLayerN(col, 0, lutsize0, lut0, texture0, window0, level0, llr0, alpha0);
 
+    for (int i=0; i<layers; ++i)
+    {
+        col = applyLayerN(col, i);
+    }
 
-	col = applyLayerN(col,0,lutsize0,lut0,texture0, window0, level0, llr0, alpha0);
+//	col = applyLayerN(col,0,lutsize0,lut0,texture0, window0, level0, llr0, alpha0);
 /*
 	if (layers>1)
 	{

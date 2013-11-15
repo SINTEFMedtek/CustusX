@@ -229,7 +229,6 @@ public:
 	GLuint lutBuffer;
 	GLuint textureId;
 	bool mAllocated;
-	int mMemorySize;
 	vtkUnsignedCharArrayPtr mTable;
 	uint64_t mMTime;
 	bool mDebugEnableCrossplatform;
@@ -238,7 +237,6 @@ public:
 	{
 		mAllocated = false;
 		textureId = 0;
-		mMemorySize = 0;
 		mMTime = 0;
 		mDebugEnableCrossplatform=false;
 	}
@@ -246,6 +244,14 @@ public:
 	{
 		release();
 	}
+
+	virtual int getMemorySize()
+	{
+		if (!mTable)
+			return 0;
+		return mTable->GetNumberOfTuples() * mTable->GetNumberOfComponents() * sizeof(float);
+	}
+
 
 	//intput lookuptable is raw imported table
 	virtual void SetColorMap(vtkUnsignedCharArrayPtr table)
@@ -300,13 +306,53 @@ public:
 		report_gl_error();
 	}
 
+	void testSendData()
+	{
+//		int lutSize = 64;
+//		int lutSize = 256;
+//		int lutSize = 512;
+		int lutSize = 5000;
+		int lutDataSize = lutSize * 4;
+		std::vector<float> lut;
+		lut.resize(lutDataSize);
+		int memorySize = lut.size() * sizeof(float);
+
+		for (unsigned i=0; i<lutSize; ++i)
+		{
+//			for (unsigned j=0; j<4; ++j)
+//				lut[i*4+j] = double(i)/(lutSize-1);
+			lut[i*4+0] = 0;
+			lut[i*4+1] = double(i)/(lutSize-1);
+			lut[i*4+2] = 0;
+			lut[i*4+3] = 1;
+		}
+
+		glTexImage1D(GL_TEXTURE_1D, 0,GL_RGBA,
+//					 memorySize, 0,
+					 lutSize, 0,
+					 GL_RGBA, GL_FLOAT, &(*lut.begin()));
+		report_gl_error();
+
+		std::cout << "lutSize: " << lutSize << std::endl;
+		std::cout << "lutDataSize: " << lutDataSize << std::endl;
+		std::cout << "sizeof(float): " << sizeof(float) << std::endl;
+		std::cout << "mem: " << memorySize << std::endl;
+		for (int i = 0; i < lutSize; ++i)
+		{
+			std::cout << "  [" << i << "]  ";
+			for (int j=0; j<4; ++j)
+				std::cout << " " << lut[4*i+j];
+			std::cout << std::endl;
+		}
+
+	}
+
 	void sendDataToGL()
 	{
 		std::vector<float> lut;
 		int lutSize = mTable->GetNumberOfTuples();
 		int lutDataSize = lutSize * mTable->GetNumberOfComponents();
 		lut.resize(lutDataSize);
-		mMemorySize = lut.size() * sizeof(float);
 		unsigned char* ptr = mTable->GetPointer(0);
 
 		for (int i = 0; i < lut.size(); ++i)
@@ -317,30 +363,15 @@ public:
 
 		if (mDebugEnableCrossplatform)
 		{
-//			glEnable(GL_TEXTURE_1D);
 			glBindTexture(GL_TEXTURE_1D, textureId);
 			glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 			glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-
-			report_gl_error();
-//			glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA,
-//						 lut.size() * sizeof(float), 0,
-//						 GL_RGBA, GL_UNSIGNED_BYTE, &(*lut.begin()));
-
-			#define TEX_SIZE 256
-
-			float texTable[TEX_SIZE];
-			for (unsigned i=0; i<TEX_SIZE; ++i)
-//				texTable[i] = 1.0;
-				texTable[i] = double(i)/(TEX_SIZE-1);
-			glTexImage1D(GL_TEXTURE_1D, 0,GL_ALPHA16,
-						 TEX_SIZE, 0,
-						 GL_ALPHA, GL_FLOAT, texTable);
 			report_gl_error();
 
-//			glDisable(GL_TEXTURE_1D);
-//			glBindTexture(GL_TEXTURE_1D, 0);
+			glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA,
+						 lutSize, 0,
+						 GL_RGBA, GL_FLOAT, &(*lut.begin()));
 			report_gl_error();
 		}
 		else
