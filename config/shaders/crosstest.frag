@@ -1,6 +1,6 @@
 #version 120
-#extension GL_EXT_gpu_shader4 : enable
-#pragma debug(on)
+//#extension GL_EXT_gpu_shader4 : enable
+//#pragma debug(on)
 uniform int layers;
 uniform sampler3D texture0,texture1,texture2,texture3,texture4;
 uniform sampler1D lut0,lut1,lut2,lut3,lut4;
@@ -12,6 +12,7 @@ uniform float alpha0,alpha1,alpha2,alpha3,alpha4;	// low level reject
 //in vec4 gl_TexCoord[10];
 vec3 bounds_lo = vec3(0.0,0.0,0.0);
 vec3 bounds_hi = vec3(1.0,1.0,1.0);
+varying vec4 gl_TexCoord[8];
 
 bool clampMe(int index)
 {
@@ -48,12 +49,12 @@ vec4 applyLutLayerN(in vec4 base,in int index,in int lutsize,in sampler1D lut,in
 
 	// map through lookup table - interpolated
 	idx = clamp(idx, 0.0, 1.0);
-/*	float pos = idx * (lutsize-1); // floating-point lut index
-	int p0 = int(floor(pos)); // integer part of lut index
-	vec4 c0 = texelFetchBuffer(lut, p0);
-	vec4 c1 = texelFetchBuffer(lut, p0+1);
-	vec4 col = mix(c0,c1,pos-p0); // interpolate lut.
-*/
+//	float pos = idx * (lutsize-1); // floating-point lut index
+//	int p0 = int(floor(pos)); // integer part of lut index
+//	vec4 c0 = texelFetchBuffer(lut, p0);
+//	vec4 c1 = texelFetchBuffer(lut, p0+1);
+//	vec4 col = mix(c0,c1,pos-p0); // interpolate lut.
+
 	vec4 val = texture1D(lut, idx);
 
 	vec4 col = vec4(0.0, 0.0, 0.0, 1.0); // interpolate lut.
@@ -110,12 +111,17 @@ vec4 applyLayerN(in vec4 base,in int index,in int lutsize,in sampler1D lut,in sa
 	}
 }
 
+
 void main()
 {
 	vec4 col = vec4(0.0, 0.0, 0.0, 1.0);
+//    col.r = 0.7;
+    
+//    col = applyLutLayerN(col, 0, lutsize0, lut0, texture0, window0, level0, llr0, alpha0);
+
 
 	col = applyLayerN(col,0,lutsize0,lut0,texture0, window0, level0, llr0, alpha0);
-
+/*
 	if (layers>1)
 	{
 		col = applyLayerN(col,1,lutsize1,lut1,texture1, window1, level1, llr1, alpha1);
@@ -128,6 +134,6 @@ void main()
 	{
 		col = applyLayerN(col,3,lutsize3,lut3,texture3, window3, level3, llr3, alpha3);
 	}
-
+*/
 	gl_FragColor = col;
 }
