@@ -55,7 +55,7 @@ class JenkinsGummyBears():
     def __init__(self):
         self.hostname = 'http://christiana-ubuntu-desktop:8080'
         self.username = 'christiana'
-        self.jobnames = ['CustusX_unit', 'CustusX_integration']
+        self.jobnames = ['CustusX_unit', 'CustusX_integration', 'CustusX_nightly']
         self.password = 'not set'
         self.debug_counter = 0
         self.lamp = PowerControl()
