@@ -296,7 +296,7 @@ void ReconstructManagerTestFixture::testThunderGPUReconstruction()
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
 
 	// set an algorithm-specific parameter
-	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "VNN");
+	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "ThunderVNN");
 	boost::shared_ptr<cx::ThunderVNNReconstructAlgorithm> algorithm;
 	algorithm = boost::dynamic_pointer_cast<cx::ThunderVNNReconstructAlgorithm>(reconstructer->createAlgorithm());
 	REQUIRE(algorithm);// Check if we got the VNN algorithm
