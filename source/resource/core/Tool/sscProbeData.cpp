@@ -185,11 +185,6 @@ void ProbeData::setUid(QString uid)
 	mUid = uid;
 }
 
-QString ProbeData::getUid()
-{
-	return mUid;
-}
-
 void ProbeData::updateClipRectFromSector()
 {
 	// cliprect and sector data are connected to linear probes:
@@ -237,11 +232,23 @@ Vector3D ProbeData::getOrigin_u() const
 	return this->transform_p_to_u(mOrigin_p);
 }
 
+DoubleBoundingBox3D ProbeData::getClipRect(CoordinateSystem to) const
+{
+	Transform3D toMp = SpaceHelpers::get_toMfrom(SpaceHelpers::getP(), to);
+	Vector3D p0 = toMp * mClipRect_p.corner(0,0,0);
+	Vector3D p1 = toMp * mClipRect_p.corner(1,1,1);
+	return DoubleBoundingBox3D(p0,p1);
+
+
+
+
+//	Vector3D p0 = transform_p_to_u(mClipRect_p.corner(0,0,0));
+//	Vector3D p1 = transform_p_to_u(mClipRect_p.corner(1,1,1));
+//	return DoubleBoundingBox3D(p0,p1);
+}
 DoubleBoundingBox3D ProbeData::getClipRect_u() const
 {
-	Vector3D p0 = transform_p_to_u(mClipRect_p.corner(0,0,0));
-	Vector3D p1 = transform_p_to_u(mClipRect_p.corner(1,1,1));
-	return DoubleBoundingBox3D(p0,p1);
+	return this->getClipRect(csIMAGE_U);
 }
 
 }
