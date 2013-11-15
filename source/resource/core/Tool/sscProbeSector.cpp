@@ -67,14 +67,14 @@ public:
 	InsideMaskFunctor(ProbeData data, Transform3D uMv) :
 		mData(data), m_vMu(uMv.inv())
 	{
-		mCachedCenter_v = m_vMu.coord(mData.getImage().getOrigin_u());
-		mClipRect_v = transform(m_vMu, mData.getImage().getClipRect_u());
+		mCachedCenter_v = m_vMu.coord(mData.getOrigin_u());
+		mClipRect_v = transform(m_vMu, mData.getClipRect_u());
 		mClipRect_v[4] = -1;
 		mClipRect_v[5] = 1;
 	}
 	bool operator ()(int x, int y) const
 	{
-		Vector3D p_v = multiply_elems(Vector3D(x, y, 0), mData.getImage().mSpacing);
+		Vector3D p_v = multiply_elems(Vector3D(x, y, 0), mData.mSpacing);
 
 		return this->insideClipRect(p_v) && this->insideSector(p_v);
 	}
@@ -141,8 +141,8 @@ vtkImageDataPtr ProbeSector::getMask()
 		return vtkImageDataPtr();
 	InsideMaskFunctor checkInside(mData, this->get_uMv());
 	vtkImageDataPtr retval;
-	retval = generateVtkImageData(Eigen::Array3i(mData.getImage().mSize.width(), mData.getImage().mSize.height(), 1),
-		mData.getImage().mSpacing, 0);
+	retval = generateVtkImageData(Eigen::Array3i(mData.mSize.width(), mData.mSize.height(), 1),
+		mData.mSpacing, 0);
 
 	int* dim(retval->GetDimensions());
 	unsigned char* dataPtr = static_cast<unsigned char*> (retval->GetScalarPointer());
@@ -163,8 +163,8 @@ void ProbeSector::test()
 	Vector3D e_z(0, 0, 1);
 
 	// zero = tMu * mOrigin_u
-	std::cout << "zero = tMu * mOrigin_u, zero: " << tMu.coord(mData.getImage().getOrigin_u()) << ", mOrigin_u: "
-		<< mData.getImage().getOrigin_u() << std::endl;
+	std::cout << "zero = tMu * mOrigin_u, zero: " << tMu.coord(mData.getOrigin_u()) << ", mOrigin_u: "
+		<< mData.getOrigin_u() << std::endl;
 
 	// e_z = tMu * -e_y
 	std::cout << "e_z = tMu * -e_y " << tMu.vector(-e_y) << std::endl;
@@ -184,7 +184,7 @@ Transform3D ProbeSector::get_tMu() const
 	Transform3D Rx = createTransformRotateX(-M_PI / 2.0);
 	Transform3D Rz = createTransformRotateY(M_PI / 2.0);
 	Transform3D R = (Rx * Rz);
-	Transform3D T = createTransformTranslate(-mData.getImage().getOrigin_u());
+	Transform3D T = createTransformTranslate(-mData.getOrigin_u());
 
 	Transform3D tMu = R * T;
 	return tMu;
@@ -193,7 +193,7 @@ Transform3D ProbeSector::get_tMu() const
 Transform3D ProbeSector::get_uMv() const
 {
 	// use H-1 because we count between pixel centers.
-	double H = (mData.getImage().mSize.height() - 1) * mData.getImage().mSpacing[1];
+	double H = (mData.mSize.height() - 1) * mData.mSpacing[1];
 	return createTransformRotateX(M_PI) * createTransformTranslate(Vector3D(0, -H, 0));
 }
 
@@ -210,7 +210,7 @@ vtkPolyDataPtr ProbeSector::getSector()
 bool ProbeSector::clipRectIntersectsSector() const
 {
 	DoubleBoundingBox3D s(mPolyData->GetPoints()->GetBounds());
-	DoubleBoundingBox3D c = mData.getImage().getClipRect_u();
+	DoubleBoundingBox3D c = mData.getClipRect_u();
 
 	double tol = 1; // assume 1mm tolerance
 	bool outside = ( (c[0] < s[0]) || similar(c[0],s[0], tol) )
@@ -269,7 +269,7 @@ vtkPolyDataPtr ProbeSector::getClipRectPolyData()
 	{ 0, 1, 2, 3, 0 };
 	sides->InsertNextCell(5, cells);
 
-	DoubleBoundingBox3D bb = mData.getImage().getClipRect_u();
+	DoubleBoundingBox3D bb = mData.getClipRect_u();
 	points->InsertNextPoint(bb.corner(0, 0, 0).begin());
 	points->InsertNextPoint(bb.corner(1, 0, 0).begin());
 	points->InsertNextPoint(bb.corner(1, 1, 0).begin());
@@ -294,7 +294,7 @@ vtkPolyDataPtr ProbeSector::getOriginPolyData()
 	{ 1, 0, 2, 3 };
 	sides->InsertNextCell(4, cells);
 
-	Vector3D o_u = mData.getImage().getOrigin_u();
+	Vector3D o_u = mData.getOrigin_u();
 	double length = (mData.getDepthStart() - mData.getDepthEnd())/15;
 	length = constrainValue(length, 2, 10);
 	Vector3D tip = o_u + Vector3D(0, -length, 0);
@@ -321,8 +321,8 @@ void ProbeSector::updateSector()
 		return;
 	}
 
-	Vector3D bounds = Vector3D(mData.getImage().mSize.width() - 1, mData.getImage().mSize.height() - 1, 1);
-	bounds = multiply_elems(bounds, mData.getImage().mSpacing);
+	Vector3D bounds = Vector3D(mData.mSize.width() - 1, mData.mSize.height() - 1, 1);
+	bounds = multiply_elems(bounds, mData.mSpacing);
 
 	vtkFloatArrayPtr newTCoords = vtkFloatArrayPtr::New();
 	newTCoords->SetNumberOfComponents(2);
