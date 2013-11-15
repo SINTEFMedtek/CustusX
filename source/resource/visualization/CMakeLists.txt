@@ -1,19 +1,8 @@
 ###########################################################
-##               Resource Core library
+##               Resource Visualization Library
 ###########################################################
 
 include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
-
-if(X11_FOUND)
-    if(APPLE)
-        option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" OFF)
-    else(APPLE)
-        option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" ON)
-    endif(APPLE)
-    include_directories( ${X11_INCLUDE_DIR} ) # needed by Mac 10.8+
-else(X11_FOUND)
-    option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" OFF)
-endif(X11_FOUND)
 
 cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	sscView
