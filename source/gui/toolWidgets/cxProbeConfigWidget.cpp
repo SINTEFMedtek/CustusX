@@ -210,13 +210,13 @@ void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 	ProbeData data = probe->getProbeData();
 	mUpdating= true;
 
-	DoubleBoundingBox3D range(0, data.getImage().mSize.width(), 0, data.getImage().mSize.height());
-	mBBWidget->setValue(data.getImage().mClipRect_p, range);
+	DoubleBoundingBox3D range(0, data.mSize.width(), 0, data.mSize.height());
+	mBBWidget->setValue(data.mClipRect_p, range);
 
-	mOrigin->setValue(data.getImage().mOrigin_p);
+	mOrigin->setValue(data.mOrigin_p);
 
-	double sx = data.getImage().mSpacing[0]; // mm/pix
-	double sy = data.getImage().mSpacing[1];
+	double sx = data.mSpacing[0]; // mm/pix
+	double sy = data.mSpacing[1];
 
 	mDepthWidget->setValue(std::make_pair(data.getDepthStart()/sy, data.getDepthEnd()/sy));
 	mDepthWidget->setRange(DoubleRange(0, range.range()[1]*1.5, 1));
@@ -254,8 +254,8 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 		return;
 	ProbeData data = probe->getProbeData();
 
-	double sx = data.getImage().mSpacing[0]; // mm/pix
-	double sy = data.getImage().mSpacing[1];
+	double sx = data.mSpacing[0]; // mm/pix
+	double sy = data.mSpacing[1];
 
 	data.setSector(mDepthWidget->getValue().first*sy, mDepthWidget->getValue().second*sy, mWidth->getValue());
 
@@ -277,10 +277,7 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 		return;
 	ProbeData data = probe->getProbeData();
 
-	ProbeData::ProbeImageData image = data.getImage();
-
-	image.mClipRect_p = mBBWidget->getValue();
-	data.setImage(image);
+	data.mClipRect_p = mBBWidget->getValue();
 
 	probe->setProbeSector(data);
 }
@@ -297,19 +294,15 @@ void ProbeConfigWidget::guiOriginSettingsChanged()
 		return;
 	ProbeData data = probe->getProbeData();
 
-	ProbeData::ProbeImageData image = data.getImage();
-
 	// if sync: move clip rect accordingly
 	if (mSyncBoxToSector->isChecked())
 	{
 		// shift
-		Vector3D shift = mOrigin->getValue() - image.mOrigin_p;
-		image.mClipRect_p = transform(createTransformTranslate(shift), image.mClipRect_p);
+		Vector3D shift = mOrigin->getValue() - data.mOrigin_p;
+		data.mClipRect_p = transform(createTransformTranslate(shift), data.mClipRect_p);
 	}
 
-	image.mOrigin_p = mOrigin->getValue();
-
-	data.setImage(image);
+	data.mOrigin_p = mOrigin->getValue();
 
 	probe->setProbeSector(data);
 }

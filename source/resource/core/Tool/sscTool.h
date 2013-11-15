@@ -44,6 +44,7 @@ typedef boost::shared_ptr<TimedTransformMap> TimedTransformMapPtr;
  *  - the origin is the tool tip
  * 	- the z axis points in the acting direction (us probe ray dir or pointing dir).
  *  - the y axis points to the left side of the tool.
+ *  - This means that in the case of an optical tracking frame, the tracking spheres points in the negative x axis
  *
  * \ingroup sscTool
  */

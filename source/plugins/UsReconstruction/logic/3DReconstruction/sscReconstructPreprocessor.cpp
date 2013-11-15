@@ -123,22 +123,19 @@ void ReconstructPreprocessor::cropInputData()
 {
 	//IntBoundingBox3D
 	ProbeData sector = mFileData.mProbeData.mData;
-	ProbeData::ProbeImageData imageSector = sector.getImage();
-	IntBoundingBox3D cropbox(imageSector.mClipRect_p.begin());
+	IntBoundingBox3D cropbox(sector.mClipRect_p.begin());
 	Eigen::Vector3i shift = cropbox.corner(0,0,0).cast<int>();
 	Eigen::Vector3i size = cropbox.range().cast<int>() + Eigen::Vector3i(1,1,0); // convert from extent format to size format by adding 1
 	mFileData.mUsRaw->setCropBox(cropbox);
 
-
 	for (unsigned i=0; i<3; ++i)
 	{
-		imageSector.mClipRect_p[2*i] -= shift[i];
-		imageSector.mClipRect_p[2*i+1] -= shift[i];
-		imageSector.mOrigin_p[i] -= shift[i];
+		sector.mClipRect_p[2*i] -= shift[i];
+		sector.mClipRect_p[2*i+1] -= shift[i];
+		sector.mOrigin_p[i] -= shift[i];
 	}
-	imageSector.mSize.setWidth(size[0]);
-	imageSector.mSize.setHeight(size[1]);
-	sector.setImage(imageSector);
+	sector.mSize.setWidth(size[0]);
+	sector.mSize.setHeight(size[1]);
 	mFileData.mProbeData.setData(sector);
 }
 

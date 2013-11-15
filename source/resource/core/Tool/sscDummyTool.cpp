@@ -24,12 +24,12 @@ ProbeData DummyToolTestUtilities::createProbeData(ProbeData::TYPE type, double d
 	retval.setSector(0, depth, width, 0);
 
 	Vector3D imageSpacing(width/extent[0], depth/extent[1], 1.0);
-	ProbeData::ProbeImageData image = retval.getImage();
-	image.mOrigin_p = Vector3D(frameSize[0]/2,0,0);
-	image.mSpacing = imageSpacing;
-	image.mClipRect_p = DoubleBoundingBox3D(0, extent[0], 0, extent[1], 0, 0);
-	image.mSize = QSize(frameSize[0], frameSize[1]);
-	retval.setImage(image);
+//	ProbeImageData image = retval.getImage();
+	retval.mOrigin_p = Vector3D(frameSize[0]/2,0,0);
+	retval.mSpacing = imageSpacing;
+	retval.mClipRect_p = DoubleBoundingBox3D(0, extent[0], 0, extent[1], 0, 0);
+	retval.mSize = QSize(frameSize[0], frameSize[1]);
+//	retval.setImage(image);
 
 	return retval;
 }
