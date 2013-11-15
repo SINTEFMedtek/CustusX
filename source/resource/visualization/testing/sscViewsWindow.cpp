@@ -112,11 +112,20 @@ ViewsWindow::~ViewsWindow()
 
 bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
 {	
-	cx::ViewWidget* view = this->create2DView(imageFilename, r, c);
-	cx::ImagePtr image = loadImage(imageFilename);
+	std::vector<cx::ImagePtr> images(1);
+	images[0] = this->loadImage(imageFilename);
 
-	if (!view || !view->getRenderWindow() || !view->getRenderWindow()->SupportsOpenGL())
+	return this->defineGPUSlice(uid, images, plane, r, c);
+}
+
+bool ViewsWindow::defineGPUSlice(const QString& uid, const std::vector<cx::ImagePtr> images, cx::PLANE_TYPE plane, int r, int c)
+{
+	cx::ViewWidget* view = this->create2DView("several images", r, c);
+
+	if (!view || !view->getRenderWindow())
 		return false;
+//	if (!view->getRenderWindow()->SupportsOpenGL())
+//		return false;
 	if (!cx::Texture3DSlicerRep::isSupported(view->getRenderWindow()))
 		return false;
 
@@ -124,9 +133,9 @@ bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(uid);
 	rep->setShaderFile(mShaderFolder + "/Texture3DOverlay.frag");
 	rep->setSliceProxy(proxy);
-	rep->setImages(std::vector<cx::ImagePtr>(1, image));
+	rep->setImages(images);
 	view->addRep(rep);
-	insertView(view, uid, imageFilename, r, c);
+	insertView(view, uid, "several images", r, c);
 
 	return true;
 }

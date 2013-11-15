@@ -22,12 +22,27 @@ namespace cx
 {
 
 CompositeTimedAlgorithm::CompositeTimedAlgorithm(QString name) :
-	TimedBaseAlgorithm(name, 20),
+	TimedBaseAlgorithm(name, 20)
+{
+}
+
+void CompositeTimedAlgorithm::append(TimedAlgorithmPtr child)
+{
+	mChildren.push_back(child);
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+CompositeSerialTimedAlgorithm::CompositeSerialTimedAlgorithm(QString name) :
+	CompositeTimedAlgorithm(name),
 	mCurrent(-1)
 {
 }
 
-QString CompositeTimedAlgorithm::getProduct() const
+QString CompositeSerialTimedAlgorithm::getProduct() const
 {
 	if (mCurrent >= 0 && mCurrent < mChildren.size())
 	{
@@ -36,17 +51,12 @@ QString CompositeTimedAlgorithm::getProduct() const
 	return "composite";
 }
 
-void CompositeTimedAlgorithm::append(TimedAlgorithmPtr child)
-{
-	mChildren.push_back(child);
-}
-
-void CompositeTimedAlgorithm::clear()
+void CompositeSerialTimedAlgorithm::clear()
 {
 	// if already started, ignore
 	if (mCurrent>=0)
 	{
-		messageManager()->sendError("Attempt to restart CompositeTimedAlgorithm while running failed.");
+		messageManager()->sendError("Attempt to restart CompositeSerialTimedAlgorithm while running failed.");
 		return;
 	}
 
@@ -54,7 +64,7 @@ void CompositeTimedAlgorithm::clear()
 	mCurrent = -1;
 }
 
-void CompositeTimedAlgorithm::execute()
+void CompositeSerialTimedAlgorithm::execute()
 {
 	// if already started, ignore
 	if (mCurrent>=0)
@@ -65,7 +75,7 @@ void CompositeTimedAlgorithm::execute()
 	this->jumpToNextChild();
 }
 
-void CompositeTimedAlgorithm::jumpToNextChild()
+void CompositeSerialTimedAlgorithm::jumpToNextChild()
 {
 	// teardown old child
 	if (mCurrent >= 0 && mCurrent < mChildren.size())
@@ -90,12 +100,12 @@ void CompositeTimedAlgorithm::jumpToNextChild()
 	}
 }
 
-bool CompositeTimedAlgorithm::isFinished() const
+bool CompositeSerialTimedAlgorithm::isFinished() const
 {
     return mCurrent == -1;
 }
 
-bool CompositeTimedAlgorithm::isRunning() const
+bool CompositeSerialTimedAlgorithm::isRunning() const
 {
     return mCurrent >= 0;
 }
@@ -105,7 +115,7 @@ bool CompositeTimedAlgorithm::isRunning() const
 //---------------------------------------------------------
 
 CompositeParallelTimedAlgorithm::CompositeParallelTimedAlgorithm(QString name) :
-	TimedBaseAlgorithm(name, 20)
+	CompositeTimedAlgorithm(name)
 {
 }
 
@@ -123,18 +133,13 @@ QString CompositeParallelTimedAlgorithm::getProduct() const
 	return products.join(", ");
 }
 
-void CompositeParallelTimedAlgorithm::append(TimedAlgorithmPtr child)
-{
-	mChildren.push_back(child);
-}
-
 void CompositeParallelTimedAlgorithm::clear()
 {
 
 	// if already started, ignore
 	if (!this->isFinished())
 	{
-		messageManager()->sendError("Attempt to restart CompositeTimedAlgorithm while running failed.");
+		messageManager()->sendError("Attempt to restart CompositeSerialTimedAlgorithm while running failed.");
 		return;
 	}
 
