@@ -88,10 +88,10 @@ void PerformanceTab::init()
 	mGPU2DRenderCheckBox->setChecked(useGPU2DRender);
 	mGPU2DRenderCheckBox->setToolTip("Use a GPU-based 2D renderer instead of the software-based one, if available.");
 
-#ifndef USE_GLX_SHARED_CONTEXT
-	mGPU2DRenderCheckBox->setChecked(false);
-	mGPU2DRenderCheckBox->setEnabled(false);
-#endif
+//#ifndef USE_GLX_SHARED_CONTEXT
+//	mGPU2DRenderCheckBox->setChecked(false);
+//	mGPU2DRenderCheckBox->setEnabled(false);
+//#endif
 
 //  bool useGPU3DDepthPeeling = settings()->value("View3D/depthPeeling").toBool();
 //	mGPU3DDepthPeelingCheckBox = new QCheckBox("Use GPU 3D depth peeling");

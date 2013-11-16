@@ -271,24 +271,19 @@ public:
 	 */
 	virtual void allocate()
 	{
-		if (mAllocated) // do this only once.
-		{
-			return;
-		}
 		if (!mTable)
 		{
 			std::cout << "error: bad lut buffer initialization" << std::endl;
 			return;
 		}
 
-		glActiveTexture(GL_TEXTURE6);
-
-		//glEnable( vtkgl::TEXTURE_3D );
-		glGenTextures(1, &textureId);
-		//glDisable(GL_TEXTURE_3D);
-
+		if (!mAllocated)
+		{
+			glActiveTexture(GL_TEXTURE6);
+			glGenTextures(1, &textureId);
+			mAllocated = true;
+		}
 		this->updateTexture();
-		mAllocated = true;
 	}
 
 	virtual void updateTexture()
@@ -300,51 +295,8 @@ public:
 		mMTime = mTable->GetMTime();
 
 		glActiveTexture(GL_TEXTURE6);
-		//vtkgl::ActiveTexture(getGLTextureForLut(textureUnitIndex)); //TODO is this OK?
 		this->sendDataToGL();
-
 		report_gl_error();
-	}
-
-	void testSendData()
-	{
-//		int lutSize = 64;
-//		int lutSize = 256;
-//		int lutSize = 512;
-		int lutSize = 5000;
-		int lutDataSize = lutSize * 4;
-		std::vector<float> lut;
-		lut.resize(lutDataSize);
-		int memorySize = lut.size() * sizeof(float);
-
-		for (unsigned i=0; i<lutSize; ++i)
-		{
-//			for (unsigned j=0; j<4; ++j)
-//				lut[i*4+j] = double(i)/(lutSize-1);
-			lut[i*4+0] = 0;
-			lut[i*4+1] = double(i)/(lutSize-1);
-			lut[i*4+2] = 0;
-			lut[i*4+3] = 1;
-		}
-
-		glTexImage1D(GL_TEXTURE_1D, 0,GL_RGBA,
-//					 memorySize, 0,
-					 lutSize, 0,
-					 GL_RGBA, GL_FLOAT, &(*lut.begin()));
-		report_gl_error();
-
-		std::cout << "lutSize: " << lutSize << std::endl;
-		std::cout << "lutDataSize: " << lutDataSize << std::endl;
-		std::cout << "sizeof(float): " << sizeof(float) << std::endl;
-		std::cout << "mem: " << memorySize << std::endl;
-		for (int i = 0; i < lutSize; ++i)
-		{
-			std::cout << "  [" << i << "]  ";
-			for (int j=0; j<4; ++j)
-				std::cout << " " << lut[4*i+j];
-			std::cout << std::endl;
-		}
-
 	}
 
 	void sendDataToGL()

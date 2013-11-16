@@ -219,10 +219,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	images[0] = this->loadImage(image[0]);
 
 	cx::ImageLUT2DPtr lut0 = images[0]->getLookupTable2D();
-//	double llr = lut1->getScalarMin() + (lut1->getScalarMax()-lut1->getScalarMin())*0.25;
-//	std::cout << "setting llr for vol1 = " << llr << std::endl;
 	lut0->addColorPoint(lut0->getScalarMax(), QColor::fromRgbF(0,0,1,1));
-//	lut1->setLLR(llr);
 
 	REQUIRE(this->defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
 //	REQUIRE(this->quickRunWidget());
@@ -240,22 +237,27 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	std::vector<cx::ImagePtr> images(2);
 	images[0] = this->loadImage(image[0]);
 	images[1] = this->loadImage(image[1]);
+
+	cx::ImageLUT2DPtr lut0 = images[0]->getLookupTable2D();
+	//std::cout << "setting llr for vol1 = " << llr << std::endl;
+	lut0->addColorPoint(lut0->getScalarMax(), QColor::fromRgbF(0,1,0,1));
+
 	cx::ImageLUT2DPtr lut1 = images[1]->getLookupTable2D();
-	double llr = lut1->getScalarMin() + (lut1->getScalarMax()-lut1->getScalarMin())*0.25;
-	std::cout << "setting llr for vol1 = " << llr << std::endl;
+	//std::cout << "setting llr for vol1 = " << llr << std::endl;
 	lut1->addColorPoint(lut1->getScalarMax(), QColor::fromRgbF(0,0,1,1));
+	double llr = lut1->getScalarMin() + (lut1->getScalarMax()-lut1->getScalarMin())*0.25;
 	lut1->setLLR(llr);
 
 	REQUIRE(this->defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
 //	REQUIRE(this->quickRunWidget());
-	REQUIRE(this->runWidget());
+	REQUIRE(this->runWidget(3000));
 
 	CHECK(this->getFractionOfBrightPixelsInView(0,20) > 0.02);
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
 				 "Visual rendering: Show ACS, 3 GPU volumes, moving tool",
-				 "[unit][resource][visualization][not_apple][not_win32][not_win64]")
+				 "[unit][resource][visualization][not_apple][not_win32][not_win64][ca_special3]")
 {
 	this->setDescription("ACS 3 volumes, moving tool, GPU");
 
@@ -266,7 +268,8 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 		REQUIRE(this->defineGPUSlice("S", image[i], cx::ptSAGITTAL, 2, i));
 	}
 	//REQUIRE(this->runWidget());
-	REQUIRE(this->quickRunWidget());
+//	REQUIRE(this->quickRunWidget());
+	REQUIRE(this->runWidget(3000));
 
 	for (unsigned i = 0; i < 3*3; ++i)
 	{
