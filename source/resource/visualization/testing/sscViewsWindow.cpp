@@ -131,7 +131,7 @@ bool ViewsWindow::defineGPUSlice(const QString& uid, const std::vector<cx::Image
 
 	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
 	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(uid);
-	rep->setShaderFile(mShaderFolder + "/Texture3DOverlay.frag");
+	rep->setShaderPath(mShaderFolder);
 	rep->setSliceProxy(proxy);
 	rep->setImages(images);
 	view->addRep(rep);

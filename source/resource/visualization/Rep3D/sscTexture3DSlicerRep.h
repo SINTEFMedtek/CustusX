@@ -87,7 +87,7 @@ public:
 	{
 		return "Texture3DSlicerRep";
 	}
-	void setShaderFile(QString shaderFile);
+	void setShaderPath(QString path);
 	virtual void printSelf(std::ostream & os, Indent indent);
 	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp); // DEPRECATED: use zoomfactor in View and the object will auto-update
 	void setImages(std::vector<ImagePtr> images);

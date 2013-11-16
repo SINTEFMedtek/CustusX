@@ -58,7 +58,7 @@ public:
 	virtual void ReleaseGraphicsResources(vtkWindow *);
 	void PrintSelf(ostream& os, vtkIndent indent);
 
-	void setShaderFile(QString shaderFile);
+	void setShaderPath(QString path);
 	void SetColorAttribute(int index, float window, float level, float llr, float alpha);
 	void SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer);
 	void SetLutBuffer(int index, GPUImageLutBufferPtr buffer);
@@ -74,12 +74,11 @@ protected:
 
 	bool CanRender(vtkRenderer*, vtkActor*);
 	static bool LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id);
-	QString loadShaderFile(QString shaderFile);
+	QString loadShaderFile();
 
 	class vtkInternals;
 	vtkInternals* mInternals;
-	QString mSource;
-	QString mShaderFile;
+	QString mShaderPath;
 
 private:
 	bool hasLoadedExtensions;

@@ -88,8 +88,6 @@ GPURayCastVolumeRep::GPURayCastVolumeRep(const QString& uid) :
 	mActor = vtkActorPtr::New();
 	mPainter = GPURayCastVolumePainterPtr::New();
 	mPainter->setStepSize(defaultStepSize);
-	// default shader for sonowand: override using setshaderfile()
-	mPainter->setShaderFolder("/Data/Resources/Shaders/");
 	mPainterPolyDatamapper = vtkPainterPolyDataMapperPtr::New();
 
 	mMerger = vtkAppendPolyDataPtr::New();

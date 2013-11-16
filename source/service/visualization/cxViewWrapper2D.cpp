@@ -272,7 +272,7 @@ void ViewWrapper2D::resetMultiSlicer()
 
 //	std::cout << "using gpu multislicer" << std::endl;
 	mMultiSliceRep = Texture3DSlicerRep::New("MultiSliceRep_" + mView->getName());
-	mMultiSliceRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
+	mMultiSliceRep->setShaderPath(DataLocations::getShaderPath());
 	mMultiSliceRep->setSliceProxy(mSliceProxy);
 	mView->addRep(mMultiSliceRep);
 	if (mGroupData)

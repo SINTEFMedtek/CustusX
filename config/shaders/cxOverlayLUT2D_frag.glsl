@@ -5,7 +5,7 @@ const int layers = ${LAYERS};
 
 uniform sampler3D texture[layers];
 uniform sampler1D lut[layers];
-uniform int lutsize[layers];
+//uniform int lutsize[layers];
 uniform float window[layers];
 uniform float level[layers];
 uniform float llr[layers];
@@ -122,14 +122,15 @@ vec4 applyRGBALayerN(in vec4 base,in int index)
  */
 vec4 applyLayerN(in vec4 base, in int index)
 {
-	if (lutsize[index]>0)
+    return applyLutLayerN(base,index);
+/*	if (lutsize[index]>0)
 	{
 		return applyLutLayerN(base,index);
 	}
 	else
 	{
 		return applyRGBALayerN(base,index);
-	}
+	}*/
 }
 
 
