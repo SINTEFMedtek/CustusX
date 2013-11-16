@@ -312,11 +312,11 @@ void ViewsWindow::dumpDebugViewToDisk(QString text, int viewIndex)
 	renderTester->printFractionOfVoxelsAboveZero(text, output);
 }
 
-double ViewsWindow::getFractionOfBrightPixelsInView(int viewIndex, int threshold)
+double ViewsWindow::getFractionOfBrightPixelsInView(int viewIndex, int threshold, int component)
 {
 	cxtest::RenderTesterPtr renderTester = cxtest::RenderTester::create(mLayouts[viewIndex]->getRenderWindow());
 	vtkImageDataPtr output = renderTester->renderToImage();
-	return cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, threshold);
+	return cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, threshold,component);
 }
 
 bool ViewsWindow::runWidget()

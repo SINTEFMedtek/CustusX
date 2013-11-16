@@ -225,7 +225,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 //	REQUIRE(this->quickRunWidget());
 	REQUIRE(this->runWidget(3000));
 
-	CHECK(this->getFractionOfBrightPixelsInView(0,20) > 0.02);
+	CHECK(this->getFractionOfBrightPixelsInView(0,20,2) > 0.02);
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
@@ -252,7 +252,8 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 //	REQUIRE(this->quickRunWidget());
 	REQUIRE(this->runWidget(3000));
 
-	CHECK(this->getFractionOfBrightPixelsInView(0,20) > 0.02);
+	CHECK(this->getFractionOfBrightPixelsInView(0,20,1) > 0.02);
+	CHECK(this->getFractionOfBrightPixelsInView(0,20,2) > 0.02);
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
