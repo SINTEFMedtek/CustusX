@@ -231,14 +231,13 @@ public:
 	bool mAllocated;
 	vtkUnsignedCharArrayPtr mTable;
 	uint64_t mMTime;
-	bool mDebugEnableCrossplatform;
 
 	GPUImageLutBufferImpl()
 	{
 		mAllocated = false;
 		textureId = 0;
 		mMTime = 0;
-		mDebugEnableCrossplatform=false;
+//		mDebugEnableCrossplatform=false;
 	}
 	virtual ~GPUImageLutBufferImpl()
 	{
@@ -257,11 +256,6 @@ public:
 	virtual void SetColorMap(vtkUnsignedCharArrayPtr table)
 	{
 		mTable = table;
-	}
-
-	virtual void debugEnableCrossplatform(bool on)
-	{
-		mDebugEnableCrossplatform = on;
 	}
 
 	/**Allocate resources for the lookup table and the volume on the GPU.
@@ -313,33 +307,16 @@ public:
 			++ptr;
 		}
 
-		if (mDebugEnableCrossplatform)
-		{
-			glBindTexture(GL_TEXTURE_1D, textureId);
-			glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-			glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-			report_gl_error();
+		glBindTexture(GL_TEXTURE_1D, textureId);
+		glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		report_gl_error();
 
-			glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA,
-						 lutSize, 0,
-						 GL_RGBA, GL_FLOAT, &(*lut.begin()));
-			report_gl_error();
-		}
-		else
-		{
-			vtkgl::GenBuffersARB(1, &lutBuffer);
-			vtkgl::BindBuffer(vtkgl::TEXTURE_BUFFER_EXT, lutBuffer);
-			vtkgl::BufferData(vtkgl::TEXTURE_BUFFER_EXT, lut.size() * sizeof(float), &(*lut.begin()), vtkgl::STATIC_DRAW);
-
-			glBindTexture(vtkgl::TEXTURE_BUFFER_EXT, textureId);
-
-
-			vtkgl::TexBufferEXT(vtkgl::TEXTURE_BUFFER_EXT, vtkgl::RGBA32F_ARB, lutBuffer);
-			report_gl_error();
-
-			glBindTexture(vtkgl::TEXTURE_BUFFER_EXT, 0);
-		}
+		glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA,
+					 lutSize, 0,
+					 GL_RGBA, GL_FLOAT, &(*lut.begin()));
+		report_gl_error();
 	}
 
 	virtual void bind(int textureUnitIndex)
@@ -356,14 +333,7 @@ public:
 
 	void bindDataToGL()
 	{
-		if (mDebugEnableCrossplatform)
-		{
-			glBindTexture(GL_TEXTURE_1D, textureId);
-		}
-		else
-		{
-			glBindTexture(vtkgl::TEXTURE_BUFFER_EXT, textureId);
-		}
+		glBindTexture(GL_TEXTURE_1D, textureId);
 	}
 
 	int getLutSize() const
@@ -377,15 +347,6 @@ public:
 			return;
 
 		glDeleteTextures(1, &textureId);
-
-		if (mDebugEnableCrossplatform)
-		{
-
-		}
-		else
-		{
-			vtkgl::DeleteBuffersARB(1,&lutBuffer);
-		}
 	}
 
 	int getGLTextureForLut(int textureUnitIndex)

@@ -55,9 +55,6 @@
 #include "sscTypeConversions.h"
 #include "sscGLHelpers.h"
 
-//#define DEBUG_ENABLE_CROSS_PLATFORM false
-#define DEBUG_ENABLE_CROSS_PLATFORM true
-
 //---------------------------------------------------------
 namespace cx
 {
@@ -104,8 +101,6 @@ public:
 	void SetBuffer(GPUImageLutBufferPtr buffer)
 	{
 		mLutBuffer = buffer;
-		mLutBuffer->debugEnableCrossplatform(DEBUG_ENABLE_CROSS_PLATFORM);
-
 	}
 	void SetColorAttribute(float window, float level, float llr,float alpha)
 	{
@@ -121,23 +116,14 @@ public:
 		if (mLutBuffer)
 			mLutBuffer->allocate();
 	}
-//	void eachPrepareRendering()
-//	{
-//		if (mVolumeBuffer)
-//			mVolumeBuffer->allocate();
-//		if (mLutBuffer)
-//			mLutBuffer->allocate();
-//	}
 	void setUniformiArray(vtkUniformVariables* uniforms, QString name, int val)
 	{
 		QString fullName = QString("%1[%2]").arg(name).arg(mIndex);
-//		std::cout << "setting: " << fullName << " = " << val << std::endl;
 		uniforms->SetUniformi(cstring_cast(fullName), 1, &val);
 	}
 	void setUniformfArray(vtkUniformVariables* uniforms, QString name, float val)
 	{
 		QString fullName = QString("%1[%2]").arg(name).arg(mIndex);
-//		std::cout << "setting: " << fullName << " = " << val << std::endl;
 		uniforms->SetUniformf(cstring_cast(fullName), 1, &val);
 	}
 
@@ -150,36 +136,19 @@ public:
 
 		int texture = 2*mIndex; //texture unit 1
 		int lut = 2*mIndex+1; //texture unit 1
-		int lutSize = 0;
 
 		if (mLutBuffer)
 		{
 			mLutBuffer->bind(mIndex);
-			lutSize = mLutBuffer->getLutSize();
 		}
 
-		if (DEBUG_ENABLE_CROSS_PLATFORM)
-		{
-//			std::cout << "lut" << mIndex << std::endl;
-			vtkUniformVariables* uniforms = shader->GetUniformVariables();
-			this->setUniformiArray(uniforms, "texture", texture);
-			this->setUniformiArray(uniforms, "lut", lut);
-			this->setUniformiArray(uniforms, "lutsize", lutSize);
-			this->setUniformfArray(uniforms, "llr", mLLR);
-			this->setUniformfArray(uniforms, "level", mLevel);
-			this->setUniformfArray(uniforms, "window", mWindow);
-			this->setUniformfArray(uniforms, "alpha", mAlpha);
-		}
-		else
-		{
-			shader->GetUniformVariables()->SetUniformi(cstring_cast("texture"+qstring_cast(mIndex)), 1, &texture);
-			shader->GetUniformVariables()->SetUniformi(cstring_cast("lut"+qstring_cast(mIndex)), 1, &lut);
-			shader->GetUniformVariables()->SetUniformi(cstring_cast("lutsize"+qstring_cast(mIndex)), 1, &lutSize);
-			shader->GetUniformVariables()->SetUniformf(cstring_cast("llr"+qstring_cast(mIndex)), 1, &mLLR);
-			shader->GetUniformVariables()->SetUniformf(cstring_cast("level"+qstring_cast(mIndex)), 1, &mLevel);
-			shader->GetUniformVariables()->SetUniformf(cstring_cast("window"+qstring_cast(mIndex)), 1, &mWindow);
-			shader->GetUniformVariables()->SetUniformf(cstring_cast("alpha"+qstring_cast(mIndex)), 1, &mAlpha);
-		}
+		vtkUniformVariables* uniforms = shader->GetUniformVariables();
+		this->setUniformiArray(uniforms, "texture", texture);
+		this->setUniformiArray(uniforms, "lut", lut);
+		this->setUniformfArray(uniforms, "llr", mLLR);
+		this->setUniformfArray(uniforms, "level", mLevel);
+		this->setUniformfArray(uniforms, "window", mWindow);
+		this->setUniformfArray(uniforms, "alpha", mAlpha);
 
 		report_gl_error();
 	}
@@ -228,20 +197,15 @@ TextureSlicePainter::TextureSlicePainter() :
 	mInternals = new vtkInternals();
 }
 
-void TextureSlicePainter::setShaderFile(QString shaderFile)
+void TextureSlicePainter::setShaderPath(QString path)
 {
-	mShaderFile = shaderFile;
+	mShaderPath = path;
 }
 
-QString TextureSlicePainter::loadShaderFile(QString shaderFile)
+QString TextureSlicePainter::loadShaderFile()
 {	
-	if (DEBUG_ENABLE_CROSS_PLATFORM)
-	{
-		QFileInfo org(shaderFile);
-		shaderFile = org.absolutePath() + "/crosstest.frag";
-	}
-
-	QFile fp(shaderFile);
+	QString filepath = mShaderPath + "/cxOverlay2D_frag.glsl";
+	QFile fp(filepath);
 	if (fp.exists())
 	{
 		fp.open(QFile::ReadOnly);
@@ -316,16 +280,16 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 	{
 		report_gl_error();
 		GL_TRACE("Loading 2D shaders");
-		mSource = this->loadShaderFile(mShaderFile);
+		QString shaderSource = this->loadShaderFile();
 		int layers = mInternals->mElement.size();
-		mSource = mSource.replace("${LAYERS}", QString("%1").arg(layers));
+		shaderSource = shaderSource.replace("${LAYERS}", QString("%1").arg(layers));
 
 		vtkShaderProgram2Ptr pgm = vtkShaderProgram2Ptr::New();
 		pgm->SetContext(static_cast<vtkOpenGLRenderWindow *> (renWin));
 
 		vtkShader2Ptr s2 = vtkShader2Ptr::New();
 		s2->SetType(VTK_SHADER_TYPE_FRAGMENT);
-		s2->SetSourceCode(cstring_cast(mSource));
+		s2->SetSourceCode(cstring_cast(shaderSource));
 		s2->SetContext(pgm->GetContext());
 		pgm->GetShaders()->AddItem(s2);
 		mInternals->Shader = pgm;
@@ -409,25 +373,9 @@ bool TextureSlicePainter::LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, 
 
 bool TextureSlicePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr)
 {
-//	GLint value[2];
-//	glGetIntegerv(vtkgl::MAX_TEXTURE_COORDS,value);
-//	if( value[0] < 8)
-//	{
-//		std::cout<<"GL_MAX_TEXTURE_COORDS="<<value[0]<<" . Number of texture coordinate sets. Min is 2."<<std::endl;
-//	}
-	if (DEBUG_ENABLE_CROSS_PLATFORM)
-	{
-		return (LoadRequiredExtension(mgr, "GL_VERSION_2_0")
-				&& LoadRequiredExtension(mgr, "GL_VERSION_1_5")
-				&& LoadRequiredExtension(mgr, "GL_ARB_vertex_buffer_object"));
-	}
-	else
-	{
-		return (LoadRequiredExtension(mgr, "GL_VERSION_2_0")
-				&& LoadRequiredExtension(mgr, "GL_VERSION_1_5")
-				&& LoadRequiredExtension(mgr, "GL_ARB_vertex_buffer_object")
-				&& LoadRequiredExtension(mgr, "GL_EXT_texture_buffer_object"));
-	}
+	return (LoadRequiredExtension(mgr, "GL_VERSION_2_0")
+			&& LoadRequiredExtension(mgr, "GL_VERSION_1_5")
+			&& LoadRequiredExtension(mgr, "GL_ARB_vertex_buffer_object"));
 }
 
 void TextureSlicePainter::SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer)

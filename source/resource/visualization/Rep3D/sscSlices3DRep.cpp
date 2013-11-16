@@ -67,10 +67,10 @@ Slices3DRepPtr Slices3DRep::New(const QString& uid)
 	return retval;
 }
 
-void Slices3DRep::setShaderFile(QString shaderFile)
+void Slices3DRep::setShaderPath(QString path)
 {
 	for (unsigned i=0; i<mProxy.size(); ++i)
-		mProxy[i]->setShaderFile(shaderFile);
+		mProxy[i]->setShaderPath(path);
 }
 
 void Slices3DRep::setImages(std::vector<ImagePtr> images)
