@@ -55,8 +55,8 @@
 #include "sscTypeConversions.h"
 #include "sscGLHelpers.h"
 
-#define DEBUG_ENABLE_CROSS_PLATFORM false
-//#define DEBUG_ENABLE_CROSS_PLATFORM true
+//#define DEBUG_ENABLE_CROSS_PLATFORM false
+#define DEBUG_ENABLE_CROSS_PLATFORM true
 
 //---------------------------------------------------------
 namespace cx
@@ -121,23 +121,23 @@ public:
 		if (mLutBuffer)
 			mLutBuffer->allocate();
 	}
-	void eachPrepareRendering()
-	{
-		if (mLutBuffer)
-			mLutBuffer->updateTexture();
-		if (mVolumeBuffer)
-			mVolumeBuffer->updateTexture();
-	}
+//	void eachPrepareRendering()
+//	{
+//		if (mVolumeBuffer)
+//			mVolumeBuffer->allocate();
+//		if (mLutBuffer)
+//			mLutBuffer->allocate();
+//	}
 	void setUniformiArray(vtkUniformVariables* uniforms, QString name, int val)
 	{
 		QString fullName = QString("%1[%2]").arg(name).arg(mIndex);
-		std::cout << "setting: " << fullName << " = " << val << std::endl;
+//		std::cout << "setting: " << fullName << " = " << val << std::endl;
 		uniforms->SetUniformi(cstring_cast(fullName), 1, &val);
 	}
 	void setUniformfArray(vtkUniformVariables* uniforms, QString name, float val)
 	{
 		QString fullName = QString("%1[%2]").arg(name).arg(mIndex);
-		std::cout << "setting: " << fullName << " = " << val << std::endl;
+//		std::cout << "setting: " << fullName << " = " << val << std::endl;
 		uniforms->SetUniformf(cstring_cast(fullName), 1, &val);
 	}
 
@@ -160,7 +160,7 @@ public:
 
 		if (DEBUG_ENABLE_CROSS_PLATFORM)
 		{
-			std::cout << "lut" << mIndex << std::endl;
+//			std::cout << "lut" << mIndex << std::endl;
 			vtkUniformVariables* uniforms = shader->GetUniformVariables();
 			this->setUniformiArray(uniforms, "texture", texture);
 			this->setUniformiArray(uniforms, "lut", lut);
@@ -307,6 +307,11 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 		hasLoadedExtensions = true;
 	}
 
+	for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
+	{
+		mInternals->mElement[i].initializeRendering();
+	}
+
 	if (!mInternals->Shader)
 	{
 		report_gl_error();
@@ -325,20 +330,16 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 		pgm->GetShaders()->AddItem(s2);
 		mInternals->Shader = pgm;
 		report_gl_error();
-		for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
-		{
-			mInternals->mElement[i].initializeRendering();
-		}
+//		for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
+//		{
+//			mInternals->mElement[i].initializeRendering();
+//		}
 		mInternals->Shader->Build();
 		if (mInternals->Shader->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)
 		{
 			vtkErrorMacro("Pass Two failed.");
 			abort();
 		}
-//		if (!mInternals->Shader->IsValid())
-//		{
-//			vtkErrorMacro(<<" validation of the program failed: "<< mInternals->Shader->GetLastValidateLog());
-//		}
 	}
 
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -346,10 +347,10 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 	glPixelStorei(GL_PACK_SKIP_ROWS, 0);
 	glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
 
-	for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
-	{
-		mInternals->mElement[i].eachPrepareRendering();
-	}
+//	for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
+//	{
+//		mInternals->mElement[i].eachPrepareRendering();
+//	}
 
 	this->Superclass::PrepareForRendering(renderer, actor);
 	report_gl_error();
