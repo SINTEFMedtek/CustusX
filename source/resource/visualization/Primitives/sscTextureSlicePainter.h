@@ -30,15 +30,39 @@
 #include <boost/shared_ptr.hpp>
 #include <vtkOpenGLRepresentationPainter.h>
 #include <QString>
-
+#include <vector>
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
-
+class vtkOpenGLRenderWindow;
+class vtkUniformVariables;
 //---------------------------------------------------------
 namespace cx
 {
 
 #ifndef WIN32
+
+class SingleVolumePainterHelper
+{
+	GPUImageDataBufferPtr mVolumeBuffer;
+	GPUImageLutBufferPtr mLutBuffer;
+	int mIndex;
+	float mWindow;
+	float mLevel;
+	float mLLR;
+	float mAlpha;
+
+public:
+	explicit SingleVolumePainterHelper(int index);
+	SingleVolumePainterHelper();
+	~SingleVolumePainterHelper();
+	void SetBuffer(GPUImageDataBufferPtr buffer);
+	void SetBuffer(GPUImageLutBufferPtr buffer);
+	void SetColorAttribute(float window, float level, float llr,float alpha);
+	void initializeRendering();
+	void setUniformiArray(vtkUniformVariables* uniforms, QString name, int val);
+	void setUniformfArray(vtkUniformVariables* uniforms, QString name, float val);
+	void eachRenderInternal(vtkSmartPointer<vtkShaderProgram2> shader);
+};
 
 
 /**
@@ -71,17 +95,21 @@ protected:
 	virtual ~TextureSlicePainter();
 	virtual void PrepareForRendering(vtkRenderer*, vtkActor*);
 	void RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags, bool forceCompileOnly);
-
 	bool CanRender(vtkRenderer*, vtkActor*);
 	static bool LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id);
-	QString loadShaderFile();
-
-	class vtkInternals;
-	vtkInternals* mInternals;
-	QString mShaderPath;
+	void ClearGraphicsResources();
 
 private:
+	QString loadShaderFile();
+	void buildProgram(QString shaderSource, vtkOpenGLRenderWindow* renderWindow);
+	SingleVolumePainterHelper& safeIndex(int index);
+
 	bool hasLoadedExtensions;
+	QString mShaderPath;
+
+	vtkWeakPointer<vtkRenderWindow> LastContext;
+	vtkSmartPointer<vtkShaderProgram2> Shader;
+	std::vector<SingleVolumePainterHelper> mElement;
 };
 
 #endif // WIN32
