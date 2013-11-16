@@ -204,7 +204,7 @@ void TextureSlicePainter::setShaderPath(QString path)
 
 QString TextureSlicePainter::loadShaderFile()
 {	
-	QString filepath = mShaderPath + "/cxOverlay2D_frag.glsl";
+	QString filepath = mShaderPath + "/cxOverlayLUT2D_frag.glsl";
 	QFile fp(filepath);
 	if (fp.exists())
 	{
