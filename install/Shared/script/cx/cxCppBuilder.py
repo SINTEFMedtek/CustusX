@@ -67,7 +67,8 @@ class CppBuilder:
         self._changeDirToSource()
         runShell('git remote set-url origin %s' % new_remote_origin_repository)
         runShell('git fetch')
-        runShell('git branch --set-upstream-to=origin/%s' % branch)
+        # old (1.7) syntax - update if needed to 'git branch --set-upstream-to origin/<branch>' 
+        runShell('git branch --set-upstream %s origin/%s' % (branch, branch))
 
     def _gitSubmoduleUpdate(self):
         self._changeDirToSource()
