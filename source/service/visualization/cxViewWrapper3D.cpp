@@ -284,7 +284,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	showToolPath->setChecked(settings()->value("showToolPath").toBool());
 	connect(showToolPath, SIGNAL(triggered(bool)), this, SLOT(showToolPathSlot(bool)));
 
-#ifdef USE_GLX_SHARED_CONTEXT
+//#ifdef USE_GLX_SHARED_CONTEXT
 	QMenu* showSlicesMenu = new QMenu("Show Slices", &contextMenu);
 	showSlicesMenu->addAction(this->createSlicesAction("ACS", &contextMenu));
 	showSlicesMenu->addAction(this->createSlicesAction("Axial", &contextMenu));
@@ -293,7 +293,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	showSlicesMenu->addAction(this->createSlicesAction("Any", &contextMenu));
 	showSlicesMenu->addAction(this->createSlicesAction("Dual", &contextMenu));
 	showSlicesMenu->addAction(this->createSlicesAction("Radial", &contextMenu));
-#endif // USE_GLX_SHARED_CONTEXT
+//#endif // USE_GLX_SHARED_CONTEXT
 	QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
 	showRefTool->setDisabled(true);
 	showRefTool->setCheckable(true);
@@ -307,9 +307,9 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	}
 
 	contextMenu.addSeparator();
-#ifdef USE_GLX_SHARED_CONTEXT
+//#ifdef USE_GLX_SHARED_CONTEXT
 	contextMenu.addMenu(showSlicesMenu);
-#endif //USE_GLX_SHARED_CONTEXT
+//#endif //USE_GLX_SHARED_CONTEXT
 	contextMenu.addAction(resetCameraAction);
 	contextMenu.addAction(centerImageAction);
 	contextMenu.addAction(centerToolAction);

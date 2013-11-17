@@ -25,7 +25,7 @@
 #include "sscIndent.h"
 class QColor;
 
-#include "sscViewQVTKWidget.h"
+#include "QVTKWidget.h"
 
 #include "sscTransform3D.h"
 
@@ -114,10 +114,10 @@ protected:
 typedef boost::shared_ptr<View> ViewPtr;
 
 /// Simple 1:1 conflation of SSC Views and Qt Widgets
-class ViewWidget : public ViewQVTKWidget, public View
+class ViewWidget : public QVTKWidget, public View
 {
 Q_OBJECT
-	typedef ViewQVTKWidget widget;
+	typedef QVTKWidget widget;
 
 public:
 	ViewWidget(QWidget *parent = NULL, Qt::WFlags f = 0);

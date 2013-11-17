@@ -62,6 +62,12 @@ class CppBuilder:
         self._changeDirToBase()
         runShell('git clone %s %s' % (repository, folder))
         self._changeDirToSource()
+        
+    def gitSetRemoteURL(self, new_remote_origin_repository, branch):
+        self._changeDirToSource()
+        runShell('git remote set-url origin %s' % new_remote_origin_repository)
+        runShell('git fetch')
+        runShell('git branch --set-upstream-to=origin/%s' % branch)
 
     def _gitSubmoduleUpdate(self):
         self._changeDirToSource()
