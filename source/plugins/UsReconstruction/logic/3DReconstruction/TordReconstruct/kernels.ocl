@@ -131,7 +131,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                             const float4 voxel,
                             const float radius,
                             int guess,
-                            int termDistance);
+                            bool doTermDistance);
 
 #if PLANE_METHOD == PLANE_EXACT
 #define FIND_CLOSE_PLANES(a, b, c, d, e, f) findClosestPlanes_heuristic(a, b, c, d, e, f, 1)
@@ -361,7 +361,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                             const float4 voxel,
                             const float radius,
                             int guess,
-                            int termDistance)
+                            bool doTermDistance)
 {
 
 	// Number of planes found so far
@@ -469,7 +469,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 		// guaranteeing to find all relevant planes, and performance (terminating earlier).
 		// This should be investigate further.
 
-		int2 term_dists = {abs_dists.x > 3.0f*radius*termDistance, abs_dists.y > 3.0f*radius*termDistance };
+		int2 term_dists = {(abs_dists.x > 3.0f*radius)*doTermDistance, (abs_dists.y > 3.0f*radius)*doTermDistance };
 
 		int2 term_boundaries = {idx.x == N_PLANES-1, idx.y == 0};
 
@@ -701,11 +701,11 @@ performInterpolation_vnn(__local close_plane_t *close_planes,
 	// Find the closest plane
 	for(int i = 0; i < n_close_planes;  i++)
 	{
-		float fabs_dist = fabs(close_planes[i].dist);
+		float fabs_dist = fabs(CLOSE_PLANE_IDX(close_planes, i).dist);
 		if(fabs_dist < lowest_dist)
 		{
 			lowest_dist = fabs_dist;
-			plane_id = close_planes[i].plane_id;
+			plane_id = CLOSE_PLANE_IDX(close_planes ,i).plane_id;
 			close_plane_id = i;
 		}
 	}
@@ -719,7 +719,7 @@ performInterpolation_vnn(__local close_plane_t *close_planes,
 	// normal vector of the plane.
 	float4 translated_voxel = projectOntoPlane(voxel,
 	                                           plane_matrices[plane_id],
-	                                           close_planes[close_plane_id].dist);
+	                                           CLOSE_PLANE_IDX(close_planes ,close_plane_id).dist);
 	translated_voxel.w = 1.0f;
 
 
@@ -773,8 +773,8 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
 	for(int i = 0; i < n_close_planes; i++)
 	{
 
-		int plane_id = close_planes[i].plane_id;
-		const __global unsigned char* image = getImageData(close_planes[i].plane_id,
+		int plane_id = CLOSE_PLANE_IDX(close_planes ,i).plane_id;
+		const __global unsigned char* image = getImageData(CLOSE_PLANE_IDX(close_planes ,i).plane_id,
 		                                             bscans_blocks,
 		                                             in_xsize,
 		                                             in_ysize);
@@ -785,7 +785,7 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
 		voxel.w = 1.0f;
 		float4 translated_voxel = projectOntoPlaneEq(voxel,
 		                                             plane_eqs[plane_id],
-		                                             close_planes[i].dist);
+		                                             CLOSE_PLANE_IDX(close_planes ,i).dist);
 
 		translated_voxel.w = 1.0f;
 		// And then we get the pixel space coordinates
@@ -801,7 +801,7 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
 		{
 			continue;
 		}
-		float dist = fabs(close_planes[i].dist);
+		float dist = fabs(CLOSE_PLANE_IDX(close_planes ,i).dist);
 
 		if(dist < 0.001f)
 			dist = 0.001f;
@@ -849,10 +849,10 @@ performInterpolation_dw(__local close_plane_t *close_planes,
 	for(int i = 0; i < n_close_planes; i++)
 	{
 
-		int plane_id = close_planes[i].plane_id;
-		const __global unsigned char* image = getImageData(close_planes[i].plane_id,
-		                                             bscans_blocks,
-		                                             in_xsize,
+		int plane_id = CLOSE_PLANE_IDX(close_planes ,i).plane_id;
+		const __global unsigned char* image = getImageData(CLOSE_PLANE_IDX(close_planes ,i).plane_id,
+		                                                   bscans_blocks,
+		                                                   in_xsize,
 		                                                   in_ysize);
 
 
@@ -861,7 +861,7 @@ performInterpolation_dw(__local close_plane_t *close_planes,
 		voxel.w = 1.0f;
 		float4 translated_voxel = projectOntoPlaneEq(voxel,
 		                                             plane_eqs[plane_id],
-		                                             close_planes[i].dist);
+		                                             CLOSE_PLANE_IDX(close_planes ,i).dist);
 
 		translated_voxel.w = 1.0f;
 		// And then we get the pixel space coordinates
@@ -888,7 +888,7 @@ performInterpolation_dw(__local close_plane_t *close_planes,
 
 		float interpolated_value = bilinearInterpolation(x, y, image, in_xsize);
 
-		float dist = fabs(close_planes[i].dist);
+		float dist = fabs(CLOSE_PLANE_IDX(close_planes ,i).dist);
 		if(dist < 0.001f) dist = 0.001f;
 		float weight = DW_WEIGHT(dist);
 		scale += weight;
@@ -934,7 +934,7 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 	int pos = 0;
 	for(int i = 0; i < n_close_planes; i++)
 	{
-		const int plane_id = close_planes[i].plane_id;
+		const int plane_id = CLOSE_PLANE_IDX(close_planes ,i).plane_id;
 		const __global unsigned char* image = getImageData(plane_id,
 		                                             bscans_blocks,
 		                                             in_xsize,
@@ -944,7 +944,7 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 		voxel.w = 1.0f;
 		float4 translated_voxel = projectOntoPlaneEq(voxel,
 		                                             plane_eqs[plane_id],
-		                                             close_planes[i].dist);
+		                                             CLOSE_PLANE_IDX(close_planes ,i).dist);
 		translated_voxel.w = 1.0f;
 
 
@@ -980,8 +980,8 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 				float dist_y = k*in_yspacing;
 				float sq_x = dist_x*dist_x;
 				float sq_y = dist_y*dist_y;
-
-				pixels[pos].dist = sqrt(close_planes[i].dist*close_planes[i].dist + sq_x + sq_y);
+				float cp_dist = CLOSE_PLANE_IDX(close_planes ,i).dist;
+				pixels[pos].dist = sqrt(cp_dist*cp_dist + sq_x + sq_y);
 				pos++;
 			}
 		}
