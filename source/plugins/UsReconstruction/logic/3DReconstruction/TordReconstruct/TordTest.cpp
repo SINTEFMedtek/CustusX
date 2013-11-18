@@ -383,8 +383,8 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                                         NULL));
 
 	//TEST
-	local_work_size = 128;
-	
+	//	local_work_size = 128;
+
 	// close planes (local CL memory, to be used by the kernel)
 	ocl_check_error(clSetKernelArg(mClKernel,
 	                               arg++,
