@@ -123,7 +123,7 @@ int isValidPixel(int x,
 
 #if PLANE_METHOD == PLANE_HEURISTIC
 int
-findHighestIdx(close_plane_t *planes,
+findHighestIdx(__local close_plane_t *planes,
                int n);
 int2
 findClosestPlanes_heuristic(__local close_plane_t *close_planes,
@@ -280,6 +280,7 @@ voxel_methods(int volume_xsize,
               __global float16 *plane_matrices,
               __global unsigned char* mask,
               __local float4 *plane_eqs,
+              __local close_plane_t *planes,
               float radius);
 
 
@@ -761,7 +762,7 @@ float bilinearInterpolation(float x,
  * and taking the pixel value
  */
 unsigned char
-performInterpolation_vnn(close_plane_t *close_planes,
+performInterpolation_vnn(__local close_plane_t *close_planes,
                          int n_close_planes,
                          __global const float16  *plane_matrices,
                          __local const float4 *plane_eqs,
@@ -833,7 +834,7 @@ performInterpolation_vnn(close_plane_t *close_planes,
  * In the end, divide sum by sum(1/dist), and you have your voxel value.
  */
 unsigned char
-performInterpolation_vnn2(close_plane_t *close_planes,
+performInterpolation_vnn2(__local close_plane_t *close_planes,
                           int n_close_planes,
                           __global const float16  *plane_matrices,
                           __local const float4 *plane_eqs,
@@ -907,7 +908,7 @@ performInterpolation_vnn2(close_plane_t *close_planes,
  * the value from each plane is a bilinearly interpolated from that plane.
  */
 unsigned char
-performInterpolation_dw(close_plane_t *close_planes,
+performInterpolation_dw(__local close_plane_t *close_planes,
                         int n_close_planes,
                         __global const float16  *plane_matrices,
                         __local const float4 *plane_eqs,
@@ -990,7 +991,7 @@ performInterpolation_dw(close_plane_t *close_planes,
  * Perform interpolation using an anisotropic filter
  */
 unsigned char
-performInterpolation_anisotropic(close_plane_t *close_planes,
+performInterpolation_anisotropic(__local close_plane_t *close_planes,
                             int n_close_planes,
                             __global const float16  *plane_matrices,
                             __local const float4 *plane_eqs,
@@ -1259,6 +1260,7 @@ voxel_methods(int volume_xsize,
               __global float16 *plane_matrices,
               __global unsigned char *mask,
               __local float4 *plane_eqs,
+              __local close_plane_t *close_planes,
               float radius
 	)
 {
@@ -1286,7 +1288,7 @@ voxel_methods(int volume_xsize,
 
 	// For most of these algorithms we need to find some set of close planes.
 	// We find all planes that are inside the voxel radius
-	__local close_plane_t close_planes[(MAX_PLANES+1)*get_local_size(0)];
+	//	__local close_plane_t close_planes[(MAX_PLANES+1)*get_local_size(0)];
 	int n_close_planes;
 	int guess = 0;
 	float4 voxel = {x * volume_xspacing,

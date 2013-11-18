@@ -258,7 +258,8 @@ TordTest::initializeFrameBlocks(frameBlock_t* framePointers,
 bool
 TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
                            vtkImageDataPtr outputData,
-                           float radius)
+                           float radius,
+                           int nClosePlanes)
 {
 	int numBlocks = 10; // FIXME?
 	// Split input US into blocks
@@ -372,6 +373,11 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	// plane_eqs (local CL memory, will be calculated by the kernel)
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float)*4*nPlanes, NULL));
 
+	// close planes (local CL memory, to be used by the kernel)
+	ocl_check_error(clSetKernelArg(mClKernel,
+	                               arg++,
+	                               (sizeof(cl_float)+sizeof(cl_int))*nClosePlanes,
+	                               NULL));
 	// radius
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &radius));
 
@@ -513,7 +519,7 @@ TordTest::reconstruct(ProcessedUSInputDataPtr input,
 	       planeMethod
 		   )) return false;
 
-	bool ret = doGPUReconstruct(input, outputData, radius );
+	bool ret = doGPUReconstruct(input, outputData, radius, nClosePlanes );
 
 	if(moClContext != NULL)
 	{
