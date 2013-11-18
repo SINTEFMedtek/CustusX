@@ -373,15 +373,6 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	// plane_eqs (local CL memory, will be calculated by the kernel)
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float)*4*nPlanes, NULL));
 
-	// close planes (local CL memory, to be used by the kernel)
-	ocl_check_error(clSetKernelArg(mClKernel,
-	                               arg++,
-	                               (sizeof(cl_float)+sizeof(cl_int))*nClosePlanes,
-	                               NULL));
-	// radius
-	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &radius));
-
-
 	size_t local_work_size;
 	// Find the optimal local work size
 	ocl_check_error(clGetKernelWorkGroupInfo(mClKernel,
@@ -390,10 +381,24 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                                         sizeof(size_t),
 	                                         &local_work_size,
 	                                         NULL));
+
+	//TEST
+	local_work_size = 128;
+	
+	// close planes (local CL memory, to be used by the kernel)
+	ocl_check_error(clSetKernelArg(mClKernel,
+	                               arg++,
+	                               (sizeof(cl_float)+sizeof(cl_int))*(nClosePlanes+1)*local_work_size,
+	                               NULL));
+	// radius
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &radius));
+
+
 	
 
 	messageManager()->sendInfo(QString("Using %1 as local workgroup size").arg(local_work_size));
 	cl_ulong local_mem_size;
+ 
 	// Print local memory usage for debugging purposes
 	ocl_check_error(clGetKernelWorkGroupInfo(mClKernel,
 	                                         moClContext->device,
@@ -405,8 +410,6 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	messageManager()->sendInfo(QString("Kernel is using %1 bytes of local memory\n").arg(local_mem_size));
 	// Global work items:	
 	size_t global_work_size = (outputDims[0]*outputDims[2]);
-	//TEST
-	local_work_size = 32;
 	// Round global_work_size up to nearest multiple of local_work_size
 	if(global_work_size % local_work_size)
 		global_work_size = ((global_work_size/local_work_size) + 1)*local_work_size;
