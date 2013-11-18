@@ -150,7 +150,7 @@ void ToolPropertiesWidget::spacesChangedSlot()
 {
 	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
 
-	std::vector<CoordinateSystem> spaces = SpaceHelpers::getAvailableSpaces(true);
+	std::vector<CoordinateSystem> spaces = SpaceHelpers::getSpacesToPresentInGUI();
 	QStringList range;
 	for (unsigned i=0; i<spaces.size(); ++i)
 	  range << spaces[i].toString();
