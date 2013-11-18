@@ -24,6 +24,7 @@
 class QDomNode;
 #include "sscVector3D.h"
 #include "sscBoundingBox3D.h"
+#include "sscCoordinateSystemHelpers.h"
 
 namespace cx
 {
