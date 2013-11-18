@@ -121,7 +121,6 @@ int isValidPixel(int x,
                  int in_xsize,
                  int in_ysize);
 
-#if PLANE_METHOD == PLANE_HEURISTIC
 int
 findHighestIdx(__local close_plane_t *planes,
                int n);
@@ -131,18 +130,13 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                             __global float16* const plane_matrices,
                             const float4 voxel,
                             const float radius,
-                            int guess);
-#endif
+                            int guess,
+                            int termDistance);
 
 #if PLANE_METHOD == PLANE_EXACT
-int2
-findClosestPlanes_exact(__local close_plane_t *close_planes,
-                        __local float4* const plane_eqs,
-                        __global float16* const plane_matrices,
-                        const float4 voxel,
-                        const float radius,
-                        int guess);
-
+#define FIND_CLOSE_PLANES(a, b, c, d, e, f) findClosestPlanes_heuristic(a, b, c, d, e, f, 1)
+#elif PLANE_METHOD == PLANE_CLOSEST
+#define FIND_CLOSE_PLANES(a, b, c, d, e, f) findClosestPlanes_heuristic(a, b, c, d, e, f, 0)
 #endif
 
 __global const unsigned char*
@@ -317,8 +311,6 @@ int isValidPixel(int x,
 
 }
 
-#if PLANE_METHOD == PLANE_HEURISTIC
-#define FIND_CLOSE_PLANES(a, b, c, d, e, f) findClosestPlanes_heuristic(a, b, c, d, e, f)
 
 /**
  * Find the plane with the highest distance to the voxel
@@ -368,7 +360,8 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                             __global float16* const plane_matrices,
                             const float4 voxel,
                             const float radius,
-                            int guess)
+                            int guess,
+                            int termDistance)
 {
 
 	// Number of planes found so far
@@ -475,7 +468,8 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 		// FIXME: The constant here represents a tradeoff between
 		// guaranteeing to find all relevant planes, and performance (terminating earlier).
 		// This should be investigate further.
-		int2 term_dists = {abs_dists.x > 3.0f*radius, abs_dists.y > 3.0f*radius };
+
+		int2 term_dists = {abs_dists.x > 3.0f*radius*termDistance, abs_dists.y > 3.0f*radius*termDistance };
 
 		int2 term_boundaries = {idx.x == N_PLANES-1, idx.y == 0};
 
@@ -496,83 +490,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 	ret.y = smallest_idx;
 	return ret;
 }
-#endif
 
-#if PLANE_METHOD == PLANE_CLOSEST
-#define FIND_CLOSE_PLANES(a, b, c, d, e, f) findClosestPlanes_exact(a, b, c, d, e, f)
-/**
- * Find the closest planes to the voxel.
- * This method, unlike the heuristic method,
- * guarantees that the closest planes are found, provided that there are no more than
- * MAX_PLANES_WITHIN_RADIUS planes within the radius
- * However, it is slower, because it has to check all the planes.
- * It works by first finding MAX_PLANES_WITHIN_RADIUS planes closer than radius,
- * and then picking the best MAX_PLANES planes by a variant of selection sort
- */
-int2 findClosestPlanes_exact(__local close_plane_t *close_planes_ret,
-                      __local float4* const plane_eqs,
-                      __global float16* const plane_matrices,
-                      const float4 voxel,
-                      const float radius,
-                      int guess)
-{
-
-	// How many planes closer than radius we have found so far
-	int found = 0;
-
-	// Assume MAX_PLANES_WITHIN_RADIUS is huge, so we have room for them all
-	// Address pointed to by orig_ptr never changes
-	__local close_plane_t orig_ptr[MAX_PLANES_WITHIN_RADIUS];
-
-	// But the address of this pointer changes!
-	close_plane_t *close_planes = &(CLOSE_PLANE_IDX(orig_ptr, 0);
-
-	// Find all planes (up to MAX_PLANES_WITHIN_RADIUS) closer than radius
-	float dist, abs_dist;
-	for(int i = 0; i < N_PLANES && found < MAX_PLANES_WITHIN_RADIUS; i++)
-	{
-		dist = dot(plane_eqs[i], voxel);
-		abs_dist = fabs(dist);
-		if(abs_dist < radius)
-		{
-			found++;
-			close_planes->plane_id = i;
-			close_planes->dist = dist;
-			close_planes++;
-		}
-	}
-	close_planes = &CLOSE_PLANE_IDX(orig_ptr, 0);
-
-	// Now pick the best MAX_PLANES and put them in close_planes_ret
-
-	int done = 0;
-	for(int i = 0; i < MAX_PLANES && !done; i++)
-	{
-		float smallest_dist = 99999.0f;
-		int smallest_idx = -1;
-		for(int j = 0; j < found; j++)
-		{
-			if(fabs(close_planes[j].dist) < smallest_dist)
-			{
-				smallest_dist = fabs(close_planes[j].dist);
-				smallest_idx = j;
-			}
-		}
-		if(smallest_idx == -1)
-		{
-			done = 1;
-			break;
-		}
-		CLOSE_PLANE_IDX(close_planes_ret, i) = close_planes[smallest_idx];
-		// Bigger than initial smallest_dist
-		close_planes[smallest_idx].dist = INFINITY;
-	}
-	int2 ret;
-	ret.x = min(MAX_PLANES, found);
-	ret.y = 0;
-	return ret;
-}
-#endif
 
 /**
  * Get a pointer to the first pixel of the image frame given by plane_id
