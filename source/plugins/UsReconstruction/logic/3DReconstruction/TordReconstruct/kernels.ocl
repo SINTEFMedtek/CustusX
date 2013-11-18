@@ -82,6 +82,8 @@
 #define DW_WEIGHT(x) WEIGHT_INV(x)
 #define VNN2_WEIGHT(x) WEIGHT_INV(x)
 
+#define CLOSE_PLANE_IDX(p, i) p[get_local_id(0)*(MAX_PLANES+1)+(i)]
+
 /**************/
 /* End macros */
 /**************/
@@ -124,7 +126,7 @@ int
 findHighestIdx(close_plane_t *planes,
                int n);
 int2
-findClosestPlanes_heuristic(close_plane_t *close_planes,
+findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                             __local float4* const plane_eqs,
                             __global float16* const plane_matrices,
                             const float4 voxel,
@@ -134,7 +136,7 @@ findClosestPlanes_heuristic(close_plane_t *close_planes,
 
 #if PLANE_METHOD == PLANE_EXACT
 int2
-findClosestPlanes_exact(close_plane_t *close_planes,
+findClosestPlanes_exact(__local close_plane_t *close_planes,
                         __local float4* const plane_eqs,
                         __global float16* const plane_matrices,
                         const float4 voxel,
@@ -190,7 +192,7 @@ pixel_t anisotropicFilter(const pixel_t *pixels,
 
 #if METHOD == METHOD_VNN
 unsigned char
-performInterpolation_vnn(close_plane_t *close_planes,
+performInterpolation_vnn(__local close_plane_t *close_planes,
                          int n_close_planes,
                          __global const float16  *plane_matrices,
                          __local const float4 *plane_eqs,
@@ -205,7 +207,7 @@ performInterpolation_vnn(close_plane_t *close_planes,
 
 #if METHOD == METHOD_VNN2
 unsigned char
-performInterpolation_vnn2(close_plane_t *close_planes,
+performInterpolation_vnn2(__local close_plane_t *close_planes,
                           int n_close_planes,
                           __global const float16  *plane_matrices,
                           __local const float4 *plane_eqs,
@@ -220,7 +222,7 @@ performInterpolation_vnn2(close_plane_t *close_planes,
 
 #if METHOD == METHOD_DW
 unsigned char
-performInterpolation_dw(close_plane_t *close_planes,
+performInterpolation_dw(__local close_plane_t *close_planes,
                         int n_close_planes,
                         __global const float16  *plane_matrices,
                         __local const float4 *plane_eqs,
@@ -235,7 +237,7 @@ performInterpolation_dw(close_plane_t *close_planes,
 
 #if METHOD == METHOD_ANISOTROPIC
 unsigned char
-performInterpolation_anisotropic(close_plane_t *close_planes,
+performInterpolation_anisotropic(__local close_plane_t *close_planes,
                             int n_close_planes,
                             __global const float16  *plane_matrices,
                             __local const float4 *plane_eqs,
@@ -325,11 +327,13 @@ int isValidPixel(int x,
  * @param n size of array pointed to *planes
  */
 int
-findHighestIdx(close_plane_t *planes,
+findHighestIdx(__local close_plane_t *planes,
                int n)
 {
 	int maxidx = 0;
 	float maxval = -1.0f;
+	planes = &CLOSE_PLANE_IDX(planes, 0);
+	
 	for(int i = 0; i < n; i++)
 	{
 		float abs = fabs(planes->dist);
@@ -358,7 +362,7 @@ findHighestIdx(close_plane_t *planes,
  * 2x radius is found before any of the MAX_PLANES closest planes.
  */
 int2
-findClosestPlanes_heuristic(close_plane_t *close_planes,
+findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                             __local float4* const plane_eqs,
                             __global float16* const plane_matrices,
                             const float4 voxel,
@@ -410,8 +414,8 @@ findClosestPlanes_heuristic(close_plane_t *close_planes,
 			BOUNDS_CHECK(idx.x, 0, N_PLANES);
 			BOUNDS_CHECK(max_idx, 0, MAX_PLANES);
 			// If yes, swap out the one with the longest distance for this plane
-			close_planes[max_idx].dist = dists.x;
-			close_planes[max_idx].plane_id = idx.x;
+			CLOSE_PLANE_IDX(close_planes, max_idx).dist = dists.x;
+			CLOSE_PLANE_IDX(close_planes, max_idx).plane_id = idx.x;
 			found++;
 
 			if(found >= MAX_PLANES)
@@ -420,7 +424,7 @@ findClosestPlanes_heuristic(close_plane_t *close_planes,
 				// Find the next candidate for eviction -
 				// the plane with the longest distance to the voxel
 				max_idx = findHighestIdx(close_planes, MAX_PLANES);
-				max_dist = fabs(close_planes[max_idx].dist);
+				max_dist = fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist);
 			}
 			else
 			{
@@ -442,8 +446,8 @@ findClosestPlanes_heuristic(close_plane_t *close_planes,
 			BOUNDS_CHECK(idx.y, 0, N_PLANES);
 			BOUNDS_CHECK(max_idx, 0, MAX_PLANES);
 			// If yes, swap out the one with the longest distance for this plane
-			close_planes[max_idx].dist = dists.y;
-			close_planes[max_idx].plane_id = idx.y;
+			CLOSE_PLANE_IDX(close_planes, max_idx).dist = dists.y;
+			CLOSE_PLANE_IDX(close_planes, max_idx).plane_id = idx.y;
 			found++;
 			if(found >= MAX_PLANES)
 			{
@@ -451,7 +455,7 @@ findClosestPlanes_heuristic(close_plane_t *close_planes,
 				// Find the next candidate for eviction -
 				// the plane with the longest distance to the voxel
 				max_idx = findHighestIdx(close_planes, MAX_PLANES);
-				max_dist = fabs(close_planes[max_idx].dist);
+				max_dist = fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist);
 			}
 			else
 			{
@@ -482,7 +486,7 @@ findClosestPlanes_heuristic(close_plane_t *close_planes,
 	#ifdef DEBUG
 	for(int i = 0; i < min(found, MAX_PLANES); i++)
 	{
-		BOUNDS_CHECK(close_planes[i].plane_id, 0, N_PLANES);
+		BOUNDS_CHECK(CLOSE_PLANE_IDX(close_planes, i).plane_id, 0, N_PLANES);
 	}
 	#endif
 	
@@ -504,7 +508,7 @@ findClosestPlanes_heuristic(close_plane_t *close_planes,
  * It works by first finding MAX_PLANES_WITHIN_RADIUS planes closer than radius,
  * and then picking the best MAX_PLANES planes by a variant of selection sort
  */
-int2 findClosestPlanes_exact(close_plane_t *close_planes_ret,
+int2 findClosestPlanes_exact(__local close_plane_t *close_planes_ret,
                       __local float4* const plane_eqs,
                       __global float16* const plane_matrices,
                       const float4 voxel,
@@ -517,10 +521,10 @@ int2 findClosestPlanes_exact(close_plane_t *close_planes_ret,
 
 	// Assume MAX_PLANES_WITHIN_RADIUS is huge, so we have room for them all
 	// Address pointed to by orig_ptr never changes
-	close_plane_t orig_ptr[MAX_PLANES_WITHIN_RADIUS];
+	__local close_plane_t orig_ptr[MAX_PLANES_WITHIN_RADIUS];
 
 	// But the address of this pointer changes!
-	close_plane_t *close_planes = orig_ptr;
+	close_plane_t *close_planes = &(CLOSE_PLANE_IDX(orig_ptr, 0);
 
 	// Find all planes (up to MAX_PLANES_WITHIN_RADIUS) closer than radius
 	float dist, abs_dist;
@@ -536,7 +540,7 @@ int2 findClosestPlanes_exact(close_plane_t *close_planes_ret,
 			close_planes++;
 		}
 	}
-	close_planes = orig_ptr;
+	close_planes = &CLOSE_PLANE_IDX(orig_ptr, 0);
 
 	// Now pick the best MAX_PLANES and put them in close_planes_ret
 
@@ -558,7 +562,7 @@ int2 findClosestPlanes_exact(close_plane_t *close_planes_ret,
 			done = 1;
 			break;
 		}
-		close_planes_ret[i] = close_planes[smallest_idx];
+		CLOSE_PLANE_IDX(close_planes_ret, i) = close_planes[smallest_idx];
 		// Bigger than initial smallest_dist
 		close_planes[smallest_idx].dist = INFINITY;
 	}
@@ -1282,7 +1286,7 @@ voxel_methods(int volume_xsize,
 
 	// For most of these algorithms we need to find some set of close planes.
 	// We find all planes that are inside the voxel radius
-	close_plane_t close_planes[MAX_PLANES+1];
+	__local close_plane_t close_planes[(MAX_PLANES+1)*get_local_size(0)];
 	int n_close_planes;
 	int guess = 0;
 	float4 voxel = {x * volume_xspacing,
@@ -1330,11 +1334,11 @@ voxel_methods(int volume_xsize,
 		// Find all planes closer than radius
 
 		close_planes_ret = FIND_CLOSE_PLANES(close_planes,
-		                                       plane_eqs,
-		                                       plane_matrices,
-		                                       voxel,
-		                                       radius,
-		                                       guess);
+		                                     plane_eqs,
+		                                     plane_matrices,
+		                                     voxel,
+		                                     radius,
+		                                     guess);
 		n_close_planes = close_planes_ret.x;
 		guess = close_planes_ret.y;
 
