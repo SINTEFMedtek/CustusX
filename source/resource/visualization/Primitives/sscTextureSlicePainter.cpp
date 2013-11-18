@@ -55,9 +55,6 @@
 #include "sscTypeConversions.h"
 #include "sscGLHelpers.h"
 
-#define DEBUG_ENABLE_CROSS_PLATFORM false
-//#define DEBUG_ENABLE_CROSS_PLATFORM true
-
 //---------------------------------------------------------
 namespace cx
 {
@@ -66,182 +63,111 @@ namespace cx
 vtkStandardNewMacro(TextureSlicePainter);
 vtkCxxRevisionMacro(TextureSlicePainter, "$Revision: 647 $");
 
-class SingleVolumePainterHelper
-{
-	GPUImageDataBufferPtr mVolumeBuffer;
-	GPUImageLutBufferPtr mLutBuffer;
-	int mIndex;
-	float mWindow;
-	float mLevel;
-	float mLLR;
-	float mAlpha;
-
-public:
-	explicit SingleVolumePainterHelper(int index) :
+SingleVolumePainterHelper::SingleVolumePainterHelper(int index) :
 		mWindow(0.0),
 		mLevel(0.0),
 		mLLR(0.0),
 		mAlpha(1.0)
-	{
-		mIndex = index;
-	}
-	SingleVolumePainterHelper() :
-		mWindow(0.0),
-		mLevel(0.0),
-		mLLR(0.0),
-		mAlpha(1.0)
-	{
-		mIndex = -1;
-	}
-	~SingleVolumePainterHelper()
-	{
-
-	}
-	void SetBuffer(GPUImageDataBufferPtr buffer)
-	{
-		mVolumeBuffer = buffer;
-	}
-	void SetBuffer(GPUImageLutBufferPtr buffer)
-	{
-		mLutBuffer = buffer;
-		mLutBuffer->debugEnableCrossplatform(DEBUG_ENABLE_CROSS_PLATFORM);
-
-	}
-	void SetColorAttribute(float window, float level, float llr,float alpha)
-	{
-		mWindow = window;
-		mLevel = level;
-		mLLR = llr;
-		mAlpha = alpha;
-	}
-	void initializeRendering()
-	{
-		if (mVolumeBuffer)
-			mVolumeBuffer->allocate();
-		if (mLutBuffer)
-			mLutBuffer->allocate();
-	}
-	void eachPrepareRendering()
-	{
-		if (mLutBuffer)
-			mLutBuffer->updateTexture();
-		if (mVolumeBuffer)
-			mVolumeBuffer->updateTexture();
-	}
-	void setUniformiArray(vtkUniformVariables* uniforms, QString name, int val)
-	{
-		QString fullName = QString("%1[%2]").arg(name).arg(mIndex);
-		std::cout << "setting: " << fullName << " = " << val << std::endl;
-		uniforms->SetUniformi(cstring_cast(fullName), 1, &val);
-	}
-	void setUniformfArray(vtkUniformVariables* uniforms, QString name, float val)
-	{
-		QString fullName = QString("%1[%2]").arg(name).arg(mIndex);
-		std::cout << "setting: " << fullName << " = " << val << std::endl;
-		uniforms->SetUniformf(cstring_cast(fullName), 1, &val);
-	}
-
-	void eachRenderInternal(vtkSmartPointer<vtkShaderProgram2> shader)
-	{
-		if (!mVolumeBuffer)
-			return;
-
-		mVolumeBuffer->bind(mIndex);
-
-		int texture = 2*mIndex; //texture unit 1
-		int lut = 2*mIndex+1; //texture unit 1
-		int lutSize = 0;
-
-		if (mLutBuffer)
-		{
-			mLutBuffer->bind(mIndex);
-			lutSize = mLutBuffer->getLutSize();
-		}
-
-		if (DEBUG_ENABLE_CROSS_PLATFORM)
-		{
-			std::cout << "lut" << mIndex << std::endl;
-			vtkUniformVariables* uniforms = shader->GetUniformVariables();
-			this->setUniformiArray(uniforms, "texture", texture);
-			this->setUniformiArray(uniforms, "lut", lut);
-			this->setUniformiArray(uniforms, "lutsize", lutSize);
-			this->setUniformfArray(uniforms, "llr", mLLR);
-			this->setUniformfArray(uniforms, "level", mLevel);
-			this->setUniformfArray(uniforms, "window", mWindow);
-			this->setUniformfArray(uniforms, "alpha", mAlpha);
-		}
-		else
-		{
-			shader->GetUniformVariables()->SetUniformi(cstring_cast("texture"+qstring_cast(mIndex)), 1, &texture);
-			shader->GetUniformVariables()->SetUniformi(cstring_cast("lut"+qstring_cast(mIndex)), 1, &lut);
-			shader->GetUniformVariables()->SetUniformi(cstring_cast("lutsize"+qstring_cast(mIndex)), 1, &lutSize);
-			shader->GetUniformVariables()->SetUniformf(cstring_cast("llr"+qstring_cast(mIndex)), 1, &mLLR);
-			shader->GetUniformVariables()->SetUniformf(cstring_cast("level"+qstring_cast(mIndex)), 1, &mLevel);
-			shader->GetUniformVariables()->SetUniformf(cstring_cast("window"+qstring_cast(mIndex)), 1, &mWindow);
-			shader->GetUniformVariables()->SetUniformf(cstring_cast("alpha"+qstring_cast(mIndex)), 1, &mAlpha);
-		}
-
-		report_gl_error();
-	}
-};
-
-class TextureSlicePainter::vtkInternals
 {
-public:
-	Display* mCurrentContext;
-	vtkWeakPointer<vtkRenderWindow> LastContext;
-	vtkSmartPointer<vtkShaderProgram2> Shader;
-	std::vector<SingleVolumePainterHelper> mElement;
+	mIndex = index;
+}
 
-	SingleVolumePainterHelper& safeIndex(int index)
+SingleVolumePainterHelper::SingleVolumePainterHelper() :
+	mWindow(0.0),
+	mLevel(0.0),
+	mLLR(0.0),
+	mAlpha(1.0)
+{
+	mIndex = -1;
+}
+
+SingleVolumePainterHelper::~SingleVolumePainterHelper()
+{
+
+}
+
+void SingleVolumePainterHelper::SetBuffer(GPUImageDataBufferPtr buffer)
+{
+	mVolumeBuffer = buffer;
+}
+
+void SingleVolumePainterHelper::SetBuffer(GPUImageLutBufferPtr buffer)
+{
+	mLutBuffer = buffer;
+}
+
+void SingleVolumePainterHelper::SetColorAttribute(float window, float level, float llr,float alpha)
+{
+	mWindow = window;
+	mLevel = level;
+	mLLR = llr;
+	mAlpha = alpha;
+}
+
+void SingleVolumePainterHelper::initializeRendering()
+{
+	if (mVolumeBuffer)
+		mVolumeBuffer->allocate();
+	if (mLutBuffer)
+		mLutBuffer->allocate();
+}
+
+void SingleVolumePainterHelper::setUniformiArray(vtkUniformVariables* uniforms, QString name, int val)
+{
+	QString fullName = QString("%1[%2]").arg(name).arg(mIndex);
+	uniforms->SetUniformi(cstring_cast(fullName), 1, &val);
+}
+
+void SingleVolumePainterHelper::setUniformfArray(vtkUniformVariables* uniforms, QString name, float val)
+{
+	QString fullName = QString("%1[%2]").arg(name).arg(mIndex);
+	uniforms->SetUniformf(cstring_cast(fullName), 1, &val);
+}
+
+void SingleVolumePainterHelper::eachRenderInternal(vtkSmartPointer<vtkShaderProgram2> shader)
+{
+	if (!mVolumeBuffer)
+		return;
+
+	mVolumeBuffer->bind(mIndex);
+
+	int texture = 2*mIndex; //texture unit 1
+	int lut = 2*mIndex+1; //texture unit 1
+
+	int lutsize = 0;
+	if (mLutBuffer)
 	{
-		if ((int)mElement.size() <= index)
-		{
-			mElement.resize(index+1);
-			mElement[index] = SingleVolumePainterHelper(index);
-		}
-		return mElement[index];
+		mLutBuffer->bind(mIndex);
+		lutsize = mLutBuffer->getLutSize();
 	}
 
-	vtkInternals()
-	{
+	vtkUniformVariables* uniforms = shader->GetUniformVariables();
+	this->setUniformiArray(uniforms, "texture", texture);
+	this->setUniformiArray(uniforms, "lut", lut);
+	this->setUniformiArray(uniforms, "lutsize", lutsize);
+	this->setUniformfArray(uniforms, "llr", mLLR);
+	this->setUniformfArray(uniforms, "level", mLevel);
+	this->setUniformfArray(uniforms, "window", mWindow);
+	this->setUniformfArray(uniforms, "alpha", mAlpha);
 
-	}
-	~vtkInternals()
-	{
-		mElement.clear();
-	}
-	void ClearGraphicsResources()
-	{
-		if (this->Shader != 0)
-		{
-			this->Shader->ReleaseGraphicsResources();
-			this->Shader = 0;
-		}
-	}
-};
+	report_gl_error();
+}
 
 //---------------------------------------------------------
 TextureSlicePainter::TextureSlicePainter() :
 	hasLoadedExtensions(false)
 {
-	mInternals = new vtkInternals();
 }
 
-void TextureSlicePainter::setShaderFile(QString shaderFile)
+void TextureSlicePainter::setShaderPath(QString path)
 {
-	mShaderFile = shaderFile;
+	mShaderPath = path;
 }
 
-QString TextureSlicePainter::loadShaderFile(QString shaderFile)
+QString TextureSlicePainter::loadShaderFile()
 {	
-	if (DEBUG_ENABLE_CROSS_PLATFORM)
-	{
-		QFileInfo org(shaderFile);
-		shaderFile = org.absolutePath() + "/crosstest.frag";
-	}
-
-	QFile fp(shaderFile);
+	QString filepath = mShaderPath + "/cxOverlay2D_frag.glsl";
+	QFile fp(filepath);
 	if (fp.exists())
 	{
 		fp.open(QFile::ReadOnly);
@@ -257,19 +183,22 @@ QString TextureSlicePainter::loadShaderFile(QString shaderFile)
 
 TextureSlicePainter::~TextureSlicePainter()
 {
-	if (mInternals->LastContext)
+	if (this->LastContext)
 	{
 	    this->ReleaseGraphicsResources(this->LastWindow);
 	}
-
-	delete mInternals;
-	mInternals = 0;
 }
 
 void TextureSlicePainter::ReleaseGraphicsResources(vtkWindow* win)
 {
-	mInternals->ClearGraphicsResources(); //the shader
-	mInternals->LastContext = 0;
+	if (this->Shader != 0)
+	{
+		this->Shader->ReleaseGraphicsResources();
+		this->Shader = 0;
+	}
+
+	this->ClearGraphicsResources(); //the shader
+	this->LastContext = 0;
 	this->Superclass::ReleaseGraphicsResources(win);
 }
 
@@ -278,67 +207,44 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 	report_gl_error();
 	if (!CanRender(renderer, actor))
 	{
-		mInternals->ClearGraphicsResources();
-		mInternals->LastContext = 0;
+		this->ClearGraphicsResources();
+		this->LastContext = 0;
 		this->Superclass::PrepareForRendering(renderer, actor);
 		return;
 	}
-	GL_TRACE("Prepare for 2D rendering");
+
 	GLint oldTextureUnit;
 	glGetIntegerv(GL_ACTIVE_TEXTURE, &oldTextureUnit);
 
 	vtkRenderWindow* renWin = renderer->GetRenderWindow();
-	if (mInternals->LastContext != renWin)
+	if (this->LastContext != renWin)
 	{
-		mInternals->ClearGraphicsResources();
+		this->ClearGraphicsResources();
 		hasLoadedExtensions = false; // force re-check
 	}
-	mInternals->LastContext = renWin;
+	this->LastContext = renWin;
 
 	vtkOpenGLRenderWindow *context = vtkOpenGLRenderWindow::SafeDownCast(renWin);
 	if (!hasLoadedExtensions)
 	{
-		GL_TRACE("Loading 2D extensions");
-		if (!LoadRequiredExtensions(context->GetExtensionManager()))
+		if (!this->LoadRequiredExtensions(context->GetExtensionManager()))
 		{
-			std::cout << "Missing required EXTENSION!!!!!!!!!!!." << endl;
 			return;
 		}
 		hasLoadedExtensions = true;
 	}
 
-	if (!mInternals->Shader)
+	for (unsigned i = 0; i < this->mElement.size(); ++i)
+		this->mElement[i].initializeRendering();
+
+	if (!this->Shader)
 	{
 		report_gl_error();
-		GL_TRACE("Loading 2D shaders");
-		mSource = this->loadShaderFile(mShaderFile);
-		int layers = mInternals->mElement.size();
-		mSource = mSource.replace("${LAYERS}", QString("%1").arg(layers));
+		QString shaderSource = this->loadShaderFile();
+		int layers = this->mElement.size();
+		shaderSource = shaderSource.replace("${LAYERS}", QString("%1").arg(layers));
 
-		vtkShaderProgram2Ptr pgm = vtkShaderProgram2Ptr::New();
-		pgm->SetContext(static_cast<vtkOpenGLRenderWindow *> (renWin));
-
-		vtkShader2Ptr s2 = vtkShader2Ptr::New();
-		s2->SetType(VTK_SHADER_TYPE_FRAGMENT);
-		s2->SetSourceCode(cstring_cast(mSource));
-		s2->SetContext(pgm->GetContext());
-		pgm->GetShaders()->AddItem(s2);
-		mInternals->Shader = pgm;
-		report_gl_error();
-		for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
-		{
-			mInternals->mElement[i].initializeRendering();
-		}
-		mInternals->Shader->Build();
-		if (mInternals->Shader->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)
-		{
-			vtkErrorMacro("Pass Two failed.");
-			abort();
-		}
-//		if (!mInternals->Shader->IsValid())
-//		{
-//			vtkErrorMacro(<<" validation of the program failed: "<< mInternals->Shader->GetLastValidateLog());
-//		}
+		this->buildProgram(shaderSource, context);
 	}
 
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -346,15 +252,9 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 	glPixelStorei(GL_PACK_SKIP_ROWS, 0);
 	glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
 
-	for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
-	{
-		mInternals->mElement[i].eachPrepareRendering();
-	}
-
 	this->Superclass::PrepareForRendering(renderer, actor);
 	report_gl_error();
 	glActiveTexture(oldTextureUnit);
-	GL_TRACE("Prepare for 2D rendering complete");
 }
 
 void TextureSlicePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags,
@@ -364,38 +264,35 @@ void TextureSlicePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor,
 	{
 		return;
 	}
-	GL_TRACE("2D rendering");
+
 	GLint oldTextureUnit;
 	glGetIntegerv(GL_ACTIVE_TEXTURE, &oldTextureUnit);
 
-	int layers = mInternals->mElement.size();
-	mInternals->Shader->GetUniformVariables()->SetUniformi("layers", 1, &layers);
+	int layers = this->mElement.size();
+	this->Shader->GetUniformVariables()->SetUniformi("layers", 1, &layers);
 
-	for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
+	for (unsigned i = 0; i < this->mElement.size(); ++i)
 	{
-		mInternals->mElement[i].eachRenderInternal(mInternals->Shader);
+		this->mElement[i].eachRenderInternal(this->Shader);
 	}
 
-	mInternals->Shader->Use();
+	this->Shader->Use();
 
-	if (!mInternals->Shader->IsValid())
+	if (!this->Shader->IsValid())
 	{
-		vtkErrorMacro(<<" validation of the program failed: "<< mInternals->Shader->GetLastValidateLog());
+		vtkErrorMacro(<<" validation of the program failed: "<< this->Shader->GetLastValidateLog());
 	}
 
 	this->Superclass::RenderInternal(renderer, actor, typeflags, forceCompileOnly);
 
-	mInternals->Shader->Restore();
-	glBindTexture(GL_TEXTURE_3D, 0);
-	glDisable(vtkgl::TEXTURE_3D);
+	this->Shader->Restore();
 	report_gl_error();
 	glActiveTexture(oldTextureUnit);
-	GL_TRACE("2D rendering complete");
 }
 
 bool TextureSlicePainter::CanRender(vtkRenderer*, vtkActor*)
 {
-	return !mInternals->mElement.empty();
+	return !this->mElement.empty();
 }
 
 bool TextureSlicePainter::LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id)
@@ -408,40 +305,24 @@ bool TextureSlicePainter::LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, 
 
 bool TextureSlicePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr)
 {
-//	GLint value[2];
-//	glGetIntegerv(vtkgl::MAX_TEXTURE_COORDS,value);
-//	if( value[0] < 8)
-//	{
-//		std::cout<<"GL_MAX_TEXTURE_COORDS="<<value[0]<<" . Number of texture coordinate sets. Min is 2."<<std::endl;
-//	}
-	if (DEBUG_ENABLE_CROSS_PLATFORM)
-	{
-		return (LoadRequiredExtension(mgr, "GL_VERSION_2_0")
-				&& LoadRequiredExtension(mgr, "GL_VERSION_1_5")
-				&& LoadRequiredExtension(mgr, "GL_ARB_vertex_buffer_object"));
-	}
-	else
-	{
-		return (LoadRequiredExtension(mgr, "GL_VERSION_2_0")
-				&& LoadRequiredExtension(mgr, "GL_VERSION_1_5")
-				&& LoadRequiredExtension(mgr, "GL_ARB_vertex_buffer_object")
-				&& LoadRequiredExtension(mgr, "GL_EXT_texture_buffer_object"));
-	}
+	return (LoadRequiredExtension(mgr, "GL_VERSION_2_0")
+			&& LoadRequiredExtension(mgr, "GL_VERSION_1_5")
+			&& LoadRequiredExtension(mgr, "GL_ARB_vertex_buffer_object"));
 }
 
 void TextureSlicePainter::SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer)
 {
-	mInternals->safeIndex(index).SetBuffer(buffer);
+	this->safeIndex(index).SetBuffer(buffer);
 }
 
 void TextureSlicePainter::SetLutBuffer(int index, GPUImageLutBufferPtr buffer)
 {
-	mInternals->safeIndex(index).SetBuffer(buffer);
+	this->safeIndex(index).SetBuffer(buffer);
 }
 
 void TextureSlicePainter::SetColorAttribute(int index, float window, float level, float llr,float alpha)
 {
-	mInternals->safeIndex(index).SetColorAttribute(window, level, llr, alpha);
+	this->safeIndex(index).SetColorAttribute(window, level, llr, alpha);
 }
 
 void TextureSlicePainter::releaseGraphicsResources(int index)
@@ -451,6 +332,48 @@ void TextureSlicePainter::releaseGraphicsResources(int index)
 void TextureSlicePainter::PrintSelf(ostream& os, vtkIndent indent)
 {
 }
+
+SingleVolumePainterHelper& TextureSlicePainter::safeIndex(int index)
+{
+	if ((int)mElement.size() <= index)
+	{
+		mElement.resize(index+1);
+		mElement[index] = SingleVolumePainterHelper(index);
+	}
+	return mElement[index];
+}
+
+void TextureSlicePainter::buildProgram(QString shaderSource, vtkOpenGLRenderWindow* renderWindow)
+{
+	vtkShaderProgram2Ptr pgm = vtkShaderProgram2Ptr::New();
+	pgm->SetContext(renderWindow);
+
+	vtkShader2Ptr s2 = vtkShader2Ptr::New();
+	s2->SetType(VTK_SHADER_TYPE_FRAGMENT);
+	s2->SetSourceCode(cstring_cast(shaderSource));
+	s2->SetContext(pgm->GetContext());
+	pgm->GetShaders()->AddItem(s2);
+	report_gl_error();
+	pgm->Build();
+
+	if (pgm->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)
+	{
+		vtkErrorMacro("Pass Two failed.");
+		abort();
+	}
+
+	this->Shader = pgm;
+}
+
+void TextureSlicePainter::ClearGraphicsResources()
+{
+	if (this->Shader != 0)
+	{
+		this->Shader->ReleaseGraphicsResources();
+		this->Shader = 0;
+	}
+}
+
 
 //---------------------------------------------------------
 }//end namespace
