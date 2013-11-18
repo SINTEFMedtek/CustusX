@@ -373,22 +373,51 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	// plane_eqs (local CL memory, will be calculated by the kernel)
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float)*4*nPlanes, NULL));
 
+
+	// Find out how much local memory the device has
+	size_t dev_local_mem_size;
+	ocl_check_error(clGetDeviceInfo(moClContext->device,
+	                                CL_DEVICE_LOCAL_MEM_SIZE,
+	                                sizeof(size_t),
+	                                &dev_local_mem_size,
+	                                NULL));
+
 	size_t local_work_size;
 	// Find the optimal local work size
 	ocl_check_error(clGetKernelWorkGroupInfo(mClKernel,
 	                                         moClContext->device,
-	                                         CL_KERNEL_WORK_GROUP_SIZE,
+	                                         CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
 	                                         sizeof(size_t),
 	                                         &local_work_size,
 	                                         NULL));
+	size_t max_work_size;
+	ocl_check_error(clGetDeviceInfo(moClContext->device,
+	                                CL_DEVICE_MAX_WORK_GROUP_SIZE,
+	                                sizeof(size_t),
+	                                &max_work_size,
+	                                NULL));
 
+	// Now find the largest multiple of the preferred work group size that will fit into local mem
+
+	size_t constant_local_mem = sizeof(cl_float)*4*nPlanes;
+	size_t varying_local_mem = (sizeof(cl_float)+sizeof(cl_int))*(nClosePlanes+1);
+	messageManager()->sendInfo(QString("Device has %1 bytes of local memory\n")
+	                           .arg(dev_local_mem_size));
+	dev_local_mem_size -= constant_local_mem;
+
+	// How many work items can the local mem support?
+
+	int maxItems = dev_local_mem_size / varying_local_mem;
+	// And what is the biggest multiple fo local_work_size that fits into that?
+	int multiple = maxItems / local_work_size;
 	//TEST
-	//	local_work_size = 128;
+	local_work_size = std::min(max_work_size, multiple * local_work_size);
+
 
 	// close planes (local CL memory, to be used by the kernel)
 	ocl_check_error(clSetKernelArg(mClKernel,
 	                               arg++,
-	                               (sizeof(cl_float)+sizeof(cl_int))*(nClosePlanes+1)*local_work_size,
+	                               varying_local_mem*local_work_size,
 	                               NULL));
 	// radius
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &radius));
