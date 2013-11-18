@@ -24,6 +24,9 @@
 #include "sscEnumConverter.h"
 #include "sscMessageManager.h"
 
+
+#include "sscTool.h"
+
 namespace cx
 {
 
@@ -228,7 +231,6 @@ Vector3D ProbeData::transform_p_to_u(const Vector3D& q_p) const
 
 Vector3D ProbeData::getOrigin_u() const
 {
-	//mOrigin_p == mOrigin_v
 	return this->transform_p_to_u(mOrigin_p);
 }
 
@@ -239,16 +241,17 @@ DoubleBoundingBox3D ProbeData::getClipRect(CoordinateSystem to) const
 	Vector3D p1 = toMp * mClipRect_p.corner(1,1,1);
 	return DoubleBoundingBox3D(p0,p1);
 
-
-
-
 //	Vector3D p0 = transform_p_to_u(mClipRect_p.corner(0,0,0));
 //	Vector3D p1 = transform_p_to_u(mClipRect_p.corner(1,1,1));
 //	return DoubleBoundingBox3D(p0,p1);
+
 }
 DoubleBoundingBox3D ProbeData::getClipRect_u() const
 {
-	return this->getClipRect(csIMAGE_U);
+	//TODO
+	ToolPtr tool;
+	QString uid = tool->getUid();
+	return this->getClipRect(CoordinateSystem(csIMAGE_U, uid));
 }
 
 }

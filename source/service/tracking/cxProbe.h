@@ -79,6 +79,8 @@ public:
 	bool isUsingDigitalVideo() const;
 	QString getRtSourceName() const;
 
+	virtual Transform3D get_vMp() const;
+
 private:
 	cxProbe(QString instrumentUid, QString scannerUid);
 	void initProbeXmlConfigParser(ProbeXmlConfigParserPtr xml);
