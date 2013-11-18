@@ -85,12 +85,8 @@ void Texture3DSlicerProxyImpl::setTargetSpaceToR()
 Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl()
 {
 	mTargetSpaceIsR = false;
-//	mView = NULL;
-	//	std::cout << "create Texture3DSlicerRep" << std::endl;
 	mActor = vtkActorPtr::New();
 	mPainter = TextureSlicePainterPtr::New();
-	// default shader for sonowand: override using setshaderfile()
-	mPainter->setShaderFile("/Data/Resources/Shaders/Texture3DOverlay.frag");
 	mPainterPolyDatamapper = vtkPainterPolyDataMapperPtr::New();
 
 	mPlaneSource = vtkPlaneSourcePtr::New();
@@ -126,9 +122,9 @@ vtkActorPtr Texture3DSlicerProxyImpl::getActor()
 	return mActor;
 }
 
-void Texture3DSlicerProxyImpl::setShaderFile(QString shaderFile)
+void Texture3DSlicerProxyImpl::setShaderPath(QString shaderFile)
 {
-	mPainter->setShaderFile(shaderFile);
+	mPainter->setShaderPath(shaderFile);
 }
 
 //void Texture3DSlicerProxyImpl::viewChanged()

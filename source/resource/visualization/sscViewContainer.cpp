@@ -23,7 +23,6 @@
 #include <vtkImageData.h>
 #include "sscVector3D.h"
 #include "vtkRenderWindow.h"
-#include "sscViewRenderWindow.h"
 #include "vtkRenderer.h"
 #ifdef check
 #undef check
@@ -62,7 +61,7 @@ ViewContainerBase::~ViewContainerBase()
 }
 
 ViewContainerWidget::ViewContainerWidget(ViewContainerBase *base, QWidget *parent, Qt::WFlags f) :
-	ViewQVTKWidget(parent, f),
+	QVTKWidget(parent, f),
 	mBase(base)
 {
 }
@@ -318,7 +317,7 @@ void ViewContainer::doRender()
 
 void ViewContainer::resizeEvent( QResizeEvent *event)
 {
-	ViewQVTKWidget::resizeEvent(event);
+	QVTKWidget::resizeEvent(event);
 	clearBackground();
 	getGridLayout()->update();
 }

@@ -57,7 +57,7 @@ public:
 	bool runWidget(int duration);
 	bool quickRunWidget();
 
-	double getFractionOfBrightPixelsInView(int viewIndex, int threshold);
+	double getFractionOfBrightPixelsInView(int viewIndex, int threshold, int component=0);
 	void dumpDebugViewToDisk(QString text, int viewIndex);
 
 	cx::ImagePtr loadImage(const QString& imageFilename);

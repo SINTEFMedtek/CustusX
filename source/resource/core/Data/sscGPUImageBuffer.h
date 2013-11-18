@@ -49,10 +49,10 @@ public:
 	 *  Call this from inside a PrepareForRendering() method in vtk.
 	 */
 	virtual void allocate() = 0;
-	/** Assuming imageData is changed,
-	  * send vtkImageData to GPU.
-	  */
-	virtual void updateTexture() = 0;
+//	/** Assuming imageData is changed,
+//	  * send vtkImageData to GPU.
+//	  */
+//	virtual void updateTexture() = 0;
 	/**Activate and bind the volume and lut buffers inside the texture units
 	 * GL_TEXTURE<2X> and GL_TEXTURE<2X+1>.
 	 * Use during RenderInternal()
@@ -90,9 +90,9 @@ public:
 	 *  Call this from inside a PrepareForRendering() methods in vtk.
 	 */
 	virtual void allocate() = 0;
-	/** If data is changed, send data to GPU.
-	  */
-	virtual void updateTexture() = 0;
+//	/** If data is changed, send data to GPU.
+//	  */
+//	virtual void updateTexture() = 0;
 	/** Activate and bind the volume and lut buffers inside the texture units
 	 *  GL_TEXTURE<2X> and GL_TEXTURE<2X+1>.
 	 *  Use during RenderInternal()
@@ -101,8 +101,6 @@ public:
 	/**Size of lut. Used by fragment shader.
 	 */
 	virtual int getLutSize() const = 0;
-
-	virtual void debugEnableCrossplatform(bool on) = 0;
 };
 
 typedef boost::shared_ptr<GPUImageLutBuffer> GPUImageLutBufferPtr;

@@ -131,7 +131,7 @@ bool ViewsWindow::defineGPUSlice(const QString& uid, const std::vector<cx::Image
 
 	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
 	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(uid);
-	rep->setShaderFile(mShaderFolder + "/Texture3DOverlay.frag");
+	rep->setShaderPath(mShaderFolder);
 	rep->setSliceProxy(proxy);
 	rep->setImages(images);
 	view->addRep(rep);
@@ -312,11 +312,11 @@ void ViewsWindow::dumpDebugViewToDisk(QString text, int viewIndex)
 	renderTester->printFractionOfVoxelsAboveZero(text, output);
 }
 
-double ViewsWindow::getFractionOfBrightPixelsInView(int viewIndex, int threshold)
+double ViewsWindow::getFractionOfBrightPixelsInView(int viewIndex, int threshold, int component)
 {
 	cxtest::RenderTesterPtr renderTester = cxtest::RenderTester::create(mLayouts[viewIndex]->getRenderWindow());
 	vtkImageDataPtr output = renderTester->renderToImage();
-	return cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, threshold);
+	return cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, threshold,component);
 }
 
 bool ViewsWindow::runWidget()
