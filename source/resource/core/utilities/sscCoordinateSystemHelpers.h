@@ -54,19 +54,23 @@ public:
 	static CoordinateSystem getD(DataPtr data);///<datas coordinate system	static CoordinateSystem getPr(); ///<patient references coordinate system
 	static CoordinateSystem getPr();
 	static CoordinateSystem getR(); ///<data references coordinate system
+	static CoordinateSystem getP();
 
-	static std::vector<CoordinateSystem> getAvailableSpaces(bool compact);
+	static std::vector<CoordinateSystem> getSpacesToPresentInGUI();
 
 private:
 	static Transform3D get_rMfrom(CoordinateSystem from); ///< ref_M_from
 
 	static Transform3D get_rMr(); ///< ref_M_ref
-	static Transform3D get_rMd(QString uid); ///< ref_M_d
-	static Transform3D get_rMdv(QString uid); ///< ref_M_dv
-	static Transform3D get_rMpr(); ///< ref_M_pr
-	static Transform3D get_rMt(QString uid); ///< ref_M_t
-	static Transform3D get_rMto(QString uid); ///< t_M_to
-	static Transform3D get_rMs(QString uid); ///< ref_M_s
+	static Transform3D get_rMd(QString uid);
+	static Transform3D get_rMdv(QString uid);
+	static Transform3D get_rMpr();
+	static Transform3D get_rMt(QString uid);
+	static Transform3D get_rMto(QString uid);
+	static Transform3D get_rMs(QString uid);
+	static Transform3D get_rMv(QString uid);
+	static Transform3D get_rMu(QString uid);
+	static Transform3D get_rMp(QString uid);
 
 	static CoordinateSystem getToolCoordinateSystem(ToolPtr tool);
 };
