@@ -492,8 +492,8 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 			BOUNDS_CHECK(idx.x, 0, N_PLANES);
 			BOUNDS_CHECK(max_idx, 0, MAX_PLANES);
 			int px, py;
-			float4 translated_voxel = projectOntoPlane(voxel,
-			                                           plane_matrices[idx.x],
+			float4 translated_voxel = projectOntoPlaneEq(voxel,
+			                                           plane_eqs[idx.x],
 			                                           dists.x);
 			toImgCoord_int(&px,
 			               &py,
@@ -540,8 +540,8 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 			BOUNDS_CHECK(max_idx, 0, MAX_PLANES);
 			// If yes, swap out the one with the longest distance for this plane
 			int px, py;
-			float4 translated_voxel = projectOntoPlane(voxel,
-			                                           plane_matrices[idx.y],
+			float4 translated_voxel = projectOntoPlaneEq(voxel,
+			                                           plane_eqs[idx.y],
 			                                           dists.y);
 
 			toImgCoord_int(&px,
