@@ -273,11 +273,6 @@ QString cxProbe::getRtSourceName() const
 	return rtSource;
 }
 
-Transform3D cxProbe::get_vMp() const
-{
-	return cx::Transform3D::Identity();
-}
-
 cxProbe::cxProbe(QString instrumentUid, QString scannerUid) :
 		mInstrumentUid(instrumentUid),
 		mScannerUid(scannerUid),

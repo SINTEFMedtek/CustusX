@@ -76,10 +76,6 @@ public:
 		mVideoSource.reset();
 		emit sectorChanged();
 	}
-	virtual Transform3D get_vMp() const
-	{
-		return cx::Transform3D::Identity();
-	}
 
 private:
 	ProbeData mProbeData;

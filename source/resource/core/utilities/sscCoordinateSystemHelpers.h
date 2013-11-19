@@ -54,7 +54,6 @@ public:
 	static CoordinateSystem getD(DataPtr data);///<datas coordinate system	static CoordinateSystem getPr(); ///<patient references coordinate system
 	static CoordinateSystem getPr();
 	static CoordinateSystem getR(); ///<data references coordinate system
-	static CoordinateSystem getP();
 
 	static std::vector<CoordinateSystem> getSpacesToPresentInGUI();
 
@@ -68,9 +67,6 @@ private:
 	static Transform3D get_rMt(QString uid);
 	static Transform3D get_rMto(QString uid);
 	static Transform3D get_rMs(QString uid);
-	static Transform3D get_rMv(QString uid);
-	static Transform3D get_rMu(QString uid);
-	static Transform3D get_rMp(QString uid);
 
 	static CoordinateSystem getToolCoordinateSystem(ToolPtr tool);
 };

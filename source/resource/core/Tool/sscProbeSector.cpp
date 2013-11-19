@@ -74,7 +74,7 @@ public:
 	}
 	bool operator ()(int x, int y) const
 	{
-		Vector3D p_v = multiply_elems(Vector3D(x, y, 0), mData.mSpacing);
+		Vector3D p_v = multiply_elems(Vector3D(x, y, 0), mData.getSpacing());
 
 		return this->insideClipRect(p_v) && this->insideSector(p_v);
 	}
@@ -141,8 +141,8 @@ vtkImageDataPtr ProbeSector::getMask()
 		return vtkImageDataPtr();
 	InsideMaskFunctor checkInside(mData, this->get_uMv());
 	vtkImageDataPtr retval;
-	retval = generateVtkImageData(Eigen::Array3i(mData.mSize.width(), mData.mSize.height(), 1),
-		mData.mSpacing, 0);
+	retval = generateVtkImageData(Eigen::Array3i(mData.getSize().width(), mData.getSize().height(), 1),
+																mData.getSpacing(), 0);
 
 	int* dim(retval->GetDimensions());
 	unsigned char* dataPtr = static_cast<unsigned char*> (retval->GetScalarPointer());
@@ -193,7 +193,7 @@ Transform3D ProbeSector::get_tMu() const
 Transform3D ProbeSector::get_uMv() const
 {
 	// use H-1 because we count between pixel centers.
-	double H = (mData.mSize.height() - 1) * mData.mSpacing[1];
+	double H = (mData.getSize().height() - 1) * mData.getSpacing()[1];
 	return createTransformRotateX(M_PI) * createTransformTranslate(Vector3D(0, -H, 0));
 }
 
@@ -321,8 +321,8 @@ void ProbeSector::updateSector()
 		return;
 	}
 
-	Vector3D bounds = Vector3D(mData.mSize.width() - 1, mData.mSize.height() - 1, 1);
-	bounds = multiply_elems(bounds, mData.mSpacing);
+	Vector3D bounds = Vector3D(mData.getSize().width() - 1, mData.getSize().height() - 1, 1);
+	bounds = multiply_elems(bounds, mData.getSpacing());
 
 	vtkFloatArrayPtr newTCoords = vtkFloatArrayPtr::New();
 	newTCoords->SetNumberOfComponents(2);

@@ -65,8 +65,6 @@ public:
 	virtual ProbeData getProbeData(QString uid = "active") const = 0; ///< Return a ProbeData for the given uid. Use 'active' to get the default.
 	virtual ProbeSectorPtr getSector(QString uid = "active") = 0; /// < Return a ProbeSectorPtr for the given uid. Use 'active' to get the default.
 
-	virtual Transform3D get_vMp() const = 0;
-
 signals:
 	void sectorChanged();
 	void activeConfigChanged();
