@@ -224,7 +224,7 @@ void Image::transformChangedSlot()
 {
 	if (mReferenceImageData)
 	{
-		Transform3D rMd = get_rMd();
+		Transform3D rMd = this->get_rMd();
 		mOrientatorMatrix->DeepCopy(rMd.inv().getVtkMatrix());
 		mReferenceImageData->Update();
 	}
