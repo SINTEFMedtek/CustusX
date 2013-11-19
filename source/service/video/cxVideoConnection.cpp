@@ -218,10 +218,10 @@ void VideoConnection::updateStatus(ProbeDataPtr msg)
 	data.setUid(msg->getUid());
 	data.setType(msg->getType());
 	data.setSector(msg->getDepthStart(), msg->getDepthEnd(), msg->getWidth());
-	data.mOrigin_p = msg->mOrigin_p;
-	data.mSize = msg->mSize;
-	data.mSpacing = msg->mSpacing;
-	data.mClipRect_p = msg->mClipRect_p;
+	data.setOrigin_p(msg->getOrigin_p());
+	data.setSize(msg->getSize());
+	data.setSpacing(msg->getSpacing());
+	data.setClipRect_p(msg->getClipRect_p());
 
 	probe->useDigitalVideo(true);
 	probe->setProbeSector(data);

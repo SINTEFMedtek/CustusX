@@ -231,8 +231,8 @@ void AcquisitionFixture::verifyFileData(cx::USReconstructInputData fileData)
 	{
 		CHECK(images->get(i));
 		Eigen::Array3i dim(images->get(i)->GetDimensions());
-		CHECK(dim[0]==fileData.mProbeData.mData.mSize.width());
-		CHECK(dim[1]==fileData.mProbeData.mData.mSize.height());
+		CHECK(dim[0]==fileData.mProbeData.mData.getSize().width());
+		CHECK(dim[1]==fileData.mProbeData.mData.getSize().height());
 	}
 }
 

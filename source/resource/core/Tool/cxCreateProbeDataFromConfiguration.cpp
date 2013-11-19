@@ -10,31 +10,31 @@ ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlCon
 	ProbeXmlConfigParser::Configuration config = basis;
 
 	QSize storedSize(basis.mImageWidth, basis.mImageHeight);
-	if (storedSize!=data.mSize)
+	if (storedSize!=data.getSize())
 	{
 		// wrong size: resample
 		data.resample(storedSize);
 	}
 
-	config.mLeftEdge = data.mClipRect_p[0];
-	config.mRightEdge = data.mClipRect_p[1];
-	config.mTopEdge = data.mClipRect_p[2];
-	config.mBottomEdge = data.mClipRect_p[3];
+	config.mLeftEdge =  data.getClipRect_p()[0];
+	config.mRightEdge =  data.getClipRect_p()[1];
+	config.mTopEdge =  data.getClipRect_p()[2];
+	config.mBottomEdge =  data.getClipRect_p()[3];
 
-	config.mOriginCol = data.mOrigin_p[0];
-	config.mOriginRow = data.mOrigin_p[1];
+	config.mOriginCol = data.getOrigin_p()[0];
+	config.mOriginRow = data.getOrigin_p()[1];
 
-	config.mPixelWidth = data.mSpacing[0];
-	config.mPixelHeight = data.mSpacing[1];
+	config.mPixelWidth = data.getSpacing()[0];
+	config.mPixelHeight = data.getSpacing()[1];
 
-	config.mImageWidth = data.mSize.width();
-	config.mImageHeight = data.mSize.height();
+	config.mImageWidth = data.getSize().width();
+	config.mImageHeight = data.getSize().height();
 
 	if (data.getType()==ProbeData::tSECTOR)
 	{
 		config.mWidthDeg = data.getWidth() / M_PI*180.0;
-		config.mOffset = data.getDepthStart() / data.mSpacing[1];
-		config.mDepth = (data.getDepthEnd() - data.getDepthStart()) / data.mSpacing[1];
+		config.mOffset = data.getDepthStart() / data.getSpacing()[1];
+		config.mDepth = (data.getDepthEnd() - data.getDepthStart()) / data.getSpacing()[1];
 	}
 	else
 	{
@@ -77,10 +77,10 @@ ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration c
 	probeData.setSector(depthStart, depthEnd, width);
   }
 
-	probeData.mSpacing = Vector3D(config.mPixelWidth, config.mPixelHeight, 1);
-	probeData.mSize = QSize(config.mImageWidth, config.mImageHeight);
-	probeData.mOrigin_p = Vector3D(config.mOriginCol, config.mOriginRow, 0);
-	probeData.mClipRect_p = DoubleBoundingBox3D(config.mLeftEdge,config.mRightEdge,config.mTopEdge,config.mBottomEdge,0,0);
+	probeData.setSpacing(Vector3D(config.mPixelWidth, config.mPixelHeight, 1));
+	probeData.setSize(QSize(config.mImageWidth, config.mImageHeight));
+	probeData.setOrigin_p(Vector3D(config.mOriginCol, config.mOriginRow, 0));
+	probeData.setClipRect_p(DoubleBoundingBox3D(config.mLeftEdge,config.mRightEdge,config.mTopEdge,config.mBottomEdge,0,0));
 	probeData.setTemporalCalibration(config.mTemporalCalibration);
 
 	return probeData;

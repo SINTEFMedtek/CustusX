@@ -51,11 +51,6 @@ std::vector<CoordinateSystem> CoordinateSystemHelpers::getSpacesToPresentInGUI()
 	retval.push_back(CoordinateSystem(csSENSOR, "active"));
 	retval.push_back(CoordinateSystem(csTOOL_OFFSET, "active"));
 
-	// active: alias for the currently active image
-	retval.push_back(CoordinateSystem(csIMAGE_V, "active"));
-	retval.push_back(CoordinateSystem(csIMAGE_U, "active"));
-	retval.push_back(CoordinateSystem(csIMAGE_PIXEL, "active"));
-
 	return retval;
 }
 
@@ -125,9 +120,6 @@ Transform3D CoordinateSystemHelpers::get_rMfrom(CoordinateSystem from)
 		break;
 	case csDATA_VOXEL:
 		rMfrom = get_rMdv(from.mRefObject);
-		break;
-	case csIMAGE_PIXEL:
-		rMfrom = get_rMp(from.mRefObject);
 		break;
 	default:
 
@@ -209,12 +201,6 @@ CoordinateSystem CoordinateSystemHelpers::getR()
 {
 	CoordinateSystem r(csREF);
 	return r;
-}
-
-CoordinateSystem CoordinateSystemHelpers::getP()
-{
-	CoordinateSystem p(csIMAGE_PIXEL);
-	return p;
 }
 
 Transform3D CoordinateSystemHelpers::get_rMr()
@@ -316,38 +302,6 @@ Transform3D CoordinateSystemHelpers::get_rMs(QString uid)
 	Transform3D rMs = rMpr * prMt * tMs;
 
 	return rMs; //ref_M_s
-}
-
-Transform3D CoordinateSystemHelpers::get_rMv(QString uid)
-{
-
-}
-
-Transform3D CoordinateSystemHelpers::get_rMu(QString uid)
-{
-
-}
-
-Transform3D CoordinateSystemHelpers::get_rMp(QString uid)
-{
-	ToolPtr tool = toolManager()->getTool(uid);
-	if(!tool)
-	{
-		messageManager()->sendWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
-		return Transform3D::Identity();
-	}
-	ProbePtr probe = tool->getProbe();
-	if(!probe)
-	{
-		messageManager()->sendWarning("Tool with uid: "+uid+" is not a probe. Can not find transform to unknown coordinate system, returning identity!");
-		return Transform3D::Identity();
-	}
-
-	Transform3D rMv = get_rMv(uid);
-	Transform3D vMp = probe->get_vMp();
-	Transform3D rMp = rMv * vMp;
-
-	return rMp;
 }
 
 } //namespace cx

@@ -231,7 +231,7 @@ IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ProbeDataPtr input)
 {
 	IGTLinkUSStatusMessage::Pointer retval = IGTLinkUSStatusMessage::New();
 
-	retval->SetOrigin(input->mOrigin_p.data());
+	retval->SetOrigin(input->getOrigin_p().data());
 	// 1 = sector, 2 = linear
 	retval->SetProbeType(input->getType());
 
@@ -267,7 +267,7 @@ ProbeDataPtr IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMess
 				probeMessage->GetDepthEnd(),
 				probeMessage->GetWidth(),
 				0);
-		retval->mOrigin_p = Vector3D(probeMessage->GetOrigin());
+		retval->setOrigin_p(Vector3D(probeMessage->GetOrigin()));
 		retval->setUid(probeMessage->GetDeviceName());
 	}
 
@@ -281,9 +281,9 @@ ProbeDataPtr IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMess
 		imageMessage->GetDimensions(size);
 		imageMessage->GetSpacing(spacing);
 
-		retval->mSpacing = Vector3D(spacing[0], spacing[1], spacing[2]);
-		retval->mSize = QSize(size[0], size[1]);
-		retval->mClipRect_p = DoubleBoundingBox3D(0, retval->mSize.width(), 0, retval->mSize.height(), 0, 0);
+		retval->setSpacing(Vector3D(spacing[0], spacing[1], spacing[2]));
+		retval->setSize(QSize(size[0], size[1]));
+		retval->setClipRect_p(DoubleBoundingBox3D(0, retval->getSize().width(), 0, retval->getSize().height(), 0, 0));
 	}
 
 	return this->decode(retval);

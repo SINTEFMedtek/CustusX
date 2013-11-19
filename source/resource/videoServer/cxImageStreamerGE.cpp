@@ -391,17 +391,17 @@ ProbeDataPtr ImageStreamerGE::getFrameStatus(QString uid, data_streaming::frame_
 	// Set width of sector in mm for LINEAR, width of sector in radians for SECTOR.
 	retval->setSector(geometry.depthStart, geometry.depthEnd, geometry.width);
 
-	retval->mOrigin_p = Vector3D(geometry.origin[0] + img->GetOrigin()[0],
+	retval->setOrigin_p(Vector3D(geometry.origin[0] + img->GetOrigin()[0],
 					geometry.origin[1]+ img->GetOrigin()[1],
-					geometry.origin[2]+ img->GetOrigin()[2]);
-	retval->mSize = QSize(img->GetDimensions()[0], img->GetDimensions()[1]);
-	retval->mSpacing = Vector3D(img->GetSpacing());
-	retval->mClipRect_p = DoubleBoundingBox3D(img->GetExtent());
+					geometry.origin[2]+ img->GetOrigin()[2]));
+	retval->setSize(QSize(img->GetDimensions()[0], img->GetDimensions()[1]));
+	retval->setSpacing(Vector3D(img->GetSpacing()));
+	retval->setClipRect_p(DoubleBoundingBox3D(img->GetExtent()));
 
 	retval->setUid(uid);
 
 	std::cout << "depthStart: " << geometry.depthStart << " depthEnd: " << geometry.depthEnd << std::endl;
-	std::cout << "Origin: " << retval->mOrigin_p << std::endl;
+	std::cout << "Origin: " << retval->getOrigin_p() << std::endl;
 
 	return retval;
 }

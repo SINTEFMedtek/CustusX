@@ -58,17 +58,17 @@ USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName
   std::pair<QString, ProbeData>  probeDataFull = this->readProbeDataBackwardsCompatible(changeExtension(fileName, "mhd"), calFilesPath);
   ProbeData  probeData = probeDataFull.second;
   // override spacing with spacing from image file. This is because the raw spacing from probe calib might have been changed by changing the sound speed.
-	bool spacingOK = similar(probeData.mSpacing[0], retval.mUsRaw->getSpacing()[0], 0.001)
-								&& similar(probeData.mSpacing[1], retval.mUsRaw->getSpacing()[1], 0.001);
+	bool spacingOK = similar(probeData.getSpacing()[0], retval.mUsRaw->getSpacing()[0], 0.001)
+								&& similar(probeData.getSpacing()[1], retval.mUsRaw->getSpacing()[1], 0.001);
   if (!spacingOK)
   {
       messageManager()->sendWarning(""
     	  "Mismatch in spacing values from calibration and recorded image.\n"
     	  "This might be valid if the sound speed was changed prior to recording.\n"
-				"Probe definition: "+ qstring_cast(probeData.mSpacing) + ", Acquired Image: " + qstring_cast(retval.mUsRaw->getSpacing())
+				"Probe definition: "+ qstring_cast(probeData.getSpacing()) + ", Acquired Image: " + qstring_cast(retval.mUsRaw->getSpacing())
     	  );
   }
-	probeData.mSpacing = Vector3D(retval.mUsRaw->getSpacing());
+	probeData.setSpacing(Vector3D(retval.mUsRaw->getSpacing()));
   retval.mProbeData.setData(probeData);
   retval.mProbeUid = probeDataFull.first;
 
@@ -105,31 +105,6 @@ std::pair<QString, ProbeData>  UsReconstructionFileReader::readProbeDataBackward
 
 	return retval;
 }
-
-/*ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(USReconstructInputData data)
-{
-	vtkImageDataPtr mask = data.getMask();
-  ImagePtr image = ImagePtr(new Image("mask", mask, "mask")) ;
-
-  Eigen::Array3i usDim(data.mUsRaw->getDimensions());
-  usDim[2] = 1;
-  Vector3D usSpacing(data.mUsRaw->getSpacing());
-
-  // checking
-  bool spacingOK = true;
-  spacingOK = spacingOK && similar(usSpacing[0], mask->GetSpacing()[0], 0.001);
-  spacingOK = spacingOK && similar(usSpacing[1], mask->GetSpacing()[1], 0.001);
-  bool dimOK = similar(usDim, Eigen::Array3i(mask->GetDimensions()));
-  if (!dimOK || !spacingOK)
-  {
-    messageManager()->sendError("Reconstruction: mismatch in mask and image dimensions/spacing: ");
-    if (!dimOK)
-      messageManager()->sendError("Dim: Image: "+ qstring_cast(usDim) + ", Mask: " + qstring_cast(Eigen::Array3i(mask->GetDimensions())));
-    if (!spacingOK)
-      messageManager()->sendError("Spacing: Image: "+ qstring_cast(usSpacing) + ", Mask: " + qstring_cast(Vector3D(mask->GetSpacing())));
-  }
-  return image;
-}*/
 
 ImagePtr UsReconstructionFileReader::generateMask(USReconstructInputData data)
 {

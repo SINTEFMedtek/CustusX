@@ -122,7 +122,7 @@ void ProbeAdapterRTSource::newFrameSlot()
 
 	QString uid = mBase->getUid();
 	ProbeData data = probe->getProbeData(uid);
-	QSize dimProbe = data.mSize;
+	QSize dimProbe = data.getSize();
 	QSize dimImage(mRedirecter->GetOutput()->GetDimensions()[0], mRedirecter->GetOutput()->GetDimensions()[1]);
 
 	if (dimProbe!=dimImage)
@@ -150,7 +150,7 @@ void ProbeAdapterRTSource::probeChangedSlot()
 	mRedirecter->Update();
 
 	QString uid = mBase->getUid();
-	mRedirecter->SetOutputSpacing(probe->getProbeData(uid).mSpacing.begin());
+	mRedirecter->SetOutputSpacing(probe->getProbeData(uid).getSpacing().begin());
 
 	mRedirecter->Update();
 }
