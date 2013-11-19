@@ -161,9 +161,13 @@ class VTK(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def _rawCheckout(self):
-        self._getBuilder().gitClone('http://vtk.org/VTK.git')
+        self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/VTK')
+        #self._getBuilder().gitClone('http://vtk.org/VTK.git')
     def update(self):
-        self._getBuilder().gitCheckout('v5.10.1', patch='VTK-5-10-1.patch')
+        # this fix should rebase repo from the original Kitware/VTK to our own fork on GitHub.
+        self._getBuilder().gitSetRemoteURL('git@github.com:SINTEFMedisinskTeknologi/VTK', branch='VTK-5-10-1.patch_branch')
+        self._getBuilder().gitCheckout('VTK-5-10-1.cx_patch_1')
+        #self._getBuilder().gitCheckout('v5.10.1.patch', patch='VTK-5-10-1.patch')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption

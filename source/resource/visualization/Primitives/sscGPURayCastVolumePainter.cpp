@@ -121,24 +121,13 @@ public:
 	void initializeRendering()
 	{
 		if (mLutBuffer)
-		{
 			mLutBuffer->allocate();
-		}
 		if (mVolumeBuffer)
-		{
 			mVolumeBuffer->allocate();
-		}
 	}
 	void eachPrepareRendering()
 	{
-		if (mLutBuffer)
-		{
-			mLutBuffer->updateTexture();
-		}
-		if (mVolumeBuffer)
-		{
-			mVolumeBuffer->updateTexture();
-		}
+		this->initializeRendering();
 	}
 	void eachRenderInternal(vtkSmartPointer<vtkShaderProgram2> shader)
 	{

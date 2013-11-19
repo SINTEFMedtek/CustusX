@@ -24,7 +24,6 @@
 class QDomNode;
 #include "sscVector3D.h"
 #include "sscBoundingBox3D.h"
-#include "sscCoordinateSystemHelpers.h"
 
 namespace cx
 {
@@ -131,15 +130,18 @@ public:
 	void updateSectorFromClipRect();
 	void applySoundSpeedCompensationFactor(double factor);///< Compensate for soundspeed for linear probes
 
-	//ProbeImageData variables
-	Vector3D mOrigin_p; ///< probe origin in space p, measured in pixels. (upper-left corner origin)
-	Vector3D mSpacing;//(_p)
-	DoubleBoundingBox3D mClipRect_p; ///< sector clipping rect, in addition to the standard sector definition. The probe sector is the intersection of the sector definition and the clip rect.
-	QSize mSize;//_p
-
 	Vector3D getOrigin_u() const; ///< probe origin in image space u. (lower-left corner origin)
 	DoubleBoundingBox3D getClipRect_u() const; ///< sector clipping rect in image space u. (lower-left corner origin)
-	DoubleBoundingBox3D getClipRect(CoordinateSystem coord) const; ///< sector clipping rect in image space u. (lower-left corner origin)
+
+	Vector3D getOrigin_p() const;
+	Vector3D getSpacing() const;
+	DoubleBoundingBox3D getClipRect_p() const;
+	QSize getSize() const;
+
+	void setOrigin_p(Vector3D origin_p);
+	void setSpacing(Vector3D spacing);
+	void setClipRect_p(DoubleBoundingBox3D clipRect_p);
+	void setSize(QSize size);
 
 private:
 	TYPE mType; ///< type of probe
@@ -150,6 +152,12 @@ private:
 	double mCenterOffset; ///< Offset of center point for sectors, mm
 	double mSoundSpeedCompensationFactor; ///< The used sound speed compensation factor
 	QString mUid; ///<  the uid of the stream data this probe data applies to.
+
+	//ProbeImageData variables
+	Vector3D mOrigin_p; ///< probe origin in space p, measured in pixels. (upper-left corner origin)
+	Vector3D mSpacing;//(_p)
+	DoubleBoundingBox3D mClipRect_p; ///< sector clipping rect, in addition to the standard sector definition. The probe sector is the intersection of the sector definition and the clip rect.
+	QSize mSize;//_p
 
 	//ProbeImageData
 	Vector3D transform_p_to_u(const Vector3D& q_p) const;

@@ -210,13 +210,13 @@ void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 	ProbeData data = probe->getProbeData();
 	mUpdating= true;
 
-	DoubleBoundingBox3D range(0, data.mSize.width(), 0, data.mSize.height());
-	mBBWidget->setValue(data.mClipRect_p, range);
+	DoubleBoundingBox3D range(0, data.getSize().width(), 0, data.getSize().height());
+	mBBWidget->setValue(data.getClipRect_p(), range);
 
-	mOrigin->setValue(data.mOrigin_p);
+	mOrigin->setValue(data.getOrigin_p());
 
-	double sx = data.mSpacing[0]; // mm/pix
-	double sy = data.mSpacing[1];
+	double sx = data.getSpacing()[0]; // mm/pix
+	double sy = data.getSpacing()[1];
 
 	mDepthWidget->setValue(std::make_pair(data.getDepthStart()/sy, data.getDepthEnd()/sy));
 	mDepthWidget->setRange(DoubleRange(0, range.range()[1]*1.5, 1));
@@ -254,8 +254,8 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 		return;
 	ProbeData data = probe->getProbeData();
 
-	double sx = data.mSpacing[0]; // mm/pix
-	double sy = data.mSpacing[1];
+	double sx = data.getSpacing()[0]; // mm/pix
+	double sy = data.getSpacing()[1];
 
 	data.setSector(mDepthWidget->getValue().first*sy, mDepthWidget->getValue().second*sy, mWidth->getValue());
 
@@ -277,7 +277,7 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 		return;
 	ProbeData data = probe->getProbeData();
 
-	data.mClipRect_p = mBBWidget->getValue();
+	data.setClipRect_p(mBBWidget->getValue());
 
 	probe->setProbeSector(data);
 }
@@ -298,11 +298,11 @@ void ProbeConfigWidget::guiOriginSettingsChanged()
 	if (mSyncBoxToSector->isChecked())
 	{
 		// shift
-		Vector3D shift = mOrigin->getValue() - data.mOrigin_p;
-		data.mClipRect_p = transform(createTransformTranslate(shift), data.mClipRect_p);
+		Vector3D shift = mOrigin->getValue() - data.getOrigin_p();
+		data.setClipRect_p(transform(createTransformTranslate(shift), data.getClipRect_p()));
 	}
 
-	data.mOrigin_p = mOrigin->getValue();
+	data.setOrigin_p(mOrigin->getValue());
 
 	probe->setProbeSector(data);
 }

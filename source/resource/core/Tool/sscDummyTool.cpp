@@ -24,10 +24,10 @@ ProbeData DummyToolTestUtilities::createProbeData(ProbeData::TYPE type, double d
 	retval.setSector(0, depth, width, 0);
 
 	Vector3D imageSpacing(width/extent[0], depth/extent[1], 1.0);
-	retval.mOrigin_p = Vector3D(frameSize[0]/2,0,0);
-	retval.mSpacing = imageSpacing;
-	retval.mClipRect_p = DoubleBoundingBox3D(0, extent[0], 0, extent[1], 0, 0);
-	retval.mSize = QSize(frameSize[0], frameSize[1]);
+	retval.setOrigin_p(Vector3D(frameSize[0]/2,0,0));
+	retval.setSpacing(imageSpacing);
+	retval.setClipRect_p(DoubleBoundingBox3D(0, extent[0], 0, extent[1], 0, 0));
+	retval.setSize(QSize(frameSize[0], frameSize[1]));
 
 	return retval;
 }

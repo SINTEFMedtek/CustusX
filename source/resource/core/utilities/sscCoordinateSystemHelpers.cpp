@@ -52,11 +52,6 @@ std::vector<CoordinateSystem> CoordinateSystemHelpers::getSpacesToPresentInGUI()
 	retval.push_back(CoordinateSystem(csSENSOR, "active"));
 	retval.push_back(CoordinateSystem(csTOOL_OFFSET, "active"));
 
-	// active: alias for the currently active image
-	retval.push_back(CoordinateSystem(csIMAGE_V, "active"));
-	retval.push_back(CoordinateSystem(csIMAGE_U, "active"));
-	retval.push_back(CoordinateSystem(csIMAGE_PIXEL, "active"));
-
 	return retval;
 }
 
@@ -127,6 +122,7 @@ Transform3D CoordinateSystemHelpers::get_rMfrom(CoordinateSystem from)
 	case csDATA_VOXEL:
 		rMfrom = get_rMdv(from.mRefObject);
 		break;
+<<<<<<< HEAD
 	case csIMAGE_PIXEL:
 		rMfrom = get_rMp(from.mRefObject);
 		break;
@@ -136,6 +132,8 @@ Transform3D CoordinateSystemHelpers::get_rMfrom(CoordinateSystem from)
 	case csIMAGE_U:
 		rMfrom = get_rMu(from.mRefObject);
 		break;
+=======
+>>>>>>> master
 	default:
 
 		break;
@@ -216,12 +214,6 @@ CoordinateSystem CoordinateSystemHelpers::getR()
 {
 	CoordinateSystem r(csREF);
 	return r;
-}
-
-CoordinateSystem CoordinateSystemHelpers::getP()
-{
-	CoordinateSystem p(csIMAGE_PIXEL);
-	return p;
 }
 
 Transform3D CoordinateSystemHelpers::get_rMr()
@@ -380,7 +372,5 @@ ProbePtr CoordinateSystemHelpers::getProbe(QString toolUid)
 
 	return probe;
 }
-
-
 
 } //namespace cx

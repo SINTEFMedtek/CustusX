@@ -25,7 +25,7 @@
 #include "sscIndent.h"
 #include <QLayoutItem>
 
-#include "sscViewQVTKWidget.h"
+#include "QVTKWidget.h"
 #include "sscView.h"
 #include "sscTransform3D.h"
 
@@ -112,13 +112,13 @@ protected:
 	QWidget *mWidget;
 };
 
-class ViewContainerWidget : public ViewQVTKWidget
+class ViewContainerWidget : public QVTKWidget
 {
 public:
 	ViewContainerWidget(ViewContainerBase *base, QWidget *parent = NULL, Qt::WFlags f = 0);
 	void setBase(ViewContainerBase *base) { mBase = base; }
 protected:
-	typedef ViewQVTKWidget widget;
+	typedef QVTKWidget widget;
 	
 private:
 	virtual void paintEvent(QPaintEvent *event);

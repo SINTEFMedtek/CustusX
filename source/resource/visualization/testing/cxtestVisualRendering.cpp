@@ -28,6 +28,8 @@
 #include "sscViewsWindow.h"
 #include "catch.hpp"
 #include "cxtestRenderTester.h"
+#include "sscMessageManager.h"
+#include "sscImageLUT2D.h"
 
 using cx::Vector3D;
 using cx::Transform3D;
@@ -37,11 +39,17 @@ class VisualRenderingFixture : public ViewsWindow
 public:
 	VisualRenderingFixture() : ViewsWindow("")
 	{
+		cx::MessageManager::initialize();
 		image.push_back("ssc/Person5/person5_t1_unsigned.mhd");
 		image.push_back("ssc/Person5/person5_t2_unsigned.mhd");
 		image.push_back("ssc/Person5/person5_flair_unsigned.mhd");
 		image.push_back("ssc/DTI/dti_eigenvector_rgb.mhd");
 	}
+	~VisualRenderingFixture()
+	{
+		cx::MessageManager::shutdown();
+	}
+
 	QStringList image;
 };
 
@@ -202,20 +210,55 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show Axial GPU slice",
-				 "[unit][resource][visualization][not_apple][not_win32][not_win64][ca_special]")
+				 "Visual rendering: Show Axial GPU slice, 1 volume",
+				 "[unit][resource][visualization][not_apple][not_win32][not_win64][ca_special1]")
 {
 	this->setDescription("A  volumes, moving tool, GPU");
 
-	REQUIRE(this->defineGPUSlice("A", image[0], cx::ptAXIAL, 0, 0));
-	REQUIRE(this->quickRunWidget());
+	std::vector<cx::ImagePtr> images(1);
+	images[0] = this->loadImage(image[0]);
 
-	CHECK(this->getFractionOfBrightPixelsInView(0,20) > 0.02);
+	cx::ImageLUT2DPtr lut0 = images[0]->getLookupTable2D();
+	lut0->addColorPoint(lut0->getScalarMax(), QColor::fromRgbF(0,0,1,1));
+
+	REQUIRE(this->defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
+//	REQUIRE(this->quickRunWidget());
+	REQUIRE(this->runWidget(3000));
+
+	CHECK(this->getFractionOfBrightPixelsInView(0,20,2) > 0.02);
+}
+
+TEST_CASE_METHOD(VisualRenderingFixture,
+				 "Visual rendering: Show Axial GPU slice, 2 volumes",
+				 "[unit][resource][visualization][not_apple][not_win32][not_win64][ca_special2]")
+{
+	this->setDescription("A  volumes, moving tool, GPU");
+
+	std::vector<cx::ImagePtr> images(2);
+	images[0] = this->loadImage(image[0]);
+	images[1] = this->loadImage(image[1]);
+
+	cx::ImageLUT2DPtr lut0 = images[0]->getLookupTable2D();
+	//std::cout << "setting llr for vol1 = " << llr << std::endl;
+	lut0->addColorPoint(lut0->getScalarMax(), QColor::fromRgbF(0,1,0,1));
+
+	cx::ImageLUT2DPtr lut1 = images[1]->getLookupTable2D();
+	//std::cout << "setting llr for vol1 = " << llr << std::endl;
+	lut1->addColorPoint(lut1->getScalarMax(), QColor::fromRgbF(0,0,1,1));
+	double llr = lut1->getScalarMin() + (lut1->getScalarMax()-lut1->getScalarMin())*0.25;
+	lut1->setLLR(llr);
+
+	REQUIRE(this->defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
+//	REQUIRE(this->quickRunWidget());
+	REQUIRE(this->runWidget(3000));
+
+	CHECK(this->getFractionOfBrightPixelsInView(0,20,1) > 0.02);
+	CHECK(this->getFractionOfBrightPixelsInView(0,20,2) > 0.02);
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
 				 "Visual rendering: Show ACS, 3 GPU volumes, moving tool",
-				 "[unit][resource][visualization][not_apple][not_win32][not_win64]")
+				 "[unit][resource][visualization][not_apple][not_win32][not_win64][ca_special3]")
 {
 	this->setDescription("ACS 3 volumes, moving tool, GPU");
 
@@ -226,7 +269,8 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 		REQUIRE(this->defineGPUSlice("S", image[i], cx::ptSAGITTAL, 2, i));
 	}
 	//REQUIRE(this->runWidget());
-	REQUIRE(this->quickRunWidget());
+//	REQUIRE(this->quickRunWidget());
+	REQUIRE(this->runWidget(3000));
 
 	for (unsigned i = 0; i < 3*3; ++i)
 	{

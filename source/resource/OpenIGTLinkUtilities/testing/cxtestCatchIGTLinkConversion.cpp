@@ -210,16 +210,16 @@ TEST_CASE_METHOD(IGTLinkConversionFixture, "IGTLinkConversion: Decode/encode Pro
 	// generate probe data input
 	cx::ProbeDataPtr input(new cx::ProbeData());
 	input->setType(cx::ProbeData::tSECTOR);
-	input->mOrigin_p = cx::Vector3D(50,0,0); ///< probe origin in pixel space p. (upper-left corner origin)
-	input->mSpacing = cx::Vector3D(0.5, 0.6, 1.0);
-	input->mSize = QSize(300, 200);
-	input->mClipRect_p = cx::DoubleBoundingBox3D(0, input->mSize.width(), 0, input->mSize.height(), 0, 0); ///< sector clipping rect, in addition to the standard sector definition. The probe sector is the intersection of the sector definition and the clip rect.
+	input->setOrigin_p(cx::Vector3D(50,0,0)); ///< probe origin in pixel space p. (upper-left corner origin)
+	input->setSpacing(cx::Vector3D(0.5, 0.6, 1.0));
+	input->setSize(QSize(300, 200));
+	input->setClipRect_p(cx::DoubleBoundingBox3D(0, input->getSize().width(), 0, input->getSize().height(), 0, 0)); ///< sector clipping rect, in addition to the standard sector definition. The probe sector is the intersection of the sector definition and the clip rect.
 	input->setSector(10, 30, M_PI/2, 2);
 
 	// generate an image based on the probe data. Part of the data is sent over this channel.
-	vtkImageDataPtr rawImage = cx::generateVtkImageData(Eigen::Array3i(input->mSize.width(), input->mSize.height(), 1),
-													input->mSpacing,
-													0);
+	vtkImageDataPtr rawImage = cx::generateVtkImageData(Eigen::Array3i(input->getSize().width(), input->getSize().height(), 1),
+																											input->getSpacing(),
+																											0);
 	cx::ImagePtr imageInput(new cx::Image("my_uid", rawImage));
 
 	// convert the data to igtlink and back
@@ -234,11 +234,11 @@ TEST_CASE_METHOD(IGTLinkConversionFixture, "IGTLinkConversion: Decode/encode Pro
 	CHECK(input->getDepthEnd() == output->getDepthEnd());
 	//not supported CHECK(input->getCenterOffset() == output->getCenterOffset());
 	CHECK(input->getWidth() == output->getWidth());
-	CHECK(cx::similar(input->mClipRect_p, output->mClipRect_p)); // only supported for cliprect equal to entire image size.
-	CHECK(cx::similar(input->mOrigin_p, output->mOrigin_p));
-	CHECK(cx::similar(input->mSpacing, output->mSpacing));
-	CHECK(input->mSize.width() == output->mSize.width());
-	CHECK(input->mSize.height() == output->mSize.height());
+	CHECK(cx::similar(input->getClipRect_p(), output->getClipRect_p())); // only supported for cliprect equal to entire image size.
+	CHECK(cx::similar(input->getOrigin_p(), output->getOrigin_p()));
+	CHECK(cx::similar(input->getSpacing(), output->getSpacing()));
+	CHECK(input->getSize().width() == output->getSize().width());
+	CHECK(input->getSize().height() == output->getSize().height());
 	//not supported CHECK(input->getTemporalCalibration() == output->getTemporalCalibration());
 }
 

@@ -53,7 +53,7 @@ public:
 	static Texture3DSlicerProxyPtr New();
 
 	virtual ~Texture3DSlicerProxy() {}
-	virtual void setShaderFile(QString shaderFile) {}
+	virtual void setShaderPath(QString shaderFile) {}
 	virtual void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp) {}
 	virtual void setImages(std::vector<ImagePtr> images) {}
 	virtual std::vector<ImagePtr> getImages() { return std::vector<ImagePtr>(); }
@@ -88,7 +88,7 @@ Q_OBJECT
 public:
 	static Texture3DSlicerProxyPtr New();
 	virtual ~Texture3DSlicerProxyImpl();
-	void setShaderFile(QString shaderFile);
+	void setShaderPath(QString shaderFile);
 	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp); // DEPRECATED: use zoomfactor in View and the object will auto-update
 	void setImages(std::vector<ImagePtr> images);
 	void setSliceProxy(SliceProxyPtr slicer);

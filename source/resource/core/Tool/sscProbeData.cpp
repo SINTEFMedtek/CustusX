@@ -24,9 +24,6 @@
 #include "sscEnumConverter.h"
 #include "sscMessageManager.h"
 
-
-#include "sscTool.h"
-
 namespace cx
 {
 
@@ -182,7 +179,6 @@ QString ProbeData::getUid() const
 	return mUid;
 }
 
-
 void ProbeData::setUid(QString uid)
 {
 	mUid = uid;
@@ -234,24 +230,51 @@ Vector3D ProbeData::getOrigin_u() const
 	return this->transform_p_to_u(mOrigin_p);
 }
 
-DoubleBoundingBox3D ProbeData::getClipRect(CoordinateSystem to) const
-{
-	Transform3D toMp = SpaceHelpers::get_toMfrom(SpaceHelpers::getP(), to);
-	Vector3D p0 = toMp * mClipRect_p.corner(0,0,0);
-	Vector3D p1 = toMp * mClipRect_p.corner(1,1,1);
-	return DoubleBoundingBox3D(p0,p1);
-
-//	Vector3D p0 = transform_p_to_u(mClipRect_p.corner(0,0,0));
-//	Vector3D p1 = transform_p_to_u(mClipRect_p.corner(1,1,1));
-//	return DoubleBoundingBox3D(p0,p1);
-
-}
 DoubleBoundingBox3D ProbeData::getClipRect_u() const
 {
-	//TODO
-	ToolPtr tool;
-	QString uid = tool->getUid();
-	return this->getClipRect(CoordinateSystem(csIMAGE_U, uid));
+		Vector3D p0 = transform_p_to_u(mClipRect_p.corner(0,0,0));
+		Vector3D p1 = transform_p_to_u(mClipRect_p.corner(1,1,1));
+		return DoubleBoundingBox3D(p0,p1);
+}
+
+Vector3D ProbeData::getOrigin_p() const
+{
+	return mOrigin_p;
+}
+
+Vector3D ProbeData::getSpacing() const
+{
+	return mSpacing;
+}
+
+DoubleBoundingBox3D ProbeData::getClipRect_p() const
+{
+	return mClipRect_p;
+}
+
+QSize ProbeData::getSize() const
+{
+	return mSize;
+}
+
+void ProbeData::setOrigin_p(Vector3D origin_p)
+{
+	mOrigin_p = origin_p;
+}
+
+void ProbeData::setSpacing(Vector3D spacing)
+{
+	mSpacing = spacing;
+}
+
+void ProbeData::setClipRect_p(DoubleBoundingBox3D clipRect_p)
+{
+	mClipRect_p = clipRect_p;
+}
+
+void ProbeData::setSize(QSize size)
+{
+	mSize = size;
 }
 
 }

@@ -144,11 +144,13 @@ protected:
 	 * @param input The input US data
 	 * @param outputData The output volume is stored here
 	 * @param radius The radius of the kernel - i.e. how far away to look for image planes to use
+	 * @param nClosePlanes The number of close planes to search for
 	 * @return true on success
 	 */	 
 	virtual bool doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                              vtkImageDataPtr outputData,
-	                              float radius);
+	                              float radius,
+	                              int nClosePlanes);
 
 	/**
 	 * Split the US input into numBlock blocks of whole frames 

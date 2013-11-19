@@ -66,7 +66,7 @@ public:
 	virtual ~Slices3DRep();
 	virtual QString getType() const { return "Slices3DRep"; }
 
-	void setShaderFile(QString shaderFile);
+	void setShaderPath(QString path);
 	void setImages(std::vector<ImagePtr> images);
 	void addPlane(PLANE_TYPE plane);
 	void setTool(ToolPtr tool);

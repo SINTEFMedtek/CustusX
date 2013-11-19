@@ -56,7 +56,6 @@ public:
 	static CoordinateSystem getD(DataPtr data);///<datas coordinate system	static CoordinateSystem getPr(); ///<patient references coordinate system
 	static CoordinateSystem getPr();
 	static CoordinateSystem getR(); ///<data references coordinate system
-	static CoordinateSystem getP();
 
 	static std::vector<CoordinateSystem> getSpacesToPresentInGUI();
 
