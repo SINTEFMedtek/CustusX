@@ -35,6 +35,26 @@ TEST_CASE("ProbeDefinition: Validating set/get", "[unit][resource][core][ProbeDe
 	QSize size = probeDefinition->getSize();
 	probeDefinition->setSize(size);
 	CHECK(size ==  probeDefinition->getSize());
+
+	double temporalCalibration = probeDefinition->getTemporalCalibration();
+	probeDefinition->setTemporalCalibration(temporalCalibration);
+	CHECK(temporalCalibration == probeDefinition->getTemporalCalibration());
+
+	cx::ProbeData::TYPE type = probeDefinition->getType();
+	probeDefinition->setType(type);
+	CHECK(type == probeDefinition->getType());
+
+	double depthStart = probeDefinition->getDepthStart();
+	double depthEnd = probeDefinition->getDepthEnd();
+	double width = probeDefinition->getWidth();
+	double centerOffset = probeDefinition->getCenterOffset();
+	probeDefinition->setSector(depthStart, depthEnd, width, centerOffset);
+	CHECK(depthStart == probeDefinition->getDepthStart());
+	CHECK(depthEnd == probeDefinition->getDepthEnd());
+	CHECK(width == probeDefinition->getWidth());
+	CHECK(centerOffset == probeDefinition->getCenterOffset());
 }
+
+
 
 }
