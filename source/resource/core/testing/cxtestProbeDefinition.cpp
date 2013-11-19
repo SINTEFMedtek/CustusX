@@ -8,14 +8,14 @@
 namespace cxtest
 {
 
-TEST_CASE("ProbeDefinition can be constructed", "[unit][resource][core][ProbeDefinition]")
+TEST_CASE("ProbeDefinition can be constructed", "[unit][resource][core][ProbeDefinition][hide]")
 {
 	cx::ProbeDataPtr probeDefinition = cx::ProbeDataPtr(new cx::ProbeData());
 	CHECK(probeDefinition.get());
 	CHECK(probeDefinition->getType() == cx::ProbeData::tNONE);
 }
 
-TEST_CASE("ProbeDefinition: Validating set/get", "[unit][resource][core][ProbeDefinition]")
+TEST_CASE("ProbeDefinition: Validating set/get", "[unit][resource][core][ProbeDefinition][hide]")
 {
 	cx::ProbeDataPtr probeDefinition;
 
