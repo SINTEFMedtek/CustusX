@@ -72,7 +72,7 @@
 
 // Gaussian weight function
 #define WEIGHT_GAUSS_SIGMA (0.05f)
- 
+
 #define WEIGHT_GAUSS_SQRT_2PI 2.506628275f
 
 #define WEIGHT_GAUSS_NONEXP_PART(sigma) (1.0f/(sigma*WEIGHT_GAUSS_SQRT_2PI))
@@ -327,7 +327,7 @@ findHighestIdx(__local close_plane_t *planes,
 	int maxidx = 0;
 	float maxval = -1.0f;
 	planes = &CLOSE_PLANE_IDX(planes, 0);
-	
+
 	for(int i = 0; i < n; i++)
 	{
 		float abs = fabs(planes->dist);
@@ -485,7 +485,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 		BOUNDS_CHECK(CLOSE_PLANE_IDX(close_planes, i).plane_id, 0, N_PLANES);
 	}
 	#endif
-	
+
 	int2 ret;
 	ret.x = min(found, MAX_PLANES);
 	ret.y = smallest_idx;
@@ -1233,20 +1233,42 @@ voxel_methods(int volume_xsize,
 	// Find all valleys in the search space of distances
 	float prev_dist = fabs(dot(voxel, plane_eqs[0]));
 	float dist = fabs(dot(voxel, plane_eqs[1]));
-	for(int i = 2; i < N_PLANES-1; i++)
+	int start_pos = 0;
+	int end_pos;
+	for(int start_id = 0; start_id < MAX_MULTISTART_STARTS; start_id++)
 	{
-		float next_dist = fabs(dot(voxel, plane_eqs[i]));
-		if(dist < next_dist  && dist < prev_dist)
+		smallest_dist = INFINITY;
+		if(start_id == MAX_MULTISTART_STARTS-1)
 		{
-			multistart_guesses[n_multistart_guesses] = i-1;
-			DEBUG_PRINTF("Multistart guess %d: %d\n", n_multistart_guesses, i-1);
-			n_multistart_guesses++;
-			if(n_multistart_guesses == MAX_MULTISTART_STARTS) break;
+			end_pos = N_PLANES-1;
 		}
-		prev_dist = dist;
-		dist = next_dist;
+		else
+		{
+			end_pos = (start_id+1)*N_PLANES/MAX_MULTISTART_STARTS;
+		}
+
+		for(int i = start_pos; i < end_pos; i++)
+		{
+			dist = fabs(dot(voxel,plane_eqs[i]));
+			//dist = fabs(plane_dist(voxel,plane_matrices[i]));
+			if(dist < smallest_dist)
+			{
+				smallest_dist = dist;
+				multistart_guesses[start_id] = i;
+			}
+		}
+		start_pos = end_pos+1;
+
 	}
 
+#ifdef DEBUG
+	for(int i = 0; i < MAX_MULTISTART_STARTS; i++)
+	{
+		DEBUG_PRINTF("Multistart %d: idx %d dist %f\n",i,
+		             multistart_guesses[i],
+		             fabs(dot(voxel, plane_eqs[multistart_guesses[i]])));
+	}
+#endif
 
 	for(int i = 0; i < N_PLANES; i++)
 	{
@@ -1257,6 +1279,7 @@ voxel_methods(int volume_xsize,
 			smallest_dist = dist;
 			guess = i;
 		}
+
 	}
 
 
