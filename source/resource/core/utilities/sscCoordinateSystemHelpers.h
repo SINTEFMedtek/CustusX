@@ -9,6 +9,8 @@
 namespace cx
 {
 
+typedef boost::shared_ptr<class Probe> ProbePtr;
+
 /**\brief Identification of a Coordinate system.
  *
  * \sa CoordinateSystemHelpers
@@ -68,9 +70,10 @@ private:
 	static Transform3D get_rMt(QString uid);
 	static Transform3D get_rMto(QString uid);
 	static Transform3D get_rMs(QString uid);
-	static Transform3D get_rMv(QString uid);
+	static Transform3D get_rMv(QString toolUid);
 	static Transform3D get_rMu(QString uid);
-	static Transform3D get_rMp(QString uid);
+	static Transform3D get_rMp(QString toolUid);
+	static ProbePtr getProbe(QString toolUid);
 
 	static CoordinateSystem getToolCoordinateSystem(ToolPtr tool);
 };

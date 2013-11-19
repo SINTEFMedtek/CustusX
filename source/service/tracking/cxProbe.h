@@ -79,7 +79,9 @@ public:
 	bool isUsingDigitalVideo() const;
 	QString getRtSourceName() const;
 
-	virtual Transform3D get_vMp() const;
+	virtual Transform3D get_vMp() const;///< Will get vMp for active probe configuration
+	virtual Transform3D get_uMv() const;
+	virtual Transform3D get_tMu() const;
 
 private:
 	cxProbe(QString instrumentUid, QString scannerUid);

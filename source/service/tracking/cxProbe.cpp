@@ -275,7 +275,32 @@ QString cxProbe::getRtSourceName() const
 
 Transform3D cxProbe::get_vMp() const
 {
-	return cx::Transform3D::Identity();
+	ProbeData probeData = this->getProbeData();
+	Transform3D vMp = createTransformScale(probeData.mSpacing);
+	return vMp;
+}
+
+Transform3D cxProbe::get_uMv() const
+{
+	ProbeData probeData = this->getProbeData();
+	// use H-1 because we count between pixel centers.
+	double H = (probeData.mSize.height() - 1) * probeData.mSpacing[1];
+	Transform3D uMv =  createTransformRotateX(M_PI) * createTransformTranslate(Vector3D(0, -H, 0));
+
+	return uMv;
+}
+
+Transform3D cxProbe::get_tMu() const
+{
+	ProbeData probeData = this->getProbeData();
+
+	Transform3D Rx = createTransformRotateX(-M_PI / 2.0);
+	Transform3D Rz = createTransformRotateY(M_PI / 2.0);
+	Transform3D R = (Rx * Rz);
+	Transform3D T = createTransformTranslate(-probeData.getOrigin_u());
+
+	Transform3D tMu = R * T;
+	return tMu;
 }
 
 cxProbe::cxProbe(QString instrumentUid, QString scannerUid) :

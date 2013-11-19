@@ -7,6 +7,7 @@
 #include "sscDefinitionStrings.h"
 #include "sscImage.h"
 #include "vtkImageData.h"
+#include "sscProbe.h"
 
 namespace cx
 {
@@ -128,6 +129,12 @@ Transform3D CoordinateSystemHelpers::get_rMfrom(CoordinateSystem from)
 		break;
 	case csIMAGE_PIXEL:
 		rMfrom = get_rMp(from.mRefObject);
+		break;
+	case csIMAGE_V:
+		rMfrom = get_rMv(from.mRefObject);
+		break;
+	case csIMAGE_U:
+		rMfrom = get_rMu(from.mRefObject);
 		break;
 	default:
 
@@ -318,36 +325,60 @@ Transform3D CoordinateSystemHelpers::get_rMs(QString uid)
 	return rMs; //ref_M_s
 }
 
-Transform3D CoordinateSystemHelpers::get_rMv(QString uid)
+Transform3D CoordinateSystemHelpers::get_rMv(QString toolUid)
 {
-
-}
-
-Transform3D CoordinateSystemHelpers::get_rMu(QString uid)
-{
-
-}
-
-Transform3D CoordinateSystemHelpers::get_rMp(QString uid)
-{
-	ToolPtr tool = toolManager()->getTool(uid);
-	if(!tool)
-	{
-		messageManager()->sendWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
-		return Transform3D::Identity();
-	}
-	ProbePtr probe = tool->getProbe();
+	ProbePtr probe = getProbe(toolUid);
 	if(!probe)
-	{
-		messageManager()->sendWarning("Tool with uid: "+uid+" is not a probe. Can not find transform to unknown coordinate system, returning identity!");
 		return Transform3D::Identity();
-	}
 
-	Transform3D rMv = get_rMv(uid);
+	Transform3D rMu = get_rMu(toolUid);
+	Transform3D uMv = probe->get_uMv();
+	Transform3D rMv = rMu * uMv;
+
+	return rMv;
+}
+
+Transform3D CoordinateSystemHelpers::get_rMu(QString toolUid)
+{
+	ProbePtr probe = getProbe(toolUid);
+	if(!probe)
+		return Transform3D::Identity();
+
+	Transform3D rMt = get_rMt(toolUid);
+	Transform3D tMu = probe->get_tMu();
+	Transform3D rMu = rMt * tMu;
+	return rMu;
+}
+
+Transform3D CoordinateSystemHelpers::get_rMp(QString toolUid)
+{
+	ProbePtr probe = getProbe(toolUid);
+	if(!probe)
+		return Transform3D::Identity();
+
+	Transform3D rMv = get_rMv(toolUid);
 	Transform3D vMp = probe->get_vMp();
 	Transform3D rMp = rMv * vMp;
 
 	return rMp;
 }
+
+
+ProbePtr CoordinateSystemHelpers::getProbe(QString toolUid)
+{
+	ProbePtr probe;
+
+	ToolPtr tool = toolManager()->getTool(toolUid);
+	if(!tool)
+		messageManager()->sendWarning("Could not find tool with uid: "+toolUid+". Can not find transform to unknown coordinate system, returning identity!");
+
+	probe = tool->getProbe();
+	if(!probe)
+		messageManager()->sendWarning("Tool with uid: "+toolUid+" is not a probe. Can not find transform to unknown coordinate system, returning identity!");
+
+	return probe;
+}
+
+
 
 } //namespace cx
