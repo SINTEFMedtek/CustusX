@@ -6,7 +6,8 @@
 /* Begin constants */
 /*******************/
 
-#define MAX_PLANES_WITHIN_RADIUS 100
+
+#define MAX_MULTISTART_STARTS 5
 #define N_BLOCKS 10
 
 // Reconstruction methods
@@ -40,7 +41,7 @@
 /* Begin macros */
 /****************/
 
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 #define DEBUG_PRINTF(...) if((get_global_id(0) % 5000) == 0) printf(##__VA_ARGS__)
@@ -1215,10 +1216,8 @@ voxel_methods(int volume_xsize,
 	                1.0f};
 	// Find the plane closest to the initial voxel
 	float smallest_dist = 99999999.9f;
-	float dist;
 
 	prepare_plane_eqs(plane_matrices, plane_eqs);
-
 
 
 	// Return if x/z is invalid
@@ -1228,6 +1227,25 @@ voxel_methods(int volume_xsize,
 	BOUNDS_CHECK(x, 0, volume_xsize);
 	BOUNDS_CHECK(z, 0, volume_zsize);
 
+	int multistart_guesses[MAX_MULTISTART_STARTS];
+	int n_multistart_guesses = 0;
+
+	// Find all valleys in the search space of distances
+	float prev_dist = fabs(dot(voxel, plane_eqs[0]));
+	float dist = fabs(dot(voxel, plane_eqs[1]));
+	for(int i = 2; i < N_PLANES-1; i++)
+	{
+		float next_dist = fabs(dot(voxel, plane_eqs[i]));
+		if(dist < next_dist  && dist < prev_dist)
+		{
+			multistart_guesses[n_multistart_guesses] = i-1;
+			DEBUG_PRINTF("Multistart guess %d: %d\n", n_multistart_guesses, i-1);
+			n_multistart_guesses++;
+			if(n_multistart_guesses == MAX_MULTISTART_STARTS) break;
+		}
+		prev_dist = dist;
+		dist = next_dist;
+	}
 
 
 	for(int i = 0; i < N_PLANES; i++)
