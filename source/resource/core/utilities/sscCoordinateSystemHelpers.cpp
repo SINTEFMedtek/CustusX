@@ -341,10 +341,12 @@ Transform3D CoordinateSystemHelpers::get_rMv(QString toolUid)
 Transform3D CoordinateSystemHelpers::get_rMu(QString toolUid)
 {
 	ProbePtr probe = getProbe(toolUid);
-	if(!probe)
-		return Transform3D::Identity();
+	Transform3D rMt;
+	if(probe)
+		rMt = get_rMt(toolUid);
+	else
+		rMt = Transform3D::Identity();
 
-	Transform3D rMt = get_rMt(toolUid);
 	Transform3D tMu = probe->get_tMu();
 	Transform3D rMu = rMt * tMu;
 	return rMu;
