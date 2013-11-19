@@ -258,7 +258,8 @@ TordTest::initializeFrameBlocks(frameBlock_t* framePointers,
 bool
 TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
                            vtkImageDataPtr outputData,
-                           float radius)
+                           float radius,
+                           int nClosePlanes)
 {
 	int numBlocks = 10; // FIXME?
 	// Split input US into blocks
@@ -372,22 +373,61 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	// plane_eqs (local CL memory, will be calculated by the kernel)
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float)*4*nPlanes, NULL));
 
-	// radius
-	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &radius));
 
+	// Find out how much local memory the device has
+	size_t dev_local_mem_size;
+	ocl_check_error(clGetDeviceInfo(moClContext->device,
+	                                CL_DEVICE_LOCAL_MEM_SIZE,
+	                                sizeof(size_t),
+	                                &dev_local_mem_size,
+	                                NULL));
 
 	size_t local_work_size;
 	// Find the optimal local work size
 	ocl_check_error(clGetKernelWorkGroupInfo(mClKernel,
 	                                         moClContext->device,
-	                                         CL_KERNEL_WORK_GROUP_SIZE,
+	                                         CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
 	                                         sizeof(size_t),
 	                                         &local_work_size,
 	                                         NULL));
+	size_t max_work_size;
+	ocl_check_error(clGetDeviceInfo(moClContext->device,
+	                                CL_DEVICE_MAX_WORK_GROUP_SIZE,
+	                                sizeof(size_t),
+	                                &max_work_size,
+	                                NULL));
+
+	// Now find the largest multiple of the preferred work group size that will fit into local mem
+
+	size_t constant_local_mem = sizeof(cl_float)*4*nPlanes;
+	size_t varying_local_mem = (sizeof(cl_float)+sizeof(cl_int))*(nClosePlanes+1);
+	messageManager()->sendInfo(QString("Device has %1 bytes of local memory\n")
+	                           .arg(dev_local_mem_size));
+	dev_local_mem_size -= constant_local_mem;
+
+	// How many work items can the local mem support?
+
+	int maxItems = dev_local_mem_size / varying_local_mem;
+	// And what is the biggest multiple fo local_work_size that fits into that?
+	int multiple = maxItems / local_work_size;
+	//TEST
+	local_work_size = std::min(max_work_size, multiple * local_work_size);
+
+
+	// close planes (local CL memory, to be used by the kernel)
+	ocl_check_error(clSetKernelArg(mClKernel,
+	                               arg++,
+	                               varying_local_mem*local_work_size,
+	                               NULL));
+	// radius
+	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &radius));
+
+
 	
 
 	messageManager()->sendInfo(QString("Using %1 as local workgroup size").arg(local_work_size));
 	cl_ulong local_mem_size;
+ 
 	// Print local memory usage for debugging purposes
 	ocl_check_error(clGetKernelWorkGroupInfo(mClKernel,
 	                                         moClContext->device,
@@ -399,8 +439,6 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	messageManager()->sendInfo(QString("Kernel is using %1 bytes of local memory\n").arg(local_mem_size));
 	// Global work items:	
 	size_t global_work_size = (outputDims[0]*outputDims[2]);
-	//TEST
-	local_work_size = 32;
 	// Round global_work_size up to nearest multiple of local_work_size
 	if(global_work_size % local_work_size)
 		global_work_size = ((global_work_size/local_work_size) + 1)*local_work_size;
@@ -513,7 +551,7 @@ TordTest::reconstruct(ProcessedUSInputDataPtr input,
 	       planeMethod
 		   )) return false;
 
-	bool ret = doGPUReconstruct(input, outputData, radius );
+	bool ret = doGPUReconstruct(input, outputData, radius, nClosePlanes );
 
 	if(moClContext != NULL)
 	{
