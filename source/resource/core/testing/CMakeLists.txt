@@ -20,6 +20,7 @@ if (BUILD_TESTING)
 		cxtestCatchVLCRecorder.cpp
 		cxtestVLCRecorderFixture.h
 		cxtestVLCRecorderFixture.cpp
+                cxtestProbeDefinition.cpp
 		)
 
     cx_catch_add_lib_and_exe(cxResource "${RESOURCE_TEST_CATCH_SOURCE_FILES}" "${CXTEST_SOURCES_TO_MOC}")
