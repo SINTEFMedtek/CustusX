@@ -24,6 +24,7 @@
 #include <boost/weak_ptr.hpp>
 #include "sscProbeData.h"
 #include "sscForwardDeclarations.h"
+#include "sscTransform3D.h"
 
 namespace cx
 {

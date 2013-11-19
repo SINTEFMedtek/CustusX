@@ -52,6 +52,11 @@ std::vector<CoordinateSystem> CoordinateSystemHelpers::getSpacesToPresentInGUI()
 	retval.push_back(CoordinateSystem(csSENSOR, "active"));
 	retval.push_back(CoordinateSystem(csTOOL_OFFSET, "active"));
 
+	// alias for the currently active tool:
+	retval.push_back(CoordinateSystem(csIMAGE_U, "active"));
+	retval.push_back(CoordinateSystem(csIMAGE_V, "active"));
+	retval.push_back(CoordinateSystem(csIMAGE_PIXEL, "active"));
+
 	return retval;
 }
 
@@ -122,18 +127,15 @@ Transform3D CoordinateSystemHelpers::get_rMfrom(CoordinateSystem from)
 	case csDATA_VOXEL:
 		rMfrom = get_rMdv(from.mRefObject);
 		break;
-<<<<<<< HEAD
-	case csIMAGE_PIXEL:
-		rMfrom = get_rMp(from.mRefObject);
+	case csIMAGE_U:
+		rMfrom = get_rMu(from.mRefObject);
 		break;
 	case csIMAGE_V:
 		rMfrom = get_rMv(from.mRefObject);
 		break;
-	case csIMAGE_U:
-		rMfrom = get_rMu(from.mRefObject);
+	case csIMAGE_PIXEL:
+		rMfrom = get_rMp(from.mRefObject);
 		break;
-=======
->>>>>>> master
 	default:
 
 		break;

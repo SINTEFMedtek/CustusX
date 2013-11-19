@@ -82,7 +82,7 @@ public:
 	virtual Transform3D get_vMp() const
 	{
 		ProbeData probeData = this->getProbeData();
-		Transform3D vMp = createTransformScale(probeData.mSpacing);
+		Transform3D vMp = createTransformScale(probeData.getSpacing());
 		return vMp;
 	}
 
@@ -91,7 +91,7 @@ public:
 	{
 		ProbeData probeData = this->getProbeData();
 		// use H-1 because we count between pixel centers.
-		double H = (probeData.mSize.height() - 1) * probeData.mSpacing[1];
+		double H = (probeData.getSize().height() - 1) * probeData.getSpacing()[1];
 		Transform3D uMv =  createTransformRotateX(M_PI) * createTransformTranslate(Vector3D(0, -H, 0));
 
 		return uMv;

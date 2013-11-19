@@ -66,6 +66,9 @@ namespace cx
 		csSENSOR, ///< a tools sensor space (s)
 		csTOOL_OFFSET, ///< the tool space t with a virtual offset added along the z axis. (to)
 		csDATA_VOXEL, ///< the data voxel space (dv)
+		csIMAGE_U,
+		csIMAGE_V,
+		csIMAGE_PIXEL,
 		csCOUNT
 	};
 
