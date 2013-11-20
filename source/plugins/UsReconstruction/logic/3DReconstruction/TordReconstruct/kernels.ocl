@@ -475,18 +475,25 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 	// We won't be changing the guess, but the compiler wouldn't know that
 	const int tmp_guess = guess;
 	BOUNDS_CHECK(tmp_guess, 1, N_PLANES);
+	float2 dists = {dot(voxel, plane_eqs[guess]), dot(voxel, plane_eqs[guess-1])};
+	float2 abs_dists = {fabs(dists.x), fabs(dists.y)}; // .x = abs_dist_up, .y = abs_dist_down,
 
 	for(int i = 0; !done.x || !done.y ; i++)
 	{
 		// Compute the indices of the planes we want to look at.
 		int2 idx = {tmp_guess + i, tmp_guess - i - 1};
 
+		float2 prev_abs_dists = abs_dists;
 
 		// Compute the distances to those planes
-		float2 dists = {dot(voxel, plane_eqs[idx.x]), dot(voxel, plane_eqs[idx.y])};
-
+		dists.x = dot(voxel, plane_eqs[idx.x]);
+		dists.y = dot(voxel, plane_eqs[idx.y]);
 		// Compute the absolute distances to those planes
-		float2 abs_dists = {fabs(dists.x), fabs(dists.y)}; // .x = abs_dist_up, .y = abs_dist_down,
+		abs_dists.x = fabs(dists.x);
+		abs_dists.y =  fabs(dists.y); // .x = abs_dist_up, .y = abs_dist_down,
+
+
+		float2 diff_dists = prev_abs_dists - abs_dists;
 
 		// Check if the plane is closer than the one farthest away we have included so far
 		if(!done.x && abs_dists.x < max_dist)
@@ -518,7 +525,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 				max_idx = findHighestIdx(close_planes, MAX_PLANES);
 				max_dist = fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist);
 
-				if(smallest_dist > abs_dists.x)
+				if(smallest_dist > abs_dists.x && fabs(diff_dists.x) < radius)
 				{
 					// Update next guess
 					smallest_dist = abs_dists.x;
@@ -553,7 +560,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 				found++;
 				max_idx = findHighestIdx(close_planes, MAX_PLANES);
 				max_dist = fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist);
-				if(smallest_dist > abs_dists.y)
+				if(smallest_dist > abs_dists.y && fabs(diff_dists.y) < radius)
 				{
 					// Update next guess
 					smallest_dist = abs_dists.y;
@@ -569,9 +576,10 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 
 		int2 term_dists = {(abs_dists.x > 3.0f*radius)*doTermDistance, (abs_dists.y > 3.0f*radius)*doTermDistance };
 
+		int2 term_radius_jump = {fabs(diff_dists.x) > radius, fabs(diff_dists.y) > radius};
 		int2 term_boundaries = {idx.x == N_PLANES-1, idx.y == 0};
 
-		done = done + term_dists + term_boundaries;
+		done = done + term_dists + term_boundaries + term_radius_jump;
 
 	}
 
@@ -1334,7 +1342,7 @@ voxel_methods(int volume_xsize,
 		}
 		else
 		{
-			end_pos = (start_id+1)*N_PLANES/MAX_MULTISTART_STARTS;
+			end_pos = (start_id+1)*N_PLANES/(MAX_MULTISTART_STARTS);
 		}
 
 		for(int i = start_pos; i < end_pos; i++)
