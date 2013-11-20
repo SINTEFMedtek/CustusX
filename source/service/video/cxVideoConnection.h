@@ -86,14 +86,14 @@ private:
 	void updateImage(ImagePtr message); // called by receiving thread when new data arrives.
 	void runClient(ImageReceiverThreadPtr client);
 	void stopClient(); ///< Get rid of the mClient thread.
-	void updateStatus(ProbeDataPtr message);
+	void updateStatus(ProbeDefinitionPtr message);
 	void startAllSources();
 	void removeSourceFromProbe(ToolPtr tool);
 
 	ImageReceiverThreadPtr mClient;
 	bool mConnected;
 	double mFPS;
-	std::vector<ProbeDataPtr> mUnsusedProbeDataVector;
+	std::vector<ProbeDefinitionPtr> mUnsusedProbeDataVector;
 
 	std::vector<BasicVideoSourcePtr> mSources;
 

@@ -44,7 +44,7 @@ class ProbeSector
 {
 public:
 	ProbeSector();
-	void setData(ProbeData data);
+	void setData(ProbeDefinition data);
 
 	vtkImageDataPtr getMask();
 	vtkPolyDataPtr getSector(); ///< get a polydata representation of the us sector
@@ -56,7 +56,7 @@ public:
 	Transform3D get_uMv() const; ///< get transform from inverted image space v (origin in ul corner) to image space u.
 	void updateSector();
 
-	ProbeData mData;
+	ProbeDefinition mData;
 
 	void test();
 

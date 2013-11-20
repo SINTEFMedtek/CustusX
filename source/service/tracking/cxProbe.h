@@ -50,7 +50,7 @@ public:
 
 	virtual QStringList getAvailableVideoSources();
 	virtual VideoSourcePtr getRTSource(QString uid = "active") const;
-	virtual ProbeData getProbeData(QString uid = "active") const;
+	virtual ProbeDefinition getProbeData(QString uid = "active") const;
 	virtual ProbeSectorPtr getSector(QString uid = "active");
 
 	virtual void addXml(QDomNode& dataNode);
@@ -64,7 +64,7 @@ public:
 	virtual void applyNewConfigurationWithId(QString uid);
 	virtual void setTemporalCalibration(double val);
 	virtual void setSoundSpeedCompensationFactor(double val);
-	virtual void setProbeSector(ProbeData probeSector);
+	virtual void setProbeSector(ProbeDefinition probeSector);
 	virtual void setRTSource(VideoSourcePtr source);
 	virtual void removeRTSource(VideoSourcePtr source);
 
@@ -91,11 +91,11 @@ private:
 	void setConfigId(QString uid);
 	void updateProbeSector();
 	bool isValidConfigId();
-	ProbeData createProbeSector();
+	ProbeDefinition createProbeSector();
 	void updateTemporalCalibration();
 
 	QString mActiveUid;
-	std::map<QString, ProbeData> mProbeData; ///< all defined probe definitions
+	std::map<QString, ProbeDefinition> mProbeData; ///< all defined probe definitions
 	std::map<QString, VideoSourcePtr> mSource; ///< all defined sources
 	ProbeWeakPtr mSelf;
 
