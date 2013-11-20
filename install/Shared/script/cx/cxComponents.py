@@ -425,6 +425,8 @@ class UltrasonixSDK(CppComponent):
         pass
     def build(self):
         pass
+    def makeClean(self):
+        pass
 # ---------------------------------------------------------
 
 class TubeSegmentationFramework(CppComponent):
@@ -487,6 +489,8 @@ class CustusX3Data(CppComponent):
         pass
     def gitRepository(self):
         return 'medtek.sintef.no//Volumes/medtek_HD/git/Data.git'
+    def makeClean(self):
+        pass
 # ---------------------------------------------------------
 
 
