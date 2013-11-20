@@ -382,13 +382,14 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
                             float in_xspacing,
                             float in_yspacing)
 {
-	
+
 	for(int i = 0; i < MAX_PLANES; i++)
 	{
 		CLOSE_PLANE_IDX(close_planes, i).dist = INFINITY;
 		CLOSE_PLANE_IDX(close_planes, i).plane_id = -1;
 	}
 	int2 ret;
+	int found = MAX_PLANES;
 	for(int i = 0; i < MAX_MULTISTART_STARTS; i++)
 	{
 		ret = findClosestPlanes_heuristic(close_planes,
@@ -405,7 +406,7 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
 		                                  in_yspacing	);
 		multistart_guesses[i] = ret.y;
 	}
-	int found = MAX_PLANES;
+
 	for(int i = 0; i < MAX_PLANES; i++)
 	{
 		// findHighestIdx guarantees that if planes with equal highest distance occur
@@ -457,7 +458,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 
 	
 	// Number of planes found so far
-	int found = MAX_PLANES;
+	int found = 0;
 
 	// Done condition. .x  = up, .y = down
 	int2 done = {0,0};
@@ -518,19 +519,12 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 				CLOSE_PLANE_IDX(close_planes, max_idx).plane_id = idx.x;
 				found++;
 
-				if(found >= MAX_PLANES)
-				{
-					// We have found MAX_PLANES planes, but we don't know they're the closest ones.
-					// Find the next candidate for eviction -
-					// the plane with the longest distance to the voxel
-					max_idx = findHighestIdx(close_planes, MAX_PLANES);
-					max_dist = fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist);
-				}
-				else
-				{
-					// We have not yet found MAX_PLANES planes, so just keep filling the array
-					max_idx++;
-				}
+				// We have found MAX_PLANES planes, but we don't know they're the closest ones.
+				// Find the next candidate for eviction -
+				// the plane with the longest distance to the voxel
+				max_idx = findHighestIdx(close_planes, MAX_PLANES);
+				max_dist = fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist);
+
 				if(smallest_dist > abs_dists.x)
 				{
 					// Update next guess
@@ -564,19 +558,8 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 				CLOSE_PLANE_IDX(close_planes, max_idx).dist = dists.y;
 				CLOSE_PLANE_IDX(close_planes, max_idx).plane_id = idx.y;
 				found++;
-				if(found >= MAX_PLANES)
-				{
-					// We have found MAX_PLANES planes, but we don't know they're the closest ones.
-					// Find the next candidate for eviction -
-					// the plane with the longest distance to the voxel
-					max_idx = findHighestIdx(close_planes, MAX_PLANES);
-					max_dist = fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist);
-				}
-				else
-				{
-					// We have not yet found MAX_PLANES planes, so just keep filling the array
-					max_idx++;
-				}
+				max_idx = findHighestIdx(close_planes, MAX_PLANES);
+				max_dist = fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist);
 				if(smallest_dist > abs_dists.y)
 				{
 					// Update next guess
@@ -600,7 +583,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 	}
 
 
-	
+
 	int2 ret;
 	ret.x = min(found, MAX_PLANES);
 	ret.y = smallest_idx;
