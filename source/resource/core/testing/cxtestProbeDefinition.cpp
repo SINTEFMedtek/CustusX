@@ -55,6 +55,27 @@ TEST_CASE("ProbeDefinition: Validating set/get", "[unit][resource][core][ProbeDe
 	CHECK(centerOffset == probeDefinition->getCenterOffset());
 }
 
+TEST_CASE("ProbeDefinition: Validating set/get with dummy values", "[unit][resource][core][ProbeDefinition][unstable]")
+{
+	cx::ProbeDefinitionPtr probeDefinition(new cx::ProbeDefinition());
+	CHECK(probeDefinition.get());
+
+	cx::Vector3D origin_p(10, 20, 30);
+	probeDefinition->setOrigin_p(origin_p);
+	CHECK(origin_p == probeDefinition->getOrigin_p());
+
+	cx::Vector3D spacing(1, 2, 3);
+	probeDefinition->setSpacing(spacing);
+	CHECK(spacing ==  probeDefinition->getSpacing());
+
+	cx::DoubleBoundingBox3D clipRect_p(10, 20, 5, 50);
+	probeDefinition->setClipRect_p(clipRect_p);
+	CHECK(clipRect_p ==  probeDefinition->getClipRect_p());
+
+	QSize size(100, 200);
+	probeDefinition->setSize(size);
+	CHECK(size ==  probeDefinition->getSize());
+}
 
 
 }
