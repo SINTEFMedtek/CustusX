@@ -355,7 +355,7 @@ void IGTLinkedImageReceiverThread::addToQueue(IGTLinkImageMessage::Pointer msg)
 	// if us status not sent, do it here
 	if (mUnsentUSStatusMessage)
 	{
-		this->addSonixStatusToQueue(converter.decode(mUnsentUSStatusMessage, msg, ProbeDataPtr(new ProbeData())));
+		this->addSonixStatusToQueue(converter.decode(mUnsentUSStatusMessage, msg, ProbeDefinitionPtr(new ProbeDefinition())));
 		mUnsentUSStatusMessage = IGTLinkUSStatusMessage::Pointer();
 	}
 }

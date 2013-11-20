@@ -227,7 +227,7 @@ ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 	return retval;
 }
 
-IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ProbeDataPtr input)
+IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ProbeDefinitionPtr input)
 {
 	IGTLinkUSStatusMessage::Pointer retval = IGTLinkUSStatusMessage::New();
 
@@ -250,18 +250,18 @@ IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ProbeDataPtr input)
 }
 
 //'copied' from OpenIGTLinkRTSource::updateSonixStatus()
-ProbeDataPtr IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ProbeDataPtr base)
+ProbeDefinitionPtr IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ProbeDefinitionPtr base)
 {
-	ProbeDataPtr retval;
+	ProbeDefinitionPtr retval;
 	if (base)
 		 retval = base;
 	else
-		retval = ProbeDataPtr(new ProbeData());
+		retval = ProbeDefinitionPtr(new ProbeDefinition());
 
 	if (probeMessage)
 	{
 		// Update the parts of the probe data that is read from the probe message.
-		retval->setType(ProbeData::TYPE(probeMessage->GetProbeType()));
+		retval->setType(ProbeDefinition::TYPE(probeMessage->GetProbeType()));
 		retval->setSector(
 				probeMessage->GetDepthStart(),
 				probeMessage->GetDepthEnd(),
@@ -305,7 +305,7 @@ ImagePtr IGTLinkConversion::decode(ImagePtr msg)
 	return retval;
 }
 
-ProbeDataPtr IGTLinkConversion::decode(ProbeDataPtr msg)
+ProbeDefinitionPtr IGTLinkConversion::decode(ProbeDefinitionPtr msg)
 {
 	QString newUid = msg->getUid();
 	QString format = this->extractColorFormat(msg->getUid(), &newUid);

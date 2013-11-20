@@ -503,7 +503,7 @@ cx::USReconstructInputData generateSyntheticUSBMode()
 
 	cx::ProbeSector probeSector;
 	double probeSize = dim-1;
-	cx::ProbeData probeData = cx::DummyToolTestUtilities::createProbeDataLinear(probeSize, probeSize, Eigen::Array2i(dim, dim));
+	cx::ProbeDefinition probeData = cx::DummyToolTestUtilities::createProbeDataLinear(probeSize, probeSize, Eigen::Array2i(dim, dim));
 	probeSector.setData(probeData);
 	retval.mProbeData = probeSector;
 

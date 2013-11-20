@@ -63,7 +63,7 @@ void GrabberSenderQTcpSocket::send(ImagePtr msg)
 	this->send(converter.encode(msg));
 }
 
-void GrabberSenderQTcpSocket::send(ProbeDataPtr msg)
+void GrabberSenderQTcpSocket::send(ProbeDefinitionPtr msg)
 {
 	if (!this->isReady())
 		return;

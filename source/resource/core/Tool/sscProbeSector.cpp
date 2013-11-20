@@ -49,10 +49,10 @@ namespace cx
 ProbeSector::ProbeSector()
 {
 	mPolyData = vtkPolyDataPtr::New();
-	mData.setType(ProbeData::tNONE);//Init
+	mData.setType(ProbeDefinition::tNONE);//Init
 }
 
-void ProbeSector::setData(ProbeData data)
+void ProbeSector::setData(ProbeDefinition data)
 {
 	mData = data;
 	//  this->test();
@@ -64,7 +64,7 @@ void ProbeSector::setData(ProbeData data)
 class InsideMaskFunctor
 {
 public:
-	InsideMaskFunctor(ProbeData data, Transform3D uMv) :
+	InsideMaskFunctor(ProbeDefinition data, Transform3D uMv) :
 		mData(data), m_vMu(uMv.inv())
 	{
 		mCachedCenter_v = m_vMu.coord(mData.getOrigin_u());
@@ -99,7 +99,7 @@ private:
 	{
 		Vector3D d = p_v - mCachedCenter_v;
 
-		if (mData.getType() == ProbeData::tSECTOR)
+		if (mData.getType() == ProbeDefinition::tSECTOR)
 		{
 			double angle = atan2(d[1], d[0]);
 			angle -= M_PI_2; // center angle on us probe axis at 90*.
@@ -126,7 +126,7 @@ private:
 		}
 	}
 
-	ProbeData mData;
+	ProbeDefinition mData;
 	Transform3D m_vMu;
 	Vector3D mCachedCenter_v; ///< center of beam sector for sector probes.
 	DoubleBoundingBox3D mClipRect_v;
@@ -137,7 +137,7 @@ private:
  */
 vtkImageDataPtr ProbeSector::getMask()
 {
-	if (mData.getType()==ProbeData::tNONE)
+	if (mData.getType()==ProbeDefinition::tNONE)
 		return vtkImageDataPtr();
 	InsideMaskFunctor checkInside(mData, this->get_uMv());
 	vtkImageDataPtr retval;
@@ -223,7 +223,7 @@ bool ProbeSector::clipRectIntersectsSector() const
 vtkPolyDataPtr ProbeSector::getSectorLinesOnly()
 {
 	this->updateSector();
-	if (mData.getType() == ProbeData::tNONE)
+	if (mData.getType() == ProbeDefinition::tNONE)
 		return mPolyData;
 
 	vtkPolyDataPtr output = vtkPolyDataPtr::New();
@@ -244,7 +244,7 @@ vtkPolyDataPtr ProbeSector::getSectorLinesOnly()
 vtkPolyDataPtr ProbeSector::getSectorSectorOnlyLinesOnly()
 {
 	this->updateSector();
-	if (mData.getType() == ProbeData::tNONE)
+	if (mData.getType() == ProbeDefinition::tNONE)
 		return mPolyData;
 
 	vtkPolyDataPtr output = vtkPolyDataPtr::New();
@@ -315,7 +315,7 @@ vtkPolyDataPtr ProbeSector::getOriginPolyData()
 
 void ProbeSector::updateSector()
 {
-	if (mData.getType() == ProbeData::tNONE)
+	if (mData.getType() == ProbeDefinition::tNONE)
 	{
 		mPolyData = vtkPolyDataPtr::New();
 		return;
@@ -349,7 +349,7 @@ void ProbeSector::updateSector()
 
 	DoubleBoundingBox3D bb_u;
 
-	if (mData.getType() == ProbeData::tLINEAR)
+	if (mData.getType() == ProbeDefinition::tLINEAR)
 	{
 		Vector3D cr = mData.getDepthStart() * e_y + mData.getWidth() / 2 * e_x;
 		Vector3D cl = mData.getDepthStart() * e_y - mData.getWidth() / 2 * e_x;
@@ -374,7 +374,7 @@ void ProbeSector::updateSector()
 		vtkIdType s_cells[5] = { 0, 3, 1, 2 };
 		strips->InsertNextCell(4, s_cells);
 	}
-	else if (mData.getType() == ProbeData::tSECTOR)
+	else if (mData.getType() == ProbeDefinition::tSECTOR)
 	{
 		Vector3D c(0, 0, 0); // arc center point
 		c += mData.getCenterOffset() * e_y;  // arc center point

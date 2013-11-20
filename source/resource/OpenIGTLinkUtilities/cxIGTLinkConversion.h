@@ -53,7 +53,7 @@ public:
 	/**
 	  * Encode the input probedata into an IGTLink message.
 	  */
-	IGTLinkUSStatusMessage::Pointer encode(ProbeDataPtr);
+	IGTLinkUSStatusMessage::Pointer encode(ProbeDefinitionPtr);
 	/**
 	  * Decode the input probe and image messages to create a
 	  * ProbeData object based in the input base.
@@ -64,7 +64,7 @@ public:
 	  *
 	  * Some or all of the input messages can be NULL.
 	  */
-	ProbeDataPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ProbeDataPtr base);
+	ProbeDefinitionPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ProbeDefinitionPtr base);
 
 	/**
 	  * Decode the image to standard format with standard color RGBX encoding.
@@ -75,7 +75,7 @@ public:
 	  * and return as new image.
 	  */
 	ImagePtr decode(ImagePtr msg);
-	ProbeDataPtr decode(ProbeDataPtr msg);
+	ProbeDefinitionPtr decode(ProbeDefinitionPtr msg);
 
 private:
 	/** Extract the color format string from enclosing brackets inside
