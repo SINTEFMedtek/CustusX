@@ -17,7 +17,7 @@ struct Package
 	IGTLinkImageMessage::Pointer mIgtLinkImageMessage;
 	IGTLinkUSStatusMessage::Pointer mIgtLinkUSStatusMessage;
 	ImagePtr mImage;
-	ProbeDataPtr mProbe;
+	ProbeDefinitionPtr mProbe;
 
 };
 
@@ -70,7 +70,7 @@ protected:
 	virtual void send(ImagePtr msg) = 0;
 	/**Send an US status message, NOT packed
 	 */
-	virtual void send(ProbeDataPtr msg) = 0;
+	virtual void send(ProbeDefinitionPtr msg) = 0;
 };
 
 class GrabberSenderQTcpSocket : public SenderImpl
@@ -85,7 +85,7 @@ protected:
 	virtual void send(IGTLinkImageMessage::Pointer msg);
 	virtual void send(IGTLinkUSStatusMessage::Pointer msg);
 	virtual void send(ImagePtr msg);
-	virtual void send(ProbeDataPtr msg);
+	virtual void send(ProbeDefinitionPtr msg);
 
 private:
 	QTcpSocket* mSocket;

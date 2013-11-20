@@ -55,8 +55,8 @@ USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName
   //Read US images
   retval.mUsRaw = this->readUsDataFile(fileName);
 
-  std::pair<QString, ProbeData>  probeDataFull = this->readProbeDataBackwardsCompatible(changeExtension(fileName, "mhd"), calFilesPath);
-  ProbeData  probeData = probeDataFull.second;
+  std::pair<QString, ProbeDefinition>  probeDataFull = this->readProbeDataBackwardsCompatible(changeExtension(fileName, "mhd"), calFilesPath);
+  ProbeDefinition  probeData = probeDataFull.second;
   // override spacing with spacing from image file. This is because the raw spacing from probe calib might have been changed by changing the sound speed.
 	bool spacingOK = similar(probeData.getSpacing()[0], retval.mUsRaw->getSpacing()[0], 0.001)
 								&& similar(probeData.getSpacing()[1], retval.mUsRaw->getSpacing()[1], 0.001);
@@ -89,11 +89,11 @@ USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName
  * or from ProbeCalibConfigs.xml file for backwards compatibility.
  *
  */
-std::pair<QString, ProbeData>  UsReconstructionFileReader::readProbeDataBackwardsCompatible(QString mhdFileName, QString calFilesPath)
+std::pair<QString, ProbeDefinition>  UsReconstructionFileReader::readProbeDataBackwardsCompatible(QString mhdFileName, QString calFilesPath)
 {
-	std::pair<QString, ProbeData>  retval = this->readProbeDataFromFile(mhdFileName);
+	std::pair<QString, ProbeDefinition>  retval = this->readProbeDataFromFile(mhdFileName);
 
-	if (retval.second.getType()==ProbeData::tNONE)
+	if (retval.second.getType()==ProbeDefinition::tNONE)
 	{
 		messageManager()->sendInfo(QString("Invalid probe in %1, falling back to old format").arg(retval.first));
 		QString caliFilename;
@@ -182,9 +182,9 @@ ProbeXmlConfigParser::Configuration UsReconstructionFileReader::readProbeConfigu
   return configuration;
 }
 
-std::pair<QString, ProbeData> UsReconstructionFileReader::readProbeDataFromFile(QString mhdFileName)
+std::pair<QString, ProbeDefinition> UsReconstructionFileReader::readProbeDataFromFile(QString mhdFileName)
 {
-	std::pair<QString, ProbeData>  retval;
+	std::pair<QString, ProbeDefinition>  retval;
 	QString filename = changeExtension(mhdFileName, "probedata.xml");
 
 	if (!QFileInfo(filename).exists())

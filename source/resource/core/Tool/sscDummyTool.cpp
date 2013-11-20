@@ -16,9 +16,9 @@
 namespace cx
 {
 
-ProbeData DummyToolTestUtilities::createProbeData(ProbeData::TYPE type, double depth, double width, Eigen::Array2i frameSize)
+ProbeDefinition DummyToolTestUtilities::createProbeData(ProbeDefinition::TYPE type, double depth, double width, Eigen::Array2i frameSize)
 {
-	ProbeData retval;
+	ProbeDefinition retval;
 	retval.setType(type);
 	Eigen::Array2i extent = frameSize - 1;
 	retval.setSector(0, depth, width, 0);
@@ -32,12 +32,12 @@ ProbeData DummyToolTestUtilities::createProbeData(ProbeData::TYPE type, double d
 	return retval;
 }
 
-ProbeData DummyToolTestUtilities::createProbeDataLinear(double depth, double width, Eigen::Array2i frameSize)
+ProbeDefinition DummyToolTestUtilities::createProbeDataLinear(double depth, double width, Eigen::Array2i frameSize)
 {
-	return createProbeData(ProbeData::tLINEAR, depth, width, frameSize);
+	return createProbeData(ProbeDefinition::tLINEAR, depth, width, frameSize);
 }
 
-DummyToolPtr DummyToolTestUtilities::createDummyTool(ProbeData probeData, ToolManager* manager)
+DummyToolPtr DummyToolTestUtilities::createDummyTool(ProbeDefinition probeData, ToolManager* manager)
 {
 	DummyToolPtr retval(new DummyTool(manager));
 	retval->setProbeSector(probeData);

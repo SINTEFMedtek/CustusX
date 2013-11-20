@@ -70,13 +70,13 @@ namespace cx
  *
  * \sa ProbeXmlConfigParser
  */
-ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config);
+ProbeDefinition createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config);
 
 /**
  * \sa ProbeXmlConfigParser
  * \sa createConfigurationFromProbeData()
  */
-ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlConfigParser::Configuration basis, ProbeData data);
+ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlConfigParser::Configuration basis, ProbeDefinition data);
 
 } // namespace cx
 

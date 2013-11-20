@@ -21,7 +21,7 @@
 
 namespace cx
 {
-class USReconstructInputData;
+struct USReconstructInputData;
 }
 namespace cx
 {
@@ -78,7 +78,7 @@ public:
 	  * for each completed saved stream.
 	  */
 	void startSaveData(QString baseFolder, bool compressImages);
-	unsigned getNumberOfSavingThreads() const;
+	size_t getNumberOfSavingThreads() const;
 	void clearRecording();
 
 signals:

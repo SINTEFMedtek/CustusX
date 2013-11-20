@@ -49,7 +49,7 @@ public:
 	virtual QString getGraphicsFileName() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual bool isCalibrated() const;
-	virtual ProbeData getProbeSector() const;
+	virtual ProbeDefinition getProbeSector() const;
 	virtual ProbePtr getProbe() const;
 
 	virtual Transform3D getCalibration_sMt() const;

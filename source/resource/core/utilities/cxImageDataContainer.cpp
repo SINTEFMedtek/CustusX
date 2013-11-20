@@ -79,7 +79,7 @@ CachedImageDataContainer::CachedImageDataContainer(QString baseFilename, int siz
 {
 	QFileInfo info(baseFilename);
 
-	for (unsigned i=0; true; ++i)
+	for (int i=0; true; ++i)
 	{
 		QString file = info.absolutePath()+"/"+info.completeBaseName()+QString("_%1.mhd").arg(i);
 
@@ -153,7 +153,7 @@ QString CachedImageDataContainer::getFilename(unsigned index)
 
 unsigned CachedImageDataContainer::size() const
 {
-	return mImages.size();
+	return (unsigned)mImages.size();
 }
 
 ///--------------------------------------------------------
@@ -195,7 +195,7 @@ vtkImageDataPtr SplitFramesContainer::get(unsigned index)
 
 unsigned SplitFramesContainer::size() const
 {
-	return mImages.size();
+	return (unsigned)mImages.size();
 }
 
 

@@ -159,7 +159,7 @@ void USSavingRecorder::clearRecording()
 }
 
 
-unsigned USSavingRecorder::getNumberOfSavingThreads() const
+size_t USSavingRecorder::getNumberOfSavingThreads() const
 {
 	return mSaveThreads.size();
 }

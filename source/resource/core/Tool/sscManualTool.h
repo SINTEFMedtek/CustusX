@@ -57,7 +57,7 @@ public:
 	virtual QString getName() const;
 	virtual int getIndex() const;
 	virtual bool isCalibrated() const;
-	virtual ProbeData getProbeSector() const;
+	virtual ProbeDefinition getProbeSector() const;
 	virtual double getTimestamp() const;
 	virtual void set_prMt(const Transform3D& prMt);
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
@@ -75,7 +75,7 @@ private slots:
 	void read3DCrossHairSlot(double toolTipOffset);
 private:
 	// constant data
-	ProbeData mSector;
+	ProbeDefinition mSector;
 	vtkSTLReaderPtr mSTLReader;
 	vtkCursor3DPtr mCrossHair;
 
