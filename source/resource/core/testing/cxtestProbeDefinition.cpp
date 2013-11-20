@@ -8,14 +8,14 @@
 namespace cxtest
 {
 
-TEST_CASE("ProbeDefinition can be constructed", "[unit][resource][core][ProbeDefinition][unstable]")
+TEST_CASE("ProbeDefinition can be constructed", "[unit][resource][core][ProbeDefinition]")
 {
 	cx::ProbeDefinitionPtr probeDefinition = cx::ProbeDefinitionPtr(new cx::ProbeDefinition());
 	CHECK(probeDefinition.get());
 	CHECK(probeDefinition->getType() == cx::ProbeDefinition::tNONE);
 }
 
-TEST_CASE("ProbeDefinition: Validating set/get", "[unit][resource][core][ProbeDefinition][unstable]")
+TEST_CASE("ProbeDefinition: Validating set/get", "[unit][resource][core][ProbeDefinition]")
 {
 	cx::ProbeDefinitionPtr probeDefinition(new cx::ProbeDefinition());
 	CHECK(probeDefinition.get());
@@ -55,7 +55,7 @@ TEST_CASE("ProbeDefinition: Validating set/get", "[unit][resource][core][ProbeDe
 	CHECK(centerOffset == probeDefinition->getCenterOffset());
 }
 
-TEST_CASE("ProbeDefinition: Validating set/get with dummy values", "[unit][resource][core][ProbeDefinition][unstable]")
+TEST_CASE("ProbeDefinition: Validating set/get with dummy values", "[unit][resource][core][ProbeDefinition]")
 {
 	cx::ProbeDefinitionPtr probeDefinition(new cx::ProbeDefinition());
 	CHECK(probeDefinition.get());
