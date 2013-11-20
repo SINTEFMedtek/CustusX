@@ -239,7 +239,7 @@ void ReconstructManagerTestFixture::validateBModeData(cx::ImagePtr bmodeOut)
 	CHECK(this->getValue(bmodeOut, 143, 152, 172)  > 1); // correction
 	CHECK(this->getValue(bmodeOut, 179, 142, 170) == 1); //
 	// two samples in a flash and three black samples just outside it.
-	CHECK(this->getValue(bmodeOut, 334,  96,  86) > 200 );
+	CHECK(this->getValue(bmodeOut, 334,  96,  86) > 180 );
 	CHECK(this->getValue(bmodeOut, 319,  95,  85) > 200 );
 	CHECK(this->getValue(bmodeOut, 316, 105,  72) == 1);
 	CHECK(this->getValue(bmodeOut, 317,  98,  44) == 1);
