@@ -1011,7 +1011,7 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 		                                              y,
 		                                              image,
 		                                              in_xsize);
-		pixels[pos++].dist = close_planes[i].dist;
+		pixels[pos++].dist = CLOSE_PLANE_IDX(close_planes, i).dist;
 
 #elif ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_GAUSSIAN_ON_PLANE
 		int x, y;
@@ -1043,7 +1043,7 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 			}
 		}
 		pixels[pos].intensity = gauss_value / gauss_weight_sum;
-		pixels[pos++].dist = close_planes[i].dist;
+		pixels[pos++].dist = CLOSE_PLANE_IDX(close_planes, i).dist;
 #endif
 
 	}
