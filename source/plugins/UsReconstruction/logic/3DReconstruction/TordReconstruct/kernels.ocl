@@ -404,7 +404,10 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
 		                                  in_ysize,
 		                                  in_xspacing,
 		                                  in_yspacing	);
-		multistart_guesses[i] = ret.y;
+		if(ret.x > 0)
+		{
+			multistart_guesses[i] = ret.y;
+		}
 		found += ret.x;
 	}
 
