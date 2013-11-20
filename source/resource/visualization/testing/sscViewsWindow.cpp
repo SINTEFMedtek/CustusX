@@ -124,10 +124,14 @@ bool ViewsWindow::defineGPUSlice(const QString& uid, const std::vector<cx::Image
 
 	if (!view || !view->getRenderWindow())
 		return false;
+
+// always fails on mac:
 //	if (!view->getRenderWindow()->SupportsOpenGL())
 //		return false;
-	if (!cx::Texture3DSlicerRep::isSupported(view->getRenderWindow()))
-		return false;
+
+// gives error when called outside of a gl render loop
+//	if (!cx::Texture3DSlicerRep::isSupported(view->getRenderWindow()))
+//		return false;
 
 	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
 	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(uid);

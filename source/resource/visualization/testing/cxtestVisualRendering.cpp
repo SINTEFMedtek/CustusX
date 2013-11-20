@@ -222,8 +222,8 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	lut0->addColorPoint(lut0->getScalarMax(), QColor::fromRgbF(0,0,1,1));
 
 	REQUIRE(this->defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
-//	REQUIRE(this->quickRunWidget());
-	REQUIRE(this->runWidget(3000));
+	REQUIRE(this->quickRunWidget());
+//	REQUIRE(this->runWidget(3000));
 
 	CHECK(this->getFractionOfBrightPixelsInView(0,20,2) > 0.02);
 }
@@ -249,8 +249,8 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	lut1->setLLR(llr);
 
 	REQUIRE(this->defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
-//	REQUIRE(this->quickRunWidget());
-	REQUIRE(this->runWidget(3000));
+	REQUIRE(this->quickRunWidget());
+//	REQUIRE(this->runWidget(3000));
 
 	CHECK(this->getFractionOfBrightPixelsInView(0,20,1) > 0.02);
 	CHECK(this->getFractionOfBrightPixelsInView(0,20,2) > 0.02);
@@ -269,8 +269,8 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 		REQUIRE(this->defineGPUSlice("S", image[i], cx::ptSAGITTAL, 2, i));
 	}
 	//REQUIRE(this->runWidget());
-//	REQUIRE(this->quickRunWidget());
-	REQUIRE(this->runWidget(3000));
+	REQUIRE(this->quickRunWidget());
+//	REQUIRE(this->runWidget(3000));
 
 	for (unsigned i = 0; i < 3*3; ++i)
 	{
