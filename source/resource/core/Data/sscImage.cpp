@@ -676,6 +676,8 @@ void Image::setCroppingBox(const DoubleBoundingBox3D& bb_d)
 
 DoubleBoundingBox3D Image::getCroppingBox() const
 {
+	if (similar(mCroppingBox_d, this->getInitialBoundingBox()))
+		return this->boundingBox();
 	return mCroppingBox_d;
 }
 
