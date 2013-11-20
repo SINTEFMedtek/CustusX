@@ -6,7 +6,8 @@
 /* Begin constants */
 /*******************/
 
-#define MAX_PLANES_WITHIN_RADIUS 100
+
+
 #define N_BLOCKS 10
 
 // Reconstruction methods
@@ -45,7 +46,7 @@
 #ifdef DEBUG
 #define DEBUG_PRINTF(...) if((get_global_id(0) % 5000) == 0) printf(##__VA_ARGS__)
 //#define DEBUG_PRINTF(...) printf(##__VA_ARGS__)
-#define BOUNDS_CHECK(x, min, max) if(x < min || x >= max) printf("%s out of range: %d min: %d max: %d\n", #x, x, min, max)
+#define BOUNDS_CHECK(x, min, max) if(x < min || x >= max) printf("Line %d: %s out of range: %d min: %d max: %d\n", __LINE__, #x, x, min, max)
 #else
 #define DEBUG_PRINTF(...)
 #define BOUNDS_CHECK(x, min, max)
@@ -71,7 +72,7 @@
 
 // Gaussian weight function
 #define WEIGHT_GAUSS_SIGMA (0.05f)
- 
+
 #define WEIGHT_GAUSS_SQRT_2PI 2.506628275f
 
 #define WEIGHT_GAUSS_NONEXP_PART(sigma) (1.0f/(sigma*WEIGHT_GAUSS_SQRT_2PI))
@@ -131,12 +132,37 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                             const float4 voxel,
                             const float radius,
                             int guess,
-                            bool doTermDistance);
+                            bool doTermDistance,
+                            __global const unsigned char* mask,
+                            int in_xsize,
+                            int in_ysize,
+                            float in_xspacing,
+                            float in_yspacing);
+
+int2
+findClosestPlanes_multistart(__local close_plane_t *close_planes,
+                             __local float4* const plane_eqs,
+                             __global float16* const plane_matrices,
+                             const float4 voxel,
+                             const float radius,
+                             int *multistart_guesses,
+                             bool doTermDistance,
+                             __global const unsigned char* mask,
+                             int in_xsize,
+                             int in_ysize,
+                             float in_xspacing,
+                             float in_yspacing);
 
 #if PLANE_METHOD == PLANE_EXACT
-#define FIND_CLOSE_PLANES(a, b, c, d, e, f) findClosestPlanes_heuristic(a, b, c, d, e, f, 1)
+#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j, k) findClosestPlanes_multistart(a, b, c, d, e, f, 1, g, h, i, j, k)
 #elif PLANE_METHOD == PLANE_CLOSEST
-#define FIND_CLOSE_PLANES(a, b, c, d, e, f) findClosestPlanes_heuristic(a, b, c, d, e, f, 0)
+
+#ifdef MAX_MULTISTART_STARTS
+#undef MAX_MULTISTART_STARTS
+#define MAX_MULTISTART_STARTS 1
+#endif
+
+#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j, k) findClosestPlanes_multistart(a, b, c, d, e, f, 0, g, h, i, j, k)
 #endif
 
 __global const unsigned char*
@@ -326,7 +352,7 @@ findHighestIdx(__local close_plane_t *planes,
 	int maxidx = 0;
 	float maxval = -1.0f;
 	planes = &CLOSE_PLANE_IDX(planes, 0);
-	
+
 	for(int i = 0; i < n; i++)
 	{
 		float abs = fabs(planes->dist);
@@ -342,7 +368,61 @@ findHighestIdx(__local close_plane_t *planes,
 	return maxidx;
 }
 
+int2
+findClosestPlanes_multistart(__local close_plane_t *close_planes,
+                            __local float4* const plane_eqs,
+                            __global float16* const plane_matrices,
+                            const float4 voxel,
+                            const float radius,
+                            int *multistart_guesses,
+                             bool doTermDistance,
+                             __global const unsigned char* mask,
+                            int in_xsize,
+                            int in_ysize,
+                            float in_xspacing,
+                            float in_yspacing)
+{
 
+	for(int i = 0; i < MAX_PLANES; i++)
+	{
+		CLOSE_PLANE_IDX(close_planes, i).dist = INFINITY;
+		CLOSE_PLANE_IDX(close_planes, i).plane_id = -1;
+	}
+	int2 ret;
+	int found = 0;
+	for(int i = 0; i < MAX_MULTISTART_STARTS; i++)
+	{
+		ret = findClosestPlanes_heuristic(close_planes,
+		                                  plane_eqs,
+		                                  plane_matrices,
+		                                  voxel,
+		                                  radius,
+		                                  multistart_guesses[i],
+		                                  doTermDistance,
+		                                  mask,
+		                                  in_xsize,
+		                                  in_ysize,
+		                                  in_xspacing,
+		                                  in_yspacing	);
+		if(ret.x > 0)
+		{
+			multistart_guesses[i] = ret.y;
+		}
+		found += ret.x;
+	}
+
+	ret.x = min(found, MAX_PLANES);
+	ret.y = 0;
+
+#ifdef DEBUG
+	for(int i = 0; i < min(found, MAX_PLANES); i++)
+	{
+		BOUNDS_CHECK(CLOSE_PLANE_IDX(close_planes, i).plane_id, 0, N_PLANES);
+	}
+#endif
+
+	return ret;
+}
 
 /**
  * Find planes that are within radius of voxel.
@@ -361,9 +441,15 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                             const float4 voxel,
                             const float radius,
                             int guess,
-                            bool doTermDistance)
+                            bool doTermDistance,
+                            __global const unsigned char* mask,
+                            int in_xsize,
+                            int in_ysize,
+                            float in_xspacing,
+                            float in_yspacing)
 {
 
+	
 	// Number of planes found so far
 	int found = 0;
 
@@ -389,47 +475,62 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 	// We won't be changing the guess, but the compiler wouldn't know that
 	const int tmp_guess = guess;
 	BOUNDS_CHECK(tmp_guess, 1, N_PLANES);
+	float2 dists = {dot(voxel, plane_eqs[guess]), dot(voxel, plane_eqs[guess-1])};
+	float2 abs_dists = {fabs(dists.x), fabs(dists.y)}; // .x = abs_dist_up, .y = abs_dist_down,
 
 	for(int i = 0; !done.x || !done.y ; i++)
 	{
 		// Compute the indices of the planes we want to look at.
 		int2 idx = {tmp_guess + i, tmp_guess - i - 1};
 
+		float2 prev_abs_dists = abs_dists;
 
 		// Compute the distances to those planes
-		float2 dists = {dot(voxel, plane_eqs[idx.x]), dot(voxel, plane_eqs[idx.y])};
-
+		dists.x = dot(voxel, plane_eqs[idx.x]);
+		dists.y = dot(voxel, plane_eqs[idx.y]);
 		// Compute the absolute distances to those planes
-		float2 abs_dists = {fabs(dists.x), fabs(dists.y)}; // .x = abs_dist_up, .y = abs_dist_down,
+		abs_dists.x = fabs(dists.x);
+		abs_dists.y =  fabs(dists.y); // .x = abs_dist_up, .y = abs_dist_down,
+
+
+		float2 diff_dists = prev_abs_dists - abs_dists;
 
 		// Check if the plane is closer than the one farthest away we have included so far
 		if(!done.x && abs_dists.x < max_dist)
 		{
 			BOUNDS_CHECK(idx.x, 0, N_PLANES);
 			BOUNDS_CHECK(max_idx, 0, MAX_PLANES);
-			// If yes, swap out the one with the longest distance for this plane
-			CLOSE_PLANE_IDX(close_planes, max_idx).dist = dists.x;
-			CLOSE_PLANE_IDX(close_planes, max_idx).plane_id = idx.x;
-			found++;
+			int px, py;
+			float4 translated_voxel = projectOntoPlaneEq(voxel,
+			                                           plane_eqs[idx.x],
+			                                           dists.x);
+			toImgCoord_int(&px,
+			               &py,
+			               translated_voxel,
+			               plane_matrices[idx.x],
+			               in_xspacing,
+			               in_yspacing);
 
-			if(found >= MAX_PLANES)
+			if(isValidPixel(px, py, mask, in_xsize, in_ysize))
 			{
+
+				// If yes, swap out the one with the longest distance for this plane
+				CLOSE_PLANE_IDX(close_planes, max_idx).dist = dists.x;
+				CLOSE_PLANE_IDX(close_planes, max_idx).plane_id = idx.x;
+				found++;
+
 				// We have found MAX_PLANES planes, but we don't know they're the closest ones.
 				// Find the next candidate for eviction -
 				// the plane with the longest distance to the voxel
 				max_idx = findHighestIdx(close_planes, MAX_PLANES);
 				max_dist = fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist);
-			}
-			else
-			{
-				// We have not yet found MAX_PLANES planes, so just keep filling the array
-				max_idx++;
-			}
-			if(smallest_dist > abs_dists.x)
-			{
-				// Update next guess
-				smallest_dist = abs_dists.x;
-				smallest_idx = idx.x;
+
+				if(smallest_dist > abs_dists.x && fabs(diff_dists.x) < radius)
+				{
+					// Update next guess
+					smallest_dist = abs_dists.x;
+					smallest_idx = idx.x;
+				}
 			}
 		}
 
@@ -440,27 +541,31 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 			BOUNDS_CHECK(idx.y, 0, N_PLANES);
 			BOUNDS_CHECK(max_idx, 0, MAX_PLANES);
 			// If yes, swap out the one with the longest distance for this plane
-			CLOSE_PLANE_IDX(close_planes, max_idx).dist = dists.y;
-			CLOSE_PLANE_IDX(close_planes, max_idx).plane_id = idx.y;
-			found++;
-			if(found >= MAX_PLANES)
+			int px, py;
+			float4 translated_voxel = projectOntoPlaneEq(voxel,
+			                                           plane_eqs[idx.y],
+			                                           dists.y);
+
+			toImgCoord_int(&px,
+			               &py,
+			               translated_voxel,
+			               plane_matrices[idx.y],
+			               in_xspacing,
+			               in_yspacing);
+			if(isValidPixel(px, py, mask, in_xsize, in_ysize))
 			{
-				// We have found MAX_PLANES planes, but we don't know they're the closest ones.
-				// Find the next candidate for eviction -
-				// the plane with the longest distance to the voxel
+
+				CLOSE_PLANE_IDX(close_planes, max_idx).dist = dists.y;
+				CLOSE_PLANE_IDX(close_planes, max_idx).plane_id = idx.y;
+				found++;
 				max_idx = findHighestIdx(close_planes, MAX_PLANES);
 				max_dist = fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist);
-			}
-			else
-			{
-				// We have not yet found MAX_PLANES planes, so just keep filling the array
-				max_idx++;
-			}
-			if(smallest_dist > abs_dists.y)
-			{
-				// Update next guess
-				smallest_dist = abs_dists.y;
-				smallest_idx = idx.y;
+				if(smallest_dist > abs_dists.y && fabs(diff_dists.y) < radius)
+				{
+					// Update next guess
+					smallest_dist = abs_dists.y;
+					smallest_idx = idx.y;
+				}
 			}
 		}
 
@@ -471,20 +576,15 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 
 		int2 term_dists = {(abs_dists.x > 3.0f*radius)*doTermDistance, (abs_dists.y > 3.0f*radius)*doTermDistance };
 
+		int2 term_radius_jump = {fabs(diff_dists.x) > radius, fabs(diff_dists.y) > radius};
 		int2 term_boundaries = {idx.x == N_PLANES-1, idx.y == 0};
 
-		done = done + term_dists + term_boundaries;
+		done = done + term_dists + term_boundaries + term_radius_jump;
 
 	}
 
 
-	#ifdef DEBUG
-	for(int i = 0; i < min(found, MAX_PLANES); i++)
-	{
-		BOUNDS_CHECK(CLOSE_PLANE_IDX(close_planes, i).plane_id, 0, N_PLANES);
-	}
-	#endif
-	
+
 	int2 ret;
 	ret.x = min(found, MAX_PLANES);
 	ret.y = smallest_idx;
@@ -1208,17 +1308,15 @@ voxel_methods(int volume_xsize,
 	// We find all planes that are inside the voxel radius
 	//	__local close_plane_t close_planes[(MAX_PLANES+1)*get_local_size(0)];
 	int n_close_planes;
-	int guess = 0;
+
 	float4 voxel = {x * volume_xspacing,
 	                0.0f,
 	                z * volume_zspacing,
 	                1.0f};
 	// Find the plane closest to the initial voxel
 	float smallest_dist = 99999999.9f;
-	float dist;
 
 	prepare_plane_eqs(plane_matrices, plane_eqs);
-
 
 
 	// Return if x/z is invalid
@@ -1228,19 +1326,47 @@ voxel_methods(int volume_xsize,
 	BOUNDS_CHECK(x, 0, volume_xsize);
 	BOUNDS_CHECK(z, 0, volume_zsize);
 
+	int multistart_guesses[MAX_MULTISTART_STARTS];
 
-
-	for(int i = 0; i < N_PLANES; i++)
+	// Find all valleys in the search space of distances
+	float prev_dist = fabs(dot(voxel, plane_eqs[0]));
+	float dist = fabs(dot(voxel, plane_eqs[1]));
+	int start_pos = 0;
+	int end_pos;
+	for(int start_id = 0; start_id < MAX_MULTISTART_STARTS; start_id++)
 	{
-		dist = fabs(dot(voxel,plane_eqs[i]));
-		//dist = fabs(plane_dist(voxel,plane_matrices[i]));
-		if(dist < smallest_dist)
+		smallest_dist = INFINITY;
+		if(start_id == MAX_MULTISTART_STARTS-1)
 		{
-			smallest_dist = dist;
-			guess = i;
+			end_pos = N_PLANES-1;
 		}
+		else
+		{
+			end_pos = (start_id+1)*N_PLANES/(MAX_MULTISTART_STARTS);
+		}
+
+		for(int i = start_pos; i < end_pos; i++)
+		{
+			dist = fabs(dot(voxel,plane_eqs[i]));
+			//dist = fabs(plane_dist(voxel,plane_matrices[i]));
+			if(dist < smallest_dist)
+			{
+				smallest_dist = dist;
+				multistart_guesses[start_id] = i;
+			}
+		}
+		start_pos = end_pos+1;
+
 	}
 
+#ifdef DEBUG
+	for(int i = 0; i < MAX_MULTISTART_STARTS; i++)
+	{
+		DEBUG_PRINTF("Multistart %d: idx %d dist %f\n",i,
+		             multistart_guesses[i],
+		             fabs(dot(voxel, plane_eqs[multistart_guesses[i]])));
+	}
+#endif
 
 	int2 close_planes_ret;
 	// Iterate over Y axis
@@ -1258,9 +1384,14 @@ voxel_methods(int volume_xsize,
 		                                     plane_matrices,
 		                                     voxel,
 		                                     radius,
-		                                     guess);
+		                                     multistart_guesses,
+		                                     mask,
+		                                     in_xsize,
+		                                     in_ysize,
+		                                     in_xspacing,
+		                                     in_yspacing);
 		n_close_planes = close_planes_ret.x;
-		guess = close_planes_ret.y;
+
 
 
 		// Call appropriate method to determine pixel value
