@@ -43,7 +43,7 @@ void DirectlyLinkedSender::send(ImagePtr msg)
 	emit newImage();
 }
 
-void DirectlyLinkedSender::send(ProbeDataPtr msg)
+void DirectlyLinkedSender::send(ProbeDefinitionPtr msg)
 {
 	if (!this->isReady())
 		return;
@@ -58,7 +58,7 @@ ImagePtr DirectlyLinkedSender::popImage()
 	return mImage;
 	mImage.reset();
 }
-ProbeDataPtr DirectlyLinkedSender::popUSStatus()
+ProbeDefinitionPtr DirectlyLinkedSender::popUSStatus()
 {
 	return mUSStatus;
 }

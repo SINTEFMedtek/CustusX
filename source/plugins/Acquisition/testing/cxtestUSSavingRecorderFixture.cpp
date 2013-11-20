@@ -85,7 +85,7 @@ void USSavingRecorderFixture::setTool(cx::ToolPtr tool)
 
 void USSavingRecorderFixture::addVideoSource(int width, int height)
 {
-	int index = mVideo.size();
+	size_t index = mVideo.size();
 	cx::TestVideoSourcePtr videoSource(new cx::TestVideoSource(
 											QString("videoSource%1").arg(index),
 											QString("Video Source %1").arg(index),

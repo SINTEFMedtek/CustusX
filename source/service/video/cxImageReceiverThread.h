@@ -70,7 +70,7 @@ public:
 	ImageReceiverThread(QObject* parent = NULL);
 	virtual ~ImageReceiverThread() {}
 	virtual ImagePtr getLastImageMessage(); // threadsafe, Threadsafe retrieval of last image message.
-	virtual ProbeDataPtr getLastSonixStatusMessage(); // threadsafe,Threadsafe retrieval of last status message.
+	virtual ProbeDefinitionPtr getLastSonixStatusMessage(); // threadsafe,Threadsafe retrieval of last status message.
 	virtual QString hostDescription() const = 0; // threadsafe
 
 signals:
@@ -89,7 +89,7 @@ protected:
 	 * \param[in] imgMsg Incoming image message
 	 */
 	void addImageToQueue(ImagePtr imgMsg);
-	void addSonixStatusToQueue(ProbeDataPtr msg); ///< add the message to a thread-safe queue
+	void addSonixStatusToQueue(ProbeDefinitionPtr msg); ///< add the message to a thread-safe queue
 	void calibrateTimeStamp(ImagePtr imgMsg); ///< Calibrate the time stamps of the incoming message based on the computer clock. Calibration is based on an average of several of the last messages. The calibration is updated every 20-30 sec.
 
 private:
@@ -100,7 +100,7 @@ private:
 	QMutex mImageMutex;
 	QMutex mSonixStatusMutex;
 	std::list<ImagePtr> mMutexedImageMessageQueue;
-	std::list<ProbeDataPtr> mMutexedSonixStatusMessageQueue;
+	std::list<ProbeDefinitionPtr> mMutexedSonixStatusMessageQueue;
 
 	double mLastReferenceTimestampDiff;
 	bool mGeneratingTimeCalibration;

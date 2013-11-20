@@ -142,7 +142,7 @@ void LandmarkRegistrationWidget::prePaintEvent()
 	Transform3D rMtarget = this->getTargetTransform();
 
 	//ready the table widget
-	mLandmarkTableWidget->setRowCount(landmarks.size());
+	mLandmarkTableWidget->setRowCount((int)landmarks.size());
 	mLandmarkTableWidget->setColumnCount(4);
 	QStringList headerItems(QStringList() << "Name" << "Status" << "Coordinates" << "Accuracy (mm)");
 	mLandmarkTableWidget->setHorizontalHeaderLabels(headerItems);

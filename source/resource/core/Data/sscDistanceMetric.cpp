@@ -56,7 +56,7 @@ DistanceMetric::~DistanceMetric()
 
 unsigned DistanceMetric::getArgumentCount() const
 {
-	return mArgument.size();
+	return (unsigned)mArgument.size();
 }
 
 void DistanceMetric::setArgument(int index, DataPtr p)

@@ -68,22 +68,22 @@ namespace cx
  *
  * Associated image:
  *
- *            x                   coordinate space v: origin upper left corner, spacing in mm
+ *            x                   coordinate space v (image): origin upper left corner, spacing in mm
  *      v*---->
  *       |
  *       | ' ' ' ' ' ' ' ' ' ' '
  *      y. '                   '  spacing in mm
- *         '    y<--t@         '  @ = point called origin: calibration center = origin of t space.
+ *         '    y<--t@         '  @ = point called origin: calibration center = origin of t (tool) space.
  *         '         |         '  (See also sscTool.h for definition of t space)
  *      y^ '        z.         '
  *       | '                   '
  *       | ' ' ' ' ' ' ' ' ' ' '
- *      u*---->                  coordinate space u: origin lower left corner
+ *      u*---->                  coordinate space u (image): origin lower left corner
  *            x
  *
  *
  *
- *            x                   coordinate space p: origin upper left corner, spacing in pixels
+ *            x                   coordinate space p (image in pixels): origin upper left corner, spacing in pixels
  *      p*---->
  *       |
  *       | ' ' ' ' ' ' ' ' ' ' '  size: pixel dimensions (width, height)
@@ -99,7 +99,7 @@ namespace cx
  *
  * \ingroup sscTool
  */
-class ProbeData
+class ProbeDefinition
 {
 public: 
 	enum TYPE { tNONE=0,   ///< undefined
@@ -108,7 +108,7 @@ public:
 				};
 
 public:
-	ProbeData(TYPE type = tNONE);
+	ProbeDefinition(TYPE type = tNONE);
 	void addXml(QDomNode dataNode) const;
 	void parseXml(QDomNode dataNode);
 
@@ -165,7 +165,7 @@ private:
 	void parseImageXml(QDomNode dataNode);
 };
 
-typedef boost::shared_ptr<ProbeData> ProbeDataPtr;
+typedef boost::shared_ptr<ProbeDefinition> ProbeDefinitionPtr;
 
 } // namespace cx
 

@@ -25,10 +25,10 @@ public:
 	virtual void send(IGTLinkImageMessage::Pointer msg);
 	virtual void send(IGTLinkUSStatusMessage::Pointer msg);
 	virtual void send(ImagePtr msg);
-	virtual void send(ProbeDataPtr msg);
+	virtual void send(ProbeDefinitionPtr msg);
 
 	ImagePtr popImage();
-	ProbeDataPtr popUSStatus();
+	ProbeDefinitionPtr popUSStatus();
 
 signals:
 	void newImage();
@@ -36,7 +36,7 @@ signals:
 
 private:
 	ImagePtr mImage;
-	ProbeDataPtr mUSStatus;
+	ProbeDefinitionPtr mUSStatus;
 	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
 
 };
