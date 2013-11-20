@@ -10,14 +10,14 @@ namespace cxtest
 
 TEST_CASE("ProbeDefinition can be constructed", "[unit][resource][core][ProbeDefinition][unstable]")
 {
-	cx::ProbeDataPtr probeDefinition = cx::ProbeDataPtr(new cx::ProbeData());
+	cx::ProbeDefinitionPtr probeDefinition = cx::ProbeDefinitionPtr(new cx::ProbeDefinition());
 	CHECK(probeDefinition.get());
-	CHECK(probeDefinition->getType() == cx::ProbeData::tNONE);
+	CHECK(probeDefinition->getType() == cx::ProbeDefinition::tNONE);
 }
 
 TEST_CASE("ProbeDefinition: Validating set/get", "[unit][resource][core][ProbeDefinition][unstable]")
 {
-	cx::ProbeDataPtr probeDefinition(new cx::ProbeData());
+	cx::ProbeDefinitionPtr probeDefinition(new cx::ProbeDefinition());
 	CHECK(probeDefinition.get());
 
 	cx::Vector3D origin_p = probeDefinition->getOrigin_p();
@@ -40,7 +40,7 @@ TEST_CASE("ProbeDefinition: Validating set/get", "[unit][resource][core][ProbeDe
 	probeDefinition->setTemporalCalibration(temporalCalibration);
 	CHECK(temporalCalibration == probeDefinition->getTemporalCalibration());
 
-	cx::ProbeData::TYPE type = probeDefinition->getType();
+	cx::ProbeDefinition::TYPE type = probeDefinition->getType();
 	probeDefinition->setType(type);
 	CHECK(type == probeDefinition->getType());
 

@@ -99,7 +99,7 @@ namespace cx
  *
  * \ingroup sscTool
  */
-class ProbeData
+class ProbeDefinition
 {
 public: 
 	enum TYPE { tNONE=0,   ///< undefined
@@ -108,7 +108,7 @@ public:
 				};
 
 public:
-	ProbeData(TYPE type = tNONE);
+	ProbeDefinition(TYPE type = tNONE);
 	void addXml(QDomNode dataNode) const;
 	void parseXml(QDomNode dataNode);
 
@@ -165,7 +165,7 @@ private:
 	void parseImageXml(QDomNode dataNode);
 };
 
-typedef boost::shared_ptr<ProbeData> ProbeDataPtr;
+typedef boost::shared_ptr<ProbeDefinition> ProbeDefinitionPtr;
 
 } // namespace cx
 

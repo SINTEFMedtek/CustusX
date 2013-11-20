@@ -53,7 +53,7 @@ public:
 	virtual void applyNewConfigurationWithId(QString uid) = 0;
 	virtual void setTemporalCalibration(double val) = 0;
 	virtual void setSoundSpeedCompensationFactor(double val) = 0;
-	virtual void setProbeSector(ProbeData probeSector) = 0;
+	virtual void setProbeSector(ProbeDefinition probeSector) = 0;
 	virtual void setRTSource(VideoSourcePtr source) = 0;
 	virtual void removeRTSource(VideoSourcePtr source) = 0;
 
@@ -62,7 +62,7 @@ public:
 
 	virtual QStringList getAvailableVideoSources() = 0; ///< Return a list of all available video source. The default is one with uid=='active'.
 	virtual VideoSourcePtr getRTSource(QString uid = "active") const = 0; ///< Return a VideoSource for the given uid. Use 'active' to get the default stream.
-	virtual ProbeData getProbeData(QString uid = "active") const = 0; ///< Return a ProbeData for the given uid. Use 'active' to get the default.
+	virtual ProbeDefinition getProbeData(QString uid = "active") const = 0; ///< Return a ProbeData for the given uid. Use 'active' to get the default.
 	virtual ProbeSectorPtr getSector(QString uid = "active") = 0; /// < Return a ProbeSectorPtr for the given uid. Use 'active' to get the default.
 
 signals:
