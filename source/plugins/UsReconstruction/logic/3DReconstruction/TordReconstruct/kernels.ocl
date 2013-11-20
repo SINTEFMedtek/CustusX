@@ -133,7 +133,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                             const float radius,
                             int guess,
                             bool doTermDistance,
-                            __global const char* mask,
+                            __global const unsigned char* mask,
                             int in_xsize,
                             int in_ysize,
                             float in_xspacing,
@@ -147,7 +147,7 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
                              const float radius,
                              int *multistart_guesses,
                              bool doTermDistance,
-                             __global const char* mask,
+                             __global const unsigned char* mask,
                              int in_xsize,
                              int in_ysize,
                              float in_xspacing,
@@ -376,7 +376,7 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
                             const float radius,
                             int *multistart_guesses,
                              bool doTermDistance,
-                             __global const char* mask,
+                             __global const unsigned char* mask,
                             int in_xsize,
                             int in_ysize,
                             float in_xspacing,
@@ -448,7 +448,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                             const float radius,
                             int guess,
                             bool doTermDistance,
-                            __global const char* mask,
+                            __global const unsigned char* mask,
                             int in_xsize,
                             int in_ysize,
                             float in_xspacing,
@@ -1324,7 +1324,7 @@ voxel_methods(int volume_xsize,
 	// We find all planes that are inside the voxel radius
 	//	__local close_plane_t close_planes[(MAX_PLANES+1)*get_local_size(0)];
 	int n_close_planes;
-	int guess = 0;
+
 	float4 voxel = {x * volume_xspacing,
 	                0.0f,
 	                z * volume_zspacing,
@@ -1384,19 +1384,6 @@ voxel_methods(int volume_xsize,
 	}
 #endif
 
-	for(int i = 0; i < N_PLANES; i++)
-	{
-		dist = fabs(dot(voxel,plane_eqs[i]));
-		//dist = fabs(plane_dist(voxel,plane_matrices[i]));
-		if(dist < smallest_dist)
-		{
-			smallest_dist = dist;
-			guess = i;
-		}
-
-	}
-
-
 	int2 close_planes_ret;
 	// Iterate over Y axis
 	for(int y = 0; y < volume_ysize; y++)
@@ -1420,7 +1407,7 @@ voxel_methods(int volume_xsize,
 		                                     in_xspacing,
 		                                     in_yspacing);
 		n_close_planes = close_planes_ret.x;
-		guess = close_planes_ret.y;
+
 
 
 		// Call appropriate method to determine pixel value
