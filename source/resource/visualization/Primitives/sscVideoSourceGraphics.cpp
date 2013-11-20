@@ -79,7 +79,7 @@ void VideoSourceGraphics::setTool(ToolPtr tool)
 	}
 
 	// accept only tool with a probe sector
-	if (tool && tool->getProbeSector().getType()!=ProbeData::tNONE)
+	if (tool && tool->getProbeSector().getType()!=ProbeDefinition::tNONE)
 	{
 		mTool = tool;
 	}

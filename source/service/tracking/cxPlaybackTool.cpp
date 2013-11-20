@@ -117,7 +117,7 @@ bool PlaybackTool::isCalibrated() const
 	return mBase->isCalibrated();
 }
 
-ProbeData PlaybackTool::getProbeSector() const
+ProbeDefinition PlaybackTool::getProbeSector() const
 {
 	return mBase->getProbeSector();
 }

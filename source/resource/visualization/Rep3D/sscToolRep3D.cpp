@@ -417,7 +417,7 @@ void ToolRep3D::tooltipOffsetSlot(double val)
 
 bool ToolRep3D::showProbe()
 {
-	return mTool && (mTool->hasType(Tool::TOOL_US_PROBE)) && (mTool->getProbeSector().getType()!=ProbeData::tNONE);
+	return mTool && (mTool->hasType(Tool::TOOL_US_PROBE)) && (mTool->getProbeSector().getType()!=ProbeDefinition::tNONE);
 }
 
 } // namespace cx

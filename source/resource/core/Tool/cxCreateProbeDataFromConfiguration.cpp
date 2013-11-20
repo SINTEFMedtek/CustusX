@@ -5,7 +5,7 @@
 namespace cx
 {
 
-ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlConfigParser::Configuration basis, ProbeData data)
+ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlConfigParser::Configuration basis, ProbeDefinition data)
 {
 	ProbeXmlConfigParser::Configuration config = basis;
 
@@ -30,7 +30,7 @@ ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlCon
 	config.mImageWidth = data.getSize().width();
 	config.mImageHeight = data.getSize().height();
 
-	if (data.getType()==ProbeData::tSECTOR)
+	if (data.getType()==ProbeDefinition::tSECTOR)
 	{
 		config.mWidthDeg = data.getWidth() / M_PI*180.0;
 		config.mOffset = data.getDepthStart() / data.getSpacing()[1];
@@ -49,12 +49,12 @@ ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlCon
 	return config;
 }
 
-ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config)
+ProbeDefinition createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config)
 {
   if(config.isEmpty())
-    return ProbeData();
+    return ProbeDefinition();
 
-	ProbeData probeData;
+	ProbeDefinition probeData;
 
   if (config.mWidthDeg > 0.1) // Sector probe
   {
@@ -62,7 +62,7 @@ ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration c
 	double depthEnd = config.mDepth * config.mPixelHeight + depthStart;
 
 	double width = config.mWidthDeg * M_PI / 180.0;//width in radians
-	probeData = ProbeData(ProbeData::tSECTOR);
+	probeData = ProbeDefinition(ProbeDefinition::tSECTOR);
 	probeData.setSector(depthStart, depthEnd, width);
   }
   else //Linear probe
@@ -73,7 +73,7 @@ ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration c
     double depthStart = double(config.mTopEdge-config.mOriginRow) * config.mPixelHeight;
     double depthEnd = double(config.mBottomEdge-config.mOriginRow) * config.mPixelHeight;
 
-	probeData = ProbeData(ProbeData::tLINEAR);
+	probeData = ProbeDefinition(ProbeDefinition::tLINEAR);
 	probeData.setSector(depthStart, depthEnd, width);
   }
 

@@ -208,8 +208,8 @@ TEST_CASE_METHOD(IGTLinkConversionFixture, "IGTLinkConversion: Decode/encode col
 TEST_CASE_METHOD(IGTLinkConversionFixture, "IGTLinkConversion: Decode/encode ProbeData", "[unit][resource][OpenIGTLinkUtilities]")
 {
 	// generate probe data input
-	cx::ProbeDataPtr input(new cx::ProbeData());
-	input->setType(cx::ProbeData::tSECTOR);
+	cx::ProbeDefinitionPtr input(new cx::ProbeDefinition());
+	input->setType(cx::ProbeDefinition::tSECTOR);
 	input->setOrigin_p(cx::Vector3D(50,0,0)); ///< probe origin in pixel space p. (upper-left corner origin)
 	input->setSpacing(cx::Vector3D(0.5, 0.6, 1.0));
 	input->setSize(QSize(300, 200));
@@ -226,7 +226,7 @@ TEST_CASE_METHOD(IGTLinkConversionFixture, "IGTLinkConversion: Decode/encode Pro
 	cx::IGTLinkConversion converter;
 	cx::IGTLinkUSStatusMessage::Pointer msg = converter.encode(input);
 	cx::IGTLinkImageMessage::Pointer imageMessage = converter.encode(imageInput);
-	cx::ProbeDataPtr output = converter.decode(msg, imageMessage, cx::ProbeDataPtr(new cx::ProbeData()));
+	cx::ProbeDefinitionPtr output = converter.decode(msg, imageMessage, cx::ProbeDefinitionPtr(new cx::ProbeDefinition()));
 
 	// compare input<->output
 	CHECK(input->getType() == output->getType());

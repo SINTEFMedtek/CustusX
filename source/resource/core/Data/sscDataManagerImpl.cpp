@@ -579,7 +579,7 @@ int DataManagerImpl::findUniqueUidNumber(QString uidBase) const
 	if (!uidBase.contains("%"))
 		return -1;
 	// Find an uid that is not used before
-	int numMatches = 1;
+	size_t numMatches = 1;
 	int recNumber = 0;
 
 	if (numMatches != 0)
