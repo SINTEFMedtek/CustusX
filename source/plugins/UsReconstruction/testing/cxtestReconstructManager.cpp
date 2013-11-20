@@ -554,6 +554,11 @@ TEST_CASE("ReconstructManager: Reconstructing using TordTest Anisotropic on synt
 			cx::DoubleDataAdapterXmlPtr x = boost::dynamic_pointer_cast<cx::DoubleDataAdapterXml>(*it);
 			x->setValue(1);
 		}
+		if(it->get()->getValueName() == "nStarts")
+		{
+			cx::DoubleDataAdapterXmlPtr x = boost::dynamic_pointer_cast<cx::DoubleDataAdapterXml>(*it);
+			x->setValue(1);
+		}
 	}
 
 
@@ -639,6 +644,7 @@ TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction
 		algorithm.getPlaneMethodOption(root)->setValue("Heuristic");
 		algorithm.getMaxPlanesOption(root)->setValue(8);
 		algorithm.getRadiusOption(root)->setValue(1);
+		algorithm.getNStartsOption(root)->setValue(1);
 	}	
 	SECTION("VNN2")
 	{
@@ -647,6 +653,7 @@ TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction
 		algorithm.getPlaneMethodOption(root)->setValue("Heuristic");
 		algorithm.getMaxPlanesOption(root)->setValue(8);
 		algorithm.getRadiusOption(root)->setValue(1);
+		algorithm.getNStartsOption(root)->setValue(1);
 	}
 	
 	SECTION("DW")
@@ -656,6 +663,7 @@ TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction
 		algorithm.getPlaneMethodOption(root)->setValue("Heuristic");
 		algorithm.getMaxPlanesOption(root)->setValue(8);
 		algorithm.getRadiusOption(root)->setValue(1);
+		algorithm.getNStartsOption(root)->setValue(1);
 	}
 	SECTION("Anisotropic")
 	{
@@ -664,6 +672,16 @@ TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction
 		algorithm.getPlaneMethodOption(root)->setValue("Heuristic");
 		algorithm.getMaxPlanesOption(root)->setValue(8);
 		algorithm.getRadiusOption(root)->setValue(1);
+		algorithm.getNStartsOption(root)->setValue(1);
+	}
+	SECTION("Multistart search")
+	{
+		std::cerr << "Testing multistart search\n";
+		algorithm.getMethodOption(root)->setValue("VNN");
+		algorithm.getPlaneMethodOption(root)->setValue("Heuristic");
+		algorithm.getMaxPlanesOption(root)->setValue(8);
+		algorithm.getRadiusOption(root)->setValue(1);
+		algorithm.getNStartsOption(root)->setValue(5);
 	}
 
 	std::vector<cx::Transform3D> planes;
