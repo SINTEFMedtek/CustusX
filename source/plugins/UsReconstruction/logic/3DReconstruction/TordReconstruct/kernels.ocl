@@ -7,7 +7,7 @@
 /*******************/
 
 
-#define MAX_MULTISTART_STARTS 1
+
 #define N_BLOCKS 10
 
 // Reconstruction methods
@@ -156,6 +156,12 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
 #if PLANE_METHOD == PLANE_EXACT
 #define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j, k) findClosestPlanes_multistart(a, b, c, d, e, f, 1, g, h, i, j, k)
 #elif PLANE_METHOD == PLANE_CLOSEST
+
+#ifdef MAX_MULTISTART_STARTS
+#undef MAX_MULTISTART_STARTS
+#define MAX_MULTISTART_STARTS 1
+#endif
+
 #define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j, k) findClosestPlanes_multistart(a, b, c, d, e, f, 0, g, h, i, j, k)
 #endif
 
@@ -376,6 +382,7 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
                             float in_xspacing,
                             float in_yspacing)
 {
+	
 	for(int i = 0; i < MAX_PLANES; i++)
 	{
 		CLOSE_PLANE_IDX(close_planes, i).dist = INFINITY;
@@ -448,6 +455,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                             float in_yspacing)
 {
 
+	
 	// Number of planes found so far
 	int found = MAX_PLANES;
 
