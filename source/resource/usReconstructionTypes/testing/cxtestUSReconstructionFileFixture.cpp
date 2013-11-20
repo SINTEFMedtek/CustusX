@@ -103,7 +103,7 @@ USReconstructionFileFixture::ReconstructionData USReconstructionFileFixture::cre
 		retval.trackerData[i] = cx::createTransformTranslate(cx::Vector3D(i,0,0));
 	retval.writeColor = true;
 	Eigen::Array2i frameSize(100, 50);
-	cx::ProbeData probeData = cx::DummyToolTestUtilities::createProbeDataLinear(10, 5, frameSize);
+	cx::ProbeDefinition probeData = cx::DummyToolTestUtilities::createProbeDataLinear(10, 5, frameSize);
 	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(probeData);
 	retval.tool = tool;
 

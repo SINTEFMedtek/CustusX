@@ -187,11 +187,11 @@ void cxTool::printInternalStructure()
 	mTool->printInternalStructure();
 }
 
-ProbeData cxTool::getProbeSector() const
+ProbeDefinition cxTool::getProbeSector() const
 {
 	if (mProbe)
 		return mProbe->getProbeData();
-	return ProbeData();
+	return ProbeDefinition();
 }
 
 std::map<int, Vector3D> cxTool::getReferencePoints() const

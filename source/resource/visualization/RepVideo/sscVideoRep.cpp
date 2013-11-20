@@ -88,7 +88,7 @@ bool VideoFixedPlaneRep::getShowSector() const
 
 void VideoFixedPlaneRep::updateSector()
 {
-	bool show = mTool && this->getShowSector() && mTool->getProbeSector().getType()!=ProbeData::tNONE;
+	bool show = mTool && this->getShowSector() && mTool->getProbeSector().getType()!=ProbeDefinition::tNONE;
 
 	mProbeOrigin->getActor()->SetVisibility(show);
 	mProbeSector->getActor()->SetVisibility(show);

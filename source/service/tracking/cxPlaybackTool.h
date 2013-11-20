@@ -47,7 +47,7 @@ public:
 	virtual QString getUid() const;
 	virtual QString getName() const;
 	virtual bool isCalibrated() const;
-	virtual ProbeData getProbeSector() const;
+	virtual ProbeDefinition getProbeSector() const;
 	virtual double getTimestamp() const;
 
 	virtual double getTooltipOffset() const;

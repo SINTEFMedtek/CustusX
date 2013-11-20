@@ -349,7 +349,7 @@ void ImageStreamerGE::send(const QString& uid, const vtkImageDataPtr& img, data_
 
 	if (geometryChanged)
 	{
-		ProbeDataPtr frameMessage( getFrameStatus(uid, geometry, img));
+		ProbeDefinitionPtr frameMessage( getFrameStatus(uid, geometry, img));
 		PackagePtr package(new Package());
 		package->mProbe = frameMessage;
 		mSender->send(package);
@@ -375,17 +375,17 @@ void ImageStreamerGE::send(const QString& uid, const vtkImageDataPtr& img, data_
 	mRenderTimer->time("sendersend");
 }
 
-ProbeDataPtr ImageStreamerGE::getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img)
+ProbeDefinitionPtr ImageStreamerGE::getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img)
 {
-	ProbeDataPtr retval;
+	ProbeDefinitionPtr retval;
 	if (!img || !mImgExportedStream)
 		return retval;
 
 	// 1 = sector, 2 = linear
 	if (geometry.imageType == data_streaming::Linear) //linear
-		retval = ProbeDataPtr( new ProbeData(ProbeData::tLINEAR));
+		retval = ProbeDefinitionPtr( new ProbeDefinition(ProbeDefinition::tLINEAR));
 	else //sector
-		retval = ProbeDataPtr( new ProbeData(ProbeData::tSECTOR));
+		retval = ProbeDefinitionPtr( new ProbeDefinition(ProbeDefinition::tSECTOR));
 
 	// Set start and end of sector in mm from origin
 	// Set width of sector in mm for LINEAR, width of sector in radians for SECTOR.
