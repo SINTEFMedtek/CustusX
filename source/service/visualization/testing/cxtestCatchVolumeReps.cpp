@@ -119,7 +119,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 1 small volume.", "[rep][uni
 	fixture.requireRepRender();
 }
 
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[rep][unit][visualization]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[rep][unit][visualization][unstable]")
 {
 	MehdiGPURayCastMultiVolumeRepFixture fixture;
 	fixture.setNumberOfImages(3);
@@ -141,7 +141,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 large volumes.", "[rep][in
 }
 
 // vtk emits PreRender end ERROR (x502) Invalid operation when this is run after another mehdi test.
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can crop 1 small volume.", "[rep][unit][visualization]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can crop 1 small volume.", "[rep][unit][visualization][unstable]")
 {
 	MehdiGPURayCastMultiVolumeRepFixture fixture;
 	fixture.setNumberOfImages(1);
@@ -175,7 +175,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can crop completely 1 small volume.", "
 }
 
 // vtk emits PreRender end ERROR (x502) Invalid operation when this is run after another mehdi test.
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip 1 small volume.", "[rep][unit][visualization]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip 1 small volume.", "[rep][unit][visualization][unstable]")
 {
 	MehdiGPURayCastMultiVolumeRepFixture fixture;
 	fixture.setNumberOfImages(1);
