@@ -36,8 +36,8 @@ M4Vector excludeClosePositions(M4Vector Tnavigation)
 		return TnavigationIncluded;
 	TnavigationIncluded.push_back(Tnavigation[0]); // first position is always included
 	int numberOfIncluded = 0;
-	int numberOfPos = Tnavigation.size();
-	for ( int index = 1; index <= numberOfPos; index++)
+	size_t numberOfPos = Tnavigation.size();
+	for ( size_t index = 1; index <= numberOfPos; index++)
 	{
 		double xDistance = (TnavigationIncluded[numberOfIncluded](0,3) - Tnavigation[index](0,3) );
 		double xDistanceSquared = xDistance * xDistance;

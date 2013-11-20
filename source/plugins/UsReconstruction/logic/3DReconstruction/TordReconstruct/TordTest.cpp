@@ -35,6 +35,7 @@ TordTest::getSettings(QDomElement root)
 	retval.push_back(this->getRadiusOption(root));
 	retval.push_back(this->getPlaneMethodOption(root));
 	retval.push_back(this->getMaxPlanesOption(root));
+	retval.push_back(this->getNStartsOption(root));
 	return retval;
 }
 
@@ -98,6 +99,17 @@ TordTest::getMaxPlanesOption(QDomElement root)
 	                                     root);
 }
 
+DoubleDataAdapterXmlPtr
+TordTest::getNStartsOption(QDomElement root)
+{
+	return DoubleDataAdapterXml::initialize("nStarts", "",
+	                                     "Number of starts for multistart searchs",
+	                                     3,
+	                                     DoubleRange(1, 8, 1),
+	                                     0,
+	                                     root);
+}
+
 int
 TordTest::getMethodID(QDomElement root)
 {
@@ -119,7 +131,8 @@ TordTest::initCL(QString kernelPath,
                  int nMaxPlanes,
                  int nPlanes,
                  int method,
-                 int planeMethod)
+                 int planeMethod,
+                 int nStarts)
 {
 	// Reusing initialization code from Thunder
 	moClContext = ocl_init("GPU");
@@ -135,6 +148,7 @@ TordTest::initCL(QString kernelPath,
 	                                            nPlanes,
 	                                            method,
 	                                            planeMethod,
+	                                            nStarts,
 	                                            kernelPath);
 
 	if(clprogram == NULL) return false;
@@ -151,6 +165,7 @@ TordTest::buildCLProgram(const char* program_src,
                          int nPlanes,
                          int method,
                          int planeMethod,
+                         int nStarts,
                          QString kernelPath)
 {
 	cl_program retval;
@@ -163,11 +178,11 @@ TordTest::buildCLProgram(const char* program_src,
 
 	ocl_check_error(err);
 
-	QString define = "-D MAX_PLANES=%1 -D N_PLANES=%2 -D METHOD=%3 -D PLANE_METHOD=%4";
-	define = define.arg(nMaxPlanes).arg(nPlanes).arg(method).arg(planeMethod);
+	QString define = "-D MAX_PLANES=%1 -D N_PLANES=%2 -D METHOD=%3 -D PLANE_METHOD=%4 -D MAX_MULTISTART_STARTS=%5";
+	define = define.arg(nMaxPlanes).arg(nPlanes).arg(method).arg(planeMethod).arg(nStarts);
 
 	err = clBuildProgram(retval, 0, NULL, define.toStdString().c_str(), 0, 0);
-	
+
 	if (err != CL_SUCCESS)
 	{
 		size_t len;
@@ -536,19 +551,23 @@ TordTest::reconstruct(ProcessedUSInputDataPtr input,
 	int method = getMethodID(settings);
 	float radius = getRadiusOption(settings)->getValue();
 	int planeMethod = getPlaneMethodID(settings);
+	int nStarts = getNStartsOption(settings)->getValue();
+
 	messageManager()->sendInfo(
-		QString("Method: %1, radius: %2, planeMethod: %3, nClosePlanes: %4, nPlanes: %5 ")
+		QString("Method: %1, radius: %2, planeMethod: %3, nClosePlanes: %4, nPlanes: %5, nStarts: %6 ")
 		.arg(method)
 		.arg(radius)
 		.arg(planeMethod)
 		.arg(nClosePlanes)
-		.arg(input->getDimensions()[2]));
+		.arg(input->getDimensions()[2])
+		.arg(nStarts));
 
 	if(!initCL(QString(TORD_KERNEL_PATH) + "/kernels.ocl",
-	       nClosePlanes,
-	       input->getDimensions()[2],
-	       method,
-	       planeMethod
+	           nClosePlanes,
+	           input->getDimensions()[2],
+	           method,
+	           planeMethod,
+	           nStarts
 		   )) return false;
 
 	bool ret = doGPUReconstruct(input, outputData, radius, nClosePlanes );
@@ -558,7 +577,7 @@ TordTest::reconstruct(ProcessedUSInputDataPtr input,
 		ocl_release(moClContext);
 		moClContext = NULL;
 	}
-	
+
 	return ret;
 }
 

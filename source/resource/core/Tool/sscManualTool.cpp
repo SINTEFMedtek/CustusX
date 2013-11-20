@@ -123,7 +123,7 @@ bool ManualTool::isCalibrated() const
 	return false;
 }
 
-ProbeData ManualTool::getProbeSector() const
+ProbeDefinition ManualTool::getProbeSector() const
 {
 	return mSector;
 }

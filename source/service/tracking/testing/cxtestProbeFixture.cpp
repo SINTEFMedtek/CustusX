@@ -55,15 +55,15 @@ void ProbeFixture::createParameters()
 {
 	mProbeName = "TestProbe";
 	mScannerName = "TestScanner";
-	cx::ProbeData probeData;
+	cx::ProbeDefinition probeData;
 	mDefaultProbeDataUid = probeData.getUid(); //Uid set to "default" in ProbeData()
 	mDefaultTemporalCalibration = probeData.getTemporalCalibration();
 	mProbeDataUid = "TestProbeData";
 }
 
-cx::ProbeData ProbeFixture::createProbeData()
+cx::ProbeDefinition ProbeFixture::createProbeData()
 {
-	cx::ProbeData probeData = mProbe->getProbeData();
+	cx::ProbeDefinition probeData = mProbe->getProbeData();
 	probeData.setUid(mProbeDataUid);
 	mTemporalCalibration = 1000.5;
 	probeData.setTemporalCalibration(mTemporalCalibration);

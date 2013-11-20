@@ -121,7 +121,7 @@ void ProbeAdapterRTSource::newFrameSlot()
 	mRedirecter->Update();
 
 	QString uid = mBase->getUid();
-	ProbeData data = probe->getProbeData(uid);
+	ProbeDefinition data = probe->getProbeData(uid);
 	QSize dimProbe = data.getSize();
 	QSize dimImage(mRedirecter->GetOutput()->GetDimensions()[0], mRedirecter->GetOutput()->GetDimensions()[1]);
 

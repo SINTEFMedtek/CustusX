@@ -139,7 +139,7 @@ public:
 	  * Read probe data from the probedata config file attached to the mhd file,
 	  * named <mhdfilename-base>.probedata.xml
 	  */
-	static std::pair<QString, ProbeData>  readProbeDataFromFile(QString mhdFileName);
+	static std::pair<QString, ProbeDefinition>  readProbeDataFromFile(QString mhdFileName);
 
 private:
 	std::vector<TimedPosition> readPositions(QString fileName);
@@ -150,7 +150,7 @@ private:
 	void readTimeStampsFile(QString fileName, std::vector<TimedPosition>* timedPos);
 	void readCustomMhdTags(QString mhdFileName, QStringList* probeConfigPath, QString* calFileName);
 	ProbeXmlConfigParser::Configuration readProbeConfiguration(QString calFilesPath, QStringList probeConfigPath);
-	std::pair<QString, ProbeData>  readProbeDataBackwardsCompatible(QString mhdFileName, QString calFilesPath);
+	std::pair<QString, ProbeDefinition>  readProbeDataBackwardsCompatible(QString mhdFileName, QString calFilesPath);
 
 //	ImagePtr createMaskFromConfigParams(USReconstructInputData data);
 	ImagePtr generateMask(USReconstructInputData data);
