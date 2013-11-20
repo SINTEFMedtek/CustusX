@@ -385,8 +385,8 @@ void RegistrationHistoryWidget::updateSlot()
 
   TimeMap times = this->getRegistrationTimes();
   std::map<QDateTime,QString>::iterator current = this->findCurrentActiveIter(times);
-  int behind = std::min<int>(distance(times.begin(), current), times.size()-1);
-  int infront = times.size() - 1 - behind;
+	size_t behind = std::min<int>(distance(times.begin(), current), times.size()-1);
+	size_t infront = times.size() - 1 - behind;
 
   mRewindAction->setText("Rewind (" + qstring_cast(behind) + ")");
 //  mRewindAction->setText("Rewind (" + qstring_cast(behind) + ")");
