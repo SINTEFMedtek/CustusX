@@ -375,7 +375,7 @@ void ReconstructManagerTestFixture::testTordTest()
 	algorithm->getMethodOption(algo)->setValue("VNN");
 	algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
 	algorithm->getMaxPlanesOption(algo)->setValue(1);
-	
+	algorithm->getNStartsOption(algo)->setValue(1);
 	SECTION("VNN2")
 	{
 		algorithm->getMethodOption(algo)->setValue("VNN2");
@@ -394,21 +394,25 @@ void ReconstructManagerTestFixture::testTordTest()
 		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
 		algorithm->getMaxPlanesOption(algo)->setValue(8);
 	}
-
+	SECTION("Multistart search")
+	{
+		algorithm->getMethodOption(algo)->setValue("VNN");
+		algorithm->getNStartsOption(algo)->setValue(5);
+	}
 	SECTION("Closest")
 	{
 		algorithm->getMethodOption(algo)->setValue("VNN");
 		algorithm->getPlaneMethodOption(algo)->setValue("Closest");
 		algorithm->getMaxPlanesOption(algo)->setValue(8);
 	}
-	
+
 	// run the reconstruction in the main thread
 	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
 	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
 	REQUIRE(cores.size()==1);
 	preprocessor->initializeCores(cores);
 	cores[0]->reconstruct();
-	
+
 	// check validity of output:
 	this->validateBModeData(cores[0]->getOutput());
 }
