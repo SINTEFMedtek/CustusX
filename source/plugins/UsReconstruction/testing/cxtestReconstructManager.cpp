@@ -239,7 +239,7 @@ void ReconstructManagerTestFixture::validateBModeData(cx::ImagePtr bmodeOut)
 	CHECK(this->getValue(bmodeOut, 143, 152, 172)  > 1); // correction
 	CHECK(this->getValue(bmodeOut, 179, 142, 170) == 1); //
 	// two samples in a flash and three black samples just outside it.
-	CHECK(this->getValue(bmodeOut, 334,  96,  86) > 200 );
+	CHECK(this->getValue(bmodeOut, 334,  96,  86) > 180 );
 	CHECK(this->getValue(bmodeOut, 319,  95,  85) > 200 );
 	CHECK(this->getValue(bmodeOut, 316, 105,  72) == 1);
 	CHECK(this->getValue(bmodeOut, 317,  98,  44) == 1);
@@ -375,7 +375,7 @@ void ReconstructManagerTestFixture::testTordTest()
 	algorithm->getMethodOption(algo)->setValue("VNN");
 	algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
 	algorithm->getMaxPlanesOption(algo)->setValue(1);
-	
+	algorithm->getNStartsOption(algo)->setValue(1);
 	SECTION("VNN2")
 	{
 		algorithm->getMethodOption(algo)->setValue("VNN2");
@@ -394,21 +394,25 @@ void ReconstructManagerTestFixture::testTordTest()
 		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
 		algorithm->getMaxPlanesOption(algo)->setValue(8);
 	}
-
+	SECTION("Multistart search")
+	{
+		algorithm->getMethodOption(algo)->setValue("VNN");
+		algorithm->getNStartsOption(algo)->setValue(5);
+	}
 	SECTION("Closest")
 	{
 		algorithm->getMethodOption(algo)->setValue("VNN");
 		algorithm->getPlaneMethodOption(algo)->setValue("Closest");
 		algorithm->getMaxPlanesOption(algo)->setValue(8);
 	}
-	
+
 	// run the reconstruction in the main thread
 	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
 	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
 	REQUIRE(cores.size()==1);
 	preprocessor->initializeCores(cores);
 	cores[0]->reconstruct();
-	
+
 	// check validity of output:
 	this->validateBModeData(cores[0]->getOutput());
 }
@@ -550,6 +554,11 @@ TEST_CASE("ReconstructManager: Reconstructing using TordTest Anisotropic on synt
 			cx::DoubleDataAdapterXmlPtr x = boost::dynamic_pointer_cast<cx::DoubleDataAdapterXml>(*it);
 			x->setValue(1);
 		}
+		if(it->get()->getValueName() == "nStarts")
+		{
+			cx::DoubleDataAdapterXmlPtr x = boost::dynamic_pointer_cast<cx::DoubleDataAdapterXml>(*it);
+			x->setValue(1);
+		}
 	}
 
 
@@ -635,6 +644,7 @@ TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction
 		algorithm.getPlaneMethodOption(root)->setValue("Heuristic");
 		algorithm.getMaxPlanesOption(root)->setValue(8);
 		algorithm.getRadiusOption(root)->setValue(1);
+		algorithm.getNStartsOption(root)->setValue(1);
 	}	
 	SECTION("VNN2")
 	{
@@ -643,6 +653,7 @@ TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction
 		algorithm.getPlaneMethodOption(root)->setValue("Heuristic");
 		algorithm.getMaxPlanesOption(root)->setValue(8);
 		algorithm.getRadiusOption(root)->setValue(1);
+		algorithm.getNStartsOption(root)->setValue(1);
 	}
 	
 	SECTION("DW")
@@ -652,6 +663,7 @@ TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction
 		algorithm.getPlaneMethodOption(root)->setValue("Heuristic");
 		algorithm.getMaxPlanesOption(root)->setValue(8);
 		algorithm.getRadiusOption(root)->setValue(1);
+		algorithm.getNStartsOption(root)->setValue(1);
 	}
 	SECTION("Anisotropic")
 	{
@@ -660,6 +672,16 @@ TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction
 		algorithm.getPlaneMethodOption(root)->setValue("Heuristic");
 		algorithm.getMaxPlanesOption(root)->setValue(8);
 		algorithm.getRadiusOption(root)->setValue(1);
+		algorithm.getNStartsOption(root)->setValue(1);
+	}
+	SECTION("Multistart search")
+	{
+		std::cerr << "Testing multistart search\n";
+		algorithm.getMethodOption(root)->setValue("VNN");
+		algorithm.getPlaneMethodOption(root)->setValue("Heuristic");
+		algorithm.getMaxPlanesOption(root)->setValue(8);
+		algorithm.getRadiusOption(root)->setValue(1);
+		algorithm.getNStartsOption(root)->setValue(5);
 	}
 
 	std::vector<cx::Transform3D> planes;

@@ -88,6 +88,13 @@ public:
 	 */
 	virtual DoubleDataAdapterXmlPtr getMaxPlanesOption(QDomElement root);
 
+	/**
+	 * Make number of starts for multistart search option for the UI
+	 * @param root The root of the configuration ui
+	 * @return Number of multistart search starts option
+	 */
+	virtual DoubleDataAdapterXmlPtr getNStartsOption(QDomElement root);
+
 protected:
 
 	/**
@@ -112,6 +119,7 @@ protected:
 	 * @param nPlanes Number of image planes in the input data set
 	 * @param method The method ID. See kernels.ocl for more information
 	 * @param planeMethod the plane method ID. See kernels.ocl for more information
+	 * @param nStarts number of starts for multistart search for close planes
 	 * @return True on success
 	 * @sa buildCLProgram
 	 */
@@ -119,7 +127,8 @@ protected:
 	                    int nMaxPlanes,
 	                    int nPlanes,
 	                    int method,
-	                    int planeMethod);
+	                    int planeMethod,
+	                    int nStarts);
 	
 	/**
 	 * Build the OpenCL kernel
@@ -128,6 +137,7 @@ protected:
 	 * @param nPlanes Number of image planes in the input data set
 	 * @param method The method ID. See kernels.ocl for more information
 	 * @param planeMethod the plane method ID. See kernels.ocl for more information
+	 * @param nStarts number of starts for multistart search for close planes
 	 * @param kernelPath The path of the kernel source code
 	 * @return True on suc
 	 */
@@ -136,6 +146,7 @@ protected:
 	                                  int nPlanes,
 	                                  int method,
 	                                  int planeMethod,
+	                                  int nStarts,
 	                                  QString kernelPath);
 	/**
 	 * Perform GPU Reconstruction.
