@@ -274,6 +274,11 @@ void
 prepare_plane_eqs(__global float16 *plane_matrices,
                   __local float4 *plane_eqs);
 
+int
+findLocalMinimas(int *guesses,
+                 __local float4 *plane_eqs,
+                 float4 voxel);
+
 __kernel void
 voxel_methods(int volume_xsize,
               int volume_ysize,
@@ -1233,6 +1238,44 @@ prepare_plane_eqs(__global float16 *plane_matrices,
 	barrier(CLK_LOCAL_MEM_FENCE);
 }
 
+int findLocalMinimas(int *guesses,
+                     __local float4 *plane_eqs,
+                     float4 voxel)
+
+{
+		// Find all valleys in the search space of distances
+	float prev_dist = fabs(dot(voxel, plane_eqs[0]));
+	float dist = fabs(dot(voxel, plane_eqs[1]));
+	float smallest_dist = 99999999.9f;
+	int start_pos = 0;
+	int end_pos;
+	for(int start_id = 0; start_id < MAX_MULTISTART_STARTS; start_id++)
+	{
+		smallest_dist = INFINITY;
+		if(start_id == MAX_MULTISTART_STARTS-1)
+		{
+			end_pos = N_PLANES-1;
+		}
+		else
+		{
+			end_pos = (start_id+1)*N_PLANES/(MAX_MULTISTART_STARTS);
+		}
+
+		for(int i = start_pos; i < end_pos; i++)
+		{
+			dist = fabs(dot(voxel,plane_eqs[i]));
+			//dist = fabs(plane_dist(voxel,plane_matrices[i]));
+			if(dist < smallest_dist)
+			{
+				smallest_dist = dist;
+				guesses[start_id] = i;
+			}
+		}
+		start_pos = end_pos+1;
+
+	}
+	return MAX_MULTISTART_STARTS;
+}
 
 /** The entry point for this set of reconstruction methods.
  * Parameters:
@@ -1314,7 +1357,7 @@ voxel_methods(int volume_xsize,
 	                z * volume_zspacing,
 	                1.0f};
 	// Find the plane closest to the initial voxel
-	float smallest_dist = 99999999.9f;
+
 
 	prepare_plane_eqs(plane_matrices, plane_eqs);
 
@@ -1327,40 +1370,13 @@ voxel_methods(int volume_xsize,
 	BOUNDS_CHECK(z, 0, volume_zsize);
 
 	int multistart_guesses[MAX_MULTISTART_STARTS];
-
-	// Find all valleys in the search space of distances
-	float prev_dist = fabs(dot(voxel, plane_eqs[0]));
-	float dist = fabs(dot(voxel, plane_eqs[1]));
-	int start_pos = 0;
-	int end_pos;
-	for(int start_id = 0; start_id < MAX_MULTISTART_STARTS; start_id++)
-	{
-		smallest_dist = INFINITY;
-		if(start_id == MAX_MULTISTART_STARTS-1)
-		{
-			end_pos = N_PLANES-1;
-		}
-		else
-		{
-			end_pos = (start_id+1)*N_PLANES/(MAX_MULTISTART_STARTS);
-		}
-
-		for(int i = start_pos; i < end_pos; i++)
-		{
-			dist = fabs(dot(voxel,plane_eqs[i]));
-			//dist = fabs(plane_dist(voxel,plane_matrices[i]));
-			if(dist < smallest_dist)
-			{
-				smallest_dist = dist;
-				multistart_guesses[start_id] = i;
-			}
-		}
-		start_pos = end_pos+1;
-
-	}
+	
+	int nGuesses = findLocalMinimas(multistart_guesses,
+	                                plane_eqs,
+	                                voxel);
 
 #ifdef DEBUG
-	for(int i = 0; i < MAX_MULTISTART_STARTS; i++)
+	for(int i = 0; i < nGuesses; i++)
 	{
 		DEBUG_PRINTF("Multistart %d: idx %d dist %f\n",i,
 		             multistart_guesses[i],
