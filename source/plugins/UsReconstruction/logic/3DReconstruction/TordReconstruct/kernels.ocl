@@ -34,7 +34,8 @@
 
 // Local search related parameters
 #define LOCAL_SEARCH_DISTANCE 10
-
+#undef MAX_MULTISTART_STARTS
+#define MAX_MULTISTART_STARTS 5
 /*****************/
 /* End constants */
 /*****************/
@@ -44,7 +45,8 @@
 /* Begin macros */
 /****************/
 
-#define DEBUG
+//#define DEBUG
+//#define CHECK_PLANE_INDICES
 
 #ifdef DEBUG
 #define DEBUG_PRINTF(...) if((get_global_id(0) % 5000) == 0) printf(##__VA_ARGS__)
@@ -149,6 +151,7 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
                              const float4 voxel,
                              const float radius,
                              int *multistart_guesses,
+                             int n_multistart_guesses,
                              bool doTermDistance,
                              __global const unsigned char* mask,
                              int in_xsize,
@@ -157,7 +160,7 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
                              float in_yspacing);
 
 #if PLANE_METHOD == PLANE_EXACT
-#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j, k) findClosestPlanes_multistart(a, b, c, d, e, f, 1, g, h, i, j, k)
+#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j, k, l) findClosestPlanes_multistart(a, b, c, d, e, f, 1, g, h, i, j, k, l)
 #elif PLANE_METHOD == PLANE_CLOSEST
 
 #ifdef MAX_MULTISTART_STARTS
@@ -165,7 +168,7 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
 #define MAX_MULTISTART_STARTS 1
 #endif
 
-#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j, k) findClosestPlanes_multistart(a, b, c, d, e, f, 0, g, h, i, j, k)
+#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j, k, l) findClosestPlanes_multistart(a, b, c, d, e, f, 0, g, h, i, j, k, l)
 #endif
 
 __global const unsigned char*
@@ -383,6 +386,7 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
                             const float4 voxel,
                             const float radius,
                             int *multistart_guesses,
+                             int n_multistart_guesses,
                              bool doTermDistance,
                              __global const unsigned char* mask,
                             int in_xsize,
@@ -398,7 +402,7 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
 	}
 	int2 ret;
 	int found = 0;
-	for(int i = 0; i < MAX_MULTISTART_STARTS; i++)
+	for(int i = 0; i < n_multistart_guesses; i++)
 	{
 		ret = findClosestPlanes_heuristic(close_planes,
 		                                  plane_eqs,
@@ -423,10 +427,12 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
 	ret.y = 0;
 
 #ifdef DEBUG
+#ifdef CHECK_PLANE_INDICES
 	for(int i = 0; i < min(found, MAX_PLANES); i++)
 	{
 		BOUNDS_CHECK(CLOSE_PLANE_IDX(close_planes, i).plane_id, 0, N_PLANES);
 	}
+#endif
 #endif
 
 	return ret;
@@ -1252,18 +1258,20 @@ int findLocalMinimas(int *guesses,
 	// But if we can find two indices a and b, such that dist(i) < dist(a) and dist(i) < dist(b)
 	// and b - a = LOCAL_SEARCH_DISTANCE, it's a good chance it's a minima.
 
-	int nMinimas = 0;
+	int nMinima = 0;
 
 	for(int i = 0;
 	    i < N_PLANES &&
 		    nMinima < MAX_MULTISTART_STARTS;
-	    i += LOCAL_SEARCH_DISTANCE)
+	    i++)
 	{
 
+		/* int a = max(0, i - LOCAL_SEARCH_DISTANCE); */
+		/* int b = min(N_PLANES-1, i + LOCAL_SEARCH_DISTANCE); */
 		int a = i - LOCAL_SEARCH_DISTANCE;
 		int b = i + LOCAL_SEARCH_DISTANCE;
-
 		float a_dist, b_dist;
+		float i_dist = fabs(dot(plane_eqs[i], voxel));
 
 		// TODO: Unroll the end cases? Lots of branching for a quite bad reason here..
 		if(a < 0) a_dist = INFINITY;
@@ -1279,28 +1287,29 @@ int findLocalMinimas(int *guesses,
 			// However, if this minima is better (i.e. closer) than the previous one
 			// inside LOCAL_SEARCH_DISTANCE,
 			// of course we want to use this one.
-			if(nMinimas > 1 && guesses[nMinimas-1] - i < LOCAL_SEARCH_DISTANCE*2)
+			if(nMinima > 0 && guesses[nMinima-1] - i < LOCAL_SEARCH_DISTANCE*2)
 			{
-				DEBUG_PRINTF("Minima %d: Found nearby minima: %d\n", nMinimas, i);
+				DEBUG_PRINTF("Minima %d: Found nearby minima: %d : %f\n", nMinima, i, i_dist);
 				// We have a previous minima, and it's too close.
-				float prev_dist = fabs(dot(plane_eqs[guesses[nMinimas-1]]));
+				float prev_dist = fabs(dot(plane_eqs[guesses[nMinima-1]], voxel));
 				if(i_dist < prev_dist)
 				{
 					DEBUG_PRINTF("Taking it\n");
 					// But this one is better, lets use it
-					guesses[nMinimas-1] = i;
+					guesses[nMinima-1] = i;
 				}
 			}
 			else
 			{
 				// We may simply store this minima
-				DEBUG_PRINTF("Minima %d: Found new minima: %d\n", nMinima, i);
+				DEBUG_PRINTF("Minima %d: Found new minima: %d : %f\n", nMinima, i, i_dist);
 				guesses[nMinima] = i;
 				nMinima++;
 			}
 		}
 	}
-	DEBUG_PRINTF("Found %d minima in total\n");
+	DEBUG_PRINTF("Found %d minima in total\n", nMinima);
+	
 	return nMinima;
 }
 
@@ -1397,7 +1406,7 @@ voxel_methods(int volume_xsize,
 	BOUNDS_CHECK(z, 0, volume_zsize);
 
 	int multistart_guesses[MAX_MULTISTART_STARTS];
-	
+
 	int nGuesses = findLocalMinimas(multistart_guesses,
 	                                plane_eqs,
 	                                voxel);
@@ -1428,6 +1437,7 @@ voxel_methods(int volume_xsize,
 		                                     voxel,
 		                                     radius,
 		                                     multistart_guesses,
+		                                     nGuesses,
 		                                     mask,
 		                                     in_xsize,
 		                                     in_ysize,
