@@ -1343,7 +1343,7 @@ int findLocalMinimas(int *guesses,
 				// We already have MAX_MULTISTART_STARTS minimas, so now pick the "worst" minima
 				// and toss it out for this one
 
-				float biggest = INFINITY;
+				float biggest = -INFINITY;
 				float tmp;
 				int biggest_idx = 0;
 				for(int j = 0; j < nMinima; j++)
