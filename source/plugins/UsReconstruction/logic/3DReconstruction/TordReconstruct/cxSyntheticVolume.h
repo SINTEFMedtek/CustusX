@@ -48,9 +48,10 @@ public:
 	 * @param noiseMean The sigma of the noise distribution on each image
 	 */
 	virtual ProcessedUSInputDataPtr
-	sampleUsData(const std::vector<Transform3D>& planes,
+	sampleUsData(const std::vector<Transform3D>& planes_rMf,
 	             const Eigen::Array2f& pixelSpacing,
 	             const Eigen::Array2i& sliceDimension,
+				 const Transform3D& output_dMr,
 	             const double noiseSigma,
 	             const unsigned char noiseMean) const;
 

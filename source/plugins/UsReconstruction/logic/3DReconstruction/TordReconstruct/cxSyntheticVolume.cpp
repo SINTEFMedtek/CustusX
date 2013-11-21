@@ -17,11 +17,11 @@ double noiseValue(double noiseSigma,
 namespace cx {
 
 ProcessedUSInputDataPtr
-cxSyntheticVolume::sampleUsData(const std::vector<Transform3D>& planes,
+cxSyntheticVolume::sampleUsData(const std::vector<Transform3D>& planes_rMf,
                                 const Eigen::Array2f& pixelSpacing,
                                 const Eigen::Array2i& sliceDimension,
-                                const double noiseSigma,
-                                const unsigned char noiseMean) const
+								const Transform3D& output_dMr,
+								const double noiseSigma, const unsigned char noiseMean) const
 {
 	// Seed the random number generator
 	srand(time(NULL));
@@ -29,11 +29,11 @@ cxSyntheticVolume::sampleUsData(const std::vector<Transform3D>& planes,
 	std::vector<TimedPosition> positions;
 	std::vector<vtkImageDataPtr> images;
 	// For each plane
-	for(std::vector<Transform3D>::const_iterator i = planes.begin();
-	    planes.end() != i;
+	for(std::vector<Transform3D>::const_iterator i = planes_rMf.begin();
+		planes_rMf.end() != i;
 	    i++)
 	{
-		const Transform3D plane = *i;
+		const Transform3D rMf = *i;
 		vtkImageDataPtr us_frame = vtkImageDataPtr::New();
 		us_frame->SetExtent(0, sliceDimension[0]-1, 0, sliceDimension[1]-1, 0, 0);
 		us_frame->SetSpacing(pixelSpacing[0], pixelSpacing[1], 0.0);
@@ -47,7 +47,7 @@ cxSyntheticVolume::sampleUsData(const std::vector<Transform3D>& planes,
 
 				// Transform it to volume space
 				const Vector3D img_coords(pixelSpacing[0]*px, pixelSpacing[1]*py, 0.0);
-				const Vector3D volume_coords = plane*img_coords;
+				const Vector3D volume_coords = rMf*img_coords;
 
 				// Evaluate volume at that position
 				const unsigned char val =
@@ -80,8 +80,8 @@ cxSyntheticVolume::sampleUsData(const std::vector<Transform3D>& planes,
 
 		// Build the TimedPosition for this frame
 		TimedPosition t;
-		t.mTime = i - planes.begin();
-		t.mPos = plane;
+		t.mTime = i - planes_rMf.begin();
+		t.mPos = output_dMr*rMf;
 
 		positions.push_back(t);
 		images.push_back(us_frame);

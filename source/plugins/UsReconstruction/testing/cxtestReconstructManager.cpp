@@ -700,6 +700,7 @@ TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction
 	cx::ProcessedUSInputDataPtr usData = volume.sampleUsData(planes,
 	                                                         pixelSpacing,
 	                                                         us_dims,
+															 cx::Transform3D::Identity(),
 	                                                         0.0,
 	                                                         0.0);
 	std::cout << "Done sampling\n";
