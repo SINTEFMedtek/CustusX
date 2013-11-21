@@ -33,9 +33,11 @@
 #define ANISOTROPIC_METHOD ANISOTROPIC_METHOD_BILINEAR_ON_PLANE
 
 // Local search related parameters
-#define LOCAL_SEARCH_DISTANCE 10
+
 #undef MAX_MULTISTART_STARTS
 #define MAX_MULTISTART_STARTS 5
+
+#define LOCAL_SEARCH_DISTANCE (N_PLANES/MAX_MULTISTART_STARTS)
 /*****************/
 /* End constants */
 /*****************/
@@ -45,7 +47,7 @@
 /* Begin macros */
 /****************/
 
-//#define DEBUG
+#define DEBUG
 //#define CHECK_PLANE_INDICES
 
 #ifdef DEBUG
@@ -283,6 +285,7 @@ prepare_plane_eqs(__global float16 *plane_matrices,
 int
 findLocalMinimas(int *guesses,
                  __local float4 *plane_eqs,
+                 float radius,
                  float4 voxel);
 
 __kernel void
@@ -1249,6 +1252,7 @@ prepare_plane_eqs(__global float16 *plane_matrices,
 
 int findLocalMinimas(int *guesses,
                      __local float4 *plane_eqs,
+                     float radius,
                      float4 voxel)
 
 {
@@ -1259,7 +1263,7 @@ int findLocalMinimas(int *guesses,
 	// and b - a = LOCAL_SEARCH_DISTANCE, it's a good chance it's a minima.
 
 	int nMinima = 0;
-
+	
 	for(int i = 0;
 	    i < N_PLANES &&
 		    nMinima < MAX_MULTISTART_STARTS;
@@ -1287,7 +1291,7 @@ int findLocalMinimas(int *guesses,
 			// However, if this minima is better (i.e. closer) than the previous one
 			// inside LOCAL_SEARCH_DISTANCE,
 			// of course we want to use this one.
-			if(nMinima > 0 && guesses[nMinima-1] - i < LOCAL_SEARCH_DISTANCE*2)
+			if(nMinima > 0 && i - guesses[nMinima-1] < LOCAL_SEARCH_DISTANCE*2)
 			{
 				DEBUG_PRINTF("Minima %d: Found nearby minima: %d : %f\n", nMinima, i, i_dist);
 				// We have a previous minima, and it's too close.
@@ -1409,6 +1413,7 @@ voxel_methods(int volume_xsize,
 
 	int nGuesses = findLocalMinimas(multistart_guesses,
 	                                plane_eqs,
+	                                radius,
 	                                voxel);
 
 #ifdef DEBUG
@@ -1424,7 +1429,7 @@ voxel_methods(int volume_xsize,
 	// Iterate over Y axis
 	for(int y = 0; y < volume_ysize; y++)
 	{
-		BOUNDS_CHECK(z, 0, volume_xsize);
+		BOUNDS_CHECK(y, 0, volume_ysize);
 
 
 		voxel.y = y*volume_yspacing;
