@@ -1270,38 +1270,40 @@ int findLocalMinimas(int *guesses,
 	float i_dist;
 
 
-	a_prev_dist = INFINITY;
-	a_dist = INFINITY;
-	i_dist = fabs(dot(plane_eqs[0], voxel));
-	b_dist = fabs(dot(plane_eqs[1], voxel));
-	b_next_dist = fabs(dot(plane_eqs[2], voxel));
 
 	int prev_pos = -1;
 	float smallest_dist = INFINITY;
-	
+#define FILTER_HALFLENGTH 4
+	float dists[FILTER_HALFLENGTH*2 + 1];
+
+	for(int i = 0; i < FILTER_HALFLENGTH; i++)
+	{
+		dists[i] = INFINITY;
+	}
+
+	for(int i = 0; i < FILTER_HALFLENGTH+1; i++)
+	{
+		dists[FILTER_HALFLENGTH+i] = fabs(dot(voxel, plane_eqs[i]));
+	}
+
+
+	float a_smooth = 0.0f;
+	float b_smooth = 0.0f;
+	float i_smooth = 0.0f;
+
+	for(int i = 0; i < FILTER_HALFLENGTH*2-2; i++)
+	{
+		a_smooth += dists[i];
+		b_smooth += dists[i+2];
+		i_smooth += dists[i+1];
+	}
+
 	for(int i = 0;
 	    i < N_PLANES;
 	    i++)
 	{
 
-		float a_smooth, b_smooth, i_smooth;
-
-		/* int a = max(0, i - LOCAL_SEARCH_DISTANCE); */
-		/* int b = min(N_PLANES-1, i + LOCAL_SEARCH_DISTANCE); */
-		int a = i - 1;
-		int b = i + 1;
-
-
-#define W_A 1
-#define W_B 1
-#define W_C 1
-#define smoothed(a, b, c) W_A*a + W_B * b + W_C * c
-		a_smooth =  smoothed(a_prev_dist ,  a_dist , i_dist);
-
-		b_smooth = smoothed(i_dist , b_dist , b_next_dist);
-
-		i_smooth = smoothed(a_dist , i_dist , b_dist);
-
+		i_dist = dists[FILTER_HALFLENGTH];
 		if((a_smooth >= i_smooth && b_smooth >= i_smooth) || i_dist < radius || i_dist < smallest_dist)
 		{
 			// We are inside a local minima. Now, how do we know we haven't found this minima before?
@@ -1363,16 +1365,21 @@ int findLocalMinimas(int *guesses,
 				}
 			}
 		}
-
-		a_prev_dist = a_dist;
-		a_dist = i_dist;
-		i_dist = b_dist;
-		b_dist = b_next_dist;
-		if(i + 2 < N_PLANES)
-			b_next_dist = fabs(dot(voxel, plane_eqs[i+2]));
+		a_smooth = i_smooth;
+		i_smooth = b_smooth;
+		b_smooth = 0.0f;
+		for(int j = 0; j < FILTER_HALFLENGTH*2; j++)
+		{
+			dists[j] = dists[j+1];
+			b_smooth += dists[j];
+		}
+		if(i + FILTER_HALFLENGTH < N_PLANES)
+			dists[FILTER_HALFLENGTH*2] = fabs(dot(voxel, plane_eqs[i + FILTER_HALFLENGTH]));
 		else
-			b_next_dist = INFINITY;
+			dists[FILTER_HALFLENGTH*2] = INFINITY;
+		
 	}
+
 	DEBUG_PRINTF("Found %d minima in total\n", nMinima);
 
 	return nMinima;
@@ -1448,16 +1455,13 @@ voxel_methods(int volume_xsize,
 	                                            in_bscans_b9 };
 
 
-	// For most of these algorithms we need to find some set of close planes.
-	// We find all planes that are inside the voxel radius
-	//	__local close_plane_t close_planes[(MAX_PLANES+1)*get_local_size(0)];
+
 	int n_close_planes;
 
 	float4 voxel = {x * volume_xspacing,
 	                0.0f,
 	                z * volume_zspacing,
 	                1.0f};
-	// Find the plane closest to the initial voxel
 
 
 	prepare_plane_eqs(plane_matrices, plane_eqs);
