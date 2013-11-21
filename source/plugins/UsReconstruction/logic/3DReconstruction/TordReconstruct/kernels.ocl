@@ -419,7 +419,7 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
 		                                  in_ysize,
 		                                  in_xspacing,
 		                                  in_yspacing	);
-		if(ret.x > 0)
+		if(ret.x != 0)
 		{
 			multistart_guesses[i] = ret.y;
 		}
@@ -475,6 +475,8 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 
 	// The index of the plane with the smallest distance found so far
 	int smallest_idx = guess;
+
+	float term_condition = fabs(dot(voxel, plane_eqs[guess])) + radius;
 
 	// The smallest distance found so far
 	float smallest_dist = 99999.9f;
@@ -591,12 +593,12 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 		// guaranteeing to find all relevant planes, and performance (terminating earlier).
 		// This should be investigate further.
 
-		int2 term_dists = {(abs_dists.x > 3.0f*radius)*doTermDistance, (abs_dists.y > 3.0f*radius)*doTermDistance };
+		int2 term_dists = {(abs_dists.x > term_condition)*doTermDistance, (abs_dists.y > term_condition)*doTermDistance };
 
 		int2 term_radius_jump = {fabs(diff_dists.x) > radius, fabs(diff_dists.y) > radius};
 		int2 term_boundaries = {idx.x == N_PLANES-1, idx.y == 0};
 
-		done = done + term_dists + term_boundaries + term_radius_jump;
+		done = done + term_dists + term_boundaries;// + term_radius_jump;
 
 	}
 
@@ -1263,57 +1265,116 @@ int findLocalMinimas(int *guesses,
 	// and b - a = LOCAL_SEARCH_DISTANCE, it's a good chance it's a minima.
 
 	int nMinima = 0;
+	float a_prev_dist, b_next_dist;
+	float a_dist, b_dist;
+	float i_dist;
+
+
+	a_prev_dist = INFINITY;
+	a_dist = INFINITY;
+	i_dist = fabs(dot(plane_eqs[0], voxel));
+	b_dist = fabs(dot(plane_eqs[1], voxel));
+	b_next_dist = fabs(dot(plane_eqs[2], voxel));
+
+	int prev_pos = -1;
+	float smallest_dist = INFINITY;
 	
 	for(int i = 0;
-	    i < N_PLANES &&
-		    nMinima < MAX_MULTISTART_STARTS;
+	    i < N_PLANES;
 	    i++)
 	{
 
+		float a_smooth, b_smooth, i_smooth;
+
 		/* int a = max(0, i - LOCAL_SEARCH_DISTANCE); */
 		/* int b = min(N_PLANES-1, i + LOCAL_SEARCH_DISTANCE); */
-		int a = i - LOCAL_SEARCH_DISTANCE;
-		int b = i + LOCAL_SEARCH_DISTANCE;
-		float a_dist, b_dist;
-		float i_dist = fabs(dot(plane_eqs[i], voxel));
+		int a = i - 1;
+		int b = i + 1;
 
-		// TODO: Unroll the end cases? Lots of branching for a quite bad reason here..
-		if(a < 0) a_dist = INFINITY;
-		else a_dist = fabs(dot(plane_eqs[a], voxel));
 
-		if(b >= N_PLANES) b_dist = INFINITY;
-		else b_dist = fabs(dot(plane_eqs[b], voxel));
+#define W_A 1
+#define W_B 1
+#define W_C 1
+#define smoothed(a, b, c) W_A*a + W_B * b + W_C * c
+		a_smooth =  smoothed(a_prev_dist ,  a_dist , i_dist);
 
-		if(a_dist > i_dist && b_dist > i_dist)
+		b_smooth = smoothed(i_dist , b_dist , b_next_dist);
+
+		i_smooth = smoothed(a_dist , i_dist , b_dist);
+
+		if((a_smooth >= i_smooth && b_smooth >= i_smooth) || i_dist < radius || i_dist < smallest_dist)
 		{
 			// We are inside a local minima. Now, how do we know we haven't found this minima before?
 			// We require that they be spaced by at least LOCAL_SEARCH_DISTANCE.
 			// However, if this minima is better (i.e. closer) than the previous one
 			// inside LOCAL_SEARCH_DISTANCE,
 			// of course we want to use this one.
-			if(nMinima > 0 && i - guesses[nMinima-1] < LOCAL_SEARCH_DISTANCE*2)
+			if(prev_pos >= 0 && i - guesses[prev_pos] < LOCAL_SEARCH_DISTANCE)
 			{
 				DEBUG_PRINTF("Minima %d: Found nearby minima: %d : %f\n", nMinima, i, i_dist);
 				// We have a previous minima, and it's too close.
-				float prev_dist = fabs(dot(plane_eqs[guesses[nMinima-1]], voxel));
+				float prev_dist = fabs(dot(plane_eqs[guesses[prev_pos]], voxel));
 				if(i_dist < prev_dist)
 				{
 					DEBUG_PRINTF("Taking it\n");
 					// But this one is better, lets use it
-					guesses[nMinima-1] = i;
+					guesses[prev_pos] = i;
+					if(i_dist < smallest_dist)
+					{
+						smallest_dist = i_dist;
+					}
 				}
 			}
-			else
+			else if(nMinima < MAX_MULTISTART_STARTS)
 			{
 				// We may simply store this minima
 				DEBUG_PRINTF("Minima %d: Found new minima: %d : %f\n", nMinima, i, i_dist);
 				guesses[nMinima] = i;
+				prev_pos = nMinima;
+				if(i_dist < smallest_dist)
+				{
+					smallest_dist = i_dist;
+				}
 				nMinima++;
 			}
+			else {
+				// We already have MAX_MULTISTART_STARTS minimas, so now pick the "worst" minima
+				// and toss it out for this one
+
+				float biggest = INFINITY;
+				float tmp;
+				int biggest_idx = 0;
+				for(int j = 0; j < nMinima; j++)
+				{
+					tmp = fabs(dot(plane_eqs[guesses[j]], voxel));
+					if(tmp > biggest)
+					{
+						biggest_idx = j;
+						biggest = tmp;
+					}
+				}
+				DEBUG_PRINTF("Switching out %d for %d: %f vs %f\n", biggest_idx, i, biggest, i_dist);
+				guesses[biggest_idx] = i;
+				prev_pos = biggest_idx;
+
+				if(i_dist < smallest_dist)
+				{
+					smallest_dist = i_dist;
+				}
+			}
 		}
+
+		a_prev_dist = a_dist;
+		a_dist = i_dist;
+		i_dist = b_dist;
+		b_dist = b_next_dist;
+		if(i + 2 < N_PLANES)
+			b_next_dist = fabs(dot(voxel, plane_eqs[i+2]));
+		else
+			b_next_dist = INFINITY;
 	}
 	DEBUG_PRINTF("Found %d minima in total\n", nMinima);
-	
+
 	return nMinima;
 }
 
