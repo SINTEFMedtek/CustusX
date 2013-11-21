@@ -419,6 +419,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	messageManager()->sendInfo(QString("Device has %1 bytes of local memory\n")
 	                           .arg(dev_local_mem_size));
 	dev_local_mem_size -= constant_local_mem;
+	dev_local_mem_size -= constant_local_mem + 128;
 
 	// How many work items can the local mem support?
 
