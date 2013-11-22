@@ -715,7 +715,7 @@ TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction
 	                      root);
 	std::cout << "Reconstruction done\n";
 
-	float sse = volume.computeRMSError(outputData);
+	float sse = volume.computeRMSError(cx::ImagePtr(new cx::Image("",outputData)));
 
 	std::cout << "RMS value: " << sse << std::endl;
 	REQUIRE(sse < 15.0f);

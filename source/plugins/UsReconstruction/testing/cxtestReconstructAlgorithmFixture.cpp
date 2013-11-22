@@ -16,11 +16,15 @@
 
 #include "sscReconstructAlgorithm.h"
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
+#include "cxtestSphereSyntheticVolume.h"
 #include "catch.hpp"
 #include "sscPNNReconstructAlgorithm.h"
+#include "sscDataReaderWriter.h"
 #include "vtkImageData.h"
 #include <QDomElement>
-
+#include "sscImage.h"
+#include "sscRegistrationTransform.h"
+#include "sscVolumeHelpers.h"
 
 namespace cxtest
 {
@@ -35,6 +39,13 @@ void ReconstructAlgorithmFixture::setBoxAndLinesPhantom()
 	Eigen::Array3i dims(100, 100, 100);
 	mPhantom.reset(new cx::cxSimpleSyntheticVolume(dims));
 }
+
+void ReconstructAlgorithmFixture::setSpherePhantom()
+{
+	Eigen::Array3i dims(100, 100, 100);
+	mPhantom.reset(new cxtest::SphereSyntheticVolume(dims, cx::Vector3D(50,50,50), 10));
+}
+
 
 void ReconstructAlgorithmFixture::setWireCrossPhantom()
 {
@@ -68,7 +79,7 @@ void ReconstructAlgorithmFixture::generateInput()
 	mInputData = mPhantom->sampleUsData(planes,
 										pixelSpacing,
 										us_dims,
-										m_dMr,
+										mOutputData->get_rMd().inv(),
 										0.0,
 										0.0);
 	std::cout << "Done sampling\n";
@@ -77,10 +88,13 @@ void ReconstructAlgorithmFixture::generateInput()
 
 void ReconstructAlgorithmFixture::generateOutputVolume()
 {
-	mOutputData = vtkImageDataPtr::New();
-	mOutputData->SetExtent(0, 99, 0, 99, 0, 99);
-	mOutputData->SetSpacing(1, 1, 1);
-	m_dMr = cx::Transform3D::Identity();
+	Eigen::Array3i dim(100,100,100);
+	cx::Vector3D spacing = cx::Vector3D(1, 1, 1) * 1;
+	vtkImageDataPtr data = cx::generateVtkImageData(dim, spacing, 0);
+	cx::Transform3D rMd = cx::Transform3D::Identity();
+
+	mOutputData = cx::ImagePtr(new cx::Image("output", data));
+	mOutputData->get_rMd_History()->setRegistration(rMd);
 }
 
 void ReconstructAlgorithmFixture::reconstruct()
@@ -95,7 +109,7 @@ void ReconstructAlgorithmFixture::reconstruct()
 	QDomElement root = domDoc.createElement("TordTest");
 
 	mAlgorithm->reconstruct(mInputData,
-							mOutputData,
+							mOutputData->getBaseVtkImageData(),
 							root);
 	std::cout << "Reconstruction done\n";
 }
@@ -112,6 +126,24 @@ double ReconstructAlgorithmFixture::getRMS()
 	float sse = mPhantom->computeRMSError(mOutputData);
 	std::cout << "RMS value: " << sse << std::endl;
 	return sse;
+}
+
+//void ReconstructAlgorithmFixture::saveNominalOutputToFile(QString filename)
+//{
+//	vtkImageDataPtr data = vtkImageDataPtr::New();
+//	data->DeepCopy(mOutputData->getBaseVtkImageData());
+
+
+
+//	cx::ImagePtr image = cx::ImagePtr(new cx::Image("nominal", data));
+//	image->get_rMd_History()->setRegistration(mOutputData->get_rMd());
+
+//	cx::MetaImageReader().saveImage(image, filename);
+//}
+
+void ReconstructAlgorithmFixture::saveOutputToFile(QString filename)
+{
+	cx::MetaImageReader().saveImage(mOutputData, filename);
 }
 
 } // namespace cxtest

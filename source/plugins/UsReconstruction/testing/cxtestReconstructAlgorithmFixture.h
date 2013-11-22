@@ -44,20 +44,24 @@ class ReconstructAlgorithmFixture
 public:
 	void setAlgorithm(cx::ReconstructAlgorithm* algorithm);
 	void setBoxAndLinesPhantom();
+	void setSpherePhantom();
 	void setWireCrossPhantom();
 	std::vector<cx::Transform3D> generateFrames_rMf_tilted();
 	void generateInput();
 	void generateOutputVolume();
 	void reconstruct();
 	void checkRMSBelow(double threshold);
-	double getRMS();
+
+	void saveOutputToFile(QString filename);
 
 private:
+	double getRMS();
+
 	cx::ReconstructAlgorithm* mAlgorithm;
 	cx::cxSyntheticVolumePtr mPhantom;
 	cx::ProcessedUSInputDataPtr mInputData;
-	vtkImageDataPtr mOutputData;
-	cx::Transform3D m_dMr;
+	cx::ImagePtr mOutputData;
+//	cx::Transform3D m_dMr;
 };
 
 } // namespace cxtest

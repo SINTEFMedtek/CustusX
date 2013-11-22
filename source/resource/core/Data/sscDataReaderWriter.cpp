@@ -243,6 +243,35 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 	return image;
 }
 
+void MetaImageReader::saveImage(ImagePtr image, const QString& filename)
+{
+	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
+	writer->SetInput(image->getBaseVtkImageData());
+	writer->SetFileDimensionality(3);
+//	QString filename = basePath + "/Images/" + image->getUid() + ".mhd";
+//	image->setFilename(QDir(basePath).relativeFilePath(filename));
+	writer->SetFileName(cstring_cast(filename));
+	QDir().mkpath(QFileInfo(filename).path());
+	std::cout << "saving to " << filename << std::endl;
+
+//	QString rawfilename = image->getUid() + ".raw";
+	QString rawfilename = QFileInfo(filename).completeBaseName() + ".raw";
+	std::cout << "raw: " << rawfilename << std::endl;
+
+	writer->SetRAWFileName(cstring_cast(rawfilename));
+	writer->SetCompression(false);
+	writer->Update();
+	writer->Write();
+
+	writer = 0;
+
+	CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
+	customReader->setTransform(image->get_rMd());
+	customReader->setModality(image->getModality());
+	customReader->setImageType(image->getImageType());
+}
+
+
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 ///--------------------------------------------------------
