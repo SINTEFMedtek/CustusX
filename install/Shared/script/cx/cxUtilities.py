@@ -36,6 +36,7 @@ def try_lxml_import():
         elif platform.system() == 'Linux':
             print "Try to install lxml using:"
             print "    sudo apt-get install -y python-pip libxml2-dev libxslt-dev"
+			print "    sudo easy_install lxml"
         raise
     
     
