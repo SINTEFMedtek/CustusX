@@ -90,6 +90,7 @@ public:
 	virtual DataPtr load(const QString& uid, const QString& filename);
 //	vtkImageDataPtr load(const QString& filename) { return this->loadVtkImageData(filename); }
 	virtual vtkImageDataPtr loadVtkImageData(QString filename);
+	void saveImage(ImagePtr image, const QString& filename);
 };
 
 /**\brief Reader for portable network graphics .png files.
