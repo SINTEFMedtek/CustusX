@@ -35,10 +35,12 @@ public:
 	}
 
 	virtual unsigned char
-	evaluate(const float x,
-	         const float y,
-	         const float z) const
+	evaluate(const cx::Vector3D &p) const
 	{
+		float x = p[0];
+		float y = p[1];
+		float z = p[2];
+
 		// Let's make a block in the middle of the volume
 		if(x > mDims(0)/3 && x < 2*mDims(0)/3
 		   && y > mDims(1)/3 && y < 2*mDims(1)/3

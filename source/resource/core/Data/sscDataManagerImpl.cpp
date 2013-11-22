@@ -238,33 +238,29 @@ void DataManagerImpl::loadData(DataPtr data)
 
 void DataManagerImpl::saveImage(ImagePtr image, const QString& basePath)
 {
-	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
-	writer->SetInput(image->getBaseVtkImageData());
-	writer->SetFileDimensionality(3);
-//	QString filename = basePath + "/" + image->getFilePath();
+//	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
+//	writer->SetInput(image->getBaseVtkImageData());
+//	writer->SetFileDimensionality(3);
 	QString filename = basePath + "/Images/" + image->getUid() + ".mhd";
-//	image->setFilename(filename);
 	image->setFilename(QDir(basePath).relativeFilePath(filename));
-	writer->SetFileName(cstring_cast(filename));
-	QDir().mkpath(QFileInfo(filename).path());
+//	writer->SetFileName(cstring_cast(filename));
+//	QDir().mkpath(QFileInfo(filename).path());
 
-	QString rawfilename = image->getUid() + ".raw";
-//        //Rename ending from .mhd to .raw
-//	QStringList splitName = qstring_cast(filename).split(".");
-//	splitName[splitName.size() - 1] = "raw";
-//	QString rawfilename = splitName.join(".");
+//	QString rawfilename = image->getUid() + ".raw";
 
-	writer->SetRAWFileName(cstring_cast(rawfilename));
-	writer->SetCompression(false);
-	writer->Update();
-	writer->Write();
+//	writer->SetRAWFileName(cstring_cast(rawfilename));
+//	writer->SetCompression(false);
+//	writer->Update();
+//	writer->Write();
 
-	writer = 0;
+//	writer = 0;
 
-	CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
-	customReader->setTransform(image->get_rMd());
-	customReader->setModality(image->getModality());
-	customReader->setImageType(image->getImageType());
+//	CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
+//	customReader->setTransform(image->get_rMd());
+//	customReader->setModality(image->getModality());
+//	customReader->setImageType(image->getImageType());
+
+	MetaImageReader().saveImage(image, filename);
 }
 
 // meshes
