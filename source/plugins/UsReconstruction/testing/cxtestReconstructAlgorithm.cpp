@@ -19,6 +19,7 @@
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #include "catch.hpp"
 #include "sscPNNReconstructAlgorithm.h"
+#include "QFileInfo"
 
 #include "cxtestReconstructAlgorithmFixture.h"
 
@@ -36,7 +37,21 @@ namespace cxtest
 //	CHECK(zeroRMS > 30.0);
 //}
 
-TEST_CASE("ReconstructAlgorithm: PNN on cross","[usreconstruction][synthetic][hide][ca_rec1]")
+TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[usreconstruction][synthetic][hide][ca_rec1]")
+{
+	ReconstructAlgorithmFixture fixture;
+	fixture.setSpherePhantom();
+	fixture.generateOutputVolume();
+	fixture.generateInput();
+
+	fixture.setAlgorithm(new cx::PNNReconstructAlgorithm());
+	fixture.reconstruct();
+
+	fixture.checkRMSBelow(15.0);
+	fixture.saveOutputToFile("/Users/christiana/test/sphere_rec.mhd");
+}
+
+TEST_CASE("ReconstructAlgorithm: PNN on box+lines, tilt","[usreconstruction][synthetic][hide][ca_rec2]")
 {
 	ReconstructAlgorithmFixture fixture;
 	fixture.setBoxAndLinesPhantom();
@@ -47,6 +62,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on cross","[usreconstruction][synthetic][hi
 	fixture.reconstruct();
 
 	fixture.checkRMSBelow(15.0);
+	fixture.saveOutputToFile("/Users/christiana/test/boxlines_rec.mhd");
 }
 
 
