@@ -24,13 +24,13 @@
 namespace cxtest
 {
 
-TEST_CASE("VLCRecorder can be constructed", "[unit][resource][core][VLCRecorder][VLC]")
+TEST_CASE("VLCRecorder can be constructed", "[unit][resource][core][VLCRecorder][VLC][unstable]")
 {
 	VLCRecorderFixture fix;
 	REQUIRE(cx::vlc());
 }
 
-TEST_CASE("VLCRecorder can find VLC application", "[unit][resource][core][VLCRecorder][VLC]")
+TEST_CASE("VLCRecorder can find VLC application", "[unit][resource][core][VLCRecorder][VLC][unstable]")
 {
 	VLCRecorderFixture fix;
 	CHECK(cx::vlc()->hasVLCApplication());
