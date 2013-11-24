@@ -628,8 +628,8 @@ TEST_CASE("ReconstructManager: B-Mode with synthetic data", "[usreconstruction][
 TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction][synthetic][hide]")
 {
 	
-	Eigen::Array3i dims(100, 100, 100);
-	cx::cxSimpleSyntheticVolume volume(dims);
+	cx::Vector3D bounds(100, 100, 100);
+	cx::cxSimpleSyntheticVolume volume(bounds);
 	cx::TordTest algorithm;
 
 	// FIXME: This should probably use the ReconstructManager somehow

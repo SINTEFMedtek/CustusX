@@ -42,26 +42,79 @@ namespace cxtest
 class ReconstructAlgorithmFixture
 {
 public:
-	void setAlgorithm(cx::ReconstructAlgorithm* algorithm);
+	ReconstructAlgorithmFixture();
+	void setAlgorithm(cx::ReconstructAlgorithmPtr algorithm);
+	void defineOutputVolume(double bounds, double spacing);
+	void defineProbeMovementNormalizedTranslationRange(double range);
+	void defineProbeMovementAngleRange(double range);
+	void defineProbeMovementSteps(int steps);
+	void defineProbe(cx::ProbeDefinition probe);
+
+	void setOverallBoundsAndSpacing(double size, double spacing);
+
+	void setVerbose(bool val) { mVerbose = val; }
+	bool getVerbose() const { return mVerbose; }
 	void setBoxAndLinesPhantom();
 	void setSpherePhantom();
 	void setWireCrossPhantom();
-	std::vector<cx::Transform3D> generateFrames_rMf_tilted();
+//	std::vector<cx::Transform3D> generateFrames_rMf_tilted();
+	std::vector<cx::Transform3D> generateFrames_rMt_tilted();
 	void generateInput();
 	void generateOutputVolume();
 	void reconstruct();
 	void checkRMSBelow(double threshold);
+	void checkCentroidDifferenceBelow(double val);
+	void checkMassDifferenceBelow(double val);
 
+	void saveNominalOutputToFile(QString filename);
 	void saveOutputToFile(QString filename);
+
+//	void generateInput_old();
+	void printConfiguration();
 
 private:
 	double getRMS();
+	cx::ImagePtr createOutputVolume(QString name);
+	cx::ImagePtr getNominalOutputImage();
 
-	cx::ReconstructAlgorithm* mAlgorithm;
+	/** Generate a sequence of planes using the input definition.
+	  * The planes work around p0, applying translation and rotation
+	  * simultaneously.
+	  */
+	std::vector<cx::Transform3D> generateFrames(cx::Vector3D p0,
+												cx::Vector3D range_translation,
+												double range_angle,
+												cx::Vector3D rotation_axis,
+												int steps);
+
+	cx::ReconstructAlgorithmPtr mAlgorithm;
 	cx::cxSyntheticVolumePtr mPhantom;
 	cx::ProcessedUSInputDataPtr mInputData;
 	cx::ImagePtr mOutputData;
+	bool mVerbose;
 //	cx::Transform3D m_dMr;
+
+	// setup parameters
+	cx::Vector3D mBounds;
+	struct OutputVolumeType
+	{
+		cx::Vector3D mBounds;
+		cx::Vector3D mSpacing;
+	};
+	OutputVolumeType mOutputVolumeDefinition;
+
+	cx::ProbeDefinition mProbe;
+
+	struct ProbeMovement
+	{
+		cx::Vector3D mRangeNormalizedTranslation;
+		double mRangeAngle;
+		double mSteps;
+	};
+	ProbeMovement mProbeMovementDefinition;
+
+	// cached values
+	cx::ImagePtr mNominalOutputImage;
 };
 
 } // namespace cxtest

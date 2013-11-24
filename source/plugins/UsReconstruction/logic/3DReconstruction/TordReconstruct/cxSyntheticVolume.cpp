@@ -5,6 +5,8 @@
 #include <time.h>
 #include "sscTypeConversions.h"
 #include <QTime>
+#include "sscLogger.h"
+#include "sscRegistrationTransform.h"
 
 double noiseValue(double noiseSigma,
                          double noiseMean)
@@ -19,6 +21,32 @@ double noiseValue(double noiseSigma,
 
 namespace cx {
 
+
+ProcessedUSInputDataPtr
+cxSyntheticVolume::sampleUsData(const std::vector<Transform3D>& planes_rMt,
+			 const ProbeDefinition& probe,
+			 const Transform3D& output_dMr,
+			 const double noiseSigma,
+			 const unsigned char noiseMean) const
+{
+	cx::ProbeSector sector;
+	sector.setData(probe);
+//	sector.get_uMv();
+
+	std::vector<Transform3D> planes_rMf(planes_rMt.size());
+	for (unsigned i=0; i<planes_rMt.size(); ++i)
+		planes_rMf[i] = planes_rMt[i] * sector.get_tMu() * sector.get_uMv();
+
+	Eigen::Array2f pixelSpacing = probe.getSpacing().block(0,0,2,1).cast<float>();
+	Eigen::Array2i sliceDimension(probe.getSize().width(), probe.getSize().height());
+
+	return this->sampleUsData(planes_rMf,
+							  pixelSpacing,
+							  sliceDimension,
+							  output_dMr,
+							  noiseSigma, noiseMean);
+}
+
 ProcessedUSInputDataPtr
 cxSyntheticVolume::sampleUsData(const std::vector<Transform3D>& planes_rMf,
                                 const Eigen::Array2f& pixelSpacing,
@@ -29,8 +57,8 @@ cxSyntheticVolume::sampleUsData(const std::vector<Transform3D>& planes_rMf,
 	// Seed the random number generator
 	srand(time(NULL));
 
-	QTime time;
-	time.start();
+//	QTime time;
+//	time.start();
 
 	std::vector<TimedPosition> positions;
 	std::vector<vtkImageDataPtr> images;
@@ -63,23 +91,8 @@ cxSyntheticVolume::sampleUsData(const std::vector<Transform3D>& planes_rMf,
 				const unsigned char val = this->evaluate(volume_coords);
 
 				const double noise_val = noiseValue(noiseSigma, noiseMean);
-
 				const int noised_val = noise_val + val;
-
-				unsigned char final_val;
-				if(noised_val < 0)
-				{
-					final_val = 0;
-				}
-				else if(noised_val > 255)
-				{
-					final_val = 255;
-				}
-				else
-				{
-					final_val = (unsigned char)noised_val;
-				}
-
+				unsigned char final_val = this->constrainToUnsignedChar(noised_val);
 				// Store that value in the US slice
 				us_data[px + py*sliceDimension[0]] = final_val;
 
@@ -95,7 +108,7 @@ cxSyntheticVolume::sampleUsData(const std::vector<Transform3D>& planes_rMf,
 		images.push_back(us_frame);
 	}
 
-	std::cout << "elapsed: " << time.elapsed() << std::endl;
+//	std::cout << "elapsed: " << time.elapsed() << std::endl;
 	// Make an empty mask
 	vtkImageDataPtr mask = vtkImageDataPtr::New();
 	mask->SetExtent(0, sliceDimension[0]-1, 0, sliceDimension[1]-1, 0, 0);
@@ -112,34 +125,182 @@ cxSyntheticVolume::sampleUsData(const std::vector<Transform3D>& planes_rMf,
 
 }
 
+unsigned char cxSyntheticVolume::constrainToUnsignedChar(const int val) const
+{
+	if(val < 0)
+	{
+		return 0;
+	}
+	else if(val > 255)
+	{
+		return 255;
+	}
+	else
+	{
+		return (unsigned char)val;
+	}
+}
 
 float cxSyntheticVolume::computeRMSError(ImagePtr vol)
 {
+	vtkImageDataPtr input = vol->getBaseVtkImageData();
+
+	vtkImageDataPtr nominal = vtkImageDataPtr::New();
+	nominal->DeepCopy(input);
+	cx::ImagePtr nominal_img(new cx::Image("nominal", nominal));
+	nominal_img->get_rMd_History()->setRegistration(vol->get_rMd());
+	this->fillVolume(nominal_img);
+
+	return calculateRMSError(input, nominal);
+}
+
+void cxSyntheticVolume::fillVolume(cx::ImagePtr vol)
+{
 	vtkImageDataPtr raw = vol->getBaseVtkImageData();
+	cx::Transform3D rMd = vol->get_rMd();
+
+	Eigen::Array3i dims = Eigen::Array3i(raw->GetDimensions());
+	Eigen::Array3d spacing = Eigen::Array3d(raw->GetSpacing());
+	unsigned char *pixels = (unsigned char*)raw->GetScalarPointer();
+
+	for(int z = 0; z < dims[2]; ++z)
+	{
+		for(int y = 0; y < dims[1]; ++y)
+		{
+			for(int x = 0; x < dims[0]; ++x)
+			{
+				Vector3D p_d = Vector3D(x, y, z).array()*spacing;
+				unsigned char our_value = evaluate(rMd.coord(p_d));
+
+				int index = x + y*dims[0] + z*dims[1]*dims[0];
+				pixels[index] =evaluate(rMd.coord(p_d));
+			}
+		}
+	}
+}
+
+double calculateRMSError(vtkImageDataPtr a, vtkImageDataPtr b)
+{
+	SSC_ASSERT(Eigen::Array3i(a->GetDimensions()).isApprox(Eigen::Array3i(b->GetDimensions())));
+	SSC_ASSERT(Eigen::Array3d(a->GetSpacing()).isApprox(Eigen::Array3d(b->GetSpacing())));
 
 	float sse = 0.0f;
-	int* dims = raw->GetDimensions();
-	unsigned char *pixels = (unsigned char*)raw->GetScalarPointer();
-	for(int z = 0; z < dims[2]; z++)
+	Eigen::Array3i dims = Eigen::Array3i(a->GetDimensions());
+	unsigned char *pa = (unsigned char*)a->GetScalarPointer();
+	unsigned char *pb = (unsigned char*)b->GetScalarPointer();
+
+	for(int z = 0; z < dims[2]; ++z)
 	{
-		for(int y = 0; y < dims[1]; y++)
+		for(int y = 0; y < dims[1]; ++y)
 		{
-			for(int x = 0; x < dims[0]; x++)
+			for(int x = 0; x < dims[0]; ++x)
 			{
-				unsigned char vol_value = pixels[x + y*dims[0] + z*dims[1]*dims[0]];
-				unsigned char our_value = evaluate(Vector3D(x, y, z));
-				float error = our_value - vol_value;
-//				if (our_value>0.5)
-//				std::cout << QString("[%1,%2,%3] = %4 - %5 = %6")
-//							 .arg(x).arg(y).arg(z)
-//							 .arg(our_value).arg(vol_value).arg(error) << std::endl;
+				int index = x + y*dims[0] + z*dims[1]*dims[0];
+				float error = pa[index] - pb[index];
 				sse += error*error;
 			}
 		}
 	}
-//	std::cout << "sse: " << sse << std::endl;
-//	std::cout << "tot: " << dims[0]*dims[1]*dims[2] << std::endl;
-	return sqrt(sse/(dims[0]*dims[1]*dims[2]));
+
+	return sqrt(sse/dims.prod());
+}
+
+/** Functor that calculates volume of input voxel sample.
+  *
+  */
+struct MassFunctor
+{
+	MassFunctor()
+	{
+		mSum = 0;
+		mThreshold = 2;
+	}
+
+	void operator()(int x, int y, int z, unsigned char* val)
+	{
+		if (*val < mThreshold)
+			return;
+		mSum += *val;
+	}
+
+	double getVolume()
+	{
+		return mSum;
+	}
+
+private:
+	double mSum;
+	unsigned char mThreshold;
+};
+
+/** Functor that calculates centroid of input voxel sample.
+  *
+  */
+struct CentroidFunctor
+{
+	CentroidFunctor()
+	{
+		mSum = 0;
+		mWeight = Vector3D::Zero();
+		mThreshold = 2;
+	}
+
+	void operator()(int x, int y, int z, unsigned char* val)
+	{
+		if (*val < mThreshold)
+			return;
+		mSum += *val;
+		mWeight += Vector3D(x,y,z) * (*val);
+	}
+
+	Vector3D getCentroid()
+	{
+		return mWeight/mSum;
+	}
+
+private:
+	double mSum;
+	Vector3D mWeight;
+	unsigned char mThreshold;
+};
+
+template<class FUNCTOR>
+void applyFunctor(cx::ImagePtr image, FUNCTOR& func)
+{
+	vtkImageDataPtr raw = image->getBaseVtkImageData();
+	Eigen::Array3i dims = Eigen::Array3i(raw->GetDimensions());
+	unsigned char *pixels = (unsigned char*)raw->GetScalarPointer();
+
+	for(int z = 0; z < dims[2]; ++z)
+	{
+		for(int y = 0; y < dims[1]; ++y)
+		{
+			for(int x = 0; x < dims[0]; ++x)
+			{
+				int index = x + y*dims[0] + z*dims[1]*dims[0];
+				func(x,y,z, pixels+index);
+			}
+		}
+	}
+}
+
+cx::Vector3D calculateCentroid(cx::ImagePtr image)
+{
+	vtkImageDataPtr raw = image->getBaseVtkImageData();
+	cx::Transform3D rMd = image->get_rMd();
+	Eigen::Array3d spacing = Eigen::Array3d(raw->GetSpacing());
+
+	CentroidFunctor func;
+	applyFunctor(image, func);
+	Vector3D ci = func.getCentroid().array() * spacing;
+	return rMd.coord(ci);
+}
+
+double calculateMass(cx::ImagePtr image)
+{
+	MassFunctor func;
+	applyFunctor(image, func);
+	return func.getVolume();
 }
 
 }

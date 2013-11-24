@@ -256,7 +256,7 @@ void MetaImageReader::saveImage(ImagePtr image, const QString& filename)
 
 //	QString rawfilename = image->getUid() + ".raw";
 	QString rawfilename = QFileInfo(filename).completeBaseName() + ".raw";
-	std::cout << "raw: " << rawfilename << std::endl;
+//	std::cout << "raw: " << rawfilename << std::endl;
 
 	writer->SetRAWFileName(cstring_cast(rawfilename));
 	writer->SetCompression(false);
