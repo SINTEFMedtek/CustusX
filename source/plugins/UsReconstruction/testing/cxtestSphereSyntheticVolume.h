@@ -28,10 +28,11 @@ namespace cxtest {
 class SphereSyntheticVolume : public cx::cxSyntheticVolume
 {
 public:
-	SphereSyntheticVolume(const Eigen::Array3i& dimensions, const cx::Vector3D& sphereCenter, double sphereRadius);
+	SphereSyntheticVolume(cx::Vector3D bounds);
+	void setSphere(const cx::Vector3D& center, double radius);
 
-	virtual unsigned char
-	evaluate(const cx::Vector3D& p) const;
+	virtual unsigned char evaluate(const cx::Vector3D& p) const;
+	virtual void printInfo() const;
 
 private:
 	double mRadius;

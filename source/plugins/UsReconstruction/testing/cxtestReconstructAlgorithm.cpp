@@ -19,53 +19,122 @@
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #include "catch.hpp"
 #include "sscPNNReconstructAlgorithm.h"
+#include "sscThunderVNNReconstructAlgorithm.h"
 #include "QFileInfo"
+#include "sscDummyTool.h"
+#include "TordReconstruct/TordTest.h"
 
 #include "cxtestReconstructAlgorithmFixture.h"
 
 namespace cxtest
 {
 
-//TEST_CASE("ReconstructAlgorithm: cross not reconstructed fails","[usreconstruction][synthetic][hide][ca_rec0]")
+TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthetic][ca_rec1][ca_rec]")
+{
+	ReconstructAlgorithmFixture fixture;
+	fixture.setOverallBoundsAndSpacing(100, 5);
+//	fixture.setVerbose(true);
+	fixture.setSpherePhantom();
+
+	fixture.setAlgorithm(cx::PNNReconstructAlgorithm::create());
+	fixture.reconstruct();
+
+	fixture.checkRMSBelow(20.0);
+	fixture.checkCentroidDifferenceBelow(1);
+	fixture.checkMassDifferenceBelow(0.01);
+
+	if (fixture.getVerbose())
+	{
+		fixture.saveOutputToFile("/Users/christiana/test/sphere_rec.mhd");
+		fixture.saveNominalOutputToFile("/Users/christiana/test/sphere_nom.mhd");
+	}
+}
+
+TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][synthetic][ca_rec5][ca_rec]")
+{
+	ReconstructAlgorithmFixture fixture;
+	fixture.defineProbeMovementSteps(40);
+	fixture.defineProbeMovementNormalizedTranslationRange(0.8);
+	fixture.defineProbeMovementAngleRange(M_PI/6);
+	fixture.defineOutputVolume(100, 2);
+	fixture.defineProbe(cx::DummyToolTestUtilities::createProbeDataLinear(100, 100, Eigen::Array2i(150,150)));
+//	fixture.setVerbose(true);
+	fixture.setSpherePhantom();
+
+	fixture.setAlgorithm(cx::PNNReconstructAlgorithm::create());
+	fixture.reconstruct();
+
+	fixture.checkRMSBelow(30.0);
+	fixture.checkCentroidDifferenceBelow(2);
+	fixture.checkMassDifferenceBelow(0.01);
+
+	if (fixture.getVerbose())
+	{
+		fixture.saveOutputToFile("/Users/christiana/test/sphere_rec.mhd");
+		fixture.saveNominalOutputToFile("/Users/christiana/test/sphere_nom.mhd");
+	}
+}
+
+//TEST_CASE("ReconstructAlgorithm: PNN on box+lines, tilt","[usreconstruction][synthetic][hide][ca_rec2]")
 //{
 //	ReconstructAlgorithmFixture fixture;
 //	fixture.setBoxAndLinesPhantom();
-//	fixture.generateInput();
-//	fixture.generateOutputVolume();
 
-//	double zeroRMS = fixture.getRMS();
-//	CHECK(zeroRMS > 30.0);
+//	fixture.setAlgorithm(cx::PNNReconstructAlgorithm::create());
+//	fixture.reconstruct();
+
+//	fixture.checkRMSBelow(15.0);
+//	fixture.checkCentroidDifferenceBelow(2);
+//	fixture.checkMassDifferenceBelow(0.05);
+
+////	fixture.saveOutputToFile("/Users/christiana/test/boxlines_rec.mhd");
 //}
 
-TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[usreconstruction][synthetic][hide][ca_rec1]")
+TEST_CASE("ReconstructAlgorithm: Thunder VNN on sphere","[unit][usreconstruction][synthetic][ca_rec3][ca_rec]")
 {
 	ReconstructAlgorithmFixture fixture;
+	fixture.setOverallBoundsAndSpacing(100, 5);
+	//fixture.setVerbose(true);
 	fixture.setSpherePhantom();
-	fixture.generateOutputVolume();
-	fixture.generateInput();
 
-	fixture.setAlgorithm(new cx::PNNReconstructAlgorithm());
+	fixture.setAlgorithm(cx::ThunderVNNReconstructAlgorithm::create(""));
 	fixture.reconstruct();
 
-	fixture.checkRMSBelow(15.0);
-	fixture.saveOutputToFile("/Users/christiana/test/sphere_rec.mhd");
+	fixture.checkRMSBelow(20.0);
+	fixture.checkCentroidDifferenceBelow(1);
+	fixture.checkMassDifferenceBelow(0.01);
+
+	if (fixture.getVerbose())
+	{
+		fixture.saveOutputToFile("/Users/christiana/test/sphere_thvnn_rec.mhd");
+		fixture.saveNominalOutputToFile("/Users/christiana/test/sphere_thvnn_nom.mhd");
+	}
 }
 
-TEST_CASE("ReconstructAlgorithm: PNN on box+lines, tilt","[usreconstruction][synthetic][hide][ca_rec2]")
+TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][usreconstruction][hide][synthetic]")
 {
 	ReconstructAlgorithmFixture fixture;
-	fixture.setBoxAndLinesPhantom();
-	fixture.generateOutputVolume();
-	fixture.generateInput();
+	fixture.setOverallBoundsAndSpacing(100, 5);
+	fixture.setSpherePhantom();
 
-	fixture.setAlgorithm(new cx::PNNReconstructAlgorithm());
+	boost::shared_ptr<cx::TordTest> algorithm(new cx::TordTest);
+
+	QDomDocument domDoc;
+	QDomElement root = domDoc.createElement("TordTest");
+
+	algorithm->getMethodOption(root)->setValue("VNN");
+	algorithm->getPlaneMethodOption(root)->setValue("Heuristic");
+	algorithm->getMaxPlanesOption(root)->setValue(8);
+	algorithm->getRadiusOption(root)->setValue(1);
+	algorithm->getNStartsOption(root)->setValue(1);
+
+	fixture.setAlgorithm(algorithm);
 	fixture.reconstruct();
 
-	fixture.checkRMSBelow(15.0);
-	fixture.saveOutputToFile("/Users/christiana/test/boxlines_rec.mhd");
+	fixture.checkRMSBelow(20.0);
+	fixture.checkCentroidDifferenceBelow(1);
+	fixture.checkMassDifferenceBelow(0.01);
 }
-
-
 
 } // namespace cxtest
 

@@ -13,14 +13,30 @@
 // See CustusX_License.txt for more information.
 
 #include "cxtestSphereSyntheticVolume.h"
+#include "sscTypeConversions.h"
 
 namespace cxtest {
 
-SphereSyntheticVolume::SphereSyntheticVolume(const Eigen::Array3i& dimensions,
-											 const cx::Vector3D& sphereCenter,
-											 double sphereRadius) :
-	cx::cxSyntheticVolume(dimensions), mCenter(sphereCenter), mRadius(sphereRadius)
+SphereSyntheticVolume::SphereSyntheticVolume(cx::Vector3D dimensions) :
+	cx::cxSyntheticVolume(dimensions)
 {
+	mCenter = mBounds/2;
+	mRadius = 0.6 * mBounds.array().minCoeff()/2;
+}
+
+void SphereSyntheticVolume::printInfo() const
+{
+	std::cout << QString("Volume: Sphere, bounds=[%1], C=[%2], R=[%3]")
+				 .arg(qstring_cast(mBounds))
+				 .arg(qstring_cast(mCenter))
+				 .arg(mRadius)
+				 << std::endl;
+}
+
+void SphereSyntheticVolume::setSphere(const cx::Vector3D& center, double radius)
+{
+	mCenter = center;
+	mRadius = radius;
 }
 
 unsigned char

@@ -11,7 +11,7 @@ namespace cx {
 /**
  * This abstract class provides an interface to synthetic volumes.
  * The requirements of this class are as follows:
- *  - The volume must be defined at every point inside the volume defined by [0, dimensions]
+ *  - The volume must be defined at every point inside the volume defined by [0, bounds]
  *  - The volume must be sliceable with any imaginable slice
  *  - The volume must be the same every time it is used (i.e. no randomness)
  *    - If you want to test noise suppression, add noise to the US slice after it has been sampled
@@ -21,23 +21,23 @@ namespace cx {
 class cxSyntheticVolume {
 public:
 
-	cxSyntheticVolume(const Eigen::Array3i& dimensions)
+	cxSyntheticVolume(Vector3D bounds)
 	{
-		mDims = dimensions;
+		mBounds = bounds;
 	}
 	virtual ~cxSyntheticVolume() { };
 
-	virtual Eigen::Array3i
-	getDimensions()
+	virtual Vector3D
+	getBounds()
 	{
-		return mDims;
+		return mBounds;
 	}
 
 	/**
 	 * Sample a set of ultrasound slices.
 	 * The planes to use are defined by planes. The Transform3D-s represent the transform
 	 * from image space to world space.
-	 * The volume is assumed to lie from [0, 0, 0] -> dimensions.
+	 * The volume is assumed to lie from [0, 0, 0] -> bounds.
 	 * If any part of an image plane is outside the definition of the volume,
 	 * the pixel value will be set to 0.
 	 * @param planes Transforms from image space to world space (and thus also volume space)
@@ -54,20 +54,33 @@ public:
 				 const Transform3D& output_dMr,
 	             const double noiseSigma,
 	             const unsigned char noiseMean) const;
+	virtual ProcessedUSInputDataPtr
+	sampleUsData(const std::vector<Transform3D>& planes_rMt,
+				 const ProbeDefinition& probe,
+				 const Transform3D& output_dMr,
+				 const double noiseSigma=0,
+				 const unsigned char noiseMean=0) const;
 
 	/**
 	 * Evaluate the volume at position (x, y, z).
 	 * The coordinates are given in volume space.
 	 */
-	virtual unsigned char
-	evaluate(const Vector3D& p) const = 0;
+	virtual unsigned char evaluate(const Vector3D& p) const = 0;
+	virtual void printInfo() const {}
 
+	void fillVolume(cx::ImagePtr vol);
 	virtual float computeRMSError(cx::ImagePtr vol);
 
 protected:
-	Eigen::Array3i mDims;
+	unsigned char constrainToUnsignedChar(const int val) const;
+
+	Vector3D mBounds;
 
 };
+
+double calculateRMSError(vtkImageDataPtr a, vtkImageDataPtr b);
+cx::Vector3D calculateCentroid(cx::ImagePtr image);
+double calculateMass(cx::ImagePtr image);
 
 }
 #endif
