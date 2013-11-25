@@ -7,7 +7,7 @@
 /*******************/
 
 
-#define CUBE_SIZE 16
+#define CUBE_SIZE 8
 
 #define N_BLOCKS 10
 
@@ -35,11 +35,9 @@
 
 // Local search related parameters
 
-#undef MAX_MULTISTART_STARTS
-#define MAX_MULTISTART_STARTS 5
 
-#define LOCAL_SEARCH_DISTANCE (N_PLANES/(MAX_MULTISTART_STARTS)) 
-/* #define LOCAL_SEARCH_DISTANCE 100 */
+//#define LOCAL_SEARCH_DISTANCE (N_PLANES/(MAX_MULTISTART_STARTS)) 
+#define LOCAL_SEARCH_DISTANCE 50
 /*****************/
 /* End constants */
 /*****************/
@@ -49,8 +47,8 @@
 /* Begin macros */
 /****************/
 
-#define DEBUG
-//#define CHECK_PLANE_INDICES
+//#define DEBUG
+#define CHECK_PLANE_INDICES
 
 #ifdef DEBUG
 #define DEBUG_PRINTF(...) if((get_global_id(0) % 5000) == 0) printf(##__VA_ARGS__)
@@ -176,7 +174,7 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
 #define MAX_MULTISTART_STARTS 1
 #endif
 
-#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j, k, l) findClosestPlanes_multistart(a, b, c, d, e, f, 0, g, h, i, j, k, l)
+#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j, k, l) findClosestPlanes_multistart(a, b, c, d, e, f, g, 0, h, i, j, k, l)
 #endif
 
 __global const unsigned char*
@@ -436,8 +434,10 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
 		                                  in_ysize,
 		                                  in_xspacing,
 		                                  in_yspacing	);
-
-		multistart_guesses[i] = ret.y;
+		if(ret.x > 0)
+		{
+			multistart_guesses[i] = ret.y;
+		}
 		found += ret.x;
 
 	}
@@ -1292,11 +1292,11 @@ int findLocalMinimas(int *guesses,
 	int nMinima = 1;
 
 	// Now with the cube-ish way of doing things, we may simply find all guesses that are closer than CUBE_SIZE * voxel_scale
-	float max_dist = 2*euclid_dist(out_xspacing * CUBE_SIZE, out_zspacing*CUBE_SIZE, out_yspacing*CUBE_SIZE);
+	float max_dist = euclid_dist(out_xspacing * CUBE_SIZE, out_zspacing*CUBE_SIZE, out_yspacing*CUBE_SIZE);
 	int prev_pos = 0;
 	float smallest_dist = fabs(dot(voxel, plane_eqs[0]));
 	guesses[0] = 0;
-	int px, py;
+
 	for(int i = 0;
 	    i < N_PLANES;
 	    i++)
@@ -1304,18 +1304,6 @@ int findLocalMinimas(int *guesses,
 		float dist = fabs(dot(voxel, plane_eqs[i]));
 		if(dist < max_dist)
 		{
-			float4 translated_voxel = projectOntoPlaneEq(voxel,
-			                                             plane_eqs[i],
-			                                             dot(voxel, plane_eqs[i]));
-			toImgCoord_int(&px, &py,
-			               translated_voxel,
-			               plane_matrices[i],
-			               in_xspacing,
-			               in_yspacing);
-			if(!isValidPixel(px, py, mask, in_xsize, in_ysize))
-			{
-				continue;
-			}
 
 			// We are inside a local minima. Now, how do we know we haven't found this minima before?
 			// We require that they be spaced by at least LOCAL_SEARCH_DISTANCE.
@@ -1434,10 +1422,21 @@ voxel_methods(int volume_xsize,
 
 	int id = get_global_id(0);
 
+	int xcubes = (volume_xsize / CUBE_SIZE) + 1;
+	int ycubes = (volume_ysize / CUBE_SIZE) + 1;
+	int zcubes = (volume_zsize / CUBE_SIZE) + 1;
 
-	int x_origin = (id % (volume_xsize / CUBE_SIZE)) * CUBE_SIZE;
-	int y_origin = (id / (volume_xsize / CUBE_SIZE)) % (volume_ysize / CUBE_SIZE) * CUBE_SIZE;
-	int z_origin = ((id / (volume_xsize / CUBE_SIZE)) / (volume_ysize / CUBE_SIZE)) * CUBE_SIZE;
+	int x_cube_id = id % xcubes;
+	int y_cube_id = (id / xcubes) % ycubes;
+	int z_cube_id = (id / (xcubes*ycubes));
+
+	int x_origin = x_cube_id * CUBE_SIZE;
+	int y_origin = y_cube_id * CUBE_SIZE;
+	int z_origin = z_cube_id * CUBE_SIZE;
+	/*	int x_origin = ((id % (volume_xsize / CUBE_SIZE)) + 1) * CUBE_SIZE;
+	int y_origin = (((id / (volume_xsize / CUBE_SIZE) + 1) % ((volume_ysize / CUBE_SIZE) + 1))) * CUBE_SIZE;
+	int z_origin = (((id / (volume_xsize / CUBE_SIZE) + 1) / ((volume_ysize / CUBE_SIZE) + 1))) * CUBE_SIZE; */
+
 
 	#ifdef DEBUG
 	if(id == 5000)
@@ -1550,7 +1549,8 @@ voxel_methods(int volume_xsize,
 					if(z >= volume_zsize) break;
 					BOUNDS_CHECK(z, 0, volume_zsize);
 
-
+					BOUNDS_CHECK(x, 0, volume_xsize);
+					BOUNDS_CHECK(y, 0, volume_ysize);
 					voxel.x = x * volume_xspacing;
 					voxel.y = y * volume_yspacing;
 					voxel.z = z * volume_zspacing;
