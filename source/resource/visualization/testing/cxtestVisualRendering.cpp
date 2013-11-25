@@ -211,7 +211,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 
 TEST_CASE_METHOD(VisualRenderingFixture,
 				 "Visual rendering: Show Axial GPU slice, 1 volume",
-				 "[unit][resource][visualization][not_apple][not_win32][not_win64][ca_special1]")
+				 "[unit][resource][visualization][not_apple][not_win32][not_win64][ca_special1][unstable]")
 {
 	this->setDescription("A  volumes, moving tool, GPU");
 
