@@ -7,7 +7,7 @@
 /*******************/
 
 
-#define CUBE_SIZE 8
+#define CUBE_SIZE 4
 
 #define N_BLOCKS 10
 
@@ -492,7 +492,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 	// The index of the plane with the smallest distance found so far
 	int smallest_idx = guess;
 
-	float term_condition = fabs(dot(voxel, plane_eqs[guess])) + 2*radius;
+	float term_condition = min(5*fabs(dot(voxel, plane_eqs[guess])), 3*radius);
 
 	// The smallest distance found so far
 	float smallest_dist = 99999.9f;
