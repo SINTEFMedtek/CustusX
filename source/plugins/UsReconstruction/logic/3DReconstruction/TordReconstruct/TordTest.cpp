@@ -453,13 +453,20 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                                         NULL));
 
 	messageManager()->sendInfo(QString("Kernel is using %1 bytes of local memory\n").arg(local_mem_size));
-	// Global work items:	
-	size_t global_work_size = (outputDims[0]*outputDims[2]);
+
+	// We will divide the work into cubes of CUBE_DIM^3 voxels. The global work size is the total number of voxels divided by
+	// that.
+	int cube_dim = 64;
+	int cube_dim_cubed = cube_dim*cube_dim*cube_dim;
+	// Global work items:
+	size_t global_work_size = ((outputDims[0]*outputDims[1]*outputDims[2]) / cube_dim_cubed) + 1;
+
+
 	// Round global_work_size up to nearest multiple of local_work_size
 	if(global_work_size % local_work_size)
 		global_work_size = ((global_work_size/local_work_size) + 1)*local_work_size;
 
-	
+
 	messageManager()->sendInfo(QString("Executing kernel"));
 	ocl_check_error(clEnqueueNDRangeKernel(moClContext->cmd_queue,
 	                                       mClKernel,
