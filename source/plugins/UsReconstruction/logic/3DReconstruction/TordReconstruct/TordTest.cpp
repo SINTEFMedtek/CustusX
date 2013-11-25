@@ -135,7 +135,7 @@ TordTest::initCL(QString kernelPath,
                  int nStarts)
 {
 	// Reusing initialization code from Thunder
-	moClContext = ocl_init("GPU");
+	moClContext = ocl_init("CPU");
 
 	size_t sourceLen;
 
@@ -418,7 +418,6 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	size_t varying_local_mem = (sizeof(cl_float)+sizeof(cl_int))*(nClosePlanes+1);
 	messageManager()->sendInfo(QString("Device has %1 bytes of local memory\n")
 	                           .arg(dev_local_mem_size));
-	dev_local_mem_size -= constant_local_mem;
 	dev_local_mem_size -= constant_local_mem + 128;
 
 	// How many work items can the local mem support?
@@ -456,7 +455,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 
 	// We will divide the work into cubes of CUBE_DIM^3 voxels. The global work size is the total number of voxels divided by
 	// that.
-	int cube_dim = 64;
+	int cube_dim = 16;
 	int cube_dim_cubed = cube_dim*cube_dim*cube_dim;
 	// Global work items:
 	size_t global_work_size = ((outputDims[0]*outputDims[1]*outputDims[2]) / cube_dim_cubed) + 1;
