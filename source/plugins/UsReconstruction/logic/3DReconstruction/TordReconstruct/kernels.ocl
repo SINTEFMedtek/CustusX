@@ -7,6 +7,7 @@
 /*******************/
 
 
+#define CUBE_SIZE 16
 
 #define N_BLOCKS 10
 
@@ -51,9 +52,11 @@
 //#define CHECK_PLANE_INDICES
 
 #ifdef DEBUG
-#define DEBUG_PRINTF(...) if((get_global_id(0) % 5000) == 0) printf(##__VA_ARGS__)
+#define DEBUG_PRINTF(...) if((get_global_id(0) % 16) == 0) printf(##__VA_ARGS__)
 //#define DEBUG_PRINTF(...) printf(##__VA_ARGS__)
-#define BOUNDS_CHECK(x, min, max) if(x < min || x >= max) printf("Line %d: %s out of range: %d min: %d max: %d\n", __LINE__, #x, x, min, max)
+//#define BOUNDS_CHECK(x, min, max) if(x < min || x >= max) printf("Line %d: %s out of range: %d min: %d max: %d\n", __LINE__, #x, x, min, max)
+#define BOUNDS_CHECK(x, min, max)
+
 #else
 #define DEBUG_PRINTF(...)
 #define BOUNDS_CHECK(x, min, max)
@@ -1435,8 +1438,12 @@ voxel_methods(int volume_xsize,
 {
 
 	int id = get_global_id(0);
-	int x = id % volume_xsize;
-	int z = id / volume_xsize;
+
+	id = id * (CUBE_SIZE*CUBE_SIZE*CUBE_SIZE);
+	int x_origin = id % volume_xsize;
+	int y_origin = (id / volume_xsize) % volume_ysize;
+	int z_origin = ((id / volume_xsize) / volume_ysize );
+
 	#ifdef DEBUG
 	if(id == 5000)
 		BOUNDS_CHECK(id, 0, 1);
@@ -1458,9 +1465,9 @@ voxel_methods(int volume_xsize,
 
 	int n_close_planes;
 
-	float4 voxel = {x * volume_xspacing,
-	                0.0f,
-	                z * volume_zspacing,
+	float4 voxel = {x_origin * volume_xspacing,
+	                y_origin * volume_yspacing,
+	                z_origin * volume_zspacing,
 	                1.0f};
 
 
@@ -1469,10 +1476,13 @@ voxel_methods(int volume_xsize,
 
 	// Return if x/z is invalid
 
-	if(z >= volume_zsize) return;
-	if(x >= volume_xsize) return;
-	BOUNDS_CHECK(x, 0, volume_xsize);
-	BOUNDS_CHECK(z, 0, volume_zsize);
+	if(z_origin >= volume_zsize) return;
+	if(x_origin >= volume_xsize) return;
+	if(y_origin >= volume_ysize) return;
+
+	BOUNDS_CHECK(x_origin, 0, volume_xsize);
+	BOUNDS_CHECK(y_origin, 0, volume_ysize);
+	BOUNDS_CHECK(z_origin, 0, volume_zsize);
 
 	int multistart_guesses[MAX_MULTISTART_STARTS];
 
@@ -1491,48 +1501,62 @@ voxel_methods(int volume_xsize,
 #endif
 
 	int2 close_planes_ret;
-	// Iterate over Y axis
-	for(int y = 0; y < volume_ysize; y++)
+	// Iterate over the axes
+	for(int xoffset = 0; xoffset < CUBE_SIZE; xoffset++)
 	{
-		BOUNDS_CHECK(y, 0, volume_ysize);
+		int x = x_origin + xoffset;
+		if(x >= volume_xsize) return;
+		BOUNDS_CHECK(x, 0, volume_xsize);
+
+		for(int yoffset = 0; yoffset < CUBE_SIZE; yoffset++)
+		{
+			int y = y_origin + yoffset;
+			if(y >= volume_ysize) return;
+			BOUNDS_CHECK(y, 0, volume_ysize);
+
+			for(int zoffset = 0; zoffset < CUBE_SIZE; zoffset++)
+				{
+					int z = z_origin + zoffset;
+					if(z >= volume_zsize) return;
+					BOUNDS_CHECK(z, 0, volume_zsize);
 
 
-		voxel.y = y*volume_yspacing;
+					voxel.x = x * volume_xspacing;
+					voxel.y = y * volume_yspacing;
+					voxel.z = z * volume_zspacing;
 
-		// Find all planes closer than radius
+					// Find all planes closer than radius
 
-		close_planes_ret = FIND_CLOSE_PLANES(close_planes,
-		                                     plane_eqs,
-		                                     plane_matrices,
-		                                     voxel,
-		                                     radius,
-		                                     multistart_guesses,
-		                                     nGuesses,
-		                                     mask,
-		                                     in_xsize,
-		                                     in_ysize,
-		                                     in_xspacing,
-		                                     in_yspacing);
-		n_close_planes = close_planes_ret.x;
-
+					close_planes_ret = FIND_CLOSE_PLANES(close_planes,
+					                                     plane_eqs,
+					                                     local_plane_matrices,
+					                                     voxel,
+					                                     radius,
+					                                     multistart_guesses,
+					                                     mask,
+					                                     in_xsize,
+					                                     in_ysize,
+					                                     in_xspacing,
+					                                     in_yspacing);
+					n_close_planes = close_planes_ret.x;
 
 
-		// Call appropriate method to determine pixel value
-		VOXEL(out_volume,x,y,z) = PERFORM_INTERPOLATION(close_planes,
-		                                                n_close_planes,
-		                                                plane_matrices,
-		                                                plane_eqs,
-		                                                bscans_blocks,
-		                                                in_xsize,
-		                                                in_ysize,
-		                                                in_xspacing,
-		                                                in_yspacing,
-		                                                mask,
-		                                                voxel);
 
-		//VOXEL(out_volume, x, y, z) = x;
-		//VOXEL(out_volume, x, y, z) = ((float)z/(float)volume_zsize) * 255;
-		//VOXEL(out_volume, x,y,z) = 1;
+					// Call appropriate method to determine pixel value
+					VOXEL(out_volume,x,y,z) = PERFORM_INTERPOLATION(close_planes,
+					                                                n_close_planes,
+					                                                local_plane_matrices,
+					                                                plane_eqs,
+					                                                bscans_blocks,
+					                                                in_xsize,
+					                                                in_ysize,
+					                                                in_xspacing,
+					                                                in_yspacing,
+					                                                mask,
+					                                                voxel);
 
+
+				}
+		}
 	}
 }
