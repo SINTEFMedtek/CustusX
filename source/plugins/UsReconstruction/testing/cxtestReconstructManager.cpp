@@ -628,8 +628,8 @@ TEST_CASE("ReconstructManager: B-Mode with synthetic data", "[usreconstruction][
 TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction][synthetic][hide]")
 {
 	
-	Eigen::Array3i dims(100, 100, 100);
-	cx::cxSimpleSyntheticVolume volume(dims);
+	cx::Vector3D bounds(100, 100, 100);
+	cx::cxSimpleSyntheticVolume volume(bounds);
 	cx::TordTest algorithm;
 
 	// FIXME: This should probably use the ReconstructManager somehow
@@ -700,6 +700,7 @@ TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction
 	cx::ProcessedUSInputDataPtr usData = volume.sampleUsData(planes,
 	                                                         pixelSpacing,
 	                                                         us_dims,
+															 cx::Transform3D::Identity(),
 	                                                         0.0,
 	                                                         0.0);
 	std::cout << "Done sampling\n";
@@ -714,7 +715,7 @@ TEST_CASE("ReconstructManager: With generated synthetic data","[usreconstruction
 	                      root);
 	std::cout << "Reconstruction done\n";
 
-	float sse = volume.computeRMSError(outputData);
+	float sse = volume.computeRMSError(cx::ImagePtr(new cx::Image("",outputData)));
 
 	std::cout << "RMS value: " << sse << std::endl;
 	REQUIRE(sse < 15.0f);

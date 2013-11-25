@@ -106,7 +106,7 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& nam
 	mInterpolationType = VTK_LINEAR_INTERPOLATION;
 	mUseCropping = false;
 	mCroppingBox_d = this->getInitialBoundingBox();
-
+	mModality = "SC";
 	//  mShading.on = false;
 	//  mShading.ambient = 0.2;
 	//  mShading.diffuse = 0.9;

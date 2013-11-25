@@ -41,6 +41,7 @@ namespace cx
 class PNNReconstructAlgorithm: public ReconstructAlgorithm
 {
 public:
+	static ReconstructAlgorithmPtr create() { return ReconstructAlgorithmPtr(new PNNReconstructAlgorithm()); }
 	PNNReconstructAlgorithm();
 	virtual ~PNNReconstructAlgorithm()
 	{
