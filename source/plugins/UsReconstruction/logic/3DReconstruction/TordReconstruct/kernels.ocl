@@ -38,7 +38,8 @@
 #undef MAX_MULTISTART_STARTS
 #define MAX_MULTISTART_STARTS 5
 
-#define LOCAL_SEARCH_DISTANCE (N_PLANES/(MAX_MULTISTART_STARTS))
+#define LOCAL_SEARCH_DISTANCE (N_PLANES/(MAX_MULTISTART_STARTS)) 
+/* #define LOCAL_SEARCH_DISTANCE 100 */
 /*****************/
 /* End constants */
 /*****************/
@@ -167,7 +168,7 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
                              float in_yspacing);
 
 #if PLANE_METHOD == PLANE_EXACT
-#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j, k, l) findClosestPlanes_multistart(a, b, c, d, e, f, 1, g, h, i, j, k, l)
+#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j, k, l) findClosestPlanes_multistart(a, b, c, d, e, f, g, 1, h, i, j, k, l)
 #elif PLANE_METHOD == PLANE_CLOSEST
 
 #ifdef MAX_MULTISTART_STARTS
@@ -437,10 +438,6 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
 		                                  in_yspacing	);
 
 		multistart_guesses[i] = ret.y;
-		if(i > 0 && ret.x == 0)
-		{
-			printf("Didn't find anything new\n");
-		}
 		found += ret.x;
 
 	}
@@ -563,7 +560,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 				max_idx = findHighestIdx(close_planes, MAX_PLANES);
 				max_dist = max(fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist), radius);
 
-				if(smallest_dist > abs_dists.x && fabs(diff_dists.x) < radius)
+				if(smallest_dist > abs_dists.x)
 				{
 					// Update next guess
 					smallest_dist = abs_dists.x;
@@ -598,7 +595,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 				found++;
 				max_idx = findHighestIdx(close_planes, MAX_PLANES);
 				max_dist = max(fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist), radius);
-				if(smallest_dist > abs_dists.y && fabs(diff_dists.y) < radius)
+				if(smallest_dist > abs_dists.y)
 				{
 					// Update next guess
 					smallest_dist = abs_dists.y;
