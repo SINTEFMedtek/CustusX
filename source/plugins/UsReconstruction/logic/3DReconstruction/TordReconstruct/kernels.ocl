@@ -35,9 +35,8 @@
 
 // Local search related parameters
 
-
 //#define LOCAL_SEARCH_DISTANCE (N_PLANES/(MAX_MULTISTART_STARTS)) 
-#define LOCAL_SEARCH_DISTANCE 50
+//#define LOCAL_SEARCH_DISTANCE 10
 /*****************/
 /* End constants */
 /*****************/
@@ -1292,18 +1291,18 @@ int findLocalMinimas(int *guesses,
 	int nMinima = 1;
 
 	// Now with the cube-ish way of doing things, we may simply find all guesses that are closer than CUBE_SIZE * voxel_scale
-	float max_dist = max(euclid_dist(out_xspacing * CUBE_SIZE, out_zspacing*CUBE_SIZE, out_yspacing*CUBE_SIZE), radius);
+	float max_dist = euclid_dist(out_xspacing * CUBE_SIZE, out_zspacing*CUBE_SIZE, out_yspacing*CUBE_SIZE) +  radius;
 	DEBUG_PRINTF("Max dist is %f\n", max_dist);
 	int prev_pos = 0;
 	float smallest_dist = fabs(dot(voxel, plane_eqs[0]));
 	guesses[0] = 0;
-
+	int hasHighSinceLastTaken = 1;
 	for(int i = 0;
 	    i < N_PLANES;
 	    i++)
 	{
 		float dist = fabs(dot(voxel, plane_eqs[i]));
-		if(dist < max_dist || dist < smallest_dist)
+		if(dist < max_dist)
 		{
 
 			// We are inside a local minima. Now, how do we know we haven't found this minima before?
@@ -1311,7 +1310,7 @@ int findLocalMinimas(int *guesses,
 			// However, if this minima is better (i.e. closer) than the previous one
 			// inside LOCAL_SEARCH_DISTANCE,
 			// of course we want to use this one.
-			if(prev_pos >= 0 && i - guesses[prev_pos] < LOCAL_SEARCH_DISTANCE)
+			if(!hasHighSinceLastTaken)
 			{
 				DEBUG_PRINTF("Minima %d: Found nearby minima: %d : %f\n", nMinima, i, dist);
 				// We have a previous minima, and it's too close.
@@ -1321,10 +1320,7 @@ int findLocalMinimas(int *guesses,
 					DEBUG_PRINTF("Taking it\n");
 					// But this one is better, lets use it
 					guesses[prev_pos] = i;
-					if(dist < smallest_dist)
-					{
-						smallest_dist = dist;
-					}
+					hasHighSinceLastTaken = 0;
 				}
 			}
 			else if(nMinima < MAX_MULTISTART_STARTS)
@@ -1333,10 +1329,7 @@ int findLocalMinimas(int *guesses,
 				DEBUG_PRINTF("Minima %d: Found new minima: %d : %f\n", nMinima, i, dist);
 				guesses[nMinima] = i;
 				prev_pos = nMinima;
-				if(dist < smallest_dist)
-				{
-					smallest_dist = dist;
-				}
+				hasHighSinceLastTaken = 0;
 				nMinima++;
 			}
 			else {
@@ -1346,6 +1339,7 @@ int findLocalMinimas(int *guesses,
 				float biggest = -INFINITY;
 				float tmp;
 				int biggest_idx = 0;
+				hasHighSinceLastTaken = 0;
 				for(int j = 0; j < nMinima; j++)
 				{
 					tmp = fabs(dot(plane_eqs[guesses[j]], voxel));
@@ -1358,12 +1352,11 @@ int findLocalMinimas(int *guesses,
 				DEBUG_PRINTF("Switching out %d for %d: %f vs %f\n", biggest_idx, i, biggest, dist);
 				guesses[biggest_idx] = i;
 				prev_pos = biggest_idx;
-
-				if(dist < smallest_dist)
-				{
-					smallest_dist = dist;
-				}
 			}
+		}
+		else
+		{
+			hasHighSinceLastTaken = 1;
 		}
 	}
 
