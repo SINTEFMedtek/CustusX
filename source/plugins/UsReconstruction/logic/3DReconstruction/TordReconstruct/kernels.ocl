@@ -491,7 +491,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 	// The index of the plane with the smallest distance found so far
 	int smallest_idx = guess;
 
-	float term_condition = min(5*fabs(dot(voxel, plane_eqs[guess])), 3*radius);
+	float term_condition = clamp(fabs(dot(voxel, plane_eqs[guess])), radius, 3*radius);
 
 	// The smallest distance found so far
 	float smallest_dist = 99999.9f;
@@ -501,6 +501,8 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 
 	// The biggest distance found so far
 	float max_dist = min(fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist), radius);
+
+
 
 	// If guess is 0, we will try to access data for plane id -1, which does not exist.
 	// Assume plane 1 is close enough in that case
