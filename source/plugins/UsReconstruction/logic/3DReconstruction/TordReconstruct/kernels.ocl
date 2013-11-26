@@ -1529,48 +1529,74 @@ voxel_methods(int volume_xsize,
 /* 		} */
 /* 	} */
 /* #endif */
-	
+
 	int2 close_planes_ret;
-	// Iterate over the axes
+	// Iterate over the axes such that the the
+	// next voxel is always a neighbour of the previous voxel
 	for(int xoffset = 0; xoffset < CUBE_SIZE; xoffset++)
 	{
 		int x = x_origin + xoffset;
 		if(x >= volume_xsize) break;
 		BOUNDS_CHECK(x, 0, volume_xsize);
 
-		for(int yoffset = 0; yoffset < CUBE_SIZE; yoffset++)
+		int ystart, yend, ydir;
+		if(xoffset % 2)
+		{
+			ystart = CUBE_SIZE-1;
+			yend = -1;
+			ydir = -1;
+		}
+		else {
+			ystart = 0;
+			yend = CUBE_SIZE;
+			ydir = 1;
+		}
+
+		for(int yoffset = ystart; yoffset != yend ; yoffset+=ydir)
 		{
 			int y = y_origin + yoffset;
 			if(y >= volume_ysize) break;
 			BOUNDS_CHECK(y, 0, volume_ysize);
 
-			for(int zoffset = 0; zoffset < CUBE_SIZE; zoffset++)
-				{
-					int z = z_origin + zoffset;
-					if(z >= volume_zsize) break;
-					BOUNDS_CHECK(z, 0, volume_zsize);
+			int zstart, zend, zdir;
+			if(yoffset % 2 && xoffset % 2)
+			{
+				zstart = CUBE_SIZE-1;
+				zend = -1;
+				zdir = -1;
+			}
+			else {
+				zstart = 0;
+				zend = CUBE_SIZE;
+				zdir = 1;
+			}
+			for(int zoffset = zstart; zoffset != zend ; zoffset+=zdir)
+			{
+				int z = z_origin + zoffset;
+				if(z >= volume_zsize) break;
+				BOUNDS_CHECK(z, 0, volume_zsize);
 
-					BOUNDS_CHECK(x, 0, volume_xsize);
-					BOUNDS_CHECK(y, 0, volume_ysize);
-					voxel.x = x * volume_xspacing;
-					voxel.y = y * volume_yspacing;
-					voxel.z = z * volume_zspacing;
+				BOUNDS_CHECK(x, 0, volume_xsize);
+				BOUNDS_CHECK(y, 0, volume_ysize);
+				voxel.x = x * volume_xspacing;
+				voxel.y = y * volume_yspacing;
+				voxel.z = z * volume_zspacing;
 
-					// Find all planes closer than radius
+				// Find all planes closer than radius
 
-					close_planes_ret = FIND_CLOSE_PLANES(close_planes,
-					                                     plane_eqs,
-					                                     plane_matrices,
-					                                     voxel,
-					                                     radius,
-					                                     multistart_guesses,
-					                                     nGuesses,
-					                                     mask,
-					                                     in_xsize,
-					                                     in_ysize,
-					                                     in_xspacing,
-					                                     in_yspacing);
-					n_close_planes = close_planes_ret.x;
+				close_planes_ret = FIND_CLOSE_PLANES(close_planes,
+				                                     plane_eqs,
+				                                     plane_matrices,
+				                                     voxel,
+				                                     radius,
+				                                     multistart_guesses,
+				                                     nGuesses,
+				                                     mask,
+				                                     in_xsize,
+				                                     in_ysize,
+				                                     in_xspacing,
+				                                     in_yspacing);
+				n_close_planes = close_planes_ret.x;
 
 
 
