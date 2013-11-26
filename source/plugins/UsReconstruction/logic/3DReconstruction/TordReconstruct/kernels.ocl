@@ -1351,9 +1351,12 @@ int findLocalMinimas(int *guesses,
 						biggest = tmp;
 					}
 				}
-				DEBUG_PRINTF("Switching out %d for %d: %f vs %f\n", biggest_idx, i, biggest, dist);
-				guesses[biggest_idx] = i;
-				prev_pos = biggest_idx;
+				if(biggest > dist)
+				{
+					DEBUG_PRINTF("Switching out %d for %d: %f vs %f\n", biggest_idx, i, biggest, dist);
+					guesses[biggest_idx] = i;
+					prev_pos = biggest_idx;
+				}
 			}
 		}
 		else
@@ -1420,7 +1423,6 @@ voxel_methods(int volume_xsize,
 
 	int xcubes = (volume_xsize / CUBE_SIZE) + 1;
 	int ycubes = (volume_ysize / CUBE_SIZE) + 1;
-	int zcubes = (volume_zsize / CUBE_SIZE) + 1;
 
 	int x_cube_id = id % xcubes;
 	int y_cube_id = (id / xcubes) % ycubes;
