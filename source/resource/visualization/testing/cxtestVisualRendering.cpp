@@ -100,7 +100,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 
 TEST_CASE_METHOD(VisualRenderingFixture,
 				 "Visual rendering: Show 3D 2 volumes - snwGPU multivolume render",
-				 "[integration][resource][visualization][not_apple][not_win32][not_win64]")
+				 "[integration][resource][visualization][not_apple][not_win32][not_win64][unstable]")
 {
 	this->setDescription("3D Composites (2 volumes), moving tool");
 	QStringList images; images << image[1] << image[2];
