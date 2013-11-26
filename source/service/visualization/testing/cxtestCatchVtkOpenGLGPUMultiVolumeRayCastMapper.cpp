@@ -177,8 +177,7 @@ TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can two kaisa in separate locati
 	int numberOfVolumes = 2;
 	VtkOpenGLGPUMultiVolumeRayCastMapperFixture fixture(numberOfVolumes);
 
-//	std::string filename = "/home/christiana/dev/working/CustusX3/CustusX3/data/Phantoms/Kaisa/MetaImage/Kaisa.mhd";
-	std::string filename = "~/dev/working/CustusX3/CustusX3/data/Phantoms/Kaisa/MetaImage/Kaisa.mhd";
+	std::string filename = "/home/christiana/dev/working/CustusX3/CustusX3/data/Phantoms/Kaisa/MetaImage/Kaisa.mhd";
 
 	vtkImageDataPtr image = fixture.loadVtkImageData(filename);
 	vtkVolumePropertyPtr property = fixture.getVolumeProperty(100,300);
