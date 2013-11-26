@@ -558,7 +558,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 				// Find the next candidate for eviction -
 				// the plane with the longest distance to the voxel
 				max_idx = findHighestIdx(close_planes, MAX_PLANES);
-				max_dist = max(fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist), radius);
+				max_dist = min(fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist), radius);
 
 				if(smallest_dist > abs_dists.x)
 				{
@@ -594,7 +594,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 				CLOSE_PLANE_IDX(close_planes, max_idx).plane_id = idx.y;
 				found++;
 				max_idx = findHighestIdx(close_planes, MAX_PLANES);
-				max_dist = max(fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist), radius);
+				max_dist = min(fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist), radius);
 				if(smallest_dist > abs_dists.y)
 				{
 					// Update next guess
@@ -1292,7 +1292,8 @@ int findLocalMinimas(int *guesses,
 	int nMinima = 1;
 
 	// Now with the cube-ish way of doing things, we may simply find all guesses that are closer than CUBE_SIZE * voxel_scale
-	float max_dist = euclid_dist(out_xspacing * CUBE_SIZE, out_zspacing*CUBE_SIZE, out_yspacing*CUBE_SIZE);
+	float max_dist = max(euclid_dist(out_xspacing * CUBE_SIZE, out_zspacing*CUBE_SIZE, out_yspacing*CUBE_SIZE), radius);
+	DEBUG_PRINTF("Max dist is %f\n", max_dist);
 	int prev_pos = 0;
 	float smallest_dist = fabs(dot(voxel, plane_eqs[0]));
 	guesses[0] = 0;
@@ -1302,7 +1303,7 @@ int findLocalMinimas(int *guesses,
 	    i++)
 	{
 		float dist = fabs(dot(voxel, plane_eqs[i]));
-		if(dist < max_dist)
+		if(dist < max_dist || dist < smallest_dist)
 		{
 
 			// We are inside a local minima. Now, how do we know we haven't found this minima before?
