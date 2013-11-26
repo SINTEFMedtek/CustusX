@@ -90,7 +90,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 ////	fixture.saveOutputToFile("/Users/christiana/test/boxlines_rec.mhd");
 //}
 
-TEST_CASE("ReconstructAlgorithm: Thunder VNN on sphere","[unit][usreconstruction][synthetic][ca_rec3][ca_rec]")
+TEST_CASE("ReconstructAlgorithm: Thunder VNN on sphere","[unit][usreconstruction][synthetic][ca_rec3][ca_rec][not_amd_gpu]")
 {
 	ReconstructAlgorithmFixture fixture;
 	fixture.setOverallBoundsAndSpacing(100, 5);
