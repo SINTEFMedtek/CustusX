@@ -96,11 +96,19 @@ public:
 	virtual DoubleDataAdapterXmlPtr getNStartsOption(QDomElement root);
 
 	/**
-	 * Make weight function option for the Anisotropic method for the UI
-	 * @param root The root of the configuration UI
-	 * @return List of available weight functions
+	 * Make brightness weight(anisotropic method only) option for the UI
+	 * @param root The root of the configuration ui
+	 * @return Number of multistart search starts option
 	 */
-	virtual StringDataAdapterXmlPtr getAnisotropicWeightFunctionOption(QDomElement root);
+	virtual DoubleDataAdapterXmlPtr getBrightnessWeightOption(QDomElement root);
+
+		/**
+	 * Make Newness weight(anisotropic method only) option for the UI
+	 * @param root The root of the configuration ui
+	 * @return Number of multistart search starts option
+	 */
+	virtual DoubleDataAdapterXmlPtr getNewnessWeightOption(QDomElement root);
+	
 protected:
 
 	/**
@@ -126,7 +134,8 @@ protected:
 	 * @param method The method ID. See kernels.ocl for more information
 	 * @param planeMethod the plane method ID. See kernels.ocl for more information
 	 * @param nStarts number of starts for multistart search for close planes
-	 * @param weightID The ID of the weight function to use with anisotropic filter
+	 * @param brightnessWeight The extra weight to give pixels brighter than mean
+	 * @param newnessWeight The extra weight to give pixels newer than mean
 	 * @return True on success
 	 * @sa buildCLProgram
 	 */
@@ -136,8 +145,8 @@ protected:
 	                    int method,
 	                    int planeMethod,
 	                    int nStarts,
-	                    int weightID);
-	
+	                    float brightnessWeight,
+	                    float newnessWeight);
 	/**
 	 * Build the OpenCL kernel
 	 * @param program_src The kernel source code
@@ -146,8 +155,9 @@ protected:
 	 * @param method The method ID. See kernels.ocl for more information
 	 * @param planeMethod the plane method ID. See kernels.ocl for more information
 	 * @param nStarts number of starts for multistart search for close planes
-	 * @param weightID The ID of the weight function to use with anisotropic filter
 	 * @param kernelPath The path of the kernel source code
+	 * @param brightnessWeight The extra weight to give pixels brighter than mean
+	 * @param newnessWeight The extra weight to give pixels newer than mean
 	 * @return True on suc
 	 */
 	virtual cl_program buildCLProgram(const char* program_src, 
@@ -156,7 +166,8 @@ protected:
 	                                  int method,
 	                                  int planeMethod,
 	                                  int nStarts,
-	                                  int weightID,
+	                                  float brightnessWeight,
+	                                  float newnessWeight,
 	                                  QString kernelPath);
 	/**
 	 * Perform GPU Reconstruction.
@@ -227,13 +238,6 @@ protected:
 	 */
 	virtual int getPlaneMethodID(QDomElement root);
 
-	/**
-	 * Retrieve the anisotropic weight function ID from the settings
-	 * @param root The algorithm settings from the UI
-	 * @return the anisotropic weight function ID to use in the OpenCL kernel
-	 */	
-	virtual int
-	getAnisotropicWeightID(QDomElement root);
 
 
 	/// OpenCL handles
@@ -245,7 +249,7 @@ protected:
 	// Method names. Indices into this array corresponds to method IDs in the OpenCL Kernel.
 	std::vector<QString> mMethods;
 	std::vector<QString> mPlaneMethods;
-	std::vector<QString> mAnisotropicWeights;
+
 	
 };
 

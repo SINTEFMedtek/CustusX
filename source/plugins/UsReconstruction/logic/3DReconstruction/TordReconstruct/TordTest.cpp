@@ -18,10 +18,6 @@ TordTest::TordTest()
 	mMethods.push_back("Anisotropic");
 	mPlaneMethods.push_back("Heuristic");
 	mPlaneMethods.push_back("Closest");
-	mAnisotropicWeights.push_back("Distance");
-	mAnisotropicWeights.push_back("Distance and brightness");
-	mAnisotropicWeights.push_back("Distance and newness");
-
 }
 
 TordTest::~TordTest()
@@ -40,7 +36,8 @@ TordTest::getSettings(QDomElement root)
 	retval.push_back(this->getPlaneMethodOption(root));
 	retval.push_back(this->getMaxPlanesOption(root));
 	retval.push_back(this->getNStartsOption(root));
-	retval.push_back(this->getAnisotropicWeightFunctionOption(root));
+	retval.push_back(this->getNewnessWeightOption(root));
+	retval.push_back(this->getBrightnessWeightOption(root));
 	return retval;
 }
 
@@ -63,25 +60,28 @@ TordTest::getMethodOption(QDomElement root)
 	                                        root);
 }
 
-StringDataAdapterXmlPtr
-TordTest::getAnisotropicWeightFunctionOption(QDomElement root)
+DoubleDataAdapterXmlPtr
+TordTest::getNewnessWeightOption(QDomElement root)
 {
-	QStringList methods;
-	for(std::vector<QString>::iterator it = mAnisotropicWeights.begin();
-	    it != mAnisotropicWeights.end();
-	    it++)
-	{
-		QString method = *it;
-		methods << method;
-	}
-	return StringDataAdapterXml::initialize("Anisotropic weight function",
-	                                        "",
-	                                        "Weight function to use with anisotropic method",
-	                                        methods[0],
-	                                        methods,
+	return DoubleDataAdapterXml::initialize("Newness weight", "",
+	                                        "Newness weight",
+	                                        1,
+	                                        DoubleRange(0.0, 10, 0.1),
+	                                        1,
 	                                        root);
 }
 
+
+DoubleDataAdapterXmlPtr
+TordTest::getBrightnessWeightOption(QDomElement root)
+{
+	return DoubleDataAdapterXml::initialize("Brightness weight", "",
+	                                        "Brightness weight",
+	                                        1,
+	                                        DoubleRange(0.0, 10, 0.1),
+	                                        1,
+	                                        root);
+}
 
 StringDataAdapterXmlPtr
 TordTest::getPlaneMethodOption(QDomElement root)
@@ -151,14 +151,6 @@ TordTest::getPlaneMethodID(QDomElement root)
 		) - mPlaneMethods.begin();
 }
 
-int
-TordTest::getAnisotropicWeightID(QDomElement root)
-{
-	return find(mAnisotropicWeights.begin(),
-	            mAnisotropicWeights.end(),
-	            this->getAnisotropicWeightFunctionOption(root)->getValue()
-		) - mAnisotropicWeights.begin();
-}
 
 bool
 TordTest::initCL(QString kernelPath,
@@ -167,7 +159,8 @@ TordTest::initCL(QString kernelPath,
                  int method,
                  int planeMethod,
                  int nStarts,
-                 int weightID
+                 float brightnessWeight,
+                 float newnessWeight
 	)
 {
 	// Reusing initialization code from Thunder
@@ -185,7 +178,8 @@ TordTest::initCL(QString kernelPath,
 	                                            method,
 	                                            planeMethod,
 	                                            nStarts,
-	                                            weightID,
+	                                            brightnessWeight,
+	                                            newnessWeight,
 	                                            kernelPath);
 
 	if(clprogram == NULL) return false;
@@ -203,7 +197,8 @@ TordTest::buildCLProgram(const char* program_src,
                          int method,
                          int planeMethod,
                          int nStarts,
-                         int weightID,
+                         float newnessWeight,
+                         float brightnessWeight,
                          QString kernelPath)
 {
 	cl_program retval;
@@ -216,8 +211,14 @@ TordTest::buildCLProgram(const char* program_src,
 
 	ocl_check_error(err);
 
-	QString define = "-D MAX_PLANES=%1 -D N_PLANES=%2 -D METHOD=%3 -D PLANE_METHOD=%4 -D MAX_MULTISTART_STARTS=%5 -D ANISOTROPIC_WEIGHT_METHOD=%6";
-		define = define.arg(nMaxPlanes).arg(nPlanes).arg(method).arg(planeMethod).arg(nStarts).arg(weightID);
+	QString define = "-D MAX_PLANES=%1 -D N_PLANES=%2 -D METHOD=%3 -D PLANE_METHOD=%4 -D MAX_MULTISTART_STARTS=%5 -D NEWNESS_FACTOR=%6 -D BRIGHTNESS_FACTOR=%7";
+	define = define.arg(nMaxPlanes)
+		.arg(nPlanes)
+		.arg(method)
+		.arg(planeMethod)
+		.arg(nStarts)
+		.arg(newnessWeight)
+		.arg(brightnessWeight);
 
 	err = clBuildProgram(retval, 0, NULL, define.toStdString().c_str(), 0, 0);
 
@@ -597,8 +598,9 @@ TordTest::reconstruct(ProcessedUSInputDataPtr input,
 	float radius = getRadiusOption(settings)->getValue();
 	int planeMethod = getPlaneMethodID(settings);
 	int nStarts = getNStartsOption(settings)->getValue();
-	int weightID = getAnisotropicWeightID(settings);
-		
+	float newnessWeight = getNewnessWeightOption(settings)->getValue();
+	float brightnessWeight = getBrightnessWeightOption(settings)->getValue();
+	
 	messageManager()->sendInfo(
 		QString("Method: %1, radius: %2, planeMethod: %3, nClosePlanes: %4, nPlanes: %5, nStarts: %6 ")
 		.arg(method)
@@ -614,7 +616,8 @@ TordTest::reconstruct(ProcessedUSInputDataPtr input,
 	           method,
 	           planeMethod,
 	           nStarts,
-	           weightID
+	           newnessWeight,
+	           brightnessWeight
 		   )) return false;
 
 	bool ret = doGPUReconstruct(input, outputData, radius, nClosePlanes );
