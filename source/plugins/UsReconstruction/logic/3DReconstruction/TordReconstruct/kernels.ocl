@@ -30,6 +30,10 @@
 #define ANISOTROPIC_METHOD_BILINEAR_ON_PLANE 1
 #define ANISOTROPIC_METHOD_GAUSSIAN_ON_PLANE 2
 
+#define ANISOTROPIC_WEIGHT_METHOD_DISTANCE 0
+#define ANISOTROPIC_WEIGHT_METHOD_BRIGHTNESS 1
+#define ANISOTROPIC_WEIGHT_METHOD_LATENESS 2
+
 
 #define ANISOTROPIC_METHOD ANISOTROPIC_METHOD_BILINEAR_ON_PLANE
 
@@ -80,13 +84,29 @@
 #define WEIGHT_INV4(x) (1.0f/fabs(x*x*x*x))
 #define WEIGHT_SUB(x) (1.0f - fabs(x))
 
+
+#define ANISOTROPIC_GAUSS_WEIGHT(px, var, mean, sigma) WEIGHT_GAUSS(px.dist, sigma)
+#define ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, sigma) \
+	WEIGHT_GAUSS(px.dist + (px.intensity - (mean))/(mean), sigma)
+#define ANISOTROPIC_WEIGHT_LATENESS(px, var, mean, sigma) \
+	WEIGHT_GAUSS(px.dist + (px.plane_id - N_PLANES/2)/N_PLANES, sigma)
+
+
+#if ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_DISTANCE
+#define ANISOTROPIC_WEIGHT(px, var, mean, sigma) ANISOTROPIC_GAUSS_WEIGHT(px, var, mean, sigma)
+#elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_BRIGHTNESS
+#define ANISOTROPIC_WEIGHT(px, var, mean, sigma) ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, sigma)
+#elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_LATENESS
+#define ANISOTROPIC_WEIGHT(px, var, mean, sigma) ANISOTROPIC_WEIGHT_LATENESS(px, var, mean, sigma)
+
+
 // Gaussian weight function
 #define WEIGHT_GAUSS_SIGMA (0.05f)
 
 #define WEIGHT_GAUSS_SQRT_2PI 2.506628275f
 
-#define WEIGHT_GAUSS_NONEXP_PART(sigma) (1.0f/(sigma*WEIGHT_GAUSS_SQRT_2PI))
-#define WEIGHT_GAUSS_EXP_PART(dist, sigma) exp(-(dist*dist)/(2*sigma*sigma))
+#define WEIGHT_GAUSS_NONEXP_PART(sigma) (1.0f/((sigma)*WEIGHT_GAUSS_SQRT_2PI))
+#define WEIGHT_GAUSS_EXP_PART(dist, sigma) exp(-((dist)*(dist))/(2*(sigma)*(sigma)))
 
 #define WEIGHT_GAUSS(x, sigma) (WEIGHT_GAUSS_NONEXP_PART(sigma)*WEIGHT_GAUSS_EXP_PART(x, sigma))
 
@@ -113,6 +133,7 @@ typedef struct _pixel
 {
 	unsigned char intensity;
 	float dist;
+	int plane_id;
 } pixel_t;
 
 /***************/
@@ -1118,6 +1139,7 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 				float sq_y = dist_y*dist_y;
 				float cp_dist = CLOSE_PLANE_IDX(close_planes ,i).dist;
 				pixels[pos].dist = sqrt(cp_dist*cp_dist + sq_x + sq_y);
+				pixels[pos].plane_id = CLOSE_PLANE_IDX(close_planes, i).plane_id;
 				pos++;
 			}
 		}
@@ -1147,6 +1169,7 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 		                                              y,
 		                                              image,
 		                                              in_xsize);
+		pixels[pos].plane_id = CLOSE_PLANE_IDX(close_planes, i).plane_id;
 		pixels[pos++].dist = CLOSE_PLANE_IDX(close_planes, i).dist;
 
 #elif ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_GAUSSIAN_ON_PLANE
@@ -1179,6 +1202,7 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 			}
 		}
 		pixels[pos].intensity = gauss_value / gauss_weight_sum;
+		pixels[pos].plane_id = CLOSE_PLANE_IDX(close_planes, i).plane_id;
 		pixels[pos++].dist = CLOSE_PLANE_IDX(close_planes, i).dist;
 #endif
 
@@ -1234,7 +1258,7 @@ pixel_t anisotropicFilter(const pixel_t *pixels,
 	// Use the resulting gauss sigma to calcualte weights
 	for(int i = 0; i < n_planes; i++)
 	{
-		float weight = WEIGHT_GAUSS(pixels[i].dist, gauss_sigma);
+		float weight = ANISOTROPIC_WEIGHT(pixels[i], variance, mean_value, gauss_sigma);
 		sum = mad(pixels[i].intensity,weight, sum);
 		sum_weights += weight;
 	}
