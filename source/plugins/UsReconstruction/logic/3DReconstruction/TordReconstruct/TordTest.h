@@ -95,6 +95,12 @@ public:
 	 */
 	virtual DoubleDataAdapterXmlPtr getNStartsOption(QDomElement root);
 
+	/**
+	 * Make weight function option for the Anisotropic method for the UI
+	 * @param root The root of the configuration UI
+	 * @return List of available weight functions
+	 */
+	virtual StringDataAdapterXmlPtr getAnisotropicWeightFunctionOption(QDomElement root);
 protected:
 
 	/**
@@ -120,6 +126,7 @@ protected:
 	 * @param method The method ID. See kernels.ocl for more information
 	 * @param planeMethod the plane method ID. See kernels.ocl for more information
 	 * @param nStarts number of starts for multistart search for close planes
+	 * @param weightID The ID of the weight function to use with anisotropic filter
 	 * @return True on success
 	 * @sa buildCLProgram
 	 */
@@ -128,7 +135,8 @@ protected:
 	                    int nPlanes,
 	                    int method,
 	                    int planeMethod,
-	                    int nStarts);
+	                    int nStarts,
+	                    int weightID);
 	
 	/**
 	 * Build the OpenCL kernel
@@ -138,6 +146,7 @@ protected:
 	 * @param method The method ID. See kernels.ocl for more information
 	 * @param planeMethod the plane method ID. See kernels.ocl for more information
 	 * @param nStarts number of starts for multistart search for close planes
+	 * @param weightID The ID of the weight function to use with anisotropic filter
 	 * @param kernelPath The path of the kernel source code
 	 * @return True on suc
 	 */
@@ -147,6 +156,7 @@ protected:
 	                                  int method,
 	                                  int planeMethod,
 	                                  int nStarts,
+	                                  int weightID,
 	                                  QString kernelPath);
 	/**
 	 * Perform GPU Reconstruction.
@@ -217,6 +227,15 @@ protected:
 	 */
 	virtual int getPlaneMethodID(QDomElement root);
 
+	/**
+	 * Retrieve the anisotropic weight function ID from the settings
+	 * @param root The algorithm settings from the UI
+	 * @return the anisotropic weight function ID to use in the OpenCL kernel
+	 */	
+	virtual int
+	getAnisotropicWeightID(QDomElement root);
+
+
 	/// OpenCL handles
 	cl_kernel mClKernel;
 	std::vector<cl_mem> mVClMemBscan;
@@ -226,6 +245,7 @@ protected:
 	// Method names. Indices into this array corresponds to method IDs in the OpenCL Kernel.
 	std::vector<QString> mMethods;
 	std::vector<QString> mPlaneMethods;
+	std::vector<QString> mAnisotropicWeights;
 	
 };
 
