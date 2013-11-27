@@ -39,7 +39,7 @@ TEST_CASE("TubeSegmentationFramework can load parameter file", "[integration]")
 	helper.testLoadParameterFile();
 }
 
-TEST_CASE("TubeSegmentationFramework default preset works", "[integration]")
+TEST_CASE("TubeSegmentationFramework default preset works", "[integration][unstable]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testDefaultPreset();
@@ -51,7 +51,7 @@ TEST_CASE("TubeSegmentationFramework SyntheticVascusynthPreset works", "[integra
 	helper.testSyntheticVascusynthPreset();
 }
 
-TEST_CASE("TubeSegmentationFramework PhantomAccUSPreset works", "[integration]")
+TEST_CASE("TubeSegmentationFramework PhantomAccUSPreset works", "[integration][unstable]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testPhantomAccUSPreset();
