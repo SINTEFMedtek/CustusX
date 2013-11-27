@@ -124,6 +124,7 @@ TEST_CASE("ReconstructAlgorithm: Thunder VNN on sphere","[unit][usreconstruction
 TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][usreconstruction][hide][synthetic]")
 {
 	ReconstructAlgorithmFixture fixture;
+
 	fixture.setOverallBoundsAndSpacing(100, 5);
 	fixture.setSpherePhantom();
 	QDomDocument domdoc;
@@ -131,14 +132,13 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][usreconstr
 	boost::shared_ptr<cx::TordTest> algorithm(new cx::TordTest);
 
 	fixture.setAlgorithm(algorithm);
-
+	algorithm->getRadiusOption(settings)->setValue(10);
 	SECTION("VNN")
 	{
 		std::cerr << "Testing VNN\n";
 		algorithm->getMethodOption(settings)->setValue("VNN");
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
 		algorithm->getMaxPlanesOption(settings)->setValue(8);
-		algorithm->getRadiusOption(settings)->setValue(1);
 		algorithm->getNStartsOption(settings)->setValue(1);
 	}
 	SECTION("VNN2")
@@ -147,7 +147,6 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][usreconstr
 		algorithm->getMethodOption(settings)->setValue("VNN2");
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
 		algorithm->getMaxPlanesOption(settings)->setValue(8);
-		algorithm->getRadiusOption(settings)->setValue(1);
 		algorithm->getNStartsOption(settings)->setValue(1);
 	}
 	SECTION("DW")
@@ -156,7 +155,6 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][usreconstr
 		algorithm->getMethodOption(settings)->setValue("DW");
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
 		algorithm->getMaxPlanesOption(settings)->setValue(8);
-		algorithm->getRadiusOption(settings)->setValue(1);
 		algorithm->getNStartsOption(settings)->setValue(1);
 	}
 	SECTION("Anisotropic")
@@ -165,8 +163,9 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][usreconstr
 		algorithm->getMethodOption(settings)->setValue("Anisotropic");
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
 		algorithm->getMaxPlanesOption(settings)->setValue(8);
-		algorithm->getRadiusOption(settings)->setValue(1);
 		algorithm->getNStartsOption(settings)->setValue(1);
+		algorithm->getBrightnessWeightOption(settings)->setValue(0);
+		algorithm->getNewnessWeightOption(settings)->setValue(0);
 	}
 	SECTION("Multistart search")
 	{
@@ -174,7 +173,6 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][usreconstr
 		algorithm->getMethodOption(settings)->setValue("VNN");
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
 		algorithm->getMaxPlanesOption(settings)->setValue(8);
-		algorithm->getRadiusOption(settings)->setValue(1);
 		algorithm->getNStartsOption(settings)->setValue(5);
 	}
 
