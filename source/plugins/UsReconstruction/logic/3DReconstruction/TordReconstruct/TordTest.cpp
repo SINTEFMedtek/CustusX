@@ -454,7 +454,8 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	// Now find the largest multiple of the preferred work group size that will fit into local mem
 
 	size_t constant_local_mem = sizeof(cl_float)*4*nPlanes;
-	size_t varying_local_mem = (sizeof(cl_float)+sizeof(cl_int))*(nClosePlanes+1);
+	size_t varying_local_mem = (sizeof(cl_float)+sizeof(cl_short) + sizeof(cl_uchar) + sizeof(cl_uchar))
+		*(nClosePlanes+1);
 	messageManager()->sendInfo(QString("Device has %1 bytes of local memory\n")
 	                           .arg(dev_local_mem_size));
 	dev_local_mem_size -= constant_local_mem + 128;
