@@ -89,7 +89,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 
 TEST_CASE_METHOD(VisualRenderingFixture,
 				 "Visual rendering: Show 3D volume - snwGPU multivolume render",
-				 "[unit][resource][visualization][not_apple][not_win32][not_win64][unstable]")
+				 "[integration][resource][visualization][not_apple][not_win32][not_win64][unstable]")
 {
 	this->setDescription("3D Volume, moving tool, GPU");
 	REQUIRE(this->define3DGPU(QStringList(image[0]), NULL, 0, 0));
@@ -100,7 +100,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 
 TEST_CASE_METHOD(VisualRenderingFixture,
 				 "Visual rendering: Show 3D 2 volumes - snwGPU multivolume render",
-				 "[unit][resource][visualization][not_apple][not_win32][not_win64]")
+				 "[integration][resource][visualization][not_apple][not_win32][not_win64][unstable]")
 {
 	this->setDescription("3D Composites (2 volumes), moving tool");
 	QStringList images; images << image[1] << image[2];
@@ -211,7 +211,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 
 TEST_CASE_METHOD(VisualRenderingFixture,
 				 "Visual rendering: Show Axial GPU slice, 1 volume",
-				 "[unit][resource][visualization][not_apple][not_win32][not_win64][ca_special1]")
+				 "[unit][resource][visualization][not_apple][not_win32][not_win64][ca_special1][unstable]")
 {
 	this->setDescription("A  volumes, moving tool, GPU");
 

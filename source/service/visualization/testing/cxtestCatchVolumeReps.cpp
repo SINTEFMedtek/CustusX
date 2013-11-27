@@ -109,7 +109,7 @@ private:
 	unsigned int mViewAxisSize;
 };
 
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 1 small volume.", "[rep][unit][visualization]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 1 small volume.", "[rep][integration][visualization]")//not stable as unit
 {
 	MehdiGPURayCastMultiVolumeRepFixture fixture;
 	fixture.setNumberOfImages(1);
@@ -119,7 +119,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 1 small volume.", "[rep][uni
 	fixture.requireRepRender();
 }
 
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[rep][unit][visualization][unstable]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 small volumes.", "[rep][integration][visualization]")//not stable as unit
 {
 	MehdiGPURayCastMultiVolumeRepFixture fixture;
 	fixture.setNumberOfImages(3);
@@ -141,7 +141,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can render 3 large volumes.", "[rep][in
 }
 
 // vtk emits PreRender end ERROR (x502) Invalid operation when this is run after another mehdi test.
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can crop 1 small volume.", "[rep][unit][visualization][unstable]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can crop 1 small volume.", "[rep][integration][visualization]")//not stable as unit
 {
 	MehdiGPURayCastMultiVolumeRepFixture fixture;
 	fixture.setNumberOfImages(1);
@@ -158,7 +158,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can crop 1 small volume.", "[rep][unit]
 }
 
 // vtk emits PreRender end ERROR (x502) Invalid operation when this is run after another mehdi test.
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can crop completely 1 small volume.", "[rep][unit][visualization][unstable]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can crop completely 1 small volume.", "[rep][integration][visualization]")//not stable as unit
 {
 	MehdiGPURayCastMultiVolumeRepFixture fixture;
 	fixture.setNumberOfImages(1);
@@ -175,7 +175,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can crop completely 1 small volume.", "
 }
 
 // vtk emits PreRender end ERROR (x502) Invalid operation when this is run after another mehdi test.
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip 1 small volume.", "[rep][unit][visualization][unstable]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip 1 small volume.", "[rep][integration][visualization]")//not stable as unit
 {
 	MehdiGPURayCastMultiVolumeRepFixture fixture;
 	fixture.setNumberOfImages(1);
@@ -192,7 +192,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip 1 small volume.", "[rep][unit]
 }
 
 // vtk emits PreRender end ERROR (x502) Invalid operation when this is run after another mehdi test.
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can remove 1 small volume with clipper.", "[rep][unit][visualization][unstable]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can remove 1 small volume with clipper.", "[rep][integration][visualization]")//not stable as unit
 {
 	MehdiGPURayCastMultiVolumeRepFixture fixture;
 	fixture.setNumberOfImages(1);
@@ -209,7 +209,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can remove 1 small volume with clipper.
 }
 
 // vtk emits PreRender end ERROR (x502) Invalid operation when this is run - in second part.
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip partially and fully 1 small volume.", "[rep][unit][visualization][unstable]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip partially and fully 1 small volume.", "[rep][unit][visualization][unstable]")//not stable as unit/integration
 {
 	MehdiGPURayCastMultiVolumeRepFixture fixture;
 	fixture.setNumberOfImages(2);
@@ -235,7 +235,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip partially and fully 1 small vo
 	REQUIRE(nonZero == Approx(0.0));
 }
 
-TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 small volume.", "[rep][unit][visualization][unstable]")
+TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 small volume.", "[rep][integration][visualization]")//not stable as unit
 {
 	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(3,3,3), 200);
 
@@ -261,7 +261,7 @@ TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 large volum
 	REQUIRE(fraction < 1);
 }
 
-TEST_CASE("VolumetricRep using vtkGPUVolumeRayCastMapper can render 1 small volume.", "[rep][unit][visualization][unstable]")
+TEST_CASE("VolumetricRep using vtkGPUVolumeRayCastMapper can render 1 small volume.", "[rep][integration][visualization]")//not stable as unit
 {
 	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(3,3,3), 200);
 
