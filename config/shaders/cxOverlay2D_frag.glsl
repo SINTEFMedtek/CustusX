@@ -1,4 +1,10 @@
 #version 120
+
+// Note:
+//  All content using the ${VAR} syntax is converted to valid glsl statements by the 
+//  preprocessor in the calling code. This trick bypasses limitations on the Mac
+//  AMD platforms.
+
 const int layers = ${LAYERS};
 
 uniform sampler3D texture[layers];
@@ -27,21 +33,17 @@ float windowLevel(float x, float window_, float level_)
 
 /** Workaround for Mac/AMD: cannot index lut using variable
   */
-//work in progress
-/*
 vec4 sampleLut(in int index, in float idx)
 {
-    if (index==0)
-        return texture1D(lut[0], idx);
-    else if (index==1)
-        return texture1D(lut[1], idx);
-    else if (index==2)
-        return texture1D(lut[2], idx);
-    else if (index==3)
-        return texture1D(lut[3], idx);
+${SAMPLE_LUT_CONTENT}
+//    if (index==0)
+//        return texture1D(lut[0], idx);
+//    else if (index==1)
+//        return texture1D(lut[1], idx);
+//    ...
     return vec4(1.0,0.0,0.0,1.0);
 }
-*/
+
 /** Map Luminance volume layer N through a window/level/llr + lut
  *
  */
