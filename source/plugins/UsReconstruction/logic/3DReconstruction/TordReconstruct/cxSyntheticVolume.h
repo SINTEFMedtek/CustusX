@@ -78,6 +78,8 @@ protected:
 
 };
 
+typedef boost::shared_ptr<cxSyntheticVolume> cxSyntheticVolumePtr;
+
 double calculateRMSError(vtkImageDataPtr a, vtkImageDataPtr b);
 cx::Vector3D calculateCentroid(cx::ImagePtr image);
 double calculateMass(cx::ImagePtr image);
