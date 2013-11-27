@@ -32,12 +32,15 @@ namespace cxtest
 TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthetic][ca_rec1][ca_rec]")
 {
 	ReconstructAlgorithmFixture fixture;
+	QDomDocument domdoc;
+	QDomElement settings = domdoc.createElement("PNN");
+
 	fixture.setOverallBoundsAndSpacing(100, 5);
 //	fixture.setVerbose(true);
 	fixture.setSpherePhantom();
 
 	fixture.setAlgorithm(cx::PNNReconstructAlgorithm::create());
-	fixture.reconstruct();
+	fixture.reconstruct(settings);
 
 	fixture.checkRMSBelow(20.0);
 	fixture.checkCentroidDifferenceBelow(1);
@@ -52,6 +55,9 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthe
 
 TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][synthetic][ca_rec5][ca_rec]")
 {
+	QDomDocument domdoc;
+	QDomElement settings = domdoc.createElement("PNN");
+
 	ReconstructAlgorithmFixture fixture;
 	fixture.defineProbeMovementSteps(40);
 	fixture.defineProbeMovementNormalizedTranslationRange(0.8);
@@ -62,7 +68,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 	fixture.setSpherePhantom();
 
 	fixture.setAlgorithm(cx::PNNReconstructAlgorithm::create());
-	fixture.reconstruct();
+	fixture.reconstruct(settings);
 
 	fixture.checkRMSBelow(30.0);
 	fixture.checkCentroidDifferenceBelow(2);
@@ -93,12 +99,16 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 TEST_CASE("ReconstructAlgorithm: Thunder VNN on sphere","[unit][usreconstruction][synthetic][ca_rec3][ca_rec][not_amd_gpu]")
 {
 	ReconstructAlgorithmFixture fixture;
+
+	QDomDocument domdoc;
+	QDomElement settings = domdoc.createElement("ThunderVNN");
+
 	fixture.setOverallBoundsAndSpacing(100, 5);
 	//fixture.setVerbose(true);
 	fixture.setSpherePhantom();
 
 	fixture.setAlgorithm(cx::ThunderVNNReconstructAlgorithm::create(""));
-	fixture.reconstruct();
+	fixture.reconstruct(settings);
 
 	fixture.checkRMSBelow(20.0);
 	fixture.checkCentroidDifferenceBelow(1);
@@ -116,9 +126,12 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][usreconstr
 	ReconstructAlgorithmFixture fixture;
 	fixture.setOverallBoundsAndSpacing(100, 5);
 	fixture.setSpherePhantom();
+	QDomDocument domdoc;
+	QDomElement settings = domdoc.createElement("TordTest");
 
 	boost::shared_ptr<cx::TordTest> algorithm(new cx::TordTest);
 
+	fixture.setAlgorithm(algorithm);
 	QDomDocument domDoc;
 	QDomElement root = domDoc.createElement("TordTest");
 
@@ -128,8 +141,8 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][usreconstr
 	algorithm->getRadiusOption(root)->setValue(1);
 	algorithm->getNStartsOption(root)->setValue(1);
 
+	fixture.reconstruct(settings);
 	fixture.setAlgorithm(algorithm);
-	fixture.reconstruct();
 
 	fixture.checkRMSBelow(20.0);
 	fixture.checkCentroidDifferenceBelow(1);
