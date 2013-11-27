@@ -24,7 +24,7 @@ public:
 	/** NOTE: will work on Windows only if VLCs "Allow only one instance" is checked in VLC gui (--one-instance commandline option is broken for windows) */
 	void checkThatVLCCanRecordTheScreen(int secondsToRecord);
 
-	void checkIsMovieFilePlayable();
+	void checkIsMovieFileOfValidSize();
 
 private:
 	void createMovieFilePath();

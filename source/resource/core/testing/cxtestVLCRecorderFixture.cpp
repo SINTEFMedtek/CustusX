@@ -8,6 +8,7 @@
 
 #include "catch.hpp"
 #include <QDir>
+#include <QFileInfo>
 
 namespace cxtest
 {
@@ -49,12 +50,13 @@ void VLCRecorderFixture::checkThatVLCCanRecordTheScreen(int secondsToRecord)
 	CHECK_FALSE(cx::vlc()->isRecording());
 }
 
-void VLCRecorderFixture::checkIsMovieFilePlayable()
+void VLCRecorderFixture::checkIsMovieFileOfValidSize()
 {
 	CHECK(QFile::exists(mMoviePath));
 
-	cx::vlc()->play(mMoviePath);
-	CHECK(cx::vlc()->waitForStarted());
-	CHECK(cx::vlc()->waitForFinished());
+	QFileInfo info(mMoviePath);
+
+	int byteSizeForUnfinishedMovies = 717; //number fetched on a mac
+	CHECK(info.size() > byteSizeForUnfinishedMovies);
 }
 } /* namespace cxtest */
