@@ -128,21 +128,57 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][usreconstr
 	fixture.setSpherePhantom();
 	QDomDocument domdoc;
 	QDomElement settings = domdoc.createElement("TordTest");
-
 	boost::shared_ptr<cx::TordTest> algorithm(new cx::TordTest);
 
 	fixture.setAlgorithm(algorithm);
-	QDomDocument domDoc;
-	QDomElement root = domDoc.createElement("TordTest");
 
-	algorithm->getMethodOption(root)->setValue("VNN");
-	algorithm->getPlaneMethodOption(root)->setValue("Heuristic");
-	algorithm->getMaxPlanesOption(root)->setValue(8);
-	algorithm->getRadiusOption(root)->setValue(1);
-	algorithm->getNStartsOption(root)->setValue(1);
+	SECTION("VNN")
+	{
+		std::cerr << "Testing VNN\n";
+		algorithm->getMethodOption(settings)->setValue("VNN");
+		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(settings)->setValue(8);
+		algorithm->getRadiusOption(settings)->setValue(1);
+		algorithm->getNStartsOption(settings)->setValue(1);
+	}
+	SECTION("VNN2")
+	{
+		std::cerr << "Testing VNN2\n";
+		algorithm->getMethodOption(settings)->setValue("VNN2");
+		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(settings)->setValue(8);
+		algorithm->getRadiusOption(settings)->setValue(1);
+		algorithm->getNStartsOption(settings)->setValue(1);
+	}
+	SECTION("DW")
+	{
+		std::cerr << "Testing DW\n";
+		algorithm->getMethodOption(settings)->setValue("DW");
+		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(settings)->setValue(8);
+		algorithm->getRadiusOption(settings)->setValue(1);
+		algorithm->getNStartsOption(settings)->setValue(1);
+	}
+	SECTION("Anisotropic")
+	{
+		std::cerr << "Testing Anisotropic\n";
+		algorithm->getMethodOption(settings)->setValue("Anisotropic");
+		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(settings)->setValue(8);
+		algorithm->getRadiusOption(settings)->setValue(1);
+		algorithm->getNStartsOption(settings)->setValue(1);
+	}
+	SECTION("Multistart search")
+	{
+		std::cerr << "Testing multistart search\n";
+		algorithm->getMethodOption(settings)->setValue("VNN");
+		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(settings)->setValue(8);
+		algorithm->getRadiusOption(settings)->setValue(1);
+		algorithm->getNStartsOption(settings)->setValue(5);
+	}
 
 	fixture.reconstruct(settings);
-	fixture.setAlgorithm(algorithm);
 
 	fixture.checkRMSBelow(20.0);
 	fixture.checkCentroidDifferenceBelow(1);
