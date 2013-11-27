@@ -18,10 +18,6 @@
 #include "sscReconstructAlgorithm.h"
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 
-namespace cx
-{
-typedef boost::shared_ptr<class cxSyntheticVolume> cxSyntheticVolumePtr;
-}
 
 namespace cxtest
 {
@@ -43,25 +39,21 @@ class ReconstructAlgorithmFixture
 {
 public:
 	ReconstructAlgorithmFixture();
+
 	void setAlgorithm(cx::ReconstructAlgorithmPtr algorithm);
 	void defineOutputVolume(double bounds, double spacing);
 	void defineProbeMovementNormalizedTranslationRange(double range);
 	void defineProbeMovementAngleRange(double range);
 	void defineProbeMovementSteps(int steps);
 	void defineProbe(cx::ProbeDefinition probe);
-
 	void setOverallBoundsAndSpacing(double size, double spacing);
 
-	void setVerbose(bool val) { mVerbose = val; }
-	bool getVerbose() const { return mVerbose; }
 	void setBoxAndLinesPhantom();
 	void setSpherePhantom();
 	void setWireCrossPhantom();
-//	std::vector<cx::Transform3D> generateFrames_rMf_tilted();
-	std::vector<cx::Transform3D> generateFrames_rMt_tilted();
-	void generateInput();
-	void generateOutputVolume();
+
 	void reconstruct();
+
 	void checkRMSBelow(double threshold);
 	void checkCentroidDifferenceBelow(double val);
 	void checkMassDifferenceBelow(double val);
@@ -69,10 +61,14 @@ public:
 	void saveNominalOutputToFile(QString filename);
 	void saveOutputToFile(QString filename);
 
-//	void generateInput_old();
-	void printConfiguration();
+	void setVerbose(bool val) { mVerbose = val; }
+	bool getVerbose() const { return mVerbose; }
 
 private:
+	std::vector<cx::Transform3D> generateFrames_rMt_tilted();
+	void generateInput();
+	void generateOutputVolume();
+	void printConfiguration();
 	double getRMS();
 	cx::ImagePtr createOutputVolume(QString name);
 	cx::ImagePtr getNominalOutputImage();
