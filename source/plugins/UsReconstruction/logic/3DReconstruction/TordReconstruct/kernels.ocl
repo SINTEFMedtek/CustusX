@@ -33,7 +33,7 @@
 #define ANISOTROPIC_WEIGHT_METHOD_DISTANCE 0
 #define ANISOTROPIC_WEIGHT_METHOD_BRIGHTNESS 1
 #define ANISOTROPIC_WEIGHT_METHOD_LATENESS 2
-
+#define ANISOTROPIC_WEIGHT_METHOD_BOTH 3
 
 #define ANISOTROPIC_METHOD ANISOTROPIC_METHOD_BILINEAR_ON_PLANE
 
@@ -84,15 +84,32 @@
 #define WEIGHT_INV4(x) (1.0f/fabs(x*x*x*x))
 #define WEIGHT_SUB(x) (1.0f - fabs(x))
 
+#define WEIGHT_TERNARY(val, mean, factor)                            \
+	((val) >= (mean) ? (factor) : 0.0f)
 
 #define ANISOTROPIC_GAUSS_WEIGHT(px, var, mean, mean_id, sigma) WEIGHT_GAUSS(px.dist, sigma)
-#define BRIGHTNESS_FACTOR 5.0f
-#define NEWNESS_FACTOR 5.0f
-#define ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, mean_id, sigma)     \
-	(WEIGHT_GAUSS(px.dist, sigma) + (px.intensity >= (mean) ? BRIGHTNESS_FACTOR : 0.0f))
-#define ANISOTROPIC_WEIGHT_LATENESS(px, var, mean, mean_id, sigma)       \
-	(WEIGHT_GAUSS(px.dist, sigma)  + (px.plane_id > (mean_id) ? NEWNESS_FACTOR : 0.0f))
 
+#ifndef ANISOTROPIC_WEIGHT_METHOD
+#define ANISOTROPIC_WEIGHT_METHOD ANISOTROPIC_WEIGHT_METHOD_BOTH
+#endif
+
+#ifndef BRIGHTNESS_FACTOR
+#define BRIGHTNESS_FACTOR 5.0f
+#endif
+#ifndef NEWNESS_FACTOR
+#define NEWNESS_FACTOR 5.0f
+#endif
+
+#define ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, mean_id, sigma)    \
+	((WEIGHT_GAUSS(px.dist, sigma)) + (WEIGHT_TERNARY(px.intensity, mean, BRIGHTNESS_FACTOR)))
+
+#define ANISOTROPIC_WEIGHT_LATENESS(px, var, mean, mean_id, sigma)      \
+	((WEIGHT_GAUSS(px.dist, sigma)) + (WEIGHT_TERNARY(px.plane_id, mean_id, NEWNESS_FACTOR)))
+
+#define ANISOTROPIC_WEIGHT_BOTH(px, var, mean, mean_id, sigma) \
+	((WEIGHT_GAUSS(px.dist, sigma)) \
+	 + (WEIGHT_TERNARY(px.plane_id, mean_id, NEWNESS_FACTOR)) \
+	 + (WEIGHT_TERNARY(px.intensity, mean, BRIGHTNESS_FACTOR)))
 
 #if ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_DISTANCE
 #define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_GAUSS_WEIGHT(px, var, mean, mean_id, sigma)
@@ -100,7 +117,10 @@
 #define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, mean_id, sigma)
 #elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_LATENESS
 #define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_LATENESS(px, var, mean, mean_id, sigma)
+#elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_BOTH
+#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_BOTH(px, var, mean, mean_id, sigma)
 #endif
+
 
 // Gaussian weight function
 #define WEIGHT_GAUSS_SIGMA (0.05f)
