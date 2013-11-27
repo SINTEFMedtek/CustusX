@@ -85,20 +85,22 @@
 #define WEIGHT_SUB(x) (1.0f - fabs(x))
 
 
-#define ANISOTROPIC_GAUSS_WEIGHT(px, var, mean, sigma) WEIGHT_GAUSS(px.dist, sigma)
-#define ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, sigma) \
-	WEIGHT_GAUSS(px.dist + (px.intensity - (mean))/(mean), sigma)
-#define ANISOTROPIC_WEIGHT_LATENESS(px, var, mean, sigma) \
-	WEIGHT_GAUSS(px.dist + (px.plane_id - N_PLANES/2)/N_PLANES, sigma)
+#define ANISOTROPIC_GAUSS_WEIGHT(px, var, mean, mean_id, sigma) WEIGHT_GAUSS(px.dist, sigma)
+#define BRIGHTNESS_FACTOR 5.0f
+#define NEWNESS_FACTOR 5.0f
+#define ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, mean_id, sigma)     \
+	(WEIGHT_GAUSS(px.dist, sigma) + (px.intensity >= (mean) ? BRIGHTNESS_FACTOR : 0.0f))
+#define ANISOTROPIC_WEIGHT_LATENESS(px, var, mean, mean_id, sigma)       \
+	(WEIGHT_GAUSS(px.dist, sigma)  + (px.plane_id > (mean_id) ? NEWNESS_FACTOR : 0.0f))
 
 
 #if ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_DISTANCE
-#define ANISOTROPIC_WEIGHT(px, var, mean, sigma) ANISOTROPIC_GAUSS_WEIGHT(px, var, mean, sigma)
+#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_GAUSS_WEIGHT(px, var, mean, mean_id, sigma)
 #elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_BRIGHTNESS
-#define ANISOTROPIC_WEIGHT(px, var, mean, sigma) ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, sigma)
+#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, mean_id, sigma)
 #elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_LATENESS
-#define ANISOTROPIC_WEIGHT(px, var, mean, sigma) ANISOTROPIC_WEIGHT_LATENESS(px, var, mean, sigma)
-
+#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_LATENESS(px, var, mean, mean_id, sigma)
+#endif
 
 // Gaussian weight function
 #define WEIGHT_GAUSS_SIGMA (0.05f)
@@ -1227,11 +1229,13 @@ pixel_t anisotropicFilter(const pixel_t *pixels,
 	// Calculate the variance
 
 	float mean_value = 0.0f;
+	int sum_ids = 0.0f;
 	for(int i = 0; i < n_planes; i++)
 	{
 		mean_value += pixels[i].intensity;
+		sum_ids += pixels[i].plane_id;
 	}
-
+	float mean_id = (float)sum_ids / n_planes;
 	mean_value = mean_value / n_planes;
 
 	float variance = 0.0f;
@@ -1258,7 +1262,7 @@ pixel_t anisotropicFilter(const pixel_t *pixels,
 	// Use the resulting gauss sigma to calcualte weights
 	for(int i = 0; i < n_planes; i++)
 	{
-		float weight = ANISOTROPIC_WEIGHT(pixels[i], variance, mean_value, gauss_sigma);
+		float weight = ANISOTROPIC_WEIGHT(pixels[i], variance, mean_value, mean_id, gauss_sigma);
 		sum = mad(pixels[i].intensity,weight, sum);
 		sum_weights += weight;
 	}
