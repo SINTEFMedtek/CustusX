@@ -65,7 +65,7 @@ TordTest::getNewnessWeightOption(QDomElement root)
 {
 	return DoubleDataAdapterXml::initialize("Newness weight", "",
 	                                        "Newness weight",
-	                                        1,
+	                                        0,
 	                                        DoubleRange(0.0, 10, 0.1),
 	                                        1,
 	                                        root);
@@ -77,7 +77,7 @@ TordTest::getBrightnessWeightOption(QDomElement root)
 {
 	return DoubleDataAdapterXml::initialize("Brightness weight", "",
 	                                        "Brightness weight",
-	                                        1,
+	                                        0,
 	                                        DoubleRange(0.0, 10, 0.1),
 	                                        1,
 	                                        root);
