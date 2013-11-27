@@ -67,8 +67,8 @@ vec4 applyLutLayerN(in vec4 base,in int index)
 	idx = windowLevel(idx, window[index], level[index]);
 	idx = clamp(idx, 0.0, 1.0);
 	// map through lookup table - interpolated
-//        vec4 col = sampleLut(index, idx);
-        vec4 col = texture1D(lut[index], idx);
+        vec4 col = sampleLut(index, idx);
+//        vec4 col = texture1D(lut[index], idx);
 	col.a = alpha[index];
 
 	col =  mix(base, col, alpha[index]);
