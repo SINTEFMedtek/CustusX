@@ -195,7 +195,7 @@ void ReconstructAlgorithmFixture::generateOutputVolume()
 	mOutputData = this->createOutputVolume("output");
 }
 
-void ReconstructAlgorithmFixture::reconstruct()
+void ReconstructAlgorithmFixture::reconstruct(QDomElement root)
 {
 	if (this->getVerbose())
 		this->printConfiguration();
@@ -210,8 +210,6 @@ void ReconstructAlgorithmFixture::reconstruct()
 
 	if (this->getVerbose())
 		std::cout << "Reconstructing\n";
-	QDomDocument domDoc;
-	QDomElement root = domDoc.createElement("TordTest");
 
 	mAlgorithm->reconstruct(mInputData,
 							mOutputData->getBaseVtkImageData(),
