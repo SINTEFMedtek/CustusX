@@ -1510,7 +1510,7 @@ voxel_methods(int volume_xsize,
 		for(int yoffset = ystart; yoffset != yend ; yoffset+=ydir)
 		{
 			int y = y_origin + yoffset;
-			if(y >= volume_ysize) break;
+			if(y >= volume_ysize) continue;
 			BOUNDS_CHECK(y, 0, volume_ysize);
 
 			int zstart, zend, zdir;
@@ -1528,9 +1528,8 @@ voxel_methods(int volume_xsize,
 			for(int zoffset = zstart; zoffset != zend ; zoffset+=zdir)
 			{
 				int z = z_origin + zoffset;
-				if(z >= volume_zsize) break;
+				if(z >= volume_zsize) continue;
 				BOUNDS_CHECK(z, 0, volume_zsize);
-
 				BOUNDS_CHECK(x, 0, volume_xsize);
 				BOUNDS_CHECK(y, 0, volume_ysize);
 				voxel.x = x * volume_xspacing;
