@@ -36,11 +36,15 @@ float windowLevel(float x, float window_, float level_)
 vec4 sampleLut(in int index, in float idx)
 {
 ${SAMPLE_LUT_CONTENT}
+// On mac/amd:
 //    if (index==0)
 //        return texture1D(lut[0], idx);
 //    else if (index==1)
 //        return texture1D(lut[1], idx);
 //    ...
+// On other platforms;
+//  return texture1D(lut[index], idx);
+
     return vec4(1.0,0.0,0.0,1.0);
 }
 
@@ -67,8 +71,7 @@ vec4 applyLutLayerN(in vec4 base,in int index)
 	idx = windowLevel(idx, window[index], level[index]);
 	idx = clamp(idx, 0.0, 1.0);
 	// map through lookup table - interpolated
-        vec4 col = sampleLut(index, idx);
-//        vec4 col = texture1D(lut[index], idx);
+	vec4 col = sampleLut(index, idx);
 	col.a = alpha[index];
 
 	col =  mix(base, col, alpha[index]);
