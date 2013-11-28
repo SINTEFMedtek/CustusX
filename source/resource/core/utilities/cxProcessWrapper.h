@@ -58,9 +58,6 @@ public:
 	bool waitForStarted(int msecs = 30000);
 	bool waitForFinished(int msecs = 30000);
 
-public slots:
-	void requestTerminateSlot();
-
 private:
 	QString getExecutableInBundlesAbsolutePath(QString exeInBundle);
 	void internalLaunch(QString executable, QStringList arguments);
