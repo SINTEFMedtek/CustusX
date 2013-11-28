@@ -52,7 +52,7 @@ public:
 	void setSpherePhantom();
 	void setWireCrossPhantom();
 
-	void reconstruct();
+	void reconstruct(QDomElement root);
 
 	void checkRMSBelow(double threshold);
 	void checkCentroidDifferenceBelow(double val);
