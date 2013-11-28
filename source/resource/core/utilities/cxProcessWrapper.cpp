@@ -62,6 +62,21 @@ bool ProcessWrapper::isRunning()
 	return mProcess->state() == QProcess::Running;
 }
 
+qint64 ProcessWrapper::write(const char * data)
+{
+	return mProcess->write(data);
+}
+
+bool ProcessWrapper::waitForStarted(int msecs)
+{
+	return mProcess->waitForStarted(msecs);
+}
+
+bool ProcessWrapper::waitForFinished(int msecs)
+{
+	return mProcess->waitForFinished(msecs);
+}
+
 void ProcessWrapper::requestTerminateSlot()
 {
 	mProcess->terminate();
