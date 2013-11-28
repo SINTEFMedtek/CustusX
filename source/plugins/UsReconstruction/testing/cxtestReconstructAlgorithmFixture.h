@@ -17,7 +17,7 @@
 
 #include "sscReconstructAlgorithm.h"
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
-
+#include "cxtestSyntheticVolumeComparer.h"
 
 namespace cxtest
 {
@@ -63,15 +63,18 @@ public:
 
 	void setVerbose(bool val) { mVerbose = val; }
 	bool getVerbose() const { return mVerbose; }
+	cx::cxSyntheticVolumePtr getPhantom() { return mPhantom; }
+
+	cx::USReconstructInputData generateSynthetic_USReconstructInputData();
 
 private:
 	std::vector<cx::Transform3D> generateFrames_rMt_tilted();
 	void generateInput();
 	void generateOutputVolume();
 	void printConfiguration();
-	double getRMS();
+//	double getRMS();
 	cx::ImagePtr createOutputVolume(QString name);
-	cx::ImagePtr getNominalOutputImage();
+//	cx::ImagePtr getNominalOutputImage();
 
 	/** Generate a sequence of planes using the input definition.
 	  * The planes work around p0, applying translation and rotation
@@ -110,7 +113,9 @@ private:
 	ProbeMovement mProbeMovementDefinition;
 
 	// cached values
-	cx::ImagePtr mNominalOutputImage;
+//	cx::ImagePtr mNominalOutputImage;
+	SyntheticVolumeComparerPtr getComparer();
+	SyntheticVolumeComparerPtr mComparer;
 };
 
 } // namespace cxtest

@@ -61,11 +61,12 @@ void ReconstructPreprocessor::initializeCores(std::vector<ReconstructCorePtr> co
 
 	for (unsigned i=0; i<cores.size(); ++i)
 	{
-		ProcessedUSInputDataPtr input(new ProcessedUSInputData(frames[i],
-																													 mFileData.mFrames,
-																													 mFileData.getMask(),
-																													 mFileData.mFilename,
-																													 QFileInfo(mFileData.mFilename).completeBaseName() ));
+		ProcessedUSInputDataPtr input;
+		input.reset(new ProcessedUSInputData(frames[i],
+											 mFileData.mFrames,
+											 mFileData.getMask(),
+											 mFileData.mFilename,
+											 QFileInfo(mFileData.mFilename).completeBaseName() ));
 		cores[i]->initialize(input, this->getOutputVolumeParams());
 	}
 

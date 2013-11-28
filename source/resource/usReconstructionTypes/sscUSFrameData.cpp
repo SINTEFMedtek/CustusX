@@ -163,6 +163,14 @@ USFrameDataPtr USFrameData::create(QString name, cx::ImageDataContainerPtr image
 	return retval;
 }
 
+USFrameDataPtr USFrameData::create(QString name, std::vector<vtkImageDataPtr> frames)
+{
+	cx::ImageDataContainerPtr container;
+	container.reset(new cx::FramesDataContainer(frames));
+	return create(name, container);
+}
+
+
 USFrameData::USFrameData() :
 		mCropbox(0,0,0,0,0,0), mPurgeInput(true)
 {
