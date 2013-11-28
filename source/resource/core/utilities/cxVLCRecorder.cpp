@@ -87,7 +87,8 @@ void VLCRecorder::startRecording(QString saveFile)
 
 void VLCRecorder::stopRecording()
 {
-	mCommandLine->write("quit\n");
+	QString quit = "quit\n";
+	mCommandLine->write(quit.toStdString().c_str());
 }
 
 void VLCRecorder::setVLCPath(QString path)
