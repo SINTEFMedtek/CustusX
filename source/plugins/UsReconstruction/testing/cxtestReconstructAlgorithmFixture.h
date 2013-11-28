@@ -64,6 +64,8 @@ public:
 	void setVerbose(bool val) { mVerbose = val; }
 	bool getVerbose() const { return mVerbose; }
 
+	void generateSynthetic_USReconstructInputData();
+
 private:
 	std::vector<cx::Transform3D> generateFrames_rMt_tilted();
 	void generateInput();
