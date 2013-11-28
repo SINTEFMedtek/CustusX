@@ -104,6 +104,57 @@ void ReconstructAlgorithmFixture::printConfiguration()
 	std::cout << "======" << std::endl;
 }
 
+/*
+// Work in progress - CA/2013-11-27 - test entire rec pipeline.
+void ReconstructAlgorithmFixture::generateSynthetic_USReconstructInputData()
+{
+//	cx::Vector3D mBounds(100,100,100);
+//	cx::cxSyntheticVolumePtr mPhantom;
+	mPhantom.reset(new cxtest::SphereSyntheticVolume(mBounds));
+	cx::ProbeDefinition mProbe; // TODO Define
+
+	cx::Vector3D p0(mBounds[0]/2, mBounds[1]/2, 0); //probe starting point. pointing along z
+	cx::Vector3D range_translation = mBounds[0] * mProbeMovementDefinition.mRangeNormalizedTranslation;
+	double range_angle = mProbeMovementDefinition.mRangeAngle;
+//	int steps = mProbeMovementDefinition.mSteps;
+	int steps_full = 3*mProbeMovementDefinition.mSteps;
+
+	std::vector<cx::Transform3D> rMt_full;
+	rMt_full = this->generateFrames(p0,
+									range_translation,
+									range_angle,
+									Eigen::Vector3d::UnitY(),
+									steps_full);
+
+	cx::USReconstructInputData result;
+
+	for (unsigned i=0; i<steps_full/2; ++i)
+	{
+		cx::TimedPosition pos;
+		pos.mTime = i;
+		pos.mPos = rMt_full[i]; // TODO: skrell av rMpr
+		result.mPositions.push_back(pos);
+	}
+
+	std::vector<vtkImageDataPtr> frames;
+	for (unsigned i=0; i<steps_full/3; ++i)
+	{
+		cx::TimedPosition pos;
+		pos.mTime = i;
+		result.mFrames.push_back(pos);
+
+		frames.push_back(mPhantom->sampleUsData(rMt_full[i], mProbe));
+	}
+	result.mUsRaw = cx::USFrameData::create(frames);
+
+	result.rMpr = cx::Transform3D::Identity();
+	result.mProbeUid = "testProbe";
+	result.mProbeData.setData(mProbe);
+
+}*/
+
+
+
 void ReconstructAlgorithmFixture::setAlgorithm(cx::ReconstructAlgorithmPtr algorithm)
 {
 	mAlgorithm = algorithm;
