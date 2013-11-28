@@ -54,6 +54,10 @@ public:
 
 	bool isRunning();
 
+	qint64 write(const char * data);
+	bool waitForStarted(int msecs = 30000);
+	bool waitForFinished(int msecs = 30000);
+
 public slots:
 	void requestTerminateSlot();
 

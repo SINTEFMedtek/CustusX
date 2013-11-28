@@ -19,6 +19,17 @@ VLCRecorder* VLCRecorder::getInstance()
   return mTheInstance;
 }
 
+void VLCRecorder::initialize()
+{
+	VLCRecorder::getInstance();
+}
+
+void VLCRecorder::shutdown()
+{
+  delete mTheInstance;
+  mTheInstance = NULL;
+}
+
 VLCRecorder::VLCRecorder() :
 		mCommandLine(new ProcessWrapper("VLC")), mVLCPath("")
 {
@@ -33,10 +44,10 @@ bool VLCRecorder::hasVLCApplication()
 	return QFile::exists(mVLCPath);
 }
 
-void VLCRecorder::findVLCApplication(QStringList searchPaths)
+void VLCRecorder::findVLCApplication(QStringList suggestedVLCLocations)
 {
-	searchPaths.push_front(this->getVLCDefaultLocation());
-	foreach(QString path, searchPaths)
+	suggestedVLCLocations.push_front(this->getVLCDefaultLocation());
+	foreach(QString path, suggestedVLCLocations)
 	{
 		if(this->isValidVLC(path))
 		{
@@ -53,12 +64,12 @@ bool VLCRecorder::isRecording()
 
 bool VLCRecorder::waitForStarted(int msecs)
 {
-	return mCommandLine->getProcess()->waitForStarted(msecs);
+	mCommandLine->waitForStarted(msecs);
 }
 
 bool VLCRecorder::waitForFinished(int msecs)
 {
-	return mCommandLine->getProcess()->waitForFinished(msecs);
+	return mCommandLine->waitForFinished(msecs);
 }
 
 QString VLCRecorder::getVLCPath()
@@ -76,12 +87,7 @@ void VLCRecorder::startRecording(QString saveFile)
 
 void VLCRecorder::stopRecording()
 {
-	mCommandLine->getProcess()->write("quit\n");
-}
-
-void VLCRecorder::play(QString moviePath)
-{
-	mCommandLine->launch("\""+mVLCPath+"\" "+moviePath+" --play-and-exit");
+	mCommandLine->write("quit\n");
 }
 
 void VLCRecorder::setVLCPath(QString path)
