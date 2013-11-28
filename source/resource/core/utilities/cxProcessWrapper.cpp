@@ -77,12 +77,6 @@ bool ProcessWrapper::waitForFinished(int msecs)
 	return mProcess->waitForFinished(msecs);
 }
 
-void ProcessWrapper::requestTerminateSlot()
-{
-	mProcess->terminate();
-	messageManager()->sendInfo(QString("Requesting termination of %1 %2").arg(mName).arg(mLastExecutablePath));
-}
-
 QString ProcessWrapper::getExecutableInBundlesAbsolutePath(QString exeInBundle)
 {
 	QString absolutePathToExe = exeInBundle;
