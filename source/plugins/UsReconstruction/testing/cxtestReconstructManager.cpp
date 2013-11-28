@@ -65,7 +65,7 @@ public:
 	void setUp();
 	void tearDown();
 
-	void testConstructor();///< Test reconstructer constructor
+//	void testConstructor();///< Test reconstructer constructor
 	void testAngioReconstruction();///< Test reconstruction of US angio data (#318)
 	void testThunderGPUReconstruction();///< Test Thunder GPU reconstruction
 	void testDualAngio();
@@ -186,11 +186,62 @@ TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][syntheti
 	}
 }
 
-
-void ReconstructManagerTestFixture::testConstructor()
+TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][synthetic][ca_rec7][ca_rec][hide]")
 {
-	cx::ReconstructManagerPtr reconstructer(new cx::ReconstructManager(cx::XmlOptionFile(),""));
+	/** Test on a phantom containing a colored sphere and a gray sphere.
+	  * Verify that the angio algo reconstructs only the colored, and the
+	  * BMode reconstructs only the gray.
+	  *
+	  */
+	ReconstructManagerTestFixture fixture;
+
+	ReconstructAlgorithmFixture algoFixture;
+	algoFixture.setOverallBoundsAndSpacing(100, 5);
+//	algoFixture.setOverallBoundsAndSpacing(100, 0.2);
+	algoFixture.setVerbose(true);
+	algoFixture.setSpherePhantom();
+	cx::USReconstructInputData input = algoFixture.generateSynthetic_USReconstructInputData();
+
+	cx::ReconstructManagerPtr reconstructer = fixture.createManager();
+	reconstructer->selectData(input);
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
+	reconstructer->getParams()->mAngioAdapter->setValue(true);
+	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
+
+	// get the specific algorithm and corresponding settings
+	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "PNN");
+	cx::PNNReconstructAlgorithmPtr algorithm;
+	algorithm = boost::dynamic_pointer_cast<cx::PNNReconstructAlgorithm>(reconstructer->createAlgorithm());
+	REQUIRE(algorithm);// Check if we got the PNN algorithm
+
+	// set an algorithm-specific parameter
+	algorithm->getInterpolationStepsOption(algo)->setValue(1);
+
+	// run the reconstruction in the main thread
+	fixture.reconstruct();
+
+	// check validity of output:
+	REQUIRE(fixture.getOutput().size()==1);
+
+	SyntheticVolumeComparerPtr comparer = fixture.getComparerForOutput(algoFixture, 0);
+	comparer->checkRMSBelow(30.0);
+	comparer->checkCentroidDifferenceBelow(1);
+	comparer->checkMassDifferenceBelow(0.01);
+	// check the value in the sphere center:
+	comparer->checkValueWithin(algoFixture.getPhantom()->getBounds()/2, 200, 255);
+
+	if (comparer->getVerbose())
+	{
+		comparer->saveOutputToFile("sphere_recman.mhd");
+		comparer->saveNominalOutputToFile("sphere_nomman.mhd");
+	}
 }
+
+
+//void ReconstructManagerTestFixture::testConstructor()
+//{
+//	cx::ReconstructManagerPtr reconstructer(new cx::ReconstructManager(cx::XmlOptionFile(),""));
+//}
 
 cx::ReconstructManagerPtr ReconstructManagerTestFixture::getManager()
 {
