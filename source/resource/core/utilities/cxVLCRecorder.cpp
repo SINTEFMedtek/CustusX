@@ -64,7 +64,7 @@ bool VLCRecorder::isRecording()
 
 bool VLCRecorder::waitForStarted(int msecs)
 {
-	mCommandLine->waitForStarted(msecs);
+	return mCommandLine->waitForStarted(msecs);
 }
 
 bool VLCRecorder::waitForFinished(int msecs)
