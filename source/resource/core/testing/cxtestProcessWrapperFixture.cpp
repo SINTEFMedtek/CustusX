@@ -58,10 +58,10 @@ bool ProcessWrapperFixture::canLaunchNotExistingExecutable()
 
 bool ProcessWrapperFixture::getResultFromFinishedExecution(cx::ProcessWrapperPtr exe)
 {
-	if(!exe->getProcess()->waitForStarted())
+	if(!exe->waitForStarted())
 		return false;
 
-	if(!exe->getProcess()->waitForFinished())
+	if(!exe->waitForFinished())
 		return false;
 
 	return true;
