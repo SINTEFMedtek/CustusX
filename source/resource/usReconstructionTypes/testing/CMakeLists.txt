@@ -4,6 +4,7 @@ if(BUILD_TESTING)
 			cxtestUSReconstructionFileFixture.h
 			cxtestUSReconstructionFileFixture.cpp
 			cxtestCatchUSReconstructionFile.cpp
+			cxtestUSReconstructInputDataAlgorithms.cpp
 			)
 		cx_catch_add_lib_and_exe(cxResourceUsReconstructionTypes "${RESOURCE_USRECONSTRUCTIONTYPES_TEST_CATCH_SOURCE_FILES}" "")
 endif()

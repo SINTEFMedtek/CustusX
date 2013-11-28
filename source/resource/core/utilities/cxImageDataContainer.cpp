@@ -199,4 +199,23 @@ unsigned SplitFramesContainer::size() const
 }
 
 
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+FramesDataContainer::FramesDataContainer(std::vector<vtkImageDataPtr> images)
+{
+	mImages = images;
+}
+
+vtkImageDataPtr FramesDataContainer::get(unsigned index)
+{
+	return mImages[index];
+}
+
+unsigned FramesDataContainer::size() const
+{
+	return mImages.size();
+}
+
 } // namespace cx

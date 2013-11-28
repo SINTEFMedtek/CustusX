@@ -36,7 +36,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthe
 	QDomElement settings = domdoc.createElement("PNN");
 
 	fixture.setOverallBoundsAndSpacing(100, 5);
-//	fixture.setVerbose(true);
+	fixture.setVerbose(true);
 	fixture.setSpherePhantom();
 
 	fixture.setAlgorithm(cx::PNNReconstructAlgorithm::create());
@@ -64,7 +64,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 	fixture.defineProbeMovementAngleRange(M_PI/6);
 	fixture.defineOutputVolume(100, 2);
 	fixture.defineProbe(cx::DummyToolTestUtilities::createProbeDataLinear(100, 100, Eigen::Array2i(150,150)));
-//	fixture.setVerbose(true);
+	fixture.setVerbose(true);
 	fixture.setSpherePhantom();
 
 	fixture.setAlgorithm(cx::PNNReconstructAlgorithm::create());
@@ -104,7 +104,7 @@ TEST_CASE("ReconstructAlgorithm: Thunder VNN on sphere","[unit][usreconstruction
 	QDomElement settings = domdoc.createElement("ThunderVNN");
 
 	fixture.setOverallBoundsAndSpacing(100, 5);
-	//fixture.setVerbose(true);
+	fixture.setVerbose(true);
 	fixture.setSpherePhantom();
 
 	fixture.setAlgorithm(cx::ThunderVNNReconstructAlgorithm::create(""));
