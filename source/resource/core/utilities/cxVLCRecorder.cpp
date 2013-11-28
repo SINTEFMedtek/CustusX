@@ -124,7 +124,7 @@ QString VLCRecorder::getVLCDefaultRecorderArguments(QString saveFile)
 	QString defaultArguements("");
 #ifdef CX_WINDOWS
 	saveFile = saveFile.replace("/", "\\");
-	defaultArguements = " -I cli screen:// :screen-fps=10.000000 :live-caching=300 :sout=#transcode{vcodec=h264,acodec=none}:file{dst="+saveFile+"} :sout-keep ";
+	defaultArguements = " -I luacli screen:// :screen-fps=10.000000 :live-caching=300 :sout=#transcode{vcodec=h264,acodec=none}:file{dst="+saveFile+"} :sout-keep ";
 #endif
 #ifdef CX_APPLE
 	defaultArguements = " -I cli screen:// \":sout=#transcode{vcodec=h264,vb=800,fps=10,scale=1,acodec=none}:duplicate{dst=standard{access=file,mux=mp4,dst="+saveFile+"}}\"";
