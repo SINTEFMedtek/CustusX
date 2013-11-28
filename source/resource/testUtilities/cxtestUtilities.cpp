@@ -63,13 +63,19 @@ vtkImageDataPtr Utilities::create3DVtkImageData(Eigen::Array3i dim, const unsign
 
 cx::ImagePtr Utilities::create3DImage(Eigen::Array3i dim, const unsigned int voxelValue)
 {
-	vtkImageDataPtr vtkImageData = create3DVtkImageData(dim, voxelValue);
+	return create3DImage(dim, cx::Vector3D(1,1,1), voxelValue);
+}
+
+cx::ImagePtr Utilities::create3DImage(Eigen::Array3i dim, cx::Vector3D spacing, const unsigned int voxelValue)
+{
+	vtkImageDataPtr vtkImageData = cx::generateVtkImageData(dim, spacing, voxelValue);
 	QString unique_string = qstring_cast(reinterpret_cast<long>(vtkImageData.GetPointer()));
 	QString imagesUid = QString("TESTUID_%2_%1").arg(unique_string);
 	cx::ImagePtr image(new cx::Image(imagesUid, vtkImageData));
 
 	return image;
 }
+
 
 std::vector<cx::ImagePtr> Utilities::create3DImages(unsigned int count, Eigen::Array3i dim, const unsigned int voxelValue)
 {

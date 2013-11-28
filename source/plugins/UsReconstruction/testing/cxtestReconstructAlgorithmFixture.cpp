@@ -27,6 +27,7 @@
 #include "sscVolumeHelpers.h"
 #include "sscDummyTool.h"
 #include "sscTypeConversions.h"
+#include "cxImageDataContainer.h"
 
 namespace cxtest
 {
@@ -104,21 +105,14 @@ void ReconstructAlgorithmFixture::printConfiguration()
 	std::cout << "======" << std::endl;
 }
 
-/*
-// Work in progress - CA/2013-11-27 - test entire rec pipeline.
-void ReconstructAlgorithmFixture::generateSynthetic_USReconstructInputData()
+cx::USReconstructInputData ReconstructAlgorithmFixture::generateSynthetic_USReconstructInputData()
 {
-//	cx::Vector3D mBounds(100,100,100);
-//	cx::cxSyntheticVolumePtr mPhantom;
-	mPhantom.reset(new cxtest::SphereSyntheticVolume(mBounds));
-	cx::ProbeDefinition mProbe; // TODO Define
-
 	cx::Vector3D p0(mBounds[0]/2, mBounds[1]/2, 0); //probe starting point. pointing along z
 	cx::Vector3D range_translation = mBounds[0] * mProbeMovementDefinition.mRangeNormalizedTranslation;
 	double range_angle = mProbeMovementDefinition.mRangeAngle;
-//	int steps = mProbeMovementDefinition.mSteps;
 	int steps_full = 3*mProbeMovementDefinition.mSteps;
 
+	// generate oversampled list of positions, for use both in tracking and imaging.
 	std::vector<cx::Transform3D> rMt_full;
 	rMt_full = this->generateFrames(p0,
 									range_translation,
@@ -128,7 +122,8 @@ void ReconstructAlgorithmFixture::generateSynthetic_USReconstructInputData()
 
 	cx::USReconstructInputData result;
 
-	for (unsigned i=0; i<steps_full/2; ++i)
+	// sample out tracking positions from the full list
+	for (unsigned i=0; i<steps_full; i+=2)
 	{
 		cx::TimedPosition pos;
 		pos.mTime = i;
@@ -136,8 +131,9 @@ void ReconstructAlgorithmFixture::generateSynthetic_USReconstructInputData()
 		result.mPositions.push_back(pos);
 	}
 
+	// sample out image frames from the full list
 	std::vector<vtkImageDataPtr> frames;
-	for (unsigned i=0; i<steps_full/3; ++i)
+	for (unsigned i=0; i<steps_full; i+=3)
 	{
 		cx::TimedPosition pos;
 		pos.mTime = i;
@@ -145,13 +141,15 @@ void ReconstructAlgorithmFixture::generateSynthetic_USReconstructInputData()
 
 		frames.push_back(mPhantom->sampleUsData(rMt_full[i], mProbe));
 	}
-	result.mUsRaw = cx::USFrameData::create(frames);
+	result.mUsRaw = cx::USFrameData::create("virtual", frames);
 
-	result.rMpr = cx::Transform3D::Identity();
+	// fill rest of info
+	result.rMpr = cx::Transform3D::Identity(); // if <>Identity, remember to also change mPositions
 	result.mProbeUid = "testProbe";
 	result.mProbeData.setData(mProbe);
 
-}*/
+	return result;
+}
 
 
 
@@ -269,65 +267,84 @@ void ReconstructAlgorithmFixture::reconstruct(QDomElement root)
 		std::cout << "Reconstruction done\n";
 }
 
+SyntheticVolumeComparerPtr ReconstructAlgorithmFixture::getComparer()
+{
+	if (!mComparer)
+	{
+		mComparer.reset(new SyntheticVolumeComparer());
+		mComparer->setVerbose(this->getVerbose());
+		mComparer->setPhantom(mPhantom);
+		mComparer->setTestImage(mOutputData);
+	}
+	return mComparer;
+}
+
 void ReconstructAlgorithmFixture::checkRMSBelow(double threshold)
 {
-	float sse = this->getRMS();
-	if (this->getVerbose())
-		std::cout << "RMS value: " << sse << std::endl;
-	CHECK(sse < threshold);
+	this->getComparer()->checkRMSBelow(threshold);
+//	float sse = this->getRMS();
+//	if (this->getVerbose())
+//		std::cout << "RMS value: " << sse << std::endl;
+//	CHECK(sse < threshold);
 }
 
-double ReconstructAlgorithmFixture::getRMS()
-{
-	double sse = cx::calculateRMSError(mOutputData->getBaseVtkImageData(), this->getNominalOutputImage()->getBaseVtkImageData());
-//	float sse = mPhantom->computeRMSError(mOutputData);
-//	std::cout << "RMS value: " << sse << std::endl;
-	return sse;
-}
+//double ReconstructAlgorithmFixture::getRMS()
+//{
+//	double sse = cx::calculateRMSError(mOutputData->getBaseVtkImageData(), this->getNominalOutputImage()->getBaseVtkImageData());
+////	float sse = mPhantom->computeRMSError(mOutputData);
+////	std::cout << "RMS value: " << sse << std::endl;
+//	return sse;
+//}
 
-cx::ImagePtr ReconstructAlgorithmFixture::getNominalOutputImage()
-{
-	if (!mNominalOutputImage)
-	{
-		mNominalOutputImage = this->createOutputVolume("nominal");
-		mPhantom->fillVolume(mNominalOutputImage);
-	}
-	return mNominalOutputImage;
-}
+//cx::ImagePtr ReconstructAlgorithmFixture::getNominalOutputImage()
+//{
+//	if (!mNominalOutputImage)
+//	{
+//		mNominalOutputImage = this->createOutputVolume("nominal");
+//		mPhantom->fillVolume(mNominalOutputImage);
+//	}
+//	return mNominalOutputImage;
+//}
 
 void ReconstructAlgorithmFixture::checkCentroidDifferenceBelow(double val)
 {
-	cx::Vector3D c_n = calculateCentroid(this->getNominalOutputImage());
-	cx::Vector3D c_r = calculateCentroid(mOutputData);
+	this->getComparer()->checkCentroidDifferenceBelow(val);
 
-	double difference = (c_n-c_r).norm();
+//	cx::Vector3D c_n = calculateCentroid(this->getNominalOutputImage());
+//	cx::Vector3D c_r = calculateCentroid(mOutputData);
 
-	if (this->getVerbose())
-		std::cout << "c_n=[" << c_n << "] c_r=[" << c_r << "] diff=[" << difference << "]" << std::endl;
+//	double difference = (c_n-c_r).norm();
 
-	CHECK(difference < val);
+//	if (this->getVerbose())
+//		std::cout << "c_n=[" << c_n << "] c_r=[" << c_r << "] diff=[" << difference << "]" << std::endl;
+
+//	CHECK(difference < val);
 }
 
 void ReconstructAlgorithmFixture::checkMassDifferenceBelow(double val)
 {
-	double v_n = calculateMass(this->getNominalOutputImage());
-	double v_r = calculateMass(mOutputData);
-	double normalized_difference = fabs(v_n-v_r)/(v_n+v_r);
+	this->getComparer()->checkMassDifferenceBelow(val);
 
-	if (this->getVerbose())
-		std::cout << "v_n=[" << v_n << "] v_r=[" << v_r << "] diff=[" << normalized_difference << "]" << std::endl;
+//	double v_n = calculateMass(this->getNominalOutputImage());
+//	double v_r = calculateMass(mOutputData);
+//	double normalized_difference = fabs(v_n-v_r)/(v_n+v_r);
 
-	CHECK(normalized_difference<val);
+//	if (this->getVerbose())
+//		std::cout << "v_n=[" << v_n << "] v_r=[" << v_r << "] diff=[" << normalized_difference << "]" << std::endl;
+
+//	CHECK(normalized_difference<val);
 }
 
 void ReconstructAlgorithmFixture::saveNominalOutputToFile(QString filename)
 {
-	cx::MetaImageReader().saveImage(this->getNominalOutputImage(), filename);
+	this->getComparer()->saveNominalOutputToFile(filename);
+//	cx::MetaImageReader().saveImage(this->getNominalOutputImage(), filename);
 }
 
 void ReconstructAlgorithmFixture::saveOutputToFile(QString filename)
 {
-	cx::MetaImageReader().saveImage(mOutputData, filename);
+	this->getComparer()->saveOutputToFile(filename);
+//	cx::MetaImageReader().saveImage(mOutputData, filename);
 }
 
 } // namespace cxtest
