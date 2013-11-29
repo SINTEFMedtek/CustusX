@@ -110,19 +110,7 @@ vec4 shade(int volNumber, vec4 value)
   float spot;
   
 #ifdef __APPLE__
-  /*
-	if(volNumber==0)
-	{
-	  g1.x=texture3D(dataSetTexture[0],pos+xvec[0]).x;
-	  g1.y=texture3D(dataSetTexture[0],pos+yvec[0]).x;
-	  g1.z=texture3D(dataSetTexture[0],pos+zvec[0]).x;
-	  g2.x=texture3D(dataSetTexture[0],pos-xvec[0]).x;
-	  g2.y=texture3D(dataSetTexture[0],pos-yvec[0]).x;
-	  g2.z=texture3D(dataSetTexture[0],pos-zvec[0]).x;
-	}
-	else
-	*/
-	{
+
 	if(volNumber==1)
 		{
 		  posX[0] = vec3(P1toPN[0]*vec4(pos,1));
@@ -156,7 +144,7 @@ vec4 shade(int volNumber, vec4 value)
 		  g2.y=texture3D(dataSetTexture[3],posX[2]-yvec[3]).x;
 		  g2.z=texture3D(dataSetTexture[3],posX[2]-zvec[3]).x;
 		}
-	}
+	
 #else
 
 		posX[volNumber-1] = vec3(P1toPN[volNumber-1]*vec4(pos,1));

@@ -58,14 +58,14 @@ uniform	vec3 ClippingplanesNormal[10];
 uniform	vec3 ClippingplanesOrigins[10];
 uniform int clipped[10];
 
-void clip (int i, vec3 pos)
+void clip (int i, vec3 position)
 {
 	
 	clipMin[i]=vec3(-10.0, -10.0, -10.0);
 
-	float partX=ClippingplanesNormal[i].x*(pos.x-ClippingplanesOrigins[i].x);
-	float partY=ClippingplanesNormal[i].y*(pos.y-ClippingplanesOrigins[i].y);
-	float partZ=ClippingplanesNormal[i].z*(pos.z-ClippingplanesOrigins[i].z);
+	float partX=ClippingplanesNormal[i].x*(position.x-ClippingplanesOrigins[i].x);
+	float partY=ClippingplanesNormal[i].y*(position.y-ClippingplanesOrigins[i].y);
+	float partZ=ClippingplanesNormal[i].z*(position.z-ClippingplanesOrigins[i].z);
 
 	float temp;
 		
