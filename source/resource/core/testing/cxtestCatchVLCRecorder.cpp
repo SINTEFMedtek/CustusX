@@ -24,6 +24,8 @@
 #include <QProcess>
 #include "cxtestUtilities.h"
 #include <QDebug>
+#include <QDir>
+#include <QTcpSocket>
 
 namespace cxtest
 {
@@ -66,8 +68,19 @@ TEST_CASE("QProcess and VLC can use cli for starting and stopping screen capture
 	QString pathToVLC = "\"C:/Program Files (x86)/VideoLAN/VLC/vlc.exe\"";
 	QString saveFile = "\"C:/Users/Dev/Desktop/test.mp4\"";
 
+	QDir vlcDir("C:/Program Files (x86)/VideoLAN/VLC/");
+	qDebug() << "Working dir: " << vlcDir.absolutePath();
+	p->setWorkingDirectory(vlcDir.absolutePath());
+
+	QStringList env = QProcess::systemEnvironment();
+	env.replaceInStrings(QRegExp("^PATH=(.*)", Qt::CaseInsensitive), "PATH=\\1;C:\\Program Files (x86)\\VideoLAN\\VLC");
+	p->setEnvironment(env);
+	//qDebug() << "Env: " << p->environment();
+
 	//p->start(pathToVLC+" -I luacli screen:// :screen-fps=10.000000 :live-caching=300 :sout=#transcode{vcodec=h264,acodec=none}:file{dst="+saveFile+"} :sout-keep");
-	p->start(pathToVLC+" -I luacli");
+	//p->start(pathToVLC+" -I luacli");
+	p->start(pathToVLC, QStringList() <<"-I" << "luacli" << "-vvv");
+	//p->start("vlc.exe -I luacli");
 #endif
 
 	REQUIRE(p->waitForStarted());
@@ -88,15 +101,19 @@ TEST_CASE("QProcess and VLC can use cli for starting and stopping screen capture
 	qDebug() << "State: " << p->state();
 
 #ifdef CX_APPLE
-	std::cout << p->write("quit\n") << std::endl;
+	QString quit("quit");
+	std::cout << p->write((quit + "\n").toLocal8Bit()) << std::endl;
 #endif
 #ifdef CX_WINDOWS
-	qDebug() << p->write("quit\r\n");
-	REQUIRE(p->waitForBytesWritten(-1));
-	p->closeWriteChannel();
+	QTcpSocket* tcp = new QTcpSocket();
+	tcp->connectToHost("localhost", 4212);
+	//REQUIRE(p->waitForFinished());
+	qDebug() << tcp->write("quit\r\n");
+	//REQUIRE(p->waitForBytesWritten());
+	//p->closeWriteChannel();
 #endif
 
-	REQUIRE(p->waitForFinished());
+	CHECK(p->waitForFinished());
 
 	qDebug() << p->readAllStandardOutput();
 
