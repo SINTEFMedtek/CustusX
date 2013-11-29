@@ -201,6 +201,8 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 	algoFixture.setVerbose(true);
 	algoFixture.setSpherePhantom();
 	cx::USReconstructInputData input = algoFixture.generateSynthetic_USReconstructInputData();
+//	REQUIRE(!input.mFrames.empty());
+//	CHECK(input.mFrames[0]->);
 
 	cx::ReconstructManagerPtr reconstructer = fixture.createManager();
 	reconstructer->selectData(input);

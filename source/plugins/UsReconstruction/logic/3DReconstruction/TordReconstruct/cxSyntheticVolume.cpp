@@ -198,10 +198,8 @@ void cxSyntheticVolume::fillVolume(cx::ImagePtr vol)
 			for(int x = 0; x < dims[0]; ++x)
 			{
 				Vector3D p_d = Vector3D(x, y, z).array()*spacing;
-				unsigned char our_value = evaluate(rMd.coord(p_d));
-
 				int index = x + y*dims[0] + z*dims[1]*dims[0];
-				pixels[index] =evaluate(rMd.coord(p_d));
+				pixels[index] = this->evaluate(rMd.coord(p_d));
 			}
 		}
 	}
