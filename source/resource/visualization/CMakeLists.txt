@@ -14,7 +14,6 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	Rep3D/sscToolRep3D
 	Rep3D/sscPickerRep
 	Rep3D/sscVolumetricRep
-	Rep3D/sscProgressiveLODVolumetricRep
 	Rep3D/sscTexture3DSlicerRep
 	Rep3D/sscGPURayCastVolumeRep
 	Rep3D/sscSlices3DRep
