@@ -19,6 +19,17 @@ VLCRecorder* VLCRecorder::getInstance()
   return mTheInstance;
 }
 
+void VLCRecorder::initialize()
+{
+	VLCRecorder::getInstance();
+}
+
+void VLCRecorder::shutdown()
+{
+  delete mTheInstance;
+  mTheInstance = NULL;
+}
+
 VLCRecorder::VLCRecorder() :
 		mCommandLine(new ProcessWrapper("VLC")), mVLCPath("")
 {
@@ -33,10 +44,10 @@ bool VLCRecorder::hasVLCApplication()
 	return QFile::exists(mVLCPath);
 }
 
-void VLCRecorder::findVLCApplication(QStringList searchPaths)
+void VLCRecorder::findVLCApplication(QStringList suggestedVLCLocations)
 {
-	searchPaths.push_front(this->getVLCDefaultLocation());
-	foreach(QString path, searchPaths)
+	suggestedVLCLocations.push_front(this->getVLCDefaultLocation());
+	foreach(QString path, suggestedVLCLocations)
 	{
 		if(this->isValidVLC(path))
 		{
@@ -53,12 +64,12 @@ bool VLCRecorder::isRecording()
 
 bool VLCRecorder::waitForStarted(int msecs)
 {
-	return mCommandLine->getProcess()->waitForStarted(msecs);
+	return mCommandLine->waitForStarted(msecs);
 }
 
 bool VLCRecorder::waitForFinished(int msecs)
 {
-	return mCommandLine->getProcess()->waitForFinished(msecs);
+	return mCommandLine->waitForFinished(msecs);
 }
 
 QString VLCRecorder::getVLCPath()
@@ -76,16 +87,8 @@ void VLCRecorder::startRecording(QString saveFile)
 
 void VLCRecorder::stopRecording()
 {
-#ifndef CX_WINDOWS
-	mCommandLine->requestTerminateSlot();
-#else
-	QProcess::startDetached("\""+mVLCPath+"\" vlc://quit");
-#endif
-}
-
-void VLCRecorder::play(QString moviePath)
-{
-	mCommandLine->launch("\""+mVLCPath+"\" "+moviePath+" --play-and-exit");
+	QString quit = "quit\n";
+	mCommandLine->write(quit.toStdString().c_str());
 }
 
 void VLCRecorder::setVLCPath(QString path)
@@ -122,13 +125,13 @@ QString VLCRecorder::getVLCDefaultRecorderArguments(QString saveFile)
 	QString defaultArguements("");
 #ifdef CX_WINDOWS
 	saveFile = saveFile.replace("/", "\\");
-	defaultArguements = " -I hotkeys screen:// :screen-fps=10.000000 :live-caching=300 :sout=#transcode{vcodec=h264,acodec=none}:file{dst="+saveFile+"} :sout-keep ";
+	defaultArguements = " -I luacli screen:// :screen-fps=10.000000 :live-caching=300 :sout=#transcode{vcodec=h264,acodec=none}:file{dst="+saveFile+"} :sout-keep ";
 #endif
 #ifdef CX_APPLE
-	defaultArguements = " -I hotkeys screen:// \":sout=#transcode{vcodec=h264,vb=800,fps=10,scale=1,acodec=none}:duplicate{dst=standard{access=file,mux=mp4,dst="+saveFile+"}}\"";
+	defaultArguements = " -I cli screen:// \":sout=#transcode{vcodec=h264,vb=800,fps=10,scale=1,acodec=none}:duplicate{dst=standard{access=file,mux=mp4,dst="+saveFile+"}}\"";
 #endif
 #ifdef CX_LINUX
-	defaultArguements = " -I hotkeys screen:// :screen-fps=10.000000 :live-caching=300 \":sout=#transcode{vcodec=h264,vb=0,fps=10,scale=0,acodec=none}:file{dst="+saveFile+"}\" :sout-keep";
+	defaultArguements = " -I cli screen:// :screen-fps=10.000000 :live-caching=300 \":sout=#transcode{vcodec=h264,vb=0,fps=10,scale=0,acodec=none}:file{dst="+saveFile+"}\" :sout-keep";
 #endif
 	return defaultArguements;
 }

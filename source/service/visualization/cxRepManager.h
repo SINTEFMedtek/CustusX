@@ -23,7 +23,6 @@
 namespace cx
 {
 typedef boost::shared_ptr<class Rep> RepPtr;
-typedef boost::shared_ptr<class ProgressiveLODVolumetricRep> ProgressiveLODVolumetricRepPtr;
 }
 
 namespace cx

@@ -20,7 +20,6 @@
 
 #include "sscVolumeHelpers.h"
 #include "sscVolumetricRep.h"
-#include "sscProgressiveLODVolumetricRep.h"
 #include "cxtestUtilities.h"
 #include "sscMessageManager.h"
 #include "cxtestDirectSignalListener.h"
@@ -78,17 +77,6 @@ TEST_CASE("MultiVolume3DRepProducer creates 1 rep using vtkGPUVolumeRayCastMappe
 	cx::VolumetricRepPtr rep = fixture.downcastRep<cx::VolumetricRep>(0);
 	REQUIRE(rep);
 	CHECK(dynamic_cast<vtkGPUVolumeRayCastMapper*>(rep->getVtkVolume()->GetMapper()));
-}
-
-TEST_CASE("MultiVolume3DRepProducer creates 1 rep using sscProgressiveLODVolumeTextureMapper3D for 1 added image.", "[unit][not_win32][not_win64]")
-{
-	MultiVolume3DRepProducerFixture fixture;
-	fixture.initializeVisualizerAndImages("sscProgressiveLODVolumeTextureMapper3D", 1);
-
-	REQUIRE(fixture.mBase.getAllReps().size() == 1);
-
-	cx::ProgressiveLODVolumetricRepPtr rep = fixture.downcastRep<cx::ProgressiveLODVolumetricRep>(0);
-	REQUIRE(rep);
 }
 
 TEST_CASE("MultiVolume3DRepProducer creates 1 rep using Image2DRep3D for 1 added 2D image, for any visualizer type.", "[unit]")

@@ -18,13 +18,13 @@ TordTest::TordTest()
 	mMethods.push_back("Anisotropic");
 	mPlaneMethods.push_back("Heuristic");
 	mPlaneMethods.push_back("Closest");
-	
 }
 
 TordTest::~TordTest()
 {
 
 }
+
 
 std::vector<DataAdapterPtr>
 TordTest::getSettings(QDomElement root)
@@ -36,6 +36,8 @@ TordTest::getSettings(QDomElement root)
 	retval.push_back(this->getPlaneMethodOption(root));
 	retval.push_back(this->getMaxPlanesOption(root));
 	retval.push_back(this->getNStartsOption(root));
+	retval.push_back(this->getNewnessWeightOption(root));
+	retval.push_back(this->getBrightnessWeightOption(root));
 	return retval;
 }
 
@@ -55,6 +57,29 @@ TordTest::getMethodOption(QDomElement root)
 	                                        "Which algorithm to use for reconstruction",
 	                                        methods[0],
 	                                        methods,
+	                                        root);
+}
+
+DoubleDataAdapterXmlPtr
+TordTest::getNewnessWeightOption(QDomElement root)
+{
+	return DoubleDataAdapterXml::initialize("Newness weight", "",
+	                                        "Newness weight",
+	                                        0,
+	                                        DoubleRange(0.0, 10, 0.1),
+	                                        1,
+	                                        root);
+}
+
+
+DoubleDataAdapterXmlPtr
+TordTest::getBrightnessWeightOption(QDomElement root)
+{
+	return DoubleDataAdapterXml::initialize("Brightness weight", "",
+	                                        "Brightness weight",
+	                                        0,
+	                                        DoubleRange(0.0, 10, 0.1),
+	                                        1,
 	                                        root);
 }
 
@@ -126,13 +151,17 @@ TordTest::getPlaneMethodID(QDomElement root)
 		) - mPlaneMethods.begin();
 }
 
+
 bool
 TordTest::initCL(QString kernelPath,
                  int nMaxPlanes,
                  int nPlanes,
                  int method,
                  int planeMethod,
-                 int nStarts)
+                 int nStarts,
+                 float brightnessWeight,
+                 float newnessWeight
+	)
 {
 	// Reusing initialization code from Thunder
 	moClContext = ocl_init("GPU");
@@ -149,6 +178,8 @@ TordTest::initCL(QString kernelPath,
 	                                            method,
 	                                            planeMethod,
 	                                            nStarts,
+	                                            brightnessWeight,
+	                                            newnessWeight,
 	                                            kernelPath);
 
 	if(clprogram == NULL) return false;
@@ -166,6 +197,8 @@ TordTest::buildCLProgram(const char* program_src,
                          int method,
                          int planeMethod,
                          int nStarts,
+                         float newnessWeight,
+                         float brightnessWeight,
                          QString kernelPath)
 {
 	cl_program retval;
@@ -178,8 +211,14 @@ TordTest::buildCLProgram(const char* program_src,
 
 	ocl_check_error(err);
 
-	QString define = "-D MAX_PLANES=%1 -D N_PLANES=%2 -D METHOD=%3 -D PLANE_METHOD=%4 -D MAX_MULTISTART_STARTS=%5";
-	define = define.arg(nMaxPlanes).arg(nPlanes).arg(method).arg(planeMethod).arg(nStarts);
+	QString define = "-D MAX_PLANES=%1 -D N_PLANES=%2 -D METHOD=%3 -D PLANE_METHOD=%4 -D MAX_MULTISTART_STARTS=%5 -D NEWNESS_FACTOR=%6 -D BRIGHTNESS_FACTOR=%7";
+	define = define.arg(nMaxPlanes)
+		.arg(nPlanes)
+		.arg(method)
+		.arg(planeMethod)
+		.arg(nStarts)
+		.arg(newnessWeight)
+		.arg(brightnessWeight);
 
 	err = clBuildProgram(retval, 0, NULL, define.toStdString().c_str(), 0, 0);
 
@@ -415,7 +454,8 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	// Now find the largest multiple of the preferred work group size that will fit into local mem
 
 	size_t constant_local_mem = sizeof(cl_float)*4*nPlanes;
-	size_t varying_local_mem = (sizeof(cl_float)+sizeof(cl_int))*(nClosePlanes+1);
+	size_t varying_local_mem = (sizeof(cl_float)+sizeof(cl_short) + sizeof(cl_uchar) + sizeof(cl_uchar))
+		*(nClosePlanes+1);
 	messageManager()->sendInfo(QString("Device has %1 bytes of local memory\n")
 	                           .arg(dev_local_mem_size));
 	dev_local_mem_size -= constant_local_mem + 128;
@@ -559,7 +599,9 @@ TordTest::reconstruct(ProcessedUSInputDataPtr input,
 	float radius = getRadiusOption(settings)->getValue();
 	int planeMethod = getPlaneMethodID(settings);
 	int nStarts = getNStartsOption(settings)->getValue();
-
+	float newnessWeight = getNewnessWeightOption(settings)->getValue();
+	float brightnessWeight = getBrightnessWeightOption(settings)->getValue();
+	
 	messageManager()->sendInfo(
 		QString("Method: %1, radius: %2, planeMethod: %3, nClosePlanes: %4, nPlanes: %5, nStarts: %6 ")
 		.arg(method)
@@ -574,7 +616,9 @@ TordTest::reconstruct(ProcessedUSInputDataPtr input,
 	           input->getDimensions()[2],
 	           method,
 	           planeMethod,
-	           nStarts
+	           nStarts,
+	           newnessWeight,
+	           brightnessWeight
 		   )) return false;
 
 	bool ret = doGPUReconstruct(input, outputData, radius, nClosePlanes );

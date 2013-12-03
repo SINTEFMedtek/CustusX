@@ -241,8 +241,9 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 	{
 		report_gl_error();
 		QString shaderSource = this->loadShaderFile();
-		int layers = this->mElement.size();
-		shaderSource = shaderSource.replace("${LAYERS}", QString("%1").arg(layers));
+		shaderSource = this->replaceShaderSourceMacros(shaderSource);
+//		int layers = this->mElement.size();
+//		shaderSource = shaderSource.replace("${LAYERS}", QString("%1").arg(layers));
 
 		this->buildProgram(shaderSource, context);
 	}
@@ -256,6 +257,23 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 	report_gl_error();
 	glActiveTexture(oldTextureUnit);
 }
+
+QString TextureSlicePainter::replaceShaderSourceMacros(QString shaderSource)
+{
+	// set constant layers
+	int layers = this->mElement.size();
+	shaderSource = shaderSource.replace("${LAYERS}", QString("%1").arg(layers));
+
+	// fill function vec4 sampleLut(in int index, in float idx)
+	QString element = "\tif (index==%1) return texture1D(lut[%1], idx);\n";
+	QString sampleLutContent;
+	for (unsigned i=0; i<layers; ++i)
+		sampleLutContent += element.arg(i);
+	shaderSource = shaderSource.replace("${SAMPLE_LUT_CONTENT}", sampleLutContent);
+
+	return shaderSource;
+}
+
 
 void TextureSlicePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags,
 		bool forceCompileOnly)

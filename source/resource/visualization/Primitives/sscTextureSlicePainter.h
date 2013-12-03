@@ -103,6 +103,7 @@ private:
 	QString loadShaderFile();
 	void buildProgram(QString shaderSource, vtkOpenGLRenderWindow* renderWindow);
 	SingleVolumePainterHelper& safeIndex(int index);
+	QString replaceShaderSourceMacros(QString shaderSource);
 
 	bool hasLoadedExtensions;
 	QString mShaderPath;

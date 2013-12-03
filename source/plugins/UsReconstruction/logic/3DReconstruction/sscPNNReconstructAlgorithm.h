@@ -30,6 +30,8 @@ namespace cx
  * \{
  */
 
+typedef boost::shared_ptr<class PNNReconstructAlgorithm> PNNReconstructAlgorithmPtr;
+
 /**\brief PNN US reconstruction.
  *
  * A specialization of ReconstructAlgorithm that implements

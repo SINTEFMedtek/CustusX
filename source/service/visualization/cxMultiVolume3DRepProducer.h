@@ -80,7 +80,6 @@ private:
 	void buildVtkOpenGLGPUMultiVolumeRayCastMapper();
 	void buildVtkVolumeTextureMapper3D(ImagePtr image);
 	void buildVtkGPUVolumeRayCastMapper(ImagePtr image);
-	void buildSscProgressiveLODVolumeTextureMapper3D(ImagePtr image);
 	bool is2DImage(ImagePtr image) const;
 	void buildSscImage2DRep3D(ImagePtr image);
 

@@ -32,12 +32,15 @@ namespace cxtest
 TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthetic][ca_rec1][ca_rec]")
 {
 	ReconstructAlgorithmFixture fixture;
+	QDomDocument domdoc;
+	QDomElement settings = domdoc.createElement("PNN");
+
 	fixture.setOverallBoundsAndSpacing(100, 5);
-//	fixture.setVerbose(true);
+	fixture.setVerbose(true);
 	fixture.setSpherePhantom();
 
 	fixture.setAlgorithm(cx::PNNReconstructAlgorithm::create());
-	fixture.reconstruct();
+	fixture.reconstruct(settings);
 
 	fixture.checkRMSBelow(20.0);
 	fixture.checkCentroidDifferenceBelow(1);
@@ -52,17 +55,20 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthe
 
 TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][synthetic][ca_rec5][ca_rec]")
 {
+	QDomDocument domdoc;
+	QDomElement settings = domdoc.createElement("PNN");
+
 	ReconstructAlgorithmFixture fixture;
 	fixture.defineProbeMovementSteps(40);
 	fixture.defineProbeMovementNormalizedTranslationRange(0.8);
 	fixture.defineProbeMovementAngleRange(M_PI/6);
 	fixture.defineOutputVolume(100, 2);
 	fixture.defineProbe(cx::DummyToolTestUtilities::createProbeDataLinear(100, 100, Eigen::Array2i(150,150)));
-//	fixture.setVerbose(true);
+	fixture.setVerbose(true);
 	fixture.setSpherePhantom();
 
 	fixture.setAlgorithm(cx::PNNReconstructAlgorithm::create());
-	fixture.reconstruct();
+	fixture.reconstruct(settings);
 
 	fixture.checkRMSBelow(30.0);
 	fixture.checkCentroidDifferenceBelow(2);
@@ -93,12 +99,16 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 TEST_CASE("ReconstructAlgorithm: Thunder VNN on sphere","[unit][usreconstruction][synthetic][ca_rec3][ca_rec][not_amd_gpu]")
 {
 	ReconstructAlgorithmFixture fixture;
+
+	QDomDocument domdoc;
+	QDomElement settings = domdoc.createElement("ThunderVNN");
+
 	fixture.setOverallBoundsAndSpacing(100, 5);
-	//fixture.setVerbose(true);
+	fixture.setVerbose(true);
 	fixture.setSpherePhantom();
 
 	fixture.setAlgorithm(cx::ThunderVNNReconstructAlgorithm::create(""));
-	fixture.reconstruct();
+	fixture.reconstruct(settings);
 
 	fixture.checkRMSBelow(20.0);
 	fixture.checkCentroidDifferenceBelow(1);
@@ -114,22 +124,59 @@ TEST_CASE("ReconstructAlgorithm: Thunder VNN on sphere","[unit][usreconstruction
 TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][usreconstruction][hide][synthetic]")
 {
 	ReconstructAlgorithmFixture fixture;
+
 	fixture.setOverallBoundsAndSpacing(100, 5);
 	fixture.setSpherePhantom();
-
+	QDomDocument domdoc;
+	QDomElement settings = domdoc.createElement("TordTest");
 	boost::shared_ptr<cx::TordTest> algorithm(new cx::TordTest);
 
-	QDomDocument domDoc;
-	QDomElement root = domDoc.createElement("TordTest");
-
-	algorithm->getMethodOption(root)->setValue("VNN");
-	algorithm->getPlaneMethodOption(root)->setValue("Heuristic");
-	algorithm->getMaxPlanesOption(root)->setValue(8);
-	algorithm->getRadiusOption(root)->setValue(1);
-	algorithm->getNStartsOption(root)->setValue(1);
-
 	fixture.setAlgorithm(algorithm);
-	fixture.reconstruct();
+	algorithm->getRadiusOption(settings)->setValue(10);
+	SECTION("VNN")
+	{
+		std::cerr << "Testing VNN\n";
+		algorithm->getMethodOption(settings)->setValue("VNN");
+		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(settings)->setValue(8);
+		algorithm->getNStartsOption(settings)->setValue(1);
+	}
+	SECTION("VNN2")
+	{
+		std::cerr << "Testing VNN2\n";
+		algorithm->getMethodOption(settings)->setValue("VNN2");
+		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(settings)->setValue(8);
+		algorithm->getNStartsOption(settings)->setValue(1);
+	}
+	SECTION("DW")
+	{
+		std::cerr << "Testing DW\n";
+		algorithm->getMethodOption(settings)->setValue("DW");
+		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(settings)->setValue(8);
+		algorithm->getNStartsOption(settings)->setValue(1);
+	}
+	SECTION("Anisotropic")
+	{
+		std::cerr << "Testing Anisotropic\n";
+		algorithm->getMethodOption(settings)->setValue("Anisotropic");
+		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(settings)->setValue(8);
+		algorithm->getNStartsOption(settings)->setValue(1);
+		algorithm->getBrightnessWeightOption(settings)->setValue(0);
+		algorithm->getNewnessWeightOption(settings)->setValue(0);
+	}
+	SECTION("Multistart search")
+	{
+		std::cerr << "Testing multistart search\n";
+		algorithm->getMethodOption(settings)->setValue("VNN");
+		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(settings)->setValue(8);
+		algorithm->getNStartsOption(settings)->setValue(5);
+	}
+
+	fixture.reconstruct(settings);
 
 	fixture.checkRMSBelow(20.0);
 	fixture.checkCentroidDifferenceBelow(1);
