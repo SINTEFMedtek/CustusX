@@ -12,6 +12,9 @@ typedef boost::shared_ptr<class VLCRecorder> VLCRecorderPtr;
  * \brief Lets you use the third party application VLC
  * to record a video of the screen.
  *
+ * Is implemented as a singleton because there should only be
+ * one instance of the application VLC running at all times.
+ *
  * \date Oct 10, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
@@ -21,23 +24,23 @@ class VLCRecorder: public QObject
 	Q_OBJECT
 
 public:
-	static VLCRecorder* getInstance(); ///< Returns a reference to the only MessageManager that exists.
+	static VLCRecorder* getInstance();
+	  static void initialize();
+	  static void shutdown();
 
 	bool hasVLCApplication();
-	void findVLCApplication(QStringList searchPaths = QStringList());
+	void findVLCApplication(QStringList suggestedVLCLocations = QStringList());
+	QString getVLCPath();
 
 	bool isRecording();
 
+	//for running without a event loop - used for testing
 	bool waitForStarted(int msecs = 30000);
 	bool waitForFinished(int msecs = 30000);
-
-	QString getVLCPath();
 
 public slots:
 	void startRecording(QString saveFile);
 	void stopRecording();
-
-	void play(QString moviePath);
 
 private:
 	VLCRecorder();
@@ -53,12 +56,10 @@ private:
 	ProcessWrapperPtr mCommandLine;
 	QString mVLCPath;
 
-	static VLCRecorder* mTheInstance; ///< The unique VLCRecorder
+	static VLCRecorder* mTheInstance;
 };
 
-/**Shortcut for accessing the vlc recorder
- */
-VLCRecorder* vlc();
+VLCRecorder* vlc(); ///< Shortcut for accessing the vlc recorder
 
 
 } /* namespace cx */

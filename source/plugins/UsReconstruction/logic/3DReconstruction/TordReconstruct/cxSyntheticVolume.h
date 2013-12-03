@@ -54,12 +54,30 @@ public:
 				 const Transform3D& output_dMr,
 	             const double noiseSigma,
 	             const unsigned char noiseMean) const;
+	/** Alternative version.
+	  * Input rMt, uses probe to generate required information about probe plane.
+	  */
 	virtual ProcessedUSInputDataPtr
 	sampleUsData(const std::vector<Transform3D>& planes_rMt,
 				 const ProbeDefinition& probe,
 				 const Transform3D& output_dMr,
 				 const double noiseSigma=0,
 				 const unsigned char noiseMean=0) const;
+	/** Generate one simulated us plane from the input rMt, probe.
+	  */
+	vtkImageDataPtr
+	sampleUsData(const Transform3D& plane_rMt,
+				 const ProbeDefinition& probe,
+				 const double noiseSigma=0,
+				 const unsigned char noiseMean=0) const;
+	/** Alternative version. Input primitive components of probe, transform to image plane f.
+	  */
+	vtkImageDataPtr
+	sampleUsData(const Transform3D& plane_rMf,
+				 const Eigen::Array2f& pixelSpacing,
+				 const Eigen::Array2i& sliceDimension,
+				 const double noiseSigma,
+				 const unsigned char noiseMean) const;
 
 	/**
 	 * Evaluate the volume at position (x, y, z).
@@ -73,10 +91,13 @@ public:
 
 protected:
 	unsigned char constrainToUnsignedChar(const int val) const;
+	vtkImageDataPtr createEmptyMask(const Eigen::Array2i& sliceDimension) const;
 
 	Vector3D mBounds;
 
 };
+
+typedef boost::shared_ptr<cxSyntheticVolume> cxSyntheticVolumePtr;
 
 double calculateRMSError(vtkImageDataPtr a, vtkImageDataPtr b);
 cx::Vector3D calculateCentroid(cx::ImagePtr image);

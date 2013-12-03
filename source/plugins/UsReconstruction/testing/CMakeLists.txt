@@ -25,6 +25,8 @@ if (BUILD_TESTING)
 		cxtestReconstructAlgorithm.cpp
 		cxtestReconstructAlgorithmFixture.h
 		cxtestReconstructAlgorithmFixture.cpp
+		cxtestSyntheticVolumeComparer.h
+		cxtestSyntheticVolumeComparer.cpp
 		cxtestSphereSyntheticVolume.h
 		cxtestSphereSyntheticVolume.cpp
 		)

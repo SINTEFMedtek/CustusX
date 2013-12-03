@@ -94,6 +94,7 @@ public:
 	static USFrameDataPtr create(ImagePtr inputFrameData);
 	static USFrameDataPtr create(QString inputFilename);
 	static USFrameDataPtr create(QString name, cx::ImageDataContainerPtr images);
+	static USFrameDataPtr create(QString name, std::vector<vtkImageDataPtr> frames);
 	~USFrameData();
 
 	Eigen::Array3i getDimensions() const;

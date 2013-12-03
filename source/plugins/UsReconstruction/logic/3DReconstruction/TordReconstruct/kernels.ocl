@@ -30,6 +30,10 @@
 #define ANISOTROPIC_METHOD_BILINEAR_ON_PLANE 1
 #define ANISOTROPIC_METHOD_GAUSSIAN_ON_PLANE 2
 
+#define ANISOTROPIC_WEIGHT_METHOD_DISTANCE 0
+#define ANISOTROPIC_WEIGHT_METHOD_BRIGHTNESS 1
+#define ANISOTROPIC_WEIGHT_METHOD_LATENESS 2
+#define ANISOTROPIC_WEIGHT_METHOD_BOTH 3
 
 #define ANISOTROPIC_METHOD ANISOTROPIC_METHOD_BILINEAR_ON_PLANE
 
@@ -80,13 +84,51 @@
 #define WEIGHT_INV4(x) (1.0f/fabs(x*x*x*x))
 #define WEIGHT_SUB(x) (1.0f - fabs(x))
 
+#define WEIGHT_TERNARY(val, mean, factor)                            \
+	((val) >= (mean) ? (factor) : 0.0f)
+
+#define ANISOTROPIC_GAUSS_WEIGHT(px, var, mean, mean_id, sigma) WEIGHT_GAUSS(px.dist, sigma)
+
+#ifndef ANISOTROPIC_WEIGHT_METHOD
+#define ANISOTROPIC_WEIGHT_METHOD ANISOTROPIC_WEIGHT_METHOD_BOTH
+#endif
+
+#ifndef BRIGHTNESS_FACTOR
+#define BRIGHTNESS_FACTOR 5.0f
+#endif
+#ifndef NEWNESS_FACTOR
+#define NEWNESS_FACTOR 5.0f
+#endif
+
+#define ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, mean_id, sigma)    \
+	((WEIGHT_GAUSS(px.dist, sigma)) + (WEIGHT_TERNARY(px.intensity, mean, BRIGHTNESS_FACTOR)))
+
+#define ANISOTROPIC_WEIGHT_LATENESS(px, var, mean, mean_id, sigma)      \
+	((WEIGHT_GAUSS(px.dist, sigma)) + (WEIGHT_TERNARY(px.plane_id, mean_id, NEWNESS_FACTOR)))
+
+#define ANISOTROPIC_WEIGHT_BOTH(px, var, mean, mean_id, sigma) \
+	((WEIGHT_GAUSS(px.dist, sigma)) \
+	 + (WEIGHT_TERNARY(px.plane_id, mean_id, NEWNESS_FACTOR)) \
+	 + (WEIGHT_TERNARY(px.intensity, mean, BRIGHTNESS_FACTOR)))
+
+#if ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_DISTANCE
+#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_GAUSS_WEIGHT(px, var, mean, mean_id, sigma)
+#elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_BRIGHTNESS
+#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, mean_id, sigma)
+#elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_LATENESS
+#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_LATENESS(px, var, mean, mean_id, sigma)
+#elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_BOTH
+#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_BOTH(px, var, mean, mean_id, sigma)
+#endif
+
+
 // Gaussian weight function
 #define WEIGHT_GAUSS_SIGMA (0.05f)
 
 #define WEIGHT_GAUSS_SQRT_2PI 2.506628275f
 
-#define WEIGHT_GAUSS_NONEXP_PART(sigma) (1.0f/(sigma*WEIGHT_GAUSS_SQRT_2PI))
-#define WEIGHT_GAUSS_EXP_PART(dist, sigma) exp(-(dist*dist)/(2*sigma*sigma))
+#define WEIGHT_GAUSS_NONEXP_PART(sigma) (1.0f/((sigma)*WEIGHT_GAUSS_SQRT_2PI))
+#define WEIGHT_GAUSS_EXP_PART(dist, sigma) exp(-((dist)*(dist))/(2*(sigma)*(sigma)))
 
 #define WEIGHT_GAUSS(x, sigma) (WEIGHT_GAUSS_NONEXP_PART(sigma)*WEIGHT_GAUSS_EXP_PART(x, sigma))
 
@@ -106,14 +148,10 @@
 typedef struct _close_plane
 {
 	float dist;
-	int plane_id;
-} close_plane_t;
-
-typedef struct _pixel
-{
+	short plane_id;
 	unsigned char intensity;
-	float dist;
-} pixel_t;
+	unsigned char padding; // Align with 4
+} close_plane_t;
 
 /***************/
 /* End structs */
@@ -218,8 +256,8 @@ bilinearInterpolation(float x,
                       const __global unsigned char* image,
                       int in_xsize);
 
-pixel_t anisotropicFilter(const pixel_t *pixels,
-                          int n_planes);
+unsigned char anisotropicFilter(__local const close_plane_t *pixels,
+                                int n_planes);
 
 #if METHOD == METHOD_VNN
 unsigned char
@@ -411,12 +449,14 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
                             float in_xspacing,
                             float in_yspacing)
 {
-
+	close_plane_t  tmp;
+	tmp.dist = INFINITY;
+	tmp.plane_id = -1;
 	for(int i = 0; i < MAX_PLANES; i++)
 	{
-		CLOSE_PLANE_IDX(close_planes, i).dist = INFINITY;
-		CLOSE_PLANE_IDX(close_planes, i).plane_id = -1;
+		CLOSE_PLANE_IDX(close_planes, i) = tmp;
 	}
+
 	int2 ret;
 	int found = 0;
 	for(int i = 0; i < n_multistart_guesses; i++)
@@ -502,7 +542,8 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 	// The biggest distance found so far
 	float max_dist = min(fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist), radius);
 
-
+	close_plane_t tmp;
+	tmp.intensity = 0;
 
 	// If guess is 0, we will try to access data for plane id -1, which does not exist.
 	// Assume plane 1 is close enough in that case
@@ -526,7 +567,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 		dists.y = dot(voxel, plane_eqs[idx.y]);
 		// Compute the absolute distances to those planes
 		abs_dists.x = fabs(dists.x);
-		abs_dists.y =  fabs(dists.y); // .x = abs_dist_up, .y = abs_dist_down,
+		abs_dists.y = fabs(dists.y); // .x = abs_dist_up, .y = abs_dist_down,
 
 
 		float2 diff_dists = prev_abs_dists - abs_dists;
@@ -551,8 +592,9 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 			{
 
 				// If yes, swap out the one with the longest distance for this plane
-				CLOSE_PLANE_IDX(close_planes, max_idx).dist = dists.x;
-				CLOSE_PLANE_IDX(close_planes, max_idx).plane_id = idx.x;
+				tmp.dist = dists.x;
+				tmp.plane_id = idx.x;
+				CLOSE_PLANE_IDX(close_planes, max_idx) = tmp;
 				found++;
 
 				// We have found MAX_PLANES planes, but we don't know they're the closest ones.
@@ -590,9 +632,10 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 			               in_yspacing);
 			if(isValidPixel(px, py, mask, in_xsize, in_ysize))
 			{
+				tmp.dist = dists.y;
+				tmp.plane_id = idx.y;
+				CLOSE_PLANE_IDX(close_planes, max_idx) = tmp;
 
-				CLOSE_PLANE_IDX(close_planes, max_idx).dist = dists.y;
-				CLOSE_PLANE_IDX(close_planes, max_idx).plane_id = idx.y;
 				found++;
 				max_idx = findHighestIdx(close_planes, MAX_PLANES);
 				max_dist = min(fabs(CLOSE_PLANE_IDX(close_planes, max_idx).dist), radius);
@@ -833,15 +876,16 @@ performInterpolation_vnn(__local close_plane_t *close_planes,
 	int plane_id = 0;
 	float lowest_dist = 10.0f;
 	int close_plane_id = 0;
-
+	close_plane_t plane;
 	// Find the closest plane
 	for(int i = 0; i < n_close_planes;  i++)
 	{
-		float fabs_dist = fabs(CLOSE_PLANE_IDX(close_planes, i).dist);
+		plane = CLOSE_PLANE_IDX(close_planes, i);
+		float fabs_dist = fabs(plane.dist);
 		if(fabs_dist < lowest_dist)
 		{
 			lowest_dist = fabs_dist;
-			plane_id = CLOSE_PLANE_IDX(close_planes ,i).plane_id;
+			plane_id = plane.plane_id;
 			close_plane_id = i;
 		}
 	}
@@ -908,12 +952,12 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
 	float val = 0;
 	for(int i = 0; i < n_close_planes; i++)
 	{
-
-		int plane_id = CLOSE_PLANE_IDX(close_planes ,i).plane_id;
-		const __global unsigned char* image = getImageData(CLOSE_PLANE_IDX(close_planes ,i).plane_id,
-		                                             bscans_blocks,
-		                                             in_xsize,
-		                                             in_ysize);
+		close_plane_t plane = CLOSE_PLANE_IDX(close_planes, i);
+		int plane_id = plane.plane_id;
+		const __global unsigned char* image = getImageData(plane_id,
+		                                                   bscans_blocks,
+		                                                   in_xsize,
+		                                                   in_ysize);
 
 
 		// Now we project the voxel onto the plane by translating the voxel along the
@@ -921,7 +965,7 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
 		voxel.w = 1.0f;
 		float4 translated_voxel = projectOntoPlaneEq(voxel,
 		                                             plane_eqs[plane_id],
-		                                             CLOSE_PLANE_IDX(close_planes ,i).dist);
+		                                             plane.dist);
 
 		translated_voxel.w = 1.0f;
 		// And then we get the pixel space coordinates
@@ -937,7 +981,7 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
 		{
 			continue;
 		}
-		float dist = fabs(CLOSE_PLANE_IDX(close_planes ,i).dist);
+		float dist = fabs(plane.dist);
 
 		if(dist < 0.001f)
 			dist = 0.001f;
@@ -984,9 +1028,9 @@ performInterpolation_dw(__local close_plane_t *close_planes,
 	float val = 0;
 	for(int i = 0; i < n_close_planes; i++)
 	{
-
-		int plane_id = CLOSE_PLANE_IDX(close_planes ,i).plane_id;
-		const __global unsigned char* image = getImageData(CLOSE_PLANE_IDX(close_planes ,i).plane_id,
+		close_plane_t plane = CLOSE_PLANE_IDX(close_planes, i);
+		int plane_id = plane.plane_id;
+		const __global unsigned char* image = getImageData(plane.plane_id,
 		                                                   bscans_blocks,
 		                                                   in_xsize,
 		                                                   in_ysize);
@@ -997,7 +1041,7 @@ performInterpolation_dw(__local close_plane_t *close_planes,
 		voxel.w = 1.0f;
 		float4 translated_voxel = projectOntoPlaneEq(voxel,
 		                                             plane_eqs[plane_id],
-		                                             CLOSE_PLANE_IDX(close_planes ,i).dist);
+		                                             plane.dist);
 
 		translated_voxel.w = 1.0f;
 		// And then we get the pixel space coordinates
@@ -1024,7 +1068,7 @@ performInterpolation_dw(__local close_plane_t *close_planes,
 
 		float interpolated_value = bilinearInterpolation(x, y, image, in_xsize);
 
-		float dist = fabs(CLOSE_PLANE_IDX(close_planes ,i).dist);
+		float dist = fabs(plane.dist);
 		if(dist < 0.001f) dist = 0.001f;
 		float weight = DW_WEIGHT(dist);
 		scale += weight;
@@ -1057,20 +1101,16 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
                             __global const unsigned char* mask,
                             float4 voxel)
 {
-	// First, find all the relevant pixels
-#if ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_INCLUDE_ALL
-	pixel_t pixels[MAX_PLANES*ANISOTROPIC_SIZE*ANISOTROPIC_SIZE];
-#elif ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_BILINEAR_ON_PLANE
-	pixel_t pixels[MAX_PLANES];
-#elif ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_GAUSSIAN_ON_PLANE
-	pixel_t pixels[MAX_PLANES];
-#endif
 
 
-	int pos = 0;
+	if(n_close_planes == 0)
+	{
+		return 1;
+	}
 	for(int i = 0; i < n_close_planes; i++)
 	{
-		const int plane_id = CLOSE_PLANE_IDX(close_planes ,i).plane_id;
+		close_plane_t plane = CLOSE_PLANE_IDX(close_planes ,i);
+		const int plane_id = plane.plane_id;
 		const __global unsigned char* image = getImageData(plane_id,
 		                                             bscans_blocks,
 		                                             in_xsize,
@@ -1080,49 +1120,9 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 		voxel.w = 1.0f;
 		float4 translated_voxel = projectOntoPlaneEq(voxel,
 		                                             plane_eqs[plane_id],
-		                                             CLOSE_PLANE_IDX(close_planes ,i).dist);
+		                                             plane.dist);
 		translated_voxel.w = 1.0f;
 
-
-#if ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_INCLUDE_ALL
-
-		int x, y;
-		toImgCoord_int(&x,
-		               &y,
-		               translated_voxel,
-		               plane_matrices[plane_id],
-		               in_xspacing,
-		               in_yspacing);
-
-		for(int j = -ANISOTROPIC_SIZE/2; j <= ANISOTROPIC_SIZE/2; j++)
-		{
-			for(int k = -ANISOTROPIC_SIZE/2; k <= ANISOTROPIC_SIZE/2; k++)
-			{
-				int _x = x + j;
-				int _y = y + k;
-				if(!isValidPixel(_x, _y, mask, in_xsize, in_ysize))
-				{
-					continue;
-				}
-				pixels[pos].intensity = image[_y*in_xsize + _x];
-
-
-				// We know the distance in the direction normal to the plane.
-				// Since this is a pixel _on_ the plane, pretend the distance along the
-				// normal is one cathete, and the distance on the image plane is another catethe.
-				// The distance is then the hypotenuse.
-
-				float dist_x = j*in_xspacing;
-				float dist_y = k*in_yspacing;
-				float sq_x = dist_x*dist_x;
-				float sq_y = dist_y*dist_y;
-				float cp_dist = CLOSE_PLANE_IDX(close_planes ,i).dist;
-				pixels[pos].dist = sqrt(cp_dist*cp_dist + sq_x + sq_y);
-				pos++;
-			}
-		}
-
-#elif ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_BILINEAR_ON_PLANE
 		float x, y;
 		toImgCoord_float(&x,
 		                 &y,
@@ -1143,83 +1143,44 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 			{
 			continue;
 		}
-		pixels[pos].intensity = bilinearInterpolation(x,
-		                                              y,
-		                                              image,
-		                                              in_xsize);
-		pixels[pos++].dist = CLOSE_PLANE_IDX(close_planes, i).dist;
-
-#elif ANISOTROPIC_METHOD == ANISOTROPIC_METHOD_GAUSSIAN_ON_PLANE
-		int x, y;
-		toImgCoord_int(&x,
-		               &y,
-		               translated_voxel,
-		               plane_matrices[plane_id],
-		               in_xspacing,
-		               in_yspacing);
-		float gauss_weight_sum = 0.0f;
-		float gauss_value = 0.0f;
-		for(int ix = 0; ix < ANISOTROPIC_GAUSSIAN_SIZE; ix++)
-		{
-			for(int iy = 0; iy < ANISOTROPIC_GAUSSIAN_SIZE; iy++)
-			{
-				int xpos = x + ix - ANISOTROPIC_GAUSSIAN_SIZE/2;
-				int ypos = y + iy - ANISOTROPIC_GAUSSIAN_SIZE/2;
-				int xmaskpos = xpos - x;
-				int ymaskpos = ypos - y;
-				if(!isValidPixel(xpos, ypos, mask, in_xsize, in_ysize))
-				{
-					// If the pixel is invalid, we simply ignore that pixel
-					continue;
-				}
-
-				float weight = WEIGHT_GAUSS(hypot((float)xmaskpos, (float)ymaskpos), 0.5f);
-				gauss_value = mad(weight,image[xpos + ypos*in_xsize], gauss_value);
-				gauss_weight_sum += weight;
-			}
-		}
-		pixels[pos].intensity = gauss_value / gauss_weight_sum;
-		pixels[pos++].dist = CLOSE_PLANE_IDX(close_planes, i).dist;
-#endif
-
+		CLOSE_PLANE_IDX(close_planes, i).intensity = bilinearInterpolation(x,
+		                                                                   y,
+		                                                                   image,
+		                                                                   in_xsize);
 	}
 
-
-	if(pos == 0)
-	{
-		return 1;
-	}
-
-	//return max((unsigned char)1, weighted_median(pixels, pos).intensity);
-	return max((unsigned char)1, anisotropicFilter(pixels, pos).intensity);
+	return max((unsigned char)1, anisotropicFilter(close_planes, n_close_planes));
 
 }
 
 
 
-pixel_t anisotropicFilter(const pixel_t *pixels,
-                          int n_planes)
+unsigned char anisotropicFilter(__local const close_plane_t *pixels,
+                                int n_planes)
 {
 	// Calculate the variance
 
 	float mean_value = 0.0f;
+	int sum_ids = 0.0f;
+	close_plane_t tmp;
 	for(int i = 0; i < n_planes; i++)
 	{
-		mean_value += pixels[i].intensity;
+		tmp = CLOSE_PLANE_IDX(pixels, i);
+		mean_value += tmp.intensity;
+		sum_ids += tmp.plane_id;
 	}
-
+	float mean_id = (float)sum_ids / n_planes;
 	mean_value = mean_value / n_planes;
 
 	float variance = 0.0f;
 	for(int i = 0; i < n_planes; i++)
 	{
-		float tmp = pixels[i].intensity - mean_value;
-		variance  += mad(tmp, tmp, variance);
+		float tmp = CLOSE_PLANE_IDX(pixels, i).intensity - mean_value;
+		variance += mad(tmp, tmp, variance);
  	}
 
 	// We want high variance regions to have a sharp weight function
 	// and small variance regions to have a smooth weight function.
-
 
 	variance = clamp(variance/(n_planes-1), 1.0f, 10000.0f);
 	float gauss_sigma = mean_value/sqrt(variance);
@@ -1234,15 +1195,12 @@ pixel_t anisotropicFilter(const pixel_t *pixels,
 	// Use the resulting gauss sigma to calcualte weights
 	for(int i = 0; i < n_planes; i++)
 	{
-		float weight = WEIGHT_GAUSS(pixels[i].dist, gauss_sigma);
-		sum = mad(pixels[i].intensity,weight, sum);
+		tmp = CLOSE_PLANE_IDX(pixels, i);
+		float weight = ANISOTROPIC_WEIGHT(tmp, variance, mean_value, mean_id, gauss_sigma);
+		sum = mad(tmp.intensity,weight, sum);
 		sum_weights += weight;
 	}
-
-	pixel_t ret;
-	ret.dist = 0.0f;
-	ret.intensity = sum / sum_weights;
-	return ret;
+	return sum / sum_weights;
 }
 
 
@@ -1552,7 +1510,7 @@ voxel_methods(int volume_xsize,
 		for(int yoffset = ystart; yoffset != yend ; yoffset+=ydir)
 		{
 			int y = y_origin + yoffset;
-			if(y >= volume_ysize) break;
+			if(y >= volume_ysize) continue;
 			BOUNDS_CHECK(y, 0, volume_ysize);
 
 			int zstart, zend, zdir;
@@ -1570,9 +1528,8 @@ voxel_methods(int volume_xsize,
 			for(int zoffset = zstart; zoffset != zend ; zoffset+=zdir)
 			{
 				int z = z_origin + zoffset;
-				if(z >= volume_zsize) break;
+				if(z >= volume_zsize) continue;
 				BOUNDS_CHECK(z, 0, volume_zsize);
-
 				BOUNDS_CHECK(x, 0, volume_xsize);
 				BOUNDS_CHECK(y, 0, volume_ysize);
 				voxel.x = x * volume_xspacing;

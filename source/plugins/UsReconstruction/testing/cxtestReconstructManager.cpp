@@ -44,18 +44,18 @@
 #include "cxImageDataContainer.h"
 #include "cxUsReconstructionFileMaker.h"
 
+#include "cxtestSphereSyntheticVolume.h"
+#include "cxtestReconstructAlgorithmFixture.h"
+
 namespace cxtest
 {
 
-/** 
+/** Unit tests that test the US reconstruction plugin
  *
  *
  * \ingroup cxtest
  * \date june 25, 2013
  * \author christiana
- */
-
-/**Unit tests that test the US reconstruction plugin
  */
 class ReconstructManagerTestFixture
 {
@@ -65,8 +65,7 @@ public:
 	void setUp();
 	void tearDown();
 
-	void testSlerpInterpolation();///< Test position matrix slerp interpolation
-	void testConstructor();///< Test reconstructer constructor
+//	void testConstructor();///< Test reconstructer constructor
 	void testAngioReconstruction();///< Test reconstruction of US angio data (#318)
 	void testThunderGPUReconstruction();///< Test Thunder GPU reconstruction
 	void testDualAngio();
@@ -75,6 +74,12 @@ public:
 #endif // SSC_USE_OpenCL
 
 	cx::ReconstructManagerPtr createManager();
+	cx::ReconstructManagerPtr getManager();
+
+	// run the reconstruction in the main thread
+	void reconstruct();
+	std::vector<cx::ImagePtr> getOutput();
+	SyntheticVolumeComparerPtr getComparerForOutput(ReconstructAlgorithmFixture& algoFixture, int index);
 
 private:
 	void validateData(cx::ImagePtr output);
@@ -85,7 +90,40 @@ private:
 	  */
 	void validateAngioData(cx::ImagePtr angioOut);
 	int getValue(cx::ImagePtr data, int x, int y, int z);
+
+	void generateSynthetic_USReconstructInputData();
+	cx::ReconstructManagerPtr mManager;
+	std::vector<cx::ImagePtr> mOutput; // valid after reconstruct() has been run
 };
+
+void ReconstructManagerTestFixture::reconstruct()
+{
+	mOutput.clear();
+	cx::ReconstructPreprocessorPtr preprocessor = this->getManager()->createPreprocessor();
+	std::vector<cx::ReconstructCorePtr> cores = this->getManager()->createCores();
+	preprocessor->initializeCores(cores);
+	for (unsigned i=0; i<cores.size(); ++i)
+	{
+		cores[i]->reconstruct();
+		mOutput.push_back(cores[i]->getOutput());
+	}
+
+}
+
+std::vector<cx::ImagePtr> ReconstructManagerTestFixture::getOutput()
+{
+	return mOutput;
+}
+
+SyntheticVolumeComparerPtr ReconstructManagerTestFixture::getComparerForOutput(ReconstructAlgorithmFixture& algoFixture, int index)
+{
+	SyntheticVolumeComparerPtr comparer(new SyntheticVolumeComparer());
+	comparer->setVerbose(algoFixture.getVerbose());
+	comparer->setPhantom(algoFixture.getPhantom());
+	//	comparer->setTestImage(cores[0]->getOutput());
+	comparer->setTestImage(this->getOutput()[0]);
+	return comparer;
+}
 
 void ReconstructManagerTestFixture::setUp()
 {
@@ -101,81 +139,131 @@ void ReconstructManagerTestFixture::tearDown()
 	// this stuff will be performed just after all tests in this class
 }
 
-void ReconstructManagerTestFixture::testSlerpInterpolation()
+
+TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][synthetic][ca_rec6][ca_rec]")
 {
-	//  ReconstructManagerPtr reconstructer(new ReconstructManager(XmlOptionFile(),""));
+	ReconstructManagerTestFixture fixture;
 
-	//  ReconstructerPtr reconstructer(new Reconstructer(XmlOptionFile(),""));
-	cx::ReconstructCorePtr reconstructer(new cx::ReconstructCore());
+	ReconstructAlgorithmFixture algoFixture;
+	algoFixture.setOverallBoundsAndSpacing(100, 5);
+//	algoFixture.setOverallBoundsAndSpacing(100, 0.2);
+	algoFixture.setVerbose(true);
+	algoFixture.setSpherePhantom();
+	cx::USReconstructInputData input = algoFixture.generateSynthetic_USReconstructInputData();
 
-	cx::Transform3D a;
-	cx::Transform3D b;
+	cx::ReconstructManagerPtr reconstructer = fixture.createManager();
+	reconstructer->selectData(input);
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
+//	reconstructer->getParams()->mAngioAdapter->setValue(true);
+	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
 
-	Eigen::Matrix3d am;
-	am =
-			Eigen::AngleAxisd(0/*M_PI / 3.0*/, Eigen::Vector3d::UnitX()) * //60 deg
-			Eigen::AngleAxisd(M_PI / 180.0*2.0, Eigen::Vector3d::UnitY()) * // 2 deg
-			Eigen::AngleAxisd(0/*M_PI / 180.0*10.0*/, Eigen::Vector3d::UnitZ()); // 10 deg
+	// get the specific algorithm and corresponding settings
+	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "PNN");
+	cx::PNNReconstructAlgorithmPtr algorithm;
+	algorithm = boost::dynamic_pointer_cast<cx::PNNReconstructAlgorithm>(reconstructer->createAlgorithm());
+	REQUIRE(algorithm);// Check if we got the PNN algorithm
 
-	a.matrix().block<3, 3>(0, 0) = am;
-	a.matrix().block<4, 1>(0, 3) = Eigen::Vector4d(0.0, 0.0, 0.0, 1.0);
+	// set an algorithm-specific parameter
+	algorithm->getInterpolationStepsOption(algo)->setValue(1);
 
-	Eigen::Matrix3d bm;
-	bm =
-			Eigen::AngleAxisd(0, Eigen::Vector3d::UnitX()) * //0 deg
-			Eigen::AngleAxisd(0, Eigen::Vector3d::UnitY()) *
-			Eigen::AngleAxisd(0, Eigen::Vector3d::UnitZ());
+	// run the reconstruction in the main thread
+	fixture.reconstruct();
 
-	b.matrix().block<3, 3>(0, 0) = bm;
-	b.matrix().block<4, 1>(0, 3) = Eigen::Vector4d(10.0, 10.0, 10.0, 1.0);
+	// check validity of output:
+	REQUIRE(fixture.getOutput().size()==1);
 
-	double t = 0.5;
+	SyntheticVolumeComparerPtr comparer = fixture.getComparerForOutput(algoFixture, 0);
+	comparer->checkRMSBelow(30.0);
+	comparer->checkCentroidDifferenceBelow(1);
+	comparer->checkMassDifferenceBelow(0.01);
+	// check the value in the sphere center:
+	comparer->checkValueWithin(algoFixture.getPhantom()->getBounds()/2, 200, 255);
 
-	cx::Transform3D c = cx::USReconstructInputDataAlgorithm::slerpInterpolate(a, b, t);
-	//Transform3D c = reconstructer->interpolate(a, b, t);
-
-	Eigen::Matrix3d goalm;
-	goalm =
-			Eigen::AngleAxisd(0/*M_PI / 6.0*/, Eigen::Vector3d::UnitX()) * //30 deg
-			Eigen::AngleAxisd(M_PI / 180.0, Eigen::Vector3d::UnitY()) * // 1 deg
-			Eigen::AngleAxisd(0/*M_PI / 180.0*5.0*/, Eigen::Vector3d::UnitZ()); // 5 deg
-
-	cx::Transform3D goal;
-	goal.matrix().block<3, 3>(0, 0) = goalm;
-	goal.matrix().block<4, 1>(0, 3) = Eigen::Vector4d(5.0, 5.0, 5.0, 1.0);
-
-	if (!cx::similar(c, goal))
+	if (comparer->getVerbose())
 	{
-		std::cout << "result: "<< std::endl << c << std::endl;
-		std::cout << "goal: "<< std::endl << goal << std::endl;
+		comparer->saveOutputToFile("sphere_recman.mhd");
+		comparer->saveNominalOutputToFile("sphere_nomman.mhd");
 	}
-	REQUIRE(cx::similar(c, goal));
-
-	// Test if normalized = the column lengths are 1
-	double norm = goal.matrix().block<3, 1>(0, 0).norm();
-	//	std::cout << "norm: " << norm << std::endl;
-	REQUIRE(cx::similar(norm, 1.0));
-	norm = goal.matrix().block<3, 1>(0, 1).norm();
-	REQUIRE(cx::similar(norm, 1.0));
-	norm = goal.matrix().block<3, 1>(0, 2).norm();
-	REQUIRE(cx::similar(norm, 1.0));
 }
 
-void ReconstructManagerTestFixture::testConstructor()
+TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][synthetic][ca_rec7][ca_rec][hide]")
 {
-	cx::ReconstructManagerPtr reconstructer(new cx::ReconstructManager(cx::XmlOptionFile(),""));
+	/** Test on a phantom containing a colored sphere and a gray sphere.
+	  * Verify that the angio algo reconstructs only the colored, and the
+	  * BMode reconstructs only the gray.
+	  *
+	  */
+	ReconstructManagerTestFixture fixture;
+
+	ReconstructAlgorithmFixture algoFixture;
+	algoFixture.setOverallBoundsAndSpacing(100, 5);
+//	algoFixture.setOverallBoundsAndSpacing(100, 0.2);
+	algoFixture.setVerbose(true);
+	algoFixture.setSpherePhantom();
+	cx::USReconstructInputData input = algoFixture.generateSynthetic_USReconstructInputData();
+//	REQUIRE(!input.mFrames.empty());
+//	CHECK(input.mFrames[0]->);
+
+	cx::ReconstructManagerPtr reconstructer = fixture.createManager();
+	reconstructer->selectData(input);
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
+	reconstructer->getParams()->mAngioAdapter->setValue(true);
+	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
+
+	// get the specific algorithm and corresponding settings
+	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "PNN");
+	cx::PNNReconstructAlgorithmPtr algorithm;
+	algorithm = boost::dynamic_pointer_cast<cx::PNNReconstructAlgorithm>(reconstructer->createAlgorithm());
+	REQUIRE(algorithm);// Check if we got the PNN algorithm
+
+	// set an algorithm-specific parameter
+	algorithm->getInterpolationStepsOption(algo)->setValue(1);
+
+	// run the reconstruction in the main thread
+	fixture.reconstruct();
+
+	// check validity of output:
+	REQUIRE(fixture.getOutput().size()==1);
+
+	SyntheticVolumeComparerPtr comparer = fixture.getComparerForOutput(algoFixture, 0);
+	comparer->checkRMSBelow(30.0);
+	comparer->checkCentroidDifferenceBelow(1);
+	comparer->checkMassDifferenceBelow(0.01);
+	// check the value in the sphere center:
+	comparer->checkValueWithin(algoFixture.getPhantom()->getBounds()/2, 200, 255);
+
+	if (comparer->getVerbose())
+	{
+		comparer->saveOutputToFile("sphere_recman.mhd");
+		comparer->saveNominalOutputToFile("sphere_nomman.mhd");
+	}
+}
+
+
+//void ReconstructManagerTestFixture::testConstructor()
+//{
+//	cx::ReconstructManagerPtr reconstructer(new cx::ReconstructManager(cx::XmlOptionFile(),""));
+//}
+
+cx::ReconstructManagerPtr ReconstructManagerTestFixture::getManager()
+{
+	if (!mManager)
+	{
+		//	std::cout << "testAngioReconstruction running" << std::endl;
+		cx::XmlOptionFile settings;
+		cx::ReconstructManagerPtr reconstructer(new cx::ReconstructManager(settings,""));
+
+		reconstructer->setOutputBasePath(cx::DataLocations::getTestDataPath() + "/temp/");
+		reconstructer->setOutputRelativePath("Images");
+
+		mManager = reconstructer;
+	}
+	return mManager;
 }
 
 cx::ReconstructManagerPtr ReconstructManagerTestFixture::createManager()
 {
-	//	std::cout << "testAngioReconstruction running" << std::endl;
-	cx::XmlOptionFile settings;
-	cx::ReconstructManagerPtr reconstructer(new cx::ReconstructManager(settings,""));
-
-	reconstructer->setOutputBasePath(cx::DataLocations::getTestDataPath() + "/temp/");
-	reconstructer->setOutputRelativePath("Images");
-
-	return reconstructer;
+	return this->getManager();
 }
 
 void ReconstructManagerTestFixture::validateData(cx::ImagePtr output)
@@ -419,11 +507,6 @@ void ReconstructManagerTestFixture::testTordTest()
 #endif // SSC_USE_OpenCL
 
 
-TEST_CASE("ReconstructManager: Slerp Interpolation", "[usreconstruction][unit]")
-{
-	ReconstructManagerTestFixture fixture;
-	fixture.testSlerpInterpolation();
-}
 TEST_CASE("ReconstructManager: Angio Reconstruction", "[usreconstruction][integration]")
 {
 	ReconstructManagerTestFixture fixture;

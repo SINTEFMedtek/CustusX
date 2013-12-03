@@ -343,24 +343,23 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View3D/annotationModel", "woman.stl");
 	this->fillDefault("View3D/depthPeeling", false);
 
-	this->fillDefault("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
+//	this->fillDefault("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
+	this->fillDefault("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
+
 	this->fillDefault("View3D/maxRenderSize", 10 * pow(10.0,6));
 
 #ifdef __APPLE__
 	this->fillDefault("useGPUVolumeRayCastMapper", false);
-	this->fillDefault("useGPU2DRendering", false);
+	this->fillDefault("useGPU2DRendering", true);
 	this->fillDefault("stillUpdateRate", 8.0);
-	this->fillDefault("useProgressiveLODTextureVolumeRayCastMapper", false);
 #elif WIN32
 	this->fillDefault("useGPUVolumeRayCastMapper", true);
 	this->fillDefault("useGPU2DRendering", false);
 	this->fillDefault("stillUpdateRate", 0.001);
-	this->fillDefault("useProgressiveLODTextureVolumeRayCastMapper", false);
 #else
 	this->fillDefault("useGPUVolumeRayCastMapper", true);
 	this->fillDefault("useGPU2DRendering", true);
 	this->fillDefault("stillUpdateRate", 0.001);
-	this->fillDefault("useProgressiveLODTextureVolumeRayCastMapper", true);
 #endif
 
 

@@ -62,10 +62,19 @@ bool ProcessWrapper::isRunning()
 	return mProcess->state() == QProcess::Running;
 }
 
-void ProcessWrapper::requestTerminateSlot()
+qint64 ProcessWrapper::write(const char * data)
 {
-	mProcess->terminate();
-	messageManager()->sendInfo(QString("Requesting termination of %1 %2").arg(mName).arg(mLastExecutablePath));
+	return mProcess->write(data);
+}
+
+bool ProcessWrapper::waitForStarted(int msecs)
+{
+	return mProcess->waitForStarted(msecs);
+}
+
+bool ProcessWrapper::waitForFinished(int msecs)
+{
+	return mProcess->waitForFinished(msecs);
 }
 
 QString ProcessWrapper::getExecutableInBundlesAbsolutePath(QString exeInBundle)
