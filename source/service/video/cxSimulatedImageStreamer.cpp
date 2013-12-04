@@ -136,6 +136,7 @@ void SimulatedImageStreamer::setSourceToImageSlot(QString imageUid)
 void SimulatedImageStreamer::setSourceImage(ImagePtr image)
 {
 	mSourceImage = image;
+	connect(mSourceImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(sliceSlot()));
 	this->sliceSlot();
 }
 
