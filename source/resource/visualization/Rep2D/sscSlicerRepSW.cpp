@@ -82,7 +82,7 @@ QString SliceRepSW::getImageUid()const
 	return mImageSlicer->getImage() ? mImageSlicer->getImage()->getUid() : "";  
 }
 
-void SliceRepSW::setSliceProxy(SliceProxyPtr slicer)
+void SliceRepSW::setSliceProxy(SliceProxyInterfacePtr slicer)
 {
 	mImageSlicer->setSliceProxy(slicer);
 }
