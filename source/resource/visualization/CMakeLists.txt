@@ -42,7 +42,6 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 
 	Primitives/cxDepthPeeling
     Primitives/cxImageMapperMonitor
-	Primitives/sscSlicedImageProxy
 	Primitives/sscTexture3DSlicerProxy
 	Primitives/sscSlicePlaneClipper
 	Primitives/sscToolTracer

@@ -36,25 +36,26 @@ public:
 
 private slots:
 	virtual void streamSlot();
-	void generateMaskSlot();
+	void resetMask();
 	void sliceSlot();
 	void setSourceToActiveImageSlot();
 	void setSourceToImageSlot(QString imageUid);
 
 private:
+	ImagePtr getSlice();
+	vtkImageDataPtr getMask();
+
+	vtkImageDataPtr frameGrab(ImagePtr source);
+	Transform3D getTransform_vMr(); ///< from reference space to video image space
 	void setSourceImage(ImagePtr image);
-	ImagePtr getSlice(ImagePtr source);
-	vtkMatrix4x4Ptr calculateSliceAxes();
-	vtkImageDataPtr getSliceUsingProbeDefinition(ImagePtr source, vtkMatrix4x4Ptr sliceAxes);
+	ImagePtr calculateSlice(ImagePtr source);
 	vtkImageDataPtr maskSlice(vtkImageDataPtr unmaskedSlice);
 	ImagePtr convertToSscImage(vtkImageDataPtr slice, ImagePtr volume);
-	vtkImageReslicePtr createReslicer(ImagePtr source, vtkMatrix4x4Ptr sliceAxes);
-	Transform3D getTransformFromProbeSectorImageSpaceToImageSpace();
 
 	ImagePtr mSourceImage;
 	ToolPtr mTool;
-	ImagePtr mImageToSend;
-	vtkImageDataPtr mMask;
+	mutable ImagePtr mCachedImageToSend;
+	mutable vtkImageDataPtr mCachedMask;
 
 };
 typedef boost::shared_ptr<SimulatedImageStreamer> SimulatedImageStreamerPtr;
