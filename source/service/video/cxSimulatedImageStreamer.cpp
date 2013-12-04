@@ -15,8 +15,14 @@
 #include "sscVolumeHelpers.h"
 #include "cxToolManager.h"
 
+#include "sscSlicedImageProxy.h"
+#include "sscSliceProxy.h"
+#include "vtkImageChangeInformation.h"
+#include "sscLogger.h"
+
 namespace cx
 {
+
 SimulatedImageStreamer::SimulatedImageStreamer()
 {
 	this->setSendInterval(40);
@@ -44,9 +50,9 @@ void SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool)
 	this->setSourceImage(image);
 	mTool = tool;
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(sliceSlot()));
-	connect(mTool->getProbe().get(), SIGNAL(activeConfigChanged()), this, SLOT(generateMaskSlot()));
+	connect(mTool->getProbe().get(), SIGNAL(activeConfigChanged()), this, SLOT(resetMask()));
 
-	this->generateMaskSlot();
+//	this->generateMaskSlot();
 
 	this->setInitialized(true);
 }
@@ -77,24 +83,42 @@ QString SimulatedImageStreamer::getType()
 void SimulatedImageStreamer::streamSlot()
 {
 	PackagePtr package(new Package());
-	package->mImage = mImageToSend;
+	package->mImage = this->getSlice();
 	mSender->send(package);
 }
 
-void SimulatedImageStreamer::generateMaskSlot()
+ImagePtr SimulatedImageStreamer::getSlice()
 {
-	messageManager()->sendDebug("START");
-	ProbeSectorPtr sector = mTool->getProbe()->getSector();
-	mMask = sector->getMask();
-	messageManager()->sendDebug("END");
-	this->sliceSlot();
+	if(!mTool || !mSourceImage)
+		return ImagePtr();
+
+	if (!mCachedImageToSend)
+	{
+		mCachedImageToSend = this->calculateSlice(mSourceImage);
+	}
+
+	return mCachedImageToSend;
+}
+
+vtkImageDataPtr SimulatedImageStreamer::getMask()
+{
+	if (!mCachedMask)
+	{
+		ProbeSectorPtr sector = mTool->getProbe()->getSector();
+		mCachedMask = sector->getMask();
+	}
+	return mCachedMask;
+}
+
+void SimulatedImageStreamer::resetMask()
+{
+	mCachedMask = NULL;
+	mCachedImageToSend.reset();
 }
 
 void SimulatedImageStreamer::sliceSlot()
 {
-	if(!mTool || !mSourceImage)
-		return;
-	mImageToSend = this->getSlice(mSourceImage);
+	mCachedImageToSend.reset();
 }
 
 void SimulatedImageStreamer::setSourceToActiveImageSlot()
@@ -112,47 +136,45 @@ void SimulatedImageStreamer::setSourceToImageSlot(QString imageUid)
 void SimulatedImageStreamer::setSourceImage(ImagePtr image)
 {
 	mSourceImage = image;
+	connect(mSourceImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(sliceSlot()));
 	this->sliceSlot();
 }
 
-ImagePtr SimulatedImageStreamer::getSlice(ImagePtr source)
+ImagePtr SimulatedImageStreamer::calculateSlice(ImagePtr source)
 {
-	vtkMatrix4x4Ptr sliceAxes = this->calculateSliceAxes();
-	vtkImageDataPtr framegrabbedSlice = this->getSliceUsingProbeDefinition(source, sliceAxes);
+	vtkImageDataPtr framegrabbedSlice = this->frameGrab(source);
 	vtkImageDataPtr maskedFramedgrabbedSlice = this->maskSlice(framegrabbedSlice);
 	ImagePtr slice = this->convertToSscImage(maskedFramedgrabbedSlice, source);
-	slice->setLookupTable2D(source->getLookupTable2D());
-	slice->setTransferFunctions3D(source->getTransferFunctions3D());
 
 	return slice;
 }
 
-vtkMatrix4x4Ptr SimulatedImageStreamer::calculateSliceAxes()
+vtkImageDataPtr SimulatedImageStreamer::frameGrab(ImagePtr source)
 {
-	vtkMatrix4x4Ptr sliceAxes = vtkMatrix4x4Ptr::New();
+	SlicedImageProxyPtr imageSlicer(new SlicedImageProxy);
+	imageSlicer->setImage(source);
 
-	Transform3D dMv = this->getTransformFromProbeSectorImageSpaceToImageSpace();
-	sliceAxes->DeepCopy(dMv.getVtkMatrix());
+	SimpleSliceProxyPtr slicer(new SimpleSliceProxy);
+	Transform3D vMr = this->getTransform_vMr();
+	slicer->set_sMr(vMr);
+	imageSlicer->setSliceProxy(slicer);
 
-	return sliceAxes;
-}
-
-vtkImageDataPtr SimulatedImageStreamer::getSliceUsingProbeDefinition(ImagePtr source, vtkMatrix4x4Ptr sliceAxes)
-{
 	ProbeDefinition probedata = mTool->getProbe()->getProbeData();
+	Eigen::Array3i outDim(probedata.getSize().width(), probedata.getSize().height(), 1);
+	imageSlicer->setOutputFormat(Vector3D(0,0,0), outDim, probedata.getSpacing());
 
-	vtkImageReslicePtr reslicer = this->createReslicer(source, sliceAxes);
+	imageSlicer->update();
+	imageSlicer->getOutput()->Update();
 
 	vtkImageDataPtr retval = vtkImageDataPtr::New();
-	retval->DeepCopy(reslicer->GetOutput());
-
+	retval->DeepCopy(imageSlicer->getOutput());
 	return retval;
 }
 
 vtkImageDataPtr SimulatedImageStreamer::maskSlice(vtkImageDataPtr unmaskedSlice)
 {
 	vtkImageMaskPtr maskFilter = vtkImageMaskPtr::New();
-	maskFilter->SetMaskInput(mMask);
+	maskFilter->SetMaskInput(this->getMask());
 	maskFilter->SetImageInput(unmaskedSlice);
 	maskFilter->SetMaskedOutputValue(0.0);
 	maskFilter->Update();
@@ -167,26 +189,7 @@ ImagePtr SimulatedImageStreamer::convertToSscImage(vtkImageDataPtr slice, ImageP
 	return retval;
 }
 
-vtkImageReslicePtr SimulatedImageStreamer::createReslicer(ImagePtr source, vtkMatrix4x4Ptr sliceAxes)
-{
-	ProbeDefinition probedata = mTool->getProbe()->getProbeData();
-
-	vtkImageReslicePtr reslicer = vtkImageReslicePtr::New();
-	reslicer->SetInput(source->getBaseVtkImageData());
-	reslicer->SetBackgroundLevel(source->getMin());
-	reslicer->SetInterpolationModeToLinear();
-	reslicer->SetOutputDimensionality(2);
-	reslicer->SetResliceAxes(sliceAxes);
-	reslicer->AutoCropOutputOn();
-	reslicer->SetOutputOrigin(0,0,0);
-	reslicer->SetOutputExtent(0, probedata.getSize().width()-1, 0, probedata.getSize().height()-1, 0, 0);
-	reslicer->SetOutputSpacing(probedata.getSpacing().data());
-	reslicer->Update();
-
-	return reslicer;
-}
-
-Transform3D SimulatedImageStreamer::getTransformFromProbeSectorImageSpaceToImageSpace()
+Transform3D SimulatedImageStreamer::getTransform_vMr()
 {
 	ProbeDefinition probedata = mTool->getProbe()->getProbeData();
 	ProbeSector probesector;
@@ -195,13 +198,12 @@ Transform3D SimulatedImageStreamer::getTransformFromProbeSectorImageSpaceToImage
 	Transform3D uMt = probesector.get_tMu().inv();
 	Transform3D vMu = probesector.get_uMv().inv();
 	Transform3D vMt = vMu * uMt;
+
 	Transform3D tMpr = mTool->get_prMt().inv();
 	Transform3D prMr = toolManager()->get_rMpr()->inv();
-	Transform3D rMd = mSourceImage->get_rMd();
-	Transform3D vMd = vMt * tMpr * prMr * rMd;
-	Transform3D dMv = vMd.inv();
 
-	return dMv;
+	Transform3D vMr = vMt * tMpr * prMr;
+	return vMr;
 }
 
 } /* namespace cx */
