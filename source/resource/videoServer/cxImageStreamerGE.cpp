@@ -387,13 +387,28 @@ ProbeDefinitionPtr ImageStreamerGE::getFrameStatus(QString uid, data_streaming::
 	else //sector
 		retval = ProbeDefinitionPtr( new ProbeDefinition(ProbeDefinition::tSECTOR));
 
-	// Set start and end of sector in mm from origin
-	// Set width of sector in mm for LINEAR, width of sector in radians for SECTOR.
-	retval->setSector(geometry.depthStart, geometry.depthEnd, geometry.width);
+    std::cout << "Geometry origin: " << geometry.origin[0] << " " << geometry.origin[1] << " " << geometry.origin[2] << std::endl;
+    std::cout << "Image origin: " << img->GetOrigin()[0] << " " << img->GetOrigin()[1] << " " << img->GetOrigin()[2] << std::endl;
 
-	retval->setOrigin_p(Vector3D(geometry.origin[0] + img->GetOrigin()[0],
-					geometry.origin[1]+ img->GetOrigin()[1],
-					geometry.origin[2]+ img->GetOrigin()[2]));
+    double yOffset = geometry.origin[1] * 1000;//m -> mm
+    double correctDepthStart = geometry.depthStart + yOffset;
+    double correctDepthEnd = geometry.depthEnd + yOffset;
+
+    std::cout << "yOffset: " << yOffset << std::endl;
+    std::cout << "correctDepthStart: " << correctDepthStart << std::endl;
+    std::cout << "correctDepthEnd: " << correctDepthEnd << std::endl;
+
+	// Set start and end of sector in mm from origin
+    // Set width of sector in mm for LINEAR, width of sector in radians for SECTOR.
+//    retval->setSector(geometry.depthStart, geometry.depthEnd, geometry.width);
+    retval->setSector(correctDepthStart, correctDepthEnd, geometry.width);
+
+//	retval->setOrigin_p(Vector3D(geometry.origin[0] + img->GetOrigin()[0],
+//					geometry.origin[1]+ img->GetOrigin()[1],
+//					geometry.origin[2]+ img->GetOrigin()[2]));
+    retval->setOrigin_p(Vector3D(geometry.origin[0] + img->GetOrigin()[0],
+                    yOffset,
+                    geometry.origin[2]+ img->GetOrigin()[2]));
 	retval->setSize(QSize(img->GetDimensions()[0], img->GetDimensions()[1]));
 	retval->setSpacing(Vector3D(img->GetSpacing()));
 	retval->setClipRect_p(DoubleBoundingBox3D(img->GetExtent()));
