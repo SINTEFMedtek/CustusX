@@ -4,6 +4,7 @@ REM http://stackoverflow.com/questions/357315/get-list-of-passed-arguments-in-wi
 set TARGET_PLATFORM=%1
 set CX_ENVSCRIPTS=%2
 set COMMAND=%3
+set COMMAND=%3
 set SCRIPT_PATH=%~dp0
 echo "hit the win batch script!"
 
@@ -21,8 +22,9 @@ if "%TARGET_PLATFORM%" == "win32" (
 REM %INIT_VS% && python -u %SCRIPT_PATH%\cxJenkinsBuildStep.py
 REM echo "NO1 win batch script complete!"
 
-%INIT_VS% && python -u %SCRIPT_PATH%\cxJenkinsBuildStep.py --root_dir D:\j\ws\unit\TARGET\win64
-echo "NO1 win batch script complete!"
+REM %INIT_VS% && python -u %SCRIPT_PATH%\cxJenkinsBuildStep.py --root_dir D:\j\ws\unit\TARGET\win64
+REM echo "NO1 win batch script complete!"
+
 
 %INIT_VS% && python -u %SCRIPT_PATH%\%COMMAND% %ARCH_FLAG%
 echo "NO2 win batch script complete!"
