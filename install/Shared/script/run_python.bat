@@ -3,8 +3,8 @@ REM http://stackoverflow.com/questions/357315/get-list-of-passed-arguments-in-wi
 
 set TARGET_PLATFORM=%1
 set CX_ENVSCRIPTS=%2
-set COMMAND=%3
-set COMMAND=%3
+set COMMAND=%~3
+
 set SCRIPT_PATH=%~dp0
 echo "hit the win batch script!"
 
