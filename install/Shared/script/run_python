@@ -1,11 +1,12 @@
 #!/bin/bash
 # Experimental
-
 echo "hit the bash script!"
 
 echo "Args: " $*
 
+set +x
 COMMAND=$3
-python -u $COMMAND
+python -u ./$COMMAND
+set -x
 
 echo "bash script complete!"
