@@ -1,15 +1,20 @@
 #!/bin/bash
-# Experimental
-echo "hit the bash script!"
+#############################################################
+# Jenkins control script
+#   Author: Christian Askeland, SINTEF Medical Technology
+#   Date:   2013.12.05
+# Run this script as a bridge form Jenkins XShell plugin to python calls in the Mac/Linux case.
+# Usage: path/to/run_python <target_os> <cx_envscripts_path> "<python_script> <arguments>"
+#   Note the hyphens around the third argument containing script name + args.
+# 
 
-echo "Args: " $*
+echo "Bash arguments: " $*
 
+COMMAND=$3
 # http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
 DIR="$( cd "$( dirname "$0" )" && pwd )" 
 
 set -x
-COMMAND=$3
 python -u $DIR/$COMMAND
 set +x
 
-echo "bash script complete!"
