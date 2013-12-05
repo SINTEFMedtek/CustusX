@@ -18,8 +18,8 @@ if "%TARGET_PLATFORM%" == "win32" (
   set INIT_VS=%CX_ENVSCRIPTS%\cxVars_x86.bat
 )
 
-%INIT_VS% && python -u %SCRIPT_PATH%\cxJenkinsBuildStep.py
-echo "NO1 win batch script complete!"
+REM %INIT_VS% && python -u %SCRIPT_PATH%\cxJenkinsBuildStep.py
+REM echo "NO1 win batch script complete!"
 
 REM %INIT_VS% && python -u cxJenkinsBuildStep.py --root_dir D:\j\ws\unit\TARGET\win64
 REM echo "NO1 win batch script complete!"
