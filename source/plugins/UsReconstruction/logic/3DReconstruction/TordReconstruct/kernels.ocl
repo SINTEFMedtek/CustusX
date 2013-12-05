@@ -196,7 +196,7 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
                              __constant float16* const plane_matrices,
                              const float4 voxel,
                              const float radius,
-                             __local int *multistart_guesses,
+                             int *multistart_guesses,
                              int n_multistart_guesses,
                              bool doTermDistance,
                              __global const unsigned char* mask,
@@ -333,7 +333,7 @@ prepare_plane_eqs(__constant float16 *plane_matrices,
 
 
 int
-findLocalMinimas(__local int *guesses,
+findLocalMinimas(int *guesses,
                  __local const float4 *plane_eqs,
                  float radius,
                  float4 voxel,
@@ -438,7 +438,7 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
                             __constant float16* const plane_matrices,
                             const float4 voxel,
                             const float radius,
-                             __local int *multistart_guesses,
+                            int *multistart_guesses,
                              int n_multistart_guesses,
                              bool doTermDistance,
                              __global const unsigned char* mask,
@@ -1207,7 +1207,7 @@ prepare_plane_eqs(__constant float16 *plane_matrices,
 	barrier(CLK_LOCAL_MEM_FENCE);
 }
 
-int findLocalMinimas(__local int *guesses,
+int findLocalMinimas(int *guesses,
                      __local const float4 *plane_eqs,
                      float radius,
                      float4 voxel,
@@ -1396,7 +1396,7 @@ voxel_methods(int volume_xsize,
 	BOUNDS_CHECK(y_origin, 0, volume_ysize);
 	BOUNDS_CHECK(z_origin, 0, volume_zsize);
 
-	__local int multistart_guesses[MAX_MULTISTART_STARTS];
+	int multistart_guesses[MAX_MULTISTART_STARTS];
 
 	int nGuesses = findLocalMinimas(multistart_guesses,
 	                                plane_eqs,
