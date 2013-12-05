@@ -4,3 +4,6 @@
 echo "hit the bash script!"
 
 echo "Args: " $*
+
+COMMAND = $3
+python -u $COMMAND
