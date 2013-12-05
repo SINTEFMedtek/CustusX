@@ -75,7 +75,7 @@
 
 #define isInside(x, size) ((x) >= 0 && (x) < (size))
 //#define isNotMasked(x, y, mask, xsize) ((mask)[(x) + (y)*(xsize)] > 0)
-#define isNotMasked(x, y, mask, xsize) 1
+#define isNotMasked(x, y, mask, xsize) true
 
 #define VOXEL(v,x,y,z) v[x + y*volume_xsize + z*volume_ysize*volume_xsize]
 

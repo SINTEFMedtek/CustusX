@@ -444,12 +444,15 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                                         sizeof(size_t),
 	                                         &local_work_size,
 	                                         NULL));
+	// Find the maximum work group size
 	size_t max_work_size;
-	ocl_check_error(clGetDeviceInfo(moClContext->device,
-	                                CL_DEVICE_MAX_WORK_GROUP_SIZE,
-	                                sizeof(size_t),
-	                                &max_work_size,
-	                                NULL));
+	ocl_check_error(clGetKernelWorkGroupInfo(mClKernel,
+	                                         moClContext->device,
+	                                         CL_KERNEL_WORK_GROUP_SIZE,
+	                                         sizeof(size_t),
+	                                         &max_work_size,
+	                                         NULL));
+
 
 	// Now find the largest multiple of the preferred work group size that will fit into local mem
 
