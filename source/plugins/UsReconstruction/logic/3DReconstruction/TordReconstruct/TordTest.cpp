@@ -317,31 +317,38 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 {
 	int numBlocks = 10; // FIXME?
 	// Split input US into blocks
-	frameBlock_t* inputBlocks = new frameBlock_t[numBlocks];
-	
-	this->initializeFrameBlocks(inputBlocks, numBlocks, input);
 
+	frameBlock_t oneBigBlock;
+	this->initializeFrameBlocks(&oneBigBlock, 1, input);
 	// Allocate CL memory for each frame block
-	cl_mem *clBlocks = new cl_mem[numBlocks];
+
 	messageManager()->sendInfo("Allocating CL input block buffers");
-
-	for(int i = 0; i < numBlocks; i++)
-	{
-		clBlocks[i] = ocl_create_buffer(moClContext->context,
-		                                CL_MEM_READ_ONLY,
-		                                inputBlocks[i].length,
-		                                inputBlocks[i].data);
-		                                
-	}
-
-	// Free the local frameblock buffers
-	this->freeFrameBlocks(inputBlocks, numBlocks);
-	delete [] inputBlocks;
-	inputBlocks = NULL;
-
+	Eigen::Array3i inputDims = input->getDimensions();
+	cl_image_format fmt;
+	fmt.image_channel_order = CL_R;
+	fmt.image_channel_data_type = CL_UNSIGNED_INT8;
+	cl_image_desc desc;
+	desc.image_type = CL_MEM_OBJECT_IMAGE2D_ARRAY;
+	desc.image_width = inputDims[0];
+	desc.image_height = inputDims[1];
+	desc.image_depth = 1;
+	desc.image_array_size = inputDims[2];
+	desc.image_row_pitch = inputDims[0];
+	desc.image_slice_pitch = inputDims[0]*inputDims[1];
+	desc.num_mip_levels = 0;
+	desc.num_samples = 0;
+	desc.buffer = NULL;
+	int err;
+	cl_mem clBscans = clCreateImage(moClContext->context,
+	                                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+	                                &fmt,
+	                                &desc,
+	                                oneBigBlock.data,
+	                                &err);
+	ocl_check_error(err);
 	// Allocate output memory
 	int *outputDims = outputData->GetDimensions();
-	
+
 	size_t outputVolumeSize =
 		outputDims[0]*outputDims[1]*outputDims[2]*sizeof(unsigned char);
 
@@ -360,14 +367,14 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	this->fillPlaneMatrices(planeMatrices, input);
 
 	cl_mem clPlaneMatrices = ocl_create_buffer(moClContext->context,
-	                                           CL_MEM_READ_ONLY,
+	                                           CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 	                                           nPlanes*sizeof(float)*16,
 	                                           planeMatrices);
 
 	// US Probe mask
 
 	cl_mem clMask = ocl_create_buffer(moClContext->context,
-	                                  CL_MEM_READ_ONLY,
+	                                  CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 	                                  sizeof(cl_uchar)*
 	                                  input->getDimensions()[0]*input->getDimensions()[1],
 	                                  input->getMask()->GetScalarPointer());
@@ -409,11 +416,8 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	// in_yspacing
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[1]));
 	
-	// The input blocks
-	for(int i = 0; i < numBlocks; i++)
-	{
-		ocl_check_error(clSetKernelArg(mClKernel, arg++,sizeof(cl_mem),&clBlocks[i]));
-	}
+	// Bscans
+	ocl_check_error(clSetKernelArg(mClKernel, arg++,sizeof(cl_mem),&clBscans));
 	
 	// out_volume
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clOutputVolume));
@@ -444,12 +448,15 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                                         sizeof(size_t),
 	                                         &local_work_size,
 	                                         NULL));
+	// Find the maximum work group size
 	size_t max_work_size;
-	ocl_check_error(clGetDeviceInfo(moClContext->device,
-	                                CL_DEVICE_MAX_WORK_GROUP_SIZE,
-	                                sizeof(size_t),
-	                                &max_work_size,
-	                                NULL));
+	ocl_check_error(clGetKernelWorkGroupInfo(mClKernel,
+	                                         moClContext->device,
+	                                         CL_KERNEL_WORK_GROUP_SIZE,
+	                                         sizeof(size_t),
+	                                         &max_work_size,
+	                                         NULL));
+
 
 	// Now find the largest multiple of the preferred work group size that will fit into local mem
 
@@ -536,10 +543,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	messageManager()->sendInfo(QString("Done, freeing GPU memory"));
 
 	// Free the allocated cl memory objects
-	for(int i = 0; i < numBlocks; i++)
-	{
-		ocl_check_error(clReleaseMemObject(clBlocks[i]));
-	}
+	ocl_check_error(clReleaseMemObject(clBscans));
 	ocl_check_error(clReleaseMemObject(clOutputVolume));
 	ocl_check_error(clReleaseMemObject(clPlaneMatrices));
 	ocl_check_error(clReleaseMemObject(clMask));
