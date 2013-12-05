@@ -121,7 +121,7 @@ TEST_CASE("ReconstructAlgorithm: Thunder VNN on sphere","[unit][usreconstruction
 	}
 }
 
-TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][usreconstruction][hide][synthetic]")
+TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][tordtest][usreconstruction][hide][synthetic]")
 {
 	ReconstructAlgorithmFixture fixture;
 
