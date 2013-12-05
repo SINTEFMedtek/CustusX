@@ -315,8 +315,8 @@ void ReconstructManagerTestFixture::validateBModeData(cx::ImagePtr bmodeOut)
 	// visible in bmode, invisible in angio.
 	CHECK(this->getValue(bmodeOut, 38, 146, 146) > 200);
 	CHECK(this->getValue(bmodeOut, 94, 148, 135) > 200);
-	CHECK(this->getValue(bmodeOut, 144, 152, 130) > 190);
-	CHECK(this->getValue(bmodeOut, 237, 161, 119) > 200);
+	CHECK(this->getValue(bmodeOut, 144, 152, 130) > 200);
+	CHECK(this->getValue(bmodeOut, 237, 161, 119) > 190);
 	CHECK(this->getValue(bmodeOut, 278, 160, 113) > 200);
 	CHECK(this->getValue(bmodeOut, 248, 149, 200) > 200);
 
