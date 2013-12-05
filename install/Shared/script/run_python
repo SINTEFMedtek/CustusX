@@ -4,9 +4,12 @@ echo "hit the bash script!"
 
 echo "Args: " $*
 
-set +x
-COMMAND=$3
-python -u ./$COMMAND
+# http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+DIR="$( cd "$( dirname "$0" )" && pwd )" 
+
 set -x
+COMMAND=$3
+python -u $DIR/$COMMAND
+set +x
 
 echo "bash script complete!"
