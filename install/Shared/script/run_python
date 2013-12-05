@@ -1,0 +1,6 @@
+#!/bin/bash
+# Experimental
+
+echo "hit the bash script!"
+
+echo "Args: " $*
