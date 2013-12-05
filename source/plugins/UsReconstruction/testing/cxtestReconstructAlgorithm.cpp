@@ -24,6 +24,8 @@
 #include "sscDummyTool.h"
 #include "TordReconstruct/TordTest.h"
 
+#include "sscMessageManager.h"
+
 #include "cxtestReconstructAlgorithmFixture.h"
 
 namespace cxtest
@@ -123,6 +125,8 @@ TEST_CASE("ReconstructAlgorithm: Thunder VNN on sphere","[unit][usreconstruction
 
 TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][tordtest][usreconstruction][hide][synthetic]")
 {
+	cx::messageManager()->initialize();
+
 	ReconstructAlgorithmFixture fixture;
 
 	fixture.setOverallBoundsAndSpacing(100, 5);
@@ -181,6 +185,8 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][tordtest][
 	fixture.checkRMSBelow(20.0);
 	fixture.checkCentroidDifferenceBelow(1);
 	fixture.checkMassDifferenceBelow(0.01);
+
+	cx::messageManager()->shutdown();
 }
 
 } // namespace cxtest
