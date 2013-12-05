@@ -7,14 +7,12 @@ echo "hit the win batch script!"
 
 echo "args:" %*
 
-if "%TARGET_PLATFORM%" == "win64" 
-(
+if "%TARGET_PLATFORM%" == "win64" (
   set INIT_VS=%CX_ENVSCRIPTS%\cxVars_x64.bat
   set ARCH_FLAG="--b32"
 )
 
-if "%TARGET_PLATFORM%" == "win32" 
-(
+if "%TARGET_PLATFORM%" == "win32" (
   set INIT_VS=%CX_ENVSCRIPTS%\cxVars_x86.bat
 )
 
