@@ -163,6 +163,14 @@ USFrameDataPtr USFrameData::create(QString name, cx::ImageDataContainerPtr image
 	return retval;
 }
 
+USFrameDataPtr USFrameData::create(QString name, std::vector<vtkImageDataPtr> frames)
+{
+	cx::ImageDataContainerPtr container;
+	container.reset(new cx::FramesDataContainer(frames));
+	return create(name, container);
+}
+
+
 USFrameData::USFrameData() :
 		mCropbox(0,0,0,0,0,0), mPurgeInput(true)
 {
@@ -200,7 +208,7 @@ Eigen::Array3i USFrameData::getDimensions() const
 	{
 		// WARNING: cannot use dimensions from the cropImage function - it uses extent,
 		// which may be larger. We need the real size, given by wholeextent/updateextent.
-		vtkImageDataPtr sample = this->cropImage(mImageContainer->get(0), mCropbox);
+		vtkImageDataPtr sample = this->cropImageExtent(mImageContainer->get(0), mCropbox);
 //		retval[0] = sample->GetDimensions()[0];
 //		retval[1] = sample->GetDimensions()[1];
 		Eigen::Array<int, 6, 1> extent(sample->GetWholeExtent());
@@ -239,7 +247,7 @@ void USFrameData::setCropBox(IntBoundingBox3D cropbox)
  * is a speed optimization during preprocessing.
  * Using ClipDataOn would create a copy with dim==extent
  */
-vtkImageDataPtr USFrameData::cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox) const
+vtkImageDataPtr USFrameData::cropImageExtent(vtkImageDataPtr input, IntBoundingBox3D cropbox) const
 {
   vtkImageClipPtr clip = vtkImageClipPtr::New();
   clip->SetInput(input);
@@ -251,19 +259,27 @@ vtkImageDataPtr USFrameData::cropImage(vtkImageDataPtr input, IntBoundingBox3D c
 }
 
 /**Convert input to grayscale, and return a COPY of that volume ( in order to break the pipeline for memory purposes)
- *
+ * ALSO: remove data in image outside extent - required by reconstruction.
  */
-vtkImageDataPtr USFrameData::toGrayscale(vtkImageDataPtr input) const
+vtkImageDataPtr USFrameData::toGrayscaleAndEffectuateCropping(vtkImageDataPtr input) const
 {
-	if (input->GetNumberOfScalarComponents() == 1) // already gray
-		return input;
+	vtkImageDataPtr outData;
 
-	vtkImageDataPtr outData = convertImageDataToGrayScale(input);
+	if (input->GetNumberOfScalarComponents() == 1) // already gray
+	{
+		// crop (slow)
+		outData = input;
+		outData->Crop();
+	}
+	else
+	{
+		// convert and crop as side effect (optimization)
+		outData = convertImageDataToGrayScale(input);
+	}
 
 	vtkImageDataPtr copy = vtkImageDataPtr::New();
 	copy->DeepCopy(outData);
 	return copy;
-
 }
 
 // for testing
@@ -397,10 +413,10 @@ std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::ve
 		vtkImageDataPtr current = mImageContainer->get(mReducedToFull[i]);
 
 		if (mCropbox.range()[0]!=0)
-			current = this->cropImage(current, mCropbox);
+			current = this->cropImageExtent(current, mCropbox);
 
 		// optimization: grayFrame is used in both calculations: compute once
-		vtkImageDataPtr grayFrame = this->toGrayscale(current);
+		vtkImageDataPtr grayFrame = this->toGrayscaleAndEffectuateCropping(current);
 
 		for (unsigned j=0; j<angio.size(); ++j)
 		{

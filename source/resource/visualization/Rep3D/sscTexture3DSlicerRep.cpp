@@ -65,9 +65,9 @@ Texture3DSlicerRepPtr Texture3DSlicerRep::New(const QString& uid)
 	return retval;
 }
 
-void Texture3DSlicerRep::setShaderFile(QString shaderFile)
+void Texture3DSlicerRep::setShaderPath(QString path)
 {
-	mProxy->setShaderFile(shaderFile);
+	mProxy->setShaderPath(path);
 }
 
 void Texture3DSlicerRep::viewChanged()

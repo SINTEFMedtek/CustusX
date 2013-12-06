@@ -63,13 +63,19 @@ vtkImageDataPtr Utilities::create3DVtkImageData(Eigen::Array3i dim, const unsign
 
 cx::ImagePtr Utilities::create3DImage(Eigen::Array3i dim, const unsigned int voxelValue)
 {
-	vtkImageDataPtr vtkImageData = create3DVtkImageData(dim, voxelValue);
+	return create3DImage(dim, cx::Vector3D(1,1,1), voxelValue);
+}
+
+cx::ImagePtr Utilities::create3DImage(Eigen::Array3i dim, cx::Vector3D spacing, const unsigned int voxelValue)
+{
+	vtkImageDataPtr vtkImageData = cx::generateVtkImageData(dim, spacing, voxelValue);
 	QString unique_string = qstring_cast(reinterpret_cast<long>(vtkImageData.GetPointer()));
 	QString imagesUid = QString("TESTUID_%2_%1").arg(unique_string);
 	cx::ImagePtr image(new cx::Image(imagesUid, vtkImageData));
 
 	return image;
 }
+
 
 std::vector<cx::ImagePtr> Utilities::create3DImages(unsigned int count, Eigen::Array3i dim, const unsigned int voxelValue)
 {
@@ -82,15 +88,16 @@ std::vector<cx::ImagePtr> Utilities::create3DImages(unsigned int count, Eigen::A
 	return retval;
 }
 
-unsigned int Utilities::getNumberOfVoxelsAboveThreshold(vtkImageDataPtr image, int threshold)
+unsigned int Utilities::getNumberOfVoxelsAboveThreshold(vtkImageDataPtr image, int threshold, int component)
 {
 	if (!image)
 		return 0;
+
 	unsigned char* ptr = reinterpret_cast<unsigned char*>(image->GetScalarPointer());
 	unsigned int pixelCount = 0;
 	for (unsigned i = 0; i < image->GetDimensions()[0]*image->GetDimensions()[1]*image->GetDimensions()[2]; ++i)
 	{
-		if (ptr[i*image->GetNumberOfScalarComponents()] > threshold)
+		if (ptr[i*image->GetNumberOfScalarComponents()+component] > threshold)
 			++pixelCount;
 	}
 	return pixelCount;
@@ -99,21 +106,11 @@ unsigned int Utilities::getNumberOfVoxelsAboveThreshold(vtkImageDataPtr image, i
 unsigned int Utilities::getNumberOfNonZeroVoxels(vtkImageDataPtr image)
 {
 	return getNumberOfVoxelsAboveThreshold(image, 0);
-//	if (!image)
-//		return 0;
-//	unsigned char* ptr = reinterpret_cast<unsigned char*>(image->GetScalarPointer());
-//	unsigned int pixelCount = 0;
-//	for (unsigned i = 0; i < image->GetDimensions()[0]*image->GetDimensions()[1]; ++i)
-//	{
-//		if (ptr[i*image->GetNumberOfScalarComponents()] != 0)
-//			++pixelCount;
-//	}
-//	return pixelCount;
 }
 
-double Utilities::getFractionOfVoxelsAboveThreshold(vtkImageDataPtr image, int threshold)
+double Utilities::getFractionOfVoxelsAboveThreshold(vtkImageDataPtr image, int threshold, int component)
 {
-	unsigned int hits = getNumberOfVoxelsAboveThreshold(image, threshold);
+	unsigned int hits = getNumberOfVoxelsAboveThreshold(image, threshold, component);
 	Eigen::Array3i dim(image->GetDimensions());
 	unsigned int totalPixels = dim[0]*dim[1]*dim[2];
 	if (totalPixels==0)

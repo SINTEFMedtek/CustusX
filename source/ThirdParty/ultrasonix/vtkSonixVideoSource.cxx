@@ -157,14 +157,15 @@ vtkSonixVideoSource::vtkSonixVideoSource()
 
 //  this->mSonixHelper = new SonixHelper;
   this->mSonixHelper = NULL;
-  lastFrameNum = 0;
-  totalMissedFrames = 0;
+  this->lastFrameNum = 0;
+  this->totalMissedFrames = 0;
 
-  lastRoiUlx = 0;
-  lastRoiBry = 0;
+  this->lastRoiUlx = 0;
+  this->lastRoiBry = 0;
 
-  mFirstConnect = true;
-  mDebugOutput = false;
+  this->mFirstConnect = true;
+  this->mDebugOutput = false;
+  this->mUseSharedMemory = true;
 }
 
 //----------------------------------------------------------------------------
@@ -552,22 +553,8 @@ bool vtkSonixVideoSource::getFreezeState()
 		return this->ult->getFreezeState();
 }
 
-//----------------------------------------------------------------------------
-void vtkSonixVideoSource::Initialize()
+void vtkSonixVideoSource::waitForSonixWindow()
 {
-	//to do:
-	//1) connect to sonix machine using the ip address provided earlier
-	//2) set the imaging mode
-	//3) set the data acquisition type
-	//4) get the data descriptor corresponding to the data type requested
-	//5) set up the frame buffer accordingly
-	//6) set parameters like: frequency, frame rate, depth
-	//7) set the callback function which gets invoked upon arrival of new frame
-	//8) update frame buffer
-  if (this->Initialized)
-    {
-    return;
-    }
 	HWND phandle = FindWindow(NULL, "Sonix: No connections");
 	if(phandle)
 	{
@@ -585,11 +572,30 @@ void vtkSonixVideoSource::Initialize()
 		}
 	} else 
 	{
-		//std::cout << "Didn't find Sonix window" << std::endl;
+		std::cout << "Didn't find Sonix window" << std::endl;
 		return;
 	}
+}
 
-   
+//----------------------------------------------------------------------------
+void vtkSonixVideoSource::Initialize()
+{
+	//to do:
+	//1) connect to sonix machine using the ip address provided earlier
+	//2) set the imaging mode
+	//3) set the data acquisition type
+	//4) get the data descriptor corresponding to the data type requested
+	//5) set up the frame buffer accordingly
+	//6) set parameters like: frequency, frame rate, depth
+	//7) set the callback function which gets invoked upon arrival of new frame
+	//8) update frame buffer
+  if (this->Initialized)
+    {
+    return;
+    }
+  if(this->mUseSharedMemory)
+	  this->waitForSonixWindow();
+
   // 1) connect to sonix machine.
   if(!this->ult->connect(this->SonixHostIP))
     {
@@ -712,7 +718,8 @@ void vtkSonixVideoSource::Initialize()
   // 8)update framebuffer 
   this->UpdateFrameBuffer();
 
-  ult->setSharedMemoryStatus(1);
+  //ult->setSharedMemoryStatus(1);
+  ult->setSharedMemoryStatus(0);
 
   this->Initialized = 1;
 }
@@ -1415,6 +1422,11 @@ void vtkSonixVideoSource::setDebugOutput(bool debug)
 void vtkSonixVideoSource::setSonixConnectionDelay(int delay)
 {
 	mSonixConnectionDelay = delay;
+}
+
+void vtkSonixVideoSource::setUseSharedMemory(bool useSharedMemory)
+{
+	mUseSharedMemory = useSharedMemory;
 }
 
 void vtkSonixVideoSource::UpdateFrameBufferExtent(uROI roi)

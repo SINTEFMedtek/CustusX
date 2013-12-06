@@ -112,21 +112,34 @@ ViewsWindow::~ViewsWindow()
 
 bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
 {	
-	cx::ViewWidget* view = this->create2DView(imageFilename, r, c);
-	cx::ImagePtr image = loadImage(imageFilename);
+	std::vector<cx::ImagePtr> images(1);
+	images[0] = this->loadImage(imageFilename);
 
-	if (!view || !view->getRenderWindow() || !view->getRenderWindow()->SupportsOpenGL())
+	return this->defineGPUSlice(uid, images, plane, r, c);
+}
+
+bool ViewsWindow::defineGPUSlice(const QString& uid, const std::vector<cx::ImagePtr> images, cx::PLANE_TYPE plane, int r, int c)
+{
+	cx::ViewWidget* view = this->create2DView("several images", r, c);
+
+	if (!view || !view->getRenderWindow())
 		return false;
-	if (!cx::Texture3DSlicerRep::isSupported(view->getRenderWindow()))
-		return false;
+
+// always fails on mac:
+//	if (!view->getRenderWindow()->SupportsOpenGL())
+//		return false;
+
+// gives error when called outside of a gl render loop
+//	if (!cx::Texture3DSlicerRep::isSupported(view->getRenderWindow()))
+//		return false;
 
 	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
 	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(uid);
-	rep->setShaderFile(mShaderFolder + "/Texture3DOverlay.frag");
+	rep->setShaderPath(mShaderFolder);
 	rep->setSliceProxy(proxy);
-	rep->setImages(std::vector<cx::ImagePtr>(1, image));
+	rep->setImages(images);
 	view->addRep(rep);
-	insertView(view, uid, imageFilename, r, c);
+	insertView(view, uid, "several images", r, c);
 
 	return true;
 }
@@ -303,11 +316,11 @@ void ViewsWindow::dumpDebugViewToDisk(QString text, int viewIndex)
 	renderTester->printFractionOfVoxelsAboveZero(text, output);
 }
 
-double ViewsWindow::getFractionOfBrightPixelsInView(int viewIndex, int threshold)
+double ViewsWindow::getFractionOfBrightPixelsInView(int viewIndex, int threshold, int component)
 {
 	cxtest::RenderTesterPtr renderTester = cxtest::RenderTester::create(mLayouts[viewIndex]->getRenderWindow());
 	vtkImageDataPtr output = renderTester->renderToImage();
-	return cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, threshold);
+	return cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, threshold,component);
 }
 
 bool ViewsWindow::runWidget()

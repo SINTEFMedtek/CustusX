@@ -36,7 +36,7 @@ bool operator==(const CoordinateSystem& lhs, const CoordinateSystem& rhs)
 
 // --------------------------------------------------------
 
-std::vector<CoordinateSystem> CoordinateSystemHelpers::getAvailableSpaces(bool compact)
+std::vector<CoordinateSystem> CoordinateSystemHelpers::getSpacesToPresentInGUI()
 {
 	std::vector<CoordinateSystem> retval;
 	retval.push_back(CoordinateSystem(csREF));
@@ -46,47 +46,10 @@ std::vector<CoordinateSystem> CoordinateSystemHelpers::getAvailableSpaces(bool c
 	retval.push_back(CoordinateSystem(csDATA, "active"));
 	retval.push_back(CoordinateSystem(csDATA_VOXEL, "active"));
 
-	if (!compact)
-	{
-		std::set<QString> dataSpaces;
-		std::map<QString, DataPtr> data = dataManager()->getData();
-		for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
-		{
-			dataSpaces.insert(iter->second->getSpace());
-	//		dataSpaces.insert(iter->second->getParentSpace()); // system only handle spaces identical to data.
-		}
-		dataSpaces.erase("");
-		for (std::set<QString>::iterator iter=dataSpaces.begin(); iter!=dataSpaces.end(); ++iter)
-		{
-			retval.push_back(CoordinateSystem(csDATA, *iter));
-		}
-		for (std::set<QString>::iterator iter=dataSpaces.begin(); iter!=dataSpaces.end(); ++iter)
-		{
-			retval.push_back(CoordinateSystem(csDATA_VOXEL, *iter));
-		}
-	}
-
 	// alias for the currently active tool:
 	retval.push_back(CoordinateSystem(csTOOL, "active"));
 	retval.push_back(CoordinateSystem(csSENSOR, "active"));
 	retval.push_back(CoordinateSystem(csTOOL_OFFSET, "active"));
-
-	if (!compact)
-	{
-		std::map<QString, ToolPtr> tools = *toolManager()->getTools();
-		for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
-		{
-			retval.push_back(CoordinateSystem(csTOOL, iter->first));
-		}
-		for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
-		{
-			retval.push_back(CoordinateSystem(csSENSOR, iter->first));
-		}
-		for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
-		{
-			retval.push_back(CoordinateSystem(csTOOL_OFFSET, iter->first));
-		}
-	}
 
 	return retval;
 }
@@ -95,26 +58,6 @@ Vector3D CoordinateSystemHelpers::getDominantToolTipPoint(CoordinateSystem to, b
 {
     Transform3D toMfrom = CoordinateSystemHelpers::getDominantToolTipTransform(to, useOffset);
     return toMfrom.coord(Vector3D(0,0,0));
-
-//    ToolPtr tool = toolManager()->getDominantTool();
-//	if (!tool)
-//		return Vector3D(0,0,0);
-////
-////	QString dominantToolUid = tool->getUid();
-////
-////	CoordinateSystem from(csTOOL, dominantToolUid);
-
-//	CoordinateSystem from = getToolCoordinateSystem(tool);
-
-//	Vector3D point_t;
-//	if(useOffset)
-//		point_t = Vector3D(0,0,tool->getTooltipOffset());
-//	else
-//		point_t = Vector3D(0,0,0);
-
-//	Vector3D P_to = CoordinateSystemHelpers::get_toMfrom(from, to).coord(point_t);
-
-//	return P_to;
 }
 
 CoordinateSystem CoordinateSystemHelpers::getToolCoordinateSystem(ToolPtr tool)
@@ -256,8 +199,8 @@ CoordinateSystem CoordinateSystemHelpers::getPr()
 
 CoordinateSystem CoordinateSystemHelpers::getR()
 {
-	CoordinateSystem pr(csREF);
-	return pr;
+	CoordinateSystem r(csREF);
+	return r;
 }
 
 Transform3D CoordinateSystemHelpers::get_rMr()

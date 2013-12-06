@@ -54,13 +54,13 @@ vtkImageDataPtr VideoGraphicsFixture::readImageData(QString filename, QString de
 	return retval;
 }
 
-cx::ProbeData VideoGraphicsFixture::readProbeData(QString filename)
+cx::ProbeDefinition VideoGraphicsFixture::readProbeData(QString filename)
 {
 	QString path = cxtest::Utilities::getDataRoot("ssc/test/"+filename);
 //	QString folder = QString("%1%2/").arg(SSC_DATA_ROOT).arg("ssc/test");
 	QString probeDataFilename = cx::changeExtension(path, "probedata.xml");
 
-	cx::ProbeData retval;
+	cx::ProbeDefinition retval;
 	cx::XmlOptionFile file = cx::XmlOptionFile(probeDataFilename, "navnet");
 	retval.parseXml(file.getElement("configuration"));
 

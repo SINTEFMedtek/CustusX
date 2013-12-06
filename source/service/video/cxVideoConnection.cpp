@@ -188,7 +188,7 @@ void VideoConnection::clientFinishedSlot()
 void VideoConnection::useUnusedProbeDataSlot()
 {
 	disconnect(cxToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
-	for (std::vector<ProbeDataPtr>::const_iterator citer = mUnsusedProbeDataVector.begin(); citer != mUnsusedProbeDataVector.end(); ++citer)
+	for (std::vector<ProbeDefinitionPtr>::const_iterator citer = mUnsusedProbeDataVector.begin(); citer != mUnsusedProbeDataVector.end(); ++citer)
 		this->updateStatus(*citer);
 	mUnsusedProbeDataVector.clear();
 }
@@ -197,7 +197,7 @@ void VideoConnection::useUnusedProbeDataSlot()
  *  and store locally. Also reset the old local info with
  *  information from the probe in toolmanager.
  */
-void VideoConnection::updateStatus(ProbeDataPtr msg)
+void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 {
 	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
 	if (!tool || !tool->getProbe())
@@ -213,17 +213,15 @@ void VideoConnection::updateStatus(ProbeDataPtr msg)
 	// start with getting a valid data object from the probe, in order to keep
 	// existing values (such as temporal calibration).
 	// Note that the 'active' data is get while the 'uid' data is set.
-	ProbeData data = probe->getProbeData();
+	ProbeDefinition data = probe->getProbeData();
 
 	data.setUid(msg->getUid());
 	data.setType(msg->getType());
 	data.setSector(msg->getDepthStart(), msg->getDepthEnd(), msg->getWidth());
-	ProbeData::ProbeImageData image = data.getImage();
-	image.mOrigin_p = msg->getImage().mOrigin_p;
-	image.mSize = msg->getImage().mSize;
-	image.mSpacing = msg->getImage().mSpacing;
-	image.mClipRect_p = msg->getImage().mClipRect_p;
-	data.setImage(image);
+	data.setOrigin_p(msg->getOrigin_p());
+	data.setSize(msg->getSize());
+	data.setSpacing(msg->getSpacing());
+	data.setClipRect_p(msg->getClipRect_p());
 
 	probe->useDigitalVideo(true);
 	probe->setProbeSector(data);

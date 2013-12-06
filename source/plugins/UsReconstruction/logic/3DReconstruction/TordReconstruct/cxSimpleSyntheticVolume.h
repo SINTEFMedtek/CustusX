@@ -2,15 +2,23 @@
 #define SIMPLESYNTHETICVOLUME_H
 
 #include "cxSyntheticVolume.h"
+#include "sscTypeConversions.h"
 
 namespace cx {
 
 class cxSimpleSyntheticVolume : public cxSyntheticVolume
 {
 public:
-	cxSimpleSyntheticVolume(const Eigen::Array3i& dimensions)
-		:	cxSyntheticVolume(dimensions)
+	cxSimpleSyntheticVolume(Vector3D bounds)
+		:	cxSyntheticVolume(bounds)
 	{
+	}
+
+	virtual void printInfo() const
+	{
+		std::cout << QString("Volume: Simple, bounds=[%1]")
+					 .arg(qstring_cast(mBounds))
+					 << std::endl;
 	}
 
 	virtual bool isOnLine(float x,
@@ -19,7 +27,7 @@ public:
 	                      int n_lines,
 	                      int axis) const
 	{
-		float linespacing = mDims(axis)/n_lines;
+		float linespacing = mBounds(axis)/n_lines;
 
 		for(int i = 0; i < n_lines; i++)
 		{
@@ -35,14 +43,16 @@ public:
 	}
 
 	virtual unsigned char
-	evaluate(const float x,
-	         const float y,
-	         const float z) const
+	evaluate(const cx::Vector3D &p) const
 	{
+		float x = p[0];
+		float y = p[1];
+		float z = p[2];
+
 		// Let's make a block in the middle of the volume
-		if(x > mDims(0)/3 && x < 2*mDims(0)/3
-		   && y > mDims(1)/3 && y < 2*mDims(1)/3
-		   && z > mDims(2)/3 && z < 2*mDims(2)/3)
+		if(x > mBounds(0)/3 && x < 2*mBounds(0)/3
+		   && y > mBounds(1)/3 && y < 2*mBounds(1)/3
+		   && z > mBounds(2)/3 && z < 2*mBounds(2)/3)
 		{
 			return 255;
 		}
@@ -111,9 +121,9 @@ public:
 
 
 		// Return nonzero if value is inside region
-		else if(x > 0 && x < mDims(0)
-		        && y > 0 && y < mDims(1)
-		        && z > 0 && z < mDims(2))
+		else if(x > 0 && x < mBounds(0)
+				&& y > 0 && y < mBounds(1)
+				&& z > 0 && z < mBounds(2))
 		{
 			return 10;
 		}

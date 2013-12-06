@@ -30,6 +30,8 @@ namespace cx
  * \{
  */
 
+typedef boost::shared_ptr<class PNNReconstructAlgorithm> PNNReconstructAlgorithmPtr;
+
 /**\brief PNN US reconstruction.
  *
  * A specialization of ReconstructAlgorithm that implements
@@ -41,6 +43,7 @@ namespace cx
 class PNNReconstructAlgorithm: public ReconstructAlgorithm
 {
 public:
+	static ReconstructAlgorithmPtr create() { return ReconstructAlgorithmPtr(new PNNReconstructAlgorithm()); }
 	PNNReconstructAlgorithm();
 	virtual ~PNNReconstructAlgorithm()
 	{

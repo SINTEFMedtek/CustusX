@@ -208,27 +208,25 @@ TEST_CASE_METHOD(IGTLinkConversionFixture, "IGTLinkConversion: Decode/encode col
 TEST_CASE_METHOD(IGTLinkConversionFixture, "IGTLinkConversion: Decode/encode ProbeData", "[unit][resource][OpenIGTLinkUtilities]")
 {
 	// generate probe data input
-	cx::ProbeDataPtr input(new cx::ProbeData());
-	input->setType(cx::ProbeData::tSECTOR);
-	cx::ProbeData::ProbeImageData imageData = input->getImage();
-	imageData.mOrigin_p = cx::Vector3D(50,0,0); ///< probe origin in pixel space p. (upper-left corner origin)
-	imageData.mSpacing = cx::Vector3D(0.5, 0.6, 1.0);
-	imageData.mSize = QSize(300, 200);
-	imageData.mClipRect_p = cx::DoubleBoundingBox3D(0, imageData.mSize.width(), 0, imageData.mSize.height(), 0, 0); ///< sector clipping rect, in addition to the standard sector definition. The probe sector is the intersection of the sector definition and the clip rect.
-	input->setImage(imageData);
+	cx::ProbeDefinitionPtr input(new cx::ProbeDefinition());
+	input->setType(cx::ProbeDefinition::tSECTOR);
+	input->setOrigin_p(cx::Vector3D(50,0,0)); ///< probe origin in pixel space p. (upper-left corner origin)
+	input->setSpacing(cx::Vector3D(0.5, 0.6, 1.0));
+	input->setSize(QSize(300, 200));
+	input->setClipRect_p(cx::DoubleBoundingBox3D(0, input->getSize().width(), 0, input->getSize().height(), 0, 0)); ///< sector clipping rect, in addition to the standard sector definition. The probe sector is the intersection of the sector definition and the clip rect.
 	input->setSector(10, 30, M_PI/2, 2);
 
 	// generate an image based on the probe data. Part of the data is sent over this channel.
-	vtkImageDataPtr rawImage = cx::generateVtkImageData(Eigen::Array3i(imageData.mSize.width(), imageData.mSize.height(), 1),
-													imageData.mSpacing,
-													0);
+	vtkImageDataPtr rawImage = cx::generateVtkImageData(Eigen::Array3i(input->getSize().width(), input->getSize().height(), 1),
+																											input->getSpacing(),
+																											0);
 	cx::ImagePtr imageInput(new cx::Image("my_uid", rawImage));
 
 	// convert the data to igtlink and back
 	cx::IGTLinkConversion converter;
 	cx::IGTLinkUSStatusMessage::Pointer msg = converter.encode(input);
 	cx::IGTLinkImageMessage::Pointer imageMessage = converter.encode(imageInput);
-	cx::ProbeDataPtr output = converter.decode(msg, imageMessage, cx::ProbeDataPtr(new cx::ProbeData()));
+	cx::ProbeDefinitionPtr output = converter.decode(msg, imageMessage, cx::ProbeDefinitionPtr(new cx::ProbeDefinition()));
 
 	// compare input<->output
 	CHECK(input->getType() == output->getType());
@@ -236,11 +234,11 @@ TEST_CASE_METHOD(IGTLinkConversionFixture, "IGTLinkConversion: Decode/encode Pro
 	CHECK(input->getDepthEnd() == output->getDepthEnd());
 	//not supported CHECK(input->getCenterOffset() == output->getCenterOffset());
 	CHECK(input->getWidth() == output->getWidth());
-	CHECK(cx::similar(input->getImage().mClipRect_p, output->getImage().mClipRect_p)); // only supported for cliprect equal to entire image size.
-	CHECK(cx::similar(input->getImage().mOrigin_p, output->getImage().mOrigin_p));
-	CHECK(cx::similar(input->getImage().mSpacing, output->getImage().mSpacing));
-	CHECK(input->getImage().mSize.width() == output->getImage().mSize.width());
-	CHECK(input->getImage().mSize.height() == output->getImage().mSize.height());
+	CHECK(cx::similar(input->getClipRect_p(), output->getClipRect_p())); // only supported for cliprect equal to entire image size.
+	CHECK(cx::similar(input->getOrigin_p(), output->getOrigin_p()));
+	CHECK(cx::similar(input->getSpacing(), output->getSpacing()));
+	CHECK(input->getSize().width() == output->getSize().width());
+	CHECK(input->getSize().height() == output->getSize().height());
 	//not supported CHECK(input->getTemporalCalibration() == output->getTemporalCalibration());
 }
 

@@ -64,8 +64,8 @@ namespace cx
 		csPATIENTREF, ///< the patient/tool reference space (pr)
 		csTOOL, ///< a tools rspace (t)
 		csSENSOR, ///< a tools sensor space (s)
-		csTOOL_OFFSET, ///< the tool space t with a virtual offset added along the z axis.
-		csDATA_VOXEL, ///< the data voxel space
+		csTOOL_OFFSET, ///< the tool space t with a virtual offset added along the z axis. (to)
+		csDATA_VOXEL, ///< the data voxel space (dv)
 		csCOUNT
 	};
 

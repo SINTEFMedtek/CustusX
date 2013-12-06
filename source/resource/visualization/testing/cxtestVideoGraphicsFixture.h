@@ -36,7 +36,7 @@ public:
 protected:
 	void renderImageAndCompareToExpected(vtkImageDataPtr input, vtkImageDataPtr expected);
 	vtkImageDataPtr  readImageData(QString filename, QString description);
-	cx::ProbeData readProbeData(QString filename);
+	cx::ProbeDefinition readProbeData(QString filename);
 	void addImageToRenderer(vtkImageDataPtr image);
 	cxtest::RenderTesterPtr mMachine;
 	cx::VideoGraphicsPtr mVideoGraphics;

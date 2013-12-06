@@ -61,11 +61,12 @@ void ReconstructPreprocessor::initializeCores(std::vector<ReconstructCorePtr> co
 
 	for (unsigned i=0; i<cores.size(); ++i)
 	{
-		ProcessedUSInputDataPtr input(new ProcessedUSInputData(frames[i],
-																													 mFileData.mFrames,
-																													 mFileData.getMask(),
-																													 mFileData.mFilename,
-																													 QFileInfo(mFileData.mFilename).completeBaseName() ));
+		ProcessedUSInputDataPtr input;
+		input.reset(new ProcessedUSInputData(frames[i],
+											 mFileData.mFrames,
+											 mFileData.getMask(),
+											 mFileData.mFilename,
+											 QFileInfo(mFileData.mFilename).completeBaseName() ));
 		cores[i]->initialize(input, this->getOutputVolumeParams());
 	}
 
@@ -122,23 +123,25 @@ void ReconstructPreprocessor::alignTimeSeries()
 void ReconstructPreprocessor::cropInputData()
 {
 	//IntBoundingBox3D
-	ProbeData sector = mFileData.mProbeData.mData;
-	ProbeData::ProbeImageData imageSector = sector.getImage();
-	IntBoundingBox3D cropbox(imageSector.mClipRect_p.begin());
+	ProbeDefinition sector = mFileData.mProbeData.mData;
+	IntBoundingBox3D cropbox(sector.getClipRect_p().begin());
 	Eigen::Vector3i shift = cropbox.corner(0,0,0).cast<int>();
 	Eigen::Vector3i size = cropbox.range().cast<int>() + Eigen::Vector3i(1,1,0); // convert from extent format to size format by adding 1
 	mFileData.mUsRaw->setCropBox(cropbox);
 
+	DoubleBoundingBox3D clipRect_p = sector.getClipRect_p();
+	Vector3D origin_p = sector.getOrigin_p();
 
 	for (unsigned i=0; i<3; ++i)
 	{
-		imageSector.mClipRect_p[2*i] -= shift[i];
-		imageSector.mClipRect_p[2*i+1] -= shift[i];
-		imageSector.mOrigin_p[i] -= shift[i];
+		clipRect_p[2*i] -= shift[i];
+		clipRect_p[2*i+1] -= shift[i];
+		origin_p[i] -= shift[i];
 	}
-	imageSector.mSize.setWidth(size[0]);
-	imageSector.mSize.setHeight(size[1]);
-	sector.setImage(imageSector);
+
+	sector.setClipRect_p(clipRect_p);
+	sector.setOrigin_p(origin_p);
+	sector.setSize(QSize(size[0], size[1]));
 	mFileData.mProbeData.setData(sector);
 }
 

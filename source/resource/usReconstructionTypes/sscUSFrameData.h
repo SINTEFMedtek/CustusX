@@ -94,6 +94,7 @@ public:
 	static USFrameDataPtr create(ImagePtr inputFrameData);
 	static USFrameDataPtr create(QString inputFilename);
 	static USFrameDataPtr create(QString name, cx::ImageDataContainerPtr images);
+	static USFrameDataPtr create(QString name, std::vector<vtkImageDataPtr> frames);
 	~USFrameData();
 
 	Eigen::Array3i getDimensions() const;
@@ -122,8 +123,8 @@ protected:
 	USFrameData();
 	vtkImageDataPtr useAngio(vtkImageDataPtr inData, vtkImageDataPtr grayFrame) const;/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
 
-	vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox) const;
-	vtkImageDataPtr toGrayscale(vtkImageDataPtr input) const;
+	vtkImageDataPtr cropImageExtent(vtkImageDataPtr input, IntBoundingBox3D cropbox) const;
+	vtkImageDataPtr toGrayscaleAndEffectuateCropping(vtkImageDataPtr input) const;
 
 	std::vector<int> mReducedToFull; ///< map from indexes in the reduced volume to the full (original) volume.
 	IntBoundingBox3D mCropbox;

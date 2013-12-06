@@ -27,10 +27,10 @@ public:
 	virtual ~DummyProbe() {}
 	virtual bool isValid() const
 	{
-		return mProbeData.getType() != ProbeData::tNONE;
+		return mProbeData.getType() != ProbeDefinition::tNONE;
 	}
 	virtual QStringList getAvailableVideoSources() { return QStringList() << "active"; }
-	virtual ProbeData getProbeData(QString uid="active") const
+	virtual ProbeDefinition getProbeData(QString uid="active") const
 	{
 		return mProbeData;
 	}
@@ -59,7 +59,7 @@ public:
 	virtual void applyNewConfigurationWithId(QString uid) {}
 	virtual void setTemporalCalibration(double val) {}
 	virtual void setSoundSpeedCompensationFactor(double val) {}
-	virtual void setProbeSector(ProbeData probeSector)
+	virtual void setProbeSector(ProbeDefinition probeSector)
 	{
 		mProbeData = probeSector;
 		emit sectorChanged();
@@ -77,9 +77,8 @@ public:
 		emit sectorChanged();
 	}
 
-
 private:
-	ProbeData mProbeData;
+	ProbeDefinition mProbeData;
 	VideoSourcePtr mVideoSource;
 };
 
@@ -113,9 +112,9 @@ signals:
 
 struct DummyToolTestUtilities
 {
-	static DummyToolPtr createDummyTool(ProbeData probeData = ProbeData(), ToolManager* manager = NULL);
-	static ProbeData createProbeDataLinear(double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
-	static ProbeData createProbeData(ProbeData::TYPE, double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
+	static DummyToolPtr createDummyTool(ProbeDefinition probeData = ProbeDefinition(), ToolManager* manager = NULL);
+	static ProbeDefinition createProbeDataLinear(double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
+	static ProbeDefinition createProbeData(ProbeDefinition::TYPE, double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
 };
 
 /**\brief Implementation of a Tool used for testing.
@@ -149,8 +148,8 @@ public:
 	{
 		return mProbe;
 	}
-	virtual ProbeData getProbeSector() const { return mProbeData; }
-	void setProbeSector( ProbeData probeData )
+	virtual ProbeDefinition getProbeSector() const { return mProbeData; }
+	void setProbeSector( ProbeDefinition probeData )
 	{
 		mProbeData = probeData;
 		mProbe.reset(new DummyProbe());
@@ -202,7 +201,7 @@ private:
 	static int mTransformCount;
 //	Type mType;
 	std::set<Type> mTypes;
-	ProbeData mProbeData;
+	ProbeDefinition mProbeData;
 	ProbePtr mProbe;
 	DummyToolThread* mThread;
 };

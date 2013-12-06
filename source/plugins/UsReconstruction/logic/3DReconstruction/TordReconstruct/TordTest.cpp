@@ -18,13 +18,13 @@ TordTest::TordTest()
 	mMethods.push_back("Anisotropic");
 	mPlaneMethods.push_back("Heuristic");
 	mPlaneMethods.push_back("Closest");
-	
 }
 
 TordTest::~TordTest()
 {
 
 }
+
 
 std::vector<DataAdapterPtr>
 TordTest::getSettings(QDomElement root)
@@ -35,6 +35,9 @@ TordTest::getSettings(QDomElement root)
 	retval.push_back(this->getRadiusOption(root));
 	retval.push_back(this->getPlaneMethodOption(root));
 	retval.push_back(this->getMaxPlanesOption(root));
+	retval.push_back(this->getNStartsOption(root));
+	retval.push_back(this->getNewnessWeightOption(root));
+	retval.push_back(this->getBrightnessWeightOption(root));
 	return retval;
 }
 
@@ -54,6 +57,29 @@ TordTest::getMethodOption(QDomElement root)
 	                                        "Which algorithm to use for reconstruction",
 	                                        methods[0],
 	                                        methods,
+	                                        root);
+}
+
+DoubleDataAdapterXmlPtr
+TordTest::getNewnessWeightOption(QDomElement root)
+{
+	return DoubleDataAdapterXml::initialize("Newness weight", "",
+	                                        "Newness weight",
+	                                        0,
+	                                        DoubleRange(0.0, 10, 0.1),
+	                                        1,
+	                                        root);
+}
+
+
+DoubleDataAdapterXmlPtr
+TordTest::getBrightnessWeightOption(QDomElement root)
+{
+	return DoubleDataAdapterXml::initialize("Brightness weight", "",
+	                                        "Brightness weight",
+	                                        0,
+	                                        DoubleRange(0.0, 10, 0.1),
+	                                        1,
 	                                        root);
 }
 
@@ -98,6 +124,17 @@ TordTest::getMaxPlanesOption(QDomElement root)
 	                                     root);
 }
 
+DoubleDataAdapterXmlPtr
+TordTest::getNStartsOption(QDomElement root)
+{
+	return DoubleDataAdapterXml::initialize("nStarts", "",
+	                                     "Number of starts for multistart searchs",
+	                                     3,
+	                                     DoubleRange(1, 8, 1),
+	                                     0,
+	                                     root);
+}
+
 int
 TordTest::getMethodID(QDomElement root)
 {
@@ -114,12 +151,17 @@ TordTest::getPlaneMethodID(QDomElement root)
 		) - mPlaneMethods.begin();
 }
 
+
 bool
 TordTest::initCL(QString kernelPath,
                  int nMaxPlanes,
                  int nPlanes,
                  int method,
-                 int planeMethod)
+                 int planeMethod,
+                 int nStarts,
+                 float brightnessWeight,
+                 float newnessWeight
+	)
 {
 	// Reusing initialization code from Thunder
 	moClContext = ocl_init("GPU");
@@ -135,6 +177,9 @@ TordTest::initCL(QString kernelPath,
 	                                            nPlanes,
 	                                            method,
 	                                            planeMethod,
+	                                            nStarts,
+	                                            brightnessWeight,
+	                                            newnessWeight,
 	                                            kernelPath);
 
 	if(clprogram == NULL) return false;
@@ -151,6 +196,9 @@ TordTest::buildCLProgram(const char* program_src,
                          int nPlanes,
                          int method,
                          int planeMethod,
+                         int nStarts,
+                         float newnessWeight,
+                         float brightnessWeight,
                          QString kernelPath)
 {
 	cl_program retval;
@@ -163,11 +211,17 @@ TordTest::buildCLProgram(const char* program_src,
 
 	ocl_check_error(err);
 
-	QString define = "-D MAX_PLANES=%1 -D N_PLANES=%2 -D METHOD=%3 -D PLANE_METHOD=%4";
-	define = define.arg(nMaxPlanes).arg(nPlanes).arg(method).arg(planeMethod);
+	QString define = "-D MAX_PLANES=%1 -D N_PLANES=%2 -D METHOD=%3 -D PLANE_METHOD=%4 -D MAX_MULTISTART_STARTS=%5 -D NEWNESS_FACTOR=%6 -D BRIGHTNESS_FACTOR=%7";
+	define = define.arg(nMaxPlanes)
+		.arg(nPlanes)
+		.arg(method)
+		.arg(planeMethod)
+		.arg(nStarts)
+		.arg(newnessWeight)
+		.arg(brightnessWeight);
 
 	err = clBuildProgram(retval, 0, NULL, define.toStdString().c_str(), 0, 0);
-	
+
 	if (err != CL_SUCCESS)
 	{
 		size_t len;
@@ -258,11 +312,13 @@ TordTest::initializeFrameBlocks(frameBlock_t* framePointers,
 bool
 TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
                            vtkImageDataPtr outputData,
-                           float radius)
+                           float radius,
+                           int nClosePlanes)
 {
 	int numBlocks = 10; // FIXME?
 	// Split input US into blocks
 	frameBlock_t* inputBlocks = new frameBlock_t[numBlocks];
+	size_t nPlanes = input->getDimensions()[2];
 	
 	this->initializeFrameBlocks(inputBlocks, numBlocks, input);
 
@@ -273,17 +329,13 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	for(int i = 0; i < numBlocks; i++)
 	{
 		clBlocks[i] = ocl_create_buffer(moClContext->context,
-		                                CL_MEM_READ_ONLY,
+		                                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 		                                inputBlocks[i].length,
 		                                inputBlocks[i].data);
-		                                
 	}
 
 	// Free the local frameblock buffers
-	this->freeFrameBlocks(inputBlocks, numBlocks);
-	delete [] inputBlocks;
-	inputBlocks = NULL;
-
+	
 	// Allocate output memory
 	int *outputDims = outputData->GetDimensions();
 	
@@ -292,27 +344,64 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 
 	messageManager()->sendInfo(QString("Allocating CL output buffer, size %1")
 	                           .arg(outputVolumeSize));
+	cl_ulong maxAllocSize;
+	cl_ulong globalMemSize;
+
+	ocl_check_error(clGetDeviceInfo(moClContext->device,
+	                                CL_DEVICE_MAX_MEM_ALLOC_SIZE,
+	                                sizeof(cl_ulong),
+	                                &maxAllocSize,
+	                                NULL));
+	ocl_check_error(clGetDeviceInfo(moClContext->device,
+	                                CL_DEVICE_GLOBAL_MEM_SIZE,
+	                                sizeof(cl_ulong),
+	                                &globalMemSize,
+	                                NULL));
+	// Check memory sizes
+	if(maxAllocSize < outputVolumeSize)
+	{
+		messageManager()->sendInfo(QString("Output volume size too large! %1 > %2\n").arg(outputVolumeSize).arg(maxAllocSize));
+		return false;
+	}
+
+	if(maxAllocSize < inputBlocks[0].length)
+	{
+		messageManager()->sendInfo(QString("Input blocks too large! %1 > %2\n").arg(inputBlocks[0].length).arg(maxAllocSize));
+		return false;
+	}
+
+
+	cl_ulong globalMemUse = 10*inputBlocks[0].length + outputVolumeSize + sizeof(float)*16*nPlanes +          sizeof(cl_uchar)*input->getDimensions()[0]*input->getDimensions()[1];
+	if(globalMemSize < globalMemUse)
+	{
+		messageManager()->sendInfo(QString("Using too much global memory! %1 > %2").arg(globalMemUse).arg(globalMemSize));
+		return false;
+	}
+
+	messageManager()->sendInfo(QString("Using %1 of %2 global memory\n").arg(globalMemUse).arg(globalMemSize));
+
+
 	cl_mem clOutputVolume = ocl_create_buffer(moClContext->context,
 	                                          CL_MEM_WRITE_ONLY,
 	                                          outputVolumeSize,
 	                                          NULL);
 
 	// Fill the plane matrices
-	size_t nPlanes = input->getDimensions()[2];
+
 
 	float *planeMatrices = new float[16*nPlanes];
 
 	this->fillPlaneMatrices(planeMatrices, input);
 
 	cl_mem clPlaneMatrices = ocl_create_buffer(moClContext->context,
-	                                           CL_MEM_READ_ONLY,
+	                                           CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 	                                           nPlanes*sizeof(float)*16,
 	                                           planeMatrices);
 
 	// US Probe mask
 
 	cl_mem clMask = ocl_create_buffer(moClContext->context,
-	                                  CL_MEM_READ_ONLY,
+	                                  CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 	                                  sizeof(cl_uchar)*
 	                                  input->getDimensions()[0]*input->getDimensions()[1],
 	                                  input->getMask()->GetScalarPointer());
@@ -372,20 +461,88 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	// plane_eqs (local CL memory, will be calculated by the kernel)
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float)*4*nPlanes, NULL));
 
+
+	// Find out how much local memory the device has
+	size_t dev_local_mem_size;
+	ocl_check_error(clGetDeviceInfo(moClContext->device,
+	                                CL_DEVICE_LOCAL_MEM_SIZE,
+	                                sizeof(size_t),
+	                                &dev_local_mem_size,
+	                                NULL));
+
+	size_t local_work_size;
+	// Find the optimal local work size
+	ocl_check_error(clGetKernelWorkGroupInfo(mClKernel,
+	                                         moClContext->device,
+	                                         CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
+	                                         sizeof(size_t),
+	                                         &local_work_size,
+	                                         NULL));
+	// Find the maximum work group size
+	size_t max_work_size;
+	ocl_check_error(clGetKernelWorkGroupInfo(mClKernel,
+	                                         moClContext->device,
+	                                         CL_KERNEL_WORK_GROUP_SIZE,
+	                                         sizeof(size_t),
+	                                         &max_work_size,
+	                                         NULL));
+
+
+	// Now find the largest multiple of the preferred work group size that will fit into local mem
+
+	size_t constant_local_mem = sizeof(cl_float)*4*nPlanes;
+	size_t varying_local_mem = (sizeof(cl_float)+sizeof(cl_short) + sizeof(cl_uchar) + sizeof(cl_uchar))
+		*(nClosePlanes+1);
+	messageManager()->sendInfo(QString("Device has %1 bytes of local memory\n")
+	                           .arg(dev_local_mem_size));
+	dev_local_mem_size -= constant_local_mem + 128;
+
+	// How many work items can the local mem support?
+
+	int maxItems = dev_local_mem_size / varying_local_mem;
+	// And what is the biggest multiple fo local_work_size that fits into that?
+	int multiple = maxItems / local_work_size;
+	//TEST
+	local_work_size = std::min(max_work_size, multiple * local_work_size);
+
+
+	// close planes (local CL memory, to be used by the kernel)
+	ocl_check_error(clSetKernelArg(mClKernel,
+	                               arg++,
+	                               varying_local_mem*local_work_size,
+	                               NULL));
 	// radius
 	ocl_check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &radius));
 
 
-	// Global work items:
-	size_t local_work_size = 128;
 	
-	size_t global_work_size = (outputDims[0]*outputDims[2]);
+
+	messageManager()->sendInfo(QString("Using %1 as local workgroup size").arg(local_work_size));
+	cl_ulong local_mem_size;
+ 
+	// Print local memory usage for debugging purposes
+	ocl_check_error(clGetKernelWorkGroupInfo(mClKernel,
+	                                         moClContext->device,
+	                                         CL_KERNEL_LOCAL_MEM_SIZE,
+	                                         sizeof(cl_ulong),
+	                                         &local_mem_size,
+	                                         NULL));
+
+	messageManager()->sendInfo(QString("Kernel is using %1 bytes of local memory\n").arg(local_mem_size));
+
+	// We will divide the work into cubes of CUBE_DIM^3 voxels. The global work size is the total number of voxels divided by
+	// that.
+	int cube_dim = 4;
+	int cube_dim_cubed = cube_dim*cube_dim*cube_dim;
+	// Global work items:
+	size_t global_work_size = (((outputDims[0]+cube_dim)*(outputDims[1]+cube_dim)*(outputDims[2]+cube_dim)) / cube_dim_cubed);
+
 
 	// Round global_work_size up to nearest multiple of local_work_size
 	if(global_work_size % local_work_size)
 		global_work_size = ((global_work_size/local_work_size) + 1)*local_work_size;
 
-	
+
 	messageManager()->sendInfo(QString("Executing kernel"));
 	ocl_check_error(clEnqueueNDRangeKernel(moClContext->cmd_queue,
 	                                       mClKernel,
@@ -396,7 +553,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                                       0,
 	                                       NULL,
 	                                       NULL));
-	
+	ocl_check_error(clFinish(moClContext->cmd_queue));
 
 	// Read back data
 	try {
@@ -414,6 +571,10 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	}
 
 	messageManager()->sendInfo(QString("Done, freeing GPU memory"));
+
+	this->freeFrameBlocks(inputBlocks, numBlocks);
+	delete [] inputBlocks;
+	inputBlocks = NULL;
 
 	// Free the allocated cl memory objects
 	for(int i = 0; i < numBlocks; i++)
@@ -478,29 +639,37 @@ TordTest::reconstruct(ProcessedUSInputDataPtr input,
 	int method = getMethodID(settings);
 	float radius = getRadiusOption(settings)->getValue();
 	int planeMethod = getPlaneMethodID(settings);
+	int nStarts = getNStartsOption(settings)->getValue();
+	float newnessWeight = getNewnessWeightOption(settings)->getValue();
+	float brightnessWeight = getBrightnessWeightOption(settings)->getValue();
+	
 	messageManager()->sendInfo(
-		QString("Method: %1, radius: %2, planeMethod: %3, nClosePlanes: %4, nPlanes: %5 ")
+		QString("Method: %1, radius: %2, planeMethod: %3, nClosePlanes: %4, nPlanes: %5, nStarts: %6 ")
 		.arg(method)
 		.arg(radius)
 		.arg(planeMethod)
 		.arg(nClosePlanes)
-		.arg(input->getDimensions()[2]));
+		.arg(input->getDimensions()[2])
+		.arg(nStarts));
 
 	if(!initCL(QString(TORD_KERNEL_PATH) + "/kernels.ocl",
-	       nClosePlanes,
-	       input->getDimensions()[2],
-	       method,
-	       planeMethod
+	           nClosePlanes,
+	           input->getDimensions()[2],
+	           method,
+	           planeMethod,
+	           nStarts,
+	           newnessWeight,
+	           brightnessWeight
 		   )) return false;
 
-	bool ret = doGPUReconstruct(input, outputData, radius );
+	bool ret = doGPUReconstruct(input, outputData, radius, nClosePlanes );
 
 	if(moClContext != NULL)
 	{
 		ocl_release(moClContext);
 		moClContext = NULL;
 	}
-	
+
 	return ret;
 }
 

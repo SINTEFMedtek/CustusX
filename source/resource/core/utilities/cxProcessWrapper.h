@@ -54,8 +54,9 @@ public:
 
 	bool isRunning();
 
-public slots:
-	void requestTerminateSlot();
+	qint64 write(const char * data);
+	bool waitForStarted(int msecs = 30000);
+	bool waitForFinished(int msecs = 30000);
 
 private:
 	QString getExecutableInBundlesAbsolutePath(QString exeInBundle);

@@ -38,7 +38,7 @@ public:
 protected:
 	void createTestProbe();
 	void createParameters();
-	cx::ProbeData createProbeData();
+	cx::ProbeDefinition createProbeData();
 	QString mProbeName;
 	QString mScannerName;
 	QString mDefaultProbeDataUid;

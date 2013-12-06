@@ -38,7 +38,8 @@ namespace cx
 
 /**\brief Display a volume in 3D
  * 
- * This abstract interface is implemented by VolumetricRep or ProgressiveLODVolumetricRep.
+ * This abstract interface is implemented by VolumetricRep
+ * Previously: ProgressiveLODVolumetricRep, which is removed.
  * 
  * \ingroup sscRep
  * \ingroup sscRep3D

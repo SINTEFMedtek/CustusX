@@ -127,6 +127,24 @@ private:
 	vtkImageDataPtr mOptionalWholeBase; ///< handle for original monolithic data if present
 };
 
+/** Primitive implementation of ImageDataContainer interface,
+ *  contains a list of image planes.
+ *
+ * \ingroup cxResourceUtilities
+ * \date Nov 28 2013
+ * \author christiana
+ */
+class FramesDataContainer : public ImageDataContainer
+{
+public:
+	FramesDataContainer(std::vector<vtkImageDataPtr> images);
+	virtual ~FramesDataContainer() {}
+	virtual vtkImageDataPtr get(unsigned index);
+	virtual unsigned size() const;
+private:
+	std::vector<vtkImageDataPtr> mImages;
+};
+
 
 /**
  * \}

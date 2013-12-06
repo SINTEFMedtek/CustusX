@@ -84,14 +84,16 @@ void PerformanceTab::init()
   m3DVisualizer->setDisplayNames(MultiVolume3DRepProducer::getAvailableVisualizerDisplayNames());
 
   bool useGPU2DRender = settings()->value("useGPU2DRendering").toBool();
-	mGPU2DRenderCheckBox = new QCheckBox("Use GPU 2D Renderer");
+	mGPU2DRenderCheckBox = new QCheckBox("2D Overlay");
 	mGPU2DRenderCheckBox->setChecked(useGPU2DRender);
-	mGPU2DRenderCheckBox->setToolTip("Use a GPU-based 2D renderer instead of the software-based one, if available.");
+	mGPU2DRenderCheckBox->setToolTip("<p>Use a GPU-based 2D renderer instead of "
+									 "the software-based one, if available.</p>"
+									 "<p>This enables multiple volume rendering in 2D.<p>");
 
-#ifndef USE_GLX_SHARED_CONTEXT
-	mGPU2DRenderCheckBox->setChecked(false);
-	mGPU2DRenderCheckBox->setEnabled(false);
-#endif
+//#ifndef USE_GLX_SHARED_CONTEXT
+//	mGPU2DRenderCheckBox->setChecked(false);
+//	mGPU2DRenderCheckBox->setEnabled(false);
+//#endif
 
 //  bool useGPU3DDepthPeeling = settings()->value("View3D/depthPeeling").toBool();
 //	mGPU3DDepthPeelingCheckBox = new QCheckBox("Use GPU 3D depth peeling");

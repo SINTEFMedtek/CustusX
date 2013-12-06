@@ -227,11 +227,11 @@ ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 	return retval;
 }
 
-IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ProbeDataPtr input)
+IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ProbeDefinitionPtr input)
 {
 	IGTLinkUSStatusMessage::Pointer retval = IGTLinkUSStatusMessage::New();
 
-	retval->SetOrigin(input->getImage().mOrigin_p.data());
+	retval->SetOrigin(input->getOrigin_p().data());
 	// 1 = sector, 2 = linear
 	retval->SetProbeType(input->getType());
 
@@ -250,26 +250,24 @@ IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ProbeDataPtr input)
 }
 
 //'copied' from OpenIGTLinkRTSource::updateSonixStatus()
-ProbeDataPtr IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ProbeDataPtr base)
+ProbeDefinitionPtr IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ProbeDefinitionPtr base)
 {
-	ProbeDataPtr retval;
+	ProbeDefinitionPtr retval;
 	if (base)
 		 retval = base;
 	else
-		retval = ProbeDataPtr(new ProbeData());
+		retval = ProbeDefinitionPtr(new ProbeDefinition());
 
 	if (probeMessage)
 	{
 		// Update the parts of the probe data that is read from the probe message.
-		retval->setType(ProbeData::TYPE(probeMessage->GetProbeType()));
+		retval->setType(ProbeDefinition::TYPE(probeMessage->GetProbeType()));
 		retval->setSector(
 				probeMessage->GetDepthStart(),
 				probeMessage->GetDepthEnd(),
 				probeMessage->GetWidth(),
 				0);
-		ProbeData::ProbeImageData imageData = retval->getImage();
-		imageData.mOrigin_p = Vector3D(probeMessage->GetOrigin());
-		retval->setImage(imageData);
+		retval->setOrigin_p(Vector3D(probeMessage->GetOrigin()));
 		retval->setUid(probeMessage->GetDeviceName());
 	}
 
@@ -283,11 +281,9 @@ ProbeDataPtr IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMess
 		imageMessage->GetDimensions(size);
 		imageMessage->GetSpacing(spacing);
 
-		ProbeData::ProbeImageData imageData = retval->getImage();
-		imageData.mSpacing = Vector3D(spacing[0], spacing[1], spacing[2]);
-		imageData.mSize = QSize(size[0], size[1]);
-		imageData.mClipRect_p = DoubleBoundingBox3D(0, imageData.mSize.width(), 0, imageData.mSize.height(), 0, 0);
-		retval->setImage(imageData);
+		retval->setSpacing(Vector3D(spacing[0], spacing[1], spacing[2]));
+		retval->setSize(QSize(size[0], size[1]));
+		retval->setClipRect_p(DoubleBoundingBox3D(0, retval->getSize().width(), 0, retval->getSize().height(), 0, 0));
 	}
 
 	return this->decode(retval);
@@ -309,7 +305,7 @@ ImagePtr IGTLinkConversion::decode(ImagePtr msg)
 	return retval;
 }
 
-ProbeDataPtr IGTLinkConversion::decode(ProbeDataPtr msg)
+ProbeDefinitionPtr IGTLinkConversion::decode(ProbeDefinitionPtr msg)
 {
 	QString newUid = msg->getUid();
 	QString format = this->extractColorFormat(msg->getUid(), &newUid);

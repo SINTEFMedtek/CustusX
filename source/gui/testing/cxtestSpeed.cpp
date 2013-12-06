@@ -107,7 +107,8 @@ TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integra
 	JenkinsMeasurement jenkins;
 	jenkins.initialize();
 
-	int fps = calculateFPS(false);
+	bool slicing = true;
+	int fps = calculateFPS(slicing);
 	jenkins.createOutput("FPS_vtkGPUVolumeRayCastMapper_Slicing", QString::number(fps));
 
 	// TODO: enter this value into config file
@@ -116,7 +117,7 @@ TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integra
 }
 
 
-TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper renderer", "[speed][gui][integration][not_win32][not_win64]")
+TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper renderer", "[speed][gui][integration][not_win32][not_win64][unstable]")
 {
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
@@ -133,7 +134,7 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper renderer", "[speed][gui][
 	REQUIRE(true);
 }
 
-TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper with slicing", "[speed][gui][integration][not_win32][not_win64]")
+TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper with slicing", "[speed][gui][integration][not_win32][not_win64][unstable]")
 {
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
@@ -141,7 +142,8 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper with slicing", "[speed][g
 	JenkinsMeasurement jenkins;
 	jenkins.initialize();
 
-	int fps = calculateFPS(false);
+	bool slicing = true;
+	int fps = calculateFPS(slicing);
 	jenkins.createOutput("FPS_vtkOpenGLGPUMultiVolumeRayCastMapper_Slicing", QString::number(fps));
 
 	// TODO: enter this value into config file
