@@ -328,10 +328,9 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	for(int i = 0; i < numBlocks; i++)
 	{
 		clBlocks[i] = ocl_create_buffer(moClContext->context,
-		                                CL_MEM_READ_ONLY,
+		                                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 		                                inputBlocks[i].length,
 		                                inputBlocks[i].data);
-		                                
 	}
 
 	// Free the local frameblock buffers
@@ -360,14 +359,14 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	this->fillPlaneMatrices(planeMatrices, input);
 
 	cl_mem clPlaneMatrices = ocl_create_buffer(moClContext->context,
-	                                           CL_MEM_READ_ONLY,
+	                                           CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 	                                           nPlanes*sizeof(float)*16,
 	                                           planeMatrices);
 
 	// US Probe mask
 
 	cl_mem clMask = ocl_create_buffer(moClContext->context,
-	                                  CL_MEM_READ_ONLY,
+	                                  CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 	                                  sizeof(cl_uchar)*
 	                                  input->getDimensions()[0]*input->getDimensions()[1],
 	                                  input->getMask()->GetScalarPointer());
