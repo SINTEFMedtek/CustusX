@@ -63,7 +63,7 @@ endmacro()
 # Initialize openCL library
 #
 # Define variables:
-#    CX_USE_OpenCV : cache option
+#    CX_USE_OpenCL : cache option
 #
 ###############################################################################
 macro(cx_initialize_opencl)
