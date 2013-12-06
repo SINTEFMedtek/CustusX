@@ -208,6 +208,7 @@ public:
   void setSonixHelper(SonixHelper* sonixHelper);
   void setDebugOutput(bool debug);///< Turn debug output on/off
   void setSonixConnectionDelay(int delay);///< The delay (sec) before trying to connect to sonix for the first time
+  void setUseSharedMemory(bool useSharedMemory);
 
 protected:
   vtkSonixVideoSource();
@@ -246,6 +247,7 @@ protected:
 
   bool mDebugOutput;
   int mSonixConnectionDelay;
+  bool mUseSharedMemory;
 
   int max(int a, int b){ if(a > b) return a; else return b;};
   int min(int a, int b){ if(a < b) return a; else return b;};
@@ -257,6 +259,8 @@ private:
   static bool vtkSonixVideoSourceNewFrameCallback(void * data, int type, int sz, bool cine, int frmnum);
   vtkSonixVideoSource(const vtkSonixVideoSource&);  // Not implemented.
   void operator=(const vtkSonixVideoSource&);  // Not implemented.
+
+  void waitForSonixWindow();
 };
 
 #endif
