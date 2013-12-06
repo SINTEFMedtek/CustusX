@@ -27,6 +27,8 @@
 
 namespace cx
 {
+typedef boost::shared_ptr<class SliceProxyInterface> SliceProxyInterfacePtr;
+
 
 /**\brief Display an image slice in 2D.
  *
@@ -51,7 +53,7 @@ public:
 	void setImage(ImagePtr image);
 	ImagePtr getImage();
 	vtkImageActorPtr getActor();
-	void setSliceProxy(SliceProxyPtr slicer);
+	void setSliceProxy(SliceProxyInterfacePtr slicer);
 	QString getImageUid()const;
 	void update();
 	virtual void printSelf(std::ostream & os, Indent indent);

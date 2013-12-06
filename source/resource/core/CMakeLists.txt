@@ -41,7 +41,8 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Tool/sscManualTool
 	Tool/sscProbeAdapterRTSource
 	Tool/sscSliceProxy
-    
+        Tool/sscSlicedImageProxy
+
 	dataAdapters/sscDataAdapter
 	dataAdapters/sscDoubleDataAdapter.h
 	dataAdapters/sscStringDataAdapter.h
@@ -86,7 +87,7 @@ cx_add_class(cxResource_SOURCE
 	Tool/ProbeXmlConfigParserImpl
 	Tool/ProbeXmlConfigParserMock
 	Tool/cxCreateProbeDataFromConfiguration
-		
+
 	Data/sscDataMetric
 	Data/sscLandmark
 	Data/sscDataReaderWriter

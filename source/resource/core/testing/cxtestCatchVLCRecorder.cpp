@@ -30,19 +30,19 @@
 namespace cxtest
 {
 
-TEST_CASE("VLCRecorder can be constructed", "[unit][resource][core][VLCRecorder][VLC][unstable]")
+TEST_CASE("VLCRecorder can be constructed", "[unit][resource][core][VLCRecorder][VLC][not_win64][not_win32]")
 {
 	VLCRecorderFixture fix;
 	REQUIRE(cx::vlc());
 }
 
-TEST_CASE("VLCRecorder can find VLC application", "[unit][resource][core][VLCRecorder][VLC][unstable]")
+TEST_CASE("VLCRecorder can find VLC application", "[unit][resource][core][VLCRecorder][VLC][not_win64][not_win32]")
 {
 	VLCRecorderFixture fix;
 	CHECK(cx::vlc()->hasVLCApplication());
 }
 
-TEST_CASE("VLCRecorder can record for 15 seconds", "[integration][resource][core][VLCRecorder][VLC][unstable]")
+TEST_CASE("VLCRecorder can record for 15 seconds", "[integration][resource][core][VLCRecorder][VLC][not_win64][not_win32]")
 {
 	VLCRecorderFixture vlc;
 
@@ -52,7 +52,7 @@ TEST_CASE("VLCRecorder can record for 15 seconds", "[integration][resource][core
 }
 
 
-TEST_CASE("QProcess and VLC can use cli for starting and stopping screen capture.", "[jb][VLC][proof_of_concept][hide][not_linux][not_win32][not_win64][not_apple]")
+TEST_CASE("QProcess and VLC can use cli for starting and stopping screen capture.", "[VLC][proof_of_concept][hide][not_linux][not_win32][not_win64][not_apple]")
 {
 	QProcess* p = new QProcess();
 	p->setProcessChannelMode(QProcess::MergedChannels);
@@ -75,12 +75,8 @@ TEST_CASE("QProcess and VLC can use cli for starting and stopping screen capture
 	QStringList env = QProcess::systemEnvironment();
 	env.replaceInStrings(QRegExp("^PATH=(.*)", Qt::CaseInsensitive), "PATH=\\1;C:\\Program Files (x86)\\VideoLAN\\VLC");
 	p->setEnvironment(env);
-	//qDebug() << "Env: " << p->environment();
 
-	//p->start(pathToVLC+" -I luacli screen:// :screen-fps=10.000000 :live-caching=300 :sout=#transcode{vcodec=h264,acodec=none}:file{dst="+saveFile+"} :sout-keep");
-	//p->start(pathToVLC+" -I luacli");
 	p->start(pathToVLC, QStringList() <<"-I" << "luacli" << "-vvv");
-	//p->start("vlc.exe -I luacli");
 #endif
 
 	REQUIRE(p->waitForStarted());
@@ -89,15 +85,12 @@ TEST_CASE("QProcess and VLC can use cli for starting and stopping screen capture
 	Utilities::sleep_sec(3);
 
 	qDebug() << "PID: " << QString::number((qint64)p->pid());
-	//qDebug() << "Program: " << p->program();
 	qDebug() << "ErrorString: " << p->errorString();
 	qDebug() << "isOpen: " << p->isOpen();
 	qDebug() << "isReadable: " << p->isReadable();
 	qDebug() << "isWritable: " << p->isWritable();
 	qDebug() << "workingDirectory: " << p->workingDirectory();
-	//qDebug() << "" << p->
-	//qDebug() << "" << p->
-	//qDebug() << "" << p->
+
 	qDebug() << "State: " << p->state();
 
 #ifdef CX_APPLE
@@ -107,10 +100,7 @@ TEST_CASE("QProcess and VLC can use cli for starting and stopping screen capture
 #ifdef CX_WINDOWS
 	QTcpSocket* tcp = new QTcpSocket();
 	tcp->connectToHost("localhost", 4212);
-	//REQUIRE(p->waitForFinished());
 	qDebug() << tcp->write("quit\r\n");
-	//REQUIRE(p->waitForBytesWritten());
-	//p->closeWriteChannel();
 #endif
 
 	CHECK(p->waitForFinished());

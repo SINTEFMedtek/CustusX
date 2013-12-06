@@ -24,12 +24,13 @@ find_package(X11)
 # Add subdirectories
 #------------------------------------------------------------------------------
 
+add_subdirectory(ThirdParty)
+
 add_subdirectory(resource)
 add_subdirectory(service)
 add_subdirectory(logic)
 add_subdirectory(plugins)
 add_subdirectory(gui)
-add_subdirectory(ThirdParty)
 
 # Testing for CustusX
 add_subdirectory(testing)

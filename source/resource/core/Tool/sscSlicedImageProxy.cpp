@@ -128,7 +128,14 @@ SlicedImageProxy::~SlicedImageProxy()
 {
 }
 
-void SlicedImageProxy::setSliceProxy(SliceProxyPtr slicer)
+void SlicedImageProxy::setOutputFormat(Vector3D origin, Eigen::Array3i dim, Vector3D spacing)
+{
+	mReslicer->SetOutputOrigin(origin.data());
+	mReslicer->SetOutputExtent(0, dim[0], 0, dim[1], 0, 0);
+	mReslicer->SetOutputSpacing(spacing.data());
+}
+
+void SlicedImageProxy::setSliceProxy(SliceProxyInterfacePtr slicer)
 {
 	if (mSlicer)
 	{
