@@ -18,11 +18,6 @@
 
 FIND_PACKAGE(PackageHandleStandardArgs)
 
-SET (OPENCL_VERSION_STRING "0.1.0")
-SET (OPENCL_VERSION_MAJOR 0)
-SET (OPENCL_VERSION_MINOR 1)
-SET (OPENCL_VERSION_PATCH 0)
-
 IF (APPLE)
 
 	FIND_LIBRARY(OPENCL_LIBRARIES OpenCL DOC "OpenCL lib for OSX")
@@ -88,6 +83,80 @@ IF(_OPENCL_CPP_INCLUDE_DIRS)
 	# This is often the same, so clean up
 	LIST( REMOVE_DUPLICATES OPENCL_INCLUDE_DIRS )
 ENDIF(_OPENCL_CPP_INCLUDE_DIRS)
+
+#================================================================================
+IF (OPENCL_FOUND)
+# Code for determining OpenCL version found:
+# https://github.com/bkloppenborg/simtoi/blob/master/CMakeModules/FindOpenCL.cmake
+
+  SET (_OPENCL_VERSION_TEST_SOURCE
+"
+#if __APPLE__
+#include <OpenCL/cl.h>
+#else /* !__APPLE__ */
+#include <CL/cl.h>
+#endif /* __APPLE__ */
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    char *version;
+    cl_int result;
+    cl_platform_id id;
+    size_t n;
+
+    result = clGetPlatformIDs(1, &id, NULL);
+
+    if (result == CL_SUCCESS) {
+        result = clGetPlatformInfo(id, CL_PLATFORM_VERSION, 0, NULL, &n);
+
+        if (result == CL_SUCCESS) {
+            version = (char*)malloc(n * sizeof(char));
+
+            result = clGetPlatformInfo(id, CL_PLATFORM_VERSION, n, version,
+                NULL);
+
+            if (result == CL_SUCCESS) {
+                printf(\"%s\", version);
+                fflush(stdout);
+            }
+
+            free(version);
+        }
+    }
+
+    return result == CL_SUCCESS ? EXIT_SUCCESS : EXIT_FAILURE;
+}
+")
+
+  SET (_OPENCL_VERSION_SOURCE
+    "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/openclversion.c")
+
+  FILE (WRITE ${_OPENCL_VERSION_SOURCE} "${_OPENCL_VERSION_TEST_SOURCE}\n")
+
+  TRY_RUN (_OPENCL_VERSION_RUN_RESULT _OPENCL_VERSION_COMPILE_RESULT
+    ${CMAKE_BINARY_DIR} ${_OPENCL_VERSION_SOURCE}
+    RUN_OUTPUT_VARIABLE _OPENCL_VERSION_STRING
+    CMAKE_FLAGS "-DINCLUDE_DIRECTORIES:STRING=${OPENCL_INCLUDE_DIRS}"
+                "-DLINK_LIBRARIES:STRING=${OPENCL_LIBRARIES}")
+
+  IF (_OPENCL_VERSION_RUN_RESULT EQUAL 0)
+    STRING (REGEX REPLACE "OpenCL[ \t]+([0-9]+)\\.[0-9]+.*" "\\1"
+      OPENCL_VERSION_MAJOR "${_OPENCL_VERSION_STRING}")
+    STRING (REGEX REPLACE "OpenCL[ \t]+[0-9]+\\.([0-9]+).*" "\\1"
+      OPENCL_VERSION_MINOR "${_OPENCL_VERSION_STRING}")
+
+    SET (OPENCL_VERSION_COMPONENTS 2)
+    SET (OPENCL_VERSION "${OPENCL_VERSION_MAJOR}.${OPENCL_VERSION_MINOR}")
+  ENDIF (_OPENCL_VERSION_RUN_RESULT EQUAL 0)
+
+  IF ("${OPENCL_VERSION}" STREQUAL "")
+    MESSAGE (WARNING "Cannot determine OpenCL's version")
+  ENDIF ("${OPENCL_VERSION}" STREQUAL "")
+ENDIF (OPENCL_FOUND)
+#================================================================================
 
 MARK_AS_ADVANCED(
   OPENCL_INCLUDE_DIRS

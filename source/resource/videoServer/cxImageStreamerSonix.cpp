@@ -134,6 +134,9 @@ void ImageStreamerSonix::initializeSonixGrabber()
 	int acquisitionDataType = convertStringWithDefault(mArguments["datatype"], 0x00000008);
 	int bufferSize          = convertStringWithDefault(mArguments["buffersize"], 500);
 	int delay          		= convertStringWithDefault(mArguments["delay"], 80);
+	bool useSharedMemory = false;
+	if (ipaddress.contains("127.0.0.1"))
+		useSharedMemory = true;
 
 	mSonixGrabber = vtkSonixVideoSource::New();
 	if (mArguments.count("debug"))
@@ -145,6 +148,7 @@ void ImageStreamerSonix::initializeSonixGrabber()
 	mSonixGrabber->SetImagingMode(imagingMode);
 	mSonixGrabber->SetAcquisitionDataType(acquisitionDataType);
 	mSonixGrabber->SetFrameBufferSize(bufferSize);  // Number of image frames in buffer
+	mSonixGrabber->setUseSharedMemory(useSharedMemory);
 	mSonixGrabber->Initialize(); // Run initialize to set spacing and offset
 
 	//TODO move to debug function OR DELETE!!! <jbake>
