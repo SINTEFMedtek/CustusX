@@ -48,11 +48,12 @@ public:
 	static QString getDataRoot(QString suffix = "");
 	static vtkImageDataPtr create3DVtkImageData(Eigen::Array3i dim = Eigen::Array3i(3,3,3), const unsigned int voxelValue = 100);
 	static cx::ImagePtr create3DImage(Eigen::Array3i dim = Eigen::Array3i(3,3,3), const unsigned int voxelValue = 100);
+	static cx::ImagePtr create3DImage(Eigen::Array3i dim, cx::Vector3D spacing, const unsigned int voxelValue);
 	static std::vector<cx::ImagePtr> create3DImages(unsigned int imageCount, Eigen::Array3i dim = Eigen::Array3i(3,3,3), const unsigned int voxelValue = 100);
 
-	static unsigned int getNumberOfVoxelsAboveThreshold(vtkImageDataPtr image, int threshold);
+	static unsigned int getNumberOfVoxelsAboveThreshold(vtkImageDataPtr image, int threshold, int component=0);
 	static unsigned int getNumberOfNonZeroVoxels(vtkImageDataPtr image);
-	static double getFractionOfVoxelsAboveThreshold(vtkImageDataPtr image, int threshold);
+	static double getFractionOfVoxelsAboveThreshold(vtkImageDataPtr image, int threshold, int component=0);
 
 	static void sleep_sec(int seconds);
 };

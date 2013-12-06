@@ -106,7 +106,7 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& nam
 	mInterpolationType = VTK_LINEAR_INTERPOLATION;
 	mUseCropping = false;
 	mCroppingBox_d = this->getInitialBoundingBox();
-
+	mModality = "SC";
 	//  mShading.on = false;
 	//  mShading.ambient = 0.2;
 	//  mShading.diffuse = 0.9;
@@ -224,7 +224,7 @@ void Image::transformChangedSlot()
 {
 	if (mReferenceImageData)
 	{
-		Transform3D rMd = get_rMd();
+		Transform3D rMd = this->get_rMd();
 		mOrientatorMatrix->DeepCopy(rMd.inv().getVtkMatrix());
 		mReferenceImageData->Update();
 	}
@@ -676,6 +676,8 @@ void Image::setCroppingBox(const DoubleBoundingBox3D& bb_d)
 
 DoubleBoundingBox3D Image::getCroppingBox() const
 {
+	if (similar(mCroppingBox_d, this->getInitialBoundingBox()))
+		return this->boundingBox();
 	return mCroppingBox_d;
 }
 

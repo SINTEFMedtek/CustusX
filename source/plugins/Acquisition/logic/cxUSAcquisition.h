@@ -19,7 +19,7 @@
 
 namespace cx
 {
-class USReconstructInputData;
+struct USReconstructInputData;
 }
 namespace cx
 {

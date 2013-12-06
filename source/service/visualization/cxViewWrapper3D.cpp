@@ -284,7 +284,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	showToolPath->setChecked(settings()->value("showToolPath").toBool());
 	connect(showToolPath, SIGNAL(triggered(bool)), this, SLOT(showToolPathSlot(bool)));
 
-#ifdef USE_GLX_SHARED_CONTEXT
+//#ifdef USE_GLX_SHARED_CONTEXT
 	QMenu* showSlicesMenu = new QMenu("Show Slices", &contextMenu);
 	showSlicesMenu->addAction(this->createSlicesAction("ACS", &contextMenu));
 	showSlicesMenu->addAction(this->createSlicesAction("Axial", &contextMenu));
@@ -293,7 +293,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	showSlicesMenu->addAction(this->createSlicesAction("Any", &contextMenu));
 	showSlicesMenu->addAction(this->createSlicesAction("Dual", &contextMenu));
 	showSlicesMenu->addAction(this->createSlicesAction("Radial", &contextMenu));
-#endif // USE_GLX_SHARED_CONTEXT
+//#endif // USE_GLX_SHARED_CONTEXT
 	QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
 	showRefTool->setDisabled(true);
 	showRefTool->setCheckable(true);
@@ -307,9 +307,9 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	}
 
 	contextMenu.addSeparator();
-#ifdef USE_GLX_SHARED_CONTEXT
+//#ifdef USE_GLX_SHARED_CONTEXT
 	contextMenu.addMenu(showSlicesMenu);
-#endif //USE_GLX_SHARED_CONTEXT
+//#endif //USE_GLX_SHARED_CONTEXT
 	contextMenu.addAction(resetCameraAction);
 	contextMenu.addAction(centerImageAction);
 	contextMenu.addAction(centerToolAction);
@@ -648,7 +648,7 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
 
 void ViewWrapper3D::updateSlices()
 {
-#ifdef USE_GLX_SHARED_CONTEXT
+//#ifdef USE_GLX_SHARED_CONTEXT
 	if (mSlices3DRep)
 		mView->removeRep(mSlices3DRep);
 	//Simple bug fix of #746: Don't create slices if no volumes exist in 3D scene
@@ -677,13 +677,12 @@ void ViewWrapper3D::updateSlices()
 		return;
 	}
 
-	mSlices3DRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
+	mSlices3DRep->setShaderPath(DataLocations::getShaderPath());
 	if (mGroupData && !mGroupData->getImages().empty())
 		mSlices3DRep->setImages(mGroupData->getImages());
 	mSlices3DRep->setTool(toolManager()->getDominantTool());
-//	return mSlices3DRep;
 	mView->addRep(mSlices3DRep);
-#endif // USE_GLX_SHARED_CONTEXT
+//#endif // USE_GLX_SHARED_CONTEXT
 }
 
 ViewWidget* ViewWrapper3D::getView()

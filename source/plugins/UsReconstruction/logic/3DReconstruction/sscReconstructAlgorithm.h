@@ -51,9 +51,6 @@ class ReconstructAlgorithm
 {
 public:
 	virtual ~ReconstructAlgorithm() {}
-	/**
-	 *  Return a unique name for this algo.
-	 */
 	virtual QString getName() const = 0;
 	/**
 	 *  Fill settings for this algorithm.

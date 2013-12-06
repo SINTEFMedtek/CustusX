@@ -63,7 +63,7 @@ endmacro()
 # Initialize openCL library
 #
 # Define variables:
-#    CX_USE_OpenCV : cache option
+#    CX_USE_OpenCL : cache option
 #
 ###############################################################################
 macro(cx_initialize_opencl)
@@ -93,19 +93,22 @@ endmacro()
 #
 ###############################################################################
 macro(cx_initialize_TSF)
-    # TSF (Tube-Segmentation-Framework)
-    #----------
     if(CX_USE_TSF)
-        find_package(Tube-Segmentation-Framework PATHS "${CustusX3_SOURCE_DIR}/../../Tube-Segmentation-Framework/build_Debug" REQUIRED)
+        find_package( Tube-Segmentation-Framework REQUIRED)
+    else()
+        find_package( Tube-Segmentation-Framework QUIET)
     endif()
 
-    IF( Tube-Segmentation-Framework_FOUND )
+    if(Tube-Segmentation-Framework_FOUND)
         option(CX_USE_TSF "use TSF (Tube-Segmentation-Framework)" ON)
+    else()
+        option(CX_USE_TSF "use TSF (Tube-Segmentation-Framework)" OFF)
+    endif()
+
+    if( CX_USE_TSF )
         ADD_DEFINITIONS(-DCX_USE_TSF)
         include(${Tube-Segmentation-Framework_USE_FILE})
-    ELSE()
-        option(CX_USE_TSF "use TSF (Tube-Segmentation-Framework)" OFF)
-    ENDIF()
+    endif()
 endmacro()
 
 ###############################################################################
@@ -119,16 +122,21 @@ endmacro()
 ###############################################################################
 macro(cx_initialize_level_set_segmentation)
     if(CX_USE_LEVEL_SET)
-        find_package(Level-Set-Segmentation PATHS "${CustusX3_SOURCE_DIR}/../../Level-Set-Segmentation/build_Debug" REQUIRED)
+        find_package( Level-Set-Segmentation REQUIRED)
+    else()
+        find_package( Level-Set-Segmentation QUIET)
     endif()
 
-    IF( Level-Set-Segmentation_FOUND )
+    if(Level-Set-Segmentation_FOUND)
         option(CX_USE_LEVEL_SET "use Level Set Segmentation" ON)
+    else()
+        option(CX_USE_LEVEL_SET "use Level Set Segmentation" OFF)
+    endif()
+
+    if( CX_USE_LEVEL_SET )
         ADD_DEFINITIONS(-DCX_USE_LEVEL_SET)
         include(${Level-Set-Segmentation_USE_FILE})
-    ELSE()
-        option(CX_USE_LEVEL_SET "use Level Set Segmentation" OFF)
-    ENDIF()
+    endif()
 endmacro()
 
 

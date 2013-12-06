@@ -55,7 +55,7 @@ private:
 	bool initialize_local();
 	void deinitialize_local();
 
-	ProbeDataPtr getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img);
+	ProbeDefinitionPtr getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img);
 	void send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged);
 
 	//Compare to geometry structs

@@ -45,7 +45,8 @@ public:
 	void define3D(const QString& imageFilename, const ImageParameters* parameters, int r, int c);
 	bool define3DGPU(const QStringList& imageFilenames, const ImageParameters* parameters, int r, int c);
 	void defineSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c);
-	bool defineGPUSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c);
+	bool defineGPUSlice(const QString& uid, const QString&    imageFilename, cx::PLANE_TYPE plane, int r, int c);
+	bool defineGPUSlice(const QString& uid, const std::vector<cx::ImagePtr> images, cx::PLANE_TYPE plane, int r, int c);
 
 //	// was test accepted?
 //	bool accepted() const { return mAcceptanceBox->accepted(); }
@@ -53,17 +54,18 @@ public:
 	// setup views
 	void insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c);
 	bool runWidget();
+	bool runWidget(int duration);
 	bool quickRunWidget();
 
-	double getFractionOfBrightPixelsInView(int viewIndex, int threshold);
+	double getFractionOfBrightPixelsInView(int viewIndex, int threshold, int component=0);
 	void dumpDebugViewToDisk(QString text, int viewIndex);
+
+	cx::ImagePtr loadImage(const QString& imageFilename);
 
 private:
 	void applyParameters(cx::ImagePtr image, const ImageParameters* parameters);
-	cx::ImagePtr loadImage(const QString& imageFilename);
 	void fixToolToCenter();
 	void prettyZoom(cx::View *view);
-	bool runWidget(int duration);
 	cx::SliceProxyPtr createSliceProxy(cx::PLANE_TYPE plane);
 	cx::ViewWidget* create2DView(const QString& title, int r, int c);
 

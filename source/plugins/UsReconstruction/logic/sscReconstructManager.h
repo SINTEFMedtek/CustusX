@@ -34,7 +34,7 @@ typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
 
 namespace cx
 {
-
+typedef boost::shared_ptr<class CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
 typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
 typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
@@ -79,51 +79,19 @@ public:
 	ReconstructManager(XmlOptionFile settings, QString shaderPath);
 	virtual ~ReconstructManager();
 
-	/**
-	  * Set input data for reconstruction
-	  */
-	void selectData(QString filename, QString calFilesPath = "");
-	/**
-	  * Set input data for reconstruction
-	  */
-	void selectData(USReconstructInputData data);
-	/**
-	  * Get the currently selected filename
-	  */
-	QString getSelectedFilename() const;
-	/**
-	  * Return the currently selected input data
-	  */
-	USReconstructInputData getSelectedFileData() { return mOriginalFileData; }
+	void selectData(QString filename, QString calFilesPath = ""); ///< Set input data for reconstruction
+	void selectData(USReconstructInputData data); ///< Set input data for reconstruction
 
-	/**
-	  * Return control parameters that can be adjusted by the GUI or similar prior to reconstruction
-	  */
-	ReconstructParamsPtr getParams();
-	/**
-	  * Return control parameters for the currently selected algorithm, adjustable like getParams()
-	  */
-	std::vector<DataAdapterPtr> getAlgoOptions();
-	/**
-	  * Return the settings xml file where parameters are stored
-	  */
-	XmlOptionFile getSettings() { return mSettings; }
-	/**
-	  * Return params controlling the output data. These are data-dependent.
-	  */
-	OutputVolumeParams getOutputVolumeParams() const;
-	/**
-	  * Control the output volume
-	  */
-	void setOutputVolumeParams(const OutputVolumeParams& par);
-	/**
-	  * Set location of output relative to base
-	  */
-	void setOutputRelativePath(QString path);
-	/**
-	  * Set base location of output
-	  */
-	void setOutputBasePath(QString path);
+	QString getSelectedFilename() const; ///< Get the currently selected filename
+	USReconstructInputData getSelectedFileData(); ///< Return the currently selected input data
+	ReconstructParamsPtr getParams(); ///< Return control parameters that can be adjusted by the GUI or similar prior to reconstruction
+	std::vector<DataAdapterPtr> getAlgoOptions(); ///< Return control parameters for the currently selected algorithm, adjustable like getParams()
+	XmlOptionFile getSettings(); ///< Return the settings xml file where parameters are stored
+	OutputVolumeParams getOutputVolumeParams() const; ///< Return params controlling the output data. These are data-dependent.
+
+	void setOutputVolumeParams(const OutputVolumeParams& par); ///< Control the output volume
+	void setOutputRelativePath(QString path); ///< Set location of output relative to base
+	void setOutputBasePath(QString path); ///< Set base location of output
 
 	/** Execute the reconstruction in another thread.
 	  *
@@ -132,10 +100,7 @@ public:
 	  * In general, dont use the retval, it is for unit testing.
 	  */
 	std::vector<ReconstructCorePtr> startReconstruction();
-	/** Return the currently reconstructing thread object(s).
-	  */
-	std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction() { return mThreadedReconstruction; }
-
+	std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction(); ///< Return the currently reconstructing thread object(s).
 	/**
 	  * Create the reconstruct preprocessor object.
 	  * This is usually created internally during reconstruction,
@@ -165,18 +130,10 @@ signals:
 	void inputDataSelected(QString mhdFileName);
 	void reconstructAboutToStart();
 
+private slots:
+	void threadFinishedSlot();
+
 private:
-	ReconstructParamsPtr mParams;
-	std::vector<DataAdapterPtr> mAlgoOptions;
-	std::set<cx::TimedAlgorithmPtr> mThreadedReconstruction;
-	USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
-
-	OutputVolumeParams mOutputVolumeParams;
-	XmlOptionFile mSettings;
-	QString mOutputRelativePath;///< Relative path to the output image
-	QString mOutputBasePath;///< Global path where the relative path starts, for the output image
-	QString mShaderPath; ///< name of shader folder
-
 	void launch(cx::TimedAlgorithmPtr thread);
 	void clearAll();
 	ReconstructCorePtr createCore(); ///< used for threaded reconstruction
@@ -190,12 +147,21 @@ private:
 	ReconstructCore::InputParams createCoreParameters();
 
 	bool validInputData() const;///< checks if internal states is valid (that it actually has frames to reconstruct)
+	cx::CompositeTimedAlgorithmPtr assembleReconstructionPipeline(std::vector<ReconstructCorePtr> cores); ///< assembles the different steps that is needed to reconstruct
+	bool canCoresRunInParallel(std::vector<ReconstructCorePtr> cores);
 
-private slots:
-	void threadFinishedSlot();
+	ReconstructParamsPtr mParams;
+	std::vector<DataAdapterPtr> mAlgoOptions;
+	std::set<cx::TimedAlgorithmPtr> mThreadedReconstruction;
+	USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
+
+	OutputVolumeParams mOutputVolumeParams;
+	XmlOptionFile mSettings;
+	QString mOutputRelativePath;///< Relative path to the output image
+	QString mOutputBasePath;///< Global path where the relative path starts, for the output image
+	QString mShaderPath; ///< name of shader folder
 
 };
-
 
 /**
  * @}

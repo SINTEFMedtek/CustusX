@@ -88,6 +88,27 @@ public:
 	 */
 	virtual DoubleDataAdapterXmlPtr getMaxPlanesOption(QDomElement root);
 
+	/**
+	 * Make number of starts for multistart search option for the UI
+	 * @param root The root of the configuration ui
+	 * @return Number of multistart search starts option
+	 */
+	virtual DoubleDataAdapterXmlPtr getNStartsOption(QDomElement root);
+
+	/**
+	 * Make brightness weight(anisotropic method only) option for the UI
+	 * @param root The root of the configuration ui
+	 * @return Number of multistart search starts option
+	 */
+	virtual DoubleDataAdapterXmlPtr getBrightnessWeightOption(QDomElement root);
+
+		/**
+	 * Make Newness weight(anisotropic method only) option for the UI
+	 * @param root The root of the configuration ui
+	 * @return Number of multistart search starts option
+	 */
+	virtual DoubleDataAdapterXmlPtr getNewnessWeightOption(QDomElement root);
+	
 protected:
 
 	/**
@@ -112,6 +133,9 @@ protected:
 	 * @param nPlanes Number of image planes in the input data set
 	 * @param method The method ID. See kernels.ocl for more information
 	 * @param planeMethod the plane method ID. See kernels.ocl for more information
+	 * @param nStarts number of starts for multistart search for close planes
+	 * @param brightnessWeight The extra weight to give pixels brighter than mean
+	 * @param newnessWeight The extra weight to give pixels newer than mean
 	 * @return True on success
 	 * @sa buildCLProgram
 	 */
@@ -119,8 +143,10 @@ protected:
 	                    int nMaxPlanes,
 	                    int nPlanes,
 	                    int method,
-	                    int planeMethod);
-	
+	                    int planeMethod,
+	                    int nStarts,
+	                    float brightnessWeight,
+	                    float newnessWeight);
 	/**
 	 * Build the OpenCL kernel
 	 * @param program_src The kernel source code
@@ -128,7 +154,10 @@ protected:
 	 * @param nPlanes Number of image planes in the input data set
 	 * @param method The method ID. See kernels.ocl for more information
 	 * @param planeMethod the plane method ID. See kernels.ocl for more information
+	 * @param nStarts number of starts for multistart search for close planes
 	 * @param kernelPath The path of the kernel source code
+	 * @param brightnessWeight The extra weight to give pixels brighter than mean
+	 * @param newnessWeight The extra weight to give pixels newer than mean
 	 * @return True on suc
 	 */
 	virtual cl_program buildCLProgram(const char* program_src, 
@@ -136,6 +165,9 @@ protected:
 	                                  int nPlanes,
 	                                  int method,
 	                                  int planeMethod,
+	                                  int nStarts,
+	                                  float brightnessWeight,
+	                                  float newnessWeight,
 	                                  QString kernelPath);
 	/**
 	 * Perform GPU Reconstruction.
@@ -144,11 +176,13 @@ protected:
 	 * @param input The input US data
 	 * @param outputData The output volume is stored here
 	 * @param radius The radius of the kernel - i.e. how far away to look for image planes to use
+	 * @param nClosePlanes The number of close planes to search for
 	 * @return true on success
 	 */	 
 	virtual bool doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                              vtkImageDataPtr outputData,
-	                              float radius);
+	                              float radius,
+	                              int nClosePlanes);
 
 	/**
 	 * Split the US input into numBlock blocks of whole frames 
@@ -204,6 +238,8 @@ protected:
 	 */
 	virtual int getPlaneMethodID(QDomElement root);
 
+
+
 	/// OpenCL handles
 	cl_kernel mClKernel;
 	std::vector<cl_mem> mVClMemBscan;
@@ -213,6 +249,7 @@ protected:
 	// Method names. Indices into this array corresponds to method IDs in the OpenCL Kernel.
 	std::vector<QString> mMethods;
 	std::vector<QString> mPlaneMethods;
+
 	
 };
 

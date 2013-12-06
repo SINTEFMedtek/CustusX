@@ -109,7 +109,7 @@ bool AngleMetric::isValid() const
 
 unsigned AngleMetric::getArgumentCount() const
 {
-	return mArgument.size();
+	return (unsigned)mArgument.size();
 }
 
 std::vector<Vector3D> AngleMetric::getEndpoints() const

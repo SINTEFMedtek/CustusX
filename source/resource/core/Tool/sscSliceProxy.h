@@ -32,7 +32,39 @@ namespace cx
 class SliceComputer;
 // forward declarations
 typedef boost::shared_ptr<class Tool> ToolPtr;
+typedef boost::shared_ptr<class SliceProxyInterface> SliceProxyInterfacePtr;
 
+
+class SliceProxyInterface : public QObject
+{
+	Q_OBJECT
+public:
+	virtual ~SliceProxyInterface() {}
+
+	virtual Transform3D get_sMr() = 0; ///< get slice transform, i.e. the matrix sMr transforming a point p in ref to slice space.
+	void printSelf(std::ostream & os, Indent indent) {}
+
+#ifdef WIN32
+	typedef Transform3D Transform3D;
+#endif
+
+signals:
+	void transformChanged(Transform3D sMr); ///< emitted when transform is changed.
+};
+
+class SimpleSliceProxy : public SliceProxyInterface
+{
+	Q_OBJECT
+public:
+	SimpleSliceProxy() : m_sMr(Transform3D::Identity()) {}
+	virtual ~SimpleSliceProxy() {}
+	void set_sMr(Transform3D sMr) { m_sMr=sMr; emit transformChanged(m_sMr); }
+	virtual Transform3D get_sMr() { return m_sMr; }
+public:
+	Transform3D m_sMr;
+};
+
+typedef boost::shared_ptr<class SimpleSliceProxy> SimpleSliceProxyPtr;
 typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
 
 /**\brief Provides a slice matrix based on definition and tool
@@ -45,7 +77,7 @@ typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
  *
  * \ingroup sscProxy
  */
-class SliceProxy : public QObject
+class SliceProxy : public SliceProxyInterface
 {
 	Q_OBJECT
 public:
@@ -70,8 +102,8 @@ public:
 	void setComputer(const SliceComputer& val);
 
 	ToolPtr getTool();
-	Transform3D get_sMr(); ///< get slice transform, i.e. the matrix sMr transforming a point p in ref to slice space.
-	void printSelf(std::ostream & os, Indent indent);
+	virtual Transform3D get_sMr(); ///< get slice transform, i.e. the matrix sMr transforming a point p in ref to slice space.
+	virtual void printSelf(std::ostream & os, Indent indent);
 
 	/**
 	 * \brief Return true if the active tools configured tool tip offset should be used for this slice proxy
@@ -82,12 +114,12 @@ public:
 	 */
 	void setUseTooltipOffset(bool);
 
-#ifdef WIN32
-	typedef Transform3D Transform3D; 
-#endif
+//#ifdef WIN32
+//	typedef Transform3D Transform3D;
+//#endif
 
 signals:
-	void transformChanged(Transform3D sMr); ///< emitted when transform is changed.
+//	void transformChanged(Transform3D sMr); ///< emitted when transform is changed.
 	void toolTransformAndTimestamp(Transform3D prMt, double timestamp); ///< forwarded from tool
 	void toolVisible(bool visible); ///< forwarding of visible in tool
 

@@ -131,7 +131,7 @@ void FusedInputOutputSelectDataStringDataAdapter::inputDataChangedSlot()
 Pipeline::Pipeline(QObject *parent) :
     QObject(parent)
 {
-	mCompositeTimedAlgorithm.reset(new CompositeTimedAlgorithm("Pipeline"));
+	mCompositeTimedAlgorithm.reset(new CompositeSerialTimedAlgorithm("Pipeline"));
 }
 
 void Pipeline::initialize(FilterGroupPtr filters)

@@ -16,30 +16,28 @@
 namespace cx
 {
 
-ProbeData DummyToolTestUtilities::createProbeData(ProbeData::TYPE type, double depth, double width, Eigen::Array2i frameSize)
+ProbeDefinition DummyToolTestUtilities::createProbeData(ProbeDefinition::TYPE type, double depth, double width, Eigen::Array2i frameSize)
 {
-	ProbeData retval;
+	ProbeDefinition retval;
 	retval.setType(type);
 	Eigen::Array2i extent = frameSize - 1;
 	retval.setSector(0, depth, width, 0);
 
 	Vector3D imageSpacing(width/extent[0], depth/extent[1], 1.0);
-	ProbeData::ProbeImageData image = retval.getImage();
-	image.mOrigin_p = Vector3D(frameSize[0]/2,0,0);
-	image.mSpacing = imageSpacing;
-	image.mClipRect_p = DoubleBoundingBox3D(0, extent[0], 0, extent[1], 0, 0);
-	image.mSize = QSize(frameSize[0], frameSize[1]);
-	retval.setImage(image);
+	retval.setOrigin_p(Vector3D(frameSize[0]/2,0,0));
+	retval.setSpacing(imageSpacing);
+	retval.setClipRect_p(DoubleBoundingBox3D(0, extent[0], 0, extent[1], 0, 0));
+	retval.setSize(QSize(frameSize[0], frameSize[1]));
 
 	return retval;
 }
 
-ProbeData DummyToolTestUtilities::createProbeDataLinear(double depth, double width, Eigen::Array2i frameSize)
+ProbeDefinition DummyToolTestUtilities::createProbeDataLinear(double depth, double width, Eigen::Array2i frameSize)
 {
-	return createProbeData(ProbeData::tLINEAR, depth, width, frameSize);
+	return createProbeData(ProbeDefinition::tLINEAR, depth, width, frameSize);
 }
 
-DummyToolPtr DummyToolTestUtilities::createDummyTool(ProbeData probeData, ToolManager* manager)
+DummyToolPtr DummyToolTestUtilities::createDummyTool(ProbeDefinition probeData, ToolManager* manager)
 {
 	DummyToolPtr retval(new DummyTool(manager));
 	retval->setProbeSector(probeData);

@@ -15,7 +15,6 @@
 #include "cxMultiVolume3DRepProducer.h"
 #include "sscMessageManager.h"
 #include "sscVolumetricRep.h"
-#include "sscProgressiveLODVolumetricRep.h"
 #include <vtkImageData.h>
 #include "sscImage2DRep3D.h"
 #include "sscView.h"
@@ -55,10 +54,7 @@ QStringList MultiVolume3DRepProducer::getAvailableVisualizers()
 {
 	QStringList retval;
 	retval << "vtkVolumeTextureMapper3D";
-//#if !defined(__APPLE__) && !defined(WIN32)
 	retval << "vtkGPUVolumeRayCastMapper";
-//#endif
-	retval << "sscProgressiveLODVolumeTextureMapper3D";
 	retval << "sscGPURayCastMultiVolume";
 #ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
 	retval << "vtkOpenGLGPUMultiVolumeRayCastMapper";
@@ -72,7 +68,6 @@ std::map<QString, QString> MultiVolume3DRepProducer::getAvailableVisualizerDispl
 	std::map<QString, QString> names;
 	names["vtkVolumeTextureMapper3D"] = "Texture (single volume)";
 	names["vtkGPUVolumeRayCastMapper"] = "Raycast GPU (single volume)";
-	names["sscProgressiveLODVolumeTextureMapper3D"] = "Progressive texture (single volume)";
 	names["sscGPURayCastMultiVolume"] = "Snw Raycast GPU (multi volume)";
 	names["vtkOpenGLGPUMultiVolumeRayCastMapper"] = "Mehdi Raycast GPU (multi volume)";
 	return names;
@@ -262,10 +257,6 @@ void MultiVolume3DRepProducer::buildSingleVolumeRenderer(ImagePtr image)
 	{
 		this->buildVtkGPUVolumeRayCastMapper(image);
 	}
-	else if (mVisualizerType=="sscProgressiveLODVolumeTextureMapper3D")
-	{
-		this->buildSscProgressiveLODVolumeTextureMapper3D(image);
-	}
 	else
 	{
 		messageManager()->sendError(QString("No visualizer found for string=%1").arg(mVisualizerType));
@@ -276,7 +267,7 @@ void MultiVolume3DRepProducer::buildSingleVolumeRenderer(ImagePtr image)
 bool MultiVolume3DRepProducer::isSingleVolumeRenderer() const
 {
 	QStringList singleTypes;
-	singleTypes << "vtkVolumeTextureMapper3D" << "vtkGPUVolumeRayCastMapper" << "sscProgressiveLODVolumeTextureMapper3D";
+	singleTypes << "vtkVolumeTextureMapper3D" << "vtkGPUVolumeRayCastMapper";
 	return singleTypes.count(mVisualizerType);
 }
 
@@ -306,16 +297,5 @@ void MultiVolume3DRepProducer::buildVtkGPUVolumeRayCastMapper(ImagePtr image)
 	rep->setImage(image);
 	mReps.push_back(rep);
 }
-
-void MultiVolume3DRepProducer::buildSscProgressiveLODVolumeTextureMapper3D(ImagePtr image)
-{
-	ProgressiveLODVolumetricRepPtr rep = ProgressiveLODVolumetricRep::New();
-
-	rep->setMaxVolumeSize(this->getMaxRenderSize());
-	rep->setImage(image);
-	mReps.push_back(rep);
-}
-
-
 
 } // namespace cx

@@ -207,28 +207,28 @@ void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::cxProbe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
-	ProbeData data = probe->getProbeData();
+	ProbeDefinition data = probe->getProbeData();
 	mUpdating= true;
 
-	DoubleBoundingBox3D range(0, data.getImage().mSize.width(), 0, data.getImage().mSize.height());
-	mBBWidget->setValue(data.getImage().mClipRect_p, range);
+	DoubleBoundingBox3D range(0, data.getSize().width(), 0, data.getSize().height());
+	mBBWidget->setValue(data.getClipRect_p(), range);
 
-	mOrigin->setValue(data.getImage().mOrigin_p);
+	mOrigin->setValue(data.getOrigin_p());
 
-	double sx = data.getImage().mSpacing[0]; // mm/pix
-	double sy = data.getImage().mSpacing[1];
+	double sx = data.getSpacing()[0]; // mm/pix
+	double sy = data.getSpacing()[1];
 
 	mDepthWidget->setValue(std::make_pair(data.getDepthStart()/sy, data.getDepthEnd()/sy));
 	mDepthWidget->setRange(DoubleRange(0, range.range()[1]*1.5, 1));
 
 	mWidth->setValue(data.getWidth());
 
-	if (data.getType()== ProbeData::tLINEAR)
+	if (data.getType()== ProbeDefinition::tLINEAR)
 	{
 		mWidth->setValueRange(DoubleRange(0, range.range()[0]*1.5*sx, 1.0*sx));
 		mWidth->setInternal2Display(1.0/sx);
 	}
-	if (data.getType()== ProbeData::tSECTOR)
+	if (data.getType()== ProbeDefinition::tSECTOR)
 	{
 		mWidth->setValueRange(DoubleRange(0, M_PI, M_PI/180));
 		mWidth->setInternal2Display(180.0/M_PI);
@@ -252,10 +252,10 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::cxProbe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
-	ProbeData data = probe->getProbeData();
+	ProbeDefinition data = probe->getProbeData();
 
-	double sx = data.getImage().mSpacing[0]; // mm/pix
-	double sy = data.getImage().mSpacing[1];
+	double sx = data.getSpacing()[0]; // mm/pix
+	double sy = data.getSpacing()[1];
 
 	data.setSector(mDepthWidget->getValue().first*sy, mDepthWidget->getValue().second*sy, mWidth->getValue());
 
@@ -275,12 +275,9 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::cxProbe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
-	ProbeData data = probe->getProbeData();
+	ProbeDefinition data = probe->getProbeData();
 
-	ProbeData::ProbeImageData image = data.getImage();
-
-	image.mClipRect_p = mBBWidget->getValue();
-	data.setImage(image);
+	data.setClipRect_p(mBBWidget->getValue());
 
 	probe->setProbeSector(data);
 }
@@ -295,21 +292,17 @@ void ProbeConfigWidget::guiOriginSettingsChanged()
 	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::cxProbe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
-	ProbeData data = probe->getProbeData();
-
-	ProbeData::ProbeImageData image = data.getImage();
+	ProbeDefinition data = probe->getProbeData();
 
 	// if sync: move clip rect accordingly
 	if (mSyncBoxToSector->isChecked())
 	{
 		// shift
-		Vector3D shift = mOrigin->getValue() - image.mOrigin_p;
-		image.mClipRect_p = transform(createTransformTranslate(shift), image.mClipRect_p);
+		Vector3D shift = mOrigin->getValue() - data.getOrigin_p();
+		data.setClipRect_p(transform(createTransformTranslate(shift), data.getClipRect_p()));
 	}
 
-	image.mOrigin_p = mOrigin->getValue();
-
-	data.setImage(image);
+	data.setOrigin_p(mOrigin->getValue());
 
 	probe->setProbeSector(data);
 }

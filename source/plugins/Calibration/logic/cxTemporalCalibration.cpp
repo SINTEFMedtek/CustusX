@@ -232,7 +232,7 @@ bool TemporalCalibration::checkFrameMovementQuality(std::vector<double> pos)
 	// accept if less than 20% zeros.
 	double error = double(count)/pos.size();
 	if (error > 0.05)
-		messageManager()->sendWarning(QString("Found %1 \% zeros in frame movement").arg(error*100));
+		messageManager()->sendWarning(QString("Found %1 % zeros in frame movement").arg(error*100));
 	return error < 0.2;
 }
 
@@ -241,8 +241,8 @@ bool TemporalCalibration::checkFrameMovementQuality(std::vector<double> pos)
  */
 double TemporalCalibration::findLeastSquares(std::vector<double> frames, std::vector<double> tracking, int shift) const
 {
-	int r0 = 0;
-	int r1 = frames.size();
+	size_t r0 = 0;
+	size_t r1 = frames.size();
 
 	r0 = std::max<int>(r0, - shift);
 	r1 = std::min<int>(r1, tracking.size() - shift);
@@ -267,7 +267,7 @@ double TemporalCalibration::findLeastSquares(std::vector<double> frames, std::ve
 double TemporalCalibration::findLSShift(std::vector<double> frames, std::vector<double> tracking, double resolution) const
 {
 	double maxShift = 1000;
-  int N = std::min(tracking.size(), frames.size());
+	size_t N = std::min(tracking.size(), frames.size());
   N = std::min<int>(N, 2*maxShift/resolution); // constrain search to 1 second in each direction
   std::vector<double> result(N, 0);
   int W = N/2;
@@ -288,7 +288,7 @@ double TemporalCalibration::findLSShift(std::vector<double> frames, std::vector<
   mDebugStream << "#frames=" << frames.size() << ", #tracks=" << tracking.size() << std::endl;
   mDebugStream << std::endl;
   mDebugStream << "Frame pos" << "\t" << "Track pos" << "\t" << "RMS(center=" << W << ")"	<< std::endl;
-  for (int x = 0; x < std::min<int>(tracking.size(), frames.size()); ++x)
+	for (size_t x = 0; x < std::min<int>(tracking.size(), frames.size()); ++x)
   {
     mDebugStream << frames[x] << "\t" << tracking[x];
     if (x<N)
@@ -310,7 +310,7 @@ double TemporalCalibration::findLSShift(std::vector<double> frames, std::vector<
  */
 double TemporalCalibration::findCorrelationShift(std::vector<double> frames, std::vector<double> tracking, double resolution) const
 {
-  int N = std::min(tracking.size(), frames.size());
+	size_t N = std::min(tracking.size(), frames.size());
   std::vector<double> result(N, 0);
 
   correlate(&*frames.begin(), &*tracking.begin(), &*result.begin(), N / 2, N);
@@ -463,7 +463,7 @@ double TemporalCalibration::findCorrelation(USFrameDataPtr data, int frame_a, in
 	int maxShift_pix = maxShift / mFileData.mUsRaw->getSpacing()[1];
 	int lastVal_pix = lastVal / mFileData.mUsRaw->getSpacing()[1];
 
-  int line_index_x = mFileData.mProbeData.mData.getImage().mOrigin_p[0];
+	int line_index_x = mFileData.mProbeData.mData.getOrigin_p()[0];
 
   int dimY = mFileData.mUsRaw->getDimensions()[1];
 

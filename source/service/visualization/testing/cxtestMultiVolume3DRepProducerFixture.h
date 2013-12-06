@@ -22,7 +22,6 @@
 
 #include "sscVolumeHelpers.h"
 #include "sscVolumetricRep.h"
-#include "sscProgressiveLODVolumetricRep.h"
 #include "cxtestUtilities.h"
 #include "sscMessageManager.h"
 #include "sscImage2DRep3D.h"

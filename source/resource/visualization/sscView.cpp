@@ -23,7 +23,6 @@
 #include <vtkImageData.h>
 #include "sscVector3D.h"
 #include "vtkRenderWindow.h"
-#include "sscViewRenderWindow.h"
 #include "vtkRenderer.h"
 #ifdef check
 #undef check
@@ -72,7 +71,7 @@ View::~View()
 ViewWidget::ViewWidget(QWidget *parent, Qt::WFlags f) :
 	widget(parent, f),
 	View(this, this->size()),
-	mRenderWindow(ViewRenderWindowPtr::New())
+	mRenderWindow(vtkRenderWindowPtr::New())
 {
 	this->SetRenderWindow(mRenderWindow);
 	clear();
@@ -81,7 +80,7 @@ ViewWidget::ViewWidget(QWidget *parent, Qt::WFlags f) :
 ViewWidget::ViewWidget(const QString& uid, const QString& name, QWidget *parent, Qt::WFlags f) :
 	widget(parent, f),
 	View(this, this->size(), uid, name),
-	mRenderWindow(ViewRenderWindowPtr::New())
+	mRenderWindow(vtkRenderWindowPtr::New())
 {
 	this->SetRenderWindow(mRenderWindow);
 	clear();

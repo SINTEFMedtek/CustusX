@@ -32,8 +32,8 @@ SET( SOURCE_FILES
   sscThunderVNNReconstructAlgorithm.cpp
   sscPNNReconstructAlgorithm.h
   sscPNNReconstructAlgorithm.cpp
-  utils/sscReconstructHelper.h
-  utils/sscReconstructHelper.cpp
+#  utils/sscReconstructHelper.h
+#  utils/sscReconstructHelper.cpp
   sscReconstructCore.cpp
   sscReconstructCore.h
   sscReconstructPreprocessor.cpp

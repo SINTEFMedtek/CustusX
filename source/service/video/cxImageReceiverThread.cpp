@@ -49,7 +49,7 @@ void ImageReceiverThread::addImageToQueue(ImagePtr imgMsg)
 	emit imageReceived(); // emit signal outside lock, catch possibly in another thread
 }
 
-void ImageReceiverThread::addSonixStatusToQueue(ProbeDataPtr msg)
+void ImageReceiverThread::addSonixStatusToQueue(ProbeDefinitionPtr msg)
 {
 	QMutexLocker sentry(&mSonixStatusMutex);
 	mMutexedSonixStatusMessageQueue.push_back(msg);
@@ -73,12 +73,12 @@ ImagePtr ImageReceiverThread::getLastImageMessage()
 	return retval;
 }
 
-ProbeDataPtr ImageReceiverThread::getLastSonixStatusMessage()
+ProbeDefinitionPtr ImageReceiverThread::getLastSonixStatusMessage()
 {
 	QMutexLocker sentry(&mSonixStatusMutex);
 	if (mMutexedSonixStatusMessageQueue.empty())
-		return ProbeDataPtr();
-	ProbeDataPtr retval = mMutexedSonixStatusMessageQueue.front();
+		return ProbeDefinitionPtr();
+	ProbeDefinitionPtr retval = mMutexedSonixStatusMessageQueue.front();
 	mMutexedSonixStatusMessageQueue.pop_front();
 	return retval;
 }

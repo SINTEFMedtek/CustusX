@@ -40,46 +40,19 @@ namespace
 	}
 }
 
-ProbeData::ProbeImageData::ProbeImageData() :
-	mOrigin_p(0, 0, 0), mSpacing(-1, -1, -1), mClipRect_p(0, 0, 0, 0), mSize(0, 0)
-{
-}
-
-void ProbeData::ProbeImageData::addXml(QDomNode dataNode) const
-{
-	QDomElement elem = dataNode.toElement();
-
-	elem.setAttribute("origin_p", qstring_cast(mOrigin_p));
-	elem.setAttribute("spacing", qstring_cast(mSpacing));
-	elem.setAttribute("clipRect_p", qstring_cast(mClipRect_p));
-	elem.setAttribute("width", qstring_cast(mSize.width()));
-	elem.setAttribute("height", qstring_cast(mSize.height()));
-}
-
-void ProbeData::ProbeImageData::parseXml(QDomNode dataNode)
-{
-	QDomElement elem = dataNode.toElement();
-
-	mOrigin_p = Vector3D::fromString(elem.attribute("origin_p"));
-	mSpacing = Vector3D::fromString(elem.attribute("spacing"));
-	mClipRect_p = DoubleBoundingBox3D::fromString(elem.attribute("clipRect_p"));
-	mSize.setWidth(loadAttribute(elem, "width", 0));
-	mSize.setHeight(loadAttribute(elem, "height", 0));
-}
-
-
 // --------------------------------------------------------
 // --------------------------------------------------------
 // --------------------------------------------------------
 
 
-ProbeData::ProbeData(TYPE type) :
+ProbeDefinition::ProbeDefinition(TYPE type) :
 	mType(type), mDepthStart(0), mDepthEnd(0), mWidth(0),
 	mTemporalCalibration(0), mCenterOffset(0), mSoundSpeedCompensationFactor(1.0),
-	mUid("default")
+	mUid("default"),
+	mOrigin_p(0, 0, 0), mSpacing(-1, -1, -1), mClipRect_p(0, 0, 0, 0), mSize(0, 0)
 {}
 
-void ProbeData::addXml(QDomNode dataNode) const
+void ProbeDefinition::addXml(QDomNode dataNode) const
 {
 	QDomElement elem = dataNode.toElement();
 	elem.setAttribute("type", qstring_cast(mType));
@@ -93,11 +66,11 @@ void ProbeData::addXml(QDomNode dataNode) const
 	elem.setAttribute("uid", qstring_cast(mUid));
 
 	QDomElement imageNode = dataNode.ownerDocument().createElement("image");
-	mImage.addXml(imageNode);
+	this->addImageXml(imageNode);
 	dataNode.appendChild(imageNode);
 }
 
-void ProbeData::parseXml(QDomNode dataNode)
+void ProbeDefinition::parseXml(QDomNode dataNode)
 {
 	QDomElement elem = dataNode.toElement();
 
@@ -110,46 +83,43 @@ void ProbeData::parseXml(QDomNode dataNode)
 	mCenterOffset = loadAttribute(elem, "centerOffset", 0);
 	mUid = elem.attribute("uid");
 
-
 	QDomNode imageNode = dataNode.namedItem("image");
-	mImage.parseXml(imageNode);
+	this->parseImageXml(imageNode);
 }
 
-Vector3D ProbeData::ProbeImageData::transform_p_to_u(const Vector3D& q_p) const
+void ProbeDefinition::addImageXml(QDomNode dataNode) const
 {
-	Vector3D c(q_p[0], double(mSize.height()) - q_p[1] - 1, -q_p[2]);
-	c = multiply_elems(c, mSpacing);
-	return c;
+	QDomElement elem = dataNode.toElement();
+
+	elem.setAttribute("origin_p", qstring_cast(mOrigin_p));
+	elem.setAttribute("spacing", qstring_cast(mSpacing));
+	elem.setAttribute("clipRect_p", qstring_cast(mClipRect_p));
+	elem.setAttribute("width", qstring_cast(mSize.width()));
+	elem.setAttribute("height", qstring_cast(mSize.height()));
 }
 
-Vector3D ProbeData::ProbeImageData::getOrigin_u() const
+void ProbeDefinition::parseImageXml(QDomNode dataNode)
 {
-	return this->transform_p_to_u(mOrigin_p);
+	QDomElement elem = dataNode.toElement();
+
+	mOrigin_p = Vector3D::fromString(elem.attribute("origin_p"));
+	mSpacing = Vector3D::fromString(elem.attribute("spacing"));
+	mClipRect_p = DoubleBoundingBox3D::fromString(elem.attribute("clipRect_p"));
+	mSize.setWidth(loadAttribute(elem, "width", 0));
+	mSize.setHeight(loadAttribute(elem, "height", 0));
 }
 
-DoubleBoundingBox3D ProbeData::ProbeImageData::getClipRect_u() const
-{
-	Vector3D p0 = transform_p_to_u(mClipRect_p.corner(0,0,0));
-	Vector3D p1 = transform_p_to_u(mClipRect_p.corner(1,1,1));
-	return DoubleBoundingBox3D(p0,p1);
-}
-
-void ProbeData::setImage(ProbeImageData value)
-{
-	mImage = value;
-}
-
-void ProbeData::setTemporalCalibration(double value)
+void ProbeDefinition::setTemporalCalibration(double value)
 {
 	mTemporalCalibration = value;
 }
 
-void ProbeData::setType(TYPE type)
+void ProbeDefinition::setType(TYPE type)
 {
 	mType = type;
 }
 
-void ProbeData::setSector(double depthStart, double depthEnd, double width, double centerOffset)
+void ProbeDefinition::setSector(double depthStart, double depthEnd, double width, double centerOffset)
 {
 	mDepthStart=depthStart;
 	mDepthEnd=depthEnd;
@@ -157,105 +127,154 @@ void ProbeData::setSector(double depthStart, double depthEnd, double width, doub
 	mCenterOffset=centerOffset;
 }
 
-ProbeData::TYPE ProbeData::getType() const
+ProbeDefinition::TYPE ProbeDefinition::getType() const
 {
 	return mType;
 }
 
-double ProbeData::getDepthStart() const
+double ProbeDefinition::getDepthStart() const
 {
 	return mDepthStart;
 }
 
-double ProbeData::getDepthEnd() const
+double ProbeDefinition::getDepthEnd() const
 {
 	return mDepthEnd;
 }
 
-double ProbeData::getWidth() const
+double ProbeDefinition::getWidth() const
 {
 	return mWidth;
 }
 
-double ProbeData::getTemporalCalibration() const
+double ProbeDefinition::getTemporalCalibration() const
 {
 	return mTemporalCalibration;
 }
 
-double ProbeData::getCenterOffset() const
+double ProbeDefinition::getCenterOffset() const
 {
 	return mCenterOffset;
 }
 
-ProbeData::ProbeImageData ProbeData::getImage() const
+void ProbeDefinition::resample(QSize newSize)
 {
-	return mImage;
-}
-
-void ProbeData::resample(QSize newSize)
-{
-	if (newSize==mImage.mSize)
+	if (newSize==mSize)
 		return;
 
-	Vector3D factor(double(newSize.width())/mImage.mSize.width(), double(newSize.height())/mImage.mSize.height(), 1);
+	Vector3D factor(double(newSize.width())/mSize.width(), double(newSize.height())/mSize.height(), 1);
 
-	mImage.mOrigin_p = multiply_elems(mImage.mOrigin_p, factor);
-	mImage.mSpacing = divide_elems(mImage.mSpacing, factor);
+	mOrigin_p = multiply_elems(mOrigin_p, factor);
+	mSpacing = divide_elems(mSpacing, factor);
 
-	Vector3D cr0 = multiply_elems(mImage.mClipRect_p.corner(0,0,0), factor);
-	Vector3D cr1 = multiply_elems(mImage.mClipRect_p.corner(1,1,1), factor);
-	mImage.mClipRect_p = DoubleBoundingBox3D(cr0, cr1);
+	Vector3D cr0 = multiply_elems(mClipRect_p.corner(0,0,0), factor);
+	Vector3D cr1 = multiply_elems(mClipRect_p.corner(1,1,1), factor);
+	mClipRect_p = DoubleBoundingBox3D(cr0, cr1);
 
-	mImage.mSize = newSize;
+	mSize = newSize;
 }
 
-QString ProbeData::getUid() const
+QString ProbeDefinition::getUid() const
 {
 	return mUid;
 }
 
-
-void ProbeData::setUid(QString uid)
+void ProbeDefinition::setUid(QString uid)
 {
 	mUid = uid;
 }
 
-QString ProbeData::getUid()
-{
-	return mUid;
-}
-
-void ProbeData::updateClipRectFromSector()
+void ProbeDefinition::updateClipRectFromSector()
 {
 	// cliprect and sector data are connected to linear probes:
 	if (mType==tLINEAR)
 	{
-		mImage.mClipRect_p[0] = mImage.mOrigin_p[0] - mWidth/2/mImage.mSpacing[0];
-		mImage.mClipRect_p[1] = mImage.mOrigin_p[0] + mWidth/2/mImage.mSpacing[0];
+		mClipRect_p[0] = mOrigin_p[0] - mWidth/2/mSpacing[0];
+		mClipRect_p[1] = mOrigin_p[0] + mWidth/2/mSpacing[0];
 
-		mImage.mClipRect_p[2] = mImage.mOrigin_p[1] + mDepthStart/mImage.mSpacing[1];
-		mImage.mClipRect_p[3] = mImage.mOrigin_p[1] + mDepthEnd/mImage.mSpacing[1];
+		mClipRect_p[2] = mOrigin_p[1] + mDepthStart/mSpacing[1];
+		mClipRect_p[3] = mOrigin_p[1] + mDepthEnd/mSpacing[1];
 	}
 }
 
-void ProbeData::updateSectorFromClipRect()
+void ProbeDefinition::updateSectorFromClipRect()
 {
 	// cliprect and sector data are connected to linear probes:
 	if (mType==tLINEAR)
 	{
-		mWidth = 2*std::max(fabs(mImage.mClipRect_p[0] - mImage.mOrigin_p[0]), fabs(mImage.mClipRect_p[1] - mImage.mOrigin_p[0])) * mImage.mSpacing[0];
-		mDepthStart = (mImage.mClipRect_p[2] - mImage.mOrigin_p[1]) * mImage.mSpacing[1];
-		mDepthEnd = (mImage.mClipRect_p[3] - mImage.mOrigin_p[1]) * mImage.mSpacing[1];
+		mWidth = 2*std::max(fabs(mClipRect_p[0] - mOrigin_p[0]), fabs(mClipRect_p[1] - mOrigin_p[0])) * mSpacing[0];
+		mDepthStart = (mClipRect_p[2] - mOrigin_p[1]) * mSpacing[1];
+		mDepthEnd = (mClipRect_p[3] - mOrigin_p[1]) * mSpacing[1];
 	}
 }
 
-void ProbeData::applySoundSpeedCompensationFactor(double factor)
+void ProbeDefinition::applySoundSpeedCompensationFactor(double factor)
 {
-	mImage.mSpacing[1] = mImage.mSpacing[1] * factor / mSoundSpeedCompensationFactor;
+	mSpacing[1] = mSpacing[1] * factor / mSoundSpeedCompensationFactor;
 	mSoundSpeedCompensationFactor = factor;
 
-	if (this->getType() != ProbeData::tLINEAR)
+	if (this->getType() != ProbeDefinition::tLINEAR)
 		messageManager()->sendWarning("Sound speed compensation is applied to spacing[1], i.e. it is correct for linear probes and approxomate for other probes. Factor: " + qstring_cast(factor));
+}
+
+//Should be transform_uMv(p) (input in pixels, output in mm)
+Vector3D ProbeDefinition::transform_p_to_u(const Vector3D& q_p) const
+{
+	Vector3D c(q_p[0], double(mSize.height()) - q_p[1] - 1, -q_p[2]);
+	c = multiply_elems(c, mSpacing);
+	return c;
+}
+
+Vector3D ProbeDefinition::getOrigin_u() const
+{
+	return this->transform_p_to_u(mOrigin_p);
+}
+
+DoubleBoundingBox3D ProbeDefinition::getClipRect_u() const
+{
+		Vector3D p0 = transform_p_to_u(mClipRect_p.corner(0,0,0));
+		Vector3D p1 = transform_p_to_u(mClipRect_p.corner(1,1,1));
+		return DoubleBoundingBox3D(p0,p1);
+}
+
+Vector3D ProbeDefinition::getOrigin_p() const
+{
+	return mOrigin_p;
+}
+
+Vector3D ProbeDefinition::getSpacing() const
+{
+	return mSpacing;
+}
+
+DoubleBoundingBox3D ProbeDefinition::getClipRect_p() const
+{
+	return mClipRect_p;
+}
+
+QSize ProbeDefinition::getSize() const
+{
+	return mSize;
+}
+
+void ProbeDefinition::setOrigin_p(Vector3D origin_p)
+{
+	mOrigin_p = origin_p;
+}
+
+void ProbeDefinition::setSpacing(Vector3D spacing)
+{
+	mSpacing = spacing;
+}
+
+void ProbeDefinition::setClipRect_p(DoubleBoundingBox3D clipRect_p)
+{
+	mClipRect_p = clipRect_p;
+}
+
+void ProbeDefinition::setSize(QSize size)
+{
+	mSize = size;
 }
 
 }

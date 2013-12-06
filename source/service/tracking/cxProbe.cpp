@@ -40,7 +40,7 @@ cxProbePtr cxProbe::New(QString instrumentUid, QString scannerUid, ProbeXmlConfi
 
 bool cxProbe::isValid() const
 {
-	return this->getProbeData("active").getType() != ProbeData::tNONE;
+	return this->getProbeData("active").getType() != ProbeDefinition::tNONE;
 }
 
 QStringList cxProbe::getAvailableVideoSources()
@@ -62,9 +62,9 @@ VideoSourcePtr cxProbe::getRTSource(QString uid) const
 	return mSource.begin()->second;
 }
 
-ProbeData cxProbe::getProbeData(QString uid) const
+ProbeDefinition cxProbe::getProbeData(QString uid) const
 {
-	ProbeData retval;
+	ProbeDefinition retval;
 
 	if (uid=="active")
 		uid = mActiveUid;
@@ -146,7 +146,7 @@ void cxProbe::setTemporalCalibration(double val)
 {
 	mOverrideTemporalCalibration = true;
 	mTemporalCalibration = val;
-	for (std::map<QString, ProbeData>::iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
+	for (std::map<QString, ProbeDefinition>::iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
 		iter->second.setTemporalCalibration(mTemporalCalibration);
 }
 
@@ -155,12 +155,12 @@ void cxProbe::setSoundSpeedCompensationFactor(double factor)
 	if(similar(mSoundSpeedCompensationFactor, factor))
 		return;
 	mSoundSpeedCompensationFactor = factor;
-	for (std::map<QString, ProbeData>::iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
+	for (std::map<QString, ProbeDefinition>::iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
 		iter->second.applySoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
 	emit sectorChanged();
 }
 
-void cxProbe::setProbeSector(ProbeData probeSector)
+void cxProbe::setProbeSector(ProbeDefinition probeSector)
 {
 	if (probeSector.getUid().isEmpty())
 		probeSector.setUid(mActiveUid);
@@ -281,7 +281,7 @@ cxProbe::cxProbe(QString instrumentUid, QString scannerUid) :
 		mTemporalCalibration(0.0),
 		mDigitalInterface(false)
 {
-	ProbeData probeData;
+	ProbeDefinition probeData;
 	mProbeData[probeData.getUid()] = probeData;
 	mActiveUid = probeData.getUid();
 }
@@ -342,7 +342,7 @@ void cxProbe::updateProbeSector()
 {
 	if(this->isValidConfigId() && !this->isUsingDigitalVideo())
 	{
-		ProbeData probeSector = this->createProbeSector();
+		ProbeDefinition probeSector = this->createProbeSector();
 		this->setProbeSector(probeSector);
 	}
 }
@@ -353,10 +353,10 @@ bool cxProbe::isValidConfigId()
 	return !this->getConfiguration(this->getConfigId()).isEmpty();
 }
 
-ProbeData cxProbe::createProbeSector()
+ProbeDefinition cxProbe::createProbeSector()
 {
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration(this->getConfigId());
-	ProbeData probeSector = createProbeDataFromConfiguration(config);
+	ProbeDefinition probeSector = createProbeDataFromConfiguration(config);
 	probeSector.setUid(mActiveUid);
 	return probeSector;
 }
