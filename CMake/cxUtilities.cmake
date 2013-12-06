@@ -348,3 +348,24 @@ function(cx_add_class_qt_moc SOURCE_FILES_ARGUMENT)
 
     set(${SOURCE_FILES_ARGUMENT} ${${SOURCE_FILES_ARGUMENT}} ${RESULT_add_class_qt_moc} PARENT_SCOPE)
 endfunction()
+
+###############################################################################
+# Determin OpenGL Version
+#
+# INFO: does not work on windows
+###############################################################################
+macro(cx_opengl_version)
+
+    IF (OPENGL_FOUND AND NOT DEFINED CX_WINDOWS)
+      execute_process(COMMAND glxinfo COMMAND grep "OpenGL version" OUTPUT_VARIABLE _OPENGL_VERSION_STRING)
+    
+      STRING (REGEX REPLACE "[^:]*:()" "\\1" OPENGL_VERSION "${_OPENGL_VERSION_STRING}")
+        
+      IF ("${OPENGL_VERSION}" STREQUAL "")
+        MESSAGE (WARNING "Cannot determine OpenGL's version")
+      ENDIF ("${OPENGL_VERSION}" STREQUAL "")
+    ELSE (OPENGL_FOUND AND NOT DEFINED CX_WINDOWS)
+        SET(OPENGL_VERSION "<cannot_find_on_windows>")
+    ENDIF (OPENGL_FOUND AND NOT DEFINED CX_WINDOWS)
+    
+endmacro(cx_opengl_version)

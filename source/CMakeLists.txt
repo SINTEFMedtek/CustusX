@@ -18,6 +18,7 @@ cx_initialize_TSF()
 cx_initialize_level_set_segmentation()
 
 find_package(OpenGL)
+cx_opengl_version()
 find_package(X11)
 
 #------------------------------------------------------------------------------
