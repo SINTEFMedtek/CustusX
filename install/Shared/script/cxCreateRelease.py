@@ -28,6 +28,7 @@ import cx.cxCustusXBuilder
 import cx.cxBuildScript
 #import cx.cxCustusXInstaller
 #import cx.cxCustusXTestInstallation
+import jenkins # the python-jenkins module - alternative to jenkinsapi with ability to reconfigure job
 
 class Jenkins:
     '''
@@ -46,6 +47,8 @@ class Jenkins:
         
         logging.basicConfig(filename='myapp.log', level=logging.DEBUG)
         self.jenkins = api.Jenkins(self.hostname, self.username, self.password)
+
+        self.pyjenkins = jenkins.Jenkins(self.hostname, self.username, self.password)
 
         print 'jenkins python controller initialized'
         self._printSetupInfo()   
