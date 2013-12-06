@@ -74,8 +74,8 @@
 #define projectOntoPlaneEq(voxel, eq, dist) (voxel - dist*(eq))
 
 #define isInside(x, size) ((x) >= 0 && (x) < (size))
-//#define isNotMasked(x, y, mask, xsize) ((mask)[(x) + (y)*(xsize)] > 0)
-#define isNotMasked(x, y, mask, xsize) 1
+#define isNotMasked(x, y, mask, xsize) ((mask)[(x) + (y)*(xsize)] > 0)
+//#define isNotMasked(x, y, mask, xsize) true
 
 #define VOXEL(v,x,y,z) v[x + y*volume_xsize + z*volume_ysize*volume_xsize]
 
@@ -560,7 +560,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 		// Compute the indices of the planes we want to look at.
 		int2 idx = {tmp_guess + i, tmp_guess - i - 1};
 
-		float2 prev_abs_dists = abs_dists;
+		//float2 prev_abs_dists = abs_dists;
 
 		// Compute the distances to those planes
 		dists.x = dot(voxel, plane_eqs[idx.x]);
@@ -570,7 +570,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 		abs_dists.y = fabs(dists.y); // .x = abs_dist_up, .y = abs_dist_down,
 
 
-		float2 diff_dists = prev_abs_dists - abs_dists;
+		//float2 diff_dists = prev_abs_dists - abs_dists;
 
 		// Check if the plane is closer than the one farthest away we have included so far
 		if(!done.x && abs_dists.x < max_dist)
@@ -655,7 +655,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 
 		int2 term_dists = {(abs_dists.x > term_condition)*doTermDistance, (abs_dists.y > term_condition)*doTermDistance };
 
-		int2 term_radius_jump = {fabs(diff_dists.x) > radius, fabs(diff_dists.y) > radius};
+		//int2 term_radius_jump = {fabs(diff_dists.x) > radius, fabs(diff_dists.y) > radius};
 		int2 term_boundaries = {idx.x == N_PLANES-1, idx.y == 0};
 
 		done = done + term_dists + term_boundaries;// + term_radius_jump;
@@ -1254,7 +1254,7 @@ int findLocalMinimas(int *guesses,
 	float max_dist = euclid_dist(out_xspacing * CUBE_SIZE, out_zspacing*CUBE_SIZE, out_yspacing*CUBE_SIZE) +  radius;
 	DEBUG_PRINTF("Max dist is %f\n", max_dist);
 	int prev_pos = 0;
-	float smallest_dist = fabs(dot(voxel, plane_eqs[0]));
+	//float smallest_dist = fabs(dot(voxel, plane_eqs[0]));
 	guesses[0] = 0;
 	int hasHighSinceLastTaken = 1;
 	for(int i = 0;

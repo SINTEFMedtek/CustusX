@@ -20,7 +20,7 @@
 #ifndef SSCSLICEDIMAGEPROXY_H_
 #define SSCSLICEDIMAGEPROXY_H_
 
-#include "sscRepImpl.h"
+#include "sscIndent.h"
 #include "sscTransform3D.h"
 #include "vtkForwardDeclarations.h"
 
@@ -29,6 +29,7 @@ namespace cx
 // forward declarations
 typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef boost::shared_ptr<class SliceProxyInterface> SliceProxyInterfacePtr;
 
 typedef boost::shared_ptr<class SlicedImageProxy> SlicedImageProxyPtr;
 typedef boost::shared_ptr<class ApplyLUTToImage2DProxy> ApplyLUTToImage2DProxyPtr;
@@ -80,9 +81,10 @@ Q_OBJECT
 public:
 	SlicedImageProxy();
 	virtual ~SlicedImageProxy();
-	void setSliceProxy(SliceProxyPtr slicer);
+	void setSliceProxy(SliceProxyInterfacePtr slicer);
 	void setImage(ImagePtr image);
 	ImagePtr getImage() const;
+	void setOutputFormat(Vector3D origin, Eigen::Array3i dim, Vector3D spacing);
 	void update();
 	vtkImageDataPtr getOutput(); ///< output 2D sliced image
 	void printSelf(std::ostream & os, Indent indent);
@@ -94,7 +96,7 @@ private slots:
 private: 
 	ApplyLUTToImage2DProxyPtr mImageWithLUTProxy;
 
-	SliceProxyPtr mSlicer;
+	SliceProxyInterfacePtr mSlicer;
 	ImagePtr mImage;
 
 	vtkImageReslicePtr mReslicer;
