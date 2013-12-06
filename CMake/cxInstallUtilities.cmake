@@ -351,6 +351,7 @@ Configuration for CustusX ${CustusX3_VERSION_STRING}
 		IGSTK Version: ${IGSTK_VERSION_MAJOR}.${IGSTK_VERSION_MINOR}.${IGSTK_VERSION_PATCH}
 		OpenIGTLink Version: ${OpenIGTLink_VERSION_MAJOR}.${OpenIGTLink_VERSION_MINOR}.${OpenIGTLink_VERSION_PATCH}
 		Boost Version: ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}
+		OpenCL Version: ${OPENCL_VERSION}
 
 	Internal libraries:
 		Tube-Segmentation-Toolkit: ${CX_USE_TSF}
