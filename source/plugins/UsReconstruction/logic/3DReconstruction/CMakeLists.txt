@@ -46,22 +46,6 @@ include_directories(
     .
     )
 
-# openCL
-#----------
-#if (SSC_USE_OpenCL)
-#    find_package( OpenCL REQUIRED)
-#else ()
-#    find_package( OpenCL QUIET)
-#endif ()
-
-#IF( OPENCL_FOUND )
-#    option(SSC_USE_OpenCL "Use OpenCL" ON)
-#ELSE()
-#    option(SSC_USE_OpenCL "Use OpenCL" OFF)
-#ENDIF()
-
-#get_filename_component(OPENCL_LIBRARY_DIRS ${OPENCL_LIBRARIES} PATH)
-
 # Thunder requires OpenCL - make it optional            
 if (SSC_USE_OpenCL)
     include_directories( Thunder
