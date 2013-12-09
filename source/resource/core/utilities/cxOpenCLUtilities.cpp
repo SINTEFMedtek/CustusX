@@ -23,18 +23,21 @@ void OpenCLUtilities::printPlatformAndDeviceInfo()
 
 	unsigned int i, j;				//iterator variables for loops
 
-	cl_platform_id platforms[32];			//an array to hold the IDs of all the platforms, hopefuly there won't be more than 32
+	cl_platform_id platforms[32];		//an array to hold the IDs of all the platforms, hopefuly there won't be more than 32
 	cl_uint num_platforms;				//this number will hold the number of platforms on this machine
-	char vendor[1024];				//this strirng will hold a platforms vendor
+	char vendor[1024];					//this strirng will hold a platforms vendor
+	char driverVersion[1024];			//OpenCL software driver version string
+	char deviceVersion[1024];			//OpenCL version supported by the device
 	cl_device_id devices[32];			//this variable holds the number of devices for each platform, hopefully it won't be more than 32 per platform
 	cl_uint num_devices;				//this number will hold the number of devices on this machine
 	char deviceName[1024];				//this string will hold the devices name
 	cl_uint numberOfCores;				//this variable holds the number of cores of on a device
 	cl_long amountOfMemory;				//this variable holds the amount of memory on a device
-	cl_uint clockFreq;				//this variable holds the clock frequency of a device
+	cl_uint clockFreq;					//this variable holds the clock frequency of a device
 	cl_ulong maxAlocatableMem;			//this variable holds the maximum allocatable memory
-	cl_ulong localMem;				//this variable holds local memory for a device
-	cl_bool	available;				//this variable holds if the device is available
+	cl_ulong localMem;					//this variable holds local memory for a device
+	cl_bool	available;					//this variable holds if the device is available
+
 
 	//get the number of platforms
 	clGetPlatformIDs (32, platforms, &num_platforms);
@@ -57,6 +60,8 @@ void OpenCLUtilities::printPlatformAndDeviceInfo()
 			//scan in device information
 			clGetDeviceInfo(devices[j], CL_DEVICE_NAME, sizeof(deviceName), deviceName, NULL);
 			clGetDeviceInfo(devices[j], CL_DEVICE_VENDOR, sizeof(vendor), vendor, NULL);
+			clGetDeviceInfo(devices[j], CL_DEVICE_VERSION, sizeof(deviceVersion), &deviceVersion, NULL);
+			clGetDeviceInfo(devices[j], CL_DRIVER_VERSION, sizeof(driverVersion), &driverVersion, NULL);
 			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(numberOfCores), &numberOfCores, NULL);
 			clGetDeviceInfo(devices[j], CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(amountOfMemory), &amountOfMemory, NULL);
 			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_CLOCK_FREQUENCY, sizeof(clockFreq), &clockFreq, NULL);
@@ -64,10 +69,14 @@ void OpenCLUtilities::printPlatformAndDeviceInfo()
 			clGetDeviceInfo(devices[j], CL_DEVICE_LOCAL_MEM_SIZE, sizeof(localMem), &localMem, NULL);
 			clGetDeviceInfo(devices[j], CL_DEVICE_AVAILABLE, sizeof(available), &available, NULL);
 
+
+
 			//print out device information
 			printf("\tDevice: %u\n", j);
 			printf("\t\tName:\t\t\t\t%s\n", deviceName);
 			printf("\t\tVendor:\t\t\t\t%s\n", vendor);
+			printf("\t\tDevice supports:\t\t%s \n", deviceVersion);
+			printf("\t\tOpenCL driver version:\t\t%s \n", driverVersion);
 			printf("\t\tAvailable:\t\t\t%s\n", available ? "Yes" : "No");
 			printf("\t\tCompute Units:\t\t\t%u\n", numberOfCores);
 			printf("\t\tClock Frequency:\t\t%u mHz\n", clockFreq);
