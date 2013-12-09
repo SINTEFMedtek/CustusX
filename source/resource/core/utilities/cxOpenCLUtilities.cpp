@@ -2,6 +2,9 @@
 
 #include "cxOpenCLUtilities.h"
 #include <stdio.h>
+#include <string>
+#include <vector>
+#include <boost/algorithm/string.hpp>
 
 #ifdef __APPLE__
 #include <OpenCL/OpenCL.h>
@@ -50,6 +53,7 @@ void OpenCLUtilities::printPlatformAndDeviceInfo()
 	size_t profilingTimerResolution;	//Describes the resolution of device timer. This is measured in nanoseconds.
 	cl_bool endianLittle;				//Is CL_TRUE if the OpenCL device is a little endian device and CL_FALSE otherwise.
 	char deviceProfile[1024];			//OpenCL profile string. Returns the profile name supported by the device.
+	char deviceExtensions[1024];		//Returns a space separated list of extension names.
 
 	//get the number of platforms
 	clGetPlatformIDs (32, platforms, &num_platforms);
@@ -93,6 +97,7 @@ void OpenCLUtilities::printPlatformAndDeviceInfo()
 			clGetDeviceInfo(devices[j], CL_DEVICE_PROFILING_TIMER_RESOLUTION, sizeof(profilingTimerResolution), &profilingTimerResolution, NULL);
 			clGetDeviceInfo(devices[j], CL_DEVICE_ENDIAN_LITTLE, sizeof(endianLittle), &endianLittle, NULL);
 			clGetDeviceInfo(devices[j], CL_DEVICE_PROFILE, sizeof(deviceProfile), &deviceProfile, NULL);
+			clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, sizeof(deviceExtensions), &deviceExtensions, NULL);
 
 
 			//print out device information
@@ -133,6 +138,17 @@ void OpenCLUtilities::printPlatformAndDeviceInfo()
 			printf("\t\tImage3D max depth:\t\t%u\n", (unsigned int)image3DMaxWidth);
 
 			printf("\n");
+
+			printf("\t\tExtensions:\t\n");
+			std::string deviceExtensionsString(deviceExtensions);
+			std::vector<std::string> strs;
+			boost::split(strs, deviceExtensionsString, boost::is_any_of(" "));
+			std::vector<std::string>::iterator it = strs.begin();
+			for(it; it != strs.end(); ++it)
+				printf("\t\t\t\t%s\n", (*it).c_str());
+
+			printf("\n");
+
 		}
 
 	}
