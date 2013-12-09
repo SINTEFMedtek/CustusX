@@ -16,7 +16,7 @@ namespace cx
 #define MAX_SOURCE_LENGTH 1048576
 #define DEFAULT_INDENTATION "\t"
 
-void OpenCLUtilities::printPlatformAndDeviceInfo()
+void OpenCLInfo::printPlatformAndDeviceInfo()
 {
 	//Based on:
 	//https://devtalk.nvidia.com/default/topic/498968/printing-all-opencl-devices-not-detecting-all-opencl-devices-under-windows/
@@ -49,7 +49,7 @@ void OpenCLUtilities::printPlatformAndDeviceInfo()
 	printf("\n====================================================================\n\n");
 }
 
-void OpenCLUtilities::printPlatformInfo(cl_platform_id platform, unsigned int indentTimes)
+void OpenCLInfo::printPlatformInfo(cl_platform_id platform, unsigned int indentTimes)
 {
 	char platformVendor[MAX_CHAR_LENGTH];
 	char platformName[MAX_CHAR_LENGTH];
@@ -75,7 +75,7 @@ void OpenCLUtilities::printPlatformInfo(cl_platform_id platform, unsigned int in
 	printf("\n");
 }
 
-void OpenCLUtilities::printDeviceInfo(cl_device_id device, unsigned int indentTimes)
+void OpenCLInfo::printDeviceInfo(cl_device_id device, unsigned int indentTimes)
 {
 	char driverVersion[MAX_CHAR_LENGTH];				//OpenCL software driver version string
 	char deviceVendor[MAX_CHAR_LENGTH];					//this strirng will hold a platforms vendor
@@ -177,7 +177,7 @@ void OpenCLUtilities::printDeviceInfo(cl_device_id device, unsigned int indentTi
 	printf("\n");
 }
 
-void OpenCLUtilities::printContextInfo(cl_context context, unsigned int indentTimes)
+void OpenCLInfo::printContextInfo(cl_context context, unsigned int indentTimes)
 {
 	cl_uint referenceCount;
 	cl_uint numberOfDevicesInContext;
@@ -199,7 +199,7 @@ void OpenCLUtilities::printContextInfo(cl_context context, unsigned int indentTi
 	}
 }
 
-void OpenCLUtilities::printProgramInfo(cl_program program, unsigned int indentTimes, bool printSource)
+void OpenCLInfo::printProgramInfo(cl_program program, unsigned int indentTimes, bool printSource)
 {
 	cl_uint referenceCount;
 	cl_context context;
@@ -230,7 +230,7 @@ void OpenCLUtilities::printProgramInfo(cl_program program, unsigned int indentTi
 
 }
 
-void OpenCLUtilities::printKernelInfo(cl_kernel kernel, unsigned int indentTimes)
+void OpenCLInfo::printKernelInfo(cl_kernel kernel, unsigned int indentTimes)
 {
 	char kernelFunctionName[MAX_CHAR_LENGTH];
 	cl_uint numberOfKernelArgs;
@@ -254,7 +254,7 @@ void OpenCLUtilities::printKernelInfo(cl_kernel kernel, unsigned int indentTimes
 
 }
 
-void OpenCLUtilities::printCommandQueueInfo(cl_command_queue command_queue, unsigned int indentTimes)
+void OpenCLInfo::printCommandQueueInfo(cl_command_queue command_queue, unsigned int indentTimes)
 {
 	cl_context context;
 	cl_device_id deviceId;
@@ -273,7 +273,7 @@ void OpenCLUtilities::printCommandQueueInfo(cl_command_queue command_queue, unsi
 	printContextInfo(context, indentTimes+1);
 }
 
-void OpenCLUtilities::printMemInfo(cl_mem memobj, unsigned int indentTimes)
+void OpenCLInfo::printMemInfo(cl_mem memobj, unsigned int indentTimes)
 {
 	if(memobj == NULL)
 		return;
@@ -310,7 +310,53 @@ void OpenCLUtilities::printMemInfo(cl_mem memobj, unsigned int indentTimes)
 	printMemInfo(associatedMemObject, indentTimes+1);
 }
 
-void OpenCLUtilities::printCharList(const char* list, const char* separator, const char* indentation)
+void OpenCLInfo::printSamplerInfo(cl_sampler sampler, unsigned int indentTimes)
+{
+	cl_uint referenceCount;
+	cl_context context;
+	cl_bool normalizedCoords;
+	cl_addressing_mode addressingMode;
+	cl_filter_mode filterMode;
+
+	clGetSamplerInfo(sampler, CL_SAMPLER_REFERENCE_COUNT, sizeof(referenceCount), &referenceCount, NULL);
+	clGetSamplerInfo(sampler, CL_SAMPLER_CONTEXT, sizeof(context), &context, NULL);
+	clGetSamplerInfo(sampler, CL_SAMPLER_NORMALIZED_COORDS, sizeof(normalizedCoords), &normalizedCoords, NULL);
+	clGetSamplerInfo(sampler, CL_SAMPLER_ADDRESSING_MODE, sizeof(addressingMode), &addressingMode, NULL);
+	clGetSamplerInfo(sampler, CL_SAMPLER_FILTER_MODE, sizeof(filterMode), &filterMode, NULL);
+
+	const char* indent = getIndentation(indentTimes).c_str();
+	printf("%s--- SamplerInfo ---\n", indent);
+	printf("%sNormalized coords:\t\t\t%s\n", indent, normalizedCoords ? "Yes" : "No");
+	printf("%sAddressing mode:\t\t\t%u\n", indent, addressingMode);
+	printf("%sFilter mode:\t\t\t%u\n", indent, filterMode);
+	printf("%sReference count:\t%u\n", indent, referenceCount);
+	printContextInfo(context, indentTimes+1);
+}
+
+void OpenCLInfo::printEventInfo(cl_event event, unsigned int indentTimes)
+{
+	cl_command_queue commandQueue;
+	cl_context context;
+	cl_command_type type;
+	cl_int	executionStatus;
+	cl_uint referenceCount;
+
+	clGetEventInfo(event, CL_EVENT_COMMAND_QUEUE, sizeof(commandQueue), &commandQueue, NULL);
+	clGetEventInfo(event, CL_EVENT_CONTEXT, sizeof(context), &context, NULL);
+	clGetEventInfo(event, CL_EVENT_COMMAND_TYPE, sizeof(type), &type, NULL);
+	clGetEventInfo(event, CL_EVENT_COMMAND_EXECUTION_STATUS, sizeof(executionStatus), &executionStatus, NULL);
+	clGetEventInfo(event, CL_EVENT_REFERENCE_COUNT, sizeof(referenceCount), &referenceCount, NULL);
+
+	const char* indent = getIndentation(indentTimes).c_str();
+	printf("%s--- EventInfo ---\n", indent);
+	printf("%Type:\t\t\t%u\n", indent, type);
+	printf("%sExecution status:\t\t\t%u\n", indent, executionStatus);
+	printf("%sReference count:\t%u\n", indent, referenceCount);
+	printCommandQueueInfo(commandQueue);
+	printContextInfo(context, indentTimes+1);
+}
+
+void OpenCLInfo::printCharList(const char* list, const char* separator, const char* indentation)
 {
 	std::string stdString(list);
 	std::vector<std::string> strings;
@@ -320,7 +366,7 @@ void OpenCLUtilities::printCharList(const char* list, const char* separator, con
 		printf("%s%s\n", indentation, (*it).c_str());
 }
 
-std::string OpenCLUtilities::getIndentation(unsigned int numberOfIndents)
+std::string OpenCLInfo::getIndentation(unsigned int numberOfIndents)
 {
 	std::string retval("");
 	for(unsigned int i=0; i < numberOfIndents; i++)

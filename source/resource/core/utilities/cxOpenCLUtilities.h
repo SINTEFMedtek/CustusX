@@ -16,12 +16,13 @@ namespace cx
 /**
  * \brief Utilities for working with OpenCL
  *
+ * NOTE: Written using OpenCL 1.1
  * WARNING: the print commands might not contain all available information.
  *
  * \date Dec 9, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
-class OpenCLUtilities
+class OpenCLInfo
 {
 public:
 	static void printPlatformAndDeviceInfo();
@@ -33,6 +34,8 @@ public:
 	static void printKernelInfo(cl_kernel kernel, unsigned int indentTimes = 1);
 	static void printCommandQueueInfo(cl_command_queue command_queue, unsigned int indentTimes = 1);
 	static void printMemInfo(cl_mem memobj, unsigned int indentTimes = 1);
+	static void printSamplerInfo(cl_sampler sampler, unsigned int indentTimes = 1); //untested
+	static void printEventInfo(cl_event event, unsigned int indentTimes = 1); //untested
 
 private:
 	static void printCharList(const char* list, const char* separator, const char* indentation);
