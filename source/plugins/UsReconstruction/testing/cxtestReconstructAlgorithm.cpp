@@ -28,6 +28,8 @@
 
 #include "cxtestReconstructAlgorithmFixture.h"
 
+#include "cxOpenCLUtilities.h"
+
 namespace cxtest
 {
 

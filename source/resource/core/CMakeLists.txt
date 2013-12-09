@@ -25,7 +25,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Data/cxToolMetric
 	Data/sscCoordinateSystemListener
 	Data/cxFrameMetricBase
-        Data/cxImageParameters
+	Data/cxImageParameters
 
 	Video/sscVideoSource.h
 	Video/sscVideoRecorder
@@ -41,7 +41,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Tool/sscManualTool
 	Tool/sscProbeAdapterRTSource
 	Tool/sscSliceProxy
-        Tool/sscSlicedImageProxy
+	Tool/sscSlicedImageProxy
 
 	dataAdapters/sscDataAdapter
 	dataAdapters/sscDoubleDataAdapter.h
@@ -122,6 +122,7 @@ cx_add_class(cxResource_SOURCE
 	utilities/sscPositionStorageFile
 	utilities/sscTimeKeeper
 	utilities/sscMeshHelpers
+	utilities/cxOpenCLUtilities
 	
 	logger/sscAudio.h
 	logger/sscLogger
@@ -145,6 +146,7 @@ cx_add_class(cxResource_SOURCE
 	vesselReg/SeansVesselReg.hxx
 	vesselReg/HackTPSTransform.hxx
     )
+    
 
 if(WIN32)
     set( CX_RESOURCE_LIBRARIES ${CX_RESOURCE_LIBRARIES} )
@@ -212,8 +214,7 @@ set(CX_RESOURCE_INCLUDE_DIRECTORIES
     ${CustusX3_BINARY_DIR}/source/resource/core/settings
     CACHE INTERNAL "Include directories for resource libraries")
 
-#include_directories( ${SSC_INCLUDE_DIRS} ${SSC_BINARY_DIR} ${QT_INCLUDES} ${Boost_INCLUDE_DIRS} )
-include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
+
 
 set (CX_RESOURCE_LIBRARIES
     ${CX_RESOURCE_LIBRARIES}
@@ -223,6 +224,15 @@ set (CX_RESOURCE_LIBRARIES
     ${QT_LIBRARIES}
     ${Boost_LIBRARIES}
     ${ITK_LIBRARIES})
+    
+if (SSC_USE_OpenCL)
+    set (CX_RESOURCE_LIBRARIES
+        ${CX_RESOURCE_LIBRARIES}
+        ${OPENCL_LIBRARIES}
+    )    
+endif ()
+
+include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 
 ADD_LIBRARY (cxResource ${cxResource_SOURCE})
 target_link_libraries(cxResource ${CX_RESOURCE_LIBRARIES} )
