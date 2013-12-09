@@ -327,7 +327,7 @@ function(cxCreateConfigurationDescription)
 	cx_assert_variable_exists(${SSC_USE_GCOV})
 	cx_assert_variable_exists(${CX_USE_TSF})
 	cx_assert_variable_exists(${SSC_USE_OpenCL})
-        cx_assert_variable_exists(${BUILD_GRABBER_SERVER})
+	cx_assert_variable_exists(${BUILD_GRABBER_SERVER})
 	cx_assert_variable_exists(${CX_USE_ISB_GE})
 	cx_assert_variable_exists(${CX_USE_OpenCV})
 	# this text can be inserted into the about box with some effort...
@@ -352,6 +352,7 @@ Configuration for CustusX ${CustusX3_VERSION_STRING}
 		OpenIGTLink Version: ${OpenIGTLink_VERSION_MAJOR}.${OpenIGTLink_VERSION_MINOR}.${OpenIGTLink_VERSION_PATCH}
 		Boost Version: ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}
 		OpenCL Version: ${OPENCL_VERSION}
+		OpenGL Version: ${OPENGL_VERSION}
 
 	Internal libraries:
 		Tube-Segmentation-Toolkit: ${CX_USE_TSF}

@@ -63,7 +63,7 @@ endmacro()
 # Initialize openCL library
 #
 # Define variables:
-#    CX_USE_OpenCV : cache option
+#    SSC_USE_OpenCL : cache option
 #
 ###############################################################################
 macro(cx_initialize_opencl)
@@ -79,6 +79,7 @@ macro(cx_initialize_opencl)
 	ENDIF()
 
 	if(OPENCL_FOUND)
+	    add_definitions(-DSSC_USE_OpenCL)
 		include_directories(${OPENCL_INCLUDE_DIRS})
 	endif()
 endmacro()
@@ -106,7 +107,7 @@ macro(cx_initialize_TSF)
     endif()
 
     if( CX_USE_TSF )
-        ADD_DEFINITIONS(-DCX_USE_TSF)
+        add_definitions(-DCX_USE_TSF)
         include(${Tube-Segmentation-Framework_USE_FILE})
     endif()
 endmacro()
