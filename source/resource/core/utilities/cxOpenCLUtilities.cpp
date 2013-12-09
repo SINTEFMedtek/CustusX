@@ -16,7 +16,7 @@ namespace cx
 OpenCLUtilities::OpenCLUtilities()
 {}
 
-void OpenCLUtilities::printDeviceInfo()
+void OpenCLUtilities::printPlatformAndDeviceInfo()
 {
 	//Based on:
 	//https://devtalk.nvidia.com/default/topic/498968/printing-all-opencl-devices-not-detecting-all-opencl-devices-under-windows/
