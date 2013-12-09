@@ -31,7 +31,9 @@ public:
 	static void printDeviceInfo(cl_device_id device, unsigned int indentTimes = 1);
 	static void printContextInfo(cl_context context, unsigned int indentTimes = 1);
 	static void printProgramInfo(cl_program program, unsigned int indentTimes = 1, bool printSource = false);
+	static void printProgramBuildInfo(cl_program program, cl_device_id device, unsigned int indentTimes = 1);
 	static void printKernelInfo(cl_kernel kernel, unsigned int indentTimes = 1);
+	static void printKernelWorkGroupInfo(cl_kernel kernel, cl_device_id device, unsigned int indentTimes = 1);
 	static void printCommandQueueInfo(cl_command_queue command_queue, unsigned int indentTimes = 1);
 	static void printMemInfo(cl_mem memobj, unsigned int indentTimes = 1);
 	static void printSamplerInfo(cl_sampler sampler, unsigned int indentTimes = 1); //untested
