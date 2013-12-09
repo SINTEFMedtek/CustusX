@@ -13,11 +13,13 @@ cx_initialize_ITK()
 cx_initialize_OpenIGTLink()
 cx_initialize_IGSTK()
 
+cx_initialize_opencl()
 cx_initialize_ISB_GE()
 cx_initialize_TSF()
 cx_initialize_level_set_segmentation()
 
 find_package(OpenGL)
+cx_opengl_version()
 find_package(X11)
 
 #------------------------------------------------------------------------------
