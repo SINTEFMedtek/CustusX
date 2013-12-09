@@ -16,7 +16,7 @@ class OpenCLUtilities
 public:
 	OpenCLUtilities();
 
-	static void printDeviceInfo();
+	static void printPlatformAndDeviceInfo();
 };
 }
 #endif //SSC_USE_OpenCL
