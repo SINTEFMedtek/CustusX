@@ -14,15 +14,13 @@ set TARGET_PLATFORM=%1
 set CX_ENVSCRIPTS=%2
 set COMMAND=%~3
 set SCRIPT_PATH=%~dp0
-set INIT_VS
-set ARCH_FLAG
 
 if "%TARGET_PLATFORM%" == "win64" (
-set INIT_VS=%CX_ENVSCRIPTS%\cxVars_x64.bat
+    set INIT_VS=%CX_ENVSCRIPTS%\cxVars_x64.bat
 )
 if "%TARGET_PLATFORM%" == "win32" (
-set INIT_VS=%CX_ENVSCRIPTS%\cxVars_x86.bat
-set ARCH_FLAG=--b32
+    set INIT_VS=%CX_ENVSCRIPTS%\cxVars_x86.bat
+    set ARCH_FLAG=--b32
 )
 
 %INIT_VS% && python -u %SCRIPT_PATH%\%COMMAND% %ARCH_FLAG%

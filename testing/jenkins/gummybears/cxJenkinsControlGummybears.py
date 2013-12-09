@@ -55,12 +55,22 @@ class JenkinsGummyBears():
     def __init__(self):
         self.hostname = 'http://christiana-ubuntu-desktop:8080'
         self.username = 'christiana'
-        self.jobnames = ['CustusX_unit', 'CustusX_integration', 'CustusX_nightly']
+        self.jobnames = self.getJobsToTest()        
         self.password = 'not set'
         self.debug_counter = 0
         self.lamp = PowerControl()
         self._previousStatus = None
 
+    def getJobsToTest(self):
+        retval = ['CustusX_nightly']
+        templates = ['unit__base_', 'integration__base_']
+        targets = ['ubuntu.12.04.x64', 'macosx.10.8', 'win32', 'win64']
+        for target in targets:
+            for template in templates:
+                jobname = template.replace('_base_', target)
+                retval.append(jobname)
+        return retval
+        
     def initializeJenkins(self):
         print 'Initializing jenkins python controller ...'
         print self._getTimeLineString()
@@ -148,7 +158,9 @@ class JenkinsGummyBears():
         return '\n'.join(retval)
 
     def _generateStatusTextForJob(self, job):
-        lastBuild = job.get_last_build()
+        lastBuild = job.get_last_build_or_none()
+        if lastBuild==None:
+            return self._generateIndentedText(['Missing builds for job %s'%str(job)], 4)
         completedBuild = job.get_last_completed_build()
         text = ''
         text = [
