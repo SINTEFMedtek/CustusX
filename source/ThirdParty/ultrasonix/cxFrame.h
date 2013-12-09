@@ -22,6 +22,7 @@ public:
   int bry;
   int blx;
   int bly;
+  std::string probeName;
 
   Frame():
     mNewStatus(false),
