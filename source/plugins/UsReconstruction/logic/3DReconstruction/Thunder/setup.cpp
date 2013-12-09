@@ -72,6 +72,28 @@ void CL_CALLBACK clCreateContextFromType_error_callback(const char *errinfo,
 	std::cout << "ERROR: From clCreateContextFromType() callback: "<< errinfo << std::endl;
 }
 
+
+std::string ocl_get_device_string(cl_device_id dev)
+{
+	std::string ret = "";
+	char buf[256];
+	size_t len;
+
+	ocl_check_error(clGetDeviceInfo(dev,
+	                                CL_DEVICE_VENDOR,
+	                                sizeof(buf),
+	                                buf,
+	                                &len));
+	ret += buf;
+	ret += " ";
+	ocl_check_error(clGetDeviceInfo(dev,
+	                                CL_DEVICE_NAME,
+	                                sizeof(buf),
+	                                buf,
+	                                &len));
+	ret += buf;
+ 	return ret;
+}
 ocl_context* ocl_init(QString processor)
 {
 	cl_int err;
@@ -93,23 +115,55 @@ ocl_context* ocl_init(QString processor)
 	//context = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
 
 	// AMD way:
-	cl_platform_id platform = NULL;
-	cl_uint numPlatforms = 1;
+	cl_platform_id platforms[10];
+	cl_uint numPlatforms = 10;
 	cl_uint foundPlatforms = 0;
-	ocl_check_error(clGetPlatformIDs(numPlatforms, &platform, &foundPlatforms));
+	ocl_check_error(clGetPlatformIDs(numPlatforms, platforms, &foundPlatforms));
+	if(foundPlatforms != 1)
+	{
+		std::cerr << "WARNING: " << foundPlatforms << " OpenCL platforms found, which differs from 1!\n";
+	}
 	cl_context_properties cps[3] =
-	{ CL_CONTEXT_PLATFORM, (cl_context_properties) platform, 0 };
+	{ CL_CONTEXT_PLATFORM, (cl_context_properties) platforms[0], 0 };
 	if (processor == "CPU")
 	{
-		ocl_check_error(clGetDeviceIDs(platform, CL_DEVICE_TYPE_CPU, 1, &(retval->device), NULL));
+		ocl_check_error(clGetDeviceIDs(platforms[0], CL_DEVICE_TYPE_CPU, 1, &(retval->device), NULL));
 		retval->context = clCreateContextFromType(cps, CL_DEVICE_TYPE_CPU, clCreateContextFromType_error_callback, NULL, &err);
 	}
 	else // GPU
 	{
-		ocl_check_error(clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &(retval->device), NULL));
-		retval->context = clCreateContextFromType(cps, CL_DEVICE_TYPE_GPU, clCreateContextFromType_error_callback, NULL, &err);
+		cl_uint foundDevices = 0;
+		cl_device_id devices[10];
+		ocl_check_error(clGetDeviceIDs(platforms[0], CL_DEVICE_TYPE_GPU, 10, devices, &foundDevices));
+		// Pick the GPU with the most global memory
+		if(foundDevices == 0)
+		{
+			std::cerr << "Did not find any GPU-! Aborting\n";
+			return NULL;
+		}
+		size_t largestMem = 0;
+		int chosenDev = 0;
+		size_t devMem = 0;
+		for(int i = 0; i < foundDevices; i++)
+		{
+			ocl_check_error(clGetDeviceInfo(devices[i],
+			                                CL_DEVICE_GLOBAL_MEM_SIZE,
+			                                sizeof(size_t),
+			                                &devMem,
+			                                NULL));
+			std::cerr << "Device " << ocl_get_device_string(devices[i]) << " has " << devMem << " bytes of memory\n";
+			if(devMem > largestMem)
+			{
+				chosenDev = i;
+				largestMem = devMem;
+			}
+		}
+		retval->context = clCreateContext(cps, 1, &devices[chosenDev],
+		                                  clCreateContextFromType_error_callback,
+		                                  NULL, &err);
+		retval->device = devices[chosenDev];
 	}
-
+	std::cerr << "Using device " << ocl_get_device_string(retval->device) << std::endl;
 	ocl_check_error(err);
 	retval->cmd_queue = clCreateCommandQueue(retval->context, retval->device, CL_QUEUE_PROFILING_ENABLE, &err);
 	ocl_check_error(err);
