@@ -230,6 +230,23 @@ void OpenCLInfo::printProgramInfo(cl_program program, unsigned int indentTimes, 
 
 }
 
+void OpenCLInfo::printProgramBuildInfo(cl_program program, cl_device_id device, unsigned int indentTimes)
+{
+	cl_build_status status;
+	char buildOptions[MAX_CHAR_LENGTH];
+	char buildLog[MAX_SOURCE_LENGTH];
+
+	clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_STATUS, sizeof(status), &status, NULL);
+	clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_OPTIONS, sizeof(buildOptions), &buildOptions, NULL);
+	clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, sizeof(buildLog), &buildLog, NULL);
+
+	const char* indent = getIndentation(indentTimes).c_str();
+	printf("%s--- ProgramBuildInfo ---\n", indent);
+	printf("%sStatus:\t\t%u\n", indent,  status);
+	printf("%sBuild options:\t\t%s\n", indent, buildOptions);
+	printf("%sBuild log:\t%s\n", indent, buildLog);
+}
+
 void OpenCLInfo::printKernelInfo(cl_kernel kernel, unsigned int indentTimes)
 {
 	char kernelFunctionName[MAX_CHAR_LENGTH];
@@ -252,6 +269,29 @@ void OpenCLInfo::printKernelInfo(cl_kernel kernel, unsigned int indentTimes)
 	printContextInfo(context, indentTimes+1);
 	printProgramInfo(program, indentTimes+1);
 
+}
+
+void OpenCLInfo::printKernelWorkGroupInfo(cl_kernel kernel, cl_device_id device, unsigned int indentTimes)
+{
+	size_t workGroupSize;
+	size_t compileWorkGroupSize[3];
+	cl_ulong localMemSize;
+	size_t preferredWorkGroupSizeMultiple;
+	size_t privateMemSize;
+
+	clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_WORK_GROUP_SIZE, sizeof(workGroupSize), &workGroupSize, NULL);
+	clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, sizeof(compileWorkGroupSize), &compileWorkGroupSize, NULL);
+	clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_LOCAL_MEM_SIZE, sizeof(localMemSize), &localMemSize, NULL);
+	clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(preferredWorkGroupSizeMultiple), &preferredWorkGroupSizeMultiple, NULL);
+	clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_PRIVATE_MEM_SIZE, sizeof(privateMemSize), &privateMemSize, NULL);
+
+	const char* indent = getIndentation(indentTimes).c_str();
+	printf("%s--- KernelWorkGroupInfo ---\n", indent);
+	printf("%sWork group size:\t\t%u\n", indent,  workGroupSize);
+	printf("%sCompiler work group size:\t\t(%u,%u,%u)\n", indent, compileWorkGroupSize[0], compileWorkGroupSize[1], compileWorkGroupSize[2]);
+	printf("%sLocal mem size:\t%u\n", indent, localMemSize);
+	printf("%sPreferred work group size:\t%u\n", indent, preferredWorkGroupSizeMultiple);
+	printf("%sPrivate mem size:\t%u\n", indent, privateMemSize);
 }
 
 void OpenCLInfo::printCommandQueueInfo(cl_command_queue command_queue, unsigned int indentTimes)
