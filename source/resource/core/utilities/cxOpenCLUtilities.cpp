@@ -254,6 +254,62 @@ void OpenCLUtilities::printKernelInfo(cl_kernel kernel, unsigned int indentTimes
 
 }
 
+void OpenCLUtilities::printCommandQueueInfo(cl_command_queue command_queue, unsigned int indentTimes)
+{
+	cl_context context;
+	cl_device_id deviceId;
+	cl_uint referenceCount;
+	cl_command_queue_properties properties;
+
+	clGetCommandQueueInfo(command_queue, CL_QUEUE_CONTEXT, sizeof(context), &context, NULL);
+	clGetCommandQueueInfo(command_queue, CL_QUEUE_DEVICE, sizeof(deviceId), &deviceId, NULL);
+	clGetCommandQueueInfo(command_queue, CL_QUEUE_REFERENCE_COUNT, sizeof(referenceCount), &referenceCount, NULL);
+	clGetCommandQueueInfo(command_queue, CL_QUEUE_PROPERTIES, sizeof(properties), &properties, NULL);
+
+	const char* indent = getIndentation(indentTimes).c_str();
+	printf("%s--- CommandQueueInfo ---\n", indent);
+	printf("%sDevice id:\t\t%u\n", indent, deviceId);
+	printf("%sReference count:\t%u\n", indent, referenceCount);
+	printContextInfo(context, indentTimes+1);
+}
+
+void OpenCLUtilities::printMemInfo(cl_mem memobj, unsigned int indentTimes)
+{
+	if(memobj == NULL)
+		return;
+
+	cl_mem_object_type type;
+	cl_mem_flags flags;
+	size_t size;
+	void *host;
+	cl_uint mapCount;
+	cl_uint referenceCount;
+	cl_context context;
+	cl_mem associatedMemObject;
+	size_t offset;
+
+	clGetMemObjectInfo(memobj, CL_MEM_TYPE, sizeof(type), &type, NULL);
+	clGetMemObjectInfo(memobj, CL_MEM_FLAGS, sizeof(flags), &flags, NULL);
+	clGetMemObjectInfo(memobj, CL_MEM_SIZE, sizeof(size), &size, NULL);
+	clGetMemObjectInfo(memobj, CL_MEM_HOST_PTR, sizeof(host), &host, NULL);
+	clGetMemObjectInfo(memobj, CL_MEM_MAP_COUNT, sizeof(mapCount), &mapCount, NULL);
+	clGetMemObjectInfo(memobj, CL_MEM_REFERENCE_COUNT, sizeof(referenceCount), &referenceCount, NULL);
+	clGetMemObjectInfo(memobj, CL_MEM_CONTEXT, sizeof(context), &context, NULL);
+	clGetMemObjectInfo(memobj, CL_MEM_ASSOCIATED_MEMOBJECT, sizeof(associatedMemObject), &associatedMemObject, NULL);
+	clGetMemObjectInfo(memobj, CL_MEM_OFFSET, sizeof(offset), &offset, NULL);
+
+	const char* indent = getIndentation(indentTimes).c_str();
+	printf("%s--- MemObjInfo ---\n", indent);
+	printf("%sType:\t\t\t%u\n", indent, type);
+	printf("%sFlags:\t\t\t%u\n", indent, flags);
+	printf("%sSize:\t\t\t%0.00f bytes\n", indent, (double)size);
+	printf("%sMap count:\t\t%u\n", indent, mapCount);
+	printf("%sOffset:\t\t\t%u\n", indent, offset);
+	printf("%sReference count:\t%u\n", indent, referenceCount);
+	printContextInfo(context, indentTimes+1);
+	printMemInfo(associatedMemObject, indentTimes+1);
+}
+
 void OpenCLUtilities::printCharList(const char* list, const char* separator, const char* indentation)
 {
 	std::string stdString(list);
