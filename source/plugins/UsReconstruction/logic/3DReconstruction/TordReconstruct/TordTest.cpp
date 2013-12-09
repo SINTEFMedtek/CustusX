@@ -318,6 +318,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	int numBlocks = 10; // FIXME?
 	// Split input US into blocks
 	frameBlock_t* inputBlocks = new frameBlock_t[numBlocks];
+	size_t nPlanes = input->getDimensions()[2];
 	
 	this->initializeFrameBlocks(inputBlocks, numBlocks, input);
 
@@ -328,17 +329,13 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	for(int i = 0; i < numBlocks; i++)
 	{
 		clBlocks[i] = ocl_create_buffer(moClContext->context,
-		                                CL_MEM_READ_ONLY,
+		                                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 		                                inputBlocks[i].length,
 		                                inputBlocks[i].data);
-		                                
 	}
 
 	// Free the local frameblock buffers
-	this->freeFrameBlocks(inputBlocks, numBlocks);
-	delete [] inputBlocks;
-	inputBlocks = NULL;
-
+	
 	// Allocate output memory
 	int *outputDims = outputData->GetDimensions();
 	
@@ -347,27 +344,64 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 
 	messageManager()->sendInfo(QString("Allocating CL output buffer, size %1")
 	                           .arg(outputVolumeSize));
+	cl_ulong maxAllocSize;
+	cl_ulong globalMemSize;
+
+	ocl_check_error(clGetDeviceInfo(moClContext->device,
+	                                CL_DEVICE_MAX_MEM_ALLOC_SIZE,
+	                                sizeof(cl_ulong),
+	                                &maxAllocSize,
+	                                NULL));
+	ocl_check_error(clGetDeviceInfo(moClContext->device,
+	                                CL_DEVICE_GLOBAL_MEM_SIZE,
+	                                sizeof(cl_ulong),
+	                                &globalMemSize,
+	                                NULL));
+	// Check memory sizes
+	if(maxAllocSize < outputVolumeSize)
+	{
+		messageManager()->sendInfo(QString("Output volume size too large! %1 > %2\n").arg(outputVolumeSize).arg(maxAllocSize));
+		return false;
+	}
+
+	if(maxAllocSize < inputBlocks[0].length)
+	{
+		messageManager()->sendInfo(QString("Input blocks too large! %1 > %2\n").arg(inputBlocks[0].length).arg(maxAllocSize));
+		return false;
+	}
+
+
+	cl_ulong globalMemUse = 10*inputBlocks[0].length + outputVolumeSize + sizeof(float)*16*nPlanes +          sizeof(cl_uchar)*input->getDimensions()[0]*input->getDimensions()[1];
+	if(globalMemSize < globalMemUse)
+	{
+		messageManager()->sendInfo(QString("Using too much global memory! %1 > %2").arg(globalMemUse).arg(globalMemSize));
+		return false;
+	}
+
+	messageManager()->sendInfo(QString("Using %1 of %2 global memory\n").arg(globalMemUse).arg(globalMemSize));
+
+
 	cl_mem clOutputVolume = ocl_create_buffer(moClContext->context,
 	                                          CL_MEM_WRITE_ONLY,
 	                                          outputVolumeSize,
 	                                          NULL);
 
 	// Fill the plane matrices
-	size_t nPlanes = input->getDimensions()[2];
+
 
 	float *planeMatrices = new float[16*nPlanes];
 
 	this->fillPlaneMatrices(planeMatrices, input);
 
 	cl_mem clPlaneMatrices = ocl_create_buffer(moClContext->context,
-	                                           CL_MEM_READ_ONLY,
+	                                           CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 	                                           nPlanes*sizeof(float)*16,
 	                                           planeMatrices);
 
 	// US Probe mask
 
 	cl_mem clMask = ocl_create_buffer(moClContext->context,
-	                                  CL_MEM_READ_ONLY,
+	                                  CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 	                                  sizeof(cl_uchar)*
 	                                  input->getDimensions()[0]*input->getDimensions()[1],
 	                                  input->getMask()->GetScalarPointer());
@@ -537,6 +571,10 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	}
 
 	messageManager()->sendInfo(QString("Done, freeing GPU memory"));
+
+	this->freeFrameBlocks(inputBlocks, numBlocks);
+	delete [] inputBlocks;
+	inputBlocks = NULL;
 
 	// Free the allocated cl memory objects
 	for(int i = 0; i < numBlocks; i++)
