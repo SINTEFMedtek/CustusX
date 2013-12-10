@@ -169,8 +169,8 @@ function(cx_install_configuration_files)
 			DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
 			PATTERN "settings/*" EXCLUDE)
 
-	# Install openCL shaders into bundle
-	install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction/Thunder/kernels.ocl
+	# Install OpenCL kernels into bundle
+	install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction/TordReconstruct/kernels.ocl
 			DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/)
 
 	if(CX_USE_ISB_GE)
@@ -355,8 +355,8 @@ Configuration for CustusX ${CustusX3_VERSION_STRING}
 		OpenGL Version: ${OPENGL_VERSION}
 
 	Internal libraries:
-		Tube-Segmentation-Toolkit: ${CX_USE_TSF}
-		SSC Thunder OpenCL US Reconstruction: ${SSC_USE_OpenCL}
+		Tube-Segmentation-Framework: ${CX_USE_TSF}
+		OpenCL US Reconstruction: ${SSC_USE_OpenCL}
 		Grabber Servers:
                         Mac QuickTime Grabber Server: ${BUILD_GRABBER_SERVER}
 				ISB GE Scanner Grabber Interface: ${CX_USE_ISB_GE}

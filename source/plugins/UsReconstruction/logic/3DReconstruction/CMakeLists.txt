@@ -22,18 +22,14 @@ SET( MOC_HEADER_FILES
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
-# library
+
 SET( SOURCE_FILES
   ${MOC_HEADER_FILES}
   sscReconstructedOutputVolumeParams.h
   sscReconstructedOutputVolumeParams.cpp
   sscReconstructAlgorithm.h
-  sscThunderVNNReconstructAlgorithm.h
-  sscThunderVNNReconstructAlgorithm.cpp
   sscPNNReconstructAlgorithm.h
   sscPNNReconstructAlgorithm.cpp
-#  utils/sscReconstructHelper.h
-#  utils/sscReconstructHelper.cpp
   sscReconstructCore.cpp
   sscReconstructCore.h
   sscReconstructPreprocessor.cpp
@@ -46,26 +42,7 @@ include_directories(
     .
     )
 
-# Thunder requires OpenCL - make it optional            
 if (SSC_USE_OpenCL)
-    include_directories( Thunder
-#        ${OPENCL_INCLUDE_DIRS}
-    )
-    SET( SOURCE_FILES
-      ${SOURCE_FILES}    
-      Thunder/holger_time.h
-      Thunder/holger_time.cpp
-      Thunder/setup.h
-      Thunder/setup.cpp
-      Thunder/utils.h
-      Thunder/utils.cpp
-      Thunder/reconstruct_vnn.h
-      Thunder/reconstruct_vnn.cpp
-      Thunder/kernels.ocl    
-      )
-    set(THUNDER_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Thunder)
-
-	# Include Tords stuff
 	include_directories(
 		TordReconstruct
 		${OPENCL_INCLUDE_DIRS}
@@ -90,6 +67,7 @@ set(sscUS3DReconstruction_LIBRARIES
     cxResource
     cxResourceUsReconstructionTypes
     )
+    
 # Don't try to use OpenCl if we haven't got it
 if( SSC_USE_OpenCL )
     set(sscUS3DReconstruction_LIBRARIES
