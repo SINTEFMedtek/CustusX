@@ -4,7 +4,7 @@
 
 
 #include "sscReconstructAlgorithm.h"
-#include "Thunder/setup.h"
+#include "cxOpenCLUtilities.h"
 #include <sscUSFrameData.h>
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
@@ -244,7 +244,7 @@ protected:
 	cl_kernel mClKernel;
 	std::vector<cl_mem> mVClMemBscan;
 	cl_mem mClMemOutput;
-	ocl_context* moClContext;
+	OpenCL::ocl_context* moClContext;
 
 	// Method names. Indices into this array corresponds to method IDs in the OpenCL Kernel.
 	std::vector<QString> mMethods;
@@ -253,7 +253,6 @@ protected:
 	
 };
 
+} //namespace cx
 
-}
-		
 #endif
