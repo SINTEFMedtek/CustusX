@@ -28,7 +28,7 @@ public:
 	static void printPlatformAndDeviceInfo();
 
 	static void printPlatformInfo(cl_platform_id platform, unsigned int indentTimes = 1);
-	static void printDeviceInfo(cl_device_id device, unsigned int indentTimes = 1);
+	static void printDeviceInfo(cl_device_id device, unsigned int indentTimes = 1, bool verbose = false);
 	static void printContextInfo(cl_context context, unsigned int indentTimes = 1);
 	static void printProgramInfo(cl_program program, unsigned int indentTimes = 1, bool printSource = false);
 	static void printProgramBuildInfo(cl_program program, cl_device_id device, unsigned int indentTimes = 1);

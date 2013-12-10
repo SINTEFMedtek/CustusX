@@ -43,7 +43,7 @@ void OpenCLInfo::printPlatformAndDeviceInfo()
 		for(unsigned int j = 0; j < numOfDevices; j++)
 		{
 			printf("\tDevice: %u\n", j);
-			printDeviceInfo(devices[j], indent+1);
+			printDeviceInfo(devices[j], indent+1, true);
 		}
 	}
 	printf("\n====================================================================\n\n");
@@ -75,7 +75,7 @@ void OpenCLInfo::printPlatformInfo(cl_platform_id platform, unsigned int indentT
 	printf("\n");
 }
 
-void OpenCLInfo::printDeviceInfo(cl_device_id device, unsigned int indentTimes)
+void OpenCLInfo::printDeviceInfo(cl_device_id device, unsigned int indentTimes, bool verbose)
 {
 	char driverVersion[MAX_CHAR_LENGTH];				//OpenCL software driver version string
 	char deviceVendor[MAX_CHAR_LENGTH];					//this strirng will hold a platforms vendor
@@ -147,46 +147,48 @@ void OpenCLInfo::printDeviceInfo(cl_device_id device, unsigned int indentTimes)
 	printf("%sDevice supports:\t\t%s \n", indent, deviceVersion);
 	printf("%sOpenCL driver version:\t\t%s\n", indent, driverVersion);
 	printf("%sHighest version can compile:\t%s\n", indent, openClCVersion);
-	printf("%sDevice Profile:\t\t\t%s \n", indent, deviceProfile);
 	printf("%sAvailable:\t\t\t%s\n", indent, available ? "Yes" : "No");
 	printf("\n");
 
+	if(!verbose)
+		return;
+
+	//Verbose output
 	printf("%sCompute Units:\t\t\t%u\n", indent, numberOfCores);
 	printf("%sClock Frequency:\t\t%u mHz\n", indent, clockFreq);
 	printf("%sGlobal Memory:\t\t\t%0.00f mb\n", indent, (double)amountOfMemory/1048576);
 	printf("%sMax Allocateable Memory:\t%0.00f mb\n", indent, (double)maxAlocatableMem/1048576);
-	printf("%sLocal Memory:\t\t\t%u kb\n", indent, (unsigned int)localMem);
+	printf("%sLocal Memory:\t\t\t%llu kb\n", indent, localMem);
 	printf("\n");
 
+	printf("%sDevice Profile:\t\t\t%s \n", indent, deviceProfile);
 	printf("%sError correction support:\t%s\n", indent, errorCorrectionSupport ? "Yes" : "No");
-	printf("%sProfiling Timer Resolution:\t%u ns\n", indent, (unsigned int)profilingTimerResolution);
+	printf("%sProfiling Timer Resolution:\t%lu ns\n", indent, profilingTimerResolution);
 	printf("%sEndian Little:\t\t\t%s\n", indent, endianLittle ? "Yes" : "No");
-	printf("%sCommand queue properties:\t%u\n", indent, commandQueueProps);
-	printf("%sExecution capabilities:\t\t%lu\n", indent, exeCapabilities);
+	printf("%sCommand queue properties:\t%llu\n", indent, commandQueueProps);
+	printf("%sExecution capabilities:\t\t%llu\n", indent, exeCapabilities);
 	printf("%sHost unified memory:\t\t%s\n", indent, hostUnifiedMemory ? "Yes" : "No");
 	printf("\n");
 
-	printf("%sMax work group size:\t\t%u\n", indent, (unsigned int)maxWorkGroupSize);
+	printf("%sMax work group size:\t\t%lu\n", indent, maxWorkGroupSize);
 	printf("%sMax work item dimensions:\t%u\n", indent, maxWorkItemDimensions);
 	for(int k = 0; k < maxWorkItemDimensions; k++)
 	{
-		printf("%s\tDimension %u supports maximum %u work items\n", indent, k, (unsigned int)maxWorkItemSize[k]);
+		printf("%s\tDimension %u supports maximum %lu work items\n", indent, k, maxWorkItemSize[k]);
 	}
 	printf("\n");
 
 	printf("%sImage support:\t\t\t%s\n", indent, imageSupport ? "Yes" : "No");
-	printf("%sImage2D max width:\t\t%u\n", indent, (unsigned int)image2DMaxWidth);
-	printf("%sImage2D max height:\t\t%u\n", indent, (unsigned int)image2DMaxHeight);
-	printf("%sImage3D max width:\t\t%u\n", indent, (unsigned int)image3DMaxWidth);
-	printf("%sImage3D max height:\t\t%u\n", indent, (unsigned int)image3DMaxHeight);
-	printf("%sImage3D max depth:\t\t%u\n", indent, (unsigned int)image3DMaxWidth);
+	printf("%sImage2D max width:\t\t%lu\n", indent, image2DMaxWidth);
+	printf("%sImage2D max height:\t\t%lu\n", indent,image2DMaxHeight);
+	printf("%sImage3D max width:\t\t%lu\n", indent, image3DMaxWidth);
+	printf("%sImage3D max height:\t\t%lu\n", indent, image3DMaxHeight);
+	printf("%sImage3D max depth:\t\t%lu\n", indent, image3DMaxWidth);
 
 	printf("\n");
 
 	printf("%sExtensions:\n", indent);
 	printCharList(deviceExtensions, " ", getIndentation(indentTimes+1).c_str());
-
-	printf("\n");
 }
 
 void OpenCLInfo::printContextInfo(cl_context context, unsigned int indentTimes)
@@ -206,9 +208,7 @@ void OpenCLInfo::printContextInfo(cl_context context, unsigned int indentTimes)
 	printf("%sReference count:\t%u\n", indent, referenceCount);
 	printf("%sDevices in context:\t%u\n", indent, numberOfDevicesInContext);
 	for(unsigned int i=0; i<numberOfDevicesInContext; i++)
-	{
-		printf("%s\tDevice %us id:\t%u\n", indent, i, listOfDevicesInContext[i]);
-	}
+		printDeviceInfo(listOfDevicesInContext[i], indentTimes+1);
 }
 
 void OpenCLInfo::printProgramInfo(cl_program program, unsigned int indentTimes, bool printSource)
@@ -233,8 +233,8 @@ void OpenCLInfo::printProgramInfo(cl_program program, unsigned int indentTimes, 
 	printf("%sAssociated devices:\t%u\n", indent, numberOfAssociatedDevices);
 	for(unsigned int i=0; i<numberOfAssociatedDevices; i++)
 	{
-		printf("%s - Device %us id:\t%u\n", indent, i, devices[i]);
 		printf("%s - Binary size:\t\t%0.0lu bytes\n", indent, binarySizes[i]);
+		printDeviceInfo(devices[i], indentTimes+1);
 	}
 	if(printSource)
 		printf("%sProgram source:\n%s\n", indent, source);
@@ -320,9 +320,9 @@ void OpenCLInfo::printCommandQueueInfo(cl_command_queue command_queue, unsigned 
 
 	const char* indent = getIndentation(indentTimes).c_str();
 	printf("%s--- CommandQueueInfo ---\n", indent);
-	printf("%sDevice id:\t\t%u\n", indent, deviceId);
 	printf("%sReference count:\t%u\n", indent, referenceCount);
 	printContextInfo(context, indentTimes+1);
+	printDeviceInfo(deviceId, indentTimes+1);
 }
 
 void OpenCLInfo::printMemInfo(cl_mem memobj, unsigned int indentTimes)
@@ -353,8 +353,8 @@ void OpenCLInfo::printMemInfo(cl_mem memobj, unsigned int indentTimes)
 	const char* indent = getIndentation(indentTimes).c_str();
 	printf("%s--- MemObjInfo ---\n", indent);
 	printf("%sType:\t\t\t%u\n", indent, type);
-	printf("%sFlags:\t\t\t%u\n", indent, flags);
-	printf("%sSize:\t\t\t%0.00f bytes\n", indent, (double)size);
+	printf("%sFlags:\t\t\t%llu\n", indent, flags);
+	printf("%sSize:\t\t\t%lu bytes\n", indent, size);
 	printf("%sMap count:\t\t%u\n", indent, mapCount);
 	printf("%sOffset:\t\t\t%lu\n", indent, offset);
 	printf("%sReference count:\t%u\n", indent, referenceCount);
@@ -401,7 +401,7 @@ void OpenCLInfo::printEventInfo(cl_event event, unsigned int indentTimes)
 
 	const char* indent = getIndentation(indentTimes).c_str();
 	printf("%s--- EventInfo ---\n", indent);
-	printf("%Type:\t\t\t%u\n", indent, type);
+	printf("%sType:\t\t\t%u\n", indent, type);
 	printf("%sExecution status:\t\t\t%u\n", indent, executionStatus);
 	printf("%sReference count:\t%u\n", indent, referenceCount);
 	printCommandQueueInfo(commandQueue);
