@@ -230,6 +230,16 @@ IGTLinkUSStatusMessage::Pointer ImageStreamerSonix::getFrameStatus(Frame& frame)
   retval->SetWidth((frame.urx -  frame.ulx ) * frame.mSpacing[0] - 0.3);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
   retval->SetDeviceName("Sonix[BGRX]"); // TODO write something useful here
 
+  //test sector probe
+  std::cout << "Received probe name: " << frame.probeName << std::endl;
+  // values needed from xml:
+  // type: 0 = CLA, 2 = linear
+  //double radius = 60000; //in microns, read directly from xml
+  //double probeLenght = 64000; // pitch * numElements
+  //retval->SetProbeType(1);//TODO: find probe type automatically (read type from xml file)
+  //retval->SetWidth(probeLenght/radius);//probeLenght/radius  //TODO: Must be read from xml file
+  //retval->SetDepthStart(radius/1000);//microns -> mm
+
   //std::cout << "uly: " << frame.uly << " bly: " << frame.bly << std::endl;
   //std::cout << "spacing: " << frame.mSpacing[0] << "  " << frame.mSpacing[1] << std::endl;
 //  std::cout << "Origin: " << frame.mOrigin[0] << " " << frame.mOrigin[1] << " " << std::endl;
