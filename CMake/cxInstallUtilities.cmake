@@ -327,7 +327,7 @@ function(cxCreateConfigurationDescription)
 	cx_assert_variable_exists(${SSC_USE_GCOV})
 	cx_assert_variable_exists(${CX_USE_TSF})
 	cx_assert_variable_exists(${SSC_USE_OpenCL})
-        cx_assert_variable_exists(${BUILD_GRABBER_SERVER})
+	cx_assert_variable_exists(${BUILD_GRABBER_SERVER})
 	cx_assert_variable_exists(${CX_USE_ISB_GE})
 	cx_assert_variable_exists(${CX_USE_OpenCV})
 	# this text can be inserted into the about box with some effort...

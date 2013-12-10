@@ -508,6 +508,12 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   //frame.blx = roi.blx;
   //frame.bly = roi.bly;
   
+  char probeName[200];
+  if(!this->ult->getActiveProbe(probeName, 200))
+	  std::cout << "Couldn't request probe name." << std::endl;
+  //std::cout << "probeName: " << probeName << std::endl;
+  frame.probeName = probeName;
+
   // Just set ROI to FrameBufferExtent
   frame.ulx = this->FrameBufferExtent[0] - this->FrameBufferExtent[0];
   frame.uly = this->FrameBufferExtent[2] - this->FrameBufferExtent[2];
