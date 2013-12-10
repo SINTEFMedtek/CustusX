@@ -233,7 +233,7 @@ void OpenCLInfo::printProgramInfo(cl_program program, unsigned int indentTimes, 
 	printf("%sAssociated devices:\t%u\n", indent, numberOfAssociatedDevices);
 	for(unsigned int i=0; i<numberOfAssociatedDevices; i++)
 	{
-		printf("%s - Binary size:\t\t%0.0lu bytes\n", indent, binarySizes[i]);
+		printf("%s - Binary size:\t\t%lu bytes\n", indent, binarySizes[i]);
 		printDeviceInfo(devices[i], indentTimes+1);
 	}
 	if(printSource)
