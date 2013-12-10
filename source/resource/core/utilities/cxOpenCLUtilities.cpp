@@ -221,11 +221,11 @@ void OpenCLInfo::printProgramInfo(cl_program program, unsigned int indentTimes, 
 	printf("%sAssociated devices:\t%u\n", indent, numberOfAssociatedDevices);
 	for(unsigned int i=0; i<numberOfAssociatedDevices; i++)
 	{
-		printf("%s\tDevice %us id:\t%u\n", indent, i, devices[i]);
+		printf("%s - Device %us id:\t%u\n", indent, i, devices[i]);
+		printf("%s - Binary size:\t\t%0.0lu bytes\n", indent, binarySizes[i]);
 	}
 	if(printSource)
 		printf("%sProgram source:\n%s\n", indent, source);
-	printf("%sBinary size:\t%u\n", indent, binarySizes);
 	printContextInfo(context,indentTimes+1);
 
 }
@@ -277,7 +277,7 @@ void OpenCLInfo::printKernelWorkGroupInfo(cl_kernel kernel, cl_device_id device,
 	size_t compileWorkGroupSize[3];
 	cl_ulong localMemSize;
 	size_t preferredWorkGroupSizeMultiple;
-	size_t privateMemSize;
+	cl_ulong privateMemSize;
 
 	clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_WORK_GROUP_SIZE, sizeof(workGroupSize), &workGroupSize, NULL);
 	clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, sizeof(compileWorkGroupSize), &compileWorkGroupSize, NULL);
@@ -287,11 +287,11 @@ void OpenCLInfo::printKernelWorkGroupInfo(cl_kernel kernel, cl_device_id device,
 
 	const char* indent = getIndentation(indentTimes).c_str();
 	printf("%s--- KernelWorkGroupInfo ---\n", indent);
-	printf("%sWork group size:\t\t%u\n", indent,  workGroupSize);
-	printf("%sCompiler work group size:\t\t(%u,%u,%u)\n", indent, compileWorkGroupSize[0], compileWorkGroupSize[1], compileWorkGroupSize[2]);
-	printf("%sLocal mem size:\t%u\n", indent, localMemSize);
-	printf("%sPreferred work group size:\t%u\n", indent, preferredWorkGroupSizeMultiple);
-	printf("%sPrivate mem size:\t%u\n", indent, privateMemSize);
+	printf("%sWork group size:\t\t%lu\n", indent,  workGroupSize);
+	printf("%sCompiler work group size:\t(%lu,%lu,%lu)\n", indent, compileWorkGroupSize[0], compileWorkGroupSize[1], compileWorkGroupSize[2]);
+	printf("%sLocal mem size:\t\t\t%llu\n", indent, localMemSize);
+	printf("%sPreferred work group size:\t%lu\n", indent, preferredWorkGroupSizeMultiple);
+	printf("%sPrivate mem size:\t\t%llu\n", indent, privateMemSize);
 }
 
 void OpenCLInfo::printCommandQueueInfo(cl_command_queue command_queue, unsigned int indentTimes)
@@ -344,7 +344,7 @@ void OpenCLInfo::printMemInfo(cl_mem memobj, unsigned int indentTimes)
 	printf("%sFlags:\t\t\t%u\n", indent, flags);
 	printf("%sSize:\t\t\t%0.00f bytes\n", indent, (double)size);
 	printf("%sMap count:\t\t%u\n", indent, mapCount);
-	printf("%sOffset:\t\t\t%u\n", indent, offset);
+	printf("%sOffset:\t\t\t%lu\n", indent, offset);
 	printf("%sReference count:\t%u\n", indent, referenceCount);
 	printContextInfo(context, indentTimes+1);
 	printMemInfo(associatedMemObject, indentTimes+1);
