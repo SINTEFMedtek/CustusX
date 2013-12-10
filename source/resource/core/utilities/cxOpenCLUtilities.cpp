@@ -102,6 +102,10 @@ void OpenCLInfo::printDeviceInfo(cl_device_id device, unsigned int indentTimes)
 	cl_bool endianLittle;								//Is CL_TRUE if the OpenCL device is a little endian device and CL_FALSE otherwise.
 	char deviceProfile[MAX_CHAR_LENGTH];				//OpenCL profile string. Returns the profile name supported by the device.
 	char deviceExtensions[MAX_CHAR_LENGTH];				//Returns a space separated list of extension names
+	cl_command_queue_properties commandQueueProps;
+	char openClCVersion[MAX_CHAR_LENGTH];
+	cl_device_exec_capabilities	exeCapabilities;
+	cl_bool hostUnifiedMemory;
 
 
 	clGetDeviceInfo(device, CL_DEVICE_NAME, sizeof(deviceName), &deviceName, NULL);
@@ -129,6 +133,10 @@ void OpenCLInfo::printDeviceInfo(cl_device_id device, unsigned int indentTimes)
 	clGetDeviceInfo(device, CL_DEVICE_ENDIAN_LITTLE, sizeof(endianLittle), &endianLittle, NULL);
 	clGetDeviceInfo(device, CL_DEVICE_PROFILE, sizeof(deviceProfile), &deviceProfile, NULL);
 	clGetDeviceInfo(device, CL_DEVICE_EXTENSIONS, sizeof(deviceExtensions), &deviceExtensions, NULL);
+	clGetDeviceInfo(device, CL_DEVICE_QUEUE_PROPERTIES, sizeof(commandQueueProps), &commandQueueProps, NULL);
+	clGetDeviceInfo(device, CL_DEVICE_OPENCL_C_VERSION, sizeof(openClCVersion), &openClCVersion, NULL);
+	clGetDeviceInfo(device, CL_DEVICE_EXECUTION_CAPABILITIES, sizeof(exeCapabilities), &exeCapabilities, NULL);
+	clGetDeviceInfo(device, CL_DEVICE_HOST_UNIFIED_MEMORY, sizeof(hostUnifiedMemory), &hostUnifiedMemory, NULL);
 
 
 	const char* indent = getIndentation(indentTimes).c_str();
@@ -138,6 +146,7 @@ void OpenCLInfo::printDeviceInfo(cl_device_id device, unsigned int indentTimes)
 	printf("%sVendor id:\t\t\t%u\n", indent, deviceVendorId);
 	printf("%sDevice supports:\t\t%s \n", indent, deviceVersion);
 	printf("%sOpenCL driver version:\t\t%s\n", indent, driverVersion);
+	printf("%sHighest version can compile:\t%s\n", indent, openClCVersion);
 	printf("%sDevice Profile:\t\t\t%s \n", indent, deviceProfile);
 	printf("%sAvailable:\t\t\t%s\n", indent, available ? "Yes" : "No");
 	printf("\n");
@@ -152,6 +161,9 @@ void OpenCLInfo::printDeviceInfo(cl_device_id device, unsigned int indentTimes)
 	printf("%sError correction support:\t%s\n", indent, errorCorrectionSupport ? "Yes" : "No");
 	printf("%sProfiling Timer Resolution:\t%u ns\n", indent, (unsigned int)profilingTimerResolution);
 	printf("%sEndian Little:\t\t\t%s\n", indent, endianLittle ? "Yes" : "No");
+	printf("%sCommand queue properties:\t%u\n", indent, commandQueueProps);
+	printf("%sExecution capabilities:\t\t%lu\n", indent, exeCapabilities);
+	printf("%sHost unified memory:\t\t%s\n", indent, hostUnifiedMemory ? "Yes" : "No");
 	printf("\n");
 
 	printf("%sMax work group size:\t\t%u\n", indent, (unsigned int)maxWorkGroupSize);
