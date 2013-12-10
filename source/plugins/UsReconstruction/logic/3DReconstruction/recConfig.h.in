@@ -17,7 +17,6 @@
 //
 // See sscLicense.txt for more information.
 
-#define THUNDER_KERNEL_PATH "@THUNDER_KERNEL_PATH@/"
 #define TORD_KERNEL_PATH "@TORD_KERNEL_PATH@/"
 #ifndef SSC_USE_OpenCL
 	#cmakedefine SSC_USE_OpenCL

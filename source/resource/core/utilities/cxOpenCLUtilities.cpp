@@ -99,8 +99,6 @@ OpenCL::ocl_context* OpenCL::ocl_init(QString processor)
 
 void OpenCL::ocl_release(OpenCL::ocl_context* context)
 {
-	//	printf("Thunder: ocl_release\n");
-
 	//TODO release context->device;
 
 	clReleaseCommandQueue(context->cmd_queue);
