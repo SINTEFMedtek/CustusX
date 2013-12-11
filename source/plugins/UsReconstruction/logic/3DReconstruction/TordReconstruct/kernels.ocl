@@ -556,10 +556,16 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 	float2 abs_dists = {fabs(dists.x), fabs(dists.y)}; // .x = abs_dist_up, .y = abs_dist_down,
 
 	for(int i = 0; !done.x || !done.y ; i++)
-	{
+	{				
 		// Compute the indices of the planes we want to look at.
 		int2 idx = {tmp_guess + i, tmp_guess - i - 1};
-
+		
+		//SINTEF BUGFIX?
+		if(idx.y <=0)
+			idx.y = 0;
+		if(idx.x >= N_PLANES-1)
+			idx.x = N_PLANES-1;
+		
 		//float2 prev_abs_dists = abs_dists;
 
 		// Compute the distances to those planes
@@ -659,10 +665,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 		int2 term_boundaries = {idx.x == N_PLANES-1, idx.y == 0};
 
 		done = done + term_dists + term_boundaries;// + term_radius_jump;
-
 	}
-
-
 
 	int2 ret;
 	ret.x = min(found, MAX_PLANES);

@@ -1,11 +1,11 @@
 #include "TordTest.h"
-#include "sscMessageManager.h"
+
+#include <iostream>
 #include <vtkImageData.h>
 #include <QDomElement>
-#include <iostream>
-#include <Thunder/utils.h>
 #include <recConfig.h>
 #include <sscUSFrameData.h>
+#include "sscMessageManager.h"
 
 namespace cx
 {
@@ -164,12 +164,12 @@ TordTest::initCL(QString kernelPath,
 	)
 {
 	// Reusing initialization code from Thunder
-	moClContext = ocl_init("GPU");
+	moClContext = OpenCL::ocl_init("GPU");
 
 	size_t sourceLen;
 
 	messageManager()->sendInfo(QString("Kernel path: %1").arg(kernelPath));
-	char* sSource = file2string(kernelPath.toLocal8Bit().data(),
+	char* sSource = OpenCLUtilities::file2string(kernelPath.toLocal8Bit().data(),
 	                             &sourceLen);
 
 	cl_program clprogram = this->buildCLProgram(sSource,
@@ -184,7 +184,7 @@ TordTest::initCL(QString kernelPath,
 
 	if(clprogram == NULL) return false;
 
-	mClKernel = ocl_kernel_build(clprogram,
+	mClKernel = OpenCL::ocl_kernel_build(clprogram,
 	                             moClContext->device, "voxel_methods");
 	return true;
 	
@@ -328,7 +328,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 
 	for(int i = 0; i < numBlocks; i++)
 	{
-		clBlocks[i] = ocl_create_buffer(moClContext->context,
+		clBlocks[i] = OpenCL::ocl_create_buffer(moClContext->context,
 		                                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 		                                inputBlocks[i].length,
 		                                inputBlocks[i].data);
@@ -381,7 +381,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	messageManager()->sendInfo(QString("Using %1 of %2 global memory\n").arg(globalMemUse).arg(globalMemSize));
 
 
-	cl_mem clOutputVolume = ocl_create_buffer(moClContext->context,
+	cl_mem clOutputVolume = OpenCL::ocl_create_buffer(moClContext->context,
 	                                          CL_MEM_WRITE_ONLY,
 	                                          outputVolumeSize,
 	                                          NULL);
@@ -393,14 +393,14 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 
 	this->fillPlaneMatrices(planeMatrices, input);
 
-	cl_mem clPlaneMatrices = ocl_create_buffer(moClContext->context,
+	cl_mem clPlaneMatrices = OpenCL::ocl_create_buffer(moClContext->context,
 	                                           CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 	                                           nPlanes*sizeof(float)*16,
 	                                           planeMatrices);
 
 	// US Probe mask
 
-	cl_mem clMask = ocl_create_buffer(moClContext->context,
+	cl_mem clMask = OpenCL::ocl_create_buffer(moClContext->context,
 	                                  CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 	                                  sizeof(cl_uchar)*
 	                                  input->getDimensions()[0]*input->getDimensions()[1],
@@ -666,7 +666,7 @@ TordTest::reconstruct(ProcessedUSInputDataPtr input,
 
 	if(moClContext != NULL)
 	{
-		ocl_release(moClContext);
+		OpenCL::ocl_release(moClContext);
 		moClContext = NULL;
 	}
 
