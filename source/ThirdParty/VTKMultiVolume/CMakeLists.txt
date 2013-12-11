@@ -87,7 +87,6 @@ if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
     # Needs vtkEncodeString, VTK_ENCODESTRING_EXE
     # should work ...
     # VTK_VOLUMERENDERING_EXPORT is the flag associated to the library, should be adapted
-    MESSAGE("PROJECT_BINARY_DIR=${PROJECT_BINARY_DIR}")
     foreach(file ${KIT_GLSL_SRCS})
       ## TODO
       set(src  ${PROJECT_SOURCE_DIR}/GLSL/${file}.glsl)

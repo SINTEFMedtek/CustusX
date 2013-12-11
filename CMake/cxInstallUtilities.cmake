@@ -179,12 +179,10 @@ function(cx_install_configuration_files)
 	endif()
 
 	if(CX_USE_TSF)
-		message(STATUS "KERNELS_DIR is set to " ${Tube-Segmentation-Framework_KERNELS_DIR})
 		install(FILES
 				${Tube-Segmentation-Framework_KERNELS_DIR}/kernels.cl
 				${Tube-Segmentation-Framework_KERNELS_DIR}/kernels_no_3d_write.cl
 				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/)
-		message(STATUS "PARAMETERS_DIR is set to " ${Tube-Segmentation-Framework_PARAMETERS_DIR})
 		install(DIRECTORY ${Tube-Segmentation-Framework_PARAMETERS_DIR}
 				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/
 				FILE_PERMISSIONS ${CX_FULL_PERMISSIONS}
