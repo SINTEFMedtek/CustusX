@@ -26,12 +26,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/gui/utilities
     )	
     
-    
-    
-
-IF(NOT THUNDER_FRAMEWORK)
-  QT4_ADD_RESOURCES(SOURCE_FILES ../../gui/cxResources.qrc)
-ENDIF(NOT THUNDER_FRAMEWORK)
+QT4_ADD_RESOURCES(SOURCE_FILES ../../gui/cxResources.qrc)
 
 IF(CX_WINDOWS)
   QT4_WRAP_CPP( SOURCE_FILES ${QT_MOC_HEADER_FILES} OPTIONS "-D_WINDOWS" )

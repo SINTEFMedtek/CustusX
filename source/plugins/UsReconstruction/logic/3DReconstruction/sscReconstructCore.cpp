@@ -22,7 +22,6 @@
 #include <vtkImageData.h>
 #include "sscDataManager.h"
 #include "sscToolManager.h"
-#include "sscThunderVNNReconstructAlgorithm.h"
 #ifdef SSC_USE_OpenCL
 	#include "TordReconstruct/TordTest.h"
 #endif // SSC_USE_OpenCL
@@ -70,13 +69,7 @@ ReconstructAlgorithmPtr ReconstructCore::createAlgorithm(QString name)
 	if (mAlgorithm && mAlgorithm->getName() == name)
 		return mAlgorithm;
 
-	// create new algo
-	if (name == "ThunderVNN")
-	{
-		retval = ThunderVNNReconstructAlgorithm::create(mInput.mShaderPath);
-//		retval = ReconstructAlgorithmPtr(new ThunderVNNReconstructAlgorithm(mInput.mShaderPath));
-	}
-	else if (name == "PNN")
+	if (name == "PNN")
 		retval = ReconstructAlgorithmPtr(new PNNReconstructAlgorithm());
 #ifdef SSC_USE_OpenCL
 	else if (name == "TordTest")
