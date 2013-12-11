@@ -4,16 +4,21 @@
 #include <QButtonGroup>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QGridLayout>
 #include <QCheckBox>
 
 namespace cx
 {
-SelectionGroupBox::SelectionGroupBox(QString title, QStringList selectionList, bool exclusive, QWidget* parent) :
+SelectionGroupBox::SelectionGroupBox(QString title, QStringList selectionList, Qt::Orientation orientation, bool exclusive, QWidget* parent) :
     QGroupBox(parent),
     mSelectionList(selectionList),
     mButtonGroup(new QButtonGroup(parent))
 {
-  mLayout = new QHBoxLayout(this);
+	if (orientation==Qt::Vertical)
+		mLayout = new QVBoxLayout(this);
+	else
+		mLayout = new QHBoxLayout(this);
+
   this->setTitle(title);
 
   this->populate(exclusive);
@@ -67,7 +72,10 @@ void SelectionGroupBox::populate(bool exclusive)
     connect(box, SIGNAL(stateChanged(int)), this, SIGNAL(selectionChanged()));
     connect(box, SIGNAL(clicked(bool)), this, SIGNAL(userClicked()));
   }
-  mLayout->addStretch();
+//  mLayout->addStretch();
+  QHBoxLayout* hbox = dynamic_cast<QHBoxLayout*>(mLayout);
+  if (hbox)
+	  hbox->addStretch();
 }
 
 void SelectionGroupBox::filter(QStringList filter)
