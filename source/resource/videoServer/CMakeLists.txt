@@ -106,9 +106,9 @@ SET( CX_QT_MOC_HEADER_FILES
 		cxImageStreamerGE.h
 		cxImageStreamer.h
 		cxSender.h
-		cxDirectlyLinkedSender.h
-		
-		cxtestSender.h
+                cxDirectlyLinkedSender.h
+
+                cxtestSender.h
 )
 
 #QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
@@ -142,9 +142,11 @@ SET ( cxOpenIGTLinkServer_FILES
 		cxSender.cpp
 		cxDirectlyLinkedSender.h
 		cxDirectlyLinkedSender.cpp
+                cxSonixProbeFileReader.h
+                cxSonixProbeFileReader.cpp
 		
 		cxtestSender.h
-		cxtestSender.cpp
+                cxtestSender.cpp
 
 )
 
