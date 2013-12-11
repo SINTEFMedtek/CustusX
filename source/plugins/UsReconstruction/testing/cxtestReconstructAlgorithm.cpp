@@ -19,7 +19,6 @@
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #include "catch.hpp"
 #include "sscPNNReconstructAlgorithm.h"
-#include "sscThunderVNNReconstructAlgorithm.h"
 #include "QFileInfo"
 #include "sscDummyTool.h"
 #include "TordReconstruct/TordTest.h"
@@ -100,30 +99,6 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 ////	fixture.saveOutputToFile("/Users/christiana/test/boxlines_rec.mhd");
 //}
 
-TEST_CASE("ReconstructAlgorithm: Thunder VNN on sphere","[unit][usreconstruction][synthetic][ca_rec3][ca_rec][not_amd_gpu]")
-{
-	ReconstructAlgorithmFixture fixture;
-
-	QDomDocument domdoc;
-	QDomElement settings = domdoc.createElement("ThunderVNN");
-
-	fixture.setOverallBoundsAndSpacing(100, 5);
-	fixture.setVerbose(true);
-	fixture.setSpherePhantom();
-
-	fixture.setAlgorithm(cx::ThunderVNNReconstructAlgorithm::create(""));
-	fixture.reconstruct(settings);
-
-	fixture.checkRMSBelow(20.0);
-	fixture.checkCentroidDifferenceBelow(1);
-	fixture.checkMassDifferenceBelow(0.01);
-
-	if (fixture.getVerbose())
-	{
-		fixture.saveOutputToFile("/Users/christiana/test/sphere_thvnn_rec.mhd");
-		fixture.saveNominalOutputToFile("/Users/christiana/test/sphere_thvnn_nom.mhd");
-	}
-}
 
 TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][tordtest][usreconstruction][hide][synthetic]")
 {

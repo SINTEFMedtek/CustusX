@@ -1,0 +1,1671 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<lst xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="probes.xsd">
+
+  <probes>
+    <probe id="0" name="4DL14-5/38">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>2</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="Vermon">
+          <model>LA8.0/128-1169</model>
+          <partnumber cableexit="left">00.035.069</partnumber>
+        </vendor>
+      </vendors>
+      <icon>4DL14-5_38.png</icon>
+      <frequency>
+        <center>8100000</center>
+        <bandwidth>6400000</bandwidth>
+      </frequency>
+      <maxfocusdistance>100000</maxfocusdistance>
+      <maxsteerangle>15000</maxsteerangle>
+      <minFocusDistanceDoppler>40000</minFocusDistanceDoppler>
+      <minlineduration>60</minlineduration>
+      <motor>
+        <FOV>55000</FOV>
+        <homeMethod>1</homeMethod>
+        <minTimeBetweenPulses>50000</minTimeBetweenPulses>
+        <radius>27500</radius>
+        <steps>318</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>300</pitch>
+      <radius>0</radius>
+      <support>
+        <freehand3d>0</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.0</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="1" name="LAP9-4/38">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="development"/>
+        <hwplatform usmoduleversion="4" state="development"/>
+      </enabled>
+      <type>2</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="Vermon">
+          <model>LA6.5/128/LAP-1290</model>
+          <partnumber cableexit="left">00.035.076</partnumber>
+        </vendor>
+      </vendors>
+      <icon>LAP9-4_38.png</icon>
+      <frequency>
+        <center>6500000</center>
+        <bandwidth>5000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>100000</maxfocusdistance>
+      <maxsteerangle>25000</maxsteerangle>
+      <minFocusDistanceDoppler>40000</minFocusDistanceDoppler>
+      <minlineduration>70</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>300</pitch>
+      <radius>0</radius>
+      <support>
+        <freehand3d>1</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.0</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="2" name="L14-5/38">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="released"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>2</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="Prosonic">
+          <model>L5-10/40EP</model>
+          <partnumber cableexit="left">00.035.081</partnumber>
+          <partnumber cableexit="left">00.035.067</partnumber>
+          <partnumber cableexit="left">00.035.051</partnumber>
+          <partnumber cableexit="right">00.035.017</partnumber>
+        </vendor>
+        <vendor name="Prosonic">
+          <model>L5-10/40EP(GPS)</model>
+          <partnumber cableexit="left">00.035.064</partnumber>
+        </vendor>
+      </vendors>
+      <icon>L14-5_38-and-L9-4_38.png</icon>
+      <biopsy>
+        <angle>40365</angle>
+        <depth>6000</depth>
+        <distance>49000</distance>
+        <width>4100</width>
+        <vendors>
+          <vendor name="Civco" partnumber="00.037.015" type="disposable">
+            <supports>
+              <partnumber>00.035.051</partnumber>
+              <partnumber>00.035.017</partnumber>
+            </supports>
+          </vendor>
+		  <vendor name="Protek" partnumber="00.037.059" type="disposable">
+            <supports>
+              <partnumber>00.035.067</partnumber>
+              <partnumber>00.035.081</partnumber>
+            </supports>
+          </vendor>
+        </vendors>
+      </biopsy>
+      <frequency>
+        <center>9500000</center>
+        <bandwidth>9000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>100000</maxfocusdistance>
+      <maxsteerangle>45000</maxsteerangle>
+      <minFocusDistanceDoppler>40000</minFocusDistanceDoppler>
+      <minlineduration>60</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>300</pitch>
+      <radius>0</radius>
+      <support>
+        <freehand3d>1</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>0.7</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="3" name="HST15-8">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>2</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="Vermon">
+          <model>LA10/128/IO-785</model>
+          <partnumber cableexit="left">00.035.056</partnumber>
+          <partnumber cableexit="right">00.035.033</partnumber>
+        </vendor>
+      </vendors>
+      <icon>HST15-8_20.png</icon>
+      <frequency>
+        <center>10000000</center>
+        <bandwidth>6000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>100000</maxfocusdistance>
+      <maxsteerangle>15000</maxsteerangle>
+      <minFocusDistanceDoppler>40000</minFocusDistanceDoppler>
+      <minlineduration>70</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>200</pitch>
+      <radius>0</radius>
+      <support>
+        <freehand3d>1</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.0</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="4" name="mTEE8-3/5">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="demo"/>
+        <hwplatform usmoduleversion="4" state="demo"/>
+      </enabled>
+      <type>2</type>
+      <transmitoffset>15.000000</transmitoffset>
+      <vendors>
+        <vendor name="Oldelft">
+          <model>MicroMulti TEE</model>
+          <partnumber cableexit="left">00.035.065</partnumber>
+        </vendor>
+      </vendors>
+      <icon>mTEE8-3_5.png</icon>
+      <frequency>
+        <center>3000000</center>
+        <bandwidth>2000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>300000</maxfocusdistance>
+      <maxsteerangle>60000</maxsteerangle>
+      <minFocusDistanceDoppler>80000</minFocusDistanceDoppler>
+      <minlineduration>120</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>32</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>150</pitch>
+      <radius>0</radius>
+      <support>
+        <freehand3d>0</freehand3d>
+        <tempAngleSensor>1</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.0</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="5" name="C5-2/60">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="released"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>0</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="Apex">
+          <model>0836</model>
+          <partnumber cableexit="left">00.035.032</partnumber>
+          <partnumber cableexit="right">00.035.016</partnumber>
+        </vendor>
+        <vendor name="Prosonic">
+          <model>C2-5/60EP</model>
+          <partnumber cableexit="right">00.035.016</partnumber>
+        </vendor>
+      </vendors>
+      <icon>C5-2_60.png</icon>
+      <biopsy>
+        <angle>25000</angle>
+        <depth>13000</depth>
+        <distance>47000</distance>
+        <width>20020</width>
+        <vendors>
+          <vendor name="Civco" partnumber="00.037.013" type="disposable">
+            <supports>
+              <partnumber>00.035.016</partnumber>
+            </supports>
+          </vendor>
+        </vendors>
+      </biopsy>
+      <frequency>
+        <center>3500000</center>
+        <bandwidth>3000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>300000</maxfocusdistance>
+      <maxsteerangle>15000</maxsteerangle>
+      <minFocusDistanceDoppler>80000</minFocusDistanceDoppler>
+      <minlineduration>120</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>500</pitch>
+      <radius>60000</radius>
+      <support>
+        <freehand3d>1</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.2</elevationLength>
+      <maxPwPrp>700</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="7" name="L14-5W/60">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>2</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="Prosonic">
+          <model>L5-10/60EP</model>
+          <partnumber cableexit="left">00.035.035</partnumber>
+          <partnumber cableexit="right">00.035.019</partnumber>
+        </vendor>
+      </vendors>
+      <icon>L14-5_60.png</icon>
+      <biopsy>
+        <angle>51000</angle>
+        <depth>5000</depth>
+        <distance>38000</distance>
+        <width>2875</width>
+        <vendors>
+          <vendor name="Civco" partnumber="00.037.014" type="disposable">
+            <supports>
+              <partnumber>00.035.035</partnumber>
+              <partnumber>00.035.019</partnumber>
+            </supports>
+          </vendor>
+        </vendors>
+      </biopsy>
+      <frequency>
+        <center>9500000</center>
+        <bandwidth>9000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>100000</maxfocusdistance>
+      <maxsteerangle>45000</maxsteerangle>
+      <minFocusDistanceDoppler>50000</minFocusDistanceDoppler>
+      <minlineduration>40</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>460</pitch>
+      <radius>0</radius>
+      <support>
+        <freehand3d>1</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>0.7</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="8" name="EC9-5/10">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="released"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>0</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="Prosonic">
+          <model>EC9-4/10EPU</model>
+          <partnumber cableexit="left">00.035.049</partnumber>
+          <partnumber cableexit="right">00.035.014</partnumber>
+        </vendor>
+      </vendors>
+      <icon>EC9-5_10.png</icon>
+      <biopsy>
+        <angle>10500</angle>
+        <depth>1900</depth>
+        <distance>141000</distance>
+        <width>20190</width>
+        <vendors>
+          <vendor name="Civco" partnumber="00.037.012" type="disposable">
+            <supports>
+              <partnumber>00.035.049</partnumber>
+              <partnumber>00.035.014</partnumber>
+            </supports>
+          </vendor>
+          <vendor name="Protek" partnumber="00.037.011" type="reusable">
+            <supports>
+              <partnumber>00.035.049</partnumber>
+              <partnumber>00.035.014</partnumber>
+            </supports>
+          </vendor>
+        </vendors>
+      </biopsy>
+      <frequency>
+        <center>7000000</center>
+        <bandwidth>4000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>200000</maxfocusdistance>
+      <maxsteerangle>15000</maxsteerangle>
+      <minFocusDistanceDoppler>40000</minFocusDistanceDoppler>
+      <minlineduration>80</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>205</pitch>
+      <radius>10000</radius>
+      <support>
+        <freehand3d>1</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>0.7</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="9" name="BIPXY">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="development"/>
+        <hwplatform usmoduleversion="4" state="development"/>
+      </enabled>
+      <type>0</type>
+      <transmitoffset>0</transmitoffset>
+      <vendors>
+        <vendor name="Vermon">
+          <model>CLA6.5/R10/2x64/BIP-1257</model>
+          <partnumber cableexit="left">00.035.XXX</partnumber>
+        </vendor>
+      </vendors>
+      <icon>BPC8-4_10-and-BPL9-5_55.png</icon>
+      <frequency>
+        <center>6500000</center>
+        <bandwidth>5000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>200000</maxfocusdistance>
+      <maxsteerangle>15000</maxsteerangle>
+      <minFocusDistanceDoppler>40000</minFocusDistanceDoppler>
+      <minlineduration>80</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>64</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>205</pitch>
+      <radius>10000</radius>
+      <support>
+        <freehand3d>0</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <dualPlane>
+        <type>2</type>
+        <maxfocusdistance>100000</maxfocusdistance>
+        <maxsteerangle>15000</maxsteerangle>
+        <minFocusDistanceDoppler>50000</minFocusDistanceDoppler>
+        <minlineduration>70</minlineduration>
+        <numElements>64</numElements>
+        <pitch>420</pitch>
+        <radius>0</radius>
+        <mux>0</mux>
+      </dualPlane>
+      <elevationLength>1.0</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="10" name="C5-2/60">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="released"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>0</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="Prosonic">
+          <model>C1-5/60EP</model>
+          <partnumber cableexit="left">00.035.066</partnumber>
+        </vendor>
+        <vendor name="Prosonic">
+          <model>C1-5/60EP(GPS)</model>
+          <partnumber cableexit="left">00.035.063</partnumber>
+        </vendor>
+      </vendors>
+      <icon>C5-2_60.png</icon>
+      <biopsy>
+        <angle>28100</angle>
+        <depth>13000</depth>
+        <distance>47000</distance>
+        <width>20020</width>
+        <vendors>
+          <vendor name="Protek" partnumber="00.037.056" type="disposable">
+            <supports>
+              <partnumber>00.035.066</partnumber>
+            </supports>
+          </vendor>
+        </vendors>
+      </biopsy>
+      <frequency>
+        <center>3500000</center>
+        <bandwidth>3000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>300000</maxfocusdistance>
+      <maxsteerangle>15000</maxsteerangle>
+      <minFocusDistanceDoppler>80000</minFocusDistanceDoppler>
+      <minlineduration>120</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>468</pitch>
+      <radius>60738</radius>
+      <support>
+        <freehand3d>1</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.2</elevationLength>
+      <maxPwPrp>700</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="11" name="L9-4/38">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>2</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="Prosonic">
+          <model>L3-8/40EP</model>
+          <partnumber cableexit="left">00.035.077</partnumber>
+          <partnumber cableexit="left">00.035.052</partnumber>
+          <partnumber cableexit="right">00.035.020</partnumber>
+        </vendor>
+      </vendors>
+      <icon>L14-5_38-and-L9-4_38.png</icon>
+      <biopsy>
+        <angle>40100</angle>
+        <depth>5600</depth>
+        <distance>48000</distance>
+        <width>4970</width>
+        <vendors>
+          <vendor name="Civco" partnumber="00.037.015" type="disposable">
+            <supports>
+              <partnumber>00.035.052</partnumber>
+              <partnumber>00.035.020</partnumber>
+            </supports>
+          </vendor>
+		  <vendor name="Protek" partnumber="00.037.059" type="disposable">
+            <supports>
+              <partnumber>00.035.077</partnumber>
+            </supports>
+          </vendor>
+        </vendors>
+      </biopsy>
+      <frequency>
+        <center>6500000</center>
+        <bandwidth>5000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>100000</maxfocusdistance>
+      <maxsteerangle>25000</maxsteerangle>
+      <minFocusDistanceDoppler>40000</minFocusDistanceDoppler>
+      <minlineduration>70</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>300</pitch>
+      <radius>0</radius>
+      <support>
+        <freehand3d>1</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.0</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="12" name="BPL9-5/55">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>2</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="Vermon">
+          <model>BIP6.5/R10/2x128-472</model>
+          <partnumber cableexit="left">00.035.053</partnumber>
+          <partnumber cableexit="right">00.035.023</partnumber>
+        </vendor>
+      </vendors>
+      <icon>BPC8-4_10-and-BPL9-5_55.png</icon>
+      <frequency>
+        <center>6500000</center>
+        <bandwidth>5000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>100000</maxfocusdistance>
+      <maxsteerangle>15000</maxsteerangle>
+      <minFocusDistanceDoppler>50000</minFocusDistanceDoppler>
+      <minlineduration>70</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>429</pitch>
+      <radius>0</radius>
+      <support>
+        <freehand3d>1</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>1</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.0</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="13" name="LAP-DROP-IN9-4 38">
+        <enabled>
+            <hwplatform usmoduleversion="2" state="development"/>
+            <hwplatform usmoduleversion="3" state="development"/>
+            <hwplatform usmoduleversion="4" state="development"/>
+        </enabled>
+        <type>2</type>
+        <transmitoffset>0.000000</transmitoffset>
+        <vendors>
+            <vendor name="Vermon">
+                <model>LA7.0/128/1533</model>
+                <partnumber cableexit="left">00.035.076</partnumber>
+            </vendor>
+        </vendors>
+        <icon>Drop_in.png</icon>
+        <frequency>
+        <center>7400000</center>
+        <bandwidth>6300000</bandwidth>
+      </frequency>
+        <maxfocusdistance>100000</maxfocusdistance>
+        <maxsteerangle>25000</maxsteerangle>
+        <minFocusDistanceDoppler>40000</minFocusDistanceDoppler>
+        <minlineduration>70</minlineduration>
+        <motor>
+            <FOV>0</FOV>
+            <homeMethod>0</homeMethod>
+            <minTimeBetweenPulses>0</minTimeBetweenPulses>
+            <radius>0</radius>
+            <steps>0</steps>
+            <homeCorrection>0</homeCorrection>
+        </motor>
+        <numElements>128</numElements>
+        <pinOffset>0</pinOffset>
+        <pitch>300</pitch>
+        <radius>0</radius>
+        <support>
+            <freehand3d>1</freehand3d>
+            <tempAngleSensor>0</tempAngleSensor>
+            <trus>0</trus>
+        </support>
+        <muxWrap>
+            <Rx>0</Rx>
+            <Tx>0</Tx>
+        </muxWrap>
+        <elevationLength>1.0</elevationLength>
+        <maxPwPrp>800</maxPwPrp>
+        <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="14" name="PAXY">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="development"/>
+        <hwplatform usmoduleversion="4" state="development"/>
+      </enabled>
+      <type>2</type>
+      <transmitoffset>31.500000</transmitoffset>
+      <vendors>
+        <vendor name="Vermon">
+          <model>XYPA2.5</model>
+          <partnumber cableexit="left">00.035.074</partnumber>
+        </vendor>
+      </vendors>
+      <icon>PAXY.png</icon>
+      <frequency>
+        <center>2500000</center>
+        <bandwidth>2000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>300000</maxfocusdistance>
+      <maxsteerangle>60000</maxsteerangle>
+      <minFocusDistanceDoppler>80000</minFocusDistanceDoppler>
+      <minlineduration>120</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>64</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>250</pitch>
+      <radius>0</radius>
+      <support>
+        <freehand3d>0</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <dualPlane>
+        <numElements>64</numElements>
+        <pitch>250</pitch>
+        <radius>0</radius>
+        <mux>0</mux>
+      </dualPlane>
+      <elevationLength>1.0</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="15" name="L13-7--IC">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>2</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="Vermon">
+          <model>CLA5.0/R40/128-1165(4D-PROBE)</model>
+          <partnumber cableexit="left">00.035.071</partnumber>
+        </vendor>
+      </vendors>
+      <icon>L14-5_38-and-L9-4_38.png</icon>
+      <frequency>
+        <center>10000000</center>
+        <bandwidth>7500000</bandwidth>
+      </frequency>
+      <maxfocusdistance>300000</maxfocusdistance>
+      <maxsteerangle>15000</maxsteerangle>
+      <minFocusDistanceDoppler>80000</minFocusDistanceDoppler>
+      <minlineduration>60</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+	<homeMethod>0</homeMethod>
+	<minTimeBetweenPulses>0</minTimeBetweenPulses>
+	<radius>0</radius>
+	<steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>64</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>205</pitch>
+      <radius>0</radius>
+      <support>
+        <freehand3d>0</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>0.7</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="16" name="m4DC7-3/40">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>0</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="Vermon">
+          <model>CLA5.0/R40/128-1104</model>
+          <partnumber cableexit="left">00.035.080</partnumber>
+        </vendor>
+      </vendors>
+      <icon>m4DC7-3_40.png</icon>
+      <frequency>
+        <center>6500000</center>
+		
+        <bandwidth>4500000</bandwidth>
+      </frequency>
+      <maxfocusdistance>300000</maxfocusdistance>
+      <maxsteerangle>15000</maxsteerangle>
+      <minFocusDistanceDoppler>80000</minFocusDistanceDoppler>
+      <minlineduration>120</minlineduration>
+      <motor>
+        <FOV>75000</FOV>
+        <homeMethod>1</homeMethod>
+        <minTimeBetweenPulses>40000</minTimeBetweenPulses>
+        <radius>18400</radius>
+        <steps>205</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>425</pitch>
+      <radius>39800</radius>
+      <support>
+        <freehand3d>0</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.0</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="20" name="PA7-4/12">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>2</type>
+      <transmitoffset>30.000000</transmitoffset>
+      <vendors>
+        <vendor name="Prosonic">
+          <model>7PAC</model>
+          <partnumber cableexit="left">00.035.072</partnumber>
+        </vendor>
+        <vendor name="Vermon">
+          <model>PA5.0/64-784</model>
+          <partnumber cableexit="left">00.035.057</partnumber>
+          <partnumber cableexit="right">00.035.034</partnumber>
+        </vendor>
+      </vendors>
+      <icon>PA7-4_12.png</icon>
+      <frequency>
+        <center>3000000</center>
+        <bandwidth>2000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>300000</maxfocusdistance>
+      <maxsteerangle>60000</maxsteerangle>
+      <minFocusDistanceDoppler>80000</minFocusDistanceDoppler>
+      <minlineduration>120</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>64</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>200</pitch>
+      <radius>0</radius>
+      <support>
+        <freehand3d>0</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.0</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+	<probe id="17" name="TEM8-3/10">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="development"/>
+        <hwplatform usmoduleversion="4" state="demo"/>
+      </enabled>
+      <type>2</type>
+      <transmitoffset>15.000000</transmitoffset>
+      <vendors>
+        <vendor name="Oldelft">
+          <model>171M300 00</model>
+          <partnumber cableexit="left">00.035.XXX</partnumber>
+        </vendor>
+      </vendors>
+      <icon>TEE8-3_10.png</icon>
+      <frequency>
+        <center>5000000</center>
+        <bandwidth>4500000</bandwidth>
+      </frequency>
+      <maxfocusdistance>300000</maxfocusdistance>
+      <maxsteerangle>60000</maxsteerangle>
+      <minFocusDistanceDoppler>80000</minFocusDistanceDoppler>
+      <minlineduration>120</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>64</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>160</pitch>
+      <radius>0</radius>
+      <support>
+        <freehand3d>0</freehand3d>
+        <tempAngleSensor>1</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.0</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="21" name="C7-3/50">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>0</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="Prosonic">
+          <model>C2-8/50EPN</model>
+          <partnumber cableexit="left">00.035.061</partnumber>
+        </vendor>
+        <vendor name="Prosonic">
+          <model>C3-7/50EP</model>
+          <partnumber cableexit="left">00.035.054</partnumber>
+          <partnumber cableexit="right">00.035.027</partnumber>
+        </vendor>
+      </vendors>
+      <icon>C7-3_50.png</icon>
+      <biopsy>
+        <angle>25000</angle>
+        <depth>13000</depth>
+        <distance>45000</distance>
+        <width>24000</width>
+        <vendors>
+          <vendor name="Civco" partnumber="00.037.013" type="disposable">
+            <supports>
+              <partnumber>00.035.027</partnumber>
+            </supports>
+          </vendor>
+          <vendor name="Protek" partnumber="00.037.056" type="disposable">
+            <supports>
+              <partnumber>00.035.061</partnumber>
+            </supports>
+          </vendor>
+        </vendors>
+      </biopsy>
+      <frequency>
+        <center>5000000</center>
+        <bandwidth>4000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>300000</maxfocusdistance>
+      <maxsteerangle>15000</maxsteerangle>
+      <minFocusDistanceDoppler>80000</minFocusDistanceDoppler>
+      <minlineduration>120</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>479</pitch>
+      <radius>50420</radius>
+      <support>
+        <freehand3d>1</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.0</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="19" name="C9-5/10">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>0</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="Prosonic">
+          <model>C9-5/10</model>
+          <partnumber cableexit="left">00.035.xxx</partnumber>
+        </vendor>
+      </vendors>
+      <icon>C9-5_10.png</icon>
+      <frequency>
+        <center>7000000</center>
+        <bandwidth>4000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>200000</maxfocusdistance>
+      <maxsteerangle>15000</maxsteerangle>
+      <minFocusDistanceDoppler>40000</minFocusDistanceDoppler>
+      <minlineduration>80</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>205</pitch>
+      <radius>10000</radius>
+      <support>
+        <freehand3d>1</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>0.7</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="22" name="MC9-4/12">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>0</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="STI">
+          <model>USX V6</model>
+          <partnumber cableexit="left">00.035.058</partnumber>
+          <partnumber cableexit="right">00.035.036</partnumber>
+        </vendor>
+      </vendors>
+      <icon>MC9-4_12.png</icon>
+      <frequency>
+        <center>6000000</center>
+        <bandwidth>4000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>200000</maxfocusdistance>
+      <maxsteerangle>15000</maxsteerangle>
+      <minFocusDistanceDoppler>40000</minFocusDistanceDoppler>
+      <minlineduration>80</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>230</pitch>
+      <radius>12520</radius>
+      <support>
+        <freehand3d>1</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.0</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="23" name="PA4-2/20">
+          <enabled>
+            <hwplatform usmoduleversion="2" state="released"/>
+            <hwplatform usmoduleversion="3" state="released"/>
+            <hwplatform usmoduleversion="4" state="released"/>
+          </enabled>
+          <type>2</type>
+          <transmitoffset>31.500000</transmitoffset>
+          <vendors>
+            <vendor name="Prosonic">
+              <model>P2-3/20APN</model>
+              <partnumber cableexit="left">00.035.050</partnumber>
+            </vendor>
+          </vendors>
+          <icon>SA4-2_24_Prosonic.png</icon>
+          <frequency>
+            <center>3000000</center>
+            <bandwidth>2000000</bandwidth>
+          </frequency>
+          <maxfocusdistance>300000</maxfocusdistance>
+          <maxsteerangle>60000</maxsteerangle>
+          <minFocusDistanceDoppler>80000</minFocusDistanceDoppler>
+          <minlineduration>120</minlineduration>
+          <motor>
+            <FOV>0</FOV>
+            <homeMethod>0</homeMethod>
+            <minTimeBetweenPulses>0</minTimeBetweenPulses>
+            <radius>0</radius>
+            <steps>0</steps>
+            <homeCorrection>0</homeCorrection>
+          </motor>
+          <numElements>64</numElements>
+          <pinOffset>0</pinOffset>
+          <pitch>300</pitch>
+          <radius>0</radius>
+          <support>
+            <freehand3d>0</freehand3d>
+            <tempAngleSensor>0</tempAngleSensor>
+            <trus>0</trus>
+          </support>
+          <muxWrap>
+            <Rx>0</Rx>
+            <Tx>0</Tx>
+          </muxWrap>
+          <elevationLength>1.0</elevationLength>
+          <maxPwPrp>700</maxPwPrp>
+          <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="24" name="4DEC9-5/10">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>0</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="Vermon">
+          <model>CLA6.5/R10/128/752</model>
+          <partnumber cableexit="left">00.035.060</partnumber>
+        </vendor>
+      </vendors>
+      <icon>4DEC9-5_10.png</icon>
+      <biopsy>
+        <angle>3000</angle>
+        <depth>6000</depth>
+        <distance>135000</distance>
+        <width>50000</width>
+        <vendors>
+          <vendor name="Civco" partnumber="00.037.046" type="reusable">
+            <supports>
+              <partnumber>00.035.060</partnumber>
+            </supports>
+          </vendor>
+        </vendors>
+      </biopsy>
+      <frequency>
+        <center>6000000</center>
+        <bandwidth>3600000</bandwidth>
+      </frequency>
+      <maxfocusdistance>200000</maxfocusdistance>
+      <maxsteerangle>15000</maxsteerangle>
+      <minFocusDistanceDoppler>80000</minFocusDistanceDoppler>
+      <minlineduration>80</minlineduration>
+      <motor>
+        <FOV>125000</FOV>
+        <homeMethod>2</homeMethod>
+        <minTimeBetweenPulses>50000</minTimeBetweenPulses>
+        <radius>12200</radius>
+        <steps>342</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>170</pitch>
+      <radius>10000</radius>
+      <support>
+        <freehand3d>0</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.0</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+	<probe id="25" name="ClariTEE8-3/5">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="demo"/>
+        <hwplatform usmoduleversion="3" state="demo"/>
+        <hwplatform usmoduleversion="4" state="demo"/>
+      </enabled>
+      <type>2</type>
+      <transmitoffset>17.000000</transmitoffset>
+      <vendors>
+        <vendor name="Imacor">
+          <model>ClariTEE</model>
+          <partnumber cableexit="left">00.035.065</partnumber>
+        </vendor>
+      </vendors>
+      <icon>mTEE8-3_5.png</icon>
+      <frequency>
+        <center>6700000</center>
+        <bandwidth>3000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>300000</maxfocusdistance>
+      <maxsteerangle>60000</maxsteerangle>
+      <minFocusDistanceDoppler>80000</minFocusDistanceDoppler>
+      <minlineduration>120</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>32</numElements>
+      <pinOffset>8</pinOffset>
+      <pitch>140</pitch>
+      <radius>0</radius>
+      <support>
+        <freehand3d>0</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.0</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="26" name="4DC7-3/40">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>0</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="Vermon">
+          <model>CLA5.0/R40/128-1165(4D-PROBE)</model>
+          <partnumber cableexit="left">00.035.055</partnumber>
+          <partnumber cableexit="right">00.035.028</partnumber>
+        </vendor>
+      </vendors>
+      <icon>4DC7-4_40.png</icon>
+      <frequency>
+        <center>4500000</center>
+        <bandwidth>3600000</bandwidth>
+      </frequency>
+      <maxfocusdistance>300000</maxfocusdistance>
+      <maxsteerangle>15000</maxsteerangle>
+      <minFocusDistanceDoppler>80000</minFocusDistanceDoppler>
+      <minlineduration>120</minlineduration>
+      <motor>
+        <FOV>75000</FOV>
+        <homeMethod>2</homeMethod>
+        <minTimeBetweenPulses>40000</minTimeBetweenPulses>
+        <radius>27250</radius>
+        <steps>205</steps>
+        <homeCorrection>1</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>425</pitch>
+      <radius>39800</radius>
+      <support>
+        <freehand3d>0</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.0</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="27" hidden="true" name="4DEC9-5/10STI">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>0</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="STI">
+          <model>USX 3DEC</model>
+          <partnumber cableexit="right">00.035.039</partnumber>
+        </vendor>
+      </vendors>
+      <icon>4DEC9-5_10.png</icon>
+      <frequency>
+        <center>6500000</center>
+        <bandwidth>4570000</bandwidth>
+      </frequency>
+      <maxfocusdistance>200000</maxfocusdistance>
+      <maxsteerangle>15000</maxsteerangle>
+      <minFocusDistanceDoppler>80000</minFocusDistanceDoppler>
+      <minlineduration>80</minlineduration>
+      <motor>
+        <FOV>90000</FOV>
+        <homeMethod>2</homeMethod>
+        <minTimeBetweenPulses>40000</minTimeBetweenPulses>
+        <radius>12000</radius>
+        <steps>233</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>199</pitch>
+      <radius>10000</radius>
+      <support>
+        <freehand3d>0</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.0</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="28" name="SA4-2/24">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>2</type>
+      <transmitoffset>31.500000</transmitoffset>
+      <vendors>
+        <vendor name="Prosonic">
+          <model>P2-3/20APN</model>
+          <partnumber cableexit="left">00.035.XXX</partnumber>
+        </vendor>
+      </vendors>
+      <icon>SA4-2_24_Prosonic.png</icon>
+      <frequency>
+        <center>2520000</center>
+        <bandwidth>1559880</bandwidth>
+      </frequency>
+      <maxfocusdistance>300000</maxfocusdistance>
+      <maxsteerangle>60000</maxsteerangle>
+      <minFocusDistanceDoppler>80000</minFocusDistanceDoppler>
+      <minlineduration>120</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>64</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>300</pitch>
+      <radius>0</radius>
+      <support>
+        <freehand3d>0</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.4</elevationLength>
+      <maxPwPrp>700</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="29" name="SA4-2/24">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="released"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>2</type>
+      <transmitoffset>31.500000</transmitoffset>
+      <vendors>
+        <vendor name="Apex">
+          <model>SA4-2</model>
+          <partnumber cableexit="left">00.035.059</partnumber>
+          <partnumber cableexit="right">00.035.038</partnumber>
+        </vendor>
+      </vendors>
+      <icon>SA4-2_24_Apex.png</icon>
+	  <biopsy>
+	    <angle>16698</angle>
+	    <depth>27000</depth>
+	    <distance>46000</distance>
+        <width>25190</width>
+	    <vendors>
+	      <vendor name="Civco" partnumber="00.037.075" type="disposable">
+		    <supports>
+	     	  <partnumber>00.035.059</partnumber>
+              <partnumber>00.035.038</partnumber>
+		    </supports>
+	      </vendor>
+	    </vendors>
+      </biopsy>
+      <frequency>
+        <center>3000000</center>
+        <bandwidth>2000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>300000</maxfocusdistance>
+      <maxsteerangle>60000</maxsteerangle>
+      <minFocusDistanceDoppler>80000</minFocusDistanceDoppler>
+      <minlineduration>120</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>64</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>254</pitch>
+      <radius>0</radius>
+      <support>
+        <freehand3d>0</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>1.4</elevationLength>
+      <maxPwPrp>700</maxPwPrp>
+      <invertedElements>1</invertedElements>
+    </probe>
+    <probe id="30" name="L40-8/12">
+      <enabled>
+        <hwplatform usmoduleversion="2" state="development"/>
+        <hwplatform usmoduleversion="3" state="development"/>
+        <hwplatform usmoduleversion="4" state="released"/>
+      </enabled>
+      <type>2</type>
+      <transmitoffset>0.000000</transmitoffset>
+      <vendors>
+        <vendor name="Vermon">
+          <model>LA15.0/128-1288</model>
+          <partnumber cableexit="left">00.035.073</partnumber>
+        </vendor>
+      </vendors>
+      <icon>L40-8_13.png</icon>
+      <frequency>
+        <center>15000000</center>
+        <bandwidth>20000000</bandwidth>
+      </frequency>
+      <maxfocusdistance>100000</maxfocusdistance>
+      <maxsteerangle>15000</maxsteerangle>
+      <minFocusDistanceDoppler>40000</minFocusDistanceDoppler>
+      <minlineduration>60</minlineduration>
+      <motor>
+        <FOV>0</FOV>
+        <homeMethod>0</homeMethod>
+        <minTimeBetweenPulses>0</minTimeBetweenPulses>
+        <radius>0</radius>
+        <steps>0</steps>
+        <homeCorrection>0</homeCorrection>
+      </motor>
+      <numElements>128</numElements>
+      <pinOffset>0</pinOffset>
+      <pitch>100</pitch>
+      <radius>0</radius>
+      <support>
+        <freehand3d>1</freehand3d>
+        <tempAngleSensor>0</tempAngleSensor>
+        <trus>0</trus>
+      </support>
+      <muxWrap>
+        <Rx>0</Rx>
+        <Tx>0</Tx>
+      </muxWrap>
+      <elevationLength>0.7</elevationLength>
+      <maxPwPrp>800</maxPwPrp>
+      <invertedElements>0</invertedElements>
+    </probe>
+    <probe id="18" name="Vora">
+          <enabled>
+            <hwplatform usmoduleversion="2" state="released"/>
+            <hwplatform usmoduleversion="3" state="released"/>
+            <hwplatform usmoduleversion="4" state="released"/>
+          </enabled>
+          <type>2</type>
+          <transmitoffset>0.000000</transmitoffset>
+          <vendors>
+            <vendor name="Prosonic">
+              <model>L5-10/40EP</model>
+              <partnumber cableexit="left">00.035.081</partnumber>
+              <partnumber cableexit="left">00.035.067</partnumber>
+              <partnumber cableexit="left">00.035.051</partnumber>
+              <partnumber cableexit="right">00.035.017</partnumber>
+            </vendor>
+            <vendor name="Prosonic">
+              <model>L5-10/40EP(GPS)</model>
+              <partnumber cableexit="left">00.035.064</partnumber>
+            </vendor>
+          </vendors>
+          <icon>L14-5_38-and-L9-4_38.png</icon>
+          <biopsy>
+            <angle>40365</angle>
+            <depth>6000</depth>
+            <distance>49000</distance>
+            <width>4100</width>
+            <vendors>
+              <vendor name="Civco" partnumber="00.037.015" type="disposable">
+                <supports>
+                  <partnumber>00.035.051</partnumber>
+                  <partnumber>00.035.017</partnumber>
+                </supports>
+              </vendor>
+    		  <vendor name="Protek" partnumber="00.037.059" type="disposable">
+                <supports>
+                  <partnumber>00.035.067</partnumber>
+                  <partnumber>00.035.081</partnumber>
+                </supports>
+              </vendor>
+            </vendors>
+          </biopsy>
+          <frequency>
+            <center>9500000</center>
+            <bandwidth>9000000</bandwidth>
+          </frequency>
+          <maxfocusdistance>100000</maxfocusdistance>
+          <maxsteerangle>45000</maxsteerangle>
+          <minFocusDistanceDoppler>40000</minFocusDistanceDoppler>
+          <minlineduration>60</minlineduration>
+          <motor>
+            <FOV>0</FOV>
+            <homeMethod>0</homeMethod>
+            <minTimeBetweenPulses>0</minTimeBetweenPulses>
+            <radius>0</radius>
+            <steps>0</steps>
+            <homeCorrection>0</homeCorrection>
+          </motor>
+          <numElements>128</numElements>
+          <pinOffset>0</pinOffset>
+          <pitch>300</pitch>
+          <radius>0</radius>
+          <support>
+            <freehand3d>1</freehand3d>
+            <tempAngleSensor>0</tempAngleSensor>
+            <trus>0</trus>
+          </support>
+          <muxWrap>
+            <Rx>0</Rx>
+            <Tx>0</Tx>
+          </muxWrap>
+          <elevationLength>0.7</elevationLength>
+          <maxPwPrp>800</maxPwPrp>
+          <invertedElements>0</invertedElements>
+    </probe>
+  </probes>
+
+</lst>

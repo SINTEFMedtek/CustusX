@@ -4,7 +4,7 @@
 #include <QGroupBox>
 
 class QButtonGroup;
-class QHBoxLayout;
+class QLayout;
 
 namespace cx
 {
@@ -23,7 +23,7 @@ class SelectionGroupBox : public QGroupBox
   Q_OBJECT
 
 public:
-  SelectionGroupBox(QString title, QStringList selectionList, bool exclusive = false, QWidget* parent = NULL);
+  SelectionGroupBox(QString title, QStringList selectionList, Qt::Orientation orientation, bool exclusive = false, QWidget *parent=NULL);
   virtual ~SelectionGroupBox();
 
   virtual QStringList getSelected(); ///< get a list of selected button text
@@ -39,7 +39,8 @@ private:
   void populate(bool exclusive); ///< Populates the group box
   void filter(QStringList filter); ///< Selects the buttons with text matching the incoming list
 
-  QHBoxLayout* mLayout;
+//  QVBoxLayout* mLayout;
+  QLayout* mLayout;
 
   QStringList     mSelectionList;
   QButtonGroup*   mButtonGroup;

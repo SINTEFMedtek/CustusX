@@ -16,7 +16,6 @@
 #include <vtkImageData.h>
 #include "sscReconstructManager.h"
 #include "sscImage.h"
-#include "sscThunderVNNReconstructAlgorithm.h"
 #include "sscPNNReconstructAlgorithm.h"
 #include "cxDataLocations.h"
 #include "cxDataManager.h"
@@ -28,6 +27,8 @@
 #include "sscDataAdapter.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
+#include <sscBoolDataAdapterXml.h>
+
 
 #include "recConfig.h"
 #ifdef SSC_USE_OpenCL
@@ -67,7 +68,6 @@ public:
 
 //	void testConstructor();///< Test reconstructer constructor
 	void testAngioReconstruction();///< Test reconstruction of US angio data (#318)
-	void testThunderGPUReconstruction();///< Test Thunder GPU reconstruction
 	void testDualAngio();
 #ifdef SSC_USE_OpenCL
 	void testTordTest(); // Test Tord GPU VNN implementation
@@ -371,36 +371,6 @@ void ReconstructManagerTestFixture::testAngioReconstruction()
 	this->validateAngioData(cores[0]->getOutput());
 }
 
-void ReconstructManagerTestFixture::testThunderGPUReconstruction()
-{
-	QString filename = cx::DataLocations::getTestDataPath() +
-			"/testing/"
-			"2012-10-24_12-39_Angio_i_US3.cx3/US_Acq/US-Acq_03_20121024T132330.mhd";
-
-	cx::ReconstructManagerPtr reconstructer = this->createManager();
-	reconstructer->selectData(filename);
-	reconstructer->getParams()->mAlgorithmAdapter->setValue("ThunderVNN");
-	reconstructer->getParams()->mAngioAdapter->setValue(false);
-	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
-
-	// set an algorithm-specific parameter
-	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "ThunderVNN");
-	boost::shared_ptr<cx::ThunderVNNReconstructAlgorithm> algorithm;
-	algorithm = boost::dynamic_pointer_cast<cx::ThunderVNNReconstructAlgorithm>(reconstructer->createAlgorithm());
-	REQUIRE(algorithm);// Check if we got the VNN algorithm
-	algorithm->getProcessorOption(algo)->setValue("GPU");
-
-	// run the reconstruction in the main thread
-	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
-	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
-	REQUIRE(cores.size()==1);
-	preprocessor->initializeCores(cores);
-	cores[0]->reconstruct();
-
-	// check validity of output:
-	this->validateBModeData(cores[0]->getOutput());
-}
-
 void ReconstructManagerTestFixture::testDualAngio()
 {
 	QString filename = cx::DataLocations::getTestDataPath() +
@@ -512,11 +482,7 @@ TEST_CASE("ReconstructManager: Angio Reconstruction", "[usreconstruction][integr
 	ReconstructManagerTestFixture fixture;
 	fixture.testAngioReconstruction();
 }
-TEST_CASE("ReconstructManager: ThunderGPU Reconstruction", "[usreconstruction][integration][thunder][not_win32][not_apple]")
-{
-	ReconstructManagerTestFixture fixture;
-	fixture.testThunderGPUReconstruction();
-}
+
 TEST_CASE("ReconstructManager: Dual Angio", "[usreconstruction][integration]")
 {
 	ReconstructManagerTestFixture fixture;

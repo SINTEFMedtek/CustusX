@@ -22,7 +22,6 @@
 #include <igstkLogger.h>
 #include <igstkTracker.h>
 #include <igstkPolarisTracker.h>
-#include <igstkPolarisClassicTracker.h>
 #include <igstkAuroraTracker.h>
 #include <itkStdStreamLogOutput.h>
 #ifdef WIN32
@@ -71,7 +70,6 @@ public:
 #endif
 	typedef igstk::Tracker TrackerType;
 	typedef igstk::PolarisTracker PolarisTrackerType;
-	typedef igstk::PolarisClassicTracker PolarisClassicTrackerType;
 	typedef igstk::AuroraTracker AuroraTrackerType;
 
 	/*only used for documentation purposes
@@ -157,7 +155,6 @@ protected:
 	TrackerType* mTracker; ///< pointer to the base class of the internal igstk tracker
 
 	PolarisTrackerType::Pointer mTempPolarisTracker; ///< pointer to a temp polaris tracker
-	PolarisClassicTrackerType::Pointer mTempPolarisClassicTracker; ///< pointer to a temp polaris classic tracker
 	AuroraTrackerType::Pointer mTempAuroraTracker; ///< pointer to a temp aurora tracker
 
 	CommunicationType::Pointer mCommunication; ///< pointer to the serial communication used to communicate with the NDI trackers
