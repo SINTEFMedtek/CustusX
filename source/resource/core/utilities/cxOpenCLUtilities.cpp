@@ -680,8 +680,8 @@ void OpenCLInfo::printCharList(const char* list, const char* separator, const ch
 	std::string stdString(list);
 	std::vector<std::string> strings;
 	boost::split(strings, stdString, boost::is_any_of(std::string(separator)));
-	std::vector<std::string>::iterator it = strings.begin();
-	for(it; it != strings.end(); ++it)
+	std::vector<std::string>::iterator it;
+	for(it = strings.begin(); it != strings.end(); ++it)
 		printf("%s%s\n", indentation, (*it).c_str());
 }
 
