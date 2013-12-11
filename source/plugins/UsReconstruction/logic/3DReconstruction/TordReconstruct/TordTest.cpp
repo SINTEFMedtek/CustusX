@@ -376,11 +376,11 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 		return false;
 	}
 
-	if(maxAllocSize < oneBigBlock.length)
-	{
-		messageManager()->sendInfo(QString("Input blocks too large! %1 > %2\n").arg(oneBigBlock.length).arg(maxAllocSize));
-		return false;
-	}
+	// if(maxAllocSize < oneBigBlock.length)
+	// {
+	// 	messageManager()->sendInfo(QString("Input blocks too large! %1 > %2\n").arg(oneBigBlock.length).arg(maxAllocSize));
+	// 	return false;
+	// }
 
 
 	cl_ulong globalMemUse = oneBigBlock.length + outputVolumeSize + sizeof(float)*16*nPlanes +          sizeof(cl_uchar)*input->getDimensions()[0]*input->getDimensions()[1];
