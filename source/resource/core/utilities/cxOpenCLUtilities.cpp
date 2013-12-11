@@ -2,6 +2,7 @@
 
 #include "cxOpenCLUtilities.h"
 
+#include <stdio.h>
 #include <vector>
 #include <iostream>
 #include <boost/algorithm/string.hpp>
