@@ -29,9 +29,6 @@ QStringList IgstkTracker::getSupportedTrackingSystems()
 {
 	QStringList retval;
 	retval << enum2string(tsPOLARIS);
-	//retval << enum2string(tsPOLARIS_SPECTRA);
-	//retval << enum2string(tsPOLARIS_VICRA);
-	retval << enum2string(tsPOLARIS_CLASSIC);
 	retval << enum2string(tsAURORA);
 	return retval;
 }
@@ -79,30 +76,11 @@ IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
 		mValid = true;
 		break;
 	case tsPOLARIS_CLASSIC:
-		mUid = mName = "Polaris Classic";
-		mTempPolarisClassicTracker = PolarisClassicTrackerType::New();
-		mTempPolarisClassicTracker->SetCommunication(mCommunication);
-		messageManager()->sendInfo("Tracker is set to Polaris Classic");
-		mTracker = mTempPolarisClassicTracker.GetPointer();
-		mValid = true;
+		mUid = mName = "None";
+		messageManager()->sendInfo("Polaris Classic is not supported");
+		mValid = false;
 		break;
 		//There is no special handling of the tracking system if its spectra or vicra, polaris is polaris as we see it
-//  case tsPOLARIS_SPECTRA:
-//    mUid = mName = "Polaris Spectra";
-//    mTempPolarisTracker = PolarisTrackerType::New();
-//    mTempPolarisTracker->SetCommunication(mCommunication);
-//    messageManager()->sendInfo("Tracker is set to Polaris Spectra");
-//    mTracker = mTempPolarisTracker.GetPointer();
-//    mValid = true;
-//    break;
-//  case tsPOLARIS_VICRA:
-//    mUid = mName = "Polaris Vicra";
-//    mTempPolarisTracker = PolarisTrackerType::New();
-//    mTempPolarisTracker->SetCommunication(mCommunication);
-//    messageManager()->sendInfo("Tracker is set to Polaris Vicra");
-//    mTracker = mTempPolarisTracker.GetPointer();
-//    mValid = true;
-//    break;
 	case tsAURORA:
 		mUid = mName = "Aurora";
 		mTempAuroraTracker = AuroraTrackerType::New();
@@ -113,7 +91,7 @@ IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
 		break;
 	case tsMICRON:
 		mUid = mName = "Micron";
-		messageManager()->sendInfo("Tracker is set to Micron");
+		messageManager()->sendInfo("Tracker is set to Micron, not supported");
 		//TODO: implement support for a micron tracker...
 		mValid = false;
 		break;
