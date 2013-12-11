@@ -18,6 +18,7 @@ if (BUILD_TESTING)
             cxTestGEInterface
             cxTestSenderController
             cxtestCatchGEInterface.cpp
+            cxtestSonixProbeFileReader.cpp
 	)
 
     cx_catch_add_lib_and_exe(cxGrabber "${CX_TEST_SOURCE_FILES}" "${CXTEST_SOURCES_TO_MOC}")
