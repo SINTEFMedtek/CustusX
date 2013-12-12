@@ -33,6 +33,8 @@ if (BUILD_TESTING)
 		cxtestSphereSyntheticVolume.cpp
 		cxtestReconstructRealData.h
 		cxtestReconstructRealData.cpp
+		cxtestSyntheticReconstructInput.h
+		cxtestSyntheticReconstructInput.cpp
 		)
 	cx_catch_add_lib_and_exe(cxPluginUSReconstruction "${CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
 
