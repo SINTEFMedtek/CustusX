@@ -14,11 +14,24 @@
 
 #include "cxtestReconstructManagerFixture.h"
 
+#include "cxDataManager.h"
+#include "catch.hpp"
+#include "sscPNNReconstructAlgorithm.h"
+#include <QApplication>
+#include "sscDoubleDataAdapterXml.h"
+#include "cxTimedAlgorithm.h"
+
+#include "cxDataLocations.h"
+#include "sscReconstructPreprocessor.h"
+
+
 namespace cxtest
 {
 
 ReconstructManagerTestFixture::ReconstructManagerTestFixture()
 {
+	mVerbose = false;
+
 	cx::MessageManager::initialize();
 	cx::cxDataManager::initialize();
 }
@@ -87,13 +100,13 @@ std::vector<cx::ImagePtr> ReconstructManagerTestFixture::getOutput()
 	return mOutput;
 }
 
-SyntheticVolumeComparerPtr ReconstructManagerTestFixture::getComparerForOutput(ReconstructAlgorithmFixture& algoFixture, int index)
+SyntheticVolumeComparerPtr ReconstructManagerTestFixture::getComparerForOutput(SyntheticReconstructInputPtr input, int index)
 {
 	SyntheticVolumeComparerPtr comparer(new SyntheticVolumeComparer());
-	comparer->setVerbose(algoFixture.getVerbose());
-	comparer->setPhantom(algoFixture.getPhantom());
+	comparer->setVerbose(this->getVerbose());
+	comparer->setPhantom(input->getPhantom());
 	//	comparer->setTestImage(cores[0]->getOutput());
-	comparer->setTestImage(this->getOutput()[0]);
+	comparer->setTestImage(this->getOutput()[index]);
 	return comparer;
 }
 

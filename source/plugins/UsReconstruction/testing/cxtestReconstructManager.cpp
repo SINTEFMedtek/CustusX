@@ -12,23 +12,12 @@
 //
 // See CustusX_License.txt for more information.
 
-#include <QApplication>
-#include <vtkImageData.h>
-#include "sscReconstructManager.h"
-#include "sscImage.h"
-#include "sscPNNReconstructAlgorithm.h"
-#include "cxDataLocations.h"
-#include "cxDataManager.h"
-#include "sscReconstructPreprocessor.h"
 #include "sscReconstructParams.h"
-#include "cxTimedAlgorithm.h"
-#include "cxUSReconstructInputDataAlgoritms.h"
-#include "sscReconstructManager.h"
-#include "sscDataAdapter.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
-#include <sscBoolDataAdapterXml.h>
-
+#include "sscBoolDataAdapterXml.h"
+#include "catch.hpp"
+#include "cxtestReconstructManagerFixture.h"
+#include "cxtestReconstructRealData.h"
+#include "cxtestSyntheticReconstructInput.h"
 
 #include "recConfig.h"
 #ifdef SSC_USE_OpenCL
@@ -36,39 +25,22 @@
   #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #endif // SSC_USE_OpenCL
 
-
-#include "catch.hpp"
-
-#include "cxtestUtilities.h"
-#include "sscUSFrameData.h"
-#include "sscDummyTool.h"
-#include "cxImageDataContainer.h"
-#include "cxUsReconstructionFileMaker.h"
-
-#include "cxtestSphereSyntheticVolume.h"
-#include "cxtestReconstructAlgorithmFixture.h"
-
-#include "cxtestReconstructManagerFixture.h"
-#include "cxtestReconstructRealData.h"
-
 namespace cxtest
 {
-
-
 
 TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][synthetic][ca_rec6][ca_rec]")
 {
 	ReconstructManagerTestFixture fixture;
+	fixture.setVerbose(true);
 
-	ReconstructAlgorithmFixture algoFixture;
-	algoFixture.setOverallBoundsAndSpacing(100, 5);
-//	algoFixture.setOverallBoundsAndSpacing(100, 0.2);
-	algoFixture.setVerbose(true);
-	algoFixture.setSpherePhantom();
-	cx::USReconstructInputData input = algoFixture.generateSynthetic_USReconstructInputData();
+	SyntheticReconstructInputPtr input(new SyntheticReconstructInput);
+	input->setOverallBoundsAndSpacing(100, 5);
+//	input->setOverallBoundsAndSpacing(100, 0.2);
+	input->setSpherePhantom();
+	cx::USReconstructInputData inputData = input->generateSynthetic_USReconstructInputData();
 
 	cx::ReconstructManagerPtr reconstructer = fixture.getManager();
-	reconstructer->selectData(input);
+	reconstructer->selectData(inputData);
 	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
 //	reconstructer->getParams()->mAngioAdapter->setValue(true);
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
@@ -81,12 +53,12 @@ TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][syntheti
 	// check validity of output:
 	REQUIRE(fixture.getOutput().size()==1);
 
-	SyntheticVolumeComparerPtr comparer = fixture.getComparerForOutput(algoFixture, 0);
+	SyntheticVolumeComparerPtr comparer = fixture.getComparerForOutput(input, 0);
 	comparer->checkRMSBelow(30.0);
 	comparer->checkCentroidDifferenceBelow(1);
 	comparer->checkMassDifferenceBelow(0.01);
 	// check the value in the sphere center:
-	comparer->checkValueWithin(algoFixture.getPhantom()->getBounds()/2, 200, 255);
+	comparer->checkValueWithin(input->getPhantom()->getBounds()/2, 200, 255);
 
 	if (comparer->getVerbose())
 	{
@@ -103,18 +75,17 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 	  *
 	  */
 	ReconstructManagerTestFixture fixture;
+	fixture.setVerbose(true);
 
-	ReconstructAlgorithmFixture algoFixture;
-	algoFixture.setOverallBoundsAndSpacing(100, 5);
-//	algoFixture.setOverallBoundsAndSpacing(100, 0.2);
-	algoFixture.setVerbose(true);
-	algoFixture.setSpherePhantom();
-	cx::USReconstructInputData input = algoFixture.generateSynthetic_USReconstructInputData();
+	SyntheticReconstructInputPtr input(new SyntheticReconstructInput);
+	input->setOverallBoundsAndSpacing(100, 5);
+	input->setSpherePhantom();
+	cx::USReconstructInputData inputData = input->generateSynthetic_USReconstructInputData();
 //	REQUIRE(!input.mFrames.empty());
 //	CHECK(input.mFrames[0]->);
 
 	cx::ReconstructManagerPtr reconstructer = fixture.getManager();
-	reconstructer->selectData(input);
+	reconstructer->selectData(inputData);
 	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
 	reconstructer->getParams()->mAngioAdapter->setValue(true);
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
@@ -127,12 +98,12 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 	// check validity of output:
 	REQUIRE(fixture.getOutput().size()==1);
 
-	SyntheticVolumeComparerPtr comparer = fixture.getComparerForOutput(algoFixture, 0);
+	SyntheticVolumeComparerPtr comparer = fixture.getComparerForOutput(input, 0);
 	comparer->checkRMSBelow(30.0);
 	comparer->checkCentroidDifferenceBelow(1);
 	comparer->checkMassDifferenceBelow(0.01);
 	// check the value in the sphere center:
-	comparer->checkValueWithin(algoFixture.getPhantom()->getBounds()/2, 200, 255);
+	comparer->checkValueWithin(input->getPhantom()->getBounds()/2, 200, 255);
 
 	if (comparer->getVerbose())
 	{

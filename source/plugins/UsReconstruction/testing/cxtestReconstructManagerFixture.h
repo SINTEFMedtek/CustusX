@@ -14,41 +14,9 @@
 #ifndef CXTESTRECONSTRUCTMANAGERFIXTURE_H
 #define CXTESTRECONSTRUCTMANAGERFIXTURE_H
 
-#include <QApplication>
-#include <vtkImageData.h>
 #include "sscReconstructManager.h"
-#include "sscImage.h"
-#include "sscPNNReconstructAlgorithm.h"
-#include "cxDataLocations.h"
-#include "cxDataManager.h"
-#include "sscReconstructPreprocessor.h"
-#include "sscReconstructParams.h"
-#include "cxTimedAlgorithm.h"
-#include "cxUSReconstructInputDataAlgoritms.h"
-#include "sscReconstructManager.h"
-#include "sscDataAdapter.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
-#include <sscBoolDataAdapterXml.h>
-
-
-#include "recConfig.h"
-#ifdef SSC_USE_OpenCL
-	#include "TordReconstruct/TordTest.h"
-  #include "TordReconstruct/cxSimpleSyntheticVolume.h"
-#endif // SSC_USE_OpenCL
-
-
-#include "catch.hpp"
-
-#include "cxtestUtilities.h"
-#include "sscUSFrameData.h"
-#include "sscDummyTool.h"
-#include "cxImageDataContainer.h"
-#include "cxUsReconstructionFileMaker.h"
-
-#include "cxtestSphereSyntheticVolume.h"
-#include "cxtestReconstructAlgorithmFixture.h"
+#include "cxtestSyntheticVolumeComparer.h"
+#include "cxtestSyntheticReconstructInput.h"
 
 namespace cxtest
 {
@@ -70,12 +38,16 @@ public:
 	void reconstruct();	///< run the reconstruction in the main thread
 	void threadedReconstruct();
 	std::vector<cx::ImagePtr> getOutput();
-	SyntheticVolumeComparerPtr getComparerForOutput(ReconstructAlgorithmFixture& algoFixture, int index);
+	SyntheticVolumeComparerPtr getComparerForOutput(SyntheticReconstructInputPtr input, int index);
 	void setPNN_InterpolationSteps(int value);
+
+	void setVerbose(bool val) { mVerbose = val; }
+	bool getVerbose() const { return mVerbose; }
 
 private:
 	cx::ReconstructManagerPtr mManager;
 	std::vector<cx::ImagePtr> mOutput; // valid after (threaded)reconstruct() has been run
+	bool mVerbose;
 };
 
 
