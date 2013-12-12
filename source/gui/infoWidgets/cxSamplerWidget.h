@@ -41,18 +41,16 @@ public:
 
 	virtual QString defaultWhatsThis() const;
 private slots:
-	void setModified2();
 	void spacesChangedSlot();
 	void toggleAdvancedSlot();
 protected:
 	void prePaintEvent();
 private:
 	void showAdvanced();
-	QHBoxLayout* mLayout;
 
+	QHBoxLayout* mLayout;
 	StringDataAdapterXmlPtr mSpaceSelector;
 	CoordinateSystemListenerPtr mListener;
-//    Vector3DDataAdapterXmlPtr mCoordinate;
 	DominantToolProxyPtr mActiveTool;
 	QLineEdit* mCoordLineEdit;
 	QAction* mAdvancedAction;

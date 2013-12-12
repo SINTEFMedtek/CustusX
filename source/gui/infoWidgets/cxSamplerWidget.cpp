@@ -16,7 +16,6 @@
 #include "sscCoordinateSystemHelpers.h"
 #include <vtkImageData.h>
 #include "cxToolManager.h"
-//#include "sscDataManager.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscTypeConversions.h"
 #include "cxSettings.h"
@@ -33,20 +32,12 @@ SamplerWidget::SamplerWidget(QWidget* parent) :
 	mActiveTool = DominantToolProxy::New();
 	connect(mActiveTool.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(setModified()));
 	connect(mActiveTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), SLOT(setModified()));
-//	connect(mActiveTool.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(setModified2()));
-//	connect(mActiveTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), SLOT(setModified2()));
 	connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(spacesChangedSlot()));
 	connect(toolManager(), SIGNAL(configured()), this, SLOT(spacesChangedSlot()));
 
 	mLayout = new QHBoxLayout(this);
 	mLayout->setMargin(4);
 	mLayout->setSpacing(4);
-
-//	QString value;// = qstring_cast(mData->getFrame());
-//    std::vector<CoordinateSystem> spaces = SpaceHelpers::getAvailableSpaces(true);
-//    QStringList range;
-//    for (unsigned i=0; i<spaces.size(); ++i)
-//      range << spaces[i].toString();
 
 	mAdvancedAction = this->createAction(this,
 	                                     QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
@@ -112,17 +103,11 @@ void SamplerWidget::showAdvanced()
 	mAdvancedWidget->setVisible(on);
 }
 
-void SamplerWidget::setModified2()
-{
-//	std::cout << "SamplerWidget::setModified2()" << std::endl;
-}
-
 void SamplerWidget::spacesChangedSlot()
 {
 	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
 	settings()->setValue("sampler/Space", space.toString());
 
-//	QString value;// = qstring_cast(mData->getFrame());
 	std::vector<CoordinateSystem> spaces = SpaceHelpers::getSpacesToPresentInGUI();
 	QStringList range;
 	for (unsigned i=0; i<spaces.size(); ++i)
@@ -135,18 +120,15 @@ void SamplerWidget::spacesChangedSlot()
 
 void SamplerWidget::prePaintEvent()
 {
-//	std::cout << "SamplerWidget::prePaintEvent()" << std::endl;
 	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
 	Vector3D p = SpaceHelpers::getDominantToolTipPoint(space, true);
 	int w=1;
-//	mCoordLineEdit->setText(qstring_cast(p));
 	QString coord = QString("%1, %2, %3").arg(p[0], w, 'f', 1).arg(p[1], w, 'f', 1).arg(p[2], w, 'f', 1);
 
 	ImagePtr image = dataManager()->getActiveImage();
 	if (image)
 	{
 		Vector3D p = SpaceHelpers::getDominantToolTipPoint(Space(csDATA_VOXEL,"active"), true);
-//		void* ptr = image->getBaseVtkImageData()->GetScalarPointer(p.begin());
 		IntBoundingBox3D bb(Eigen::Vector3i(0,0,0),
 		                         Eigen::Vector3i(image->getBaseVtkImageData()->GetDimensions())-Eigen::Vector3i(1,1,1));
 		if (bb.contains(p.cast<int>()))
