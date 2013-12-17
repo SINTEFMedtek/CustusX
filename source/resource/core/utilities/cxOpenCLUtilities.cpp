@@ -6,12 +6,12 @@
 #include <vector>
 #include <iostream>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/format.hpp>
 #include <QString>
 
 namespace cx
 {
-//================================================================================================================
-//================================================================================================================
 
 /**
  *  See clCreateContextFromType doc for more
@@ -285,61 +285,34 @@ char* OpenCLUtilities::file2string(const char* filename, size_t * final_length) 
 
 void OpenCLInfo::printPlatformAndDeviceInfo()
 {
-	//Based on:
-	//https://devtalk.nvidia.com/default/topic/498968/printing-all-opencl-devices-not-detecting-all-opencl-devices-under-windows/
+	VECTOR_CLASS<cl::Platform> platforms;
+	cl::Platform::get(&platforms);
 
-	cl_platform_id platformIds[MAX_NUMBER_OF_PLATFORMS];	//an array to hold the IDs of all the platforms, hopefuly there won't be more than 32
-	cl_uint numOfPlatforms;									//this number will hold the number of platforms on this machine
-	cl_device_id devices[MAX_NUMBER_OF_DEVICES];			//this variable holds the number of devices for each platform, hopefully it won't be more than 32 per platform
-	cl_uint numOfDevices;									//this number will hold the number of devices on this machine
+	VECTOR_CLASS<cl::Device> devices;
+    for(unsigned int i = 0; i < platforms.size(); i++)
+    {
+    	printPlatformInfo(platforms[i]);
 
-	printf("\n============================   OpenCL   ============================\n\n");
+		platforms[i].getDevices(CL_DEVICE_TYPE_ALL, &devices);
 
-	unsigned int indent = 1;
-	clGetPlatformIDs (MAX_NUMBER_OF_DEVICES, platformIds, &numOfPlatforms);
-	printf("\nNumber of platforms:\t%u\n\n", numOfPlatforms);
-
-	for(unsigned int i = 0; i < numOfPlatforms; i++)
-	{
-		printf("Platform:\t\t%u\n\n", i);
-		printPlatformInfo(platformIds[i], indent);
-
-		clGetDeviceIDs (platformIds[i], CL_DEVICE_TYPE_ALL, sizeof(devices), devices, &numOfDevices);
-		printf("\tNumber of devices:\t%u\n\n", numOfDevices);
-
-		for(unsigned int j = 0; j < numOfDevices; j++)
-		{
-			printf("\tDevice: %u\n", j);
-			printDeviceInfo(devices[j], indent+1, true);
-		}
-	}
-	printf("\n====================================================================\n\n");
+		for(unsigned int j = 0; j < devices.size(); j++)
+			printDeviceInfo(devices[j]);
+    }
+    std::cout << "\n";
+    print("Number of platforms", platforms.size());
+    print("Number of devices", devices.size());
+    std::cout << "\n";
 }
 
-void OpenCLInfo::printPlatformInfo(cl_platform_id platform, unsigned int indentTimes)
+void OpenCLInfo::printPlatformInfo(cl::Platform platform)
 {
-	char platformVendor[MAX_CHAR_LENGTH];
-	char platformName[MAX_CHAR_LENGTH];
-	char platformExtensions[MAX_CHAR_LENGTH];
-	char platformVersion[MAX_CHAR_LENGTH];
-	char platformProfile[MAX_CHAR_LENGTH];
-
-	clGetPlatformInfo (platform, CL_PLATFORM_VENDOR, sizeof(platformVendor), &platformVendor, NULL);
-	clGetPlatformInfo (platform, CL_PLATFORM_NAME, sizeof(platformName), &platformName, NULL);
-	clGetPlatformInfo (platform, CL_PLATFORM_EXTENSIONS, sizeof(platformExtensions), &platformExtensions, NULL);
-	clGetPlatformInfo (platform, CL_PLATFORM_VERSION, sizeof(platformVersion), &platformVersion, NULL);
-	clGetPlatformInfo (platform, CL_PLATFORM_PROFILE, sizeof(platformProfile), &platformProfile, NULL);
-
-	const char* indent = getIndentation(indentTimes).c_str();
-	printf("%s--- PlatformInfo ---\n", indent);
-	printf("%sName:\t\t\t%s\n", indent, platformName);
-	printf("%sVendor:\t\t\t%s\n", indent, platformVendor);
-	printf("%sVersion:\t\t%s\n", indent, platformVersion);
-	printf("%sProfil:\t\t\t%s\n", indent, platformProfile);
-	printf("%sExtensions:\n", indent);
-	printCharList(platformExtensions, " ", getIndentation(indentTimes+1).c_str());
-
-	printf("\n");
+	print("--- PlatformInfo ---", "");
+	print("Name", platform.getInfo<CL_PLATFORM_NAME>());
+	print("Vendor", platform.getInfo<CL_PLATFORM_VENDOR>());
+	print("Version", platform.getInfo<CL_PLATFORM_VERSION>());
+	print("Profile", platform.getInfo<CL_PLATFORM_PROFILE>());
+	print("Extensions", "");
+	printStringList(platform.getInfo<CL_PLATFORM_EXTENSIONS>());
 }
 
 void OpenCLInfo::printDeviceInfo(cl_device_id device, unsigned int indentTimes, bool verbose)
@@ -456,6 +429,18 @@ void OpenCLInfo::printDeviceInfo(cl_device_id device, unsigned int indentTimes, 
 
 	printf("%sExtensions:\n", indent);
 	printCharList(deviceExtensions, " ", getIndentation(indentTimes+1).c_str());
+}
+
+void OpenCLInfo::printDeviceInfo(cl::Device device)
+{
+	print("--- DeviceInfo ---", "");
+	print("Name", device.getInfo<CL_DEVICE_NAME>());
+	print("Vendor", device.getInfo<CL_DEVICE_VENDOR>());
+	print("Vendor id", device.getInfo<CL_DEVICE_VENDOR_ID>());
+	print("Device supports", device.getInfo<CL_DEVICE_VERSION>());
+	print("Graphics card driver", device.getInfo<CL_DRIVER_VERSION>());
+	print("Available", (device.getInfo<CL_DEVICE_AVAILABLE>() ? "Yes" : "No"));
+	//std::cout << "Highest version can compile: " << device.getInfo<CL_DEVICE_OPENCL_C_VERSION>() << std::endl;
 }
 
 void OpenCLInfo::printContextInfo(cl_context context, unsigned int indentTimes)
@@ -683,6 +668,27 @@ void OpenCLInfo::printCharList(const char* list, const char* separator, const ch
 	std::vector<std::string>::iterator it;
 	for(it = strings.begin(); it != strings.end(); ++it)
 		printf("%s%s\n", indentation, (*it).c_str());
+}
+
+void OpenCLInfo::printStringList(std::string list, std::string separator)
+{
+	std::vector<std::string> strings;
+	boost::split(strings, list, boost::is_any_of(std::string(separator)));
+	std::vector<std::string>::iterator it;
+	for(it = strings.begin(); it != strings.end(); ++it)
+		print("", (*it));
+}
+
+void OpenCLInfo::print(std::string name, std::string value, int indents)
+{
+	std::string stringIndents = getIndentation(indents);
+	std::cout << stringIndents << boost::format("%-30s %-20s\n") % name % value;
+}
+
+void OpenCLInfo::print(std::string name, int value, int indents)
+{
+	std::string stringValue = boost::lexical_cast<std::string>(value);
+	print(name, stringValue, indents);
 }
 
 std::string OpenCLInfo::getIndentation(unsigned int numberOfIndents)
