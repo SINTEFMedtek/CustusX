@@ -80,7 +80,7 @@ private:
   QTcpSocket* mSocket; ///< The socket to send messages to.
 
   QMutex mImageMutex; ///< A lock for making the class threadsafe
-  size_type mMaxqueueInfo;
+	size_t mMaxqueueInfo;
   int mMaxBufferSize;
   std::list<IGTLinkImageMessage::Pointer> mMutexedImageMessageQueue; ///< A threasafe internal queue
 
