@@ -54,6 +54,7 @@
 #include "cxConfig.h"
 #include "cxVLCRecorder.h"
 #include "cxSecondaryViewLayoutWindow.h"
+#include "cxRegistrationHistoryWidget.h"
 
 namespace cx
 {
@@ -978,6 +979,11 @@ void MainWindow::createToolBars()
 	toolOffsetToolBar->setObjectName("ToolOffsetToolBar");
 	toolOffsetToolBar->addWidget(createDataWidget(this, DoubleDataAdapterActiveToolOffset::create()));
 	this->registerToolBar(toolOffsetToolBar, "Toolbar");
+
+	QToolBar* registrationHistoryToolBar = addToolBar("Registration History");
+	registrationHistoryToolBar->setObjectName("RegistrationHistoryToolBar");
+	registrationHistoryToolBar->addWidget(new RegistrationHistoryWidget(this, true));
+	this->registerToolBar(registrationHistoryToolBar, "Toolbar");
 }
 
 void MainWindow::registerToolBar(QToolBar* toolbar, QString groupname)

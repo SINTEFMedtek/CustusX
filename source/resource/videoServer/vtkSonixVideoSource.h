@@ -233,6 +233,7 @@ protected:
   void DoFormatSetup();
   void calculateSpacingAndOrigin();///< Calculate spacing and origin when needed (for each frame?)
   void UpdateFrameBufferExtent(uROI roi);///< Calculate FrameBufferExtent from roi and FrameSize
+  void ResetFrameBufferExtent();
 
   // Description:
   // For internal use only

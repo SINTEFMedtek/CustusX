@@ -11,7 +11,6 @@
 #include <QScrollBar>
 #include <QTouchEvent>
 
-#include <QToolButton>
 #include <QAction>
 #include <QRadialGradient>
 #include "vtkRenderer.h"
@@ -38,9 +37,7 @@ TrackPadWidget::TrackPadWidget(QWidget* parent) :
   mMinPadSize = QSize(50,50);
   mMinBarSize = QSize(20,50);
 
-  //layout
   mTopLayout = new QVBoxLayout(this);
-  //toptopLayout->setMargin(0);
 
   this->createStandard3DViewActions();
   this->definePanLayout();
@@ -77,15 +74,11 @@ void TrackPadWidget::defineRotateLayout()
   group->setLayout(layout);
 
   MousePadWidget* rotateWidget = new MousePadWidget(this, mMinPadSize);
-//  rotateWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-//  rotateWidget->setLineWidth(3);
   connect(rotateWidget, SIGNAL(mouseMoved(QPointF)), this, SLOT(rotateXZSlot(QPointF)));
   layout->addWidget(rotateWidget, 4);
 
   MousePadWidget* rotateYWidget = new MousePadWidget(this, mMinBarSize);
   rotateYWidget->setFixedXPos(true);
-//  rotateYWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-//  rotateYWidget->setLineWidth(3);
   connect(rotateYWidget, SIGNAL(mouseMoved(QPointF)), this, SLOT(rotateYSlot(QPointF)));
   layout->addWidget(rotateYWidget, 1);
 }
@@ -102,15 +95,11 @@ void TrackPadWidget::definePanLayout()
   group->setLayout(panLayout);
 
   MousePadWidget* panWidget = new MousePadWidget(this, mMinPadSize);
-//  panWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-//  panWidget->setLineWidth(3);
   connect(panWidget, SIGNAL(mouseMoved(QPointF)), this, SLOT(panXZSlot(QPointF)));
   panLayout->addWidget(panWidget, 4);
 
   MousePadWidget* dollyWidget = new MousePadWidget(this, mMinBarSize);
   dollyWidget->setFixedXPos(true);
-//  dollyWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-//  dollyWidget->setLineWidth(3);
   connect(dollyWidget, SIGNAL(mouseMoved(QPointF)), this, SLOT(dollySlot(QPointF)));
   panLayout->addWidget(dollyWidget, 1);
 }

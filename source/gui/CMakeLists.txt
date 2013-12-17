@@ -43,6 +43,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	infoWidgets/cxSamplerWidget
 	infoWidgets/cxFrameMetricWrapper
     infoWidgets/cxToolMetricWrapper
+    infoWidgets/cxRegistrationHistoryWidget
     #----------------------
 	navigationWidgets/cxNavigationWidget
 	navigationWidgets/cxTrackPadWidget

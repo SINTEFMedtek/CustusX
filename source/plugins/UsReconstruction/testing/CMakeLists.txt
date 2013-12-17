@@ -21,6 +21,8 @@ if (BUILD_TESTING)
 	#QT4_WRAP_CPP(CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES
 	#	)
 	set(CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES ${CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES}
+		cxtestReconstructManagerFixture.h
+		cxtestReconstructManagerFixture.cpp
 		cxtestReconstructManager.cpp
 		cxtestReconstructAlgorithm.cpp
 		cxtestReconstructAlgorithmFixture.h
@@ -29,6 +31,10 @@ if (BUILD_TESTING)
 		cxtestSyntheticVolumeComparer.cpp
 		cxtestSphereSyntheticVolume.h
 		cxtestSphereSyntheticVolume.cpp
+		cxtestReconstructRealData.h
+		cxtestReconstructRealData.cpp
+		cxtestSyntheticReconstructInput.h
+		cxtestSyntheticReconstructInput.cpp
 		)
 	cx_catch_add_lib_and_exe(cxPluginUSReconstruction "${CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
 
