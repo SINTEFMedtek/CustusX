@@ -18,6 +18,7 @@
 #include "sscReconstructAlgorithm.h"
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #include "cxtestSyntheticVolumeComparer.h"
+#include "cxtestSyntheticReconstructInput.h"
 
 namespace cxtest
 {
@@ -42,15 +43,7 @@ public:
 
 	void setAlgorithm(cx::ReconstructAlgorithmPtr algorithm);
 	void defineOutputVolume(double bounds, double spacing);
-	void defineProbeMovementNormalizedTranslationRange(double range);
-	void defineProbeMovementAngleRange(double range);
-	void defineProbeMovementSteps(int steps);
-	void defineProbe(cx::ProbeDefinition probe);
 	void setOverallBoundsAndSpacing(double size, double spacing);
-
-	void setBoxAndLinesPhantom();
-	void setSpherePhantom();
-	void setWireCrossPhantom();
 
 	void reconstruct(QDomElement root);
 
@@ -63,38 +56,22 @@ public:
 
 	void setVerbose(bool val) { mVerbose = val; }
 	bool getVerbose() const { return mVerbose; }
-	cx::cxSyntheticVolumePtr getPhantom() { return mPhantom; }
+	cx::cxSyntheticVolumePtr getPhantom() { return mInputGenerator->getPhantom(); }
 
-	cx::USReconstructInputData generateSynthetic_USReconstructInputData();
+	SyntheticReconstructInputPtr getInputGenerator() { return mInputGenerator; }
 
 private:
-	std::vector<cx::Transform3D> generateFrames_rMt_tilted();
 	void generateInput();
 	void generateOutputVolume();
 	void printConfiguration();
-//	double getRMS();
 	cx::ImagePtr createOutputVolume(QString name);
-//	cx::ImagePtr getNominalOutputImage();
-
-	/** Generate a sequence of planes using the input definition.
-	  * The planes work around p0, applying translation and rotation
-	  * simultaneously.
-	  */
-	std::vector<cx::Transform3D> generateFrames(cx::Vector3D p0,
-												cx::Vector3D range_translation,
-												double range_angle,
-												cx::Vector3D rotation_axis,
-												int steps);
 
 	cx::ReconstructAlgorithmPtr mAlgorithm;
-	cx::cxSyntheticVolumePtr mPhantom;
 	cx::ProcessedUSInputDataPtr mInputData;
 	cx::ImagePtr mOutputData;
 	bool mVerbose;
-//	cx::Transform3D m_dMr;
 
 	// setup parameters
-	cx::Vector3D mBounds;
 	struct OutputVolumeType
 	{
 		cx::Vector3D mBounds;
@@ -102,20 +79,10 @@ private:
 	};
 	OutputVolumeType mOutputVolumeDefinition;
 
-	cx::ProbeDefinition mProbe;
-
-	struct ProbeMovement
-	{
-		cx::Vector3D mRangeNormalizedTranslation;
-		double mRangeAngle;
-		double mSteps;
-	};
-	ProbeMovement mProbeMovementDefinition;
-
 	// cached values
-//	cx::ImagePtr mNominalOutputImage;
 	SyntheticVolumeComparerPtr getComparer();
 	SyntheticVolumeComparerPtr mComparer;
+	SyntheticReconstructInputPtr mInputGenerator;
 };
 
 } // namespace cxtest
