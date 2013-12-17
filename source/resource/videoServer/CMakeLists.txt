@@ -150,7 +150,7 @@ SET ( cxOpenIGTLinkServer_FILES
 		vtkSonixVideoSource.cxx
 		vtkUltrasoundWin32Header.h
 		cxFrame.h
-		sonixHelper.h
+		SonixHelper.h
 		
 		cxtestSender.h
 		cxtestSender.cpp
