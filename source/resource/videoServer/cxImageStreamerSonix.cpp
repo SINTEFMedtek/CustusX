@@ -259,13 +259,13 @@ IGTLinkUSStatusMessage::Pointer ImageStreamerSonix::getFrameStatus(Frame& frame)
 	  retval->SetDepthEnd((depthStart + frame.mImagingDepth) * depthEndReductionFactor);
   }
 
-  retval->SetDeviceName(createDeviceName(frame.probeName).c_str());
+  retval->SetDeviceName(createDeviceName().c_str());
   return retval;
 }
 
-std::string ImageStreamerSonix::createDeviceName(std::string probeName)
+std::string ImageStreamerSonix::createDeviceName()
 {
-	std::string retval = "Sonix_" + probeName + "[BGRX]";
+	std::string retval = "Sonix[BGRX]";
 	return retval;
 }
 
@@ -282,7 +282,7 @@ IGTLinkImageMessage::Pointer ImageStreamerSonix::convertFrame(Frame& frame)
   retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);
   //std::cout << "Frame spacing: " << frame.mSpacing[0] << " " << frame.mSpacing[1] << std::endl;
   retval->SetScalarType(frame.mPixelFormat); //Use frame.mPixelFormat directly
-  retval->SetDeviceName(createDeviceName(frame.probeName).c_str());
+  retval->SetDeviceName(createDeviceName().c_str());
 
   retval->SetSubVolume(size,offset);
   retval->AllocateScalars();
