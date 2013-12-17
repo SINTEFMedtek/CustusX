@@ -90,8 +90,9 @@ class CustusXInstaller:
         '''
         PrintFormatter.printInfo('Removing local git tags ...')
         shell.changeDir(self.source_path)
-        shell.run('git tag -l | xargs git tag -d')
-        shell.run('git fetch')
+        #shell.run('git tag -l | xargs git tag -d') no good on windows
+        #shell.run('git fetch')
+        shell.run('git fetch origin --prune --tags')
         
     def _getDateString(self):
         return '%s' % datetime.date.today().isoformat()
