@@ -9,6 +9,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <QString>
+#include "sscMessageManager.h"
 
 namespace cx
 {
@@ -21,25 +22,44 @@ void CL_CALLBACK clCreateContextFromType_error_callback(const char *errinfo, con
 	std::cout << "ERROR: From clCreateContextFromType() callback: "<< errinfo << std::endl;
 }
 
+OpenCL::ocl_context* OpenCL::init(QString processorType)
+{
+	OpenCL::ocl_context* retval = new OpenCL::ocl_context;
+
+	VECTOR_CLASS<cl::Platform> platforms;
+	cl::Platform::get(&platforms);
+
+	if(platforms.size() != 1)
+		messageManager()->sendWarning("Found more than one OpenCL platform.");
+
+ 	cl_device_type deviceType = (processorType == "GPU") ? CL_DEVICE_TYPE_GPU : CL_DEVICE_TYPE_CPU;
+
+	VECTOR_CLASS<cl::Device> devices;
+	//autoselect platform 0
+	cl::Platform selectedPlatform = platforms[0];
+	selectedPlatform.getDevices(deviceType, &devices);
+
+	if(devices.size() != 1)
+		messageManager()->sendWarning("Found more than one OpenCL device.");
+
+	//autoselect the first device
+	cl::Device selectedDevice = devices[0];
+
+	//TODO
+	retval->device = selectedDevice();
+	cl_context_properties cps[3] =
+	{ CL_CONTEXT_PLATFORM, (cl_context_properties) selectedPlatform, 0 };
+	retval->context = cl::Context(deviceType, cps)();
+	retval->cmd_queue = cl::CommandQueue(retval->context, retval->device)();
+
+	return retval;
+}
+
 OpenCL::ocl_context* OpenCL::ocl_init(QString processor)
 {
 	cl_int err;
 
 	OpenCL::ocl_context* retval = new OpenCL::ocl_context;
-
-	/* // Old way:
-	 context = clCreateContextFromType(0, CL_DEVICE_TYPE_GPU, 0, 0, &err);
-	 ocl_check_error(err, "clCreateContextFromType");
-	 size_t context_descriptor_size;
-	 clGetContextInfo(context, CL_CONTEXT_DEVICES, 0, 0, &context_descriptor_size);
-	 cl_device_id * devices = (cl_device_id *) malloc(context_descriptor_size);
-	 clGetContextInfo(context, CL_CONTEXT_DEVICES, context_descriptor_size, devices, 0);
-	 device = devices[0];
-	 */
-
-	// New way:
-	//clGetDeviceIDs(NULL, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
-	//context = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
 
 	// AMD way:
 	cl_platform_id platforms[10];
