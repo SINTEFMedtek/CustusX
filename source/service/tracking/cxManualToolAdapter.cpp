@@ -91,4 +91,14 @@ std::map<int, Vector3D> ManualToolAdapter::getReferencePoints() const
 	return mBase->getReferencePoints();
 }
 
+double ManualToolAdapter::getTooltipOffset() const
+{
+	return mBase->getTooltipOffset();
+}
+
+void ManualToolAdapter::setTooltipOffset(double val)
+{
+	mBase->setTooltipOffset(val);
+}
+
 }
