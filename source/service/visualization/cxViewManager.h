@@ -34,8 +34,8 @@ class QTime;
 
 namespace cx
 {
-class LayoutData;
-class LayoutRegion;
+struct LayoutData;
+struct LayoutRegion;
 class LayoutWidget;
 class ViewWrapper;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
