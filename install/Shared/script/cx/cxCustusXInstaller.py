@@ -26,6 +26,7 @@ import cxComponentAssembly
 import shlex
 #import cxTestRunner
 import cxUtilities
+import cxSSH
 import datetime
 
 class CustusXInstaller:
@@ -90,8 +91,9 @@ class CustusXInstaller:
         '''
         PrintFormatter.printInfo('Removing local git tags ...')
         shell.changeDir(self.source_path)
-        shell.run('git tag -l | xargs git tag -d')
-        shell.run('git fetch')
+        #shell.run('git tag -l | xargs git tag -d') no good on windows
+        #shell.run('git fetch')
+        shell.run('git fetch origin --prune --tags')
         
     def _getDateString(self):
         return '%s' % datetime.date.today().isoformat()
@@ -163,13 +165,14 @@ class CustusXInstaller:
         remoteServer = "medtek.sintef.no"
         remoteServerPath = "/Volumes/MedTekDisk/Software/CustusX/AutomatedReleases"
         targetFolder = os.path.split(path)[1]
-        source = '%s/*' % path
+#        source = '%s/*' % path
         target = '%s/%s/%s' % (remoteServerPath, targetFolder, self._getUserFriendlyPlatformName())
-        cmd1 = 'ssh %s "mkdir -p %s"' % (remoteServer, target)
-        cmd2 = 'scp -r %s/* %s:%s' % (path, remoteServer, target)
+ #       cmd1 = 'ssh %s "mkdir -p %s"' % (remoteServer, target)
+ #       cmd2 = 'scp -r %s/* %s:%s' % (path, remoteServer, target)
         PrintFormatter.printInfo('Publishing contents of [%s] to remote path [%s]' % (path, target))
-        shell.run(cmd1)
-        shell.run(cmd2)
+#        shell.run(cmd1)
+#        shell.run(cmd2)
+        cxSSH.copyFolderContentsToRemoteServer(remoteServer, path, target);
         
     def _getUserFriendlyPlatformName(self):
         'generate a platform name understandable for users.'

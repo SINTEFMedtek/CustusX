@@ -14,6 +14,33 @@ import os
 import os.path
 import platform
 import sys
+import importlib
+
+
+def try_module_import(module):
+    '''
+    Use for modules not bundled with the standard Python installation.
+    This function attempts to load it, and outputs a howto
+    it the load fails.
+    
+    The module is returned. Assign it to a 
+    local variable in order to use it!
+    '''
+    try:
+        i = importlib.import_module(module)
+        #import module
+        return i
+    except ImportError:
+        print "Error: Module %s not found." % module
+        if platform.system() == 'Darwin':
+            print "Try to install %s using:" % module
+            print "    sudo easy_install pip"
+            print "    sudo pip install %s" % module
+        elif platform.system() == 'Linux':
+            print "Try to install %s using:" % module
+            print "    sudo apt-get install -y python-pip libxml2-dev libxslt-dev"
+            print "    sudo easy_install %s" % module
+        raise
 
 def try_lxml_import():
     '''
@@ -38,6 +65,9 @@ def try_lxml_import():
 			print "    sudo apt-get install -y python-pip libxml2-dev libxslt-dev"
 			print "    sudo easy_install lxml"
         raise
+
+def try_paramiko_import():
+    return try_module_import('paramiko')
     
     
 def writeToNewFile(filename, text):
