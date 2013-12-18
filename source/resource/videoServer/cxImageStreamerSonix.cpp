@@ -17,9 +17,13 @@
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
 #include "vtkMetaImageWriter.h"
-
+#include "cxSonixProbeFileReader.h"
 
 #include "vtkSonixVideoSource.h"
+
+#include "cxDataLocations.h"
+#include "cxSonixProbeFileReader.h"
+//#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -212,39 +216,57 @@ void ImageStreamerSonix::receiveFrameSlot(Frame& frame)
 IGTLinkUSStatusMessage::Pointer ImageStreamerSonix::getFrameStatus(Frame& frame)
 {
   IGTLinkUSStatusMessage::Pointer retval = IGTLinkUSStatusMessage::New();
-  //retval->SetOrigin(); //Origin is set in IGTLinkImageMessage
-//  retval->SetWidth();
-//  retval->SetType();
 
-//  retval->SetROI(frame.ulx, frame.uly, frame.urx, frame.ury, frame.brx, frame.bry, frame.blx, frame.bly);
-
-  //TODO: Only dummy values. Calculate real values
   retval->SetOrigin(frame.mOrigin[0], frame.mOrigin[1], 0);
-  retval->SetProbeType(2); 		// 1 = sector, 2 = linear
-//  retval->SetDepthStart(10.0);// Start of sector in mm from origin
-//  retval->SetDepthEnd(40.0);	// End of sector in mm from origin
-//  retval->SetWidth(30.0);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
-  retval->SetDepthStart((frame.uly-frame.mOrigin[1]) * frame.mSpacing[1]);// Start of sector in mm from origin
-  retval->SetDepthEnd((frame.bly-frame.mOrigin[1]) * frame.mSpacing[1]);	// End of sector in mm from origin
-  //As ROI is a bit wide we subtract the width by 0.3 mm
-  retval->SetWidth((frame.urx -  frame.ulx ) * frame.mSpacing[0] - 0.3);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
-  retval->SetDeviceName("Sonix[BGRX]"); // TODO write something useful here
 
-  //std::cout << "uly: " << frame.uly << " bly: " << frame.bly << std::endl;
-  //std::cout << "spacing: " << frame.mSpacing[0] << "  " << frame.mSpacing[1] << std::endl;
-//  std::cout << "Origin: " << frame.mOrigin[0] << " " << frame.mOrigin[1] << " " << std::endl;
-//  std::cout << "Probetype: " << retval->GetProbeType() << std::endl;
-//  std::cout << "Depth start: " << retval->GetDepthStart();
-//  std::cout << " end: " << retval->GetDepthEnd();
-//  std::cout << " width: " << retval->GetWidth() << std::endl;
-  //  retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);
-  //std::cout << "Spacing: " << frame.mSpacing[0] << ", " << frame.mSpacing[1] << std::endl;
+  //std::cout << "Received probe name: " << frame.probeName << std::endl;
 
-  //double spacing[3];
-  //retval->GetSpacing(spacing);
-  //std::cout << "Spacing2: " << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << std::endl;
+  //Path to probes.xml on on ultrasonix scanner:
+  QString probeFile = "C:/Program Files/Ultrasonix/Exam/config/probes.xml";
+  //QString probeFile = cx::DataLocations::getRootConfigPath() + "/ultrasonix/probes.xml";
+  cx::SonixProbeFileReader reader(probeFile);
+  if(!reader.init())
+  {
+	  std::cout << "Failed to initialize probe xml reader" << std::endl;
+	  return retval;
+  }
+  QDomNode probeNode = reader.getProbeNode(frame.probeName.c_str());
+  long radius = reader.getProbeParam(probeNode, "radius") / 1000; //microns -> mm
+  long probeLenght = reader.getProbeLenght(probeNode) / 1000; //microns -> mm
+  double probeWidth;
 
+  double widthReductionFactor = 0.98;
+  if(frame.mSectorSizeInPercent <= 100)
+	  probeWidth = probeLenght * frame.mSectorSizeInPercent / 100.0 * widthReductionFactor;
+  else
+	  probeWidth = probeLenght;
+
+  if(reader.isProbeLinear(probeNode))
+  {
+	  retval->SetProbeType(2);
+	  retval->SetDepthStart((frame.uly-frame.mOrigin[1]) * frame.mSpacing[1]);// Start of sector in mm from origin
+	  retval->SetDepthEnd((frame.bly-frame.mOrigin[1]) * frame.mSpacing[1]);	// End of sector in mm from origin
+	  retval->SetWidth(probeWidth);
+  }
+  else // sector
+  {
+	  retval->SetProbeType(1);
+	  retval->SetWidth(probeWidth/radius);
+	  double depthStart = radius;
+	  double depthStartIncreaseFactor = 1.01;
+	  double depthEndReductionFactor = 0.99;
+	  retval->SetDepthStart(depthStart * depthStartIncreaseFactor);
+	  retval->SetDepthEnd((depthStart + frame.mImagingDepth) * depthEndReductionFactor);
+  }
+
+  retval->SetDeviceName(createDeviceName().c_str());
   return retval;
+}
+
+std::string ImageStreamerSonix::createDeviceName()
+{
+	std::string retval = "Sonix[BGRX]";
+	return retval;
 }
 
 IGTLinkImageMessage::Pointer ImageStreamerSonix::convertFrame(Frame& frame)
@@ -260,8 +282,8 @@ IGTLinkImageMessage::Pointer ImageStreamerSonix::convertFrame(Frame& frame)
   retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);
   //std::cout << "Frame spacing: " << frame.mSpacing[0] << " " << frame.mSpacing[1] << std::endl;
   retval->SetScalarType(frame.mPixelFormat); //Use frame.mPixelFormat directly
-//  retval->SetDeviceName("ImageStreamerSonix [BGRX]"); // TODO write something useful here
-  retval->SetDeviceName("Sonix[BGRX]"); // TODO write something useful here
+  retval->SetDeviceName(createDeviceName().c_str());
+
   retval->SetSubVolume(size,offset);
   retval->AllocateScalars();
 

@@ -19,7 +19,6 @@
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #include "catch.hpp"
 #include "sscPNNReconstructAlgorithm.h"
-#include "sscThunderVNNReconstructAlgorithm.h"
 #include "QFileInfo"
 #include "sscDummyTool.h"
 #include "TordReconstruct/TordTest.h"
@@ -27,6 +26,8 @@
 #include "sscMessageManager.h"
 
 #include "cxtestReconstructAlgorithmFixture.h"
+
+#include "cxOpenCLUtilities.h"
 
 namespace cxtest
 {
@@ -39,7 +40,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthe
 
 	fixture.setOverallBoundsAndSpacing(100, 5);
 	fixture.setVerbose(true);
-	fixture.setSpherePhantom();
+	fixture.getInputGenerator()->setSpherePhantom();
 
 	fixture.setAlgorithm(cx::PNNReconstructAlgorithm::create());
 	fixture.reconstruct(settings);
@@ -61,13 +62,15 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 	QDomElement settings = domdoc.createElement("PNN");
 
 	ReconstructAlgorithmFixture fixture;
-	fixture.defineProbeMovementSteps(40);
-	fixture.defineProbeMovementNormalizedTranslationRange(0.8);
-	fixture.defineProbeMovementAngleRange(M_PI/6);
-	fixture.defineOutputVolume(100, 2);
-	fixture.defineProbe(cx::DummyToolTestUtilities::createProbeDataLinear(100, 100, Eigen::Array2i(150,150)));
 	fixture.setVerbose(true);
-	fixture.setSpherePhantom();
+
+	SyntheticReconstructInputPtr generator = fixture.getInputGenerator();
+	generator->defineProbeMovementSteps(40);
+	generator->defineProbeMovementNormalizedTranslationRange(0.8);
+	generator->defineProbeMovementAngleRange(M_PI/6);
+	generator->defineProbe(cx::DummyToolTestUtilities::createProbeDataLinear(100, 100, Eigen::Array2i(150,150)));
+	generator->setSpherePhantom();
+	fixture.defineOutputVolume(100, 2);
 
 	fixture.setAlgorithm(cx::PNNReconstructAlgorithm::create());
 	fixture.reconstruct(settings);
@@ -98,30 +101,6 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 ////	fixture.saveOutputToFile("/Users/christiana/test/boxlines_rec.mhd");
 //}
 
-TEST_CASE("ReconstructAlgorithm: Thunder VNN on sphere","[unit][usreconstruction][synthetic][ca_rec3][ca_rec][not_amd_gpu]")
-{
-	ReconstructAlgorithmFixture fixture;
-
-	QDomDocument domdoc;
-	QDomElement settings = domdoc.createElement("ThunderVNN");
-
-	fixture.setOverallBoundsAndSpacing(100, 5);
-	fixture.setVerbose(true);
-	fixture.setSpherePhantom();
-
-	fixture.setAlgorithm(cx::ThunderVNNReconstructAlgorithm::create(""));
-	fixture.reconstruct(settings);
-
-	fixture.checkRMSBelow(20.0);
-	fixture.checkCentroidDifferenceBelow(1);
-	fixture.checkMassDifferenceBelow(0.01);
-
-	if (fixture.getVerbose())
-	{
-		fixture.saveOutputToFile("/Users/christiana/test/sphere_thvnn_rec.mhd");
-		fixture.saveNominalOutputToFile("/Users/christiana/test/sphere_thvnn_nom.mhd");
-	}
-}
 
 TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][tordtest][usreconstruction][hide][synthetic]")
 {
@@ -130,7 +109,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][tordtest][
 	ReconstructAlgorithmFixture fixture;
 
 	fixture.setOverallBoundsAndSpacing(100, 5);
-	fixture.setSpherePhantom();
+	fixture.getInputGenerator()->setSpherePhantom();
 	QDomDocument domdoc;
 	QDomElement settings = domdoc.createElement("TordTest");
 	boost::shared_ptr<cx::TordTest> algorithm(new cx::TordTest);

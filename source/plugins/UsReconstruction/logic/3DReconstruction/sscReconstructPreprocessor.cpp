@@ -25,7 +25,6 @@
 #include <QFileInfo>
 #include "sscDataManager.h"
 #include "sscToolManager.h"
-#include "sscThunderVNNReconstructAlgorithm.h"
 #include "sscPNNReconstructAlgorithm.h"
 #include "sscTime.h"
 #include "sscTypeConversions.h"

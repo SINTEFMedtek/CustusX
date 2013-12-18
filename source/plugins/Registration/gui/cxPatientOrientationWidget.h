@@ -39,18 +39,11 @@ public:
 private slots:
   void enableToolSampleButtonSlot();
   void setPatientOrientationSlot();
-//  void patientOrientationFrontFaceSlot();
-//  void patientOrientationBackFaceSlot();
 
 private:
   Transform3D get_tMtm() const;
   QPushButton* mPatientOrientationButton;
   QCheckBox* mInvertButton;
-
-//  QToolButton* mPatientOrientationFrontFaceButton;
-//  QToolButton* mPatientOrientationBackFaceButton;
-//  QAction* mPatientOrientationFrontFaceAction;
-//  QAction* mPatientOrientationBackFaceAction;
 
   DominantToolProxyPtr mDominantToolProxy;
 };

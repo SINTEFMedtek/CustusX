@@ -32,10 +32,11 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
   //mConfigFilesComboBox->setMinimumSize(200, 0);
   //mConfigFilesComboBox->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
-  mApplicationGroupBox = new SelectionGroupBox("Applications", stateService()->getApplication()->getAllApplicationNames(), true, NULL);
+  mApplicationGroupBox = new SelectionGroupBox("Applications", stateService()->getApplication()->getAllApplicationNames(), Qt::Vertical, true, NULL);
   mApplicationGroupBox->setEnabledButtons(false); //< application application is determined by the application state chosen elsewhere in the system
+  mApplicationGroupBox->hide(); // large and redundant box - info is only used for path generation, which can be found in the "Save Path" box
   mApplicationGroupBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
-  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", cxToolManager::getInstance()->getSupportedTrackingSystems(), true, NULL);
+  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", cxToolManager::getInstance()->getSupportedTrackingSystems(), Qt::Horizontal, true, NULL);
   mToolListWidget = new ConfigToolListWidget(NULL);
 
   this->setClinicalApplicationSlot(string2enum<CLINICAL_APPLICATION>(stateService()->getApplication()->getActiveStateName()));
@@ -47,17 +48,25 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
   toolLayout->addWidget(mToolListWidget);
 
   QGridLayout* layout = new QGridLayout(this);
-  layout->addWidget(new QLabel("Selected config: "), 0, 0, 1, 1);
-  layout->addWidget(mConfigFilesComboBox, 0, 1, 1, 1);
-  layout->addWidget(new QLabel("Save path: "), 1, 0, 1, 1);
-  layout->addWidget(mConfigFilePathLineEdit, 1, 1, 1, 1);
-  layout->addWidget(new QLabel("File name: "), 2, 0, 1, 1);
-  layout->addWidget(mConfigFileLineEdit, 2, 1, 1, 1);
-  layout->addWidget(mApplicationGroupBox, 3, 0, 1, 2);
-  layout->addWidget(mTrackingSystemGroupBox, 4, 0, 1, 2);
-  layout->addWidget(toolGroupBox, 5, 0, 1, 2);
-  layout->addWidget(new QLabel("Reference: "), 6, 0, 1, 1);
-  layout->addWidget(mReferenceComboBox, 6, 1, 1, 1);
+  int row=0;
+  layout->addWidget(new QLabel("Selected config: "), row, 0, 1, 1);
+  layout->addWidget(mConfigFilesComboBox, row, 1, 1, 1);
+  row++;
+  layout->addWidget(new QLabel("Save path: "), row, 0, 1, 1);
+  layout->addWidget(mConfigFilePathLineEdit, row, 1, 1, 1);
+  row++;
+  layout->addWidget(new QLabel("File name: "), row, 0, 1, 1);
+  layout->addWidget(mConfigFileLineEdit, row, 1, 1, 1);
+  row++;
+  layout->addWidget(mApplicationGroupBox, row, 0, 1, 2);
+  row++;
+  layout->addWidget(mTrackingSystemGroupBox, row, 0, 1, 2);
+  row++;
+  layout->addWidget(toolGroupBox, row, 0, 1, 2);
+  layout->setRowStretch(row, 1);
+  row++;
+  layout->addWidget(new QLabel("Reference: "), row, 0, 1, 1);
+  layout->addWidget(mReferenceComboBox, row, 1, 1, 1);
 
   //changes due to programming actions
   connect(mConfigFilesComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configChangedSlot()));

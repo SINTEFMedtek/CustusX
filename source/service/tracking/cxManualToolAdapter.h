@@ -57,6 +57,9 @@ public:
 
 	void setBase(ToolPtr base);
 
+	virtual double getTooltipOffset() const;
+	virtual void setTooltipOffset(double val);
+
 private:
   ToolPtr mBase;
 };

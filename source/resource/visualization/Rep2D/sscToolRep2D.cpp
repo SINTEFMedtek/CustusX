@@ -243,7 +243,7 @@ bool ToolRep2D::showProbe()
 }
 bool ToolRep2D::showOffset()
 {
-	return mSlicer->getTool() && mUseOffset && !showProbe();
+	return mSlicer->getTool() && mUseOffset;
 }
 
 void ToolRep2D::setVisibility()

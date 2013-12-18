@@ -169,8 +169,8 @@ function(cx_install_configuration_files)
 			DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
 			PATTERN "settings/*" EXCLUDE)
 
-	# Install openCL shaders into bundle
-	install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction/Thunder/kernels.ocl
+	# Install OpenCL kernels into bundle
+	install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction/TordReconstruct/kernels.ocl
 			DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/)
 
 	if(CX_USE_ISB_GE)
@@ -179,12 +179,10 @@ function(cx_install_configuration_files)
 	endif()
 
 	if(CX_USE_TSF)
-		message(STATUS "KERNELS_DIR is set to " ${Tube-Segmentation-Framework_KERNELS_DIR})
 		install(FILES
 				${Tube-Segmentation-Framework_KERNELS_DIR}/kernels.cl
 				${Tube-Segmentation-Framework_KERNELS_DIR}/kernels_no_3d_write.cl
 				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/)
-		message(STATUS "PARAMETERS_DIR is set to " ${Tube-Segmentation-Framework_PARAMETERS_DIR})
 		install(DIRECTORY ${Tube-Segmentation-Framework_PARAMETERS_DIR}
 				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/
 				FILE_PERMISSIONS ${CX_FULL_PERMISSIONS}
@@ -327,7 +325,7 @@ function(cxCreateConfigurationDescription)
 	cx_assert_variable_exists(${SSC_USE_GCOV})
 	cx_assert_variable_exists(${CX_USE_TSF})
 	cx_assert_variable_exists(${SSC_USE_OpenCL})
-        cx_assert_variable_exists(${BUILD_GRABBER_SERVER})
+	cx_assert_variable_exists(${BUILD_GRABBER_SERVER})
 	cx_assert_variable_exists(${CX_USE_ISB_GE})
 	cx_assert_variable_exists(${CX_USE_OpenCV})
 	# this text can be inserted into the about box with some effort...
@@ -355,8 +353,8 @@ Configuration for CustusX ${CustusX3_VERSION_STRING}
 		OpenGL Version: ${OPENGL_VERSION}
 
 	Internal libraries:
-		Tube-Segmentation-Toolkit: ${CX_USE_TSF}
-		SSC Thunder OpenCL US Reconstruction: ${SSC_USE_OpenCL}
+		Tube-Segmentation-Framework: ${CX_USE_TSF}
+		OpenCL US Reconstruction: ${SSC_USE_OpenCL}
 		Grabber Servers:
                         Mac QuickTime Grabber Server: ${BUILD_GRABBER_SERVER}
 				ISB GE Scanner Grabber Interface: ${CX_USE_ISB_GE}

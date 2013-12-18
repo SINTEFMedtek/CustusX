@@ -113,11 +113,16 @@ QString cxTool::getName() const
 
 double cxTool::getTooltipOffset() const
 {
-	return toolManager()->getTooltipOffset();
+	if(this->getProbe())
+		return this->getProbe()->getProbeData().getDepthStart();
+	else
+		return toolManager()->getTooltipOffset();
 }
 
 void cxTool::setTooltipOffset(double val)
 {
+	if(this->getProbe())
+		return;
 	toolManager()->setTooltipOffset(val);
 }
 
