@@ -342,7 +342,7 @@ void ToolRep3D::probeSectorChanged()
 
 void ToolRep3D::updateOffsetGraphics()
 {
-	bool visible = mTool && mTool->getVisible() && !mTool->hasType(Tool::TOOL_US_PROBE); // no offset for probes
+	bool visible = mTool && mTool->getVisible();
 
 	if (!mStayVisibleAfterHide || (mOffsetPoint->getActor()->GetVisibility() == false))
 	{
