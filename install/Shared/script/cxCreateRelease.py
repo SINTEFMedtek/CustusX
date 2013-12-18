@@ -307,7 +307,7 @@ Thus, we get the following pattern:
         self.jenkins = Jenkins()
         self.jenkins.username = self.options.username
         self.jenkins.password = self.options.password
-        self.jenkins.jobname = 'CustusX_release_ubuntu'
+        self.jenkins.jobname = 'rel'
         self.jenkins.initializeJenkins()
         
         parameters = { 'CX_RELEASE_GIT_TAG':tag }

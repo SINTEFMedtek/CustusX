@@ -3,11 +3,12 @@
 
 #ifdef SSC_USE_OpenCL
 
-#ifdef __APPLE__
-#include <OpenCL/OpenCL.h>
+#if defined(__APPLE__) || defined(__MACOSX)
+    #include "OpenCL/cl.hpp"
 #else
-#include <CL/cl.h>
-#endif //__APPLE__
+    #include <CL/cl.hpp>
+#endif
+
 
 #include <string>
 
@@ -34,6 +35,7 @@ public:
 		cl_command_queue cmd_queue;
 	};
 
+	static OpenCL::ocl_context* init(QString processorType);
 	static ocl_context* ocl_init(QString processor);
 	static void ocl_release(ocl_context* context);
 	static cl_kernel ocl_kernel_build(cl_program program, cl_device_id device, const char * kernel_name);
@@ -74,13 +76,15 @@ public:
  * \date Dec 9, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
-class OpenCLInfo  //OpenCLPrinter?
+class OpenCLInfo
 {
 public:
 	static void printPlatformAndDeviceInfo();
+	static void printPlatformInfo(cl::Platform platform);
+	static void printDeviceInfo(cl::Device device);
 
-	static void printPlatformInfo(cl_platform_id platform, unsigned int indentTimes = 1);
 	static void printDeviceInfo(cl_device_id device, unsigned int indentTimes = 1, bool verbose = false);
+
 	static void printContextInfo(cl_context context, unsigned int indentTimes = 1);
 	static void printProgramInfo(cl_program program, unsigned int indentTimes = 1, bool printSource = false);
 	static void printProgramBuildInfo(cl_program program, cl_device_id device, unsigned int indentTimes = 1);
@@ -93,6 +97,9 @@ public:
 
 private:
 	static void printCharList(const char* list, const char* separator, const char* indentation);
+	static void printStringList(std::string list, std::string separator = " ");
+	static void print(std::string name, std::string value, int indents = 1);
+	static void print(std::string name, int value, int indents = 1);
 	static std::string getIndentation(unsigned int numberOfIndents);
 };
 }

@@ -37,7 +37,6 @@ include(${OpenIGTLink_USE_FILE})
 include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 include_directories(
         ${Boost_INCLUDE_DIRS}
-        ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
      	${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
         )
 
@@ -47,9 +46,11 @@ include_directories(
 # link to ulterius only on when building 32 bit
 # - ulterius lib is only available on windows as 32 bit
 if(CX_WIN32)
+
+    include_directories( ${ULTERIUS_INCLUDE_DIR} )
+
     SET(WIN32_LINK_LIBRARIES
             ${ULTERIUS_LIBRARY}
-            vtkOpenIGTUltrasound
     )
 endif(CX_WIN32)
 
@@ -106,9 +107,9 @@ SET( CX_QT_MOC_HEADER_FILES
 		cxImageStreamerGE.h
 		cxImageStreamer.h
 		cxSender.h
-                cxDirectlyLinkedSender.h
-
-                cxtestSender.h
+		cxDirectlyLinkedSender.h
+		SonixHelper.h
+		cxtestSender.h
 )
 
 #QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
@@ -142,11 +143,17 @@ SET ( cxOpenIGTLinkServer_FILES
 		cxSender.cpp
 		cxDirectlyLinkedSender.h
 		cxDirectlyLinkedSender.cpp
-                cxSonixProbeFileReader.h
-                cxSonixProbeFileReader.cpp
+		cxSonixProbeFileReader.h
+		cxSonixProbeFileReader.cpp
+		
+		vtkSonixVideoSource.h
+		vtkSonixVideoSource.cxx
+		vtkUltrasoundWin32Header.h
+		cxFrame.h
+		SonixHelper.h
 		
 		cxtestSender.h
-                cxtestSender.cpp
+		cxtestSender.cpp
 
 )
 
@@ -163,6 +170,5 @@ configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/geConfig.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/geConfig.h" )
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-
 
 add_subdirectory(testing)
