@@ -461,6 +461,8 @@ void OpenCLInfo::printDeviceInfo(cl::Device device)
 	print("Device supports", device.getInfo<CL_DEVICE_VERSION>());
 	print("Graphics card driver", device.getInfo<CL_DRIVER_VERSION>());
 	print("Available", (device.getInfo<CL_DEVICE_AVAILABLE>() ? "Yes" : "No"));
+	print("Extensions", "");
+	printStringList(device.getInfo<CL_DEVICE_EXTENSIONS>());
 	//std::cout << "Highest version can compile: " << device.getInfo<CL_DEVICE_OPENCL_C_VERSION>() << std::endl;
 }
 

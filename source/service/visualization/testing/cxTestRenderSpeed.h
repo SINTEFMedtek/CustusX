@@ -19,8 +19,6 @@ namespace cxtest
 class TestRenderSpeed
 {
 public:
-    void setUp();
-    void tearDown();
 	TestRenderSpeed();
 	void testSingleView();
 	void testSeveralViews();
