@@ -17,9 +17,10 @@ ToolFilterGroupBox::ToolFilterGroupBox(QWidget* parent) :
 {
   this->setTitle("Tool filter");
 
-  mApplicationGroupBox = new SelectionGroupBox("Applications", stateService()->getApplication()->getAllApplicationNames(), false, NULL);
+  mApplicationGroupBox = new SelectionGroupBox("Applications", stateService()->getApplication()->getAllApplicationNames(), Qt::Vertical, false, NULL);
   mApplicationGroupBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
-  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", cxToolManager::getInstance()->getSupportedTrackingSystems(), true, NULL);
+
+  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", cxToolManager::getInstance()->getSupportedTrackingSystems(), Qt::Horizontal, true, NULL);
   mToolListWidget = new FilteringToolListWidget(NULL);
   connect(mToolListWidget, SIGNAL(toolSelected(QString)), this, SIGNAL(toolSelected(QString)));
 

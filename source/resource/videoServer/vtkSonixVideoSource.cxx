@@ -37,6 +37,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#ifdef CX_WIN32
 #include "vtkSonixVideoSource.h"
 
 #include "vtkImageData.h"
@@ -48,11 +49,12 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtksys/SystemTools.hxx"
-
 #include <ctype.h>
-
 #include "sscTime.h"
 #include <igtlImageMessage.h>
+
+#include "cxSonixProbeFileReader.h"
+
 
 // because of warnings in windows header push and pop the warning level
 #ifdef _MSC_VER
@@ -353,11 +355,46 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 
 	// Get ROI. Use this to clip video before sending
   uROI roi = this->DataDescriptor->roi;
-  //Try just to update FrameBufferExtent first
   //std::cout << "FrameBufferExtent: " << this->FrameBufferExtent[0] << " " << this->FrameBufferExtent[1] << " " ;
   //std::cout << this->FrameBufferExtent[2] << " " << this->FrameBufferExtent[3] << std::endl;
 
-  this->UpdateFrameBufferExtent(roi);
+    int imagingDepth = 0;
+    int sectorPercent = 0;
+    long radius = 0;
+    long probeLenght = 0;
+    bool linearProbe = true;
+
+    if(!this->ult->getParamValue("b-depth", imagingDepth))
+    	std::cout << "Couldn't request the BMode imaging depth." << std::endl;
+
+    if(!this->ult->getParamValue("sector", sectorPercent))
+    	std::cout << "Couldn't request the sector percent." << std::endl;
+
+    char probeName[200];
+    if(!this->ult->getActiveProbe(probeName, 200))
+  	  std::cout << "Couldn't request probe name." << std::endl;
+
+    //Path to probes.xml on on ultrasonix scanner:
+    QString probeFile = "C:/Program Files/Ultrasonix/Exam/config/probes.xml";
+    cx::SonixProbeFileReader reader(probeFile);
+    if(!reader.init())
+    {
+  	  std::cout << "Failed to initialize probe xml reader" << std::endl;
+    }
+    else
+    {
+    	QDomNode probeNode = reader.getProbeNode(probeName);
+    	linearProbe = reader.isProbeLinear(probeNode);
+    	long radius = reader.getProbeParam(probeNode, "radius"); // in microns
+    	long probeLenght = reader.getProbeLenght(probeNode); // in microns
+    }
+
+
+    //roi is only correct for linear probe
+    if(linearProbe)
+    	this->UpdateFrameBufferExtent(roi);
+    else
+    	this->ResetFrameBufferExtent();
 
   //std::cout << "new FrameBufferExtent: " << this->FrameBufferExtent[0] << " " << this->FrameBufferExtent[1] << " " ;
   //std::cout << this->FrameBufferExtent[2] << " " << this->FrameBufferExtent[3] << std::endl;
@@ -478,6 +515,10 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   //Modify origin by ROI
   frame.mOrigin[0] = this->DataOrigin[0] - this->FrameBufferExtent[0];//roi.ulx;
   frame.mOrigin[1] = this->DataOrigin[1] - this->FrameBufferExtent[2];//roi.uly;
+
+  frame.mImagingDepth = imagingDepth;
+  frame.mSectorSizeInPercent = sectorPercent;
+
   if(mDebugOutput)
   {
 	  //std::cout << "frame.mOrigin: " << frame.mOrigin[0] << ", " << frame.mOrigin[1];
@@ -508,6 +549,8 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   //frame.blx = roi.blx;
   //frame.bly = roi.bly;
   
+  frame.probeName = probeName;
+
   // Just set ROI to FrameBufferExtent
   frame.ulx = this->FrameBufferExtent[0] - this->FrameBufferExtent[0];
   frame.uly = this->FrameBufferExtent[2] - this->FrameBufferExtent[2];
@@ -1436,3 +1479,12 @@ void vtkSonixVideoSource::UpdateFrameBufferExtent(uROI roi)
 	this->FrameBufferExtent[2] = max(roi.uly, 0);
 	this->FrameBufferExtent[3] = min(roi.bly, this->FrameSize[1] - 1);
 }
+
+void vtkSonixVideoSource::ResetFrameBufferExtent()
+{
+	this->FrameBufferExtent[0] = 0;
+	this->FrameBufferExtent[1] = this->FrameSize[0] - 1;
+	this->FrameBufferExtent[2] = 0;
+	this->FrameBufferExtent[3] = this->FrameSize[1] - 1;
+}
+#endif // CX_WIN32

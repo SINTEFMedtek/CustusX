@@ -74,6 +74,8 @@ private:
   void addStatusMessageToQueue(IGTLinkUSStatusMessage::Pointer msg); ///< Adds a OpenIGTLink StatusMessage to the queue
   IGTLinkUSStatusMessage::Pointer getLastStatusMessageFromQueue(); ///< Gets the oldest message from the queue-
 
+  std::string createDeviceName();
+
   QMutex mImageMutex; ///< A lock for making the class threadsafe
   int mMaxqueueInfo;
   std::list<IGTLinkImageMessage::Pointer> mMutexedImageMessageQueue; ///< A threasafe internal queue

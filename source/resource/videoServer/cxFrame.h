@@ -22,6 +22,9 @@ public:
   int bry;
   int blx;
   int bly;
+  std::string probeName;
+  int mImagingDepth; //Imaging depth in mm
+  int mSectorSizeInPercent; //Size of sector in percent compared to full
 
   Frame():
     mNewStatus(false),

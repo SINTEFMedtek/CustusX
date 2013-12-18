@@ -157,6 +157,18 @@ void VideoFixedPlaneRep::setCamera()
 	if (w_vp > vw) // if image too wide: reduce scale
 		scale = w_vp/vw;
 
+    //Set camera position and focus so that it looks at the video stream center
+    double position[3];
+    camera->GetPosition(position);
+    position[0] = bounds.center()[0];
+    position[1] = bounds.center()[1];
+    camera->SetPosition(position);
+
+    camera->GetFocalPoint(position);
+    position[0] = bounds.center()[0];
+    position[1] = bounds.center()[1];
+    camera->SetFocalPoint(position);
+
 	camera->SetParallelScale(h/2*scale*1.01); // exactly fill the viewport height
 	mViewportListener->startListen(mRenderer);
 }

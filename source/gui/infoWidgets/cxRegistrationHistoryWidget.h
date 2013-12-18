@@ -29,11 +29,9 @@ class RegistrationHistoryWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  RegistrationHistoryWidget(QWidget* parent);
+  RegistrationHistoryWidget(QWidget* parent, bool compact = false);
   virtual ~RegistrationHistoryWidget();
   virtual QString defaultWhatsThis() const;
-
-signals:
 
 protected slots:
   void rewindSlot();
@@ -42,7 +40,6 @@ protected slots:
   void fastForwardSlot();
   void updateSlot();
   void reconnectSlot();
-//  void showDetailsSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -50,6 +47,7 @@ protected:
 
 private:
   RegistrationHistoryWidget();
+  void createControls(QHBoxLayout* layout);
   QString  debugDump();
   template<class T>
   QAction* createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot);
@@ -59,13 +57,13 @@ private:
   QDateTime getActiveTime();
   void setActiveTime(QDateTime active);
   TimeMap::iterator findCurrentActiveIter(TimeMap& times);
+
   QFrame* mGroup;
   std::vector<RegistrationHistoryPtr> mHistories;
   QAction* mRewindAction;
   QAction* mRemoveAction;
   QAction* mForwardAction;
   QAction* mFastForwardAction;
-//  QAction* mDetailsAction;
 
   QLabel* mBehindLabel;
   QLabel* mInFrontLabel;

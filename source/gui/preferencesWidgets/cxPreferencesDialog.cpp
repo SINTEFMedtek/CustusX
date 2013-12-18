@@ -344,6 +344,9 @@ ToolConfigTab::~ToolConfigTab()
 void ToolConfigTab::init()
 {
   QGroupBox* filepreviewGroupBox = new QGroupBox(this);
+//  filepreviewGroupBox->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+//  mFilePreviewWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
   filepreviewGroupBox->setTitle("Toolfile preview");
   QHBoxLayout* filepreviewLayout = new QHBoxLayout();
   filepreviewGroupBox->setLayout(filepreviewLayout);
@@ -363,6 +366,8 @@ void ToolConfigTab::init()
   layout->addWidget(mToolFilterGroupBox, 0, 2, 1, 2);
   layout->addWidget(filepreviewGroupBox, 1, 0, 1, 3);
   layout->addWidget(imagepreviewGroupBox, 1, 3, 1, 1);
+//  layout->setRowStretch(0, 1);
+//  layout->setRowStretch(2, 1);
 
   mToolConfigureGroupBox->setCurrentlySelectedCofiguration(DataLocations::getToolConfigFilePath());
 }
