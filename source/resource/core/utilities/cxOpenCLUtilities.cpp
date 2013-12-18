@@ -22,6 +22,7 @@ void CL_CALLBACK clCreateContextFromType_error_callback(const char *errinfo, con
 	std::cout << "ERROR: From clCreateContextFromType() callback: "<< errinfo << std::endl;
 }
 
+/*
 OpenCL::ocl_context* OpenCL::init(QString processorType)
 {
 	OpenCL::ocl_context* retval = new OpenCL::ocl_context;
@@ -53,7 +54,7 @@ OpenCL::ocl_context* OpenCL::init(QString processorType)
 	retval->cmd_queue = cl::CommandQueue(retval->context, retval->device)();
 
 	return retval;
-}
+}*/
 
 OpenCL::ocl_context* OpenCL::ocl_init(QString processor)
 {
