@@ -15,23 +15,11 @@ TestRenderSpeed::TestRenderSpeed():
 {
 }
 
-void TestRenderSpeed::setUp()
-{
-	// this stuff will be performed just before all tests in this class
-}
-
-void TestRenderSpeed::tearDown()
-{
-	// this stuff will be performed just after all tests in this class
-}
-
 void TestRenderSpeed::testSingleView()
 {
 	this->create3Dviews(1);
 	this->showViews();
 	this->renderNumTimes(100);
-//	this->printResult();
-//	CPPUNIT_ASSERT(this->getTotalRenderTimeInMs() < 2000);
 }
 
 void TestRenderSpeed::testSeveralViews()
@@ -40,8 +28,6 @@ void TestRenderSpeed::testSeveralViews()
 	this->create2Dviews(8);
 	this->showViews();
 	this->renderNumTimes(100);
-//	this->printResult();
-//	CPPUNIT_ASSERT(this->getTotalRenderTimeInMs() < 5000);
 }
 
 void TestRenderSpeed::testLotsOfViews()
@@ -50,22 +36,18 @@ void TestRenderSpeed::testLotsOfViews()
 	this->create2Dviews(80);
 	this->showViews();
 	this->renderNumTimes(10);
-//	this->printResult();
-//	CPPUNIT_ASSERT(this->getTotalRenderTimeInMs() < 5000);
 }
 
 void TestRenderSpeed::testVtkRenderWindow()
 {
 	createVtkRenderWindows(1);
 	this->renderNumTimes(100);
-//	this->printResult();
 }
 
 void TestRenderSpeed::testSeveralVtkRenderWindows()
 {
 	createVtkRenderWindows(10);
 	this->renderNumTimes(100);
-//	this->printResult();
 }
 
 void TestRenderSpeed::createVtkRenderWindows(int num)
@@ -103,7 +85,6 @@ void TestRenderSpeed::showViews()
 {
 	QWidget* mainWidget = new QWidget;
 	mainWidget->resize(1000,500);
-//	QBoxLayout* layout = new QBoxLayout(QBoxLayout::LeftToRight, mainWidget);
 	QGridLayout* layout = new QGridLayout();
 	mainWidget->setLayout(layout);
 	this->addViewsToGridLayout(layout);
@@ -188,7 +169,6 @@ int TestRenderSpeed::getRenderFPS()
 
 int TestRenderSpeed::getNumViews()
 {
-//	return mViews.size();
 	return mNumViews;
 }
 
