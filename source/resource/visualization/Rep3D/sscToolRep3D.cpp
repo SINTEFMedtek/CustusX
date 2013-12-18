@@ -156,7 +156,7 @@ void ToolRep3D::setTool(ToolPtr tool)
 		connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));
 		connect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChanged()));
 
-		this->probeSectorChanged();
+        this->probeSectorChanged();
 	}
 }
 
@@ -356,7 +356,10 @@ void ToolRep3D::updateOffsetGraphics()
 
 	if (similar(0.0, mTool->getTooltipOffset()))
 	{
-		mTooltipPoint->getActor()->SetVisibility(visible && mOffsetPointVisibleAtZeroOffset);
+        if(mTool->hasType(Tool::TOOL_US_PROBE))
+            mTooltipPoint->getActor()->SetVisibility(false);
+        else
+            mTooltipPoint->getActor()->SetVisibility(visible && mOffsetPointVisibleAtZeroOffset);
 		mOffsetPoint->getActor()->SetVisibility(false);
 		mOffsetLine->getActor()->SetVisibility(false);
 	}
