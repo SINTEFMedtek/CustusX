@@ -8,39 +8,73 @@
 import os
 import os.path
 import cx.cxUtilities
+import platform
+import getpass
 
-def copyFolderContentsToRemoteServer_non_portable(remoteServer, sourcePath, destPath):
-    '''
-    '''
-    cmd1 = 'ssh %s "mkdir -p %s"' % (remoteServer, target)
-    cmd2 = 'scp -r %s/* %s:%s' % (path, remoteServer, target)
-    shell.run(cmd1)
-    shell.run(cmd2)
-#    cxSSH.copyFolderContentsToRemoteServer(remoteServer, path, target);
 
 class RemoteFileTransfer:
-    def __init__(self, remoteServer):
-#        self.test = cx.cxUtilities.try_module_import('blabla')
+    def __init__(self):
         self.paramiko = cx.cxUtilities.try_paramiko_import()
-        self.ssh = self.paramiko.SSHClient() 
-        self.ssh.load_host_keys(os.path.expanduser(os.path.join("~", ".ssh", "known_hosts")))
-        #ssh.connect(server, username=username, password=password)
-        self.ssh.connect(remoteServer)
-        self.sftp = self.ssh.open_sftp()
+
+    def connect(self, remoteServer):
+        self.host_name = remoteServer
+
+        self.transport = self.paramiko.Transport((remoteServer, 22))
+        self.transport.start_client()
+        if not self._authenticate():
+            return False
+        
+        self.sftp = self.transport.open_sftp_client()
+        return True
         
     def close(self):
         self.sftp.close()
-        self.ssh.close()
+        self.transport.close()
+
+    def _getUsername(self):
+        '''
+        Read username from ssh config
+        https://github.com/paramiko/paramiko/pull/97
+        '''
+        conf = self.paramiko.SSHConfig()
+        conf.parse(open(os.path.expanduser('~/.ssh/config')))
+        host = conf.lookup(self.host_name)
+        if 'user' in host:
+            return host['user']
+        else:
+            return getpass.getuser()
+    
+    def _authenticate(self):
+        agent = self.paramiko.Agent()
+        rsa_private_key = self._getPrivateKey()
+        username = self._getUsername()
+        print 'Username ', username
+        agent_keys = agent.get_keys() + (rsa_private_key,)
+        if len(agent_keys) == 0:
+            print 'failed to authenticate, no keys'
+            return False
+        for key in agent_keys:
+            print 'Trying ssh-agent key %s' % key.get_fingerprint().encode('hex'),
+            try:
+                self.transport.auth_publickey(username, key)
+                print '... success!'
+            except self.paramiko.SSHException, e:
+                print '... failed!', e
+                return False
+        print "Authenticated successfully"
+        return True
+
+    def _getPrivateKey(self):
+        rsa_private_key = os.path.expanduser(os.path.join("~", ".ssh", "id_rsa"))
+        try:
+            ki = self.paramiko.RSAKey.from_private_key_file(rsa_private_key)
+        except Exception, e:
+            print 'Failed loading %s, e=%s' % (rsa_private_key, e)
+        return ki
 
     def copyFolderContentsToRemoteServer(self, sourcePath, destPath):
-        #files = self._getFiles
-#        print '=== copyFolderContentsToRemoteServer src=%s, dst=%s' % (sourcePath, destPath)
         self.remote_mkdir(destPath)
         for (root, dirs, files) in os.walk(sourcePath):
-#            print "*"*20
-#            print "  root", root
-#            print "  dirs", dirs
-#            print "  files", files
             for file in files:
                 self.remote_put(os.path.join(sourcePath, file), 
                                os.path.join(destPath, file))
@@ -50,11 +84,14 @@ class RemoteFileTransfer:
             break
                 
     def remote_put(self, source, dest):
+        dest = dest.replace('\\', '/')
         print 'remote_put %s -> %s' % (source, dest)
         self.sftp.put(source, dest)
-    
+        if platform.system() == 'Windows':
+            self.sftp.chmod(dest, 0777) # default is rw for user only on win
     
     def remote_mkdir(self, path):
+        path = path.replace('\\', '/')
         print 'remote_mkdir %s' % path
         try:
             self.sftp.mkdir(path)
@@ -64,7 +101,8 @@ class RemoteFileTransfer:
 def copyFolderContentsToRemoteServer(remoteServer, sourcePath, destPath):
     '''
     '''
-    transfer = RemoteFileTransfer(remoteServer)
+    transfer = RemoteFileTransfer()
+    transfer.connect(remoteServer)
     transfer.copyFolderContentsToRemoteServer(sourcePath, destPath);
     transfer.close()
 
