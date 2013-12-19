@@ -512,7 +512,9 @@ void ImageTFData::fillLUTFromLut(vtkLookupTablePtr output, vtkLookupTablePtr inp
 	// This causes all zeros to become transparent, but the alternative is worse.
 	// (what we really need is to subclass vtkLookupTable,
 	//  but it contains nonvirtual functions).
-	llr = std::max(1.0, llr); // hack.
+
+	//Removing this hack for now to  make 2D images in 3D scene work better
+	//llr = std::max(0.0, llr); // hack.
 
 	output->Build();
 	output->SetNumberOfTableValues(input->GetNumberOfTableValues());
