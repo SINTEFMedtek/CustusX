@@ -126,7 +126,8 @@ DoubleRange DoubleDataAdapterImageTFDataLLR::getValueRange() const
 
   double max = mImageTFData->getScalarMax();
   double min = mImageTFData->getScalarMin();
-  return DoubleRange(min,max,(max-min)/1000.0);
+	//Set range to min - 1 to allow an llr that shows all values
+	return DoubleRange(min - 1,max,(max-min)/1000.0);
 }
 
 //---------------------------------------------------------
