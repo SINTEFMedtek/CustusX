@@ -10,6 +10,7 @@ if (BUILD_TESTING)
 #        cx_catch__private_define_platform_specific_linker_options()
         cx_add_class(RESOURCE_VISUALZATION_TEST_UTILITIES_SOURCE_FILES
 		cxtestRenderTester
+		cxTestRenderSpeed
 		)
 #        add_library(cxResourceVisualizationTestUtilities ${CX_CATCH_SHARED_LIB_TYPE} ${RESOURCE_VISUALZATION_TEST_UTILITIES_SOURCE_FILES})
 #        target_link_libraries(cxResourceVisualizationTestUtilities cxResourceVisualization cxtestUtilities)
