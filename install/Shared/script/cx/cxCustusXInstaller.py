@@ -24,7 +24,7 @@ import cxInstallData
 import cxComponents
 import cxComponentAssembly
 import shlex
-#import cxTestRunner
+# import cxTestRunner
 import cxUtilities
 import cxSSH
 import datetime
@@ -91,8 +91,8 @@ class CustusXInstaller:
         '''
         PrintFormatter.printInfo('Removing local git tags ...')
         shell.changeDir(self.source_path)
-        #shell.run('git tag -l | xargs git tag -d') no good on windows
-        #shell.run('git fetch')
+        # shell.run('git tag -l | xargs git tag -d') no good on windows
+        # shell.run('git fetch')
         shell.run('git fetch origin --prune --tags')
         
     def _getDateString(self):
@@ -125,9 +125,9 @@ class CustusXInstaller:
             self._copyFile('%s/install/Apple/apple_install_readme.rtf' % self.source_path, targetPath)
         if platform.system() == 'Linux':
             linux_distro = 'Ubuntu'
-            #shutil.copy2('%s/install/Linux/copy/*'%self.source_path, targetPath)
-            #shutil.copy2('%s/install/Linux/copy/run_v2u.sh'%self.source_path, targetPath)
-            #shutil.copy2('%s/install/Linux/copy/v2u'%self.source_path, targetPath)
+            # shutil.copy2('%s/install/Linux/copy/*'%self.source_path, targetPath)
+            # shutil.copy2('%s/install/Linux/copy/run_v2u.sh'%self.source_path, targetPath)
+            # shutil.copy2('%s/install/Linux/copy/v2u'%self.source_path, targetPath)
             self._copyFolder('%s/install/Linux/script/NVIDIA' % self.source_path, targetPath)
             self._copyFolder('%s/install/Linux/script/vga2usb' % self.source_path, targetPath)
             self._copyFile('%s/install/Linux/script/programmer_setup.sh' % self.source_path, targetPath)
@@ -163,7 +163,8 @@ class CustusXInstaller:
         '''
         PrintFormatter.printHeader('copy/publish package to medtek server', level=2)
         remoteServer = "medtek.sintef.no"
-        remoteServerPath = "/Volumes/MedTekDisk/Software/CustusX/AutomatedReleases"
+#        remoteServerPath = "/Volumes/MedTekDisk/Software/CustusX/AutomatedReleases"
+        remoteServerPath = "/Users/christiana/publish_test" # test while server is down...
         targetFolder = os.path.split(path)[1]
 #        source = '%s/*' % path
         target = '%s/%s/%s' % (remoteServerPath, targetFolder, self._getUserFriendlyPlatformName())
@@ -241,7 +242,7 @@ class CustusXInstaller:
         temp_path = '%s/temp/Install' % self.root_dir
         shell.removeTree(temp_path)
         shell.changeDir(temp_path)
-        shell.run('tar -zxvf %s' % (filename)) # extract to path
+        shell.run('tar -zxvf %s' % (filename))  # extract to path
         corename = os.path.basename(filename).split('.tar.gz')[0]
         unpackedfolder = "%s/%s" % (temp_path, corename)
         installfolder = '%s' % self.install_root
@@ -261,7 +262,7 @@ class CustusXInstaller:
             pkgName = coreName + '.pkg'
         PrintFormatter.printInfo("install package %s from file %s" % (pkgName, coreName))
         shell.run('hdiutil attach -mountpoint /Volumes/%s %s' % (coreName, dmgfile))
-        target = '/' # TODO: mount on another (test) volume - this one requires sudo
+        target = '/'  # TODO: mount on another (test) volume - this one requires sudo
         shell.run('sudo installer -pkg /Volumes/%s/%s -target %s' % (coreName, pkgName, target))
         shell.run('hdiutil detach /Volumes/%s' % coreName)
         PrintFormatter.printInfo("Installed %s" % pkgName)
