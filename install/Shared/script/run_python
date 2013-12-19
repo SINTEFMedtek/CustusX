@@ -14,6 +14,8 @@ COMMAND=$3
 # http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
 DIR="$( cd "$( dirname "$0" )" && pwd )" 
 
+# auto propagate errors, set stoud redirect on
+set -e
 set -x
 python -u $DIR/$COMMAND
 set +x
