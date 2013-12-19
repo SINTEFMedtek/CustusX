@@ -44,6 +44,7 @@ include_directories(
 		cxtestTransferFunctionWidgets.cpp
 		cxtestTestTransferFunctions.h
 		cxtestTestTransferFunctions.cpp
+		cxtestOpenCLAndGui.cpp
 	    )
 
 	cx_catch_add_lib_and_exe(cxGui
