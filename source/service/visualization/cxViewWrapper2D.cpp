@@ -251,7 +251,8 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 
 bool ViewWrapper2D::overlayIsEnabled()
 {
-	return settings()->value("useGPU2DRendering").toBool();
+	//return settings()->value("useGPU2DRendering").toBool();
+	return true;//Overlay controls (like llr) are also needed for 2D images in 3D scene
 }
 
 /**Hack: gpu slicer recreate and fill with images every time,
