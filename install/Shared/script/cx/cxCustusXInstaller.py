@@ -128,7 +128,7 @@ class CustusXInstaller:
             # shutil.copy2('%s/install/Linux/copy/*'%self.source_path, targetPath)
             # shutil.copy2('%s/install/Linux/copy/run_v2u.sh'%self.source_path, targetPath)
             # shutil.copy2('%s/install/Linux/copy/v2u'%self.source_path, targetPath)
-            self._copyFolder('%s/install/Linux/script/NVIDIA' % self.source_path, targetPath)
+            self._copyFolder('%s/install/Linux/script/Ubuntu12.04/NVIDIA' % self.source_path, targetPath)
             self._copyFolder('%s/install/Linux/script/vga2usb' % self.source_path, targetPath)
             self._copyFile('%s/install/Linux/script/programmer_setup.sh' % self.source_path, targetPath)
             self._copyFile('%s/install/Linux/script/NDIToolBox_install.sh' % self.source_path, targetPath)
