@@ -100,7 +100,7 @@ private:
 	static void printStringList(std::string list, std::string separator = " ");
 	static void print(std::string name, std::string value, int indents = 1);
 	static void print(std::string name, int value, int indents = 1);
-	static std::string getIndentation(unsigned int numberOfIndents);
+	static std::string const getIndentation(unsigned int numberOfIndents);
 };
 }
 #endif //SSC_USE_OpenCL
