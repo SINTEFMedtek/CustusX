@@ -714,7 +714,7 @@ void OpenCLInfo::print(std::string name, int value, int indents)
 	print(name, stringValue, indents);
 }
 
-std::string OpenCLInfo::getIndentation(unsigned int numberOfIndents)
+std::string const OpenCLInfo::getIndentation(unsigned int numberOfIndents)
 {
 	std::string retval("");
 	for(unsigned int i=0; i < numberOfIndents; i++)
