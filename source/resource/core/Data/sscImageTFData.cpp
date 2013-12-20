@@ -507,14 +507,6 @@ void ImageTFData::fillLUTFromLut(vtkLookupTablePtr output, vtkLookupTablePtr inp
 	// mapped data. Thus we map the llr through the lut and insert that value
 	// into the lut.
 	double llr = mapThroughLUT(mLLR, input->GetNumberOfTableValues());
-	// if LLR < minimum table range, even the first value in the LUT will climb
-	// above the llr. To avoid this, we use a hack that sets llr to at least 1.
-	// This causes all zeros to become transparent, but the alternative is worse.
-	// (what we really need is to subclass vtkLookupTable,
-	//  but it contains nonvirtual functions).
-
-	//Removing this hack for now to  make 2D images in 3D scene work better
-	//llr = std::max(0.0, llr); // hack.
 
 	output->Build();
 	output->SetNumberOfTableValues(input->GetNumberOfTableValues());
