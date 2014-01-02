@@ -123,6 +123,7 @@ cx_add_class(cxResource_SOURCE
 	utilities/sscTimeKeeper
 	utilities/sscMeshHelpers
 	utilities/cxOpenCLUtilities
+	utilities/cxOpenCLPrinter
 	
 	logger/sscAudio.h
 	logger/sscLogger
