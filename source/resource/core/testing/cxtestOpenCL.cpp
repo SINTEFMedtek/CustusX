@@ -1,14 +1,14 @@
 #ifdef SSC_USE_OpenCL
 
 #include "catch.hpp"
-#include "cxOpenCLUtilities.h"
+#include "cxOpenCLPrinter.h"
 
 namespace cxtest
 {
 
 TEST_CASE("OpenCL: print info about platform and devices", "[unit][OpenCL]")
 {
-	cx::OpenCLInfo::printPlatformAndDeviceInfo();
+	cx::OpenCLPrinter::printPlatformAndDeviceInfo();
 	CHECK(true);
 }
 
