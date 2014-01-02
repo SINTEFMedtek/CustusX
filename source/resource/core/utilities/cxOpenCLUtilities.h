@@ -35,7 +35,6 @@ public:
 		cl_command_queue cmd_queue;
 	};
 
-	//static OpenCL::ocl_context* init(QString processorType);
 	static ocl_context* ocl_init(QString processor);
 	static void ocl_release(ocl_context* context);
 	static cl_kernel ocl_kernel_build(cl_program program, cl_device_id device, const char * kernel_name);

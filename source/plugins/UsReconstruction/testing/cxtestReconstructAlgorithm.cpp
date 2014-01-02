@@ -102,7 +102,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 //}
 
 
-TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][not_mac][tordtest][usreconstruction][hide][synthetic]")
+TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconstruction][synthetic]")
 {
 	cx::messageManager()->initialize();
 
