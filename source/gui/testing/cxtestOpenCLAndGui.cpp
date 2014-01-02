@@ -1,7 +1,7 @@
 #ifdef SSC_USE_OpenCL
 
 #include "catch.hpp"
-#include "cxOpenCLUtilities.h"
+#include "cxOpenCLPrinter.h"
 
 #include <QApplication>
 #include <QPushButton>
@@ -14,7 +14,7 @@ namespace cxtest
 
 TEST_CASE("OpenCL and Gui: Init OpenCL and show a button", "[unit][OpenCL][gui][hide]")
 {
-	cx::OpenCLInfo::printPlatformAndDeviceInfo();
+	cx::OpenCLPrinter::printPlatformAndDeviceInfo();
 
     QPushButton button ("Hello world !");
     button.show();
@@ -33,7 +33,7 @@ TEST_CASE("OpenCL and Gui: Show a button and init OpenCL", "[unit][OpenCL][gui][
 
     QTimer::singleShot(1000, qApp, SLOT(quit()) );
 
-	cx::OpenCLInfo::printPlatformAndDeviceInfo();
+	cx::OpenCLPrinter::printPlatformAndDeviceInfo();
 
 	CHECK(true);
     qApp->exec();
@@ -44,14 +44,14 @@ TEST_CASE("OpenCL and OpenGl: Show a OpenGL view and init OpenCL", "[unit][OpenC
     TestRenderSpeed helper;
     helper.testSingleView();
 
-	cx::OpenCLInfo::printPlatformAndDeviceInfo();
+	cx::OpenCLPrinter::printPlatformAndDeviceInfo();
 
 	CHECK(true);
 }
 
 TEST_CASE("OpenCL and OpenGl: Init OpenCL and show a OpenGL view.", "[unit][OpenCL][OpenGL][gui][hide]")
 {
-	cx::OpenCLInfo::printPlatformAndDeviceInfo();
+	cx::OpenCLPrinter::printPlatformAndDeviceInfo();
 
     TestRenderSpeed helper;
     helper.testSingleView();
