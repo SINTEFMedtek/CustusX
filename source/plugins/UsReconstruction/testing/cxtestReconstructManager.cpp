@@ -155,7 +155,7 @@ TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruc
 }
 
 #ifdef SSC_USE_OpenCL
-TEST_CASE("ReconstructManager: TordTest on real data", "[usreconstruction][integration][tordtest][hide]")
+TEST_CASE("ReconstructManager: TordTest on real data", "[usreconstruction][integration][tordtest]")
 {
 	ReconstructManagerTestFixture fixture;
 	ReconstructRealTestData realData;
