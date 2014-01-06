@@ -264,7 +264,7 @@ unsigned char anisotropicFilter(__local const close_plane_t *pixels,
 
 #if METHOD == METHOD_VNN
 
-__constant const sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_NONE | CLK_FILTER_NEAREST;
+__constant const sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE| CLK_FILTER_NEAREST;
 unsigned char
 performInterpolation_vnn(__local close_plane_t *close_planes,
                          int n_close_planes,
@@ -280,7 +280,7 @@ performInterpolation_vnn(__local close_plane_t *close_planes,
 #endif
 
 #if METHOD == METHOD_VNN2
-__constant const sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_NONE | CLK_FILTER_NEAREST;
+__constant const sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_NEAREST;
 unsigned char
 performInterpolation_vnn2(__local close_plane_t *close_planes,
                           int n_close_planes,
@@ -296,7 +296,7 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
 #endif
 
 #if METHOD == METHOD_DW
-__constant const sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_NONE | CLK_FILTER_LINEAR;
+__constant const sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_LINEAR;
 unsigned char
 performInterpolation_dw(__local close_plane_t *close_planes,
                         int n_close_planes,
@@ -312,7 +312,7 @@ performInterpolation_dw(__local close_plane_t *close_planes,
 #endif
 
 #if METHOD == METHOD_ANISOTROPIC
-__constant const sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_NONE | CLK_FILTER_LINEAR;
+__constant const sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_LINEAR;
 unsigned char
 performInterpolation_anisotropic(__local close_plane_t *close_planes,
                             int n_close_planes,
@@ -916,7 +916,7 @@ performInterpolation_vnn(__local close_plane_t *close_planes,
 	}
 	BOUNDS_CHECK(x, 0, in_xsize);
 	BOUNDS_CHECK(y, 0, in_ysize);
-	return max(1, read_imagei(in_bscans, sampler, coord).x);
+	return max((unsigned int)1, read_imageui(in_bscans, sampler, coord).x);
 
 }
 #endif
@@ -981,11 +981,11 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
 		float weight = VNN2_WEIGHT(dist);
 		int4 coord = {x, y, plane_id, 0};
 		scale += weight;
-		val += (read_imagei(in_bscans, sampler, coord).x * weight);
+		val += (read_imageui(in_bscans, sampler, coord).x * weight);
 	}
 
 
-	return max((unsigned char)1, (unsigned char) (val / scale));
+	return max((unsigned char)1, (unsigned char) ((val / scale) + 0.5f));
 
 }
 #endif
@@ -1055,7 +1055,7 @@ performInterpolation_dw(__local close_plane_t *close_planes,
 			continue;
 		}
 		float4 coord = {x, y, plane_id, 0};
-		float interpolated_value = read_imagei(in_bscans, sampler, coord).x;
+		float interpolated_value = read_imageui(in_bscans, sampler, coord).x;
 
 		float dist = fabs(plane.dist);
 		if(dist < 0.001f) dist = 0.001f;
@@ -1065,7 +1065,7 @@ performInterpolation_dw(__local close_plane_t *close_planes,
 	}
 
 
-	return max((unsigned char)1, (unsigned char) (val / scale));
+	return max((unsigned char)1, (unsigned char) ((val / scale) + 0.5f));
 
 }
 #endif
@@ -1130,7 +1130,7 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 			continue;
 		}
 		float4 coord = {x, y, plane_id, 0};
-		CLOSE_PLANE_IDX(close_planes, found_planes).intensity = read_imagei(in_bscans, sampler, coord).x;
+		CLOSE_PLANE_IDX(close_planes, found_planes).intensity = read_imageui(in_bscans, sampler, coord).x;
 		found_planes++;
 	}
 	return max((unsigned char)1, anisotropicFilter(close_planes, found_planes));
@@ -1184,7 +1184,7 @@ unsigned char anisotropicFilter(__local const close_plane_t *pixels,
 		sum = mad(tmp.intensity,weight, sum);
 		sum_weights += weight;
 	}
-	return sum / sum_weights;
+	return (sum / sum_weights) + 0.5f;
 }
 
 
