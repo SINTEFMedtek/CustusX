@@ -1043,6 +1043,9 @@ performInterpolation_dw(__local close_plane_t *close_planes,
 		           in_yspacing);
 
 
+		// The OpenCL spec defines the linear filtering to be shited by 0.5f for some reason
+		x += 0.5f;
+		y += 0.5f;
 		int ix, iy;
 		ix = x;
 		iy = y;
@@ -1055,6 +1058,7 @@ performInterpolation_dw(__local close_plane_t *close_planes,
 			continue;
 		}
 		float4 coord = {x, y, plane_id, 0};
+
 		float interpolated_value = read_imageui(in_bscans, sampler, coord).x;
 
 		float dist = fabs(plane.dist);
@@ -1117,6 +1121,9 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 		                 in_xspacing,
 		                 in_yspacing);
 
+		// The OpenCL spec defines the linear filtering to be shited by 0.5f for some reason
+		x += 0.5f;
+		y += 0.5f;
 
 		int ix, iy;
 		ix = x;
