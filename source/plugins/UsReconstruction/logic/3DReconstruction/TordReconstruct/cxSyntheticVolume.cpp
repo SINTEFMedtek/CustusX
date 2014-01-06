@@ -107,8 +107,7 @@ cxSyntheticVolume::sampleUsData(const Transform3D& rMf,
 								const Eigen::Array2i& sliceDimension,
 								const double noiseSigma, const unsigned char noiseMean) const
 {
-	// Seed the random number generator
-	srand(time(NULL));
+
 
 	const Vector3D p0 = rMf.coord(Vector3D(0,0,0));
 	const Vector3D e_x = rMf.vector(Vector3D(pixelSpacing[0],0,0));
