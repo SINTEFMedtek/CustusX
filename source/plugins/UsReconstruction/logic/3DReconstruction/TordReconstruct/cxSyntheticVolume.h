@@ -4,6 +4,8 @@
 #include "sscUSFrameData.h"
 #include <vector>
 #include "sscMathBase.h"
+#include <cstdlib>
+#include <time.h>
 
 
 namespace cx {
@@ -23,6 +25,8 @@ public:
 
 	cxSyntheticVolume(Vector3D bounds)
 	{
+		// Seed the random number generator
+		srand(time(NULL));
 		mBounds = bounds;
 	}
 	virtual ~cxSyntheticVolume() { };
