@@ -1096,6 +1096,7 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 	{
 		return 1;
 	}
+	int found_planes = 0;
 	for(int i = 0; i < n_close_planes; i++)
 	{
 		close_plane_t plane = CLOSE_PLANE_IDX(close_planes ,i);
@@ -1129,10 +1130,10 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 			continue;
 		}
 		float4 coord = {x, y, plane_id, 0};
-		CLOSE_PLANE_IDX(close_planes, i).intensity = read_imagei(in_bscans, sampler, coord).x;
+		CLOSE_PLANE_IDX(close_planes, found_planes).intensity = read_imagei(in_bscans, sampler, coord).x;
+		found_planes++;
 	}
-
-	return max((unsigned char)1, anisotropicFilter(close_planes, n_close_planes));
+	return max((unsigned char)1, anisotropicFilter(close_planes, found_planes));
 
 }
 
