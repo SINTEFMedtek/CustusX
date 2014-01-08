@@ -170,11 +170,9 @@ int isValidPixel(int x,
                  int in_xsize,
                  int in_ysize);
 
-int
-findHighestIdx(__local close_plane_t *planes,
-               int n);
-int2
-findClosestPlanes_heuristic(__local close_plane_t *close_planes,
+int findHighestIdx(__local close_plane_t *planes, int n);
+
+int2 findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                             __local float4* const plane_eqs,
                             __global float16* const plane_matrices,
                             const float4 voxel,
@@ -187,8 +185,7 @@ findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                             float in_xspacing,
                             float in_yspacing);
 
-int2
-findClosestPlanes_multistart(__local close_plane_t *close_planes,
+int2 findClosestPlanes_multistart(__local close_plane_t *close_planes,
                              __local float4* const plane_eqs,
                              __global float16* const plane_matrices,
                              const float4 voxel,
@@ -214,44 +211,34 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
 #define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j, k, l) findClosestPlanes_multistart(a, b, c, d, e, f, g, 0, h, i, j, k, l)
 #endif
 
-__global const unsigned char*
-getImageData(int plane_id,
+__global const unsigned char* getImageData(int plane_id,
              __global const unsigned char* bscans_blocks[],
              int in_xsize,
              int in_ysize);
 
-float4
-transform(float16 matrix,
-                 float4 voxel);
+float4 transform(float16 matrix, float4 voxel);
 
-float4
-transform_inv(float16 matrix,
-                     float4 voxel);
+float4 transform_inv(float16 matrix, float4 voxel);
 
-float2
-transform_inv_xy(float16 matrix, float4 voxel);
+float2 transform_inv_xy(float16 matrix, float4 voxel);
 
-void
-printMatrix(float16 matrix);
+void printMatrix(float16 matrix);
 
-void
-toImgCoord_int(int* x,
+void toImgCoord_int(int* x,
                int* y,
                float4 voxel,
                float16 plane_matrix,
                float in_xspacing,
                float in_yspacing);
 
-void
-toImgCoord_float(float* x,
+void toImgCoord_float(float* x,
                  float* y,
                  float4 voxel,
                  float16 plane_matrix,
                  float in_xspacing,
                  float in_yspacing);
 
-float
-bilinearInterpolation(float x,
+float bilinearInterpolation(float x,
                       float y,
                       const __global unsigned char* image,
                       int in_xsize);
@@ -260,8 +247,7 @@ unsigned char anisotropicFilter(__local const close_plane_t *pixels,
                                 int n_planes);
 
 #if METHOD == METHOD_VNN
-unsigned char
-performInterpolation_vnn(__local close_plane_t *close_planes,
+unsigned char performInterpolation_vnn(__local close_plane_t *close_planes,
                          int n_close_planes,
                          __global const float16  *plane_matrices,
                          __local const float4 *plane_eqs,
@@ -275,8 +261,7 @@ performInterpolation_vnn(__local close_plane_t *close_planes,
 #endif
 
 #if METHOD == METHOD_VNN2
-unsigned char
-performInterpolation_vnn2(__local close_plane_t *close_planes,
+unsigned char performInterpolation_vnn2(__local close_plane_t *close_planes,
                           int n_close_planes,
                           __global const float16  *plane_matrices,
                           __local const float4 *plane_eqs,
@@ -290,8 +275,7 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
 #endif
 
 #if METHOD == METHOD_DW
-unsigned char
-performInterpolation_dw(__local close_plane_t *close_planes,
+unsigned char performInterpolation_dw(__local close_plane_t *close_planes,
                         int n_close_planes,
                         __global const float16  *plane_matrices,
                         __local const float4 *plane_eqs,
@@ -305,8 +289,7 @@ performInterpolation_dw(__local close_plane_t *close_planes,
 #endif
 
 #if METHOD == METHOD_ANISOTROPIC
-unsigned char
-performInterpolation_anisotropic(__local close_plane_t *close_planes,
+unsigned char performInterpolation_anisotropic(__local close_plane_t *close_planes,
                             int n_close_planes,
                             __global const float16  *plane_matrices,
                             __local const float4 *plane_eqs,
@@ -319,13 +302,11 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
                             float4 voxel);
 #endif
 
-void
-prepare_plane_eqs(__global float16 *plane_matrices,
+void prepare_plane_eqs(__global float16 *plane_matrices,
                   __local float4 *plane_eqs);
 
 
-int
-findLocalMinimas(int *guesses,
+int findLocalMinimas(int *guesses,
                  __local const float4 *plane_eqs,
                  float radius,
                  float4 voxel,
@@ -340,8 +321,7 @@ findLocalMinimas(int *guesses,
                  int in_ysize);
 
 
-__kernel void
-voxel_methods(int volume_xsize,
+__kernel void voxel_methods(int volume_xsize,
               int volume_ysize,
               int volume_zsize,
               float volume_xspacing,
@@ -411,8 +391,7 @@ int isValidPixel(int x,
  * @param *planes Pointer to first element of plane array
  * @param n size of array pointed to *planes
  */
-int
-findHighestIdx(__local close_plane_t *planes,
+int findHighestIdx(__local close_plane_t *planes,
                int n)
 {
 	int maxidx = 0;
@@ -434,8 +413,7 @@ findHighestIdx(__local close_plane_t *planes,
 	return maxidx;
 }
 
-int2
-findClosestPlanes_multistart(__local close_plane_t *close_planes,
+int2 findClosestPlanes_multistart(__local close_plane_t *close_planes,
                             __local float4* const plane_eqs,
                             __global float16* const plane_matrices,
                             const float4 voxel,
@@ -506,8 +484,7 @@ findClosestPlanes_multistart(__local close_plane_t *close_planes,
  * provided no plane with distance greater than
  * 2x radius is found before any of the MAX_PLANES closest planes.
  */
-int2
-findClosestPlanes_heuristic(__local close_plane_t *close_planes,
+int2 findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                             __local float4* const plane_eqs,
                             __global float16* const plane_matrices,
                             const float4 voxel,

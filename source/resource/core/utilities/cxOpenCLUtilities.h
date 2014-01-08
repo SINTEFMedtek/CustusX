@@ -28,17 +28,19 @@ namespace cx
 class OpenCL
 {
 public:
-	struct ocl_context
+	struct context
 	{
 		cl_context context;
 		cl_device_id device;
 		cl_command_queue cmd_queue;
 	};
 
-	static ocl_context* ocl_init(QString processor);
-	static void ocl_release(ocl_context* context);
-	static cl_kernel ocl_kernel_build(cl_program program, cl_device_id device, const char * kernel_name);
-	static cl_mem ocl_create_buffer(cl_context context, cl_mem_flags flags, size_t size, void * host_data);
+	static context* init(QString processor);
+	static void release(context* context);
+	static cl_kernel createKernel(cl_program program, cl_device_id device, const char * kernel_name);
+	static cl_mem createBuffer(cl_context context, cl_mem_flags flags, size_t size, void * host_data);
+
+//	static void checkBuildProgramLog(cl_program program, cl_device_id device, cl_int err);
 };
 
 /**
@@ -54,11 +56,11 @@ class OpenCLUtilities
 {
 public:
 	static void generateOpenCLError(cl_int id, const char* file, int line);
-	static std::string ocl_get_device_string(cl_device_id dev);
+	static std::string getDeviceString(cl_device_id dev);
 	static char * file2string(const char* filename, size_t * final_length = NULL);
 };
 
-#define ocl_check_error(id) 													\
+#define check_error(id) 													\
 {																				\
 	if (id != CL_SUCCESS) 														\
 	{																			\

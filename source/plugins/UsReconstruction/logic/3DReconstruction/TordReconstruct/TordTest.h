@@ -244,7 +244,7 @@ protected:
 	cl_kernel mClKernel;
 	std::vector<cl_mem> mVClMemBscan;
 	cl_mem mClMemOutput;
-	OpenCL::ocl_context* moClContext;
+	OpenCL::context* moClContext;
 
 	// Method names. Indices into this array corresponds to method IDs in the OpenCL Kernel.
 	std::vector<QString> mMethods;
