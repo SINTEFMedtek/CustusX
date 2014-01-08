@@ -30,6 +30,7 @@ public:
 	static void printPlatformAndDeviceInfo();
 	static void printPlatformInfo(cl::Platform platform);
 	static void printDeviceInfo(cl::Device device, bool verbose = false);
+	static void printContextInfo(cl::Context context);
 
 private:
 	static void printStringList(std::string list, std::string separator = " ");

@@ -14,7 +14,10 @@ void CL_CALLBACK errorCallback(const char *errinfo, const void *private_info, si
 	messageManager()->sendError("Error callback: " + QString(errinfo));
 }
 
-OpenCL::
+OpenCL::context_cpp OpenCL::init(QString deviceType)
+{
+	OpenCL::context_cpp* retval = new OpenCL::context_cpp;
+}
 
 OpenCL::context* OpenCL::init(QString processor)
 {
