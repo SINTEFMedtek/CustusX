@@ -348,6 +348,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                                oneBigBlock.data,
 	                                &err);
 	ocl_check_error(err);
+	this->freeFrameBlocks(&oneBigBlock, 1);
 	// Allocate output memory
 	int *outputDims = outputData->GetDimensions();
 
@@ -410,6 +411,7 @@ TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input,
 	                                           nPlanes*sizeof(float)*16,
 	                                           planeMatrices);
 
+	delete [] planeMatrices;
 	// US Probe mask
 
 	cl_mem clMask = OpenCL::ocl_create_buffer(moClContext->context,
