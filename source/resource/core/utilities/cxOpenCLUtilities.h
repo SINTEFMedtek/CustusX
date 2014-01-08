@@ -28,6 +28,13 @@ namespace cx
 class OpenCL
 {
 public:
+	struct context_cpp
+	{
+		cl::Context context;
+		cl::Device device;
+		cl::CommandQueue cmd_queue;
+	}
+
 	struct context
 	{
 		cl_context context;

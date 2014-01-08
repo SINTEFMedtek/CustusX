@@ -88,6 +88,15 @@ void OpenCLPrinter::printDeviceInfo(cl::Device device, bool verbose)
 	print("Image3D max depth", device.getInfo<CL_DEVICE_IMAGE3D_MAX_DEPTH>());
 }
 
+void OpenCLPrinter::printContextInfo(cl::Context context)
+{
+	print("--- ContextInfo ---", "");
+	VECTOR_CLASS<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
+	for(int i=0; i<devices.size(); ++i)
+		printDeviceInfo(devices[i]);
+
+}
+
 void OpenCLPrinter::printStringList(std::string list, std::string separator)
 {
 	std::vector<std::string> strings;
