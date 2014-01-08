@@ -105,14 +105,15 @@ TemporalCalibrationWidget::~TemporalCalibrationWidget()
 
 QString TemporalCalibrationWidget::defaultWhatsThis() const
 {
-  return "<html>"
-      "<h3>Temporal Calibration.</h3>"
-      "<p><i>Calibrate the time shift between the tracking system and the video acquisition source.</i></br>"
-	  "<p>Part 1, Acqusition: Move the probe in a sinusoidal pattern up and down in a water tank or similar."
-	  "The <i>first</i> image should be a typical image, as it is used to correlate against all the others."
-	  "<p>Part 2, Calibration: Press calibrate to calculate the temporal shift for the selected acquisition."
-	  "The shift is not applied in any way. Refer to the log folder for the calibration curves."
-      "</html>";
+	return "<html>"
+			"<h3>Temporal Calibration.</h3>"
+			"<p><i>Calibrate the time shift between the tracking system and the video acquisition source.</i></br>"
+			"<p>Part 1, Acqusition: Move the probe in a sinusoidal pattern up and down in a water tank or similar."
+			"The <i>first</i> image should be a typical image, as it is used to correlate against all the others."
+			"<p>Part 2, Calibration: Press calibrate to calculate the temporal shift for the selected acquisition."
+			"The shift is not applied in any way. Refer to the log folder for the calibration curves."
+			"<p><b>NB:</b> Previous temporal calibration is applied to probe frames during acqusition.</p>"
+			"</html>";
 }
 
 void TemporalCalibrationWidget::showEvent(QShowEvent* event)
