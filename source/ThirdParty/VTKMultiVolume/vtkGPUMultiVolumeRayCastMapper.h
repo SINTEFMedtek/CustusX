@@ -27,8 +27,13 @@
 #include "vtkVolumeMapper.h"
 
 
-#define MAX_NUMBER_OF_ADDITIONAL_VOLUMES 3 //Mehdi //?
-//#define NUMBER_OF_ADDITIONAL_VOLUMES 3 //Mehdi //?
+#if defined (__APPLE__)
+	#define MAX_NUMBER_OF_ADDITIONAL_VOLUMES 3 //Mehdi //?
+#else
+	#define MAX_NUMBER_OF_ADDITIONAL_VOLUMES 7 //Mehdi //?
+#endif
+
+
 
 class vtkVolumeProperty;
 class vtkRenderWindow;

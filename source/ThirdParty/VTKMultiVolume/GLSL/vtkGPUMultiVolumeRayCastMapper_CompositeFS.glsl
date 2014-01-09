@@ -15,21 +15,28 @@
 
 // Fragment program part with ray cast and composite method.
 
-uniform sampler3D dataSetTexture[4]; //Mehdi
-uniform sampler1D opacityTexture[4]; //Mehdi
 
-uniform mat4 P1toPN[3];
+#ifdef __APPLE__
+	#define MAX_NUMBER_OF_VOLUMES 4						
+#else
+	#define MAX_NUMBER_OF_VOLUMES 8
+#endif
+
+uniform sampler3D dataSetTexture[MAX_NUMBER_OF_VOLUMES]; //Mehdi
+uniform sampler1D opacityTexture[MAX_NUMBER_OF_VOLUMES]; //Mehdi
+
+uniform mat4 P1toPN[MAX_NUMBER_OF_VOLUMES-1];
 
 
-uniform vec3 lowBounds[4]; //Mehdi
-uniform vec3 highBounds[4]; //Mehdi
+uniform vec3 lowBounds[MAX_NUMBER_OF_VOLUMES]; //Mehdi
+uniform vec3 highBounds[MAX_NUMBER_OF_VOLUMES]; //Mehdi
 
 
 uniform int Number_Of_Volumes;
 
 // Entry position (global scope)
 vec3 pos;
-vec3 posX[3];
+vec3 posX[MAX_NUMBER_OF_VOLUMES-1];
 
 
 
@@ -142,8 +149,8 @@ void trace(void)
   vec4 destColor=initialColor();
   float remainOpacity=1.0-destColor.a;
   
-  vec4 color[4];
-  vec4 opacity[4];
+  vec4 color[MAX_NUMBER_OF_VOLUMES];
+  vec4 opacity[MAX_NUMBER_OF_VOLUMES];
   
 
   
@@ -164,8 +171,8 @@ void trace(void)
      	for(int iii=0;iii<Number_Of_Volumes-1;iii++) //Mehdi
 			posX[iii] = vec3(P1toPN[iii]*vec4(pos,1)); //Mehdi
 		
-		vec4 value[10];
-		float scalar[10];
+		vec4 value[MAX_NUMBER_OF_VOLUMES];
+		float scalar[MAX_NUMBER_OF_VOLUMES];
 		
 		
 			//Texture 1
@@ -199,10 +206,10 @@ void trace(void)
 				
 			//Texture2 and upper
 		
-			int xx=1;
+			//int xx=1;
 		
 		//	while(xx<Number_Of_Volumes)	
-			for(int xx=1; (xx<4)&&(xx<Number_Of_Volumes); xx++)
+			for(int xx=1; (xx<MAX_NUMBER_OF_VOLUMES)&&(xx<Number_Of_Volumes); xx++)
 			{
 		
 				if (all(greaterThanEqual(posX[xx-1],lowBounds[xx]))

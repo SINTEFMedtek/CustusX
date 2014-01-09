@@ -22,7 +22,14 @@
 // "value" is a sample of the dataset.
 // Think of "value" as an object.
 
-uniform sampler1D colorTexture[4];//Mehdi
+
+#ifdef __APPLE__
+	#define MAX_NUMBER_OF_VOLUMES 4						
+#else
+	#define MAX_NUMBER_OF_VOLUMES 8
+#endif
+
+uniform sampler1D colorTexture[MAX_NUMBER_OF_VOLUMES];//Mehdi
 
 float scalarFromValue(vec4 value)
 {
