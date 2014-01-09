@@ -59,6 +59,7 @@ protected:
   BoolDataAdapterXmlPtr mShowLabels;
   StringDataAdapterXmlPtr mAnnotationModel;
   DoubleDataAdapterXmlPtr mAnnotationModelSize;
+  DoubleDataAdapterXmlPtr mAnyplaneViewOffset;
 
   //Stereo
   QComboBox* mStereoTypeComboBox;

@@ -246,7 +246,10 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 	{
 		this->updateView();
 	}
-
+	if (key == "Navigation/anyplaneViewOffset")
+	{
+		this->updateView();
+	}
 }
 
 bool ViewWrapper2D::overlayIsEnabled()
@@ -323,7 +326,10 @@ void ViewWrapper2D::viewportChanged()
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(length-clipDepth, length+0.1);
 //	std::cout << "height: " << viewHeight << ", d=" << clipDepth << std::endl;
 
-	mSliceProxy->setToolViewportHeight(viewHeight);
+//	mSliceProxy->setToolViewportHeight(viewHeight);
+	double anyplaneViewOffset = settings()->value("Navigation/anyplaneViewOffset").toDouble();
+//	mSliceProxy->initializeFromPlane(m, false, Vector3D(0, 0, 1), true, viewHeight, anyplaneViewOffset, true);
+	mSliceProxy->setToolViewOffset(mSliceProxy->getUseTooltipOffset(), viewHeight, anyplaneViewOffset, true);
 
 	DoubleBoundingBox3D BB_vp = getViewport();
 	Transform3D vpMs = get_vpMs();
@@ -382,8 +388,10 @@ void ViewWrapper2D::initializePlane(PLANE_TYPE plane)
 {
 //  mOrientationAnnotationRep->setPlaneType(plane);
 	mPlaneTypeText->setText(0, qstring_cast(plane));
-	double viewHeight = mView->heightMM() / this->getZoomFactor2D();
-	mSliceProxy->initializeFromPlane(plane, false, Vector3D(0, 0, 1), true, viewHeight, 0.25);
+//	double viewHeight = mView->heightMM() / this->getZoomFactor2D();
+//	mSliceProxy->initializeFromPlane(plane, false, Vector3D(0, 0, 1), true, viewHeight, 0.25);
+//	double anyplaneViewOffset = settings()->value("Navigation/anyplaneViewOffset").toDouble();
+	mSliceProxy->initializeFromPlane(plane, false, Vector3D(0, 0, 1), true, 1, 0);
 	mOrientationAnnotationRep->setSliceProxy(mSliceProxy);
 
 	// do this to force sync global and local type - must think on how we want this to work
