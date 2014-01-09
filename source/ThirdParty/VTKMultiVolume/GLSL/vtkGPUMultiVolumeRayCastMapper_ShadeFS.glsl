@@ -24,7 +24,7 @@
 #ifdef __APPLE__
 	#define MAX_NUMBER_OF_VOLUMES 4						
 #else
-	#define MAX_NUMBER_OF_VOLUMES 8
+	#define MAX_NUMBER_OF_VOLUMES 5
 #endif
 
 vec4 colorFromValue(int volNumber,vec4 value);

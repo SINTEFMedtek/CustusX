@@ -419,10 +419,10 @@ void CreateTransferFunctions( int vol,const VolumeInfo& vi,
 		switch(vol)//Mehdi
 		{
 			case 0:	colorFun->AddRGBSegment(0.0, 1.0, 0.0, 0.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
-            case 1:	colorFun->AddRGBSegment(0.0, 0.0, 1.0, 0.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
+            case 1:	colorFun->AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
 			case 2:	colorFun->AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
-			case 3:	colorFun->AddRGBSegment(0.0, 0.0, 0.0, 1.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
-			case 4:	colorFun->AddRGBSegment(0.0, 1.0, 1.0, 0.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
+			case 3:	colorFun->AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
+			case 4:	colorFun->AddRGBSegment(0.0, 1.0, 0.0, 0.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
 			case 5:	colorFun->AddRGBSegment(0.0, 0.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
 			case 6:	colorFun->AddRGBSegment(0.0, 1.0, 0.0, 1.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
 			default:colorFun->AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1.0, 1.0, 1.0 ); break;//? /*M*/
