@@ -78,6 +78,13 @@ void VisualizationTab::init()
 	  eyeAngle, DoubleRange(0, 25, 0.1), 1);
   connect(mEyeAngleAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(eyeAngleSlot()));
 
+  double anyplaneViewOffset = settings()->value("Navigation/anyplaneViewOffset").toDouble();
+  mAnyplaneViewOffset = DoubleDataAdapterXml::initialize("AnyplaneViewOffset",
+														 "View Offset",
+														 "Position of virtual tool tip in anyplane view, % from top.",
+														 anyplaneViewOffset, DoubleRange(0.1,0.5,0.01), 2, QDomNode());
+  mAnyplaneViewOffset->setInternal2Display(100);
+
   QVBoxLayout* stereoLayout = new QVBoxLayout();
   stereoLayout->addWidget(mStereoTypeComboBox);
   stereoLayout->addWidget(new SpinBoxAndSliderGroupWidget(this, mEyeAngleAdapter));
@@ -92,6 +99,7 @@ void VisualizationTab::init()
   mMainLayout->addWidget(new SpinBoxGroupWidget(this, mLabelSize));
   mMainLayout->addWidget(new SpinBoxGroupWidget(this, mAnnotationModelSize));
   mMainLayout->addWidget(sscCreateDataWidget(this, mAnnotationModel));
+  mMainLayout->addWidget(sscCreateDataWidget(this, mAnyplaneViewOffset));
 
   mMainLayout->addWidget(stereoGroupBox);
 
@@ -170,6 +178,7 @@ void VisualizationTab::saveParametersSlot()
   settings()->setValue("View3D/labelSize", mLabelSize->getValue());
   settings()->setValue("View3D/annotationModelSize", mAnnotationModelSize->getValue());
   settings()->setValue("View3D/annotationModel", mAnnotationModel->getValue());
+  settings()->setValue("Navigation/anyplaneViewOffset", mAnyplaneViewOffset->getValue());
 }
 
 void VisualizationTab::setBackgroundColorSlot(QColor color)

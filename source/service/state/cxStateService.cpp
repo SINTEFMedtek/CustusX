@@ -318,6 +318,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View3D/sphereRadius", 1.0);
 	this->fillDefault("View3D/labelSize", 2.5);
 	this->fillDefault("View3D/showOrientationAnnotation", true);
+	this->fillDefault("Navigation/anyplaneViewOffset", 0.25);
 
 	QStringList grabber = this->getDefaultGrabberServer();
 //	std::cout << "def grabber: " << grabber.join("--") << std::endl;
