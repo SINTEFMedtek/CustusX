@@ -841,13 +841,13 @@ int main(int argc, char *argv[])
 	*/
   
   
-  /*
+  
   for (int i = 0; i < 90; i++) 
   { 
 	renderer->GetActiveCamera()->Azimuth(1);
 	renWin->Render();
   }
-  */
+  
    
   /*new*/
 
@@ -858,10 +858,10 @@ int main(int argc, char *argv[])
   renderer->AddObserver(vtkCommand::EndEvent, callback4);
 */
   // interact with data
-  
+  /*
   renWin->Render();
   iren->Start();
-  
+  */
   double fps = sumFPS/(long double)frameCount;
   std::cout << "FPS: " << fps << std::endl;
 
