@@ -3,12 +3,13 @@
 
 #ifdef SSC_USE_OpenCL
 
+#define __NO_STD_VECTOR // Apple: if using std::vector VECTOR_CLASS.push_back added 2 to size!
+#define __CL_ENABLE_EXCEPTIONS //telling the opencl c++ wrapper to throw exceptions
 #if defined(__APPLE__) || defined(__MACOSX)
     #include "OpenCL/cl.hpp"
 #else
     #include <CL/cl.hpp>
 #endif
-
 
 #include <string>
 
@@ -16,6 +17,8 @@ class QString;
 
 namespace cx
 {
+static void CL_CALLBACK memoryDestructorCallback(cl_mem memobj, void* user_data);
+
 /**
  * \brief Functionality for working with OpenCL
  *
@@ -28,26 +31,41 @@ namespace cx
 class OpenCL
 {
 public:
-	struct context_cpp
-	{
-		cl::Context context;
-		cl::Device device;
-		cl::CommandQueue cmd_queue;
-	}
 
-	struct context
+
+	struct ocl
 	{
-		cl_context context;
-		cl_device_id device;
-		cl_command_queue cmd_queue;
+//		cl_context context;
+//		cl_device_id device;
+//		cl_command_queue cmd_queue;
+
+		cl::Context context_cpp;
+		cl::Device device_cpp;
+		cl::CommandQueue cmd_queue_cpp;
 	};
 
-	static context* init(QString processor);
-	static void release(context* context);
-	static cl_kernel createKernel(cl_program program, cl_device_id device, const char * kernel_name);
-	static cl_mem createBuffer(cl_context context, cl_mem_flags flags, size_t size, void * host_data);
+	//cpp
+	static ocl* init(cl_device_type type);
 
-//	static void checkBuildProgramLog(cl_program program, cl_device_id device, cl_int err);
+
+private:
+	static cl::Platform selectPlatform();
+	static cl::Device selectDevice(cl_device_type type, cl::Platform platform);
+	static cl::Device chooseDeviceWithMostGlobalMemory(VECTOR_CLASS<cl::Device> devices);
+	static cl::Context createContext(cl::Device device, cl_context_properties* cps);
+	static cl::Context createContext(const VECTOR_CLASS<cl::Device> devices, cl_context_properties* cps);
+	static cl::CommandQueue createCommandQueue(cl::Context context, cl::Device device);
+
+	static VECTOR_CLASS<cl::Device> getOnlyValidDevices(VECTOR_CLASS<cl::Device> devices);
+public:
+	//c
+	//static ocl* init(QString processor);
+	static void release(ocl* ocl);
+	static cl::Kernel createKernel(cl::Program program, cl::Device device, const char * kernel_name);
+	static cl::Buffer createBuffer(cl::Context context, cl_mem_flags flags, size_t size, void * host_data, std::string bufferName);
+
+	static void checkBuildProgramLog(cl::Program program, cl::Device device, cl_int err);
+
 };
 
 /**

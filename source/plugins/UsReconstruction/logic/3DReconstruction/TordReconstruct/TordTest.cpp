@@ -6,9 +6,11 @@
 #include <recConfig.h>
 #include <sscUSFrameData.h>
 #include "sscMessageManager.h"
+#include "cxOpenCLPrinter.h"
 
 namespace cx
 {
+
 
 TordTest::TordTest()
 {
@@ -104,40 +106,81 @@ int TordTest::getPlaneMethodID(QDomElement root)
 			- mPlaneMethods.begin();
 }
 
-bool TordTest::initCL(QString kernelPath, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts,
-		float brightnessWeight, float newnessWeight)
+
+
+
+
+
+
+
+
+
+
+
+
+bool TordTest::initCL(QString kernelPath, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts, float brightnessWeight, float newnessWeight)
 {
+	//-------------INIT--------------------------------
 	// Reusing initialization code from Thunder
-	moClContext = OpenCL::init("GPU");
+	//moClContext = OpenCL::init("GPU");
+	mOCL = OpenCL::init(CL_DEVICE_TYPE_GPU);
 
-	size_t sourceLen;
 
+	//-------------READ FILE--------------------------------
 	messageManager()->sendInfo(QString("Kernel path: %1").arg(kernelPath));
+	size_t sourceLen;
 	char* sSource = OpenCLUtilities::file2string(kernelPath.toLocal8Bit().data(), &sourceLen);
 
-	cl_program clprogram = this->buildCLProgram(sSource, nMaxPlanes, nPlanes, method, planeMethod, nStarts,brightnessWeight, newnessWeight, kernelPath);
+	//-------------BUILD PROGRAM--------------------------------
+	//cl_program clprogram = this->buildCLProgram(sSource, nMaxPlanes, nPlanes, method, planeMethod, nStarts,brightnessWeight, newnessWeight, kernelPath);
+	cl::Program clprogram = this->buildCLProgram(sSource, nMaxPlanes, nPlanes, method, planeMethod, nStarts,brightnessWeight, newnessWeight, kernelPath, sourceLen);
+	//OpenCLPrinter::printProgramSource(clprogram); //seems ok
 
-	if (clprogram == NULL)
-		return false;
 
-	mClKernel = OpenCL::createKernel(clprogram, moClContext->device, "voxel_methods");
+	//exception if failed so no need?
+//	if (clprogram == NULL)
+//		return false;
+
+	//-------------CREATE KERNEL--------------------------------
+	//mClKernel = OpenCL::createKernel(clprogram, moClContext->device, "voxel_methods");
+	mKernel = OpenCL::createKernel(clprogram, mOCL->device_cpp, "voxel_methods");
+	//OpenCLPrinter::printKernelInfo(mKernel); //ok
+
 	return true;
-
 }
 
-cl_program TordTest::buildCLProgram(const char* program_src, int nMaxPlanes, int nPlanes, int method, int planeMethod,
-		int nStarts, float newnessWeight, float brightnessWeight, QString kernelPath)
+//cl_program TordTest::buildCLProgram(const char* program_src, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts, float newnessWeight, float brightnessWeight, QString kernelPath)
+cl::Program TordTest::buildCLProgram(const char* program_src, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts, float newnessWeight, float brightnessWeight, QString kernelPath, size_t sourceLen)
 {
-	cl_program retval;
-	cl_int err;
-	retval = clCreateProgramWithSource(moClContext->context, 1, (const char **) &program_src, 0, &err);
-	check_error(err);
+	cl::Program retval;
+	cl_int err = 0;
+	VECTOR_CLASS<cl::Device> devices;
+	try
+	{
+		//cl_program retval;
 
-	QString define = "-D MAX_PLANES=%1 -D N_PLANES=%2 -D METHOD=%3 -D PLANE_METHOD=%4 -D MAX_MULTISTART_STARTS=%5 -D NEWNESS_FACTOR=%6 -D BRIGHTNESS_FACTOR=%7";
-	define = define.arg(nMaxPlanes).arg(nPlanes).arg(method).arg(planeMethod).arg(nStarts).arg(newnessWeight).arg(brightnessWeight);
+		//retval = clCreateProgramWithSource(moClContext->context, 1, (const char **) &program_src, 0, &err);
+		//typedef VECTOR_CLASS<std::pair<const char*, ::size_t> > Sources;
+		cl::Program::Sources sources;
+		sources.push_back(std::pair<const char*, ::size_t>(program_src, sourceLen));
+		retval = cl::Program(mOCL->context_cpp, sources, &err);
+		check_error(err);
 
-	err = clBuildProgram(retval, 0, NULL, define.toStdString().c_str(), 0, 0);
-	check_error(err);
+		QString define = "-D MAX_PLANES=%1 -D N_PLANES=%2 -D METHOD=%3 -D PLANE_METHOD=%4 -D MAX_MULTISTART_STARTS=%5 -D NEWNESS_FACTOR=%6 -D BRIGHTNESS_FACTOR=%7";
+		define = define.arg(nMaxPlanes).arg(nPlanes).arg(method).arg(planeMethod).arg(nStarts).arg(newnessWeight).arg(brightnessWeight);
+
+		//err = clBuildProgram(retval, 0, NULL, define.toStdString().c_str(), 0, 0);
+		devices = mOCL->context_cpp.getInfo<CL_CONTEXT_DEVICES>();
+		//err = retval.build(devices, define.toStdString().c_str(), 0, 0);
+		err = retval.build(devices, define.toStdString().c_str(), NULL, NULL);
+		//OpenCL::checkBuildProgramLog(retval, devices[0], err);
+		//check_error(err);
+	} catch (cl::Error error)
+	{
+		messageManager()->sendError("Could not build a OpenCL program. Reason: "+QString(error.what()));
+		check_error(error.err());
+		//OpenCL::checkBuildProgramLog(retval, devices[0], err);
+	}
 
 //	if (err != CL_SUCCESS)
 //	{
@@ -171,12 +214,11 @@ bool TordTest::initializeFrameBlocks(frameBlock_t* framePointers, int numBlocks,
 	Eigen::Array3i dims = inputFrames->getDimensions();
 	size_t frameSize = dims[0] * dims[1];
 	size_t numFrames = dims[2];
-	messageManager()->sendInfo(QString("Input dims: %1 %2 %3").arg(dims[0]).arg(dims[1]).arg(dims[2]));
+	messageManager()->sendInfo(QString("Input dims: (%1, %2, %3)").arg(dims[0]).arg(dims[1]).arg(dims[2]));
 
 	// Find out how many frames needs to be in each block
 	size_t framesPerBlock = numFrames / numBlocks;
-	messageManager()->sendInfo(
-			QString("Frames: %1 Blocks: %2 Frames per block: %3").arg(numFrames).arg(numBlocks).arg(framesPerBlock));
+	messageManager()->sendInfo(QString("Frames: %1, Blocks: %2, Frames per block: %3").arg(numFrames).arg(numBlocks).arg(framesPerBlock));
 
 	// Some blocks will need to contain one extra frame
 	// (numFrames and numBlocks is probably not evenly divisible)
@@ -214,8 +256,7 @@ bool TordTest::initializeFrameBlocks(frameBlock_t* framePointers, int numBlocks,
 	return true;
 }
 
-bool TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr outputData, float radius,
-		int nClosePlanes)
+bool TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr outputData, float radius, int nClosePlanes)
 {
 	int numBlocks = 10; // FIXME?
 	// Split input US into blocks
@@ -225,13 +266,18 @@ bool TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	this->initializeFrameBlocks(inputBlocks, numBlocks, input);
 
 	// Allocate CL memory for each frame block
-	cl_mem *clBlocks = new cl_mem[numBlocks];
+	//cl_mem *clBlocks = new cl_mem[numBlocks];
+	VECTOR_CLASS<cl::Buffer> clBlocks;
 	messageManager()->sendInfo("Allocating CL input block buffers");
 
 	for (int i = 0; i < numBlocks; i++)
 	{
-		clBlocks[i] = OpenCL::createBuffer(moClContext->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-				inputBlocks[i].length, inputBlocks[i].data);
+		//clBlocks[i] = OpenCL::createBuffer(moClContext->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, inputBlocks[i].length, inputBlocks[i].data);
+		//TODO why does the context suddenly contain a "dummy" device?
+		//OpenCLPrinter::printContextInfo(mOCL->context_cpp);
+		cl::Buffer buffer = OpenCL::createBuffer(mOCL->context_cpp, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, inputBlocks[i].length, inputBlocks[i].data, "block buffer "+QString::number(i).toStdString());
+		//OpenCLPrinter::printMemoryInfo(buffer);
+		clBlocks.push_back(buffer);
 	}
 
 	// Free the local frameblock buffers
@@ -240,43 +286,40 @@ bool TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	int *outputDims = outputData->GetDimensions();
 
 	size_t outputVolumeSize = outputDims[0] * outputDims[1] * outputDims[2] * sizeof(unsigned char);
+	messageManager()->sendDebug("Output dimensions: "+QString::number(outputDims[0])+", "+QString::number(outputDims[1])+", "+QString::number(outputDims[2]));
 
 	messageManager()->sendInfo(QString("Allocating CL output buffer, size %1").arg(outputVolumeSize));
 	cl_ulong maxAllocSize;
 	cl_ulong globalMemSize;
 
-	check_error(
-			clGetDeviceInfo(moClContext->device, CL_DEVICE_MAX_MEM_ALLOC_SIZE, sizeof(cl_ulong), &maxAllocSize, NULL));
-	check_error(
-			clGetDeviceInfo(moClContext->device, CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(cl_ulong), &globalMemSize, NULL));
+	//check_error(clGetDeviceInfo(moClContext->device, CL_DEVICE_MAX_MEM_ALLOC_SIZE, sizeof(cl_ulong), &maxAllocSize, NULL));
+	maxAllocSize = mOCL->device_cpp.getInfo<CL_DEVICE_MAX_MEM_ALLOC_SIZE>();
+	//check_error(clGetDeviceInfo(moClContext->device, CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(cl_ulong), &globalMemSize, NULL));
+	globalMemSize = mOCL->device_cpp.getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>();
 	// Check memory sizes
 	if (maxAllocSize < outputVolumeSize)
 	{
-		messageManager()->sendInfo(
-				QString("Output volume size too large! %1 > %2\n").arg(outputVolumeSize).arg(maxAllocSize));
+		messageManager()->sendInfo(QString("Output volume size too large! %1 > %2\n").arg(outputVolumeSize).arg(maxAllocSize));
 		return false;
 	}
 
 	if (maxAllocSize < inputBlocks[0].length)
 	{
-		messageManager()->sendInfo(
-				QString("Input blocks too large! %1 > %2\n").arg(inputBlocks[0].length).arg(maxAllocSize));
+		messageManager()->sendInfo(QString("Input blocks too large! %1 > %2\n").arg(inputBlocks[0].length).arg(maxAllocSize));
 		return false;
 	}
 
-	cl_ulong globalMemUse = 10 * inputBlocks[0].length + outputVolumeSize + sizeof(float) * 16 * nPlanes
-			+ sizeof(cl_uchar) * input->getDimensions()[0] * input->getDimensions()[1];
+	cl_ulong globalMemUse = 10 * inputBlocks[0].length + outputVolumeSize + sizeof(float) * 16 * nPlanes + sizeof(cl_uchar) * input->getDimensions()[0] * input->getDimensions()[1];
 	if (globalMemSize < globalMemUse)
 	{
-		messageManager()->sendInfo(
-				QString("Using too much global memory! %1 > %2").arg(globalMemUse).arg(globalMemSize));
+		messageManager()->sendInfo(QString("Using too much global memory! %1 > %2").arg(globalMemUse).arg(globalMemSize));
 		return false;
 	}
 
 	messageManager()->sendInfo(QString("Using %1 of %2 global memory").arg(globalMemUse).arg(globalMemSize));
 
-	cl_mem clOutputVolume = OpenCL::createBuffer(moClContext->context, CL_MEM_WRITE_ONLY, outputVolumeSize,
-	NULL);
+	//cl_mem clOutputVolume = OpenCL::createBuffer(moClContext->context, CL_MEM_WRITE_ONLY, outputVolumeSize, NULL);
+	cl::Buffer clOutputVolume = OpenCL::createBuffer(mOCL->context_cpp, CL_MEM_WRITE_ONLY, outputVolumeSize, NULL, "output volume buffer");
 
 	// Fill the plane matrices
 
@@ -284,23 +327,29 @@ bool TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 
 	this->fillPlaneMatrices(planeMatrices, input);
 
-	cl_mem clPlaneMatrices = OpenCL::createBuffer(moClContext->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-			nPlanes * sizeof(float) * 16, planeMatrices);
+	//cl_mem clPlaneMatrices = OpenCL::createBuffer(moClContext->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,nPlanes * sizeof(float) * 16, planeMatrices);
+	cl::Buffer clPlaneMatrices = OpenCL::createBuffer(mOCL->context_cpp, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,nPlanes * sizeof(float) * 16, planeMatrices, "plane matrices buffer");
 
 	// US Probe mask
-
-	cl_mem clMask = OpenCL::createBuffer(moClContext->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+//	cl_mem clMask = OpenCL::createBuffer(moClContext->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+//			sizeof(cl_uchar) * input->getDimensions()[0] * input->getDimensions()[1],
+//			input->getMask()->GetScalarPointer());
+	cl::Buffer clMask = OpenCL::createBuffer(mOCL->context_cpp, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 			sizeof(cl_uchar) * input->getDimensions()[0] * input->getDimensions()[1],
-			input->getMask()->GetScalarPointer());
+			input->getMask()->GetScalarPointer(), "mask buffer");
 
 	// Set kernel args
 	int arg = 0;
 	// volume_xsize
-	check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &outputDims[0]));
+	//check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &outputDims[0]));
+	messageManager()->sendDebug("1");
+	mKernel.setArg(arg++, outputDims[0]);
 	// volume_ysize
-	check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &outputDims[1]));
+	//check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &outputDims[1]));
+	mKernel.setArg(arg++, outputDims[1]);
 	// volume_zsize
-	check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &outputDims[2]));
+	//check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &outputDims[2]));
+	mKernel.setArg(arg++, outputDims[2]);
 
 	double *out_spacing = outputData->GetSpacing();
 	float spacings[3];
@@ -309,61 +358,80 @@ bool TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	spacings[2] = out_spacing[2];
 
 	// volume_xspacing
-	check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[0]));
+	//check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[0]));
+	mKernel.setArg(arg++, spacings[0]);
 	// volume_yspacing
-	check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[1]));
+	//check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[1]));
+	mKernel.setArg(arg++, spacings[1]);
 	// volume_zspacing
-	check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[2]));
+	//check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[2]));
+	mKernel.setArg(arg++, spacings[2]);
 
 	// in_xsize
-	check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[0]));
+	//check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[0]));
+	mKernel.setArg(arg++, input->getDimensions()[0]);
 	// in_ysize
-	check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[1]));
+	//check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_int), &input->getDimensions()[1]));
+	mKernel.setArg(arg++, input->getDimensions()[1]);
 
 	spacings[0] = input->getSpacing()[0];
 	spacings[1] = input->getSpacing()[1];
 
 	// in_xspacing
-	check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[0]));
+	//check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[0]));
+	mKernel.setArg(arg++, spacings[0]);
 	// in_yspacing
-	check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[1]));
+	//check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &spacings[1]));
+	mKernel.setArg(arg++, spacings[1]);
 
 	// The input blocks
-	for (int i = 0; i < numBlocks; i++)
+	messageManager()->sendDebug("2");
+	//for (int i = 0; i < numBlocks; i++)
+	for (int i = 0; i < clBlocks.size(); i++)
 	{
-		check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clBlocks[i]));
+		//check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clBlocks[i]));
+		mKernel.setArg(arg++, clBlocks[i]);
 	}
-
+	messageManager()->sendDebug("3");
 	// out_volume
-	check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clOutputVolume));
+	//check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clOutputVolume));
+	mKernel.setArg(arg++, clOutputVolume);
+
 	// plane_matrices
-	check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clPlaneMatrices));
+	//check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clPlaneMatrices));
+	mKernel.setArg(arg++, clPlaneMatrices);
 
 	// US Probe mask
-	check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clMask));
+	//check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_mem), &clMask));
+	mKernel.setArg(arg++, clMask);
+	messageManager()->sendDebug("4");
 
 	// plane_eqs (local CL memory, will be calculated by the kernel)
-	check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float)*4*nPlanes, NULL));
+	//check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float)*4*nPlanes, NULL));
+	//TODO why 4? because float4 is used??
+	//mKernel.setArg(arg++, NULL);
+	mKernel.setArg(arg++, cl::__local(sizeof(cl_float)*4*nPlanes));
 
 	// Find out how much local memory the device has
 	size_t dev_local_mem_size;
-	check_error(
-			clGetDeviceInfo(moClContext->device, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(size_t), &dev_local_mem_size, NULL));
+	//check_error(clGetDeviceInfo(moClContext->device, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(size_t), &dev_local_mem_size, NULL));
+	dev_local_mem_size = mOCL->device_cpp.getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
 
 	size_t local_work_size;
 	// Find the optimal local work size
-	check_error(
-			clGetKernelWorkGroupInfo(mClKernel, moClContext->device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(size_t), &local_work_size, NULL));
+	//check_error(clGetKernelWorkGroupInfo(mClKernel, moClContext->device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(size_t), &local_work_size, NULL));
+	//OpenCLPrinter::printDeviceInfo(mOCL->device_cpp);
+	mKernel.getWorkGroupInfo(mOCL->device_cpp, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &local_work_size);
+	messageManager()->sendDebug("Kernels preferred work group size multiple is "+QString::number(local_work_size));
 	// Find the maximum work group size
 	size_t max_work_size;
-	check_error(
-			clGetKernelWorkGroupInfo(mClKernel, moClContext->device, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &max_work_size, NULL));
+	//check_error(clGetKernelWorkGroupInfo(mClKernel, moClContext->device, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &max_work_size, NULL));
+	mKernel.getWorkGroupInfo(mOCL->device_cpp, CL_KERNEL_WORK_GROUP_SIZE, &max_work_size);
 
 	// Now find the largest multiple of the preferred work group size that will fit into local mem
 
 	size_t constant_local_mem = sizeof(cl_float) * 4 * nPlanes;
-	size_t varying_local_mem = (sizeof(cl_float) + sizeof(cl_short) + sizeof(cl_uchar) + sizeof(cl_uchar))
-			* (nClosePlanes + 1);
+	size_t varying_local_mem = (sizeof(cl_float) + sizeof(cl_short) + sizeof(cl_uchar) + sizeof(cl_uchar)) * (nClosePlanes + 1);
 	messageManager()->sendInfo(QString("Device has %1 bytes of local memory").arg(dev_local_mem_size));
 	dev_local_mem_size -= constant_local_mem + 128;
 
@@ -376,16 +444,19 @@ bool TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	local_work_size = std::min(max_work_size, multiple * local_work_size);
 
 	// close planes (local CL memory, to be used by the kernel)
-	check_error(clSetKernelArg(mClKernel, arg++, varying_local_mem*local_work_size, NULL));
+	//check_error(clSetKernelArg(mClKernel, arg++, varying_local_mem*local_work_size, NULL));
+	size_t close_planes_size = varying_local_mem*local_work_size;
+	mKernel.setArg(arg++, cl::__local(close_planes_size));
 	// radius
-	check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &radius));
+	//check_error(clSetKernelArg(mClKernel, arg++, sizeof(cl_float), &radius));
+	mKernel.setArg(arg++, radius);
 
 	messageManager()->sendInfo(QString("Using %1 as local workgroup size").arg(local_work_size));
 	cl_ulong local_mem_size;
 
 	// Print local memory usage for debugging purposes
-	check_error(
-			clGetKernelWorkGroupInfo(mClKernel, moClContext->device, CL_KERNEL_LOCAL_MEM_SIZE, sizeof(cl_ulong), &local_mem_size, NULL));
+	//check_error(clGetKernelWorkGroupInfo(mClKernel, moClContext->device, CL_KERNEL_LOCAL_MEM_SIZE, sizeof(cl_ulong), &local_mem_size, NULL));
+	mKernel.getWorkGroupInfo(mOCL->device_cpp, CL_KERNEL_LOCAL_MEM_SIZE, &local_mem_size);
 
 	messageManager()->sendInfo(QString("Kernel is using %1 bytes of local memory").arg(local_mem_size));
 
@@ -394,27 +465,45 @@ bool TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	int cube_dim = 4;
 	int cube_dim_cubed = cube_dim * cube_dim * cube_dim;
 	// Global work items:
-	size_t global_work_size = (((outputDims[0] + cube_dim) * (outputDims[1] + cube_dim) * (outputDims[2] + cube_dim))
-			/ cube_dim_cubed);
+	size_t global_work_size = (((outputDims[0] + cube_dim) * (outputDims[1] + cube_dim) * (outputDims[2] + cube_dim)) / cube_dim_cubed);
 
 	// Round global_work_size up to nearest multiple of local_work_size
 	if (global_work_size % local_work_size)
 		global_work_size = ((global_work_size / local_work_size) + 1) * local_work_size;
 
 	messageManager()->sendInfo(QString("Executing kernel"));
-//	check_error(
-//			clEnqueueNDRangeKernel(moClContext->cmd_queue, mClKernel, 1, NULL, &global_work_size, &local_work_size, 0, NULL, NULL));
+
+//	check_error(clEnqueueNDRangeKernel(moClContext->cmd_queue, mClKernel, 1, NULL, &global_work_size, &local_work_size, 0, NULL, NULL));
 //	check_error(clFinish(moClContext->cmd_queue));
+	try
+	{
+		messageManager()->sendDebug("BEFORE enqueueNDRangeKernel");
+		messageManager()->sendDebug("Global work size: "+QString::number(global_work_size/(1024*1024))+" MB");
+		messageManager()->sendDebug("Local work size: "+QString::number(local_work_size/(1024*1024))+" MB");
+		mOCL->cmd_queue_cpp.enqueueNDRangeKernel(mKernel, 0, global_work_size, local_work_size, NULL, NULL);
+		messageManager()->sendDebug("BETWEEN enqueueNDRangeKernel and finish");
+		mOCL->cmd_queue_cpp.finish();
+		messageManager()->sendDebug("AFTER enqueueNDRangeKernel and finish");
+//		mOCL->cmd_queue_cpp.enqueueBarrier();
+	} catch (cl::Error error)
+	{
+		messageManager()->sendError("Could not execute kernels. Reason: "+QString(error.what()));
+		check_error(error.err());
+	}
 
 	// Read back data
 	try
 	{
-		check_error(
-				clEnqueueReadBuffer(moClContext->cmd_queue, clOutputVolume, CL_TRUE, 0, outputVolumeSize,
-						outputData->GetScalarPointer(), 0, 0, 0));
-	} catch (std::string& except)
+		//check_error(clEnqueueReadBuffer(moClContext->cmd_queue, clOutputVolume, CL_TRUE, 0, outputVolumeSize, outputData->GetScalarPointer(), 0, 0, 0));
+		messageManager()->sendDebug("BEFORE enqueueReadBuffer");
+		messageManager()->sendDebug("OutputVolumeSize: "+QString::number(outputVolumeSize/(1024*1024))+" MB");
+		mOCL->cmd_queue_cpp.enqueueReadBuffer(clOutputVolume, CL_TRUE, 0, outputVolumeSize, outputData->GetScalarPointer(), 0, 0);
+		messageManager()->sendDebug("AFTER enqueueReadBuffer");
+	} catch (cl::Error error)
 	{
-		messageManager()->sendInfo(QString((std::string("Got exception: ") + except).c_str()));
+//		messageManager()->sendInfo(QString((std::string("Got exception: ") + except).c_str()));
+		messageManager()->sendError("Could not read output volume buffer from OpenCL. Reason: "+QString(error.what()));
+		check_error(error.err());
 	}
 
 	messageManager()->sendInfo(QString("Done, freeing GPU memory"));
@@ -424,13 +513,13 @@ bool TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	inputBlocks = NULL;
 
 	// Free the allocated cl memory objects
-	for (int i = 0; i < numBlocks; i++)
-	{
-		check_error(clReleaseMemObject(clBlocks[i]));
-	}
-	check_error(clReleaseMemObject(clOutputVolume));
-	check_error(clReleaseMemObject(clPlaneMatrices));
-	check_error(clReleaseMemObject(clMask));
+//	for (int i = 0; i < numBlocks; i++)
+//	{
+//		check_error(clReleaseMemObject(clBlocks[i]));
+//	}
+//	check_error(clReleaseMemObject(clOutputVolume));
+//	check_error(clReleaseMemObject(clPlaneMatrices));
+//	check_error(clReleaseMemObject(clMask));
 
 	return true;
 }
@@ -485,16 +574,22 @@ bool TordTest::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr output
 			QString("Method: %1, radius: %2, planeMethod: %3, nClosePlanes: %4, nPlanes: %5, nStarts: %6 ").arg(method).arg(
 					radius).arg(planeMethod).arg(nClosePlanes).arg(input->getDimensions()[2]).arg(nStarts));
 
-	if (!initCL(QString(TORD_KERNEL_PATH) + "/kernels.ocl", nClosePlanes, input->getDimensions()[2], method,
+	if (!initCL(QString(TORD_KERNEL_PATH) + "/kernels.cl", nClosePlanes, input->getDimensions()[2], method,
 			planeMethod, nStarts, newnessWeight, brightnessWeight))
 		return false;
 
 	bool ret = doGPUReconstruct(input, outputData, radius, nClosePlanes);
 
-	if (moClContext != NULL)
+//	if (moClContext != NULL)
+//	{
+//		OpenCL::release(moClContext);
+//		moClContext = NULL;
+//	}
+
+	if (mOCL != NULL)
 	{
-		OpenCL::release(moClContext);
-		moClContext = NULL;
+		OpenCL::release(mOCL);
+		mOCL = NULL;
 	}
 
 	return ret;
