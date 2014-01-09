@@ -30,7 +30,7 @@
 #if defined (__APPLE__)
 	#define MAX_NUMBER_OF_ADDITIONAL_VOLUMES 3 //Mehdi //?
 #else
-	#define MAX_NUMBER_OF_ADDITIONAL_VOLUMES 7 //Mehdi //?
+	#define MAX_NUMBER_OF_ADDITIONAL_VOLUMES 4 //Mehdi //?
 #endif
 
 
