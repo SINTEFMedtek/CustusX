@@ -82,8 +82,19 @@ void VisualizationTab::init()
   mAnyplaneViewOffset = DoubleDataAdapterXml::initialize("AnyplaneViewOffset",
 														 "View Offset",
 														 "Position of virtual tool tip in anyplane view, % from top.",
-														 anyplaneViewOffset, DoubleRange(0.1,0.5,0.01), 2, QDomNode());
+														 anyplaneViewOffset, DoubleRange(0.1,0.5,0.05), 2, QDomNode());
   mAnyplaneViewOffset->setInternal2Display(100);
+
+  bool followTooltip = settings()->value("Navigation/followTooltip").value<bool>();
+  mFollowTooltip = BoolDataAdapterXml::initialize("Views Follow Tool", "",
+												 "ACS Views follow the virtual tool tip",
+												 followTooltip);
+  double followTooltipBoundary = settings()->value("Navigation/followTooltipBoundary").toDouble();
+  mFollowTooltipBoundary = DoubleDataAdapterXml::initialize("FollowTooltipBoundary",
+														 "Follow Tool Boundary",
+														 "Boundary in ACS Views where follow tool tip is applied. % of view size",
+														 followTooltipBoundary, DoubleRange(0.0,0.5,0.05), 2, QDomNode());
+  mFollowTooltipBoundary->setInternal2Display(100);
 
   QVBoxLayout* stereoLayout = new QVBoxLayout();
   stereoLayout->addWidget(mStereoTypeComboBox);
@@ -100,6 +111,8 @@ void VisualizationTab::init()
   mMainLayout->addWidget(new SpinBoxGroupWidget(this, mAnnotationModelSize));
   mMainLayout->addWidget(sscCreateDataWidget(this, mAnnotationModel));
   mMainLayout->addWidget(sscCreateDataWidget(this, mAnyplaneViewOffset));
+  mMainLayout->addWidget(sscCreateDataWidget(this, mFollowTooltip));
+  mMainLayout->addWidget(sscCreateDataWidget(this, mFollowTooltipBoundary));
 
   mMainLayout->addWidget(stereoGroupBox);
 
@@ -179,6 +192,8 @@ void VisualizationTab::saveParametersSlot()
   settings()->setValue("View3D/annotationModelSize", mAnnotationModelSize->getValue());
   settings()->setValue("View3D/annotationModel", mAnnotationModel->getValue());
   settings()->setValue("Navigation/anyplaneViewOffset", mAnyplaneViewOffset->getValue());
+  settings()->setValue("Navigation/followTooltip", mFollowTooltip->getValue());
+  settings()->setValue("Navigation/followTooltipBoundary", mFollowTooltipBoundary->getValue());
 }
 
 void VisualizationTab::setBackgroundColorSlot(QColor color)

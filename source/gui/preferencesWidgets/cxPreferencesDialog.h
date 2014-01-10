@@ -60,6 +60,8 @@ protected:
   StringDataAdapterXmlPtr mAnnotationModel;
   DoubleDataAdapterXmlPtr mAnnotationModelSize;
   DoubleDataAdapterXmlPtr mAnyplaneViewOffset;
+  BoolDataAdapterXmlPtr mFollowTooltip;
+  DoubleDataAdapterXmlPtr mFollowTooltipBoundary;
 
   //Stereo
   QComboBox* mStereoTypeComboBox;

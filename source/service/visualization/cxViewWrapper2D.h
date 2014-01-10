@@ -36,6 +36,7 @@ class QWheelEvent;
 namespace cx
 {
 typedef boost::shared_ptr<class OrientationAnnotationSmartRep> OrientationAnnotationSmartRepPtr;
+typedef boost::shared_ptr<class ViewFollower> ViewFollowerPtr;
 }
 
 
@@ -124,8 +125,9 @@ private:
 	DisplayTextRepPtr mDataNameText;
 	SlicePlanes3DMarkerIn2DRepPtr mSlicePlanes3DMarker;
 	QPointer<ViewWidget> mView;
+	ViewFollowerPtr mViewFollower;
 
-	// sunchronized data
+	// synchronized data
 	SyncedValuePtr mZoom2D;
 	SyncedValuePtr mOrientationMode;
 	Vector3D mClickPos;
