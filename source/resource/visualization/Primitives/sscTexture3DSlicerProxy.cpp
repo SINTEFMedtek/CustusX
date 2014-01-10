@@ -44,6 +44,7 @@
 #include "sscTypeConversions.h"
 #include "sscGPUImageBuffer.h"
 #include <vtkOpenGLRenderWindow.h>
+#include "sscLogger.h"
 
 //---------------------------------------------------------
 namespace cx
