@@ -8,6 +8,8 @@
 #include <cxToolManualCalibrationWidget.h>
 #include "cxActiveToolWidget.h"
 #include "sscToolManager.h"
+#include "cxDataInterface.h"
+#include "sscHelperWidgets.h"
 
 namespace cx
 {
@@ -19,7 +21,8 @@ ToolManualCalibrationWidget::ToolManualCalibrationWidget(QWidget* parent) :
   QVBoxLayout* mToptopLayout = new QVBoxLayout(this);
   //toptopLayout->setMargin(0);
 
-  mToptopLayout->addWidget(new ActiveToolWidget(this));
+  mTool = SelectToolStringDataAdapter::New();
+  mToptopLayout->addWidget(sscCreateDataWidget(this, mTool));
 
   mToptopLayout->addWidget(new QLabel("<font color=red>Caution: sMt is changed directly by this control.</font>"));
   mGroup = new QGroupBox(this);
@@ -31,7 +34,7 @@ ToolManualCalibrationWidget::ToolManualCalibrationWidget(QWidget* parent) :
   mMatrixWidget = new Transform3DWidget(mGroup);
   groupLayout->addWidget(mMatrixWidget);
   connect(mMatrixWidget, SIGNAL(changed()), this, SLOT(matrixWidgetChanged()));
-  connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(toolCalibrationChanged()));
+  connect(mTool.get(), SIGNAL(changed()), this, SLOT(toolCalibrationChanged()));
 
   this->toolCalibrationChanged();
   mMatrixWidget->setEditable(true);
@@ -56,7 +59,7 @@ QString ToolManualCalibrationWidget::defaultWhatsThis() const
 
 void ToolManualCalibrationWidget::toolCalibrationChanged()
 {
-  ToolPtr tool = toolManager()->getDominantTool();
+	ToolPtr tool = mTool->getTool();
   if (!tool)
     return;
 
@@ -68,8 +71,8 @@ void ToolManualCalibrationWidget::toolCalibrationChanged()
 
 void ToolManualCalibrationWidget::matrixWidgetChanged()
 {
-  ToolPtr tool = toolManager()->getDominantTool();
-    if (!tool)
+	ToolPtr tool = mTool->getTool();
+	if (!tool)
       return;
 
   Transform3D M = mMatrixWidget->getMatrix();
