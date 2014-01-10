@@ -190,6 +190,8 @@ void SliceComputer::setToolViewOffset(bool use, double viewportHeight, double vi
 	mUseViewOffset = use; 
 	mViewportHeight = viewportHeight; 
 	mViewOffset = viewOffset;
+	if (mPlaneType==ptRADIALPLANE)
+		mViewOffset = 0.5; // position in the center
 	mUseConstrainedViewOffset = useConstrainedViewOffset;
 }
 
@@ -267,7 +269,8 @@ SlicePlane SliceComputer::applyViewOffset(const SlicePlane& base) const
 	{
 		Vector3D toolCenter = m_rMt.coord(Vector3D(0,0,mToolOffset));
 		Vector3D newCenter = toolCenter - mViewportHeight*(0.5-mViewOffset) * base.j;
-		retval.c = base.c + dot(newCenter - base.c, base.j) * base.j; // extract j-component of newCenter
+		double distance = dot(newCenter - base.c, base.j);
+		retval.c = base.c + distance * base.j; // extract j-component of newCenter
 	}
 	return retval;
 }
