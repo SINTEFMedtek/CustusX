@@ -126,6 +126,8 @@ void ReconstructPreprocessor::cropInputData()
 	IntBoundingBox3D cropbox(sector.getClipRect_p().begin());
 	Eigen::Vector3i shift = cropbox.corner(0,0,0).cast<int>();
 	Eigen::Vector3i size = cropbox.range().cast<int>() + Eigen::Vector3i(1,1,0); // convert from extent format to size format by adding 1
+	size[0] = std::min(size[0], sector.getSize().width());
+	size[1] = std::min(size[1], sector.getSize().height());
 	mFileData.mUsRaw->setCropBox(cropbox);
 
 	DoubleBoundingBox3D clipRect_p = sector.getClipRect_p();
