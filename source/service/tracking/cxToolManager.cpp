@@ -639,7 +639,6 @@ ToolPtr cxToolManager::getTool(const QString& uid)
 
 void cxToolManager::setTooltipOffset(double offset)
 {
-    std::cout << "cxToolManager::setTooltipOffset: " << offset << std::endl;
 	if (similar(offset, mToolTipOffset))
 		return;
 	mToolTipOffset = offset;
@@ -679,8 +678,6 @@ void cxToolManager::setDominantTool(const QString& uid)
 		if (mDominantTool)
 		{
 			mManualTool->set_prMt(mDominantTool->get_prMt());
-            //mManualTool->setTooltipOffset(mDominantTool->getTooltipOffset());
-
 		}
 		mManualTool->setVisible(true);
 //    mManualTool->setVisible(settings()->value("showManualTool").toBool());
