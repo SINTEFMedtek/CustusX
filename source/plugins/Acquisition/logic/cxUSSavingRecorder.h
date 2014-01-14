@@ -59,6 +59,7 @@ class USSavingRecorder : public QObject
 	Q_OBJECT
 public:
 	USSavingRecorder();
+	virtual ~USSavingRecorder();
 	/**
 	  * Start recording
 	  */
