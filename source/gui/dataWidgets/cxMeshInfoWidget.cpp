@@ -14,6 +14,8 @@
 #include "cxDataInterface.h"
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringDataAdapter.h"
+#include "sscLogger.h"
+
 
 namespace cx
 {
@@ -58,7 +60,12 @@ void MeshInfoWidget::meshSelectedSlot()
 	mMesh = mSelectMeshWidget->getMesh();
 
 	if (!mMesh)
-	return;
+	{
+		mParentFrameAdapter->setData(mMesh);
+		mNameAdapter->setData(mMesh);
+		mUidAdapter->setData(mMesh);
+		return;
+	}
 
 	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
 	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
@@ -90,6 +97,7 @@ void MeshInfoWidget::meshChangedSlot()
 {
 	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
 	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
+	mColorAdapter->setValue(mMesh->getColor());
 }
 
 void MeshInfoWidget::showEvent(QShowEvent* event)

@@ -59,6 +59,8 @@
 #include "sscMesh.h"
 #include "sscImage.h"
 #include "sscPointMetricRep2D.h"
+#include "sscLogger.h"
+#include "cxViewFollower.h"
 
 namespace cx
 {
@@ -193,6 +195,9 @@ void ViewWrapper2D::addReps()
 
 	// slice proxy
 	mSliceProxy = SliceProxy::New("sliceproxy_(" + mView->getName() + ")");
+	mViewFollower.reset(new ViewFollower);
+	mViewFollower->setSliceProxy(mSliceProxy);
+//	connect(mSliceProxy.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(ensureCenterWithinView()));
 
 	// slice rep
 	//the mul
@@ -246,7 +251,10 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 	{
 		this->updateView();
 	}
-
+	if (key == "Navigation/anyplaneViewOffset")
+	{
+		this->updateView();
+	}
 }
 
 bool ViewWrapper2D::overlayIsEnabled()
@@ -324,16 +332,22 @@ void ViewWrapper2D::viewportChanged()
 //	std::cout << "height: " << viewHeight << ", d=" << clipDepth << std::endl;
 
 	mSliceProxy->setToolViewportHeight(viewHeight);
+	double anyplaneViewOffset = settings()->value("Navigation/anyplaneViewOffset").toDouble();
+	mSliceProxy->initializeFromPlane(mSliceProxy->getComputer().getPlaneType(), false, Vector3D(0, 0, 1), true, viewHeight, anyplaneViewOffset, true);
+//	mSliceProxy->setToolViewOffset(mSliceProxy->getComputer().get, viewHeight, anyplaneViewOffset, true);
 
 	DoubleBoundingBox3D BB_vp = getViewport();
 	Transform3D vpMs = get_vpMs();
+	DoubleBoundingBox3D BB_s = transform(vpMs.inv(), BB_vp);
 	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
 
 	mToolRep2D->setViewportData(vpMs, BB_vp);
 	if (mSlicePlanes3DMarker)
 	{
-		mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, transform(vpMs.inv(), BB_vp));
+		mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, BB_s);
 	}
+
+	mViewFollower->setView(BB_s);
 }
 
 /**Return the viewport in vtk pixels. (viewport space)
@@ -384,6 +398,8 @@ void ViewWrapper2D::initializePlane(PLANE_TYPE plane)
 	mPlaneTypeText->setText(0, qstring_cast(plane));
 	double viewHeight = mView->heightMM() / this->getZoomFactor2D();
 	mSliceProxy->initializeFromPlane(plane, false, Vector3D(0, 0, 1), true, viewHeight, 0.25);
+//	double anyplaneViewOffset = settings()->value("Navigation/anyplaneViewOffset").toDouble();
+//	mSliceProxy->initializeFromPlane(plane, false, Vector3D(0, 0, 1), true, 1, 0);
 	mOrientationAnnotationRep->setSliceProxy(mSliceProxy);
 
 	// do this to force sync global and local type - must think on how we want this to work
@@ -484,7 +500,6 @@ void ViewWrapper2D::updateView()
 				mSliceRep->setSliceProxy(mSliceProxy);
 				mView->addRep(mSliceRep);
 			}
-//			std::cout << "using sw slicer" << std::endl;
 
 			QStringList textList;
 			mSliceRep->setImage(image);
@@ -497,21 +512,6 @@ void ViewWrapper2D::updateView()
 			textList << image->getName();
 			text = textList.join("\n");
 		}
-//#ifdef USE_2D_GPU_RENDER
-//		this->resetMultiSlicer();
-//		text = this->getAllDataNames().join("\n");
-//#else
-//		QStringList textList;
-//		mSliceRep->setImage(image);
-//
-//		// list all meshes and one image.
-//		std::vector<MeshPtr> mesh = mViewGroup->getMeshes();
-//		for (unsigned i = 0; i < mesh.size(); ++i)
-//		textList << qstring_cast(mesh[i]->getName());
-//		if (image)
-//		textList << image->getName();
-//		text = textList.join("\n");
-//#endif
 	}
 
 	bool show = settings()->value("View/showDataText").value<bool>();
@@ -524,7 +524,10 @@ void ViewWrapper2D::updateView()
 
 	mOrientationAnnotationRep->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
 
+//	mViewFollower->ensureCenterWithinView();
 }
+
+
 
 void ViewWrapper2D::imageRemoved(const QString& uid)
 {

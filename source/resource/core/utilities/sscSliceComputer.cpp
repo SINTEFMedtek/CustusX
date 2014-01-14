@@ -250,15 +250,17 @@ SlicePlane SliceComputer::applyViewOffset(const SlicePlane& base) const
 		return base;
 	}
 
+	double centerOffset = this->getViewOffsetAbsoluteFromCenter();
+
 	SlicePlane retval = base;
 	if (mUseConstrainedViewOffset)
 	{
 		Vector3D toolOffsetCenter = m_rMt.coord(Vector3D(0,0,mToolOffset));
-		Vector3D newCenter = toolOffsetCenter - mViewportHeight*(mViewOffset-0.5) * base.j;
+		Vector3D newCenter = toolOffsetCenter + centerOffset * base.j;
 		double toolOffsetDistance = dot(newCenter - base.c, base.j);
 
 		Vector3D toolCenter = m_rMt.coord(Vector3D(0,0,0));
-		newCenter = toolCenter - mViewportHeight*(0.5-mViewOffset) * base.j;
+		newCenter = toolCenter - centerOffset * base.j;
 		double toolDistance = dot(newCenter - base.c, base.j);
 		double usedDistance = std::min(toolOffsetDistance, toolDistance);
 		retval.c = base.c + usedDistance * base.j; // extract j-component of newCenter
@@ -266,10 +268,19 @@ SlicePlane SliceComputer::applyViewOffset(const SlicePlane& base) const
 	else
 	{
 		Vector3D toolCenter = m_rMt.coord(Vector3D(0,0,mToolOffset));
-		Vector3D newCenter = toolCenter - mViewportHeight*(0.5-mViewOffset) * base.j;
-		retval.c = base.c + dot(newCenter - base.c, base.j) * base.j; // extract j-component of newCenter
+		Vector3D newCenter = toolCenter - centerOffset * base.j;
+		double distance = dot(newCenter - base.c, base.j);
+		retval.c = base.c + distance * base.j; // extract j-component of newCenter
 	}
 	return retval;
+}
+
+double SliceComputer::getViewOffsetAbsoluteFromCenter() const
+{
+	if (mPlaneType==ptRADIALPLANE)
+		return 0; // position in the center
+
+	return mViewportHeight*(0.5-mViewOffset);
 }
 
 /**Generate the <i,j> vector pair spanning the basis plane

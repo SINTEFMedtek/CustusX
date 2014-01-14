@@ -81,13 +81,15 @@ bool PositionStorageReader::read(Transform3D* matrix, double* timestamp, QString
 
   stream >> type; // read type and make ready for a new read below
 
-  if (type==2) // change tool format
+  while (type==2) // change tool format
   {
-    stream >> size;
+	  if (this->atEnd())
+		return false;
+	stream >> size;
     char* data = NULL;
     uint isize = 0;
     stream.readBytes(data, isize);
-    mCurrentToolUid = QString(QByteArray(data, size));
+	mCurrentToolUid = QString(QByteArray(data, size));
     delete[] data;
 
     stream >> type; // read type and make ready for a new read below
