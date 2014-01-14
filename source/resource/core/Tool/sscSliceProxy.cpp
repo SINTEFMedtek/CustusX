@@ -95,6 +95,8 @@ void SliceProxy::toolTransformAndTimestampSlot(Transform3D prMt, double timestam
 //	}
 	mCutplane->setToolPosition(rMt);
 	this->changed();
+	emit toolTransformAndTimestamp(prMt, timestamp);
+
 }
 
 void SliceProxy::tooltipOffsetSlot(double val)

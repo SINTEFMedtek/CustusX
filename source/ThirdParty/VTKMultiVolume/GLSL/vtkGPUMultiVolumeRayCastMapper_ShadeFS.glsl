@@ -20,9 +20,16 @@
 // Think of "value" as an object.
 
 // from 1- vs 4-component shader.
+
+#ifdef __APPLE__
+	#define MAX_NUMBER_OF_VOLUMES 4						
+#else
+	#define MAX_NUMBER_OF_VOLUMES 5
+#endif
+
 vec4 colorFromValue(int volNumber,vec4 value);
 
-uniform sampler3D dataSetTexture[4]; // need neighbors for gradient
+uniform sampler3D dataSetTexture[MAX_NUMBER_OF_VOLUMES]; // need neighbors for gradient
 
 
 // Change-of-coordinate matrix from eye space to texture space
@@ -39,14 +46,14 @@ uniform vec3 cellScale;
 
 // Entry position (global scope), updated in the loop
 vec3 pos;
-vec3 posX[3];
+vec3 posX[MAX_NUMBER_OF_VOLUMES-1];
 
 
 // Incremental vector in texture space (global scope)
 vec3 rayDir;
 
-uniform mat4 P1toPN[3]; //Mehdi
-uniform mat4 PNtoP1[3]; //Mehdi
+uniform mat4 P1toPN[MAX_NUMBER_OF_VOLUMES-1]; //Mehdi
+uniform mat4 PNtoP1[MAX_NUMBER_OF_VOLUMES-1]; //Mehdi
 
 uniform int Number_Of_Volumes;
 
@@ -55,9 +62,9 @@ const vec3 minusOne=vec3(-1.0,-1.0,-1.0);
 const vec4 clampMin=vec4(0.0,0.0,0.0,0.0);
 const vec4 clampMax=vec4(1.0,1.0,1.0,1.0);
 
-vec3 xvec[10];
-vec3 yvec[10];
-vec3 zvec[10];
+vec3 xvec[MAX_NUMBER_OF_VOLUMES];
+vec3 yvec[MAX_NUMBER_OF_VOLUMES];
+vec3 zvec[MAX_NUMBER_OF_VOLUMES];
 
 
 vec3 wReverseRayDir;
