@@ -32,6 +32,7 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(Registratio
 	mImageLandmarkSource = ImageLandmarksSource::New();
 	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(regManager));
 	connect(mManager.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedDataChanged()));
+	connect(toolManager(), SIGNAL(rMprChanged()), this, SLOT(setModified()));
 
 	//buttons
 	mToolSampleButton->setDisabled(true);
