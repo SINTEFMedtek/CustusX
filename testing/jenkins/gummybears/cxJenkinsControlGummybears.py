@@ -76,7 +76,7 @@ class JenkinsGummyBears():
         print self._getTimeLineString()
         self._printConfigInfo()
         
-        logging.basicConfig(filename='myapp.log', level=logging.DEBUG)
+        logging.basicConfig(filename='myapp.log', level=logging.INFO)
         self.jenkins = api.Jenkins(self.hostname, self.username, self.password)
 
         print 'jenkins python controller initialized'
