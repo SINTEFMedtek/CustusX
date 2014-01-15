@@ -50,6 +50,7 @@ public:
     /** Return the filedata after preprocessing, ready to be sent to reconstruction
       */
     void initializeCores(std::vector<ReconstructCorePtr> cores); ///< fill input cores with relevant processed input
+		std::vector<ProcessedUSInputDataPtr> createProcessedInput(std::vector<ReconstructCorePtr> cores);
 
 private:
     void cropInputData();

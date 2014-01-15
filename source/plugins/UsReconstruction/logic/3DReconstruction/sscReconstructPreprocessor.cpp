@@ -52,11 +52,26 @@ void ReconstructPreprocessor::initializeCores(std::vector<ReconstructCorePtr> co
 {
 	TimeKeeper timer;
 
+	std::vector<ProcessedUSInputDataPtr> processedInput = this->createProcessedInput(cores);
+	SSC_ASSERT(cores.size() == processedInput.size());
+
+	for (unsigned i=0; i<cores.size(); ++i)
+	{
+		cores[i]->initialize(processedInput[i], this->getOutputVolumeParams());
+	}
+
+	timer.printElapsedSeconds("Reconstruct preprocess time");
+}
+
+std::vector<ProcessedUSInputDataPtr> ReconstructPreprocessor::createProcessedInput(std::vector<ReconstructCorePtr> cores)
+{
 	std::vector<bool> angio;
 	for (unsigned i=0; i<cores.size(); ++i)
 		angio.push_back(cores[i]->getInputParams().mAngio);
 
 	std::vector<std::vector<vtkImageDataPtr> > frames = mFileData.mUsRaw->initializeFrames(angio);
+
+	std::vector<ProcessedUSInputDataPtr> retval;
 
 	for (unsigned i=0; i<cores.size(); ++i)
 	{
@@ -66,11 +81,10 @@ void ReconstructPreprocessor::initializeCores(std::vector<ReconstructCorePtr> co
 											 mFileData.getMask(),
 											 mFileData.mFilename,
 											 QFileInfo(mFileData.mFilename).completeBaseName() ));
-		cores[i]->initialize(input, this->getOutputVolumeParams());
+		SSC_ASSERT(Eigen::Array3i(frames[i][0]->GetDimensions()).isApprox(Eigen::Array3i(mFileData.getMask()->GetDimensions())));
+		retval.push_back(input);
 	}
-
-
-	timer.printElapsedSeconds("Reconstruct preprocess time");
+	return retval;
 }
 
 namespace
