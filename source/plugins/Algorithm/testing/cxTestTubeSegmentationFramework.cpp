@@ -18,6 +18,7 @@
 #include <fstream>
 #include "sscData.h"
 #include "cxLogicManager.h"
+#include "sscMessageManager.h"
 #include "cxDataInterface.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
@@ -31,6 +32,16 @@
 #include "SIPL/Exceptions.hpp"
 
 #include "catch.hpp"
+
+TestTubeSegmentationFramework::TestTubeSegmentationFramework() 
+{
+	cx::MessageManager::initialize();
+}
+
+TestTubeSegmentationFramework::~TestTubeSegmentationFramework() 
+{
+	cx::MessageManager::shutdown();
+}
 
 void TestTubeSegmentationFramework::setUp()
 {
