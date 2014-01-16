@@ -217,7 +217,7 @@ void Acquisition::setState(STATE newState)
 	if (lastState!=sRUNNING && newState==sRUNNING)
 		emit started();
 	else if (lastState==sRUNNING && newState!=sRUNNING && mLatestSession)
-		emit stopped();
+		emit acquisitionStopped();
 	else if (lastState==sRUNNING && newState!=sRUNNING && !mLatestSession)
 		emit cancelled();
 
