@@ -82,7 +82,7 @@ void DataManagerImpl::clear()
 	emit centerChanged();
 	emit activeImageChanged("");
 	emit landmarkPropertiesChanged();
-	emit dataLoaded();
+	emit dataAddedOrRemoved();
 }
 
 // streams
@@ -232,7 +232,7 @@ void DataManagerImpl::loadData(DataPtr data)
 	{
 		this->verifyParentFrame(data);
 		mData[data->getUid()] = data;
-		emit dataLoaded();
+		emit dataAddedOrRemoved();
 	}
 }
 
@@ -455,7 +455,7 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 		iter->first->parseXml(iter->second);
 	}
 
-	emit dataLoaded();
+	emit dataAddedOrRemoved();
 
 	//we need to make sure all images are loaded before we try to set an active image
 	child = dataManagerNode.firstChild();
@@ -687,8 +687,7 @@ void DataManagerImpl::removeData(const QString& uid, QString basePath)
 
 	this->deleteFiles(data, basePath);
 
-	emit dataRemoved(uid);
-	emit dataLoaded(); // this should alert everybody interested in the data as a collection.
+	emit dataAddedOrRemoved(); // this should alert everybody interested in the data as a collection.
 	messageManager()->sendInfo("Removed data [" + uid + "].");
 }
 

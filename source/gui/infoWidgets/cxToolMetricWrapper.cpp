@@ -25,7 +25,7 @@ ToolMetricWrapper::ToolMetricWrapper(cx::ToolMetricPtr data) : mData(data)
 	mInternalUpdate = false;
 	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
 	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
-	connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
+	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* ToolMetricWrapper::createWidget()

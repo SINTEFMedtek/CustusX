@@ -159,8 +159,8 @@ public:
 
 signals:
 	void centerChanged(); ///< emitted when center is changed.
-	void dataLoaded(); ///< emitted when data is loaded successfully
-	void dataRemoved(QString uid); ///< emitted when data is removed
+	void dataAddedOrRemoved();
+//	void dataRemoved(QString uid); ///< emitted when data is removed
 	void activeImageChanged(const QString& uId); ///< emitted when the active image is changed
 //	void activeImageTransferFunctionsChanged(); ///< emitted when the transfer functions in active image is changed. No longer used: Use ActiveImageProxy in CustusX
 	//void activeMeshChanged(const QString& uId); ///< emitted when the active mesh is changed

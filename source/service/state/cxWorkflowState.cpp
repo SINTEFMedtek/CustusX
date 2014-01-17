@@ -118,7 +118,7 @@ bool NavigationWorkflowState::canEnter() const
 RegistrationWorkflowState::RegistrationWorkflowState(QState* parent) :
 				WorkflowState(parent, "RegistrationUid", "Registration")
 {
-//	connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
+//	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(canEnterSlot()));
 	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
 }
 ;
@@ -141,7 +141,7 @@ bool RegistrationWorkflowState::canEnter() const
 PreOpPlanningWorkflowState::PreOpPlanningWorkflowState(QState* parent) :
 				WorkflowState(parent, "PreOpPlanningUid", "Preoperative Planning")
 {
-	connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
+	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(canEnterSlot()));
 }
 
 bool PreOpPlanningWorkflowState::canEnter() const
@@ -180,7 +180,7 @@ bool IntraOpImagingWorkflowState::canEnter() const
 PostOpControllWorkflowState::PostOpControllWorkflowState(QState* parent) :
 				WorkflowState(parent, "PostOpControllUid", "Postoperative Control")
 {
-	connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
+	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(canEnterSlot()));
 }
 
 bool PostOpControllWorkflowState::canEnter() const
