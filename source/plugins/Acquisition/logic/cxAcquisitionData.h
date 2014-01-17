@@ -142,7 +142,7 @@ signals:
 	/** emitted when state changes from sRUNNING
 	  * with valid recording data.
 	  */
-	void stopped();
+	void acquisitionStopped();
 	/** emitted when state changes from sRUNNING
 	  * without valid recording data.
 	  */
