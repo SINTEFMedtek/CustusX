@@ -39,6 +39,15 @@ USSavingRecorder::USSavingRecorder() : mDoWriteColor(true), m_rMpr(Transform3D::
 
 }
 
+USSavingRecorder::~USSavingRecorder()
+{
+	std::list<QFutureWatcher<QString>*>::iterator iter;
+	for (iter=mSaveThreads.begin(); iter!=mSaveThreads.end(); ++iter)
+	{
+		(*iter)->waitForFinished();
+	}
+}
+
 void USSavingRecorder::setWriteColor(bool on)
 {
 	mDoWriteColor = on;

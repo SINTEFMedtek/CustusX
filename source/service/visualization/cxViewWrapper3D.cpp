@@ -244,16 +244,21 @@ void ViewWrapper3D::PickerRepDataPickedSlot(QString uid)
 
 void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 {
-	QAction* slicePlanesAction = new QAction("Show Slice Planes", &contextMenu);
-	slicePlanesAction->setCheckable(true);
-	slicePlanesAction->setChecked(mSlicePlanes3DRep->getProxy()->getVisible());
-	connect(slicePlanesAction, SIGNAL(triggered(bool)), this, SLOT(showSlicePlanesActionSlot(bool)));
+	QAction* slicePlanesAction = NULL;
+	QAction* fillSlicePlanesAction = NULL;
+	if (mSlicePlanes3DRep)
+	{
+		slicePlanesAction = new QAction("Show Slice Planes", &contextMenu);
+		slicePlanesAction->setCheckable(true);
+		slicePlanesAction->setChecked(mSlicePlanes3DRep->getProxy()->getVisible());
+		connect(slicePlanesAction, SIGNAL(triggered(bool)), this, SLOT(showSlicePlanesActionSlot(bool)));
 
-	QAction* fillSlicePlanesAction = new QAction("Fill Slice Planes", &contextMenu);
-	fillSlicePlanesAction->setCheckable(true);
-	fillSlicePlanesAction->setEnabled(mSlicePlanes3DRep->getProxy()->getVisible());
-	fillSlicePlanesAction->setChecked(mSlicePlanes3DRep->getProxy()->getDrawPlanes());
-	connect(fillSlicePlanesAction, SIGNAL(triggered(bool)), this, SLOT(fillSlicePlanesActionSlot(bool)));
+		fillSlicePlanesAction = new QAction("Fill Slice Planes", &contextMenu);
+		fillSlicePlanesAction->setCheckable(true);
+		fillSlicePlanesAction->setEnabled(mSlicePlanes3DRep->getProxy()->getVisible());
+		fillSlicePlanesAction->setChecked(mSlicePlanes3DRep->getProxy()->getDrawPlanes());
+		connect(fillSlicePlanesAction, SIGNAL(triggered(bool)), this, SLOT(fillSlicePlanesActionSlot(bool)));
+	}
 
 	QAction* resetCameraAction = new QAction("Reset Camera (r)", &contextMenu);
 	connect(resetCameraAction, SIGNAL(triggered()), this, SLOT(resetCameraActionSlot()));
@@ -321,8 +326,10 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	if (showToolPath)
 		contextMenu.addAction(showToolPath);
 	contextMenu.addSeparator();
-	contextMenu.addAction(slicePlanesAction);
-	contextMenu.addAction(fillSlicePlanesAction);
+	if (slicePlanesAction)
+		contextMenu.addAction(slicePlanesAction);
+	if (fillSlicePlanesAction)
+		contextMenu.addAction(fillSlicePlanesAction);
 }
 
 QAction* ViewWrapper3D::createSlicesAction(QString title, QWidget* parent)
@@ -486,11 +493,15 @@ void ViewWrapper3D::centerToolActionSlot()
 
 void ViewWrapper3D::showSlicePlanesActionSlot(bool checked)
 {
+	if (!mSlicePlanes3DRep)
+		return;
 	mSlicePlanes3DRep->getProxy()->setVisible(checked);
 	settings()->setValue("showSlicePlanes", checked);
 }
 void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
 {
+	if (!mSlicePlanes3DRep)
+		return;
 	mSlicePlanes3DRep->getProxy()->setDrawPlanes(checked);
 }
 

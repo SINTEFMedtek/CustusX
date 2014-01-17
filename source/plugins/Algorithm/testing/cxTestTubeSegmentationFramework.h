@@ -22,6 +22,8 @@ class paramList;
 class TestTubeSegmentationFramework
 {
 public:
+	TestTubeSegmentationFramework();
+	~TestTubeSegmentationFramework();
 	void setUp();
 	void tearDown();
 
