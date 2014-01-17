@@ -21,7 +21,7 @@ FrameTreeWidget::FrameTreeWidget(QWidget* parent) :
   mTreeWidget->setHeaderLabels(QStringList() << "Frame");
 
   // TODO this must also listen to all changed() in all data
-  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataLoadedSlot()));
+  connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataLoadedSlot()));
 }
 
 QString FrameTreeWidget::defaultWhatsThis() const

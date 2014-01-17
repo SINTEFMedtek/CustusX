@@ -63,7 +63,7 @@ MetricWidget::MetricWidget(QWidget* parent) :
   mActiveLandmark("")
 {
   connect(toolManager(), SIGNAL(configured()), this, SLOT(setModified()));
-  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(setModified()));
+  connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(setModified()));
 
   //table widget
   connect(mTable, SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChanged()));

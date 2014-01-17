@@ -62,7 +62,7 @@ void CoordinateSystemListener::doConnect()
 		if (data)
 		{
 			connect(data.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
-			connect(dataManager(), SIGNAL(dataRemoved(QString)), this, SIGNAL(changed()));
+			connect(dataManager(), SIGNAL(dataAddedOrRemoved(QString)), this, SIGNAL(changed()));
 		}
 	}
 
