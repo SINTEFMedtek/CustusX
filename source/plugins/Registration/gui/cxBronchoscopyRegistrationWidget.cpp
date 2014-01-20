@@ -53,7 +53,7 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegistrationManag
     mAquisition.reset(new Acquisition(mAcquisitionData, this));
 
     connect(mAquisition.get(), SIGNAL(started()), this, SLOT(acquisitionStarted()));
-    connect(mAquisition.get(), SIGNAL(stopped()), this, SLOT(acquisitionStopped()));
+		connect(mAquisition.get(), SIGNAL(acquisitionStopped()), this, SLOT(acquisitionStopped()), Qt::QueuedConnection);
     connect(mAquisition.get(), SIGNAL(cancelled()), this, SLOT(acquisitionStopped()));
 
 //    mTrackedCenterLine = new TrackedCenterlineWidget(mAcquisitionData, this);

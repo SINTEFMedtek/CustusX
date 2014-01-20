@@ -39,7 +39,7 @@ class TubeSegmentationFilter : public FilterImpl
 
 public:
 	TubeSegmentationFilter();
-	virtual ~TubeSegmentationFilter() {}
+	virtual ~TubeSegmentationFilter(); 
 
 	virtual QString getType() const;
 	virtual QString getName() const;

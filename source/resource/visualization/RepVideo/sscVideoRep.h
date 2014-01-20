@@ -78,6 +78,7 @@ private:
 
 	TextDisplayPtr mStatusText;
 	TextDisplayPtr mInfoText;
+	TextDisplayPtr mOrientationVText;
 
 	GraphicalPolyData3DPtr mProbeSector;
 	GraphicalPolyData3DPtr mProbeOrigin;

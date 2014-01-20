@@ -137,6 +137,7 @@ void Mesh::parseXml(QDomNode& dataNode)
 		mBackfaceCulling = cullingNode.toElement().attribute("backfaceCulling").toInt();
 		mFrontfaceCulling = cullingNode.toElement().attribute("frontfaceCulling").toInt();
 	}
+	emit meshChanged();
 }
 
 void Mesh::setColor(const QColor& color)

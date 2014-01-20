@@ -152,23 +152,15 @@ void Navigation::centerManualTool(Vector3D& p_r)
 
 ViewGroup::ViewGroup()
 {
-//  mRegistrationMode = rsNOT_REGISTRATED;
 	mZoom2D.mLocal = SyncedValue::create(1.0);
 	mZoom2D.activateGlobal(false);
 
 	mViewGroupData.reset(new ViewGroupData());
-
-//  this->setSlicePlanesProxy();
 }
 
 ViewGroup::~ViewGroup()
 {
 }
-
-//void ViewGroup::setSlicePlanesProxy()
-//{
-//  mSlicePlanesProxy.reset(new SlicePlanesProxy());
-//}
 
 /**Add one view wrapper and setup the necessary connections.
  */
@@ -179,9 +171,7 @@ void ViewGroup::addView(ViewWrapperPtr wrapper)
 
 	// add state
 	wrapper->setZoom2D(mZoom2D.mActive);
-
 	wrapper->setViewGroup(mViewGroupData);
-//  wrapper->setSlicePlanesProxy(mSlicePlanesProxy);
 
 	// connect signals
 	connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(activateManualToolSlot()));
