@@ -34,9 +34,9 @@ OpenCL::ocl* OpenCL::init(cl_device_type type)
 
     //fill the struct
 	OpenCL::ocl* retval = new OpenCL::ocl;
-    retval->device_cpp = device;
-    retval->context_cpp = context;
-    retval->cmd_queue_cpp = commandQueue;
+    retval->device = device;
+    retval->context = context;
+    retval->cmd_queue = commandQueue;
 
     return retval;
 }
@@ -158,10 +158,6 @@ cl::Context OpenCL::createContext(const VECTOR_CLASS<cl::Device> devices, cl_con
 	cl::Context retval;
 	try
 	{
-		messageManager()->sendDebug("Going to create a OpenCL context with "+QString::number(devices.size())+" device(s).");
-		//retval = cl::Context(devices, cps, errorCallback, NULL, NULL);
-		//TODO if extension is available use:
-		//retval = cl::Context(devices, cps, clLogMessagesToStdoutAPPLEretval, NULL, NULL);
 		retval = cl::Context(devices, cps, errorCallback, NULL, NULL);
 		cl::STRING_CLASS devicelist="";
 		for(int i=0; i<devices.size(); ++i)
@@ -174,7 +170,6 @@ cl::Context OpenCL::createContext(const VECTOR_CLASS<cl::Device> devices, cl_con
 
 		VECTOR_CLASS<cl::Device> readBackDevices;
 		readBackDevices = retval.getInfo<CL_CONTEXT_DEVICES>();
-		messageManager()->sendDebug("Found "+QString::number(readBackDevices.size())+" device(s) in the new context.");
 
 	} catch (cl::Error error)
 	{
@@ -220,104 +215,23 @@ VECTOR_CLASS<cl::Device> OpenCL::getOnlyValidDevices(VECTOR_CLASS<cl::Device> de
 	return valid;
 }
 
-
-//------
-
-//OpenCL::ocl* OpenCL::init(QString processor)
-//{
-//	cl_int err;
-//
-//	OpenCL::ocl* retval = new OpenCL::ocl;
-//
-//	// AMD way:
-//	cl_platform_id platforms[10];
-//	cl_uint numPlatforms = 10;
-//	cl_uint foundPlatforms = 0;
-//	check_error(clGetPlatformIDs(numPlatforms, platforms, &foundPlatforms));
-//
-//	if (foundPlatforms != 1)
-//	{
-//		messageManager()->sendWarning("The number of platforms found differs from 1. This might not be supported.");
-//	}
-//
-//	cl_context_properties cps[3] =
-//	{ CL_CONTEXT_PLATFORM, (cl_context_properties) platforms[0], 0 };
-//
-//
-//	if (processor == "CPU")
-//	{
-//		check_error(clGetDeviceIDs(platforms[0], CL_DEVICE_TYPE_CPU, 1, &(retval->device), NULL));
-//		//This callback function will be used by the OpenCL implementation to report information on errors that occur in this context.
-//		retval->context = clCreateContextFromType(cps, CL_DEVICE_TYPE_CPU, errorCallback, NULL, &err);
-//	}
-//
-//
-//	else // GPU
-//	{
-//		cl_uint foundDevices = 0;
-//		cl_device_id devices[10];
-//		check_error(clGetDeviceIDs(platforms[0], CL_DEVICE_TYPE_GPU, 10, devices, &foundDevices));
-//		// Pick the GPU with the most global memory
-//		if (foundDevices == 0)
-//		{
-//			messageManager()->sendError("Did not find any GPU. Aborting.");
-//			return NULL;
-//		}
-//		size_t largestMem = 0;
-//		int chosenDev = 0;
-//		size_t devMem = 0;
-//		for (int i = 0; i < foundDevices; i++)
-//		{
-//			check_error(clGetDeviceInfo(devices[i], CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(size_t), &devMem, NULL));
-//			messageManager()->sendInfo(
-//							"Device " + QString(OpenCLUtilities::getDeviceString(devices[i]).c_str()) + " has "
-//							+ QString::number(devMem) + " bytes (" + QString::number(devMem / 1024.0f / 1024.0f)
-//							+ " MB) of memory.");
-//			if (devMem > largestMem)
-//			{
-//				chosenDev = i;
-//				largestMem = devMem;
-//			}
-//		}
-//		//This callback function will be used by the OpenCL implementation to report information on errors that occur in this context.
-//		retval->context = clCreateContext(cps, 1, &devices[chosenDev], errorCallback, NULL, &err);
-//		retval->device = devices[chosenDev];
-//	}
-//
-//
-//	messageManager()->sendInfo("Using device " + QString(OpenCLUtilities::getDeviceString(retval->device).c_str()));
-//	check_error(err);
-//	retval->cmd_queue = clCreateCommandQueue(retval->context, retval->device, CL_QUEUE_PROFILING_ENABLE, &err);
-//	check_error(err);
-//
-//	return retval;
-//}
-
 void OpenCL::release(OpenCL::ocl* ocl)
 {
-	//TODO release context->device;
-
-//	clReleaseCommandQueue(ocl->cmd_queue);
-//	clReleaseContext(ocl->context);
-//	clUnloadCompiler();
 	messageManager()->sendInfo("Releasing OpenCL context, device and command queue.");
 
+	cl::UnloadCompiler();
 	delete ocl;
 }
 
-//cl_kernel OpenCL::createKernel(cl_program program, cl_device_id device, const char * kernel_name)
 cl::Kernel OpenCL::createKernel(cl::Program program, cl::Device device, const char * kernel_name)
 {
 	cl_int err = 0;
-//	cl_kernel kernel = clCreateKernel(program, kernel_name, &err);
-//	check_error(err);
 	cl::Kernel kernel(program, kernel_name, &err);
 	check_error(err);
 
 	return kernel;
 }
 
-//cl_mem OpenCL::createBuffer(cl_context context, cl_mem_flags flags, size_t size, void * host_data)
 cl::Buffer OpenCL::createBuffer(cl::Context context, cl_mem_flags flags, size_t size, void * host_data, std::string bufferName)
 {
 	cl::Buffer dev_mem;
@@ -325,15 +239,8 @@ cl::Buffer OpenCL::createBuffer(cl::Context context, cl_mem_flags flags, size_t 
 	{
 		if (host_data != NULL)
 			flags |= CL_MEM_COPY_HOST_PTR;
-		//cl_mem dev_mem = clCreateBuffer(context, flags, size, host_data, &err);
-		messageManager()->sendDebug("Buffer size is "+QString::number(size)+" bytes ("+QString::number((double)size/(1024*1024))+" MB)");
 		dev_mem = cl::Buffer(context, flags, size, host_data, NULL);
 		dev_mem.setDestructorCallback(memoryDestructorCallback, static_cast<void*>(new std::string(bufferName)));
-	//	if (err != CL_SUCCESS)
-	//	{
-	//		messageManager()->sendError("Could not create buffer of size " + QString::number(size) + " ("+ QString::number(size / 1024.0f / 1024.0f) + " MB, error:" + QString(err));
-	//		exit(err);
-	//	}
 	} catch (cl::Error error)
 	{
 		messageManager()->sendError("Could not create a OpenCL buffer queue. Reason: "+QString(error.what()));
@@ -349,9 +256,6 @@ void OpenCL::checkBuildProgramLog(cl::Program program, cl::Device device, cl_int
 
 		messageManager()->sendInfo("Build log: \n"+qstring_cast(log));
 }
-//================================================================================================================
-//================================================================================================================
-
 
 void OpenCLUtilities::generateOpenCLError(cl_int id, const char* file, int line)
 {
@@ -413,9 +317,6 @@ void OpenCLUtilities::generateOpenCLError(cl_int id, const char* file, int line)
 
 	QString err = QString("OpenCL ERROR[%1], file=%2[%3], msg=%4").arg(id).arg(file).arg(line).arg(type);
 	messageManager()->sendError(err);
-
-	//CustusX don«t
-	//throw err.toStdString();
 }
 
 std::string OpenCLUtilities::getDeviceString(cl_device_id dev)
