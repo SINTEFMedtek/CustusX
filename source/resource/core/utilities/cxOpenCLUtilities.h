@@ -5,6 +5,7 @@
 
 #define __NO_STD_VECTOR // Apple: if using std::vector VECTOR_CLASS.push_back added 2 to size!
 #define __CL_ENABLE_EXCEPTIONS //telling the opencl c++ wrapper to throw exceptions
+
 #if defined(__APPLE__) || defined(__MACOSX)
     #include "OpenCL/cl.hpp"
 #else
@@ -31,22 +32,19 @@ static void CL_CALLBACK memoryDestructorCallback(cl_mem memobj, void* user_data)
 class OpenCL
 {
 public:
-
-
 	struct ocl
 	{
-//		cl_context context;
-//		cl_device_id device;
-//		cl_command_queue cmd_queue;
-
-		cl::Context context_cpp;
-		cl::Device device_cpp;
-		cl::CommandQueue cmd_queue_cpp;
+		cl::Context context;
+		cl::Device device;
+		cl::CommandQueue cmd_queue;
 	};
 
-	//cpp
 	static ocl* init(cl_device_type type);
+	static void release(ocl* ocl);
+	static cl::Kernel createKernel(cl::Program program, cl::Device device, const char * kernel_name);
+	static cl::Buffer createBuffer(cl::Context context, cl_mem_flags flags, size_t size, void * host_data, std::string bufferName);
 
+	static void checkBuildProgramLog(cl::Program program, cl::Device device, cl_int err);
 
 private:
 	static cl::Platform selectPlatform();
@@ -57,15 +55,6 @@ private:
 	static cl::CommandQueue createCommandQueue(cl::Context context, cl::Device device);
 
 	static VECTOR_CLASS<cl::Device> getOnlyValidDevices(VECTOR_CLASS<cl::Device> devices);
-public:
-	//c
-	//static ocl* init(QString processor);
-	static void release(ocl* ocl);
-	static cl::Kernel createKernel(cl::Program program, cl::Device device, const char * kernel_name);
-	static cl::Buffer createBuffer(cl::Context context, cl_mem_flags flags, size_t size, void * host_data, std::string bufferName);
-
-	static void checkBuildProgramLog(cl::Program program, cl::Device device, cl_int err);
-
 };
 
 /**
