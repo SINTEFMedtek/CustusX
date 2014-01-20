@@ -78,7 +78,7 @@ public:
 	void setOptions(Options options);
 
 private slots:
-	void removeDataSlot(QString uid);
+	void dataAddedOrRemovedInManager();
 
 signals:
 	void dataAdded(QString uid);

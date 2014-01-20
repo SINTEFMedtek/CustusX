@@ -191,6 +191,7 @@ public:
 	 */
 	virtual void bind(int textureUnitIndex)
 	{
+		this->updateTexture();
 		if (!mAllocated)
 		{
 			std::cout << "error: called bind() on unallocated volume buffer" << std::endl;
@@ -321,6 +322,7 @@ public:
 
 	virtual void bind(int textureUnitIndex)
 	{
+		this->updateTexture();
 		if (!mAllocated)
 		{
 			std::cout << "error: called bind() on unallocated lut buffer" << std::endl;

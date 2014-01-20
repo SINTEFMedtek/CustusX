@@ -46,6 +46,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	Primitives/sscToolTracer
     Primitives/cxVolumeProperty
 	Primitives/sscVideoSourceGraphics
+	Primitives/cxViewFollower
 
 	RepVideo/sscVideoRep
         )

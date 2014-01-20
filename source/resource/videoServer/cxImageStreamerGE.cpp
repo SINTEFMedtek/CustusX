@@ -387,16 +387,20 @@ ProbeDefinitionPtr ImageStreamerGE::getFrameStatus(QString uid, data_streaming::
 	else //sector
 		retval = ProbeDefinitionPtr( new ProbeDefinition(ProbeDefinition::tSECTOR));
 
-		std::cout << "Geometry origin: " << geometry.origin[0] << " " << geometry.origin[1] << " " << geometry.origin[2] << std::endl;
-		std::cout << "Image origin: " << img->GetOrigin()[0] << " " << img->GetOrigin()[1] << " " << img->GetOrigin()[2] << std::endl;
+//		std::cout << "Geometry origin: " << geometry.origin[0] << " " << geometry.origin[1] << " " << geometry.origin[2] << std::endl;
+//		std::cout << "Image origin: " << img->GetOrigin()[0] << " " << img->GetOrigin()[1] << " " << img->GetOrigin()[2] << std::endl;
 
-		double yOffset = geometry.origin[1] * 1000;//m -> mm
-		double correctDepthStart = geometry.depthStart + yOffset;
-		double correctDepthEnd = geometry.depthEnd + yOffset;
+        double inputDepthStart = geometry.origin[1] * 1000;//m -> mm
+        double yImageOrigin = inputDepthStart * cos(geometry.width/2.0);
+        double correctDepthStart = geometry.depthStart - inputDepthStart;
+        double correctDepthEnd = geometry.depthEnd - inputDepthStart;
 
-		std::cout << "yOffset: " << yOffset << std::endl;
-		std::cout << "correctDepthStart: " << correctDepthStart << std::endl;
-		std::cout << "correctDepthEnd: " << correctDepthEnd << std::endl;
+
+//        std::cout << "width: " << geometry.width << std::endl;
+//        std::cout << "inputDepthStart: " << inputDepthStart << " mm" << std::endl;
+//        std::cout << "yImageOrigin: " << yImageOrigin << " mm" << std::endl;
+//		std::cout << "correctDepthStart: " << correctDepthStart << std::endl;
+//		std::cout << "correctDepthEnd: " << correctDepthEnd << std::endl;
 
 	// Set start and end of sector in mm from origin
 		// Set width of sector in mm for LINEAR, width of sector in radians for SECTOR.
@@ -406,17 +410,18 @@ ProbeDefinitionPtr ImageStreamerGE::getFrameStatus(QString uid, data_streaming::
 //	retval->setOrigin_p(Vector3D(geometry.origin[0] + img->GetOrigin()[0],
 //					geometry.origin[1]+ img->GetOrigin()[1],
 //					geometry.origin[2]+ img->GetOrigin()[2]));
-		retval->setOrigin_p(Vector3D(geometry.origin[0]*1000 + img->GetOrigin()[0],
-				geometry.origin[1]*1000 + img->GetOrigin()[1],
-				geometry.origin[2]*1000+ img->GetOrigin()[2]));
+        retval->setOrigin_p(Vector3D(geometry.origin[0]*1000 / img->GetSpacing()[0] + img->GetOrigin()[0],
+                                     //geometry.origin[1]*1000 / img->GetSpacing()[1] + img->GetOrigin()[1],
+                                     yImageOrigin / img->GetSpacing()[1] + img->GetOrigin()[1],
+                /*geometry.origin[2]*1000 +*/ img->GetOrigin()[2]));
 	retval->setSize(QSize(img->GetDimensions()[0], img->GetDimensions()[1]));
 	retval->setSpacing(Vector3D(img->GetSpacing()));
 	retval->setClipRect_p(DoubleBoundingBox3D(img->GetExtent()));
 
 	retval->setUid(uid);
 
-	std::cout << "depthStart: " << geometry.depthStart << " depthEnd: " << geometry.depthEnd << std::endl;
-	std::cout << "Origin: " << retval->getOrigin_p() << std::endl;
+//	std::cout << "depthStart: " << geometry.depthStart << " depthEnd: " << geometry.depthEnd << std::endl;
+//	std::cout << "Origin: " << retval->getOrigin_p() << std::endl;
 
 	return retval;
 }

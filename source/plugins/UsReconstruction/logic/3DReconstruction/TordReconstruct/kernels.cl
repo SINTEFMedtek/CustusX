@@ -1162,8 +1162,8 @@ unsigned char anisotropicFilter(__local const close_plane_t *pixels,
 	// We want high variance regions to have a sharp weight function
 	// and small variance regions to have a smooth weight function.
 
-	variance = clamp(variance/(n_planes-1), 1.0f, 10000.0f);
-	float gauss_sigma = mean_value/sqrt(variance);
+	variance = clamp(variance/(n_planes-1), 1.0f, 10000000.0f);
+	float gauss_sigma = 32.0f/sqrt(variance);
 
 #ifdef DEBUG
 	if(variance > 0.1f && mean_value> 10.0f)

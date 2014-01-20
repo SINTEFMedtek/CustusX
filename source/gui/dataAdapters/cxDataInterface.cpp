@@ -450,7 +450,7 @@ ToolPtr SelectToolStringDataAdapter::getTool() const
 
 ParentFrameStringDataAdapter::ParentFrameStringDataAdapter()
 {
-  connect(dataManager(), SIGNAL(dataLoaded()), this, SIGNAL(changed()));
+  connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(changed()));
 }
 
 void ParentFrameStringDataAdapter::setData(DataPtr data)
@@ -597,7 +597,7 @@ void DataUidEditableStringDataAdapter::setData(DataPtr data)
 
 DataModalityStringDataAdapter::DataModalityStringDataAdapter()
 {
-	connect(dataManager(), SIGNAL(dataLoaded()), this, SIGNAL(changed()));
+	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(changed()));
 }
 
 void DataModalityStringDataAdapter::setData(ImagePtr data)
@@ -653,7 +653,7 @@ QStringList DataModalityStringDataAdapter::getValueRange() const
 
 ImageTypeStringDataAdapter::ImageTypeStringDataAdapter()
 {
-	connect(dataManager(), SIGNAL(dataLoaded()), this, SIGNAL(changed()));
+	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(changed()));
 }
 
 void ImageTypeStringDataAdapter::setData(ImagePtr data)
