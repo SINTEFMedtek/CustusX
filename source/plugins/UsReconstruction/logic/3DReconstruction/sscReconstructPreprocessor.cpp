@@ -224,12 +224,11 @@ void ReconstructPreprocessor::interpolatePositions()
 
 		// Remove frames too far from the positions
 		// Don't increment frame index since the index now points to the next element
-		if ((fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos].mTime) > mMaxTimeDiff) || (fabs(
-																																																					mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos + 1].mTime) > mMaxTimeDiff))
+		double timeToPos1 = timeToPosition(i_frame, i_pos);
+		double timeToPos2 = timeToPosition(i_frame, i_pos+1);
+		if ((timeToPos1 > mMaxTimeDiff) || (timeToPos2 > mMaxTimeDiff))
 		{
-			double diff1 = fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos].mTime);
-			double diff2 = fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos + 1].mTime);
-			removedData[i_frame].add(std::max(diff1, diff2));
+			removedData[i_frame].add(std::max(timeToPos1, timeToPos2));
 
 			mFileData.mFrames.erase(mFileData.mFrames.begin() + i_frame);
 			mFileData.mUsRaw->removeFrame(i_frame);
@@ -268,6 +267,12 @@ void ReconstructPreprocessor::interpolatePositions()
 			messageManager()->sendInfo("Removed " + QString::number(percent, 'f', 1) + "% of the " + qstring_cast(startFrames) + " frames.");
 		}
 	}
+}
+
+
+double ReconstructPreprocessor::timeToPosition(unsigned i_frame, unsigned i_pos)
+{
+		return fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos].mTime);
 }
 
 /**
