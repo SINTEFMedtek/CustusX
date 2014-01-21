@@ -4,137 +4,258 @@
 
 #include <iostream>
 #include <QString>
+#include "sscTypeConversions.h"
 #include "sscMessageManager.h"
+
+#include "cxOpenCLPrinter.h"
 
 namespace cx
 {
 
-/**
- *  See clCreateContextFromType doc for more
- */
-void CL_CALLBACK clCreateContextFromType_error_callback(const char *errinfo, const void  *private_info, size_t  cb, void  *user_data)
+void CL_CALLBACK errorCallback(const char *errinfo, const void *private_info, size_t cb, void *user_data)
 {
-	std::cout << "ERROR: From clCreateContextFromType() callback: "<< errinfo << std::endl;
+	messageManager()->sendError("Error callback: " + QString(errinfo));
 }
 
-OpenCL::ocl_context* OpenCL::ocl_init(QString processor)
+void CL_CALLBACK memoryDestructorCallback(cl_mem memobj, void* user_data)
 {
-	cl_int err;
+	std::string* data_pointer = static_cast<std::string*>(user_data);
+	std::string data = *data_pointer;
+	messageManager()->sendInfo("Memory destructor callback: " + QString(data.c_str()));
+}
 
-	OpenCL::ocl_context* retval = new OpenCL::ocl_context;
+OpenCL::ocl* OpenCL::init(cl_device_type type)
+{
+	cl::Platform platform = selectPlatform();
+    cl::Device device = selectDevice(type, platform);
+	cl_context_properties cps[] = { CL_CONTEXT_PLATFORM, (cl_context_properties) (platform)(), 0 };
+    cl::Context context = createContext(device, cps);
+    cl::CommandQueue commandQueue = createCommandQueue(context, device);
 
-	// AMD way:
-	cl_platform_id platforms[10];
-	cl_uint numPlatforms = 10;
-	cl_uint foundPlatforms = 0;
-	ocl_check_error(clGetPlatformIDs(numPlatforms, platforms, &foundPlatforms));
-	if(foundPlatforms != 1)
+    //fill the struct
+	OpenCL::ocl* retval = new OpenCL::ocl;
+    retval->device = device;
+    retval->context = context;
+    retval->cmd_queue = commandQueue;
+
+    return retval;
+}
+
+cl::Platform OpenCL::selectPlatform()
+{
+	cl::Platform retval;
+    try
 	{
-		std::cerr << "WARNING: " << foundPlatforms << " OpenCL platforms found, which differs from 1!\n";
-	}
-	cl_context_properties cps[3] =
-	{ CL_CONTEXT_PLATFORM, (cl_context_properties) platforms[0], 0 };
-	if (processor == "CPU")
+		VECTOR_CLASS<cl::Platform> platforms;
+    	cl::Platform::get(&platforms);
+
+    	int foundPlatforms = platforms.size();
+    	if(foundPlatforms == 0)
+    		throw cl::Error(1, "No OpenCL platforms found.");
+    	else if(foundPlatforms > 1)
+        	messageManager()->sendWarning("The number of platforms found differs from 1. This might not be supported.");
+
+        int platformToSelect = 0; //just select the first platform in the list
+        retval = platforms[platformToSelect];
+
+	}catch(cl::Error error)
 	{
-		ocl_check_error(clGetDeviceIDs(platforms[0], CL_DEVICE_TYPE_CPU, 1, &(retval->device), NULL));
-		retval->context = clCreateContextFromType(cps, CL_DEVICE_TYPE_CPU, clCreateContextFromType_error_callback, NULL, &err);
+		messageManager()->sendError("Could not select a OpenCL platform. Reason: "+QString(error.what()));
+		check_error(error.err());
 	}
-	else // GPU
-	{
-		cl_uint foundDevices = 0;
-		cl_device_id devices[10];
-		ocl_check_error(clGetDeviceIDs(platforms[0], CL_DEVICE_TYPE_GPU, 10, devices, &foundDevices));
-		// Pick the GPU with the most global memory
-		if(foundDevices == 0)
-		{
-			std::cerr << "Did not find any GPU-! Aborting\n";
-			return NULL;
-		}
-		size_t largestMem = 0;
-		int chosenDev = 0;
-		size_t devMem = 0;
-		for(int i = 0; i < foundDevices; i++)
-		{
-			ocl_check_error(clGetDeviceInfo(devices[i],
-			                                CL_DEVICE_GLOBAL_MEM_SIZE,
-			                                sizeof(size_t),
-			                                &devMem,
-			                                NULL));
-			std::cerr << "Device " << OpenCLUtilities::ocl_get_device_string(devices[i]) << " has " << devMem << " bytes of memory\n";
-			if(devMem > largestMem)
-			{
-				chosenDev = i;
-				largestMem = devMem;
-			}
-		}
-		retval->context = clCreateContext(cps, 1, &devices[chosenDev],
-		                                  clCreateContextFromType_error_callback,
-		                                  NULL, &err);
-		retval->device = devices[chosenDev];
-	}
-	std::cerr << "Using device " << OpenCLUtilities::ocl_get_device_string(retval->device) << std::endl;
-	ocl_check_error(err);
-	retval->cmd_queue = clCreateCommandQueue(retval->context, retval->device, CL_QUEUE_PROFILING_ENABLE, &err);
-	ocl_check_error(err);
+
+	std::string name, vendor, version;
+	name = retval.getInfo<CL_PLATFORM_NAME>();
+	vendor = retval.getInfo<CL_PLATFORM_VENDOR>();
+	version = retval.getInfo<CL_PLATFORM_VERSION>();
+	messageManager()->sendInfo("Selected platform "+qstring_cast(name)+" from vendor "+qstring_cast(vendor)+" using "+qstring_cast(version));
 
 	return retval;
 }
 
-void OpenCL::ocl_release(OpenCL::ocl_context* context)
+cl::Device OpenCL::selectDevice(cl_device_type type, cl::Platform platform)
 {
-	//TODO release context->device;
+	cl::Device retval;
 
-	clReleaseCommandQueue(context->cmd_queue);
-	clReleaseContext(context->context);
-	clUnloadCompiler();
+	std::string typeString  = "";
+	switch (type)
+	{
+		case CL_DEVICE_TYPE_CPU: typeString = "CPU"; break;
+		case CL_DEVICE_TYPE_GPU: typeString = "GPU"; break;
+		case CL_DEVICE_TYPE_ALL: typeString = "ALL"; break;
+		default: break;
+	}
+
+	try
+	{
+		VECTOR_CLASS<cl::Device> devices;
+		platform.getDevices(type, &devices);
+
+		int foundDevices = devices.size();
+		messageManager()->sendDebug("Found "+QString::number(foundDevices)+" devices.");
+		if(foundDevices == 0)
+			throw cl::Error(1, std::string("No OpenCL devices of type "+typeString+" found on this platform.").c_str());
+
+		retval = chooseDeviceWithMostGlobalMemory(devices);
+
+	}catch(cl::Error error)
+	{
+		messageManager()->sendError("Could not select a OpenCL device. Reason: "+QString(error.what()));
+		check_error(error.err());
+	}
+
+	cl::STRING_CLASS name, vendor, version;
+	name = retval.getInfo<CL_DEVICE_NAME>();
+	vendor = retval.getInfo<CL_DEVICE_VENDOR>();
+	version = retval.getInfo<CL_DEVICE_VERSION>();
+	messageManager()->sendInfo("Selected device "+qstring_cast(name)+" from vendor "+qstring_cast(vendor)+" using "+qstring_cast(version));
+
+    return retval;
+
 }
 
-cl_kernel OpenCL::ocl_kernel_build(cl_program program, cl_device_id device, const char * kernel_name) {
-	cl_int err;
-	cl_kernel kernel = clCreateKernel(program, kernel_name, &err);
-	//	if (err != CL_SUCCESS) {
-		size_t len = 0;
-		char buffer[2048];
-		//printf("ERROR: Failed to build kernel %s on device %p. Error code: %d\n", kernel_name, device, err);
+cl::Device OpenCL::chooseDeviceWithMostGlobalMemory(VECTOR_CLASS<cl::Device> devices)
+{
+	if(devices.size() <= 0)
+		throw cl::Error(1, "Cannot choose among 0 devices.");
 
-		clGetProgramBuildInfo(
-			program,              // the program object being queried
-			device,            // the device for which the OpenCL code was built
-			CL_PROGRAM_BUILD_LOG, // specifies that we want the build log
-			sizeof(buffer),       // the size of the buffer
-			buffer,               // on return, holds the build log
-			&len);                // on return, the actual size in bytes of the data returned
+	cl::Device retval = devices[0];
 
-		if(len != 0)
+	cl_ulong largestMemory = 0;
+	cl_ulong deviceMemory = 0;
+	for(int i=0; i < devices.size(); i++)
+	{
+		try
 		{
-			buffer[len] = 0;
-			printf("%s\n", buffer);
+			deviceMemory = devices[i].getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>();
+			if(deviceMemory > largestMemory)
+			{
+				largestMemory = deviceMemory;
+				retval = devices[i];
+			}
+		} catch (cl::Error error)
+		{
+			messageManager()->sendWarning("Could not ask device about CL_DEVICE_GLOBAL_MEM_SIZE. Reason: "+QString(error.what()));
+			check_error(error.err());
 		}
+	}
+	cl::STRING_CLASS name;
+	name = retval.getInfo<CL_DEVICE_NAME>();
+	messageManager()->sendInfo("Device with most global memory is "+qstring_cast(name)+" with "+QString::number((double)largestMemory/(1024*1024*1024))+" GB.");
 
-		// for (int i = 0; i < 2048; i++)
-		// 	printf("%c", buffer[i]);
-		// printf("\n");
-		//		exit(1);
-		//	}
+	return retval;
+}
+
+cl::Context OpenCL::createContext(cl::Device device, cl_context_properties* cps)
+{
+	VECTOR_CLASS<cl::Device> devices;
+	devices.push_back(device); //if using std vector for VECTOR_CLASS this results in size = 2 instead of the correct 1.
+	return createContext(devices, cps);
+}
+
+cl::Context OpenCL::createContext(const VECTOR_CLASS<cl::Device> devices, cl_context_properties* cps)
+{
+	cl::Context retval;
+	try
+	{
+		retval = cl::Context(devices, cps, errorCallback, NULL, NULL);
+		cl::STRING_CLASS devicelist="";
+		for(int i=0; i<devices.size(); ++i)
+		{
+			devicelist = devicelist + devices[i].getInfo<CL_DEVICE_NAME>();
+			if(i != devices.size()-1)
+				devicelist =+ " and ";
+		}
+		messageManager()->sendInfo("Created context using device(s) "+qstring_cast(devicelist));
+
+		VECTOR_CLASS<cl::Device> readBackDevices;
+		readBackDevices = retval.getInfo<CL_CONTEXT_DEVICES>();
+
+	} catch (cl::Error error)
+	{
+		messageManager()->sendError("Could not create a OpenCL context. Reason: "+QString(error.what()));
+		check_error(error.err());
+	}
+
+	return retval;
+}
+
+cl::CommandQueue OpenCL::createCommandQueue(cl::Context context, cl::Device device)
+{
+	OpenCLPrinter::printDeviceInfo(device);
+	cl::CommandQueue retval;
+	try
+	{
+		retval = cl::CommandQueue(context, device, CL_QUEUE_PROFILING_ENABLE, NULL);
+		messageManager()->sendInfo("Created command queue using device "+qstring_cast(device.getInfo<CL_DEVICE_NAME>()));
+	} catch(cl::Error error)
+	{
+		messageManager()->sendError("Could not create a OpenCL command queue. Reason: "+QString(error.what()));
+		check_error(error.err());
+	}
+
+	return retval;
+}
+
+VECTOR_CLASS<cl::Device> OpenCL::getOnlyValidDevices(VECTOR_CLASS<cl::Device> devices)
+{
+	VECTOR_CLASS<cl::Device> valid;
+	for(int i=0; i<devices.size(); ++i)
+	{
+		try
+		{
+			devices[i].getInfo<CL_DEVICE_NAME>();
+			valid.push_back(devices[i]);
+
+		} catch (cl::Error error)
+		{
+			messageManager()->sendWarning("Found invalid device. Device had no name.");
+		}
+	}
+	return valid;
+}
+
+void OpenCL::release(OpenCL::ocl* ocl)
+{
+	messageManager()->sendInfo("Releasing OpenCL context, device and command queue.");
+
+	cl::UnloadCompiler();
+	delete ocl;
+}
+
+cl::Kernel OpenCL::createKernel(cl::Program program, cl::Device device, const char * kernel_name)
+{
+	cl_int err = 0;
+	cl::Kernel kernel(program, kernel_name, &err);
+	check_error(err);
+
 	return kernel;
 }
 
-cl_mem OpenCL::ocl_create_buffer(cl_context context, cl_mem_flags flags, size_t size, void * host_data) {
-	if (host_data != NULL) flags |= CL_MEM_COPY_HOST_PTR;
-	cl_int err;
-	cl_mem dev_mem = clCreateBuffer(context, flags, size, host_data, &err);
-	if (err != CL_SUCCESS) {
-		printf("ERROR clCreateBuffer of size %lu bytes (%f MB): %d\n", size, size/1024.0f/1024.0f, err);
-		exit(err);
+cl::Buffer OpenCL::createBuffer(cl::Context context, cl_mem_flags flags, size_t size, void * host_data, std::string bufferName)
+{
+	cl::Buffer dev_mem;
+	try
+	{
+		if (host_data != NULL)
+			flags |= CL_MEM_COPY_HOST_PTR;
+		dev_mem = cl::Buffer(context, flags, size, host_data, NULL);
+		dev_mem.setDestructorCallback(memoryDestructorCallback, static_cast<void*>(new std::string(bufferName)));
+	} catch (cl::Error error)
+	{
+		messageManager()->sendError("Could not create a OpenCL buffer queue. Reason: "+QString(error.what()));
+		check_error(error.err());
 	}
-	//printf("Successfull clCreateBuffer of size %lu bytes (%f MB)\n", size, size/1024.0f/1024.0f);
 	return dev_mem;
 }
 
+void OpenCL::checkBuildProgramLog(cl::Program program, cl::Device device, cl_int err)
+{
+	    cl::STRING_CLASS log;
+	    program.getBuildInfo(device, CL_PROGRAM_BUILD_LOG, &log);
 
-//================================================================================================================
-//================================================================================================================
-
+		messageManager()->sendInfo("Build log: \n"+qstring_cast(log));
+}
 
 void OpenCLUtilities::generateOpenCLError(cl_int id, const char* file, int line)
 {
@@ -195,61 +316,53 @@ void OpenCLUtilities::generateOpenCLError(cl_int id, const char* file, int line)
 	}
 
 	QString err = QString("OpenCL ERROR[%1], file=%2[%3], msg=%4").arg(id).arg(file).arg(line).arg(type);
-	std::cerr << err.toStdString() << std::endl;
-	throw err.toStdString();
+	messageManager()->sendError(err);
 }
 
-std::string OpenCLUtilities::ocl_get_device_string(cl_device_id dev)
+std::string OpenCLUtilities::getDeviceString(cl_device_id dev)
 {
 	std::string ret = "";
 	char buf[256];
 	size_t len;
 
-	ocl_check_error(clGetDeviceInfo(dev,
-	                                CL_DEVICE_VENDOR,
-	                                sizeof(buf),
-	                                buf,
-	                                &len));
+	check_error(clGetDeviceInfo(dev, CL_DEVICE_VENDOR, sizeof(buf), buf, &len));
 	ret += buf;
 	ret += " ";
-	ocl_check_error(clGetDeviceInfo(dev,
-	                                CL_DEVICE_NAME,
-	                                sizeof(buf),
-	                                buf,
-	                                &len));
+	check_error(clGetDeviceInfo(dev, CL_DEVICE_NAME, sizeof(buf), buf, &len));
 	ret += buf;
- 	return ret;
+	return ret;
 }
 
-char* OpenCLUtilities::file2string(const char* filename, size_t * final_length) {
+char* OpenCLUtilities::file2string(const char* filename, size_t * final_length)
+{
 	FILE * file_stream = NULL;
 	size_t source_length;
 
 	// open the OpenCL source code file
 	file_stream = fopen(filename, "rb");
-	if(file_stream == NULL) return 0;
+	if (file_stream == NULL)
+		return 0;
 
 	fseek(file_stream, 0, SEEK_END);
 	source_length = ftell(file_stream);
 	fseek(file_stream, 0, SEEK_SET);
 
-	char* source_str = (char *)malloc(source_length + 1); // TODO: Free
+	char* source_str = (char *) malloc(source_length + 1); // TODO: Free
 	memset(source_str, 0, source_length);
 
-	if (fread(source_str, source_length, 1, file_stream) != 1) {
+	if (fread(source_str, source_length, 1, file_stream) != 1)
+	{
 		fclose(file_stream);
 		free(source_str);
-		printf("ERROR: fread did not read file %s correctly\n", filename);
+		messageManager()->sendError("fread did not read " + QString(filename) + " correctly.");
 		return 0;
 	}
 
 	fclose(file_stream);
-	if(final_length != NULL)
+	if (final_length != NULL)
 		*final_length = source_length;
 
 	source_str[source_length] = '\0';
-
-	//printf("file2string returns size %d string: \n%s\n", source_length, source_str);
 
 	return source_str;
 }

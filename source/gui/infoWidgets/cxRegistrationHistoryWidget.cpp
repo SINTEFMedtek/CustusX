@@ -93,8 +93,8 @@ void RegistrationHistoryWidget::showEvent(QShowEvent* event)
 	QWidget::showEvent(event);
 
 	this->reconnectSlot();
-	connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(reconnectSlot()));
-	connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(updateSlot()));
+	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(reconnectSlot()));
+	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(updateSlot()));
 
 	updateSlot();
 }
@@ -107,8 +107,8 @@ void RegistrationHistoryWidget::hideEvent(QCloseEvent* event)
 	{
 		disconnect(mHistories[i].get(), SIGNAL(currentChanged()), this, SLOT(updateSlot()));
 	}
-	disconnect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(updateSlot()));
-	disconnect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(reconnectSlot()));
+	disconnect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(updateSlot()));
+	disconnect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(reconnectSlot()));
 }
 
 void RegistrationHistoryWidget::reconnectSlot()

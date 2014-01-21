@@ -32,7 +32,7 @@ SamplerWidget::SamplerWidget(QWidget* parent) :
 	mActiveTool = DominantToolProxy::New();
 	connect(mActiveTool.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(setModified()));
 	connect(mActiveTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), SLOT(setModified()));
-	connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(spacesChangedSlot()));
+	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(spacesChangedSlot()));
 	connect(toolManager(), SIGNAL(configured()), this, SLOT(spacesChangedSlot()));
 
 	mLayout = new QHBoxLayout(this);

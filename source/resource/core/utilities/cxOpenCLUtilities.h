@@ -3,12 +3,14 @@
 
 #ifdef SSC_USE_OpenCL
 
+#define __NO_STD_VECTOR // Apple: if using std::vector VECTOR_CLASS.push_back added 2 to size!
+#define __CL_ENABLE_EXCEPTIONS //telling the opencl c++ wrapper to throw exceptions
+
 #if defined(__APPLE__) || defined(__MACOSX)
     #include "OpenCL/cl.hpp"
 #else
     #include <CL/cl.hpp>
 #endif
-
 
 #include <string>
 
@@ -16,6 +18,8 @@ class QString;
 
 namespace cx
 {
+static void CL_CALLBACK memoryDestructorCallback(cl_mem memobj, void* user_data);
+
 /**
  * \brief Functionality for working with OpenCL
  *
@@ -28,17 +32,29 @@ namespace cx
 class OpenCL
 {
 public:
-	struct ocl_context
+	struct ocl
 	{
-		cl_context context;
-		cl_device_id device;
-		cl_command_queue cmd_queue;
+		cl::Context context;
+		cl::Device device;
+		cl::CommandQueue cmd_queue;
 	};
 
-	static ocl_context* ocl_init(QString processor);
-	static void ocl_release(ocl_context* context);
-	static cl_kernel ocl_kernel_build(cl_program program, cl_device_id device, const char * kernel_name);
-	static cl_mem ocl_create_buffer(cl_context context, cl_mem_flags flags, size_t size, void * host_data);
+	static ocl* init(cl_device_type type);
+	static void release(ocl* ocl);
+	static cl::Kernel createKernel(cl::Program program, cl::Device device, const char * kernel_name);
+	static cl::Buffer createBuffer(cl::Context context, cl_mem_flags flags, size_t size, void * host_data, std::string bufferName);
+
+	static void checkBuildProgramLog(cl::Program program, cl::Device device, cl_int err);
+
+private:
+	static cl::Platform selectPlatform();
+	static cl::Device selectDevice(cl_device_type type, cl::Platform platform);
+	static cl::Device chooseDeviceWithMostGlobalMemory(VECTOR_CLASS<cl::Device> devices);
+	static cl::Context createContext(cl::Device device, cl_context_properties* cps);
+	static cl::Context createContext(const VECTOR_CLASS<cl::Device> devices, cl_context_properties* cps);
+	static cl::CommandQueue createCommandQueue(cl::Context context, cl::Device device);
+
+	static VECTOR_CLASS<cl::Device> getOnlyValidDevices(VECTOR_CLASS<cl::Device> devices);
 };
 
 /**
@@ -54,11 +70,11 @@ class OpenCLUtilities
 {
 public:
 	static void generateOpenCLError(cl_int id, const char* file, int line);
-	static std::string ocl_get_device_string(cl_device_id dev);
+	static std::string getDeviceString(cl_device_id dev);
 	static char * file2string(const char* filename, size_t * final_length = NULL);
 };
 
-#define ocl_check_error(id) 													\
+#define check_error(id) 													\
 {																				\
 	if (id != CL_SUCCESS) 														\
 	{																			\

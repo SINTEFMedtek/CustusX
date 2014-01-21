@@ -120,14 +120,6 @@ void DataListWidget::populateData(QString uid, bool indent, QListWidgetItem* aft
   emit listSizeChanged();
 }
 
-
-//void DataListWidget::dataClickedSlot(QListWidgetItem* item)
-//{
-//  QString uid = item->data(Qt::UserRole).toString();
-//  emit dataSelected(uid);
-//}
-
-
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
@@ -136,14 +128,10 @@ void DataListWidget::populateData(QString uid, bool indent, QListWidgetItem* aft
 AllDataListWidget::AllDataListWidget(QWidget* parent) :
     DataListWidget(parent)
 {
-//  this->setDragDropMode(QAbstractItemView::DragOnly);
-//  this->setDragEnabled(true);
   this->setDropIndicatorShown(false);
   this->setDragEnabled(true);
-//  this->setAcceptDrops(true); // if we want to back-drag items (for deletion)
 
-  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(populateAllDataList()));
-  connect(dataManager(), SIGNAL(dataRemoved(QString)), this, SLOT(populateAllDataList()));
+  connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(populateAllDataList()));
 }
 
 AllDataListWidget::~AllDataListWidget()
@@ -151,39 +139,13 @@ AllDataListWidget::~AllDataListWidget()
 
 void AllDataListWidget::mousePressEvent(QMouseEvent *event)
 {
-//  if (event->button() == Qt::LeftButton)
-//    startPos = event->pos();
   QListWidget::mousePressEvent(event);
 }
 
 void AllDataListWidget::mouseMoveEvent(QMouseEvent *event)
 {
   QListWidget::mouseMoveEvent(event);
-//  if (event->buttons() & Qt::LeftButton)
-//  {
-//    int distance = (event->pos() - startPos).manhattanLength();
-//    if (distance >= 10)
-//      this->startDrag();
-//  }
 }
-
-//void AllDataListWidget::startDrag()
-//{
-//  QListWidgetItem *item = currentItem();
-//  if (item)
-//  {
-//    QMimeData *mimeData = new QMimeData;
-//    mimeData->setText(item->data(Qt::UserRole).toString());
-//    QDrag *drag = new QDrag(this);
-//    drag->setMimeData(mimeData);
-//
-//    drag->start(Qt::CopyAction);
-//
-////    if (drag->start(Qt::MoveAction) == Qt::MoveAction)
-////      delete item;
-//  }
-//}
-
 
 void AllDataListWidget::populateAllDataList()
 {
@@ -229,19 +191,8 @@ SelectedDataListWidget::SelectedDataListWidget(QWidget* parent) :
   this->viewport()->setAcceptDrops(true);
   this->setDragDropOverwriteMode(true);
 
-//  this->viewport()->setAcceptDrops(true);
-//  this->setAcceptDrops(true);
-//  this->setDropIndicatorShown(true);
-//  this->setDefaultDropAction(Qt::CopyAction);
-//  this->setDragDropMode(QAbstractItemView::DragDrop);
-
   connect(this, SIGNAL(userChangedList()), this, SLOT(userChangedListSlot()));
   connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(contextMenuSlot(const QPoint &)));
-
-//  if (!viewManager()->getViewGroups().empty())
-//    mSelectedDataListWidget->setViewGroupData(viewManager()->getViewGroups()[0]->getData());
-  //nt ViewManager::getActiveViewGroup() const
-  //void DataViewSelectionWidget::activeViewChanged
 }
 
 

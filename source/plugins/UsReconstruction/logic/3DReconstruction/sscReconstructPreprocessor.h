@@ -50,21 +50,18 @@ public:
     /** Return the filedata after preprocessing, ready to be sent to reconstruction
       */
     void initializeCores(std::vector<ReconstructCorePtr> cores); ///< fill input cores with relevant processed input
+		std::vector<ProcessedUSInputDataPtr> createProcessedInput(std::vector<ReconstructCorePtr> cores);
 
 private:
     void cropInputData();
     void updateFromOriginalFileData();
     void findExtentAndOutputTransform();
     Transform3D applyOutputOrientation();
-    std::vector<Vector3D> generateInputRectangle();
-//	void transformPositionsTo_prMu(USReconstructInputData *data);
-    void interpolatePositions();
-	void interpolatePositions2();
-//	Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);
+		std::vector<Vector3D> generateInputRectangle();
+		void interpolatePositions();
     void applyTimeCalibration();
     void alignTimeSeries();
-    void calibrateTimeStamps(double offset, double scale);
-//	std::vector<double> interpolateFramePositionsFromTracking(USReconstructInputData* data) const;
+		void calibrateTimeStamps(double offset, double scale);
 
     // input data
     ReconstructCore::InputParams mInput;

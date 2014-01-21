@@ -88,23 +88,19 @@ ViewGroupData::Options::Options() :
 ViewGroupData::ViewGroupData() :
 				mCamera3D(CameraData::create())
 {
-	connect(dataManager(), SIGNAL(dataRemoved(QString)), this, SLOT(removeDataSlot(QString)));
+	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataAddedOrRemovedInManager()));
 	mVideoSource = "active";
-
-//	mPickerGlyph.reset(new Mesh("PickerGlyph"));
-//
-//
-//	mOptions.getSpherePickerGlyph()->SetRadius(40);
-//	mOptions.getSpherePickerGlyph()->SetThetaResolution(16);
-//	mOptions.getSpherePickerGlyph()->SetPhiResolution(12);
-//	mOptions.getSpherePickerGlyph()->LatLongTessellationOn();
 }
 
-void ViewGroupData::removeDataSlot(QString uid)
+void ViewGroupData::dataAddedOrRemovedInManager()
 {
-	for (unsigned i = 0; i < mData.size(); ++i)
-		if (mData[i]->getUid() == uid)
+	for (unsigned i = 0; i < mData.size(); )
+	{
+		if (!dataManager()->getData(mData[i]->getUid()))
 			this->removeData(mData[i]);
+		else
+			++i;
+	}
 }
 
 void ViewGroupData::requestInitialize()
@@ -133,7 +129,6 @@ void ViewGroupData::addDataSorted(DataPtr data)
 		return;
 	if (std::count(mData.begin(), mData.end(), data))
 		return;
-//	std::cout << "adding: " << data->getName() << std::endl;
 	for (int i=mData.size()-1; i>=0; --i)
 	{
 		if (!dataTypeSort(data, mData[i]))
@@ -144,9 +139,6 @@ void ViewGroupData::addDataSorted(DataPtr data)
 	}
 	if (!std::count(mData.begin(), mData.end(), data))
 		mData.insert(mData.begin(), data);
-//	std::cout << "  post sort:" << std::endl;
-//	for (unsigned i=0; i<mData.size();++i)
-//		std::cout << "    " << mData[i]->getName() << std::endl;
 	emit dataAdded(qstring_cast(data->getUid()));
 }
 

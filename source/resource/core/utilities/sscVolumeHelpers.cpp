@@ -211,26 +211,50 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ImagePtr image)
 	retval["Acquisition time"] = string_cast(image->getAcquisitionTime().toString(timestampSecondsFormatNice()));
 	retval["Voxels with min value"] = string_cast(calculateNumVoxelsWithMinValue(image));
 	retval["Voxels with max value"] = string_cast(calculateNumVoxelsWithMaxValue(image));
+	retval["rMd"] = string_cast(image->get_rMd());
 
-	//vtImageData
+	std::map<std::string, std::string> volumeMap = getDisplayFriendlyInfo(image->getBaseVtkImageData());
+	retval.insert(volumeMap.begin(), volumeMap.end());
+
+	return retval;
+}
+
+std::map<std::string, std::string> getDisplayFriendlyInfo(vtkImageDataPtr image)
+{
+	std::map<std::string, std::string> retval;
+	if(!image)
+		return retval;
+
 	double spacing_x, spacing_y, spacing_z;
-	image->getBaseVtkImageData()->GetSpacing(spacing_x, spacing_y, spacing_z);
+	image->GetSpacing(spacing_x, spacing_y, spacing_z);
 	retval["Spacing"] = string_cast(spacing_x)+" mm , "+string_cast(spacing_y)+" mm , "+string_cast(spacing_z)+" mm ";
 	int dims[3];
-	image->getBaseVtkImageData()->GetDimensions(dims);
+	image->GetDimensions(dims);
 	retval["Dimensions"] = string_cast(dims[0])+" , "+string_cast(dims[1])+" , "+string_cast(dims[2]);
 	retval["Size"] = string_cast(dims[0]*spacing_x)+" mm , "+string_cast(dims[1]*spacing_y)+" mm, "+string_cast(dims[2]*spacing_z)+" mm";
-	float actualMemorySizeKB = (float)image->getBaseVtkImageData()->GetActualMemorySize();
-	retval["Actual memory size"] = string_cast(actualMemorySizeKB/(1024*1024))+" GB, "+string_cast(actualMemorySizeKB/1024)+" MB, "+string_cast(actualMemorySizeKB)+" kB";
-	retval["Scalar components"] = string_cast(image->getBaseVtkImageData()->GetNumberOfScalarComponents());
-	retval["rMd"] = string_cast(image->get_rMd());
-	retval["Number of components for points"] = string_cast(image->getBaseVtkImageData()->GetPointData()->GetNumberOfComponents());
-	retval["Scalar type"] = string_cast(image->getBaseVtkImageData()->GetScalarTypeAsString());
+	float actualMemorySizeKB = (float)image->GetActualMemorySize();
+	retval["Actual memory size"] = string_cast(actualMemorySizeKB/(1024*1024))+" GB, "+string_cast(actualMemorySizeKB/1024)+" MB, "+string_cast(actualMemorySizeKB)+" kB"+string_cast(actualMemorySizeKB*1024)+" bytes";
+	retval["Scalar components"] = string_cast(image->GetNumberOfScalarComponents());
+	retval["Number of components for points"] = string_cast(image->GetPointData()->GetNumberOfComponents());
+	retval["Scalar type"] = string_cast(image->GetScalarTypeAsString());
+	retval["Scalar size"] = string_cast(image->GetScalarSize());
 	int extent[6];
-	image->getBaseVtkImageData()->GetExtent(extent);
+	image->GetExtent(extent);
 	retval["Extent"] = string_cast(extent[0])+" , "+string_cast(extent[1])+" , "+string_cast(extent[2])+" , "+string_cast(extent[3])+" , "+string_cast(extent[4])+" , "+string_cast(extent[5]);
 
 	return retval;
+}
+
+void printDisplayFriendlyInfo(std::map<std::string, std::string> map)
+{
+	messageManager()->sendInfo("----- DisplayFriendlyInfo -----");
+	std::map<std::string, std::string>::iterator it;
+	for(it = map.begin(); it != map.end(); ++it)
+	{
+		QString message((it->first+": "+it->second).c_str());
+		messageManager()->sendInfo(message);
+	}
+	messageManager()->sendInfo("-------------------------------");
 }
 
 int calculateNumVoxelsWithMaxValue(ImagePtr image)

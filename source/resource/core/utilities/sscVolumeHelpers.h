@@ -36,10 +36,9 @@ void fillShortImageDataWithGradient(vtkImageDataPtr data, int maxValue);
   */
 ImagePtr convertImageToUnsigned(ImagePtr image, vtkImageDataPtr suggestedConvertedVolume = vtkImageDataPtr(), bool verbose = true);
 
-/**
- * Get information about a ssc volume.
- */
 std::map<std::string, std::string> getDisplayFriendlyInfo(ImagePtr image);
+std::map<std::string, std::string> getDisplayFriendlyInfo(vtkImageDataPtr image);
+void printDisplayFriendlyInfo(std::map<std::string, std::string> map);
 
 int calculateNumVoxelsWithMaxValue(ImagePtr image);///<Find number of voxels containing max scalar value
 int calculateNumVoxelsWithMinValue(ImagePtr image);///<Find number of voxels containing min scalar value
