@@ -46,7 +46,7 @@ USAcquisition::USAcquisition(AcquisitionPtr base, QObject* parent) : QObject(par
 	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(checkIfReadySlot()));
 
 	connect(mBase.get(), SIGNAL(started()), this, SLOT(recordStarted()));
-	connect(mBase.get(), SIGNAL(stopped()), this, SLOT(recordStopped()));
+	connect(mBase.get(), SIGNAL(acquisitionStopped()), this, SLOT(recordStopped()), Qt::QueuedConnection);
 	connect(mBase.get(), SIGNAL(cancelled()), this, SLOT(recordCancelled()));
 
 	this->checkIfReadySlot();

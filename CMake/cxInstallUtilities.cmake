@@ -170,7 +170,7 @@ function(cx_install_configuration_files)
 			PATTERN "settings/*" EXCLUDE)
 
 	# Install OpenCL kernels into bundle
-	install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction/TordReconstruct/kernels.ocl
+	install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction/TordReconstruct/kernels.cl
 			DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/)
 
 	if(CX_USE_ISB_GE)

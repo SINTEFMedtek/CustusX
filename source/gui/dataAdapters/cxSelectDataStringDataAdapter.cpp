@@ -28,7 +28,7 @@ SelectDataStringDataAdapterBase::SelectDataStringDataAdapterBase(QString typeReg
 {
 	mValueName = "Select data";
 	mHelp = mValueName;
-	connect(dataManager(), SIGNAL(dataLoaded()),   this, SIGNAL(changed()));
+	connect(dataManager(), SIGNAL(dataAddedOrRemoved()),   this, SIGNAL(changed()));
 }
 
 /**

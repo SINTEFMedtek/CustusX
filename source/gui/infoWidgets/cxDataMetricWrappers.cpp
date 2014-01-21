@@ -34,7 +34,7 @@ PointMetricWrapper::PointMetricWrapper(PointMetricPtr data) : mData(data)
 {
   mInternalUpdate = false;
   connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
+  connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* PointMetricWrapper::createWidget()
@@ -152,7 +152,7 @@ PlaneMetricWrapper::PlaneMetricWrapper(PlaneMetricPtr data) : mData(data)
 {
   mInternalUpdate = false;
   connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
+  connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* PlaneMetricWrapper::createWidget()
@@ -288,7 +288,7 @@ DistanceMetricWrapper::DistanceMetricWrapper(DistanceMetricPtr data) : mData(dat
 {
   mInternalUpdate = false;
   connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
+  connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 void DistanceMetricWrapper::getAvailableArgumentMetrics(QStringList* uid, std::map<QString,QString>* namemap)
@@ -397,7 +397,7 @@ AngleMetricWrapper::AngleMetricWrapper(AngleMetricPtr data) : mData(data)
 {
   mInternalUpdate = false;
   connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
+  connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 void AngleMetricWrapper::getPointMetrics(QStringList* uid, std::map<QString,QString>* namemap)

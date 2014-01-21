@@ -19,6 +19,11 @@
 #include "cxtestReconstructRealData.h"
 #include "cxtestSyntheticReconstructInput.h"
 
+#include "sscDummyTool.h"
+#include "sscPNNReconstructAlgorithm.h"
+#include "sscReconstructPreprocessor.h"
+#include <vtkImageData.h>
+
 #include "recConfig.h"
 #ifdef SSC_USE_OpenCL
 	#include "TordReconstruct/TordTest.h"
@@ -154,6 +159,49 @@ TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruc
 
 }
 
+TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[unit][usreconstruction][synthetic]")
+{
+	ReconstructManagerTestFixture fixture;
+	fixture.setVerbose(true);
+
+	SyntheticReconstructInputPtr generator(new SyntheticReconstructInput);
+	Eigen::Array2i frameSize = Eigen::Array2i(150,150);
+	Eigen::Array2i extent = frameSize - 1;
+	cx::ProbeDefinition probeDefinition = cx::DummyToolTestUtilities::createProbeDataLinear(100, 100, frameSize);
+
+	//Adding 2 sections creates 3 runs: 1 with the simple case clip rect == extent, the other 2 with extent+1 and +500
+	SECTION("Set clip rect just to large")
+		probeDefinition.setClipRect_p(cx::DoubleBoundingBox3D(0, extent[0]+1, 0, extent[1]+1, 0, 0));
+	SECTION("Set clop rect very large")
+		probeDefinition.setClipRect_p(cx::DoubleBoundingBox3D(0, extent[0]+500, 0, extent[1]+500, 0, 0));
+
+	generator->defineProbe(probeDefinition);
+
+	generator->setSpherePhantom();
+	cx::USReconstructInputData inputData = generator->generateSynthetic_USReconstructInputData();
+
+	cx::ReconstructManagerPtr reconstructer = fixture.getManager();
+	reconstructer->selectData(inputData);
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
+	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
+	fixture.setPNN_InterpolationSteps(1);// set an algorithm-specific parameter
+
+	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
+	REQUIRE(preprocessor);
+	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
+	REQUIRE(cores.size() > 0);
+	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(cores);
+
+	REQUIRE(processedInput.size() == cores.size());
+	{
+		Eigen::Array3i dimFirstFrame = processedInput[0]->getDimensions();
+		dimFirstFrame[2] = 1;
+		INFO("Clip prect: " << probeDefinition.getClipRect_p());
+		INFO(dimFirstFrame << " == " << Eigen::Array3i(processedInput[0]->getMask()->GetDimensions()));
+		REQUIRE(dimFirstFrame.isApprox(Eigen::Array3i(processedInput[0]->getMask()->GetDimensions())));
+	}
+}
+
 #ifdef SSC_USE_OpenCL
 TEST_CASE("ReconstructManager: TordTest on real data", "[usreconstruction][integration][tordtest][not_apple][unstable]")
 {
@@ -178,35 +226,35 @@ TEST_CASE("ReconstructManager: TordTest on real data", "[usreconstruction][integ
 	algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
 	algorithm->getMaxPlanesOption(algo)->setValue(1);
 	algorithm->getNStartsOption(algo)->setValue(1);
-	SECTION("VNN2")
-	{
-		algorithm->getMethodOption(algo)->setValue("VNN2");
-		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-		algorithm->getMaxPlanesOption(algo)->setValue(8);
-	}
-	SECTION("DW")
-	{
-		algorithm->getMethodOption(algo)->setValue("DW");
-		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-		algorithm->getMaxPlanesOption(algo)->setValue(8);
-	}
-	SECTION("Anisotropic")
-	{
-		algorithm->getMethodOption(algo)->setValue("Anisotropic");
-		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-		algorithm->getMaxPlanesOption(algo)->setValue(8);
-	}
-	SECTION("Multistart search")
-	{
-		algorithm->getMethodOption(algo)->setValue("VNN");
-		algorithm->getNStartsOption(algo)->setValue(5);
-	}
-	SECTION("Closest")
-	{
-		algorithm->getMethodOption(algo)->setValue("VNN");
-		algorithm->getPlaneMethodOption(algo)->setValue("Closest");
-		algorithm->getMaxPlanesOption(algo)->setValue(8);
-	}
+//	SECTION("VNN2")
+//	{
+//		algorithm->getMethodOption(algo)->setValue("VNN2");
+//		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
+//		algorithm->getMaxPlanesOption(algo)->setValue(8);
+//	}
+//	SECTION("DW")
+//	{
+//		algorithm->getMethodOption(algo)->setValue("DW");
+//		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
+//		algorithm->getMaxPlanesOption(algo)->setValue(8);
+//	}
+//	SECTION("Anisotropic")
+//	{
+//		algorithm->getMethodOption(algo)->setValue("Anisotropic");
+//		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
+//		algorithm->getMaxPlanesOption(algo)->setValue(8);
+//	}
+//	SECTION("Multistart search")
+//	{
+//		algorithm->getMethodOption(algo)->setValue("VNN");
+//		algorithm->getNStartsOption(algo)->setValue(5);
+//	}
+//	SECTION("Closest")
+//	{
+//		algorithm->getMethodOption(algo)->setValue("VNN");
+//		algorithm->getPlaneMethodOption(algo)->setValue("Closest");
+//		algorithm->getMaxPlanesOption(algo)->setValue(8);
+//	}
 
 	// run the reconstruction in the main thread
 	fixture.reconstruct();

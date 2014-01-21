@@ -52,11 +52,26 @@ void ReconstructPreprocessor::initializeCores(std::vector<ReconstructCorePtr> co
 {
 	TimeKeeper timer;
 
+	std::vector<ProcessedUSInputDataPtr> processedInput = this->createProcessedInput(cores);
+	SSC_ASSERT(cores.size() == processedInput.size());
+
+	for (unsigned i=0; i<cores.size(); ++i)
+	{
+		cores[i]->initialize(processedInput[i], this->getOutputVolumeParams());
+	}
+
+	timer.printElapsedSeconds("Reconstruct preprocess time");
+}
+
+std::vector<ProcessedUSInputDataPtr> ReconstructPreprocessor::createProcessedInput(std::vector<ReconstructCorePtr> cores)
+{
 	std::vector<bool> angio;
 	for (unsigned i=0; i<cores.size(); ++i)
 		angio.push_back(cores[i]->getInputParams().mAngio);
 
 	std::vector<std::vector<vtkImageDataPtr> > frames = mFileData.mUsRaw->initializeFrames(angio);
+
+	std::vector<ProcessedUSInputDataPtr> retval;
 
 	for (unsigned i=0; i<cores.size(); ++i)
 	{
@@ -66,11 +81,10 @@ void ReconstructPreprocessor::initializeCores(std::vector<ReconstructCorePtr> co
 											 mFileData.getMask(),
 											 mFileData.mFilename,
 											 QFileInfo(mFileData.mFilename).completeBaseName() ));
-		cores[i]->initialize(input, this->getOutputVolumeParams());
+		SSC_ASSERT(Eigen::Array3i(frames[i][0]->GetDimensions()).isApprox(Eigen::Array3i(mFileData.getMask()->GetDimensions())));
+		retval.push_back(input);
 	}
-
-
-	timer.printElapsedSeconds("Reconstruct preprocess time");
+	return retval;
 }
 
 namespace
@@ -255,61 +269,6 @@ void ReconstructPreprocessor::interpolatePositions()
 		}
 	}
 }
-
-/**
- * Find interpolated position values for each frame based on the input position
- * data.
- * Current implementation:
- * Linear interpolation
- */
-void ReconstructPreprocessor::interpolatePositions2()
-{
-	int startFrames = mFileData.mFrames.size();
-
-	std::map<int,RemoveDataType> removedData;
-
-	std::vector<double> error = cx::USReconstructInputDataAlgorithm::interpolateFramePositionsFromTracking(&mFileData);
-	SSC_ASSERT(error.size()==mFileData.mFrames.size());
-	int i_frame = 0;
-
-	for (unsigned i = 0; i < error.size(); ++i)
-	{
-		if (error[i] > mMaxTimeDiff)
-		{
-			removedData[i_frame].add(error[i]);
-			mFileData.mFrames.erase(mFileData.mFrames.begin() + i_frame);
-			mFileData.mUsRaw->removeFrame(i_frame);
-		}
-		else
-		{
-			i_frame++;// Only increment if we didn't delete the frame
-		}
-	}
-
-	int removeCount=0;
-	for (std::map<int,RemoveDataType>::iterator iter=removedData.begin(); iter!=removedData.end(); ++iter)
-	{
-		int first = iter->first+removeCount;
-		int last = first + iter->second.count-1;
-		messageManager()->sendInfo(QString("Removed input frame [%1-%2]. Time diff=%3").arg(first).arg(last).arg(iter->second.err, 0, 'f', 1));
-		removeCount += iter->second.count;
-	}
-
-	double removed = double(startFrames - mFileData.mFrames.size()) / double(startFrames);
-	if (removed > 0.02)
-	{
-		double percent = removed * 100;
-		if (percent > 1)
-		{
-			messageManager()->sendWarning("Removed " + QString::number(percent, 'f', 1) + "% of the "+ qstring_cast(startFrames) + " frames.");
-		}
-		else
-		{
-			messageManager()->sendInfo("Removed " + QString::number(percent, 'f', 1) + "% of the " + qstring_cast(startFrames) + " frames.");
-		}
-	}
-}
-
 
 /**
  * Generate a rectangle (2D) defining ROI in input image space

@@ -88,6 +88,47 @@ void OpenCLPrinter::printDeviceInfo(cl::Device device, bool verbose)
 	print("Image3D max depth", device.getInfo<CL_DEVICE_IMAGE3D_MAX_DEPTH>());
 }
 
+void OpenCLPrinter::printContextInfo(cl::Context context)
+{
+	print("--- ContextInfo ---", "");
+	VECTOR_CLASS<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
+	print("Number of devices", devices.size());
+	for(int i=0; i<devices.size(); ++i)
+		printDeviceInfo(devices[i]);
+}
+
+void OpenCLPrinter::printProgramInfo(cl::Program program)
+{
+	print("--- ProgramInfo ---", "");
+	//printProgramSource(program);
+}
+
+void OpenCLPrinter::printProgramSource(cl::Program program)
+{
+	print("--- ProgramSource ---", "");
+	cl::STRING_CLASS source = program.getInfo<CL_PROGRAM_SOURCE>();
+	print("", "\n"+source);
+}
+
+void OpenCLPrinter::printKernelInfo(cl::Kernel kernel)
+{
+	print("--- KernelInfo ---", "");
+	cl::STRING_CLASS functionName = kernel.getInfo<CL_KERNEL_FUNCTION_NAME>();
+	cl::Context context = kernel.getInfo<CL_KERNEL_CONTEXT>();
+	cl::Program program = kernel.getInfo<CL_KERNEL_PROGRAM>();
+	print("Function name", functionName);
+	printContextInfo(context);
+	printProgramInfo(program);
+
+}
+
+void OpenCLPrinter::printMemoryInfo(cl::Memory memory)
+{
+	print("--- MemoryInfo ---", "");
+	cl::Context context = memory.getInfo<CL_MEM_CONTEXT>();
+	printContextInfo(context);
+}
+
 void OpenCLPrinter::printStringList(std::string list, std::string separator)
 {
 	std::vector<std::string> strings;

@@ -319,7 +319,7 @@ class IGSTK(CppComponent):
 
 class ISB_DataStreaming(CppComponent):
     def name(self):
-        self.mCurrentRevision = "477"
+        self.mCurrentRevision = "483"
         return "ISB_DataStreaming"
     def help(self):
         return 'ISB GE Digital Interface stuff'
@@ -439,7 +439,7 @@ class TubeSegmentationFramework(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/Tube-Segmentation-Framework.git')
     def update(self):
-        self._getBuilder().gitUpdate(branch='master', submodules=True)    
+        self._getBuilder().gitCheckout('80416ea1fd0245208b42c1d67f76ca177507a61a', submodules=True)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption

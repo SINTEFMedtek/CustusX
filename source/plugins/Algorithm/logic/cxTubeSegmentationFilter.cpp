@@ -926,6 +926,12 @@ TSFPresetsPtr TubeSegmentationFilter::populatePresets()
 	return retval;
 }
 
+TubeSegmentationFilter::~TubeSegmentationFilter() {
+	// Cleanup the output from TSF
+	if(mOutput != NULL)
+		delete mOutput;
+}
+
 } /* namespace cx */
 #endif //CX_USE_TSF
 

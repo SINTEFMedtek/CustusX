@@ -60,6 +60,11 @@ VideoFixedPlaneRep::VideoFixedPlaneRep(const QString& uid, const QString& name) 
 	mStatusText->setPosition(0.5, 0.5);
 	mStatusText->updateText("Not Connected");
 
+	mOrientationVText.reset(new TextDisplay("V", Vector3D(1.0, 0.9, 0.0), 30));
+	mOrientationVText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+	mOrientationVText->setCentered();
+	mOrientationVText->setPosition(0.05, 0.95);
+
 	mProbeOrigin.reset(new GraphicalPolyData3D());
 	mProbeOrigin->setColor(Vector3D(1, 165.0/255.0, 0)); // orange
 	mProbeSector.reset(new GraphicalPolyData3D());
@@ -123,6 +128,7 @@ void VideoFixedPlaneRep::newDataSlot()
 	mInfoText->updateText(mData->getInfoString());
 	mStatusText->updateText(mData->getStatusString());
 	mStatusText->getActor()->SetVisibility(!mData->validData());
+	mOrientationVText->getActor()->SetVisibility(mData->validData());
 	this->setCamera();
 	this->updateSector();
 }
@@ -183,6 +189,7 @@ void VideoFixedPlaneRep::addRepActorsToViewRenderer(View* view)
 	view->getRenderer()->AddActor(mRTGraphics->getActor());
 	view->getRenderer()->AddActor(mInfoText->getActor());
 	view->getRenderer()->AddActor(mStatusText->getActor());
+	view->getRenderer()->AddActor(mOrientationVText->getActor());
 
 	mProbeClipRect->setRenderer(view->getRenderer());
 	mProbeOrigin->setRenderer(view->getRenderer());
@@ -195,6 +202,7 @@ void VideoFixedPlaneRep::removeRepActorsFromViewRenderer(View* view)
 	view->getRenderer()->RemoveActor(mRTGraphics->getActor());
 	view->getRenderer()->RemoveActor(mInfoText->getActor());
 	view->getRenderer()->RemoveActor(mStatusText->getActor());
+	view->getRenderer()->RemoveActor(mOrientationVText->getActor());
 	mProbeOrigin->setRenderer(NULL);
 	mProbeSector->setRenderer(NULL);
 	mProbeClipRect->setRenderer(NULL);

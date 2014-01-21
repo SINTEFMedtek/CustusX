@@ -1,6 +1,9 @@
-// This is a preliminary test written by Tord Øygard in order to familiarize himself with the CustusX codebase.
+	// This is a preliminary test written by Tord Øygard in order to familiarize himself with the CustusX codebase.
 #ifndef TORD_TEST_H_
 #define TORD_TEST_H_
+
+#define __NO_STD_VECTOR // Apple: if using std::vector VECTOR_CLASS.push_back added 2 to size!
+#define __CL_ENABLE_EXCEPTIONS //telling the opencl c++ wrapper to throw exceptions
 
 
 #include "sscReconstructAlgorithm.h"
@@ -131,8 +134,8 @@ protected:
 	 * @param kernelFile Path to the OpenCL kernel source
 	 * @param nMaxPlanes The MAX_PLANES parameter of the kernel, i.e. max value of how many planes to include in the reconstruction of one voxel
 	 * @param nPlanes Number of image planes in the input data set
-	 * @param method The method ID. See kernels.ocl for more information
-	 * @param planeMethod the plane method ID. See kernels.ocl for more information
+	 * @param method The method ID. See kernels.cl for more information
+	 * @param planeMethod the plane method ID. See kernels.cl for more information
 	 * @param nStarts number of starts for multistart search for close planes
 	 * @param brightnessWeight The extra weight to give pixels brighter than mean
 	 * @param newnessWeight The extra weight to give pixels newer than mean
@@ -152,15 +155,15 @@ protected:
 	 * @param program_src The kernel source code
 	 * @param nMaxPlanes The MAX_PLANES parameter of the kernel, i.e. max value of how many planes to include in the reconstruction of one voxel
 	 * @param nPlanes Number of image planes in the input data set
-	 * @param method The method ID. See kernels.ocl for more information
-	 * @param planeMethod the plane method ID. See kernels.ocl for more information
+	 * @param method The method ID. See kernels.cl for more information
+	 * @param planeMethod the plane method ID. See kernels.cl for more information
 	 * @param nStarts number of starts for multistart search for close planes
 	 * @param kernelPath The path of the kernel source code
 	 * @param brightnessWeight The extra weight to give pixels brighter than mean
 	 * @param newnessWeight The extra weight to give pixels newer than mean
 	 * @return True on suc
 	 */
-	virtual cl_program buildCLProgram(const char* program_src, 
+	virtual cl::Program buildCLProgram(const char* program_src,
 	                                  int nMaxPlanes,
 	                                  int nPlanes,
 	                                  int method,
@@ -168,7 +171,8 @@ protected:
 	                                  int nStarts,
 	                                  float brightnessWeight,
 	                                  float newnessWeight,
-	                                  QString kernelPath);
+	                                  QString kernelPath,
+	                                  size_t sourceLen);
 	/**
 	 * Perform GPU Reconstruction.
 	 * This function initializes the CL memory objects, calls the kernel and reads back the result,
@@ -241,10 +245,16 @@ protected:
 
 
 	/// OpenCL handles
-	cl_kernel mClKernel;
-	std::vector<cl_mem> mVClMemBscan;
-	cl_mem mClMemOutput;
-	OpenCL::ocl_context* moClContext;
+//	cl_kernel mClKernel;
+//	std::vector<cl_mem> mVClMemBscan;
+//	cl_mem mClMemOutput;
+//	OpenCL::ocl* moClContext;
+
+	//OpenCL cpp handles
+	cl::Kernel mKernel;
+	VECTOR_CLASS<cl::Memory> mBScans;
+	cl::Memory mOutput;
+	OpenCL::ocl* mOCL;
 
 	// Method names. Indices into this array corresponds to method IDs in the OpenCL Kernel.
 	std::vector<QString> mMethods;
