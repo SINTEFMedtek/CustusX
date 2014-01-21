@@ -104,8 +104,16 @@ private slots:
 	void vtkImageDataChangedSlot();
 
 private:
-	void clear();
-	void setup();
+	void initializeMapper();
+	void updateTransforms();
+	void clearVolume();
+	void setupVolume();
+	ImagePtr getEnvelopingImage();
+	void disconnectImages();
+	void connectImages();
+	void setupMonitor();
+	void setupVolumeProperties();
+	void setupReferenceVolumeAndPropertiesAndConnectToVolume();
 
 	vtkVolumePtr mVolume;
 	vtkOpenGLGPUMultiVolumeRayCastMapperPtr mMapper;
@@ -114,7 +122,6 @@ private:
 	std::vector<ImagePtr> mImages;
 	ImagePtr mReferenceImage;
 	std::vector<ImageMapperMonitorPtr> mMonitors;
-	ImageEnveloperPtr mGenerator;
 };
 
 #endif // CXMEHDIGPURAYCASTMULTIVOLUMEREP_H
