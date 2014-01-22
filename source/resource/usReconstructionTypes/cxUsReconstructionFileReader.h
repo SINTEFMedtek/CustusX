@@ -142,6 +142,7 @@ public:
 	static std::pair<QString, ProbeDefinition>  readProbeDataFromFile(QString mhdFileName);
 
 private:
+	bool valid(USReconstructInputData input);
 	std::vector<TimedPosition> readPositions(QString fileName);
 	bool readMaskFile(QString mhdFileName, ImagePtr mask);
 	USFrameDataPtr readUsDataFile(QString mhdFileName);
