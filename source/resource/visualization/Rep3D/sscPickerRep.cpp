@@ -149,21 +149,12 @@ typedef vtkSmartPointer<class vtkDataSet> vtkDataSetPtr;
 void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer)
 {
 	vtkVolumePickerPtr picker = vtkVolumePickerPtr::New();
-//	std::cout << "pixel pos " << clickPosition << std::endl;
-// default values:
-//	picker->SetVolumeOpacityIsovalue(0.05);
-//	picker->SetTolerance(1.0E-6);
 	int hit = picker->Pick(clickPosition[0], clickPosition[1], 0, renderer);
-//	std::cout << "  pick pos  " << clickPosition << std::endl;
 
 	// search for picked data in manager, emit uid if found.
 	vtkDataSetPtr data = picker->GetDataSet();
-//	std::cout << "data " << data << std::endl;
 	if (data)
 	{
-//		data->Print(std::cout);
-//		std::cout << "looking for " << data.GetPointer() << std::endl;
-
 		std::map<QString, DataPtr> allData = dataManager()->getData();
 		for (std::map<QString, DataPtr>::iterator iter = allData.begin(); iter != allData.end(); ++iter)
 		{
@@ -172,15 +163,11 @@ void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr rende
 				emit dataPicked(iter->first);
 
 			ImagePtr image = boost::dynamic_pointer_cast<Image>(iter->second);
-//			if (image)
-//				std::cout << "  checking " << image->getBaseVtkImageData().GetPointer() << std::endl;
 			if (image && image->getBaseVtkImageData() == data)
 				emit dataPicked(iter->first);
 		}
 	}
-//	data->Print(std::cout);
-//	std::cout << "  hit: " << data.GetPointer() << std::endl;
-//	std::cout << "  pt : " << mGraphicalPoint->getPolyData().GetPointer() << std::endl;
+
 	Vector3D pick_w(picker->GetPickPosition());
 
 	if ( data &&

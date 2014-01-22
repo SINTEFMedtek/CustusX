@@ -57,15 +57,12 @@ private:
     void updateFromOriginalFileData();
     void findExtentAndOutputTransform();
     Transform3D applyOutputOrientation();
-    std::vector<Vector3D> generateInputRectangle();
-//	void transformPositionsTo_prMu(USReconstructInputData *data);
-    void interpolatePositions();
-	void interpolatePositions2();
-//	Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);
+		std::vector<Vector3D> generateInputRectangle();
+		void interpolatePositions();
+		double timeToPosition(unsigned i_frame, unsigned i_pos);
     void applyTimeCalibration();
     void alignTimeSeries();
-    void calibrateTimeStamps(double offset, double scale);
-//	std::vector<double> interpolateFramePositionsFromTracking(USReconstructInputData* data) const;
+		void calibrateTimeStamps(double offset, double scale);
 
     // input data
     ReconstructCore::InputParams mInput;
