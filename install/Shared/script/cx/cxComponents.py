@@ -439,7 +439,7 @@ class TubeSegmentationFramework(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/Tube-Segmentation-Framework.git')
     def update(self):
-        self._getBuilder().gitCheckout('80416ea1fd0245208b42c1d67f76ca177507a61a', submodules=True)
+        self._getBuilder().gitCheckout('61eefebdcc088bdff47a27b91f95007d4f77fe6f', submodules=True)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -459,7 +459,7 @@ class LevelSetSegmentation(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:smistad/Level-Set-Segmentation')
     def update(self):
-        self._getBuilder().gitCheckout('0558190d667be653dae7d2ca65bdece6c84d0f7e', submodules=True)
+        self._getBuilder().gitCheckout('4b63248b915aa7a8adf98ead801dec1149a5772b', submodules=True)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
