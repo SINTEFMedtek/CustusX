@@ -226,8 +226,11 @@ void OpenCL::release(OpenCL::ocl* ocl)
 	messageManager()->sendInfo("Releasing OpenCL context, device and command queue.");
 
 	cl::UnloadCompiler();
-	delete ocl;
-	ocl = NULL;
+	if(ocl != NULL)
+	{
+		delete ocl;
+		ocl = NULL;
+	}
 }
 
 cl::Kernel OpenCL::createKernel(cl::Program program, cl::Device device, const char * kernel_name)
