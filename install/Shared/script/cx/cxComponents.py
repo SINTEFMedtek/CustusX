@@ -439,7 +439,7 @@ class TubeSegmentationFramework(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/Tube-Segmentation-Framework.git')
     def update(self):
-        self._getBuilder().gitCheckout('61eefebdcc088bdff47a27b91f95007d4f77fe6f', submodules=True)
+        self._getBuilder().gitCheckout('874997f3c8c5e760924a15a6e2656cc7f0de136a', submodules=True)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
