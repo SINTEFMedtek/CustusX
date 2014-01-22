@@ -7,8 +7,6 @@
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 
-#include "cxOpenCLPrinter.h"
-
 namespace cx
 {
 
@@ -26,24 +24,33 @@ void CL_CALLBACK memoryDestructorCallback(cl_mem memobj, void* user_data)
 
 OpenCL::ocl* OpenCL::init(cl_device_type type)
 {
-	cl::Platform platform = selectPlatform();
-    cl::Device device = selectDevice(type, platform);
-	cl_context_properties cps[] = { CL_CONTEXT_PLATFORM, (cl_context_properties) (platform)(), 0 };
-    cl::Context context = createContext(device, cps);
-    cl::CommandQueue commandQueue = createCommandQueue(context, device);
+	OpenCL::ocl* retval = NULL;
 
-    //fill the struct
-	OpenCL::ocl* retval = new OpenCL::ocl;
-    retval->device = device;
-    retval->context = context;
-    retval->cmd_queue = commandQueue;
+	try
+	{
+		cl::Platform platform = selectPlatform();
+		cl::Device device = selectDevice(type, platform);
+		cl_context_properties cps[] = { CL_CONTEXT_PLATFORM, (cl_context_properties) (platform)(), 0 };
+		cl::Context context = createContext(device, cps);
+		cl::CommandQueue commandQueue = createCommandQueue(context, device);
+
+		retval = new OpenCL::ocl;
+		retval->device = device;
+		retval->context = context;
+		retval->cmd_queue = commandQueue;
+
+	}catch(cl::Error error)
+	{
+		messageManager()->sendError("Could not initialize OpenCL. Reason: "+QString(error.what()));
+		check_error(error.err());
+	}
 
     return retval;
 }
 
 cl::Platform OpenCL::selectPlatform()
 {
-	cl::Platform retval;
+	cl::Platform retval = NULL;
     try
 	{
 		VECTOR_CLASS<cl::Platform> platforms;
@@ -58,17 +65,18 @@ cl::Platform OpenCL::selectPlatform()
         int platformToSelect = 0; //just select the first platform in the list
         retval = platforms[platformToSelect];
 
+        std::string name, vendor, version;
+		name = retval.getInfo<CL_PLATFORM_NAME>();
+		vendor = retval.getInfo<CL_PLATFORM_VENDOR>();
+		version = retval.getInfo<CL_PLATFORM_VERSION>();
+
+		messageManager()->sendInfo("Selected platform "+qstring_cast(name)+" from vendor "+qstring_cast(vendor)+" using "+qstring_cast(version));
+
 	}catch(cl::Error error)
 	{
 		messageManager()->sendError("Could not select a OpenCL platform. Reason: "+QString(error.what()));
 		check_error(error.err());
 	}
-
-	std::string name, vendor, version;
-	name = retval.getInfo<CL_PLATFORM_NAME>();
-	vendor = retval.getInfo<CL_PLATFORM_VENDOR>();
-	version = retval.getInfo<CL_PLATFORM_VERSION>();
-	messageManager()->sendInfo("Selected platform "+qstring_cast(name)+" from vendor "+qstring_cast(vendor)+" using "+qstring_cast(version));
 
 	return retval;
 }
@@ -92,23 +100,22 @@ cl::Device OpenCL::selectDevice(cl_device_type type, cl::Platform platform)
 		platform.getDevices(type, &devices);
 
 		int foundDevices = devices.size();
-		messageManager()->sendDebug("Found "+QString::number(foundDevices)+" devices.");
 		if(foundDevices == 0)
 			throw cl::Error(1, std::string("No OpenCL devices of type "+typeString+" found on this platform.").c_str());
 
 		retval = chooseDeviceWithMostGlobalMemory(devices);
+
+		cl::STRING_CLASS name, vendor, version;
+		name = retval.getInfo<CL_DEVICE_NAME>();
+		vendor = retval.getInfo<CL_DEVICE_VENDOR>();
+		version = retval.getInfo<CL_DEVICE_VERSION>();
+		messageManager()->sendInfo("Selected device "+qstring_cast(name)+" from vendor "+qstring_cast(vendor)+" using "+qstring_cast(version));
 
 	}catch(cl::Error error)
 	{
 		messageManager()->sendError("Could not select a OpenCL device. Reason: "+QString(error.what()));
 		check_error(error.err());
 	}
-
-	cl::STRING_CLASS name, vendor, version;
-	name = retval.getInfo<CL_DEVICE_NAME>();
-	vendor = retval.getInfo<CL_DEVICE_VENDOR>();
-	version = retval.getInfo<CL_DEVICE_VERSION>();
-	messageManager()->sendInfo("Selected device "+qstring_cast(name)+" from vendor "+qstring_cast(vendor)+" using "+qstring_cast(version));
 
     return retval;
 
@@ -182,7 +189,6 @@ cl::Context OpenCL::createContext(const VECTOR_CLASS<cl::Device> devices, cl_con
 
 cl::CommandQueue OpenCL::createCommandQueue(cl::Context context, cl::Device device)
 {
-	OpenCLPrinter::printDeviceInfo(device);
 	cl::CommandQueue retval;
 	try
 	{
@@ -221,6 +227,7 @@ void OpenCL::release(OpenCL::ocl* ocl)
 
 	cl::UnloadCompiler();
 	delete ocl;
+	ocl = NULL;
 }
 
 cl::Kernel OpenCL::createKernel(cl::Program program, cl::Device device, const char * kernel_name)

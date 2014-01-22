@@ -35,6 +35,7 @@ if (BUILD_TESTING)
 		cxtestReconstructRealData.cpp
 		cxtestSyntheticReconstructInput.h
 		cxtestSyntheticReconstructInput.cpp
+		cxtestOpenCLReconstruction.cpp
 		)
 	cx_catch_add_lib_and_exe(cxPluginUSReconstruction "${CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
 
