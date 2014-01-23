@@ -50,7 +50,7 @@ OpenCL::ocl* OpenCL::init(cl_device_type type)
 
 cl::Platform OpenCL::selectPlatform()
 {
-	cl::Platform retval = NULL;
+	cl::Platform retval;
     try
 	{
 		VECTOR_CLASS<cl::Platform> platforms;
@@ -76,6 +76,7 @@ cl::Platform OpenCL::selectPlatform()
 	{
 		messageManager()->sendError("Could not select a OpenCL platform. Reason: "+QString(error.what()));
 		check_error(error.err());
+		throw error;
 	}
 
 	return retval;
@@ -115,6 +116,7 @@ cl::Device OpenCL::selectDevice(cl_device_type type, cl::Platform platform)
 	{
 		messageManager()->sendError("Could not select a OpenCL device. Reason: "+QString(error.what()));
 		check_error(error.err());
+		throw error;
 	}
 
     return retval;
@@ -144,6 +146,7 @@ cl::Device OpenCL::chooseDeviceWithMostGlobalMemory(VECTOR_CLASS<cl::Device> dev
 		{
 			messageManager()->sendWarning("Could not ask device about CL_DEVICE_GLOBAL_MEM_SIZE. Reason: "+QString(error.what()));
 			check_error(error.err());
+			throw error;
 		}
 	}
 	cl::STRING_CLASS name;
@@ -182,6 +185,7 @@ cl::Context OpenCL::createContext(const VECTOR_CLASS<cl::Device> devices, cl_con
 	{
 		messageManager()->sendError("Could not create a OpenCL context. Reason: "+QString(error.what()));
 		check_error(error.err());
+		throw error;
 	}
 
 	return retval;
@@ -198,6 +202,7 @@ cl::CommandQueue OpenCL::createCommandQueue(cl::Context context, cl::Device devi
 	{
 		messageManager()->sendError("Could not create a OpenCL command queue. Reason: "+QString(error.what()));
 		check_error(error.err());
+		throw error;
 	}
 
 	return retval;
@@ -216,6 +221,8 @@ VECTOR_CLASS<cl::Device> OpenCL::getOnlyValidDevices(VECTOR_CLASS<cl::Device> de
 		} catch (cl::Error error)
 		{
 			messageManager()->sendWarning("Found invalid device. Device had no name.");
+			check_error(error.err());
+			throw error;
 		}
 	}
 	return valid;
@@ -255,6 +262,7 @@ cl::Buffer OpenCL::createBuffer(cl::Context context, cl_mem_flags flags, size_t 
 	{
 		messageManager()->sendError("Could not create a OpenCL buffer queue. Reason: "+QString(error.what()));
 		check_error(error.err());
+		throw error;
 	}
 	return dev_mem;
 }
