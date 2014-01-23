@@ -3,6 +3,7 @@
 #include "catch.hpp"
 #include "cxOpenCLUtilities.h"
 #include "sscMessageManager.h"
+#include "cxtestUtilities.h"
 
 namespace cxtest
 {
@@ -10,7 +11,6 @@ namespace cxtest
 //TODO make OpenCL testing fixture, waiting for common opencl library
 bool runTestKernel(cx::OpenCL::ocl* opencl)
 {
-	cx::messageManager()->initialize();
 	const char* source = "__kernel void test_kernel(void){int i = 0; i+=i;}";
 	bool build = true;
 	cl::Program::Sources sources(1, std::pair<const char*, ::size_t>(source, strlen(source)));
@@ -36,25 +36,35 @@ bool runTestKernel(cx::OpenCL::ocl* opencl)
 		success = false;
 	}
 	return success;
-	cx::messageManager()->shutdown();
 }
 
 TEST_CASE("OpenCLUtilities: Can initialize OpenCL using CPU", "[unit][OpenCL][OpenCLUtilities][CPU]")
 {
+	cx::messageManager()->initialize();
 	cx::OpenCL::ocl* opencl = cx::OpenCL::init(CL_DEVICE_TYPE_CPU);
 	CHECK(opencl);
 	cx::OpenCL::release(opencl);
+	//need to be sure opencl thread is finished before shutting down messagemanager,
+	//or else we could get seg fault because og a callbackk from opencl to messagemAnager after it is shut down
+	Utilities::sleep_sec(1);
+	cx::messageManager()->shutdown();
 }
 
 TEST_CASE("OpenCLUtilities: Can initialize OpenCL using GPU", "[unit][OpenCL][OpenCLUtilities][GPU]")
 {
+	cx::messageManager()->initialize();
 	cx::OpenCL::ocl* opencl = cx::OpenCL::init(CL_DEVICE_TYPE_GPU);
 	CHECK(opencl);
 	cx::OpenCL::release(opencl);
+	//need to be sure opencl thread is finished before shutting down messagemanager,
+	//or else we could get seg fault because og a callbackk from opencl to messagemAnager after it is shut down
+	Utilities::sleep_sec(1);
+	cx::messageManager()->shutdown();
 }
 
 TEST_CASE("OpenCLUtilities: Can create a small global OpenCL buffer using CPU device", "[unit][OpenCL][OpenCLUtilities][CPU]")
 {
+	cx::messageManager()->initialize();
 	cx::OpenCL::ocl* opencl = cx::OpenCL::init(CL_DEVICE_TYPE_CPU);
 	REQUIRE(opencl);
 
@@ -62,26 +72,40 @@ TEST_CASE("OpenCLUtilities: Can create a small global OpenCL buffer using CPU de
 	cl::Buffer buffer = cx::OpenCL::createBuffer(opencl->context, CL_MEM_READ_WRITE, size, NULL, "global test buffer");
 
 	cx::OpenCL::release(opencl);
+	//need to be sure opencl thread is finished before shutting down messagemanager,
+	//or else we could get seg fault because og a callbackk from opencl to messagemAnager after it is shut down
+	Utilities::sleep_sec(1);
+	cx::messageManager()->shutdown();
 }
 
-TEST_CASE("OpenCLUtilities: Can create a small kernel, build a program and run it on a CPU", "[unit][OpenCL][OpenCLUtilities][CPU]")
+TEST_CASE("OpenCLUtilities: Can create a small kernel, build a program and run it on a CPU", "[unit][OpenCL][OpenCLUtilities][CPU][not_NVidia]")
 {
+	cx::messageManager()->initialize();
 	cx::OpenCL::ocl* opencl = cx::OpenCL::init(CL_DEVICE_TYPE_CPU);
 	REQUIRE(opencl);
 
 	CHECK(runTestKernel(opencl));
 
 	cx::OpenCL::release(opencl);
+	//need to be sure opencl thread is finished before shutting down messagemanager,
+	//or else we could get seg fault because og a callbackk from opencl to messagemAnager after it is shut down
+	Utilities::sleep_sec(1);
+	cx::messageManager()->shutdown();
 }
 
 TEST_CASE("OpenCLUtilities: Can create a small kernel, build a program and run it on a GPU", "[unit][OpenCL][OpenCLUtilities][CPU]")
 {
+	cx::messageManager()->initialize();
 	cx::OpenCL::ocl* opencl = cx::OpenCL::init(CL_DEVICE_TYPE_GPU);
 	REQUIRE(opencl);
 
 	CHECK(runTestKernel(opencl));
 
 	cx::OpenCL::release(opencl);
+	//need to be sure opencl thread is finished before shutting down messagemanager,
+	//or else we could get seg fault because og a callbackk from opencl to messagemAnager after it is shut down
+	Utilities::sleep_sec(1);
+	cx::messageManager()->shutdown();
 }
 
 }
