@@ -59,7 +59,6 @@ signals:
 private slots:
 	void newDataSlot();
 	void receiveTransforms(Transform3D matrix, double timestamp);
-	void receiveVisible(bool visible);
 	void probeSectorChanged();
 
 private:

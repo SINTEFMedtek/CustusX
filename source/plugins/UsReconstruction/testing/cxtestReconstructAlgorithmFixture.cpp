@@ -119,9 +119,9 @@ void ReconstructAlgorithmFixture::reconstruct(QDomElement root)
 	if (this->getVerbose())
 		std::cout << "Reconstructing\n";
 
-	mAlgorithm->reconstruct(mInputData,
+	REQUIRE(mAlgorithm->reconstruct(mInputData,
 							mOutputData->getBaseVtkImageData(),
-							root);
+							root));
 	if (this->getVerbose())
 		std::cout << "Reconstruction done\n";
 }

@@ -101,6 +101,7 @@ public:
 	Vector3D getSpacing() const;
 	QString getName() const;
 	cx::ImageDataContainerPtr getImageContainer() { return mImageContainer; }
+	unsigned getNumImages();
 
 	void removeFrame(unsigned int index);
 	void setCropBox(IntBoundingBox3D mCropbox);

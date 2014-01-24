@@ -74,7 +74,6 @@ void VideoSourceGraphics::setTool(ToolPtr tool)
 	if (mTool)
 	{
 		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
-		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
 		disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChanged()));
 	}
 
@@ -88,7 +87,6 @@ void VideoSourceGraphics::setTool(ToolPtr tool)
 	if (mTool )
 	{
 		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
-		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
 		connect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChanged()));
 	}
 
@@ -169,11 +167,6 @@ void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 	{
 		mImage->get_rMd_History()->setRegistration(rMu);
 	}
-}
-
-void VideoSourceGraphics::receiveVisible(bool visible)
-{
-	messageManager()->sendWarning("Empty function called...");
 }
 
 void VideoSourceGraphics::newDataSlot()
