@@ -468,6 +468,23 @@ class LevelSetSegmentation(CppComponent):
         
 # ---------------------------------------------------------
 
+class OpenCLUtilityLibrary(CppComponent):
+    def name(self):
+        return "OpenCLUtilityLibrary"
+    def help(self):
+        return 'OpenCLUtilityLibrary. Functions for interacting with OpenCL.'
+    def path(self):
+        return self.controlData.getWorkingPath() + "/OpenCLUtilityLibrary"
+    def _rawCheckout(self):
+        self._getBuilder().gitClone('git@github.com:smistad/OpenCLUtilityLibrary')
+    def update(self):
+        self._getBuilder().gitUpdate('master')
+    def configure(self):
+        builder = self._getBuilder()
+        builder.configureCMake()
+        
+# ---------------------------------------------------------
+
 class CustusX3Data(CppComponent):
     def name(self):
         return "CustusX3-Data"
