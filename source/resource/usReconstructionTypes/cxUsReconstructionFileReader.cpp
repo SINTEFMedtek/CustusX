@@ -75,6 +75,11 @@ USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName
   retval.mFrames = this->readFrameTimestamps(fileName);
   retval.mPositions = this->readPositions(fileName);
 
+	if (!this->valid(retval))
+	{
+		return USReconstructInputData();
+	}
+
 	//mPos is now prMs
   if (!retval.mFrames.empty())
   {
@@ -83,6 +88,18 @@ USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName
   }
 
   return retval;
+}
+
+bool UsReconstructionFileReader::valid(USReconstructInputData input)
+{
+	if (input.mUsRaw->getNumImages() != input.mFrames.size())
+	{
+		messageManager()->sendError("Mismatch between number of images and number of image positions.\n"
+																"Images: " + qstring_cast(input.mUsRaw->getNumImages()) +
+																" image positions: " + qstring_cast(input.mFrames.size()));
+		return false;
+	}
+	return true;
 }
 
 /**Read the probe data either from the .probedata.xml file,

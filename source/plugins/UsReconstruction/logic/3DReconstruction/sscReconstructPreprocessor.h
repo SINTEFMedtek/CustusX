@@ -59,6 +59,7 @@ private:
     Transform3D applyOutputOrientation();
 		std::vector<Vector3D> generateInputRectangle();
 		void interpolatePositions();
+		double timeToPosition(unsigned i_frame, unsigned i_pos);
     void applyTimeCalibration();
     void alignTimeSeries();
 		void calibrateTimeStamps(double offset, double scale);

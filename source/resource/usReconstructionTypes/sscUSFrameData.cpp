@@ -459,6 +459,11 @@ QString USFrameData::getName() const
 	return QFileInfo(mName).completeBaseName();
 }
 
+unsigned USFrameData::getNumImages()
+{
+	return mImageContainer->size();
+}
+
 void USFrameData::fillImageImport(vtkImageImportPtr import, int index)
 {
 	TimeKeeper timer;

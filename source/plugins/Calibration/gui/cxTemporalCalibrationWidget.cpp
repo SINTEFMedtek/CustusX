@@ -85,8 +85,11 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(AcquisitionDataPtr acquisit
   mVerbose = new QCheckBox("Save data to temporal_calib.txt");
   topLayout->addWidget(mVerbose);
 
-  QPushButton* calibrateButton = new QPushButton("Calibrate");
-  calibrateButton->setToolTip(this->defaultWhatsThis());
+	QPushButton* calibrateButton = new QPushButton("Calibrate");
+	calibrateButton->setToolTip("Calculate the temporal shift for the selected acqusition."
+															"The shift is not applied in any way."
+															"<p><b>NB:</b>"
+															" The calculation takes a few seconds, and in this time the program will be unresponsive</p>");
 
   connect(calibrateButton, SIGNAL(clicked()), this, SLOT(calibrateSlot()));
   topLayout->addWidget(calibrateButton);

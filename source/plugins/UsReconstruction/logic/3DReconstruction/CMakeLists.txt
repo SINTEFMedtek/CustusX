@@ -55,6 +55,10 @@ if (SSC_USE_OpenCL)
 		TordReconstruct/cxSimpleSyntheticVolume.h
 		TordReconstruct/TordTest.h
 		TordReconstruct/kernels.cl
+		cxOpenCLReconstruction.h
+		cxOpenCLReconstruction.cpp
+		cxOpenCLReconstructionHost.h
+		cxOpenCLReconstructionHost.cpp
 		)
    SET(TORD_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/TordReconstruct)
 
