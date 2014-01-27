@@ -2,6 +2,7 @@
 
 #include "cxOpenCLUtilities.h"
 #include "cxOpenCLReconstructionHost.h"
+#include "sscMessageManager.h"
 
 namespace cx
 {
@@ -19,7 +20,8 @@ std::vector<DataAdapterPtr> OpenCLReconstruction::getSettings(QDomElement root)
 
 bool OpenCLReconstruction::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr output, QDomElement settings)
 {
-	OpenCL::ocl* opencl = OpenCL::init(CL_DEVICE_TYPE_GPU);
+	messageManager()->sendDebug("OpenCLReconstruction::reconstruct");
+	OpenCL::ocl* opencl = OpenCL::init(CL_DEVICE_TYPE_CPU);
 	OpenCLReconstructionHost host(opencl, input, output);
 	return host.reconstruct();
 }
