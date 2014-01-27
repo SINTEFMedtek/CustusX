@@ -24,6 +24,8 @@ private:
 	void findClosesInputPlanesForAllOutputVoxels(int numberOfPlanesToFind, int searchRadiusInMm); //run a kernel
 	void fillOutputVoxelWithApropiateIntensity(); //run a kernel
 
+	cl::Kernel getKernelWithName(QString name);
+
 	OpenCL::ocl* mOpenCL;
 
 	ProcessedUSInputDataPtr mInput;
