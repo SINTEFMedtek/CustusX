@@ -61,6 +61,7 @@ if (SSC_USE_OpenCL)
 		cxOpenCLReconstructionHost.cpp
 		)
    SET(TORD_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/TordReconstruct)
+   SET(KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/kernels)
 
 endif (SSC_USE_OpenCL)
 

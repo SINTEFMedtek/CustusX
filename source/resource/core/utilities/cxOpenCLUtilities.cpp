@@ -10,9 +10,9 @@
 namespace cx
 {
 
-void CL_CALLBACK errorCallback(const char *errinfo, const void *private_info, size_t cb, void *user_data)
+void CL_CALLBACK contextCallback(const char *errinfo, const void *private_info, size_t cb, void *user_data)
 {
-	messageManager()->sendError("Error callback: " + QString(errinfo));
+	messageManager()->sendError("Context callback:\n " + QString(errinfo));
 }
 
 void CL_CALLBACK memoryDestructorCallback(cl_mem memobj, void* user_data)
@@ -168,7 +168,7 @@ cl::Context OpenCL::createContext(const VECTOR_CLASS<cl::Device> devices, cl_con
 	cl::Context retval;
 	try
 	{
-		retval = cl::Context(devices, cps, errorCallback, NULL, NULL);
+		retval = cl::Context(devices, cps, contextCallback, NULL, NULL);
 		cl::STRING_CLASS devicelist="";
 		for(int i=0; i<devices.size(); ++i)
 		{
@@ -232,7 +232,7 @@ void OpenCL::release(OpenCL::ocl* ocl)
 {
 	messageManager()->sendInfo("Releasing OpenCL context, device and command queue.");
 
-	cl::UnloadCompiler();
+	cl::UnloadCompiler(); //TODO is this needed???
 	if(ocl != NULL)
 	{
 		delete ocl;
@@ -240,11 +240,54 @@ void OpenCL::release(OpenCL::ocl* ocl)
 	}
 }
 
-cl::Kernel OpenCL::createKernel(cl::Program program, cl::Device device, const char * kernel_name)
+cl::Program OpenCL::createProgram(cl::Context context, const char* source, size_t sourceLength)
 {
-	cl_int err = 0;
-	cl::Kernel kernel(program, kernel_name, &err);
-	check_error(err);
+	cl::Program retval;
+	try
+	{
+		cl::Program::Sources sources;
+		sources.push_back(std::pair<const char*, ::size_t>(source, sourceLength));
+		retval = cl::Program(context, sources);
+	}
+	catch (cl::Error error)
+	{
+		messageManager()->sendError("Could not create a OpenCL program queue. Reason: "+QString(error.what()));
+		check_error(error.err());
+		throw error;
+	}
+	return retval;
+}
+
+void OpenCL::build(cl::Program program, QString buildOptions)
+{
+	try
+	{
+		VECTOR_CLASS<cl::Device> devices;
+		cl::Context context(program.getInfo<CL_PROGRAM_CONTEXT>());
+		devices = context.getInfo<CL_CONTEXT_DEVICES>();
+		program.build(devices, buildOptions.toStdString().c_str(), NULL, NULL);
+	}catch(cl::Error error)
+	{
+		messageManager()->sendError("Could not build program. Reason:"+QString(error.what()));
+		check_error(error.err());
+	}
+}
+
+cl::Kernel OpenCL::createKernel(cl::Program program, const char * kernel_name)
+{
+	cl::Kernel kernel;
+	if(kernel_name == NULL)
+		messageManager()->sendError("kernel_name is NULL...");
+	try
+	{
+		kernel = cl::Kernel(program, kernel_name, NULL);
+		messageManager()->sendInfo("Created kernel with name "+QString(kernel_name));
+	}
+	catch(cl::Error error)
+	{
+		messageManager()->sendError("Could not create kernel. Reason:"+QString(error.what()));
+		check_error(error.err());
+	}
 
 	return kernel;
 }
@@ -359,7 +402,10 @@ char* OpenCLUtilities::file2string(const char* filename, size_t * final_length)
 	// open the OpenCL source code file
 	file_stream = fopen(filename, "rb");
 	if (file_stream == NULL)
+	{
+		messageManager()->sendError("Could not read kernel file: "+QString(filename));
 		return 0;
+	}
 
 	fseek(file_stream, 0, SEEK_END);
 	source_length = ftell(file_stream);
