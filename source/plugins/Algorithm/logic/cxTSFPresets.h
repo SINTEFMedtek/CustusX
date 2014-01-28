@@ -29,7 +29,7 @@ public:
 	virtual ~TSFPresets();
 
 	static QDomElement createPresetElement(QString name, std::map<QString,QString>& parameters);
-	virtual void save();
+	virtual void save();///< Saves last custom preset (current)
 	virtual void remove();
 
 protected:
