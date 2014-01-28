@@ -125,7 +125,7 @@ bool TordTest::initCL(QString kernelPath, int nMaxPlanes, int nPlanes, int metho
 	cl::Program clprogram = this->buildCLProgram(sSource, nMaxPlanes, nPlanes, method, planeMethod, nStarts,brightnessWeight, newnessWeight, kernelPath, sourceLen);
 
 	// CREATE KERNEL
-	mKernel = OpenCL::createKernel(clprogram, mOCL->device, "voxel_methods");
+	mKernel = OpenCL::createKernel(clprogram, "voxel_methods");
 
 	return true;
 }

@@ -22,16 +22,12 @@ bool OpenCLFixture::runTestKernel(cl_device_type type)
 	cx::OpenCL::ocl* opencl = cx::OpenCL::init(type);
 
 	const char* source = "__kernel void test_kernel(void){int i = 0; i+=i;}";
-	cl::Program::Sources sources(1, std::pair<const char*, ::size_t>(source, strlen(source)));
-	VECTOR_CLASS<cl::Device> devices;
-	devices.push_back(opencl->device);
-
 	bool success = true;
 	try
 	{
-		cl::Program program(opencl->context, sources);
-		program.build(devices, "", NULL, NULL);
-		cl::Kernel kernel = cx::OpenCL::createKernel(program, opencl->device, "test_kernel");
+		cl::Program program = cx::OpenCL::createProgram(opencl->context, source, strlen(source));
+		cx::OpenCL::build(program, "");
+		cl::Kernel kernel = cx::OpenCL::createKernel(program, "test_kernel");
 		size_t numberOfWorkingItems;
 		kernel.getWorkGroupInfo(opencl->device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &numberOfWorkingItems);
 		int numberOfWorkGroups = 2;
