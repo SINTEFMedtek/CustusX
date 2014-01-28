@@ -16,6 +16,8 @@
 #include <vtkInteractorObserver.h>
 #include <vtkInteractorStyleTrackballCamera.h>
 #include "vtkMultiVolumePicker.h"
+#include <vtkCamera.h>
+#include "sscLogger.h"
 
 //#include <QString>
 #include <eigen3/Eigen/Core>
@@ -34,6 +36,8 @@ typedef vtkSmartPointer<vtkTransform> vtkTransformPtr;
 typedef vtkSmartPointer<vtkMetaImageReader> vtkMetaImageReaderPtr;
 typedef vtkSmartPointer<vtkRenderWindowInteractor> vtkRenderWindowInteractorPtr;
 typedef vtkSmartPointer<vtkInteractorStyleTrackballCamera> vtkInteractorStyleTrackballCameraPtr;
+typedef vtkSmartPointer<vtkVolumePicker> vtkMultiVolumePickerPtr;
+//typedef vtkSmartPointer<vtkMultiVolumePicker> vtkMultiVolumePickerPtr;
 #include "vtkForwardDeclarations.h"
 
 typedef vtkSmartPointer<vtkOpenGLGPUMultiVolumeRayCastMapper> vtkOpenGLGPUMultiVolumeRayCastMapperPtr;
@@ -93,11 +97,14 @@ public:
 
 	void renderOnce()
 	{
-		mRenderWindow = vtkRenderWindowPtr::New();
-		mRenderer = vtkRendererPtr::New();
-		mRenderWindow->AddRenderer(mRenderer);
-		mRenderWindow->SetSize(200,200);
-		mRenderer->AddVolume(mVolume);
+		if (!mRenderWindow)
+		{
+			mRenderWindow = vtkRenderWindowPtr::New();
+			mRenderer = vtkRendererPtr::New();
+			mRenderWindow->AddRenderer(mRenderer);
+			mRenderWindow->SetSize(200,200);
+			mRenderer->AddVolume(mVolume);
+		}
 		mRenderWindow->Render();
 	}
 	vtkRendererPtr getRenderer() { return mRenderer; }
@@ -161,6 +168,34 @@ public:
 		reader->ReleaseDataFlagOn();
 		reader->Update();
 		return reader->GetOutput();
+	}
+
+	vtkMultiVolumePickerPtr pickAlongRayReturnSuccessfulMultiVolumePicker(Eigen::Vector3d pos, Eigen::Vector3d dir)
+	{
+		SSC_LOG("A");
+		this->renderOnce();
+		vtkRendererPtr renderer = this->getRenderer();
+		vtkCameraPtr camera = renderer->GetActiveCamera();
+		Eigen::Vector3d p_camera = pos;
+		Eigen::Vector3d p_focus = p_camera + dir;
+		camera->SetPosition(p_camera.data());
+		camera->SetFocalPoint(p_focus.data());
+		renderer->ResetCameraClippingRange();
+		std::cout << "p_camera " << p_camera << std::endl;
+		std::cout << "p_focus " << p_focus << std::endl;
+		this->renderOnce();
+
+		vtkMultiVolumePickerPtr picker = vtkMultiVolumePickerPtr::New();
+//		Eigen::Vector3d p_click = p_camera;
+		Eigen::Vector3d p_click(100,100,0);
+		int hit = picker->Pick(p_click[0], p_click[1], 0, renderer);
+		std::cout << "p_click " << p_click << std::endl;
+		std::cout << "hit " << hit << std::endl;
+
+		if (hit)
+			return picker;
+		else
+			return vtkMultiVolumePickerPtr();
 	}
 
 private:
@@ -241,6 +276,35 @@ TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can render 1 small volume withou
 	REQUIRE(1); // makes this a valid catch test
 }
 
+TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper vs vtkMultiVolumePicker: Simple test", "[unit]")
+{
+	int numberOfVolumes = 1;
+	VtkOpenGLGPUMultiVolumeRayCastMapperFixture fixture(numberOfVolumes);
+
+	// volume extent=(0..100, 0..100, 0..100)
+	vtkImageDataPtr refImage = fixture.createVtkImageData(Eigen::Array3i(51,51,51), Eigen::Array3d(2,2,2), 200);
+	vtkVolumePropertyPtr property = fixture.getVolumeProperty(100,300);
+
+	fixture.setReferenceImage(refImage, property);
+
+	// volume extent=(0..10, 0..10, 0..10)
+	fixture.addImage(0, refImage, property);
+
+	Eigen::Vector3d p_camera(55,55,-100);
+	Eigen::Vector3d viewdir = Eigen::Vector3d(0,0,1);
+
+	vtkMultiVolumePickerPtr picker = fixture.pickAlongRayReturnSuccessfulMultiVolumePicker(p_camera, viewdir);
+
+	Eigen::Vector3d p_expected(55,55,0);
+	REQUIRE(picker.GetPointer() != NULL);
+
+	//vtkDataSetPtr data = picker->GetDataSet();
+	Eigen::Vector3d p_pick(picker->GetPickPosition());
+	REQUIRE(p_pick.isApprox(p_expected));
+
+	REQUIRE(1); // makes this a valid catch test
+}
+
 TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can be picked using vtkMultiVolumePicker", "[unit]")
 {
 	int numberOfVolumes = 3;
@@ -256,26 +320,19 @@ TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can be picked using vtkMultiVolu
 	vtkImageDataPtr image = fixture.createVtkImageData(Eigen::Array3i(11,11,11), Eigen::Array3d(1,1,1), 200);
 	fixture.addImage(0, image, property, Eigen::Array3d(0,0,0));
 	fixture.addImage(1, image, property, Eigen::Array3d(50,0,0));
-	fixture.addImage(1, image, property, Eigen::Array3d(50,50,0));
+	fixture.addImage(2, image, property, Eigen::Array3d(50,50,0));
 
-	fixture.renderOnce();
-	vtkRendererPtr renderer = fixture.getRenderer();
-	vtkCameraPtr camera = renderer->GetActiveCamera();
+	Eigen::Vector3d p_camera(55,55,-100);
+	Eigen::Vector3d viewdir = Eigen::Vector3d(0,0,1);
 
-	fixture.renderOnce();
+	vtkMultiVolumePickerPtr picker = fixture.pickAlongRayReturnSuccessfulMultiVolumePicker(p_camera, viewdir);
 
-	typedef vtkSmartPointer<vtkMultiVolumePicker> vtkMultiVolumePickerPtr;
-	vtkMultiVolumePickerPtr picker = vtkMultiVolumePickerPtr::New();
-//	picker->
-	Eigen::Array3d clickPosition(...);
-	int hit = picker->Pick(clickPosition[0], clickPosition[1], 0, renderer);
-	Eigen::Array3d pick_w(picker->GetPickPosition());
+	Eigen::Vector3d p_expected(55,55,0);
+	REQUIRE(picker.GetPointer() != NULL);
 
-//	for (unsigned i=0; i<numberOfVolumes; ++i)
-//	{
-//		vtkImageDataPtr image = fixture.createVtkImageData(Eigen::Array3i(11,11,11), Eigen::Array3d(1,1,1), 200);
-//		fixture.addImage(i, image, property);
-//	}
+	//vtkDataSetPtr data = picker->GetDataSet();
+	Eigen::Vector3d p_pick(picker->GetPickPosition());
+	REQUIRE(p_pick.isApprox(p_expected));
 
 	REQUIRE(1); // makes this a valid catch test
 }
