@@ -20,8 +20,7 @@ std::vector<DataAdapterPtr> OpenCLReconstruction::getSettings(QDomElement root)
 
 bool OpenCLReconstruction::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr output, QDomElement settings)
 {
-	messageManager()->sendDebug("OpenCLReconstruction::reconstruct");
-	OpenCL::ocl* opencl = OpenCL::init(CL_DEVICE_TYPE_CPU);
+	OpenCL::ocl* opencl = OpenCL::init(CL_DEVICE_TYPE_GPU);
 	OpenCLReconstructionHost host(opencl, input, output);
 	return host.reconstruct();
 }
