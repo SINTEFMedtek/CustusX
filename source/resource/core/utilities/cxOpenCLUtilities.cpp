@@ -248,6 +248,7 @@ cl::Program OpenCL::createProgram(cl::Context context, const char* source, size_
 		cl::Program::Sources sources;
 		sources.push_back(std::pair<const char*, ::size_t>(source, sourceLength));
 		retval = cl::Program(context, sources);
+		messageManager()->sendInfo("Created program.");
 	}
 	catch (cl::Error error)
 	{
@@ -260,16 +261,23 @@ cl::Program OpenCL::createProgram(cl::Context context, const char* source, size_
 
 void OpenCL::build(cl::Program program, QString buildOptions)
 {
+	VECTOR_CLASS<cl::Device> devices;
 	try
 	{
-		VECTOR_CLASS<cl::Device> devices;
 		cl::Context context(program.getInfo<CL_PROGRAM_CONTEXT>());
 		devices = context.getInfo<CL_CONTEXT_DEVICES>();
+		if(devices == NULL || devices.size())
+			messageManager()->sendError("Device is NULL.");
 		program.build(devices, buildOptions.toStdString().c_str(), NULL, NULL);
-	}catch(cl::Error error)
+	}
+	catch(cl::Error error)
 	{
-		messageManager()->sendError("Could not build program. Reason:"+QString(error.what()));
-		check_error(error.err());
+		messageManager()->sendError("Could not build program. Reason: "+QString(error.what()));
+		for(int i=0; i<devices.size(); i++)
+		{
+			checkBuildProgramLog(program, devices[i], error.err());
+		}
+		//check_error(error.err());
 	}
 }
 
