@@ -17,20 +17,27 @@ OpenCLReconstructionHost::OpenCLReconstructionHost(OpenCL::ocl* opencl, Processe
 
 bool OpenCLReconstructionHost::reconstruct()
 {
+	bool success = false;
+
 	int numberOfPlanesToFind = 2;
 	int radiusInMm = 10;
-	this->findClosesInputPlanesForAllOutputVoxels(numberOfPlanesToFind, radiusInMm); //run a kernel
 
-	this->fillOutputVoxelWithApropiateIntensity(); //run a kernel
+//	this->fillPlaneEquations();
+	this->findClosesInputPlanesForAllOutputVoxels(numberOfPlanesToFind, radiusInMm);
 
-	return true;
+	this->fillOutputVoxelWithApropiateIntensity();
+
+	return success;
 }
 
-void OpenCLReconstructionHost::findClosesInputPlanesForAllOutputVoxels(int numberOfPlanesToFind, int searchRadiusInMm)
+bool OpenCLReconstructionHost::findClosesInputPlanesForAllOutputVoxels(int numberOfPlanesToFind, int searchRadiusInMm)
 {
+	bool success = true;
 	try
 	{
 		cl::Kernel kernel = this->getKernelWithName("test");
+//		cl::Kernel kernel = this->getKernelWithName("findClosesPlanes");
+//		this->setArguments(kernel, "");
 
 		cl::NDRange offset = 0;
 		cl::NDRange global = mOpenCL->device.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
@@ -42,13 +49,16 @@ void OpenCLReconstructionHost::findClosesInputPlanesForAllOutputVoxels(int numbe
 	{
 		messageManager()->sendError("Could not find closes planes. Reason: "+QString(error.what()));
 		check_error(error.err());
+		success = false;
 	}
+	return success;
 
 }
 
-void OpenCLReconstructionHost::fillOutputVoxelWithApropiateIntensity()
+bool OpenCLReconstructionHost::fillOutputVoxelWithApropiateIntensity()
 {
 	//TODO run a kernel
+	return true;
 }
 
 

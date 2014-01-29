@@ -21,8 +21,8 @@ public:
 	bool reconstruct();
 
 private:
-	void findClosesInputPlanesForAllOutputVoxels(int numberOfPlanesToFind, int searchRadiusInMm); //run a kernel
-	void fillOutputVoxelWithApropiateIntensity(); //run a kernel
+	bool findClosesInputPlanesForAllOutputVoxels(int numberOfPlanesToFind, int searchRadiusInMm); //run a kernel
+	bool fillOutputVoxelWithApropiateIntensity(); //run a kernel
 
 	cl::Kernel getKernelWithName(QString name);
 
@@ -30,6 +30,8 @@ private:
 
 	ProcessedUSInputDataPtr mInput;
 	vtkImageDataPtr mOutput;
+
+//	std::map<int, Transform3D> mP
 
 	QString mKernelPath;
 
