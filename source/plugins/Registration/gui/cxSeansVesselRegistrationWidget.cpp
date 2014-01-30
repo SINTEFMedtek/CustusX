@@ -28,20 +28,24 @@ SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegistrationManager
 		mLTSRatioSpinBox(new QSpinBox()), mLinearCheckBox(new QCheckBox()), mAutoLTSCheckBox(new QCheckBox()),
 		mRegisterButton(new QPushButton("Register"))
 {
-
+	mRegisterButton->setEnabled(false);
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
+
+	connect(mManager.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(inputChanged()));
+	connect(mManager.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(inputChanged()));
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 	QGridLayout* layout = new QGridLayout();
 	topLayout->addLayout(layout);
 
-	QPushButton* vesselRegOptionsButton = new QPushButton("Options", this);
-	vesselRegOptionsButton->setCheckable(true);
+	mVesselRegOptionsButton = new QPushButton("Options", this);
+	mVesselRegOptionsButton->setEnabled(false);
+	mVesselRegOptionsButton->setCheckable(true);
 
-	QGroupBox* vesselRegOptionsWidget = this->createGroupbox(this->createOptionsWidget(),
+	mVesselRegOptionsWidget = this->createGroupbox(this->createOptionsWidget(),
 		"Vessel registration options");
-	connect(vesselRegOptionsButton, SIGNAL(clicked(bool)), vesselRegOptionsWidget, SLOT(setVisible(bool)));
-	vesselRegOptionsWidget->setVisible(vesselRegOptionsButton->isChecked());
+	connect(mVesselRegOptionsButton, SIGNAL(clicked(bool)), mVesselRegOptionsWidget, SLOT(setVisible(bool)));
+	mVesselRegOptionsWidget->setVisible(mVesselRegOptionsButton->isChecked());
 
 	QGridLayout* entryLayout = new QGridLayout;
 	entryLayout->setColumnStretch(1, 1);
@@ -53,8 +57,8 @@ SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegistrationManager
 
 	layout->addLayout(entryLayout, 0, 0, 2, 2);
 	layout->addWidget(mRegisterButton, 2, 0);
-	layout->addWidget(vesselRegOptionsButton, 2, 1);
-	layout->addWidget(vesselRegOptionsWidget, 3, 0, 1, 2);
+	layout->addWidget(mVesselRegOptionsButton, 2, 1);
+	layout->addWidget(mVesselRegOptionsWidget, 3, 0, 1, 2);
 }
 
 SeansVesselRegistrationWidget::~SeansVesselRegistrationWidget()
@@ -68,6 +72,22 @@ QString SeansVesselRegistrationWidget::defaultWhatsThis() const
 		"<p>Select two datasets you want to registere to eachother, adjust the input parameters.</p>"
 		"<p><i>Adjust the parameters and click the register button.</i></p>"
 		"</html>";
+}
+
+void SeansVesselRegistrationWidget::inputChanged()
+{
+	if(mManager->getMovingData() && mManager->getFixedData())
+	{
+		mRegisterButton->setEnabled(true);
+		mVesselRegOptionsButton->setEnabled(true);
+		mVesselRegOptionsWidget->setVisible(mVesselRegOptionsButton->isChecked());
+	}
+	else
+	{
+		mRegisterButton->setEnabled(false);
+		mVesselRegOptionsButton->setEnabled(false);
+		mVesselRegOptionsWidget->setVisible(false);
+	}
 }
 
 void SeansVesselRegistrationWidget::registerSlot()
@@ -99,6 +119,17 @@ void SeansVesselRegistrationWidget::registerSlot()
 	else
 	{
 		messageManager()->sendDebug("Using lts_ratio: " + qstring_cast(vesselReg.mt_ltsRatio));
+	}
+
+	if(!mManager->getMovingData())
+	{
+		messageManager()->sendWarning("Moving volume not set.");
+		return;
+	}
+	else if(!mManager->getFixedData())
+	{
+		messageManager()->sendWarning("Fixed volume not set.");
+		return;
 	}
 
 	bool success = vesselReg.execute(mManager->getMovingData(), mManager->getFixedData(), logPath);

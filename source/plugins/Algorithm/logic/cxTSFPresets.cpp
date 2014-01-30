@@ -50,17 +50,19 @@ void TSFPresets::save()
 		QDomElement element = node.toElement();
 
 		QString folderPath;
+		folderPath = mPresetPath + "/centerline-gpu/";
 		std::map<QString, QString> parameters;
 		QDomNamedNodeMap attributes = element.attributes();
-		for (int i = 0; i < attributes.count(); ++i)
+		for (int j = 0; j < attributes.count(); ++j)
 		{
-			QDomNode attribute = attributes.item(i);
+			QDomNode attribute = attributes.item(j);
+			if (attribute.isNull())
+					continue;
 			if (attribute.nodeName() != "name")
 				parameters[attribute.nodeName()] = attribute.nodeValue();
-			if (attribute.nodeName() == "centerline-method")
-				folderPath = mPresetPath + "/centerline-gpu/";
 		}
-		this->saveFile(folderPath, parameters);
+		if (mLastCustomPresetAdded == element.attribute("name")) //Save only current preset
+			this->saveFile(folderPath, parameters);
 	}
 }
 
@@ -72,7 +74,7 @@ void TSFPresets::remove()
 
 QStringList TSFPresets::generatePresetList(QString tag)
 {
-	this->loadPresetsFromFiles();
+	this->getPresetsNameAndPath();
 	QStringList retval;
 	std::map<QString, QString>::iterator it;
 	for (it = mPresetsMap.begin(); it != mPresetsMap.end(); ++it)

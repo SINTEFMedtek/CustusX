@@ -41,7 +41,9 @@ public:
 
 	static ocl* init(cl_device_type type);
 	static void release(ocl* ocl);
-	static cl::Kernel createKernel(cl::Program program, cl::Device device, const char * kernel_name);
+	static cl::Program createProgram(cl::Context context, const char* source, size_t sourceLength);
+	static void build(cl::Program program, QString buildOptions); //TODO return error value or throw???
+	static cl::Kernel createKernel(cl::Program program, const char * kernel_name);
 	static cl::Buffer createBuffer(cl::Context context, cl_mem_flags flags, size_t size, void * host_data, std::string bufferName);
 
 	static void checkBuildProgramLog(cl::Program program, cl::Device device, cl_int err);
