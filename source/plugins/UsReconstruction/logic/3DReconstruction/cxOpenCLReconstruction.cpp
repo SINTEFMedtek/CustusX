@@ -2,6 +2,7 @@
 
 #include "cxOpenCLUtilities.h"
 #include "cxOpenCLReconstructionHost.h"
+#include "sscMessageManager.h"
 
 namespace cx
 {

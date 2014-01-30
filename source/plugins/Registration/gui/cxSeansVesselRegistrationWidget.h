@@ -43,6 +43,7 @@ private slots:
   void debugRunOneNonlinearStep();
   void debugClear();
   void debugApply();
+	void inputChanged();
 
 private:
   QWidget* createOptionsWidget();
@@ -52,6 +53,8 @@ private:
   QCheckBox* mLinearCheckBox;
   QCheckBox* mAutoLTSCheckBox;
   QPushButton* mRegisterButton;
+	QPushButton* mVesselRegOptionsButton;
+	QGroupBox* mVesselRegOptionsWidget;
 
   StringDataAdapterPtr mFixedImage;
   StringDataAdapterPtr mMovingImage;

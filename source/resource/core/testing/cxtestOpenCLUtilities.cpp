@@ -28,7 +28,7 @@ TEST_CASE("OpenCLUtilities: Can create a small global OpenCL buffer using GPU co
 	cx::OpenCL::release(opencl);
 }
 
-TEST_CASE("OpenCLUtilities: Can create a small kernel, build a program and run it on a GPU", "[unit][OpenCL][OpenCLUtilities][GPU]")
+TEST_CASE("OpenCLUtilities: Can create a small kernel, build a program and run it on a GPU", "[unit][OpenCL][OpenCLUtilities][GPU][broken][unstable]")
 {
 	OpenCLFixture fixture;
 	CHECK(fixture.runTestKernel(CL_DEVICE_TYPE_GPU));

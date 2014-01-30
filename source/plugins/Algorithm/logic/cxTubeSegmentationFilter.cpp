@@ -554,7 +554,7 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
 	//generate string adapters
     boost::unordered_map<std::string, StringParameter>::iterator stringIt;
     for(stringIt = defaultOptions.strings.begin(); stringIt != defaultOptions.strings.end(); ++stringIt )
-    {
+		{
     	StringDataAdapterXmlPtr option = this->makeStringOption(root, stringIt->first, stringIt->second);
     	option->setAdvanced(true);
     	option->setGroup(qstring_cast(stringIt->second.getGroup()));
@@ -567,7 +567,7 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
 	//generate bool adapters
     boost::unordered_map<std::string, BoolParameter>::iterator boolIt;
     for(boolIt = defaultOptions.bools.begin(); boolIt != defaultOptions.bools.end(); ++boolIt )
-    {
+		{
     	BoolDataAdapterXmlPtr option = this->makeBoolOption(root, boolIt->first, boolIt->second);
     	option->setAdvanced(true);
     	option->setGroup(qstring_cast(boolIt->second.getGroup()));
@@ -577,7 +577,7 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
 	//generate double adapters
     boost::unordered_map<std::string, NumericParameter>::iterator numericIt;
     for(numericIt = defaultOptions.numerics.begin(); numericIt != defaultOptions.numerics.end(); ++numericIt )
-    {
+		{
     	DoubleDataAdapterXmlPtr option = this->makeDoubleOption(root, numericIt->first, numericIt->second);
     	option->setAdvanced(true);
     	option->setGroup(qstring_cast(numericIt->second.getGroup()));
@@ -822,13 +822,12 @@ std::vector<DataAdapterPtr> TubeSegmentationFilter::getNotDefaultOptions()
 	{
 	    boost::unordered_map<std::string, NumericParameter>::iterator numericIt;
 	    for(numericIt = defaultOptions.numerics.begin(); numericIt != defaultOptions.numerics.end(); ++numericIt )
-	    {
-	    	if(doubleDAIt->get()->getValueName().toStdString() == numericIt->first)
-	    	{
-	    		float epsilon = 0.00000000000001;
-	    		if(!(abs(doubleDAIt->get()->getValue() - numericIt->second.get()) < epsilon))
-	    			retval.push_back(*doubleDAIt);
-	    	}
+			{
+				if(doubleDAIt->get()->getValueName().toStdString() == numericIt->first)
+				{
+					if(!similar(doubleDAIt->get()->getValue(), numericIt->second.get()))
+						retval.push_back(*doubleDAIt);
+				}
 	    }
 	}
 

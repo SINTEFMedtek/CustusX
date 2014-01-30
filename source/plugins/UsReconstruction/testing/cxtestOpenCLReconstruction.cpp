@@ -16,13 +16,12 @@
 
 #include "cxtestReconstructAlgorithmFixture.h"
 #include "sscMessageManager.h"
-//#include "cxOpenCLUtilities.h"
 #include "cxOpenCLReconstruction.h"
 
 namespace cxtest
 {
 
-TEST_CASE("OpenCLReconstruction","[unit][usreconstruction][OpenCL][OpenCLReconstruction]")
+TEST_CASE("OpenCLReconstruction","[unit][usreconstruction][OpenCL][OpenCLReconstruction][broken][unstable]")
 {
 	cx::messageManager()->initialize();
 
@@ -31,7 +30,7 @@ TEST_CASE("OpenCLReconstruction","[unit][usreconstruction][OpenCL][OpenCLReconst
 	fixture.setOverallBoundsAndSpacing(100, 5);
 	fixture.getInputGenerator()->setSpherePhantom();
 
-	boost::shared_ptr<cx::OpenCLReconstruction> algorithm(new cx::OpenCLReconstruction);
+	boost::shared_ptr<cx::OpenCLReconstruction> algorithm(new cx::OpenCLReconstruction());
 
 	fixture.setAlgorithm(algorithm);
 
