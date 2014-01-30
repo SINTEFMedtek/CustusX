@@ -324,6 +324,8 @@ function(cxCreateConfigurationDescription)
 	cx_assert_variable_exists(${CustusX3_VERSION_STRING})
 	cx_assert_variable_exists(${SSC_USE_GCOV})
 	cx_assert_variable_exists(${CX_USE_TSF})
+	cx_assert_variable_exists(${CX_USE_LEVEL_SET})
+	cx_assert_variable_exists(${CX_USE_OPENCL_UTILITY})
 	cx_assert_variable_exists(${SSC_USE_OpenCL})
 	cx_assert_variable_exists(${BUILD_GRABBER_SERVER})
 	cx_assert_variable_exists(${CX_USE_ISB_GE})
@@ -354,11 +356,14 @@ Configuration for CustusX ${CustusX3_VERSION_STRING}
 
 	Internal libraries:
 		Tube-Segmentation-Framework: ${CX_USE_TSF}
+		Level Set Segmentation: ${CX_USE_LEVEL_SET}
+		OpenCL Utility Library: ${CX_USE_OPENCL_UTILITY}
 		OpenCL US Reconstruction: ${SSC_USE_OpenCL}
-		Grabber Servers:
-                        Mac QuickTime Grabber Server: ${BUILD_GRABBER_SERVER}
-				ISB GE Scanner Grabber Interface: ${CX_USE_ISB_GE}
-				OpenCV Grabber Interface: ${CX_USE_OpenCV}
+	
+	Grabber Servers:
+		Mac QuickTime Grabber Server: ${BUILD_GRABBER_SERVER}
+		ISB GE Scanner Grabber Interface: ${CX_USE_ISB_GE}
+		OpenCV Grabber Interface: ${CX_USE_OpenCV}
 
 ")
 	set(CX_CONFIGURATION_DESCRIPTION ${CONFIGURATION_TEXT} PARENT_SCOPE)

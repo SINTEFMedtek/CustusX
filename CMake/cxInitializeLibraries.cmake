@@ -140,6 +140,34 @@ macro(cx_initialize_level_set_segmentation)
     endif()
 endmacro()
 
+###############################################################################
+# Initialize OpenCLUtilityLibrary
+#
+# Find the package and run the include USE file.
+#
+# Define variables:
+#    CX_USE_OPENCL_UTILITY : cache option
+#
+###############################################################################
+macro(cx_initialize_OpenCLUtilityLibrary)
+    if(CX_USE_OPENCL_UTILITY)
+        find_package( OpenCLUtilityLibrary REQUIRED)
+    else()
+        find_package( OpenCLUtilityLibrary QUIET)
+    endif()
+
+    if(OpenCLUtilityLibrary_FOUND)
+        option(CX_USE_OPENCL_UTILITY "use OpenCL UtilityLibrary" ON)
+    else()
+        option(CX_USE_OPENCL_UTILITY "use OpenCL UtilityLibrary" OFF)
+    endif()
+
+    if( CX_USE_OPENCL_UTILITY )
+        ADD_DEFINITIONS(-DCX_USE_OPENCL_UTILITY)
+        include(${OpenCLUtilityLibrary_USE_FILE})
+    endif()
+endmacro()
+
 
 ###############################################################################
 # Initialize GEStreamer library
