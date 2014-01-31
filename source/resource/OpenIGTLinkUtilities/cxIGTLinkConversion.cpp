@@ -54,7 +54,7 @@ IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ImagePtr image)
 	//	IGTLinkImageMessage::Pointer retval;
 	vtkImageDataPtr rawImage = image->getBaseVtkImageData();
 
-	static int staticCounter = 0;
+//	static int staticCounter = 0;
 	//------------------------------------------------------------
 	// size parameters
 	int   size[]     = {256, 256, 1};       // image dimension

@@ -16,6 +16,7 @@ namespace cx
 
 TordTest::TordTest()
 {
+	mOCL = NULL;
 	mMethods.push_back("VNN");
 	mMethods.push_back("VNN2");
 	mMethods.push_back("DW");
@@ -46,7 +47,7 @@ std::vector<DataAdapterPtr> TordTest::getSettings(QDomElement root)
 StringDataAdapterXmlPtr TordTest::getMethodOption(QDomElement root)
 {
 	QStringList methods;
-	for (std::vector<QString>::iterator it = mMethods.begin(); it != mMethods.end(); it++)
+	for (std::vector<QString>::iterator it = mMethods.begin(); it != mMethods.end(); ++it)
 	{
 		QString method = *it;
 		methods << method;
@@ -70,7 +71,7 @@ DoubleDataAdapterXmlPtr TordTest::getBrightnessWeightOption(QDomElement root)
 StringDataAdapterXmlPtr TordTest::getPlaneMethodOption(QDomElement root)
 {
 	QStringList methods;
-	for (std::vector<QString>::iterator it = mPlaneMethods.begin(); it != mPlaneMethods.end(); it++)
+	for (std::vector<QString>::iterator it = mPlaneMethods.begin(); it != mPlaneMethods.end(); ++it)
 	{
 		QString method = *it;
 		methods << method;
@@ -147,7 +148,7 @@ cl::Program TordTest::buildCLProgram(const char* program_src, int nMaxPlanes, in
 
 		devices = mOCL->context.getInfo<CL_CONTEXT_DEVICES>();
 		err = retval.build(devices, define.toStdString().c_str(), NULL, NULL);
-	} catch (cl::Error error)
+	} catch (cl::Error &error)
 	{
 		messageManager()->sendError("Could not build a OpenCL program. Reason: "+QString(error.what()));
 		check_error(error.err());
@@ -375,7 +376,7 @@ bool TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	{
 		mOCL->cmd_queue.enqueueNDRangeKernel(mKernel, 0, global_work_size, local_work_size, NULL, NULL);
 		mOCL->cmd_queue.finish();
-	} catch (cl::Error error)
+	} catch (cl::Error &error)
 	{
 		messageManager()->sendError("Could not execute kernels. Reason: "+QString(error.what()));
 		check_error(error.err());
@@ -385,7 +386,7 @@ bool TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	try
 	{
 		mOCL->cmd_queue.enqueueReadBuffer(outputBuffer, CL_TRUE, 0, outputVolumeSize, outputData->GetScalarPointer(), 0, 0);
-	} catch (cl::Error error)
+	} catch (cl::Error &error)
 	{
 		messageManager()->sendError("Could not read output volume buffer from OpenCL. Reason: "+QString(error.what()));
 		check_error(error.err());
@@ -412,7 +413,7 @@ void TordTest::fillPlaneMatrices(float *planeMatrices, ProcessedUSInputDataPtr i
 	}
 
 	int i = 0;
-	for (std::vector<TimedPosition>::iterator it = vecPosition.begin(); it != vecPosition.end(); it++)
+	for (std::vector<TimedPosition>::iterator it = vecPosition.begin(); it != vecPosition.end(); ++it)
 	{
 		Transform3D pos = it->mPos;
 
