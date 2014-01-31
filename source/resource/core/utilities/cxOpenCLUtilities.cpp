@@ -39,7 +39,7 @@ OpenCL::ocl* OpenCL::init(cl_device_type type)
 		retval->context = context;
 		retval->cmd_queue = commandQueue;
 
-	}catch(cl::Error error)
+	}catch(cl::Error &error)
 	{
 		messageManager()->sendError("Could not initialize OpenCL. Reason: "+QString(error.what()));
 		check_error(error.err());
@@ -72,7 +72,7 @@ cl::Platform OpenCL::selectPlatform()
 
 		messageManager()->sendInfo("Selected platform "+qstring_cast(name)+" from vendor "+qstring_cast(vendor)+" using "+qstring_cast(version));
 
-	}catch(cl::Error error)
+	}catch(cl::Error &error)
 	{
 		messageManager()->sendError("Could not select a OpenCL platform. Reason: "+QString(error.what()));
 		check_error(error.err());
@@ -112,7 +112,7 @@ cl::Device OpenCL::selectDevice(cl_device_type type, cl::Platform platform)
 		version = retval.getInfo<CL_DEVICE_VERSION>();
 		messageManager()->sendInfo("Selected device "+qstring_cast(name)+" from vendor "+qstring_cast(vendor)+" using "+qstring_cast(version));
 
-	}catch(cl::Error error)
+	}catch(cl::Error &error)
 	{
 		messageManager()->sendError("Could not select a OpenCL device. Reason: "+QString(error.what()));
 		check_error(error.err());
@@ -142,7 +142,7 @@ cl::Device OpenCL::chooseDeviceWithMostGlobalMemory(VECTOR_CLASS<cl::Device> dev
 				largestMemory = deviceMemory;
 				retval = devices[i];
 			}
-		} catch (cl::Error error)
+		} catch (cl::Error &error)
 		{
 			messageManager()->sendWarning("Could not ask device about CL_DEVICE_GLOBAL_MEM_SIZE. Reason: "+QString(error.what()));
 			check_error(error.err());
@@ -181,7 +181,7 @@ cl::Context OpenCL::createContext(const VECTOR_CLASS<cl::Device> devices, cl_con
 		VECTOR_CLASS<cl::Device> readBackDevices;
 		readBackDevices = retval.getInfo<CL_CONTEXT_DEVICES>();
 
-	} catch (cl::Error error)
+	} catch (cl::Error &error)
 	{
 		messageManager()->sendError("Could not create a OpenCL context. Reason: "+QString(error.what()));
 		check_error(error.err());
@@ -198,7 +198,7 @@ cl::CommandQueue OpenCL::createCommandQueue(cl::Context context, cl::Device devi
 	{
 		retval = cl::CommandQueue(context, device, CL_QUEUE_PROFILING_ENABLE, NULL);
 		messageManager()->sendInfo("Created command queue using device "+qstring_cast(device.getInfo<CL_DEVICE_NAME>()));
-	} catch(cl::Error error)
+	} catch(cl::Error &error)
 	{
 		messageManager()->sendError("Could not create a OpenCL command queue. Reason: "+QString(error.what()));
 		check_error(error.err());
@@ -218,7 +218,7 @@ VECTOR_CLASS<cl::Device> OpenCL::getOnlyValidDevices(VECTOR_CLASS<cl::Device> de
 			devices[i].getInfo<CL_DEVICE_NAME>();
 			valid.push_back(devices[i]);
 
-		} catch (cl::Error error)
+		} catch (cl::Error &error)
 		{
 			messageManager()->sendWarning("Found invalid device. Device had no name.");
 			check_error(error.err());
@@ -250,7 +250,7 @@ cl::Program OpenCL::createProgram(cl::Context context, const char* source, size_
 		retval = cl::Program(context, sources);
 		messageManager()->sendInfo("Created program.");
 	}
-	catch (cl::Error error)
+	catch (cl::Error &error)
 	{
 		messageManager()->sendError("Could not create a OpenCL program queue. Reason: "+QString(error.what()));
 		check_error(error.err());
@@ -270,7 +270,7 @@ void OpenCL::build(cl::Program program, QString buildOptions)
 			messageManager()->sendError("Device is NULL.");
 		program.build(devices, buildOptions.toStdString().c_str(), NULL, NULL);
 	}
-	catch(cl::Error error)
+	catch(cl::Error &error)
 	{
 		messageManager()->sendError("Could not build program. Reason: "+QString(error.what()));
 		for(int i=0; i<devices.size(); i++)
@@ -291,7 +291,7 @@ cl::Kernel OpenCL::createKernel(cl::Program program, const char * kernel_name)
 		kernel = cl::Kernel(program, kernel_name, NULL);
 		messageManager()->sendInfo("Created kernel with name "+QString(kernel_name));
 	}
-	catch(cl::Error error)
+	catch(cl::Error &error)
 	{
 		messageManager()->sendError("Could not create kernel. Reason:"+QString(error.what()));
 		check_error(error.err());
@@ -309,7 +309,7 @@ cl::Buffer OpenCL::createBuffer(cl::Context context, cl_mem_flags flags, size_t 
 			flags |= CL_MEM_COPY_HOST_PTR;
 		dev_mem = cl::Buffer(context, flags, size, host_data, NULL);
 		dev_mem.setDestructorCallback(memoryDestructorCallback, static_cast<void*>(new std::string(bufferName)));
-	} catch (cl::Error error)
+	} catch (cl::Error &error)
 	{
 		messageManager()->sendError("Could not create a OpenCL buffer queue. Reason: "+QString(error.what()));
 		check_error(error.err());
