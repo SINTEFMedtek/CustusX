@@ -27,9 +27,15 @@ if (BUILD_TESTING)
     		cxtestOpenCLPrinter.cpp
     		cxtestOpenCLUtilities.cpp
     		cxtestOpenCLFixture.h
-    		cxtestOpenCLFixture.cpp
+        	cxtestOpenCLFixture.cpp
 		) 
 	endif(SSC_USE_OpenCL)
+	
+	if(CX_USE_OPENCL_UTILITY)
+		set(RESOURCE_TEST_CATCH_SOURCE_FILES ${RESOURCE_TEST_CATCH_SOURCE_FILES}
+            ${OpenCLUtilityLibrary_INCLUDE_DIRS}/testing/tests.cpp
+		)	
+	endif(CX_USE_OPENCL_UTILITY)
 
     cx_catch_add_lib_and_exe(cxResource "${RESOURCE_TEST_CATCH_SOURCE_FILES}" "${CXTEST_SOURCES_TO_MOC}")
 

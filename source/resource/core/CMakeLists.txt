@@ -233,6 +233,13 @@ if (SSC_USE_OpenCL)
     )    
 endif ()
 
+if (CX_USE_OPENCL_UTILITY)
+    set (CX_RESOURCE_LIBRARIES
+        ${CX_RESOURCE_LIBRARIES}
+        ${OpenCLUtilityLibrary_LIBRARY}
+    )    
+endif ()
+
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 
 ADD_LIBRARY (cxResource ${cxResource_SOURCE})
