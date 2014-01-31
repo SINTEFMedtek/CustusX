@@ -115,7 +115,7 @@ void ViewContainer::clearBackground()
   */
 QGridLayout* ViewContainer::getGridLayout()
 {
-	return (QGridLayout*) layout();
+	return dynamic_cast<QGridLayout*>(layout());
 }
 
 void ViewContainerWidget::paintEvent(QPaintEvent* event)

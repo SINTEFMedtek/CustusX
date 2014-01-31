@@ -77,7 +77,7 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 {
 	positions = sortMatrix(2,positions);
 	Eigen::MatrixXd positionsNotUsed = positions;
-	int minIndex;
+//	int minIndex;
 	int index;
 	int splitIndex;
 	Eigen::MatrixXd::Index startIndex;
