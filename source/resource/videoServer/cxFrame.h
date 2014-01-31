@@ -12,7 +12,7 @@ public:
   int mHeight; ///< Height in pixels
   int mPixelFormat; ///< Pixel format in OSType (FourCC)
   unsigned char* mFirstPixel; ///< Pointer to first pixel in frame
-  double mSpacing[2];
+	double mSpacing[2];
   float mOrigin[2];
   int ulx;
   int uly;
@@ -26,20 +26,25 @@ public:
   int mImagingDepth; //Imaging depth in mm
   int mSectorSizeInPercent; //Size of sector in percent compared to full
 
-  Frame():
-    mNewStatus(false),
-    mTimestamp(0.0),
-    mWidth(0),
-    mHeight(0),
-    mPixelFormat(0),
-    ulx(0),
-    uly(0),
-    urx(0),
-    ury(0),
-    brx(0),
-    bry(0),
-    blx(0),
-    bly(0) {};
+	Frame():
+		mNewStatus(false),
+		mTimestamp(0.0),
+		mWidth(0),
+		mHeight(0),
+		mPixelFormat(0),
+		mFirstPixel(NULL),
+		mSpacing(),
+		mOrigin(),
+		ulx(0),
+		uly(0),
+		urx(0),
+		ury(0),
+		brx(0),
+		bry(0),
+		blx(0),
+		bly(0),
+		mImagingDepth(0),
+		mSectorSizeInPercent(0) {}
 };
 }//namespace cx
 
