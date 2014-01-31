@@ -7,6 +7,10 @@
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 
+#if CX_USE_OPENCL_UTILITY
+	#include "OpenCLManager.hpp"
+#endif
+
 namespace cx
 {
 
@@ -24,6 +28,10 @@ void CL_CALLBACK memoryDestructorCallback(cl_mem memobj, void* user_data)
 
 OpenCL::ocl* OpenCL::init(cl_device_type type)
 {
+
+#if CX_USE_OPENCL_UTILITY
+	oul::opencl();
+#endif
 	OpenCL::ocl* retval = NULL;
 
 	try
