@@ -35,23 +35,23 @@ ColorDataAdapterXmlPtr ColorDataAdapterXml::initialize(const QString& uid, QStri
     retval->mName = name.isEmpty() ? uid : name;
     retval->mHelp = help;
     retval->mStore = XmlOptionItem(uid, root.toElement());
-    retval->mValue = QColor(retval->string2color(retval->mStore.readValue(retval->color2string(value))));
+	retval->mValue = string2color(retval->mStore.readValue(color2string(value)));
     return retval;
 }
 
-QString ColorDataAdapterXml::color2string(QColor color) const
-{
-    return qstring_cast(Eigen::Vector4f(color.redF(), color.greenF(), color.blueF(), color.alphaF()));
-}
+//QString ColorDataAdapterXml::color2string(QColor color) const
+//{
+//    return qstring_cast(Eigen::Vector4f(color.redF(), color.greenF(), color.blueF(), color.alphaF()));
+//}
 
-QColor ColorDataAdapterXml::string2color(QString input) const
-{
-    QStringList c = input.split(" ");
-    if (c.size()<4)
-        return QColor("green");
-    bool ok;
-    return QColor::fromRgbF(c[0].toDouble(&ok), c[1].toDouble(&ok), c[2].toDouble(&ok), c[3].toDouble(&ok));
-}
+//QColor ColorDataAdapterXml::string2color(QString input) const
+//{
+//    QStringList c = input.split(" ");
+//    if (c.size()<4)
+//        return QColor("green");
+//    bool ok;
+//    return QColor::fromRgbF(c[0].toDouble(&ok), c[1].toDouble(&ok), c[2].toDouble(&ok), c[3].toDouble(&ok));
+//}
 
 QString ColorDataAdapterXml::getUid() const
 {
@@ -79,7 +79,7 @@ bool ColorDataAdapterXml::setValue(QColor val)
         return false;
 
     mValue = val;
-    mStore.writeValue(this->color2string(val));
+	mStore.writeValue(color2string(val));
     emit valueWasSet();
     emit changed();
     return true;

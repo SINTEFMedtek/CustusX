@@ -72,7 +72,7 @@ void PointMetricRep::changedSlot()
 
 	mGraphicalPoint->setValue(p0_r);
 	mGraphicalPoint->setRadius(mGraphicsSize);
-	mGraphicalPoint->setColor(mColor);
+	mGraphicalPoint->setColor(this->getColorAsVector3D());
 
     this->drawText();
 

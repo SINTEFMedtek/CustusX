@@ -90,7 +90,7 @@ CoordinateSystem PointMetric::getSpace() const
 
 void PointMetric::addXml(QDomNode& dataNode)
 {
-	Data::addXml(dataNode);
+	DataMetric::addXml(dataNode);
 
 	dataNode.toElement().setAttribute("space", mSpace.toString());
 	dataNode.toElement().setAttribute("coord", qstring_cast(mCoordinate));
@@ -98,7 +98,7 @@ void PointMetric::addXml(QDomNode& dataNode)
 
 void PointMetric::parseXml(QDomNode& dataNode)
 {
-	Data::parseXml(dataNode);
+	DataMetric::parseXml(dataNode);
 
 	this->setSpace(CoordinateSystem::fromString(dataNode.toElement().attribute("space", mSpace.toString())));
 	this->setCoordinate(Vector3D::fromString(dataNode.toElement().attribute("coord", qstring_cast(mCoordinate))));
