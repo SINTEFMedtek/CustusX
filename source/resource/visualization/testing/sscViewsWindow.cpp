@@ -27,7 +27,6 @@
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
 #include "sscTexture3DSlicerRep.h"
-#include "sscGPURayCastVolumeRep.h"
 #include "sscViewsWindow.h"
 #include "sscImageTF3D.h"
 #include "cxDataLocations.h"
@@ -230,38 +229,6 @@ void ViewsWindow::define3D(const QString& imageFilename, const ImageParameters* 
 	view->addRep(mRepPtr);
 		
 	insertView(view, uid, imageFilename, r, c);
-}
-
-bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImageParameters* parameters, int r, int c)
-{
-	QString uid = "3D";
-	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
-
-	std::vector<cx::ImagePtr> images;
-
-	for (int i = 0; i < imageFilenames.size(); ++i)
-	{
-		cx::ImagePtr image = loadImage(imageFilenames[i]);
-		if (!image)
-			return false;
-
-		this->applyParameters(image, &parameters[i]);
-		images.push_back(image);
-	}
-
-	// volume rep
-#ifndef WIN32
-	if (!cx::GPURayCastVolumeRep::isSupported(view->getRenderWindow()))
-		return false;
-	cx::GPURayCastVolumeRepPtr mRepPtr = cx::GPURayCastVolumeRep::New( images[0]->getUid() );
-	mRepPtr->setShaderFolder(mShaderFolder);
-	mRepPtr->setImages(images);
-	mRepPtr->setName(images[0]->getName());
-	view->addRep(mRepPtr);
-#endif //WIN32
-	
-	insertView(view, uid, imageFilenames[0], r, c);
-	return true;
 }
 
 void ViewsWindow::applyParameters(cx::ImagePtr image, const ImageParameters *parameters)

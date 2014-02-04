@@ -88,54 +88,6 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show 3D volume - snwGPU multivolume render",
-				 "[integration][resource][visualization][not_apple][not_win32][not_win64][unstable]")
-{
-	this->setDescription("3D Volume, moving tool, GPU");
-	REQUIRE(this->define3DGPU(QStringList(image[0]), NULL, 0, 0));
-	REQUIRE(this->runWidget());
-	//REQUIRE(this->quickRunWidget());
-	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) > 0.01);
-}
-
-TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show 3D 2 volumes - snwGPU multivolume render",
-				 "[integration][resource][visualization][not_apple][not_win32][not_win64][unstable]")
-{
-	this->setDescription("3D Composites (2 volumes), moving tool");
-	QStringList images; images << image[1] << image[2];
-	ImageParameters parameters[2];
-
-	parameters[0].llr = 35;
-	parameters[0].alpha = .1;
-
-	parameters[1].llr = 55;
-	parameters[1].alpha = .7;
-	parameters[1].lut = getCreateLut(0, 200, .67, .68, 0, 1, .4, .8);
-
-	REQUIRE(this->define3DGPU(images, parameters, 0, 0));
-
-	REQUIRE(this->runWidget());
-	//REQUIRE(this->quickRunWidget());
-	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
-}
-
-TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show 3D RGB GPU volume",
-				 "[unit][resource][visualization][not_apple][not_win32][not_win64][hide]")
-{
-	this->setDescription("3D RGB Volume");
-
-	ImageParameters parameters;
-	parameters.llr = 35;
-
-	REQUIRE(this->define3DGPU(QStringList(image[3]), &parameters, 0, 0));
-	//REQUIRE(this->runWidget());
-	REQUIRE(this->quickRunWidget());
-	CHECK(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
-}
-
-TEST_CASE_METHOD(VisualRenderingFixture,
 				 "Visual rendering: Show 3D volume with lut",
 				 "[unit][resource][visualization]")
 {
