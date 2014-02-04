@@ -43,7 +43,6 @@ public:
 	
 	void setDescription(const QString& desc);
 	void define3D(const QString& imageFilename, const ImageParameters* parameters, int r, int c);
-	bool define3DGPU(const QStringList& imageFilenames, const ImageParameters* parameters, int r, int c);
 	void defineSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c);
 	bool defineGPUSlice(const QString& uid, const QString&    imageFilename, cx::PLANE_TYPE plane, int r, int c);
 	bool defineGPUSlice(const QString& uid, const std::vector<cx::ImagePtr> images, cx::PLANE_TYPE plane, int r, int c);
