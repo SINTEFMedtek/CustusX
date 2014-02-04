@@ -51,7 +51,7 @@ TEST_CASE("TubeSegmentationFramework SyntheticVascusynthPreset works", "[integra
 	helper.testSyntheticVascusynthPreset();
 }
 
-TEST_CASE("TubeSegmentationFramework PhantomAccUSPreset works", "[integration][unstable]")
+TEST_CASE("TubeSegmentationFramework PhantomAccUSPreset works", "[integration][not_apple][broken]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testPhantomAccUSPreset();
