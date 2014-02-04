@@ -59,6 +59,8 @@ QWidget* ToolMetricWrapper::createWidget()
 	connect(mFrameWidget, SIGNAL(changed()), this, SLOT(frameWidgetChangedSlot()));
 	topLayout->addWidget(mFrameWidget);
 
+	this->addColorWidget(topLayout);
+
 	this->dataChangedSlot();
 
 	return widget;
@@ -101,7 +103,7 @@ QString ToolMetricWrapper::getValue() const
 	return prettyFormat(mData->getRefCoord(), 1, 3);
 }
 
-DataPtr ToolMetricWrapper::getData() const
+DataMetricPtr ToolMetricWrapper::getData() const
 {
 	return mData;
 }
