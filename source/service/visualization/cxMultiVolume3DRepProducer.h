@@ -76,7 +76,6 @@ private:
 
 	ImagePtr removeImageFromVector(QString uid, std::vector<ImagePtr> &images);
 
-	void buildSscGPURayCastMultiVolume();
 	void buildVtkOpenGLGPUMultiVolumeRayCastMapper();
 	void buildVtkVolumeTextureMapper3D(ImagePtr image);
 	void buildVtkGPUVolumeRayCastMapper(ImagePtr image);
