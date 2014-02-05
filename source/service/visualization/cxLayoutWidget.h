@@ -40,11 +40,8 @@ public:
 	void setStretchFactors(LayoutRegion region, int stretchFactor);
 	void addView(ViewWidget* view, LayoutRegion region);
 	void clearViews();
-	void setLayoutName(QString name);
-	QString getLayoutName() const;
 
 private:
-	QString mLayoutName;
 	QGridLayout* mLayout; ///< the layout
 	std::vector<ViewWidget*> mViews;
 };

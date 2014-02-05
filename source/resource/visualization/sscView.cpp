@@ -67,7 +67,6 @@ View::View(QWidget *parent, QSize size, const QString& uid, const QString& name)
 
 View::~View()
 {
-	SSC_LOG("");
 }
 
 ViewWidget::ViewWidget(QWidget *parent, Qt::WFlags f) :
