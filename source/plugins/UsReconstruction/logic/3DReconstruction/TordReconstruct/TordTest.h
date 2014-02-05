@@ -2,7 +2,6 @@
 #ifndef TORD_TEST_H_
 #define TORD_TEST_H_
 
-#define __NO_STD_VECTOR // Apple: if using std::vector VECTOR_CLASS.push_back added 2 to size!
 #define __CL_ENABLE_EXCEPTIONS //telling the opencl c++ wrapper to throw exceptions
 
 
