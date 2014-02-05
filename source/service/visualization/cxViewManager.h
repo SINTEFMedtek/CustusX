@@ -115,7 +115,7 @@ public:
 	void setLayoutData(const LayoutData& data); ///< add or edit a layout
 	QString generateLayoutUid() const; ///< return an uid not used in present layouts.
 	void deleteLayoutData(const QString uid);
-	QActionGroup* createLayoutActionGroup(int widgetIndex);
+//	QActionGroup* createLayoutActionGroup(int widgetIndex);
 	QActionGroup* createInteractorStyleActionGroup();
 	bool isCustomLayout(const QString& uid) const;
 
@@ -203,7 +203,7 @@ protected:
 	void addDefaultLayouts();
 	unsigned findLayoutData(const QString uid) const;
 	void addDefaultLayout(LayoutData data);
-	QAction* addLayoutAction(QString layout, QActionGroup* group, int widgetIndex);
+//	QAction* addLayoutAction(QString layout, QActionGroup* group, int widgetIndex);
 	void setRenderingInterval(int interval);
 
 //	void addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QIcon icon,

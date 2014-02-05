@@ -53,9 +53,6 @@
 #include "cxRenderTimer.h"
 #include "cxLayoutWidget.h"
 
-#include "boost/bind.hpp"
-#include "libQtSignalAdapters/Qt2Func.h"
-#include "libQtSignalAdapters/ConnectionFactories.h"
 #include "sscLogger.h"
 
 namespace cx
@@ -154,6 +151,7 @@ void ViewManager::initialize()
 
 QWidget *ViewManager::getLayoutWidget(int index)
 {
+	SSC_ASSERT(index < mLayoutWidgets.size());
 	return mLayoutWidgets[index];
 }
 
@@ -245,6 +243,7 @@ void ViewManager::setRegistrationMode(REGISTRATION_STATUS mode)
 
 QString ViewManager::getActiveLayout(int widgetIndex) const
 {
+	SSC_ASSERT(mActiveLayout.size() > widgetIndex);
 	return mActiveLayout[widgetIndex];
 }
 
@@ -476,6 +475,9 @@ void ViewManager::rebuildLayouts()
 
 	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
 	{
+		if (i>0)
+			continue; // HACK: remove second layout
+
 		LayoutData next = this->getLayoutData(mActiveLayout[i]);
 		if (!next.getUid().isEmpty())
 			this->activateViews(mLayoutWidgets[i], next);
@@ -880,71 +882,6 @@ unsigned ViewManager::findLayoutData(const QString uid) const
 			return i;
 	}
 	return mLayouts.size();
-}
-
-QActionGroup* ViewManager::createLayoutActionGroup(int widgetIndex)
-{
-	QActionGroup* retval = new QActionGroup(this);
-	retval->setExclusive(true);
-
-	// add default layouts
-	//std::vector<QString> layouts = this->getAvailableLayouts();
-	for (unsigned i = 0; i < mLayouts.size(); ++i)
-	{
-		if (!this->isCustomLayout(mLayouts[i].getUid()))
-			this->addLayoutAction(mLayouts[i].getUid(), retval, widgetIndex);
-	}
-
-	// add separator
-	QAction* sep = new QAction(retval);
-	sep->setSeparator(this);
-	//retval->addAction(sep);
-
-	if (mDefaultLayouts.size() != mLayouts.size())
-	{
-		QAction* action = new QAction("Custom", retval);
-		action->setEnabled(false);
-	}
-
-	// add custom layouts
-	for (unsigned i = 0; i < mLayouts.size(); ++i)
-	{
-		if (this->isCustomLayout(mLayouts[i].getUid()))
-			this->addLayoutAction(mLayouts[i].getUid(), retval, widgetIndex);
-	}
-
-	// set checked status
-	QString type = this->getActiveLayout(widgetIndex);
-	QList<QAction*> actions = retval->actions();
-	for (int i = 0; i < actions.size(); ++i)
-	{
-		if (actions[i]->data().toString() == type)
-			actions[i]->setChecked(true);
-	}
-
-	return retval;
-}
-
-/** Add one layout as an action to the layout menu.
- */
-QAction* ViewManager::addLayoutAction(QString layout, QActionGroup* group, int widgetIndex)
-{
-	LayoutData data = this->getLayoutData(layout);
-	if (data.isEmpty())
-	{
-		QAction* sep = new QAction(group);
-		sep->setSeparator(this);
-	}
-	QAction* action = new QAction(data.getName(), group);
-	action->setEnabled(!data.isEmpty());
-	action->setCheckable(!data.isEmpty());
-
-	QtSignalAdapters::connect0<void()>(
-		action,
-		SIGNAL(triggered()),
-		boost::bind(&ViewManager::setActiveLayout, this, layout, widgetIndex));
-
-	return action;
 }
 
 bool ViewManager::isCustomLayout(const QString& uid) const

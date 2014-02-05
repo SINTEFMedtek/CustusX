@@ -16,6 +16,8 @@
 
 #include "cxViewManager.h"
 #include "sscLogger.h"
+#include <QApplication>
+#include <QDesktopWidget>
 
 namespace cx
 {
@@ -28,6 +30,46 @@ SecondaryViewLayoutWindow::SecondaryViewLayoutWindow(QWidget* parent) :
 
 SecondaryViewLayoutWindow::~SecondaryViewLayoutWindow()
 {
+}
+
+void print(QString header, QRect r)
+{
+	std::cout << header << "  (" << r.left() << ", " << r.top() << ", " << r.width() << ", " << r.height() << ")"<< std::endl;
+}
+
+void SecondaryViewLayoutWindow::tryShowOnSecondaryScreen()
+{
+	QDesktopWidget* desktop = QApplication::desktop();
+	SSC_ASSERT(desktop);
+	print(QString("def screen:"), desktop->screenGeometry());
+	print(QString("screen 0:"), desktop->screenGeometry(0));
+
+	this->show();
+
+	if (desktop->screenCount()>1)
+	{
+		print(QString("screen 1:"), desktop->screenGeometry(1));
+		int bestScreen = 1;
+		for (int i=2; i<desktop->screenCount(); ++i)
+		{
+			print(QString("screen %1:").arg(i), desktop->screenGeometry(i));
+			QRect last = desktop->screenGeometry(bestScreen);
+			QRect current = desktop->screenGeometry(i);
+			if (current.height()*current.width() < last.height()*last.width())
+				bestScreen = i;
+		}
+
+		std::cout << "Displaying secondary view layout on screen " << bestScreen << std::endl;
+		QRect rect = desktop->screenGeometry(bestScreen);
+		print(QString("using rect:"), rect);
+		this->setGeometry(rect);
+
+//		QRect rect = desktop->screenGeometry(1);
+//		move(rect.topLeft());
+//		setWindowState(Qt::WindowFullScreen);
+
+		//mSecondaryViewLayoutWindow->setWindowState(mSecondaryViewLayoutWindow->windowState() | Qt::WindowFullScreen);
+	}
 }
 
 void SecondaryViewLayoutWindow::showEvent(QShowEvent* event)

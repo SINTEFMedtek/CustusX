@@ -6,7 +6,7 @@
 #include <QPushButton>
 #include <QActionGroup>
 #include "cxViewManager.h"
-
+#include "sscLogger.h"
 namespace cx
 {
 
@@ -49,6 +49,7 @@ void LayoutEditorTab::init()
 
 void LayoutEditorTab::populateEditableLayouts(QString selectedLayoutUid)
 {
+	mLayoutList->blockSignals(true);
   mLayoutList->clear();
 
   QString newName = "New layout";
@@ -59,7 +60,7 @@ void LayoutEditorTab::populateEditableLayouts(QString selectedLayoutUid)
   for(unsigned i=0; i<layoutUids.size();++i)
   {
     QString uid = layoutUids[i];
-    if(viewManager()->isCustomLayout(uid))
+	if(viewManager()->isCustomLayout(uid))
     {
       QString name = viewManager()->getLayoutData(uid).getName();
       this->addCustomLayoutToDisplayList(name, uid);
@@ -71,10 +72,12 @@ void LayoutEditorTab::populateEditableLayouts(QString selectedLayoutUid)
     findIndex = mLayoutList->findData(newUid, Qt::ToolTipRole);
   
   mLayoutList->setCurrentIndex(findIndex);
+  mLayoutList->blockSignals(false);
 
+//  this->updateLayoutToEdit(name);
 }
 
-void LayoutEditorTab::layoutToEditChangedSlot(const QString& name)
+LayoutData LayoutEditorTab::updateLayoutToEdit(const QString& name)
 {
   mSaveLayoutButton->setEnabled(name == "New layout");
 
@@ -88,29 +91,37 @@ void LayoutEditorTab::layoutToEditChangedSlot(const QString& name)
   std::vector<QString>::iterator it = std::find(layoutUids.begin(), layoutUids.end(), uid);
   if(it != layoutUids.end())
   {
-    //std::cout << "Found layout in viewmanager: " << *it << std::endl;
-    data = viewManager()->getLayoutData(uid);
+//	std::cout << "Found layout in viewmanager: " << *it << std::endl;
+	data = viewManager()->getLayoutData(uid);
   }
   else
   {
-    //std::cout << "Did not find layout in viewmanager: " << name << std::endl;
-    data = viewManager()->getLayoutData(viewManager()->getActiveLayout());
+//	std::cout << "Did not find layout in viewmanager: " << name << std::endl;
+	data = viewManager()->getLayoutData(viewManager()->getActiveLayout());
   }
-  
+
   if(!viewManager()->isCustomLayout(data.getUid()))
   {
-    //std::cout << "It is not a custom layout. New layout mode." << std::endl;
-    data.resetUid(viewManager()->generateLayoutUid()); //for adding a new layout
+//	std::cout << "It is not a custom layout. New layout mode." << std::endl;
+	data.resetUid(viewManager()->generateLayoutUid()); //for adding a new layout
   }
   else
   {
-    //std::cout << "It is a custom layout. Editing mode." << std::endl;
+//	std::cout << "It is a custom layout. Editing mode." << std::endl;
    data = viewManager()->getLayoutData(data.getUid()); //for editing
   }
-  //std::cout << "=================================" << std::endl;
-  
+//  std::cout << "=================================" << std::endl;
+
   mLayoutEditorWidget->setLayoutData(data);
+  return data;
+}
+
+void LayoutEditorTab::layoutToEditChangedSlot(const QString& name)
+{
+  LayoutData data = this->updateLayoutToEdit(name);
+
   viewManager()->setActiveLayout(data.getUid());
+  SSC_LOG("");
 }
 
 void LayoutEditorTab::deleteCustomLayoutSlot()

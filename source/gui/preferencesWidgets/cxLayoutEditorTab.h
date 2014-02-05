@@ -41,6 +41,7 @@ private:
   void populateEditableLayouts(QString selectedLayoutUid);
   void addCustomLayoutToDisplayList( QString displayName, QString uid );
   void setToActiveLayout();
+  LayoutData updateLayoutToEdit(const QString& name);
 
   LayoutEditorWidget* mLayoutEditorWidget;
   QLabel*             mLayoutLabel;
