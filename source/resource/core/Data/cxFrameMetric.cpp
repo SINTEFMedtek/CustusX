@@ -48,7 +48,7 @@ FrameMetric::~FrameMetric()
 
 void FrameMetric::addXml(QDomNode& dataNode)
 {
-	Data::addXml(dataNode);
+	DataMetric::addXml(dataNode);
 
 	dataNode.toElement().setAttribute("space", mSpace.toString());
 	dataNode.toElement().setAttribute("frame", qstring_cast(mFrame));
@@ -56,7 +56,7 @@ void FrameMetric::addXml(QDomNode& dataNode)
 
 void FrameMetric::parseXml(QDomNode& dataNode)
 {
-	Data::parseXml(dataNode);
+	DataMetric::parseXml(dataNode);
 
 	this->setSpace(CoordinateSystem::fromString(dataNode.toElement().attribute("space", mSpace.toString())));
 	this->setFrame(Transform3D::fromString(dataNode.toElement().attribute("frame", qstring_cast(mFrame))));

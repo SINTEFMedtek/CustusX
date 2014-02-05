@@ -33,7 +33,7 @@ DataMetricRep::DataMetricRep(const QString& uid, const QString& name) :
 				mGraphicsSize(1),
 				mShowLabel(false),
 				mLabelSize(2.5),
-                mColor(Vector3D(1, 0, 0)),
+//                mColor(Vector3D(1, 0, 0)),
                 mView(NULL)
 {
 //  mViewportListener.reset(new ViewportListener);
@@ -83,11 +83,11 @@ void DataMetricRep::setLabelSize(double size)
 	this->changedSlot();
 }
 
-void DataMetricRep::setColor(double red, double green, double blue)
-{
-	mColor = Vector3D(red, green, blue);
-	this->changedSlot();
-}
+//void DataMetricRep::setColor(double red, double green, double blue)
+//{
+//	mColor = Vector3D(red, green, blue);
+//	this->changedSlot();
+//}
 
 void DataMetricRep::clear()
 {
@@ -121,7 +121,7 @@ void DataMetricRep::drawText()
     }
 
     mText.reset(new CaptionText3D(mView->getRenderer()));
-    mText->setColor(mColor);
+	mText->setColor(this->getColorAsVector3D());
     mText->setText(text);
     mText->setPosition(mMetric->getRefCoord());
     mText->setSize(mLabelSize / 100);
@@ -132,6 +132,16 @@ QString DataMetricRep::getText()
     if (mShowLabel)
         return mMetric->getName();
     return "";
+}
+
+Vector3D DataMetricRep::getColorAsVector3D() const
+{
+	if (!mMetric)
+		return Vector3D(1,1,1);
+
+	QColor color = mMetric->getColor();
+	Vector3D retval(color.redF(), color.greenF(), color.blueF());
+	return retval;
 }
 
 }

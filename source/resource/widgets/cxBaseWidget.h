@@ -26,17 +26,30 @@ public:
     virtual ~CXFrame() {}
 };
 
+/** QToolButton descendant with dedicated style sheet: rounded corners
+  *
+  * \ingroup cxGUI
+  * \date Feb 4, 2014
+  * \author Christian Askeland, SINTEF
+  */
+class CXToolButton : public QToolButton
+{
+	Q_OBJECT
+public:
+	CXToolButton(QWidget* parent=0) : QToolButton(parent) {}
+};
+
 /** QToolButton descendant with dedicated style sheet: smaller
   *
   * \ingroup cxGUI
   * \date Nov 25, 2012
   * \author Christian Askeland, SINTEF
   */
-class CXSmallToolButton : public QToolButton
+class CXSmallToolButton : public CXToolButton
 {
     Q_OBJECT
 public:
-    CXSmallToolButton(QWidget* parent=0) : QToolButton(parent) {}
+	CXSmallToolButton(QWidget* parent=0) : CXToolButton(parent) {}
 };
 
 

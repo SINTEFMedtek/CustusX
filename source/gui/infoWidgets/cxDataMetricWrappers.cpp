@@ -26,9 +26,36 @@
 #include "sscLabeledComboBoxWidget.h"
 #include "cxVector3DWidget.h"
 #include "sscRegistrationTransform.h"
+#include "cxDataAdapterHelper.h"
+#include "cxBaseWidget.h"
 
 namespace cx
 {
+
+void MetricBase::colorSelected()
+{
+//	if (mInternalUpdate)
+//		return;
+	this->getData()->setColor(mColorSelector->getValue());
+}
+
+void MetricBase::addColorWidget(QVBoxLayout* layout)
+{
+	mColorSelector = ColorDataAdapterXml::initialize("color", "Color",
+													 "Set color of metric",
+													 this->getData()->getColor(), QDomNode());
+	QHBoxLayout* line = new QHBoxLayout;
+	line->addWidget(createDataWidget(NULL, mColorSelector));
+	line->addStretch();
+	line->setMargin(0);
+	layout->addLayout(line);
+//	layout->addWidget(createDataWidget(NULL, mColorSelector));
+	connect(mColorSelector.get(), SIGNAL(valueWasSet()), this, SLOT(colorSelected()));
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
 
 PointMetricWrapper::PointMetricWrapper(PointMetricPtr data) : mData(data)
 {
@@ -39,47 +66,75 @@ PointMetricWrapper::PointMetricWrapper(PointMetricPtr data) : mData(data)
 
 QWidget* PointMetricWrapper::createWidget()
 {
-  QWidget* widget = new QWidget;
-  QVBoxLayout* topLayout = new QVBoxLayout(widget);
-  QHBoxLayout* hLayout = new QHBoxLayout;
-  hLayout->setMargin(0);
-  topLayout->setMargin(0);
-  topLayout->addLayout(hLayout);
+	QWidget* widget = new QWidget;
+	QVBoxLayout* topLayout = new QVBoxLayout(widget);
+	QHBoxLayout* hLayout = new QHBoxLayout;
+	hLayout->setMargin(0);
+	topLayout->setMargin(0);
+	topLayout->addLayout(hLayout);
 
-  QString value;// = qstring_cast(mData->getFrame());
+	mSpaceSelector = this->createSpaceSelector();
+	hLayout->addWidget(new LabeledComboBoxWidget(widget, mSpaceSelector));
+
+	mCoordinate =  this->createCoordinateSelector();
+	topLayout->addWidget(Vector3DWidget::createSmallHorizontal(widget, mCoordinate));
+
+	QWidget* sampleButton = this->createSampleButton(widget);
+	hLayout->addWidget(sampleButton);
+
+	this->addColorWidget(topLayout);
+	topLayout->addStretch();
+	this->dataChangedSlot();
+
+	return widget;
+}
+
+StringDataAdapterXmlPtr PointMetricWrapper::createSpaceSelector() const
+{
+	QString value;// = qstring_cast(mData->getFrame());
 	std::vector<CoordinateSystem> spaces = SpaceHelpers::getSpacesToPresentInGUI();
-  QStringList range;
-  for (unsigned i=0; i<spaces.size(); ++i)
-    range << spaces[i].toString();
+	QStringList range;
+	for (unsigned i=0; i<spaces.size(); ++i)
+		range << spaces[i].toString();
 
-  mSpaceSelector = StringDataAdapterXml::initialize("selectSpace",
-      "Space",
-      "Select coordinate system to store position in.",
-      value,
-      range,
-      QDomNode());
-  hLayout->addWidget(new LabeledComboBoxWidget(widget, mSpaceSelector));
+	StringDataAdapterXmlPtr retval;
+	retval = StringDataAdapterXml::initialize("selectSpace",
+											  "Space",
+											  "Select coordinate system to store position in.",
+											  value,
+											  range,
+											  QDomNode());
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(spaceSelected()));
+	return retval;
+}
 
-  mCoordinate = Vector3DDataAdapterXml::initialize("selectCoordinate",
-      "Coord",
-      "Coordinate values.",
-      Vector3D(0,0,0),
-      DoubleRange(-1000,1000,0.1),
-      1,
-      QDomNode());
-//  topLayout->addWidget(Vector3DWidget::createVerticalWithSliders(widget, mCoordinate));
-  topLayout->addWidget(Vector3DWidget::createSmallHorizontal(widget, mCoordinate));
+Vector3DDataAdapterXmlPtr PointMetricWrapper::createCoordinateSelector() const
+{
+	Vector3DDataAdapterXmlPtr retval;
+	retval = Vector3DDataAdapterXml::initialize("selectCoordinate",
+												"Coord",
+												"Coordinate values.",
+												Vector3D(0,0,0),
+												DoubleRange(-1000,1000,0.1),
+												1,
+												QDomNode());
 
-  QPushButton* sampleButton = new QPushButton("Sample");
-  sampleButton->setToolTip("Set the position equal to the current tool tip position.");
-  hLayout->addWidget(sampleButton);
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(coordinateChanged()));
+	return retval;
+}
 
-  connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spaceSelected()));
-  connect(mCoordinate.get(), SIGNAL(valueWasSet()), this, SLOT(coordinateChanged()));
-  connect(sampleButton, SIGNAL(clicked()), this, SLOT(moveToToolPosition()));
-  this->dataChangedSlot();
+QWidget* PointMetricWrapper::createSampleButton(QWidget* parent) const
+{
+	QAction* sampleAction = new QAction("Sample", parent);
+	QString sampleTip("Set the position equal to the current tool tip position.");
+	sampleAction->setStatusTip(sampleTip);
+	sampleAction->setWhatsThis(sampleTip);
+	sampleAction->setToolTip(sampleTip);
+	connect(sampleAction, SIGNAL(triggered()), this, SLOT(moveToToolPosition()));
 
-  return widget;
+	CXToolButton* sampleButton = new CXToolButton(parent);
+	sampleButton->setDefaultAction(sampleAction);
+	return sampleButton;
 }
 
 QString PointMetricWrapper::getValue() const
@@ -89,7 +144,7 @@ QString PointMetricWrapper::getValue() const
   return prettyFormat(mData->getRefCoord(), 1, 3);
 }
 
-DataPtr PointMetricWrapper::getData() const
+DataMetricPtr PointMetricWrapper::getData() const
 {
   return mData;
 }
@@ -204,6 +259,9 @@ QWidget* PlaneMetricWrapper::createWidget()
   hLayout->addWidget(sampleButton);
   connect(sampleButton, SIGNAL(clicked()), this, SLOT(moveToToolPosition()));
 
+  this->addColorWidget(topLayout);
+  topLayout->addStretch();
+
   this->dataChangedSlot();
 
   return widget;
@@ -214,7 +272,7 @@ QString PlaneMetricWrapper::getValue() const
   return "NA";
 }
 
-DataPtr PlaneMetricWrapper::getData() const
+DataMetricPtr PlaneMetricWrapper::getData() const
 {
   return mData;
 }
@@ -322,16 +380,20 @@ QWidget* DistanceMetricWrapper::createWidget()
   mPSelector.resize(mData->getArgumentCount());
   for (unsigned i=0; i<mPSelector.size(); ++i)
   {
-    mPSelector[i] = StringDataAdapterXml::initialize(QString("p%1").arg(i),
-        QString("p%1").arg(i),
+	  QString id = QString("p%1").arg(i);
+	mPSelector[i] = StringDataAdapterXml::initialize(id,
+		id,
         QString("line endpoint %1").arg(i),
         mData->getArgument(i) ? mData->getArgument(i)->getUid() : "",
         range,
         QDomNode());
     mPSelector[i]->setDisplayNames(names);
     hLayout->addWidget(new LabeledComboBoxWidget(widget, mPSelector[i]));
-    connect(mPSelector[i].get(), SIGNAL(valueWasSet()), this, SLOT(pointSelected()));
+    connect(mPSelector[i].get(), SIGNAL(valueWasSet()), this, SLOT(pointSelected()));	
   }
+
+  this->addColorWidget(topLayout);
+  topLayout->addStretch();
 
   this->dataChangedSlot();
   return widget;
@@ -341,7 +403,7 @@ QString DistanceMetricWrapper::getValue() const
 {
   return QString("%1 mm").arg(mData->getDistance(), 5, 'f', 1);
 }
-DataPtr DistanceMetricWrapper::getData() const
+DataMetricPtr DistanceMetricWrapper::getData() const
 {
   return mData;
 }
@@ -358,7 +420,6 @@ QString DistanceMetricWrapper::getArguments() const
   return data.join("-");
 
 }
-
 
 void DistanceMetricWrapper::pointSelected()
 {
@@ -441,6 +502,9 @@ QWidget* AngleMetricWrapper::createWidget()
     connect(mPSelector[i].get(), SIGNAL(valueWasSet()), this, SLOT(pointSelected()));
   }
 
+  this->addColorWidget(topLayout);
+  topLayout->addStretch();
+
   this->dataChangedSlot();
   return widget;
 }
@@ -449,7 +513,7 @@ QString AngleMetricWrapper::getValue() const
 {
   return QString("%1*").arg(mData->getAngle()/M_PI*180, 5, 'f', 1);
 }
-DataPtr AngleMetricWrapper::getData() const
+DataMetricPtr AngleMetricWrapper::getData() const
 {
   return mData;
 }
