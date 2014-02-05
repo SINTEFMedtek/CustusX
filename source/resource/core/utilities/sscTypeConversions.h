@@ -6,6 +6,7 @@
 #include <QString>
 #include <QVariant>
 #include <QDomDocument>
+#include <QColor>
 
 #ifndef Q_MOC_RUN // workaround for bug in moc vs boost 1.48+: https://bugreports.qt-project.org/browse/QTBUG-22829
 #include <boost/lexical_cast.hpp>
@@ -79,6 +80,9 @@ QString streamXml2String(T& val)
 	val.addXml(root);
 	return doc.toString();
 }
+
+QString color2string(QColor color);
+QColor string2color(QString input, QColor defaultValue=QColor("green"));
 
 /**
  * \}

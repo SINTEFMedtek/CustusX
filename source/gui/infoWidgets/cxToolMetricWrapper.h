@@ -34,7 +34,7 @@ public:
   virtual ~ToolMetricWrapper() {}
   virtual QWidget* createWidget();
   virtual QString getValue() const;
-  virtual DataPtr getData() const;
+  virtual DataMetricPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
 private slots:

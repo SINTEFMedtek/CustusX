@@ -18,6 +18,7 @@
 #include "sscPlaneMetric.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscVector3DDataAdapterXml.h"
+#include "sscColorDataAdapterXml.h"
 
 class QVBoxLayout;
 class QTableWidget;
@@ -41,9 +42,15 @@ public:
   virtual ~MetricBase() {}
   virtual QWidget* createWidget() = 0;
   virtual QString getValue() const = 0;
-  virtual DataPtr getData() const = 0;
+  virtual DataMetricPtr getData() const = 0;
   virtual QString getArguments() const = 0;
   virtual QString getType() const = 0;
+
+private slots:
+  void colorSelected();
+protected:
+  ColorDataAdapterXmlPtr mColorSelector;
+  void addColorWidget(QVBoxLayout* layout);
 };
 
 class PointMetricWrapper : public MetricBase
@@ -54,7 +61,7 @@ public:
   virtual ~PointMetricWrapper() {}
   virtual QWidget* createWidget();
   virtual QString getValue() const;
-  virtual DataPtr getData() const;
+  virtual DataMetricPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
 private slots:
@@ -63,6 +70,9 @@ private slots:
   void coordinateChanged();
   void dataChangedSlot();
 private:
+  QWidget* createSampleButton(QWidget* parent) const;
+  StringDataAdapterXmlPtr createSpaceSelector() const;
+  Vector3DDataAdapterXmlPtr createCoordinateSelector() const;
   PointMetricPtr mData;
   StringDataAdapterXmlPtr mSpaceSelector;
   Vector3DDataAdapterXmlPtr mCoordinate;
@@ -77,7 +87,7 @@ public:
   virtual ~PlaneMetricWrapper() {}
   virtual QWidget* createWidget();
   virtual QString getValue() const;
-  virtual DataPtr getData() const;
+  virtual DataMetricPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
 private slots:
@@ -101,7 +111,7 @@ public:
   virtual ~DistanceMetricWrapper() {}
   virtual QWidget* createWidget();
   virtual QString getValue() const;
-  virtual DataPtr getData() const;
+  virtual DataMetricPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
 
@@ -112,7 +122,7 @@ private slots:
 private:
   DistanceMetricPtr mData;
   std::vector<StringDataAdapterXmlPtr> mPSelector;
-  void getAvailableArgumentMetrics(QStringList* uid, std::map<QString,QString>* namemap);
+void getAvailableArgumentMetrics(QStringList* uid, std::map<QString,QString>* namemap);
   bool mInternalUpdate;
 };
 
@@ -124,7 +134,7 @@ public:
   virtual ~AngleMetricWrapper() {}
   virtual QWidget* createWidget();
   virtual QString getValue() const;
-  virtual DataPtr getData() const;
+  virtual DataMetricPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
 

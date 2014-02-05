@@ -82,7 +82,7 @@ bool AngleMetric::validArgument(DataPtr p) const
 
 void AngleMetric::addXml(QDomNode& dataNode)
 {
-	Data::addXml(dataNode);
+	DataMetric::addXml(dataNode);
 
 	for (unsigned i = 0; i < mArgument.size(); ++i)
 	{
@@ -93,7 +93,7 @@ void AngleMetric::addXml(QDomNode& dataNode)
 
 void AngleMetric::parseXml(QDomNode& dataNode)
 {
-	Data::parseXml(dataNode);
+	DataMetric::parseXml(dataNode);
 
 	for (unsigned i = 0; i < mArgument.size(); ++i)
 	{
