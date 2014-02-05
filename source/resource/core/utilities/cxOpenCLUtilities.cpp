@@ -274,7 +274,7 @@ void OpenCL::build(cl::Program program, QString buildOptions)
 	{
 		cl::Context context(program.getInfo<CL_PROGRAM_CONTEXT>());
 		devices = context.getInfo<CL_CONTEXT_DEVICES>();
-		if(devices == NULL || devices.size())
+		if(devices.size() == 0)
 			messageManager()->sendError("Device is NULL.");
 		program.build(devices, buildOptions.toStdString().c_str(), NULL, NULL);
 	}
