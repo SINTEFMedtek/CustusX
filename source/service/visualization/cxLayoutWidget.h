@@ -34,13 +34,17 @@ class LayoutWidget : public QWidget
 	Q_OBJECT
 public:
 	LayoutWidget();
+	~LayoutWidget();
 	/** Set the stretch factors of columns and rows in mLayout.
 	 */
 	void setStretchFactors(LayoutRegion region, int stretchFactor);
 	void addView(ViewWidget* view, LayoutRegion region);
 	void clearViews();
+	void setLayoutName(QString name);
+	QString getLayoutName() const;
 
 private:
+	QString mLayoutName;
 	QGridLayout* mLayout; ///< the layout
 	std::vector<ViewWidget*> mViews;
 };
