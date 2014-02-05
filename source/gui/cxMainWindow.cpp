@@ -55,6 +55,7 @@
 #include "cxVLCRecorder.h"
 #include "cxSecondaryViewLayoutWindow.h"
 #include "cxRegistrationHistoryWidget.h"
+#include "sscLogger.h"
 
 namespace cx
 {
@@ -223,7 +224,8 @@ void MainWindow::addToWidgetGroupMap(QAction* action, QString groupname)
 }
 
 MainWindow::~MainWindow()
-{}
+{
+}
 
 QMenu* MainWindow::createPopupMenu()
 {
@@ -667,6 +669,7 @@ void MainWindow::showSecondaryViewLayoutWindowActionSlot()
 		mSecondaryViewLayoutWindow = new SecondaryViewLayoutWindow(this);
 
 	QDesktopWidget* desktop = QApplication::desktop();
+	SSC_ASSERT(desktop);
 	print(QString("def screen:"), desktop->screenGeometry());
 	print(QString("screen 0:"), desktop->screenGeometry(0));
 
@@ -768,7 +771,7 @@ void MainWindow::layoutChangedSlot()
 
 	//if(mLayoutActionGroup)
 	delete mLayoutActionGroup;
-	mLayoutActionGroup = viewManager()->createLayoutActionGroup();
+	mLayoutActionGroup = viewManager()->createLayoutActionGroup(0);
 
 	//  mLayoutMenu->clear(); // Clearing removes too much
 	mLayoutMenu->addActions(mLayoutActionGroup->actions());
