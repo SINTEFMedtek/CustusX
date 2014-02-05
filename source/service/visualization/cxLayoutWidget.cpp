@@ -14,6 +14,7 @@
 
 #include "cxLayoutWidget.h"
 #include <QGridLayout>
+#include "sscLogger.h"
 
 namespace cx
 {
@@ -25,6 +26,10 @@ LayoutWidget::LayoutWidget()
 	mLayout->setSpacing(2);
 	mLayout->setMargin(4);
 	this->setLayout(mLayout);
+}
+
+LayoutWidget::~LayoutWidget()
+{
 }
 
 void LayoutWidget::setStretchFactors(LayoutRegion region, int stretchFactor)
@@ -60,8 +65,6 @@ void LayoutWidget::clearViews()
 
 	this->setStretchFactors(LayoutRegion(0, 0, 10, 10), 0);
 }
-
-
 
 } // namespace cx
 

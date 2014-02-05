@@ -43,7 +43,7 @@ PointMetricRep2D::PointMetricRep2D(const QString& uid, const QString& name) :
 	mOutlineWidth(0.1)
 {
 	mFillVisible = true;
-	mOutlineColor = Vector3D(1,1,1) - mColor;
+	mOutlineColor = Vector3D(1,1,1) - this->getColorAsVector3D();
 }
 
 void PointMetricRep2D::setDynamicSize(bool on)
@@ -119,7 +119,8 @@ void PointMetricRep2D::changedSlot()
 	if (!mCircleActor)
 		return;
 
-	mCircleActor->GetProperty()->SetColor(mColor[0], mColor[1], mColor[2]);
+	Vector3D color = this->getColorAsVector3D();
+	mCircleActor->GetProperty()->SetColor(color[0], color[1], color[2]);
 	mOutlineActor->GetProperty()->SetColor(mOutlineColor[0], mOutlineColor[1], mOutlineColor[2]);
 
 	Vector3D position = mSliceProxy->get_sMr() * mMetric->getRefCoord();

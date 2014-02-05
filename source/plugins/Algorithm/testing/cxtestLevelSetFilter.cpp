@@ -53,7 +53,7 @@ TEST_CASE("LevelSetFilter: isSeedPointInsideImage", "[unit][plugins][Algorithm][
     CHECK_FALSE(cx::LevelSetFilter::isSeedPointInsideImage(point, image));
 }
 
-TEST_CASE("LevelSetFilter: execute", "[integration][plugins][Algorithm][LevelSetFilter][unstable]")
+TEST_CASE("LevelSetFilter: execute", "[integration][plugins][Algorithm][LevelSetFilter][hide][broken]")
 {
     cx::LogicManager::initialize();
 	//setup filter

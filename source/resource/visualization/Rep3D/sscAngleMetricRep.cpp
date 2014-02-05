@@ -81,9 +81,9 @@ void AngleMetricRep::changedSlot()
 
     std::vector<Vector3D> p = angleMetric->getEndpoints();
 
-	mLine0->setColor(mColor);
-	mLine1->setColor(mColor);
-	mArc->setColor(mColor);
+	mLine0->setColor(this->getColorAsVector3D());
+	mLine1->setColor(this->getColorAsVector3D());
+	mArc->setColor(this->getColorAsVector3D());
 	mLine0->setStipple(0x0F0F);
     mLine1->setStipple(0x0F0F);
 	mArc->setStipple(0xF0FF);

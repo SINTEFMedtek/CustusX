@@ -22,6 +22,7 @@
 #define SSCDATAMETRIC_H_
 
 #include "sscData.h"
+#include <QColor>
 
 namespace cx
 {
@@ -50,8 +51,17 @@ public:
     virtual Vector3D getRefCoord() const = 0;
 	virtual QString getAsSingleLineString() const = 0;
 	virtual bool isValid() const { return true; }
+
+	void setColor(const QColor& color);
+	QColor getColor();
+
+	void addXml(QDomNode& dataNode);
+	void parseXml(QDomNode& dataNode);
+
 protected:
 	QString getSingleLineHeader() const;
+	QColor mColor;
+
 };
 typedef boost::shared_ptr<DataMetric> DataMetricPtr;
 

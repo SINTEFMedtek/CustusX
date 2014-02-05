@@ -97,7 +97,7 @@ bool DistanceMetric::isValid() const
 
 void DistanceMetric::addXml(QDomNode& dataNode)
 {
-	Data::addXml(dataNode);
+	DataMetric::addXml(dataNode);
 
 	for (unsigned i = 0; i < mArgument.size(); ++i)
 	{
@@ -108,7 +108,7 @@ void DistanceMetric::addXml(QDomNode& dataNode)
 
 void DistanceMetric::parseXml(QDomNode& dataNode)
 {
-	Data::parseXml(dataNode);
+	DataMetric::parseXml(dataNode);
 
 	for (unsigned i = 0; i < mArgument.size(); ++i)
 	{

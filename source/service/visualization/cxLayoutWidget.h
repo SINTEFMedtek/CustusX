@@ -34,6 +34,7 @@ class LayoutWidget : public QWidget
 	Q_OBJECT
 public:
 	LayoutWidget();
+	~LayoutWidget();
 	/** Set the stretch factors of columns and rows in mLayout.
 	 */
 	void setStretchFactors(LayoutRegion region, int stretchFactor);

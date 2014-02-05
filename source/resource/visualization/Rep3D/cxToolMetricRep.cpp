@@ -85,10 +85,10 @@ void ToolMetricRep::changedSlot()
 	Vector3D toolTip_r = rMt.coord(Vector3D(0,0,-metric->getToolOffset()));
 
 	mToolTip->setValue(toolTip_r);
-	mToolTip->setColor(mColor);
+	mToolTip->setColor(this->getColorAsVector3D());
 
 	mToolOffset->setValue(p0_r, toolTip_r);
-	mToolOffset->setColor(mColor);
+	mToolOffset->setColor(this->getColorAsVector3D());
 
 	mAxes->setTransform(metric->getRefFrame());
 	this->drawText();
