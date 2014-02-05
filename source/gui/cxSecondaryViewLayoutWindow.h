@@ -39,6 +39,10 @@ Q_OBJECT
 public:
 	SecondaryViewLayoutWindow(QWidget* parent);
 	~SecondaryViewLayoutWindow();
+protected:
+	virtual void showEvent(QShowEvent* event);
+	virtual void hideEvent(QCloseEvent* event);
+	virtual void closeEvent(QCloseEvent *event);
 private:
 };
 
