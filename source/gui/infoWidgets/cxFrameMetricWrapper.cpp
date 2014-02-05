@@ -61,6 +61,9 @@ QWidget* FrameMetricWrapper::createWidget()
 
 	connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spaceSelected()));
 	connect(sampleButton, SIGNAL(clicked()), this, SLOT(moveToToolPosition()));
+
+	this->addColorWidget(topLayout);
+
 	this->dataChangedSlot();
 
 	return widget;
@@ -71,7 +74,7 @@ QString FrameMetricWrapper::getValue() const
 	return prettyFormat(mData->getRefCoord(), 1, 3);
 }
 
-DataPtr FrameMetricWrapper::getData() const
+DataMetricPtr FrameMetricWrapper::getData() const
 {
 	return mData;
 }

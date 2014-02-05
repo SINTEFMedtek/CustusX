@@ -48,7 +48,7 @@ public:
 	void setGraphicsSize(double size);
 	void setLabelSize(double size);
 	void setShowLabel(bool on);
-	void setColor(double red, double green, double blue);
+//	void setColor(double red, double green, double blue);
 
     void setDataMetric(DataMetricPtr value);
     DataMetricPtr getDataMetric();
@@ -69,7 +69,8 @@ protected:
 	double mGraphicsSize;
 	bool mShowLabel;
 	double mLabelSize;
-	Vector3D mColor;
+//	Vector3D mColor;
+	Vector3D getColorAsVector3D() const;
 
     DataMetricPtr mMetric;
     View *mView;

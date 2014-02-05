@@ -15,6 +15,7 @@
 #include "cxSecondaryViewLayoutWindow.h"
 
 #include "cxViewManager.h"
+#include "sscLogger.h"
 
 namespace cx
 {
@@ -23,16 +24,27 @@ SecondaryViewLayoutWindow::SecondaryViewLayoutWindow(QWidget* parent) :
 	QMainWindow(parent)
 {
 	this->setWindowTitle("View Layout");
-
-	viewManager()->setSecondaryLayout("LAYOUT_OBLIQUE_3DAnyDual_x1");
-	this->setCentralWidget(viewManager()->getLayoutWidget(1));
 }
 
 SecondaryViewLayoutWindow::~SecondaryViewLayoutWindow()
 {
-	viewManager()->setSecondaryLayout("");
 }
 
+void SecondaryViewLayoutWindow::showEvent(QShowEvent* event)
+{
+	viewManager()->setActiveLayout("LAYOUT_OBLIQUE_3DAnyDual_x1", 1);
+	this->setCentralWidget(viewManager()->getLayoutWidget(1));
+}
+
+void SecondaryViewLayoutWindow::hideEvent(QCloseEvent* event)
+{
+	viewManager()->setActiveLayout("", 1);
+}
+
+void SecondaryViewLayoutWindow::closeEvent(QCloseEvent *event)
+{
+	viewManager()->setActiveLayout("", 1);
+}
 
 } // namespace cx
 

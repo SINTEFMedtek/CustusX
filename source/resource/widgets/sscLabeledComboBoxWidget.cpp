@@ -53,7 +53,7 @@ LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, StringDataAdapterP
 	else // add directly to this
 	{
         QHBoxLayout* topLayout = new QHBoxLayout;
-        topLayout->setMargin(0);
+		topLayout->setMargin(0);
         this->setLayout(topLayout);
 
         topLayout->addWidget(mLabel);
