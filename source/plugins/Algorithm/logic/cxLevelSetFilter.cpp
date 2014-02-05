@@ -187,7 +187,6 @@ void LevelSetFilter::createInputTypes()
 	temp = SelectImageStringDataAdapter::New();
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for thresholding");
-	connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
 	mInputTypes.push_back(temp);
 }
 
