@@ -236,7 +236,7 @@ endif ()
 if (CX_USE_OPENCL_UTILITY)
     set (CX_RESOURCE_LIBRARIES
         ${CX_RESOURCE_LIBRARIES}
-        ${OpenCLUtilityLibrary_LIBRARY}
+        ${OpenCLUtilityLibrary_LIBRARIES}
     )    
 endif ()
 
