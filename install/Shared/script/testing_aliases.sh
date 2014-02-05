@@ -11,8 +11,10 @@
 alias appleunitw="~/dev/working/CustusX3/CustusX3/install/Shared/script/cxRunTests.py --run_catch --wrap_in_ctest [unit]~[unstable]~[hide]~[not_apple]"
 alias appleunit="~/dev/working/CustusX3/CustusX3/install/Shared/script/cxRunTests.py --run_catch [unit]~[unstable]~[hide]~[not_apple]"
 alias appleint="~/dev/working/CustusX3/CustusX3/install/Shared/script/cxRunTests.py --run_catch --wrap_in_ctest [integration]~[unstable]~[hide]~[not_apple]"
+alias appletestw="~/dev/working/CustusX3/CustusX3/install/Shared/script/cxRunTests.py --run_catch --wrap_in_ctest ~[unstable]~[hide]~[not_apple]"
 
 
 alias unitw="~/dev/working/CustusX3/CustusX3/install/Shared/script/cxRunTests.py --run_catch --wrap_in_ctest [unit]~[unstable]~[hide]~[not_linux]"
 alias unit="~/dev/working/CustusX3/CustusX3/install/Shared/script/cxRunTests.py --run_catch [unit]~[unstable]~[hide]~[not_linux]"
 alias int="~/dev/working/CustusX3/CustusX3/install/Shared/script/cxRunTests.py --run_catch --wrap_in_ctest [integration]~[unstable]~[hide]~[not_linux]"
+alias testw="~/dev/working/CustusX3/CustusX3/install/Shared/script/cxRunTests.py --run_catch --wrap_in_ctest ~[unstable]~[hide]~[not_linux]"
