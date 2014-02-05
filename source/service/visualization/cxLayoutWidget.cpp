@@ -30,7 +30,6 @@ LayoutWidget::LayoutWidget()
 
 LayoutWidget::~LayoutWidget()
 {
-	SSC_LOG("");
 }
 
 void LayoutWidget::setStretchFactors(LayoutRegion region, int stretchFactor)
@@ -66,17 +65,6 @@ void LayoutWidget::clearViews()
 
 	this->setStretchFactors(LayoutRegion(0, 0, 10, 10), 0);
 }
-
-void LayoutWidget::setLayoutName(QString name)
-{
-	mLayoutName = name;
-}
-
-QString LayoutWidget::getLayoutName() const
-{
-	return mLayoutName;
-}
-
 
 } // namespace cx
 

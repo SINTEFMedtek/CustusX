@@ -225,7 +225,6 @@ void MainWindow::addToWidgetGroupMap(QAction* action, QString groupname)
 
 MainWindow::~MainWindow()
 {
-	SSC_LOG("");
 }
 
 QMenu* MainWindow::createPopupMenu()

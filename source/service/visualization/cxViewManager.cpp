@@ -87,8 +87,6 @@ void ViewManager::destroyInstance()
 }
 
 ViewManager::ViewManager() :
-//				mLayout(NULL),
-//				mMainWindowsCentralWidget(NULL),
 				mRenderingTimer(NULL),
 				mGlobal2DZoom(true),
 				mGlobalObliqueOrientation(false),
@@ -96,7 +94,6 @@ ViewManager::ViewManager() :
 {
 	mRenderTimer.reset(new CyclicActionTimer("Main Render timer"));
 	mSlicePlanesProxy.reset(new SlicePlanesProxy());
-//	mSlicePlanesProxy->getProperties().m3DFontSize = 50;
 
 	connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
 	connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
@@ -134,15 +131,9 @@ void ViewManager::initialize()
 		mLayoutWidgets[i] = new LayoutWidget;
 	}
 
-//	mLayout = new QGridLayout;
-//	mMainWindowsCentralWidget = new QWidget;
 	mViewCache2D.reset(new ViewCache<ViewWidget>(mLayoutWidgets[0],	"View2D"));
 	mViewCache3D.reset(new ViewCache<ViewWidget>(mLayoutWidgets[0], "View3D"));
 	mViewCacheRT.reset(new ViewCache<ViewWidget>(mLayoutWidgets[0], "ViewRT"));
-
-//	mLayout->setSpacing(2);
-//	mLayout->setMargin(4);
-//	mMainWindowsCentralWidget->setLayout(mLayout);
 
 	mInteractiveCropper.reset(new InteractiveCropper());
 	mInteractiveClipper.reset(new InteractiveClipper());
@@ -159,8 +150,6 @@ void ViewManager::initialize()
 
 	mGlobalZoom2DVal = SyncedValue::create(1);
 	this->setGlobal2DZoom(mGlobal2DZoom);
-
-//	return mMainWindowsCentralWidget;
 }
 
 QWidget *ViewManager::getLayoutWidget(int index)
@@ -278,7 +267,6 @@ void ViewManager::setActiveView(QString viewUid)
 		return;
 	mActiveView = qstring_cast(viewUid);
 	emit activeViewChanged();
-//  messageManager()->sendInfo("Active view set to ["+mActiveView + "]");
 }
 
 int ViewManager::getActiveViewGroup() const
@@ -328,10 +316,6 @@ void ViewManager::addXml(QDomNode& parentNode)
 	global2DZoomNode.appendChild(doc.createTextNode(string_cast(mGlobal2DZoom).c_str()));
 	viewManagerNode.appendChild(global2DZoomNode);
 
-//  QDomElement activeLayoutNode = doc.createElement("activeLayout");
-//  activeLayoutNode.appendChild(doc.createTextNode(mActiveLayout));
-//  viewManagerNode.appendChild(activeLayoutNode);
-
 	QDomElement activeViewNode = doc.createElement("activeView");
 	activeViewNode.appendChild(doc.createTextNode(mActiveView));
 	viewManagerNode.appendChild(activeViewNode);
@@ -375,24 +359,13 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 			else
 				this->setGlobal2DZoom(true);
 		}
-// removed because the layout is better stored in the global settings file (bug #364)
-//    else if(child.toElement().tagName() == "activeLayout")
-//    {
-//      const QString activeLayoutString = child.toElement().text();
-//      if(!activeLayoutString.isEmpty())
-//        this->setActiveLayout(activeLayoutString);
-//    }
 		else if (child.toElement().tagName() == "activeView")
 		{
 			activeViewString = child.toElement().text();
-			//set active view after all viewgroups are properly set up
-			//if(!activeViewString.isEmpty())
-			//this->setActiveView(getViewWrapper(activeViewString.toStdString()));
 		}
 		else if (child.toElement().tagName() == "clippedImage")
 		{
 			QString clippedImage = child.toElement().text();
-//			std::cout << "ClippedImage  " << clippedImage << std::endl;
 			mInteractiveClipper->setImage(dataManager()->getImage(clippedImage));
 		}
 		child = child.nextSibling();
@@ -465,7 +438,6 @@ void ViewManager::deactivateCurrentLayout()
 
 	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
 	{
-		std::cout << "clearing layout widget " << mLayoutWidgets[i] << std::endl;
 		if (mLayoutWidgets[i])
 			mLayoutWidgets[i]->clearViews();
 	}
@@ -475,7 +447,6 @@ void ViewManager::deactivateCurrentLayout()
 		mViewGroups[i]->removeViews();
 	}
 
-//	this->setStretchFactors(LayoutRegion(0, 0, 10, 10), 0);
 	this->setActiveView("");
 	mSlicePlanesProxy->clearViewports();
 }
@@ -484,10 +455,6 @@ void ViewManager::deactivateCurrentLayout()
  */
 void ViewManager::setActiveLayout(const QString& layout, int widgetIndex)
 {
-//	if (mActiveLayout.size() >= widgetIndex)
-//	{
-//		mActiveLayout.resize(widgetIndex+1);
-//	}
 	SSC_ASSERT(mActiveLayout.size() > widgetIndex);
 
 	if (mActiveLayout[widgetIndex] == layout)
@@ -495,12 +462,12 @@ void ViewManager::setActiveLayout(const QString& layout, int widgetIndex)
 
 	mActiveLayout[widgetIndex] = layout;
 
-//	std::cout << "ViewManager::setActiveLayout " << layout << std::endl;
 	this->rebuildLayouts();
 
 	emit activeLayoutChanged();
 
-	messageManager()->sendInfo("Layout changed to " + this->getLayoutData(mActiveLayout.join(", ")).getName());
+	QString layoutName = this->getLayoutData(layout).getName();
+	messageManager()->sendInfo(QString("Layout %1 changed to %2").arg(widgetIndex).arg(layoutName));
 }
 
 void ViewManager::rebuildLayouts()
@@ -513,10 +480,6 @@ void ViewManager::rebuildLayouts()
 		if (!next.getUid().isEmpty())
 			this->activateViews(mLayoutWidgets[i], next);
 	}
-
-//	LayoutData secondary = this->getLayoutData(mSecondaryActiveLayout);
-//	if (!secondary.getUid().isEmpty())
-//		this->activateViews(mLayoutWidgets[1], secondary);
 
 	// Set the same proxy in all wrappers, but stop adding after the
 	// first group with 2D views are found.
@@ -534,15 +497,6 @@ void ViewManager::rebuildLayouts()
 			break;
 	}
 }
-
-//void ViewManager::setSecondaryLayout(QString layout)
-//{
-//	mSecondaryActiveLayout = layout;
-
-//	QString current = mActiveLayout;
-//	mActiveLayout = "";
-//	this->setActiveLayout(current, 0);
-//}
 
 void ViewManager::activateViews(LayoutWidget *widget, LayoutData next)
 {
