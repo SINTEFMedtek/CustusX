@@ -26,6 +26,10 @@ LayoutWidget::LayoutWidget()
 	mLayout->setSpacing(2);
 	mLayout->setMargin(4);
 	this->setLayout(mLayout);
+
+	mViewCache2D.reset(new ViewCache<ViewWidget>(this,	"View2D"));
+	mViewCache3D.reset(new ViewCache<ViewWidget>(this, "View3D"));
+	mViewCacheRT.reset(new ViewCache<ViewWidget>(this, "ViewRT"));
 }
 
 LayoutWidget::~LayoutWidget()
@@ -56,6 +60,10 @@ void LayoutWidget::addView(ViewWidget* view, LayoutRegion region)
 
 void LayoutWidget::clearViews()
 {
+	mViewCache2D->clearUsedViews();
+	mViewCache3D->clearUsedViews();
+	mViewCacheRT->clearUsedViews();
+
 	for (unsigned i=0; i<mViews.size(); ++i)
 	{
 		mViews[i]->hide();

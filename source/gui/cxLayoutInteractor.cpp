@@ -22,6 +22,7 @@
 #include "boost/bind.hpp"
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
+#include <QVBoxLayout>
 
 namespace cx
 {

@@ -10,6 +10,7 @@
 #include "sscToolManager.h"
 #include "cxViewManager.h"
 #include "sscTime.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {

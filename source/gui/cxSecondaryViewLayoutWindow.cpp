@@ -18,6 +18,7 @@
 #include "sscLogger.h"
 #include <QApplication>
 #include <QDesktopWidget>
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -74,7 +75,8 @@ void SecondaryViewLayoutWindow::tryShowOnSecondaryScreen()
 
 void SecondaryViewLayoutWindow::showEvent(QShowEvent* event)
 {
-	viewManager()->setActiveLayout("LAYOUT_OBLIQUE_3DAnyDual_x1", 1);
+	viewManager()->setActiveLayout("LAYOUT_3D", 1);
+//	viewManager()->setActiveLayout("LAYOUT_OBLIQUE_3DAnyDual_x1", 1);
 	this->setCentralWidget(viewManager()->getLayoutWidget(1));
 }
 

@@ -26,6 +26,8 @@
 #include "vtkSmartPointer.h"
 #include "cxViewManager.h"
 #include "sscView.h"
+#include <QDomNode>
+#include "sscTypeConversions.h"
 
 namespace cx
 {
