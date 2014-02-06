@@ -618,7 +618,8 @@ void MainWindow::onWorkflowStateChangedSlot()
 	for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter != mDockWidgets.end(); ++iter)
 		(*iter)->hide();
 
-	viewManager()->setActiveLayout(desktop.mLayoutUid);
+	viewManager()->setActiveLayout(desktop.mLayoutUid, 0);
+	viewManager()->setActiveLayout(desktop.mSecondaryLayoutUid, 1);
 	this->restoreState(desktop.mMainWindowState);
 	patientService()->getPatientData()->autoSave();
 }
@@ -627,7 +628,8 @@ void MainWindow::saveDesktopSlot()
 {
 	Desktop desktop;
 	desktop.mMainWindowState = this->saveState();
-	desktop.mLayoutUid = viewManager()->getActiveLayout();
+	desktop.mLayoutUid = viewManager()->getActiveLayout(0);
+	desktop.mSecondaryLayoutUid = viewManager()->getActiveLayout(1);
 	stateService()->saveDesktop(desktop);
 }
 
@@ -648,40 +650,7 @@ void MainWindow::showSecondaryViewLayoutWindowActionSlot()
 {
 	if (!mSecondaryViewLayoutWindow)
 		mSecondaryViewLayoutWindow = new SecondaryViewLayoutWindow(this);
-
-//	QDesktopWidget* desktop = QApplication::desktop();
-//	SSC_ASSERT(desktop);
-//	print(QString("def screen:"), desktop->screenGeometry());
-//	print(QString("screen 0:"), desktop->screenGeometry(0));
-
-//	mSecondaryViewLayoutWindow->show();
 	mSecondaryViewLayoutWindow->tryShowOnSecondaryScreen();
-
-//	if (desktop->screenCount()>1)
-//	{
-//		print(QString("screen 1:"), desktop->screenGeometry(1));
-//		int bestScreen = 1;
-//		for (int i=2; i<desktop->screenCount(); ++i)
-//		{
-//			print(QString("screen %1:").arg(i), desktop->screenGeometry(i));
-//			QRect last = desktop->screenGeometry(bestScreen);
-//			QRect current = desktop->screenGeometry(i);
-//			if (current.height()*current.width() < last.height()*last.width())
-//				bestScreen = i;
-//		}
-
-//		std::cout << "Displaying secondary view layout on screen " << bestScreen << std::endl;
-//		QRect rect = desktop->screenGeometry(bestScreen);
-//		print(QString("using rect:"), rect);
-//		 mSecondaryViewLayoutWindow->setGeometry(rect);
-
-//		 QRect rect = desktop->screenGeometry(1);
-//		 move(rect.topLeft());
-//		 setWindowState(Qt::WindowFullScreen);
-
-//		 //mSecondaryViewLayoutWindow->setWindowState(mSecondaryViewLayoutWindow->windowState() | Qt::WindowFullScreen);
-//	}
-
 }
 
 void MainWindow::loadPatientFileSlot()

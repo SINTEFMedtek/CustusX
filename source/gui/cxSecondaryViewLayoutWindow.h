@@ -47,6 +47,8 @@ protected:
 	virtual void hideEvent(QCloseEvent* event);
 	virtual void closeEvent(QCloseEvent *event);
 private:
+	QString toString(QRect r) const;
+	int findSmallestSecondaryScreen();
 };
 
 } // namespace cx

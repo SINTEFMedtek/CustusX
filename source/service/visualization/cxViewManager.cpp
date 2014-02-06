@@ -122,11 +122,11 @@ void ViewManager::initialize()
 	mCameraStyle.reset(new CameraStyle()); // uses the global viewmanager() instance - must be created after creation of this.
 
 	mActiveLayout = QStringList() << "" << "";
-	mLayoutWidgets.resize(mActiveLayout.size());
-	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
-	{
-		mLayoutWidgets[i] = new LayoutWidget;
-	}
+	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
+//	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
+//	{
+//		mLayoutWidgets[i] = new LayoutWidget;
+//	}
 
 	mInteractiveCropper.reset(new InteractiveCropper());
 	mInteractiveClipper.reset(new InteractiveClipper());
@@ -148,6 +148,11 @@ void ViewManager::initialize()
 QWidget *ViewManager::getLayoutWidget(int index)
 {
 	SSC_ASSERT(index < mLayoutWidgets.size());
+	if (!mLayoutWidgets[index])
+	{
+		mLayoutWidgets[index] = new LayoutWidget;
+		this->rebuildLayouts();
+	}
 	return mLayoutWidgets[index];
 }
 
@@ -468,7 +473,7 @@ void ViewManager::rebuildLayouts()
 	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
 	{
 		LayoutData next = this->getLayoutData(mActiveLayout[i]);
-		if (!next.getUid().isEmpty())
+		if (mLayoutWidgets[i] && !next.getUid().isEmpty())
 			this->activateViews(mLayoutWidgets[i], next);
 	}
 

@@ -19,6 +19,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include "sscTypeConversions.h"
+#include "sscMessageManager.h"
 
 namespace cx
 {
@@ -38,46 +39,61 @@ void print(QString header, QRect r)
 	std::cout << header << "  (" << r.left() << ", " << r.top() << ", " << r.width() << ", " << r.height() << ")"<< std::endl;
 }
 
+QString SecondaryViewLayoutWindow::toString(QRect r) const
+{
+	return QString("%1, %2, %3, %4").arg(r.left()).arg(r.top()).arg(r.width()).arg(r.height());
+}
+
 void SecondaryViewLayoutWindow::tryShowOnSecondaryScreen()
 {
-	QDesktopWidget* desktop = QApplication::desktop();
-	SSC_ASSERT(desktop);
-	print(QString("def screen:"), desktop->screenGeometry());
-	print(QString("screen 0:"), desktop->screenGeometry(0));
-
 	this->show();
 
-	if (desktop->screenCount()>1)
+	int bestScreen = this->findSmallestSecondaryScreen();
+
+	QDesktopWidget* desktop = QApplication::desktop();
+
+	if (desktop->primaryScreen()==bestScreen)
 	{
-		print(QString("screen 1:"), desktop->screenGeometry(1));
-		int bestScreen = 1;
-		for (int i=2; i<desktop->screenCount(); ++i)
-		{
-			print(QString("screen %1:").arg(i), desktop->screenGeometry(i));
-			QRect last = desktop->screenGeometry(bestScreen);
-			QRect current = desktop->screenGeometry(i);
-			if (current.height()*current.width() < last.height()*last.width())
-				bestScreen = i;
-		}
-
-		std::cout << "Displaying secondary view layout on screen " << bestScreen << std::endl;
-		QRect rect = desktop->screenGeometry(bestScreen);
-		print(QString("using rect:"), rect);
-		this->setGeometry(rect);
-
-//		QRect rect = desktop->screenGeometry(1);
-//		move(rect.topLeft());
-//		setWindowState(Qt::WindowFullScreen);
-
-		//mSecondaryViewLayoutWindow->setWindowState(mSecondaryViewLayoutWindow->windowState() | Qt::WindowFullScreen);
+		messageManager()->sendInfo(QString("No secondary screen found. Displaying secondary view layout on primary screen."));
 	}
+	else
+	{
+		QRect rect = desktop->screenGeometry(bestScreen);
+		messageManager()->sendInfo(QString("Displaying secondary view layout on fullscreen %1 of %2, size=[%3]")
+								   .arg(bestScreen+1)
+								   .arg(desktop->screenCount())
+								   .arg(this->toString(rect)));
+		this->setGeometry(rect);
+		this->move(rect.topLeft());
+		this->setWindowState(this->windowState() | Qt::WindowFullScreen);
+	}
+}
+
+int SecondaryViewLayoutWindow::findSmallestSecondaryScreen()
+{
+	QDesktopWidget* desktop = QApplication::desktop();
+
+	int best = 0;
+	for (int i=1; i<desktop->screenCount(); ++i)
+	{
+		if (desktop->primaryScreen()==i)
+			continue;
+		QRect last = desktop->screenGeometry(best);
+		QRect current = desktop->screenGeometry(i);
+		if (current.height()*current.width() < last.height()*last.width())
+			best = i;
+		if (desktop->primaryScreen()==best)
+			best = i;
+	}
+
+	return best;
 }
 
 void SecondaryViewLayoutWindow::showEvent(QShowEvent* event)
 {
-	viewManager()->setActiveLayout("LAYOUT_3D", 1);
-//	viewManager()->setActiveLayout("LAYOUT_OBLIQUE_3DAnyDual_x1", 1);
 	this->setCentralWidget(viewManager()->getLayoutWidget(1));
+	if (viewManager()->getActiveLayout(1).isEmpty())
+		viewManager()->setActiveLayout("LAYOUT_OBLIQUE_3DAnyDual_x1", 1);
 }
 
 void SecondaryViewLayoutWindow::hideEvent(QCloseEvent* event)

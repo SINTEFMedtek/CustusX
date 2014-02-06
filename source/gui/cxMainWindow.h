@@ -6,6 +6,7 @@
 #include <set>
 #include "boost/shared_ptr.hpp"
 #include "cxPluginBase.h"
+#include <QPointer>
 
 class QAction;
 class QMenu;
@@ -182,8 +183,8 @@ private:
 	QString mLastImportDataFolder;
 
 	//widgets
-	class SecondaryMainWindow* mControlPanel;
-	class SecondaryViewLayoutWindow* mSecondaryViewLayoutWindow;
+	QPointer<class SecondaryMainWindow> mControlPanel;
+	QPointer<class SecondaryViewLayoutWindow> mSecondaryViewLayoutWindow;
 
 	//Preferences
 	CameraControlPtr mCameraControl;
