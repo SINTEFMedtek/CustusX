@@ -17,6 +17,8 @@
 
 #include "sscView.h"
 #include "cxLayoutData.h"
+#include "cxViewCache.h"
+
 class QGridLayout;
 
 namespace cx
@@ -40,6 +42,10 @@ public:
 	void setStretchFactors(LayoutRegion region, int stretchFactor);
 	void addView(ViewWidget* view, LayoutRegion region);
 	void clearViews();
+
+	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache2D;
+	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache3D;
+	boost::shared_ptr<ViewCache<ViewWidget> > mViewCacheRT;
 
 private:
 	QGridLayout* mLayout; ///< the layout

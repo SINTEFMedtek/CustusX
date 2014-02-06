@@ -128,9 +128,9 @@ void ViewManager::initialize()
 		mLayoutWidgets[i] = new LayoutWidget;
 	}
 
-	mViewCache2D.reset(new ViewCache<ViewWidget>(mLayoutWidgets[0],	"View2D"));
-	mViewCache3D.reset(new ViewCache<ViewWidget>(mLayoutWidgets[0], "View3D"));
-	mViewCacheRT.reset(new ViewCache<ViewWidget>(mLayoutWidgets[0], "ViewRT"));
+//	mViewCache2D.reset(new ViewCache<ViewWidget>(mLayoutWidgets[0],	"View2D"));
+//	mViewCache3D.reset(new ViewCache<ViewWidget>(mLayoutWidgets[0], "View3D"));
+//	mViewCacheRT.reset(new ViewCache<ViewWidget>(mLayoutWidgets[0], "ViewRT"));
 
 	mInteractiveCropper.reset(new InteractiveCropper());
 	mInteractiveClipper.reset(new InteractiveClipper());
@@ -430,9 +430,9 @@ ViewWidgetQPtr ViewManager::get3DView(int group, int index)
  */
 void ViewManager::deactivateCurrentLayout()
 {
-	mViewCache2D->clearUsedViews();
-	mViewCache3D->clearUsedViews();
-	mViewCacheRT->clearUsedViews();
+//	mViewCache2D->clearUsedViews();
+//	mViewCache3D->clearUsedViews();
+//	mViewCacheRT->clearUsedViews();
 	mViewMap.clear();
 
 	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
@@ -475,9 +475,6 @@ void ViewManager::rebuildLayouts()
 
 	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
 	{
-		if (i>0)
-			continue; // HACK: remove second layout
-
 		LayoutData next = this->getLayoutData(mActiveLayout[i]);
 		if (!next.getUid().isEmpty())
 			this->activateViews(mLayoutWidgets[i], next);
@@ -551,7 +548,7 @@ void ViewManager::activateView(LayoutWidget* widget, ViewWrapperPtr wrapper, int
 
 void ViewManager::activate2DView(LayoutWidget* widget, int group, PLANE_TYPE plane, LayoutRegion region)
 {
-	ViewWidget* view = mViewCache2D->retrieveView();
+	ViewWidget* view = widget->mViewCache2D->retrieveView();
 	view->setType(View::VIEW_2D);
 
 	ViewWrapper2DPtr wrapper(new ViewWrapper2D(view));
@@ -561,7 +558,7 @@ void ViewManager::activate2DView(LayoutWidget* widget, int group, PLANE_TYPE pla
 
 void ViewManager::activate3DView(LayoutWidget* widget, int group, LayoutRegion region)
 {
-	ViewWidget* view = mViewCache3D->retrieveView();
+	ViewWidget* view = widget->mViewCache3D->retrieveView();
 	view->setType(View::VIEW_3D);
 	ViewWrapper3DPtr wrapper(new ViewWrapper3D(group + 1, view));
 	if (group == 0)
@@ -574,7 +571,7 @@ void ViewManager::activate3DView(LayoutWidget* widget, int group, LayoutRegion r
 
 void ViewManager::activateRTStreamView(LayoutWidget *widget, int group, LayoutRegion region)
 {
-	ViewWidget* view = mViewCacheRT->retrieveView();
+	ViewWidget* view = widget->mViewCacheRT->retrieveView();
 	view->setType(View::VIEW_REAL_TIME);
 	ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view));
 	this->activateView(widget, wrapper, group, region);

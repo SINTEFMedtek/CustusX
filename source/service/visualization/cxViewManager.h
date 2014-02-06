@@ -22,7 +22,7 @@
 #include "sscData.h"
 #include "sscDefinitions.h"
 #include "cxForwardDeclarations.h"
-#include "cxViewCache.h"
+//#include "cxViewCache.h"
 
 
 class QActionGroup;
@@ -244,9 +244,9 @@ protected:
 	bool mSmartRender; ///< use ViewWidget::render()
 	bool mModified; ///< Modified flag tells renderAllViewsSlot() that the views must be updated
 
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache2D;
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache3D;
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCacheRT;
+//	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache2D;
+//	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache3D;
+//	boost::shared_ptr<ViewCache<ViewWidget> > mViewCacheRT;
 	InteractiveClipperPtr mInteractiveClipper;
 	InteractiveCropperPtr mInteractiveCropper;
 	SlicePlanesProxyPtr mSlicePlanesProxy;
