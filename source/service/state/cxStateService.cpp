@@ -111,6 +111,7 @@ public:
 		}
 		retval.mMainWindowState = QByteArray::fromBase64(desktopElement.attribute("mainwindowstate").toAscii());
 		retval.mLayoutUid = desktopElement.attribute("layoutuid");
+		retval.mSecondaryLayoutUid = desktopElement.attribute("secondarylayoutuid");
 
 		return retval;
 	}
@@ -121,6 +122,7 @@ public:
 						mXmlFile.descend(applicationName).descend("workflows").descend(workflowName).descend("custom").getElement();
 		desktopElement.setAttribute("mainwindowstate", QString(desktop.mMainWindowState.toBase64()));
 		desktopElement.setAttribute("layoutuid", desktop.mLayoutUid);
+		desktopElement.setAttribute("secondarylayoutuid", desktop.mSecondaryLayoutUid);
 		mXmlFile.save();
 	}
 
@@ -388,20 +390,23 @@ void StateService::initialize()
 Desktop StateService::getActiveDesktop()
 {
 	ApplicationsParser parser;
-	return parser.getDesktop(mApplicationStateMachine->getActiveUidState(), mWorkflowStateMachine->getActiveUidState());
+	return parser.getDesktop(mApplicationStateMachine->getActiveUidState(),
+							 mWorkflowStateMachine->getActiveUidState());
 }
 
 void StateService::saveDesktop(Desktop desktop)
 {
 	ApplicationsParser parser;
-	parser.setDesktop(mApplicationStateMachine->getActiveUidState(), mWorkflowStateMachine->getActiveUidState(),
-					desktop);
+	parser.setDesktop(mApplicationStateMachine->getActiveUidState(),
+					  mWorkflowStateMachine->getActiveUidState(),
+					  desktop);
 }
 
 void StateService::resetDesktop()
 {
 	ApplicationsParser parser;
-	parser.resetDesktop(mApplicationStateMachine->getActiveUidState(), mWorkflowStateMachine->getActiveUidState());
+	parser.resetDesktop(mApplicationStateMachine->getActiveUidState(),
+						mWorkflowStateMachine->getActiveUidState());
 }
 
 } //namespace cx
