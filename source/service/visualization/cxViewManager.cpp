@@ -128,10 +128,6 @@ void ViewManager::initialize()
 		mLayoutWidgets[i] = new LayoutWidget;
 	}
 
-//	mViewCache2D.reset(new ViewCache<ViewWidget>(mLayoutWidgets[0],	"View2D"));
-//	mViewCache3D.reset(new ViewCache<ViewWidget>(mLayoutWidgets[0], "View3D"));
-//	mViewCacheRT.reset(new ViewCache<ViewWidget>(mLayoutWidgets[0], "ViewRT"));
-
 	mInteractiveCropper.reset(new InteractiveCropper());
 	mInteractiveClipper.reset(new InteractiveClipper());
 	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
@@ -417,7 +413,6 @@ ViewWidgetQPtr ViewManager::get3DView(int group, int index)
 	{
 		if(!views[i])
 			continue;
-//		ViewWidgetQPtr retval = views[i].data();
 		if (views[i]->getType()!=View::VIEW_3D)
 			continue;
 		if (index == count++)
@@ -430,9 +425,6 @@ ViewWidgetQPtr ViewManager::get3DView(int group, int index)
  */
 void ViewManager::deactivateCurrentLayout()
 {
-//	mViewCache2D->clearUsedViews();
-//	mViewCache3D->clearUsedViews();
-//	mViewCacheRT->clearUsedViews();
 	mViewMap.clear();
 
 	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
