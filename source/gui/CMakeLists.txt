@@ -54,7 +54,6 @@ cx_add_class_qt_moc(cxGui_SRCS
 	preferencesWidgets/cxToolListWidget
 	preferencesWidgets/cxToolConfigureWidget
 	preferencesWidgets/cxLayoutEditorWidget
-	preferencesWidgets/cxLayoutEditorTab
 	preferencesWidgets/cxGeneralTab
 	preferencesWidgets/cxPreferenceTab
     #----------------------
