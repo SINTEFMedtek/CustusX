@@ -10,7 +10,8 @@
 namespace cx
 {
 
-Branch::Branch()
+Branch::Branch() :
+	parentBranch(NULL)
 {
 	// TODO Auto-generated constructor stub
 

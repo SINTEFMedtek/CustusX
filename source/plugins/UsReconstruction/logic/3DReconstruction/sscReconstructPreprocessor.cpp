@@ -39,7 +39,8 @@
 namespace cx
 {
 
-ReconstructPreprocessor::ReconstructPreprocessor()
+ReconstructPreprocessor::ReconstructPreprocessor() :
+	mInput(ReconstructCore::InputParams())
 {
 	mMaxTimeDiff = 100; // TODO: Change default value for max allowed time difference between tracking and image time tags
 }
