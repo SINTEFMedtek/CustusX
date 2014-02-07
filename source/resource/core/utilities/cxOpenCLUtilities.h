@@ -1,16 +1,9 @@
 #ifndef CXOPENCLUTILITIES_H_
 #define CXOPENCLUTILITIES_H_
 
-#ifdef SSC_USE_OpenCL
-
 #define __CL_ENABLE_EXCEPTIONS //telling the opencl c++ wrapper to throw exceptions
 
-#if defined(__APPLE__) || defined(__MACOSX)
-    #include "OpenCL/cl.hpp"
-#else
-    #include "CL/cl.hpp"
-#endif
-
+#include "OpenCLManager.hpp"
 #include <string>
 
 class QString;
@@ -84,5 +77,4 @@ public:
 }
 
 }
-#endif //SSC_USE_OpenCL
 #endif /* CXOPENCLUTILITIES_H_ */

@@ -26,11 +26,13 @@ cx_add_class_qt_moc(cxVisualizationService_SOURCE
     cxViewGroupData
     cxAxisConnector
 	cxLayoutWidget
+	cxRenderLoop
     )
 
 cx_add_class(cxVisualizationService_SOURCE
     cxLayoutData
-    )
+	cxLayoutRepository
+	)
 
 include_directories(
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}

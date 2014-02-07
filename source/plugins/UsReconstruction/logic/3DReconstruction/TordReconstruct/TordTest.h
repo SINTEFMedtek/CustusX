@@ -4,7 +4,6 @@
 
 #define __CL_ENABLE_EXCEPTIONS //telling the opencl c++ wrapper to throw exceptions
 
-
 #include "sscReconstructAlgorithm.h"
 #include "cxOpenCLUtilities.h"
 #include <sscUSFrameData.h>
