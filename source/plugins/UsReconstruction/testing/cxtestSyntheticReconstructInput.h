@@ -66,7 +66,6 @@ private:
 												int steps);
 
 	cx::cxSyntheticVolumePtr mPhantom;
-	bool mVerbose;
 
 	// setup parameters
 	cx::Vector3D mBounds;
