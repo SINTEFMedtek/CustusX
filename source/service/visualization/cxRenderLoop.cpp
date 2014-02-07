@@ -68,12 +68,12 @@ void RenderLoop::sendRenderIntervalToTimer(int interval)
 
 void RenderLoop::clearViews()
 {
-	mViewMap.clear();
+	mViews.clear();
 }
 
 void RenderLoop::addView(ViewWidget* view)
 {
-	mViewMap[view->getUid()] = view;
+	mViews.insert(view);
 }
 
 void RenderLoop::timeoutSlot()
@@ -106,9 +106,9 @@ void RenderLoop::renderViews()
 {
 	bool smart = this->pollForSmartRenderingThisCycle();
 
-	for (ViewMap::iterator iter = mViewMap.begin(); iter != mViewMap.end(); ++iter)
+	for (ViewWidgetSet::iterator iter = mViews.begin(); iter != mViews.end(); ++iter)
 	{
-		ViewWidget* current = iter->second;
+		ViewWidget* current = *iter;
 		if (current->isVisible())
 		{
 			if (smart)
