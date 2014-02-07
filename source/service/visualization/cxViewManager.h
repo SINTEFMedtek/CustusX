@@ -22,8 +22,6 @@
 #include "sscData.h"
 #include "sscDefinitions.h"
 #include "cxForwardDeclarations.h"
-#include "cxViewCache.h"
-
 
 class QActionGroup;
 class QAction;
@@ -100,8 +98,6 @@ typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
  */
 class ViewManager: public QObject
 {
-//	typedef std::map<QString, ViewWidget*> View2DMap;
-//	typedef std::map<QString, ViewWidget*> View3DMap;
 	typedef std::map<QString, ViewWidget*> ViewMap;
 
 Q_OBJECT
@@ -110,14 +106,11 @@ public:
 	ViewWidgetQPtr get3DView(int group = 0, int index = 0);
 	std::vector<ViewGroupPtr> getViewGroups() { return mViewGroups; }
 
-//  void fillModelTree(TreeItemPtr root);
-
 	LayoutData getLayoutData(const QString uid) const; ///< get data for given layout
 	std::vector<QString> getAvailableLayouts() const; ///< get uids of all defined layouts
 	void setLayoutData(const LayoutData& data); ///< add or edit a layout
 	QString generateLayoutUid() const; ///< return an uid not used in present layouts.
 	void deleteLayoutData(const QString uid);
-	QActionGroup* createLayoutActionGroup();
 	QActionGroup* createInteractorStyleActionGroup();
 	bool isCustomLayout(const QString& uid) const;
 
@@ -133,14 +126,13 @@ public:
 
 	void setRegistrationMode(REGISTRATION_STATUS mode);
 
-	QString getActiveLayout() const; ///< returns the active layout
-	void setActiveLayout(const QString& uid); ///< change the layout
-	void setSecondaryLayout(QString layout);
+	QString getActiveLayout(int widgetIndex=0) const; ///< returns the active layout
+	void setActiveLayout(const QString& uid, int widgetIndex=0); ///< change the layout
 
 	ViewWrapperPtr getActiveView() const; ///< returns the active view
 	int getActiveViewGroup() const;
-	//void setActiveView(ViewWrapperPtr view); ///< change the active view
 	void setActiveView(QString viewUid); ///< convenient function for setting the active view
+	void storeLayoutData(const LayoutData& data);
 
 	void setGlobal2DZoom(bool global); ///< enable/disable global 2d zooming
 	bool getGlobal2DZoom(); ///< find out if global 2D zooming is enable
@@ -165,13 +157,8 @@ signals:
 	void activeLayoutChanged(); ///< emitted when the active layout changes
 	void activeViewChanged(); ///< emitted when the active view changes
 
-public slots:
-//  void renderingIntervalChangedSlot(int interval); ///< Sets the rendering interval timer
-
 protected slots:
 	void renderAllViewsSlot(); ///< renders all views
-	void setLayoutActionSlot();
-//	void setInteractionStyleActionSlot();
 	void settingsChangedSlot(QString key);
 
 	void clearSlot();
@@ -191,11 +178,8 @@ protected:
 	ViewMap get3DViews(); ///< returns all possible 3D views
 
 	ViewWidget* getView(const QString& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
-//	View2D* get2DView(const QString& uid); ///< returns a 2D view with a given uid
-//	View3D* get3DView(const QString& uid); ///< returns a 3D view with a given uid
 
 	void syncOrientationMode(SyncedValuePtr val);
-//	void setStretchFactors(LayoutRegion region, int stretchFactor);
 
 	void activateView(LayoutWidget* widget, ViewWrapperPtr wrapper, int group, LayoutRegion region);
 	void activate2DView(LayoutWidget *widget, int group, PLANE_TYPE plane, LayoutRegion region);
@@ -204,15 +188,13 @@ protected:
 	void addDefaultLayouts();
 	unsigned findLayoutData(const QString uid) const;
 	void addDefaultLayout(LayoutData data);
-	QAction* addLayoutAction(QString layout, QActionGroup* group);
 	void setRenderingInterval(int interval);
 
-//	void addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QIcon icon,
-//					QString helptext);
 	void loadGlobalSettings();
 	void saveGlobalSettings();
 	void updateViews();
 	void activateViews(LayoutWidget *widget, LayoutData next);
+	void rebuildLayouts();
 
 	static ViewManager* mTheInstance; ///< the only instance of this class
 
@@ -220,11 +202,8 @@ protected:
 	LayoutDataVector mLayouts;
 	std::vector<QString> mDefaultLayouts;
 
-	QString mActiveLayout; ///< the active layout (type)
-	QString mSecondaryActiveLayout; ///< additional layout used for secondary screen.
-//	QGridLayout* mLayout; ///< the layout
-//	QPointer<QWidget> mMainWindowsCentralWidget; ///< should not be used after stealCentralWidget has been called, because then MainWindow owns it!!!
 	std::vector<QPointer<LayoutWidget> > mLayoutWidgets;
+	QStringList mActiveLayout; ///< the active layout (type)
 
 	QString mActiveView; ///< the active view
 	ViewMap mViewMap; ///< a map of all the views
@@ -243,9 +222,6 @@ protected:
 	bool mSmartRender; ///< use ViewWidget::render()
 	bool mModified; ///< Modified flag tells renderAllViewsSlot() that the views must be updated
 
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache2D;
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache3D;
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCacheRT;
 	InteractiveClipperPtr mInteractiveClipper;
 	InteractiveCropperPtr mInteractiveCropper;
 	SlicePlanesProxyPtr mSlicePlanesProxy;

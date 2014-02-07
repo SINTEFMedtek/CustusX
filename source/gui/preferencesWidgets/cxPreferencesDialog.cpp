@@ -20,7 +20,6 @@
 #include "cxToolConfigureWidget.h"
 #include "cxToolFilterWidget.h"
 #include "cxColorSelectButton.h"
-#include "cxLayoutEditorTab.h"
 #include "cxViewWrapper3D.h"
 #include "sscHelperWidgets.h"
 #include "cxApplicationStateMachine.h"
@@ -449,7 +448,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
   this->addTab(new VisualizationTab, tr("Visualization"));
   this->addTab(new VideoTab, tr("Video"));
   this->addTab(new ToolConfigTab, tr("Tool Configuration"));
-  this->addTab(new LayoutEditorTab, tr("Layout editor"));
   this->addTab(new DebugTab, tr("Debug"));
 
   QPushButton* applyButton = mButtonBox->button(QDialogButtonBox::Apply);
