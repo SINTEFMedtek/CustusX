@@ -184,6 +184,7 @@ protected:
 	void activate3DView(LayoutWidget *widget, int group, LayoutRegion region);
 	void activateRTStreamView(LayoutWidget *widget, int group, LayoutRegion region);
 	void setRenderingInterval(int interval);
+	void setSlicePlanesProxyInViewsUpTo2DViewgroup();
 
 	void loadGlobalSettings();
 	void saveGlobalSettings();
