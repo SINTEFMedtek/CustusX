@@ -18,7 +18,7 @@
 #include "sscMessageManager.h"
 #include "sscVector3D.h"
 #include "cxImageSenderFactory.h"
-#include "cxRenderTimer.h"
+#include "cxCyclicActionLogger.h"
 #include "cxDirectlyLinkedSender.h"
 #include "cxSimulatedImageStreamer.h"
 #include "cxToolManager.h"

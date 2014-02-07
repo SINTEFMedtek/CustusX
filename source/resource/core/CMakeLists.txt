@@ -100,7 +100,7 @@ cx_add_class(cxResource_SOURCE
 	
 	utilities/sscXmlOptionItem
 	utilities/sscDoubleRange.h
-	utilities/cxRenderTimer
+	utilities/cxCyclicActionLogger
 	utilities/cxTransformFile
 	utilities/cxPlaybackTime
 	utilities/cxProcessWrapper
