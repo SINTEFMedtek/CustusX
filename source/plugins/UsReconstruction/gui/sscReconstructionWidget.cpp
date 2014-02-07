@@ -35,6 +35,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructManagerPt
 	mFileSelectWidget = new FileSelectWidget(this);
 	connect(mFileSelectWidget, SIGNAL(fileSelected(QString)), this, SLOT(selectData(QString)));
 	mFileSelectWidget->setNameFilter(QStringList() << "*.fts");
+	connect(mReconstructer.get(), SIGNAL(newInputDataAvailable(QString)), mFileSelectWidget, SLOT(refresh()));
 
 	QHBoxLayout* extentLayout = new QHBoxLayout;
 	mExtentLineEdit = new QLineEdit(this);
