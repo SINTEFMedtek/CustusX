@@ -24,7 +24,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkImageData.h>
 #include "cxViewWrapper2D.h"
-#include "sscGLHelpers.h"
+//#include "sscGLHelpers.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "cxLayoutData.h"
@@ -50,8 +50,9 @@
 #include "cxInteractiveClipper.h"
 #include "sscImage.h"
 #include "cxCameraStyle.h"
-#include "cxRenderTimer.h"
+#include "cxCyclicActionLogger.h"
 #include "cxLayoutWidget.h"
+#include "cxRenderLoop.h"
 
 #include "sscLogger.h"
 
@@ -84,12 +85,13 @@ void ViewManager::destroyInstance()
 }
 
 ViewManager::ViewManager() :
-				mRenderingTimer(NULL),
 				mGlobal2DZoom(true),
-				mGlobalObliqueOrientation(false),
-				mModified(false)
+				mGlobalObliqueOrientation(false)
 {
-	mRenderTimer.reset(new CyclicActionTimer("Main Render timer"));
+	mRenderLoop.reset(new RenderLoop());
+	connect(mRenderLoop.get(), SIGNAL(preRender()), this, SLOT(updateViews()));
+	connect(mRenderLoop.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int)));
+
 	mSlicePlanesProxy.reset(new SlicePlanesProxy());
 
 	connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
@@ -99,7 +101,7 @@ ViewManager::ViewManager() :
 	this->addDefaultLayouts();
 	this->loadGlobalSettings();
 
-	mSmartRender = settings()->value("smartRender", true).toBool();
+	mRenderLoop->setSmartRender(settings()->value("smartRender", true).toBool());
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 
 	const unsigned VIEW_GROUP_COUNT = 5; // set this to enough
@@ -116,30 +118,24 @@ ViewManager::~ViewManager()
 {
 }
 
-
 void ViewManager::initialize()
 {
 	mCameraStyle.reset(new CameraStyle()); // uses the global viewmanager() instance - must be created after creation of this.
 
 	mActiveLayout = QStringList() << "" << "";
 	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
-//	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
-//	{
-//		mLayoutWidgets[i] = new LayoutWidget;
-//	}
 
 	mInteractiveCropper.reset(new InteractiveCropper());
 	mInteractiveClipper.reset(new InteractiveClipper());
 	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
-	connect(mInteractiveCropper.get(), SIGNAL(changed()), this, SLOT(setModifiedSlot()));
-	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(setModifiedSlot()));
+	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
+	connect(mInteractiveClipper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
 
 	// set start layout
 	this->setActiveLayout("LAYOUT_3D_ACS_SINGLE", 0);
 
-	mRenderingTimer = new QTimer(this);
-	this->setRenderingInterval(settings()->value("renderingInterval").toInt());
-	connect(mRenderingTimer, SIGNAL(timeout()), this, SLOT(renderAllViewsSlot()));
+	mRenderLoop->setRenderingInterval(settings()->value("renderingInterval").toInt());
+	mRenderLoop->start();
 
 	mGlobalZoom2DVal = SyncedValue::create(1);
 	this->setGlobal2DZoom(mGlobal2DZoom);
@@ -154,11 +150,6 @@ QWidget *ViewManager::getLayoutWidget(int index)
 		this->rebuildLayouts();
 	}
 	return mLayoutWidgets[index];
-}
-
-void ViewManager::setModifiedSlot()
-{
-	mModified = true;
 }
 
 void ViewManager::updateViews()
@@ -202,11 +193,11 @@ void ViewManager::settingsChangedSlot(QString key)
 {
 	if (key == "smartRender")
 	{
-		mSmartRender = settings()->value("smartRender", true).toBool();
+		mRenderLoop->setSmartRender(settings()->value("smartRender", true).toBool());
 	}
 	if (key == "renderingInterval")
 	{
-		this->setRenderingInterval(settings()->value("renderingInterval").toInt());
+		mRenderLoop->setRenderingInterval(settings()->value("renderingInterval").toInt());
 	}
 }
 
@@ -430,7 +421,7 @@ ViewWidgetQPtr ViewManager::get3DView(int group, int index)
  */
 void ViewManager::deactivateCurrentLayout()
 {
-	mViewMap.clear();
+	mRenderLoop->clearViews();
 
 	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
 	{
@@ -522,21 +513,13 @@ void ViewManager::activateViews(LayoutWidget *widget, LayoutData next)
 
 void ViewManager::setRenderingInterval(int interval)
 {
-	if (!mRenderingTimer)
-		return;
-    if (interval==mRenderingTimer->interval())
-        return;
-
-	mRenderingTimer->stop();
-	if (interval == 0)
-		interval = 30;
-	mRenderingTimer->start(interval);
+	mRenderLoop->setRenderingInterval(interval);
 }
 
 void ViewManager::activateView(LayoutWidget* widget, ViewWrapperPtr wrapper, int group, LayoutRegion region)
 {
 	ViewWidget* view = wrapper->getView();
-	mViewMap[view->getUid()] = view;
+	mRenderLoop->addView(view);
 	mViewGroups[group]->addView(wrapper);
 	widget->addView(view, region);
 
@@ -744,69 +727,6 @@ void ViewManager::addDefaultLayouts()
 	}
 }
 
-void ViewManager::renderAllViewsSlot()
-{
-	mRenderTimer->beginRender();
-    mLastBeginRender = QDateTime::currentDateTime();
-    this->setRenderingInterval(settings()->value("renderingInterval").toInt());
-
-    // updateViews() may be a bit expensive so we don't want to have it as a slot as previously
-    // Only set the mModified flag, and update the views here
-    if(mModified)
-    {
-        updateViews();
-        mModified = false;
-    }
-
-//    mRenderTimer->time("update");
-
-    // do a full render anyway at low rate. This is a convenience hack for rendering
-    // occational effects that the smart render is too dumb to see.
-    bool smart = mSmartRender;
-    int smartInterval = mRenderingTimer->interval() * 40;
-    if (mLastFullRender.time().msecsTo(QDateTime::currentDateTime().time()) > smartInterval)
-        smart = false;
-
-    for (ViewMap::iterator iter = mViewMap.begin(); iter != mViewMap.end(); ++iter)
-    {
-        if (iter->second->isVisible())
-        {
-            if (smart)
-                dynamic_cast<View*>(iter->second)->render(); // render only changed scenegraph (shaky but smooth)
-            else
-            {
-                iter->second->getRenderWindow()->Render(); // previous version: renders even when nothing is changed
-            }
-
-            report_gl_error_text(cstring_cast(QString("During rendering of view: ") + iter->first));
-        }
-    }
-
-    if (!smart)
-        mLastFullRender = QDateTime::currentDateTime();
-
-	mRenderTimer->time("render");
-
-	if (mRenderTimer->intervalPassed())
-	{
-		emit fps(mRenderTimer->getFPS());
-//        static int counter=0;
-//        if (++counter%3==0)
-//            messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
-        mRenderTimer->reset();
-	}
-//	std::cout << "==============================ViewManager::render" << std::endl;
-
-    // tests show that the application wait between renderings even if the rendering uses more time
-    // then the interval. This hack shortens the wait time between renderings but keeps below the
-    // input update rate at all times.
-    int usage = mLastBeginRender.msecsTo(QDateTime::currentDateTime()); // time spent in rendering
-    int leftover = std::max(0, mRenderingTimer->interval() - usage); // time left of the rendering interval
-    int timeToNext = std::max(1, leftover); // always wait at least 1ms - give others time to do stuff
-//    std::cout << QString("setting interval %1, usage is %2").arg(timeToNext).arg(usage) << std::endl;
-    this->setRenderingInterval(timeToNext);
-}
-
 LayoutData ViewManager::getLayoutData(const QString uid) const
 {
 	unsigned pos = this->findLayoutData(uid);
@@ -956,6 +876,11 @@ void ViewManager::autoShowData(DataPtr data)
 	{
 		this->getViewGroups()[0]->getData()->addDataSorted(data);
 	}
+}
+
+CyclicActionLoggerPtr ViewManager::getRenderTimer()
+{
+	return mRenderLoop->getRenderTimer();
 }
 
 

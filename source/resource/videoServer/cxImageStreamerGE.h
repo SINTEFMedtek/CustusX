@@ -12,7 +12,7 @@
 #include "igtlImageMessage.h"
 #include "cxImageSenderFactory.h"
 #include "cxIGTLinkImageMessage.h"
-#include "cxRenderTimer.h"
+#include "cxCyclicActionLogger.h"
 #include "GEStreamer.h"
 
 class QTimer;
@@ -63,7 +63,7 @@ private:
 	void printTimeIntervals();
 
 	QTimer* mGrabTimer;
-	CyclicActionTimerPtr mRenderTimer;
+	CyclicActionLoggerPtr mRenderTimer;
 
 	//The GE Connection code from ISB
 	data_streaming::GEStreamer mGEStreamer;
