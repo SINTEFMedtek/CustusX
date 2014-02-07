@@ -38,7 +38,8 @@ ToolMetricPtr ToolMetric::create(QDomNode node)
 }
 
 ToolMetric::ToolMetric(const QString& uid, const QString& name) :
-		cx::FrameMetricBase(uid, name)
+		cx::FrameMetricBase(uid, name),
+		mToolOffset(0.0)
 {
 }
 
