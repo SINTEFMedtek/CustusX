@@ -31,7 +31,8 @@ cx_add_class_qt_moc(cxVisualizationService_SOURCE
 
 cx_add_class(cxVisualizationService_SOURCE
     cxLayoutData
-    )
+	cxLayoutRepository
+	)
 
 include_directories(
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
