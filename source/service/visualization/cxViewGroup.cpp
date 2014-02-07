@@ -33,6 +33,7 @@
 #include "cxViewWrapper.h"
 #include "sscManualTool.h"
 #include "sscVolumeHelpers.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {

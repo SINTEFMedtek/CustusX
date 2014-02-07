@@ -24,6 +24,7 @@
 #include "sscVector3D.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#include "sscLogger.h"
 #ifdef check
 #undef check
 #endif
