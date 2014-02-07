@@ -42,6 +42,7 @@ typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
 typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
 typedef boost::shared_ptr<class RenderLoop> RenderLoopPtr;
+typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
 
 /**
  * \file
@@ -182,9 +183,6 @@ protected:
 	void activate2DView(LayoutWidget *widget, int group, PLANE_TYPE plane, LayoutRegion region);
 	void activate3DView(LayoutWidget *widget, int group, LayoutRegion region);
 	void activateRTStreamView(LayoutWidget *widget, int group, LayoutRegion region);
-	void addDefaultLayouts();
-	unsigned findLayoutData(const QString uid) const;
-	void addDefaultLayout(LayoutData data);
 	void setRenderingInterval(int interval);
 
 	void loadGlobalSettings();
@@ -194,9 +192,7 @@ protected:
 
 	static ViewManager* mTheInstance; ///< the only instance of this class
 
-	typedef std::vector<LayoutData> LayoutDataVector;
-	LayoutDataVector mLayouts;
-	std::vector<QString> mDefaultLayouts;
+	LayoutRepositoryPtr mLayoutRepository;
 	std::vector<QPointer<LayoutWidget> > mLayoutWidgets;
 	QStringList mActiveLayout; ///< the active layout (type)
 	QString mActiveView; ///< the active view
