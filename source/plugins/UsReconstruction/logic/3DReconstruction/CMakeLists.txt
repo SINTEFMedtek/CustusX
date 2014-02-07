@@ -34,6 +34,9 @@ SET( SOURCE_FILES
   sscReconstructCore.h
   sscReconstructPreprocessor.cpp
   sscReconstructPreprocessor.h
+	TordReconstruct/cxSyntheticVolume.h
+	TordReconstruct/cxSyntheticVolume.cpp
+	TordReconstruct/cxSimpleSyntheticVolume.h
       )
 
 # =========================================================
@@ -49,11 +52,8 @@ if (CX_USE_OPENCL_UTILITY)
 		)
 	SET( SOURCE_FILES
 		${SOURCE_FILES}
-		TordReconstruct/TordTest.cpp
-		TordReconstruct/cxSyntheticVolume.h
-		TordReconstruct/cxSyntheticVolume.cpp
-		TordReconstruct/cxSimpleSyntheticVolume.h
 		TordReconstruct/TordTest.h
+		TordReconstruct/TordTest.cpp
 		TordReconstruct/kernels.cl
 		cxOpenCLReconstruction.h
 		cxOpenCLReconstruction.cpp

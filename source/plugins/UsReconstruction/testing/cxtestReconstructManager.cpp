@@ -23,11 +23,12 @@
 #include "sscPNNReconstructAlgorithm.h"
 #include "sscReconstructPreprocessor.h"
 #include <vtkImageData.h>
-
+#include "sscStringDataAdapterXml.h"
 #include "recConfig.h"
+
 #ifdef CX_USE_OPENCL_UTILITY
-	#include "TordReconstruct/TordTest.h"
-  #include "TordReconstruct/cxSimpleSyntheticVolume.h"
+#include "TordReconstruct/TordTest.h"
+#include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #endif // CX_USE_OPENCL_UTILITY
 
 namespace cxtest
