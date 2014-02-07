@@ -111,9 +111,9 @@ void PerformanceTab::init()
   new SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 7);
   mMainLayout->addWidget(sscCreateDataWidget(this, m3DVisualizer), 8, 0, 1, 2);
 
-  mMainLayout->setColumnStretch(0, 0.6);
-  mMainLayout->setColumnStretch(1, 0.6);
-  mMainLayout->setColumnStretch(2, 0.3);
+  mMainLayout->setColumnStretch(0, 2);
+  mMainLayout->setColumnStretch(1, 2);
+  mMainLayout->setColumnStretch(2, 1);
 
   mTopLayout->addLayout(mMainLayout);
 }

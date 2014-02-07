@@ -18,6 +18,7 @@
 #include "cxForwardDeclarations.h"
 class QTimer;
 #include <QDateTime>
+#include <set>
 
 namespace cx
 {
@@ -76,8 +77,8 @@ private:
 	bool mPreRenderSignalRequested;
 	int mBaseRenderInterval;
 
-	typedef std::map<QString, ViewWidget*> ViewMap;
-	ViewMap mViewMap;
+	typedef std::set<QPointer<ViewWidget> > ViewWidgetSet;
+	ViewWidgetSet mViews;
 };
 
 typedef boost::shared_ptr<RenderLoop> RenderLoopPtr;
