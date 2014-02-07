@@ -40,6 +40,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	connect(mBase.get(), SIGNAL(started()), this, SLOT(recordStarted()));
 	connect(mBase.get(), SIGNAL(acquisitionStopped()), this, SLOT(recordStopped()), Qt::DirectConnection);
 	connect(mBase.get(), SIGNAL(cancelled()), this, SLOT(recordCancelled()));
+	connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), mPluginData->getReconstructer().get(), SIGNAL(newInputDataAvailable(QString)));
 
 	mRecordSessionWidget->setDescriptionVisibility(false);
 
