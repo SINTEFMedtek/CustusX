@@ -46,7 +46,7 @@ ImageStreamerGE::ImageStreamerGE() :
 	mExportVelocity(false)
 {
 	//data_streaming::DataStreamApp test;
-	mRenderTimer.reset(new CyclicActionTimer("GE Grabber Timer"));
+	mRenderTimer.reset(new CyclicActionLogger("GE Grabber Timer"));
 
 	this->setSendInterval(40);
 

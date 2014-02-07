@@ -18,7 +18,7 @@
 #include "sscConsoleWidget.h"
 #include "sscImage.h"
 #include "cxPatientData.h"
-#include "cxRenderTimer.h"
+#include "cxCyclicActionLogger.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"

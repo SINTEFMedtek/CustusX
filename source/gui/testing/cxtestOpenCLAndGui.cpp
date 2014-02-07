@@ -1,5 +1,3 @@
-#ifdef SSC_USE_OpenCL
-
 #include "catch.hpp"
 #include "cxOpenCLPrinter.h"
 
@@ -60,4 +58,3 @@ TEST_CASE("OpenCL and OpenGl: Init OpenCL and show a OpenGL view.", "[unit][Open
 }
 
 }
-#endif //SSC_USE_OpenCL

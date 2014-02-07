@@ -1,16 +1,8 @@
 #ifndef CXOPENCLPRINTER_H_
 #define CXOPENCLPRINTER_H_
 
-#ifdef SSC_USE_OpenCL
-
-#if defined(__APPLE__) || defined(__MACOSX)
-    #include "OpenCL/cl.hpp"
-#else
-    #include <CL/cl.hpp>
-#endif
-
 #include <string>
-
+#include "OpenCLManager.hpp"
 class QString;
 
 namespace cx
@@ -43,5 +35,4 @@ private:
 	static std::string const getIndentation(unsigned int numberOfIndents);
 };
 } //namespace cx
-#endif //SSC_USE_OpenCL
 #endif /* CXOPENCLPRINTER_H_ */

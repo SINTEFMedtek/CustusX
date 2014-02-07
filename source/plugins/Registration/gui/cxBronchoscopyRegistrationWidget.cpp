@@ -31,6 +31,7 @@
 #include "sscToolTracer.h"
 #include "cxBronchoscopyRegistration.h"
 #include "sscMessageManager.h"
+#include "sscTypeConversions.h"
 
 
 namespace cx

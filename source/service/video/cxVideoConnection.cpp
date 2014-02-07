@@ -47,7 +47,7 @@
 #include "sscData.h"
 #include "sscLogger.h"
 #include "sscVolumeHelpers.h"
-#include "cxRenderTimer.h"
+#include "cxCyclicActionLogger.h"
 #include "cxBasicVideoSource.h"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;

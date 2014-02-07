@@ -1,5 +1,3 @@
-#ifdef SSC_USE_OpenCL
-
 #include "catch.hpp"
 #include "cxOpenCLPrinter.h"
 
@@ -13,4 +11,3 @@ TEST_CASE("OpenCLPrinter: print info about platform and devices", "[unit][OpenCL
 }
 
 }
-#endif //SSC_USE_OpenCL

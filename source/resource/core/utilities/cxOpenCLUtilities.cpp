@@ -1,5 +1,3 @@
-#ifdef SSC_USE_OpenCL
-
 #include "cxOpenCLUtilities.h"
 
 #include <iostream>
@@ -240,7 +238,6 @@ void OpenCL::release(OpenCL::ocl* ocl)
 {
 	messageManager()->sendInfo("Releasing OpenCL context, device and command queue.");
 
-	cl::UnloadCompiler(); //TODO is this needed???
 	if(ocl != NULL)
 	{
 		delete ocl;
@@ -448,6 +445,3 @@ char* OpenCLUtilities::file2string(const char* filename, size_t * final_length)
 }
 
 }//namespace cx
-
-
-#endif //SSC_USE_OpenCL

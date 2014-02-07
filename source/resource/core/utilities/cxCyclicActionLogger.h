@@ -11,8 +11,8 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-#ifndef CXRENDERTIMER_H_
-#define CXRENDERTIMER_H_
+#ifndef CXCYCLICACTIONLOGGER_H_
+#define CXCYCLICACTIONLOGGER_H_
 
 #include "boost/shared_ptr.hpp"
 #include <QTime>
@@ -27,7 +27,7 @@ namespace cx
 * @{
 */
 
-typedef boost::shared_ptr<class CyclicActionTimer> CyclicActionTimerPtr;
+typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
 
 /**Helper class for counting time spent by the rendering process or other
  * process running in a cycle.
@@ -36,14 +36,12 @@ typedef boost::shared_ptr<class CyclicActionTimer> CyclicActionTimerPtr;
  *  \date Oct 16, 2012
  *  \author christiana
  */
-class CyclicActionTimer
+class CyclicActionLogger
 {
 public:
-	CyclicActionTimer();
-	explicit CyclicActionTimer(QString name);
+	CyclicActionLogger();
+	explicit CyclicActionLogger(QString name);
 	void reset(int interval = 1000);
-	void beginRender();
-	void endRender();
 
 	void begin(); ///< start timing for this cycle
 	void time(QString id); ///< store time from begin or last time()
@@ -72,4 +70,4 @@ private:
 
 } // namespace cx
 
-#endif /* CXRENDERTIMER_H_ */
+#endif /* CXCYCLICACTIONLOGGER_H_ */

@@ -1,5 +1,3 @@
-#ifdef SSC_USE_OpenCL
-
 #include "catch.hpp"
 #include "cxOpenCLUtilities.h"
 #include "sscMessageManager.h"
@@ -35,4 +33,3 @@ TEST_CASE("OpenCLUtilities: Can create a small kernel, build a program and run i
 }
 
 }
-#endif //SSC_USE_OpenCL

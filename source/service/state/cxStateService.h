@@ -46,6 +46,7 @@ struct Desktop
 	Desktop(QString layout, QByteArray mainwindowstate);
 
 	QString mLayoutUid;
+	QString mSecondaryLayoutUid;
 	QByteArray mMainWindowState;
 };
 

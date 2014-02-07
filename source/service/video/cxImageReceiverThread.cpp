@@ -15,7 +15,7 @@
 #include "cxImageReceiverThread.h"
 #include "sscMessageManager.h"
 #include "sscVector3D.h"
-#include "cxRenderTimer.h"
+#include "cxCyclicActionLogger.h"
 #include "cxVideoService.h"
 
 namespace cx
@@ -24,7 +24,7 @@ namespace cx
 ImageReceiverThread::ImageReceiverThread(QObject* parent) :
 		QThread(parent)
 {
-	mFPSTimer.reset(new CyclicActionTimer());
+	mFPSTimer.reset(new CyclicActionLogger());
 	mGeneratingTimeCalibration = false;
 	mLastReferenceTimestampDiff = 0.0;
 	mLastTimeStamps.reserve(20);
@@ -123,8 +123,7 @@ void ImageReceiverThread::calibrateTimeStamp(ImagePtr imgMsg)
 
 void ImageReceiverThread::reportFPS()
 {
-	mFPSTimer->beginRender();
-	mFPSTimer->endRender();
+	mFPSTimer->begin();
 	if (mFPSTimer->intervalPassed())
 	{
 		emit fps(mFPSTimer->getFPS());

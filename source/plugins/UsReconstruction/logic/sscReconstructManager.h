@@ -129,6 +129,7 @@ signals:
 	void algorithmChanged();
 	void inputDataSelected(QString mhdFileName);
 	void reconstructAboutToStart();
+	void newInputDataAvailable(QString mhdFileName);
 
 private slots:
 	void threadFinishedSlot();
