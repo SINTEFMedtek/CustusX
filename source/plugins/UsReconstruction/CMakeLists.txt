@@ -8,15 +8,10 @@
 ##
 ###########################################################
 
-
-cx_initialize_opencl()
-
-
-
 SET( MOC_HEADER_FILES
-  logic/sscReconstructManager.h
-  logic/sscReconstructThreads.h
-  logic/sscReconstructParams.h
+   logic/sscReconstructManager.h
+   logic/sscReconstructThreads.h
+   logic/sscReconstructParams.h
    gui/sscReconstructionWidget.h
    gui/sscReconstructOutputValueParamsInterfaces.h
    gui/cxUsReconstructionPlugin.h
@@ -76,7 +71,5 @@ add_library( cxPluginUSReconstruction ${SOURCE_FILES} )
 target_link_libraries( cxPluginUSReconstruction ${cxPluginUSReconstruction_LIB_FILES})
 CX_COTIRE_ADD_LIBRARY( cxPluginUSReconstruction "${cxPluginUSReconstruction_LIB_FILES}")
 
-#add_subdirectory(logic)
-#add_subdirectory(gui)
 add_subdirectory(testing)
 add_subdirectory(logic/3DReconstruction)
