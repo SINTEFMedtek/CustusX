@@ -39,14 +39,17 @@ class ViewWrapper;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
-typedef boost::shared_ptr<class CyclicActionTimer> CyclicActionTimerPtr;
+typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
 typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
+typedef boost::shared_ptr<class RenderLoop> RenderLoopPtr;
 
 /**
  * \file
  * \addtogroup cxServiceVisualization
  * @{
  */
+
+
 
 /**
  * \class ViewManager
@@ -98,8 +101,6 @@ typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
  */
 class ViewManager: public QObject
 {
-	typedef std::map<QString, ViewWidget*> ViewMap;
-
 Q_OBJECT
 public:
 
@@ -140,7 +141,7 @@ public:
 	InteractiveClipperPtr getClipper();
 	InteractiveCropperPtr getCropper();
 
-	CyclicActionTimerPtr getRenderTimer() { return mRenderTimer; }
+	CyclicActionLoggerPtr getRenderTimer();// { return mRenderTimer; }
 	CameraStylePtr getCameraStyle() { return mCameraStyle; }
 
 	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
@@ -158,13 +159,12 @@ signals:
 	void activeViewChanged(); ///< emitted when the active view changes
 
 protected slots:
-	void renderAllViewsSlot(); ///< renders all views
 	void settingsChangedSlot(QString key);
 
 	void clearSlot();
 	void duringSavePatientSlot();
 	void duringLoadPatientSlot();
-	void setModifiedSlot();
+	void updateViews();
 
 protected:
 	ViewManager(); ///< create all needed views
@@ -173,9 +173,6 @@ protected:
 	//Interface for saving/loading
 	void addXml(QDomNode& parentNode); ///< adds xml information about the viewmanager and its variables
 	void parseXml(QDomNode viewmanagerNode); ///< Use a XML node to load data. \param viewmanagerNode A XML data representation of the ViewManager
-
-	ViewMap get2DViews(); ///< returns all possible 2D views
-	ViewMap get3DViews(); ///< returns all possible 3D views
 
 	ViewWidget* getView(const QString& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
 
@@ -192,7 +189,6 @@ protected:
 
 	void loadGlobalSettings();
 	void saveGlobalSettings();
-	void updateViews();
 	void activateViews(LayoutWidget *widget, LayoutData next);
 	void rebuildLayouts();
 
@@ -201,26 +197,15 @@ protected:
 	typedef std::vector<LayoutData> LayoutDataVector;
 	LayoutDataVector mLayouts;
 	std::vector<QString> mDefaultLayouts;
-
 	std::vector<QPointer<LayoutWidget> > mLayoutWidgets;
 	QStringList mActiveLayout; ///< the active layout (type)
-
 	QString mActiveView; ///< the active view
-	ViewMap mViewMap; ///< a map of all the views
-
-	QTimer* mRenderingTimer; ///< timer that drives rendering
-	QDateTime mLastFullRender;
-    QDateTime mLastBeginRender;
-
-	CyclicActionTimerPtr mRenderTimer;
-
+	RenderLoopPtr mRenderLoop;
 	std::vector<ViewGroupPtr> mViewGroups;
 
 	bool mGlobal2DZoom; ///< controlling whether or not 2D zooming is global
 	bool mGlobalObliqueOrientation; ///< controlling whether or not all 2d views should be oblique or orthogonal
 	SyncedValuePtr mGlobalZoom2DVal;
-	bool mSmartRender; ///< use ViewWidget::render()
-	bool mModified; ///< Modified flag tells renderAllViewsSlot() that the views must be updated
 
 	InteractiveClipperPtr mInteractiveClipper;
 	InteractiveCropperPtr mInteractiveCropper;

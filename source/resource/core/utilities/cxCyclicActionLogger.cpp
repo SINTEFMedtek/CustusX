@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxRenderTimer.h"
+#include "cxCyclicActionLogger.h"
 #include <numeric>
 #include <sstream>
 #include <QStringList>
@@ -22,14 +22,14 @@
 namespace cx
 {
 
-CyclicActionTimer::CyclicActionTimer()
+CyclicActionLogger::CyclicActionLogger()
 {
   mRenderClock.start();
   mIntervalClock.start();
   this->reset();
 }
 
-CyclicActionTimer::CyclicActionTimer(QString name)
+CyclicActionLogger::CyclicActionLogger(QString name)
 {
 	mName = name;
 	mRenderClock.start();
@@ -37,33 +37,19 @@ CyclicActionTimer::CyclicActionTimer(QString name)
 	this->reset();
 }
 
-void CyclicActionTimer::reset(int interval)
+void CyclicActionLogger::reset(int interval)
 {
   mIntervalClock.restart();
   mInterval = interval;
   mTiming.clear();
 }
 
-/** rendering engine must call this before a render
- */
-void CyclicActionTimer::beginRender()
-{
-	this->begin();
-}
-
-/** rendering engine must call this after a render
- */
-void CyclicActionTimer::endRender()
-{
-	this->time("render");
-}
-
-void CyclicActionTimer::begin()
+void CyclicActionLogger::begin()
 {
 	this->time("outside");
 }
 
-void CyclicActionTimer::time(QString id)
+void CyclicActionLogger::time(QString id)
 {
 	  std::vector<Entry>::iterator iter;
 	  for (iter=mTiming.begin(); iter!=mTiming.end(); ++iter)
@@ -82,7 +68,7 @@ void CyclicActionTimer::time(QString id)
 
 /** return frames per second during the last interval.
  */
-double CyclicActionTimer::getFPS()
+double CyclicActionLogger::getFPS()
 {
   if (!mIntervalClock.elapsed())
     return -1;
@@ -91,12 +77,12 @@ double CyclicActionTimer::getFPS()
   return floor(fps+0.5); // round
 }
 
-bool CyclicActionTimer::intervalPassed() const
+bool CyclicActionLogger::intervalPassed() const
 {
   return mIntervalClock.elapsed() > mInterval;
 }
 
-QString CyclicActionTimer::dumpStatistics()
+QString CyclicActionLogger::dumpStatistics()
 {
 	return this->dumpStatisticsSmall();
 //  std::stringstream ss;
@@ -137,7 +123,7 @@ QString CyclicActionTimer::dumpStatistics()
 //  return qstring_cast(ss.str());
 }
 
-QString CyclicActionTimer::dumpStatisticsSmall()
+QString CyclicActionLogger::dumpStatisticsSmall()
 {
 	  std::stringstream ss;
 	  ss << mName << ":\t";

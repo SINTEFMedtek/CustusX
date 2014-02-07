@@ -25,7 +25,7 @@
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "cxIGTLinkConversion.h"
-#include "cxRenderTimer.h"
+#include "cxCyclicActionLogger.h"
 
 //int ReceiveTransform(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Pointer& header)
 //{
