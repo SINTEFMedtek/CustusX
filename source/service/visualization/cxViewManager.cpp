@@ -467,6 +467,11 @@ void ViewManager::rebuildLayouts()
 			this->activateViews(mLayoutWidgets[i], next);
 	}
 
+	this->setSlicePlanesProxyInViewsUpTo2DViewgroup();
+}
+
+void ViewManager::setSlicePlanesProxyInViewsUpTo2DViewgroup()
+{
 	// Set the same proxy in all wrappers, but stop adding after the
 	// first group with 2D views are found.
 	// This works well _provided_ that the 3D view is in the first group.
@@ -483,7 +488,6 @@ void ViewManager::rebuildLayouts()
 			break;
 	}
 }
-
 void ViewManager::activateViews(LayoutWidget *widget, LayoutData next)
 {
 	if (!widget)
