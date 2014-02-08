@@ -30,6 +30,7 @@
 #include <vtkLookupTable.h>
 #include <vtkImageData.h>
 #include <vtkColorTransferFunction.h>
+#include <vtkPiecewiseFunction.h>
 
 #include "sscVector3D.h"
 #include "sscLogger.h"
@@ -37,13 +38,18 @@
 namespace cx
 {
 
-ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
-	ImageTFData(base)
+ImageLUT2D::ImageLUT2D()
 {
 	mOutputLUT = vtkLookupTablePtr::New();
 
-	double smin = mBase->GetScalarRange()[0];
-	double smax = mBase->GetScalarRange()[1];
+//	connect(this, SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged())); called by the slot.
+	connect(this, SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
+}
+
+void ImageLUT2D::setInitialTFFromImage(vtkImageDataPtr base)
+{
+	double smin = base->GetScalarRange()[0];
+	double smax = base->GetScalarRange()[1];
 	double srange = smax - smin;
 
 	// this sets the initial opacity tf to full
@@ -71,26 +77,23 @@ ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 		this->setWindow(srange);
 	}
 	this->transferFunctionsChangedSlot();//Need to update transfer function after setting window/level
-
-//	connect(this, SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged())); called by the slot.
-	connect(this, SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
 }
 
-ImageLUT2DPtr ImageLUT2D::createCopy(vtkImageDataPtr newBase)
+ImageLUT2DPtr ImageLUT2D::createCopy()
 {
-	ImageLUT2DPtr retval(new ImageLUT2D(newBase));
+	ImageLUT2DPtr retval(new ImageLUT2D());
 
 	retval->deepCopy(this);
-	retval->setVtkImageData(newBase);
+//	retval->setVtkImageData(newBase);
 	retval->mOutputLUT->DeepCopy(mOutputLUT);
 
 	return retval;
 }
 
-void ImageLUT2D::setFullRangeWinLevel()
+void ImageLUT2D::setFullRangeWinLevel(vtkImageDataPtr image)
 {
-	double smin = mBase->GetScalarRange()[0];
-	double smax = mBase->GetScalarRange()[1];
+	double smin = image->GetScalarRange()[0];
+	double smax = image->GetScalarRange()[1];
 	double srange = smax - smin;
 	this->setWindow(srange);
 	this->setLevel(smin + srange / 2.0);
@@ -98,29 +101,30 @@ void ImageLUT2D::setFullRangeWinLevel()
 
 void ImageLUT2D::transferFunctionsChangedSlot()
 {
+//	this->colorMapChanged();
 	this->refreshOutput();
 }
 
 /**set basic lookuptable, to be modified by level/window/llr/alpha
  */
-void ImageLUT2D::setBaseLookupTable(vtkLookupTablePtr lut)
-{
-	this->setLut(lut);
-}
+//void ImageLUT2D::setBaseLookupTable(vtkLookupTablePtr lut)
+//{
+//	this->setLut(lut);
+//}
 
 vtkLookupTablePtr ImageLUT2D::getOutputLookupTable()
 {
 	return mOutputLUT;
 }
-vtkLookupTablePtr ImageLUT2D::getBaseLookupTable()
-{
-	return this->getLut();
-}
+//vtkLookupTablePtr ImageLUT2D::getBaseLookupTable()
+//{
+//	return this->getLut();
+//}
 
-void ImageLUT2D::LUTChanged()
-{
-	this->refreshOutput();
-}
+//void ImageLUT2D::LUTChanged()
+//{
+//	this->refreshOutput();
+//}
 
 void ImageLUT2D::alphaLLRChanged()
 {
@@ -132,21 +136,91 @@ void ImageLUT2D::alphaLLRChanged()
  */
 void ImageLUT2D::buildOpacityMapFromLLRAlpha()
 {
+	// REMOVED CA 2014-02-07 - TODO
 	mOpacityMapPtr->clear();
-	this->addAlphaPoint(this->getScalarMin(), 0);
-	if (this->getLLR() > this->getScalarMin())
+//	this->addAlphaPoint(this->getScalarMin(), 0);
+//	if (this->getLLR() > this->getScalarMin())
 		this->addAlphaPoint(this->getLLR() - 1, 0);
 	this->addAlphaPoint(this->getLLR(), this->getAlpha() * 255);
-	this->addAlphaPoint(this->getScalarMax(), this->getAlpha() * 255);
+//	this->addAlphaPoint(this->getScalarMax(), this->getAlpha() * 255);
 }
 
 /**rebuild the output lut from all inputs.
  */
 void ImageLUT2D::refreshOutput()
 {
-	this->fillLUTFromLut(mOutputLUT, mLut);
+//	this->fillLUTFromLut(mOutputLUT, mLut);
+	this->buildOutputLUT();
 	emit transferFunctionsChanged();
 }
+
+std::pair<int,int> ImageLUT2D::getMapsRange()
+{
+	std::pair<int,int> retval;
+
+	int imin = 0;
+	int imax = 0;
+
+	if (!mColorMapPtr->empty() && !mOpacityMapPtr->empty())
+	{
+		int imin = std::min(mColorMapPtr->begin()->first, mOpacityMapPtr->begin()->first);
+		int imax = std::max(mColorMapPtr->rbegin()->first, mOpacityMapPtr->rbegin()->first);
+		return std::make_pair(imin,imax);
+	}
+	else if (!mColorMapPtr->empty())
+	{
+		int imin = mColorMapPtr->begin()->first;
+		int imax = mColorMapPtr->rbegin()->first;
+		return std::make_pair(imin,imax);
+	}
+	else if (!mOpacityMapPtr->empty())
+	{
+		int imin = mOpacityMapPtr->begin()->first;
+		int imax = mOpacityMapPtr->rbegin()->first;
+		return std::make_pair(imin,imax);
+	}
+	else
+	{
+		return std::make_pair(0,0);
+	}
+
+//	if ()
+//	// the total range [imin,imax] of values in the opacity and color tables
+//	int imin = std::min(mColorMapPtr->begin()->first, mOpacityMapPtr->begin()->first);
+//	int imax = std::max(mColorMapPtr->rbegin()->first, mOpacityMapPtr->rbegin()->first);
+//	int icount = imax - imin + 1;
+}
+
+void ImageLUT2D::buildOutputLUT()
+{
+	std::pair<int,int> range = this->getMapsRange();
+	int imin = range.first;
+	int imax = range.second;
+	if (imin==imax)
+		imax = imin+1;
+	int icount = imax - imin + 1;
+
+	vtkLookupTablePtr lut = mOutputLUT;
+	lut->Build();
+	lut->SetNumberOfTableValues(icount);
+	lut->SetTableRange(imin, imax);
+
+	vtkColorTransferFunctionPtr colorFunc = vtkColorTransferFunctionPtr::New();
+	this->fillColorTFFromMap(colorFunc);
+	vtkPiecewiseFunctionPtr opacityFunc = vtkPiecewiseFunctionPtr::New();
+	this->fillOpacityTFFromMap(opacityFunc);
+
+	for (int i = 0; i < icount; ++i)
+	{
+		double* rgb = colorFunc->GetColor(i + imin);
+		double alpha = opacityFunc->GetValue(i + imin);
+		lut->SetTableValue(i, rgb[0], rgb[1], rgb[2], alpha);
+	}
+
+	lut->Modified();
+}
+
+
 
 void ImageLUT2D::addXml(QDomNode dataNode)
 {
@@ -157,7 +231,7 @@ void ImageLUT2D::parseXml(QDomNode dataNode)
 {
 	ImageTFData::parseXml(dataNode);
 
-	this->buildLUTFromColorMap();
+//	this->buildLUTFromColorMap();
 	this->refreshOutput();
 }
 

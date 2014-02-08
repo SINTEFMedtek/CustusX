@@ -19,8 +19,8 @@ namespace cxtest {
 class TestTransferFunctions {
 public:
 	TestTransferFunctions();
-	bool hasValid3DTransferFunction();
-	bool hasValid2DTransferFunction();
+//	bool hasValid3DTransferFunction();
+//	bool hasValid2DTransferFunction();
 	void Corrupt3DTransferFunctionWindowWidth();
 	void Corrupt3DTransferFunctionWindowLevel();
 	void Corrupt2DTransferFunctionWindowWidth();

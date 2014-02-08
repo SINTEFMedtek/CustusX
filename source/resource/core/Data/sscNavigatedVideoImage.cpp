@@ -32,7 +32,7 @@ NavigatedVideoImage::NavigatedVideoImage(QString uid, VideoSourcePtr source, Sli
 	mToolPositionY = -1;
 	connect(source.get(), SIGNAL(newFrame()),
 		this, SLOT(newFrame()));
-	getLookupTable2D()->setFullRangeWinLevel();
+	getLookupTable2D()->setFullRangeWinLevel(source->getVtkImageData());
 }
 
 static double computeEffectiveOffset(double offset, double size)

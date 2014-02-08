@@ -34,12 +34,13 @@ DoubleDataAdapterImageTFDataBase::DoubleDataAdapterImageTFDataBase()
 {
 }
 
-void DoubleDataAdapterImageTFDataBase::setImageTFData(ImageTFDataPtr tfData)
+void DoubleDataAdapterImageTFDataBase::setImageTFData(ImageTFDataPtr tfData, ImagePtr image)
 {
   if (mImageTFData)
     disconnect(mImageTFData.get(), SIGNAL(changed()), this, SIGNAL(changed()));
 
   mImageTFData = tfData;
+  mImage = image;
 
   if (mImageTFData)
     connect(mImageTFData.get(), SIGNAL(changed()), this, SIGNAL(changed()));
@@ -78,9 +79,9 @@ void DoubleDataAdapterImageTFDataWindow::setValueInternal(double val)
 
 DoubleRange DoubleDataAdapterImageTFDataWindow::getValueRange() const
 {
-  if (!mImageTFData)
+  if (!mImage)
     return DoubleRange();
-  double range = mImageTFData->getScalarMax()-mImageTFData->getScalarMin();
+  double range = mImage->getMax() - mImage->getMin();
   return DoubleRange(1,range,range/1000.0);
 }
 
@@ -103,8 +104,8 @@ DoubleRange DoubleDataAdapterImageTFDataLevel::getValueRange() const
   if (!mImageTFData)
     return DoubleRange();
 
-  double max = mImageTFData->getScalarMax();
-  double min = mImageTFData->getScalarMin();
+  double max = mImage->getMax();
+  double min = mImage->getMin();
   return DoubleRange(min,max,1);
 }
 
@@ -124,8 +125,8 @@ DoubleRange DoubleDataAdapterImageTFDataLLR::getValueRange() const
   if (!mImageTFData)
     return DoubleRange();
 
-  double max = mImageTFData->getScalarMax();
-  double min = mImageTFData->getScalarMin();
+  double max = mImage->getMax();
+  double min = mImage->getMin();
 	//Set range to min - 1 to allow an llr that shows all values
 	return DoubleRange(min - 1,max,(max-min)/1000.0);
 }
@@ -274,10 +275,10 @@ void TransferFunction2DWidget::activeImageChangedSlot()
   mTransferFunctionAlphaWidget->setData(image, tf);
   mTransferFunctionColorWidget->setData(image, tf);
 
-  mDataWindow->setImageTFData(tf);
-  mDataLevel->setImageTFData(tf);
-  mDataAlpha->setImageTFData(tf);
-  mDataLLR->setImageTFData(tf);
+  mDataWindow->setImageTFData(tf, image);
+  mDataLevel->setImageTFData(tf, image);
+  mDataAlpha->setImageTFData(tf, image);
+  mDataLLR->setImageTFData(tf, image);
 }
 
 

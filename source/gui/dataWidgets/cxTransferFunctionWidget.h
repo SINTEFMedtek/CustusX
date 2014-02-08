@@ -38,12 +38,13 @@ public:
   virtual bool setValue(double val);
   virtual void connectValueSignals(bool on) {}
 public:
-  void setImageTFData(ImageTFDataPtr tfData);
+  void setImageTFData(ImageTFDataPtr tfData, ImagePtr image);
 protected:
   virtual double getValueInternal() const = 0;
   virtual void setValueInternal(double val) = 0;
 
   ImageTFDataPtr mImageTFData;
+  ImagePtr mImage;
 };
 typedef boost::shared_ptr<DoubleDataAdapterImageTFDataBase> DoubleDataAdapterImageTFDataBasePtr;
 

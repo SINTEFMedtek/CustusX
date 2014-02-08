@@ -57,13 +57,14 @@ class ImageLUT2D: public ImageTFData
 {
 Q_OBJECT
 public:
-	ImageLUT2D(vtkImageDataPtr base);
-	ImageLUT2DPtr createCopy(vtkImageDataPtr newBase);
-	void setFullRangeWinLevel(); ///< Set winlevel spanning the entire range
+	explicit ImageLUT2D();
+	void setInitialTFFromImage(vtkImageDataPtr base);
+	ImageLUT2DPtr createCopy();
+	void setFullRangeWinLevel(vtkImageDataPtr image); ///< Set winlevel spanning the entire range
 
-	void setBaseLookupTable(vtkLookupTablePtr lut); //</ backwards compatibility: prefer setLut()
+//	void setBaseLookupTable(vtkLookupTablePtr lut); //</ backwards compatibility: prefer setLut()
 	vtkLookupTablePtr getOutputLookupTable();
-	vtkLookupTablePtr getBaseLookupTable(); ///< backwards compatibility: prefer getLut()
+//	vtkLookupTablePtr getBaseLookupTable(); ///< backwards compatibility: prefer getLut()
 
 	virtual void addXml(QDomNode dataNode); ///< adds xml information about the image and its variabels \param dataNode data node in the XML tree \return The created subnode
 	virtual void parseXml(QDomNode dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
@@ -75,10 +76,12 @@ private slots:
 	void transferFunctionsChangedSlot();
 
 private:
+	std::pair<int,int> getMapsRange();
 	virtual void alphaLLRChanged();
 	void buildOpacityMapFromLLRAlpha();
 	void refreshOutput();
-	void LUTChanged();
+//	void LUTChanged();
+	void buildOutputLUT();
 
 	vtkLookupTablePtr mOutputLUT; ///< the sum of all internal values
 };
