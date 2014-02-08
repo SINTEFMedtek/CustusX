@@ -193,11 +193,11 @@ void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
 
   // Go through each point and draw squares
 
-  ColorMapPtr colorMapPtr = mImageTF->getColorMap();
+  ColorMap colorMap = mImageTF->getColorMap();
   QPoint lastScreenPoint;
   this->mPointRects.clear();
-  for (ColorMap::iterator colorPoint = colorMapPtr->begin();
-       colorPoint != colorMapPtr->end();
+  for (ColorMap::iterator colorPoint = colorMap.begin();
+	   colorPoint != colorMap.end();
        ++colorPoint)
   {
     // Get the screen (plot) position of this point
@@ -238,9 +238,9 @@ bool TransferFunctionColorWidget::isInsideCurrentPoint()
       mCurrentPoint.position = it->first;
       if (it == mPointRects.begin() || it == --mPointRects.end())
         mEndPoint = true;
-      ColorMapPtr colorMapPtr = mImageTF->getColorMap();
-      if (colorMapPtr->find(mCurrentPoint.position) != colorMapPtr->end())
-        mCurrentPoint.value = colorMapPtr->find(mCurrentPoint.position)->second;
+	  ColorMap colorMap = mImageTF->getColorMap();
+	  if (colorMap.find(mCurrentPoint.position) != colorMap.end())
+		mCurrentPoint.value = colorMap.find(mCurrentPoint.position)->second;
       return true;
     }
   }
@@ -286,7 +286,8 @@ void TransferFunctionColorWidget::moveCurrentPoint()
   ColorPoint newColorPoint = this->getCurrentColorPoint();
   newColorPoint.value = mCurrentPoint.value;
 
-  ColorMap::iterator prevPointIterator = mImageTF->getColorMap()->find(mCurrentPoint.position);
+  ColorMap colorMap = mImageTF->getColorMap();
+  ColorMap::iterator prevPointIterator = colorMap.find(mCurrentPoint.position);
 
   if (mCurrentPoint.position != mImage->getMin()
     && mCurrentPoint.position != mImage->getMax() )
@@ -325,10 +326,10 @@ void TransferFunctionColorWidget::setColorSlotDelayed()
 
   if (result.isValid() && result != newPoint.value)
   {
-    ColorMapPtr colorMapPtr = mImageTF->getColorMap();
+	ColorMap colorMap = mImageTF->getColorMap();
 
     // Check if the point is already in the map
-    ColorMap::iterator pointIterator = colorMapPtr->find(newPoint.position);
+	ColorMap::iterator pointIterator = colorMap.find(newPoint.position);
 
     mImageTF->addColorPoint(newPoint.position, result);
     newPoint.value = result;

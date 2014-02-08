@@ -182,12 +182,12 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
   }
 
   // Go through each point and draw squares and lines
-  OpacityMapPtr opacityMap = mImageTF->getOpacityMap();
+  IntIntMap opacityMap = mImageTF->getOpacityMap();
 
   QPoint lastScreenPoint;
   this->mPointRects.clear();
-  for (IntIntMap::iterator opPoint = opacityMap->begin();
-       opPoint != opacityMap->end();
+  for (IntIntMap::iterator opPoint = opacityMap.begin();
+	   opPoint != opacityMap.end();
        ++opPoint)
   {
     // Get the screen (plot) position of this point
@@ -202,7 +202,7 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
     //std::cout << "x: " << opPoint->first  << " y: " << opPoint->second << std::endl;
     //std::cout << "Screen x: " << screenPoint.x() << " y: " << screenPoint.y() << std::endl;
     // Draw line from previous point if this is not the first point
-    if (opPoint != opacityMap->begin())
+	if (opPoint != opacityMap.begin())
     {
       painter.setPen(pointLinePen);
       painter.drawLine(lastScreenPoint, screenPoint);
@@ -303,9 +303,9 @@ void TransferFunctionAlphaWidget::moveCurrentAlphaPoint(int mouseX, int mouseY)
   }
   else
   {
-    OpacityMapPtr opacityMap = mImageTF->getOpacityMap();
-    IntIntMap::iterator prevpoint = opacityMap->find(mCurrentAlphaPoint.position);
-    IntIntMap::iterator nextpoint = opacityMap->find(mCurrentAlphaPoint.position);
+	IntIntMap opacityMap = mImageTF->getOpacityMap();
+	IntIntMap::iterator prevpoint = opacityMap.find(mCurrentAlphaPoint.position);
+	IntIntMap::iterator nextpoint = opacityMap.find(mCurrentAlphaPoint.position);
     --prevpoint;
     ++nextpoint;
 

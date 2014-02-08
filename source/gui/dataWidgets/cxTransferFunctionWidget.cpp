@@ -37,13 +37,13 @@ DoubleDataAdapterImageTFDataBase::DoubleDataAdapterImageTFDataBase()
 void DoubleDataAdapterImageTFDataBase::setImageTFData(ImageTFDataPtr tfData, ImagePtr image)
 {
   if (mImageTFData)
-    disconnect(mImageTFData.get(), SIGNAL(changed()), this, SIGNAL(changed()));
+	disconnect(mImageTFData.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
 
   mImageTFData = tfData;
   mImage = image;
 
   if (mImageTFData)
-    connect(mImageTFData.get(), SIGNAL(changed()), this, SIGNAL(changed()));
+	connect(mImageTFData.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
 
   emit changed();
 }
