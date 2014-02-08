@@ -41,80 +41,80 @@
 namespace cx
 {
 
-ImageTFData::ImageTFData(vtkImageDataPtr base) :
-	mBase(base), mOpacityMapPtr(new IntIntMap()), mColorMapPtr(new ColorMap())
+ImageTFData::ImageTFData() :
+	mOpacityMapPtr(new IntIntMap()), mColorMapPtr(new ColorMap())
 {
-	double min = this->getScalarMin();
-	double max = this->getScalarMax();
+//	double min = this->getScalarMin();
+//	double max = this->getScalarMax();
 
-	// set a winlevel spanning the entire range
-	mWindow = max - min;
-	mLevel = min + mWindow / 2.0;
-	// set llr/alpha with full transmission
-	mLLR = min;
-	mAlpha = 1.0;
+//	// set a winlevel spanning the entire range
+//	mWindow = max - min;
+//	mLevel = min + mWindow / 2.0;
+//	// set llr/alpha with full transmission
+//	mLLR = min;
+//	mAlpha = 1.0;
 }
 
 ImageTFData::~ImageTFData()
 {
 }
 
-void ImageTFData::setVtkImageData(vtkImageDataPtr base)
-{
-	mBase = base;
-	emit changed();
-}
+//void ImageTFData::setVtkImageData(vtkImageDataPtr base)
+//{
+//	mBase = base;
+//	emit changed();
+//}
 
-vtkImageDataPtr ImageTFData::getVtkImageData()
-{
-	return mBase;
-}
+//vtkImageDataPtr ImageTFData::getVtkImageData()
+//{
+//	return mBase;
+//}
 
-/**Return the maximum intensity value of the underlying dataset.
- * The range of all settings is |0,max>
- */
-double ImageTFData::getScalarMax() const
-{
-	return mBase->GetScalarRange()[1];
-}
+///**Return the maximum intensity value of the underlying dataset.
+// * The range of all settings is |0,max>
+// */
+//double ImageTFData::getScalarMax() const
+//{
+//	return mBase->GetScalarRange()[1];
+//}
 
-double ImageTFData::getScalarMin() const
-{
-	return mBase->GetScalarRange()[0];
-}
+//double ImageTFData::getScalarMin() const
+//{
+//	return mBase->GetScalarRange()[0];
+//}
 
-int ImageTFData::getMaxAlphaValue() const
-{
-	return 255;
-}
+//int ImageTFData::getMaxAlphaValue() const
+//{
+//	return 255;
+//}
 
 /**set a lut that is used as a basis for the color tf.
  */
 void ImageTFData::setLut(vtkLookupTablePtr lut)
 {
-	if (lut == mLut)
-		return;
-	mLut = lut;
-	this->LUTChanged();
-	//this->refreshColorTF();
+//	if (lut == mLut)
+//		return;
+//	mLut = lut;
+//	this->LUTChanged();
+//	//this->refreshColorTF();
 }
 
-vtkLookupTablePtr ImageTFData::getLut() const
-{
-	return mLut;
-}
+//vtkLookupTablePtr ImageTFData::getLut() const
+//{
+//	return mLut;
+//}
 
 void ImageTFData::deepCopy(ImageTFData* source)
 {
 	mOpacityMapPtr.reset(new IntIntMap(*source->mOpacityMapPtr));
 	mColorMapPtr.reset(new ColorMap(*source->mColorMapPtr));
 
-	if (mLut)
-	{
-		mLut = vtkLookupTablePtr::New();
-		mLut->DeepCopy(source->mLut);
-	}
-	mBase = source->mBase;
+//	if (mLut)
+//	{
+//		mLut = vtkLookupTablePtr::New();
+//		mLut->DeepCopy(source->mLut);
+//	}
+//	mBase = source->mBase;
 
 	mLevel = source->mLevel;
 	mWindow = source->mWindow;
@@ -204,10 +204,12 @@ void ImageTFData::parseXml(QDomNode dataNode)
 	//Repair TF's if faulty
 //	this->fixTransferFunctions();
 
+//	std::cout << "window " << mWindow << std::endl;
 	mWindow = this->loadAttribute(dataNode, "window", mWindow);
 	mLevel = this->loadAttribute(dataNode, "level", mLevel);
 	mLLR = this->loadAttribute(dataNode, "llr", mLLR);
 	mAlpha = this->loadAttribute(dataNode, "alpha", mAlpha);
+//	std::cout << "window " << mWindow << std::endl;
 
 	//  std::cout << "void ImageTF3D::parseXml(QDomNode dataNode)" << std::endl;
 }
@@ -220,33 +222,19 @@ void ImageTFData::parseXml(QDomNode dataNode)
  */
 void ImageTFData::unsignedCT(bool onLoad)
 {
-	//Signed after all. Don't do anyting
-	if (this->getScalarMin() < 0)
-		return;
+	// REMOVED CA 2014-02-07 - TODO
+
+//	//Signed after all. Don't do anyting
+//	if (this->getScalarMin() < 0)
+//		return;
 
 	int modify = -1024;
 	if(onLoad)
 		modify = 1024;
 
+//	modify=0;
+	std::cout << "unsignedCT shift " << modify << std::endl;
 	this->shift(modify);
-
-//	//	OpacityMapPtr opacityMap = this->getOpacityMap();
-//	OpacityMapPtr newOpacipyMap(new IntIntMap());
-//	for (IntIntMap::iterator it = this->getOpacityMap()->begin(); it != this->getOpacityMap()->end(); ++it)
-//		(*newOpacipyMap)[it->first + modify] = it->second;
-
-//	ColorMapPtr newColorMap(new ColorMap());
-//	for (ColorMap::iterator it = this->getColorMap()->begin(); it != this->getColorMap()->end(); ++it)
-//		(*newColorMap)[it->first + modify] = it->second;
-
-//	mOpacityMapPtr = newOpacipyMap;
-//	mColorMapPtr = newColorMap;
-
-//	mLevel = mLevel + modify;
-//	mLLR = mLLR + modify;
-//	// Don't emit for now. This function are used also for temporary modifications
-//	// Emit is moved to fixTransferFunctions()
-////	emit changed();
 }
 
 void ImageTFData::shift(int val)
@@ -265,82 +253,82 @@ void ImageTFData::shift(int val)
 	mOpacityMapPtr = newOpacipyMap;
 	mColorMapPtr = newColorMap;
 
-	mLevel = mLevel + modify;
+	//mLevel = mLevel + modify;
 	mLLR = mLLR + modify;
 	// Don't emit for now. This function are used also for temporary modifications
 	// Emit is moved to fixTransferFunctions()
 //	emit changed();
 
-	this->colorMapChanged();
+//	this->colorMapChanged();
 	//this->alphaLLRChanged(); // dont do this - it resets the 3D transfer function, clearing the opacity map
 	emit changed();
 }
 
 
-void ImageTFData::fixTransferFunctions()
-{
-	//Make sure min and max values for transferfunctions are set
+//void ImageTFData::fixTransferFunctions()
+//{
+//	//Make sure min and max values for transferfunctions are set
 
-	OpacityMapPtr opacityMap = this->getOpacityMap();
-	ColorMapPtr colorMap = this->getColorMap();
+//	OpacityMapPtr opacityMap = this->getOpacityMap();
+//	ColorMapPtr colorMap = this->getColorMap();
 
-	vtkColorTransferFunctionPtr interpolatedTrFunc = vtkColorTransferFunctionPtr::New();
-	this->fillColorTFFromMap(interpolatedTrFunc);
+//	vtkColorTransferFunctionPtr interpolatedTrFunc = vtkColorTransferFunctionPtr::New();
+//	this->fillColorTFFromMap(interpolatedTrFunc);
 
-	if (opacityMap->find(this->getScalarMin()) == opacityMap->end())
-	{
-		this->addAlphaPoint(this->getScalarMin(), 0);
-	}
-	if (opacityMap->find(this->getScalarMax()) == opacityMap->end())
-	{
-		//The optimal solution may be to interpolate/extrapolate the max (min) values from the existing values
-		//However, as most presets usually have all the top values set to white the error of the simpler code below is usually small
-		IntIntMap::iterator opPoint = opacityMap->end();
-		--opPoint;
-		this->addAlphaPoint(this->getScalarMax(), opPoint->second);// Use value of current max element
-	}
-	if (colorMap->find(this->getScalarMin()) == colorMap->end())
-	{
-		this->addColorPoint(this->getScalarMin(), QColor(0, 0, 0));
-	}
-	if (colorMap->find(this->getScalarMax()) == colorMap->end())
-	{
-		//Interpolate to get correct color
-		double* rgb = interpolatedTrFunc->GetColor(this->getScalarMax());
-		QColor newColor = QColor(int(rgb[0] * 255), int(rgb[1] * 255), int(rgb[2] * 255));
-		this->addColorPoint(this->getScalarMax(), newColor);
-	}
+//	if (opacityMap->find(this->getScalarMin()) == opacityMap->end())
+//	{
+//		this->addAlphaPoint(this->getScalarMin(), 0);
+//	}
+//	if (opacityMap->find(this->getScalarMax()) == opacityMap->end())
+//	{
+//		//The optimal solution may be to interpolate/extrapolate the max (min) values from the existing values
+//		//However, as most presets usually have all the top values set to white the error of the simpler code below is usually small
+//		IntIntMap::iterator opPoint = opacityMap->end();
+//		--opPoint;
+//		this->addAlphaPoint(this->getScalarMax(), opPoint->second);// Use value of current max element
+//	}
+//	if (colorMap->find(this->getScalarMin()) == colorMap->end())
+//	{
+//		this->addColorPoint(this->getScalarMin(), QColor(0, 0, 0));
+//	}
+//	if (colorMap->find(this->getScalarMax()) == colorMap->end())
+//	{
+//		//Interpolate to get correct color
+//		double* rgb = interpolatedTrFunc->GetColor(this->getScalarMax());
+//		QColor newColor = QColor(int(rgb[0] * 255), int(rgb[1] * 255), int(rgb[2] * 255));
+//		this->addColorPoint(this->getScalarMax(), newColor);
+//	}
 
-	//Remove transfer function points outside range
-	IntIntMap::iterator opIt = this->getOpacityMap()->begin();
-	while (opIt != this->getOpacityMap()->end())
-	{
-		int delPoint = 1000000;
-		if (opIt->first < this->getScalarMin())
-			delPoint = opIt->first;
-		else if (opIt->first > this->getScalarMax())
-			delPoint = opIt->first;
-		++opIt;
+//	//Remove transfer function points outside range
+//	IntIntMap::iterator opIt = this->getOpacityMap()->begin();
+//	while (opIt != this->getOpacityMap()->end())
+//	{
+//		int delPoint = 1000000;
+//		if (opIt->first < this->getScalarMin())
+//			delPoint = opIt->first;
+//		else if (opIt->first > this->getScalarMax())
+//			delPoint = opIt->first;
+//		++opIt;
 
-		if (delPoint != 1000000)
-			this->removeAlphaPoint(delPoint);
-	}
+//		if (delPoint != 1000000)
+//			this->removeAlphaPoint(delPoint);
+//	}
 
-	ColorMap::iterator it = this->getColorMap()->begin();
-	while (it != this->getColorMap()->end())
-	{
-		int delPoint = 1000000;
-		if (it->first < this->getScalarMin())
-			delPoint = it->first;
-		else if (it->first > this->getScalarMax())
-			delPoint = it->first;
-		++it;
+//	ColorMap::iterator it = this->getColorMap()->begin();
+//	while (it != this->getColorMap()->end())
+//	{
+//		int delPoint = 1000000;
+//		if (it->first < this->getScalarMin())
+//			delPoint = it->first;
+//		else if (it->first > this->getScalarMax())
+//			delPoint = it->first;
+//		++it;
 
-		if (delPoint != 1000000)
-			this->removeColorPoint(delPoint);
-	}
-	emit changed();
-}
+//		if (delPoint != 1000000)
+//			this->removeColorPoint(delPoint);
+//	}
+//	emit changed();
+//}
 
 double ImageTFData::loadAttribute(QDomNode dataNode, QString name, double defVal)
 {
@@ -361,7 +349,7 @@ void ImageTFData::setLLR(double val)
 		return;
 
 	mLLR = val;
-	this->alphaLLRChanged();
+//	this->alphaLLRChanged();
 	emit changed();
 }
 
@@ -376,7 +364,7 @@ void ImageTFData::setAlpha(double val)
 		return;
 
 	mAlpha = val;
-	this->alphaLLRChanged();
+//	this->alphaLLRChanged();
 	emit changed();
 }
 
@@ -451,13 +439,13 @@ void ImageTFData::addColorPoint(int colorPosition, QColor colorValue)
 {
 	(*mColorMapPtr)[colorPosition] = colorValue;
 	//mColorMapPtr->insert(std::pair<int, QColor>(colorPosition, colorValue));
-	this->colorMapChanged();
+//	this->colorMapChanged();
 	emit changed();
 }
 void ImageTFData::removeColorPoint(int colorPosition)
 {
 	mColorMapPtr->erase(colorPosition);
-	this->colorMapChanged();
+//	this->colorMapChanged();
 	emit changed();
 }
 
@@ -465,124 +453,136 @@ void ImageTFData::moveColorPoint(int oldpos, int newpos, QColor colorValue)
 {
 	mColorMapPtr->erase(oldpos);
 	(*mColorMapPtr)[newpos] = colorValue;
-	this->colorMapChanged();
+//	this->colorMapChanged();
+	emit changed();
+}
+
+void ImageTFData::resetAlpha(IntIntMap val)
+{
+	*mOpacityMapPtr = val;
+	emit changed();
+}
+
+void ImageTFData::resetColor(ColorMap val)
+{
+	*mColorMapPtr = val;
+//	this->colorMapChanged();
 	emit changed();
 }
 
 void ImageTFData::fillColorTFFromMap(vtkColorTransferFunctionPtr tf)
 {
-	// Create vtkColorTransferFunction from the color map
 	tf->RemoveAllPoints();
-
 	for (ColorMap::iterator iter = mColorMapPtr->begin(); iter != mColorMapPtr->end(); ++iter)
-		tf->AddRGBPoint(iter->first, iter->second.red() / 255.0, iter->second.green() / 255.0, iter->second.blue()
-			/ 255.0);
-	//tf->Update();
+	{
+		QColor c = iter->second;
+		tf->AddRGBPoint(iter->first, c.redF(), c.greenF(), c.blueF());
+	}
 }
 
 void ImageTFData::fillOpacityTFFromMap(vtkPiecewiseFunctionPtr tf)
 {
-	// Create vtkPiecewiseFunction from the color map
 	tf->RemoveAllPoints();
 	for (IntIntMap::iterator iter = mOpacityMapPtr->begin(); iter != mOpacityMapPtr->end(); ++iter)
 		tf->AddPoint(iter->first, iter->second / 255.0);
 	tf->Update();
 }
 
-double ImageTFData::mapThroughLUT(double x, int lutSize)
-{
-	double y = (mLLR - (mLevel - mWindow / 2)) / mWindow * lutSize;
-	return y;
-}
+//double ImageTFData::mapThroughLUT(double x, int lutSize)
+//{
+//	double y = (mLLR - (mLevel - mWindow / 2)) / mWindow * lutSize;
+//	return y;
+//}
 
-/**rebuild the output lut from all inputs.
- */
-void ImageTFData::fillLUTFromLut(vtkLookupTablePtr output, vtkLookupTablePtr input)
-{
-	double b0 = mLevel - mWindow / 2.0;
-	double b1 = mLevel + mWindow / 2.0;
+///**rebuild the output lut from all inputs.
+// */
+//void ImageTFData::fillLUTFromLut(vtkLookupTablePtr output, vtkLookupTablePtr input)
+//{
+//	double b0 = mLevel - mWindow / 2.0;
+//	double b1 = mLevel + mWindow / 2.0;
 
-	// find LLR on the lut:
-	// We want to use the LLR on the _input_ intensity data, not on the
-	// mapped data. Thus we map the llr through the lut and insert that value
-	// into the lut.
-	double llr = mapThroughLUT(mLLR, input->GetNumberOfTableValues());
+//	// find LLR on the lut:
+//	// We want to use the LLR on the _input_ intensity data, not on the
+//	// mapped data. Thus we map the llr through the lut and insert that value
+//	// into the lut.
+//	double llr = mapThroughLUT(mLLR, input->GetNumberOfTableValues());
 
-	output->Build();
-	output->SetNumberOfTableValues(input->GetNumberOfTableValues());
-	output->SetTableRange(b0, b1);
+//	output->Build();
+//	output->SetNumberOfTableValues(input->GetNumberOfTableValues());
+//	output->SetTableRange(b0, b1);
 
-	for (int i = 0; i < output->GetNumberOfTableValues(); ++i)
-	{
-		double rgba[4];
-		input->GetTableValue(i, rgba);
+//	for (int i = 0; i < output->GetNumberOfTableValues(); ++i)
+//	{
+//		double rgba[4];
+//		input->GetTableValue(i, rgba);
 
-		if (i >= llr)
-			rgba[3] = 0.9999;
-		else
-			rgba[3] = 0.001;
+//		if (i >= llr)
+//			rgba[3] = 0.9999;
+//		else
+//			rgba[3] = 0.001;
 
-		output->SetTableValue(i, rgba);
-	}
-	output->Modified();
+//		output->SetTableValue(i, rgba);
+//	}
+//	output->Modified();
 
-	//  std::cout << "-----------------" << std::endl;
-	//  for (unsigned i=0; i<256; i+=20)
-	//  {
-	//    testMap(i);
-	//  }
-	//  testMap(255);
-	//  //mOutputLUT->Print(std::cout);
-	//  //mOutputLUT->GetTable()->Print(std::cout);
-	//  std::cout << "-----"
-	//    << "llr=" << llr
-	//    << ", LLR=" << mLLR
-	//    << ", level=" << mLevel
-	//    << ", window=" << mWindow
-	//    << ", b=[" << b0 << "," << b1 << "] "
-	//    << this
-	//    << std::endl;
-	//  std::cout << "-----------------" << std::endl;
+//	//  std::cout << "-----------------" << std::endl;
+//	//  for (unsigned i=0; i<256; i+=20)
+//	//  {
+//	//    testMap(i);
+//	//  }
+//	//  testMap(255);
+//	//  //mOutputLUT->Print(std::cout);
+//	//  //mOutputLUT->GetTable()->Print(std::cout);
+//	//  std::cout << "-----"
+//	//    << "llr=" << llr
+//	//    << ", LLR=" << mLLR
+//	//    << ", level=" << mLevel
+//	//    << ", window=" << mWindow
+//	//    << ", b=[" << b0 << "," << b1 << "] "
+//	//    << this
+//	//    << std::endl;
+//	//  std::cout << "-----------------" << std::endl;
 
-}
+//}
 
-void ImageTFData::colorMapChanged()
-{
-	this->buildLUTFromColorMap();
-}
 
-/**build the mBaseLUT from the mColorMap.
- * This overwrites the mBaseLUT.
- */
-void ImageTFData::buildLUTFromColorMap()
-{
-	//  std::cout << "colormap begin" << std::endl;
-	//  for (ColorMap::iterator iter=mColorMapPtr->begin(); iter!=mColorMapPtr->end(); ++iter)
-	//  {
-	//    std::cout << " " << iter->first << " " << iter->second.red() << " " << iter->second.green() << " " << iter->second.blue() << std::endl;
-	//  }
-	//  std::cout << "colormap end" << std::endl;
+//void ImageTFData::colorMapChanged()
+//{
+//	this->buildLUTFromColorMap();
+//}
 
-	int N = 0;
-	if (!mColorMapPtr->empty())
-		N = mColorMapPtr->rbegin()->first - mColorMapPtr->begin()->first; // largest key value in color map
-	N += 1;//Because in the range 0 - 255 we have 256 values
-	mLut = vtkLookupTablePtr::New(); // must reset in order to get the gpu buffering to reload
-	mLut->Build();
-	mLut->SetNumberOfTableValues(N);
-	mLut->SetTableRange(0, N - 1);
+///**build the mBaseLUT from the mColorMap.
+// * This overwrites the mBaseLUT.
+// */
+//void ImageTFData::buildLUTFromColorMap()
+//{
+//	//  std::cout << "colormap begin" << std::endl;
+//	//  for (ColorMap::iterator iter=mColorMapPtr->begin(); iter!=mColorMapPtr->end(); ++iter)
+//	//  {
+//	//    std::cout << " " << iter->first << " " << iter->second.red() << " " << iter->second.green() << " " << iter->second.blue() << std::endl;
+//	//  }
+//	//  std::cout << "colormap end" << std::endl;
 
-	vtkColorTransferFunctionPtr colorFunc = vtkColorTransferFunctionPtr::New();
-	this->fillColorTFFromMap(colorFunc);
+//	int N = 0;
+//	if (!mColorMapPtr->empty())
+//		N = mColorMapPtr->rbegin()->first - mColorMapPtr->begin()->first; // largest key value in color map
+//	N += 1;//Because in the range 0 - 255 we have 256 values
+//	mLut = vtkLookupTablePtr::New(); // must reset in order to get the gpu buffering to reload
+//	mLut->Build();
+//	mLut->SetNumberOfTableValues(N);
+//	mLut->SetTableRange(0, N - 1);
 
-	for (int i = 0; i < N; ++i)
-	{
-		double* rgb = colorFunc->GetColor(i + mColorMapPtr->begin()->first);
-		mLut->SetTableValue(i, rgb[0], rgb[1], rgb[2], 1);
-	}
-	mLut->Modified();
+//	vtkColorTransferFunctionPtr colorFunc = vtkColorTransferFunctionPtr::New();
+//	this->fillColorTFFromMap(colorFunc);
 
-	this->LUTChanged();
-}
+//	for (int i = 0; i < N; ++i)
+//	{
+//		double* rgb = colorFunc->GetColor(i + mColorMapPtr->begin()->first);
+//		mLut->SetTableValue(i, rgb[0], rgb[1], rgb[2], 1);
+//	}
+//	mLut->Modified();
+
+//	this->LUTChanged();
+//}
 
 }

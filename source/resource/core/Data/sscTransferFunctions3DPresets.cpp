@@ -187,8 +187,8 @@ void TransferFunctions3DPresets::load2D(QString name, ImagePtr image)
 		LUT2D->unsignedCT(true);
 	}
 
-	//Make sure the preset transfer functions work correctly
-	LUT2D->fixTransferFunctions();
+//	//Make sure the preset transfer functions work correctly
+//	LUT2D->fixTransferFunctions();
 }
 
 void TransferFunctions3DPresets::load3D(QString name, ImagePtr image)
@@ -211,8 +211,8 @@ void TransferFunctions3DPresets::load3D(QString name, ImagePtr image)
 		transferFunctions->unsignedCT(true);
 	}
 
-	//Make sure the preset transfer functions work correctly
-	transferFunctions->fixTransferFunctions();
+//	//Make sure the preset transfer functions work correctly
+//	transferFunctions->fixTransferFunctions();
 }
 
 ///** look for a preset with the given name. Create one if not found.

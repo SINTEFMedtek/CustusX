@@ -60,8 +60,8 @@ void TransferFunction2DColorWidget::activeImageChangedSlot()
   mTransferFunctionColorWidget->setData(image, tf);
   mTransferFunctionAlphaWidget->setData(image, tf);
 
-  mDataWindow->setImageTFData(tf);
-  mDataLevel->setImageTFData(tf);
+  mDataWindow->setImageTFData(tf, image);
+  mDataLevel->setImageTFData(tf, image);
 }
 
 

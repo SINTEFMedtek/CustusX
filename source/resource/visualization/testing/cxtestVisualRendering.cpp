@@ -171,7 +171,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	images[0] = this->loadImage(image[0]);
 
 	cx::ImageLUT2DPtr lut0 = images[0]->getLookupTable2D();
-	lut0->addColorPoint(lut0->getScalarMax(), QColor::fromRgbF(0,0,1,1));
+	lut0->addColorPoint(images[0]->getMax(), QColor::fromRgbF(0,0,1,1));
 
 	REQUIRE(this->defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
 	REQUIRE(this->quickRunWidget());
@@ -192,12 +192,12 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 
 	cx::ImageLUT2DPtr lut0 = images[0]->getLookupTable2D();
 	//std::cout << "setting llr for vol1 = " << llr << std::endl;
-	lut0->addColorPoint(lut0->getScalarMax(), QColor::fromRgbF(0,1,0,1));
+	lut0->addColorPoint(images[0]->getMax(), QColor::fromRgbF(0,1,0,1));
 
 	cx::ImageLUT2DPtr lut1 = images[1]->getLookupTable2D();
 	//std::cout << "setting llr for vol1 = " << llr << std::endl;
-	lut1->addColorPoint(lut1->getScalarMax(), QColor::fromRgbF(0,0,1,1));
-	double llr = lut1->getScalarMin() + (lut1->getScalarMax()-lut1->getScalarMin())*0.25;
+	lut1->addColorPoint(images[1]->getMax(), QColor::fromRgbF(0,0,1,1));
+	double llr = images[1]->getMin() + (images[1]->getMax()-images[1]->getMin())*0.25;
 	lut1->setLLR(llr);
 
 	REQUIRE(this->defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));

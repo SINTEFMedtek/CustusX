@@ -367,7 +367,8 @@ void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 	{
 		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData() ;
 
-		vtkLookupTablePtr lut = mImages[i]->getLookupTable2D()->getBaseLookupTable();
+		vtkLookupTablePtr lut = mImages[i]->getLookupTable2D()->getOutputLookupTable();
+		lut->GetTable()->Modified();
 		GPUImageLutBufferPtr lutBuffer = GPUImageBufferRepository::getInstance()->getGPUImageLutBuffer(lut->GetTable());
 
 		// no lut indicates to the fragment shader that RGBA should be used
@@ -377,10 +378,18 @@ void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 		}
 
 		int scalarTypeMax = (int)inputImage->GetScalarTypeMax();
-		float window = (float) mImages[i]->getLookupTable2D()->getWindow() / scalarTypeMax;
+		double imin = lut->GetRange()[0];
+		double imax = lut->GetRange()[1];
+
+		float window = (float) (imax-imin) / scalarTypeMax;
 		float llr = (float) mImages[i]->getLookupTable2D()->getLLR() / scalarTypeMax;
-		float level = (float) mImages[i]->getLookupTable2D()->getLevel() / scalarTypeMax;
+		float level = (float) imin/scalarTypeMax + window/2;
 		float alpha = (float) mImages[i]->getLookupTable2D()->getAlpha();
+
+//		float window = (float) mImages[i]->getLookupTable2D()->getWindow() / scalarTypeMax;
+//		float llr = (float) mImages[i]->getLookupTable2D()->getLLR() / scalarTypeMax;
+//		float level = (float) mImages[i]->getLookupTable2D()->getLevel() / scalarTypeMax;
+//		float alpha = (float) mImages[i]->getLookupTable2D()->getAlpha();
 		mPainter->SetColorAttribute(i, window, level, llr, alpha);
 	}
 	mActor->Modified();

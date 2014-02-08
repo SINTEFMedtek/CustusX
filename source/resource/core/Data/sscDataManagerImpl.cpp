@@ -613,17 +613,17 @@ ImagePtr DataManagerImpl::createDerivedImage(vtkImageDataPtr data, QString uid, 
 	ImagePtr retval = this->createImage(data, uid, name, filePath);
 	retval->get_rMd_History()->setRegistration(parentImage->get_rMd());
 	retval->get_rMd_History()->setParentSpace(parentImage->getUid());
-	ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy(retval->getBaseVtkImageData());
-	ImageLUT2DPtr LUT2D = parentImage->getLookupTable2D()->createCopy(retval->getBaseVtkImageData());
+	ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy();
+	ImageLUT2DPtr LUT2D = parentImage->getLookupTable2D()->createCopy();
 	//The parent may have a different range of voxel values. Make sure the transfer functions are working
-	if (transferFunctions)
-		transferFunctions->fixTransferFunctions();
-	else
-		std::cout << "transferFunctions error" << std::endl;
-	if (LUT2D)
-		LUT2D->fixTransferFunctions();
-	else
-		std::cout << "LUT2D error" << std::endl;
+//	if (transferFunctions)
+//		transferFunctions->fixTransferFunctions();
+//	else
+//		std::cout << "transferFunctions error" << std::endl;
+//	if (LUT2D)
+//		LUT2D->fixTransferFunctions();
+//	else
+//		std::cout << "LUT2D error" << std::endl;
 	retval->setLookupTable2D(LUT2D);
 	retval->setTransferFunctions3D(transferFunctions);
 	retval->setModality(parentImage->getModality());

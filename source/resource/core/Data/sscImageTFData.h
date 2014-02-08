@@ -81,9 +81,9 @@ class ImageTFData: public QObject
 {
 Q_OBJECT
 public:
-	ImageTFData(vtkImageDataPtr base);
-	void setVtkImageData(vtkImageDataPtr base);
-	vtkImageDataPtr getVtkImageData();
+	ImageTFData();
+//	void setVtkImageData(vtkImageDataPtr base);
+//	vtkImageDataPtr getVtkImageData();
 	virtual ~ImageTFData();
 
 	void setAlpha(double val); ///< range [0..1]
@@ -96,18 +96,20 @@ public:
 	double getLevel() const;
 
 	void setLut(vtkLookupTablePtr lut);
-	vtkLookupTablePtr getLut() const;
 
-	double getScalarMax() const;
-	double getScalarMin() const;///< \return Minimum intensity of underlying dataset
-	int getMaxAlphaValue() const; // dont use
+//	double getScalarMax() const;
+//	double getScalarMin() const;///< \return Minimum intensity of underlying dataset
+//	int getMaxAlphaValue() const; // dont use
 
 	OpacityMapPtr getOpacityMap();///< \return The values of the opacity transfer function. Key range [scalarMin..scalarMax], Value range [0..255].
 	ColorMapPtr getColorMap();///< \return The values of the color transfer function. Key range [scalarMin..scalarMax].
 
+	void resetAlpha(IntIntMap val);
 	void addAlphaPoint(int alphaPosition, int alphaValue);///< Add point to the opacity transfer function
 	void removeAlphaPoint(int alphaPosition);///< Remove point from the opacity transfer function
 	void moveAlphaPoint(int oldpos, int newpos, int alphaValue);
+
+	void resetColor(ColorMap val);
 	void addColorPoint(int colorPosition, QColor colorValue);///< Add point to the color transfer function
 	void removeColorPoint(int colorPosition);///< Remove point from the color transfer function
 	void moveColorPoint(int oldpos, int newpos, QColor colorValue);
@@ -118,40 +120,43 @@ public:
 	void unsignedCT(bool onLoad);
 	void shift(int val); ///< shift the transfter function index values by the input amount. Used for signed/unsigned conversion.
 
-	void fixTransferFunctions(); ///< Modify/repair transfer function so it matches current image
+//	void fixTransferFunctions(); ///< Modify/repair transfer function so it matches current image
 	void fillColorTFFromMap(vtkColorTransferFunctionPtr tf);
 
 signals:
 	void changed();
 
 protected:
-	virtual void colorMapChanged();
-	virtual void alphaLLRChanged()
-	{
-	} // implemented by subclass
-	virtual void LUTChanged()
-	{
-	} // implemented by subclass
+//		vtkLookupTablePtr getLut() const;
 
-	void buildLUTFromColorMap();
+//	virtual void colorMapChanged();
+//	virtual void alphaLLRChanged()
+//	{
+//	} // implemented by subclass
+//	virtual void LUTChanged()
+//	{
+//	} // implemented by subclass
+
+//	void buildLUTFromColorMap();
 	void deepCopy(ImageTFData* source);
 
 	void fillOpacityTFFromMap(vtkPiecewiseFunctionPtr tf);
-	void fillLUTFromLut(vtkLookupTablePtr output, vtkLookupTablePtr input);
+//	void fillLUTFromLut(vtkLookupTablePtr output, vtkLookupTablePtr input);
 
-	vtkImageDataPtr mBase;
+//	vtkImageDataPtr mBase;
 	OpacityMapPtr mOpacityMapPtr;
 	ColorMapPtr mColorMapPtr;
-	vtkLookupTablePtr mLut;
+//	vtkLookupTablePtr mLut;
 
-private:
 	// these values can be used instead of setting the opacity TF explicitly
 	double mLLR;
 	double mWindow;
 	double mLevel;
 	double mAlpha;
+
+private:
 	double loadAttribute(QDomNode dataNode, QString name, double defVal);
-	double mapThroughLUT(double x, int lutSize);
+//	double mapThroughLUT(double x, int lutSize);
 };
 
 }
