@@ -82,8 +82,6 @@ class ImageTFData: public QObject
 Q_OBJECT
 public:
 	ImageTFData();
-//	void setVtkImageData(vtkImageDataPtr base);
-//	vtkImageDataPtr getVtkImageData();
 	virtual ~ImageTFData();
 
 	void setAlpha(double val); ///< range [0..1]
@@ -97,12 +95,8 @@ public:
 
 	void setLut(vtkLookupTablePtr lut);
 
-//	double getScalarMax() const;
-//	double getScalarMin() const;///< \return Minimum intensity of underlying dataset
-//	int getMaxAlphaValue() const; // dont use
-
-	OpacityMapPtr getOpacityMap();///< \return The values of the opacity transfer function. Key range [scalarMin..scalarMax], Value range [0..255].
-	ColorMapPtr getColorMap();///< \return The values of the color transfer function. Key range [scalarMin..scalarMax].
+	IntIntMap getOpacityMap();///< \return The values of the opacity transfer function. Key range [scalarMin..scalarMax], Value range [0..255].
+	ColorMap getColorMap();///< \return The values of the color transfer function. Key range [scalarMin..scalarMax].
 
 	void resetAlpha(IntIntMap val);
 	void addAlphaPoint(int alphaPosition, int alphaValue);///< Add point to the opacity transfer function
@@ -120,33 +114,18 @@ public:
 	void unsignedCT(bool onLoad);
 	void shift(int val); ///< shift the transfter function index values by the input amount. Used for signed/unsigned conversion.
 
-//	void fixTransferFunctions(); ///< Modify/repair transfer function so it matches current image
 	void fillColorTFFromMap(vtkColorTransferFunctionPtr tf);
 
 signals:
-	void changed();
+	void transferFunctionsChanged();
 
 protected:
-//		vtkLookupTablePtr getLut() const;
-
-//	virtual void colorMapChanged();
-//	virtual void alphaLLRChanged()
-//	{
-//	} // implemented by subclass
-//	virtual void LUTChanged()
-//	{
-//	} // implemented by subclass
-
-//	void buildLUTFromColorMap();
 	void deepCopy(ImageTFData* source);
+	virtual void internalsHaveChanged() {}
 
 	void fillOpacityTFFromMap(vtkPiecewiseFunctionPtr tf);
-//	void fillLUTFromLut(vtkLookupTablePtr output, vtkLookupTablePtr input);
-
-//	vtkImageDataPtr mBase;
-	OpacityMapPtr mOpacityMapPtr;
-	ColorMapPtr mColorMapPtr;
-//	vtkLookupTablePtr mLut;
+	IntIntMap mOpacityMap;
+	ColorMap mColorMap;
 
 	// these values can be used instead of setting the opacity TF explicitly
 	double mLLR;
@@ -156,7 +135,6 @@ protected:
 
 private:
 	double loadAttribute(QDomNode dataNode, QString name, double defVal);
-//	double mapThroughLUT(double x, int lutSize);
 };
 
 }

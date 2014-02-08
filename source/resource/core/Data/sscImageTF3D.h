@@ -64,26 +64,15 @@ public:
 	ImageTF3D();
 
 	void setInitialTFFromImage(vtkImageDataPtr base);
-//	void removeInitAlphaPoint();///< Remove the initial point set at 10%. Used when we need a "clean" transfer function.
 	ImageTF3DPtr createCopy();
 
 	vtkPiecewiseFunctionPtr getOpacityTF();
 	vtkColorTransferFunctionPtr getColorTF();
 
-	virtual void addXml(QDomNode dataNode); ///< adds xml information about the transferfunction and its variabels
-	virtual void parseXml(QDomNode dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
-
-signals:
-	void transferFunctionsChanged();
-private slots:
-	void transferFunctionsChangedSlot();
+protected:
+	virtual void internalsHaveChanged();
 private:
-//	ImageTF3D();
-	virtual void LUTChanged();
-	virtual void alphaLLRChanged();
-
 	void buildOpacityMapFromLLRAlpha();
-
 	void refreshColorTF();
 	void refreshOpacityTF();
 

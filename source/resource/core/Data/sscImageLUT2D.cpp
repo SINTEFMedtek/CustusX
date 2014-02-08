@@ -40,10 +40,6 @@ namespace cx
 
 ImageLUT2D::ImageLUT2D()
 {
-	mOutputLUT = vtkLookupTablePtr::New();
-
-//	connect(this, SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged())); called by the slot.
-	connect(this, SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
 }
 
 void ImageLUT2D::setInitialTFFromImage(vtkImageDataPtr base)
@@ -76,17 +72,14 @@ void ImageLUT2D::setInitialTFFromImage(vtkImageDataPtr base)
 		this->setLevel(smin + srange * 0.5);
 		this->setWindow(srange);
 	}
-	this->transferFunctionsChangedSlot();//Need to update transfer function after setting window/level
+
+	this->internalsHaveChanged();
 }
 
 ImageLUT2DPtr ImageLUT2D::createCopy()
 {
 	ImageLUT2DPtr retval(new ImageLUT2D());
-
 	retval->deepCopy(this);
-//	retval->setVtkImageData(newBase);
-	retval->mOutputLUT->DeepCopy(mOutputLUT);
-
 	return retval;
 }
 
@@ -99,36 +92,14 @@ void ImageLUT2D::setFullRangeWinLevel(vtkImageDataPtr image)
 	this->setLevel(smin + srange / 2.0);
 }
 
-void ImageLUT2D::transferFunctionsChangedSlot()
-{
-//	this->colorMapChanged();
-	this->refreshOutput();
-}
-
-/**set basic lookuptable, to be modified by level/window/llr/alpha
- */
-//void ImageLUT2D::setBaseLookupTable(vtkLookupTablePtr lut)
-//{
-//	this->setLut(lut);
-//}
-
 vtkLookupTablePtr ImageLUT2D::getOutputLookupTable()
 {
+	if (!mOutputLUT)
+	{
+		mOutputLUT = vtkLookupTablePtr::New();
+		this->refreshOutputLUT();
+	}
 	return mOutputLUT;
-}
-//vtkLookupTablePtr ImageLUT2D::getBaseLookupTable()
-//{
-//	return this->getLut();
-//}
-
-//void ImageLUT2D::LUTChanged()
-//{
-//	this->refreshOutput();
-//}
-
-void ImageLUT2D::alphaLLRChanged()
-{
-	this->buildOpacityMapFromLLRAlpha();
 }
 
 /**Rebuild the opacity tf from LLR and alpha.
@@ -137,7 +108,7 @@ void ImageLUT2D::alphaLLRChanged()
 void ImageLUT2D::buildOpacityMapFromLLRAlpha()
 {
 	// REMOVED CA 2014-02-07 - TODO
-	mOpacityMapPtr->clear();
+	mOpacityMap.clear();
 //	this->addAlphaPoint(this->getScalarMin(), 0);
 //	if (this->getLLR() > this->getScalarMin())
 		this->addAlphaPoint(this->getLLR() - 1, 0);
@@ -145,12 +116,9 @@ void ImageLUT2D::buildOpacityMapFromLLRAlpha()
 //	this->addAlphaPoint(this->getScalarMax(), this->getAlpha() * 255);
 }
 
-/**rebuild the output lut from all inputs.
- */
-void ImageLUT2D::refreshOutput()
+void ImageLUT2D::internalsHaveChanged()
 {
-//	this->fillLUTFromLut(mOutputLUT, mLut);
-	this->buildOutputLUT();
+	this->refreshOutputLUT();
 	emit transferFunctionsChanged();
 }
 
@@ -161,38 +129,35 @@ std::pair<int,int> ImageLUT2D::getMapsRange()
 	int imin = 0;
 	int imax = 0;
 
-	if (!mColorMapPtr->empty() && !mOpacityMapPtr->empty())
+	if (!mColorMap.empty() && !mOpacityMap.empty())
 	{
-		int imin = std::min(mColorMapPtr->begin()->first, mOpacityMapPtr->begin()->first);
-		int imax = std::max(mColorMapPtr->rbegin()->first, mOpacityMapPtr->rbegin()->first);
+		int imin = std::min(mColorMap.begin()->first, mOpacityMap.begin()->first);
+		int imax = std::max(mColorMap.rbegin()->first, mOpacityMap.rbegin()->first);
 		return std::make_pair(imin,imax);
 	}
-	else if (!mColorMapPtr->empty())
+	else if (!mColorMap.empty())
 	{
-		int imin = mColorMapPtr->begin()->first;
-		int imax = mColorMapPtr->rbegin()->first;
+		int imin = mColorMap.begin()->first;
+		int imax = mColorMap.rbegin()->first;
 		return std::make_pair(imin,imax);
 	}
-	else if (!mOpacityMapPtr->empty())
+	else if (!mOpacityMap.empty())
 	{
-		int imin = mOpacityMapPtr->begin()->first;
-		int imax = mOpacityMapPtr->rbegin()->first;
+		int imin = mOpacityMap.begin()->first;
+		int imax = mOpacityMap.rbegin()->first;
 		return std::make_pair(imin,imax);
 	}
 	else
 	{
 		return std::make_pair(0,0);
 	}
-
-//	if ()
-//	// the total range [imin,imax] of values in the opacity and color tables
-//	int imin = std::min(mColorMapPtr->begin()->first, mOpacityMapPtr->begin()->first);
-//	int imax = std::max(mColorMapPtr->rbegin()->first, mOpacityMapPtr->rbegin()->first);
-//	int icount = imax - imin + 1;
 }
 
-void ImageLUT2D::buildOutputLUT()
+void ImageLUT2D::refreshOutputLUT()
 {
+	if (!mOutputLUT)
+		return;
+
 	std::pair<int,int> range = this->getMapsRange();
 	int imin = range.first;
 	int imax = range.second;
@@ -218,21 +183,6 @@ void ImageLUT2D::buildOutputLUT()
 	}
 
 	lut->Modified();
-}
-
-
-
-void ImageLUT2D::addXml(QDomNode dataNode)
-{
-	ImageTFData::addXml(dataNode);
-}
-
-void ImageLUT2D::parseXml(QDomNode dataNode)
-{
-	ImageTFData::parseXml(dataNode);
-
-//	this->buildLUTFromColorMap();
-	this->refreshOutput();
 }
 
 //---------------------------------------------------------

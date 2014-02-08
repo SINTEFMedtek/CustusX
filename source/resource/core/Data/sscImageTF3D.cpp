@@ -45,30 +45,8 @@
 namespace cx
 {
 
-ImageTF3D::ImageTF3D() //:
-//	ImageTFData(base)//, mOpacityTF(vtkPiecewiseFunctionPtr::New()), mColorTF(vtkColorTransferFunctionPtr::New())
+ImageTF3D::ImageTF3D()
 {
-//	mColorTF->SetColorSpaceToRGB();
-
-//	double smin = base->GetScalarRange()[0];
-//	double smax = base->GetScalarRange()[1];
-//	double srange = smax - smin;
-
-//	//  double max = this->getScalarMax();
-//	//	mOpacityTF->AddPoint(0.0, 0.0);
-//	//	mOpacityTF->AddPoint(max, 1.0);
-//	//	mColorTF->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
-//	//	mColorTF->AddRGBPoint(max, 1.0, 1.0, 1.0);
-
-//	this->addAlphaPoint(smin, 0);
-//	this->addAlphaPoint(srange * 0.1 + smin, 0);
-//	this->addAlphaPoint(smax, 255);
-
-//	this->addColorPoint(smin, Qt::black);
-//	this->addColorPoint(smax, Qt::white);
-
-	connect(this, SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged()));
-	connect(this, SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
 }
 
 void ImageTF3D::setInitialTFFromImage(vtkImageDataPtr base)
@@ -84,12 +62,6 @@ void ImageTF3D::setInitialTFFromImage(vtkImageDataPtr base)
 	mLLR = smin;
 	mAlpha = 1.0;
 
-	//  double max = this->getScalarMax();
-	//	mOpacityTF->AddPoint(0.0, 0.0);
-	//	mOpacityTF->AddPoint(max, 1.0);
-	//	mColorTF->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
-	//	mColorTF->AddRGBPoint(max, 1.0, 1.0, 1.0);
-
 	this->addAlphaPoint(smin, 0);
 	this->addAlphaPoint(srange * 0.1 + smin, 0);
 	this->addAlphaPoint(smax, 255);
@@ -98,45 +70,38 @@ void ImageTF3D::setInitialTFFromImage(vtkImageDataPtr base)
 	this->addColorPoint(smax, Qt::white);
 }
 
-
-//void ImageTF3D::removeInitAlphaPoint()
-//{
-//	double smin = mBase->GetScalarRange()[0];
-//	double smax = mBase->GetScalarRange()[1];
-//	double srange = smax - smin;
-//	this->removeAlphaPoint(srange * 0.1 + smin);
-//}
-
-void ImageTF3D::transferFunctionsChangedSlot()
+void ImageTF3D::internalsHaveChanged()
 {
 	this->refreshOpacityTF();
 	this->refreshColorTF();
+	emit transferFunctionsChanged();
 }
 
 ImageTF3DPtr ImageTF3D::createCopy()
 {
 	ImageTF3DPtr retval(new ImageTF3D());
 	retval->deepCopy(this);
-//	retval->setVtkImageData(newDataBase);//deepCopy also copies the data base
 	return retval;
 }
 
 vtkPiecewiseFunctionPtr ImageTF3D::getOpacityTF()
 {
-	this->refreshOpacityTF();
+	if (!mOpacityTF)
+	{
+		mOpacityTF = vtkPiecewiseFunctionPtr::New();
+		this->refreshOpacityTF();
+	}
 	return mOpacityTF;
 }
 
 vtkColorTransferFunctionPtr ImageTF3D::getColorTF()
 {
-	this->refreshColorTF();
+	if (!mColorTF)
+	{
+		mColorTF = vtkColorTransferFunctionPtr::New();
+		this->refreshColorTF();
+	}
 	return mColorTF;
-}
-
-void ImageTF3D::LUTChanged()
-{
-	this->refreshColorTF();
-	emit transferFunctionsChanged();
 }
 
 /**update the color TF according to the
@@ -145,11 +110,7 @@ void ImageTF3D::LUTChanged()
 void ImageTF3D::refreshColorTF()
 {
 	if (!mColorTF)
-	{
-		mColorTF = vtkColorTransferFunctionPtr::New();
-		mColorTF->SetColorSpaceToRGB();
-	}
-
+		return;
 	this->fillColorTFFromMap(mColorTF);
 }
 
@@ -157,19 +118,9 @@ void ImageTF3D::refreshColorTF()
  */
 void ImageTF3D::refreshOpacityTF()
 {
-//	if (!mLut)
-//		return;
-
 	if (!mOpacityTF)
-	{
-		mOpacityTF = vtkPiecewiseFunctionPtr::New();
-	}
+		return;
 	this->fillOpacityTFFromMap(mOpacityTF);
-}
-
-void ImageTF3D::alphaLLRChanged()
-{
-	this->buildOpacityMapFromLLRAlpha();
 }
 
 /**Rebuild the opacity tf from LLR and alpha.
@@ -181,7 +132,7 @@ void ImageTF3D::buildOpacityMapFromLLRAlpha()
 	double range = this->getWindow();
 	int smooth = (int) (0.1 * range);
 
-	mOpacityMapPtr->clear();
+	mOpacityMap.clear();
 //	this->addAlphaPoint(this->getScalarMin(), 0);
 //	if (this->getLLR() > this->getScalarMin())
 	this->addAlphaPoint(this->getLLR() - 1, 0);
@@ -189,16 +140,6 @@ void ImageTF3D::buildOpacityMapFromLLRAlpha()
 	this->addAlphaPoint(this->getLLR() + 4 * smooth, this->getAlpha() * 255 * 5 / 10);
 	this->addAlphaPoint(this->getLLR() + 10 * smooth, this->getAlpha() * 255);
 //	this->addAlphaPoint(this->getScalarMax(), this->getAlpha() * 255);
-}
-
-void ImageTF3D::addXml(QDomNode dataNode)
-{
-	ImageTFData::addXml(dataNode);
-}
-
-void ImageTF3D::parseXml(QDomNode dataNode)
-{
-	ImageTFData::parseXml(dataNode);
 }
 
 }
