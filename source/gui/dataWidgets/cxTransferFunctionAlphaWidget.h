@@ -49,7 +49,11 @@ protected:
       position(INT_MIN),
       value(INT_MIN)
       {}
-    void reset()
+	AlphaPoint(int pos, int val) :
+	  position(pos),
+	  value(val)
+	  {}
+	void reset()
     {
       position = INT_MIN;
       value = INT_MIN;
@@ -71,26 +75,31 @@ protected:
   virtual void paintEvent(QPaintEvent* event); ///< Reimplemented from superclass. Paints the transferfunction GUI
   virtual void resizeEvent(QResizeEvent* evt);///< Reimplemented from superclass
 
-  bool isInsideCurrentPoint(int mouseX, int mouseY);///< Checks if a screen coordinate is inside any of the point rectangles
-  AlphaPoint getCurrentAlphaPoint(int mouseX, int mouseY);///< Get aplha point based on mCurrentClickX and mCurrentClickY
-  void toggleCurrentPoint(int mouseX, int mouseY);///< Turn a transfer function point on or off (depending on it is on or not)
-  void moveCurrentAlphaPoint(int mouseX, int mouseY);///< Move the currently selected point to the selected screen coordinate (mCurrentClickX and mCurrentClickY)
+  bool isInsideCurrentPoint(QPoint pos);///< Checks if a screen coordinate is inside any of the point rectangles
+  AlphaPoint getCurrentAlphaPoint(QPoint pos);///< Get aplha point based on mCurrentClickX and mCurrentClickY
+  void toggleCurrentPoint(QPoint pos);///< Turn a transfer function point on or off (depending on it is on or not)
+  void moveCurrentAlphaPoint(QPoint pos);///< Move the currently selected point to the selected screen coordinate (mCurrentClickX and mCurrentClickY)
+  QPoint alpha2screen(AlphaPoint pt) const;
+
+  bool isEndpoint(int intensity) const;
+  void paintHistogram(QPainter& painter);
+  void paintOpacityGraph(QPainter& painter);
+  std::pair<int,int> findAllowedMoveRangeAroundAlphaPoint(int selectedPointIntensity);
 
   QRect mFullArea; ///< The full widget area.
   QRect mPlotArea; ///< The plot area.
+  int mBorder;///< The size of the border around the transferfunction. The size of the rectangles are mBorder * 2
+  bool mReadOnly;///< Is class readOnly? Eg no mouse interaction possible
+
   std::map<int, QRect> mPointRects; ///< Cache with all point rectangles.
   AlphaPoint mCurrentAlphaPoint;///< The current alpha point
-	bool mEndPoint;///< Current alpha point is an endpoint
-
-  int mBorder;///< The size of the border around the transferfunction. The size of the rectangles are mBorder * 2
+//  bool mEndPoint;///< Current alpha point is an endpoint
 
   ImagePtr mImage;
   ImageTFDataPtr mImageTF;
-  
-  bool mReadOnly;///< Is class readOnly? Eg no mouse interaction possible
+  ActiveImageProxyPtr mActiveImageProxy;
 
   virtual QSize sizeHint () const { return QSize(200, 100);};///< Define a recommended size
-  ActiveImageProxyPtr mActiveImageProxy;
 };
 }
 #endif /* CXTRANSFERFUNCTIONALPHAWIDGET_H_ */

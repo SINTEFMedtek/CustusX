@@ -217,6 +217,8 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 	double level = customReader->readKey("WindowLevel").toDouble(&ok1);
 	double window = customReader->readKey("WindowWidth").toDouble(&ok2);
 
+	image->resetTransferFunctions();
+
 	if (ok1 && ok2)
 	{
 //		image->getTransferFunctions3D()->setLevel(level);
@@ -224,11 +226,14 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 
 		// set TF 3D using the color points and alpha points based on windowlevel settings.
 		ImageTF3DPtr tf3D = image->getTransferFunctions3D();
+		tf3D->setWindow(window);
+		tf3D->setLevel(level);
 //		SSC_LOG("level: %f, win: %f, first: %f, second: %f", level, window, level-window/2, level+window/2);
-		ColorMap colors;
-		colors[level-window/2] = QColor("black");
-		colors[level+window/2] = QColor("white");
-		tf3D->resetColor(colors);
+//		ColorMap colors;
+//		colors[level-window/2] = QColor("black");
+//		colors[level+window/2] = QColor("white");
+//		tf3D->resetColor(colors);
+//		tf3D->setLLR();
 
 		IntIntMap opacity;
 		opacity[level-0.7*window/2] = 0;

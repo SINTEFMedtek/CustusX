@@ -20,7 +20,6 @@ namespace cx
 {
 TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(QWidget* parent) :
   BaseWidget(parent, "TransferFunctionAlphaWidget", "Alpha Transfer Function"),
-  mEndPoint(false),
   mBorder(5),
   mReadOnly(false)
 {
@@ -79,11 +78,11 @@ void TransferFunctionAlphaWidget::mousePressEvent(QMouseEvent* event)
 
   if(event->button() == Qt::LeftButton)
   {
-    this->isInsideCurrentPoint(event->x(), event->y());
+	  this->isInsideCurrentPoint(event->pos());
   }
   else if(event->button() == Qt::RightButton)
   {
-    this->toggleCurrentPoint(event->x(), event->y());
+	  this->toggleCurrentPoint(event->pos());
   }
 }
 
@@ -92,12 +91,7 @@ void TransferFunctionAlphaWidget::mouseReleaseEvent(QMouseEvent* event)
   if(mReadOnly)
     return;
   QWidget::mouseReleaseEvent(event);
-
-  //we no longer need these values
   mCurrentAlphaPoint.reset();
-	
-  //TODO do we need to render here?
-  //this->update();
 }
 
 void TransferFunctionAlphaWidget::mouseMoveEvent(QMouseEvent* event)
@@ -105,7 +99,7 @@ void TransferFunctionAlphaWidget::mouseMoveEvent(QMouseEvent* event)
   if (!mImage)
     return;
 
-  AlphaPoint point = this->getCurrentAlphaPoint(event->x(), event->y());
+  AlphaPoint point = this->getCurrentAlphaPoint(event->pos());
   this->setToolTip(QString("(%1, %2)").arg(point.position).arg(point.value / 255.0, 0, 'f', 2));
   if(mReadOnly) //Only show tool tip if readOnly
     return;
@@ -113,7 +107,7 @@ void TransferFunctionAlphaWidget::mouseMoveEvent(QMouseEvent* event)
 
   if(event->buttons() == Qt::LeftButton)
   {
-    this->moveCurrentAlphaPoint(event->x(), event->y());
+	this->moveCurrentAlphaPoint(event->pos());
   }
   // Mouse is only moved inside the widget.
   // Emit value for possible use by info widget
@@ -142,10 +136,6 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
   QWidget::paintEvent(event);
 
   QPainter painter(this);
-  QPen pointPen, pointLinePen;
-  
-  pointPen.setColor(QColor(0, 0, 150));
-  pointLinePen.setColor(QColor(150, 100, 100));
   
   // Fill with white global background color and grey plot area background color
   const QBrush frameBrush = QBrush(QColor(170, 170, 170));
@@ -153,72 +143,99 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
   painter.fillRect(this->mFullArea, frameBrush);
   painter.fillRect(this->mPlotArea, backgroundBrush);
 
-  // Draw histogram
-  // with log compression
-
-  vtkImageAccumulatePtr histogram = mImage->getHistogram();
-  int histogramSize = histogram->GetComponentExtent()[1] - 
-                      histogram->GetComponentExtent()[0];
-  
-  painter.setPen(QColor(140, 140, 210));
-  
-  // A more correct approach may be to sum all values that comes inside
-  // a y-value instead of drawing multiple lines on the same position.
-  int x = 0;
-  int y = 0;
-  double barHeightMult = (height() - mBorder*2) 
-  / log(histogram->GetOutput()->GetPointData()->GetScalars()->GetRange()[1]+1);
-  
-  double posMult = (width() - mBorder*2) / double(histogramSize);
-  for (int i = mImage->getMin(); i <= mImage->getMax(); i++)
-  {
-    x = ((i- mImage->getMin()) * posMult); //Offset with min value
-    y = log(double(static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i - mImage->getMin()]+1)) * barHeightMult;
-    if (y > 0)
-    {
-      painter.drawLine(x + mBorder, height() - mBorder, 
-                       x + mBorder, height() - mBorder - y);
-    }
-  }
-
-  // Go through each point and draw squares and lines
-  IntIntMap opacityMap = mImageTF->getOpacityMap();
-
-  QPoint lastScreenPoint;
-  this->mPointRects.clear();
-  for (IntIntMap::iterator opPoint = opacityMap.begin();
-	   opPoint != opacityMap.end();
-       ++opPoint)
-  {
-    // Get the screen (plot) position of this point
-    QPoint screenPoint = QPoint(
-      static_cast<int>(mPlotArea.left() + mPlotArea.width() * 
-                       (opPoint->first - mImage->getMin()) /
-                       static_cast<double>(mImage->getRange())),
-      static_cast<int>(mPlotArea.bottom() - mPlotArea.height() * 
-                       opPoint->second / 
-                       static_cast<double>(mImage->getMaxAlphaValue())) );
-
-    //std::cout << "x: " << opPoint->first  << " y: " << opPoint->second << std::endl;
-    //std::cout << "Screen x: " << screenPoint.x() << " y: " << screenPoint.y() << std::endl;
-    // Draw line from previous point if this is not the first point
-	if (opPoint != opacityMap.begin())
-    {
-      painter.setPen(pointLinePen);
-      painter.drawLine(lastScreenPoint, screenPoint);
-    }
-
-    // Draw the rectangle
-    QRect pointRect(screenPoint.x() - mBorder, screenPoint.y() - mBorder, 
-                    mBorder*2, mBorder*2);
-    painter.setPen(pointPen);
-    painter.drawRect(pointRect);
-    this->mPointRects[opPoint->first] = pointRect;
-
-    // Store the point
-    lastScreenPoint = screenPoint;
-  }
+  this->paintHistogram(painter);
+  this->paintOpacityGraph(painter);
 }
+
+void TransferFunctionAlphaWidget::paintOpacityGraph(QPainter& painter)
+{
+	QPen pointPen, pointLinePen;
+	pointPen.setColor(QColor(0, 0, 150));
+	pointLinePen.setColor(QColor(150, 100, 100));
+
+	// Go through each point and draw squares and lines
+	IntIntMap opacityMap = mImageTF->getOpacityMap();
+
+	QPoint lastScreenPoint;
+	this->mPointRects.clear();
+	for (IntIntMap::iterator opPoint = opacityMap.begin();
+		 opPoint != opacityMap.end();
+		 ++opPoint)
+	{
+	  // Get the screen (plot) position of this point
+		AlphaPoint pt(opPoint->first, opPoint->second);
+		QPoint screenPoint = this->alpha2screen(pt);
+
+		// draw line from left edge to first point:
+		if (opPoint==opacityMap.begin())
+		{
+			lastScreenPoint = QPoint(mImage->getMin(), screenPoint.y());
+		}
+
+	  // Draw line from previous point
+		painter.setPen(pointLinePen);
+		painter.drawLine(lastScreenPoint, screenPoint);
+
+	  // Draw the rectangle
+	  QRect pointRect(screenPoint.x() - mBorder, screenPoint.y() - mBorder,
+					  mBorder*2, mBorder*2);
+	  painter.setPen(pointPen);
+	  painter.drawRect(pointRect);
+	  this->mPointRects[opPoint->first] = pointRect;
+
+	  // Store the point
+	  lastScreenPoint = screenPoint;
+	}
+
+	// draw a line from the last point to the right end
+	QPoint screenPoint(mImage->getMax(), lastScreenPoint.y());
+	painter.setPen(pointLinePen);
+	painter.drawLine(lastScreenPoint, screenPoint);
+
+}
+
+QPoint TransferFunctionAlphaWidget::alpha2screen(AlphaPoint pt) const
+{
+	QPoint screenPoint = QPoint(
+				static_cast<int>(mPlotArea.left() + mPlotArea.width() *
+								 (pt.position - mImage->getMin()) /
+								 static_cast<double>(mImage->getRange())),
+				static_cast<int>(mPlotArea.bottom() - mPlotArea.height() *
+								 pt.value /
+								 static_cast<double>(mImage->getMaxAlphaValue())) );
+	return screenPoint;
+}
+
+void TransferFunctionAlphaWidget::paintHistogram(QPainter& painter)
+{
+	// Draw histogram
+	// with log compression
+
+	vtkImageAccumulatePtr histogram = mImage->getHistogram();
+	int histogramSize = histogram->GetComponentExtent()[1] -
+						histogram->GetComponentExtent()[0];
+
+	painter.setPen(QColor(140, 140, 210));
+
+	int x = 0;
+	int y = 0;
+	double barHeightMult = (this->height() - mBorder*2)
+	/ log(histogram->GetOutput()->GetPointData()->GetScalars()->GetRange()[1]+1);
+
+	double posMult = (this->width() - mBorder*2) / double(histogramSize);
+	for (int i = mImage->getMin(); i <= mImage->getMax(); i++)
+	{
+	  x = ((i- mImage->getMin()) * posMult); //Offset with min value
+	  y = log(double(static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i - mImage->getMin()]+1)) * barHeightMult;
+	  if (y > 0)
+	  {
+		painter.drawLine(x + mBorder, height() - mBorder,
+						 x + mBorder, height() - mBorder - y);
+	  }
+	}
+}
+
+
 void TransferFunctionAlphaWidget::resizeEvent(QResizeEvent* evt)
 {
   QWidget::resizeEvent(evt);
@@ -229,17 +246,14 @@ void TransferFunctionAlphaWidget::resizeEvent(QResizeEvent* evt)
                           width() - mBorder*2, height() - mBorder*2);
 }
 
-bool TransferFunctionAlphaWidget::isInsideCurrentPoint(int mouseX, int mouseY)
+bool TransferFunctionAlphaWidget::isInsideCurrentPoint(QPoint pos)
 {
-  mEndPoint = false;
   std::map<int, QRect>::iterator it = mPointRects.begin();
   for(;it != mPointRects.end(); ++it)
   {
-    if (it->second.contains(mouseX, mouseY))
+	if (it->second.contains(pos))
     {
       mCurrentAlphaPoint.position = it->first;
-      if (it == mPointRects.begin() || it == --mPointRects.end())
-        mEndPoint = true;
       return true;
     }
   }
@@ -247,17 +261,26 @@ bool TransferFunctionAlphaWidget::isInsideCurrentPoint(int mouseX, int mouseY)
   return false;
 }
 
-TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::getCurrentAlphaPoint(int mouseX, int mouseY)
+bool TransferFunctionAlphaWidget::isEndpoint(int intensity) const
+{
+	if (mPointRects.begin()->first == intensity)
+		return true;
+	if (mPointRects.rbegin()->first == intensity)
+		return true;
+	return false;
+}
+
+TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::getCurrentAlphaPoint(QPoint pos)
 {
   AlphaPoint point;
 
   point.position = 
     static_cast<int>(mImage->getMin() + ( mImage->getRange() *
-                     (mouseX - mPlotArea.left()) /
+					 (pos.x() - mPlotArea.left()) /
                      static_cast<double>(mPlotArea.width()) ));
   point.value = 
     static_cast<int>( mImage->getMaxAlphaValue() *
-                     (mPlotArea.bottom() - mouseY) /
+					 (mPlotArea.bottom() - pos.y()) /
                      static_cast<double>(mPlotArea.height()) );
 
   point.position = constrainValue(point.position, mImage->getMin(), mImage->getMax());
@@ -266,18 +289,17 @@ TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::getCurrentA
   return point;
 }
 
-void TransferFunctionAlphaWidget::toggleCurrentPoint(int mouseX, int mouseY)
+void TransferFunctionAlphaWidget::toggleCurrentPoint(QPoint pos)
 {
   if(!mImage)
     return;
-  if(!isInsideCurrentPoint(mouseX, mouseY))
+  if(!isInsideCurrentPoint(pos))
   {
     // Outside any of the rectangles
-    AlphaPoint point = getCurrentAlphaPoint(mouseX, mouseY);
+	AlphaPoint point = getCurrentAlphaPoint(pos);
     mImageTF->addAlphaPoint(point.position,point.value);
   }
-  // mEndPoint is set in isInsideCurrentPoint()
-  else if(!mEndPoint)
+  else if(!this->isEndpoint(mCurrentAlphaPoint.position))
   {
     // Inside one of the rectangles
     if(mCurrentAlphaPoint.isValid())
@@ -287,40 +309,45 @@ void TransferFunctionAlphaWidget::toggleCurrentPoint(int mouseX, int mouseY)
   this->update();
 }
 
-void TransferFunctionAlphaWidget::moveCurrentAlphaPoint(int mouseX, int mouseY)
+void TransferFunctionAlphaWidget::moveCurrentAlphaPoint(QPoint pos)
 {
-  if(!mCurrentAlphaPoint.isValid())
-    return;
+	if(!mCurrentAlphaPoint.isValid())
+		return;
 
-  AlphaPoint newAlphaPoint = this->getCurrentAlphaPoint(mouseX, mouseY);
+	AlphaPoint newAlphaPoint = this->getCurrentAlphaPoint(pos);
 
-  // Max and min points may only be moved in y direction
-  if(mCurrentAlphaPoint.position == mImage->getMin()
-     || mCurrentAlphaPoint.position == mImage->getMax() )
-  {
-    mImageTF->addAlphaPoint(mCurrentAlphaPoint.position,
-                                    newAlphaPoint.value);
-  }
-  else
-  {
-	IntIntMap opacityMap = mImageTF->getOpacityMap();
-	IntIntMap::iterator prevpoint = opacityMap.find(mCurrentAlphaPoint.position);
-	IntIntMap::iterator nextpoint = opacityMap.find(mCurrentAlphaPoint.position);
-    --prevpoint;
-    ++nextpoint;
+	std::pair<int,int> range = this->findAllowedMoveRangeAroundAlphaPoint(mCurrentAlphaPoint.position);
+	newAlphaPoint.position = constrainValue(newAlphaPoint.position, range.first, range.second);
 
-    if (newAlphaPoint.position <= prevpoint->first)
-      newAlphaPoint.position = prevpoint->first + 1;
-    else if (newAlphaPoint.position >= nextpoint->first)
-      newAlphaPoint.position = nextpoint->first - 1;
-
-//    mImageTF->removeAlphaPoint(mCurrentAlphaPoint.position);
-//    mImageTF->addAlphaPoint(newAlphaPoint.position, newAlphaPoint.value);
 	mImageTF->moveAlphaPoint(mCurrentAlphaPoint.position, newAlphaPoint.position, newAlphaPoint.value);
 
-    mCurrentAlphaPoint = newAlphaPoint;
-  }
-  // Update GUI while moving point
-  this->update();
+	mCurrentAlphaPoint = newAlphaPoint;
+	this->update();
 }
+
+std::pair<int,int> TransferFunctionAlphaWidget::findAllowedMoveRangeAroundAlphaPoint(int selectedPointIntensity)
+{
+	// constrain new point intensity between the two neigbours
+	IntIntMap opacityMap = mImageTF->getOpacityMap();
+	IntIntMap::iterator pointIterator = opacityMap.find(selectedPointIntensity);
+
+	std::pair<int,int> range(mImage->getMin(), mImage->getMax());
+	if (pointIterator!=opacityMap.begin())
+	{
+		IntIntMap::iterator prevPointIterator = pointIterator;
+		--prevPointIterator;
+		range.first = std::max(range.first, prevPointIterator->first + 1);
+	}
+
+	IntIntMap::iterator nextPointIterator = pointIterator;
+	++nextPointIterator;
+	if (nextPointIterator!=opacityMap.end())
+	{
+		range.second = std::min(range.second, nextPointIterator->first - 1);
+	}
+
+	return range;
+}
+
+
 }//namespace cx

@@ -7,10 +7,7 @@
 namespace cxtest {
 
 TestTransferFunctionColorWidget::TestTransferFunctionColorWidget() :
-		TransferFunctionColorWidget(NULL),
-		mLeftAreaBoundary(0),
-		mRightAreaBoundary(0),
-		mWidthAreaBoundary(0)
+		TransferFunctionColorWidget(NULL)
 {}
 
 
@@ -21,10 +18,6 @@ void TestTransferFunctionColorWidget::initWithTestData()
 	cx::ImageTFDataPtr transferFunction;
 	transferFunction = dummyImage->getTransferFunctions3D();
 	this->setData(dummyImage, transferFunction);
-	this->calculateColorTFBoundaries(
-			this->mLeftAreaBoundary,
-			this->mRightAreaBoundary,
-			this->mWidthAreaBoundary);
 }
 
 void TestTransferFunctionColorWidget::setPlotArea(QRect plotArea)
@@ -34,11 +27,11 @@ void TestTransferFunctionColorWidget::setPlotArea(QRect plotArea)
 
 int TestTransferFunctionColorWidget::getLeftAreaBoundary()
 {
-	return this->mLeftAreaBoundary;
+	return mPlotArea.left();
 }
 int TestTransferFunctionColorWidget::getRigthAreaBoundary()
 {
-	return this->mRightAreaBoundary;
+	return mPlotArea.right();
 }
 
 } /* namespace cxtest */
