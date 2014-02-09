@@ -56,16 +56,26 @@ void ImageTF3D::setInitialTFFromImage(vtkImageDataPtr base)
 	double srange = smax - smin;
 
 	// set a winlevel spanning the entire range
-	mWindow = smax - smin;
-	mLevel = smin + mWindow / 2.0;
+//	mWindow = smax - smin;
+//	mLevel = smin + mWindow / 2.0;
 	// set llr/alpha with full transmission
-	mLLR = smin;
-	mAlpha = 1.0;
+//	mLLR = smin;
+//	mAlpha = 1.0;
 
-	this->addAlphaPoint(smin, 0);
-	this->addAlphaPoint(srange * 0.1 + smin, 0);
+//	mOpacityMap.clear();
+//	this->addAlphaPoint(smin, 0);
+//	this->addAlphaPoint(srange * 0.1 + smin, 0);
+//	this->addAlphaPoint(smax, 255);
+
+//	int smooth = (int) (0.1 * srange);
+	mOpacityMap.clear();
+	this->addAlphaPoint(smin - 1, 0);
+	this->addAlphaPoint(smin + 0.1  * srange, 255.0 * 0.1);
+	this->addAlphaPoint(smin + 0.4  * srange, 255.0 * 0.5);
+//	this->addAlphaPoint(smin + 10 * smooth, 255.0 * 1.0);
 	this->addAlphaPoint(smax, 255);
 
+	mColorMap.clear();
 	this->addColorPoint(smin, Qt::black);
 	this->addColorPoint(smax, Qt::white);
 }

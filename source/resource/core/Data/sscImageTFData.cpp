@@ -65,18 +65,11 @@ void ImageTFData::deepCopy(ImageTFData* source)
 {
 	mOpacityMap = source->mOpacityMap;
 	mColorMap = source->mColorMap;
-
-	mLevel = source->mLevel;
-	mWindow = source->mWindow;
-	mLLR = source->mLLR;
-	mAlpha = source->mAlpha;
 }
 
 void ImageTFData::addXml(QDomNode dataNode)
 {
 	QDomDocument doc = dataNode.ownerDocument();
-	//  QDomElement transferfunctionsNode = doc.createElement("transferfunctions");
-	//  parentNode.appendChild(transferfunctionsNode);
 
 	QDomElement alphaNode = doc.createElement("alpha");
 	// Use QStringList to put all points in the same string instead of storing
@@ -99,10 +92,6 @@ void ImageTFData::addXml(QDomNode dataNode)
 	dataNode.appendChild(colorNode);
 
 	QDomElement elem = dataNode.toElement();
-	elem.setAttribute("window", mWindow);
-	elem.setAttribute("level", mLevel);
-	elem.setAttribute("llr", mLLR);
-	elem.setAttribute("alpha", mAlpha);
 }
 
 void ImageTFData::parseXml(QDomNode dataNode)
@@ -151,15 +140,6 @@ void ImageTFData::parseXml(QDomNode dataNode)
 		std::cout << std::endl;
 	}
 
-//	std::cout << "window " << mWindow << std::endl;
-	mWindow = this->loadAttribute(dataNode, "window", mWindow);
-	mLevel = this->loadAttribute(dataNode, "level", mLevel);
-	mLLR = this->loadAttribute(dataNode, "llr", mLLR);
-	mAlpha = this->loadAttribute(dataNode, "alpha", mAlpha);
-//	std::cout << "window " << mWindow << std::endl;
-
-	//  std::cout << "void ImageTF3D::parseXml(QDomNode dataNode)" << std::endl;
-
 	this->internalsHaveChanged();
 }
 
@@ -171,8 +151,6 @@ void ImageTFData::parseXml(QDomNode dataNode)
  */
 void ImageTFData::unsignedCT(bool onLoad)
 {
-	// REMOVED CA 2014-02-07 - TODO
-
 //	//Signed after all. Don't do anyting
 //	if (this->getScalarMin() < 0)
 //		return;
@@ -181,41 +159,40 @@ void ImageTFData::unsignedCT(bool onLoad)
 	if(onLoad)
 		modify = 1024;
 
-//	modify=0;
-	std::cout << "unsignedCT shift " << modify << std::endl;
+//	std::cout << "unsignedCT shift " << modify << std::endl;
 	this->shift(modify);
 }
 
 void ImageTFData::shift(int val)
 {
-	int modify = val;
-
-	//	OpacityMapPtr opacityMap = this->getOpacityMap();
-	IntIntMap newOpacipyMap;
-	for (IntIntMap::iterator it = mOpacityMap.begin(); it != mOpacityMap.end(); ++it)
-		newOpacipyMap[it->first + modify] = it->second;
-
-	ColorMap newColorMap;
-	for (ColorMap::iterator it = mColorMap.begin(); it != mColorMap.end(); ++it)
-		newColorMap[it->first + modify] = it->second;
-
-	mOpacityMap = newOpacipyMap;
-	mColorMap = newColorMap;
-
-	//mLevel = mLevel + modify;
-	mLLR = mLLR + modify;
+	this->shiftOpacity(val);
+	this->shiftColor(val, 0, 1);
 
 	this->internalsHaveChanged();
 }
 
-double ImageTFData::loadAttribute(QDomNode dataNode, QString name, double defVal)
+void ImageTFData::shiftColor(int shift, double center, double scale)
 {
-	QString text = dataNode.toElement().attribute(name);
-	bool ok;
-	double val = text.toDouble(&ok);
-	if (ok)
-		return val;
-	return defVal;
+	ColorMap newColorMap;
+	for (ColorMap::iterator it = mColorMap.begin(); it != mColorMap.end(); ++it)
+	{
+		double newVal = (it->first-center)*scale+center + shift;
+		int roundedVal = floor(newVal + 0.5);
+		newColorMap[roundedVal] = it->second;
+	}
+	mColorMap = newColorMap;
+}
+
+void ImageTFData::shiftOpacity(int shift)
+{
+	IntIntMap newOpacipyMap;
+	for (IntIntMap::iterator it = mOpacityMap.begin(); it != mOpacityMap.end(); ++it)
+	{
+		double newVal = it->first + shift;
+		int roundedVal = floor(newVal + 0.5);
+		newOpacipyMap[it->first + shift] = it->second;
+	}
+	mOpacityMap = newOpacipyMap;
 }
 
 /**Set Low Level Reject, meaning the lowest intensity
@@ -223,30 +200,63 @@ double ImageTFData::loadAttribute(QDomNode dataNode, QString name, double defVal
  */
 void ImageTFData::setLLR(double val)
 {
-	if (similar(mLLR, val))
+	double old = this->getLLR();
+	if (similar(old, val))
 		return;
 
-	mLLR = val;
+	this->shiftOpacity(val-old);
 	this->internalsHaveChanged();
 }
 
 double ImageTFData::getLLR() const
 {
-	return mLLR;
+	if (mOpacityMap.empty())
+		return 0;
+
+	for (IntIntMap::const_iterator it = mOpacityMap.begin(); it != mOpacityMap.end(); ++it)
+	{
+		if (!similar(it->second, 0.0))
+			return it->first;
+	}
+	return mOpacityMap.begin()->first;
 }
 
 void ImageTFData::setAlpha(double val)
 {
-	if (similar(mAlpha, val))
+	double old = this->getAlpha();
+	if (similar(old, val))
 		return;
 
-	mAlpha = val;
+	if (similar(old, 0.0))
+	{
+		// degenerate case: we have lost all info, simpl add input val to all but the first entry
+		for (IntIntMap::iterator it = mOpacityMap.begin(); it != mOpacityMap.end(); ++it)
+		{
+			if (it==mOpacityMap.begin() && mOpacityMap.size()>1)
+				continue; // heuristic: assume first entry should stay at zero
+			it->second += val*255;
+		}
+	}
+	else
+	{
+		double scale = val/old;
+		for (IntIntMap::iterator it = mOpacityMap.begin(); it != mOpacityMap.end(); ++it)
+		{
+			it->second *= scale;
+		}
+	}
+
 	this->internalsHaveChanged();
 }
 
 double ImageTFData::getAlpha() const
 {
-	return mAlpha;
+	double amax = 0;
+	for (IntIntMap::const_iterator it = mOpacityMap.begin(); it != mOpacityMap.end(); ++it)
+	{
+		amax = std::max<double>(it->second, amax);
+	}
+	return amax/255;
 }
 
 /**Set Window, i.e. the size of the intensity
@@ -254,19 +264,33 @@ double ImageTFData::getAlpha() const
  */
 void ImageTFData::setWindow(double val)
 {
+	double old = this->getWindow();
 	val = std::max(1.0, val);
 
-	if (similar(mWindow, val))
+	if (similar(old, val))
 		return;
 
-	mWindow = val;
+	double scale = val/old;
+	std::cout << "setwindow" << std::endl;
+	std::cout << QString("  win=%1, lvl=%2, scale=%3")
+				 .arg(this->getWindow())
+				 .arg(this->getLevel())
+				 .arg(scale) << std::endl;
+	this->shiftColor(0, this->getLevel(), scale);
+	std::cout << QString("  win=%1, lvl=%2, scale=%3")
+				 .arg(this->getWindow())
+				 .arg(this->getLevel())
+				 .arg(scale) << std::endl;
 
 	this->internalsHaveChanged();
 }
 
 double ImageTFData::getWindow() const
 {
-	return mWindow;
+	if (mColorMap.empty())
+		return 0;
+	return mColorMap.rbegin()->first - mColorMap.begin()->first;
+//	return mWindow;
 }
 
 /**Set Level, i.e. the position of the intensity
@@ -274,16 +298,25 @@ double ImageTFData::getWindow() const
  */
 void ImageTFData::setLevel(double val)
 {
-	if (similar(mLevel, val))
+	double old = this->getLevel();
+	if (similar(old, val))
 		return;
+	double shift = val-old;
 
-	mLevel = val;
+	this->shiftColor(shift, 0.0, 1.0);
+
+//	mLevel = val;
 	this->internalsHaveChanged();
 }
 
 double ImageTFData::getLevel() const
 {
-	return mLevel;
+	if (mColorMap.empty())
+		return 0;
+	int a = mColorMap.begin()->first;
+	int b = mColorMap.rbegin()->first;
+	return a + (b-a)/2;
+//	return mLevel;
 }
 
 IntIntMap ImageTFData::getOpacityMap()
@@ -342,21 +375,35 @@ void ImageTFData::resetColor(ColorMap val)
 	this->internalsHaveChanged();
 }
 
-void ImageTFData::fillColorTFFromMap(vtkColorTransferFunctionPtr tf)
+vtkColorTransferFunctionPtr ImageTFData::generateColorTF() const
+{
+	vtkColorTransferFunctionPtr tf = vtkColorTransferFunctionPtr::New();
+	this->fillColorTFFromMap(tf);
+	return tf;
+}
+
+vtkPiecewiseFunctionPtr ImageTFData::generateOpacityTF() const
+{
+	vtkPiecewiseFunctionPtr tf = vtkPiecewiseFunctionPtr::New();
+	this->fillOpacityTFFromMap(tf);
+	return tf;
+}
+
+void ImageTFData::fillColorTFFromMap(vtkColorTransferFunctionPtr tf) const
 {
 	tf->SetColorSpaceToRGB();
 	tf->RemoveAllPoints();
-	for (ColorMap::iterator iter = mColorMap.begin(); iter != mColorMap.end(); ++iter)
+	for (ColorMap::const_iterator iter = mColorMap.begin(); iter != mColorMap.end(); ++iter)
 	{
 		QColor c = iter->second;
 		tf->AddRGBPoint(iter->first, c.redF(), c.greenF(), c.blueF());
 	}
 }
 
-void ImageTFData::fillOpacityTFFromMap(vtkPiecewiseFunctionPtr tf)
+void ImageTFData::fillOpacityTFFromMap(vtkPiecewiseFunctionPtr tf) const
 {
 	tf->RemoveAllPoints();
-	for (IntIntMap::iterator iter = mOpacityMap.begin(); iter != mOpacityMap.end(); ++iter)
+	for (IntIntMap::const_iterator iter = mOpacityMap.begin(); iter != mOpacityMap.end(); ++iter)
 		tf->AddPoint(iter->first, iter->second / 255.0);
 	tf->Update();
 }

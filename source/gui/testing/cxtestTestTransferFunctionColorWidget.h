@@ -20,11 +20,6 @@ public:
 	void setPlotArea(QRect plotArea);
 	int getLeftAreaBoundary();
 	int getRigthAreaBoundary();
-
-private:
-	int mLeftAreaBoundary;
-	int mRightAreaBoundary;
-	int mWidthAreaBoundary;
 };
 
 } /* namespace cxtest */

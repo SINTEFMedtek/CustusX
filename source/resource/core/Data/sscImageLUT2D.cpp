@@ -49,29 +49,30 @@ void ImageLUT2D::setInitialTFFromImage(vtkImageDataPtr base)
 	double srange = smax - smin;
 
 	// this sets the initial opacity tf to full
-	this->setAlpha(1);
-	this->setLLR(smin);
-	this->buildOpacityMapFromLLRAlpha();
+	mOpacityMap.clear();
+	this->addAlphaPoint(smin - 1, 0);
+	this->addAlphaPoint(smin, 255);
 
 	// this also sets the initial lut to grayscale
+	mColorMap.clear();
 	this->addColorPoint(smin, Qt::black);
 	this->addColorPoint(smax, Qt::white);
 
-	if (base->GetNumberOfScalarComponents() <=2)
-	{
-		// set values suitable for CT.
-	//	this->setLevel(srange * 0.15 + smin);
-	//	this->setWindow(srange * 0.5);
-		// changed default values (2012.03.29-CA) : the previous was usually a bad guess, especially for MR. Use almost entire range instead
-		this->setLevel(smin + 0.8*srange * 0.5);
-		this->setWindow(0.8*srange);
-	}
-	else
-	{
-		// set full range for color images. Assume they want to be rendered as is.
-		this->setLevel(smin + srange * 0.5);
-		this->setWindow(srange);
-	}
+//	if (base->GetNumberOfScalarComponents() <=2)
+//	{
+//		// set values suitable for CT.
+//	//	this->setLevel(srange * 0.15 + smin);
+//	//	this->setWindow(srange * 0.5);
+//		// changed default values (2012.03.29-CA) : the previous was usually a bad guess, especially for MR. Use almost entire range instead
+//		this->setLevel(smin + 0.8*srange * 0.5);
+//		this->setWindow(0.8*srange);
+//	}
+//	else
+//	{
+//		// set full range for color images. Assume they want to be rendered as is.
+//		this->setLevel(smin + srange * 0.5);
+//		this->setWindow(srange);
+//	}
 
 	this->internalsHaveChanged();
 }
@@ -102,19 +103,19 @@ vtkLookupTablePtr ImageLUT2D::getOutputLookupTable()
 	return mOutputLUT;
 }
 
-/**Rebuild the opacity tf from LLR and alpha.
- * This is because the 2D renderer only handles llr+alpha.
- */
-void ImageLUT2D::buildOpacityMapFromLLRAlpha()
-{
-	// REMOVED CA 2014-02-07 - TODO
-	mOpacityMap.clear();
-//	this->addAlphaPoint(this->getScalarMin(), 0);
-//	if (this->getLLR() > this->getScalarMin())
-		this->addAlphaPoint(this->getLLR() - 1, 0);
-	this->addAlphaPoint(this->getLLR(), this->getAlpha() * 255);
-//	this->addAlphaPoint(this->getScalarMax(), this->getAlpha() * 255);
-}
+///**Rebuild the opacity tf from LLR and alpha.
+// * This is because the 2D renderer only handles llr+alpha.
+// */
+//void ImageLUT2D::buildOpacityMapFromLLRAlpha()
+//{
+//	// REMOVED CA 2014-02-07 - TODO
+//	mOpacityMap.clear();
+////	this->addAlphaPoint(this->getScalarMin(), 0);
+////	if (this->getLLR() > this->getScalarMin())
+//		this->addAlphaPoint(this->getLLR() - 1, 0);
+//	this->addAlphaPoint(this->getLLR(), this->getAlpha() * 255);
+////	this->addAlphaPoint(this->getScalarMax(), this->getAlpha() * 255);
+//}
 
 void ImageLUT2D::internalsHaveChanged()
 {
@@ -170,10 +171,8 @@ void ImageLUT2D::refreshOutputLUT()
 	lut->SetNumberOfTableValues(icount);
 	lut->SetTableRange(imin, imax);
 
-	vtkColorTransferFunctionPtr colorFunc = vtkColorTransferFunctionPtr::New();
-	this->fillColorTFFromMap(colorFunc);
-	vtkPiecewiseFunctionPtr opacityFunc = vtkPiecewiseFunctionPtr::New();
-	this->fillOpacityTFFromMap(opacityFunc);
+	vtkColorTransferFunctionPtr colorFunc = this->generateColorTF();
+	vtkPiecewiseFunctionPtr opacityFunc = this->generateOpacityTF();
 
 	for (int i = 0; i < icount; ++i)
 	{

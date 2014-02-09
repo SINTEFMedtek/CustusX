@@ -114,7 +114,8 @@ public:
 	void unsignedCT(bool onLoad);
 	void shift(int val); ///< shift the transfter function index values by the input amount. Used for signed/unsigned conversion.
 
-	void fillColorTFFromMap(vtkColorTransferFunctionPtr tf);
+	vtkColorTransferFunctionPtr generateColorTF() const;
+	vtkPiecewiseFunctionPtr generateOpacityTF() const;
 
 signals:
 	void transferFunctionsChanged();
@@ -123,18 +124,13 @@ protected:
 	void deepCopy(ImageTFData* source);
 	virtual void internalsHaveChanged() {}
 
-	void fillOpacityTFFromMap(vtkPiecewiseFunctionPtr tf);
+	void fillOpacityTFFromMap(vtkPiecewiseFunctionPtr tf) const;
+	void fillColorTFFromMap(vtkColorTransferFunctionPtr tf) const;
+	void shiftColor(int shift, double center, double scale);
+	void shiftOpacity(int shift);
+
 	IntIntMap mOpacityMap;
 	ColorMap mColorMap;
-
-	// these values can be used instead of setting the opacity TF explicitly
-	double mLLR;
-	double mWindow;
-	double mLevel;
-	double mAlpha;
-
-private:
-	double loadAttribute(QDomNode dataNode, QString name, double defVal);
 };
 
 }
