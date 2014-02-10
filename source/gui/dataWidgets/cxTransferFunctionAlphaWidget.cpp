@@ -23,10 +23,12 @@ TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(QWidget* parent) :
   mBorder(5),
   mReadOnly(false)
 {
+	this->setFocusPolicy(Qt::StrongFocus);
+
   mActiveImageProxy = ActiveImageProxy::New();
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageTransferFunctionsChangedSlot()));
 
-  mCurrentAlphaPoint.reset();
+  mSelectedAlphaPoint.reset();
 }
 TransferFunctionAlphaWidget::~TransferFunctionAlphaWidget()
 {}
@@ -78,12 +80,14 @@ void TransferFunctionAlphaWidget::mousePressEvent(QMouseEvent* event)
 
   if(event->button() == Qt::LeftButton)
   {
-	  this->isInsideCurrentPoint(event->pos());
+	  mSelectedAlphaPoint = this->selectPoint(event->pos());
   }
   else if(event->button() == Qt::RightButton)
   {
-	  this->toggleCurrentPoint(event->pos());
+	  this->toggleSelectedPoint(event->pos());
   }
+
+  this->update();
 }
 
 void TransferFunctionAlphaWidget::mouseReleaseEvent(QMouseEvent* event)
@@ -91,7 +95,7 @@ void TransferFunctionAlphaWidget::mouseReleaseEvent(QMouseEvent* event)
   if(mReadOnly)
     return;
   QWidget::mouseReleaseEvent(event);
-  mCurrentAlphaPoint.reset();
+//  mCurrentAlphaPoint.reset();
 }
 
 void TransferFunctionAlphaWidget::mouseMoveEvent(QMouseEvent* event)
@@ -99,33 +103,85 @@ void TransferFunctionAlphaWidget::mouseMoveEvent(QMouseEvent* event)
   if (!mImage)
     return;
 
-  AlphaPoint point = this->getCurrentAlphaPoint(event->pos());
-  this->setToolTip(QString("(%1, %2)").arg(point.position).arg(point.value / 255.0, 0, 'f', 2));
+//  AlphaPoint point = this->getCurrentAlphaPoint(event->pos());
+  this->updateTooltip(event->pos());
+//  this->setToolTip(QString("(%1, %2)").arg(point.position).arg(point.value / 255.0, 0, 'f', 2));
   if(mReadOnly) //Only show tool tip if readOnly
     return;
   QWidget::mouseMoveEvent(event);
 
   if(event->buttons() == Qt::LeftButton)
   {
-	this->moveCurrentAlphaPoint(event->pos());
+	this->moveCurrentAlphaPoint(this->getCurrentAlphaPoint(event->pos()));
+	  //	AlphaPoint newAlphaPoint = this->getCurrentAlphaPoint(pos);
+	  this->updateTooltip(event->pos());
+	  this->update();
   }
-  // Mouse is only moved inside the widget.
-  // Emit value for possible use by info widget
-  else
-  {
-    if((event->x() >= mPlotArea.left()) &&
-       (event->x() <= (mPlotArea.width()+mPlotArea.left())))
-    {
-      if(mImage)
-      {
-        mCurrentAlphaPoint.position = int(mImage->getMin() + mImage->getRange() *
-                                       (event->x() - mPlotArea.left()) / 
-                                       static_cast<double>(mPlotArea.width()) );
-        emit positionChanged(mCurrentAlphaPoint.position);
-      }
-    }
-  }
+//  // Mouse is only moved inside the widget.
+//  // Emit value for possible use by info widget
+//  else
+//  {
+//    if((event->x() >= mPlotArea.left()) &&
+//       (event->x() <= (mPlotArea.width()+mPlotArea.left())))
+//    {
+//      if(mImage)
+//      {
+//        mCurrentAlphaPoint.position = int(mImage->getMin() + mImage->getRange() *
+//                                       (event->x() - mPlotArea.left()) /
+//                                       static_cast<double>(mPlotArea.width()) );
+//        emit positionChanged(mCurrentAlphaPoint.position);
+//      }
+//    }
+//	this->update();
+//  }
 }
+
+void TransferFunctionAlphaWidget::keyPressEvent(QKeyEvent* event)
+{
+	if (mSelectedAlphaPoint.isValid())
+	{
+		int shift = 0;
+		int alphaShift = 0;
+		if (event->key()==Qt::Key_Left)
+			shift = -1;
+		if (event->key()==Qt::Key_Right)
+			shift = +1;
+		if (event->key()==Qt::Key_Down)
+			alphaShift = -1;
+		if (event->key()==Qt::Key_Up)
+			alphaShift = +1;
+
+		if ((shift!=0) || (alphaShift!=0))
+		{
+			AlphaPoint newPoint = mSelectedAlphaPoint;
+			newPoint.position += shift;
+			newPoint.value += alphaShift;
+			this->moveCurrentAlphaPoint(newPoint);
+			this->updateTooltip(mSelectedAlphaPoint);
+			this->update();
+			return;
+		}
+	}
+
+	QWidget::keyPressEvent(event);
+}
+
+void TransferFunctionAlphaWidget::updateTooltip(QPoint pos)
+{
+	AlphaPoint selected = this->selectPoint(pos);
+	if (!selected.isValid())
+		selected = this->getCurrentAlphaPoint(pos);
+	this->updateTooltip(selected);
+	this->update();
+}
+
+void TransferFunctionAlphaWidget::updateTooltip(AlphaPoint point)
+{
+	QString tip = QString("alpha(%1)=%2").arg(point.position).arg(double(point.value)/255, 0, 'f', 2);
+	this->setToolTip(tip);
+}
+
+
 void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
 {
   // Don't do anything before we have an image
@@ -169,7 +225,7 @@ void TransferFunctionAlphaWidget::paintOpacityGraph(QPainter& painter)
 		// draw line from left edge to first point:
 		if (opPoint==opacityMap.begin())
 		{
-			lastScreenPoint = QPoint(mImage->getMin(), screenPoint.y());
+			lastScreenPoint = QPoint(mPlotArea.left(), screenPoint.y());
 		}
 
 	  // Draw line from previous point
@@ -179,7 +235,16 @@ void TransferFunctionAlphaWidget::paintOpacityGraph(QPainter& painter)
 	  // Draw the rectangle
 	  QRect pointRect(screenPoint.x() - mBorder, screenPoint.y() - mBorder,
 					  mBorder*2, mBorder*2);
-	  painter.setPen(pointPen);
+	  if (opPoint->first==mSelectedAlphaPoint.position)
+	  {
+		  pointPen.setWidth(2);
+		  painter.setPen(pointPen);
+	  }
+	  else
+	  {
+		  pointPen.setWidth(1);
+		  painter.setPen(pointPen);
+	  }
 	  painter.drawRect(pointRect);
 	  this->mPointRects[opPoint->first] = pointRect;
 
@@ -188,7 +253,7 @@ void TransferFunctionAlphaWidget::paintOpacityGraph(QPainter& painter)
 	}
 
 	// draw a line from the last point to the right end
-	QPoint screenPoint(mImage->getMax(), lastScreenPoint.y());
+	QPoint screenPoint(mPlotArea.right(), lastScreenPoint.y());
 	painter.setPen(pointLinePen);
 	painter.drawLine(lastScreenPoint, screenPoint);
 
@@ -246,19 +311,23 @@ void TransferFunctionAlphaWidget::resizeEvent(QResizeEvent* evt)
                           width() - mBorder*2, height() - mBorder*2);
 }
 
-bool TransferFunctionAlphaWidget::isInsideCurrentPoint(QPoint pos)
+TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::selectPoint(QPoint pos)
 {
-  std::map<int, QRect>::iterator it = mPointRects.begin();
-  for(;it != mPointRects.end(); ++it)
-  {
-	if (it->second.contains(pos))
-    {
-      mCurrentAlphaPoint.position = it->first;
-      return true;
-    }
-  }
-  mCurrentAlphaPoint.reset();
-  return false;
+	std::map<int, QRect>::iterator it = mPointRects.begin();
+	for(;it != mPointRects.end(); ++it)
+	{
+		if (it->second.contains(pos))
+		{
+			AlphaPoint retval;
+			retval.position = it->first;
+			IntIntMap opactiyMap = mImageTF->getOpacityMap();
+			if (opactiyMap.find(retval.position) != opactiyMap.end())
+				retval.value = opactiyMap.find(retval.position)->second;
+			return retval;
+		}
+	}
+
+	return AlphaPoint();
 }
 
 bool TransferFunctionAlphaWidget::isEndpoint(int intensity) const
@@ -289,39 +358,42 @@ TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::getCurrentA
   return point;
 }
 
-void TransferFunctionAlphaWidget::toggleCurrentPoint(QPoint pos)
+void TransferFunctionAlphaWidget::toggleSelectedPoint(QPoint pos)
 {
   if(!mImage)
     return;
-  if(!isInsideCurrentPoint(pos))
+  mSelectedAlphaPoint = this->selectPoint(pos);
+  if(!mSelectedAlphaPoint.isValid())
   {
     // Outside any of the rectangles
 	AlphaPoint point = getCurrentAlphaPoint(pos);
     mImageTF->addAlphaPoint(point.position,point.value);
+	mSelectedAlphaPoint = this->selectPoint(pos);
   }
-  else if(!this->isEndpoint(mCurrentAlphaPoint.position))
+  else if(!this->isEndpoint(mSelectedAlphaPoint.position))
   {
     // Inside one of the rectangles
-    if(mCurrentAlphaPoint.isValid())
-      mImageTF->removeAlphaPoint(mCurrentAlphaPoint.position);
+	if(mSelectedAlphaPoint.isValid())
+	  mImageTF->removeAlphaPoint(mSelectedAlphaPoint.position);
+	mSelectedAlphaPoint.reset();
   }
 
   this->update();
 }
 
-void TransferFunctionAlphaWidget::moveCurrentAlphaPoint(QPoint pos)
+void TransferFunctionAlphaWidget::moveCurrentAlphaPoint(AlphaPoint newAlphaPoint)
 {
-	if(!mCurrentAlphaPoint.isValid())
+	if(!mSelectedAlphaPoint.isValid())
 		return;
 
-	AlphaPoint newAlphaPoint = this->getCurrentAlphaPoint(pos);
+//	AlphaPoint newAlphaPoint = this->getCurrentAlphaPoint(pos);
 
-	std::pair<int,int> range = this->findAllowedMoveRangeAroundAlphaPoint(mCurrentAlphaPoint.position);
+	std::pair<int,int> range = this->findAllowedMoveRangeAroundAlphaPoint(mSelectedAlphaPoint.position);
 	newAlphaPoint.position = constrainValue(newAlphaPoint.position, range.first, range.second);
 
-	mImageTF->moveAlphaPoint(mCurrentAlphaPoint.position, newAlphaPoint.position, newAlphaPoint.value);
+	mImageTF->moveAlphaPoint(mSelectedAlphaPoint.position, newAlphaPoint.position, newAlphaPoint.value);
 
-	mCurrentAlphaPoint = newAlphaPoint;
+	mSelectedAlphaPoint = newAlphaPoint;
 	this->update();
 }
 

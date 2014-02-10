@@ -42,40 +42,40 @@ ImageLUT2D::ImageLUT2D()
 {
 }
 
-void ImageLUT2D::setInitialTFFromImage(vtkImageDataPtr base)
-{
-	double smin = base->GetScalarRange()[0];
-	double smax = base->GetScalarRange()[1];
-	double srange = smax - smin;
+//void ImageLUT2D::setInitialTFFromImage(vtkImageDataPtr base)
+//{
+//	double smin = base->GetScalarRange()[0];
+//	double smax = base->GetScalarRange()[1];
+//	double srange = smax - smin;
 
-	// this sets the initial opacity tf to full
-	mOpacityMap.clear();
-	this->addAlphaPoint(smin - 1, 0);
-	this->addAlphaPoint(smin, 255);
+//	// this sets the initial opacity tf to full
+//	mOpacityMap.clear();
+//	this->addAlphaPoint(smin - 1, 0);
+//	this->addAlphaPoint(smin, 255);
 
-	// this also sets the initial lut to grayscale
-	mColorMap.clear();
-	this->addColorPoint(smin, Qt::black);
-	this->addColorPoint(smax, Qt::white);
+//	// this also sets the initial lut to grayscale
+//	mColorMap.clear();
+//	this->addColorPoint(smin, Qt::black);
+//	this->addColorPoint(smax, Qt::white);
 
-//	if (base->GetNumberOfScalarComponents() <=2)
-//	{
-//		// set values suitable for CT.
-//	//	this->setLevel(srange * 0.15 + smin);
-//	//	this->setWindow(srange * 0.5);
-//		// changed default values (2012.03.29-CA) : the previous was usually a bad guess, especially for MR. Use almost entire range instead
-//		this->setLevel(smin + 0.8*srange * 0.5);
-//		this->setWindow(0.8*srange);
-//	}
-//	else
-//	{
-//		// set full range for color images. Assume they want to be rendered as is.
-//		this->setLevel(smin + srange * 0.5);
-//		this->setWindow(srange);
-//	}
+////	if (base->GetNumberOfScalarComponents() <=2)
+////	{
+////		// set values suitable for CT.
+////	//	this->setLevel(srange * 0.15 + smin);
+////	//	this->setWindow(srange * 0.5);
+////		// changed default values (2012.03.29-CA) : the previous was usually a bad guess, especially for MR. Use almost entire range instead
+////		this->setLevel(smin + 0.8*srange * 0.5);
+////		this->setWindow(0.8*srange);
+////	}
+////	else
+////	{
+////		// set full range for color images. Assume they want to be rendered as is.
+////		this->setLevel(smin + srange * 0.5);
+////		this->setWindow(srange);
+////	}
 
-	this->internalsHaveChanged();
-}
+//	this->internalsHaveChanged();
+//}
 
 ImageLUT2DPtr ImageLUT2D::createCopy()
 {

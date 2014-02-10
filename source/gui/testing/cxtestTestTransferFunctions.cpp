@@ -57,7 +57,7 @@ void TestTransferFunctions::Corrupt2DTransferFunctionWindowLevel()
 void TestTransferFunctions::setNewCorrupt3DTranferFunction()
 {
 	cx::ImageTF3DPtr transferFunction(new cx::ImageTF3D());
-	transferFunction->setInitialTFFromImage(mDummyImage->getBaseVtkImageData());
+//	transferFunction->setInitialTFFromImage(mDummyImage->getBaseVtkImageData());
 	transferFunction->setWindow(mDummyImage->getMax() + 10);
 	mDummyImage->setTransferFunctions3D(transferFunction);
 }
@@ -65,7 +65,7 @@ void TestTransferFunctions::setNewCorrupt3DTranferFunction()
 void TestTransferFunctions::setNewCorrupt2DTranferFunction()
 {
 	cx::ImageLUT2DPtr transferFunction(new cx::ImageLUT2D());
-	transferFunction->setInitialTFFromImage(mDummyImage->getBaseVtkImageData());
+//	transferFunction->setInitialTFFromImage(mDummyImage->getBaseVtkImageData());
 	transferFunction->setWindow(mDummyImage->getMax() + 10);
 	mDummyImage->setLookupTable2D(transferFunction);
 }

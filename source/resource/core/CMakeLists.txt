@@ -92,6 +92,7 @@ cx_add_class(cxResource_SOURCE
 	Data/sscLandmark
 	Data/sscDataReaderWriter
 	Data/sscGPUImageBuffer
+	Data/cxImageDefaultTFGenerator
 	
 	Math/sscBoundingBox3D
 	Math/sscVector3D

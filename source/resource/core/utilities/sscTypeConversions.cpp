@@ -40,17 +40,32 @@ std::vector<double> convertQString2DoubleVector(const QString& input, bool* ok)
 
 QString color2string(QColor color)
 {
-	return qstring_cast(Eigen::Vector4f(color.redF(), color.greenF(), color.blueF(), color.alphaF()));
+	QString retval = QString("%1/%2/%3")
+					.arg(color.red())
+					.arg(color.green())
+					.arg(color.blue());
+	if (color.alpha()!=255)
+		retval += QString("/%1").arg(color.alpha());
+	return retval;
 }
 
 
 QColor string2color(QString input, QColor defaultValue)
 {
-	QStringList c = input.split(" ");
+	QStringList c = input.split("/");
+	if (c.size()==3)
+		c.push_back("255");
 	if (c.size()<4)
 		return defaultValue;
 	bool ok;
-	return QColor::fromRgbF(c[0].toDouble(&ok), c[1].toDouble(&ok), c[2].toDouble(&ok), c[3].toDouble(&ok));
+	QColor retval = QColor::fromRgb(
+				c[0].toInt(&ok),
+				c[1].toInt(&ok),
+				c[2].toInt(&ok),
+				c[3].toInt(&ok));
+	if (!ok)
+		return defaultValue;
+	return retval;
 }
 
 

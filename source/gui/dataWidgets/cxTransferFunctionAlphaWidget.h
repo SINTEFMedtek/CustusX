@@ -34,8 +34,8 @@ public:
   void setData(ImagePtr image, ImageTFDataPtr tfData);
   void setReadOnly(bool readOnly);///< Set class readonly: Disable mouse interaction
 
-signals:
-  void positionChanged(int);///< Emits this signal whenever the mouse is moved inside the widget
+//signals:
+//  void positionChanged(int);///< Emits this signal whenever the mouse is moved inside the widget
   
 public slots:
   void activeImageTransferFunctionsChangedSlot(); ///< Acts when the image's transfer function is changed
@@ -71,15 +71,18 @@ protected:
   virtual void mousePressEvent(QMouseEvent* event); ///< Reimplemented from superclass
   virtual void mouseReleaseEvent(QMouseEvent* event); ///< Reimplemented from superclass
   virtual void mouseMoveEvent(QMouseEvent* event);  ///< Reimplemented from superclass
+  virtual void keyPressEvent(QKeyEvent* event);
 
   virtual void paintEvent(QPaintEvent* event); ///< Reimplemented from superclass. Paints the transferfunction GUI
   virtual void resizeEvent(QResizeEvent* evt);///< Reimplemented from superclass
 
-  bool isInsideCurrentPoint(QPoint pos);///< Checks if a screen coordinate is inside any of the point rectangles
+  AlphaPoint selectPoint(QPoint pos);
   AlphaPoint getCurrentAlphaPoint(QPoint pos);///< Get aplha point based on mCurrentClickX and mCurrentClickY
-  void toggleCurrentPoint(QPoint pos);///< Turn a transfer function point on or off (depending on it is on or not)
-  void moveCurrentAlphaPoint(QPoint pos);///< Move the currently selected point to the selected screen coordinate (mCurrentClickX and mCurrentClickY)
+  void toggleSelectedPoint(QPoint pos);///< Turn a transfer function point on or off (depending on it is on or not)
+  void moveCurrentAlphaPoint(AlphaPoint newAlphaPoint);
   QPoint alpha2screen(AlphaPoint pt) const;
+  void updateTooltip(QPoint pos);
+  void updateTooltip(AlphaPoint point);
 
   bool isEndpoint(int intensity) const;
   void paintHistogram(QPainter& painter);
@@ -92,7 +95,7 @@ protected:
   bool mReadOnly;///< Is class readOnly? Eg no mouse interaction possible
 
   std::map<int, QRect> mPointRects; ///< Cache with all point rectangles.
-  AlphaPoint mCurrentAlphaPoint;///< The current alpha point
+  AlphaPoint mSelectedAlphaPoint;///< The current alpha point
 //  bool mEndPoint;///< Current alpha point is an endpoint
 
   ImagePtr mImage;

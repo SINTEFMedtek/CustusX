@@ -17,6 +17,7 @@
 #include "sscImageLUT2D.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
+#include "sscLogger.h"
 
 namespace cx
 {
@@ -25,6 +26,7 @@ TransferFunctionColorWidget::TransferFunctionColorWidget(QWidget* parent) :
 	mCurrentClickPos(INT_MIN,INT_MIN),
   mBorder(5)
 {
+  this->setFocusPolicy(Qt::StrongFocus);
   mActiveImageProxy = ActiveImageProxy::New();
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageTransferFunctionsChangedSlot()));
 
@@ -50,6 +52,17 @@ QString TransferFunctionColorWidget::defaultWhatsThis() const
     "</html>";
 }
 
+void TransferFunctionColorWidget::enterEvent(QEvent* event)
+{
+  this->setMouseTracking(true);
+}
+
+void TransferFunctionColorWidget::leaveEvent(QEvent* event)
+{
+  this->setMouseTracking(false);
+}
+
+
 void TransferFunctionColorWidget::setData(ImagePtr image, ImageTFDataPtr tfData)
 {
   if (( mImage == image )&&( mImageTF==tfData ))
@@ -73,6 +86,7 @@ void TransferFunctionColorWidget::mousePressEvent(QMouseEvent* event)
   if(event->button() == Qt::LeftButton)
   {
 	  mSelectedPoint = this->selectPoint(mCurrentClickPos);
+	  this->update();
   }
 }
 
@@ -80,7 +94,7 @@ void TransferFunctionColorWidget::mouseReleaseEvent(QMouseEvent* event)
 {
   QWidget::mouseReleaseEvent(event);
   //we no longer need these values
-  mSelectedPoint.reset();
+  //mSelectedPoint.reset();
 }
 
 void TransferFunctionColorWidget::mouseMoveEvent(QMouseEvent* event)
@@ -91,8 +105,52 @@ void TransferFunctionColorWidget::mouseMoveEvent(QMouseEvent* event)
   {
     // Update current screen point for use in moveCurrentAlphaPoint
 	mCurrentClickPos = event->pos();
-    this->moveCurrentPoint();
+//    this->moveCurrentPoint();
+	this->moveSelectedPointTo(this->getCurrentColorPoint());
   }
+
+  this->updateTooltip(event->pos());
+}
+
+void TransferFunctionColorWidget::updateTooltip(QPoint pos)
+{
+	ColorPoint selected = this->selectPoint(pos);
+	if (!selected.isValid())
+		selected = this->getCurrentColorPoint(pos.x());
+	this->updateTooltip(selected);
+	this->update();
+}
+
+void TransferFunctionColorWidget::updateTooltip(ColorPoint point)
+{
+	QString tip = QString("color(%1)=(%2)").arg(point.intensity).arg(color2string(point.value));
+//	std::cout << "updated to " << tip << std::endl;
+	this->setToolTip(tip);
+//	this->setStatusTip(tip);
+}
+
+
+void TransferFunctionColorWidget::keyPressEvent(QKeyEvent* event)
+{
+	if (mSelectedPoint.isValid())
+	{
+		int shift = 0;
+		if (event->key()==Qt::Key_Left)
+			shift = -1;
+		if (event->key()==Qt::Key_Right)
+			shift = +1;
+
+		if (shift!=0)
+		{
+			ColorPoint newPoint = mSelectedPoint;
+			newPoint.intensity += shift;
+			this->moveSelectedPointTo(newPoint);
+			this->updateTooltip(mSelectedPoint);
+			return;
+		}
+	}
+
+	QWidget::keyPressEvent(event);
 }
 
 int TransferFunctionColorWidget::imageIntensity2screenX(int intensity)
@@ -162,7 +220,6 @@ void TransferFunctionColorWidget::paintColorBar(QPainter& painter)
 
 void TransferFunctionColorWidget::paintColorPointsAndGenerateCache(QPainter& painter)
 {
-	QPen pointPen;
 	// Go through each point and draw squares
 	ColorMap colorMap = mImageTF->getColorMap();
 	this->mPointRects.clear();
@@ -173,7 +230,19 @@ void TransferFunctionColorWidget::paintColorPointsAndGenerateCache(QPainter& pai
 		// Draw the rectangle
 		QRect pointRect(screenX - mBorder, mFullArea.top(),
 						mBorder*2, mFullArea.height());
-		painter.setPen(pointPen);
+
+		if (colorPoint->first == mSelectedPoint.intensity)
+		{
+			QPen pen;
+			pen.setWidth(2);
+			painter.setPen(pen);
+		}
+		else
+		{
+			QPen pen;
+			painter.setPen(pen);
+		}
+
 		painter.drawRect(pointRect);
 		this->mPointRects[colorPoint->first] = pointRect;
 	}
@@ -221,20 +290,27 @@ void TransferFunctionColorWidget::contextMenuEvent(QContextMenuEvent *event)
   QMenu menu;
   menu.addAction(mCustomColorAction);
 
-  ColorPoint point = this->selectPoint(mCurrentClickPos);
+  mSelectedPoint = this->selectPoint(mCurrentClickPos);
 
-  if (point.isValid() && !this->isEndpoint(point.intensity))
+  if (mSelectedPoint.isValid() && !this->isEndpoint(mSelectedPoint.intensity))
   {
     menu.addSeparator();
     menu.addAction(mRemoveColorAction);
   }
+  this->update();
+
   menu.exec(event->globalPos());
 }
   
 TransferFunctionColorWidget::ColorPoint TransferFunctionColorWidget::getCurrentColorPoint()
 {
+	return this->getCurrentColorPoint(mCurrentClickPos.x());
+}
+
+TransferFunctionColorWidget::ColorPoint TransferFunctionColorWidget::getCurrentColorPoint(int clickX)
+{
   ColorPoint point;
-  point.intensity = screenX2imageIntensity(mCurrentClickPos.x());
+  point.intensity = screenX2imageIntensity(clickX);
   point.intensity = constrainValue(point.intensity, mImage->getMin(), mImage->getMax());
 
   vtkColorTransferFunctionPtr trFunc = mImageTF->generateColorTF();
@@ -244,22 +320,39 @@ TransferFunctionColorWidget::ColorPoint TransferFunctionColorWidget::getCurrentC
   return point;
 }
 
-void TransferFunctionColorWidget::moveCurrentPoint()
+//void TransferFunctionColorWidget::moveCurrentPoint()
+//{
+//	if(!mSelectedPoint.isValid())
+//		return;
+
+//	std::pair<int,int> range = this->findAllowedMoveRangeAroundColorPoint(mSelectedPoint.intensity);
+
+//	ColorPoint newColorPoint = this->getCurrentColorPoint();
+//	newColorPoint.value = mSelectedPoint.value;
+//	newColorPoint.intensity = constrainValue(newColorPoint.intensity, range.first, range.second);
+
+//	mImageTF->moveColorPoint(mSelectedPoint.intensity, newColorPoint.intensity, newColorPoint.value);
+//	mSelectedPoint = newColorPoint;
+//	this->update();
+//}
+//void TransferFunctionColorWidget::moveCurrentPoint()
+//{
+//	this->moveCurrentPoint(this->getCurrentColorPoint());
+//}
+
+void TransferFunctionColorWidget::moveSelectedPointTo(ColorPoint newPoint)
 {
 	if(!mSelectedPoint.isValid())
 		return;
 
-//	if (this->isEndpoint(mSelectedPoint.intensity))
-//		return;
-
 	std::pair<int,int> range = this->findAllowedMoveRangeAroundColorPoint(mSelectedPoint.intensity);
 
-	ColorPoint newColorPoint = this->getCurrentColorPoint();
-	newColorPoint.value = mSelectedPoint.value;
-	newColorPoint.intensity = constrainValue(newColorPoint.intensity, range.first, range.second);
+//	ColorPoint newColorPoint = this->getCurrentColorPoint();
+	newPoint.value = mSelectedPoint.value;
+	newPoint.intensity = constrainValue(newPoint.intensity, range.first, range.second);
 
-	mImageTF->moveColorPoint(mSelectedPoint.intensity, newColorPoint.intensity, newColorPoint.value);
-	mSelectedPoint = newColorPoint;
+	mImageTF->moveColorPoint(mSelectedPoint.intensity, newPoint.intensity, newPoint.value);
+	mSelectedPoint = newPoint;
 	this->update();
 }
 
@@ -312,6 +405,7 @@ void TransferFunctionColorWidget::removeColorSlot()
 {
 	if(!this->mSelectedPoint.isValid())
 		return;
+	SSC_LOG("");
 
 	mImageTF->removeColorPoint(this->mSelectedPoint.intensity);
 

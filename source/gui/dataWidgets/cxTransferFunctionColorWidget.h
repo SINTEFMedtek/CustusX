@@ -75,6 +75,8 @@ protected:
   std::pair<int,int> findAllowedMoveRangeAroundColorPoint(int selectedPointIntensity);
   void paintColorPointsAndGenerateCache(QPainter& painter);
   void paintColorBar(QPainter& painter);
+  void updateTooltip(QPoint pos);
+  void updateTooltip(ColorPoint point);
 
   ImagePtr mImage;
   ImageTFDataPtr mImageTF;
@@ -87,11 +89,16 @@ protected:
     
   QPoint getPlotPoint(int iScalar);///< Calculate the screen point of a given scalar (x-axis) and value (y-axis)
   ColorPoint getCurrentColorPoint();///< Calculate the color point (position and color) based on clicked x coordinate
-  void moveCurrentPoint();///< Move the currently selected point to the selected screen coordinate (mCurrentClickX)
-  
+  ColorPoint getCurrentColorPoint(int clickX);
+//  void moveCurrentPoint();///< Move the currently selected point to the selected screen coordinate (mCurrentClickX)
+  void moveSelectedPointTo(ColorPoint newPoint);
+
+  virtual void enterEvent(QEvent* event);
+  virtual void leaveEvent(QEvent* event);
   virtual void mousePressEvent(QMouseEvent* event); ///< Reimplemented from superclass
   virtual void mouseReleaseEvent(QMouseEvent* event); ///< Reimplemented from superclass
   virtual void mouseMoveEvent(QMouseEvent* event);  ///< Reimplemented from superclass
+  virtual void keyPressEvent(QKeyEvent* event);
   virtual void resizeEvent(QResizeEvent* evt);///< Reimplemented from superclass
   virtual void paintEvent(QPaintEvent* event); ///< Reimplemented from superclass. Paints the transferfunction GUI
   

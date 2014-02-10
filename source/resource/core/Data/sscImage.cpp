@@ -42,6 +42,7 @@
 #include "sscTypeConversions.h"
 #include "sscUtilHelpers.h"
 #include "sscVolumeHelpers.h"
+#include "cxImageDefaultTFGenerator.h"
 
 #include "sscUnsignedDerivedImage.h"
 
@@ -103,6 +104,9 @@ Image::~Image()
 Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& name) :
 	Data(uid, name), mBaseImageData(data), mMaxRGBIntensity(-1)
 {
+	mInitialWindowWidth = -1;
+	mInitialWindowLevel = -1;
+
 	mInterpolationType = VTK_LINEAR_INTERPOLATION;
 	mUseCropping = false;
 	mCroppingBox_d = this->getInitialBoundingBox();
@@ -138,32 +142,31 @@ ImagePtr Image::getUnsigned(ImagePtr self)
 	return mUnsigned;
 }
 
+
+struct null_deleter
+{
+	void operator()(void const *) const {}
+};
+
 void Image::resetTransferFunctions(bool _2D, bool _3D)
 {
-	//messageManager()->sendDebug("Image::reset called");
-
 	if (!mBaseImageData)
 	{
 		messageManager()->sendWarning("Image has no image data");
 		return;
 	}
 
-	//mBaseImageData->Update();
 	mBaseImageData->GetScalarRange(); // this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
 	mMaxRGBIntensity = -1;
 
+	ImageDefaultTFGenerator tfGenerator(ImagePtr(this, null_deleter()));
 	if (_3D)
 	{
-		ImageTF3DPtr tf(new ImageTF3D());
-		tf->setInitialTFFromImage(mBaseImageData);
-		this->resetTransferFunction(tf);
+		this->resetTransferFunction(tfGenerator.generate3DTFPreset());
+		tfGenerator.resetShading();
 	}
 	if (_2D)
-	{
-		ImageLUT2DPtr tf(new ImageLUT2D());
-		tf->setInitialTFFromImage(mBaseImageData);
-		this->resetTransferFunction(tf);
-	}
+		this->resetTransferFunction(tfGenerator.generate2DTFPreset());
 }
 
 void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D)
@@ -195,7 +198,6 @@ void Image::resetTransferFunction(ImageLUT2DPtr imageLookupTable2D)
 
 	if (mImageLookupTable2D)
 	{
-//		mImageLookupTable2D->setVtkImageData(mBaseImageData);
 		connect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(transferFunctionsChanged()));
 	}
 
@@ -220,7 +222,6 @@ void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D)
 
 	if (mImageTransferFunctions3D)
 	{
-//		mImageTransferFunctions3D->setVtkImageData(mBaseImageData);
 		connect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()), this,
 			SIGNAL(transferFunctionsChanged()));
 	}
@@ -522,6 +523,20 @@ void Image::addXml(QDomNode& dataNode)
 	QDomElement imageTypeNode = doc.createElement("imageType");
 	imageTypeNode.appendChild(doc.createTextNode(mImageType));
 	imageNode.appendChild(imageTypeNode);
+
+	QDomElement initialWindowNode = doc.createElement("initialWindow");
+	initialWindowNode.setAttribute("width", mInitialWindowWidth);
+	initialWindowNode.setAttribute("level", mInitialWindowLevel);
+}
+
+double Image::loadAttribute(QDomNode dataNode, QString name, double defVal)
+{
+	QString text = dataNode.toElement().attribute(name);
+	bool ok;
+	double val = text.toDouble(&ok);
+	if (ok)
+		return val;
+	return defVal;
 }
 
 void Image::parseXml(QDomNode& dataNode)
@@ -543,6 +558,9 @@ void Image::parseXml(QDomNode& dataNode)
 		std::cout << "Warning: Image::parseXml() found no transferfunctions";
 		std::cout << std::endl;
 	}
+
+	mInitialWindowWidth = this->loadAttribute(dataNode.namedItem("initialWindow"), "width", -1);
+	mInitialWindowLevel = this->loadAttribute(dataNode.namedItem("initialWindow"), "level", -1);
 
 	this->getLookupTable2D()->parseXml(dataNode.namedItem("lookuptable2D"));
 
@@ -591,6 +609,12 @@ void Image::parseXml(QDomNode& dataNode)
 
 	mModality = dataNode.namedItem("modality").toElement().text();
 	mImageType = dataNode.namedItem("imageType").toElement().text();
+}
+
+void Image::setInitialWindowLevel(double width, double level)
+{
+	mInitialWindowWidth = width;
+	mInitialWindowLevel = level;
 }
 
 void Image::setShadingOn(bool on)

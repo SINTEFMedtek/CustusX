@@ -58,7 +58,7 @@ class ImageLUT2D: public ImageTFData
 Q_OBJECT
 public:
 	explicit ImageLUT2D();
-	void setInitialTFFromImage(vtkImageDataPtr base);
+//	void setInitialTFFromImage(vtkImageDataPtr base);
 	ImageLUT2DPtr createCopy();
 	void setFullRangeWinLevel(vtkImageDataPtr image); ///< Set winlevel spanning the entire range
 
