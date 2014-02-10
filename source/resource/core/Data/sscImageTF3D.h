@@ -63,7 +63,7 @@ Q_OBJECT
 public:
 	ImageTF3D();
 
-	void setInitialTFFromImage(vtkImageDataPtr base);
+//	void setInitialTFFromImage(vtkImageDataPtr base);
 	ImageTF3DPtr createCopy();
 
 	vtkPiecewiseFunctionPtr getOpacityTF();
