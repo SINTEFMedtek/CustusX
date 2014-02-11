@@ -93,6 +93,7 @@ public:
   void sendWarning(QString warning); ///< The program does not need to terminate, but the user might need to do something, default not muted
   void sendError(QString error); ///< The program (might) need to terminate, default not muted
   void sendDebug(QString debug); ///< Used to output debug info, no sound associated
+  void sendVolatile(QString debug); ///< Used to output volatile info that changes rapidly, not suited for logging.
 
 #ifdef SSC_PRINT_CALLER_INFO
   void sendInfoRedefined(QString info);
@@ -100,12 +101,14 @@ public:
   void sendWarningRedefined(QString warning);
   void sendErrorRedefined(QString error);
   void sendDebugRedefined(QString debug);
+  void sendVolatileRedefined(QString debug);
   void sendCallerInformation(const std::string &caller, const std::string &file, int line);
   void sendInfoWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
   void sendSuccessWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
   void sendWarningWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
   void sendErrorWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
   void sendDebugWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
+  void sendVolatileWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
 #endif
 
   void sendMessage(QString text, MESSAGE_LEVEL messageLevel=mlDEBUG, int timeout=0, bool mute=false, QString sourceLocation="");
@@ -173,6 +176,10 @@ MessageManager* messageManager();
 
 	#undef sendDebug
 	#define sendDebug(msg) sendDebugWithCallerInfo(msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
+
+	#undef sendVolatile
+	#define sendVolatile(msg) sendVolatileWithCallerInfo(msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
+
 #endif
 
 typedef cx::Message Message;
