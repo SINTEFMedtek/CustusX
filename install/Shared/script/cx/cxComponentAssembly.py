@@ -40,12 +40,11 @@ class LibraryAssembly:
         if (platform.system() != 'Windows'):
              self.libraries.append(cxComponents.ISB_DataStreaming());
         self.libraries.append(cxComponents.UltrasonixSDK())
+        self.libraries.append(cxComponents.OpenCLUtilityLibrary())
         if (platform.system() != 'Windows'):
             self.libraries.append(cxComponents.TubeSegmentationFramework());
         if (platform.system() == 'Linux'):
             self.libraries.append(cxComponents.LevelSetSegmentation());
-        if(getpass.getuser() == "jbake"): #just until the lib is stable enough to enroll to the rest
-            self.libraries.append(cxComponents.OpenCLUtilityLibrary())
         self.libraries.append(cxComponents.CustusX3())
         self.libraries.append(cxComponents.CustusX3Data())
         
