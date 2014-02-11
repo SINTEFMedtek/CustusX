@@ -21,13 +21,14 @@
 #include "sscPNNReconstructAlgorithm.h"
 #include "QFileInfo"
 #include "sscDummyTool.h"
+
+#ifdef CX_USE_OPENCL_UTILITY
 #include "TordReconstruct/TordTest.h"
+#include "cxOpenCLUtilities.h"
+#endif
 
 #include "sscMessageManager.h"
-
 #include "cxtestReconstructAlgorithmFixture.h"
-
-#include "cxOpenCLUtilities.h"
 #include "cxtestUtilities.h"
 
 namespace cxtest
@@ -102,7 +103,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 ////	fixture.saveOutputToFile("/Users/christiana/test/boxlines_rec.mhd");
 //}
 
-
+#ifdef CX_USE_OPENCL_UTILITY
 TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconstruction][synthetic][not_win32][unstable][broken]")
 {
 	cx::messageManager()->initialize();
@@ -171,6 +172,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	Utilities::sleep_sec(1);
 	cx::messageManager()->shutdown();
 }
+#endif//CX_USE_OPENCL_UTILITY
 
 } // namespace cxtest
 

@@ -23,12 +23,13 @@
 #include "sscPNNReconstructAlgorithm.h"
 #include "sscReconstructPreprocessor.h"
 #include <vtkImageData.h>
-
+#include "sscStringDataAdapterXml.h"
 #include "recConfig.h"
-#ifdef SSC_USE_OpenCL
-	#include "TordReconstruct/TordTest.h"
-  #include "TordReconstruct/cxSimpleSyntheticVolume.h"
-#endif // SSC_USE_OpenCL
+
+#ifdef CX_USE_OPENCL_UTILITY
+#include "TordReconstruct/TordTest.h"
+#include "TordReconstruct/cxSimpleSyntheticVolume.h"
+#endif // CX_USE_OPENCL_UTILITY
 
 namespace cxtest
 {
@@ -202,7 +203,7 @@ TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[unit]
 	}
 }
 
-#ifdef SSC_USE_OpenCL
+#ifdef CX_USE_OPENCL_UTILITY
 TEST_CASE("ReconstructManager: TordTest on real data", "[usreconstruction][integration][tordtest][not_apple][unstable]")
 {
 	ReconstructManagerTestFixture fixture;
@@ -262,7 +263,7 @@ TEST_CASE("ReconstructManager: TordTest on real data", "[usreconstruction][integ
 	REQUIRE(fixture.getOutput().size()==1);
 	realData.validateBModeData(fixture.getOutput()[0]);
 }
-#endif // SSC_USE_OpenCL
+#endif // CX_USE_OPENCL_UTILITY
 
 
 } // namespace cxtest
