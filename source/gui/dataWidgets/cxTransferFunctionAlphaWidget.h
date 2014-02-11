@@ -33,9 +33,6 @@ public:
 
   void setData(ImagePtr image, ImageTFDataPtr tfData);
   void setReadOnly(bool readOnly);///< Set class readonly: Disable mouse interaction
-
-//signals:
-//  void positionChanged(int);///< Emits this signal whenever the mouse is moved inside the widget
   
 public slots:
   void activeImageTransferFunctionsChangedSlot(); ///< Acts when the image's transfer function is changed

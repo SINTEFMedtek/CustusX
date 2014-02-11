@@ -103,37 +103,18 @@ void TransferFunctionAlphaWidget::mouseMoveEvent(QMouseEvent* event)
   if (!mImage)
     return;
 
-//  AlphaPoint point = this->getCurrentAlphaPoint(event->pos());
   this->updateTooltip(event->pos());
-//  this->setToolTip(QString("(%1, %2)").arg(point.position).arg(point.value / 255.0, 0, 'f', 2));
   if(mReadOnly) //Only show tool tip if readOnly
     return;
+
   QWidget::mouseMoveEvent(event);
 
   if(event->buttons() == Qt::LeftButton)
   {
 	this->moveCurrentAlphaPoint(this->getCurrentAlphaPoint(event->pos()));
-	  //	AlphaPoint newAlphaPoint = this->getCurrentAlphaPoint(pos);
 	  this->updateTooltip(event->pos());
 	  this->update();
   }
-//  // Mouse is only moved inside the widget.
-//  // Emit value for possible use by info widget
-//  else
-//  {
-//    if((event->x() >= mPlotArea.left()) &&
-//       (event->x() <= (mPlotArea.width()+mPlotArea.left())))
-//    {
-//      if(mImage)
-//      {
-//        mCurrentAlphaPoint.position = int(mImage->getMin() + mImage->getRange() *
-//                                       (event->x() - mPlotArea.left()) /
-//                                       static_cast<double>(mPlotArea.width()) );
-//        emit positionChanged(mCurrentAlphaPoint.position);
-//      }
-//    }
-//	this->update();
-//  }
 }
 
 void TransferFunctionAlphaWidget::keyPressEvent(QKeyEvent* event)
@@ -343,14 +324,10 @@ TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::getCurrentA
 {
   AlphaPoint point;
 
-  point.position = 
-    static_cast<int>(mImage->getMin() + ( mImage->getRange() *
-					 (pos.x() - mPlotArea.left()) /
-                     static_cast<double>(mPlotArea.width()) ));
-  point.value = 
-    static_cast<int>( mImage->getMaxAlphaValue() *
-					 (mPlotArea.bottom() - pos.y()) /
-                     static_cast<double>(mPlotArea.height()) );
+  double dposition = mImage->getMin() + mImage->getRange() * double(pos.x() - mPlotArea.left()) / mPlotArea.width();
+  double dvalue = mImage->getMaxAlphaValue() * double(mPlotArea.bottom() - pos.y())/mPlotArea.height();
+  point.position = int(dposition+0.5);
+  point.value = int(dvalue+0.5);
 
   point.position = constrainValue(point.position, mImage->getMin(), mImage->getMax());
   point.value = constrainValue(point.value, 0, mImage->getMaxAlphaValue());
