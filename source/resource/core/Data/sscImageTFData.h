@@ -93,8 +93,6 @@ public:
 	void setLevel(double val); ///< range [scalarMin..scalarMax]
 	double getLevel() const;
 
-	void setLut(vtkLookupTablePtr lut);
-
 	IntIntMap getOpacityMap();///< \return The values of the opacity transfer function. Key range [scalarMin..scalarMax], Value range [0..255].
 	ColorMap getColorMap();///< \return The values of the color transfer function. Key range [scalarMin..scalarMax].
 

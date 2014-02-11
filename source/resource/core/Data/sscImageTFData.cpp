@@ -49,18 +49,6 @@ ImageTFData::~ImageTFData()
 {
 }
 
-/**set a lut that is used as a basis for the color tf.
- */
-void ImageTFData::setLut(vtkLookupTablePtr lut)
-{
-	std::cout << "ImageTFData::setLut not used" << std::endl;
-//	if (lut == mLut)
-//		return;
-//	mLut = lut;
-//	this->LUTChanged();
-//	//this->refreshColorTF();
-}
-
 void ImageTFData::deepCopy(ImageTFData* source)
 {
 	mOpacityMap = source->mOpacityMap;

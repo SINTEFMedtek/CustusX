@@ -24,7 +24,7 @@ public:
 	double llr;
 	double alpha;
 
-	vtkLookupTablePtr lut;
+//	vtkLookupTablePtr lut;
 };
 
 /**Test class  with convenience methods for defining views.
