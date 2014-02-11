@@ -160,6 +160,7 @@ void TransferFunctionAlphaWidget::updateTooltip(AlphaPoint point)
 {
 	QString tip = QString("alpha(%1)=%2").arg(point.position).arg(double(point.value)/255, 0, 'f', 2);
 	this->setToolTip(tip);
+	messageManager()->sendVolatile(tip);
 }
 
 
@@ -363,7 +364,7 @@ void TransferFunctionAlphaWidget::moveCurrentAlphaPoint(AlphaPoint newAlphaPoint
 	if(!mSelectedAlphaPoint.isValid())
 		return;
 
-//	AlphaPoint newAlphaPoint = this->getCurrentAlphaPoint(pos);
+	newAlphaPoint.value = constrainValue(newAlphaPoint.value, 0, 255);
 
 	std::pair<int,int> range = this->findAllowedMoveRangeAroundAlphaPoint(mSelectedAlphaPoint.position);
 	newAlphaPoint.position = constrainValue(newAlphaPoint.position, range.first, range.second);

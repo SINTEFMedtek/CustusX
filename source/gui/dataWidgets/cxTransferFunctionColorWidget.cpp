@@ -126,6 +126,7 @@ void TransferFunctionColorWidget::updateTooltip(ColorPoint point)
 	QString tip = QString("color(%1)=(%2)").arg(point.intensity).arg(color2string(point.value));
 //	std::cout << "updated to " << tip << std::endl;
 	this->setToolTip(tip);
+	messageManager()->sendVolatile(tip);
 //	this->setStatusTip(tip);
 }
 
