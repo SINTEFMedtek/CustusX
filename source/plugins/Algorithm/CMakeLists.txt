@@ -117,12 +117,15 @@ include_directories(
 
 set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui)
 
+message(STATUS "[DEBUG] OpenCLUtilityLibrary_INCLUDE_DIRS "${OpenCLUtilityLibrary_INCLUDE_DIRS})
 if (CX_USE_TSF AND CX_USE_OPENCL_UTILITY)
     set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} OpenCLUtilityLibrary ${OPENCL_LIBRARIES} tubeSegmentationLib)
+    include_directories(${OpenCLUtilityLibrary_INCLUDE_DIRS})
 endif(CX_USE_TSF AND CX_USE_OPENCL_UTILITY)
 
 if (CX_USE_LEVEL_SET AND CX_USE_OPENCL_UTILITY)
     set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} OpenCLUtilityLibrary ${OPENCL_LIBRARIES} levelSetSegLib)
+    include_directories(${OpenCLUtilityLibrary_INCLUDE_DIRS})
 endif(CX_USE_LEVEL_SET AND CX_USE_OPENCL_UTILITY)
 
 
@@ -133,7 +136,4 @@ add_library( cxPluginAlgorithm ${SOURCE_FILES} )
 target_link_libraries( cxPluginAlgorithm ${CX_ALGORITHM_LIBRARIES})
 CX_COTIRE_ADD_LIBRARY(cxPluginAlgorithm "${CX_ALGORITHM_LIBRARIES}")
 
-# add/remove to suit your own needs.
-#add_subdirectory(logic)
-#add_subdirectory(gui)
 add_subdirectory(testing)
