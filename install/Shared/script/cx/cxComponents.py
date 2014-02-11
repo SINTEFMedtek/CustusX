@@ -319,7 +319,7 @@ class IGSTK(CppComponent):
 
 class ISB_DataStreaming(CppComponent):
     def name(self):
-        self.mCurrentRevision = "492"
+        self.mCurrentRevision = "483"
         return "ISB_DataStreaming"
     def help(self):
         return 'ISB GE Digital Interface stuff'
@@ -381,6 +381,10 @@ class CustusX3(CppComponent):
         add('ULTERIUS_LIBRARY:FILEPATH', self._createSibling(UltrasonixSDK).libFile())
         add('ULTERIUS_BIN_DIR:FILEPATH', self._createSibling(UltrasonixSDK).binDir())
         add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).configPath())
+        add('TSF_USE_EXTRNAL_OUL:BOOL', False)
+        add('TSF_EXTERNAL_OUL_USEFILE:PATH', self._createSibling(OpenCLUtilityLibrary).useFilePath())
+        add('LS_USE_EXTRNAL_OUL:BOOL', False)
+        add('LS_EXTERNAL_OUL_USEFILE:PATH', self._createSibling(OpenCLUtilityLibrary).useFilePath())
         add('Level-Set-Segmentation_DIR:PATH', self._createSibling(LevelSetSegmentation).configPath())
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
         add('GEStreamer_DIR:PATH', self._createSibling(ISB_DataStreaming).configPath())
@@ -483,6 +487,8 @@ class OpenCLUtilityLibrary(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()
+    def useFilePath(self):
+        return self.path() + "/OpenCLUtilityLibrary/CMake/OpenCLUtilityLibraryUse.cmake"
         
 # ---------------------------------------------------------
 

@@ -28,11 +28,7 @@ include_directories(
         cxtestTestTransferFunctionColorWidget.h
     )
 
-	#QT4_WRAP_CPP(CXTEST_GUI_SOURCES
-	#	cxTestCustusXController.h
-	#	cxtestTestVideoConnectionWidget.h
-	#	cxtestTestTransferFunctionColorWidget.h
-	#	)
+
 	set(CXTEST_GUI_SOURCES #${CXTEST_GUI_SOURCES}
 		cxTestCustusXController.cpp
 		cxtestSpeed.cpp

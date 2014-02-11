@@ -2,7 +2,6 @@
 
 #ifdef CX_USE_TSF
 #include "tube-segmentation.hpp"
-#include "openCLUtilities.hpp"
 #include "tsf-config.h"
 #include "Exceptions.hpp"
 

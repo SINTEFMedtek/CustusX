@@ -1,5 +1,3 @@
-#ifdef SSC_USE_OpenCL
-
 #include "cxOpenCLUtilities.h"
 
 #include <iostream>
@@ -240,7 +238,6 @@ void OpenCL::release(OpenCL::ocl* ocl)
 {
 	messageManager()->sendInfo("Releasing OpenCL context, device and command queue.");
 
-	cl::UnloadCompiler(); //TODO is this needed???
 	if(ocl != NULL)
 	{
 		delete ocl;
@@ -274,7 +271,7 @@ void OpenCL::build(cl::Program program, QString buildOptions)
 	{
 		cl::Context context(program.getInfo<CL_PROGRAM_CONTEXT>());
 		devices = context.getInfo<CL_CONTEXT_DEVICES>();
-		if(devices == NULL || devices.size())
+		if(devices.size() == 0)
 			messageManager()->sendError("Device is NULL.");
 		program.build(devices, buildOptions.toStdString().c_str(), NULL, NULL);
 	}
@@ -448,6 +445,3 @@ char* OpenCLUtilities::file2string(const char* filename, size_t * final_length)
 }
 
 }//namespace cx
-
-
-#endif //SSC_USE_OpenCL
