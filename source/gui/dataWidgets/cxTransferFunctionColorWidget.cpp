@@ -165,10 +165,9 @@ int TransferFunctionColorWidget::imageIntensity2screenX(int intensity)
 
 int TransferFunctionColorWidget::screenX2imageIntensity(int screenX)
 {
-	int retval =
-			static_cast<int>( mImage->getMin() + ( mImage->getRange() ) *
-							  (screenX - mPlotArea.left()) /
-							  static_cast<double>(mPlotArea.width()-1) );
+//	int retval =
+	double i = mImage->getMin() + mImage->getRange() * double(screenX - mPlotArea.left()) /(mPlotArea.width()-1);
+	int retval = int(i+0.5);
 	return retval;
 }
 

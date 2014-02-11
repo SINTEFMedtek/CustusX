@@ -38,8 +38,8 @@ ImageLUT2DPtr ImageDefaultTFGenerator::generate2DTFPreset()
 {
 	ImageLUT2DPtr tf(new ImageLUT2D());
 
-	std::pair<double, double> fullRange = this->getFullScalarRange();
-	std::pair<double, double> range = this->guessInitialScalarRange();
+	double_pair fullRange = this->getFullScalarRange();
+	double_pair range = this->guessInitialScalarRange();
 	double smin = range.first;
 	double smax = range.second;
 	double srange = smax - smin;
@@ -62,7 +62,9 @@ ImageTF3DPtr ImageDefaultTFGenerator::generate3DTFPreset()
 {
 	ImageTF3DPtr tf(new ImageTF3D());
 
-	std::pair<double, double> range = this->guessInitialScalarRange();
+	double_pair range = this->guessInitialScalarRange();
+//	std::cout << "    end: " << range.first << ", " << range.second << std::endl;
+
 	double smin = range.first;
 	double smax = range.second;
 	double srange = smax - smin;
@@ -70,10 +72,12 @@ ImageTF3DPtr ImageDefaultTFGenerator::generate3DTFPreset()
 
 	IntIntMap opacity;
 //	opacity[smin - 1] = 0;
-	opacity[smin + 0.1*srange] = 0;
-	opacity[smin + 0.3*srange] = 255.0 * 0.7;
-	opacity[smin + 0.5*srange] = 255;
+	// Note the ordering: add in descending order to ensure zero is
+	// always written into smin, also for binary volumes
 	opacity[smax             ] = 255;
+	opacity[smin + 0.5*srange] = 255;
+	opacity[smin + 0.3*srange] = 255.0 * 0.7;
+	opacity[smin + 0.1*srange] = 0;
 	tf->resetAlpha(opacity);
 
 	ColorMap colors;
@@ -89,9 +93,9 @@ bool ImageDefaultTFGenerator::hasValidInitialWindow() const
 	return mImage->getInitialWindowWidth()>0;
 }
 
-std::pair<double, double> ImageDefaultTFGenerator::guessInitialScalarRange()
+double_pair ImageDefaultTFGenerator::guessInitialScalarRange()
 {
-	std::pair<double, double> srange = this->getFullScalarRange();
+	double_pair srange = this->getFullScalarRange();
 
 	if (this->hasValidInitialWindow())
 	{
@@ -110,10 +114,19 @@ std::pair<double, double> ImageDefaultTFGenerator::guessInitialScalarRange()
 		}
 	}
 
+	srange = this->ensureNonZeroRoundedRange(srange);
 	return srange;
 }
 
-std::pair<double, double> ImageDefaultTFGenerator::getFullScalarRange()
+double_pair ImageDefaultTFGenerator::ensureNonZeroRoundedRange(double_pair range)
+{
+	range.first = int(range.first+0.5);
+	range.second = int(range.second+0.5);
+	range.second = std::max(range.second, range.first+1);
+	return range;
+}
+
+double_pair ImageDefaultTFGenerator::getFullScalarRange()
 {
 	double smin = mImage->getBaseVtkImageData()->GetScalarRange()[0];
 	double smax = mImage->getBaseVtkImageData()->GetScalarRange()[1];
@@ -121,7 +134,7 @@ std::pair<double, double> ImageDefaultTFGenerator::getFullScalarRange()
 	return std::make_pair(smin, smax);
 }
 
-std::pair<double, double> ImageDefaultTFGenerator::getInitialWindowRange()
+double_pair ImageDefaultTFGenerator::getInitialWindowRange()
 {
 	double smin = mImage->getInitialWindowLevel() - mImage->getInitialWindowWidth()/2;
 	double smax = mImage->getInitialWindowLevel() + mImage->getInitialWindowWidth()/2;
@@ -129,7 +142,7 @@ std::pair<double, double> ImageDefaultTFGenerator::getInitialWindowRange()
 	return std::make_pair(smin, smax);
 }
 
-std::pair<double, double> ImageDefaultTFGenerator::guessCTRange()
+double_pair ImageDefaultTFGenerator::guessCTRange()
 {
 	// signed: [-1024...3072]
 	// choose a default from lung to bone, approximately.
@@ -146,9 +159,9 @@ std::pair<double, double> ImageDefaultTFGenerator::guessCTRange()
 	return std::make_pair(smin, smax);
 }
 
-std::pair<double, double> ImageDefaultTFGenerator::guessMRRange()
+double_pair ImageDefaultTFGenerator::guessMRRange()
 {
-	std::pair<double, double> srange = this->getFullScalarRange();
+	double_pair srange = this->getFullScalarRange();
 	srange.second *= 0.25; // usually lots of high-intensity noise of no interest
 //	std::cout << "    MR: " << srange.first << ", " << srange.second << std::endl;
 	return srange;

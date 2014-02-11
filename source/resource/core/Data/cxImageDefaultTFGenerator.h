@@ -19,6 +19,8 @@
 
 namespace cx
 {
+typedef std::pair<double,double> double_pair;
+
 
 /** Generates default transfer functions for an Image.
  *
@@ -38,13 +40,13 @@ public:
 
 private:
 	ImagePtr mImage;
-	std::pair<double, double> guessInitialScalarRange();
-	std::pair<double, double> getFullScalarRange();
-	std::pair<double, double> getInitialWindowRange();
+	double_pair guessInitialScalarRange();
+	double_pair getFullScalarRange();
+	double_pair getInitialWindowRange();
 	bool hasValidInitialWindow() const;
-	std::pair<double, double> guessMRRange();
-	std::pair<double, double> guessCTRange();
-
+	double_pair guessMRRange();
+	double_pair guessCTRange();
+	double_pair ensureNonZeroRoundedRange(double_pair range);
 };
 
 
