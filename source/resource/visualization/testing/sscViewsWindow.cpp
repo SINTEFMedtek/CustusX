@@ -237,7 +237,7 @@ void ViewsWindow::applyParameters(cx::ImagePtr image, const ImageParameters *par
 		return;
 	image->getTransferFunctions3D()->setLLR(parameters->llr);
 	image->getTransferFunctions3D()->setAlpha(parameters->alpha);
-	image->getTransferFunctions3D()->setLut(parameters->lut);
+//	image->getTransferFunctions3D()->setLut(parameters->lut);
 }
 
 void ViewsWindow::updateRender()

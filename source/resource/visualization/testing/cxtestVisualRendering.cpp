@@ -88,22 +88,6 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show 3D volume with lut",
-				 "[unit][resource][visualization]")
-{
-	this->setDescription("3D with lut, moving tool");
-
-	ImageParameters parameters;
-	parameters.llr = 75;
-	parameters.lut = getCreateLut(0, 200, .67, .68, 0, 1, .4, .8);
-
-	this->define3D(image[0], &parameters, 0, 0);
-
-	REQUIRE(this->quickRunWidget());
-	CHECK(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
-}
-
-TEST_CASE_METHOD(VisualRenderingFixture,
 				 "Visual rendering: Show ACS+3D, centered hidden tool",
 				 "[unit][resource][visualization]")
 {
