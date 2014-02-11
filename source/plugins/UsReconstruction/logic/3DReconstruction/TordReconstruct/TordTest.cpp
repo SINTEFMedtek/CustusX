@@ -339,11 +339,24 @@ bool TordTest::doGPUReconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	dev_local_mem_size -= constant_local_mem + 128; //Hmmm? 128?
 
 	// How many work items can the local mem support?
-	int maxItems = dev_local_mem_size / varying_local_mem;
+	size_t maxItems = dev_local_mem_size / varying_local_mem;
 	// And what is the biggest multiple of local_work_size that fits into that?
 	int multiple = maxItems / local_work_size;
+
+	if(multiple == 0)
+	  {
+	    // If the maximum amount of work items is smaller than the preferred multiple, we end up here.
+	    // This means that the local memory use is so big we can't even fit into the preferred multiple, and
+	    // have use a sub-optimal local work size.
+	    local_work_size = std::min(max_work_size, maxItems);
+	  }
+	else
+	  {
+	    // Otherwise, we make it fit into the local work size.
+	  local_work_size = std::min(max_work_size, multiple * local_work_size);
+
+	  }
 	//TEST
-	local_work_size = std::min(max_work_size, multiple * local_work_size);
 	messageManager()->sendDebug("TEST: local_work_size "+QString::number(local_work_size));
 
 	size_t close_planes_size = varying_local_mem*local_work_size;
