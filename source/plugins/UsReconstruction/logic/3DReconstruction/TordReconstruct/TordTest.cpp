@@ -95,7 +95,7 @@ DoubleDataAdapterXmlPtr TordTest::getMaxPlanesOption(QDomElement root)
 DoubleDataAdapterXmlPtr TordTest::getNStartsOption(QDomElement root)
 {
 	return DoubleDataAdapterXml::initialize("nStarts", "", "Number of starts for multistart searchs", 3,
-			DoubleRange(1, 8, 1), 0, root);
+			DoubleRange(1, 16, 1), 0, root);
 }
 
 int TordTest::getMethodID(QDomElement root)
