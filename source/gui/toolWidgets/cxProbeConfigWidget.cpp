@@ -254,7 +254,7 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 		return;
 	ProbeDefinition data = probe->getProbeData();
 
-	double sx = data.getSpacing()[0]; // mm/pix
+//	double sx = data.getSpacing()[0]; // mm/pix
 	double sy = data.getSpacing()[1];
 
 	data.setSector(mDepthWidget->getValue().first*sy, mDepthWidget->getValue().second*sy, mWidth->getValue());
