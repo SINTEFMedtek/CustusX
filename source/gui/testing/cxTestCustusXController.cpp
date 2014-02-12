@@ -97,7 +97,7 @@ void CustusXController::enableSlicingSlot()
 
 	//	ImagePtr image = dataManager()->getActiveImage();
 		std::map<QString, cx::ImagePtr> imageMap = cx::dataManager()->getImages();
-		if(imageMap.size() > 0)
+		if(!imageMap.empty())
 		{
 			cx::ImagePtr image = imageMap.begin()->second;
 			interactiveClipper->setImage(image);

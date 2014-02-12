@@ -82,7 +82,7 @@ cl::Platform OpenCL::selectPlatform()
 	{
 		messageManager()->sendError("Could not select a OpenCL platform. Reason: "+QString(error.what()));
 		check_error(error.err());
-		throw error;
+		throw;
 	}
 
 	return retval;
@@ -122,7 +122,7 @@ cl::Device OpenCL::selectDevice(cl_device_type type, cl::Platform platform)
 	{
 		messageManager()->sendError("Could not select a OpenCL device. Reason: "+QString(error.what()));
 		check_error(error.err());
-		throw error;
+		throw;
 	}
 
     return retval;
@@ -152,7 +152,7 @@ cl::Device OpenCL::chooseDeviceWithMostGlobalMemory(VECTOR_CLASS<cl::Device> dev
 		{
 			messageManager()->sendWarning("Could not ask device about CL_DEVICE_GLOBAL_MEM_SIZE. Reason: "+QString(error.what()));
 			check_error(error.err());
-			throw error;
+			throw;
 		}
 	}
 	cl::STRING_CLASS name;
@@ -191,7 +191,7 @@ cl::Context OpenCL::createContext(const VECTOR_CLASS<cl::Device> devices, cl_con
 	{
 		messageManager()->sendError("Could not create a OpenCL context. Reason: "+QString(error.what()));
 		check_error(error.err());
-		throw error;
+		throw;
 	}
 
 	return retval;
@@ -208,7 +208,7 @@ cl::CommandQueue OpenCL::createCommandQueue(cl::Context context, cl::Device devi
 	{
 		messageManager()->sendError("Could not create a OpenCL command queue. Reason: "+QString(error.what()));
 		check_error(error.err());
-		throw error;
+		throw;
 	}
 
 	return retval;
@@ -228,7 +228,7 @@ VECTOR_CLASS<cl::Device> OpenCL::getOnlyValidDevices(VECTOR_CLASS<cl::Device> de
 		{
 			messageManager()->sendWarning("Found invalid device. Device had no name.");
 			check_error(error.err());
-			throw error;
+			throw;
 		}
 	}
 	return valid;
@@ -259,7 +259,7 @@ cl::Program OpenCL::createProgram(cl::Context context, const char* source, size_
 	{
 		messageManager()->sendError("Could not create a OpenCL program queue. Reason: "+QString(error.what()));
 		check_error(error.err());
-		throw error;
+		throw;
 	}
 	return retval;
 }
@@ -318,7 +318,7 @@ cl::Buffer OpenCL::createBuffer(cl::Context context, cl_mem_flags flags, size_t 
 	{
 		messageManager()->sendError("Could not create a OpenCL buffer queue. Reason: "+QString(error.what()));
 		check_error(error.err());
-		throw error;
+		throw;
 	}
 	return dev_mem;
 }
