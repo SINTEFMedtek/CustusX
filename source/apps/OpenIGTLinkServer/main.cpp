@@ -27,7 +27,7 @@ BOOL WINAPI ConsoleHandler(
 
 BOOL WINAPI ConsoleHandler(DWORD CEvent)
 {
-    char mesg[128];
+//    char mesg[128];
 
     switch(CEvent)
     {
