@@ -23,9 +23,8 @@
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 
-
 #include "levelSet.hpp"
-#include "openCLUtilities.hpp"
+#include "OpenCLManager.hpp"
 
 namespace cx
 {
