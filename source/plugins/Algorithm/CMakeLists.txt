@@ -117,7 +117,6 @@ include_directories(
 
 set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui)
 
-message(STATUS "[DEBUG] OpenCLUtilityLibrary_INCLUDE_DIRS "${OpenCLUtilityLibrary_INCLUDE_DIRS})
 if (CX_USE_TSF AND CX_USE_OPENCL_UTILITY)
     set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} OpenCLUtilityLibrary ${OPENCL_LIBRARIES} tubeSegmentationLib)
     include_directories(${OpenCLUtilityLibrary_INCLUDE_DIRS})

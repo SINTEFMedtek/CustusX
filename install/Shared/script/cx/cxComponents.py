@@ -381,10 +381,6 @@ class CustusX3(CppComponent):
         add('ULTERIUS_LIBRARY:FILEPATH', self._createSibling(UltrasonixSDK).libFile())
         add('ULTERIUS_BIN_DIR:FILEPATH', self._createSibling(UltrasonixSDK).binDir())
         add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).configPath())
-        add('TSF_USE_EXTRNAL_OUL:BOOL', True)
-        add('TSF_EXTERNAL_OUL_USEFILE:PATH', self._createSibling(OpenCLUtilityLibrary).useFilePath())
-        add('LS_USE_EXTRNAL_OUL:BOOL', True)
-        add('LS_EXTERNAL_OUL_USEFILE:PATH', self._createSibling(OpenCLUtilityLibrary).useFilePath())
         add('Level-Set-Segmentation_DIR:PATH', self._createSibling(LevelSetSegmentation).configPath())
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
         add('GEStreamer_DIR:PATH', self._createSibling(ISB_DataStreaming).configPath())
@@ -444,12 +440,14 @@ class TubeSegmentationFramework(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/Tube-Segmentation-Framework.git')
     def update(self):
-        self._getBuilder().gitCheckout('431391d7e79721ec1efffc870f03abadb9d45e02', submodules=True)
+        self._getBuilder().gitCheckout('e83582d2cae965f5a135cfa2b49c5ba68f7cb3f0', submodules=True)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         add('USE_C++11', False)
         add('SIPL_USE_GTK', False)
+        add('TSF_USE_EXTRNAL_OUL:BOOL', True)
+        add('TSF_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
         builder.configureCMake()
 
  # ---------------------------------------------------------
@@ -469,6 +467,8 @@ class LevelSetSegmentation(CppComponent):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         add('sipl_use_gtk', False)
+        add('LS_USE_EXTRNAL_OUL:BOOL', True)
+        add('LS_EXTERNAL_OUL_USEFILE:PATH', self._createSibling(OpenCLUtilityLibrary).useFilePath())
         builder.configureCMake()
         
 # ---------------------------------------------------------
@@ -487,8 +487,8 @@ class OpenCLUtilityLibrary(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()
-    def useFilePath(self):
-        return self.path() + "/OpenCLUtilityLibrary/CMake/OpenCLUtilityLibraryUse.cmake"
+    def findPackagePath(self):
+        return self.buildPath()
         
 # ---------------------------------------------------------
 
