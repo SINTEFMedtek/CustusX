@@ -353,18 +353,16 @@ void StateService::fillDefaultSettings()
 
 	this->fillDefault("View3D/maxRenderSize", 10 * pow(10.0,6));
 
+
+	this->fillDefault("useGPUVolumeRayCastMapper", true);
+	this->fillDefault("stillUpdateRate", 0.001);
+
 #ifdef __APPLE__
-	this->fillDefault("useGPUVolumeRayCastMapper", false);
 	this->fillDefault("useGPU2DRendering", true);
-	this->fillDefault("stillUpdateRate", 8.0);
 #elif WIN32
-	this->fillDefault("useGPUVolumeRayCastMapper", true);
 	this->fillDefault("useGPU2DRendering", false);
-	this->fillDefault("stillUpdateRate", 0.001);
 #else
-	this->fillDefault("useGPUVolumeRayCastMapper", true);
 	this->fillDefault("useGPU2DRendering", true);
-	this->fillDefault("stillUpdateRate", 0.001);
 #endif
 
 
