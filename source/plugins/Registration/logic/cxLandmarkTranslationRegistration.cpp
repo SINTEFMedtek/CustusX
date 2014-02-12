@@ -239,7 +239,7 @@ namespace cx
 Transform3D LandmarkTranslationRegistration::registerPoints(std::vector<Vector3D> ref,
 				std::vector<Vector3D> target, bool* ok)
 {
-	if (ref.size() != target.size() || ref.size() == 0)
+	if (ref.size() != target.size() || ref.empty())
 	{
 		std::cout << "Different sizes in ref and target: aborting registration." << std::endl;
 		*ok = false;

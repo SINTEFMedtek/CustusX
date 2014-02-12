@@ -51,7 +51,7 @@ RecordSessionPtr SelectRecordSessionStringDataAdapter::getRecordSession()
 void SelectRecordSessionStringDataAdapter::setDefaultSlot()
 {
   std::vector<RecordSessionPtr> sessions = mPluginData->getRecordSessions();
-  if(sessions.size() > 0)
+	if(!sessions.empty())
     this->setValue(sessions.at(0)->getUid());
 }
 
