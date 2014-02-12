@@ -381,9 +381,9 @@ class CustusX3(CppComponent):
         add('ULTERIUS_LIBRARY:FILEPATH', self._createSibling(UltrasonixSDK).libFile())
         add('ULTERIUS_BIN_DIR:FILEPATH', self._createSibling(UltrasonixSDK).binDir())
         add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).configPath())
-        add('TSF_USE_EXTRNAL_OUL:BOOL', False)
+        add('TSF_USE_EXTRNAL_OUL:BOOL', True)
         add('TSF_EXTERNAL_OUL_USEFILE:PATH', self._createSibling(OpenCLUtilityLibrary).useFilePath())
-        add('LS_USE_EXTRNAL_OUL:BOOL', False)
+        add('LS_USE_EXTRNAL_OUL:BOOL', True)
         add('LS_EXTERNAL_OUL_USEFILE:PATH', self._createSibling(OpenCLUtilityLibrary).useFilePath())
         add('Level-Set-Segmentation_DIR:PATH', self._createSibling(LevelSetSegmentation).configPath())
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
@@ -444,7 +444,7 @@ class TubeSegmentationFramework(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/Tube-Segmentation-Framework.git')
     def update(self):
-        self._getBuilder().gitCheckout('874997f3c8c5e760924a15a6e2656cc7f0de136a', submodules=True)
+        self._getBuilder().gitCheckout('431391d7e79721ec1efffc870f03abadb9d45e02', submodules=True)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -464,7 +464,7 @@ class LevelSetSegmentation(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:smistad/Level-Set-Segmentation')
     def update(self):
-        self._getBuilder().gitCheckout('4b63248b915aa7a8adf98ead801dec1149a5772b', submodules=True)
+        self._getBuilder().gitCheckout('d36d6e9d33010584b6101c43fcc84b367cc85faa', submodules=True)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
