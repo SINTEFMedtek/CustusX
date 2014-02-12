@@ -468,7 +468,7 @@ class LevelSetSegmentation(CppComponent):
         add = builder.addCMakeOption
         add('sipl_use_gtk', False)
         add('LS_USE_EXTRNAL_OUL:BOOL', True)
-        add('LS_EXTERNAL_OUL_USEFILE:PATH', self._createSibling(OpenCLUtilityLibrary).useFilePath())
+        add('LS_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
         builder.configureCMake()
         
 # ---------------------------------------------------------
