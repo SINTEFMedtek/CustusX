@@ -24,6 +24,7 @@
 #include "sscView.h"
 #include "sscDataMetric.h"
 #include "sscLogger.h"
+#include "sscVtkHelperClasses.h"
 
 namespace cx
 {
@@ -121,7 +122,7 @@ void DataMetricRep::drawText()
     }
 
     mText.reset(new CaptionText3D(mView->getRenderer()));
-	mText->setColor(this->getColorAsVector3D());
+	mText->setColor(mMetric->getColor());
     mText->setText(text);
     mText->setPosition(mMetric->getRefCoord());
     mText->setSize(mLabelSize / 100);
@@ -138,10 +139,10 @@ Vector3D DataMetricRep::getColorAsVector3D() const
 {
 	if (!mMetric)
 		return Vector3D(1,1,1);
-
-	QColor color = mMetric->getColor();
-	Vector3D retval(color.redF(), color.greenF(), color.blueF());
-	return retval;
+//	QColor color = mMetric->getColor();
+//	Vector3D retval(color.redF(), color.greenF(), color.blueF());
+//	return retval;
+	return cx::getColorAsVector3D(mMetric->getColor());
 }
 
 }

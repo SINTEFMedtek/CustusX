@@ -36,6 +36,9 @@ DataPtr AngleMetricReader::load(const QString& uid, const QString& filename)
 AngleMetric::AngleMetric(const QString& uid, const QString& name) :
 				DataMetric(uid, name)
 {
+	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "point 0" << "point 1" << "point 2" << "point 3"));
+	mArguments->setValidArgumentTypes(QStringList() << "pointMetric");
+	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 }
 
 AngleMetricPtr AngleMetric::create(QString uid, QString name)
@@ -54,52 +57,16 @@ AngleMetric::~AngleMetric()
 {
 }
 
-void AngleMetric::setArgument(int index, DataPtr p)
-{
-	if (mArgument[index] == p)
-		return;
-
-	if (mArgument[index])
-		disconnect(mArgument[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
-
-	mArgument[index] = p;
-
-	if (mArgument[index])
-		connect(mArgument[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
-
-	emit transformChanged();
-}
-
-DataPtr AngleMetric::getArgument(int index)
-{
-	return mArgument[index];
-}
-
-bool AngleMetric::validArgument(DataPtr p) const
-{
-	return p->getType() == "pointMetric"; // || p->getType()=="planeMetric";
-}
-
 void AngleMetric::addXml(QDomNode& dataNode)
 {
 	DataMetric::addXml(dataNode);
-
-	for (unsigned i = 0; i < mArgument.size(); ++i)
-	{
-		if (mArgument[i])
-			dataNode.toElement().setAttribute(QString("p%1").arg(i), mArgument[i]->getUid());
-	}
+	mArguments->addXml(dataNode);
 }
 
 void AngleMetric::parseXml(QDomNode& dataNode)
 {
 	DataMetric::parseXml(dataNode);
-
-	for (unsigned i = 0; i < mArgument.size(); ++i)
-	{
-		QString uid = dataNode.toElement().attribute(QString("p%1").arg(i), "");
-		this->setArgument(i, dataManager()->getData(uid));
-	}
+	mArguments->parseXml(dataNode);
 }
 
 bool AngleMetric::isValid() const
@@ -107,21 +74,9 @@ bool AngleMetric::isValid() const
 	return !this->getEndpoints().empty();
 }
 
-unsigned AngleMetric::getArgumentCount() const
-{
-	return (unsigned)mArgument.size();
-}
-
 std::vector<Vector3D> AngleMetric::getEndpoints() const
 {
-	std::vector<Vector3D> p(this->getArgumentCount());
-	for (unsigned i = 0; i < p.size(); ++i)
-	{
-		if (!mArgument[i])
-			return std::vector<Vector3D>();
-		p[i] = boost::dynamic_pointer_cast<PointMetric>(mArgument[i])->getRefCoord();
-	}
-	return p;
+	return mArguments->getRefCoords();
 }
 
 Vector3D AngleMetric::getRefCoord() const

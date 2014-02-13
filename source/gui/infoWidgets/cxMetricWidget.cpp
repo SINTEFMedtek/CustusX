@@ -82,6 +82,10 @@ MetricWidget::MetricWidget(QWidget* parent) :
   this->createAction(group, ":/icons/metric_distance.png", "Dist", "Create a new Distance Metric", SLOT(addDistanceButtonClickedSlot()));
   this->createAction(group, ":/icons/metric_angle.png", "Angle", "Create a new Angle Metric",   SLOT(addAngleButtonClickedSlot()));
   this->createAction(group, ":/icons/metric_plane.png", "Plane", "Create a new Plane Metric",   SLOT(addPlaneButtonClickedSlot()));
+
+  this->createAction(group, ":/icons/metric_point.png", "Sphere", "Create a new SphereMetric",   SLOT(addSphereButtonClickedSlot()));
+  this->createAction(group, ":/icons/metric_point.png", "Donut", "Create a new Donut Metric",   SLOT(addDonutButtonClickedSlot()));
+
   this->createAction(group, "", "", "", NULL)->setSeparator(true);
   mRemoveAction = this->createAction(group, ":/icons/metric_remove.png", "Remove", "Remove currently selected metric",   SLOT(removeButtonClickedSlot()));
   mRemoveAction->setDisabled(true);
@@ -224,6 +228,14 @@ MetricBasePtr MetricWidget::createMetricWrapper(DataPtr data)
   {
 	return MetricBasePtr(new ToolMetricWrapper(boost::dynamic_pointer_cast<cx::ToolMetric>(data)));
   }
+  else if (boost::dynamic_pointer_cast<DonutMetric>(data))
+  {
+	return MetricBasePtr(new DonutMetricWrapper(boost::dynamic_pointer_cast<DonutMetric>(data)));
+  }
+  else if (boost::dynamic_pointer_cast<SphereMetric>(data))
+  {
+	return MetricBasePtr(new SphereMetricWrapper(boost::dynamic_pointer_cast<SphereMetric>(data)));
+  }
 
 	return MetricBasePtr();
 }
@@ -261,7 +273,7 @@ void MetricWidget::prePaintEvent()
   	for (unsigned i=0; i<mMetrics.size(); ++i)
   	{
   		rebuild = rebuild || mMetrics[i]->getData()!=newMetrics[i]->getData();
-  	}
+	}
   }
 
   // rebuild all:
@@ -392,9 +404,7 @@ void MetricWidget::addFrameButtonClickedSlot()
   frame->setSpace(ref);
   frame->setFrame(rMt);
 
-  dataManager()->loadData(frame);
-  this->setActiveUid(frame->getUid());
-  viewManager()->getViewGroups()[0]->getData()->addData(frame);
+  this->installNewMetric(frame);
 }
 
 void MetricWidget::addToolButtonClickedSlot()
@@ -410,9 +420,7 @@ void MetricWidget::addToolButtonClickedSlot()
   frame->setToolName(toolManager()->getDominantTool()->getName());
   frame->setToolOffset(toolManager()->getDominantTool()->getTooltipOffset());
 
-  dataManager()->loadData(frame);
-  this->setActiveUid(frame->getUid());
-  viewManager()->getViewGroups()[0]->getData()->addData(frame);
+  this->installNewMetric(frame);
 }
 
 void MetricWidget::addPlaneButtonClickedSlot()
@@ -440,10 +448,7 @@ void MetricWidget::addPlaneButtonClickedSlot()
 	  p1->setNormal(rMto.vector(Vector3D(0,0,1)));
   }
 
-  dataManager()->loadData(p1);
-	this->setActiveUid(p1->getUid());
-
-  viewManager()->getViewGroups()[0]->getData()->addData(p1);
+  this->installNewMetric(p1);
 }
 
 /**Starting with a selection of allowed arguments for a new metric,
@@ -481,55 +486,76 @@ std::vector<DataPtr> MetricWidget::refinePointArguments(std::vector<DataPtr> arg
   return args;
 }
 
-
 void MetricWidget::addDistanceButtonClickedSlot()
 {
 	DistanceMetricPtr d0(new DistanceMetric("distance%1","distance%1"));
   d0->get_rMd_History()->setParentSpace("reference");
-	// first try to reuse existing points as distance arguments, otherwise create new ones.
-  std::vector<DataPtr> args;
 
-  for (unsigned i=0; i<mMetrics.size(); ++i)
-  {
-  	if (d0->validArgument(mMetrics[i]->getData()))
-  		args.push_back(mMetrics[i]->getData());
-  }
-
-  args = this->refinePointArguments(args, d0->getArgumentCount());
-
+  std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
   for (unsigned i=0; i<args.size(); ++i)
-    d0->setArgument(i, args[i]);
+	d0->getArguments()->set(i, args[i]);
 
-	dataManager()->loadData(d0);
-
-	this->setActiveUid(d0->getUid());
-	viewManager()->getViewGroups()[0]->getData()->addData(d0);
+  this->installNewMetric(d0);
 }
 
 void MetricWidget::addAngleButtonClickedSlot()
 {
 	AngleMetricPtr d0(new AngleMetric("angle%1","angle%1"));
   d0->get_rMd_History()->setParentSpace("reference");
+
+  std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments(), 3);
+  d0->getArguments()->set(0, args[0]);
+  d0->getArguments()->set(1, args[1]);
+  d0->getArguments()->set(2, args[1]);
+  d0->getArguments()->set(3, args[2]);
+
+  this->installNewMetric(d0);
+}
+
+std::vector<DataPtr> MetricWidget::getSpecifiedNumberOfValidArguments(MetricReferenceArgumentListPtr arguments, int numberOfRequiredArguments)
+{
 	// first try to reuse existing points as distance arguments, otherwise create new ones.
-  std::vector<DataPtr> args;
 
-  for (unsigned i=0; i<mMetrics.size(); ++i)
-  {
-  	if (d0->validArgument(mMetrics[i]->getData()))
-  		args.push_back(mMetrics[i]->getData());
-  }
+	std::vector<DataPtr> args;
+	for (unsigned i=0; i<mMetrics.size(); ++i)
+	{
+	  if (arguments->validArgument(mMetrics[i]->getData()))
+		  args.push_back(mMetrics[i]->getData());
+	}
 
-  args = this->refinePointArguments(args, 3);
+	if (numberOfRequiredArguments<0)
+		numberOfRequiredArguments = arguments->getCount();
+	args = this->refinePointArguments(args, numberOfRequiredArguments);
 
-  d0->setArgument(0, args[0]);
-  d0->setArgument(1, args[1]);
-  d0->setArgument(2, args[1]);
-  d0->setArgument(3, args[2]);
+	return args;
+}
 
-  dataManager()->loadData(d0);
+void MetricWidget::addSphereButtonClickedSlot()
+{
+	SphereMetricPtr d0(new SphereMetric("sphere%1","sphere%1"));
+	d0->get_rMd_History()->setParentSpace("reference");
+	std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
+	d0->getArguments()->set(0, args[0]);
 
-	this->setActiveUid(d0->getUid());
-  viewManager()->getViewGroups()[0]->getData()->addData(d0);
+	this->installNewMetric(d0);
+}
+
+void MetricWidget::addDonutButtonClickedSlot()
+{
+	DonutMetricPtr d0(new DonutMetric("donut%1","donut%1"));
+	d0->get_rMd_History()->setParentSpace("reference");
+	std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
+	d0->getArguments()->set(0, args[0]);
+	d0->getArguments()->set(1, args[1]);
+
+	this->installNewMetric(d0);
+}
+
+void MetricWidget::installNewMetric(DataMetricPtr metric)
+{
+	dataManager()->loadData(metric);
+	this->setActiveUid(metric->getUid());
+	viewManager()->getViewGroups()[0]->getData()->addData(metric);
 }
 
 void MetricWidget::removeButtonClickedSlot()

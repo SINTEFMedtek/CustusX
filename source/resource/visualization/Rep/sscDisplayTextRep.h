@@ -24,6 +24,7 @@
 #include "sscRepImpl.h"
 #include "sscVector3D.h"
 #include "vtkForwardDeclarations.h"
+class QColor;
 
 namespace cx
 {
@@ -47,9 +48,9 @@ class DisplayTextRep : public RepImpl
 public:
 	static DisplayTextRepPtr New(const QString& uid, const QString& name);
 	virtual QString getType() const{ return "vm::DisplayTextRep";}
-	TextDisplayPtr addText(const Vector3D& color, const QString& text, const Vector3D& pos, int maxWidth=0, vtkViewport *vp=NULL);
+	TextDisplayPtr addText(const QColor& color, const QString& text, const Vector3D& pos, int maxWidth=0, vtkViewport *vp=NULL);
 	void setText(unsigned i, const QString& text);
-	void setColor(const Vector3D& color );
+	void setColor(const QColor& color );
 	void setFontSize(int size);
 	virtual ~DisplayTextRep();
 

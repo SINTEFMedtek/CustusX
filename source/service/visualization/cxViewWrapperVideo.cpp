@@ -240,12 +240,12 @@ void ViewWrapperVideo::addReps()
 {
 	// plane type text rep
 	mPlaneTypeText = DisplayTextRep::New("planeTypeRep_" + mView->getName(), "");
-	mPlaneTypeText->addText(Vector3D(0, 1, 0), "RT", Vector3D(0.98, 0.02, 0.0));
+	mPlaneTypeText->addText(QColor(Qt::green), "RT", Vector3D(0.98, 0.02, 0.0));
 	mView->addRep(mPlaneTypeText);
 
 	//data name text rep
 	mDataNameText = DisplayTextRep::New("dataNameText_" + mView->getName(), "");
-	mDataNameText->addText(Vector3D(0, 1, 0), "not initialized", Vector3D(0.02, 0.02, 0.0));
+	mDataNameText->addText(QColor(Qt::green), "not initialized", Vector3D(0.02, 0.02, 0.0));
 	mView->addRep(mDataNameText);
 }
 

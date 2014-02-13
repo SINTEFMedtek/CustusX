@@ -26,6 +26,9 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Data/sscCoordinateSystemListener
 	Data/cxFrameMetricBase
 	Data/cxImageParameters
+	Data/cxShapedMetric
+	Data/cxSphereMetric
+	Data/cxMetricReferenceArgumentList
 
 	Video/sscVideoSource.h
 	Video/sscVideoRecorder

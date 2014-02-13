@@ -74,7 +74,7 @@ void DistanceMetricRep::changedSlot()
 
     if (mGraphicalLine)
     {
-		mGraphicalLine->setColor(this->getColorAsVector3D());
+		mGraphicalLine->setColor(mMetric->getColor());
         std::vector<Vector3D> p = distanceMetric->getEndpoints();
         mGraphicalLine->setValue(p[0], p[1]);
         mGraphicalLine->setStipple(0xF0FF);

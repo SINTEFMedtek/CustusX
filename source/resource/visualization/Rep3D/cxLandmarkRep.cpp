@@ -32,6 +32,7 @@
 #include "sscTypeConversions.h"
 #include "boost/bind.hpp"
 #include "sscToolManager.h"
+#include "sscVtkHelperClasses.h"
 
 namespace cx
 {
@@ -120,9 +121,9 @@ LandmarkRepPtr LandmarkRep::New(const QString& uid, const QString& name)
 }
 
 LandmarkRep::LandmarkRep(const QString& uid, const QString& name) :
-				RepImpl(uid, name), mInactiveColor(0.5,0.5,0.5), mColor(0, 1, 0),
+	RepImpl(uid, name), mInactiveColor(QColor::fromRgbF(0.5,0.5,0.5)), mColor(QColor(Qt::green)),
 				//  mSecondaryColor(0,0.6,0.8),
-				mSecondaryColor(0, 0.9, 0.5), mShowLandmarks(true), mGraphicsSize(1), mLabelSize(2.5)
+				mSecondaryColor(QColor::fromRgbF(0, 0.9, 0.5)), mShowLandmarks(true), mGraphicsSize(1), mLabelSize(2.5)
 {
 	connect(dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(internalUpdate()));
 
@@ -158,13 +159,13 @@ void LandmarkRep::setSecondarySource(LandmarksSourcePtr secondary)
 	this->internalUpdate();
 }
 
-void LandmarkRep::setColor(Vector3D color)
+void LandmarkRep::setColor(QColor color)
 {
 	mColor = color;
 	this->internalUpdate();
 }
 
-void LandmarkRep::setSecondaryColor(Vector3D color)
+void LandmarkRep::setSecondaryColor(QColor color)
 {
 	mSecondaryColor = color;
 	this->internalUpdate();
@@ -261,8 +262,8 @@ void LandmarkRep::addLandmark(QString uid)
 	}
 
 	double radius = 2;
-	Vector3D color = mColor;
-	Vector3D secondaryColor = mSecondaryColor;
+	QColor color = mColor;
+	QColor secondaryColor = mSecondaryColor;
 
 	if (!property.getActive())
 	{

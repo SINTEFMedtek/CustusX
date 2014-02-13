@@ -40,9 +40,9 @@ SlicePlanesProxy::SlicePlanesProxy()
 	mVisible = true;
 	mDrawPlane = false;
 
-	Vector3D color1(0, 1, 1);
-	Vector3D color2(0, 0.6, 1);
-	Vector3D color3(0.5, 0.5, 1);
+	QColor color1 = QColor::fromRgbF(0, 1, 1);
+	QColor color2 = QColor::fromRgbF(0, 0.6, 1);
+	QColor color3 = QColor::fromRgbF(0.5, 0.5, 1);
 
 	mProperties.mColor[ptAXIAL] = color1;
 	mProperties.mSymbol[ptAXIAL] = "A";
@@ -239,7 +239,7 @@ void SlicePlanes3DRep::changedSlot()
 		{
 			data.mText = vtkTextActor3DPtr::New();
 			data.mText->SetInput(cstring_cast(base.mSymbol));
-			data.mText->GetTextProperty()->SetColor(base.mColor.begin());
+			data.mText->GetTextProperty()->SetColor(getColorAsVector3D(base.mColor).begin());
 			data.mText->GetTextProperty()->SetFontSize(mProxy->getProperties().m3DFontSize);
 			data.mText->GetTextProperty()->BoldOn();
 			data.mText->GetTextProperty()->SetVerticalJustificationToBottom();

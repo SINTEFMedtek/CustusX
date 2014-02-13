@@ -19,6 +19,7 @@
 #include "vtkMatrix4x4.h"
 #include "vtkCaptionActor2D.h"
 #include "vtkTextProperty.h"
+#include "sscVtkHelperClasses.h"
 
 namespace cx
 {
@@ -155,10 +156,15 @@ void GraphicalPoint3D::setRadius(double radius)
 	source->SetRadius(radius);
 }
 
-void GraphicalPoint3D::setColor(Vector3D color)
+void GraphicalPoint3D::setColor(QColor color)
 {
-	actor->GetProperty()->SetColor(color.begin());
+	setColorAndOpacity(actor->GetProperty(), color);
 }
+
+//void GraphicalPoint3D::setColor(Vector3D color)
+//{
+//	actor->GetProperty()->SetColor(color.begin());
+//}
 
 void GraphicalPoint3D::setValue(Vector3D point)
 {
@@ -218,9 +224,9 @@ void GraphicalLine3D::setRenderer(vtkRendererPtr renderer)
 	}
 }
 
-void GraphicalLine3D::setColor(Vector3D color)
+void GraphicalLine3D::setColor(QColor color)
 {
-	actor->GetProperty()->SetColor(color.begin());
+	setColorAndOpacity(actor->GetProperty(), color);
 }
 
 void GraphicalLine3D::setValue(Vector3D point1, Vector3D point2)
@@ -268,9 +274,9 @@ GraphicalArc3D::~GraphicalArc3D()
 		mRenderer->RemoveActor(actor);
 }
 
-void GraphicalArc3D::setColor(Vector3D color)
+void GraphicalArc3D::setColor(QColor color)
 {
-	actor->GetProperty()->SetColor(color.begin());
+	setColorAndOpacity(actor->GetProperty(), color);
 }
 
 void GraphicalArc3D::setValue(Vector3D point1, Vector3D point2, Vector3D center)
@@ -320,9 +326,9 @@ GraphicalArrow3D::~GraphicalArrow3D()
 		mRenderer->RemoveActor(actor);
 }
 
-void GraphicalArrow3D::setColor(Vector3D color)
+void GraphicalArrow3D::setColor(QColor color)
 {
-	actor->GetProperty()->SetColor(color.begin());
+	setColorAndOpacity(actor->GetProperty(), color);
 }
 
 void GraphicalArrow3D::setValue(Vector3D base, Vector3D normal, double length)
@@ -352,12 +358,13 @@ void GraphicalArrow3D::setValue(Vector3D base, Vector3D normal, double length)
 ///--------------------------------------------------------
 
 
-Rect3D::Rect3D(vtkRendererPtr renderer, Vector3D color)
+Rect3D::Rect3D(vtkRendererPtr renderer, QColor color)
 {
 	mRenderer = renderer;
 	mapper = vtkPolyDataMapperPtr::New();
 	actor = vtkActorPtr::New();
-	actor->GetProperty()->SetColor(color.begin());
+	setColorAndOpacity(actor->GetProperty(), color);
+//	actor->GetProperty()->SetColor(color.begin());
 	actor->SetMapper(mapper);
 	if (mRenderer)
 		mRenderer->AddActor(actor);
@@ -490,9 +497,10 @@ void FollowerText3D::setSizeInNormalizedViewport(bool on, double size)
 	this->setSize(size);
 }
 
-void FollowerText3D::setColor(Vector3D color)
+void FollowerText3D::setColor(QColor color)
 {
-	mFollower->GetProperty()->SetColor(color.begin());
+	setColorAndOpacity(mFollower->GetProperty(), color);
+//	mFollower->GetProperty()->SetColor(getColorAsVector3D(color).begin());
 }
 
 void FollowerText3D::setText(QString text)
@@ -579,9 +587,9 @@ void CaptionText3D::setSize(double val)
 	mText->SetHeight(val);
 }
 
-void CaptionText3D::setColor(Vector3D color)
+void CaptionText3D::setColor(QColor color)
 {
-	mText->GetCaptionTextProperty()->SetColor(color.begin());
+	mText->GetCaptionTextProperty()->SetColor(getColorAsVector3D(color).begin());
 }
 
 void CaptionText3D::setText(QString text)

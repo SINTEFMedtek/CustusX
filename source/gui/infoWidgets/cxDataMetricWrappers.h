@@ -16,9 +16,12 @@
 #include "sscDistanceMetric.h"
 #include "sscAngleMetric.h"
 #include "sscPlaneMetric.h"
+#include "cxSphereMetric.h"
+#include "cxShapedMetric.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscVector3DDataAdapterXml.h"
 #include "sscColorDataAdapterXml.h"
+#include "sscDoubleDataAdapterXml.h"
 
 class QVBoxLayout;
 class QTableWidget;
@@ -51,6 +54,29 @@ private slots:
 protected:
   ColorDataAdapterXmlPtr mColorSelector;
   void addColorWidget(QVBoxLayout* layout);
+};
+
+/**
+  *
+  */
+class MetricReferenceArgumentListGui : public QObject
+{
+	Q_OBJECT
+public:
+	MetricReferenceArgumentListGui();
+	void setArguments(MetricReferenceArgumentListPtr arguments);
+	void addWidgets(QBoxLayout* layout);
+	QString getAsString() const;
+public:
+	void argumentsChanged();
+private slots:
+  void pointSelected();
+  void dataChangedSlot();
+private:
+	MetricReferenceArgumentListPtr mArguments;
+	std::vector<StringDataAdapterXmlPtr> mPSelector;
+	bool mInternalUpdate;
+	void getAvailableArgumentMetrics(QStringList* uid, std::map<QString,QString>* namemap);
 };
 
 class PointMetricWrapper : public MetricBase
@@ -116,14 +142,12 @@ public:
   virtual QString getType() const;
 
 private slots:
-  void pointSelected();
   void dataChangedSlot();
 
 private:
   DistanceMetricPtr mData;
-  std::vector<StringDataAdapterXmlPtr> mPSelector;
-void getAvailableArgumentMetrics(QStringList* uid, std::map<QString,QString>* namemap);
   bool mInternalUpdate;
+  MetricReferenceArgumentListGui mArguments;
 };
 
 class AngleMetricWrapper : public MetricBase
@@ -139,16 +163,66 @@ public:
   virtual QString getType() const;
 
 private slots:
-  void pointSelected();
   void dataChangedSlot();
 
 private:
   AngleMetricPtr mData;
-  std::vector<StringDataAdapterXmlPtr> mPSelector;
-  void getPointMetrics(QStringList* uid, std::map<QString,QString>* namemap);
+  MetricReferenceArgumentListGui mArguments;
   bool mInternalUpdate;
 };
 
+class DonutMetricWrapper : public MetricBase
+{
+  Q_OBJECT
+public:
+  explicit DonutMetricWrapper(DonutMetricPtr data);
+  virtual ~DonutMetricWrapper() {}
+  virtual QWidget* createWidget();
+  virtual QString getValue() const;
+  virtual DataMetricPtr getData() const;
+  virtual QString getArguments() const;
+  virtual QString getType() const;
+
+private slots:
+  void dataChangedSlot();
+  void guiChanged();
+
+private:
+  DoubleDataAdapterXmlPtr createRadiusSelector() const;
+  DoubleDataAdapterXmlPtr createThicknessSelector() const;
+
+  DonutMetricPtr mData;
+  DoubleDataAdapterXmlPtr mRadius;
+  DoubleDataAdapterXmlPtr mThickness;
+  bool mInternalUpdate;
+  MetricReferenceArgumentListGui mArguments;
+
+};
+
+class SphereMetricWrapper : public MetricBase
+{
+  Q_OBJECT
+public:
+  explicit SphereMetricWrapper(SphereMetricPtr data);
+  virtual ~SphereMetricWrapper() {}
+  virtual QWidget* createWidget();
+  virtual QString getValue() const;
+  virtual DataMetricPtr getData() const;
+  virtual QString getArguments() const;
+  virtual QString getType() const;
+
+private slots:
+  void dataChangedSlot();
+  void guiChanged();
+
+private:
+  DoubleDataAdapterXmlPtr createRadiusSelector() const;
+
+  SphereMetricPtr mData;
+  DoubleDataAdapterXmlPtr mRadius;
+  bool mInternalUpdate;
+  MetricReferenceArgumentListGui mArguments;
+};
 
 /**
  * @}
