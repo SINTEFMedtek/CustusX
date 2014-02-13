@@ -290,18 +290,6 @@ double ViewsWindow::getFractionOfBrightPixelsInView(int viewIndex, int threshold
 	return cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, threshold,component);
 }
 
-bool ViewsWindow::runWidget()
-{
-	this->show();
-#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
-	this->activateWindow();
-#endif
-	this->raise();
-	this->updateRender();
-	mRemaindingRenderings = 5;
-	return !qApp->exec();
-}
-
 bool ViewsWindow::quickRunWidget()
 {
 	this->show();
