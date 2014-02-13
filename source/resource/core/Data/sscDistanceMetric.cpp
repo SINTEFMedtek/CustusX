@@ -143,6 +143,11 @@ double DistanceMetric::getDistance() const
 	return (endpoints[1] - endpoints[0]).length();
 }
 
+QString DistanceMetric::getValueAsString() const
+{
+	return QString("%1 mm").arg(this->getDistance(), 0, 'f', 1);
+}
+
 DoubleBoundingBox3D DistanceMetric::boundingBox() const
 {
 	return DoubleBoundingBox3D::fromCloud(this->getEndpoints());

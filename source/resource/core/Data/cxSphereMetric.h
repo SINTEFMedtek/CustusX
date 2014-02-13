@@ -77,6 +77,8 @@ public:
 	{
 		return "SphereMetric";
 	}
+	virtual QString getValueAsString() const;
+	virtual bool showValueInGraphics() const { return false; }
 
 private:
 	MetricReferenceArgumentListPtr mArguments;

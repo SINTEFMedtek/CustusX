@@ -67,32 +67,12 @@ void SphereMetric::parseXml(QDomNode& dataNode)
 bool SphereMetric::isValid() const
 {
 	return !mArguments->getRefCoords().empty();
-//        return !this->getEndpoints().empty();
 }
-
-//std::vector<Vector3D> SphereMetric::getEndpoints() const
-//{
-//	return mArguments->getRefCoords();
-//}
 
 Vector3D SphereMetric::getRefCoord() const
 {
 	return this->boundingBox().center();
 }
-
-//double SphereMetric::getAngle() const
-//{
-//	std::vector<Vector3D> p = this->getEndpoints();
-
-//	if (p.empty())
-//		return -1;
-
-//	Vector3D a = (p[0] - p[1]).normalized();
-//	Vector3D b = (p[3] - p[2]).normalized();
-
-//	double angle = acos(dot(a, b) / a.length() / b.length());
-//	return angle;
-//}
 
 DoubleBoundingBox3D SphereMetric::boundingBox() const
 {
@@ -115,6 +95,11 @@ void SphereMetric::setRadius(double val)
 double SphereMetric::getRadius() const
 {
 	return mRadius;
+}
+
+QString SphereMetric::getValueAsString() const
+{
+	return QString("%1").arg(this->getRadius(), 0, 'f', 1);
 }
 
 }

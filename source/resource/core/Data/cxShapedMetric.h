@@ -86,6 +86,8 @@ public:
 	{
 		return "DonutMetric";
 	}
+	virtual QString getValueAsString() const { return ""; }
+	virtual bool showValueInGraphics() const { return false; }
 
 private:
 	MetricReferenceArgumentListPtr mArguments;

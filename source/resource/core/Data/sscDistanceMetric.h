@@ -84,6 +84,9 @@ public:
 		return "distanceMetric";
 	}
 
+	virtual QString getValueAsString() const;
+	virtual bool showValueInGraphics() const { return true; }
+
 private:
 	MetricReferenceArgumentListPtr mArguments;
 };

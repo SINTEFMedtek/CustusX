@@ -30,15 +30,13 @@ namespace cx
 {
 
 DataMetricRep::DataMetricRep(const QString& uid, const QString& name) :
-				RepImpl(uid, name),
-				mGraphicsSize(1),
-				mShowLabel(false),
-				mLabelSize(2.5),
-//                mColor(Vector3D(1, 0, 0)),
-                mView(NULL)
+	RepImpl(uid, name),
+	mGraphicsSize(1),
+	mShowLabel(false),
+	mLabelSize(2.5),
+	mShowAnnotation(true),
+	mView(NULL)
 {
-//  mViewportListener.reset(new ViewportListener);
-//  mViewportListener->setCallback(boost::bind(&DataMetricRep::rescale, this));
 }
 
 void DataMetricRep::setDataMetric(DataMetricPtr value)
@@ -81,6 +79,12 @@ void DataMetricRep::setGraphicsSize(double size)
 void DataMetricRep::setLabelSize(double size)
 {
 	mLabelSize = size;
+	this->changedSlot();
+}
+
+void DataMetricRep::setShowAnnotation(bool on)
+{
+	mShowAnnotation = on;
 	this->changedSlot();
 }
 
@@ -130,9 +134,14 @@ void DataMetricRep::drawText()
 
 QString DataMetricRep::getText()
 {
-    if (mShowLabel)
-        return mMetric->getName();
-    return "";
+	if (!mShowAnnotation)
+		return "";
+	QStringList text;
+	if (mShowLabel)
+		text << mMetric->getName();
+	if (mMetric->showValueInGraphics())
+		text << mMetric->getValueAsString();
+	return text.join(" = ");
 }
 
 Vector3D DataMetricRep::getColorAsVector3D() const

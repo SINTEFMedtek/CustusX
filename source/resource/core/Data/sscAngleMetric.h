@@ -90,9 +90,15 @@ public:
 		return "angleMetric";
 	}
 
+	virtual QString getValueAsString() const;
+	virtual bool showValueInGraphics() const { return true; }
+	bool getUseSimpleVisualization() const;
+	void setUseSimpleVisualization(bool val);
+
 private:
 	boost::array<DataPtr, 4> mArgument;
 	MetricReferenceArgumentListPtr mArguments;
+	bool mUseSimpleVisualization;
 };
 
 /**

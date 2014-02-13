@@ -100,6 +100,7 @@ private:
   void prePaintEvent();
   std::vector<DataPtr> getSpecifiedNumberOfValidArguments(MetricReferenceArgumentListPtr arguments, int numberOfRequiredArguments=-1);
   void installNewMetric(DataMetricPtr metric);
+  PointMetricPtr addPointInDefaultPosition();
 
 //  template<class T>
   QAction* createAction(QActionGroup* group, QString iconName, QString text, QString tip, const char* slot);

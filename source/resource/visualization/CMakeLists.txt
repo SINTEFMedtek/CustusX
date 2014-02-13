@@ -30,6 +30,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     Rep3D/sscImage2DRep3D
 	Rep3D/cxSphereMetricRep
 	Rep3D/cxDonutMetricRep
+	Rep3D/cxMetricNamesRep
 
 	Rep2D/sscOrientationAnnotationRep
 	Rep2D/sscSlicerRepSW

@@ -72,12 +72,12 @@ void SphereMetricRep::changedSlot()
 	this->drawText();
 }
 
-QString SphereMetricRep::getText()
-{
-	QString text = QString("%1").arg(this->getSphereMetric()->getRadius(), 0, 'f', 1);
-	if (mShowLabel)
-		text = mMetric->getName() + " = " + text;
-	return text;
-}
+//QString SphereMetricRep::getText()
+//{
+//	QString text = QString("%1").arg(this->getSphereMetric()->getRadius(), 0, 'f', 1);
+//	if (mShowLabel)
+//		text = mMetric->getName() + " = " + text;
+//	return text;
+//}
 
 }

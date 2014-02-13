@@ -388,9 +388,14 @@ void MetricWidget::setActiveUid(QString uid)
 
 void MetricWidget::addPointButtonClickedSlot()
 {
-  CoordinateSystem ref = SpaceHelpers::getR();
-  Vector3D p_ref = SpaceHelpers::getDominantToolTipPoint(ref, true);
-  this->addPoint(p_ref, ref);
+	this->addPointInDefaultPosition();
+}
+
+PointMetricPtr MetricWidget::addPointInDefaultPosition()
+{
+	CoordinateSystem ref = SpaceHelpers::getR();
+	Vector3D p_ref = SpaceHelpers::getDominantToolTipPoint(ref, true);
+	return this->addPoint(p_ref, ref);
 }
 
 void MetricWidget::addFrameButtonClickedSlot()
@@ -479,8 +484,8 @@ std::vector<DataPtr> MetricWidget::refinePointArguments(std::vector<DataPtr> arg
 
   while (args.size() < argNo)
   {
-	  PointMetricPtr p0 = this->addPoint(Vector3D(0,0,0), CoordinateSystem(csREF, ""));
-  	args.push_back(p0);
+	  PointMetricPtr p0 = this->addPointInDefaultPosition();
+	  args.push_back(p0);
   }
 
   return args;
@@ -597,7 +602,6 @@ void MetricWidget::loadReferencePointsSlot()
   for(; it != referencePoints_s.end(); ++it)
   {
     Vector3D P_ref = CoordinateSystemHelpers::get_toMfrom(sensor, ref).coord(it->second);
-//    this->addPoint(P_ref);
     this->addPoint(P_ref, CoordinateSystem(csREF), "ref%1");
   }
 }

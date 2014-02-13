@@ -79,6 +79,7 @@
 #include "cxDepthPeeling.h"
 #include "cxAxisConnector.h"
 #include "cxMultiVolume3DRepProducer.h"
+#include "cxMetricNamesRep.h"
 
 
 namespace cx
@@ -127,6 +128,9 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view)
 	mDataNameText = DisplayTextRep::New("dataNameText_" + mView->getName(), "");
 	mDataNameText->addText(QColor(Qt::green), "not initialized", Vector3D(0.02, 0.02, 0.0));
 	mView->addRep(mDataNameText);
+
+	//data name text rep
+	this->updateMetricNamesRep();
 
 	connect(toolManager(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
 	connect(toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
@@ -201,20 +205,25 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	if ((key == "View3D/annotationModelSize" )||( key == "View3D/annotationModel"))
 	{
 		mAnnotationMarker->setMarkerFilename(
-						DataLocations::getRootConfigPath() + "/models/"
-										+ settings()->value("View3D/annotationModel").toString());
+					DataLocations::getRootConfigPath() + "/models/"
+					+ settings()->value("View3D/annotationModel").toString());
 		mAnnotationMarker->setSize(settings()->value("View3D/annotationModelSize").toDouble());
 	}
 	if (key == "showManualTool")
 	{
 		this->toolsAvailableSlot();
 	}
-	if ((key == "View3D/sphereRadius" )||( key == "View3D/labelSize" )||( key == "View/showLabels"))
+	if ((key == "View3D/sphereRadius" )
+			||( key == "View3D/labelSize" )
+			||( key == "View/showLabels")
+			||( key == "View/showMetricNamesInCorner"))
 	{
 		for (RepMap::iterator iter = mDataReps.begin(); iter != mDataReps.end(); ++iter)
 		{
 			this->readDataRepSettings(iter->second);
 		}
+
+		this->updateMetricNamesRep();
 
 		this->toolsAvailableSlot();
 		mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
@@ -222,6 +231,28 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	}
 	if (key == "View3D/depthPeeling")
 		this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
+}
+
+void ViewWrapper3D::updateMetricNamesRep()
+{
+	bool enabled = settings()->value("View/showMetricNamesInCorner").value<bool>();
+
+	if (enabled)
+	{
+		if (!mMetricNames)
+		{
+			mMetricNames = MetricNamesRep::New("metricsNames_" + mView->getName(), "");
+			mView->addRep(mMetricNames);
+		}
+
+		if (mGroupData)
+			mMetricNames->setData(mGroupData->getData());
+	}
+	else
+	{
+		mView->removeRep(mMetricNames);
+		mMetricNames.reset();
+	}
 }
 
 void ViewWrapper3D::PickerRepPointPickedSlot(Vector3D p_r)
@@ -618,6 +649,7 @@ void ViewWrapper3D::readDataRepSettings(RepPtr rep)
 	val->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
 	val->setShowLabel(settings()->value("View/showLabels").toBool());
 	val->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+	val->setShowAnnotation(!settings()->value("View/showMetricNamesInCorner").toBool());
 }
 
 void ViewWrapper3D::updateView()
@@ -629,6 +661,16 @@ void ViewWrapper3D::updateView()
 		text = this->getAllDataNames().join("\n");
 	mDataNameText->setText(0, text);
 	mDataNameText->setFontSize(std::max(12, 22 - 2 * text.size()));
+
+	this->updateMetricNamesRep();
+//	if (mGroupData && mMetricNames)
+//		mMetricNames->setData(mGroupData->getData());
+//	bool showMetricTexts = true;
+//	if (showMetricTexts)
+//	{
+//		mMetricsText->setColoredTextList(this->getAllMetricTexts(), Eigen::Array2d(0.98, 0.98));
+//	}
+
 
 	mAnnotationMarker->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
 }

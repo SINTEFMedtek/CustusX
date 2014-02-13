@@ -28,6 +28,7 @@
 #include "sscRegistrationTransform.h"
 #include "cxDataAdapterHelper.h"
 #include "cxBaseWidget.h"
+#include "sscBoolDataAdapterXml.h"
 
 namespace cx
 {
@@ -37,6 +38,14 @@ void MetricBase::colorSelected()
 	//	if (mInternalUpdate)
 	//		return;
 	this->getData()->setColor(mColorSelector->getValue());
+}
+
+QString MetricBase::getValue() const
+{
+	QString retval = this->getData()->getValueAsString();
+	if (retval.isEmpty())
+		return "NA";
+	return retval;
 }
 
 void MetricBase::addColorWidget(QVBoxLayout* layout)
@@ -219,10 +228,10 @@ QWidget* PointMetricWrapper::createSampleButton(QWidget* parent) const
 	return sampleButton;
 }
 
-QString PointMetricWrapper::getValue() const
-{
-	return prettyFormat(mData->getRefCoord(), 1, 3);
-}
+//QString PointMetricWrapper::getValue() const
+//{
+//	return prettyFormat(mData->getRefCoord(), 1, 3);
+//}
 
 DataMetricPtr PointMetricWrapper::getData() const
 {
@@ -343,10 +352,10 @@ QWidget* PlaneMetricWrapper::createWidget()
 	return widget;
 }
 
-QString PlaneMetricWrapper::getValue() const
-{
-	return "NA";
-}
+//QString PlaneMetricWrapper::getValue() const
+//{
+//	return "NA";
+//}
 
 DataMetricPtr PlaneMetricWrapper::getData() const
 {
@@ -438,10 +447,10 @@ QWidget* DistanceMetricWrapper::createWidget()
 	return widget;
 }
 
-QString DistanceMetricWrapper::getValue() const
-{
-	return QString("%1 mm").arg(mData->getDistance(), 5, 'f', 1);
-}
+//QString DistanceMetricWrapper::getValue() const
+//{
+//	return QString("%1 mm").arg(mData->getDistance(), 5, 'f', 1);
+//}
 
 DataMetricPtr DistanceMetricWrapper::getData() const
 {
@@ -486,6 +495,10 @@ QWidget* AngleMetricWrapper::createWidget()
 	topLayout->addLayout(hLayout);
 
 	mArguments.addWidgets(hLayout);
+
+	mUseSimpleVisualization =  this->createUseSimpleVisualizationSelector();
+	topLayout->addWidget(createDataWidget(widget, mUseSimpleVisualization));
+
 	this->addColorWidget(topLayout);
 	topLayout->addStretch();
 
@@ -493,10 +506,11 @@ QWidget* AngleMetricWrapper::createWidget()
 	return widget;
 }
 
-QString AngleMetricWrapper::getValue() const
-{
-	return QString("%1*").arg(mData->getAngle()/M_PI*180, 5, 'f', 1);
-}
+//QString AngleMetricWrapper::getValue() const
+//{
+//	return QString("%1*").arg(mData->getAngle()/M_PI*180, 5, 'f', 1);
+//}
+
 DataMetricPtr AngleMetricWrapper::getData() const
 {
 	return mData;
@@ -514,8 +528,28 @@ QString AngleMetricWrapper::getArguments() const
 void AngleMetricWrapper::dataChangedSlot()
 {
 	mInternalUpdate = true;
+	mUseSimpleVisualization->setValue(mData->getUseSimpleVisualization());
 	mInternalUpdate = false;
 }
+
+void AngleMetricWrapper::guiChanged()
+{
+	if (mInternalUpdate)
+		return;
+	mData->setUseSimpleVisualization(mUseSimpleVisualization->getValue());
+}
+
+BoolDataAdapterXmlPtr AngleMetricWrapper::createUseSimpleVisualizationSelector() const
+{
+	BoolDataAdapterXmlPtr retval;
+	retval = BoolDataAdapterXml::initialize("Simple Visualization", "",
+											  "Simple Visualization",
+											  mData->getUseSimpleVisualization());
+
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -551,10 +585,11 @@ QWidget* DonutMetricWrapper::createWidget()
 	return widget;
 }
 
-QString DonutMetricWrapper::getValue() const
-{
-	return "NA";
-}
+//QString DonutMetricWrapper::getValue() const
+//{
+//	return "NA";
+//}
+
 DataMetricPtr DonutMetricWrapper::getData() const
 {
 	return mData;
@@ -652,10 +687,11 @@ QWidget* SphereMetricWrapper::createWidget()
 	return widget;
 }
 
-QString SphereMetricWrapper::getValue() const
-{
-	return QString("%1").arg(mData->getRadius(), 0, 'f', 1);
-}
+//QString SphereMetricWrapper::getValue() const
+//{
+//	return QString("%1").arg(mData->getRadius(), 0, 'f', 1);
+//}
+
 DataMetricPtr SphereMetricWrapper::getData() const
 {
 	return mData;

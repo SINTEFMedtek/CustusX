@@ -111,15 +111,19 @@ class TextDisplay
 	public:
 		TextDisplay(const QString& text, const QColor& color, int fontsize);
 		~TextDisplay();
+		void setRenderer( vtkRendererPtr renderer );
 		void setPosition( float x, float y);
 		void setPosition( const Vector3D& pos );
 		void setCentered();
 		void updateText(const QString& text );
+		void setColor(QColor color);
 		vtkTextProperty* textProperty();
 		vtkActor2DPtr getActor();
 		void setMaxWidth( int width, vtkViewport *vp );
 		int getMaxWidth();
 		int getWidth( vtkViewport *vp );
+		vtkTextMapperPtr getMapper() { return mapper; }
+
 	private:
 		vtkTextMapperPtr mapper;
 		vtkActor2DPtr actor;

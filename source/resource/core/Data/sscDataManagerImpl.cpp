@@ -541,7 +541,7 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 
 	// conversion for change in format 2013-10-29
 	QString newPath = rootPath+"/"+data->getFilename();
-	if (path != newPath)
+	if (QDir::cleanPath(path) != QDir::cleanPath(newPath))
 	{
 		messageManager()->sendWarning(QString("Detected old data format, converting from %1 to %2").arg(path).arg(newPath));
 		this->saveData(data, rootPath);
@@ -693,6 +693,8 @@ void DataManagerImpl::removeData(const QString& uid, QString basePath)
 
 void DataManagerImpl::deleteFiles(DataPtr data, QString basePath)
 {
+	if (!data)
+		return;
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	QStringList files;
 	if (!data->getFilename().isEmpty())
