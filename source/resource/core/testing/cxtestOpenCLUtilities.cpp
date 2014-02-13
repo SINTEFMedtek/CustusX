@@ -6,7 +6,7 @@
 namespace cxtest
 {
 
-TEST_CASE("OpenCLUtilities: Can initialize OpenCL using GPU", "[unit][OpenCL][OpenCLUtilities][GPU]")
+TEST_CASE("OpenCLUtilities: Can initialize OpenCL using GPU", "[integration][broken][OpenCL][OpenCLUtilities][GPU]")
 {
 	OpenCLFixture fixture;
 	cx::OpenCL::ocl* opencl = cx::OpenCL::init(CL_DEVICE_TYPE_GPU);
@@ -14,7 +14,7 @@ TEST_CASE("OpenCLUtilities: Can initialize OpenCL using GPU", "[unit][OpenCL][Op
 	cx::OpenCL::release(opencl);
 }
 
-TEST_CASE("OpenCLUtilities: Can create a small global OpenCL buffer using GPU context", "[unit][OpenCL][OpenCLUtilities][GPU]")
+TEST_CASE("OpenCLUtilities: Can create a small global OpenCL buffer using GPU context", "[integration][broken][OpenCL][OpenCLUtilities][GPU]")
 {
 	OpenCLFixture fixture;
 	cx::OpenCL::ocl* opencl = cx::OpenCL::init(CL_DEVICE_TYPE_GPU);
