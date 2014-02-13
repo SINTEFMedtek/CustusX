@@ -160,7 +160,7 @@ TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruc
 
 }
 
-TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[unit][usreconstruction][synthetic]")
+TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integration][usreconstruction][synthetic]")
 {
 	ReconstructManagerTestFixture fixture;
 	fixture.setVerbose(true);
@@ -173,7 +173,7 @@ TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[unit]
 	//Adding 2 sections creates 3 runs: 1 with the simple case clip rect == extent, the other 2 with extent+1 and +500
 	SECTION("Set clip rect just to large")
 		probeDefinition.setClipRect_p(cx::DoubleBoundingBox3D(0, extent[0]+1, 0, extent[1]+1, 0, 0));
-	SECTION("Set clop rect very large")
+    SECTION("Set clip rect very large")
 		probeDefinition.setClipRect_p(cx::DoubleBoundingBox3D(0, extent[0]+500, 0, extent[1]+500, 0, 0));
 
 	generator->defineProbe(probeDefinition);
