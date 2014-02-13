@@ -66,12 +66,11 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 {
 	this->setDescription("Empty view");
 	cx::ViewWidget* view = new cx::ViewWidget(this->centralWidget());
-	this->insertView(view, "dummy", "none", 0, 0);
-//	REQUIRE(this->runWidget());
+    this->insertView(view, "dummy", "none", 0, 0);
 	REQUIRE(this->quickRunWidget());
 
 	this->dumpDebugViewToDisk("emptyview", 0);
-	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) == Approx(0));
+    REQUIRE(this->getFractionOfBrightPixelsInView(0,0) == Approx(0));
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
@@ -81,7 +80,6 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	this->setDescription("3D Volume, moving tool");
 	this->define3D(image[0], NULL, 0, 0);
 
-//	REQUIRE(this->runWidget());
 	REQUIRE(this->quickRunWidget());
 	this->dumpDebugViewToDisk("3DvtkGPU", 0);
 	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) > 0.01);
@@ -158,8 +156,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	lut0->addColorPoint(images[0]->getMax(), QColor::fromRgbF(0,0,1,1));
 
 	REQUIRE(this->defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
-	REQUIRE(this->quickRunWidget());
-//	REQUIRE(this->runWidget(3000));
+    REQUIRE(this->quickRunWidget());
 
 	CHECK(this->getFractionOfBrightPixelsInView(0,20,2) > 0.02);
 }
@@ -185,8 +182,7 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	lut1->setLLR(llr);
 
 	REQUIRE(this->defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
-	REQUIRE(this->quickRunWidget());
-//	REQUIRE(this->runWidget(3000));
+    REQUIRE(this->quickRunWidget());
 
 	CHECK(this->getFractionOfBrightPixelsInView(0,20,1) > 0.02);
 	CHECK(this->getFractionOfBrightPixelsInView(0,20,2) > 0.02);
@@ -203,10 +199,8 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 		REQUIRE(this->defineGPUSlice("A", image[i], cx::ptAXIAL, 0, i));
 		REQUIRE(this->defineGPUSlice("C", image[i], cx::ptCORONAL, 1, i));
 		REQUIRE(this->defineGPUSlice("S", image[i], cx::ptSAGITTAL, 2, i));
-	}
-	//REQUIRE(this->runWidget());
-	REQUIRE(this->quickRunWidget());
-//	REQUIRE(this->runWidget(3000));
+    }
+    REQUIRE(this->quickRunWidget());
 
 	for (unsigned i = 0; i < 3*3; ++i)
 	{
