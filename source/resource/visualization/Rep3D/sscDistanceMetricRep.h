@@ -53,7 +53,7 @@ public:
 
 protected:
     virtual void clear();
-    virtual QString getText();
+//    virtual QString getText();
 
 protected slots:
 	virtual void changedSlot();

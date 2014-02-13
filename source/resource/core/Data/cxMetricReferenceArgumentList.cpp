@@ -16,6 +16,7 @@
 #include "sscData.h"
 #include "sscPointMetric.h"
 #include <QDomNode>
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -25,6 +26,7 @@ MetricReferenceArgumentList::MetricReferenceArgumentList(QStringList description
 {
 	mArgument.resize(descriptions.size());
 	mDescriptions = descriptions;
+	this->setValidArgumentTypes(QStringList() << "pointMetric");
 }
 
 void MetricReferenceArgumentList::setValidArgumentTypes(QStringList types)
@@ -56,7 +58,6 @@ DataPtr MetricReferenceArgumentList::get(int index)
 bool MetricReferenceArgumentList::validArgument(DataPtr p) const
 {
 	return mValidTypes.contains(p->getType());
-//	return p->getType() == "pointMetric"; // || p->getType()=="planeMetric";
 }
 
 unsigned MetricReferenceArgumentList::getCount() const

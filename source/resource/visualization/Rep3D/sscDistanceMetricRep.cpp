@@ -92,12 +92,12 @@ void DistanceMetricRep::changedSlot()
     this->drawText();
 }
 
-QString DistanceMetricRep::getText()
-{
-    QString text = QString("%1 mm").arg(this->getDistanceMetric()->getDistance(), 0, 'f', 1);
-    if (mShowLabel)
-        text = mMetric->getName() + " = " + text;
-    return text;
-}
+//QString DistanceMetricRep::getText()
+//{
+//    QString text = QString("%1 mm").arg(this->getDistanceMetric()->getDistance(), 0, 'f', 1);
+//    if (mShowLabel)
+//        text = mMetric->getName() + " = " + text;
+//    return text;
+//}
 
 }

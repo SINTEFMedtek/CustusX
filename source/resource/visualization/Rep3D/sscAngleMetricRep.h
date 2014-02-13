@@ -53,14 +53,10 @@ public:
 	static AngleMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
 	virtual ~AngleMetricRep() {}
 
-//	void setMetric(AngleMetricPtr point);
 	virtual QString getType() const { return "AngleMetricRep"; }
 
 protected:
-//	virtual void addRepActorsToViewRenderer(View *view);
-//	virtual void removeRepActorsFromViewRenderer(View *view);
     virtual void clear();
-    virtual QString getText();
 
 protected slots:
 	virtual void changedSlot();
@@ -73,8 +69,6 @@ private:
 	GraphicalLine3DPtr mLine0;
 	GraphicalLine3DPtr mLine1;
 	GraphicalArc3DPtr mArc;
-//	CaptionText3DPtr mText;
-//	AngleMetricPtr mMetric;
 };
 
 }

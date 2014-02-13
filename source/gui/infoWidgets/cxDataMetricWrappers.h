@@ -44,7 +44,7 @@ class MetricBase : public QObject
 public:
   virtual ~MetricBase() {}
   virtual QWidget* createWidget() = 0;
-  virtual QString getValue() const = 0;
+  virtual QString getValue() const;
   virtual DataMetricPtr getData() const = 0;
   virtual QString getArguments() const = 0;
   virtual QString getType() const = 0;
@@ -86,7 +86,7 @@ public:
   explicit PointMetricWrapper(PointMetricPtr data);
   virtual ~PointMetricWrapper() {}
   virtual QWidget* createWidget();
-  virtual QString getValue() const;
+//  virtual QString getValue() const;
   virtual DataMetricPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
@@ -112,7 +112,7 @@ public:
   explicit PlaneMetricWrapper(PlaneMetricPtr data);
   virtual ~PlaneMetricWrapper() {}
   virtual QWidget* createWidget();
-  virtual QString getValue() const;
+//  virtual QString getValue() const;
   virtual DataMetricPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
@@ -136,7 +136,7 @@ public:
   explicit DistanceMetricWrapper(DistanceMetricPtr data);
   virtual ~DistanceMetricWrapper() {}
   virtual QWidget* createWidget();
-  virtual QString getValue() const;
+//  virtual QString getValue() const;
   virtual DataMetricPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
@@ -157,18 +157,22 @@ public:
   explicit AngleMetricWrapper(AngleMetricPtr data);
   virtual ~AngleMetricWrapper() {}
   virtual QWidget* createWidget();
-  virtual QString getValue() const;
+//  virtual QString getValue() const;
   virtual DataMetricPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
 
 private slots:
   void dataChangedSlot();
+  void guiChanged();
 
 private:
   AngleMetricPtr mData;
   MetricReferenceArgumentListGui mArguments;
+  BoolDataAdapterXmlPtr mUseSimpleVisualization;
   bool mInternalUpdate;
+  BoolDataAdapterXmlPtr createUseSimpleVisualizationSelector() const;
+
 };
 
 class DonutMetricWrapper : public MetricBase
@@ -178,7 +182,7 @@ public:
   explicit DonutMetricWrapper(DonutMetricPtr data);
   virtual ~DonutMetricWrapper() {}
   virtual QWidget* createWidget();
-  virtual QString getValue() const;
+//  virtual QString getValue() const;
   virtual DataMetricPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
@@ -206,7 +210,7 @@ public:
   explicit SphereMetricWrapper(SphereMetricPtr data);
   virtual ~SphereMetricWrapper() {}
   virtual QWidget* createWidget();
-  virtual QString getValue() const;
+//  virtual QString getValue() const;
   virtual DataMetricPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;

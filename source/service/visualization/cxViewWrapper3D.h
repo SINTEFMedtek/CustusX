@@ -39,6 +39,8 @@ namespace cx
 typedef boost::shared_ptr<class Slices3DRep> Slices3DRepPtr;
 typedef boost::shared_ptr<class CoordinateSystemListener> CoordinateSystemListenerPtr;
 typedef boost::shared_ptr<class DataMetricRep> DataMetricRepPtr;
+typedef boost::shared_ptr<class MetricNamesRep> MetricNamesRepPtr;
+
 }
 
 namespace cx
@@ -119,6 +121,7 @@ private:
 
 	void setTranslucentRenderingToDepthPeeling(bool setDepthPeeling);
 	void initializeMultiVolume3DRepProducer();
+	void updateMetricNamesRep();
 
 	MultiVolume3DRepProducerPtr mMultiVolume3DRepProducer;
 	typedef std::map<QString, RepPtr> RepMap;
@@ -127,6 +130,8 @@ private:
 	PickerRepPtr mPickerRep;
 	DisplayTextRepPtr mPlaneTypeText;
 	DisplayTextRepPtr mDataNameText;
+//	DisplayTextRepPtr mMetricsText;
+	MetricNamesRepPtr mMetricNames;
 	QString mShowSlicesMode;
 	std::vector<AxisConnectorPtr> mAxis;
 

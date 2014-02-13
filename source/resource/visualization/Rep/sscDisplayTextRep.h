@@ -24,6 +24,7 @@
 #include "sscRepImpl.h"
 #include "sscVector3D.h"
 #include "vtkForwardDeclarations.h"
+#include "sscBoundingBox3D.h"
 class QColor;
 
 namespace cx
@@ -59,6 +60,7 @@ protected:
 	virtual void addRepActorsToViewRenderer(View *view);
 	virtual void removeRepActorsFromViewRenderer(View *view);
 
+	vtkRendererPtr getRenderer();
 	std::vector<TextDisplayPtr> mDisplayText;
 };
 
