@@ -71,6 +71,10 @@
 #include "sscAngleMetric.h"
 #include "sscDistanceMetric.h"
 #include "sscPointMetric.h"
+#include "cxSphereMetric.h"
+#include "cxShapedMetric.h"
+#include "cxSphereMetricRep.h"
+#include "cxDonutMetricRep.h"
 
 #include "cxDepthPeeling.h"
 #include "cxAxisConnector.h"
@@ -116,12 +120,12 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view)
 
 	// plane type text rep
 	mPlaneTypeText = DisplayTextRep::New("planeTypeRep_" + mView->getName(), "");
-	mPlaneTypeText->addText(Vector3D(0, 1, 0), "3D", Vector3D(0.98, 0.02, 0.0));
+	mPlaneTypeText->addText(QColor(Qt::green), "3D", Vector3D(0.98, 0.02, 0.0));
 	mView->addRep(mPlaneTypeText);
 
 	//data name text rep
 	mDataNameText = DisplayTextRep::New("dataNameText_" + mView->getName(), "");
-	mDataNameText->addText(Vector3D(0, 1, 0), "not initialized", Vector3D(0.02, 0.02, 0.0));
+	mDataNameText->addText(QColor(Qt::green), "not initialized", Vector3D(0.02, 0.02, 0.0));
 	mView->addRep(mDataNameText);
 
 	connect(toolManager(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
@@ -589,6 +593,10 @@ DataMetricRepPtr ViewWrapper3D::createDataMetricRep3D(DataPtr data)
         rep = AngleMetricRep::New(data->getUid() + "_3D_rep");
     else if (boost::dynamic_pointer_cast<PlaneMetric>(data))
         rep = PlaneMetricRep::New(data->getUid() + "_3D_rep");
+	else if (boost::dynamic_pointer_cast<DonutMetric>(data))
+		rep = DonutMetricRep::New(data->getUid() + "_3D_rep");
+	else if (boost::dynamic_pointer_cast<SphereMetric>(data))
+		rep = SphereMetricRep::New(data->getUid() + "_3D_rep");
 
     if (rep)
     {

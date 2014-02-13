@@ -38,7 +38,7 @@ namespace cx
 typedef boost::shared_ptr<class AngleMetricRep> AngleMetricRepPtr;
 typedef boost::shared_ptr<class AngleMetric> AngleMetricPtr;
 
-/**Rep for visualizing a DistanceMetric.
+/**Rep for visualizing a AngleMetric.
  *
  * \ingroup sscRep
  * \ingroup sscRep3D

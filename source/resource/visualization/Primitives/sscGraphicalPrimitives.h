@@ -7,6 +7,7 @@
 #include "sscViewportListener.h"
 #include <vtkPolyDataAlgorithm.h>
 
+class QColor;
 typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
 typedef vtkSmartPointer<class vtkArcSource> vtkArcSourcePtr;
 typedef vtkSmartPointer<class vtkArrowSource> vtkArrowSourcePtr;
@@ -58,7 +59,8 @@ class GraphicalPoint3D
     void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
 		~GraphicalPoint3D();
 		void setRadius(double radius);
-		void setColor(Vector3D color);
+//		void setColor(Vector3D color);
+		void setColor(QColor color);
 		void setValue(Vector3D point);
 		Vector3D getValue() const;
 		vtkActorPtr getActor();
@@ -80,7 +82,7 @@ class GraphicalLine3D
 		GraphicalLine3D(vtkRendererPtr renderer = vtkRendererPtr());
     void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
 		~GraphicalLine3D();
-		void setColor(Vector3D color);
+		void setColor(QColor color);
 		void setValue(Vector3D point1, Vector3D point2);
 		void setStipple(int stipple);
 		vtkActorPtr getActor();
@@ -100,7 +102,7 @@ class GraphicalArc3D
   public:
   GraphicalArc3D(vtkRendererPtr renderer = vtkRendererPtr());
     ~GraphicalArc3D();
-    void setColor(Vector3D color);
+	void setColor(QColor color);
     void setValue(Vector3D point1, Vector3D point2, Vector3D center);
     void setStipple(int stipple);
     vtkActorPtr getActor();
@@ -120,7 +122,7 @@ class GraphicalArrow3D
   public:
 	GraphicalArrow3D(vtkRendererPtr renderer = vtkRendererPtr());
     ~GraphicalArrow3D();
-    void setColor(Vector3D color);
+	void setColor(QColor color);
     void setValue(Vector3D base, Vector3D normal, double length);
 
   private:
@@ -136,7 +138,7 @@ typedef boost::shared_ptr<GraphicalArrow3D> GraphicalArrow3DPtr;
 class Rect3D
 {
 public:
-  Rect3D(vtkRendererPtr renderer, Vector3D color);
+  Rect3D(vtkRendererPtr renderer, QColor color);
   ~Rect3D();
   void updatePosition(const DoubleBoundingBox3D bb, const Transform3D& M);
   void setLine(bool on, int width);
@@ -162,7 +164,7 @@ class FollowerText3D
   void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
 
     ~FollowerText3D();
-    void setColor(Vector3D color);
+	void setColor(QColor color);
     void setText(QString text);
     void setPosition(Vector3D pos);
 
@@ -192,7 +194,7 @@ public:
 	void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
 
 	~CaptionText3D();
-	void setColor(Vector3D color);
+	void setColor(QColor color);
 	void setText(QString text);
 	void setPosition(Vector3D pos);
 

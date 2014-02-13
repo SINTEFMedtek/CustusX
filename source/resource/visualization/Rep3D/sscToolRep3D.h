@@ -65,9 +65,9 @@ public:
 	ToolTracerPtr getTracer();
 	void setSphereRadius(double radius);
 
-	void setTooltipPointColor(Vector3D c);
-	void setOffsetPointColor(Vector3D c);
-	void setOffsetLineColor(Vector3D c);
+	void setTooltipPointColor(QColor c);
+	void setOffsetPointColor(QColor c);
+	void setOffsetLineColor(QColor c);
 	void setOffsetStipplePattern(int pattern);
 
 	void setStayHiddenAfterVisible(bool val);
@@ -121,9 +121,9 @@ private:
 	vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
 	vtkActorPtr mProbeSectorActor;
 	VideoSourceGraphicsPtr mRTStream;
-	Vector3D mTooltipPointColor;
-	Vector3D mOffsetPointColor;
-	Vector3D mOffsetLineColor;
+	QColor mTooltipPointColor;
+	QColor mOffsetPointColor;
+	QColor mOffsetLineColor;
 	int mStipplePattern;
 };
 } // namespace cx

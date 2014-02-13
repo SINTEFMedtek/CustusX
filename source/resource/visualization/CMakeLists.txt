@@ -28,6 +28,8 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     Rep3D/cxLandmarkRep
     Rep3D/sscOrientationAnnotation3DRep
     Rep3D/sscImage2DRep3D
+	Rep3D/cxSphereMetricRep
+	Rep3D/cxDonutMetricRep
 
 	Rep2D/sscOrientationAnnotationRep
 	Rep2D/sscSlicerRepSW
@@ -46,6 +48,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     Primitives/cxVolumeProperty
 	Primitives/sscVideoSourceGraphics
 	Primitives/cxViewFollower
+	Primitives/cxGraphicalTorus3D
 
 	RepVideo/sscVideoRep
         )

@@ -33,12 +33,25 @@
 #include <vtkCursor2D.h>
 #include <vtkLeaderActor2D.h>
 #include "sscTypeConversions.h"
-
+#include <vtkProperty.h>
 #include "sscBoundingBox3D.h"
 
 // --------------------------------------------------------
 namespace cx
 {
+
+void setColorAndOpacity(vtkPropertyPtr property, QColor color)
+{
+	property->SetColor(color.redF(), color.greenF(), color.blueF());
+	property->SetOpacity(color.alphaF());
+}
+
+Vector3D getColorAsVector3D(QColor color)
+{
+	Vector3D retval(color.redF(), color.greenF(), color.blueF());
+	return retval;
+}
+
 
 RGBColor::RGBColor() {}
 
@@ -286,13 +299,13 @@ vtkActor2DPtr  CrossHair2D::getActor()
 // --------------------------------------------------------
 // TEXT DISPLAY CLASS
 // --------------------------------------------------------
-TextDisplay::TextDisplay( const QString& text, const Vector3D& color, int fontsize )
+TextDisplay::TextDisplay( const QString& text, const QColor &color, int fontsize )
 {
 	this->text = text;
-	Vector3D c = color;
+//	Vector3D c = color;
 	mapper = vtkTextMapperPtr::New();
 	mapper->SetInput( cstring_cast(text) );
-	mapper->GetTextProperty()->SetColor( c.begin() );
+	mapper->GetTextProperty()->SetColor(getColorAsVector3D(color).begin() );
 	mapper->GetTextProperty()->SetFontSize( fontsize );
 
 	actor= vtkActor2DPtr::New();

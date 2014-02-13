@@ -85,15 +85,15 @@ void PlaneMetricRep::changedSlot()
 	{
 		mGraphicalPoint.reset(new GraphicalPoint3D(mView->getRenderer()));
 		mNormal.reset(new GraphicalArrow3D(mView->getRenderer()));
-		mRect.reset(new Rect3D(mView->getRenderer(), this->getColorAsVector3D()));
+		mRect.reset(new Rect3D(mView->getRenderer(), mMetric->getColor()));
 		mRect->setLine(true, 1);
 	}
 
 	if (!mGraphicalPoint)
 		return;
 
-	mGraphicalPoint->setColor(this->getColorAsVector3D());
-	mNormal->setColor(this->getColorAsVector3D());
+	mGraphicalPoint->setColor(mMetric->getColor());
+	mNormal->setColor(mMetric->getColor());
 
 	this->rescale();
 }

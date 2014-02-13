@@ -64,11 +64,11 @@ void DisplayTextRep::removeRepActorsFromViewRenderer(View *view)
 /**Add a text with give RGB color at pos.
  * pos is in normalized view space.
  */
-TextDisplayPtr DisplayTextRep::addText(const Vector3D& color, const QString& text, const Vector3D& pos, int maxWidth, vtkViewport *vp)
+TextDisplayPtr DisplayTextRep::addText(const QColor& color, const QString& text, const Vector3D& pos, int maxWidth, vtkViewport *vp)
 {
-	Vector3D c = color;
+//	Vector3D c = color;
 	TextDisplayPtr textRep;
-	textRep.reset( new TextDisplay( text, c, 20) );
+	textRep.reset( new TextDisplay( text, color, 20) );
 	textRep->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
 	textRep->setPosition(pos);
 	textRep->textProperty()->SetJustificationToLeft();
@@ -103,12 +103,12 @@ void DisplayTextRep::setText(unsigned i, const QString& text)
 /**set the color in all existing texts
  *
  */
-void DisplayTextRep::setColor(const Vector3D& color )
+void DisplayTextRep::setColor(const QColor& color )
 {
-	Vector3D c = color;
+//	Vector3D c = color;
 	for(unsigned i =0; i<mDisplayText.size(); ++i)
 	{
-		mDisplayText.at(i)->textProperty()->SetColor(c.begin()) ;
+		mDisplayText.at(i)->textProperty()->SetColor(getColorAsVector3D(color).begin()) ;
 	}
 
 }

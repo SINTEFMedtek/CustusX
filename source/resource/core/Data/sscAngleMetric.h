@@ -24,6 +24,7 @@
 #include "sscDataMetric.h"
 #include "sscPointMetric.h"
 #include "sscDataManagerImpl.h"
+#include "cxMetricReferenceArgumentList.h"
 
 namespace cx
 {
@@ -76,10 +77,7 @@ public:
 	double getAngle() const;
 	std::vector<Vector3D> getEndpoints() const;
 
-	unsigned getArgumentCount() const;
-	void setArgument(int index, DataPtr p);
-	DataPtr getArgument(int index);
-	bool validArgument(DataPtr p) const;
+	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
     virtual bool isValid() const;
 	virtual QString getAsSingleLineString() const;
 
@@ -94,6 +92,7 @@ public:
 
 private:
 	boost::array<DataPtr, 4> mArgument;
+	MetricReferenceArgumentListPtr mArguments;
 };
 
 /**

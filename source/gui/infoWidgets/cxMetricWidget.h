@@ -73,6 +73,8 @@ protected slots:
   void addPlaneButtonClickedSlot();
   void addAngleButtonClickedSlot();
   void addDistanceButtonClickedSlot();
+  void addSphereButtonClickedSlot();
+  void addDonutButtonClickedSlot();
   void cellChangedSlot(int row, int col);
   virtual void cellClickedSlot(int row, int column);
   void exportMetricsButtonClickedSlot();
@@ -96,6 +98,8 @@ private:
   std::vector<DataPtr> refinePointArguments(std::vector<DataPtr> args, unsigned argNo);
   void setManualToolPosition(Vector3D p_r);
   void prePaintEvent();
+  std::vector<DataPtr> getSpecifiedNumberOfValidArguments(MetricReferenceArgumentListPtr arguments, int numberOfRequiredArguments=-1);
+  void installNewMetric(DataMetricPtr metric);
 
 //  template<class T>
   QAction* createAction(QActionGroup* group, QString iconName, QString text, QString tip, const char* slot);
