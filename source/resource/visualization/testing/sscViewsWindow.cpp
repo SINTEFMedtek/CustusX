@@ -297,19 +297,3 @@ bool ViewsWindow::quickRunWidget()
 	return true;
 }
 
-/**show/render/execute input widget.
- * Return success of execution.
- */
-bool ViewsWindow::runWidget(int duration)
-{
-	this->show();
-#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
-	this->activateWindow();
-#endif
-	this->raise();
-	this->updateRender();
-
-	QTimer::singleShot(duration, qApp, SLOT(quit()));
-	return !qApp->exec();
-}
-

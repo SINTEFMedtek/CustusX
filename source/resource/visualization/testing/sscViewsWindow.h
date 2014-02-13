@@ -52,7 +52,6 @@ public:
 	
 	// setup views
 	void insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c);
-	bool runWidget(int duration);
 	bool quickRunWidget();
 
 	double getFractionOfBrightPixelsInView(int viewIndex, int threshold, int component=0);
