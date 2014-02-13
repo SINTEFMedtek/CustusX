@@ -25,7 +25,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Data/cxToolMetric
 	Data/sscCoordinateSystemListener
 	Data/cxFrameMetricBase
-	Data/cxImageParameters
 	Data/cxShapedMetric
 	Data/cxSphereMetric
 	Data/cxMetricReferenceArgumentList
@@ -67,13 +66,10 @@ cx_add_class_qt_moc(cxResource_SOURCE
     algorithms/cxThreadedTimedAlgorithm.h
     algorithms/cxCompositeTimedAlgorithm.h
 
-	utilities/sscApplication
-	utilities/sscSharedMemory
 	utilities/sscAcceptanceBoxWidget
     utilities/cxPlaybackTime.h
     utilities/cxProcessWrapper.h
 	utilities/cxProcessReporter
-	utilities/cxImageDataContainer
 	utilities/cxVLCRecorder
 	)
 
@@ -96,7 +92,8 @@ cx_add_class(cxResource_SOURCE
 	Data/sscDataReaderWriter
 	Data/sscGPUImageBuffer
 	Data/cxImageDefaultTFGenerator
-	
+	Data/cxImageParameters
+
 	Math/sscBoundingBox3D
 	Math/sscVector3D
 	Math/sscTransform3D
@@ -126,7 +123,10 @@ cx_add_class(cxResource_SOURCE
 	utilities/sscPositionStorageFile
 	utilities/sscTimeKeeper
 	utilities/sscMeshHelpers
-	
+	utilities/sscApplication
+	utilities/sscSharedMemory
+	utilities/cxImageDataContainer
+
 	logger/sscAudio.h
 	logger/sscLogger
 		
