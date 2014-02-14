@@ -463,7 +463,7 @@ class LevelSetSegmentation(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:smistad/Level-Set-Segmentation')
     def update(self):
-        self._getBuilder().gitCheckout('d36d6e9d33010584b6101c43fcc84b367cc85faa', submodules=True)
+        self._getBuilder().gitCheckout('e088efa2740ed7fa1018361b850c3c1cc26040cb', submodules=True)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
