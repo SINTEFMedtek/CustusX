@@ -46,10 +46,15 @@ class GraphicalTorus3D
 		vtkPolyDataPtr getPolyData();
 
 	private:
+		void updateOrientation();
+
 		vtkSuperquadricSourcePtr source;
 		vtkPolyDataMapperPtr mapper;
 		vtkActorPtr actor;
 		vtkRendererPtr mRenderer;
+
+		Vector3D mPoint;
+		Vector3D mDirection;
 };
 typedef boost::shared_ptr<GraphicalTorus3D> GraphicalTorus3DPtr;
 
