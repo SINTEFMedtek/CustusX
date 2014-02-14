@@ -21,7 +21,7 @@
 namespace cxtest
 {
 
-TEST_CASE("OpenCLReconstruction","[unit][usreconstruction][OpenCL][OpenCLReconstruction][broken][unstable]")
+TEST_CASE("OpenCLReconstruction","[unit][usreconstruction][OpenCL][OpenCLReconstruction][broken][hide]")
 {
 	cx::messageManager()->initialize();
 
