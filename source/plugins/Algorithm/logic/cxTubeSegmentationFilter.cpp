@@ -99,7 +99,7 @@ QDomElement TubeSegmentationFilter::generatePresetFromCurrentlySetOptions(QStrin
 void TubeSegmentationFilter::requestSetPresetSlot(QString name)
 {
 	QString centerLineMethod = "gpu";
-	if((name == "<Default preset>") || (name == "none") || (name == "default"))
+	if((name == "<Default preset>") || (name == "none") || (name == "default") || (name == "Default"))
 		mParameterFile = "none";
 	else
 	{
