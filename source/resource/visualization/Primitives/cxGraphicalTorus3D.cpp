@@ -33,6 +33,9 @@ namespace cx
 
 GraphicalTorus3D::GraphicalTorus3D(vtkRendererPtr renderer)
 {
+	mPoint = Vector3D(0,0,0);
+	mDirection = Vector3D(0,1,0);
+
 	source = vtkSuperquadricSourcePtr::New();
 	source->SetToroidal(true);
 	source->SetSize(10);
@@ -79,13 +82,21 @@ void GraphicalTorus3D::setColor(QColor color)
 
 void GraphicalTorus3D::setPosition(Vector3D point)
 {
-	actor->SetPosition(point.begin());
+	mPoint = point;
+	this->updateOrientation();
 }
 
 void GraphicalTorus3D::setDirection(Vector3D direction)
 {
+	mDirection = direction;
+
+	this->updateOrientation();
+}
+
+void GraphicalTorus3D::updateOrientation()
+{
 	Transform3D M;
-	bool directionAlongYAxis = similar(dot(Vector3D::UnitY(), direction.normal()), 1.0);
+	bool directionAlongYAxis = similar(dot(Vector3D::UnitY(), mDirection.normal()), 1.0);
 
 	if (directionAlongYAxis)
 	{
@@ -93,12 +104,18 @@ void GraphicalTorus3D::setDirection(Vector3D direction)
 	}
 	else
 	{
-		Vector3D ivec = cross(Vector3D::UnitY(), direction).normal();
-		Vector3D jvec = direction.normal();
+		Vector3D ivec = cross(Vector3D::UnitY(), mDirection).normal();
+		Vector3D jvec = mDirection.normal();
 		Vector3D center = Vector3D::Zero();
 		M = createTransformIJC(ivec, jvec, center);
 	}
 
+	Transform3D T = createTransformTranslate(mPoint);
+//	M = M*T;
+	M = T*M;
+
+	std::cout << "M end:\n" << M << std::endl;
+//	actor->SetPosition(point.begin());
 	actor->SetUserMatrix(M.getVtkMatrix());
 }
 
