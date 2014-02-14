@@ -39,7 +39,7 @@ TEST_CASE("TubeSegmentationFramework can load parameter file", "[integration]")
 	helper.testLoadParameterFile();
 }
 
-TEST_CASE("TubeSegmentationFramework default preset works", "[integration][unstable]")
+TEST_CASE("TubeSegmentationFramework default preset works", "[integration]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testDefaultPreset();
