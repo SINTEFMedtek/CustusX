@@ -20,6 +20,7 @@ cx_add_class_qt_moc(cxVisualizationService_SOURCE
     cxInteractiveCropper
     cxCameraControl
     cxCameraStyle
+	cxCameraStyleForView
     cxRepManager
     cxThresholdPreview
     cxMultiVolume3DRepProducer

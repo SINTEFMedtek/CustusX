@@ -111,11 +111,10 @@ void GraphicalTorus3D::updateOrientation()
 	}
 
 	Transform3D T = createTransformTranslate(mPoint);
-//	M = M*T;
 	M = T*M;
 
-	std::cout << "M end:\n" << M << std::endl;
-//	actor->SetPosition(point.begin());
+//	std::cout << "M end:\n" << M << std::endl;
+////	actor->SetPosition(point.begin());
 	actor->SetUserMatrix(M.getVtkMatrix());
 }
 
