@@ -43,9 +43,9 @@ namespace cx
 ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
 	RepImpl(uid, name),
 	mSphereRadiusInNormalizedViewport(false),
-	mTooltipPointColor(1.0, 0.8, 0.0),
-	mOffsetPointColor(1.0, 0.8, 0.0),
-	mOffsetLineColor(1.0, 0.8, 0.0),
+	mTooltipPointColor(QColor::fromRgbF(1.0, 0.8, 0.0)),
+	mOffsetPointColor(QColor::fromRgbF(1.0, 0.8, 0.0)),
+	mOffsetLineColor(QColor::fromRgbF(1.0, 0.8, 0.0)),
 	mStipplePattern(0xFFFF)
 {
 	mSphereRadius = 2;
@@ -145,7 +145,8 @@ void ToolRep3D::setTool(ToolPtr tool)
 		mToolActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
 		if (mTool->hasType(Tool::TOOL_MANUAL))
 		{
-			mToolActor->GetProperty()->SetColor(mTooltipPointColor.begin());
+			setColorAndOpacity(mToolActor->GetProperty(), mTooltipPointColor);
+//			mToolActor->GetProperty()->SetColor(mTooltipPointColor.begin());
 		}
 
 		receiveTransforms(mTool->get_prMt(), 0);
@@ -174,17 +175,17 @@ void ToolRep3D::setSphereRadius(double radius)
 		mTooltipPoint->setRadius(mSphereRadius);
 }
 
-void ToolRep3D::setTooltipPointColor(Vector3D c)
+void ToolRep3D::setTooltipPointColor(QColor c)
 {
 	mTooltipPointColor = c;
 }
 
-void ToolRep3D::setOffsetPointColor(Vector3D c)
+void ToolRep3D::setOffsetPointColor(QColor c)
 {
 	mOffsetPointColor = c;
 }
 
-void ToolRep3D::setOffsetLineColor(Vector3D c)
+void ToolRep3D::setOffsetLineColor(QColor c)
 {
 	mOffsetLineColor = c;
 }

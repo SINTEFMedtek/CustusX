@@ -28,6 +28,7 @@
 #include "sscForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
 #include "sscViewportListener.h"
+#include <QColor>
 
 namespace cx
 {
@@ -54,7 +55,7 @@ public:
 	 */
 	struct PropertiesType
 	{
-		std::map<PLANE_TYPE, Vector3D> mColor; /// normalized RGB
+		std::map<PLANE_TYPE, QColor> mColor; /// normalized RGB
 		std::map<PLANE_TYPE, QString> mSymbol;
 		int m2DFontSize;
 		int m3DFontSize;
@@ -68,7 +69,7 @@ public:
 		DoubleBoundingBox3D vp_s;
 		SliceProxyPtr mSliceProxy;
 		QString mSymbol;
-		Vector3D mColor;
+		QColor mColor;
 		Vector3D mPointPos_normvp;
 	};
 	typedef std::map<PLANE_TYPE, DataType> DataMap;

@@ -20,12 +20,18 @@
 #include "libQtSignalAdapters/ConnectionFactories.h"
 #include "cxVideoConnection.h"
 #include "sscManualTool.h"
+#include "sscTypeConversions.h"
+#include "sscDefinitionStrings.h"
 
 
 namespace cx
 {
 StatusBar::StatusBar() :
-	mRenderingFpsLabel(new QLabel(this)), mGrabbingInfoLabel(new QLabel(this)), mTpsLabel(new QLabel(this))
+	mRenderingFpsLabel(new QLabel(this)),
+	mGrabbingInfoLabel(new QLabel(this)),
+	mTpsLabel(new QLabel(this))
+//	mMessageLevelLabel(new QToolButton(this))
+//	mMessageLevelLabel(new QLabel(this))
 {
 	connect(messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
 
@@ -42,6 +48,7 @@ StatusBar::StatusBar() :
 	connect(videoService()->getVideoConnection().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
 	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));
 
+//	this->addPermanentWidget(mMessageLevelLabel);
 	this->addPermanentWidget(mRenderingFpsLabel);
 }
 
@@ -173,7 +180,16 @@ void StatusBar::grabberConnectedSlot(bool connected)
 
 void StatusBar::showMessageSlot(Message message)
 {
-	this->showMessage(message.getPrintableMessage(), message.getTimeout());
+	QString text = QString("[%1] %4")
+			.arg(qstring_cast(message.getMessageLevel()))
+			.arg(message.getText());
+
+//	this->showMessage(message.getPrintableMessage(), message.getTimeout());
+//	mMessageLevelLabel->setPixmap(QPixmap(":/images/go-home.png"));
+//	mMessageLevelLabel->setPixmap(QPixmap(":/icons/screenshot-screen.png"));
+//	mMessageLevelLabel->setIcon(QIcon(":/icons/screenshot-screen.png"));
+//	mMessageLevelLabel->show();
+	this->showMessage(text, message.getTimeout());
 }
 
 }//namespace cx

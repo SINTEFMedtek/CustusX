@@ -45,7 +45,7 @@ bool OpenCLReconstructionHost::findClosesInputPlanesForAllOutputVoxels(int numbe
 		mOpenCL->cmd_queue.enqueueNDRangeKernel(kernel, offset ,global, local, NULL, NULL);
 		mOpenCL->cmd_queue.finish();
 	}
-	catch (cl::Error error)
+	catch (cl::Error &error)
 	{
 		messageManager()->sendError("Could not find closes planes. Reason: "+QString(error.what()));
 		check_error(error.err());
@@ -74,7 +74,7 @@ cl::Kernel OpenCLReconstructionHost::getKernelWithName(QString name)
 		OpenCL::build(program, "");
 		kernel = OpenCL::createKernel(program, name.toStdString().c_str());
 	}
-	catch (cl::Error error)
+	catch (cl::Error &error)
 	{
 		messageManager()->sendError("Could get the kernel "+name+". Reason: "+QString(error.what()));
 		check_error(error.err());

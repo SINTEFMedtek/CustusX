@@ -40,7 +40,8 @@ class LibraryAssembly:
         if (platform.system() != 'Windows'):
              self.libraries.append(cxComponents.ISB_DataStreaming());
         self.libraries.append(cxComponents.UltrasonixSDK())
-        self.libraries.append(cxComponents.OpenCLUtilityLibrary())
+        if (platform.system() != 'Windows'):
+            self.libraries.append(cxComponents.OpenCLUtilityLibrary())
         if (platform.system() != 'Windows'):
             self.libraries.append(cxComponents.TubeSegmentationFramework());
         if (platform.system() == 'Linux'):

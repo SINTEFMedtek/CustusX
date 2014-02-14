@@ -67,29 +67,43 @@ void AngleMetricRep::changedSlot()
 
     if (!angleMetric || !mMetric->isValid())
 		return;
-
-	if (!mLine0 && !mLine1 && mView && mMetric)
-	{
-		mLine0.reset(new GraphicalLine3D(mView->getRenderer()));
-		mLine1.reset(new GraphicalLine3D(mView->getRenderer()));
-		mArc.reset(new GraphicalArc3D(mView->getRenderer()));
-//		mText.reset(new CaptionText3D(mView->getRenderer()));
-	}
-
-	if (!mLine0)
+	if (!mMetric)
+		return;
+	if (!mView)
 		return;
 
     std::vector<Vector3D> p = angleMetric->getEndpoints();
 
-	mLine0->setColor(this->getColorAsVector3D());
-	mLine1->setColor(this->getColorAsVector3D());
-	mArc->setColor(this->getColorAsVector3D());
-	mLine0->setStipple(0x0F0F);
-    mLine1->setStipple(0x0F0F);
-	mArc->setStipple(0xF0FF);
-	mLine0->setValue(p[0], p[1]);
-	mLine1->setValue(p[2], p[3]);
+	if (angleMetric->getUseSimpleVisualization())
+	{
+		mLine0.reset();
+		mLine1.reset();
+	}
+	else
+	{
+		if (!mLine0)
+		{
+			mLine0.reset(new GraphicalLine3D(mView->getRenderer()));
+		}
+		mLine0->setColor(mMetric->getColor());
+		mLine0->setStipple(0x0F0F);
+		mLine0->setValue(p[0], p[1]);
 
+		if (!mLine1)
+		{
+			mLine1.reset(new GraphicalLine3D(mView->getRenderer()));
+		}
+		mLine1->setColor(mMetric->getColor());
+		mLine1->setStipple(0x0F0F);
+		mLine1->setValue(p[2], p[3]);
+	}
+
+	if (!mArc)
+	{
+		mArc.reset(new GraphicalArc3D(mView->getRenderer()));
+	}
+	mArc->setColor(mMetric->getColor());
+	mArc->setStipple(0xF0FF);
 	Vector3D a_center = (p[1] + p[2]) / 2;
 	Vector3D l0 = p[0] - p[1];
 	Vector3D l1 = p[3] - p[2];
@@ -98,24 +112,8 @@ void AngleMetricRep::changedSlot()
 	Vector3D a_end = a_center + l1.normalized() * d;
 	mArc->setValue(a_start, a_end, a_center);
 
-//	Vector3D a_text = (a_center + a_start + a_end) / 3;
-
-//	QString text = QString("%1*").arg(mMetric->getAngle() / M_PI * 180, 0, 'f', 1);
-//	if (mShowLabel)
-//		text = mMetric->getName() + " = " + text;
-//	mText->setColor(mColor);
-//	mText->setText(text);
-//	mText->setPosition(a_text);
-//	mText->setSize(mLabelSize / 100);
     this->drawText();
 }
 
-QString AngleMetricRep::getText()
-{
-    QString text = QString("%1*").arg(this->getAngleMetric()->getAngle() / M_PI * 180, 0, 'f', 1);
-    if (mShowLabel)
-        text = mMetric->getName() + " = " + text;
-    return text;
-}
 
 }

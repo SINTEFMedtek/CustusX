@@ -84,7 +84,7 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 	Branch* branchToSplit;
 	while (positionsNotUsed.size() > 0)
 	{
-		if (Branches.size() > 0)
+		if (!Branches.empty())
 		{
 			double minDistance = 1000;
 			for (int i = 0; i < Branches.size(); i++)

@@ -57,6 +57,7 @@ protected:
   DoubleDataAdapterXmlPtr mLabelSize;
   BoolDataAdapterXmlPtr mShowDataText;
   BoolDataAdapterXmlPtr mShowLabels;
+  BoolDataAdapterXmlPtr mShowMetricNamesInCorner;
   StringDataAdapterXmlPtr mAnnotationModel;
   DoubleDataAdapterXmlPtr mAnnotationModelSize;
   DoubleDataAdapterXmlPtr mAnyplaneViewOffset;

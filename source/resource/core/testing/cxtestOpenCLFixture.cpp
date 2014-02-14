@@ -35,7 +35,7 @@ bool OpenCLFixture::runTestKernel(cl_device_type type)
 		opencl->cmd_queue.enqueueNDRangeKernel(kernel, 0, totalNumberOfItems, numberOfWorkingItems, NULL, NULL);
 		opencl->cmd_queue.finish();
 	}
-	catch(cl::Error error)
+	catch(cl::Error &error)
 	{
 		cx::messageManager()->sendError("Could not execute the kernel. Reason: "+QString(error.what()));
 		success = false;

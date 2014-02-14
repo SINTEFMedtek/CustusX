@@ -343,7 +343,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View3D/eyeAngle", 4.0);
 	this->fillDefault("View/showDataText", true);
 	this->fillDefault("View/showLabels", true);
-
+	this->fillDefault("View/showMetricNamesInCorner", false);
 	this->fillDefault("View3D/annotationModelSize", 0.2);
 	this->fillDefault("View3D/annotationModel", "woman.stl");
 	this->fillDefault("View3D/depthPeeling", false);
@@ -353,18 +353,16 @@ void StateService::fillDefaultSettings()
 
 	this->fillDefault("View3D/maxRenderSize", 10 * pow(10.0,6));
 
+
+	this->fillDefault("useGPUVolumeRayCastMapper", true);
+	this->fillDefault("stillUpdateRate", 0.001);
+
 #ifdef __APPLE__
-	this->fillDefault("useGPUVolumeRayCastMapper", false);
 	this->fillDefault("useGPU2DRendering", true);
-	this->fillDefault("stillUpdateRate", 8.0);
 #elif WIN32
-	this->fillDefault("useGPUVolumeRayCastMapper", true);
 	this->fillDefault("useGPU2DRendering", false);
-	this->fillDefault("stillUpdateRate", 0.001);
 #else
-	this->fillDefault("useGPUVolumeRayCastMapper", true);
 	this->fillDefault("useGPU2DRendering", true);
-	this->fillDefault("stillUpdateRate", 0.001);
 #endif
 
 

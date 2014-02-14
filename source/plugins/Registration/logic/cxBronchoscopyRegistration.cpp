@@ -342,7 +342,7 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDat
 
 	std::vector<Branch*> BL = branches->getBranches();
 
-	int totalNumberOfPoints = 0;
+//	int totalNumberOfPoints = 0;
 	std::cout << "Number of branches: " << BL.size() << std::endl;
 
 //	for (int i = 0; i < BL.size(); i++)

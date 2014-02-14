@@ -58,6 +58,12 @@ void VisualizationTab::init()
                                                  "Attach name labels to entities in the views.",
                                                  showLabels);
 
+  bool showMetricNamesInCorner = settings()->value("View/showMetricNamesInCorner").value<bool>();
+  mShowMetricNamesInCorner = BoolDataAdapterXml::initialize("Corner Metrics", "",
+												 "Show the metric data in the upper right corner of the view instead of in the scene.",
+												 showMetricNamesInCorner);
+
+
   double annotationModelSize = settings()->value("View3D/annotationModelSize").toDouble();
   mAnnotationModelSize = DoubleDataAdapterXml::initialize("AnnotationModelSize", "Annotation Model Size", "Size (0..1) of the annotation model in the 3D scene.", annotationModelSize, DoubleRange(0.01,1,0.01), 2, QDomNode());
   QStringList annotationModelRange;
@@ -106,6 +112,7 @@ void VisualizationTab::init()
   mMainLayout->addWidget(new SpinBoxGroupWidget(this, mSphereRadius));
   mMainLayout->addWidget(sscCreateDataWidget(this, mShowDataText));
   mMainLayout->addWidget(sscCreateDataWidget(this, mShowLabels));
+  mMainLayout->addWidget(sscCreateDataWidget(this, mShowMetricNamesInCorner));
   mMainLayout->addWidget(new SpinBoxGroupWidget(this, mLabelSize));
   mMainLayout->addWidget(new SpinBoxGroupWidget(this, mAnnotationModelSize));
   mMainLayout->addWidget(sscCreateDataWidget(this, mAnnotationModel));
@@ -187,6 +194,7 @@ void VisualizationTab::saveParametersSlot()
   settings()->setValue("View3D/sphereRadius", mSphereRadius->getValue());
   settings()->setValue("View/showDataText", mShowDataText->getValue());
   settings()->setValue("View/showLabels", mShowLabels->getValue());
+  settings()->setValue("View/showMetricNamesInCorner", mShowMetricNamesInCorner->getValue());
   settings()->setValue("View3D/labelSize", mLabelSize->getValue());
   settings()->setValue("View3D/annotationModelSize", mAnnotationModelSize->getValue());
   settings()->setValue("View3D/annotationModel", mAnnotationModel->getValue());

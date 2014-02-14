@@ -28,9 +28,12 @@ Message::~Message(){};
 
 QString Message::getPrintableMessage()
 {
-	return QString("[%1] [%2] [%3] %4")
+	QString source = QString("");
+	if (mSourceLocation.isEmpty())
+		source = QString("[%1]").arg(mSourceLocation);
+	return QString("[%1]%2[%3] %4")
 		.arg(mTimeStamp.toString("hh:mm:ss.zzz"))
-		.arg(mSourceLocation)
+		.arg(source)
 		.arg(qstring_cast(mMessageLevel))
 		.arg(mText);
 }
@@ -284,6 +287,15 @@ void MessageManager::sendDebugRedefined(QString debug)
   this->sendMessage(debug, mlDEBUG, 0);
 }
 
+#ifndef SSC_PRINT_CALLER_INFO
+void MessageManager::sendVolatile(QString debug)
+#else
+void MessageManager::sendVolatileRedefined(QString debug)
+#endif
+{
+  this->sendMessage(debug, mlVOLATILE, 5000);
+}
+
 #ifdef SSC_PRINT_CALLER_INFO
 void MessageManager::sendCallerInformation(const std::string &caller, const std::string &file, int line)
 {
@@ -325,6 +337,13 @@ void MessageManager::sendDebugWithCallerInfo(QString info, const std::string &ca
 	this->sendCallerInformation(caller, file, line);
 	printf("\n");
 }
+
+void MessageManager::sendVolatileWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
+{
+	this->sendVolatileRedefined(info);
+	this->sendCallerInformation(caller, file, line);
+	printf("\n");
+}
 #endif
 
 void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int timeout, bool mute, QString sourceLocation)
@@ -334,16 +353,19 @@ void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int t
 
 	Message message(text, messageLevel, timeout, sourceLocation);
 
-	if (mCout)
+	if (messageLevel!=mlVOLATILE)
 	{
-		// send text to cout if it not already comes from that stream (or cerr)
-		mCout->setEnableRedirect(false);
-		if (messageLevel != mlCOUT && messageLevel != mlCERR)
-			std::cout << message.getPrintableMessage() << std::endl;
-		mCout->setEnableRedirect(true);
-	}
+		if (mCout)
+		{
+			// send text to cout if it not already comes from that stream (or cerr)
+			mCout->setEnableRedirect(false);
+			if (messageLevel != mlCOUT && messageLevel != mlCERR)
+				std::cout << message.getPrintableMessage() << std::endl;
+			mCout->setEnableRedirect(true);
+		}
 
-	this->appendToLogfile(this->formatMessage(message) + "\n");
+		this->appendToLogfile(this->formatMessage(message) + "\n");
+	}
 
 	if (!mute)
 		this->playSound(messageLevel);

@@ -78,8 +78,10 @@ void ConsoleWidget::showEvent(QShowEvent* event)
 
 void ConsoleWidget::printMessage(Message message)
 {
-	this->format(message);
+	if (message.getMessageLevel()==mlVOLATILE)
+		return;
 
+	this->format(message);
 	this->append(message.getPrintableMessage());
 }
 
