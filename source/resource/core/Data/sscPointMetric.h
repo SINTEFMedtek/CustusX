@@ -83,9 +83,8 @@ public:
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 	virtual DoubleBoundingBox3D boundingBox() const;
 
-	// additional functionality:
-	// - get coord in space
-	// - rep
+	virtual QString getValueAsString() const;
+	virtual bool showValueInGraphics() const { return false; }
 
 private:
 	Vector3D mCoordinate;

@@ -28,6 +28,9 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     Rep3D/cxLandmarkRep
     Rep3D/sscOrientationAnnotation3DRep
     Rep3D/sscImage2DRep3D
+	Rep3D/cxSphereMetricRep
+	Rep3D/cxDonutMetricRep
+	Rep3D/cxMetricNamesRep
 
 	Rep2D/sscOrientationAnnotationRep
 	Rep2D/sscSlicerRepSW
@@ -38,7 +41,6 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	Rep2D/sscGuideRep2D
     Rep2D/sscOrientationAnnotation2DRep
 
-	Primitives/cxDepthPeeling
     Primitives/cxImageMapperMonitor
 	Primitives/sscTexture3DSlicerProxy
 	Primitives/sscSlicePlaneClipper
@@ -57,6 +59,8 @@ if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
 endif()
 
 cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
+	Primitives/cxDepthPeeling
+	Primitives/cxGraphicalTorus3D
 	Primitives/sscVtkHelperClasses
 	Primitives/sscTextureSlicePainter
     Rep/sscRepImpl

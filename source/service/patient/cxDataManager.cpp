@@ -15,10 +15,6 @@
 #include <QDomDocument>
 #include "cxDataManager.h"
 
-#include "sscPointMetric.h"
-#include "sscDistanceMetric.h"
-#include "sscPlaneMetric.h"
-#include "sscAngleMetric.h"
 #include "sscXmlOptionItem.h"
 #include "cxDataLocations.h"
 #include "sscTransferFunctions3DPresets.h"
@@ -29,12 +25,6 @@ namespace cx
 void cxDataManager::initialize()
 {
 	setInstance(new cxDataManager());
-
-	//	// extra cx data types
-	//	getInstance()->mDataReaders.insert(DataReaderPtr(new PointMetricReader()));
-	//	getInstance()->mDataReaders.insert(DataReaderPtr(new DistanceMetricReader()));
-	//	getInstance()->mDataReaders.insert(DataReaderPtr(new PlaneMetricReader()));
-	//	getInstance()->mDataReaders.insert(DataReaderPtr(new AngleMetricReader()));
 }
 
 cxDataManager* cxDataManager::getInstance()
