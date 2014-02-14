@@ -321,7 +321,7 @@ void ToolRep2D::createToolLine(vtkRendererPtr renderer, const Vector3D& centerPo
  */
 void ToolRep2D::createOffsetText(vtkRendererPtr renderer, const Vector3D& pos )
 {
-	Vector3D color(0.7372, 0.815, 0.6039);
+	QColor color = QColor::fromRgbF(0.7372, 0.815, 0.6039);
 	distanceText.reset( new TextDisplay( "---", color, 18) );
 	distanceText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
 	distanceText->textProperty()->SetJustificationToRight();

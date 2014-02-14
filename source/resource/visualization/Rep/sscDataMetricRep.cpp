@@ -24,20 +24,19 @@
 #include "sscView.h"
 #include "sscDataMetric.h"
 #include "sscLogger.h"
+#include "sscVtkHelperClasses.h"
 
 namespace cx
 {
 
 DataMetricRep::DataMetricRep(const QString& uid, const QString& name) :
-				RepImpl(uid, name),
-				mGraphicsSize(1),
-				mShowLabel(false),
-				mLabelSize(2.5),
-//                mColor(Vector3D(1, 0, 0)),
-                mView(NULL)
+	RepImpl(uid, name),
+	mGraphicsSize(1),
+	mShowLabel(false),
+	mLabelSize(2.5),
+	mShowAnnotation(true),
+	mView(NULL)
 {
-//  mViewportListener.reset(new ViewportListener);
-//  mViewportListener->setCallback(boost::bind(&DataMetricRep::rescale, this));
 }
 
 void DataMetricRep::setDataMetric(DataMetricPtr value)
@@ -83,6 +82,12 @@ void DataMetricRep::setLabelSize(double size)
 	this->changedSlot();
 }
 
+void DataMetricRep::setShowAnnotation(bool on)
+{
+	mShowAnnotation = on;
+	this->changedSlot();
+}
+
 //void DataMetricRep::setColor(double red, double green, double blue)
 //{
 //	mColor = Vector3D(red, green, blue);
@@ -121,7 +126,7 @@ void DataMetricRep::drawText()
     }
 
     mText.reset(new CaptionText3D(mView->getRenderer()));
-	mText->setColor(this->getColorAsVector3D());
+	mText->setColor(mMetric->getColor());
     mText->setText(text);
     mText->setPosition(mMetric->getRefCoord());
     mText->setSize(mLabelSize / 100);
@@ -129,19 +134,24 @@ void DataMetricRep::drawText()
 
 QString DataMetricRep::getText()
 {
-    if (mShowLabel)
-        return mMetric->getName();
-    return "";
+	if (!mShowAnnotation)
+		return "";
+	QStringList text;
+	if (mShowLabel)
+		text << mMetric->getName();
+	if (mMetric->showValueInGraphics())
+		text << mMetric->getValueAsString();
+	return text.join(" = ");
 }
 
 Vector3D DataMetricRep::getColorAsVector3D() const
 {
 	if (!mMetric)
 		return Vector3D(1,1,1);
-
-	QColor color = mMetric->getColor();
-	Vector3D retval(color.redF(), color.greenF(), color.blueF());
-	return retval;
+//	QColor color = mMetric->getColor();
+//	Vector3D retval(color.redF(), color.greenF(), color.blueF());
+//	return retval;
+	return cx::getColorAsVector3D(mMetric->getColor());
 }
 
 }

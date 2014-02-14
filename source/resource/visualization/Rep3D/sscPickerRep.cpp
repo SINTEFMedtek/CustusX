@@ -431,7 +431,7 @@ void PickerRep::addRepActorsToViewRenderer(View *view)
 		this->connectInteractor();
 
 	mGraphicalPoint.reset(new GraphicalPoint3D(mView->getRenderer()));
-	mGraphicalPoint->setColor(Vector3D(0, 0, 1));
+	mGraphicalPoint->setColor(QColor(Qt::blue));
 	mGraphicalPoint->setRadius(mSphereRadius);
 	mGraphicalPoint->getActor()->SetVisibility(mSnapToSurface);
 

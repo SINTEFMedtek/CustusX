@@ -54,6 +54,8 @@
 #include "sscDistanceMetric.h"
 #include "sscPlaneMetric.h"
 #include "sscAngleMetric.h"
+#include "cxShapedMetric.h"
+#include "cxSphereMetric.h"
 #include "cxFrameMetric.h"
 #include "cxToolMetric.h"
 
@@ -356,8 +358,10 @@ DataReaderWriter::DataReaderWriter()
 	mDataReaders.insert(DataReaderPtr(new DistanceMetricReader()));
 	mDataReaders.insert(DataReaderPtr(new PlaneMetricReader()));
 	mDataReaders.insert(DataReaderPtr(new AngleMetricReader()));
-	mDataReaders.insert(DataReaderPtr(new cx::FrameMetricReader()));
-	mDataReaders.insert(DataReaderPtr(new cx::ToolMetricReader()));
+	mDataReaders.insert(DataReaderPtr(new FrameMetricReader()));
+	mDataReaders.insert(DataReaderPtr(new ToolMetricReader()));
+	mDataReaders.insert(DataReaderPtr(new DonutMetricReader()));
+	mDataReaders.insert(DataReaderPtr(new SphereMetricReader()));
 }
 
 DataReaderPtr DataReaderWriter::findReader(const QString& path, const QString& type)
