@@ -29,7 +29,7 @@ std::vector<Vector3D> TrackingDataToVolume::extractPoints(TimedTransformMap& map
     {
       Vector3D point_t = Vector3D(0,0,0);
       positions_pr.push_back(mapIter->second.coord(point_t));
-      mapIter++;
+			++mapIter;
     }
     return positions_pr;
 }

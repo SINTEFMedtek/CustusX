@@ -122,6 +122,11 @@ Vector3D PointMetric::getRefCoord() const
 	return rM1.coord(this->getCoordinate());
 }
 
+QString PointMetric::getValueAsString() const
+{
+	return prettyFormat(this->getRefCoord(), 1, 3);
+}
+
 QString PointMetric::getAsSingleLineString() const
 {
 	return QString("%1 \"%2\" %3")

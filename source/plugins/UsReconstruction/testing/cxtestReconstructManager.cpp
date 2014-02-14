@@ -190,7 +190,7 @@ TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integ
 	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
 	REQUIRE(preprocessor);
 	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
-	REQUIRE(cores.size() > 0);
+	REQUIRE(!cores.empty());
 	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(cores);
 
 	REQUIRE(processedInput.size() == cores.size());

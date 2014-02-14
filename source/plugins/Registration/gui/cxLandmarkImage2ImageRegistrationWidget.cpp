@@ -101,7 +101,7 @@ void LandmarkImage2ImageRegistrationWidget::showEvent(QShowEvent* event)
 	{
 		rep->setPrimarySource(mFixedLandmarkSource);
 		rep->setSecondarySource(mMovingLandmarkSource);
-		rep->setSecondaryColor(Vector3D(0, 0.9, 0.5));
+		rep->setSecondaryColor(QColor::fromRgbF(0, 0.9, 0.5));
 	}
 }
 

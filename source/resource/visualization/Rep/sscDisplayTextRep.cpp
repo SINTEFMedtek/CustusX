@@ -22,6 +22,7 @@
 #include <vtkRenderer.h>
 #include <vtkActor2D.h>
 #include <vtkTextProperty.h>
+#include <vtkTextMapper.h>
 
 #include "sscView.h"
 #include "sscVtkHelperClasses.h"
@@ -49,7 +50,8 @@ void DisplayTextRep::addRepActorsToViewRenderer(View *view)
 {
 	for(unsigned i =0; i<mDisplayText.size(); ++i)
 	{
-		view->getRenderer()->AddActor( mDisplayText.at(i)->getActor() );
+		mDisplayText[i]->setRenderer(view->getRenderer());
+//		view->getRenderer()->AddActor( mDisplayText.at(i)->getActor() );
 	}
 }
 
@@ -57,18 +59,19 @@ void DisplayTextRep::removeRepActorsFromViewRenderer(View *view)
 {
 	for(unsigned i =0; i<mDisplayText.size(); ++i)
 	{
-		view->getRenderer()->RemoveActor(mDisplayText.at(i)->getActor() );
+		mDisplayText[i]->setRenderer(NULL);
+//		view->getRenderer()->RemoveActor(mDisplayText.at(i)->getActor() );
 	}
 }
 
 /**Add a text with give RGB color at pos.
  * pos is in normalized view space.
  */
-TextDisplayPtr DisplayTextRep::addText(const Vector3D& color, const QString& text, const Vector3D& pos, int maxWidth, vtkViewport *vp)
+TextDisplayPtr DisplayTextRep::addText(const QColor& color, const QString& text, const Vector3D& pos, int maxWidth, vtkViewport *vp)
 {
-	Vector3D c = color;
+//	Vector3D c = color;
 	TextDisplayPtr textRep;
-	textRep.reset( new TextDisplay( text, c, 20) );
+	textRep.reset( new TextDisplay( text, color, 20) );
 	textRep->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
 	textRep->setPosition(pos);
 	textRep->textProperty()->SetJustificationToLeft();
@@ -81,6 +84,9 @@ TextDisplayPtr DisplayTextRep::addText(const Vector3D& color, const QString& tex
 	{
 		textRep->textProperty()->SetVerticalJustificationToTop();
 	}
+
+	textRep->setRenderer(this->getRenderer());
+
 	//textRep->setCentered();
 	mDisplayText.push_back( textRep );
 
@@ -89,6 +95,13 @@ TextDisplayPtr DisplayTextRep::addText(const Vector3D& color, const QString& tex
 		textRep->setMaxWidth(maxWidth, vp);
 	}
 	return textRep;
+}
+
+vtkRendererPtr DisplayTextRep::getRenderer()
+{
+	if (!this->mViews.empty())
+		return (*this->mViews.begin())->getRenderer();
+	return vtkRendererPtr();
 }
 
 /**Set a text previously set with addText.
@@ -103,12 +116,11 @@ void DisplayTextRep::setText(unsigned i, const QString& text)
 /**set the color in all existing texts
  *
  */
-void DisplayTextRep::setColor(const Vector3D& color )
+void DisplayTextRep::setColor(const QColor& color )
 {
-	Vector3D c = color;
 	for(unsigned i =0; i<mDisplayText.size(); ++i)
 	{
-		mDisplayText.at(i)->textProperty()->SetColor(c.begin()) ;
+		mDisplayText.at(i)->textProperty()->SetColor(getColorAsVector3D(color).begin()) ;
 	}
 
 }

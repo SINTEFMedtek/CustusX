@@ -32,6 +32,13 @@ namespace cx
 {
 // --------------------------------------------------------
 
+/** Set the RGB and alpha components of QColor into a vtkProperty
+  */
+void setColorAndOpacity(vtkPropertyPtr property, QColor color);
+/** Convert a QColor to Vector3D using 0..1 scale, ignoring alpha.
+  */
+Vector3D getColorAsVector3D(QColor color) ;
+
 /**\brief RGB color data.
  *
  * \ingroup sscProxy
@@ -102,17 +109,21 @@ class LineSegment
 class TextDisplay
 {
 	public:
-		TextDisplay(const QString& text, const Vector3D& color, int fontsize);
+		TextDisplay(const QString& text, const QColor& color, int fontsize);
 		~TextDisplay();
+		void setRenderer( vtkRendererPtr renderer );
 		void setPosition( float x, float y);
 		void setPosition( const Vector3D& pos );
 		void setCentered();
 		void updateText(const QString& text );
+		void setColor(QColor color);
 		vtkTextProperty* textProperty();
 		vtkActor2DPtr getActor();
 		void setMaxWidth( int width, vtkViewport *vp );
 		int getMaxWidth();
 		int getWidth( vtkViewport *vp );
+		vtkTextMapperPtr getMapper() { return mapper; }
+
 	private:
 		vtkTextMapperPtr mapper;
 		vtkActor2DPtr actor;
