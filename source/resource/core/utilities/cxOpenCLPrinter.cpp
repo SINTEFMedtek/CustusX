@@ -22,13 +22,11 @@ void OpenCLPrinter::printPlatformAndDeviceInfo()
 
 		for(unsigned int j = 0; j < devices.size(); j++)
 		{
-			printDeviceInfo(devices[j]);
-			std::cout << "\n";
+            printDeviceInfo(devices[j]);
 		}
     }
     print("Number of platforms", platforms.size());
     print("Number of devices", devices.size());
-    std::cout << "\n";
 }
 
 void OpenCLPrinter::printPlatformInfo(cl::Platform platform)
@@ -141,7 +139,7 @@ void OpenCLPrinter::printStringList(std::string list, std::string separator)
 void OpenCLPrinter::print(std::string name, std::string value, int indents)
 {
 	std::string stringIndents = getIndentation(indents);
-	std::cout << stringIndents << boost::format("%-30s %-20s\n") % name % value;
+    std::cout << stringIndents << boost::format("%-30s %-20s\n") % name % value;
 }
 
 void OpenCLPrinter::print(std::string name, int value, int indents)
