@@ -35,7 +35,7 @@
 //#include <vtkDataSetAttributes.h>
 #include <vtkEventQtSlotConnect.h>
 //#include <vtkCellPicker.h>
-#include <vtkVolumePicker.h>
+#include <vtkMultiVolumePicker.h>
 #include "sscMesh.h"
 #include "sscDataManager.h"
 #include "sscMessageManager.h"
@@ -136,7 +136,7 @@ void PickerRep::setGlyph(MeshPtr glyph)
 	 mGlyphRep->setMesh(mGlyph);
 }
 
-typedef vtkSmartPointer<class vtkVolumePicker> vtkVolumePickerPtr;
+typedef vtkSmartPointer<class vtkMultiVolumePicker> vtkMultiVolumePickerPtr;
 typedef vtkSmartPointer<class vtkDataSet> vtkDataSetPtr;
 
 /**
@@ -148,7 +148,7 @@ typedef vtkSmartPointer<class vtkDataSet> vtkDataSetPtr;
  */
 void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer)
 {
-	vtkVolumePickerPtr picker = vtkVolumePickerPtr::New();
+	vtkMultiVolumePickerPtr picker = vtkMultiVolumePickerPtr::New();
 	int hit = picker->Pick(clickPosition[0], clickPosition[1], 0, renderer);
 
 	// search for picked data in manager, emit uid if found.
