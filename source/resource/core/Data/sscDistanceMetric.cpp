@@ -40,6 +40,7 @@ DistanceMetric::DistanceMetric(const QString& uid, const QString& name) :
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "line endpoint 0" << "line endpoint 1"));
 	mArguments->setValidArgumentTypes(QStringList() << "pointMetric" << "planeMetric");
 
+	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SLOT(resetCachedValues()));
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 }
 
@@ -78,9 +79,24 @@ void DistanceMetric::parseXml(QDomNode& dataNode)
 {
 	DataMetric::parseXml(dataNode);
 	mArguments->parseXml(dataNode);
+	this->resetCachedValues();
+}
+
+void DistanceMetric::resetCachedValues()
+{
+	mCachedEndPoints.reset();
 }
 
 std::vector<Vector3D> DistanceMetric::getEndpoints() const
+{
+	if (!mCachedEndPoints.isValid())
+	{
+		mCachedEndPoints.set(this->getEndpointsUncached());
+	}
+	return mCachedEndPoints.get();
+}
+
+std::vector<Vector3D> DistanceMetric::getEndpointsUncached() const
 {
 	DataPtr a0 = mArguments->get(0);
 	DataPtr a1 = mArguments->get(1);
