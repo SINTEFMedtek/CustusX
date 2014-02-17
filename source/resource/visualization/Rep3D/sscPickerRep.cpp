@@ -35,7 +35,6 @@
 //#include <vtkDataSetAttributes.h>
 #include <vtkEventQtSlotConnect.h>
 //#include <vtkCellPicker.h>
-#include <vtkMultiVolumePicker.h>
 #include "sscMesh.h"
 #include "sscDataManager.h"
 #include "sscMessageManager.h"
@@ -45,6 +44,14 @@
 #include "sscToolManager.h"
 #include "sscRegistrationTransform.h"
 #include "sscGeometricRep.h"
+
+#include "vtkVolumePicker.h"
+#ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
+	#include "vtkMultiVolumePicker.h"
+	typedef vtkSmartPointer<class vtkMultiVolumePicker> vtkMultiVolumePickerPtr;
+#else
+	typedef vtkSmartPointer<class vtkVolumePicker> vtkMultiVolumePickerPtr;
+#endif
 
 namespace cx
 {
@@ -136,7 +143,6 @@ void PickerRep::setGlyph(MeshPtr glyph)
 	 mGlyphRep->setMesh(mGlyph);
 }
 
-typedef vtkSmartPointer<class vtkMultiVolumePicker> vtkMultiVolumePickerPtr;
 typedef vtkSmartPointer<class vtkDataSet> vtkDataSetPtr;
 
 /**
