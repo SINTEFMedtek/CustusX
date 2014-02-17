@@ -54,7 +54,7 @@ SphereMetricPtr SphereMetricRep::getSphereMetric()
 	return boost::dynamic_pointer_cast<SphereMetric>(mMetric);
 }
 
-void SphereMetricRep::changedSlot()
+void SphereMetricRep::onModifiedStartRender()
 {
 	if (!mMetric)
 		return;
@@ -71,13 +71,5 @@ void SphereMetricRep::changedSlot()
 
 	this->drawText();
 }
-
-//QString SphereMetricRep::getText()
-//{
-//	QString text = QString("%1").arg(this->getSphereMetric()->getRadius(), 0, 'f', 1);
-//	if (mShowLabel)
-//		text = mMetric->getName() + " = " + text;
-//	return text;
-//}
 
 }

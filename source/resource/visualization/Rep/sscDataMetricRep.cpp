@@ -25,6 +25,8 @@
 #include "sscDataMetric.h"
 #include "sscLogger.h"
 #include "sscVtkHelperClasses.h"
+#include "vtkCallbackCommand.h"
+#include "vtkRenderer.h"
 
 namespace cx
 {
@@ -37,26 +39,50 @@ DataMetricRep::DataMetricRep(const QString& uid, const QString& name) :
 	mShowAnnotation(true),
 	mView(NULL)
 {
+	mModified = true;
+	this->mCallbackCommand = vtkCallbackCommandPtr::New();
+	this->mCallbackCommand->SetClientData(this);
+	this->mCallbackCommand->SetCallback(DataMetricRep::ProcessEvents);
+}
+
+void DataMetricRep::ProcessEvents(vtkObject* vtkNotUsed(object), unsigned long event, void* clientdata,
+		void* vtkNotUsed(calldata))
+{
+	DataMetricRep* self = reinterpret_cast<DataMetricRep*>(clientdata);
+	self->onStartRenderPrivate();
+}
+
+void DataMetricRep::onStartRenderPrivate()
+{
+	if (!mModified)
+		return;
+	this->onModifiedStartRender();
+	mModified = false;
+}
+
+void DataMetricRep::setModified()
+{
+	mModified = true;
 }
 
 void DataMetricRep::setDataMetric(DataMetricPtr value)
 {
     if (mMetric)
 	{
-        disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-		disconnect(mMetric.get(), SIGNAL(propertiesChanged()), this, SLOT(changedSlot()));
+		disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
+		disconnect(mMetric.get(), SIGNAL(propertiesChanged()), this, SLOT(setModified()));
 	}
 
     mMetric = value;
 
     if (mMetric)
 	{
-		connect(mMetric.get(), SIGNAL(propertiesChanged()), this, SLOT(changedSlot()));
-		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
+		connect(mMetric.get(), SIGNAL(propertiesChanged()), this, SLOT(setModified()));
+		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
 	}
 
     this->clear();
-    this->changedSlot();
+	this->setModified();
 }
 
 DataMetricPtr DataMetricRep::getDataMetric()
@@ -67,32 +93,26 @@ DataMetricPtr DataMetricRep::getDataMetric()
 void DataMetricRep::setShowLabel(bool on)
 {
 	mShowLabel = on;
-	this->changedSlot();
+	this->setModified();
 }
 
 void DataMetricRep::setGraphicsSize(double size)
 {
 	mGraphicsSize = size;
-	this->changedSlot();
+	this->setModified();
 }
 
 void DataMetricRep::setLabelSize(double size)
 {
 	mLabelSize = size;
-	this->changedSlot();
+	this->setModified();
 }
 
 void DataMetricRep::setShowAnnotation(bool on)
 {
 	mShowAnnotation = on;
-	this->changedSlot();
+	this->setModified();
 }
-
-//void DataMetricRep::setColor(double red, double green, double blue)
-//{
-//	mColor = Vector3D(red, green, blue);
-//	this->changedSlot();
-//}
 
 void DataMetricRep::clear()
 {
@@ -102,12 +122,19 @@ void DataMetricRep::clear()
 void DataMetricRep::addRepActorsToViewRenderer(View *view)
 {
     mView = view;
+
+	vtkRendererPtr renderer = mView->getRenderer();
+	renderer->AddObserver(vtkCommand::StartEvent, this->mCallbackCommand, 1.0);
+
     this->clear();
-    this->changedSlot();
+	this->setModified();
 }
 
 void DataMetricRep::removeRepActorsFromViewRenderer(View *view)
 {
+	vtkRendererPtr renderer = mView->getRenderer();
+	renderer->RemoveObserver(this->mCallbackCommand);
+
     mView = NULL;
     this->clear();
 }
@@ -125,7 +152,10 @@ void DataMetricRep::drawText()
         return;
     }
 
-    mText.reset(new CaptionText3D(mView->getRenderer()));
+	if (!mText)
+	{
+		mText.reset(new CaptionText3D(mView->getRenderer()));
+	}
 	mText->setColor(mMetric->getColor());
     mText->setText(text);
     mText->setPosition(mMetric->getRefCoord());

@@ -22,6 +22,7 @@
 
 #include "sscRepImpl.h"
 #include "sscVector3D.h"
+#include "vtkForwardDeclarations.h"
 
 namespace cx
 {
@@ -49,37 +50,42 @@ public:
 	void setLabelSize(double size);
 	void setShowLabel(bool on);
 	void setShowAnnotation(bool on);
-//	void setColor(double red, double green, double blue);
 
     void setDataMetric(DataMetricPtr value);
     DataMetricPtr getDataMetric();
 
 protected slots:
-	virtual void changedSlot() = 0; ///< called when interals are changed: update all
+	void setModified(); // set flag to get onModifiedStartRender() called before next render
 
 protected:
 	DataMetricRep(const QString& uid, const QString& name);
-//  virtual void rescale() = 0; ///< called when scaling has changed: rescale text etc to keep const vp size.
 
     void addRepActorsToViewRenderer(View *view);
     void removeRepActorsFromViewRenderer(View *view);
     void drawText();
     virtual void clear(); // reset all internals
     virtual QString getText();
+	virtual void onModifiedStartRender() {}
 
 	double mGraphicsSize;
 	bool mShowLabel;
 	double mLabelSize;
 	bool mShowAnnotation;
-//	Vector3D mColor;
 	Vector3D getColorAsVector3D() const;
 
     DataMetricPtr mMetric;
     View *mView;
-private:
-    CaptionText3DPtr mText;
+	vtkCallbackCommandPtr mCallbackCommand;
 
-//  ViewportListenerPtr mViewportListener;
+private:
+	static void ProcessEvents(vtkObject* object,
+										unsigned long event,
+										void* clientdata,
+										void* calldata);
+	bool mModified;
+	void onStartRenderPrivate();
+
+	CaptionText3DPtr mText;
 };
 typedef boost::shared_ptr<class DataMetricRep> DataMetricRepPtr;
 
