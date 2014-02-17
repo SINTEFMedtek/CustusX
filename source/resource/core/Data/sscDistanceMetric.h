@@ -23,6 +23,7 @@
 #include "sscDataMetric.h"
 #include "sscDataReaderWriter.h"
 #include "cxMetricReferenceArgumentList.h"
+#include "cxOptionalValue.h"
 
 namespace cx
 {
@@ -87,8 +88,13 @@ public:
 	virtual QString getValueAsString() const;
 	virtual bool showValueInGraphics() const { return true; }
 
+private slots:
+	void resetCachedValues();
 private:
+	std::vector<Vector3D> getEndpointsUncached() const;
 	MetricReferenceArgumentListPtr mArguments;
+	mutable OptionalValue<std::vector<Vector3D> > mCachedEndPoints;
+
 };
 
 /**

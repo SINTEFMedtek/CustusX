@@ -25,6 +25,9 @@
 #include "cxApplicationStateMachine.h"
 #include "cxMultiVolume3DRepProducer.h"
 
+#include "sscDataManager.h"
+#include "sscDummyTool.h"
+
 namespace cx
 {
 
@@ -544,19 +547,46 @@ void DebugTab::init()
 	mManualToolPhysicalPropertiesCheckBox->setChecked(settings()->value("giveManualToolPhysicalProperties", true).toBool());
 	mManualToolPhysicalPropertiesCheckBox->setToolTip("give manual tool the properties of the first physical tool. \nUse to simulate f.ex. probes with manual tool. (need restart)");
 
+	QPushButton* runDebugToolButton = new QPushButton("Run Debug Tool", this);
+	runDebugToolButton->setToolTip("Start a dummy tool that runs in a deterministic pattern inside the bounding box of the first found volume.");
+	connect(runDebugToolButton, SIGNAL(clicked()), this, SLOT(runDebugToolSlot()));
+
+	mRenderSpeedLoggingCheckBox = new QCheckBox("Render Speed Logging");
+	mRenderSpeedLoggingCheckBox->setChecked(settings()->value("renderSpeedLogging", true).toBool());
+	mRenderSpeedLoggingCheckBox->setToolTip("Dump render speed statistics to the console");
+
 	//Layout
 	mMainLayout = new QGridLayout;
 	int i=0;
 	mMainLayout->addWidget(mIGSTKDebugLoggingCheckBox, i++, 0);
 	mMainLayout->addWidget(mManualToolPhysicalPropertiesCheckBox, i++, 0);
+	mMainLayout->addWidget(runDebugToolButton, i++, 0);
+	mMainLayout->addWidget(mRenderSpeedLoggingCheckBox, i++, 0);
 
 	mTopLayout->addLayout(mMainLayout);
+}
+
+void DebugTab::runDebugToolSlot()
+{
+	if (!dataManager()->getImages().size())
+		return;
+
+	cx::ImagePtr image = dataManager()->getImages().begin()->second;
+	cx::DoubleBoundingBox3D bb_r = transform(image->get_rMd(), image->boundingBox());
+
+	dataManager()->setCenter(bb_r.center());
+
+	cx::DummyToolPtr dummyTool(new cx::DummyTool(cx::cxToolManager::getInstance()));
+	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
+	messageManager()->sendInfo(QString("Running debug tool inside box %1").arg(qstring_cast(bb_r)));
+	cx::cxToolManager::getInstance()->runDummyTool(dummyTool);
 }
 
 void DebugTab::saveParametersSlot()
 {
 	settings()->setValue("IGSTKDebugLogging", mIGSTKDebugLoggingCheckBox->isChecked());
 	settings()->setValue("giveManualToolPhysicalProperties", mManualToolPhysicalPropertiesCheckBox->isChecked());
+	settings()->setValue("renderSpeedLogging", mRenderSpeedLoggingCheckBox->isChecked());
 }
 
 }//namespace cx

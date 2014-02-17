@@ -126,6 +126,7 @@ cx_add_class(cxResource_SOURCE
 	utilities/sscApplication
 	utilities/sscSharedMemory
 	utilities/cxImageDataContainer
+	utilities/cxOptionalValue
 
 	logger/sscAudio.h
 	logger/sscLogger

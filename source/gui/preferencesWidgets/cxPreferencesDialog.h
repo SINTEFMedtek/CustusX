@@ -241,10 +241,12 @@ public:
 
 public slots:
   void saveParametersSlot();
+  void runDebugToolSlot();
 
 protected:
   QCheckBox* mIGSTKDebugLoggingCheckBox;
   QCheckBox* mManualToolPhysicalPropertiesCheckBox;
+  QCheckBox* mRenderSpeedLoggingCheckBox;
   QGridLayout *mMainLayout;
 };
 
