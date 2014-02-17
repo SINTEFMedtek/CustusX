@@ -25,6 +25,7 @@
 #include "sscPointMetric.h"
 #include "sscDataManagerImpl.h"
 #include "cxMetricReferenceArgumentList.h"
+#include "cxOptionalValue.h"
 
 namespace cx
 {
@@ -95,10 +96,14 @@ public:
 	bool getUseSimpleVisualization() const;
 	void setUseSimpleVisualization(bool val);
 
+private slots:
+	void resetCachedValues();
 private:
 	boost::array<DataPtr, 4> mArgument;
 	MetricReferenceArgumentListPtr mArguments;
 	bool mUseSimpleVisualization;
+	mutable OptionalValue<std::vector<Vector3D> > mCachedEndPoints;
+
 };
 
 /**
