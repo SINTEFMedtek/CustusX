@@ -296,7 +296,7 @@ TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper vs vtkMultiVolumePicker: Simple 
 	vtkMultiVolumePickerPtr picker = fixture.pickAlongRayReturnSuccessfulMultiVolumePicker(p_camera, viewdir);
 
 	Eigen::Vector3d p_expected(55,55,0);
-	REQUIRE(picker.GetPointer() != NULL);
+	REQUIRE(picker.GetPointer());
 
 	//vtkDataSetPtr data = picker->GetDataSet();
 	Eigen::Vector3d p_pick(picker->GetPickPosition());
@@ -305,7 +305,7 @@ TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper vs vtkMultiVolumePicker: Simple 
 	REQUIRE(1); // makes this a valid catch test
 }
 
-TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can be picked using vtkMultiVolumePicker", "[unit]")
+TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can be picked using vtkMultiVolumePicker", "[unit][hide]")
 {
 	int numberOfVolumes = 3;
 	VtkOpenGLGPUMultiVolumeRayCastMapperFixture fixture(numberOfVolumes);
@@ -328,7 +328,7 @@ TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can be picked using vtkMultiVolu
 	vtkMultiVolumePickerPtr picker = fixture.pickAlongRayReturnSuccessfulMultiVolumePicker(p_camera, viewdir);
 
 	Eigen::Vector3d p_expected(55,55,0);
-	REQUIRE(picker.GetPointer() != NULL);
+	REQUIRE(picker.GetPointer());
 
 	//vtkDataSetPtr data = picker->GetDataSet();
 	Eigen::Vector3d p_pick(picker->GetPickPosition());
