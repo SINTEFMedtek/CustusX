@@ -60,7 +60,7 @@ ToolMetricPtr ToolMetricRep::getToolMetric()
 	return boost::dynamic_pointer_cast<ToolMetric>(mMetric);
 }
 
-void ToolMetricRep::changedSlot()
+void ToolMetricRep::onModifiedStartRender()
 {
 	ToolMetricPtr metric = this->getToolMetric();
 

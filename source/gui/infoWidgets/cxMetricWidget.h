@@ -62,6 +62,9 @@ public:
 
 signals:
 
+ public slots:
+  virtual void setModified();
+
 protected slots:
 	void itemSelectionChanged();
 
@@ -80,6 +83,7 @@ protected slots:
   void cellChangedSlot(int row, int col);
   virtual void cellClickedSlot(int row, int column);
   void exportMetricsButtonClickedSlot();
+  void delayedUpdate();
 
 protected:
   QAction* mPointMetricAction;
@@ -100,6 +104,7 @@ private:
   void resetWrappersAndEditWidgets(std::vector<MetricBasePtr> wrappers);
   void initializeTable();
   void updateTableContents();
+  void expensizeColumnResize();
 
   QAction* createAction(QActionGroup* group, QString iconName, QString text, QString tip, const char* slot);
 
@@ -112,6 +117,10 @@ private:
   QAction* mLoadReferencePointsAction; ///< button for loading a reference tools reference points
   QStackedWidget* mEditWidgets;
   MetricManagerPtr mMetricManager;
+  int mModifiedCount;
+  int mPaintCount;
+  QTimer* mDelayedUpdateTimer;
+  bool mLocalModified;
 };
 
 }//end namespace cx

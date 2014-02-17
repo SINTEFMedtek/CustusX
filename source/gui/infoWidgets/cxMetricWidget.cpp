@@ -49,6 +49,7 @@
 //#include "sscManualTool.h"
 //#include "sscPointMetric.h"
 //#include "sscDistanceMetric.h"
+#include "sscLogger.h"
 
 namespace cx
 {
@@ -63,6 +64,17 @@ MetricWidget::MetricWidget(QWidget* parent) :
   mVerticalLayout(new QVBoxLayout(this)),
   mTable(new QTableWidget(this))
 {
+	// the delayed timer lowers the update rate of this widget,
+	// as is is seen to strangle the render speed when many metrics are present.
+	int lowUpdateRate = 200;
+	mLocalModified = false;
+	mDelayedUpdateTimer = new QTimer(this);
+	connect(mDelayedUpdateTimer, SIGNAL(timeout()), this, SLOT(delayedUpdate())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+	mDelayedUpdateTimer->start(lowUpdateRate);
+
+
+	mModifiedCount = 0;
+	mPaintCount = 0;
 	mMetricManager.reset(new MetricManager());
 	connect(mMetricManager.get(), SIGNAL(activeMetricChanged()), this, SLOT(setModified()));
 	connect(mMetricManager.get(), SIGNAL(metricsChanged()), this, SLOT(setModified()));
@@ -251,33 +263,47 @@ std::vector<MetricBasePtr> MetricWidget::createMetricWrappers()
 
 void MetricWidget::prePaintEvent()
 {
+//	QTime timer;
+//	timer.start();
+	mPaintCount++;
   std::vector<MetricBasePtr> newMetrics = this->createMetricWrappers();
 
   bool rebuild = !this->checkEqual(newMetrics, mMetrics);
-  // rebuild all:
   if (rebuild)
   {
-//    std::cout << "rebuild " << newMetrics.size() << std::endl;
 	this->resetWrappersAndEditWidgets(newMetrics);
 	this->initializeTable();
   }
 
   this->updateTableContents();
 
+  if (rebuild)
+  {
+	  this->expensizeColumnResize();
+  }
+
   this->enablebuttons();
+//  std::cout << QString("prepaint, mod=%1, paint=%2, elapsed=%3ms").arg(mModifiedCount).arg(mPaintCount).arg(timer.elapsed()) << std::endl;
+//  std::cout << QString("prepaint, mod=%1, paint=%2").arg(mModifiedCount).arg(mPaintCount) << std::endl;
+}
+
+void MetricWidget::expensizeColumnResize()
+{
+	int valueColumn = 1;
+	mTable->resizeColumnToContents(valueColumn);
 }
 
 void MetricWidget::initializeTable()
 {
 	mTable->blockSignals(true);
+
 	mTable->clear();
 
-	//ready the table widget
 	mTable->setRowCount(mMetrics.size());
 	mTable->setColumnCount(4);
 	QStringList headerItems(QStringList() << "Name" << "Value" << "Arguments" << "Type");
 	mTable->setHorizontalHeaderLabels(headerItems);
-	mTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+//	mTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents); // dangerous: uses lots of painting time
 	mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	mTable->verticalHeader()->hide();
 
@@ -289,9 +315,7 @@ void MetricWidget::initializeTable()
 		{
 			QTableWidgetItem* item = new QTableWidgetItem("empty");
 			item->setData(Qt::UserRole, current->getData()->getUid());
-			//        item->setFlags(item->flags() & (~Qt::ItemFlags(Qt::ItemIsEditable))); // turn off editable (also turned off ability to select+copy text - removed)
 			mTable->setItem(i, j, item);
-			//        std::cout << "set item " << i << " " << j << std::endl;
 		}
 	}
 	mTable->blockSignals(false);
@@ -301,6 +325,17 @@ void MetricWidget::updateTableContents()
 {
 	mTable->blockSignals(true);
 	// update contents:
+	QTime timer;
+	timer.start();
+	for (unsigned i = 0; i < mMetrics.size(); ++i)
+	{
+		MetricBasePtr current = mMetrics[i];
+		QString name = current->getData()->getName();
+		QString value = current->getValue();
+		QString arguments = current->getArguments();
+		QString type = current->getType();
+	}
+
 	for (unsigned i = 0; i < mMetrics.size(); ++i)
 	{
 		MetricBasePtr current = mMetrics[i];
@@ -309,10 +344,15 @@ void MetricWidget::updateTableContents()
 			std::cout << "no qitem for:: " << i << " " << current->getData()->getName() << std::endl;
 			continue;
 		}
-		mTable->item(i,0)->setText(current->getData()->getName());
-		mTable->item(i,1)->setText(current->getValue());
-		mTable->item(i,2)->setText(current->getArguments());
-		mTable->item(i,3)->setText(current->getType());
+		QString name = current->getData()->getName();
+		QString value = current->getValue();
+		QString arguments = current->getArguments();
+		QString type = current->getType();
+
+		mTable->item(i,0)->setText(name);
+		mTable->item(i,1)->setText(value);
+		mTable->item(i,2)->setText(arguments);
+		mTable->item(i,3)->setText(type);
 
 		//highlight selected row
 		if (current->getData()->getUid() == mMetricManager->getActiveUid())
@@ -322,6 +362,22 @@ void MetricWidget::updateTableContents()
 		}
 	}
 	mTable->blockSignals(false);
+}
+
+void MetricWidget::setModified()
+{
+	mLocalModified = true;
+//	BaseWidget::setModified();
+	mModifiedCount++;
+}
+
+void MetricWidget::delayedUpdate()
+{
+	if (!mLocalModified)
+		return;
+	BaseWidget::setModified();
+	mLocalModified = false;
+
 }
 
 void MetricWidget::resetWrappersAndEditWidgets(std::vector<MetricBasePtr> wrappers)

@@ -47,9 +47,7 @@ public:
 
 protected:
     virtual void clear();
-
-protected slots:
-	virtual void changedSlot();
+	virtual void onModifiedStartRender();
 
 private:
 	FrameMetricRep(const QString& uid, const QString& name = "");
