@@ -25,8 +25,6 @@
 #include "sscDataMetric.h"
 #include "sscLogger.h"
 #include "sscVtkHelperClasses.h"
-#include "vtkCallbackCommand.h"
-#include "vtkRenderer.h"
 
 namespace cx
 {
@@ -36,33 +34,9 @@ DataMetricRep::DataMetricRep(const QString& uid, const QString& name) :
 	mGraphicsSize(1),
 	mShowLabel(false),
 	mLabelSize(2.5),
-	mShowAnnotation(true),
-	mView(NULL)
+	mShowAnnotation(true)
+//	mView(NULL)
 {
-	mModified = true;
-	this->mCallbackCommand = vtkCallbackCommandPtr::New();
-	this->mCallbackCommand->SetClientData(this);
-	this->mCallbackCommand->SetCallback(DataMetricRep::ProcessEvents);
-}
-
-void DataMetricRep::ProcessEvents(vtkObject* vtkNotUsed(object), unsigned long event, void* clientdata,
-		void* vtkNotUsed(calldata))
-{
-	DataMetricRep* self = reinterpret_cast<DataMetricRep*>(clientdata);
-	self->onStartRenderPrivate();
-}
-
-void DataMetricRep::onStartRenderPrivate()
-{
-	if (!mModified)
-		return;
-	this->onModifiedStartRender();
-	mModified = false;
-}
-
-void DataMetricRep::setModified()
-{
-	mModified = true;
 }
 
 void DataMetricRep::setDataMetric(DataMetricPtr value)
@@ -121,10 +95,10 @@ void DataMetricRep::clear()
 
 void DataMetricRep::addRepActorsToViewRenderer(View *view)
 {
-    mView = view;
+//    mView = view;
 
-	vtkRendererPtr renderer = mView->getRenderer();
-	renderer->AddObserver(vtkCommand::StartEvent, this->mCallbackCommand, 1.0);
+//	vtkRendererPtr renderer = mView->getRenderer();
+//	renderer->AddObserver(vtkCommand::StartEvent, this->mCallbackCommand, 1.0);
 
     this->clear();
 	this->setModified();
@@ -132,16 +106,16 @@ void DataMetricRep::addRepActorsToViewRenderer(View *view)
 
 void DataMetricRep::removeRepActorsFromViewRenderer(View *view)
 {
-	vtkRendererPtr renderer = mView->getRenderer();
-	renderer->RemoveObserver(this->mCallbackCommand);
+//	vtkRendererPtr renderer = mView->getRenderer();
+//	renderer->RemoveObserver(this->mCallbackCommand);
 
-    mView = NULL;
+//    mView = NULL;
     this->clear();
 }
 
 void DataMetricRep::drawText()
 {
-    if (!mView)
+	if (!this->getView())
         return;
 
     QString text = this->getText();
@@ -154,7 +128,7 @@ void DataMetricRep::drawText()
 
 	if (!mText)
 	{
-		mText.reset(new CaptionText3D(mView->getRenderer()));
+		mText.reset(new CaptionText3D(this->getRenderer()));
 	}
 	mText->setColor(mMetric->getColor());
     mText->setText(text);

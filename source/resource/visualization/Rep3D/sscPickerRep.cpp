@@ -222,7 +222,8 @@ void PickerRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 	int pickedPoint[2]; //<x,y>
 	iren->GetEventPosition(pickedPoint); //mouse positions are measured in pixels
 
-	vtkRendererPtr renderer = this->getRendererFromRenderWindow(*iren);
+	vtkRendererPtr renderer = this->getRenderer();
+//	vtkRendererPtr renderer = this->getRendererFromRenderWindow(*iren);
 	if (renderer == NULL)
 		return;
 
@@ -471,17 +472,17 @@ void PickerRep::removeRepActorsFromViewRenderer(View *view)
 	mView = NULL;
 }
 
-vtkRendererPtr PickerRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
-{
-	vtkRendererPtr renderer = NULL;
-	std::set<View *>::const_iterator it = mViews.begin();
-	for (; it != mViews.end(); ++it)
-	{
-		if (iren.GetRenderWindow() == (*it)->getRenderWindow())
-			renderer = (*it)->getRenderer();
-	}
-	return renderer;
-}
+//vtkRendererPtr PickerRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
+//{
+//	vtkRendererPtr renderer = NULL;
+//	std::set<View *>::const_iterator it = mViews.begin();
+//	for (; it != mViews.end(); ++it)
+//	{
+//		if (iren.GetRenderWindow() == (*it)->getRenderWindow())
+//			renderer = (*it)->getRenderer();
+//	}
+//	return renderer;
+//}
 
 Vector3D PickerRep::getPosition() const
 {

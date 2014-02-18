@@ -60,14 +60,6 @@ void MetricNamesRep::removeRepActorsFromViewRenderer(View *view)
 	}
 }
 
-vtkRendererPtr MetricNamesRep::getRenderer()
-{
-	if (!this->mViews.empty())
-		return (*this->mViews.begin())->getRenderer();
-	return vtkRendererPtr();
-}
-
-
 void MetricNamesRep::setData(std::vector<DataPtr> data)
 {
 	std::vector<DataMetricPtr> metrics = this->convertToMetrics(data);
@@ -77,16 +69,16 @@ void MetricNamesRep::setData(std::vector<DataPtr> data)
 
 	for (unsigned i=0; i<mMetrics.size(); ++i)
 	{
-		disconnect(mMetrics[i].get(), SIGNAL(transformChanged()), this, SLOT(metricChangedSlot()));
-		disconnect(mMetrics[i].get(), SIGNAL(propertiesChanged()), this, SLOT(metricChangedSlot()));
+		disconnect(mMetrics[i].get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
+		disconnect(mMetrics[i].get(), SIGNAL(propertiesChanged()), this, SLOT(setModified()));
 	}
 
 	mMetrics = metrics;
 
 	for (unsigned i=0; i<mMetrics.size(); ++i)
 	{
-		connect(mMetrics[i].get(), SIGNAL(transformChanged()), this, SLOT(metricChangedSlot()));
-		connect(mMetrics[i].get(), SIGNAL(propertiesChanged()), this, SLOT(metricChangedSlot()));
+		connect(mMetrics[i].get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
+		connect(mMetrics[i].get(), SIGNAL(propertiesChanged()), this, SLOT(setModified()));
 	}
 
 	this->setColoredTextList(this->getAllMetricTexts(), Eigen::Array2d(0.98, 0.98));
@@ -114,7 +106,7 @@ bool MetricNamesRep::equal(std::vector<DataMetricPtr> a, std::vector<DataMetricP
 	return true;
 }
 
-void MetricNamesRep::metricChangedSlot()
+void MetricNamesRep::onModifiedStartRender()
 {
 	std::vector<std::pair<QColor, QString> > text;
 	text = this->getAllMetricTexts();
