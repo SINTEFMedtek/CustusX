@@ -152,30 +152,5 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper with slicing", "[speed][g
 	REQUIRE(true);
 }
 
-TEST_CASE("Speed: metrics/multiguide", "[speed][gui][not_win32][not_win64][unstable]")
-{
-	initTest();
-	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
-
-	JenkinsMeasurement jenkins;
-	jenkins.initialize();
-
-	CustusXController custusX(NULL);
-	custusX.mPatientFolder = "/Users/christiana/Patients/2014-02-03_13-50_Multiguide.cx3";
-	custusX.mEnableSlicing = true;
-
-	custusX.start();
-	qApp->exec();
-//	requireVolumeIn3DScene();
-	custusX.stop();
-
-	int fps = custusX.mMeasuredFPS;
-	jenkins.createOutput("Speed: metrics/multiguide", QString::number(fps));
-
-	// TODO: enter this value into config file
-//	double minimumFPS = 5;
-//	REQUIRE(fps > minimumFPS);
-	REQUIRE(true);
-}
 
 }//namespace cx
