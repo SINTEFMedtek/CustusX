@@ -85,7 +85,7 @@ protected:
 	PickerRep(const QString& uid, const QString& name = ""); ///< use New instead
 	virtual void addRepActorsToViewRenderer(View *view); ///< connects to the renderwindowinteractor
 	virtual void removeRepActorsFromViewRenderer(View *view); ///< disconnects from the renderwindowinteractor
-	vtkRendererPtr getRendererFromRenderWindow(vtkRenderWindowInteractor& iren); ///< tries to get a renderer from the given renderwindowinteractor
+//	vtkRendererPtr getRendererFromRenderWindow(vtkRenderWindowInteractor& iren); ///< tries to get a renderer from the given renderwindowinteractor
 	void connectInteractor();
 	void disconnectInteractor();
 	void scaleSphere();

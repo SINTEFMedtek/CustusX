@@ -23,6 +23,10 @@
 #include <set>
 #include "sscRep.h"
 #include "sscIndent.h"
+#include <vtkSmartPointer.h>
+class vtkObject;
+typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
+typedef vtkSmartPointer<class vtkCallbackCommand> vtkCallbackCommandPtr;
 
 namespace cx
 {
@@ -41,6 +45,7 @@ namespace cx
  */
 class RepImpl : public Rep
 {
+	Q_OBJECT
 public:
 	explicit RepImpl(const QString& uid="", const QString& name="");
 	virtual ~RepImpl();
@@ -69,17 +74,32 @@ public:
 		return retval;
 	}
 
+protected slots:
+	void setModified(); // set flag to get onModifiedStartRender() called before next render
+
 protected:
-	std::set<View *> mViews;
+	View* getView();
+	vtkRendererPtr getRenderer();
+
+	View* mView;
 	QString mName;
 	QString mUid;
 	RepWeakPtr mSelf;
 
+	virtual void onModifiedStartRender() {}
 	virtual void addRepActorsToViewRenderer(View *view) = 0;
 	virtual void removeRepActorsFromViewRenderer(View *view) = 0;
 
 private:
 //	RepImpl(); ///< not implemented
+	static void ProcessEvents(vtkObject* object,
+										unsigned long event,
+										void* clientdata,
+										void* calldata);
+	bool mModified;
+	vtkCallbackCommandPtr mCallbackCommand;
+	void onStartRenderPrivate();
+
 };
 
 

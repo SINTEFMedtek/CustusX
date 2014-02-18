@@ -19,6 +19,9 @@
 
 #include "sscRepImpl.h"
 #include "sscTypeConversions.h"
+#include "sscView.h"
+#include "vtkCallbackCommand.h"
+#include "vtkRenderer.h"
 
 namespace cx
 {
@@ -26,6 +29,12 @@ namespace cx
 RepImpl::RepImpl(const QString& uid, const QString& name) :
 	mName(name), mUid(uid)
 {
+	mView = NULL;
+
+	mModified = true;
+	this->mCallbackCommand = vtkCallbackCommandPtr::New();
+	this->mCallbackCommand->SetClientData(this);
+	this->mCallbackCommand->SetCallback(RepImpl::ProcessEvents);
 }
 
 RepImpl::~RepImpl()
@@ -49,19 +58,27 @@ QString RepImpl::getUid() const
 
 bool RepImpl::isConnectedToView(View *theView) const
 {
-	return mViews.count(theView);
+	return mView==theView;
 }
 
 void RepImpl::connectToView(View *theView)
 {
-	mViews.insert(theView);
+	mView = theView;
+
+	vtkRendererPtr renderer = mView->getRenderer();
+	renderer->AddObserver(vtkCommand::StartEvent, this->mCallbackCommand, 1.0);
+
 	this->addRepActorsToViewRenderer(theView);
 }
 
 void RepImpl::disconnectFromView(View *theView)
 {
-	mViews.erase(theView);
+//	mViews.erase(theView);
+	vtkRendererPtr renderer = mView->getRenderer();
+	renderer->RemoveObserver(this->mCallbackCommand);
+
 	this->removeRepActorsFromViewRenderer(theView);
+	mView = NULL;
 }
 
 void RepImpl::printSelf(std::ostream & os, Indent indent)
@@ -69,6 +86,39 @@ void RepImpl::printSelf(std::ostream & os, Indent indent)
 	os << indent << "mUid: " << mUid << std::endl;
 	os << indent << "mName: " << mName << std::endl;
 	os << indent << "Type: " << getType() << std::endl;
+}
+
+View* RepImpl::getView()
+{
+	return mView;
+}
+
+vtkRendererPtr RepImpl::getRenderer()
+{
+	if (!mView)
+		return vtkRendererPtr();
+	return this->getView()->getRenderer();
+}
+
+
+void RepImpl::ProcessEvents(vtkObject* vtkNotUsed(object), unsigned long event, void* clientdata,
+		void* vtkNotUsed(calldata))
+{
+	RepImpl* self = reinterpret_cast<RepImpl*>(clientdata);
+	self->onStartRenderPrivate();
+}
+
+void RepImpl::onStartRenderPrivate()
+{
+	if (!mModified)
+		return;
+	this->onModifiedStartRender();
+	mModified = false;
+}
+
+void RepImpl::setModified()
+{
+	mModified = true;
 }
 
 

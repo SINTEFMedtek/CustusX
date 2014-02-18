@@ -97,13 +97,6 @@ TextDisplayPtr DisplayTextRep::addText(const QColor& color, const QString& text,
 	return textRep;
 }
 
-vtkRendererPtr DisplayTextRep::getRenderer()
-{
-	if (!this->mViews.empty())
-		return (*this->mViews.begin())->getRenderer();
-	return vtkRendererPtr();
-}
-
 /**Set a text previously set with addText.
  *
  */

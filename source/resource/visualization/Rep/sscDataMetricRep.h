@@ -54,9 +54,6 @@ public:
     void setDataMetric(DataMetricPtr value);
     DataMetricPtr getDataMetric();
 
-protected slots:
-	void setModified(); // set flag to get onModifiedStartRender() called before next render
-
 protected:
 	DataMetricRep(const QString& uid, const QString& name);
 
@@ -65,7 +62,6 @@ protected:
     void drawText();
     virtual void clear(); // reset all internals
     virtual QString getText();
-	virtual void onModifiedStartRender() {}
 
 	double mGraphicsSize;
 	bool mShowLabel;
@@ -74,17 +70,9 @@ protected:
 	Vector3D getColorAsVector3D() const;
 
     DataMetricPtr mMetric;
-    View *mView;
-	vtkCallbackCommandPtr mCallbackCommand;
+//    View *mView;
 
 private:
-	static void ProcessEvents(vtkObject* object,
-										unsigned long event,
-										void* clientdata,
-										void* calldata);
-	bool mModified;
-	void onStartRenderPrivate();
-
 	CaptionText3DPtr mText;
 };
 typedef boost::shared_ptr<class DataMetricRep> DataMetricRepPtr;
