@@ -197,7 +197,6 @@ void ViewWrapper2D::addReps()
 	mSliceProxy = SliceProxy::New("sliceproxy_(" + mView->getName() + ")");
 	mViewFollower.reset(new ViewFollower);
 	mViewFollower->setSliceProxy(mSliceProxy);
-//	connect(mSliceProxy.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(ensureCenterWithinView()));
 
 	// slice rep
 	//the mul

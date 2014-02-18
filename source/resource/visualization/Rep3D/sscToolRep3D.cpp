@@ -104,7 +104,7 @@ void ToolRep3D::setTool(ToolPtr tool)
 
 	if (mTool)
 	{
-		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
+		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(setModified()));
 		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
 		disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));
 		disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChanged()));
@@ -149,10 +149,10 @@ void ToolRep3D::setTool(ToolPtr tool)
 //			mToolActor->GetProperty()->SetColor(mTooltipPointColor.begin());
 		}
 
-		receiveTransforms(mTool->get_prMt(), 0);
+		this->setModified();
 		mToolActor->SetVisibility(mTool->getVisible());
 
-		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
+		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(setModified()));
 		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
 		connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));
 		connect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChanged()));
@@ -281,20 +281,34 @@ void ToolRep3D::scaleSpheres()
 		mTooltipPoint->setRadius(sphereSize);
 }
 
-void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
+//void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
+//{
+//	return;
+//	Transform3DPtr rMprPtr = ToolManager::getInstance()->get_rMpr();
+//	Transform3D rMt = (*rMprPtr) * prMt;
+//	mToolActor->SetUserMatrix(rMt.getVtkMatrix());
+//	this->update();
+//}
+
+void ToolRep3D::onModifiedStartRender()
 {
-	Transform3DPtr rMprPtr = ToolManager::getInstance()->get_rMpr();
-	Transform3D rMt = (*rMprPtr) * prMt;
-	mToolActor->SetUserMatrix(rMt.getVtkMatrix());
 	this->update();
 }
 
+
 void ToolRep3D::update()
 {
+//	Transform3DPtr rMprPtr = ToolManager::getInstance()->get_rMpr();
+//	Transform3D rMt = (*rMprPtr) * prMt;
+//	mToolActor->SetUserMatrix(rMt.getVtkMatrix());
+
 	Transform3D prMt = Transform3D::Identity();
 	if (mTool)
 		prMt = mTool->get_prMt();
 	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
+
+	Transform3D rMt = rMpr * prMt;
+	mToolActor->SetUserMatrix(rMt.getVtkMatrix());
 
 	if (this->showProbe())
 	{
