@@ -66,7 +66,7 @@ MetricWidget::MetricWidget(QWidget* parent) :
 {
 	// the delayed timer lowers the update rate of this widget,
 	// as is is seen to strangle the render speed when many metrics are present.
-	int lowUpdateRate = 200;
+	int lowUpdateRate = 100;
 	mLocalModified = false;
 	mDelayedUpdateTimer = new QTimer(this);
 	connect(mDelayedUpdateTimer, SIGNAL(timeout()), this, SLOT(delayedUpdate())); // this signal will be executed in the thread of THIS, i.e. the main thread.

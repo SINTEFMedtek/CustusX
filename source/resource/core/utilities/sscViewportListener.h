@@ -15,7 +15,39 @@ namespace cx
 {
 
 
-/**\brief Listens to changes in viewport and camera matrix.
+/** \brief Base class for listening to a vtkRenderer
+ *
+ *  Subclass by adding the observer to the mRenderer
+ *  A callback function is called when a change is detected.
+ *
+ * \ingroup sscUtility
+ */
+class ViewportListenerBase
+{
+public:
+		ViewportListenerBase();
+		virtual ~ViewportListenerBase();
+
+		void startListen(vtkRendererPtr renderer);
+		void stopListen();
+		bool isListening() const;
+
+		void setCallback(boost::function<void ()> func);
+
+		virtual void callback();
+		double getVpnZoom();
+protected:
+		virtual void addObservers() = 0;
+		virtual void removeObservers() = 0;
+
+		typedef vtkSmartPointer<class ViewportObserverPrivate> ViewportObserverPrivatePtr;
+		ViewportObserverPrivatePtr mObserver;
+		vtkRendererPtr mRenderer;
+private:
+		boost::function<void ()> mCallback;
+};
+
+/** \brief Listens to changes in viewport and camera matrix.
  *
  *  Class that listens to changes in the viewport size and camera matrix.
  *  A callback function is called when a change is detected.
@@ -25,29 +57,46 @@ namespace cx
  *
  * \ingroup sscUtility
  */
-class ViewportListener
+class ViewportListener : public ViewportListenerBase
 {
 public:
-		ViewportListener();
-		~ViewportListener();
+		ViewportListener() {}
+		virtual ~ViewportListener();
+		void setModified();
 
-		void startListen(vtkRendererPtr renderer);
-		void stopListen();
-		bool isListening() const;
-
-		void setCallback(boost::function<void ()> func);
-
-		void callback();
-		double getVpnZoom();
-
-private:
-		typedef vtkSmartPointer<class ViewportObserverPrivate> ViewportObserverPrivatePtr;
-		ViewportObserverPrivatePtr mObserver;
-		vtkRendererPtr mRenderer;
-		boost::function<void ()> mCallback;
+protected:
+		virtual void addObservers();
+		virtual void removeObservers();
 };
 
-typedef boost::shared_ptr<ViewportListener> ViewportListenerPtr;
+typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
+
+/** \brief Listens to the start render event in a vtkRenderer
+ *
+ *  A callback function is called when render is about to start.
+ *  Use to perform special processing prior to a render operation.
+ *
+ * The callback is called only of setModified() has been called since
+ * last callback.
+ *
+ * \ingroup sscUtility
+ */
+class ViewportPreRenderListener : public ViewportListenerBase
+{
+public:
+		ViewportPreRenderListener();
+		virtual ~ViewportPreRenderListener();
+		virtual void callback();
+		void setModified();
+
+protected:
+		virtual void addObservers();
+		virtual void removeObservers();
+private:
+		bool mModified;
+};
+
+typedef boost::shared_ptr<class ViewportPreRenderListener> ViewportPreRenderListenerPtr;
 
 }
 
