@@ -60,6 +60,9 @@ CameraStyleForView::CameraStyleForView() :
 	mViewportListener.reset(new ViewportListener);
 	mViewportListener->setCallback(boost::bind(&CameraStyleForView::viewportChangedSlot, this));
 
+	mPreRenderListener.reset(new ViewportPreRenderListener);
+	mPreRenderListener->setCallback(boost::bind(&CameraStyleForView::onPreRender, this));
+
 	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 	this->dominantToolChangedSlot();
 	this->viewChangedSlot();
@@ -81,6 +84,12 @@ void CameraStyleForView::viewportChangedSlot()
 	if (mBlockCameraUpdate)
 		return;
 	this->updateCamera();
+}
+
+void CameraStyleForView::onPreRender()
+{
+	if (mFollowingTool)
+		this->moveCameraToolStyleSlot(mFollowingTool->get_prMt(), mFollowingTool->getTimestamp());
 }
 
 ToolRep3DPtr CameraStyleForView::getToolRep() const
@@ -106,16 +115,36 @@ vtkCameraPtr CameraStyleForView::getCamera() const
 	return this->getRenderer()->GetActiveCamera();
 }
 
+void CameraStyleForView::setModified()
+{
+	mPreRenderListener->setModified();
+}
+
 void CameraStyleForView::updateCamera()
 {
-	if (mFollowingTool)
-		this->moveCameraToolStyleSlot(mFollowingTool->get_prMt(), mFollowingTool->getTimestamp());
+	this->setModified();
+//	if (mFollowingTool)
+//		this->moveCameraToolStyleSlot(mFollowingTool->get_prMt(), mFollowingTool->getTimestamp());
 }
+
+//void CameraStyleForView::moveCameraToolStyleSlot(Transform3D prMt, double timestamp)
+//{
+//	mPreRenderListener->setModified();
+//}
+
+//void CameraStyleForView::update()
+//{
+//	if (mFollowingTool)
+//		this->moveCameraToolStyleSlot(mFollowingTool->get_prMt(), mFollowingTool->getTimestamp());
+//}
 
 void CameraStyleForView::moveCameraToolStyleSlot(Transform3D prMt, double timestamp)
 {
 	if (mCameraStyleForView == cstDEFAULT_STYLE)
 		return;
+	if (!mFollowingTool)
+		return;
+
 
 	vtkCameraPtr camera = this->getCamera();
 	if (!camera)
@@ -207,13 +236,14 @@ void CameraStyleForView::connectTool()
 		return; //cannot set the camera to follow a tool if that tool does not have a rep
 
 	connect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
-		SLOT(moveCameraToolStyleSlot(Transform3D, double)));
+			SLOT(setModified()));
 
 	rep->setOffsetPointVisibleAtZeroOffset(true);
 	if (mCameraStyleForView == cstTOOL_STYLE)
 		rep->setStayHiddenAfterVisible(true);
 
 	mViewportListener->startListen(this->getRenderer());
+	mPreRenderListener->startListen(this->getRenderer());
 
 	this->updateCamera();
 
@@ -226,11 +256,12 @@ void CameraStyleForView::disconnectTool()
 		return;
 
 	mViewportListener->stopListen();
+	mPreRenderListener->stopListen();
 
 	if (mFollowingTool)
 	{
 		disconnect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
-			SLOT(moveCameraToolStyleSlot(Transform3D, double)));
+			SLOT(setModified()));
 
 		ToolRep3DPtr rep = this->getToolRep();
 		if (rep)
