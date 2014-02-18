@@ -97,7 +97,7 @@ private:
   void enablebuttons();
   MetricBasePtr createMetricWrapper(DataPtr data);
   std::vector<MetricBasePtr> createMetricWrappers();
-  void prePaintEvent();
+  virtual void prePaintEvent();
   std::set<QString> getSelectedUids();
   void createActions(QActionGroup* group);
   bool checkEqual(const std::vector<MetricBasePtr>& a, const std::vector<MetricBasePtr>& b) const;
