@@ -112,17 +112,16 @@ void PickerRep::setTool(ToolPtr tool)
 	if (mTool)
 	{
 		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
-				SLOT(receiveTransforms(Transform3D, double)));
+				SLOT(setModified()));
 	}
 
 	mTool = tool;
 
 	if (mTool)
 	{
-		receiveTransforms(mTool->get_prMt(), 0);
-
 		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
-				SLOT(receiveTransforms(Transform3D, double)));
+				SLOT(setModified()));
+		this->setModified();
 	}
 }
 
@@ -231,8 +230,17 @@ void PickerRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 	this->pickLandmark(clickPoint, renderer);
 }
 
-void PickerRep::receiveTransforms(Transform3D prMt, double timestamp)
+void PickerRep::onModifiedStartRender()
 {
+	this->toolHasChanged();
+}
+
+//void PickerRep::receiveTransforms(Transform3D prMt, double timestamp)
+void PickerRep::toolHasChanged()
+{
+	if (!mTool)
+		return;
+	Transform3D prMt = mTool->get_prMt();
 	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
 	Transform3D rMt = rMpr * prMt;
 	Vector3D p_r = rMt.coord(Vector3D(0, 0, mTool->getTooltipOffset()));
@@ -263,27 +271,6 @@ void PickerRep::setEnabled(bool on)
 			mGraphicalPoint->getActor()->SetVisibility(false);
 	}
 }
-
-//void PickerRep::setEnabled(bool on)
-//{
-//	if (mEnabled == on)
-//		return;
-//
-//	mEnabled = on;
-//
-//	if (mEnabled)
-//	{
-//		this->connectInteractor();
-//		if (mGraphicalPoint)
-//			mGraphicalPoint->getActor()->SetVisibility(true);
-//	}
-//	else
-//	{
-//		this->disconnectInteractor();
-//		if (mGraphicalPoint)
-//			mGraphicalPoint->getActor()->SetVisibility(false);
-//	}
-//}
 
 void PickerRep::ProcessEvents(vtkObject* vtkNotUsed(object), unsigned long event, void* clientdata,
 		void* vtkNotUsed(calldata))

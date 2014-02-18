@@ -78,8 +78,8 @@ public slots:
 	void pickLandmarkSlot(vtkObject* renderWindowInteractor); ///< When you use the renderwindowinteractor
 //	void MySlot(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data, vtkCommand* command);
 
-protected slots:
-	void receiveTransforms(Transform3D prMt, double timestamp); ///< receive transforms from the connected tool
+//protected slots:
+//	void receiveTransforms(Transform3D prMt, double timestamp); ///< receive transforms from the connected tool
 
 protected:
 	PickerRep(const QString& uid, const QString& name = ""); ///< use New instead
@@ -89,6 +89,8 @@ protected:
 	void connectInteractor();
 	void disconnectInteractor();
 	void scaleSphere();
+	virtual void onModifiedStartRender();
+	void toolHasChanged();
 	static void ProcessEvents(vtkObject* object,
 	                                    unsigned long event,
 	                                    void* clientdata,
@@ -108,9 +110,7 @@ protected:
 	Vector3D mPickedPoint; ///< the last point that was successfully sampled from intersection with an image
 	double mSphereRadius;
 	MeshPtr mGlyph;
-//	GraphicalPolyData3DPtr mGlyphRep;
 	GeometricRepPtr mGlyphRep;
-	//	vtkEventQtSlotConnectPtr mConnections; ///< used to sending signals and events between vtk and qt
 	Vector3D mClickedPoint;
 	bool mIsDragging;
 
