@@ -25,6 +25,7 @@
 
 #include "levelSet.hpp"
 #include "OpenCLManager.hpp"
+#include "HelperFunctions.hpp"
 
 namespace cx
 {
@@ -161,10 +162,19 @@ bool LevelSetFilter::execute() {
 
         return true;
     } catch(SIPL::SIPLException &e) {
+		std::string error = e.what();
+		messageManager()->sendError("SIPL::SIPLException: "+qstring_cast(error));
+
         return false;
     } catch(cl::Error &e) {
+        if(e.err() == CL_MEM_OBJECT_ALLOCATION_FAILURE) {
+            messageManager()->sendError("cl::Error: Not enough memory on the device to process this image. ("+qstring_cast(oul::getCLErrorString(e.err()))+")");
+        } else {
+            messageManager()->sendError("cl::Error: "+qstring_cast(oul::getCLErrorString(e.err())));
+        }
         return false;
     } catch(...) {
+		messageManager()->sendError("Unknown exception occured.");
         return false;
     }
 }
