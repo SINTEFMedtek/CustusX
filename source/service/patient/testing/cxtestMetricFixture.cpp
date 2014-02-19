@@ -111,8 +111,8 @@ DistanceMetricWithInput MetricFixture::getDistanceMetricWithInput(double distanc
     retval.mDistance = distance;
 
 	retval.mMetric = cx::DistanceMetric::create("testMetric%1");
-    retval.mMetric->setArgument(0, p0);
-    retval.mMetric->setArgument(1, p1);
+	retval.mMetric->getArguments()->set(0, p0);
+	retval.mMetric->getArguments()->set(1, p1);
 	cx::cxDataManager::getInstance()->loadData(retval.mMetric);
 
     return retval;
@@ -125,8 +125,8 @@ DistanceMetricWithInput MetricFixture::getDistanceMetricWithInput(double distanc
     retval.mDistance = distance;
 
 	retval.mMetric = cx::DistanceMetric::create("testMetric%1");
-	retval.mMetric->setArgument(0, this->getPointMetricWithInput(cx::Vector3D(0,0,0)).mMetric);
-	retval.mMetric->setArgument(1, this->getPointMetricWithInput(cx::Vector3D(distance,0,0)).mMetric);
+	retval.mMetric->getArguments()->set(0, this->getPointMetricWithInput(cx::Vector3D(0,0,0)).mMetric);
+	retval.mMetric->getArguments()->set(1, this->getPointMetricWithInput(cx::Vector3D(distance,0,0)).mMetric);
 	cx::cxDataManager::getInstance()->loadData(retval.mMetric);
 
     return retval;
@@ -167,11 +167,11 @@ bool MetricFixture::inputEqualsMetric(DistanceMetricWithInput data)
     INFO(qstring_cast(data.mMetric->getDistance()));
 
     INFO("p0:");
-    if (data.mMetric->getArgument(0))
-        INFO(streamXml2String(*data.mMetric->getArgument(0)));
+	if (data.mMetric->getArguments()->get(0))
+		INFO(streamXml2String(*data.mMetric->getArguments()->get(0)));
     INFO("p1:");
-    if (data.mMetric->getArgument(1))
-        INFO(streamXml2String(*data.mMetric->getArgument(1)));
+	if (data.mMetric->getArguments()->get(1))
+		INFO(streamXml2String(*data.mMetric->getArguments()->get(1)));
 
 	return (cx::similar(data.mDistance, data.mMetric->getDistance()));
 }

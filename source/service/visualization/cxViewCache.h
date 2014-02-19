@@ -59,7 +59,10 @@ public:
 //    mCached.clear();
 		if (mCached.empty())
 		{
-			QString uid = qstring_cast(mTypeText) + "-" + qstring_cast(mNameGenerator++);
+			QString uid = QString("%1-%2-%3")
+					.arg(mTypeText)
+					.arg(mNameGenerator++)
+					.arg(reinterpret_cast<long>(this));
 			VIEW_TYPE* view = new VIEW_TYPE(uid, uid, mCentralWidget);
 			view->setContextMenuPolicy(Qt::CustomContextMenu);
 			view->hide();

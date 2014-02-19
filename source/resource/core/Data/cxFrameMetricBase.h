@@ -43,6 +43,9 @@ public:
 	virtual CoordinateSystem getSpace() const; // use parentframe from Data
 	virtual DoubleBoundingBox3D boundingBox() const;
 
+	virtual QString getValueAsString() const { return ""; }
+	virtual bool showValueInGraphics() const { return false; }
+
 protected:
 	QString matrixAsSingleLineString() const;
 	CoordinateSystem mSpace;

@@ -46,35 +46,6 @@ GuideRep2D::GuideRep2D(const QString& uid, const QString& name) :
 {
 }
 
-//void GuideRep2D::setPointMetric(PointMetricPtr point)
-//{
-//	if (mMetric)
-//		disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-//	mMetric = point;
-
-//	if (mMetric)
-//		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-//	this->changedSlot();
-//}
-
-//PointMetricPtr GuideRep2D::getPointMetric()
-//{
-//	return mMetric;
-//}
-
-//void GuideRep2D::addRepActorsToViewRenderer(View* view)
-//{
-//	mView = view;
-//	this->changedSlot();
-//}
-
-//void GuideRep2D::removeRepActorsFromViewRenderer(View* view)
-//{
-//	mView->getRenderer()->RemoveActor(mCircleActor);
-//	mView = NULL;
-//}
 
 void GuideRep2D::clear()
 {
@@ -82,7 +53,7 @@ void GuideRep2D::clear()
         mView->getRenderer()->RemoveActor(mCircleActor);
 }
 
-void GuideRep2D::changedSlot()
+void GuideRep2D::onModifiedStartRender()
 {
 	if (!mMetric)
 		return;
@@ -149,23 +120,23 @@ void GuideRep2D::changedSlot()
 void GuideRep2D::setSliceProxy(SliceProxyPtr sliceProxy)
 {
 	if (mSliceProxy)
-		disconnect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(changedSlot()));
+		disconnect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(setModified()));
 	mSliceProxy = sliceProxy;
 	if (mSliceProxy)
-		connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(changedSlot()));
-	changedSlot();
+		connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(setModified()));
+	this->setModified();
 }
 
 void GuideRep2D::setOutlineWidth(double width)
 {
 	mOutlineWidth = width;
-	changedSlot();
+	this->setModified();
 }
 
 void GuideRep2D::setRequestedAccuracy(double accuracy)
 {
 	mRequestedAccuracy = accuracy;
-	changedSlot();
+	this->setModified();
 }
 
 }

@@ -49,6 +49,8 @@ private:
   QLabel* mRenderingFpsLabel; ///< Label for showing rendering FPS
   QLabel* mGrabbingInfoLabel; ///< Label for showing info about the grabber
   QLabel* mTpsLabel; ///< Label for showing TPS
+//  QLabel* mMessageLevelLabel;
+  QToolButton* mMessageLevelLabel;
 
   struct ToolData
   {

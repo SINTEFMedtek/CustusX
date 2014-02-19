@@ -25,7 +25,9 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Data/cxToolMetric
 	Data/sscCoordinateSystemListener
 	Data/cxFrameMetricBase
-	Data/cxImageParameters
+	Data/cxShapedMetric
+	Data/cxSphereMetric
+	Data/cxMetricReferenceArgumentList
 
 	Video/sscVideoSource.h
 	Video/sscVideoRecorder
@@ -64,13 +66,10 @@ cx_add_class_qt_moc(cxResource_SOURCE
     algorithms/cxThreadedTimedAlgorithm.h
     algorithms/cxCompositeTimedAlgorithm.h
 
-	utilities/sscApplication
-	utilities/sscSharedMemory
 	utilities/sscAcceptanceBoxWidget
     utilities/cxPlaybackTime.h
     utilities/cxProcessWrapper.h
 	utilities/cxProcessReporter
-	utilities/cxImageDataContainer
 	utilities/cxVLCRecorder
 	)
 
@@ -92,7 +91,9 @@ cx_add_class(cxResource_SOURCE
 	Data/sscLandmark
 	Data/sscDataReaderWriter
 	Data/sscGPUImageBuffer
-	
+	Data/cxImageDefaultTFGenerator
+	Data/cxImageParameters
+
 	Math/sscBoundingBox3D
 	Math/sscVector3D
 	Math/sscTransform3D
@@ -100,7 +101,7 @@ cx_add_class(cxResource_SOURCE
 	
 	utilities/sscXmlOptionItem
 	utilities/sscDoubleRange.h
-	utilities/cxRenderTimer
+	utilities/cxCyclicActionLogger
 	utilities/cxTransformFile
 	utilities/cxPlaybackTime
 	utilities/cxProcessWrapper
@@ -122,9 +123,11 @@ cx_add_class(cxResource_SOURCE
 	utilities/sscPositionStorageFile
 	utilities/sscTimeKeeper
 	utilities/sscMeshHelpers
-	utilities/cxOpenCLUtilities
-	utilities/cxOpenCLPrinter
-	
+	utilities/sscApplication
+	utilities/sscSharedMemory
+	utilities/cxImageDataContainer
+	utilities/cxOptionalValue
+
 	logger/sscAudio.h
 	logger/sscLogger
 		
@@ -159,7 +162,8 @@ else(WIN32)
     set( CX_RESOURCE_LIBRARIES ${CX_RESOURCE_LIBRARIES} GLU crypto ssl)
 endif(WIN32)
 
-set( CX_RESOURCE_LIBRARIES ${CX_RESOURCE_LIBRARIES}
+set( CX_RESOURCE_LIBRARIES 
+    ${CX_RESOURCE_LIBRARIES}
     vtkIO
     vtkRendering
     vtkImaging
@@ -224,25 +228,25 @@ set (CX_RESOURCE_LIBRARIES
     ${OPENGL_LIBRARIES}
     ${QT_LIBRARIES}
     ${Boost_LIBRARIES}
-    ${ITK_LIBRARIES})
+    ${ITK_LIBRARIES}
+    )
     
-if (SSC_USE_OpenCL)
-    set (CX_RESOURCE_LIBRARIES
-        ${CX_RESOURCE_LIBRARIES}
-        ${OPENCL_LIBRARIES}
-    )    
-endif ()
-
 if (CX_USE_OPENCL_UTILITY)
+    cx_add_class(cxResource_SOURCE
+    	utilities/cxOpenCLUtilities
+    	utilities/cxOpenCLPrinter
+    )
+
     set (CX_RESOURCE_LIBRARIES
         ${CX_RESOURCE_LIBRARIES}
-        ${OpenCLUtilityLibrary_LIBRARIES}
+        OpenCLUtilityLibrary
+        ${OPENCL_LIBRARIES}
     )    
 endif ()
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 
-ADD_LIBRARY (cxResource ${cxResource_SOURCE})
+add_library (cxResource ${cxResource_SOURCE})
 target_link_libraries(cxResource ${CX_RESOURCE_LIBRARIES} )
 CX_COTIRE_ADD_LIBRARY( cxResource "${CX_RESOURCE_LIBRARIES}")
 

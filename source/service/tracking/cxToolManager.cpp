@@ -1020,7 +1020,7 @@ void cxToolManager::addXml(QDomNode& parentNode)
 	QDomElement toolsNode = doc.createElement("tools");
 	ToolManager::ToolMapPtr tools = this->getTools();
 	ToolManager::ToolMap::iterator toolIt = tools->begin();
-	for (; toolIt != tools->end(); toolIt++)
+	for (; toolIt != tools->end(); ++toolIt)
 	{
 		QDomElement toolNode = doc.createElement("tool");
 		cxToolPtr tool = boost::dynamic_pointer_cast<cxTool>(toolIt->second);

@@ -51,6 +51,8 @@ public:
     virtual Vector3D getRefCoord() const = 0;
 	virtual QString getAsSingleLineString() const = 0;
 	virtual bool isValid() const { return true; }
+	virtual QString getValueAsString() const = 0;
+	virtual bool showValueInGraphics() const { return false; }
 
 	void setColor(const QColor& color);
 	QColor getColor();

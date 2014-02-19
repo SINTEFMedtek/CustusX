@@ -319,7 +319,7 @@ class IGSTK(CppComponent):
 
 class ISB_DataStreaming(CppComponent):
     def name(self):
-        self.mCurrentRevision = "483"
+        self.mCurrentRevision = "498"
         return "ISB_DataStreaming"
     def help(self):
         return 'ISB GE Digital Interface stuff'
@@ -440,12 +440,15 @@ class TubeSegmentationFramework(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/Tube-Segmentation-Framework.git')
     def update(self):
-        self._getBuilder().gitCheckout('874997f3c8c5e760924a15a6e2656cc7f0de136a', submodules=True)
+        #self._getBuilder().gitCheckout('e83582d2cae965f5a135cfa2b49c5ba68f7cb3f0', submodules=True)
+        self._getBuilder().gitUpdate('master', submodules=True)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         add('USE_C++11', False)
         add('SIPL_USE_GTK', False)
+        add('TSF_USE_EXTRNAL_OUL:BOOL', True)
+        add('TSF_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
         builder.configureCMake()
 
  # ---------------------------------------------------------
@@ -460,11 +463,13 @@ class LevelSetSegmentation(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:smistad/Level-Set-Segmentation')
     def update(self):
-        self._getBuilder().gitCheckout('4b63248b915aa7a8adf98ead801dec1149a5772b', submodules=True)
+        self._getBuilder().gitCheckout('4be1a3b3729e0b76f3e70cb99f5ee86bc15856d2', submodules=True)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         add('sipl_use_gtk', False)
+        add('LS_USE_EXTRNAL_OUL:BOOL', True)
+        add('LS_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
         builder.configureCMake()
         
 # ---------------------------------------------------------
@@ -483,6 +488,8 @@ class OpenCLUtilityLibrary(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()
+    def findPackagePath(self):
+        return self.buildPath()
         
 # ---------------------------------------------------------
 

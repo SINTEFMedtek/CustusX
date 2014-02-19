@@ -180,6 +180,9 @@ QStringList ViewWrapper::getAllDataNames() const
 	QStringList text;
 	for (unsigned i = 0; i < data.size(); ++i)
 	{
+		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data[i]);
+		if (metric) // dont show metrics here: too much spam - use separate list is necessary
+			continue;
 		QString line = data[i]->getName();
 
 		ImagePtr image = boost::dynamic_pointer_cast<Image>(data[i]);
@@ -196,5 +199,27 @@ QStringList ViewWrapper::getAllDataNames() const
 	std::reverse(text.begin(), text.end());
 	return text;
 }
+
+//std::vector<std::pair<QColor, QString> > ViewWrapper::getAllMetricTexts() const
+//{
+//	std::vector<std::pair<QColor, QString> > retval;
+
+//	if (!mGroupData)
+//		return retval;
+//	std::vector<DataPtr> data = mGroupData->getData();
+
+
+//	for (unsigned i = 0; i < data.size(); ++i)
+//	{
+//		QString line = data[i]->getName();
+
+//		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data[i]);
+//		if (!metric)
+//			continue;
+//		retval.push_back(std::make_pair(metric->getColor(), metric->getValueAsString()));
+//	}
+//	std::reverse(retval.begin(), retval.end());
+//	return retval;
+//}
 
 } //namespace cx

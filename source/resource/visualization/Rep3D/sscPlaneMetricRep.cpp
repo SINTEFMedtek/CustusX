@@ -40,21 +40,6 @@ PlaneMetricRep::PlaneMetricRep(const QString& uid, const QString& name) :
 	mViewportListener->setCallback(boost::bind(&PlaneMetricRep::rescale, this));
 }
 
-//void PlaneMetricRep::setMetric(PlaneMetricPtr point)
-//{
-//	if (mMetric)
-//		disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-//	mMetric = point;
-
-//	if (mMetric)
-//		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-//	mGraphicalPoint.reset();
-//	mNormal.reset();
-//	this->changedSlot();
-//}
-
 void PlaneMetricRep::clear()
 {
     mGraphicalPoint.reset();
@@ -69,14 +54,11 @@ void PlaneMetricRep::addRepActorsToViewRenderer(View *view)
 
 void PlaneMetricRep::removeRepActorsFromViewRenderer(View *view)
 {
-//	mView = NULL;
-//	mGraphicalPoint.reset();
-//	mNormal.reset();
 	mViewportListener->stopListen();
     DataMetricRep::removeRepActorsFromViewRenderer(view);
 }
 
-void PlaneMetricRep::changedSlot()
+void PlaneMetricRep::onModifiedStartRender()
 {
 	if (!mMetric)
 		return;
@@ -85,15 +67,15 @@ void PlaneMetricRep::changedSlot()
 	{
 		mGraphicalPoint.reset(new GraphicalPoint3D(mView->getRenderer()));
 		mNormal.reset(new GraphicalArrow3D(mView->getRenderer()));
-		mRect.reset(new Rect3D(mView->getRenderer(), this->getColorAsVector3D()));
+		mRect.reset(new Rect3D(mView->getRenderer(), mMetric->getColor()));
 		mRect->setLine(true, 1);
 	}
 
 	if (!mGraphicalPoint)
 		return;
 
-	mGraphicalPoint->setColor(this->getColorAsVector3D());
-	mNormal->setColor(this->getColorAsVector3D());
+	mGraphicalPoint->setColor(mMetric->getColor());
+	mNormal->setColor(mMetric->getColor());
 
 	this->rescale();
 }

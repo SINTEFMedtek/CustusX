@@ -57,7 +57,7 @@ void PointMetricRep::removeRepActorsFromViewRenderer(View *view)
     mViewportListener->stopListen();
 }
 
-void PointMetricRep::changedSlot()
+void PointMetricRep::onModifiedStartRender()
 {
     if (!mMetric)
 		return;
@@ -72,7 +72,7 @@ void PointMetricRep::changedSlot()
 
 	mGraphicalPoint->setValue(p0_r);
 	mGraphicalPoint->setRadius(mGraphicsSize);
-	mGraphicalPoint->setColor(this->getColorAsVector3D());
+	mGraphicalPoint->setColor(mMetric->getColor());
 
     this->drawText();
 

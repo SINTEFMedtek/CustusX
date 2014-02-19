@@ -54,6 +54,7 @@ namespace cx
 		mlCOUT,
 		mlCERR,
 		mlSUCCESS,
+		mlVOLATILE,
 		mlCOUNT
 	};
 

@@ -22,6 +22,8 @@
 
 #include "sscDataMetric.h"
 #include "sscDataReaderWriter.h"
+#include "cxMetricReferenceArgumentList.h"
+#include "cxOptionalValue.h"
 
 namespace cx
 {
@@ -71,10 +73,8 @@ public:
     virtual Vector3D getRefCoord() const;
 	virtual QString getAsSingleLineString() const;
 
-    unsigned getArgumentCount() const;
-	void setArgument(int index, DataPtr p);
-	DataPtr getArgument(int index);
-	bool validArgument(DataPtr p) const;
+	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
+
     virtual bool isValid() const;
 
     virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
@@ -85,8 +85,16 @@ public:
 		return "distanceMetric";
 	}
 
+	virtual QString getValueAsString() const;
+	virtual bool showValueInGraphics() const { return true; }
+
+private slots:
+	void resetCachedValues();
 private:
-	boost::array<DataPtr, 2> mArgument;
+	std::vector<Vector3D> getEndpointsUncached() const;
+	MetricReferenceArgumentListPtr mArguments;
+	mutable OptionalValue<std::vector<Vector3D> > mCachedEndPoints;
+
 };
 
 /**

@@ -177,8 +177,8 @@ ImagePtr convertImageToUnsigned(ImagePtr image, vtkImageDataPtr suggestedConvert
 
 	ImagePtr retval = dataManager()->createDerivedImage(convertedImageData, image->getUid()+"_u", image->getName()+" u", image, "");
 
-	ImageTF3DPtr TF3D = retval->getTransferFunctions3D()->createCopy(retval->getBaseVtkImageData());
-	ImageLUT2DPtr LUT2D = retval->getLookupTable2D()->createCopy(retval->getBaseVtkImageData());
+	ImageTF3DPtr TF3D = retval->getTransferFunctions3D()->createCopy();
+	ImageLUT2DPtr LUT2D = retval->getLookupTable2D()->createCopy();
 	TF3D->shift(shift);
 	LUT2D->shift(shift);
 	retval->setLookupTable2D(LUT2D);

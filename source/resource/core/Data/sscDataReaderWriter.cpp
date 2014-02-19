@@ -54,6 +54,8 @@
 #include "sscDistanceMetric.h"
 #include "sscPlaneMetric.h"
 #include "sscAngleMetric.h"
+#include "cxShapedMetric.h"
+#include "cxSphereMetric.h"
 #include "cxFrameMetric.h"
 #include "cxToolMetric.h"
 
@@ -219,25 +221,43 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 
 	if (ok1 && ok2)
 	{
-//		image->getTransferFunctions3D()->setLevel(level);
-//		image->getTransferFunctions3D()->setWindow(window);
-
-		// set TF 3D using the color points and alpha points based on windowlevel settings.
-		ImageTF3DPtr tf3D = image->getTransferFunctions3D();
-//		SSC_LOG("level: %f, win: %f, first: %f, second: %f", level, window, level-window/2, level+window/2);
-		tf3D->addColorPoint(level-window/2, QColor("black"));
-		tf3D->addColorPoint(level+window/2, QColor("white"));
-		tf3D->removeInitAlphaPoint();
-		tf3D->addAlphaPoint(level-0.7*window/2, 0);
-		tf3D->addAlphaPoint(level+window/2, 255);
-
-		image->getLookupTable2D()->setLevel(level);
-		image->getLookupTable2D()->setWindow(window);
+		image->setInitialWindowLevel(window, level);
+		image->resetTransferFunctions();
 	}
 
-	// add shading for known preoperative modalities
-	if (image->getModality().contains("CT") || image->getModality().contains("MR"))
-		image->setShadingOn(true);
+//	if (ok1 && ok2)
+//	{
+////		image->getTransferFunctions3D()->setLevel(level);
+////		image->getTransferFunctions3D()->setWindow(window);
+
+//		// set TF 3D using the color points and alpha points based on windowlevel settings.
+//		ImageTF3DPtr tf3D = image->getTransferFunctions3D();
+//		tf3D->setWindow(window);
+//		tf3D->setLevel(level);
+////		SSC_LOG("level: %f, win: %f, first: %f, second: %f", level, window, level-window/2, level+window/2);
+////		ColorMap colors;
+////		colors[level-window/2] = QColor("black");
+////		colors[level+window/2] = QColor("white");
+////		tf3D->resetColor(colors);
+////		tf3D->setLLR();
+
+//		IntIntMap opacity;
+//		opacity[level-0.7*window/2] = 0;
+//		opacity[level+window/2] = 255;
+//		tf3D->resetAlpha(opacity);
+//		//		tf3D->addColorPoint(level-window/2, QColor("black"));
+//		//		tf3D->addColorPoint(level+window/2, QColor("white"));
+//		//		tf3D->removeInitAlphaPoint();
+////		tf3D->addAlphaPoint(level-0.7*window/2, 0);
+////		tf3D->addAlphaPoint(level+window/2, 255);
+
+//		image->getLookupTable2D()->setLevel(level);
+//		image->getLookupTable2D()->setWindow(window);
+//	}
+
+//	// add shading for known preoperative modalities
+//	if (image->getModality().contains("CT") || image->getModality().contains("MR"))
+//		image->setShadingOn(true);
 
 	//std::cout << "ImagePtr MetaImageReader::load" << std::endl << std::endl;
 	return image;
@@ -338,8 +358,10 @@ DataReaderWriter::DataReaderWriter()
 	mDataReaders.insert(DataReaderPtr(new DistanceMetricReader()));
 	mDataReaders.insert(DataReaderPtr(new PlaneMetricReader()));
 	mDataReaders.insert(DataReaderPtr(new AngleMetricReader()));
-	mDataReaders.insert(DataReaderPtr(new cx::FrameMetricReader()));
-	mDataReaders.insert(DataReaderPtr(new cx::ToolMetricReader()));
+	mDataReaders.insert(DataReaderPtr(new FrameMetricReader()));
+	mDataReaders.insert(DataReaderPtr(new ToolMetricReader()));
+	mDataReaders.insert(DataReaderPtr(new DonutMetricReader()));
+	mDataReaders.insert(DataReaderPtr(new SphereMetricReader()));
 }
 
 DataReaderPtr DataReaderWriter::findReader(const QString& path, const QString& type)

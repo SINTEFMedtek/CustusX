@@ -36,6 +36,11 @@ DataPtr AngleMetricReader::load(const QString& uid, const QString& filename)
 AngleMetric::AngleMetric(const QString& uid, const QString& name) :
 				DataMetric(uid, name)
 {
+	mUseSimpleVisualization = false;
+	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "point 0" << "point 1" << "point 2" << "point 3"));
+	mArguments->setValidArgumentTypes(QStringList() << "pointMetric");
+	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SLOT(resetCachedValues()));
+	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 }
 
 AngleMetricPtr AngleMetric::create(QString uid, QString name)
@@ -54,52 +59,25 @@ AngleMetric::~AngleMetric()
 {
 }
 
-void AngleMetric::setArgument(int index, DataPtr p)
-{
-	if (mArgument[index] == p)
-		return;
-
-	if (mArgument[index])
-		disconnect(mArgument[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
-
-	mArgument[index] = p;
-
-	if (mArgument[index])
-		connect(mArgument[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
-
-	emit transformChanged();
-}
-
-DataPtr AngleMetric::getArgument(int index)
-{
-	return mArgument[index];
-}
-
-bool AngleMetric::validArgument(DataPtr p) const
-{
-	return p->getType() == "pointMetric"; // || p->getType()=="planeMetric";
-}
-
 void AngleMetric::addXml(QDomNode& dataNode)
 {
 	DataMetric::addXml(dataNode);
-
-	for (unsigned i = 0; i < mArgument.size(); ++i)
-	{
-		if (mArgument[i])
-			dataNode.toElement().setAttribute(QString("p%1").arg(i), mArgument[i]->getUid());
-	}
+	mArguments->addXml(dataNode);
+	dataNode.toElement().setAttribute("useSimpleVisualization", QString::number(mUseSimpleVisualization));
 }
 
 void AngleMetric::parseXml(QDomNode& dataNode)
 {
 	DataMetric::parseXml(dataNode);
+	mArguments->parseXml(dataNode);
 
-	for (unsigned i = 0; i < mArgument.size(); ++i)
-	{
-		QString uid = dataNode.toElement().attribute(QString("p%1").arg(i), "");
-		this->setArgument(i, dataManager()->getData(uid));
-	}
+	mUseSimpleVisualization = dataNode.toElement().attribute("useSimpleVisualization", QString::number(mUseSimpleVisualization)).toInt();
+	this->resetCachedValues();
+}
+
+void AngleMetric::resetCachedValues()
+{
+	mCachedEndPoints.reset();
 }
 
 bool AngleMetric::isValid() const
@@ -107,21 +85,13 @@ bool AngleMetric::isValid() const
 	return !this->getEndpoints().empty();
 }
 
-unsigned AngleMetric::getArgumentCount() const
-{
-	return (unsigned)mArgument.size();
-}
-
 std::vector<Vector3D> AngleMetric::getEndpoints() const
 {
-	std::vector<Vector3D> p(this->getArgumentCount());
-	for (unsigned i = 0; i < p.size(); ++i)
+	if (!mCachedEndPoints.isValid())
 	{
-		if (!mArgument[i])
-			return std::vector<Vector3D>();
-		p[i] = boost::dynamic_pointer_cast<PointMetric>(mArgument[i])->getRefCoord();
+		mCachedEndPoints.set(mArguments->getRefCoords());
 	}
-	return p;
+	return mCachedEndPoints.get();
 }
 
 Vector3D AngleMetric::getRefCoord() const
@@ -143,6 +113,11 @@ double AngleMetric::getAngle() const
 	return angle;
 }
 
+QString AngleMetric::getValueAsString() const
+{
+	return QString("%1*").arg(this->getAngle() / M_PI * 180, 0, 'f', 1);
+}
+
 DoubleBoundingBox3D AngleMetric::boundingBox() const
 {
 	return DoubleBoundingBox3D::fromCloud(this->getEndpoints());
@@ -154,5 +129,17 @@ QString AngleMetric::getAsSingleLineString() const
 			.arg(this->getSingleLineHeader())
 			.arg(qstring_cast(this->getAngle()));
 }
+
+bool AngleMetric::getUseSimpleVisualization() const
+{
+	return mUseSimpleVisualization;
+}
+
+void AngleMetric::setUseSimpleVisualization(bool val)
+{
+	mUseSimpleVisualization = val;
+	emit propertiesChanged();
+}
+
 
 }

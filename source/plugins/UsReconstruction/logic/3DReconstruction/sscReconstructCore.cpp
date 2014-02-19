@@ -22,9 +22,9 @@
 #include <vtkImageData.h>
 #include "sscDataManager.h"
 #include "sscToolManager.h"
-#ifdef SSC_USE_OpenCL
+#ifdef CX_USE_OPENCL_UTILITY
 	#include "TordReconstruct/TordTest.h"
-#endif // SSC_USE_OpenCL
+#endif // CX_USE_OPENCL_UTILITY
 #include "sscPNNReconstructAlgorithm.h"
 #include "sscTime.h"
 #include "sscTypeConversions.h"
@@ -38,7 +38,8 @@
 namespace cx
 {
 
-ReconstructCore::ReconstructCore()
+ReconstructCore::ReconstructCore() :
+	mInput(InputParams())
 {
 //	mMaxTimeDiff = 100; // TODO: Change default value for max allowed time difference between tracking and image time tags
 	mSuccess = false;
@@ -71,12 +72,12 @@ ReconstructAlgorithmPtr ReconstructCore::createAlgorithm(QString name)
 
 	if (name == "PNN")
 		retval = ReconstructAlgorithmPtr(new PNNReconstructAlgorithm());
-#ifdef SSC_USE_OpenCL
+#ifdef CX_USE_OPENCL_UTILITY
 	else if (name == "TordTest")
 	{
 		retval = ReconstructAlgorithmPtr(new TordTest());
 	}
-#endif // SSC_USE_OpenCL
+#endif // CX_USE_OPENCL_UTILITY
 	else
 		retval.reset();
 

@@ -147,7 +147,7 @@ void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
 	{
 		rep->setPrimarySource(mImageLandmarkSource);
 		rep->setSecondarySource(PatientLandmarksSource::New());
-		rep->setSecondaryColor(Vector3D(0, 0.6, 0.8));
+		rep->setSecondaryColor(QColor::fromRgbF(0, 0.6, 0.8));
 	}
 }
 

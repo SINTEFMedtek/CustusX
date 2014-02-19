@@ -34,7 +34,7 @@ vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt)
     Vector3D p = rMt.coord(point_t);
     points->InsertNextPoint(p.begin());
 
-    mapIter++;
+		++mapIter;
   }
 
   lines->Initialize();

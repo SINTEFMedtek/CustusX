@@ -89,8 +89,8 @@ void UnsignedDerivedImage::unsignedTransferFunctionsChangedSlot()
 
     int shift = this->findShift();
 
-	ImageTF3DPtr TF3D = base->getTransferFunctions3D()->createCopy(base->getBaseVtkImageData());
-	ImageLUT2DPtr LUT2D = base->getLookupTable2D()->createCopy(base->getBaseVtkImageData());
+	ImageTF3DPtr TF3D = base->getTransferFunctions3D()->createCopy();
+	ImageLUT2DPtr LUT2D = base->getLookupTable2D()->createCopy();
 	TF3D->shift(shift);
 	LUT2D->shift(shift);
 	this->setLookupTable2D(LUT2D);

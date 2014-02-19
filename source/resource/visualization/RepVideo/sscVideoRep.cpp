@@ -49,18 +49,18 @@ VideoFixedPlaneRep::VideoFixedPlaneRep(const QString& uid, const QString& name) 
 	mRTGraphics->setShowInToolSpace(false);
 	mRTGraphics->setClipToSector(false);
 
-	mInfoText.reset(new TextDisplay("", Vector3D(1.0, 0.8, 0.0), 16));
+	mInfoText.reset(new TextDisplay("", QColor::fromRgbF(1.0, 0.8, 0.0), 16));
 	mInfoText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
 	mInfoText->setCentered();
 	mInfoText->setPosition(0.5, 0.05);
 
-	mStatusText.reset(new TextDisplay("", Vector3D(1.0, 0.8, 0.0), 20));
+	mStatusText.reset(new TextDisplay("", QColor::fromRgbF(1.0, 0.8, 0.0), 20));
 	mStatusText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
 	mStatusText->setCentered();
 	mStatusText->setPosition(0.5, 0.5);
 	mStatusText->updateText("Not Connected");
 
-	mOrientationVText.reset(new TextDisplay("V", Vector3D(1.0, 0.9, 0.0), 30));
+	mOrientationVText.reset(new TextDisplay("V", QColor::fromRgbF(1.0, 0.9, 0.0), 30));
 	mOrientationVText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
 	mOrientationVText->setCentered();
 	mOrientationVText->setPosition(0.05, 0.95);

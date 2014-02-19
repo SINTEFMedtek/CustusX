@@ -24,40 +24,39 @@
 #include "sscView.h"
 #include "sscDataMetric.h"
 #include "sscLogger.h"
+#include "sscVtkHelperClasses.h"
 
 namespace cx
 {
 
 DataMetricRep::DataMetricRep(const QString& uid, const QString& name) :
-				RepImpl(uid, name),
-				mGraphicsSize(1),
-				mShowLabel(false),
-				mLabelSize(2.5),
-//                mColor(Vector3D(1, 0, 0)),
-                mView(NULL)
+	RepImpl(uid, name),
+	mGraphicsSize(1),
+	mShowLabel(false),
+	mLabelSize(2.5),
+	mShowAnnotation(true)
+//	mView(NULL)
 {
-//  mViewportListener.reset(new ViewportListener);
-//  mViewportListener->setCallback(boost::bind(&DataMetricRep::rescale, this));
 }
 
 void DataMetricRep::setDataMetric(DataMetricPtr value)
 {
     if (mMetric)
 	{
-        disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-		disconnect(mMetric.get(), SIGNAL(propertiesChanged()), this, SLOT(changedSlot()));
+		disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
+		disconnect(mMetric.get(), SIGNAL(propertiesChanged()), this, SLOT(setModified()));
 	}
 
     mMetric = value;
 
     if (mMetric)
 	{
-		connect(mMetric.get(), SIGNAL(propertiesChanged()), this, SLOT(changedSlot()));
-		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
+		connect(mMetric.get(), SIGNAL(propertiesChanged()), this, SLOT(setModified()));
+		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
 	}
 
     this->clear();
-    this->changedSlot();
+	this->setModified();
 }
 
 DataMetricPtr DataMetricRep::getDataMetric()
@@ -68,26 +67,26 @@ DataMetricPtr DataMetricRep::getDataMetric()
 void DataMetricRep::setShowLabel(bool on)
 {
 	mShowLabel = on;
-	this->changedSlot();
+	this->setModified();
 }
 
 void DataMetricRep::setGraphicsSize(double size)
 {
 	mGraphicsSize = size;
-	this->changedSlot();
+	this->setModified();
 }
 
 void DataMetricRep::setLabelSize(double size)
 {
 	mLabelSize = size;
-	this->changedSlot();
+	this->setModified();
 }
 
-//void DataMetricRep::setColor(double red, double green, double blue)
-//{
-//	mColor = Vector3D(red, green, blue);
-//	this->changedSlot();
-//}
+void DataMetricRep::setShowAnnotation(bool on)
+{
+	mShowAnnotation = on;
+	this->setModified();
+}
 
 void DataMetricRep::clear()
 {
@@ -96,20 +95,27 @@ void DataMetricRep::clear()
 
 void DataMetricRep::addRepActorsToViewRenderer(View *view)
 {
-    mView = view;
+//    mView = view;
+
+//	vtkRendererPtr renderer = mView->getRenderer();
+//	renderer->AddObserver(vtkCommand::StartEvent, this->mCallbackCommand, 1.0);
+
     this->clear();
-    this->changedSlot();
+	this->setModified();
 }
 
 void DataMetricRep::removeRepActorsFromViewRenderer(View *view)
 {
-    mView = NULL;
+//	vtkRendererPtr renderer = mView->getRenderer();
+//	renderer->RemoveObserver(this->mCallbackCommand);
+
+//    mView = NULL;
     this->clear();
 }
 
 void DataMetricRep::drawText()
 {
-    if (!mView)
+	if (!this->getView())
         return;
 
     QString text = this->getText();
@@ -120,8 +126,11 @@ void DataMetricRep::drawText()
         return;
     }
 
-    mText.reset(new CaptionText3D(mView->getRenderer()));
-	mText->setColor(this->getColorAsVector3D());
+	if (!mText)
+	{
+		mText.reset(new CaptionText3D(this->getRenderer()));
+	}
+	mText->setColor(mMetric->getColor());
     mText->setText(text);
     mText->setPosition(mMetric->getRefCoord());
     mText->setSize(mLabelSize / 100);
@@ -129,19 +138,24 @@ void DataMetricRep::drawText()
 
 QString DataMetricRep::getText()
 {
-    if (mShowLabel)
-        return mMetric->getName();
-    return "";
+	if (!mShowAnnotation)
+		return "";
+	QStringList text;
+	if (mShowLabel)
+		text << mMetric->getName();
+	if (mMetric->showValueInGraphics())
+		text << mMetric->getValueAsString();
+	return text.join(" = ");
 }
 
 Vector3D DataMetricRep::getColorAsVector3D() const
 {
 	if (!mMetric)
 		return Vector3D(1,1,1);
-
-	QColor color = mMetric->getColor();
-	Vector3D retval(color.redF(), color.greenF(), color.blueF());
-	return retval;
+//	QColor color = mMetric->getColor();
+//	Vector3D retval(color.redF(), color.greenF(), color.blueF());
+//	return retval;
+	return cx::getColorAsVector3D(mMetric->getColor());
 }
 
 }

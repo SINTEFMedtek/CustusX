@@ -47,14 +47,10 @@ void TransferFunctions3DPresets::save(QString name, ImagePtr image, bool _2D, bo
 		this->save3D(name, image);
 }
 
-
 void TransferFunctions3DPresets::save2D(QString name, ImagePtr image)
 {
 	XmlOptionFile file = this->getCustomFile();
 	file = file.descend("Preset", "name", name);
-
-	//TODO
-//	XmlOptionFile file = Presets::saveCustom(name);
 
 	QDomNode tf2DNode = file.getElement("lookuptable2D");
 	while (tf2DNode.hasChildNodes())
@@ -100,12 +96,6 @@ void TransferFunctions3DPresets::save3D(QString name, ImagePtr image)
 		transferFunctions->unsignedCT(false);
 	}
 
-	//generate xml
-//	QDomElement transferfunctionElement = QDomDocument().createElement("transferfunctions");
-//	QDomElement shadingElement = QDomDocument().createElement("shading");
-//	transferFunctions->addXml(transferfunctionElement);
-//	image->getShading().addXml(shadingElement);
-
 	transferFunctions->addXml(file.getElement("transferfunctions"));
 	image->getShading().addXml(file.getElement("shading"));
 
@@ -117,14 +107,6 @@ void TransferFunctions3DPresets::save3D(QString name, ImagePtr image)
 
 	file.getElement().setAttribute("modality", image->getModality());
 	file.save();
-
-//	//save it
-//	std::vector<QDomElement> children;
-//	children.push_back(transferfunctionElement);
-//	children.push_back(shadingElement);
-//	std::map<QString, QString> attributes;
-//	attributes["modality"] = image->getModality();
-//	XmlOptionFile file = Presets::saveCustom(name, attributes, children);
 }
 
 void TransferFunctions3DPresets::load(QString name, ImagePtr image, bool _2D, bool _3D)
@@ -134,42 +116,6 @@ void TransferFunctions3DPresets::load(QString name, ImagePtr image, bool _2D, bo
 	if (_3D)
 		this->load3D(name, image);
 }
-
-//void PresetTransferFunctions3D::load(QString name, ImagePtr image, bool _2D, bool _3D)
-//{
-//	if (_2D)
-//
-//
-//	//Make sure transfer functions are reset in case something is missing from the preset
-//	image->resetTransferFunctions();
-//
-//  if(name == "Transfer function preset...")
-//  	return;
-//
-//	ImageTF3DPtr transferFunctions = image->getTransferFunctions3D();
-//	ImageLUT2DPtr LUT2D = image->getLookupTable2D();
-//	XmlOptionFile node = this->getPresetNode(name);
-//
-//	transferFunctions->parseXml(node.getElement().namedItem("transferfunctions"));
-//	LUT2D->parseXml(node.getElement().namedItem("lookuptable2D"));
-//
-//	Image::ShadingStruct shading = image->getShading();
-//	shading.parseXml(node.getElement().namedItem("shading"));
-//	image->setShading(shading);
-//
-//	// Transfer functions for CT data are signed, so these have to be converted if they are to be used for unsigned CT
-//	if ((0 <= image->getMin()) && ("CT" == image->getModality()))
-//	{
-//		transferFunctions->unsignedCT(true);
-//		LUT2D->unsignedCT(true);
-//	}
-//
-//	//Make sure the preset transfer functions work correctly
-//	transferFunctions->fixTransferFunctions();
-//	LUT2D->fixTransferFunctions();
-//
-////	emit changed();
-//}
 
 void TransferFunctions3DPresets::load2D(QString name, ImagePtr image)
 {
@@ -186,9 +132,6 @@ void TransferFunctions3DPresets::load2D(QString name, ImagePtr image)
 	{
 		LUT2D->unsignedCT(true);
 	}
-
-	//Make sure the preset transfer functions work correctly
-	LUT2D->fixTransferFunctions();
 }
 
 void TransferFunctions3DPresets::load3D(QString name, ImagePtr image)
@@ -210,30 +153,11 @@ void TransferFunctions3DPresets::load3D(QString name, ImagePtr image)
 	{
 		transferFunctions->unsignedCT(true);
 	}
-
-	//Make sure the preset transfer functions work correctly
-	transferFunctions->fixTransferFunctions();
 }
-
-///** look for a preset with the given name. Create one if not found.
-// *
-// */
-//XmlOptionFile TransferFunctions3DPresets::getPresetNode(const QString& presetName)
-//{
-//	XmlOptionFile retval = mPresetFile;
-//	retval = retval.tryDescend("Preset", "name", presetName);
-//	if (!retval.getDocument().isNull())
-//		return retval;
-//
-//	retval = this->getCustomFile();
-//	retval = retval.descend("Preset", "name", presetName);
-//	return retval;
-//}
 
 QStringList TransferFunctions3DPresets::generatePresetList(QString modality)
 {
 	QStringList presetList;
-//	presetList.append("Transfer function preset...");
 
 	QDomNodeList presetNodeList = mPresetFile.getElement().elementsByTagName("Preset");
 	for (int i = 0; i < presetNodeList.count(); ++i)
@@ -261,14 +185,6 @@ QStringList TransferFunctions3DPresets::generatePresetList(QString modality)
 
 	return presetList;
 }
-
-//bool TransferFunctions3DPresets::isDefaultPreset(QString presetName)
-//{
-//	XmlOptionFile testval = mPresetFile.tryDescend("Preset", "name", presetName);
-//	if (!testval.getDocument().isNull())
-//		return true;
-//	return false;
-//}
 
 void TransferFunctions3DPresets::deletePresetData(QString name, bool _2D, bool _3D)
 {

@@ -58,23 +58,11 @@ public:
 	void load2D(QString name, ImagePtr image);
 	void load3D(QString name, ImagePtr image);
 
-//	QStringList getPresetList(QString modality=""); ///< returns a list of the preset names for the given modality
-//	bool isDefaultPreset(QString presetName); ///< Check is the preset is one of the "system presets"
 	void deletePresetData(QString name, bool _2D=true, bool _3D=true); ///< Delete the preset data node
-//
-//signals:
-//	void changed();
 protected:
 	QStringList generatePresetList(QString modality); ///< internally generate the preset list
 
 private:
-//	XmlOptionFile getPresetNode(const QString& presetName);
-//	XmlOptionFile getCustomFile();
-
-//	XmlOptionFile mPresetFile;
-//	XmlOptionFile mCustomFile;
-
-	//QDomElement mLastReturnedPreset; //NOT USED?
 };
 
 }//namespace cx

@@ -53,8 +53,8 @@ void TransferFunction2DOpacityWidget::activeImageChangedSlot()
 
   mTransferFunctionAlphaWidget->setData(image, tf);
 
-  mDataAlpha->setImageTFData(tf);
-  mDataLLR->setImageTFData(tf);
+  mDataAlpha->setImageTFData(tf, image);
+  mDataLLR->setImageTFData(tf, image);
 }
 
 

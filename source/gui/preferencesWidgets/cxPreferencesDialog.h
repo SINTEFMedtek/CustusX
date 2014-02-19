@@ -57,6 +57,7 @@ protected:
   DoubleDataAdapterXmlPtr mLabelSize;
   BoolDataAdapterXmlPtr mShowDataText;
   BoolDataAdapterXmlPtr mShowLabels;
+  BoolDataAdapterXmlPtr mShowMetricNamesInCorner;
   StringDataAdapterXmlPtr mAnnotationModel;
   DoubleDataAdapterXmlPtr mAnnotationModelSize;
   DoubleDataAdapterXmlPtr mAnyplaneViewOffset;
@@ -240,10 +241,12 @@ public:
 
 public slots:
   void saveParametersSlot();
+  void runDebugToolSlot();
 
 protected:
   QCheckBox* mIGSTKDebugLoggingCheckBox;
   QCheckBox* mManualToolPhysicalPropertiesCheckBox;
+  QCheckBox* mRenderSpeedLoggingCheckBox;
   QGridLayout *mMainLayout;
 };
 

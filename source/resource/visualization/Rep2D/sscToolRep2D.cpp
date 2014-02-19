@@ -88,7 +88,7 @@ void ToolRep2D::setViewportData(const Transform3D& vpMs, const DoubleBoundingBox
 	mBB_vp = vp;
 
 	crossHairResized();
-	update();
+	this->setModified();
 }
 
 /**Set a slice proxy representing the plane on which to render.
@@ -158,7 +158,7 @@ void ToolRep2D::addRepActorsToViewRenderer(View *view)
 	createOffsetText(view->getRenderer(), Vector3D(0,0,0));
 	view->getRenderer()->AddActor(mProbeSectorActor);
 	setVisibility();
-	update();
+	this->setModified();
 }
 
 void ToolRep2D::removeRepActorsFromViewRenderer(View *view)
@@ -174,18 +174,23 @@ void ToolRep2D::removeRepActorsFromViewRenderer(View *view)
 
 void ToolRep2D::sliceTransformChangedSlot(Transform3D sMr)
 {
-	update();
+	this->setModified();
 }
 
 void ToolRep2D::toolTransformAndTimestampSlot(Transform3D prMt, double timestamp)
 {
-	update();
+	this->setModified();
 }
 
 void ToolRep2D::toolVisibleSlot(bool visible)
 {
 	setVisibility();
-	update();
+	this->setModified();
+}
+
+void ToolRep2D::onModifiedStartRender()
+{
+	this->update();
 }
 
 void ToolRep2D::update()
@@ -321,7 +326,7 @@ void ToolRep2D::createToolLine(vtkRendererPtr renderer, const Vector3D& centerPo
  */
 void ToolRep2D::createOffsetText(vtkRendererPtr renderer, const Vector3D& pos )
 {
-	Vector3D color(0.7372, 0.815, 0.6039);
+	QColor color = QColor::fromRgbF(0.7372, 0.815, 0.6039);
 	distanceText.reset( new TextDisplay( "---", color, 18) );
 	distanceText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
 	distanceText->textProperty()->SetJustificationToRight();

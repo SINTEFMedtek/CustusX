@@ -20,11 +20,13 @@
 #include "cxToolConfigureWidget.h"
 #include "cxToolFilterWidget.h"
 #include "cxColorSelectButton.h"
-#include "cxLayoutEditorTab.h"
 #include "cxViewWrapper3D.h"
 #include "sscHelperWidgets.h"
 #include "cxApplicationStateMachine.h"
 #include "cxMultiVolume3DRepProducer.h"
+
+#include "sscDataManager.h"
+#include "sscDummyTool.h"
 
 namespace cx
 {
@@ -58,6 +60,12 @@ void VisualizationTab::init()
   mShowLabels = BoolDataAdapterXml::initialize("Show Labels", "",
                                                  "Attach name labels to entities in the views.",
                                                  showLabels);
+
+  bool showMetricNamesInCorner = settings()->value("View/showMetricNamesInCorner").value<bool>();
+  mShowMetricNamesInCorner = BoolDataAdapterXml::initialize("Corner Metrics", "",
+												 "Show the metric data in the upper right corner of the view instead of in the scene.",
+												 showMetricNamesInCorner);
+
 
   double annotationModelSize = settings()->value("View3D/annotationModelSize").toDouble();
   mAnnotationModelSize = DoubleDataAdapterXml::initialize("AnnotationModelSize", "Annotation Model Size", "Size (0..1) of the annotation model in the 3D scene.", annotationModelSize, DoubleRange(0.01,1,0.01), 2, QDomNode());
@@ -107,6 +115,7 @@ void VisualizationTab::init()
   mMainLayout->addWidget(new SpinBoxGroupWidget(this, mSphereRadius));
   mMainLayout->addWidget(sscCreateDataWidget(this, mShowDataText));
   mMainLayout->addWidget(sscCreateDataWidget(this, mShowLabels));
+  mMainLayout->addWidget(sscCreateDataWidget(this, mShowMetricNamesInCorner));
   mMainLayout->addWidget(new SpinBoxGroupWidget(this, mLabelSize));
   mMainLayout->addWidget(new SpinBoxGroupWidget(this, mAnnotationModelSize));
   mMainLayout->addWidget(sscCreateDataWidget(this, mAnnotationModel));
@@ -188,6 +197,7 @@ void VisualizationTab::saveParametersSlot()
   settings()->setValue("View3D/sphereRadius", mSphereRadius->getValue());
   settings()->setValue("View/showDataText", mShowDataText->getValue());
   settings()->setValue("View/showLabels", mShowLabels->getValue());
+  settings()->setValue("View/showMetricNamesInCorner", mShowMetricNamesInCorner->getValue());
   settings()->setValue("View3D/labelSize", mLabelSize->getValue());
   settings()->setValue("View3D/annotationModelSize", mAnnotationModelSize->getValue());
   settings()->setValue("View3D/annotationModel", mAnnotationModel->getValue());
@@ -449,7 +459,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
   this->addTab(new VisualizationTab, tr("Visualization"));
   this->addTab(new VideoTab, tr("Video"));
   this->addTab(new ToolConfigTab, tr("Tool Configuration"));
-  this->addTab(new LayoutEditorTab, tr("Layout editor"));
   this->addTab(new DebugTab, tr("Debug"));
 
   QPushButton* applyButton = mButtonBox->button(QDialogButtonBox::Apply);
@@ -538,19 +547,46 @@ void DebugTab::init()
 	mManualToolPhysicalPropertiesCheckBox->setChecked(settings()->value("giveManualToolPhysicalProperties", true).toBool());
 	mManualToolPhysicalPropertiesCheckBox->setToolTip("give manual tool the properties of the first physical tool. \nUse to simulate f.ex. probes with manual tool. (need restart)");
 
+	QPushButton* runDebugToolButton = new QPushButton("Run Debug Tool", this);
+	runDebugToolButton->setToolTip("Start a dummy tool that runs in a deterministic pattern inside the bounding box of the first found volume.");
+	connect(runDebugToolButton, SIGNAL(clicked()), this, SLOT(runDebugToolSlot()));
+
+	mRenderSpeedLoggingCheckBox = new QCheckBox("Render Speed Logging");
+	mRenderSpeedLoggingCheckBox->setChecked(settings()->value("renderSpeedLogging", true).toBool());
+	mRenderSpeedLoggingCheckBox->setToolTip("Dump render speed statistics to the console");
+
 	//Layout
 	mMainLayout = new QGridLayout;
 	int i=0;
 	mMainLayout->addWidget(mIGSTKDebugLoggingCheckBox, i++, 0);
 	mMainLayout->addWidget(mManualToolPhysicalPropertiesCheckBox, i++, 0);
+	mMainLayout->addWidget(runDebugToolButton, i++, 0);
+	mMainLayout->addWidget(mRenderSpeedLoggingCheckBox, i++, 0);
 
 	mTopLayout->addLayout(mMainLayout);
+}
+
+void DebugTab::runDebugToolSlot()
+{
+	if (!dataManager()->getImages().size())
+		return;
+
+	cx::ImagePtr image = dataManager()->getImages().begin()->second;
+	cx::DoubleBoundingBox3D bb_r = transform(image->get_rMd(), image->boundingBox());
+
+	dataManager()->setCenter(bb_r.center());
+
+	cx::DummyToolPtr dummyTool(new cx::DummyTool(cx::cxToolManager::getInstance()));
+	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
+	messageManager()->sendInfo(QString("Running debug tool inside box %1").arg(qstring_cast(bb_r)));
+	cx::cxToolManager::getInstance()->runDummyTool(dummyTool);
 }
 
 void DebugTab::saveParametersSlot()
 {
 	settings()->setValue("IGSTKDebugLogging", mIGSTKDebugLoggingCheckBox->isChecked());
 	settings()->setValue("giveManualToolPhysicalProperties", mManualToolPhysicalPropertiesCheckBox->isChecked());
+	settings()->setValue("renderSpeedLogging", mRenderSpeedLoggingCheckBox->isChecked());
 }
 
 }//namespace cx

@@ -50,9 +50,7 @@ protected:
 	virtual void clear();
 	void addRepActorsToViewRenderer(View *view);
 	void removeRepActorsFromViewRenderer(View *view);
-
-protected slots:
-	virtual void changedSlot();
+	virtual void onModifiedStartRender();
 
 private:
 	ToolMetricRep(const QString& uid, const QString& name = "");

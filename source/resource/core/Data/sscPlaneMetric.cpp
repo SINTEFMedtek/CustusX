@@ -111,13 +111,6 @@ void PlaneMetric::setSpace(CoordinateSystem space)
 	mSpace = space;
 
 	mSpaceListener->setSpace(space);
-//	//TODO connect to the owner of space - data or tool or whatever
-//	if (mSpace.mId == csTOOL)
-//	{
-//		connect(toolManager()->getTool(mSpace.mRefObject).get(),
-//						SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this,
-//						SIGNAL(transformChanged()));
-//	}
 
 	emit transformChanged();
 }

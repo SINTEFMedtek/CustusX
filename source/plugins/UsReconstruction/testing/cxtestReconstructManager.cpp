@@ -23,12 +23,13 @@
 #include "sscPNNReconstructAlgorithm.h"
 #include "sscReconstructPreprocessor.h"
 #include <vtkImageData.h>
-
+#include "sscStringDataAdapterXml.h"
 #include "recConfig.h"
-#ifdef SSC_USE_OpenCL
-	#include "TordReconstruct/TordTest.h"
-  #include "TordReconstruct/cxSimpleSyntheticVolume.h"
-#endif // SSC_USE_OpenCL
+
+#ifdef CX_USE_OPENCL_UTILITY
+#include "TordReconstruct/TordTest.h"
+#include "TordReconstruct/cxSimpleSyntheticVolume.h"
+#endif // CX_USE_OPENCL_UTILITY
 
 namespace cxtest
 {
@@ -159,7 +160,7 @@ TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruc
 
 }
 
-TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[unit][usreconstruction][synthetic]")
+TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integration][usreconstruction][synthetic]")
 {
 	ReconstructManagerTestFixture fixture;
 	fixture.setVerbose(true);
@@ -172,7 +173,7 @@ TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[unit]
 	//Adding 2 sections creates 3 runs: 1 with the simple case clip rect == extent, the other 2 with extent+1 and +500
 	SECTION("Set clip rect just to large")
 		probeDefinition.setClipRect_p(cx::DoubleBoundingBox3D(0, extent[0]+1, 0, extent[1]+1, 0, 0));
-	SECTION("Set clop rect very large")
+    SECTION("Set clip rect very large")
 		probeDefinition.setClipRect_p(cx::DoubleBoundingBox3D(0, extent[0]+500, 0, extent[1]+500, 0, 0));
 
 	generator->defineProbe(probeDefinition);
@@ -189,7 +190,7 @@ TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[unit]
 	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
 	REQUIRE(preprocessor);
 	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
-	REQUIRE(cores.size() > 0);
+	REQUIRE(!cores.empty());
 	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(cores);
 
 	REQUIRE(processedInput.size() == cores.size());
@@ -202,7 +203,7 @@ TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[unit]
 	}
 }
 
-#ifdef SSC_USE_OpenCL
+#ifdef CX_USE_OPENCL_UTILITY
 TEST_CASE("ReconstructManager: TordTest on real data", "[usreconstruction][integration][tordtest][not_apple][unstable]")
 {
 	ReconstructManagerTestFixture fixture;
@@ -262,7 +263,7 @@ TEST_CASE("ReconstructManager: TordTest on real data", "[usreconstruction][integ
 	REQUIRE(fixture.getOutput().size()==1);
 	realData.validateBModeData(fixture.getOutput()[0]);
 }
-#endif // SSC_USE_OpenCL
+#endif // CX_USE_OPENCL_UTILITY
 
 
 } // namespace cxtest

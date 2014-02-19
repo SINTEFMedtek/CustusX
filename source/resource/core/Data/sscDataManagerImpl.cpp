@@ -541,7 +541,7 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 
 	// conversion for change in format 2013-10-29
 	QString newPath = rootPath+"/"+data->getFilename();
-	if (path != newPath)
+	if (QDir::cleanPath(path) != QDir::cleanPath(newPath))
 	{
 		messageManager()->sendWarning(QString("Detected old data format, converting from %1 to %2").arg(path).arg(newPath));
 		this->saveData(data, rootPath);
@@ -613,17 +613,17 @@ ImagePtr DataManagerImpl::createDerivedImage(vtkImageDataPtr data, QString uid, 
 	ImagePtr retval = this->createImage(data, uid, name, filePath);
 	retval->get_rMd_History()->setRegistration(parentImage->get_rMd());
 	retval->get_rMd_History()->setParentSpace(parentImage->getUid());
-	ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy(retval->getBaseVtkImageData());
-	ImageLUT2DPtr LUT2D = parentImage->getLookupTable2D()->createCopy(retval->getBaseVtkImageData());
+	ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy();
+	ImageLUT2DPtr LUT2D = parentImage->getLookupTable2D()->createCopy();
 	//The parent may have a different range of voxel values. Make sure the transfer functions are working
-	if (transferFunctions)
-		transferFunctions->fixTransferFunctions();
-	else
-		std::cout << "transferFunctions error" << std::endl;
-	if (LUT2D)
-		LUT2D->fixTransferFunctions();
-	else
-		std::cout << "LUT2D error" << std::endl;
+//	if (transferFunctions)
+//		transferFunctions->fixTransferFunctions();
+//	else
+//		std::cout << "transferFunctions error" << std::endl;
+//	if (LUT2D)
+//		LUT2D->fixTransferFunctions();
+//	else
+//		std::cout << "LUT2D error" << std::endl;
 	retval->setLookupTable2D(LUT2D);
 	retval->setTransferFunctions3D(transferFunctions);
 	retval->setModality(parentImage->getModality());
@@ -693,6 +693,8 @@ void DataManagerImpl::removeData(const QString& uid, QString basePath)
 
 void DataManagerImpl::deleteFiles(DataPtr data, QString basePath)
 {
+	if (!data)
+		return;
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	QStringList files;
 	if (!data->getFilename().isEmpty())

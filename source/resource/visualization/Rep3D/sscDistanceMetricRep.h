@@ -53,10 +53,7 @@ public:
 
 protected:
     virtual void clear();
-    virtual QString getText();
-
-protected slots:
-	virtual void changedSlot();
+	virtual void onModifiedStartRender();
 
 private:
 	DistanceMetricRep(const QString& uid, const QString& name = "");
