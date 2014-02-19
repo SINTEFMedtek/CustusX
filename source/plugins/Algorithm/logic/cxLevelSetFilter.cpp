@@ -162,8 +162,8 @@ bool LevelSetFilter::execute() {
 
         return true;
     } catch(SIPL::SIPLException &e) {
-		std::string error = e.what();
-		messageManager()->sendError("SIPL::SIPLException: "+qstring_cast(error));
+        std::string error = e.what();
+        messageManager()->sendError("SIPL::SIPLException: "+qstring_cast(error));
 
         return false;
     } catch(cl::Error &e) {
@@ -174,7 +174,7 @@ bool LevelSetFilter::execute() {
         }
         return false;
     } catch(...) {
-		messageManager()->sendError("Unknown exception occured.");
+        messageManager()->sendError("Unknown exception occured.");
         return false;
     }
 }
