@@ -43,6 +43,7 @@ class QPushButton;
 
 namespace cx
 {
+typedef boost::shared_ptr<class MetricManager> MetricManagerPtr;
 
 
 /**
@@ -61,21 +62,28 @@ public:
 
 signals:
 
+ public slots:
+  virtual void setModified();
+
 protected slots:
 	void itemSelectionChanged();
 
   void removeButtonClickedSlot();
-  void loadReferencePointsSlot();
 
+  void loadReferencePointsSlot();
   void addPointButtonClickedSlot();
   void addFrameButtonClickedSlot();
   void addToolButtonClickedSlot();
   void addPlaneButtonClickedSlot();
   void addAngleButtonClickedSlot();
   void addDistanceButtonClickedSlot();
+  void addSphereButtonClickedSlot();
+  void addDonutButtonClickedSlot();
+
   void cellChangedSlot(int row, int col);
   virtual void cellClickedSlot(int row, int column);
   void exportMetricsButtonClickedSlot();
+  void delayedUpdate();
 
 protected:
   QAction* mPointMetricAction;
@@ -83,32 +91,36 @@ protected:
   QAction* mToolMetricAction;
   QAction* mExportFramesAction;
 
-  void exportMetricsToFile(QString filename);
-
 private:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event);
   void enablebuttons();
-  void setActiveUid(QString uid);
-  PointMetricPtr addPoint(Vector3D point, CoordinateSystem space=CoordinateSystem(csREF), QString name="point%1");
   MetricBasePtr createMetricWrapper(DataPtr data);
   std::vector<MetricBasePtr> createMetricWrappers();
-  std::vector<DataPtr> refinePointArguments(std::vector<DataPtr> args, unsigned argNo);
-  void setManualToolPosition(Vector3D p_r);
-  void prePaintEvent();
+  virtual void prePaintEvent();
+  std::set<QString> getSelectedUids();
+  void createActions(QActionGroup* group);
+  bool checkEqual(const std::vector<MetricBasePtr>& a, const std::vector<MetricBasePtr>& b) const;
+  void resetWrappersAndEditWidgets(std::vector<MetricBasePtr> wrappers);
+  void initializeTable();
+  void updateTableContents();
+  void expensizeColumnResize();
 
-//  template<class T>
   QAction* createAction(QActionGroup* group, QString iconName, QString text, QString tip, const char* slot);
 
   QVBoxLayout* mVerticalLayout; ///< vertical layout is used
   QTableWidget* mTable; ///< the table widget presenting the landmarks
-  QString mActiveLandmark; ///< uid of surrently selected landmark.
 
   std::vector<MetricBasePtr> mMetrics;
 
   QAction* mRemoveAction; ///< the Remove Landmark button
   QAction* mLoadReferencePointsAction; ///< button for loading a reference tools reference points
   QStackedWidget* mEditWidgets;
+  MetricManagerPtr mMetricManager;
+  int mModifiedCount;
+  int mPaintCount;
+  QTimer* mDelayedUpdateTimer;
+  bool mLocalModified;
 };
 
 }//end namespace cx

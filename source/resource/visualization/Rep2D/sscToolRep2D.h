@@ -81,6 +81,7 @@ class ToolRep2D : public RepImpl
 
 		virtual void addRepActorsToViewRenderer(View *view);
 		virtual void removeRepActorsFromViewRenderer(View *view);
+		virtual void onModifiedStartRender();
 
 	private:
 		void setProbeSector(ProbeData data);

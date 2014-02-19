@@ -185,19 +185,18 @@ void ViewWrapper2D::addReps()
 
 	// plane type text rep
 	mPlaneTypeText = DisplayTextRep::New("planeTypeRep_" + mView->getName(), "");
-	mPlaneTypeText->addText(Vector3D(0, 1, 0), "not initialized", Vector3D(0.98, 0.02, 0.0));
+	mPlaneTypeText->addText(QColor(Qt::green), "not initialized", Vector3D(0.98, 0.02, 0.0));
 	mView->addRep(mPlaneTypeText);
 
 	//data name text rep
 	mDataNameText = DisplayTextRep::New("dataNameText_" + mView->getName(), "");
-	mDataNameText->addText(Vector3D(0, 1, 0), "not initialized", Vector3D(0.02, 0.02, 0.0));
+	mDataNameText->addText(QColor(Qt::green), "not initialized", Vector3D(0.02, 0.02, 0.0));
 	mView->addRep(mDataNameText);
 
 	// slice proxy
 	mSliceProxy = SliceProxy::New("sliceproxy_(" + mView->getName() + ")");
 	mViewFollower.reset(new ViewFollower);
 	mViewFollower->setSliceProxy(mSliceProxy);
-//	connect(mSliceProxy.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(ensureCenterWithinView()));
 
 	// slice rep
 	//the mul

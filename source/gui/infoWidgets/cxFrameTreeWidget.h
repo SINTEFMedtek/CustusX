@@ -33,6 +33,8 @@ public:
 
   virtual QString defaultWhatsThis() const;
 
+protected:
+  virtual void prePaintEvent();
 private:
   QTreeWidget* mTreeWidget;
   void fill(QTreeWidgetItem* parent, QDomNode node);

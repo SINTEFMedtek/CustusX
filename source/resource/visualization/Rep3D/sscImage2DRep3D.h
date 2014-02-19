@@ -66,8 +66,6 @@ private slots:
 private:
 	ApplyLUTToImage2DProxyPtr mImageWithLUTProxy;
 	ImagePtr mImage;
-//	View* mView;
-//	bool mTargetSpaceIsR;
 	vtkImageActorPtr mActor;
 };
 

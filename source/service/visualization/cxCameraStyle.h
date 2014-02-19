@@ -28,6 +28,7 @@ class QIcon;
 class QWidget;
 class QMenu;
 class QActionGroup;
+#include "cxCameraStyleForView.h"
 
 namespace cx
 {
@@ -40,11 +41,6 @@ using cx::Transform3D;
  * \addtogroup cxServiceVisualization
  * @{
  */
-
-enum CAMERA_STYLE_TYPE
-{
-	cstDEFAULT_STYLE, cstTOOL_STYLE, cstANGLED_TOOL_STYLE, cstUNICAM_STYLE, cstCOUNT
-};
 
 /**
  * \class CameraStyle
@@ -63,38 +59,22 @@ public:
 	CameraStyle();
 
 	/** Select tool style. This replaces the vtkInteractor Style.
-	  *
 	  */
 	void setCameraStyle(CAMERA_STYLE_TYPE style);
 	QActionGroup* createInteractorStyleActionGroup();
 
 private slots:
-	void moveCameraToolStyleSlot(Transform3D prMt, double timestamp); ///< receives transforms from the tool which the camera should follow
-	void dominantToolChangedSlot();
 	void viewChangedSlot();
 	void setInteractionStyleActionSlot();
 
 private:
-	ViewWidgetQPtr getView() const;
-	vtkRendererPtr getRenderer() const;
-	vtkCameraPtr getCamera() const;
-	ToolRep3DPtr getToolRep() const;
-	bool isToolFollowingStyle(CAMERA_STYLE_TYPE style) const;
-
-	void connectTool();
-	void disconnectTool();
-	void viewportChangedSlot();
-	void updateCamera();
 	void updateActionGroup();
-
 	void addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QIcon icon,
 					QString helptext);
 
 	CAMERA_STYLE_TYPE mCameraStyle; ///< the current camerastyle
-	ToolPtr mFollowingTool; ///< the tool the camera is following
-	ViewportListenerPtr mViewportListener;
-	bool mBlockCameraUpdate; ///< for breaking a camera update loop
 	QActionGroup* mCameraStyleGroup;
+	std::vector<CameraStyleForViewPtr> mViews;
 };
 
 /**
@@ -102,6 +82,5 @@ private:
  */
 } //namespace cx
 
-SNW_DECLARE_ENUM_STRING_CONVERTERS(cx, CAMERA_STYLE_TYPE);
 
 #endif /* CXCAMERASTYLE_H_ */

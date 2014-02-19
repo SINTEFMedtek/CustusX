@@ -43,7 +43,7 @@ FrameMetricPtr FrameMetricRep::getFrameMetric()
     return boost::dynamic_pointer_cast<FrameMetric>(mMetric);
 }
 
-void FrameMetricRep::changedSlot()
+void FrameMetricRep::onModifiedStartRender()
 {
     FrameMetricPtr metric = this->getFrameMetric();
 

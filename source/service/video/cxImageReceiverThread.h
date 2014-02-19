@@ -28,7 +28,7 @@
 
 namespace cx
 {
-typedef boost::shared_ptr<class CyclicActionTimer> CyclicActionTimerPtr;
+typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
 
 /**
  * \file
@@ -81,7 +81,7 @@ signals:
 	void stopInternal();
 
 protected:
-	cx::CyclicActionTimerPtr mFPSTimer;
+	cx::CyclicActionLoggerPtr mFPSTimer;
 	/** Add the message to a thread-safe queue.
 	 * Tests if the time stamps of image messages should be calibrated based on the computer clock.
 	 * Time stamps only need to be synched if set on another computer that is

@@ -69,7 +69,13 @@ void PerformanceTab::init()
   mMaxRenderSize->setInternal2Display(1.0/Mb);
 
   double stillUpdateRate = settings()->value("stillUpdateRate").value<double>();
-	mStillUpdateRate = DoubleDataAdapterXml::initialize("StillUpdateRate", "Still Update Rate", "Still Update Rate in vtkRenderWindow. Changing this may change render quality. Restart needed.", stillUpdateRate, DoubleRange(0.0001, 20, 0.0001), 4, QDomNode());
+	mStillUpdateRate = DoubleDataAdapterXml::initialize("StillUpdateRate", "Still Update Rate",
+																											"<p>Still Update Rate in vtkRenderWindow. "
+																											"Changing this may change render quality.</p> "
+																											"Generally raycast rendering requires this to be low (0.001), "
+																											"while texture based rendering requires it to be high (5-10)."
+																											"<p>Restart needed.</p>",
+																											stillUpdateRate, DoubleRange(0.0001, 20, 0.0001), 4, QDomNode());
 
   mSmartRenderCheckBox = new QCheckBox("Smart Render");
   mSmartRenderCheckBox->setChecked(settings()->value("smartRender", true).toBool());
@@ -111,9 +117,9 @@ void PerformanceTab::init()
   new SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 7);
   mMainLayout->addWidget(sscCreateDataWidget(this, m3DVisualizer), 8, 0, 1, 2);
 
-  mMainLayout->setColumnStretch(0, 0.6);
-  mMainLayout->setColumnStretch(1, 0.6);
-  mMainLayout->setColumnStretch(2, 0.3);
+  mMainLayout->setColumnStretch(0, 2);
+  mMainLayout->setColumnStretch(1, 2);
+  mMainLayout->setColumnStretch(2, 1);
 
   mTopLayout->addLayout(mMainLayout);
 }

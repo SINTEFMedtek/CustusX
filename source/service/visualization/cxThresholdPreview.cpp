@@ -105,24 +105,41 @@ void ThresholdPreview::setPreview(ImagePtr image, double setValue)
     if (!mModifiedImage)
     {
         mModifiedImage = image;
-        mTF3D_original = image->getTransferFunctions3D()->createCopy(image->getBaseVtkImageData());
-        mTF2D_original = image->getLookupTable2D()->createCopy(image->getBaseVtkImageData());
+		mTF3D_original = image->getTransferFunctions3D()->createCopy();
+		mTF2D_original = image->getLookupTable2D()->createCopy();
         mShadingOn_original = image->getShadingOn();
     }
     image->resetTransferFunctions();
     ImageTF3DPtr tf3D = image->getTransferFunctions3D();
-    tf3D->removeInitAlphaPoint();
-    tf3D->addAlphaPoint(setValue - 1, 0);
-    tf3D->addAlphaPoint(setValue, image->getMaxAlphaValue());
-    tf3D->addColorPoint(setValue, Qt::green);
-    tf3D->addColorPoint(image->getMax(), Qt::green);
+
+	ColorMap colors;
+	colors[setValue] = Qt::green;
+	colors[image->getMax()] = Qt::green;
+	tf3D->resetColor(colors);
+
+	IntIntMap opacity;
+	opacity[setValue - 1] = 0;
+	opacity[setValue] = image->getMaxAlphaValue();
+	tf3D->resetAlpha(opacity);
+
+
+//	tf3D->removeInitAlphaPoint();
+//    tf3D->addAlphaPoint(setValue - 1, 0);
+//    tf3D->addAlphaPoint(setValue, image->getMaxAlphaValue());
+//    tf3D->addColorPoint(setValue, Qt::green);
+//    tf3D->addColorPoint(image->getMax(), Qt::green);
     image->setShadingOn(true);
 
     ImageLUT2DPtr lut2D = image->getLookupTable2D();
-    lut2D->setFullRangeWinLevel();
-    lut2D->addColorPoint(setValue, Qt::green);
-    lut2D->addColorPoint(image->getMax(), Qt::green);
+	colors.clear();
+	colors[setValue] = Qt::green;
+	colors[image->getMax()] = Qt::green;
+	lut2D->resetColor(colors);
+//	lut2D->setFullRangeWinLevel(source->getVtkImageData());
+//    lut2D->addColorPoint(setValue, Qt::green);
+//    lut2D->addColorPoint(image->getMax(), Qt::green);
     lut2D->setLLR(setValue);
+
 
     //Remove VTK linear interpolation
 	mModifiedImage->setInterpolationTypeToNearest();

@@ -77,7 +77,7 @@ cxSyntheticVolume::sampleUsData(const std::vector<Transform3D>& planes_rMf,
 	// For each plane
 	for(std::vector<Transform3D>::const_iterator i = planes_rMf.begin();
 		planes_rMf.end() != i;
-	    i++)
+			++i)
 	{
 		const Transform3D rMf = *i;
 

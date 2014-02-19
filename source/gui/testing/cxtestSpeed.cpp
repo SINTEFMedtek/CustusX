@@ -129,7 +129,7 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper renderer", "[speed][gui][
 	jenkins.createOutput("FPS_vtkOpenGLGPUMultiVolumeRayCastMapper", QString::number(fps));
 
 	// TODO: enter this value into config file
-	double minimumFPS = 5;
+//	double minimumFPS = 5;
 //	REQUIRE(fps > minimumFPS);
 	REQUIRE(true);
 }
@@ -147,9 +147,10 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper with slicing", "[speed][g
 	jenkins.createOutput("FPS_vtkOpenGLGPUMultiVolumeRayCastMapper_Slicing", QString::number(fps));
 
 	// TODO: enter this value into config file
-	double minimumFPS = 5;
+//	double minimumFPS = 5;
 //	REQUIRE(fps > minimumFPS);
 	REQUIRE(true);
 }
+
 
 }//namespace cx

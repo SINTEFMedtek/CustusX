@@ -18,6 +18,7 @@
 #include <sscRepImpl.h>
 
 #include <map>
+#include <QColor>
 #include <sscImage.h>
 #include "vtkForwardDeclarations.h"
 #include "sscGraphicalPrimitives.h"
@@ -99,8 +100,8 @@ public:
 	static LandmarkRepPtr New(const QString& uid, const QString& name = "");
 	virtual ~LandmarkRep();
 
-	void setColor(Vector3D color); ///< sets the reps color
-	void setSecondaryColor(Vector3D color); ///< sets the reps color
+	void setColor(QColor color); ///< sets the reps color
+	void setSecondaryColor(QColor color); ///< sets the reps color
 	void showLandmarks(bool on); ///< turn on or off showing landmarks
 	void setGraphicsSize(double size);
 	void setLabelSize(double size);
@@ -121,9 +122,9 @@ protected slots:
 	void internalUpdate(); ///< updates the text, color, scale etc
 
 protected:
-	Vector3D mInactiveColor; ///< color given to inactive landmarks
-	Vector3D mColor; ///< the color of the landmark actors
-	Vector3D mSecondaryColor; ///< color used on the secondary coordinate
+	QColor mInactiveColor; ///< color given to inactive landmarks
+	QColor mColor; ///< the color of the landmark actors
+	QColor mSecondaryColor; ///< color used on the secondary coordinate
 	bool mShowLandmarks; ///< whether or not the actors should be showed in (all) views
 	double mGraphicsSize;
 	double mLabelSize;

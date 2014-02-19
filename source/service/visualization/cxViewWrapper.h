@@ -63,57 +63,6 @@ private:
 	void changed();
 };
 
-//typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
-
-///** \brief Container for data shared between all members of a view group
-// */
-//class ViewGroupData: public QObject
-//{
-//Q_OBJECT
-//public:
-//	ViewGroupData();
-//	void requestInitialize();
-//	std::vector<DataPtr> getData() const;
-//	QString getVideoSource() const;
-//	void addData(DataPtr data);
-//	void addDataSorted(DataPtr data); ///< add data in a predefined ordering: CT/MR/SC/US/USA/Mesh/Metrics
-//	void setVideoSource(QString uid);
-//	bool removeData(DataPtr data);
-//	void clearData();
-//	std::vector<ImagePtr> getImages() const;
-//	std::vector<MeshPtr> getMeshes() const;
-
-//	CameraDataPtr getCamera3D() { return mCamera3D; }
-
-//	// view options for this group.
-//	struct Options
-//	{
-//		Options();
-//		bool mShowLandmarks;
-//		bool mShowPointPickerProbe;
-//		MeshPtr mPickerGlyph;
-//	};
-
-//	Options getOptions() const;
-//	void setOptions(Options options);
-
-//private slots:
-//    void removeDataSlot(QString uid);
-
-//signals:
-//	void dataAdded(QString uid);
-//	void dataRemoved(QString uid);
-//	void videoSourceChanged(QString uid);
-//	void initialized();
-//	void optionsChanged();
-
-//private:
-//	QString mVideoSource;
-//	std::vector<DataPtr> mData;
-//	CameraDataPtr mCamera3D;
-//	Options mOptions;
-//};
-
 /**
  * \brief Superclass for ViewWrappers.
  *
@@ -155,6 +104,7 @@ protected:
 	virtual void appendToContextMenu(QMenu& contextMenu) = 0;
 	void addDataAction(QString uid, QMenu* contextMenu);
 	QStringList getAllDataNames() const;
+//	std::vector<std::pair<QColor, QString> > getAllMetricTexts() const;
 
 	ViewGroupDataPtr mGroupData;
 

@@ -61,12 +61,14 @@ if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
       ${${KIT}_HDRS}
       vtkGPUMultiVolumeRayCastMapper.h
       vtkOpenGLGPUMultiVolumeRayCastMapper.h
+      vtkMultiVolumePicker.h
     )
 
     SET(${KIT}_SRCS
       ${${KIT}_SRCS}
       vtkGPUMultiVolumeRayCastMapper.cxx
       vtkOpenGLGPUMultiVolumeRayCastMapper.cxx
+      vtkMultiVolumePicker.cxx
     #  ${KIT}.cxx
     )
 

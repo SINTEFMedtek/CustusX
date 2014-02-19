@@ -23,6 +23,7 @@
 #include "sscDataMetric.h"
 #include "sscDataReaderWriter.h"
 #include "sscCoordinateSystemListener.h"
+#include "cxOptionalValue.h"
 
 namespace cx
 {
@@ -83,14 +84,16 @@ public:
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 	virtual DoubleBoundingBox3D boundingBox() const;
 
-	// additional functionality:
-	// - get coord in space
-	// - rep
+	virtual QString getValueAsString() const;
+	virtual bool showValueInGraphics() const { return false; }
 
+private slots:
+	void resetCachedValues();
 private:
 	Vector3D mCoordinate;
 	CoordinateSystem mSpace;
 	CoordinateSystemListenerPtr mSpaceListener;
+	mutable OptionalValue<Vector3D> mCachedRefCoord;
 };
 
 /**

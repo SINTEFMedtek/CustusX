@@ -26,6 +26,7 @@
 namespace cx
 {
 
+
 DataPtr PointMetricReader::load(const QString& uid, const QString& filename)
 {
 	return DataPtr(new PointMetric(uid, filename));
@@ -37,6 +38,7 @@ PointMetric::PointMetric(const QString& uid, const QString& name) :
 	mSpace(SpaceHelpers::getR())
 {
 	mSpaceListener.reset(new CoordinateSystemListener(mSpace));
+	connect(mSpaceListener.get(), SIGNAL(changed()), this, SLOT(resetCachedValues()));
 	connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
 }
 
@@ -62,6 +64,7 @@ void PointMetric::setCoordinate(const Vector3D& p)
 		return;
 
 	mCoordinate = p;
+	this->resetCachedValues();
 	emit transformChanged();
 }
 
@@ -80,6 +83,7 @@ void PointMetric::setSpace(CoordinateSystem space)
 	mCoordinate = new_M_old.coord(mCoordinate);
 
 	mSpace = space;
+	this->resetCachedValues();
 	mSpaceListener->setSpace(space);
 }
 
@@ -107,10 +111,18 @@ void PointMetric::parseXml(QDomNode& dataNode)
 DoubleBoundingBox3D PointMetric::boundingBox() const
 {
 	// convert both inputs to r space
-	Transform3D rM0 = SpaceHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
-	Vector3D p0_r = rM0.coord(this->getCoordinate());
+//	Transform3D rM0 = SpaceHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
+//	Vector3D p0_r = rM0.coord(this->getCoordinate());
+	Vector3D p0_r = this->getRefCoord();
 
 	return DoubleBoundingBox3D(p0_r, p0_r);
+}
+
+void PointMetric::resetCachedValues()
+{
+//	std::cout << " ** PointMetric::resetCachedValues" << std::endl;
+
+	mCachedRefCoord.reset();
 }
 
 /** Utility function: return the coordinate the the reference space.
@@ -118,8 +130,22 @@ DoubleBoundingBox3D PointMetric::boundingBox() const
  */
 Vector3D PointMetric::getRefCoord() const
 {
-	Transform3D rM1 = SpaceHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
-	return rM1.coord(this->getCoordinate());
+//	std::cout << " ** PointMetric::getRefCoord" << std::endl;
+
+//	return Vector3D(1,2,3);
+	if (!mCachedRefCoord.isValid())
+	{
+//		std::cout << " ** PointMetric::getRefCoord FILL CACHE" << std::endl;
+		Transform3D rM1 = SpaceHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
+		Vector3D val = rM1.coord(this->getCoordinate());
+		mCachedRefCoord.set(val);
+	}
+	return mCachedRefCoord.get();
+}
+
+QString PointMetric::getValueAsString() const
+{
+	return prettyFormat(this->getRefCoord(), 1, 3);
 }
 
 QString PointMetric::getAsSingleLineString() const

@@ -111,6 +111,7 @@ public:
 		}
 		retval.mMainWindowState = QByteArray::fromBase64(desktopElement.attribute("mainwindowstate").toAscii());
 		retval.mLayoutUid = desktopElement.attribute("layoutuid");
+		retval.mSecondaryLayoutUid = desktopElement.attribute("secondarylayoutuid");
 
 		return retval;
 	}
@@ -121,6 +122,7 @@ public:
 						mXmlFile.descend(applicationName).descend("workflows").descend(workflowName).descend("custom").getElement();
 		desktopElement.setAttribute("mainwindowstate", QString(desktop.mMainWindowState.toBase64()));
 		desktopElement.setAttribute("layoutuid", desktop.mLayoutUid);
+		desktopElement.setAttribute("secondarylayoutuid", desktop.mSecondaryLayoutUid);
 		mXmlFile.save();
 	}
 
@@ -341,7 +343,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View3D/eyeAngle", 4.0);
 	this->fillDefault("View/showDataText", true);
 	this->fillDefault("View/showLabels", true);
-
+	this->fillDefault("View/showMetricNamesInCorner", false);
 	this->fillDefault("View3D/annotationModelSize", 0.2);
 	this->fillDefault("View3D/annotationModel", "woman.stl");
 	this->fillDefault("View3D/depthPeeling", false);
@@ -351,18 +353,16 @@ void StateService::fillDefaultSettings()
 
 	this->fillDefault("View3D/maxRenderSize", 10 * pow(10.0,6));
 
+
+	this->fillDefault("useGPUVolumeRayCastMapper", true);
+	this->fillDefault("stillUpdateRate", 0.001);
+
 #ifdef __APPLE__
-	this->fillDefault("useGPUVolumeRayCastMapper", false);
 	this->fillDefault("useGPU2DRendering", true);
-	this->fillDefault("stillUpdateRate", 8.0);
 #elif WIN32
-	this->fillDefault("useGPUVolumeRayCastMapper", true);
 	this->fillDefault("useGPU2DRendering", false);
-	this->fillDefault("stillUpdateRate", 0.001);
 #else
-	this->fillDefault("useGPUVolumeRayCastMapper", true);
 	this->fillDefault("useGPU2DRendering", true);
-	this->fillDefault("stillUpdateRate", 0.001);
 #endif
 
 
@@ -370,6 +370,7 @@ void StateService::fillDefaultSettings()
 
 	this->fillDefault("IGSTKDebugLogging", false);
 	this->fillDefault("giveManualToolPhysicalProperties", false);
+	this->fillDefault("renderSpeedLogging", false);
 
 	this->fillDefault("applyTransferFunctionPresetsToAll", false);
 }
@@ -388,20 +389,23 @@ void StateService::initialize()
 Desktop StateService::getActiveDesktop()
 {
 	ApplicationsParser parser;
-	return parser.getDesktop(mApplicationStateMachine->getActiveUidState(), mWorkflowStateMachine->getActiveUidState());
+	return parser.getDesktop(mApplicationStateMachine->getActiveUidState(),
+							 mWorkflowStateMachine->getActiveUidState());
 }
 
 void StateService::saveDesktop(Desktop desktop)
 {
 	ApplicationsParser parser;
-	parser.setDesktop(mApplicationStateMachine->getActiveUidState(), mWorkflowStateMachine->getActiveUidState(),
-					desktop);
+	parser.setDesktop(mApplicationStateMachine->getActiveUidState(),
+					  mWorkflowStateMachine->getActiveUidState(),
+					  desktop);
 }
 
 void StateService::resetDesktop()
 {
 	ApplicationsParser parser;
-	parser.resetDesktop(mApplicationStateMachine->getActiveUidState(), mWorkflowStateMachine->getActiveUidState());
+	parser.resetDesktop(mApplicationStateMachine->getActiveUidState(),
+						mWorkflowStateMachine->getActiveUidState());
 }
 
 } //namespace cx

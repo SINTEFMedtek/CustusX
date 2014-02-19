@@ -17,6 +17,7 @@
 #include "cxDataManager.h"
 #include "cxRepManager.h"
 #include "sscGPUImageBuffer.h"
+#include "cxSettings.h"
 
 namespace cx
 {

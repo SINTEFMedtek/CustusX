@@ -66,12 +66,11 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 {
 	this->setDescription("Empty view");
 	cx::ViewWidget* view = new cx::ViewWidget(this->centralWidget());
-	this->insertView(view, "dummy", "none", 0, 0);
-//	REQUIRE(this->runWidget());
+    this->insertView(view, "dummy", "none", 0, 0);
 	REQUIRE(this->quickRunWidget());
 
 	this->dumpDebugViewToDisk("emptyview", 0);
-	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) == Approx(0));
+    REQUIRE(this->getFractionOfBrightPixelsInView(0,0) == Approx(0));
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
@@ -81,26 +80,9 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	this->setDescription("3D Volume, moving tool");
 	this->define3D(image[0], NULL, 0, 0);
 
-//	REQUIRE(this->runWidget());
 	REQUIRE(this->quickRunWidget());
 	this->dumpDebugViewToDisk("3DvtkGPU", 0);
 	REQUIRE(this->getFractionOfBrightPixelsInView(0,0) > 0.01);
-}
-
-TEST_CASE_METHOD(VisualRenderingFixture,
-				 "Visual rendering: Show 3D volume with lut",
-				 "[unit][resource][visualization]")
-{
-	this->setDescription("3D with lut, moving tool");
-
-	ImageParameters parameters;
-	parameters.llr = 75;
-	parameters.lut = getCreateLut(0, 200, .67, .68, 0, 1, .4, .8);
-
-	this->define3D(image[0], &parameters, 0, 0);
-
-	REQUIRE(this->quickRunWidget());
-	CHECK(this->getFractionOfBrightPixelsInView(0,0) > 0.02);
 }
 
 TEST_CASE_METHOD(VisualRenderingFixture,
@@ -171,11 +153,10 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 	images[0] = this->loadImage(image[0]);
 
 	cx::ImageLUT2DPtr lut0 = images[0]->getLookupTable2D();
-	lut0->addColorPoint(lut0->getScalarMax(), QColor::fromRgbF(0,0,1,1));
+	lut0->addColorPoint(images[0]->getMax(), QColor::fromRgbF(0,0,1,1));
 
 	REQUIRE(this->defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
-	REQUIRE(this->quickRunWidget());
-//	REQUIRE(this->runWidget(3000));
+    REQUIRE(this->quickRunWidget());
 
 	CHECK(this->getFractionOfBrightPixelsInView(0,20,2) > 0.02);
 }
@@ -192,17 +173,16 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 
 	cx::ImageLUT2DPtr lut0 = images[0]->getLookupTable2D();
 	//std::cout << "setting llr for vol1 = " << llr << std::endl;
-	lut0->addColorPoint(lut0->getScalarMax(), QColor::fromRgbF(0,1,0,1));
+	lut0->addColorPoint(images[0]->getMax(), QColor::fromRgbF(0,1,0,1));
 
 	cx::ImageLUT2DPtr lut1 = images[1]->getLookupTable2D();
 	//std::cout << "setting llr for vol1 = " << llr << std::endl;
-	lut1->addColorPoint(lut1->getScalarMax(), QColor::fromRgbF(0,0,1,1));
-	double llr = lut1->getScalarMin() + (lut1->getScalarMax()-lut1->getScalarMin())*0.25;
+	lut1->addColorPoint(images[1]->getMax(), QColor::fromRgbF(0,0,1,1));
+	double llr = images[1]->getMin() + (images[1]->getMax()-images[1]->getMin())*0.25;
 	lut1->setLLR(llr);
 
 	REQUIRE(this->defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
-	REQUIRE(this->quickRunWidget());
-//	REQUIRE(this->runWidget(3000));
+    REQUIRE(this->quickRunWidget());
 
 	CHECK(this->getFractionOfBrightPixelsInView(0,20,1) > 0.02);
 	CHECK(this->getFractionOfBrightPixelsInView(0,20,2) > 0.02);
@@ -219,10 +199,8 @@ TEST_CASE_METHOD(VisualRenderingFixture,
 		REQUIRE(this->defineGPUSlice("A", image[i], cx::ptAXIAL, 0, i));
 		REQUIRE(this->defineGPUSlice("C", image[i], cx::ptCORONAL, 1, i));
 		REQUIRE(this->defineGPUSlice("S", image[i], cx::ptSAGITTAL, 2, i));
-	}
-	//REQUIRE(this->runWidget());
-	REQUIRE(this->quickRunWidget());
-//	REQUIRE(this->runWidget(3000));
+    }
+    REQUIRE(this->quickRunWidget());
 
 	for (unsigned i = 0; i < 3*3; ++i)
 	{

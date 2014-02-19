@@ -37,6 +37,11 @@ DataPtr DistanceMetricReader::load(const QString& uid, const QString& filename)
 DistanceMetric::DistanceMetric(const QString& uid, const QString& name) :
 				DataMetric(uid, name)
 {
+	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "line endpoint 0" << "line endpoint 1"));
+	mArguments->setValidArgumentTypes(QStringList() << "pointMetric" << "planeMetric");
+
+	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SLOT(resetCachedValues()));
+	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 }
 
 DistanceMetricPtr DistanceMetric::create(QString uid, QString name)
@@ -54,37 +59,6 @@ DistanceMetric::~DistanceMetric()
 {
 }
 
-unsigned DistanceMetric::getArgumentCount() const
-{
-	return (unsigned)mArgument.size();
-}
-
-void DistanceMetric::setArgument(int index, DataPtr p)
-{
-	if (mArgument[index] == p)
-		return;
-
-	if (mArgument[index])
-		disconnect(mArgument[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
-
-	mArgument[index] = p;
-
-	if (mArgument[index])
-		connect(mArgument[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
-
-	emit transformChanged();
-}
-
-DataPtr DistanceMetric::getArgument(int index)
-{
-	return mArgument[index];
-}
-
-bool DistanceMetric::validArgument(DataPtr p) const
-{
-	return p->getType() == "pointMetric" || p->getType() == "planeMetric";
-}
-
 Vector3D DistanceMetric::getRefCoord() const
 {
     return this->boundingBox().center();
@@ -98,52 +72,60 @@ bool DistanceMetric::isValid() const
 void DistanceMetric::addXml(QDomNode& dataNode)
 {
 	DataMetric::addXml(dataNode);
-
-	for (unsigned i = 0; i < mArgument.size(); ++i)
-	{
-		if (mArgument[i])
-			dataNode.toElement().setAttribute(QString("p%1").arg(i), mArgument[i]->getUid());
-	}
+	mArguments->addXml(dataNode);
 }
 
 void DistanceMetric::parseXml(QDomNode& dataNode)
 {
 	DataMetric::parseXml(dataNode);
+	mArguments->parseXml(dataNode);
+	this->resetCachedValues();
+}
 
-	for (unsigned i = 0; i < mArgument.size(); ++i)
-	{
-		QString uid = dataNode.toElement().attribute(QString("p%1").arg(i), "");
-		this->setArgument(i, dataManager()->getData(uid));
-	}
+void DistanceMetric::resetCachedValues()
+{
+	mCachedEndPoints.reset();
 }
 
 std::vector<Vector3D> DistanceMetric::getEndpoints() const
 {
-	if (!mArgument[0] || !mArgument[1])
+	if (!mCachedEndPoints.isValid())
+	{
+		mCachedEndPoints.set(this->getEndpointsUncached());
+	}
+	return mCachedEndPoints.get();
+}
+
+std::vector<Vector3D> DistanceMetric::getEndpointsUncached() const
+{
+	DataPtr a0 = mArguments->get(0);
+	DataPtr a1 = mArguments->get(1);
+
+	if (!a0 || !a1)
 		return std::vector<Vector3D>();
-//	PointMetricPtr pt = boost::dynamic_pointer_cast<PointMetric>(dataManager()->getData(uid));
 	std::vector<Vector3D> retval(2);
+
 	// case   I: point-point
 	// case  II: point-plane
 	// case III: plane-plane (not implemented)
 
-	if ((mArgument[0]->getType() == "pointMetric") && (mArgument[1]->getType() == "pointMetric"))
+	if ((a0->getType() == "pointMetric") && (a1->getType() == "pointMetric"))
 	{
-		retval[0] = boost::dynamic_pointer_cast<PointMetric>(mArgument[0])->getRefCoord();
-		retval[1] = boost::dynamic_pointer_cast<PointMetric>(mArgument[1])->getRefCoord();
+		retval[0] = boost::dynamic_pointer_cast<PointMetric>(a0)->getRefCoord();
+		retval[1] = boost::dynamic_pointer_cast<PointMetric>(a1)->getRefCoord();
 	}
-	else if ((mArgument[0]->getType() == "planeMetric") && (mArgument[1]->getType() == "pointMetric"))
+	else if ((a0->getType() == "planeMetric") && (a1->getType() == "pointMetric"))
 	{
-		Plane3D plane = boost::dynamic_pointer_cast<PlaneMetric>(mArgument[0])->getRefPlane();
-		Vector3D p = boost::dynamic_pointer_cast<PointMetric>(mArgument[1])->getRefCoord();
+		Plane3D plane = boost::dynamic_pointer_cast<PlaneMetric>(a0)->getRefPlane();
+		Vector3D p = boost::dynamic_pointer_cast<PointMetric>(a1)->getRefCoord();
 
 		retval[0] = plane.projection(p);
 		retval[1] = p;
 	}
-	else if ((mArgument[0]->getType() == "pointMetric") && (mArgument[1]->getType() == "planeMetric"))
+	else if ((a0->getType() == "pointMetric") && (a1->getType() == "planeMetric"))
 	{
-		Plane3D plane = boost::dynamic_pointer_cast<PlaneMetric>(mArgument[1])->getRefPlane();
-		Vector3D p = boost::dynamic_pointer_cast<PointMetric>(mArgument[0])->getRefCoord();
+		Plane3D plane = boost::dynamic_pointer_cast<PlaneMetric>(a1)->getRefPlane();
+		Vector3D p = boost::dynamic_pointer_cast<PointMetric>(a0)->getRefCoord();
 
 		retval[1] = plane.projection(p);
 		retval[0] = p;
@@ -175,6 +157,11 @@ double DistanceMetric::getDistance() const
 		return -1;
 
 	return (endpoints[1] - endpoints[0]).length();
+}
+
+QString DistanceMetric::getValueAsString() const
+{
+	return QString("%1 mm").arg(this->getDistance(), 0, 'f', 1);
 }
 
 DoubleBoundingBox3D DistanceMetric::boundingBox() const

@@ -2,7 +2,6 @@
 
 #ifdef CX_USE_TSF
 #include "tube-segmentation.hpp"
-#include "openCLUtilities.hpp"
 #include "tsf-config.h"
 #include "Exceptions.hpp"
 
@@ -100,7 +99,7 @@ QDomElement TubeSegmentationFilter::generatePresetFromCurrentlySetOptions(QStrin
 void TubeSegmentationFilter::requestSetPresetSlot(QString name)
 {
 	QString centerLineMethod = "gpu";
-	if((name == "<Default preset>") || (name == "none") || (name == "default"))
+	if((name == "<Default preset>") || (name == "none") || (name == "default") || (name == "Default"))
 		mParameterFile = "none";
 	else
 	{

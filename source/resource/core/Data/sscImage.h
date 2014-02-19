@@ -95,6 +95,10 @@ public:
 	virtual ImageLUT2DPtr getLookupTable2D();
 	virtual void setLookupTable2D(ImageLUT2DPtr imageLookupTable2D);
 
+	virtual void setInitialWindowLevel(double width, double level);
+	double getInitialWindowLevel() const { return mInitialWindowLevel; }
+	double getInitialWindowWidth() const { return mInitialWindowWidth; }
+
 	virtual DoubleBoundingBox3D boundingBox() const; ///< bounding box in image space
 	virtual Eigen::Array3d getSpacing() const;
 	virtual vtkImageAccumulatePtr getHistogram();///< \return The histogram for the image
@@ -140,8 +144,8 @@ public:
 
 	void moveThisAndChildrenToThread(QThread* thread); ///< Move this and all children to thread. Use the thread is generated in a worker thread and the result is to be used in the main thread.
 
-	bool isValidTransferFunction(ImageTFDataPtr transferFunction); ///< Check if transfer function is valid for this image
-	ImageTFDataPtr fixCorruptTransferFunction(ImageTFDataPtr transferFunction);
+//	bool isValidTransferFunction(ImageTFDataPtr transferFunction); ///< Check if transfer function is valid for this image
+//	ImageTFDataPtr fixCorruptTransferFunction(ImageTFDataPtr transferFunction);
 	static vtkImageDataPtr createDummyImageData(int axisSize, int maxVoxelValue); ///< Create a moc object of vtkImageData
 
 	void setInterpolationTypeToNearest();
@@ -194,11 +198,15 @@ private:
 	void resetTransferFunction(ImageLUT2DPtr imageLookupTable2D);
 	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D);
 	DoubleBoundingBox3D getInitialBoundingBox() const;
+	double loadAttribute(QDomNode dataNode, QString name, double defVal);
 
 	double computeResampleFactor(long maxVoxels);
 
 	ImageTF3DPtr mImageTransferFunctions3D;
 	ImageLUT2DPtr mImageLookupTable2D;
+
+	double mInitialWindowWidth;
+	double mInitialWindowLevel;
 };
 
 } // end namespace cx

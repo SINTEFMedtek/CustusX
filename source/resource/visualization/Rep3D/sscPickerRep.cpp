@@ -35,7 +35,6 @@
 //#include <vtkDataSetAttributes.h>
 #include <vtkEventQtSlotConnect.h>
 //#include <vtkCellPicker.h>
-#include <vtkVolumePicker.h>
 #include "sscMesh.h"
 #include "sscDataManager.h"
 #include "sscMessageManager.h"
@@ -45,6 +44,14 @@
 #include "sscToolManager.h"
 #include "sscRegistrationTransform.h"
 #include "sscGeometricRep.h"
+
+#include "vtkVolumePicker.h"
+#ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
+	#include "vtkMultiVolumePicker.h"
+	typedef vtkSmartPointer<class vtkMultiVolumePicker> vtkMultiVolumePickerPtr;
+#else
+	typedef vtkSmartPointer<class vtkVolumePicker> vtkMultiVolumePickerPtr;
+#endif
 
 namespace cx
 {
@@ -105,17 +112,16 @@ void PickerRep::setTool(ToolPtr tool)
 	if (mTool)
 	{
 		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
-				SLOT(receiveTransforms(Transform3D, double)));
+				SLOT(setModified()));
 	}
 
 	mTool = tool;
 
 	if (mTool)
 	{
-		receiveTransforms(mTool->get_prMt(), 0);
-
 		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
-				SLOT(receiveTransforms(Transform3D, double)));
+				SLOT(setModified()));
+		this->setModified();
 	}
 }
 
@@ -136,7 +142,6 @@ void PickerRep::setGlyph(MeshPtr glyph)
 	 mGlyphRep->setMesh(mGlyph);
 }
 
-typedef vtkSmartPointer<class vtkVolumePicker> vtkVolumePickerPtr;
 typedef vtkSmartPointer<class vtkDataSet> vtkDataSetPtr;
 
 /**
@@ -148,7 +153,7 @@ typedef vtkSmartPointer<class vtkDataSet> vtkDataSetPtr;
  */
 void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer)
 {
-	vtkVolumePickerPtr picker = vtkVolumePickerPtr::New();
+	vtkMultiVolumePickerPtr picker = vtkMultiVolumePickerPtr::New();
 	int hit = picker->Pick(clickPosition[0], clickPosition[1], 0, renderer);
 
 	// search for picked data in manager, emit uid if found.
@@ -216,7 +221,8 @@ void PickerRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 	int pickedPoint[2]; //<x,y>
 	iren->GetEventPosition(pickedPoint); //mouse positions are measured in pixels
 
-	vtkRendererPtr renderer = this->getRendererFromRenderWindow(*iren);
+	vtkRendererPtr renderer = this->getRenderer();
+//	vtkRendererPtr renderer = this->getRendererFromRenderWindow(*iren);
 	if (renderer == NULL)
 		return;
 
@@ -224,8 +230,17 @@ void PickerRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 	this->pickLandmark(clickPoint, renderer);
 }
 
-void PickerRep::receiveTransforms(Transform3D prMt, double timestamp)
+void PickerRep::onModifiedStartRender()
 {
+	this->toolHasChanged();
+}
+
+//void PickerRep::receiveTransforms(Transform3D prMt, double timestamp)
+void PickerRep::toolHasChanged()
+{
+	if (!mTool)
+		return;
+	Transform3D prMt = mTool->get_prMt();
 	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
 	Transform3D rMt = rMpr * prMt;
 	Vector3D p_r = rMt.coord(Vector3D(0, 0, mTool->getTooltipOffset()));
@@ -256,27 +271,6 @@ void PickerRep::setEnabled(bool on)
 			mGraphicalPoint->getActor()->SetVisibility(false);
 	}
 }
-
-//void PickerRep::setEnabled(bool on)
-//{
-//	if (mEnabled == on)
-//		return;
-//
-//	mEnabled = on;
-//
-//	if (mEnabled)
-//	{
-//		this->connectInteractor();
-//		if (mGraphicalPoint)
-//			mGraphicalPoint->getActor()->SetVisibility(true);
-//	}
-//	else
-//	{
-//		this->disconnectInteractor();
-//		if (mGraphicalPoint)
-//			mGraphicalPoint->getActor()->SetVisibility(false);
-//	}
-//}
 
 void PickerRep::ProcessEvents(vtkObject* vtkNotUsed(object), unsigned long event, void* clientdata,
 		void* vtkNotUsed(calldata))
@@ -431,7 +425,7 @@ void PickerRep::addRepActorsToViewRenderer(View *view)
 		this->connectInteractor();
 
 	mGraphicalPoint.reset(new GraphicalPoint3D(mView->getRenderer()));
-	mGraphicalPoint->setColor(Vector3D(0, 0, 1));
+	mGraphicalPoint->setColor(QColor(Qt::blue));
 	mGraphicalPoint->setRadius(mSphereRadius);
 	mGraphicalPoint->getActor()->SetVisibility(mSnapToSurface);
 
@@ -465,17 +459,17 @@ void PickerRep::removeRepActorsFromViewRenderer(View *view)
 	mView = NULL;
 }
 
-vtkRendererPtr PickerRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
-{
-	vtkRendererPtr renderer = NULL;
-	std::set<View *>::const_iterator it = mViews.begin();
-	for (; it != mViews.end(); ++it)
-	{
-		if (iren.GetRenderWindow() == (*it)->getRenderWindow())
-			renderer = (*it)->getRenderer();
-	}
-	return renderer;
-}
+//vtkRendererPtr PickerRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
+//{
+//	vtkRendererPtr renderer = NULL;
+//	std::set<View *>::const_iterator it = mViews.begin();
+//	for (; it != mViews.end(); ++it)
+//	{
+//		if (iren.GetRenderWindow() == (*it)->getRenderWindow())
+//			renderer = (*it)->getRenderer();
+//	}
+//	return renderer;
+//}
 
 Vector3D PickerRep::getPosition() const
 {

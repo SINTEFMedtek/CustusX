@@ -33,9 +33,6 @@ public:
 
   void setData(ImagePtr image, ImageTFDataPtr tfData);
   void setReadOnly(bool readOnly);///< Set class readonly: Disable mouse interaction
-
-signals:
-  void positionChanged(int);///< Emits this signal whenever the mouse is moved inside the widget
   
 public slots:
   void activeImageTransferFunctionsChangedSlot(); ///< Acts when the image's transfer function is changed
@@ -49,7 +46,11 @@ protected:
       position(INT_MIN),
       value(INT_MIN)
       {}
-    void reset()
+	AlphaPoint(int pos, int val) :
+	  position(pos),
+	  value(val)
+	  {}
+	void reset()
     {
       position = INT_MIN;
       value = INT_MIN;
@@ -67,30 +68,38 @@ protected:
   virtual void mousePressEvent(QMouseEvent* event); ///< Reimplemented from superclass
   virtual void mouseReleaseEvent(QMouseEvent* event); ///< Reimplemented from superclass
   virtual void mouseMoveEvent(QMouseEvent* event);  ///< Reimplemented from superclass
+  virtual void keyPressEvent(QKeyEvent* event);
 
   virtual void paintEvent(QPaintEvent* event); ///< Reimplemented from superclass. Paints the transferfunction GUI
   virtual void resizeEvent(QResizeEvent* evt);///< Reimplemented from superclass
 
-  bool isInsideCurrentPoint(int mouseX, int mouseY);///< Checks if a screen coordinate is inside any of the point rectangles
-  AlphaPoint getCurrentAlphaPoint(int mouseX, int mouseY);///< Get aplha point based on mCurrentClickX and mCurrentClickY
-  void toggleCurrentPoint(int mouseX, int mouseY);///< Turn a transfer function point on or off (depending on it is on or not)
-  void moveCurrentAlphaPoint(int mouseX, int mouseY);///< Move the currently selected point to the selected screen coordinate (mCurrentClickX and mCurrentClickY)
+  AlphaPoint selectPoint(QPoint pos);
+  AlphaPoint getCurrentAlphaPoint(QPoint pos);///< Get aplha point based on mCurrentClickX and mCurrentClickY
+  void toggleSelectedPoint(QPoint pos);///< Turn a transfer function point on or off (depending on it is on or not)
+  void moveCurrentAlphaPoint(AlphaPoint newAlphaPoint);
+  QPoint alpha2screen(AlphaPoint pt) const;
+  void updateTooltip(QPoint pos);
+  void updateTooltip(AlphaPoint point);
+
+  bool isEndpoint(int intensity) const;
+  void paintHistogram(QPainter& painter);
+  void paintOpacityGraph(QPainter& painter);
+  std::pair<int,int> findAllowedMoveRangeAroundAlphaPoint(int selectedPointIntensity);
 
   QRect mFullArea; ///< The full widget area.
   QRect mPlotArea; ///< The plot area.
-  std::map<int, QRect> mPointRects; ///< Cache with all point rectangles.
-  AlphaPoint mCurrentAlphaPoint;///< The current alpha point
-	bool mEndPoint;///< Current alpha point is an endpoint
-
   int mBorder;///< The size of the border around the transferfunction. The size of the rectangles are mBorder * 2
+  bool mReadOnly;///< Is class readOnly? Eg no mouse interaction possible
+
+  std::map<int, QRect> mPointRects; ///< Cache with all point rectangles.
+  AlphaPoint mSelectedAlphaPoint;///< The current alpha point
+//  bool mEndPoint;///< Current alpha point is an endpoint
 
   ImagePtr mImage;
   ImageTFDataPtr mImageTF;
-  
-  bool mReadOnly;///< Is class readOnly? Eg no mouse interaction possible
+  ActiveImageProxyPtr mActiveImageProxy;
 
   virtual QSize sizeHint () const { return QSize(200, 100);};///< Define a recommended size
-  ActiveImageProxyPtr mActiveImageProxy;
 };
 }
 #endif /* CXTRANSFERFUNCTIONALPHAWIDGET_H_ */

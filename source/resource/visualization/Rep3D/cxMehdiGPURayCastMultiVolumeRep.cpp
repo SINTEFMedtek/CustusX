@@ -152,8 +152,8 @@ void MehdiGPURayCastMultiVolumeRep::clearVolume()
 
 	// should not be necessary, but seems that mapper is not cleared by vtk.
 	// http://vtk.1045678.n5.nabble.com/quot-a-vtkShader2-object-is-being-deleted-before-ReleaseGraphicsResources-has-been-called-quot-with-r-td4872396.html
-	if (!mViews.empty())
-		mVolume->ReleaseGraphicsResources((*mViews.begin())->getRenderWindow());
+	if (this->getView())
+		mVolume->ReleaseGraphicsResources(this->getView()->getRenderWindow());
 	mVolume->SetMapper(NULL);
 
 	mReferenceImage.reset();

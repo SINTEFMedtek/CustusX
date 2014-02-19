@@ -303,8 +303,8 @@ void WirePhantomWidget::showDataMetrics(Vector3D cross_r)
     if (!d0)
         d0.reset(new DistanceMetric("accuracy", "accuracy"));
     d0->get_rMd_History()->setParentSpace("reference");
-    d0->setArgument(0, p1);
-    d0->setArgument(1, p2);
+	d0->getArguments()->set(0, p1);
+	d0->getArguments()->set(1, p2);
     dataManager()->loadData(d0);
     this->showData(d0);
 }
