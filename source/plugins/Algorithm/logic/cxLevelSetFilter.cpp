@@ -52,11 +52,20 @@ bool LevelSetFilter::preProcess() {
     return true;
 }
 
-Vector3D LevelSetFilter::getSeedPointFromTool(DataPtr image) {
+Vector3D LevelSetFilter::getSeedPointFromTool(DataPtr data) {
     // Retrieve position of tooltip and use it as seed point
     Vector3D point = CoordinateSystemHelpers::getDominantToolTipPoint(
-            CoordinateSystemHelpers::getD(image)
+            CoordinateSystemHelpers::getD(data)
     );
+
+    // Have to multiply by the inverse of the spacing to get the voxel position
+    ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+    double spacingX, spacingY, spacingZ;
+    image->getBaseVtkImageData()->GetSpacing(spacingX, spacingY, spacingZ);
+    point(0) = point(0)*(1.0/spacingX);
+    point(1) = point(1)*(1.0/spacingY);
+    point(2) = point(2)*(1.0/spacingZ);
+
     std::cout << "the selected seed point is: " << point(0) << " " << point(1) << " " << point(2) << "\n";
 
     return point;
