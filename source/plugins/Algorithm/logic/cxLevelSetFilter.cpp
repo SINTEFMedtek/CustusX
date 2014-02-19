@@ -167,7 +167,7 @@ bool LevelSetFilter::execute() {
 
         return false;
     } catch(cl::Error &e) {
-        if(e.err() == CL_MEM_OBJECT_ALLOCATION_FAILURE) {
+        if(e.err() == CL_MEM_OBJECT_ALLOCATION_FAILURE || e.err() == CL_OUT_OF_RESOURCES) {
             messageManager()->sendError("cl::Error: Not enough memory on the device to process this image. ("+qstring_cast(oul::getCLErrorString(e.err()))+")");
         } else {
             messageManager()->sendError("cl::Error: "+qstring_cast(oul::getCLErrorString(e.err())));
