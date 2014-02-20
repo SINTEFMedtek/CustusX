@@ -37,17 +37,22 @@ void FrameTreeWidget::dataLoadedSlot()
 {
   for (DataManager::DataMap::iterator iter=mConnectedData.begin(); iter!=mConnectedData.end(); ++iter)
   {
-    disconnect(iter->second.get(), SIGNAL(transformChanged()), this, SLOT(rebuild()));
+	disconnect(iter->second.get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
   }
 
   mConnectedData = dataManager()->getData();
 
   for (DataManager::DataMap::iterator iter=mConnectedData.begin(); iter!=mConnectedData.end(); ++iter)
   {
-    connect(iter->second.get(), SIGNAL(transformChanged()), this, SLOT(rebuild()));
+	connect(iter->second.get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
   }
 
-  this->rebuild();
+  this->setModified();
+}
+
+void FrameTreeWidget::prePaintEvent()
+{
+	this->rebuild();
 }
 
 void FrameTreeWidget::rebuild()

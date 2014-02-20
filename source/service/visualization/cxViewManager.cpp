@@ -100,6 +100,7 @@ ViewManager::ViewManager() :
 
 	this->loadGlobalSettings();
 
+	mRenderLoop->setLogging(settings()->value("renderSpeedLogging").toBool());
 	mRenderLoop->setSmartRender(settings()->value("smartRender", true).toBool());
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 
@@ -197,6 +198,10 @@ void ViewManager::settingsChangedSlot(QString key)
 	if (key == "renderingInterval")
 	{
 		mRenderLoop->setRenderingInterval(settings()->value("renderingInterval").toInt());
+	}
+	if (key == "renderSpeedLogging")
+	{
+		mRenderLoop->setLogging(settings()->value("renderSpeedLogging").toBool());
 	}
 }
 

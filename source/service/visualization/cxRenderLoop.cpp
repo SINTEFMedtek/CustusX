@@ -19,7 +19,7 @@
 #include "vtkRenderWindow.h"
 #include "sscTypeConversions.h"
 #include "sscGLHelpers.h"
-
+#include "sscMessageManager.h"
 
 namespace cx
 {
@@ -29,6 +29,7 @@ RenderLoop::RenderLoop() :
 	mTimer(NULL),
 	mPreRenderSignalRequested(false),
 	mSmartRender(false),
+	mLogging(false),
 	mBaseRenderInterval(40)
 {
 	mCyclicLogger.reset(new CyclicActionLogger("Main Render timer"));
@@ -52,6 +53,10 @@ void RenderLoop::setRenderingInterval(int interval)
 	this->sendRenderIntervalToTimer(mBaseRenderInterval);
 }
 
+void RenderLoop::setLogging(bool on)
+{
+	mLogging = on;
+}
 
 void RenderLoop::sendRenderIntervalToTimer(int interval)
 {
@@ -140,11 +145,22 @@ void RenderLoop::emitFPSIfRequired()
 	if (mCyclicLogger->intervalPassed())
 	{
 		emit fps(mCyclicLogger->getFPS());
-//        static int counter=0;
-//        if (++counter%3==0)
-//            messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
+		this->dumpStatistics();
+//		static int counter=0;
+//		if (++counter%3==0)
+//			messageManager()->sendDebug(mCyclicLogger->dumpStatisticsSmall());
 		mCyclicLogger->reset();
 	}
+}
+
+void RenderLoop::dumpStatistics()
+{
+	if (!mLogging)
+		return;
+
+	static int counter=0;
+	if (++counter%3==0) // every third event
+		messageManager()->sendDebug(mCyclicLogger->dumpStatisticsSmall());
 }
 
 int RenderLoop::calculateTimeToNextRender()

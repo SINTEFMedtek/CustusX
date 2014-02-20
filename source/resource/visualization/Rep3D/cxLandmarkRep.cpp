@@ -249,9 +249,7 @@ void LandmarkRep::removeRepActorsFromViewRenderer(View* view)
 void LandmarkRep::addLandmark(QString uid)
 {
 //  std::cout << this << " LandmarkRep::addLandmark init" << uid << std::endl;
-	vtkRendererPtr renderer;
-	if (!mViews.empty())
-		renderer = (*mViews.begin())->getRenderer();
+	vtkRendererPtr renderer = this->getRenderer();
 
 	LandmarkProperty property = dataManager()->getLandmarkProperties()[uid];
 	if (property.getUid().isEmpty())

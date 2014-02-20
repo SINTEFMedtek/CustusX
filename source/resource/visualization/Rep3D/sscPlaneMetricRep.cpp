@@ -40,21 +40,6 @@ PlaneMetricRep::PlaneMetricRep(const QString& uid, const QString& name) :
 	mViewportListener->setCallback(boost::bind(&PlaneMetricRep::rescale, this));
 }
 
-//void PlaneMetricRep::setMetric(PlaneMetricPtr point)
-//{
-//	if (mMetric)
-//		disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-//	mMetric = point;
-
-//	if (mMetric)
-//		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-//	mGraphicalPoint.reset();
-//	mNormal.reset();
-//	this->changedSlot();
-//}
-
 void PlaneMetricRep::clear()
 {
     mGraphicalPoint.reset();
@@ -69,14 +54,11 @@ void PlaneMetricRep::addRepActorsToViewRenderer(View *view)
 
 void PlaneMetricRep::removeRepActorsFromViewRenderer(View *view)
 {
-//	mView = NULL;
-//	mGraphicalPoint.reset();
-//	mNormal.reset();
 	mViewportListener->stopListen();
     DataMetricRep::removeRepActorsFromViewRenderer(view);
 }
 
-void PlaneMetricRep::changedSlot()
+void PlaneMetricRep::onModifiedStartRender()
 {
 	if (!mMetric)
 		return;

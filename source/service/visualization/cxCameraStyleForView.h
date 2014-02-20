@@ -24,6 +24,7 @@ class QActionGroup;
 
 namespace cx
 {
+typedef boost::shared_ptr<class ViewportPreRenderListener> ViewportPreRenderListenerPtr;
 
 typedef boost::shared_ptr<class CameraStyleForView> CameraStyleForViewPtr;
 using cx::Transform3D;
@@ -64,7 +65,7 @@ public:
 	void setCameraStyle(CAMERA_STYLE_TYPE style);
 
 private slots:
-	void moveCameraToolStyleSlot(Transform3D prMt, double timestamp); ///< receives transforms from the tool which the camera should follow
+	void setModified();
 	void dominantToolChangedSlot();
 	void viewChangedSlot();
 
@@ -74,6 +75,9 @@ private:
 	vtkCameraPtr getCamera() const;
 	ToolRep3DPtr getToolRep() const;
 	bool isToolFollowingStyle(CAMERA_STYLE_TYPE style) const;
+	void onPreRender();
+	void moveCameraToolStyleSlot(Transform3D prMt, double timestamp); ///< receives transforms from the tool which the camera should follow
+//	void update();
 
 	void connectTool();
 	void disconnectTool();
@@ -83,6 +87,7 @@ private:
 	CAMERA_STYLE_TYPE mCameraStyleForView; ///< the current CameraStyleForView
 	ToolPtr mFollowingTool; ///< the tool the camera is following
 	ViewportListenerPtr mViewportListener;
+	ViewportPreRenderListenerPtr mPreRenderListener;
 	bool mBlockCameraUpdate; ///< for breaking a camera update loop
 
 	ViewWidgetQPtr mView;

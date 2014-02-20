@@ -52,13 +52,12 @@ public:
 	void setFontSize(int size); ///< must be set before setting data
 	void setData(std::vector<DataPtr> data);
 
-private slots:
-	void metricChangedSlot();
 
 protected:
 	MetricNamesRep(const QString& uid, const QString& name);
 	virtual void addRepActorsToViewRenderer(View *view);
 	virtual void removeRepActorsFromViewRenderer(View *view);
+	virtual void onModifiedStartRender();
 
 	/** Add a list of colored strings at pos.
 	  * This is not directly supported by VTK, so the input viewport is required for extra calculations,
@@ -66,7 +65,7 @@ protected:
 	  */
 	void setColoredTextList(std::vector<std::pair<QColor, QString> > text, Eigen::Array2d pos, vtkViewport *vp=0);
 
-	vtkRendererPtr getRenderer();
+//	vtkRendererPtr getRenderer();
 	DoubleBoundingBox3D findNormalizedBoundingBoxAroundText(std::vector<std::pair<QColor, QString> > text, Eigen::Array2d pos, vtkViewport *vp);
 	DoubleBoundingBox3D moveBoxIntoAnother(DoubleBoundingBox3D box, DoubleBoundingBox3D another);
 	bool equal(std::vector<DataMetricPtr> a, std::vector<DataMetricPtr> b) const;

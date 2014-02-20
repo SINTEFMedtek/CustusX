@@ -57,7 +57,7 @@ void PointMetricRep::removeRepActorsFromViewRenderer(View *view)
     mViewportListener->stopListen();
 }
 
-void PointMetricRep::changedSlot()
+void PointMetricRep::onModifiedStartRender()
 {
     if (!mMetric)
 		return;

@@ -463,7 +463,7 @@ class LevelSetSegmentation(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:smistad/Level-Set-Segmentation')
     def update(self):
-        self._getBuilder().gitCheckout('e088efa2740ed7fa1018361b850c3c1cc26040cb', submodules=True)
+        self._getBuilder().gitCheckout('b24f6a652cf7cfc4907be354d68260caa7773f56', submodules=True)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -484,7 +484,7 @@ class OpenCLUtilityLibrary(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:smistad/OpenCLUtilityLibrary')
     def update(self):
-        self._getBuilder().gitUpdate('master')
+        self._getBuilder().gitCheckout('f962d5f66b6471e8df2fc2222f8a8e071e698acf', submodules=False)
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()
