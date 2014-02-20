@@ -51,9 +51,7 @@ public:
 
 protected:
 	virtual void clear();
-
-protected slots:
-	virtual void changedSlot();
+	virtual void onModifiedStartRender();
 
 private:
 	DonutMetricRep(const QString& uid, const QString& name = "");

@@ -80,7 +80,7 @@ void PointMetricRep2D::clear()
     DataMetricRep::clear();
 }
 
-void PointMetricRep2D::changedSlot()
+void PointMetricRep2D::onModifiedStartRender()
 {
 	if (!mMetric)
 		return;
@@ -179,36 +179,29 @@ void PointMetricRep2D::setFillVisibility(bool on)
  */
 void PointMetricRep2D::rescale()
 {
-	this->changedSlot();
-//	if (!mCircleActor)
-//		return;
-//
-//	double size = mViewportListener->getVpnZoom();
-////  double sphereSize = 0.007/size;
-//	double sphereSize = mGraphicsSize / 100 / size;
-//	mGraphicalPoint->setRadius(sphereSize);
+	this->setModified();
 }
 
 void PointMetricRep2D::setSliceProxy(SliceProxyPtr sliceProxy)
 {
 	if (mSliceProxy)
-		disconnect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(changedSlot()));
+		disconnect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(setModified()));
 	mSliceProxy = sliceProxy;
 	if (mSliceProxy)
-		connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(changedSlot()));
-	changedSlot();
+		connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(setModified()));
+	this->setModified();
 }
 
 void PointMetricRep2D::setOutlineWidth(double width)
 {
 	mOutlineWidth = width;
-	changedSlot();
+	this->setModified();
 }
 
 void PointMetricRep2D::setOutlineColor(double red, double green, double blue)
 {
 	mOutlineColor = Vector3D(red, green, blue);
-	changedSlot();
+	this->setModified();
 }
 
 }

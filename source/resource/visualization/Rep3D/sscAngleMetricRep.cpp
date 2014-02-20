@@ -61,7 +61,7 @@ AngleMetricPtr AngleMetricRep::getAngleMetric()
     return boost::dynamic_pointer_cast<AngleMetric>(mMetric);
 }
 
-void AngleMetricRep::changedSlot()
+void AngleMetricRep::onModifiedStartRender()
 {
     AngleMetricPtr angleMetric = this->getAngleMetric();
 

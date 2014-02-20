@@ -9,6 +9,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	sscViewContainer
     
 	Rep/sscRep.h
+	Rep/sscRepImpl
 	Rep/sscDataMetricRep
 
 	Rep3D/sscToolRep3D
@@ -63,7 +64,6 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
 	Primitives/cxGraphicalTorus3D
 	Primitives/sscVtkHelperClasses
 	Primitives/sscTextureSlicePainter
-    Rep/sscRepImpl
 	Primitives/sscUltrasoundSectorSource
     Rep3D/sscAxesRep
     Rep/sscDisplayTextRep

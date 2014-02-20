@@ -152,4 +152,5 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper with slicing", "[speed][g
 	REQUIRE(true);
 }
 
+
 }//namespace cx

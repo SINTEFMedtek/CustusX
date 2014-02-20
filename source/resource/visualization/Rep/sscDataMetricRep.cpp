@@ -34,8 +34,8 @@ DataMetricRep::DataMetricRep(const QString& uid, const QString& name) :
 	mGraphicsSize(1),
 	mShowLabel(false),
 	mLabelSize(2.5),
-	mShowAnnotation(true),
-	mView(NULL)
+	mShowAnnotation(true)
+//	mView(NULL)
 {
 }
 
@@ -43,20 +43,20 @@ void DataMetricRep::setDataMetric(DataMetricPtr value)
 {
     if (mMetric)
 	{
-        disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-		disconnect(mMetric.get(), SIGNAL(propertiesChanged()), this, SLOT(changedSlot()));
+		disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
+		disconnect(mMetric.get(), SIGNAL(propertiesChanged()), this, SLOT(setModified()));
 	}
 
     mMetric = value;
 
     if (mMetric)
 	{
-		connect(mMetric.get(), SIGNAL(propertiesChanged()), this, SLOT(changedSlot()));
-		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
+		connect(mMetric.get(), SIGNAL(propertiesChanged()), this, SLOT(setModified()));
+		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
 	}
 
     this->clear();
-    this->changedSlot();
+	this->setModified();
 }
 
 DataMetricPtr DataMetricRep::getDataMetric()
@@ -67,32 +67,26 @@ DataMetricPtr DataMetricRep::getDataMetric()
 void DataMetricRep::setShowLabel(bool on)
 {
 	mShowLabel = on;
-	this->changedSlot();
+	this->setModified();
 }
 
 void DataMetricRep::setGraphicsSize(double size)
 {
 	mGraphicsSize = size;
-	this->changedSlot();
+	this->setModified();
 }
 
 void DataMetricRep::setLabelSize(double size)
 {
 	mLabelSize = size;
-	this->changedSlot();
+	this->setModified();
 }
 
 void DataMetricRep::setShowAnnotation(bool on)
 {
 	mShowAnnotation = on;
-	this->changedSlot();
+	this->setModified();
 }
-
-//void DataMetricRep::setColor(double red, double green, double blue)
-//{
-//	mColor = Vector3D(red, green, blue);
-//	this->changedSlot();
-//}
 
 void DataMetricRep::clear()
 {
@@ -101,20 +95,27 @@ void DataMetricRep::clear()
 
 void DataMetricRep::addRepActorsToViewRenderer(View *view)
 {
-    mView = view;
+//    mView = view;
+
+//	vtkRendererPtr renderer = mView->getRenderer();
+//	renderer->AddObserver(vtkCommand::StartEvent, this->mCallbackCommand, 1.0);
+
     this->clear();
-    this->changedSlot();
+	this->setModified();
 }
 
 void DataMetricRep::removeRepActorsFromViewRenderer(View *view)
 {
-    mView = NULL;
+//	vtkRendererPtr renderer = mView->getRenderer();
+//	renderer->RemoveObserver(this->mCallbackCommand);
+
+//    mView = NULL;
     this->clear();
 }
 
 void DataMetricRep::drawText()
 {
-    if (!mView)
+	if (!this->getView())
         return;
 
     QString text = this->getText();
@@ -125,7 +126,10 @@ void DataMetricRep::drawText()
         return;
     }
 
-    mText.reset(new CaptionText3D(mView->getRenderer()));
+	if (!mText)
+	{
+		mText.reset(new CaptionText3D(this->getRenderer()));
+	}
 	mText->setColor(mMetric->getColor());
     mText->setText(text);
     mText->setPosition(mMetric->getRefCoord());

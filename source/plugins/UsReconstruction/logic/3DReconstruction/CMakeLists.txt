@@ -55,13 +55,8 @@ if (CX_USE_OPENCL_UTILITY)
 		TordReconstruct/TordTest.h
 		TordReconstruct/TordTest.cpp
 		TordReconstruct/kernels.cl
-		cxOpenCLReconstruction.h
-		cxOpenCLReconstruction.cpp
-		cxOpenCLReconstructionHost.h
-		cxOpenCLReconstructionHost.cpp
 		)
    SET(TORD_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/TordReconstruct)
-   SET(KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/kernels)
 
 endif (CX_USE_OPENCL_UTILITY)
 
@@ -73,7 +68,6 @@ set(sscUS3DReconstruction_LIBRARIES
     cxResourceUsReconstructionTypes
     )
     
-# Don't try to use OpenCl if we haven't got it
 if( CX_USE_OPENCL_UTILITY )
     set(sscUS3DReconstruction_LIBRARIES
         ${sscUS3DReconstruction_LIBRARIES}
@@ -84,7 +78,9 @@ target_link_libraries( sscUS3DReconstruction ${sscUS3DReconstruction_LIBRARIES})
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/recConfig.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/recConfig.h" )
+  "${CMAKE_CURRENT_BINARY_DIR}/recConfig.h"
+  )
+  
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
 # =========================================================

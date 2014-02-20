@@ -22,6 +22,7 @@
 
 #include "sscRepImpl.h"
 #include "sscVector3D.h"
+#include "vtkForwardDeclarations.h"
 
 namespace cx
 {
@@ -49,17 +50,12 @@ public:
 	void setLabelSize(double size);
 	void setShowLabel(bool on);
 	void setShowAnnotation(bool on);
-//	void setColor(double red, double green, double blue);
 
     void setDataMetric(DataMetricPtr value);
     DataMetricPtr getDataMetric();
 
-protected slots:
-	virtual void changedSlot() = 0; ///< called when interals are changed: update all
-
 protected:
 	DataMetricRep(const QString& uid, const QString& name);
-//  virtual void rescale() = 0; ///< called when scaling has changed: rescale text etc to keep const vp size.
 
     void addRepActorsToViewRenderer(View *view);
     void removeRepActorsFromViewRenderer(View *view);
@@ -71,15 +67,13 @@ protected:
 	bool mShowLabel;
 	double mLabelSize;
 	bool mShowAnnotation;
-//	Vector3D mColor;
 	Vector3D getColorAsVector3D() const;
 
     DataMetricPtr mMetric;
-    View *mView;
-private:
-    CaptionText3DPtr mText;
+//    View *mView;
 
-//  ViewportListenerPtr mViewportListener;
+private:
+	CaptionText3DPtr mText;
 };
 typedef boost::shared_ptr<class DataMetricRep> DataMetricRepPtr;
 

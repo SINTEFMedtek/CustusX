@@ -62,7 +62,7 @@ DonutMetricPtr DonutMetricRep::getDonutMetric()
 	return boost::dynamic_pointer_cast<DonutMetric>(mMetric);
 }
 
-void DonutMetricRep::changedSlot()
+void DonutMetricRep::onModifiedStartRender()
 {
 	if (!mMetric)
 		return;

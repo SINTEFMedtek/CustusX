@@ -66,9 +66,10 @@ protected:
 
     virtual void clear();
     virtual void rescale();
+	virtual void onModifiedStartRender();
 
-protected slots:
-	virtual void changedSlot();
+//protected slots:
+//	virtual void changedSlot();
 
 private:
 	PointMetricRep2D(const QString& uid, const QString& name = "");

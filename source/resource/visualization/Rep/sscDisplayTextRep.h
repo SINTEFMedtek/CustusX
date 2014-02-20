@@ -60,7 +60,6 @@ protected:
 	virtual void addRepActorsToViewRenderer(View *view);
 	virtual void removeRepActorsFromViewRenderer(View *view);
 
-	vtkRendererPtr getRenderer();
 	std::vector<TextDisplayPtr> mDisplayText;
 };
 

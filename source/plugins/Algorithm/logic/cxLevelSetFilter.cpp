@@ -25,6 +25,7 @@
 
 #include "levelSet.hpp"
 #include "OpenCLManager.hpp"
+#include "HelperFunctions.hpp"
 
 namespace cx
 {
@@ -51,11 +52,20 @@ bool LevelSetFilter::preProcess() {
     return true;
 }
 
-Vector3D LevelSetFilter::getSeedPointFromTool(DataPtr image) {
+Vector3D LevelSetFilter::getSeedPointFromTool(DataPtr data) {
     // Retrieve position of tooltip and use it as seed point
     Vector3D point = CoordinateSystemHelpers::getDominantToolTipPoint(
-            CoordinateSystemHelpers::getD(image)
+            CoordinateSystemHelpers::getD(data)
     );
+
+    // Have to multiply by the inverse of the spacing to get the voxel position
+    ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+    double spacingX, spacingY, spacingZ;
+    image->getBaseVtkImageData()->GetSpacing(spacingX, spacingY, spacingZ);
+    point(0) = point(0)*(1.0/spacingX);
+    point(1) = point(1)*(1.0/spacingY);
+    point(2) = point(2)*(1.0/spacingZ);
+
     std::cout << "the selected seed point is: " << point(0) << " " << point(1) << " " << point(2) << "\n";
 
     return point;
@@ -152,10 +162,19 @@ bool LevelSetFilter::execute() {
 
         return true;
     } catch(SIPL::SIPLException &e) {
+        std::string error = e.what();
+        messageManager()->sendError("SIPL::SIPLException: "+qstring_cast(error));
+
         return false;
     } catch(cl::Error &e) {
+        if(e.err() == CL_MEM_OBJECT_ALLOCATION_FAILURE || e.err() == CL_OUT_OF_RESOURCES) {
+            messageManager()->sendError("cl::Error: Not enough memory on the device to process this image. ("+qstring_cast(oul::getCLErrorString(e.err()))+")");
+        } else {
+            messageManager()->sendError("cl::Error: "+qstring_cast(oul::getCLErrorString(e.err())));
+        }
         return false;
     } catch(...) {
+        messageManager()->sendError("Unknown exception occured.");
         return false;
     }
 }
@@ -186,7 +205,6 @@ void LevelSetFilter::createInputTypes()
 	temp = SelectImageStringDataAdapter::New();
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for thresholding");
-	connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
 	mInputTypes.push_back(temp);
 }
 

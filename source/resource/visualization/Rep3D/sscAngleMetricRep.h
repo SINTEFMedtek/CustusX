@@ -57,9 +57,7 @@ public:
 
 protected:
     virtual void clear();
-
-protected slots:
-	virtual void changedSlot();
+	virtual void onModifiedStartRender();
 
 private:
 	AngleMetricRep(const QString& uid, const QString& name = "");

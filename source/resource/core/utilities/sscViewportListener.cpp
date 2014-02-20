@@ -20,27 +20,27 @@ class ViewportObserverPrivate : public vtkCommand
 public:
 	ViewportObserverPrivate() : mBase(NULL) {}
 	static ViewportObserverPrivate* New() {return new ViewportObserverPrivate;}
-	void SetBase(ViewportListener* base) {mBase = base;}
+	void SetBase(ViewportListenerBase* base) {mBase = base;}
 	virtual void Execute(vtkObject* caller, unsigned long, void*)
 	{
 		if (mBase)
 			mBase->callback();
 	}
-	ViewportListener* mBase;
+	ViewportListenerBase* mBase;
 };
 
 
-ViewportListener::ViewportListener()
+ViewportListenerBase::ViewportListenerBase()
 {
 
 }
 
-ViewportListener::~ViewportListener()
+ViewportListenerBase::~ViewportListenerBase()
 {
-	this->stopListen();
+//	this->stopListen();
 }
 
-void ViewportListener::startListen(vtkRendererPtr renderer)
+void ViewportListenerBase::startListen(vtkRendererPtr renderer)
 {
 	mRenderer = renderer;
 
@@ -49,49 +49,52 @@ void ViewportListener::startListen(vtkRendererPtr renderer)
 	{
 		mObserver = ViewportObserverPrivatePtr::New();
 		mObserver->SetBase(this);
-		mRenderer->GetActiveCamera()->AddObserver(vtkCommand::ModifiedEvent, mObserver); // needed during startup
-		mRenderer->AddObserver(vtkCommand::ModifiedEvent, mObserver); // camera changes, viewport changes
-		mRenderer->AddObserver(vtkCommand::ActiveCameraEvent, mObserver);
-		mRenderer->AddObserver(vtkCommand::ResetCameraEvent, mObserver);
+		this->addObservers();
+//		mRenderer->GetActiveCamera()->AddObserver(vtkCommand::ModifiedEvent, mObserver); // needed during startup
+//		mRenderer->AddObserver(vtkCommand::ModifiedEvent, mObserver); // camera changes, viewport changes
+//		mRenderer->AddObserver(vtkCommand::ActiveCameraEvent, mObserver);
+//		mRenderer->AddObserver(vtkCommand::ResetCameraEvent, mObserver);
 		//	  mRenderer->AddObserver(vtkCommand::CreateCameraEvent, mObserver);
 		//	  mRenderer->AddObserver(vtkCommand::LeaveEvent, mObserver);
 	}
 }
 
-void ViewportListener::stopListen()
+
+void ViewportListenerBase::stopListen()
 {
 	// turn off observer
 	if (mObserver)
 	{
 		mObserver->SetBase(NULL);
+		this->removeObservers();
 
-		mRenderer->GetActiveCamera()->RemoveObserver(mObserver);
-		mRenderer->RemoveObserver(mObserver);
+//		mRenderer->GetActiveCamera()->RemoveObserver(mObserver);
+//		mRenderer->RemoveObserver(mObserver);
 
-		if (mRenderer->GetActiveCamera()->HasObserver(vtkCommand::ModifiedEvent, mObserver))
-			std::cout << "ERROR camera vtkCommand::ModifiedEvent" << std::endl;
-		if (mRenderer->HasObserver(vtkCommand::ModifiedEvent, mObserver))
-			std::cout << "ERROR vtkCommand::ModifiedEvent" << std::endl;
-		if (mRenderer->HasObserver(vtkCommand::ActiveCameraEvent, mObserver))
-			std::cout << "ERROR vtkCommand::ActiveCameraEvent" << std::endl;
-		if (mRenderer->HasObserver(vtkCommand::ResetCameraEvent, mObserver))
-			std::cout << "ERROR vtkCommand::ResetCameraEvent" << std::endl;
+//		if (mRenderer->GetActiveCamera()->HasObserver(vtkCommand::ModifiedEvent, mObserver))
+//			std::cout << "ERROR camera vtkCommand::ModifiedEvent" << std::endl;
+//		if (mRenderer->HasObserver(vtkCommand::ModifiedEvent, mObserver))
+//			std::cout << "ERROR vtkCommand::ModifiedEvent" << std::endl;
+//		if (mRenderer->HasObserver(vtkCommand::ActiveCameraEvent, mObserver))
+//			std::cout << "ERROR vtkCommand::ActiveCameraEvent" << std::endl;
+//		if (mRenderer->HasObserver(vtkCommand::ResetCameraEvent, mObserver))
+//			std::cout << "ERROR vtkCommand::ResetCameraEvent" << std::endl;
 
 		mObserver = 0;
 	}
 }
 
-bool ViewportListener::isListening() const
+bool ViewportListenerBase::isListening() const
 {
 	return mObserver!=0;
 }
 
-void ViewportListener::setCallback(boost::function<void ()> func)
+void ViewportListenerBase::setCallback(boost::function<void ()> func)
 {
 	mCallback = func;
 }
 
-void ViewportListener::callback()
+void ViewportListenerBase::callback()
 {
 	if (mCallback)
 		mCallback();
@@ -101,7 +104,7 @@ void ViewportListener::callback()
  * the normalized viewport space.
  *
  */
-double ViewportListener::getVpnZoom()
+double ViewportListenerBase::getVpnZoom()
 {
 	if (!mRenderer)
 	{
@@ -122,6 +125,63 @@ double ViewportListener::getVpnZoom()
 	p_fup[2] = 0;
 	double size = (p_f - p_fup).length()/2;
 	return size;
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+void ViewportListener::addObservers()
+{
+	mRenderer->GetActiveCamera()->AddObserver(vtkCommand::ModifiedEvent, mObserver); // needed during startup
+	mRenderer->AddObserver(vtkCommand::ModifiedEvent, mObserver); // camera changes, viewport changes
+	mRenderer->AddObserver(vtkCommand::ActiveCameraEvent, mObserver);
+	mRenderer->AddObserver(vtkCommand::ResetCameraEvent, mObserver);
+}
+void ViewportListener::removeObservers()
+{
+	mRenderer->GetActiveCamera()->RemoveObserver(mObserver);
+	mRenderer->RemoveObserver(mObserver);
+}
+
+ViewportListener::~ViewportListener()
+{
+	this->stopListen();
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+ViewportPreRenderListener::ViewportPreRenderListener() : mModified(true)
+{
+}
+
+void ViewportPreRenderListener::setModified()
+{
+	mModified = true;
+}
+
+void ViewportPreRenderListener::callback()
+{
+	if (!mModified)
+		return;
+	ViewportListenerBase::callback();
+	mModified = false;
+}
+
+void ViewportPreRenderListener::addObservers()
+{
+	mRenderer->AddObserver(vtkCommand::StartEvent, mObserver, 1.0);
+}
+void ViewportPreRenderListener::removeObservers()
+{
+	mRenderer->RemoveObserver(mObserver);
+}
+
+ViewportPreRenderListener::~ViewportPreRenderListener()
+{
+	this->stopListen();
 }
 
 }

@@ -23,6 +23,7 @@
 #include "sscDataMetric.h"
 #include "sscDataReaderWriter.h"
 #include "sscCoordinateSystemListener.h"
+#include "cxOptionalValue.h"
 
 namespace cx
 {
@@ -86,10 +87,13 @@ public:
 	virtual QString getValueAsString() const;
 	virtual bool showValueInGraphics() const { return false; }
 
+private slots:
+	void resetCachedValues();
 private:
 	Vector3D mCoordinate;
 	CoordinateSystem mSpace;
 	CoordinateSystemListenerPtr mSpaceListener;
+	mutable OptionalValue<Vector3D> mCachedRefCoord;
 };
 
 /**

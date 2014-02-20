@@ -52,9 +52,7 @@ protected:
 	virtual void addRepActorsToViewRenderer(View *view);
 	virtual void removeRepActorsFromViewRenderer(View *view);
     virtual void clear();
-
-protected slots:
-	virtual void changedSlot();
+	virtual void onModifiedStartRender();
 
 private:
 	PlaneMetricRep(const QString& uid, const QString& name = "");

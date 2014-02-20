@@ -228,11 +228,6 @@ QWidget* PointMetricWrapper::createSampleButton(QWidget* parent) const
 	return sampleButton;
 }
 
-//QString PointMetricWrapper::getValue() const
-//{
-//	return prettyFormat(mData->getRefCoord(), 1, 3);
-//}
-
 DataMetricPtr PointMetricWrapper::getData() const
 {
 	return mData;
@@ -352,11 +347,6 @@ QWidget* PlaneMetricWrapper::createWidget()
 	return widget;
 }
 
-//QString PlaneMetricWrapper::getValue() const
-//{
-//	return "NA";
-//}
-
 DataMetricPtr PlaneMetricWrapper::getData() const
 {
 	return mData;
@@ -447,11 +437,6 @@ QWidget* DistanceMetricWrapper::createWidget()
 	return widget;
 }
 
-//QString DistanceMetricWrapper::getValue() const
-//{
-//	return QString("%1 mm").arg(mData->getDistance(), 5, 'f', 1);
-//}
-
 DataMetricPtr DistanceMetricWrapper::getData() const
 {
 	return mData;
@@ -505,11 +490,6 @@ QWidget* AngleMetricWrapper::createWidget()
 	this->dataChangedSlot();
 	return widget;
 }
-
-//QString AngleMetricWrapper::getValue() const
-//{
-//	return QString("%1*").arg(mData->getAngle()/M_PI*180, 5, 'f', 1);
-//}
 
 DataMetricPtr AngleMetricWrapper::getData() const
 {
@@ -584,11 +564,6 @@ QWidget* DonutMetricWrapper::createWidget()
 	this->dataChangedSlot();
 	return widget;
 }
-
-//QString DonutMetricWrapper::getValue() const
-//{
-//	return "NA";
-//}
 
 DataMetricPtr DonutMetricWrapper::getData() const
 {
@@ -686,11 +661,6 @@ QWidget* SphereMetricWrapper::createWidget()
 	this->dataChangedSlot();
 	return widget;
 }
-
-//QString SphereMetricWrapper::getValue() const
-//{
-//	return QString("%1").arg(mData->getRadius(), 0, 'f', 1);
-//}
 
 DataMetricPtr SphereMetricWrapper::getData() const
 {
