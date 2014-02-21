@@ -418,7 +418,7 @@ void VideoConnectionWidget::importStreamImageSlot()
 Transform3D VideoConnectionWidget::calculate_rMd_ForAProbeImage(ToolPtr probe)
 {
 	Transform3D rMd = Transform3D::Identity();
-	Transform3D rMpr = cxToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = dataManager()->get_rMpr();
 	Transform3D prMt = probe->get_prMt();
 	Transform3D tMu = probe->getProbe()->getSector()->get_tMu();
 	Transform3D uMv = probe->getProbe()->getSector()->get_uMv();

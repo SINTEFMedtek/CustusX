@@ -244,7 +244,7 @@ Transform3D CoordinateSystemHelpers::get_rMdv(QString uid)
 
 Transform3D CoordinateSystemHelpers::get_rMpr()
 {
-	Transform3D rMpr = toolManager()->get_rMpr();
+	Transform3D rMpr = dataManager()->get_rMpr();
 	return rMpr; //ref_M_pr
 }
 

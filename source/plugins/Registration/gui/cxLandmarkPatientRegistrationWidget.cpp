@@ -32,7 +32,7 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(Registratio
 	mImageLandmarkSource = ImageLandmarksSource::New();
 	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(regManager));
 	connect(mManager.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedDataChanged()));
-	connect(toolManager(), SIGNAL(rMprChanged()), this, SLOT(setModified()));
+	connect(dataManager(), SIGNAL(rMprChanged()), this, SLOT(setModified()));
 
 	//buttons
 	mToolSampleButton->setDisabled(true);
@@ -125,7 +125,7 @@ void LandmarkPatientRegistrationWidget::toolSampleButtonClickedSlot()
 	if (mActiveLandmark.isEmpty() && !dataManager()->getLandmarkProperties().empty())
 		mActiveLandmark = dataManager()->getLandmarkProperties().begin()->first;
 
-	toolManager()->getPatientLandmarks()->setLandmark(Landmark(mActiveLandmark, p_pr));
+	dataManager()->getPatientLandmarks()->setLandmark(Landmark(mActiveLandmark, p_pr));
 	messageManager()->playSampleSound();
 
     this->activateLandmark(this->getNextLandmark());
@@ -137,8 +137,8 @@ void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
 {
 //	std::cout << "LandmarkPatientRegistrationWidget::showEvent" << std::endl;
 	LandmarkRegistrationWidget::showEvent(event);
-	connect(toolManager()->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
-	connect(toolManager()->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
+	connect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
+	connect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
 	viewManager()->setRegistrationMode(rsPATIENT_REGISTRATED);
 
@@ -155,8 +155,8 @@ void LandmarkPatientRegistrationWidget::hideEvent(QHideEvent* event)
 {
 //	std::cout << "LandmarkPatientRegistrationWidget::hideEvent" << std::endl;
 	LandmarkRegistrationWidget::hideEvent(event);
-	disconnect(toolManager()->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
-	disconnect(toolManager()->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
+	disconnect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
+	disconnect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
 	if(viewManager()->get3DView(0, 0))
 	{
@@ -173,7 +173,7 @@ void LandmarkPatientRegistrationWidget::hideEvent(QHideEvent* event)
 void LandmarkPatientRegistrationWidget::removeLandmarkButtonClickedSlot()
 {
     QString next = this->getNextLandmark();
-	toolManager()->getPatientLandmarks()->removeLandmark(mActiveLandmark);
+	dataManager()->getPatientLandmarks()->removeLandmark(mActiveLandmark);
     this->activateLandmark(next);
 }
 
@@ -196,7 +196,7 @@ void LandmarkPatientRegistrationWidget::prePaintEvent()
  */
 LandmarkMap LandmarkPatientRegistrationWidget::getTargetLandmarks() const
 {
-	return toolManager()->getPatientLandmarks()->getLandmarks();
+	return dataManager()->getPatientLandmarks()->getLandmarks();
 }
 
 /** Return transform from target space to reference space
@@ -204,13 +204,13 @@ LandmarkMap LandmarkPatientRegistrationWidget::getTargetLandmarks() const
  */
 Transform3D LandmarkPatientRegistrationWidget::getTargetTransform() const
 {
-	Transform3D rMpr = toolManager()->get_rMpr();
+	Transform3D rMpr = dataManager()->get_rMpr();
 	return rMpr;
 }
 
 void LandmarkPatientRegistrationWidget::setTargetLandmark(QString uid, Vector3D p_target)
 {
-	toolManager()->getPatientLandmarks()->setLandmark(Landmark(uid, p_target));
+	dataManager()->getPatientLandmarks()->setLandmark(Landmark(uid, p_target));
 	messageManager()->playSampleSound();
 }
 
@@ -219,7 +219,7 @@ void LandmarkPatientRegistrationWidget::performRegistration()
 	if (!mManager->getFixedData())
 		mManager->setFixedData(dataManager()->getActiveImage());
 
-	if (toolManager()->getPatientLandmarks()->getLandmarks().size() < 3)
+	if (dataManager()->getPatientLandmarks()->getLandmarks().size() < 3)
 		return;
 
 	mManager->doPatientRegistration();

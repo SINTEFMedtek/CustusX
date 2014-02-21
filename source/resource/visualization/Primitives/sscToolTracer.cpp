@@ -35,6 +35,7 @@
 #include "sscBoundingBox3D.h"
 #include "sscVolumeHelpers.h"
 #include "sscToolManager.h"
+#include "sscDataManager.h"
 
 namespace cx
 {
@@ -138,7 +139,7 @@ bool ToolTracer::isRunning() const
 
 void ToolTracer::receiveTransforms(Transform3D prMt, double timestamp)
 {
-	Transform3D rMpr = ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = dataManager()->get_rMpr();
 	Transform3D rMt = rMpr * prMt;
 
 	Vector3D p = rMt.coord(Vector3D(0,0,0));

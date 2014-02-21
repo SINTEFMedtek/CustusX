@@ -84,8 +84,8 @@ void GuideRep2D::onModifiedStartRender()
 	}
 
 	double toolOffset = mSliceProxy->getTool()->getTooltipOffset();
-	Vector3D toolOffsetPosRef = (ToolManager::getInstance()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,0,toolOffset));
-	Vector3D toolPosRef = (ToolManager::getInstance()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,0,0));
+	Vector3D toolOffsetPosRef = (dataManager()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,0,toolOffset));
+	Vector3D toolPosRef = (dataManager()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,0,0));
 
 	Vector3D centerRef = mMetric->getRefCoord() + 0.5*(toolOffsetPosRef - mMetric->getRefCoord());
 	Vector3D position = mSliceProxy->get_sMr() * centerRef;

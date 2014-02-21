@@ -277,7 +277,7 @@ std::vector<TimelineEvent> PlaybackWidget::createEvents()
 		copy(current.begin(), current.end(), std::back_inserter(events));
 	}
 
-	RegistrationHistoryPtr reg = toolManager()->get_rMpr_History();
+	RegistrationHistoryPtr reg = dataManager()->get_rMpr_History();
 	TimelineEventVector current = this->convertRegistrationHistoryToEvents(reg);
 	copy(current.begin(), current.end(), std::back_inserter(events));
 

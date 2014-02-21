@@ -305,7 +305,7 @@ void ToolRep3D::update()
 	Transform3D prMt = Transform3D::Identity();
 	if (mTool)
 		prMt = mTool->get_prMt();
-	Transform3D rMpr = ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = dataManager()->get_rMpr();
 
 	Transform3D rMt = rMpr * prMt;
 	mToolActor->SetUserMatrix(rMt.getVtkMatrix());
@@ -328,7 +328,7 @@ void ToolRep3D::probeSectorChanged()
 		return;
 
 	Transform3D prMt = mTool->get_prMt();
-	Transform3D rMpr = ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = dataManager()->get_rMpr();
 
 	if (this->showProbe())
 	{
@@ -381,7 +381,7 @@ void ToolRep3D::updateOffsetGraphics()
 
 	if (!mTool)
 		return;
-	Transform3D rMpr = ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = dataManager()->get_rMpr();
 	Transform3D rMt = rMpr * mTool->get_prMt();
 
 	Vector3D p0 = rMt.coord(Vector3D(0, 0, 0));

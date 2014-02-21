@@ -28,6 +28,7 @@
 #include "sscToolRep3D.h"
 #include "sscTypeConversions.h"
 #include "cxViewManager.h"
+#include "sscDataManager.h"
 #include "sscView.h"
 #include "sscTool.h"
 #include "boost/bind.hpp"
@@ -150,7 +151,7 @@ void CameraStyleForView::moveCameraToolStyleSlot(Transform3D prMt, double timest
 	if (!camera)
 		return;
 
-	Transform3D rMpr = toolManager()->get_rMpr();
+	Transform3D rMpr = dataManager()->get_rMpr();
 
 	Transform3D rMt = rMpr * prMt;
 

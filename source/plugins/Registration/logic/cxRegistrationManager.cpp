@@ -280,7 +280,7 @@ void RegistrationManager::doPatientRegistration()
     return;
   }
   LandmarkMap fixedLandmarks = fixedImage->getLandmarks()->getLandmarks();
-  LandmarkMap toolLandmarks = toolManager()->getPatientLandmarks()->getLandmarks();
+  LandmarkMap toolLandmarks = dataManager()->getPatientLandmarks()->getLandmarks();
 
   this->writePreLandmarkRegistration(fixedImage->getName(), fixedImage->getLandmarks()->getLandmarks());
   this->writePreLandmarkRegistration("physical", toolLandmarks);
@@ -434,7 +434,7 @@ void RegistrationManager::doFastRegistration_Translation()
   }
 
   LandmarkMap fixedLandmarks = fixedImage->getLandmarks()->getLandmarks();
-  LandmarkMap toolLandmarks = toolManager()->getPatientLandmarks()->getLandmarks();
+  LandmarkMap toolLandmarks = dataManager()->getPatientLandmarks()->getLandmarks();
 
   this->writePreLandmarkRegistration(fixedImage->getName(), fixedImage->getLandmarks()->getLandmarks());
   this->writePreLandmarkRegistration("physical", toolLandmarks);
@@ -442,7 +442,7 @@ void RegistrationManager::doFastRegistration_Translation()
   std::vector<QString> landmarks = this->getUsableLandmarks(fixedLandmarks, toolLandmarks);
 
   Transform3D rMd = fixedImage->get_rMd();
-  Transform3D rMpr_old = toolManager()->get_rMpr();
+  Transform3D rMpr_old = dataManager()->get_rMpr();
   std::vector<Vector3D> p_pr_old = this->convertAndTransformToPoints(landmarks, fixedLandmarks, rMpr_old.inv()*rMd);
   std::vector<Vector3D> p_pr_new = this->convertAndTransformToPoints(landmarks, toolLandmarks, Transform3D::Identity());
 
@@ -471,7 +471,7 @@ void RegistrationManager::doFastRegistration_Translation()
  */
 void RegistrationManager::applyPatientOrientation(const Transform3D& tMtm)
 {
-	Transform3D rMpr = toolManager()->get_rMpr();
+	Transform3D rMpr = dataManager()->get_rMpr();
 	Transform3D prMt = toolManager()->getDominantTool()->get_prMt();
 
 	//create a marked(m) space tm, which is related to tool space (t) as follows:
@@ -550,7 +550,7 @@ void RegistrationManager::applyPatientRegistration(Transform3D rMpr_new, QString
 {
 	RegistrationTransform regTrans(rMpr_new, QDateTime::currentDateTime(), description);
 	regTrans.mFixed = mFixedData ? mFixedData->getUid() : "";
-	toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
+	dataManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
 	mLastRegistrationTime = regTrans.mTimestamp;
 	messageManager()->sendSuccess(QString("Patient registration [%1] has been performed.").arg(description));
 	patientService()->getPatientData()->autoSave();

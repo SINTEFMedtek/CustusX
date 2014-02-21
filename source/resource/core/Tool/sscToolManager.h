@@ -35,13 +35,12 @@ namespace cx
 {
 
 typedef std::map<ToolPtr, TimedTransformMap> SessionToolHistoryMap;
-typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 
 /**\brief Manager interface for tools and tracking systems.
  *
  * A singleton for managing all tools.
- * Configuration, active tool, patient registration.
+ * Configuration, active tool.
  *
  * Implementations of ToolManager typically connect to
  * a physical tracking system.
@@ -84,16 +83,12 @@ public:
 	virtual std::vector<QString> getToolNames() const = 0; ///< get the name of all tools
 	virtual std::vector<QString> getToolUids() const = 0; ///< get the uid of all the tools
 
-	virtual Transform3D get_rMpr() const = 0; ///< transform from patient ref to ref space
-	virtual void set_rMpr(const Transform3D& val) = 0; ///< set transform from patient ref to ref space
-	virtual RegistrationHistoryPtr get_rMpr_History() = 0;
 	virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
 	virtual void savePositionHistory() = 0;
 	virtual void loadPositionHistory() = 0;
 	virtual void addXml(QDomNode& parentNode) = 0;
 	virtual void parseXml(QDomNode& dataNode) = 0;
 	virtual void clear() = 0;
-	virtual LandmarksPtr getPatientLandmarks() = 0;
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime) = 0;
 
 signals:
@@ -105,7 +100,6 @@ signals:
 	void trackingStopped(); ///< system stops tracking
 
 	void dominantToolChanged(const QString& uId); ///<signal for change of dominant tool
-	void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
 	void tps(int); ///< the dominant tools tps
 	void tooltipOffset(double offset); ///< The tool tip offset
 

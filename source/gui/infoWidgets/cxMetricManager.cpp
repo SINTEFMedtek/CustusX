@@ -85,7 +85,7 @@ void MetricManager::moveToMetric(QString uid)
 
 void MetricManager::setManualToolPosition(Vector3D p_r)
 {
-	Transform3D rMpr = toolManager()->get_rMpr();
+	Transform3D rMpr = dataManager()->get_rMpr();
 	Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip

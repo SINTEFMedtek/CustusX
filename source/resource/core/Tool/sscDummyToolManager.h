@@ -75,7 +75,7 @@ public:
 
 	virtual LandmarksPtr getPatientLandmarks() { return Landmarks::create(); }
 
-	virtual RegistrationHistoryPtr get_rMpr_History() { return RegistrationHistoryPtr(); }
+//	virtual RegistrationHistoryPtr get_rMpr_History() { return RegistrationHistoryPtr(); }
 	virtual void savePositionHistory() {}
 	virtual void loadPositionHistory() {}
 	virtual void addXml(QDomNode& parentNode) {}

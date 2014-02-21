@@ -156,7 +156,7 @@ void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 {
 	if (!mShowInToolSpace)
 		return;
-	Transform3D rMpr = ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = dataManager()->get_rMpr();
 	Transform3D tMu = mProbeData.get_tMu();
 	Transform3D rMu = rMpr * prMt * tMu;
 	mPipeline->setActorUserMatrix(rMu.getVtkMatrix());

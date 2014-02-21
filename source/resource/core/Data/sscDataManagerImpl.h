@@ -102,6 +102,12 @@ public:
 	virtual ImagePtr createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath);
 	virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath);
 
+	virtual Transform3D get_rMpr() const; ///< get the patient registration transform
+	virtual void set_rMpr(const Transform3D& val); ///<  set the transform from patient to reference space
+	virtual RegistrationHistoryPtr get_rMpr_History();
+
+	virtual LandmarksPtr getPatientLandmarks();
+
 protected:
 	DataManagerImpl();
 	virtual ~DataManagerImpl();
@@ -124,6 +130,8 @@ protected:
 	void generateUidAndName(QString* _uid, QString* _name);
 
 	LandmarkPropertyMap mLandmarkProperties; ///< uid and name
+	RegistrationHistoryPtr m_rMpr_History; ///< transform from the patient reference to the reference, along with historical data.
+	LandmarksPtr mPatientLandmarks; ///< in space patient reference.
 
 public slots:
 	void vtkImageDataChangedSlot();

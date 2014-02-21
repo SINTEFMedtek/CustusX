@@ -65,6 +65,9 @@ void DataManagerImpl::initialize()
 DataManagerImpl::DataManagerImpl()
 {
 	mClinicalApplication = mdLABORATORY;
+	m_rMpr_History.reset(new RegistrationHistory());
+	connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
+	mPatientLandmarks = Landmarks::create();
 	this->clear();
 }
 
@@ -79,10 +82,18 @@ void DataManagerImpl::clear()
 	mActiveImage.reset();
 	mLandmarkProperties.clear();
 
+	m_rMpr_History->clear();
+	mPatientLandmarks->clear();
+
 	emit centerChanged();
 	emit activeImageChanged("");
 	emit landmarkPropertiesChanged();
 	emit dataAddedOrRemoved();
+}
+
+LandmarksPtr DataManagerImpl::getPatientLandmarks()
+{
+	return mPatientLandmarks;
 }
 
 // streams
@@ -366,6 +377,8 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 	QDomElement dataManagerNode = doc.createElement("datamanager");
 	parentNode.appendChild(dataManagerNode);
 
+	m_rMpr_History->addXml(dataManagerNode);
+
 	QDomElement activeImageNode = doc.createElement("activeImageUid");
 	if (mActiveImage)
 		activeImageNode.appendChild(doc.createTextNode(mActiveImage->getUid()));
@@ -381,6 +394,10 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 	}
 	dataManagerNode.appendChild(landmarkPropsNode);
 
+	QDomElement landmarksNode = doc.createElement("landmarks");
+	mPatientLandmarks->addXml(landmarksNode);
+	dataManagerNode.appendChild(landmarksNode);
+
 	QDomElement centerNode = doc.createElement("center");
 	centerNode.appendChild(doc.createTextNode(qstring_cast(mCenter)));
 	dataManagerNode.appendChild(centerNode);
@@ -395,6 +412,19 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 
 void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 {
+//	QDomNode toolManagerNode = dataManagerNode.parentNode().namedItem("toolManager");
+//	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
+//	QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
+//	toolManager()->parseXml(toolmanagerNode);
+
+	// look in the toolmanager, for backwards compatibility (2014-02-21)
+	QDomNode toolManagerNode = dataManagerNode.parentNode().namedItem("toolManager");
+
+	QDomNode registrationHistory = dataManagerNode.namedItem("registrationHistory");
+	if (registrationHistory.isNull())
+		registrationHistory = toolManagerNode.namedItem("registrationHistory");
+	m_rMpr_History->parseXml(registrationHistory);
+
 	QDomNode landmarksNode = dataManagerNode.namedItem("landmarkprops");
 	QDomElement landmarkNode = landmarksNode.firstChildElement("landmarkprop");
 	for (; !landmarkNode.isNull(); landmarkNode = landmarkNode.nextSiblingElement("landmarkprop"))
@@ -405,6 +435,11 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 		//std::cout << "Loaded landmarkprop with name: " << landmarkProp.getName() << std::endl;
 		emit landmarkPropertiesChanged();
 	}
+
+	QDomNode patientLandmarksNode = dataManagerNode.namedItem("landmarks");
+	if (patientLandmarksNode.isNull())
+		patientLandmarksNode = toolManagerNode.namedItem("landmarks");
+	mPatientLandmarks->parseXml(patientLandmarksNode);
 
 	// All images must be created from the DataManager, so the image nodes are parsed here
 	std::map<DataPtr, QDomNode> datanodes;
@@ -677,6 +712,20 @@ void DataManagerImpl::deleteFiles(DataPtr data, QString basePath)
 	}
 }
 
+Transform3D DataManagerImpl::get_rMpr() const
+{
+	return m_rMpr_History->getCurrentRegistration().mValue;
+}
+
+void DataManagerImpl::set_rMpr(const Transform3D& val)
+{
+	m_rMpr_History->setRegistration(val);
+}
+
+RegistrationHistoryPtr DataManagerImpl::get_rMpr_History()
+{
+	return m_rMpr_History;
+}
 
 
 

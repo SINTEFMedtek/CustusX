@@ -31,11 +31,13 @@
 #include "sscLandmark.h"
 #include "sscDefinitions.h"
 #include "sscForwardDeclarations.h"
+#include "sscTransform3D.h"
 
 namespace cx
 {
 // forward declarations
 typedef boost::shared_ptr<class TransferFunctions3DPresets> PresetTransferFunctions3DPtr;
+typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 
 /**\brief Interface for a manager of data objects.
  *
@@ -106,6 +108,11 @@ public:
 	virtual void addXml(QDomNode& parentNode) = 0; ///< adds xml information about the datamanger and its variabels
 	virtual void parseXml(QDomNode& datamangerNode, QString absolutePath = QString()) = 0; ///< Use a XML node to load data. \param datamangerNode A XML data representation of the DataManager. \param absolutePath Absolute path to the data elements. Used together with the relative paths stored in the filePath elements.
 
+	virtual Transform3D get_rMpr() const = 0; ///< get the patient registration transform
+	virtual void set_rMpr(const Transform3D& val) = 0; ///<  set the transform from patient to reference space
+	virtual RegistrationHistoryPtr get_rMpr_History() = 0;
+	virtual LandmarksPtr getPatientLandmarks() = 0;
+
 signals:
 	void centerChanged(); ///< emitted when center is changed.
 	void dataAddedOrRemoved();
@@ -113,6 +120,7 @@ signals:
 	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
 	void clinicalApplicationChanged();
 	void streamLoaded();
+	void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
 
 protected:
 	static void setInstance(DataManager* instance);
