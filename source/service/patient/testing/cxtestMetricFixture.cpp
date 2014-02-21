@@ -43,7 +43,7 @@ FrameMetricWithInput MetricFixture::getFrameMetricWithInput()
 	FrameMetricWithInput retval;
 
 	retval.m_qMt = cx::createTransformRotateZ(M_PI_2) * cx::createTransformTranslate(cx::Vector3D(1,2,3));
-	retval.mSpace = cx::SpaceHelpers::getR();
+	retval.mSpace = cx::CoordinateSystemHelpers::getR();
 
 	retval.mMetric = cx::FrameMetric::create("testMetric%1");
     retval.mMetric->setFrame(retval.m_qMt);
@@ -58,7 +58,7 @@ ToolMetricWithInput MetricFixture::getToolMetricWithInput()
 	ToolMetricWithInput retval;
 
 	retval.m_qMt = cx::createTransformRotateZ(M_PI_2) * cx::createTransformTranslate(cx::Vector3D(1,2,3));
-	retval.mSpace = cx::SpaceHelpers::getR();
+	retval.mSpace = cx::CoordinateSystemHelpers::getR();
 	retval.mName = "TestTool";
 	retval.mOffset = 5;
 
@@ -77,7 +77,7 @@ PointMetricWithInput MetricFixture::getPointMetricWithInput(cx::Vector3D point)
 	PointMetricWithInput retval;
 
     retval.mPoint = point;
-	retval.mSpace = cx::SpaceHelpers::getR();
+	retval.mSpace = cx::CoordinateSystemHelpers::getR();
 
 	retval.mMetric = cx::PointMetric::create("testMetric%1");
     retval.mMetric->setCoordinate(point);
@@ -93,7 +93,7 @@ PlaneMetricWithInput MetricFixture::getPlaneMetricWithInput(cx::Vector3D point, 
 
     retval.mPoint = point;
     retval.mNormal = normal;
-	retval.mSpace = cx::SpaceHelpers::getR();
+	retval.mSpace = cx::CoordinateSystemHelpers::getR();
 
 	retval.mMetric = cx::PlaneMetric::create("testMetric%1");
     retval.mMetric->setCoordinate(point);

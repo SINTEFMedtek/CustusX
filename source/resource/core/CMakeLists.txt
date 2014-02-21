@@ -45,6 +45,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Tool/sscProbeAdapterRTSource
 	Tool/sscSliceProxy
 	Tool/sscSlicedImageProxy
+	Tool/cxToolImpl
 
 	dataAdapters/sscDataAdapter
 	dataAdapters/sscDoubleDataAdapter.h

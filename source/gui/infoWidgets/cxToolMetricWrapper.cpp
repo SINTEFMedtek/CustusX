@@ -69,7 +69,7 @@ QWidget* ToolMetricWrapper::createWidget()
 void ToolMetricWrapper::initializeDataAdapters()
 {
 	QString value;// = qstring_cast(mData->getFrame());
-	std::vector<CoordinateSystem> spaces = SpaceHelpers::getSpacesToPresentInGUI();
+	std::vector<CoordinateSystem> spaces = CoordinateSystemHelpers::getSpacesToPresentInGUI();
 	QStringList range;
 	for (unsigned i=0; i<spaces.size(); ++i)
 		range << spaces[i].toString();
@@ -121,8 +121,8 @@ QString ToolMetricWrapper::getArguments() const
 
 void ToolMetricWrapper::resampleMetric()
 {
-	CoordinateSystem ref = SpaceHelpers::getR();
-	Transform3D qMt = SpaceHelpers::getDominantToolTipTransform(mData->getSpace(), true);
+	CoordinateSystem ref = CoordinateSystemHelpers::getR();
+	Transform3D qMt = CoordinateSystemHelpers::getDominantToolTipTransform(mData->getSpace(), true);
 	mData->setFrame(qMt);
 	mData->setToolName(toolManager()->getDominantTool()->getName());
 	mData->setToolOffset(toolManager()->getDominantTool()->getTooltipOffset());

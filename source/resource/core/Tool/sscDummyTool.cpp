@@ -56,6 +56,7 @@ int DummyTool::mTransformCount = 0;
 
 
 DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
+	ToolImpl(manager, uid),
 	mVisible(false),
 	mTransformSaveFileName("DummyToolsAreToDumbToSaveThemselves"),
 	mTimer(new QTimer()),
@@ -70,8 +71,8 @@ DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
 	mPolyData = this->createPolyData(150, 15, 4, 2);
 
 	connect(mTimer.get(), SIGNAL(timeout()),this, SLOT(sendTransform()));
-	if (manager)
-		connect(manager, SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
+	if (mManager)
+		connect(mManager, SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }
 
 DummyTool::~DummyTool()
@@ -367,17 +368,19 @@ Transform3D* DummyTool::getNextTransform()
 void DummyTool::set_prMt(const Transform3D& prMt)
 {
 	double timestamp = this->getTimestamp();
-	Tool::set_prMt(prMt, timestamp);
+	ToolImpl::set_prMt(prMt, timestamp);
 }
 
 double DummyTool::getTooltipOffset() const 
 {
-	return toolManager()->getTooltipOffset();
+	if (mManager)
+		return mManager->getTooltipOffset();
 }
 
 void DummyTool::setTooltipOffset(double val) 
 { 
-	toolManager()->setTooltipOffset(val);
+	if (mManager)
+		mManager->setTooltipOffset(val);
 }
 
 Transform3D DummyTool::getCalibration_sMt() const

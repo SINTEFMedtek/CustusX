@@ -20,7 +20,7 @@ namespace cx {
 
 FrameMetricBase::FrameMetricBase(const QString& uid, const QString& name) :
 		DataMetric(uid, name),
-		mSpace(SpaceHelpers::getR()),
+		mSpace(CoordinateSystemHelpers::getR()),
 		mFrame(Transform3D::Identity())
 {
 	mSpaceListener.reset(new CoordinateSystemListener(mSpace));
@@ -51,7 +51,7 @@ Vector3D FrameMetricBase::getCoordinate() const
   */
 Transform3D FrameMetricBase::getRefFrame() const
 {
-	Transform3D rMq = SpaceHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
+	Transform3D rMq = CoordinateSystemHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
 	return rMq * mFrame;
 }
 
@@ -70,7 +70,7 @@ void FrameMetricBase::setSpace(CoordinateSystem space)
 		return;
 
 	// keep the absolute position (in ref) constant when changing space.
-	Transform3D new_M_old = SpaceHelpers::get_toMfrom(this->getSpace(), space);
+	Transform3D new_M_old = CoordinateSystemHelpers::get_toMfrom(this->getSpace(), space);
 	mFrame = new_M_old*mFrame;
 
 	mSpace = space;
@@ -85,7 +85,7 @@ CoordinateSystem FrameMetricBase::getSpace() const
 DoubleBoundingBox3D FrameMetricBase::boundingBox() const
 {
 	// convert both inputs to r space
-	Transform3D rM0 = SpaceHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
+	Transform3D rM0 = CoordinateSystemHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
 	Vector3D p0_r = rM0.coord(this->getCoordinate());
 
 	return DoubleBoundingBox3D(p0_r, p0_r);

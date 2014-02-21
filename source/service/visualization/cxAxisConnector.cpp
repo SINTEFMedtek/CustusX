@@ -49,7 +49,7 @@ void AxisConnector::connectTo(ToolPtr tool)
 
 void AxisConnector::changedSlot()
 {
-	Transform3D  rMs = SpaceHelpers::get_toMfrom(mListener->getSpace(), CoordinateSystem(csREF));
+	Transform3D  rMs = CoordinateSystemHelpers::get_toMfrom(mListener->getSpace(), CoordinateSystem(csREF));
 	mRep->setTransform(rMs);
 
 	mRep->setVisible(true);
@@ -61,7 +61,7 @@ void AxisConnector::changedSlot()
 	// Dont show if equal to base
 	if (mBase)
 	{
-		Transform3D rMb = SpaceHelpers::get_toMfrom(mBase->getSpace(), CoordinateSystem(csREF));
+		Transform3D rMb = CoordinateSystemHelpers::get_toMfrom(mBase->getSpace(), CoordinateSystem(csREF));
 		if (similar(rMb, rMs))
 			mRep->setVisible(false);
 	}

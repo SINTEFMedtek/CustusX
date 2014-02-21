@@ -183,7 +183,7 @@ QWidget* PointMetricWrapper::createWidget()
 StringDataAdapterXmlPtr PointMetricWrapper::createSpaceSelector() const
 {
 	QString value;// = qstring_cast(mData->getFrame());
-	std::vector<CoordinateSystem> spaces = SpaceHelpers::getSpacesToPresentInGUI();
+	std::vector<CoordinateSystem> spaces = CoordinateSystemHelpers::getSpacesToPresentInGUI();
 	QStringList range;
 	for (unsigned i=0; i<spaces.size(); ++i)
 		range << spaces[i].toString();
@@ -250,7 +250,7 @@ QString PointMetricWrapper::getArguments() const
 
 void PointMetricWrapper::moveToToolPosition()
 {
-	Vector3D p = SpaceHelpers::getDominantToolTipPoint(mData->getSpace(), true);
+	Vector3D p = CoordinateSystemHelpers::getDominantToolTipPoint(mData->getSpace(), true);
 	mData->setCoordinate(p);
 }
 
@@ -300,7 +300,7 @@ QWidget* PlaneMetricWrapper::createWidget()
 	topLayout->addLayout(hLayout);
 
 	QString value;// = qstring_cast(mData->getFrame());
-	std::vector<CoordinateSystem> spaces = SpaceHelpers::getSpacesToPresentInGUI();
+	std::vector<CoordinateSystem> spaces = CoordinateSystemHelpers::getSpacesToPresentInGUI();
 	QStringList range;
 	for (unsigned i=0; i<spaces.size(); ++i)
 		range << spaces[i].toString();

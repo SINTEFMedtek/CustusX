@@ -70,6 +70,5 @@ private:
 
 	static CoordinateSystem getToolCoordinateSystem(ToolPtr tool);
 };
-typedef CoordinateSystemHelpers SpaceHelpers;
 }//namespace cx
 #endif /* SSCCOORDINATESYSTEMHELPERS_H_ */
