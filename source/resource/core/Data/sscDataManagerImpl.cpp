@@ -180,9 +180,9 @@ void DataManagerImpl::setLandmarkActive(QString uid, bool active)
 	emit landmarkPropertiesChanged();
 }
 
-ImagePtr DataManagerImpl::loadImage(const QString& uid, const QString& filename, READER_TYPE notused)
+ImagePtr DataManagerImpl::loadImage(const QString& uid, const QString& filename)
 {
-	DataPtr data = this->loadData(uid, filename, notused);
+	DataPtr data = this->loadData(uid, filename);
 	if (!data)
 		{
 			messageManager()->sendError("Error with image file: " + filename);
@@ -191,7 +191,7 @@ ImagePtr DataManagerImpl::loadImage(const QString& uid, const QString& filename,
 	return this->getImage(uid);
 }
 
-DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path, READER_TYPE notused)
+DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 {
 	DataPtr data = this->readData(uid, path, "unknown");
 	if (!data)
@@ -238,35 +238,16 @@ void DataManagerImpl::loadData(DataPtr data)
 
 void DataManagerImpl::saveImage(ImagePtr image, const QString& basePath)
 {
-//	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
-//	writer->SetInput(image->getBaseVtkImageData());
-//	writer->SetFileDimensionality(3);
 	QString filename = basePath + "/Images/" + image->getUid() + ".mhd";
 	image->setFilename(QDir(basePath).relativeFilePath(filename));
-//	writer->SetFileName(cstring_cast(filename));
-//	QDir().mkpath(QFileInfo(filename).path());
-
-//	QString rawfilename = image->getUid() + ".raw";
-
-//	writer->SetRAWFileName(cstring_cast(rawfilename));
-//	writer->SetCompression(false);
-//	writer->Update();
-//	writer->Write();
-
-//	writer = 0;
-
-//	CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
-//	customReader->setTransform(image->get_rMd());
-//	customReader->setModality(image->getModality());
-//	customReader->setImageType(image->getImageType());
 
 	MetaImageReader().saveImage(image, filename);
 }
 
 // meshes
-MeshPtr DataManagerImpl::loadMesh(const QString& uid, const QString& fileName, READER_TYPE type)
+MeshPtr DataManagerImpl::loadMesh(const QString& uid, const QString& fileName)
 {
-	DataPtr data = this->loadData(uid, fileName, type);
+	DataPtr data = this->loadData(uid, fileName);
 	if (!data)
 		{
 			messageManager()->sendError("Error with mesh file: " + fileName);
@@ -303,10 +284,7 @@ void DataManagerImpl::saveMesh(MeshPtr mesh, const QString& basePath)
 {
 	vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();
 	writer->SetInput(mesh->getVtkPolyData());
-	//writer->SetFileDimensionality(3);
-//	QString filename = basePath + "/" + mesh->getFilePath();
 	QString filename = basePath + "/Images/" + mesh->getUid() + ".vtk";
-//	mesh->setFilename(filename);
 	mesh->setFilename(QDir(basePath).relativeFilePath(filename));
 	writer->SetFileName(cstring_cast(filename));
 
@@ -402,12 +380,6 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 		landmarkPropsNode.appendChild(landmarkPropNode);
 	}
 	dataManagerNode.appendChild(landmarkPropsNode);
-
-	//TODO
-	/*QDomElement activeMeshNode = doc.createElement("activeMesh");
-	 if(mActiveMesh)
-	 activeMeshNode.appendChild(doc.createTextNode(mActiveMesh->getUid().c_str()));
-	 dataManagerNode.appendChild(activeMeshNode);*/
 
 	QDomElement centerNode = doc.createElement("center");
 	centerNode.appendChild(doc.createTextNode(qstring_cast(mCenter)));
@@ -615,15 +587,6 @@ ImagePtr DataManagerImpl::createDerivedImage(vtkImageDataPtr data, QString uid, 
 	retval->get_rMd_History()->setParentSpace(parentImage->getUid());
 	ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy();
 	ImageLUT2DPtr LUT2D = parentImage->getLookupTable2D()->createCopy();
-	//The parent may have a different range of voxel values. Make sure the transfer functions are working
-//	if (transferFunctions)
-//		transferFunctions->fixTransferFunctions();
-//	else
-//		std::cout << "transferFunctions error" << std::endl;
-//	if (LUT2D)
-//		LUT2D->fixTransferFunctions();
-//	else
-//		std::cout << "LUT2D error" << std::endl;
 	retval->setLookupTable2D(LUT2D);
 	retval->setTransferFunctions3D(transferFunctions);
 	retval->setModality(parentImage->getModality());
