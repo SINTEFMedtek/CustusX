@@ -150,7 +150,7 @@ void CameraStyleForView::moveCameraToolStyleSlot(Transform3D prMt, double timest
 	if (!camera)
 		return;
 
-	Transform3D rMpr = *toolManager()->get_rMpr();
+	Transform3D rMpr = toolManager()->get_rMpr();
 
 	Transform3D rMt = rMpr * prMt;
 

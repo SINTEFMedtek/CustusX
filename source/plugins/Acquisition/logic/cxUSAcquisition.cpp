@@ -119,7 +119,7 @@ void USAcquisition::recordStopped()
 
 	this->sendAcquisitionDataToReconstructer();
 
-	mCore->set_rMpr(*toolManager()->get_rMpr());
+	mCore->set_rMpr(toolManager()->get_rMpr());
 	bool compress = settings()->value("Ultrasound/CompressAcquisition", true).toBool();
 	QString baseFolder = patientService()->getPatientData()->getActivePatientFolder();
 	mCore->startSaveData(baseFolder, compress);
@@ -136,7 +136,7 @@ void USAcquisition::recordCancelled()
 
 void USAcquisition::sendAcquisitionDataToReconstructer()
 {
-	mCore->set_rMpr(*toolManager()->get_rMpr());
+	mCore->set_rMpr(toolManager()->get_rMpr());
 
 	VideoSourcePtr activeVideoSource = videoService()->getActiveVideoSource();
 	if (activeVideoSource)

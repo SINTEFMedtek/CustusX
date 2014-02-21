@@ -323,7 +323,7 @@ std::pair<QString, Transform3D> WirePhantomWidget::getLastProbePosition()
     if (usData.mPositions.empty())
         return std::make_pair("", Transform3D::Identity());
     prMt_us = usData.mPositions[usData.mPositions.size()/2].mPos;
-    Transform3D rMt_us = (*ToolManager::getInstance()->get_rMpr()) * prMt_us;
+	Transform3D rMt_us = ToolManager::getInstance()->get_rMpr() * prMt_us;
     return std::make_pair(usData.mFilename, prMt_us);
 }
 
@@ -394,7 +394,7 @@ void WirePhantomWidget::generate_sMt()
         Transform3D prMt = rMt_us;
         Transform3D sMt = probe->getCalibration_sMt();
         Transform3D prMs = prMt * sMt.inv();
-        Transform3D usMpr = mManager->getMovingData()->get_rMd().inv() * *toolManager()->get_rMpr();
+		Transform3D usMpr = mManager->getMovingData()->get_rMd().inv() * toolManager()->get_rMpr();
         Transform3D nomMus = mLastRegistration.inv();
 
         Transform3D sQt; // Q is the new calibration matrix.

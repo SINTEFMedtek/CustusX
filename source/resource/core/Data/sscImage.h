@@ -23,14 +23,12 @@
 #include <map>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-#include "sscLandmark.h"
 #include "sscBoundingBox3D.h"
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
 #include "sscData.h"
 
 typedef boost::shared_ptr<std::map<int, int> > HistogramMapPtr;
-typedef std::map<QString, class Landmark> LandmarkMap;
 
 class QDomNode;
 class QDomDocument;
@@ -39,14 +37,12 @@ class QDomDocument;
 
 namespace cx
 {
+typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 
 /**\brief A volumetric data set.
  *
  * One volumetric data set, represented as a vtkImageData,
  * along with auxiliary data.
- *
- * \warning Landmarks are only used by SINTEF atm, so they can change the code
- * at any given point.
  *
  * \ingroup sscData
  */
@@ -79,7 +75,7 @@ public:
 	virtual vtkImageDataPtr getGrayScaleVtkImageData(); ///< as getBaseVtkImageData(), but constrained to 1 component if multicolor.
 	virtual vtkImageDataPtr get8bitGrayScaleVtkImageData();///< Have never been used or tested. Create a test for it
 	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the reference coordinate space
-	virtual LandmarkMap getLandmarks(); ///< \return all landmarks defined on the image.
+	LandmarksPtr getLandmarks();
 	/** Return a version of this, containing image data and transfer functions converted to unsigned.
 	  * This is used for the 3D texture slicer that doesnt handle signed data.
 	  */
@@ -144,8 +140,6 @@ public:
 
 	void moveThisAndChildrenToThread(QThread* thread); ///< Move this and all children to thread. Use the thread is generated in a worker thread and the result is to be used in the main thread.
 
-//	bool isValidTransferFunction(ImageTFDataPtr transferFunction); ///< Check if transfer function is valid for this image
-//	ImageTFDataPtr fixCorruptTransferFunction(ImageTFDataPtr transferFunction);
 	static vtkImageDataPtr createDummyImageData(int axisSize, int maxVoxelValue); ///< Create a moc object of vtkImageData
 
 	void setInterpolationTypeToNearest();
@@ -156,16 +150,10 @@ public:
 	vtkImageDataPtr resample(long maxVoxels);
 
 signals:
-	void landmarkRemoved(QString uid);
-	void landmarkAdded(QString uid);
 	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
 	void transferFunctionsChanged(); ///< emitted when image transfer functions in 2D or 3D are changed.
 	void clipPlanesChanged();
 	void cropBoxChanged();
-
-public slots:
-	void setLandmark(Landmark landmark);
-	void removeLandmark(QString uid);
 
 protected slots:
 	virtual void transformChangedSlot();
@@ -179,7 +167,7 @@ protected:
 	vtkImageAccumulatePtr mHistogramPtr;///< Histogram
 	ImagePtr mUnsigned; ///< version of this containing unsigned data.
 
-	LandmarkMap mLandmarks; ///< map with all landmarks always in space d (data).
+	LandmarksPtr mLandmarks;
 
 	ShadingStruct mShading;
 

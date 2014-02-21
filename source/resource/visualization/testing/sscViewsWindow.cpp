@@ -181,7 +181,7 @@ cx::SliceProxyPtr ViewsWindow::createSliceProxy(cx::PLANE_TYPE plane)
 cx::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 {
 	QString filename = cxtest::Utilities::getDataRoot(imageFilename);
-	cx::ImagePtr image = cx::DataManager::getInstance()->loadImage(filename, filename, cx::rtMETAIMAGE);
+	cx::ImagePtr image = cx::DataManager::getInstance()->loadImage(filename, filename);
 	Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);
 	cx::DataManager::getInstance()->setCenter(center);

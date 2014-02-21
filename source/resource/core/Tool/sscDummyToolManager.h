@@ -65,13 +65,23 @@ public:
 	virtual std::vector<QString> getToolNames() const;
 	virtual std::vector<QString> getToolUids() const;
 
-	virtual Transform3DPtr get_rMpr() const;
-	virtual void set_rMpr(const Transform3DPtr& val);
+	virtual Transform3D get_rMpr() const;
+	virtual void set_rMpr(const Transform3D& val);
 	virtual ToolPtr getReferenceTool() const;
 	virtual void saveTransformsAndTimestamps(QString filePathAndName = "");
 
 	virtual void setTooltipOffset(double offset);
 	virtual double getTooltipOffset() const;
+
+	virtual LandmarksPtr getPatientLandmarks() { return Landmarks::create(); }
+
+	virtual RegistrationHistoryPtr get_rMpr_History() { return RegistrationHistoryPtr(); }
+	virtual void savePositionHistory() {}
+	virtual void loadPositionHistory() {}
+	virtual void addXml(QDomNode& parentNode) {}
+	virtual void parseXml(QDomNode& dataNode) {}
+	virtual void clear() {}
+	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime) { return SessionToolHistoryMap(); }
 
 	static DummyToolManager* getDowncastInstance();
 	/**
@@ -91,7 +101,7 @@ private:
 	DummyToolPtr mDominantTool;
 	DummyToolPtr mReferenceTool;
 
-	Transform3DPtr m_rMpr;
+	Transform3D m_rMpr;
 	double mToolTipOffset; ///< Common tool tip offset for all tools
 
 	bool mConfigured;

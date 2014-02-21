@@ -96,8 +96,8 @@ public:
 	virtual std::vector<QString> getToolNames() const; ///< both from configured and connected tools
 	virtual std::vector<QString> getToolUids() const; ///< both from configured and connected tools
 
-	virtual Transform3DPtr get_rMpr() const; ///< get the patient registration transform
-	virtual void set_rMpr(const Transform3DPtr& val); ///<  set the transform from patient to reference space
+	virtual Transform3D get_rMpr() const; ///< get the patient registration transform
+	virtual void set_rMpr(const Transform3D& val); ///<  set the transform from patient to reference space
 
 	virtual RegistrationHistoryPtr get_rMpr_History();
 
@@ -113,10 +113,7 @@ public:
 	virtual void clear(); ///< clear everything loaded from xml
 
 	ManualToolPtr getManualTool(); ///< a mouse-controllable virtual tool that is available even when not tracking.
-	virtual LandmarkMap getLandmarks();
-	virtual void setLandmark(Landmark landmark);
-	virtual void removeLandmark(QString uid);
-	virtual void removeLandmarks();
+	virtual LandmarksPtr getPatientLandmarks();
 
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
 
@@ -175,7 +172,7 @@ private:
 	bool mTracking; ///< whether or not the system is tracking
 	bool mPlayBackMode; ///< special mode: all tools are displaying historic positions.
 
-	LandmarkMap mLandmarks; ///< in space patient reference.
+	LandmarksPtr mPatientLandmarks; ///< in space patient reference.
 	double mLastLoadPositionHistory;
 
 	IgstkTrackerThreadPtr mTrackerThread;

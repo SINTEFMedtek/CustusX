@@ -25,6 +25,7 @@
 #include <QObject>
 #include <QDateTime>
 #include "sscVector3D.h"
+#include "boost/shared_ptr.hpp"
 
 class QDomNode;
 
@@ -56,7 +57,7 @@ public:
 	Vector3D getCoord() const;
 	QDateTime getTimestamp() const;
 
-	void addXml(QDomNode& dataNode);
+	void addXml(QDomNode& dataNode) const;
 	void parseXml(QDomNode& dataNode);
 
 private:
@@ -67,6 +68,33 @@ private:
 typedef std::map<QString, Landmark> LandmarkMap;
 
 bool operator<(const Landmark& lhs, const Landmark& rhs);
+
+typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
+/** A collection of all landmarks in a given space.
+  */
+class Landmarks : public QObject
+{
+	Q_OBJECT
+public:
+	static LandmarksPtr create();
+
+	LandmarkMap getLandmarks();
+	void addXml(QDomNode dataNode) const;
+	void parseXml(QDomNode dataNode);
+	void clear();
+
+public slots:
+	void setLandmark(Landmark landmark);
+	void removeLandmark(QString uid);
+
+signals:
+	void landmarkRemoved(QString uid);
+	void landmarkAdded(QString uid);
+
+private:
+	Landmarks();
+	LandmarkMap mLandmarks; ///< map with all landmarks always in a specific space.
+};
 
 
 class LandmarkProperty
