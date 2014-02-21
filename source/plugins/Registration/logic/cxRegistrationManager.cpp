@@ -279,10 +279,10 @@ void RegistrationManager::doPatientRegistration()
     messageManager()->sendError("The fixed data is not a image, cannot do patient registration!");
     return;
   }
-  LandmarkMap fixedLandmarks = fixedImage->getLandmarks();
-  LandmarkMap toolLandmarks = toolManager()->getLandmarks();
+  LandmarkMap fixedLandmarks = fixedImage->getLandmarks()->getLandmarks();
+  LandmarkMap toolLandmarks = toolManager()->getPatientLandmarks()->getLandmarks();
 
-  this->writePreLandmarkRegistration(fixedImage->getName(), fixedImage->getLandmarks());
+  this->writePreLandmarkRegistration(fixedImage->getName(), fixedImage->getLandmarks()->getLandmarks());
   this->writePreLandmarkRegistration("physical", toolLandmarks);
 
   std::vector<QString> landmarks = this->getUsableLandmarks(fixedLandmarks, toolLandmarks);
@@ -343,11 +343,11 @@ void RegistrationManager::doImageRegistration(bool translationOnly)
     return;
   }
 
-  LandmarkMap fixedLandmarks = fixedImage->getLandmarks();
-  LandmarkMap imageLandmarks = movingImage->getLandmarks();
+  LandmarkMap fixedLandmarks = fixedImage->getLandmarks()->getLandmarks();
+  LandmarkMap imageLandmarks = movingImage->getLandmarks()->getLandmarks();
 
-  this->writePreLandmarkRegistration(fixedImage->getName(), fixedImage->getLandmarks());
-  this->writePreLandmarkRegistration(movingImage->getName(), movingImage->getLandmarks());
+  this->writePreLandmarkRegistration(fixedImage->getName(), fixedImage->getLandmarks()->getLandmarks());
+  this->writePreLandmarkRegistration(movingImage->getName(), movingImage->getLandmarks()->getLandmarks());
 
   std::vector<QString> landmarks = getUsableLandmarks(fixedLandmarks, imageLandmarks);
 //  vtkPointsPtr p_ref = convertTovtkPoints(landmarks, fixedLandmarks, fixedImage->get_rMd());
@@ -404,7 +404,7 @@ void RegistrationManager::doImageRegistration(bool translationOnly)
  */
 void RegistrationManager::doFastRegistration_Orientation(const Transform3D& tMtm)
 {
-  Transform3DPtr rMpr = toolManager()->get_rMpr();
+//  Transform3D rMpr = toolManager()->get_rMpr();
   Transform3D prMt = toolManager()->getDominantTool()->get_prMt();
 
   //create a marked(m) space tm, which is related to tool space (t) as follows:
@@ -433,16 +433,16 @@ void RegistrationManager::doFastRegistration_Translation()
     return;
   }
 
-  LandmarkMap fixedLandmarks = fixedImage->getLandmarks();
-  LandmarkMap toolLandmarks = toolManager()->getLandmarks();
+  LandmarkMap fixedLandmarks = fixedImage->getLandmarks()->getLandmarks();
+  LandmarkMap toolLandmarks = toolManager()->getPatientLandmarks()->getLandmarks();
 
-  this->writePreLandmarkRegistration(fixedImage->getName(), fixedImage->getLandmarks());
+  this->writePreLandmarkRegistration(fixedImage->getName(), fixedImage->getLandmarks()->getLandmarks());
   this->writePreLandmarkRegistration("physical", toolLandmarks);
 
   std::vector<QString> landmarks = this->getUsableLandmarks(fixedLandmarks, toolLandmarks);
 
   Transform3D rMd = fixedImage->get_rMd();
-  Transform3D rMpr_old = *toolManager()->get_rMpr();
+  Transform3D rMpr_old = toolManager()->get_rMpr();
   std::vector<Vector3D> p_pr_old = this->convertAndTransformToPoints(landmarks, fixedLandmarks, rMpr_old.inv()*rMd);
   std::vector<Vector3D> p_pr_new = this->convertAndTransformToPoints(landmarks, toolLandmarks, Transform3D::Identity());
 
@@ -471,7 +471,7 @@ void RegistrationManager::doFastRegistration_Translation()
  */
 void RegistrationManager::applyPatientOrientation(const Transform3D& tMtm)
 {
-	Transform3D rMpr = *toolManager()->get_rMpr();
+	Transform3D rMpr = toolManager()->get_rMpr();
 	Transform3D prMt = toolManager()->getDominantTool()->get_prMt();
 
 	//create a marked(m) space tm, which is related to tool space (t) as follows:

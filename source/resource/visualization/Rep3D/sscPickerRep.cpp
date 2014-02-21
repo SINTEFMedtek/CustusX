@@ -243,7 +243,7 @@ void PickerRep::toolHasChanged()
 	if (!mTool)
 		return;
 	Transform3D prMt = mTool->get_prMt();
-	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = ToolManager::getInstance()->get_rMpr();
 	Transform3D rMt = rMpr * prMt;
 	Vector3D p_r = rMt.coord(Vector3D(0, 0, mTool->getTooltipOffset()));
 

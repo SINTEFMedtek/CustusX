@@ -59,8 +59,6 @@ UnsignedDerivedImage::UnsignedDerivedImage(ImagePtr base) : Image(base->getUid()
     // redirected signals:
     connect(base.get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
     connect(base.get(), SIGNAL(propertiesChanged()), this, SIGNAL(propertiesChanged()));
-    connect(base.get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(landmarkRemoved(QString)));
-    connect(base.get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(landmarkAdded(QString)));
     connect(base.get(), SIGNAL(clipPlanesChanged()), this, SIGNAL(clipPlanesChanged()));
     connect(base.get(), SIGNAL(cropBoxChanged()), this, SIGNAL(cropBoxChanged()));
 

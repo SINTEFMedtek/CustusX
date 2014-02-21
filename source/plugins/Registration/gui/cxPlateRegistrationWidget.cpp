@@ -44,8 +44,8 @@ QString PlateRegistrationWidget::defaultWhatsThis() const
 void PlateRegistrationWidget::showEvent(QShowEvent* event)
 {
   BaseWidget::showEvent(event);
-  connect(toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
-  connect(toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
+  connect(toolManager()->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
+  connect(toolManager()->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
   viewManager()->setRegistrationMode(rsPATIENT_REGISTRATED);
 }
@@ -53,8 +53,8 @@ void PlateRegistrationWidget::showEvent(QShowEvent* event)
 void PlateRegistrationWidget::hideEvent(QHideEvent* event)
 {
   BaseWidget::hideEvent(event);
-  disconnect(toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
-  disconnect(toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
+  disconnect(toolManager()->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
+  disconnect(toolManager()->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
   viewManager()->setRegistrationMode(rsNOT_REGISTRATED);
 }
@@ -66,7 +66,7 @@ void PlateRegistrationWidget::landmarkUpdatedSlot()
 
 void PlateRegistrationWidget::plateRegistrationSlot()
 {
-  toolManager()->removeLandmarks();
+  toolManager()->getPatientLandmarks()->clear();
 
   ToolPtr refTool = toolManager()->getReferenceTool();
   if(!refTool)//cannot register without a reference tool
@@ -86,7 +86,7 @@ void PlateRegistrationWidget::plateRegistrationSlot()
   {
     QString uid = dataManager()->addLandmark();
     dataManager()->setLandmarkName(uid, qstring_cast(it->first));
-    toolManager()->setLandmark(Landmark(uid, it->second));
+	toolManager()->getPatientLandmarks()->setLandmark(Landmark(uid, it->second));
   }
 
   // set all landmarks as not active as default

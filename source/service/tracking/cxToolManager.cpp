@@ -16,8 +16,6 @@
 
 #include "cxToolManager.h"
 
-//#include <boost/thread/thread.hpp>
-
 #include <QTimer>
 #include <QDir>
 #include <QList>
@@ -76,6 +74,8 @@ cxToolManager::cxToolManager() :
 {
 	m_rMpr_History.reset(new RegistrationHistory());
 	connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
+
+	mPatientLandmarks = Landmarks::create();
 
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 
@@ -217,7 +217,7 @@ void cxToolManager::initializeManualTool()
 		connect(mManualTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
 	}
 
-	Transform3D prMt = this->get_rMpr()->inv() * createTransformRotateY(M_PI)
+	Transform3D prMt = this->get_rMpr().inv() * createTransformRotateY(M_PI)
 					* createTransformRotateZ(M_PI/2);
 	mManualTool->set_prMt(prMt);
 }
@@ -551,31 +551,9 @@ void cxToolManager::saveToolsSlot()
 //	messageManager()->sendInfo("Transforms and timestamps are saved for connected tools.");
 }
 
-LandmarkMap cxToolManager::getLandmarks()
+LandmarksPtr cxToolManager::getPatientLandmarks()
 {
-	return mLandmarks;
-}
-
-void cxToolManager::setLandmark(Landmark landmark)
-{
-	mLandmarks[landmark.getUid()] = landmark;
-	emit landmarkAdded(landmark.getUid());
-}
-
-void cxToolManager::removeLandmark(QString uid)
-{
-	mLandmarks.erase(uid);
-	emit landmarkRemoved(uid);
-}
-
-void cxToolManager::removeLandmarks()
-{
-	LandmarkMap landmarks = toolManager()->getLandmarks();
-	LandmarkMap::iterator it = landmarks.begin();
-	for (; it != landmarks.end(); ++it)
-	{
-		toolManager()->removeLandmark(it->first);
-	}
+	return mPatientLandmarks;
 }
 
 SessionToolHistoryMap cxToolManager::getSessionHistory(double startTime, double stopTime)
@@ -734,14 +712,14 @@ std::vector<QString> cxToolManager::getToolUids() const
 	return uids;
 }
 
-Transform3DPtr cxToolManager::get_rMpr() const
+Transform3D cxToolManager::get_rMpr() const
 {
-	return Transform3DPtr(new Transform3D(m_rMpr_History->getCurrentRegistration().mValue));
+	return m_rMpr_History->getCurrentRegistration().mValue;
 }
 
-void cxToolManager::set_rMpr(const Transform3DPtr& val)
+void cxToolManager::set_rMpr(const Transform3D& val)
 {
-	m_rMpr_History->setRegistration(*val);
+	m_rMpr_History->setRegistration(val);
 }
 
 ToolPtr cxToolManager::getReferenceTool() const
@@ -1007,13 +985,14 @@ void cxToolManager::addXml(QDomNode& parentNode)
 	base.appendChild(manualToolNode);
 
 	QDomElement landmarksNode = doc.createElement("landmarks");
-	LandmarkMap::iterator it = mLandmarks.begin();
-	for (; it != mLandmarks.end(); ++it)
-	{
-		QDomElement landmarkNode = doc.createElement("landmark");
-		it->second.addXml(landmarkNode);
-		landmarksNode.appendChild(landmarkNode);
-	}
+	mPatientLandmarks->addXml(landmarksNode);
+//	LandmarkMap::iterator it = mLandmarks.begin();
+//	for (; it != mLandmarks.end(); ++it)
+//	{
+//		QDomElement landmarkNode = doc.createElement("landmark");
+//		it->second.addXml(landmarkNode);
+//		landmarksNode.appendChild(landmarkNode);
+//	}
 	base.appendChild(landmarksNode);
 
 	//Tools
@@ -1037,7 +1016,8 @@ void cxToolManager::clear()
 {
 	m_rMpr_History->clear();
 	mManualTool->set_prMt(Transform3D::Identity());
-	mLandmarks.clear();
+	mPatientLandmarks->clear();
+//	mLandmarks.clear();
 }
 
 void cxToolManager::parseXml(QDomNode& dataNode)
@@ -1051,14 +1031,15 @@ void cxToolManager::parseXml(QDomNode& dataNode)
 	QString manualToolText = dataNode.namedItem("manualTool").toElement().text();
 	mManualTool->set_prMt(Transform3D::fromString(manualToolText));
 
-	QDomNode landmarksNode = dataNode.namedItem("landmarks");
-	QDomElement landmarkNode = landmarksNode.firstChildElement("landmark");
-	for (; !landmarkNode.isNull(); landmarkNode = landmarkNode.nextSiblingElement("landmark"))
-	{
-		Landmark landmark;
-		landmark.parseXml(landmarkNode);
-		this->setLandmark(landmark);
-	}
+	mPatientLandmarks->parseXml(dataNode.namedItem("landmarks"));
+//	QDomNode landmarksNode = dataNode.namedItem("landmarks");
+//	QDomElement landmarkNode = landmarksNode.firstChildElement("landmark");
+//	for (; !landmarkNode.isNull(); landmarkNode = landmarkNode.nextSiblingElement("landmark"))
+//	{
+//		Landmark landmark;
+//		landmark.parseXml(landmarkNode);
+//		this->setLandmark(landmark);
+//	}
 
 	//Tools
 	ToolManager::ToolMapPtr tools = this->getTools();

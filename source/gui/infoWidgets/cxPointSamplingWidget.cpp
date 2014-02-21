@@ -191,7 +191,7 @@ void PointSamplingWidget::setManualTool(const Vector3D& p_r)
   ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
 
   //Transform3D sMr = mSliceProxy->get_sMr();
-  Transform3D rMpr = *cxToolManager::getInstance()->get_rMpr();
+  Transform3D rMpr = cxToolManager::getInstance()->get_rMpr();
   Transform3D prMt = tool->get_prMt();
 
   // find tool position in r

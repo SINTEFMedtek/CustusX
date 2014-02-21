@@ -91,7 +91,7 @@ void Navigation::centerToTooltip()
 {
 	ToolPtr tool = toolManager()->getDominantTool();
 	Vector3D p_pr = tool->get_prMt().coord(Vector3D(0, 0, tool->getTooltipOffset()));
-	Vector3D p_r = toolManager()->get_rMpr()->coord(p_pr);
+	Vector3D p_r = toolManager()->get_rMpr().coord(p_pr);
 
 	// set center to calculated position
 	dataManager()->setCenter(p_r);
@@ -139,7 +139,7 @@ void Navigation::centerManualTool(Vector3D& p_r)
 {
 	// move the manual tool to the same position. (this is a side effect... do we want it?)
 	ManualToolPtr manual = cxToolManager::getInstance()->getManualTool();
-	Vector3D p_pr = toolManager()->get_rMpr()->inv().coord(p_r);
+	Vector3D p_pr = toolManager()->get_rMpr().inv().coord(p_r);
 	Transform3D prM0t = manual->get_prMt(); // modify old pos in order to keep orientation
 	Vector3D t_pr = prM0t.coord(Vector3D(0, 0, manual->getTooltipOffset()));
 	Transform3D prM1t = createTransformTranslate(p_pr - t_pr) * prM0t;

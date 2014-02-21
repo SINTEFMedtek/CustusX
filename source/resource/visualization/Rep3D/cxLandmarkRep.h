@@ -22,6 +22,7 @@
 #include <sscImage.h>
 #include "vtkForwardDeclarations.h"
 #include "sscGraphicalPrimitives.h"
+#include "sscLandmark.h"
 
 namespace cx
 {

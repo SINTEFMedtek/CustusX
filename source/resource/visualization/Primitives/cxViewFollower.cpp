@@ -94,7 +94,7 @@ Vector3D ViewFollower::findVirtualTooltip_s()
 {
 	ToolPtr tool = mSliceProxy->getTool();
 	Transform3D sMr = mSliceProxy->get_sMr();
-	Transform3D rMpr = *toolManager()->get_rMpr();
+	Transform3D rMpr = toolManager()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 	Vector3D pt_s = sMr * rMpr * prMt.coord(Vector3D(0,0,tool->getTooltipOffset()));
 	pt_s[2] = 0; // project into plane
