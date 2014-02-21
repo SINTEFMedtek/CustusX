@@ -46,11 +46,13 @@
 #include "sscGeometricRep.h"
 
 #include "vtkVolumePicker.h"
+
+#include "cxConfig.h"
 #ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
 	#include "vtkMultiVolumePicker.h"
 	typedef vtkSmartPointer<class vtkMultiVolumePicker> vtkMultiVolumePickerPtr;
 #else
-	typedef vtkSmartPointer<class vtkVolumePicker> vtkMultiVolumePickerPtr;
+    typedef vtkSmartPointer<class vtkVolumePicker> vtkMultiVolumePickerPtr;
 #endif
 
 namespace cx
