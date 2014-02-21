@@ -51,7 +51,7 @@ QDateTime Landmark::getTimestamp() const
 	return mTimestamp;
 }
 
-void Landmark::addXml(QDomNode& dataNode)
+void Landmark::addXml(QDomNode& dataNode) const
 {
 	QDomDocument doc = dataNode.ownerDocument();
 
@@ -89,6 +89,74 @@ bool operator<(const Landmark& lhs, const Landmark& rhs)
 	return lhs.getUid() < rhs.getUid();
 }
 
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+Landmarks::Landmarks() : QObject(NULL)
+{
+
+}
+
+LandmarksPtr Landmarks::create()
+{
+	return LandmarksPtr(new Landmarks());
+}
+
+LandmarkMap Landmarks::getLandmarks()
+{
+	return mLandmarks;
+}
+
+void Landmarks::setLandmark(Landmark landmark)
+{
+	//std::cout << "Image::setLandmark" << std::endl;
+	mLandmarks[landmark.getUid()] = landmark;
+	emit landmarkAdded(landmark.getUid());
+}
+
+void Landmarks::removeLandmark(QString uid)
+{
+	mLandmarks.erase(uid);
+	emit landmarkRemoved(uid);
+}
+
+void Landmarks::clear()
+{
+	while (!mLandmarks.empty())
+		this->removeLandmark(mLandmarks.begin()->first);
+}
+
+void Landmarks::addXml(QDomNode dataNode) const
+{
+	QDomElement landmarksNode = dataNode.toElement();
+	QDomDocument doc = dataNode.ownerDocument();
+
+	LandmarkMap::const_iterator it = mLandmarks.begin();
+	for (; it != mLandmarks.end(); ++it)
+	{
+		QDomElement landmarkNode = doc.createElement("landmark");
+		it->second.addXml(landmarkNode);
+		landmarksNode.appendChild(landmarkNode);
+	}
+}
+
+void Landmarks::parseXml(QDomNode dataNode)
+{
+	QDomElement landmarksNode = dataNode.toElement();
+
+	if (dataNode.isNull())
+		return;
+
+	QDomElement landmarkNode = landmarksNode.firstChildElement("landmark");
+	for (; !landmarkNode.isNull(); landmarkNode = landmarkNode.nextSiblingElement("landmark"))
+	{
+		Landmark landmark;
+		landmark.parseXml(landmarkNode);
+		this->setLandmark(landmark);
+	}
+}
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------

@@ -116,7 +116,7 @@ void CrossHairRep2D::update()
 		return;
 
 	Transform3D prMt = mSlicer->getTool()->get_prMt();
-	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = ToolManager::getInstance()->get_rMpr();
 	Transform3D sMr = mSlicer->get_sMr();
 
 	if (mCursor)

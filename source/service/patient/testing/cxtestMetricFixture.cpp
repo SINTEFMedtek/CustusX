@@ -209,7 +209,8 @@ QDomNode MetricFixture::createDummyXmlNode()
 
 void MetricFixture::setPatientRegistration()
 {
-	cx::Transform3DPtr testRegistration(new cx::Transform3D(cx::createTransformTranslate(cx::Vector3D(5,6,7))));
+	cx::Transform3D testRegistration;
+	testRegistration = cx::Transform3D(cx::createTransformTranslate(cx::Vector3D(5,6,7)));
 	cx::toolManager()->set_rMpr(testRegistration);
 }
 

@@ -116,6 +116,7 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& nam
 	//  mShading.diffuse = 0.9;
 	//  mShading.specular = 0.3;
 	//  mShading.specularPower = 15.0;
+	mLandmarks = Landmarks::create();
 
 	mImageLookupTable2D.reset();
 	mImageTransferFunctions3D.reset();
@@ -290,11 +291,6 @@ ImageTF3DPtr Image::getTransferFunctions3D()
 
 void Image::setTransferFunctions3D(ImageTF3DPtr transferFuntion)
 {
-//	if(!this->isValidTransferFunction(transferFuntion))
-//	{
-////		messageManager()->sendWarning("Not a valid 3D transfer function for Image");
-//		fixCorruptTransferFunction(transferFuntion);
-//	}
 	this->resetTransferFunction(transferFuntion);
 }
 
@@ -307,11 +303,6 @@ ImageLUT2DPtr Image::getLookupTable2D()
 
 void Image::setLookupTable2D(ImageLUT2DPtr imageLookupTable2D)
 {
-//	if(!this->isValidTransferFunction(imageLookupTable2D))
-//	{
-////		messageManager()->sendWarning("Not a valid 2D transfer function / lookup table for Image");
-//		fixCorruptTransferFunction(imageLookupTable2D);
-//	}
 	this->resetTransferFunction(imageLookupTable2D);
 }
 
@@ -341,24 +332,6 @@ vtkImageDataPtr Image::getRefVtkImageData()
 	}
 
 	return mReferenceImageData;
-}
-
-LandmarkMap Image::getLandmarks()
-{
-	return mLandmarks;
-}
-
-void Image::setLandmark(Landmark landmark)
-{
-	//std::cout << "Image::setLandmark" << std::endl;
-	mLandmarks[landmark.getUid()] = landmark;
-	emit landmarkAdded(landmark.getUid());
-}
-
-void Image::removeLandmark(QString uid)
-{
-	mLandmarks.erase(uid);
-	emit landmarkRemoved(uid);
 }
 
 DoubleBoundingBox3D Image::boundingBox() const
@@ -471,6 +444,11 @@ int Image::getMaxAlphaValue()
 	return 255;
 }
 
+LandmarksPtr Image::getLandmarks()
+{
+	return mLandmarks;
+}
+
 void Image::addXml(QDomNode& dataNode)
 {
 	Data::addXml(dataNode);
@@ -490,13 +468,7 @@ void Image::addXml(QDomNode& dataNode)
 	imageNode.appendChild(shadingNode);
 
 	QDomElement landmarksNode = doc.createElement("landmarks");
-	LandmarkMap::iterator it = mLandmarks.begin();
-	for (; it != mLandmarks.end(); ++it)
-	{
-		QDomElement landmarkNode = doc.createElement("landmark");
-		it->second.addXml(landmarkNode);
-		landmarksNode.appendChild(landmarkNode);
-	}
+	mLandmarks->addXml(landmarksNode);
 	imageNode.appendChild(landmarksNode);
 
 	QDomElement cropNode = doc.createElement("crop");
@@ -579,14 +551,7 @@ void Image::parseXml(QDomNode& dataNode)
 	// new way:
 	mShading.parseXml(dataNode.namedItem("shading"));
 
-	QDomNode landmarksNode = dataNode.namedItem("landmarks");
-	QDomElement landmarkNode = landmarksNode.firstChildElement("landmark");
-	for (; !landmarkNode.isNull(); landmarkNode = landmarkNode.nextSiblingElement("landmark"))
-	{
-		Landmark landmark;
-		landmark.parseXml(landmarkNode);
-		this->setLandmark(landmark);
-	}
+	mLandmarks->parseXml(dataNode.namedItem("landmarks"));
 
 	QDomElement cropNode = dataNode.namedItem("crop").toElement();
 	if (!cropNode.isNull())
@@ -777,22 +742,7 @@ void Image::mergevtkSettingsIntosscTransform()
 
 	this->get_rMd_History()->setRegistration(this->get_rMd() * createTransformTranslate(origin + extentShift));
 
-//	//Since this function discards the vtkImageData, the transfer functions must be fixed
-//	ImageTF3DPtr transferFunctions = this->getTransferFunctions3D()->createCopy(getBaseVtkImageData());
-//	ImageLUT2DPtr LUT2D = this->getLookupTable2D()->createCopy(getBaseVtkImageData());
-//	// Make sure the transfer functions are working
-//	if (transferFunctions)
-//		transferFunctions->fixTransferFunctions();
-//	else
-//		messageManager()->sendError("Image::mergevtkSettingsIntosscTransform() transferFunctions error");
-//	if (LUT2D)
-//		LUT2D->fixTransferFunctions();
-//	else
-//		messageManager()->sendError("Image::mergevtkSettingsIntosscTransform() LUT2D error");
-//	this->resetTransferFunction(transferFunctions, LUT2D);
-
 	emit vtkImageDataChanged();
-//	emit transferFunctionsChanged();
 	emit clipPlanesChanged();
 	emit cropBoxChanged();
 }
@@ -818,42 +768,6 @@ void Image::setImageType(const QString& val)
 	mImageType = val;
 	emit propertiesChanged();
 }
-
-//bool Image::isValidTransferFunction(ImageTFDataPtr transferFunction)
-//{
-//	int scalarMin = this->getMin();
-//	int scalarMax = this->getMax();
-//	double windowWidth = transferFunction->getWindow();
-//	double windowLevel = transferFunction->getLevel();
-
-//	if(windowWidth > (scalarMax-scalarMin))
-//		return false;
-//	if(windowWidth < 1)
-//		return false;
-
-//	if(windowLevel > scalarMax)
-//		return false;
-//	if(windowLevel < scalarMin)
-//		return false;
-
-//	return true;
-//}
-
-//ImageTFDataPtr Image::fixCorruptTransferFunction(ImageTFDataPtr transferFunction)
-//{
-//	int scalarMin = this->getMin();
-//	int scalarMax = this->getMax();
-
-//	if(transferFunction->getWindow() > (scalarMax-scalarMin))
-//		transferFunction->setWindow(scalarMax-scalarMin);
-//	if(transferFunction->getWindow() < 1)
-//		transferFunction->setWindow(1);
-
-//	if(transferFunction->getLevel() > scalarMax || transferFunction->getLevel() < scalarMin)
-//		transferFunction->setLevel((scalarMax - scalarMin) / 2.0);
-
-//	return transferFunction;
-//}
 
 vtkImageDataPtr Image::createDummyImageData(int axisSize, int maxVoxelValue)
 {

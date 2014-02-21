@@ -66,11 +66,10 @@ public:
 	virtual std::map<QString, ImagePtr> getImages() const;
 
 	void loadData(DataPtr data);
-	DataPtr loadData(const QString& uid, const QString& path, READER_TYPE type);
+	DataPtr loadData(const QString& uid, const QString& path);
     virtual void saveData(DataPtr data, const QString& basePath); ///< Save data to file
     std::map<QString, DataPtr> getData() const;
 	DataPtr getData(const QString& uid) const;
-	//  virtual void saveData(DataPtr image, const QString& basePath, bool headerOnly=false);///< Save image to file \param basePath Absolute path to patient data folder
 
 	// meshes
 	virtual void saveMesh(MeshPtr mesh, const QString& basePath);///< Save mesh to file \param mesh to save \param basePath Absolute path to patient data folder
@@ -93,9 +92,6 @@ public:
 	virtual void clear(); ///< remove all stuff from manager
 	virtual void removeData(const QString& uid, QString basePath);
 
-	//virtual MeshPtr getActiveMesh() const; ///< used for system state
-	//virtual void setActiveMesh(MeshPtr activeMesh); ///< used for system state
-
 	//Interface for saving/loading
 	virtual void addXml(QDomNode& parentNode); ///< adds xml information about the datamanger and its variabels
 	virtual void parseXml(QDomNode& datamangerNode, QString absolutePath = QString());///< Use a XML node to load data. \param datamangerNode A XML data representation of the DataManager. \param absolutePath Absolute path to the data elements. Used together with the relative paths stored in the filePath elements.
@@ -116,16 +112,12 @@ protected:
 	DataMap mData;
 	Vector3D mCenter;
 	CLINICAL_APPLICATION mClinicalApplication;
-//	typedef std::set<DataReaderPtr> DataReadersType;
-//	DataReadersType mDataReaders;
 	void deleteFiles(DataPtr data, QString basePath);
 
 	//state
 	ImagePtr mActiveImage;
-	//MeshPtr mActiveMesh;
-	virtual ImagePtr loadImage(const QString& uid, const QString& filename, READER_TYPE notused);
-	virtual MeshPtr loadMesh(const QString& uid, const QString& fileName, READER_TYPE notused);
-	//  READER_TYPE getReaderType(QString fileType);
+	virtual ImagePtr loadImage(const QString& uid, const QString& filename);
+	virtual MeshPtr loadMesh(const QString& uid, const QString& fileName);
 	DataPtr loadData(QDomElement node, QString rootPath);
 	DataPtr readData(const QString& uid, const QString& path, const QString& type);
 	int findUniqueUidNumber(QString uidBase) const;
@@ -135,7 +127,6 @@ protected:
 
 public slots:
 	void vtkImageDataChangedSlot();
-//	void transferFunctionsChangedSlot();//Not uses any longer. Use ActiveImageProxy in CustusX
 };
 
 } // namespace cx

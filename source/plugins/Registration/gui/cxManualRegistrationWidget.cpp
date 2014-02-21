@@ -149,7 +149,7 @@ void ManualPatientRegistrationWidget::matrixWidgetChanged()
 void ManualPatientRegistrationWidget::patientMatrixChanged()
 {
 	mMatrixWidget->blockSignals(true);
-	mMatrixWidget->setMatrix(*toolManager()->get_rMpr());
+	mMatrixWidget->setMatrix(toolManager()->get_rMpr());
 	mMatrixWidget->blockSignals(false);
 }
 

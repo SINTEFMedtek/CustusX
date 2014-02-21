@@ -28,6 +28,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Data/cxShapedMetric
 	Data/cxSphereMetric
 	Data/cxMetricReferenceArgumentList
+	Data/sscLandmark
 
 	Video/sscVideoSource.h
 	Video/sscVideoRecorder
@@ -88,7 +89,6 @@ cx_add_class(cxResource_SOURCE
 	Tool/cxCreateProbeDataFromConfiguration
 
 	Data/sscDataMetric
-	Data/sscLandmark
 	Data/sscDataReaderWriter
 	Data/sscGPUImageBuffer
 	Data/cxImageDefaultTFGenerator

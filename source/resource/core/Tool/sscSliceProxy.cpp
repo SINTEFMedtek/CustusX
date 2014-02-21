@@ -87,7 +87,7 @@ void SliceProxy::setTool(ToolPtr tool)
 void SliceProxy::toolTransformAndTimestampSlot(Transform3D prMt, double timestamp)
 {
 	//std::cout << "proxy get transform" << std::endl;
-	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = toolManager()->get_rMpr();
 	Transform3D rMt = rMpr*prMt;
 //	if (similar(rMt, mCutplane->getToolPosition()))
 //	{

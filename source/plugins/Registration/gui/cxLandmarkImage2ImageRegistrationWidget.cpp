@@ -130,7 +130,7 @@ LandmarkMap LandmarkImage2ImageRegistrationWidget::getTargetLandmarks() const
 	ImagePtr moving = boost::dynamic_pointer_cast<Image>(mManager->getMovingData());
 
 	if (moving)
-		return moving->getLandmarks();
+		return moving->getLandmarks()->getLandmarks();
 	else
 		return LandmarkMap();
 }
@@ -156,7 +156,7 @@ void LandmarkImage2ImageRegistrationWidget::setTargetLandmark(QString uid, Vecto
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(mManager->getMovingData());
 	if (!image)
 		return;
-	image->setLandmark(Landmark(uid, p_target));
+	image->getLandmarks()->setLandmark(Landmark(uid, p_target));
 }
 
 QString LandmarkImage2ImageRegistrationWidget::getTargetName() const

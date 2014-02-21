@@ -200,7 +200,7 @@ Transform3D SimulatedImageStreamer::getTransform_vMr()
 	Transform3D vMt = vMu * uMt;
 
 	Transform3D tMpr = mTool->get_prMt().inv();
-	Transform3D prMr = toolManager()->get_rMpr()->inv();
+	Transform3D prMr = toolManager()->get_rMpr().inv();
 
 	Transform3D vMr = vMt * tMpr * prMr;
 	return vMr;
