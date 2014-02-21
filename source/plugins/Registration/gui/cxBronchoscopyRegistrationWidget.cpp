@@ -77,7 +77,7 @@ QString BronchoscopyRegistrationWidget::defaultWhatsThis() const
 
 void BronchoscopyRegistrationWidget::registerSlot()
 {
-	Transform3D old_rMpr = *toolManager()->get_rMpr();//input?
+	Transform3D old_rMpr = toolManager()->get_rMpr();//input?
     std::cout << "rMpr: " << std::endl;
     std::cout << old_rMpr << std::endl;
 

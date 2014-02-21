@@ -40,17 +40,17 @@ namespace cx
 PatientLandmarksSource::PatientLandmarksSource()
 {
 	ToolManager* toolmanager = ToolManager::getInstance();
-	connect(toolmanager, SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
-	connect(toolmanager, SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
+	connect(toolmanager->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
+	connect(toolmanager->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
 	connect(toolmanager, SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 }
 LandmarkMap PatientLandmarksSource::getLandmarks() const
 {
-	return ToolManager::getInstance()->getLandmarks();
+	return toolManager()->getPatientLandmarks()->getLandmarks();
 }
 Transform3D PatientLandmarksSource::get_rMl() const
 {
-	return *ToolManager::getInstance()->get_rMpr();
+	return ToolManager::getInstance()->get_rMpr();
 }
 // --------------------------------------------------------
 Vector3D PatientLandmarksSource::getTextPos(Vector3D p_l) const
@@ -73,8 +73,8 @@ void ImageLandmarksSource::setImage(ImagePtr image)
 
 	if (mImage)
 	{
-		disconnect(mImage.get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
-		disconnect(mImage.get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
+		disconnect(mImage->getLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
+		disconnect(mImage->getLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
 		disconnect(mImage.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
 	}
 
@@ -82,8 +82,8 @@ void ImageLandmarksSource::setImage(ImagePtr image)
 
 	if (mImage)
 	{
-		connect(mImage.get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
-		connect(mImage.get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
+		connect(mImage->getLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
+		connect(mImage->getLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
 		connect(mImage.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
 	}
 
@@ -93,7 +93,7 @@ LandmarkMap ImageLandmarksSource::getLandmarks() const
 {
 	if (!mImage)
 		return LandmarkMap();
-	return mImage->getLandmarks();
+	return mImage->getLandmarks()->getLandmarks();
 }
 Transform3D ImageLandmarksSource::get_rMl() const
 {

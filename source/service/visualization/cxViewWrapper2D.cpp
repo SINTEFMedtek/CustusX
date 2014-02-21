@@ -727,7 +727,7 @@ void ViewWrapper2D::shiftAxisPos(Vector3D delta_vp)
 	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
-	Transform3D rMpr = *toolManager()->get_rMpr();
+	Transform3D rMpr = toolManager()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 	Vector3D delta_s = get_vpMs().inv().vector(delta_vp);
 
@@ -747,7 +747,7 @@ void ViewWrapper2D::setAxisPos(Vector3D click_vp)
 	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
-	Transform3D rMpr = *toolManager()->get_rMpr();
+	Transform3D rMpr = toolManager()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 
 	// find tool position in s
