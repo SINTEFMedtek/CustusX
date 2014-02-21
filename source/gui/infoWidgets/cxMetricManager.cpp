@@ -122,8 +122,8 @@ void MetricManager::addPointButtonClickedSlot()
 
 PointMetricPtr MetricManager::addPointInDefaultPosition()
 {
-	CoordinateSystem ref = SpaceHelpers::getR();
-	Vector3D p_ref = SpaceHelpers::getDominantToolTipPoint(ref, true);
+	CoordinateSystem ref = CoordinateSystemHelpers::getR();
+	Vector3D p_ref = CoordinateSystemHelpers::getDominantToolTipPoint(ref, true);
 	return this->addPoint(p_ref, ref);
 }
 
@@ -132,8 +132,8 @@ void MetricManager::addFrameButtonClickedSlot()
   FrameMetricPtr frame(new FrameMetric("frame%1", "frame%1"));
   frame->get_rMd_History()->setParentSpace("reference");
 
-  CoordinateSystem ref = SpaceHelpers::getR();
-  Transform3D rMt = SpaceHelpers::getDominantToolTipTransform(ref, true);
+  CoordinateSystem ref = CoordinateSystemHelpers::getR();
+  Transform3D rMt = CoordinateSystemHelpers::getDominantToolTipTransform(ref, true);
 
   frame->setSpace(ref);
   frame->setFrame(rMt);
@@ -146,8 +146,8 @@ void MetricManager::addToolButtonClickedSlot()
   ToolMetricPtr frame(new ToolMetric("tool%1", "tool%1"));
   frame->get_rMd_History()->setParentSpace("reference");
 
-  CoordinateSystem ref = SpaceHelpers::getR();
-  Transform3D rMt = SpaceHelpers::getDominantToolTipTransform(ref, true);
+  CoordinateSystem ref = CoordinateSystemHelpers::getR();
+  Transform3D rMt = CoordinateSystemHelpers::getDominantToolTipTransform(ref, true);
 
   frame->setSpace(ref);
   frame->setFrame(rMt);
@@ -159,8 +159,8 @@ void MetricManager::addToolButtonClickedSlot()
 
 void MetricManager::addPlaneButtonClickedSlot()
 {
-  CoordinateSystem ref = SpaceHelpers::getR();
-//  Vector3D p_ref = SpaceHelpers::getDominantToolTipPoint(ref, true);
+  CoordinateSystem ref = CoordinateSystemHelpers::getR();
+//  Vector3D p_ref = CoordinateSystemHelpers::getDominantToolTipPoint(ref, true);
 
   PlaneMetricPtr p1(new PlaneMetric("plane%1","plane%1"));
   p1->get_rMd_History()->setParentSpace("reference");

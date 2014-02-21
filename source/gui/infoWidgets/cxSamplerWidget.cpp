@@ -108,7 +108,7 @@ void SamplerWidget::spacesChangedSlot()
 	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
 	settings()->setValue("sampler/Space", space.toString());
 
-	std::vector<CoordinateSystem> spaces = SpaceHelpers::getSpacesToPresentInGUI();
+	std::vector<CoordinateSystem> spaces = CoordinateSystemHelpers::getSpacesToPresentInGUI();
 	QStringList range;
 	for (unsigned i=0; i<spaces.size(); ++i)
 	  range << spaces[i].toString();
@@ -121,14 +121,14 @@ void SamplerWidget::spacesChangedSlot()
 void SamplerWidget::prePaintEvent()
 {
 	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
-	Vector3D p = SpaceHelpers::getDominantToolTipPoint(space, true);
+	Vector3D p = CoordinateSystemHelpers::getDominantToolTipPoint(space, true);
 	int w=1;
 	QString coord = QString("%1, %2, %3").arg(p[0], w, 'f', 1).arg(p[1], w, 'f', 1).arg(p[2], w, 'f', 1);
 
 	ImagePtr image = dataManager()->getActiveImage();
 	if (image)
 	{
-		Vector3D p = SpaceHelpers::getDominantToolTipPoint(Space(csDATA_VOXEL,"active"), true);
+		Vector3D p = CoordinateSystemHelpers::getDominantToolTipPoint(Space(csDATA_VOXEL,"active"), true);
 		IntBoundingBox3D bb(Eigen::Vector3i(0,0,0),
 		                         Eigen::Vector3i(image->getBaseVtkImageData()->GetDimensions())-Eigen::Vector3i(1,1,1));
 		if (bb.contains(p.cast<int>()))

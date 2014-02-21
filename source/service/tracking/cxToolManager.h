@@ -107,7 +107,7 @@ public:
 	void parseXml(QDomNode& dataNode); ///< read internal state from node
 	virtual void clear(); ///< clear everything loaded from xml
 
-	ManualToolPtr getManualTool(); ///< a mouse-controllable virtual tool that is available even when not tracking.
+	virtual ManualToolPtr getManualTool(); ///< a mouse-controllable virtual tool that is available even when not tracking.
 
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
 
@@ -127,7 +127,7 @@ public slots:
 	void startTracking(); ///< starts tracking
 	void stopTracking(); ///< stops tracking
 	void saveToolsSlot(); ///< saves transforms and timestamps
-	void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
+	virtual void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
 
 private slots:
 	void trackerConfiguredSlot(bool on);

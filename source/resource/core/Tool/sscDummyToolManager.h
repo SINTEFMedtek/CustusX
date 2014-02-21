@@ -60,6 +60,7 @@ public:
 
 	virtual ToolPtr getDominantTool();
 	virtual void setDominantTool(const QString& uid);
+	virtual void dominantCheckSlot() {}
 
 	virtual std::map<QString, QString> getToolUidsAndNames() const;
 	virtual std::vector<QString> getToolNames() const;
@@ -75,7 +76,7 @@ public:
 
 	virtual LandmarksPtr getPatientLandmarks() { return Landmarks::create(); }
 
-//	virtual RegistrationHistoryPtr get_rMpr_History() { return RegistrationHistoryPtr(); }
+	virtual ManualToolPtr getManualTool() { return ManualToolPtr(); }
 	virtual void savePositionHistory() {}
 	virtual void loadPositionHistory() {}
 	virtual void addXml(QDomNode& parentNode) {}

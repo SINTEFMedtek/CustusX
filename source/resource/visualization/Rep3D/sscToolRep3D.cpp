@@ -281,15 +281,6 @@ void ToolRep3D::scaleSpheres()
 		mTooltipPoint->setRadius(sphereSize);
 }
 
-//void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
-//{
-//	return;
-//	Transform3DPtr rMprPtr = ToolManager::getInstance()->get_rMpr();
-//	Transform3D rMt = (*rMprPtr) * prMt;
-//	mToolActor->SetUserMatrix(rMt.getVtkMatrix());
-//	this->update();
-//}
-
 void ToolRep3D::onModifiedStartRender()
 {
 	this->update();
@@ -298,10 +289,6 @@ void ToolRep3D::onModifiedStartRender()
 
 void ToolRep3D::update()
 {
-//	Transform3DPtr rMprPtr = ToolManager::getInstance()->get_rMpr();
-//	Transform3D rMt = (*rMprPtr) * prMt;
-//	mToolActor->SetUserMatrix(rMt.getVtkMatrix());
-
 	Transform3D prMt = Transform3D::Identity();
 	if (mTool)
 		prMt = mTool->get_prMt();

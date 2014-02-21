@@ -91,7 +91,7 @@ void PlaneMetricRep::rescale()
 	if (!mGraphicalPoint)
 		return;
 
-	Transform3D rM0 = SpaceHelpers::get_toMfrom(mMetric->getSpace(), CoordinateSystem(csREF));
+	Transform3D rM0 = CoordinateSystemHelpers::get_toMfrom(mMetric->getSpace(), CoordinateSystem(csREF));
 	Vector3D p0_r = rM0.coord(mMetric->getCoordinate());
 	Vector3D n_r = rM0.vector(mMetric->getNormal());
 

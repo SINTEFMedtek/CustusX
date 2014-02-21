@@ -34,7 +34,7 @@ DataPtr PlaneMetricReader::load(const QString& uid, const QString& filename)
 
 PlaneMetric::PlaneMetric(const QString& uid, const QString& name) :
 	DataMetric(uid, name),
-	mSpace(SpaceHelpers::getR())
+	mSpace(CoordinateSystemHelpers::getR())
 {
 	mSpaceListener.reset(new CoordinateSystemListener(mSpace));
 	connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
@@ -58,7 +58,7 @@ PlaneMetric::~PlaneMetric()
 
 Plane3D PlaneMetric::getRefPlane() const
 {
-	Transform3D rM1 = SpaceHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
+	Transform3D rM1 = CoordinateSystemHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
 	Vector3D p = rM1.coord(this->getCoordinate());
 	Vector3D n = rM1.vector(this->getNormal()).normalized();
 
@@ -67,7 +67,7 @@ Plane3D PlaneMetric::getRefPlane() const
 
 Vector3D PlaneMetric::getRefCoord() const
 {
-    Transform3D rM0 = SpaceHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
+    Transform3D rM0 = CoordinateSystemHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
     Vector3D p0_r = rM0.coord(this->getCoordinate());
     return p0_r;
 }
@@ -104,7 +104,7 @@ void PlaneMetric::setSpace(CoordinateSystem space)
 		return;
 
 	// keep the absolute position (in ref) constant when changing space.
-	Transform3D new_M_old = SpaceHelpers::get_toMfrom(this->getSpace(), space);
+	Transform3D new_M_old = CoordinateSystemHelpers::get_toMfrom(this->getSpace(), space);
 	mCoordinate = new_M_old.coord(mCoordinate);
 	mNormal = new_M_old.vector(mNormal);
 
@@ -142,7 +142,7 @@ void PlaneMetric::parseXml(QDomNode& dataNode)
 DoubleBoundingBox3D PlaneMetric::boundingBox() const
 {
 	// convert both inputs to r space
-	Transform3D rM0 = SpaceHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
+	Transform3D rM0 = CoordinateSystemHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
 	Vector3D p0_r = rM0.coord(this->getCoordinate());
 
 	return DoubleBoundingBox3D(p0_r, p0_r);

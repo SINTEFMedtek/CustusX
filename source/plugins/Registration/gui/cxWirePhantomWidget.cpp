@@ -278,14 +278,14 @@ void WirePhantomWidget::registration()
 void WirePhantomWidget::showDataMetrics(Vector3D cross_r)
 {
     // add metrics displaying the distance from cross in the nominal and us spaces:
-    Transform3D usMnom = SpaceHelpers::get_toMfrom(SpaceHelpers::getD(mManager->getFixedData()), SpaceHelpers::getD(mManager->getMovingData()));
+    Transform3D usMnom = CoordinateSystemHelpers::get_toMfrom(CoordinateSystemHelpers::getD(mManager->getFixedData()), CoordinateSystemHelpers::getD(mManager->getMovingData()));
     Vector3D cross_us = usMnom.coord(cross_r);
 
     PointMetricPtr p1 = boost::dynamic_pointer_cast<PointMetric>(dataManager()->getData("cross_nominal"));
     if (!p1)
         p1.reset(new PointMetric("cross_nominal", "cross_nominal"));
     p1->get_rMd_History()->setParentSpace(mManager->getFixedData()->getUid());
-    p1->setSpace(SpaceHelpers::getD(mManager->getFixedData()));
+    p1->setSpace(CoordinateSystemHelpers::getD(mManager->getFixedData()));
     p1->setCoordinate(cross_r);
     dataManager()->loadData(p1);
     //this->showData(p1);
@@ -294,7 +294,7 @@ void WirePhantomWidget::showDataMetrics(Vector3D cross_r)
     if (!p2)
         p2.reset(new PointMetric("cross_us", "cross_us"));
     p2->get_rMd_History()->setParentSpace(mManager->getMovingData()->getUid());
-    p2->setSpace(SpaceHelpers::getD(mManager->getMovingData()));
+    p2->setSpace(CoordinateSystemHelpers::getD(mManager->getMovingData()));
     p2->setCoordinate(cross_us);
     dataManager()->loadData(p2);
     //this->showData(p2);

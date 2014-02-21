@@ -35,7 +35,7 @@ DataPtr PointMetricReader::load(const QString& uid, const QString& filename)
 PointMetric::PointMetric(const QString& uid, const QString& name) :
 	DataMetric(uid, name),
 	mCoordinate(0,0,0),
-	mSpace(SpaceHelpers::getR())
+	mSpace(CoordinateSystemHelpers::getR())
 {
 	mSpaceListener.reset(new CoordinateSystemListener(mSpace));
 	connect(mSpaceListener.get(), SIGNAL(changed()), this, SLOT(resetCachedValues()));
@@ -79,7 +79,7 @@ void PointMetric::setSpace(CoordinateSystem space)
 		return;
 
 	// keep the absolute position (in ref) constant when changing space.
-	Transform3D new_M_old = SpaceHelpers::get_toMfrom(this->getSpace(), space);
+	Transform3D new_M_old = CoordinateSystemHelpers::get_toMfrom(this->getSpace(), space);
 	mCoordinate = new_M_old.coord(mCoordinate);
 
 	mSpace = space;
@@ -111,8 +111,6 @@ void PointMetric::parseXml(QDomNode& dataNode)
 DoubleBoundingBox3D PointMetric::boundingBox() const
 {
 	// convert both inputs to r space
-//	Transform3D rM0 = SpaceHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
-//	Vector3D p0_r = rM0.coord(this->getCoordinate());
 	Vector3D p0_r = this->getRefCoord();
 
 	return DoubleBoundingBox3D(p0_r, p0_r);
@@ -136,7 +134,7 @@ Vector3D PointMetric::getRefCoord() const
 	if (!mCachedRefCoord.isValid())
 	{
 //		std::cout << " ** PointMetric::getRefCoord FILL CACHE" << std::endl;
-		Transform3D rM1 = SpaceHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
+		Transform3D rM1 = CoordinateSystemHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
 		Vector3D val = rM1.coord(this->getCoordinate());
 		mCachedRefCoord.set(val);
 	}
