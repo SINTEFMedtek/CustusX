@@ -30,8 +30,8 @@ TEST_CASE("ImageAlgorithms: resample() works", "[unit][resource][core]")
 	QString fname0 = cx::DataLocations::getTestDataPath() + "/testing/ResampleTest.cx3/Images/mra.mhd";
 	QString fname1 = cx::DataLocations::getTestDataPath() + "/testing/ResampleTest.cx3/Images/US_01_20110222T110117_1.mhd";
 
-	/*DataPtr image = */cx::dataManager()->loadData(fname0, fname0, cx::rtAUTO);
-	/*DataPtr referenceImage = */cx::dataManager()->loadData(fname1, fname1, cx::rtAUTO);
+	/*DataPtr image = */cx::dataManager()->loadData(fname0, fname0);
+	/*DataPtr referenceImage = */cx::dataManager()->loadData(fname1, fname1);
 	cx::ImagePtr image = cx::dataManager()->getImage(fname0);
 	cx::ImagePtr referenceImage = cx::dataManager()->getImage(fname1);
 	//	std::cout << "referenceImage base: " << referenceImage->getBaseVtkImageData() << std::endl;

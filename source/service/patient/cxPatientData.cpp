@@ -408,7 +408,7 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 	}
 
 	// Read files before copy
-	DataPtr data = dataManager()->loadData(uid, fileName, rtAUTO);
+	DataPtr data = dataManager()->loadData(uid, fileName);
 	if (!data)
 	{
 		QString text = "Error with data file: " + fileName + " Import canceled.";
