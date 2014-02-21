@@ -32,6 +32,7 @@
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "sscProbeSector.h"
+#include "sscDataManager.h"
 
 namespace cx
 {
@@ -203,7 +204,7 @@ void ToolRep2D::update()
 	{
 		prMt = mSlicer->getTool()->get_prMt();
 	}
-	Transform3D rMpr = ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = dataManager()->get_rMpr();
 	Transform3D sMr = mSlicer->get_sMr();
 	Transform3D sMt = sMr*rMpr*prMt;
 	Transform3D vpMt = m_vpMs*sMt;

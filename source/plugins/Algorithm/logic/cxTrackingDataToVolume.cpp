@@ -117,7 +117,7 @@ void TrackingDataToVolume::setInput(TimedTransformMap map_prMt, int padding_voxe
   bounds_mm[5] += padding_mm;
   mImage = createEmptyImage(bounds_mm, initialSpacing_mm);
 
-  Transform3D rMpr = toolManager()->get_rMpr();
+  Transform3D rMpr = dataManager()->get_rMpr();
   //std::cout << "rMpr\n" << rMpr << std::endl;
   Transform3D rMd = rMpr * createTransformTranslate(bounds_mm.corner(0,0,0)); // TODO + eller - ?????
   //std::cout << "rMd\n" << rMd << std::endl;

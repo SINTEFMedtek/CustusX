@@ -33,6 +33,7 @@
 #include "sscToolManager.h"
 #include "sscSliceProxy.h"
 #include "sscVtkHelperClasses.h"
+#include "sscDataManager.h"
 
 namespace cx
 {
@@ -116,7 +117,7 @@ void CrossHairRep2D::update()
 		return;
 
 	Transform3D prMt = mSlicer->getTool()->get_prMt();
-	Transform3D rMpr = ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = dataManager()->get_rMpr();
 	Transform3D sMr = mSlicer->get_sMr();
 
 	if (mCursor)

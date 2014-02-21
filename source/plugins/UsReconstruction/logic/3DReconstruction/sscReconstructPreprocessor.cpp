@@ -415,8 +415,8 @@ void ReconstructPreprocessor::findExtentAndOutputTransform()
 	mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing);
 	mOutputVolumeParams.setMaxVolumeSize(mInput.mMaxOutputVolumeSize);
 
-	if (ToolManager::getInstance())
-		mOutputVolumeParams.set_rMd((ToolManager::getInstance()->get_rMpr()) * prMd);
+	if (dataManager())
+		mOutputVolumeParams.set_rMd((dataManager()->get_rMpr()) * prMd);
 	else
 		mOutputVolumeParams.set_rMd(prMd);
 

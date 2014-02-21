@@ -39,18 +39,17 @@ namespace cx
 
 PatientLandmarksSource::PatientLandmarksSource()
 {
-	ToolManager* toolmanager = ToolManager::getInstance();
-	connect(toolmanager->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
-	connect(toolmanager->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
-	connect(toolmanager, SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+	connect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
+	connect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
+	connect(dataManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 }
 LandmarkMap PatientLandmarksSource::getLandmarks() const
 {
-	return toolManager()->getPatientLandmarks()->getLandmarks();
+	return dataManager()->getPatientLandmarks()->getLandmarks();
 }
 Transform3D PatientLandmarksSource::get_rMl() const
 {
-	return ToolManager::getInstance()->get_rMpr();
+	return dataManager()->get_rMpr();
 }
 // --------------------------------------------------------
 Vector3D PatientLandmarksSource::getTextPos(Vector3D p_l) const

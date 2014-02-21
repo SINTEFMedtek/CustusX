@@ -79,13 +79,13 @@ void CoordinateSystemListener::doConnect()
 				connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
 				connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
 			}
-			connect(toolManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+			connect(dataManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 		}
 	}
 
 	if (mSpace.mId == csPATIENTREF)
 	{
-		connect(toolManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+		connect(dataManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 	}
 }
 
@@ -114,13 +114,13 @@ void CoordinateSystemListener::doDisconnect()
 				disconnect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
 				disconnect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
 			}
-			disconnect(toolManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+			disconnect(dataManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 		}
 	}
 
 	if (mSpace.mId == csPATIENTREF)
 	{
-		disconnect(toolManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+		disconnect(dataManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 	}
 }
 

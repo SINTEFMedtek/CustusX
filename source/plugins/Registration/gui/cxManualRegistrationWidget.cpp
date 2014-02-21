@@ -17,6 +17,7 @@
 #include "cxRegistrationDataAdapters.h"
 #include "cxRegistrationManager.h"
 #include "sscToolManager.h"
+#include "sscDataManager.h"
 
 namespace cx
 {
@@ -25,13 +26,6 @@ ManualImageRegistrationWidget::ManualImageRegistrationWidget(RegistrationManager
 				RegistrationBaseWidget(regManager, parent, "ManualImageRegistrationWidget",
 								"Manual Image Registration"), mVerticalLayout(new QVBoxLayout(this))
 {
-//  mResetOffsetButton->setDisabled(true);
-//  connect(mResetOffsetButton, SIGNAL(clicked()), this, SLOT(resetOffsetSlot()));
-
-//  //registrationmanager
-//  connect(mManager.get(), SIGNAL(patientRegistrationPerformed()), this, SLOT(activateManualRegistrationFieldSlot()));
-//  connect(toolManager(), SIGNAL(rMprChanged()), this, SLOT(activateManualRegistrationFieldSlot()));
-
 	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(regManager));
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedImage));
 	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(regManager));
@@ -128,7 +122,7 @@ ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(RegistrationMan
 
 	mVerticalLayout->addStretch();
 
-	connect(toolManager(), SIGNAL(rMprChanged()), this, SLOT(patientMatrixChanged()));
+	connect(dataManager(), SIGNAL(rMprChanged()), this, SLOT(patientMatrixChanged()));
 
 	this->patientMatrixChanged();
 }
@@ -149,7 +143,7 @@ void ManualPatientRegistrationWidget::matrixWidgetChanged()
 void ManualPatientRegistrationWidget::patientMatrixChanged()
 {
 	mMatrixWidget->blockSignals(true);
-	mMatrixWidget->setMatrix(toolManager()->get_rMpr());
+	mMatrixWidget->setMatrix(dataManager()->get_rMpr());
 	mMatrixWidget->blockSignals(false);
 }
 

@@ -80,7 +80,7 @@ void LandmarkRegistrationWidget::cellClickedSlot(int row, int column)
 	{
 		Vector3D p_d = targetData[mActiveLandmark].getCoord();
 		Vector3D p_r = this->getTargetTransform().coord(p_d);
-		Vector3D p_pr = toolManager()->get_rMpr().coord(p_r);
+		Vector3D p_pr = dataManager()->get_rMpr().coord(p_r);
 		this->setManualToolPosition(p_r);
 	}
 
@@ -88,7 +88,7 @@ void LandmarkRegistrationWidget::cellClickedSlot(int row, int column)
 
 void LandmarkRegistrationWidget::setManualToolPosition(Vector3D p_r)
 {
-	Transform3D rMpr = toolManager()->get_rMpr();
+	Transform3D rMpr = dataManager()->get_rMpr();
 	Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip

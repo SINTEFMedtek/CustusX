@@ -17,7 +17,7 @@ vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt)
 {
   vtkPolyDataPtr retval = vtkPolyDataPtr::New();
 
-  Transform3D rMpr = toolManager()->get_rMpr();
+  Transform3D rMpr = dataManager()->get_rMpr();
 
   vtkPointsPtr points = vtkPointsPtr::New();
   vtkCellArrayPtr lines = vtkCellArrayPtr::New();
