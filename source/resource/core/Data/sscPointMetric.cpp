@@ -27,13 +27,13 @@ namespace cx
 {
 
 
-DataPtr PointMetricReader::load(const QString& uid, const QString& filename)
-{
-	return DataPtr(new PointMetric(uid, filename));
-}
+//DataPtr PointMetricReader::load(const QString& uid, const QString& filename)
+//{
+//	return PointMetric::create(uid, filename);
+//}
 
-PointMetric::PointMetric(const QString& uid, const QString& name) :
-	DataMetric(uid, name),
+PointMetric::PointMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+	DataMetric(uid, name, dataManager, spaceProvider),
 	mCoordinate(0,0,0),
 	mSpace(CoordinateSystemHelpers::getR())
 {
@@ -42,17 +42,17 @@ PointMetric::PointMetric(const QString& uid, const QString& name) :
 	connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
 }
 
-PointMetricPtr PointMetric::create(QString uid, QString name)
+PointMetricPtr PointMetric::create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider)
 {
-    return PointMetricPtr(new PointMetric(uid, name));
+	return PointMetricPtr(new PointMetric(uid, name, dataManager, spaceProvider));
 }
 
-PointMetricPtr PointMetric::create(QDomNode node)
-{
-    PointMetricPtr retval = PointMetric::create("");
-    retval->parseXml(node);
-    return retval;
-}
+//PointMetricPtr PointMetric::create(QDomNode node)
+//{
+//    PointMetricPtr retval = PointMetric::create("");
+//    retval->parseXml(node);
+//    return retval;
+//}
 
 PointMetric::~PointMetric()
 {

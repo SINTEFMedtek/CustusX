@@ -37,23 +37,23 @@ namespace cx
 
 typedef boost::shared_ptr<class AngleMetric> AngleMetricPtr;
 
-/** \brief DataReader implementation for AngleMetric
- *
- * \date Jul 27, 2011
- * \author Christian Askeland, SINTEF
- */
-class AngleMetricReader: public DataReader
-{
-public:
-	virtual ~AngleMetricReader()
-	{
-	}
-	virtual bool canLoad(const QString& type, const QString& filename)
-	{
-		return type == "angleMetric";
-	}
-	virtual DataPtr load(const QString& uid, const QString& filename);
-};
+///** \brief DataReader implementation for AngleMetric
+// *
+// * \date Jul 27, 2011
+// * \author Christian Askeland, SINTEF
+// */
+//class AngleMetricReader: public DataReader
+//{
+//public:
+//	virtual ~AngleMetricReader()
+//	{
+//	}
+//	virtual bool canLoad(const QString& type, const QString& filename)
+//	{
+//		return type == "angleMetric";
+//	}
+//	virtual DataPtr load(const QString& uid, const QString& filename);
+//};
 
 /**\brief Data class that represents an angle between two lines.
  *
@@ -70,10 +70,9 @@ class AngleMetric: public DataMetric
 {
 Q_OBJECT
 public:
-	AngleMetric(const QString& uid, const QString& name);
 	virtual ~AngleMetric();
-    static AngleMetricPtr create(QDomNode node);
-    static AngleMetricPtr create(QString uid, QString name="");
+//    static AngleMetricPtr create(QDomNode node);
+	static AngleMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 
 	double getAngle() const;
 	std::vector<Vector3D> getEndpoints() const;
@@ -88,6 +87,10 @@ public:
     virtual Vector3D getRefCoord() const;
     virtual QString getType() const
 	{
+		return getTypeName();
+	}
+	static QString getTypeName()
+	{
 		return "angleMetric";
 	}
 
@@ -99,6 +102,7 @@ public:
 private slots:
 	void resetCachedValues();
 private:
+	AngleMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 	boost::array<DataPtr, 4> mArgument;
 	MetricReferenceArgumentListPtr mArguments;
 	bool mUseSimpleVisualization;

@@ -29,23 +29,23 @@ namespace cx
 
 typedef boost::shared_ptr<class DonutMetric> DonutMetricPtr;
 
-/** \brief DataReader implementation for DonutMetric
- *
- * \date 2014-02-11
- * \author Christian Askeland, SINTEF
- */
-class DonutMetricReader: public DataReader
-{
-public:
-	virtual ~DonutMetricReader()
-	{
-	}
-	virtual bool canLoad(const QString& type, const QString& filename)
-	{
-		return type == "DonutMetric";
-	}
-	virtual DataPtr load(const QString& uid, const QString& filename);
-};
+///** \brief DataReader implementation for DonutMetric
+// *
+// * \date 2014-02-11
+// * \author Christian Askeland, SINTEF
+// */
+//class DonutMetricReader: public DataReader
+//{
+//public:
+//	virtual ~DonutMetricReader()
+//	{
+//	}
+//	virtual bool canLoad(const QString& type, const QString& filename)
+//	{
+//		return type == "DonutMetric";
+//	}
+//	virtual DataPtr load(const QString& uid, const QString& filename);
+//};
 
 
 /** \brief Data class that represents a donut.
@@ -61,10 +61,9 @@ class DonutMetric: public DataMetric
 {
 Q_OBJECT
 public:
-	DonutMetric(const QString& uid, const QString& name);
 	virtual ~DonutMetric();
-	static DonutMetricPtr create(QDomNode node);
-	static DonutMetricPtr create(QString uid, QString name="");
+//	static DonutMetricPtr create(QDomNode node);
+	static DonutMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 
 	virtual bool isValid() const;
 	virtual QString getAsSingleLineString() const;
@@ -84,12 +83,17 @@ public:
 	virtual Vector3D getRefCoord() const;
 	virtual QString getType() const
 	{
+		return getTypeName();
+	}
+	static QString getTypeName()
+	{
 		return "DonutMetric";
 	}
 	virtual QString getValueAsString() const { return ""; }
 	virtual bool showValueInGraphics() const { return false; }
 
 private:
+	DonutMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 	MetricReferenceArgumentListPtr mArguments;
 	double mRadius;
 	double mThickness;

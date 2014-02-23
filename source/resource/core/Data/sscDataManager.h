@@ -38,6 +38,8 @@ namespace cx
 // forward declarations
 typedef boost::shared_ptr<class TransferFunctions3DPresets> PresetTransferFunctions3DPtr;
 typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
+typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
 
 /**\brief Interface for a manager of data objects.
  *
@@ -82,6 +84,9 @@ public:
     virtual void saveData(DataPtr data, const QString& basePath) = 0; ///< Save data to file
     virtual std::map<QString, DataPtr> getData() const = 0;
 	virtual DataPtr getData(const QString& uid) const = 0;
+	virtual SpaceProviderPtr getSpaceProvider() = 0;
+	virtual DataFactoryPtr getDataFactory() = 0;
+
 
 	// global data (move to separate class if list grows)
 	virtual Vector3D getCenter() const = 0; ///< current common center point for user viewing.

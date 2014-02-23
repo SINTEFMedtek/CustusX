@@ -21,30 +21,30 @@
 namespace cx
 {
 
-DataPtr SphereMetricReader::load(const QString& uid, const QString& filename)
-{
-	return DataPtr(new SphereMetric(uid, filename));
-}
+//DataPtr SphereMetricReader::load(const QString& uid, const QString& filename)
+//{
+//	return DataPtr(new SphereMetric(uid, filename));
+//}
 
-SphereMetric::SphereMetric(const QString& uid, const QString& name) :
-				DataMetric(uid, name)
+SphereMetric::SphereMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+				DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "position"));
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 	mRadius = 5;
 }
 
-SphereMetricPtr SphereMetric::create(QString uid, QString name)
+SphereMetricPtr SphereMetric::create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider)
 {
-	return SphereMetricPtr(new SphereMetric(uid, name));
+	return SphereMetricPtr(new SphereMetric(uid, name, dataManager, spaceProvider));
 }
 
-SphereMetricPtr SphereMetric::create(QDomNode node)
-{
-	SphereMetricPtr retval = SphereMetric::create("");
-	retval->parseXml(node);
-	return retval;
-}
+//SphereMetricPtr SphereMetric::create(QDomNode node)
+//{
+//	SphereMetricPtr retval = SphereMetric::create("");
+//	retval->parseXml(node);
+//	return retval;
+//}
 
 SphereMetric::~SphereMetric()
 {

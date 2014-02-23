@@ -37,23 +37,23 @@ typedef Eigen::Hyperplane<double, 3> Plane3D;
 
 typedef boost::shared_ptr<class PlaneMetric> PlaneMetricPtr;
 
-/**\brief DataReader implementation for PlaneMetric
- *
- *  \date Jul 27, 2011
- *  \author Christian Askeland, SINTEF
- */
-class PlaneMetricReader: public DataReader
-{
-public:
-	virtual ~PlaneMetricReader()
-	{
-	}
-	virtual bool canLoad(const QString& type, const QString& filename)
-	{
-		return type == "planeMetric";
-	}
-	virtual DataPtr load(const QString& uid, const QString& filename);
-};
+///**\brief DataReader implementation for PlaneMetric
+// *
+// *  \date Jul 27, 2011
+// *  \author Christian Askeland, SINTEF
+// */
+//class PlaneMetricReader: public DataReader
+//{
+//public:
+//	virtual ~PlaneMetricReader()
+//	{
+//	}
+//	virtual bool canLoad(const QString& type, const QString& filename)
+//	{
+//		return type == "planeMetric";
+//	}
+//	virtual DataPtr load(const QString& uid, const QString& filename);
+//};
 
 /**
  * \brief Data class representing a plane.
@@ -71,10 +71,10 @@ class PlaneMetric: public DataMetric
 {
 Q_OBJECT
 public:
-	PlaneMetric(const QString& uid, const QString& name = "");
+	PlaneMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 	virtual ~PlaneMetric();
-    static PlaneMetricPtr create(QDomNode node);
-    static PlaneMetricPtr create(QString uid, QString name="");
+//    static PlaneMetricPtr create(QDomNode node);
+	static PlaneMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 
 	void setCoordinate(const Vector3D& p);
 	Vector3D getCoordinate() const;
@@ -84,6 +84,10 @@ public:
 	void setSpace(CoordinateSystem space); // use parentframe from Data
 	CoordinateSystem getSpace() const; // use parentframe from Data
 	virtual QString getType() const
+	{
+		return getTypeName();
+	}
+	static QString getTypeName()
 	{
 		return "planeMetric";
 	}

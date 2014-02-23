@@ -108,13 +108,22 @@ public:
 	bool inputEqualsMetric(PlaneMetricWithInput data);
 	bool inputEqualsMetric(ToolMetricWithInput data);
 
+	template<class METRIC_TYPE>
+	boost::shared_ptr<METRIC_TYPE> createTestMetric(QString uid="")
+	{
+		return METRIC_TYPE::create(uid, "", NULL, cx::SpaceProviderPtr());
+	}
+
     template<class DATA>
     bool saveLoadXmlGivesEqualTransform(DATA data)
     {
         QDomNode xmlNode = this->createDummyXmlNode();
         data.mMetric->addXml(xmlNode);
 
-        data.mMetric = DATA::METRIC_TYPE::create(xmlNode);
+//		typedef typename DATA::METRIC_TYPE TYPE;
+		data.mMetric = this->createTestMetric<typename DATA::METRIC_TYPE>("");
+		data.mMetric->parseXml(xmlNode);
+//        data.mMetric = DATA::METRIC_TYPE::create(xmlNode);
 
 		return this->inputEqualsMetric(data);
     }

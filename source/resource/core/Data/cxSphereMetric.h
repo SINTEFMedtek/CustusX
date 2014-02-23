@@ -29,23 +29,23 @@ namespace cx
 
 typedef boost::shared_ptr<class SphereMetric> SphereMetricPtr;
 
-/** \brief DataReader implementation for SphereMetric
- *
- * \date 2014-02-11
- * \author Christian Askeland, SINTEF
- */
-class SphereMetricReader: public DataReader
-{
-public:
-	virtual ~SphereMetricReader()
-	{
-	}
-	virtual bool canLoad(const QString& type, const QString& filename)
-	{
-		return type == "SphereMetric";
-	}
-	virtual DataPtr load(const QString& uid, const QString& filename);
-};
+//* \brief DataReader implementation for SphereMetric
+// *
+// * \date 2014-02-11
+// * \author Christian Askeland, SINTEF
+
+//class SphereMetricReader: public DataReader
+//{
+//public:
+//	virtual ~SphereMetricReader()
+//	{
+//	}
+//	virtual bool canLoad(const QString& type, const QString& filename)
+//	{
+//		return type == "SphereMetric";
+//	}
+//	virtual DataPtr load(const QString& uid, const QString& filename);
+//};
 
 /**\brief Data class that represents a donut.
  *
@@ -57,10 +57,9 @@ class SphereMetric: public DataMetric
 {
 Q_OBJECT
 public:
-	SphereMetric(const QString& uid, const QString& name);
 	virtual ~SphereMetric();
-	static SphereMetricPtr create(QDomNode node);
-	static SphereMetricPtr create(QString uid, QString name="");
+//	static SphereMetricPtr create(QDomNode node);
+	static SphereMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 
 	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
 	virtual bool isValid() const;
@@ -75,12 +74,17 @@ public:
 	virtual Vector3D getRefCoord() const;
 	virtual QString getType() const
 	{
+		return getTypeName();
+	}
+	static QString getTypeName()
+	{
 		return "SphereMetric";
 	}
 	virtual QString getValueAsString() const;
 	virtual bool showValueInGraphics() const { return false; }
 
 private:
+	SphereMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 	MetricReferenceArgumentListPtr mArguments;
 	double mRadius;
 };
