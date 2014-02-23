@@ -23,7 +23,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Data/sscUnsignedDerivedImage
 	Data/cxFrameMetric
 	Data/cxToolMetric
-	Data/sscCoordinateSystemListener
 	Data/cxFrameMetricBase
 	Data/cxShapedMetric
 	Data/cxSphereMetric
@@ -78,6 +77,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	utilities/cxSpaceProviderImpl
 	utilities/cxSpaceListener
 	utilities/cxSpaceListenerImpl
+	utilities/cxLegacySingletons
 	)
 
      

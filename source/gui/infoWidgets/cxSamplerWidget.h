@@ -20,7 +20,6 @@
 #include "sscVector3DDataAdapterXml.h"
 #include "cxDominantToolProxy.h"
 #include "sscPointMetric.h"
-#include "sscCoordinateSystemListener.h"
 
 namespace cx
 {
@@ -51,7 +50,7 @@ private:
 
 	QHBoxLayout* mLayout;
 	StringDataAdapterXmlPtr mSpaceSelector;
-	CoordinateSystemListenerPtr mListener;
+	SpaceListenerPtr mListener;
 	DominantToolProxyPtr mActiveTool;
 	QLineEdit* mCoordLineEdit;
 	QAction* mAdvancedAction;

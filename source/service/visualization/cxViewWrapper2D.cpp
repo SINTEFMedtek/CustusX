@@ -65,8 +65,9 @@
 namespace cx
 {
 
-ViewWrapper2D::ViewWrapper2D(ViewWidget* view) :
-				mOrientationActionGroup(new QActionGroup(view))
+ViewWrapper2D::ViewWrapper2D(ViewWidget* view, VisualizationServiceBackendPtr backend) :
+	ViewWrapper(backend),
+	mOrientationActionGroup(new QActionGroup(view))
 {
 //  std::cout << "ViewWrapper2D create" << std::endl;
 	mView = view;

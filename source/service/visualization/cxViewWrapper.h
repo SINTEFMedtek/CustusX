@@ -32,6 +32,7 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class CameraData> CameraDataPtr;
+typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
 
 /**
  * \file
@@ -97,6 +98,7 @@ protected slots:
 	virtual void videoSourceChangedSlot(QString uid) {}
 
 protected:
+	ViewWrapper(VisualizationServiceBackendPtr backend);
 	virtual void dataAdded(DataPtr data) = 0;
 	virtual void dataRemoved(const QString& uid) = 0;
 
@@ -107,6 +109,7 @@ protected:
 //	std::vector<std::pair<QColor, QString> > getAllMetricTexts() const;
 
 	ViewGroupDataPtr mGroupData;
+	VisualizationServiceBackendPtr mBackend;
 
 private:
 	QString mLastDataActionUid;

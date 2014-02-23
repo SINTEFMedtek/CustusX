@@ -33,6 +33,8 @@
 #include "sscAngleMetric.h"
 #include "cxSphereMetric.h"
 #include "cxDataFactory.h"
+#include "cxLegacySingletons.h"
+#include "cxSpaceProvider.h"
 
 
 namespace cx
@@ -131,8 +133,8 @@ void MetricManager::addPointButtonClickedSlot()
 
 PointMetricPtr MetricManager::addPointInDefaultPosition()
 {
-	CoordinateSystem ref = CoordinateSystemHelpers::getR();
-	Vector3D p_ref = CoordinateSystemHelpers::getDominantToolTipPoint(ref, true);
+	CoordinateSystem ref = CoordinateSystem::reference();
+	Vector3D p_ref = spaceProvider()->getDominantToolTipPoint(ref, true);
 	return this->addPoint(p_ref, ref);
 }
 
@@ -142,8 +144,8 @@ void MetricManager::addFrameButtonClickedSlot()
 //	  FrameMetricPtr frame(new FrameMetric("frame%1", "frame%1"));
   frame->get_rMd_History()->setParentSpace("reference");
 
-  CoordinateSystem ref = CoordinateSystemHelpers::getR();
-  Transform3D rMt = CoordinateSystemHelpers::getDominantToolTipTransform(ref, true);
+  CoordinateSystem ref = CoordinateSystem::reference();
+  Transform3D rMt = spaceProvider()->getDominantToolTipTransform(ref, true);
 
   frame->setSpace(ref);
   frame->setFrame(rMt);
@@ -157,8 +159,8 @@ void MetricManager::addToolButtonClickedSlot()
 //  ToolMetricPtr frame(new ToolMetric("tool%1", "tool%1"));
   frame->get_rMd_History()->setParentSpace("reference");
 
-  CoordinateSystem ref = CoordinateSystemHelpers::getR();
-  Transform3D rMt = CoordinateSystemHelpers::getDominantToolTipTransform(ref, true);
+  CoordinateSystem ref = CoordinateSystem::reference();
+  Transform3D rMt = spaceProvider()->getDominantToolTipTransform(ref, true);
 
   frame->setSpace(ref);
   frame->setFrame(rMt);
@@ -170,7 +172,7 @@ void MetricManager::addToolButtonClickedSlot()
 
 void MetricManager::addPlaneButtonClickedSlot()
 {
-  CoordinateSystem ref = CoordinateSystemHelpers::getR();
+  CoordinateSystem ref = CoordinateSystem::reference();
 //  Vector3D p_ref = CoordinateSystemHelpers::getDominantToolTipPoint(ref, true);
 
   PlaneMetricPtr p1 = this->getDataFactory()->createSpecific<PlaneMetric>("plane%1");
@@ -188,7 +190,7 @@ void MetricManager::addPlaneButtonClickedSlot()
   {
 	  CoordinateSystem from(csTOOL_OFFSET, tool->getUid());
 	  Vector3D point_t = Vector3D(0,0,0);
-	  Transform3D rMto = CoordinateSystemHelpers::get_toMfrom(from, ref);
+	  Transform3D rMto = spaceProvider()->get_toMfrom(from, ref);
 
 	  p1->setCoordinate(rMto.coord(Vector3D(0,0,0)));
 	  p1->setNormal(rMto.vector(Vector3D(0,0,1)));
@@ -321,13 +323,13 @@ void MetricManager::loadReferencePointsSlot()
 	return;
   }
 
-  CoordinateSystem ref = CoordinateSystemHelpers::getR();
-  CoordinateSystem sensor = CoordinateSystemHelpers::getS(refTool);
+  CoordinateSystem ref = CoordinateSystem::reference();
+  CoordinateSystem sensor = spaceProvider()->getS(refTool);
 
   std::map<int, Vector3D>::iterator it = referencePoints_s.begin();
   for(; it != referencePoints_s.end(); ++it)
   {
-	Vector3D P_ref = CoordinateSystemHelpers::get_toMfrom(sensor, ref).coord(it->second);
+	Vector3D P_ref = spaceProvider()->get_toMfrom(sensor, ref).coord(it->second);
 	this->addPoint(P_ref, CoordinateSystem(csREF), "ref%1");
   }
 }
