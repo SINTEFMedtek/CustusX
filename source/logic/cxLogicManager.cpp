@@ -18,6 +18,9 @@
 #include "cxRepManager.h"
 #include "sscGPUImageBuffer.h"
 #include "cxSettings.h"
+#include "cxSpaceProviderImpl.h"
+//#include "sscDataReaderWriter.h"
+#include "cxDataFactory.h"
 
 namespace cx
 {
@@ -53,6 +56,16 @@ void LogicManager::initializeServices()
 	cx::ViewManager::createInstance();
 	cx::StateService::getInstance();
 	// init stateservice....
+
+	cx::SpaceProviderPtr spaceProvider;
+	spaceProvider.reset(new cx::SpaceProviderImpl(cx::cxToolManager::getInstance(),
+												  cx::DataManager::getInstance()));
+	cx::cxDataManager::getInstance()->setSpaceProvider(spaceProvider);
+
+	cx::DataFactoryPtr dataFactory;
+	dataFactory.reset(new DataFactory(cx::cxDataManager::getInstance(), spaceProvider));
+
+	cx::cxDataManager::getInstance()->setDataFactory(dataFactory);
 
 	// logic layer
 	//cx::LogicManager::initialize();

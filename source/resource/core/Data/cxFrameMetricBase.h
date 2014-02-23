@@ -30,7 +30,7 @@ class FrameMetricBase: public DataMetric
 {
 	Q_OBJECT
 public:
-	FrameMetricBase(const QString& uid, const QString& name = "");
+	FrameMetricBase(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 	virtual ~FrameMetricBase();
 	virtual QString getType() const = 0;
 

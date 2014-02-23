@@ -19,6 +19,8 @@
 #include "sscLabeledComboBoxWidget.h"
 #include "sscTypeConversions.h"
 #include "cxSettings.h"
+#include "sscDataManager.h"
+#include "sscImage.h"
 
 namespace cx
 {

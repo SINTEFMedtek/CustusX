@@ -21,7 +21,7 @@
 #include "cxToolManager.h"
 #include <QFile>
 #include "sscMessageManager.h"
-
+#include "sscDataReaderWriter.h"
 
 #include "sscRegistrationTransform.h"
 #include "sscPointMetric.h"
@@ -32,6 +32,8 @@
 #include "cxShapedMetric.h"
 #include "sscAngleMetric.h"
 #include "cxSphereMetric.h"
+#include "cxDataFactory.h"
+
 
 namespace cx
 {
@@ -100,9 +102,16 @@ void MetricManager::setManualToolPosition(Vector3D p_r)
 	tool->set_prMt(createTransformTranslate(p_pr - p0_pr) * tool->get_prMt());
 }
 
+DataFactoryPtr MetricManager::getDataFactory()
+{
+	return dataManager()->getDataFactory();
+}
+
 PointMetricPtr MetricManager::addPoint(Vector3D point, CoordinateSystem space, QString name)
 {
-	PointMetricPtr p1(new PointMetric("point%1","point%1"));
+	PointMetricPtr p1 =	this->getDataFactory()->createSpecific<PointMetric>("point%1");
+//	PointMetricPtr p1 = this->createTestMetric<cx::PointMetric>("point%1");
+//	PointMetricPtr p1 = PointMetric::create("point%1","point%1");
   p1->get_rMd_History()->setParentSpace("reference");
 	p1->setSpace(space);
 	p1->setCoordinate(point);
@@ -129,7 +138,8 @@ PointMetricPtr MetricManager::addPointInDefaultPosition()
 
 void MetricManager::addFrameButtonClickedSlot()
 {
-  FrameMetricPtr frame(new FrameMetric("frame%1", "frame%1"));
+	FrameMetricPtr frame = this->getDataFactory()->createSpecific<FrameMetric>("frame%1");
+//	  FrameMetricPtr frame(new FrameMetric("frame%1", "frame%1"));
   frame->get_rMd_History()->setParentSpace("reference");
 
   CoordinateSystem ref = CoordinateSystemHelpers::getR();
@@ -143,7 +153,8 @@ void MetricManager::addFrameButtonClickedSlot()
 
 void MetricManager::addToolButtonClickedSlot()
 {
-  ToolMetricPtr frame(new ToolMetric("tool%1", "tool%1"));
+	ToolMetricPtr frame = this->getDataFactory()->createSpecific<ToolMetric>("tool%1");
+//  ToolMetricPtr frame(new ToolMetric("tool%1", "tool%1"));
   frame->get_rMd_History()->setParentSpace("reference");
 
   CoordinateSystem ref = CoordinateSystemHelpers::getR();
@@ -162,7 +173,8 @@ void MetricManager::addPlaneButtonClickedSlot()
   CoordinateSystem ref = CoordinateSystemHelpers::getR();
 //  Vector3D p_ref = CoordinateSystemHelpers::getDominantToolTipPoint(ref, true);
 
-  PlaneMetricPtr p1(new PlaneMetric("plane%1","plane%1"));
+  PlaneMetricPtr p1 = this->getDataFactory()->createSpecific<PlaneMetric>("plane%1");
+//  PlaneMetricPtr p1(new PlaneMetric("plane%1","plane%1"));
   p1->get_rMd_History()->setParentSpace("reference");
   p1->setSpace(ref);
 
@@ -217,7 +229,8 @@ std::vector<DataPtr> MetricManager::refinePointArguments(std::vector<DataPtr> ar
 
 void MetricManager::addDistanceButtonClickedSlot()
 {
-	DistanceMetricPtr d0(new DistanceMetric("distance%1","distance%1"));
+	DistanceMetricPtr d0 = this->getDataFactory()->createSpecific<DistanceMetric>("distance%1");
+//	DistanceMetricPtr d0(new DistanceMetric("distance%1","distance%1"));
   d0->get_rMd_History()->setParentSpace("reference");
 
   std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
@@ -229,7 +242,8 @@ void MetricManager::addDistanceButtonClickedSlot()
 
 void MetricManager::addAngleButtonClickedSlot()
 {
-	AngleMetricPtr d0(new AngleMetric("angle%1","angle%1"));
+	AngleMetricPtr d0 = this->getDataFactory()->createSpecific<AngleMetric>("angle%1");
+//	AngleMetricPtr d0(new AngleMetric("angle%1","angle%1"));
   d0->get_rMd_History()->setParentSpace("reference");
 
   std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments(), 3);
@@ -263,7 +277,8 @@ std::vector<DataPtr> MetricManager::getSpecifiedNumberOfValidArguments(MetricRef
 
 void MetricManager::addSphereButtonClickedSlot()
 {
-	SphereMetricPtr d0(new SphereMetric("sphere%1","sphere%1"));
+	SphereMetricPtr d0 = this->getDataFactory()->createSpecific<SphereMetric>("sphere%1");
+//	SphereMetricPtr d0(new SphereMetric("sphere%1","sphere%1"));
 	d0->get_rMd_History()->setParentSpace("reference");
 	std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
 	d0->getArguments()->set(0, args[0]);
@@ -273,7 +288,8 @@ void MetricManager::addSphereButtonClickedSlot()
 
 void MetricManager::addDonutButtonClickedSlot()
 {
-	DonutMetricPtr d0(new DonutMetric("donut%1","donut%1"));
+	DonutMetricPtr d0 = this->getDataFactory()->createSpecific<DonutMetric>("donut%1");
+//	DonutMetricPtr d0(new DonutMetric("donut%1","donut%1"));
 	d0->get_rMd_History()->setParentSpace("reference");
 	std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
 	d0->getArguments()->set(0, args[0]);

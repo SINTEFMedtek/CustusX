@@ -53,6 +53,8 @@
 #include "sscImageTF3D.h"
 #include "sscLogger.h"
 #include "sscDataReaderWriter.h"
+#include "cxSpaceProvider.h"
+#include "cxDataFactory.h"
 
 namespace cx
 {
@@ -73,6 +75,26 @@ DataManagerImpl::DataManagerImpl()
 
 DataManagerImpl::~DataManagerImpl()
 {
+}
+
+void DataManagerImpl::setSpaceProvider(SpaceProviderPtr spaceProvider)
+{
+	mSpaceProvider = spaceProvider;
+}
+
+void DataManagerImpl::setDataFactory(DataFactoryPtr dataFactory)
+{
+	mDataFactory = dataFactory;
+}
+
+SpaceProviderPtr DataManagerImpl::getSpaceProvider()
+{
+	return mSpaceProvider;
+}
+
+DataFactoryPtr DataManagerImpl::getDataFactory()
+{
+	return mDataFactory;
 }
 
 void DataManagerImpl::clear()
@@ -204,7 +226,17 @@ ImagePtr DataManagerImpl::loadImage(const QString& uid, const QString& filename)
 
 DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 {
-	DataPtr data = this->readData(uid, path, "unknown");
+	if (mData.count(uid)) // dont load same image twice
+		return mData[uid];
+
+	QString type = DataReaderWriter().findDataTypeFromFile(path);
+	DataPtr data = mDataFactory->create(type, uid);
+	data->load(path);
+
+//	DataPtr current = DataReaderWriter().readData(uid, path, type);
+//	return current;
+
+//	DataPtr data = this->readData(uid, path, "unknown");
 	if (!data)
 		{
 			messageManager()->sendError("Error with data file: " + path);
@@ -214,19 +246,24 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 	return data;
 }
 
-/** Read a data set and return it. Do NOT add it to the datamanager.
- *  Internal method: used by loadData family.
- */
-DataPtr DataManagerImpl::readData(const QString& uid, const QString& path, const QString& type)
-{
-	if (mData.count(uid)) // dont load same image twice
-	{
-		return mData[uid];
-	}
+///** Read a data set and return it. Do NOT add it to the datamanager.
+// *  Internal method: used by loadData family.
+// */
+//DataPtr DataManagerImpl::readData(const QString& uid, const QString& path, const QString& type)
+//{
+//	if (mData.count(uid)) // dont load same image twice
+//	{
+//		return mData[uid];
+//	}
 
-	DataPtr current = DataReaderWriter().readData(uid, path, type);
-	return current;
-}
+//	DataPtr current = mDataFactory->create(type, uid, name);
+//	bool loaded = current->load(path);
+//	if (loaded)
+//		return current;
+
+////	DataPtr current = DataReaderWriter().readData(uid, path, type);
+////	return current;
+//}
 
 void DataManagerImpl::loadData(DataPtr data)
 {
@@ -532,9 +569,20 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 		return DataPtr();
 	}
 
-	DataPtr data = this->readData(uid, path, type);	
+//	DataPtr data = this->readData(uid, path, type);
 
+	if (mData.count(uid)) // dont load same image twice
+		return mData[uid];
+
+	DataPtr data = mDataFactory->create(type, uid, name);
 	if (!data)
+	{
+		messageManager()->sendWarning(QString("Unknown type: %1 for file %2").arg(type).arg(path));
+		return DataPtr();
+	}
+	bool loaded = data->load(path);
+
+	if (!data || !loaded)
 	{
 		messageManager()->sendWarning("Unknown file: " + path);
 		return DataPtr();

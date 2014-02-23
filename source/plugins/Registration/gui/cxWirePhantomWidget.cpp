@@ -36,6 +36,8 @@
 #include "cxAcquisitionData.h"
 #include "sscReconstructManager.h"
 #include "cxPipelineWidget.h"
+#include "sscDataReaderWriter.h"
+#include "cxDataFactory.h"
 
 #include "cxSmoothingImageFilter.h"
 #include "cxBinaryThinningImageFilter3DFilter.h"
@@ -283,7 +285,8 @@ void WirePhantomWidget::showDataMetrics(Vector3D cross_r)
 
     PointMetricPtr p1 = boost::dynamic_pointer_cast<PointMetric>(dataManager()->getData("cross_nominal"));
     if (!p1)
-        p1.reset(new PointMetric("cross_nominal", "cross_nominal"));
+		p1 = dataManager()->getDataFactory()->createSpecific<PointMetric>("cross_nominal");
+//		p1 = PointMetric::create("cross_nominal", "cross_nominal");
     p1->get_rMd_History()->setParentSpace(mManager->getFixedData()->getUid());
     p1->setSpace(CoordinateSystemHelpers::getD(mManager->getFixedData()));
     p1->setCoordinate(cross_r);
@@ -292,7 +295,8 @@ void WirePhantomWidget::showDataMetrics(Vector3D cross_r)
 
     PointMetricPtr p2 = boost::dynamic_pointer_cast<PointMetric>(dataManager()->getData("cross_us"));
     if (!p2)
-        p2.reset(new PointMetric("cross_us", "cross_us"));
+		p2 = dataManager()->getDataFactory()->createSpecific<PointMetric>("cross_us");
+//		p2 = PointMetric::create("cross_us", "cross_us");
     p2->get_rMd_History()->setParentSpace(mManager->getMovingData()->getUid());
     p2->setSpace(CoordinateSystemHelpers::getD(mManager->getMovingData()));
     p2->setCoordinate(cross_us);
@@ -301,7 +305,8 @@ void WirePhantomWidget::showDataMetrics(Vector3D cross_r)
 
     DistanceMetricPtr d0 = boost::dynamic_pointer_cast<DistanceMetric>(dataManager()->getData("accuracy"));
     if (!d0)
-        d0.reset(new DistanceMetric("accuracy", "accuracy"));
+		d0 = dataManager()->getDataFactory()->createSpecific<DistanceMetric>("accuracy");
+//        d0.reset(new DistanceMetric("accuracy", "accuracy"));
     d0->get_rMd_History()->setParentSpace("reference");
 	d0->getArguments()->set(0, p1);
 	d0->getArguments()->set(1, p2);

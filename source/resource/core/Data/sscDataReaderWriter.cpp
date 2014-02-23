@@ -50,14 +50,14 @@
 #include "sscVideoSource.h"
 #include "sscCustomMetaImage.h"
 
-#include "sscPointMetric.h"
-#include "sscDistanceMetric.h"
-#include "sscPlaneMetric.h"
-#include "sscAngleMetric.h"
-#include "cxShapedMetric.h"
-#include "cxSphereMetric.h"
-#include "cxFrameMetric.h"
-#include "cxToolMetric.h"
+//#include "sscPointMetric.h"
+//#include "sscDistanceMetric.h"
+//#include "sscPlaneMetric.h"
+//#include "sscAngleMetric.h"
+//#include "cxShapedMetric.h"
+//#include "cxSphereMetric.h"
+//#include "cxFrameMetric.h"
+//#include "cxToolMetric.h"
 
 #include "sscImageLUT2D.h"
 #include "sscImageTF3D.h"
@@ -83,11 +83,16 @@ StaticMutexVtkLocker::~StaticMutexVtkLocker()
 boost::shared_ptr<QMutex> StaticMutexVtkLocker::mMutex;
 //---------------------------------------------------------
 
-
-//-----
-DataPtr MincImageReader::load(const QString& uid, const QString& filename)
+bool MincImageReader::readInto(DataPtr data, QString filename)
 {
-	std::cout << "Reading " << filename << std::endl;
+	return this->readInto(boost::dynamic_pointer_cast<Image>(data), filename);
+}
+
+bool MincImageReader::readInto(ImagePtr image, QString filename)
+{
+	vtkImageDataPtr raw = this->loadVtkImageData(filename);
+	if(!raw)
+		return false;
 
 	//Read data input file
 	vtkMINCImageReaderPtr l_dataReader = vtkMINCImageReaderPtr::New();
@@ -121,15 +126,23 @@ DataPtr MincImageReader::load(const QString& uid, const QString& filename)
 	QFile file(filename);
 	QFileInfo info(file);
 	//QString uid(info.completeBaseName()+"_minc_%1");
-	QString name = uid;
+//	QString name = uid;
 
-	ImagePtr image(new Image(uid, imageData));
+//	ImagePtr image(new Image(uid, imageData));
+	image->setVtkImageData(imageData);
 	//ImagePtr image = dataManager()->createImage(l_dataReader->GetOutput(),uid, name);
 	image->get_rMd_History()->addRegistration(RegistrationTransform(rMd, info.lastModified(), "from Minc file"));
 	image->getBaseVtkImageData()->Print(std::cout);
 
+	return true;
+}
+
+//-----
+DataPtr MincImageReader::load(const QString& uid, const QString& filename)
+{
+	ImagePtr image(new Image(uid, vtkImageDataPtr()));
+	this->readInto(image, filename);
 	return image;
-	//////////////////////////////
 }
 
 /** Wrapper for vtkAlgorithm::Update(),
@@ -196,17 +209,24 @@ vtkImageDataPtr MetaImageReader::loadVtkImageData(QString filename)
 	return zeroer->GetOutput();
 }
 
-//-----
-DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
+bool MetaImageReader::readInto(DataPtr data, QString filename)
 {
+	return this->readInto(boost::dynamic_pointer_cast<Image>(data), filename);
+}
+bool MetaImageReader::readInto(ImagePtr image, QString filename)
+{
+	if (!image)
+		return false;
+
 	CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
 	Transform3D rMd = customReader->readTransform();
 
 	vtkImageDataPtr raw = this->loadVtkImageData(filename);
 	if(!raw)
-		return DataPtr();
+		return false;
 
-	ImagePtr image(new Image(uid, raw));
+	image->setVtkImageData(raw);
+//	ImagePtr image(new Image(uid, raw));
 
 	//  RegistrationTransform regTrans(rMd, QFileInfo(filename).lastModified(), "From MHD file");
 	//  image->get_rMd_History()->addRegistration(regTrans);
@@ -225,41 +245,14 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 		image->resetTransferFunctions();
 	}
 
-//	if (ok1 && ok2)
-//	{
-////		image->getTransferFunctions3D()->setLevel(level);
-////		image->getTransferFunctions3D()->setWindow(window);
+	return true;
+}
 
-//		// set TF 3D using the color points and alpha points based on windowlevel settings.
-//		ImageTF3DPtr tf3D = image->getTransferFunctions3D();
-//		tf3D->setWindow(window);
-//		tf3D->setLevel(level);
-////		SSC_LOG("level: %f, win: %f, first: %f, second: %f", level, window, level-window/2, level+window/2);
-////		ColorMap colors;
-////		colors[level-window/2] = QColor("black");
-////		colors[level+window/2] = QColor("white");
-////		tf3D->resetColor(colors);
-////		tf3D->setLLR();
-
-//		IntIntMap opacity;
-//		opacity[level-0.7*window/2] = 0;
-//		opacity[level+window/2] = 255;
-//		tf3D->resetAlpha(opacity);
-//		//		tf3D->addColorPoint(level-window/2, QColor("black"));
-//		//		tf3D->addColorPoint(level+window/2, QColor("white"));
-//		//		tf3D->removeInitAlphaPoint();
-////		tf3D->addAlphaPoint(level-0.7*window/2, 0);
-////		tf3D->addAlphaPoint(level+window/2, 255);
-
-//		image->getLookupTable2D()->setLevel(level);
-//		image->getLookupTable2D()->setWindow(window);
-//	}
-
-//	// add shading for known preoperative modalities
-//	if (image->getModality().contains("CT") || image->getModality().contains("MR"))
-//		image->setShadingOn(true);
-
-	//std::cout << "ImagePtr MetaImageReader::load" << std::endl << std::endl;
+//-----
+DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
+{
+	ImagePtr image(new Image(uid, vtkImageDataPtr()));
+	this->readInto(image, filename);
 	return image;
 }
 
@@ -289,12 +282,26 @@ void MetaImageReader::saveImage(ImagePtr image, const QString& filename)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-DataPtr PNGImageReader::load(const QString& uid, const QString& filename)
+bool PNGImageReader::readInto(DataPtr data, QString filename)
 {
+	return this->readInto(boost::dynamic_pointer_cast<Image>(data), filename);
+}
+
+bool PNGImageReader::readInto(ImagePtr image, QString filename)
+{
+	if (!image)
+		return false;
 	vtkImageDataPtr raw = this->loadVtkImageData(filename);
 	if(!raw)
-		return DataPtr();
-	ImagePtr image(new Image(uid, raw));
+		return false;
+	image->setVtkImageData(raw);
+	return true;
+}
+
+DataPtr PNGImageReader::load(const QString& uid, const QString& filename)
+{
+	ImagePtr image(new Image(uid, vtkImageDataPtr()));
+	this->readInto(image, filename);
 	return image;
 }
 
@@ -310,40 +317,76 @@ vtkImageDataPtr PNGImageReader::loadVtkImageData(QString filename)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
+bool PolyDataMeshReader::readInto(DataPtr data, QString filename)
+{
+	return this->readInto(boost::dynamic_pointer_cast<Mesh>(data), filename);
+}
+
+bool PolyDataMeshReader::readInto(MeshPtr mesh, QString filename)
+{
+	if (!mesh)
+		return false;
+	vtkPolyDataPtr raw = this->loadVtkPolyData(filename);
+	if(!raw)
+		return false;
+	mesh->setVtkPolyData(raw);
+	return true;
+}
 //-----
-DataPtr PolyDataMeshReader::load(const QString& uid, const QString& fileName)
+vtkPolyDataPtr PolyDataMeshReader::loadVtkPolyData(QString fileName)
 {
 	vtkPolyDataReaderPtr reader = vtkPolyDataReaderPtr::New();
 	reader->SetFileName(cstring_cast(fileName));
 
 	if (!ErrorObserver::checkedRead(reader, fileName))
-		return DataPtr();
+		return vtkPolyDataPtr();
 
 	vtkPolyDataPtr polyData = reader->GetOutput();
-
-	//return MeshPtr(new Mesh(fileName, fileName, polyData));
-	MeshPtr tempMesh(new Mesh(uid, "PolyData", polyData));
-	return tempMesh;
-
+	return polyData;
 }
 
-DataPtr StlMeshReader::load(const QString& uid, const QString& fileName)
+DataPtr PolyDataMeshReader::load(const QString& uid, const QString& filename)
+{
+	MeshPtr mesh(new Mesh(uid));
+	this->readInto(mesh, filename);
+	return mesh;
+}
+
+bool StlMeshReader::readInto(DataPtr data, QString filename)
+{
+	return this->readInto(boost::dynamic_pointer_cast<Mesh>(data), filename);
+}
+
+bool StlMeshReader::readInto(MeshPtr mesh, QString filename)
+{
+	if (!mesh)
+		return false;
+	vtkPolyDataPtr raw = this->loadVtkPolyData(filename);
+	if(!raw)
+		return false;
+	mesh->setVtkPolyData(raw);
+	return true;
+}
+
+
+vtkPolyDataPtr StlMeshReader::loadVtkPolyData(QString fileName)
 {
 	vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
 	reader->SetFileName(cstring_cast(fileName));
 
 	if (!ErrorObserver::checkedRead(reader, fileName))
-		return DataPtr();
+		return vtkPolyDataPtr();
 
 	vtkPolyDataPtr polyData = reader->GetOutput();
-
-	//return MeshPtr(new Mesh(fileName, fileName, polyData));
-	MeshPtr tempMesh(new Mesh(uid, "PolyData", polyData));
-	return tempMesh;
-
+	return polyData;
 }
 
-
+DataPtr StlMeshReader::load(const QString& uid, const QString& filename)
+{
+	MeshPtr mesh(new Mesh(uid));
+	this->readInto(mesh, filename);
+	return mesh;
+}
 
 DataReaderWriter::DataReaderWriter()
 {
@@ -352,16 +395,6 @@ DataReaderWriter::DataReaderWriter()
 	mDataReaders.insert(DataReaderPtr(new PolyDataMeshReader()));
 	mDataReaders.insert(DataReaderPtr(new StlMeshReader()));
 	mDataReaders.insert(DataReaderPtr(new PNGImageReader()));
-
-	// extra cx data types
-	mDataReaders.insert(DataReaderPtr(new PointMetricReader()));
-	mDataReaders.insert(DataReaderPtr(new DistanceMetricReader()));
-	mDataReaders.insert(DataReaderPtr(new PlaneMetricReader()));
-	mDataReaders.insert(DataReaderPtr(new AngleMetricReader()));
-	mDataReaders.insert(DataReaderPtr(new FrameMetricReader()));
-	mDataReaders.insert(DataReaderPtr(new ToolMetricReader()));
-	mDataReaders.insert(DataReaderPtr(new DonutMetricReader()));
-	mDataReaders.insert(DataReaderPtr(new SphereMetricReader()));
 }
 
 DataReaderPtr DataReaderWriter::findReader(const QString& path, const QString& type)
@@ -390,30 +423,28 @@ vtkPolyDataPtr DataReaderWriter::loadVtkPolyData(QString filename)
 	return vtkPolyDataPtr();
 }
 
-/** Read a data set and return it. Do NOT add it to the datamanager.
- *  Internal method: used by loadData family.
- */
-DataPtr DataReaderWriter::readData(const QString& uid, const QString& path, const QString& type)
+QString DataReaderWriter::findDataTypeFromFile(QString filename)
 {
-	DataReaderPtr reader = this->findReader(path, type);
-	if (!reader)
-	{
-		std::cout << "failed to create data object: " << path << ", " << uid << ", " << type << std::endl;
-		return DataPtr();
-	}
-
-	DataPtr current = reader->load(uid, path);
-	if(!current)
-		std::cout << "Failed to read data object: " << path << ", " << uid << ", " << type << std::endl;
-	else
-	{
-		QFileInfo fileInfo(qstring_cast(path));
-		current->setName(changeExtension(fileInfo.fileName(), ""));
-		current->setFilename(path); // need path even when not set explicitly: nice for testing
-	}
-	return current;
+	DataReaderPtr reader = this->findReader(filename);
+	if (reader)
+		return reader->canLoadDataType();
+	return "";
 }
 
+void DataReaderWriter::readInto(DataPtr data, QString path)
+{
+	DataReaderPtr reader = this->findReader(path, data->getType());
+	if (reader)
+		reader->readInto(data, path);
+
+	if(data)
+	{
+		QFileInfo fileInfo(qstring_cast(path));
+		data->setName(changeExtension(fileInfo.fileName(), ""));
+		data->setFilename(path); // need path even when not set explicitly: nice for testing
+	}
+
+}
 
 } // namespace cx
 

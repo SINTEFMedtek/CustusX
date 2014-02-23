@@ -27,30 +27,30 @@
 namespace cx
 {
 
-DataPtr PlaneMetricReader::load(const QString& uid, const QString& filename)
-{
-	return DataPtr(new PlaneMetric(uid, filename));
-}
+//DataPtr PlaneMetricReader::load(const QString& uid, const QString& filename)
+//{
+//	return DataPtr(new PlaneMetric(uid, filename));
+//}
 
-PlaneMetric::PlaneMetric(const QString& uid, const QString& name) :
-	DataMetric(uid, name),
+PlaneMetric::PlaneMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+	DataMetric(uid, name, dataManager, spaceProvider),
 	mSpace(CoordinateSystemHelpers::getR())
 {
 	mSpaceListener.reset(new CoordinateSystemListener(mSpace));
 	connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
 }
 
-PlaneMetricPtr PlaneMetric::create(QString uid, QString name)
+PlaneMetricPtr PlaneMetric::create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider)
 {
-    return PlaneMetricPtr(new PlaneMetric(uid, name));
+	return PlaneMetricPtr(new PlaneMetric(uid, name, dataManager, spaceProvider));
 }
 
-PlaneMetricPtr PlaneMetric::create(QDomNode node)
-{
-    PlaneMetricPtr retval = PlaneMetric::create("");
-    retval->parseXml(node);
-    return retval;
-}
+//PlaneMetricPtr PlaneMetric::create(QDomNode node)
+//{
+//    PlaneMetricPtr retval = PlaneMetric::create("");
+//    retval->parseXml(node);
+//    return retval;
+//}
 
 PlaneMetric::~PlaneMetric()
 {

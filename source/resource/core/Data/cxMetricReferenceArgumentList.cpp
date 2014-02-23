@@ -17,6 +17,7 @@
 #include "sscPointMetric.h"
 #include <QDomNode>
 #include "sscTypeConversions.h"
+#include "sscDataManager.h"
 
 namespace cx
 {

@@ -45,6 +45,7 @@ class Mesh: public Data
 {
 Q_OBJECT
 public:
+	static MeshPtr create(const QString& uid, const QString& name = "");
 	Mesh(const QString& uid, const QString& name = "");
 	Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData);
 	virtual ~Mesh();
@@ -55,7 +56,12 @@ public:
 
 	void addXml(QDomNode& dataNode); ///< adds xml information about the image and its variabels
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
+	virtual bool load(QString path);
 	virtual QString getType() const
+	{
+		return getTypeName();
+	}
+	static QString getTypeName()
 	{
 		return "mesh";
 	}

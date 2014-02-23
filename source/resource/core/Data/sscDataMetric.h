@@ -26,6 +26,9 @@
 
 namespace cx
 {
+typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+class DataManager;
+
 /**
  * \file
  * \addtogroup sscData
@@ -44,7 +47,7 @@ namespace cx
 class DataMetric: public Data
 {
 public:
-	DataMetric(const QString& uid, const QString& name = "");
+	DataMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 	virtual ~DataMetric();
 
     virtual QString getSpace();
@@ -59,8 +62,12 @@ public:
 
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode& dataNode);
+	virtual bool load(QString path) { return true; } ///< metrics dont store info in file, xml only.
 
 protected:
+	DataManager* mDataManager;
+	SpaceProviderPtr mSpaceProvider;
+
 	QString getSingleLineHeader() const;
 	QColor mColor;
 

@@ -29,6 +29,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Data/cxSphereMetric
 	Data/cxMetricReferenceArgumentList
 	Data/sscLandmark
+	Data/cxDataFactory
 
 	Video/sscVideoSource.h
 	Video/sscVideoRecorder
@@ -73,6 +74,10 @@ cx_add_class_qt_moc(cxResource_SOURCE
     utilities/cxProcessWrapper.h
 	utilities/cxProcessReporter
 	utilities/cxVLCRecorder
+	utilities/cxSpaceProvider
+	utilities/cxSpaceProviderImpl
+	utilities/cxSpaceListener
+	utilities/cxSpaceListenerImpl
 	)
 
      
