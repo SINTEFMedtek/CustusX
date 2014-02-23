@@ -22,24 +22,6 @@ namespace cx
 
 typedef boost::shared_ptr<class FrameMetric> FrameMetricPtr;
 
-///** \brief DataReader implementation for FrameMetric
-// *
-// * \date Aug 16, 2011
-// * \author Ole Vegard Solberg, SINTEF
-// */
-//class FrameMetricReader: public DataReader
-//{
-//public:
-//	virtual ~FrameMetricReader()
-//	{
-//	}
-//	virtual bool canLoad(const QString& type, const QString& filename)
-//	{
-//		return type == "frameMetric";
-//	}
-//	virtual DataPtr load(const QString& uid, const QString& filename);
-//};
-
 /**\brief Data class that represents a single frame (transform).
  *
  * The transform is attached to a specific coordinate system / frame.
@@ -52,7 +34,6 @@ class FrameMetric: public cx::FrameMetricBase
 Q_OBJECT
 public:
 	virtual ~FrameMetric();
-//    static FrameMetricPtr create(QDomNode node);
 	static FrameMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 	virtual QString getType() const
 	{

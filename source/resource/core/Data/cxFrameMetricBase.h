@@ -16,7 +16,6 @@
 #define CXFRAMEMETRICBASE_H_
 
 #include "sscDataMetric.h"
-#include "sscCoordinateSystemListener.h"
 
 namespace cx {
 
@@ -49,7 +48,7 @@ public:
 protected:
 	QString matrixAsSingleLineString() const;
 	CoordinateSystem mSpace;
-	CoordinateSystemListenerPtr mSpaceListener;
+	SpaceListenerPtr mSpaceListener;
 	Transform3D mFrame; ///< frame qFt described in local space q = mSpace
 
 };

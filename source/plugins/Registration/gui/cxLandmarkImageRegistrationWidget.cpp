@@ -167,8 +167,6 @@ void LandmarkImageRegistrationWidget::cellClickedSlot(int row, int column)
 void LandmarkImageRegistrationWidget::enableButtons()
 {
 	bool selected = !mLandmarkTableWidget->selectedItems().isEmpty();
-//	bool tracking = toolManager()->getDominantTool() && !toolManager()->getDominantTool()->hasType(Tool::TOOL_MANUAL)
-//		&& toolManager()->getDominantTool()->getVisible();
 	bool loaded = dataManager()->getActiveImage() != 0;
 
 	// you might want to add landmarks using the tracking pointer in rare cases.

@@ -69,7 +69,8 @@ void AngleMetric::addXml(QDomNode& dataNode)
 void AngleMetric::parseXml(QDomNode& dataNode)
 {
 	DataMetric::parseXml(dataNode);
-	mArguments->parseXml(dataNode);
+
+	mArguments->parseXml(dataNode, mDataManager->getData());
 
 	mUseSimpleVisualization = dataNode.toElement().attribute("useSimpleVisualization", QString::number(mUseSimpleVisualization)).toInt();
 	this->resetCachedValues();

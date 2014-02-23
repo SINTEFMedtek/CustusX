@@ -92,12 +92,14 @@ void MetricReferenceArgumentList::addXml(QDomNode& dataNode)
 	}
 }
 
-void MetricReferenceArgumentList::parseXml(QDomNode& dataNode)
+void MetricReferenceArgumentList::parseXml(QDomNode& dataNode, const std::map<QString, DataPtr>& data)
 {
 	for (unsigned i = 0; i < mArgument.size(); ++i)
 	{
 		QString uid = dataNode.toElement().attribute(QString("p%1").arg(i), "");
-		this->set(i, dataManager()->getData(uid));
+		if (!data.count(uid))
+			continue;
+		this->set(i, data.find(uid)->second);
 	}
 }
 

@@ -22,6 +22,8 @@ struct CoordinateSystem
 	COORDINATE_SYSTEM mId; ///< the type of coordinate system
 	QString           mRefObject; ///< for tool, sensor and data we need a object uid to define the coordinate system
 
+	static CoordinateSystem reference() { return CoordinateSystem(csREF); }
+	static CoordinateSystem patientReference() { return CoordinateSystem(csPATIENTREF); }
 	QString toString() const;
 	static CoordinateSystem fromString(QString text);
 

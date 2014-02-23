@@ -23,20 +23,18 @@
 #include "sscTool.h"
 #include "sscToolManager.h"
 #include "sscTypeConversions.h"
+#include "cxSpaceListener.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
 
-//DataPtr PlaneMetricReader::load(const QString& uid, const QString& filename)
-//{
-//	return DataPtr(new PlaneMetric(uid, filename));
-//}
-
 PlaneMetric::PlaneMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
 	DataMetric(uid, name, dataManager, spaceProvider),
-	mSpace(CoordinateSystemHelpers::getR())
+	mSpace(CoordinateSystem::reference())
 {
-	mSpaceListener.reset(new CoordinateSystemListener(mSpace));
+	mSpaceListener = mSpaceProvider->createListener();
+	mSpaceListener->setSpace(mSpace);
 	connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
 }
 
@@ -45,20 +43,13 @@ PlaneMetricPtr PlaneMetric::create(QString uid, QString name, DataManager* dataM
 	return PlaneMetricPtr(new PlaneMetric(uid, name, dataManager, spaceProvider));
 }
 
-//PlaneMetricPtr PlaneMetric::create(QDomNode node)
-//{
-//    PlaneMetricPtr retval = PlaneMetric::create("");
-//    retval->parseXml(node);
-//    return retval;
-//}
-
 PlaneMetric::~PlaneMetric()
 {
 }
 
 Plane3D PlaneMetric::getRefPlane() const
 {
-	Transform3D rM1 = CoordinateSystemHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
+	Transform3D rM1 = mSpaceProvider->get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
 	Vector3D p = rM1.coord(this->getCoordinate());
 	Vector3D n = rM1.vector(this->getNormal()).normalized();
 
@@ -67,9 +58,16 @@ Plane3D PlaneMetric::getRefPlane() const
 
 Vector3D PlaneMetric::getRefCoord() const
 {
-    Transform3D rM0 = CoordinateSystemHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
+	Transform3D rM0 = mSpaceProvider->get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
     Vector3D p0_r = rM0.coord(this->getCoordinate());
     return p0_r;
+}
+
+Vector3D PlaneMetric::getRefNormal() const
+{
+	Transform3D rM0 = mSpaceProvider->get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
+	Vector3D n_r = rM0.vector(this->getNormal());
+	return n_r;
 }
 
 void PlaneMetric::setCoordinate(const Vector3D& p)
@@ -104,7 +102,7 @@ void PlaneMetric::setSpace(CoordinateSystem space)
 		return;
 
 	// keep the absolute position (in ref) constant when changing space.
-	Transform3D new_M_old = CoordinateSystemHelpers::get_toMfrom(this->getSpace(), space);
+	Transform3D new_M_old = mSpaceProvider->get_toMfrom(this->getSpace(), space);
 	mCoordinate = new_M_old.coord(mCoordinate);
 	mNormal = new_M_old.vector(mNormal);
 
@@ -142,7 +140,7 @@ void PlaneMetric::parseXml(QDomNode& dataNode)
 DoubleBoundingBox3D PlaneMetric::boundingBox() const
 {
 	// convert both inputs to r space
-	Transform3D rM0 = CoordinateSystemHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
+	Transform3D rM0 = mSpaceProvider->get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
 	Vector3D p0_r = rM0.coord(this->getCoordinate());
 
 	return DoubleBoundingBox3D(p0_r, p0_r);

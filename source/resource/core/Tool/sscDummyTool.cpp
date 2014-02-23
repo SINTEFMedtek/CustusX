@@ -375,6 +375,7 @@ double DummyTool::getTooltipOffset() const
 {
 	if (mManager)
 		return mManager->getTooltipOffset();
+	return 0;
 }
 
 void DummyTool::setTooltipOffset(double val) 

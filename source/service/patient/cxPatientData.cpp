@@ -130,12 +130,6 @@ void PatientData::newPatient(QString choosenDir)
 void PatientData::clearPatient()
 {
 	dataManager()->clear();
-	//TODO
-//  toolManager()->clear();
-//  viewManager()->clear();
-//  registrationManager()->clear();
-	//rep
-	//usrec?
 
 	QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
 
