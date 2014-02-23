@@ -20,11 +20,8 @@
 
 namespace cx
 {
-typedef boost::shared_ptr<class CoordinateSystemListener> CoordinateSystemListenerPtr;
-}
-
-namespace cx
-{
+typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
 
 /** 
  * Ad-hoc class for connecting axis reps to coord spaces.
@@ -38,16 +35,17 @@ class AxisConnector : public QObject
 {
 	Q_OBJECT
 	public:
-		AxisConnector(CoordinateSystem space);
+		AxisConnector(CoordinateSystem space, SpaceProviderPtr spaceProvider);
 		void connectTo(ToolPtr tool);
-		void mergeWith(CoordinateSystemListenerPtr base);
+		void mergeWith(SpaceListenerPtr base);
 		AxesRepPtr mRep; ///< axis
-		CoordinateSystemListenerPtr mListener;
+		SpaceListenerPtr mListener;
 	private slots:
 		void changedSlot();
 	private:
-		CoordinateSystemListenerPtr mBase;
+		SpaceListenerPtr mBase;
 		ToolPtr mTool;
+		SpaceProviderPtr mSpaceProvider;
 };
 typedef boost::shared_ptr<class AxisConnector> AxisConnectorPtr;
 

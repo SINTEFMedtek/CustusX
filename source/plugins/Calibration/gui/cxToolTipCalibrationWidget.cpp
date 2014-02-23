@@ -30,6 +30,9 @@
 //#include "cxStateService.h"
 #include "cxPatientData.h"
 
+#include "cxLegacySingletons.h"
+#include "cxSpaceProvider.h"
+
 namespace cx
 {
 
@@ -90,8 +93,8 @@ void ToolTipCalibrateWidget::calibrateSlot()
     return;
 
   ToolPtr tool = toolManager()->getDominantTool();
-  CoordinateSystem to = CoordinateSystemHelpers::getT(tool);
-  Vector3D P_t = CoordinateSystemHelpers::getDominantToolTipPoint(to);
+  CoordinateSystem to = spaceProvider()->getT(tool);
+  Vector3D P_t = spaceProvider()->getDominantToolTipPoint(to);
 
   ToolTipCalibrationCalculator calc(tool, refTool, P_t);
   Transform3D calibration = calc.get_calibration_sMt();
@@ -116,8 +119,8 @@ void ToolTipCalibrateWidget::testCalibrationSlot()
   if(!selectedTool || !selectedTool->hasReferencePointWithId(1))
     return;
 
-  CoordinateSystem to = CoordinateSystemHelpers::getT(toolManager()->getDominantTool());
-  Vector3D sampledPoint = CoordinateSystemHelpers::getDominantToolTipPoint(to);
+  CoordinateSystem to = spaceProvider()->getT(toolManager()->getDominantTool());
+  Vector3D sampledPoint = spaceProvider()->getDominantToolTipPoint(to);
 
   ToolTipCalibrationCalculator calc(toolManager()->getDominantTool(), selectedTool, sampledPoint);
   Vector3D delta_selectedTool = calc.get_delta_ref();
@@ -180,10 +183,10 @@ Vector3D ToolTipCalibrationCalculator::get_sampledPoint_t()
 
 Vector3D ToolTipCalibrationCalculator::get_sampledPoint_ref()
 {
-  CoordinateSystem csT = CoordinateSystemHelpers::getT(mTool); //from
-  CoordinateSystem csRef = CoordinateSystemHelpers::getT(mRef); //to
+  CoordinateSystem csT = spaceProvider()->getT(mTool); //from
+  CoordinateSystem csRef = spaceProvider()->getT(mRef); //to
 
-  Transform3D refMt = CoordinateSystemHelpers::get_toMfrom(csT, csRef);
+  Transform3D refMt = spaceProvider()->get_toMfrom(csT, csRef);
 
   Vector3D P_ref = refMt.coord(mP_t);
 
@@ -199,9 +202,9 @@ Transform3D ToolTipCalibrationCalculator::get_sMt_new()
 {
   Transform3D sMt_old = mTool->getCalibration_sMt();
 
-  CoordinateSystem csT = CoordinateSystemHelpers::getT(mTool); //to
-  CoordinateSystem csRef = CoordinateSystemHelpers::getT(mRef); //from
-  Transform3D tMref = CoordinateSystemHelpers::get_toMfrom(csRef, csT);
+  CoordinateSystem csT = spaceProvider()->getT(mTool); //to
+  CoordinateSystem csRef = spaceProvider()->getT(mRef); //from
+  Transform3D tMref = spaceProvider()->get_toMfrom(csRef, csT);
 
   Vector3D delta_t = tMref.vector(this->get_delta_ref());
   Transform3D T_delta_t = createTransformTranslate(delta_t);

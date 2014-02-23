@@ -30,6 +30,9 @@
 #include "cxBaseWidget.h"
 #include "sscBoolDataAdapterXml.h"
 
+#include "cxLegacySingletons.h"
+#include "cxSpaceProvider.h"
+
 namespace cx
 {
 
@@ -183,7 +186,7 @@ QWidget* PointMetricWrapper::createWidget()
 StringDataAdapterXmlPtr PointMetricWrapper::createSpaceSelector() const
 {
 	QString value;// = qstring_cast(mData->getFrame());
-	std::vector<CoordinateSystem> spaces = CoordinateSystemHelpers::getSpacesToPresentInGUI();
+	std::vector<CoordinateSystem> spaces = spaceProvider()->getSpacesToPresentInGUI();
 	QStringList range;
 	for (unsigned i=0; i<spaces.size(); ++i)
 		range << spaces[i].toString();
@@ -250,7 +253,7 @@ QString PointMetricWrapper::getArguments() const
 
 void PointMetricWrapper::moveToToolPosition()
 {
-	Vector3D p = CoordinateSystemHelpers::getDominantToolTipPoint(mData->getSpace(), true);
+	Vector3D p = spaceProvider()->getDominantToolTipPoint(mData->getSpace(), true);
 	mData->setCoordinate(p);
 }
 
@@ -300,7 +303,7 @@ QWidget* PlaneMetricWrapper::createWidget()
 	topLayout->addLayout(hLayout);
 
 	QString value;// = qstring_cast(mData->getFrame());
-	std::vector<CoordinateSystem> spaces = CoordinateSystemHelpers::getSpacesToPresentInGUI();
+	std::vector<CoordinateSystem> spaces = spaceProvider()->getSpacesToPresentInGUI();
 	QStringList range;
 	for (unsigned i=0; i<spaces.size(); ++i)
 		range << spaces[i].toString();
@@ -374,7 +377,7 @@ void PlaneMetricWrapper::moveToToolPosition()
 	{
 		CoordinateSystem from(csTOOL_OFFSET, tool->getUid());
 		Vector3D point_t = Vector3D(0, 0, 0);
-		Transform3D rMto = CoordinateSystemHelpers::get_toMfrom(from, mData->getSpace());
+		Transform3D rMto = spaceProvider()->get_toMfrom(from, mData->getSpace());
 
 		mData->setCoordinate(rMto.coord(Vector3D(0, 0, 0)));
 		mData->setNormal(rMto.vector(Vector3D(0, 0, 1)));

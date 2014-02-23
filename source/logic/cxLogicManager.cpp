@@ -21,6 +21,7 @@
 #include "cxSpaceProviderImpl.h"
 //#include "sscDataReaderWriter.h"
 #include "cxDataFactory.h"
+#include "cxVisualizationServiceBackend.h"
 
 namespace cx
 {
@@ -58,9 +59,6 @@ void LogicManager::initializeServices()
 	cx::cxDataManager::initialize();
 	cx::cxToolManager::initializeObject();
 	cx::VideoService::initialize();
-	cx::ViewManager::createInstance();
-	cx::StateService::getInstance();
-	// init stateservice....
 
 //	cx::SpaceProviderPtr spaceProvider;
 	mSpaceProvider.reset(new cx::SpaceProviderImpl(cx::cxToolManager::getInstance(),
@@ -69,6 +67,14 @@ void LogicManager::initializeServices()
 
 	mDataFactory.reset(new DataFactory(cx::cxDataManager::getInstance(), mSpaceProvider));
 	cx::cxDataManager::getInstance()->setDataFactory(mDataFactory);
+
+	VisualizationServiceBackendPtr vsBackend;
+	vsBackend.reset(new VisualizationServiceBackend(cx::DataManager::getInstance(),
+													cx::ToolManager::getInstance(),
+													mSpaceProvider));
+	cx::ViewManager::createInstance(vsBackend);
+	cx::StateService::getInstance();
+	// init stateservice....
 
 	mServiceController.reset(new ServiceController);
 
