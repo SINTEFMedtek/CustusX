@@ -111,7 +111,7 @@ public:
 	template<class METRIC_TYPE>
 	boost::shared_ptr<METRIC_TYPE> createTestMetric(QString uid="")
 	{
-		return METRIC_TYPE::create(uid, "", NULL, cx::SpaceProviderPtr());
+		return METRIC_TYPE::create(uid, "", this->getDataManager(), this->getSpaceProvider());
 	}
 
     template<class DATA>
@@ -120,10 +120,8 @@ public:
         QDomNode xmlNode = this->createDummyXmlNode();
         data.mMetric->addXml(xmlNode);
 
-//		typedef typename DATA::METRIC_TYPE TYPE;
 		data.mMetric = this->createTestMetric<typename DATA::METRIC_TYPE>("");
 		data.mMetric->parseXml(xmlNode);
-//        data.mMetric = DATA::METRIC_TYPE::create(xmlNode);
 
 		return this->inputEqualsMetric(data);
     }
@@ -131,8 +129,12 @@ public:
     QDomNode createDummyXmlNode();
     void setPatientRegistration();
 
-//    QStringList splitStringLineIntoTextComponents(QString line);
 	bool verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric);
+
+private:
+	cx::DataManager* getDataManager();
+	cx::SpaceProviderPtr getSpaceProvider();
+
 };
 
 } //namespace cxtest

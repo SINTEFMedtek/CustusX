@@ -21,7 +21,6 @@
 #define SSCPOINTMETRIC_H_
 
 #include "sscDataMetric.h"
-#include "sscCoordinateSystemListener.h"
 #include "cxOptionalValue.h"
 
 namespace cx
@@ -34,25 +33,7 @@ namespace cx
 
 typedef boost::shared_ptr<class PointMetric> PointMetricPtr;
 
-///** \brief DataReader implementation for PointMetric
-// *
-// * \date Jul 4, 2011
-// * \author Christian Askeland, SINTEF
-// */
-//class PointMetricReader: public DataReader
-//{
-//public:
-//	virtual ~PointMetricReader()
-//	{
-//	}
-//	virtual bool canLoad(const QString& type, const QString& filename)
-//	{
-//		return type == "pointMetric";
-//	}
-//	virtual DataPtr load(const QString& uid, const QString& filename);
-//};
-
-/**\brief Data class that represents a single point.
+/** \brief Data class that represents a single point.
  *
  * The point is attached to a specific coordinate system / frame.
  *
@@ -95,7 +76,7 @@ private:
 	PointMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 	Vector3D mCoordinate;
 	CoordinateSystem mSpace;
-	CoordinateSystemListenerPtr mSpaceListener;
+	SpaceListenerPtr mSpaceListener;
 	mutable OptionalValue<Vector3D> mCachedRefCoord;
 };
 

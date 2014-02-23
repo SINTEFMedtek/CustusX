@@ -60,7 +60,8 @@ void SphereMetric::addXml(QDomNode& dataNode)
 void SphereMetric::parseXml(QDomNode& dataNode)
 {
 	DataMetric::parseXml(dataNode);
-	mArguments->parseXml(dataNode);
+
+	mArguments->parseXml(dataNode, mDataManager->getData());
 	mRadius = dataNode.toElement().attribute("radius", qstring_cast(mRadius)).toDouble();
 }
 

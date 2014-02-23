@@ -21,6 +21,7 @@
 #include "catch.hpp"
 #include "sscTypeConversions.h"
 #include "cxStringHelpers.h"
+#include "cxSpaceProviderImpl.h"
 
 namespace cxtest {
 
@@ -37,13 +38,22 @@ MetricFixture::~MetricFixture()
 	cx::cxDataManager::shutdown();
 }
 
+cx::DataManager* MetricFixture::getDataManager()
+{
+	return cx::dataManager();
+}
+
+cx::SpaceProviderPtr MetricFixture::getSpaceProvider()
+{
+	return cx::SpaceProviderPtr(new cx::SpaceProviderImpl(cx::toolManager(), cx::dataManager()));
+}
 
 FrameMetricWithInput MetricFixture::getFrameMetricWithInput()
 {
 	FrameMetricWithInput retval;
 
 	retval.m_qMt = cx::createTransformRotateZ(M_PI_2) * cx::createTransformTranslate(cx::Vector3D(1,2,3));
-	retval.mSpace = cx::CoordinateSystemHelpers::getR();
+	retval.mSpace = cx::CoordinateSystem::reference();
 
 	retval.mMetric = this->createTestMetric<cx::FrameMetric>("testMetric%1");
 //	retval.mMetric = cx::FrameMetric::create("testMetric%1", "");
@@ -59,7 +69,7 @@ ToolMetricWithInput MetricFixture::getToolMetricWithInput()
 	ToolMetricWithInput retval;
 
 	retval.m_qMt = cx::createTransformRotateZ(M_PI_2) * cx::createTransformTranslate(cx::Vector3D(1,2,3));
-	retval.mSpace = cx::CoordinateSystemHelpers::getR();
+	retval.mSpace = cx::CoordinateSystem::reference();
 	retval.mName = "TestTool";
 	retval.mOffset = 5;
 
@@ -79,7 +89,7 @@ PointMetricWithInput MetricFixture::getPointMetricWithInput(cx::Vector3D point)
 	PointMetricWithInput retval;
 
     retval.mPoint = point;
-	retval.mSpace = cx::CoordinateSystemHelpers::getR();
+	retval.mSpace = cx::CoordinateSystem::reference();
 
 //	retval.mMetric = cx::PointMetric::create("testMetric%1");
 	retval.mMetric = this->createTestMetric<cx::PointMetric>("testMetric%1");
@@ -96,7 +106,7 @@ PlaneMetricWithInput MetricFixture::getPlaneMetricWithInput(cx::Vector3D point, 
 
     retval.mPoint = point;
     retval.mNormal = normal;
-	retval.mSpace = cx::CoordinateSystemHelpers::getR();
+	retval.mSpace = cx::CoordinateSystem::reference();
 
 //	retval.mMetric = cx::PlaneMetric::create("testMetric%1");
 	retval.mMetric = this->createTestMetric<cx::PlaneMetric>("testMetric%1");

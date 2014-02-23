@@ -37,8 +37,8 @@ public:
 	virtual ~SpaceListenerImpl();
 	void setSpace(CoordinateSystem space);
 	CoordinateSystem getSpace() const;
-signals:
-	void changed();
+//signals:
+//	void changed();
 private slots:
 	void reconnect();
 private:

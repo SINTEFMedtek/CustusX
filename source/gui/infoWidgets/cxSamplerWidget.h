@@ -20,6 +20,7 @@
 #include "sscVector3DDataAdapterXml.h"
 #include "cxDominantToolProxy.h"
 #include "sscPointMetric.h"
+#include "sscCoordinateSystemListener.h"
 
 namespace cx
 {

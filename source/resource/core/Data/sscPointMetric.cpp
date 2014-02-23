@@ -22,22 +22,19 @@
 #include "sscTool.h"
 #include "sscToolManager.h"
 #include "sscTypeConversions.h"
+#include "cxSpaceProvider.h"
+#include "cxSpaceListener.h"
 
 namespace cx
 {
 
-
-//DataPtr PointMetricReader::load(const QString& uid, const QString& filename)
-//{
-//	return PointMetric::create(uid, filename);
-//}
-
 PointMetric::PointMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
 	DataMetric(uid, name, dataManager, spaceProvider),
 	mCoordinate(0,0,0),
-	mSpace(CoordinateSystemHelpers::getR())
+	mSpace(CoordinateSystem::reference())
 {
-	mSpaceListener.reset(new CoordinateSystemListener(mSpace));
+	mSpaceListener = mSpaceProvider->createListener();
+	mSpaceListener->setSpace(mSpace);
 	connect(mSpaceListener.get(), SIGNAL(changed()), this, SLOT(resetCachedValues()));
 	connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
 }
@@ -46,13 +43,6 @@ PointMetricPtr PointMetric::create(QString uid, QString name, DataManager* dataM
 {
 	return PointMetricPtr(new PointMetric(uid, name, dataManager, spaceProvider));
 }
-
-//PointMetricPtr PointMetric::create(QDomNode node)
-//{
-//    PointMetricPtr retval = PointMetric::create("");
-//    retval->parseXml(node);
-//    return retval;
-//}
 
 PointMetric::~PointMetric()
 {
@@ -79,7 +69,7 @@ void PointMetric::setSpace(CoordinateSystem space)
 		return;
 
 	// keep the absolute position (in ref) constant when changing space.
-	Transform3D new_M_old = CoordinateSystemHelpers::get_toMfrom(this->getSpace(), space);
+	Transform3D new_M_old = mSpaceProvider->get_toMfrom(this->getSpace(), space);
 	mCoordinate = new_M_old.coord(mCoordinate);
 
 	mSpace = space;
@@ -134,7 +124,7 @@ Vector3D PointMetric::getRefCoord() const
 	if (!mCachedRefCoord.isValid())
 	{
 //		std::cout << " ** PointMetric::getRefCoord FILL CACHE" << std::endl;
-		Transform3D rM1 = CoordinateSystemHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
+		Transform3D rM1 = mSpaceProvider->get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
 		Vector3D val = rM1.coord(this->getCoordinate());
 		mCachedRefCoord.set(val);
 	}

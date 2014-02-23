@@ -68,7 +68,7 @@ void DonutMetric::parseXml(QDomNode& dataNode)
 {
 	DataMetric::parseXml(dataNode);
 
-	mArguments->parseXml(dataNode);
+	mArguments->parseXml(dataNode, mDataManager->getData());
 	mRadius = dataNode.toElement().attribute("radius", qstring_cast(mRadius)).toDouble();
 	mThickness = dataNode.toElement().attribute("thickness", qstring_cast(mThickness)).toDouble();
 }

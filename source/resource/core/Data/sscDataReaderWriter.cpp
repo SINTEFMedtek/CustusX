@@ -130,7 +130,6 @@ bool MincImageReader::readInto(ImagePtr image, QString filename)
 
 //	ImagePtr image(new Image(uid, imageData));
 	image->setVtkImageData(imageData);
-	//ImagePtr image = dataManager()->createImage(l_dataReader->GetOutput(),uid, name);
 	image->get_rMd_History()->addRegistration(RegistrationTransform(rMd, info.lastModified(), "from Minc file"));
 	image->getBaseVtkImageData()->Print(std::cout);
 

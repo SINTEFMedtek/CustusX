@@ -16,6 +16,7 @@
 #include "sscPointMetric.h"
 #include "sscAxesRep.h"
 #include "sscTool.h"
+#include "sscCoordinateSystemListener.h"
 
 namespace cx
 {
