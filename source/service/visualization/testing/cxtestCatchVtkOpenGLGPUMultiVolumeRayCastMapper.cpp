@@ -19,11 +19,12 @@
 #include <vtkCamera.h>
 #include "sscLogger.h"
 
-//#include <QString>
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/Geometry>
-#include <string>
+#include "sscVector3D.h" //Neeed to setup Eigen correctly
+
 #include "vtkOpenGLGPUMultiVolumeRayCastMapper.h"
+
+#include "cxtestRenderTester.h"
+#include "cxtestUtilities.h"
 
 typedef vtkSmartPointer<vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<vtkVolumeProperty> vtkVolumePropertyPtr;
@@ -84,6 +85,24 @@ public:
 		mMapper->SetInput(currentIndex+1, image);
 		mMapper->SetAdditionalProperty(currentIndex, property);
 	}
+
+void requireRender()
+{
+	vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
+	vtkRendererPtr renderer = vtkRendererPtr::New();
+	renderWindow->AddRenderer(renderer);
+	renderWindow->SetSize(30,30);
+	renderer->AddVolume(mVolume);
+	renderWindow->Render();
+	renderWindow->Render();
+
+	RenderTesterPtr renderTester = cxtest::RenderTester::create(renderWindow);
+	vtkImageDataPtr output = renderTester->renderToImage();
+	double fraction = cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, 0);
+//	std::cout << "fraction: " << fraction << std::endl;
+	REQUIRE(fraction > 0);
+	REQUIRE(fraction < 1);
+}
 
 	void renderLoop()
 	{
@@ -362,10 +381,12 @@ TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper vs vtkMultiVolumePicker: Origin"
 	vtkImageDataPtr image = fixture.createVtkImageData(Eigen::Array3i(11,11,11), Eigen::Array3d(1,1,1), 200);
 	fixture.addImage(0, image, property, Eigen::Array3d(0,0,0));
 
+	fixture.requireRender();
 	fixture.requireHit(0, 0);
 	fixture.requireHit(10, 10);
 	fixture.requireMiss(11, 11);
 	fixture.requireMiss(20, 20);
+	fixture.requireRender();
 }
 
 TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper vs vtkMultiVolumePicker: Small target", "[unit]")
@@ -381,10 +402,12 @@ TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper vs vtkMultiVolumePicker: Small t
 	vtkImageDataPtr image = fixture.createVtkImageData(Eigen::Array3i(11,11,11), Eigen::Array3d(1,1,1), 300);
 	fixture.addImage(0, image, property, Eigen::Array3d(10,10,0));
 
+	fixture.requireRender();
 	fixture.requireMiss(0, 0);
 	fixture.requireMiss(9, 9);
 	fixture.requireHit(10, 10);
 	fixture.requireHit(20, 20);
+	fixture.requireRender();
 }
 
 TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can be picked using vtkMultiVolumePicker", "[unit]")
@@ -404,6 +427,7 @@ TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can be picked using vtkMultiVolu
 	fixture.addImage(1, image, property, Eigen::Array3d(20,0,0));
 	fixture.addImage(2, image, property, Eigen::Array3d(20,20,0));
 
+	fixture.requireRender();
 	fixture.requireHit(5, 5);
 	fixture.requireMiss(15, 0);
 	fixture.requireMiss(15, 15);
@@ -412,6 +436,7 @@ TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can be picked using vtkMultiVolu
 	fixture.requireHit(25, 25);
 	fixture.requireMiss(40, 0);
 	fixture.requireMiss(40, 40);
+	fixture.requireRender();
 }
 
 } // namespace cxtest

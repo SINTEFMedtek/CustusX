@@ -522,6 +522,11 @@ bool Image::load(QString path)
 	vtkImageDataPtr raw;
 	raw = DataReaderWriter().loadVtkImageData(path);
 	this->setVtkImageData(raw);
+	if(raw)
+	{
+		this->setName(QFileInfo(path).baseName());
+		this->setFilename(path); // need path even when not set explicitly: nice for testing
+	}
 	return raw!=0;
 }
 
