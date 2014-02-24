@@ -135,7 +135,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServ
 
 	connect(toolManager(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
 	connect(toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
-	connect(dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
+	connect(mBackend->getDataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
 	this->toolsAvailableSlot();
 
 	mAnnotationMarker = RepManager::getInstance()->getCachedRep<OrientationAnnotation3DRep>(
@@ -258,7 +258,7 @@ void ViewWrapper3D::updateMetricNamesRep()
 
 void ViewWrapper3D::PickerRepPointPickedSlot(Vector3D p_r)
 {
-	Transform3D rMpr = dataManager()->get_rMpr();
+	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
 	Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
@@ -268,7 +268,7 @@ void ViewWrapper3D::PickerRepPointPickedSlot(Vector3D p_r)
 	p_r = rMpr.coord(p_pr);
 
 	// TODO set center here will not do: must handle
-	dataManager()->setCenter(p_r);
+	mBackend->getDataManager()->setCenter(p_r);
 	Vector3D p0_pr = tool->get_prMt().coord(Vector3D(0, 0, 0));
 	tool->set_prMt(createTransformTranslate(p_pr - p0_pr) * tool->get_prMt());
 }
@@ -516,15 +516,15 @@ void ViewWrapper3D::resetCameraActionSlot()
 
 void ViewWrapper3D::centerImageActionSlot()
 {
-	if (dataManager()->getActiveImage())
-		Navigation().centerToData(dataManager()->getActiveImage());
+	if (mBackend->getDataManager()->getActiveImage())
+		Navigation(mBackend).centerToData(mBackend->getDataManager()->getActiveImage());
 	else
-		Navigation().centerToView(mGroupData->getData());
+		Navigation(mBackend).centerToView(mGroupData->getData());
 }
 
 void ViewWrapper3D::centerToolActionSlot()
 {
-	Navigation().centerToTooltip();
+	Navigation(mBackend).centerToTooltip();
 }
 
 void ViewWrapper3D::showSlicePlanesActionSlot(bool checked)
@@ -680,7 +680,7 @@ void ViewWrapper3D::activeImageChangedSlot()
 {
 	if(!mGroupData)
 		return;
-	ImagePtr image = dataManager()->getActiveImage();
+	ImagePtr image = mBackend->getDataManager()->getActiveImage();
 
 	// only show landmarks belonging to image visible in this view:
 	std::vector<ImagePtr> images = mGroupData->getImages();

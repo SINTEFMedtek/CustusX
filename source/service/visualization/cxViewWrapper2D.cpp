@@ -707,7 +707,7 @@ void ViewWrapper2D::mouseWheelSlot(QWheelEvent* event)
 
 	this->setZoomFactor2D(newZoom);
 
-	Navigation().centerToTooltip(); // side effect: center on tool
+	Navigation(mBackend).centerToTooltip(); // side effect: center on tool
 }
 
 /**Convert a position in Qt viewport space (pixels with origin in upper-left corner)
@@ -729,7 +729,7 @@ void ViewWrapper2D::shiftAxisPos(Vector3D delta_vp)
 	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
-	Transform3D rMpr = dataManager()->get_rMpr();
+	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 	Vector3D delta_s = get_vpMs().inv().vector(delta_vp);
 
@@ -749,7 +749,7 @@ void ViewWrapper2D::setAxisPos(Vector3D click_vp)
 	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
-	Transform3D rMpr = dataManager()->get_rMpr();
+	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 
 	// find tool position in s

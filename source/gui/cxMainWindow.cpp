@@ -473,17 +473,20 @@ void MainWindow::updateStreamingActionSlot()
 
 void MainWindow::centerToImageCenterSlot()
 {
+	NavigationPtr nav = viewManager()->getNavigation();
+
 	if (dataManager()->getActiveImage())
-		Navigation().centerToData(dataManager()->getActiveImage());
+		nav->centerToData(dataManager()->getActiveImage());
 	else if (!viewManager()->getViewGroups().empty())
-		Navigation().centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
+		nav->centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
 	else
-		Navigation().centerToGlobalDataCenter();
+		nav->centerToGlobalDataCenter();
 }
 
 void MainWindow::centerToTooltipSlot()
 {
-	Navigation().centerToTooltip();
+	NavigationPtr nav = viewManager()->getNavigation();
+	nav->centerToTooltip();
 }
 
 void MainWindow::togglePointPickerActionSlot()
