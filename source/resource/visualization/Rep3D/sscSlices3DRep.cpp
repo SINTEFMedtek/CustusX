@@ -44,6 +44,7 @@
 #include "sscGPUImageBuffer.h"
 #include "sscTexture3DSlicerProxy.h"
 #include "sscMessageManager.h"
+#include "sscDataManager.h"
 
 //---------------------------------------------------------
 namespace cx
@@ -89,7 +90,7 @@ void Slices3DRep::setImages(std::vector<ImagePtr> images)
 
 void Slices3DRep::addPlane(PLANE_TYPE plane)
 {
-	SliceProxyPtr sliceProxy = SliceProxy::New("");
+	SliceProxyPtr sliceProxy = SliceProxy::create(dataManager());
 	sliceProxy->initializeFromPlane(ptAXIAL, false, Vector3D(0,0,1), true, 150, 0.25);
 
 

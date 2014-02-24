@@ -5,7 +5,6 @@
 #include <vtkPoints.h>
 #include <vtkCellArray.h>
 
-#include "sscToolManager.h"
 #include "sscDataManager.h"
 #include "sscMesh.h"
 #include "sscTypeConversions.h"

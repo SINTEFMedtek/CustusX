@@ -31,7 +31,6 @@
 #include "sscDataManager.h"
 #include "sscTypeConversions.h"
 #include "boost/bind.hpp"
-#include "sscToolManager.h"
 #include "sscVtkHelperClasses.h"
 
 namespace cx

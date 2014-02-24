@@ -26,9 +26,9 @@
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkSectorSource.h>
+#include "sscTool.h"
 
 #include "sscSliceProxy.h"
-#include "sscToolManager.h"
 #include "sscView.h"
 #include "sscDataManager.h"
 

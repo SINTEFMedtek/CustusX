@@ -34,7 +34,6 @@
 #include "sscTool.h"
 #include "sscBoundingBox3D.h"
 #include "sscVolumeHelpers.h"
-#include "sscToolManager.h"
 #include "sscDataManager.h"
 
 namespace cx

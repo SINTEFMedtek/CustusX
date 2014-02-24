@@ -14,6 +14,7 @@
 #ifndef CXSPACEPROVIDER_H
 #define CXSPACEPROVIDER_H
 
+#include "sscTransform3D.h"
 #include "sscCoordinateSystemHelpers.h"
 
 namespace cx
