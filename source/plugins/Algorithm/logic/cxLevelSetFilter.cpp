@@ -26,6 +26,8 @@
 #include "levelSet.hpp"
 #include "OpenCLManager.hpp"
 #include "HelperFunctions.hpp"
+#include "cxLegacySingletons.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
@@ -54,8 +56,8 @@ bool LevelSetFilter::preProcess() {
 
 Vector3D LevelSetFilter::getSeedPointFromTool(DataPtr data) {
     // Retrieve position of tooltip and use it as seed point
-    Vector3D point = CoordinateSystemHelpers::getDominantToolTipPoint(
-            CoordinateSystemHelpers::getD(data)
+	Vector3D point = spaceProvider()->getDominantToolTipPoint(
+			spaceProvider()->getD(data)
     );
 
     // Have to multiply by the inverse of the spacing to get the voxel position
