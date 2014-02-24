@@ -54,6 +54,7 @@
 #include "cxRenderLoop.h"
 #include "cxLayoutRepository.h"
 #include "sscLogger.h"
+#include "cxVisualizationServiceBackend.h"
 
 namespace cx
 {
@@ -109,7 +110,7 @@ ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 	// initialize view groups:
 	for (unsigned i = 0; i < VIEW_GROUP_COUNT; ++i)
 	{
-		mViewGroups.push_back(ViewGroupPtr(new ViewGroup()));
+		mViewGroups.push_back(ViewGroupPtr(new ViewGroup(mBackend)));
 	}
 
 	this->syncOrientationMode(SyncedValue::create(0));
@@ -140,6 +141,11 @@ void ViewManager::initialize()
 
 	mGlobalZoom2DVal = SyncedValue::create(1);
 	this->setGlobal2DZoom(mGlobal2DZoom);
+}
+
+NavigationPtr ViewManager::getNavigation()
+{
+	return NavigationPtr(new Navigation(mBackend));
 }
 
 QWidget *ViewManager::getLayoutWidget(int index)
@@ -362,7 +368,7 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 		else if (child.toElement().tagName() == "clippedImage")
 		{
 			QString clippedImage = child.toElement().text();
-			mInteractiveClipper->setImage(dataManager()->getImage(clippedImage));
+			mInteractiveClipper->setImage(mBackend->getDataManager()->getImage(clippedImage));
 		}
 		child = child.nextSibling();
 	}
