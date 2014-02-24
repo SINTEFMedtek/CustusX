@@ -33,6 +33,8 @@ namespace cx
 
 typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
 typedef boost::shared_ptr<class ToolTracer> ToolTracerPtr;
+typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+
 
 /**\brief Display a Tool in 3D.
  *
@@ -55,7 +57,7 @@ class ToolRep3D : public RepImpl
 {
 	Q_OBJECT
 public:
-	static ToolRep3DPtr New(const QString& uid, const QString& name="");
+	static ToolRep3DPtr New(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name="");
 	virtual ~ToolRep3D();
 	virtual QString getType() const;
 
@@ -76,7 +78,7 @@ public:
 	void setSphereRadiusInNormalizedViewport(bool on);
 
 protected:
-	ToolRep3D(const QString& uid, const QString& name="");
+	ToolRep3D(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name="");
 	virtual void addRepActorsToViewRenderer(View *view);
 	virtual void removeRepActorsFromViewRenderer(View *view);
 	bool showProbe();
@@ -116,6 +118,7 @@ private:
 	bool mSphereRadiusInNormalizedViewport;
 	ToolTracerPtr mTracer;
 	ViewportListenerPtr mViewportListener;
+	SpaceProviderPtr mSpaceProvider;
 
 	//US Probe sector
 	ProbeSectorPtr mProbeSector;

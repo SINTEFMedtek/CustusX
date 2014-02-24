@@ -127,7 +127,7 @@ void ViewManager::initialize()
 	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
 
 	mInteractiveCropper.reset(new InteractiveCropper());
-	mInteractiveClipper.reset(new InteractiveClipper());
+	mInteractiveClipper.reset(new InteractiveClipper(mBackend));
 	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
 	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));

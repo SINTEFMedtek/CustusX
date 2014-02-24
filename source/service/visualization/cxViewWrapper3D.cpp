@@ -106,11 +106,11 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServ
 
 	this->initializeMultiVolume3DRepProducer();
 
-	mLandmarkRep = LandmarkRep::New("LandmarkRep_" + index);
+	mLandmarkRep = LandmarkRep::New(mBackend->getDataManager(), "LandmarkRep_" + index);
 	mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
 	mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 
-	mPickerRep = PickerRep::New("PickerRep_" + index, "PickerRep_" + index);
+	mPickerRep = PickerRep::New(mBackend->getDataManager(), "PickerRep_" + index, "PickerRep_" + index);
 
 	connect(mPickerRep.get(), SIGNAL(pointPicked(Vector3D)), this, SLOT(PickerRepPointPickedSlot(Vector3D)));
 	connect(mPickerRep.get(), SIGNAL(dataPicked(QString)), this, SLOT(PickerRepDataPickedSlot(QString)));
@@ -696,7 +696,7 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
 	ToolRep3DPtr refRep = RepManager::findFirstRep<ToolRep3D>(mView->getReps(), refTool);
 	if (!refRep)
 	{
-		refRep = ToolRep3D::New(refTool->getUid() + "_rep3d_" + this->mView->getUid());
+		refRep = ToolRep3D::New(mBackend->getSpaceProvider(), refTool->getUid() + "_rep3d_" + this->mView->getUid());
 		refRep->setTool(refTool);
 	}
 
@@ -725,13 +725,13 @@ void ViewWrapper3D::updateSlices()
 	PLANE_TYPE type = string2enum<PLANE_TYPE>(mShowSlicesMode);
 	if (type != ptCOUNT)
 	{
-		mSlices3DRep->addPlane(type);
+		mSlices3DRep->addPlane(type, mBackend->getDataManager());
 	}
 	else if (mShowSlicesMode == "ACS")
 	{
-		mSlices3DRep->addPlane(ptAXIAL);
-		mSlices3DRep->addPlane(ptSAGITTAL);
-		mSlices3DRep->addPlane(ptCORONAL);
+		mSlices3DRep->addPlane(ptAXIAL, mBackend->getDataManager());
+		mSlices3DRep->addPlane(ptSAGITTAL, mBackend->getDataManager());
+		mSlices3DRep->addPlane(ptCORONAL, mBackend->getDataManager());
 	}
 	else
 	{
@@ -782,7 +782,7 @@ void ViewWrapper3D::toolsAvailableSlot()
 
 		if (!toolRep)
 		{
-			toolRep = ToolRep3D::New(tool->getUid() + "_rep3d_" + this->mView->getUid());
+			toolRep = ToolRep3D::New(mBackend->getSpaceProvider(), tool->getUid() + "_rep3d_" + this->mView->getUid());
 			if (settings()->value("showToolPath").toBool())
 				toolRep->getTracer()->start();
 		}

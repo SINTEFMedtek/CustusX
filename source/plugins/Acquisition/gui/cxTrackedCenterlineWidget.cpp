@@ -88,8 +88,6 @@ void TrackedCenterlineWidget::postProcessingSlot(QString sessionId)
 
 void TrackedCenterlineWidget::preprocessResampler()
 {
-
-
 	RecordSessionPtr session = mPluginData->getRecordSession(mSessionID);
 
 	//get the transforms from the session
@@ -101,7 +99,7 @@ void TrackedCenterlineWidget::preprocessResampler()
 	}
 
 	//visualize the tracked data as a mesh
-	loadMeshFromToolTransforms(transforms_prMt);
+	loadMeshFromToolTransforms(dataManager(), transforms_prMt);
 
 	//convert the transforms into a binary image
 	TrackingDataToVolume converter;

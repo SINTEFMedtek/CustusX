@@ -11,6 +11,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class Data> DataPtr;
+class DataManager;
 
 /**
  * \addtogroup sscUtility
@@ -34,7 +35,7 @@ void fillShortImageDataWithGradient(vtkImageDataPtr data, int maxValue);
   * The suggestedConvertedVolume is a pure optimization: Is set it will be used as the converted
   * output instead of doing the conversion once more. Can be used when only the LUT should be updated.
   */
-ImagePtr convertImageToUnsigned(ImagePtr image, vtkImageDataPtr suggestedConvertedVolume = vtkImageDataPtr(), bool verbose = true);
+ImagePtr convertImageToUnsigned(DataManager* dataManager, ImagePtr image, vtkImageDataPtr suggestedConvertedVolume = vtkImageDataPtr(), bool verbose = true);
 
 std::map<std::string, std::string> getDisplayFriendlyInfo(ImagePtr image);
 std::map<std::string, std::string> getDisplayFriendlyInfo(vtkImageDataPtr image);

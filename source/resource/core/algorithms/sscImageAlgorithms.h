@@ -27,6 +27,7 @@
 
 namespace cx
 {
+class DataManager;
 
 /**
 * \file
@@ -39,11 +40,11 @@ namespace cx
 * @{
 */
 
-ImagePtr resampleImage(ImagePtr image, const Vector3D spacing, QString uid="", QString name="");
-ImagePtr resampleImage(ImagePtr image, Transform3D refMi);
+ImagePtr resampleImage(DataManager *dataManager, ImagePtr image, const Vector3D spacing, QString uid="", QString name="");
+ImagePtr resampleImage(DataManager *dataManager, ImagePtr image, Transform3D refMi);
 vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox);
-ImagePtr cropImage(ImagePtr image);
-ImagePtr duplicateImage(ImagePtr image);
+ImagePtr cropImage(DataManager *dataManager, ImagePtr image);
+ImagePtr duplicateImage(DataManager *dataManager, ImagePtr image);
 
 /**
  */

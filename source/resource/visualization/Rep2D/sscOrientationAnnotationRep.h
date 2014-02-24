@@ -28,6 +28,7 @@
 
 namespace cx
 {
+class DataManager;
 
 class OrientationAnnotation : public vtkCornerAnnotation
 {
@@ -58,7 +59,7 @@ class OrientationAnnotationRep : public RepImpl
 {
 	Q_OBJECT
 public:
-	static OrientationAnnotationRepPtr  New(const QString& uid,const QString& name);
+	static OrientationAnnotationRepPtr  New(DataManager* dataManager, const QString& uid,const QString& name);
 	virtual ~OrientationAnnotationRep();
 	virtual QString getType() const { return "vm::OrientationAnnotationRep"; };
 
@@ -67,7 +68,7 @@ public:
 	private slots:
 	void clinicalApplicationChangedSlot();
 protected:
-	OrientationAnnotationRep(const QString& uid, const QString& name);
+	OrientationAnnotationRep(DataManager* dataManager, const QString& uid, const QString& name);
 	virtual void addRepActorsToViewRenderer(View *view);
 	virtual void removeRepActorsFromViewRenderer(View *view);
 
@@ -77,6 +78,7 @@ protected:
 
 	OrientationAnnotationPtr mOrientation;
 	PLANE_TYPE mPlane;
+	DataManager* mDataManager;
 
 	QString mNorthAnnotation;
 	QString mSouthAnnotation;

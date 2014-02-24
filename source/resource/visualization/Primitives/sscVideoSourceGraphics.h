@@ -27,6 +27,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class VideoGraphics> VideoGraphicsPtr;
 typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
+typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
 /** \brief Helper class for displaying a VideoSource.
  *
@@ -42,7 +43,7 @@ class VideoSourceGraphics : public QObject
 {
 	Q_OBJECT
 public:
-	VideoSourceGraphics(bool useMaskFilter=false);
+	explicit VideoSourceGraphics(SpaceProviderPtr spaceProvider, bool useMaskFilter=false);
 	virtual ~VideoSourceGraphics();
 
 	void setRealtimeStream(VideoSourcePtr data);
@@ -68,7 +69,8 @@ private:
 	ToolPtr mTool;
 	ProbeSector mProbeData;
 	VideoSourcePtr mData;
-	ImagePtr mImage;//Can be used instead of mTexture. This allows visualization of rt 3D
+	SpaceProviderPtr mSpaceProvider;
+//	ImagePtr mImage;//Can be used instead of mTexture. This allows visualization of rt 3D
 };
 
 } // namespace cx

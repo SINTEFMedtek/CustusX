@@ -36,12 +36,14 @@
 #include "sscDataManager.h"
 #include "sscToolTracer.h"
 #include "sscTool.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
 
-ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
+ToolRep3D::ToolRep3D(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name) :
 	RepImpl(uid, name),
+	mSpaceProvider(spaceProvider),
 	mSphereRadiusInNormalizedViewport(false),
 	mTooltipPointColor(QColor::fromRgbF(1.0, 0.8, 0.0)),
 	mOffsetPointColor(QColor::fromRgbF(1.0, 0.8, 0.0)),
@@ -65,9 +67,9 @@ ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
 	mProbeSectorActor = vtkActorPtr::New();
 
 	bool useMask = true; // if true, use mask instead of texture to render the sector. Mask is identical to the algo used in reconstruction.
-	mRTStream.reset(new VideoSourceGraphics(useMask));
+	mRTStream.reset(new VideoSourceGraphics(mSpaceProvider, useMask));
 
-	mTracer.reset(new ToolTracer());
+	mTracer = ToolTracer::create(mSpaceProvider);
 }
 
 ToolRep3D::~ToolRep3D()
@@ -78,9 +80,9 @@ ToolTracerPtr ToolRep3D::getTracer()
 	return mTracer;
 }
 
-ToolRep3DPtr ToolRep3D::New(const QString& uid, const QString& name)
+ToolRep3DPtr ToolRep3D::New(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name)
 {
-	ToolRep3DPtr retval(new ToolRep3D(uid, name));
+	ToolRep3DPtr retval(new ToolRep3D(spaceProvider, uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
@@ -292,7 +294,7 @@ void ToolRep3D::update()
 	Transform3D prMt = Transform3D::Identity();
 	if (mTool)
 		prMt = mTool->get_prMt();
-	Transform3D rMpr = dataManager()->get_rMpr();
+	Transform3D rMpr = mSpaceProvider->get_rMpr();
 
 	Transform3D rMt = rMpr * prMt;
 	mToolActor->SetUserMatrix(rMt.getVtkMatrix());
@@ -315,7 +317,7 @@ void ToolRep3D::probeSectorChanged()
 		return;
 
 	Transform3D prMt = mTool->get_prMt();
-	Transform3D rMpr = dataManager()->get_rMpr();
+	Transform3D rMpr = mSpaceProvider->get_rMpr();
 
 	if (this->showProbe())
 	{
@@ -368,7 +370,7 @@ void ToolRep3D::updateOffsetGraphics()
 
 	if (!mTool)
 		return;
-	Transform3D rMpr = dataManager()->get_rMpr();
+	Transform3D rMpr = mSpaceProvider->get_rMpr();
 	Transform3D rMt = rMpr * mTool->get_prMt();
 
 	Vector3D p0 = rMt.coord(Vector3D(0, 0, 0));
