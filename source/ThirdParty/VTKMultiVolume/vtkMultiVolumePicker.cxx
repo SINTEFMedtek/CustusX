@@ -26,11 +26,7 @@
 #include "vtkTransform.h"
 #include "vtkImageChangeInformation.h"
 
-typedef vtkSmartPointer<class vtkGPUVolumeRayCastMapper> vtkGPUVolumeRayCastMapperPtr;
-typedef vtkSmartPointer<class vtkVolumeTextureMapper3D> vtkVolumeTextureMapper3DPtr;
 typedef vtkSmartPointer<class vtkVolume> vtkVolumePtr;
-typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
-typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 typedef vtkSmartPointer<vtkImageChangeInformation> vtkImageChangeInformationPtr;
 
 vtkStandardNewMacro(vtkMultiVolumePicker);
@@ -77,49 +73,27 @@ double vtkMultiVolumePicker::IntersectVolumeWithLine(const double p1[3],
 	vtkOpenGLGPUMultiVolumeRayCastMapper* multivolumeMapper = dynamic_cast<vtkOpenGLGPUMultiVolumeRayCastMapper*>(mapper);
 	if(multivolumeMapper)
 	{
-//		std::cout << "multivolumeMapper NUMBER_OF_ADDITIONAL_VOLUMES: " << multivolumeMapper->NUMBER_OF_ADDITIONAL_VOLUMES << std::endl;
 		double retval = VTK_DOUBLE_MAX;
 
 		for(int i = 0; i < multivolumeMapper->NUMBER_OF_ADDITIONAL_VOLUMES; ++i)
 		{
-			double tempRetval;
+			vtkMatrix4x4Ptr rMd0 = prop->GetUserMatrix();
+			vtkTransformPtr d0Mdi = multivolumeMapper->GetAdditionalInputUserTransform(i); //transform is d0Mdi
+			vtkTransformPtr rMdi = this->calculate_rMdi(rMd0, d0Mdi);
 
-			vtkVolumePtr volume = vtkVolumePtr::New();
-			vtkImageData* image = multivolumeMapper->GetInput(i+1);
+			double newOrigin[3];
+			rMdi->GetPosition(newOrigin);
+
+			vtkImageDataPtr image = multivolumeMapper->GetInput(i+1);
+			vtkImageDataPtr tempImage = this->generateImageCopyAndMoveOrigin(image, newOrigin);
+			vtkAbstractVolumeMapperPtr singleVolumeMapper = this->generateSingleVolumeMapper(tempImage);
 			vtkVolumeProperty* property = multivolumeMapper->GetAdditionalProperty(i);
 
-			vtkMatrix4x4Ptr rMd0 = prop->GetUserMatrix();
-			if (!rMd0)
-			{
-//				std::cout << "No user matrix in prop" << std::endl;
-				rMd0 = vtkMatrix4x4Ptr::New();
-				rMd0->Identity();
-			}
-			vtkTransform* transform = multivolumeMapper->GetAdditionalInputUserTransform(i); //transform is d0Mdi
-			transform->PostMultiply();
-			transform->Concatenate(rMd0);//rMd0 * d0Mdi -> transform is now rMdi
-
-			double trans_pos[3];
-			transform->GetPosition(trans_pos);
-
-			vtkImageChangeInformationPtr info = vtkImageChangeInformationPtr::New();
-			info->SetInput(image);
-			info->SetOutputOrigin(trans_pos);
-			vtkImageData* tempImage = info->GetOutput();
-
-//			vtkGPUVolumeRayCastMapperPtr singleVolumeMapper = vtkGPUVolumeRayCastMapperPtr::New();
-            vtkVolumeTextureMapper3DPtr singleVolumeMapper = vtkVolumeTextureMapper3DPtr::New();
-			singleVolumeMapper->SetBlendModeToComposite();
-			singleVolumeMapper->SetInput(tempImage);
-			singleVolumeMapper->Update();
-
+			vtkVolumePtr volume = vtkVolumePtr::New();
 			volume->SetMapper(singleVolumeMapper);
 			volume->SetProperty(property);
-//			volume->SetUserTransform(transform); //Transform is not used by IntersectVolumeWithLine(), only vtkImageData::Origin()
-//			volume->Update();
 
-			tempRetval = this->Superclass::IntersectVolumeWithLine(p1, p2, t1, t2, volume, singleVolumeMapper);
-//			std::cout << "temp retval: " << tempRetval << std::endl;
+			double tempRetval = this->Superclass::IntersectVolumeWithLine(p1, p2, t1, t2, volume, singleVolumeMapper);
 			retval = fmin(retval, tempRetval);
 		}
 
@@ -127,6 +101,39 @@ double vtkMultiVolumePicker::IntersectVolumeWithLine(const double p1[3],
 	} else
 		return this->Superclass::IntersectVolumeWithLine(p1, p2, t1, t2, prop, mapper);
 
+}
+
+vtkTransformPtr vtkMultiVolumePicker::calculate_rMdi(vtkMatrix4x4Ptr rMd0, vtkTransformPtr d0Mdi)
+{
+	if (!rMd0)
+	{
+		rMd0 = vtkMatrix4x4Ptr::New();
+		rMd0->Identity();
+	}
+
+	vtkTransformPtr retval = d0Mdi;
+	retval->PostMultiply();
+	retval->Concatenate(rMd0);
+	return retval;
+}
+
+vtkImageDataPtr vtkMultiVolumePicker::generateImageCopyAndMoveOrigin(vtkImageDataPtr image, double* newOrigin)
+{
+	vtkImageChangeInformationPtr info = vtkImageChangeInformationPtr::New();
+	info->SetInput(image);
+	info->SetOutputOrigin(newOrigin);
+	vtkImageDataPtr retval = info->GetOutput();
+	return retval;
+}
+
+vtkVolumeTextureMapper3DPtr vtkMultiVolumePicker::generateSingleVolumeMapper(vtkImageDataPtr tempImage)
+{
+	//vtkGPUVolumeRayCastMapperPtr singleVolumeMapper = vtkGPUVolumeRayCastMapperPtr::New();
+	vtkVolumeTextureMapper3DPtr singleVolumeMapper = vtkVolumeTextureMapper3DPtr::New();
+	singleVolumeMapper->SetBlendModeToComposite();
+	singleVolumeMapper->SetInput(tempImage);
+	singleVolumeMapper->Update();
+	return singleVolumeMapper;
 }
 
 

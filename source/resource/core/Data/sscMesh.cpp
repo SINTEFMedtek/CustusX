@@ -65,6 +65,11 @@ bool Mesh::load(QString path)
 	vtkPolyDataPtr raw;
 	raw = DataReaderWriter().loadVtkPolyData(path);
 	this->setVtkPolyData(raw);
+	if(raw)
+	{
+		this->setName(QFileInfo(path).baseName());
+		this->setFilename(path); // need path even when not set explicitly: nice for testing
+	}
 	return raw!=0;
 }
 
