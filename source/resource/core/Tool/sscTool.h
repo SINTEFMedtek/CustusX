@@ -52,14 +52,8 @@ class Tool: public QObject
 {
 	Q_OBJECT
 public:
-	Tool() :
-		mUid(""), mName(""), mPositionHistory(new TimedTransformMap()),
-		m_prMt(Transform3D::Identity())
-	{
-	}
-	Tool(const QString& uid, const QString& name = "") :
-		mUid(uid), mName(name), mPositionHistory(new TimedTransformMap()),
-		m_prMt(Transform3D::Identity())
+	Tool(const QString& uid="", const QString& name = "") :
+		mUid(uid), mName(name)
 	{
 		if (name.isEmpty())
 			mName = uid;
@@ -117,19 +111,13 @@ public:
 
 	//	/**Saves the tools internal buffers of transforms and timestamps to file.
 	//	 */
-	virtual TimedTransformMapPtr getPositionHistory() { return mPositionHistory; }
-	//	virtual void saveTransformsAndTimestamps() = 0;
-	//	/**Which file to use when calling saveTransformsAndTimestamps().
-	//	 */
-	//	virtual void setTransformSaveFile(const QString& filename) = 0;
-//	virtual Transform3D get_prMt() const = 0; ///< \return transform from tool to patient ref space
+	virtual TimedTransformMapPtr getPositionHistory() = 0;
 
 	virtual bool getVisible() const = 0; ///< \return the visibility status of the tool
 	virtual bool isInitialized() const	{ return true; }
 
 	virtual QString getUid() const = 0; ///< \return an unique id for this instance
 	virtual QString getName() const = 0; ///< \return a descriptive name for this instance
-	//virtual int getIndex() const = 0;///<return a index ivar due to a list..
 
 	virtual bool isCalibrated() const = 0; ///< a tool may not be calibrated, then no tracking i allowed
 	virtual Transform3D getCalibration_sMt() const = 0; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
@@ -145,19 +133,8 @@ public:
 	virtual std::map<int, Vector3D> getReferencePoints() const { return std::map<int, Vector3D>(); } ///< Get the optional reference points from this tool
 	virtual bool hasReferencePointWithId(int id) { Q_UNUSED(id); return false; }
 
-	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime)
-	{
-		TimedTransformMap::iterator startIt = mPositionHistory->lower_bound(startTime);
-		TimedTransformMap::iterator stopIt = mPositionHistory->upper_bound(stopTime);
-
-		TimedTransformMap retval(startIt, stopIt);
-		return retval;
-	}
-
-	virtual Transform3D get_prMt() const
-	{
-		return m_prMt;
-	}
+	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime) = 0;
+	virtual Transform3D get_prMt() const = 0;
 
 	virtual CoordinateSystem getSensorCoordinateSystem() { return CoordinateSystem(csSENSOR, this->getUid()); }
 	virtual CoordinateSystem getToolCoordinateSystem() { return CoordinateSystem(csTOOL, this->getUid()); }
@@ -178,15 +155,6 @@ signals:
 protected:
 	QString mUid;
 	QString mName;
-	TimedTransformMapPtr mPositionHistory;
-	Transform3D m_prMt; ///< the transform from the tool to the patient reference
-
-	virtual void set_prMt(const Transform3D& prMt, double timestamp)
-	{
-		m_prMt = prMt;
-		(*mPositionHistory)[timestamp] = m_prMt;
-		emit toolTransformAndTimestamp(m_prMt, timestamp);
-	}
 };
 typedef boost::shared_ptr<Tool> ToolPtr;
 } // namespace cx

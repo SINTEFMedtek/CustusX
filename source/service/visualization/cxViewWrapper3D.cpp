@@ -80,14 +80,15 @@
 #include "cxAxisConnector.h"
 #include "cxMultiVolume3DRepProducer.h"
 #include "cxMetricNamesRep.h"
-
+#include "cxVisualizationServiceBackend.h"
 
 namespace cx
 {
 
 
 
-ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view)
+ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServiceBackendPtr backend) :
+	ViewWrapper(backend)
 {
 	view->getRenderer()->GetActiveCamera()->SetClippingRange(1, 2000);
 	if (!view->getRenderWindow()->GetStereoCapableWindow())
@@ -443,7 +444,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		AxisConnectorPtr axis;
 
 		// reference space
-		axis.reset(new AxisConnector(CoordinateSystem(csREF)));
+		axis.reset(new AxisConnector(CoordinateSystem(csREF), mBackend->getSpaceProvider()));
 		axis->mRep->setAxisLength(0.12);
 		axis->mRep->setShowAxesLabels(true);
 		axis->mRep->setCaption("ref", Vector3D(1, 0, 0));
@@ -454,7 +455,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		std::vector<DataPtr> data = mGroupData->getData();
 		for (unsigned i = 0; i < data.size(); ++i)
 		{
-			axis.reset(new AxisConnector(CoordinateSystem(csDATA, data[i]->getUid())));
+			axis.reset(new AxisConnector(CoordinateSystem(csDATA, data[i]->getUid()), mBackend->getSpaceProvider()));
 			axis->mRep->setAxisLength(0.08);
 			axis->mRep->setShowAxesLabels(false);
 			axis->mRep->setCaption(data[i]->getName(), Vector3D(1, 0, 0));
@@ -469,17 +470,17 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		{
 			ToolPtr tool = iter->second;
 
-			axis.reset(new AxisConnector(CoordinateSystem(csTOOL, tool->getUid())));
+			axis.reset(new AxisConnector(CoordinateSystem(csTOOL, tool->getUid()), mBackend->getSpaceProvider()));
 			axis->mRep->setAxisLength(0.08);
 			axis->mRep->setShowAxesLabels(false);
 			axis->mRep->setCaption("t", Vector3D(0.7, 1, 0.7));
 			axis->mRep->setFontSize(0.03);
 			axis->connectTo(tool);
-			CoordinateSystemListenerPtr mToolListener = axis->mListener;
+			SpaceListenerPtr mToolListener = axis->mListener;
 
 			mAxis.push_back(axis);
 
-			axis.reset(new AxisConnector(CoordinateSystem(csSENSOR, tool->getUid())));
+			axis.reset(new AxisConnector(CoordinateSystem(csSENSOR, tool->getUid()), mBackend->getSpaceProvider()));
 			axis->mRep->setAxisLength(0.05);
 			axis->mRep->setShowAxesLabels(false);
 			axis->mRep->setCaption("s", Vector3D(1, 1, 0));

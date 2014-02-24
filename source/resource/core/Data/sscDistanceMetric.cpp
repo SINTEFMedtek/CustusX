@@ -29,13 +29,13 @@
 namespace cx
 {
 
-DataPtr DistanceMetricReader::load(const QString& uid, const QString& filename)
-{
-	return DataPtr(new DistanceMetric(uid, filename));
-}
+//DataPtr DistanceMetricReader::load(const QString& uid, const QString& filename)
+//{
+//	return DataPtr(new DistanceMetric(uid, filename));
+//}
 
-DistanceMetric::DistanceMetric(const QString& uid, const QString& name) :
-				DataMetric(uid, name)
+DistanceMetric::DistanceMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+				DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "line endpoint 0" << "line endpoint 1"));
 	mArguments->setValidArgumentTypes(QStringList() << "pointMetric" << "planeMetric");
@@ -44,17 +44,17 @@ DistanceMetric::DistanceMetric(const QString& uid, const QString& name) :
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 }
 
-DistanceMetricPtr DistanceMetric::create(QString uid, QString name)
+DistanceMetricPtr DistanceMetric::create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider)
 {
-    return DistanceMetricPtr(new DistanceMetric(uid, name));
+	return DistanceMetricPtr(new DistanceMetric(uid, name, dataManager, spaceProvider));
 }
 
-DistanceMetricPtr DistanceMetric::create(QDomNode node)
-{
-    DistanceMetricPtr retval = DistanceMetric::create("");
-    retval->parseXml(node);
-    return retval;
-}
+//DistanceMetricPtr DistanceMetric::create(QDomNode node)
+//{
+//    DistanceMetricPtr retval = DistanceMetric::create("");
+//    retval->parseXml(node);
+//    return retval;
+//}
 DistanceMetric::~DistanceMetric()
 {
 }
@@ -78,7 +78,8 @@ void DistanceMetric::addXml(QDomNode& dataNode)
 void DistanceMetric::parseXml(QDomNode& dataNode)
 {
 	DataMetric::parseXml(dataNode);
-	mArguments->parseXml(dataNode);
+
+	mArguments->parseXml(dataNode, mDataManager->getData());
 	this->resetCachedValues();
 }
 

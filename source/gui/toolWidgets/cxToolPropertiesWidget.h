@@ -63,7 +63,6 @@ private:
   QGroupBox* mManualGroup;
   Transform3DWidget* mManualToolWidget;
   StringDataAdapterXmlPtr mSpaceSelector;
-//  CoordinateSystemListenerPtr mListener;
 
 //  SliderGroupWidget* mToolOffsetWidget;
   QLabel* mActiveToolVisibleLabel;

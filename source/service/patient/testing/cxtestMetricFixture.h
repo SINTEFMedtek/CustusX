@@ -108,13 +108,20 @@ public:
 	bool inputEqualsMetric(PlaneMetricWithInput data);
 	bool inputEqualsMetric(ToolMetricWithInput data);
 
+	template<class METRIC_TYPE>
+	boost::shared_ptr<METRIC_TYPE> createTestMetric(QString uid="")
+	{
+		return METRIC_TYPE::create(uid, "", this->getDataManager(), this->getSpaceProvider());
+	}
+
     template<class DATA>
     bool saveLoadXmlGivesEqualTransform(DATA data)
     {
         QDomNode xmlNode = this->createDummyXmlNode();
         data.mMetric->addXml(xmlNode);
 
-        data.mMetric = DATA::METRIC_TYPE::create(xmlNode);
+		data.mMetric = this->createTestMetric<typename DATA::METRIC_TYPE>("");
+		data.mMetric->parseXml(xmlNode);
 
 		return this->inputEqualsMetric(data);
     }
@@ -122,8 +129,12 @@ public:
     QDomNode createDummyXmlNode();
     void setPatientRegistration();
 
-//    QStringList splitStringLineIntoTextComponents(QString line);
 	bool verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric);
+
+private:
+	cx::DataManager* getDataManager();
+	cx::SpaceProviderPtr getSpaceProvider();
+
 };
 
 } //namespace cxtest

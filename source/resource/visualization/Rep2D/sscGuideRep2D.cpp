@@ -30,6 +30,8 @@
 #include "sscSliceProxy.h"
 #include "sscToolManager.h"
 #include "sscView.h"
+#include "sscDataManager.h"
+
 namespace cx
 {
 

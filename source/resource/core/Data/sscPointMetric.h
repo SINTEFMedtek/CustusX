@@ -21,8 +21,6 @@
 #define SSCPOINTMETRIC_H_
 
 #include "sscDataMetric.h"
-#include "sscDataReaderWriter.h"
-#include "sscCoordinateSystemListener.h"
 #include "cxOptionalValue.h"
 
 namespace cx
@@ -35,25 +33,7 @@ namespace cx
 
 typedef boost::shared_ptr<class PointMetric> PointMetricPtr;
 
-/** \brief DataReader implementation for PointMetric
- *
- * \date Jul 4, 2011
- * \author Christian Askeland, SINTEF
- */
-class PointMetricReader: public DataReader
-{
-public:
-	virtual ~PointMetricReader()
-	{
-	}
-	virtual bool canLoad(const QString& type, const QString& filename)
-	{
-		return type == "pointMetric";
-	}
-	virtual DataPtr load(const QString& uid, const QString& filename);
-};
-
-/**\brief Data class that represents a single point.
+/** \brief Data class that represents a single point.
  *
  * The point is attached to a specific coordinate system / frame.
  *
@@ -64,10 +44,9 @@ class PointMetric: public DataMetric
 {
 Q_OBJECT
 public:
-	PointMetric(const QString& uid, const QString& name = "");
 	virtual ~PointMetric();
-    static PointMetricPtr create(QDomNode node);
-    static PointMetricPtr create(QString uid, QString name="");
+//    static PointMetricPtr create(QDomNode node);
+	static PointMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 
 	void setCoordinate(const Vector3D& p);
 	Vector3D getCoordinate() const;
@@ -75,9 +54,13 @@ public:
 	CoordinateSystem getSpace() const; // use parentframe from Data
 	virtual QString getType() const
 	{
+		return getTypeName();
+	}
+	static QString getTypeName()
+	{
 		return "pointMetric";
 	}
-    virtual Vector3D getRefCoord() const;
+	virtual Vector3D getRefCoord() const;
 	virtual QString getAsSingleLineString() const;
 
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
@@ -90,9 +73,10 @@ public:
 private slots:
 	void resetCachedValues();
 private:
+	PointMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 	Vector3D mCoordinate;
 	CoordinateSystem mSpace;
-	CoordinateSystemListenerPtr mSpaceListener;
+	SpaceListenerPtr mSpaceListener;
 	mutable OptionalValue<Vector3D> mCachedRefCoord;
 };
 

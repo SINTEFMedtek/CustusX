@@ -199,7 +199,9 @@ cx::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 void ViewsWindow::fixToolToCenter()
 {
 	Vector3D c = cx::DataManager::getInstance()->getCenter();
-	dummyTool()->setToolPositionMovement(std::vector<Transform3D>(1, cx::createTransformTranslate(c)));
+	cx::Transform3D prMt = cx::createTransformTranslate(c);
+	dummyTool()->setToolPositionMovement(std::vector<Transform3D>(1, prMt));
+	dummyTool()->set_prMt(prMt);
 }
 
 void ViewsWindow::insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c)
@@ -294,6 +296,9 @@ bool ViewsWindow::quickRunWidget()
 {
 	this->show();
 	this->updateRender();
+
+	cx::Transform3D rMt = cx::dataManager()->get_rMpr() * dummyTool()->get_prMt();
+
 	return true;
 }
 

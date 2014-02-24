@@ -57,6 +57,10 @@ QVariant SyncedValue::get() const
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
+ViewWrapper::ViewWrapper(VisualizationServiceBackendPtr backend) :
+	mBackend(backend)
+{
+}
 
 void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 {

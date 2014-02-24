@@ -21,7 +21,7 @@
 #define SSCMANUALTOOL_H_
 
 #include <QMutex>
-#include "sscTool.h"
+#include "cxToolImpl.h"
 #include "vtkForwardDeclarations.h"
 
 namespace cx
@@ -40,7 +40,7 @@ class ToolManager;
  *
  * \ingroup sscTool
  */
-class ManualTool : public Tool
+class ManualTool : public ToolImpl
 {
 	Q_OBJECT
 public:

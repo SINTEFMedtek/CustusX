@@ -37,7 +37,6 @@ typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWi
 namespace cx
 {
 typedef boost::shared_ptr<class Slices3DRep> Slices3DRepPtr;
-typedef boost::shared_ptr<class CoordinateSystemListener> CoordinateSystemListenerPtr;
 typedef boost::shared_ptr<class DataMetricRep> DataMetricRepPtr;
 typedef boost::shared_ptr<class MetricNamesRep> MetricNamesRepPtr;
 
@@ -72,7 +71,7 @@ class ViewWrapper3D: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapper3D(int startIndex, ViewWidget* view);
+	ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServiceBackendPtr backend);
 	virtual ~ViewWrapper3D();
 	virtual ViewWidget* getView();
 	virtual double getZoom2D() { return -1.0; }

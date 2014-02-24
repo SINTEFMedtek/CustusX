@@ -59,7 +59,7 @@ TEST_CASE("ToolMetric can set space correctly", "[unit]")
 
 	fixture.setPatientRegistration();
 
-	testData.mMetric->setSpace(cx::CoordinateSystemHelpers::getPr());
+	testData.mMetric->setSpace(cx::CoordinateSystem::patientReference());
 	CHECK_FALSE(fixture.inputEqualsMetric(testData));
 
 	testData.mMetric->setSpace(testData.mSpace);
@@ -76,7 +76,7 @@ TEST_CASE("ToolMetric can get a valid reference coordinate", "[unit]")
 	INFO(qstring_cast(testCoord)+" == "+qstring_cast(refCoord));
 	CHECK(cx::similar(refCoord, testCoord));
 
-	testData.mMetric->setSpace(cx::CoordinateSystemHelpers::getPr());
+	testData.mMetric->setSpace(cx::CoordinateSystem::patientReference());
 
 	refCoord = testData.mMetric->getRefCoord();
 	INFO(qstring_cast(testCoord)+" == "+qstring_cast(refCoord));

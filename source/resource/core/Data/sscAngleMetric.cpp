@@ -28,13 +28,13 @@
 namespace cx
 {
 
-DataPtr AngleMetricReader::load(const QString& uid, const QString& filename)
-{
-	return DataPtr(new AngleMetric(uid, filename));
-}
+//DataPtr AngleMetricReader::load(const QString& uid, const QString& filename)
+//{
+//	return DataPtr(new AngleMetric(uid, filename));
+//}
 
-AngleMetric::AngleMetric(const QString& uid, const QString& name) :
-				DataMetric(uid, name)
+AngleMetric::AngleMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+				DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mUseSimpleVisualization = false;
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "point 0" << "point 1" << "point 2" << "point 3"));
@@ -43,17 +43,17 @@ AngleMetric::AngleMetric(const QString& uid, const QString& name) :
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 }
 
-AngleMetricPtr AngleMetric::create(QString uid, QString name)
+AngleMetricPtr AngleMetric::create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider)
 {
-    return AngleMetricPtr(new AngleMetric(uid, name));
+	return AngleMetricPtr(new AngleMetric(uid, name, dataManager, spaceProvider));
 }
 
-AngleMetricPtr AngleMetric::create(QDomNode node)
-{
-    AngleMetricPtr retval = AngleMetric::create("");
-    retval->parseXml(node);
-    return retval;
-}
+//AngleMetricPtr AngleMetric::create(QDomNode node)
+//{
+//    AngleMetricPtr retval = AngleMetric::create("");
+//    retval->parseXml(node);
+//    return retval;
+//}
 
 AngleMetric::~AngleMetric()
 {
@@ -69,7 +69,8 @@ void AngleMetric::addXml(QDomNode& dataNode)
 void AngleMetric::parseXml(QDomNode& dataNode)
 {
 	DataMetric::parseXml(dataNode);
-	mArguments->parseXml(dataNode);
+
+	mArguments->parseXml(dataNode, mDataManager->getData());
 
 	mUseSimpleVisualization = dataNode.toElement().attribute("useSimpleVisualization", QString::number(mUseSimpleVisualization)).toInt();
 	this->resetCachedValues();

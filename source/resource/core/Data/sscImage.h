@@ -67,6 +67,8 @@ public:
 		double loadAttribute(QDomNode dataNode, QString name, double defVal);
 	};
 
+	static ImagePtr create(const QString& uid, const QString& name);
+
 	virtual ~Image();
 	Image(const QString& uid, const vtkImageDataPtr& data, const QString& name = "");
 	virtual void setVtkImageData(const vtkImageDataPtr& data);
@@ -117,7 +119,12 @@ public:
 
 	void addXml(QDomNode& dataNode); ///< adds xml information about the image and its variabels \param dataNode Data node in the XML tree \return The created subnode
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
+	virtual bool load(QString path);
 	virtual QString getType() const
+	{
+		return getTypeName();
+	}
+	static QString getTypeName()
 	{
 		return "image";
 	}

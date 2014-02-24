@@ -44,7 +44,7 @@ public:
 	std::vector<Vector3D> getRefCoords() const;
 	QString getDescription(int index) const;
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
-	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
+	virtual void parseXml(QDomNode& dataNode, const std::map<QString, DataPtr>& data); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 signals:
 	void argumentsChanged();
 private:

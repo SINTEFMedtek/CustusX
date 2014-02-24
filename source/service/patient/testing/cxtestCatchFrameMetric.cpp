@@ -57,7 +57,7 @@ TEST_CASE("cxFrameMetric can set space correctly", "[unit]")
 
     fixture.setPatientRegistration();
 
-	testData.mMetric->setSpace(cx::CoordinateSystemHelpers::getPr());
+	testData.mMetric->setSpace(cx::CoordinateSystem::patientReference());
     CHECK_FALSE(fixture.inputEqualsMetric(testData));
 
     testData.mMetric->setSpace(testData.mSpace);

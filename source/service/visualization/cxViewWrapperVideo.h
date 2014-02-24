@@ -41,7 +41,7 @@ class ViewWrapperVideo: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapperVideo(ViewWidget* view);
+	ViewWrapperVideo(ViewWidget* view, VisualizationServiceBackendPtr backend);
 	virtual ~ViewWrapperVideo();
 	virtual ViewWidget* getView();
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) {}

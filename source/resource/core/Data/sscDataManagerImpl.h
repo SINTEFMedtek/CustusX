@@ -31,7 +31,6 @@
 #include <QFileInfo>
 #include "boost/scoped_ptr.hpp"
 
-
 class QDomElement;
 
 namespace cx
@@ -54,6 +53,8 @@ class DataManagerImpl: public DataManager
 Q_OBJECT
 public:
 	static void initialize();
+	void setSpaceProvider(SpaceProviderPtr spaceProvider);
+	void setDataFactory(DataFactoryPtr dataFactory);
 
 	// streams
 	virtual VideoSourcePtr getStream(const QString& uid) const;
@@ -70,6 +71,8 @@ public:
     virtual void saveData(DataPtr data, const QString& basePath); ///< Save data to file
     std::map<QString, DataPtr> getData() const;
 	DataPtr getData(const QString& uid) const;
+	virtual SpaceProviderPtr getSpaceProvider();
+	virtual DataFactoryPtr getDataFactory();
 
 	// meshes
 	virtual void saveMesh(MeshPtr mesh, const QString& basePath);///< Save mesh to file \param mesh to save \param basePath Absolute path to patient data folder
@@ -125,13 +128,15 @@ protected:
 	virtual ImagePtr loadImage(const QString& uid, const QString& filename);
 	virtual MeshPtr loadMesh(const QString& uid, const QString& fileName);
 	DataPtr loadData(QDomElement node, QString rootPath);
-	DataPtr readData(const QString& uid, const QString& path, const QString& type);
+//	DataPtr readData(const QString& uid, const QString& path, const QString& type);
 	int findUniqueUidNumber(QString uidBase) const;
 	void generateUidAndName(QString* _uid, QString* _name);
 
 	LandmarkPropertyMap mLandmarkProperties; ///< uid and name
 	RegistrationHistoryPtr m_rMpr_History; ///< transform from the patient reference to the reference, along with historical data.
 	LandmarksPtr mPatientLandmarks; ///< in space patient reference.
+	SpaceProviderPtr mSpaceProvider;
+	DataFactoryPtr mDataFactory;
 
 public slots:
 	void vtkImageDataChangedSlot();
