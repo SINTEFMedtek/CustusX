@@ -29,13 +29,13 @@
 #include <vtkRenderer.h>
 
 #include "sscGraphicalPrimitives.h"
-#include "sscToolManager.h"
 #include "sscProbe.h"
 #include "sscView.h"
 #include "sscVideoSourceGraphics.h"
 #include "sscTypeConversions.h"
 #include "sscDataManager.h"
 #include "sscToolTracer.h"
+#include "sscTool.h"
 
 namespace cx
 {

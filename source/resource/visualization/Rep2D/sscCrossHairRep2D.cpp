@@ -29,8 +29,8 @@
 #include <vtkActor2D.h>
 #include <vtkRenderer.h>
 
+#include "sscTool.h"
 #include "sscView.h"
-#include "sscToolManager.h"
 #include "sscSliceProxy.h"
 #include "sscVtkHelperClasses.h"
 #include "sscDataManager.h"

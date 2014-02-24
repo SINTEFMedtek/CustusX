@@ -22,7 +22,6 @@
 #include <vtkImageData.h>
 #include <vtkPolyData.h>
 
-#include "sscToolManager.h"
 #include "sscMessageManager.h"
 #include "sscTool.h"
 #include "sscDataManager.h"

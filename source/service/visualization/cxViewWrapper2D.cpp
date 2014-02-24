@@ -61,6 +61,7 @@
 #include "sscPointMetricRep2D.h"
 #include "sscLogger.h"
 #include "cxViewFollower.h"
+#include "cxVisualizationServiceBackend.h"
 
 namespace cx
 {
@@ -195,7 +196,7 @@ void ViewWrapper2D::addReps()
 	mView->addRep(mDataNameText);
 
 	// slice proxy
-	mSliceProxy = SliceProxy::New("sliceproxy_(" + mView->getName() + ")");
+	mSliceProxy = SliceProxy::create(mBackend->getDataManager());
 	mViewFollower.reset(new ViewFollower);
 	mViewFollower->setSliceProxy(mSliceProxy);
 

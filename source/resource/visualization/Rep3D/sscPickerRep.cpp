@@ -41,7 +41,6 @@
 #include "sscImage.h"
 #include "sscView.h"
 #include "sscTool.h"
-#include "sscToolManager.h"
 #include "sscRegistrationTransform.h"
 #include "sscGeometricRep.h"
 

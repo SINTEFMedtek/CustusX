@@ -20,7 +20,6 @@
 #include "sscPointMetric.h"
 #include "sscBoundingBox3D.h"
 #include "sscTool.h"
-#include "sscToolManager.h"
 #include "sscTypeConversions.h"
 #include "cxSpaceProvider.h"
 #include "cxSpaceListener.h"

@@ -21,7 +21,6 @@
 #include "sscUtilHelpers.h"
 #include "sscDefinitionStrings.h"
 
-#include "sscToolManager.h"
 #include "sscDataManager.h"
 #include "sscMessageManager.h"
 

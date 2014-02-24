@@ -27,7 +27,7 @@
 #include <vtkPolyData.h>
 #include <vtkMatrix4x4.h>
 #include "sscSliceProxy.h"
-#include "sscToolManager.h"
+#include "sscTool.h"
 #include "sscView.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
