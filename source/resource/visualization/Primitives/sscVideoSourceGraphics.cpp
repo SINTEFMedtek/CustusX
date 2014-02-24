@@ -29,16 +29,18 @@
 #include "sscRegistrationTransform.h"
 #include "sscVideoGraphics.h"
 #include "sscVideoSource.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
 
-VideoSourceGraphics::VideoSourceGraphics(bool useMaskFilter)
+VideoSourceGraphics::VideoSourceGraphics(SpaceProviderPtr spaceProvider, bool useMaskFilter)
 {
+	mSpaceProvider = spaceProvider;
 	mClipToSector = true;
 	mPipeline.reset(new VideoGraphics());
 	mShowInToolSpace = true;
-	mImage = ImagePtr();
+//	mImage = ImagePtr();
 }
 
 VideoSourceGraphics::~VideoSourceGraphics()
@@ -91,8 +93,8 @@ void VideoSourceGraphics::setTool(ToolPtr tool)
 
 	this->probeSectorChanged();
 
-	if(mTool && mImage)
-		mImage->setName(mTool->getName());
+//	if(mTool && mImage)
+//		mImage->setName(mTool->getName());
 }
 
 void VideoSourceGraphics::setClipToSector(bool on)
@@ -139,13 +141,13 @@ void VideoSourceGraphics::setRealtimeStream(VideoSourcePtr data)
 		connect(mData.get(), SIGNAL(newFrame()), this, SLOT(newDataSlot()));
 		mPipeline->setInputVideo(mData->getVtkImageData());
 
-		//Only add image in dataManager once
-		mImage = dataManager()->getImage("4D US");
-		if(!mImage)
-		{
-//			mImage = dataManager()->createImage(mDataRedirecter->GetOutput(), "4D US", mData->getName());
-//			dataManager()->loadData(boost::dynamic_pointer_cast<Data>(mImage));//Uncomment to test unstable 4D US
-		}
+//		//Only add image in dataManager once
+//		mImage = dataManager()->getImage("4D US");
+//		if(!mImage)
+//		{
+////			mImage = dataManager()->createImage(mDataRedirecter->GetOutput(), "4D US", mData->getName());
+////			dataManager()->loadData(boost::dynamic_pointer_cast<Data>(mImage));//Uncomment to test unstable 4D US
+//		}
 	}
 
 	this->newDataSlot();
@@ -155,17 +157,17 @@ void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 {
 	if (!mShowInToolSpace)
 		return;
-	Transform3D rMpr = dataManager()->get_rMpr();
+	Transform3D rMpr = mSpaceProvider->get_rMpr();
 	Transform3D tMu = mProbeData.get_tMu();
 	Transform3D rMu = rMpr * prMt * tMu;
 	mPipeline->setActorUserMatrix(rMu.getVtkMatrix());
 
-	//TODO: Set correct position and orientation on mImage
-	//std::cout << "rMu: " << rMu << std::endl;
-	if (mImage)
-	{
-		mImage->get_rMd_History()->setRegistration(rMu);
-	}
+//	//TODO: Set correct position and orientation on mImage
+//	//std::cout << "rMu: " << rMu << std::endl;
+//	if (mImage)
+//	{
+//		mImage->get_rMd_History()->setRegistration(rMu);
+//	}
 }
 
 void VideoSourceGraphics::newDataSlot()
@@ -179,10 +181,10 @@ void VideoSourceGraphics::newDataSlot()
 
 	mPipeline->update();
 
-	if (mImage)
-	{
-		mImage->setVtkImageData(mData->getVtkImageData());//Update pointer to 4D image
-	}
+//	if (mImage)
+//	{
+//		mImage->setVtkImageData(mData->getVtkImageData());//Update pointer to 4D image
+//	}
 
 	bool visible = mData->validData();
 	if (mShowInToolSpace)

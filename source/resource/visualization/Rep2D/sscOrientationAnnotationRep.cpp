@@ -90,16 +90,17 @@ void OrientationAnnotation::SetTextActorsJustification()
 //---------------------------------------------------------
 
 
-OrientationAnnotationRep::OrientationAnnotationRep( const QString& uid, const QString& name) :
-	RepImpl(uid, name)
+OrientationAnnotationRep::OrientationAnnotationRep(DataManager* dataManager, const QString& uid, const QString& name) :
+	RepImpl(uid, name),
+	mDataManager(dataManager)
 {
 	mPlane = ptCOUNT;
-	connect(dataManager(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
+	connect(mDataManager, SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
 }
 
-OrientationAnnotationRepPtr OrientationAnnotationRep::New(const QString& uid,const QString& name)
+OrientationAnnotationRepPtr OrientationAnnotationRep::New(DataManager* dataManager, const QString& uid,const QString& name)
 {
-	OrientationAnnotationRepPtr retval(new OrientationAnnotationRep(uid,name));
+	OrientationAnnotationRepPtr retval(new OrientationAnnotationRep(dataManager, uid,name));
 	retval->mSelf = retval;
 	return retval;
 }
@@ -122,7 +123,7 @@ void OrientationAnnotationRep::clinicalApplicationChangedSlot()
 
 void OrientationAnnotationRep::setPlaneType(PLANE_TYPE type)
 {
-	switch (dataManager()->getClinicalApplication())
+	switch (mDataManager->getClinicalApplication())
 	{
 	case mdLAPAROSCOPY:
 	case mdBRONCHOSCOPY:

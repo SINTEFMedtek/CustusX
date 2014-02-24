@@ -88,15 +88,13 @@ void Slices3DRep::setImages(std::vector<ImagePtr> images)
 	}
 }
 
-void Slices3DRep::addPlane(PLANE_TYPE plane)
+void Slices3DRep::addPlane(PLANE_TYPE plane, DataManager* dataManager)
 {
-	SliceProxyPtr sliceProxy = SliceProxy::create(dataManager());
-	sliceProxy->initializeFromPlane(ptAXIAL, false, Vector3D(0,0,1), true, 150, 0.25);
-
-
-	Texture3DSlicerProxyPtr current = Texture3DSlicerProxy::New();
+	SliceProxyPtr sliceProxy = SliceProxy::create(dataManager);
 	sliceProxy->initializeFromPlane(plane, false, Vector3D(0,0,1), true, 150, 0.25);
 	sliceProxy->setAlwaysUseDefaultCenter(true);
+
+	Texture3DSlicerProxyPtr current = Texture3DSlicerProxy::New();
 	current->setSliceProxy(sliceProxy);
 	current->setTargetSpaceToR();
 

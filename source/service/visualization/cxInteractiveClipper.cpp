@@ -26,22 +26,27 @@
 #include "sscImage.h"
 #include "sscToolManager.h"
 #include "sscLogger.h"
+#include "cxVisualizationServiceBackend.h"
+
+
 namespace cx
 {
 
-InteractiveClipper::InteractiveClipper() :
-	mUseClipper(false)
+InteractiveClipper::InteractiveClipper(VisualizationServiceBackendPtr backend) :
+	mUseClipper(false),
+	mBackend(backend)
 {
 
 	// create a slice planes proxy containing all slice definitions,
 	// for use with the clipper
+	DataManager* dm = mBackend->getDataManager();
 	mSlicePlanesProxy = SlicePlanesProxyPtr(new SlicePlanesProxy());
-	mSlicePlanesProxy->addSimpleSlicePlane(ptSAGITTAL);
-	mSlicePlanesProxy->addSimpleSlicePlane(ptCORONAL);
-	mSlicePlanesProxy->addSimpleSlicePlane(ptAXIAL);
-	mSlicePlanesProxy->addSimpleSlicePlane(ptANYPLANE);
-	mSlicePlanesProxy->addSimpleSlicePlane(ptSIDEPLANE);
-	mSlicePlanesProxy->addSimpleSlicePlane(ptRADIALPLANE);
+	mSlicePlanesProxy->addSimpleSlicePlane(ptSAGITTAL, dm);
+	mSlicePlanesProxy->addSimpleSlicePlane(ptCORONAL, dm);
+	mSlicePlanesProxy->addSimpleSlicePlane(ptAXIAL, dm);
+	mSlicePlanesProxy->addSimpleSlicePlane(ptANYPLANE, dm);
+	mSlicePlanesProxy->addSimpleSlicePlane(ptSIDEPLANE, dm);
+	mSlicePlanesProxy->addSimpleSlicePlane(ptRADIALPLANE, dm);
 
 	mSlicePlaneClipper = SlicePlaneClipper::New();
 

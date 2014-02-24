@@ -127,9 +127,9 @@ void SlicePlanesProxy::setViewportData(PLANE_TYPE type, SliceProxyPtr slice, con
 	emit changed();
 }
 
-void SlicePlanesProxy::addSimpleSlicePlane(PLANE_TYPE type)
+void SlicePlanesProxy::addSimpleSlicePlane(PLANE_TYPE type, DataManager* dataManager)
 {
-	SliceProxyPtr slice = SliceProxy::create(dataManager());
+	SliceProxyPtr slice = SliceProxy::create(dataManager);
 	slice->initializeFromPlane(type, false, Vector3D(0, 0, 1), true, 1, 0.25);
 
 	this->setViewportData(type, slice, DoubleBoundingBox3D(0, 1, 0, 1, 0, 1));

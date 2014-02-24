@@ -128,7 +128,7 @@ void fillShortImageDataWithGradient(vtkImageDataPtr data, int maxValue)
  * as output, depending on the input range.
  *
  */
-ImagePtr convertImageToUnsigned(ImagePtr image, vtkImageDataPtr suggestedConvertedVolume, bool verbose)
+ImagePtr convertImageToUnsigned(DataManager* dataManager, ImagePtr image, vtkImageDataPtr suggestedConvertedVolume, bool verbose)
 {
 	vtkImageDataPtr input = image->getBaseVtkImageData();
 
@@ -175,7 +175,7 @@ ImagePtr convertImageToUnsigned(ImagePtr image, vtkImageDataPtr suggestedConvert
 		convertedImageData = cast->GetOutput();
 	}
 
-	ImagePtr retval = dataManager()->createDerivedImage(convertedImageData, image->getUid()+"_u", image->getName()+" u", image, "");
+	ImagePtr retval = dataManager->createDerivedImage(convertedImageData, image->getUid()+"_u", image->getName()+" u", image, "");
 
 	ImageTF3DPtr TF3D = retval->getTransferFunctions3D()->createCopy();
 	ImageLUT2DPtr LUT2D = retval->getLookupTable2D()->createCopy();

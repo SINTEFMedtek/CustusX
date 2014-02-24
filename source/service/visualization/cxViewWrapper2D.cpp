@@ -197,7 +197,7 @@ void ViewWrapper2D::addReps()
 
 	// slice proxy
 	mSliceProxy = SliceProxy::create(mBackend->getDataManager());
-	mViewFollower.reset(new ViewFollower);
+	mViewFollower = ViewFollower::create(mBackend->getDataManager());
 	mViewFollower->setSliceProxy(mSliceProxy);
 
 	// slice rep
@@ -223,7 +223,7 @@ void ViewWrapper2D::addReps()
 //#endif
 
 	// tool rep
-	mToolRep2D = ToolRep2D::New("Tool2D_" + mView->getName());
+	mToolRep2D = ToolRep2D::New(mBackend->getSpaceProvider(), "Tool2D_" + mView->getName());
 	mToolRep2D->setSliceProxy(mSliceProxy);
 	mToolRep2D->setUseCrosshair(true);
 //  mToolRep2D->setUseToolLine(false);

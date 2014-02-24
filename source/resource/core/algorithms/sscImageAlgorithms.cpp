@@ -38,7 +38,7 @@ namespace cx
 /** Return an image that is resampled into space q.
  *  The image is not added to the data manager nor saved.
  */
-ImagePtr resampleImage(ImagePtr image, Transform3D qMd)
+ImagePtr resampleImage(DataManager *dataManager, ImagePtr image, Transform3D qMd)
 {
 	//TODO: fix error:
 	// There is an error in the transfer functions of the returned image from this function
@@ -58,7 +58,7 @@ ImagePtr resampleImage(ImagePtr image, Transform3D qMd)
 
   QString uid = image->getUid() + "_or%1";
   QString name = image->getName()+" or%1";
-  ImagePtr oriented = dataManager()->createDerivedImage(rawResult, uid, name, image);
+  ImagePtr oriented = dataManager->createDerivedImage(rawResult, uid, name, image);
   //oriented->get_rMd_History()->setRegistration(reference->get_rMd());
   oriented->get_rMd_History()->setRegistration(image->get_rMd() * qMd.inv());
 //  std::cout << "rMd pre merge oriented\n" << oriented->get_rMd() << std::endl;
@@ -71,7 +71,7 @@ ImagePtr resampleImage(ImagePtr image, Transform3D qMd)
 /** Return an image that is resampled with a new output spacing.
  *  The image is not added to the data manager nor saved.
  */
-ImagePtr resampleImage(ImagePtr image, const Vector3D spacing, QString uid, QString name)
+ImagePtr resampleImage(DataManager *dataManager, ImagePtr image, const Vector3D spacing, QString uid, QString name)
 {
 //  std::cout << "oldspacing: " << Vector3D(image->getBaseVtkImageData()->GetSpacing()) << std::endl;
 //  std::cout << "spacing: " << spacing << std::endl;
@@ -89,20 +89,18 @@ ImagePtr resampleImage(ImagePtr image, const Vector3D spacing, QString uid, QStr
     uid = image->getUid() + "_res%1";
     name = image->getName()+" res%1";
   }
-  ImagePtr retval = dataManager()->createDerivedImage(rawResult, uid, name, image);
+  ImagePtr retval = dataManager->createDerivedImage(rawResult, uid, name, image);
 
-  //dataManager()->loadData(retval);
-  //dataManager()->saveImage(retval, outputBasePath);
   return retval;
 }
 
 /** Return an image that is cropped using its own croppingBox.
  *  The image is not added to the data manager nor saved.
  */
-ImagePtr duplicateImage(ImagePtr image)
+ImagePtr duplicateImage(DataManager *dataManager, ImagePtr image)
 {
 	Vector3D spacing(image->getBaseVtkImageData()->GetSpacing());
-	return resampleImage(image, spacing, image->getUid()+"_copy%1", image->getName()+" copy%1");
+	return resampleImage(dataManager, image, spacing, image->getUid()+"_copy%1", image->getName()+" copy%1");
 }
 
 /** Return an image that is cropped using its own croppingBox.
@@ -125,7 +123,7 @@ vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox)
 /** Return an image that is cropped using its own croppingBox.
  *  The image is not added to the data manager nor saved.
  */
-ImagePtr cropImage(ImagePtr image)
+ImagePtr cropImage(DataManager* dataManager, ImagePtr image)
 {
   DoubleBoundingBox3D bb = image->getCroppingBox();
   double* sp = image->getBaseVtkImageData()->GetSpacing();
@@ -137,7 +135,7 @@ ImagePtr cropImage(ImagePtr image)
 
   QString uid = image->getUid() + "_crop%1";
   QString name = image->getName()+" crop%1";
-  ImagePtr result = dataManager()->createDerivedImage(rawResult,uid, name, image);
+  ImagePtr result = dataManager->createDerivedImage(rawResult,uid, name, image);
   result->mergevtkSettingsIntosscTransform();
 
   return result;

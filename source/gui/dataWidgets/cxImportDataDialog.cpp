@@ -247,7 +247,7 @@ void ImportDataDialog::convertToUnsigned()
 	if (!image)
 		return;
 
-	ImagePtr converted = convertImageToUnsigned(image);
+	ImagePtr converted = convertImageToUnsigned(dataManager(), image);
 
 	image->setVtkImageData(converted->getBaseVtkImageData());
 
