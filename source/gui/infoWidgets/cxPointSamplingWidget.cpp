@@ -17,6 +17,9 @@
 #include "sscDataManager.h"
 #include "sscManualTool.h"
 
+#include "cxLegacySingletons.h"
+#include "cxSpaceProvider.h"
+
 namespace cx
 {
 
@@ -220,16 +223,8 @@ void PointSamplingWidget::addButtonClickedSlot()
 
 Vector3D PointSamplingWidget::getSample() const
 {
-// find current tool position:
-//  ToolPtr tool = toolManager()->getDominantTool();
-//  if (!tool)
-//    return Vector3D(0,0,0);
-//  Transform3D prMt = tool->get_prMt();
-//  Transform3D rMpr = *toolManager()->get_rMpr();
-//  Vector3D pos = (rMpr*prMt).coord(Vector3D(0,0,tool->getTooltipOffset()));
-
-  CoordinateSystem ref = CoordinateSystemHelpers::getR();
-  Vector3D P_ref = CoordinateSystemHelpers::getDominantToolTipPoint(ref, true);
+//  CoordinateSystem ref = spaceProvider()->getR();
+  Vector3D P_ref = spaceProvider()->getDominantToolTipPoint(CoordinateSystem::reference(), true);
 
   return P_ref;
 }
@@ -281,13 +276,13 @@ void PointSamplingWidget::loadReferencePointsSlot()
     return;
   }
 
-  CoordinateSystem ref = CoordinateSystemHelpers::getR();
-  CoordinateSystem sensor = CoordinateSystemHelpers::getS(refTool);
+  CoordinateSystem ref = spaceProvider()->getR();
+  CoordinateSystem sensor = spaceProvider()->getS(refTool);
 
   std::map<int, Vector3D>::iterator it = referencePoints_s.begin();
   for(; it != referencePoints_s.end(); ++it)
   {
-    Vector3D P_ref = CoordinateSystemHelpers::get_toMfrom(sensor, ref).coord(it->second);
+	Vector3D P_ref = spaceProvider()->get_toMfrom(sensor, ref).coord(it->second);
     this->addPoint(P_ref);
   }
 }

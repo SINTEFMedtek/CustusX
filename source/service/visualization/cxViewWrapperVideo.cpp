@@ -34,7 +34,8 @@
 namespace cx
 {
 
-ViewWrapperVideo::ViewWrapperVideo(ViewWidget* view)
+ViewWrapperVideo::ViewWrapperVideo(ViewWidget* view, VisualizationServiceBackendPtr backend) :
+	ViewWrapper(backend)
 {
 	mView = view;
 	this->connectContextMenu(mView);

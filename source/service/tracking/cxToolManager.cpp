@@ -141,7 +141,7 @@ void cxToolManager::setPlaybackMode(PlaybackTimePtr controller)
 	{
 		if (iter->second==mManualTool)
 			continue; // dont wrap the manual tool
-		cx::PlaybackToolPtr current(new PlaybackTool(iter->second, controller));
+		cx::PlaybackToolPtr current(new PlaybackTool(this, iter->second, controller));
 		mTools[current->getUid()] = current;
 
 		TimedTransformMapPtr history = iter->second->getPositionHistory();
@@ -302,7 +302,7 @@ void cxToolManager::trackerConfiguredSlot(bool on)
 	for (; it != igstkTools.end(); ++it)
 	{
 		IgstkToolPtr igstkTool = it->second;
-		cxToolPtr tool(new cxTool(igstkTool));
+		cxToolPtr tool(new cxTool(this, igstkTool));
 		if (tool->isValid())
 		{
 			if (igstkTool == reference)

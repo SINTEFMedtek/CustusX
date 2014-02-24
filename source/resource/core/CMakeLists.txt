@@ -23,12 +23,12 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Data/sscUnsignedDerivedImage
 	Data/cxFrameMetric
 	Data/cxToolMetric
-	Data/sscCoordinateSystemListener
 	Data/cxFrameMetricBase
 	Data/cxShapedMetric
 	Data/cxSphereMetric
 	Data/cxMetricReferenceArgumentList
 	Data/sscLandmark
+	Data/cxDataFactory
 
 	Video/sscVideoSource.h
 	Video/sscVideoRecorder
@@ -45,6 +45,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Tool/sscProbeAdapterRTSource
 	Tool/sscSliceProxy
 	Tool/sscSlicedImageProxy
+	Tool/cxToolImpl
 
 	dataAdapters/sscDataAdapter
 	dataAdapters/sscDoubleDataAdapter.h
@@ -72,6 +73,11 @@ cx_add_class_qt_moc(cxResource_SOURCE
     utilities/cxProcessWrapper.h
 	utilities/cxProcessReporter
 	utilities/cxVLCRecorder
+	utilities/cxSpaceProvider
+	utilities/cxSpaceProviderImpl
+	utilities/cxSpaceListener
+	utilities/cxSpaceListenerImpl
+	utilities/cxLegacySingletons
 	)
 
      

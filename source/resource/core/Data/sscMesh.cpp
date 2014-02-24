@@ -26,9 +26,16 @@
 #include "sscTypeConversions.h"
 #include "sscRegistrationTransform.h"
 #include "sscBoundingBox3D.h"
+#include "sscDataReaderWriter.h"
 
 namespace cx
 {
+
+MeshPtr Mesh::create(const QString& uid, const QString& name)
+{
+	return MeshPtr(new Mesh(uid, name));
+}
+
 Mesh::Mesh(const QString& uid, const QString& name) :
 	Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false)
 {
@@ -51,6 +58,14 @@ void Mesh::setIsWireframe(bool on)
 bool Mesh::getIsWireframe() const
 {
 	return mWireframe;
+}
+
+bool Mesh::load(QString path)
+{
+	vtkPolyDataPtr raw;
+	raw = DataReaderWriter().loadVtkPolyData(path);
+	this->setVtkPolyData(raw);
+	return raw!=0;
 }
 
 void Mesh::setVtkPolyData(const vtkPolyDataPtr& polyData)

@@ -33,6 +33,7 @@ cx_add_class_qt_moc(cxVisualizationService_SOURCE
 cx_add_class(cxVisualizationService_SOURCE
     cxLayoutData
 	cxLayoutRepository
+	cxVisualizationServiceBackend
 	)
 
 include_directories(

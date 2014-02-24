@@ -91,16 +91,11 @@ void PlaneMetricRep::rescale()
 	if (!mGraphicalPoint)
 		return;
 
-	Transform3D rM0 = SpaceHelpers::get_toMfrom(mMetric->getSpace(), CoordinateSystem(csREF));
-	Vector3D p0_r = rM0.coord(mMetric->getCoordinate());
-	Vector3D n_r = rM0.vector(mMetric->getNormal());
+	Vector3D p0_r = mMetric->getRefCoord();
+	Vector3D n_r = mMetric->getRefNormal();
 
 	double size = mViewportListener->getVpnZoom();
 	double sphereSize = mGraphicsSize / 100 / size;
-//  double mSize = mSphereRadius/100/size*10;
-//	double mSize = 0.07; // ratio of vp height
-//  double scale = mSize/size;
-//  std::cout << "s= " << size << "  ,scale= " << scale << std::endl;
 
 	mGraphicalPoint->setValue(p0_r);
 	mNormal->setValue(p0_r, n_r, sphereSize * 8);
@@ -121,21 +116,9 @@ void PlaneMetricRep::rescale()
 	DoubleBoundingBox3D bb(-bb_size,bb_size,-bb_size,bb_size,0,0);
 	mRect->updatePosition(bb, rMb);
 
-//  double sphereSize = 0.007/size;
 	mGraphicalPoint->setRadius(sphereSize);
 
     this->drawText();
-//	if (!mShowLabel)
-//		mText.reset();
-//	if (!mText && mShowLabel)
-//		mText.reset(new CaptionText3D(mView->getRenderer()));
-//	if (mText)
-//	{
-//		mText->setColor(mColor);
-//		mText->setText(mMetric->getName());
-//		mText->setPosition(p0_r);
-//		mText->setSize(mLabelSize / 100);
-//	}
 }
 
 }

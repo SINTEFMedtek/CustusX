@@ -20,6 +20,8 @@ namespace cx
 */
 
 typedef boost::shared_ptr<class ServiceController> ServiceControllerPtr;
+typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
 
 /**\brief Responsible for the entire logic layer.
  * \ingroup cxLogic
@@ -43,18 +45,21 @@ public:
 	*/
   static void shutdown();
 
+  SpaceProviderPtr getSpaceProvider();
+  DataFactoryPtr getDataFactory();
+
 private:
   /**
 	* Initialize all system services, resources and other static objects.
 	*/
-  static void initializeServices();
+  void initializeServices();
   /**
 	* Shutdown all system services, resources and other static objects.
 	*
 	* Deallocate all global resources.
 	* Assumes MainWindow already has been destroyed and the mainloop is exited.
 	*/
-  static void shutdownServices();
+  void shutdownServices();
 
   static LogicManager* mInstance;
   static void setInstance(LogicManager* instance);
@@ -66,9 +71,14 @@ private:
 	LogicManager& operator=(LogicManager const&); // not implemented
 
 	ServiceControllerPtr mServiceController;
+
+// services:
+	SpaceProviderPtr mSpaceProvider;
+	DataFactoryPtr mDataFactory;
+
 };
 
-//LogicManager* logicManager(); // if necessary
+LogicManager* logicManager(); // if necessary
 
 /**
 * @}

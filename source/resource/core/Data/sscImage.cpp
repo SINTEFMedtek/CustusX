@@ -43,6 +43,7 @@
 #include "sscUtilHelpers.h"
 #include "sscVolumeHelpers.h"
 #include "cxImageDefaultTFGenerator.h"
+#include "sscDataReaderWriter.h"
 
 #include "sscUnsignedDerivedImage.h"
 
@@ -96,6 +97,11 @@ void Image::ShadingStruct::parseXml(QDomNode dataNode)
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
+
+ImagePtr Image::create(const QString& uid, const QString& name)
+{
+	return ImagePtr(new Image(uid, vtkImageDataPtr(), name));
+}
 
 Image::~Image()
 {
@@ -509,6 +515,14 @@ double Image::loadAttribute(QDomNode dataNode, QString name, double defVal)
 	if (ok)
 		return val;
 	return defVal;
+}
+
+bool Image::load(QString path)
+{
+	vtkImageDataPtr raw;
+	raw = DataReaderWriter().loadVtkImageData(path);
+	this->setVtkImageData(raw);
+	return raw!=0;
 }
 
 void Image::parseXml(QDomNode& dataNode)

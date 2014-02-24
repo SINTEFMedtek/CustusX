@@ -68,11 +68,11 @@ ViewManager* ViewManager::getInstance()
 	return mTheInstance;
 }
 
-ViewManager* ViewManager::createInstance()
+ViewManager* ViewManager::createInstance(VisualizationServiceBackendPtr backend)
 {
 	if (mTheInstance == NULL)
 	{
-		mTheInstance = new ViewManager();
+		mTheInstance = new ViewManager(backend);
 		}
 	return mTheInstance;
 }
@@ -83,10 +83,11 @@ void ViewManager::destroyInstance()
 	mTheInstance = NULL;
 }
 
-ViewManager::ViewManager() :
+ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 				mGlobal2DZoom(true),
 				mGlobalObliqueOrientation(false)
 {
+	mBackend = backend;
 	mRenderLoop.reset(new RenderLoop());
 	connect(mRenderLoop.get(), SIGNAL(preRender()), this, SLOT(updateViews()));
 	connect(mRenderLoop.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int)));
@@ -539,7 +540,7 @@ void ViewManager::activate2DView(LayoutWidget* widget, int group, PLANE_TYPE pla
 	ViewWidget* view = widget->mViewCache2D->retrieveView();
 	view->setType(View::VIEW_2D);
 
-	ViewWrapper2DPtr wrapper(new ViewWrapper2D(view));
+	ViewWrapper2DPtr wrapper(new ViewWrapper2D(view, mBackend));
 	wrapper->initializePlane(plane);
 	this->activateView(widget, wrapper, group, region);
 }
@@ -548,7 +549,7 @@ void ViewManager::activate3DView(LayoutWidget* widget, int group, LayoutRegion r
 {
 	ViewWidget* view = widget->mViewCache3D->retrieveView();
 	view->setType(View::VIEW_3D);
-	ViewWrapper3DPtr wrapper(new ViewWrapper3D(group + 1, view));
+	ViewWrapper3DPtr wrapper(new ViewWrapper3D(group + 1, view, mBackend));
 	if (group == 0)
 	{
 		mInteractiveCropper->setView(view);
@@ -561,7 +562,7 @@ void ViewManager::activateRTStreamView(LayoutWidget *widget, int group, LayoutRe
 {
 	ViewWidget* view = widget->mViewCacheRT->retrieveView();
 	view->setType(View::VIEW_REAL_TIME);
-	ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view));
+	ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view, mBackend));
 	this->activateView(widget, wrapper, group, region);
 }
 
