@@ -27,6 +27,9 @@ class QDomDocument;
 
 namespace cx
 {
+
+class DataManager;
+
 /**
  * \file
  * \addtogroup cxServicePatient
@@ -57,7 +60,7 @@ class PatientData: public QObject
 {
 Q_OBJECT
 public:
-	PatientData();
+	explicit PatientData(DataManager* dataManager);
 	virtual ~PatientData();
 
 	QString getActivePatientFolder() const;
@@ -121,6 +124,7 @@ private:
 	//Patient
 	QString mActivePatientFolder; ///< Folder for storing the files for the active patient. Path relative to globalPatientDataFolder.
 	QDomDocument mWorkingDocument; ///< available during load and save, used to add/extract extra info from the file.
+	DataManager* mDataManager;
 };
 
 typedef boost::shared_ptr<PatientData> PatientDataPtr;

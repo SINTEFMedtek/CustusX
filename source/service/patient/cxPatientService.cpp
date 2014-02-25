@@ -17,6 +17,7 @@
 #include "cxFileHelpers.h"
 #include "cxDataLocations.h"
 #include "sscTypeConversions.h"
+#include "sscDataManager.h"
 
 namespace cx
 {
@@ -64,7 +65,7 @@ void PatientService::clearCache()
 PatientService::PatientService()
 {
 	this->clearCache();
-	mPatientData.reset(new PatientData());
+	mPatientData.reset(new PatientData(dataManager()));
 }
 
 PatientService::~PatientService()

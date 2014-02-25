@@ -38,6 +38,7 @@
 #include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkInteractorStyleTrackballActor.h"
 #include "vtkInteractorStyleFlight.h"
+#include "cxVisualizationServiceBackend.h"
 
 
 SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, CAMERA_STYLE_TYPE, cstCOUNT)
@@ -52,9 +53,10 @@ SNW_DEFINE_ENUM_STRING_CONVERTERS_END(cx, CAMERA_STYLE_TYPE, cstCOUNT)
 namespace cx
 {
 
-CameraStyleForView::CameraStyleForView() :
+CameraStyleForView::CameraStyleForView(VisualizationServiceBackendPtr backend) :
 	mCameraStyleForView(cstDEFAULT_STYLE),
-	mBlockCameraUpdate(false)
+	mBlockCameraUpdate(false),
+	mBackend(backend)
 {
 	connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(viewChangedSlot()));
 
@@ -64,7 +66,7 @@ CameraStyleForView::CameraStyleForView() :
 	mPreRenderListener.reset(new ViewportPreRenderListener);
 	mPreRenderListener->setCallback(boost::bind(&CameraStyleForView::onPreRender, this));
 
-	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(mBackend->getToolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 	this->dominantToolChangedSlot();
 	this->viewChangedSlot();
 }
@@ -151,7 +153,7 @@ void CameraStyleForView::moveCameraToolStyleSlot(Transform3D prMt, double timest
 	if (!camera)
 		return;
 
-	Transform3D rMpr = dataManager()->get_rMpr();
+	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
 
 	Transform3D rMt = rMpr * prMt;
 
@@ -204,7 +206,7 @@ void CameraStyleForView::viewChangedSlot()
 
 void CameraStyleForView::dominantToolChangedSlot()
 {
-	ToolPtr newTool = toolManager()->getDominantTool();
+	ToolPtr newTool = mBackend->getToolManager()->getDominantTool();
 	if (newTool == mFollowingTool)
 		return;
 
@@ -222,7 +224,7 @@ void CameraStyleForView::connectTool()
 	if (!this->isToolFollowingStyle(mCameraStyleForView))
 		return;
 
-	mFollowingTool = toolManager()->getDominantTool();
+	mFollowingTool = mBackend->getToolManager()->getDominantTool();
 
 	if (!mFollowingTool)
 		return;

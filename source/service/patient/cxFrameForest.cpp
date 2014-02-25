@@ -23,10 +23,10 @@ namespace cx
 /**Create a forest representing all Data objects and their spatial relationships.
  *
  */
-FrameForest::FrameForest()
+FrameForest::FrameForest(DataManager* dataManager) : mDataManager(dataManager)
 {
 //  std::cout << "Forrest doc2:" << std::endl;
-	DataManager::DataMap allData = dataManager()->getData();
+	DataManager::DataMap allData = mDataManager->getData();
 	mDocument.appendChild(mDocument.createElement("root"));
 
 	for (DataManager::DataMap::iterator iter = allData.begin(); iter != allData.end(); ++iter)
@@ -169,7 +169,7 @@ std::vector<DataPtr> FrameForest::getDataFromDescendantsAndSelf(QDomNode node)
 
 	for (unsigned i = 0; i < nodes.size(); ++i)
 	{
-		DataPtr data = dataManager()->getData(nodes[i].toElement().tagName());
+		DataPtr data = mDataManager->getData(nodes[i].toElement().tagName());
 		if (data)
 			retval.push_back(data);
 	}

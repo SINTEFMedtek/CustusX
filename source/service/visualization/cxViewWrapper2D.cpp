@@ -88,7 +88,7 @@ ViewWrapper2D::ViewWrapper2D(ViewWidget* view, VisualizationServiceBackendPtr ba
 	setZoom2D(SyncedValue::create(1));
 	setOrientationMode(SyncedValue::create(0)); // must set after addreps()
 
-	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(mBackend->getToolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 	connect(mView, SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
 	connect(mView, SIGNAL(showSignal(QShowEvent*)), this, SLOT(showSlot()));
 	connect(mView, SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mousePressSlot(QMouseEvent*)));
@@ -613,7 +613,7 @@ void ViewWrapper2D::pointMetricRemoved(const QString& uid)
 
 void ViewWrapper2D::dominantToolChangedSlot()
 {
-	ToolPtr dominantTool = toolManager()->getDominantTool();
+	ToolPtr dominantTool = mBackend->getToolManager()->getDominantTool();
 	mSliceProxy->setTool(dominantTool);
 }
 

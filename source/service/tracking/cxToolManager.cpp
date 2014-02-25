@@ -41,7 +41,6 @@
 #include "cxPlaybackTool.h"
 #include "sscLogger.h"
 #include "cxPlaybackTime.h"
-#include "sscDataManager.h"
 
 namespace cx
 {
@@ -213,8 +212,8 @@ void cxToolManager::initializeManualTool()
 		connect(mManualTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
 	}
 
-	Transform3D prMt = dataManager()->get_rMpr().inv() * createTransformRotateY(M_PI)
-					* createTransformRotateZ(M_PI/2);
+	Transform3D rMpr = Transform3D::Identity(); // not known: not really important either
+	Transform3D prMt = rMpr.inv() * createTransformRotateY(M_PI) * createTransformRotateZ(M_PI/2);
 	mManualTool->set_prMt(prMt);
 }
 

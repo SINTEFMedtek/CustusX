@@ -48,7 +48,7 @@ void ShadingWidget::init()
   shadingSpecularWidget->setEnabled(false);
   shadingSpecularPowerWidget->setEnabled(false);
 
-  mActiveImageProxy = ActiveImageProxy::New();
+  mActiveImageProxy = ActiveImageProxy::New(dataManager());
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 

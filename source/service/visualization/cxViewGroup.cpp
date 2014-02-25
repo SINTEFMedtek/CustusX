@@ -96,7 +96,7 @@ void Navigation::centerToGlobalDataCenter()
  */
 void Navigation::centerToTooltip()
 {
-	ToolPtr tool = toolManager()->getDominantTool();
+	ToolPtr tool = mBackend->getToolManager()->getDominantTool();
 	Vector3D p_pr = tool->get_prMt().coord(Vector3D(0, 0, tool->getTooltipOffset()));
 	Vector3D p_r = mBackend->getDataManager()->get_rMpr().coord(p_pr);
 
@@ -246,12 +246,7 @@ void ViewGroup::syncOrientationMode(SyncedValuePtr val)
 void ViewGroup::mouseClickInViewGroupSlot()
 {
 	std::vector<ImagePtr> images = mViewGroupData->getImages();
-	if (images.empty())
-	{
-		//Don't remove active image too easily
-		//dataManager()->setActiveImage(ImagePtr());
-	}
-	else
+	if (!images.empty())
 	{
 		if (!std::count(images.begin(), images.end(), mBackend->getDataManager()->getActiveImage()))
 		{
