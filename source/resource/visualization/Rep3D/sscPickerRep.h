@@ -105,7 +105,7 @@ protected:
 
 	View *mView;
 	bool mEnabled;
-	bool mConnected;
+	bool mConnected; ///< Interactor connected
 	ToolPtr mTool; ///< the connected tool
 	Vector3D mPickedPoint; ///< the last point that was successfully sampled from intersection with an image
 	double mSphereRadius;
