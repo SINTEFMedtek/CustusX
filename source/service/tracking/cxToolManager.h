@@ -90,8 +90,6 @@ public:
 	virtual ToolPtr getDominantTool(); ///< get the dominant tool
 	virtual void setDominantTool(const QString& uid); ///< can be set to either a connected or configured tool
 
-	void setClinicalApplication(CLINICAL_APPLICATION application);
-
 	virtual std::map<QString, QString> getToolUidsAndNames() const; ///< both from configured and connected tools
 	virtual std::vector<QString> getToolNames() const; ///< both from configured and connected tools
 	virtual std::vector<QString> getToolUids() const; ///< both from configured and connected tools
@@ -112,7 +110,7 @@ public:
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
 
 	void runDummyTool(DummyToolPtr tool);
-	ToolPtr findFirstProbe();
+	virtual ToolPtr findFirstProbe();
 
 	void setPlaybackMode(PlaybackTimePtr controller);
 
@@ -152,7 +150,6 @@ private:
 	QString mConfigurationFilePath; ///< path to the configuration file
 	QString mLoggingFolder; ///< path to where logging should be saved
 
-	CLINICAL_APPLICATION mApplication; ///< Current clinical application
 	ToolManager::ToolMap mTools; ///< all tools
 
 	ToolPtr mDominantTool; ///< the tool with highest priority

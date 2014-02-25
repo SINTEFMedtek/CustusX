@@ -90,10 +90,10 @@ SimulatedImageStreamerPtr DirectlyLinkedImageReceiverThread::createSimulatedImag
 {
 	SimulatedImageStreamerPtr streamer(new SimulatedImageStreamer());
 
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = toolManager()->findFirstProbe();
 	if(!tool)
 		messageManager()->sendDebug("No tool");
-	ImagePtr image = DataManager::getInstance()->getImage(mImageUidToSimulate);
+	ImagePtr image = dataManager()->getImage(mImageUidToSimulate);
 	if(!image)
 		messageManager()->sendDebug("No image with uid "+mImageUidToSimulate);
 

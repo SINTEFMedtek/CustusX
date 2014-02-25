@@ -123,7 +123,7 @@ VideoSourcePtr VideoService::getGuessForActiveVideoSource(VideoSourcePtr old)
 		return mUSAcquisitionVideoPlayback->getVideoSource();
 
 	// ask for active stream in first probe:
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = toolManager()->findFirstProbe();
 	if (tool && tool->getProbe() && tool->getProbe()->getRTSource())
 	{
 		// keep existing if present

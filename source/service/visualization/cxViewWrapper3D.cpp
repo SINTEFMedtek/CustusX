@@ -262,7 +262,7 @@ void ViewWrapper3D::PickerRepPointPickedSlot(Vector3D p_r)
 	Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
-	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
+	ManualToolPtr tool = mBackend->getToolManager()->getManualTool();
 	Vector3D offset = tool->get_prMt().vector(Vector3D(0, 0, tool->getTooltipOffset()));
 	p_pr -= offset;
 	p_r = rMpr.coord(p_pr);
@@ -338,7 +338,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
 	showRefTool->setDisabled(true);
 	showRefTool->setCheckable(true);
-	ToolPtr refTool = cxToolManager::getInstance()->getReferenceTool();
+	ToolPtr refTool = mBackend->getToolManager()->getReferenceTool();
 	if (refTool)
 	{
 		showRefTool->setText("Show " + refTool->getName());
@@ -498,7 +498,6 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 void ViewWrapper3D::showManualToolSlot(bool visible)
 {
 	settings()->setValue("showManualTool", visible);
-//  ToolManager::getInstance()->getManualTool()->setVisible(visible);
 }
 
 void ViewWrapper3D::showOrientationSlot(bool visible)

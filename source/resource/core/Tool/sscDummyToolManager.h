@@ -90,6 +90,8 @@ public:
 	 */
 	static void reset();
 	void addTool(DummyToolPtr tool);
+	virtual ToolPtr findFirstProbe() { return ToolPtr(); }
+
 
 private:
 	typedef DummyToolMap::iterator DummyToolMapIter;

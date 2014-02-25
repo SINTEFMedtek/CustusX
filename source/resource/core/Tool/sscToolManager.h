@@ -92,6 +92,7 @@ public:
 	virtual void parseXml(QDomNode& dataNode) = 0;
 	virtual void clear() = 0;
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime) = 0;
+	virtual ToolPtr findFirstProbe() = 0;
 
 signals:
 	void configured(); ///< system is configured

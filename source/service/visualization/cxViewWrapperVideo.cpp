@@ -158,7 +158,7 @@ void ViewWrapperVideo::connectStream()
 		uid = source->getUid();
 
 	ToolPtr newTool;
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
 	if (tool && tool->getProbe())
 	{
 		if (tool->getProbe()->getAvailableVideoSources().count(uid))

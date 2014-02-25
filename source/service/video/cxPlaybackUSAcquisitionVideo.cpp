@@ -196,7 +196,7 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 	mVideoSource->start();
 
 	// set the probe sector from file data:
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = toolManager()->findFirstProbe();
 	if (tool)
 	{
 		ProbePtr probe = boost::dynamic_pointer_cast<cxProbe>(tool->getProbe());
