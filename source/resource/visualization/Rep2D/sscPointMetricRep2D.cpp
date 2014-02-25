@@ -89,8 +89,6 @@ void PointMetricRep2D::onModifiedStartRender()
 	{
 		mDisk.reset(new GraphicalDisk());
 		mDisk->setRenderer(this->getRenderer());
-
-		mDisk->setRadius(mGraphicsSize);
 	}
 
 	if (!mDisk)

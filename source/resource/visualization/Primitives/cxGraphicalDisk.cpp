@@ -21,6 +21,7 @@
 #include <vtkProperty.h>
 #include <vtkSectorSource.h>
 #include "sscVtkHelperClasses.h"
+#include "vtkMatrix4x4.h"
 
 namespace cx
 {
@@ -28,10 +29,14 @@ namespace cx
 GraphicalDisk::GraphicalDisk() :
 	mOutlineWidth(0.1)
 {
+	mDirection = Vector3D::UnitZ();
+	std::cout << "GraphicalDisk::create " << mDirection << std::endl;
+
 	mRadius = 1;
 	mColor = QColor(Qt::blue);
 	mFillVisible = true;
 	mOutlineColor = QColor(Qt::magenta);
+	mUseLighting = false;
 }
 
 GraphicalDisk::~GraphicalDisk()
@@ -62,6 +67,16 @@ void GraphicalDisk::setColor(QColor color)
 void GraphicalDisk::setPosition(Vector3D pos)
 {
 	mPosition = pos;
+}
+void GraphicalDisk::setDirection(Vector3D direction)
+{
+	std::cout << "GraphicalDisk::setDirection " << direction << std::endl;
+
+	mDirection = direction;
+}
+void GraphicalDisk::setLighting(bool on)
+{
+	mUseLighting = on;
 }
 
 void GraphicalDisk::setRenderer(vtkRendererPtr renderer)
@@ -106,8 +121,8 @@ void GraphicalDisk::update()
 	mCircleActor->GetProperty()->SetColor(getColorAsVector3D(mColor).begin());
 	mOutlineActor->GetProperty()->SetColor(getColorAsVector3D(mOutlineColor).begin());
 
-	mCircleActor->SetPosition(mPosition[0], mPosition[1], mPosition[2]);
-	mOutlineActor->SetPosition(mPosition[0], mPosition[1], mPosition[2]);
+//	mCircleActor->SetPosition(mPosition[0], mPosition[1], mPosition[2]);
+//	mOutlineActor->SetPosition(mPosition[0], mPosition[1], mPosition[2]);
 //	mOutlineSource->SetZCoord(0.01);
 //	mCircleSource->SetZCoord(0.01);
 
@@ -117,6 +132,8 @@ void GraphicalDisk::update()
 	mOutlineSource->SetOuterRadius(mRadius);
 
 	mCircleActor->SetVisibility(mFillVisible);
+
+	this->updateOrientation();
 }
 
 void GraphicalDisk::createActors()
@@ -124,33 +141,68 @@ void GraphicalDisk::createActors()
 	if (mCircleActor)
 		return;
 
+	int resolution = 40;
+
 	mCircleSource = vtkSectorSourcePtr::New();
 	mCircleSource->SetOuterRadius(mRadius);
 	mCircleSource->SetInnerRadius(0);
 	mCircleSource->SetStartAngle(0);
 	mCircleSource->SetEndAngle(360);
-	mCircleSource->SetCircumferentialResolution(20);
+	mCircleSource->SetCircumferentialResolution(resolution);
 	vtkPolyDataMapperPtr mapper = vtkPolyDataMapperPtr::New();
 	mapper->SetInput(mCircleSource->GetOutput());
 	mapper->ScalarVisibilityOff();
 	mCircleActor = vtkActorPtr::New();
 	mCircleActor->SetMapper(mapper);
-	mCircleActor->GetProperty()->LightingOff();
-//	mRenderer->AddActor(mCircleActor);
+	mCircleActor->GetProperty()->SetLighting(mUseLighting);
 
 	mOutlineSource = vtkSectorSourcePtr::New();
 	mOutlineSource->SetOuterRadius(mRadius);
 	mOutlineSource->SetInnerRadius(0);
 	mOutlineSource->SetStartAngle(0);
 	mOutlineSource->SetEndAngle(360);
-	mOutlineSource->SetCircumferentialResolution(20);
+	mOutlineSource->SetCircumferentialResolution(resolution);
 	vtkPolyDataMapperPtr outlineMapper = vtkPolyDataMapperPtr::New();
 	outlineMapper->SetInput(mOutlineSource->GetOutput());
 	outlineMapper->ScalarVisibilityOff();
 	mOutlineActor = vtkActorPtr::New();
 	mOutlineActor->SetMapper(outlineMapper);
-	mOutlineActor->GetProperty()->LightingOff();
-//	mRenderer->AddActor(mOutlineActor);
+	mOutlineActor->GetProperty()->SetLighting(mUseLighting);
+}
+
+
+void GraphicalDisk::updateOrientation()
+{
+//	Transform3D M = createTransformRotationBetweenVectors(Vector3D::UnitX(), mDirection.normal());
+
+	Vector3D from = Vector3D::UnitZ();
+	Transform3D M;
+	bool directionAlongYAxis = similar(dot(from, mDirection.normal()), 1.0);
+
+	if (directionAlongYAxis)
+	{
+		M = Transform3D::Identity();
+	}
+	else
+	{
+		Vector3D newXAxis = cross(from, mDirection).normal();
+		Vector3D newZAxis = mDirection;
+		Vector3D ivec = newXAxis;
+		Vector3D jvec = cross(newZAxis, newXAxis);
+		Vector3D center = Vector3D::Zero();
+		M = createTransformIJC(ivec, jvec, center);
+
+	}
+
+	Transform3D T = createTransformTranslate(mPosition);
+	M = T*M;
+
+	mCircleActor->SetUserMatrix(M.getVtkMatrix());
+	mOutlineActor->SetUserMatrix(M.getVtkMatrix());
+
+//		mCircleActor->SetPosition(mPosition[0], mPosition[1], mPosition[2]);
+//		mOutlineActor->SetPosition(mPosition[0], mPosition[1], mPosition[2]);
+
 }
 
 } // namespace cx

@@ -30,6 +30,7 @@
 #include "sscGraphicalPrimitives.h"
 #include "vtkMatrix4x4.h"
 #include "cxGraphicalTorus3D.h"
+#include "cxGraphicalDisk.h"
 
 namespace cx
 {
@@ -55,6 +56,7 @@ void DonutMetricRep::clear()
 {
 	DataMetricRep::clear();
 	mTorus.reset();
+	mDisk.reset();
 }
 
 DonutMetricPtr DonutMetricRep::getDonutMetric()
@@ -63,6 +65,17 @@ DonutMetricPtr DonutMetricRep::getDonutMetric()
 }
 
 void DonutMetricRep::onModifiedStartRender()
+{
+	if (!mMetric)
+		return;
+
+//	this->updateTorus();
+	this->updateDisc();
+
+	this->drawText();
+}
+
+void DonutMetricRep::updateTorus()
 {
 	if (!mMetric)
 		return;
@@ -80,8 +93,48 @@ void DonutMetricRep::onModifiedStartRender()
 	mTorus->setRadius(donut->getRadius());
 	mTorus->setThickness(donut->getThickness());
 	mTorus->setColor(donut->getColor());
+}
 
-	this->drawText();
+void DonutMetricRep::updateDisc()
+{
+	if (!mMetric)
+		return;
+
+	if (!mDisk && mView && mMetric)
+	{
+		mDisk.reset(new GraphicalDisk());
+		mDisk->setRenderer(this->getRenderer());
+	}
+
+	if (!mDisk)
+		return;
+
+	DonutMetricPtr donut = this->getDonutMetric();
+	mDisk->setPosition(donut->getPosition());
+	mDisk->setDirection(donut->getDirection());
+	mDisk->setRadius(donut->getRadius());
+//	mTorus->setThickness(donut->getThickness());
+	mDisk->setColor(donut->getColor());
+	mDisk->setOutlineColor(donut->getColor());
+	mDisk->setOutlineWidth(0.25);
+	mDisk->setFillVisible(false);
+	mDisk->setLighting(true);
+
+//	Vector3D position = mSliceProxy->get_sMr() * mMetric->getRefCoord();
+
+//	mDisk->setColor(mMetric->getColor());
+//	mDisk->setOutlineColor(mMetric->getColor());
+//	mDisk->setOutlineWidth(0.25);
+//	mDisk->setFillVisible(false);
+
+//	mDisk->setRadius(this->findDiskRadius(position));
+
+//	Vector3D projectedPosition = position;
+//	double offsetFromXYPlane = 0.01;
+//	projectedPosition[2] = offsetFromXYPlane;
+//	mDisk->setPosition(projectedPosition);
+
+	mDisk->update();
 }
 
 }
