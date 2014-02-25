@@ -29,6 +29,9 @@
 
 #include "sscSliceProxy.h"
 #include "sscView.h"
+#include "cxGraphicalDisk.h"
+#include "sscLogger.h"
+
 namespace cx
 {
 
@@ -39,11 +42,8 @@ PointMetricRep2DPtr PointMetricRep2D::New(const QString& uid, const QString& nam
 }
 
 PointMetricRep2D::PointMetricRep2D(const QString& uid, const QString& name) :
-    DataMetricRep(uid, name),
-	mOutlineWidth(0.1)
-{
-	mFillVisible = true;
-	mOutlineColor = Vector3D(1,1,1) - this->getColorAsVector3D();
+	DataMetricRep(uid, name)
+{	
 }
 
 void PointMetricRep2D::setDynamicSize(bool on)
@@ -68,8 +68,8 @@ void PointMetricRep2D::addRepActorsToViewRenderer(View* view)
 
 void PointMetricRep2D::removeRepActorsFromViewRenderer(View* view)
 {
-    mView->getRenderer()->RemoveActor(mCircleActor);
-	mView->getRenderer()->RemoveActor(mOutlineActor);
+	mDisk.reset();
+
 	if (mViewportListener)
 		mViewportListener->stopListen();
     DataMetricRep::removeRepActorsFromViewRenderer(view);
@@ -85,98 +85,56 @@ void PointMetricRep2D::onModifiedStartRender()
 	if (!mMetric)
 		return;
 
-	if (!mCircleActor && mView && mMetric && mSliceProxy)
+	if (!mDisk && mView && mMetric && mSliceProxy)
 	{
-		mCircleSource = vtkSectorSourcePtr::New();
-		mCircleSource->SetOuterRadius(mGraphicsSize);
-		mCircleSource->SetInnerRadius(0);
-		mCircleSource->SetStartAngle(0);
-		mCircleSource->SetEndAngle(360);
-		mCircleSource->SetCircumferentialResolution(20);
-		vtkPolyDataMapperPtr mapper = vtkPolyDataMapperPtr::New();
-		mapper->SetInput(mCircleSource->GetOutput());
-		mapper->ScalarVisibilityOff();
-		mCircleActor = vtkActorPtr::New();
-		mCircleActor->SetMapper(mapper);
-		mCircleActor->GetProperty()->LightingOff();
-		mView->getRenderer()->AddActor(mCircleActor);
+		mDisk.reset(new GraphicalDisk());
+		mDisk->setRenderer(this->getRenderer());
 
-		mOutlineSource = vtkSectorSourcePtr::New();
-		mOutlineSource->SetOuterRadius(mGraphicsSize);
-		mOutlineSource->SetInnerRadius(0);
-		mOutlineSource->SetStartAngle(0);
-		mOutlineSource->SetEndAngle(360);
-		mOutlineSource->SetCircumferentialResolution(20);
-		vtkPolyDataMapperPtr outlineMapper = vtkPolyDataMapperPtr::New();
-		outlineMapper->SetInput(mOutlineSource->GetOutput());
-		outlineMapper->ScalarVisibilityOff();
-		mOutlineActor = vtkActorPtr::New();
-		mOutlineActor->SetMapper(outlineMapper);
-		mOutlineActor->GetProperty()->LightingOff();
-		mView->getRenderer()->AddActor(mOutlineActor);
+		mDisk->setRadius(mGraphicsSize);
 	}
 
-	if (!mCircleActor)
+	if (!mDisk)
 		return;
 
-	Vector3D color = this->getColorAsVector3D();
-	mCircleActor->GetProperty()->SetColor(color[0], color[1], color[2]);
-	mOutlineActor->GetProperty()->SetColor(mOutlineColor[0], mOutlineColor[1], mOutlineColor[2]);
-
 	Vector3D position = mSliceProxy->get_sMr() * mMetric->getRefCoord();
-	mCircleActor->SetPosition(position[0], position[1], 0.0);
-	mOutlineActor->SetPosition(position[0], position[1], 0.0);
-	mOutlineSource->SetZCoord(0.01);
-	mCircleSource->SetZCoord(0.01);
 
-	if (abs(position[2]) > mGraphicsSize)
+	mDisk->setColor(mMetric->getColor());
+	mDisk->setOutlineColor(mMetric->getColor());
+	mDisk->setOutlineWidth(0.25);
+	mDisk->setFillVisible(false);
+
+	mDisk->setRadius(this->findDiskRadius(position));
+
+	Vector3D projectedPosition = position;
+	double offsetFromXYPlane = 0.01;
+	projectedPosition[2] = offsetFromXYPlane;
+	mDisk->setPosition(projectedPosition);
+
+	mDisk->update();
+}
+
+double PointMetricRep2D::findDiskRadius(Vector3D position)
+{
+	double radius = mGraphicsSize;
+	if (mViewportListener)
 	{
-		mCircleSource->SetOuterRadius(0);
-		mOutlineSource->SetOuterRadius(0);
-		mOutlineSource->SetInnerRadius(0);
+		double size = mViewportListener->getVpnZoom();
+		radius = mGraphicsSize / 100 / size * 2.5;
+	}
+
+//	double radius = mGraphicsSize;
+	if (abs(position[2]) > radius)
+	{
+		radius = 0;
 	}
 	else
 	{
-		double sphereSize = mGraphicsSize;
-		if (mViewportListener)
-		{
-			double size = mViewportListener->getVpnZoom();
-			sphereSize = mGraphicsSize / 100 / size * 2.5;
-		}
-
-		double radius = sphereSize*cos(asin(position[2]/sphereSize));
-
-		mCircleSource->SetOuterRadius(radius*(1.0 - mOutlineWidth));
-		mOutlineSource->SetInnerRadius(radius*(1.0 - mOutlineWidth));
-		mOutlineSource->SetOuterRadius(radius);
+		radius = radius*cos(asin(position[2]/radius));
 	}
 
-//	if (!mShowLabel)
-//		mText.reset();
-//	if (!mText && mShowLabel && mView)
-//		mText.reset(new CaptionText3D(mView->getRenderer()));
-//	if (mText)
-//	{
-//		mText->setColor(mColor);
-//		mText->setText(mMetric->getName());
-////		mText->setPosition(p0_r);
-//		mText->setSize(mLabelSize / 100);
-//	}
-
-	mCircleActor->SetVisibility(mFillVisible);
+	return radius;
 }
 
-void PointMetricRep2D::setFillVisibility(bool on)
-{
-	mFillVisible = on;
-}
-
-/**Note: Internal method!
- *
- * Scale the text to be a constant fraction of the viewport height
- * Called from a vtk camera observer
- *
- */
 void PointMetricRep2D::rescale()
 {
 	this->setModified();
@@ -189,18 +147,6 @@ void PointMetricRep2D::setSliceProxy(SliceProxyPtr sliceProxy)
 	mSliceProxy = sliceProxy;
 	if (mSliceProxy)
 		connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(setModified()));
-	this->setModified();
-}
-
-void PointMetricRep2D::setOutlineWidth(double width)
-{
-	mOutlineWidth = width;
-	this->setModified();
-}
-
-void PointMetricRep2D::setOutlineColor(double red, double green, double blue)
-{
-	mOutlineColor = Vector3D(red, green, blue);
 	this->setModified();
 }
 
