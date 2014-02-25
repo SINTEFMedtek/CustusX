@@ -80,9 +80,10 @@ double vtkMultiVolumePicker::IntersectVolumeWithLine(const double p1[3],
 			vtkMatrix4x4Ptr rMd0 = prop->GetUserMatrix();
 			vtkTransformPtr d0Mdi = multivolumeMapper->GetAdditionalInputUserTransform(i); //transform is d0Mdi
 			vtkTransformPtr rMdi = this->calculate_rMdi(rMd0, d0Mdi);
-
 			double newOrigin[3];
 			rMdi->GetPosition(newOrigin);
+			this->calculateNewOrigin(newOrigin, rMd0);
+
 			vtkImageDataPtr image = multivolumeMapper->GetInput(i+1);
 			vtkImageDataPtr tempImage = this->generateImageCopyAndMoveOrigin(image, newOrigin);
 
@@ -94,7 +95,10 @@ double vtkMultiVolumePicker::IntersectVolumeWithLine(const double p1[3],
 			volume->SetProperty(property);
 
 			double tempRetval = this->Superclass::IntersectVolumeWithLine(p1, p2, t1, t2, volume, singleVolumeMapper);
+
 			retval = fmin(retval, tempRetval);
+			if(similar(retval, tempRetval))
+				this->storeFoundImage(image, singleVolumeMapper);
 		}
 
 		return retval;
@@ -107,14 +111,28 @@ vtkTransformPtr vtkMultiVolumePicker::calculate_rMdi(vtkMatrix4x4Ptr rMd0, vtkTr
 {
 	if (!rMd0)
 	{
+		std::cout << "vtkMultiVolumePicker::calculate_rMdi(): No rMd0, setting it to identity" << std::endl;
 		rMd0 = vtkMatrix4x4Ptr::New();
 		rMd0->Identity();
 	}
 
-	vtkTransformPtr retval = d0Mdi;
+	vtkTransformPtr retval = vtkTransformPtr::New();
+	retval->DeepCopy(d0Mdi);
 	retval->PostMultiply();
 	retval->Concatenate(rMd0);
 	return retval;
+}
+
+void vtkMultiVolumePicker::calculateNewOrigin(double* newOrigin, vtkMatrix4x4Ptr rMd0)
+{
+	double oldOrigin[3];
+	oldOrigin[0] = rMd0->GetElement(0, 3);
+	oldOrigin[1] = rMd0->GetElement(1, 3);
+	oldOrigin[2] = rMd0->GetElement(2, 3);
+
+	newOrigin[0] = newOrigin[0] - oldOrigin[0];
+	newOrigin[1] = newOrigin[1] - oldOrigin[1];
+	newOrigin[2] = newOrigin[2] - oldOrigin[2];
 }
 
 vtkImageDataPtr vtkMultiVolumePicker::generateImageCopyAndMoveOrigin(vtkImageDataPtr image, double* newOrigin)
@@ -136,4 +154,13 @@ vtkVolumeTextureMapper3DPtr vtkMultiVolumePicker::generateSingleVolumeMapper(vtk
 	return singleVolumeMapper;
 }
 
+bool vtkMultiVolumePicker::similar(double a, double b, double tol)
+{
+	return fabs(b - a) < tol;
+}
 
+void vtkMultiVolumePicker::storeFoundImage(vtkDataSet* image, vtkAbstractVolumeMapper* mapper)
+{
+	this->DataSet = image;
+	this->Mapper = mapper;
+}
