@@ -26,6 +26,7 @@ namespace cx
 
 typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
 typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
+typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 
 /**
 * \file
@@ -44,7 +45,7 @@ class VideoConnectionManager: public QObject
 {
 Q_OBJECT
 public:
-	VideoConnectionManager();
+	explicit VideoConnectionManager(VideoServiceBackendPtr backend);
 	virtual ~VideoConnectionManager();
 
 	StringDataAdapterXmlPtr getConnectionMethod();
@@ -104,6 +105,7 @@ private:
 
 	StringDataAdapterXmlPtr mConnectionMethod;
 	XmlOptionFile mOptions;
+	VideoServiceBackendPtr mBackend;
 
 };
 typedef boost::shared_ptr<VideoConnectionManager> VideoConnectionManagerPtr;

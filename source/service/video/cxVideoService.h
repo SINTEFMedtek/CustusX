@@ -32,8 +32,8 @@ namespace cx
 typedef boost::shared_ptr<class USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;
 typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
+typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 
-//typedef boost::shared_ptr<class OpenIGTLinkDirectLinkRTSource> OpenIGTLinkDirectLinkRTSourcePtr;
 
 
 /**
@@ -87,7 +87,7 @@ Q_OBJECT
 public:
 	static VideoService* getInstance();
 
-	static void initialize();
+	static void initialize(VideoServiceBackendPtr videoBackend);
 	static void shutdown();
 
 	VideoConnectionManagerPtr getVideoConnection();
@@ -117,7 +117,7 @@ private:
 	static VideoService* mInstance;
 	static void setInstance(VideoService* instance);
 
-	VideoService();
+	VideoService(VideoServiceBackendPtr videoBackend);
 	virtual ~VideoService();
 
 	VideoService(VideoService const&); // not implemented
@@ -142,6 +142,7 @@ private:
 	VideoSourcePtr mActiveVideoSource;
 	VideoSourcePtr mEmptyVideoSource;
 	USAcquisitionVideoPlaybackPtr mUSAcquisitionVideoPlayback;
+	VideoServiceBackendPtr mBackend;
 };
 
 VideoService* videoService();

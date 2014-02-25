@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxVisualizationServiceBackend.h"
+#include "cxVideoServiceBackend.h"
 
 #include "sscDataManager.h"
 #include "sscToolManager.h"
@@ -21,38 +21,37 @@
 namespace cx
 {
 
-VisualizationServiceBackend::VisualizationServiceBackend(DataManager* dataManager,
-														 ToolManager* toolManager,
-														 VideoService* videoService,
-														 SpaceProviderPtr spaceProvider) :
+VideoServiceBackendPtr VideoServiceBackend::create(DataManager* dataManager,
+							ToolManager* toolManager,
+							SpaceProviderPtr spaceProvider)
+{
+	return VideoServiceBackendPtr(new VideoServiceBackend(dataManager, toolManager, spaceProvider));
+}
+
+VideoServiceBackend::VideoServiceBackend(DataManager* dataManager,
+							ToolManager* toolManager,
+							SpaceProviderPtr spaceProvider) :
 	mDataManager(dataManager),
 	mToolManager(toolManager),
-	mSpaceProvider(spaceProvider),
-  mVideoService(videoService)
+	mSpaceProvider(spaceProvider)
 {
 
 }
 
-DataManager* VisualizationServiceBackend::getDataManager()
+DataManager* VideoServiceBackend::getDataManager()
 {
 	return mDataManager;
 }
 
-ToolManager* VisualizationServiceBackend::getToolManager()
+ToolManager* VideoServiceBackend::getToolManager()
 {
 	return mToolManager;
 }
 
-VideoService* VisualizationServiceBackend::getVideoService()
-{
-	return mVideoService;
-}
-
-SpaceProviderPtr VisualizationServiceBackend::getSpaceProvider()
+SpaceProviderPtr VideoServiceBackend::getSpaceProvider()
 {
 	return mSpaceProvider;
 }
-
 
 } // namespace cx
 

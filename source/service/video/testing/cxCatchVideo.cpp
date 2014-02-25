@@ -27,6 +27,7 @@
 #include "cxtestSender.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
+#include "sscDataManager.h"
 
 namespace cxtest
 {
@@ -53,7 +54,7 @@ cx::SimulatedImageStreamerPtr createRunningSimulatedImageStreamer(TestSenderPtr&
 	cx::SimulatedImageStreamerPtr imagestreamer(new cx::SimulatedImageStreamer());
 	REQUIRE(imagestreamer);
 
-	imagestreamer->initialize(image, tool);
+	imagestreamer->initialize(image, tool, cx::dataManager());
 	REQUIRE(imagestreamer->startStreaming(sender));
 	return imagestreamer;
 }
