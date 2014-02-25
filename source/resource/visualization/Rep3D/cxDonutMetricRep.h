@@ -31,6 +31,7 @@ typedef boost::shared_ptr<class GraphicalTorus3D> GraphicalTorus3DPtr;
 
 typedef boost::shared_ptr<class DonutMetricRep> DonutMetricRepPtr;
 typedef boost::shared_ptr<class DonutMetric> DonutMetricPtr;
+typedef boost::shared_ptr<class GraphicalDisk> GraphicalDiskPtr;
 
 /**Rep for visualizing a DonutMetric.
  *
@@ -57,8 +58,11 @@ private:
 	DonutMetricRep(const QString& uid, const QString& name = "");
 	DonutMetricRep(); ///< not implemented
 	DonutMetricPtr getDonutMetric();
+	void updateTorus();
+	void updateDisc();
 
 	GraphicalTorus3DPtr mTorus;
+	GraphicalDiskPtr mDisk;
 };
 
 }

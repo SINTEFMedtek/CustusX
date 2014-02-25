@@ -95,6 +95,7 @@ void GraphicalTorus3D::setDirection(Vector3D direction)
 
 void GraphicalTorus3D::updateOrientation()
 {
+//	Transform3D M = createTransformRotationBetweenVectors(Vector3D::UnitY(), mDirection.normal());
 	Transform3D M;
 	bool directionAlongYAxis = similar(dot(Vector3D::UnitY(), mDirection.normal()), 1.0);
 

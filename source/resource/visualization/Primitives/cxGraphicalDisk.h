@@ -40,19 +40,24 @@ public:
 	void setOutlineWidth(double width);
 	void setColor(QColor color);
 	void setFillVisible(bool val);
+	void setLighting(bool on);
 
 	void setPosition(Vector3D pos);
+	void setDirection(Vector3D direction);
+
 	void update();
 
 private:
 	void createActors();
 	void addActors();
 	void removeActors();
+	void updateOrientation();
 
 	vtkRendererPtr mRenderer;
 
 	double mRadius;
 	Vector3D mPosition;
+	Vector3D mDirection;
 
 	vtkActorPtr mCircleActor;
 	vtkSectorSourcePtr mCircleSource;
@@ -62,7 +67,7 @@ private:
 	QColor mOutlineColor;
 	QColor mColor;
 	bool mFillVisible;
-
+	bool mUseLighting;
 };
 typedef boost::shared_ptr<GraphicalDisk> GraphicalDiskPtr;
 
