@@ -724,7 +724,7 @@ Vector3D ViewWrapper2D::qvp2vp(QPoint pos_qvp)
 void ViewWrapper2D::shiftAxisPos(Vector3D delta_vp)
 {
 	delta_vp = -delta_vp;
-	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
+	ManualToolPtr tool = mBackend->getToolManager()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
 	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
@@ -744,7 +744,7 @@ void ViewWrapper2D::shiftAxisPos(Vector3D delta_vp)
  */
 void ViewWrapper2D::setAxisPos(Vector3D click_vp)
 {
-	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
+	ManualToolPtr tool = mBackend->getToolManager()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
 	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();

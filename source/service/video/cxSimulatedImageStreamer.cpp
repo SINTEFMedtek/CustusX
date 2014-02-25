@@ -34,7 +34,7 @@ SimulatedImageStreamer::~SimulatedImageStreamer()
 void SimulatedImageStreamer::initialize()
 {
 	ImagePtr image = dataManager()->getActiveImage();
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = toolManager()->findFirstProbe();
 	this->initialize(image, tool);
 }
 

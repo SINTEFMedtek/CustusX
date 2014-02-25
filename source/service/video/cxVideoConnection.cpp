@@ -168,7 +168,7 @@ void VideoConnection::disconnectServer()
 	for (unsigned i=0; i<mSources.size(); ++i)
 		mSources[i]->setInput(ImagePtr());
 
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = toolManager()->findFirstProbe();
 	if (tool && tool->getProbe())
 		this->removeSourceFromProbe(tool);
 
@@ -187,7 +187,7 @@ void VideoConnection::clientFinishedSlot()
 
 void VideoConnection::useUnusedProbeDataSlot()
 {
-	disconnect(cxToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+	disconnect(toolManager(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
 	for (std::vector<ProbeDefinitionPtr>::const_iterator citer = mUnsusedProbeDataVector.begin(); citer != mUnsusedProbeDataVector.end(); ++citer)
 		this->updateStatus(*citer);
 	mUnsusedProbeDataVector.clear();
@@ -199,12 +199,12 @@ void VideoConnection::useUnusedProbeDataSlot()
  */
 void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 {
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = toolManager()->findFirstProbe();
 	if (!tool || !tool->getProbe())
 	{
 		//Don't throw away the ProbeData. Save it until it can be used
 		if (mUnsusedProbeDataVector.empty())
-			connect(cxToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+			connect(toolManager(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
 		mUnsusedProbeDataVector.push_back(msg);
 		return;
 	}
@@ -298,7 +298,7 @@ void VideoConnection::setImageToStream(QString uid)
  */
 void VideoConnection::connectVideoToProbe()
 {
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = toolManager()->findFirstProbe();
 	if (!tool)
 		return;
 

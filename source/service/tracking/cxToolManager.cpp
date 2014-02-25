@@ -663,11 +663,6 @@ void cxToolManager::setDominantTool(const QString& uid)
 	emit dominantToolChanged(uid);
 }
 
-void cxToolManager::setClinicalApplication(CLINICAL_APPLICATION application)
-{
-	mApplication = application;
-}
-
 std::map<QString, QString> cxToolManager::getToolUidsAndNames() const
 {
 	std::map<QString, QString> uidsAndNames;
