@@ -19,20 +19,10 @@
 
 #include "sscDataManagerImpl.h"
 
-#include <sstream>
 #include <vtkImageData.h>
-#include <vtkMetaImageReader.h>
-#include <vtkSmartPointer.h>
-#include <vtkMetaImageWriter.h>
 
 #include <vtkPolyData.h>
-#include <vtkPolyDataReader.h>
 #include <vtkPolyDataWriter.h>
-#include <vtkSTLReader.h>
-#include <vtkImageChangeInformation.h>
-#include "vtkMINCImageReader.h"
-#include "vtkTransform.h"
-#include "vtkCommand.h"
 
 #include <QtCore>
 #include <QDomDocument>
@@ -47,7 +37,6 @@
 #include "sscTypeConversions.h"
 #include "sscUtilHelpers.h"
 #include "sscVideoSource.h"
-#include "sscCustomMetaImage.h"
 
 #include "sscImageLUT2D.h"
 #include "sscImageTF3D.h"
@@ -449,11 +438,6 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 
 void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 {
-//	QDomNode toolManagerNode = dataManagerNode.parentNode().namedItem("toolManager");
-//	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
-//	QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
-//	toolManager()->parseXml(toolmanagerNode);
-
 	// look in the toolmanager, for backwards compatibility (2014-02-21)
 	QDomNode toolManagerNode = dataManagerNode.parentNode().namedItem("toolManager");
 

@@ -40,7 +40,7 @@ TEST_CASE("ImageAlgorithms: resample() works", "[unit][resource][core]")
 
 	cx::Transform3D refMi = referenceImage->get_rMd().inv() * image->get_rMd();
 
-	cx::ImagePtr oriented = resampleImage(image, refMi);
+	cx::ImagePtr oriented = resampleImage(dataManager(), image, refMi);
 	REQUIRE(oriented);
 	int inMin = image->getBaseVtkImageData()->GetScalarRange()[0];
 	int inMax = image->getBaseVtkImageData()->GetScalarRange()[1];
@@ -71,7 +71,7 @@ TEST_CASE("ImageAlgorithms: resample() works", "[unit][resource][core]")
 
 	oriented->setCroppingBox(bb_crop);
 
-	cx::ImagePtr cropped = cropImage(oriented);
+	cx::ImagePtr cropped = cropImage(dataManager(), oriented);
 	REQUIRE(cropped);
 	int cropMin = cropped->getBaseVtkImageData()->GetScalarRange()[0];
 	int cropMax = cropped->getBaseVtkImageData()->GetScalarRange()[1];
@@ -85,7 +85,7 @@ TEST_CASE("ImageAlgorithms: resample() works", "[unit][resource][core]")
 	QString uid = image->getUid() + "_resample%1";
 	QString name = image->getName() + " resample%1";
 
-	cx::ImagePtr resampled = cx::resampleImage(cropped, cx::Vector3D(referenceImage->getBaseVtkImageData()->GetSpacing()), uid, name);
+	cx::ImagePtr resampled = cx::resampleImage(dataManager(), cropped, cx::Vector3D(referenceImage->getBaseVtkImageData()->GetSpacing()), uid, name);
 	REQUIRE(resampled);
 	outMin = resampled->getBaseVtkImageData()->GetScalarRange()[0];
 	outMax = resampled->getBaseVtkImageData()->GetScalarRange()[1];

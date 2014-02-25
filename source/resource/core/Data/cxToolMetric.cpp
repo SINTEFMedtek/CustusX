@@ -14,7 +14,6 @@
 
 #include "cxToolMetric.h"
 #include "sscTool.h"
-#include "sscToolManager.h"
 #include "sscTypeConversions.h"
 
 namespace cx

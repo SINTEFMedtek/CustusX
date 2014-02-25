@@ -21,7 +21,6 @@
 
 #include "sscBoundingBox3D.h"
 #include "sscTool.h"
-#include "sscToolManager.h"
 #include "sscTypeConversions.h"
 #include "cxSpaceListener.h"
 #include "cxSpaceProvider.h"

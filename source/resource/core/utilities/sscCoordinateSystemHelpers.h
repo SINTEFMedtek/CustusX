@@ -1,10 +1,11 @@
 #ifndef SSCCOORDINATESYSTEMHELPERS_H_
 #define SSCCOORDINATESYSTEMHELPERS_H_
 
-#include "sscTransform3D.h"
+//#include "sscTransform3D.h"
 #include "sscDefinitions.h"
 #include "sscForwardDeclarations.h"
 #include <vector>
+#include <QString>
 
 namespace cx
 {

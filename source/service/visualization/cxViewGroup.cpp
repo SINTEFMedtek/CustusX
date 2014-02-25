@@ -34,9 +34,16 @@
 #include "sscManualTool.h"
 #include "sscVolumeHelpers.h"
 #include "sscTypeConversions.h"
+#include "cxVisualizationServiceBackend.h"
 
 namespace cx
 {
+
+Navigation::Navigation(VisualizationServiceBackendPtr backend) :
+	mBackend(backend)
+{
+
+}
 
 /**Place the global center to the center of the image.
  */
@@ -47,7 +54,7 @@ void Navigation::centerToData(DataPtr image)
 	Vector3D p_r = image->get_rMd().coord(image->boundingBox().center());
 
 	// set center to calculated position
-	dataManager()->setCenter(p_r);
+	mBackend->getDataManager()->setCenter(p_r);
 	CameraControl().translateByFocusTo(p_r);
 	this->centerManualTool(p_r);
 }
@@ -61,7 +68,7 @@ void Navigation::centerToView(const std::vector<DataPtr>& images)
 	std::cout << "center ToView: " << images.size() << " - " << p_r << std::endl;
 
 	// set center to calculated position
-	dataManager()->setCenter(p_r);
+	mBackend->getDataManager()->setCenter(p_r);
 	CameraControl().translateByFocusTo(p_r);
 	this->centerManualTool(p_r);
 //  std::cout << "Centered to view." << std::endl;
@@ -72,13 +79,13 @@ void Navigation::centerToView(const std::vector<DataPtr>& images)
  */
 void Navigation::centerToGlobalDataCenter()
 {
-	if (dataManager()->getData().empty())
+	if (mBackend->getDataManager()->getData().empty())
 		return;
 
 	Vector3D p_r = this->findGlobalDataCenter();
 
 	// set center to calculated position
-	dataManager()->setCenter(p_r);
+	mBackend->getDataManager()->setCenter(p_r);
 	CameraControl().translateByFocusTo(p_r);
 	this->centerManualTool(p_r);
 //  std::cout << "Centered to all images." << std::endl;
@@ -91,10 +98,10 @@ void Navigation::centerToTooltip()
 {
 	ToolPtr tool = toolManager()->getDominantTool();
 	Vector3D p_pr = tool->get_prMt().coord(Vector3D(0, 0, tool->getTooltipOffset()));
-	Vector3D p_r = dataManager()->get_rMpr().coord(p_pr);
+	Vector3D p_r = mBackend->getDataManager()->get_rMpr().coord(p_pr);
 
 	// set center to calculated position
-	dataManager()->setCenter(p_r);
+	mBackend->getDataManager()->setCenter(p_r);
 	CameraControl().translateByFocusTo(p_r);
 }
 
@@ -111,7 +118,7 @@ Vector3D Navigation::findViewCenter(const std::vector<DataPtr>& images)
  */
 Vector3D Navigation::findGlobalDataCenter()
 {
-	DataManager::DataMap images = dataManager()->getData();
+	DataManager::DataMap images = mBackend->getDataManager()->getData();
 	if (images.empty())
 		return Vector3D(0, 0, 0);
 
@@ -139,7 +146,7 @@ void Navigation::centerManualTool(Vector3D& p_r)
 {
 	// move the manual tool to the same position. (this is a side effect... do we want it?)
 	ManualToolPtr manual = cxToolManager::getInstance()->getManualTool();
-	Vector3D p_pr = dataManager()->get_rMpr().inv().coord(p_r);
+	Vector3D p_pr = mBackend->getDataManager()->get_rMpr().inv().coord(p_r);
 	Transform3D prM0t = manual->get_prMt(); // modify old pos in order to keep orientation
 	Vector3D t_pr = prM0t.coord(Vector3D(0, 0, manual->getTooltipOffset()));
 	Transform3D prM1t = createTransformTranslate(p_pr - t_pr) * prM0t;
@@ -151,12 +158,13 @@ void Navigation::centerManualTool(Vector3D& p_r)
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-ViewGroup::ViewGroup()
+ViewGroup::ViewGroup(VisualizationServiceBackendPtr backend)
 {
+	mBackend = backend;
 	mZoom2D.mLocal = SyncedValue::create(1.0);
 	mZoom2D.activateGlobal(false);
 
-	mViewGroupData.reset(new ViewGroupData());
+	mViewGroupData.reset(new ViewGroupData(backend));
 }
 
 ViewGroup::~ViewGroup()
@@ -245,9 +253,9 @@ void ViewGroup::mouseClickInViewGroupSlot()
 	}
 	else
 	{
-		if (!std::count(images.begin(), images.end(), dataManager()->getActiveImage()))
+		if (!std::count(images.begin(), images.end(), mBackend->getDataManager()->getActiveImage()))
 		{
-			dataManager()->setActiveImage(images.front());
+			mBackend->getDataManager()->setActiveImage(images.front());
 		}
 	}
 
@@ -305,7 +313,7 @@ void ViewGroup::parseXml(QDomNode dataNode)
 	for (QDomElement elem = dataNode.firstChildElement("data"); !elem.isNull(); elem = elem.nextSiblingElement("data"))
 	{
 		QString uid = elem.text();
-		DataPtr data = dataManager()->getData(uid);
+		DataPtr data = mBackend->getDataManager()->getData(uid);
 
 		mViewGroupData->addData(data);
 		if (!data)

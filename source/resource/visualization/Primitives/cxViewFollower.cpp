@@ -21,12 +21,23 @@
 #include "sscUtilHelpers.h"
 #include "sscDefinitionStrings.h"
 
-#include "sscToolManager.h"
 #include "sscDataManager.h"
 #include "sscMessageManager.h"
 
 namespace cx
 {
+
+ViewFollowerPtr ViewFollower::create(DataManager* dataManager)
+{
+	return ViewFollowerPtr(new ViewFollower(dataManager));
+}
+
+ViewFollower::ViewFollower(DataManager* dataManager) :
+	mDataManager(dataManager)
+{
+
+}
+
 
 void ViewFollower::setSliceProxy(SliceProxyPtr sliceProxy)
 {
@@ -94,7 +105,7 @@ Vector3D ViewFollower::findVirtualTooltip_s()
 {
 	ToolPtr tool = mSliceProxy->getTool();
 	Transform3D sMr = mSliceProxy->get_sMr();
-	Transform3D rMpr = dataManager()->get_rMpr();
+	Transform3D rMpr = mDataManager->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 	Vector3D pt_s = sMr * rMpr * prMt.coord(Vector3D(0,0,tool->getTooltipOffset()));
 	pt_s[2] = 0; // project into plane
@@ -129,10 +140,10 @@ Vector3D ViewFollower::findShiftFromBoxToTool_s(DoubleBoundingBox3D BB_s, Vector
 void ViewFollower::applyShiftToCenter(Vector3D shift_s)
 {
 	Transform3D sMr = mSliceProxy->get_sMr();
-	Vector3D c_s = sMr.coord(dataManager()->getCenter());
+	Vector3D c_s = sMr.coord(mDataManager->getCenter());
 	Vector3D newcenter_s = c_s + shift_s;
 	Vector3D newcenter_r = sMr.inv().coord(newcenter_s);
-	dataManager()->setCenter(newcenter_r);
+	mDataManager->setCenter(newcenter_r);
 }
 
 } // namespace cx

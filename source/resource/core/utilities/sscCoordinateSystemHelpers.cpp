@@ -1,12 +1,12 @@
 #include "sscCoordinateSystemHelpers.h"
 
-#include "sscToolManager.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscData.h"
+//#include "sscToolManager.h"
+//#include "sscMessageManager.h"
+//#include "sscDataManager.h"
+//#include "sscData.h"
 #include "sscDefinitionStrings.h"
-#include "sscImage.h"
-#include "vtkImageData.h"
+//#include "sscImage.h"
+//#include "vtkImageData.h"
 
 namespace cx
 {

@@ -21,6 +21,7 @@
 #include "sscDefinitions.h"
 #include "cxForwardDeclarations.h"
 #include "sscVector3D.h"
+
 class QMenu;
 class QPoint;
 
@@ -28,6 +29,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
+typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
 
 /**
  * \file
@@ -42,19 +44,21 @@ typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 class Navigation
 {
 public:
+	Navigation(VisualizationServiceBackendPtr backend);
 	void centerToData(DataPtr image);
 	void centerToView(const std::vector<DataPtr>& images);
 	void centerToGlobalDataCenter();
 	void centerToTooltip();
 
 private:
+	VisualizationServiceBackendPtr mBackend;
 	Vector3D findViewCenter(const std::vector<DataPtr>& images);
 	Vector3D findGlobalDataCenter();
 	Vector3D findDataCenter(std::vector<DataPtr> data);
 
 	void centerManualTool(Vector3D& p_r);
-
 };
+typedef boost::shared_ptr<Navigation> NavigationPtr;
 
 /**
  * \brief
@@ -66,7 +70,7 @@ class ViewGroup: public QObject
 {
 Q_OBJECT
 public:
-	ViewGroup();
+	explicit ViewGroup(VisualizationServiceBackendPtr backend);
 	virtual ~ViewGroup();
 
 	void addView(ViewWrapperPtr wrapper);
@@ -115,6 +119,7 @@ protected:
 	ViewGroupDataPtr mViewGroupData;
 	std::vector<ViewWrapperPtr> mViewWrappers;
 //  SlicePlanesProxyPtr mSlicePlanesProxy;
+	VisualizationServiceBackendPtr mBackend;
 };
 
 bool isViewWrapper2D(ViewWrapperPtr wrapper);

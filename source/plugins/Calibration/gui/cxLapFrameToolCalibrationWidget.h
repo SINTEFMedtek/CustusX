@@ -15,6 +15,8 @@
 #ifndef CXLAPFRAMETOOLCALIBRATIONWIDGET_H_
 #define CXLAPFRAMETOOLCALIBRATIONWIDGET_H_
 
+#include "sscTransform3D.h"
+#include "sscVector3D.h"
 #include "cxBaseWidget.h"
 #include "sscCoordinateSystemHelpers.h"
 #include "sscForwardDeclarations.h"

@@ -37,6 +37,7 @@ typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
 typedef boost::shared_ptr<class CrossHair2D> CrossHair2DPtr;
 
 typedef boost::shared_ptr<class CrossHairRep2D> CrossHairRep2DPtr;
+typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
 /**\brief Display the Tool in 2D as a crosshair in the tool tip position.
  *
@@ -49,7 +50,7 @@ class CrossHairRep2D : public RepImpl
 {
 	Q_OBJECT
 public:
-	static CrossHairRep2DPtr New(const QString& uid, const QString& name="");
+	static CrossHairRep2DPtr New(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name="");
 	virtual ~CrossHairRep2D();
 	virtual QString getType() const;
 
@@ -62,7 +63,7 @@ private slots:
 	void toolVisibleSlot(bool visible); 
 
 protected:
-	CrossHairRep2D(const QString& uid, const QString& name="");
+	CrossHairRep2D(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name="");
 	virtual void addRepActorsToViewRenderer(View *view);
 	virtual void removeRepActorsFromViewRenderer(View *view);
 
@@ -71,6 +72,7 @@ private:
 	CrossHair2DPtr mCursor;
 	SliceProxyPtr mSlicer;
 	Transform3D m_vpMs;
+	SpaceProviderPtr mSpaceProvider;
 };
 
 

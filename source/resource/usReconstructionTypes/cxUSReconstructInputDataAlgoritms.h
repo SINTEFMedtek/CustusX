@@ -15,7 +15,6 @@
 #define CXUSRECONSTRUCTINPUTDATAALGORITMS_H
 
 #include "cxUSReconstructInputData.h"
-#include "sscToolManager.h"
 
 namespace cx
 {
