@@ -83,9 +83,9 @@ double vtkMultiVolumePicker::IntersectVolumeWithLine(const double p1[3],
 
 			double newOrigin[3];
 			rMdi->GetPosition(newOrigin);
-
 			vtkImageDataPtr image = multivolumeMapper->GetInput(i+1);
 			vtkImageDataPtr tempImage = this->generateImageCopyAndMoveOrigin(image, newOrigin);
+
 			vtkAbstractVolumeMapperPtr singleVolumeMapper = this->generateSingleVolumeMapper(tempImage);
 			vtkVolumeProperty* property = multivolumeMapper->GetAdditionalProperty(i);
 

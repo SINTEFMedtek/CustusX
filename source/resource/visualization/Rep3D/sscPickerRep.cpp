@@ -156,6 +156,8 @@ typedef vtkSmartPointer<class vtkDataSet> vtkDataSetPtr;
  */
 void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer)
 {
+	if (!this->mEnabled)
+		return;
 	vtkMultiVolumePickerPtr picker = vtkMultiVolumePickerPtr::New();
 	int hit = picker->Pick(clickPosition[0], clickPosition[1], 0, renderer);
 
@@ -256,6 +258,7 @@ void PickerRep::toolHasChanged()
 
 void PickerRep::setEnabled(bool on)
 {
+	mEnabled = on;
 	if (mSnapToSurface == on)
 		return;
 
@@ -424,8 +427,7 @@ void PickerRep::addRepActorsToViewRenderer(View *view)
 
 	mView = view;
 
-	if (mEnabled)
-		this->connectInteractor();
+	this->connectInteractor();
 
 	mGraphicalPoint.reset(new GraphicalPoint3D(mView->getRenderer()));
 	mGraphicalPoint->setColor(QColor(Qt::blue));
