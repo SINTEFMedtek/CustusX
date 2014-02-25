@@ -54,6 +54,8 @@ if (CX_USE_OPENCL_UTILITY)
 		${SOURCE_FILES}
 		TordReconstruct/TordTest.h
 		TordReconstruct/TordTest.cpp
+		TordReconstruct/cxTordAlgorithm.h
+		TordReconstruct/cxTordAlgorithm.cpp
 		TordReconstruct/kernels.cl
 		)
    SET(TORD_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/TordReconstruct)

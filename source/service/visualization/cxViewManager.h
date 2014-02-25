@@ -44,6 +44,7 @@ typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
 typedef boost::shared_ptr<class RenderLoop> RenderLoopPtr;
 typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
 typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
+typedef boost::shared_ptr<class Navigation> NavigationPtr;
 
 /**
  * \file
@@ -116,6 +117,7 @@ public:
 	void deleteLayoutData(const QString uid);
 	QActionGroup* createInteractorStyleActionGroup();
 	bool isCustomLayout(const QString& uid) const;
+	NavigationPtr getNavigation();
 
 	static ViewManager* createInstance(VisualizationServiceBackendPtr backend); ///< create the instance
 	static ViewManager* getInstance(); ///< returns the only instance of this class, NULL unless createInstance has been called.

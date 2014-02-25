@@ -31,6 +31,8 @@
 namespace cx
 {
 class ProbeData;
+typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+
 
 /**\brief Display a Tool in 2D.
  *
@@ -51,7 +53,7 @@ class ToolRep2D : public RepImpl
 {
 	Q_OBJECT
 	public:
-		static ToolRep2DPtr New(const QString& uid, const QString& name="");
+		static ToolRep2DPtr New(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name="");
 		~ToolRep2D();
 		virtual QString getType() const;
 
@@ -84,6 +86,8 @@ class ToolRep2D : public RepImpl
 		virtual void onModifiedStartRender();
 
 	private:
+		ToolRep2D(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name="");
+
 		void setProbeSector(ProbeData data);
 		double getOffset();
 		void createCrossHair(vtkRendererPtr renderer);
@@ -93,9 +97,9 @@ class ToolRep2D : public RepImpl
 
 		void updateToolLine(const Vector3D& crossPos, const Vector3D& toolTipPos, const Vector3D toolTipBackPos);
 		void updateOffsetText();
-		ToolRep2D(const QString& uid, const QString& name="");
 		void crossHairResized();
 
+		SpaceProviderPtr mSpaceProvider;
 		SliceProxyPtr mSlicer;
 		Transform3D m_vpMs;
 		DoubleBoundingBox3D mBB_vp;

@@ -41,6 +41,7 @@ public:
 
 	virtual cx::Vector3D getDominantToolTipPoint(cx::CoordinateSystem to, bool useOffset = false) { return cx::Vector3D::Zero(); }
 	virtual cx::Transform3D getDominantToolTipTransform(cx::CoordinateSystem to, bool useOffset = false) { return cx::Transform3D::Identity(); }
+	virtual cx::Transform3D get_rMpr() { return cx::Transform3D::Identity(); }
 
 	virtual cx::CoordinateSystem getS(cx::ToolPtr tool) { return cx::CoordinateSystem(cx::csSENSOR); }
 	virtual cx::CoordinateSystem getT(cx::ToolPtr tool) { return cx::CoordinateSystem(cx::csTOOL); }

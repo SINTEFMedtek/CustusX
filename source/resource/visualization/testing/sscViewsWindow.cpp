@@ -172,7 +172,7 @@ cx::SliceProxyPtr ViewsWindow::createSliceProxy(cx::PLANE_TYPE plane)
 	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
 	cx::ToolPtr tool = mToolmanager->getDominantTool();
 
-	cx::SliceProxyPtr proxy(new cx::SliceProxy());
+	cx::SliceProxyPtr proxy = cx::SliceProxy::create(cx::dataManager());
 	proxy->setTool(tool);
 	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
 	return proxy;

@@ -40,6 +40,7 @@ public:
 
 	virtual Vector3D getDominantToolTipPoint(CoordinateSystem to, bool useOffset = false); ///< P_to, dominant tools current point in coord
 	virtual Transform3D getDominantToolTipTransform(CoordinateSystem to, bool useOffset = false);///< Get toMt, where t is dominant tool
+	virtual Transform3D get_rMpr();
 
 	virtual CoordinateSystem getS(ToolPtr tool); ///<tools sensor coordinate system
 	virtual CoordinateSystem getT(ToolPtr tool); ///<tools coordinate system
@@ -54,7 +55,7 @@ private:
 	Transform3D get_rMr(); ///< ref_M_ref
 	Transform3D get_rMd(QString uid);
 	Transform3D get_rMdv(QString uid);
-	Transform3D get_rMpr();
+//	Transform3D get_rMpr();
 	Transform3D get_rMt(QString uid);
 	Transform3D get_rMto(QString uid);
 	Transform3D get_rMs(QString uid);

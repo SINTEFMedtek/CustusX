@@ -33,6 +33,7 @@ typedef vtkSmartPointer<class vtkCallbackCommand> vtkCallbackCommandPtr;
 
 namespace cx
 {
+class DataManager;
 typedef boost::shared_ptr<class PickerRep> PickerRepPtr;
 typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
@@ -56,7 +57,7 @@ class PickerRep: public RepImpl
 Q_OBJECT
 
 public:
-	static PickerRepPtr New(const QString& uid, const QString& name = ""); ///< for creating new instances
+	static PickerRepPtr New(DataManager* dataManager, const QString& uid, const QString& name = ""); ///< for creating new instances
 	virtual ~PickerRep(); ///<empty
 
 	virtual QString getType() const; ///< returns a string identifying this class type
@@ -76,16 +77,11 @@ signals:
 
 public slots:
 	void pickLandmarkSlot(vtkObject* renderWindowInteractor); ///< When you use the renderwindowinteractor
-//	void MySlot(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data, vtkCommand* command);
-
-//protected slots:
-//	void receiveTransforms(Transform3D prMt, double timestamp); ///< receive transforms from the connected tool
 
 protected:
-	PickerRep(const QString& uid, const QString& name = ""); ///< use New instead
+	PickerRep(DataManager *dataManager, const QString& uid, const QString &name); ///< use New instead
 	virtual void addRepActorsToViewRenderer(View *view); ///< connects to the renderwindowinteractor
 	virtual void removeRepActorsFromViewRenderer(View *view); ///< disconnects from the renderwindowinteractor
-//	vtkRendererPtr getRendererFromRenderWindow(vtkRenderWindowInteractor& iren); ///< tries to get a renderer from the given renderwindowinteractor
 	void connectInteractor();
 	void disconnectInteractor();
 	void scaleSphere();
@@ -119,6 +115,7 @@ protected:
 	GraphicalPoint3DPtr mGraphicalPoint;
 	ViewportListenerPtr mViewportListener;
 	vtkCallbackCommandPtr mCallbackCommand;
+	DataManager* mDataManager;
 };
 
 typedef boost::shared_ptr<PickerRep> PickerRepPtr;

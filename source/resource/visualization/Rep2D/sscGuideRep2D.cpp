@@ -26,23 +26,24 @@
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkSectorSource.h>
+#include "sscTool.h"
 
 #include "sscSliceProxy.h"
-#include "sscToolManager.h"
 #include "sscView.h"
 #include "sscDataManager.h"
 
 namespace cx
 {
 
-GuideRep2DPtr GuideRep2D::New(const QString& uid, const QString& name)
+GuideRep2DPtr GuideRep2D::New(DataManager* dataManager, const QString& uid, const QString& name)
 {
-	GuideRep2DPtr retval(new GuideRep2D(uid, name));
+	GuideRep2DPtr retval(new GuideRep2D(dataManager, uid, name));
 	return retval;
 }
 
-GuideRep2D::GuideRep2D(const QString& uid, const QString& name) :
+GuideRep2D::GuideRep2D(DataManager* dataManager, const QString& uid, const QString& name) :
     DataMetricRep(uid, name),
+	mDataManager(dataManager),
 	mOutlineWidth(1),
 	mRequestedAccuracy(1)
 {
@@ -86,8 +87,9 @@ void GuideRep2D::onModifiedStartRender()
 	}
 
 	double toolOffset = mSliceProxy->getTool()->getTooltipOffset();
-	Vector3D toolOffsetPosRef = (dataManager()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,0,toolOffset));
-	Vector3D toolPosRef = (dataManager()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,0,0));
+	Transform3D rMt = mDataManager->get_rMpr()*mSliceProxy->getTool()->get_prMt();
+	Vector3D toolOffsetPosRef = rMt.coord(Vector3D(0,0,toolOffset));
+	Vector3D toolPosRef = rMt.coord(Vector3D(0,0,0));
 
 	Vector3D centerRef = mMetric->getRefCoord() + 0.5*(toolOffsetPosRef - mMetric->getRefCoord());
 	Vector3D position = mSliceProxy->get_sMr() * centerRef;

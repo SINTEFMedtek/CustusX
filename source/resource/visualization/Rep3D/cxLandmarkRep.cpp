@@ -31,25 +31,24 @@
 #include "sscDataManager.h"
 #include "sscTypeConversions.h"
 #include "boost/bind.hpp"
-#include "sscToolManager.h"
 #include "sscVtkHelperClasses.h"
 
 namespace cx
 {
 
-PatientLandmarksSource::PatientLandmarksSource()
+PatientLandmarksSource::PatientLandmarksSource(DataManager* dataManager) : mDataManager(dataManager)
 {
-	connect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
-	connect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
-	connect(dataManager(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+	connect(mDataManager->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
+	connect(mDataManager->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
+	connect(mDataManager, SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 }
 LandmarkMap PatientLandmarksSource::getLandmarks() const
 {
-	return dataManager()->getPatientLandmarks()->getLandmarks();
+	return mDataManager->getPatientLandmarks()->getLandmarks();
 }
 Transform3D PatientLandmarksSource::get_rMl() const
 {
-	return dataManager()->get_rMpr();
+	return mDataManager->get_rMpr();
 }
 // --------------------------------------------------------
 Vector3D PatientLandmarksSource::getTextPos(Vector3D p_l) const
@@ -112,19 +111,25 @@ Vector3D ImageLandmarksSource::getTextPos(Vector3D p_l) const
 // --------------------------------------------------------
 // --------------------------------------------------------
 
-LandmarkRepPtr LandmarkRep::New(const QString& uid, const QString& name)
+LandmarkRepPtr LandmarkRep::New(DataManager* dataManager, const QString& uid, const QString& name)
 {
-	LandmarkRepPtr retval(new LandmarkRep(uid, name));
+	LandmarkRepPtr retval(new LandmarkRep(dataManager, uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
 
-LandmarkRep::LandmarkRep(const QString& uid, const QString& name) :
-	RepImpl(uid, name), mInactiveColor(QColor::fromRgbF(0.5,0.5,0.5)), mColor(QColor(Qt::green)),
+LandmarkRep::LandmarkRep(DataManager* dataManager, const QString& uid, const QString& name) :
+	RepImpl(uid, name),
+	mDataManager(dataManager),
+	mInactiveColor(QColor::fromRgbF(0.5,0.5,0.5)),
+	mColor(QColor(Qt::green)),
 				//  mSecondaryColor(0,0.6,0.8),
-				mSecondaryColor(QColor::fromRgbF(0, 0.9, 0.5)), mShowLandmarks(true), mGraphicsSize(1), mLabelSize(2.5)
+	mSecondaryColor(QColor::fromRgbF(0, 0.9, 0.5)),
+	mShowLandmarks(true),
+	mGraphicsSize(1),
+	mLabelSize(2.5)
 {
-	connect(dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(internalUpdate()));
+	connect(mDataManager, SIGNAL(landmarkPropertiesChanged()), this, SLOT(internalUpdate()));
 
 	mViewportListener.reset(new ViewportListener);
 	mViewportListener->setCallback(boost::bind(&LandmarkRep::rescale, this));
@@ -205,7 +210,7 @@ void LandmarkRep::addAll()
 {
 //  std::cout << this << " LandmarkRep::addLandmark ADD ALL" << std::endl;
 
-	LandmarkPropertyMap props = dataManager()->getLandmarkProperties();
+	LandmarkPropertyMap props = mDataManager->getLandmarkProperties();
 
 	for (LandmarkPropertyMap::iterator it = props.begin(); it != props.end(); ++it)
 	{
@@ -250,7 +255,7 @@ void LandmarkRep::addLandmark(QString uid)
 //  std::cout << this << " LandmarkRep::addLandmark init" << uid << std::endl;
 	vtkRendererPtr renderer = this->getRenderer();
 
-	LandmarkProperty property = dataManager()->getLandmarkProperties()[uid];
+	LandmarkProperty property = mDataManager->getLandmarkProperties()[uid];
 	if (property.getUid().isEmpty())
 	{
 //    std::cout << "LandmarkRep::addLandmark CLEAR" << uid << std::endl;

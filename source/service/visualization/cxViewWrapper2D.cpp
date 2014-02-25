@@ -61,6 +61,7 @@
 #include "sscPointMetricRep2D.h"
 #include "sscLogger.h"
 #include "cxViewFollower.h"
+#include "cxVisualizationServiceBackend.h"
 
 namespace cx
 {
@@ -195,8 +196,8 @@ void ViewWrapper2D::addReps()
 	mView->addRep(mDataNameText);
 
 	// slice proxy
-	mSliceProxy = SliceProxy::New("sliceproxy_(" + mView->getName() + ")");
-	mViewFollower.reset(new ViewFollower);
+	mSliceProxy = SliceProxy::create(mBackend->getDataManager());
+	mViewFollower = ViewFollower::create(mBackend->getDataManager());
 	mViewFollower->setSliceProxy(mSliceProxy);
 
 	// slice rep
@@ -222,7 +223,7 @@ void ViewWrapper2D::addReps()
 //#endif
 
 	// tool rep
-	mToolRep2D = ToolRep2D::New("Tool2D_" + mView->getName());
+	mToolRep2D = ToolRep2D::New(mBackend->getSpaceProvider(), "Tool2D_" + mView->getName());
 	mToolRep2D->setSliceProxy(mSliceProxy);
 	mToolRep2D->setUseCrosshair(true);
 //  mToolRep2D->setUseToolLine(false);
@@ -706,7 +707,7 @@ void ViewWrapper2D::mouseWheelSlot(QWheelEvent* event)
 
 	this->setZoomFactor2D(newZoom);
 
-	Navigation().centerToTooltip(); // side effect: center on tool
+	Navigation(mBackend).centerToTooltip(); // side effect: center on tool
 }
 
 /**Convert a position in Qt viewport space (pixels with origin in upper-left corner)
@@ -728,7 +729,7 @@ void ViewWrapper2D::shiftAxisPos(Vector3D delta_vp)
 	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
-	Transform3D rMpr = dataManager()->get_rMpr();
+	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 	Vector3D delta_s = get_vpMs().inv().vector(delta_vp);
 
@@ -748,7 +749,7 @@ void ViewWrapper2D::setAxisPos(Vector3D click_vp)
 	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
-	Transform3D rMpr = dataManager()->get_rMpr();
+	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 
 	// find tool position in s
