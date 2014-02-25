@@ -593,10 +593,8 @@ void ViewWrapper2D::pointMetricAdded(PointMetricPtr mesh)
 	PointMetricRep2DPtr rep = PointMetricRep2D::New(mesh->getUid() + "_rep2D");
 	rep->setSliceProxy(mSliceProxy);
     rep->setDataMetric(mesh);
-	rep->setFillVisibility(false);
-	rep->setOutlineWidth(0.25);
-	rep->setOutlineColor(1,0,0);
 	rep->setDynamicSize(true);
+	rep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
 	mView->addRep(rep);
 	mPointMetricRep[mesh->getUid()] = rep;
 	this->updateView();
