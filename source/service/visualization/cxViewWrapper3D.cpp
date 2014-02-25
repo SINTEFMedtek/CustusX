@@ -117,7 +117,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServ
 	mPickerRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
 	mPickerRep->setEnabled(false);
 	mView->addRep(mPickerRep);
-	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(mBackend->getToolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 	this->dominantToolChangedSlot();
 
 	// plane type text rep
@@ -133,8 +133,8 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServ
 	//data name text rep
 	this->updateMetricNamesRep();
 
-	connect(toolManager(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
-	connect(toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
+	connect(mBackend->getToolManager(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
+	connect(mBackend->getToolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
 	connect(mBackend->getDataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
 	this->toolsAvailableSlot();
 
@@ -409,7 +409,7 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 void ViewWrapper3D::showToolPathSlot(bool checked)
 {
 	ToolRep3DPtr activeRep3D = RepManager::findFirstRep<ToolRep3D>(mView->getReps(),
-					toolManager()->getDominantTool());
+					mBackend->getToolManager()->getDominantTool());
 	if (activeRep3D)
 	{
 		if (activeRep3D->getTracer()->isRunning())
@@ -464,7 +464,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		}
 
 		// tool spaces
-		ToolManager::ToolMapPtr tools = toolManager()->getTools();
+		ToolManager::ToolMapPtr tools = mBackend->getToolManager()->getTools();
 		ToolManager::ToolMapPtr::element_type::iterator iter;
 		for (iter = tools->begin(); iter != tools->end(); ++iter)
 		{
@@ -690,7 +690,7 @@ void ViewWrapper3D::activeImageChangedSlot()
 
 void ViewWrapper3D::showRefToolSlot(bool checked)
 {
-	ToolPtr refTool = toolManager()->getReferenceTool();
+	ToolPtr refTool = mBackend->getToolManager()->getReferenceTool();
 	if (!refTool)
 		return;
 	ToolRep3DPtr refRep = RepManager::findFirstRep<ToolRep3D>(mView->getReps(), refTool);
@@ -742,7 +742,7 @@ void ViewWrapper3D::updateSlices()
 	mSlices3DRep->setShaderPath(DataLocations::getShaderPath());
 	if (mGroupData && !mGroupData->getImages().empty())
 		mSlices3DRep->setImages(mGroupData->getImages());
-	mSlices3DRep->setTool(toolManager()->getDominantTool());
+	mSlices3DRep->setTool(mBackend->getToolManager()->getDominantTool());
 	mView->addRep(mSlices3DRep);
 //#endif // USE_GLX_SHARED_CONTEXT
 }
@@ -754,7 +754,7 @@ ViewWidget* ViewWrapper3D::getView()
 
 void ViewWrapper3D::dominantToolChangedSlot()
 {
-	ToolPtr dominantTool = toolManager()->getDominantTool();
+	ToolPtr dominantTool = mBackend->getToolManager()->getDominantTool();
 	mPickerRep->setTool(dominantTool);
 	if (mSlices3DRep)
 		mSlices3DRep->setTool(dominantTool);
@@ -762,7 +762,7 @@ void ViewWrapper3D::dominantToolChangedSlot()
 
 void ViewWrapper3D::toolsAvailableSlot()
 {
-	ToolManager::ToolMapPtr tools = toolManager()->getTools();
+	ToolManager::ToolMapPtr tools = mBackend->getToolManager()->getTools();
 	ToolManager::ToolMapPtr::element_type::iterator iter;
 	for (iter = tools->begin(); iter != tools->end(); ++iter)
 	{

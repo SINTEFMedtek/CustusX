@@ -30,6 +30,7 @@
 #include "cxSettings.h"
 #include "cxToolManager.h"
 #include "cxVideoService.h"
+#include "cxVisualizationServiceBackend.h"
 
 namespace cx
 {
@@ -46,9 +47,9 @@ ViewWrapperVideo::ViewWrapperVideo(ViewWidget* view, VisualizationServiceBackend
 	double clipDepth = 1.0; // 1mm depth, i.e. all 3D props rendered outside this range is not shown.
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth / 2.0, clipDepth / 2.0);
 
-	connect(toolManager(), SIGNAL(configured()), this, SLOT(connectStream()));
+	connect(mBackend->getToolManager(), SIGNAL(configured()), this, SLOT(connectStream()));
 	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SLOT(connectStream()));
-	connect(toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectStream()));
+	connect(mBackend->getToolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectStream()));
 
 	addReps();
 

@@ -55,8 +55,8 @@ void LogicManager::initializeServices()
 	MessageManager::initialize();
 
 	// services layer
-	cx::PatientService::initialize();
 	cx::cxDataManager::initialize();
+	cx::PatientService::initialize();
 	cx::cxToolManager::initializeObject();
 	cx::VideoService::initialize();
 

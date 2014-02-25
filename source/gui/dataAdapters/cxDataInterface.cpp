@@ -82,7 +82,7 @@ DoubleRange DoubleDataAdapterActiveToolOffset::getValueRange() const
 
 DoubleDataAdapterActiveImageBase::DoubleDataAdapterActiveImageBase()
 {
-  mActiveImageProxy = ActiveImageProxy::New();
+	mActiveImageProxy = ActiveImageProxy::New(dataManager());
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChanged()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
 }

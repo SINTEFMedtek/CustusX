@@ -52,7 +52,7 @@ InteractiveClipper::InteractiveClipper(VisualizationServiceBackendPtr backend) :
 
 	connect(mSlicePlaneClipper.get(), SIGNAL(slicePlaneChanged()), this, SLOT(changedSlot()));
 	connect(this, SIGNAL(changed()), this, SLOT(changedSlot()));
-	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(mBackend->getToolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 
 	this->dominantToolChangedSlot();
 	this->changedSlot();
@@ -178,7 +178,7 @@ std::vector<PLANE_TYPE> InteractiveClipper::getAvailableSlicePlanes() const
 
 void InteractiveClipper::dominantToolChangedSlot()
 {
-	ToolPtr dominantTool = toolManager()->getDominantTool();
+	ToolPtr dominantTool = mBackend->getToolManager()->getDominantTool();
 
 	SlicePlanesProxy::DataMap data = mSlicePlanesProxy->getData();
 	for (SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)

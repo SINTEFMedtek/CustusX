@@ -118,7 +118,7 @@ std::vector<QString> RegistrationManager::getUsableLandmarks(const LandmarkMap& 
 void RegistrationManager::updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrameUid)
 {
 //	std::cout << "==== RegistrationManager::updateRegistration" << std::endl;
-  FrameForest forest;
+	FrameForest forest(dataManager());
   QDomNode target = forest.getNode(qstring_cast(data->getUid()));
   QDomNode masterFrame = target;
   QDomNode targetBase = target;
@@ -187,7 +187,7 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, RegistrationTran
   }
   // as we now have mutated the datamanager, forest is now outdated.
 
-  FrameForest forest2;
+//  FrameForest forest2;
 //	std::cout << "    ==== RegistrationManager::updateRegistration" << std::endl;
 }
 

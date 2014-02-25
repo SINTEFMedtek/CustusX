@@ -18,11 +18,12 @@
 namespace cx
 {
 
-ActiveImageProxy::ActiveImageProxy()
+ActiveImageProxy::ActiveImageProxy(DataManager* dataManager) :
+	mDataManager(dataManager)
 {
-	connect(dataManager(), SIGNAL(activeImageChanged(const QString&)), this,
+	connect(mDataManager, SIGNAL(activeImageChanged(const QString&)), this,
 					SLOT(activeImageChangedSlot(const QString&)));
-	connect(dataManager(), SIGNAL(activeImageChanged(const QString&)), this,
+	connect(mDataManager, SIGNAL(activeImageChanged(const QString&)), this,
 					SIGNAL(activeImageChanged(const QString&)));
 
 }
@@ -43,7 +44,7 @@ void ActiveImageProxy::activeImageChangedSlot(const QString& uid)
 		disconnect(mImage.get(), SIGNAL(clipPlanesChanged()), this, SIGNAL(clipPlanesChanged()));
 		disconnect(mImage.get(), SIGNAL(cropBoxChanged()), this, SIGNAL(cropBoxChanged()));
 	}
-	mImage = dataManager()->getActiveImage();
+	mImage = mDataManager->getActiveImage();
 	if (mImage)
 	{
 		connect(mImage.get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));

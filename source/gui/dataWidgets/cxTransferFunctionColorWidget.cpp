@@ -27,7 +27,7 @@ TransferFunctionColorWidget::TransferFunctionColorWidget(QWidget* parent) :
   mBorder(5)
 {
   this->setFocusPolicy(Qt::StrongFocus);
-  mActiveImageProxy = ActiveImageProxy::New();
+	mActiveImageProxy = ActiveImageProxy::New(dataManager());
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageTransferFunctionsChangedSlot()));
 
   mSelectedPoint.reset();

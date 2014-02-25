@@ -59,7 +59,7 @@ void FrameTreeWidget::rebuild()
 {
   mTreeWidget->clear();
 
-  FrameForest forest;
+  FrameForest forest(dataManager());
   QDomElement root = forest.getDocument().documentElement();
 
   this->fill(mTreeWidget->invisibleRootItem(), root);

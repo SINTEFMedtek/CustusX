@@ -122,12 +122,12 @@ ViewManager::~ViewManager()
 
 void ViewManager::initialize()
 {
-	mCameraStyle.reset(new CameraStyle()); // uses the global viewmanager() instance - must be created after creation of this.
+	mCameraStyle.reset(new CameraStyle(mBackend));
 
 	mActiveLayout = QStringList() << "" << "";
 	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
 
-	mInteractiveCropper.reset(new InteractiveCropper());
+	mInteractiveCropper.reset(new InteractiveCropper(mBackend));
 	mInteractiveClipper.reset(new InteractiveClipper(mBackend));
 	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
 	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
