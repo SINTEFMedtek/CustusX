@@ -11,8 +11,9 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-#ifndef CXVISUALIZATIONSERVICEBACKEND_H
-#define CXVISUALIZATIONSERVICEBACKEND_H
+
+#ifndef CXVIDEOSERVICEBACKEND_H
+#define CXVIDEOSERVICEBACKEND_H
 
 #include "boost/shared_ptr.hpp"
 
@@ -20,40 +21,37 @@ namespace cx
 {
 class DataManager;
 class ToolManager;
-class VideoService;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
-typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
+typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 /**
  *
  *
  * \ingroup cx
- * \date 23.02.2014, 2014
+ * \date 25.02.2014, 2014
  * \author christiana
  */
-class VisualizationServiceBackend
+class VideoServiceBackend
 {
 public:
-	VisualizationServiceBackend(DataManager* dataManager,
+	static VideoServiceBackendPtr create(DataManager* dataManager,
 								ToolManager* toolManager,
-								VideoService* videoService,
+								SpaceProviderPtr spaceProvider);
+	VideoServiceBackend(DataManager* dataManager,
+								ToolManager* toolManager,
 								SpaceProviderPtr spaceProvider);
 
 	DataManager* getDataManager();
 	ToolManager* getToolManager();
-	VideoService* getVideoService();
 	SpaceProviderPtr getSpaceProvider();
 
 private:
 	DataManager* mDataManager;
 	ToolManager* mToolManager;
 	SpaceProviderPtr mSpaceProvider;
-	VideoService* mVideoService;
 };
-
 
 } // namespace cx
 
 
-
-#endif // CXVISUALIZATIONSERVICEBACKEND_H
+#endif // CXVIDEOSERVICEBACKEND_H

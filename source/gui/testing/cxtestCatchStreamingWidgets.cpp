@@ -10,6 +10,8 @@
 #include "sscDummyToolManager.h"
 #include "cxDataManager.h"
 #include "cxToolManager.h"
+#include "cxVideoService.h"
+#include "cxVideoServiceBackend.h"
 
 namespace cxtest
 {
@@ -21,6 +23,11 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][widget][streaming]")
 
 	cx::cxToolManager::initializeObject();
 	cx::cxToolManager* tm = cx::cxToolManager::getInstance();
+
+	cx::VideoService::initialize(cx::VideoServiceBackend::create(cx::cxDataManager::getInstance(),
+																 tm,
+																 cx::SpaceProviderPtr()));
+
 	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear(),tm);
 	tm->runDummyTool(tool);
 	tm->setDominantTool(tool->getUid());

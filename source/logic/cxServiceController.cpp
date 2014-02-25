@@ -80,47 +80,5 @@ void ServiceController::duringLoadPatientSlot()
 	toolManager()->parseXml(toolmanagerNode);
 }
 
-///**Connect a probe from Tracking Service to a video source in Video Service.
-// *
-// */
-//void ServiceController::updateVideoConnections()
-//{
-//	ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
-
-//	this->connectVideoToProbe(tool);
-//}
-
-///**insert the rt source into the (first) probe tool
-// * in the tool manager.
-// *
-// * Apply time calibration to the source.
-// *
-// */
-//void ServiceController::connectVideoToProbe(ToolPtr probe)
-//{
-//	VideoSourcePtr source = videoService()->getActiveVideoSource();
-//	if (!source)
-//	{
-//		messageManager()->sendError("no rt source.");
-//		return;
-//	}
-
-//	// find probe in tool manager
-//	// set source in cxTool
-//	// insert timecalibration using config
-//	if (!source->isConnected())
-//		return;
-
-//	if (!probe)
-//		return;
-
-//	if (probe)
-//	{
-//		ProbePtr probeInterface = probe->getProbe();
-//		if (!probeInterface)
-//			return;
-//		probeInterface->setRTSource(source);
-//	}
-//}
 
 }
