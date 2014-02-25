@@ -57,8 +57,11 @@ private:
   void operator=(const vtkMultiVolumePicker&);  // Not implemented.
 
 	vtkTransformPtr calculate_rMdi(vtkMatrix4x4Ptr rMd0, vtkTransformPtr d0Mdi);
+	void calculateNewOrigin(double* newOrigin, vtkMatrix4x4Ptr rMd0);
 	vtkImageDataPtr generateImageCopyAndMoveOrigin(vtkImageDataPtr image, double* newOrigin);
 	vtkVolumeTextureMapper3DPtr generateSingleVolumeMapper(vtkImageDataPtr tempImage);
+	bool similar(double a, double b, double tol = 1.0E-6); ///< check for equality with a tolerance: |b-a|<tol
+	void storeFoundImage(vtkDataSet* image, vtkAbstractVolumeMapper* mapper);
 };
 
 #endif
