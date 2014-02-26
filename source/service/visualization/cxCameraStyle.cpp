@@ -37,15 +37,17 @@
 #include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkInteractorStyleTrackballActor.h"
 #include "vtkInteractorStyleFlight.h"
+#include "cxVisualizationServiceBackend.h"
 
 #include "cxViewGroup.h"
 
 namespace cx
 {
 
-CameraStyle::CameraStyle() :
+CameraStyle::CameraStyle(VisualizationServiceBackendPtr backend) :
 	mCameraStyle(cstDEFAULT_STYLE),
-    mCameraStyleGroup(NULL)
+	mCameraStyleGroup(NULL),
+	mBackend(backend)
 {
 	connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(viewChangedSlot()));
 	this->viewChangedSlot();
@@ -65,7 +67,7 @@ void CameraStyle::viewChangedSlot()
 			continue;
 		if (views[i]->getType()!=View::VIEW_3D)
 			continue;
-		CameraStyleForViewPtr style(new CameraStyleForView());
+		CameraStyleForViewPtr style(new CameraStyleForView(mBackend));
 		style->setView(views[i]);
 		mViews.push_back(style);
 	}

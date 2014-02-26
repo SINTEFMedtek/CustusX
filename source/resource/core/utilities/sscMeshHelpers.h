@@ -12,14 +12,15 @@
 
 namespace cx
 {
+class DataManager;
 
 /**
  * \addtogroup sscUtility
  * \{
  */
 
-vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt);
-void loadMeshFromToolTransforms(TimedTransformMap transforms_prMt);
+vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt, Transform3D rMpr);
+void loadMeshFromToolTransforms(DataManager *dataManager, TimedTransformMap transforms_prMt);
 
 /**
  * Get information about a ssc mesh.

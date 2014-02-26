@@ -39,7 +39,8 @@ TEST_CASE("TubeSegmentationFramework can load parameter file", "[integration]")
 	helper.testLoadParameterFile();
 }
 
-TEST_CASE("TubeSegmentationFramework default preset works", "[integration]")
+//This test is tagged as unstable as it sometimes fails on OSX. Could be tagged as not_apple instead
+TEST_CASE("TubeSegmentationFramework default preset works", "[integration][unstable]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testDefaultPreset();

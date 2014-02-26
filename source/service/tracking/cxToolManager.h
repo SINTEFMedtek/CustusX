@@ -90,16 +90,9 @@ public:
 	virtual ToolPtr getDominantTool(); ///< get the dominant tool
 	virtual void setDominantTool(const QString& uid); ///< can be set to either a connected or configured tool
 
-	void setClinicalApplication(CLINICAL_APPLICATION application);
-
 	virtual std::map<QString, QString> getToolUidsAndNames() const; ///< both from configured and connected tools
 	virtual std::vector<QString> getToolNames() const; ///< both from configured and connected tools
 	virtual std::vector<QString> getToolUids() const; ///< both from configured and connected tools
-
-	virtual Transform3DPtr get_rMpr() const; ///< get the patient registration transform
-	virtual void set_rMpr(const Transform3DPtr& val); ///<  set the transform from patient to reference space
-
-	virtual RegistrationHistoryPtr get_rMpr_History();
 
 	virtual ToolPtr getReferenceTool() const; ///< get the tool that is used as a reference, if any
 
@@ -112,16 +105,12 @@ public:
 	void parseXml(QDomNode& dataNode); ///< read internal state from node
 	virtual void clear(); ///< clear everything loaded from xml
 
-	ManualToolPtr getManualTool(); ///< a mouse-controllable virtual tool that is available even when not tracking.
-	virtual LandmarkMap getLandmarks();
-	virtual void setLandmark(Landmark landmark);
-	virtual void removeLandmark(QString uid);
-	virtual void removeLandmarks();
+	virtual ManualToolPtr getManualTool(); ///< a mouse-controllable virtual tool that is available even when not tracking.
 
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
 
 	void runDummyTool(DummyToolPtr tool);
-	ToolPtr findFirstProbe();
+	virtual ToolPtr findFirstProbe();
 
 	void setPlaybackMode(PlaybackTimePtr controller);
 
@@ -136,7 +125,7 @@ public slots:
 	void startTracking(); ///< starts tracking
 	void stopTracking(); ///< stops tracking
 	void saveToolsSlot(); ///< saves transforms and timestamps
-	void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
+	virtual void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
 
 private slots:
 	void trackerConfiguredSlot(bool on);
@@ -161,21 +150,17 @@ private:
 	QString mConfigurationFilePath; ///< path to the configuration file
 	QString mLoggingFolder; ///< path to where logging should be saved
 
-	CLINICAL_APPLICATION mApplication; ///< Current clinical application
 	ToolManager::ToolMap mTools; ///< all tools
 
 	ToolPtr mDominantTool; ///< the tool with highest priority
 	ToolPtr mReferenceTool; ///< the tool which is used as patient reference tool
 	ManualToolAdapterPtr mManualTool; ///< a mouse-controllable virtual tool that is available even when not tracking.
 
-	RegistrationHistoryPtr m_rMpr_History; ///< transform from the patient reference to the reference, along with historical data.
-
 	bool mConfigured; ///< whether or not the system is configured
 	bool mInitialized; ///< whether or not the system is initialized
 	bool mTracking; ///< whether or not the system is tracking
 	bool mPlayBackMode; ///< special mode: all tools are displaying historic positions.
 
-	LandmarkMap mLandmarks; ///< in space patient reference.
 	double mLastLoadPositionHistory;
 
 	IgstkTrackerThreadPtr mTrackerThread;

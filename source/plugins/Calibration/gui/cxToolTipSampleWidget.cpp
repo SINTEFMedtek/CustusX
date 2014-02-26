@@ -22,6 +22,8 @@
 #include "cxPatientData.h"
 #include "cxPatientService.h"
 #include "cxSelectDataStringDataAdapter.h"
+#include "cxLegacySingletons.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
@@ -95,7 +97,7 @@ void ToolTipSampleWidget::sampleSlot()
   QFile samplingFile(mSaveToFileNameLabel->text());
 
   CoordinateSystem to = this->getSelectedCoordinateSystem();
-  Vector3D toolPoint = CoordinateSystemHelpers::getDominantToolTipPoint(to, false);
+  Vector3D toolPoint = spaceProvider()->getDominantToolTipPoint(to, false);
 
   if(!samplingFile.open(QIODevice::WriteOnly | (mTruncateFile ? QIODevice::Truncate : QIODevice::Append)))
   {
@@ -151,13 +153,13 @@ CoordinateSystem ToolTipSampleWidget::getSelectedCoordinateSystem()
   switch (retval.mId)
   {
   case csDATA:
-    retval = CoordinateSystemHelpers::getD(mData->getData());
+	retval = spaceProvider()->getD(mData->getData());
     break;
   case csTOOL:
-    retval = CoordinateSystemHelpers::getT(mTools->getTool());
+	retval = spaceProvider()->getT(mTools->getTool());
     break;
   case csSENSOR:
-    retval = CoordinateSystemHelpers::getT(mTools->getTool());
+	retval = spaceProvider()->getT(mTools->getTool());
     break;
   default:
     retval.mRefObject = "";

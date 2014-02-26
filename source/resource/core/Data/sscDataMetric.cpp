@@ -24,9 +24,12 @@
 namespace cx
 {
 
-DataMetric::DataMetric(const QString& uid, const QString& name) :
-				Data(uid, name)
+DataMetric::DataMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+	Data(uid, name)
 {
+	mDataManager = dataManager;
+	mSpaceProvider = spaceProvider;
+
 	mColor = QColor(240, 170, 255, 255);
 	m_rMd_History = RegistrationHistory::getNullObject();
 }

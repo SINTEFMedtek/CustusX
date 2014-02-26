@@ -10,6 +10,7 @@ typedef vtkSmartPointer<class vtkImageMask> vtkImageMaskPtr;
 namespace cx
 {
 typedef Transform3D Transform3D;
+class DataManager;
 
 /**
  * SimulatedImageStreamer delivers a stream of 2D images
@@ -27,8 +28,7 @@ public:
 	SimulatedImageStreamer();
 	virtual ~SimulatedImageStreamer();
 
-	void initialize(); ///< initializes with active image and first probe
-	void initialize(ImagePtr image, ToolPtr tool);
+	void initialize(ImagePtr image, ToolPtr tool, DataManager* dataManager);
 	virtual bool startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
 
@@ -38,7 +38,6 @@ private slots:
 	virtual void streamSlot();
 	void resetMask();
 	void sliceSlot();
-	void setSourceToActiveImageSlot();
 	void setSourceToImageSlot(QString imageUid);
 
 private:
@@ -56,6 +55,7 @@ private:
 	ToolPtr mTool;
 	mutable ImagePtr mCachedImageToSend;
 	mutable vtkImageDataPtr mCachedMask;
+	DataManager* mDataManager;
 
 };
 typedef boost::shared_ptr<SimulatedImageStreamer> SimulatedImageStreamerPtr;

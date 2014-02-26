@@ -20,7 +20,14 @@
 #include "vtkImageData.h"
 #include "vtkVolume.h"
 #include "vtkVolumeMapper.h"
-#
+#include "vtkOpenGLGPUMultiVolumeRayCastMapper.h"
+#include "vtkGPUVolumeRayCastMapper.h"
+#include "vtkVolumeTextureMapper3D.h"
+#include "vtkTransform.h"
+#include "vtkImageChangeInformation.h"
+
+typedef vtkSmartPointer<class vtkVolume> vtkVolumePtr;
+typedef vtkSmartPointer<vtkImageChangeInformation> vtkImageChangeInformationPtr;
 
 vtkStandardNewMacro(vtkMultiVolumePicker);
 
@@ -63,171 +70,97 @@ double vtkMultiVolumePicker::IntersectVolumeWithLine(const double p1[3],
                                                 vtkProp3D *prop, 
                                                 vtkAbstractVolumeMapper *mapper)
 {
-	return this->Superclass::IntersectVolumeWithLine(p1, p2, t1, t2, prop, mapper);
-/*
-	double tMin = VTK_DOUBLE_MAX;
+	vtkOpenGLGPUMultiVolumeRayCastMapper* multivolumeMapper = dynamic_cast<vtkOpenGLGPUMultiVolumeRayCastMapper*>(mapper);
+	if(multivolumeMapper)
+	{
+		double retval = VTK_DOUBLE_MAX;
 
-  vtkImageData *data = vtkImageData::SafeDownCast(mapper->GetDataSetInput());
-  vtkVolumeMapper *vmapper = vtkVolumeMapper::SafeDownCast(mapper);
-  
-  if (data == 0)
-    {
-    // This picker only works with image inputs
-    return VTK_DOUBLE_MAX;
-    }
+		for(int i = 0; i < multivolumeMapper->NUMBER_OF_ADDITIONAL_VOLUMES; ++i)
+		{
+			vtkMatrix4x4Ptr rMd0 = prop->GetUserMatrix();
+			vtkTransformPtr d0Mdi = multivolumeMapper->GetAdditionalInputUserTransform(i); //transform is d0Mdi
+			vtkTransformPtr rMdi = this->calculate_rMdi(rMd0, d0Mdi);
+			double newOrigin[3];
+			rMdi->GetPosition(newOrigin);
+			this->calculateNewOrigin(newOrigin, rMd0);
 
-  // Convert ray to structured coordinates
-  double spacing[3], origin[3];
-  int extent[6];
-  data->GetSpacing(spacing);
-  data->GetOrigin(origin);
-  data->GetExtent(extent);
+			vtkImageDataPtr image = multivolumeMapper->GetInput(i+1);
+			vtkImageDataPtr tempImage = this->generateImageCopyAndMoveOrigin(image, newOrigin);
 
-  double x1[3], x2[3];
-  for (int i = 0; i < 3; i++)
-    {
-    x1[i] = (p1[i] - origin[i])/spacing[i];
-    x2[i] = (p2[i] - origin[i])/spacing[i];
-    }
+			vtkAbstractVolumeMapperPtr singleVolumeMapper = this->generateSingleVolumeMapper(tempImage);
+			vtkVolumeProperty* property = multivolumeMapper->GetAdditionalProperty(i);
 
-  // These are set to the plane that the ray enters through
-  int planeId = -1;
-  int extentPlaneId = -1;
+			vtkVolumePtr volume = vtkVolumePtr::New();
+			volume->SetMapper(singleVolumeMapper);
+			volume->SetProperty(property);
 
-  // There might be multiple regions, depending on cropping flags
-  int numSegments = 1;
-  double t1List[16], t2List[16], s1List[16];
-  int planeIdList[16];
-  t1List[0] = t1;
-  t2List[0] = t2;
-  // s1 is the cropping plane intersection, initialize to large value
-  double s1 = s1List[0] = VTK_DOUBLE_MAX;
-  planeIdList[0] = -1;
- 
-  // Find the cropping bounds in structured coordinates
-  double bounds[6];
-  for (int j = 0; j < 6; j++)
-    {
-    bounds[j] = extent[j];
-    }
+			double tempRetval = this->Superclass::IntersectVolumeWithLine(p1, p2, t1, t2, volume, singleVolumeMapper);
 
-  if (vmapper && vmapper->GetCropping())
-    {
-    vmapper->GetCroppingRegionPlanes(bounds);
-    for (int j = 0; j < 3; j++)
-      {
-      double b1 = (bounds[2*j] - origin[j])/spacing[j]; 
-      double b2 = (bounds[2*j+1] - origin[j])/spacing[j]; 
-      bounds[2*j] = (b1 < b2 ? b1 : b2);
-      bounds[2*j+1] = (b1 < b2 ? b2 : b1);
-      if (bounds[2*j] < extent[2*j]) { bounds[2*j] = extent[2*j]; }
-      if (bounds[2*j+1] > extent[2*j+1]) { bounds[2*j+1] = extent[2*j+1]; }
-      if (bounds[2*j] > bounds[2*j+1])
-        {
-        return VTK_DOUBLE_MAX;
-        }
-      }
+			retval = fmin(retval, tempRetval);
+			if(similar(retval, tempRetval))
+				this->storeFoundImage(image, singleVolumeMapper);
+		}
 
-    // Get all of the line segments that intersect the visible blocks
-    int flags = vmapper->GetCroppingRegionFlags();
-    if (!this->ClipLineWithCroppingRegion(bounds, extent, flags, x1, x2,
-                                          t1, t2, extentPlaneId, numSegments,
-                                          t1List, t2List, s1List, planeIdList))
-      {
-      return VTK_DOUBLE_MAX;
-      }
-    }
-  else
-    {
-    // If no cropping, then use volume bounds
-    double s2;
-    if (!this->ClipLineWithExtent(extent, x1, x2, s1, s2, extentPlaneId))
-      {
-      return VTK_DOUBLE_MAX;
-      }
-    s1List[0] = s1;
-    t1List[0] = ( (s1 > t1) ? s1 : t1 );
-    t2List[0] = ( (s2 < t2) ? s2 : t2 );
-    }
+		return retval;
+	} else
+		return this->Superclass::IntersectVolumeWithLine(p1, p2, t1, t2, prop, mapper);
 
-  if (this->PickCroppingPlanes && vmapper && vmapper->GetCropping())
-    {
-    // Only require information about the first intersection
-    s1 = s1List[0];
-    if (s1 > t1)
-      {
-      planeId = planeIdList[0];
-      }
-
-    // Set data values at the intersected cropping or clipping plane
-    if ((tMin = t1List[0]) < this->GlobalTMin)
-      {
-      this->ResetPickInfo();
-      this->DataSet = data;
-      this->Mapper = vmapper;
-
-      double x[3];
-      for (int j = 0; j < 3; j++)
-        {
-        x[j] = x1[j]*(1.0 - tMin) + x2[j]*tMin;
-        if (planeId >= 0 && j == planeId/2)
-          {
-          x[j] = bounds[planeId];
-          }
-        else if (planeId < 0 && extentPlaneId >= 0 && j == extentPlaneId/2)
-          {
-          x[j] = extent[extentPlaneId];
-          }
-        this->MapperPosition[j] = x[j]*spacing[j] + origin[j];
-        }
-
-      this->SetImageDataPickInfo(x, extent);
-      }
-    }
-  else
-    {
-    // Go through the segments in order, until a hit occurs
-    for (int segment = 0; segment < numSegments; segment++)
-      {
-      if ((tMin = this->Superclass::IntersectVolumeWithLine(
-           p1, p2, t1List[segment], t2List[segment], prop, mapper))
-           < VTK_DOUBLE_MAX)
-        {
-        s1 = s1List[segment];
-        // Keep the first planeId that was set at the first intersection
-        // that occurred after t1
-        if (planeId < 0 && s1 > t1)
-          {
-          planeId = planeIdList[segment];
-          }
-        break;
-        }
-      }
-    }
-
-  if (tMin < this->GlobalTMin)
-    {
-    this->CroppingPlaneId = planeId;
-    // If t1 is at a cropping or extent plane, use the plane normal
-    if (planeId < 0)
-      {
-      planeId = extentPlaneId;
-      }
-    if (planeId >= 0 && tMin == s1)
-      {
-      this->MapperNormal[0] = 0.0;
-      this->MapperNormal[1] = 0.0;
-      this->MapperNormal[2] = 0.0;
-      this->MapperNormal[planeId/2] = 2.0*(planeId%2) - 1.0;
-      if (spacing[planeId/2] < 0)
-        {
-        this->MapperNormal[planeId/2] = - this->MapperNormal[planeId/2];
-        }
-      }
-    }
-
-  return tMin;
-  */
 }
 
+vtkTransformPtr vtkMultiVolumePicker::calculate_rMdi(vtkMatrix4x4Ptr rMd0, vtkTransformPtr d0Mdi)
+{
+	if (!rMd0)
+	{
+		std::cout << "vtkMultiVolumePicker::calculate_rMdi(): No rMd0, setting it to identity" << std::endl;
+		rMd0 = vtkMatrix4x4Ptr::New();
+		rMd0->Identity();
+	}
 
+	vtkTransformPtr retval = vtkTransformPtr::New();
+	retval->DeepCopy(d0Mdi);
+	retval->PostMultiply();
+	retval->Concatenate(rMd0);
+	return retval;
+}
+
+void vtkMultiVolumePicker::calculateNewOrigin(double* newOrigin, vtkMatrix4x4Ptr rMd0)
+{
+	double oldOrigin[3];
+	oldOrigin[0] = rMd0->GetElement(0, 3);
+	oldOrigin[1] = rMd0->GetElement(1, 3);
+	oldOrigin[2] = rMd0->GetElement(2, 3);
+
+	newOrigin[0] = newOrigin[0] - oldOrigin[0];
+	newOrigin[1] = newOrigin[1] - oldOrigin[1];
+	newOrigin[2] = newOrigin[2] - oldOrigin[2];
+}
+
+vtkImageDataPtr vtkMultiVolumePicker::generateImageCopyAndMoveOrigin(vtkImageDataPtr image, double* newOrigin)
+{
+	vtkImageChangeInformationPtr info = vtkImageChangeInformationPtr::New();
+	info->SetInput(image);
+	info->SetOutputOrigin(newOrigin);
+	vtkImageDataPtr retval = info->GetOutput();
+	return retval;
+}
+
+vtkVolumeTextureMapper3DPtr vtkMultiVolumePicker::generateSingleVolumeMapper(vtkImageDataPtr tempImage)
+{
+	//vtkGPUVolumeRayCastMapperPtr singleVolumeMapper = vtkGPUVolumeRayCastMapperPtr::New();
+	vtkVolumeTextureMapper3DPtr singleVolumeMapper = vtkVolumeTextureMapper3DPtr::New();
+	singleVolumeMapper->SetBlendModeToComposite();
+	singleVolumeMapper->SetInput(tempImage);
+	singleVolumeMapper->Update();
+	return singleVolumeMapper;
+}
+
+bool vtkMultiVolumePicker::similar(double a, double b, double tol)
+{
+	return fabs(b - a) < tol;
+}
+
+void vtkMultiVolumePicker::storeFoundImage(vtkDataSet* image, vtkAbstractVolumeMapper* mapper)
+{
+	this->DataSet = image;
+	this->Mapper = mapper;
+}

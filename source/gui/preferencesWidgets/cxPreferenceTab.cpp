@@ -71,7 +71,8 @@ void PerformanceTab::init()
   double stillUpdateRate = settings()->value("stillUpdateRate").value<double>();
 	mStillUpdateRate = DoubleDataAdapterXml::initialize("StillUpdateRate", "Still Update Rate",
 																											"<p>Still Update Rate in vtkRenderWindow. "
-																											"Changing this may change render quality.</p> "
+																											"Increasing the value may improve rendering speed "
+																											"at the cost of render quality.</p> "
 																											"Generally raycast rendering requires this to be low (0.001), "
 																											"while texture based rendering requires it to be high (5-10)."
 																											"<p>Restart needed.</p>",

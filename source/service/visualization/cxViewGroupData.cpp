@@ -29,6 +29,7 @@
 #include "cxViewManager.h"
 #include "cxInteractiveClipper.h"
 #include "cxRepManager.h"
+#include "cxVisualizationServiceBackend.h"
 
 namespace cx
 {
@@ -85,10 +86,12 @@ ViewGroupData::Options::Options() :
 {
 }
 
-ViewGroupData::ViewGroupData() :
-				mCamera3D(CameraData::create())
+ViewGroupData::ViewGroupData(VisualizationServiceBackendPtr backend) :
+	mBackend(backend),
+	mCamera3D(CameraData::create())
 {
-	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataAddedOrRemovedInManager()));
+	if(mBackend)
+		connect(mBackend->getDataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataAddedOrRemovedInManager()));
 	mVideoSource = "active";
 }
 
@@ -96,7 +99,7 @@ void ViewGroupData::dataAddedOrRemovedInManager()
 {
 	for (unsigned i = 0; i < mData.size(); )
 	{
-		if (!dataManager()->getData(mData[i]->getUid()))
+		if (!mBackend->getDataManager()->getData(mData[i]->getUid()))
 			this->removeData(mData[i]);
 		else
 			++i;

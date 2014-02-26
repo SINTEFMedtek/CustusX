@@ -21,6 +21,10 @@ if (BUILD_TESTING)
 		cxtestVLCRecorderFixture.h
 		cxtestVLCRecorderFixture.cpp
 		cxtestProbeDefinition.cpp
+		cxtestSpaceProviderMock.h
+		cxtestSpaceProviderMock.cpp
+		cxtestSpaceListenerMock.h
+		cxtestSpaceListenerMock.cpp
 		)
 	if (CX_USE_OPENCL_UTILITY)
 	   	set(RESOURCE_TEST_CATCH_SOURCE_FILES

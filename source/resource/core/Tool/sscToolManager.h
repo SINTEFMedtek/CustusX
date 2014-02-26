@@ -35,12 +35,12 @@ namespace cx
 {
 
 typedef std::map<ToolPtr, TimedTransformMap> SessionToolHistoryMap;
-typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
+typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 
 /**\brief Manager interface for tools and tracking systems.
  *
  * A singleton for managing all tools.
- * Configuration, active tool, patient registration.
+ * Configuration, active tool.
  *
  * Implementations of ToolManager typically connect to
  * a physical tracking system.
@@ -78,62 +78,21 @@ public:
 
 	virtual ToolPtr getDominantTool() = 0; ///< get the tool that has higest priority when tracking
 	virtual void setDominantTool(const QString& uid) = 0; ///< set a tool to be the dominant tool
+	virtual void dominantCheckSlot() = 0; ///< checks if the visible tool is going to be set as dominant tool
 
 	virtual std::map<QString, QString> getToolUidsAndNames() const = 0; ///< get all tools uids and names
 	virtual std::vector<QString> getToolNames() const = 0; ///< get the name of all tools
 	virtual std::vector<QString> getToolUids() const = 0; ///< get the uid of all the tools
 
-	virtual Transform3DPtr get_rMpr() const = 0; ///< transform from patient ref to ref space
-	virtual void set_rMpr(const Transform3DPtr& val) = 0; ///< set transform from patient ref to ref space
-	virtual RegistrationHistoryPtr get_rMpr_History()
-	{
-		return RegistrationHistoryPtr();
-	} ///< interface to rMpr history.
 	virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
-
-	virtual void savePositionHistory()
-	{
-	}
-	virtual void loadPositionHistory()
-	{
-	}
-
-	virtual void addXml(QDomNode& parentNode)
-	{
-		Q_UNUSED(parentNode);
-	} ///< write internal state to node
-	virtual void parseXml(QDomNode& dataNode)
-	{
-		Q_UNUSED(dataNode);
-	} ///< read internal state from node
-	virtual void clear()
-	{
-	} ///< clear everything loaded from xml
-
-	virtual LandmarkMap getLandmarks()
-	{
-		return LandmarkMap();
-	}
-	virtual void setLandmark(Landmark landmark)
-	{
-		Q_UNUSED(landmark);
-	}
-	virtual void removeLandmark(QString uid)
-	{
-		Q_UNUSED(uid);
-	}
-	virtual void removeLandmarks()
-	{
-	}
-	;
-
-	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime)
-	{
-		Q_UNUSED(startTime);
-		Q_UNUSED(stopTime);
-		return SessionToolHistoryMap();
-	}
-	;
+	virtual ManualToolPtr getManualTool() = 0; ///< a mouse-controllable virtual tool that is available even when not tracking.
+	virtual void savePositionHistory() = 0;
+	virtual void loadPositionHistory() = 0;
+	virtual void addXml(QDomNode& parentNode) = 0;
+	virtual void parseXml(QDomNode& dataNode) = 0;
+	virtual void clear() = 0;
+	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime) = 0;
+	virtual ToolPtr findFirstProbe() = 0;
 
 signals:
 	void configured(); ///< system is configured
@@ -144,9 +103,6 @@ signals:
 	void trackingStopped(); ///< system stops tracking
 
 	void dominantToolChanged(const QString& uId); ///<signal for change of dominant tool
-	void landmarkRemoved(QString uid);
-	void landmarkAdded(QString uid);
-	void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
 	void tps(int); ///< the dominant tools tps
 	void tooltipOffset(double offset); ///< The tool tip offset
 

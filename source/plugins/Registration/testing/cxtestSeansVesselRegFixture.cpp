@@ -190,9 +190,9 @@ void SeansVesselRegFixture::doTestVessel2VesselRegistration(
 	}
 
 	cx::DataPtr source = cx::dataManager()->loadData("source_" + filenameSource,
-			filenameSource, cx::rtAUTO);
+			filenameSource);
 	cx::DataPtr target = cx::dataManager()->loadData("target_" + filenameTarget,
-			filenameTarget, cx::rtAUTO);
+			filenameTarget);
 	CHECK(source);
 	CHECK(target);
 	source->get_rMd_History()->setRegistration(perturbation);

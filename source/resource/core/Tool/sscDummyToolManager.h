@@ -60,18 +60,29 @@ public:
 
 	virtual ToolPtr getDominantTool();
 	virtual void setDominantTool(const QString& uid);
+	virtual void dominantCheckSlot() {}
 
 	virtual std::map<QString, QString> getToolUidsAndNames() const;
 	virtual std::vector<QString> getToolNames() const;
 	virtual std::vector<QString> getToolUids() const;
 
-	virtual Transform3DPtr get_rMpr() const;
-	virtual void set_rMpr(const Transform3DPtr& val);
+	virtual Transform3D get_rMpr() const;
+	virtual void set_rMpr(const Transform3D& val);
 	virtual ToolPtr getReferenceTool() const;
 	virtual void saveTransformsAndTimestamps(QString filePathAndName = "");
 
 	virtual void setTooltipOffset(double offset);
 	virtual double getTooltipOffset() const;
+
+	virtual LandmarksPtr getPatientLandmarks() { return Landmarks::create(); }
+
+	virtual ManualToolPtr getManualTool() { return ManualToolPtr(); }
+	virtual void savePositionHistory() {}
+	virtual void loadPositionHistory() {}
+	virtual void addXml(QDomNode& parentNode) {}
+	virtual void parseXml(QDomNode& dataNode) {}
+	virtual void clear() {}
+	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime) { return SessionToolHistoryMap(); }
 
 	static DummyToolManager* getDowncastInstance();
 	/**
@@ -79,6 +90,8 @@ public:
 	 */
 	static void reset();
 	void addTool(DummyToolPtr tool);
+	virtual ToolPtr findFirstProbe() { return ToolPtr(); }
+
 
 private:
 	typedef DummyToolMap::iterator DummyToolMapIter;
@@ -91,7 +104,7 @@ private:
 	DummyToolPtr mDominantTool;
 	DummyToolPtr mReferenceTool;
 
-	Transform3DPtr m_rMpr;
+	Transform3D m_rMpr;
 	double mToolTipOffset; ///< Common tool tip offset for all tools
 
 	bool mConfigured;

@@ -18,6 +18,8 @@
 #include "cxToolDataAdapters.h"
 #include "cxActiveToolWidget.h"
 #include "sscManualTool.h"
+#include "cxLegacySingletons.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
@@ -74,7 +76,7 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
       QDomNode());
   connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spacesChangedSlot()));
   connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(setModified()));
-  mSpaceSelector->setValue(SpaceHelpers::getPr().toString());
+  mSpaceSelector->setValue(spaceProvider()->getPr().toString());
   manualGroupLayout->addWidget(new LabeledComboBoxWidget(this, mSpaceSelector));
 
   mUSSectorConfigBox = new LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New());
@@ -127,8 +129,8 @@ void ToolPropertiesWidget::manualToolChanged()
 
   Transform3D prMt = cxToolManager::getInstance()->getManualTool()->get_prMt();
   CoordinateSystem space_q = CoordinateSystem::fromString(mSpaceSelector->getValue());
-  CoordinateSystem space_mt = SpaceHelpers::getTO(cxToolManager::getInstance()->getManualTool());
-  Transform3D qMt = SpaceHelpers::get_toMfrom(space_mt, space_q);
+  CoordinateSystem space_mt = spaceProvider()->getTO(cxToolManager::getInstance()->getManualTool());
+  Transform3D qMt = spaceProvider()->get_toMfrom(space_mt, space_q);
 
   mManualToolWidget->setMatrix(qMt);
   mManualToolWidget->blockSignals(false);
@@ -138,9 +140,9 @@ void ToolPropertiesWidget::manualToolWidgetChanged()
 {
 	Transform3D qMt = mManualToolWidget->getMatrix();
   CoordinateSystem space_q = CoordinateSystem::fromString(mSpaceSelector->getValue());
-  CoordinateSystem space_mt = SpaceHelpers::getTO(cxToolManager::getInstance()->getManualTool());
-  CoordinateSystem space_pr = SpaceHelpers::getPr();
-  Transform3D qMpr = SpaceHelpers::get_toMfrom(space_pr, space_q);
+  CoordinateSystem space_mt = spaceProvider()->getTO(cxToolManager::getInstance()->getManualTool());
+  CoordinateSystem space_pr = spaceProvider()->getPr();
+  Transform3D qMpr = spaceProvider()->get_toMfrom(space_pr, space_q);
   Transform3D prMt = qMpr.inv() * qMt;
 
   cxToolManager::getInstance()->getManualTool()->set_prMt(prMt);
@@ -150,7 +152,7 @@ void ToolPropertiesWidget::spacesChangedSlot()
 {
 	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
 
-	std::vector<CoordinateSystem> spaces = SpaceHelpers::getSpacesToPresentInGUI();
+	std::vector<CoordinateSystem> spaces = spaceProvider()->getSpacesToPresentInGUI();
 	QStringList range;
 	for (unsigned i=0; i<spaces.size(); ++i)
 	  range << spaces[i].toString();

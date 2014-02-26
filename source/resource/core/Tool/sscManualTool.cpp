@@ -30,13 +30,13 @@ namespace cx
 {
 
 ManualTool::ManualTool(ToolManager* manager, const QString& uid, const QString& name) :
-	Tool(uid,name)
+	ToolImpl(manager, uid, name)
 {
 	mTimestamp = 0;
 	mVisible = false;
 	read3DCrossHairSlot(0);
-	connect(manager, SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
-	connect(manager, SIGNAL(tooltipOffset(double)), this, SLOT(read3DCrossHairSlot(double)));
+	connect(mManager, SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
+	connect(mManager, SIGNAL(tooltipOffset(double)), this, SLOT(read3DCrossHairSlot(double)));
 }
 
 ManualTool::~ManualTool()
@@ -69,7 +69,7 @@ void ManualTool::set_prMt(const Transform3D& prMt)
 void ManualTool::set_prMt(const Transform3D& prMt, double timestamp)
 {
 	mTimestamp = timestamp;
-	Tool::set_prMt(prMt, timestamp);
+	ToolImpl::set_prMt(prMt, timestamp);
 }
 
 QString ManualTool::getGraphicsFileName() const
@@ -136,13 +136,13 @@ double ManualTool::getTimestamp() const
 // Just use the tool tip offset from the tool manager
 double ManualTool::getTooltipOffset() const
 {
-	return toolManager()->getTooltipOffset();
+	return mManager->getTooltipOffset();
 }
 
 // Just use the tool tip offset from the tool manager
 void ManualTool::setTooltipOffset(double val)
 {
-	toolManager()->setTooltipOffset(val);
+	mManager->setTooltipOffset(val);
 }
 
 Transform3D ManualTool::getCalibration_sMt() const

@@ -29,6 +29,7 @@
 
 namespace cx
 {
+class DataManager;
 class SliceComputer;
 // forward declarations
 typedef boost::shared_ptr<class Tool> ToolPtr;
@@ -81,8 +82,7 @@ class SliceProxy : public SliceProxyInterface
 {
 	Q_OBJECT
 public:
-	static SliceProxyPtr New(const QString& name);
-	SliceProxy();
+	static SliceProxyPtr create(DataManager* dataManager);
 	virtual ~SliceProxy();
 
 	void setTool(ToolPtr tool);
@@ -90,7 +90,6 @@ public:
 	void setPlane(PLANE_TYPE plane );
 	void setFollowType(FOLLOW_TYPE followType);
 	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, bool useConstrainedViewOffset = false);
-	QString getName() const;
 
 	void setGravity(bool use, const Vector3D& dir);
 	void setToolViewOffset(bool use, double viewportHeight, double toolViewOffset, bool useConstrainedViewOffset = false);
@@ -114,12 +113,7 @@ public:
 	 */
 	void setUseTooltipOffset(bool);
 
-//#ifdef WIN32
-//	typedef Transform3D Transform3D;
-//#endif
-
 signals:
-//	void transformChanged(Transform3D sMr); ///< emitted when transform is changed.
 	void toolTransformAndTimestamp(Transform3D prMt, double timestamp); ///< forwarded from tool
 	void toolVisible(bool visible); ///< forwarding of visible in tool
 
@@ -132,13 +126,15 @@ private slots:
 	void changed();
 
 private:
+	SliceProxy(cx::DataManager *dataManager);
 	Transform3D getSyntheticToolPos(const Vector3D& center) const;
 	ToolPtr mTool;
 	boost::scoped_ptr<SliceComputer> mCutplane;
 	Vector3D mDefaultCenter; ///< use this center when no tool is available
 	bool mAlwaysUseDefaultCenter; ///< use def center anyway
-	QString mName; ///< for debug
+//	QString mName; ///< for debug
 	bool mUseTooltipOffset;
+	DataManager* mDataManager;
 };
 
 }

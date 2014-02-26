@@ -155,7 +155,7 @@ void EraserWidget::duplicateSlot()
 	ImagePtr original = dataManager()->getActiveImage();
 	QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
 
-	ImagePtr duplicate = duplicateImage(original);
+	ImagePtr duplicate = duplicateImage(dataManager(), original);
 	dataManager()->loadData(duplicate);
 	dataManager()->saveImage(duplicate, outputBasePath);
 	dataManager()->setActiveImage(duplicate);

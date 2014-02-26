@@ -32,7 +32,8 @@
 namespace cx
 {
 
-cxTool::cxTool(IgstkToolPtr igstkTool) :
+cxTool::cxTool(ToolManager* manager, IgstkToolPtr igstkTool) :
+	ToolImpl(manager, ""),
 				mTool(igstkTool), mPolyData(NULL),
 				mValid(false), mConfigured(false), mTracked(false)
 {
@@ -55,7 +56,7 @@ cxTool::cxTool(IgstkToolPtr igstkTool) :
 						mTool->getInternalStructure().mInstrumentScannerId);
 		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 	}
-	connect(toolManager(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
+	connect(mManager, SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }
 
 cxTool::~cxTool()
@@ -116,14 +117,14 @@ double cxTool::getTooltipOffset() const
 	if(this->getProbe())
 		return this->getProbe()->getProbeData().getDepthStart();
 	else
-		return toolManager()->getTooltipOffset();
+		return mManager->getTooltipOffset();
 }
 
 void cxTool::setTooltipOffset(double val)
 {
 	if(this->getProbe())
 		return;
-	toolManager()->setTooltipOffset(val);
+	mManager->setTooltipOffset(val);
 }
 
 bool cxTool::isValid() const
@@ -234,7 +235,7 @@ void cxTool::parseXml(QDomNode& dataNode)
 
 void cxTool::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)
 {
-	Tool::set_prMt(matrix, timestamp);
+	ToolImpl::set_prMt(matrix, timestamp);
 }
 
 void cxTool::calculateTpsSlot()

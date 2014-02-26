@@ -50,7 +50,7 @@ private:
 
 	QHBoxLayout* mLayout;
 	StringDataAdapterXmlPtr mSpaceSelector;
-	CoordinateSystemListenerPtr mListener;
+	SpaceListenerPtr mListener;
 	DominantToolProxyPtr mActiveTool;
 	QLineEdit* mCoordLineEdit;
 	QAction* mAdvancedAction;

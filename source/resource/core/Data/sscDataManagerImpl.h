@@ -31,7 +31,6 @@
 #include <QFileInfo>
 #include "boost/scoped_ptr.hpp"
 
-
 class QDomElement;
 
 namespace cx
@@ -54,6 +53,8 @@ class DataManagerImpl: public DataManager
 Q_OBJECT
 public:
 	static void initialize();
+	void setSpaceProvider(SpaceProviderPtr spaceProvider);
+	void setDataFactory(DataFactoryPtr dataFactory);
 
 	// streams
 	virtual VideoSourcePtr getStream(const QString& uid) const;
@@ -66,11 +67,12 @@ public:
 	virtual std::map<QString, ImagePtr> getImages() const;
 
 	void loadData(DataPtr data);
-	DataPtr loadData(const QString& uid, const QString& path, READER_TYPE type);
+	DataPtr loadData(const QString& uid, const QString& path);
     virtual void saveData(DataPtr data, const QString& basePath); ///< Save data to file
     std::map<QString, DataPtr> getData() const;
 	DataPtr getData(const QString& uid) const;
-	//  virtual void saveData(DataPtr image, const QString& basePath, bool headerOnly=false);///< Save image to file \param basePath Absolute path to patient data folder
+	virtual SpaceProviderPtr getSpaceProvider();
+	virtual DataFactoryPtr getDataFactory();
 
 	// meshes
 	virtual void saveMesh(MeshPtr mesh, const QString& basePath);///< Save mesh to file \param mesh to save \param basePath Absolute path to patient data folder
@@ -93,9 +95,6 @@ public:
 	virtual void clear(); ///< remove all stuff from manager
 	virtual void removeData(const QString& uid, QString basePath);
 
-	//virtual MeshPtr getActiveMesh() const; ///< used for system state
-	//virtual void setActiveMesh(MeshPtr activeMesh); ///< used for system state
-
 	//Interface for saving/loading
 	virtual void addXml(QDomNode& parentNode); ///< adds xml information about the datamanger and its variabels
 	virtual void parseXml(QDomNode& datamangerNode, QString absolutePath = QString());///< Use a XML node to load data. \param datamangerNode A XML data representation of the DataManager. \param absolutePath Absolute path to the data elements. Used together with the relative paths stored in the filePath elements.
@@ -105,6 +104,12 @@ public:
 	virtual ImagePtr createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath);
 	virtual ImagePtr createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath);
 	virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath);
+
+	virtual Transform3D get_rMpr() const; ///< get the patient registration transform
+	virtual void set_rMpr(const Transform3D& val); ///<  set the transform from patient to reference space
+	virtual RegistrationHistoryPtr get_rMpr_History();
+
+	virtual LandmarksPtr getPatientLandmarks();
 
 protected:
 	DataManagerImpl();
@@ -116,26 +121,25 @@ protected:
 	DataMap mData;
 	Vector3D mCenter;
 	CLINICAL_APPLICATION mClinicalApplication;
-//	typedef std::set<DataReaderPtr> DataReadersType;
-//	DataReadersType mDataReaders;
 	void deleteFiles(DataPtr data, QString basePath);
 
 	//state
 	ImagePtr mActiveImage;
-	//MeshPtr mActiveMesh;
-	virtual ImagePtr loadImage(const QString& uid, const QString& filename, READER_TYPE notused);
-	virtual MeshPtr loadMesh(const QString& uid, const QString& fileName, READER_TYPE notused);
-	//  READER_TYPE getReaderType(QString fileType);
+	virtual ImagePtr loadImage(const QString& uid, const QString& filename);
+	virtual MeshPtr loadMesh(const QString& uid, const QString& fileName);
 	DataPtr loadData(QDomElement node, QString rootPath);
-	DataPtr readData(const QString& uid, const QString& path, const QString& type);
+//	DataPtr readData(const QString& uid, const QString& path, const QString& type);
 	int findUniqueUidNumber(QString uidBase) const;
 	void generateUidAndName(QString* _uid, QString* _name);
 
 	LandmarkPropertyMap mLandmarkProperties; ///< uid and name
+	RegistrationHistoryPtr m_rMpr_History; ///< transform from the patient reference to the reference, along with historical data.
+	LandmarksPtr mPatientLandmarks; ///< in space patient reference.
+	SpaceProviderPtr mSpaceProvider;
+	DataFactoryPtr mDataFactory;
 
 public slots:
 	void vtkImageDataChangedSlot();
-//	void transferFunctionsChangedSlot();//Not uses any longer. Use ActiveImageProxy in CustusX
 };
 
 } // namespace cx

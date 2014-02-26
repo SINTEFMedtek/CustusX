@@ -41,7 +41,7 @@ void DummyToolManager::reset()
 
 DummyToolManager::DummyToolManager() :
 	mDummyTools(new DummyToolMap),
-	m_rMpr(new Transform3D(Transform3D::Identity())),
+	m_rMpr(Transform3D::Identity()),
 	mToolTipOffset(0),
 	mConfigured(false),
 	mInitialized(false),
@@ -189,12 +189,12 @@ std::vector<QString> DummyToolManager::getToolUids() const
 	return uids;
 }
 
-Transform3DPtr DummyToolManager::get_rMpr() const
+Transform3D DummyToolManager::get_rMpr() const
 {
 	return m_rMpr;
 }
 
-void DummyToolManager::set_rMpr(const Transform3DPtr& val)
+void DummyToolManager::set_rMpr(const Transform3D& val)
 {
 	m_rMpr = val;
 }

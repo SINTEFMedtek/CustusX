@@ -80,14 +80,15 @@
 #include "cxAxisConnector.h"
 #include "cxMultiVolume3DRepProducer.h"
 #include "cxMetricNamesRep.h"
-
+#include "cxVisualizationServiceBackend.h"
 
 namespace cx
 {
 
 
 
-ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view)
+ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServiceBackendPtr backend) :
+	ViewWrapper(backend)
 {
 	view->getRenderer()->GetActiveCamera()->SetClippingRange(1, 2000);
 	if (!view->getRenderWindow()->GetStereoCapableWindow())
@@ -105,18 +106,18 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view)
 
 	this->initializeMultiVolume3DRepProducer();
 
-	mLandmarkRep = LandmarkRep::New("LandmarkRep_" + index);
+	mLandmarkRep = LandmarkRep::New(mBackend->getDataManager(), "LandmarkRep_" + index);
 	mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
 	mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 
-	mPickerRep = PickerRep::New("PickerRep_" + index, "PickerRep_" + index);
+	mPickerRep = PickerRep::New(mBackend->getDataManager(), "PickerRep_" + index, "PickerRep_" + index);
 
 	connect(mPickerRep.get(), SIGNAL(pointPicked(Vector3D)), this, SLOT(PickerRepPointPickedSlot(Vector3D)));
 	connect(mPickerRep.get(), SIGNAL(dataPicked(QString)), this, SLOT(PickerRepDataPickedSlot(QString)));
 	mPickerRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
 	mPickerRep->setEnabled(false);
 	mView->addRep(mPickerRep);
-	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(mBackend->getToolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 	this->dominantToolChangedSlot();
 
 	// plane type text rep
@@ -132,9 +133,9 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view)
 	//data name text rep
 	this->updateMetricNamesRep();
 
-	connect(toolManager(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
-	connect(toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
-	connect(dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
+	connect(mBackend->getToolManager(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
+	connect(mBackend->getToolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
+	connect(mBackend->getDataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
 	this->toolsAvailableSlot();
 
 	mAnnotationMarker = RepManager::getInstance()->getCachedRep<OrientationAnnotation3DRep>(
@@ -257,17 +258,17 @@ void ViewWrapper3D::updateMetricNamesRep()
 
 void ViewWrapper3D::PickerRepPointPickedSlot(Vector3D p_r)
 {
-	Transform3D rMpr = *toolManager()->get_rMpr();
+	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
 	Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
-	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
+	ManualToolPtr tool = mBackend->getToolManager()->getManualTool();
 	Vector3D offset = tool->get_prMt().vector(Vector3D(0, 0, tool->getTooltipOffset()));
 	p_pr -= offset;
 	p_r = rMpr.coord(p_pr);
 
 	// TODO set center here will not do: must handle
-	dataManager()->setCenter(p_r);
+	mBackend->getDataManager()->setCenter(p_r);
 	Vector3D p0_pr = tool->get_prMt().coord(Vector3D(0, 0, 0));
 	tool->set_prMt(createTransformTranslate(p_pr - p0_pr) * tool->get_prMt());
 }
@@ -337,7 +338,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
 	showRefTool->setDisabled(true);
 	showRefTool->setCheckable(true);
-	ToolPtr refTool = cxToolManager::getInstance()->getReferenceTool();
+	ToolPtr refTool = mBackend->getToolManager()->getReferenceTool();
 	if (refTool)
 	{
 		showRefTool->setText("Show " + refTool->getName());
@@ -408,7 +409,7 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 void ViewWrapper3D::showToolPathSlot(bool checked)
 {
 	ToolRep3DPtr activeRep3D = RepManager::findFirstRep<ToolRep3D>(mView->getReps(),
-					toolManager()->getDominantTool());
+					mBackend->getToolManager()->getDominantTool());
 	if (activeRep3D)
 	{
 		if (activeRep3D->getTracer()->isRunning())
@@ -443,7 +444,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		AxisConnectorPtr axis;
 
 		// reference space
-		axis.reset(new AxisConnector(CoordinateSystem(csREF)));
+		axis.reset(new AxisConnector(CoordinateSystem(csREF), mBackend->getSpaceProvider()));
 		axis->mRep->setAxisLength(0.12);
 		axis->mRep->setShowAxesLabels(true);
 		axis->mRep->setCaption("ref", Vector3D(1, 0, 0));
@@ -454,7 +455,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		std::vector<DataPtr> data = mGroupData->getData();
 		for (unsigned i = 0; i < data.size(); ++i)
 		{
-			axis.reset(new AxisConnector(CoordinateSystem(csDATA, data[i]->getUid())));
+			axis.reset(new AxisConnector(CoordinateSystem(csDATA, data[i]->getUid()), mBackend->getSpaceProvider()));
 			axis->mRep->setAxisLength(0.08);
 			axis->mRep->setShowAxesLabels(false);
 			axis->mRep->setCaption(data[i]->getName(), Vector3D(1, 0, 0));
@@ -463,23 +464,23 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		}
 
 		// tool spaces
-		ToolManager::ToolMapPtr tools = toolManager()->getTools();
+		ToolManager::ToolMapPtr tools = mBackend->getToolManager()->getTools();
 		ToolManager::ToolMapPtr::element_type::iterator iter;
 		for (iter = tools->begin(); iter != tools->end(); ++iter)
 		{
 			ToolPtr tool = iter->second;
 
-			axis.reset(new AxisConnector(CoordinateSystem(csTOOL, tool->getUid())));
+			axis.reset(new AxisConnector(CoordinateSystem(csTOOL, tool->getUid()), mBackend->getSpaceProvider()));
 			axis->mRep->setAxisLength(0.08);
 			axis->mRep->setShowAxesLabels(false);
 			axis->mRep->setCaption("t", Vector3D(0.7, 1, 0.7));
 			axis->mRep->setFontSize(0.03);
 			axis->connectTo(tool);
-			CoordinateSystemListenerPtr mToolListener = axis->mListener;
+			SpaceListenerPtr mToolListener = axis->mListener;
 
 			mAxis.push_back(axis);
 
-			axis.reset(new AxisConnector(CoordinateSystem(csSENSOR, tool->getUid())));
+			axis.reset(new AxisConnector(CoordinateSystem(csSENSOR, tool->getUid()), mBackend->getSpaceProvider()));
 			axis->mRep->setAxisLength(0.05);
 			axis->mRep->setShowAxesLabels(false);
 			axis->mRep->setCaption("s", Vector3D(1, 1, 0));
@@ -497,7 +498,6 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 void ViewWrapper3D::showManualToolSlot(bool visible)
 {
 	settings()->setValue("showManualTool", visible);
-//  ToolManager::getInstance()->getManualTool()->setVisible(visible);
 }
 
 void ViewWrapper3D::showOrientationSlot(bool visible)
@@ -515,15 +515,15 @@ void ViewWrapper3D::resetCameraActionSlot()
 
 void ViewWrapper3D::centerImageActionSlot()
 {
-	if (dataManager()->getActiveImage())
-		Navigation().centerToData(dataManager()->getActiveImage());
+	if (mBackend->getDataManager()->getActiveImage())
+		Navigation(mBackend).centerToData(mBackend->getDataManager()->getActiveImage());
 	else
-		Navigation().centerToView(mGroupData->getData());
+		Navigation(mBackend).centerToView(mGroupData->getData());
 }
 
 void ViewWrapper3D::centerToolActionSlot()
 {
-	Navigation().centerToTooltip();
+	Navigation(mBackend).centerToTooltip();
 }
 
 void ViewWrapper3D::showSlicePlanesActionSlot(bool checked)
@@ -679,7 +679,7 @@ void ViewWrapper3D::activeImageChangedSlot()
 {
 	if(!mGroupData)
 		return;
-	ImagePtr image = dataManager()->getActiveImage();
+	ImagePtr image = mBackend->getDataManager()->getActiveImage();
 
 	// only show landmarks belonging to image visible in this view:
 	std::vector<ImagePtr> images = mGroupData->getImages();
@@ -689,13 +689,13 @@ void ViewWrapper3D::activeImageChangedSlot()
 
 void ViewWrapper3D::showRefToolSlot(bool checked)
 {
-	ToolPtr refTool = toolManager()->getReferenceTool();
+	ToolPtr refTool = mBackend->getToolManager()->getReferenceTool();
 	if (!refTool)
 		return;
 	ToolRep3DPtr refRep = RepManager::findFirstRep<ToolRep3D>(mView->getReps(), refTool);
 	if (!refRep)
 	{
-		refRep = ToolRep3D::New(refTool->getUid() + "_rep3d_" + this->mView->getUid());
+		refRep = ToolRep3D::New(mBackend->getSpaceProvider(), refTool->getUid() + "_rep3d_" + this->mView->getUid());
 		refRep->setTool(refTool);
 	}
 
@@ -724,13 +724,13 @@ void ViewWrapper3D::updateSlices()
 	PLANE_TYPE type = string2enum<PLANE_TYPE>(mShowSlicesMode);
 	if (type != ptCOUNT)
 	{
-		mSlices3DRep->addPlane(type);
+		mSlices3DRep->addPlane(type, mBackend->getDataManager());
 	}
 	else if (mShowSlicesMode == "ACS")
 	{
-		mSlices3DRep->addPlane(ptAXIAL);
-		mSlices3DRep->addPlane(ptSAGITTAL);
-		mSlices3DRep->addPlane(ptCORONAL);
+		mSlices3DRep->addPlane(ptAXIAL, mBackend->getDataManager());
+		mSlices3DRep->addPlane(ptSAGITTAL, mBackend->getDataManager());
+		mSlices3DRep->addPlane(ptCORONAL, mBackend->getDataManager());
 	}
 	else
 	{
@@ -741,7 +741,7 @@ void ViewWrapper3D::updateSlices()
 	mSlices3DRep->setShaderPath(DataLocations::getShaderPath());
 	if (mGroupData && !mGroupData->getImages().empty())
 		mSlices3DRep->setImages(mGroupData->getImages());
-	mSlices3DRep->setTool(toolManager()->getDominantTool());
+	mSlices3DRep->setTool(mBackend->getToolManager()->getDominantTool());
 	mView->addRep(mSlices3DRep);
 //#endif // USE_GLX_SHARED_CONTEXT
 }
@@ -753,7 +753,7 @@ ViewWidget* ViewWrapper3D::getView()
 
 void ViewWrapper3D::dominantToolChangedSlot()
 {
-	ToolPtr dominantTool = toolManager()->getDominantTool();
+	ToolPtr dominantTool = mBackend->getToolManager()->getDominantTool();
 	mPickerRep->setTool(dominantTool);
 	if (mSlices3DRep)
 		mSlices3DRep->setTool(dominantTool);
@@ -761,7 +761,7 @@ void ViewWrapper3D::dominantToolChangedSlot()
 
 void ViewWrapper3D::toolsAvailableSlot()
 {
-	ToolManager::ToolMapPtr tools = toolManager()->getTools();
+	ToolManager::ToolMapPtr tools = mBackend->getToolManager()->getTools();
 	ToolManager::ToolMapPtr::element_type::iterator iter;
 	for (iter = tools->begin(); iter != tools->end(); ++iter)
 	{
@@ -781,7 +781,7 @@ void ViewWrapper3D::toolsAvailableSlot()
 
 		if (!toolRep)
 		{
-			toolRep = ToolRep3D::New(tool->getUid() + "_rep3d_" + this->mView->getUid());
+			toolRep = ToolRep3D::New(mBackend->getSpaceProvider(), tool->getUid() + "_rep3d_" + this->mView->getUid());
 			if (settings()->value("showToolPath").toBool())
 				toolRep->getTracer()->start();
 		}

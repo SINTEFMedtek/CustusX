@@ -35,6 +35,7 @@ namespace cx
 
 typedef boost::shared_ptr<class ImageReceiverThread> ImageReceiverThreadPtr;
 typedef boost::shared_ptr<class BasicVideoSource> BasicVideoSourcePtr;
+typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 
 /** \brief Represent one video grabber connection.
  *
@@ -56,7 +57,7 @@ class VideoConnection : public QObject
 	Q_OBJECT
 
 public:
-	VideoConnection();
+	explicit VideoConnection(VideoServiceBackendPtr backend);
 	virtual ~VideoConnection();
 	virtual bool isConnected() const;
 
@@ -98,6 +99,7 @@ private:
 	std::vector<BasicVideoSourcePtr> mSources;
 
 	QString mImageUidToStream;
+	VideoServiceBackendPtr mBackend;
 };
 typedef boost::shared_ptr<VideoConnection> VideoConnectionPtr;
 

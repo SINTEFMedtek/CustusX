@@ -41,28 +41,32 @@
 #include "sscImage.h"
 #include "sscView.h"
 #include "sscTool.h"
-#include "sscToolManager.h"
 #include "sscRegistrationTransform.h"
 #include "sscGeometricRep.h"
 
 #include "vtkVolumePicker.h"
+
+#include "cxConfig.h"
 #ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
 	#include "vtkMultiVolumePicker.h"
-	typedef vtkSmartPointer<class vtkMultiVolumePicker> vtkMultiVolumePickerPtr;
+    typedef vtkSmartPointer<class vtkMultiVolumePicker> vtkMultiVolumePickerPtr;
+//    typedef vtkSmartPointer<class vtkVolumePicker> vtkMultiVolumePickerPtr;
 #else
-	typedef vtkSmartPointer<class vtkVolumePicker> vtkMultiVolumePickerPtr;
+    typedef vtkSmartPointer<class vtkVolumePicker> vtkMultiVolumePickerPtr;
 #endif
 
 namespace cx
 {
-PickerRepPtr PickerRep::New(const QString& uid, const QString& name)
+PickerRepPtr PickerRep::New(DataManager* dataManager, const QString& uid, const QString& name)
 {
-	PickerRepPtr retval(new PickerRep(uid, name));
+	PickerRepPtr retval(new PickerRep(dataManager, uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
-PickerRep::PickerRep(const QString& uid, const QString& name) :
-		RepImpl(uid, name), mPickedPoint(), mSphereRadius(2) //, mConnections(vtkEventQtSlotConnectPtr::New())
+PickerRep::PickerRep(DataManager* dataManager, const QString& uid, const QString& name) :
+	RepImpl(uid, name),
+	mDataManager(dataManager),
+	mPickedPoint(), mSphereRadius(2) //, mConnections(vtkEventQtSlotConnectPtr::New())
 {
 	mIsDragging = false;
 	mViewportListener.reset(new ViewportListener);
@@ -153,6 +157,8 @@ typedef vtkSmartPointer<class vtkDataSet> vtkDataSetPtr;
  */
 void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer)
 {
+	if (!this->mEnabled)
+		return;
 	vtkMultiVolumePickerPtr picker = vtkMultiVolumePickerPtr::New();
 	int hit = picker->Pick(clickPosition[0], clickPosition[1], 0, renderer);
 
@@ -160,7 +166,7 @@ void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr rende
 	vtkDataSetPtr data = picker->GetDataSet();
 	if (data)
 	{
-		std::map<QString, DataPtr> allData = dataManager()->getData();
+		std::map<QString, DataPtr> allData = mDataManager->getData();
 		for (std::map<QString, DataPtr>::iterator iter = allData.begin(); iter != allData.end(); ++iter)
 		{
 			MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(iter->second);
@@ -241,7 +247,7 @@ void PickerRep::toolHasChanged()
 	if (!mTool)
 		return;
 	Transform3D prMt = mTool->get_prMt();
-	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = mDataManager->get_rMpr();
 	Transform3D rMt = rMpr * prMt;
 	Vector3D p_r = rMt.coord(Vector3D(0, 0, mTool->getTooltipOffset()));
 
@@ -253,6 +259,7 @@ void PickerRep::toolHasChanged()
 
 void PickerRep::setEnabled(bool on)
 {
+	mEnabled = on;
 	if (mSnapToSurface == on)
 		return;
 
@@ -421,8 +428,7 @@ void PickerRep::addRepActorsToViewRenderer(View *view)
 
 	mView = view;
 
-	if (mEnabled)
-		this->connectInteractor();
+	this->connectInteractor();
 
 	mGraphicalPoint.reset(new GraphicalPoint3D(mView->getRenderer()));
 	mGraphicalPoint->setColor(QColor(Qt::blue));
