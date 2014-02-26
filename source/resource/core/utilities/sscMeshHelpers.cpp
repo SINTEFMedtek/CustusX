@@ -5,7 +5,6 @@
 #include <vtkPoints.h>
 #include <vtkCellArray.h>
 
-#include "sscToolManager.h"
 #include "sscDataManager.h"
 #include "sscMesh.h"
 #include "sscTypeConversions.h"
@@ -13,11 +12,9 @@
 
 namespace cx
 {
-vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt)
+vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt, Transform3D rMpr)
 {
   vtkPolyDataPtr retval = vtkPolyDataPtr::New();
-
-  Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
 
   vtkPointsPtr points = vtkPointsPtr::New();
   vtkCellArrayPtr lines = vtkCellArrayPtr::New();
@@ -48,15 +45,16 @@ vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt)
   return retval;
 }
 
-void loadMeshFromToolTransforms(TimedTransformMap transforms_prMt)
+void loadMeshFromToolTransforms(DataManager *dataManager, TimedTransformMap transforms_prMt)
 {
   //create polydata from positions
-  vtkPolyDataPtr centerlinePolydata = polydataFromTransforms(transforms_prMt);
+	Transform3D rMpr = dataManager->get_rMpr();
+  vtkPolyDataPtr centerlinePolydata = polydataFromTransforms(transforms_prMt, rMpr);
   QString uid = "tool_positions_mesh_%1";
   QString name = "Tool positions mesh %1";
-  MeshPtr mesh = dataManager()->createMesh(centerlinePolydata, uid, name, "Images");
+  MeshPtr mesh = dataManager->createMesh(centerlinePolydata, uid, name, "Images");
   mesh->setColor(QColor("red"));
-  dataManager()->loadData(mesh);
+  dataManager->loadData(mesh);
 }
 
 std::map<std::string, std::string> getDisplayFriendlyInfo(MeshPtr mesh)

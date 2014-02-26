@@ -56,7 +56,7 @@ class ViewWrapper2D: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapper2D(ViewWidget* view);
+	ViewWrapper2D(ViewWidget* view, VisualizationServiceBackendPtr backend);
 	virtual ~ViewWrapper2D();
 	virtual void initializePlane(PLANE_TYPE plane);
 	virtual ViewWidget* getView();

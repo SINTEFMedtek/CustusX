@@ -13,6 +13,9 @@
 //#include "cxStateService.h"
 //#include "cxPatientData.h"
 
+#include "cxLegacySingletons.h"
+#include "cxSpaceProvider.h"
+
 namespace cx
 {
 TrackingDataToVolume::TrackingDataToVolume()
@@ -69,9 +72,9 @@ void TrackingDataToVolume::insertPoints(ImagePtr image_d, std::vector<Vector3D> 
   vtkImageDataPtr data_pr = image_d->getBaseVtkImageData();
 
   //convert points into image space (d) and insert a binary value into the image at the points location in the image
-  CoordinateSystem pr = CoordinateSystemHelpers::getPr();
-  CoordinateSystem d = CoordinateSystemHelpers::getD(image_d);
-  Transform3D dMpr = CoordinateSystemHelpers::get_toMfrom(pr, d);
+  CoordinateSystem pr = spaceProvider()->getPr();
+  CoordinateSystem d = spaceProvider()->getD(image_d);
+  Transform3D dMpr = spaceProvider()->get_toMfrom(pr, d);
 
   std::vector<Vector3D>::iterator it = points_pr.begin();
   for(; it != points_pr.end(); ++it)
@@ -117,7 +120,7 @@ void TrackingDataToVolume::setInput(TimedTransformMap map_prMt, int padding_voxe
   bounds_mm[5] += padding_mm;
   mImage = createEmptyImage(bounds_mm, initialSpacing_mm);
 
-  Transform3D rMpr = *toolManager()->get_rMpr();
+  Transform3D rMpr = dataManager()->get_rMpr();
   //std::cout << "rMpr\n" << rMpr << std::endl;
   Transform3D rMd = rMpr * createTransformTranslate(bounds_mm.corner(0,0,0)); // TODO + eller - ?????
   //std::cout << "rMd\n" << rMd << std::endl;

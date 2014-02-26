@@ -202,7 +202,7 @@ void RegistrationHistoryWidget::setActiveTime(QDateTime active)
 std::vector<RegistrationHistoryPtr> RegistrationHistoryWidget::getAllRegistrationHistories()
 {
 	std::vector<RegistrationHistoryPtr> retval;
-	retval.push_back(ToolManager::getInstance()->get_rMpr_History());
+	retval.push_back(dataManager()->get_rMpr_History());
 
 	std::map<QString, DataPtr> data = DataManager::getInstance()->getData();
 	for (std::map<QString, DataPtr>::iterator iter = data.begin(); iter != data.end(); ++iter)

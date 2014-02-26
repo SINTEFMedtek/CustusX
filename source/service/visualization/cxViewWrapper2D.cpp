@@ -61,12 +61,14 @@
 #include "sscPointMetricRep2D.h"
 #include "sscLogger.h"
 #include "cxViewFollower.h"
+#include "cxVisualizationServiceBackend.h"
 
 namespace cx
 {
 
-ViewWrapper2D::ViewWrapper2D(ViewWidget* view) :
-				mOrientationActionGroup(new QActionGroup(view))
+ViewWrapper2D::ViewWrapper2D(ViewWidget* view, VisualizationServiceBackendPtr backend) :
+	ViewWrapper(backend),
+	mOrientationActionGroup(new QActionGroup(view))
 {
 //  std::cout << "ViewWrapper2D create" << std::endl;
 	mView = view;
@@ -86,7 +88,7 @@ ViewWrapper2D::ViewWrapper2D(ViewWidget* view) :
 	setZoom2D(SyncedValue::create(1));
 	setOrientationMode(SyncedValue::create(0)); // must set after addreps()
 
-	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(mBackend->getToolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 	connect(mView, SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
 	connect(mView, SIGNAL(showSignal(QShowEvent*)), this, SLOT(showSlot()));
 	connect(mView, SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mousePressSlot(QMouseEvent*)));
@@ -194,8 +196,8 @@ void ViewWrapper2D::addReps()
 	mView->addRep(mDataNameText);
 
 	// slice proxy
-	mSliceProxy = SliceProxy::New("sliceproxy_(" + mView->getName() + ")");
-	mViewFollower.reset(new ViewFollower);
+	mSliceProxy = SliceProxy::create(mBackend->getDataManager());
+	mViewFollower = ViewFollower::create(mBackend->getDataManager());
 	mViewFollower->setSliceProxy(mSliceProxy);
 
 	// slice rep
@@ -221,7 +223,7 @@ void ViewWrapper2D::addReps()
 //#endif
 
 	// tool rep
-	mToolRep2D = ToolRep2D::New("Tool2D_" + mView->getName());
+	mToolRep2D = ToolRep2D::New(mBackend->getSpaceProvider(), "Tool2D_" + mView->getName());
 	mToolRep2D->setSliceProxy(mSliceProxy);
 	mToolRep2D->setUseCrosshair(true);
 //  mToolRep2D->setUseToolLine(false);
@@ -591,10 +593,8 @@ void ViewWrapper2D::pointMetricAdded(PointMetricPtr mesh)
 	PointMetricRep2DPtr rep = PointMetricRep2D::New(mesh->getUid() + "_rep2D");
 	rep->setSliceProxy(mSliceProxy);
     rep->setDataMetric(mesh);
-	rep->setFillVisibility(false);
-	rep->setOutlineWidth(0.25);
-	rep->setOutlineColor(1,0,0);
 	rep->setDynamicSize(true);
+	rep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
 	mView->addRep(rep);
 	mPointMetricRep[mesh->getUid()] = rep;
 	this->updateView();
@@ -613,7 +613,7 @@ void ViewWrapper2D::pointMetricRemoved(const QString& uid)
 
 void ViewWrapper2D::dominantToolChangedSlot()
 {
-	ToolPtr dominantTool = toolManager()->getDominantTool();
+	ToolPtr dominantTool = mBackend->getToolManager()->getDominantTool();
 	mSliceProxy->setTool(dominantTool);
 }
 
@@ -705,7 +705,7 @@ void ViewWrapper2D::mouseWheelSlot(QWheelEvent* event)
 
 	this->setZoomFactor2D(newZoom);
 
-	Navigation().centerToTooltip(); // side effect: center on tool
+	Navigation(mBackend).centerToTooltip(); // side effect: center on tool
 }
 
 /**Convert a position in Qt viewport space (pixels with origin in upper-left corner)
@@ -724,10 +724,10 @@ Vector3D ViewWrapper2D::qvp2vp(QPoint pos_qvp)
 void ViewWrapper2D::shiftAxisPos(Vector3D delta_vp)
 {
 	delta_vp = -delta_vp;
-	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
+	ManualToolPtr tool = mBackend->getToolManager()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
-	Transform3D rMpr = *toolManager()->get_rMpr();
+	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 	Vector3D delta_s = get_vpMs().inv().vector(delta_vp);
 
@@ -744,10 +744,10 @@ void ViewWrapper2D::shiftAxisPos(Vector3D delta_vp)
  */
 void ViewWrapper2D::setAxisPos(Vector3D click_vp)
 {
-	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
+	ManualToolPtr tool = mBackend->getToolManager()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
-	Transform3D rMpr = *toolManager()->get_rMpr();
+	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 
 	// find tool position in s

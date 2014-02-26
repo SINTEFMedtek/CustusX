@@ -19,20 +19,10 @@
 
 #include "sscDataManagerImpl.h"
 
-#include <sstream>
 #include <vtkImageData.h>
-#include <vtkMetaImageReader.h>
-#include <vtkSmartPointer.h>
-#include <vtkMetaImageWriter.h>
 
 #include <vtkPolyData.h>
-#include <vtkPolyDataReader.h>
 #include <vtkPolyDataWriter.h>
-#include <vtkSTLReader.h>
-#include <vtkImageChangeInformation.h>
-#include "vtkMINCImageReader.h"
-#include "vtkTransform.h"
-#include "vtkCommand.h"
 
 #include <QtCore>
 #include <QDomDocument>
@@ -47,12 +37,13 @@
 #include "sscTypeConversions.h"
 #include "sscUtilHelpers.h"
 #include "sscVideoSource.h"
-#include "sscCustomMetaImage.h"
 
 #include "sscImageLUT2D.h"
 #include "sscImageTF3D.h"
 #include "sscLogger.h"
 #include "sscDataReaderWriter.h"
+#include "cxSpaceProvider.h"
+#include "cxDataFactory.h"
 
 namespace cx
 {
@@ -65,11 +56,34 @@ void DataManagerImpl::initialize()
 DataManagerImpl::DataManagerImpl()
 {
 	mClinicalApplication = mdLABORATORY;
+	m_rMpr_History.reset(new RegistrationHistory());
+	connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
+	mPatientLandmarks = Landmarks::create();
 	this->clear();
 }
 
 DataManagerImpl::~DataManagerImpl()
 {
+}
+
+void DataManagerImpl::setSpaceProvider(SpaceProviderPtr spaceProvider)
+{
+	mSpaceProvider = spaceProvider;
+}
+
+void DataManagerImpl::setDataFactory(DataFactoryPtr dataFactory)
+{
+	mDataFactory = dataFactory;
+}
+
+SpaceProviderPtr DataManagerImpl::getSpaceProvider()
+{
+	return mSpaceProvider;
+}
+
+DataFactoryPtr DataManagerImpl::getDataFactory()
+{
+	return mDataFactory;
 }
 
 void DataManagerImpl::clear()
@@ -79,10 +93,18 @@ void DataManagerImpl::clear()
 	mActiveImage.reset();
 	mLandmarkProperties.clear();
 
+	m_rMpr_History->clear();
+	mPatientLandmarks->clear();
+
 	emit centerChanged();
 	emit activeImageChanged("");
 	emit landmarkPropertiesChanged();
 	emit dataAddedOrRemoved();
+}
+
+LandmarksPtr DataManagerImpl::getPatientLandmarks()
+{
+	return mPatientLandmarks;
 }
 
 // streams
@@ -180,9 +202,9 @@ void DataManagerImpl::setLandmarkActive(QString uid, bool active)
 	emit landmarkPropertiesChanged();
 }
 
-ImagePtr DataManagerImpl::loadImage(const QString& uid, const QString& filename, READER_TYPE notused)
+ImagePtr DataManagerImpl::loadImage(const QString& uid, const QString& filename)
 {
-	DataPtr data = this->loadData(uid, filename, notused);
+	DataPtr data = this->loadData(uid, filename);
 	if (!data)
 		{
 			messageManager()->sendError("Error with image file: " + filename);
@@ -191,9 +213,19 @@ ImagePtr DataManagerImpl::loadImage(const QString& uid, const QString& filename,
 	return this->getImage(uid);
 }
 
-DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path, READER_TYPE notused)
+DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 {
-	DataPtr data = this->readData(uid, path, "unknown");
+	if (mData.count(uid)) // dont load same image twice
+		return mData[uid];
+
+	QString type = DataReaderWriter().findDataTypeFromFile(path);
+	DataPtr data = mDataFactory->create(type, uid);
+	data->load(path);
+
+//	DataPtr current = DataReaderWriter().readData(uid, path, type);
+//	return current;
+
+//	DataPtr data = this->readData(uid, path, "unknown");
 	if (!data)
 		{
 			messageManager()->sendError("Error with data file: " + path);
@@ -203,19 +235,24 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path, READE
 	return data;
 }
 
-/** Read a data set and return it. Do NOT add it to the datamanager.
- *  Internal method: used by loadData family.
- */
-DataPtr DataManagerImpl::readData(const QString& uid, const QString& path, const QString& type)
-{
-	if (mData.count(uid)) // dont load same image twice
-	{
-		return mData[uid];
-	}
+///** Read a data set and return it. Do NOT add it to the datamanager.
+// *  Internal method: used by loadData family.
+// */
+//DataPtr DataManagerImpl::readData(const QString& uid, const QString& path, const QString& type)
+//{
+//	if (mData.count(uid)) // dont load same image twice
+//	{
+//		return mData[uid];
+//	}
 
-	DataPtr current = DataReaderWriter().readData(uid, path, type);
-	return current;
-}
+//	DataPtr current = mDataFactory->create(type, uid, name);
+//	bool loaded = current->load(path);
+//	if (loaded)
+//		return current;
+
+////	DataPtr current = DataReaderWriter().readData(uid, path, type);
+////	return current;
+//}
 
 void DataManagerImpl::loadData(DataPtr data)
 {
@@ -238,35 +275,16 @@ void DataManagerImpl::loadData(DataPtr data)
 
 void DataManagerImpl::saveImage(ImagePtr image, const QString& basePath)
 {
-//	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
-//	writer->SetInput(image->getBaseVtkImageData());
-//	writer->SetFileDimensionality(3);
 	QString filename = basePath + "/Images/" + image->getUid() + ".mhd";
 	image->setFilename(QDir(basePath).relativeFilePath(filename));
-//	writer->SetFileName(cstring_cast(filename));
-//	QDir().mkpath(QFileInfo(filename).path());
-
-//	QString rawfilename = image->getUid() + ".raw";
-
-//	writer->SetRAWFileName(cstring_cast(rawfilename));
-//	writer->SetCompression(false);
-//	writer->Update();
-//	writer->Write();
-
-//	writer = 0;
-
-//	CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
-//	customReader->setTransform(image->get_rMd());
-//	customReader->setModality(image->getModality());
-//	customReader->setImageType(image->getImageType());
 
 	MetaImageReader().saveImage(image, filename);
 }
 
 // meshes
-MeshPtr DataManagerImpl::loadMesh(const QString& uid, const QString& fileName, READER_TYPE type)
+MeshPtr DataManagerImpl::loadMesh(const QString& uid, const QString& fileName)
 {
-	DataPtr data = this->loadData(uid, fileName, type);
+	DataPtr data = this->loadData(uid, fileName);
 	if (!data)
 		{
 			messageManager()->sendError("Error with mesh file: " + fileName);
@@ -303,10 +321,7 @@ void DataManagerImpl::saveMesh(MeshPtr mesh, const QString& basePath)
 {
 	vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();
 	writer->SetInput(mesh->getVtkPolyData());
-	//writer->SetFileDimensionality(3);
-//	QString filename = basePath + "/" + mesh->getFilePath();
 	QString filename = basePath + "/Images/" + mesh->getUid() + ".vtk";
-//	mesh->setFilename(filename);
 	mesh->setFilename(QDir(basePath).relativeFilePath(filename));
 	writer->SetFileName(cstring_cast(filename));
 
@@ -388,6 +403,8 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 	QDomElement dataManagerNode = doc.createElement("datamanager");
 	parentNode.appendChild(dataManagerNode);
 
+	m_rMpr_History->addXml(dataManagerNode);
+
 	QDomElement activeImageNode = doc.createElement("activeImageUid");
 	if (mActiveImage)
 		activeImageNode.appendChild(doc.createTextNode(mActiveImage->getUid()));
@@ -403,11 +420,9 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 	}
 	dataManagerNode.appendChild(landmarkPropsNode);
 
-	//TODO
-	/*QDomElement activeMeshNode = doc.createElement("activeMesh");
-	 if(mActiveMesh)
-	 activeMeshNode.appendChild(doc.createTextNode(mActiveMesh->getUid().c_str()));
-	 dataManagerNode.appendChild(activeMeshNode);*/
+	QDomElement landmarksNode = doc.createElement("landmarks");
+	mPatientLandmarks->addXml(landmarksNode);
+	dataManagerNode.appendChild(landmarksNode);
 
 	QDomElement centerNode = doc.createElement("center");
 	centerNode.appendChild(doc.createTextNode(qstring_cast(mCenter)));
@@ -423,6 +438,14 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 
 void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 {
+	// look in the toolmanager, for backwards compatibility (2014-02-21)
+	QDomNode toolManagerNode = dataManagerNode.parentNode().namedItem("toolManager");
+
+	QDomNode registrationHistory = dataManagerNode.namedItem("registrationHistory");
+	if (registrationHistory.isNull())
+		registrationHistory = toolManagerNode.namedItem("registrationHistory");
+	m_rMpr_History->parseXml(registrationHistory);
+
 	QDomNode landmarksNode = dataManagerNode.namedItem("landmarkprops");
 	QDomElement landmarkNode = landmarksNode.firstChildElement("landmarkprop");
 	for (; !landmarkNode.isNull(); landmarkNode = landmarkNode.nextSiblingElement("landmarkprop"))
@@ -433,6 +456,11 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 		//std::cout << "Loaded landmarkprop with name: " << landmarkProp.getName() << std::endl;
 		emit landmarkPropertiesChanged();
 	}
+
+	QDomNode patientLandmarksNode = dataManagerNode.namedItem("landmarks");
+	if (patientLandmarksNode.isNull())
+		patientLandmarksNode = toolManagerNode.namedItem("landmarks");
+	mPatientLandmarks->parseXml(patientLandmarksNode);
 
 	// All images must be created from the DataManager, so the image nodes are parsed here
 	std::map<DataPtr, QDomNode> datanodes;
@@ -525,9 +553,20 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 		return DataPtr();
 	}
 
-	DataPtr data = this->readData(uid, path, type);	
+//	DataPtr data = this->readData(uid, path, type);
 
+	if (mData.count(uid)) // dont load same image twice
+		return mData[uid];
+
+	DataPtr data = mDataFactory->create(type, uid, name);
 	if (!data)
+	{
+		messageManager()->sendWarning(QString("Unknown type: %1 for file %2").arg(type).arg(path));
+		return DataPtr();
+	}
+	bool loaded = data->load(path);
+
+	if (!data || !loaded)
 	{
 		messageManager()->sendWarning("Unknown file: " + path);
 		return DataPtr();
@@ -615,15 +654,6 @@ ImagePtr DataManagerImpl::createDerivedImage(vtkImageDataPtr data, QString uid, 
 	retval->get_rMd_History()->setParentSpace(parentImage->getUid());
 	ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy();
 	ImageLUT2DPtr LUT2D = parentImage->getLookupTable2D()->createCopy();
-	//The parent may have a different range of voxel values. Make sure the transfer functions are working
-//	if (transferFunctions)
-//		transferFunctions->fixTransferFunctions();
-//	else
-//		std::cout << "transferFunctions error" << std::endl;
-//	if (LUT2D)
-//		LUT2D->fixTransferFunctions();
-//	else
-//		std::cout << "LUT2D error" << std::endl;
 	retval->setLookupTable2D(LUT2D);
 	retval->setTransferFunctions3D(transferFunctions);
 	retval->setModality(parentImage->getModality());
@@ -714,6 +744,20 @@ void DataManagerImpl::deleteFiles(DataPtr data, QString basePath)
 	}
 }
 
+Transform3D DataManagerImpl::get_rMpr() const
+{
+	return m_rMpr_History->getCurrentRegistration().mValue;
+}
+
+void DataManagerImpl::set_rMpr(const Transform3D& val)
+{
+	m_rMpr_History->setRegistration(val);
+}
+
+RegistrationHistoryPtr DataManagerImpl::get_rMpr_History()
+{
+	return m_rMpr_History;
+}
 
 
 

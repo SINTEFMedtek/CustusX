@@ -29,17 +29,20 @@
 #include <vtkActor2D.h>
 #include <vtkRenderer.h>
 
+#include "sscTool.h"
 #include "sscView.h"
-#include "sscToolManager.h"
 #include "sscSliceProxy.h"
 #include "sscVtkHelperClasses.h"
+#include "sscDataManager.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
 
-CrossHairRep2D::CrossHairRep2D(const QString& uid, const QString& name) :
+CrossHairRep2D::CrossHairRep2D(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name) :
 	RepImpl(uid, name),
-	m_vpMs(Transform3D::Identity())
+	m_vpMs(Transform3D::Identity()),
+	mSpaceProvider(spaceProvider)
 {
 }
 
@@ -47,9 +50,9 @@ CrossHairRep2D::~CrossHairRep2D()
 {
 }
 
-CrossHairRep2DPtr CrossHairRep2D::New(const QString& uid, const QString& name)
+CrossHairRep2DPtr CrossHairRep2D::New(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name)
 {
-	CrossHairRep2DPtr retval(new CrossHairRep2D(uid, name));
+	CrossHairRep2DPtr retval(new CrossHairRep2D(spaceProvider, uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
@@ -116,7 +119,7 @@ void CrossHairRep2D::update()
 		return;
 
 	Transform3D prMt = mSlicer->getTool()->get_prMt();
-	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = mSpaceProvider->get_rMpr();
 	Transform3D sMr = mSlicer->get_sMr();
 
 	if (mCursor)

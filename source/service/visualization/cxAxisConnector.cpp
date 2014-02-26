@@ -16,13 +16,17 @@
 #include "sscPointMetric.h"
 #include "sscAxesRep.h"
 #include "sscTool.h"
+#include "cxSpaceListener.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
 
-AxisConnector::AxisConnector(CoordinateSystem space)
+AxisConnector::AxisConnector(CoordinateSystem space, SpaceProviderPtr spaceProvider)
 {
-	mListener.reset(new CoordinateSystemListener(space));
+	mSpaceProvider = spaceProvider;
+	mListener = mSpaceProvider->createListener();
+	mListener->setSpace(space);
 	connect(mListener.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
 
 	mRep = AxesRep::New(space.toString() + "_axis");
@@ -33,7 +37,7 @@ AxisConnector::AxisConnector(CoordinateSystem space)
 	this->changedSlot();
 }
 
-void AxisConnector::mergeWith(CoordinateSystemListenerPtr base)
+void AxisConnector::mergeWith(SpaceListenerPtr base)
 {
 	mBase = base;
 	connect(mBase.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
@@ -49,7 +53,7 @@ void AxisConnector::connectTo(ToolPtr tool)
 
 void AxisConnector::changedSlot()
 {
-	Transform3D  rMs = SpaceHelpers::get_toMfrom(mListener->getSpace(), CoordinateSystem(csREF));
+	Transform3D  rMs = mSpaceProvider->get_toMfrom(mListener->getSpace(), CoordinateSystem(csREF));
 	mRep->setTransform(rMs);
 
 	mRep->setVisible(true);
@@ -61,7 +65,7 @@ void AxisConnector::changedSlot()
 	// Dont show if equal to base
 	if (mBase)
 	{
-		Transform3D rMb = SpaceHelpers::get_toMfrom(mBase->getSpace(), CoordinateSystem(csREF));
+		Transform3D rMb = mSpaceProvider->get_toMfrom(mBase->getSpace(), CoordinateSystem(csREF));
 		if (similar(rMb, rMs))
 			mRep->setVisible(false);
 	}

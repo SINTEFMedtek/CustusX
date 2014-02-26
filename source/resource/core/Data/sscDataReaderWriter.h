@@ -32,6 +32,8 @@
 
 namespace cx
 {
+typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+class DataManager;
 
 /** Locks a static mutex in the constructor and unlocks it in the desctructor,
   * similar to a QMutexLocker.
@@ -69,6 +71,9 @@ public:
 	virtual DataPtr load(const QString& uid, const QString& filename) = 0;
 	virtual vtkImageDataPtr loadVtkImageData(QString filename) { return vtkImageDataPtr(); }
 	virtual vtkPolyDataPtr loadVtkPolyData(QString filename) { return vtkPolyDataPtr(); }
+	virtual QString canLoadDataType() const =0;
+	virtual bool readInto(DataPtr data, QString path) = 0;
+
 };
 typedef boost::shared_ptr<DataReader> DataReaderPtr;
 
@@ -87,6 +92,9 @@ public:
 		QString fileType = QFileInfo(filename).suffix();
 		return (fileType.compare("mhd", Qt::CaseInsensitive) == 0 || fileType.compare("mha", Qt::CaseInsensitive) == 0);
 	}
+	virtual QString canLoadDataType() const { return "image"; }
+	virtual bool readInto(DataPtr data, QString path);
+	bool readInto(ImagePtr image, QString filename);
 	virtual DataPtr load(const QString& uid, const QString& filename);
 //	vtkImageDataPtr load(const QString& filename) { return this->loadVtkImageData(filename); }
 	virtual vtkImageDataPtr loadVtkImageData(QString filename);
@@ -106,6 +114,9 @@ public:
 		QString fileType = QFileInfo(filename).suffix();
 		return (fileType.compare("png", Qt::CaseInsensitive) == 0);
 	}
+	virtual bool readInto(DataPtr data, QString path);
+	bool readInto(ImagePtr image, QString filename);
+	virtual QString canLoadDataType() const { return "image"; }
 	virtual DataPtr load(const QString& uid, const QString& filename);
 	virtual vtkImageDataPtr loadVtkImageData(QString filename);
 };
@@ -125,18 +136,13 @@ public:
 		QString fileType = QFileInfo(filename).suffix();
 		return (fileType.compare("mnc", Qt::CaseInsensitive) == 0);
 	}
+	virtual bool readInto(DataPtr data, QString path);
+	bool readInto(ImagePtr image, QString filename);
+
+//	virtual vtkImageDataPtr loadVtkImageData(QString filename);
+	virtual QString canLoadDataType() const { return "image"; }
 	virtual DataPtr load(const QString& uid, const QString& filename);
 };
-
-//class MeshReader :
-//{
-//public:
-//	virtual ~MeshReader() {}
-//	virtual bool canLoad(const QString& filename) = 0;
-//	virtual MeshPtr load(const QString& uid, const QString& filename) = 0;
-//};
-//typedef boost::shared_ptr<MeshReader> MeshReaderPtr;
-
 
 /**\brief Reader for .vtk files.
  *
@@ -153,6 +159,11 @@ public:
 		QString fileType = QFileInfo(filename).suffix();
 		return (fileType.compare("vtk", Qt::CaseInsensitive) == 0);
 	}
+	virtual bool readInto(DataPtr data, QString path);
+	bool readInto(MeshPtr mesh, QString filename);
+
+	virtual vtkPolyDataPtr loadVtkPolyData(QString filename);
+	virtual QString canLoadDataType() const { return "mesh"; }
 	virtual DataPtr load(const QString& uid, const QString& filename);
 };
 
@@ -171,6 +182,10 @@ public:
 		QString fileType = QFileInfo(filename).suffix();
 		return (fileType.compare("stl", Qt::CaseInsensitive) == 0);
 	}
+	virtual bool readInto(DataPtr data, QString path);
+	bool readInto(MeshPtr mesh, QString filename);
+	virtual vtkPolyDataPtr loadVtkPolyData(QString filename);
+	virtual QString canLoadDataType() const { return "mesh"; }
 	virtual DataPtr load(const QString& uid, const QString& filename);
 };
 
@@ -184,18 +199,20 @@ public:
 class DataReaderWriter
 {
 public:
-	DataReaderWriter();
+	explicit DataReaderWriter();
 
 	vtkImageDataPtr loadVtkImageData(QString filename);
 	vtkPolyDataPtr loadVtkPolyData(QString filename);
-//	DataPtr loadData(QString uid, QString filename);
-	DataPtr readData(const QString& uid, const QString& path, const QString& type);
+	QString findDataTypeFromFile(QString filename);
+	void readInto(DataPtr data, QString path);
 
 private:
 	DataReaderPtr findReader(const QString& path, const QString& type="unknown");
 	typedef std::set<DataReaderPtr> DataReadersType;
 	DataReadersType mDataReaders;
 };
+
+
 
 } // namespace cx
 

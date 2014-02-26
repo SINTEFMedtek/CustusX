@@ -23,6 +23,14 @@
 #define __vtkMultiVolumePicker_h
 
 #include "vtkVolumePicker.h"
+#include "vtkSmartPointer.h"
+
+typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
+typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
+typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
+typedef vtkSmartPointer<class vtkVolumeTextureMapper3D> vtkVolumeTextureMapper3DPtr;
+typedef vtkSmartPointer<class vtkGPUVolumeRayCastMapper> vtkGPUVolumeRayCastMapperPtr;
+typedef vtkSmartPointer<class vtkAbstractVolumeMapper> vtkAbstractVolumeMapperPtr;
 
 class VTK_VOLUMERENDERING_EXPORT vtkMultiVolumePicker : public vtkVolumePicker
 {
@@ -47,6 +55,13 @@ protected:
 private:
   vtkMultiVolumePicker(const vtkMultiVolumePicker&);  // Not implemented.
   void operator=(const vtkMultiVolumePicker&);  // Not implemented.
+
+	vtkTransformPtr calculate_rMdi(vtkMatrix4x4Ptr rMd0, vtkTransformPtr d0Mdi);
+	void calculateNewOrigin(double* newOrigin, vtkMatrix4x4Ptr rMd0);
+	vtkImageDataPtr generateImageCopyAndMoveOrigin(vtkImageDataPtr image, double* newOrigin);
+	vtkVolumeTextureMapper3DPtr generateSingleVolumeMapper(vtkImageDataPtr tempImage);
+	bool similar(double a, double b, double tol = 1.0E-6); ///< check for equality with a tolerance: |b-a|<tol
+	void storeFoundImage(vtkDataSet* image, vtkAbstractVolumeMapper* mapper);
 };
 
 #endif

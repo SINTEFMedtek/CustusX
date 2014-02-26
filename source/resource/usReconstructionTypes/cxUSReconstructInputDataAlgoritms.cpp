@@ -35,7 +35,6 @@ void USReconstructInputDataAlgorithm::transformTrackingPositionsTo_prMu(USRecons
 void USReconstructInputDataAlgorithm::transformFramePositionsTo_rMu(USReconstructInputData* data)
 {
 	Transform3D rMpr = data->rMpr;
-//    Transform3D rMpr = *toolManager()->get_rMpr();
     // Transform from image coordinate syst with origin in upper left corner to t (tool) space.
     Transform3D tMv = data->mProbeData.get_tMu() * data->mProbeData.get_uMv();
 

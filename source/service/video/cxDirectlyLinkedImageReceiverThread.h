@@ -24,6 +24,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class Streamer> StreamerPtr;
 typedef boost::shared_ptr<class DirectlyLinkedSender> DirectlyLinkedSenderPtr;
+typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 
 /**
  * \file
@@ -47,6 +48,7 @@ class DirectlyLinkedImageReceiverThread: public ImageReceiverThread
 
 public:
 	DirectlyLinkedImageReceiverThread(std::map<QString, QString> args, QObject* parent = NULL);
+	void setBackend(VideoServiceBackendPtr backend);
 	virtual QString hostDescription() const; ///< threadsafe
 
 	void setImageToStream(QString imageUid);
@@ -69,6 +71,7 @@ private:
 	StreamerPtr mImageStreamer;
 	DirectlyLinkedSenderPtr mSender;
 	QString mImageUidToSimulate;
+	VideoServiceBackendPtr mBackend;
 };
 
 /**

@@ -24,6 +24,7 @@
 #include "sscImage.h"
 #include "sscRegistrationTransform.h"
 #include "cxAcquisitionData.h"
+#include "sscLandmark.h"
 
 namespace cx
 {

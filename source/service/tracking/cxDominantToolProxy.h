@@ -27,6 +27,7 @@ namespace cx
  */
 
 typedef boost::shared_ptr<class DominantToolProxy> DominantToolProxyPtr;
+class ToolManager;
 
 /**
  * \brief Helper class for connecting to the dominant tool.
@@ -43,11 +44,10 @@ class DominantToolProxy: public QObject
 Q_OBJECT
 
 public:
-	static DominantToolProxyPtr New()
+	static DominantToolProxyPtr New(ToolManager *toolManager)
 	{
-		return DominantToolProxyPtr(new DominantToolProxy());
+		return DominantToolProxyPtr(new DominantToolProxy(toolManager));
 	}
-	DominantToolProxy();
 
 signals:
 	// the original tool change signal
@@ -64,7 +64,9 @@ signals:
 private slots:
 	void dominantToolChangedSlot(const QString&);
 private:
+	DominantToolProxy(ToolManager *toolManager);
 	ToolPtr mTool;
+	ToolManager* mToolManager;
 };
 
 /**

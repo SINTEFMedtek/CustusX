@@ -22,33 +22,28 @@
 #include <math.h>
 #include "sscTypeConversions.h"
 #include "sscDataManager.h"
-#include "sscToolManager.h"
 #include "sscSliceComputer.h"
+#include "sscTool.h"
 
 namespace cx
 {
 
-SliceProxyPtr SliceProxy::New(const QString& name)
+SliceProxyPtr SliceProxy::create(DataManager *dataManager)
 {
-	SliceProxyPtr retval(new SliceProxy);
-	retval->mName = name;
+	SliceProxyPtr retval(new SliceProxy(dataManager));
 	return retval;
 }
 
-QString SliceProxy::getName() const
-{
-	return mName;
-}
-
-SliceProxy::SliceProxy() :
+SliceProxy::SliceProxy(DataManager* dataManager) :
 	mCutplane(new SliceComputer())
 {
+	mDataManager = dataManager;
 	mAlwaysUseDefaultCenter = false;
 	mUseTooltipOffset = true;
-	connect(DataManager::getInstance(), SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
-	connect(dataManager(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
+	connect(mDataManager, SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
+	connect(mDataManager, SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
 	//TODO connect to toolmanager rMpr changed
-	mDefaultCenter = DataManager::getInstance()->getCenter();
+	mDefaultCenter = mDataManager->getCenter();
 	this->centerChangedSlot();
 }
 
@@ -87,7 +82,7 @@ void SliceProxy::setTool(ToolPtr tool)
 void SliceProxy::toolTransformAndTimestampSlot(Transform3D prMt, double timestamp)
 {
 	//std::cout << "proxy get transform" << std::endl;
-	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = mDataManager->get_rMpr();
 	Transform3D rMt = rMpr*prMt;
 //	if (similar(rMt, mCutplane->getToolPosition()))
 //	{
@@ -155,7 +150,7 @@ void SliceProxy::centerChangedSlot()
 	}
 	else if (mTool)
 	{
-		Vector3D c = DataManager::getInstance()->getCenter();
+		Vector3D c = mDataManager->getCenter();
 		mCutplane->setFixedCenter(c);
 		//std::cout << "center changed: " + string_cast(c) << std::endl;
 	}
@@ -174,7 +169,7 @@ void SliceProxy::centerChangedSlot()
 
 void SliceProxy::clinicalApplicationChangedSlot()
 {
-	mCutplane->setClinicalApplication(dataManager()->getClinicalApplication());
+	mCutplane->setClinicalApplication(mDataManager->getClinicalApplication());
 	changed();
 }
 
@@ -182,7 +177,11 @@ void SliceProxy::clinicalApplicationChangedSlot()
  */
 void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, bool useConstrainedViewOffset)
 {
-	mCutplane->initializeFromPlane(plane, useGravity, gravityDir, useViewOffset, viewportHeight, toolViewOffset, dataManager()->getClinicalApplication(), useConstrainedViewOffset);
+	mCutplane->initializeFromPlane(plane,
+								   useGravity, gravityDir,
+								   useViewOffset, viewportHeight, toolViewOffset,
+								   mDataManager->getClinicalApplication(),
+								   useConstrainedViewOffset);
 	changed();
 //	setPlane(plane);
 //	//Logger::log("vm.log"," set plane to proxy ");

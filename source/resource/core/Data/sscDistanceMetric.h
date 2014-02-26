@@ -21,7 +21,6 @@
 #define SSCDISTANCEMETRIC_H_
 
 #include "sscDataMetric.h"
-#include "sscDataReaderWriter.h"
 #include "cxMetricReferenceArgumentList.h"
 #include "cxOptionalValue.h"
 
@@ -35,23 +34,23 @@ namespace cx
 
 typedef boost::shared_ptr<class DistanceMetric> DistanceMetricPtr;
 
-/**\brief DataReader implementation for DistanceMetric
- *
- * \date Jul 4, 2011
- * \author Christian Askeland, SINTEF
- */
-class DistanceMetricReader: public DataReader
-{
-public:
-	virtual ~DistanceMetricReader()
-	{
-	}
-	virtual bool canLoad(const QString& type, const QString& filename)
-	{
-		return type == "distanceMetric";
-	}
-	virtual DataPtr load(const QString& uid, const QString& filename);
-};
+///**\brief DataReader implementation for DistanceMetric
+// *
+// * \date Jul 4, 2011
+// * \author Christian Askeland, SINTEF
+// */
+//class DistanceMetricReader: public DataReader
+//{
+//public:
+//	virtual ~DistanceMetricReader()
+//	{
+//	}
+//	virtual bool canLoad(const QString& type, const QString& filename)
+//	{
+//		return type == "distanceMetric";
+//	}
+//	virtual DataPtr load(const QString& uid, const QString& filename);
+//};
 
 /**\brief Data class that represents a distance between two points,
  * or a point and a plane.
@@ -63,10 +62,9 @@ class DistanceMetric: public DataMetric
 {
 Q_OBJECT
 public:
-	DistanceMetric(const QString& uid, const QString& name);
 	virtual ~DistanceMetric();
-    static DistanceMetricPtr create(QDomNode node);
-    static DistanceMetricPtr create(QString uid, QString name="");
+//    static DistanceMetricPtr create(QDomNode node);
+	static DistanceMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 
 	double getDistance() const;
     std::vector<Vector3D> getEndpoints() const; ///< return the two endpoints in reference space. None if invalid.
@@ -82,6 +80,10 @@ public:
 	virtual DoubleBoundingBox3D boundingBox() const;
 	virtual QString getType() const
 	{
+		return getTypeName();
+	}
+	static QString getTypeName()
+	{
 		return "distanceMetric";
 	}
 
@@ -91,6 +93,7 @@ public:
 private slots:
 	void resetCachedValues();
 private:
+	DistanceMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 	std::vector<Vector3D> getEndpointsUncached() const;
 	MetricReferenceArgumentListPtr mArguments;
 	mutable OptionalValue<std::vector<Vector3D> > mCachedEndPoints;

@@ -1,7 +1,7 @@
 #ifndef SSCDUMMYTOOL_H_
 #define SSCDUMMYTOOL_H_
 
-#include "sscTool.h"
+#include "cxToolImpl.h"
 #include <vector>
 #include <QThread>
 #include <QDateTime>
@@ -126,7 +126,7 @@ struct DummyToolTestUtilities
  *
  * \ingroup sscTool
  */
-class DummyTool : public Tool
+class DummyTool : public ToolImpl
 {
 	Q_OBJECT
 public:

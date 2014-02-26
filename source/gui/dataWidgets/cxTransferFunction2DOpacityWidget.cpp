@@ -16,7 +16,7 @@ TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(QWidget* parent
   mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
   mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
 
-  mActiveImageProxy = ActiveImageProxy::New();
+  mActiveImageProxy = ActiveImageProxy::New(dataManager());
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 

@@ -69,7 +69,7 @@ QDomElement getElementForced(QDomNode root, QString path)
 	return current;
 }
 
-PatientData::PatientData()
+PatientData::PatientData(DataManager *dataManager) : mDataManager(dataManager)
 {}
 
 PatientData::~PatientData()
@@ -129,13 +129,7 @@ void PatientData::newPatient(QString choosenDir)
  */
 void PatientData::clearPatient()
 {
-	dataManager()->clear();
-	//TODO
-//  toolManager()->clear();
-//  viewManager()->clear();
-//  registrationManager()->clear();
-	//rep
-	//usrec?
+	mDataManager->clear();
 
 	QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
 
@@ -264,7 +258,7 @@ void PatientData::savePatient()
 
 	// save position transforms into the mhd files.
 	// This hack ensures data files can be used in external programs without an explicit export.
-	DataManager::ImagesMap images = dataManager()->getImages();
+	DataManager::ImagesMap images = mDataManager->getImages();
 	for (DataManager::ImagesMap::iterator iter = images.begin(); iter != images.end(); ++iter)
 	{
 		CustomMetaImagePtr customReader = CustomMetaImage::create(
@@ -295,13 +289,13 @@ void PatientData::exportPatient(bool niftiFormat)
 	QString targetFolder = mActivePatientFolder + "/Export/"
 					+ QDateTime::currentDateTime().toString(timestampSecondsFormat());
 
-	DataManager::ImagesMap images = dataManager()->getImages();
+	DataManager::ImagesMap images = mDataManager->getImages();
 	for (DataManager::ImagesMap::iterator iter = images.begin(); iter != images.end(); ++iter)
 	{
-		dataManager()->saveImage(iter->second, targetFolder);
+		mDataManager->saveImage(iter->second, targetFolder);
 	}
 
-	DataManager::MeshMap meshes = dataManager()->getMeshes();
+	DataManager::MeshMap meshes = mDataManager->getMeshes();
 	for (DataManager::MeshMap::iterator iter = meshes.begin(); iter != meshes.end(); ++iter)
 	{
 		MeshPtr mesh = iter->second;
@@ -315,8 +309,8 @@ void PatientData::exportPatient(bool niftiFormat)
 
 		vtkPolyDataPtr poly = mesh->getTransformedPolyData(rMd);
 		// create a copy with the SAME UID as the original. Do not load this one into the datamanager!
-		mesh = dataManager()->createMesh(poly, mesh->getUid(), mesh->getName(), "Images");
-		dataManager()->saveMesh(mesh, targetFolder);
+		mesh = mDataManager->createMesh(poly, mesh->getUid(), mesh->getName(), "Images");
+		mDataManager->saveMesh(mesh, targetFolder);
 	}
 
 	messageManager()->sendInfo("Exported patient data to " + targetFolder + ".");
@@ -399,7 +393,7 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 	QString strippedFilename = changeExtension(fileInfo.fileName(), "");
 	QString uid = strippedFilename + "_" + QDateTime::currentDateTime().toString(timestampSecondsFormat());
 
-	if (dataManager()->getData(uid))
+	if (mDataManager->getData(uid))
 	{
 		QString text = "Data with uid " + uid + " already exists. Import canceled.";
 		messageManager()->sendWarning(text);
@@ -408,7 +402,7 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 	}
 
 	// Read files before copy
-	DataPtr data = dataManager()->loadData(uid, fileName, rtAUTO);
+	DataPtr data = mDataManager->loadData(uid, fileName);
 	if (!data)
 	{
 		QString text = "Error with data file: " + fileName + " Import canceled.";
@@ -424,7 +418,7 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 
 //	data->setFilePath(patientDataDir.relativeFilePath(pathToNewFile)); // Update file path
 
-	dataManager()->saveData(data, mActivePatientFolder);
+	mDataManager->saveData(data, mActivePatientFolder);
 //	this->copyAllSimilarFiles(fileName, patientsImageFolder, infoText);
 
 	// remove redundant line breaks
@@ -435,7 +429,7 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 
 void PatientData::removeData(QString uid)
 {
-	dataManager()->removeData(uid, this->getActivePatientFolder());
+	mDataManager->removeData(uid, this->getActivePatientFolder());
 }
 
 void PatientData::createPatientFolders(QString choosenDir)
@@ -527,7 +521,7 @@ void PatientData::generateSaveDoc(QDomDocument& doc)
 	QDomElement managerNode = doc.createElement("managers");
 	patientNode.appendChild(managerNode);
 
-	dataManager()->addXml(managerNode);
+	mDataManager->addXml(managerNode);
 }
 
 void PatientData::readLoadDoc(QDomDocument& doc, QString patientFolder)
@@ -542,7 +536,7 @@ void PatientData::readLoadDoc(QDomDocument& doc, QString patientFolder)
 
 	if (!dataManagerNode.isNull())
 	{
-		dataManager()->parseXml(dataManagerNode, patientFolder);
+		mDataManager->parseXml(dataManagerNode, patientFolder);
 	}
 
 	emit

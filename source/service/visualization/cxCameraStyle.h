@@ -35,6 +35,7 @@ namespace cx
 
 typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
 using cx::Transform3D;
+typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
 
 /**
  * \file
@@ -56,7 +57,7 @@ class CameraStyle: public QObject
 {
 Q_OBJECT
 public:
-	CameraStyle();
+	explicit CameraStyle(VisualizationServiceBackendPtr backend);
 
 	/** Select tool style. This replaces the vtkInteractor Style.
 	  */
@@ -75,6 +76,7 @@ private:
 	CAMERA_STYLE_TYPE mCameraStyle; ///< the current camerastyle
 	QActionGroup* mCameraStyleGroup;
 	std::vector<CameraStyleForViewPtr> mViews;
+	VisualizationServiceBackendPtr mBackend;
 };
 
 /**

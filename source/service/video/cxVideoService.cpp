@@ -27,6 +27,7 @@
 #include "sscTypeConversions.h"
 
 #include "cxToolManager.h"
+#include "cxVideoServiceBackend.h"
 
 namespace cx
 {
@@ -35,8 +36,9 @@ namespace cx
 VideoService* VideoService::mInstance = NULL; ///< static member
 // --------------------------------------------------------
 
-void VideoService::initialize()
+void VideoService::initialize(VideoServiceBackendPtr videoBackend)
 {
+	VideoService::setInstance(new VideoService(videoBackend));
 	VideoService::getInstance();
 }
 
@@ -50,7 +52,7 @@ VideoService* VideoService::getInstance()
 {
 	if (!mInstance)
 	{
-		VideoService::setInstance(new VideoService());
+		VideoService::setInstance(new VideoService(VideoServiceBackendPtr()));
 	}
 	return mInstance;
 }
@@ -64,16 +66,17 @@ void VideoService::setInstance(VideoService* instance)
 	mInstance = instance;
 }
 
-VideoService::VideoService()
+VideoService::VideoService(VideoServiceBackendPtr videoBackend)
 {
+	mBackend = videoBackend;
 	mEmptyVideoSource.reset(new BasicVideoSource());
-	mVideoConnection.reset(new VideoConnectionManager());
+	mVideoConnection.reset(new VideoConnectionManager(mBackend));
 	mActiveVideoSource = mEmptyVideoSource;
-	mUSAcquisitionVideoPlayback.reset(new USAcquisitionVideoPlayback());
+	mUSAcquisitionVideoPlayback.reset(new USAcquisitionVideoPlayback(mBackend));
 
 	connect(mVideoConnection.get(), SIGNAL(connected(bool)), this, SLOT(autoSelectActiveVideoSource()));
 	connect(mVideoConnection.get(), SIGNAL(videoSourcesChanged()), this, SLOT(autoSelectActiveVideoSource()));
-	connect(toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(autoSelectActiveVideoSource()));
+	connect(mBackend->getToolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(autoSelectActiveVideoSource()));
 }
 
 VideoService::~VideoService()
@@ -102,7 +105,7 @@ void VideoService::setActiveVideoSource(QString uid)
 //	std::cout << "VideoService::setActiveVideoSource() " << mActiveVideoSource->getUid() << std::endl;
 
 	// set active stream in all probes if stream is present:
-	ToolManager::ToolMap tools = *toolManager()->getTools();
+	ToolManager::ToolMap tools = *mBackend->getToolManager()->getTools();
 	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 	{
 		ProbePtr probe = iter->second->getProbe();
@@ -123,7 +126,7 @@ VideoSourcePtr VideoService::getGuessForActiveVideoSource(VideoSourcePtr old)
 		return mUSAcquisitionVideoPlayback->getVideoSource();
 
 	// ask for active stream in first probe:
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
 	if (tool && tool->getProbe() && tool->getProbe()->getRTSource())
 	{
 		// keep existing if present
@@ -172,7 +175,7 @@ void VideoService::setPlaybackMode(PlaybackTimePtr controller)
 	this->autoSelectActiveVideoSource();
 
 	VideoSourcePtr playbackSource = mUSAcquisitionVideoPlayback->getVideoSource();
-	ToolManager::ToolMap tools = *toolManager()->getTools();
+	ToolManager::ToolMap tools = *mBackend->getToolManager()->getTools();
 	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 	{
 		ProbePtr probe = iter->second->getProbe();
@@ -187,25 +190,6 @@ void VideoService::setPlaybackMode(PlaybackTimePtr controller)
 		this->setActiveVideoSource(playbackSource->getUid());
 	else
 		this->autoSelectActiveVideoSource();
-
-
-//	if (mUSAcquisitionVideoPlayback->isActive())
-//	{
-//		VideoSourcePtr playbackSource = mUSAcquisitionVideoPlayback->getVideoSource();
-//		ToolManager::ToolMap tools = *toolManager()->getTools();
-//		for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
-//		{
-//			ProbePtr probe = iter->second->getProbe();
-//			if (!probe)
-//				continue;
-//			probe->setRTSource(playbackSource);
-//		}
-//		this->setActiveVideoSource(playbackSource->getUid());
-//	}
-//	else
-//	{
-//		// clear playback
-//	}
 }
 
 std::vector<VideoSourcePtr> VideoService::getVideoSources()

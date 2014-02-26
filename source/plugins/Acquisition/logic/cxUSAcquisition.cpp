@@ -25,6 +25,7 @@
 #include "cxVideoConnectionManager.h"
 #include "cxToolManager.h"
 #include "cxUSSavingRecorder.h"
+#include "sscDataManager.h"
 #include "cxAcquisitionData.h"
 
 namespace cx
@@ -119,7 +120,7 @@ void USAcquisition::recordStopped()
 
 	this->sendAcquisitionDataToReconstructer();
 
-	mCore->set_rMpr(*toolManager()->get_rMpr());
+	mCore->set_rMpr(dataManager()->get_rMpr());
 	bool compress = settings()->value("Ultrasound/CompressAcquisition", true).toBool();
 	QString baseFolder = patientService()->getPatientData()->getActivePatientFolder();
 	mCore->startSaveData(baseFolder, compress);
@@ -136,7 +137,7 @@ void USAcquisition::recordCancelled()
 
 void USAcquisition::sendAcquisitionDataToReconstructer()
 {
-	mCore->set_rMpr(*toolManager()->get_rMpr());
+	mCore->set_rMpr(dataManager()->get_rMpr());
 
 	VideoSourcePtr activeVideoSource = videoService()->getActiveVideoSource();
 	if (activeVideoSource)

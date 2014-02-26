@@ -44,7 +44,9 @@ namespace cx
 VideoFixedPlaneRep::VideoFixedPlaneRep(const QString& uid, const QString& name) :
 	RepImpl(uid, name)
 {
-	mRTGraphics.reset(new VideoSourceGraphics());
+	SpaceProviderPtr nullProvider;
+
+	mRTGraphics.reset(new VideoSourceGraphics(nullProvider));
 	connect(mRTGraphics.get(), SIGNAL(newData()), this, SLOT(newDataSlot()));
 	mRTGraphics->setShowInToolSpace(false);
 	mRTGraphics->setClipToSector(false);

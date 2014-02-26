@@ -43,6 +43,8 @@ typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
 typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
 typedef boost::shared_ptr<class RenderLoop> RenderLoopPtr;
 typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
+typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
+typedef boost::shared_ptr<class Navigation> NavigationPtr;
 
 /**
  * \file
@@ -115,8 +117,9 @@ public:
 	void deleteLayoutData(const QString uid);
 	QActionGroup* createInteractorStyleActionGroup();
 	bool isCustomLayout(const QString& uid) const;
+	NavigationPtr getNavigation();
 
-	static ViewManager* createInstance(); ///< create the instance
+	static ViewManager* createInstance(VisualizationServiceBackendPtr backend); ///< create the instance
 	static ViewManager* getInstance(); ///< returns the only instance of this class, NULL unless createInstance has been called.
 	static void destroyInstance(); ///< destroys the only instance of this class
 
@@ -168,7 +171,7 @@ protected slots:
 	void updateViews();
 
 protected:
-	ViewManager(); ///< create all needed views
+	ViewManager(VisualizationServiceBackendPtr backend); ///< create all needed views
 	virtual ~ViewManager();
 
 	//Interface for saving/loading
@@ -209,6 +212,7 @@ protected:
 	SlicePlanesProxyPtr mSlicePlanesProxy;
 
 	CameraStylePtr mCameraStyle;
+	VisualizationServiceBackendPtr mBackend;
 
 private:
 	ViewManager(ViewManager const&);

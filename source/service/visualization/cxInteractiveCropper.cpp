@@ -40,6 +40,7 @@
 #include "sscTransform3D.h"
 #include "sscVolumetricRep.h"
 #include "cxActiveImageProxy.h"
+#include "cxVisualizationServiceBackend.h"
 
 namespace cx
 {
@@ -95,9 +96,10 @@ public:
 //---------------------------------------------------------
 
 
-InteractiveCropper::InteractiveCropper()
+InteractiveCropper::InteractiveCropper(VisualizationServiceBackendPtr backend) :
+	mBackend(backend)
 {
-	mActiveImageProxy = ActiveImageProxy::New();
+	mActiveImageProxy = ActiveImageProxy::New(mBackend->getDataManager());
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(imageChangedSlot()));
 	connect(mActiveImageProxy.get(), SIGNAL(cropBoxChanged()), this, SLOT(imageCropChangedSlot()));
 }
@@ -219,7 +221,7 @@ void InteractiveCropper::resetBoundingBox()
 
 void InteractiveCropper::imageChangedSlot()
 {
-	mImage = dataManager()->getActiveImage();
+	mImage = mBackend->getDataManager()->getActiveImage();
 
 	this->imageCropChangedSlot();
 	emit changed();

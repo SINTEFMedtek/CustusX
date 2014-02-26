@@ -54,6 +54,7 @@
 #include "cxRenderLoop.h"
 #include "cxLayoutRepository.h"
 #include "sscLogger.h"
+#include "cxVisualizationServiceBackend.h"
 
 namespace cx
 {
@@ -68,11 +69,11 @@ ViewManager* ViewManager::getInstance()
 	return mTheInstance;
 }
 
-ViewManager* ViewManager::createInstance()
+ViewManager* ViewManager::createInstance(VisualizationServiceBackendPtr backend)
 {
 	if (mTheInstance == NULL)
 	{
-		mTheInstance = new ViewManager();
+		mTheInstance = new ViewManager(backend);
 		}
 	return mTheInstance;
 }
@@ -83,10 +84,11 @@ void ViewManager::destroyInstance()
 	mTheInstance = NULL;
 }
 
-ViewManager::ViewManager() :
+ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 				mGlobal2DZoom(true),
 				mGlobalObliqueOrientation(false)
 {
+	mBackend = backend;
 	mRenderLoop.reset(new RenderLoop());
 	connect(mRenderLoop.get(), SIGNAL(preRender()), this, SLOT(updateViews()));
 	connect(mRenderLoop.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int)));
@@ -108,7 +110,7 @@ ViewManager::ViewManager() :
 	// initialize view groups:
 	for (unsigned i = 0; i < VIEW_GROUP_COUNT; ++i)
 	{
-		mViewGroups.push_back(ViewGroupPtr(new ViewGroup()));
+		mViewGroups.push_back(ViewGroupPtr(new ViewGroup(mBackend)));
 	}
 
 	this->syncOrientationMode(SyncedValue::create(0));
@@ -120,13 +122,13 @@ ViewManager::~ViewManager()
 
 void ViewManager::initialize()
 {
-	mCameraStyle.reset(new CameraStyle()); // uses the global viewmanager() instance - must be created after creation of this.
+	mCameraStyle.reset(new CameraStyle(mBackend));
 
 	mActiveLayout = QStringList() << "" << "";
 	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
 
-	mInteractiveCropper.reset(new InteractiveCropper());
-	mInteractiveClipper.reset(new InteractiveClipper());
+	mInteractiveCropper.reset(new InteractiveCropper(mBackend));
+	mInteractiveClipper.reset(new InteractiveClipper(mBackend));
 	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
 	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
@@ -139,6 +141,11 @@ void ViewManager::initialize()
 
 	mGlobalZoom2DVal = SyncedValue::create(1);
 	this->setGlobal2DZoom(mGlobal2DZoom);
+}
+
+NavigationPtr ViewManager::getNavigation()
+{
+	return NavigationPtr(new Navigation(mBackend));
 }
 
 QWidget *ViewManager::getLayoutWidget(int index)
@@ -361,7 +368,7 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 		else if (child.toElement().tagName() == "clippedImage")
 		{
 			QString clippedImage = child.toElement().text();
-			mInteractiveClipper->setImage(dataManager()->getImage(clippedImage));
+			mInteractiveClipper->setImage(mBackend->getDataManager()->getImage(clippedImage));
 		}
 		child = child.nextSibling();
 	}
@@ -539,7 +546,7 @@ void ViewManager::activate2DView(LayoutWidget* widget, int group, PLANE_TYPE pla
 	ViewWidget* view = widget->mViewCache2D->retrieveView();
 	view->setType(View::VIEW_2D);
 
-	ViewWrapper2DPtr wrapper(new ViewWrapper2D(view));
+	ViewWrapper2DPtr wrapper(new ViewWrapper2D(view, mBackend));
 	wrapper->initializePlane(plane);
 	this->activateView(widget, wrapper, group, region);
 }
@@ -548,7 +555,7 @@ void ViewManager::activate3DView(LayoutWidget* widget, int group, LayoutRegion r
 {
 	ViewWidget* view = widget->mViewCache3D->retrieveView();
 	view->setType(View::VIEW_3D);
-	ViewWrapper3DPtr wrapper(new ViewWrapper3D(group + 1, view));
+	ViewWrapper3DPtr wrapper(new ViewWrapper3D(group + 1, view, mBackend));
 	if (group == 0)
 	{
 		mInteractiveCropper->setView(view);
@@ -561,7 +568,7 @@ void ViewManager::activateRTStreamView(LayoutWidget *widget, int group, LayoutRe
 {
 	ViewWidget* view = widget->mViewCacheRT->retrieveView();
 	view->setType(View::VIEW_REAL_TIME);
-	ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view));
+	ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view, mBackend));
 	this->activateView(widget, wrapper, group, region);
 }
 

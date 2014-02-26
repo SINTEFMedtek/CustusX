@@ -25,13 +25,13 @@ namespace cx
 //-------------------------------------------------------
 //-------------------------------------------------------
 
-DataPtr DonutMetricReader::load(const QString& uid, const QString& filename)
-{
-	return DataPtr(new DonutMetric(uid, filename));
-}
+//DataPtr DonutMetricReader::load(const QString& uid, const QString& filename)
+//{
+//	return DataPtr(new DonutMetric(uid, filename));
+//}
 
-DonutMetric::DonutMetric(const QString& uid, const QString& name) :
-				DataMetric(uid, name)
+DonutMetric::DonutMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+				DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "position" << "direction"));
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
@@ -39,17 +39,17 @@ DonutMetric::DonutMetric(const QString& uid, const QString& name) :
 	mThickness = 2;
 }
 
-DonutMetricPtr DonutMetric::create(QString uid, QString name)
+DonutMetricPtr DonutMetric::create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider)
 {
-	return DonutMetricPtr(new DonutMetric(uid, name));
+	return DonutMetricPtr(new DonutMetric(uid, name, dataManager, spaceProvider));
 }
 
-DonutMetricPtr DonutMetric::create(QDomNode node)
-{
-	DonutMetricPtr retval = DonutMetric::create("");
-	retval->parseXml(node);
-	return retval;
-}
+//DonutMetricPtr DonutMetric::create(QDomNode node)
+//{
+//	DonutMetricPtr retval = DonutMetric::create("");
+//	retval->parseXml(node);
+//	return retval;
+//}
 
 DonutMetric::~DonutMetric()
 {
@@ -68,7 +68,7 @@ void DonutMetric::parseXml(QDomNode& dataNode)
 {
 	DataMetric::parseXml(dataNode);
 
-	mArguments->parseXml(dataNode);
+	mArguments->parseXml(dataNode, mDataManager->getData());
 	mRadius = dataNode.toElement().attribute("radius", qstring_cast(mRadius)).toDouble();
 	mThickness = dataNode.toElement().attribute("thickness", qstring_cast(mThickness)).toDouble();
 }

@@ -16,8 +16,6 @@
 
 #include "cxToolManager.h"
 
-//#include <boost/thread/thread.hpp>
-
 #include <QTimer>
 #include <QDir>
 #include <QList>
@@ -74,9 +72,6 @@ cxToolManager::cxToolManager() :
 				mLastLoadPositionHistory(0),
 				mToolTipOffset(0)
 {
-	m_rMpr_History.reset(new RegistrationHistory());
-	connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
-
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 
 	this->initializeManualTool();
@@ -145,7 +140,7 @@ void cxToolManager::setPlaybackMode(PlaybackTimePtr controller)
 	{
 		if (iter->second==mManualTool)
 			continue; // dont wrap the manual tool
-		cx::PlaybackToolPtr current(new PlaybackTool(iter->second, controller));
+		cx::PlaybackToolPtr current(new PlaybackTool(this, iter->second, controller));
 		mTools[current->getUid()] = current;
 
 		TimedTransformMapPtr history = iter->second->getPositionHistory();
@@ -217,8 +212,8 @@ void cxToolManager::initializeManualTool()
 		connect(mManualTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
 	}
 
-	Transform3D prMt = this->get_rMpr()->inv() * createTransformRotateY(M_PI)
-					* createTransformRotateZ(M_PI/2);
+	Transform3D rMpr = Transform3D::Identity(); // not known: not really important either
+	Transform3D prMt = rMpr.inv() * createTransformRotateY(M_PI) * createTransformRotateZ(M_PI/2);
 	mManualTool->set_prMt(prMt);
 }
 
@@ -306,7 +301,7 @@ void cxToolManager::trackerConfiguredSlot(bool on)
 	for (; it != igstkTools.end(); ++it)
 	{
 		IgstkToolPtr igstkTool = it->second;
-		cxToolPtr tool(new cxTool(igstkTool));
+		cxToolPtr tool(new cxTool(this, igstkTool));
 		if (tool->isValid())
 		{
 			if (igstkTool == reference)
@@ -551,33 +546,6 @@ void cxToolManager::saveToolsSlot()
 //	messageManager()->sendInfo("Transforms and timestamps are saved for connected tools.");
 }
 
-LandmarkMap cxToolManager::getLandmarks()
-{
-	return mLandmarks;
-}
-
-void cxToolManager::setLandmark(Landmark landmark)
-{
-	mLandmarks[landmark.getUid()] = landmark;
-	emit landmarkAdded(landmark.getUid());
-}
-
-void cxToolManager::removeLandmark(QString uid)
-{
-	mLandmarks.erase(uid);
-	emit landmarkRemoved(uid);
-}
-
-void cxToolManager::removeLandmarks()
-{
-	LandmarkMap landmarks = toolManager()->getLandmarks();
-	LandmarkMap::iterator it = landmarks.begin();
-	for (; it != landmarks.end(); ++it)
-	{
-		toolManager()->removeLandmark(it->first);
-	}
-}
-
 SessionToolHistoryMap cxToolManager::getSessionHistory(double startTime, double stopTime)
 {
 	SessionToolHistoryMap retval;
@@ -680,7 +648,6 @@ void cxToolManager::setDominantTool(const QString& uid)
 			mManualTool->set_prMt(mDominantTool->get_prMt());
 		}
 		mManualTool->setVisible(true);
-//    mManualTool->setVisible(settings()->value("showManualTool").toBool());
 	}
 
 	if (mDominantTool)
@@ -694,11 +661,6 @@ void cxToolManager::setDominantTool(const QString& uid)
 //	messageManager()->sendInfo("Change active tool to: " + mDominantTool->getName());
 
 	emit dominantToolChanged(uid);
-}
-
-void cxToolManager::setClinicalApplication(CLINICAL_APPLICATION application)
-{
-	mApplication = application;
 }
 
 std::map<QString, QString> cxToolManager::getToolUidsAndNames() const
@@ -732,16 +694,6 @@ std::vector<QString> cxToolManager::getToolUids() const
 		uids.push_back(it->second->getUid());
 
 	return uids;
-}
-
-Transform3DPtr cxToolManager::get_rMpr() const
-{
-	return Transform3DPtr(new Transform3D(m_rMpr_History->getCurrentRegistration().mValue));
-}
-
-void cxToolManager::set_rMpr(const Transform3DPtr& val)
-{
-	m_rMpr_History->setRegistration(*val);
 }
 
 ToolPtr cxToolManager::getReferenceTool() const
@@ -955,11 +907,6 @@ void cxToolManager::dominantCheckSlot()
 		//sort most important tool to the start of the vector:
 		sort(visibleTools.begin(), visibleTools.end(), toolTypeSort);
 		const QString uid = visibleTools.at(0)->getUid();
-//	std::cout << "sorted:" << std::endl;
-//    for (int i=0; i<visibleTools.size(); ++i)
-//    {
-//    	std::cout << "    " << visibleTools[i]->getUid() << std::endl;
-//    }
 		this->setDominantTool(uid);
 	}
 }
@@ -1000,21 +947,10 @@ void cxToolManager::addXml(QDomNode& parentNode)
 	QDomDocument doc = parentNode.ownerDocument();
 	QDomElement base = doc.createElement("toolManager");
 	parentNode.appendChild(base);
-	m_rMpr_History->addXml(base);
 
 	QDomElement manualToolNode = doc.createElement("manualTool");
 	manualToolNode.appendChild(doc.createTextNode("\n" + qstring_cast(mManualTool->get_prMt())));
 	base.appendChild(manualToolNode);
-
-	QDomElement landmarksNode = doc.createElement("landmarks");
-	LandmarkMap::iterator it = mLandmarks.begin();
-	for (; it != mLandmarks.end(); ++it)
-	{
-		QDomElement landmarkNode = doc.createElement("landmark");
-		it->second.addXml(landmarkNode);
-		landmarksNode.appendChild(landmarkNode);
-	}
-	base.appendChild(landmarksNode);
 
 	//Tools
 	QDomElement toolsNode = doc.createElement("tools");
@@ -1035,9 +971,7 @@ void cxToolManager::addXml(QDomNode& parentNode)
 
 void cxToolManager::clear()
 {
-	m_rMpr_History->clear();
 	mManualTool->set_prMt(Transform3D::Identity());
-	mLandmarks.clear();
 }
 
 void cxToolManager::parseXml(QDomNode& dataNode)
@@ -1045,20 +979,8 @@ void cxToolManager::parseXml(QDomNode& dataNode)
 	if (dataNode.isNull())
 		return;
 
-	QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
-	m_rMpr_History->parseXml(registrationHistory);
-
 	QString manualToolText = dataNode.namedItem("manualTool").toElement().text();
 	mManualTool->set_prMt(Transform3D::fromString(manualToolText));
-
-	QDomNode landmarksNode = dataNode.namedItem("landmarks");
-	QDomElement landmarkNode = landmarksNode.firstChildElement("landmark");
-	for (; !landmarkNode.isNull(); landmarkNode = landmarkNode.nextSiblingElement("landmark"))
-	{
-		Landmark landmark;
-		landmark.parseXml(landmarkNode);
-		this->setLandmark(landmark);
-	}
 
 	//Tools
 	ToolManager::ToolMapPtr tools = this->getTools();
@@ -1074,11 +996,6 @@ void cxToolManager::parseXml(QDomNode& dataNode)
 			tool->parseXml(toolNode);
 		}
 	}
-}
-
-RegistrationHistoryPtr cxToolManager::get_rMpr_History()
-{
-	return m_rMpr_History;
 }
 
 ManualToolPtr cxToolManager::getManualTool()

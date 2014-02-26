@@ -38,6 +38,7 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class ToolTracer> ToolTracerPtr;
+typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
 /**\brief 3D Graphics class for displaying the trace path traversed by a tool.
  *
@@ -51,7 +52,7 @@ class ToolTracer : QObject
 {
 	Q_OBJECT
 public:
-	ToolTracer();
+	static ToolTracerPtr create(SpaceProviderPtr spaceProvider);
 	void setTool(ToolPtr tool);
 	vtkPolyDataPtr getPolyData();
 	vtkActorPtr getActor();
@@ -68,6 +69,7 @@ public:
 private slots:
 	void receiveTransforms(Transform3D prMt, double timestamp);
 private:
+	ToolTracer();
 	void connectTool();
 	void disconnectTool();
 
@@ -85,6 +87,8 @@ private:
 	int mSkippedPoints;
 	Vector3D mPreviousPoint;
 	double mMinDistance;
+
+	SpaceProviderPtr mSpaceProvider;
 };
 
 } // namespace cx

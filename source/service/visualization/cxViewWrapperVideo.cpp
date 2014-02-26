@@ -30,15 +30,16 @@
 #include "cxSettings.h"
 #include "cxToolManager.h"
 #include "cxVideoService.h"
+#include "cxVisualizationServiceBackend.h"
 
 namespace cx
 {
 
-ViewWrapperVideo::ViewWrapperVideo(ViewWidget* view)
+ViewWrapperVideo::ViewWrapperVideo(ViewWidget* view, VisualizationServiceBackendPtr backend) :
+	ViewWrapper(backend)
 {
 	mView = view;
 	this->connectContextMenu(mView);
-//	mSelectedVideoSource = "active";
 
 	// disable vtk interactor: this wrapper IS an interactor
 	mView->getRenderWindow()->GetInteractor()->Disable();
@@ -46,10 +47,9 @@ ViewWrapperVideo::ViewWrapperVideo(ViewWidget* view)
 	double clipDepth = 1.0; // 1mm depth, i.e. all 3D props rendered outside this range is not shown.
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth / 2.0, clipDepth / 2.0);
 
-//	connect(dataManager(), SIGNAL(streamLoaded()), this, SLOT(configureSlot()));
-	connect(toolManager(), SIGNAL(configured()), this, SLOT(connectStream()));
-	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SLOT(connectStream()));
-	connect(toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectStream()));
+	connect(mBackend->getToolManager(), SIGNAL(configured()), this, SLOT(connectStream()));
+	connect(mBackend->getVideoService(), SIGNAL(activeVideoSourceChanged()), this, SLOT(connectStream()));
+	connect(mBackend->getToolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectStream()));
 
 	addReps();
 
@@ -85,7 +85,7 @@ void ViewWrapperVideo::appendToContextMenu(QMenu& contextMenu)
 
 //	QActionGroup sourceGroup = new QActionGroup(&contextMenu);
 	QMenu* sourceMenu = new QMenu("Video Source", &contextMenu);
-	std::vector<VideoSourcePtr> sources = videoService()->getVideoSources();
+	std::vector<VideoSourcePtr> sources = mBackend->getVideoService()->getVideoSources();
 	this->addStreamAction("active", sourceMenu);
 	for (unsigned i=0; i<sources.size(); ++i)
 		this->addStreamAction(sources[i]->getUid(), sourceMenu);
@@ -128,12 +128,7 @@ void ViewWrapperVideo::streamActionSlot()
 		return;
 
 	QString uid = theAction->data().toString();
-//	std::cout << "selected source  " << uid << std::endl;
-//	mSelectedVideoSource = uid;
 	mGroupData->setVideoSource(uid);
-//	this->connectStream();
-
-//	VideoSourcePtr source = videoService()->getVideoSources();
 }
 
 void ViewWrapperVideo::videoSourceChangedSlot(QString uid)
@@ -158,7 +153,7 @@ void ViewWrapperVideo::connectStream()
 		uid = source->getUid();
 
 	ToolPtr newTool;
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
 	if (tool && tool->getProbe())
 	{
 		if (tool->getProbe()->getAvailableVideoSources().count(uid))
@@ -179,9 +174,9 @@ void ViewWrapperVideo::connectStream()
 VideoSourcePtr ViewWrapperVideo::getSourceFromService(QString uid)
 {
 	if (uid=="active")
-		return videoService()->getActiveVideoSource();
+		return mBackend->getVideoService()->getActiveVideoSource();
 
-	std::vector<VideoSourcePtr> source = videoService()->getVideoSources();
+	std::vector<VideoSourcePtr> source = mBackend->getVideoService()->getVideoSources();
 
 	for (unsigned i=0; i< source.size(); ++i)
 	{

@@ -27,17 +27,20 @@
 #include <vtkPolyData.h>
 #include <vtkMatrix4x4.h>
 #include "sscSliceProxy.h"
-#include "sscToolManager.h"
+#include "sscTool.h"
 #include "sscView.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "sscProbeSector.h"
+#include "sscDataManager.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
 
-ToolRep2D::ToolRep2D(const QString& uid, const QString& name) :
+ToolRep2D::ToolRep2D(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name) :
 	RepImpl(uid, name),
+	mSpaceProvider(spaceProvider),
 	m_vpMs(Transform3D::Identity()),
 	mBB_vp(0, 1, 0, 1, 0, 1),
 	mTooltipPointColor(0.96, 0.87, 0.17),
@@ -60,9 +63,9 @@ ToolRep2D::~ToolRep2D()
 {
 }
 
-ToolRep2DPtr ToolRep2D::New(const QString& uid, const QString& name)
+ToolRep2DPtr ToolRep2D::New(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name)
 {
-	ToolRep2DPtr retval(new ToolRep2D(uid, name));
+	ToolRep2DPtr retval(new ToolRep2D(spaceProvider, uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
@@ -203,7 +206,7 @@ void ToolRep2D::update()
 	{
 		prMt = mSlicer->getTool()->get_prMt();
 	}
-	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = mSpaceProvider->get_rMpr();
 	Transform3D sMr = mSlicer->get_sMr();
 	Transform3D sMt = sMr*rMpr*prMt;
 	Transform3D vpMt = m_vpMs*sMt;

@@ -10,10 +10,10 @@
 #include "sscSliceProxy.h"
 #include "sscProbeSector.h"
 #include "sscProbeData.h"
-#include "sscToolManager.h"
+//#include "sscToolManager.h"
 #include "sscTransform3D.h"
 #include "sscVolumeHelpers.h"
-#include "cxToolManager.h"
+//#include "cxToolManager.h"
 
 #include "sscSlicedImageProxy.h"
 #include "sscSliceProxy.h"
@@ -25,26 +25,22 @@ namespace cx
 
 SimulatedImageStreamer::SimulatedImageStreamer()
 {
+	mDataManager = NULL;
 	this->setSendInterval(40);
 }
 
 SimulatedImageStreamer::~SimulatedImageStreamer()
 {}
 
-void SimulatedImageStreamer::initialize()
-{
-	ImagePtr image = dataManager()->getActiveImage();
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
-	this->initialize(image, tool);
-}
 
-void SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool)
+void SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataManager *dataManager)
 {
-	if(!image || !tool)
+	if(!image || !tool || !dataManager)
 	{
 		this->setInitialized(false);
 		return;
 	}
+	mDataManager = dataManager;
 	this->createSendTimer();
 
 	this->setSourceImage(image);
@@ -121,15 +117,9 @@ void SimulatedImageStreamer::sliceSlot()
 	mCachedImageToSend.reset();
 }
 
-void SimulatedImageStreamer::setSourceToActiveImageSlot()
-{
-	ImagePtr image = dataManager()->getActiveImage();
-	this->setSourceImage(image);
-}
-
 void SimulatedImageStreamer::setSourceToImageSlot(QString imageUid)
 {
-	ImagePtr image = dataManager()->getImage(imageUid);
+	ImagePtr image = mDataManager->getImage(imageUid);
 	this->setSourceImage(image);
 }
 
@@ -200,7 +190,7 @@ Transform3D SimulatedImageStreamer::getTransform_vMr()
 	Transform3D vMt = vMu * uMt;
 
 	Transform3D tMpr = mTool->get_prMt().inv();
-	Transform3D prMr = toolManager()->get_rMpr()->inv();
+	Transform3D prMr = mDataManager->get_rMpr().inv();
 
 	Transform3D vMr = vMt * tMpr * prMr;
 	return vMr;

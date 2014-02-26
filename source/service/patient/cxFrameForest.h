@@ -43,6 +43,8 @@
 
 namespace cx
 {
+class DataManager;
+
 /**
 * \file
 * \addtogroup cxServicePatient
@@ -64,7 +66,7 @@ namespace cx
 class FrameForest
 {
 public:
-	FrameForest();
+	explicit FrameForest(DataManager* dataManager);
 	QDomNode getNode(QString frame);
 	QDomNode getOldestAncestor(QDomNode node);
 
@@ -78,6 +80,7 @@ private:
 	bool isAncestorOf(QDomNode node, QDomNode ancestor);
 	void insertFrame(DataPtr data);
 	QDomDocument mDocument;
+	DataManager* mDataManager;
 };
 
 /**

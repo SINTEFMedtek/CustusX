@@ -32,8 +32,9 @@
 namespace cx
 {
 
-VideoConnectionManager::VideoConnectionManager()
+VideoConnectionManager::VideoConnectionManager(VideoServiceBackendPtr backend)
 {
+	mBackend = backend;
 	mReconnectInterval = 400;
 	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("video");
 
@@ -46,7 +47,7 @@ VideoConnectionManager::VideoConnectionManager()
 	mIniScriptProcess.reset(new ProcessWrapper("Init Script"));
 	mLocalVideoServerProcess.reset(new ProcessWrapper("Local Video Server"));
 	connect(mLocalVideoServerProcess->getProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
-	mVideoConnection.reset(new VideoConnection());
+	mVideoConnection.reset(new VideoConnection(mBackend));
 	connect(mVideoConnection.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
 	connect(mVideoConnection.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int)));
 	connect(mVideoConnection.get(), SIGNAL(videoSourcesChanged()), this, SIGNAL(videoSourcesChanged()));

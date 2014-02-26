@@ -172,7 +172,7 @@ cx::SliceProxyPtr ViewsWindow::createSliceProxy(cx::PLANE_TYPE plane)
 	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
 	cx::ToolPtr tool = mToolmanager->getDominantTool();
 
-	cx::SliceProxyPtr proxy(new cx::SliceProxy());
+	cx::SliceProxyPtr proxy = cx::SliceProxy::create(cx::dataManager());
 	proxy->setTool(tool);
 	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
 	return proxy;
@@ -181,7 +181,7 @@ cx::SliceProxyPtr ViewsWindow::createSliceProxy(cx::PLANE_TYPE plane)
 cx::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 {
 	QString filename = cxtest::Utilities::getDataRoot(imageFilename);
-	cx::ImagePtr image = cx::DataManager::getInstance()->loadImage(filename, filename, cx::rtMETAIMAGE);
+	cx::ImagePtr image = cx::DataManager::getInstance()->loadImage(filename, filename);
 	Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);
 	cx::DataManager::getInstance()->setCenter(center);
@@ -199,7 +199,9 @@ cx::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 void ViewsWindow::fixToolToCenter()
 {
 	Vector3D c = cx::DataManager::getInstance()->getCenter();
-	dummyTool()->setToolPositionMovement(std::vector<Transform3D>(1, cx::createTransformTranslate(c)));
+	cx::Transform3D prMt = cx::createTransformTranslate(c);
+	dummyTool()->setToolPositionMovement(std::vector<Transform3D>(1, prMt));
+	dummyTool()->set_prMt(prMt);
 }
 
 void ViewsWindow::insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c)
@@ -294,6 +296,9 @@ bool ViewsWindow::quickRunWidget()
 {
 	this->show();
 	this->updateRender();
+
+	cx::Transform3D rMt = cx::dataManager()->get_rMpr() * dummyTool()->get_prMt();
+
 	return true;
 }
 

@@ -17,30 +17,29 @@
 
 #include "cxFrameMetricBase.h"
 #include "sscPointMetric.h"
-#include "sscDataReaderWriter.h"
 
 namespace cx
 {
 
 typedef boost::shared_ptr<class ToolMetric> ToolMetricPtr;
 
-/** \brief DataReader implementation for ToolMetric
- *
- * \date Aug 16, 2011
- * \author Ole Vegard Solberg, SINTEF
- */
-class ToolMetricReader: public DataReader
-{
-public:
-	virtual ~ToolMetricReader()
-	{
-	}
-	virtual bool canLoad(const QString& type, const QString& filename)
-	{
-		return type == "ToolMetric";
-	}
-	virtual DataPtr load(const QString& uid, const QString& filename);
-};
+///** \brief DataReader implementation for ToolMetric
+// *
+// * \date Aug 16, 2011
+// * \author Ole Vegard Solberg, SINTEF
+// */
+//class ToolMetricReader: public DataReader
+//{
+//public:
+//	virtual ~ToolMetricReader()
+//	{
+//	}
+//	virtual bool canLoad(const QString& type, const QString& filename)
+//	{
+//		return type == "ToolMetric";
+//	}
+//	virtual DataPtr load(const QString& uid, const QString& filename);
+//};
 
 /** Metric class containing a snapshot of a tool
  *  at a given point in time.
@@ -55,16 +54,19 @@ class ToolMetric: public cx::FrameMetricBase
 {
 Q_OBJECT
 public:
-	ToolMetric(const QString& uid, const QString& name = "");
 	virtual ~ToolMetric();
-	static ToolMetricPtr create(QDomNode node);
-	static ToolMetricPtr create(QString uid, QString name="");
+//	static ToolMetricPtr create(QDomNode node);
+	static ToolMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 
 	double getToolOffset() const;
 	void setToolOffset(double val);
 	QString getToolName() const;
 	void setToolName(const QString& val);
 	virtual QString getType() const
+	{
+		return getTypeName();
+	}
+	static QString getTypeName()
 	{
 		return "ToolMetric";
 	}
@@ -73,6 +75,7 @@ public:
 	virtual QString getAsSingleLineString() const;
 
 private:
+	ToolMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 	double mToolOffset;
 	QString mToolName;
 };

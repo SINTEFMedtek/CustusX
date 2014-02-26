@@ -15,7 +15,7 @@
 #ifndef CXTOOL_H_
 #define CXTOOL_H_
 
-#include "sscTool.h"
+#include "cxToolImpl.h"
 
 #include <limits.h>
 #include <QTimer>
@@ -58,7 +58,7 @@ typedef boost::shared_ptr<class cxProbe> cxProbePtr;
  * \date Nov 6, 2008
  * \author Janne Beate Bakeng, SINTEF
  */
-class cxTool: public Tool
+class cxTool: public ToolImpl
 {
 	Q_OBJECT
 
@@ -77,7 +77,7 @@ public:
 	 TOOL_AURORA_CHANNEL_NUMBER        ///< hardware responds to Aurora channel number
 	 */
 
-	cxTool(IgstkToolPtr igstkTool);
+	cxTool(ToolManager *manager, IgstkToolPtr igstkTool);
 	virtual ~cxTool();
 
 	virtual std::set<Type> getTypes() const;
@@ -119,8 +119,6 @@ private slots:
 	void toolVisibleSlot(bool);
 
 private:
-	cxTool() {}  ///< do not use this constructor
-
 	void createPolyData(); ///< creates the polydata either from file or a vtkConeSource
 
 	void printInternalStructure(); ///< FOR DEBUGGING
@@ -128,13 +126,10 @@ private:
 	IgstkToolPtr mTool;
 
 	vtkPolyDataPtr mPolyData; ///< the polydata used to represent the tool graphically
-
 	bool mValid; ///< whether this tool is constructed correctly or not
 	bool mConfigured; ///< whether or not the tool is properly configured
 	bool mTracked; ///< whether the tool is being tracked or not
-
 	ProbePtr mProbe;
-
 	QTimer mTpsTimer;
 
 };
