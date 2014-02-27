@@ -85,7 +85,6 @@ void ViewManager::destroyInstance()
 }
 
 ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
-//				mGlobal2DZoom(true),
 				mGlobalObliqueOrientation(false)
 {
 	mBackend = backend;
@@ -140,9 +139,6 @@ void ViewManager::initialize()
 
 	mRenderLoop->setRenderingInterval(settings()->value("renderingInterval").toInt());
 	mRenderLoop->start();
-
-//	mGlobalZoom2DVal = SyncedValue::create(1);
-//	this->setGlobal2DZoom(mGlobal2DZoom);
 }
 
 void ViewManager::initializeGlobal2DZoom()
@@ -303,30 +299,15 @@ void ViewManager::syncOrientationMode(SyncedValuePtr val)
 	}
 }
 
-//void ViewManager::setGlobal2DZoom(bool global)
-//{
-//	mGlobal2DZoom = global;
-
-//	for (unsigned i = 0; i < mViewGroups.size(); ++i)
-//	{
-//		mViewGroups[i]->setGlobal2DZoom(mGlobal2DZoom, mGlobalZoom2DVal);
-//	}
-//}
-
-//bool ViewManager::getGlobal2DZoom()
-//{
-//	return mGlobal2DZoom;
-//}
-
 void ViewManager::addXml(QDomNode& parentNode)
 {
 	QDomDocument doc = parentNode.ownerDocument();
 	QDomElement viewManagerNode = doc.createElement("viewManager");
 	parentNode.appendChild(viewManagerNode);
 
-//	QDomElement global2DZoomNode = doc.createElement("global2DZoom");
-//	global2DZoomNode.appendChild(doc.createTextNode(string_cast(mGlobal2DZoom).c_str()));
-//	viewManagerNode.appendChild(global2DZoomNode);
+	QDomElement zoom2DNode = doc.createElement("global2DZoom");
+	zoom2DNode.appendChild(doc.createTextNode(qstring_cast(mGlobal2DZoomVal->get().toDouble())));
+	viewManagerNode.appendChild(zoom2DNode);
 
 	QDomElement activeViewNode = doc.createElement("activeView");
 	activeViewNode.appendChild(doc.createTextNode(mActiveView));
@@ -363,14 +344,6 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 	QDomNode child = viewmanagerNode.firstChild();
 	while (!child.isNull())
 	{
-//		if (child.toElement().tagName() == "global2DZoom")
-//		{
-//			const QString global2DZoomString = child.toElement().text();
-//			if (!global2DZoomString.isEmpty() && global2DZoomString.toInt() == 0)
-//				this->setGlobal2DZoom(false);
-//			else
-//				this->setGlobal2DZoom(true);
-//		}
 		if (child.toElement().tagName() == "activeView")
 		{
 			activeViewString = child.toElement().text();
@@ -382,6 +355,12 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 		}
 		child = child.nextSibling();
 	}
+
+	QString zoom2D = viewmanagerNode.namedItem("global2DZoom").toElement().text();
+	bool ok;
+	double zoom2Ddouble = zoom2D.toDouble(&ok);
+	if (ok)
+		mGlobal2DZoomVal->set(zoom2Ddouble);
 
 	QDomElement slicePlanes3DNode = viewmanagerNode.namedItem("slicePlanes3D").toElement();
 	mSlicePlanesProxy->setVisible(slicePlanes3DNode.attribute("use").toInt());

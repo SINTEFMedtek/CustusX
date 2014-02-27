@@ -140,14 +140,10 @@ public:
 	void setActiveView(QString viewUid); ///< convenient function for setting the active view
 	void storeLayoutData(const LayoutData& data);
 
-//	void setGlobal2DZoom(bool global); ///< enable/disable global 2d zooming
-//	bool getGlobal2DZoom(); ///< find out if global 2D zooming is enable
-
 	InteractiveClipperPtr getClipper();
 	InteractiveCropperPtr getCropper();
 
 	CyclicActionLoggerPtr getRenderTimer();// { return mRenderTimer; }
-//	CameraStylePtr getCameraStyle() { return mCameraStyle; }
 
 	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
 	void autoShowData(DataPtr data);
@@ -206,7 +202,6 @@ protected:
 	RenderLoopPtr mRenderLoop;
 	std::vector<ViewGroupPtr> mViewGroups;
 
-//	bool mGlobal2DZoom; ///< controlling whether or not 2D zooming is global
 	bool mGlobalObliqueOrientation; ///< controlling whether or not all 2d views should be oblique or orthogonal
 	SyncedValuePtr mGlobal2DZoomVal;
 
