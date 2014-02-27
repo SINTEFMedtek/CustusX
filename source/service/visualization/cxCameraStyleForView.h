@@ -68,7 +68,6 @@ public:
 private slots:
 	void setModified();
 	void dominantToolChangedSlot();
-	void viewChangedSlot();
 
 private:
 	ViewWidgetQPtr getView() const;
@@ -78,7 +77,6 @@ private:
 	bool isToolFollowingStyle(CAMERA_STYLE_TYPE style) const;
 	void onPreRender();
 	void moveCameraToolStyleSlot(Transform3D prMt, double timestamp); ///< receives transforms from the tool which the camera should follow
-//	void update();
 
 	void connectTool();
 	void disconnectTool();

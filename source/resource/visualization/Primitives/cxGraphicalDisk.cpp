@@ -30,7 +30,7 @@ GraphicalDisk::GraphicalDisk() :
 	mOutlineWidth(0.1)
 {
 	mDirection = Vector3D::UnitZ();
-	std::cout << "GraphicalDisk::create " << mDirection << std::endl;
+//	std::cout << "GraphicalDisk::create " << mDirection << std::endl;
 
 	mRadius = 1;
 	mColor = QColor(Qt::blue);
@@ -70,7 +70,7 @@ void GraphicalDisk::setPosition(Vector3D pos)
 }
 void GraphicalDisk::setDirection(Vector3D direction)
 {
-	std::cout << "GraphicalDisk::setDirection " << direction << std::endl;
+//	std::cout << "GraphicalDisk::setDirection " << direction << std::endl;
 
 	mDirection = direction;
 }

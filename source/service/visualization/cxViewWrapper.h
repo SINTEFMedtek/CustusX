@@ -60,7 +60,8 @@ public:
 	void set(QVariant val);
 	QVariant get() const;
 private:
-	QVariant mValue;signals:
+	QVariant mValue;
+signals:
 	void changed();
 };
 
@@ -81,7 +82,7 @@ public:
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) = 0;
 	virtual void setViewGroup(ViewGroupDataPtr group);
 
-	virtual void setZoom2D(SyncedValuePtr value) {}
+//	virtual void setZoom2D(SyncedValuePtr value) {}
 	virtual void setOrientationMode(SyncedValuePtr value) {}
 
 	virtual void updateView() = 0;
