@@ -33,12 +33,15 @@ public:
 
 	static ocl* init(cl_device_type type);
 	static void release(ocl* ocl);
+
 	static cl::Program createProgram(cl::Context context, const char* source, size_t sourceLength);
-	static void build(cl::Program program, QString buildOptions); //TODO return error value or throw???
 	static cl::Kernel createKernel(cl::Program program, const char * kernel_name);
 	static cl::Buffer createBuffer(cl::Context context, cl_mem_flags flags, size_t size, void * host_data, std::string bufferName);
 
+	static void build(cl::Program program, QString buildOptions); //TODO return error value or throw???
 	static void checkBuildProgramLog(cl::Program program, cl::Device device, cl_int err);
+	static void executeKernel(cl::CommandQueue queue, cl::Kernel kernel, size_t global_work_size, size_t local_work_size);
+	static void readResultingVolume(cl::CommandQueue queue, cl::Buffer outputBuffer, size_t outputVolumeSize, void *outputData);
 
 private:
 	static cl::Platform selectPlatform();
