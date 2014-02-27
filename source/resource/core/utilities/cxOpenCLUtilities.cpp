@@ -54,6 +54,17 @@ OpenCL::ocl* OpenCL::init(cl_device_type type)
     return retval;
 }
 
+void OpenCL::release(OpenCL::ocl* ocl)
+{
+	messageManager()->sendInfo("Releasing OpenCL context, device and command queue.");
+
+	if(ocl != NULL)
+	{
+		delete ocl;
+		ocl = NULL;
+	}
+}
+
 cl::Platform OpenCL::selectPlatform()
 {
 	cl::Platform retval;
@@ -234,17 +245,6 @@ VECTOR_CLASS<cl::Device> OpenCL::getOnlyValidDevices(VECTOR_CLASS<cl::Device> de
 	return valid;
 }
 
-void OpenCL::release(OpenCL::ocl* ocl)
-{
-	messageManager()->sendInfo("Releasing OpenCL context, device and command queue.");
-
-	if(ocl != NULL)
-	{
-		delete ocl;
-		ocl = NULL;
-	}
-}
-
 cl::Program OpenCL::createProgram(cl::Context context, const char* source, size_t sourceLength)
 {
 	cl::Program retval;
@@ -329,6 +329,32 @@ void OpenCL::checkBuildProgramLog(cl::Program program, cl::Device device, cl_int
 	    program.getBuildInfo(device, CL_PROGRAM_BUILD_LOG, &log);
 
 		messageManager()->sendInfo("Build log: \n"+qstring_cast(log));
+}
+
+void OpenCL::executeKernel(cl::CommandQueue queue, cl::Kernel kernel, size_t global_work_size, size_t local_work_size)
+{
+	messageManager()->sendInfo(QString("Executing kernel"));
+	try
+	{
+		queue.enqueueNDRangeKernel(kernel, 0, global_work_size, local_work_size, NULL, NULL);
+		queue.finish();
+	} catch (cl::Error &error)
+	{
+		messageManager()->sendError("Could not execute kernels. Reason: "+QString(error.what()));
+		check_error(error.err());
+	}
+}
+
+void OpenCL::readResultingVolume(cl::CommandQueue queue, cl::Buffer outputBuffer, size_t outputVolumeSize, void *outputData)
+{
+	try
+	{
+		queue.enqueueReadBuffer(outputBuffer, CL_TRUE, 0, outputVolumeSize, outputData, 0, 0);
+	} catch (cl::Error &error)
+	{
+		messageManager()->sendError("Could not read output volume buffer from OpenCL. Reason: "+QString(error.what()));
+		check_error(error.err());
+	}
 }
 
 void OpenCLUtilities::generateOpenCLError(cl_int id, const char* file, int line)

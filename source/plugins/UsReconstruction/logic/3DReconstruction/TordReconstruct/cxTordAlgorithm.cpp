@@ -152,24 +152,34 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	spacings[0] = input->getSpacing()[0];
 	spacings[1] = input->getSpacing()[1];
 
-	// The input blocks
-	std::vector<cl::Buffer> blocks;
-	for (int i = 0; i < clBlocks.size(); i++)
-	{
-		blocks.push_back(clBlocks[i]);
-	}
-
 	//TODO why 4? because float4 is used??
 	size_t planes_eqs_size =  sizeof(cl_float)*4*nPlanes_numberOfInputImages;
 
-	size_t local_work_size;
 	// Find the optimal local work size
+	size_t local_work_size;
 	mKernel.getWorkGroupInfo(mOpenCL->device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &local_work_size);
 
-	size_t close_planes_size = this->calculateSpaceNeededForClosePlanes(local_work_size, nPlanes_numberOfInputImages, nClosePlanes);
+	size_t close_planes_size = this->calculateSpaceNeededForClosePlanes(mKernel, mOpenCL->device, local_work_size, nPlanes_numberOfInputImages, nClosePlanes);
 
-	this->setKernelArguments(outputDims[0], outputDims[1], outputDims[2], spacings[0], spacings[1], spacings[2], input->getDimensions()[0], input->getDimensions()[1],
-			spacings[0], spacings[1], blocks, outputBuffer, clPlaneMatrices, clMask, planes_eqs_size, close_planes_size, radius);
+	this->setKernelArguments(
+			mKernel,
+			outputDims[0],
+			outputDims[1],
+			outputDims[2],
+			spacings[0],
+			spacings[1],
+			spacings[2],
+			input->getDimensions()[0],
+			input->getDimensions()[1],
+			spacings[0],
+			spacings[1],
+			clBlocks,
+			outputBuffer,
+			clPlaneMatrices,
+			clMask,
+			planes_eqs_size,
+			close_planes_size,
+			radius);
 
 	messageManager()->sendInfo(QString("Using %1 as local workgroup size").arg(local_work_size));
 
@@ -183,13 +193,14 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	if (global_work_size % local_work_size)
 		global_work_size = ((global_work_size / local_work_size) + 1) * local_work_size; // ceil(...)
 
-	this->executeKernel(global_work_size, local_work_size);
-	this->readResultingVolume(outputBuffer, outputVolumeSize, outputData->GetScalarPointer());
+	OpenCL::executeKernel(mOpenCL->cmd_queue, mKernel, global_work_size, local_work_size);
+	OpenCL::readResultingVolume(mOpenCL->cmd_queue, outputBuffer, outputVolumeSize, outputData->GetScalarPointer());
 
 	// Cleaning up
 	messageManager()->sendInfo(QString("Done, freeing GPU memory"));
 	this->freeFrameBlocks(inputBlocks, numBlocks);
 	delete[] inputBlocks;
+
 	inputBlocks = NULL;
 
 	return true;
@@ -228,6 +239,7 @@ void TordAlgorithm::freeFrameBlocks(frameBlock_t *framePointers, int numBlocks)
 }
 
 void TordAlgorithm::setKernelArguments(
+		cl::Kernel kernel,
 		int volume_xsize,
         int volume_ysize,
         int volume_zsize,
@@ -247,63 +259,37 @@ void TordAlgorithm::setKernelArguments(
         float radius)
 {
 	int arg = 0;
-	mKernel.setArg(arg++, volume_xsize); // volume_xsize
-	mKernel.setArg(arg++, volume_ysize); // volume_ysize
-	mKernel.setArg(arg++, volume_zsize); // volume_zsize
-	mKernel.setArg(arg++, volume_xspacing); // volume_xspacing
-	mKernel.setArg(arg++, volume_yspacing); // volume_yspacing
-	mKernel.setArg(arg++, volume_zspacing); // volume_zspacing
-	mKernel.setArg(arg++, in_xsize); // in_xsize
-	mKernel.setArg(arg++, in_ysize); // in_ysize
-	mKernel.setArg(arg++, in_xspacing); // in_xspacing
-	mKernel.setArg(arg++, in_yspacing); // in_yspacing
+	kernel.setArg(arg++, volume_xsize);
+	kernel.setArg(arg++, volume_ysize);
+	kernel.setArg(arg++, volume_zsize);
+	kernel.setArg(arg++, volume_xspacing);
+	kernel.setArg(arg++, volume_yspacing);
+	kernel.setArg(arg++, volume_zspacing);
+	kernel.setArg(arg++, in_xsize);
+	kernel.setArg(arg++, in_ysize);
+	kernel.setArg(arg++, in_xspacing);
+	kernel.setArg(arg++, in_yspacing);
 	for (int i = 0; i < blocks.size(); i++)
 	{
-		mKernel.setArg(arg++, blocks[i]);
+		kernel.setArg(arg++, blocks[i]);
 	}
-	mKernel.setArg(arg++, out_volume); // out_volume
-	mKernel.setArg(arg++, plane_matrices); // plane_matrices
-	mKernel.setArg(arg++, mask); // US Probe mask
-	mKernel.setArg<cl::LocalSpaceArg>(arg++, cl::__local(plane_eqs_size)); // plane_eqs (local CL memory, will be calculated by the kernel)
-	mKernel.setArg<cl::LocalSpaceArg>(arg++, cl::__local(close_planes_size)); // close planes (local CL memory, to be used by the kernel)
-	mKernel.setArg(arg++, radius); // radius
+	kernel.setArg(arg++, out_volume);
+	kernel.setArg(arg++, plane_matrices);
+	kernel.setArg(arg++, mask);
+	kernel.setArg<cl::LocalSpaceArg>(arg++, cl::__local(plane_eqs_size));
+	kernel.setArg<cl::LocalSpaceArg>(arg++, cl::__local(close_planes_size));
+	kernel.setArg(arg++, radius);
 }
 
-void TordAlgorithm::executeKernel(size_t global_work_size, size_t local_work_size)
-{
-	messageManager()->sendInfo(QString("Executing kernel"));
-	try
-	{
-		mOpenCL->cmd_queue.enqueueNDRangeKernel(mKernel, 0, global_work_size, local_work_size, NULL, NULL);
-		mOpenCL->cmd_queue.finish();
-	} catch (cl::Error &error)
-	{
-		messageManager()->sendError("Could not execute kernels. Reason: "+QString(error.what()));
-		check_error(error.err());
-	}
-}
-
-void TordAlgorithm::readResultingVolume(cl::Buffer outputBuffer, size_t outputVolumeSize, void *outputData)
-{
-	try
-	{
-		mOpenCL->cmd_queue.enqueueReadBuffer(outputBuffer, CL_TRUE, 0, outputVolumeSize, outputData, 0, 0);
-	} catch (cl::Error &error)
-	{
-		messageManager()->sendError("Could not read output volume buffer from OpenCL. Reason: "+QString(error.what()));
-		check_error(error.err());
-	}
-}
-
-size_t TordAlgorithm::calculateSpaceNeededForClosePlanes(size_t local_work_size, size_t nPlanes_numberOfInputImages, int nClosePlanes)
+size_t TordAlgorithm::calculateSpaceNeededForClosePlanes(cl::Kernel kernel, cl::Device device, size_t local_work_size, size_t nPlanes_numberOfInputImages, int nClosePlanes)
 {
 	// Find out how much local memory the device has
 	size_t dev_local_mem_size;
-	dev_local_mem_size = mOpenCL->device.getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
+	dev_local_mem_size = device.getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
 
 	// Find the maximum work group size
 	size_t max_work_size;
-	mKernel.getWorkGroupInfo(mOpenCL->device, CL_KERNEL_WORK_GROUP_SIZE, &max_work_size);
+	kernel.getWorkGroupInfo(device, CL_KERNEL_WORK_GROUP_SIZE, &max_work_size);
 
 	// Now find the largest multiple of the preferred work group size that will fit into local mem
 	size_t constant_local_mem = sizeof(cl_float) * 4 * nPlanes_numberOfInputImages;
