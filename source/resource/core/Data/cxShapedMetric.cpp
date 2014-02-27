@@ -29,6 +29,7 @@ DonutMetric::DonutMetric(const QString& uid, const QString& name, DataManager* d
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 	mRadius = 5;
 	mThickness = 2;
+	mHeight = 0;
 	mFlat = true;
 }
 
@@ -48,6 +49,8 @@ void DonutMetric::addXml(QDomNode& dataNode)
 	mArguments->addXml(dataNode);
 	dataNode.toElement().setAttribute("radius", mRadius);
 	dataNode.toElement().setAttribute("thickness", mThickness);
+	dataNode.toElement().setAttribute("height", mHeight);
+	dataNode.toElement().setAttribute("flat", mFlat);
 }
 
 void DonutMetric::parseXml(QDomNode& dataNode)
@@ -57,6 +60,8 @@ void DonutMetric::parseXml(QDomNode& dataNode)
 	mArguments->parseXml(dataNode, mDataManager->getData());
 	mRadius = dataNode.toElement().attribute("radius", qstring_cast(mRadius)).toDouble();
 	mThickness = dataNode.toElement().attribute("thickness", qstring_cast(mThickness)).toDouble();
+	mHeight = dataNode.toElement().attribute("height", qstring_cast(mHeight)).toDouble();
+	mFlat = dataNode.toElement().attribute("flat", qstring_cast(mFlat)).toInt();
 }
 
 bool DonutMetric::isValid() const
@@ -121,6 +126,16 @@ void DonutMetric::setThickness(double val)
 double DonutMetric::getThickness() const
 {
 	return mThickness;
+}
+
+void DonutMetric::setHeight(double val)
+{
+	mHeight = val;
+}
+
+double DonutMetric::getHeight() const
+{
+	return mHeight;
 }
 
 void DonutMetric::setFlat(bool val)

@@ -18,6 +18,7 @@
 #include "vtkForwardDeclarations.h"
 #include "sscVector3D.h"
 #include <QColor>
+typedef vtkSmartPointer<class vtkLinearExtrusionFilter> vtkLinearExtrusionFilterPtr;
 
 namespace cx
 {
@@ -41,6 +42,7 @@ public:
 	void setColor(QColor color);
 	void setFillVisible(bool val);
 	void setLighting(bool on);
+	void setHeight(double height);
 
 	void setPosition(Vector3D pos);
 	void setDirection(Vector3D direction);
@@ -56,12 +58,15 @@ private:
 	vtkRendererPtr mRenderer;
 
 	double mRadius;
+	double mHeight;
 	Vector3D mPosition;
 	Vector3D mDirection;
 
 	vtkActorPtr mCircleActor;
+	vtkLinearExtrusionFilterPtr mCircleExtruder;
 	vtkSectorSourcePtr mCircleSource;
 	vtkActorPtr mOutlineActor;
+	vtkLinearExtrusionFilterPtr mOutlineExtruder;
 	vtkSectorSourcePtr mOutlineSource;
 	double mOutlineWidth;
 	QColor mOutlineColor;

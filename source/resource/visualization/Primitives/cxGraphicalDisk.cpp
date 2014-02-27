@@ -22,6 +22,8 @@
 #include <vtkSectorSource.h>
 #include "sscVtkHelperClasses.h"
 #include "vtkMatrix4x4.h"
+#include "vtkLinearExtrusionFilter.h"
+#include "vtkPolyDataNormals.h"
 
 namespace cx
 {
@@ -37,6 +39,7 @@ GraphicalDisk::GraphicalDisk() :
 	mFillVisible = true;
 	mOutlineColor = QColor(Qt::magenta);
 	mUseLighting = false;
+	mHeight = 0;
 }
 
 GraphicalDisk::~GraphicalDisk()
@@ -77,6 +80,10 @@ void GraphicalDisk::setDirection(Vector3D direction)
 void GraphicalDisk::setLighting(bool on)
 {
 	mUseLighting = on;
+}
+void GraphicalDisk::setHeight(double height)
+{
+	mHeight = height;
 }
 
 void GraphicalDisk::setRenderer(vtkRendererPtr renderer)
@@ -121,15 +128,13 @@ void GraphicalDisk::update()
 	mCircleActor->GetProperty()->SetColor(getColorAsVector3D(mColor).begin());
 	mOutlineActor->GetProperty()->SetColor(getColorAsVector3D(mOutlineColor).begin());
 
-//	mCircleActor->SetPosition(mPosition[0], mPosition[1], mPosition[2]);
-//	mOutlineActor->SetPosition(mPosition[0], mPosition[1], mPosition[2]);
-//	mOutlineSource->SetZCoord(0.01);
-//	mCircleSource->SetZCoord(0.01);
-
 	double innerRadius = std::max(0.0, mRadius*(1.0 - mOutlineWidth));
 	mCircleSource->SetOuterRadius(innerRadius);
 	mOutlineSource->SetInnerRadius(innerRadius);
 	mOutlineSource->SetOuterRadius(mRadius);
+
+	mCircleExtruder->SetScaleFactor(mHeight);
+	mOutlineExtruder->SetScaleFactor(mHeight);
 
 	mCircleActor->SetVisibility(mFillVisible);
 
@@ -149,8 +154,15 @@ void GraphicalDisk::createActors()
 	mCircleSource->SetStartAngle(0);
 	mCircleSource->SetEndAngle(360);
 	mCircleSource->SetCircumferentialResolution(resolution);
+
+	mCircleExtruder = vtkLinearExtrusionFilterPtr::New();
+	mCircleExtruder->SetInput(mCircleSource->GetOutput());
+	mCircleExtruder->SetScaleFactor(mHeight);
+	mCircleExtruder->SetExtrusionTypeToVectorExtrusion();
+	mCircleExtruder->SetVector(0,0,1);
+
 	vtkPolyDataMapperPtr mapper = vtkPolyDataMapperPtr::New();
-	mapper->SetInput(mCircleSource->GetOutput());
+	mapper->SetInput(mCircleExtruder->GetOutput());
 	mapper->ScalarVisibilityOff();
 	mCircleActor = vtkActorPtr::New();
 	mCircleActor->SetMapper(mapper);
@@ -162,8 +174,19 @@ void GraphicalDisk::createActors()
 	mOutlineSource->SetStartAngle(0);
 	mOutlineSource->SetEndAngle(360);
 	mOutlineSource->SetCircumferentialResolution(resolution);
+
+	mOutlineExtruder = vtkLinearExtrusionFilterPtr::New();
+	mOutlineExtruder->SetInput(mOutlineSource->GetOutput());
+	mOutlineExtruder->SetScaleFactor(mHeight);
+	mOutlineExtruder->SetExtrusionTypeToVectorExtrusion();
+	mOutlineExtruder->SetVector(0,0,1);
+
+	vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
+	normals->SetInput(mOutlineExtruder->GetOutput());
+
 	vtkPolyDataMapperPtr outlineMapper = vtkPolyDataMapperPtr::New();
-	outlineMapper->SetInput(mOutlineSource->GetOutput());
+	outlineMapper->SetInput(normals->GetOutput());
+//	outlineMapper->SetInput(mOutlineExtruder->GetOutput());
 	outlineMapper->ScalarVisibilityOff();
 	mOutlineActor = vtkActorPtr::New();
 	mOutlineActor->SetMapper(outlineMapper);
