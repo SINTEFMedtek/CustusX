@@ -120,6 +120,7 @@ void DonutMetricRep::updateDisc()
 	mDisk->setPosition(donut->getPosition());
 	mDisk->setDirection(donut->getDirection());
 	mDisk->setRadius(donut->getRadius());
+	mDisk->setHeight(donut->getHeight());
 	mDisk->setColor(donut->getColor());
 	mDisk->setOutlineColor(donut->getColor());
 	mDisk->setOutlineWidth(donut->getThickness());

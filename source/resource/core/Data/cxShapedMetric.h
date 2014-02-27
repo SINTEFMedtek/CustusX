@@ -52,6 +52,8 @@ public:
 	double getRadius() const;
 	void setThickness(double val);
 	double getThickness() const;
+	void setHeight(double val);
+	double getHeight() const;
 	bool getFlat() const;
 	void setFlat(bool val);
 
@@ -79,6 +81,7 @@ private:
 	MetricReferenceArgumentListPtr mArguments;
 	double mRadius;
 	double mThickness;
+	double mHeight;
 	bool mFlat;
 };
 
