@@ -49,8 +49,15 @@ TEST_CASE("DistanceMetric composed of a point and plane gives a correct distance
     cxtest::MetricFixture fixture;
     double distance = 2;
 	cx::Vector3D normal(0,0,1);
+	cx::Vector3D origin(10,10,0);
+
 	cxtest::PointMetricWithInput p0 = fixture.getPointMetricWithInput(cx::Vector3D(0,0, distance));
-	cxtest::PlaneMetricWithInput p1 = fixture.getPlaneMetricWithInput(cx::Vector3D(0,0,0), normal);
+	cxtest::PointMetricWithInput plane_origin = fixture.getPointMetricWithInput(origin);
+	cxtest::PointMetricWithInput plane_dir = fixture.getPointMetricWithInput(origin+normal);
+	cxtest::PlaneMetricWithInput p1 = fixture.getPlaneMetricWithInput(origin,
+																	  normal,
+																	  plane_origin.mMetric,
+																	  plane_dir.mMetric);
 
 	cxtest::DistanceMetricWithInput testData = fixture.getDistanceMetricWithInput(distance, p0.mMetric, p1.mMetric);
 	CHECK(fixture.inputEqualsMetric(testData));

@@ -38,6 +38,8 @@ public:
   virtual DataMetricPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
+	virtual void update();
+
 private slots:
   void moveToToolPosition();
   void spaceSelected();

@@ -100,19 +100,21 @@ PointMetricWithInput MetricFixture::getPointMetricWithInput(cx::Vector3D point)
     return retval;
 }
 
-PlaneMetricWithInput MetricFixture::getPlaneMetricWithInput(cx::Vector3D point, cx::Vector3D normal)
+PlaneMetricWithInput MetricFixture::getPlaneMetricWithInput(cx::Vector3D point, cx::Vector3D normal, cx::DataMetricPtr p0, cx::DataMetricPtr p1)
 {
 	PlaneMetricWithInput retval;
 
-    retval.mPoint = point;
-    retval.mNormal = normal;
-	retval.mSpace = cx::CoordinateSystem::reference();
+	retval.mPoint = point;
+	retval.mNormal = normal;
+//	retval.mSpace = cx::CoordinateSystem::reference();
 
 //	retval.mMetric = cx::PlaneMetric::create("testMetric%1");
 	retval.mMetric = this->createTestMetric<cx::PlaneMetric>("testMetric%1");
-	retval.mMetric->setCoordinate(point);
-    retval.mMetric->setNormal(normal);
-    retval.mMetric->setSpace(retval.mSpace);
+	retval.mMetric->getArguments()->set(0, p0);
+	retval.mMetric->getArguments()->set(1, p1);
+//	retval.mMetric->setCoordinate(point);
+//    retval.mMetric->setNormal(normal);
+//    retval.mMetric->setSpace(retval.mSpace);
 	cx::dataManager()->loadData(retval.mMetric);
 
     return retval;
@@ -200,9 +202,8 @@ bool MetricFixture::inputEqualsMetric(PointMetricWithInput data)
 
 bool MetricFixture::inputEqualsMetric(PlaneMetricWithInput data)
 {
-	return (cx::similar(data.mPoint, data.mMetric->getCoordinate()))
-			&& (cx::similar(data.mNormal, data.mMetric->getNormal()))
-            && (data.mSpace == data.mMetric->getSpace());
+	return (cx::similar(data.mPoint, data.mMetric->getRefCoord()))
+			&& (cx::similar(data.mNormal, data.mMetric->getRefNormal()));
 }
 
 QStringList MetricFixture::getSingleLineDataList(cx::DataMetricPtr metric)

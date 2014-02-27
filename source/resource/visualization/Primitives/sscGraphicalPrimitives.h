@@ -140,6 +140,7 @@ class Rect3D
 public:
   Rect3D(vtkRendererPtr renderer, QColor color);
   ~Rect3D();
+  void setColor(QColor color);
   void updatePosition(const DoubleBoundingBox3D bb, const Transform3D& M);
   void setLine(bool on, int width);
   void setSurface(bool on);

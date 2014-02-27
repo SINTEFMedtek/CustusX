@@ -139,6 +139,7 @@ QString StringDataAdapterXml::convertInternal2Display(QString internal)
 void StringDataAdapterXml::setDisplayNames(std::map<QString, QString> names)
 {
 	mDisplayNames = names;
+	emit changed();
 }
 
 } // namespace cx

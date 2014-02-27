@@ -17,6 +17,7 @@
 #include "sscBoundingBox3D.h"
 #include "sscTypeConversions.h"
 #include "sscDataManager.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
