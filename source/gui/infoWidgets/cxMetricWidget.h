@@ -105,6 +105,7 @@ private:
   void initializeTable();
   void updateTableContents();
   void expensizeColumnResize();
+  void updateMetricWrappers();
 
   QAction* createAction(QActionGroup* group, QString iconName, QString text, QString tip, const char* slot);
 

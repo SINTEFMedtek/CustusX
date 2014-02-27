@@ -36,10 +36,16 @@
 namespace cx
 {
 
+MetricBase::MetricBase() //: mModified(true)
+{
+//	mInternalUpdate = false;
+//	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
+//	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
+//	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
+}
+
 void MetricBase::colorSelected()
 {
-	//	if (mInternalUpdate)
-	//		return;
 	this->getData()->setColor(mColorSelector->getValue());
 }
 
@@ -70,22 +76,24 @@ void MetricBase::addColorWidget(QVBoxLayout* layout)
 
 MetricReferenceArgumentListGui::MetricReferenceArgumentListGui()
 {
+	mModified = true;
 	mInternalUpdate = false;
-	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
+//	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 void MetricReferenceArgumentListGui::setArguments(MetricReferenceArgumentListPtr arguments)
 {
 	mArguments = arguments;
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SLOT(dataChangedSlot()));
+//	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(argumentsChanged()));
 }
 
 void MetricReferenceArgumentListGui::addWidgets(QBoxLayout* layout)
 {
 	QString value;// = qstring_cast(mData->getFrame());
-	QStringList range;
-	std::map<QString,QString> names;
-	this->getAvailableArgumentMetrics(&range, &names);
+//	QStringList range;
+//	std::map<QString,QString> names;
+//	this->getAvailableArgumentMetrics(&range, &names);
 
 	mPSelector.resize(mArguments->getCount());
 	for (unsigned i=0; i<mPSelector.size(); ++i)
@@ -94,9 +102,9 @@ void MetricReferenceArgumentListGui::addWidgets(QBoxLayout* layout)
 														 QString("p%1").arg(i),
 														 mArguments->getDescription(i),
 														 mArguments->get(i) ? mArguments->get(i)->getUid() : "",
-														 range,
+														 QStringList(),
 														 QDomNode());
-		mPSelector[i]->setDisplayNames(names);
+//		mPSelector[i]->setDisplayNames(names);
 		layout->addWidget(new LabeledComboBoxWidget(NULL, mPSelector[i]));
 		connect(mPSelector[i].get(), SIGNAL(valueWasSet()), this, SLOT(pointSelected()));
 	}
@@ -109,7 +117,7 @@ void MetricReferenceArgumentListGui::getAvailableArgumentMetrics(QStringList* ui
 	std::map<QString, DataPtr> data = dataManager()->getData();
 	for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
 	{
-		if (boost::dynamic_pointer_cast<PointMetric>(iter->second))
+		if (mArguments->validArgument(iter->second))
 		{
 			*uid << iter->first;
 			(*namemap)[iter->first] = iter->second->getName();
@@ -131,21 +139,42 @@ void MetricReferenceArgumentListGui::pointSelected()
 		return;
 	for (unsigned i=0; i<mPSelector.size(); ++i)
 	{
-		PointMetricPtr p = boost::dynamic_pointer_cast<PointMetric>(dataManager()->getData(mPSelector[i]->getValue()));
-		mArguments->set(i, p);
+		DataPtr data = dataManager()->getData(mPSelector[i]->getValue());
+		if (mArguments->validArgument(data))
+			mArguments->set(i, data);
+		else
+			messageManager()->sendWarning(QString("Failed to set data [%1] in metric, invalid argument.").arg(data?data->getName():"NULL"));
 	}
 }
 
 void MetricReferenceArgumentListGui::dataChangedSlot()
 {
+//	mModified = true;
+}
+
+void MetricReferenceArgumentListGui::update()
+{
+	if (!mModified)
+		return;
 	mInternalUpdate = true;
+
+	QStringList range;
+	std::map<QString,QString> names;
+	this->getAvailableArgumentMetrics(&range, &names);
+
 	for (unsigned i=0; i<mPSelector.size(); ++i)
 	{
-		if (mArguments->get(i))
-			mPSelector[i]->setValue(mArguments->get(i)->getUid());
+		if (!mArguments->get(i))
+			continue;
+		mPSelector[i]->setValue(mArguments->get(i)->getUid());
+		mPSelector[i]->setDisplayNames(names);
+		mPSelector[i]->setValueRange(range);
 	}
+
 	mInternalUpdate = false;
+	mModified = true;
 }
+
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -276,6 +305,11 @@ void PointMetricWrapper::coordinateChanged()
 
 void PointMetricWrapper::dataChangedSlot()
 {
+
+}
+
+void PointMetricWrapper::update()
+{
 	mInternalUpdate = true;
 	mSpaceSelector->setValue(mData->getSpace().toString());
 	mCoordinate->setValue(mData->getCoordinate());
@@ -288,8 +322,10 @@ void PointMetricWrapper::dataChangedSlot()
 
 PlaneMetricWrapper::PlaneMetricWrapper(PlaneMetricPtr data) : mData(data)
 {
+	mArguments.setArguments(data->getArguments());
 	mInternalUpdate = false;
 	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
+	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
 	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
@@ -302,46 +338,7 @@ QWidget* PlaneMetricWrapper::createWidget()
 	topLayout->setMargin(0);
 	topLayout->addLayout(hLayout);
 
-	QString value;// = qstring_cast(mData->getFrame());
-	std::vector<CoordinateSystem> spaces = spaceProvider()->getSpacesToPresentInGUI();
-	QStringList range;
-	for (unsigned i=0; i<spaces.size(); ++i)
-		range << spaces[i].toString();
-
-	mSpaceSelector = StringDataAdapterXml::initialize("selectSpace",
-													  "Space",
-													  "Select coordinate system to store position in.",
-													  value,
-													  range,
-													  QDomNode());
-	hLayout->addWidget(new LabeledComboBoxWidget(widget, mSpaceSelector));
-	connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spaceSelected()));
-
-	mCoordinate = Vector3DDataAdapterXml::initialize("selectCoordinate",
-													 "Coord",
-													 "Coordinate values.",
-													 Vector3D(0,0,0),
-													 DoubleRange(-1000,1000,1),
-													 1,
-													 QDomNode());
-	topLayout->addWidget(Vector3DWidget::createSmallHorizontal(widget, mCoordinate));
-	connect(mCoordinate.get(), SIGNAL(valueWasSet()), this, SLOT(coordinateChanged()));
-
-	mNormal = Vector3DDataAdapterXml::initialize("selectNormal",
-												 "Normal",
-												 "Normal values.",
-												 Vector3D(1,0,0),
-												 DoubleRange(-1,1,0.1),
-												 2,
-												 QDomNode());
-	topLayout->addWidget(Vector3DWidget::createSmallHorizontal(widget, mNormal));
-	connect(mNormal.get(), SIGNAL(valueWasSet()), this, SLOT(coordinateChanged()));
-
-	QPushButton* sampleButton = new QPushButton("Sample");
-	sampleButton->setToolTip("Set the position equal to the current tool tip position.");
-	hLayout->addWidget(sampleButton);
-	connect(sampleButton, SIGNAL(clicked()), this, SLOT(moveToToolPosition()));
-
+	mArguments.addWidgets(hLayout);
 	this->addColorWidget(topLayout);
 	topLayout->addStretch();
 
@@ -362,53 +359,18 @@ QString PlaneMetricWrapper::getType() const
 
 QString PlaneMetricWrapper::getArguments() const
 {
-	return mData->getSpace().toString();
-}
-
-void PlaneMetricWrapper::moveToToolPosition()
-{
-	ToolPtr tool = toolManager()->getDominantTool();
-	if (!tool)
-	{
-		mData->setCoordinate(Vector3D(0, 0, 0));
-		mData->setNormal(Vector3D(1, 0, 0));
-	}
-	else
-	{
-		CoordinateSystem from(csTOOL_OFFSET, tool->getUid());
-		Vector3D point_t = Vector3D(0, 0, 0);
-		Transform3D rMto = spaceProvider()->get_toMfrom(from, mData->getSpace());
-
-		mData->setCoordinate(rMto.coord(Vector3D(0, 0, 0)));
-		mData->setNormal(rMto.vector(Vector3D(0, 0, 1)));
-	}
-}
-
-void PlaneMetricWrapper::spaceSelected()
-{
-	if (mInternalUpdate)
-		return;
-	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
-	if (space.mId==csCOUNT)
-		return;
-	mData->setSpace(space);
-}
-
-void PlaneMetricWrapper::coordinateChanged()
-{
-	if (mInternalUpdate)
-		return;
-	mData->setCoordinate(mCoordinate->getValue());
-	mData->setNormal(mNormal->getValue());
+	return mArguments.getAsString();
 }
 
 void PlaneMetricWrapper::dataChangedSlot()
 {
 	mInternalUpdate = true;
-	mSpaceSelector->setValue(mData->getSpace().toString());
-	mCoordinate->setValue(mData->getCoordinate());
-	mNormal->setValue(mData->getNormal());
 	mInternalUpdate = false;
+}
+
+void PlaneMetricWrapper::update()
+{
+	mArguments.update();
 }
 
 //---------------------------------------------------------
@@ -460,6 +422,12 @@ void DistanceMetricWrapper::dataChangedSlot()
 	mInternalUpdate = true;
 	mInternalUpdate = false;
 }
+
+void DistanceMetricWrapper::update()
+{
+	mArguments.update();
+}
+
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -533,6 +501,10 @@ BoolDataAdapterXmlPtr AngleMetricWrapper::createUseSimpleVisualizationSelector()
 	return retval;
 }
 
+void AngleMetricWrapper::update()
+{
+	mArguments.update();
+}
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -584,8 +556,10 @@ QString DonutMetricWrapper::getArguments() const
 	return mArguments.getAsString();
 }
 
-void DonutMetricWrapper::dataChangedSlot()
+void DonutMetricWrapper::update()
 {
+	mArguments.update();
+
 	if (mInternalUpdate)
 		return;
 	mInternalUpdate = true;
@@ -593,6 +567,17 @@ void DonutMetricWrapper::dataChangedSlot()
 	mThickness->setValue(mData->getThickness());
 	mFlat->setValue(mData->getFlat());
 	mInternalUpdate = false;
+}
+
+void DonutMetricWrapper::dataChangedSlot()
+{
+//	if (mInternalUpdate)
+//		return;
+//	mInternalUpdate = true;
+//	mRadius->setValue(mData->getRadius());
+//	mThickness->setValue(mData->getThickness());
+//	mFlat->setValue(mData->getFlat());
+//	mInternalUpdate = false;
 }
 
 void DonutMetricWrapper::guiChanged()
@@ -698,6 +683,12 @@ QString SphereMetricWrapper::getArguments() const
 
 void SphereMetricWrapper::dataChangedSlot()
 {
+
+}
+
+void SphereMetricWrapper::update()
+{
+	mArguments.update();
 	mInternalUpdate = true;
 	mRadius->setValue(mData->getRadius());
 	mInternalUpdate = false;

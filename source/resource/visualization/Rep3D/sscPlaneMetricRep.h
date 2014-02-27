@@ -45,7 +45,6 @@ public:
 	static PlaneMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
 	virtual ~PlaneMetricRep() {}
 
-//	void setMetric(PlaneMetricPtr point);
 	virtual QString getType() const { return "PlaneMetricRep"; }
 
 protected:
@@ -59,11 +58,12 @@ private:
 	PlaneMetricRep(); ///< not implemented
 
 	void rescale();
+	PlaneMetricPtr getPlaneMetric();
+	void drawRectangleForPlane(Vector3D p0_r, Vector3D n_r, double size);
 
 	GraphicalPoint3DPtr mGraphicalPoint;
 	GraphicalArrow3DPtr mNormal;
 	Rect3DPtr mRect;
-	PlaneMetricPtr mMetric;
 	ViewportListenerPtr mViewportListener;
 };
 

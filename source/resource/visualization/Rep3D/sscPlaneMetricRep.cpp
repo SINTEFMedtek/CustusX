@@ -58,9 +58,15 @@ void PlaneMetricRep::removeRepActorsFromViewRenderer(View *view)
     DataMetricRep::removeRepActorsFromViewRenderer(view);
 }
 
+PlaneMetricPtr PlaneMetricRep::getPlaneMetric()
+{
+	return boost::dynamic_pointer_cast<PlaneMetric>(mMetric);
+}
+
 void PlaneMetricRep::onModifiedStartRender()
 {
-	if (!mMetric)
+	PlaneMetricPtr planeMetric = this->getPlaneMetric();
+	if (!planeMetric)
 		return;
 
 	if (!mGraphicalPoint && mView && mMetric)
@@ -76,6 +82,7 @@ void PlaneMetricRep::onModifiedStartRender()
 
 	mGraphicalPoint->setColor(mMetric->getColor());
 	mNormal->setColor(mMetric->getColor());
+	mRect->setColor(mMetric->getColor());
 
 	this->rescale();
 }
@@ -91,15 +98,28 @@ void PlaneMetricRep::rescale()
 	if (!mGraphicalPoint)
 		return;
 
-	Vector3D p0_r = mMetric->getRefCoord();
-	Vector3D n_r = mMetric->getRefNormal();
+	PlaneMetricPtr planeMetric = this->getPlaneMetric();
+
+	Vector3D p0_r = planeMetric->getRefCoord();
+	Vector3D n_r = planeMetric->getRefNormal();
 
 	double size = mViewportListener->getVpnZoom();
 	double sphereSize = mGraphicsSize / 100 / size;
 
 	mGraphicalPoint->setValue(p0_r);
+	mGraphicalPoint->setRadius(sphereSize);
+
 	mNormal->setValue(p0_r, n_r, sphereSize * 8);
 
+	this->drawRectangleForPlane(p0_r, n_r, size);
+
+    this->drawText();
+}
+
+void PlaneMetricRep::drawRectangleForPlane(Vector3D p0_r, Vector3D n_r, double size)
+{
+	if (!mRect)
+		return;
 	// draw a rectangle showing the plane:
 	Vector3D e_z = n_r;
 	Vector3D k1(1,0,0);
@@ -114,11 +134,8 @@ void PlaneMetricRep::rescale()
 	Transform3D rMb = createTransformIJC(e_x, e_y, p0_r);
 	double bb_size = 0.10/size;
 	DoubleBoundingBox3D bb(-bb_size,bb_size,-bb_size,bb_size,0,0);
+
 	mRect->updatePosition(bb, rMb);
-
-	mGraphicalPoint->setRadius(sphereSize);
-
-    this->drawText();
 }
 
 }

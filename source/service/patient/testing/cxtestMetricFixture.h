@@ -97,7 +97,7 @@ public:
 	FrameMetricWithInput getFrameMetricWithInput();
 	ToolMetricWithInput getToolMetricWithInput();
 	PointMetricWithInput getPointMetricWithInput(cx::Vector3D point);
-	PlaneMetricWithInput getPlaneMetricWithInput(cx::Vector3D point, cx::Vector3D normal);
+	PlaneMetricWithInput getPlaneMetricWithInput(cx::Vector3D point, cx::Vector3D normal, cx::DataMetricPtr p0, cx::DataMetricPtr p1);
 	DistanceMetricWithInput getDistanceMetricWithInput(double distance, cx::DataMetricPtr p0, cx::DataMetricPtr p1);
 	DistanceMetricWithInput getDistanceMetricWithInput(double distance);
 	QStringList getSingleLineDataList(cx::DataMetricPtr metric);

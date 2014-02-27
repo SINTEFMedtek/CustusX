@@ -234,6 +234,8 @@ MetricBasePtr MetricWidget::createMetricWrapper(DataPtr data)
 	  return createMetricWrapperOfType<FrameMetricWrapper, FrameMetric>(data);
 	if (isType<ToolMetric>(data))
 	  return createMetricWrapperOfType<ToolMetricWrapper, ToolMetric>(data);
+	if (isType<PlaneMetric>(data))
+	  return createMetricWrapperOfType<PlaneMetricWrapper, PlaneMetric>(data);
 	if (isType<DonutMetric>(data))
 	  return createMetricWrapperOfType<DonutMetricWrapper, DonutMetric>(data);
 	if (isType<SphereMetric>(data))
@@ -275,6 +277,7 @@ void MetricWidget::prePaintEvent()
 	this->initializeTable();
   }
 
+  this->updateMetricWrappers();
   this->updateTableContents();
 
   if (rebuild)
@@ -319,6 +322,14 @@ void MetricWidget::initializeTable()
 		}
 	}
 	mTable->blockSignals(false);
+}
+
+void MetricWidget::updateMetricWrappers()
+{
+	for (unsigned i = 0; i < mMetrics.size(); ++i)
+	{
+		mMetrics[i]->update();
+	}
 }
 
 void MetricWidget::updateTableContents()

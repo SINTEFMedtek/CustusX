@@ -23,16 +23,10 @@
 #include "sscPlaneMetric.h"
 #include "sscPointMetric.h"
 
-//TODO: this inclusion adds an unwanted dependency - must be solved.
 #include "sscDataManager.h"
 
 namespace cx
 {
-
-//DataPtr DistanceMetricReader::load(const QString& uid, const QString& filename)
-//{
-//	return DataPtr(new DistanceMetric(uid, filename));
-//}
 
 DistanceMetric::DistanceMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
 				DataMetric(uid, name, dataManager, spaceProvider)
@@ -49,12 +43,6 @@ DistanceMetricPtr DistanceMetric::create(QString uid, QString name, DataManager*
 	return DistanceMetricPtr(new DistanceMetric(uid, name, dataManager, spaceProvider));
 }
 
-//DistanceMetricPtr DistanceMetric::create(QDomNode node)
-//{
-//    DistanceMetricPtr retval = DistanceMetric::create("");
-//    retval->parseXml(node);
-//    return retval;
-//}
 DistanceMetric::~DistanceMetric()
 {
 }
@@ -131,18 +119,6 @@ std::vector<Vector3D> DistanceMetric::getEndpointsUncached() const
 		retval[1] = plane.projection(p);
 		retval[0] = p;
 	}
-//	else if ((mArgument[0]->getType()=="planeMetric") && (mArgument[0]->getType()=="pointMetric"))
-//	{
-//		... only if planes are parallel... not much use.
-//
-//		Plane3D plane0 = boost::dynamic_pointer_cast<PlaneMetric>(mArgument[0])->getRefPlane();
-//		Plane3D plane1 = boost::dynamic_pointer_cast<PlaneMetric>(mArgument[1])->getRefPlane();
-//
-//		Vector3D p0 = - plane0.normal() * plane0.offset();
-//		Vector3D p0 = - plane0.normal() * plane0.offset();
-//
-//		if (cross(plane0.))
-//	}
 	else
 	{
 		return std::vector<Vector3D>();
