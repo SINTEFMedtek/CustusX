@@ -35,6 +35,7 @@
 #include "sscVolumeHelpers.h"
 #include "sscTypeConversions.h"
 #include "cxVisualizationServiceBackend.h"
+#include "cxCameraStyle.h"
 
 namespace cx
 {
@@ -161,8 +162,9 @@ void Navigation::centerManualTool(Vector3D& p_r)
 ViewGroup::ViewGroup(VisualizationServiceBackendPtr backend)
 {
 	mBackend = backend;
-	mZoom2D.mLocal = SyncedValue::create(1.0);
-	mZoom2D.activateGlobal(false);
+//	mZoom2D.mLocal = SyncedValue::create(1.0);
+//	mZoom2D.activateGlobal(false);
+	mCameraStyle.reset(new CameraStyle(mBackend));
 
 	mViewGroupData.reset(new ViewGroupData(backend));
 }
@@ -179,8 +181,9 @@ void ViewGroup::addView(ViewWrapperPtr wrapper)
 	mViewWrappers.push_back(wrapper);
 
 	// add state
-	wrapper->setZoom2D(mZoom2D.mActive);
+//	wrapper->setZoom2D(mZoom2D.mActive);
 	wrapper->setViewGroup(mViewGroupData);
+	mCameraStyle->addView(wrapper->getView());
 
 	// connect signals
 	connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(activateManualToolSlot()));
@@ -201,6 +204,7 @@ void ViewGroup::removeViews()
 
 	mViews.clear();
 	mViewWrappers.clear();
+	mCameraStyle->clearViews();
 //  mSlicePlanesProxy->clearViewports();
 }
 
@@ -214,26 +218,26 @@ ViewWrapperPtr ViewGroup::getViewWrapperFromViewUid(QString viewUid)
 	return ViewWrapperPtr();
 }
 
-void ViewGroup::setGlobal2DZoom(bool use, SyncedValuePtr val)
-{
-	mZoom2D.mGlobal = val;
-	mZoom2D.activateGlobal(use);
+//void ViewGroup::setGlobal2DZoom(bool use, SyncedValuePtr val)
+//{
+//	mZoom2D.mGlobal = val;
+//	mZoom2D.activateGlobal(use);
 
-	for (unsigned i = 0; i < mViewWrappers.size(); ++i)
-		mViewWrappers[i]->setZoom2D(mZoom2D.mActive);
-}
+//	for (unsigned i = 0; i < mViewWrappers.size(); ++i)
+//		mViewWrappers[i]->setZoom2D(mZoom2D.mActive);
+//}
 
-/**Set the zoom2D factor, only.
- */
-void ViewGroup::setZoom2D(double newZoom)
-{
-	mZoom2D.mActive->set(newZoom);
-}
+///**Set the zoom2D factor, only.
+// */
+//void ViewGroup::setZoom2D(double newZoom)
+//{
+//	mZoom2D.mActive->set(newZoom);
+//}
 
-double ViewGroup::getZoom2D()
-{
-	return mZoom2D.mActive->get().toDouble();
-}
+//double ViewGroup::getZoom2D()
+//{
+//	return mZoom2D.mActive->get().toDouble();
+//}
 
 void ViewGroup::syncOrientationMode(SyncedValuePtr val)
 {
@@ -286,9 +290,9 @@ void ViewGroup::addXml(QDomNode& dataNode)
 	mViewGroupData->getCamera3D()->addXml(cameraNode);
 	dataNode.appendChild(cameraNode);
 
-	QDomElement zoom2DNode = doc.createElement("zoomFactor2D");
-	zoom2DNode.appendChild(doc.createTextNode(qstring_cast(this->getZoom2D())));
-	dataNode.appendChild(zoom2DNode);
+//	QDomElement zoom2DNode = doc.createElement("zoomFactor2D");
+//	zoom2DNode.appendChild(doc.createTextNode(qstring_cast(this->getZoom2D())));
+//	dataNode.appendChild(zoom2DNode);
 
 //  QDomElement slicePlanes3DNode = doc.createElement("slicePlanes3D");
 //  slicePlanes3DNode.setAttribute("use", mSlicePlanesProxy->getVisible());
@@ -300,7 +304,7 @@ void ViewGroup::addXml(QDomNode& dataNode)
 void ViewGroup::clearPatientData()
 {
 	mViewGroupData->clearData();
-	this->setZoom2D(1.0);
+//	this->setZoom2D(1.0);
 }
 
 void ViewGroup::parseXml(QDomNode dataNode)
@@ -317,13 +321,13 @@ void ViewGroup::parseXml(QDomNode dataNode)
 
 	mViewGroupData->getCamera3D()->parseXml(dataNode.namedItem("camera3D"));
 
-	QString zoom2D = dataNode.namedItem("zoomFactor2D").toElement().text();
-	bool ok;
-	double zoom2Ddouble = zoom2D.toDouble(&ok);
-	if (ok)
-		this->setZoom2D(zoom2Ddouble);
-	else
-		messageManager()->sendError("Couldn't convert the zoomfactor to a double: " + qstring_cast(zoom2D) + "");
+//	QString zoom2D = dataNode.namedItem("zoomFactor2D").toElement().text();
+//	bool ok;
+//	double zoom2Ddouble = zoom2D.toDouble(&ok);
+//	if (ok)
+//		this->setZoom2D(zoom2Ddouble);
+//	else
+//		messageManager()->sendError("Couldn't convert the zoomfactor to a double: " + qstring_cast(zoom2D) + "");
 
 //  QDomElement slicePlanes3DNode = dataNode.namedItem("slicePlanes3D").toElement();
 //  mSlicePlanesProxy->setVisible(slicePlanes3DNode.attribute("use").toInt());
@@ -335,6 +339,16 @@ void ViewGroup::parseXml(QDomNode dataNode)
 std::vector<ImagePtr> ViewGroup::getImages()
 {
 	return mViewGroupData->getImages();
+}
+
+bool ViewGroup::contains3DView() const
+{
+	for (unsigned j = 0; j < mViews.size(); ++j)
+	{
+		if (mViews[j] && (mViews[j]->getType()==View::VIEW_3D))
+			return true;
+	}
+	return false;
 }
 
 } //cx

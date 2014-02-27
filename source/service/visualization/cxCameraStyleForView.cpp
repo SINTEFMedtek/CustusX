@@ -14,32 +14,21 @@
 
 #include "cxCameraStyleForView.h"
 
-#include <QWidget>
-#include <QMenu>
-#include <QAction>
-#include <QContextMenuEvent>
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
-#include "sscImage.h"
-#include "sscVolumetricRep.h"
 #include "sscMessageManager.h"
 #include "cxRepManager.h"
 #include "sscToolManager.h"
 #include "sscToolRep3D.h"
-#include "sscTypeConversions.h"
-#include "cxViewManager.h"
 #include "sscDataManager.h"
 #include "sscView.h"
-#include "sscTool.h"
 #include "boost/bind.hpp"
 #include <vtkRenderWindow.h>
-#include "vtkRenderWindowInteractor.h"
 #include "vtkInteractorStyleUnicam.h"
 #include "vtkInteractorStyleTrackballCamera.h"
-#include "vtkInteractorStyleTrackballActor.h"
-#include "vtkInteractorStyleFlight.h"
 #include "cxVisualizationServiceBackend.h"
-
+#include "sscViewportListener.h"
+#include "sscLogger.h"
 
 SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, CAMERA_STYLE_TYPE, cstCOUNT)
 {
@@ -58,8 +47,6 @@ CameraStyleForView::CameraStyleForView(VisualizationServiceBackendPtr backend) :
 	mBlockCameraUpdate(false),
 	mBackend(backend)
 {
-	connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(viewChangedSlot()));
-
 	mViewportListener.reset(new ViewportListener);
 	mViewportListener->setCallback(boost::bind(&CameraStyleForView::viewportChangedSlot, this));
 
@@ -67,13 +54,13 @@ CameraStyleForView::CameraStyleForView(VisualizationServiceBackendPtr backend) :
 	mPreRenderListener->setCallback(boost::bind(&CameraStyleForView::onPreRender, this));
 
 	connect(mBackend->getToolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
-	this->dominantToolChangedSlot();
-	this->viewChangedSlot();
 }
 
 void CameraStyleForView::setView(ViewWidgetQPtr widget)
 {
+	this->disconnectTool();
 	mView = widget;
+	this->connectTool();
 }
 
 
@@ -126,20 +113,7 @@ void CameraStyleForView::setModified()
 void CameraStyleForView::updateCamera()
 {
 	this->setModified();
-//	if (mFollowingTool)
-//		this->moveCameraToolStyleSlot(mFollowingTool->get_prMt(), mFollowingTool->getTimestamp());
 }
-
-//void CameraStyleForView::moveCameraToolStyleSlot(Transform3D prMt, double timestamp)
-//{
-//	mPreRenderListener->setModified();
-//}
-
-//void CameraStyleForView::update()
-//{
-//	if (mFollowingTool)
-//		this->moveCameraToolStyleSlot(mFollowingTool->get_prMt(), mFollowingTool->getTimestamp());
-//}
 
 void CameraStyleForView::moveCameraToolStyleSlot(Transform3D prMt, double timestamp)
 {
@@ -194,16 +168,6 @@ void CameraStyleForView::moveCameraToolStyleSlot(Transform3D prMt, double timest
 	mBlockCameraUpdate = false;
 }
 
-/**reset the view connection, this is in case the view, reps or tool has been deleted/recreated in
- * the layout change process.
- */
-void CameraStyleForView::viewChangedSlot()
-{
-//	std::cout << "CameraStyleForView::viewChangedSlot()" << std::endl;
-	this->disconnectTool();
-	this->connectTool();
-}
-
 void CameraStyleForView::dominantToolChangedSlot()
 {
 	ToolPtr newTool = mBackend->getToolManager()->getDominantTool();
@@ -232,18 +196,16 @@ void CameraStyleForView::connectTool()
 	if (!this->getView())
 		return;
 
-	//Need the toolrep to get the direction the camera should point in
-	ToolRep3DPtr rep = this->getToolRep();
-
-	if (!rep)
-		return; //cannot set the camera to follow a tool if that tool does not have a rep
-
 	connect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
 			SLOT(setModified()));
 
-	rep->setOffsetPointVisibleAtZeroOffset(true);
-	if (mCameraStyleForView == cstTOOL_STYLE)
-		rep->setStayHiddenAfterVisible(true);
+	ToolRep3DPtr rep = this->getToolRep();
+	if (rep)
+	{
+		rep->setOffsetPointVisibleAtZeroOffset(true);
+		if (mCameraStyleForView == cstTOOL_STYLE)
+			rep->setStayHiddenAfterVisible(true);
+	}
 
 	mViewportListener->startListen(this->getRenderer());
 	mPreRenderListener->startListen(this->getRenderer());

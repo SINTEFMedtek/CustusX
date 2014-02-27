@@ -39,8 +39,6 @@ protected:
   //camera settings
   QGroupBox*    mCameraGroupBox; ///< widget to put all camera specific settings
   QVBoxLayout*  mCameraGroupLayout; ///< layout for the cameragroupbox
-
-  CameraStylePtr getCameraStyle();
 };
 }
 #endif /* CXNAVIGATIONWIDGET_H_ */

@@ -85,7 +85,7 @@ void ViewManager::destroyInstance()
 }
 
 ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
-				mGlobal2DZoom(true),
+//				mGlobal2DZoom(true),
 				mGlobalObliqueOrientation(false)
 {
 	mBackend = backend;
@@ -113,6 +113,7 @@ ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 		mViewGroups.push_back(ViewGroupPtr(new ViewGroup(mBackend)));
 	}
 
+	this->initializeGlobal2DZoom();
 	this->syncOrientationMode(SyncedValue::create(0));
 }
 
@@ -122,7 +123,7 @@ ViewManager::~ViewManager()
 
 void ViewManager::initialize()
 {
-	mCameraStyle.reset(new CameraStyle(mBackend));
+	mCameraStyleInteractor.reset(new CameraStyleInteractor);
 
 	mActiveLayout = QStringList() << "" << "";
 	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
@@ -132,6 +133,7 @@ void ViewManager::initialize()
 	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
 	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
+	connect(this, SIGNAL(activeViewChanged()), this, SLOT(updateCameraStyleActions()));
 
 	// set start layout
 	this->setActiveLayout("LAYOUT_3D_ACS_SINGLE", 0);
@@ -139,8 +141,16 @@ void ViewManager::initialize()
 	mRenderLoop->setRenderingInterval(settings()->value("renderingInterval").toInt());
 	mRenderLoop->start();
 
-	mGlobalZoom2DVal = SyncedValue::create(1);
-	this->setGlobal2DZoom(mGlobal2DZoom);
+//	mGlobalZoom2DVal = SyncedValue::create(1);
+//	this->setGlobal2DZoom(mGlobal2DZoom);
+}
+
+void ViewManager::initializeGlobal2DZoom()
+{
+	mGlobal2DZoomVal = SyncedValue::create(1);
+
+	for (unsigned i = 0; i < mViewGroups.size(); ++i)
+		mViewGroups[i]->getData()->initializeGlobal2DZoom(mGlobal2DZoomVal);
 }
 
 NavigationPtr ViewManager::getNavigation()
@@ -265,9 +275,9 @@ ViewWrapperPtr ViewManager::getActiveView() const
 
 void ViewManager::setActiveView(QString viewUid)
 {
-	if (mActiveView == qstring_cast(viewUid))
+	if (mActiveView == viewUid)
 		return;
-	mActiveView = qstring_cast(viewUid);
+	mActiveView = viewUid;
 	emit activeViewChanged();
 }
 
@@ -293,20 +303,20 @@ void ViewManager::syncOrientationMode(SyncedValuePtr val)
 	}
 }
 
-void ViewManager::setGlobal2DZoom(bool global)
-{
-	mGlobal2DZoom = global;
+//void ViewManager::setGlobal2DZoom(bool global)
+//{
+//	mGlobal2DZoom = global;
 
-	for (unsigned i = 0; i < mViewGroups.size(); ++i)
-	{
-		mViewGroups[i]->setGlobal2DZoom(mGlobal2DZoom, mGlobalZoom2DVal);
-	}
-}
+//	for (unsigned i = 0; i < mViewGroups.size(); ++i)
+//	{
+//		mViewGroups[i]->setGlobal2DZoom(mGlobal2DZoom, mGlobalZoom2DVal);
+//	}
+//}
 
-bool ViewManager::getGlobal2DZoom()
-{
-	return mGlobal2DZoom;
-}
+//bool ViewManager::getGlobal2DZoom()
+//{
+//	return mGlobal2DZoom;
+//}
 
 void ViewManager::addXml(QDomNode& parentNode)
 {
@@ -314,9 +324,9 @@ void ViewManager::addXml(QDomNode& parentNode)
 	QDomElement viewManagerNode = doc.createElement("viewManager");
 	parentNode.appendChild(viewManagerNode);
 
-	QDomElement global2DZoomNode = doc.createElement("global2DZoom");
-	global2DZoomNode.appendChild(doc.createTextNode(string_cast(mGlobal2DZoom).c_str()));
-	viewManagerNode.appendChild(global2DZoomNode);
+//	QDomElement global2DZoomNode = doc.createElement("global2DZoom");
+//	global2DZoomNode.appendChild(doc.createTextNode(string_cast(mGlobal2DZoom).c_str()));
+//	viewManagerNode.appendChild(global2DZoomNode);
 
 	QDomElement activeViewNode = doc.createElement("activeView");
 	activeViewNode.appendChild(doc.createTextNode(mActiveView));
@@ -353,15 +363,15 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 	QDomNode child = viewmanagerNode.firstChild();
 	while (!child.isNull())
 	{
-		if (child.toElement().tagName() == "global2DZoom")
-		{
-			const QString global2DZoomString = child.toElement().text();
-			if (!global2DZoomString.isEmpty() && global2DZoomString.toInt() == 0)
-				this->setGlobal2DZoom(false);
-			else
-				this->setGlobal2DZoom(true);
-		}
-		else if (child.toElement().tagName() == "activeView")
+//		if (child.toElement().tagName() == "global2DZoom")
+//		{
+//			const QString global2DZoomString = child.toElement().text();
+//			if (!global2DZoomString.isEmpty() && global2DZoomString.toInt() == 0)
+//				this->setGlobal2DZoom(false);
+//			else
+//				this->setGlobal2DZoom(true);
+//		}
+		if (child.toElement().tagName() == "activeView")
 		{
 			activeViewString = child.toElement().text();
 		}
@@ -428,6 +438,7 @@ ViewWidgetQPtr ViewManager::get3DView(int group, int index)
 	return ViewWidgetQPtr();
 }
 
+
 /**deactivate the current layout, leaving an empty layout
  */
 void ViewManager::deactivateCurrentLayout()
@@ -461,6 +472,9 @@ void ViewManager::setActiveLayout(const QString& layout, int widgetIndex)
 	mActiveLayout[widgetIndex] = layout;
 
 	this->rebuildLayouts();
+
+	if (!mViewGroups[0]->getViews().empty())
+		this->setActiveView(mViewGroups[0]->getViews()[0]->getUid());
 
 	emit activeLayoutChanged();
 
@@ -633,8 +647,39 @@ void ViewManager::saveGlobalSettings()
 
 QActionGroup* ViewManager::createInteractorStyleActionGroup()
 {
-	return mCameraStyle->createInteractorStyleActionGroup();
+	return mCameraStyleInteractor->createInteractorStyleActionGroup();
 }
+
+void ViewManager::updateCameraStyleActions()
+{
+	int active = this->getActiveViewGroup();
+	int index = this->findGroupContaining3DViewGivenGuess(active);
+
+	if (index<0)
+	{
+		mCameraStyleInteractor->connectCameraStyle(CameraStylePtr());
+	}
+	else
+	{
+		ViewGroupPtr group = this->getViewGroups()[index];
+		mCameraStyleInteractor->connectCameraStyle(group->getCameraStyle());
+	}
+}
+
+/**Look for the index'th 3DView in given group.
+ */
+int ViewManager::findGroupContaining3DViewGivenGuess(int preferredGroup)
+{
+	if (preferredGroup>=0)
+		if (mViewGroups[preferredGroup]->contains3DView())
+			return preferredGroup;
+
+	for (unsigned i=0; i<mViewGroups.size(); ++i)
+		if (mViewGroups[i]->contains3DView())
+			return i;
+	return -1;
+}
+
 
 void ViewManager::autoShowData(DataPtr data)
 {
