@@ -132,6 +132,7 @@ public:
 
 private:
 	void setKernelArguments(
+			cl::Kernel kernel,
 			int volume_xsize,
 	        int volume_ysize,
 	        int volume_zsize,
@@ -149,12 +150,10 @@ private:
 	        size_t plane_eqs_size,
 	        size_t close_planes_size,
 	        float radius);
-	void executeKernel(size_t global_work_size, size_t local_work_size);
-	void readResultingVolume(cl::Buffer outputBuffer, size_t outputVolumeSize, void *outputData);
-	size_t calculateSpaceNeededForClosePlanes(size_t local_work_size, size_t nPlanes_numberOfInputImages, int nClosePlanes);
+	size_t calculateSpaceNeededForClosePlanes(cl::Kernel kernel, cl::Device device, size_t local_work_size, size_t nPlanes_numberOfInputImages, int nClosePlanes);
 	bool isUsingTooMuchMemory(size_t outputVolumeSize, size_t inputBlocksLength, cl_ulong globalMemUse);
 
-	cl::Kernel mKernel; //Todo make local
+	cl::Kernel mKernel;
 	OpenCL::ocl* mOpenCL;
 
 };
