@@ -96,29 +96,10 @@ private slots:
 	void mouseClickInViewGroupSlot();
 
 protected:
-	//zoom2d is the same for all viewwrapper2ds in a viewgroup
-//	void setZoom2D(double newZoom);
-
 	std::vector<ViewWidgetQPtr> mViews;
-
-//	struct SyncGroup
-//	{
-//		void activateGlobal(bool val)
-//		{
-//			if (val)
-//				mActive = mGlobal;
-//			else
-//				mActive = mLocal;
-//		}
-//		SyncedValuePtr mGlobal;
-//		SyncedValuePtr mLocal;
-//		SyncedValuePtr mActive;
-//	};
-//	SyncGroup mZoom2D;
 
 	ViewGroupDataPtr mViewGroupData;
 	std::vector<ViewWrapperPtr> mViewWrappers;
-//  SlicePlanesProxyPtr mSlicePlanesProxy;
 	CameraStylePtr mCameraStyle;
 	VisualizationServiceBackendPtr mBackend;
 };

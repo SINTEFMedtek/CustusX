@@ -14,31 +14,9 @@
 
 #include "cxCameraStyle.h"
 
-#include <QWidget>
-#include <QMenu>
 #include <QAction>
-#include <QContextMenuEvent>
-#include <vtkRenderer.h>
-#include <vtkCamera.h>
-#include "sscImage.h"
-#include "sscVolumetricRep.h"
 #include "sscMessageManager.h"
-#include "cxRepManager.h"
-#include "sscToolManager.h"
-#include "sscToolRep3D.h"
-#include "sscTypeConversions.h"
-#include "cxViewManager.h"
 #include "sscView.h"
-#include "sscTool.h"
-#include "boost/bind.hpp"
-#include <vtkRenderWindow.h>
-#include "vtkRenderWindowInteractor.h"
-#include "vtkInteractorStyleUnicam.h"
-#include "vtkInteractorStyleTrackballCamera.h"
-#include "vtkInteractorStyleTrackballActor.h"
-#include "vtkInteractorStyleFlight.h"
-#include "cxVisualizationServiceBackend.h"
-
 #include "cxViewGroup.h"
 
 namespace cx
@@ -140,7 +118,6 @@ void CameraStyleInteractor::addInteractorStyleAction(QString caption, QActionGro
 	action->setData(uid);
 	action->setToolTip(helptext);
 	action->setWhatsThis(helptext);
-//	action->setChecked(enum2string(mCameraStyle) == uid);
 	connect(action, SIGNAL(triggered(bool)), this, SLOT(setInteractionStyleActionSlot()));
 }
 
@@ -174,8 +151,6 @@ void CameraStyleInteractor::setInteractionStyleActionSlot()
 
 	if (mStyle)
 		mStyle->setCameraStyle(newStyle);
-
-//	this->updateActionGroup();
 }
 
 
