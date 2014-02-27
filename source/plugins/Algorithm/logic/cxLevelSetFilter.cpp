@@ -23,6 +23,11 @@
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 
+#include <itkBinaryMorphologicalClosingImageFilter.h>
+#include <itkBinaryBallStructuringElement.h>
+#include "cxAlgorithmHelpers.h"
+#include <vtkImageCast.h>
+
 #include "levelSet.hpp"
 #include "OpenCLManager.hpp"
 #include "HelperFunctions.hpp"
@@ -112,6 +117,7 @@ bool LevelSetFilter::execute() {
     float threshold = getThresholdOption(mOptions)->getValue();
     float epsilon = getEpsilonOption(mOptions)->getValue();
     float alpha = getAlphaOption(mOptions)->getValue();
+    float radius = getRadiusOption(mOptions)->getValue();
 
     std::cout << "Parameters are set to: " << threshold << " "  << epsilon << " " << alpha << std::endl;
 
@@ -130,23 +136,66 @@ bool LevelSetFilter::execute() {
         );
         SIPL::int3 size = result->getSize();
         ImagePtr image = DataManager::getInstance()->getImage(inputImage->getUid());
-        std::cout << "data ptr to image ptr finished" << std::endl;
         vtkImageDataPtr rawSegmentation = this->convertToVtkImageData((char *)result->getData(), size.x, size.y, size.z, image);
-        std::cout << "convert to image data finished" << std::endl;
         delete result;
+
+        //add segmentation internally to cx
+        QString uidSegmentation = image->getUid() + "_seg%1";
+        QString nameSegmentation = image->getName()+"_seg%1";
+        ImagePtr outputSegmentation2 = dataManager()->createDerivedImage(rawSegmentation,uidSegmentation, nameSegmentation, image);
+        ImagePtr outputSegmentation;
+        if (!outputSegmentation2)
+            return false;
+
+        if(radius > 0) {
+            std::cout << "Performing morphological closing on segmentation result" << std::endl;
+
+            // Convert radius in mm to radius in voxels for the structuring element
+            Eigen::Array3d spacing = image->getSpacing();
+            itk::Size<3> radiusInVoxels;
+            radiusInVoxels[0] = radius/spacing(0);
+            radiusInVoxels[1] = radius/spacing(1);
+            radiusInVoxels[2] = radius/spacing(2);
+
+            itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(outputSegmentation2);
+
+            // Create structuring element
+            typedef itk::BinaryBallStructuringElement<unsigned char,3> StructuringElementType;
+            StructuringElementType structuringElement;
+            structuringElement.SetRadius(radiusInVoxels);
+            structuringElement.CreateStructuringElement();
+
+            // Morphological closing
+            typedef itk::BinaryMorphologicalClosingImageFilter<itkImageType, itkImageType, StructuringElementType> closingFilterType;
+            closingFilterType::Pointer closingFilter = closingFilterType::New();
+            closingFilter->SetInput(itkImage);
+            closingFilter->SetKernel(structuringElement);
+            closingFilter->SetForegroundValue(1);
+            closingFilter->Update();
+            itkImage = closingFilter->GetOutput();
+
+            //Convert ITK to VTK
+            itkToVtkFilterType::Pointer itkToVtkFilter = itkToVtkFilterType::New();
+            itkToVtkFilter->SetInput(itkImage);
+            itkToVtkFilter->Update();
+
+            vtkImageDataPtr rawResult = vtkImageDataPtr::New();
+            rawResult->DeepCopy(itkToVtkFilter->GetOutput());
+
+            vtkImageCastPtr imageCast = vtkImageCastPtr::New();
+            imageCast->SetInput(rawResult);
+            imageCast->SetOutputScalarTypeToUnsignedChar();
+            rawResult = imageCast->GetOutput();
+
+            outputSegmentation = dataManager()->createDerivedImage(rawResult,uidSegmentation, nameSegmentation, image);
+            rawSegmentation = rawResult;
+        } else {
+            outputSegmentation = outputSegmentation2;
+        }
 
         //make contour of segmented volume
         double threshold = 1;/// because the segmented image is 0..1
         vtkPolyDataPtr rawContour = ContourFilter::execute(rawSegmentation, threshold);
-        std::cout << "contour filter finished" << std::endl;
-        //add segmentation internally to cx
-        QString uidSegmentation = image->getUid() + "_seg%1";
-        QString nameSegmentation = image->getName()+"_seg%1";
-        ImagePtr outputSegmentation = dataManager()->createDerivedImage(rawSegmentation,uidSegmentation, nameSegmentation, image);
-        std::cout << "finished adding seg to cx" << std::endl;
-        if (!outputSegmentation)
-            return false;
-
         Transform3D rMd_i = image->get_rMd(); //transform from the volumes coordinate system to our reference coordinate system
         outputSegmentation->get_rMd_History()->setRegistration(rMd_i);
         dataManager()->loadData(outputSegmentation);
@@ -155,12 +204,10 @@ bool LevelSetFilter::execute() {
         //add contour internally to cx
         MeshPtr contour = ContourFilter::postProcess(rawContour, image, QColor("blue"));
         contour->get_rMd_History()->setRegistration(rMd_i);
-        std::cout << "finished adding contour to cx" << std::endl;
 
         //set output
         mOutputTypes[0]->setValue(outputSegmentation->getUid());
         mOutputTypes[1]->setValue(contour->getUid());
-        std::cout << "finished setting output" << std::endl;
 
         return true;
     } catch(SIPL::SIPLException &e) {
@@ -194,6 +241,7 @@ void LevelSetFilter::createOptions()
 	mOptionsAdapters.push_back(this->getThresholdOption(mOptions));
 	mOptionsAdapters.push_back(this->getEpsilonOption(mOptions));
 	mOptionsAdapters.push_back(this->getAlphaOption(mOptions));
+	mOptionsAdapters.push_back(this->getRadiusOption(mOptions));
 }
 
 QDomElement LevelSetFilter::getmOptions() {
@@ -279,7 +327,7 @@ vtkImageDataPtr LevelSetFilter::importRawImageData(void * data, int size_x, int 
 DoubleDataAdapterXmlPtr LevelSetFilter::getThresholdOption(
         QDomElement root) {
 	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Threshold", "",
-	                                                                            "Select threshold for the segmentation", 1, DoubleRange(-5000, 5000, 0.0000001), 0, root);
+        "Select threshold for the segmentation", 1, DoubleRange(-5000, 5000, 0.0000001), 0, root);
 	//retval->setAddSlider(true);
 	return retval;
 
@@ -288,7 +336,7 @@ DoubleDataAdapterXmlPtr LevelSetFilter::getThresholdOption(
 DoubleDataAdapterXmlPtr LevelSetFilter::getEpsilonOption(
         QDomElement root) {
 	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Epsilon", "",
-	                                                                            "Select epsilon for the segmentation", 1, DoubleRange(-5000, 5000, 0.0000001), 0, root);
+        "Select epsilon for the segmentation", 1, DoubleRange(-5000, 5000, 0.0000001), 0, root);
 	//retval->setAddSlider(true);
 	return retval;
 
@@ -297,13 +345,20 @@ DoubleDataAdapterXmlPtr LevelSetFilter::getEpsilonOption(
 DoubleDataAdapterXmlPtr LevelSetFilter::getAlphaOption(
         QDomElement root) {
 	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Alpha", "",
-	                                                                            "Select alpha for the segmentation", 0.1, DoubleRange(0, 1, 0.01), 2,
-	                                                                            root);
+        "Select alpha for the segmentation", 0.1, DoubleRange(0, 1, 0.01), 2, root);
 	retval->setAddSlider(true);
 	return retval;
 
 }
 
+DoubleDataAdapterXmlPtr LevelSetFilter::getRadiusOption(
+        QDomElement root) {
+	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Radius for morphological closing", "",
+        "Select radius (in mm) for the morphological closing of the final result. Radius at 0 will skip this process.", 0.0, DoubleRange(0, 20,0.5), 2, root);
+	retval->setAddSlider(true);
+	return retval;
+
+}
 
 
 } // end namespace cx
