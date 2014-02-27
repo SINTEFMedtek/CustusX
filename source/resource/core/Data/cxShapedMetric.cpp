@@ -21,15 +21,6 @@
 namespace cx
 {
 
-//-------------------------------------------------------
-//-------------------------------------------------------
-//-------------------------------------------------------
-
-//DataPtr DonutMetricReader::load(const QString& uid, const QString& filename)
-//{
-//	return DataPtr(new DonutMetric(uid, filename));
-//}
-
 DonutMetric::DonutMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
 				DataMetric(uid, name, dataManager, spaceProvider)
 {
@@ -37,19 +28,13 @@ DonutMetric::DonutMetric(const QString& uid, const QString& name, DataManager* d
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 	mRadius = 5;
 	mThickness = 2;
+	mFlat = true;
 }
 
 DonutMetricPtr DonutMetric::create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider)
 {
 	return DonutMetricPtr(new DonutMetric(uid, name, dataManager, spaceProvider));
 }
-
-//DonutMetricPtr DonutMetric::create(QDomNode node)
-//{
-//	DonutMetricPtr retval = DonutMetric::create("");
-//	retval->parseXml(node);
-//	return retval;
-//}
 
 DonutMetric::~DonutMetric()
 {
@@ -80,7 +65,7 @@ bool DonutMetric::isValid() const
 
 Vector3D DonutMetric::getRefCoord() const
 {
-	return this->boundingBox().center();
+	return mArguments->getRefCoords().front();
 }
 
 DoubleBoundingBox3D DonutMetric::boundingBox() const
@@ -135,6 +120,17 @@ void DonutMetric::setThickness(double val)
 double DonutMetric::getThickness() const
 {
 	return mThickness;
+}
+
+void DonutMetric::setFlat(bool val)
+{
+	mFlat = val;
+	emit propertiesChanged();
+}
+
+bool DonutMetric::getFlat() const
+{
+	return mFlat;
 }
 
 }

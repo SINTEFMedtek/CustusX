@@ -29,25 +29,6 @@ namespace cx
 
 typedef boost::shared_ptr<class DonutMetric> DonutMetricPtr;
 
-///** \brief DataReader implementation for DonutMetric
-// *
-// * \date 2014-02-11
-// * \author Christian Askeland, SINTEF
-// */
-//class DonutMetricReader: public DataReader
-//{
-//public:
-//	virtual ~DonutMetricReader()
-//	{
-//	}
-//	virtual bool canLoad(const QString& type, const QString& filename)
-//	{
-//		return type == "DonutMetric";
-//	}
-//	virtual DataPtr load(const QString& uid, const QString& filename);
-//};
-
-
 /** \brief Data class that represents a donut.
  *
  * The donut can be used as a targeting device, for example using needle injection.
@@ -62,7 +43,6 @@ class DonutMetric: public DataMetric
 Q_OBJECT
 public:
 	virtual ~DonutMetric();
-//	static DonutMetricPtr create(QDomNode node);
 	static DonutMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
 
 	virtual bool isValid() const;
@@ -72,6 +52,8 @@ public:
 	double getRadius() const;
 	void setThickness(double val);
 	double getThickness() const;
+	bool getFlat() const;
+	void setFlat(bool val);
 
 	Vector3D getPosition();
 	Vector3D getDirection();
@@ -97,6 +79,7 @@ private:
 	MetricReferenceArgumentListPtr mArguments;
 	double mRadius;
 	double mThickness;
+	bool mFlat;
 };
 
 /**

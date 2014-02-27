@@ -194,10 +194,12 @@ private slots:
 private:
   DoubleDataAdapterXmlPtr createRadiusSelector() const;
   DoubleDataAdapterXmlPtr createThicknessSelector() const;
+  BoolDataAdapterXmlPtr createFlatSelector() const;
 
   DonutMetricPtr mData;
   DoubleDataAdapterXmlPtr mRadius;
   DoubleDataAdapterXmlPtr mThickness;
+  BoolDataAdapterXmlPtr mFlat;
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;
 

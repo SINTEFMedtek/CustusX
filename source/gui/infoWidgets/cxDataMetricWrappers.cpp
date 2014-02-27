@@ -560,6 +560,8 @@ QWidget* DonutMetricWrapper::createWidget()
 	topLayout->addWidget(createDataWidget(widget, mRadius));
 	mThickness =  this->createThicknessSelector();
 	topLayout->addWidget(createDataWidget(widget, mThickness));
+	mFlat =  this->createFlatSelector();
+	topLayout->addWidget(createDataWidget(widget, mFlat));
 
 	this->addColorWidget(topLayout);
 	topLayout->addStretch();
@@ -589,6 +591,7 @@ void DonutMetricWrapper::dataChangedSlot()
 	mInternalUpdate = true;
 	mRadius->setValue(mData->getRadius());
 	mThickness->setValue(mData->getThickness());
+	mFlat->setValue(mData->getFlat());
 	mInternalUpdate = false;
 }
 
@@ -599,6 +602,7 @@ void DonutMetricWrapper::guiChanged()
 	mInternalUpdate = true;
 	mData->setRadius(mRadius->getValue());
 	mData->setThickness(mThickness->getValue());
+	mData->setFlat(mFlat->getValue());
 	mInternalUpdate = false;
 }
 
@@ -625,8 +629,21 @@ DoubleDataAdapterXmlPtr DonutMetricWrapper::createThicknessSelector() const
 											  "Thickness",
 											  "Donut Thickness",
 											  mData->getThickness(),
-											  DoubleRange(0, 1, 0.05),
+											  DoubleRange(0.05, 1, 0.05),
 											  2,
+											  QDomNode());
+
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
+BoolDataAdapterXmlPtr DonutMetricWrapper::createFlatSelector() const
+{
+	BoolDataAdapterXmlPtr retval;
+	retval = BoolDataAdapterXml::initialize("selectFlat",
+											  "Flat",
+											  "Flat disk or torus",
+											  mData->getFlat(),
 											  QDomNode());
 
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));

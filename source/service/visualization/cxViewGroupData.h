@@ -43,7 +43,7 @@ int getPriority(DataPtr data);
  */
 bool dataTypeSort(const DataPtr data1, const DataPtr data2);
 
-
+typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 
 /** \brief Container for data shared between all members of a view group
@@ -63,6 +63,9 @@ public:
 	void clearData();
 	std::vector<ImagePtr> getImages() const;
 	std::vector<MeshPtr> getMeshes() const;
+	void initializeGlobal2DZoom(SyncedValuePtr val);
+	SyncedValuePtr getGroup2DZoom();
+	SyncedValuePtr getGlobal2DZoom();
 
 	CameraDataPtr getCamera3D() { return mCamera3D; }
 
@@ -94,6 +97,8 @@ private:
 	std::vector<DataPtr> mData;
 	CameraDataPtr mCamera3D;
 	Options mOptions;
+	SyncedValuePtr mGroup2DZoom;
+	SyncedValuePtr mGlobal2DZoom;
 };
 
 

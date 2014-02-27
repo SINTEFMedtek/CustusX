@@ -40,7 +40,7 @@ typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
-typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
+typedef boost::shared_ptr<class CameraStyleInteractor> CameraStyleInteractorPtr;
 typedef boost::shared_ptr<class RenderLoop> RenderLoopPtr;
 typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
 typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
@@ -118,6 +118,7 @@ public:
 	QActionGroup* createInteractorStyleActionGroup();
 	bool isCustomLayout(const QString& uid) const;
 	NavigationPtr getNavigation();
+	int findGroupContaining3DViewGivenGuess(int preferredGroup);
 
 	static ViewManager* createInstance(VisualizationServiceBackendPtr backend); ///< create the instance
 	static ViewManager* getInstance(); ///< returns the only instance of this class, NULL unless createInstance has been called.
@@ -139,14 +140,14 @@ public:
 	void setActiveView(QString viewUid); ///< convenient function for setting the active view
 	void storeLayoutData(const LayoutData& data);
 
-	void setGlobal2DZoom(bool global); ///< enable/disable global 2d zooming
-	bool getGlobal2DZoom(); ///< find out if global 2D zooming is enable
+//	void setGlobal2DZoom(bool global); ///< enable/disable global 2d zooming
+//	bool getGlobal2DZoom(); ///< find out if global 2D zooming is enable
 
 	InteractiveClipperPtr getClipper();
 	InteractiveCropperPtr getCropper();
 
 	CyclicActionLoggerPtr getRenderTimer();// { return mRenderTimer; }
-	CameraStylePtr getCameraStyle() { return mCameraStyle; }
+//	CameraStylePtr getCameraStyle() { return mCameraStyle; }
 
 	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
 	void autoShowData(DataPtr data);
@@ -169,6 +170,7 @@ protected slots:
 	void duringSavePatientSlot();
 	void duringLoadPatientSlot();
 	void updateViews();
+	void updateCameraStyleActions();
 
 protected:
 	ViewManager(VisualizationServiceBackendPtr backend); ///< create all needed views
@@ -193,6 +195,7 @@ protected:
 	void saveGlobalSettings();
 	void activateViews(LayoutWidget *widget, LayoutData next);
 	void rebuildLayouts();
+	void initializeGlobal2DZoom();
 
 	static ViewManager* mTheInstance; ///< the only instance of this class
 
@@ -203,15 +206,16 @@ protected:
 	RenderLoopPtr mRenderLoop;
 	std::vector<ViewGroupPtr> mViewGroups;
 
-	bool mGlobal2DZoom; ///< controlling whether or not 2D zooming is global
+//	bool mGlobal2DZoom; ///< controlling whether or not 2D zooming is global
 	bool mGlobalObliqueOrientation; ///< controlling whether or not all 2d views should be oblique or orthogonal
-	SyncedValuePtr mGlobalZoom2DVal;
+	SyncedValuePtr mGlobal2DZoomVal;
 
 	InteractiveClipperPtr mInteractiveClipper;
 	InteractiveCropperPtr mInteractiveCropper;
 	SlicePlanesProxyPtr mSlicePlanesProxy;
 
-	CameraStylePtr mCameraStyle;
+//	CameraStylePtr mCameraStyle;
+	CameraStyleInteractorPtr mCameraStyleInteractor;
 	VisualizationServiceBackendPtr mBackend;
 
 private:
