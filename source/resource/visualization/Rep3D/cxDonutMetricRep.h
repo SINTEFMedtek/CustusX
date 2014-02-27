@@ -24,11 +24,7 @@ typedef vtkSmartPointer<class vtkTextActor> vtkTextActorPtr;
 
 namespace cx
 {
-//typedef boost::shared_ptr<class CaptionText3D> CaptionText3DPtr;
-//typedef boost::shared_ptr<class GraphicalArc3D> GraphicalArc3DPtr;
 typedef boost::shared_ptr<class GraphicalTorus3D> GraphicalTorus3DPtr;
-
-
 typedef boost::shared_ptr<class DonutMetricRep> DonutMetricRepPtr;
 typedef boost::shared_ptr<class DonutMetric> DonutMetricPtr;
 typedef boost::shared_ptr<class GraphicalDisk> GraphicalDiskPtr;

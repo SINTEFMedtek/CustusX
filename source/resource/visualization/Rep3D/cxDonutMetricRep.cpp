@@ -35,12 +35,6 @@
 namespace cx
 {
 
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
-
 DonutMetricRepPtr DonutMetricRep::New(const QString& uid, const QString& name)
 {
 	DonutMetricRepPtr retval(new DonutMetricRep(uid, name));
@@ -69,7 +63,7 @@ void DonutMetricRep::onModifiedStartRender()
 	if (!mMetric)
 		return;
 
-//	this->updateTorus();
+	this->updateTorus();
 	this->updateDisc();
 
 	this->drawText();
@@ -80,13 +74,19 @@ void DonutMetricRep::updateTorus()
 	if (!mMetric)
 		return;
 
+	DonutMetricPtr donut = this->getDonutMetric();
+
+	if (donut->getFlat())
+	{
+		mTorus.reset();
+		return;
+	}
+
 	if (!mTorus && mView && mMetric)
 		mTorus.reset(new GraphicalTorus3D(mView->getRenderer()));
 
 	if (!mTorus)
 		return;
-
-	DonutMetricPtr donut = this->getDonutMetric();
 
 	mTorus->setPosition(donut->getPosition());
 	mTorus->setDirection(donut->getDirection());
@@ -100,6 +100,14 @@ void DonutMetricRep::updateDisc()
 	if (!mMetric)
 		return;
 
+	DonutMetricPtr donut = this->getDonutMetric();
+
+	if (!donut->getFlat())
+	{
+		mDisk.reset();
+		return;
+	}
+
 	if (!mDisk && mView && mMetric)
 	{
 		mDisk.reset(new GraphicalDisk());
@@ -109,30 +117,14 @@ void DonutMetricRep::updateDisc()
 	if (!mDisk)
 		return;
 
-	DonutMetricPtr donut = this->getDonutMetric();
 	mDisk->setPosition(donut->getPosition());
 	mDisk->setDirection(donut->getDirection());
 	mDisk->setRadius(donut->getRadius());
-//	mTorus->setThickness(donut->getThickness());
 	mDisk->setColor(donut->getColor());
 	mDisk->setOutlineColor(donut->getColor());
-	mDisk->setOutlineWidth(0.25);
+	mDisk->setOutlineWidth(donut->getThickness());
 	mDisk->setFillVisible(false);
 	mDisk->setLighting(true);
-
-//	Vector3D position = mSliceProxy->get_sMr() * mMetric->getRefCoord();
-
-//	mDisk->setColor(mMetric->getColor());
-//	mDisk->setOutlineColor(mMetric->getColor());
-//	mDisk->setOutlineWidth(0.25);
-//	mDisk->setFillVisible(false);
-
-//	mDisk->setRadius(this->findDiskRadius(position));
-
-//	Vector3D projectedPosition = position;
-//	double offsetFromXYPlane = 0.01;
-//	projectedPosition[2] = offsetFromXYPlane;
-//	mDisk->setPosition(projectedPosition);
 
 	mDisk->update();
 }

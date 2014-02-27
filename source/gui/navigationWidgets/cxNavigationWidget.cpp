@@ -27,7 +27,7 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
 
   QToolBar* toolBar = new QToolBar(this);
   mCameraGroupLayout->addWidget(toolBar);
-  toolBar->addActions(this->getCameraStyle()->createInteractorStyleActionGroup()->actions());
+  toolBar->addActions(viewManager()->createInteractorStyleActionGroup()->actions());
 
   QWidget* toolOffsetWidget = new SliderGroupWidget(this, DoubleDataAdapterActiveToolOffset::create());
 
@@ -48,11 +48,6 @@ QString NavigationWidget::defaultWhatsThis() const
       "<p>Lets you select if the camera should follow a tool.</p>"
       "<p><i>Click the options to select camera following style.</i></p>"
       "</html>";
-}
-
-CameraStylePtr NavigationWidget::getCameraStyle()
-{
-	return viewManager()->getCameraStyle();
 }
 
 }

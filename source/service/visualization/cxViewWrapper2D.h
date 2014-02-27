@@ -37,6 +37,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class OrientationAnnotationSmartRep> OrientationAnnotationSmartRepPtr;
 typedef boost::shared_ptr<class ViewFollower> ViewFollowerPtr;
+typedef boost::shared_ptr<class Zoom2DHandler> Zoom2DHandlerPtr;
 }
 
 
@@ -60,7 +61,7 @@ public:
 	virtual ~ViewWrapper2D();
 	virtual void initializePlane(PLANE_TYPE plane);
 	virtual ViewWidget* getView();
-	virtual void setZoom2D(SyncedValuePtr value);
+//	virtual void setZoom2D(SyncedValuePtr value);
 	virtual void setOrientationMode(SyncedValuePtr value);
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy);
 	virtual void setViewGroup(ViewGroupDataPtr group);
@@ -76,15 +77,19 @@ private slots:
 	void mouseMoveSlot(QMouseEvent* event);
 	void mouseWheelSlot(QWheelEvent* event);
 	void orientationActionSlot();
-	void global2DZoomActionSlot();
+//	void global2DZoomActionSlot();
 	void orientationModeChanged();
 	void settingsChangedSlot(QString key);
 	void optionChangedSlot();
+//	void zoom2DActionSlot();
 
 private:
-	virtual void setZoomFactor2D(double zoomFactor);
-	virtual double getZoomFactor2D() const;
 	void moveManualTool(QPoint point);
+//	virtual void setZoomFactor2D(double zoomFactor);
+//	virtual double getZoomFactor2D() const;
+//	void set2DZoomConnectivityFromType(QString type);
+//	QString get2DZoomConnectivityType();
+//	void add2DZoomConnectivityAction(QString type, QString text, QMenu &contextMenu);
 
 	virtual void appendToContextMenu(QMenu& contextMenu);
 	void addReps();
@@ -128,11 +133,14 @@ private:
 	ViewFollowerPtr mViewFollower;
 
 	// synchronized data
-	SyncedValuePtr mZoom2D;
+//	SyncedValuePtr mZoom2D;
+	Zoom2DHandlerPtr mZoom2D;
+
 	SyncedValuePtr mOrientationMode;
 	Vector3D mClickPos;
 
 	QActionGroup* mOrientationActionGroup;
+//	QActionGroup* m2DZoomConnectivityActionGroup;
 
 };
 typedef boost::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;

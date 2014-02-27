@@ -30,6 +30,7 @@
 #include "cxInteractiveClipper.h"
 #include "cxRepManager.h"
 #include "cxVisualizationServiceBackend.h"
+#include "cxViewWrapper.h"
 
 namespace cx
 {
@@ -93,6 +94,8 @@ ViewGroupData::ViewGroupData(VisualizationServiceBackendPtr backend) :
 	if(mBackend)
 		connect(mBackend->getDataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataAddedOrRemovedInManager()));
 	mVideoSource = "active";
+	mGroup2DZoom = SyncedValue::create(1);
+	mGlobal2DZoom = mGroup2DZoom;
 }
 
 void ViewGroupData::dataAddedOrRemovedInManager()
@@ -161,6 +164,9 @@ void ViewGroupData::clearData()
 	while (!mData.empty())
 		this->removeData(mData.front());
 	this->setVideoSource("active");
+
+	mGroup2DZoom->set(1.0);
+	mGlobal2DZoom->set(1.0);
 }
 
 void ViewGroupData::setVideoSource(QString uid)
@@ -209,6 +215,20 @@ void ViewGroupData::setOptions(ViewGroupData::Options options)
 {
 	mOptions = options;
 	emit optionsChanged();
+}
+
+void ViewGroupData::initializeGlobal2DZoom(SyncedValuePtr val)
+{
+	mGlobal2DZoom = val;
+}
+
+SyncedValuePtr ViewGroupData::getGroup2DZoom()
+{
+	return mGroup2DZoom;
+}
+SyncedValuePtr ViewGroupData::getGlobal2DZoom()
+{
+	return mGlobal2DZoom;
 }
 
 
