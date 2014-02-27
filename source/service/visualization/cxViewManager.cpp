@@ -55,6 +55,7 @@
 #include "cxLayoutRepository.h"
 #include "sscLogger.h"
 #include "cxVisualizationServiceBackend.h"
+#include "cxXMLNodeWrapper.h"
 
 namespace cx
 {
@@ -301,72 +302,45 @@ void ViewManager::syncOrientationMode(SyncedValuePtr val)
 
 void ViewManager::addXml(QDomNode& parentNode)
 {
-	QDomDocument doc = parentNode.ownerDocument();
-	QDomElement viewManagerNode = doc.createElement("viewManager");
-	parentNode.appendChild(viewManagerNode);
+	XMLNodeAdder parent(parentNode);
+	XMLNodeAdder base(parent.addElement("viewManager"));
 
-	QDomElement zoom2DNode = doc.createElement("global2DZoom");
-	zoom2DNode.appendChild(doc.createTextNode(qstring_cast(mGlobal2DZoomVal->get().toDouble())));
-	viewManagerNode.appendChild(zoom2DNode);
+	base.addTextToElement("global2DZoom", qstring_cast(mGlobal2DZoomVal->get().toDouble()));
+	base.addTextToElement("activeView", mActiveView);
 
-	QDomElement activeViewNode = doc.createElement("activeView");
-	activeViewNode.appendChild(doc.createTextNode(mActiveView));
-	viewManagerNode.appendChild(activeViewNode);
-
-	QDomElement slicePlanes3DNode = doc.createElement("slicePlanes3D");
+	QDomElement slicePlanes3DNode = base.addElement("slicePlanes3D");
 	slicePlanes3DNode.setAttribute("use", mSlicePlanesProxy->getVisible());
 	slicePlanes3DNode.setAttribute("opaque", mSlicePlanesProxy->getDrawPlanes());
-	viewManagerNode.appendChild(slicePlanes3DNode);
 
-	QDomElement viewGroupsNode = doc.createElement("viewGroups");
-	viewManagerNode.appendChild(viewGroupsNode);
+	XMLNodeAdder viewGroupsNode(base.addElement("viewGroups"));
 	for (unsigned i = 0; i < mViewGroups.size(); ++i)
 	{
-		QDomElement viewGroupNode = doc.createElement("viewGroup");
+		QDomElement viewGroupNode = viewGroupsNode.addElement("viewGroup");
 		viewGroupNode.setAttribute("index", i);
-		viewGroupsNode.appendChild(viewGroupNode);
-
 		mViewGroups[i]->addXml(viewGroupNode);
 	}
 
 	if (mInteractiveClipper)
 	{
-		QDomElement clippedImageNode = doc.createElement("clippedImage");
 		QString clippedImage = (mInteractiveClipper->getImage()) ? mInteractiveClipper->getImage()->getUid() : "";
-		clippedImageNode.appendChild(doc.createTextNode(clippedImage));
-		viewManagerNode.appendChild(clippedImageNode);
+		base.addTextToElement("clippedImage", clippedImage);
 	}
 }
 
 void ViewManager::parseXml(QDomNode viewmanagerNode)
 {
-	QString activeViewString;
-	QDomNode child = viewmanagerNode.firstChild();
-	while (!child.isNull())
-	{
-		if (child.toElement().tagName() == "activeView")
-		{
-			activeViewString = child.toElement().text();
-		}
-		else if (child.toElement().tagName() == "clippedImage")
-		{
-			QString clippedImage = child.toElement().text();
-			mInteractiveClipper->setImage(mBackend->getDataManager()->getImage(clippedImage));
-		}
-		child = child.nextSibling();
-	}
+	XMLNodeParser base(viewmanagerNode);
 
-	QString zoom2D = viewmanagerNode.namedItem("global2DZoom").toElement().text();
-	bool ok;
-	double zoom2Ddouble = zoom2D.toDouble(&ok);
-	if (ok)
-		mGlobal2DZoomVal->set(zoom2Ddouble);
+	QString clippedImage = base.parseTextFromElement("clippedImage");
+	mInteractiveClipper->setImage(mBackend->getDataManager()->getImage(clippedImage));
 
-	QDomElement slicePlanes3DNode = viewmanagerNode.namedItem("slicePlanes3D").toElement();
+	base.parseDoubleFromElementWithDefault("global2DZoom", mGlobal2DZoomVal->get().toDouble());
+
+	QDomElement slicePlanes3DNode = base.parseElement("slicePlanes3D");
 	mSlicePlanesProxy->setVisible(slicePlanes3DNode.attribute("use").toInt());
 	mSlicePlanesProxy->setDrawPlanes(slicePlanes3DNode.attribute("opaque").toInt());
 
-	QDomElement viewgroups = viewmanagerNode.namedItem("viewGroups").toElement();
+	QDomElement viewgroups = base.parseElement("viewGroups");
 	QDomNode viewgroup = viewgroups.firstChild();
 	while (!viewgroup.isNull())
 	{
@@ -388,7 +362,7 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 		viewgroup = viewgroup.nextSibling();
 	}
 
-	this->setActiveView(activeViewString);
+	this->setActiveView(base.parseTextFromElement("activeView"));
 }
 
 void ViewManager::clearSlot()
