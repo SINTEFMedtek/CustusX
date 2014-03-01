@@ -149,7 +149,15 @@ private:
 	        cl::Buffer mask,
 	        size_t plane_eqs_size,
 	        size_t close_planes_size,
-	        float radius);
+#ifdef CL_VERSION_1_2
+	        float radius,
+	        cl::Image2DArray clBscans,
+	        bool use_image_array
+#else
+	        float radius
+#endif
+
+);
 	size_t calculateSpaceNeededForClosePlanes(cl::Kernel kernel, cl::Device device, size_t local_work_size, size_t nPlanes_numberOfInputImages, int nClosePlanes);
 	bool isUsingTooMuchMemory(size_t outputVolumeSize, size_t inputBlocksLength, cl_ulong globalMemUse);
 
