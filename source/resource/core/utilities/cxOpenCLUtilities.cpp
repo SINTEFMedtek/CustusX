@@ -356,6 +356,85 @@ void OpenCL::readResultingVolume(cl::CommandQueue queue, cl::Buffer outputBuffer
 		check_error(error.err());
 	}
 }
+OpenCL::ocl_version
+OpenCL::versionSupported(OpenCL::ocl *_ocl)
+{
+	// The returned string has the format
+	// "OpenCL<space><major_version.minor_version><space><vendor-specific information>"
+	std::string queried_version = _ocl->device.getInfo<CL_DEVICE_VERSION>();
+	std::istringstream sstream(queried_version);
+	std::string opencl, version, vendor_specific;
+	sstream >> opencl;
+	sstream >> version;
+	sstream >> vendor_specific;
+	messageManager()->sendInfo("OpenCL version string: " + QString(queried_version.c_str()));
+	if(version == "1.0")
+	{
+		return OpenCL::V_1_0;
+	}
+	else if(version == "1.1")
+	{
+		return OpenCL::V_1_1;
+	}
+	else if(version == "1.2")
+	{
+		return OpenCL::V_1_2;
+	}
+	else if(version == "2.0")
+	{
+		return OpenCL::V_2_0;
+	}
+	else
+	{
+		messageManager()->sendError("Did not understand the OpenCL version string!");
+		return OpenCL::V_INVALID;
+	}
+}
+
+#ifdef CL_VERSION_1_2
+cl::Image2DArray OpenCL::createImage2DArray(cl::Context context,
+                                            cl_mem_flags flags,
+                                            cl::ImageFormat format,
+                                            size_t array_size,
+                                            size_t width,
+                                            size_t height,
+                                            size_t row_pitch,
+                                            size_t slice_pitch,
+                                            void *host_data,
+                                            std::string image_name)
+{
+	cl::Image2DArray ret;
+	cl_int err;
+	if (host_data != NULL)
+		flags |= CL_MEM_COPY_HOST_PTR;
+	try {
+		ret = cl::Image2DArray(context,
+		                       flags,
+		                       format,
+		                       array_size,
+		                       width,
+		                       height,
+		                       row_pitch,
+		                       slice_pitch,
+		                       host_data,
+		                       &err);
+		ret.setDestructorCallback(memoryDestructorCallback, static_cast<void*>(new std::string(image_name)));
+	}
+	catch(cl::Error &error)
+	{
+		messageManager()->sendError("Could not create OpenCL image array! Reason: "+QString(error.what()));
+		check_error(error.err());
+		throw;
+	}
+	if(err != CL_SUCCESS)
+	{
+		messageManager()->sendError(QString("Could not create OpenCL image array! Error: %1").arg(err));
+		check_error(err)
+		throw;
+	}
+	return ret;
+}
+#endif
 
 void OpenCLUtilities::generateOpenCLError(cl_int id, const char* file, int line)
 {
@@ -469,5 +548,6 @@ char* OpenCLUtilities::file2string(const char* filename, size_t * final_length)
 
 	return source_str;
 }
+
 
 }//namespace cx
