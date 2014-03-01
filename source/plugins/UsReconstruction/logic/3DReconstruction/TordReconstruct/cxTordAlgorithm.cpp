@@ -145,10 +145,12 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 
 	double *out_spacing = outputData->GetSpacing();
 	float spacings[2];
+
 	float f_out_spacings[3];
 	f_out_spacings[0] = out_spacing[0];
 	f_out_spacings[1] = out_spacing[1];
 	f_out_spacings[2] = out_spacing[2];
+
 
 
 	spacings[0] = input->getSpacing()[0];
