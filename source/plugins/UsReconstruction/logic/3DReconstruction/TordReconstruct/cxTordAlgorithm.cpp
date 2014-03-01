@@ -163,10 +163,12 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	int *outputDims = outputData->GetDimensions();
 
 	size_t outputVolumeSize = outputDims[0] * outputDims[1] * outputDims[2] * sizeof(unsigned char);
-
+	
 	messageManager()->sendInfo(QString("Allocating CL output buffer, size %1").arg(outputVolumeSize));
+	cl_ulong globalMemUse;
 
-	cl_ulong globalMemUse = 10 * inputBlocks[0].length + outputVolumeSize + sizeof(float) * 16 * nPlanes_numberOfInputImages + sizeof(cl_uchar) * input->getDimensions()[0] * input->getDimensions()[1];
+	globalMemUse = numBlocks*inputBlocks[0].length + outputVolumeSize + sizeof(float) * 16 * nPlanes_numberOfInputImages + sizeof(cl_uchar) * input->getDimensions()[0] * input->getDimensions()[1];
+
 	if(isUsingTooMuchMemory(outputVolumeSize, inputBlocks[0].length, globalMemUse))
 		return false;
 
