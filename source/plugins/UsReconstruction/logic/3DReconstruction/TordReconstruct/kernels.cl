@@ -7,7 +7,7 @@
 /*******************/
 
 #if __OPENCL_C_VERSION__ >= CL_VERSION_1_2
-//#define USE_SAMPLER
+#define USE_SAMPLER
 #endif
 
 
