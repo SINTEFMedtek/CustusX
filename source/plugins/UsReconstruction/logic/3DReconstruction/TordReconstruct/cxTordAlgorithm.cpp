@@ -115,7 +115,7 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	// instead of a normal buffer block
 	int numBlocks = 10; // FIXME? needs to be the same as the number of input bscans to the voxel_method kernel
 #ifdef CL_VERSION_1_2
-	bool use_image_array = false; //opencl_version >= OpenCL::V_1_2;
+	bool use_image_array = opencl_version >= OpenCL::V_1_2;
 	messageManager()->sendInfo(QString("Use image array: %1").arg(use_image_array));
 	if(use_image_array)
 	{
