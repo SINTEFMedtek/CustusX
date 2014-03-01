@@ -31,17 +31,35 @@ public:
 		cl::CommandQueue cmd_queue;
 	};
 
+	enum ocl_version
+	{
+		V_INVALID = 0,
+		V_1_0 = 10,
+		V_1_1 = 11,
+		V_1_2 = 12,
+		V_2_0 = 20
+	};
+
 	static ocl* init(cl_device_type type);
 	static void release(ocl* ocl);
 
 	static cl::Program createProgram(cl::Context context, const char* source, size_t sourceLength);
 	static cl::Kernel createKernel(cl::Program program, const char * kernel_name);
 	static cl::Buffer createBuffer(cl::Context context, cl_mem_flags flags, size_t size, void * host_data, std::string bufferName);
-
+#ifdef CL_VERSION_1_2
+	static cl::Image2DArray createImage2DArray(cl::Context context, cl_mem_flags flags,
+	                                           cl::ImageFormat format, size_t array_size,
+	                                           size_t width, size_t height, size_t row_pitch,
+	                                           size_t slice_pitch, void *host_data, std::string name);
+#endif
 	static void build(cl::Program program, QString buildOptions); //TODO return error value or throw???
 	static void checkBuildProgramLog(cl::Program program, cl::Device device, cl_int err);
 	static void executeKernel(cl::CommandQueue queue, cl::Kernel kernel, size_t global_work_size, size_t local_work_size);
 	static void readResultingVolume(cl::CommandQueue queue, cl::Buffer outputBuffer, size_t outputVolumeSize, void *outputData);
+	/**
+	 * Return the highest supported OpenCL standard supported by the selected device
+	 */
+	static ocl_version versionSupported(ocl *_ocl);
 
 private:
 	static cl::Platform selectPlatform();
