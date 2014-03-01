@@ -50,6 +50,14 @@ cl::Program TordAlgorithm::buildCLProgram(const char* program_src, int nMaxPlane
 	} catch (cl::Error &error)
 	{
 		messageManager()->sendError("Could not build a OpenCL program. Reason: "+QString(error.what()));
+		for(int i=0; i<devices.size(); i++)
+		{
+	    cl::STRING_CLASS log;
+	    retval.getBuildInfo(devices[i], CL_PROGRAM_BUILD_LOG, &log);
+	    messageManager()->sendInfo("Build log: \n"+QString(log.c_str()));
+
+		}
+
 		check_error(error.err());
 	}
 	return retval;
@@ -102,23 +110,55 @@ bool TordAlgorithm::initializeFrameBlocks(frameBlock_t* framePointers, int numBl
 
 bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr outputData, float radius, int nClosePlanes)
 {
+	OpenCL::ocl_version opencl_version = OpenCL::versionSupported(mOpenCL);
+	// If the device supports OpenCL version 1.2 or higher, we want to use an image array for the bscans
+	// instead of a normal buffer block
 	int numBlocks = 10; // FIXME? needs to be the same as the number of input bscans to the voxel_method kernel
-
+#ifdef CL_VERSION_1_2
+	bool use_image_array = false; //opencl_version >= OpenCL::V_1_2;
+	messageManager()->sendInfo(QString("Use image array: %1").arg(use_image_array));
+	if(use_image_array)
+	{
+		// Put all B-scans in a big block, we don't need to split it up when using an image array.
+		numBlocks = 1;
+	}
+#endif
 	// Split input US into blocks
 	// Splits and copies data from the processed input in the way the kernel will processes it, which is per frameBlock
 	frameBlock_t* inputBlocks = new frameBlock_t[numBlocks];
 	size_t nPlanes_numberOfInputImages = input->getDimensions()[2];
 	this->initializeFrameBlocks(inputBlocks, numBlocks, input);
 
-	// Allocate CL memory for each frame block
 	VECTOR_CLASS<cl::Buffer> clBlocks;
-	messageManager()->sendInfo("Allocating OpenCL input block buffers");
-	for (int i = 0; i < numBlocks; i++)
+#ifdef CL_VERSION_1_2
+	cl::Image2DArray clBscans;
+	if(use_image_array)
 	{
-		//TODO why does the context suddenly contain a "dummy" device?
-		cl::Buffer buffer = OpenCL::createBuffer(mOpenCL->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, inputBlocks[i].length, inputBlocks[i].data, "block buffer "+QString::number(i).toStdString());
-		clBlocks.push_back(buffer);
+		clBscans = OpenCL::createImage2DArray(mOpenCL->context,
+		                                      CL_MEM_COPY_HOST_PTR | CL_MEM_READ_ONLY,
+		                                      cl::ImageFormat(CL_R, CL_UNSIGNED_INT8),
+		                                      nPlanes_numberOfInputImages,
+		                                      input->getDimensions()[0],
+		                                      input->getDimensions()[1],
+		                                      input->getDimensions()[0],
+		                                      input->getDimensions()[0]*input->getDimensions()[1],
+		                                      inputBlocks[0].data,
+		                                      "BScans image array");
 	}
+	else
+	{
+#endif
+		// Allocate CL memory for each frame block
+		messageManager()->sendInfo("Allocating OpenCL input block buffers");
+		for (int i = 0; i < numBlocks; i++)
+		{
+			//TODO why does the context suddenly contain a "dummy" device?
+			cl::Buffer buffer = OpenCL::createBuffer(mOpenCL->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, inputBlocks[i].length, inputBlocks[i].data, "block buffer "+QString::number(i).toStdString());
+			clBlocks.push_back(buffer);
+		}
+#ifdef CL_VERSION_1_2
+	}
+#endif
 	// Allocate output memory
 	int *outputDims = outputData->GetDimensions();
 
@@ -183,7 +223,14 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 			clMask,
 			planes_eqs_size,
 			close_planes_size,
-			radius);
+#ifdef CL_VERSION_1_2
+			radius,
+			clBscans,
+			use_image_array
+#else
+			radius
+#endif
+		);
 
 	messageManager()->sendInfo(QString("Using %1 as local workgroup size").arg(local_work_size));
 
@@ -260,7 +307,14 @@ void TordAlgorithm::setKernelArguments(
         cl::Buffer mask,
         size_t plane_eqs_size,
         size_t close_planes_size,
-        float radius)
+#ifdef CL_VERSION_1_2
+		float radius,
+		cl::Image2DArray clBscans,
+		bool use_image_array
+#else
+		float radius
+#endif
+	)
 {
 	int arg = 0;
 	kernel.setArg(arg++, volume_xsize);
@@ -273,10 +327,20 @@ void TordAlgorithm::setKernelArguments(
 	kernel.setArg(arg++, in_ysize);
 	kernel.setArg(arg++, in_xspacing);
 	kernel.setArg(arg++, in_yspacing);
+#ifdef CL_VERSION_1_2
+	if(use_image_array)
+	{
+		kernel.setArg(arg++, clBscans);
+	}
+	else {
+#endif
 	for (int i = 0; i < blocks.size(); i++)
 	{
 		kernel.setArg(arg++, blocks[i]);
 	}
+#ifdef CL_VERSION_1_2
+	}
+#endif
 	kernel.setArg(arg++, out_volume);
 	kernel.setArg(arg++, plane_matrices);
 	kernel.setArg(arg++, mask);

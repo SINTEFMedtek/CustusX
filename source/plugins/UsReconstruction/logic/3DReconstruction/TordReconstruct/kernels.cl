@@ -6,6 +6,10 @@
 /* Begin constants */
 /*******************/
 
+#if __OPENCL_C_VERSION__ >= CL_VERSION_1_2
+//#define USE_SAMPLER
+#endif
+
 
 #define CUBE_SIZE 4
 
@@ -247,59 +251,87 @@ unsigned char anisotropicFilter(__local const close_plane_t *pixels,
                                 int n_planes);
 
 #if METHOD == METHOD_VNN
+#ifdef USE_SAMPLER
+__constant const sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE| CLK_FILTER_NEAREST;
+#endif
 unsigned char performInterpolation_vnn(__local close_plane_t *close_planes,
-                         int n_close_planes,
-                         __global const float16  *plane_matrices,
-                         __local const float4 *plane_eqs,
-                         __global const unsigned char* bscans_blocks[],
-                         int in_xsize,
-                         int in_ysize,
-                         float in_xspacing,
-                         float in_yspacing,
-                         __global const unsigned char* mask,
-                         float4 voxel);
+                                       int n_close_planes,
+                                       __global const float16  *plane_matrices,
+                                       __local const float4 *plane_eqs,
+#ifdef USE_SAMPLER
+                                       __read_only image2d_array_t in_bscans,
+#else
+                                       __global const unsigned char* bscans_blocks[],
+#endif
+                                       int in_xsize,
+                                       int in_ysize,
+                                       float in_xspacing,
+                                       float in_yspacing,
+                                       __global const unsigned char* mask,
+                                       float4 voxel);
 #endif
 
 #if METHOD == METHOD_VNN2
+#ifdef USE_SAMPLER
+__constant const sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE| CLK_FILTER_NEAREST;
+#endif
 unsigned char performInterpolation_vnn2(__local close_plane_t *close_planes,
-                          int n_close_planes,
-                          __global const float16  *plane_matrices,
-                          __local const float4 *plane_eqs,
-                          __global const unsigned char* bscans_blocks[],
-                          int in_xsize,
-                          int in_ysize,
-                          float in_xspacing,
-                          float in_yspacing,
-                          __global const unsigned char* mask,
-                          float4 voxel);
+                                        int n_close_planes,
+                                        __global const float16  *plane_matrices,
+                                        __local const float4 *plane_eqs,
+#ifdef USE_SAMPLER
+                                        __read_only image2d_array_t in_bscans,
+#else
+                                        __global const unsigned char* bscans_blocks[],
+#endif
+                                        int in_xsize,
+                                        int in_ysize,
+                                        float in_xspacing,
+                                        float in_yspacing,
+                                        __global const unsigned char* mask,
+                                        float4 voxel);
 #endif
 
 #if METHOD == METHOD_DW
+#ifdef USE_SAMPLER
+__constant const sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_LINEAR;
+#endif
 unsigned char performInterpolation_dw(__local close_plane_t *close_planes,
-                        int n_close_planes,
-                        __global const float16  *plane_matrices,
-                        __local const float4 *plane_eqs,
-                        __global const unsigned char* bscans_blocks[],
-                        int in_xsize,
-                        int in_ysize,
-                        float in_xspacing,
-                        float in_yspacing,
-                        __global const unsigned char* mask,
-                        float4 voxel);
+                                      int n_close_planes,
+                                      __global const float16  *plane_matrices,
+                                      __local const float4 *plane_eqs,
+#ifdef USE_SAMPLER
+                                      __read_only image2d_array_t in_bscans,
+#else
+                                      __global const unsigned char* bscans_blocks[],
+#endif
+                                      int in_xsize,
+                                      int in_ysize,
+                                      float in_xspacing,
+                                      float in_yspacing,
+                                      __global const unsigned char* mask,
+                                      float4 voxel);
 #endif
 
 #if METHOD == METHOD_ANISOTROPIC
+#ifdef USE_SAMPLER
+__constant const sampler_t sampler = CLK_NORMALIZED_COORDS_FALSE | CLK_ADDRESS_CLAMP_TO_EDGE | CLK_FILTER_LINEAR;
+#endif
 unsigned char performInterpolation_anisotropic(__local close_plane_t *close_planes,
-                            int n_close_planes,
-                            __global const float16  *plane_matrices,
-                            __local const float4 *plane_eqs,
-                            __global const unsigned char* bscans_blocks[],
-                            int in_xsize,
-                            int in_ysize,
-                            float in_xspacing,
-                            float in_yspacing,
-                            __global const unsigned char* mask,
-                            float4 voxel);
+                                               int n_close_planes,
+                                               __global const float16  *plane_matrices,
+                                               __local const float4 *plane_eqs,
+#ifdef USE_SAMPLER
+                                               __read_only image2d_array_t in_bscans,
+#else
+                                               __global const unsigned char* bscans_blocks[],
+#endif
+                                               int in_xsize,
+                                               int in_ysize,
+                                               float in_xspacing,
+                                               float in_yspacing,
+                                               __global const unsigned char* mask,
+                                               float4 voxel);
 #endif
 
 void prepare_plane_eqs(__global float16 *plane_matrices,
@@ -322,32 +354,36 @@ int findLocalMinimas(int *guesses,
 
 
 __kernel void voxel_methods(int volume_xsize,
-              int volume_ysize,
-              int volume_zsize,
-              float volume_xspacing,
-              float volume_yspacing,
-              float volume_zspacing,
-              int in_xsize,
-              int in_ysize,
-              float in_xspacing,
-              float in_yspacing,
-              // TODO: Wouldn't it be kind of nice if the bscans was an image sampler object?
-              __global unsigned char* in_bscans_b0,
-              __global unsigned char* in_bscans_b1,
-              __global unsigned char* in_bscans_b2,
-              __global unsigned char* in_bscans_b3,
-              __global unsigned char* in_bscans_b4,
-              __global unsigned char* in_bscans_b5,
-              __global unsigned char* in_bscans_b6,
-              __global unsigned char* in_bscans_b7,
-              __global unsigned char* in_bscans_b8,
-              __global unsigned char* in_bscans_b9,
-              __global unsigned char* out_volume,
-              __global float16 *plane_matrices,
-              __global unsigned char* mask,
-              __local float4 *plane_eqs,
-              __local close_plane_t *planes,
-              float radius);
+                            int volume_ysize,
+                            int volume_zsize,
+                            float volume_xspacing,
+                            float volume_yspacing,
+                            float volume_zspacing,
+                            int in_xsize,
+                            int in_ysize,
+                            float in_xspacing,
+                            float in_yspacing,
+
+#ifdef USE_SAMPLER
+                            __read_only image2d_array_t in_bscans,
+#else
+                            __global unsigned char* in_bscans_b0,
+                            __global unsigned char* in_bscans_b1,
+                            __global unsigned char* in_bscans_b2,
+                            __global unsigned char* in_bscans_b3,
+                            __global unsigned char* in_bscans_b4,
+                            __global unsigned char* in_bscans_b5,
+                            __global unsigned char* in_bscans_b6,
+                            __global unsigned char* in_bscans_b7,
+                            __global unsigned char* in_bscans_b8,
+                            __global unsigned char* in_bscans_b9,
+#endif
+                            __global unsigned char* out_volume,
+                            __global float16 *plane_matrices,
+                            __global unsigned char* mask,
+                            __local float4 *plane_eqs,
+                            __local close_plane_t *planes,
+                            float radius);
 
 
 
@@ -843,7 +879,11 @@ performInterpolation_vnn(__local close_plane_t *close_planes,
                          int n_close_planes,
                          __global const float16  *plane_matrices,
                          __local const float4 *plane_eqs,
+#ifdef USE_SAMPLER
+                         __read_only image2d_array_t in_bscans,
+#else
                          __global const unsigned char* bscans_blocks[],
+#endif
                          int in_xsize,
                          int in_ysize,
                          float in_xspacing,
@@ -870,11 +910,12 @@ performInterpolation_vnn(__local close_plane_t *close_planes,
 		}
 	}
 	BOUNDS_CHECK(plane_id, 0, N_PLANES);
+#ifndef USE_SAMPLER
 	const __global unsigned char* image = getImageData(plane_id,
 	                                                   bscans_blocks,
 	                                                   in_xsize,
 	                                                   in_ysize);
-
+#endif
 	// Now we project the voxel onto the plane by translating the voxel along the
 	// normal vector of the plane.
 	float4 translated_voxel = projectOntoPlane(voxel,
@@ -898,8 +939,12 @@ performInterpolation_vnn(__local close_plane_t *close_planes,
 	}
 	BOUNDS_CHECK(x, 0, in_xsize);
 	BOUNDS_CHECK(y, 0, in_ysize);
+#ifdef USE_SAMPLER
+	int4 coord = {x, y, plane_id, 0};
+	return max((unsigned char)1, (unsigned char)read_imageui(in_bscans, sampler, coord).x);
+#else
 	return max((unsigned char)1, image[y*in_xsize + x]);
-
+#endif
 }
 #endif
 
@@ -916,7 +961,11 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
                           int n_close_planes,
                           __global const float16  *plane_matrices,
                           __local const float4 *plane_eqs,
-                          __global const unsigned char* bscans_blocks[],
+#ifdef USE_SAMPLER
+                         __read_only image2d_array_t in_bscans,
+#else
+                         __global const unsigned char* bscans_blocks[],
+#endif
                           int in_xsize,
                           int in_ysize,
                           float in_xspacing,
@@ -934,11 +983,12 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
 	{
 		close_plane_t plane = CLOSE_PLANE_IDX(close_planes, i);
 		int plane_id = plane.plane_id;
+#ifdef USE_SAMPLER
 		const __global unsigned char* image = getImageData(plane_id,
 		                                                   bscans_blocks,
 		                                                   in_xsize,
 		                                                   in_ysize);
-
+#endif
 
 		// Now we project the voxel onto the plane by translating the voxel along the
 		// normal vector of the plane.
@@ -968,7 +1018,12 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
 		float weight = VNN2_WEIGHT(dist);
 
 		scale += weight;
+#ifdef USE_SAMPLER
+		int4 coord = {x, y, plane_id, 0};
+		val += read_imageui(in_bscans, sampler, coord).x * weight;
+#else
 		val += (image[y*in_xsize + x] * weight);
+#endif
 	}
 
 
@@ -990,8 +1045,11 @@ performInterpolation_dw(__local close_plane_t *close_planes,
                         int n_close_planes,
                         __global const float16  *plane_matrices,
                         __local const float4 *plane_eqs,
-                        __global const unsigned char* bscans_blocks[],
-                        int in_xsize,
+#ifdef USE_SAMPLER
+                         __read_only image2d_array_t in_bscans,
+#else
+                         __global const unsigned char* bscans_blocks[],
+#endif
                         int in_ysize,
                         float in_xspacing,
                         float in_yspacing,
@@ -1010,11 +1068,12 @@ performInterpolation_dw(__local close_plane_t *close_planes,
 	{
 		close_plane_t plane = CLOSE_PLANE_IDX(close_planes, i);
 		int plane_id = plane.plane_id;
+#ifndef USE_SAMPLER
 		const __global unsigned char* image = getImageData(plane.plane_id,
 		                                                   bscans_blocks,
 		                                                   in_xsize,
 		                                                   in_ysize);
-
+#endif
 
 		// Now we project the voxel onto the plane by translating the voxel along the
 		// normal vector of the plane.
@@ -1045,9 +1104,12 @@ performInterpolation_dw(__local close_plane_t *close_planes,
 		{
 			continue;
 		}
-
+#ifdef USE_SAMPLER
+		float4 coord = {x, y, plane_id, 0};
+		float interpolated_value = read_imageui(in_bscans, sampler, coord).x;
+#else
 		float interpolated_value = bilinearInterpolation(x, y, image, in_xsize);
-
+#endif
 		float dist = fabs(plane.dist);
 		if(dist < 0.001f) dist = 0.001f;
 		float weight = DW_WEIGHT(dist);
@@ -1073,8 +1135,11 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
                             int n_close_planes,
                             __global const float16  *plane_matrices,
                             __local const float4 *plane_eqs,
-                            __global const unsigned char* bscans_blocks[],
-                            int in_xsize,
+#ifdef USE_SAMPLER
+                         __read_only image2d_array_t in_bscans,
+#else
+                         __global const unsigned char* bscans_blocks[],
+#endif
                             int in_ysize,
                             float in_xspacing,
                             float in_yspacing,
@@ -1123,10 +1188,13 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 			{
 			continue;
 		}
-		CLOSE_PLANE_IDX(close_planes, i).intensity = bilinearInterpolation(x,
-		                                                                   y,
-		                                                                   image,
-		                                                                   in_xsize);
+		#ifdef USE_SAMPLER
+		float4 coord = {x, y, plane_id, 0};
+		float interpolated_value = read_imageui(in_bscans, sampler, coord).x;
+#else
+		float interpolated_value = bilinearInterpolation(x, y, image, in_xsize);
+#endif
+		CLOSE_PLANE_IDX(close_planes, i).intensity = interpolated_value;
 	}
 
 	return max((unsigned char)1, anisotropicFilter(close_planes, n_close_planes));
@@ -1338,6 +1406,9 @@ voxel_methods(int volume_xsize,
               float in_xspacing,
               float in_yspacing,
               // TODO: Wouldn't it be kind of nice if the bscans was an image sampler object?
+#ifdef USE_SAMPLER
+              __read_only image2d_array_t in_bscans,
+#else
               __global unsigned char* in_bscans_b0,
               __global unsigned char* in_bscans_b1,
               __global unsigned char* in_bscans_b2,
@@ -1348,6 +1419,7 @@ voxel_methods(int volume_xsize,
               __global unsigned char* in_bscans_b7,
               __global unsigned char* in_bscans_b8,
               __global unsigned char* in_bscans_b9,
+#endif
               __global unsigned char* out_volume,
               __global float16 *plane_matrices,
               __global unsigned char *mask,
@@ -1379,7 +1451,7 @@ voxel_methods(int volume_xsize,
 		BOUNDS_CHECK(id, 0, 1);
 	#endif
 	// Aggregate pointers to the bscan blocks into one array for convenience
-
+#ifndef USE_SAMPLER
 	const __global unsigned char *bscans_blocks[] = { in_bscans_b0,
 	                                            in_bscans_b1,
 	                                            in_bscans_b2,
@@ -1390,6 +1462,7 @@ voxel_methods(int volume_xsize,
 	                                            in_bscans_b7,
 	                                            in_bscans_b8,
 	                                            in_bscans_b9 };
+#endif
 
 
 
@@ -1539,7 +1612,11 @@ voxel_methods(int volume_xsize,
 					                                                n_close_planes,
 					                                                plane_matrices,
 					                                                plane_eqs,
+#ifdef USE_SAMPLER
+					                                                in_bscans,
+#else
 					                                                bscans_blocks,
+#endif
 					                                                in_xsize,
 					                                                in_ysize,
 					                                                in_xspacing,
