@@ -144,10 +144,12 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 			input->getMask()->GetScalarPointer(), "mask buffer");
 
 	double *out_spacing = outputData->GetSpacing();
-	float spacings[3];
-	spacings[0] = out_spacing[0];
-	spacings[1] = out_spacing[1];
-	spacings[2] = out_spacing[2];
+	float spacings[2];
+	float f_out_spacings[3];
+	f_out_spacings[0] = out_spacing[0];
+	f_out_spacings[1] = out_spacing[1];
+	f_out_spacings[2] = out_spacing[2];
+
 
 	spacings[0] = input->getSpacing()[0];
 	spacings[1] = input->getSpacing()[1];
@@ -166,9 +168,9 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 			outputDims[0],
 			outputDims[1],
 			outputDims[2],
-			spacings[0],
-			spacings[1],
-			spacings[2],
+			f_out_spacings[0],
+			f_out_spacings[1],
+			f_out_spacings[2],
 			input->getDimensions()[0],
 			input->getDimensions()[1],
 			spacings[0],
