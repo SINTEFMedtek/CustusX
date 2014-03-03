@@ -71,7 +71,7 @@ ViewsWindow::ViewsWindow(QString displayText)
 	this->setDescription(displayText);
 	mZoomFactor = 1;
 	mShaderFolder = cx::DataLocations::getShaderPath();
-	mRemaindingRenderings = -1;
+//	mRemaindingRenderings = -1;
 	QRect screen = qApp->desktop()->screenGeometry(qApp->desktop()->primaryScreen());
 	screen.adjust(screen.width()*0.15, screen.height()*0.15, -screen.width()*0.15, -screen.height()*0.15);
 	this->setGeometry(screen);
@@ -206,6 +206,9 @@ void ViewsWindow::fixToolToCenter()
 
 void ViewsWindow::insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c)
 {
+//	view->GetRenderWindow()->SetErase(false);
+//	view->GetRenderWindow()->SetDoubleBuffer(false);
+
 	QVBoxLayout *layout = new QVBoxLayout;
 	mSliceLayout->addLayout(layout, r,c);
 
@@ -254,12 +257,17 @@ void ViewsWindow::updateRender()
 		mLayouts[i]->getRenderWindow()->Render();
 	}
 
-	if (mRemaindingRenderings>=0)
-	{
-		--mRemaindingRenderings;
-		if (mRemaindingRenderings<0)
-			QTimer::singleShot(0, qApp, SLOT(quit()));
-	}
+//	for (unsigned i=0; i<mLayouts.size(); ++i)
+//	{
+//		mLayouts[i]->getRenderWindow()->Render();
+//	}
+
+//	if (mRemaindingRenderings>=0)
+//	{
+//		--mRemaindingRenderings;
+//		if (mRemaindingRenderings<0)
+//			QTimer::singleShot(0, qApp, SLOT(quit()));
+//	}
 }
 
 void ViewsWindow::prettyZoom(cx::View *view)
@@ -288,7 +296,8 @@ void ViewsWindow::dumpDebugViewToDisk(QString text, int viewIndex)
 double ViewsWindow::getFractionOfBrightPixelsInView(int viewIndex, int threshold, int component)
 {
 	cxtest::RenderTesterPtr renderTester = cxtest::RenderTester::create(mLayouts[viewIndex]->getRenderWindow());
-	vtkImageDataPtr output = renderTester->renderToImage();
+	vtkImageDataPtr output = renderTester->getImageFromRenderWindow();
+//	vtkImageDataPtr output = renderTester->renderToImage();
 	return cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, threshold,component);
 }
 
@@ -297,7 +306,7 @@ bool ViewsWindow::quickRunWidget()
 	this->show();
 	this->updateRender();
 
-	cx::Transform3D rMt = cx::dataManager()->get_rMpr() * dummyTool()->get_prMt();
+//	cx::Transform3D rMt = cx::dataManager()->get_rMpr() * dummyTool()->get_prMt();
 
 	return true;
 }
