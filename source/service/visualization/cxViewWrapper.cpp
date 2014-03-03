@@ -21,7 +21,6 @@
 #include "cxViewGroup.h" //for class Navigation
 #include "sscMesh.h"
 #include "sscTypeConversions.h"
-#include "cxCameraControl.h"
 #include "sscImageAlgorithms.h"
 #include "sscDataMetric.h"
 #include "sscView.h"
@@ -193,7 +192,7 @@ QStringList ViewWrapper::getAllDataNames() const
 		{
 			if (image->getCropping())
 				line += " (cropped)";
-			if (!image->getAllClipPlanes().empty() || ((viewManager()->getClipper()->getImage() == image) &&  viewManager()->getClipper()->getUseClipper()))
+			if (!image->getAllClipPlanes().empty())
 				line += " (clipped)";
 		}
 
