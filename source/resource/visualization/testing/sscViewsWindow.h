@@ -74,7 +74,7 @@ private:
 	QString mShaderFolder;
 //	cx::AcceptanceBoxWidget* mAcceptanceBox;
 	QTimer* mRenderingTimer;
-	int mRemaindingRenderings;
+//	int mRemaindingRenderings;
 
 public slots:
 	void updateRender();
