@@ -159,8 +159,8 @@ vtkImageDataPtr RenderTester::renderToImage()
 
 vtkImageDataPtr RenderTester::getImageFromRenderWindow()
 {
-//	mRenderWindow->Render();
-//	mRenderWindow->Render();
+	mRenderWindow->Render();
+	mRenderWindow->Render();
 
 	vtkImageDataPtr retval = vtkImageDataPtr::New();
 
