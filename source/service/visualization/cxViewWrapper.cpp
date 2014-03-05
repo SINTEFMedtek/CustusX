@@ -122,7 +122,7 @@ void DataViewPropertiesInteractor::dataActionSlot()
 	DataPtr data = mBackend->getDataManager()->getData(uid);
 	ImagePtr image = mBackend->getDataManager()->getImage(data->getUid());
 
-	bool firstData = mGroupData->getData(DataViewProperties()).empty();
+	bool firstData = mGroupData->getData(DataViewProperties::createFull()).empty();
 
 	DataViewProperties old = mGroupData->getProperties(data);
 
@@ -159,15 +159,15 @@ ViewWrapper::ViewWrapper(VisualizationServiceBackendPtr backend) :
 void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 {
 	mGroupData = group;
-	connect(mGroupData.get(), SIGNAL(dataAdded(QString)), SLOT(dataAddedSlot(QString)));
-	connect(mGroupData.get(), SIGNAL(dataRemoved(QString)), SLOT(dataRemovedSlot(QString)));
+
+	connect(mGroupData.get(), SIGNAL(dataViewPropertiesChanged(QString)), SLOT(dataViewPropertiesChangedSlot(QString)));
+//	connect(mGroupData.get(), SIGNAL(dataAdded(QString)), SLOT(dataAddedSlot(QString)));
+//	connect(mGroupData.get(), SIGNAL(dataRemoved(QString)), SLOT(dataRemovedSlot(QString)));
 	connect(mGroupData.get(), SIGNAL(videoSourceChanged(QString)), SLOT(videoSourceChangedSlot(QString)));
 
 	std::vector<DataPtr> data = mGroupData->getData();
 	for (unsigned i = 0; i < data.size(); ++i)
-	{
-		this->dataAddedSlot(qstring_cast(data[i]->getUid()));
-	}
+		this->dataViewPropertiesChangedSlot(data[i]->getUid());
 
 	mDataViewPropertiesInteractor.reset(new DataViewPropertiesInteractor(mBackend, mGroupData));
 
@@ -175,15 +175,19 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 	mShow3DSlicesInteractor->setDataViewProperties(DataViewProperties::createSlice3D());
 }
 
-void ViewWrapper::dataAddedSlot(QString uid)
+void ViewWrapper::dataViewPropertiesChangedSlot(QString uid)
 {
-	this->dataAdded(mBackend->getDataManager()->getData(uid));
 }
 
-void ViewWrapper::dataRemovedSlot(QString uid)
-{
-	this->dataRemoved(uid);
-}
+//void ViewWrapper::dataAddedSlot(QString uid)
+//{
+//	this->dataAdded(mBackend->getDataManager()->getData(uid));
+//}
+
+//void ViewWrapper::dataRemovedSlot(QString uid)
+//{
+//	this->dataRemoved(uid);
+//}
 
 void ViewWrapper::contextMenuSlot(const QPoint& point)
 {

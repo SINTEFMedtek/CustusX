@@ -116,14 +116,15 @@ signals:
 protected slots:
 	void contextMenuSlot(const QPoint& point);
 
-	void dataAddedSlot(QString uid);
-	void dataRemovedSlot(QString uid);
+	virtual void dataViewPropertiesChangedSlot(QString uid);
+//	void dataAddedSlot(QString uid);
+//	void dataRemovedSlot(QString uid);
 	virtual void videoSourceChangedSlot(QString uid) {}
 
 protected:
 	ViewWrapper(VisualizationServiceBackendPtr backend);
-	virtual void dataAdded(DataPtr data) = 0;
-	virtual void dataRemoved(const QString& uid) = 0;
+//	virtual void dataAdded(DataPtr data) = 0;
+//	virtual void dataRemoved(const QString& uid) = 0;
 
 	void connectContextMenu(ViewWidget* view);
 	virtual void appendToContextMenu(QMenu& contextMenu) = 0;
