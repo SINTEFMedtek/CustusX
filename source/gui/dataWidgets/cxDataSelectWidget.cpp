@@ -186,7 +186,7 @@ void DataSelectWidget::toggleShowData()
 
     if (mToggleShowAction->isChecked())
     {
-        mCurrentViewGroup->addData(mData->getData());
+		mCurrentViewGroup->addData(mData->getData());
     }
     else
     {

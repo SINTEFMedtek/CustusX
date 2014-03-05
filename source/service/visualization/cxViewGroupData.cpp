@@ -227,22 +227,11 @@ void ViewGroupData::requestInitialize()
 	emit initialized();
 }
 
-//std::vector<DataPtr> ViewGroupData::getData() const
-//{
-//	return this->getDataOfType<Data>(DataViewProperties::createDefault());
-////	return mData;
-//}
-
 void ViewGroupData::addData(DataPtr data)
 {
-	if (!data)
-		return;
-	if (this->contains(data))
-		return;
-	DataViewProperties properties = DataViewProperties::createDefault();
-	DataAndViewProperties item(data, properties);
-	mData.push_back(item);
-	emit dataAdded(qstring_cast(data->getUid()));
+	DataViewProperties properties = this->getProperties(data);
+	properties.addFlagsIn(DataViewProperties::createDefault());
+	this->setProperties(data, properties);
 }
 
 void ViewGroupData::addDataSorted(DataPtr data)
@@ -279,25 +268,30 @@ void ViewGroupData::setProperties(DataPtr data, DataViewProperties properties)
 {
 	if (!data)
 		return;
-	if (!this->contains(data))
-		this->addData(data);
-//	if (this->contains(data))
-	std::find_if(mData.begin(), mData.end(), data_equals(data))->second = properties;
-	emit dataAdded(data->getUid());
-	emit dataRemoved(data->getUid());
 
 	if (properties.empty())
+	{
 		this->removeData(data);
+		return;
+	}
+
+	if (!this->contains(data))
+	{
+		DataAndViewProperties item(data, properties);
+		mData.push_back(item);
+	}
+	else
+	{
+		std::find_if(mData.begin(), mData.end(), data_equals(data))->second = properties;
+	}
+
+	emit dataAdded(data->getUid());
+	emit dataRemoved(data->getUid());
 }
 
 bool ViewGroupData::contains(DataPtr data) const
 {
 	return std::count_if(mData.begin(), mData.end(), data_equals(data));
-//	return (this->find_iterator(data) != mData.end());
-//	for (unsigned i=0; i<mData.size(); ++i)
-//		if (mData[i].first == data)
-//			return true;
-//	return false;
 }
 
 bool ViewGroupData::removeData(DataPtr data)
@@ -357,49 +351,14 @@ std::vector<boost::shared_ptr<DATA_TYPE> > ViewGroupData::getDataOfType(DataView
 	return retval;
 }
 
-std::vector<ImagePtr> ViewGroupData::getImages() const
+std::vector<ImagePtr> ViewGroupData::getImages(DataViewProperties properties) const
 {
-	return this->getDataOfType<Image>(DataViewProperties::createDefault());
-//	std::vector<ImagePtr> retval;
-//	for (unsigned i = 0; i < mData.size(); ++i)
-//	{
-//		ImagePtr data = boost::dynamic_pointer_cast<Image>(mData[i]);
-//		if (data)
-//			retval.push_back(data);
-//	}
-//	return retval;
+	return this->getDataOfType<Image>(properties);
 }
 
-std::vector<MeshPtr> ViewGroupData::getMeshes() const
+std::vector<MeshPtr> ViewGroupData::getMeshes(DataViewProperties properties) const
 {
-	return this->getDataOfType<Mesh>(DataViewProperties::createDefault());
-
-
-//	std::vector<MeshPtr> retval;
-//	for (unsigned i = 0; i < mData.size(); ++i)
-//	{
-//		MeshPtr data = boost::dynamic_pointer_cast<Mesh>(mData[i]);
-//		if (data)
-//			retval.push_back(data);
-//	}
-//	return retval;
-}
-
-std::vector<ImagePtr> ViewGroupData::get3DSliceImages()
-{
-//	std::vector<ImagePtr> retval = this->getDataOfType<Image>();
-
-	std::vector<ImagePtr> retval;
-	for (unsigned i = 0; i < mData.size(); ++i)
-	{
-		ImagePtr data = boost::dynamic_pointer_cast<Image>(mData[i].first);
-		if (!data)
-			continue;
-		if (!mData[i].second.hasSlice3D())
-			continue;
-		retval.push_back(data);
-	}
-	return retval;
+	return this->getDataOfType<Mesh>(properties);
 }
 
 ViewGroupData::Options ViewGroupData::getOptions() const

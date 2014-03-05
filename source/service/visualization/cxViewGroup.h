@@ -83,7 +83,7 @@ public:
 	virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
 	virtual void parseXml(QDomNode dataNode); ///< load internal state info from dataNode
 	void clearPatientData();
-	std::vector<ImagePtr> getImages();
+//	std::vector<ImagePtr> getImages();
 	CameraStylePtr getCameraStyle() { return mCameraStyle; }
 
 	bool contains3DView() const;

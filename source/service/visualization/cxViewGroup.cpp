@@ -225,7 +225,7 @@ void ViewGroup::syncOrientationMode(SyncedValuePtr val)
 
 void ViewGroup::mouseClickInViewGroupSlot()
 {
-	std::vector<ImagePtr> images = mViewGroupData->getImages();
+	std::vector<ImagePtr> images = mViewGroupData->getImages(DataViewProperties::createFull());
 	if (!images.empty())
 	{
 		if (!std::count(images.begin(), images.end(), mBackend->getDataManager()->getActiveImage()))
@@ -286,10 +286,10 @@ void ViewGroup::parseXml(QDomNode dataNode)
 //	base.parseObjectFromElement("camera3D", mViewGroupData->getCamera3D());
 }
 
-std::vector<ImagePtr> ViewGroup::getImages()
-{
-	return mViewGroupData->getImages();
-}
+//std::vector<ImagePtr> ViewGroup::getImages()
+//{
+//	return mViewGroupData->getImages();
+//}
 
 bool ViewGroup::contains3DView() const
 {
