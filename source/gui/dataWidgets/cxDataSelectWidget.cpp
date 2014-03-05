@@ -110,7 +110,7 @@ void DataSelectWidget::updateDataVisibility()
         std::vector<DataPtr> visibleData;
         if (mCurrentViewGroup)
         {
-            visibleData = mCurrentViewGroup->getData();
+			visibleData = mCurrentViewGroup->getData();
         }
         visible = std::count(visibleData.begin(), visibleData.end(), mData->getData());
     }

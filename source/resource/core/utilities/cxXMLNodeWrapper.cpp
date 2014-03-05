@@ -23,10 +23,11 @@ XMLNodeAdder::XMLNodeAdder(QDomNode node) : mNode(node)
 {
 }
 
-void XMLNodeAdder::addTextToElement(QString name, QString text)
+QDomElement XMLNodeAdder::addTextToElement(QString name, QString text)
 {
 	QDomElement element = this->addElement(name);
 	element.appendChild(this->document().createTextNode(text));
+	return element;
 }
 
 QDomElement XMLNodeAdder::addElement(QString name)
@@ -75,6 +76,19 @@ QStringList XMLNodeParser::parseTextFromDuplicateElements(QString name)
 	}
 	return retval;
 }
+
+std::vector<QDomElement> XMLNodeParser::getDuplicateElements(QString name)
+{
+	std::vector<QDomElement> retval;
+	for (QDomElement elem = mNode.firstChildElement(name);
+		 !elem.isNull();
+		 elem = elem.nextSiblingElement(name))
+	{
+		retval.push_back(elem);
+	}
+	return retval;
+}
+
 
 QDomElement XMLNodeParser::parseElement(QString name)
 {
