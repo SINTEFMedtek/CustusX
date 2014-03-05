@@ -254,7 +254,7 @@ void ViewGroupData::addDataSorted(DataPtr data)
 	}
 	if (!this->contains(data))
 		mData.insert(mData.begin(), item);
-	emit dataAdded(qstring_cast(data->getUid()));
+	emit dataViewPropertiesChanged(data->getUid());
 }
 
 DataViewProperties ViewGroupData::getProperties(DataPtr data)
@@ -285,8 +285,7 @@ void ViewGroupData::setProperties(DataPtr data, DataViewProperties properties)
 		std::find_if(mData.begin(), mData.end(), data_equals(data))->second = properties;
 	}
 
-	emit dataAdded(data->getUid());
-	emit dataRemoved(data->getUid());
+	emit dataViewPropertiesChanged(data->getUid());
 }
 
 bool ViewGroupData::contains(DataPtr data) const
@@ -301,7 +300,7 @@ bool ViewGroupData::removeData(DataPtr data)
 	if (!this->contains(data))
 		return false;
 	mData.erase(std::find_if(mData.begin(), mData.end(), data_equals(data)));
-	emit dataRemoved(qstring_cast(data->getUid()));
+	emit dataViewPropertiesChanged(data->getUid());
 	return true;
 }
 

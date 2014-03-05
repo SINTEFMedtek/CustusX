@@ -128,8 +128,9 @@ private slots:
 	void dataAddedOrRemovedInManager();
 
 signals:
-	void dataAdded(QString uid);
-	void dataRemoved(QString uid);
+	void dataViewPropertiesChanged(QString uid);
+//	void dataAdded(QString uid);
+//	void dataRemoved(QString uid);
 	void videoSourceChanged(QString uid);
 	void initialized();
 	void optionsChanged();

@@ -584,6 +584,18 @@ void ViewWrapper2D::imageRemoved(const QString& uid)
 	updateView();
 }
 
+void ViewWrapper2D::dataViewPropertiesChangedSlot(QString uid)
+{
+	DataPtr data = mBackend->getDataManager()->getData(uid);
+	DataViewProperties properties = mGroupData->getProperties(data);
+
+	if (properties.hasSlice2D())
+		this->dataAdded(data);
+	else
+		this->dataRemoved(uid);
+
+}
+
 void ViewWrapper2D::dataAdded(DataPtr data)
 {
 	if (boost::dynamic_pointer_cast<Image>(data))

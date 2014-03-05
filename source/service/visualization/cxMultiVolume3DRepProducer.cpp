@@ -91,8 +91,20 @@ void MultiVolume3DRepProducer::setVisualizerType(QString type)
 	this->updateRepsInView();
 }
 
+bool MultiVolume3DRepProducer::contains(ImagePtr image) const
+{
+	if (std::count(m2DImages.begin(), m2DImages.end(), image))
+		return true;
+	if (std::count(m3DImages.begin(), m3DImages.end(), image))
+		return true;
+	return false;
+}
+
 void MultiVolume3DRepProducer::addImage(ImagePtr image)
 {
+	if (this->contains(image))
+		return;
+
 	if (image)
 	{
 		connect(image.get(), SIGNAL(clipPlanesChanged()), this, SIGNAL(imagesChanged()));
