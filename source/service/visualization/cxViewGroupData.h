@@ -94,8 +94,8 @@ public:
 	void setVideoSource(QString uid);
 	bool removeData(DataPtr data);
 	void clearData();
-	std::vector<ImagePtr> getImages() const;
-	std::vector<MeshPtr> getMeshes() const;
+	std::vector<ImagePtr> getImages(DataViewProperties properties) const;
+	std::vector<MeshPtr> getMeshes(DataViewProperties properties) const;
 	DataViewProperties getProperties(DataPtr data);
 	void setProperties(DataPtr data, DataViewProperties properties);
 
@@ -105,7 +105,7 @@ public:
 
 	CameraDataPtr getCamera3D() { return mCamera3D; }
 
-	std::vector<ImagePtr> get3DSliceImages();
+//	std::vector<ImagePtr> get3DSliceImages();
 	PlaneTypeCollection getSliceDefinitions() { return mSliceDefinitions; }
 	void setSliceDefinitions(PlaneTypeCollection val) { mSliceDefinitions = val; emit optionsChanged(); }
 

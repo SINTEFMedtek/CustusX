@@ -148,11 +148,11 @@ public:
 	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
 	void autoShowData(DataPtr data);
 
-	/**
-	 * Return a list of all images used in viewGroups
-	 * Uses a map to remove duplicates
-	 */
-	std::map<QString, ImagePtr> getVisibleImages();
+//	/**
+//	 * Return a list of all images used in viewGroups
+//	 * Uses a map to remove duplicates
+//	 */
+//	std::map<QString, ImagePtr> getVisibleImages();
 
 signals:
 	void fps(int number); ///< Emits number of frames per second

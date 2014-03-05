@@ -212,7 +212,7 @@ void SelectedDataListWidget::userChangedListSlot()
     DataPtr current = dataManager()->getData(data[i]);
     if (!current)
       continue;
-    mViewGroupData->addData(current);
+	mViewGroupData->addData(current);
   }
 }
 

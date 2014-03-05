@@ -695,7 +695,7 @@ void ViewWrapper3D::activeImageChangedSlot()
 	ImagePtr image = mBackend->getDataManager()->getActiveImage();
 
 	// only show landmarks belonging to image visible in this view:
-	std::vector<ImagePtr> images = mGroupData->getImages();
+	std::vector<ImagePtr> images = mGroupData->getImages(DataViewProperties::create3D());
 	if (!std::count(images.begin(), images.end(), image))
 		image.reset();
 }
@@ -728,7 +728,8 @@ void ViewWrapper3D::updateSlices()
 	if (!mGroupData)
 		return;
 
-	std::vector<ImagePtr> images = mGroupData->get3DSliceImages();
+	std::vector<ImagePtr> images = mGroupData->getImages(DataViewProperties::createSlice3D());
+//	std::vector<ImagePtr> images = mGroupData->get3DSliceImages();
 	if (images.empty())
 		return;
 
