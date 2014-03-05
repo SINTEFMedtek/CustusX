@@ -36,7 +36,6 @@
 #include "sscTypeConversions.h"
 #include "cxVisualizationServiceBackend.h"
 #include "cxCameraStyle.h"
-#include "cxXMLNodeWrapper.h"
 
 namespace cx
 {
@@ -253,13 +252,14 @@ void ViewGroup::activateManualToolSlot()
 
 void ViewGroup::addXml(QDomNode& dataNode)
 {
-	XMLNodeAdder base(dataNode);
+	mViewGroupData->addXml(dataNode);
+//	XMLNodeAdder base(dataNode);
 
-	std::vector<DataPtr> data = mViewGroupData->getData();
-	for (unsigned i = 0; i < data.size(); ++i)
-		base.addTextToElement("data", data[i]->getUid());
+//	std::vector<DataPtr> data = mViewGroupData->getData();
+//	for (unsigned i = 0; i < data.size(); ++i)
+//		base.addTextToElement("data", data[i]->getUid());
 
-	base.addObjectToElement("camera3D", mViewGroupData->getCamera3D());
+//	base.addObjectToElement("camera3D", mViewGroupData->getCamera3D());
 }
 
 void ViewGroup::clearPatientData()
@@ -269,20 +269,21 @@ void ViewGroup::clearPatientData()
 
 void ViewGroup::parseXml(QDomNode dataNode)
 {
-	XMLNodeParser base(dataNode);
+	mViewGroupData->parseXml(dataNode);
+//	XMLNodeParser base(dataNode);
 
-	QStringList dataUids = base.parseTextFromDuplicateElements("data");
-	for (unsigned i=0; i<dataUids.size(); ++i)
-	{
-		QString uid = dataUids[i];
-		DataPtr data = mBackend->getDataManager()->getData(uid);
+//	QStringList dataUids = base.parseTextFromDuplicateElements("data");
+//	for (unsigned i=0; i<dataUids.size(); ++i)
+//	{
+//		QString uid = dataUids[i];
+//		DataPtr data = mBackend->getDataManager()->getData(uid);
 
-		mViewGroupData->addData(data);
-		if (!data)
-			messageManager()->sendError("Couldn't find the data: [" + uid + "] in the datamanager.");
-	}
+//		mViewGroupData->addData(data);
+//		if (!data)
+//			messageManager()->sendError("Couldn't find the data: [" + uid + "] in the datamanager.");
+//	}
 
-	base.parseObjectFromElement("camera3D", mViewGroupData->getCamera3D());
+//	base.parseObjectFromElement("camera3D", mViewGroupData->getCamera3D());
 }
 
 std::vector<ImagePtr> ViewGroup::getImages()

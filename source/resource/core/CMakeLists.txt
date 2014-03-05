@@ -134,6 +134,7 @@ cx_add_class(cxResource_SOURCE
 	utilities/cxImageDataContainer
 	utilities/cxOptionalValue
 	utilities/cxXMLNodeWrapper
+	utilities/cxPlaneTypeCollection
 
 	logger/sscAudio.h
 	logger/sscLogger

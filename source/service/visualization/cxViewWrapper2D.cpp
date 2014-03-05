@@ -534,7 +534,7 @@ void ViewWrapper2D::updateView()
 		if (settings()->value("useGPU2DRendering").toBool())
 		{
 			this->resetMultiSlicer();
-			text = this->getAllDataNames().join("\n");
+			text = this->getAllDataNames(DataViewProperties::createSlice2D()).join("\n");
 		}
 		else
 		{

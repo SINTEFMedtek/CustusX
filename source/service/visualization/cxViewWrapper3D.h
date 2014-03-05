@@ -109,6 +109,11 @@ private:
 
 	QAction* createSlicesAction(QString title, QWidget* parent);
 
+	void createSlicesActions(QWidget *parent);
+	QAction* createSlicesAction(PlaneTypeCollection planes, QWidget* parent);
+
+
+
 	void showLandmarks(bool on);
 	void showPointPickerProbe(bool on);
 	void setOrientationAnnotation();
@@ -131,7 +136,7 @@ private:
 	DisplayTextRepPtr mDataNameText;
 //	DisplayTextRepPtr mMetricsText;
 	MetricNamesRepPtr mMetricNames;
-	QString mShowSlicesMode;
+//	QString mShowSlicesMode;
 	std::vector<AxisConnectorPtr> mAxis;
 
 	bool mShowAxes; ///< show 3D axes reps for all tools and ref space
