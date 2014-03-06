@@ -70,7 +70,9 @@ QDomElement getElementForced(QDomNode root, QString path)
 }
 
 PatientData::PatientData(DataManager *dataManager) : mDataManager(dataManager)
-{}
+{
+	connect(dataManager, SIGNAL(clinicalApplicationChanged()), this, SLOT(clearPatient()));
+}
 
 PatientData::~PatientData()
 {}
