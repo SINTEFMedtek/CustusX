@@ -24,6 +24,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class ApplicationStateMachine> ApplicationStateMachinePtr;
 typedef boost::shared_ptr<class WorkflowStateMachine> WorkflowStateMachinePtr;
+typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
 /**
  * \file
@@ -117,6 +118,8 @@ class StateService: public QObject
 Q_OBJECT
 
 public:
+
+	static StateService* createInstance(StateServiceBackendPtr backend);
 	static StateService* getInstance(); ///< returns the only instance of this class
 	static void destroyInstance(); ///< destroys the only instance of this class
 
@@ -135,7 +138,7 @@ private:
 	StateService();
 	virtual ~StateService();
 
-	void initialize(); ///< init stuff that is dependent of the statemanager
+	void initialize(StateServiceBackendPtr backend); ///< init stuff that is dependent of the statemanager
 	void fillDefaultSettings();
 	template<class T>
 	void fillDefault(QString name, T value);
@@ -149,6 +152,8 @@ private:
 
 	WorkflowStateMachinePtr mWorkflowStateMachine;
 	ApplicationStateMachinePtr mApplicationStateMachine;
+	StateServiceBackendPtr mBackend;
+
 };
 
 StateService* stateService();

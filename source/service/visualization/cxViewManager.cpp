@@ -98,9 +98,6 @@ ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 	mLayoutRepository.reset(new LayoutRepository());
 	mCameraControl.reset(new CameraControl());
 
-	connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
-	connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
-	connect(patientService()->getPatientData().get(), SIGNAL(cleared()), this, SLOT(clearSlot()));
 	connect(mBackend->getDataManager(), SIGNAL(centerChanged()), this, SLOT(globalCenterChangedSlot()));
 
 	this->loadGlobalSettings();
@@ -190,18 +187,6 @@ void ViewManager::updateViews()
 		for (unsigned j=0; j<group->getWrappers().size(); ++j)
 			group->getWrappers()[j]->updateView();
 	}
-}
-
-void ViewManager::duringSavePatientSlot()
-{
-	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
-	this->addXml(managerNode);
-}
-
-void ViewManager::duringLoadPatientSlot()
-{
-	QDomElement viewmanagerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers/viewManager");
-	this->parseXml(viewmanagerNode);
 }
 
 void ViewManager::settingsChangedSlot(QString key)
@@ -369,7 +354,7 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 	this->setActiveView(base.parseTextFromElement("activeView"));
 }
 
-void ViewManager::clearSlot()
+void ViewManager::clear()
 {
 	for (unsigned i = 0; i < mViewGroups.size(); ++i)
 	{

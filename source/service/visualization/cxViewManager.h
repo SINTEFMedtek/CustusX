@@ -148,6 +148,10 @@ public:
 	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
 	void autoShowData(DataPtr data);
 	CameraControlPtr getCameraControl() { return mCameraControl; }
+	void clear();
+	//Interface for saving/loading
+	void addXml(QDomNode& parentNode);
+	void parseXml(QDomNode viewmanagerNode);
 
 signals:
 	void fps(int number); ///< Emits number of frames per second
@@ -157,21 +161,17 @@ signals:
 protected slots:
 	void settingsChangedSlot(QString key);
 
-	void clearSlot();
-	void duringSavePatientSlot();
-	void duringLoadPatientSlot();
+//	void clearSlot();
+//	void duringSavePatientSlot();
+//	void duringLoadPatientSlot();
 	void updateViews();
 	void updateCameraStyleActions();
 	void globalCenterChangedSlot();
 	void setActiveView(QString viewUid);
 
 protected:
-	ViewManager(VisualizationServiceBackendPtr backend); ///< create all needed views
+	ViewManager(VisualizationServiceBackendPtr backend);
 	virtual ~ViewManager();
-
-	//Interface for saving/loading
-	void addXml(QDomNode& parentNode); ///< adds xml information about the viewmanager and its variables
-	void parseXml(QDomNode viewmanagerNode); ///< Use a XML node to load data. \param viewmanagerNode A XML data representation of the ViewManager
 
 	ViewWidget* getView(const QString& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
 

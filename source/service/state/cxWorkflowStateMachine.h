@@ -24,6 +24,8 @@ class QMenu;
 
 namespace cx
 {
+typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
+
 /**
  * \file
  * \addtogroup cxServiceState
@@ -43,7 +45,7 @@ class WorkflowStateMachine: public QStateMachine
 {
 Q_OBJECT
 public:
-	WorkflowStateMachine();
+	WorkflowStateMachine(StateServiceBackendPtr backend);
 	virtual ~WorkflowStateMachine();
 
 	QActionGroup* getActionGroup();
@@ -72,6 +74,7 @@ private:
 	WorkflowState* mParentState;
 	QActionGroup* mActionGroup;
 	bool mStarted;
+	StateServiceBackendPtr mBackend;
 };
 
 typedef boost::shared_ptr<WorkflowStateMachine> WorkflowStateMachinePtr;
