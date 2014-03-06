@@ -67,6 +67,7 @@ private:
 
 	void updateRepsInView();
 	void fillReps();
+	bool contains(ImagePtr image) const;
 
 	void rebuildReps();
 	void rebuild2DReps();

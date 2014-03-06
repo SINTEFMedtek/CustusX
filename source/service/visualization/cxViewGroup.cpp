@@ -36,7 +36,6 @@
 #include "sscTypeConversions.h"
 #include "cxVisualizationServiceBackend.h"
 #include "cxCameraStyle.h"
-#include "cxXMLNodeWrapper.h"
 
 namespace cx
 {
@@ -57,8 +56,6 @@ void Navigation::centerToData(DataPtr image)
 
 	// set center to calculated position
 	mBackend->getDataManager()->setCenter(p_r);
-	CameraControl().translateByFocusTo(p_r);
-	this->centerManualTool(p_r);
 }
 
 /**Place the global center to the mean center of
@@ -71,9 +68,6 @@ void Navigation::centerToView(const std::vector<DataPtr>& images)
 
 	// set center to calculated position
 	mBackend->getDataManager()->setCenter(p_r);
-	CameraControl().translateByFocusTo(p_r);
-	this->centerManualTool(p_r);
-//  std::cout << "Centered to view." << std::endl;
 }
 
 /**Place the global center to the mean center of
@@ -88,9 +82,6 @@ void Navigation::centerToGlobalDataCenter()
 
 	// set center to calculated position
 	mBackend->getDataManager()->setCenter(p_r);
-	CameraControl().translateByFocusTo(p_r);
-	this->centerManualTool(p_r);
-//  std::cout << "Centered to all images." << std::endl;
 }
 
 /**Place the global center at the current position of the
@@ -104,7 +95,6 @@ void Navigation::centerToTooltip()
 
 	// set center to calculated position
 	mBackend->getDataManager()->setCenter(p_r);
-	CameraControl().translateByFocusTo(p_r);
 }
 
 /**Find the center of all images in the view(wrapper), defined as the mean of
@@ -144,7 +134,7 @@ Vector3D Navigation::findDataCenter(std::vector<DataPtr> data)
 	return bb_sigma.center();
 }
 
-void Navigation::centerManualTool(Vector3D& p_r)
+void Navigation::moveManualToolToPosition(Vector3D& p_r)
 {
 	// move the manual tool to the same position. (this is a side effect... do we want it?)
 	ManualToolPtr manual = mBackend->getToolManager()->getManualTool();
@@ -153,7 +143,8 @@ void Navigation::centerManualTool(Vector3D& p_r)
 	Vector3D t_pr = prM0t.coord(Vector3D(0, 0, manual->getTooltipOffset()));
 	Transform3D prM1t = createTransformTranslate(p_pr - t_pr) * prM0t;
 
-	manual->set_prMt(prM1t);
+	if (!similar(prM1t, prM0t))
+		manual->set_prMt(prM1t);
 //  std::cout << "center manual tool" << std::endl;
 }
 //---------------------------------------------------------
@@ -226,7 +217,7 @@ void ViewGroup::syncOrientationMode(SyncedValuePtr val)
 
 void ViewGroup::mouseClickInViewGroupSlot()
 {
-	std::vector<ImagePtr> images = mViewGroupData->getImages();
+	std::vector<ImagePtr> images = mViewGroupData->getImages(DataViewProperties::createFull());
 	if (!images.empty())
 	{
 		if (!std::count(images.begin(), images.end(), mBackend->getDataManager()->getActiveImage()))
@@ -237,7 +228,7 @@ void ViewGroup::mouseClickInViewGroupSlot()
 
 	ViewWidgetQPtr view = static_cast<ViewWidget*>(this->sender());
 	if (view)
-		viewManager()->setActiveView(view->getUid());
+		emit viewSelected(view->getUid());
 }
 
 std::vector<ViewWidgetQPtr> ViewGroup::getViews() const
@@ -253,13 +244,14 @@ void ViewGroup::activateManualToolSlot()
 
 void ViewGroup::addXml(QDomNode& dataNode)
 {
-	XMLNodeAdder base(dataNode);
+	mViewGroupData->addXml(dataNode);
+//	XMLNodeAdder base(dataNode);
 
-	std::vector<DataPtr> data = mViewGroupData->getData();
-	for (unsigned i = 0; i < data.size(); ++i)
-		base.addTextToElement("data", data[i]->getUid());
+//	std::vector<DataPtr> data = mViewGroupData->getData();
+//	for (unsigned i = 0; i < data.size(); ++i)
+//		base.addTextToElement("data", data[i]->getUid());
 
-	base.addObjectToElement("camera3D", mViewGroupData->getCamera3D());
+//	base.addObjectToElement("camera3D", mViewGroupData->getCamera3D());
 }
 
 void ViewGroup::clearPatientData()
@@ -269,26 +261,27 @@ void ViewGroup::clearPatientData()
 
 void ViewGroup::parseXml(QDomNode dataNode)
 {
-	XMLNodeParser base(dataNode);
+	mViewGroupData->parseXml(dataNode);
+//	XMLNodeParser base(dataNode);
 
-	QStringList dataUids = base.parseTextFromDuplicateElements("data");
-	for (unsigned i=0; i<dataUids.size(); ++i)
-	{
-		QString uid = dataUids[i];
-		DataPtr data = mBackend->getDataManager()->getData(uid);
+//	QStringList dataUids = base.parseTextFromDuplicateElements("data");
+//	for (unsigned i=0; i<dataUids.size(); ++i)
+//	{
+//		QString uid = dataUids[i];
+//		DataPtr data = mBackend->getDataManager()->getData(uid);
 
-		mViewGroupData->addData(data);
-		if (!data)
-			messageManager()->sendError("Couldn't find the data: [" + uid + "] in the datamanager.");
-	}
+//		mViewGroupData->addData(data);
+//		if (!data)
+//			messageManager()->sendError("Couldn't find the data: [" + uid + "] in the datamanager.");
+//	}
 
-	base.parseObjectFromElement("camera3D", mViewGroupData->getCamera3D());
+//	base.parseObjectFromElement("camera3D", mViewGroupData->getCamera3D());
 }
 
-std::vector<ImagePtr> ViewGroup::getImages()
-{
-	return mViewGroupData->getImages();
-}
+//std::vector<ImagePtr> ViewGroup::getImages()
+//{
+//	return mViewGroupData->getImages();
+//}
 
 bool ViewGroup::contains3DView() const
 {

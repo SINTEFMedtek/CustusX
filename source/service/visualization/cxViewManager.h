@@ -45,6 +45,7 @@ typedef boost::shared_ptr<class RenderLoop> RenderLoopPtr;
 typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
 typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
 typedef boost::shared_ptr<class Navigation> NavigationPtr;
+typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 
 /**
  * \file
@@ -137,7 +138,6 @@ public:
 
 	ViewWrapperPtr getActiveView() const; ///< returns the active view
 	int getActiveViewGroup() const;
-	void setActiveView(QString viewUid); ///< convenient function for setting the active view
 	void storeLayoutData(const LayoutData& data);
 
 	InteractiveClipperPtr getClipper();
@@ -147,12 +147,7 @@ public:
 
 	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
 	void autoShowData(DataPtr data);
-
-	/**
-	 * Return a list of all images used in viewGroups
-	 * Uses a map to remove duplicates
-	 */
-	std::map<QString, ImagePtr> getVisibleImages();
+	CameraControlPtr getCameraControl() { return mCameraControl; }
 
 signals:
 	void fps(int number); ///< Emits number of frames per second
@@ -167,6 +162,8 @@ protected slots:
 	void duringLoadPatientSlot();
 	void updateViews();
 	void updateCameraStyleActions();
+	void globalCenterChangedSlot();
+	void setActiveView(QString viewUid);
 
 protected:
 	ViewManager(VisualizationServiceBackendPtr backend); ///< create all needed views
@@ -201,6 +198,7 @@ protected:
 	QString mActiveView; ///< the active view
 	RenderLoopPtr mRenderLoop;
 	std::vector<ViewGroupPtr> mViewGroups;
+	CameraControlPtr mCameraControl;
 
 	bool mGlobalObliqueOrientation; ///< controlling whether or not all 2d views should be oblique or orthogonal
 	SyncedValuePtr mGlobal2DZoomVal;

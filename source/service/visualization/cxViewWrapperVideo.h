@@ -53,10 +53,12 @@ private slots:
 	void showSectorActionSlot(bool checked);
 	void connectStream();
 	void streamActionSlot();
+protected slots:
+	virtual void dataViewPropertiesChangedSlot(QString uid) {}
 
 protected:
-	virtual void dataAdded(DataPtr data) {}
-	virtual void dataRemoved(const QString& uid) {}
+//	virtual void dataAdded(DataPtr data) {}
+//	virtual void dataRemoved(const QString& uid) {}
 	virtual void videoSourceChangedSlot(QString uid);
 
 private:

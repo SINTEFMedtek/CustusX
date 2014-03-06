@@ -65,6 +65,29 @@ signals:
 	void changed();
 };
 
+typedef boost::shared_ptr<class DataViewPropertiesInteractor> DataViewPropertiesInteractorPtr;
+/** Provide an action list for showing data in views.
+  *
+  */
+class DataViewPropertiesInteractor : public QObject
+{
+	Q_OBJECT
+public:
+	DataViewPropertiesInteractor(VisualizationServiceBackendPtr backend, ViewGroupDataPtr groupData);
+	void addDataActions(QWidget* parent);
+	void setDataViewProperties(DataViewProperties properties);
+
+private slots:
+	void dataActionSlot();
+private:
+	void addDataAction(QString uid, QWidget* parent);
+	VisualizationServiceBackendPtr mBackend;
+	ViewGroupDataPtr mGroupData;
+	DataViewProperties mProperties;
+
+	QString mLastDataActionUid;
+};
+
 /**
  * \brief Superclass for ViewWrappers.
  *
@@ -92,28 +115,26 @@ signals:
 
 protected slots:
 	void contextMenuSlot(const QPoint& point);
-	void dataActionSlot();
 
-	void dataAddedSlot(QString uid);
-	void dataRemovedSlot(QString uid);
+	virtual void dataViewPropertiesChangedSlot(QString uid);
+//	void dataAddedSlot(QString uid);
+//	void dataRemovedSlot(QString uid);
 	virtual void videoSourceChangedSlot(QString uid) {}
 
 protected:
 	ViewWrapper(VisualizationServiceBackendPtr backend);
-	virtual void dataAdded(DataPtr data) = 0;
-	virtual void dataRemoved(const QString& uid) = 0;
+//	virtual void dataAdded(DataPtr data) = 0;
+//	virtual void dataRemoved(const QString& uid) = 0;
 
 	void connectContextMenu(ViewWidget* view);
 	virtual void appendToContextMenu(QMenu& contextMenu) = 0;
-	void addDataAction(QString uid, QMenu* contextMenu);
-	QStringList getAllDataNames() const;
-//	std::vector<std::pair<QColor, QString> > getAllMetricTexts() const;
+	QStringList getAllDataNames(DataViewProperties properties) const;
 
 	ViewGroupDataPtr mGroupData;
 	VisualizationServiceBackendPtr mBackend;
+	DataViewPropertiesInteractorPtr mDataViewPropertiesInteractor;
+	DataViewPropertiesInteractorPtr mShow3DSlicesInteractor;
 
-private:
-	QString mLastDataActionUid;
 
 };
 
