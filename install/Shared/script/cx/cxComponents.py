@@ -382,8 +382,8 @@ class TubeSegmentationFramework(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
-        add('USE_C++11', False)
-        add('SIPL_USE_GTK', False)
+        add('USE_C++11:BOOL', False)
+        add('SIPL_USE_GTK:BOOL', False)
         add('TSF_USE_EXTRNAL_OUL:BOOL', True)
         add('TSF_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
         builder.configureCMake()
@@ -404,7 +404,7 @@ class LevelSetSegmentation(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
-        add('sipl_use_gtk', False)
+        add('sipl_use_gtk:BOOL', False)
         add('LS_USE_EXTRNAL_OUL:BOOL', True)
         add('LS_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
         builder.configureCMake()
