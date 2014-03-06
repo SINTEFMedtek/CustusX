@@ -3,6 +3,7 @@
 
 #include <QComboBox>
 #include "cxPreferenceTab.h"
+#include "sscBoolDataAdapterXml.h"
 
 namespace cx
 {
@@ -45,6 +46,8 @@ private:
 
   QComboBox* mToolConfigFolderComboBox;
   QComboBox* mChooseApplicationComboBox;
+
+  BoolDataAdapterXmlPtr mFilterToolPositions;
 
   QString mGlobalPatientDataFolder;
   QString mVLCPath;

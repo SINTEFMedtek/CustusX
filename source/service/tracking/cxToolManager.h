@@ -146,6 +146,7 @@ private:
 	void closePlayBackMode();
 	void initializeManualTool();
 	void setConfigurationFile(QString configurationFile); ///< Sets the configuration file to use, must be located in the resourcefolder \param configurationFile path to the configuration file to use
+	void resetTrackingPositionFilters();
 
 	QString mConfigurationFilePath; ///< path to the configuration file
 	QString mLoggingFolder; ///< path to where logging should be saved

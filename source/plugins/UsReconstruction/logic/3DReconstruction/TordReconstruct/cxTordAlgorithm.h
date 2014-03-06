@@ -4,9 +4,8 @@
 //TODO remove, should be defined in oul instead
 #define __CL_ENABLE_EXCEPTIONS //telling the opencl c++ wrapper to throw exceptions
 
-
-#include "cxOpenCLUtilities.h"
 #include <sscUSFrameData.h>
+#include "OpenCLManager.hpp"
 
 namespace cx
 {
@@ -66,7 +65,7 @@ public:
 	 * @param newnessWeight The extra weight to give pixels newer than mean
 	 * @return True on suc
 	 */
-	virtual cl::Program buildCLProgram(const char* program_src,
+	virtual cl::Program buildCLProgram(std::string program_src,
 	                                  int nMaxPlanes,
 	                                  int nPlanes,
 	                                  int method,
@@ -74,8 +73,7 @@ public:
 	                                  int nStarts,
 	                                  float brightnessWeight,
 	                                  float newnessWeight,
-	                                  QString kernelPath,
-	                                  size_t sourceLen);
+	                                  QString kernelPath);
 	/**
 	 * Perform GPU Reconstruction.
 	 * This function initializes the CL memory objects, calls the kernel and reads back the result,
@@ -154,7 +152,7 @@ private:
 	bool isUsingTooMuchMemory(size_t outputVolumeSize, size_t inputBlocksLength, cl_ulong globalMemUse);
 
 	cl::Kernel mKernel;
-	OpenCL::ocl* mOpenCL;
+	oul::Context mOulContex;
 
 };
 

@@ -68,7 +68,7 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	stylesheet.open(QIODevice::ReadOnly);
 	qApp->setStyleSheet(stylesheet.readAll());
 
-	mCameraControl.reset(new CameraControl(this));
+	mCameraControl = viewManager()->getCameraControl();
 	mLayoutInteractor.reset(new LayoutInteractor());
 
 	viewManager()->initialize();

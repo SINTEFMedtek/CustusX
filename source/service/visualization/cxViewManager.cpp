@@ -56,6 +56,7 @@
 #include "sscLogger.h"
 #include "cxVisualizationServiceBackend.h"
 #include "cxXMLNodeWrapper.h"
+#include "cxCameraControl.h"
 
 namespace cx
 {
@@ -95,10 +96,12 @@ ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 
 	mSlicePlanesProxy.reset(new SlicePlanesProxy());
 	mLayoutRepository.reset(new LayoutRepository());
+	mCameraControl.reset(new CameraControl());
 
 	connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
 	connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
 	connect(patientService()->getPatientData().get(), SIGNAL(cleared()), this, SLOT(clearSlot()));
+	connect(mBackend->getDataManager(), SIGNAL(centerChanged()), this, SLOT(globalCenterChangedSlot()));
 
 	this->loadGlobalSettings();
 
@@ -110,7 +113,9 @@ ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 	// initialize view groups:
 	for (unsigned i = 0; i < VIEW_GROUP_COUNT; ++i)
 	{
-		mViewGroups.push_back(ViewGroupPtr(new ViewGroup(mBackend)));
+		ViewGroupPtr group(new ViewGroup(mBackend));
+		mViewGroups.push_back(group);
+		connect(group.get(), SIGNAL(viewSelected(QString)), this, SLOT(setActiveView(QString)));
 	}
 
 	this->initializeGlobal2DZoom();
@@ -174,21 +179,6 @@ void ViewManager::updateViews()
 		for (unsigned j=0; j<group->getWrappers().size(); ++j)
 			group->getWrappers()[j]->updateView();
 	}
-}
-
-std::map<QString, ImagePtr> ViewManager::getVisibleImages()
-{
-	std::map<QString, ImagePtr> retval;
-	for(unsigned i=0; i<mViewGroups.size(); ++i)
-	{
-		ViewGroupPtr group = mViewGroups[i];
-		std::vector<ImagePtr> images = group->getImages();
-		for (unsigned j=0; j<images.size(); ++j)
-		{
-			retval[images[j]->getUid()] = images[j];
-		}
-	}
-	return retval;
 }
 
 void ViewManager::duringSavePatientSlot()
@@ -270,11 +260,12 @@ ViewWrapperPtr ViewManager::getActiveView() const
 	return ViewWrapperPtr();
 }
 
-void ViewManager::setActiveView(QString viewUid)
+void ViewManager::setActiveView(QString uid)
 {
-	if (mActiveView == viewUid)
+	if (mActiveView == uid)
 		return;
-	mActiveView = viewUid;
+	mActiveView = uid;
+
 	emit activeViewChanged();
 }
 
@@ -447,6 +438,7 @@ void ViewManager::rebuildLayouts()
 	}
 
 	this->setSlicePlanesProxyInViewsUpTo2DViewgroup();
+	mCameraControl->setView(this->get3DView());
 }
 
 void ViewManager::setSlicePlanesProxyInViewsUpTo2DViewgroup()
@@ -645,6 +637,13 @@ void ViewManager::autoShowData(DataPtr data)
 CyclicActionLoggerPtr ViewManager::getRenderTimer()
 {
 	return mRenderLoop->getRenderTimer();
+}
+
+void ViewManager::globalCenterChangedSlot()
+{
+	Vector3D p_r = mBackend->getDataManager()->getCenter();
+	this->getCameraControl()->translateByFocusTo(p_r);
+	this->getNavigation()->moveManualToolToPosition(p_r);
 }
 
 } //namespace cx

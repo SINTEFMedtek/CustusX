@@ -57,6 +57,10 @@ void ToolImpl::set_prMt(const Transform3D& prMt, double timestamp)
 	emit toolTransformAndTimestamp(m_prMt, timestamp);
 }
 
+void ToolImpl::resetTrackingPositionFilter(TrackingPositionFilterPtr filter)
+{
+	mTrackingPositionFilter = filter;
+}
 
 } // namespace cx
 

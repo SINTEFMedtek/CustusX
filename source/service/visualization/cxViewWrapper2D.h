@@ -69,6 +69,8 @@ public:
 	static bool overlayIsEnabled();
 	virtual void updateView();
 
+protected slots:
+	virtual void dataViewPropertiesChangedSlot(QString uid);
 private slots:
 	void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
 	void viewportChanged();
