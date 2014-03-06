@@ -50,6 +50,7 @@ public:
 	void centerToView(const std::vector<DataPtr>& images);
 	void centerToGlobalDataCenter();
 	void centerToTooltip();
+	void moveManualToolToPosition(Vector3D& p_r);
 
 private:
 	VisualizationServiceBackendPtr mBackend;
@@ -57,7 +58,6 @@ private:
 	Vector3D findGlobalDataCenter();
 	Vector3D findDataCenter(std::vector<DataPtr> data);
 
-	void centerManualTool(Vector3D& p_r);
 };
 typedef boost::shared_ptr<Navigation> NavigationPtr;
 
@@ -83,12 +83,14 @@ public:
 	virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
 	virtual void parseXml(QDomNode dataNode); ///< load internal state info from dataNode
 	void clearPatientData();
-	std::vector<ImagePtr> getImages();
+//	std::vector<ImagePtr> getImages();
 	CameraStylePtr getCameraStyle() { return mCameraStyle; }
 
 	bool contains3DView() const;
 	void syncOrientationMode(SyncedValuePtr val);
 
+signals:
+	void viewSelected(QString uid);
 public slots:
 
 private slots:

@@ -26,12 +26,14 @@
 #include <vtkImageDifference.h>
 #include <vtkImageAppendComponents.h>
 #include <vtkRendererCollection.h>
+#include <vtkImageImport.h>
 
 #include "sscBoundingBox3D.h"
 #include "sscView.h"
 #include "sscTypeConversions.h"
 #include "sscDataReaderWriter.h"
 #include "cxtestUtilities.h"
+#include "sscLogger.h"
 
 typedef vtkSmartPointer<class vtkProp> vtkPropPtr;
 typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;
@@ -40,6 +42,7 @@ typedef vtkSmartPointer<class vtkPNGReader> vtkPNGReaderPtr;
 
 typedef vtkSmartPointer<class vtkImageDifference> vtkImageDifferencePtr;
 typedef vtkSmartPointer<class vtkImageClip> vtkImageClipPtr;
+typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
 
 namespace cxtest
@@ -89,6 +92,7 @@ RenderTester::RenderTester(vtkRenderWindowPtr renderWindow) :
 	mImageErrorThreshold(100.0),
 	mBorderOffset(2)
 {
+	SSC_ASSERT(renderWindow->GetRenderers()->GetNumberOfItems()==1);
 }
 
 RenderTester::RenderTester(cx::RepPtr rep, const unsigned int viewAxisSize) :
@@ -152,16 +156,50 @@ vtkImageDataPtr RenderTester::renderToImage()
 	return this->getImageFromRenderWindow();
 }
 
+
 vtkImageDataPtr RenderTester::getImageFromRenderWindow()
 {
-	vtkWindowToImageFilterPtr windowToImageFilter = vtkWindowToImageFilterPtr::New();
-	windowToImageFilter->SetReadFrontBuffer(false); // might give less interference from other windows...?
-	windowToImageFilter->SetInput(mRenderWindow);
-	windowToImageFilter->Modified();
-	windowToImageFilter->Update();
+	mRenderWindow->Render();
+	mRenderWindow->Render();
 
-	return windowToImageFilter->GetOutput();
+	vtkImageDataPtr retval = vtkImageDataPtr::New();
+
+//	std::cout << "mapped: " << mRenderWindow->GetMapped() << std::endl;
+//	mRenderWindow->Render();
+//	std::cout << "erase: " << mRenderWindow->GetErase() << std::endl;
+//	mRenderWindow->SetErase(false);
+//	mRenderWindow->SetDoubleBuffer(false);
+	Eigen::Vector2i size(mRenderWindow->GetSize());
+	bool useFrontBuffer = true; // false gives lots of garbage in the image - at least on mac
+	void* rawPointer = mRenderWindow->GetPixelData(0, 0, size[0]-1, size[1]-1, useFrontBuffer);
+
+	vtkImageImportPtr import = vtkImageImportPtr::New();
+
+//	std::cout << "size: " << size << std::endl;
+	import->SetImportVoidPointer(rawPointer, 0);
+	import->SetDataScalarTypeToUnsignedChar();
+	import->SetDataSpacing(1, 1, 1);
+	import->SetNumberOfScalarComponents(3);
+	import->SetWholeExtent(0, size[0]-1, 0, size[1]-1, 0, 0);
+	import->SetDataExtentToWholeExtent();
+	import->Update();
+
+	return import->GetOutput();
 }
+
+//vtkImageDataPtr RenderTester::getImageFromRenderWindow()
+//{
+//	vtkWindowToImageFilterPtr windowToImageFilter = vtkWindowToImageFilterPtr::New();
+//	windowToImageFilter->ShouldRerenderOff();
+//	windowToImageFilter->SetReadFrontBuffer(false); // might give less interf erence from other windows...?
+////	mRenderWindow->Render();
+////	mRenderWindow->Render();
+//	windowToImageFilter->SetInput(mRenderWindow);
+//	windowToImageFilter->Modified();
+//	windowToImageFilter->Update();
+
+//	return windowToImageFilter->GetOutput();
+//}
 
 void RenderTester::writeToPNG(vtkImageDataPtr image, QString filename)
 {

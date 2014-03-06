@@ -333,7 +333,7 @@ void ViewWrapper2D::resetMultiSlicer()
 	mMultiSliceRep->setSliceProxy(mSliceProxy);
 	mView->addRep(mMultiSliceRep);
 	if (mGroupData)
-		mMultiSliceRep->setImages(mGroupData->getImages());
+		mMultiSliceRep->setImages(mGroupData->getImages(DataViewProperties::createSlice2D()));
 	this->viewportChanged();
 }
 
@@ -519,7 +519,7 @@ void ViewWrapper2D::updateView()
 	QString text;
 	if (mGroupData)
 	{
-		std::vector<ImagePtr> images = mGroupData->getImages();
+		std::vector<ImagePtr> images = mGroupData->getImages(DataViewProperties::createSlice2D());
 		ImagePtr image;
 		if (!images.empty())
 			image = images.back(); // always show last in vector
@@ -534,7 +534,7 @@ void ViewWrapper2D::updateView()
 		if (settings()->value("useGPU2DRendering").toBool())
 		{
 			this->resetMultiSlicer();
-			text = this->getAllDataNames().join("\n");
+			text = this->getAllDataNames(DataViewProperties::createSlice2D()).join("\n");
 		}
 		else
 		{
@@ -555,7 +555,7 @@ void ViewWrapper2D::updateView()
 			mSliceRep->setImage(image);
 
 			// list all meshes and one image.
-			std::vector<MeshPtr> mesh = mGroupData->getMeshes();
+			std::vector<MeshPtr> mesh = mGroupData->getMeshes(DataViewProperties::createSlice2D());
 			for (unsigned i = 0; i < mesh.size(); ++i)
 			textList << qstring_cast(mesh[i]->getName());
 			if (image)
@@ -582,6 +582,18 @@ void ViewWrapper2D::updateView()
 void ViewWrapper2D::imageRemoved(const QString& uid)
 {
 	updateView();
+}
+
+void ViewWrapper2D::dataViewPropertiesChangedSlot(QString uid)
+{
+	DataPtr data = mBackend->getDataManager()->getData(uid);
+	DataViewProperties properties = mGroupData->getProperties(data);
+
+	if (properties.hasSlice2D())
+		this->dataAdded(data);
+	else
+		this->dataRemoved(uid);
+
 }
 
 void ViewWrapper2D::dataAdded(DataPtr data)
