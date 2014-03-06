@@ -643,7 +643,7 @@ void ViewManager::globalCenterChangedSlot()
 {
 	Vector3D p_r = mBackend->getDataManager()->getCenter();
 	this->getCameraControl()->translateByFocusTo(p_r);
-	this->getNavigation()->moveManualToolToPosition(p_r);
+//	this->getNavigation()->moveManualToolToPosition(p_r);
 }
 
 } //namespace cx
