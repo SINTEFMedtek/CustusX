@@ -242,7 +242,6 @@ set (CX_RESOURCE_LIBRARIES
     
 if (CX_USE_OPENCL_UTILITY)
     cx_add_class(cxResource_SOURCE
-    	utilities/cxOpenCLUtilities
     	utilities/cxOpenCLPrinter
     )
 
