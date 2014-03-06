@@ -28,6 +28,7 @@
 #include "cxToolManager.h"
 #include "cxProbe.h"
 #include "cxIgstkTool.h"
+#include "cxTrackingPositionFilter.h"
 
 namespace cx
 {
@@ -235,7 +236,19 @@ void cxTool::parseXml(QDomNode& dataNode)
 
 void cxTool::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)
 {
-	ToolImpl::set_prMt(matrix, timestamp);
+	Transform3D prMt_filtered = matrix;
+
+	if (mTrackingPositionFilter)
+	{
+		mTrackingPositionFilter->addPosition(matrix, timestamp);
+		prMt_filtered = mTrackingPositionFilter->getFilteredPosition();
+	}
+
+	(*mPositionHistory)[timestamp] = matrix; // store original in history
+	m_prMt = prMt_filtered;
+	emit toolTransformAndTimestamp(m_prMt, timestamp);
+
+//	ToolImpl::set_prMt(matrix, timestamp);
 }
 
 void cxTool::calculateTpsSlot()

@@ -93,6 +93,7 @@ cx_add_class(cxResource_SOURCE
 	Tool/ProbeXmlConfigParserImpl
 	Tool/ProbeXmlConfigParserMock
 	Tool/cxCreateProbeDataFromConfiguration
+	Tool/cxTrackingPositionFilter
 
 	Data/sscDataMetric
 	Data/sscDataReaderWriter
