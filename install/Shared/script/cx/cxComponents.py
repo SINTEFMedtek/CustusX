@@ -384,6 +384,7 @@ class TubeSegmentationFramework(CppComponent):
         add = builder.addCMakeOption
         add('USE_C++11:BOOL', False)
         add('SIPL_USE_GTK:BOOL', False)
+        add('sipl_use_gtk:BOOL', False) #variables in cmake are case sensitive, SIPL uses this options
         add('TSF_USE_EXTRNAL_OUL:BOOL', True)
         add('TSF_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
         builder.configureCMake()
