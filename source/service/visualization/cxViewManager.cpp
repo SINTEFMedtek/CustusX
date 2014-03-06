@@ -115,10 +115,10 @@ ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 	{
 		ViewGroupPtr group(new ViewGroup(mBackend));
 		mViewGroups.push_back(group);
-		connect(group.get(), SIGNAL(viewSelected(QString)), this, SLOT(setActiveView(QString)));
 	}
 
 	this->initializeGlobal2DZoom();
+	this->initializeActiveView();
 	this->syncOrientationMode(SyncedValue::create(0));
 }
 
@@ -154,6 +154,17 @@ void ViewManager::initializeGlobal2DZoom()
 	for (unsigned i = 0; i < mViewGroups.size(); ++i)
 		mViewGroups[i]->getData()->initializeGlobal2DZoom(mGlobal2DZoomVal);
 }
+
+void ViewManager::initializeActiveView()
+{
+	mActiveView = SyncedValue::create("");
+	connect(mActiveView.get(), SIGNAL(changed()), this, SIGNAL(activeViewChanged()));
+
+	for (unsigned i = 0; i < mViewGroups.size(); ++i)
+		mViewGroups[i]->initializeActiveView(mActiveView);
+}
+
+
 
 NavigationPtr ViewManager::getNavigation()
 {
@@ -251,7 +262,7 @@ ViewWrapperPtr ViewManager::getActiveView() const
 {
 	for (unsigned i = 0; i < mViewGroups.size(); ++i)
 	{
-		ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(mActiveView);
+		ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(mActiveView->get().value<QString>());
 		if (viewWrapper)
 		{
 			return viewWrapper;
@@ -262,20 +273,22 @@ ViewWrapperPtr ViewManager::getActiveView() const
 
 void ViewManager::setActiveView(QString uid)
 {
-	if (mActiveView == uid)
-		return;
-	mActiveView = uid;
+	mActiveView->set(uid);
+//	if (mActiveView == uid)
+//		return;
+//	mActiveView = uid;
 
-	emit activeViewChanged();
+//	emit activeViewChanged();
 }
 
 int ViewManager::getActiveViewGroup() const
 {
 	int retval = -1;
+	QString activeView = mActiveView->value<QString>();
 
 	for (unsigned i = 0; i < mViewGroups.size(); ++i)
 	{
-		ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(mActiveView);
+		ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(activeView);
 		if (viewWrapper)
 			retval = i;
 	}
@@ -297,7 +310,7 @@ void ViewManager::addXml(QDomNode& parentNode)
 	XMLNodeAdder base(parent.addElement("viewManager"));
 
 	base.addTextToElement("global2DZoom", qstring_cast(mGlobal2DZoomVal->get().toDouble()));
-	base.addTextToElement("activeView", mActiveView);
+	base.addTextToElement("activeView", mActiveView->value<QString>());
 
 	QDomElement slicePlanes3DNode = base.addElement("slicePlanes3D");
 	slicePlanes3DNode.setAttribute("use", mSlicePlanesProxy->getVisible());

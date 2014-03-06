@@ -189,13 +189,15 @@ protected:
 	void activateViews(LayoutWidget *widget, LayoutData next);
 	void rebuildLayouts();
 	void initializeGlobal2DZoom();
+	void initializeActiveView();
 
 	static ViewManager* mTheInstance; ///< the only instance of this class
 
 	LayoutRepositoryPtr mLayoutRepository;
 	std::vector<QPointer<LayoutWidget> > mLayoutWidgets;
 	QStringList mActiveLayout; ///< the active layout (type)
-	QString mActiveView; ///< the active view
+//	QString mActiveView; ///< the active view
+	SyncedValuePtr mActiveView;
 	RenderLoopPtr mRenderLoop;
 	std::vector<ViewGroupPtr> mViewGroups;
 	CameraControlPtr mCameraControl;
