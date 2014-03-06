@@ -76,6 +76,7 @@ VideoService::VideoService(VideoServiceBackendPtr videoBackend)
 
 	connect(mVideoConnection.get(), SIGNAL(connected(bool)), this, SLOT(autoSelectActiveVideoSource()));
 	connect(mVideoConnection.get(), SIGNAL(videoSourcesChanged()), this, SLOT(autoSelectActiveVideoSource()));
+	connect(mVideoConnection.get(), SIGNAL(fps(QString, int)), this, SLOT(fpsSlot(QString, int)));
 	connect(mBackend->getToolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(autoSelectActiveVideoSource()));
 }
 
@@ -199,6 +200,13 @@ std::vector<VideoSourcePtr> VideoService::getVideoSources()
 		retval.push_back(mUSAcquisitionVideoPlayback->getVideoSource());
 	return retval;
 }
+
+void VideoService::fpsSlot(QString source, int val)
+{
+	if (source==mActiveVideoSource->getUid())
+		emit fps(val);
+}
+
 
 //---------------------------------------------------------
 //---------------------------------------------------------

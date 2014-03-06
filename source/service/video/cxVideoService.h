@@ -104,6 +104,7 @@ signals:
 	  * OR when the available set of sources are changed.
 	  */
 	void activeVideoSourceChanged();
+	void fps(int);
 
 private slots:
 	/** Autoselect the active VideoSource
@@ -113,6 +114,8 @@ private slots:
 	  * autoGuessVideoSource().
 	  */
 	void autoSelectActiveVideoSource();
+	void fpsSlot(QString source, int val);
+
 private:
 	static VideoService* mInstance;
 	static void setInstance(VideoService* instance);
