@@ -8,6 +8,7 @@
 #include "cxStateService.h"
 #include "cxApplicationStateMachine.h"
 #include "cxVLCRecorder.h"
+#include "cxDataAdapterHelper.h"
 
 namespace cx
 {
@@ -55,6 +56,11 @@ void GeneralTab::init()
   connect(mChooseApplicationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(currentApplicationChangedSlot(int)));
   this->applicationStateChangedSlot();
 
+  bool filterToolPositions = settings()->value("TrackingPositionFilter/enabled").value<bool>();
+  mFilterToolPositions = BoolDataAdapterXml::initialize("Tool smoothing", "",
+												 "Smooth the tool tracking positions using a low-pass filter.",
+												 filterToolPositions);
+
   // Layout
   QGridLayout *mainLayout = new QGridLayout;
   mainLayout->addWidget(patientDataFolderLabel, 0, 0);
@@ -68,6 +74,8 @@ void GeneralTab::init()
   mainLayout->addWidget(mVLCPathComboBox, 2, 1);
   mainLayout->addWidget(browseVLCPathButton, 2, 2);
 
+  createDataWidget(this, mFilterToolPositions, mainLayout, 3);
+//  mainLayout->addWidget(createDataWidget(this, mFilterToolPositions ));
 
   mTopLayout->addLayout(mainLayout);
 }
@@ -145,6 +153,7 @@ void GeneralTab::saveParametersSlot()
 {
   settings()->setValue("globalPatientDataFolder", mGlobalPatientDataFolder);
   settings()->setValue("vlcPath", mVLCPath);
+  settings()->setValue("TrackingPositionFilter/enabled", mFilterToolPositions->getValue());
   settings()->sync();
 
   emit savedParameters();

@@ -19,6 +19,7 @@
 namespace cx
 {
 class ToolManager;
+typedef boost::shared_ptr<class TrackingPositionFilter> TrackingPositionFilterPtr;
 
 /** \brief Common functionality for Tool subclasses
  *
@@ -38,13 +39,16 @@ public:
 	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime);
 	virtual Transform3D get_prMt() const;
 
+	void resetTrackingPositionFilter(TrackingPositionFilterPtr filter);
+
 protected:
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
 	TimedTransformMapPtr mPositionHistory;
 	ToolManager* mManager;
+	Transform3D m_prMt; ///< the transform from the tool to the patient reference
+	TrackingPositionFilterPtr mTrackingPositionFilter;
 private slots:
 private:
-	Transform3D m_prMt; ///< the transform from the tool to the patient reference
 };
 
 
