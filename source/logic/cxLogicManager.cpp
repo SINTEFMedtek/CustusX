@@ -19,10 +19,10 @@
 #include "sscGPUImageBuffer.h"
 #include "cxSettings.h"
 #include "cxSpaceProviderImpl.h"
-//#include "sscDataReaderWriter.h"
 #include "cxDataFactory.h"
 #include "cxVisualizationServiceBackend.h"
 #include "cxVideoServiceBackend.h"
+#include "cxStateServiceBackend.h"
 
 namespace cx
 {
@@ -81,7 +81,13 @@ void LogicManager::initializeServices()
 													cx::VideoService::getInstance(),
 													mSpaceProvider));
 	cx::ViewManager::createInstance(vsBackend);
-	cx::StateService::getInstance();
+
+	StateServiceBackendPtr ssBackend;
+	ssBackend.reset(new StateServiceBackend(cx::DataManager::getInstance(),
+													cx::ToolManager::getInstance(),
+													cx::VideoService::getInstance(),
+													mSpaceProvider));
+	cx::StateService::createInstance(ssBackend);
 	// init stateservice....
 
 	mServiceController.reset(new ServiceController);

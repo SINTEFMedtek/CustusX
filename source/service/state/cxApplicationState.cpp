@@ -28,6 +28,7 @@
 #include "cxPatientService.h"
 #include "cxToolManager.h"
 #include "cxWorkflowStateMachine.h"
+#include "cxStateServiceBackend.h"
 
 namespace cx
 {
@@ -42,6 +43,11 @@ ApplicationState::~ApplicationState()
 {
 }
 
+void ApplicationState::setBackend(StateServiceBackendPtr backend)
+{
+	mBackend = backend;
+}
+
 void ApplicationState::onEntry(QEvent * event)
 {
 	mActive = true;
@@ -49,7 +55,7 @@ void ApplicationState::onEntry(QEvent * event)
 	if (mAction)
 		mAction->setChecked(true);
 
-	dataManager()->setClinicalApplication(this->getClinicalApplication());
+	mBackend->getDataManager()->setClinicalApplication(this->getClinicalApplication());
 	if (stateService()->getWorkflow())
 		stateService()->getWorkflow()->setActiveState("PatientDataUid");
 	patientService()->getPatientData()->clearPatient();
