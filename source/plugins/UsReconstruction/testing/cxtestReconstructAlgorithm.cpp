@@ -24,7 +24,6 @@
 
 #ifdef CX_USE_OPENCL_UTILITY
 #include "TordReconstruct/TordTest.h"
-#include "cxOpenCLUtilities.h"
 #endif
 
 #include "sscMessageManager.h"

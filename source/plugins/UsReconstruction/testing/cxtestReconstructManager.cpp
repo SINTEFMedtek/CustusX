@@ -227,35 +227,35 @@ TEST_CASE("ReconstructManager: TordTest on real data", "[usreconstruction][integ
 	algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
 	algorithm->getMaxPlanesOption(algo)->setValue(1);
 	algorithm->getNStartsOption(algo)->setValue(1);
-//	SECTION("VNN2")
-//	{
-//		algorithm->getMethodOption(algo)->setValue("VNN2");
-//		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-//		algorithm->getMaxPlanesOption(algo)->setValue(8);
-//	}
-//	SECTION("DW")
-//	{
-//		algorithm->getMethodOption(algo)->setValue("DW");
-//		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-//		algorithm->getMaxPlanesOption(algo)->setValue(8);
-//	}
-//	SECTION("Anisotropic")
-//	{
-//		algorithm->getMethodOption(algo)->setValue("Anisotropic");
-//		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-//		algorithm->getMaxPlanesOption(algo)->setValue(8);
-//	}
-//	SECTION("Multistart search")
-//	{
-//		algorithm->getMethodOption(algo)->setValue("VNN");
-//		algorithm->getNStartsOption(algo)->setValue(5);
-//	}
-//	SECTION("Closest")
-//	{
-//		algorithm->getMethodOption(algo)->setValue("VNN");
-//		algorithm->getPlaneMethodOption(algo)->setValue("Closest");
-//		algorithm->getMaxPlanesOption(algo)->setValue(8);
-//	}
+	SECTION("VNN2")
+	{
+		algorithm->getMethodOption(algo)->setValue("VNN2");
+		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(algo)->setValue(8);
+	}
+	SECTION("DW")
+	{
+		algorithm->getMethodOption(algo)->setValue("DW");
+		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(algo)->setValue(8);
+	}
+	SECTION("Anisotropic")
+	{
+		algorithm->getMethodOption(algo)->setValue("Anisotropic");
+		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(algo)->setValue(8);
+	}
+	SECTION("Multistart search")
+	{
+		algorithm->getMethodOption(algo)->setValue("VNN");
+		algorithm->getNStartsOption(algo)->setValue(5);
+	}
+	SECTION("Closest")
+	{
+		algorithm->getMethodOption(algo)->setValue("VNN");
+		algorithm->getPlaneMethodOption(algo)->setValue("Closest");
+		algorithm->getMaxPlanesOption(algo)->setValue(8);
+	}
 
 	// run the reconstruction in the main thread
 	fixture.reconstruct();
