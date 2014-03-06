@@ -56,9 +56,6 @@ void ApplicationState::onEntry(QEvent * event)
 		mAction->setChecked(true);
 
 	mBackend->getDataManager()->setClinicalApplication(this->getClinicalApplication());
-	if (stateService()->getWorkflow())
-		stateService()->getWorkflow()->setActiveState("PatientDataUid");
-	patientService()->getPatientData()->clearPatient();
 }
 
 void ApplicationState::onExit(QEvent * event)

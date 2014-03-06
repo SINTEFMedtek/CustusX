@@ -18,6 +18,8 @@
 #include <QToolBar>
 #include "cxWorkflowState.h"
 #include "cxRequestEnterStateTransition.h"
+#include "cxStateServiceBackend.h"
+#include "sscDataManager.h"
 
 namespace cx
 {
@@ -40,6 +42,13 @@ WorkflowStateMachine::WorkflowStateMachine(StateServiceBackendPtr backend) : mBa
 	//set initial state on all levels
 	this->setInitialState(mParentState);
 	mParentState->setInitialState(patientData);
+
+	connect(mBackend->getDataManager(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
+}
+
+void WorkflowStateMachine::clinicalApplicationChangedSlot()
+{
+	this->setActiveState("PatientDataUid");
 }
 
 void WorkflowStateMachine::startedSlot()

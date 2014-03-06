@@ -97,7 +97,7 @@ void WorkflowState::autoStartHardware()
 NavigationWorkflowState::NavigationWorkflowState(QState* parent, StateServiceBackendPtr backend) :
 				WorkflowState(parent, "NavigationUid", "Navigation", backend)
 {
-	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
+	connect(mBackend->getPatientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
 }
 
 void NavigationWorkflowState::onEntry(QEvent * event)
@@ -107,7 +107,7 @@ void NavigationWorkflowState::onEntry(QEvent * event)
 
 bool NavigationWorkflowState::canEnter() const
 {
-	return patientService()->getPatientData()->isPatientValid();
+	return mBackend->getPatientService()->getPatientData()->isPatientValid();
 }
 
 // --------------------------------------------------------
@@ -119,7 +119,7 @@ bool NavigationWorkflowState::canEnter() const
 RegistrationWorkflowState::RegistrationWorkflowState(QState* parent, StateServiceBackendPtr backend) :
 				WorkflowState(parent, "RegistrationUid", "Registration", backend)
 {
-	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
+	connect(mBackend->getPatientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
 }
 ;
 
@@ -127,7 +127,7 @@ bool RegistrationWorkflowState::canEnter() const
 {
 // We need to perform patient orientation prior to
 // running and us acq. Thus we need access to the reg mode.
-	return patientService()->getPatientData()->isPatientValid();
+	return mBackend->getPatientService()->getPatientData()->isPatientValid();
 }
 ;
 
@@ -157,7 +157,7 @@ bool PreOpPlanningWorkflowState::canEnter() const
 IntraOpImagingWorkflowState::IntraOpImagingWorkflowState(QState* parent, StateServiceBackendPtr backend) :
 				WorkflowState(parent, "IntraOpImagingUid", "Intraoperative Imaging", backend)
 {
-	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
+	connect(mBackend->getPatientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
 }
 
 void IntraOpImagingWorkflowState::onEntry(QEvent * event)
@@ -167,7 +167,7 @@ void IntraOpImagingWorkflowState::onEntry(QEvent * event)
 
 bool IntraOpImagingWorkflowState::canEnter() const
 {
-	return patientService()->getPatientData()->isPatientValid();
+	return mBackend->getPatientService()->getPatientData()->isPatientValid();
 }
 
 // --------------------------------------------------------

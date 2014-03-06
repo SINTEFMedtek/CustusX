@@ -86,7 +86,8 @@ void LogicManager::initializeServices()
 	ssBackend.reset(new StateServiceBackend(cx::DataManager::getInstance(),
 													cx::ToolManager::getInstance(),
 													cx::VideoService::getInstance(),
-													mSpaceProvider));
+													mSpaceProvider,
+											cx::PatientService::getInstance()));
 	cx::StateService::createInstance(ssBackend);
 	// init stateservice....
 

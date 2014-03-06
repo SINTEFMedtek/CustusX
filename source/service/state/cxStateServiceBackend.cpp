@@ -17,18 +17,21 @@
 #include "sscDataManager.h"
 #include "sscToolManager.h"
 #include "cxSpaceProvider.h"
+#include "cxPatientService.h"
 
 namespace cx
 {
 
 StateServiceBackend::StateServiceBackend(DataManager* dataManager,
-														 ToolManager* toolManager,
-														 VideoService* videoService,
-														 SpaceProviderPtr spaceProvider) :
+										 ToolManager* toolManager,
+										 VideoService* videoService,
+										 SpaceProviderPtr spaceProvider,
+										 PatientService *patientService) :
 	mDataManager(dataManager),
 	mToolManager(toolManager),
 	mSpaceProvider(spaceProvider),
-  mVideoService(videoService)
+	mVideoService(videoService),
+	mPatientService(patientService)
 {
 
 }
@@ -51,6 +54,11 @@ VideoService* StateServiceBackend::getVideoService()
 SpaceProviderPtr StateServiceBackend::getSpaceProvider()
 {
 	return mSpaceProvider;
+}
+
+PatientService* StateServiceBackend::getPatientService()
+{
+	return mPatientService;
 }
 
 

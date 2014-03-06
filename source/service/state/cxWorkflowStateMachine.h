@@ -61,6 +61,7 @@ signals:
 
 private slots:
 	void startedSlot();
+	void clinicalApplicationChangedSlot();
 
 private:
 	void fillMenu(QMenu* menu, WorkflowState* current);
