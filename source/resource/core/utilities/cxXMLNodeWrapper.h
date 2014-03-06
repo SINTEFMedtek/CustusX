@@ -16,7 +16,7 @@
 
 #include <QDomNode>
 #include <QStringList>
-
+#include <vector>
 
 namespace cx
 {
@@ -32,7 +32,7 @@ class XMLNodeAdder
 public:
 	XMLNodeAdder(QDomNode node);
 
-	void addTextToElement(QString name, QString text);
+	QDomElement addTextToElement(QString name, QString text);
 
 	template<class T>
 	void addObjectToElement(QString name, T object)
@@ -62,6 +62,7 @@ public:
 	QString parseTextFromElement(QString name);
 	double parseDoubleFromElementWithDefault(QString name, double defaultValue);
 	QStringList parseTextFromDuplicateElements(QString name);
+	std::vector<QDomElement> getDuplicateElements(QString name);
 
 	template<class T>
 	void parseObjectFromElement(QString name, T object)

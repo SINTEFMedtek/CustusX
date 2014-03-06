@@ -131,7 +131,6 @@ private:
 	bool mTracked; ///< whether the tool is being tracked or not
 	ProbePtr mProbe;
 	QTimer mTpsTimer;
-
 };
 typedef boost::shared_ptr<cxTool> cxToolPtr;
 

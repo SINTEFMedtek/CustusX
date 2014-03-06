@@ -23,8 +23,8 @@
 #include <QAction>
 #include "vtkRenderer.h"
 #include "vtkCamera.h"
-#include "vtkSmartPointer.h"
-#include "cxViewManager.h"
+//#include "vtkSmartPointer.h"
+//#include "cxViewManager.h"
 #include "sscView.h"
 #include <QDomNode>
 #include "sscTypeConversions.h"
@@ -159,11 +159,16 @@ QAction* CameraControl::addStandard3DViewAction(QString caption, QString help, V
 	return action;
 }
 
+void CameraControl::setView(ViewWidgetQPtr view)
+{
+	mView = view;
+}
+
 vtkRendererPtr CameraControl::getRenderer() const
 {
-	if (!viewManager()->get3DView())
+	if (!mView)
 		return vtkRendererPtr();
-	return viewManager()->get3DView()->getRenderer();
+	return mView->getRenderer();
 }
 vtkCameraPtr CameraControl::getCamera() const
 {

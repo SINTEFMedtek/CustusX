@@ -212,7 +212,7 @@ void SelectedDataListWidget::userChangedListSlot()
     DataPtr current = dataManager()->getData(data[i]);
     if (!current)
       continue;
-    mViewGroupData->addData(current);
+	mViewGroupData->addData(current);
   }
 }
 
@@ -378,8 +378,7 @@ void SelectedDataListWidget::setViewGroupData(ViewGroupDataPtr viewGroupData)
   if (mViewGroupData)
   {
     disconnect(mViewGroupData.get(), SIGNAL(initialized()), this, SLOT(populateList()));
-    disconnect(mViewGroupData.get(), SIGNAL(dataAdded(QString)), this, SLOT(populateList()));
-    disconnect(mViewGroupData.get(), SIGNAL(dataRemoved(QString)), this, SLOT(populateList()));
+	disconnect(mViewGroupData.get(), SIGNAL(dataViewPropertiesChanged(QString)), this, SLOT(populateList()));
   }
 
   mViewGroupData = viewGroupData;
@@ -387,8 +386,7 @@ void SelectedDataListWidget::setViewGroupData(ViewGroupDataPtr viewGroupData)
   if (mViewGroupData)
   {
     connect(mViewGroupData.get(), SIGNAL(initialized()), this, SLOT(populateList()));
-    connect(mViewGroupData.get(), SIGNAL(dataAdded(QString)), this, SLOT(populateList()));
-    connect(mViewGroupData.get(), SIGNAL(dataRemoved(QString)), this, SLOT(populateList()));
+	connect(mViewGroupData.get(), SIGNAL(dataViewPropertiesChanged(QString)), this, SLOT(populateList()));
   }
 
   this->populateList();

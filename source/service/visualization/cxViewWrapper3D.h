@@ -79,6 +79,8 @@ public:
 	virtual void setViewGroup(ViewGroupDataPtr group);
 	void setStereoType(int type);
 
+protected slots:
+	virtual void dataViewPropertiesChangedSlot(QString uid);
 private slots:
 	void showSlices();
 	void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
@@ -109,14 +111,20 @@ private:
 
 	QAction* createSlicesAction(QString title, QWidget* parent);
 
+	void createSlicesActions(QWidget *parent);
+	QAction* createSlicesAction(PlaneTypeCollection planes, QWidget* parent);
+
 	void showLandmarks(bool on);
 	void showPointPickerProbe(bool on);
 	void setOrientationAnnotation();
 
 	RepPtr createDataRep3D(DataPtr data);
     DataMetricRepPtr createDataMetricRep3D(DataPtr data);
-    virtual void dataAdded(DataPtr data);
-	virtual void dataRemoved(const QString& uid);
+//    virtual void dataAdded(DataPtr data);
+//	virtual void dataRemoved(const QString& uid);
+
+	void addVolumeDataRep(DataPtr data);
+	void removeVolumeDataRep(QString uid);
 
 	void setTranslucentRenderingToDepthPeeling(bool setDepthPeeling);
 	void initializeMultiVolume3DRepProducer();
@@ -131,7 +139,7 @@ private:
 	DisplayTextRepPtr mDataNameText;
 //	DisplayTextRepPtr mMetricsText;
 	MetricNamesRepPtr mMetricNames;
-	QString mShowSlicesMode;
+//	QString mShowSlicesMode;
 	std::vector<AxisConnectorPtr> mAxis;
 
 	bool mShowAxes; ///< show 3D axes reps for all tools and ref space

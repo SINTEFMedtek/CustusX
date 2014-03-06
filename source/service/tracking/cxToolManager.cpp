@@ -41,6 +41,7 @@
 #include "cxPlaybackTool.h"
 #include "sscLogger.h"
 #include "cxPlaybackTime.h"
+#include "cxTrackingPositionFilter.h"
 
 namespace cx
 {
@@ -857,10 +858,31 @@ void cxToolManager::configureAfterDeconfigureSlot()
 
 void cxToolManager::globalConfigurationFileChangedSlot(QString key)
 {
-	if (key != "toolConfigFile")
-		return;
+	if (key == "toolConfigFile")
+	{
+		this->setConfigurationFile(DataLocations::getToolConfigFilePath());
+	}
+	if (key.contains("TrackingPositionFilter"))
+	{
+		this->resetTrackingPositionFilters();
+	}
+}
 
-	this->setConfigurationFile(DataLocations::getToolConfigFilePath());
+void cxToolManager::resetTrackingPositionFilters()
+{
+	bool enabled = settings()->value("TrackingPositionFilter/enabled", false).toInt();
+
+	for (ToolMap::iterator iter=mTools.begin(); iter!=mTools.end(); ++iter)
+	{
+		boost::shared_ptr<ToolImpl> tool;
+		tool = boost::dynamic_pointer_cast<ToolImpl>(iter->second);
+		if (!tool)
+			continue;
+		TrackingPositionFilterPtr filter;
+		if (enabled)
+			filter.reset(new TrackingPositionFilter());
+		tool->resetTrackingPositionFilter(filter);
+	}
 }
 
 void cxToolManager::dominantCheckSlot()
