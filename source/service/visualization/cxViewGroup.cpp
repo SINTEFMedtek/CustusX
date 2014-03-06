@@ -194,7 +194,6 @@ void ViewGroup::removeViews()
 	mViews.clear();
 	mViewWrappers.clear();
 	mCameraStyle->clearViews();
-//  mSlicePlanesProxy->clearViewports();
 }
 
 ViewWrapperPtr ViewGroup::getViewWrapperFromViewUid(QString viewUid)
@@ -227,8 +226,8 @@ void ViewGroup::mouseClickInViewGroupSlot()
 	}
 
 	ViewWidgetQPtr view = static_cast<ViewWidget*>(this->sender());
-	if (view)
-		emit viewSelected(view->getUid());
+	if (view && mActiveView)
+		mActiveView->set(view->getUid());
 }
 
 std::vector<ViewWidgetQPtr> ViewGroup::getViews() const
@@ -241,17 +240,15 @@ void ViewGroup::activateManualToolSlot()
 	mBackend->getToolManager()->dominantCheckSlot();
 }
 
+void ViewGroup::initializeActiveView(SyncedValuePtr val)
+{
+	mActiveView = val;
+}
+
 
 void ViewGroup::addXml(QDomNode& dataNode)
 {
 	mViewGroupData->addXml(dataNode);
-//	XMLNodeAdder base(dataNode);
-
-//	std::vector<DataPtr> data = mViewGroupData->getData();
-//	for (unsigned i = 0; i < data.size(); ++i)
-//		base.addTextToElement("data", data[i]->getUid());
-
-//	base.addObjectToElement("camera3D", mViewGroupData->getCamera3D());
 }
 
 void ViewGroup::clearPatientData()
@@ -262,26 +259,7 @@ void ViewGroup::clearPatientData()
 void ViewGroup::parseXml(QDomNode dataNode)
 {
 	mViewGroupData->parseXml(dataNode);
-//	XMLNodeParser base(dataNode);
-
-//	QStringList dataUids = base.parseTextFromDuplicateElements("data");
-//	for (unsigned i=0; i<dataUids.size(); ++i)
-//	{
-//		QString uid = dataUids[i];
-//		DataPtr data = mBackend->getDataManager()->getData(uid);
-
-//		mViewGroupData->addData(data);
-//		if (!data)
-//			messageManager()->sendError("Couldn't find the data: [" + uid + "] in the datamanager.");
-//	}
-
-//	base.parseObjectFromElement("camera3D", mViewGroupData->getCamera3D());
 }
-
-//std::vector<ImagePtr> ViewGroup::getImages()
-//{
-//	return mViewGroupData->getImages();
-//}
 
 bool ViewGroup::contains3DView() const
 {

@@ -59,6 +59,8 @@ public:
 	static SyncedValuePtr create(QVariant val = QVariant());
 	void set(QVariant val);
 	QVariant get() const;
+	template<class T>
+	T value() const { return this->get().value<T>(); }
 private:
 	QVariant mValue;
 signals:
