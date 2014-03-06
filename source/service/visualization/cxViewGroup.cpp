@@ -56,8 +56,6 @@ void Navigation::centerToData(DataPtr image)
 
 	// set center to calculated position
 	mBackend->getDataManager()->setCenter(p_r);
-	CameraControl().translateByFocusTo(p_r);
-	this->centerManualTool(p_r);
 }
 
 /**Place the global center to the mean center of
@@ -70,9 +68,6 @@ void Navigation::centerToView(const std::vector<DataPtr>& images)
 
 	// set center to calculated position
 	mBackend->getDataManager()->setCenter(p_r);
-	CameraControl().translateByFocusTo(p_r);
-	this->centerManualTool(p_r);
-//  std::cout << "Centered to view." << std::endl;
 }
 
 /**Place the global center to the mean center of
@@ -87,9 +82,6 @@ void Navigation::centerToGlobalDataCenter()
 
 	// set center to calculated position
 	mBackend->getDataManager()->setCenter(p_r);
-	CameraControl().translateByFocusTo(p_r);
-	this->centerManualTool(p_r);
-//  std::cout << "Centered to all images." << std::endl;
 }
 
 /**Place the global center at the current position of the
@@ -103,7 +95,6 @@ void Navigation::centerToTooltip()
 
 	// set center to calculated position
 	mBackend->getDataManager()->setCenter(p_r);
-	CameraControl().translateByFocusTo(p_r);
 }
 
 /**Find the center of all images in the view(wrapper), defined as the mean of
@@ -143,7 +134,7 @@ Vector3D Navigation::findDataCenter(std::vector<DataPtr> data)
 	return bb_sigma.center();
 }
 
-void Navigation::centerManualTool(Vector3D& p_r)
+void Navigation::moveManualToolToPosition(Vector3D& p_r)
 {
 	// move the manual tool to the same position. (this is a side effect... do we want it?)
 	ManualToolPtr manual = mBackend->getToolManager()->getManualTool();
@@ -152,7 +143,8 @@ void Navigation::centerManualTool(Vector3D& p_r)
 	Vector3D t_pr = prM0t.coord(Vector3D(0, 0, manual->getTooltipOffset()));
 	Transform3D prM1t = createTransformTranslate(p_pr - t_pr) * prM0t;
 
-	manual->set_prMt(prM1t);
+	if (!similar(prM1t, prM0t))
+		manual->set_prMt(prM1t);
 //  std::cout << "center manual tool" << std::endl;
 }
 //---------------------------------------------------------
@@ -236,7 +228,7 @@ void ViewGroup::mouseClickInViewGroupSlot()
 
 	ViewWidgetQPtr view = static_cast<ViewWidget*>(this->sender());
 	if (view)
-		viewManager()->setActiveView(view->getUid());
+		emit viewSelected(view->getUid());
 }
 
 std::vector<ViewWidgetQPtr> ViewGroup::getViews() const
