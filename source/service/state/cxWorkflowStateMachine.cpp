@@ -37,26 +37,6 @@ WorkflowStateMachine::WorkflowStateMachine(StateServiceBackendPtr backend) : mBa
 	this->newState(new IntraOpImagingWorkflowState(mParentState, mBackend));
 	this->newState(new PostOpControllWorkflowState(mParentState, mBackend));
 
-//	WorkflowState* patientData = this->newState(new PatientDataWorkflowState(mParentState, mBackend));
-//	WorkflowState* registration = this->newState(new RegistrationWorkflowState(mParentState, mBackend));
-//	WorkflowState* preOpPlanning = this->newState(new PreOpPlanningWorkflowState(mParentState, mBackend));
-//	WorkflowState* navigation = this->newState(new NavigationWorkflowState(mParentState, mBackend));
-//	WorkflowState* intraOpImaging = this->newState(new IntraOpImagingWorkflowState(mParentState, mBackend));
-//	WorkflowState* postOpControll = this->newState(new PostOpControllWorkflowState(mParentState, mBackend));
-
-//	connect(patientData, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
-//	connect(registration, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
-//	connect(preOpPlanning, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
-//	connect(navigation, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
-//	connect(intraOpImaging, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
-//	connect(postOpControll, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
-
-//	Q_UNUSED(registration);
-//	Q_UNUSED(preOpPlanning);
-//	Q_UNUSED(navigation);
-//	Q_UNUSED(intraOpImaging);
-//	Q_UNUSED(postOpControll);
-
 	//set initial state on all levels
 	this->setInitialState(mParentState);
 	mParentState->setInitialState(patientData);
