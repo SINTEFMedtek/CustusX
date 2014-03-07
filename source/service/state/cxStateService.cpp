@@ -144,33 +144,41 @@ private:
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
-StateService *StateService::mTheInstance = NULL;
-StateService* stateService()
+StateServicePtr StateService::create(StateServiceBackendPtr backend)
 {
-	return StateService::getInstance();
+	StateServicePtr retval;
+	retval.reset(new StateService());
+	retval->initialize(backend);
+	return retval;
 }
 
-StateService* StateService::createInstance(StateServiceBackendPtr backend)
-{
-	if (mTheInstance == NULL)
-	{
-		mTheInstance = new StateService();
-		mTheInstance->initialize(backend);
-	}
-	return mTheInstance;
-}
+//StateService *StateService::mTheInstance = NULL;
+//StateService* stateService()
+//{
+//	return StateService::getInstance();
+//}
+
+//StateService* StateService::createInstance(StateServiceBackendPtr backend)
+//{
+//	if (mTheInstance == NULL)
+//	{
+//		mTheInstance = new StateService();
+//		mTheInstance->initialize(backend);
+//	}
+//	return mTheInstance;
+//}
 
 
-StateService* StateService::getInstance()
-{
-	return mTheInstance;
-}
+//StateService* StateService::getInstance()
+//{
+//	return mTheInstance;
+//}
 
-void StateService::destroyInstance()
-{
-	delete mTheInstance;
-	mTheInstance = NULL;
-}
+//void StateService::destroyInstance()
+//{
+//	delete mTheInstance;
+//	mTheInstance = NULL;
+//}
 
 StateService::StateService()
 {

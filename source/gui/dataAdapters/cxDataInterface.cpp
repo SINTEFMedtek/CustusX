@@ -178,7 +178,7 @@ QString SelectRTSourceStringDataAdapterBase::convertInternal2Display(QString int
 
 ActiveVideoSourceStringDataAdapter::ActiveVideoSourceStringDataAdapter()
 {
-	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SIGNAL(changed()));
+	connect(videoService().get(), SIGNAL(activeVideoSourceChanged()), this, SIGNAL(changed()));
 }
 
 QString ActiveVideoSourceStringDataAdapter::getValueName() const

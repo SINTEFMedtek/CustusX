@@ -61,9 +61,10 @@ public:
 
 //  SpaceProviderPtr getSpaceProvider();
   DataFactoryPtr getDataFactory();
-  PatientServicePtr getPatientService();
+  DataServicePtr getDataService();
   TrackingServicePtr getTrackingService();
   SpaceProviderPtr getSpaceProvider();
+  PatientServicePtr getPatientService();
   VideoServicePtr getVideoService();
   VisualizationServicePtr getVisualizationService();
   StateServicePtr getStateService();
@@ -83,6 +84,7 @@ private:
 
   void createTrackingService();
   void createPatientService();
+  void createDataService();
   void createDataFactory();
   void createSpaceProvider();
   void createVideoService();
@@ -90,6 +92,15 @@ private:
   void createStateService();
 
   void createInterconnectedDataAndSpace();
+  template <class T>
+  void checkUseCountBeforeDesctruction(const boost::shared_ptr<T>& object, QString text);
+
+  void shutdownStateService();
+  void shutdownVisualizationService();
+  void shutdownVideoService();
+  void shutdownPatientService();
+  void shutdownInterconnectedDataAndSpace();
+  void shutdownTrackingService();
 
   static LogicManager* mInstance;
   static void setInstance(LogicManager* instance);

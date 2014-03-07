@@ -119,7 +119,6 @@ public:
 	virtual LandmarksPtr getPatientLandmarks() = 0;
 
 	virtual bool getDebugMode() const = 0;
-	virtual void setDebugMode(bool on) = 0;
 
 signals:
 	void centerChanged(); ///< emitted when center is changed.
@@ -130,6 +129,9 @@ signals:
 	void streamLoaded();
 	void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
 	void debugModeChanged(bool on);
+
+public slots:
+	virtual void setDebugMode(bool on) = 0;
 
 protected:
 //	static void setInstance(DataServicePtr instance);

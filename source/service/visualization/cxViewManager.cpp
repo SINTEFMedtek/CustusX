@@ -61,30 +61,37 @@
 namespace cx
 {
 
-ViewManager *ViewManager::mTheInstance = NULL;
-ViewManager* viewManager()
+VisualizationServicePtr ViewManager::create(VisualizationServiceBackendPtr backend)
 {
-	return ViewManager::getInstance();
-}
-ViewManager* ViewManager::getInstance()
-{
-	return mTheInstance;
+	VisualizationServicePtr retval;
+	retval.reset(new ViewManager(backend));
+	return retval;
 }
 
-ViewManager* ViewManager::createInstance(VisualizationServiceBackendPtr backend)
-{
-	if (mTheInstance == NULL)
-	{
-		mTheInstance = new ViewManager(backend);
-		}
-	return mTheInstance;
-}
+//ViewManager *ViewManager::mTheInstance = NULL;
+//ViewManager* viewManager()
+//{
+//	return ViewManager::getInstance();
+//}
+//ViewManager* ViewManager::getInstance()
+//{
+//	return mTheInstance;
+//}
 
-void ViewManager::destroyInstance()
-{
-	delete mTheInstance;
-	mTheInstance = NULL;
-}
+//ViewManager* ViewManager::createInstance(VisualizationServiceBackendPtr backend)
+//{
+//	if (mTheInstance == NULL)
+//	{
+//		mTheInstance = new ViewManager(backend);
+//		}
+//	return mTheInstance;
+//}
+
+//void ViewManager::destroyInstance()
+//{
+//	delete mTheInstance;
+//	mTheInstance = NULL;
+//}
 
 ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 				mGlobalObliqueOrientation(false)

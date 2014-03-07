@@ -71,8 +71,8 @@ DummyTool::DummyTool(TrackingServicePtr manager, const QString& uid) :
 	mPolyData = this->createPolyData(150, 15, 4, 2);
 
 	connect(mTimer.get(), SIGNAL(timeout()),this, SLOT(sendTransform()));
-	if (mManager)
-		connect(mManager.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
+	if (this->getTrackingService())
+		connect(this->getTrackingService().get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }
 
 DummyTool::~DummyTool()
@@ -371,18 +371,18 @@ void DummyTool::set_prMt(const Transform3D& prMt)
 	ToolImpl::set_prMt(prMt, timestamp);
 }
 
-double DummyTool::getTooltipOffset() const 
-{
-	if (mManager)
-		return mManager->getTooltipOffset();
-	return 0;
-}
+//double DummyTool::getTooltipOffset() const
+//{
+//	if (this->getTrackingService())
+//		return this->getTrackingService()->getTooltipOffset();
+//	return 0;
+//}
 
-void DummyTool::setTooltipOffset(double val) 
-{ 
-	if (mManager)
-		mManager->setTooltipOffset(val);
-}
+//void DummyTool::setTooltipOffset(double val)
+//{
+//	if (this->getTrackingService())
+//		this->getTrackingService()->setTooltipOffset(val);
+//}
 
 Transform3D DummyTool::getCalibration_sMt() const
 {

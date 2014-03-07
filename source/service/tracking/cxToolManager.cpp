@@ -51,18 +51,12 @@ cxToolManager::cxToolManagerPtr cxToolManager::create()
 	cxToolManagerPtr retval;
 	retval.reset(new cxToolManager());
 	retval->mSelf = retval;
+
+	retval->initializeManualTool(); // do this after setting self.
+	retval->setDominantTool("ManualTool");
+
 	return retval;
 }
-
-//void cxToolManager::initializeObject()
-//{
-//	ToolManager::setInstance(new cxToolManager());
-//}
-
-//cxTrackingServicePtr cxToolManager::getInstance()
-//{
-//	return dynamic_cast<cxTrackingServicePtr>(ToolManager::getInstance());
-//}
 
 QStringList cxToolManager::getSupportedTrackingSystems()
 {
@@ -82,10 +76,6 @@ cxToolManager::cxToolManager() :
 				mToolTipOffset(0)
 {
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
-
-	this->initializeManualTool();
-	this->setDominantTool("ManualTool");
-
 	// initialize config file
 	this->setConfigurationFile(DataLocations::getToolConfigFilePath());
 }

@@ -118,10 +118,12 @@ class StateService: public QObject
 Q_OBJECT
 
 public:
+	static StateServicePtr create(StateServiceBackendPtr backend);
+	virtual ~StateService();
 
-	static StateService* createInstance(StateServiceBackendPtr backend);
-	static StateService* getInstance(); ///< returns the only instance of this class
-	static void destroyInstance(); ///< destroys the only instance of this class
+//	static StateService* createInstance(StateServiceBackendPtr backend);
+//	static StateService* getInstance(); ///< returns the only instance of this class
+//	static void destroyInstance(); ///< destroys the only instance of this class
 
 	QString getVersionName();
 
@@ -136,7 +138,6 @@ public:
 
 private:
 	StateService();
-	virtual ~StateService();
 
 	void initialize(StateServiceBackendPtr backend); ///< init stuff that is dependent of the statemanager
 	void fillDefaultSettings();
@@ -148,7 +149,7 @@ private:
 	QStringList checkGrabberServerExist(QString path, QString filename, QString args);
 	QString getDefaultGrabberInitScript();
 
-	static StateService* mTheInstance; ///< the only instance of this class
+//	static StateService* mTheInstance; ///< the only instance of this class
 
 	WorkflowStateMachinePtr mWorkflowStateMachine;
 	ApplicationStateMachinePtr mApplicationStateMachine;
@@ -156,7 +157,7 @@ private:
 
 };
 
-StateService* stateService();
+//StateService* stateService();
 
 /**
  * @}

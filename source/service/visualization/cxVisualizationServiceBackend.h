@@ -37,19 +37,19 @@ class VisualizationServiceBackend
 public:
 	VisualizationServiceBackend(DataServicePtr dataManager,
 								TrackingServicePtr toolManager,
-								VideoService* videoService,
+								VideoServicePtr videoService,
 								SpaceProviderPtr spaceProvider);
 
 	DataServicePtr getDataManager();
 	TrackingServicePtr getToolManager();
-	VideoService* getVideoService();
+	VideoServicePtr getVideoService();
 	SpaceProviderPtr getSpaceProvider();
 
 private:
 	DataServicePtr mDataManager;
 	TrackingServicePtr mToolManager;
 	SpaceProviderPtr mSpaceProvider;
-	VideoService* mVideoService;
+	VideoServicePtr mVideoService;
 };
 
 

@@ -174,8 +174,8 @@ public:
 	void set_prMt(const Transform3D& ptMt);
 	void setVisible(bool val);
 
-	virtual double getTooltipOffset() const;
-	virtual void setTooltipOffset(double val);
+//	virtual double getTooltipOffset() const;
+//	virtual void setTooltipOffset(double val);
 	virtual Transform3D getCalibration_sMt() const;
 
 	virtual std::map<int, Vector3D> getReferencePoints() const {return std::map<int, Vector3D>();};
