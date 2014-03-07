@@ -11,6 +11,7 @@
 #include <QListWidget>
 //#include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
+#include "cxLegacySingletons.h"
 class QLabel;
 
 namespace cx

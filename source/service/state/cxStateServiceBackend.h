@@ -37,24 +37,24 @@ typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 class StateServiceBackend
 {
 public:
-	StateServiceBackend(DataManager* dataManager,
+	StateServiceBackend(DataServicePtr dataManager,
 								TrackingServicePtr toolManager,
 								VideoService* videoService,
 								SpaceProviderPtr spaceProvider,
-						PatientService* patientService);
+						PatientServicePtr patientService);
 
-	DataManager* getDataManager();
+	DataServicePtr getDataManager();
 	TrackingServicePtr getToolManager();
 	VideoService* getVideoService();
 	SpaceProviderPtr getSpaceProvider();
-	PatientService* getPatientService();
+	PatientServicePtr getPatientService();
 
 private:
-	DataManager* mDataManager;
+	DataServicePtr mDataManager;
 	TrackingServicePtr mToolManager;
 	SpaceProviderPtr mSpaceProvider;
 	VideoService* mVideoService;
-	PatientService* mPatientService;
+	PatientServicePtr mPatientService;
 };
 
 

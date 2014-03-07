@@ -24,6 +24,7 @@
 #include "sscReconstructedOutputVolumeParams.h"
 #include "sscReconstructCore.h"
 #include "cxUSReconstructInputData.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {

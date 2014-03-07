@@ -22,7 +22,7 @@
 namespace cx
 {
 
-DonutMetric::DonutMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+DonutMetric::DonutMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 				DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "position" << "direction"));
@@ -33,7 +33,7 @@ DonutMetric::DonutMetric(const QString& uid, const QString& name, DataManager* d
 	mFlat = true;
 }
 
-DonutMetricPtr DonutMetric::create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider)
+DonutMetricPtr DonutMetric::create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
 	return DonutMetricPtr(new DonutMetric(uid, name, dataManager, spaceProvider));
 }

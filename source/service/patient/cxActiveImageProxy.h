@@ -43,11 +43,11 @@ class ActiveImageProxy: public QObject
 {
 Q_OBJECT
 public:
-	static ActiveImageProxyPtr New(DataManager *dataManager)
+	static ActiveImageProxyPtr New(DataServicePtr dataManager)
 	{
 		return ActiveImageProxyPtr(new ActiveImageProxy(dataManager));
 	}
-	ActiveImageProxy(DataManager *dataManager);
+	ActiveImageProxy(DataServicePtr dataManager);
 
 signals:
 	void activeImageChanged(const QString& uid); ///< The original image changed signal from DataManager
@@ -66,7 +66,7 @@ private slots:
 	void activeImageChangedSlot(const QString&);
 private:
 	ImagePtr mImage;
-	DataManager* mDataManager;
+	DataServicePtr mDataManager;
 };
 
 /**

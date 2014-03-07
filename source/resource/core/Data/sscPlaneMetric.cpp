@@ -28,14 +28,14 @@
 namespace cx
 {
 
-PlaneMetric::PlaneMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+PlaneMetric::PlaneMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 	DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "position" << "direction"));
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 }
 
-PlaneMetricPtr PlaneMetric::create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider)
+PlaneMetricPtr PlaneMetric::create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
 	return PlaneMetricPtr(new PlaneMetric(uid, name, dataManager, spaceProvider));
 }

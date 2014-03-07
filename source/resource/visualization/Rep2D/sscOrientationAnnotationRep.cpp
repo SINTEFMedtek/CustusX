@@ -90,15 +90,15 @@ void OrientationAnnotation::SetTextActorsJustification()
 //---------------------------------------------------------
 
 
-OrientationAnnotationRep::OrientationAnnotationRep(DataManager* dataManager, const QString& uid, const QString& name) :
+OrientationAnnotationRep::OrientationAnnotationRep(DataServicePtr dataManager, const QString& uid, const QString& name) :
 	RepImpl(uid, name),
 	mDataManager(dataManager)
 {
 	mPlane = ptCOUNT;
-	connect(mDataManager, SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
+	connect(mDataManager.get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
 }
 
-OrientationAnnotationRepPtr OrientationAnnotationRep::New(DataManager* dataManager, const QString& uid,const QString& name)
+OrientationAnnotationRepPtr OrientationAnnotationRep::New(DataServicePtr dataManager, const QString& uid,const QString& name)
 {
 	OrientationAnnotationRepPtr retval(new OrientationAnnotationRep(dataManager, uid,name));
 	retval->mSelf = retval;

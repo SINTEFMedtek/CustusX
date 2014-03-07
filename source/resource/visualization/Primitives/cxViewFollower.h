@@ -35,14 +35,14 @@ class ViewFollower : public QObject
 {
 	Q_OBJECT
 public:
-	static ViewFollowerPtr create(DataManager* dataManager);
+	static ViewFollowerPtr create(DataServicePtr dataManager);
 	void setSliceProxy(SliceProxyPtr sliceProxy);
 	void setView(DoubleBoundingBox3D bb_s);
 
 private slots:
 	void ensureCenterWithinView();
 private:
-	explicit ViewFollower(DataManager* dataManager);
+	explicit ViewFollower(DataServicePtr dataManager);
 	Vector3D findCenterShift_s();
 	DoubleBoundingBox3D findStaticBox();
 	Vector3D findShiftFromBoxToTool_s(DoubleBoundingBox3D BB_s, Vector3D pt_s);
@@ -51,7 +51,7 @@ private:
 
 	SliceProxyPtr mSliceProxy;
 	DoubleBoundingBox3D mBB_s;
-	DataManager* mDataManager;
+	DataServicePtr mDataManager;
 private:
 };
 

@@ -16,6 +16,7 @@
 
 #include "sscStringDataAdapter.h"
 #include "cxForwardDeclarations.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {

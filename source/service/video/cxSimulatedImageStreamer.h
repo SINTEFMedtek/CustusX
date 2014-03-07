@@ -28,7 +28,7 @@ public:
 	SimulatedImageStreamer();
 	virtual ~SimulatedImageStreamer();
 
-	void initialize(ImagePtr image, ToolPtr tool, DataManager* dataManager);
+	void initialize(ImagePtr image, ToolPtr tool, DataServicePtr dataManager);
 	virtual bool startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
 
@@ -55,7 +55,7 @@ private:
 	ToolPtr mTool;
 	mutable ImagePtr mCachedImageToSend;
 	mutable vtkImageDataPtr mCachedMask;
-	DataManager* mDataManager;
+	DataServicePtr mDataManager;
 
 };
 typedef boost::shared_ptr<SimulatedImageStreamer> SimulatedImageStreamerPtr;

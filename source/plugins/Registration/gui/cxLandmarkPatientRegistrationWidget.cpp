@@ -51,7 +51,7 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(Registratio
 	mDominantToolProxy = DominantToolProxy::New(trackingService());
 	connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolSampleButton()));
 	connect(mDominantToolProxy.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateToolSampleButton()));
-	connect(cxDataManager::getInstance(), SIGNAL(debugModeChanged(bool)), this, SLOT(updateToolSampleButton()));
+	connect(dataManager(), SIGNAL(debugModeChanged(bool)), this, SLOT(updateToolSampleButton()));
 
 	//layout
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedDataAdapter));
@@ -99,7 +99,7 @@ void LandmarkPatientRegistrationWidget::updateToolSampleButton()
 	ToolPtr tool = toolManager()->getDominantTool();
 
 	bool enabled = false;
-	enabled = tool && tool->getVisible() && (!tool->hasType(Tool::TOOL_MANUAL) || cxDataManager::getInstance()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
+	enabled = tool && tool->getVisible() && (!tool->hasType(Tool::TOOL_MANUAL) || dataManager()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
 	mToolSampleButton->setEnabled(enabled);
 
 	if (toolManager()->getDominantTool())
@@ -146,7 +146,7 @@ void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
 	if (rep)
 	{
 		rep->setPrimarySource(mImageLandmarkSource);
-		rep->setSecondarySource(PatientLandmarksSource::New(dataManager()));
+		rep->setSecondarySource(PatientLandmarksSource::New(dataService()));
 		rep->setSecondaryColor(QColor::fromRgbF(0, 0.6, 0.8));
 	}
 }

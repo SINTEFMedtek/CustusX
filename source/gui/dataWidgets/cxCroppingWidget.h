@@ -5,6 +5,7 @@
 #include "sscStringDataAdapter.h"
 #include "cxViewManager.h"
 #include "cxBaseWidget.h"
+#include "cxLegacySingletons.h"
 
 #include "cxBoundingBoxWidget.h"
 

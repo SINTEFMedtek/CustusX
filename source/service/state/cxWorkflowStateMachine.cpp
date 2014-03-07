@@ -43,7 +43,7 @@ WorkflowStateMachine::WorkflowStateMachine(StateServiceBackendPtr backend) : mBa
 	this->setInitialState(mParentState);
 	mParentState->setInitialState(patientData);
 
-	connect(mBackend->getDataManager(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
+	connect(mBackend->getDataManager().get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
 }
 
 void WorkflowStateMachine::clinicalApplicationChangedSlot()

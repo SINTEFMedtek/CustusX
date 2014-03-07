@@ -98,7 +98,7 @@ ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 	mLayoutRepository.reset(new LayoutRepository());
 	mCameraControl.reset(new CameraControl());
 
-	connect(mBackend->getDataManager(), SIGNAL(centerChanged()), this, SLOT(globalCenterChangedSlot()));
+	connect(mBackend->getDataManager().get(), SIGNAL(centerChanged()), this, SLOT(globalCenterChangedSlot()));
 
 	this->loadGlobalSettings();
 

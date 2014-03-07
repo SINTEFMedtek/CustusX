@@ -23,6 +23,7 @@
 #include "sscBoundingBox3D.h"
 #include "cxForwardDeclarations.h"
 #include "sscReconstructedOutputVolumeParams.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {

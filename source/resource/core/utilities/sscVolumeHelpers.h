@@ -6,6 +6,7 @@
 #include "vtkForwardDeclarations.h"
 #include "sscBoundingBox3D.h"
 #include "sscTransform3D.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
@@ -35,7 +36,7 @@ void fillShortImageDataWithGradient(vtkImageDataPtr data, int maxValue);
   * The suggestedConvertedVolume is a pure optimization: Is set it will be used as the converted
   * output instead of doing the conversion once more. Can be used when only the LUT should be updated.
   */
-ImagePtr convertImageToUnsigned(DataManager* dataManager, ImagePtr image, vtkImageDataPtr suggestedConvertedVolume = vtkImageDataPtr(), bool verbose = true);
+ImagePtr convertImageToUnsigned(DataServicePtr dataManager, ImagePtr image, vtkImageDataPtr suggestedConvertedVolume = vtkImageDataPtr(), bool verbose = true);
 
 std::map<std::string, std::string> getDisplayFriendlyInfo(ImagePtr image);
 std::map<std::string, std::string> getDisplayFriendlyInfo(vtkImageDataPtr image);

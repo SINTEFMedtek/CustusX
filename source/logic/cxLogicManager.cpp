@@ -32,11 +32,13 @@ struct LegacySingletons
 	static TrackingServicePtr mToolManager;
 	static DataServicePtr mDataManager;
 	static SpaceProviderPtr mSpaceProvider;
+	static PatientServicePtr mPatientService;
 };
 
 TrackingServicePtr LegacySingletons::mToolManager;
 DataServicePtr LegacySingletons::mDataManager;
 SpaceProviderPtr LegacySingletons::mSpaceProvider;
+PatientServicePtr LegacySingletons::mPatientService;
 
 ToolManager* toolManager()
 {
@@ -46,7 +48,6 @@ DataManager* dataManager()
 {
 	return LegacySingletons::mDataManager.get(); // TODO remove get()
 }
-
 TrackingServicePtr trackingService()
 {
 	return LegacySingletons::mToolManager;
@@ -54,6 +55,14 @@ TrackingServicePtr trackingService()
 SpaceProviderPtr spaceProvider()
 {
 	return LegacySingletons::mSpaceProvider;
+}
+PatientServicePtr patientService()
+{
+	return LegacySingletons::mPatientService;
+}
+DataServicePtr dataService()
+{
+	return LegacySingletons::mDataManager;
 }
 
 
@@ -149,19 +158,23 @@ void LogicManager::createInterconnectedDataAndSpace()
 	this->getTrackingService();
 
 	// build object(s):
-//	mPatientService = PatientService::create();
-//	LegacySingletons::mDataManager = mPatientService->getDataService();
+	mDataService = DataManagerImpl::create();
+
+	LegacySingletons::mDataManager = mDataService;
 
 //	cx::cxDataManager::initialize();
 //	cx::PatientService::initialize();
 //	cx::cxToolManager::initializeObject();
 
 	mSpaceProvider.reset(new cx::SpaceProviderImpl(mTrackingService,
-												  cx::DataManager::getInstance()));
-	cx::cxDataManager::getInstance()->setSpaceProvider(mSpaceProvider);
+												  mDataService));
+	mDataService->setSpaceProvider(mSpaceProvider);
 
-	mDataFactory.reset(new DataFactory(cx::cxDataManager::getInstance(), mSpaceProvider));
-	cx::cxDataManager::getInstance()->setDataFactory(mDataFactory);
+	mDataFactory.reset(new DataFactory(mDataService, mSpaceProvider));
+	mDataService->setDataFactory(mDataFactory);
+
+	mPatientService = PatientService::create(mDataService);
+	LegacySingletons::mPatientService = mPatientService;
 }
 
 void LogicManager::createDataFactory()
@@ -189,7 +202,7 @@ void LogicManager::createVideoService()
 	// build object(s):
 
 	VideoServiceBackendPtr videoBackend;
-	videoBackend = VideoServiceBackend::create(cx::DataManager::getInstance(),
+	videoBackend = VideoServiceBackend::create(mDataService,
 											   mTrackingService,
 											   mSpaceProvider);
 	cx::VideoService::initialize(videoBackend);
@@ -207,7 +220,7 @@ void LogicManager::createVisualizationService()
 	// build object(s):
 
 	VisualizationServiceBackendPtr vsBackend;
-	vsBackend.reset(new VisualizationServiceBackend(cx::DataManager::getInstance(),
+	vsBackend.reset(new VisualizationServiceBackend(mDataService,
 													mTrackingService,
 													cx::VideoService::getInstance(),
 													mSpaceProvider));
@@ -224,11 +237,11 @@ void LogicManager::createStateService()
 
 	// build object(s):
 	StateServiceBackendPtr ssBackend;
-	ssBackend.reset(new StateServiceBackend(cx::DataManager::getInstance(),
+	ssBackend.reset(new StateServiceBackend(mDataService,
 													mTrackingService,
 													cx::VideoService::getInstance(),
 													mSpaceProvider,
-											cx::PatientService::getInstance()));
+											mPatientService));
 	cx::StateService::createInstance(ssBackend);
 	// init stateservice....
 

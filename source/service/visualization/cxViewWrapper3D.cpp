@@ -135,7 +135,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServ
 
 	connect(mBackend->getToolManager().get(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
 	connect(mBackend->getToolManager().get(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
-	connect(mBackend->getDataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
+	connect(mBackend->getDataManager().get(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
 	this->toolsAvailableSlot();
 
 	mAnnotationMarker = RepManager::getInstance()->getCachedRep<OrientationAnnotation3DRep>(

@@ -25,33 +25,33 @@
 namespace cx
 {
 
-// --------------------------------------------------------
-DataManager* DataManager::mInstance = NULL; ///< static member
-// --------------------------------------------------------
+//// --------------------------------------------------------
+//DataServicePtr DataManager::mInstance = NULL; ///< static member
+//// --------------------------------------------------------
 
-void DataManager::shutdown()
-{
-	delete mInstance;
-	mInstance = NULL;
-}
+//void DataManager::shutdown()
+//{
+//	delete mInstance;
+//	mInstance = NULL;
+//}
 
-DataManager* DataManager::getInstance()
-{
-    if (!mInstance)
-    {
-        DataManagerImpl::initialize();
-    }
-	return mInstance;
-}
+//DataServicePtr DataManager::getInstance()
+//{
+//    if (!mInstance)
+//    {
+//        DataManagerImpl::initialize();
+//    }
+//	return mInstance;
+//}
 
-void DataManager::setInstance(DataManager* instance)
-{
-	if (mInstance)
-	{
-		delete mInstance;
-	}
-	mInstance = instance;
-}
+//void DataManager::setInstance(DataServicePtr instance)
+//{
+//	if (mInstance)
+//	{
+//		delete mInstance;
+//	}
+//	mInstance = instance;
+//}
 
 DataManager::DataManager()
 {
@@ -74,9 +74,9 @@ void DataManager::setActiveImage(ImagePtr activeImage)
 {
 } ///< used for system state
 
-DataManager* dataManager()
-{
-	return DataManager::getInstance();
-}
+//DataServicePtr dataManager()
+//{
+//	return DataManager::getInstance();
+//}
 
 } // namespace cx

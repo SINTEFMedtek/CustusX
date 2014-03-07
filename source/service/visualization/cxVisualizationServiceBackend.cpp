@@ -21,7 +21,7 @@
 namespace cx
 {
 
-VisualizationServiceBackend::VisualizationServiceBackend(DataManager* dataManager,
+VisualizationServiceBackend::VisualizationServiceBackend(DataServicePtr dataManager,
 														 TrackingServicePtr toolManager,
 														 VideoService* videoService,
 														 SpaceProviderPtr spaceProvider) :
@@ -33,7 +33,7 @@ VisualizationServiceBackend::VisualizationServiceBackend(DataManager* dataManage
 
 }
 
-DataManager* VisualizationServiceBackend::getDataManager()
+DataServicePtr VisualizationServiceBackend::getDataManager()
 {
 	return mDataManager;
 }
