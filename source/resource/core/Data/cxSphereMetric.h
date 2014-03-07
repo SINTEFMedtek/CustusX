@@ -59,7 +59,7 @@ Q_OBJECT
 public:
 	virtual ~SphereMetric();
 //	static SphereMetricPtr create(QDomNode node);
-	static SphereMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	static SphereMetricPtr create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
 	virtual bool isValid() const;
@@ -84,7 +84,7 @@ public:
 	virtual bool showValueInGraphics() const { return false; }
 
 private:
-	SphereMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	SphereMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	MetricReferenceArgumentListPtr mArguments;
 	double mRadius;
 };

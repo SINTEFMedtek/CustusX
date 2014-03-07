@@ -201,7 +201,7 @@ ViewGroupData::ViewGroupData(VisualizationServiceBackendPtr backend) :
 	mCamera3D(CameraData::create())
 {
 	if(mBackend)
-		connect(mBackend->getDataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataAddedOrRemovedInManager()));
+		connect(mBackend->getDataManager().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataAddedOrRemovedInManager()));
 	mVideoSource = "active";
 	mGroup2DZoom = SyncedValue::create(1);
 	mGlobal2DZoom = mGroup2DZoom;

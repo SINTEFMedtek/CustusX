@@ -38,7 +38,7 @@ MetricFixture::~MetricFixture()
 	cx::cxDataManager::shutdown();
 }
 
-cx::DataManager* MetricFixture::getDataManager()
+cx::DataServicePtr MetricFixture::getDataManager()
 {
 	return cx::dataManager();
 }

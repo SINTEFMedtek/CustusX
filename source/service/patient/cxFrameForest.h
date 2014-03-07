@@ -66,7 +66,7 @@ class DataManager;
 class FrameForest
 {
 public:
-	explicit FrameForest(DataManager* dataManager);
+	explicit FrameForest(DataServicePtr dataManager);
 	QDomNode getNode(QString frame);
 	QDomNode getOldestAncestor(QDomNode node);
 
@@ -80,7 +80,7 @@ private:
 	bool isAncestorOf(QDomNode node, QDomNode ancestor);
 	void insertFrame(DataPtr data);
 	QDomDocument mDocument;
-	DataManager* mDataManager;
+	DataServicePtr mDataManager;
 };
 
 /**

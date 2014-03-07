@@ -25,7 +25,6 @@ namespace cx
 
 SimulatedImageStreamer::SimulatedImageStreamer()
 {
-	mDataManager = NULL;
 	this->setSendInterval(40);
 }
 
@@ -33,7 +32,7 @@ SimulatedImageStreamer::~SimulatedImageStreamer()
 {}
 
 
-void SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataManager *dataManager)
+void SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServicePtr dataManager)
 {
 	if(!image || !tool || !dataManager)
 	{

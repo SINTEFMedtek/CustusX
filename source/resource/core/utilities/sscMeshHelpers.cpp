@@ -45,7 +45,7 @@ vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt, Trans
   return retval;
 }
 
-void loadMeshFromToolTransforms(DataManager *dataManager, TimedTransformMap transforms_prMt)
+void loadMeshFromToolTransforms(DataServicePtr dataManager, TimedTransformMap transforms_prMt)
 {
   //create polydata from positions
 	Transform3D rMpr = dataManager->get_rMpr();

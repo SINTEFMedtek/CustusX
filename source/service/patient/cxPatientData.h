@@ -19,7 +19,7 @@
 #include <QString>
 #include <QObject>
 #include "sscForwardDeclarations.h"
-#include "vtkForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 #include "sscTransform3D.h"
 #include <QDomDocument>
 
@@ -60,7 +60,7 @@ class PatientData: public QObject
 {
 Q_OBJECT
 public:
-	explicit PatientData(DataManager* dataManager);
+	explicit PatientData(DataServicePtr dataManager);
 	virtual ~PatientData();
 
 	QString getActivePatientFolder() const;
@@ -124,7 +124,7 @@ private:
 	//Patient
 	QString mActivePatientFolder; ///< Folder for storing the files for the active patient. Path relative to globalPatientDataFolder.
 	QDomDocument mWorkingDocument; ///< available during load and save, used to add/extract extra info from the file.
-	DataManager* mDataManager;
+	DataServicePtr mDataManager;
 };
 
 typedef boost::shared_ptr<PatientData> PatientDataPtr;

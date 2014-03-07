@@ -59,7 +59,7 @@ class OrientationAnnotationRep : public RepImpl
 {
 	Q_OBJECT
 public:
-	static OrientationAnnotationRepPtr  New(DataManager* dataManager, const QString& uid,const QString& name);
+	static OrientationAnnotationRepPtr  New(DataServicePtr dataManager, const QString& uid,const QString& name);
 	virtual ~OrientationAnnotationRep();
 	virtual QString getType() const { return "vm::OrientationAnnotationRep"; };
 
@@ -68,7 +68,7 @@ public:
 	private slots:
 	void clinicalApplicationChangedSlot();
 protected:
-	OrientationAnnotationRep(DataManager* dataManager, const QString& uid, const QString& name);
+	OrientationAnnotationRep(DataServicePtr dataManager, const QString& uid, const QString& name);
 	virtual void addRepActorsToViewRenderer(View *view);
 	virtual void removeRepActorsFromViewRenderer(View *view);
 
@@ -78,7 +78,7 @@ protected:
 
 	OrientationAnnotationPtr mOrientation;
 	PLANE_TYPE mPlane;
-	DataManager* mDataManager;
+	DataServicePtr mDataManager;
 
 	QString mNorthAnnotation;
 	QString mSouthAnnotation;

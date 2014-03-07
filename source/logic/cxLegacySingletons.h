@@ -22,6 +22,8 @@ class DataManager;
 class ToolManager;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 typedef boost::shared_ptr<class ToolManager> TrackingServicePtr;
+typedef boost::shared_ptr<class PatientService> PatientServicePtr;
+typedef boost::shared_ptr<class DataManager> DataServicePtr;
 
 /** 
  *
@@ -34,10 +36,12 @@ typedef boost::shared_ptr<class ToolManager> TrackingServicePtr;
 // old style singleton accessors:
 DataManager* dataManager();
 ToolManager* toolManager();
-SpaceProviderPtr spaceProvider();
 
 // access to new shared ptrs:
+SpaceProviderPtr spaceProvider();
 TrackingServicePtr trackingService();
+DataServicePtr dataService();
+PatientServicePtr patientService();
 
 } // namespace cx
 

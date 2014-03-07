@@ -35,6 +35,7 @@ typedef boost::shared_ptr<class ServiceController> ServiceControllerPtr;
 //typedef boost::shared_ptr<class StateService> StateServicePtr;
 
 //typedef boost::shared_ptr<class DataManager> DataServicePtr;
+typedef boost::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
 
 /**\brief Responsible for the entire logic layer.
  * \ingroup cxLogic
@@ -110,6 +111,7 @@ private:
 	VideoServicePtr mVideoService;
 	VisualizationServicePtr mVisualizationService;
 	StateServicePtr mStateService;
+	DataManagerImplPtr mDataService;
 };
 
 LogicManager* logicManager(); // if necessary

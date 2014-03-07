@@ -42,7 +42,7 @@ class GuideRep2D: public DataMetricRep
 {
 Q_OBJECT
 public:
-	static GuideRep2DPtr New(DataManager* dataManager, const QString& uid, const QString& name = ""); ///constructor
+	static GuideRep2DPtr New(DataServicePtr dataManager, const QString& uid, const QString& name = ""); ///constructor
 	virtual ~GuideRep2D() {}
 
 //	void setPointMetric(PointMetricPtr point);
@@ -63,11 +63,11 @@ protected:
 	virtual void onModifiedStartRender();
 
 private:
-	GuideRep2D(DataManager* dataManager, const QString& uid, const QString& name = "");
+	GuideRep2D(DataServicePtr dataManager, const QString& uid, const QString& name = "");
 	GuideRep2D(); ///< not implemented
 
 //	PointMetricPtr mMetric;
-	DataManager* mDataManager;
+	DataServicePtr mDataManager;
 	SliceProxyPtr mSliceProxy;
 	vtkActorPtr mCircleActor;
 	vtkSectorSourcePtr mCircleSource;

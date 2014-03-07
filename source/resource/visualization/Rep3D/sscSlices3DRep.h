@@ -68,7 +68,7 @@ public:
 
 	void setShaderPath(QString path);
 	void setImages(std::vector<ImagePtr> images);
-	void addPlane(PLANE_TYPE plane, DataManager *dataManager);
+	void addPlane(PLANE_TYPE plane, DataServicePtr dataManager);
 	void setTool(ToolPtr tool);
 
 protected:

@@ -57,8 +57,8 @@ public:
 	typedef std::map<QString, MeshPtr> MeshMap;
 	typedef std::map<QString, VideoSourcePtr> StreamMap;
 
-	static DataManager* getInstance();
-	static void shutdown();
+//	static DataServicePtr getInstance();
+//	static void shutdown();
 
 	// streams
 	virtual VideoSourcePtr getStream(const QString& uid) const = 0;
@@ -118,6 +118,9 @@ public:
 	virtual RegistrationHistoryPtr get_rMpr_History() = 0;
 	virtual LandmarksPtr getPatientLandmarks() = 0;
 
+	virtual bool getDebugMode() const = 0;
+	virtual void setDebugMode(bool on) = 0;
+
 signals:
 	void centerChanged(); ///< emitted when center is changed.
 	void dataAddedOrRemoved();
@@ -126,17 +129,18 @@ signals:
 	void clinicalApplicationChanged();
 	void streamLoaded();
 	void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
+	void debugModeChanged(bool on);
 
 protected:
-	static void setInstance(DataManager* instance);
+//	static void setInstance(DataServicePtr instance);
 	DataManager();
 	virtual ~DataManager();
 
-private:
-	static DataManager* mInstance;
+//private:
+//	static DataServicePtr mInstance;
 };
 
-DataManager* dataManager();
+//DataServicePtr dataManager();
 
 } // namespace cx
 

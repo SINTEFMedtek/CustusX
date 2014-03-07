@@ -14,41 +14,41 @@ namespace cx
  * @{
  */
 
-/**
- * \brief cx implementation of additional functionality for the DataManager
- * \ingroup cxServicePatient
- *
- * \date Mar 23, 2009
- * \author Janne Beate Bakeng, SINTEF
- */
-class cxDataManager: public DataManagerImpl
-{
-Q_OBJECT
-public:
-	static cxDataManager* getInstance();
-	virtual ~cxDataManager();
+///**
+// * \brief cx implementation of additional functionality for the DataManager
+// * \ingroup cxServicePatient
+// *
+// * \date Mar 23, 2009
+// * \author Janne Beate Bakeng, SINTEF
+// */
+//class cxDataManager: public DataManagerImpl
+//{
+//Q_OBJECT
+//public:
+//	static cxDataServicePtr getInstance();
+//	virtual ~cxDataManager();
 
-	static void initialize();
-	bool getDebugMode() const;
-	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
+//	static void initialize();
+//	bool getDebugMode() const;
+//	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
-signals:
-	void debugModeChanged(bool on);
+//signals:
+//	void debugModeChanged(bool on);
 
-public slots:
-	void setDebugMode(bool on);
+//public slots:
+//	void setDebugMode(bool on);
 
-protected:
-	cxDataManager(); ///< DataManager is a Singleton. Use getInstance instead
+//protected:
+//	cxDataManager(); ///< DataManager is a Singleton. Use getInstance instead
 
-	bool mDebugMode; ///< if set: allow lots of weird debug stuff.
+//	bool mDebugMode; ///< if set: allow lots of weird debug stuff.
 
-private:
-	cxDataManager(cxDataManager const&);
-	cxDataManager& operator=(cxDataManager const&);
+//private:
+//	cxDataManager(cxDataManager const&);
+//	cxDataManager& operator=(cxDataManager const&);
 
-	mutable PresetTransferFunctions3DPtr mPresetTransferFunctions3D;
-};
+//	mutable PresetTransferFunctions3DPtr mPresetTransferFunctions3D;
+//};
 
 /**
  * @}

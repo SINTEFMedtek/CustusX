@@ -19,12 +19,12 @@
 namespace cx
 {
 
-FrameMetricPtr FrameMetric::create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider)
+FrameMetricPtr FrameMetric::create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
 	return FrameMetricPtr(new FrameMetric(uid, name, dataManager, spaceProvider));
 }
 
-FrameMetric::FrameMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+FrameMetric::FrameMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 		cx::FrameMetricBase(uid, name, dataManager, spaceProvider)
 {
 }

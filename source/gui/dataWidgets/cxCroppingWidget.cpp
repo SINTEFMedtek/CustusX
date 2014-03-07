@@ -109,7 +109,7 @@ ImagePtr CroppingWidget::cropClipButtonClickedSlot()
   ImagePtr image = dataManager()->getActiveImage();
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
 
-  ImagePtr retval = cropImage(dataManager(), image);
+  ImagePtr retval = cropImage(dataService(), image);
   dataManager()->loadData(retval);
   dataManager()->saveImage(retval, outputBasePath);
   return retval;

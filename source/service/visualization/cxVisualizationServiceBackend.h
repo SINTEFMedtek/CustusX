@@ -35,18 +35,18 @@ typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServic
 class VisualizationServiceBackend
 {
 public:
-	VisualizationServiceBackend(DataManager* dataManager,
+	VisualizationServiceBackend(DataServicePtr dataManager,
 								TrackingServicePtr toolManager,
 								VideoService* videoService,
 								SpaceProviderPtr spaceProvider);
 
-	DataManager* getDataManager();
+	DataServicePtr getDataManager();
 	TrackingServicePtr getToolManager();
 	VideoService* getVideoService();
 	SpaceProviderPtr getSpaceProvider();
 
 private:
-	DataManager* mDataManager;
+	DataServicePtr mDataManager;
 	TrackingServicePtr mToolManager;
 	SpaceProviderPtr mSpaceProvider;
 	VideoService* mVideoService;

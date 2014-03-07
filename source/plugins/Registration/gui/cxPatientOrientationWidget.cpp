@@ -24,7 +24,7 @@ PatientOrientationWidget::PatientOrientationWidget(RegistrationManagerPtr regMan
   mPatientOrientationButton->setToolTip(defaultWhatsThis());
   connect(mPatientOrientationButton, SIGNAL(clicked()), this, SLOT(setPatientOrientationSlot()));
 
-  connect(cxDataManager::getInstance(), SIGNAL(debugModeChanged(bool)), this, SLOT(enableToolSampleButtonSlot()));
+  connect(dataManager(), SIGNAL(debugModeChanged(bool)), this, SLOT(enableToolSampleButtonSlot()));
 
   mDominantToolProxy =  DominantToolProxy::New(trackingService());
   connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableToolSampleButtonSlot()));
@@ -76,7 +76,7 @@ void PatientOrientationWidget::enableToolSampleButtonSlot()
   bool enabled = false;
   enabled = tool &&
 	  tool->getVisible() &&
-      (!tool->hasType(Tool::TOOL_MANUAL) || cxDataManager::getInstance()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
+	  (!tool->hasType(Tool::TOOL_MANUAL) || dataManager()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
 
   mPatientOrientationButton->setEnabled(enabled);
 }

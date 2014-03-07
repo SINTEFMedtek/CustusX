@@ -28,7 +28,7 @@
 namespace cx
 {
 
-DistanceMetric::DistanceMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+DistanceMetric::DistanceMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 				DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "line endpoint 0" << "line endpoint 1"));
@@ -38,7 +38,7 @@ DistanceMetric::DistanceMetric(const QString& uid, const QString& name, DataMana
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 }
 
-DistanceMetricPtr DistanceMetric::create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider)
+DistanceMetricPtr DistanceMetric::create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
 	return DistanceMetricPtr(new DistanceMetric(uid, name, dataManager, spaceProvider));
 }

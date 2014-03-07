@@ -27,7 +27,7 @@
 namespace cx
 {
 
-PointMetric::PointMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+PointMetric::PointMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 	DataMetric(uid, name, dataManager, spaceProvider),
 	mCoordinate(0,0,0),
 	mSpace(CoordinateSystem::reference())
@@ -38,7 +38,7 @@ PointMetric::PointMetric(const QString& uid, const QString& name, DataManager* d
 	connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
 }
 
-PointMetricPtr PointMetric::create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider)
+PointMetricPtr PointMetric::create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
 	return PointMetricPtr(new PointMetric(uid, name, dataManager, spaceProvider));
 }

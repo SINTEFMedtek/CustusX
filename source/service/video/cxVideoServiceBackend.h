@@ -35,19 +35,19 @@ typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 class VideoServiceBackend
 {
 public:
-	static VideoServiceBackendPtr create(DataManager* dataManager,
+	static VideoServiceBackendPtr create(DataServicePtr dataManager,
 								TrackingServicePtr toolManager,
 								SpaceProviderPtr spaceProvider);
-	VideoServiceBackend(DataManager* dataManager,
+	VideoServiceBackend(DataServicePtr dataManager,
 								TrackingServicePtr toolManager,
 								SpaceProviderPtr spaceProvider);
 
-	DataManager* getDataManager();
+	DataServicePtr getDataManager();
 	TrackingServicePtr getToolManager();
 	SpaceProviderPtr getSpaceProvider();
 
 private:
-	DataManager* mDataManager;
+	DataServicePtr mDataManager;
 	TrackingServicePtr mToolManager;
 	SpaceProviderPtr mSpaceProvider;
 };

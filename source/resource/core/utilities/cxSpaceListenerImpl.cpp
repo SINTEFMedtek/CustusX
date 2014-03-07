@@ -21,7 +21,7 @@
 namespace cx
 {
 
-SpaceListenerImpl::SpaceListenerImpl(TrackingServicePtr toolManager, DataManager* dataManager)
+SpaceListenerImpl::SpaceListenerImpl(TrackingServicePtr toolManager, DataServicePtr dataManager)
 {
 	mToolManager = toolManager;
 	mDataManager = dataManager;
@@ -65,7 +65,7 @@ void SpaceListenerImpl::doConnect()
 		if (data)
 		{
 			connect(data.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
-			connect(mDataManager, SIGNAL(dataAddedOrRemoved(QString)), this, SIGNAL(changed()));
+			connect(mDataManager.get(), SIGNAL(dataAddedOrRemoved(QString)), this, SIGNAL(changed()));
 		}
 	}
 
@@ -82,13 +82,13 @@ void SpaceListenerImpl::doConnect()
 				connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
 				connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
 			}
-			connect(mDataManager, SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+			connect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 		}
 	}
 
 	if (mSpace.mId == csPATIENTREF)
 	{
-		connect(mDataManager, SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+		connect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 	}
 }
 
@@ -100,7 +100,7 @@ void SpaceListenerImpl::doDisconnect()
 		if (data)
 		{
 			disconnect(data.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
-			disconnect(mDataManager, SIGNAL(dataAddedOrRemoved(QString)), this, SIGNAL(changed()));
+			disconnect(mDataManager.get(), SIGNAL(dataAddedOrRemoved(QString)), this, SIGNAL(changed()));
 		}
 	}
 
@@ -117,13 +117,13 @@ void SpaceListenerImpl::doDisconnect()
 				disconnect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
 				disconnect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
 			}
-			disconnect(mDataManager, SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+			disconnect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 		}
 	}
 
 	if (mSpace.mId == csPATIENTREF)
 	{
-		disconnect(mDataManager, SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+		disconnect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 	}
 }
 

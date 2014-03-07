@@ -132,7 +132,7 @@ public:
 	bool verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric);
 
 private:
-	cx::DataManager* getDataManager();
+	cx::DataServicePtr getDataManager();
 	cx::SpaceProviderPtr getSpaceProvider();
 
 };

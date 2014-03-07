@@ -23,7 +23,7 @@ namespace cx
 /**Create a forest representing all Data objects and their spatial relationships.
  *
  */
-FrameForest::FrameForest(DataManager* dataManager) : mDataManager(dataManager)
+FrameForest::FrameForest(DataServicePtr dataManager) : mDataManager(dataManager)
 {
 //  std::cout << "Forrest doc2:" << std::endl;
 	DataManager::DataMap allData = mDataManager->getData();
