@@ -21,7 +21,7 @@
 namespace cx
 {
 
-SpaceListenerImpl::SpaceListenerImpl(ToolManager* toolManager, DataManager* dataManager)
+SpaceListenerImpl::SpaceListenerImpl(TrackingServicePtr toolManager, DataManager* dataManager)
 {
 	mToolManager = toolManager;
 	mDataManager = dataManager;
@@ -79,8 +79,8 @@ void SpaceListenerImpl::doConnect()
 
 			if (mSpace.mRefObject == "active")
 			{
-				connect(mToolManager, SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
-				connect(mToolManager, SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
+				connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
+				connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
 			}
 			connect(mDataManager, SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 		}
@@ -114,8 +114,8 @@ void SpaceListenerImpl::doDisconnect()
 
 			if (mSpace.mRefObject == "active")
 			{
-				disconnect(mToolManager, SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
-				disconnect(mToolManager, SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
+				disconnect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
+				disconnect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
 			}
 			disconnect(mDataManager, SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 		}

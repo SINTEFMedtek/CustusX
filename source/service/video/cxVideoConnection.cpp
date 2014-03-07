@@ -63,9 +63,9 @@ VideoConnection::VideoConnection(VideoServiceBackendPtr backend)
 	mConnected = false;
 	mUnsusedProbeDataVector.clear();
 
-	connect(mBackend->getToolManager(), SIGNAL(configured()),                 this, SLOT(connectVideoToProbe()));
-	connect(mBackend->getToolManager(), SIGNAL(initialized()),                this, SLOT(connectVideoToProbe()));
-	connect(mBackend->getToolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectVideoToProbe()));
+	connect(mBackend->getToolManager().get(), SIGNAL(configured()),                 this, SLOT(connectVideoToProbe()));
+	connect(mBackend->getToolManager().get(), SIGNAL(initialized()),                this, SLOT(connectVideoToProbe()));
+	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectVideoToProbe()));
 }
 
 VideoConnection::~VideoConnection()
@@ -190,7 +190,7 @@ void VideoConnection::clientFinishedSlot()
 
 void VideoConnection::useUnusedProbeDataSlot()
 {
-	disconnect(mBackend->getToolManager(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+	disconnect(mBackend->getToolManager().get(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
 	for (std::vector<ProbeDefinitionPtr>::const_iterator citer = mUnsusedProbeDataVector.begin(); citer != mUnsusedProbeDataVector.end(); ++citer)
 		this->updateStatus(*citer);
 	mUnsusedProbeDataVector.clear();
@@ -207,7 +207,7 @@ void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 	{
 		//Don't throw away the ProbeData. Save it until it can be used
 		if (mUnsusedProbeDataVector.empty())
-			connect(mBackend->getToolManager(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+			connect(mBackend->getToolManager().get(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
 		mUnsusedProbeDataVector.push_back(msg);
 		return;
 	}

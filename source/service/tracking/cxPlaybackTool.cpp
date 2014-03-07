@@ -22,7 +22,7 @@
 namespace cx
 {
 
-PlaybackTool::PlaybackTool(ToolManager* manager, ToolPtr base, PlaybackTimePtr time) :
+PlaybackTool::PlaybackTool(TrackingServicePtr manager, ToolPtr base, PlaybackTimePtr time) :
 	ToolImpl(manager, "playback_"+base->getUid(), "playback "+base->getName()), mBase(base),
     mTime(time),
     mVisible(false)

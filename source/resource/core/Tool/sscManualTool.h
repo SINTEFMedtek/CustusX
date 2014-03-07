@@ -45,7 +45,7 @@ class ManualTool : public ToolImpl
 	Q_OBJECT
 public:
 
-	explicit ManualTool(ToolManager* manager, const QString& uid, const QString& name ="");
+	explicit ManualTool(TrackingServicePtr manager, const QString& uid, const QString& name ="");
 	virtual ~ManualTool();
 	virtual std::set<Type> getTypes() const;
 	virtual QString getGraphicsFileName() const;

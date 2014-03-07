@@ -16,6 +16,7 @@
 #define CXVIDEOSERVICEBACKEND_H
 
 #include "boost/shared_ptr.hpp"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
@@ -35,19 +36,19 @@ class VideoServiceBackend
 {
 public:
 	static VideoServiceBackendPtr create(DataManager* dataManager,
-								ToolManager* toolManager,
+								TrackingServicePtr toolManager,
 								SpaceProviderPtr spaceProvider);
 	VideoServiceBackend(DataManager* dataManager,
-								ToolManager* toolManager,
+								TrackingServicePtr toolManager,
 								SpaceProviderPtr spaceProvider);
 
 	DataManager* getDataManager();
-	ToolManager* getToolManager();
+	TrackingServicePtr getToolManager();
 	SpaceProviderPtr getSpaceProvider();
 
 private:
 	DataManager* mDataManager;
-	ToolManager* mToolManager;
+	TrackingServicePtr mToolManager;
 	SpaceProviderPtr mSpaceProvider;
 };
 

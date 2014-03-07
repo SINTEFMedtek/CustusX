@@ -130,7 +130,7 @@ void ContainerWindow::container3D(cx::ViewItem *view, const QString& imageFilena
 	view->addRep(mRepPtr);
 
 	// Tool 3D rep
-	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
+	cx::TrackingServicePtr mToolmanager = cx::DummyToolManager::getInstance();
 	cx::ToolPtr tool = mToolmanager->getDominantTool();
 	cx::ToolRep3DPtr toolRep = cx::ToolRep3D::New(tool->getUid(), tool->getName());
 	toolRep->setTool(tool);
@@ -167,7 +167,7 @@ void ContainerWindow::containerGPU3D(cx::ViewItem *view, const QStringList& imag
 #endif //WIN32
 
 	// Tool 3D rep
-	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
+	cx::TrackingServicePtr mToolmanager = cx::DummyToolManager::getInstance();
 	cx::ToolPtr tool = mToolmanager->getDominantTool();
 	cx::ToolRep3DPtr toolRep = cx::ToolRep3D::New( tool->getUid(), tool->getName() );
 	toolRep->setTool(tool);
@@ -177,7 +177,7 @@ void ContainerWindow::containerGPU3D(cx::ViewItem *view, const QStringList& imag
 void ContainerWindow::start(bool showSliders)
 {
 	// Initialize dummy toolmanager.
-	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
+	cx::TrackingServicePtr mToolmanager = cx::DummyToolManager::getInstance();
 	mToolmanager->configure();
 	mToolmanager->initialize();
 	mToolmanager->startTracking();

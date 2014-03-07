@@ -30,6 +30,7 @@
 #include "sscIndent.h"
 #include "sscCoordinateSystemHelpers.h"
 #include "sscProbe.h"
+#include "sscForwardDeclarations.h"
 
 namespace cx
 {

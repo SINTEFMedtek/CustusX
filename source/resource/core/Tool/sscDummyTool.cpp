@@ -37,7 +37,7 @@ ProbeDefinition DummyToolTestUtilities::createProbeDataLinear(double depth, doub
 	return createProbeData(ProbeDefinition::tLINEAR, depth, width, frameSize);
 }
 
-DummyToolPtr DummyToolTestUtilities::createDummyTool(ProbeDefinition probeData, ToolManager* manager)
+DummyToolPtr DummyToolTestUtilities::createDummyTool(ProbeDefinition probeData, TrackingServicePtr manager)
 {
 	DummyToolPtr retval(new DummyTool(manager));
 	retval->setProbeSector(probeData);
@@ -55,7 +55,7 @@ int DummyTool::mTransformCount = 0;
 
 
 
-DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
+DummyTool::DummyTool(TrackingServicePtr manager, const QString& uid) :
 	ToolImpl(manager, uid),
 	mVisible(false),
 	mTransformSaveFileName("DummyToolsAreToDumbToSaveThemselves"),
@@ -72,7 +72,7 @@ DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
 
 	connect(mTimer.get(), SIGNAL(timeout()),this, SLOT(sendTransform()));
 	if (mManager)
-		connect(mManager, SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
+		connect(mManager.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }
 
 DummyTool::~DummyTool()

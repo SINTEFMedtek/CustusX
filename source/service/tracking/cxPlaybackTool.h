@@ -35,7 +35,7 @@ class PlaybackTool: public ToolImpl
 {
 Q_OBJECT
 public:
-	explicit PlaybackTool(ToolManager* manager, ToolPtr base, PlaybackTimePtr time);
+	explicit PlaybackTool(TrackingServicePtr manager, ToolPtr base, PlaybackTimePtr time);
 	virtual ~PlaybackTool();
 	virtual std::set<Type> getTypes() const;
 	virtual QString getGraphicsFileName() const;

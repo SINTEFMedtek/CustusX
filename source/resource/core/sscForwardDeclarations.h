@@ -90,6 +90,25 @@ typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
 
 class LabeledComboBoxWidget;
 
+// Services
+typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
+typedef boost::shared_ptr<class PatientService> PatientServicePtr;
+typedef boost::shared_ptr<class ToolManager> TrackingServicePtr;
+typedef boost::shared_ptr<class VideoService> VideoServicePtr;
+typedef boost::shared_ptr<class ViewManager> VisualizationServicePtr;
+typedef boost::shared_ptr<class StateService> StateServicePtr;
+typedef boost::shared_ptr<class DataManager> DataServicePtr;
+
+typedef boost::weak_ptr<class SpaceProvider> SpaceProviderWeakPtr;
+typedef boost::weak_ptr<class DataFactory> DataFactoryWeakPtr;
+typedef boost::weak_ptr<class PatientService> PatientServiceWeakPtr;
+typedef boost::weak_ptr<class ToolManager> TrackingServiceWeakPtr;
+typedef boost::weak_ptr<class VideoService> VideoServiceWeakPtr;
+typedef boost::weak_ptr<class ViewManager> VisualizationServiceWeakPtr;
+typedef boost::weak_ptr<class StateService> StateServiceWeakPtr;
+typedef boost::weak_ptr<class DataManager> DataServiceWeakPtr;
+
 } // namespace cx
 
 #endif /*SSC_FORWARDDECLARARATIONS_H_*/

@@ -15,6 +15,7 @@
 #define CXSTATESERVICEBACKEND_H
 
 #include "boost/shared_ptr.hpp"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
@@ -37,20 +38,20 @@ class StateServiceBackend
 {
 public:
 	StateServiceBackend(DataManager* dataManager,
-								ToolManager* toolManager,
+								TrackingServicePtr toolManager,
 								VideoService* videoService,
 								SpaceProviderPtr spaceProvider,
 						PatientService* patientService);
 
 	DataManager* getDataManager();
-	ToolManager* getToolManager();
+	TrackingServicePtr getToolManager();
 	VideoService* getVideoService();
 	SpaceProviderPtr getSpaceProvider();
 	PatientService* getPatientService();
 
 private:
 	DataManager* mDataManager;
-	ToolManager* mToolManager;
+	TrackingServicePtr mToolManager;
 	SpaceProviderPtr mSpaceProvider;
 	VideoService* mVideoService;
 	PatientService* mPatientService;

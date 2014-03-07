@@ -64,8 +64,8 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   manualGroupLayout->setMargin(0);
   mManualToolWidget = new Transform3DWidget(manualGroup);
   manualGroupLayout->addWidget(mManualToolWidget);
-  connect(cxToolManager::getInstance()->getManualTool().get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(manualToolChanged()));
-  connect(cxToolManager::getInstance()->getManualTool().get(), SIGNAL(toolVisible(bool)), this, SLOT(manualToolChanged()));
+  connect(toolManager()->getManualTool().get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(manualToolChanged()));
+  connect(toolManager()->getManualTool().get(), SIGNAL(toolVisible(bool)), this, SLOT(manualToolChanged()));
   connect(mManualToolWidget, SIGNAL(changed()), this, SLOT(manualToolWidgetChanged()));
 
   mSpaceSelector = StringDataAdapterXml::initialize("selectSpace",
@@ -122,14 +122,14 @@ QString ToolPropertiesWidget::defaultWhatsThis() const
 
 void ToolPropertiesWidget::manualToolChanged()
 {
-	if (!cxToolManager::getInstance()->getManualTool())
+	if (!toolManager()->getManualTool())
 		return;
-  mManualGroup->setVisible(cxToolManager::getInstance()->getManualTool()->getVisible());
+  mManualGroup->setVisible(toolManager()->getManualTool()->getVisible());
   mManualToolWidget->blockSignals(true);
 
-  Transform3D prMt = cxToolManager::getInstance()->getManualTool()->get_prMt();
+  Transform3D prMt = toolManager()->getManualTool()->get_prMt();
   CoordinateSystem space_q = CoordinateSystem::fromString(mSpaceSelector->getValue());
-  CoordinateSystem space_mt = spaceProvider()->getTO(cxToolManager::getInstance()->getManualTool());
+  CoordinateSystem space_mt = spaceProvider()->getTO(toolManager()->getManualTool());
   Transform3D qMt = spaceProvider()->get_toMfrom(space_mt, space_q);
 
   mManualToolWidget->setMatrix(qMt);
@@ -140,12 +140,12 @@ void ToolPropertiesWidget::manualToolWidgetChanged()
 {
 	Transform3D qMt = mManualToolWidget->getMatrix();
   CoordinateSystem space_q = CoordinateSystem::fromString(mSpaceSelector->getValue());
-  CoordinateSystem space_mt = spaceProvider()->getTO(cxToolManager::getInstance()->getManualTool());
+  CoordinateSystem space_mt = spaceProvider()->getTO(toolManager()->getManualTool());
   CoordinateSystem space_pr = spaceProvider()->getPr();
   Transform3D qMpr = spaceProvider()->get_toMfrom(space_pr, space_q);
   Transform3D prMt = qMpr.inv() * qMt;
 
-  cxToolManager::getInstance()->getManualTool()->set_prMt(prMt);
+  toolManager()->getManualTool()->set_prMt(prMt);
 }
 
 void ToolPropertiesWidget::spacesChangedSlot()

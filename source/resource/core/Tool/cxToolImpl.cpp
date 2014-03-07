@@ -17,7 +17,7 @@
 namespace cx
 {
 
-ToolImpl::ToolImpl(ToolManager* manager, const QString& uid, const QString& name) :
+ToolImpl::ToolImpl(TrackingServicePtr manager, const QString& uid, const QString& name) :
 	Tool(uid, name),
 	mPositionHistory(new TimedTransformMap()),
 	m_prMt(Transform3D::Identity()),
