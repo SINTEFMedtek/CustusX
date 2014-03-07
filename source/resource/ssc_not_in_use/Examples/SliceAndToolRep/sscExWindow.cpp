@@ -58,7 +58,7 @@ ViewsWindow::ViewsWindow()
 //	this->setCentralWidget( new QWidget() );
 
   // Initialize dummy toolmanager.
-  ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
+  ssc::TrackingServicePtr mToolmanager = ssc::DummyToolManager::getInstance();
   mToolmanager->configure();
   mToolmanager->initialize();
  mToolmanager->startTracking();
@@ -114,7 +114,7 @@ ssc::View* ViewsWindow::generateSlice(const QString& uid, ssc::ToolPtr tool, ssc
 
 void ViewsWindow::defineSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c)
 {
-	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
+	ssc::TrackingServicePtr mToolmanager = ssc::DummyToolManager::getInstance();
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
 
 	ssc::ImagePtr image = loadImage(imageFilename);
@@ -164,7 +164,7 @@ void ViewsWindow::defineGPU_3D(const QString& imageFilename, int r, int c)
 //	view->addRep(mRepPtr);
 //
 //	// Tool 3D rep
-//	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
+//	ssc::TrackingServicePtr mToolmanager = ssc::DummyToolManager::getInstance();
 //	ssc::ToolPtr tool = mToolmanager->getDominantTool();
 //	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
 //	toolRep->setTool(tool);
@@ -201,7 +201,7 @@ void ViewsWindow::define3D(ssc::ImagePtr image, int r, int c)
 	//mVolumetricRep = mRepPtr;
 
 	// Tool 3D rep
-	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
+	ssc::TrackingServicePtr mToolmanager = ssc::DummyToolManager::getInstance();
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
 	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New(tool->getUid(), tool->getName());
 	toolRep->setTool(tool);

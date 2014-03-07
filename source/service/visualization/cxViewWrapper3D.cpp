@@ -117,7 +117,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServ
 	mPickerRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
 	mPickerRep->setEnabled(false);
 	mView->addRep(mPickerRep);
-	connect(mBackend->getToolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 	this->dominantToolChangedSlot();
 
 	// plane type text rep
@@ -133,8 +133,8 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServ
 	//data name text rep
 	this->updateMetricNamesRep();
 
-	connect(mBackend->getToolManager(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
-	connect(mBackend->getToolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
+	connect(mBackend->getToolManager().get(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
+	connect(mBackend->getToolManager().get(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
 	connect(mBackend->getDataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
 	this->toolsAvailableSlot();
 

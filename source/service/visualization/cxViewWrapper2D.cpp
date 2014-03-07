@@ -93,7 +93,7 @@ ViewWrapper2D::ViewWrapper2D(ViewWidget* view, VisualizationServiceBackendPtr ba
 //	setZoom2D(SyncedValue::create(1));
 	setOrientationMode(SyncedValue::create(0)); // must set after addreps()
 
-	connect(mBackend->getToolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 	connect(mView, SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
 	connect(mView, SIGNAL(showSignal(QShowEvent*)), this, SLOT(showSlot()));
 	connect(mView, SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mousePressSlot(QMouseEvent*)));

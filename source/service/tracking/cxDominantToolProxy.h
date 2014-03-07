@@ -44,7 +44,7 @@ class DominantToolProxy: public QObject
 Q_OBJECT
 
 public:
-	static DominantToolProxyPtr New(ToolManager *toolManager)
+	static DominantToolProxyPtr New(TrackingServicePtr toolManager)
 	{
 		return DominantToolProxyPtr(new DominantToolProxy(toolManager));
 	}
@@ -64,9 +64,9 @@ signals:
 private slots:
 	void dominantToolChangedSlot(const QString&);
 private:
-	DominantToolProxy(ToolManager *toolManager);
+	DominantToolProxy(TrackingServicePtr toolManager);
 	ToolPtr mTool;
-	ToolManager* mToolManager;
+	TrackingServicePtr mToolManager;
 };
 
 /**

@@ -22,14 +22,14 @@ namespace cx
 {
 
 VideoServiceBackendPtr VideoServiceBackend::create(DataManager* dataManager,
-							ToolManager* toolManager,
+							TrackingServicePtr toolManager,
 							SpaceProviderPtr spaceProvider)
 {
 	return VideoServiceBackendPtr(new VideoServiceBackend(dataManager, toolManager, spaceProvider));
 }
 
 VideoServiceBackend::VideoServiceBackend(DataManager* dataManager,
-							ToolManager* toolManager,
+							TrackingServicePtr toolManager,
 							SpaceProviderPtr spaceProvider) :
 	mDataManager(dataManager),
 	mToolManager(toolManager),
@@ -43,7 +43,7 @@ DataManager* VideoServiceBackend::getDataManager()
 	return mDataManager;
 }
 
-ToolManager* VideoServiceBackend::getToolManager()
+TrackingServicePtr VideoServiceBackend::getToolManager()
 {
 	return mToolManager;
 }

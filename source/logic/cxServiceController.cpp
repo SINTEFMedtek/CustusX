@@ -18,6 +18,7 @@
 #include "sscTypeConversions.h"
 #include "cxPlaybackUSAcquisitionVideo.h"
 #include "cxViewManager.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
@@ -56,7 +57,7 @@ void ServiceController::patientChangedSlot()
 	}
 	videoService()->getUSAcquisitionVideoPlayback()->setRoot(patientService()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
 
-	cxToolManager::getInstance()->setLoggingFolder(loggingPath);
+	toolManager()->setLoggingFolder(loggingPath);
 	messageManager()->setLoggingFolder(loggingPath);
 }
 

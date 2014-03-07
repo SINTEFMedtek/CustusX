@@ -77,7 +77,7 @@ public:
 	 TOOL_AURORA_CHANNEL_NUMBER        ///< hardware responds to Aurora channel number
 	 */
 
-	cxTool(ToolManager *manager, IgstkToolPtr igstkTool);
+	cxTool(TrackingServicePtr manager, IgstkToolPtr igstkTool);
 	virtual ~cxTool();
 
 	virtual std::set<Type> getTypes() const;

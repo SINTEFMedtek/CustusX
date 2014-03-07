@@ -62,7 +62,7 @@ void USAcquisition::checkIfReadySlot()
 {
 	bool tracking = toolManager()->isTracking();
 	bool streaming = videoService()->getVideoConnection()->isConnected();
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = toolManager()->findFirstProbe();
 
 	QString mWhatsMissing;
 	mWhatsMissing.clear();
@@ -109,7 +109,7 @@ void USAcquisition::recordStarted()
 {
 	mBase->getPluginData()->getReconstructer()->selectData(USReconstructInputData()); // clear old data in reconstructeer
 
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = toolManager()->findFirstProbe();
 	mCore->setWriteColor(this->getWriteColor());
 	mCore->startRecord(mBase->getLatestSession(), tool, this->getRecordingVideoSources(tool));
 }

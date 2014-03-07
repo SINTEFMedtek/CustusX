@@ -78,7 +78,7 @@ ViewsWindow::ViewsWindow(QString displayText)
 	this->setCentralWidget( new QWidget(this) );
 
 	// Initialize dummy toolmanager.
-	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
+	cx::TrackingServicePtr mToolmanager = cx::DummyToolManager::getInstance();
 	mToolmanager->configure();
 	mToolmanager->initialize();
 	mToolmanager->startTracking();
@@ -169,7 +169,7 @@ cx::ViewWidget* ViewsWindow::create2DView(const QString& title, int r, int c)
 
 cx::SliceProxyPtr ViewsWindow::createSliceProxy(cx::PLANE_TYPE plane)
 {
-	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
+	cx::TrackingServicePtr mToolmanager = cx::DummyToolManager::getInstance();
 	cx::ToolPtr tool = mToolmanager->getDominantTool();
 
 	cx::SliceProxyPtr proxy = cx::SliceProxy::create(cx::dataManager());

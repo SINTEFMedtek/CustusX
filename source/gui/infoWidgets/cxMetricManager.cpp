@@ -94,7 +94,7 @@ void MetricManager::setManualToolPosition(Vector3D p_r)
 	Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
-	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
+	ManualToolPtr tool = toolManager()->getManualTool();
 	Vector3D offset = tool->get_prMt().vector(Vector3D(0, 0, tool->getTooltipOffset()));
 	p_pr -= offset;
 	p_r = rMpr.coord(p_pr);

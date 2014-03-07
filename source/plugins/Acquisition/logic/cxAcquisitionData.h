@@ -19,6 +19,7 @@
 class QDomNode;
 #include <vector>
 #include "cxRecordSession.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {

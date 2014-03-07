@@ -182,7 +182,7 @@ void Acquisition::stopRecord()
 
 	mLatestSession->setStopTime(getMilliSecondsSinceEpoch());
 	mPluginData->addRecordSession(mLatestSession);
-	cxToolManager::getInstance()->saveToolsSlot(); //asks all the tools to save their transforms and timestamps
+	toolManager()->saveToolsSlot(); //asks all the tools to save their transforms and timestamps
 	messageManager()->playStopSound();
 	this->setState(sNOT_RUNNING);
 }

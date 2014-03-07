@@ -31,7 +31,7 @@ class DataManager;
 class SpaceProviderImpl : public SpaceProvider
 {
 public:
-	SpaceProviderImpl(ToolManager* toolManager, DataManager* dataManager);
+	SpaceProviderImpl(TrackingServicePtr toolManager, DataManager* dataManager);
 	virtual ~SpaceProviderImpl() {}
 
 	virtual Transform3D get_toMfrom(CoordinateSystem from, CoordinateSystem to); ///< to_M_from
@@ -62,7 +62,7 @@ private:
 
 	CoordinateSystem getToolCoordinateSystem(ToolPtr tool);
 
-	ToolManager* mToolManager;
+	TrackingServicePtr mToolManager;
 	DataManager* mDataManager;
 };
 

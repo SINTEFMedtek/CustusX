@@ -121,7 +121,7 @@ void TestSlicePlaneRep::start()
 	//view->addRep(axesRep);
 
 	// Initialize dummy toolmanager.
-	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
+	ssc::TrackingServicePtr mToolmanager = ssc::DummyToolManager::getInstance();
 	mToolmanager->configure();
 	mToolmanager->initialize();
 	mToolmanager->startTracking();

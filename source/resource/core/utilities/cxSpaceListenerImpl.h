@@ -32,7 +32,7 @@ class SpaceListenerImpl: public SpaceListener
 Q_OBJECT
 
 public:
-	SpaceListenerImpl(ToolManager* toolManager, DataManager* dataManager);
+	SpaceListenerImpl(TrackingServicePtr toolManager, DataManager* dataManager);
 //	SpaceListenerImpl(CoordinateSystem space);
 	virtual ~SpaceListenerImpl();
 	void setSpace(CoordinateSystem space);
@@ -46,7 +46,7 @@ private:
 	void doDisconnect();
 	CoordinateSystem mSpace;
 
-	ToolManager* mToolManager;
+	TrackingServicePtr mToolManager;
 	DataManager* mDataManager;
 };
 

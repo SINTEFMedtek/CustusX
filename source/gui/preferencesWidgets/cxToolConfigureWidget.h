@@ -5,6 +5,7 @@
 
 #include "sscDefinitions.h"
 #include "cxToolConfigurationParser.h"
+#include "cxLegacySingletons.h"
 
 class QComboBox;
 class QLineEdit;

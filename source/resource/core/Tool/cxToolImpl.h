@@ -32,7 +32,7 @@ class ToolImpl : public Tool
 {
 	Q_OBJECT
 public:
-	explicit ToolImpl(ToolManager* manager, const QString& uid="", const QString& name ="");
+	explicit ToolImpl(TrackingServicePtr manager, const QString& uid="", const QString& name ="");
 	virtual ~ToolImpl();
 
 	virtual TimedTransformMapPtr getPositionHistory();
@@ -44,7 +44,7 @@ public:
 protected:
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
 	TimedTransformMapPtr mPositionHistory;
-	ToolManager* mManager;
+	TrackingServicePtr mManager;
 	Transform3D m_prMt; ///< the transform from the tool to the patient reference
 	TrackingPositionFilterPtr mTrackingPositionFilter;
 private slots:

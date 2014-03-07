@@ -33,7 +33,7 @@
 namespace cx
 {
 
-cxTool::cxTool(ToolManager* manager, IgstkToolPtr igstkTool) :
+cxTool::cxTool(TrackingServicePtr manager, IgstkToolPtr igstkTool) :
 	ToolImpl(manager, ""),
 				mTool(igstkTool), mPolyData(NULL),
 				mValid(false), mConfigured(false), mTracked(false)
@@ -57,7 +57,7 @@ cxTool::cxTool(ToolManager* manager, IgstkToolPtr igstkTool) :
 						mTool->getInternalStructure().mInstrumentScannerId);
 		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 	}
-	connect(mManager, SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
+	connect(mManager.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }
 
 cxTool::~cxTool()

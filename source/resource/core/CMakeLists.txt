@@ -77,7 +77,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	utilities/cxSpaceProviderImpl
 	utilities/cxSpaceListener
 	utilities/cxSpaceListenerImpl
-	utilities/cxLegacySingletons
 	)
 
      

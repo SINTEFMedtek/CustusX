@@ -29,14 +29,14 @@
 namespace cx
 {
 
-ManualTool::ManualTool(ToolManager* manager, const QString& uid, const QString& name) :
+ManualTool::ManualTool(TrackingServicePtr manager, const QString& uid, const QString& name) :
 	ToolImpl(manager, uid, name)
 {
 	mTimestamp = 0;
 	mVisible = false;
 	read3DCrossHairSlot(0);
-	connect(mManager, SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
-	connect(mManager, SIGNAL(tooltipOffset(double)), this, SLOT(read3DCrossHairSlot(double)));
+	connect(mManager.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
+	connect(mManager.get(), SIGNAL(tooltipOffset(double)), this, SLOT(read3DCrossHairSlot(double)));
 }
 
 ManualTool::~ManualTool()

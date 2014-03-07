@@ -36,6 +36,7 @@
 #include "sscVector3DDataAdapterXml.h"
 #include "cxDataMetricWrappers.h"
 #include "cxFrameMetric.h"
+#include "cxLegacySingletons.h"
 
 class QVBoxLayout;
 class QTableWidget;
