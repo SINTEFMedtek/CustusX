@@ -23,6 +23,7 @@
 #include "cxVisualizationServiceBackend.h"
 #include "cxVideoServiceBackend.h"
 #include "cxStateServiceBackend.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -33,12 +34,18 @@ struct LegacySingletons
 	static DataServicePtr mDataManager;
 	static SpaceProviderPtr mSpaceProvider;
 	static PatientServicePtr mPatientService;
+	static VideoServicePtr mVideoService;
+	static VisualizationServicePtr mVisualizationService;
+	static StateServicePtr mStateService;
 };
 
 TrackingServicePtr LegacySingletons::mToolManager;
 DataServicePtr LegacySingletons::mDataManager;
 SpaceProviderPtr LegacySingletons::mSpaceProvider;
 PatientServicePtr LegacySingletons::mPatientService;
+VideoServicePtr LegacySingletons::mVideoService;
+VisualizationServicePtr LegacySingletons::mVisualizationService;
+StateServicePtr LegacySingletons::mStateService;
 
 ToolManager* toolManager()
 {
@@ -48,6 +55,11 @@ DataManager* dataManager()
 {
 	return LegacySingletons::mDataManager.get(); // TODO remove get()
 }
+ViewManager* viewManager()
+{
+	return LegacySingletons::mVisualizationService.get();
+}
+
 TrackingServicePtr trackingService()
 {
 	return LegacySingletons::mToolManager;
@@ -63,6 +75,18 @@ PatientServicePtr patientService()
 DataServicePtr dataService()
 {
 	return LegacySingletons::mDataManager;
+}
+VideoServicePtr videoService()
+{
+	return LegacySingletons::mVideoService;
+}
+VisualizationServicePtr visualizationService()
+{
+	return LegacySingletons::mVisualizationService;
+}
+StateServicePtr stateService()
+{
+	return LegacySingletons::mStateService;
 }
 
 
@@ -96,46 +120,12 @@ void LogicManager::initializeServices()
 	MessageManager::initialize();
 
 	// services layer
-//	cx::cxDataManager::initialize();
-//	cx::PatientService::initialize();
-//	cx::cxToolManager::initializeObject();
-
 	this->getPatientService();
 	this->getTrackingService();
 	this->getVideoService();
 	this->getStateService();
 	this->getVisualizationService();
 	this->getSpaceProvider();
-
-//	VideoServiceBackendPtr videoBackend;
-//	videoBackend = VideoServiceBackend::create(cx::DataManager::getInstance(),
-//											   cx::ToolManager::getInstance(),
-//											   mSpaceProvider);
-//	cx::VideoService::initialize(videoBackend);
-
-//	cx::SpaceProviderPtr spaceProvider;
-//	mSpaceProvider.reset(new cx::SpaceProviderImpl(cx::cxToolManager::getInstance(),
-//												  cx::DataManager::getInstance()));
-//	cx::cxDataManager::getInstance()->setSpaceProvider(mSpaceProvider);
-
-//	mDataFactory.reset(new DataFactory(cx::cxDataManager::getInstance(), mSpaceProvider));
-//	cx::cxDataManager::getInstance()->setDataFactory(mDataFactory);
-
-//	VisualizationServiceBackendPtr vsBackend;
-//	vsBackend.reset(new VisualizationServiceBackend(cx::DataManager::getInstance(),
-//													cx::ToolManager::getInstance(),
-//													cx::VideoService::getInstance(),
-//													mSpaceProvider));
-//	cx::ViewManager::createInstance(vsBackend);
-
-//	StateServiceBackendPtr ssBackend;
-//	ssBackend.reset(new StateServiceBackend(cx::DataManager::getInstance(),
-//													cx::ToolManager::getInstance(),
-//													cx::VideoService::getInstance(),
-//													mSpaceProvider,
-//											cx::PatientService::getInstance()));
-//	cx::StateService::createInstance(ssBackend);
-//	// init stateservice....
 
 	mServiceController.reset(new ServiceController);
 
@@ -159,22 +149,15 @@ void LogicManager::createInterconnectedDataAndSpace()
 
 	// build object(s):
 	mDataService = DataManagerImpl::create();
-
 	LegacySingletons::mDataManager = mDataService;
 
-//	cx::cxDataManager::initialize();
-//	cx::PatientService::initialize();
-//	cx::cxToolManager::initializeObject();
-
 	mSpaceProvider.reset(new cx::SpaceProviderImpl(mTrackingService,
-												  mDataService));
+												   mDataService));
 	mDataService->setSpaceProvider(mSpaceProvider);
+	LegacySingletons::mSpaceProvider= mSpaceProvider;
 
 	mDataFactory.reset(new DataFactory(mDataService, mSpaceProvider));
 	mDataService->setDataFactory(mDataFactory);
-
-	mPatientService = PatientService::create(mDataService);
-	LegacySingletons::mPatientService = mPatientService;
 }
 
 void LogicManager::createDataFactory()
@@ -182,7 +165,7 @@ void LogicManager::createDataFactory()
 	this->createInterconnectedDataAndSpace();
 }
 
-void LogicManager::createPatientService()
+void LogicManager::createDataService()
 {
 	this->createInterconnectedDataAndSpace();
 }
@@ -192,59 +175,67 @@ void LogicManager::createSpaceProvider()
 	this->createInterconnectedDataAndSpace();
 }
 
+void LogicManager::createPatientService()
+{
+	// prerequisites:
+	this->getDataService();
+	// build object(s):
+	mPatientService = PatientService::create(mDataService);
+	LegacySingletons::mPatientService = mPatientService;
+}
+
 void LogicManager::createVideoService()
 {
 	// prerequisites:
 	this->getTrackingService();
-	this->getPatientService();
+	this->getDataService();
 	this->getSpaceProvider();
 
 	// build object(s):
-
 	VideoServiceBackendPtr videoBackend;
 	videoBackend = VideoServiceBackend::create(mDataService,
 											   mTrackingService,
 											   mSpaceProvider);
-	cx::VideoService::initialize(videoBackend);
-
+	mVideoService = VideoService::create(videoBackend);
+	LegacySingletons::mVideoService = mVideoService;
 }
 
 void LogicManager::createVisualizationService()
 {
 	// prerequisites:
 	this->getTrackingService();
-	this->getPatientService();
+	this->getDataService();
 	this->getVideoService();
 	this->getSpaceProvider();
 
 	// build object(s):
-
-	VisualizationServiceBackendPtr vsBackend;
-	vsBackend.reset(new VisualizationServiceBackend(mDataService,
-													mTrackingService,
-													cx::VideoService::getInstance(),
-													mSpaceProvider));
-	cx::ViewManager::createInstance(vsBackend);
+	VisualizationServiceBackendPtr backend;
+	backend.reset(new VisualizationServiceBackend(mDataService,
+												  mTrackingService,
+												  mVideoService,
+												  mSpaceProvider));
+	mVisualizationService = ViewManager::create(backend);
+	LegacySingletons::mVisualizationService = mVisualizationService;
 }
 
 void LogicManager::createStateService()
 {
 	// prerequisites:
 	this->getTrackingService();
+	this->getDataService();
 	this->getPatientService();
 	this->getVideoService();
 	this->getSpaceProvider();
 
 	// build object(s):
-	StateServiceBackendPtr ssBackend;
-	ssBackend.reset(new StateServiceBackend(mDataService,
-													mTrackingService,
-													cx::VideoService::getInstance(),
-													mSpaceProvider,
-											mPatientService));
-	cx::StateService::createInstance(ssBackend);
-	// init stateservice....
-
+	StateServiceBackendPtr backend;
+	backend.reset(new StateServiceBackend(mDataService,
+										  mTrackingService,
+										  mVideoService,
+										  mSpaceProvider,
+										  mPatientService));
+	mStateService = StateService::create(backend);
+	LegacySingletons::mStateService = mStateService;
 }
 
 
@@ -254,6 +245,13 @@ DataFactoryPtr LogicManager::getDataFactory()
 	if (!mDataFactory)
 		this->createPatientService();
 	return mDataFactory;
+}
+
+DataServicePtr LogicManager::getDataService()
+{
+	if (!mDataService)
+		this->createDataService();
+	return mDataService;
 }
 
 PatientServicePtr LogicManager::getPatientService()
@@ -316,13 +314,12 @@ void LogicManager::shutdownServices()
 //	this->resetService(mPatientService);
 //	this->resetService(mTrackingService);
 
-	mStateService.reset();
-	mVisualizationService.reset();
-	mVideoService.reset();
-	mSpaceProvider.reset();
-	mDataFactory.reset();
-	mPatientService.reset();
-	mTrackingService.reset();
+	this->shutdownStateService();
+	this->shutdownVisualizationService();
+	this->shutdownVideoService();
+	this->shutdownPatientService();
+	this->shutdownInterconnectedDataAndSpace();
+	this->shutdownTrackingService();
 
 //	// old stuff - high level
 //	StateService::destroyInstance();
@@ -338,6 +335,75 @@ void LogicManager::shutdownServices()
 	GPUImageBufferRepository::shutdown();
 	MessageManager::shutdown();
 	Settings::destroyInstance();
+}
+
+void LogicManager::shutdownStateService()
+{
+	LegacySingletons::mStateService.reset();
+	this->checkUseCountBeforeDesctruction(mStateService, "StateService");
+	mStateService.reset();
+}
+
+void LogicManager::shutdownVisualizationService()
+{
+	LegacySingletons::mVisualizationService.reset();
+	this->checkUseCountBeforeDesctruction(mVisualizationService, "VisualizationService");
+	mVisualizationService.reset();
+}
+
+
+void LogicManager::shutdownVideoService()
+{
+	LegacySingletons::mVideoService.reset();
+	this->checkUseCountBeforeDesctruction(mVideoService, "VideoService");
+	mVideoService.reset();
+}
+
+void LogicManager::shutdownPatientService()
+{
+	LegacySingletons::mPatientService.reset();
+	this->checkUseCountBeforeDesctruction(mPatientService, "PatientService");
+	mPatientService.reset();
+}
+
+void LogicManager::shutdownInterconnectedDataAndSpace()
+{
+	// [HACK] break loop by removing connection to DataFactory and SpaceProvider
+	mDataService->setSpaceProvider(SpaceProviderPtr());
+	mDataService->setDataFactory(DataFactoryPtr());
+
+	this->checkUseCountBeforeDesctruction(mDataFactory, "DataFactory");
+	mDataFactory.reset();
+
+	LegacySingletons::mSpaceProvider.reset();
+	this->checkUseCountBeforeDesctruction(mSpaceProvider, "SpaceProvider");
+	mSpaceProvider.reset();
+
+	LegacySingletons::mDataManager.reset();
+	this->checkUseCountBeforeDesctruction(mDataService, "DataService");
+	mDataService.reset();
+}
+
+void LogicManager::shutdownTrackingService()
+{
+	LegacySingletons::mToolManager.reset();
+	this->checkUseCountBeforeDesctruction(mTrackingService, "TrackingService");
+	mTrackingService.reset();
+}
+
+
+
+
+template<class T>
+void LogicManager::checkUseCountBeforeDesctruction(const boost::shared_ptr<T>& object, QString text)
+{
+	if (object.use_count()>1)
+	{
+		QString msg = QString("Detected %1 external users for service [%2] during shutdown. ")
+				.arg(object.use_count()-1)
+				.arg(text);
+		messageManager()->sendError(msg);
+	}
 }
 
 

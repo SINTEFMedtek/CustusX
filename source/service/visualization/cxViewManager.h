@@ -107,6 +107,8 @@ class ViewManager: public QObject
 {
 Q_OBJECT
 public:
+	static VisualizationServicePtr create(VisualizationServiceBackendPtr backend);
+	virtual ~ViewManager();
 
 	ViewWidgetQPtr get3DView(int group = 0, int index = 0);
 	std::vector<ViewGroupPtr> getViewGroups() { return mViewGroups; }
@@ -121,9 +123,9 @@ public:
 	NavigationPtr getNavigation();
 	int findGroupContaining3DViewGivenGuess(int preferredGroup);
 
-	static ViewManager* createInstance(VisualizationServiceBackendPtr backend); ///< create the instance
-	static ViewManager* getInstance(); ///< returns the only instance of this class, NULL unless createInstance has been called.
-	static void destroyInstance(); ///< destroys the only instance of this class
+//	static ViewManager* createInstance(VisualizationServiceBackendPtr backend); ///< create the instance
+//	static ViewManager* getInstance(); ///< returns the only instance of this class, NULL unless createInstance has been called.
+//	static void destroyInstance(); ///< destroys the only instance of this class
 
 	/** Initialize the widget and fill with the default view layout.
 	  * Return the top widget, it should be added to the calling gui.
@@ -171,7 +173,6 @@ protected slots:
 
 protected:
 	ViewManager(VisualizationServiceBackendPtr backend);
-	virtual ~ViewManager();
 
 	ViewWidget* getView(const QString& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
 
@@ -191,7 +192,7 @@ protected:
 	void initializeGlobal2DZoom();
 	void initializeActiveView();
 
-	static ViewManager* mTheInstance; ///< the only instance of this class
+//	static ViewManager* mTheInstance; ///< the only instance of this class
 
 	LayoutRepositoryPtr mLayoutRepository;
 	std::vector<QPointer<LayoutWidget> > mLayoutWidgets;
@@ -217,9 +218,9 @@ private:
 	ViewManager(ViewManager const&);
 	ViewManager& operator=(ViewManager const&);
 };
-/**Shortcut for accessing the viewmanager instance.
- */
-ViewManager* viewManager();
+///**Shortcut for accessing the viewmanager instance.
+// */
+//ViewManager* viewManager();
 
 /**
  * @}

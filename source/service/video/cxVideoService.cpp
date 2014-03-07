@@ -32,39 +32,46 @@
 namespace cx
 {
 
-// --------------------------------------------------------
-VideoService* VideoService::mInstance = NULL; ///< static member
-// --------------------------------------------------------
+//// --------------------------------------------------------
+//VideoServicePtr VideoService::mInstance = NULL; ///< static member
+//// --------------------------------------------------------
 
-void VideoService::initialize(VideoServiceBackendPtr videoBackend)
+VideoServicePtr VideoService::create(VideoServiceBackendPtr backend)
 {
-	VideoService::setInstance(new VideoService(videoBackend));
-	VideoService::getInstance();
+	VideoServicePtr retval;
+	retval.reset(new VideoService(backend));
+	return retval;
 }
 
-void VideoService::shutdown()
-{
-  delete mInstance;
-  mInstance = NULL;
-}
+//void VideoService::initialize(VideoServiceBackendPtr videoBackend)
+//{
+//	VideoService::setInstance(new VideoService(videoBackend));
+//	VideoService::getInstance();
+//}
 
-VideoService* VideoService::getInstance()
-{
-	if (!mInstance)
-	{
-		VideoService::setInstance(new VideoService(VideoServiceBackendPtr()));
-	}
-	return mInstance;
-}
+//void VideoService::shutdown()
+//{
+//  delete mInstance;
+//  mInstance = NULL;
+//}
 
-void VideoService::setInstance(VideoService* instance)
-{
-	if (mInstance)
-	{
-		delete mInstance;
-	}
-	mInstance = instance;
-}
+//VideoServicePtr VideoService::getInstance()
+//{
+//	if (!mInstance)
+//	{
+//		VideoService::setInstance(new VideoService(VideoServiceBackendPtr()));
+//	}
+//	return mInstance;
+//}
+
+//void VideoService::setInstance(VideoServicePtr instance)
+//{
+//	if (mInstance)
+//	{
+//		delete mInstance;
+//	}
+//	mInstance = instance;
+//}
 
 VideoService::VideoService(VideoServiceBackendPtr videoBackend)
 {
@@ -98,7 +105,7 @@ void VideoService::setActiveVideoSource(QString uid)
 {
 	mActiveVideoSource = mEmptyVideoSource;
 
-	std::vector<VideoSourcePtr> sources = videoService()->getVideoSources();
+	std::vector<VideoSourcePtr> sources = this->getVideoSources();
 	for (unsigned i=0; i<sources.size(); ++i)
 		if (sources[i]->getUid()==uid)
 			mActiveVideoSource = sources[i];
@@ -212,9 +219,9 @@ void VideoService::fpsSlot(QString source, int val)
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-VideoService* videoService()
-{
-	return VideoService::getInstance();
-}
+//VideoServicePtr videoService()
+//{
+//	return VideoService::getInstance();
+//}
 
 }

@@ -35,8 +35,8 @@ ManualTool::ManualTool(TrackingServicePtr manager, const QString& uid, const QSt
 	mTimestamp = 0;
 	mVisible = false;
 	read3DCrossHairSlot(0);
-	connect(mManager.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
-	connect(mManager.get(), SIGNAL(tooltipOffset(double)), this, SLOT(read3DCrossHairSlot(double)));
+	connect(this->getTrackingService().get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
+	connect(this->getTrackingService().get(), SIGNAL(tooltipOffset(double)), this, SLOT(read3DCrossHairSlot(double)));
 }
 
 ManualTool::~ManualTool()
@@ -133,17 +133,20 @@ double ManualTool::getTimestamp() const
 	return mTimestamp;
 }
 
-// Just use the tool tip offset from the tool manager
-double ManualTool::getTooltipOffset() const
-{
-	return mManager->getTooltipOffset();
-}
+//// Just use the tool tip offset from the tool manager
+//double ManualTool::getTooltipOffset() const
+//{
+//	if (this->getTrackingService())
+//		return this->getTrackingService()->getTooltipOffset();
+//	return 0;
+//}
 
-// Just use the tool tip offset from the tool manager
-void ManualTool::setTooltipOffset(double val)
-{
-	mManager->setTooltipOffset(val);
-}
+//// Just use the tool tip offset from the tool manager
+//void ManualTool::setTooltipOffset(double val)
+//{
+//	if (this->getTrackingService())
+//		this->getTrackingService()->setTooltipOffset(val);
+//}
 
 Transform3D ManualTool::getCalibration_sMt() const
 {

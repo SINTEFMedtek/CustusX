@@ -57,7 +57,7 @@ cxTool::cxTool(TrackingServicePtr manager, IgstkToolPtr igstkTool) :
 						mTool->getInternalStructure().mInstrumentScannerId);
 		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 	}
-	connect(mManager.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
+	connect(this->getTrackingService().get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }
 
 cxTool::~cxTool()
@@ -117,15 +117,16 @@ double cxTool::getTooltipOffset() const
 {
 	if(this->getProbe())
 		return this->getProbe()->getProbeData().getDepthStart();
-	else
-		return mManager->getTooltipOffset();
+	return ToolImpl::getTooltipOffset();
+//		return this->getTrackingService()->getTooltipOffset();
 }
 
 void cxTool::setTooltipOffset(double val)
 {
 	if(this->getProbe())
 		return;
-	mManager->setTooltipOffset(val);
+	ToolImpl::setTooltipOffset(val);
+//	this->getTrackingService()->setTooltipOffset(val);
 }
 
 bool cxTool::isValid() const
