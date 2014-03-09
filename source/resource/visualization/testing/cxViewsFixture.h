@@ -14,15 +14,11 @@
 #ifndef CXVIEWSFIXTURE_H
 #define CXVIEWSFIXTURE_H
 
-#include <QtGui>
-#include <map>
-#include "sscView.h"
-#include "sscViewContainer.h"
-#include "sscSliceProxy.h"
-#include "sscSlicerRepSW.h"
-#include "sscAcceptanceBoxWidget.h"
 #include "cxtestDummyDataManager.h"
 #include "cxMessageListener.h"
+#include "cxForwardDeclarations.h"
+#include "sscDefinitions.h"
+#include <vector>
 
 namespace cxtest
 {
@@ -47,11 +43,7 @@ public:
 
 typedef boost::shared_ptr<class ViewsWindow> ViewsWindowPtr;
 
-/**Test class  with convenience methods for defining views.
- * Uses the following reps:
- *  - ToolRep3D
- *  - SliceRepSW
- *  - VolumetricRep
+/** Test class  with convenience methods for defining views.
  */
 class ViewsFixture : public QObject
 {
@@ -61,16 +53,13 @@ public:
 	ViewsFixture(QString displayText="");
 	virtual ~ViewsFixture();
 
-//	void setDescription(const QString& desc);
 	void define3D(const QString& imageFilename, const ImageParameters* parameters, int r, int c);
 	void defineSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c);
 	bool defineGPUSlice(const QString& uid, const QString&    imageFilename, cx::PLANE_TYPE plane, int r, int c);
 	bool defineGPUSlice(const QString& uid, const std::vector<cx::ImagePtr> images, cx::PLANE_TYPE plane, int r, int c);
 
-//	// setup views
 	cx::ViewWidget* addView(QString caption, int row, int col);
 
-//	void insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c);
 	bool quickRunWidget();
 
 	double getFractionOfBrightPixelsInView(int viewIndex, int threshold, int component=0);
@@ -82,25 +71,13 @@ public:
 private:
 	void applyParameters(cx::ImagePtr image, const ImageParameters* parameters);
 	void fixToolToCenter();
-//	void prettyZoom(cx::View *view);
 	cx::SliceProxyPtr createSliceProxy(cx::PLANE_TYPE plane);
-//	cx::ViewWidget* create2DView(const QString& title, int r, int c);
-//	vtkImageDataPtr getRenderedImageForView(int viewIndex);
 	RenderTesterPtr getRenderTesterForView(int viewIndex);
 
-//	std::vector<cx::View *> mLayouts;
-//	QGridLayout* mSliceLayout;
-//	QString mDisplayText;
-
-//	double mZoomFactor;
 	QString mShaderFolder;
-//	QTimer* mRenderingTimer;
 	cxtest::TestServicesPtr mServices;
 	cx::MessageListenerPtr mMessageListener;
 	ViewsWindowPtr mWindow;
-
-//public slots:
-//	void updateRender();
 };
 
 } // namespace cxtest

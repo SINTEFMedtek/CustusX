@@ -55,27 +55,11 @@ TEST_CASE("Visual rendering: Init view",
 }
 
 TEST_CASE("Visual rendering: Empty view",
-		  "[ca_test][unit][resource][visualization]")
+		  "[unit][resource][visualization]")
 {
 	cxtest::ViewsFixture fixture;
 
 	cx::ViewWidget* view = fixture.addView("empty", 0, 0);
-//	cx::ViewWidget* view = new cx::ViewWidget(fixture.centralWidget());
-//	fixture.insertView(view, "dummy", "none", 0, 0);
-	REQUIRE(fixture.quickRunWidget());
-
-	fixture.dumpDebugViewToDisk("emptyview", 0);
-	REQUIRE(fixture.getFractionOfBrightPixelsInView(0,0) == Approx(0));
-}
-
-TEST_CASE("Visual rendering: Empty view 2",
-		  "[ca_test][unit][resource][visualization]")
-{
-	cxtest::ViewsFixture fixture;
-
-	cx::ViewWidget* view = fixture.addView("empty", 0, 0);
-//	cx::ViewWidget* view = new cx::ViewWidget(fixture.centralWidget());
-//	fixture.insertView(view, "dummy", "none", 0, 0);
 	REQUIRE(fixture.quickRunWidget());
 
 	fixture.dumpDebugViewToDisk("emptyview", 0);
@@ -83,7 +67,7 @@ TEST_CASE("Visual rendering: Empty view 2",
 }
 
 TEST_CASE("Visual rendering: Several empty views in a sequence.",
-		  "[ca_test][unit][resource][visualization]")
+		  "[unit][resource][visualization]")
 {
 	int numberOfIterations = 2;
 	for (unsigned i=0; i<numberOfIterations; ++i)
@@ -93,8 +77,8 @@ TEST_CASE("Visual rendering: Several empty views in a sequence.",
 		cx::ViewWidget* view = fixture.addView("empty", 0, 0);
 		REQUIRE(fixture.quickRunWidget());
 
-//		fixture.dumpDebugViewToDisk("emptyview", 0);
-//		REQUIRE(fixture.getFractionOfBrightPixelsInView(0,0) == Approx(0));
+		fixture.dumpDebugViewToDisk("emptyview", 0);
+		REQUIRE(fixture.getFractionOfBrightPixelsInView(0,0) == Approx(0));
 	}
 }
 
