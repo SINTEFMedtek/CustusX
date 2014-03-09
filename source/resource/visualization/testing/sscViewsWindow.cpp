@@ -1,68 +1,22 @@
 #include "sscViewsWindow.h"
 
+#include <QtGui>
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <sstream>
-
-#include <vtkImageData.h>
-#include <vtkMetaImageReader.h>
-#include <vtkImagePlaneWidget.h>
 #include <vtkRenderer.h>
 #include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
 #include "vtkCamera.h"
-#include "vtkLookupTable.h"
-
-#include "cxtestUtilities.h"
-#include "sscDataManagerImpl.h"
-#include "sscImage.h"
-#include "sscAxesRep.h"
-#include "sscImageTF3D.h"
-#include "sscVolumetricRep.h"
-#include "sscSliceComputer.h"
-#include "sscVector3D.h"
-#include "sscTransform3D.h"
-#include "sscToolRep3D.h"
-#include "sscDummyToolManager.h"
-#include "sscDummyTool.h"
-#include "sscSliceProxy.h"
-#include "sscSlicerRepSW.h"
-#include "sscTexture3DSlicerRep.h"
-#include "sscViewsWindow.h"
-#include "sscImageTF3D.h"
-#include "cxDataLocations.h"
-#include "cxtestRenderTester.h"
-#include "sscLogger.h"
-#include "cxViewsFixture.h"
-
-#include "catch.hpp"
-
-using cx::Vector3D;
-using cx::Transform3D;
-
+#include "sscBoundingBox3D.h"
 
 namespace cxtest
 {
 
 ViewsWindow::ViewsWindow()
 {
-//	mServices = cxtest::TestServices::create();
-//	mMessageListener = cx::MessageListener::create();
-
-//	this->setDescription(displayText);
 	mZoomFactor = 1;
-//	mShaderFolder = cx::DataLocations::getShaderPath();
 	QRect screen = qApp->desktop()->screenGeometry(qApp->desktop()->primaryScreen());
 	screen.adjust(screen.width()*0.15, screen.height()*0.15, -screen.width()*0.15, -screen.height()*0.15);
 	this->setGeometry(screen);
 	this->setCentralWidget( new QWidget(this) );
-
-//	// Initialize dummy toolmanager.
-//	mServices->trackingService()->configure();
-//	mServices->trackingService()->initialize();
-//	mServices->trackingService()->startTracking();
 
 	//gui controll
 	QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -85,13 +39,10 @@ void ViewsWindow::setDescription(const QString& desc)
 ViewsWindow::~ViewsWindow()
 {
 	mRenderingTimer->stop();
-//	mServices.reset();
-//	CHECK(!mMessageListener->containsErrors());
 }
 
 cx::ViewWidget* ViewsWindow::addView(QString caption, int r, int c)
 {
-//	cx::ViewWidget* view = fixture.addView("empty", 0, 0);
 	cx::ViewWidget* view = new cx::ViewWidget(this->centralWidget());
 	this->insertView(view, caption, "", r, c);
 	return view;
@@ -107,17 +58,6 @@ cx::ViewWidget* ViewsWindow::add2DView(QString caption, int r, int c)
 
 	return view;
 }
-
-//cx::ViewWidget* ViewsWindow::create2DView(const QString& title, int r, int c)
-//{
-//	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
-
-//	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
-//	view->GetRenderWindow()->GetInteractor()->Disable();
-//	view->setZoomFactor(mZoomFactor);
-
-//	return view;
-//}
 
 void ViewsWindow::insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c)
 {
@@ -156,18 +96,6 @@ void ViewsWindow::updateRender()
 	{
 		mLayouts[i]->getRenderWindow()->Render();
 	}
-
-//	for (unsigned i=0; i<mLayouts.size(); ++i)
-//	{
-//		mLayouts[i]->getRenderWindow()->Render();
-//	}
-
-//	if (mRemaindingRenderings>=0)
-//	{
-//		--mRemaindingRenderings;
-//		if (mRemaindingRenderings<0)
-//			QTimer::singleShot(0, qApp, SLOT(quit()));
-//	}
 }
 
 void ViewsWindow::prettyZoom(cx::View *view)

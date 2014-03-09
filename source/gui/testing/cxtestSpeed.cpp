@@ -68,10 +68,29 @@ double calculateFPS(bool slicing)
 
 }
 
-TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][not_win32]")
+TEST_CASE("CustusX full run emits no errors, correct service shutdown.", "[integration][not_win32]")
 {
 	initTest();
 	cx::MessageListenerPtr messageListener = cx::MessageListener::create();
+
+	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
+	cx::settings()->setValue("Automation/autoStartStreaming", "false");
+
+	CustusXController custusX(NULL);
+	custusX.mPatientFolder = cx::DataLocations::getTestDataPath() + "/Phantoms/Kaisa/CustusX/Speed_Test_Kaisa.cx3";
+	custusX.mBaseTime = 1;
+	custusX.start();
+	qApp->exec();
+	custusX.stop();
+
+	// the original argument for this test was to check if LogicManager succeeds in deleting
+	// all services: Failure to do so sends an error to the messagemanager.
+	CHECK(!messageListener->containsErrors());
+}
+
+TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][not_win32]")
+{
+	initTest();
 
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
 
@@ -84,7 +103,6 @@ TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][n
 	// TODO: enter this value into config file
 	double minimumFPS = 5;
 	REQUIRE(fps > minimumFPS);
-	CHECK(!messageListener->containsErrors());
 }
 
 TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration][not_win32]")

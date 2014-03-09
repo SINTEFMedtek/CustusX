@@ -1,15 +1,9 @@
 #ifndef SSCTESTSLICEANDTOOLREP_H_
 #define SSCTESTSLICEANDTOOLREP_H_
 
-#include <QtGui>
-#include <map>
+#include <QMainWindow>
 #include "sscView.h"
-#include "sscViewContainer.h"
-#include "sscSliceProxy.h"
-#include "sscSlicerRepSW.h"
-#include "sscAcceptanceBoxWidget.h"
-#include "cxtestDummyDataManager.h"
-#include "cxMessageListener.h"
+class QGridLayout;
 
 namespace cxtest
 {
@@ -35,7 +29,6 @@ public:
 
 private:
 	void prettyZoom(cx::View *view);
-//	cx::ViewWidget* create2DView(const QString& title, int r, int c);
 	void insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c);
 
 	std::vector<cx::View *> mLayouts;
@@ -43,9 +36,7 @@ private:
 	QString mDisplayText;
 
 	double mZoomFactor;
-//	QString mShaderFolder;
 	QTimer* mRenderingTimer;
-//	cxtest::TestServicesPtr mServices;
 
 public slots:
 	void updateRender();
