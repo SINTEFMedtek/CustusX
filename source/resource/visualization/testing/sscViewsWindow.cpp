@@ -1,3 +1,6 @@
+#include "sscViewsWindow.h"
+
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -32,56 +35,34 @@
 #include "cxDataLocations.h"
 #include "cxtestRenderTester.h"
 #include "sscLogger.h"
+#include "cxViewsFixture.h"
+
 #include "catch.hpp"
 
 using cx::Vector3D;
 using cx::Transform3D;
 
 
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-namespace {
-}
-
-
-vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueRangeMin, double hueRangeMax,
-	double saturationRangeMin, double saturationRangeMax, double valueRangeMin, double valueRangeMax)
+namespace cxtest
 {
-	vtkLookupTablePtr lut = vtkLookupTablePtr::New();
-	lut->SetTableRange(tableRangeMin, tableRangeMax);
-	lut->SetHueRange(hueRangeMin, hueRangeMax);
-	lut->SetSaturationRange(saturationRangeMin, saturationRangeMax);
-	lut->SetValueRange(valueRangeMin, valueRangeMax);
-	lut->Build();
 
-	return lut;
-}
-
-ViewsWindow::ViewsWindow(QString displayText)
+ViewsWindow::ViewsWindow()
 {
-	mServices = cxtest::TestServices::create();
-	mMessageListener = cx::MessageListener::create();
+//	mServices = cxtest::TestServices::create();
+//	mMessageListener = cx::MessageListener::create();
 
-	//	cx::DataManagerImpl::initialize();
-
-	this->setDescription(displayText);
+//	this->setDescription(displayText);
 	mZoomFactor = 1;
-	mShaderFolder = cx::DataLocations::getShaderPath();
-//	mRemaindingRenderings = -1;
+//	mShaderFolder = cx::DataLocations::getShaderPath();
 	QRect screen = qApp->desktop()->screenGeometry(qApp->desktop()->primaryScreen());
 	screen.adjust(screen.width()*0.15, screen.height()*0.15, -screen.width()*0.15, -screen.height()*0.15);
 	this->setGeometry(screen);
 	this->setCentralWidget( new QWidget(this) );
 
-	// Initialize dummy toolmanager.
-//	cx::TrackingServicePtr mToolmanager = cx::DummyToolManager::getInstance();
-	mServices->trackingService()->configure();
-	mServices->trackingService()->initialize();
-	mServices->trackingService()->startTracking();
+//	// Initialize dummy toolmanager.
+//	mServices->trackingService()->configure();
+//	mServices->trackingService()->initialize();
+//	mServices->trackingService()->startTracking();
 
 	//gui controll
 	QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -104,68 +85,21 @@ void ViewsWindow::setDescription(const QString& desc)
 ViewsWindow::~ViewsWindow()
 {
 	mRenderingTimer->stop();
-//	cx::ToolManager::shutdown();
-//	cx::DataManager::shutdown();
-	mServices.reset();
-	CHECK(!mMessageListener->containsErrors());
+//	mServices.reset();
+//	CHECK(!mMessageListener->containsErrors());
 }
 
-cx::DummyToolPtr ViewsWindow::dummyTool()
+cx::ViewWidget* ViewsWindow::addView(QString caption, int r, int c)
 {
-	return boost::dynamic_pointer_cast<cx::DummyTool>(mServices->trackingService()->getDominantTool());
+//	cx::ViewWidget* view = fixture.addView("empty", 0, 0);
+	cx::ViewWidget* view = new cx::ViewWidget(this->centralWidget());
+	this->insertView(view, caption, "", r, c);
+	return view;
 }
 
-
-bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
-{	
-	std::vector<cx::ImagePtr> images(1);
-	images[0] = this->loadImage(imageFilename);
-
-	return this->defineGPUSlice(uid, images, plane, r, c);
-}
-
-bool ViewsWindow::defineGPUSlice(const QString& uid, const std::vector<cx::ImagePtr> images, cx::PLANE_TYPE plane, int r, int c)
+cx::ViewWidget* ViewsWindow::add2DView(QString caption, int r, int c)
 {
-	cx::ViewWidget* view = this->create2DView("several images", r, c);
-
-	if (!view || !view->getRenderWindow())
-		return false;
-
-// always fails on mac:
-//	if (!view->getRenderWindow()->SupportsOpenGL())
-//		return false;
-
-// gives error when called outside of a gl render loop
-//	if (!cx::Texture3DSlicerRep::isSupported(view->getRenderWindow()))
-//		return false;
-
-	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
-	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(uid);
-	rep->setShaderPath(mShaderFolder);
-	rep->setSliceProxy(proxy);
-	rep->setImages(images);
-	view->addRep(rep);
-	insertView(view, uid, "several images", r, c);
-
-	return true;
-}
-
-void ViewsWindow::defineSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
-{
-	cx::ViewWidget* view = this->create2DView(imageFilename, r, c);
-	cx::ImagePtr image = loadImage(imageFilename);
-
-	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
-	cx::SliceRepSWPtr rep = cx::SliceRepSW::New(uid);
-	rep->setImage(image);
-	rep->setSliceProxy(proxy);
-	view->addRep(rep);
-	insertView(view, uid, imageFilename, r, c);
-}
-
-cx::ViewWidget* ViewsWindow::create2DView(const QString& title, int r, int c)
-{
-	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
+	cx::ViewWidget* view = this->addView(caption, r, c);
 
 	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
 	view->GetRenderWindow()->GetInteractor()->Disable();
@@ -174,42 +108,16 @@ cx::ViewWidget* ViewsWindow::create2DView(const QString& title, int r, int c)
 	return view;
 }
 
-cx::SliceProxyPtr ViewsWindow::createSliceProxy(cx::PLANE_TYPE plane)
-{
-//	cx::TrackingServicePtr mToolmanager = cx::DummyToolManager::getInstance();
-	cx::ToolPtr tool = mServices->trackingService()->getDominantTool();
+//cx::ViewWidget* ViewsWindow::create2DView(const QString& title, int r, int c)
+//{
+//	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
 
-	cx::SliceProxyPtr proxy = cx::SliceProxy::create(mServices->dataService());
-	proxy->setTool(tool);
-	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
-	return proxy;
-}
+//	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
+//	view->GetRenderWindow()->GetInteractor()->Disable();
+//	view->setZoomFactor(mZoomFactor);
 
-cx::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
-{
-	QString filename = cxtest::Utilities::getDataRoot(imageFilename);
-	cx::ImagePtr image = mServices->dataService()->loadImage(filename, filename);
-	Vector3D center = image->boundingBox().center();
-	center = image->get_rMd().coord(center);
-	mServices->dataService()->setCenter(center);
-	
-	if (!image)
-		return cx::ImagePtr();
-
-	// side effect: set tool movement box to data box,
-	dummyTool()->setToolPositionMovementBB(transform(image->get_rMd(), image->boundingBox()));
-	this->fixToolToCenter();
-
-	return image;
-}
-
-void ViewsWindow::fixToolToCenter()
-{
-	Vector3D c = mServices->dataService()->getCenter();
-	cx::Transform3D prMt = cx::createTransformTranslate(c);
-	dummyTool()->setToolPositionMovement(std::vector<Transform3D>(1, prMt));
-	dummyTool()->set_prMt(prMt);
-}
+//	return view;
+//}
 
 void ViewsWindow::insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c)
 {
@@ -224,32 +132,17 @@ void ViewsWindow::insertView(cx::ViewWidget *view, const QString& uid, const QSt
 	layout->addWidget(new QLabel(uid+" "+volume, this));
 }
 
-void ViewsWindow::define3D(const QString& imageFilename, const ImageParameters* parameters, int r, int c)
+cx::View* ViewsWindow::getView(int index)
 {
-	QString uid = "3D";
-	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
-	
-	cx::ImagePtr image = loadImage(imageFilename);
-	this->applyParameters(image, parameters);
-
-	// volume rep
-	cx::VolumetricRepPtr mRepPtr = cx::VolumetricRep::New( image->getUid() );
-	mRepPtr->setMaxVolumeSize(10*1000*1000);
-	mRepPtr->setUseGPUVolumeRayCastMapper(); // if available
-	mRepPtr->setImage(image);	
-	mRepPtr->setName(image->getName());
-	view->addRep(mRepPtr);
-		
-	insertView(view, uid, imageFilename, r, c);
+	return mLayouts[index];
 }
 
-void ViewsWindow::applyParameters(cx::ImagePtr image, const ImageParameters *parameters)
+bool ViewsWindow::quickRunWidget()
 {
-	if (!parameters)
-		return;
-	image->getTransferFunctions3D()->setLLR(parameters->llr);
-	image->getTransferFunctions3D()->setAlpha(parameters->alpha);
-//	image->getTransferFunctions3D()->setLut(parameters->lut);
+	this->show();
+	this->updateRender();
+
+	return true;
 }
 
 void ViewsWindow::updateRender()
@@ -293,28 +186,5 @@ void ViewsWindow::prettyZoom(cx::View *view)
 	camera->SetParallelScale(parallelscale);
 }
 
-void ViewsWindow::dumpDebugViewToDisk(QString text, int viewIndex)
-{
-	cxtest::RenderTesterPtr renderTester = cxtest::RenderTester::create(mLayouts[viewIndex]->getRenderWindow());
-	vtkImageDataPtr output = renderTester->getImageFromRenderWindow();
-	renderTester->printFractionOfVoxelsAboveZero(text, output);
-}
-
-double ViewsWindow::getFractionOfBrightPixelsInView(int viewIndex, int threshold, int component)
-{
-	cxtest::RenderTesterPtr renderTester = cxtest::RenderTester::create(mLayouts[viewIndex]->getRenderWindow());
-	vtkImageDataPtr output = renderTester->getImageFromRenderWindow();
-//	vtkImageDataPtr output = renderTester->renderToImage();
-	return cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, threshold,component);
-}
-
-bool ViewsWindow::quickRunWidget()
-{
-	this->show();
-	this->updateRender();
-
-//	cx::Transform3D rMt = cx::dataManager()->get_rMpr() * dummyTool()->get_prMt();
-
-	return true;
-}
+} // namespace cxtest
 
