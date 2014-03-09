@@ -28,7 +28,8 @@
 #include "cxtestJenkinsMeasurement.h"
 #include "cxtestRenderTester.h"
 #include "cxViewManager.h"
-
+#include "cxLegacySingletons.h"
+#include "cxMessageListener.h"
 
 namespace cxtest
 {
@@ -70,6 +71,8 @@ double calculateFPS(bool slicing)
 TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][not_win32]")
 {
 	initTest();
+	cx::MessageListenerPtr messageListener = cx::MessageListener::create();
+
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
 
 	JenkinsMeasurement jenkins;
@@ -81,6 +84,7 @@ TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][n
 	// TODO: enter this value into config file
 	double minimumFPS = 5;
 	REQUIRE(fps > minimumFPS);
+	CHECK(!messageListener->containsErrors());
 }
 
 TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration][not_win32]")

@@ -111,13 +111,12 @@ void testAndDeleteBaseWidgetChild(cx::BaseWidget* widget)
 
 void init()
 {
-
 	cx::LogicManager::initialize();
-	cx::viewManager()->initialize();
+//	cx::viewManager()->initialize();
 }
 void shutdown()
 {
-	cx::viewManager()->destroyInstance();
+//	cx::viewManager()->destroyInstance();
 	cx::LogicManager::shutdown();
 }
 }

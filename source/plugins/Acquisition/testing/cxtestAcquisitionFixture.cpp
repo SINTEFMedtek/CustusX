@@ -27,6 +27,7 @@
 #include "cxToolManager.h"
 #include "cxLogicManager.h"
 #include "cxStateService.h"
+#include "cxLegacySingletons.h"
 
 namespace cxtest
 {
@@ -86,7 +87,7 @@ void AcquisitionFixture::setupVideo()
 void AcquisitionFixture::setupProbe()
 {
 	SSC_LOG("");
-	cx::DummyToolPtr dummyTool(new cx::DummyTool(cx::cxToolManager::getInstance()));
+	cx::DummyToolPtr dummyTool(new cx::DummyTool(cx::trackingService()));
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(cx::DoubleBoundingBox3D(0,0,0,10,10,10)));
 	std::pair<QString, cx::ProbeDefinition> probedata = cx::UsReconstructionFileReader::readProbeDataFromFile(mAcqDataFilename);
 	cx::cxProbePtr probe = cx::cxProbe::New("","");
@@ -96,7 +97,7 @@ void AcquisitionFixture::setupProbe()
 	CHECK(dummyTool->getProbe()->isValid());
 	dummyTool->setVisible(true);
 	// TODO: refactor toolmanager to be runnable in dummy mode (playback might benefit from this too)
-	cx::cxToolManager::getInstance()->runDummyTool(dummyTool);
+	cx::trackingService()->runDummyTool(dummyTool);
 	CHECK(dummyTool->getProbe()->getRTSource());
 }
 

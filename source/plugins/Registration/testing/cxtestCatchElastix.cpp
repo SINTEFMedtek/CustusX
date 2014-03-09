@@ -38,6 +38,7 @@
 #include "cxElastixSingleThreadedRunner.h"
 #include "sscTypeConversions.h"
 #include "cxElastixParameters.h"
+#include "cxLogicManager.h"
 
 namespace cxtest
 {
@@ -55,14 +56,16 @@ class ElastiXFixture
 public:
 	ElastiXFixture()
 	{
-		cx::MessageManager::initialize();
-		cx::cxDataManager::initialize();
+//		cx::MessageManager::initialize();
+//		cx::cxDataManager::initialize();
+		cx::LogicManager::initialize();
 	}
 
 	~ElastiXFixture()
 	{
-		cx::DataManager::shutdown();
-		cx::MessageManager::shutdown();
+		cx::LogicManager::shutdown();
+//		cx::DataManager::shutdown();
+//		cx::MessageManager::shutdown();
 	}
 	bool compareTransforms(cx::Transform3D result, cx::Transform3D solution)
 	{

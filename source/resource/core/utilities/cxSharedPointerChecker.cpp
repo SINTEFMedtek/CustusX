@@ -12,27 +12,22 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "catch.hpp"
-#include "sscDataManagerImpl.h"
-#include "cxtestDummyDataManager.h"
+#include "cxSharedPointerChecker.h"
 #include "sscMessageManager.h"
 
-
-TEST_CASE("DataManagerImpl setup/shutdown works multiple times", "[unit]")
+namespace cx
 {
-    for (unsigned i=0; i<2; ++i)
-    {
-		cx::DataServicePtr service = cx::DataManagerImpl::create();
-		REQUIRE(service);
-		CHECK(service.unique());
-		service.reset();
 
-//		cx::DataManagerImpl::initialize();
-//		CHECK(cx::dataManager());
-
-//		cx::DataManagerImpl::shutdown();
-        //REQUIRE_FALSE(dataManager()); //todo: should work
-    }
+void requireUnique(int use_count, QString objectName)
+{
+	if (use_count>1)
+	{
+		QString msg = QString("Detected %1 users for object [%2], should be unique. ")
+				.arg(use_count)
+				.arg(objectName);
+		cx::messageManager()->sendError(msg);
+	}
 }
 
 
+} // namespace cx

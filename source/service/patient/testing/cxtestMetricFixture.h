@@ -22,6 +22,8 @@
 #include "sscPlaneMetric.h"
 //#include "cxToolMetric.h"
 #include <QDomNode>
+#include "cxtestDummyDataManager.h"
+#include "cxMessageListener.h"
 
 namespace cxtest {
 
@@ -132,6 +134,9 @@ public:
 	bool verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric);
 
 private:
+	TestServicesPtr mServices;
+	cx::MessageListenerPtr mMessageListener;
+
 	cx::DataServicePtr getDataManager();
 	cx::SpaceProviderPtr getSpaceProvider();
 

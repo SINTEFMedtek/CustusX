@@ -11,28 +11,31 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
+#ifndef CXSHAREDPOINTERCHECKER_H
+#define CXSHAREDPOINTERCHECKER_H
 
-#include "catch.hpp"
-#include "sscDataManagerImpl.h"
-#include "cxtestDummyDataManager.h"
-#include "sscMessageManager.h"
+#include "boost/shared_ptr.hpp"
+#include <QString>
 
-
-TEST_CASE("DataManagerImpl setup/shutdown works multiple times", "[unit]")
+namespace cx
 {
-    for (unsigned i=0; i<2; ++i)
-    {
-		cx::DataServicePtr service = cx::DataManagerImpl::create();
-		REQUIRE(service);
-		CHECK(service.unique());
-		service.reset();
 
-//		cx::DataManagerImpl::initialize();
-//		CHECK(cx::dataManager());
+void requireUnique(int use_count, QString objectName);
 
-//		cx::DataManagerImpl::shutdown();
-        //REQUIRE_FALSE(dataManager()); //todo: should work
-    }
+/** Utility for checking the usage count of share_ptr's
+  * and reporting it.
+  *
+ * \date 2014-03-09
+ * \author christiana
+  */
+template<class T>
+void requireUnique(const boost::shared_ptr<T>& object, QString objectName)
+{
+	requireUnique(object.use_count(), objectName);
 }
 
 
+} // namespace cx
+
+
+#endif // CXSHAREDPOINTERCHECKER_H
