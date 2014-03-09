@@ -32,6 +32,7 @@
 #include "cxDataLocations.h"
 #include "cxtestRenderTester.h"
 #include "sscLogger.h"
+#include "catch.hpp"
 
 using cx::Vector3D;
 using cx::Transform3D;
@@ -44,10 +45,6 @@ using cx::Transform3D;
 //---------------------------------------------------------
 
 namespace {
-	cx::DummyToolPtr dummyTool()
-	{
-		return boost::dynamic_pointer_cast<cx::DummyTool>(cx::ToolManager::getInstance()->getDominantTool());
-	}
 }
 
 
@@ -66,7 +63,10 @@ vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueR
 
 ViewsWindow::ViewsWindow(QString displayText)
 {
-	cx::DataManagerImpl::initialize();
+	mServices = cxtest::TestServices::create();
+	mMessageListener = cx::MessageListener::create();
+
+	//	cx::DataManagerImpl::initialize();
 
 	this->setDescription(displayText);
 	mZoomFactor = 1;
@@ -78,10 +78,10 @@ ViewsWindow::ViewsWindow(QString displayText)
 	this->setCentralWidget( new QWidget(this) );
 
 	// Initialize dummy toolmanager.
-	cx::TrackingServicePtr mToolmanager = cx::DummyToolManager::getInstance();
-	mToolmanager->configure();
-	mToolmanager->initialize();
-	mToolmanager->startTracking();
+//	cx::TrackingServicePtr mToolmanager = cx::DummyToolManager::getInstance();
+	mServices->trackingService()->configure();
+	mServices->trackingService()->initialize();
+	mServices->trackingService()->startTracking();
 
 	//gui controll
 	QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -104,8 +104,15 @@ void ViewsWindow::setDescription(const QString& desc)
 ViewsWindow::~ViewsWindow()
 {
 	mRenderingTimer->stop();
-	cx::ToolManager::shutdown();
-	cx::DataManager::shutdown();
+//	cx::ToolManager::shutdown();
+//	cx::DataManager::shutdown();
+	mServices.reset();
+	CHECK(!mMessageListener->containsErrors());
+}
+
+cx::DummyToolPtr ViewsWindow::dummyTool()
+{
+	return boost::dynamic_pointer_cast<cx::DummyTool>(mServices->trackingService()->getDominantTool());
 }
 
 
@@ -169,10 +176,10 @@ cx::ViewWidget* ViewsWindow::create2DView(const QString& title, int r, int c)
 
 cx::SliceProxyPtr ViewsWindow::createSliceProxy(cx::PLANE_TYPE plane)
 {
-	cx::TrackingServicePtr mToolmanager = cx::DummyToolManager::getInstance();
-	cx::ToolPtr tool = mToolmanager->getDominantTool();
+//	cx::TrackingServicePtr mToolmanager = cx::DummyToolManager::getInstance();
+	cx::ToolPtr tool = mServices->trackingService()->getDominantTool();
 
-	cx::SliceProxyPtr proxy = cx::SliceProxy::create(cx::dataManager());
+	cx::SliceProxyPtr proxy = cx::SliceProxy::create(mServices->dataService());
 	proxy->setTool(tool);
 	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
 	return proxy;
@@ -181,10 +188,10 @@ cx::SliceProxyPtr ViewsWindow::createSliceProxy(cx::PLANE_TYPE plane)
 cx::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 {
 	QString filename = cxtest::Utilities::getDataRoot(imageFilename);
-	cx::ImagePtr image = cx::DataManager::getInstance()->loadImage(filename, filename);
+	cx::ImagePtr image = mServices->dataService()->loadImage(filename, filename);
 	Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);
-	cx::DataManager::getInstance()->setCenter(center);
+	mServices->dataService()->setCenter(center);
 	
 	if (!image)
 		return cx::ImagePtr();
@@ -198,7 +205,7 @@ cx::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 
 void ViewsWindow::fixToolToCenter()
 {
-	Vector3D c = cx::DataManager::getInstance()->getCenter();
+	Vector3D c = mServices->dataService()->getCenter();
 	cx::Transform3D prMt = cx::createTransformTranslate(c);
 	dummyTool()->setToolPositionMovement(std::vector<Transform3D>(1, prMt));
 	dummyTool()->set_prMt(prMt);

@@ -124,14 +124,8 @@ ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 	this->initializeGlobal2DZoom();
 	this->initializeActiveView();
 	this->syncOrientationMode(SyncedValue::create(0));
-}
 
-ViewManager::~ViewManager()
-{
-}
-
-void ViewManager::initialize()
-{
+	// moved here from initialize() ... ensures object is fully callable after construction
 	mCameraStyleInteractor.reset(new CameraStyleInteractor);
 
 	mActiveLayout = QStringList() << "" << "";
@@ -143,6 +137,25 @@ void ViewManager::initialize()
 	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
 	connect(this, SIGNAL(activeViewChanged()), this, SLOT(updateCameraStyleActions()));
+}
+
+ViewManager::~ViewManager()
+{
+}
+
+void ViewManager::initialize()
+{
+//	mCameraStyleInteractor.reset(new CameraStyleInteractor);
+
+//	mActiveLayout = QStringList() << "" << "";
+//	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
+
+//	mInteractiveCropper.reset(new InteractiveCropper(mBackend));
+//	mInteractiveClipper.reset(new InteractiveClipper(mBackend));
+//	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
+//	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
+//	connect(mInteractiveClipper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
+//	connect(this, SIGNAL(activeViewChanged()), this, SLOT(updateCameraStyleActions()));
 
 	// set start layout
 	this->setActiveLayout("LAYOUT_3D_ACS_SINGLE", 0);

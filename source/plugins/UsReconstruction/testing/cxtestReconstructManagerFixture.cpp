@@ -23,7 +23,7 @@
 
 #include "cxDataLocations.h"
 #include "sscReconstructPreprocessor.h"
-
+#include "cxLogicManager.h"
 
 namespace cxtest
 {
@@ -32,14 +32,16 @@ ReconstructManagerTestFixture::ReconstructManagerTestFixture()
 {
 	mVerbose = false;
 
-	cx::MessageManager::initialize();
-	cx::cxDataManager::initialize();
+//	cx::MessageManager::initialize();
+//	cx::cxDataManager::initialize();
+	cx::LogicManager::initialize();
 }
 
 ReconstructManagerTestFixture::~ReconstructManagerTestFixture()
 {
-	cx::cxDataManager::shutdown();
-	cx::MessageManager::shutdown();
+	cx::LogicManager::shutdown();
+//	cx::cxDataManager::shutdown();
+//	cx::MessageManager::shutdown();
 }
 
 void ReconstructManagerTestFixture::setPNN_InterpolationSteps(int value)

@@ -7,6 +7,8 @@
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
 #include "sscAcceptanceBoxWidget.h"
+#include "cxtestDummyDataManager.h"
+#include "cxMessageListener.h"
 
 /**
   * @brief Creates and returns a lut, based on range parameters.
@@ -58,6 +60,7 @@ public:
 	void dumpDebugViewToDisk(QString text, int viewIndex);
 
 	cx::ImagePtr loadImage(const QString& imageFilename);
+	cx::DummyToolPtr dummyTool();
 
 private:
 	void applyParameters(cx::ImagePtr image, const ImageParameters* parameters);
@@ -75,6 +78,8 @@ private:
 //	cx::AcceptanceBoxWidget* mAcceptanceBox;
 	QTimer* mRenderingTimer;
 //	int mRemaindingRenderings;
+	cxtest::TestServicesPtr mServices;
+	cx::MessageListenerPtr mMessageListener;
 
 public slots:
 	void updateRender();

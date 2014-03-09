@@ -92,8 +92,6 @@ private:
   void createStateService();
 
   void createInterconnectedDataAndSpace();
-  template <class T>
-  void checkUseCountBeforeDesctruction(const boost::shared_ptr<T>& object, QString text);
 
   void shutdownStateService();
   void shutdownVisualizationService();

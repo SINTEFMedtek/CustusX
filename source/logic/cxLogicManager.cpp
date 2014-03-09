@@ -24,6 +24,7 @@
 #include "cxVideoServiceBackend.h"
 #include "cxStateServiceBackend.h"
 #include "sscTypeConversions.h"
+#include "cxSharedPointerChecker.h"
 
 namespace cx
 {
@@ -340,14 +341,14 @@ void LogicManager::shutdownServices()
 void LogicManager::shutdownStateService()
 {
 	LegacySingletons::mStateService.reset();
-	this->checkUseCountBeforeDesctruction(mStateService, "StateService");
+	requireUnique(mStateService, "StateService");
 	mStateService.reset();
 }
 
 void LogicManager::shutdownVisualizationService()
 {
 	LegacySingletons::mVisualizationService.reset();
-	this->checkUseCountBeforeDesctruction(mVisualizationService, "VisualizationService");
+	requireUnique(mVisualizationService, "VisualizationService");
 	mVisualizationService.reset();
 }
 
@@ -355,14 +356,14 @@ void LogicManager::shutdownVisualizationService()
 void LogicManager::shutdownVideoService()
 {
 	LegacySingletons::mVideoService.reset();
-	this->checkUseCountBeforeDesctruction(mVideoService, "VideoService");
+	requireUnique(mVideoService, "VideoService");
 	mVideoService.reset();
 }
 
 void LogicManager::shutdownPatientService()
 {
 	LegacySingletons::mPatientService.reset();
-	this->checkUseCountBeforeDesctruction(mPatientService, "PatientService");
+	requireUnique(mPatientService, "PatientService");
 	mPatientService.reset();
 }
 
@@ -371,41 +372,26 @@ void LogicManager::shutdownInterconnectedDataAndSpace()
 	// [HACK] break loop by removing connection to DataFactory and SpaceProvider
 	mDataService->setSpaceProvider(SpaceProviderPtr());
 	mDataService->setDataFactory(DataFactoryPtr());
+	mDataService->clear();
 
-	this->checkUseCountBeforeDesctruction(mDataFactory, "DataFactory");
+	requireUnique(mDataFactory, "DataFactory");
 	mDataFactory.reset();
 
 	LegacySingletons::mSpaceProvider.reset();
-	this->checkUseCountBeforeDesctruction(mSpaceProvider, "SpaceProvider");
+	requireUnique(mSpaceProvider, "SpaceProvider");
 	mSpaceProvider.reset();
 
 	LegacySingletons::mDataManager.reset();
-	this->checkUseCountBeforeDesctruction(mDataService, "DataService");
+	requireUnique(mDataService, "DataService");
 	mDataService.reset();
 }
 
 void LogicManager::shutdownTrackingService()
 {
 	LegacySingletons::mToolManager.reset();
-	this->checkUseCountBeforeDesctruction(mTrackingService, "TrackingService");
+	requireUnique(mTrackingService, "TrackingService");
 	mTrackingService.reset();
 }
-
-
-
-
-template<class T>
-void LogicManager::checkUseCountBeforeDesctruction(const boost::shared_ptr<T>& object, QString text)
-{
-	if (object.use_count()>1)
-	{
-		QString msg = QString("Detected %1 external users for service [%2] during shutdown. ")
-				.arg(object.use_count()-1)
-				.arg(text);
-		messageManager()->sendError(msg);
-	}
-}
-
 
 LogicManager* LogicManager::getInstance()
 {
@@ -415,7 +401,6 @@ LogicManager* LogicManager::getInstance()
 	}
 	return mInstance;
 }
-
 
 LogicManager::LogicManager()
 {

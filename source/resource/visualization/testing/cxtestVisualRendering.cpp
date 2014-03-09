@@ -39,7 +39,7 @@ class VisualRenderingFixture : public ViewsWindow
 public:
 	VisualRenderingFixture() : ViewsWindow("")
 	{
-		cx::MessageManager::initialize();
+//		cx::MessageManager::initialize();
 		image.push_back("ssc/Person5/person5_t1_unsigned.mhd");
 		image.push_back("ssc/Person5/person5_t2_unsigned.mhd");
 		image.push_back("ssc/Person5/person5_flair_unsigned.mhd");
@@ -47,7 +47,7 @@ public:
 	}
 	~VisualRenderingFixture()
 	{
-		cx::MessageManager::shutdown();
+//		cx::MessageManager::shutdown();
 	}
 
 	QStringList image;
