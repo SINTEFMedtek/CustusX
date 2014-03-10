@@ -20,19 +20,21 @@
 
 namespace cxtest {
 
-void setSeedPoint(cx::Vector3D point) {
-    cx::cxToolManager::initializeObject();
-    cx::cxToolManager * toolmanager = cx::cxToolManager::getInstance();
-    cx::ManualToolPtr tool = toolmanager->getManualTool();
+void setSeedPoint(cx::TrackingServicePtr trackingService, cx::Vector3D point)
+{
+//    cx::cxToolManager::initializeObject();
+//    cx::cxToolManager * toolmanager = cx::cxToolManager::getInstance();
+	cx::ManualToolPtr tool = trackingService->getManualTool();
     tool->set_prMt(cx::createTransformTranslate(point));
 
 }
 
 TEST_CASE("LevelSetFilter: getSeedPointFromTool", "[unit][plugins][Algorithm][LevelSetFilter]")
 {
+	cx::TrackingServicePtr trackingService = cx::cxToolManager::create();
     cx::Vector3D toolTipPoint;
     toolTipPoint.setRandom();
-    setSeedPoint(toolTipPoint);
+	setSeedPoint(trackingService, toolTipPoint);
     cx::ImagePtr image = cxtest::Utilities::create3DImage();
     cx::Vector3D point = cx::LevelSetFilter::getSeedPointFromTool(image);
     REQUIRE(toolTipPoint(0) == point(0));
@@ -91,7 +93,7 @@ TEST_CASE("LevelSetFilter: execute", "[integration][plugins][Algorithm][LevelSet
 	seedPoint(0) = 34;
 	seedPoint(1) = 29;
 	seedPoint(2) = 50;
-	setSeedPoint(seedPoint);
+	setSeedPoint(cx::trackingService(), seedPoint);
 	// TODO: the three lines below are not working properly. The options are not set!
 	lsf->getThresholdOption(lsf->getmOptions())->setValue(60);
 	lsf->getEpsilonOption(lsf->getmOptions())->setValue(100);
