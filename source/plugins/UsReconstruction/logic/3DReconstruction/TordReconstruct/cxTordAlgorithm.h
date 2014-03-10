@@ -60,7 +60,6 @@ public:
 	 * @param method The method ID. See kernels.cl for more information
 	 * @param planeMethod the plane method ID. See kernels.cl for more information
 	 * @param nStarts number of starts for multistart search for close planes
-	 * @param kernelPath The path of the kernel source code
 	 * @param brightnessWeight The extra weight to give pixels brighter than mean
 	 * @param newnessWeight The extra weight to give pixels newer than mean
 	 * @return True on suc
@@ -72,8 +71,7 @@ public:
 	                                  int planeMethod,
 	                                  int nStarts,
 	                                  float brightnessWeight,
-	                                  float newnessWeight,
-	                                  QString kernelPath);
+	                                  float newnessWeight);
 	/**
 	 * Perform GPU Reconstruction.
 	 * This function initializes the CL memory objects, calls the kernel and reads back the result,
