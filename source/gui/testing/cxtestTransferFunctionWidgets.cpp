@@ -2,12 +2,14 @@
 
 #include "cxtestTestTransferFunctionColorWidget.h"
 #include "cxtestTestTransferFunctions.h"
+#include "cxLogicManager.h"
 
 namespace cxtest
 {
 
 TEST_CASE("Correct ColorTFBoundaries calculated for default transfer function", "[unit][gui][widget]")
 {
+	cx::LogicManager::initialize();
 	TestTransferFunctionColorWidget*  widget = new TestTransferFunctionColorWidget();
 	QRect plotArea = QRect(10, 20, 100, 200);
 	widget->setPlotArea(plotArea);
@@ -15,6 +17,7 @@ TEST_CASE("Correct ColorTFBoundaries calculated for default transfer function", 
 	REQUIRE(plotArea.left() <= widget->getLeftAreaBoundary());
 	REQUIRE(plotArea.right() >= widget->getRigthAreaBoundary());
 	delete widget;
+	cx::LogicManager::shutdown();
 }
 
 
