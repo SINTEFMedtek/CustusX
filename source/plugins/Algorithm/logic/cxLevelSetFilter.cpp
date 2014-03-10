@@ -135,7 +135,7 @@ bool LevelSetFilter::execute() {
                 alpha
         );
         SIPL::int3 size = result->getSize();
-        ImagePtr image = DataManager::getInstance()->getImage(inputImage->getUid());
+		ImagePtr image = dataManager()->getImage(inputImage->getUid());
         vtkImageDataPtr rawSegmentation = this->convertToVtkImageData((char *)result->getData(), size.x, size.y, size.z, image);
         delete result;
 
