@@ -37,7 +37,14 @@ public:
 
 private:
 	std::map<double, Transform3D> mHistory;
-	void clearIfTimestampIsOlderThanHead(double timestamp);
+	std::map<double, Transform3D> mResampled;
+	std::map<double, Transform3D> mFiltered;
+	void clearIfTimestampIsOlderThanHead(Transform3D pos, double timestamp);
+	void clearIfJumpInTimestamps(Transform3D pos, double timestamp);
+	void interpolateAndFilterPositions(Transform3D pos, double timestamp);
+	int cutOffFrequency;
+	int filterOrder;
+	int resampleFrequency;
 };
 typedef boost::shared_ptr<TrackingPositionFilter> TrackingPositionFilterPtr;
 
