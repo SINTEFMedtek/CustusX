@@ -49,7 +49,7 @@ VideoConnectionManager::VideoConnectionManager(VideoServiceBackendPtr backend)
 	connect(mLocalVideoServerProcess->getProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
 	mVideoConnection.reset(new VideoConnection(mBackend));
 	connect(mVideoConnection.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
-	connect(mVideoConnection.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int)));
+	connect(mVideoConnection.get(), SIGNAL(fps(QString, int)), this, SIGNAL(fps(QString, int)));
 	connect(mVideoConnection.get(), SIGNAL(videoSourcesChanged()), this, SIGNAL(videoSourcesChanged()));
 }
 

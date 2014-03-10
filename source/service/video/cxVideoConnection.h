@@ -71,14 +71,14 @@ public:
 
 signals:
 	bool connected(bool);
-	void fps(int fps);
+	void fps(QString source, int fps);
 	void videoSourcesChanged();
 
 private slots:
 	void clientFinishedSlot();
 	void imageReceivedSlot();
 	void statusReceivedSlot();
-	void fpsSlot(double fps);
+	void fpsSlot(QString, double fps);
 	void connectedSlot(bool on);
 	void connectVideoToProbe();
 	void useUnusedProbeDataSlot();///< If no probe is available the ProbeData is saved and this slot is called when a probe becomes available

@@ -32,39 +32,46 @@
 namespace cx
 {
 
-// --------------------------------------------------------
-VideoService* VideoService::mInstance = NULL; ///< static member
-// --------------------------------------------------------
+//// --------------------------------------------------------
+//VideoServicePtr VideoService::mInstance = NULL; ///< static member
+//// --------------------------------------------------------
 
-void VideoService::initialize(VideoServiceBackendPtr videoBackend)
+VideoServicePtr VideoService::create(VideoServiceBackendPtr backend)
 {
-	VideoService::setInstance(new VideoService(videoBackend));
-	VideoService::getInstance();
+	VideoServicePtr retval;
+	retval.reset(new VideoService(backend));
+	return retval;
 }
 
-void VideoService::shutdown()
-{
-  delete mInstance;
-  mInstance = NULL;
-}
+//void VideoService::initialize(VideoServiceBackendPtr videoBackend)
+//{
+//	VideoService::setInstance(new VideoService(videoBackend));
+//	VideoService::getInstance();
+//}
 
-VideoService* VideoService::getInstance()
-{
-	if (!mInstance)
-	{
-		VideoService::setInstance(new VideoService(VideoServiceBackendPtr()));
-	}
-	return mInstance;
-}
+//void VideoService::shutdown()
+//{
+//  delete mInstance;
+//  mInstance = NULL;
+//}
 
-void VideoService::setInstance(VideoService* instance)
-{
-	if (mInstance)
-	{
-		delete mInstance;
-	}
-	mInstance = instance;
-}
+//VideoServicePtr VideoService::getInstance()
+//{
+//	if (!mInstance)
+//	{
+//		VideoService::setInstance(new VideoService(VideoServiceBackendPtr()));
+//	}
+//	return mInstance;
+//}
+
+//void VideoService::setInstance(VideoServicePtr instance)
+//{
+//	if (mInstance)
+//	{
+//		delete mInstance;
+//	}
+//	mInstance = instance;
+//}
 
 VideoService::VideoService(VideoServiceBackendPtr videoBackend)
 {
@@ -76,7 +83,8 @@ VideoService::VideoService(VideoServiceBackendPtr videoBackend)
 
 	connect(mVideoConnection.get(), SIGNAL(connected(bool)), this, SLOT(autoSelectActiveVideoSource()));
 	connect(mVideoConnection.get(), SIGNAL(videoSourcesChanged()), this, SLOT(autoSelectActiveVideoSource()));
-	connect(mBackend->getToolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(autoSelectActiveVideoSource()));
+	connect(mVideoConnection.get(), SIGNAL(fps(QString, int)), this, SLOT(fpsSlot(QString, int)));
+	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(QString)), this, SLOT(autoSelectActiveVideoSource()));
 }
 
 VideoService::~VideoService()
@@ -97,7 +105,7 @@ void VideoService::setActiveVideoSource(QString uid)
 {
 	mActiveVideoSource = mEmptyVideoSource;
 
-	std::vector<VideoSourcePtr> sources = videoService()->getVideoSources();
+	std::vector<VideoSourcePtr> sources = this->getVideoSources();
 	for (unsigned i=0; i<sources.size(); ++i)
 		if (sources[i]->getUid()==uid)
 			mActiveVideoSource = sources[i];
@@ -200,13 +208,20 @@ std::vector<VideoSourcePtr> VideoService::getVideoSources()
 	return retval;
 }
 
+void VideoService::fpsSlot(QString source, int val)
+{
+	if (source==mActiveVideoSource->getUid())
+		emit fps(val);
+}
+
+
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-VideoService* videoService()
-{
-	return VideoService::getInstance();
-}
+//VideoServicePtr videoService()
+//{
+//	return VideoService::getInstance();
+//}
 
 }

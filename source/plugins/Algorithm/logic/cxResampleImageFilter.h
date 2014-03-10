@@ -15,6 +15,7 @@
 #define CXRESAMPLEIMAGEFILTER_H
 
 #include "cxFilterImpl.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {

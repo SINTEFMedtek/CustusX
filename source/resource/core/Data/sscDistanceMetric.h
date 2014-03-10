@@ -45,7 +45,7 @@ class DistanceMetric: public DataMetric
 Q_OBJECT
 public:
 	virtual ~DistanceMetric();
-	static DistanceMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	static DistanceMetricPtr create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	double getDistance() const;
     std::vector<Vector3D> getEndpoints() const; ///< return the two endpoints in reference space. None if invalid.
@@ -74,7 +74,7 @@ public:
 private slots:
 	void resetCachedValues();
 private:
-	DistanceMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	DistanceMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	std::vector<Vector3D> getEndpointsUncached() const;
 	MetricReferenceArgumentListPtr mArguments;
 	mutable OptionalValue<std::vector<Vector3D> > mCachedEndPoints;

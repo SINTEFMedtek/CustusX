@@ -46,14 +46,16 @@
 namespace cx
 {
 
-void cxToolManager::initializeObject()
+cxToolManager::cxToolManagerPtr cxToolManager::create()
 {
-	ToolManager::setInstance(new cxToolManager());
-}
+	cxToolManagerPtr retval;
+	retval.reset(new cxToolManager());
+	retval->mSelf = retval;
 
-cxToolManager* cxToolManager::getInstance()
-{
-	return dynamic_cast<cxToolManager*>(ToolManager::getInstance());
+	retval->initializeManualTool(); // do this after setting self.
+	retval->setDominantTool("ManualTool");
+
+	return retval;
 }
 
 QStringList cxToolManager::getSupportedTrackingSystems()
@@ -74,10 +76,6 @@ cxToolManager::cxToolManager() :
 				mToolTipOffset(0)
 {
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
-
-	this->initializeManualTool();
-	this->setDominantTool("ManualTool");
-
 	// initialize config file
 	this->setConfigurationFile(DataLocations::getToolConfigFilePath());
 }
@@ -141,7 +139,7 @@ void cxToolManager::setPlaybackMode(PlaybackTimePtr controller)
 	{
 		if (iter->second==mManualTool)
 			continue; // dont wrap the manual tool
-		cx::PlaybackToolPtr current(new PlaybackTool(this, iter->second, controller));
+		cx::PlaybackToolPtr current(new PlaybackTool(mSelf.lock(), iter->second, controller));
 		mTools[current->getUid()] = current;
 
 		TimedTransformMapPtr history = iter->second->getPositionHistory();
@@ -206,7 +204,7 @@ void cxToolManager::initializeManualTool()
 	if (!mManualTool)
 	{
 		//adding a manual tool as default
-		mManualTool.reset(new ManualToolAdapter(this, "ManualTool"));
+		mManualTool.reset(new ManualToolAdapter(mSelf.lock(), "ManualTool"));
 		mTools["ManualTool"] = mManualTool;
 		mManualTool->setVisible(true);
 //    mManualTool->setVisible(settings()->value("showManualTool").toBool());
@@ -302,7 +300,7 @@ void cxToolManager::trackerConfiguredSlot(bool on)
 	for (; it != igstkTools.end(); ++it)
 	{
 		IgstkToolPtr igstkTool = it->second;
-		cxToolPtr tool(new cxTool(this, igstkTool));
+		cxToolPtr tool(new cxTool(mSelf.lock(), igstkTool));
 		if (tool->isValid())
 		{
 			if (igstkTool == reference)

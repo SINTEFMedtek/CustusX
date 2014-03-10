@@ -3,6 +3,7 @@
 
 #include <QGroupBox>
 #include "sscDefinitions.h"
+#include "cxLegacySingletons.h"
 
 class QComboBox;
 class QButtonGroup;

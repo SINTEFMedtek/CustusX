@@ -76,12 +76,11 @@ public:
 signals:
 	void imageReceived();
 	void sonixStatusReceived();
-	void fps(double);
+	void fps(QString, double);
 	void connected(bool on);
 	void stopInternal();
 
 protected:
-	cx::CyclicActionLoggerPtr mFPSTimer;
 	/** Add the message to a thread-safe queue.
 	 * Tests if the time stamps of image messages should be calibrated based on the computer clock.
 	 * Time stamps only need to be synched if set on another computer that is
@@ -93,10 +92,10 @@ protected:
 	void calibrateTimeStamp(ImagePtr imgMsg); ///< Calibrate the time stamps of the incoming message based on the computer clock. Calibration is based on an average of several of the last messages. The calibration is updated every 20-30 sec.
 
 private:
-	void reportFPS();
-	bool imageComesFromActiveVideoSource(ImagePtr imgMsg);
+	void reportFPS(QString streamUid);
 	bool imageComesFromSonix(ImagePtr imgMsg);
 
+	std::map<QString, cx::CyclicActionLoggerPtr> mFPSTimer;
 	QMutex mImageMutex;
 	QMutex mSonixStatusMutex;
 	std::list<ImagePtr> mMutexedImageMessageQueue;

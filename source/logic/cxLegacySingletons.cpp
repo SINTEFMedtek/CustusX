@@ -11,29 +11,16 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-#ifndef CXLEGACYSINGLETONS_H
-#define CXLEGACYSINGLETONS_H
 
-#include "boost/shared_ptr.hpp"
+#include "cxLegacySingletons.h"
+
+#include "sscDataManager.h"
+#include "sscToolManager.h"
+#include "cxSpaceProviderImpl.h"
 
 namespace cx
 {
-class DataManager;
-class ToolManager;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-
-/** 
- *
- *
- * \ingroup cx
- * \date 23.02.2014, 2014
- * \author christiana
- */
-DataManager* dataManager();
-ToolManager* toolManager();
-SpaceProviderPtr spaceProvider();
 
 } // namespace cx
 
 
-#endif // CXLEGACYSINGLETONS_H

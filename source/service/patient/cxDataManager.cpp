@@ -22,50 +22,50 @@
 namespace cx
 {
 
-void cxDataManager::initialize()
-{
-	setInstance(new cxDataManager());
-}
+//void cxDataManager::initialize()
+//{
+//	setInstance(new cxDataManager());
+//}
 
-cxDataManager* cxDataManager::getInstance()
-{
-	return dynamic_cast<cxDataManager*>(DataManager::getInstance());
-}
+//cxDataServicePtr cxDataManager::getInstance()
+//{
+//	return dynamic_cast<cxDataServicePtr>(DataManager::getInstance());
+//}
 
-cxDataManager::cxDataManager() :
-				mDebugMode(false)
-{
-}
+//cxDataManager::cxDataManager() :
+//				mDebugMode(false)
+//{
+//}
 
-cxDataManager::~cxDataManager()
-{
-}
+//cxDataManager::~cxDataManager()
+//{
+//}
 
-PresetTransferFunctions3DPtr cxDataManager::getPresetTransferFunctions3D() const
-{
-	///< create from filename, create trivial document of type name and root node if no file exists.
-	XmlOptionFile preset = XmlOptionFile(
-					DataLocations::getRootConfigPath() + "/transferFunctions/presets.xml", "transferFunctions");
-	XmlOptionFile custom = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend(
-					"presetTransferFunctions");
+//PresetTransferFunctions3DPtr cxDataManager::getPresetTransferFunctions3D() const
+//{
+//	///< create from filename, create trivial document of type name and root node if no file exists.
+//	XmlOptionFile preset = XmlOptionFile(
+//					DataLocations::getRootConfigPath() + "/transferFunctions/presets.xml", "transferFunctions");
+//	XmlOptionFile custom = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend(
+//					"presetTransferFunctions");
 
-	if (!mPresetTransferFunctions3D)
-		mPresetTransferFunctions3D.reset(new TransferFunctions3DPresets(preset, custom));
+//	if (!mPresetTransferFunctions3D)
+//		mPresetTransferFunctions3D.reset(new TransferFunctions3DPresets(preset, custom));
 
-	return mPresetTransferFunctions3D;
-}
+//	return mPresetTransferFunctions3D;
+//}
 
-bool cxDataManager::getDebugMode() const
-{
-	return mDebugMode;
-}
-void cxDataManager::setDebugMode(bool on)
-{
-	if (mDebugMode == on)
-		return;
-	std::cout << "Setting DEBUG MODE = " << on << std::endl;
-	mDebugMode = on;
-	emit debugModeChanged(mDebugMode);
-}
+//bool cxDataManager::getDebugMode() const
+//{
+//	return mDebugMode;
+//}
+//void cxDataManager::setDebugMode(bool on)
+//{
+//	if (mDebugMode == on)
+//		return;
+//	std::cout << "Setting DEBUG MODE = " << on << std::endl;
+//	mDebugMode = on;
+//	emit debugModeChanged(mDebugMode);
+//}
 
 } //namespace cx

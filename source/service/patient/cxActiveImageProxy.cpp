@@ -18,12 +18,12 @@
 namespace cx
 {
 
-ActiveImageProxy::ActiveImageProxy(DataManager* dataManager) :
+ActiveImageProxy::ActiveImageProxy(DataServicePtr dataManager) :
 	mDataManager(dataManager)
 {
-	connect(mDataManager, SIGNAL(activeImageChanged(const QString&)), this,
+	connect(mDataManager.get(), SIGNAL(activeImageChanged(const QString&)), this,
 					SLOT(activeImageChangedSlot(const QString&)));
-	connect(mDataManager, SIGNAL(activeImageChanged(const QString&)), this,
+	connect(mDataManager.get(), SIGNAL(activeImageChanged(const QString&)), this,
 					SIGNAL(activeImageChanged(const QString&)));
 
 }

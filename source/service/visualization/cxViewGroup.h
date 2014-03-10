@@ -83,15 +83,11 @@ public:
 	virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
 	virtual void parseXml(QDomNode dataNode); ///< load internal state info from dataNode
 	void clearPatientData();
-//	std::vector<ImagePtr> getImages();
 	CameraStylePtr getCameraStyle() { return mCameraStyle; }
 
 	bool contains3DView() const;
 	void syncOrientationMode(SyncedValuePtr val);
-
-signals:
-	void viewSelected(QString uid);
-public slots:
+	void initializeActiveView(SyncedValuePtr val);
 
 private slots:
 	void activateManualToolSlot();
@@ -104,6 +100,7 @@ protected:
 	std::vector<ViewWrapperPtr> mViewWrappers;
 	CameraStylePtr mCameraStyle;
 	VisualizationServiceBackendPtr mBackend;
+	SyncedValuePtr mActiveView;
 };
 
 bool isViewWrapper2D(ViewWrapperPtr wrapper);

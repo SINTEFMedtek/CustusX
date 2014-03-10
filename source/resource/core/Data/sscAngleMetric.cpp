@@ -33,7 +33,7 @@ namespace cx
 //	return DataPtr(new AngleMetric(uid, filename));
 //}
 
-AngleMetric::AngleMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+AngleMetric::AngleMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 				DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mUseSimpleVisualization = false;
@@ -43,7 +43,7 @@ AngleMetric::AngleMetric(const QString& uid, const QString& name, DataManager* d
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 }
 
-AngleMetricPtr AngleMetric::create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider)
+AngleMetricPtr AngleMetric::create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
 	return AngleMetricPtr(new AngleMetric(uid, name, dataManager, spaceProvider));
 }

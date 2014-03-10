@@ -36,7 +36,7 @@ SamplerWidget::SamplerWidget(QWidget* parent) :
 //	mListener.reset(new CoordinateSystemListener(Space(csREF)));
 	connect(mListener.get(), SIGNAL(changed()), this, SLOT(setModified()));
 
-	mActiveTool = DominantToolProxy::New(toolManager());
+	mActiveTool = DominantToolProxy::New(trackingService());
 	connect(mActiveTool.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(setModified()));
 	connect(mActiveTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), SLOT(setModified()));
 	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(spacesChangedSlot()));

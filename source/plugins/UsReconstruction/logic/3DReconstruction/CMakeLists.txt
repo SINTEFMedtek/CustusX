@@ -68,6 +68,7 @@ add_library( sscUS3DReconstruction ${SOURCE_FILES} )
 set(sscUS3DReconstruction_LIBRARIES
     cxResource
     cxResourceUsReconstructionTypes
+	cxLogicManager
     )
     
 if( CX_USE_OPENCL_UTILITY )

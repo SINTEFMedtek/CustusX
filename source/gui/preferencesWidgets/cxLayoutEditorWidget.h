@@ -20,6 +20,7 @@ class QBoxLayout;
 class QGridLayout;
 class QLineEdit;
 #include "cxLayoutData.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {

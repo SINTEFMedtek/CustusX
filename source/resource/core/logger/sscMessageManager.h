@@ -34,12 +34,14 @@ public:
   Message(QString text ="", MESSAGE_LEVEL messageLevel=mlDEBUG, int timeoutTime=0, QString sourceLocation="");
   ~Message();
 
-  QString getPrintableMessage(); ///< Text containing  information appropriate to display
-  MESSAGE_LEVEL getMessageLevel(); ///< The category of the message
-  QString getText(); ///< The raw message.
-  QDateTime* getTimeStamp(); ///< The time at which the message was created.
-  int getTimeout(); ///< Timout tells the statusbar how long it should be displayed, this depends on the message level
+  QString getPrintableMessage() const; ///< Text containing  information appropriate to display
+  MESSAGE_LEVEL getMessageLevel() const; ///< The category of the message
+  QString getText() const; ///< The raw message.
+  QDateTime getTimeStamp() const; ///< The time at which the message was created.
+  int getTimeout() const; ///< Timout tells the statusbar how long it should be displayed, this depends on the message level
+  QString getSourceLocation() const { return mSourceLocation; }
 
+private:
   QString mText;
   MESSAGE_LEVEL mMessageLevel;
   int mTimeoutTime;

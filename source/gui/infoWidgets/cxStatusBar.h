@@ -5,6 +5,8 @@
 #include <map>
 #include "sscMessageManager.h"
 #include "sscForwardDeclarations.h"
+#include "cxLegacySingletons.h"
+
 
 class QLabel;
 class QPixmap;

@@ -107,6 +107,8 @@ class ViewManager: public QObject
 {
 Q_OBJECT
 public:
+	static VisualizationServicePtr create(VisualizationServiceBackendPtr backend);
+	virtual ~ViewManager();
 
 	ViewWidgetQPtr get3DView(int group = 0, int index = 0);
 	std::vector<ViewGroupPtr> getViewGroups() { return mViewGroups; }
@@ -121,9 +123,9 @@ public:
 	NavigationPtr getNavigation();
 	int findGroupContaining3DViewGivenGuess(int preferredGroup);
 
-	static ViewManager* createInstance(VisualizationServiceBackendPtr backend); ///< create the instance
-	static ViewManager* getInstance(); ///< returns the only instance of this class, NULL unless createInstance has been called.
-	static void destroyInstance(); ///< destroys the only instance of this class
+//	static ViewManager* createInstance(VisualizationServiceBackendPtr backend); ///< create the instance
+//	static ViewManager* getInstance(); ///< returns the only instance of this class, NULL unless createInstance has been called.
+//	static void destroyInstance(); ///< destroys the only instance of this class
 
 	/** Initialize the widget and fill with the default view layout.
 	  * Return the top widget, it should be added to the calling gui.
@@ -148,6 +150,10 @@ public:
 	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
 	void autoShowData(DataPtr data);
 	CameraControlPtr getCameraControl() { return mCameraControl; }
+	void clear();
+	//Interface for saving/loading
+	void addXml(QDomNode& parentNode);
+	void parseXml(QDomNode viewmanagerNode);
 
 signals:
 	void fps(int number); ///< Emits number of frames per second
@@ -157,21 +163,16 @@ signals:
 protected slots:
 	void settingsChangedSlot(QString key);
 
-	void clearSlot();
-	void duringSavePatientSlot();
-	void duringLoadPatientSlot();
+//	void clearSlot();
+//	void duringSavePatientSlot();
+//	void duringLoadPatientSlot();
 	void updateViews();
 	void updateCameraStyleActions();
 	void globalCenterChangedSlot();
 	void setActiveView(QString viewUid);
 
 protected:
-	ViewManager(VisualizationServiceBackendPtr backend); ///< create all needed views
-	virtual ~ViewManager();
-
-	//Interface for saving/loading
-	void addXml(QDomNode& parentNode); ///< adds xml information about the viewmanager and its variables
-	void parseXml(QDomNode viewmanagerNode); ///< Use a XML node to load data. \param viewmanagerNode A XML data representation of the ViewManager
+	ViewManager(VisualizationServiceBackendPtr backend);
 
 	ViewWidget* getView(const QString& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
 
@@ -189,13 +190,15 @@ protected:
 	void activateViews(LayoutWidget *widget, LayoutData next);
 	void rebuildLayouts();
 	void initializeGlobal2DZoom();
+	void initializeActiveView();
 
-	static ViewManager* mTheInstance; ///< the only instance of this class
+//	static ViewManager* mTheInstance; ///< the only instance of this class
 
 	LayoutRepositoryPtr mLayoutRepository;
 	std::vector<QPointer<LayoutWidget> > mLayoutWidgets;
 	QStringList mActiveLayout; ///< the active layout (type)
-	QString mActiveView; ///< the active view
+//	QString mActiveView; ///< the active view
+	SyncedValuePtr mActiveView;
 	RenderLoopPtr mRenderLoop;
 	std::vector<ViewGroupPtr> mViewGroups;
 	CameraControlPtr mCameraControl;
@@ -215,9 +218,9 @@ private:
 	ViewManager(ViewManager const&);
 	ViewManager& operator=(ViewManager const&);
 };
-/**Shortcut for accessing the viewmanager instance.
- */
-ViewManager* viewManager();
+///**Shortcut for accessing the viewmanager instance.
+// */
+//ViewManager* viewManager();
 
 /**
  * @}

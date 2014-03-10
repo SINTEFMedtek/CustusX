@@ -63,9 +63,9 @@ VideoConnection::VideoConnection(VideoServiceBackendPtr backend)
 	mConnected = false;
 	mUnsusedProbeDataVector.clear();
 
-	connect(mBackend->getToolManager(), SIGNAL(configured()),                 this, SLOT(connectVideoToProbe()));
-	connect(mBackend->getToolManager(), SIGNAL(initialized()),                this, SLOT(connectVideoToProbe()));
-	connect(mBackend->getToolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectVideoToProbe()));
+	connect(mBackend->getToolManager().get(), SIGNAL(configured()),                 this, SLOT(connectVideoToProbe()));
+	connect(mBackend->getToolManager().get(), SIGNAL(initialized()),                this, SLOT(connectVideoToProbe()));
+	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectVideoToProbe()));
 }
 
 VideoConnection::~VideoConnection()
@@ -73,10 +73,10 @@ VideoConnection::~VideoConnection()
 	this->stopClient();
 }
 
-void VideoConnection::fpsSlot(double fpsNumber)
+void VideoConnection::fpsSlot(QString source, double fpsNumber)
 {
 	mFPS = fpsNumber;
-	emit fps(fpsNumber);
+	emit fps(source, fpsNumber);
 }
 
 bool VideoConnection::isConnected() const
@@ -120,7 +120,7 @@ void VideoConnection::runClient(ImageReceiverThreadPtr client)
 	connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
 	connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
 	connect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(statusReceivedSlot())); // thread-bridging connection
-	connect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
+	connect(mClient.get(), SIGNAL(fps(QString, double)), this, SLOT(fpsSlot(QString, double))); // thread-bridging connection
 	connect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
 
 	mClient->start();
@@ -157,7 +157,7 @@ void VideoConnection::stopClient()
 		disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
 		disconnect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
 		disconnect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(statusReceivedSlot())); // thread-bridging connection
-		disconnect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
+		disconnect(mClient.get(), SIGNAL(fps(QString, double)), this, SLOT(fpsSlot(QString, double))); // thread-bridging connection
 		disconnect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
 
 		mClient.reset();
@@ -190,7 +190,7 @@ void VideoConnection::clientFinishedSlot()
 
 void VideoConnection::useUnusedProbeDataSlot()
 {
-	disconnect(mBackend->getToolManager(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+	disconnect(mBackend->getToolManager().get(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
 	for (std::vector<ProbeDefinitionPtr>::const_iterator citer = mUnsusedProbeDataVector.begin(); citer != mUnsusedProbeDataVector.end(); ++citer)
 		this->updateStatus(*citer);
 	mUnsusedProbeDataVector.clear();
@@ -207,7 +207,7 @@ void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 	{
 		//Don't throw away the ProbeData. Save it until it can be used
 		if (mUnsusedProbeDataVector.empty())
-			connect(mBackend->getToolManager(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+			connect(mBackend->getToolManager().get(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
 		mUnsusedProbeDataVector.push_back(msg);
 		return;
 	}

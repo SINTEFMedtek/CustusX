@@ -576,10 +576,10 @@ void DebugTab::runDebugToolSlot()
 
 	dataManager()->setCenter(bb_r.center());
 
-	cx::DummyToolPtr dummyTool(new cx::DummyTool(cx::cxToolManager::getInstance()));
+	cx::DummyToolPtr dummyTool(new cx::DummyTool(trackingService()));
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
 	messageManager()->sendInfo(QString("Running debug tool inside box %1").arg(qstring_cast(bb_r)));
-	cx::cxToolManager::getInstance()->runDummyTool(dummyTool);
+	toolManager()->runDummyTool(dummyTool);
 }
 
 void DebugTab::saveParametersSlot()

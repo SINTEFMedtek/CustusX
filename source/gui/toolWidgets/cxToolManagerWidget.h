@@ -2,6 +2,7 @@
 #define CXTOOLMANAGERWIDGET_H_
 
 #include "cxBaseWidget.h"
+#include "cxLegacySingletons.h"
 
 class QPushButton;
 

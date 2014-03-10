@@ -20,7 +20,7 @@ class DataManager;
  */
 
 vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt, Transform3D rMpr);
-void loadMeshFromToolTransforms(DataManager *dataManager, TimedTransformMap transforms_prMt);
+void loadMeshFromToolTransforms(DataServicePtr dataManager, TimedTransformMap transforms_prMt);
 
 /**
  * Get information about a ssc mesh.

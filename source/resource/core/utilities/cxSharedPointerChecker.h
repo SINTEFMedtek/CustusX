@@ -11,31 +11,31 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
+#ifndef CXSHAREDPOINTERCHECKER_H
+#define CXSHAREDPOINTERCHECKER_H
 
-#include "cxLegacySingletons.h"
-
-#include "sscDataManager.h"
-#include "sscToolManager.h"
-#include "cxSpaceProviderImpl.h"
+#include "boost/shared_ptr.hpp"
+#include <QString>
 
 namespace cx
 {
 
-//DataManager* dataManager()
-//{
-//	return DataManager::getInstance();
-//}
+void requireUnique(int use_count, QString objectName);
 
-//ToolManager* toolManager()
-//{
-//	return ToolManager::getInstance();
-//}
-
-SpaceProviderPtr spaceProvider()
+/** Utility for checking the usage count of share_ptr's
+  * and reporting it.
+  *
+ * \date 2014-03-09
+ * \author christiana
+  */
+template<class T>
+void requireUnique(const boost::shared_ptr<T>& object, QString objectName)
 {
-	return SpaceProviderPtr(new SpaceProviderImpl(toolManager(), dataManager()));
+	requireUnique(object.use_count(), objectName);
 }
+
 
 } // namespace cx
 
 
+#endif // CXSHAREDPOINTERCHECKER_H

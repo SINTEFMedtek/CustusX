@@ -11,6 +11,7 @@ if (BUILD_TESTING)
         cx_add_class(RESOURCE_VISUALZATION_TEST_UTILITIES_SOURCE_FILES
 		cxtestRenderTester
 		cxTestRenderSpeed
+#		cxViewsFixture
 		)
 #        add_library(cxResourceVisualizationTestUtilities ${CX_CATCH_SHARED_LIB_TYPE} ${RESOURCE_VISUALZATION_TEST_UTILITIES_SOURCE_FILES})
 #        target_link_libraries(cxResourceVisualizationTestUtilities cxResourceVisualization cxtestUtilities)
@@ -21,8 +22,10 @@ if (BUILD_TESTING)
 
 	set(CXTEST_SOURCES_TO_MOC
 		sscViewsWindow.h
+		cxViewsFixture.h
 	)
 	cx_add_class(RESOURCE_VISUALZATION_TEST_CATCH_SOURCE_FILES
+		cxViewsFixture.cpp
 		sscViewsWindow.cpp
 		cxtestVideoGraphicsFixture
         cxtestVideoGraphics.cpp

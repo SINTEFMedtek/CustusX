@@ -22,22 +22,30 @@
 namespace cx
 {
 
-//ToolManager* ToolManager::mInstance = NULL;
+//TrackingServicePtr ToolManager::mInstance = NULL;
 
-ToolManager* DummyToolManager::getInstance()
+DummyToolManager::DummyToolManagerPtr DummyToolManager::create()
 {
-	if(ToolManager::mInstance == NULL)
-	{
-		ToolManager::mInstance = new DummyToolManager();
-	}
-	return ToolManager::mInstance;
+	DummyToolManagerPtr retval;
+	retval.reset(new DummyToolManager());
+	retval->mSelf = retval;
+	return retval;
 }
 
-void DummyToolManager::reset()
-{
-	ToolManager::mInstance = NULL;
-	getInstance();
-}
+//TrackingServicePtr DummyToolManager::getInstance()
+//{
+//	if(ToolManager::mInstance == NULL)
+//	{
+//		ToolManager::mInstance = new DummyToolManager();
+//	}
+//	return ToolManager::mInstance;
+//}
+
+//void DummyToolManager::reset()
+//{
+//	ToolManager::mInstance = NULL;
+//	getInstance();
+//}
 
 DummyToolManager::DummyToolManager() :
 	mDummyTools(new DummyToolMap),
@@ -47,7 +55,7 @@ DummyToolManager::DummyToolManager() :
 	mInitialized(false),
 	mIsTracking(false)
 {
-	DummyToolPtr tool1(new DummyTool(this));
+	DummyToolPtr tool1(new DummyTool(mSelf.lock()));
 
 	mDominantTool = tool1;
 	mReferenceTool = tool1;
@@ -213,10 +221,10 @@ void DummyToolManager::saveTransformsAndTimestamps(QString filePathAndName)
 	}
 }
 
-DummyToolManager* DummyToolManager::getDowncastInstance()
-{
-	return dynamic_cast<DummyToolManager*>( getInstance() );
-}
+//DummyToolManager* DummyToolManager::getDowncastInstance()
+//{
+//	return dynamic_cast<DummyToolManager*>( getInstance() );
+//}
 
 void DummyToolManager::addTool(DummyToolPtr tool)
 {

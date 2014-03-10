@@ -24,7 +24,7 @@
 namespace cx
 {
 
-DataMetric::DataMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+DataMetric::DataMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 	Data(uid, name)
 {
 	mDataManager = dataManager;

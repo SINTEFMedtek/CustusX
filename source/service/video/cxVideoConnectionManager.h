@@ -81,7 +81,7 @@ public:
 	bool isConnected() const;
 
 signals:
-	void fps(int fps);
+	void fps(QString source, int fps);
 	void connected(bool on);
 	void videoSourcesChanged();
 	void connectionMethodChanged();

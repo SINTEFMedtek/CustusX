@@ -17,6 +17,7 @@
 
 #include <QObject>
 #include "boost/shared_ptr.hpp"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
@@ -48,24 +49,28 @@ class PatientService: public QObject
 {
 Q_OBJECT
 public:
-	static PatientService* getInstance();
+	static PatientServicePtr create(DataServicePtr dataService);
+	virtual ~PatientService();
 
-	static void initialize();
-	static void shutdown();
+//	static PatientService* getInstance();
+
+//	static void initialize();
+//	static void shutdown();
 
 	PatientDataPtr getPatientData();
+	DataServicePtr getDataService();
 
 private:
-	static PatientService* mInstance;
-	static void setInstance(PatientService* instance);
+//	static PatientService* mInstance;
+//	static void setInstance(PatientService* instance);
 
-	PatientService();
-	virtual ~PatientService();
+	PatientService(DataServicePtr dataService);
 
 	PatientService(PatientService const&); // not implemented
 	PatientService& operator=(PatientService const&); // not implemented
 
 	PatientDataPtr mPatientData;
+	DataServicePtr mDataService;
 
 	/**
 	  * Clear the global cache used by the entire application (cx::DataLocations::getCachePath()).
@@ -73,7 +78,7 @@ private:
 	void clearCache();
 };
 
-PatientService* patientService();
+//PatientService* patientService();
 
 /**
  * @}

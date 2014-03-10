@@ -20,7 +20,7 @@
 
 namespace cx {
 
-FrameMetricBase::FrameMetricBase(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+FrameMetricBase::FrameMetricBase(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 		DataMetric(uid, name, dataManager, spaceProvider),
 		mSpace(CoordinateSystem::reference()),
 		mFrame(Transform3D::Identity())

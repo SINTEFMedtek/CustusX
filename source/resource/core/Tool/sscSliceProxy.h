@@ -26,6 +26,7 @@
 #include "boost/scoped_ptr.hpp"
 #include "sscTransform3D.h"
 #include "sscIndent.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
@@ -82,7 +83,7 @@ class SliceProxy : public SliceProxyInterface
 {
 	Q_OBJECT
 public:
-	static SliceProxyPtr create(DataManager* dataManager);
+	static SliceProxyPtr create(DataServicePtr dataManager);
 	virtual ~SliceProxy();
 
 	void setTool(ToolPtr tool);
@@ -126,7 +127,7 @@ private slots:
 	void changed();
 
 private:
-	SliceProxy(cx::DataManager *dataManager);
+	SliceProxy(DataServicePtr dataManager);
 	Transform3D getSyntheticToolPos(const Vector3D& center) const;
 	ToolPtr mTool;
 	boost::scoped_ptr<SliceComputer> mCutplane;
@@ -134,7 +135,7 @@ private:
 	bool mAlwaysUseDefaultCenter; ///< use def center anyway
 //	QString mName; ///< for debug
 	bool mUseTooltipOffset;
-	DataManager* mDataManager;
+	DataServicePtr mDataManager;
 };
 
 }
