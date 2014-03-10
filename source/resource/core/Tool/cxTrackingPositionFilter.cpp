@@ -18,30 +18,82 @@ namespace cx
 
 TrackingPositionFilter::TrackingPositionFilter()
 {
+	cutOffFrequency = 3;
+	filterOrder = 4;
+	resampleFrequency = 40;
 }
 
 void TrackingPositionFilter::addPosition(Transform3D pos, double timestamp)
 {
-	this->clearIfTimestampIsOlderThanHead(timestamp);
+
+	this->clearIfTimestampIsOlderThanHead(pos, timestamp);
+	this->clearIfJumpInTimestamps(pos, timestamp);
+
+	if (mResampled.empty()){
+		mResampled[timestamp] = pos;
+		mHistory[timestamp] = pos;
+		return;
+	}
+	this->interpolateAndFilterPositions(pos, timestamp);
 
 	mHistory[timestamp] = pos;
 }
 
 Transform3D TrackingPositionFilter::getFilteredPosition()
 {
-	if (mHistory.empty())
+	//std::cout << mFiltered.size() << std::endl;
+
+	if (mFiltered.size() > 50) //check if mFiltered contains enough positions for the filter to be stable
+		return mFiltered.rbegin()->second;
+	else if (!mHistory.empty())
+		return mHistory.rbegin()->second;
+	else
 		return Transform3D::Identity();
-	return mHistory.rbegin()->second;
 }
 
-void TrackingPositionFilter::clearIfTimestampIsOlderThanHead(double timestamp)
+void TrackingPositionFilter::clearIfTimestampIsOlderThanHead(Transform3D pos, double timestamp)
 {
-	if (mHistory.empty())
+	if (mResampled.empty())
 		return;
-	if (timestamp < mHistory.rbegin()->first) // clear history if old timestamps appear
-		mHistory.clear();
+
+	if (timestamp < mResampled.rbegin()->first) // clear history if old timestamps appear
+		mResampled.clear();
+
 }
 
+void TrackingPositionFilter::clearIfJumpInTimestamps(Transform3D pos, double timestamp)
+{
+	if (mResampled.empty())
+		return;
+
+	double timeStep = timestamp - mResampled.rbegin()->first;
+	if ( timeStep > 1000) // clear history of resampled data if jump in timestamps of more than 1 second
+		mResampled.clear();
+
+}
+
+void TrackingPositionFilter::interpolateAndFilterPositions(Transform3D pos, double timestamp)
+{
+	Transform3D previousPositionMatrix = mHistory.rbegin()->second;
+	double deltaT = timestamp - mHistory.rbegin()->first; //time from previous measured position to this position
+	int numberOfInterpolationPoints = floor( (timestamp - mResampled.rbegin()->first)/1000 * resampleFrequency ); // interpolate from last resampled position to current measured position
+	//std::cout << timestamp << std::endl;
+	//std::cout << mResampled.rbegin()->first << std::endl;
+	//std::cout << numberOfInterpolationPoints << std::endl;
+	//std::cout << mHistory.rbegin()->first << std::endl;
+	for (int i=0; i < numberOfInterpolationPoints; i++)
+	{
+		double resampledTimestamp = mResampled.rbegin()->first + 1000/resampleFrequency;
+		double deltaTpast = resampledTimestamp - mHistory.rbegin()->first;
+		double deltaTfuture = timestamp - resampledTimestamp;
+		Transform3D interpolatedPosition;
+		interpolatedPosition = pos.matrix() * deltaTpast/deltaT + previousPositionMatrix.matrix() * deltaTfuture/deltaT; // linear interpolation between previous and current measured position
+		mResampled[resampledTimestamp] = interpolatedPosition;
+		//add position to low-pass filter here
+		mFiltered[resampledTimestamp] = interpolatedPosition;
+	}
+
+}
 } // namespace cx
 
 

@@ -41,6 +41,24 @@ TEST_CASE("TrackingPositionFilter: No positions return identity", "[unit]")
 	CHECK(cx::similar(expected, result));
 }
 
+TEST_CASE("TrackingPositionFilter: Check if interpolation is correct", "[unit]")
+{
+	//cx::Transform3D expected = cx::createTransformTranslate(cx::Vector3D(1,2,3));
+	cx::TrackingPositionFilter filter;
+	for (int i = 0; i < 50; i++){
+		cx::Transform3D pos = cx::createTransformTranslate(cx::Vector3D(i,i,i));
+		filter.addPosition(pos, i*40);
+		cx::Transform3D result = filter.getFilteredPosition();
+		//std::cout << pos << std::endl;
+		//std::cout << result << std::endl;
+		//std::cout << std::endl;
+	}
+
+	//INFO(expected << " == " << result);
+	//CHECK(cx::similar(expected, result));
+}
+
+
 } // namespace cx
 
 
