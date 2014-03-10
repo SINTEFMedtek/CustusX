@@ -190,7 +190,8 @@ void ViewsFixture::dumpDebugViewToDisk(QString text, int viewIndex)
 double ViewsFixture::getFractionOfBrightPixelsInView(int viewIndex, int threshold, int component)
 {
 	cxtest::RenderTesterPtr renderTester = this->getRenderTesterForView(viewIndex);
-	vtkImageDataPtr output = renderTester->getImageFromRenderWindow();
+	vtkImageDataPtr output = renderTester->renderToImage();
+//	vtkImageDataPtr output = renderTester->getImageFromRenderWindow();
 	return cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, threshold,component);
 }
 
