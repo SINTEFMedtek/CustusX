@@ -90,15 +90,11 @@ ActiveProbeConfigurationStringDataAdapter::ActiveProbeConfigurationStringDataAda
 
 void ActiveProbeConfigurationStringDataAdapter::dominantToolChanged()
 {
-//	std::cout << "ActiveProbeConfigurationStringDataAdapter::dominantToolChanged() "
-//		<< ToolManager::getInstance()->findFirstProbe().get() << std::endl;
 	// ignore tool changes to something non-probeish.
 	// This gives the user a chance to use the widget without having to show the probe.
-	ToolPtr newTool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr newTool = toolManager()->findFirstProbe();
 	if (!newTool || !newTool->getProbe())
 		return;
-
-//	std::cout << " probe " << newTool->getProbe().get() << std::endl;
 
 	if (mTool)
 		disconnect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));

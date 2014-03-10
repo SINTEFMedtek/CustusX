@@ -24,6 +24,8 @@
 #include <QFile>
 #include "cxTimedAlgorithm.h"
 #include "sscMessageManager.h"
+#include "cxLegacySingletons.h"
+
 
 namespace cx
 {

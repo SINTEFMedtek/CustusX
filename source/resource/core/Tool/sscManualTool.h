@@ -45,7 +45,7 @@ class ManualTool : public ToolImpl
 	Q_OBJECT
 public:
 
-	explicit ManualTool(ToolManager* manager, const QString& uid, const QString& name ="");
+	explicit ManualTool(TrackingServicePtr manager, const QString& uid, const QString& name ="");
 	virtual ~ManualTool();
 	virtual std::set<Type> getTypes() const;
 	virtual QString getGraphicsFileName() const;
@@ -62,8 +62,8 @@ public:
 	virtual void set_prMt(const Transform3D& prMt);
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
 
-	virtual double getTooltipOffset() const;
-	virtual void setTooltipOffset(double val);
+//	virtual double getTooltipOffset() const;
+//	virtual void setTooltipOffset(double val);
 
 	virtual Transform3D getCalibration_sMt() const;
 	virtual std::map<int, Vector3D> getReferencePoints() const { return std::map<int, Vector3D>(); }

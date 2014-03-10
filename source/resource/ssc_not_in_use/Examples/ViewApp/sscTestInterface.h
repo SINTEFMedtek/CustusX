@@ -51,7 +51,7 @@ private:
 	QAction* mTestDummyToolAndDummyToolManagerAction;
 	QAction* mTestSwitchingViewsRepsAndImagesAction;
 
-	ToolManager* mToolmanager;
+	TrackingServicePtr mToolmanager;
 	vtkCallbackCommand* mCallback;
 	ViewWidget *mView1;
 	ViewWidget *mView2;

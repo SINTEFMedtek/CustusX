@@ -22,7 +22,7 @@
 namespace cx
 {
 
-PlaybackTool::PlaybackTool(ToolManager* manager, ToolPtr base, PlaybackTimePtr time) :
+PlaybackTool::PlaybackTool(TrackingServicePtr manager, ToolPtr base, PlaybackTimePtr time) :
 	ToolImpl(manager, "playback_"+base->getUid(), "playback "+base->getName()), mBase(base),
     mTime(time),
     mVisible(false)
@@ -73,8 +73,11 @@ void PlaybackTool::timeChangedSlot()
 
 	// Overwrite manual tool pos, set timestamp to 1ms previous.
 	// This makes sure manual tool is not picked as dominant.
-	mManager->getManualTool()->set_prMt(m_rMpr, mTimestamp-1);
-	mManager->dominantCheckSlot();
+	if (this->getTrackingService())
+	{
+		this->getTrackingService()->getManualTool()->set_prMt(m_rMpr, mTimestamp-1);
+		this->getTrackingService()->dominantCheckSlot();
+	}
 }
 
 QString PlaybackTool::getGraphicsFileName() const

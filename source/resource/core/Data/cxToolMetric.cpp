@@ -24,7 +24,7 @@ namespace cx
 //	return DataPtr(new ToolMetric(uid, filename));
 //}
 
-ToolMetricPtr ToolMetric::create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider)
+ToolMetricPtr ToolMetric::create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
 	return ToolMetricPtr(new ToolMetric(uid, name, dataManager, spaceProvider));
 }
@@ -36,7 +36,7 @@ ToolMetricPtr ToolMetric::create(QString uid, QString name, DataManager* dataMan
 //	return retval;
 //}
 
-ToolMetric::ToolMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+ToolMetric::ToolMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 		cx::FrameMetricBase(uid, name, dataManager, spaceProvider),
 		mToolOffset(0.0)
 {

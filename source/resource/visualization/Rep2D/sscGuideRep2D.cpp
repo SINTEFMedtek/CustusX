@@ -35,13 +35,13 @@
 namespace cx
 {
 
-GuideRep2DPtr GuideRep2D::New(DataManager* dataManager, const QString& uid, const QString& name)
+GuideRep2DPtr GuideRep2D::New(DataServicePtr dataManager, const QString& uid, const QString& name)
 {
 	GuideRep2DPtr retval(new GuideRep2D(dataManager, uid, name));
 	return retval;
 }
 
-GuideRep2D::GuideRep2D(DataManager* dataManager, const QString& uid, const QString& name) :
+GuideRep2D::GuideRep2D(DataServicePtr dataManager, const QString& uid, const QString& name) :
     DataMetricRep(uid, name),
 	mDataManager(dataManager),
 	mOutlineWidth(1),

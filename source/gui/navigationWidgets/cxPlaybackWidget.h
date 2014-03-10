@@ -22,6 +22,7 @@
 #include "sscVector3D.h"
 #include "sscRegistrationTransform.h"
 #include "cxPlaybackTime.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {

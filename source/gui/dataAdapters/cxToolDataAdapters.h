@@ -17,6 +17,7 @@
 
 #include "sscStringDataAdapter.h"
 #include "sscTool.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {

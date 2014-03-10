@@ -15,6 +15,7 @@
 #define CXVISUALIZATIONSERVICEBACKEND_H
 
 #include "boost/shared_ptr.hpp"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
@@ -28,27 +29,27 @@ typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServic
  *
  *
  * \ingroup cx
- * \date 23.02.2014, 2014
+ * \date 2014-02-23
  * \author christiana
  */
 class VisualizationServiceBackend
 {
 public:
-	VisualizationServiceBackend(DataManager* dataManager,
-								ToolManager* toolManager,
-								VideoService* videoService,
+	VisualizationServiceBackend(DataServicePtr dataManager,
+								TrackingServicePtr toolManager,
+								VideoServicePtr videoService,
 								SpaceProviderPtr spaceProvider);
 
-	DataManager* getDataManager();
-	ToolManager* getToolManager();
-	VideoService* getVideoService();
+	DataServicePtr getDataManager();
+	TrackingServicePtr getToolManager();
+	VideoServicePtr getVideoService();
 	SpaceProviderPtr getSpaceProvider();
 
 private:
-	DataManager* mDataManager;
-	ToolManager* mToolManager;
+	DataServicePtr mDataManager;
+	TrackingServicePtr mToolManager;
 	SpaceProviderPtr mSpaceProvider;
-	VideoService* mVideoService;
+	VideoServicePtr mVideoService;
 };
 
 

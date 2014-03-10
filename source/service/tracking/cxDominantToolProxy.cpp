@@ -18,12 +18,12 @@
 namespace cx
 {
 
-DominantToolProxy::DominantToolProxy(ToolManager* toolManager) :
+DominantToolProxy::DominantToolProxy(TrackingServicePtr toolManager) :
 	mToolManager(toolManager)
 {
-	connect(mToolManager, SIGNAL(dominantToolChanged(const QString&)), this,
+	connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this,
 					SLOT(dominantToolChangedSlot(const QString&)));
-	connect(mToolManager, SIGNAL(dominantToolChanged(const QString&)), this,
+	connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this,
 					SIGNAL(dominantToolChanged(const QString&)));
 
 	if (mToolManager->getDominantTool())

@@ -56,7 +56,7 @@ Q_OBJECT
 public:
 	virtual ~ToolMetric();
 //	static ToolMetricPtr create(QDomNode node);
-	static ToolMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	static ToolMetricPtr create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	double getToolOffset() const;
 	void setToolOffset(double val);
@@ -75,7 +75,7 @@ public:
 	virtual QString getAsSingleLineString() const;
 
 private:
-	ToolMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	ToolMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	double mToolOffset;
 	QString mToolName;
 };

@@ -69,8 +69,10 @@ QDomElement getElementForced(QDomNode root, QString path)
 	return current;
 }
 
-PatientData::PatientData(DataManager *dataManager) : mDataManager(dataManager)
-{}
+PatientData::PatientData(DataServicePtr dataManager) : mDataManager(dataManager)
+{
+	connect(dataManager.get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clearPatient()));
+}
 
 PatientData::~PatientData()
 {}

@@ -22,29 +22,29 @@
 namespace cx
 {
 
-ToolManager* toolManager()
-{
-	return ToolManager::getInstance();
-}
+//TrackingServicePtr toolManager()
+//{
+//	return ToolManager::getInstance();
+//}
 
-ToolManager* ToolManager::mInstance = NULL;
+//TrackingServicePtr ToolManager::mInstance = NULL;
 
-/** not sure if this is needed? we have getInstance in subclasses...*/
-void ToolManager::setInstance(ToolManager* instance)
-{
-	mInstance = instance;
-}
-;
+///** not sure if this is needed? we have getInstance in subclasses...*/
+//void ToolManager::setInstance(TrackingServicePtr instance)
+//{
+//	mInstance = instance;
+//}
+//;
 
-ToolManager* ToolManager::getInstance()
-{
-	return mInstance;
-}
+//TrackingServicePtr ToolManager::getInstance()
+//{
+//	return mInstance;
+//}
 
-void ToolManager::shutdown()
-{
-	delete mInstance;
-	mInstance = NULL;
-}
+//void ToolManager::shutdown()
+//{
+//	delete mInstance;
+//	mInstance = NULL;
+//}
 
 }

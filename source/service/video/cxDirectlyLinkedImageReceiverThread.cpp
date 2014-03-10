@@ -60,7 +60,7 @@ void DirectlyLinkedImageReceiverThread::run()
 		this->quit();
 	emit connected(true);
 
-	mFPSTimer->reset(2000);
+//	mFPSTimer->reset(2000);
 
 	this->exec();
 

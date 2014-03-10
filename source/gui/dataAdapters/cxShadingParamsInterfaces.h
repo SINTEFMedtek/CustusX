@@ -13,7 +13,7 @@
 #include "sscDoubleWidgets.h"
 #include "sscForwardDeclarations.h"
 #include "cxActiveImageProxy.h"
-
+#include "cxLegacySingletons.h"
 
 namespace cx
 {

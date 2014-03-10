@@ -6,6 +6,7 @@
 #include <sscImage.h>
 #include "sscForwardDeclarations.h"
 #include "cxActiveImageProxy.h"
+#include "cxLegacySingletons.h"
 
 class QRect;
 class QMenu;

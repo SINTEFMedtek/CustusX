@@ -18,7 +18,7 @@ TransferFunction2DColorWidget::TransferFunction2DColorWidget(QWidget* parent) :
   mDataWindow.reset(new DoubleDataAdapterImageTFDataWindow);
   mDataLevel.reset(new DoubleDataAdapterImageTFDataLevel);
 
-  mActiveImageProxy = ActiveImageProxy::New(dataManager());
+  mActiveImageProxy = ActiveImageProxy::New(dataService());
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 

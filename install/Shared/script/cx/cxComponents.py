@@ -165,7 +165,7 @@ class VTK(CppComponent):
     def update(self):
         # this fix should rebase repo from the original Kitware/VTK to our own fork on GitHub.
         self._getBuilder().gitSetRemoteURL('git@github.com:SINTEFMedisinskTeknologi/VTK', branch='VTK-5-10-1.patch_branch')
-        self._getBuilder().gitCheckout('VTK-5-10-1.cx_patch_1')
+        self._getBuilder().gitCheckout('VTK-5-10-1.cx_patch_2')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -382,8 +382,9 @@ class TubeSegmentationFramework(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
-        add('USE_C++11', False)
-        add('SIPL_USE_GTK', False)
+        add('USE_C++11:BOOL', False)
+        add('SIPL_USE_GTK:BOOL', False)
+        add('sipl_use_gtk:BOOL', False) #variables in cmake are case sensitive, SIPL uses this options
         add('TSF_USE_EXTRNAL_OUL:BOOL', True)
         add('TSF_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
         builder.configureCMake()
@@ -404,7 +405,7 @@ class LevelSetSegmentation(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
-        add('sipl_use_gtk', False)
+        add('sipl_use_gtk:BOOL', False)
         add('LS_USE_EXTRNAL_OUL:BOOL', True)
         add('LS_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
         builder.configureCMake()

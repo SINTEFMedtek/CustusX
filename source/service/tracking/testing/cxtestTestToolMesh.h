@@ -20,8 +20,8 @@ public:
 private:
 	QString mToolToolPath;
 	QString mCurrentToolPath;
-	QString mMeshFileName;
-	cx::DataPtr mMesh;
+//	QString mMeshFileName;
+//	cx::DataPtr mMesh;
 };
 
 } /* namespace cxtest */

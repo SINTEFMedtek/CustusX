@@ -7,6 +7,7 @@
 #include "sscDoubleDataAdapterXml.h"
 #include "sscBoolDataAdapterXml.h"
 #include "sscStringDataAdapterXml.h"
+#include "cxLegacySingletons.h"
 
 class QTabWidget;
 class QToolBox;

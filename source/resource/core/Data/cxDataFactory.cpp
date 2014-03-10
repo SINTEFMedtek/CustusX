@@ -28,7 +28,7 @@
 namespace cx
 {
 
-DataFactory::DataFactory(DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+DataFactory::DataFactory(DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 	mDataManager(dataManager),
 	mSpaceProvider(spaceProvider)
 {

@@ -66,7 +66,7 @@ public:
 	double getResultLtsRatio(ContextPtr context=ContextPtr());
 	Transform3D getNonLinearTransform();
 	void checkQuality(Transform3D linearTransform);
-	ImagePtr loadMinc(char* source_file);
+//	ImagePtr loadMinc(char* source_file);
 	void setDebugOutput(bool on)
 	{
 		mt_verbose = on;

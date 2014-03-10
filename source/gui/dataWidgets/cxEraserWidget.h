@@ -20,6 +20,7 @@
 #include "sscVector3D.h"
 #include "vtkForwardDeclarations.h"
 #include "sscDoubleDataAdapterXml.h"
+#include "cxLegacySingletons.h"
 typedef vtkSmartPointer<class vtkSphereWidget> vtkSphereWidgetPtr;
 
 namespace cx

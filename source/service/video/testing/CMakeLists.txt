@@ -18,6 +18,9 @@
 
 if (BUILD_TESTING)
 	# Catch unit test framework stuff:
+	include_directories(
+	${CustusX3_SOURCE_DIR}/source/resource/core/testing
+	)
 
     set(CXTEST_SOURCES_TO_MOC
     )

@@ -17,6 +17,8 @@
 #include "cxPatientData.h"
 #include "sscTypeConversions.h"
 #include "cxPlaybackUSAcquisitionVideo.h"
+#include "cxViewManager.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
@@ -55,13 +57,14 @@ void ServiceController::patientChangedSlot()
 	}
 	videoService()->getUSAcquisitionVideoPlayback()->setRoot(patientService()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
 
-	cxToolManager::getInstance()->setLoggingFolder(loggingPath);
+	toolManager()->setLoggingFolder(loggingPath);
 	messageManager()->setLoggingFolder(loggingPath);
 }
 
 void ServiceController::clearPatientSlot()
 {
 	toolManager()->clear();
+	viewManager()->clear();
 }
 
 void ServiceController::duringSavePatientSlot()
@@ -70,6 +73,8 @@ void ServiceController::duringSavePatientSlot()
 
 	toolManager()->addXml(managerNode);
 	toolManager()->savePositionHistory();
+
+	viewManager()->addXml(managerNode);
 }
 
 void ServiceController::duringLoadPatientSlot()
@@ -78,6 +83,9 @@ void ServiceController::duringLoadPatientSlot()
 
 	QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
 	toolManager()->parseXml(toolmanagerNode);
+
+	QDomNode viewmanagerNode = managerNode.namedItem("viewManager");
+	viewManager()->parseXml(viewmanagerNode);
 }
 
 

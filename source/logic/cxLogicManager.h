@@ -10,6 +10,8 @@
 
 #include <boost/shared_ptr.hpp>
 #include <QObject>
+#include "cxForwardDeclarations.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
@@ -19,9 +21,21 @@ namespace cx
 * @{
 */
 
+//typedef class ToolManager TrackingService;
+//typedef class ViewManager VisualizationService;
+
 typedef boost::shared_ptr<class ServiceController> ServiceControllerPtr;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
+//typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+//typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
+
+//typedef boost::shared_ptr<class PatientService> PatientServicePtr;
+//typedef boost::shared_ptr<class ToolManager> TrackingServicePtr;
+//typedef boost::shared_ptr<class VideoService> VideoServicePtr;
+//typedef boost::shared_ptr<class ViewManager> VisualizationServicePtr;
+//typedef boost::shared_ptr<class StateService> StateServicePtr;
+
+//typedef boost::shared_ptr<class DataManager> DataServicePtr;
+typedef boost::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
 
 /**\brief Responsible for the entire logic layer.
  * \ingroup cxLogic
@@ -45,8 +59,15 @@ public:
 	*/
   static void shutdown();
 
-  SpaceProviderPtr getSpaceProvider();
+//  SpaceProviderPtr getSpaceProvider();
   DataFactoryPtr getDataFactory();
+  DataServicePtr getDataService();
+  TrackingServicePtr getTrackingService();
+  SpaceProviderPtr getSpaceProvider();
+  PatientServicePtr getPatientService();
+  VideoServicePtr getVideoService();
+  VisualizationServicePtr getVisualizationService();
+  StateServicePtr getStateService();
 
 private:
   /**
@@ -60,6 +81,24 @@ private:
 	* Assumes MainWindow already has been destroyed and the mainloop is exited.
 	*/
   void shutdownServices();
+
+  void createTrackingService();
+  void createPatientService();
+  void createDataService();
+  void createDataFactory();
+  void createSpaceProvider();
+  void createVideoService();
+  void createVisualizationService();
+  void createStateService();
+
+  void createInterconnectedDataAndSpace();
+
+  void shutdownStateService();
+  void shutdownVisualizationService();
+  void shutdownVideoService();
+  void shutdownPatientService();
+  void shutdownInterconnectedDataAndSpace();
+  void shutdownTrackingService();
 
   static LogicManager* mInstance;
   static void setInstance(LogicManager* instance);
@@ -76,6 +115,12 @@ private:
 	SpaceProviderPtr mSpaceProvider;
 	DataFactoryPtr mDataFactory;
 
+	PatientServicePtr mPatientService;
+	TrackingServicePtr mTrackingService;
+	VideoServicePtr mVideoService;
+	VisualizationServicePtr mVisualizationService;
+	StateServicePtr mStateService;
+	DataManagerImplPtr mDataService;
 };
 
 LogicManager* logicManager(); // if necessary

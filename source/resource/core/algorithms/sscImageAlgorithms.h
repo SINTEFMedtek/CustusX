@@ -40,11 +40,11 @@ class DataManager;
 * @{
 */
 
-ImagePtr resampleImage(DataManager *dataManager, ImagePtr image, const Vector3D spacing, QString uid="", QString name="");
-ImagePtr resampleImage(DataManager *dataManager, ImagePtr image, Transform3D refMi);
+ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, const Vector3D spacing, QString uid="", QString name="");
+ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, Transform3D refMi);
 vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox);
-ImagePtr cropImage(DataManager *dataManager, ImagePtr image);
-ImagePtr duplicateImage(DataManager *dataManager, ImagePtr image);
+ImagePtr cropImage(DataServicePtr dataManager, ImagePtr image);
+ImagePtr duplicateImage(DataServicePtr dataManager, ImagePtr image);
 
 /**
  */

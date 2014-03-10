@@ -25,6 +25,9 @@
 #include "cxForwardDeclarations.h"
 #include "sscCoordinateSystemHelpers.h"
 
+#include "cxLegacySingletons.h"
+
+
 namespace cx
 {
 typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;

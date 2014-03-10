@@ -20,6 +20,7 @@
 #include <QDesktopWidget>
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {

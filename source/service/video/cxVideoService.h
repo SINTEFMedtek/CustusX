@@ -26,6 +26,7 @@
 
 #include <vector>
 #include "sscVideoSource.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
@@ -33,8 +34,6 @@ typedef boost::shared_ptr<class USAcquisitionVideoPlayback> USAcquisitionVideoPl
 typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
 typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
-
-
 
 /**
  * \file
@@ -85,10 +84,12 @@ class VideoService: public QObject
 {
 Q_OBJECT
 public:
-	static VideoService* getInstance();
+	static VideoServicePtr create(VideoServiceBackendPtr backend);
+	virtual ~VideoService();
+//	static VideoServicePtr getInstance();
 
-	static void initialize(VideoServiceBackendPtr videoBackend);
-	static void shutdown();
+//	static void initialize(VideoServiceBackendPtr videoBackend);
+//	static void shutdown();
 
 	VideoConnectionManagerPtr getVideoConnection();
 	USAcquisitionVideoPlaybackPtr getUSAcquisitionVideoPlayback();
@@ -104,6 +105,7 @@ signals:
 	  * OR when the available set of sources are changed.
 	  */
 	void activeVideoSourceChanged();
+	void fps(int);
 
 private slots:
 	/** Autoselect the active VideoSource
@@ -113,12 +115,13 @@ private slots:
 	  * autoGuessVideoSource().
 	  */
 	void autoSelectActiveVideoSource();
+	void fpsSlot(QString source, int val);
+
 private:
-	static VideoService* mInstance;
-	static void setInstance(VideoService* instance);
+//	static VideoServicePtr mInstance;
+//	static void setInstance(VideoServicePtr instance);
 
 	VideoService(VideoServiceBackendPtr videoBackend);
-	virtual ~VideoService();
 
 	VideoService(VideoService const&); // not implemented
 	VideoService& operator=(VideoService const&); // not implemented
@@ -145,7 +148,7 @@ private:
 	VideoServiceBackendPtr mBackend;
 };
 
-VideoService* videoService();
+//VideoServicePtr videoService();
 
 /**
  * @}

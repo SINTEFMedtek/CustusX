@@ -70,15 +70,20 @@ class cxToolManager: public ToolManager
 Q_OBJECT
 
 public:
-	static void initializeObject();
-	static cxToolManager* getInstance();
+	typedef boost::shared_ptr<cxToolManager> cxToolManagerPtr;
 
-	QStringList getSupportedTrackingSystems();
+	static cxToolManagerPtr create();
+	virtual ~cxToolManager();
+
+//	static void initializeObject();
+//	static cxTrackingServicePtr getInstance();
+
+	virtual QStringList getSupportedTrackingSystems();
 
 	virtual bool isConfigured() const; ///< checks if the system is configured
 	virtual bool isInitialized() const; ///< checks if the hardware is initialized
 	virtual bool isTracking() const; ///< checks if the system is tracking
-	bool         isPlaybackMode() const { return mPlayBackMode; }
+	virtual bool isPlaybackMode() const { return mPlayBackMode; }
 
 	virtual ToolManager::ToolMapPtr getConfiguredTools(); ///< get all configured, but not initialized tools
 	virtual ToolManager::ToolMapPtr getInitializedTools(); ///< get all initialized tools
@@ -99,7 +104,7 @@ public:
 	virtual void savePositionHistory();
 	virtual void loadPositionHistory();
 
-	void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
+	virtual void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
 
 	void addXml(QDomNode& parentNode); ///< write internal state to node
 	void parseXml(QDomNode& dataNode); ///< read internal state from node
@@ -109,22 +114,22 @@ public:
 
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
 
-	void runDummyTool(DummyToolPtr tool);
+	virtual void runDummyTool(DummyToolPtr tool);
 	virtual ToolPtr findFirstProbe();
 
-	void setPlaybackMode(PlaybackTimePtr controller);
+	virtual void setPlaybackMode(PlaybackTimePtr controller);
 
 signals:
 	void probeAvailable(); ///< Emitted when a probe is configured
 
 public slots:
 	void configure(); ///< sets up the software like the xml file suggests
-	void deconfigure(); ///< deconfigures the software
+	virtual void deconfigure(); ///< deconfigures the software
 	void initialize(); ///< connects to the hardware
 	void uninitialize(); ///< disconnects from the hardware
 	void startTracking(); ///< starts tracking
 	void stopTracking(); ///< stops tracking
-	void saveToolsSlot(); ///< saves transforms and timestamps
+	virtual void saveToolsSlot(); ///< saves transforms and timestamps
 	virtual void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
 
 private slots:
@@ -140,8 +145,8 @@ private slots:
 	void globalConfigurationFileChangedSlot(QString key);
 
 private:
-	cxToolManager(); ///< use getInstance instead
-	virtual ~cxToolManager(); ///< destructor
+	cxToolManager();
+	TrackingServiceWeakPtr mSelf;
 
 	void closePlayBackMode();
 	void initializeManualTool();

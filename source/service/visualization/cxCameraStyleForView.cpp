@@ -53,7 +53,7 @@ CameraStyleForView::CameraStyleForView(VisualizationServiceBackendPtr backend) :
 	mPreRenderListener.reset(new ViewportPreRenderListener);
 	mPreRenderListener->setCallback(boost::bind(&CameraStyleForView::onPreRender, this));
 
-	connect(mBackend->getToolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 }
 
 void CameraStyleForView::setView(ViewWidgetQPtr widget)

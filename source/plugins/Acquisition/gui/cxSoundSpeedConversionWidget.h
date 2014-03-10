@@ -3,6 +3,7 @@
 
 #include "cxBaseWidget.h"
 #include "cxTool.h"
+#include "cxLegacySingletons.h"
 
 class QPushButton;
 class QDoubleSpinBox;

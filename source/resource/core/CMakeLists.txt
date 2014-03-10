@@ -61,6 +61,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	dataAdapters/cxVector3DComponentDataAdapter
 
 	logger/sscMessageManager
+	logger/cxMessageListener
 
 	settings/cxSettings.h
 
@@ -77,7 +78,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	utilities/cxSpaceProviderImpl
 	utilities/cxSpaceListener
 	utilities/cxSpaceListenerImpl
-	utilities/cxLegacySingletons
 	)
 
      
@@ -136,6 +136,7 @@ cx_add_class(cxResource_SOURCE
 	utilities/cxOptionalValue
 	utilities/cxXMLNodeWrapper
 	utilities/cxPlaneTypeCollection
+	utilities/cxSharedPointerChecker
 
 	logger/sscAudio.h
 	logger/sscLogger

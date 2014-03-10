@@ -72,7 +72,7 @@ Q_OBJECT
 public:
 	virtual ~AngleMetric();
 //    static AngleMetricPtr create(QDomNode node);
-	static AngleMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	static AngleMetricPtr create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	double getAngle() const;
 	std::vector<Vector3D> getEndpoints() const;
@@ -102,7 +102,7 @@ public:
 private slots:
 	void resetCachedValues();
 private:
-	AngleMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	AngleMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	boost::array<DataPtr, 4> mArgument;
 	MetricReferenceArgumentListPtr mArguments;
 	bool mUseSimpleVisualization;

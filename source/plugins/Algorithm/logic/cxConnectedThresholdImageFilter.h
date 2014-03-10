@@ -3,6 +3,7 @@
 
 #include "cxThreadedTimedAlgorithm.h"
 #include "cxAlgorithmHelpers.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {

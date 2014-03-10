@@ -32,7 +32,7 @@ class DataManager;
 class DataFactory
 {
 public:
-	explicit DataFactory(DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	explicit DataFactory(DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	DataPtr create(QString type, QString uid, QString name="");
 
@@ -43,7 +43,7 @@ public:
 		return boost::dynamic_pointer_cast<T>(retval);
 	}
 private:
-	DataManager* mDataManager;
+	DataServicePtr mDataManager;
 	SpaceProviderPtr mSpaceProvider;
 };
 typedef boost::shared_ptr<DataFactory> DataFactoryPtr;

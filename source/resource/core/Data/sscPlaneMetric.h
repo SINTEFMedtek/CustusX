@@ -54,9 +54,9 @@ class PlaneMetric: public DataMetric
 {
 Q_OBJECT
 public:
-	PlaneMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	PlaneMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	virtual ~PlaneMetric();
-	static PlaneMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	static PlaneMetricPtr create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
     virtual Vector3D getRefCoord() const;
 	Vector3D getRefNormal() const;

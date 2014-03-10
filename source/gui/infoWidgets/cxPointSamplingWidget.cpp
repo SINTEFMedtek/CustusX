@@ -191,7 +191,7 @@ void PointSamplingWidget::addPoint(Vector3D point)
 
 void PointSamplingWidget::setManualTool(const Vector3D& p_r)
 {
-  ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
+  ManualToolPtr tool = toolManager()->getManualTool();
 
   //Transform3D sMr = mSliceProxy->get_sMr();
   Transform3D rMpr = dataManager()->get_rMpr();

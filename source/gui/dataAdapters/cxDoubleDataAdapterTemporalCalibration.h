@@ -10,6 +10,7 @@
 
 #include "sscDoubleDataAdapter.h"
 #include "sscForwardDeclarations.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
