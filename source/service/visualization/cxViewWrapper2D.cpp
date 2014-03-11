@@ -44,7 +44,7 @@
 #include "sscManualTool.h"
 #include "sscDataManager.h"
 #include "cxViewManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxViewGroup.h"
 #include "sscDefinitionStrings.h"
 #include "sscSlicePlanes3DRep.h"

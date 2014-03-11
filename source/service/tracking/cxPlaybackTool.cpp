@@ -15,7 +15,7 @@
 #include "cxPlaybackTool.h"
 #include "sscTime.h"
 #include "sscTypeConversions.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxPlaybackTime.h"
 #include "cxManualToolAdapter.h"
 

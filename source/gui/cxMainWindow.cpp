@@ -9,7 +9,7 @@
 #include "sscDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxStatusBar.h"
 #include "cxVolumePropertiesWidget.h"
 #include "cxNavigationWidget.h"

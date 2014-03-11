@@ -18,7 +18,7 @@
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewGroupData.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include <QFile>
 #include "sscMessageManager.h"
 #include "sscDataReaderWriter.h"

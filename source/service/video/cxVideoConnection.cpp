@@ -39,7 +39,7 @@
 #include "sscDataManager.h"
 #include "cxProbe.h"
 #include "cxVideoService.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxImageSenderFactory.h"
 #include "cxDirectlyLinkedImageReceiverThread.h"
 #include "sscTypeConversions.h"

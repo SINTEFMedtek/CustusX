@@ -19,7 +19,7 @@
 #include "sscImage.h"
 #include "cxPatientData.h"
 #include "cxCyclicActionLogger.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"
 #include "cxPatientService.h"

@@ -21,7 +21,7 @@
 #include <QStringList>
 #include "sscTime.h"
 #include "sscMessageManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxSettings.h"
 
 namespace cx
