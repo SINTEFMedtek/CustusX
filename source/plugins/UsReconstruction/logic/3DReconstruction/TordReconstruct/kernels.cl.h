@@ -57,8 +57,8 @@ typedef struct _close_plane
 typedef struct _output_volume_type
 {
 	int3 size;
-	float3 spacing;__global
-	unsigned char* volume;
+	float3 spacing;
+	__global unsigned char* volume;
 } output_volume_type;
 
 /***************/
