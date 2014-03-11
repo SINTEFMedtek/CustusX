@@ -37,7 +37,7 @@ namespace cx
  * Init with the parent (root) node and an uid,
  * then read/write the value.
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_core_utilities
  */
 class XmlOptionItem
 {
@@ -70,7 +70,7 @@ private:
  * The getElement() methods are used to retrieve QDomElements relative
  * to the current element.
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_core_utilities
  */
 class XmlOptionFile
 {

@@ -28,7 +28,7 @@ typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
 /**
  * \file
- * \addtogroup cxServiceState
+ * \addtogroup cx_service_state
  * @{
  */
 
@@ -38,6 +38,7 @@ class WorkflowState;
  *
  *  See StateService for a description.
  *
+ * \ingroup cx_service_state
  * \date 4. aug. 2010
  * \author Janne Beate Bakeng, SINTEF
  */

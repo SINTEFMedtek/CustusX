@@ -17,12 +17,15 @@
 //
 // See sscLicense.txt for more information.
 
+
+
 namespace cx
 {
 
 
 /**
- * \defgroup cxService Service Layer
+ * \defgroup cx_service Service Layer
+ * \ingroup cx_base
  * \brief A collection of singletons providing basic services:
  * 	      Patient Model, Tracking, Video and Visualization.
  *
@@ -32,19 +35,19 @@ namespace cx
  * Connections are managed in the logic layer. Detailed info on some of these
  * services can be found in Implementation 5.
  *
- *  - \ref cxServicePatient : Contains information related to the current patient.
+ *  - \ref cx_service_patient : Contains information related to the current patient.
  *    This includes entities of data, such as volumetric data, mesh data,
  *    landmarks, labels, and temporal data such as video streams. Spatial,
  *    hierarchical and temporal relations between these entities are also
  *    available.
- *  - \ref cxServiceTracking : An interface to the physical tracking devices,
+ *  - \ref cx_service_tracking : An interface to the physical tracking devices,
  *    such as navigation pointers, US probes and surgical instruments.
- *  - \ref cxServiceVideo : An interface to realtime image stream sources such as
+ *  - \ref cx_service_video : An interface to realtime image stream sources such as
  *    endoscopic, ultrasound and fluoroscopy video, along with means to
  *    connect to them.
- *  - \ref cxServiceState :  Global application states: Application state 4.1,
- *    workflow state 4.2.
- *  - \ref cxServiceVisualization : Handles the layout and content of the views,
+ *  - \ref cx_service_state :  Global application states: Application state,
+ *    workflow state.
+ *  - \ref cx_service_visualization : Handles the layout and content of the views,
  *    i.e. visualization in 2D and 3D. This service uses the other services
  *    freely, for historical reasons.
  *
@@ -52,8 +55,8 @@ namespace cx
  */
 
 /**
- * \defgroup cxServicePatient Patient Service
- * \ingroup cxService
+ * \defgroup cx_service_patient Patient Service
+ * \ingroup cx_service
  * \brief The virtual patient.
  *
  * A model of the patient. Data sets of various modalities, fiducials
@@ -67,8 +70,8 @@ namespace cx
  */
 
 /**
- * \defgroup cxServiceTracking Tracking Service
- * \ingroup cxService
+ * \defgroup cx_service_tracking Tracking Service
+ * \ingroup cx_service
  * \brief Tracking hardware, US probes and navigation pointers.
  *
  * See \ref cx::ToolManager for a description of the service.
@@ -78,8 +81,8 @@ namespace cx
  */
 
 /**
- * \defgroup cxServiceVideo Video Service
- * \ingroup cxService
+ * \defgroup cx_service_video Video Service
+ * \ingroup cx_service
  * \brief Video input.
  *
  * See \ref cx::VideoService for a description of the service.
@@ -87,24 +90,18 @@ namespace cx
  */
 
 /**
- * \defgroup cxServiceVisualization Visualization Service
- * \ingroup cxService
- * \brief 2D and 3D Visualization in Views.
+ * \defgroup cx_service_visualization Visualization Service
+ * \ingroup cx_service
+ *
+ * \brief 2D and 3D Visualization/Rendering engine
  *
  * See \ref cx::ViewManager for a description of the service.
  *
  */
 
 /**
- * \defgroup cxServiceVisualizationRep Visualization Representations
- * \ingroup cxServiceVisualization
- * \brief CX-specific versions of ssc::Rep .
- *
- */
-
-/**
- * \defgroup cxServiceState State Service
- * \ingroup cxService
+ * \defgroup cx_service_state State Service
+ * \ingroup cx_service
  * \brief Global application states
  *
  * See \ref cx::StateService for a description of the service.

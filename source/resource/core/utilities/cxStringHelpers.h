@@ -18,8 +18,9 @@
 class QString;
 class QStringList;
 
+
 /**
-* \addtogroup cxResourceUtilities
+* \addtogroup cx_resource_core_utilities
 * @{
 */
 

@@ -23,9 +23,10 @@ namespace cx
 {
 class SliderRangeGroupWidget;
 
+
 /**
  * \brief Widget displays/edits a BoundingBox3D
- * \ingroup cxGUI
+ * \ingroup cx_resource_widgets
  *
  * \date Mar 16, 2012
  * \author Christian Askeland, SINTEF

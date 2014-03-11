@@ -12,8 +12,8 @@ namespace cx
  * \class TabbedWidget
  *
  * \brief Interface for making widgets with a hierarchy of tabs
- * \ingroup cxGUI
  *
+ * \ingroup cx_resource_widgets
  * \date 27. sep. 2010
  * \\author Janne Beate Bakeng
  */

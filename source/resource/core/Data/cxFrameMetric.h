@@ -26,6 +26,7 @@ typedef boost::shared_ptr<class FrameMetric> FrameMetricPtr;
  *
  * The transform is attached to a specific coordinate system / frame.
  *
+ * \ingroup cx_resource_core_data
  * \date Aug 25, 2013
  * \author Ole Vegard Solberg, SINTEF
  */

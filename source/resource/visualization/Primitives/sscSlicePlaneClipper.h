@@ -38,12 +38,13 @@ typedef boost::shared_ptr<class SlicePlaneClipper> SlicePlaneClipperPtr;
  * \author christiana
  */
 
-/**\brief Clip several 3D volumes using a SliceProxy.
+/** \brief Clip several 3D volumes using a SliceProxy.
  *
  * Several 3D volumes, represented as VolumetricBaseRep, are decorated with
  * a clip plane defined by a SliceProxy.
  *
- * \ingroup sscRep
+ * \ingroup cx_resource_visualization
+
  */
 class SlicePlaneClipper : public QObject
 {

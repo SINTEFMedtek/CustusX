@@ -78,7 +78,7 @@ private slots:
 /** 
  * Rep wrapping the multivolume renderer created by Mehdi.
  *
- * \ingroup cxServiceVisualizationRep
+ * \ingroup cx_resource_visualization
  * \date 9 Sep 2013
  * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF

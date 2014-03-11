@@ -7,13 +7,13 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxPluginAlgorithm
+ * \addtogroup cx_plugin_algorithm
  * @{
  */
 
 /** Filter wrapping a itk::BinaryThresholdImageFilter.
  *
- * \ingroup cxPluginAlgorithm
+ * \ingroup cx_plugin_algorithm
  * \date Nov 21, 2012
  * \author christiana
  */

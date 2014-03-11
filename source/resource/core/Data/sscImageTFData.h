@@ -75,7 +75,7 @@ typedef boost::shared_ptr<class ImageTFData> ImageTFDataPtr;
   \endverbatim
  *
  *
- * \ingroup sscData
+ * \ingroup cx_resource_core_data
  */
 class ImageTFData: public QObject
 {

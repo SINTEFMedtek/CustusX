@@ -48,7 +48,7 @@ class MousePadWidget;
  *
  * Use the double-named methods instead of qslider's int-based ones.
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_widgets
  */
 class DoubleSlider: public QSlider
 {
@@ -135,7 +135,7 @@ public:
  * use the widget normally, or add to grid, in case you wish to integrate the elements into a
  * larger grid.
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_widgets
  */
 class ScalarInteractionWidget: public OptimizedUpdateWidget
 {
@@ -182,7 +182,7 @@ private:
  * Consists of <namelabel, valueedit, slider>.
  * Insert a subclass of DoubDoubleDataAdapter order to connect to data.
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_widgets
  */
 class SliderGroupWidget: public ScalarInteractionWidget
 {
@@ -198,7 +198,7 @@ public:
  *
  * Uses a QDoubleSpinBox instead of a slider - this gives a more compact widget.
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_widgets
  */
 class SpinBoxGroupWidget: public ScalarInteractionWidget
 {
@@ -214,7 +214,7 @@ public:
  *
  * Uses both a slider and a spin box
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_widgets
  */
 class SpinBoxAndSliderGroupWidget: public ScalarInteractionWidget
 {
@@ -231,7 +231,7 @@ typedef boost::shared_ptr<SpinBoxAndSliderGroupWidget> SpinBoxAndSliderGroupWidg
  *
  * This slider is custom-made and infinitely long.
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_widgets
  */
 class SpinBoxInfiniteSliderGroupWidget: public ScalarInteractionWidget
 {

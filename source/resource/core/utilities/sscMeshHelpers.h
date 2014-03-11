@@ -15,7 +15,7 @@ namespace cx
 class DataManager;
 
 /**
- * \addtogroup sscUtility
+ * \addtogroup cx_resource_core_utilities
  * \{
  */
 

@@ -34,7 +34,7 @@ class DataManager;
 *
 * Various image algorithms. Mostly wrappers around ITK.
 *
-* \addtogroup cxResourceAlgorithms
+* \addtogroup cx_resource_core_algorithms
 *
 *
 * @{
@@ -98,9 +98,6 @@ std::vector<T> sortOnGroupsAndAcquisitionTime(std::map<QString, T> input)
 
   return retval;
 }
-
-
-//vtkImageDataPtr CropAndClipImageTovtkImageData()
 
 /**
 * @}

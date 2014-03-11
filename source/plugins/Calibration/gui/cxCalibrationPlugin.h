@@ -11,8 +11,8 @@
 #include "cxPluginBase.h"
 
 /**
- * \defgroup cxPluginCalibration Calibration Plugin
- * \ingroup cxPlugins
+ * \defgroup cx_plugin_calibration Calibration Plugin
+ * \ingroup cx_plugins
  * \brief Calibration collection with widgets.
  *
  * See \ref cx::CalibrationPlugin.
@@ -27,7 +27,7 @@ typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 
 /**
  * \file
- * \addtogroup cxPluginCalibration
+ * \addtogroup cx_plugin_calibration
  * @{
  */
 

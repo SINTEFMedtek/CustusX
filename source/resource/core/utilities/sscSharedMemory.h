@@ -22,7 +22,7 @@ namespace cx
  * more smooth when all users release their buffers as soon as they are done.
  *
  * \sa SharedMemoryClient
- * \ingroup sscUtility
+ * \ingroup cx_resource_core_utilities
  */
 class SharedMemoryServer
 {
@@ -66,7 +66,7 @@ private:
  *
  *
  * \sa SharedMemoryServer
- * \ingroup sscUtility
+ * \ingroup cx_resource_core_utilities
  */
 class SharedMemoryClient
 {

@@ -29,12 +29,12 @@ typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
 namespace cx
 {
 
-/**\brief Visualization for one 3D coordinate axis triplet.
+/** \brief Visualization for one 3D coordinate axis triplet.
  *
  * Set the position using setTransform().
  *
- * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep3D
  */
 class GraphicalAxes3D
 {

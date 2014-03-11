@@ -32,7 +32,7 @@ namespace cx
  * are visible in a different color than the visible
  * periods. Also other events like registration, data load.
  *
- * \ingroup cxResourceUtilities
+ * \ingroup cx_resource_widgets
  * \date Mar 29, 2012
  * \author Christian Askeland, SINTEF
  */

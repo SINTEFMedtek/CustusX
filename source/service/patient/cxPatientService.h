@@ -23,14 +23,14 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxServicePatient
+ * \addtogroup cx_service_patient
  * @{
  */
 
 typedef boost::shared_ptr<class PatientData> PatientDataPtr;
 
 /**\brief The virtual patient
- * \ingroup cxServicePatient
+ * \ingroup cx_service_patient
  *
  * PatientService provides access to the Patient Specific Model (PaSM).
  *   - data entities

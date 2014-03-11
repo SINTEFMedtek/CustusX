@@ -70,7 +70,7 @@ namespace cx
  * When testing, or during development, you can use the DoubleDataAdapterNull
  * as a dummy implementation.
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_core_dataadapters
  */
 class DoubleDataAdapter: public DataAdapter
 {

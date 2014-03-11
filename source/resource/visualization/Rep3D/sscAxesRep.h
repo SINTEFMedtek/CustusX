@@ -31,12 +31,12 @@ typedef boost::shared_ptr<class AxesRep> AxesRepPtr;
 typedef boost::shared_ptr<class GraphicalAxes3D> GraphicalAxes3DPtr;
 typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
 
-/**\brief Representation for one 3D coordinate axis triplet.
+/** \brief Representation for one 3D coordinate axis triplet.
  *
  * Set the position using setTransform().
  *
- * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep3D
  */
 class AxesRep: public RepImpl
 {

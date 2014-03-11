@@ -30,7 +30,7 @@ namespace cx
  * from within an event handler and not caught
  * anywhere else.
  *
- * \ingroup sscUtility
+ * \ingroup cx_resource_core_utilities
  * \date March 6, 2013
  * \author christiana
  */

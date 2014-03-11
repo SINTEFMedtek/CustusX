@@ -39,7 +39,7 @@ namespace cx
  * A mesh is implemented as a vtkPolyData, and
  * thus can represent whatever that class can.
  *
- * \ingroup sscData
+ * \ingroup cx_resource_core_data
  */
 class Mesh: public Data
 {

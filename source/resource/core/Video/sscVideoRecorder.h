@@ -46,7 +46,7 @@ namespace cx
  * a shift between the master and source clocks. This shift is then added to the input
  * times in getRecording in order to retrieve data using the source clock.
  *
- * \ingroup sscVideo
+ * \ingroup cx_resource_core_video
  */
 class VideoRecorder : public QObject
 {

@@ -36,6 +36,12 @@ class SliceComputer;
 typedef boost::shared_ptr<class Tool> ToolPtr;
 typedef boost::shared_ptr<class SliceProxyInterface> SliceProxyInterfacePtr;
 
+/**
+* \file
+* \addtogroup cx_resource_core_tool
+* @{
+*/
+
 
 class SliceProxyInterface : public QObject
 {
@@ -77,7 +83,6 @@ typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
  * Used as the slicer in Sonowand.
  * Used as the slicer in CustusX.
  *
- * \ingroup sscProxy
  */
 class SliceProxy : public SliceProxyInterface
 {
@@ -137,6 +142,10 @@ private:
 	bool mUseTooltipOffset;
 	DataServicePtr mDataManager;
 };
+
+/**
+* @}
+*/
 
 }
 

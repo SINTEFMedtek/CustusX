@@ -24,6 +24,7 @@ namespace cx
  * and emits a signal if that system changes.
  *
  *
+ * \ingroup cx_resource_core_utilities
  * \date 21.02.2014, 2014
  * \author christiana
  */

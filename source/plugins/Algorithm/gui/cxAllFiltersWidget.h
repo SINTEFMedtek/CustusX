@@ -14,7 +14,7 @@ namespace cx {
  *  and run it. All available filters in the system should be
  *  in this widget.
  *
- * \ingroup cxPluginAlgorithm
+ * \ingroup cx_plugin_algorithm
  * \date Nov 18, 2012
  * \author Christian Askeland, SINTEF
  * \author Janne Beate Bakeng, SINTEF

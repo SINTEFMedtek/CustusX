@@ -36,7 +36,7 @@ namespace cx
  * Consists of <namelabel, combobox>.
  * Insert a subclass of StringDataAdStringDataAdapter to connect to data.
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_widgets
  */
 class LabeledComboBoxWidget: public OptimizedUpdateWidget
 {

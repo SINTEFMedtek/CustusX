@@ -86,7 +86,6 @@ void ThresholdPreview::revertTransferFunctions()
  *
  * A timer is added that will the remove the preview when the calling widget is no longer visible.
  *
- * \param fromWidget The calling widget
  * \param image The image to modify the transfer function of
  * \param setValue The threshold value to be used
  */

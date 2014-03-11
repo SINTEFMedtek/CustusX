@@ -29,7 +29,7 @@ typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
  *
  * This is the main render loop in Custus.
  *
- * \ingroup cxServiceVisualization
+ * \ingroup cx_service_visualization
  * \date 2014-02-06
  * \author christiana
  */

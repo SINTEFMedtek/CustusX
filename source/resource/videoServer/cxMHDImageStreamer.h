@@ -17,6 +17,7 @@ vtkImageDataPtr convertToTestColorImage(vtkImageDataPtr image);
 /**
  * Create test data for MHDImageStreamer
  *
+ * \ingroup cx_resource_videoserver
  * \author Janne Beate Bakeng, SINTEF
  * \date May 16, 2013
  */
@@ -38,6 +39,7 @@ typedef boost::shared_ptr<class ImageTestData> ImageTestDataPtr;
 /**
  * Reads a mhd file from disk and sends slices at a given interval.
  *
+ * \ingroup cx_resource_videoserver
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  * \date Jun 21, 2011

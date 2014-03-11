@@ -23,14 +23,14 @@ namespace cx
 class DataManager;
 /**
  * \file
- * \addtogroup cxServicePatient
+ * \addtogroup cx_service_patient
  * @{
  */
 
 typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
 /**
  * \brief Helper class for connection the active image.
- * \ingroup cxServicePatient
+ * \ingroup cx_service_patient
  *
  * By listening to this class, you will always listen
  * to the active tool.

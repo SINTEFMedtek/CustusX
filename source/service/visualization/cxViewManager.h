@@ -49,7 +49,7 @@ typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 
 /**
  * \file
- * \addtogroup cxServiceVisualization
+ * \addtogroup cx_service_visualization
  * @{
  */
 

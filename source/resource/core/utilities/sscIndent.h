@@ -10,7 +10,7 @@ namespace cx
  *
  * Based on vtkIndent.
  *
- * \ingroup sscUtility
+ * \ingroup cx_resource_core_utilities
  */
 class Indent// : public vtkIndent
 {

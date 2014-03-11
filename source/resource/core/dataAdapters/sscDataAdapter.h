@@ -31,10 +31,10 @@
  * manner, thus enabling us to write generic widgets for displaying
  * and changing them.
  *
+ * \ingroup cx_resource_core_dataadapters
  * \author Christian Askeland, SINTEF
  * \date Jun 27, 2010
  *
- * \ingroup sscWidget
  */
 class DataAdapter: public QObject
 {

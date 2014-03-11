@@ -38,8 +38,8 @@ typedef boost::shared_ptr<class GeometricRep2D> GeometricRep2DPtr;
  *
  * Used by CustusX.
  *
- * \ingroup sscRep
- * \ingroup sscRep2D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep2D
  */
 class GeometricRep2D : public RepImpl
 {

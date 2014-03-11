@@ -23,29 +23,11 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup sscData
+ * \addtogroup cx_resource_core_data
  * @{
  */
 
 typedef boost::shared_ptr<class SphereMetric> SphereMetricPtr;
-
-//* \brief DataReader implementation for SphereMetric
-// *
-// * \date 2014-02-11
-// * \author Christian Askeland, SINTEF
-
-//class SphereMetricReader: public DataReader
-//{
-//public:
-//	virtual ~SphereMetricReader()
-//	{
-//	}
-//	virtual bool canLoad(const QString& type, const QString& filename)
-//	{
-//		return type == "SphereMetric";
-//	}
-//	virtual DataPtr load(const QString& uid, const QString& filename);
-//};
 
 /**\brief Data class that represents a donut.
  *
