@@ -223,8 +223,7 @@ int2 findClosestPlanes_multistart(__local close_plane_t *close_planes,
 
 __global const unsigned char* getImageData(int plane_id,
         __global const unsigned char* bscans_blocks[],
-        int in_xsize,
-        int in_ysize);
+        int2 in_size);
 
 float4 transform(float16 matrix, float4 voxel);
 
