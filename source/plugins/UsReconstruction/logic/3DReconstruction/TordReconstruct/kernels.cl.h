@@ -1,3 +1,6 @@
+#ifndef KERNELS_CLH_
+#define KERNELS_CLH_
+
 /*******************/
 /* Begin constants */
 /*******************/
@@ -38,6 +41,27 @@
 /*****************/
 /* End constants */
 /*****************/
+
+/*****************/
+/* Begin structs */
+/*****************/
+
+typedef struct _close_plane {
+    float dist;
+    short plane_id;
+    unsigned char intensity;
+    unsigned char padding; // Align with 4
+} close_plane_t;
+
+typedef struct _output_volume_type {
+    int3 size;
+    float3 spacing;
+    __global unsigned char* volume;
+} output_volume_type;
+
+/***************/
+/* End structs */
+/***************/
 
 /****************/
 /* Begin macros */
@@ -104,13 +128,13 @@
      + (WEIGHT_TERNARY(px.intensity, mean, BRIGHTNESS_FACTOR)))
 
 #if ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_DISTANCE
-#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_GAUSS_WEIGHT(px, var, mean, mean_id, sigma)
+	#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_GAUSS_WEIGHT(px, var, mean, mean_id, sigma)
 #elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_BRIGHTNESS
-#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, mean_id, sigma)
+	#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, mean_id, sigma)
 #elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_LATENESS
-#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_LATENESS(px, var, mean, mean_id, sigma)
+	#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_LATENESS(px, var, mean, mean_id, sigma)
 #elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_BOTH
-#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_BOTH(px, var, mean, mean_id, sigma)
+	#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_BOTH(px, var, mean, mean_id, sigma)
 #endif
 
 // Gaussian weight function
@@ -138,32 +162,22 @@
 /* End macros */
 /**************/
 
-/*****************/
-/* Begin structs */
-/*****************/
-
-typedef struct _close_plane {
-    float dist;
-    short plane_id;
-    unsigned char intensity;
-    unsigned char padding; // Align with 4
-} close_plane_t;
-
-typedef struct _output_volume_type {
-    int3 size;
-    float3 spacing;__global
-    unsigned char* volume;
-} output_volume_type;
-
-/***************/
-/* End structs */
-/***************/
-
 /********************/
 /* Begin prototypes */
 /********************/
 
 // Declare all the functions, as Apple seems to need that
+
+//---------------------DEBUGGING-FUNCTIONALITY---------------------
+
+#ifdef DEBUG
+
+void printMatrix(float16 matrix);
+
+#endif /* DEBUG */
+
+//---------------------DEBUGGING-FUNCTIONALITY---------------------
+
 int isValidPixel(int x,
         int y,
         const __global unsigned char* mask,
@@ -221,8 +235,6 @@ float4 transform(float16 matrix, float4 voxel);
 float4 transform_inv(float16 matrix, float4 voxel);
 
 float2 transform_inv_xy(float16 matrix, float4 voxel);
-
-void printMatrix(float16 matrix);
 
 void toImgCoord_int(int* x, int* y, float4 voxel, float16 plane_matrix,
         float in_xspacing, float in_yspacing);
@@ -342,3 +354,6 @@ __kernel void voxel_methods(int volume_xsize,
 /******************/
 /* End prototypes */
 /******************/
+
+
+#endif /* KERNELS_CLH_ */

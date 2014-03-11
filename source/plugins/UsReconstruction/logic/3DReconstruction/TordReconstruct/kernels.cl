@@ -1,4 +1,34 @@
-#include "kernels.clh"
+#include "kernels.cl.h"
+
+//---------------------DEBUGGING-FUNCTIONALITY---------------------
+/**
+ * Print a matrix - useful for debugging
+ */
+#ifdef DEBUG
+void printMatrix(float16 matrix)
+{
+    printf("[ %f, %f, %f, %f\n   %f, %f, %f, %f\n   %f, %f, %f, %f\n   %f, %f, %f, %f\n",
+            matrix.s0,
+            matrix.s1,
+            matrix.s2,
+            matrix.s3,
+            matrix.s4,
+            matrix.s5,
+            matrix.s6,
+            matrix.s7,
+            matrix.s8,
+            matrix.s9,
+            matrix.sA,
+            matrix.sB,
+            matrix.sC,
+            matrix.sD,
+            matrix.sE,
+            matrix.sF);
+}
+#endif
+
+//---------------------DEBUGGING-FUNCTIONALITY---------------------
+
 
 int isValidPixel(int x,
         int y,
@@ -180,9 +210,9 @@ int2 findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 
         //SINTEF BUGFIX?
         if(idx.y <=0)
-        idx.y = 0;
+        	idx.y = 0;
         if(idx.x >= N_PLANES-1)
-        idx.x = N_PLANES-1;
+        	idx.x = N_PLANES-1;
 
         //float2 prev_abs_dists = abs_dists;
 
@@ -371,32 +401,6 @@ float2 transform_inv_xy(float16 matrix, float4 voxel) {
     ret.y = dot(voxel, col1) - dot(col3, col1);
     return ret;
 }
-
-/**
- * Print a matrix - useful for debugging
- */
-#ifdef DEBUG
-void printMatrix(float16 matrix)
-{
-    printf("[ %f, %f, %f, %f\n   %f, %f, %f, %f\n   %f, %f, %f, %f\n   %f, %f, %f, %f\n",
-            matrix.s0,
-            matrix.s1,
-            matrix.s2,
-            matrix.s3,
-            matrix.s4,
-            matrix.s5,
-            matrix.s6,
-            matrix.s7,
-            matrix.s8,
-            matrix.s9,
-            matrix.sA,
-            matrix.sB,
-            matrix.sC,
-            matrix.sD,
-            matrix.sE,
-            matrix.sF);
-}
-#endif
 
 /**
  * Transform to integer image coordinates - i.e. pixel coordinates
