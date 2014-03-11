@@ -194,10 +194,8 @@ int2 findClosestPlanes_heuristic(__local close_plane_t *close_planes,
         int guess,
         bool doTermDistance,
         __global const unsigned char* mask,
-        int in_xsize,
-        int in_ysize,
-        float in_xspacing,
-        float in_yspacing);
+        int2 in_size,
+        float2 in_spacing);
 
 int2 findClosestPlanes_multistart(__local close_plane_t *close_planes,
         __local float4* const plane_eqs,
@@ -208,13 +206,11 @@ int2 findClosestPlanes_multistart(__local close_plane_t *close_planes,
         int n_multistart_guesses,
         bool doTermDistance,
         __global const unsigned char* mask,
-        int in_xsize,
-        int in_ysize,
-        float in_xspacing,
-        float in_yspacing);
+        int2 in_size,
+        float2 in_spacing);
 
 #if PLANE_METHOD == PLANE_EXACT
-#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j, k, l) findClosestPlanes_multistart(a, b, c, d, e, f, g, 1, h, i, j, k, l)
+#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j) findClosestPlanes_multistart(a, b, c, d, e, f, g, 1, h, i, j)
 #elif PLANE_METHOD == PLANE_CLOSEST
 
 #ifdef MAX_MULTISTART_STARTS
@@ -222,7 +218,7 @@ int2 findClosestPlanes_multistart(__local close_plane_t *close_planes,
 #define MAX_MULTISTART_STARTS 1
 #endif
 
-#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j, k, l) findClosestPlanes_multistart(a, b, c, d, e, f, g, 0, h, i, j, k, l)
+#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j) findClosestPlanes_multistart(a, b, c, d, e, f, g, 0, h, i, j)
 #endif
 
 __global const unsigned char* getImageData(int plane_id,
@@ -256,10 +252,8 @@ unsigned char performInterpolation_vnn(__local close_plane_t *close_planes,
         __global const float16 *plane_matrices,
         __local const float4 *plane_eqs,
         __global const unsigned char* bscans_blocks[],
-        int in_xsize,
-        int in_ysize,
-        float in_xspacing,
-        float in_yspacing,
+        int2 in_size,
+        float2 in_spacing,
         __global const unsigned char* mask,
         float4 voxel);
 #endif
@@ -270,10 +264,8 @@ unsigned char performInterpolation_vnn2(__local close_plane_t *close_planes,
         __global const float16 *plane_matrices,
         __local const float4 *plane_eqs,
         __global const unsigned char* bscans_blocks[],
-        int in_xsize,
-        int in_ysize,
-        float in_xspacing,
-        float in_yspacing,
+        int2 in_size,
+        float2 in_spacing,
         __global const unsigned char* mask,
         float4 voxel);
 #endif
@@ -284,10 +276,8 @@ unsigned char performInterpolation_dw(__local close_plane_t *close_planes,
         __global const float16 *plane_matrices,
         __local const float4 *plane_eqs,
         __global const unsigned char* bscans_blocks[],
-        int in_xsize,
-        int in_ysize,
-        float in_xspacing,
-        float in_yspacing,
+        int2 in_size,
+        float2 in_spacing,
         __global const unsigned char* mask,
         float4 voxel);
 #endif
@@ -298,10 +288,8 @@ unsigned char performInterpolation_anisotropic(__local close_plane_t *close_plan
         __global const float16 *plane_matrices,
         __local const float4 *plane_eqs,
         __global const unsigned char* bscans_blocks[],
-        int in_xsize,
-        int in_ysize,
-        float in_xspacing,
-        float in_yspacing,
+        int2 in_size,
+        float2 in_spacing,
         __global const unsigned char* mask,
         float4 voxel);
 #endif
