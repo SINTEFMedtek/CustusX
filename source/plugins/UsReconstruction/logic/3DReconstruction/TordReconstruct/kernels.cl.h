@@ -233,10 +233,10 @@ float4 transform_inv(float16 matrix, float4 voxel);
 float2 transform_inv_xy(float16 matrix, float4 voxel);
 
 void toImgCoord_int(int* x, int* y, float4 voxel, float16 plane_matrix,
-        float in_xspacing, float in_yspacing);
+        float2 in_spacing);
 
 void toImgCoord_float(float* x, float* y, float4 voxel, float16 plane_matrix,
-        float in_xspacing, float in_yspacing);
+        float2 in_spacing);
 
 float bilinearInterpolation(float x,
         float y,

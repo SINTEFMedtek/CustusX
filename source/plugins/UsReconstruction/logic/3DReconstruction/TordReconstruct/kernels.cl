@@ -232,8 +232,7 @@ int2 findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                     &py,
                     translated_voxel,
                     plane_matrices[idx.x],
-                    in_spacing.x,
-                    in_spacing.y);
+                    in_spacing);
 
             if(isValidPixel(px, py, mask, in_size.x, in_size.y))
             {
@@ -275,8 +274,7 @@ int2 findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                     &py,
                     translated_voxel,
                     plane_matrices[idx.y],
-                    in_spacing.x,
-                    in_spacing.y);
+                    in_spacing);
             if(isValidPixel(px, py, mask, in_size.x, in_size.y))
             {
                 tmp.dist = dists.y;
@@ -400,24 +398,24 @@ float2 transform_inv_xy(float16 matrix, float4 voxel) {
  * Transform to integer image coordinates - i.e. pixel coordinates
  */
 void toImgCoord_int(int* x, int* y, float4 voxel, float16 plane_matrix,
-        float in_xspacing, float in_yspacing) {
+        float2 in_spacing) {
 
     float2 transformed_voxel = transform_inv_xy(plane_matrix, voxel);
 
-    *x = ((transformed_voxel.x / in_xspacing) + 0.5f);
-    *y = ((transformed_voxel.y / in_yspacing) + 0.5f);
+    *x = ((transformed_voxel.x / in_spacing.x) + 0.5f);
+    *y = ((transformed_voxel.y / in_spacing.y) + 0.5f);
 }
 
 /**
  * Transform to floating point image coordinates
  */
 void toImgCoord_float(float* x, float* y, float4 voxel, float16 plane_matrix,
-        float in_xspacing, float in_yspacing) {
+        float2 in_spacing) {
 
     float2 transformed_voxel = transform_inv_xy(plane_matrix, voxel);
 
-    *x = ((transformed_voxel.x / in_xspacing));
-    *y = ((transformed_voxel.y / in_yspacing));
+    *x = ((transformed_voxel.x / in_spacing.x));
+    *y = ((transformed_voxel.y / in_spacing.y));
 }
 
 /**
@@ -502,8 +500,7 @@ performInterpolation_vnn(__local close_plane_t *close_planes,
             &y,
             translated_voxel,
             plane_matrices[plane_id],
-            in_spacing.x,
-            in_spacing.y);
+            in_spacing);
 
     if(!isValidPixel(x,y, mask, in_size.x, in_size.y))
     {
@@ -558,8 +555,7 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
                 &y,
                 translated_voxel,
                 plane_matrices[plane_id],
-                in_spacing.x,
-                in_spacing.y);
+                in_spacing);
 
         if(!isValidPixel(x,y, mask, in_size.x, in_size.y))
         {
@@ -623,8 +619,7 @@ performInterpolation_dw(__local close_plane_t *close_planes,
                 &y,
                 translated_voxel,
                 plane_matrices[plane_id],
-                in_spacing.x,
-                in_spacing.y);
+                in_spacing);
 
         int ix, iy;
         ix = x;
@@ -691,8 +686,7 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
                 &y,
                 translated_voxel,
                 plane_matrices[plane_id],
-                in_spacing.x,
-                in_spacing.y);
+                in_spacing);
 
         int ix, iy;
         ix = x;
