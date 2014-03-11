@@ -243,10 +243,21 @@ float bilinearInterpolation(float x,
         const __global unsigned char* image,
         int in_xsize);
 
-unsigned char anisotropicFilter(__local const close_plane_t *pixels,
-        int n_planes);
 
 #if METHOD == METHOD_VNN
+	#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
+		performInterpolation_vnn(a, b, c, d, e, f, g, h, i)
+#elif METHOD == METHOD_VNN2
+	#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
+		performInterpolation_vnn2(a, b, c, d, e, f, g, h, i)
+#elif METHOD == METHOD_DW
+	#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
+		performInterpolation_dw(a, b, c, d, e, f, g, h, i)
+#elif METHOD == METHOD_ANISOTROPIC
+	#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
+		performInterpolation_anisotropic(a, b, c, d, e, f, g, h, i)
+#endif
+
 unsigned char performInterpolation_vnn(__local close_plane_t *close_planes,
         int n_close_planes,
         __global const float16 *plane_matrices,
@@ -256,9 +267,7 @@ unsigned char performInterpolation_vnn(__local close_plane_t *close_planes,
         float2 in_spacing,
         __global const unsigned char* mask,
         float4 voxel);
-#endif
 
-#if METHOD == METHOD_VNN2
 unsigned char performInterpolation_vnn2(__local close_plane_t *close_planes,
         int n_close_planes,
         __global const float16 *plane_matrices,
@@ -268,9 +277,7 @@ unsigned char performInterpolation_vnn2(__local close_plane_t *close_planes,
         float2 in_spacing,
         __global const unsigned char* mask,
         float4 voxel);
-#endif
 
-#if METHOD == METHOD_DW
 unsigned char performInterpolation_dw(__local close_plane_t *close_planes,
         int n_close_planes,
         __global const float16 *plane_matrices,
@@ -280,9 +287,7 @@ unsigned char performInterpolation_dw(__local close_plane_t *close_planes,
         float2 in_spacing,
         __global const unsigned char* mask,
         float4 voxel);
-#endif
 
-#if METHOD == METHOD_ANISOTROPIC
 unsigned char performInterpolation_anisotropic(__local close_plane_t *close_planes,
         int n_close_planes,
         __global const float16 *plane_matrices,
@@ -292,7 +297,9 @@ unsigned char performInterpolation_anisotropic(__local close_plane_t *close_plan
         float2 in_spacing,
         __global const unsigned char* mask,
         float4 voxel);
-#endif
+
+unsigned char anisotropicFilter(__local const close_plane_t *pixels,
+        int n_planes);
 
 void prepare_plane_eqs(__global float16 *plane_matrices,
         __local float4 *plane_eqs);
