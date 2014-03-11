@@ -183,7 +183,8 @@ RenderTesterPtr ViewsFixture::getRenderTesterForView(int viewIndex)
 void ViewsFixture::dumpDebugViewToDisk(QString text, int viewIndex)
 {
 	cxtest::RenderTesterPtr renderTester = this->getRenderTesterForView(viewIndex);
-	vtkImageDataPtr output = renderTester->getImageFromRenderWindow();
+//	vtkImageDataPtr output = renderTester->getImageFromRenderWindow();
+	vtkImageDataPtr output = renderTester->renderToImage();
 	renderTester->printFractionOfVoxelsAboveZero(text, output);
 }
 
