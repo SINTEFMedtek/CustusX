@@ -448,10 +448,6 @@ float bilinearInterpolation(float x,
 
 }
 
-#if METHOD == METHOD_VNN
-#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
-	performInterpolation_vnn(a, b, c, d, e, f, g, h, i)
-
 /**
  * Perform interpolation using the Voxel Nearest Neighbour method.
  * This works by taking finding the plane closest to the voxel,
@@ -518,11 +514,6 @@ performInterpolation_vnn(__local close_plane_t *close_planes,
     return max((unsigned char)1, image[y*in_size.x + x]);
 
 }
-#endif
-
-#if METHOD == METHOD_VNN2
-#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
-	performInterpolation_vnn2(a, b, c, d, e, f, g, h, i)
 
 /**
  * Perform interpolation using the VNN2 method. For each close plane, add (1/dist)*closest_pixel_value to the sum.
@@ -587,11 +578,6 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
     return max((unsigned char)1, (unsigned char) (val / scale));
 
 }
-#endif
-
-#if METHOD == METHOD_DW
-#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
-	performInterpolation_dw(a, b, c, d, e, f, g, h, i)
 
 /**
  * Perform interpolation using the DW method. Works the same as VNN2, but instead of taking the closest pixel on each image plane,
@@ -664,11 +650,6 @@ performInterpolation_dw(__local close_plane_t *close_planes,
     return max((unsigned char)1, (unsigned char) (val / scale));
 
 }
-#endif
-
-#if METHOD == METHOD_ANISOTROPIC
-#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
-	performInterpolation_anisotropic(a, b, c, d, e, f, g, h, i)
 
 /**
  * Perform interpolation using an anisotropic filter
@@ -782,7 +763,6 @@ unsigned char anisotropicFilter(__local const close_plane_t *pixels,
     return sum / sum_weights;
 }
 
-#endif
 /**
  * Build the plane equations from the matrices and store them in local memory
  */
