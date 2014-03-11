@@ -46,17 +46,19 @@
 /* Begin structs */
 /*****************/
 
-typedef struct _close_plane {
-    float dist;
-    short plane_id;
-    unsigned char intensity;
-    unsigned char padding; // Align with 4
+typedef struct _close_plane
+{
+	float dist;
+	short plane_id;
+	unsigned char intensity;
+	unsigned char padding; // Align with 4
 } close_plane_t;
 
-typedef struct _output_volume_type {
-    int3 size;
-    float3 spacing;
-    __global unsigned char* volume;
+typedef struct _output_volume_type
+{
+	int3 size;
+	float3 spacing;__global
+	unsigned char* volume;
 } output_volume_type;
 
 /***************/
@@ -128,13 +130,13 @@ typedef struct _output_volume_type {
      + (WEIGHT_TERNARY(px.intensity, mean, BRIGHTNESS_FACTOR)))
 
 #if ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_DISTANCE
-	#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_GAUSS_WEIGHT(px, var, mean, mean_id, sigma)
+#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_GAUSS_WEIGHT(px, var, mean, mean_id, sigma)
 #elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_BRIGHTNESS
-	#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, mean_id, sigma)
+#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, mean_id, sigma)
 #elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_LATENESS
-	#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_LATENESS(px, var, mean, mean_id, sigma)
+#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_LATENESS(px, var, mean, mean_id, sigma)
 #elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_BOTH
-	#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_BOTH(px, var, mean, mean_id, sigma)
+#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_BOTH(px, var, mean, mean_id, sigma)
 #endif
 
 // Gaussian weight function
@@ -167,9 +169,7 @@ typedef struct _output_volume_type {
 /********************/
 
 // Declare all the functions, as Apple seems to need that
-
 //---------------------DEBUGGING-FUNCTIONALITY---------------------
-
 #ifdef DEBUG
 
 void printMatrix(float16 matrix);
@@ -179,34 +179,34 @@ void printMatrix(float16 matrix);
 //---------------------DEBUGGING-FUNCTIONALITY---------------------
 
 int isValidPixel(int x,
-        int y,
-        const __global unsigned char* mask,
-        int2 in_size);
+		int y,
+		const __global unsigned char* mask,
+		int2 in_size);
 
 int findHighestIdx(__local close_plane_t *planes, int n);
 
 int2 findClosestPlanes_heuristic(__local close_plane_t *close_planes,
-        __local float4* const plane_eqs,
-        __global float16* const plane_matrices,
-        const float4 voxel,
-        const float radius,
-        int guess,
-        bool doTermDistance,
-        __global const unsigned char* mask,
-        int2 in_size,
-        float2 in_spacing);
+		__local float4* const plane_eqs,
+		__global float16* const plane_matrices,
+		const float4 voxel,
+		const float radius,
+		int guess,
+		bool doTermDistance,
+		__global const unsigned char* mask,
+		int2 in_size,
+		float2 in_spacing);
 
 int2 findClosestPlanes_multistart(__local close_plane_t *close_planes,
-        __local float4* const plane_eqs,
-        __global float16* const plane_matrices,
-        const float4 voxel,
-        const float radius,
-        int *multistart_guesses,
-        int n_multistart_guesses,
-        bool doTermDistance,
-        __global const unsigned char* mask,
-        int2 in_size,
-        float2 in_spacing);
+		__local float4* const plane_eqs,
+		__global float16* const plane_matrices,
+		const float4 voxel,
+		const float radius,
+		int *multistart_guesses,
+		int n_multistart_guesses,
+		bool doTermDistance,
+		__global const unsigned char* mask,
+		int2 in_size,
+		float2 in_spacing);
 
 #if PLANE_METHOD == PLANE_EXACT
 #define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j) findClosestPlanes_multistart(a, b, c, d, e, f, g, 1, h, i, j)
@@ -221,8 +221,8 @@ int2 findClosestPlanes_multistart(__local close_plane_t *close_planes,
 #endif
 
 __global const unsigned char* getImageData(int plane_id,
-        __global const unsigned char* bscans_blocks[],
-        int2 in_size);
+		__global const unsigned char* bscans_blocks[],
+		int2 in_size);
 
 float4 transform(float16 matrix, float4 voxel);
 
@@ -230,117 +230,113 @@ float4 transform_inv(float16 matrix, float4 voxel);
 
 float2 transform_inv_xy(float16 matrix, float4 voxel);
 
-void toImgCoord_int(int* x, int* y, float4 voxel, float16 plane_matrix,
-        float2 in_spacing);
+void toImgCoord_int(int* x, int* y, float4 voxel, float16 plane_matrix, float2 in_spacing);
 
-void toImgCoord_float(float* x, float* y, float4 voxel, float16 plane_matrix,
-        float2 in_spacing);
+void toImgCoord_float(float* x, float* y, float4 voxel, float16 plane_matrix, float2 in_spacing);
 
 float bilinearInterpolation(float x,
-        float y,
-        const __global unsigned char* image,
-        int in_xsize);
-
+		float y,
+		const __global unsigned char* image,
+		int in_xsize);
 
 #if METHOD == METHOD_VNN
-	#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
+#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
 		performInterpolation_vnn(a, b, c, d, e, f, g, h, i)
 #elif METHOD == METHOD_VNN2
-	#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
+#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
 		performInterpolation_vnn2(a, b, c, d, e, f, g, h, i)
 #elif METHOD == METHOD_DW
-	#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
+#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
 		performInterpolation_dw(a, b, c, d, e, f, g, h, i)
 #elif METHOD == METHOD_ANISOTROPIC
-	#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
+#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
 		performInterpolation_anisotropic(a, b, c, d, e, f, g, h, i)
 #endif
 
 unsigned char performInterpolation_vnn(__local close_plane_t *close_planes,
-        int n_close_planes,
-        __global const float16 *plane_matrices,
-        __local const float4 *plane_eqs,
-        __global const unsigned char* bscans_blocks[],
-        int2 in_size,
-        float2 in_spacing,
-        __global const unsigned char* mask,
-        float4 voxel);
+		int n_close_planes,
+		__global const float16 *plane_matrices,
+		__local const float4 *plane_eqs,
+		__global const unsigned char* bscans_blocks[],
+		int2 in_size,
+		float2 in_spacing,
+		__global const unsigned char* mask,
+		float4 voxel);
 
 unsigned char performInterpolation_vnn2(__local close_plane_t *close_planes,
-        int n_close_planes,
-        __global const float16 *plane_matrices,
-        __local const float4 *plane_eqs,
-        __global const unsigned char* bscans_blocks[],
-        int2 in_size,
-        float2 in_spacing,
-        __global const unsigned char* mask,
-        float4 voxel);
+		int n_close_planes,
+		__global const float16 *plane_matrices,
+		__local const float4 *plane_eqs,
+		__global const unsigned char* bscans_blocks[],
+		int2 in_size,
+		float2 in_spacing,
+		__global const unsigned char* mask,
+		float4 voxel);
 
 unsigned char performInterpolation_dw(__local close_plane_t *close_planes,
-        int n_close_planes,
-        __global const float16 *plane_matrices,
-        __local const float4 *plane_eqs,
-        __global const unsigned char* bscans_blocks[],
-        int2 in_size,
-        float2 in_spacing,
-        __global const unsigned char* mask,
-        float4 voxel);
+		int n_close_planes,
+		__global const float16 *plane_matrices,
+		__local const float4 *plane_eqs,
+		__global const unsigned char* bscans_blocks[],
+		int2 in_size,
+		float2 in_spacing,
+		__global const unsigned char* mask,
+		float4 voxel);
 
 unsigned char performInterpolation_anisotropic(__local close_plane_t *close_planes,
-        int n_close_planes,
-        __global const float16 *plane_matrices,
-        __local const float4 *plane_eqs,
-        __global const unsigned char* bscans_blocks[],
-        int2 in_size,
-        float2 in_spacing,
-        __global const unsigned char* mask,
-        float4 voxel);
+		int n_close_planes,
+		__global const float16 *plane_matrices,
+		__local const float4 *plane_eqs,
+		__global const unsigned char* bscans_blocks[],
+		int2 in_size,
+		float2 in_spacing,
+		__global const unsigned char* mask,
+		float4 voxel);
 
 unsigned char anisotropicFilter(__local const close_plane_t *pixels,
-        int n_planes);
+		int n_planes);
 
 void prepare_plane_eqs(__global float16 *plane_matrices,
-        __local float4 *plane_eqs);
+		__local float4 *plane_eqs);
 
 int findLocalMinimas(int *guesses,
-        __local const float4 *plane_eqs,
-        float radius,
-        float4 voxel,
-        float3 out_spacing,
-        __global const float16 *plane_matrices,
-        __global const unsigned char *mask);
+		__local const float4 *plane_eqs,
+		float radius,
+		float4 voxel,
+		float3 out_spacing,
+		__global const float16 *plane_matrices,
+		__global const unsigned char *mask);
 
 __kernel void voxel_methods(int volume_xsize,
-        int volume_ysize,
-        int volume_zsize,
-        float volume_xspacing,
-        float volume_yspacing,
-        float volume_zspacing,
-        int in_xsize,
-        int in_ysize,
-        float in_xspacing,
-        float in_yspacing,
-        // TODO: Wouldn't it be kind of nice if the bscans was an image sampler object?
-        __global unsigned char* in_bscans_b0,
-        __global unsigned char* in_bscans_b1,
-        __global unsigned char* in_bscans_b2,
-        __global unsigned char* in_bscans_b3,
-        __global unsigned char* in_bscans_b4,
-        __global unsigned char* in_bscans_b5,
-        __global unsigned char* in_bscans_b6,
-        __global unsigned char* in_bscans_b7,
-        __global unsigned char* in_bscans_b8,
-        __global unsigned char* in_bscans_b9,
-        __global unsigned char* out_volume,
-        __global float16 *plane_matrices,
-        __global unsigned char* mask,
-        __local float4 *plane_eqs,
-        __local close_plane_t *planes,
-        float radius);
+		int volume_ysize,
+		int volume_zsize,
+		float volume_xspacing,
+		float volume_yspacing,
+		float volume_zspacing,
+		int in_xsize,
+		int in_ysize,
+		float in_xspacing,
+		float in_yspacing,
+		// TODO: Wouldn't it be kind of nice if the bscans was an image sampler object?
+		__global unsigned char* in_bscans_b0,
+		__global unsigned char* in_bscans_b1,
+		__global unsigned char* in_bscans_b2,
+		__global unsigned char* in_bscans_b3,
+		__global unsigned char* in_bscans_b4,
+		__global unsigned char* in_bscans_b5,
+		__global unsigned char* in_bscans_b6,
+		__global unsigned char* in_bscans_b7,
+		__global unsigned char* in_bscans_b8,
+		__global unsigned char* in_bscans_b9,
+		__global unsigned char* out_volume,
+		__global float16 *plane_matrices,
+		__global unsigned char* mask,
+		__local float4 *plane_eqs,
+		__local close_plane_t *planes,
+		float radius);
 
 /******************/
 /* End prototypes */
 /******************/
-
 
 #endif /* KERNELS_CLH_ */
