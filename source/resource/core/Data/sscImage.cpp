@@ -52,6 +52,12 @@ typedef vtkSmartPointer<vtkImageChangeInformation> vtkImageChangeInformationPtr;
 namespace cx
 {
 
+struct null_deleter
+{
+	void operator()(void const *) const {}
+};
+
+
 Image::ShadingStruct::ShadingStruct()
 {
 	on = false;
@@ -150,10 +156,6 @@ ImagePtr Image::getUnsigned(ImagePtr self)
 }
 
 
-struct null_deleter
-{
-	void operator()(void const *) const {}
-};
 
 void Image::resetTransferFunctions(bool _2D, bool _3D)
 {
@@ -519,15 +521,9 @@ double Image::loadAttribute(QDomNode dataNode, QString name, double defVal)
 
 bool Image::load(QString path)
 {
-	vtkImageDataPtr raw;
-	raw = DataReaderWriter().loadVtkImageData(path);
-	this->setVtkImageData(raw);
-	if(raw)
-	{
-		this->setName(QFileInfo(path).baseName());
-		this->setFilename(path); // need path even when not set explicitly: nice for testing
-	}
-	return raw!=0;
+	ImagePtr self = ImagePtr(this, null_deleter());
+	DataReaderWriter().readInto(self, path);
+	return this->getBaseVtkImageData()!=0;
 }
 
 void Image::parseXml(QDomNode& dataNode)

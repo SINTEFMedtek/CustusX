@@ -50,6 +50,7 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][widget][streaming]")
 //	DummyToolManager::getInstance()->shutdown();
 //	cx::cxDataManager::getInstance()->shutdown();
 //	cx::messageManager()->shutdown();
+	ts.reset();
 	cx::LogicManager::shutdown();
 }
 
