@@ -9,7 +9,7 @@
 
 #include <QDir>
 
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "cxToolManager.h"
 #include "cxVideoService.h"
 #include "sscMessageManager.h"
