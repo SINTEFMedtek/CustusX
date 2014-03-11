@@ -788,16 +788,9 @@ int findLocalMinimas(int *guesses,
         __local const float4 *plane_eqs,
         float radius,
         float4 voxel,
-        float out_xspacing,
-        float out_yspacing,
-        float out_zspacing,
-        float in_xspacing,
-        float in_yspacing,
+        float3 out_spacing,
         __global const float16 *plane_matrices,
-        __global const unsigned char *mask,
-        int in_xsize,
-        int in_ysize)
-
+        __global const unsigned char *mask)
 {
     // Find all valleys in the search space of distances.
     // We don't need the _exact_ minima, however it should be inside the sweep we want.
@@ -808,7 +801,7 @@ int findLocalMinimas(int *guesses,
     int nMinima = 1;
 
     // Now with the cube-ish way of doing things, we may simply find all guesses that are closer than CUBE_SIZE * voxel_scale
-    float max_dist = euclid_dist(out_xspacing * CUBE_SIZE, out_zspacing*CUBE_SIZE, out_yspacing*CUBE_SIZE) + radius;
+    float max_dist = euclid_dist(out_spacing.x * CUBE_SIZE, out_spacing.z*CUBE_SIZE, out_spacing.y*CUBE_SIZE) + radius;
     DEBUG_PRINTF("Max dist is %f\n", max_dist);
     int prev_pos = 0;
     //float smallest_dist = fabs(dot(voxel, plane_eqs[0]));
@@ -1002,15 +995,9 @@ voxel_methods(int volume_xsize,
             plane_eqs,
             radius,
             voxel,
-            output_volume.spacing.x,
-            output_volume.spacing.y,
-            output_volume.spacing.z,
-            in_spacing.x,
-            in_spacing.y,
+            output_volume.spacing,
             plane_matrices,
-            mask,
-            in_size.x,
-            in_size.y);
+            mask);
 
 #ifdef DEBUG
     for(int i = 0; i < nGuesses; i++)
