@@ -33,17 +33,16 @@ void printMatrix(float16 matrix)
 int isValidPixel(int x,
         int y,
         const __global unsigned char* mask,
-        int in_xsize,
-        int in_ysize)
+        int2 in_size)
 {
 #ifndef DEBUG
-    return (isInside(x, in_xsize)
-            && isInside(y, in_ysize)
-            && isNotMasked(x, y, mask, in_xsize));
+    return (ISINSIDE(x, in_size.x)
+            && ISINSIDE(y, in_size.y)
+            && ISNOTMASKED(x, y, mask, in_size.x));
 #else
-    if((isInside(x, in_xsize)
-                    && isInside(y, in_ysize)
-                    && isNotMasked(x, y, mask, in_xsize)))
+    if((ISINSIDE(x, in_size.x)
+                    && ISINSIDE(y, in_size.y)
+                    && ISNOTMASKED(x, y, mask, in_size.x)))
     {
         return 1;
     }
@@ -225,7 +224,7 @@ int2 findClosestPlanes_heuristic(__local close_plane_t *close_planes,
             BOUNDS_CHECK(idx.x, 0, N_PLANES);
             BOUNDS_CHECK(max_idx, 0, MAX_PLANES);
             int px, py;
-            float4 translated_voxel = projectOntoPlaneEq(voxel,
+            float4 translated_voxel = PROJECTONTOPLANEEQ(voxel,
                     plane_eqs[idx.x],
                     dists.x);
             toImgCoord_int(&px,
@@ -234,7 +233,7 @@ int2 findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                     plane_matrices[idx.x],
                     in_spacing);
 
-            if(isValidPixel(px, py, mask, in_size.x, in_size.y))
+            if(isValidPixel(px, py, mask, in_size))
             {
 
                 // If yes, swap out the one with the longest distance for this plane
@@ -266,7 +265,7 @@ int2 findClosestPlanes_heuristic(__local close_plane_t *close_planes,
             BOUNDS_CHECK(max_idx, 0, MAX_PLANES);
             // If yes, swap out the one with the longest distance for this plane
             int px, py;
-            float4 translated_voxel = projectOntoPlaneEq(voxel,
+            float4 translated_voxel = PROJECTONTOPLANEEQ(voxel,
                     plane_eqs[idx.y],
                     dists.y);
 
@@ -275,7 +274,7 @@ int2 findClosestPlanes_heuristic(__local close_plane_t *close_planes,
                     translated_voxel,
                     plane_matrices[idx.y],
                     in_spacing);
-            if(isValidPixel(px, py, mask, in_size.x, in_size.y))
+            if(isValidPixel(px, py, mask, in_size))
             {
                 tmp.dist = dists.y;
                 tmp.plane_id = idx.y;
@@ -487,7 +486,7 @@ performInterpolation_vnn(__local close_plane_t *close_planes,
 
     // Now we project the voxel onto the plane by translating the voxel along the
     // normal vector of the plane.
-    float4 translated_voxel = projectOntoPlane(voxel,
+    float4 translated_voxel = PROJECTONTOPLANE(voxel,
             plane_matrices[plane_id],
             CLOSE_PLANE_IDX(close_planes ,close_plane_id).dist);
     translated_voxel.w = 1.0f;
@@ -500,7 +499,7 @@ performInterpolation_vnn(__local close_plane_t *close_planes,
             plane_matrices[plane_id],
             in_spacing);
 
-    if(!isValidPixel(x,y, mask, in_size.x, in_size.y))
+    if(!isValidPixel(x,y, mask, in_size))
     {
         return 1;
     }
@@ -541,7 +540,7 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
         // Now we project the voxel onto the plane by translating the voxel along the
         // normal vector of the plane.
         voxel.w = 1.0f;
-        float4 translated_voxel = projectOntoPlaneEq(voxel,
+        float4 translated_voxel = PROJECTONTOPLANEEQ(voxel,
                 plane_eqs[plane_id],
                 plane.dist);
 
@@ -554,7 +553,7 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
                 plane_matrices[plane_id],
                 in_spacing);
 
-        if(!isValidPixel(x,y, mask, in_size.x, in_size.y))
+        if(!isValidPixel(x,y, mask, in_size))
         {
             continue;
         }
@@ -604,7 +603,7 @@ performInterpolation_dw(__local close_plane_t *close_planes,
         // Now we project the voxel onto the plane by translating the voxel along the
         // normal vector of the plane.
         voxel.w = 1.0f;
-        float4 translated_voxel = projectOntoPlaneEq(voxel,
+        float4 translated_voxel = PROJECTONTOPLANEEQ(voxel,
                 plane_eqs[plane_id],
                 plane.dist);
 
@@ -620,10 +619,10 @@ performInterpolation_dw(__local close_plane_t *close_planes,
         int ix, iy;
         ix = x;
         iy = y;
-        if(!isValidPixel(ix,iy, mask, in_size.x, in_size.y)
-                || !isValidPixel(ix+1, iy, mask, in_size.x, in_size.y)
-                || !isValidPixel(ix+1, iy+1, mask, in_size.x, in_size.y)
-                || !isValidPixel(ix, iy+1, mask, in_size.x, in_size.y)
+        if(!isValidPixel(ix,iy, mask, in_size)
+                || !isValidPixel(ix+1, iy, mask, in_size)
+                || !isValidPixel(ix+1, iy+1, mask, in_size)
+                || !isValidPixel(ix, iy+1, mask, in_size)
         )
         {
             continue;
@@ -671,7 +670,7 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 
         // Project onto plane
         voxel.w = 1.0f;
-        float4 translated_voxel = projectOntoPlaneEq(voxel,
+        float4 translated_voxel = PROJECTONTOPLANEEQ(voxel,
                 plane_eqs[plane_id],
                 plane.dist);
         translated_voxel.w = 1.0f;
@@ -686,10 +685,10 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
         int ix, iy;
         ix = x;
         iy = y;
-        if(!isValidPixel(ix,iy, mask, in_size.x, in_size.y)
-                || !isValidPixel(ix+1, iy, mask, in_size.x, in_size.y)
-                || !isValidPixel(ix+1, iy+1, mask, in_size.x, in_size.y)
-                || !isValidPixel(ix, iy+1, mask, in_size.x, in_size.y)
+        if(!isValidPixel(ix,iy, mask, in_size)
+                || !isValidPixel(ix+1, iy, mask, in_size)
+                || !isValidPixel(ix+1, iy+1, mask, in_size)
+                || !isValidPixel(ix, iy+1, mask, in_size)
         )
         {
             continue;
@@ -790,7 +789,7 @@ int findLocalMinimas(int *guesses,
     int nMinima = 1;
 
     // Now with the cube-ish way of doing things, we may simply find all guesses that are closer than CUBE_SIZE * voxel_scale
-    float max_dist = euclid_dist(out_spacing.x * CUBE_SIZE, out_spacing.z*CUBE_SIZE, out_spacing.y*CUBE_SIZE) + radius;
+    float max_dist = EUCLID_DIST(out_spacing.x * CUBE_SIZE, out_spacing.z*CUBE_SIZE, out_spacing.y*CUBE_SIZE) + radius;
     DEBUG_PRINTF("Max dist is %f\n", max_dist);
     int prev_pos = 0;
     //float smallest_dist = fabs(dot(voxel, plane_eqs[0]));

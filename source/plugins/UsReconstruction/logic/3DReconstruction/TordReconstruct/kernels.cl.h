@@ -73,7 +73,7 @@ typedef struct _output_volume_type {
 #ifdef DEBUG
 #define DEBUG_PRINTF(...) if((get_global_id(0) % 5000) == 0) printf(##__VA_ARGS__)
 //#define DEBUG_PRINTF(...) printf(##__VA_ARGS__)
-//#define BOUNDS_CHECK(x, min, max) if(x < min || x >= max) printf("Line %d: %s out of range: %d min: %d max: %d\n", __LINE__, #x, x, min, max)
+//#define BOUNDS_CHECK(x, min, ma x) if(x < min || x >= max) printf("Line %d: %s out of range: %d min: %d max: %d\n", __LINE__, #x, x, min, max)
 #define BOUNDS_CHECK(x, min, max)
 
 #else
@@ -81,17 +81,17 @@ typedef struct _output_volume_type {
 #define BOUNDS_CHECK(x, min, max)
 #endif
 
-#define plane_dist(voxel, matrix) (dot(matrix.s26AE,voxel) - dot(matrix.s26AE, matrix.s37BF))
+//#define PLANE_DIST(voxel, matrix) (dot(matrix.s26AE,voxel) - dot(matrix.s26AE, matrix.s37BF))
 
-#define euclid_dist(a, b, c) sqrt((a)*(a) + (b)*(b) + (c)*(c))
+#define EUCLID_DIST(a, b, c) sqrt((a)*(a) + (b)*(b) + (c)*(c))
 
-#define projectOntoPlane(voxel, matrix, dist) (voxel - dist*(matrix.s26AE))
+#define PROJECTONTOPLANE(voxel, matrix, dist) (voxel - dist*(matrix.s26AE))
 
-#define projectOntoPlaneEq(voxel, eq, dist) (voxel - dist*(eq))
+#define PROJECTONTOPLANEEQ(voxel, eq, dist) (voxel - dist*(eq))
 
-#define isInside(x, size) ((x) >= 0 && (x) < (size))
-#define isNotMasked(x, y, mask, xsize) ((mask)[(x) + (y)*(xsize)] > 0)
-//#define isNotMasked(x, y, mask, xsize) true
+#define ISINSIDE(x, size) ((x) >= 0 && (x) < (size))
+#define ISNOTMASKED(x, y, mask, xsize) ((mask)[(x) + (y)*(xsize)] > 0)
+//#define ISNOTMASKED(x, y, mask, xsize) true
 
 #define VOXEL(v,x,y,z) v[x + y*volume_xsize + z*volume_ysize*volume_xsize]
 
@@ -181,8 +181,7 @@ void printMatrix(float16 matrix);
 int isValidPixel(int x,
         int y,
         const __global unsigned char* mask,
-        int in_xsize,
-        int in_ysize);
+        int2 in_size);
 
 int findHighestIdx(__local close_plane_t *planes, int n);
 
