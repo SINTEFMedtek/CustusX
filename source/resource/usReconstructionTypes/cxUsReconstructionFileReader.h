@@ -21,7 +21,7 @@ namespace cx
 
 /**
 * \file
-* \addtogroup cxResourceUtilities
+* \addtogroup cx_resource_usreconstructiontypes
 * @{
 */
 

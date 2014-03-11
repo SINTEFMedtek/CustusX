@@ -35,8 +35,7 @@ namespace cx
  *
  *  Accepts a StringDataAdapterPtr that has getAllowOnlyValuesInRange()==false
  *
- *
- * \ingroup sscWidget
+ * \ingroup cx_resource_widgets
  */
 class LabeledLineEditWidget: public OptimizedUpdateWidget
 {

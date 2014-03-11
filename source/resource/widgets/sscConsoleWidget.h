@@ -34,7 +34,7 @@ namespace cx
  * \date 24. aug. 2010
  * \author: Janne Beate Bakeng, SINTEF Medisinsk Teknologi
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_widgets
  */
 class ConsoleWidget: public QTextBrowser
 {

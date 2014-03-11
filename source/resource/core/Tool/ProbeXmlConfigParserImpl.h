@@ -9,6 +9,7 @@
  *  \brief Implementation of abstract interface ProbeXmlConfigParser
  *  Interface to ProbeCalibConfigs.xml
  *
+ *  \ingroup cx_resource_core_tool
  *  \date Jun 4, 2013
  *  \author Ole Vegard Solberg, SINTEF
  *  \author jbake

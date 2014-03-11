@@ -18,7 +18,7 @@ class ConfigToolListWidget;
 
 /**
  * \brief Manage tool configurations
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * A widget for creating/modifying tool configurations. The user
  * can select configs, and set name and which tools that are part

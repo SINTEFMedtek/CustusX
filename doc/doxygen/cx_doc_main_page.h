@@ -31,6 +31,11 @@ namespace cx
  *
  * This page describes the architecture of CustusX3.
  *
+ * The <a href="modules.html">module list</a> is a recommended starting point.
+ * The modules break down the library into manageable chunks. Also read the
+ * \ref cx_section_arch section.
+ *
+ *
  * \image html metastase_mr_us_small.png "Neuro Navigation with MR and US"
  *
  *
@@ -47,56 +52,40 @@ namespace cx
  * <a href="http://www.midasjournal.org/browse/publication/808">here</a>.
  *
  *
- *
- * \section cx_section_doc Documentation
- *
- * The <a href="modules.html">module list</a> is a recommended starting point.
- * The modules break down the library into manageable chunks. Also read the
- * \ref cx_section_arch section.
- *
- * Remember to check out the SSC documentation. It should be merged with the
- * CustusX doxygen somehow... TBD
- *
- *
- *
  * \section cx_section_arch Architecture
  *
- * The CustusX system is divided onto four layers: \ref cxGUI , \ref cxLogic ,
- * \ref cxService and \ref cxResource .
+ * The CustusX system is divided onto four layers: \ref cx_gui , \ref cx_logic ,
+ * \ref cx_service and \ref cx_resource .
  *
  * <ul>
- * 	<li> \ref cxResource : A collection of common utility classes available to
+ * 	<li> \ref cx_resource : A collection of common utility classes available to
  * 	  everyone. A math library. Much of the SSC library can be found here.
- * 	<li> \ref cxService : A collection of singletons providing basic services:
+ * 	<li> \ref cx_service : A collection of singletons providing basic services:
  * 	  Patient Model, Tracking, Video and Visualization. These provide core
  * 	  functionality to the system, along with system states.
- * 	<li> \ref cxLogic : Adds blocks of functionality on top of the services. A few core
+ * 	<li> \ref cx_logic : Adds blocks of functionality on top of the services. A few core
  * 	  classes provide initialization of the services, everything else is
  * 	  added as plugins.
- * 	<li> \ref cxGUI : Graphical user interface (GUI) consisting of widgets,
+ * 	<li> \ref cx_gui : Graphical user interface (GUI) consisting of widgets,
  * 	  extensible by plugins.
  * </ul>
  *
  * \image html cxArchitecture_top_new.png "CX Structure"
  *
  * The layers are organized as a directed graph. A lower layer may never access
- * components from a higher layer. I.e: Logic may never control \ref cxGUI, but
- * \ref cxLogic may freely access \ref cxLogic (and \ref cxService + \ref
- * cxResource ). Objects within the same layer can interact, but this should be
+ * components from a higher layer. I.e: Logic may never control \ref cx_gui, but
+ * \ref cx_logic may freely access \ref cx_logic (and \ref cx_service + \ref
+ * cx_resource ). Objects within the same layer can interact, but this should be
  * kept to a minimum.
  *
- * The \ref cxPlugins extends the core by adding specific functionality. Examples of
+ * The \ref cx_plugins extends the core by adding specific functionality. Examples of
  * plugins are: Segmentation, Registration, Data Acquisition, 3D US
  * Reconstruction and Calibration. They can be added by people not necessarily
  * part of the core team, and can depend on other plugins. A plugin typically
  * consist of a Logic part that uses the services to perform an operation, and
  * possibly GUI widgets for user interaction.
  *
- * \subsection cx_section_arch_external_resources External resources
- *
- * Not strictly a layer, but consider it as one below resources. All external
- * libraries used by CustusX can be used by the entire system. They are
- * described in 3.7.
+ * All external libraries used by CustusX can be used by the entire system.
  *
  *
  *

@@ -22,6 +22,7 @@ namespace cx
 /**
  * Information needed to create a cx::Image
  *
+ * \ingroup cx_resource_core_data
  * \date 8 Oct 2013
  * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF

@@ -17,7 +17,7 @@ namespace cx
 {
 
 /**\brief Custom widget for display of double-valued data.
- * \ingroup cxGUI
+ * \ingroup cx_resource_widgets
  *
  * Use the double-named methods instead of qslider's int-based ones.
  */
@@ -78,7 +78,7 @@ private:
 };
 
 /**
- * \ingroup cxGUI
+ * \ingroup cx_guisource_widgets
  *
  */
 class SliderRangeGroupWidget : public QWidget

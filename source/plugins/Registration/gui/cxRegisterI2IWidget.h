@@ -23,7 +23,7 @@ class SeansVesselRegistrationWidget;
 
 /**
  * \file
- * \addtogroup cxPluginRegistration
+ * \addtogroup cx_plugin_registration
  * @{
  */
 

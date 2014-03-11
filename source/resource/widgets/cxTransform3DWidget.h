@@ -26,7 +26,8 @@ class MatrixTextEdit;
 /**
  * \brief Widget for displaying and manipulating an affine matrix,
  * i.e. a rotation+translation matrix.
- * \ingroup cxGUI
+ *
+ * \ingroup cx_resource_widgets
  *
  */
 class Transform3DWidget : public BaseWidget

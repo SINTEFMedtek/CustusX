@@ -32,7 +32,7 @@ using cx::Transform3D;
 
 /**
  * \file
- * \addtogroup cxServiceVisualization
+ * \addtogroup cx_service_visualization
  * @{
  */
 

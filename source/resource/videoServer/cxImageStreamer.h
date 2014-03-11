@@ -29,7 +29,7 @@ namespace cx
 
 /**\brief
  *
- * \ingroup cxGrabberServer
+ * \ingroup cx_resource_videoserver
  *
  * \date May 22, 2013
  * \author Janne Beate Bakeng, SINTEF

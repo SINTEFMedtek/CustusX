@@ -10,13 +10,13 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxServicePatient
+ * \addtogroup cx_service_patient
  * @{
  */
 
 ///**
 // * \brief cx implementation of additional functionality for the DataManager
-// * \ingroup cxServicePatient
+// * \ingroup cx_service_patient
 // *
 // * \date Mar 23, 2009
 // * \author Janne Beate Bakeng, SINTEF

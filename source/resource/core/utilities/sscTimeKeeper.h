@@ -30,7 +30,7 @@ namespace cx
  *  \date Nov 06, 2012
  *  \author christiana
  *
- * \ingroup sscUtility
+ * \ingroup cx_resource_core_utilities
  */
 class TimeKeeper
 {

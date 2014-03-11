@@ -32,7 +32,7 @@ class TimelineWidget;
 /**\brief Widget interface to PlaybackTime
  *
  *
- * \ingroup cxGUI
+ * \ingroup cx_gui
  * \date Mar 29, 2012
  * \author Christian Askeland, SINTEF
  */

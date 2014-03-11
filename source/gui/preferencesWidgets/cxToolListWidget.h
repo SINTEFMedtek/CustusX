@@ -13,7 +13,7 @@ namespace cx
  * ToolListWidget
  *
  * \brief Class for displaying tool files that can be dragged and dropped
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * Superclass, not used directly.
  *

@@ -45,7 +45,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxServiceVisualization
+ * \addtogroup cx_service_visualization
  * @{
  */
 

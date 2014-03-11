@@ -12,7 +12,7 @@ namespace cx
 {
 /**
 * \file
-* \addtogroup cxPluginAcquisition
+* \addtogroup cx_plugin_acquisition
 * @{
 */
 

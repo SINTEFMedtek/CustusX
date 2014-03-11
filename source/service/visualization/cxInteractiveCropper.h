@@ -39,7 +39,7 @@ typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServic
 
 /**
 * \file
-* \addtogroup cxServiceVisualization
+* \addtogroup cx_service_visualization
 * @{
 */
 

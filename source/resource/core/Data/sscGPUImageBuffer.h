@@ -30,15 +30,15 @@ namespace cx
 {
 
 /**
- * \addtogroup sscData
- * \{
+ * \file
+ * \addtogroup cx_resource_core_data
+ * @{
  */
 
 /**\brief Helper class for sharing GPU memory over several Views (GL contexts).
  *
  * This one stores 3D volume texture in the form of a vtkImageDataPtr
  *
- * \ingroup sscData
  */
 class GPUImageDataBuffer
 {
@@ -78,7 +78,6 @@ GPUImageDataBufferPtr createGPUImageDataBuffer(vtkImageDataPtr volume);
  *
  * This one stores lut in the form of a vtkUnsignedCharArrayPtr
  *
- * \ingroup sscData
  */
 class GPUImageLutBuffer
 {
@@ -113,7 +112,6 @@ GPUImageLutBufferPtr createGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut);
  *
  * Use this repository for avoiding multiple allocations of buffer data. *
  *
- * \ingroup sscData
  */
 class GPUImageBufferRepository
 {

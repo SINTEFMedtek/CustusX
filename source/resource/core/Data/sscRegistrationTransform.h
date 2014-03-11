@@ -38,7 +38,7 @@ namespace cx
  * Encapsulation of a transform and the registration event,
  * i.e the time and kind of registration.
  *
- * \ingroup sscData
+ * \ingroup cx_resource_core_data
  */
 class RegistrationTransform
 {

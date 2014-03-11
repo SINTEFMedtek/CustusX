@@ -31,7 +31,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxPluginCalibration
+ * \addtogroup cx_plugin_calibration
  * @{
  */
 

@@ -36,13 +36,13 @@ namespace cx
 {
 
 
-/**\brief Display a volume in 3D
+/** \brief Display a volume in 3D
  * 
  * This abstract interface is implemented by VolumetricRep
  * Previously: ProgressiveLODVolumetricRep, which is removed.
  * 
- * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep3D
  */
 class VolumetricBaseRep : public RepImpl
 {
@@ -62,7 +62,7 @@ protected:
 	VolumetricBaseRep() : RepImpl() {}
 };
 
-/**\brief Display a volume in 3D
+/** \brief Display a volume in 3D
  *
  * Use this to render volumetric image data in a 3D scene. Both
  * texture rendering and GPU raycasting are available.
@@ -70,8 +70,8 @@ protected:
  * Used by Sonowand.
  * Used by CustusX.
  *
- * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep3D
  */
 class VolumetricRep : public VolumetricBaseRep
 {

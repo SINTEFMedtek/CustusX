@@ -41,7 +41,7 @@ Vector3D getColorAsVector3D(QColor color) ;
 
 /**\brief RGB color data.
  *
- * \ingroup sscProxy
+ * \ingroup cx_resource_visualization
  */
 class RGBColor : public boost::array<double,3>
 {
@@ -58,7 +58,7 @@ public:
 
 /**\brief Helper for drawing a point in 2D.
  *
- * \ingroup sscProxy
+ * \ingroup cx_resource_visualization
  */
 class OffsetPoint
 {
@@ -80,7 +80,7 @@ typedef boost::shared_ptr<OffsetPoint> OffsetPointPtr;
 
 /**\brief Helper for drawing a line in 2D.
  *
- * \ingroup sscProxy
+ * \ingroup cx_resource_visualization
  */
 class LineSegment
 {
@@ -104,7 +104,7 @@ class LineSegment
 
 /**\brief Helper for drawing text in 2D.
  *
- * \ingroup sscProxy
+ * \ingroup cx_resource_visualization
  */
 class TextDisplay
 {
@@ -136,7 +136,7 @@ typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
 
 /**\brief Helper for drawing a crosshair in 2D.
  *
- * \ingroup sscProxy
+ * \ingroup cx_resource_visualization
  */
 class CrossHair2D
 {
@@ -161,7 +161,7 @@ typedef boost::shared_ptr<class CrossHair2D> CrossHair2DPtr;
  * Wrapper class for a vtkAxes. Sets up some nice defaults and draws the
  * axes in the world coordinate system.
  *
- * \ingroup sscProxy
+ * \ingroup cx_resource_visualization
  */
 class Axes3D
 {

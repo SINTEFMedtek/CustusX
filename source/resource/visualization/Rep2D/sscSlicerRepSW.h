@@ -39,8 +39,8 @@ typedef boost::shared_ptr<class SliceProxyInterface> SliceProxyInterfacePtr;
  *
  * \sa SlicedImageProxy SliceProxy
  *
- * \ingroup sscRep
- * \ingroup sscRep2D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep2D
  */
 class SliceRepSW : public RepImpl
 {

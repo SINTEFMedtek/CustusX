@@ -31,7 +31,7 @@ namespace cx
  * \date Oct 29, 2008
  * \author: jbake
  *
- * \ingroup sscTool
+ * \ingroup cx_resource_core_tool
  */
 class DummyToolManager : public ToolManager
 {

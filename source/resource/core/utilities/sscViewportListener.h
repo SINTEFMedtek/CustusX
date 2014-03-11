@@ -20,7 +20,7 @@ namespace cx
  *  Subclass by adding the observer to the mRenderer
  *  A callback function is called when a change is detected.
  *
- * \ingroup sscUtility
+ * \ingroup cx_resource_core_utilities
  */
 class ViewportListenerBase
 {
@@ -55,7 +55,7 @@ private:
  *  This can be used to update reps with respect to viewport size, for example
  *  keep a 3D object in constant observed size.
  *
- * \ingroup sscUtility
+ * \ingroup cx_resource_core_utilities
  */
 class ViewportListener : public ViewportListenerBase
 {
@@ -79,7 +79,7 @@ typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
  * The callback is called only of setModified() has been called since
  * last callback.
  *
- * \ingroup sscUtility
+ * \ingroup cx_resource_core_utilities
  */
 class ViewportPreRenderListener : public ViewportListenerBase
 {

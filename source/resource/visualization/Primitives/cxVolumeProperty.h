@@ -27,7 +27,7 @@ typedef boost::shared_ptr<class VolumeProperty> VolumePropertyPtr;
   * Given an internal Image, the vtkVolumeProperty
   * is kept up to date.
   *
-  * \ingroup sscProxy
+  * \ingroup cx_resource_visualization
   * \date 10 Sep 2013, 2013
   * \author Christian Askeland, SINTEF
   * \author Ole Vegard Solberg, SINTEF
