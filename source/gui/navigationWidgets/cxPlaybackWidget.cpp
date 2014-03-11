@@ -17,7 +17,7 @@
 #include <QPainter>
 #include <QToolTip>
 #include <QMouseEvent>
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "sscHelperWidgets.h"
 #include "sscTime.h"
 #include "sscMessageManager.h"

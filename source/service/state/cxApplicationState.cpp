@@ -26,7 +26,7 @@
 #include "cxStateService.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxWorkflowStateMachine.h"
 #include "cxStateServiceBackend.h"
 

@@ -9,7 +9,7 @@
 #include "sscEnumConverter.h"
 #include "sscMessageManager.h"
 #include "cxStateService.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxSelectionGroupBox.h"
 #include "cxToolListWidget.h"
 #include "cxDataLocations.h"

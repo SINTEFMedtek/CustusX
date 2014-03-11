@@ -21,7 +21,7 @@
 #include "cxCyclicActionLogger.h"
 #include "cxDirectlyLinkedSender.h"
 #include "cxSimulatedImageStreamer.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "sscDataManager.h"
 #include "cxVideoServiceBackend.h"
 

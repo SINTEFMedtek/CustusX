@@ -23,7 +23,7 @@
 #include "cxUsReconstructionFileReader.h"
 #include "sscTestVideoSource.h"
 #include "sscImageImportVideoSource.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxProbe.h"
 #include "sscUSFrameData.h"
 #include "cxPlaybackTime.h"

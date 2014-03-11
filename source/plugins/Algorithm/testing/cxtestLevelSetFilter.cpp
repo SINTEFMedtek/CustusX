@@ -3,7 +3,7 @@
 #include "cxLevelSetFilter.h"
 #include "sscCoordinateSystemHelpers.h"
 #include "sscToolManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "sscManualTool.h"
 #include "sscData.h"
 #include "sscImage.h"
