@@ -317,8 +317,7 @@ int2 findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 __global const unsigned char*
 getImageData(int plane_id,
         __global const unsigned char* bscans_blocks[],
-        int in_xsize,
-        int in_ysize)
+        int2 in_size)
 {
     int scans_per_block = N_PLANES / N_BLOCKS;
     int n_big_blocks = N_PLANES % N_BLOCKS;
@@ -341,7 +340,7 @@ getImageData(int plane_id,
     }
     BOUNDS_CHECK(block, 0, 10);
 
-    return &bscans_blocks[block][idx_in_block*in_xsize*in_ysize];
+    return &bscans_blocks[block][idx_in_block*in_size.x*in_size.y];
 }
 
 /**
@@ -484,8 +483,7 @@ performInterpolation_vnn(__local close_plane_t *close_planes,
     BOUNDS_CHECK(plane_id, 0, N_PLANES);
     const __global unsigned char* image = getImageData(plane_id,
             bscans_blocks,
-            in_size.x,
-            in_size.y);
+            in_size);
 
     // Now we project the voxel onto the plane by translating the voxel along the
     // normal vector of the plane.
@@ -538,8 +536,7 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
         int plane_id = plane.plane_id;
         const __global unsigned char* image = getImageData(plane_id,
                 bscans_blocks,
-                in_size.x,
-                in_size.y);
+                in_size);
 
         // Now we project the voxel onto the plane by translating the voxel along the
         // normal vector of the plane.
@@ -602,8 +599,7 @@ performInterpolation_dw(__local close_plane_t *close_planes,
         int plane_id = plane.plane_id;
         const __global unsigned char* image = getImageData(plane.plane_id,
                 bscans_blocks,
-                in_size.x,
-                in_size.y);
+                in_size);
 
         // Now we project the voxel onto the plane by translating the voxel along the
         // normal vector of the plane.
@@ -671,8 +667,7 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
         const int plane_id = plane.plane_id;
         const __global unsigned char* image = getImageData(plane_id,
                 bscans_blocks,
-                in_size.x,
-                in_size.y);
+                in_size);
 
         // Project onto plane
         voxel.w = 1.0f;
