@@ -15,7 +15,7 @@
 #include "cxtestMetricFixture.h"
 
 #include "sscDataManagerImpl.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "sscDummyToolManager.h"
 #include "cxDataLocations.h"
 #include "catch.hpp"

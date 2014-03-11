@@ -8,7 +8,7 @@
 
 #include "sscMessageManager.h"
 #include "sscDummyToolManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "cxToolManager.h"
 #include "cxVideoService.h"
 #include "cxVideoServiceBackend.h"

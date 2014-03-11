@@ -16,7 +16,7 @@
 #include "sscTypeConversions.h"
 #include "cxRegistrationManager.h"
 #include "sscToolManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "cxRepManager.h"
 #include "cxLandmarkRep.h"

@@ -30,7 +30,7 @@
 #include "cxClippingWidget.h"
 #include "cxInteractiveClipper.h"
 #include "cxViewManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 
 CustusXController::CustusXController(QObject* parent) : QObject(parent)
 {
