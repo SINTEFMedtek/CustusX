@@ -37,10 +37,10 @@ namespace cx
  *
  * \section cx_section_other_sources Other Sources
  *
- * <a href="medtekserver.sintef.no/groups/custusx">The CustusX Wiki</a>
+ * <a href="http://medtek.sintef.no/wiki/projects/custusx/CustusX.html">The CustusX Wiki</a>
  * More information about installation, plans etc can be found there.
  *
- * <a href="medtekserver.sintef.no/mantis">Mantis Bug Tracker</a>
+ * <a href="http://medtek.sintef.no/mantis/">Mantis Bug Tracker</a>
  *
  * Paper published at MICCAI 2011 on CustusX architecture can be found
  * <a href="http://hdl.handle.net/10380/3273">here</a> or
@@ -96,19 +96,19 @@ namespace cx
  *
  * Not strictly a layer, but consider it as one below resources. All external
  * libraries used by CustusX can be used by the entire system. They are
- * described in 3.7. SSC (5.6) is an exception: It is so tightly integrated
- * into CustusX that it should be considered part of it.
+ * described in 3.7.
  *
  *
  *
  * \section cx_section_legal Legal stuff
  *
- * CustusX is fully owned by SINTEF MedTech. CustusX source code and binaries
- * can only be used by SINTEF MedTech and those with explicit permission.
+ * CustusX is fully owned by SINTEF Medical Technology. CustusX source code and binaries
+ * can only be used by SINTEF MT and those with explicit permission.
  * CustusX shall not be distributed to anyone else. In order to use CustusX,
- * a signed agreement with SINTEF must be made. SSC is owned by SINTEF MedTech
- * and SonoWand AS. It can be used by both parties in any way. For SINTEF
- * MedTech, the same rules apply as for CustusX.
+ * a signed agreement with SINTEF must be made.
+ *
+ * CustusX contains elements from the discontinued SSC library, which is jointly owned by
+ * SINTEF MT and Sonowand AS.
  *
  * CustusX contains code created by other parties, under various licenses.
  * This is described within the source code at the appropriate places.
@@ -117,14 +117,14 @@ namespace cx
  * \section cx_section_install Installation
  *
  * Installation instructions can be found on the
- * <a href="medtekserver.sintef.no/groups/custusx">Wiki</a>.
+ * <a href="http://medtek.sintef.no/wiki/projects/custusx/CustusX.html">internal SINTEF MT Wiki</a>.
  *
  *
  * \section cx_section_platforms Platforms
  *
  * CustusX compiles and runs on Mac, Linux and Windows.
- * Mac and Windows also has an installer.
- * Linux must be compiled on Fedora Linux.
+ * Usually the two latest Mac OSX operating system versions is supported.
+ * Linux is supported on Ubuntu. It has also been tested on Fedora.
  *
  *
  * \section cx_section_libs Libraries
@@ -133,7 +133,7 @@ namespace cx
  * compiled on you system in order to make CX compile.
  *
  * Adding more libraries: If a new library is needed, remember that is
- * must be available under the LGPL license or similar, and must run
+ * must be available under the LGPL, BSD or similar license, and must run
  * on all platforms. It should also be easy to install on all platforms,
  * or be Cmake-compatible.
  *
@@ -174,7 +174,7 @@ namespace cx
 		<TD>Yes</TD>
 	</TR>
 	<TR>
-		<TD>Cppunit</TD>
+		<TD>Catch</TD>
 		<TD>for unit testing.</TD>
 		<TD>Yes</TD>
 	</TR>
@@ -194,17 +194,17 @@ namespace cx
 		<TD>Yes</TD>
 	</TR>
 	<TR>
-		<TD>Others</TD>
-		<TD>Some other libraries are included directly in ssc/Code/3rdParty.
-		This includes Eigen, the math library.</TD>
-		<TD>Included</TD>
+		<TD>Eigen</TD>
+		<TD>Math library</TD>
+		<TD>Yes</TD>
 	</TR>
 </TABLE>
  *
  *
  * \section cx_section_style Code style
  *
- * This is described under SSC. TBD
+ * See document <a href="cx_code_standard.pdf" target="_blank"><b>Code Style</b></a>
+ *
  *
  * \section cx_section_coordinate_systems Coordinate Systems
  *

@@ -79,6 +79,8 @@ class Component(object):
         builder.setBuildType(self.getBuildType())
         builder.setControlData(self.controlData)
         return builder
+    def isPubliclyAvailable(self):
+        return True
         
 # ---------------------------------------------------------
 
@@ -296,6 +298,9 @@ class ISB_DataStreaming(CppComponent):
             return '--username sintef'
         else:
             return '--non-interactive --username sintef --password %s' % self.controlData.isb_password
+    def isPubliclyAvailable(self):
+        return False
+        
 # ---------------------------------------------------------
 
 class CustusX3(CppComponent):
@@ -365,6 +370,8 @@ class UltrasonixSDK(CppComponent):
         pass
     def makeClean(self):
         pass
+    def isPubliclyAvailable(self):
+        return False
 # ---------------------------------------------------------
 
 class TubeSegmentationFramework(CppComponent):
@@ -453,6 +460,8 @@ class CustusX3Data(CppComponent):
         return 'medtek.sintef.no//Volumes/medtek_HD/git/Data.git'
     def makeClean(self):
         pass
+    def isPubliclyAvailable(self):
+        return False
 # ---------------------------------------------------------
 
 
