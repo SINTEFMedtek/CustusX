@@ -308,15 +308,9 @@ int findLocalMinimas(int *guesses,
         __local const float4 *plane_eqs,
         float radius,
         float4 voxel,
-        float out_xspacing,
-        float out_yspacing,
-        float out_zspacing,
-        float in_xspacing,
-        float in_yspacing,
+        float3 out_spacing,
         __global const float16 *plane_matrices,
-        __global const unsigned char *mask,
-        int in_xsize,
-        int in_ysize);
+        __global const unsigned char *mask);
 
 __kernel void voxel_methods(int volume_xsize,
         int volume_ysize,
