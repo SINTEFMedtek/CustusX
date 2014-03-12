@@ -10,12 +10,13 @@
 
 #include "sscDoubleDataAdapter.h"
 #include "sscForwardDeclarations.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup cxGUI
+ * \addtogroup cx_gui
  * @{
  */
 

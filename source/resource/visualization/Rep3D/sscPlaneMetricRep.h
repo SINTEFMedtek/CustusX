@@ -30,10 +30,10 @@ namespace cx
 
 typedef boost::shared_ptr<class PlaneMetricRep> PlaneMetricRepPtr;
 
-/**\brief Rep for visualizing a PlaneMetric.
+/** \brief Rep for visualizing a PlaneMetric.
  *
- * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep3D
  *
  * \date Jul 27, 2011
  * \author Christian Askeland, SINTEF
@@ -45,7 +45,6 @@ public:
 	static PlaneMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
 	virtual ~PlaneMetricRep() {}
 
-//	void setMetric(PlaneMetricPtr point);
 	virtual QString getType() const { return "PlaneMetricRep"; }
 
 protected:
@@ -59,11 +58,12 @@ private:
 	PlaneMetricRep(); ///< not implemented
 
 	void rescale();
+	PlaneMetricPtr getPlaneMetric();
+	void drawRectangleForPlane(Vector3D p0_r, Vector3D n_r, double size);
 
 	GraphicalPoint3DPtr mGraphicalPoint;
 	GraphicalArrow3DPtr mNormal;
 	Rect3DPtr mRect;
-	PlaneMetricPtr mMetric;
 	ViewportListenerPtr mViewportListener;
 };
 

@@ -28,7 +28,8 @@ cx_add_class_qt_moc(cxVisualizationService_SOURCE
     cxAxisConnector
 	cxLayoutWidget
 	cxRenderLoop
-    )
+	cx2DZoomHandler
+	)
 
 cx_add_class(cxVisualizationService_SOURCE
     cxLayoutData

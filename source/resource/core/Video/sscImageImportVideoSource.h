@@ -41,7 +41,7 @@ namespace cx
  * Set a vtkImageImport, and call refresh() to emit a
  * signal.
  *
- * \ingroup sscVideo
+ * \ingroup cx_resource_core_video
  * \date April 11, 2012
  * \author Christian Askeland, SINTEF
  */

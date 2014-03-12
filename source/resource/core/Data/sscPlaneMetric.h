@@ -24,6 +24,7 @@
 #include "sscCoordinateSystemHelpers.h"
 #include "sscDataManagerImpl.h"
 #include "sscPointMetric.h"
+#include "cxMetricReferenceArgumentList.h"
 
 namespace cx
 {
@@ -31,7 +32,7 @@ typedef Eigen::Hyperplane<double, 3> Plane3D;
 
 /**
  * \file
- * \addtogroup sscData
+ * \addtogroup cx_resource_core_data
  * @{
  */
 
@@ -53,19 +54,12 @@ class PlaneMetric: public DataMetric
 {
 Q_OBJECT
 public:
-	PlaneMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	PlaneMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	virtual ~PlaneMetric();
-//    static PlaneMetricPtr create(QDomNode node);
-	static PlaneMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	static PlaneMetricPtr create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
-	void setCoordinate(const Vector3D& p);
-	Vector3D getCoordinate() const;
     virtual Vector3D getRefCoord() const;
 	Vector3D getRefNormal() const;
-    void setNormal(const Vector3D& p);
-	Vector3D getNormal() const;
-	void setSpace(CoordinateSystem space); // use parentframe from Data
-	CoordinateSystem getSpace() const; // use parentframe from Data
 	virtual QString getType() const
 	{
 		return getTypeName();
@@ -78,6 +72,8 @@ public:
 
 	Plane3D getRefPlane() const;
 
+	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
+
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 	virtual DoubleBoundingBox3D boundingBox() const;
@@ -86,10 +82,7 @@ public:
 	virtual bool showValueInGraphics() const { return false; }
 
 private:
-	Vector3D mCoordinate;
-	Vector3D mNormal;
-	CoordinateSystem mSpace;
-	SpaceListenerPtr mSpaceListener;
+	MetricReferenceArgumentListPtr mArguments;
 };
 
 /**

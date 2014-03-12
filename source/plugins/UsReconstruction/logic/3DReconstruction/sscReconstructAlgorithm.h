@@ -33,7 +33,7 @@ namespace cx
 typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
 
 /**
- * \addtogroup sscUSReconstruction
+ * \addtogroup cx_plugin_usreconstruction
  * \{
  */
 

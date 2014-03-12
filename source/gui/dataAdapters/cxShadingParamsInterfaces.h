@@ -13,13 +13,13 @@
 #include "sscDoubleWidgets.h"
 #include "sscForwardDeclarations.h"
 #include "cxActiveImageProxy.h"
-
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup cxGUI
+ * \addtogroup cx_gui
  * @{
  */
 

@@ -31,29 +31,11 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup sscData
+ * \addtogroup cx_resource_core_data
  * @{
  */
 
 typedef boost::shared_ptr<class AngleMetric> AngleMetricPtr;
-
-///** \brief DataReader implementation for AngleMetric
-// *
-// * \date Jul 27, 2011
-// * \author Christian Askeland, SINTEF
-// */
-//class AngleMetricReader: public DataReader
-//{
-//public:
-//	virtual ~AngleMetricReader()
-//	{
-//	}
-//	virtual bool canLoad(const QString& type, const QString& filename)
-//	{
-//		return type == "angleMetric";
-//	}
-//	virtual DataPtr load(const QString& uid, const QString& filename);
-//};
 
 /**\brief Data class that represents an angle between two lines.
  *
@@ -72,7 +54,7 @@ Q_OBJECT
 public:
 	virtual ~AngleMetric();
 //    static AngleMetricPtr create(QDomNode node);
-	static AngleMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	static AngleMetricPtr create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	double getAngle() const;
 	std::vector<Vector3D> getEndpoints() const;
@@ -102,7 +84,7 @@ public:
 private slots:
 	void resetCachedValues();
 private:
-	AngleMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	AngleMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	boost::array<DataPtr, 4> mArgument;
 	MetricReferenceArgumentListPtr mArguments;
 	bool mUseSimpleVisualization;

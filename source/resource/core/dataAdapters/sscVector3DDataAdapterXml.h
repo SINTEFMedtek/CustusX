@@ -47,7 +47,7 @@ typedef boost::shared_ptr<class Vector3DDataAdapterXml> Vector3DDataAdapterXmlPt
     <option id="Processor" value="3.14"/>
    \endverbatim
  *
- *   \ingroup sscWidget
+ * \ingroup cx_resource_core_dataadapters
  */
 class Vector3DDataAdapterXml: public Vector3DDataAdapter
 {

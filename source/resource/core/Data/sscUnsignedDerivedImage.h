@@ -38,7 +38,7 @@ namespace cx
  * Intended for structures that requires unsigned input, such
  * as TextureSlice3DProxy.
  *
- *   \ingroup sscData
+ * \ingroup cx_resource_core_data
  *   \date Feb 21, 2013
  *   \author christiana
  */

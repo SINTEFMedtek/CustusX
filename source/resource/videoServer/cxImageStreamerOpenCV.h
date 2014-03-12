@@ -32,6 +32,7 @@ typedef boost::shared_ptr<cv::VideoCapture> VideoCapturePtr;
  * it must be created within the run() method
  * of a qthread.
  *
+ * \ingroup cx_resource_videoserver
  * \author Christian Askeland, SINTEF
  * \date Jun 21, 2011
  *

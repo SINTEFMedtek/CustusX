@@ -27,6 +27,7 @@ typedef std::pair<double,double> double_pair;
  * Based on information on scalar range, modality,
  * and default windowlevel.
  *
+ * \ingroup cx_resource_core_data
  * \date 2014-02-10
  * \author christiana
  */

@@ -42,7 +42,7 @@ mapped onto this polygon.
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<vtkPolyData> vtkPolyDataPtr;
 
-/**\brief Source for an Ultrasound sector.
+/** \brief Source for an Ultrasound sector.
  * The output vtkPolyData contains a polygon plus texture coordinates.
  * The output is given in space u: a xy vtk image space with origin in the lower-left corner,
  *
@@ -52,7 +52,7 @@ typedef vtkSmartPointer<vtkPolyData> vtkPolyDataPtr;
  *
  * Adapted from same-named class in CustusX1
  *
- * \ingroup sscProxy
+ * \ingroup cx_resource_visualization
  */
 class UltrasoundSectorSource : public vtkPolyDataSource 
 {

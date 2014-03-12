@@ -13,7 +13,7 @@ namespace cx
 
 /**\brief Widget for displaying various volume information.
  *
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * \author Christian Askeland, SINTEF
  * \author Janne Beate Bakeng, SINTEF

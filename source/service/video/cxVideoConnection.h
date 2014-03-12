@@ -29,12 +29,13 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxServiceVideo
+ * \addtogroup cx_service_video
  * @{
  */
 
 typedef boost::shared_ptr<class ImageReceiverThread> ImageReceiverThreadPtr;
 typedef boost::shared_ptr<class BasicVideoSource> BasicVideoSourcePtr;
+typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 
 /** \brief Represent one video grabber connection.
  *
@@ -46,7 +47,7 @@ typedef boost::shared_ptr<class BasicVideoSource> BasicVideoSourcePtr;
  *
  * Refactored from old class OpenIGTLinkRTSource.
  *
- *  \ingroup cxServiceVideo
+ *  \ingroup cx_service_video
  *  \date Oct 31, 2010
  *  \date Feb 26, 2013
  *  \author Christian Askeland, SINTEF
@@ -56,7 +57,7 @@ class VideoConnection : public QObject
 	Q_OBJECT
 
 public:
-	VideoConnection();
+	explicit VideoConnection(VideoServiceBackendPtr backend);
 	virtual ~VideoConnection();
 	virtual bool isConnected() const;
 
@@ -70,14 +71,14 @@ public:
 
 signals:
 	bool connected(bool);
-	void fps(int fps);
+	void fps(QString source, int fps);
 	void videoSourcesChanged();
 
 private slots:
 	void clientFinishedSlot();
 	void imageReceivedSlot();
 	void statusReceivedSlot();
-	void fpsSlot(double fps);
+	void fpsSlot(QString, double fps);
 	void connectedSlot(bool on);
 	void connectVideoToProbe();
 	void useUnusedProbeDataSlot();///< If no probe is available the ProbeData is saved and this slot is called when a probe becomes available
@@ -98,6 +99,7 @@ private:
 	std::vector<BasicVideoSourcePtr> mSources;
 
 	QString mImageUidToStream;
+	VideoServiceBackendPtr mBackend;
 };
 typedef boost::shared_ptr<VideoConnection> VideoConnectionPtr;
 

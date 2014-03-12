@@ -30,7 +30,7 @@
 namespace cx
 {
 
-ApplicationStateMachine::ApplicationStateMachine()
+ApplicationStateMachine::ApplicationStateMachine(StateServiceBackendPtr backend) : mBackend(backend)
 {
 	mActionGroup = new QActionGroup(this);
 
@@ -59,6 +59,7 @@ ApplicationStateMachine::ApplicationStateMachine()
 
 ApplicationState* ApplicationStateMachine::newState(ApplicationState* state)
 {
+	state->setBackend(mBackend);
 	RequestEnterStateTransition* transToState = new RequestEnterStateTransition(state->getUid());
 	transToState->setTargetState(state);
 	mParentState->addTransition(transToState);

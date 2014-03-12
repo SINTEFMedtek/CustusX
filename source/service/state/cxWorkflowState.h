@@ -26,9 +26,11 @@
 
 namespace cx
 {
+typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
+
 /**
  * \file
- * \addtogroup cxServiceState
+ * \addtogroup cx_service_state
  * @{
  */
 
@@ -42,11 +44,12 @@ class WorkflowState: public QState
 Q_OBJECT
 
 public:
-	WorkflowState(QState* parent, QString uid, QString name) :
+	WorkflowState(QState* parent, QString uid, QString name, StateServiceBackendPtr backend) :
 					QState(parent),
 					mUid(uid),
 					mName(name),
-					mAction(NULL)
+					mAction(NULL),
+		mBackend(backend)
 	{}
 
 	virtual ~WorkflowState() {}
@@ -75,14 +78,15 @@ protected:
 	QString mUid;
 	QString mName;
 	QAction* mAction;
+	StateServiceBackendPtr mBackend;
 };
 
 class ParentWorkflowState: public WorkflowState
 {
 Q_OBJECT
 public:
-	ParentWorkflowState(QState* parent) :
-					WorkflowState(parent, "ParentUid", "Parent") {}
+	ParentWorkflowState(QState* parent, StateServiceBackendPtr backend) :
+					WorkflowState(parent, "ParentUid", "Parent", backend) {}
 	virtual ~ParentWorkflowState() {}
 	virtual void onEntry(QEvent * event) {}
 	virtual void onExit(QEvent * event) {}
@@ -95,8 +99,8 @@ class PatientDataWorkflowState: public WorkflowState
 Q_OBJECT
 
 public:
-	PatientDataWorkflowState(QState* parent) :
-					WorkflowState(parent, "PatientDataUid", "Patient Data")
+	PatientDataWorkflowState(QState* parent, StateServiceBackendPtr backend) :
+					WorkflowState(parent, "PatientDataUid", "Patient Data", backend)
 	{}
 	virtual ~PatientDataWorkflowState() {}
 	virtual QIcon getIcon() const { return QIcon(":/icons/workflow_state_patient_data.png"); }
@@ -109,7 +113,7 @@ class NavigationWorkflowState: public WorkflowState
 Q_OBJECT
 
 public:
-	NavigationWorkflowState(QState* parent);
+	NavigationWorkflowState(QState* parent, StateServiceBackendPtr backend);
 	virtual ~NavigationWorkflowState() {}
 	virtual QIcon getIcon() const
 	{
@@ -124,7 +128,7 @@ class RegistrationWorkflowState: public WorkflowState
 Q_OBJECT
 
 public:
-	RegistrationWorkflowState(QState* parent);
+	RegistrationWorkflowState(QState* parent, StateServiceBackendPtr backend);
 
 	virtual ~RegistrationWorkflowState() {}
 	virtual QIcon getIcon() const
@@ -140,7 +144,7 @@ class PreOpPlanningWorkflowState: public WorkflowState
 Q_OBJECT
 
 public:
-	PreOpPlanningWorkflowState(QState* parent);
+	PreOpPlanningWorkflowState(QState* parent, StateServiceBackendPtr backend);
 
 	virtual ~PreOpPlanningWorkflowState()
 	{}
@@ -157,7 +161,7 @@ class IntraOpImagingWorkflowState: public WorkflowState
 Q_OBJECT
 
 public:
-	IntraOpImagingWorkflowState(QState* parent);
+	IntraOpImagingWorkflowState(QState* parent, StateServiceBackendPtr backend);
 	virtual ~IntraOpImagingWorkflowState()
 	{}
 	virtual QIcon getIcon() const
@@ -174,7 +178,7 @@ class PostOpControllWorkflowState: public WorkflowState
 Q_OBJECT
 
 public:
-	PostOpControllWorkflowState(QState* parent);
+	PostOpControllWorkflowState(QState* parent, StateServiceBackendPtr backend);
 	virtual ~PostOpControllWorkflowState() {}
 	virtual QIcon getIcon() const
 	{

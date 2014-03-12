@@ -140,8 +140,8 @@ void ReconstructCore::threadedPostReconstruct()
 										.arg(mInput.mTransferFunctionPreset)
 										.arg(mInput.mAngio));
 
-		DataManager::getInstance()->loadData(mOutput);
-		DataManager::getInstance()->saveImage(mOutput, mInput.mOutputBasePath);
+		dataManager()->loadData(mOutput);
+		dataManager()->saveImage(mOutput, mInput.mOutputBasePath);
 	}
 	else
 	{

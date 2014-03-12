@@ -24,7 +24,7 @@
 namespace cx
 {
 
-SpaceProviderImpl::SpaceProviderImpl(ToolManager* toolManager, DataManager* dataManager)
+SpaceProviderImpl::SpaceProviderImpl(TrackingServicePtr toolManager, DataServicePtr dataManager)
 {
 	mToolManager = toolManager;
 	mDataManager = dataManager;

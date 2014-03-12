@@ -17,13 +17,14 @@
 
 #include "sscStringDataAdapter.h"
 #include "sscTool.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
 
 /**
  * \file
- * \addtogroup cxGUI
+ * \addtogroup cx_gui
  * @{
  */
 

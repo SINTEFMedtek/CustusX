@@ -23,7 +23,7 @@ typedef boost::shared_ptr<class SelectDataStringDataAdapter> SelectDataStringDat
 
 /**
  * \file
- * \addtogroup cxPluginCalibration
+ * \addtogroup cx_plugin_calibration
  * @{
  */
 

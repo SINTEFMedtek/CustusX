@@ -6,7 +6,6 @@
 #include "cxVideoService.h"
 #include "cxVideoConnectionManager.h"
 #include "cxVideoConnection.h"
-#include "cxDirectlyLinkedImageReceiverThread.h"
 
 namespace cx
 {

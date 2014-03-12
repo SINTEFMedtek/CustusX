@@ -23,29 +23,11 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup sscData
+ * \addtogroup cx_resource_core_data
  * @{
  */
 
 typedef boost::shared_ptr<class SphereMetric> SphereMetricPtr;
-
-//* \brief DataReader implementation for SphereMetric
-// *
-// * \date 2014-02-11
-// * \author Christian Askeland, SINTEF
-
-//class SphereMetricReader: public DataReader
-//{
-//public:
-//	virtual ~SphereMetricReader()
-//	{
-//	}
-//	virtual bool canLoad(const QString& type, const QString& filename)
-//	{
-//		return type == "SphereMetric";
-//	}
-//	virtual DataPtr load(const QString& uid, const QString& filename);
-//};
 
 /**\brief Data class that represents a donut.
  *
@@ -59,7 +41,7 @@ Q_OBJECT
 public:
 	virtual ~SphereMetric();
 //	static SphereMetricPtr create(QDomNode node);
-	static SphereMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	static SphereMetricPtr create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
 	virtual bool isValid() const;
@@ -84,7 +66,7 @@ public:
 	virtual bool showValueInGraphics() const { return false; }
 
 private:
-	SphereMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	SphereMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	MetricReferenceArgumentListPtr mArguments;
 	double mRadius;
 };

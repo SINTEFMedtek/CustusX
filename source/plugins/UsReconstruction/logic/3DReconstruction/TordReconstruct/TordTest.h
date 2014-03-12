@@ -12,7 +12,7 @@ namespace cx
 {
 
 /**
- * \addtogroup sscUSReconstruction
+ * \addtogroup cx_plugin_usreconstruction
  * \{
  */
 

@@ -19,6 +19,8 @@ class ToolManager;
 
 /** Minimal implementation of the Probe interface.
   * Use setData() and setRTSource() to initialize.
+  *
+ * \ingroup cx_resource_core_tool
   */
 class DummyProbe: public Probe
 {
@@ -112,7 +114,7 @@ signals:
 
 struct DummyToolTestUtilities
 {
-	static DummyToolPtr createDummyTool(ProbeDefinition probeData = ProbeDefinition(), ToolManager* manager = NULL);
+	static DummyToolPtr createDummyTool(ProbeDefinition probeData = ProbeDefinition(), TrackingServicePtr manager = TrackingServicePtr());
 	static ProbeDefinition createProbeDataLinear(double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
 	static ProbeDefinition createProbeData(ProbeDefinition::TYPE, double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
 };
@@ -130,7 +132,7 @@ class DummyTool : public ToolImpl
 {
 	Q_OBJECT
 public:
-	explicit DummyTool(ToolManager *manager, const QString& uid="dummytool");
+	explicit DummyTool(TrackingServicePtr manager, const QString& uid="dummytool");
 	~DummyTool();
 	virtual std::set<Type> getTypes() const;
 	virtual void setType(Type);
@@ -174,8 +176,8 @@ public:
 	void set_prMt(const Transform3D& ptMt);
 	void setVisible(bool val);
 
-	virtual double getTooltipOffset() const;
-	virtual void setTooltipOffset(double val);
+//	virtual double getTooltipOffset() const;
+//	virtual void setTooltipOffset(double val);
 	virtual Transform3D getCalibration_sMt() const;
 
 	virtual std::map<int, Vector3D> getReferencePoints() const {return std::map<int, Vector3D>();};

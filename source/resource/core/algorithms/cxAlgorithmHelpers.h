@@ -35,7 +35,7 @@ typedef itk::VTKImageToImageFilter<itkImageType> itkVTKImageToImageFilterType;
 
 /**
  * \brief Class with helper functions for algorithms.
- * \ingroup cxResourceAlgorithms
+ * \ingroup cx_resource_core_algorithms
  *
  * \date Feb 16, 2011
  * \author Janne Beate Bakeng, SINTEF

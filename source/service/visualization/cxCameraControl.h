@@ -27,6 +27,7 @@
 //#include "sscDoubleWidgets.h"
 #include "sscForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 
 class QActionGroup;
 class QAction;
@@ -36,7 +37,7 @@ namespace cx
 {
 /**
 * \file
-* \addtogroup cxServiceVisualization
+* \addtogroup cx_service_visualization
 * @{
 */
 
@@ -74,6 +75,7 @@ public:
 	CameraControl(QObject* parent = NULL);
 	virtual ~CameraControl();
 
+	void setView(ViewWidgetQPtr view);
 	QActionGroup* createStandard3DViewActions();
 	void translateByFocusTo(Vector3D p_r);
 
@@ -87,6 +89,7 @@ private:
 	vtkCameraPtr getCamera() const;
 	void defineRotateLayout();
 	void definePanLayout();
+	ViewWidgetQPtr mView;
 
 	QAction* addStandard3DViewAction(QString caption, QString help, Vector3D viewDirection, QActionGroup* group);
 };

@@ -31,17 +31,22 @@ namespace cx
  * \date Oct 29, 2008
  * \author: jbake
  *
- * \ingroup sscTool
+ * \ingroup cx_resource_core_tool
  */
 class DummyToolManager : public ToolManager
 {
 	Q_OBJECT
 
 public:
+	typedef boost::shared_ptr<DummyToolManager> DummyToolManagerPtr;
+	static DummyToolManagerPtr create();
+
+	virtual ~DummyToolManager();
+
 	typedef std::map<QString, DummyToolPtr> DummyToolMap;
 	typedef boost::shared_ptr<DummyToolMap> DummyToolMapPtr;
 
-	static ToolManager* getInstance();
+//	static TrackingServicePtr getInstance();
 
 	virtual bool isConfigured() const;
 	virtual bool isInitialized() const;
@@ -84,19 +89,21 @@ public:
 	virtual void clear() {}
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime) { return SessionToolHistoryMap(); }
 
-	static DummyToolManager* getDowncastInstance();
+//	static DummyToolManager* getDowncastInstance();
 	/**
 	 * Reset all internal state of the DummyToolMananger instance. Call between tests to avoid state leak.
 	 */
-	static void reset();
+//	static void reset();
 	void addTool(DummyToolPtr tool);
+	virtual ToolPtr findFirstProbe() { return ToolPtr(); }
+
 
 private:
 	typedef DummyToolMap::iterator DummyToolMapIter;
 	typedef DummyToolMap::const_iterator DummyToolMapConstIter;
 
 	DummyToolManager();
-	~DummyToolManager();
+	TrackingServiceWeakPtr mSelf;
 
 	DummyToolMapPtr mDummyTools;
 	DummyToolPtr mDominantTool;

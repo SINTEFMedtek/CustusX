@@ -20,7 +20,8 @@ namespace cx
 
 /**
  * \brief Widget for displaying a Vector3D
- * \ingroup cxGUI
+ *
+ * \ingroup cx_resource_widgets
  *
  */
 class Vector3DWidget: public QWidget

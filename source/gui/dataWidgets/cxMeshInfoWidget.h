@@ -16,7 +16,7 @@ typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDat
  *
  * \brief Widget for displaying information about meshes.
  *
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * \date 2010.07.07
  * \author Ole Vegard Solberg, SINTEF

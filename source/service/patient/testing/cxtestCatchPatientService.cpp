@@ -14,15 +14,25 @@
 
 #include "catch.hpp"
 #include "sscDataManagerImpl.h"
+#include "cxtestDummyDataManager.h"
+#include "sscMessageManager.h"
+
 
 TEST_CASE("DataManagerImpl setup/shutdown works multiple times", "[unit]")
 {
     for (unsigned i=0; i<2; ++i)
     {
-		cx::DataManagerImpl::initialize();
-		CHECK(cx::dataManager());
+		cx::DataServicePtr service = cx::DataManagerImpl::create();
+		REQUIRE(service);
+		CHECK(service.unique());
+		service.reset();
 
-		cx::DataManagerImpl::shutdown();
+//		cx::DataManagerImpl::initialize();
+//		CHECK(cx::dataManager());
+
+//		cx::DataManagerImpl::shutdown();
         //REQUIRE_FALSE(dataManager()); //todo: should work
     }
 }
+
+

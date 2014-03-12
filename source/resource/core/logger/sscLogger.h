@@ -30,7 +30,7 @@ extern "C"
 *
 * The file sscLogger contains c-style logging functions and macros.
 *
-* \addtogroup sscUtility
+ * \addtogroup cx_resource_core_logger
 *
 * @{
 */

@@ -37,6 +37,10 @@ namespace cx
 class DoubleBoundingBox3D;
 typedef boost::shared_ptr<class Rep> RepPtr;
 
+/**
+  *
+  * \ingroup cx_resource_visualization
+  */
 class ViewItem : public QObject, public View, public QLayoutItem
 {
 Q_OBJECT
@@ -87,6 +91,10 @@ private:
 };
 typedef boost::shared_ptr<ViewItem> ViewItemPtr;
 
+/**
+  *
+  * \ingroup cx_resource_visualization
+  */
 class ViewContainerBase
 {
 public:
@@ -112,6 +120,10 @@ protected:
 	QWidget *mWidget;
 };
 
+/**
+  *
+  * \ingroup cx_resource_visualization
+  */
 class ViewContainerWidget : public QVTKWidget
 {
 public:
@@ -132,7 +144,10 @@ private:
 	ViewContainerBase *mBase;
 };
 
-/// More advanced N:1 combination of SSC Views and Qt Widgets
+/** More advanced N:1 combination of SSC Views and Qt Widgets
+  *
+  * \ingroup cx_resource_visualization
+  */
 class ViewContainer : public ViewContainerWidget, public ViewContainerBase
 {
 Q_OBJECT

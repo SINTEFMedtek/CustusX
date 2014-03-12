@@ -6,6 +6,7 @@
 #include <sscImage.h>
 #include "sscForwardDeclarations.h"
 #include "cxActiveImageProxy.h"
+#include "cxLegacySingletons.h"
 
 class QRect;
 class QMenu;
@@ -16,7 +17,7 @@ namespace cx
  * \class TransferFunctionColorWidget
  *
  * \brief
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * \date Apr 01, 2009
  * \\author Ole Vegard Solberg, SINTEF

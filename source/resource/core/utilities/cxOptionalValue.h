@@ -20,7 +20,7 @@ namespace cx
 
 /** Template that holds a value and validity of that value.
  *
- * \ingroup cx
+ * \ingroup cx_resource_core_utilities
  * \date 2014-03-27
  * \author christiana
  */

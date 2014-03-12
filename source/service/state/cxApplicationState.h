@@ -30,9 +30,11 @@
 
 namespace cx
 {
+typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
+
 /**
  * \file
- * \addtogroup cxServiceState
+ * \addtogroup cx_service_state
  * @{
  */
 
@@ -47,6 +49,7 @@ Q_OBJECT
 public:
 	ApplicationState(QState* parent, QString uid, QString name);
 	virtual ~ApplicationState();
+	void setBackend(StateServiceBackendPtr backend);
 	virtual void onEntry(QEvent * event);
 	virtual void onExit(QEvent * event);
 	virtual QString getUid() const;
@@ -61,6 +64,7 @@ protected:
 	QString mName;
 	QAction* mAction;
 	bool mActive;
+	StateServiceBackendPtr mBackend;
 };
 
 class ParentApplicationState: public ApplicationState

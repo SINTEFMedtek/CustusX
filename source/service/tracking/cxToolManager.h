@@ -28,7 +28,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxServiceTracking
+ * \addtogroup cx_service_tracking
  * @{
  */
 
@@ -38,7 +38,7 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 
 /**
  * \brief Interface towards the navigation system.
- * \ingroup cxServiceTracking
+ * \ingroup cx_service_tracking
  *
  * \image html tracking_simple.png "Tracking Service ideal design."
  *
@@ -49,7 +49,7 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
  * ToolManager and Tool are implemented using IGSTK, and communicates with
  * the Polaris and Aurora tracking systems. All interaction with the module
  * should go through the SSC interfaces. The ToolManager should be
- * considered equal to the \ref cxServiceTracking.
+ * considered equal to the \ref cx_service_tracking.
  *
  * \image html cxArchitecture_tracking.png "Tracking Service Implementation."
  *
@@ -70,15 +70,20 @@ class cxToolManager: public ToolManager
 Q_OBJECT
 
 public:
-	static void initializeObject();
-	static cxToolManager* getInstance();
+	typedef boost::shared_ptr<cxToolManager> cxToolManagerPtr;
 
-	QStringList getSupportedTrackingSystems();
+	static cxToolManagerPtr create();
+	virtual ~cxToolManager();
+
+//	static void initializeObject();
+//	static cxTrackingServicePtr getInstance();
+
+	virtual QStringList getSupportedTrackingSystems();
 
 	virtual bool isConfigured() const; ///< checks if the system is configured
 	virtual bool isInitialized() const; ///< checks if the hardware is initialized
 	virtual bool isTracking() const; ///< checks if the system is tracking
-	bool         isPlaybackMode() const { return mPlayBackMode; }
+	virtual bool isPlaybackMode() const { return mPlayBackMode; }
 
 	virtual ToolManager::ToolMapPtr getConfiguredTools(); ///< get all configured, but not initialized tools
 	virtual ToolManager::ToolMapPtr getInitializedTools(); ///< get all initialized tools
@@ -90,8 +95,6 @@ public:
 	virtual ToolPtr getDominantTool(); ///< get the dominant tool
 	virtual void setDominantTool(const QString& uid); ///< can be set to either a connected or configured tool
 
-	void setClinicalApplication(CLINICAL_APPLICATION application);
-
 	virtual std::map<QString, QString> getToolUidsAndNames() const; ///< both from configured and connected tools
 	virtual std::vector<QString> getToolNames() const; ///< both from configured and connected tools
 	virtual std::vector<QString> getToolUids() const; ///< both from configured and connected tools
@@ -101,7 +104,7 @@ public:
 	virtual void savePositionHistory();
 	virtual void loadPositionHistory();
 
-	void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
+	virtual void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
 
 	void addXml(QDomNode& parentNode); ///< write internal state to node
 	void parseXml(QDomNode& dataNode); ///< read internal state from node
@@ -111,22 +114,22 @@ public:
 
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
 
-	void runDummyTool(DummyToolPtr tool);
-	ToolPtr findFirstProbe();
+	virtual void runDummyTool(DummyToolPtr tool);
+	virtual ToolPtr findFirstProbe();
 
-	void setPlaybackMode(PlaybackTimePtr controller);
+	virtual void setPlaybackMode(PlaybackTimePtr controller);
 
 signals:
 	void probeAvailable(); ///< Emitted when a probe is configured
 
 public slots:
 	void configure(); ///< sets up the software like the xml file suggests
-	void deconfigure(); ///< deconfigures the software
+	virtual void deconfigure(); ///< deconfigures the software
 	void initialize(); ///< connects to the hardware
 	void uninitialize(); ///< disconnects from the hardware
 	void startTracking(); ///< starts tracking
 	void stopTracking(); ///< stops tracking
-	void saveToolsSlot(); ///< saves transforms and timestamps
+	virtual void saveToolsSlot(); ///< saves transforms and timestamps
 	virtual void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
 
 private slots:
@@ -142,17 +145,17 @@ private slots:
 	void globalConfigurationFileChangedSlot(QString key);
 
 private:
-	cxToolManager(); ///< use getInstance instead
-	virtual ~cxToolManager(); ///< destructor
+	cxToolManager();
+	TrackingServiceWeakPtr mSelf;
 
 	void closePlayBackMode();
 	void initializeManualTool();
 	void setConfigurationFile(QString configurationFile); ///< Sets the configuration file to use, must be located in the resourcefolder \param configurationFile path to the configuration file to use
+	void resetTrackingPositionFilters();
 
 	QString mConfigurationFilePath; ///< path to the configuration file
 	QString mLoggingFolder; ///< path to where logging should be saved
 
-	CLINICAL_APPLICATION mApplication; ///< Current clinical application
 	ToolManager::ToolMap mTools; ///< all tools
 
 	ToolPtr mDominantTool; ///< the tool with highest priority

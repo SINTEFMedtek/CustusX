@@ -82,7 +82,7 @@ DoubleRange DoubleDataAdapterActiveToolOffset::getValueRange() const
 
 DoubleDataAdapterActiveImageBase::DoubleDataAdapterActiveImageBase()
 {
-  mActiveImageProxy = ActiveImageProxy::New();
+	mActiveImageProxy = ActiveImageProxy::New(dataService());
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChanged()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
 }
@@ -178,7 +178,7 @@ QString SelectRTSourceStringDataAdapterBase::convertInternal2Display(QString int
 
 ActiveVideoSourceStringDataAdapter::ActiveVideoSourceStringDataAdapter()
 {
-	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SIGNAL(changed()));
+	connect(videoService().get(), SIGNAL(activeVideoSourceChanged()), this, SIGNAL(changed()));
 }
 
 QString ActiveVideoSourceStringDataAdapter::getValueName() const

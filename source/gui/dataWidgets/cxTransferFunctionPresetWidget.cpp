@@ -27,7 +27,7 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent, bool
 	mApplyToAll = settings()->value("applyTransferFunctionPresetsToAll").toBool();
 	this->updateToggles();
 
-	mActiveImageProxy = ActiveImageProxy::New();
+	mActiveImageProxy = ActiveImageProxy::New(dataService());
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this,
 			SLOT(populatePresetListSlot()));
 	connect(mActiveImageProxy.get(), SIGNAL(propertiesChanged()), this,

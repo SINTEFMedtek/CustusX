@@ -26,7 +26,7 @@ Message::Message(QString text, MESSAGE_LEVEL messageLevel, int timeoutTime, QStr
 Message::~Message(){};
 
 
-QString Message::getPrintableMessage()
+QString Message::getPrintableMessage() const
 {
 	QString source = QString("");
 	if (mSourceLocation.isEmpty())
@@ -38,27 +38,26 @@ QString Message::getPrintableMessage()
 		.arg(mText);
 }
 
-MESSAGE_LEVEL Message::getMessageLevel()
+MESSAGE_LEVEL Message::getMessageLevel() const
 {
   return mMessageLevel;
 }
 
-QString Message::getText()
+QString Message::getText() const
 {
   return mText;
 }
 
-QDateTime* Message::getTimeStamp()
+QDateTime Message::getTimeStamp() const
 {
-  return &mTimeStamp;
+  return mTimeStamp;
 }
-int Message::getTimeout()
+int Message::getTimeout() const
 {
   return mTimeoutTime;
 }
 // --------------------------------------------------------
 // --------------------------------------------------------
-
 
 namespace
 {
@@ -180,9 +179,14 @@ void MessageManager::initialize()
 
 void MessageManager::initializeObject()
 {
-  mCout.reset(new SingleStreamerImpl(std::cout, mlCOUT));
-  mCerr.reset(new SingleStreamerImpl(std::cerr, mlCERR));
-  mEnabled = true;
+	// must clear both before reinit (in case of nested initializing)
+	// otherwise we get a segfault.
+	mCout.reset();
+	mCerr.reset();
+
+	mCout.reset(new SingleStreamerImpl(std::cout, mlCOUT));
+	mCerr.reset(new SingleStreamerImpl(std::cerr, mlCERR));
+	mEnabled = true;
 }
 
 void MessageManager::setFormat(Format format)
@@ -447,21 +451,21 @@ QString MessageManager::formatMessage(Message msg)
 	QString ket = (mFormat.mShowBrackets ? "]" : "");
 
 	// timestamp in front
-	retval += bra + msg.mTimeStamp.toString("hh:mm:ss.zzz") + ket;
+	retval += bra + msg.getTimeStamp().toString("hh:mm:ss.zzz") + ket;
 
 	// show source location
-	if (!msg.mSourceLocation.isEmpty())
-		retval += " " + bra + msg.mSourceLocation + ket;
+	if (!msg.getSourceLocation().isEmpty())
+		retval += " " + bra + msg.getSourceLocation() + ket;
 
 	// show level if set, or anyway if one of error/warning/success
 	if (mFormat.mShowLevel
-		|| msg.mMessageLevel == mlERROR
-		|| msg.mMessageLevel == mlWARNING
-		|| msg.mMessageLevel == mlSUCCESS)
-		retval += " " + bra + qstring_cast(msg.mMessageLevel) + ket;
+			|| msg.getMessageLevel() == mlERROR
+			|| msg.getMessageLevel() == mlWARNING
+			|| msg.getMessageLevel() == mlSUCCESS)
+		retval += " " + bra + qstring_cast(msg.getMessageLevel()) + ket;
 
 	// add message text at end.
-	retval += " " + msg.mText;
+	retval += " " + msg.getText();
 
 	return retval;
 }

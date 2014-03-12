@@ -9,14 +9,16 @@
 
 #include <QDir>
 
-#include "cxDataManager.h"
-#include "cxToolManager.h"
+#include "sscDataManager.h"
+#include "sscToolManager.h"
 #include "cxVideoService.h"
 #include "sscMessageManager.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "sscTypeConversions.h"
 #include "cxPlaybackUSAcquisitionVideo.h"
+#include "cxViewManager.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
@@ -55,13 +57,14 @@ void ServiceController::patientChangedSlot()
 	}
 	videoService()->getUSAcquisitionVideoPlayback()->setRoot(patientService()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
 
-	cxToolManager::getInstance()->setLoggingFolder(loggingPath);
+	toolManager()->setLoggingFolder(loggingPath);
 	messageManager()->setLoggingFolder(loggingPath);
 }
 
 void ServiceController::clearPatientSlot()
 {
 	toolManager()->clear();
+	viewManager()->clear();
 }
 
 void ServiceController::duringSavePatientSlot()
@@ -70,6 +73,8 @@ void ServiceController::duringSavePatientSlot()
 
 	toolManager()->addXml(managerNode);
 	toolManager()->savePositionHistory();
+
+	viewManager()->addXml(managerNode);
 }
 
 void ServiceController::duringLoadPatientSlot()
@@ -78,49 +83,10 @@ void ServiceController::duringLoadPatientSlot()
 
 	QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
 	toolManager()->parseXml(toolmanagerNode);
+
+	QDomNode viewmanagerNode = managerNode.namedItem("viewManager");
+	viewManager()->parseXml(viewmanagerNode);
 }
 
-///**Connect a probe from Tracking Service to a video source in Video Service.
-// *
-// */
-//void ServiceController::updateVideoConnections()
-//{
-//	ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
-
-//	this->connectVideoToProbe(tool);
-//}
-
-///**insert the rt source into the (first) probe tool
-// * in the tool manager.
-// *
-// * Apply time calibration to the source.
-// *
-// */
-//void ServiceController::connectVideoToProbe(ToolPtr probe)
-//{
-//	VideoSourcePtr source = videoService()->getActiveVideoSource();
-//	if (!source)
-//	{
-//		messageManager()->sendError("no rt source.");
-//		return;
-//	}
-
-//	// find probe in tool manager
-//	// set source in cxTool
-//	// insert timecalibration using config
-//	if (!source->isConnected())
-//		return;
-
-//	if (!probe)
-//		return;
-
-//	if (probe)
-//	{
-//		ProbePtr probeInterface = probe->getProbe();
-//		if (!probeInterface)
-//			return;
-//		probeInterface->setRTSource(source);
-//	}
-//}
 
 }

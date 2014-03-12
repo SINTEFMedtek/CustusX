@@ -51,6 +51,8 @@ SET (cxVideoService_SOURCE
     
     cxSimulatedImageStreamer.h
     cxSimulatedImageStreamer.cpp
+	cxVideoServiceBackend.h
+	cxVideoServiceBackend.cpp
 )
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})

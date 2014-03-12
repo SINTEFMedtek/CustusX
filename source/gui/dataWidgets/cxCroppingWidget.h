@@ -5,6 +5,7 @@
 #include "sscStringDataAdapter.h"
 #include "cxViewManager.h"
 #include "cxBaseWidget.h"
+#include "cxLegacySingletons.h"
 
 #include "cxBoundingBoxWidget.h"
 
@@ -16,7 +17,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxGUI
+ * \addtogroup cx_gui
  * @{
  */
 

@@ -53,13 +53,15 @@ TEST_CASE("cxFrameMetric can convert transform to single line string", "[unit]")
 TEST_CASE("cxFrameMetric can set space correctly", "[unit]")
 {
     cxtest::MetricFixture fixture;
-    cxtest::FrameMetricWithInput testData = fixture.getFrameMetricWithInput();
+	cxtest::FrameMetricWithInput testData = fixture.getFrameMetricWithInput();
 
-    fixture.setPatientRegistration();
+	fixture.setPatientRegistration();
 
 	testData.mMetric->setSpace(cx::CoordinateSystem::patientReference());
-    CHECK_FALSE(fixture.inputEqualsMetric(testData));
+	CHECK_FALSE(fixture.inputEqualsMetric(testData));
 
-    testData.mMetric->setSpace(testData.mSpace);
-    CHECK(fixture.inputEqualsMetric(testData));
+	testData.mMetric->setSpace(testData.mSpace);
+	CHECK(fixture.inputEqualsMetric(testData));
+
+	testData.mMetric.reset();
 }

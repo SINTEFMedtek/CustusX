@@ -9,7 +9,7 @@
 #include "sscEnumConverter.h"
 #include "sscMessageManager.h"
 #include "cxStateService.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxSelectionGroupBox.h"
 #include "cxToolListWidget.h"
 #include "cxDataLocations.h"
@@ -36,7 +36,7 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
   mApplicationGroupBox->setEnabledButtons(false); //< application application is determined by the application state chosen elsewhere in the system
   mApplicationGroupBox->hide(); // large and redundant box - info is only used for path generation, which can be found in the "Save Path" box
   mApplicationGroupBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
-  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", cxToolManager::getInstance()->getSupportedTrackingSystems(), Qt::Horizontal, true, NULL);
+  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", toolManager()->getSupportedTrackingSystems(), Qt::Horizontal, true, NULL);
   mToolListWidget = new ConfigToolListWidget(NULL);
 
   this->setClinicalApplicationSlot(string2enum<CLINICAL_APPLICATION>(stateService()->getApplication()->getActiveStateName()));
@@ -118,7 +118,7 @@ QString ToolConfigureGroupBox::requestSaveConfigurationSlot()
     return retval;
 
   // deconfigure toolmanager in order to be able to reread config data
-  cxToolManager::getInstance()->deconfigure();
+  toolManager()->deconfigure();
 
   ConfigurationFileParser::Configuration config = this->getCurrentConfiguration();
   ConfigurationFileParser::saveConfiguration(config);

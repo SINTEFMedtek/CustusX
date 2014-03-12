@@ -40,7 +40,7 @@ typedef boost::shared_ptr<class BoolDataAdapterXml> BoolDataAdapterXmlPtr;
 
 /**\brief DataAdapter for boolean values.
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_core_dataadapters
  */
 class BoolDataAdapterXml: public BoolDataAdapter
 {

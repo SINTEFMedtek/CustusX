@@ -14,7 +14,7 @@ namespace cx
 VolumeInfoWidget::VolumeInfoWidget(QWidget* parent) :
   InfoWidget(parent, "VolumeInfoWidget", "Volume Info")
 {
-	mActiveImageProxy = ActiveImageProxy::New();
+	mActiveImageProxy = ActiveImageProxy::New(dataService());
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(updateSlot()));
 
 	this->addWidgets();

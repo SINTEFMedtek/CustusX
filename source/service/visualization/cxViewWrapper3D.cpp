@@ -45,7 +45,7 @@
 #include "sscToolTracer.h"
 #include "sscOrientationAnnotation3DRep.h"
 #include "cxSettings.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxRepManager.h"
 #include "cxCameraControl.h"
 #include "cxLandmarkRep.h"
@@ -117,7 +117,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServ
 	mPickerRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
 	mPickerRep->setEnabled(false);
 	mView->addRep(mPickerRep);
-	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 	this->dominantToolChangedSlot();
 
 	// plane type text rep
@@ -133,9 +133,9 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServ
 	//data name text rep
 	this->updateMetricNamesRep();
 
-	connect(toolManager(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
-	connect(toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
-	connect(mBackend->getDataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
+	connect(mBackend->getToolManager().get(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
+	connect(mBackend->getToolManager().get(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
+	connect(mBackend->getDataManager().get(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
 	this->toolsAvailableSlot();
 
 	mAnnotationMarker = RepManager::getInstance()->getCachedRep<OrientationAnnotation3DRep>(
@@ -262,7 +262,7 @@ void ViewWrapper3D::PickerRepPointPickedSlot(Vector3D p_r)
 	Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
-	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
+	ManualToolPtr tool = mBackend->getToolManager()->getManualTool();
 	Vector3D offset = tool->get_prMt().vector(Vector3D(0, 0, tool->getTooltipOffset()));
 	p_pr -= offset;
 	p_r = rMpr.coord(p_pr);
@@ -325,20 +325,13 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	showToolPath->setChecked(settings()->value("showToolPath").toBool());
 	connect(showToolPath, SIGNAL(triggered(bool)), this, SLOT(showToolPathSlot(bool)));
 
-//#ifdef USE_GLX_SHARED_CONTEXT
-	QMenu* showSlicesMenu = new QMenu("Show Slices", &contextMenu);
-	showSlicesMenu->addAction(this->createSlicesAction("ACS", &contextMenu));
-	showSlicesMenu->addAction(this->createSlicesAction("Axial", &contextMenu));
-	showSlicesMenu->addAction(this->createSlicesAction("Sagittal", &contextMenu));
-	showSlicesMenu->addAction(this->createSlicesAction("Coronal", &contextMenu));
-	showSlicesMenu->addAction(this->createSlicesAction("Any", &contextMenu));
-	showSlicesMenu->addAction(this->createSlicesAction("Dual", &contextMenu));
-	showSlicesMenu->addAction(this->createSlicesAction("Radial", &contextMenu));
-//#endif // USE_GLX_SHARED_CONTEXT
+	QMenu* showSlicesMenu = new QMenu("Slice Type", &contextMenu);
+	this->createSlicesActions(showSlicesMenu);
+
 	QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
 	showRefTool->setDisabled(true);
 	showRefTool->setCheckable(true);
-	ToolPtr refTool = cxToolManager::getInstance()->getReferenceTool();
+	ToolPtr refTool = mBackend->getToolManager()->getReferenceTool();
 	if (refTool)
 	{
 		showRefTool->setText("Show " + refTool->getName());
@@ -348,9 +341,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	}
 
 	contextMenu.addSeparator();
-//#ifdef USE_GLX_SHARED_CONTEXT
 	contextMenu.addMenu(showSlicesMenu);
-//#endif //USE_GLX_SHARED_CONTEXT
 	contextMenu.addAction(resetCameraAction);
 	contextMenu.addAction(centerImageAction);
 	contextMenu.addAction(centerToolAction);
@@ -368,13 +359,29 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 		contextMenu.addAction(fillSlicePlanesAction);
 }
 
-QAction* ViewWrapper3D::createSlicesAction(QString title, QWidget* parent)
+void ViewWrapper3D::createSlicesActions(QWidget* parent)
 {
+	this->createSlicesAction(PlaneTypeCollection(ptAXIAL, ptCORONAL, ptSAGITTAL), parent);
+	this->createSlicesAction(PlaneTypeCollection(ptAXIAL), parent);
+	this->createSlicesAction(PlaneTypeCollection(ptCORONAL), parent);
+	this->createSlicesAction(PlaneTypeCollection(ptSAGITTAL), parent);
+	this->createSlicesAction(PlaneTypeCollection(ptANYPLANE), parent);
+	this->createSlicesAction(PlaneTypeCollection(ptRADIALPLANE), parent);
+	this->createSlicesAction(PlaneTypeCollection(ptSIDEPLANE), parent);
+}
+
+QAction* ViewWrapper3D::createSlicesAction(PlaneTypeCollection planes, QWidget* parent)
+{
+	QString title = planes.toString();
+	QString active = mGroupData->getSliceDefinitions().toString();
+
 	QAction* action = new QAction(title, parent);
 	connect(action, SIGNAL(triggered()), this, SLOT(showSlices()));
 	action->setData(title);
 	action->setCheckable(true);
-	action->setChecked(mShowSlicesMode == title);
+	action->setChecked(active == title);
+
+	parent->addAction(action);
 	return action;
 }
 
@@ -384,12 +391,12 @@ void ViewWrapper3D::showSlices()
 	if (!action)
 		return;
 
+	PlaneTypeCollection planes = PlaneTypeCollection::fromString(action->data().toString());
+
 	if (!action->isChecked())
-		mShowSlicesMode = "";
+		mGroupData->setSliceDefinitions(PlaneTypeCollection());
 	else
-		mShowSlicesMode = action->data().toString();
-	//	std::cout << "show " << mShowSlicesMode << std::endl;
-	this->updateSlices();
+		mGroupData->setSliceDefinitions(planes);
 }
 
 void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
@@ -409,7 +416,7 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 void ViewWrapper3D::showToolPathSlot(bool checked)
 {
 	ToolRep3DPtr activeRep3D = RepManager::findFirstRep<ToolRep3D>(mView->getReps(),
-					toolManager()->getDominantTool());
+					mBackend->getToolManager()->getDominantTool());
 	if (activeRep3D)
 	{
 		if (activeRep3D->getTracer()->isRunning())
@@ -464,7 +471,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		}
 
 		// tool spaces
-		ToolManager::ToolMapPtr tools = toolManager()->getTools();
+		ToolManager::ToolMapPtr tools = mBackend->getToolManager()->getTools();
 		ToolManager::ToolMapPtr::element_type::iterator iter;
 		for (iter = tools->begin(); iter != tools->end(); ++iter)
 		{
@@ -498,7 +505,6 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 void ViewWrapper3D::showManualToolSlot(bool visible)
 {
 	settings()->setValue("showManualTool", visible);
-//  ToolManager::getInstance()->getManualTool()->setVisible(visible);
 }
 
 void ViewWrapper3D::showOrientationSlot(bool visible)
@@ -519,7 +525,7 @@ void ViewWrapper3D::centerImageActionSlot()
 	if (mBackend->getDataManager()->getActiveImage())
 		Navigation(mBackend).centerToData(mBackend->getDataManager()->getActiveImage());
 	else
-		Navigation(mBackend).centerToView(mGroupData->getData());
+		Navigation(mBackend).centerToView(mGroupData->getData(DataViewProperties::create3D()));
 }
 
 void ViewWrapper3D::centerToolActionSlot()
@@ -534,6 +540,7 @@ void ViewWrapper3D::showSlicePlanesActionSlot(bool checked)
 	mSlicePlanes3DRep->getProxy()->setVisible(checked);
 	settings()->setValue("showSlicePlanes", checked);
 }
+
 void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
 {
 	if (!mSlicePlanes3DRep)
@@ -541,11 +548,26 @@ void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
 	mSlicePlanes3DRep->getProxy()->setDrawPlanes(checked);
 }
 
-void ViewWrapper3D::dataAdded(DataPtr data)
+void ViewWrapper3D::dataViewPropertiesChangedSlot(QString uid)
+{
+	DataPtr data = mBackend->getDataManager()->getData(uid);
+	DataViewProperties properties = mGroupData->getProperties(data);
+
+	if (properties.hasVolume3D())
+		this->addVolumeDataRep(data);
+	else
+		this->removeVolumeDataRep(uid);
+
+	this->updateSlices();
+
+	this->activeImageChangedSlot();
+	this->updateView();
+}
+
+void ViewWrapper3D::addVolumeDataRep(DataPtr data)
 {
 	if (!data)
 		return;
-
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	if (image)
 	{
@@ -556,26 +578,16 @@ void ViewWrapper3D::dataAdded(DataPtr data)
 		if (!mDataReps.count(data->getUid()))
 		{
 			RepPtr rep = this->createDataRep3D(data);
-			if (!rep)
-				return;
-			mDataReps[data->getUid()] = rep;
-			mView->addRep(rep);
-
-	//			ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
-	//			if (image)
-	//			{
-	//				connect(image.get(), SIGNAL(clipPlanesChanged()), this, SLOT(updateView()));
-	//				connect(image.get(), SIGNAL(cropBoxChanged()), this, SLOT(updateView()));
-	//			}
+			if (rep)
+			{
+				mDataReps[data->getUid()] = rep;
+				mView->addRep(rep);
+			}
 		}
 	}
-
-
-	this->activeImageChangedSlot();
-	this->updateView();
 }
 
-void ViewWrapper3D::dataRemoved(const QString& uid)
+void ViewWrapper3D::removeVolumeDataRep(QString uid)
 {
 	mMultiVolume3DRepProducer->removeImage(uid);
 	if (mDataReps.count(uid))
@@ -583,10 +595,65 @@ void ViewWrapper3D::dataRemoved(const QString& uid)
 		mView->removeRep(mDataReps[uid]);
 		mDataReps.erase(uid);
 	}
-
-	this->activeImageChangedSlot();
-	this->updateView();
 }
+
+//void ViewWrapper3D::dataAdded(DataPtr data)
+//{
+//	if (!data)
+//		return;
+
+//	DataViewProperties properties = mGroupData->getProperties(data);
+
+//	if (properties.hasVolume3D())
+//	{
+//		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+//		if (image)
+//		{
+//			mMultiVolume3DRepProducer->addImage(image);
+//		}
+//		else
+//		{
+//			if (!mDataReps.count(data->getUid()))
+//			{
+//				RepPtr rep = this->createDataRep3D(data);
+//				if (!rep)
+//					return;
+//				mDataReps[data->getUid()] = rep;
+//				mView->addRep(rep);
+//			}
+//		}
+//	}
+//	if (properties.hasSlice3D())
+//	{
+//		this->updateSlices();
+//	}
+
+//	this->activeImageChangedSlot();
+//	this->updateView();
+//}
+
+//void ViewWrapper3D::dataRemoved(const QString& uid)
+//{
+//	DataViewProperties properties = mGroupData->getProperties(mBackend->getDataManager()->getData(uid));
+
+//	if (!properties.hasVolume3D())
+//	{
+//		mMultiVolume3DRepProducer->removeImage(uid);
+//		if (mDataReps.count(uid))
+//		{
+//			mView->removeRep(mDataReps[uid]);
+//			mDataReps.erase(uid);
+//		}
+//	}
+
+//	if (!properties.hasSlice3D())
+//	{
+//		this->updateSlices();
+//	}
+
+//	this->activeImageChangedSlot();
+//	this->updateView();
+//}
 
 /**Construct a 3D standard rep for a given data.
  *
@@ -659,19 +726,13 @@ void ViewWrapper3D::updateView()
 	bool show = settings()->value("View/showDataText").value<bool>();
 
 	if (show)
-		text = this->getAllDataNames().join("\n");
+	{
+		text = this->getAllDataNames(DataViewProperties::create3D()).join("\n");
+	}
 	mDataNameText->setText(0, text);
 	mDataNameText->setFontSize(std::max(12, 22 - 2 * text.size()));
 
 	this->updateMetricNamesRep();
-//	if (mGroupData && mMetricNames)
-//		mMetricNames->setData(mGroupData->getData());
-//	bool showMetricTexts = true;
-//	if (showMetricTexts)
-//	{
-//		mMetricsText->setColoredTextList(this->getAllMetricTexts(), Eigen::Array2d(0.98, 0.98));
-//	}
-
 
 	mAnnotationMarker->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
 }
@@ -683,14 +744,14 @@ void ViewWrapper3D::activeImageChangedSlot()
 	ImagePtr image = mBackend->getDataManager()->getActiveImage();
 
 	// only show landmarks belonging to image visible in this view:
-	std::vector<ImagePtr> images = mGroupData->getImages();
+	std::vector<ImagePtr> images = mGroupData->getImages(DataViewProperties::create3D());
 	if (!std::count(images.begin(), images.end(), image))
 		image.reset();
 }
 
 void ViewWrapper3D::showRefToolSlot(bool checked)
 {
-	ToolPtr refTool = toolManager()->getReferenceTool();
+	ToolPtr refTool = mBackend->getToolManager()->getReferenceTool();
 	if (!refTool)
 		return;
 	ToolRep3DPtr refRep = RepManager::findFirstRep<ToolRep3D>(mView->getReps(), refTool);
@@ -710,41 +771,29 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
 
 void ViewWrapper3D::updateSlices()
 {
-//#ifdef USE_GLX_SHARED_CONTEXT
 	if (mSlices3DRep)
 		mView->removeRep(mSlices3DRep);
-	//Simple bug fix of #746: Don't create slices if no volumes exist in 3D scene
-	if (!mGroupData || mGroupData->getImages().empty())
-	{
-		messageManager()->sendWarning("Need volumes in the 3D scene to create 2D slices");
+
+	if (!mGroupData)
 		return;
-	}
+
+	std::vector<ImagePtr> images = mGroupData->getImages(DataViewProperties::createSlice3D());
+//	std::vector<ImagePtr> images = mGroupData->get3DSliceImages();
+	if (images.empty())
+		return;
+
+	std::vector<PLANE_TYPE> planes = mGroupData->getSliceDefinitions().get();
+	if (planes.empty())
+		return;
 
 	mSlices3DRep = Slices3DRep::New("MultiSliceRep_" + mView->getName());
-
-	PLANE_TYPE type = string2enum<PLANE_TYPE>(mShowSlicesMode);
-	if (type != ptCOUNT)
-	{
-		mSlices3DRep->addPlane(type, mBackend->getDataManager());
-	}
-	else if (mShowSlicesMode == "ACS")
-	{
-		mSlices3DRep->addPlane(ptAXIAL, mBackend->getDataManager());
-		mSlices3DRep->addPlane(ptSAGITTAL, mBackend->getDataManager());
-		mSlices3DRep->addPlane(ptCORONAL, mBackend->getDataManager());
-	}
-	else
-	{
-		mSlices3DRep.reset();
-		return;
-	}
-
+	for (unsigned i=0; i<planes.size(); ++i)
+		mSlices3DRep->addPlane(planes[i], mBackend->getDataManager());
 	mSlices3DRep->setShaderPath(DataLocations::getShaderPath());
-	if (mGroupData && !mGroupData->getImages().empty())
-		mSlices3DRep->setImages(mGroupData->getImages());
-	mSlices3DRep->setTool(toolManager()->getDominantTool());
+	mSlices3DRep->setImages(images);
+	mSlices3DRep->setTool(mBackend->getToolManager()->getDominantTool());
+
 	mView->addRep(mSlices3DRep);
-//#endif // USE_GLX_SHARED_CONTEXT
 }
 
 ViewWidget* ViewWrapper3D::getView()
@@ -754,7 +803,7 @@ ViewWidget* ViewWrapper3D::getView()
 
 void ViewWrapper3D::dominantToolChangedSlot()
 {
-	ToolPtr dominantTool = toolManager()->getDominantTool();
+	ToolPtr dominantTool = mBackend->getToolManager()->getDominantTool();
 	mPickerRep->setTool(dominantTool);
 	if (mSlices3DRep)
 		mSlices3DRep->setTool(dominantTool);
@@ -762,7 +811,7 @@ void ViewWrapper3D::dominantToolChangedSlot()
 
 void ViewWrapper3D::toolsAvailableSlot()
 {
-	ToolManager::ToolMapPtr tools = toolManager()->getTools();
+	ToolManager::ToolMapPtr tools = mBackend->getToolManager()->getTools();
 	ToolManager::ToolMapPtr::element_type::iterator iter;
 	for (iter = tools->begin(); iter != tools->end(); ++iter)
 	{
@@ -803,6 +852,8 @@ void ViewWrapper3D::optionChangedSlot()
 	this->showLandmarks(options.mShowLandmarks);
 	this->showPointPickerProbe(options.mShowPointPickerProbe);
 	mPickerRep->setGlyph(options.mPickerGlyph);
+
+	this->updateSlices();
 }
 
 void ViewWrapper3D::showLandmarks(bool on)

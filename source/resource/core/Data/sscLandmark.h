@@ -45,7 +45,7 @@ namespace cx
  * can exist in several coordinate spaces. This class represent
  * the coordinate in one of these spaces.
  *
- * \ingroup sscData
+ * \ingroup cx_resource_core_data
  */
 class Landmark
 {

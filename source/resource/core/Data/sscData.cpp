@@ -27,10 +27,6 @@
 
 namespace cx
 {
-//Data::Data() :
-//	mUid("DummyUID"), mName("DummyName"), mRegistrationStatus(rsNOT_REGISTRATED)
-//{
-//}
 
 Data::Data(const QString& uid, const QString& name) :
 	mUid(uid), mRegistrationStatus(rsNOT_REGISTRATED)//, mParentFrame("")
@@ -52,17 +48,14 @@ Data::~Data()
 void Data::setUid(const QString& uid)
 {
 	mUid = uid;
+	emit propertiesChanged();
 }
 
 void Data::setName(const QString& name)
 {
 	mName = name;
+	emit propertiesChanged();
 }
-
-//void Data::setFilePath(const QString& filePath)
-//{
-//	mFilePath = filePath;
-//}
 
 void Data::setRegistrationStatus(REGISTRATION_STATUS regStat)
 {
@@ -87,12 +80,6 @@ void Data::setFilename(QString val)
 {
 	mFilename = val;
 }
-
-
-//QString Data::getFilePath() const
-//{
-//	return mFilePath;
-//}
 
 REGISTRATION_STATUS Data::getRegistrationStatus() const
 {

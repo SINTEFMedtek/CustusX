@@ -41,7 +41,7 @@ namespace cx
 
 /**\brief Widget for the BoolDataAdapter.
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_widgets
  */
 class CheckBoxWidget: public OptimizedUpdateWidget
 {

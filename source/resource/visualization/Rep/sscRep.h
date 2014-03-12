@@ -44,7 +44,7 @@ class ViewWidget;
  * The default implementation can be found in RepImpl. Inherit from that when
  * implementing concrete classes.
  *
- * \ingroup sscRep
+ * \ingroup cx_resource_visualization
  */
 class Rep :public QObject
 {

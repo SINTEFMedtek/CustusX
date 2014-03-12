@@ -17,13 +17,6 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- * sscImageTransferFunctions3D.h
- *
- *  Created on: Jan 9, 2009
- *      Author: christiana
- */
-
 #ifndef SSCIMAGETRANSFERFUNCTIONS3D_H_
 #define SSCIMAGETRANSFERFUNCTIONS3D_H_
 
@@ -55,7 +48,9 @@ typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
  *
  * The volume rendering classes can use the data by getting OpacityTF and ColorTF.
  *
- * \ingroup sscData
+ * \ingroup cx_resource_core_data
+ *  Created on: Jan 9, 2009
+ *      Author: christiana
  */
 class ImageTF3D: public ImageTFData
 {

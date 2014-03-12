@@ -28,22 +28,22 @@
 namespace cx
 {
 
-DataFactory::DataFactory(DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+DataFactory::DataFactory(DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 	mDataManager(dataManager),
 	mSpaceProvider(spaceProvider)
 {
 
 }
 
-#define CREATE_IF_MATCH(name, TYPE) \
+#define CREATE_IF_MATCH(typeName, TYPE) \
 { \
-	if (name==TYPE::getTypeName()) \
-		return TYPE::create(uid, name); \
+	if (typeName==TYPE::getTypeName()) \
+		return TYPE::create(uid, ""); \
 }
-#define CREATE_METRIC_IF_MATCH(name, TYPE) \
+#define CREATE_METRIC_IF_MATCH(typeName, TYPE) \
 { \
-	if (name==TYPE::getTypeName()) \
-		return TYPE::create(uid, name, mDataManager, mSpaceProvider); \
+	if (typeName==TYPE::getTypeName()) \
+		return TYPE::create(uid, "", mDataManager, mSpaceProvider); \
 }
 
 DataPtr DataFactory::create(QString type, QString uid, QString name)

@@ -47,7 +47,7 @@ class FileInputWidget;
 /**
  * \brief GUI for setting up a connection to a video stream
  *
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * \date 2010.10.27
  * \author Christian Askeland, SINTEF

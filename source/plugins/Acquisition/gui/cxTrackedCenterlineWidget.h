@@ -2,13 +2,13 @@
 #define CXTRACKEDCENTERLINEWIDGET_H_
 
 #include "cxRecordBaseWidget.h"
-#include "cxTool.h"
+#include "sscTool.h"
 
 namespace cx
 {
 /**
 * \file
-* \addtogroup cxPluginAcquisition
+* \addtogroup cx_plugin_acquisition
 * @{
 */
 
@@ -39,7 +39,7 @@ protected slots:
 
 private:
   virtual TimedTransformMap getRecording(RecordSessionPtr session); ///< gets the tracking data from all relevant tool for the given session
-  cxToolPtr findTool(double startTime, double stopTime);
+  ToolPtr findTool(double startTime, double stopTime);
 
 //  Centerline  mCenterlineAlgorithm;
   QString mSessionID;

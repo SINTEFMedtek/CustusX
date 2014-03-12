@@ -30,6 +30,7 @@ public:
 	DoubleDataAdapterXmlPtr getThresholdOption(QDomElement root);
 	DoubleDataAdapterXmlPtr getEpsilonOption(QDomElement root);
 	DoubleDataAdapterXmlPtr getAlphaOption(QDomElement root);
+    DoubleDataAdapterXmlPtr getRadiusOption(QDomElement root);
 
 	static Vector3D getSeedPointFromTool(DataPtr image);
 	static bool isSeedPointInsideImage(Vector3D, DataPtr);

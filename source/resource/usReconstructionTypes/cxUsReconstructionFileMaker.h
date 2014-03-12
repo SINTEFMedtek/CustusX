@@ -18,7 +18,7 @@ typedef boost::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
 
 /**
 * \file
-* \addtogroup cxResourceUtilities
+* \addtogroup cx_resource_usreconstructiontypes
 * @{
 */
 

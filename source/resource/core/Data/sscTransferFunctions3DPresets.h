@@ -41,7 +41,7 @@ typedef boost::shared_ptr<class TransferFunctions3DPresets> TransferFunctions3DP
 
 /**\brief Handles transfer function presets
  *
- * \ingroup sscData
+ * \ingroup cx_resource_core_data
  */
 class TransferFunctions3DPresets : public Presets
 {

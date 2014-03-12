@@ -128,7 +128,7 @@ void fillShortImageDataWithGradient(vtkImageDataPtr data, int maxValue)
  * as output, depending on the input range.
  *
  */
-ImagePtr convertImageToUnsigned(DataManager* dataManager, ImagePtr image, vtkImageDataPtr suggestedConvertedVolume, bool verbose)
+ImagePtr convertImageToUnsigned(DataServicePtr dataManager, ImagePtr image, vtkImageDataPtr suggestedConvertedVolume, bool verbose)
 {
 	vtkImageDataPtr input = image->getBaseVtkImageData();
 

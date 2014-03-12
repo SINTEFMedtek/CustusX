@@ -38,7 +38,7 @@ typedef boost::shared_ptr<class PickerRep> PickerRepPtr;
 typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
 
-/**\brief Picking of points in an image.
+/** \brief Picking of points in an image.
  *
  * When enabled, clicking in the view is interpreted as picking a point on
  * the attached image. The picked point is the projection of the mouse click
@@ -49,15 +49,15 @@ typedef boost::shared_ptr<class Tool> ToolPtr;
  * Used by CustusX.
  * Not used by Sonowand.
  *
- * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep3D
  */
 class PickerRep: public RepImpl
 {
 Q_OBJECT
 
 public:
-	static PickerRepPtr New(DataManager* dataManager, const QString& uid, const QString& name = ""); ///< for creating new instances
+	static PickerRepPtr New(DataServicePtr dataManager, const QString& uid, const QString& name = ""); ///< for creating new instances
 	virtual ~PickerRep(); ///<empty
 
 	virtual QString getType() const; ///< returns a string identifying this class type
@@ -79,7 +79,7 @@ public slots:
 	void pickLandmarkSlot(vtkObject* renderWindowInteractor); ///< When you use the renderwindowinteractor
 
 protected:
-	PickerRep(DataManager *dataManager, const QString& uid, const QString &name); ///< use New instead
+	PickerRep(DataServicePtr dataManager, const QString& uid, const QString &name); ///< use New instead
 	virtual void addRepActorsToViewRenderer(View *view); ///< connects to the renderwindowinteractor
 	virtual void removeRepActorsFromViewRenderer(View *view); ///< disconnects from the renderwindowinteractor
 	void connectInteractor();
@@ -115,7 +115,7 @@ protected:
 	GraphicalPoint3DPtr mGraphicalPoint;
 	ViewportListenerPtr mViewportListener;
 	vtkCallbackCommandPtr mCallbackCommand;
-	DataManager* mDataManager;
+	DataServicePtr mDataManager;
 };
 
 typedef boost::shared_ptr<PickerRep> PickerRepPtr;

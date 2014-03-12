@@ -29,7 +29,7 @@ namespace cx
 /**
  * \brief Base class for algorithms that wants to thread and time their
  * execution. T is the return type of the calculated data in the thread.
- * \ingroup cxResourceAlgorithms
+ * \ingroup cx_resource_core_algorithms
  *
  * \date Feb 22, 2011
  * \author Janne Beate Bakeng, SINTEF

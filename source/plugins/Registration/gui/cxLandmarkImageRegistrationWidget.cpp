@@ -31,7 +31,7 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegistrationMan
 	mActiveImageAdapter = ActiveImageStringDataAdapter::New();
 	mImageLandmarkSource = ImageLandmarksSource::New();
 
-	mDominantToolProxy = DominantToolProxy::New();
+	mDominantToolProxy = DominantToolProxy::New(trackingService());
 	connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableButtons()));
 	connect(mDominantToolProxy.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(enableButtons()));
 

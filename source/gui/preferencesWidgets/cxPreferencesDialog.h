@@ -7,6 +7,7 @@
 #include "sscDoubleDataAdapterXml.h"
 #include "sscBoolDataAdapterXml.h"
 #include "sscStringDataAdapterXml.h"
+#include "cxLegacySingletons.h"
 
 class QTabWidget;
 class QToolBox;
@@ -35,7 +36,7 @@ class ToolConfigureGroupBox;
 
 /**
  * \file
- * \addtogroup cxGUI
+ * \addtogroup cx_gui
  * @{
  */
 
@@ -149,7 +150,7 @@ protected:
  * \brief Interface for selecting a tool configuration.
  *
  * The tab has three parts:
- * \beginverbatim
+ * \verbatim
  *
  *  ____________________________________________
  * |                       |                    |

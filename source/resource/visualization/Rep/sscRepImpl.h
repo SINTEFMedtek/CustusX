@@ -41,7 +41,7 @@ namespace cx
  * - addRepActorsToViewRenderer()
  * - removeRepActorsFromViewRenderer().
  *
- * \ingroup sscRep
+ * \ingroup cx_resource_visualization
  */
 class RepImpl : public Rep
 {

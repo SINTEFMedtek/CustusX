@@ -16,13 +16,15 @@
 
 #include "sscXmlOptionItem.h"
 #include "cxForwardDeclarations.h"
+#include "cxLegacySingletons.h"
+
 
 namespace cx
 {
 
 /**
  * \file
- * \addtogroup cxPluginUsReconstruction
+ * \addtogroup cx_plugin_usreconstruction
  * @{
  */
 

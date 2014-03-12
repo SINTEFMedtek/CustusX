@@ -29,6 +29,7 @@
 #include "cxDataLocations.h"
 #include "cxConfig.h"
 #include "cxVLCRecorder.h"
+#include "cxStateServiceBackend.h"
 
 namespace cx
 {
@@ -143,26 +144,41 @@ private:
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
-StateService *StateService::mTheInstance = NULL;
-StateService* stateService()
+StateServicePtr StateService::create(StateServiceBackendPtr backend)
 {
-	return StateService::getInstance();
-}
-StateService* StateService::getInstance()
-{
-	if (mTheInstance == NULL)
-	{
-		mTheInstance = new StateService();
-		mTheInstance->initialize();
-	}
-	return mTheInstance;
+	StateServicePtr retval;
+	retval.reset(new StateService());
+	retval->initialize(backend);
+	return retval;
 }
 
-void StateService::destroyInstance()
-{
-	delete mTheInstance;
-	mTheInstance = NULL;
-}
+//StateService *StateService::mTheInstance = NULL;
+//StateService* stateService()
+//{
+//	return StateService::getInstance();
+//}
+
+//StateService* StateService::createInstance(StateServiceBackendPtr backend)
+//{
+//	if (mTheInstance == NULL)
+//	{
+//		mTheInstance = new StateService();
+//		mTheInstance->initialize(backend);
+//	}
+//	return mTheInstance;
+//}
+
+
+//StateService* StateService::getInstance()
+//{
+//	return mTheInstance;
+//}
+
+//void StateService::destroyInstance()
+//{
+//	delete mTheInstance;
+//	mTheInstance = NULL;
+//}
 
 StateService::StateService()
 {
@@ -170,6 +186,18 @@ StateService::StateService()
 
 StateService::~StateService()
 {
+}
+
+void StateService::initialize(StateServiceBackendPtr backend)
+{
+	mBackend = backend;
+	this->fillDefaultSettings();
+
+	mApplicationStateMachine.reset(new ApplicationStateMachine(mBackend));
+	mApplicationStateMachine->start();
+
+	mWorkflowStateMachine.reset(new WorkflowStateMachine(mBackend));
+	mWorkflowStateMachine->start();
 }
 
 QString StateService::getVersionName()
@@ -375,16 +403,6 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("applyTransferFunctionPresetsToAll", false);
 }
 
-void StateService::initialize()
-{
-	this->fillDefaultSettings();
-
-	mApplicationStateMachine.reset(new ApplicationStateMachine());
-	mApplicationStateMachine->start();
-
-	mWorkflowStateMachine.reset(new WorkflowStateMachine());
-	mWorkflowStateMachine->start();
-}
 
 Desktop StateService::getActiveDesktop()
 {

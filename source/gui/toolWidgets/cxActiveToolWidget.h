@@ -9,7 +9,7 @@ namespace cx
  * \class ActiveToolWidget
  *
  * \brief Widget that contains a select active tool combo box
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * \date May 4, 2011
  * \author Christian Askeland, SINTEF
