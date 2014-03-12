@@ -55,9 +55,6 @@ QString LevelSetFilter::getHelp() const
 }
 
 
-bool LevelSetFilter::preProcess() {
-    return true;
-}
 
 Vector3D LevelSetFilter::getSeedPointFromTool(DataPtr data) {
     // Retrieve position of tooltip and use it as seed point
@@ -94,8 +91,7 @@ bool LevelSetFilter::isSeedPointInsideImage(Vector3D seedPoint, DataPtr image) {
     return result;
 }
 
-
-bool LevelSetFilter::execute() {
+bool LevelSetFilter::preProcess() {
     DataPtr inputImage = mInputTypes[0].get()->getData();
     if(!inputImage) {
         std::cout << "No input data selected" << std::endl;
@@ -107,22 +103,28 @@ bool LevelSetFilter::execute() {
         return false;
     }
 
-    Vector3D seedPoint = getSeedPointFromTool(inputImage);
+	filename = (patientService()->getPatientData()->getActivePatientFolder()+"/"+inputImage->getFilename()).toStdString();
 
+    seedPoint = getSeedPointFromTool(inputImage);
     if(!isSeedPointInsideImage(seedPoint, inputImage)) {
         std::cout << "Seed point is not inside image!" << std::endl;
         return false;
     }
+    image = dataManager()->getImage(inputImage->getUid());
+
+    return true;
+}
+
+bool LevelSetFilter::execute() {
+    DataPtr inputImage = mInputTypes[0].get()->getData();
 
     float threshold = getThresholdOption(mOptions)->getValue();
     float epsilon = getEpsilonOption(mOptions)->getValue();
     float alpha = getAlphaOption(mOptions)->getValue();
-    float radius = getRadiusOption(mOptions)->getValue();
 
     std::cout << "Parameters are set to: " << threshold << " "  << epsilon << " " << alpha << std::endl;
 
     // Run level set segmentation 
-	std::string filename = (patientService()->getPatientData()->getActivePatientFolder()+"/"+inputImage->getFilename()).toStdString();
     SIPL::int3 seed(seedPoint(0), seedPoint(1), seedPoint(2));
     try {
         SIPL::Volume<char> * result = runLevelSet(
@@ -135,79 +137,8 @@ bool LevelSetFilter::execute() {
                 alpha
         );
         SIPL::int3 size = result->getSize();
-		ImagePtr image = dataManager()->getImage(inputImage->getUid());
-        vtkImageDataPtr rawSegmentation = this->convertToVtkImageData((char *)result->getData(), size.x, size.y, size.z, image);
+        rawSegmentation = this->convertToVtkImageData((char *)result->getData(), size.x, size.y, size.z, image);
         delete result;
-
-        //add segmentation internally to cx
-        QString uidSegmentation = image->getUid() + "_seg%1";
-        QString nameSegmentation = image->getName()+"_seg%1";
-        ImagePtr outputSegmentation2 = dataManager()->createDerivedImage(rawSegmentation,uidSegmentation, nameSegmentation, image);
-        ImagePtr outputSegmentation;
-        if (!outputSegmentation2)
-            return false;
-
-        if(radius > 0) {
-            std::cout << "Performing morphological closing on segmentation result" << std::endl;
-
-            // Convert radius in mm to radius in voxels for the structuring element
-            Eigen::Array3d spacing = image->getSpacing();
-            itk::Size<3> radiusInVoxels;
-            radiusInVoxels[0] = radius/spacing(0);
-            radiusInVoxels[1] = radius/spacing(1);
-            radiusInVoxels[2] = radius/spacing(2);
-
-            itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(outputSegmentation2);
-
-            // Create structuring element
-            typedef itk::BinaryBallStructuringElement<unsigned char,3> StructuringElementType;
-            StructuringElementType structuringElement;
-            structuringElement.SetRadius(radiusInVoxels);
-            structuringElement.CreateStructuringElement();
-
-            // Morphological closing
-            typedef itk::BinaryMorphologicalClosingImageFilter<itkImageType, itkImageType, StructuringElementType> closingFilterType;
-            closingFilterType::Pointer closingFilter = closingFilterType::New();
-            closingFilter->SetInput(itkImage);
-            closingFilter->SetKernel(structuringElement);
-            closingFilter->SetForegroundValue(1);
-            closingFilter->Update();
-            itkImage = closingFilter->GetOutput();
-
-            //Convert ITK to VTK
-            itkToVtkFilterType::Pointer itkToVtkFilter = itkToVtkFilterType::New();
-            itkToVtkFilter->SetInput(itkImage);
-            itkToVtkFilter->Update();
-
-            vtkImageDataPtr rawResult = vtkImageDataPtr::New();
-            rawResult->DeepCopy(itkToVtkFilter->GetOutput());
-
-            vtkImageCastPtr imageCast = vtkImageCastPtr::New();
-            imageCast->SetInput(rawResult);
-            imageCast->SetOutputScalarTypeToUnsignedChar();
-            rawResult = imageCast->GetOutput();
-
-            outputSegmentation = dataManager()->createDerivedImage(rawResult,uidSegmentation, nameSegmentation, image);
-            rawSegmentation = rawResult;
-        } else {
-            outputSegmentation = outputSegmentation2;
-        }
-
-        //make contour of segmented volume
-        double threshold = 1;/// because the segmented image is 0..1
-        vtkPolyDataPtr rawContour = ContourFilter::execute(rawSegmentation, threshold);
-        Transform3D rMd_i = image->get_rMd(); //transform from the volumes coordinate system to our reference coordinate system
-        outputSegmentation->get_rMd_History()->setRegistration(rMd_i);
-        dataManager()->loadData(outputSegmentation);
-        dataManager()->saveImage(outputSegmentation, patientService()->getPatientData()->getActivePatientFolder());
-
-        //add contour internally to cx
-        MeshPtr contour = ContourFilter::postProcess(rawContour, image, QColor("blue"));
-        contour->get_rMd_History()->setRegistration(rMd_i);
-
-        //set output
-        mOutputTypes[0]->setValue(outputSegmentation->getUid());
-        mOutputTypes[1]->setValue(contour->getUid());
 
         return true;
     } catch(SIPL::SIPLException &e) {
@@ -231,7 +162,76 @@ bool LevelSetFilter::execute() {
 
 bool LevelSetFilter::postProcess() {
 
-    // TODO: create contour of segmentation
+    //add segmentation internally to cx
+    QString uidSegmentation = image->getUid() + "_seg%1";
+    QString nameSegmentation = image->getName()+"_seg%1";
+    ImagePtr outputSegmentation2 = dataManager()->createDerivedImage(rawSegmentation,uidSegmentation, nameSegmentation, image);
+    ImagePtr outputSegmentation;
+    if (!outputSegmentation2)
+        return false;
+
+    float radius = getRadiusOption(mOptions)->getValue();
+    if(radius > 0) {
+        std::cout << "Performing morphological closing on segmentation result" << std::endl;
+
+        // Convert radius in mm to radius in voxels for the structuring element
+        Eigen::Array3d spacing = image->getSpacing();
+        itk::Size<3> radiusInVoxels;
+        radiusInVoxels[0] = radius/spacing(0);
+        radiusInVoxels[1] = radius/spacing(1);
+        radiusInVoxels[2] = radius/spacing(2);
+
+        itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(outputSegmentation2);
+
+        // Create structuring element
+        typedef itk::BinaryBallStructuringElement<unsigned char,3> StructuringElementType;
+        StructuringElementType structuringElement;
+        structuringElement.SetRadius(radiusInVoxels);
+        structuringElement.CreateStructuringElement();
+
+        // Morphological closing
+        typedef itk::BinaryMorphologicalClosingImageFilter<itkImageType, itkImageType, StructuringElementType> closingFilterType;
+        closingFilterType::Pointer closingFilter = closingFilterType::New();
+        closingFilter->SetInput(itkImage);
+        closingFilter->SetKernel(structuringElement);
+        closingFilter->SetForegroundValue(1);
+        closingFilter->Update();
+        itkImage = closingFilter->GetOutput();
+
+        //Convert ITK to VTK
+        itkToVtkFilterType::Pointer itkToVtkFilter = itkToVtkFilterType::New();
+        itkToVtkFilter->SetInput(itkImage);
+        itkToVtkFilter->Update();
+
+        vtkImageDataPtr rawResult = vtkImageDataPtr::New();
+        rawResult->DeepCopy(itkToVtkFilter->GetOutput());
+
+        vtkImageCastPtr imageCast = vtkImageCastPtr::New();
+        imageCast->SetInput(rawResult);
+        imageCast->SetOutputScalarTypeToUnsignedChar();
+        rawResult = imageCast->GetOutput();
+
+        outputSegmentation = dataManager()->createDerivedImage(rawResult,uidSegmentation, nameSegmentation, image);
+        rawSegmentation = rawResult;
+    } else {
+        outputSegmentation = outputSegmentation2;
+    }
+
+    //make contour of segmented volume
+    double threshold = 1;/// because the segmented image is 0..1
+    vtkPolyDataPtr rawContour = ContourFilter::execute(rawSegmentation, threshold);
+    Transform3D rMd_i = image->get_rMd(); //transform from the volumes coordinate system to our reference coordinate system
+    outputSegmentation->get_rMd_History()->setRegistration(rMd_i);
+    dataManager()->loadData(outputSegmentation);
+    dataManager()->saveImage(outputSegmentation, patientService()->getPatientData()->getActivePatientFolder());
+
+    //add contour internally to cx
+    MeshPtr contour = ContourFilter::postProcess(rawContour, image, QColor("blue"));
+    contour->get_rMd_History()->setRegistration(rMd_i);
+
+    //set output
+    mOutputTypes[0]->setValue(outputSegmentation->getUid());
+    mOutputTypes[1]->setValue(contour->getUid());
 
     return true;
 }
