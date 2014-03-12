@@ -179,6 +179,8 @@ bool LevelSetFilter::execute()
 
 bool LevelSetFilter::postProcess()
 {
+	if(!rawSegmentation)
+		return false;
 
 	//add segmentation internally to cx
 	QString uidSegmentation = image->getUid() + "_seg%1";
