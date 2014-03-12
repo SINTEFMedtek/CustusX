@@ -23,7 +23,7 @@
 #include "cxPatientService.h"
 #include "cxVideoService.h"
 #include "cxVideoConnectionManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxUSSavingRecorder.h"
 #include "sscDataManager.h"
 #include "cxAcquisitionData.h"

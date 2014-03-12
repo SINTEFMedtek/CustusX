@@ -28,8 +28,7 @@ namespace cx {
  * a uniform preset system. Contains a preset selector, functionality for
  * resetting to a default preset, saving new presets and deleting presets.
  *
- * \ingroup cxGUI
- *
+ * \ingroup cx_resource_widgets
  * \date Mar 8, 2013
  * \author Janne Beate Bakeng, SINTEF
  */

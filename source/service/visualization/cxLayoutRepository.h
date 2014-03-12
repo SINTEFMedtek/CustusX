@@ -27,7 +27,7 @@ class LayoutData;
  * Each layout is a separate configuration of 2D/3D/Video views, laid out
  * in a specific way on screen.
  *
- * \ingroup cxServiceVisualization
+ * \ingroup cx_service_visualization
  * \date 2014-02-07
  * \author christiana
  */

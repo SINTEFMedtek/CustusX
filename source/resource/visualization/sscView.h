@@ -47,6 +47,7 @@ typedef boost::shared_ptr<class Rep> RepPtr;
  * GPU memory between GL contexts (i.e. Views). This is described
  * in the vtkMods folder.
  *
+ * \ingroup cx_resource_visualization
  */
 class View
 {
@@ -113,7 +114,10 @@ protected:
 };
 typedef boost::shared_ptr<View> ViewPtr;
 
-/// Simple 1:1 conflation of SSC Views and Qt Widgets
+/** Simple 1:1 conflation of SSC Views and Qt Widgets
+  *
+ * \ingroup cx_resource_visualization
+  */
 class ViewWidget : public QVTKWidget, public View
 {
 Q_OBJECT

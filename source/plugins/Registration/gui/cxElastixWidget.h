@@ -33,7 +33,7 @@ class TimedAlgorithmProgressBar;
 
 /**
  * \file
- * \addtogroup cxPluginRegistration
+ * \addtogroup cx_plugin_registration
  * @{
  */
 

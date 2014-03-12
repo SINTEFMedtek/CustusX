@@ -26,7 +26,7 @@
 #include "sscDefinitionStrings.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
-#include "cxTool.h"
+#include "sscTool.h"
 //#include "cxStateService.h"
 #include "cxPatientData.h"
 
@@ -138,7 +138,7 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
 
   if(mTools->getTool())
   {
-	cxToolPtr tool = boost::dynamic_pointer_cast<cxTool>(mTools->getTool());
+	ToolPtr tool = mTools->getTool();
     if(tool && tool->hasReferencePointWithId(1))
     {
       text = "Ref. point: "+qstring_cast(tool->getReferencePoints()[1]);

@@ -52,7 +52,7 @@ namespace cx
  *
  * Contains data assosiated with a shared memory video stream
  *
- * \ingroup sscVideo
+ * \ingroup cx_resource_core_video
  */
 class VideoSourceSHM : public VideoSource
 {

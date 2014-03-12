@@ -36,7 +36,7 @@ class ToolConfigureGroupBox;
 
 /**
  * \file
- * \addtogroup cxGUI
+ * \addtogroup cx_gui
  * @{
  */
 
@@ -150,7 +150,7 @@ protected:
  * \brief Interface for selecting a tool configuration.
  *
  * The tab has three parts:
- * \beginverbatim
+ * \verbatim
  *
  *  ____________________________________________
  * |                       |                    |

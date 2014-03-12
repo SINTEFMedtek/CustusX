@@ -13,8 +13,8 @@
 #include "sscTypeConversions.h"
 //#include "UsConfigGui.h"
 #include "cxDataInterface.h"
-#include "cxToolManager.h"
-#include "cxTool.h"
+#include "sscToolManager.h"
+#include "sscTool.h"
 #include "cxToolDataAdapters.h"
 #include "cxActiveToolWidget.h"
 #include "sscManualTool.h"
@@ -167,8 +167,6 @@ void ToolPropertiesWidget::spacesChangedSlot()
 
 void ToolPropertiesWidget::dominantToolChangedSlot()
 {
-//  cxToolPtr cxTool = boost::dynamic_pointer_cast<cxTool>(mActiveTool);
-
   if (mActiveTool)
     disconnect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
 

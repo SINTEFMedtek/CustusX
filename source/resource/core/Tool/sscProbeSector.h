@@ -38,7 +38,7 @@ typedef boost::shared_ptr<class ProbeSector> ProbeSectorPtr;
 
 /**\brief Utility functions for drawing an US Probe sector
  *
- * \ingroup sscTool
+ * \ingroup cx_resource_core_tool
  */
 class ProbeSector
 {

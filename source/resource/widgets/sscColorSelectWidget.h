@@ -25,16 +25,11 @@
 namespace cx
 {
 
-/** 
- *
- *
- * \ingroup sscWidget
- * \date 11/22/2012, 2012
- * \author christiana
- */
 /**\brief Widget for the BoolDataAdapter.
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_widgets
+ * \date 11/22/2012, 2012
+ * \author christiana
  */
 class ColorSelectWidget: public OptimizedUpdateWidget
 {

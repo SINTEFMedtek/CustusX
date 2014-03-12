@@ -46,7 +46,7 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
  * Implementations of ToolManager typically connect to
  * a physical tracking system.
  *
- * \ingroup sscTool
+ * \ingroup cx_resource_core_tool
  */
 class ToolManager: public QObject
 {

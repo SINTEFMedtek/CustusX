@@ -11,14 +11,9 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-/**
- * \file
- * \addtogroup cxGUI
- * @{
- */
-
 #ifndef CXDATAINTERFACE_H_
 #define CXDATAINTERFACE_H_
+
 
 #include "sscDoubleDataAdapter.h"
 #include "sscStringDataAdapter.h"
@@ -27,6 +22,11 @@
 
 #include "cxLegacySingletons.h"
 
+/**
+ * \file
+ * \addtogroup cx_gui
+ * @{
+ */
 
 namespace cx
 {
@@ -443,9 +443,11 @@ protected:
   ImagePtr mData;
 };
 
+} // namespace cx
+
+
 /**
  * @}
  */
-} // namespace cx
 
 #endif /* CXDATAINTERFACE_H_ */

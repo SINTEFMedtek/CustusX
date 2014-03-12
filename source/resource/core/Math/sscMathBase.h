@@ -25,6 +25,16 @@ class QStringList;
 typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
 
+/**
+ * \file
+ *
+ * Include this file before using any Eigen classes. It contains defines that
+ * redefine Eigen behaviour.
+ *
+ * \addtogroup cx_resource_core_math
+ * @{
+ */
+
 // Extensions of the Eigen classes
 // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
 
@@ -40,6 +50,10 @@ typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
 // Eigen library
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Geometry>
+
+/**
+ * @}
+ */
 
 // --------------------------------------------------------
 

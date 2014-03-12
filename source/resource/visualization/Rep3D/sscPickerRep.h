@@ -38,7 +38,7 @@ typedef boost::shared_ptr<class PickerRep> PickerRepPtr;
 typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
 
-/**\brief Picking of points in an image.
+/** \brief Picking of points in an image.
  *
  * When enabled, clicking in the view is interpreted as picking a point on
  * the attached image. The picked point is the projection of the mouse click
@@ -49,8 +49,8 @@ typedef boost::shared_ptr<class Tool> ToolPtr;
  * Used by CustusX.
  * Not used by Sonowand.
  *
- * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep3D
  */
 class PickerRep: public RepImpl
 {

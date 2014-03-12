@@ -27,6 +27,7 @@ typedef boost::shared_ptr<class MetricReferenceArgumentList> MetricReferenceArgu
 /** \brief Collection of Metric arguments that refer to another metric
  *
  *
+ * \ingroup cx_resource_core_data
  * \date 2014-02-11
  * \author Christian Askeland, SINTEF
  */

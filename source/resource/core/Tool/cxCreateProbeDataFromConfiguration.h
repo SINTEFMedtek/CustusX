@@ -10,7 +10,7 @@
 * \date Nov 26, 2010
 * \author Christian Askeland, SINTEF
 *
-* \addtogroup cxResourceUtilities
+* \addtogroup cx_resource_core_tool
 * @{
 */
 

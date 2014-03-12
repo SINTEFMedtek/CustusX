@@ -22,7 +22,7 @@ namespace cx
 /** Filter for smoothing a volume.
  *
  *
- * \ingroup cxPluginAlgorithm
+ * \ingroup cx_plugin_algorithm
  * \date Nov 26, 2012
  * \author christiana
  */

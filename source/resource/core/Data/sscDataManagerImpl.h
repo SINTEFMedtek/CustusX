@@ -36,19 +36,15 @@ class QDomElement;
 namespace cx
 {
 
-
-/**
- * \date Jan 6, 2009
- * \author christiana
- */
-
 typedef boost::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
 
 /**\brief Default implementation of DataManager.
  *
  * Used by CustusX.
  *
- * \ingroup sscData
+ * \ingroup cx_resource_core_data
+ * \date Jan 6, 2009
+ * \author christiana
  */
 class DataManagerImpl: public DataManager
 {

@@ -14,7 +14,7 @@ namespace cx
  *
  * \sa CoordinateSystemProvider
  *
- * \ingroup sscUtility
+ * \ingroup cx_resource_core_utilities
  */
 struct CoordinateSystem
 {

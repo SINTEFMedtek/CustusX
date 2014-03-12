@@ -20,9 +20,10 @@ namespace cx
 {
 
 /**
- * \addtogroup cxResourceUtilities
- * \{
- */
+* \file
+* \addtogroup cx_resource_core_utilities
+* @{
+*/
 
 /** Remove a nonempty folder recursively
  *
@@ -35,7 +36,7 @@ namespace cx
 bool removeNonemptyDirRecursively(const QString& dirName);
 
 /**
- * \}
+ * @\}
  */
 
 } // namespace cx

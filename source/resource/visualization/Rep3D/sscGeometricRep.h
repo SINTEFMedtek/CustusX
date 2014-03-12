@@ -30,14 +30,14 @@ typedef boost::shared_ptr<class Mesh> MeshPtr;
 
 typedef boost::shared_ptr<class GeometricRep> GeometricRepPtr;
 
-/**\brief Display one Mesh in 3D.
+/** \brief Display one Mesh in 3D.
  *
  * Use this to render geometric polydata (vtkPolyData) in a 3D scene.
  *
  * Used by CustusX.
  *
- * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep3D
  */
 class GeometricRep : public RepImpl
 {

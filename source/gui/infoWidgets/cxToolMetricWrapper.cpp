@@ -16,7 +16,7 @@
 #include <QHBoxLayout>
 #include "sscLabeledComboBoxWidget.h"
 #include "cxDataAdapterHelper.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 

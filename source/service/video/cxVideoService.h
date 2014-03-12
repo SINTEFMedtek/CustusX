@@ -37,14 +37,14 @@ typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 
 /**
  * \file
- * \addtogroup cxServiceVideo
+ * \addtogroup cx_service_video
  * @{
  */
 
 /**
  * \brief Provides access to all video sources in the
  * system, and connection stuff for the sources.
- * \ingroup cxServiceVideo
+ * \ingroup cx_service_video
  *
  * \image html videoservice_simple.png "VideoService Overview"
  *

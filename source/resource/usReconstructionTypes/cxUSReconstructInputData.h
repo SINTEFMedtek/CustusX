@@ -24,7 +24,7 @@ typedef boost::shared_ptr<class USFrameData> USFrameDataPtr;
 typedef boost::shared_ptr<class Image> ImagePtr;
 
 /**
- * \addtogroup cxResourceUtilities
+ * \addtogroup cx_resource_usreconstructiontypes
  * \{
  */
 

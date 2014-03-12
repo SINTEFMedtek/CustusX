@@ -35,7 +35,7 @@ namespace cx
 
 
 /**
- * \addtogroup cxResourceUtilities
+ * \addtogroup cx_resource_usreconstructiontypes
  * \{
  */
 

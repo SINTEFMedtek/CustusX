@@ -32,7 +32,7 @@ namespace cx
 /**\brief Utility class for describing a bounded numeric range.
  *
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_core_utilities
  */
 struct DoubleRange
 {

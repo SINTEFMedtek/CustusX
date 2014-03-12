@@ -24,12 +24,12 @@ typedef boost::shared_ptr<class PlaybackTool> PlaybackToolPtr;
 typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 
 
-/**\brief A tool used during playback
+/** \brief A tool used during playback
  *
  * \date Mar 29, 2012
  * \author Christian Askeland, SINTEF
  *
- * \ingroup sscTool
+ * \ingroup cx_service_tracking
  */
 class PlaybackTool: public ToolImpl
 {

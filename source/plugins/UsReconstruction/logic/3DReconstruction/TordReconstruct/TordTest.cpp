@@ -28,6 +28,11 @@ TordTest::~TordTest()
 
 }
 
+void TordTest::enableProfiling()
+{
+	mAlgorithm->setProfiling(true);
+}
+
 QString TordTest::getName() const
 {
 	return "TordTest";

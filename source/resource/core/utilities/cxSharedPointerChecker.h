@@ -20,6 +20,12 @@
 namespace cx
 {
 
+/**
+* \file
+* \addtogroup cx_resource_core_utilities
+* @{
+*/
+
 void requireUnique(int use_count, QString objectName);
 
 /** Utility for checking the usage count of share_ptr's
@@ -34,6 +40,9 @@ void requireUnique(const boost::shared_ptr<T>& object, QString objectName)
 	requireUnique(object.use_count(), objectName);
 }
 
+/**
+* @}
+*/
 
 } // namespace cx
 

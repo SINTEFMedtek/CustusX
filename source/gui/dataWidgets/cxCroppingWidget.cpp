@@ -15,7 +15,8 @@
 #include "cxInteractiveCropper.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
+#include "sscImage.h"
 
 namespace cx
 {

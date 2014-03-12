@@ -25,7 +25,7 @@ class DataManager;
 /** Provides information about all the coordinate systems in the application.
  *
  *
- * \ingroup cx
+ * \ingroup cx_resource_core_utilities
  * \date 2014-02-21
  * \author christiana
  */

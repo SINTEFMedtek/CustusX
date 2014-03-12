@@ -28,7 +28,7 @@ typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
 /**
  * \file
- * \addtogroup cxServiceState
+ * \addtogroup cx_service_state
  * @{
  */
 
@@ -54,10 +54,10 @@ struct Desktop
 /**
  * \brief Global Application states for CustusX.
  *
- * The StateManager is the main class in \ref cxServiceState , and maintains
+ * The StateManager is the main class in \ref cx_service_state , and maintains
  * global state.
  *
- * Exception: \ref cxResourceSettings also contains some global state.
+ * Exception: \ref cx_resource_core_settings also contains some global state.
  *
  * \image html cxArchitecture_application.png "State Service main classes"
  *

@@ -25,7 +25,7 @@
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "sscProbeData.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxProbe.h"
 #include "cxIgstkTool.h"
 #include "cxTrackingPositionFilter.h"

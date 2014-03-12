@@ -25,7 +25,7 @@ class DataManager;
 /** Factory for creating cx::Data objects
  *
  *
- * \ingroup sscData
+ * \ingroup cx_resource_core_data
  * \date 2014-02-22
  * \author christiana
  */
