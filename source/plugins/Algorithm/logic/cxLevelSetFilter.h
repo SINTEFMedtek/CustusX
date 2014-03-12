@@ -43,6 +43,10 @@ protected:
 private:
     vtkImageDataPtr convertToVtkImageData(char * data, int size_x, int size_y, int size_z, ImagePtr input); ///< converts a char array to a vtkImageDataPtr
     vtkImageDataPtr importRawImageData(void * data, int size_x, int size_y, int size_z, ImagePtr input, int type); ///< converts a any array to a vtkImageDataPtr
+    std::string filename;
+    Vector3D seedPoint;
+    ImagePtr image;
+    vtkImageDataPtr rawSegmentation;
 
 
 }; // end LevelSetFilter class
