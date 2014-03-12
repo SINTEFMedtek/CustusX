@@ -2,7 +2,8 @@
 #define CXSOUNDSPEEDCONVERSIONWIDGET_H_
 
 #include "cxBaseWidget.h"
-#include "cxTool.h"
+#include "sscTool.h"
+#include "cxLegacySingletons.h"
 
 class QPushButton;
 class QDoubleSpinBox;
@@ -11,7 +12,7 @@ namespace cx
 {
 /**
 * \file
-* \addtogroup cxPluginAcquisition
+* \addtogroup cx_plugin_acquisition
 * @{
 */
 

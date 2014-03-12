@@ -21,7 +21,7 @@ namespace cx
 {
 
 /**\brief Provides syntax highlighting for ElastiX parameter files.
- * \ingroup cxPluginRegistration
+ * \ingroup cx_plugin_registration
  *
  *  \date Feb 14, 2012
  *  \author christiana

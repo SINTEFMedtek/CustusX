@@ -30,15 +30,10 @@
 #include "sscGraphicalPrimitives.h"
 #include "vtkMatrix4x4.h"
 #include "cxGraphicalTorus3D.h"
+#include "cxGraphicalDisk.h"
 
 namespace cx
 {
-
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
 
 DonutMetricRepPtr DonutMetricRep::New(const QString& uid, const QString& name)
 {
@@ -55,6 +50,7 @@ void DonutMetricRep::clear()
 {
 	DataMetricRep::clear();
 	mTorus.reset();
+	mDisk.reset();
 }
 
 DonutMetricPtr DonutMetricRep::getDonutMetric()
@@ -67,21 +63,71 @@ void DonutMetricRep::onModifiedStartRender()
 	if (!mMetric)
 		return;
 
+	this->updateTorus();
+	this->updateDisc();
+
+	this->drawText();
+}
+
+void DonutMetricRep::updateTorus()
+{
+	if (!mMetric)
+		return;
+
+	DonutMetricPtr donut = this->getDonutMetric();
+
+	if (donut->getFlat())
+	{
+		mTorus.reset();
+		return;
+	}
+
 	if (!mTorus && mView && mMetric)
 		mTorus.reset(new GraphicalTorus3D(mView->getRenderer()));
 
 	if (!mTorus)
 		return;
 
-	DonutMetricPtr donut = this->getDonutMetric();
-
 	mTorus->setPosition(donut->getPosition());
 	mTorus->setDirection(donut->getDirection());
 	mTorus->setRadius(donut->getRadius());
 	mTorus->setThickness(donut->getThickness());
 	mTorus->setColor(donut->getColor());
+}
 
-	this->drawText();
+void DonutMetricRep::updateDisc()
+{
+	if (!mMetric)
+		return;
+
+	DonutMetricPtr donut = this->getDonutMetric();
+
+	if (!donut->getFlat())
+	{
+		mDisk.reset();
+		return;
+	}
+
+	if (!mDisk && mView && mMetric)
+	{
+		mDisk.reset(new GraphicalDisk());
+		mDisk->setRenderer(this->getRenderer());
+	}
+
+	if (!mDisk)
+		return;
+
+	mDisk->setPosition(donut->getPosition());
+	mDisk->setDirection(donut->getDirection());
+	mDisk->setRadius(donut->getRadius());
+	mDisk->setHeight(donut->getHeight());
+	mDisk->setColor(donut->getColor());
+	mDisk->setOutlineColor(donut->getColor());
+	mDisk->setOutlineWidth(donut->getThickness());
+	mDisk->setFillVisible(false);
+	mDisk->setLighting(true);
+
+	mDisk->update();
 }
 
 }

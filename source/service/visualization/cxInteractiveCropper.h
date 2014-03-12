@@ -35,10 +35,11 @@ namespace cx
 typedef vtkSmartPointer<class CropBoxCallback> CropBoxCallbackPtr;
 typedef vtkSmartPointer<class CropBoxEnableCallback> CropBoxEnableCallbackPtr;
 typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
+typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
 
 /**
 * \file
-* \addtogroup cxServiceVisualization
+* \addtogroup cx_service_visualization
 * @{
 */
 
@@ -51,7 +52,7 @@ class InteractiveCropper: public QObject
 {
 Q_OBJECT
 public:
-	InteractiveCropper();
+	explicit InteractiveCropper(VisualizationServiceBackendPtr backend);
 	void setView(ViewWidget* view); ///< adds an interactive box widget to the view. Press 'I' to show
 	DoubleBoundingBox3D getBoundingBox(); ///< get BB in data space
 	void setBoundingBox(const DoubleBoundingBox3D& bb_d); ///< set BB in reference space
@@ -87,6 +88,7 @@ private:
 	CropBoxEnableCallbackPtr mCropBoxDisableCallback;
 	bool mShowBoxWidget;
 	ActiveImageProxyPtr mActiveImageProxy;
+	VisualizationServiceBackendPtr mBackend;
 };
 
 typedef boost::shared_ptr<InteractiveCropper> InteractiveCropperPtr;

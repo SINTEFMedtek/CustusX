@@ -6,7 +6,7 @@
 #include <QVBoxLayout>
 #include "sscMessageManager.h"
 #include "sscToolManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "cxRegistrationManager.h"
 
 namespace cx
@@ -23,9 +23,9 @@ FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(Registratio
 
   mSetOrientationButton->setToolTip(this->defaultWhatsThis());
 
-  connect(cxDataManager::getInstance(), SIGNAL(debugModeChanged(bool)), this, SLOT(enableToolSampleButtonSlot()));
+  connect(dataManager(), SIGNAL(debugModeChanged(bool)), this, SLOT(enableToolSampleButtonSlot()));
 
-  mDominantToolProxy =  DominantToolProxy::New();
+  mDominantToolProxy =  DominantToolProxy::New(trackingService());
   connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableToolSampleButtonSlot()));
   connect(mDominantToolProxy.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(enableToolSampleButtonSlot()));
   this->enableToolSampleButtonSlot();
@@ -88,7 +88,7 @@ void FastOrientationRegistrationWidget::enableToolSampleButtonSlot()
   bool enabled = false;
   enabled = tool &&
 	  tool->getVisible() &&
-      (!tool->hasType(Tool::TOOL_MANUAL) || cxDataManager::getInstance()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
+	  (!tool->hasType(Tool::TOOL_MANUAL) || dataManager()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
 
   mSetOrientationButton->setEnabled(enabled);
 }

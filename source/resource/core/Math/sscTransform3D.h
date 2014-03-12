@@ -115,7 +115,7 @@ namespace cx
 class DoubleBoundingBox3D;
 
 /**
- * \addtogroup sscMath
+ * \addtogroup cx_resource_core_math
  * @{
  */
 
@@ -141,6 +141,7 @@ Transform3D createTransformRotateX(const double angle);
 Transform3D createTransformRotateY(const double angle);
 Transform3D createTransformRotateZ(const double angle);
 Transform3D createTransformIJC(const Vector3D& ivec, const Vector3D& jvec, const Vector3D& center);
+Transform3D createTransformRotationBetweenVectors(Vector3D from, Vector3D to);
 
 // --------------------------------------------------------
 typedef boost::shared_ptr<Transform3D> Transform3DPtr;

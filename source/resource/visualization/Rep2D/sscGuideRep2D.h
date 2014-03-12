@@ -32,8 +32,8 @@ typedef boost::shared_ptr<class GuideRep2D> GuideRep2DPtr;
 
 /**Rep for visualizing a PointMetric in 2D views.
  *
- * \ingroup sscRep
- * \ingroup sscRep2D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep2D
  *
  * \date Jun 14, 2012
  * \author Sigmund Augdal, SonoWand AS
@@ -42,7 +42,7 @@ class GuideRep2D: public DataMetricRep
 {
 Q_OBJECT
 public:
-	static GuideRep2DPtr New(DataManager* dataManager, const QString& uid, const QString& name = ""); ///constructor
+	static GuideRep2DPtr New(DataServicePtr dataManager, const QString& uid, const QString& name = ""); ///constructor
 	virtual ~GuideRep2D() {}
 
 //	void setPointMetric(PointMetricPtr point);
@@ -63,11 +63,11 @@ protected:
 	virtual void onModifiedStartRender();
 
 private:
-	GuideRep2D(DataManager* dataManager, const QString& uid, const QString& name = "");
+	GuideRep2D(DataServicePtr dataManager, const QString& uid, const QString& name = "");
 	GuideRep2D(); ///< not implemented
 
 //	PointMetricPtr mMetric;
-	DataManager* mDataManager;
+	DataServicePtr mDataManager;
 	SliceProxyPtr mSliceProxy;
 	vtkActorPtr mCircleActor;
 	vtkSectorSourcePtr mCircleSource;

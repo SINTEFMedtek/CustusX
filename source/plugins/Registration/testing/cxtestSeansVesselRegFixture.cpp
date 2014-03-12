@@ -10,6 +10,7 @@
 #include "sscRegistrationTransform.h"
 #include "sscTypeConversions.h"
 #include <QDir>
+#include "cxLogicManager.h"
 
 #include "catch.hpp"
 
@@ -28,12 +29,13 @@ SeansVesselRegFixture::~SeansVesselRegFixture()
 void SeansVesselRegFixture::setUp()
 {
 	cx::DataLocations::setTestMode();
-
+	cx::LogicManager::initialize();
 }
 
 void SeansVesselRegFixture::tearDown()
 {
-	cx::DataManager::shutdown();
+	cx::LogicManager::shutdown();
+//	cx::DataManager::shutdown();
 }
 
 /**return endpoint

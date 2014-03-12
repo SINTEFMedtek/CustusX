@@ -32,7 +32,7 @@ class DataManager;
 
 /**
  * \file
- * \addtogroup sscData
+ * \addtogroup cx_resource_core_data
  * @{
  */
 
@@ -48,7 +48,7 @@ class DataManager;
 class DataMetric: public Data
 {
 public:
-	DataMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	DataMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	virtual ~DataMetric();
 
     virtual QString getSpace();
@@ -66,7 +66,7 @@ public:
 	virtual bool load(QString path) { return true; } ///< metrics dont store info in file, xml only.
 
 protected:
-	DataManager* mDataManager;
+	DataServicePtr mDataManager;
 	SpaceProviderPtr mSpaceProvider;
 
 	QString getSingleLineHeader() const;

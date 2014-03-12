@@ -29,7 +29,7 @@ typedef boost::shared_ptr<class TSFPresets> TSFPresetsPtr;
  * Algorithm written by Erik Smistad. For more information, see paper:
  * "GPU-Based Airway Segmentation and Centerline Extraction for Image Guided Bronchoscopy."
  *
- * \ingroup cxPluginAlgorithm
+ * \ingroup cx_plugin_algorithm
  * \date 14.12.2012
  * \author Janne Beate Bakeng, SINTEF
  */

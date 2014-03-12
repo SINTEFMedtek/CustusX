@@ -40,7 +40,7 @@
 #include "cxPatientService.h"
 #include "cxInteractiveCropper.h"
 #include "cxViewManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxViewWrapper.h"
 #include "cxViewGroup.h"
 
@@ -155,7 +155,7 @@ void EraserWidget::duplicateSlot()
 	ImagePtr original = dataManager()->getActiveImage();
 	QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
 
-	ImagePtr duplicate = duplicateImage(dataManager(), original);
+	ImagePtr duplicate = duplicateImage(dataService(), original);
 	dataManager()->loadData(duplicate);
 	dataManager()->saveImage(duplicate, outputBasePath);
 	dataManager()->setActiveImage(duplicate);

@@ -13,6 +13,10 @@
 namespace cx
 {
 
+/**
+ * \ingroup cx_resource_videoserver
+ *
+ */
 class DirectlyLinkedSender : public SenderImpl
 {
 	Q_OBJECT

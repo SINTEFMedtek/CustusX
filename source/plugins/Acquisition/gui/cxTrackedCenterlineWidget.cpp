@@ -11,7 +11,7 @@
 #include "cxTrackingDataToVolume.h"
 #include "cxPatientData.h"
 #include "cxRecordSessionWidget.h"
-#include "cxTool.h"
+#include "sscTool.h"
 #include "cxPatientService.h"
 #include "sscMessageManager.h"
 #include "sscView.h"
@@ -99,7 +99,7 @@ void TrackedCenterlineWidget::preprocessResampler()
 	}
 
 	//visualize the tracked data as a mesh
-	loadMeshFromToolTransforms(dataManager(), transforms_prMt);
+	loadMeshFromToolTransforms(dataService(), transforms_prMt);
 
 	//convert the transforms into a binary image
 	TrackingDataToVolume converter;
@@ -164,7 +164,7 @@ TimedTransformMap TrackedCenterlineWidget::getRecording(RecordSessionPtr session
   double startTime = session->getStartTime();
   double stopTime = session->getStopTime();
 
-  cxToolPtr tool = this->findTool(startTime, stopTime);
+  ToolPtr tool = this->findTool(startTime, stopTime);
   if(!tool)
   {
 	messageManager()->sendWarning("Found no tool with tracking data from the given session.");
@@ -176,21 +176,21 @@ TimedTransformMap TrackedCenterlineWidget::getRecording(RecordSessionPtr session
   return retval;
 }
 
-cxToolPtr TrackedCenterlineWidget::findTool(double startTime, double stopTime)
+ToolPtr TrackedCenterlineWidget::findTool(double startTime, double stopTime)
 {
-  cxToolPtr retval;
+  ToolPtr retval;
 
   SessionToolHistoryMap toolTransformMap = toolManager()->getSessionHistory(startTime, stopTime);
   if(toolTransformMap.size() == 1)
   {
 	messageManager()->sendInfo("Found one tool("+toolTransformMap.begin()->first->getName()+") with relevant data.");
-    retval = boost::dynamic_pointer_cast<cxTool>(toolTransformMap.begin()->first);
+	retval = toolTransformMap.begin()->first;
   }
   else if(toolTransformMap.size() > 1)
   {
 	messageManager()->sendWarning("Found more than one tool with relevant data, user needs to choose which one to use for tracked centerline extraction.");
     //TODO make the user select which tool they wanna use!!! Pop-up???
-    retval = boost::dynamic_pointer_cast<cxTool>(toolTransformMap.begin()->first);
+	retval = toolTransformMap.begin()->first;
     //TODO
   }else if(toolTransformMap.empty())
   {

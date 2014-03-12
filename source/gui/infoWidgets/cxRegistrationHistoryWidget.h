@@ -5,13 +5,13 @@
 #include <QtGui>
 #include "sscRegistrationTransform.h"
 #include "cxBaseWidget.h"
-
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup cxPluginRegistration
+ * \addtogroup cx_plugin_registration
  * @{
  */
 

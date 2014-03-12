@@ -23,7 +23,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxServicePatient
+ * \addtogroup cx_service_visualization
  * @{
  */
 
@@ -53,7 +53,7 @@ private:
 
 /**
  * \brief Use transfer function to preview a threshold in the selected volume. Used by widgets: segmentation and surface generation
- * \ingroup cxServicePatient
+ * \ingroup cx_service_visualization
  *
  * \date 12. okt. 2011
  * \author Ole Vegard Solberg, SINTEF

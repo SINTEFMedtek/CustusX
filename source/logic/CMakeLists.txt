@@ -14,6 +14,8 @@ SET (cxLogicManager_SOURCE
     cxServiceController.cpp
     cxLogicManager.h
     cxLogicManager.cpp
+	cxLegacySingletons.h
+	cxLegacySingletons.cpp
 )
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})

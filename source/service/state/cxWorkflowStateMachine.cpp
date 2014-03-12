@@ -18,41 +18,37 @@
 #include <QToolBar>
 #include "cxWorkflowState.h"
 #include "cxRequestEnterStateTransition.h"
+#include "cxStateServiceBackend.h"
+#include "sscDataManager.h"
 
 namespace cx
 {
 
-WorkflowStateMachine::WorkflowStateMachine()
+WorkflowStateMachine::WorkflowStateMachine(StateServiceBackendPtr backend) : mBackend(backend)
 {
 	mStarted = false;
 	connect(this, SIGNAL(started()), this, SLOT(startedSlot()));
 	mActionGroup = new QActionGroup(this);
 
-	mParentState = new ParentWorkflowState(this);
+	mParentState = new ParentWorkflowState(this, mBackend);
 
-	WorkflowState* patientData = this->newState(new PatientDataWorkflowState(mParentState));
-	WorkflowState* registration = this->newState(new RegistrationWorkflowState(mParentState));
-	WorkflowState* preOpPlanning = this->newState(new PreOpPlanningWorkflowState(mParentState));
-	WorkflowState* navigation = this->newState(new NavigationWorkflowState(mParentState));
-	WorkflowState* intraOpImaging = this->newState(new IntraOpImagingWorkflowState(mParentState));
-	WorkflowState* postOpControll = this->newState(new PostOpControllWorkflowState(mParentState));
-
-	connect(patientData, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
-	connect(registration, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
-	connect(preOpPlanning, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
-	connect(navigation, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
-	connect(intraOpImaging, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
-	connect(postOpControll, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
-
-	Q_UNUSED(registration);
-	Q_UNUSED(preOpPlanning);
-	Q_UNUSED(navigation);
-	Q_UNUSED(intraOpImaging);
-	Q_UNUSED(postOpControll);
+	WorkflowState* patientData = this->newState(new PatientDataWorkflowState(mParentState, mBackend));
+	this->newState(new RegistrationWorkflowState(mParentState, mBackend));
+	this->newState(new PreOpPlanningWorkflowState(mParentState, mBackend));
+	this->newState(new NavigationWorkflowState(mParentState, mBackend));
+	this->newState(new IntraOpImagingWorkflowState(mParentState, mBackend));
+	this->newState(new PostOpControllWorkflowState(mParentState, mBackend));
 
 	//set initial state on all levels
 	this->setInitialState(mParentState);
 	mParentState->setInitialState(patientData);
+
+	connect(mBackend->getDataManager().get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
+}
+
+void WorkflowStateMachine::clinicalApplicationChangedSlot()
+{
+	this->setActiveState("PatientDataUid");
 }
 
 void WorkflowStateMachine::startedSlot()
@@ -69,6 +65,9 @@ WorkflowState* WorkflowStateMachine::newState(WorkflowState* state)
 	connect(state, SIGNAL(entered()), this, SIGNAL(activeStateChanged()));
 
 	mStates[state->getUid()] = state;
+
+	connect(state, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
+
 	return state;
 }
 

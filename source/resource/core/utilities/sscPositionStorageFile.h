@@ -39,7 +39,7 @@ namespace cx {
    \endverbatim
  *
  * \sa PositionStorageWriter
- * \ingroup sscUtility
+ * \ingroup cx_resource_core_utilities
  */
 class PositionStorageReader
 {

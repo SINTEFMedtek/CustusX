@@ -6,10 +6,10 @@
 #include "boost/bind.hpp"
 #include "sscTime.h"
 #include "sscMessageManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxStatusBar.h"
 #include "cxVolumePropertiesWidget.h"
 #include "cxNavigationWidget.h"
@@ -68,7 +68,7 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	stylesheet.open(QIODevice::ReadOnly);
 	qApp->setStyleSheet(stylesheet.readAll());
 
-	mCameraControl.reset(new CameraControl(this));
+	mCameraControl = viewManager()->getCameraControl();
 	mLayoutInteractor.reset(new LayoutInteractor());
 
 	viewManager()->initialize();
@@ -279,10 +279,10 @@ void MainWindow::createActions()
 	mDebugModeAction = new QAction(tr("&Debug Mode"), this);
 	mDebugModeAction->setShortcut(tr("Ctrl+D"));
 	mDebugModeAction->setCheckable(true);
-	mDebugModeAction->setChecked(cxDataManager::getInstance()->getDebugMode());
+	mDebugModeAction->setChecked(dataManager()->getDebugMode());
 	mDebugModeAction->setStatusTip(tr("Set debug mode, this enables lots of weird stuff."));
-	connect(mDebugModeAction, SIGNAL(triggered(bool)), cxDataManager::getInstance(), SLOT(setDebugMode(bool)));
-	connect(cxDataManager::getInstance(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
+	connect(mDebugModeAction, SIGNAL(triggered(bool)), dataManager(), SLOT(setDebugMode(bool)));
+	connect(dataManager(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
 	connect(mDebugModeAction, SIGNAL(toggled(bool)), this, SLOT(toggleDebugModeSlot(bool)));
 
 	mFullScreenAction = new QAction(tr("Fullscreen"), this);

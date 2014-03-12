@@ -45,15 +45,28 @@
 #include "cxSpaceProvider.h"
 #include "cxDataFactory.h"
 
+#include "sscXmlOptionItem.h"
+#include "cxDataLocations.h"
+#include "sscTransferFunctions3DPresets.h"
+
 namespace cx
 {
 
-void DataManagerImpl::initialize()
+DataManagerImplPtr DataManagerImpl::create()
 {
-	setInstance(new DataManagerImpl());
+	DataManagerImplPtr retval;
+	retval.reset(new DataManagerImpl());
+//	retval->mSelf = retval;
+	return retval;
 }
 
-DataManagerImpl::DataManagerImpl()
+//void DataManagerImpl::initialize()
+//{
+//	setInstance(new DataManagerImpl());
+//}
+
+DataManagerImpl::DataManagerImpl() :
+	mDebugMode(false)
 {
 	mClinicalApplication = mdLABORATORY;
 	m_rMpr_History.reset(new RegistrationHistory());
@@ -759,6 +772,33 @@ RegistrationHistoryPtr DataManagerImpl::get_rMpr_History()
 	return m_rMpr_History;
 }
 
+
+PresetTransferFunctions3DPtr DataManagerImpl::getPresetTransferFunctions3D() const
+{
+	///< create from filename, create trivial document of type name and root node if no file exists.
+	XmlOptionFile preset = XmlOptionFile(
+					DataLocations::getRootConfigPath() + "/transferFunctions/presets.xml", "transferFunctions");
+	XmlOptionFile custom = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend(
+					"presetTransferFunctions");
+
+	if (!mPresetTransferFunctions3D)
+		mPresetTransferFunctions3D.reset(new TransferFunctions3DPresets(preset, custom));
+
+	return mPresetTransferFunctions3D;
+}
+
+bool DataManagerImpl::getDebugMode() const
+{
+	return mDebugMode;
+}
+void DataManagerImpl::setDebugMode(bool on)
+{
+	if (mDebugMode == on)
+		return;
+	std::cout << "Setting DEBUG MODE = " << on << std::endl;
+	mDebugMode = on;
+	emit debugModeChanged(mDebugMode);
+}
 
 
 

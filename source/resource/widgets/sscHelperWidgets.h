@@ -28,9 +28,15 @@ class QHBoxLayout;
 namespace cx
 {
 
+/**
+* \file
+* \addtogroup cx_resource_widgets
+* @{
+*/
+
+
 /**\brief A widget that floats above the other windows. Used as basis for the floating controls.
  *
- * \ingroup sscWidget
  */
 class sscFloatingWidget: public QWidget
 {
@@ -64,14 +70,12 @@ public:
   *
   *   \author christiana
   *   \date Nov 25, 2012
-  *   \ingroup sscWidget
   */
 QHBoxLayout* mergeWidgetsIntoHBoxLayout(QWidget* first, QWidget* second);
 /** Add on hack for mergeWidgetsIntoHBoxLayout(),
   * create a small extent for the widget so that is has a visible region
   *   \author christiana
   *   \date Dec 5, 2012
-  *   \ingroup sscWidget
   */
 QWidget* addDummyMargin(QWidget* widget);
 
@@ -80,9 +84,12 @@ QWidget* addDummyMargin(QWidget* widget);
  * If a gridLayout is provided, the widget will insert its components
  * into a row in that layout
  *
- * \ingroup sscWidget
  */
 QWidget* sscCreateDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
 }
+
+/**
+* @}
+*/
 
 #endif

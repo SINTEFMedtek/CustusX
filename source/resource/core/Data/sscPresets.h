@@ -37,6 +37,7 @@ namespace cx {
  * A preset node should look like this:
  * <Preset name="example" valuename1="value1" valuename2="value2" ... valuenameN="valueN"/>
  *
+ * \ingroup cx_resource_core_data
  * \date Mar 11, 2013
  * \author Janne Beate Bakeng, SINTEF
  */

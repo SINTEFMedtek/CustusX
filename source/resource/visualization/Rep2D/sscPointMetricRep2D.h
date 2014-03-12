@@ -28,12 +28,13 @@
 namespace cx
 {
 
+typedef boost::shared_ptr<class GraphicalDisk> GraphicalDiskPtr;
 typedef boost::shared_ptr<class PointMetricRep2D> PointMetricRep2DPtr;
 
 /**Rep for visualizing a PointMetric in 2D views.
  *
- * \ingroup sscRep
- * \ingroup sscRep2D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep2D
  *
  * \date Jun 14, 2012
  * \author Sigmund Augdal, SonoWand AS
@@ -45,19 +46,8 @@ public:
 	static PointMetricRep2DPtr New(const QString& uid, const QString& name = ""); ///constructor
 	virtual ~PointMetricRep2D() {}
 
-//	void setPointMetric(PointMetricPtr point);
-//	PointMetricPtr getPointMetric();
 	virtual QString getType() const { return "PointMetricRep2D"; }
 	void setSliceProxy(SliceProxyPtr slicer);
-	/**
-	 * Set the width of the outline in fractions of the full size
-	 */
-	void setOutlineWidth(double width);
-	/**
-	 * Set the color of the outline
-	 */
-	void setOutlineColor(double red, double green, double blue);
-	void setFillVisibility(bool on);
 	void setDynamicSize(bool on);
 
 protected:
@@ -68,23 +58,16 @@ protected:
     virtual void rescale();
 	virtual void onModifiedStartRender();
 
-//protected slots:
-//	virtual void changedSlot();
-
 private:
 	PointMetricRep2D(const QString& uid, const QString& name = "");
 	PointMetricRep2D(); ///< not implemented
 
-//	PointMetricPtr mMetric;
+	double findDiskRadius(Vector3D position);
+
 	ViewportListenerPtr mViewportListener;
 	SliceProxyPtr mSliceProxy;
-	vtkActorPtr mCircleActor;
-	vtkSectorSourcePtr mCircleSource;
-	vtkActorPtr mOutlineActor;
-	vtkSectorSourcePtr mOutlineSource;
-	double mOutlineWidth;
-	Vector3D mOutlineColor;
-	bool mFillVisible;
+
+	GraphicalDiskPtr mDisk;
 };
 
 

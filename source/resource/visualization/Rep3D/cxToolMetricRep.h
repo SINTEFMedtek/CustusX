@@ -31,8 +31,8 @@ typedef boost::shared_ptr<class ToolMetricRep> ToolMetricRepPtr;
 
 /** Rep for visualizing a ToolMetric.
  *
- * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep3D
  *
  * \date Aug 30, 2013
  * \author Christian Askeland, SINTEF

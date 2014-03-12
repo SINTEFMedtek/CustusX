@@ -21,7 +21,7 @@ namespace cx
  * Early version of metric/label system.
  * Replaced by MetricWidget.
  *
- * \ingroup cxGUI
+ * \ingroup cx_gui
  * \ingroup cxNotUsed
  *
  * \sa MetricWidget

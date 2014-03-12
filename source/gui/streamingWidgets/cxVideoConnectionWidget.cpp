@@ -38,7 +38,7 @@
 #include "cxVideoService.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxViewManager.h"
 #include "cxSimulateUSWidget.h"
 #include "cxFileInputWidget.h"
@@ -381,7 +381,7 @@ void VideoConnectionWidget::importStreamImageSlot()
 		return;
 	}
 	Transform3D rMd = Transform3D::Identity();
-	ToolPtr probe = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr probe = toolManager()->findFirstProbe();
 	VideoSourcePtr videoSource;
 	if (probe)
 	{

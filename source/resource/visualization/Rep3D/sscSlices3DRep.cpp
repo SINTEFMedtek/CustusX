@@ -88,7 +88,7 @@ void Slices3DRep::setImages(std::vector<ImagePtr> images)
 	}
 }
 
-void Slices3DRep::addPlane(PLANE_TYPE plane, DataManager* dataManager)
+void Slices3DRep::addPlane(PLANE_TYPE plane, DataServicePtr dataManager)
 {
 	SliceProxyPtr sliceProxy = SliceProxy::create(dataManager);
 	sliceProxy->initializeFromPlane(plane, false, Vector3D(0,0,1), true, 150, 0.25);

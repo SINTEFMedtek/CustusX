@@ -79,6 +79,8 @@ class Component(object):
         builder.setBuildType(self.getBuildType())
         builder.setControlData(self.controlData)
         return builder
+    def isPubliclyAvailable(self):
+        return True
         
 # ---------------------------------------------------------
 
@@ -162,12 +164,10 @@ class VTK(CppComponent):
         return self.controlData.getBuildExternalsType()
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/VTK')
-        #self._getBuilder().gitClone('http://vtk.org/VTK.git')
     def update(self):
         # this fix should rebase repo from the original Kitware/VTK to our own fork on GitHub.
         self._getBuilder().gitSetRemoteURL('git@github.com:SINTEFMedisinskTeknologi/VTK', branch='VTK-5-10-1.patch_branch')
-        self._getBuilder().gitCheckout('VTK-5-10-1.cx_patch_1')
-        #self._getBuilder().gitCheckout('v5.10.1.patch', patch='VTK-5-10-1.patch')
+        self._getBuilder().gitCheckout('VTK-5-10-1.cx_patch_2')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -189,8 +189,6 @@ class OpenCV(CppComponent):
         return "OpenCV"
     def help(self):
         return 'http://opencv.willowgarage.com'
-#    def sourceFolder(self):
-#        return self.name()+"/opencv"
     def path(self):
         return self.controlData.getExternalPath() + "/OpenCV"
     def getBuildType(self):
@@ -246,7 +244,6 @@ class IGSTK(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def _rawCheckout(self):
-#        self._getBuilder().gitCheckout('git://igstk.org/IGSTK.git')
         self._getBuilder().gitClone('git://igstk.org/IGSTK.git')
     def update(self):
         self._getBuilder().gitCheckout('v5.2', patch='IGSTK-5-2.patch')
@@ -267,56 +264,6 @@ class IGSTK(CppComponent):
         return serialPort
 # ---------------------------------------------------------
 
-#===============================================================================
-# class DCMTK(CppComponent):
-#    '''
-#    The only way to get 3.6.1 to work is to install it,
-#    thats the reason for the special treatment in this class.
-#    
-#    This might change in the future.
-#    '''
-#    def name(self):
-#        return "DCMTK"
-#    #def buildFolder(self):
-#        #'in-source build because this is necessary for including an uninstalled DCMTK'
-#        #return self.sourceFolder()    
-#    def help(self):
-#        return 'dcmtk.org'
-#    def path(self):
-#        return self.controlData.mExternalDir + "/DCMTK"
-# 
-#    def _rawCheckout(self):
-#        self._changeDirToBase()
-#        runShell('git clone git://git.dcmtk.org/dcmtk DCMTK')
-#        # the commontk version of DCMTK compiles without problems on Mac.
-#        #runShell('git clone git://github.com/commontk/DCMTK.git DCMTK')     
-#        self.update()
-#    def update(self):
-#        self._changeDirToSource()
-#        #runShell('git pull')
-#        #runShell('git checkout master')   
-#        runShell('git checkout PUBLIC_360')  # 3.6.0 seems to have some issues on fedora 16.  
-# 
-#    def configure(self):
-#        self._changeDirToBuild()
-#        runShell('''\
-# \cmake \
-# -G"%s" \
-# -DBUILD_SHARED_LIBS:BOOL=%s \
-# -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
-# ../%s''' % (self.controlData.mCMakeGenerator,
-#            self.controlData.mBuildShared, 
-#            self.controlData.mOSX_DEPLOYMENT_TARGET,
-#            self.sourceFolder()))
-#    def build(self):
-#        CppComponent.build(self)
-#        runShell('sudo make install')
-#    def installPath(self):
-#        #return '/usr/local/include/dcmtk'
-#        return '' # ignore: use yum instead
-#===============================================================================
-# ---------------------------------------------------------
-
 class ISB_DataStreaming(CppComponent):
     def name(self):
         self.mCurrentRevision = "498"
@@ -327,10 +274,6 @@ class ISB_DataStreaming(CppComponent):
         return self.buildPath() + "/vtkDataStreamClient/"
     def path(self):
         return self.controlData.getWorkingPath() + "/ISB_DataStreaming"
-        #    def sourceFolder(self):
-#return self.name() + "/vtkDataStreamClient/"
-        #    def buildFolder(self):
-#return self.controlData.getBuildFolder()
     def _rawCheckout(self):
         self._changeDirToBase()
         runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ -r%s %s %s' % (self.mCurrentRevision, self._svn_login_info(), self.sourceFolder()))
@@ -355,7 +298,10 @@ class ISB_DataStreaming(CppComponent):
             return '--username sintef'
         else:
             return '--non-interactive --username sintef --password %s' % self.controlData.isb_password
-    # ---------------------------------------------------------
+    def isPubliclyAvailable(self):
+        return False
+        
+# ---------------------------------------------------------
 
 class CustusX3(CppComponent):
     def name(self):
@@ -371,7 +317,6 @@ class CustusX3(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
-        # dependencies
         add('ITK_DIR:PATH', self._createSibling(ITK).configPath())
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('IGSTK_DIR:PATH', self._createSibling(IGSTK).configPath())
@@ -384,7 +329,6 @@ class CustusX3(CppComponent):
         add('Level-Set-Segmentation_DIR:PATH', self._createSibling(LevelSetSegmentation).configPath())
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
         add('GEStreamer_DIR:PATH', self._createSibling(ISB_DataStreaming).configPath())
-        # other options
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.mDoxygen)            
         add('SSC_BUILD_EXAMPLES:BOOL', self.controlData.mBuildSSCExamples);
         add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
@@ -396,8 +340,6 @@ class CustusX3(CppComponent):
         builder.configureCMake()
     def forceConnectSublibraries(self, add):
         print 'CustusX force connect sublibraries.'
-        #builder = self._getBuilder()
-        #add = builder.addCMakeOption
         add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
         add('CX_USE_LEVEL_SET:BOOL', platform.system() == 'Linux')
         add('CX_USE_TSF:BOOL', platform.system() != 'Windows');
@@ -428,6 +370,8 @@ class UltrasonixSDK(CppComponent):
         pass
     def makeClean(self):
         pass
+    def isPubliclyAvailable(self):
+        return False
 # ---------------------------------------------------------
 
 class TubeSegmentationFramework(CppComponent):
@@ -445,8 +389,9 @@ class TubeSegmentationFramework(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
-        add('USE_C++11', False)
-        add('SIPL_USE_GTK', False)
+        add('USE_C++11:BOOL', False)
+        add('SIPL_USE_GTK:BOOL', False)
+        add('sipl_use_gtk:BOOL', False) #variables in cmake are case sensitive, SIPL uses this options
         add('TSF_USE_EXTRNAL_OUL:BOOL', True)
         add('TSF_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
         builder.configureCMake()
@@ -463,11 +408,11 @@ class LevelSetSegmentation(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:smistad/Level-Set-Segmentation')
     def update(self):
-        self._getBuilder().gitCheckout('b24f6a652cf7cfc4907be354d68260caa7773f56', submodules=True)
+        self._getBuilder().gitCheckout('6bf9277ac604ecf6f10c0a70d9e04ae5489c2060', submodules=True)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
-        add('sipl_use_gtk', False)
+        add('sipl_use_gtk:BOOL', False)
         add('LS_USE_EXTRNAL_OUL:BOOL', True)
         add('LS_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
         builder.configureCMake()
@@ -484,7 +429,7 @@ class OpenCLUtilityLibrary(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:smistad/OpenCLUtilityLibrary')
     def update(self):
-        self._getBuilder().gitCheckout('f962d5f66b6471e8df2fc2222f8a8e071e698acf', submodules=False)
+        self._getBuilder().gitCheckout('8b13121582b791b16e68ef4537df81746953eb28', submodules=False)
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()
@@ -507,7 +452,6 @@ class CustusX3Data(CppComponent):
         self._getBuilder().gitClone('ssh://%s'%self.gitRepository(), self.sourceFolder())
     def update(self):
         self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag())    
-#        self._getBuilder().gitUpdate('master')    
     def configure(self):
         pass
     def build(self):
@@ -516,7 +460,8 @@ class CustusX3Data(CppComponent):
         return 'medtek.sintef.no//Volumes/medtek_HD/git/Data.git'
     def makeClean(self):
         pass
+    def isPubliclyAvailable(self):
+        return False
 # ---------------------------------------------------------
-
 
 

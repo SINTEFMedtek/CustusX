@@ -25,14 +25,15 @@
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "sscProbeData.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxProbe.h"
 #include "cxIgstkTool.h"
+#include "cxTrackingPositionFilter.h"
 
 namespace cx
 {
 
-cxTool::cxTool(ToolManager* manager, IgstkToolPtr igstkTool) :
+cxTool::cxTool(TrackingServicePtr manager, IgstkToolPtr igstkTool) :
 	ToolImpl(manager, ""),
 				mTool(igstkTool), mPolyData(NULL),
 				mValid(false), mConfigured(false), mTracked(false)
@@ -56,7 +57,7 @@ cxTool::cxTool(ToolManager* manager, IgstkToolPtr igstkTool) :
 						mTool->getInternalStructure().mInstrumentScannerId);
 		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 	}
-	connect(mManager, SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
+	connect(this->getTrackingService().get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }
 
 cxTool::~cxTool()
@@ -116,15 +117,16 @@ double cxTool::getTooltipOffset() const
 {
 	if(this->getProbe())
 		return this->getProbe()->getProbeData().getDepthStart();
-	else
-		return mManager->getTooltipOffset();
+	return ToolImpl::getTooltipOffset();
+//		return this->getTrackingService()->getTooltipOffset();
 }
 
 void cxTool::setTooltipOffset(double val)
 {
 	if(this->getProbe())
 		return;
-	mManager->setTooltipOffset(val);
+	ToolImpl::setTooltipOffset(val);
+//	this->getTrackingService()->setTooltipOffset(val);
 }
 
 bool cxTool::isValid() const
@@ -235,7 +237,19 @@ void cxTool::parseXml(QDomNode& dataNode)
 
 void cxTool::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)
 {
-	ToolImpl::set_prMt(matrix, timestamp);
+	Transform3D prMt_filtered = matrix;
+
+	if (mTrackingPositionFilter)
+	{
+		mTrackingPositionFilter->addPosition(matrix, timestamp);
+		prMt_filtered = mTrackingPositionFilter->getFilteredPosition();
+	}
+
+	(*mPositionHistory)[timestamp] = matrix; // store original in history
+	m_prMt = prMt_filtered;
+	emit toolTransformAndTimestamp(m_prMt, timestamp);
+
+//	ToolImpl::set_prMt(matrix, timestamp);
 }
 
 void cxTool::calculateTpsSlot()

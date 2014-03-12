@@ -13,11 +13,12 @@
 // See CustusX_License.txt for more information.
 
 #include "cxToolImpl.h"
+#include "sscToolManager.h"
 
 namespace cx
 {
 
-ToolImpl::ToolImpl(ToolManager* manager, const QString& uid, const QString& name) :
+ToolImpl::ToolImpl(TrackingServicePtr manager, const QString& uid, const QString& name) :
 	Tool(uid, name),
 	mPositionHistory(new TimedTransformMap()),
 	m_prMt(Transform3D::Identity()),
@@ -29,6 +30,30 @@ ToolImpl::ToolImpl(ToolManager* manager, const QString& uid, const QString& name
 ToolImpl::~ToolImpl()
 {
 
+}
+
+TrackingServicePtr ToolImpl::getTrackingService()
+{
+	return mManager.lock();
+}
+TrackingServicePtr ToolImpl::getTrackingService() const
+{
+	return mManager.lock();
+}
+
+// Just use the tool tip offset from the tool manager
+double ToolImpl::getTooltipOffset() const
+{
+	if (this->getTrackingService())
+		return this->getTrackingService()->getTooltipOffset();
+	return 0;
+}
+
+// Just use the tool tip offset from the tool manager
+void ToolImpl::setTooltipOffset(double val)
+{
+	if (this->getTrackingService())
+		this->getTrackingService()->setTooltipOffset(val);
 }
 
 TimedTransformMapPtr ToolImpl::getPositionHistory()
@@ -57,6 +82,10 @@ void ToolImpl::set_prMt(const Transform3D& prMt, double timestamp)
 	emit toolTransformAndTimestamp(m_prMt, timestamp);
 }
 
+void ToolImpl::resetTrackingPositionFilter(TrackingPositionFilterPtr filter)
+{
+	mTrackingPositionFilter = filter;
+}
 
 } // namespace cx
 

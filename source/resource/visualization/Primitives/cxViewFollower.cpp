@@ -27,12 +27,12 @@
 namespace cx
 {
 
-ViewFollowerPtr ViewFollower::create(DataManager* dataManager)
+ViewFollowerPtr ViewFollower::create(DataServicePtr dataManager)
 {
 	return ViewFollowerPtr(new ViewFollower(dataManager));
 }
 
-ViewFollower::ViewFollower(DataManager* dataManager) :
+ViewFollower::ViewFollower(DataServicePtr dataManager) :
 	mDataManager(dataManager)
 {
 

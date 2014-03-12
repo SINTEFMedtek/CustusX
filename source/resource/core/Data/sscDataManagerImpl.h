@@ -36,23 +36,23 @@ class QDomElement;
 namespace cx
 {
 
-
-/**
- * \date Jan 6, 2009
- * \author christiana
- */
+typedef boost::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
 
 /**\brief Default implementation of DataManager.
  *
  * Used by CustusX.
  *
- * \ingroup sscData
+ * \ingroup cx_resource_core_data
+ * \date Jan 6, 2009
+ * \author christiana
  */
 class DataManagerImpl: public DataManager
 {
 Q_OBJECT
 public:
-	static void initialize();
+	static DataManagerImplPtr create();
+	virtual ~DataManagerImpl();
+//	static void initialize();
 	void setSpaceProvider(SpaceProviderPtr spaceProvider);
 	void setDataFactory(DataFactoryPtr dataFactory);
 
@@ -110,10 +110,13 @@ public:
 	virtual RegistrationHistoryPtr get_rMpr_History();
 
 	virtual LandmarksPtr getPatientLandmarks();
+	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
+
+	virtual bool getDebugMode() const;
+	virtual void setDebugMode(bool on);
 
 protected:
 	DataManagerImpl();
-	virtual ~DataManagerImpl();
 	virtual void verifyParentFrame(DataPtr data); ///< checks if data has a valid frameOfReferenceUid, generates and adds it if not
 
 protected:
@@ -135,6 +138,9 @@ protected:
 	LandmarkPropertyMap mLandmarkProperties; ///< uid and name
 	RegistrationHistoryPtr m_rMpr_History; ///< transform from the patient reference to the reference, along with historical data.
 	LandmarksPtr mPatientLandmarks; ///< in space patient reference.
+	bool mDebugMode; ///< if set: allow lots of weird debug stuff.
+	mutable PresetTransferFunctions3DPtr mPresetTransferFunctions3D;
+
 	SpaceProviderPtr mSpaceProvider;
 	DataFactoryPtr mDataFactory;
 

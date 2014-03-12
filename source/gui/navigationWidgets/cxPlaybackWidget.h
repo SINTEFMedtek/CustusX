@@ -22,6 +22,7 @@
 #include "sscVector3D.h"
 #include "sscRegistrationTransform.h"
 #include "cxPlaybackTime.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
@@ -31,7 +32,7 @@ class TimelineWidget;
 /**\brief Widget interface to PlaybackTime
  *
  *
- * \ingroup cxGUI
+ * \ingroup cx_gui
  * \date Mar 29, 2012
  * \author Christian Askeland, SINTEF
  */

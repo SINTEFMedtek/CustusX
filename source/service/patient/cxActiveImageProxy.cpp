@@ -13,16 +13,18 @@
 // See CustusX_License.txt for more information.
 
 #include "cxActiveImageProxy.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
+#include "sscImage.h"
 
 namespace cx
 {
 
-ActiveImageProxy::ActiveImageProxy()
+ActiveImageProxy::ActiveImageProxy(DataServicePtr dataManager) :
+	mDataManager(dataManager)
 {
-	connect(dataManager(), SIGNAL(activeImageChanged(const QString&)), this,
+	connect(mDataManager.get(), SIGNAL(activeImageChanged(const QString&)), this,
 					SLOT(activeImageChangedSlot(const QString&)));
-	connect(dataManager(), SIGNAL(activeImageChanged(const QString&)), this,
+	connect(mDataManager.get(), SIGNAL(activeImageChanged(const QString&)), this,
 					SIGNAL(activeImageChanged(const QString&)));
 
 }
@@ -43,7 +45,7 @@ void ActiveImageProxy::activeImageChangedSlot(const QString& uid)
 		disconnect(mImage.get(), SIGNAL(clipPlanesChanged()), this, SIGNAL(clipPlanesChanged()));
 		disconnect(mImage.get(), SIGNAL(cropBoxChanged()), this, SIGNAL(cropBoxChanged()));
 	}
-	mImage = dataManager()->getActiveImage();
+	mImage = mDataManager->getActiveImage();
 	if (mImage)
 	{
 		connect(mImage.get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));

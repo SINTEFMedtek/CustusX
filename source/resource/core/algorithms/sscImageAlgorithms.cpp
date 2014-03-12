@@ -38,7 +38,7 @@ namespace cx
 /** Return an image that is resampled into space q.
  *  The image is not added to the data manager nor saved.
  */
-ImagePtr resampleImage(DataManager *dataManager, ImagePtr image, Transform3D qMd)
+ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, Transform3D qMd)
 {
 	//TODO: fix error:
 	// There is an error in the transfer functions of the returned image from this function
@@ -71,7 +71,7 @@ ImagePtr resampleImage(DataManager *dataManager, ImagePtr image, Transform3D qMd
 /** Return an image that is resampled with a new output spacing.
  *  The image is not added to the data manager nor saved.
  */
-ImagePtr resampleImage(DataManager *dataManager, ImagePtr image, const Vector3D spacing, QString uid, QString name)
+ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, const Vector3D spacing, QString uid, QString name)
 {
 //  std::cout << "oldspacing: " << Vector3D(image->getBaseVtkImageData()->GetSpacing()) << std::endl;
 //  std::cout << "spacing: " << spacing << std::endl;
@@ -97,7 +97,7 @@ ImagePtr resampleImage(DataManager *dataManager, ImagePtr image, const Vector3D 
 /** Return an image that is cropped using its own croppingBox.
  *  The image is not added to the data manager nor saved.
  */
-ImagePtr duplicateImage(DataManager *dataManager, ImagePtr image)
+ImagePtr duplicateImage(DataServicePtr dataManager, ImagePtr image)
 {
 	Vector3D spacing(image->getBaseVtkImageData()->GetSpacing());
 	return resampleImage(dataManager, image, spacing, image->getUid()+"_copy%1", image->getName()+" copy%1");
@@ -123,7 +123,7 @@ vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox)
 /** Return an image that is cropped using its own croppingBox.
  *  The image is not added to the data manager nor saved.
  */
-ImagePtr cropImage(DataManager* dataManager, ImagePtr image)
+ImagePtr cropImage(DataServicePtr dataManager, ImagePtr image)
 {
   DoubleBoundingBox3D bb = image->getCroppingBox();
   double* sp = image->getBaseVtkImageData()->GetSpacing();

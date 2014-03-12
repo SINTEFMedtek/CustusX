@@ -26,6 +26,7 @@
 #include "boost/scoped_ptr.hpp"
 #include "sscTransform3D.h"
 #include "sscIndent.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
@@ -34,6 +35,12 @@ class SliceComputer;
 // forward declarations
 typedef boost::shared_ptr<class Tool> ToolPtr;
 typedef boost::shared_ptr<class SliceProxyInterface> SliceProxyInterfacePtr;
+
+/**
+* \file
+* \addtogroup cx_resource_core_tool
+* @{
+*/
 
 
 class SliceProxyInterface : public QObject
@@ -76,13 +83,12 @@ typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
  * Used as the slicer in Sonowand.
  * Used as the slicer in CustusX.
  *
- * \ingroup sscProxy
  */
 class SliceProxy : public SliceProxyInterface
 {
 	Q_OBJECT
 public:
-	static SliceProxyPtr create(DataManager* dataManager);
+	static SliceProxyPtr create(DataServicePtr dataManager);
 	virtual ~SliceProxy();
 
 	void setTool(ToolPtr tool);
@@ -126,7 +132,7 @@ private slots:
 	void changed();
 
 private:
-	SliceProxy(cx::DataManager *dataManager);
+	SliceProxy(DataServicePtr dataManager);
 	Transform3D getSyntheticToolPos(const Vector3D& center) const;
 	ToolPtr mTool;
 	boost::scoped_ptr<SliceComputer> mCutplane;
@@ -134,8 +140,12 @@ private:
 	bool mAlwaysUseDefaultCenter; ///< use def center anyway
 //	QString mName; ///< for debug
 	bool mUseTooltipOffset;
-	DataManager* mDataManager;
+	DataServicePtr mDataManager;
 };
+
+/**
+* @}
+*/
 
 }
 

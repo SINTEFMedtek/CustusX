@@ -18,7 +18,7 @@
 #include <QString>
 #include <map>
 #include "boost/shared_ptr.hpp"
-//#include "cxToolManager.h"
+//#include "sscToolManager.h"
 #include "cxForwardDeclarations.h"
 #include "sscTransform3D.h"
 
@@ -28,7 +28,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxPluginAcquisition
+ * \addtogroup cx_plugin_acquisition
  * @{
  */
 

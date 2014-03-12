@@ -7,7 +7,7 @@
 #include <string>
 #include <QWidget>
 #include "sscForwardDeclarations.h"
-
+#include "cxLegacySingletons.h"
 class QTreeWidget;
 class QTreeWidgetItem;
 class QDomNode;
@@ -19,7 +19,7 @@ namespace cx
  * \class FrameTreeWidget
  *
  *\brief Widget for displaying the FrameForest object
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  *\date Sep 23, 2010
  *\\author Christian Askeland, SINTEF

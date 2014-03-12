@@ -7,7 +7,7 @@
 #include <sscImage.h>
 #include "sscForwardDeclarations.h"
 #include "cxActiveImageProxy.h"
-
+#include "cxLegacySingletons.h"
 class QRect;
 
 namespace cx
@@ -16,7 +16,7 @@ namespace cx
  * \class TransferFunctionAlphaWidget
  *
  * \brief
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * \date Mar 23, 2009
  * \\author Janne Beate Bakeng, SINTEF

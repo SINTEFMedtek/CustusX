@@ -153,6 +153,20 @@ typedef struct _close_plane
 	unsigned char padding; // Align with 4
 } close_plane_t;
 
+typedef struct _output_volume_type
+{
+	int3 size;
+	float3 spacing;
+    __global unsigned char* volume;
+} output_volume_type;
+
+#define CREATE_OUTPUT_VOLUME_TYPE(name, in_size, in_spacing, in_volume) \
+        output_volume_type name; \
+        name.size = in_size; \
+        name.spacing = in_spacing; \
+        name.volume = in_volume;
+
+
 /***************/
 /* End structs */
 /***************/
@@ -1356,23 +1370,28 @@ voxel_methods(int volume_xsize,
               float radius
 	)
 {
+  int3 volume_size = { volume_xsize, volume_ysize, volume_zsize };
+  float3 volume_spacing = { volume_xspacing, volume_yspacing, volume_zspacing };
+  int2 in_size = { in_xsize, in_ysize };
+  float2 in_spacing = { in_xspacing, in_yspacing };
+  CREATE_OUTPUT_VOLUME_TYPE(output_volume, volume_size, volume_spacing, out_volume);
 
 	int id = get_global_id(0);
 
-	int xcubes = (volume_xsize / CUBE_SIZE) + 1;
-	int ycubes = (volume_ysize / CUBE_SIZE) + 1;
+	int xcubes = (output_volume.size.x / CUBE_SIZE) + 1;
+	int ycubes = (output_volume.size.y / CUBE_SIZE) + 1;
+//	int xcubes = (volume_xsize / CUBE_SIZE) + 1;
+//	int ycubes = (volume_ysize / CUBE_SIZE) + 1;
 
-	int x_cube_id = id % xcubes;
-	int y_cube_id = (id / xcubes) % ycubes;
-	int z_cube_id = (id / (xcubes*ycubes));
+	int3 cube_id;
+	cube_id.x = id % xcubes;
+	cube_id.y = (id / xcubes) % ycubes;
+	cube_id.z = (id / (xcubes*ycubes));
 
-	int x_origin = x_cube_id * CUBE_SIZE;
-	int y_origin = y_cube_id * CUBE_SIZE;
-	int z_origin = z_cube_id * CUBE_SIZE;
-	/*	int x_origin = ((id % (volume_xsize / CUBE_SIZE)) + 1) * CUBE_SIZE;
-	int y_origin = (((id / (volume_xsize / CUBE_SIZE) + 1) % ((volume_ysize / CUBE_SIZE) + 1))) * CUBE_SIZE;
-	int z_origin = (((id / (volume_xsize / CUBE_SIZE) + 1) / ((volume_ysize / CUBE_SIZE) + 1))) * CUBE_SIZE; */
-
+	int3 origin = cube_id * CUBE_SIZE;
+//	int x_origin = x_cube_id * CUBE_SIZE;
+//	int y_origin = y_cube_id * CUBE_SIZE;
+//	int z_origin = z_cube_id * CUBE_SIZE;
 
 	#ifdef DEBUG
 	if(id == 5000)
@@ -1395,15 +1414,14 @@ voxel_methods(int volume_xsize,
 
 	int n_close_planes;
 
-	/* float4 voxel = {(x_origin + CUBE_SIZE/2) * volume_xspacing, */
-	/*                 (y_origin + CUBE_SIZE/2) * volume_yspacing, */
-	/*                 (z_origin + CUBE_SIZE/2)* volume_zspacing, */
-	/*                 1.0f}; */
-
-	float4 voxel = {(x_origin) * volume_xspacing,
-	                (y_origin) * volume_yspacing,
-	                (z_origin)* volume_zspacing,
+	float4 voxel = {(origin.x) * output_volume.spacing.x,
+	                (origin.y) * output_volume.spacing.y,
+	                (origin.z)* output_volume.spacing.z,
 	                1.0f};
+//	float4 voxel = {(x_origin) * volume_xspacing,
+//	                (y_origin) * volume_yspacing,
+//	                (z_origin)* volume_zspacing,
+//	                1.0f};
 
 
 	prepare_plane_eqs(plane_matrices, plane_eqs);
@@ -1411,13 +1429,13 @@ voxel_methods(int volume_xsize,
 
 	// Return if x/z is invalid
 
-	if(z_origin >= volume_zsize) return;
-	if(x_origin >= volume_xsize) return;
-	if(y_origin >= volume_ysize) return;
+	if(origin.z >= output_volume.size.z) return;
+	if(origin.x >= output_volume.size.x) return;
+	if(origin.y >= output_volume.size.y) return;
 
-	BOUNDS_CHECK(x_origin, 0, volume_xsize);
-	BOUNDS_CHECK(y_origin, 0, volume_ysize);
-	BOUNDS_CHECK(z_origin, 0, volume_zsize);
+	BOUNDS_CHECK(origin.x, 0, output_volume.size.x);
+	BOUNDS_CHECK(origin.y, 0, output_volume.size.y);
+	BOUNDS_CHECK(origin.z, 0, output_volume.size.z);
 
 	int multistart_guesses[MAX_MULTISTART_STARTS];
 
@@ -1425,15 +1443,15 @@ voxel_methods(int volume_xsize,
 	                                plane_eqs,
 	                                radius,
 	                                voxel,
-	                                volume_xspacing,
-	                                volume_yspacing,
-	                                volume_zspacing,
-	                                in_xspacing,
-	                                in_yspacing,
+	                                output_volume.spacing.x,
+	                                output_volume.spacing.y,
+	                                output_volume.spacing.z,
+	                                in_spacing.x,
+	                                in_spacing.y,
 	                                plane_matrices,
 	                                mask,
-	                                in_xsize,
-	                                in_ysize);
+	                                in_size.x,
+	                                in_size.y);
 
 #ifdef DEBUG
 	for(int i = 0; i < nGuesses; i++)
@@ -1444,35 +1462,14 @@ voxel_methods(int volume_xsize,
 	}
 #endif
 
-/* #ifdef DEBUG */
-/* 	int hasSmaller = 0; */
-/* 	for(int i = 0; i < nGuesses; i++) */
-/* 	{ */
-/* 		if(fabs(dot(voxel, plane_eqs[multistart_guesses[i]])) < radius) */
-/* 			hasSmaller = 1; */
-/* 	} */
-/* 	if(hasSmaller == 0) */
-/* 	{ */
-/* 		printf("Voxel %d, %d, %d has no close guess. Guesses:\n", */
-/* 		       x_origin, */
-/* 		       y_origin, */
-/* 		       z_origin); */
-/* 		for(int i = 0; i < nGuesses; i++) */
-/* 		{ */
-/* 			printf("%d: %f\n", multistart_guesses[i], */
-/* 			       fabs(dot(voxel, plane_eqs[multistart_guesses[i]]))); */
-/* 		} */
-/* 	} */
-/* #endif */
-
 	int2 close_planes_ret;
 	// Iterate over the axes such that the the
 	// next voxel is always a neighbour of the previous voxel
 	for(int xoffset = 0; xoffset < CUBE_SIZE; xoffset++)
 	{
-		int x = x_origin + xoffset;
-		if(x >= volume_xsize) break;
-		BOUNDS_CHECK(x, 0, volume_xsize);
+		int x = origin.x + xoffset;
+		if(x >= output_volume.size.x) break;
+		BOUNDS_CHECK(x, 0, output_volume.size.x);
 
 		int ystart, yend, ydir;
 		if(xoffset % 2)
@@ -1489,9 +1486,9 @@ voxel_methods(int volume_xsize,
 
 		for(int yoffset = ystart; yoffset != yend ; yoffset+=ydir)
 		{
-			int y = y_origin + yoffset;
-			if(y >= volume_ysize) continue;
-			BOUNDS_CHECK(y, 0, volume_ysize);
+			int y = origin.y + yoffset;
+			if(y >= output_volume.size.y) continue;
+			BOUNDS_CHECK(y, 0, output_volume.size.y);
 
 			int zstart, zend, zdir;
 			if(yoffset % 2 && xoffset % 2)
@@ -1507,14 +1504,15 @@ voxel_methods(int volume_xsize,
 			}
 			for(int zoffset = zstart; zoffset != zend ; zoffset+=zdir)
 			{
-				int z = z_origin + zoffset;
-				if(z >= volume_zsize) continue;
-				BOUNDS_CHECK(z, 0, volume_zsize);
-				BOUNDS_CHECK(x, 0, volume_xsize);
-				BOUNDS_CHECK(y, 0, volume_ysize);
-				voxel.x = x * volume_xspacing;
-				voxel.y = y * volume_yspacing;
-				voxel.z = z * volume_zspacing;
+				int z = origin.z + zoffset;
+				if(z >= output_volume.size.z) continue;
+				BOUNDS_CHECK(z, 0, output_volume.size.z);
+				BOUNDS_CHECK(x, 0, output_volume.size.x);
+				BOUNDS_CHECK(y, 0, output_volume.size.y);
+				voxel.x = x;
+				voxel.y = y;
+				voxel.z = z;
+				voxel.xyz *= output_volume.spacing;
 
 				// Find all planes closer than radius
 
@@ -1526,10 +1524,10 @@ voxel_methods(int volume_xsize,
 				                                     multistart_guesses,
 				                                     nGuesses,
 				                                     mask,
-				                                     in_xsize,
-				                                     in_ysize,
-				                                     in_xspacing,
-				                                     in_yspacing);
+				                                     in_size.x,
+				                                     in_size.y,
+				                                     in_spacing.x,
+				                                     in_spacing.y);
 				n_close_planes = close_planes_ret.x;
 
 
@@ -1540,10 +1538,10 @@ voxel_methods(int volume_xsize,
 					                                                plane_matrices,
 					                                                plane_eqs,
 					                                                bscans_blocks,
-					                                                in_xsize,
-					                                                in_ysize,
-					                                                in_xspacing,
-					                                                in_yspacing,
+					                                                in_size.x,
+					                                                in_size.y,
+					                                                in_spacing.x,
+					                                                in_spacing.y,
 					                                                mask,
 					                                                voxel);
 

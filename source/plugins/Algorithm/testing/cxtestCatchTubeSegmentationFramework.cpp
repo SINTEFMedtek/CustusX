@@ -20,57 +20,57 @@
 namespace cxtest
 {
 
-TEST_CASE("TubeSegmentationFramework testConstructor works", "[integration]")
+TEST_CASE("TubeSegmentationFramework testConstructor works", "[integration][tsf]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testConstructor();
 	REQUIRE(true);
 }
 
-TEST_CASE("TubeSegmentationFramework can set parameters", "[integration]")
+TEST_CASE("TubeSegmentationFramework can set parameters", "[integration][tsf]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testParameters();
 }
 
-TEST_CASE("TubeSegmentationFramework can load parameter file", "[integration]")
+TEST_CASE("TubeSegmentationFramework can load parameter file", "[integration][tsf]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testLoadParameterFile();
 }
 
 //This test is tagged as unstable as it sometimes fails on OSX. Could be tagged as not_apple instead
-TEST_CASE("TubeSegmentationFramework default preset works", "[integration][unstable]")
+TEST_CASE("TubeSegmentationFramework default preset works", "[integration][unstable][tsf]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testDefaultPreset();
 }
 
-TEST_CASE("TubeSegmentationFramework SyntheticVascusynthPreset works", "[integration][not_apple][broken]")
+TEST_CASE("TubeSegmentationFramework SyntheticVascusynthPreset works", "[integration][not_apple][broken][tsf]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testSyntheticVascusynthPreset();
 }
 
-TEST_CASE("TubeSegmentationFramework PhantomAccUSPreset works", "[integration][not_apple][broken]")
+TEST_CASE("TubeSegmentationFramework PhantomAccUSPreset works", "[integration][not_apple][broken][tsf]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testPhantomAccUSPreset();
 }
 
-TEST_CASE("TubeSegmentationFramework NeuroVesselsMRAPreset works", "[integration][not_apple]")
+TEST_CASE("TubeSegmentationFramework NeuroVesselsMRAPreset works", "[integration][not_apple][tsf]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testNeuroVesselsMRAPreset();
 }
 
-TEST_CASE("TubeSegmentationFramework testNeuroVesselsUSAPreset works", "[integration][not_apple]")
+TEST_CASE("TubeSegmentationFramework testNeuroVesselsUSAPreset works", "[integration][not_apple][tsf]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testNeuroVesselsUSAPreset();
 }
 
-TEST_CASE("TubeSegmentationFramework testLungAirwaysCTPreset works", "[integration][not_apple]")
+TEST_CASE("TubeSegmentationFramework testLungAirwaysCTPreset works", "[integration][not_apple][tsf]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testLungAirwaysCTPreset();

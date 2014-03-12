@@ -26,26 +26,25 @@
 
 #include <vector>
 #include "sscVideoSource.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
 typedef boost::shared_ptr<class USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;
 typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
-
-//typedef boost::shared_ptr<class OpenIGTLinkDirectLinkRTSource> OpenIGTLinkDirectLinkRTSourcePtr;
-
+typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 
 /**
  * \file
- * \addtogroup cxServiceVideo
+ * \addtogroup cx_service_video
  * @{
  */
 
 /**
  * \brief Provides access to all video sources in the
  * system, and connection stuff for the sources.
- * \ingroup cxServiceVideo
+ * \ingroup cx_service_video
  *
  * \image html videoservice_simple.png "VideoService Overview"
  *
@@ -85,10 +84,12 @@ class VideoService: public QObject
 {
 Q_OBJECT
 public:
-	static VideoService* getInstance();
+	static VideoServicePtr create(VideoServiceBackendPtr backend);
+	virtual ~VideoService();
+//	static VideoServicePtr getInstance();
 
-	static void initialize();
-	static void shutdown();
+//	static void initialize(VideoServiceBackendPtr videoBackend);
+//	static void shutdown();
 
 	VideoConnectionManagerPtr getVideoConnection();
 	USAcquisitionVideoPlaybackPtr getUSAcquisitionVideoPlayback();
@@ -104,6 +105,7 @@ signals:
 	  * OR when the available set of sources are changed.
 	  */
 	void activeVideoSourceChanged();
+	void fps(int);
 
 private slots:
 	/** Autoselect the active VideoSource
@@ -113,12 +115,13 @@ private slots:
 	  * autoGuessVideoSource().
 	  */
 	void autoSelectActiveVideoSource();
-private:
-	static VideoService* mInstance;
-	static void setInstance(VideoService* instance);
+	void fpsSlot(QString source, int val);
 
-	VideoService();
-	virtual ~VideoService();
+private:
+//	static VideoServicePtr mInstance;
+//	static void setInstance(VideoServicePtr instance);
+
+	VideoService(VideoServiceBackendPtr videoBackend);
 
 	VideoService(VideoService const&); // not implemented
 	VideoService& operator=(VideoService const&); // not implemented
@@ -142,9 +145,10 @@ private:
 	VideoSourcePtr mActiveVideoSource;
 	VideoSourcePtr mEmptyVideoSource;
 	USAcquisitionVideoPlaybackPtr mUSAcquisitionVideoPlayback;
+	VideoServiceBackendPtr mBackend;
 };
 
-VideoService* videoService();
+//VideoServicePtr videoService();
 
 /**
  * @}

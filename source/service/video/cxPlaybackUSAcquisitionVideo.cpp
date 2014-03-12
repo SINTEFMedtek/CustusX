@@ -23,7 +23,7 @@
 #include "cxUsReconstructionFileReader.h"
 #include "sscTestVideoSource.h"
 #include "sscImageImportVideoSource.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxProbe.h"
 #include "sscUSFrameData.h"
 #include "cxPlaybackTime.h"
@@ -31,12 +31,16 @@
 #include "cxBasicVideoSource.h"
 #include "sscImage.h"
 #include "cxImageDataContainer.h"
+#include "cxVideoServiceBackend.h"
 
 namespace cx
 {
 
-USAcquisitionVideoPlayback::USAcquisitionVideoPlayback() : QObject(NULL), mVideoSourceUid("playback")
+USAcquisitionVideoPlayback::USAcquisitionVideoPlayback(VideoServiceBackendPtr backend) :
+	QObject(NULL),
+	mVideoSourceUid("playback")
 {
+	mBackend = backend;
 	mVideoSource.reset(new BasicVideoSource(mVideoSourceUid));
 	mVideoSource->setStatusString(QString("No US Acquisition"));
 
@@ -196,7 +200,7 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 	mVideoSource->start();
 
 	// set the probe sector from file data:
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
 	if (tool)
 	{
 		ProbePtr probe = boost::dynamic_pointer_cast<cxProbe>(tool->getProbe());

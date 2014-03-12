@@ -30,7 +30,7 @@ typedef boost::shared_ptr<class ColorDataAdapterXml> ColorDataAdapterXmlPtr;
 /** DataAdapter for QColor values.
  *
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_core_dataadapters
  * \date Nov 22, 2012
  * \author christiana
  */

@@ -26,17 +26,18 @@
 namespace cx
 {
 typedef boost::shared_ptr<class BasicVideoSource> BasicVideoSourcePtr;
+typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 
 /**
  * \file
- * \addtogroup cxServiceVideo
+ * \addtogroup cx_service_video
  * @{
  */
 
 /**\brief Handler for playback of US image data
  * from a US recording session.
  *
- * \ingroup cxServiceVideo
+ * \ingroup cx_service_video
  * \date Apr 11, 2012
  * \author Christian Askeland, SINTEF
  *
@@ -45,7 +46,7 @@ class USAcquisitionVideoPlayback : public QObject
 {
 	Q_OBJECT
 public:
-	USAcquisitionVideoPlayback();
+	explicit USAcquisitionVideoPlayback(VideoServiceBackendPtr backend);
 	virtual ~USAcquisitionVideoPlayback();
 	VideoSourcePtr getVideoSource();
 	void setRoot(const QString path);
@@ -75,6 +76,7 @@ private:
 	QFuture<USReconstructInputData> mUSImageDataFutureResult;
 	QFutureWatcher<USReconstructInputData> mUSImageDataFutureWatcher;
 
+	VideoServiceBackendPtr mBackend;
 };
 typedef boost::shared_ptr<USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;
 

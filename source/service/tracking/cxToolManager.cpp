@@ -41,19 +41,21 @@
 #include "cxPlaybackTool.h"
 #include "sscLogger.h"
 #include "cxPlaybackTime.h"
-#include "sscDataManager.h"
+#include "cxTrackingPositionFilter.h"
 
 namespace cx
 {
 
-void cxToolManager::initializeObject()
+cxToolManager::cxToolManagerPtr cxToolManager::create()
 {
-	ToolManager::setInstance(new cxToolManager());
-}
+	cxToolManagerPtr retval;
+	retval.reset(new cxToolManager());
+	retval->mSelf = retval;
 
-cxToolManager* cxToolManager::getInstance()
-{
-	return dynamic_cast<cxToolManager*>(ToolManager::getInstance());
+	retval->initializeManualTool(); // do this after setting self.
+	retval->setDominantTool("ManualTool");
+
+	return retval;
 }
 
 QStringList cxToolManager::getSupportedTrackingSystems()
@@ -74,10 +76,6 @@ cxToolManager::cxToolManager() :
 				mToolTipOffset(0)
 {
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
-
-	this->initializeManualTool();
-	this->setDominantTool("ManualTool");
-
 	// initialize config file
 	this->setConfigurationFile(DataLocations::getToolConfigFilePath());
 }
@@ -141,7 +139,7 @@ void cxToolManager::setPlaybackMode(PlaybackTimePtr controller)
 	{
 		if (iter->second==mManualTool)
 			continue; // dont wrap the manual tool
-		cx::PlaybackToolPtr current(new PlaybackTool(this, iter->second, controller));
+		cx::PlaybackToolPtr current(new PlaybackTool(mSelf.lock(), iter->second, controller));
 		mTools[current->getUid()] = current;
 
 		TimedTransformMapPtr history = iter->second->getPositionHistory();
@@ -206,15 +204,15 @@ void cxToolManager::initializeManualTool()
 	if (!mManualTool)
 	{
 		//adding a manual tool as default
-		mManualTool.reset(new ManualToolAdapter(this, "ManualTool"));
+		mManualTool.reset(new ManualToolAdapter(mSelf.lock(), "ManualTool"));
 		mTools["ManualTool"] = mManualTool;
 		mManualTool->setVisible(true);
 //    mManualTool->setVisible(settings()->value("showManualTool").toBool());
 		connect(mManualTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
 	}
 
-	Transform3D prMt = dataManager()->get_rMpr().inv() * createTransformRotateY(M_PI)
-					* createTransformRotateZ(M_PI/2);
+	Transform3D rMpr = Transform3D::Identity(); // not known: not really important either
+	Transform3D prMt = rMpr.inv() * createTransformRotateY(M_PI) * createTransformRotateZ(M_PI/2);
 	mManualTool->set_prMt(prMt);
 }
 
@@ -302,7 +300,7 @@ void cxToolManager::trackerConfiguredSlot(bool on)
 	for (; it != igstkTools.end(); ++it)
 	{
 		IgstkToolPtr igstkTool = it->second;
-		cxToolPtr tool(new cxTool(this, igstkTool));
+		cxToolPtr tool(new cxTool(mSelf.lock(), igstkTool));
 		if (tool->isValid())
 		{
 			if (igstkTool == reference)
@@ -664,11 +662,6 @@ void cxToolManager::setDominantTool(const QString& uid)
 	emit dominantToolChanged(uid);
 }
 
-void cxToolManager::setClinicalApplication(CLINICAL_APPLICATION application)
-{
-	mApplication = application;
-}
-
 std::map<QString, QString> cxToolManager::getToolUidsAndNames() const
 {
 	std::map<QString, QString> uidsAndNames;
@@ -863,10 +856,31 @@ void cxToolManager::configureAfterDeconfigureSlot()
 
 void cxToolManager::globalConfigurationFileChangedSlot(QString key)
 {
-	if (key != "toolConfigFile")
-		return;
+	if (key == "toolConfigFile")
+	{
+		this->setConfigurationFile(DataLocations::getToolConfigFilePath());
+	}
+	if (key.contains("TrackingPositionFilter"))
+	{
+		this->resetTrackingPositionFilters();
+	}
+}
 
-	this->setConfigurationFile(DataLocations::getToolConfigFilePath());
+void cxToolManager::resetTrackingPositionFilters()
+{
+	bool enabled = settings()->value("TrackingPositionFilter/enabled", false).toInt();
+
+	for (ToolMap::iterator iter=mTools.begin(); iter!=mTools.end(); ++iter)
+	{
+		boost::shared_ptr<ToolImpl> tool;
+		tool = boost::dynamic_pointer_cast<ToolImpl>(iter->second);
+		if (!tool)
+			continue;
+		TrackingPositionFilterPtr filter;
+		if (enabled)
+			filter.reset(new TrackingPositionFilter());
+		tool->resetTrackingPositionFilter(filter);
+	}
 }
 
 void cxToolManager::dominantCheckSlot()

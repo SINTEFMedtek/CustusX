@@ -24,12 +24,14 @@
 #include <QFile>
 #include "cxTimedAlgorithm.h"
 #include "sscMessageManager.h"
+#include "cxLegacySingletons.h"
+
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup cxPluginRegistration
+ * \addtogroup cx_plugin_registration
  * @{
  */
 

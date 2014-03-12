@@ -26,16 +26,17 @@ namespace cx
 
 typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
 typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
+typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 
 /**
 * \file
-* \addtogroup cxServiceVideo
+* \addtogroup cx_service_video
 * @{
 */
 
 /**\brief
  *
- * \ingroup cxServiceVideo
+ * \ingroup cx_service_video
  *
  *  \date Jan 25, 2011
  *  \author Christian Askeland, SINTEF
@@ -44,7 +45,7 @@ class VideoConnectionManager: public QObject
 {
 Q_OBJECT
 public:
-	VideoConnectionManager();
+	explicit VideoConnectionManager(VideoServiceBackendPtr backend);
 	virtual ~VideoConnectionManager();
 
 	StringDataAdapterXmlPtr getConnectionMethod();
@@ -80,7 +81,7 @@ public:
 	bool isConnected() const;
 
 signals:
-	void fps(int fps);
+	void fps(QString source, int fps);
 	void connected(bool on);
 	void videoSourcesChanged();
 	void connectionMethodChanged();
@@ -104,6 +105,7 @@ private:
 
 	StringDataAdapterXmlPtr mConnectionMethod;
 	XmlOptionFile mOptions;
+	VideoServiceBackendPtr mBackend;
 
 };
 typedef boost::shared_ptr<VideoConnectionManager> VideoConnectionManagerPtr;

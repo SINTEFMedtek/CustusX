@@ -36,6 +36,7 @@
 #include "sscVector3DDataAdapterXml.h"
 #include "cxDataMetricWrappers.h"
 #include "cxFrameMetric.h"
+#include "cxLegacySingletons.h"
 
 class QVBoxLayout;
 class QTableWidget;
@@ -47,7 +48,7 @@ typedef boost::shared_ptr<class MetricManager> MetricManagerPtr;
 
 
 /**
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  */
 class MetricWidget : public BaseWidget
@@ -105,6 +106,7 @@ private:
   void initializeTable();
   void updateTableContents();
   void expensizeColumnResize();
+  void updateMetricWrappers();
 
   QAction* createAction(QActionGroup* group, QString iconName, QString text, QString tip, const char* slot);
 

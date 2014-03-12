@@ -24,7 +24,7 @@ namespace cx
 {
 
 /**
- * \ingroup cxGUI
+ * \ingroup cx_gui
  */
 class ShadingWidget : public BaseWidget
 {

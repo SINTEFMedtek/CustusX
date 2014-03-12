@@ -26,7 +26,7 @@ namespace cx {
  *
  * \brief
  *
- * \ingroup cxPluginAlgorithm
+ * \ingroup cx_plugin_algorithm
  *
  * \date Mar 18, 2013
  * \author Janne Beate Bakeng, SINTEF

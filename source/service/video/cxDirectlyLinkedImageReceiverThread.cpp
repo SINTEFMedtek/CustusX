@@ -21,8 +21,9 @@
 #include "cxCyclicActionLogger.h"
 #include "cxDirectlyLinkedSender.h"
 #include "cxSimulatedImageStreamer.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "sscDataManager.h"
+#include "cxVideoServiceBackend.h"
 
 namespace cx
 {
@@ -30,6 +31,11 @@ namespace cx
 DirectlyLinkedImageReceiverThread::DirectlyLinkedImageReceiverThread(StringMap args, QObject* parent) :
 		ImageReceiverThread(parent), mArguments(args)
 {}
+
+void DirectlyLinkedImageReceiverThread::setBackend(VideoServiceBackendPtr backend)
+{
+	mBackend = backend;
+}
 
 void DirectlyLinkedImageReceiverThread::run()
 {
@@ -54,7 +60,7 @@ void DirectlyLinkedImageReceiverThread::run()
 		this->quit();
 	emit connected(true);
 
-	mFPSTimer->reset(2000);
+//	mFPSTimer->reset(2000);
 
 	this->exec();
 
@@ -90,14 +96,14 @@ SimulatedImageStreamerPtr DirectlyLinkedImageReceiverThread::createSimulatedImag
 {
 	SimulatedImageStreamerPtr streamer(new SimulatedImageStreamer());
 
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
 	if(!tool)
 		messageManager()->sendDebug("No tool");
-	ImagePtr image = DataManager::getInstance()->getImage(mImageUidToSimulate);
+	ImagePtr image = mBackend->getDataManager()->getImage(mImageUidToSimulate);
 	if(!image)
 		messageManager()->sendDebug("No image with uid "+mImageUidToSimulate);
 
-	streamer->initialize(image, tool);
+	streamer->initialize(image, tool, mBackend->getDataManager());
 	connect(this, SIGNAL(imageToStream(QString)), streamer.get(), SLOT(setSourceToImageSlot(QString)));
 
 	return streamer;

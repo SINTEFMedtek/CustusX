@@ -25,14 +25,14 @@ class DataManager;
 /** Factory for creating cx::Data objects
  *
  *
- * \ingroup sscData
+ * \ingroup cx_resource_core_data
  * \date 2014-02-22
  * \author christiana
  */
 class DataFactory
 {
 public:
-	explicit DataFactory(DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	explicit DataFactory(DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	DataPtr create(QString type, QString uid, QString name="");
 
@@ -43,7 +43,7 @@ public:
 		return boost::dynamic_pointer_cast<T>(retval);
 	}
 private:
-	DataManager* mDataManager;
+	DataServicePtr mDataManager;
 	SpaceProviderPtr mSpaceProvider;
 };
 typedef boost::shared_ptr<DataFactory> DataFactoryPtr;

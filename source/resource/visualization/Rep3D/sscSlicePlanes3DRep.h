@@ -34,7 +34,7 @@ namespace cx
 {
 class DataManager;
 
-/**\brief Helper class for managing a set of slice planes.
+/** \brief Helper class for managing a set of slice planes.
  *
  * Use this to manage a set of slice planes
  * (represented by SliceProxy) that are used as a group.
@@ -43,7 +43,7 @@ class DataManager;
  *
  * \sa SlicePlanes3DRep SlicePlanes3DMarkerIn2DRep
  *
- * \ingroup sscProxy
+ * \ingroup cx_resource_visualization
  */
 class SlicePlanesProxy : public QObject
 {
@@ -77,7 +77,7 @@ public:
 
 	void clearViewports();
 	void setViewportData(PLANE_TYPE type, SliceProxyPtr slice, const DoubleBoundingBox3D& vp_s);
-	void addSimpleSlicePlane(PLANE_TYPE type, DataManager *dataManager);
+	void addSimpleSlicePlane(PLANE_TYPE type, DataServicePtr dataManager);
 	DataMap getData();
 
 	void setVisible(bool visible);
@@ -110,8 +110,9 @@ typedef boost::shared_ptr<class SlicePlanes3DRep> SlicePlanes3DRepPtr;
  *
  * \sa SlicePlanesProxy SlicePlanes3DMarkerIn2DRep
  *
- * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup cx_resource_visualization
+
+ * \ingroup cx_resource_visualization_rep3D
  */
 class SlicePlanes3DRep : public RepImpl
 {
@@ -160,8 +161,9 @@ typedef boost::shared_ptr<class SlicePlanes3DMarkerIn2DRep> SlicePlanes3DMarkerI
  *
  * \sa SlicePlanesProxy SlicePlanes3DRep
  *
- * \ingroup sscRep
- * \ingroup sscRep2D
+ * \ingroup cx_resource_visualization
+
+ * \ingroup cx_resource_visualization_rep2D
  */
 class SlicePlanes3DMarkerIn2DRep : public RepImpl
 {

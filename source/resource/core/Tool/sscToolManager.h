@@ -36,6 +36,7 @@ namespace cx
 
 typedef std::map<ToolPtr, TimedTransformMap> SessionToolHistoryMap;
 typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
+typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 
 /**\brief Manager interface for tools and tracking systems.
  *
@@ -45,7 +46,7 @@ typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
  * Implementations of ToolManager typically connect to
  * a physical tracking system.
  *
- * \ingroup sscTool
+ * \ingroup cx_resource_core_tool
  */
 class ToolManager: public QObject
 {
@@ -54,10 +55,10 @@ public:
 	typedef std::map<QString, ToolPtr> ToolMap;
 	typedef boost::shared_ptr<ToolMap> ToolMapPtr;
 
-	/** not sure if this is needed? we have getInstance in subclasses...*/
-	static void setInstance(ToolManager* instance); ///< must call this one before calling getInstance()
-	static ToolManager* getInstance();
-	static void shutdown();
+//	/** not sure if this is needed? we have getInstance in subclasses...*/
+//	static void setInstance(TrackingServicePtr instance); ///< must call this one before calling getInstance()
+//	static TrackingServicePtr getInstance();
+//	static void shutdown();
 
 	virtual bool isConfigured() const = 0; ///< system is ready to use but not connected to hardware
 	virtual bool isInitialized() const = 0; ///< system is connected to hw and ready
@@ -92,6 +93,18 @@ public:
 	virtual void parseXml(QDomNode& dataNode) = 0;
 	virtual void clear() = 0;
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime) = 0;
+	virtual ToolPtr findFirstProbe() = 0;
+	virtual void setLoggingFolder(QString loggingFolder) {}
+
+	virtual bool isPlaybackMode() const { return false; }
+	virtual void setPlaybackMode(PlaybackTimePtr controller) {}
+
+	virtual void runDummyTool(DummyToolPtr tool) {}
+	virtual QStringList getSupportedTrackingSystems() { return QStringList(); }
+
+public slots:
+	virtual void deconfigure() {}
+	virtual void saveToolsSlot() {}
 
 signals:
 	void configured(); ///< system is configured
@@ -113,11 +126,11 @@ protected:
 	{
 	} ///< Empty on purpose
 
-	static ToolManager* mInstance; ///< The only instance of this class that can exist.
+//	static TrackingServicePtr mInstance; ///< The only instance of this class that can exist.
 };
 
 /**Shortcut for accessing the toolmanager instance.*/
-ToolManager* toolManager();
+//TrackingServicePtr toolManager();
 
 } //namespace cx
 #endif /* SSCTOOLMANAGER_H_ */

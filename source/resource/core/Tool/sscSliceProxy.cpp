@@ -28,20 +28,20 @@
 namespace cx
 {
 
-SliceProxyPtr SliceProxy::create(DataManager *dataManager)
+SliceProxyPtr SliceProxy::create(DataServicePtr dataManager)
 {
 	SliceProxyPtr retval(new SliceProxy(dataManager));
 	return retval;
 }
 
-SliceProxy::SliceProxy(DataManager* dataManager) :
+SliceProxy::SliceProxy(DataServicePtr dataManager) :
 	mCutplane(new SliceComputer())
 {
 	mDataManager = dataManager;
 	mAlwaysUseDefaultCenter = false;
 	mUseTooltipOffset = true;
-	connect(mDataManager, SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
-	connect(mDataManager, SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
+	connect(mDataManager.get(), SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
+	connect(mDataManager.get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
 	//TODO connect to toolmanager rMpr changed
 	mDefaultCenter = mDataManager->getCenter();
 	this->centerChangedSlot();

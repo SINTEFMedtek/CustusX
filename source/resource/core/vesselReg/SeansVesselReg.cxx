@@ -730,50 +730,50 @@ void SeansVesselReg::printOutResults(QString fileNamePrefix, vtkGeneralTransform
 	file_out2.close();
 }
 
-/**Not used and probably buggy
- *
- */
-ImagePtr SeansVesselReg::loadMinc(char* p_dataFile)
-{
-	time_t sec1 = clock();
-	std::cout << "Reading " << p_dataFile << " -> ";
-	std::cout.flush();
+///**Not used and probably buggy
+// *
+// */
+//ImagePtr SeansVesselReg::loadMinc(char* p_dataFile)
+//{
+//	time_t sec1 = clock();
+//	std::cout << "Reading " << p_dataFile << " -> ";
+//	std::cout.flush();
 
-	//Read data input file
-	vtkMINCImageReaderPtr l_dataReader = vtkMINCImageReaderPtr::New();
-	l_dataReader->SetFileName(p_dataFile);
-	l_dataReader->Update();
+//	//Read data input file
+//	vtkMINCImageReaderPtr l_dataReader = vtkMINCImageReaderPtr::New();
+//	l_dataReader->SetFileName(p_dataFile);
+//	l_dataReader->Update();
 
-	double l_dataOrigin[3];
-	l_dataReader->GetOutput()->GetOrigin(l_dataOrigin);
-	std::cout << (clock() - sec1) / (double) CLOCKS_PER_SEC << " secs...DONE -> Processing...";
-	std::cout.flush();
-	int l_dimensions[3];
-	l_dataReader->GetOutput()->GetDimensions(l_dimensions);
+//	double l_dataOrigin[3];
+//	l_dataReader->GetOutput()->GetOrigin(l_dataOrigin);
+//	std::cout << (clock() - sec1) / (double) CLOCKS_PER_SEC << " secs...DONE -> Processing...";
+//	std::cout.flush();
+//	int l_dimensions[3];
+//	l_dataReader->GetOutput()->GetDimensions(l_dimensions);
 
-	//set the transform
-	vtkTransformPtr l_dataTransform = vtkTransformPtr::New();
-	l_dataTransform->SetMatrix(l_dataReader->GetDirectionCosines());
-	l_dataTransform->Translate(l_dataReader->GetDataOrigin());
-	l_dataTransform->GetInverse()->TransformPoint(l_dataOrigin, l_dataOrigin);
-	l_dataTransform->Translate(l_dataOrigin);
-	l_dataTransform->Scale(l_dataReader->GetOutput()->GetSpacing());
+//	//set the transform
+//	vtkTransformPtr l_dataTransform = vtkTransformPtr::New();
+//	l_dataTransform->SetMatrix(l_dataReader->GetDirectionCosines());
+//	l_dataTransform->Translate(l_dataReader->GetDataOrigin());
+//	l_dataTransform->GetInverse()->TransformPoint(l_dataOrigin, l_dataOrigin);
+//	l_dataTransform->Translate(l_dataOrigin);
+//	l_dataTransform->Scale(l_dataReader->GetOutput()->GetSpacing());
 
-	Transform3D rMd(l_dataTransform->GetMatrix());
+//	Transform3D rMd(l_dataTransform->GetMatrix());
 
-	// TODO: ensure rMd is correct in CustusX terms
+//	// TODO: ensure rMd is correct in CustusX terms
 
-	QFile file(p_dataFile);
-	QFileInfo info(file);
-	QString uid(info.completeBaseName() + "_minc_%1");
-	QString name = uid;
+//	QFile file(p_dataFile);
+//	QFileInfo info(file);
+//	QString uid(info.completeBaseName() + "_minc_%1");
+//	QString name = uid;
 
-	ImagePtr image = dataManager()->createImage(l_dataReader->GetOutput(), uid, name);
-	image->get_rMd_History()->addRegistration(RegistrationTransform(rMd, QDateTime::currentDateTime(),
-		"from Minc file"));
+//	ImagePtr image = dataManager()->createImage(l_dataReader->GetOutput(), uid, name);
+//	image->get_rMd_History()->addRegistration(RegistrationTransform(rMd, QDateTime::currentDateTime(),
+//		"from Minc file"));
 
-	return image;
-}
+//	return image;
+//}
 
 /** Input an image representation of centerlines.
  *  Transform to polydata, reject all data outside bounding box,

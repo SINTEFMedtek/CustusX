@@ -145,7 +145,7 @@ MeshPtr WirePhantomWidget::loadNominalCross()
 
 void WirePhantomWidget::showData(DataPtr data)
 {
-    viewManager()->getViewGroups()[0]->getData()->addData(data);
+	viewManager()->getViewGroups()[0]->getData()->addData(data);
 }
 
 void WirePhantomWidget::measureSlot()

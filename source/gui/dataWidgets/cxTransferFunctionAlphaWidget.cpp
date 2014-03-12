@@ -25,7 +25,7 @@ TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(QWidget* parent) :
 {
 	this->setFocusPolicy(Qt::StrongFocus);
 
-  mActiveImageProxy = ActiveImageProxy::New();
+	mActiveImageProxy = ActiveImageProxy::New(dataService());
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageTransferFunctionsChangedSlot()));
 
   mSelectedAlphaPoint.reset();

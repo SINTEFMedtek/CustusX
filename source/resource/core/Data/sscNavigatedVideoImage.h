@@ -32,6 +32,9 @@ namespace cx
  * that can be used in 2D views to combine the video source with
  * slices of other images. This image is allways registered in a
  * particular way to a tool specified using a SliceProxy.
+ *
+ * \ingroup cx_resource_core_data
+ *
  */
 class NavigatedVideoImage: public Image
 {

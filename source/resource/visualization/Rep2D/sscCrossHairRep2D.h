@@ -43,8 +43,8 @@ typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
  *
  * This is a simple Rep that can be used instead of the more elaborate ToolRep2D.
  *
- * \ingroup sscRep
- * \ingroup sscRep2D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep2D
  */
 class CrossHairRep2D : public RepImpl
 {

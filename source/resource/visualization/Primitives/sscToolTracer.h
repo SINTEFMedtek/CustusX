@@ -40,13 +40,13 @@ namespace cx
 typedef boost::shared_ptr<class ToolTracer> ToolTracerPtr;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
-/**\brief 3D Graphics class for displaying the trace path traversed by a tool.
+/** \brief 3D Graphics class for displaying the trace path traversed by a tool.
  *
  * ToolTracer is used internally by ToolRep3D as an option.
  *
  * Used by CustusX.
  *
- * \ingroup sscProxy
+ * \ingroup cx_resource_visualization
  */
 class ToolTracer : QObject
 {

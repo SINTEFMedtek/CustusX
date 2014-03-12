@@ -61,6 +61,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	dataAdapters/cxVector3DComponentDataAdapter
 
 	logger/sscMessageManager
+	logger/cxMessageListener
 
 	settings/cxSettings.h
 
@@ -77,7 +78,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	utilities/cxSpaceProviderImpl
 	utilities/cxSpaceListener
 	utilities/cxSpaceListenerImpl
-	utilities/cxLegacySingletons
 	)
 
      
@@ -93,6 +93,7 @@ cx_add_class(cxResource_SOURCE
 	Tool/ProbeXmlConfigParserImpl
 	Tool/ProbeXmlConfigParserMock
 	Tool/cxCreateProbeDataFromConfiguration
+	Tool/cxTrackingPositionFilter
 
 	Data/sscDataMetric
 	Data/sscDataReaderWriter
@@ -133,6 +134,9 @@ cx_add_class(cxResource_SOURCE
 	utilities/sscSharedMemory
 	utilities/cxImageDataContainer
 	utilities/cxOptionalValue
+	utilities/cxXMLNodeWrapper
+	utilities/cxPlaneTypeCollection
+	utilities/cxSharedPointerChecker
 
 	logger/sscAudio.h
 	logger/sscLogger
@@ -239,7 +243,6 @@ set (CX_RESOURCE_LIBRARIES
     
 if (CX_USE_OPENCL_UTILITY)
     cx_add_class(cxResource_SOURCE
-    	utilities/cxOpenCLUtilities
     	utilities/cxOpenCLPrinter
     )
 

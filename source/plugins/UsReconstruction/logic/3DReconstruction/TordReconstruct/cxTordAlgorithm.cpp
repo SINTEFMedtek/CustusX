@@ -1,56 +1,57 @@
 #include "cxTordAlgorithm.h"
 
 #include "sscMessageManager.h"
+#include "sscTypeConversions.h"
+#include "OpenCLManager.hpp"
+#include "HelperFunctions.hpp"
 #include <vtkImageData.h>
+#include <recConfig.h>
+
 
 namespace cx
 {
 TordAlgorithm::TordAlgorithm()
-{}
+{
+	oul::DeviceCriteria criteria;
+	criteria.setTypeCriteria(oul::DEVICE_TYPE_GPU);
+	mOulContex = oul::opencl()->createContext(criteria);
+}
 
 TordAlgorithm::~TordAlgorithm()
 {}
 
 bool TordAlgorithm::initCL(QString kernelPath, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts, float brightnessWeight, float newnessWeight)
 {
-	// INIT
-	mOpenCL = OpenCL::init(CL_DEVICE_TYPE_GPU);
-
 	// READ KERNEL FILE
 	messageManager()->sendInfo(QString("Kernel path: %1").arg(kernelPath));
-	size_t sourceLen;
-	char* sSource = OpenCLUtilities::file2string(kernelPath.toLocal8Bit().data(), &sourceLen);
+	std::string source = oul::readFile(kernelPath.toStdString());
 
 	// BUILD PROGRAM
-	cl::Program clprogram = this->buildCLProgram(sSource, nMaxPlanes, nPlanes, method, planeMethod, nStarts,brightnessWeight, newnessWeight, kernelPath, sourceLen);
+	cl::Program clprogram = this->buildCLProgram(source, nMaxPlanes, nPlanes, method, planeMethod, nStarts,brightnessWeight, newnessWeight);
 
 	// CREATE KERNEL
-	mKernel = OpenCL::createKernel(clprogram, "voxel_methods");
+	mKernel = mOulContex.createKernel(clprogram, "voxel_methods");
 
 	return true;
 }
 
-cl::Program TordAlgorithm::buildCLProgram(const char* program_src, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts, float newnessWeight, float brightnessWeight, QString kernelPath, size_t sourceLen)
+cl::Program TordAlgorithm::buildCLProgram(std::string program_src, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts, float newnessWeight, float brightnessWeight)
 {
 	cl::Program retval;
 	cl_int err = 0;
 	VECTOR_CLASS<cl::Device> devices;
 	try
 	{
-		cl::Program::Sources sources;
-		sources.push_back(std::pair<const char*, ::size_t>(program_src, sourceLen));
-		retval = cl::Program(mOpenCL->context, sources, &err);
-		check_error(err);
-
 		QString define = "-D MAX_PLANES=%1 -D N_PLANES=%2 -D METHOD=%3 -D PLANE_METHOD=%4 -D MAX_MULTISTART_STARTS=%5 -D NEWNESS_FACTOR=%6 -D BRIGHTNESS_FACTOR=%7";
 		define = define.arg(nMaxPlanes).arg(nPlanes).arg(method).arg(planeMethod).arg(nStarts).arg(newnessWeight).arg(brightnessWeight);
 
-		devices = mOpenCL->context.getInfo<CL_CONTEXT_DEVICES>();
-		err = retval.build(devices, define.toStdString().c_str(), NULL, NULL);
+		int programID = mOulContex.createProgramFromString(program_src, "-I " + std::string(TORD_KERNEL_PATH) + " " + define.toStdString());
+		retval = mOulContex.getProgram(programID);
+
 	} catch (cl::Error &error)
 	{
 		messageManager()->sendError("Could not build a OpenCL program. Reason: "+QString(error.what()));
-		check_error(error.err());
+		messageManager()->sendError(qstring_cast(oul::getCLErrorString(error.err())));
 	}
 	return retval;
 }
@@ -116,7 +117,7 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	for (int i = 0; i < numBlocks; i++)
 	{
 		//TODO why does the context suddenly contain a "dummy" device?
-		cl::Buffer buffer = OpenCL::createBuffer(mOpenCL->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, inputBlocks[i].length, inputBlocks[i].data, "block buffer "+QString::number(i).toStdString());
+		cl::Buffer buffer = mOulContex.createBuffer(mOulContex.getContext(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, inputBlocks[i].length, inputBlocks[i].data, "block buffer "+QString::number(i).toStdString());
 		clBlocks.push_back(buffer);
 	}
 	// Allocate output memory
@@ -130,46 +131,60 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	if(isUsingTooMuchMemory(outputVolumeSize, inputBlocks[0].length, globalMemUse))
 		return false;
 
-	cl::Buffer outputBuffer = OpenCL::createBuffer(mOpenCL->context, CL_MEM_WRITE_ONLY, outputVolumeSize, NULL, "output volume buffer");
+	cl::Buffer outputBuffer = mOulContex.createBuffer(mOulContex.getContext(), CL_MEM_WRITE_ONLY, outputVolumeSize, NULL, "output volume buffer");
 
 	// Fill the plane matrices
 	float *planeMatrices = new float[16 * nPlanes_numberOfInputImages]; //4x4 (matrix) = 16
 	this->fillPlaneMatrices(planeMatrices, input);
 
-	cl::Buffer clPlaneMatrices = OpenCL::createBuffer(mOpenCL->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, nPlanes_numberOfInputImages * sizeof(float) * 16, planeMatrices, "plane matrices buffer");
+	cl::Buffer clPlaneMatrices = mOulContex.createBuffer(mOulContex.getContext(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, nPlanes_numberOfInputImages * sizeof(float) * 16, planeMatrices, "plane matrices buffer");
 
 	// US Probe mask
-	cl::Buffer clMask = OpenCL::createBuffer(mOpenCL->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+	cl::Buffer clMask = mOulContex.createBuffer(mOulContex.getContext(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 			sizeof(cl_uchar) * input->getMask()->GetDimensions()[0] * input->getMask()->GetDimensions()[1],
 			input->getMask()->GetScalarPointer(), "mask buffer");
 
 	double *out_spacing = outputData->GetSpacing();
-	float spacings[3];
-	spacings[0] = out_spacing[0];
-	spacings[1] = out_spacing[1];
-	spacings[2] = out_spacing[2];
+	float spacings[2];
+	float f_out_spacings[3];
+	f_out_spacings[0] = out_spacing[0];
+	f_out_spacings[1] = out_spacing[1];
+	f_out_spacings[2] = out_spacing[2];
+
 
 	spacings[0] = input->getSpacing()[0];
 	spacings[1] = input->getSpacing()[1];
 
-	// The input blocks
-	std::vector<cl::Buffer> blocks;
-	for (int i = 0; i < clBlocks.size(); i++)
-	{
-		blocks.push_back(clBlocks[i]);
-	}
-
 	//TODO why 4? because float4 is used??
 	size_t planes_eqs_size =  sizeof(cl_float)*4*nPlanes_numberOfInputImages;
 
-	size_t local_work_size;
 	// Find the optimal local work size
-	mKernel.getWorkGroupInfo(mOpenCL->device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &local_work_size);
+	size_t local_work_size;
+	unsigned int deviceNumber = 0;
+	cl::Device device = mOulContex.getDevice(deviceNumber);
+	mKernel.getWorkGroupInfo(device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &local_work_size);
 
-	size_t close_planes_size = this->calculateSpaceNeededForClosePlanes(local_work_size, nPlanes_numberOfInputImages, nClosePlanes);
+	size_t close_planes_size = this->calculateSpaceNeededForClosePlanes(mKernel, device, local_work_size, nPlanes_numberOfInputImages, nClosePlanes);
 
-	this->setKernelArguments(outputDims[0], outputDims[1], outputDims[2], spacings[0], spacings[1], spacings[2], input->getDimensions()[0], input->getDimensions()[1],
-			spacings[0], spacings[1], blocks, outputBuffer, clPlaneMatrices, clMask, planes_eqs_size, close_planes_size, radius);
+	this->setKernelArguments(
+			mKernel,
+			outputDims[0],
+			outputDims[1],
+			outputDims[2],
+			f_out_spacings[0],
+			f_out_spacings[1],
+			f_out_spacings[2],
+			input->getDimensions()[0],
+			input->getDimensions()[1],
+			spacings[0],
+			spacings[1],
+			clBlocks,
+			outputBuffer,
+			clPlaneMatrices,
+			clMask,
+			planes_eqs_size,
+			close_planes_size,
+			radius);
 
 	messageManager()->sendInfo(QString("Using %1 as local workgroup size").arg(local_work_size));
 
@@ -183,13 +198,16 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	if (global_work_size % local_work_size)
 		global_work_size = ((global_work_size / local_work_size) + 1) * local_work_size; // ceil(...)
 
-	this->executeKernel(global_work_size, local_work_size);
-	this->readResultingVolume(outputBuffer, outputVolumeSize, outputData->GetScalarPointer());
+	unsigned int queueNumber = 0;
+	cl::CommandQueue queue = mOulContex.getQueue(queueNumber);
+	mOulContex.executeKernel(queue, mKernel, global_work_size, local_work_size);
+	mOulContex.readBuffer(queue, outputBuffer, outputVolumeSize, outputData->GetScalarPointer());
 
 	// Cleaning up
 	messageManager()->sendInfo(QString("Done, freeing GPU memory"));
 	this->freeFrameBlocks(inputBlocks, numBlocks);
 	delete[] inputBlocks;
+
 	inputBlocks = NULL;
 
 	return true;
@@ -228,6 +246,7 @@ void TordAlgorithm::freeFrameBlocks(frameBlock_t *framePointers, int numBlocks)
 }
 
 void TordAlgorithm::setKernelArguments(
+		cl::Kernel kernel,
 		int volume_xsize,
         int volume_ysize,
         int volume_zsize,
@@ -247,63 +266,37 @@ void TordAlgorithm::setKernelArguments(
         float radius)
 {
 	int arg = 0;
-	mKernel.setArg(arg++, volume_xsize); // volume_xsize
-	mKernel.setArg(arg++, volume_ysize); // volume_ysize
-	mKernel.setArg(arg++, volume_zsize); // volume_zsize
-	mKernel.setArg(arg++, volume_xspacing); // volume_xspacing
-	mKernel.setArg(arg++, volume_yspacing); // volume_yspacing
-	mKernel.setArg(arg++, volume_zspacing); // volume_zspacing
-	mKernel.setArg(arg++, in_xsize); // in_xsize
-	mKernel.setArg(arg++, in_ysize); // in_ysize
-	mKernel.setArg(arg++, in_xspacing); // in_xspacing
-	mKernel.setArg(arg++, in_yspacing); // in_yspacing
+	kernel.setArg(arg++, volume_xsize);
+	kernel.setArg(arg++, volume_ysize);
+	kernel.setArg(arg++, volume_zsize);
+	kernel.setArg(arg++, volume_xspacing);
+	kernel.setArg(arg++, volume_yspacing);
+	kernel.setArg(arg++, volume_zspacing);
+	kernel.setArg(arg++, in_xsize);
+	kernel.setArg(arg++, in_ysize);
+	kernel.setArg(arg++, in_xspacing);
+	kernel.setArg(arg++, in_yspacing);
 	for (int i = 0; i < blocks.size(); i++)
 	{
-		mKernel.setArg(arg++, blocks[i]);
+		kernel.setArg(arg++, blocks[i]);
 	}
-	mKernel.setArg(arg++, out_volume); // out_volume
-	mKernel.setArg(arg++, plane_matrices); // plane_matrices
-	mKernel.setArg(arg++, mask); // US Probe mask
-	mKernel.setArg<cl::LocalSpaceArg>(arg++, cl::__local(plane_eqs_size)); // plane_eqs (local CL memory, will be calculated by the kernel)
-	mKernel.setArg<cl::LocalSpaceArg>(arg++, cl::__local(close_planes_size)); // close planes (local CL memory, to be used by the kernel)
-	mKernel.setArg(arg++, radius); // radius
+	kernel.setArg(arg++, out_volume);
+	kernel.setArg(arg++, plane_matrices);
+	kernel.setArg(arg++, mask);
+	kernel.setArg<cl::LocalSpaceArg>(arg++, cl::__local(plane_eqs_size));
+	kernel.setArg<cl::LocalSpaceArg>(arg++, cl::__local(close_planes_size));
+	kernel.setArg(arg++, radius);
 }
 
-void TordAlgorithm::executeKernel(size_t global_work_size, size_t local_work_size)
-{
-	messageManager()->sendInfo(QString("Executing kernel"));
-	try
-	{
-		mOpenCL->cmd_queue.enqueueNDRangeKernel(mKernel, 0, global_work_size, local_work_size, NULL, NULL);
-		mOpenCL->cmd_queue.finish();
-	} catch (cl::Error &error)
-	{
-		messageManager()->sendError("Could not execute kernels. Reason: "+QString(error.what()));
-		check_error(error.err());
-	}
-}
-
-void TordAlgorithm::readResultingVolume(cl::Buffer outputBuffer, size_t outputVolumeSize, void *outputData)
-{
-	try
-	{
-		mOpenCL->cmd_queue.enqueueReadBuffer(outputBuffer, CL_TRUE, 0, outputVolumeSize, outputData, 0, 0);
-	} catch (cl::Error &error)
-	{
-		messageManager()->sendError("Could not read output volume buffer from OpenCL. Reason: "+QString(error.what()));
-		check_error(error.err());
-	}
-}
-
-size_t TordAlgorithm::calculateSpaceNeededForClosePlanes(size_t local_work_size, size_t nPlanes_numberOfInputImages, int nClosePlanes)
+size_t TordAlgorithm::calculateSpaceNeededForClosePlanes(cl::Kernel kernel, cl::Device device, size_t local_work_size, size_t nPlanes_numberOfInputImages, int nClosePlanes)
 {
 	// Find out how much local memory the device has
 	size_t dev_local_mem_size;
-	dev_local_mem_size = mOpenCL->device.getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
+	dev_local_mem_size = device.getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
 
 	// Find the maximum work group size
 	size_t max_work_size;
-	mKernel.getWorkGroupInfo(mOpenCL->device, CL_KERNEL_WORK_GROUP_SIZE, &max_work_size);
+	kernel.getWorkGroupInfo(device, CL_KERNEL_WORK_GROUP_SIZE, &max_work_size);
 
 	// Now find the largest multiple of the preferred work group size that will fit into local mem
 	size_t constant_local_mem = sizeof(cl_float) * 4 * nPlanes_numberOfInputImages;
@@ -339,8 +332,9 @@ bool TordAlgorithm::isUsingTooMuchMemory(size_t outputVolumeSize, size_t inputBl
 {
 	bool usingTooMuchMemory = false;
 
-	cl_ulong maxAllocSize = mOpenCL->device.getInfo<CL_DEVICE_MAX_MEM_ALLOC_SIZE>();
-	cl_ulong globalMemSize = mOpenCL->device.getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>();
+	unsigned int deviceNumber = 0;
+	cl_ulong maxAllocSize = mOulContex.getDevice(deviceNumber).getInfo<CL_DEVICE_MAX_MEM_ALLOC_SIZE>();
+	cl_ulong globalMemSize = mOulContex.getDevice(deviceNumber).getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>();
 	if (maxAllocSize < outputVolumeSize)
 	{
 		messageManager()->sendError(QString("Output volume size too large! %1 > %2\n").arg(outputVolumeSize).arg(maxAllocSize));

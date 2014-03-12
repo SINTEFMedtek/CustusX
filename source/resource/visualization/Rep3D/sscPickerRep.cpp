@@ -57,13 +57,13 @@
 
 namespace cx
 {
-PickerRepPtr PickerRep::New(DataManager* dataManager, const QString& uid, const QString& name)
+PickerRepPtr PickerRep::New(DataServicePtr dataManager, const QString& uid, const QString& name)
 {
 	PickerRepPtr retval(new PickerRep(dataManager, uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
-PickerRep::PickerRep(DataManager* dataManager, const QString& uid, const QString& name) :
+PickerRep::PickerRep(DataServicePtr dataManager, const QString& uid, const QString& name) :
 	RepImpl(uid, name),
 	mDataManager(dataManager),
 	mPickedPoint(), mSphereRadius(2) //, mConnections(vtkEventQtSlotConnectPtr::New())

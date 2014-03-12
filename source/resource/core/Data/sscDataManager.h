@@ -46,7 +46,7 @@ typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
  * Simply calling instance() will instantiate the default manager DataManagerImpl.
  * It is also possible to subclass and use setInstance() to set another type.
  *
- * \ingroup sscData
+ * \ingroup cx_resource_core_data
  */
 class DataManager: public QObject
 {
@@ -57,8 +57,8 @@ public:
 	typedef std::map<QString, MeshPtr> MeshMap;
 	typedef std::map<QString, VideoSourcePtr> StreamMap;
 
-	static DataManager* getInstance();
-	static void shutdown();
+//	static DataServicePtr getInstance();
+//	static void shutdown();
 
 	// streams
 	virtual VideoSourcePtr getStream(const QString& uid) const = 0;
@@ -118,6 +118,8 @@ public:
 	virtual RegistrationHistoryPtr get_rMpr_History() = 0;
 	virtual LandmarksPtr getPatientLandmarks() = 0;
 
+	virtual bool getDebugMode() const = 0;
+
 signals:
 	void centerChanged(); ///< emitted when center is changed.
 	void dataAddedOrRemoved();
@@ -126,17 +128,15 @@ signals:
 	void clinicalApplicationChanged();
 	void streamLoaded();
 	void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
+	void debugModeChanged(bool on);
+
+public slots:
+	virtual void setDebugMode(bool on) = 0;
 
 protected:
-	static void setInstance(DataManager* instance);
 	DataManager();
 	virtual ~DataManager();
-
-private:
-	static DataManager* mInstance;
 };
-
-DataManager* dataManager();
 
 } // namespace cx
 

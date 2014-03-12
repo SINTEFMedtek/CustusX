@@ -27,7 +27,7 @@ namespace cx
 /**
  *
  * \brief Widget that displays/edits a probe configuration
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * \date Mar 16, 2012
  * \author Christian Askeland, SINTEF

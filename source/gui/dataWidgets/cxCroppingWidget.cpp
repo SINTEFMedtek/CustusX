@@ -15,7 +15,8 @@
 #include "cxInteractiveCropper.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
+#include "sscImage.h"
 
 namespace cx
 {
@@ -109,7 +110,7 @@ ImagePtr CroppingWidget::cropClipButtonClickedSlot()
   ImagePtr image = dataManager()->getActiveImage();
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
 
-  ImagePtr retval = cropImage(dataManager(), image);
+  ImagePtr retval = cropImage(dataService(), image);
   dataManager()->loadData(retval);
   dataManager()->saveImage(retval, outputBasePath);
   return retval;

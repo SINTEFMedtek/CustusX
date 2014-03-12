@@ -17,39 +17,26 @@
 #include "sscBoundingBox3D.h"
 #include "sscTypeConversions.h"
 #include "sscDataManager.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
 
-//-------------------------------------------------------
-//-------------------------------------------------------
-//-------------------------------------------------------
-
-//DataPtr DonutMetricReader::load(const QString& uid, const QString& filename)
-//{
-//	return DataPtr(new DonutMetric(uid, filename));
-//}
-
-DonutMetric::DonutMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+DonutMetric::DonutMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 				DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "position" << "direction"));
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 	mRadius = 5;
 	mThickness = 2;
+	mHeight = 0;
+	mFlat = true;
 }
 
-DonutMetricPtr DonutMetric::create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider)
+DonutMetricPtr DonutMetric::create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
 	return DonutMetricPtr(new DonutMetric(uid, name, dataManager, spaceProvider));
 }
-
-//DonutMetricPtr DonutMetric::create(QDomNode node)
-//{
-//	DonutMetricPtr retval = DonutMetric::create("");
-//	retval->parseXml(node);
-//	return retval;
-//}
 
 DonutMetric::~DonutMetric()
 {
@@ -62,6 +49,8 @@ void DonutMetric::addXml(QDomNode& dataNode)
 	mArguments->addXml(dataNode);
 	dataNode.toElement().setAttribute("radius", mRadius);
 	dataNode.toElement().setAttribute("thickness", mThickness);
+	dataNode.toElement().setAttribute("height", mHeight);
+	dataNode.toElement().setAttribute("flat", mFlat);
 }
 
 void DonutMetric::parseXml(QDomNode& dataNode)
@@ -71,6 +60,8 @@ void DonutMetric::parseXml(QDomNode& dataNode)
 	mArguments->parseXml(dataNode, mDataManager->getData());
 	mRadius = dataNode.toElement().attribute("radius", qstring_cast(mRadius)).toDouble();
 	mThickness = dataNode.toElement().attribute("thickness", qstring_cast(mThickness)).toDouble();
+	mHeight = dataNode.toElement().attribute("height", qstring_cast(mHeight)).toDouble();
+	mFlat = dataNode.toElement().attribute("flat", qstring_cast(mFlat)).toInt();
 }
 
 bool DonutMetric::isValid() const
@@ -80,7 +71,7 @@ bool DonutMetric::isValid() const
 
 Vector3D DonutMetric::getRefCoord() const
 {
-	return this->boundingBox().center();
+	return mArguments->getRefCoords().front();
 }
 
 DoubleBoundingBox3D DonutMetric::boundingBox() const
@@ -135,6 +126,27 @@ void DonutMetric::setThickness(double val)
 double DonutMetric::getThickness() const
 {
 	return mThickness;
+}
+
+void DonutMetric::setHeight(double val)
+{
+	mHeight = val;
+}
+
+double DonutMetric::getHeight() const
+{
+	return mHeight;
+}
+
+void DonutMetric::setFlat(bool val)
+{
+	mFlat = val;
+	emit propertiesChanged();
+}
+
+bool DonutMetric::getFlat() const
+{
+	return mFlat;
 }
 
 }

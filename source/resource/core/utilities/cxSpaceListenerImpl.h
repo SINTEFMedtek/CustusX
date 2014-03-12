@@ -24,6 +24,7 @@ class DataManager;
 /**\brief Class that listens to changes in a coordinate system,
  * and emits a signal if that system changes.
  *
+ * \ingroup cx_resource_core_utilities
  * \date Jul 4, 2011
  * \author Christian Askeland, SINTEF
  */
@@ -32,7 +33,7 @@ class SpaceListenerImpl: public SpaceListener
 Q_OBJECT
 
 public:
-	SpaceListenerImpl(ToolManager* toolManager, DataManager* dataManager);
+	SpaceListenerImpl(TrackingServicePtr toolManager, DataServicePtr dataManager);
 //	SpaceListenerImpl(CoordinateSystem space);
 	virtual ~SpaceListenerImpl();
 	void setSpace(CoordinateSystem space);
@@ -46,8 +47,8 @@ private:
 	void doDisconnect();
 	CoordinateSystem mSpace;
 
-	ToolManager* mToolManager;
-	DataManager* mDataManager;
+	TrackingServicePtr mToolManager;
+	DataServicePtr mDataManager;
 };
 
 } // namespace cx

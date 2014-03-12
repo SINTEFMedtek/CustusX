@@ -16,7 +16,7 @@
 #include <QHBoxLayout>
 #include "sscLabeledComboBoxWidget.h"
 #include "cxDataAdapterHelper.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 
@@ -157,6 +157,18 @@ void ToolMetricWrapper::toolOffsetSet()
 
 void ToolMetricWrapper::dataChangedSlot()
 {
+//	mInternalUpdate = true;
+
+//	mSpaceSelector->setValue(mData->getSpace().toString());
+//	mFrameWidget->setMatrix(mData->getFrame());
+//	mToolNameSelector->setValue(mData->getToolName());
+//	mToolOffsetSelector->setValue(mData->getToolOffset());
+
+//	mInternalUpdate = false;
+}
+
+void ToolMetricWrapper::update()
+{
 	mInternalUpdate = true;
 
 	mSpaceSelector->setValue(mData->getSpace().toString());
@@ -166,6 +178,7 @@ void ToolMetricWrapper::dataChangedSlot()
 
 	mInternalUpdate = false;
 }
+
 
 void ToolMetricWrapper::frameWidgetChangedSlot()
 {

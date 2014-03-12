@@ -204,7 +204,7 @@ std::vector<RegistrationHistoryPtr> RegistrationHistoryWidget::getAllRegistratio
 	std::vector<RegistrationHistoryPtr> retval;
 	retval.push_back(dataManager()->get_rMpr_History());
 
-	std::map<QString, DataPtr> data = DataManager::getInstance()->getData();
+	std::map<QString, DataPtr> data = dataManager()->getData();
 	for (std::map<QString, DataPtr>::iterator iter = data.begin(); iter != data.end(); ++iter)
 	{
 		retval.push_back(iter->second->get_rMd_History());

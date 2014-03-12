@@ -364,7 +364,6 @@ Rect3D::Rect3D(vtkRendererPtr renderer, QColor color)
 	mapper = vtkPolyDataMapperPtr::New();
 	actor = vtkActorPtr::New();
 	setColorAndOpacity(actor->GetProperty(), color);
-//	actor->GetProperty()->SetColor(color.begin());
 	actor->SetMapper(mapper);
 	if (mRenderer)
 		mRenderer->AddActor(actor);
@@ -410,6 +409,11 @@ Rect3D::~Rect3D()
 {
 	if (mRenderer)
 		mRenderer->RemoveActor(actor);
+}
+
+void Rect3D::setColor(QColor color)
+{
+	setColorAndOpacity(actor->GetProperty(), color);
 }
 
 void Rect3D::updatePosition(const DoubleBoundingBox3D bb, const Transform3D& M)

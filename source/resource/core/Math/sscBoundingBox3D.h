@@ -13,7 +13,7 @@ namespace cx
 // --------------------------------------------------------
 
 /**
- * \addtogroup sscMath
+ * \addtogroup cx_resource_core_math
  * @{
  */
 
