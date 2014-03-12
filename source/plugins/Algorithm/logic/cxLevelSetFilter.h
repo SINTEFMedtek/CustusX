@@ -10,12 +10,14 @@ typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 namespace cx
 {
 
-class LevelSetFilter : public FilterImpl
+class LevelSetFilter: public FilterImpl
 {
-	Q_OBJECT
+Q_OBJECT
 
 public:
-	virtual ~LevelSetFilter() {}
+	virtual ~LevelSetFilter()
+	{
+	}
 
 	virtual QString getType() const;
 	virtual QString getName() const;
@@ -30,7 +32,7 @@ public:
 	DoubleDataAdapterXmlPtr getThresholdOption(QDomElement root);
 	DoubleDataAdapterXmlPtr getEpsilonOption(QDomElement root);
 	DoubleDataAdapterXmlPtr getAlphaOption(QDomElement root);
-    DoubleDataAdapterXmlPtr getRadiusOption(QDomElement root);
+	DoubleDataAdapterXmlPtr getRadiusOption(QDomElement root);
 
 	static Vector3D getSeedPointFromTool(DataPtr image);
 	static bool isSeedPointInsideImage(Vector3D, DataPtr);
@@ -41,15 +43,17 @@ protected:
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
 private:
-    vtkImageDataPtr convertToVtkImageData(char * data, int size_x, int size_y, int size_z, ImagePtr input); ///< converts a char array to a vtkImageDataPtr
-    vtkImageDataPtr importRawImageData(void * data, int size_x, int size_y, int size_z, ImagePtr input, int type); ///< converts a any array to a vtkImageDataPtr
-    std::string filename;
-    Vector3D seedPoint;
-    ImagePtr image;
-    vtkImageDataPtr rawSegmentation;
+	vtkImageDataPtr convertToVtkImageData(char * data, int size_x, int size_y,
+			int size_z, ImagePtr input); ///< converts a char array to a vtkImageDataPtr
+	vtkImageDataPtr importRawImageData(void * data, int size_x, int size_y,
+			int size_z, ImagePtr input, int type); ///< converts a any array to a vtkImageDataPtr
+	std::string filename;
+	Vector3D seedPoint;
+	ImagePtr image;
+	vtkImageDataPtr rawSegmentation;
 
-
-}; // end LevelSetFilter class
+};
+// end LevelSetFilter class
 
 typedef boost::shared_ptr<class LevelSetFilter> LevelSetFilterPtr;
 
