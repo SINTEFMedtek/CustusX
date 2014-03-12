@@ -35,6 +35,11 @@ public:
 	virtual ~TordTest();
 
 	/**
+	 * Turn OpenCL profiling on
+	 */
+	void enableProfiling();
+
+	/**
 	 * Return the name of the algorithm
 	 */
 	virtual QString getName() const;
