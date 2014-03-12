@@ -2,7 +2,6 @@
 
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
-#include "OpenCLManager.hpp"
 #include "HelperFunctions.hpp"
 #include <vtkImageData.h>
 #include <recConfig.h>
@@ -10,11 +9,15 @@
 
 namespace cx
 {
-TordAlgorithm::TordAlgorithm()
+TordAlgorithm::TordAlgorithm() :
+		mRuntime(new oul::RuntimeMeasurementsManager())
 {
 	oul::DeviceCriteria criteria;
 	criteria.setTypeCriteria(oul::DEVICE_TYPE_GPU);
-	mOulContex = oul::opencl()->createContext(criteria);
+	bool enableProfilling = true;
+	mOulContex = oul::opencl()->createContext(criteria, NULL, enableProfilling);
+	if(enableProfilling)
+		mRuntime->enable();
 }
 
 TordAlgorithm::~TordAlgorithm()
@@ -200,8 +203,22 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 
 	unsigned int queueNumber = 0;
 	cl::CommandQueue queue = mOulContex.getQueue(queueNumber);
+	if(mRuntime->isEnabled())
+	{
+		mRuntime->enable();
+		mRuntime->startCLTimer("kernel", queue);
+		mRuntime->startCLTimer("buffer", queue);
+	}
 	mOulContex.executeKernel(queue, mKernel, global_work_size, local_work_size);
+	if(mRuntime->isEnabled())
+		mRuntime->stopCLTimer("buffer", queue);
 	mOulContex.readBuffer(queue, outputBuffer, outputVolumeSize, outputData->GetScalarPointer());
+	if(mRuntime->isEnabled())
+	{
+		mRuntime->stopCLTimer("kernel", queue);
+		mRuntime->printAll();
+	}
+
 
 	// Cleaning up
 	messageManager()->sendInfo(QString("Done, freeing GPU memory"));
@@ -235,6 +252,14 @@ void TordAlgorithm::fillPlaneMatrices(float *planeMatrices, ProcessedUSInputData
 			planeMatrices[i++] = pos(j / 4, j % 4);
 		}
 	}
+}
+
+void TordAlgorithm::setProfiling(bool on)
+{
+	if(on)
+		mRuntime->enable();
+	else
+		mRuntime->disable();
 }
 
 void TordAlgorithm::freeFrameBlocks(frameBlock_t *framePointers, int numBlocks)

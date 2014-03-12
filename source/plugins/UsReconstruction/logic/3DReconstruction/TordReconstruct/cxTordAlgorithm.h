@@ -6,6 +6,7 @@
 
 #include <sscUSFrameData.h>
 #include "OpenCLManager.hpp"
+#include "RuntimeMeasurementManager.hpp"
 
 namespace cx
 {
@@ -126,6 +127,11 @@ public:
 	virtual void fillPlaneMatrices(float *planeMatrices,
 	                               ProcessedUSInputDataPtr input);
 
+	/**
+	 * Enable/diable OpenCL profiling for this algorithm
+	 */
+	void setProfiling(bool on);
+
 private:
 	void setKernelArguments(
 			cl::Kernel kernel,
@@ -151,6 +157,7 @@ private:
 
 	cl::Kernel mKernel;
 	oul::Context mOulContex;
+	oul::RuntimeMeasurementsManagerPtr mRuntime;
 
 };
 
