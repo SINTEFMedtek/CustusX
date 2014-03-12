@@ -24,7 +24,7 @@ namespace cx
 /** Applies a smoothing filter to tracking positions.
  *
  *
- * \ingroup cxTool
+ * \ingroup cx_resource_core_tool
  * \date 2014-03-06
  * \author christiana
  */

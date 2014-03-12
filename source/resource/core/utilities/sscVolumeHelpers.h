@@ -15,7 +15,7 @@ typedef boost::shared_ptr<class Data> DataPtr;
 class DataManager;
 
 /**
- * \addtogroup sscUtility
+ * \addtogroup cx_resource_core_utilities
  * \{
  */
 

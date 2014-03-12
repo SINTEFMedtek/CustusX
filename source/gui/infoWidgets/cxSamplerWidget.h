@@ -28,7 +28,7 @@ namespace cx
  * Utility for sampling the current tool point.
  * Displays the current tool tip position in a selected coordinate system.
  *
- * \ingroup cxGUI
+ * \ingroup cx_gui
  * \date feb 1, 2013, 2013
  * \author christiana
  */

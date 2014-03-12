@@ -11,7 +11,7 @@ namespace cx
  * \date Mar 11, 2011
  * \author Janne Beate Bakeng, SINTEF
  *
- * \ingroup sscUtility
+ * \ingroup cx_resource_core_logger
  */
 class Audio
 {

@@ -23,7 +23,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup sscData
+ * \addtogroup cx_resource_core_data
  * @{
  */
 

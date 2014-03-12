@@ -32,6 +32,7 @@ typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
 
 typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
 
+
 /** \brief Display a VideoSource in a View.
  *
  * A rep visualizing a VideoSource directly into the view plane.
@@ -40,8 +41,8 @@ typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
  *
  * Used by CustusX.
  *
- * \ingroup sscRep
- * \ingroup sscRepVideo
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_repvideo
  *
  * \date Oct 31, 2010
  * \author christiana

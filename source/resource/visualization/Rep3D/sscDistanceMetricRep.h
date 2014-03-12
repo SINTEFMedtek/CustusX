@@ -34,10 +34,10 @@ namespace cx
 
 typedef boost::shared_ptr<class DistanceMetricRep> DistanceMetricRepPtr;
 
-/**\brief Rep for visualizing a DistanceMetric.
+/** \brief Rep for visualizing a DistanceMetric.
  *
- * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep3D
  *
  * \date Jul 5, 2011
  * \author Christian Askeland, SINTEF

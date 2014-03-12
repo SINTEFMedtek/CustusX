@@ -32,8 +32,9 @@ typedef boost::shared_ptr<class DataMetric> DataMetricPtr;
 /**
  * \brief Base class for all Data Metric reps.
  *
- * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup cx_resource_visualization
+
+ * \ingroup cx_resource_visualization_rep3D
  *
  * Handles common functionality: labels, size.
  *

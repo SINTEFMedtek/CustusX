@@ -51,7 +51,7 @@ typedef boost::shared_ptr<class AxisConnector> AxisConnectorPtr;
 
 /**
  * \file
- * \addtogroup cxServiceVisualization
+ * \addtogroup cx_service_visualization
  * @{
  */
 

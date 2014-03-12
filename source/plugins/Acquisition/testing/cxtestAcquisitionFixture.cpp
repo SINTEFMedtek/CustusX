@@ -24,7 +24,7 @@
 #include "cxImageDataContainer.h"
 #include "sscStringDataAdapterXml.h"
 #include "cxProbe.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxLogicManager.h"
 #include "cxStateService.h"
 #include "cxLegacySingletons.h"

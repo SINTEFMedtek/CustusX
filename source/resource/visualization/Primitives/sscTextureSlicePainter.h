@@ -71,7 +71,7 @@ public:
  * \sa Texture3DSlicerProxyImpl
  *
  *
- * \ingroup sscProxy
+ * \ingroup cx_resource_visualization
  */
 class TextureSlicePainter : public vtkOpenGLRepresentationPainter
 {

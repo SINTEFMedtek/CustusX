@@ -34,7 +34,7 @@ namespace cx
 
 /**\brief DataAdapter interface for boolean values.
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_core_dataadapters
  */
 class BoolDataAdapter: public DataAdapter
 {

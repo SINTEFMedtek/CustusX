@@ -9,7 +9,7 @@ namespace cx
 {
 
 /**
- * \addtogroup sscUtility
+ * \addtogroup cx_resource_core_utilities
  * \{
  */
 

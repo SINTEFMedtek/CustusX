@@ -22,6 +22,7 @@ namespace cx {
 /*
  * \brief Abstract base class for frame metric.
  *
+ * \ingroup cx_resource_core_data
  * \date Sep 2, 2013
  * \author Ole Vegard Solberg, SINTEF
  */

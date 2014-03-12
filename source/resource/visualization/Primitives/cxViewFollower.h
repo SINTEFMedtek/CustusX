@@ -27,7 +27,7 @@ class DataManager;
 /**
  * Ensure the tool is inside a given viewport, by moving the global center.
  *
- * \ingroup cx
+ * \ingroup cx_resource_visualization
  * \date 2014-01-14
  * \author christiana
  */

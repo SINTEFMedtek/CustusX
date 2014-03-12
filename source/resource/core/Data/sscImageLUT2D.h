@@ -17,13 +17,6 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- * sscImageLookupTable2D.h
- *
- *  Created on: Jan 9, 2009
- *      Author: christiana
- */
-
 #ifndef SSCIMAGELOOKUPTABLE2D_H_
 #define SSCIMAGELOOKUPTABLE2D_H_
 
@@ -51,7 +44,9 @@ typedef boost::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
  * The slicer classes will use the data either by getting the LUT+parameters(win/lvl(llr/alpha) and,
  * or by getting OutputLookupTable() which is a merge of the LUT and parameters.
  *
- * \ingroup sscData
+ * \ingroup cx_resource_core_data
+ *  Created on: Jan 9, 2009
+ *      Author: christiana
  */
 class ImageLUT2D: public ImageTFData
 {

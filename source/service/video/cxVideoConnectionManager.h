@@ -30,13 +30,13 @@ typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 
 /**
 * \file
-* \addtogroup cxServiceVideo
+* \addtogroup cx_service_video
 * @{
 */
 
 /**\brief
  *
- * \ingroup cxServiceVideo
+ * \ingroup cx_service_video
  *
  *  \date Jan 25, 2011
  *  \author Christian Askeland, SINTEF

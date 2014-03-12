@@ -9,8 +9,8 @@
 
 #include <QDir>
 
-#include "cxDataManager.h"
-#include "cxToolManager.h"
+#include "sscDataManager.h"
+#include "sscToolManager.h"
 #include "cxVideoService.h"
 #include "sscMessageManager.h"
 #include "cxPatientService.h"

@@ -52,8 +52,8 @@ typedef vtkSmartPointer<class OrientationAnnotation> OrientationAnnotationPtr;
  * Use cx::OrientationAnnotationRep instead if decoration of oblique views
  * also is needed.
  *
- * \ingroup sscRep
- * \ingroup sscRep2D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep2D
  */
 class OrientationAnnotationRep : public RepImpl
 {

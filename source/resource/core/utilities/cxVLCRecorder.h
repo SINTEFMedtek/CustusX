@@ -6,6 +6,13 @@
 
 namespace cx
 {
+
+/**
+ * \file
+ * \addtogroup cx_resource_core_utilities
+ * @{
+ */
+
 typedef boost::shared_ptr<class VLCRecorder> VLCRecorderPtr;
 
 /**
@@ -61,6 +68,9 @@ private:
 
 VLCRecorder* vlc(); ///< Shortcut for accessing the vlc recorder
 
+/**
+ * @}
+ */
 
 } /* namespace cx */
 

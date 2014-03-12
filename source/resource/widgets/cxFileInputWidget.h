@@ -28,7 +28,7 @@ namespace cx
  *	Widget for displaying, editing and browsing for a filename.
  *  \sa FileSelectWidget
  *
- * \ingroup cxResourceWidgets
+ * \ingroup cx_resource_widgets
  * \date 28 Oct 2013, 2013
  * \author christiana
  */

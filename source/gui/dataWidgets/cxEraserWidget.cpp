@@ -40,7 +40,7 @@
 #include "cxPatientService.h"
 #include "cxInteractiveCropper.h"
 #include "cxViewManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxViewWrapper.h"
 #include "cxViewGroup.h"
 

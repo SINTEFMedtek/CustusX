@@ -21,9 +21,14 @@
 namespace cx
 {
 
+/**
+ * \file
+ * \addtogroup cx_resource_core_utilities
+ * @{
+ */
+
 /** Helper for CustusX addXml/parseXml framework
  *
- * \ingroup cx
  * \date 2014-02-27
  * \author christiana
  */
@@ -50,7 +55,6 @@ private:
 
 /** Helper for CustusX addXml/parseXml framework
  *
- * \ingroup cx
  * \date 2014-02-27
  * \author christiana
  */
@@ -75,6 +79,10 @@ public:
 private:
 	QDomNode mNode;
 };
+
+/**
+ * @}
+ */
 
 } // namespace cx
 

@@ -10,7 +10,7 @@
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "sscCoordinateSystemHelpers.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"

@@ -47,7 +47,7 @@ typedef boost::shared_ptr<class ApplyLUTToImage2DProxy> ApplyLUTToImage2DProxyPt
  *
  * Used by CustusX
  *
- * \ingroup sscProxy
+ * \ingroup cx_resource_core_tool
  */
 class ApplyLUTToImage2DProxy : public QObject
 {
@@ -73,7 +73,7 @@ private:
  * Used by Sonowand 2.1
  * Used by CustusX
  *
- * \ingroup sscProxy
+ * \ingroup cx_resource_visualization
  */
 class SlicedImageProxy : public QObject
 {

@@ -28,7 +28,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxServiceTracking
+ * \addtogroup cx_service_tracking
  * @{
  */
 
@@ -38,7 +38,7 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 
 /**
  * \brief Interface towards the navigation system.
- * \ingroup cxServiceTracking
+ * \ingroup cx_service_tracking
  *
  * \image html tracking_simple.png "Tracking Service ideal design."
  *
@@ -49,7 +49,7 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
  * ToolManager and Tool are implemented using IGSTK, and communicates with
  * the Polaris and Aurora tracking systems. All interaction with the module
  * should go through the SSC interfaces. The ToolManager should be
- * considered equal to the \ref cxServiceTracking.
+ * considered equal to the \ref cx_service_tracking.
  *
  * \image html cxArchitecture_tracking.png "Tracking Service Implementation."
  *

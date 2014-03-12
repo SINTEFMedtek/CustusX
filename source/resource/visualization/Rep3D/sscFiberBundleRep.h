@@ -38,6 +38,8 @@ namespace cx
  * representation from the FiberBundle interface.
  * Used by Sonowand.
  *
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep3D
  */
 class FiberBundleRep : public RepImpl
 {

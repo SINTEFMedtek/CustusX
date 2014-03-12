@@ -32,7 +32,7 @@ class DataManager;
 
 /**
  * \file
- * \addtogroup cxServicePatient
+ * \addtogroup cx_service_patient
  * @{
  */
 
@@ -46,7 +46,7 @@ QDomElement getElementForced(QDomNode root, QString path);
 /**
  * \brief Functionality for storing patient data in a folder on the disk
  * and access to these data.
- * \ingroup cxServicePatient
+ * \ingroup cx_service_patient
  *
  * Keeps track of a single active patient (patient folder).
  * Only one such patient can be active at a time, since the

@@ -3,7 +3,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include "sscTypeConversions.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "cxRegistrationManager.h"

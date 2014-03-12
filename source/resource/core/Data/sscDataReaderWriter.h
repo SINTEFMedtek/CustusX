@@ -35,6 +35,12 @@ namespace cx
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 class DataManager;
 
+/**
+ * \file
+ * \addtogroup cx_resource_core_data
+ * @{
+ */
+
 /** Locks a static mutex in the constructor and unlocks it in the desctructor,
   * similar to a QMutexLocker.
   *
@@ -59,7 +65,6 @@ private:
 
 /**\brief Interface for Data file readers.
  *
- * \ingroup sscData
  */
 class DataReader
 {
@@ -79,7 +84,6 @@ typedef boost::shared_ptr<DataReader> DataReaderPtr;
 
 /**\brief Reader for metaheader .mhd files.
  *
- * \ingroup sscData
  */
 class MetaImageReader: public DataReader
 {
@@ -103,7 +107,6 @@ public:
 
 /**\brief Reader for portable network graphics .png files.
  *
- * \ingroup sscData
  */
 class PNGImageReader: public DataReader
 {
@@ -123,7 +126,6 @@ public:
 
 /**\brief Reader for minc files.
  *
- * \ingroup sscData
  */
 class MincImageReader: public DataReader
 {
@@ -146,7 +148,6 @@ public:
 
 /**\brief Reader for .vtk files.
  *
- * \ingroup sscData
  */
 class PolyDataMeshReader: public DataReader
 {
@@ -169,7 +170,6 @@ public:
 
 /**\brief Reader for STL files.
  *
- * \ingroup sscData
  */
 class StlMeshReader: public DataReader
 {
@@ -191,8 +191,6 @@ public:
 
 /** Read or write vtk or ssc data objects from/to file.
  *
- *
- * \ingroup sscData
  * \date May 2, 2013
  * \author christiana
  */
@@ -212,6 +210,9 @@ private:
 	DataReadersType mDataReaders;
 };
 
+/**
+ * @}
+ */
 
 
 } // namespace cx

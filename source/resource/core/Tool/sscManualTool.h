@@ -38,7 +38,7 @@ class ToolManager;
  *
  * This class is Threadsafe.
  *
- * \ingroup sscTool
+ * \ingroup cx_resource_core_tool
  */
 class ManualTool : public ToolImpl
 {

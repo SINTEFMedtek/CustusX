@@ -97,7 +97,7 @@ namespace cx
  *
  * \endverbatim
  *
- * \ingroup sscTool
+ * \ingroup cx_resource_core_tool
  */
 class ProbeDefinition
 {

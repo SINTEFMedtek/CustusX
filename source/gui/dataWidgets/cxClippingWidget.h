@@ -16,7 +16,7 @@ typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 
 /**
  * \file
- * \addtogroup cxGUI
+ * \addtogroup cx_gui
  * @{
  */
 

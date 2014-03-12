@@ -15,7 +15,7 @@
 
 #include "sscCoordinateSystemHelpers.h"
 #include <vtkImageData.h>
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscTypeConversions.h"
 #include "cxSettings.h"

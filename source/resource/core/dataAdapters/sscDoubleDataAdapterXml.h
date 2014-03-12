@@ -48,7 +48,7 @@ typedef boost::shared_ptr<class DoubleDataAdapterXml> DoubleDataAdapterXmlPtr;
     <option id="Processor" value="3.14"/>
    \endverbatim
  *
- *   \ingroup sscWidget
+ * \ingroup cx_resource_core_dataadapters
  */
 class DoubleDataAdapterXml: public DoubleDataAdapter
 {

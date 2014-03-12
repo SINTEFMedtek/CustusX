@@ -4,7 +4,7 @@
 #include <QHBoxLayout>
 #include "sscEnumConverter.h"
 #include "cxStateService.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxSelectionGroupBox.h"
 #include "cxToolListWidget.h"
 #include "cxApplicationStateMachine.h"

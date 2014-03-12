@@ -39,9 +39,9 @@ namespace cx
  *  no paintEvent will come, and the prePaintEvent will not be called.
  *  See ScalarInteractionWidget for an example of how to hack this if necessary.
  *
+ *   \ingroup cx_resource_widgets
  *   \author christiana
  *   \date Nov 15, 2012
- *   \ingroup sscWidget
  */
 class OptimizedUpdateWidget: public QWidget
 {

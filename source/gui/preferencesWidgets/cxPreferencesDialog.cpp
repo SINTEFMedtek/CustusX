@@ -12,7 +12,7 @@
 #include "cxPreferencesDialog.h"
 #include "cxViewManager.h"
 #include "cxDataLocations.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxDataLocations.h"
 #include "cxStateService.h"
 #include "cxFilePreviewWidget.h"

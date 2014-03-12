@@ -35,6 +35,7 @@ namespace cx
 /**
  * Internal class for the MousePadWidget
  *
+ * \ingroup cx_resource_widgets
  */
 class MousePadWidgetInternal: public QFrame
 {
@@ -69,7 +70,7 @@ private:
 
 /**\brief A touchpad-friendly area  for performing 1D/2D scroll operations.
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_widgets
  */
 class MousePadWidget: public QFrame
 {

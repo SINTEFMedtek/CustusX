@@ -74,8 +74,8 @@ typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
  * \author petterw
  * \author christiana
  *
- * \ingroup sscRep
- * \ingroup sscRep2D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep2D
  */
 class Texture3DSlicerRep: public RepImpl
 {

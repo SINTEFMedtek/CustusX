@@ -43,7 +43,7 @@ typedef boost::shared_ptr<class ReconstructAlgorithm> ReconstructAlgorithmPtr;
 
 /**
  * \file
- * \addtogroup cxPluginUsReconstruction
+ * \addtogroup cx_plugin_usreconstruction
  * @{
  */
 

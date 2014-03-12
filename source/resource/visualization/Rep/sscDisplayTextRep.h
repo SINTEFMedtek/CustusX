@@ -39,10 +39,10 @@ typedef boost::shared_ptr<class DisplayTextRep> DisplayTextRepPtr;
  * The positioning is done in normalized view space, i.e. the text
  * is placed relative to the view and not the world.
  *
- * \ingroup sscRep
- * \ingroup sscRep2D
- * \ingroup sscRep3D
- * \ingroup sscRepVideo
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep2D
+ * \ingroup cx_resource_visualization_rep3D
+ * \ingroup cx_resource_visualization_repvideo
  */
 class DisplayTextRep : public RepImpl
 {

@@ -30,7 +30,7 @@ namespace cx
 
 /**
  * \brief Class for reading the files defining a CustusX3 tool
- * \ingroup cxServiceTracking
+ * \ingroup cx_service_tracking
  *
  * \date 21. march 2011
  * \author Janne Beate Bakeng, SINTEF
@@ -76,7 +76,7 @@ private:
 
 /**
  * \brief Class for reading the files defining a CustusX3 tool
- * \ingroup cxServiceTracking
+ * \ingroup cx_service_tracking
  *
  * \date 21. march 2011
  * \author Janne Beate Bakeng, SINTEF

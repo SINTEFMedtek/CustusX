@@ -14,7 +14,7 @@ typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegi
 
 /**
  * \file
- * \addtogroup cxPluginRegistration
+ * \addtogroup cx_plugin_registration
  * @{
  */
 

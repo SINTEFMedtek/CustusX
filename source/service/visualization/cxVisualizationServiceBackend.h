@@ -27,8 +27,7 @@ typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
 /**
  *
- *
- * \ingroup cx
+ * \ingroup cx_service_visualization
  * \date 2014-02-23
  * \author christiana
  */
