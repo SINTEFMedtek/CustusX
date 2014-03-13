@@ -1,3 +1,17 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 /*
  * cxShadingWidget.cpp
  *
@@ -14,6 +28,8 @@
 
 //#include "sscAbstractInterface.h"
 #include "cxShadingParamsInterfaces.h"
+
+#include "cxImagePropertiesWidget.h"
 
 namespace cx
 {
@@ -37,7 +53,7 @@ void ShadingWidget::init()
   connect(mShadingCheckBox, SIGNAL(toggled(bool)), this, SLOT(shadingToggledSlot(bool)));
 
   QGridLayout* shadingLayput = new QGridLayout();
-  shadingLayput->addWidget(mShadingCheckBox, 0,0);
+	shadingLayput->addWidget(mShadingCheckBox, 0,0);
   SliderGroupWidget* shadingAmbientWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingAmbient()), shadingLayput, 1);
   SliderGroupWidget* shadingDiffuseWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingDiffuse()), shadingLayput, 2);
   SliderGroupWidget* shadingSpecularWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingSpecular()), shadingLayput, 3);
@@ -52,8 +68,10 @@ void ShadingWidget::init()
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
+	ImagePropertiesWidget* imagePropertiesWidget = new ImagePropertiesWidget(NULL);
+	shadingLayput->addWidget(imagePropertiesWidget, 5, 0, 1, 2);
   mLayout->addLayout(shadingLayput);
-  mLayout->addStretch(1);
+	mLayout->addStretch(1);
 
 //  this->setLayout(mLayout);
 }

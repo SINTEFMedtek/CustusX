@@ -159,6 +159,11 @@ cx_add_class(cxResource_SOURCE
 	vesselReg/SeansVesselReg.cxx
 	vesselReg/SeansVesselReg.hxx
 	vesselReg/HackTPSTransform.hxx
+	
+	${CustusX3_SOURCE_DIR}/source/ThirdParty/iir1/iir/Butterworth.cpp
+	${CustusX3_SOURCE_DIR}/source/ThirdParty/iir1/iir/Cascade.cpp
+	${CustusX3_SOURCE_DIR}/source/ThirdParty/iir1/iir/PoleFilter.cpp
+	${CustusX3_SOURCE_DIR}/source/ThirdParty/iir1/iir/Biquad.cpp
     )
     
 
@@ -223,6 +228,7 @@ set(CX_RESOURCE_INCLUDE_DIRECTORIES
     ${CustusX3_SOURCE_DIR}/source/resource/core/settings
     ${CustusX3_SOURCE_DIR}/source/resource/core/utilities
     ${CustusX3_SOURCE_DIR}/source/ThirdParty
+    ${CustusX3_SOURCE_DIR}/source/ThirdParty/iir1
     
     ${CustusX3_BINARY_DIR}/source/resource/core
     ${CustusX3_BINARY_DIR}/source/resource/core/utilities

@@ -266,7 +266,7 @@ class IGSTK(CppComponent):
 
 class ISB_DataStreaming(CppComponent):
     def name(self):
-        self.mCurrentRevision = "498"
+        self.mCurrentRevision = "523"
         return "ISB_DataStreaming"
     def help(self):
         return 'ISB GE Digital Interface stuff'
@@ -288,7 +288,7 @@ class ISB_DataStreaming(CppComponent):
         add('DATASTREAMING_USE_TRACKING:BOOL', False)
         add('DATASTREAMING_USE_SC_DICOM_LOADERS:BOOL', False)
         add('DATASTREAMING_USE_OPENCL:BOOL', self.controlData.mGEStreamerUseOpenCL)
-        add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
+        add('DATASTREAMING_BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
         builder.configureCMake()
     def _svn_login_info(self):
         '''
@@ -429,7 +429,7 @@ class OpenCLUtilityLibrary(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:smistad/OpenCLUtilityLibrary')
     def update(self):
-        self._getBuilder().gitCheckout('8b13121582b791b16e68ef4537df81746953eb28', submodules=False)
+        self._getBuilder().gitCheckout('c59775aec5f648666ce8b35c6cb7873bc2b5476e', submodules=False)
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()
