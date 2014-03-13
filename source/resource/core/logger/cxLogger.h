@@ -36,10 +36,10 @@ extern "C"
 */
 
 
-int SSC_Logging_Init_Default(const char *busName); ///< Initialize SonoWand logging system and databus connection.
-int SSC_Logging_Init(const char *busName, const char* applicationPath); ///< Initialize SonoWand logging system and databus connection.
-void SSC_Logging_Done( void ); ///< Properly close down connection to databus.
-void SSC_Logging( bool on ); ///< Turn logging on or off.
+//int SSC_Logging_Init_Default(const char *busName); ///< Initialize SonoWand logging system and databus connection.
+//int SSC_Logging_Init(const char *busName, const char* applicationPath); ///< Initialize SonoWand logging system and databus connection.
+//void SSC_Logging_Done( void ); ///< Properly close down connection to databus.
+//void SSC_Logging( bool on ); ///< Turn logging on or off.
 
 /** General low-level log function. */
 #define SSC_LOG( ... ) SSC_Log(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__ ) ///< log using printf-style. Example: SSC_LOG(s%, "Hello world!");

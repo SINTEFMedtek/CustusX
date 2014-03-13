@@ -56,7 +56,7 @@ class ElastiXFixture
 public:
 	ElastiXFixture()
 	{
-//		cx::MessageManager::initialize();
+//		cx::Reporter::initialize();
 //		cx::cxDataManager::initialize();
 		cx::LogicManager::initialize();
 	}
@@ -65,7 +65,7 @@ public:
 	{
 		cx::LogicManager::shutdown();
 //		cx::DataManager::shutdown();
-//		cx::MessageManager::shutdown();
+//		cx::Reporter::shutdown();
 	}
 	bool compareTransforms(cx::Transform3D result, cx::Transform3D solution)
 	{

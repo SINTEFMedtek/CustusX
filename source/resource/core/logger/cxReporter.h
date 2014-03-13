@@ -76,7 +76,7 @@ public:
   static void initialize(); ///< initialize service. must be called before use.
   static void shutdown(); ///< shutdown service.
 
-  static Reporter* getInstance(); ///< Returns a reference to the only MessageManager that exists.
+  static Reporter* getInstance(); ///< Returns a reference to the only Reporter that exists.
 
   void setLoggingFolder(QString absoluteLoggingFolderPath); // deprecated
   bool setLogFile(QString filename); ///< set a file to write messages to.
@@ -162,6 +162,17 @@ private:
 /**Shortcut for accessing the message manager instance.
  */
 Reporter* reporter();
+
+//#define reportMessage(msg, level)    \
+//{                                    \
+//	reporter()->sendMessage(msg, level, -1);    \
+//}
+
+//#define reportDebug(msg)   reportMessage(msg, mlDEBUG)
+//#define report(msg)        reportMessage(msg, mlINFO)
+//#define reportWarning(msg) reportMessage(msg, mlWARNING)
+//#define reportError(msg)   reportMessage(msg, mlERROR)
+//#define reportSuccess(msg) reportMessage(msg, mlSUCCESS)
 
 static void reportDebug(QString msg) { reporter()->sendDebug(msg); }
 static void report(QString msg) { reporter()->sendInfo(msg); }

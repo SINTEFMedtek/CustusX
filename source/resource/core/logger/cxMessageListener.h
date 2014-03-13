@@ -23,7 +23,7 @@ namespace cx
 
 typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
 
-/** Utility for listening to the MessageManager
+/** Utility for listening to the Reporter
   * and storing messages from it.
   *
  * \ingroup cx_resource_core_logger

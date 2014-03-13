@@ -22,7 +22,7 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][widget][streaming]")
 {
 	cx::LogicManager::initialize();
 //	cxtest::TestServicesPtr services = cxtest::TestServices::create();
-//	cx::messageManager()->initialize();
+//	cx::Reporter()->initialize();
 //	cx::cxDataManager::getInstance()->initialize();
 
 //	cx::cxToolManager::initializeObject();
@@ -49,7 +49,7 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][widget][streaming]")
 
 //	DummyToolManager::getInstance()->shutdown();
 //	cx::cxDataManager::getInstance()->shutdown();
-//	cx::messageManager()->shutdown();
+//	cx::Reporter()->shutdown();
 	ts.reset();
 	cx::LogicManager::shutdown();
 }

@@ -32,7 +32,7 @@ ReconstructManagerTestFixture::ReconstructManagerTestFixture()
 {
 	mVerbose = false;
 
-//	cx::MessageManager::initialize();
+//	cx::Reporter::initialize();
 //	cx::cxDataManager::initialize();
 	cx::LogicManager::initialize();
 }
@@ -41,7 +41,7 @@ ReconstructManagerTestFixture::~ReconstructManagerTestFixture()
 {
 	cx::LogicManager::shutdown();
 //	cx::cxDataManager::shutdown();
-//	cx::MessageManager::shutdown();
+//	cx::Reporter::shutdown();
 }
 
 void ReconstructManagerTestFixture::setPNN_InterpolationSteps(int value)

@@ -84,7 +84,7 @@ TEST_CASE("CustusX full run emits no errors, correct service shutdown.", "[integ
 	custusX.stop();
 
 	// the original argument for this test was to check if LogicManager succeeds in deleting
-	// all services: Failure to do so sends an error to the messagemanager.
+	// all services: Failure to do so sends an error to the Reporter.
 	CHECK(!messageListener->containsErrors());
 }
 
