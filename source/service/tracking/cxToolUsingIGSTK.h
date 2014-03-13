@@ -12,8 +12,8 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXTOOL_H_
-#define CXTOOL_H_
+#ifndef CXTOOLUSINGIGSTK_H_
+#define CXTOOLUSINGIGSTK_H_
 
 #include "cxToolImpl.h"
 
@@ -138,4 +138,4 @@ typedef boost::shared_ptr<cxTool> cxToolPtr;
  * @}
  */
 } //namespace cx
-#endif /* CXTOOL_H_ */
+#endif /* CXTOOLUSINGIGSTK_H_ */

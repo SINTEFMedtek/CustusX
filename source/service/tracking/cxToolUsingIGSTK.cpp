@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #define _USE_MATH_DEFINES
-#include "cxTool.h"
+#include "cxToolUsingIGSTK.h"
 
 #include <vtkPolyData.h>
 #include <vtkConeSource.h>
@@ -26,7 +26,7 @@
 #include "sscTypeConversions.h"
 #include "sscProbeData.h"
 #include "sscToolManager.h"
-#include "cxProbe.h"
+#include "cxProbeImpl.h"
 #include "cxIgstkTool.h"
 #include "cxTrackingPositionFilter.h"
 

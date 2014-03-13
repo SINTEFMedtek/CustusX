@@ -21,7 +21,7 @@
 #include <QTimer>
 #include "cxIgstkTracker.h"
 #include "cxIgstkTrackerThread.h"
-#include "cxTool.h"
+#include "cxToolUsingIGSTK.h"
 #include "cxIgstkTool.h"
 #include "cxIgstkToolManager.h"
 

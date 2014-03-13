@@ -24,7 +24,7 @@
 #include "sscTestVideoSource.h"
 #include "sscImageImportVideoSource.h"
 #include "sscToolManager.h"
-#include "cxProbe.h"
+#include "cxProbeImpl.h"
 #include "sscUSFrameData.h"
 #include "cxPlaybackTime.h"
 #include "sscLogger.h"

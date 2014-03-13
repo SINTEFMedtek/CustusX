@@ -243,8 +243,16 @@ class CppFilePair:
         else:
             old_base_name = os.path.basename(self.old_source_file_abs_path)            
         old_base_name = os.path.splitext(old_base_name)[0]
+        
+        #delimiter = '^[a-zA-Z0-9]%s'
+        delimiter = '\W'
+        regex_pattern = r'(%s)(%s)(%s)' % (delimiter, old_base_name, delimiter)
+        replace_with_text = r'\1%s\3' % new_base_name
+        
         for target_file in target_files:
-            find_and_replace_text_in_file(target_file, regex_pattern=old_base_name, replace_with_text=new_base_name)
+            find_and_replace_text_in_file(target_file, 
+                                          regex_pattern=regex_pattern, 
+                                          replace_with_text=replace_with_text)
         
     def _find_cpp_file_pair(self, path_to_file):
         file = File(path_to_file)
@@ -363,8 +371,8 @@ Parses the scripts incoming arguments and does what it's told.
 '''
 def main():
     argv_parser = argparse.ArgumentParser(description='Rename a cplusplus header and source file pair.')
-#    argv_parser.add_argument("header_file", help="Absolute or relative path to existing cplusplus header file. ex: ./thing.h", type=str)
-#    argv_parser.add_argument("new_name", help="New base name for the header file. ex: something", type=str)
+    argv_parser.add_argument("header_file", help="Absolute or relative path to existing cplusplus header file. ex: ./thing.h", type=str)
+    argv_parser.add_argument("new_name", help="New base name for the header file. ex: something", type=str)
     argv_parser.add_argument("--root_dir", help="root directory, work on all files inside", type=str)
     argv_parser.add_argument("-d", "--debug", action = "store_true", help="Used for debugging the script")
     argv_parser.add_argument("-v", "--verbosity", default=2, type=int, help="Verbosity level: 0=quiet, 1=errors, 2=warnings, 3=status")
@@ -378,8 +386,8 @@ def main():
     logger.setRootPath(os.path.abspath(args.root_dir))
     logger.setVerbosityLevel(args.verbosity)
 
-    rename_ssc_to_cx(file_repository)
-    return
+    #rename_ssc_to_cx(file_repository)
+    #return
     
     file_pair = CppFilePair(args.header_file)
     renamer = CppFileRenamer(file_pair, args.new_name, file_repository)

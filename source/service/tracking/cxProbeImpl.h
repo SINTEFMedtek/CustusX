@@ -20,8 +20,8 @@
  *  \author Ole Vegard Solberg, SINTEF
  */
 
-#ifndef CXPROBE_H_
-#define CXPROBE_H_
+#ifndef CXPROBEIMPL_H_
+#define CXPROBEIMPL_H_
 
 #include "sscProbe.h"
 #include <map>
@@ -115,5 +115,5 @@ private:
  */
 } // namespace cx
 
-#endif /* CXPROBE_H_ */
+#endif /* CXPROBEIMPL_H_ */
 

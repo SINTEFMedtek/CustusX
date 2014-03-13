@@ -23,7 +23,7 @@
 #include "cxUsReconstructionFileReader.h"
 #include "cxImageDataContainer.h"
 #include "sscStringDataAdapterXml.h"
-#include "cxProbe.h"
+#include "cxProbeImpl.h"
 #include "sscToolManager.h"
 #include "cxLogicManager.h"
 #include "cxStateService.h"

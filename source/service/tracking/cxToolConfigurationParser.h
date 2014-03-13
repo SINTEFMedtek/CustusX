@@ -21,7 +21,7 @@
 #include <QString>
 #include <QDomDocument>
 #include "sscToolManager.h"
-#include "cxTool.h"
+#include "cxToolUsingIGSTK.h"
 #include "cxIgstkTracker.h"
 #include "cxIgstkTool.h"
 

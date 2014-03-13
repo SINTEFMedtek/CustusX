@@ -19,7 +19,7 @@
 #include "sscDoubleWidgets.h"
 #include "cxToolDataAdapters.h"
 #include "cxVector3DWidget.h"
-#include "cxProbe.h"
+#include "cxProbeImpl.h"
 #include "cxDoubleSpanSlider.h"
 #include "sscHelperWidgets.h"
 #include "sscTypeConversions.h"
