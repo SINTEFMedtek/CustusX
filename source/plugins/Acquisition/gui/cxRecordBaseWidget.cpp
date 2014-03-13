@@ -8,7 +8,7 @@
 #include <QDoubleSpinBox>
 #include <vtkPolyData.h>
 #include "cxToolManager.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxMesh.h"
 #include "cxTransform3D.h"

@@ -10,7 +10,7 @@
 #include <vtkPlane.h>
 #include <vtkClipPolyData.h>
 #include "cxToolManager.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTimeKeeper.h"
 
 namespace cx

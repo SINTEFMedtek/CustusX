@@ -14,7 +14,7 @@
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
 #include "cxDataManager.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTime.h"
 
 #include "cxPatientService.h"

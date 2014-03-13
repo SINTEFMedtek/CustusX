@@ -10,7 +10,7 @@
 #include <QSlider>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxPickerRep.h"
 #include "cxLabeledComboBoxWidget.h"
@@ -109,7 +109,7 @@ void LandmarkImageRegistrationWidget::addLandmarkButtonClickedSlot()
 	PickerRepPtr PickerRep = this->getPickerRep();
 	if (!PickerRep)
 	{
-		messageManager()->sendError("Could not find a rep to add the landmark to.");
+		reportError("Could not find a rep to add the landmark to.");
 		return;
 	}
 
@@ -131,7 +131,7 @@ void LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot()
 	PickerRepPtr PickerRep = this->getPickerRep();
 	if (!PickerRep)
 	{
-		messageManager()->sendError("Could not find a rep to edit the landmark for.");
+		reportError("Could not find a rep to edit the landmark for.");
 		return;
 	}
 

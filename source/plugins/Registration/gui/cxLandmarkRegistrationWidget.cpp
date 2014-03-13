@@ -10,7 +10,7 @@
 #include <QSlider>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxRegistrationManager.h"
 #include "cxDataManager.h"
 #include "cxRegistrationHistoryWidget.h"
@@ -70,7 +70,7 @@ void LandmarkRegistrationWidget::cellClickedSlot(int row, int column)
 		return;
 
 	if (!mLandmarkTableWidget)
-		messageManager()->sendDebug("mLandmarkTableWidget is null");
+		reporter()->sendDebug("mLandmarkTableWidget is null");
 
 	mActiveLandmark = mLandmarkTableWidget->item(row, column)->data(Qt::UserRole).toString();
 

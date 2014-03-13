@@ -15,7 +15,7 @@
 #include "catch.hpp"
 #include "cxDataManagerImpl.h"
 #include "cxtestDummyDataManager.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxMessageListener.h"
 
 namespace cx

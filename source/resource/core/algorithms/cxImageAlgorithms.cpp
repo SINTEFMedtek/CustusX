@@ -28,7 +28,7 @@
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
 #include "cxRegistrationTransform.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTime.h"
 
 

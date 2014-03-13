@@ -16,7 +16,7 @@
 #include "cxtestProbeFixture.h"
 
 #include <QString>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "ProbeXmlConfigParserMock.h"
 #include "cxProbeData.h"
 #include "cxTestVideoSource.h"
@@ -29,7 +29,7 @@ namespace cxtest
 ProbeFixture::ProbeFixture()
 {
 	// this stuff will be performed just before all tests in this class
-	cx::MessageManager::initialize();
+	cx::Reporter::initialize();
 	this->createTestProbe();
 }
 
@@ -37,7 +37,7 @@ ProbeFixture::ProbeFixture()
 ProbeFixture::~ProbeFixture()
 {
 	// this stuff will be performed just after all tests in this class
-	cx::MessageManager::shutdown();
+	cx::Reporter::shutdown();
 }
 
 

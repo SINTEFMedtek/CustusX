@@ -4,7 +4,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QVBoxLayout>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxToolManager.h"
 #include "cxDataManager.h"
 #include "cxRegistrationManager.h"

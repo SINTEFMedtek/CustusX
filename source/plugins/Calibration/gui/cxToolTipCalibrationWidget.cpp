@@ -19,7 +19,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include "cxTypeConversions.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxToolManager.h"
 #include "cxDataManager.h"
 #include "cxVector3D.h"
@@ -127,7 +127,7 @@ void ToolTipCalibrateWidget::testCalibrationSlot()
 
   mDeltaLabel->setText("<b>Delta:</b> "+qstring_cast(delta_selectedTool)+" <br> <b>Length:</b>  "+qstring_cast(delta_selectedTool.length()));
 
-  messageManager()->sendInfo("Delta: "+qstring_cast(delta_selectedTool)+" Length:   "+qstring_cast(delta_selectedTool.length()));
+  report("Delta: "+qstring_cast(delta_selectedTool)+" Length:   "+qstring_cast(delta_selectedTool.length()));
 }
 
 void ToolTipCalibrateWidget::toolSelectedSlot()
@@ -146,7 +146,7 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
 //      mTestButton->setEnabled(true);
     }
     else
-		messageManager()->sendWarning("Selected tool have no known reference point");
+		reportWarning("Selected tool have no known reference point");
     if(tool)
     {
       mCalibrationLabel->setText("Calibration:\n"+qstring_cast(tool->getCalibration_sMt()));

@@ -25,7 +25,7 @@
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDataManager.h"
 #include "cxTime.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxProbeSector.h"
 #include "cxRegistrationTransform.h"
 #include "cxStringDataAdapterXml.h"
@@ -311,7 +311,6 @@ void VideoConnectionWidget::writeSettings()
 	}
 	else if (this->getVideoConnectionManager()->useSimulatedServer())
 	{
-		std::cout << "****** simulated image streamer" << std::endl;
 		this->getVideoConnectionManager()->setLocalServerArguments("--type SimulatedImageStreamer");
 	}
 }
@@ -373,12 +372,12 @@ void VideoConnectionWidget::importStreamImageSlot()
 {
 	if (!this->getVideoConnectionManager())
 	{
-		messageManager()->sendWarning("No video connection");
+		reportWarning("No video connection");
 		return;
 	}
 	if (!this->getVideoConnectionManager()->isConnected())
 	{
-		messageManager()->sendWarning("Video is not connected");
+		reportWarning("Video is not connected");
 		return;
 	}
 	Transform3D rMd = Transform3D::Identity();
@@ -394,12 +393,12 @@ void VideoConnectionWidget::importStreamImageSlot()
 
 	if (!videoSource)
 	{
-		messageManager()->sendWarning("No Video data source");
+		reportWarning("No Video data source");
 		return;
 	}
 	if (!videoSource->validData())
 	{
-		messageManager()->sendWarning("No valid video data");
+		reportWarning("No valid video data");
 		return;
 	}
 
@@ -407,7 +406,7 @@ void VideoConnectionWidget::importStreamImageSlot()
 	input = videoSource->getVtkImageData();
 	if (!input)
 	{
-		messageManager()->sendWarning("No Video data");
+		reportWarning("No Video data");
 		return;
 	}
 	QString filename = generateFilename(videoSource);
@@ -452,7 +451,7 @@ void VideoConnectionWidget::saveAndImportSnapshot(vtkImageDataPtr input, QString
 	dataManager()->loadData(output);
 	dataManager()->saveImage(output, folder);
 	viewManager()->autoShowData(output);
-	messageManager()->sendInfo(QString("Saved snapshot %1 from active video source").arg(output->getName()));
+	report(QString("Saved snapshot %1 from active video source").arg(output->getName()));
 }
 
 } //end namespace cx

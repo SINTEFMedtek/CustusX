@@ -29,7 +29,7 @@
 #include "cxLayoutData.h"
 
 #include "cxVolumetricRep.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxXmlOptionItem.h"
 #include "cxDataManager.h"
 #include "cxToolManager.h"
@@ -441,7 +441,7 @@ void ViewManager::setActiveLayout(const QString& layout, int widgetIndex)
 	emit activeLayoutChanged();
 
 	QString layoutName = this->getLayoutData(layout).getName();
-	messageManager()->sendInfo(QString("Layout %1 changed to %2").arg(widgetIndex).arg(layoutName));
+	report(QString("Layout %1 changed to %2").arg(widgetIndex).arg(layoutName));
 }
 
 void ViewManager::rebuildLayouts()

@@ -27,7 +27,7 @@
  */
 
 #include "cxUSFrameData.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include <vtkImageData.h>
 #include <vtkImageLuminance.h>
 #include <vtkImageClip.h>
@@ -320,7 +320,7 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData, vtkImageDataPtr gr
 
 	if (inData->GetNumberOfScalarComponents() != 3)
 	{
-		messageManager()->sendWarning("Angio requested for grayscale ultrasound");
+		reportWarning("Angio requested for grayscale ultrasound");
 		return grayFrame;
 	}
 

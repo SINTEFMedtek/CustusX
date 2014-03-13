@@ -11,7 +11,7 @@
 #include <QTextStream>
 #include <QStringList>
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 
 namespace cx
@@ -101,7 +101,7 @@ void CustomMetaImage::setModality(QString value)
 
     if (!file.open(QIODevice::ReadWrite))
     {
-      messageManager()->sendError("Failed to open file " + mFilename + ".");
+      reportError("Failed to open file " + mFilename + ".");
       return;
     }
 
@@ -122,7 +122,7 @@ void CustomMetaImage::setImageType(QString value)
 
     if (!file.open(QIODevice::ReadWrite))
     {
-      messageManager()->sendError("Failed to open file " + mFilename + ".");
+      reportError("Failed to open file " + mFilename + ".");
       return;
     }
 
@@ -138,7 +138,7 @@ void CustomMetaImage::setImageType(QString value)
 
 Transform3D CustomMetaImage::readTransform()
 {
-  //messageManager()->sendDebug("load filename: "+string_cast(filename));
+  //reportDebug("load filename: "+string_cast(filename));
   //read the specific TransformMatrix-tag from the header
   Vector3D p_r(0, 0, 0);
   Vector3D e_x(1, 0, 0);
@@ -202,7 +202,7 @@ void CustomMetaImage::setTransform(const Transform3D M)
 
   if (!file.open(QIODevice::ReadWrite))
   {
-    messageManager()->sendError("Failed to open file " + mFilename + ".");
+    reportError("Failed to open file " + mFilename + ".");
     return;
   }
 

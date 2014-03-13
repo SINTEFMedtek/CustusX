@@ -22,7 +22,7 @@
 #include <vtkSTLReader.h>
 #include <vtkCursor3D.h>
 #include "cxDummyTool.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxToolManager.h"
 #include "cxTime.h"
 

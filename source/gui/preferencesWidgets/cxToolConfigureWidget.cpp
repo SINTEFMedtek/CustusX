@@ -7,7 +7,7 @@
 #include <QDir>
 #include <QLineEdit>
 #include "cxEnumConverter.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxStateService.h"
 #include "cxToolManager.h"
 #include "cxSelectionGroupBox.h"
@@ -98,7 +98,7 @@ void ToolConfigureGroupBox::setCurrentlySelectedCofiguration(QString configAbsol
   if(currentIndex < 0)
   {
     currentIndex = 0;
-    messageManager()->sendWarning("Tool configuration doesn't exist: " + cleanPath);
+    reportWarning("Tool configuration doesn't exist: " + cleanPath);
   }
   mConfigFilesComboBox->setCurrentIndex(currentIndex);
 }

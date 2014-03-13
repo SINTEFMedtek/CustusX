@@ -12,7 +12,7 @@
 #include <vtkDoubleArray.h>
 #include "cxVector3D.h"
 #include "cxViewManager.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxRegistrationManager.h"
 #include "cxToolManager.h"
@@ -114,7 +114,7 @@ void LandmarkPatientRegistrationWidget::toolSampleButtonClickedSlot()
 
 	if (!tool)
 	{
-		messageManager()->sendError("mToolToSample is NULL!");
+		reportError("mToolToSample is NULL!");
 		return;
 	}
 	//TODO What if the reference frame isnt visible?
@@ -126,7 +126,7 @@ void LandmarkPatientRegistrationWidget::toolSampleButtonClickedSlot()
 		mActiveLandmark = dataManager()->getLandmarkProperties().begin()->first;
 
 	dataManager()->getPatientLandmarks()->setLandmark(Landmark(mActiveLandmark, p_pr));
-	messageManager()->playSampleSound();
+	reporter()->playSampleSound();
 
     this->activateLandmark(this->getNextLandmark());
 
@@ -211,7 +211,7 @@ Transform3D LandmarkPatientRegistrationWidget::getTargetTransform() const
 void LandmarkPatientRegistrationWidget::setTargetLandmark(QString uid, Vector3D p_target)
 {
 	dataManager()->getPatientLandmarks()->setLandmark(Landmark(uid, p_target));
-	messageManager()->playSampleSound();
+	reporter()->playSampleSound();
 }
 
 void LandmarkPatientRegistrationWidget::performRegistration()

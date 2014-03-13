@@ -24,7 +24,7 @@ MessageListenerPtr MessageListener::create()
 
 MessageListener::MessageListener() : mManager(NULL)
 {
-	mManager = messageManager();
+	mManager = reporter();
 	connect(mManager, SIGNAL(emittedMessage(Message)), this, SLOT(messageReceived(Message)));
 }
 

@@ -3,7 +3,7 @@
 #include <QFile>
 #include <QPicture>
 #include <QVBoxLayout>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 namespace cx
 {

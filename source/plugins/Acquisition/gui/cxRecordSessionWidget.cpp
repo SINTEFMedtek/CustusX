@@ -6,7 +6,7 @@
 #include <QVBoxLayout>
 #include <QEvent>
 #include "cxTime.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxRecordSession.h"
 #include "cxToolManager.h"
 #include "cxTypeConversions.h"

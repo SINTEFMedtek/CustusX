@@ -133,7 +133,7 @@ void ReconstructCore::threadedPostReconstruct()
 
 		Eigen::Array3i outputDims(mRawOutput->GetDimensions());
 		int total = outputDims[0] * outputDims[1] * outputDims[2];
-		messageManager()->sendInfo(QString("US Reconstruction complete: %1Mb, output=%2, algo=%3, preset=%4, angio=%5")
+		report(QString("US Reconstruction complete: %1Mb, output=%2, algo=%3, preset=%4, angio=%5")
 										.arg(total/1024/1024)
 										.arg(mOutput->getName())
 										.arg(mAlgorithm->getName())
@@ -145,7 +145,7 @@ void ReconstructCore::threadedPostReconstruct()
 	}
 	else
 	{
-		messageManager()->sendError("Reconstruction failed");
+		reportError("Reconstruction failed");
 	}
 }
 

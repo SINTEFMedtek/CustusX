@@ -2,7 +2,7 @@
 #include "cxMacGrabberServer.h"
 
 #include <QMacCocoaViewContainer>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxMacGrabber.h"
 

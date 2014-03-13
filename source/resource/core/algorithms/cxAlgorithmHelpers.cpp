@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 #include "cxAlgorithmHelpers.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxImage.h"
 #include "cxTypeConversions.h"
 #include "itkImageFileReader.h"
@@ -82,7 +82,7 @@ itkImageType::ConstPointer AlgorithmHelper::getITKfromVTKImageViaFile(vtkImageDa
   double maxVal = input->GetScalarRange()[1];
 
   if(maxVal > SHRT_MAX || minVal < SHRT_MIN)
-  	messageManager()->sendWarning("Image values out of range. max: " + qstring_cast(maxVal)
+  	reportWarning("Image values out of range. max: " + qstring_cast(maxVal)
   			+ " min: " + qstring_cast(minVal) + " See bug #363 if this needs to be fixed");
 
   QString tempFolder = DataLocations::getCachePath() + "/vtk2itk/";

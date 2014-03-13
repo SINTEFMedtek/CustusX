@@ -10,7 +10,7 @@
 #include <QApplication>
 #include <iostream>
 #include "cxMainWindow.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 #include "cxUsReconstructionPlugin.h"
 #include "cxAcquisitionPlugin.h"

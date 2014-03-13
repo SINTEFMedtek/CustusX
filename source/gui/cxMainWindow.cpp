@@ -5,7 +5,7 @@
 #include "boost/scoped_ptr.hpp"
 #include "boost/bind.hpp"
 #include "cxTime.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
@@ -79,8 +79,8 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	this->createToolBars();
 	this->setStatusBar(new StatusBar());
 
-	messageManager()->setLoggingFolder(DataLocations::getRootConfigPath());
-	messageManager()->setAudioSource(AudioPtr(new AudioImpl()));
+	reporter()->setLoggingFolder(DataLocations::getRootConfigPath());
+	reporter()->setAudioSource(AudioPtr(new AudioImpl()));
 
 	connect(stateService()->getApplication().get(), SIGNAL(activeStateChanged()), this,
 		SLOT(onApplicationStateChangedSlot()));
@@ -445,8 +445,8 @@ void MainWindow::saveScreenShot(QPixmap pixmap)
 void MainWindow::saveScreenShotThreaded(QImage pixmap, QString filename)
 {
 	pixmap.save(filename, "png");
-	messageManager()->sendInfo("Saved screenshot to " + filename);
-	messageManager()->playScreenShotSound();
+	report("Saved screenshot to " + filename);
+	reporter()->playScreenShotSound();
 }
 
 void MainWindow::toggleStreamingSlot()
@@ -540,7 +540,7 @@ void MainWindow::newPatientSlot()
 	if (!QDir().exists(patientDatafolder))
 	{
 		QDir().mkdir(patientDatafolder);
-		messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder);
+		report("Made a new patient folder: " + patientDatafolder);
 	}
 
 	QString timestamp = QDateTime::currentDateTime().toString(timestampFormatFolderFriendly()) + "_";
@@ -571,14 +571,14 @@ void MainWindow::clearPatientSlot()
 {
 	patientService()->getPatientData()->clearPatient();
 	patientService()->getPatientData()->writeRecentPatientData();
-	messageManager()->sendWarning("Cleared current patient data");
+	reportWarning("Cleared current patient data");
 }
 
 void MainWindow::savePatientFileSlot()
 {
 	if (patientService()->getPatientData()->getActivePatientFolder().isEmpty())
 	{
-		messageManager()->sendWarning("No patient selected, select or create patient before saving!");
+		reportWarning("No patient selected, select or create patient before saving!");
 		this->newPatientSlot();
 		return;
 	}
@@ -663,7 +663,7 @@ void MainWindow::loadPatientFileSlot()
 	if (!QDir().exists(patientDatafolder))
 	{
 		QDir().mkdir(patientDatafolder);
-		messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder);
+		report("Made a new patient folder: " + patientDatafolder);
 	}
 	// Open file dialog
 	QString choosenDir = QFileDialog::getExistingDirectory(this, tr("Select patient"), patientDatafolder,
@@ -695,7 +695,7 @@ void MainWindow::importDataSlot()
 		folder, tr("Image/Mesh (*.mhd *.mha *.stl *.vtk *.mnc)"));
 	if (fileName.empty())
 	{
-		messageManager()->sendInfo("Import canceled");
+		report("Import canceled");
 		return;
 	}
 
@@ -882,7 +882,7 @@ void MainWindow::preferencesSlot()
 
 void MainWindow::quitSlot()
 {
-	messageManager()->sendInfo("Shutting down CustusX");
+	report("Shutting down CustusX");
 	viewManager()->deactivateCurrentLayout();
 
 	patientService()->getPatientData()->autoSave();
@@ -890,7 +890,7 @@ void MainWindow::quitSlot()
 	settings()->setValue("mainWindow/geometry", saveGeometry());
 	settings()->setValue("mainWindow/windowState", saveState());
 	settings()->sync();
-	messageManager()->sendInfo("Closing: Save geometry and window state");
+	report("Closing: Save geometry and window state");
 
 	qApp->quit();
 }

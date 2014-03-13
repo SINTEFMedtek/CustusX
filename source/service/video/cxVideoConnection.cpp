@@ -31,7 +31,7 @@
 #include <vtkExtractVOI.h>
 #include "cxTypeConversions.h"
 #include "cxIGTLinkedImageReceiverThread.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTime.h"
 #include "cxVector3D.h"
 #include "cxProbeData.h"
@@ -151,7 +151,7 @@ void VideoConnection::stopClient()
 		{
 			mClient->terminate();
 			mClient->wait(); // forever or until dead thread
-			messageManager()->sendWarning(QString("Video Client [%1] did not quit normally - terminated.").arg(mClient->hostDescription()));
+			reportWarning(QString("Video Client [%1] did not quit normally - terminated.").arg(mClient->hostDescription()));
 		}
 
 		disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));

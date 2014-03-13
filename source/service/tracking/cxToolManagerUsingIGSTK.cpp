@@ -25,7 +25,7 @@
 #include <QCoreApplication>
 
 #include "cxRegistrationTransform.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxPositionStorageFile.h"
 #include "cxTime.h"
@@ -126,7 +126,7 @@ void ToolManagerUsingIGSTK::setPlaybackMode(PlaybackTimePtr controller)
 
 	if (!this->isConfigured())
 	{
-		messageManager()->sendWarning("ToolManager must be configured before setting playback");
+		reportWarning("ToolManager must be configured before setting playback");
 		return;
 	}
 
@@ -153,7 +153,7 @@ void ToolManagerUsingIGSTK::setPlaybackMode(PlaybackTimePtr controller)
 
 	controller->initialize(QDateTime::fromMSecsSinceEpoch(timeRange.first), timeRange.second - timeRange.first);
 
-	messageManager()->sendInfo("Opened Playback Mode");
+	report("Opened Playback Mode");
 	mPlayBackMode = true;
 	emit initialized();
 }
@@ -175,14 +175,14 @@ void ToolManagerUsingIGSTK::closePlayBackMode()
 	}
 	mTools[mManualTool->getUid()] = mManualTool;
 
-	messageManager()->sendInfo("Closed Playback Mode");
+	report("Closed Playback Mode");
 	mPlayBackMode = false;
 	emit initialized();
 }
 
 void ToolManagerUsingIGSTK::runDummyTool(DummyToolPtr tool)
 {
-	messageManager()->sendInfo("Running dummy tool " + tool->getUid());
+	report("Running dummy tool " + tool->getUid());
 
 	mTools[tool->getUid()] = tool;
 	tool->setVisible(true);
@@ -190,7 +190,7 @@ void ToolManagerUsingIGSTK::runDummyTool(DummyToolPtr tool)
     tool->startTracking(30);
 	this->setDominantTool(tool->getUid());
 
-	messageManager()->sendInfo("Dummy: Config/Init/Track started in toolManager");
+	report("Dummy: Config/Init/Track started in toolManager");
 	mConfigured = true;
 	emit configured();
 	this->initializedSlot(true);
@@ -232,7 +232,7 @@ void ToolManagerUsingIGSTK::configure()
 {
 	if (mConfigurationFilePath.isEmpty() || !QFile::exists(mConfigurationFilePath))
 	{
-		messageManager()->sendWarning("Configuration file is not valid, could not configure the toolmanager.");
+		reportWarning("Configuration file is not valid, could not configure the toolmanager.");
 		return;
 	}
 
@@ -243,7 +243,7 @@ void ToolManagerUsingIGSTK::configure()
 
 	if (trackers.empty())
 	{
-		messageManager()->sendWarning("Failed to configure tracking.");
+		reportWarning("Failed to configure tracking.");
 		return;
 	}
 
@@ -288,7 +288,7 @@ void ToolManagerUsingIGSTK::trackerConfiguredSlot(bool on)
 
 	if (!mTrackerThread)
 	{
-		messageManager()->sendDebug(
+		reporter()->sendDebug(
 						"Received a configured signal in ToolManager, but we don't have a mTrackerThread, this should never happen, contact programmer.");
 		return;
 	}
@@ -312,7 +312,7 @@ void ToolManagerUsingIGSTK::trackerConfiguredSlot(bool on)
 				emit probeAvailable();
 		}
 		else
-			messageManager()->sendWarning("Creation of the cxTool " + it->second->getUid() + " failed.");
+			reportWarning("Creation of the cxTool " + it->second->getUid() + " failed.");
 	}
 
 	// debug: give the manual tool properties from the first non-manual tool. Nice for testing tools
@@ -325,7 +325,7 @@ void ToolManagerUsingIGSTK::trackerConfiguredSlot(bool on)
 			if (iter->second->hasType(ToolUsingIGSTK::TOOL_REFERENCE))
 				continue;
 			mManualTool->setBase(iter->second);
-			messageManager()->sendInfo("Manual tool imbued with properties from " + iter->first);
+			report("Manual tool imbued with properties from " + iter->first);
 			break;
 		}
 	}
@@ -337,7 +337,7 @@ void ToolManagerUsingIGSTK::trackerConfiguredSlot(bool on)
 
 	this->loadPositionHistory(); // the tools are always reconfigured after a setloggingfolder
 
-	messageManager()->sendSuccess("ToolManager is configured.");
+	reportSuccess("ToolManager is configured.");
 	emit configured();
 }
 
@@ -368,7 +368,7 @@ void ToolManagerUsingIGSTK::deconfigure()
 	mConfigured = false;
 	emit
 	deconfigured();
-	messageManager()->sendInfo("ToolManager is deconfigured.");
+	report("ToolManager is deconfigured.");
 }
 
 void ToolManagerUsingIGSTK::initialize()
@@ -382,14 +382,14 @@ void ToolManagerUsingIGSTK::initialize()
 
 	if (!this->isConfigured())
 	{
-		messageManager()->sendWarning("Please configure before trying to initialize.");
+		reportWarning("Please configure before trying to initialize.");
 		return;
 	}
 
 #ifndef WIN32
 	if (!this->createSymlink())
 	{
-		messageManager()->sendError("Initialization of tracking failed.");
+		reportError("Initialization of tracking failed.");
 		return;
 	}
 #endif
@@ -397,7 +397,7 @@ void ToolManagerUsingIGSTK::initialize()
 	if (mTrackerThread)
 		mTrackerThread->initialize(true);
 	else
-		messageManager()->sendError(
+		reportError(
 						"Cannot initialize the tracking system because the tracking thread does not exist.");
 }
 
@@ -412,7 +412,7 @@ void ToolManagerUsingIGSTK::uninitialize()
 
 	if (!this->isInitialized())
 	{
-//		messageManager()->sendInfo("No need to uninitialize, toolmanager is not initialized.");
+//		report("No need to uninitialize, toolmanager is not initialized.");
 		return;
 	}
 	if (mTrackerThread)
@@ -435,7 +435,7 @@ bool ToolManagerUsingIGSTK::createSymlink()
 
 	if (!linkDir.exists())
 	{
-		messageManager()->sendError(
+		reportError(
 						QString("Folder %1 does not exist. System is not properly installed.").arg(linkDir.path()));
 		return false;
 	}
@@ -450,15 +450,15 @@ bool ToolManagerUsingIGSTK::createSymlink()
 
 	if (files.empty())
 	{
-		messageManager()->sendError(
+		reportError(
 						QString("No usb connections found in /dev using filters %1").arg(filters.join(";")));
 		return false;
 	}
 	else
 	{
-		messageManager()->sendInfo(QString("Device files: %1").arg(files.join(",")));
+		report(QString("Device files: %1").arg(files.join(",")));
 		if (files.size() > 1)
-			messageManager()->sendError(
+			reportError(
 					QString("More than one tracker connected? Will only try to connect to: %1").arg(files[0]));
 	}
 
@@ -470,21 +470,21 @@ bool ToolManagerUsingIGSTK::createSymlink()
 	QFileInfo devFileInfo(device);
 	if (!devFileInfo.isWritable())
 	{
-		messageManager()->sendError(QString("Device %1 is not writable. Connection will fail.").arg(device));
+		reportError(QString("Device %1 is not writable. Connection will fail.").arg(device));
 		retval = false;
 	}
 	// this call only succeeds if Custus is run as root.
 	bool val = devFile.link(linkfile);
 	if (!val)
 	{
-		messageManager()->sendError(
+		reportError(
 						QString("Symlink %1 creation to device %2 failed with code %3").arg(linkfile).arg(device).arg(
 										devFile.error()));
 		retval = false;
 	}
 	else
 	{
-		messageManager()->sendInfo(QString("Created symlink %1 to device %2").arg(linkfile).arg(device));
+		report(QString("Created symlink %1 to device %2").arg(linkfile).arg(device));
 	}
 
 	devFile.setPermissions(
@@ -506,7 +506,7 @@ QFileInfo ToolManagerUsingIGSTK::getSymlink() const
  */
 void ToolManagerUsingIGSTK::cleanupSymlink()
 {
-	messageManager()->sendInfo("Cleaning up symlinks.");
+	report("Cleaning up symlinks.");
 	QFile(this->getSymlink().absoluteFilePath()).remove();
 }
 #endif //WIN32
@@ -521,7 +521,7 @@ void ToolManagerUsingIGSTK::startTracking()
 
 	if (!mInitialized)
 	{
-		messageManager()->sendWarning("Please initialize before trying to start tracking.");
+		reportWarning("Please initialize before trying to start tracking.");
 		return;
 	}
 	if (mTrackerThread)
@@ -532,7 +532,7 @@ void ToolManagerUsingIGSTK::stopTracking()
 {
 	if (!mTracking)
 	{
-//		messageManager()->sendWarning("Please start tracking before trying to stop tracking.");
+//		reportWarning("Please start tracking before trying to stop tracking.");
 		return;
 	}
 	if (mTrackerThread)
@@ -542,7 +542,7 @@ void ToolManagerUsingIGSTK::stopTracking()
 void ToolManagerUsingIGSTK::saveToolsSlot()
 {
 	this->savePositionHistory();
-//	messageManager()->sendInfo("Transforms and timestamps are saved for connected tools.");
+//	report("Transforms and timestamps are saved for connected tools.");
 }
 
 SessionToolHistoryMap ToolManagerUsingIGSTK::getSessionHistory(double startTime, double stopTime)
@@ -657,7 +657,7 @@ void ToolManagerUsingIGSTK::setDominantTool(const QString& uid)
 	if (mDominantTool->hasType(ToolUsingIGSTK::TOOL_MANUAL))
 		emit tps(0);
 
-//	messageManager()->sendInfo("Change active tool to: " + mDominantTool->getName());
+//	report("Change active tool to: " + mDominantTool->getName());
 
 	emit dominantToolChanged(uid);
 }
@@ -757,7 +757,7 @@ void ToolManagerUsingIGSTK::loadPositionHistory()
 
 	if (!missingTools.empty())
 	{
-		messageManager()->sendWarning(
+		reportWarning(
 						QString("Loaded position history.\n"
 								"The following tools were found in the history\n"
 								"but not in the configuration:\n%1").arg(missingTools.join(", ")));
@@ -799,12 +799,12 @@ void ToolManagerUsingIGSTK::initializedSlot(bool value)
 	mInitialized = value;
 	if (mInitialized)
 	{
-		messageManager()->sendSuccess("ToolManager is initialized.");
+		reportSuccess("ToolManager is initialized.");
 		emit initialized();
 	}
 	else
 	{
-		messageManager()->sendInfo("ToolManager is uninitialized.");
+		report("ToolManager is uninitialized.");
 		emit uninitialized();
 	}
 }
@@ -814,12 +814,12 @@ void ToolManagerUsingIGSTK::trackerTrackingSlot(bool value)
 	mTracking = value;
 	if (mTracking)
 	{
-		messageManager()->sendSuccess("ToolManager started tracking.");
+		reportSuccess("ToolManager started tracking.");
 		emit trackingStarted();
 	}
 	else
 	{
-		messageManager()->sendSuccess("ToolManager stopped tracking.");
+		reportSuccess("ToolManager stopped tracking.");
 		emit trackingStopped();
 	}
 }

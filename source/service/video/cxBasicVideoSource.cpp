@@ -20,7 +20,7 @@
 #include <vtkImageData.h>
 #include "cxImage.h"
 #include "cxBoundingBox3D.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxVolumeHelpers.h"
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
@@ -79,7 +79,7 @@ void BasicVideoSource::timeout()
 	if (mTimeout)
 		return;
 
-	messageManager()->sendWarning("Timeout!");
+	reportWarning("Timeout!");
 	mTimeout = true;
 	emit newFrame();
 }

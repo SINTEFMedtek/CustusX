@@ -1,6 +1,6 @@
 #include "cxFastImageRegistrationWidget.h"
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxRegistrationManager.h"
 

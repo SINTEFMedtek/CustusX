@@ -14,7 +14,7 @@
 
 #include "catch.hpp"
 #include "cxImageParameters.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 namespace cxtest
 {

@@ -19,7 +19,7 @@
 #include "cxDataFactory.h"
 #include "cxDummyToolManager.h"
 #include "cxSpaceProviderImpl.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxSharedPointerChecker.h"
 
 namespace cxtest
@@ -73,7 +73,7 @@ void destroyDummyCoreServices(TestServicesType& services)
 	requireUnique(services.mTrackingService, "TrackingService");
 	services.mTrackingService.reset();
 
-	cx::MessageManager::shutdown();
+	cx::Reporter::shutdown();
 }
 
 cx::DataServicePtr createDummyDataService()
@@ -88,7 +88,7 @@ TestServicesPtr TestServices::create()
 
 TestServices::TestServices()
 {
-	cx::messageManager()->initialize();
+	cx::reporter()->initialize();
 
 	TestServicesType data = createDummyCoreServices();
 

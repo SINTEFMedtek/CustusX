@@ -39,7 +39,7 @@
 #include "cxSlicePlaneClipper.h"
 #include "cxTypeConversions.h"
 #include "vtkForwardDeclarations.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxImageMapperMonitor.h"
 
 #include "cxVolumeProperty.h"

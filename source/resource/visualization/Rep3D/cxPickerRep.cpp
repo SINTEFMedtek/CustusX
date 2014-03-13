@@ -37,7 +37,7 @@
 //#include <vtkCellPicker.h>
 #include "cxMesh.h"
 #include "cxDataManager.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxImage.h"
 #include "cxView.h"
 #include "cxTool.h"
@@ -422,7 +422,7 @@ void PickerRep::addRepActorsToViewRenderer(View *view)
 {
 	if (view == NULL)
 	{
-		messageManager()->sendDebug("Cannot add rep actor to a NULL view.");
+		reporter()->sendDebug("Cannot add rep actor to a NULL view.");
 		return;
 	}
 

@@ -23,7 +23,7 @@
 #include "cxUSFrameData.h"
 #include "cxImage.h"
 #include "cxUsReconstructionFileReader.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTime.h"
 #include <vtkImageMask.h>
 
@@ -113,11 +113,11 @@ void TemporalCalibration::selectData(QString filename)
 
   if (!mFileData.mUsRaw)
   {
-    messageManager()->sendWarning("Failed to load data from " + filename);
+    reportWarning("Failed to load data from " + filename);
     return;
   }
 
-  messageManager()->sendInfo("Temporal Calibration: Successfully loaded data from " + filename);
+  report("Temporal Calibration: Successfully loaded data from " + filename);
 }
 
 void TemporalCalibration::setDebugFolder(QString filename)
@@ -136,12 +136,12 @@ void TemporalCalibration::saveDebugFile()
 
   if (!file.open(QIODevice::ReadWrite))
   {
-    messageManager()->sendError("Failed to write file " + file.fileName() + ".");
+    reportError("Failed to write file " + file.fileName() + ".");
     return;
   }
 
   file.write(qstring_cast(mDebugStream.str()).toAscii());
-  messageManager()->sendInfo("Saved temporal calibration details to " + file.fileName());
+  report("Saved temporal calibration details to " + file.fileName());
   file.close();
 }
 
@@ -167,12 +167,12 @@ double TemporalCalibration::calibrate(bool* success)
 
   if (!mFileData.mUsRaw)
   {
-    messageManager()->sendWarning("Temporal calib: No data loaded");
+    reportWarning("Temporal calib: No data loaded");
     return 0;
   }
   if (mFileData.mPositions.empty())
   {
-    messageManager()->sendWarning("Temporal calib: Missing tracking data.");
+    reportWarning("Temporal calib: Missing tracking data.");
     return 0;
   }
 
@@ -186,7 +186,7 @@ double TemporalCalibration::calibrate(bool* success)
 
   if (!this->checkFrameMovementQuality(frameMovement))
   {
-	  messageManager()->sendError("Failed to detect movement in images. Make sure that the first image is clear and visible.");
+	  reportError("Failed to detect movement in images. Make sure that the first image is clear and visible.");
 	  *success = false;
 	  return 0;
   }
@@ -232,7 +232,7 @@ bool TemporalCalibration::checkFrameMovementQuality(std::vector<double> pos)
 	// accept if less than 20% zeros.
 	double error = double(count)/pos.size();
 	if (error > 0.05)
-		messageManager()->sendWarning(QString("Found %1 % zeros in frame movement").arg(error*100));
+		reportWarning(QString("Found %1 % zeros in frame movement").arg(error*100));
 	return error < 0.2;
 }
 
@@ -360,7 +360,7 @@ std::vector<double> TemporalCalibration::resample(std::vector<double> shift, std
 {
   if (shift.size()!=time.size())
   {
-    messageManager()->sendError("Assert failure, shift and time different sizes");
+    reportError("Assert failure, shift and time different sizes");
   }
 
   vtkPiecewiseFunctionPtr frames = vtkPiecewiseFunctionPtr::New();

@@ -15,7 +15,7 @@
 #include "cxImage.h"
 #include <QSet>
 #include "cxMesh.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxImageLUT2D.h"
 #include "cxDataManager.h"
 #include "cxToolManager.h"

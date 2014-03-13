@@ -121,7 +121,7 @@ void ReconstructPreprocessor::calibrateTimeStamps(double offset, double scale)
  */
 void ReconstructPreprocessor::alignTimeSeries()
 {
-	messageManager()->sendInfo("Generate time calibration based on input time stamps.");
+	report("Generate time calibration based on input time stamps.");
 	double framesSpan = mFileData.mFrames.back().mTime - mFileData.mFrames.front().mTime;
 	double positionsSpan = mFileData.mPositions.back().mTime - mFileData.mPositions.front().mTime;
 	double scale = framesSpan / positionsSpan;
@@ -179,7 +179,7 @@ void ReconstructPreprocessor::applyTimeCalibration()
 	//  std::cout << "TIMESHIFT " << timeshift << std::endl;
 	//  timeshift = -timeshift;
 	if (!similar(0.0, timeshift))
-		messageManager()->sendInfo("Applying reconstruction-time calibration to tracking data: " + qstring_cast(
+		report("Applying reconstruction-time calibration to tracking data: " + qstring_cast(
 																 timeshift) + "ms");
 	this->calibrateTimeStamps(timeshift, 1.0);
 
@@ -251,7 +251,7 @@ void ReconstructPreprocessor::interpolatePositions()
 	{
 		int first = iter->first+removeCount;
 		int last = first + iter->second.count-1;
-		messageManager()->sendInfo(QString("Removed input frame [%1-%2]. Time diff=%3").arg(first).arg(last).arg(iter->second.err, 0, 'f', 1));
+		report(QString("Removed input frame [%1-%2]. Time diff=%3").arg(first).arg(last).arg(iter->second.err, 0, 'f', 1));
 		removeCount += iter->second.count;
 	}
 
@@ -261,11 +261,11 @@ void ReconstructPreprocessor::interpolatePositions()
 		double percent = removed * 100;
 		if (percent > 1)
 		{
-			messageManager()->sendWarning("Removed " + QString::number(percent, 'f', 1) + "% of the "+ qstring_cast(startFrames) + " frames.");
+			reportWarning("Removed " + QString::number(percent, 'f', 1) + "% of the "+ qstring_cast(startFrames) + " frames.");
 		}
 		else
 		{
-			messageManager()->sendInfo("Removed " + QString::number(percent, 'f', 1) + "% of the " + qstring_cast(startFrames) + " frames.");
+			report("Removed " + QString::number(percent, 'f', 1) + "% of the " + qstring_cast(startFrames) + " frames.");
 		}
 	}
 }
@@ -285,7 +285,7 @@ std::vector<Vector3D> ReconstructPreprocessor::generateInputRectangle()
 	vtkImageDataPtr mask = mFileData.getMask();
 	if (!mask)
 	{
-		messageManager()->sendError("Reconstructer::generateInputRectangle() + requires mask");
+		reportError("Reconstructer::generateInputRectangle() + requires mask");
 		return retval;
 	}
 	Eigen::Array3i dims = mFileData.mUsRaw->getDimensions();
@@ -294,7 +294,7 @@ std::vector<Vector3D> ReconstructPreprocessor::generateInputRectangle()
 	Eigen::Array3i maskDims(mask->GetDimensions());
 
 	if (( maskDims[0]<dims[0] )||( maskDims[1]<dims[1] ))
-		messageManager()->sendError(QString("input data (%1) and mask (%2) dim mimatch")
+		reportError(QString("input data (%1) and mask (%2) dim mimatch")
 																.arg(qstring_cast(dims))
 																.arg(qstring_cast(maskDims)));
 
@@ -356,7 +356,7 @@ Transform3D ReconstructPreprocessor::applyOutputOrientation()
 	}
 	else
 	{
-		messageManager()->sendError("no orientation algorithm selected in reconstruction");
+		reportError("no orientation algorithm selected in reconstruction");
 	}
 
 	// apply the selected orientation to the frames.

@@ -18,7 +18,7 @@
 // See sscLicense.txt for more information.
 
 #include "cxTimeKeeper.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -27,11 +27,11 @@ TimeKeeper::TimeKeeper() : mTime(QDateTime::currentDateTime()) {}
 
 void TimeKeeper::printElapsedSeconds(QString text)
 {
-    messageManager()->sendDebug(text + ": " + this->getElapsedSecondsAsString() + "s");
+    reporter()->sendDebug(text + ": " + this->getElapsedSecondsAsString() + "s");
 }
 void TimeKeeper::printElapsedms(QString text) const
 {
-    messageManager()->sendDebug(QString(text + ": %1").arg(getElapsedms()));
+    reporter()->sendDebug(QString(text + ": %1").arg(getElapsedms()));
 }
 
 QString TimeKeeper::getElapsedSecondsAsString() const

@@ -1,17 +1,17 @@
 #include "cxtestProcessWrapperFixture.h"
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 namespace cxtest {
 
 ProcessWrapperFixture::ProcessWrapperFixture()
 {
-	cx::MessageManager::initialize();
+	cx::Reporter::initialize();
 }
 
 ProcessWrapperFixture::~ProcessWrapperFixture()
 {
-	cx::MessageManager::shutdown();
+	cx::Reporter::shutdown();
 }
 
 bool ProcessWrapperFixture::canLaunchGit_Version()

@@ -5,7 +5,7 @@
 #include <QDomElement>
 #include <recConfig.h>
 #include "cxUSFrameData.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -64,7 +64,7 @@ bool TordTest::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr output
 	float newnessWeight = getNewnessWeightOption(settings)->getValue();
 	float brightnessWeight = getBrightnessWeightOption(settings)->getValue();
 
-	messageManager()->sendInfo(
+	report(
 			QString("Method: %1, radius: %2, planeMethod: %3, nClosePlanes: %4, nPlanes: %5, nStarts: %6 ").arg(method).arg(
 					radius).arg(planeMethod).arg(nClosePlanes).arg(input->getDimensions()[2]).arg(nStarts));
 

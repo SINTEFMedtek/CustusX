@@ -16,7 +16,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include "cxDataLocations.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 
 namespace cx
@@ -88,7 +88,7 @@ QString ProcessWrapper::getExecutableInBundlesAbsolutePath(QString exeInBundle)
 	absolutePathToExe = QDir::cleanPath(absolutePathToExe);
 
 	if (!QFileInfo(absolutePathToExe).exists())
-		messageManager()->sendError(QString("Cannot find %1 [%2]").arg(mName).arg(absolutePathToExe));
+		reportError(QString("Cannot find %1 [%2]").arg(mName).arg(absolutePathToExe));
 
 	return absolutePathToExe;
 }
@@ -98,7 +98,7 @@ void ProcessWrapper::internalLaunch(QString executable, QStringList arguments)
 	if(this->isRunning())
 		return;
 
-	messageManager()->sendInfo(QString("Launching %1 %2 with arguments: %3").arg(mName).arg(executable).arg(arguments.join(" ")));
+	report(QString("Launching %1 %2 with arguments: %3").arg(mName).arg(executable).arg(arguments.join(" ")));
 
 	if(arguments.isEmpty())
 		mProcess->start(executable);

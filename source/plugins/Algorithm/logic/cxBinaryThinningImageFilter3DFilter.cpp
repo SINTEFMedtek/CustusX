@@ -16,7 +16,7 @@
 
 #include <itkBinaryThinningImageFilter3D.h>
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxRegistrationTransform.h"
 #include "cxMesh.h"
@@ -115,7 +115,7 @@ bool BinaryThinningImageFilter3DFilter::preProcess()
 
 	if (input->getMax() != 1 || input->getMin() != 0)
 	{
-		messageManager()->sendWarning(QString("Centerline: Input image %1 must be binary, aborting.").arg(input->getName()));
+		reportWarning(QString("Centerline: Input image %1 must be binary, aborting.").arg(input->getName()));
 		return false;
 	}
 
@@ -133,7 +133,7 @@ bool BinaryThinningImageFilter3DFilter::execute()
 		return false;
 	}
 
-	//      messageManager()->sendInfo(QString("Creating centerline from \"%1\"...").arg(input->getName()));
+	//      report(QString("Creating centerline from \"%1\"...").arg(input->getName()));
 
 	itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(input);
 

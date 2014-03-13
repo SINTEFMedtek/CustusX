@@ -22,7 +22,7 @@
 #include "cxDefinitionStrings.h"
 
 #include "cxDataManager.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 namespace cx
 {

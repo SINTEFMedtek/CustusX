@@ -8,7 +8,7 @@
 #include <cxLogicManager.h>
 
 #include "cxServiceController.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxPatientService.h"
 #include "cxVideoService.h"
 #include "cxToolManagerUsingIGSTK.h"
@@ -118,7 +118,7 @@ void LogicManager::shutdown()
 void LogicManager::initializeServices()
 {
 	// resources layer
-	MessageManager::initialize();
+	Reporter::initialize();
 
 	// services layer
 	this->getPatientService();
@@ -334,7 +334,7 @@ void LogicManager::shutdownServices()
 //	cx::PatientService::shutdown();
 
 	GPUImageBufferRepository::shutdown();
-	MessageManager::shutdown();
+	Reporter::shutdown();
 	Settings::destroyInstance();
 }
 

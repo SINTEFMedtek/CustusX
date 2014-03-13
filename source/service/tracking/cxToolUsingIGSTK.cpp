@@ -22,7 +22,7 @@
 #include <QDateTime>
 #include <QStringList>
 #include <QTextStream>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxProbeData.h"
 #include "cxToolManager.h"

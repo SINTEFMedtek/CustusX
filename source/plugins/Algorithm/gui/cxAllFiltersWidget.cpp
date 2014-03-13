@@ -2,7 +2,7 @@
 
 #include "cxStringDataAdapterXml.h"
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
 #include "cxTimedAlgorithmProgressBar.h"
@@ -138,7 +138,7 @@ void AllFiltersWidget::runFilterSlot()
 		return;
 	if (mThread)
 	{
-		messageManager()->sendWarning(QString("Last operation on %1 is not finished. Could not start filtering")
+		reportWarning(QString("Last operation on %1 is not finished. Could not start filtering")
 		                                   .arg(mThread->getFilter()->getName()));
 		return;
 	}

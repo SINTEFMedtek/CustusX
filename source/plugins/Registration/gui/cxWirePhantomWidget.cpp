@@ -45,6 +45,7 @@
 
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -134,7 +135,7 @@ MeshPtr WirePhantomWidget::loadNominalCross()
 
     if (!retval)
     {
-        messageManager()->sendError(QString("failed to load %s.").arg(nominalCrossFilename));
+        reportError(QString("failed to load %s.").arg(nominalCrossFilename));
     }
 
     retval->setColor(QColor("green"));
@@ -193,7 +194,7 @@ void WirePhantomWidget::registration()
     MeshPtr nominalCross = this->loadNominalCross();
     if (!nominalCross || !measuredCross)
     {
-        messageManager()->sendError("Missing fixed/moving data. WirePhantom measurement failed.");
+        reportError("Missing fixed/moving data. WirePhantom measurement failed.");
         return;
     }
 
@@ -213,7 +214,7 @@ void WirePhantomWidget::registration()
     bool success = vesselReg.execute(mManager->getMovingData(), mManager->getFixedData(), logPath);
     if (!success)
     {
-        messageManager()->sendWarning("Vessel registration failed.");
+        reportWarning("Vessel registration failed.");
         return;
     }
 
@@ -270,7 +271,7 @@ void WirePhantomWidget::registration()
     result += QString("Angle: \t%1\t*\n").arg(fmt(angle / M_PI * 180.0));
 
     mResults->append(result);
-    messageManager()->sendInfo("Wire Phantom Test Results:\n"+result);
+	report("Wire Phantom Test Results:\n"+result);
 
     this->showDataMetrics(cross_r);
 }
@@ -346,7 +347,7 @@ void WirePhantomWidget::generate_sMt()
     Transform3D rMt_us = probePos.second;
     if (probePos.first.isEmpty())
     {
-        messageManager()->sendWarning("Cannot find probe position from last recording, aborting calibration test.");
+        reportWarning("Cannot find probe position from last recording, aborting calibration test.");
         return;
     }
 
@@ -354,19 +355,19 @@ void WirePhantomWidget::generate_sMt()
     ToolPtr probe = toolManager()->getTool(usData.mProbeUid);
     if (!probe || !probe->hasType(Tool::TOOL_US_PROBE))
     {
-        messageManager()->sendWarning("Cannot find probe, aborting calibration test.");
+        reportWarning("Cannot find probe, aborting calibration test.");
         return;
     }
 
 //	ToolPtr probe = toolManager()->getDominantTool();
 //	if (!probe || !probe->getVisible() || !probe->hasType(Tool::TOOL_US_PROBE))
 //	{
-//		messageManager()->sendWarning("Cannot find visible probe, aborting calibration test.");
+//		reportWarning("Cannot find visible probe, aborting calibration test.");
 //		return;
 //	}
     if (!mManager->getMovingData())
     {
-        messageManager()->sendWarning("Cannot find moving data, aborting calibration test.");
+        reportWarning("Cannot find moving data, aborting calibration test.");
         return;
     }
 
@@ -392,7 +393,7 @@ void WirePhantomWidget::generate_sMt()
 
         sQt = sMt * createTransformTranslate(diff_tus);
 
-        messageManager()->sendInfo(QString(""
+		report(QString(""
                 "Calculated new calibration matrix\n"
                 "adding only translation "
                 "from last accuracy test\n"
@@ -416,7 +417,7 @@ void WirePhantomWidget::generate_sMt()
 
         sQt = usMs.inv() * nomMus * usMs * sMt;
 
-		messageManager()->sendInfo(QString(""
+		report(QString(""
 												"Calculated new calibration matrix\n"
 												"from last accuracy test\n"
 												"and raw data %1.\n"

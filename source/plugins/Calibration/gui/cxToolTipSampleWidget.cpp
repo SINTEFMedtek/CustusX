@@ -12,7 +12,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include "cxTypeConversions.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxToolManager.h"
 #include "cxDataManager.h"
 #include "cxVector3D.h"
@@ -101,8 +101,8 @@ void ToolTipSampleWidget::sampleSlot()
 
   if(!samplingFile.open(QIODevice::WriteOnly | (mTruncateFile ? QIODevice::Truncate : QIODevice::Append)))
   {
-    messageManager()->sendWarning("Could not open "+samplingFile.fileName());
-    messageManager()->sendInfo("Sampled point: "+qstring_cast(toolPoint));
+    reportWarning("Could not open "+samplingFile.fileName());
+    report("Sampled point: "+qstring_cast(toolPoint));
     return;
   }
   else
@@ -117,8 +117,8 @@ void ToolTipSampleWidget::sampleSlot()
   streamer << sampledPoint;
   streamer << endl;
 
-  messageManager()->playSampleSound();
-  messageManager()->sendInfo("Sampled point in "+qstring_cast(to.mId)+" ("+to.mRefObject+") space, result: "+sampledPoint);
+  reporter()->playSampleSound();
+  report("Sampled point in "+qstring_cast(to.mId)+" ("+to.mRefObject+") space, result: "+sampledPoint);
 }
 
 void ToolTipSampleWidget::coordinateSystemChanged()

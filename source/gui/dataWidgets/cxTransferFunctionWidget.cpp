@@ -13,7 +13,7 @@
 #include "cxDataManager.h"
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxTransferFunctionPresetWidget.h"
 #include "cxTransferFunctionAlphaWidget.h"

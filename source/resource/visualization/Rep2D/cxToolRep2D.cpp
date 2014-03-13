@@ -29,7 +29,7 @@
 #include "cxSliceProxy.h"
 #include "cxTool.h"
 #include "cxView.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxProbeSector.h"
 #include "cxDataManager.h"

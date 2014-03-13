@@ -12,7 +12,7 @@
 #include <QApplication>
 
 #include "igtlImageMessage.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 // utility for reporting errors
 void reportError(NSError* error)
@@ -21,8 +21,8 @@ void reportError(NSError* error)
         return;
     NSString* errorString = [error localizedDescription];
     std::string errorStdString = std::string([errorString UTF8String]);
-//    messageManager()->sendError(qstring_cast(errorStdString));
-	cx::messageManager()->sendError(QString::fromStdString(errorStdString));
+//    reportError(qstring_cast(errorStdString));
+	cx::reportError(QString::fromStdString(errorStdString));
 }
 
 // utility for reporting strings
@@ -31,8 +31,8 @@ void reportString(NSString* string)
     if(!string)
         return;
     std::string stdString = std::string([string UTF8String]);
-//    messageManager()->sendInfo(qstring_cast(stdString));
-	cx::messageManager()->sendInfo(QString::fromStdString(stdString));
+//    report(qstring_cast(stdString));
+	cx::report(QString::fromStdString(stdString));
 }
 
 //==============================================================================
@@ -99,7 +99,7 @@ void reportString(NSString* string)
   frame.mHeight = height;
   //frame.mPixelFormat = static_cast<int>(CVPixelBufferGetPixelFormatType(videoFrame));
   frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT32;
-  //messageManager()->sendDebug("Pixel format: "+qstring_cast(frame.mPixelFormat));
+  //reporter()->sendDebug("Pixel format: "+qstring_cast(frame.mPixelFormat));
   frame.mFirstPixel = reinterpret_cast<unsigned char*>(CVPixelBufferGetBaseAddress(videoFrame));
 	
   //Just initialize these with dummy values
@@ -169,12 +169,12 @@ void MacGrabber::start()
   if(this->findConnectedDevice())
   {
     if(!this->openDevice())
-      messageManager()->sendError("Could not open the selected device. Aborting.");
+	  reportError("Could not open the selected device. Aborting.");
     else
       this->startSession();
   } else
   {
-    messageManager()->sendError("Could not find a connected device (must be present in SupportedGrabbers.txt). Aborting.");
+	reportError("Could not find a connected device (must be present in SupportedGrabbers.txt). Aborting.");
   }
 }
 
@@ -221,8 +221,8 @@ bool MacGrabber::findConnectedDevice()
   //Report to user all found grabbers
   NSArray *devices = [QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo];
   int i = [devices count];
-//  messageManager()->sendInfo("Number of input grabber devices: "+qstring_cast(i));
-  messageManager()->sendInfo("Number of input grabber devices: "+ QString::number(i));
+//  report("Number of input grabber devices: "+qstring_cast(i));
+  report("Number of input grabber devices: "+ QString::number(i));
   for (QTCaptureDevice *device in devices)
     reportString([device localizedDisplayName]);
 
@@ -248,7 +248,7 @@ bool MacGrabber::findConnectedDevice()
   }
 
   //Report to user how to change grabber
-  messageManager()->sendInfo("To change priority of grabbers or add new grabbers, edit the file \"SupportedGrabbers.txt\" that is next to the GrabberServer.");
+  report("To change priority of grabbers or add new grabbers, edit the file \"SupportedGrabbers.txt\" that is next to the GrabberServer.");
 
   return found;
 
@@ -258,7 +258,7 @@ bool MacGrabber::findConnectedDevice()
   //find which grabber is connected to the system
   NSArray *devices = [QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo];
   int i = [devices count];
-  messageManager()->sendInfo("Number of connected grabber devices: "+qstring_cast(i));
+  report("Number of connected grabber devices: "+qstring_cast(i));
   
   NSEnumerator *enumerator = [devices objectEnumerator];
   QTCaptureDevice* captureDevice;
@@ -327,15 +327,15 @@ void MacGrabber::startSession()
   
   NSString* grabberName = [mObjectiveC->mSelectedDevice localizedDisplayName];
   std::string name = std::string([grabberName UTF8String]);
-//  messageManager()->sendSuccess("Started grabbing from "+qstring_cast(name));
-  messageManager()->sendSuccess("Started grabbing from "+QString::fromStdString(name));
+//  reportSuccess("Started grabbing from "+qstring_cast(name));
+  reportSuccess("Started grabbing from "+QString::fromStdString(name));
   emit started();
 }
 
 void MacGrabber::stopSession()
 {
   [mObjectiveC->mCaptureSession stopRunning];
-  messageManager()->sendSuccess("Grabbing stopped.");
+  reportSuccess("Grabbing stopped.");
   emit stopped();
 }
 

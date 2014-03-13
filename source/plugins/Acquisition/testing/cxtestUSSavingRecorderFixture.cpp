@@ -25,7 +25,7 @@
 #include "cxTime.h"
 #include "catch.hpp"
 #include "cxFileHelpers.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 #ifdef CX_WINDOWS
 #include <windows.h>
@@ -37,12 +37,12 @@ namespace cxtest
 void USSavingRecorderFixture::setUp()
 {
 	cx::removeNonemptyDirRecursively(this->getDataPath());
-	cx::MessageManager::initialize();
+	cx::Reporter::initialize();
 }
 
 void USSavingRecorderFixture::tearDown()
 {
-	cx::MessageManager::shutdown();
+	cx::Reporter::shutdown();
 	cx::removeNonemptyDirRecursively(this->getDataPath());
 }
 

@@ -19,7 +19,7 @@
 #include "vtkRenderWindow.h"
 #include "cxTypeConversions.h"
 #include "cxGLHelpers.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -148,7 +148,7 @@ void RenderLoop::emitFPSIfRequired()
 		this->dumpStatistics();
 //		static int counter=0;
 //		if (++counter%3==0)
-//			messageManager()->sendDebug(mCyclicLogger->dumpStatisticsSmall());
+//			reportDebug(mCyclicLogger->dumpStatisticsSmall());
 		mCyclicLogger->reset();
 	}
 }
@@ -160,7 +160,7 @@ void RenderLoop::dumpStatistics()
 
 	static int counter=0;
 	if (++counter%3==0) // every third event
-		messageManager()->sendDebug(mCyclicLogger->dumpStatisticsSmall());
+		reporter()->sendDebug(mCyclicLogger->dumpStatisticsSmall());
 }
 
 int RenderLoop::calculateTimeToNextRender()

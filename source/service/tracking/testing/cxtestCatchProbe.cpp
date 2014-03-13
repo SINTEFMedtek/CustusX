@@ -16,7 +16,7 @@
 #include "cxtestProbeFixture.h"
 
 #include <QString>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "ProbeXmlConfigParserMock.h"
 #include "cxProbeData.h"
 #include "cxTestVideoSource.h"

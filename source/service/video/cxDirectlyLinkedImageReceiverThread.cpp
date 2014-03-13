@@ -15,7 +15,7 @@
 #include "cxDirectlyLinkedImageReceiverThread.h"
 
 #include "cxTypeConversions.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxVector3D.h"
 #include "cxImageSenderFactory.h"
 #include "cxCyclicActionLogger.h"
@@ -39,7 +39,7 @@ void DirectlyLinkedImageReceiverThread::setBackend(VideoServiceBackendPtr backen
 
 void DirectlyLinkedImageReceiverThread::run()
 {
-	messageManager()->sendInfo("Starting direct link grabber.");
+	report("Starting direct link grabber.");
 
 	if(mArguments["type"] == "SimulatedImageStreamer")
 		mImageStreamer = this->createSimulatedImageStreamer();
@@ -88,7 +88,7 @@ QString DirectlyLinkedImageReceiverThread::hostDescription() const
 void DirectlyLinkedImageReceiverThread::setImageToStream(QString imageUid)
 {
 	mImageUidToSimulate = imageUid;
-	messageManager()->sendDebug("Setting image to stream to be "+imageUid);
+	reporter()->sendDebug("Setting image to stream to be "+imageUid);
 	emit imageToStream(imageUid);
 }
 
@@ -98,10 +98,10 @@ SimulatedImageStreamerPtr DirectlyLinkedImageReceiverThread::createSimulatedImag
 
 	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
 	if(!tool)
-		messageManager()->sendDebug("No tool");
+		reporter()->sendDebug("No tool");
 	ImagePtr image = mBackend->getDataManager()->getImage(mImageUidToSimulate);
 	if(!image)
-		messageManager()->sendDebug("No image with uid "+mImageUidToSimulate);
+		reporter()->sendDebug("No image with uid "+mImageUidToSimulate);
 
 	streamer->initialize(image, tool, mBackend->getDataManager());
 	connect(this, SIGNAL(imageToStream(QString)), streamer.get(), SLOT(setSourceToImageSlot(QString)));
@@ -111,14 +111,14 @@ SimulatedImageStreamerPtr DirectlyLinkedImageReceiverThread::createSimulatedImag
 
 void DirectlyLinkedImageReceiverThread::printArguments()
 {
-	messageManager()->sendDebug("-------------");
-	messageManager()->sendDebug("DirectlyLinkedImageReceiverThread arguments:");
+	reporter()->sendDebug("-------------");
+	reporter()->sendDebug("DirectlyLinkedImageReceiverThread arguments:");
 	StringMap::iterator it;
 	for(it = mArguments.begin(); it != mArguments.end(); ++it)
 	{
-		messageManager()->sendDebug(it->first+": "+it->second);
+		reporter()->sendDebug(it->first+": "+it->second);
 	}
-	messageManager()->sendDebug("-------------");
+	reporter()->sendDebug("-------------");
 }
 
 } //end namespace cx

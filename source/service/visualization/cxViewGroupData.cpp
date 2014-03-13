@@ -16,7 +16,7 @@
 
 #include <QMenu>
 #include "vtkCamera.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxViewGroup.h" //for class Navigation
 #include "cxMesh.h"
@@ -415,7 +415,7 @@ void ViewGroupData::parseXml(QDomNode dataNode)
 		DataPtr data = mBackend->getDataManager()->getData(uid);
 		if (!data)
 		{
-			messageManager()->sendError("Couldn't find the data: [" + uid + "] in the datamanager.");
+			reportError("Couldn't find the data: [" + uid + "] in the datamanager.");
 			continue;
 		}
 		DataViewProperties properties = DataViewProperties::createDefault();

@@ -6,7 +6,7 @@
 #include "cxtestQueuedSignalListener.h"
 #include "cxDataLocations.h"
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDummyToolManager.h"
 #include "cxDataManager.h"
 #include "cxToolManager.h"

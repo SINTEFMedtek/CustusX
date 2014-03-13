@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include "catch.hpp"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxtestDirectSignalListener.h"
 
 namespace cx
@@ -21,13 +21,13 @@ namespace cx
 
 TEST_CASE("MessageManager can catch cout", "[unit]")
 {
-	cx::MessageManager::initialize();
+	cx::Reporter::initialize();
 
-	cxtest::DirectSignalListener listener(cx::messageManager(), SIGNAL(emittedMessage(Message)));
+	cxtest::DirectSignalListener listener(cx::reporter(), SIGNAL(emittedMessage(Message)));
 	std::cout << "<test string>" << std::endl;
 	CHECK(listener.isReceived());
 
-	cx::MessageManager::shutdown();
+	cx::Reporter::shutdown();
 }
 
 TEST_CASE("MessageManager can be run multiple times", "[unit]")
@@ -35,20 +35,20 @@ TEST_CASE("MessageManager can be run multiple times", "[unit]")
 	unsigned numberOfRuns = 3;
 	for (unsigned i=0; i<numberOfRuns; ++i)
 	{
-		cx::MessageManager::initialize();
+		cx::Reporter::initialize();
 		std::cout << "<test string>" << std::endl;
-		cx::MessageManager::shutdown();
+		cx::Reporter::shutdown();
 	}
 	CHECK(true);
 }
 
 TEST_CASE("MessageManager can be run nested", "[unit]")
 {
-	cx::MessageManager::initialize();
-	cx::MessageManager::initialize();
+	cx::Reporter::initialize();
+	cx::Reporter::initialize();
 	std::cout << "<test string>" << std::endl;
-	cx::MessageManager::shutdown();
-	cx::MessageManager::shutdown();
+	cx::Reporter::shutdown();
+	cx::Reporter::shutdown();
 
 	CHECK(true);
 }

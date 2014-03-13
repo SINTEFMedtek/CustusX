@@ -23,7 +23,7 @@
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
 #include "vtkMetaImageWriter.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 
 #include <opencv2/highgui/highgui.hpp>
@@ -266,7 +266,7 @@ void ImageStreamerOpenCV::send()
 		return;
 	if (!mAvailableImage)
 	{
-//		messageManager()->sendDebug("dropped resend of frame");
+//		reportDebug("dropped resend of frame");
 		return;
 	}
 	PackagePtr package(new Package());

@@ -28,7 +28,7 @@
 #include "cxViewsFixture.h"
 #include "catch.hpp"
 #include "cxtestRenderTester.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxImageLUT2D.h"
 
 using cx::Vector3D;

@@ -23,7 +23,7 @@
 #include "igtlStatusMessage.h"
 
 #include "cxTypeConversions.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxIGTLinkConversion.h"
 #include "cxCyclicActionLogger.h"
 
@@ -152,13 +152,13 @@ void IGTLinkedImageReceiverThread::run()
 	connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(errorSlot(QAbstractSocket::SocketError)),
 					Qt::DirectConnection);
 
-	messageManager()->sendInfo("Looking for host: " + this->hostDescription());
+	report("Looking for host: " + this->hostDescription());
 	mSocket->connectToHost(mAddress, mPort);
 
 	int timeout = 5000;
 	if (!mSocket->waitForConnected(timeout))
 	{
-		messageManager()->sendWarning("Timeout looking for host " + this->hostDescription());
+		reportWarning("Timeout looking for host " + this->hostDescription());
 		mSocket->disconnectFromHost();
 		return;
 	}
@@ -183,21 +183,21 @@ QString IGTLinkedImageReceiverThread::hostDescription() const
 
 void IGTLinkedImageReceiverThread::hostFoundSlot()
 {
-	messageManager()->sendInfo("Host found: " + this->hostDescription());
+	report("Host found: " + this->hostDescription());
 }
 void IGTLinkedImageReceiverThread::connectedSlot()
 {
-	messageManager()->sendSuccess("Connected to host " + this->hostDescription());
+	reportSuccess("Connected to host " + this->hostDescription());
 	emit connected(true);
 }
 void IGTLinkedImageReceiverThread::disconnectedSlot()
 {
-	messageManager()->sendInfo("Disconnected to host " + this->hostDescription());
+	report("Disconnected to host " + this->hostDescription());
 	emit connected(false);
 }
 void IGTLinkedImageReceiverThread::errorSlot(QAbstractSocket::SocketError socketError)
 {
-	messageManager()->sendError(
+	reportError(
 					"Socket error [Host=" + this->hostDescription() + ", Code=" + socketError + "]\n"
 									+ mSocket->errorString());
 }

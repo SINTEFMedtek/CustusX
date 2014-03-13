@@ -15,7 +15,7 @@
 
 #include <QVBoxLayout>
 #include "cxImage.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxRegistrationTransform.h"
 #include "cxLabeledComboBoxWidget.h"
@@ -103,7 +103,7 @@ void MeshInfoWidget::importTransformSlot()
   if (!parent)
     return;
   mMesh->get_rMd_History()->setRegistration(parent->get_rMd());
-  messageManager()->sendInfo("Assigned rMd from volume [" + parent->getName() + "] to surface [" + mMesh->getName() + "]");
+  report("Assigned rMd from volume [" + parent->getName() + "] to surface [" + mMesh->getName() + "]");
 }
   
 void MeshInfoWidget::meshChangedSlot()

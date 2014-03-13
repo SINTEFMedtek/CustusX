@@ -20,7 +20,7 @@
 #include "cxProbeAdapterRTSource.h"
 #include <vtkImageChangeInformation.h>
 #include <vtkImageData.h>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTool.h"
 #include "cxTypeConversions.h"
 
@@ -127,7 +127,7 @@ void ProbeAdapterRTSource::newFrameSlot()
 
 	if (dimProbe!=dimImage)
 	{
-		messageManager()->sendInfo(
+		report(
 			QString("Resampling probe calibration. Calibration:[%1,%2], Image:[%3,%4], uid=%5")
 			.arg(dimProbe.width())
 			.arg(dimProbe.height())

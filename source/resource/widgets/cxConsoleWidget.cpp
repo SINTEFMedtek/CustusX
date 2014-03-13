@@ -42,7 +42,7 @@ ConsoleWidget::ConsoleWidget(QWidget* parent) :
 	this->setReadOnly(true);
 	this->createTextCharFormats();
 
-    connect(messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(printMessage(Message)));
+    connect(reporter(), SIGNAL(emittedMessage(Message)), this, SLOT(printMessage(Message)));
 
 	mLineWrappingAction->setCheckable(true);
 	connect(mLineWrappingAction, SIGNAL(triggered(bool)), this, SLOT(lineWrappingSlot(bool)));
@@ -88,7 +88,7 @@ void ConsoleWidget::printMessage(Message message)
 void ConsoleWidget::lineWrappingSlot(bool checked)
 {
 	this->setLineWrapMode(checked ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
-	//messageManager()->sendDebug("LineWrapping: " + qstring_cast(checked));
+	//reportDebug("LineWrapping: " + qstring_cast(checked));
 }
 
 void ConsoleWidget::createTextCharFormats()

@@ -27,7 +27,7 @@
 #include <vtkRenderWindow.h>
 #include "cxView.h"
 #include "cxLandmark.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxTypeConversions.h"
 #include "boost/bind.hpp"

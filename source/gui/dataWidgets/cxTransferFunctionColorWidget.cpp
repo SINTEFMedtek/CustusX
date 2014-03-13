@@ -15,7 +15,7 @@
 #include "cxImageTFData.h"
 #include "cxUtilHelpers.h"
 #include "cxImageLUT2D.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
 
@@ -126,7 +126,7 @@ void TransferFunctionColorWidget::updateTooltip(ColorPoint point)
 	QString tip = QString("color(%1)=(%2)").arg(point.intensity).arg(color2string(point.value));
 //	std::cout << "updated to " << tip << std::endl;
 	this->setToolTip(tip);
-	messageManager()->sendVolatile(tip);
+	reporter()->sendVolatile(tip);
 //	this->setStatusTip(tip);
 }
 

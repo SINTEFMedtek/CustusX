@@ -15,7 +15,7 @@
 #include "cxCameraStyle.h"
 
 #include <QAction>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxView.h"
 #include "cxViewGroup.h"
 
@@ -59,7 +59,7 @@ void CameraStyle::setCameraStyle(CAMERA_STYLE_TYPE style)
 	mCameraStyle = style;
 
 	emit cameraStyleChanged();
-	messageManager()->sendInfo(QString("Activated camera style %1.").arg(enum2string(style)));
+	report(QString("Activated camera style %1.").arg(enum2string(style)));
 }
 
 ///--------------------------------------------------------

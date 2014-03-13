@@ -13,7 +13,7 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxToolManager.h"
@@ -143,7 +143,7 @@ void MetricReferenceArgumentListGui::pointSelected()
 		if (mArguments->validArgument(data))
 			mArguments->set(i, data);
 		else
-			messageManager()->sendWarning(QString("Failed to set data [%1] in metric, invalid argument.").arg(data?data->getName():"NULL"));
+			reportWarning(QString("Failed to set data [%1] in metric, invalid argument.").arg(data?data->getName():"NULL"));
 	}
 }
 

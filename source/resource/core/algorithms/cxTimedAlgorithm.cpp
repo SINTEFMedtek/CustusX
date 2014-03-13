@@ -19,7 +19,7 @@
 //#include "vtkMetaImageWriter.h"
 #include "cxSettings.h"
 #include "cxUtilHelpers.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 //#include "cxImage.h"
 
 namespace cx
@@ -42,14 +42,14 @@ void TimedBaseAlgorithm::startTiming()
 {
 	mStartTime = QDateTime::currentDateTime();
 	if (mUseDefaultMessages)
-		messageManager()->sendInfo(QString("Algorithm %1 started.").arg(mProduct));
+		report(QString("Algorithm %1 started.").arg(mProduct));
 	mTimer->start();
 }
 
 void TimedBaseAlgorithm::stopTiming()
 {
 	if (mUseDefaultMessages)
-		messageManager()->sendSuccess(QString("Algorithm %1 complete [%2s]").arg(mProduct).arg(this->getSecondsPassedAsString()));
+		reportSuccess(QString("Algorithm %1 complete [%2s]").arg(mProduct).arg(this->getSecondsPassedAsString()));
 	//mStartTime = QDateTime(); we might need the timing after this call
 	mTimer->stop();
 }
@@ -69,7 +69,7 @@ QString TimedBaseAlgorithm::getSecondsPassedAsString() const
 
 void TimedBaseAlgorithm::timeoutSlot()
 {
-  messageManager()->sendInfo(QString("Still executing %1, [%2] ...").arg(mProduct).arg(this->getTimePassed().toString("m:ss")));
+  report(QString("Still executing %1, [%2] ...").arg(mProduct).arg(this->getTimePassed().toString("m:ss")));
 }
 //---------------------------------------------------------------------------------------------------------------------
 

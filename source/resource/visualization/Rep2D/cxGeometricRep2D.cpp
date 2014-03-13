@@ -33,7 +33,7 @@
 
 #include "cxMesh.h"
 #include "cxView.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxSliceProxy.h"
 #include "cxTypeConversions.h"
 

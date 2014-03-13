@@ -14,7 +14,7 @@
 #ifndef CXMESSAGELISTENER_H
 #define CXMESSAGELISTENER_H
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include <vector>
 #include <QPointer>
 
@@ -44,7 +44,7 @@ private slots:
 private:
 	bool isError(MESSAGE_LEVEL level) const;
 	std::vector<Message> mMessages;
-	QPointer<MessageManager> mManager;
+	QPointer<Reporter> mManager;
 };
 
 

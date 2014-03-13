@@ -18,7 +18,7 @@
 #include "cxData.h"
 #include "cxImage.h"
 #include "vtkImageData.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxSpaceListenerImpl.h"
 
 namespace cx
@@ -216,7 +216,7 @@ Transform3D SpaceProviderImpl::get_rMd(QString uid)
 
 	if(!data)
 	{
-		messageManager()->sendWarning("Could not find data with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
+		reportWarning("Could not find data with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
 		return Transform3D::Identity();
 	}
 	return data->get_rMd(); // ref_M_d
@@ -231,7 +231,7 @@ Transform3D SpaceProviderImpl::get_rMdv(QString uid)
 
 	if(!data)
 	{
-		messageManager()->sendWarning("Could not find data with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
+		reportWarning("Could not find data with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
 		return Transform3D::Identity();
 	}
 
@@ -256,7 +256,7 @@ Transform3D SpaceProviderImpl::get_rMt(QString uid)
 
 	if(!tool)
 	{
-		messageManager()->sendWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
+		reportWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
 		return Transform3D::Identity();
 	}
 	return get_rMpr() * tool->get_prMt(); // ref_M_t
@@ -271,7 +271,7 @@ Transform3D SpaceProviderImpl::get_rMto(QString uid)
 
 	if(!tool)
 	{
-		messageManager()->sendWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
+		reportWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
 		return Transform3D::Identity();
 	}
 
@@ -289,7 +289,7 @@ Transform3D SpaceProviderImpl::get_rMs(QString uid)
 
 	if(!tool)
 	{
-		messageManager()->sendWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
+		reportWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
 		return Transform3D::Identity();
 	}
 

@@ -4,7 +4,7 @@
 #include <QLabel>
 #include <QSpinBox>
 #include "cxTypeConversions.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxRegistrationManager.h"
 #include "cxTimedAlgorithm.h"
 #include "cxPatientData.h"
@@ -114,28 +114,28 @@ void SeansVesselRegistrationWidget::registerSlot()
 
 	if (vesselReg.mt_auto_lts)
 	{
-		messageManager()->sendDebug("Using automatic lts_ratio");
+		reporter()->sendDebug("Using automatic lts_ratio");
 	}
 	else
 	{
-		messageManager()->sendDebug("Using lts_ratio: " + qstring_cast(vesselReg.mt_ltsRatio));
+		reporter()->sendDebug("Using lts_ratio: " + qstring_cast(vesselReg.mt_ltsRatio));
 	}
 
 	if(!mManager->getMovingData())
 	{
-		messageManager()->sendWarning("Moving volume not set.");
+		reportWarning("Moving volume not set.");
 		return;
 	}
 	else if(!mManager->getFixedData())
 	{
-		messageManager()->sendWarning("Fixed volume not set.");
+		reportWarning("Fixed volume not set.");
 		return;
 	}
 
 	bool success = vesselReg.execute(mManager->getMovingData(), mManager->getFixedData(), logPath);
 	if (!success)
 	{
-		messageManager()->sendWarning("Vessel registration failed.");
+		reportWarning("Vessel registration failed.");
 		return;
 	}
 
@@ -199,7 +199,7 @@ public:
 
 		this->update();
 
-		messageManager()->sendInfo("Initialized V2V algorithm (debug). Use Step to iterate.");
+		report("Initialized V2V algorithm (debug). Use Step to iterate.");
 	}
 	~SeansVesselRegistrationDebugger()
 	{
@@ -207,7 +207,7 @@ public:
 		view->removeRep(m_mRep);
 		view->removeRep(m_fRep);
 		view->removeRep(m_lineRep);
-		messageManager()->sendInfo("Closed V2V algorithm (debug).");
+		report("Closed V2V algorithm (debug).");
 	}
 	void stepL()
 	{
@@ -215,7 +215,7 @@ public:
 			return;
 		mRegistrator.performOneRegistration(mContext, true);
 		this->update();
-		messageManager()->sendInfo(QString("One Linear V2V iteration, metric=%1").arg(mContext->mMetric));
+		report(QString("One Linear V2V iteration, metric=%1").arg(mContext->mMetric));
 	}
 	void stepNL()
 	{
@@ -223,7 +223,7 @@ public:
 			return;
 		mRegistrator.performOneRegistration(mContext, false);
 		this->update();
-		messageManager()->sendInfo(QString("One Nonlinear V2V iteration, metric=%1").arg(mContext->mMetric));
+		report(QString("One Nonlinear V2V iteration, metric=%1").arg(mContext->mMetric));
 	}
 	void apply()
 	{
@@ -237,7 +237,7 @@ public:
 		Transform3D delta = linearTransform.inv();
 		mManager->applyImage2ImageRegistration(delta, "Vessel based");
 
-		messageManager()->sendInfo(QString("Applied linear registration from debug iteration."));
+		report(QString("Applied linear registration from debug iteration."));
 	}
 	void update()
 	{

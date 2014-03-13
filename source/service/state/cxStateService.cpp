@@ -20,7 +20,7 @@
 #include <QDir>
 #include "cxEnumConverter.h"
 #include "cxXmlOptionItem.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxWorkflowStateMachine.h"
