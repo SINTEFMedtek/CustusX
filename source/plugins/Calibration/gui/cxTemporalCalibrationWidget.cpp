@@ -11,21 +11,21 @@
 #include <QtGui>
 #include <QVBoxLayout>
 #include "boost/bind.hpp"
-#include "sscToolManager.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxToolManager.h"
+#include "cxLabeledComboBoxWidget.h"
 #include <vtkDoubleArray.h>
 #include <vtkPointData.h>
-#include "sscDoubleWidgets.h"
-#include "sscTypeConversions.h"
+#include "cxDoubleWidgets.h"
+#include "cxTypeConversions.h"
 #include "cxPatientData.h"
 #include "cxRecordSessionWidget.h"
 #include "cxSettings.h"
 #include "cxToolDataAdapters.h"
 #include "cxDoubleDataAdapterTemporalCalibration.h"
-#include "sscUtilHelpers.h"
-#include "sscVolumeHelpers.h"
+#include "cxUtilHelpers.h"
+#include "cxVolumeHelpers.h"
 #include "vtkImageCorrelation.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxPatientService.h"
 
 typedef vtkSmartPointer<vtkImageCorrelation> vtkImageCorrelationPtr;

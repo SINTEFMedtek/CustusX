@@ -1,7 +1,7 @@
 #ifndef CXCREATEPROBEDATAFROMCONFIGURATION_H_
 #define CXCREATEPROBEDATAFROMCONFIGURATION_H_
 
-#include "sscProbeData.h"
+#include "cxProbeData.h"
 #include "ProbeXmlConfigParser.h"
 
 /**

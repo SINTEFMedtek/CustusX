@@ -1,9 +1,9 @@
 #include "cxAllFiltersWidget.h"
 
-#include "sscStringDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
 
-#include "sscMessageManager.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxMessageManager.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
 #include "cxTimedAlgorithmProgressBar.h"
 

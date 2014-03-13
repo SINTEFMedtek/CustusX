@@ -5,14 +5,14 @@
 #include <iostream>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
-#include "sscMessageManager.h"
-#include "sscDoubleWidgets.h"
-#include "sscEnumConverter.h"
+#include "cxMessageManager.h"
+#include "cxDoubleWidgets.h"
+#include "cxEnumConverter.h"
 #include "cxSettings.h"
 #include "cxPreferencesDialog.h"
 #include "cxViewManager.h"
 #include "cxDataLocations.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxDataLocations.h"
 #include "cxStateService.h"
 #include "cxFilePreviewWidget.h"
@@ -21,12 +21,12 @@
 #include "cxToolFilterWidget.h"
 #include "cxColorSelectButton.h"
 #include "cxViewWrapper3D.h"
-#include "sscHelperWidgets.h"
+#include "cxHelperWidgets.h"
 #include "cxApplicationStateMachine.h"
 #include "cxMultiVolume3DRepProducer.h"
 
-#include "sscDataManager.h"
-#include "sscDummyTool.h"
+#include "cxDataManager.h"
+#include "cxDummyTool.h"
 
 namespace cx
 {

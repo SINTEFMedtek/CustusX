@@ -15,7 +15,7 @@
 #include "cxFilterPresetWidget.h"
 
 #include <QMessageBox>
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxFilter.h"
 
 namespace cx {

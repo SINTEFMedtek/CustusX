@@ -19,14 +19,14 @@
 #include <QStateMachine>
 #include <QString>
 #include <QAction>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxRequestEnterStateTransition.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
+#include "cxMessageManager.h"
+#include "cxDataManager.h"
 #include "cxStateService.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxWorkflowStateMachine.h"
 #include "cxStateServiceBackend.h"
 

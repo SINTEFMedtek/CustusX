@@ -18,9 +18,9 @@
 #include "boost/shared_ptr.hpp"
 #include <QString>
 #include <QObject>
-#include "sscForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
-#include "sscTransform3D.h"
+#include "cxForwardDeclarations.h"
+#include "cxTransform3D.h"
 #include <QDomDocument>
 
 class QDomDocument;

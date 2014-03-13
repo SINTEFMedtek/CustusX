@@ -3,13 +3,13 @@
 
 #include <vtkImageData.h>
 
-#include "sscBoundingBox3D.h"
-#include "sscDataManager.h"
-#include "sscToolManager.h"
-#include "sscRegistrationTransform.h"
-#include "sscCoordinateSystemHelpers.h"
-#include "sscVolumeHelpers.h"
-#include "sscMessageManager.h"
+#include "cxBoundingBox3D.h"
+#include "cxDataManager.h"
+#include "cxToolManager.h"
+#include "cxRegistrationTransform.h"
+#include "cxCoordinateSystemHelpers.h"
+#include "cxVolumeHelpers.h"
+#include "cxMessageManager.h"
 //#include "cxStateService.h"
 //#include "cxPatientData.h"
 

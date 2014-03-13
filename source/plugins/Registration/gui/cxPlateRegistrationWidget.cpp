@@ -2,10 +2,10 @@
 
 #include <QPushButton>
 #include <QLabel>
-#include "sscTypeConversions.h"
-#include "sscToolManager.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
+#include "cxTypeConversions.h"
+#include "cxToolManager.h"
+#include "cxMessageManager.h"
+#include "cxDataManager.h"
 #include "cxRegistrationManager.h"
 #include "cxViewManager.h"
 

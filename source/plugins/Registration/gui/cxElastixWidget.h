@@ -16,11 +16,11 @@
 #define CXELASTIXWIDGET_H_
 
 #include "cxRegistrationBaseWidget.h"
-#include "sscStringDataAdapter.h"
-#include "sscFileSelectWidget.h"
+#include "cxStringDataAdapter.h"
+#include "cxFileSelectWidget.h"
 #include "cxElastixManager.h"
 #include "cxFilePreviewWidget.h"
-#include "sscBoolDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
 
 class QSpinBox;
 class QPushButton;

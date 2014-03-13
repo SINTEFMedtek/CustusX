@@ -8,19 +8,19 @@
 #include <vtkImageData.h>
 #include "vtkImageAppend.h"
 #include "vtkMetaImageWriter.h"
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxMessageManager.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
-#include "sscXmlOptionItem.h"
-#include "sscTimeKeeper.h"
-#include "sscDataReaderWriter.h"
-#include "sscUSFrameData.h"
+#include "cxXmlOptionItem.h"
+#include "cxTimeKeeper.h"
+#include "cxDataReaderWriter.h"
+#include "cxUSFrameData.h"
 #include "cxSavingVideoRecorder.h"
 #include "cxImageDataContainer.h"
 #include "cxUSReconstructInputDataAlgoritms.h"
-#include "sscCustomMetaImage.h"
-#include "sscLogger.h"
+#include "cxCustomMetaImage.h"
+#include "cxLogger.h"
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 

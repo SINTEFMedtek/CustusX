@@ -12,10 +12,10 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "sscSliceComputer.h"
-#include "sscTypeConversions.h"
+#include "cxSliceComputer.h"
+#include "cxTypeConversions.h"
 #include "catch.hpp"
-#include "sscLogger.h"
+#include "cxLogger.h"
 
 TEST_CASE("SliceComputer is created", "[unit][resource][core]")
 {

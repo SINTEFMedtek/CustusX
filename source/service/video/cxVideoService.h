@@ -25,7 +25,7 @@
 #include <QObject>
 
 #include <vector>
-#include "sscVideoSource.h"
+#include "cxVideoSource.h"
 #include "cxForwardDeclarations.h"
 
 namespace cx

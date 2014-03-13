@@ -15,7 +15,7 @@
 #ifndef CXFRAMEMETRICBASE_H_
 #define CXFRAMEMETRICBASE_H_
 
-#include "sscDataMetric.h"
+#include "cxDataMetric.h"
 
 namespace cx {
 

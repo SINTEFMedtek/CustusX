@@ -16,14 +16,14 @@
 #include "cxElastixManager.h"
 
 #include <QDir>
-#include "sscLogger.h"
-#include "sscTime.h"
+#include "cxLogger.h"
+#include "cxTime.h"
 #include "cxDataLocations.h"
 #include "cxElastixExecuter.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxSettings.h"
-#include "sscDataReaderWriter.h"
+#include "cxDataReaderWriter.h"
 
 namespace cx
 {

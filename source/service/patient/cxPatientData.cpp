@@ -21,20 +21,20 @@
 #include <QTextStream>
 #include <QApplication>
 
-#include "sscTime.h"
-#include "sscMessageManager.h"
-#include "sscUtilHelpers.h"
-#include "sscCustomMetaImage.h"
-#include "sscMesh.h"
+#include "cxTime.h"
+#include "cxMessageManager.h"
+#include "cxUtilHelpers.h"
+#include "cxCustomMetaImage.h"
+#include "cxMesh.h"
 
 #include "cxSettings.h"
 
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
 
-#include "sscDataManager.h"
-#include "sscImage.h"
-#include "sscTypeConversions.h"
+#include "cxDataManager.h"
+#include "cxImage.h"
+#include "cxTypeConversions.h"
 #include "cxConfig.h"
 
 namespace cx

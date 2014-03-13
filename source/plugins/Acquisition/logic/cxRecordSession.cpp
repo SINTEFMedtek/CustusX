@@ -15,10 +15,10 @@
 
 #include <QDomDocument>
 #include <QDomElement>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscTime.h"
-#include "sscTool.h"
+#include "cxTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxTime.h"
+#include "cxTool.h"
 
 namespace cx
 {

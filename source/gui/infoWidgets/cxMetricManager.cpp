@@ -13,29 +13,29 @@
 // See CustusX_License.txt for more information.
 
 #include "cxMetricManager.h"
-#include "sscDataManager.h"
-#include "sscManualTool.h"
+#include "cxDataManager.h"
+#include "cxManualTool.h"
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewGroupData.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include <QFile>
-#include "sscMessageManager.h"
-#include "sscDataReaderWriter.h"
+#include "cxMessageManager.h"
+#include "cxDataReaderWriter.h"
 
-#include "sscRegistrationTransform.h"
-#include "sscPointMetric.h"
-#include "sscDistanceMetric.h"
+#include "cxRegistrationTransform.h"
+#include "cxPointMetric.h"
+#include "cxDistanceMetric.h"
 #include "cxFrameMetric.h"
 #include "cxToolMetric.h"
-#include "sscPlaneMetric.h"
+#include "cxPlaneMetric.h"
 #include "cxShapedMetric.h"
-#include "sscAngleMetric.h"
+#include "cxAngleMetric.h"
 #include "cxSphereMetric.h"
 #include "cxDataFactory.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 
 namespace cx

@@ -14,10 +14,10 @@
 
 #include "cxPlaybackTime.h"
 #include <iostream>
-#include "sscTime.h"
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscVector3D.h"
+#include "cxTime.h"
+#include "cxTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxVector3D.h"
 
 namespace cx
 {

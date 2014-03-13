@@ -4,7 +4,7 @@
 class QTextStream;
 class QDir;
 
-#include "sscTool.h"
+#include "cxTool.h"
 #include "cxUSReconstructInputData.h"
 #include "cxForwardDeclarations.h"
 

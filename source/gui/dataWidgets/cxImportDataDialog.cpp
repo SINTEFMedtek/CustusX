@@ -9,21 +9,21 @@
 #include <QCheckBox>
 #include <QTimer>
 #include <vtkImageData.h>
-#include "sscLabeledComboBoxWidget.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
-#include "sscData.h"
-#include "sscDataManager.h"
-#include "sscRegistrationTransform.h"
-#include "sscImageAlgorithms.h"
-#include "sscImage.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxData.h"
+#include "cxDataManager.h"
+#include "cxRegistrationTransform.h"
+#include "cxImageAlgorithms.h"
+#include "cxImage.h"
 #include "cxStateService.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
 #include "cxViewManager.h"
-#include "sscVolumeHelpers.h"
-#include "sscImageTF3D.h"
-#include "sscImageLUT2D.h"
+#include "cxVolumeHelpers.h"
+#include "cxImageTF3D.h"
+#include "cxImageLUT2D.h"
 
 namespace cx
 {

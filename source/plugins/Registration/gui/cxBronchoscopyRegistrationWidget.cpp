@@ -14,10 +14,10 @@
 
 #include "cxBronchoscopyRegistrationWidget.h"
 #include <vtkPolyData.h>
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 #include "cxDataSelectWidget.h"
-#include "sscToolManager.h"
-#include "sscMesh.h"
+#include "cxToolManager.h"
+#include "cxMesh.h"
 #include "cxRegistrationManager.h"
 #include "cxAcquisitionData.h"
 #include "cxSelectDataStringDataAdapter.h"
@@ -26,12 +26,12 @@
 #include "cxRecordSession.h"
 #include "cxRepManager.h"
 #include "cxViewManager.h"
-#include "sscView.h"
-#include "sscToolRep3D.h"
-#include "sscToolTracer.h"
+#include "cxView.h"
+#include "cxToolRep3D.h"
+#include "cxToolTracer.h"
 #include "cxBronchoscopyRegistration.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
 
 
 namespace cx

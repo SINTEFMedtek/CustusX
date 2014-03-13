@@ -1,11 +1,11 @@
 #include "cxVolumeInfoWidget.h"
 
 #include <QPushButton>
-#include "sscDataManager.h"
-#include "sscImage.h"
-#include "sscLabeledLineEditWidget.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscVolumeHelpers.h"
+#include "cxDataManager.h"
+#include "cxImage.h"
+#include "cxLabeledLineEditWidget.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxVolumeHelpers.h"
 #include "cxActiveImageProxy.h"
 
 namespace cx

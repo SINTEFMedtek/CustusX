@@ -18,7 +18,7 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include <vector>
-#include "sscVideoSource.h"
+#include "cxVideoSource.h"
 #include "cxUSReconstructInputData.h"
 #include "cxPlaybackTime.h"
 #include "cxForwardDeclarations.h"

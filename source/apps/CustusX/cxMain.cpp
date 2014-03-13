@@ -10,7 +10,7 @@
 #include <QApplication>
 #include <iostream>
 #include "cxMainWindow.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 
 #include "cxUsReconstructionPlugin.h"
 #include "cxAcquisitionPlugin.h"
@@ -18,9 +18,9 @@
 #include "cxAlgorithmPlugin.h"
 #include "cxRegistrationPlugin.h"
 
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxLogicManager.h"
-#include "sscApplication.h"
+#include "cxApplication.h"
 
 #ifdef WIN32
 int __stdcall WinMain(int argc, char *argv[])

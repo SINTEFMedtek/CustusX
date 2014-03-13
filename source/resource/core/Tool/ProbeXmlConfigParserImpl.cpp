@@ -5,8 +5,8 @@
 #include <QStringList>
 #include <algorithm>
 #include <qfileinfo.h>
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
 
 ProbeXmlConfigParserImpl::ProbeXmlConfigParserImpl(QString& pathToXml)
 {

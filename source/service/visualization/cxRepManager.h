@@ -18,7 +18,7 @@
 #include <QObject>
 #include <map>
 #include <vector>
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {

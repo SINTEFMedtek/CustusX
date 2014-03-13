@@ -5,9 +5,9 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
-#include "sscMessageManager.h"
-#include "sscToolManager.h"
-#include "sscProbe.h"
+#include "cxMessageManager.h"
+#include "cxToolManager.h"
+#include "cxProbe.h"
 
 namespace cx
 {

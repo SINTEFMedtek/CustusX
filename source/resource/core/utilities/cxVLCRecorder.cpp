@@ -1,7 +1,7 @@
 #include <cxVLCRecorder.h>
 
 #include <QFileInfo>
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include <QProcess>
 
 namespace cx

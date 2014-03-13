@@ -15,11 +15,11 @@
 
 #include "cxCyclicActionLogger.h"
 #include <QTimer>
-#include "sscView.h"
+#include "cxView.h"
 #include "vtkRenderWindow.h"
-#include "sscTypeConversions.h"
-#include "sscGLHelpers.h"
-#include "sscMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxGLHelpers.h"
+#include "cxMessageManager.h"
 
 namespace cx
 {

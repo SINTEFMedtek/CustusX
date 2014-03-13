@@ -17,15 +17,15 @@
 
 #include "catch.hpp"
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
-#include "sscVolumetricRep.h"
+#include "cxVolumetricRep.h"
 
 #include <vtkImageData.h>
 #include <vtkPlane.h>
-#include "sscImage.h"
+#include "cxImage.h"
 #include "cxtestRenderTester.h"
 #include "cxtestUtilities.h"
-#include "sscBoundingBox3D.h"
-#include "sscMessageManager.h"
+#include "cxBoundingBox3D.h"
+#include "cxMessageManager.h"
 #include "cxImageEnveloper.h"
 
 typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;

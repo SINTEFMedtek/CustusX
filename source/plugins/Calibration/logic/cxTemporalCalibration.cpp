@@ -11,20 +11,20 @@
 #include <QtGui>
 #include <QVBoxLayout>
 #include "boost/bind.hpp"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include <vtkPiecewiseFunction.h>
 #include <vtkPointData.h>
 #include <vtkImageData.h>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxSettings.h"
-#include "sscUtilHelpers.h"
-#include "sscVolumeHelpers.h"
+#include "cxUtilHelpers.h"
+#include "cxVolumeHelpers.h"
 #include "vtkImageCorrelation.h"
-#include "sscUSFrameData.h"
-#include "sscImage.h"
+#include "cxUSFrameData.h"
+#include "cxImage.h"
 #include "cxUsReconstructionFileReader.h"
-#include "sscMessageManager.h"
-#include "sscTime.h"
+#include "cxMessageManager.h"
+#include "cxTime.h"
 #include <vtkImageMask.h>
 
 typedef vtkSmartPointer<vtkImageMask> vtkImageMaskPtr;

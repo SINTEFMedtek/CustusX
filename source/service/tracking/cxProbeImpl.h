@@ -23,7 +23,7 @@
 #ifndef CXPROBEIMPL_H_
 #define CXPROBEIMPL_H_
 
-#include "sscProbe.h"
+#include "cxProbe.h"
 #include <map>
 #include "ProbeXmlConfigParserImpl.h"
 

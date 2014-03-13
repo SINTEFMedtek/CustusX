@@ -11,7 +11,7 @@
 #include <QDomNode>
 #include <QDateTime>
 #include <QStringList>
-#include "sscTime.h"
+#include "cxTime.h"
 #include "cxAcquisitionData.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"

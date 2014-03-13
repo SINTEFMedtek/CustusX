@@ -2,8 +2,8 @@
 #include "cxMacGrabberServer.h"
 
 #include <QMacCocoaViewContainer>
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
 #include "cxMacGrabber.h"
 
 namespace cx

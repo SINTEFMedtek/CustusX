@@ -15,10 +15,10 @@
 #ifndef CXFRAMEFOREST_H_
 #define CXFRAMEFOREST_H_
 
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 
 #include <QDomDocument>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 /*
 

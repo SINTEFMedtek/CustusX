@@ -2,7 +2,7 @@
 
 #include <QFileSystemWatcher>
 #include <QFileInfo>
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 
 namespace cx
 {

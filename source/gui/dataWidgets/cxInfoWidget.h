@@ -2,7 +2,7 @@
 #define CXINFOWIDGET_H_
 
 #include "cxBaseWidget.h"
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 
 class QGridLayout;
 class QVBoxLayout;

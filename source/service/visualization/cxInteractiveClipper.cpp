@@ -14,18 +14,18 @@
 
 #include "cxInteractiveClipper.h"
 
-#include "sscVolumetricRep.h"
-#include "sscMessageManager.h"
+#include "cxVolumetricRep.h"
+#include "cxMessageManager.h"
 #include "cxRepManager.h"
-#include "sscDataManager.h"
-#include "sscSliceComputer.h"
+#include "cxDataManager.h"
+#include "cxSliceComputer.h"
 
-#include "sscSlicePlaneClipper.h"
-#include "sscSlicePlanes3DRep.h"
-#include "sscSliceProxy.h"
-#include "sscImage.h"
-#include "sscToolManager.h"
-#include "sscLogger.h"
+#include "cxSlicePlaneClipper.h"
+#include "cxSlicePlanes3DRep.h"
+#include "cxSliceProxy.h"
+#include "cxImage.h"
+#include "cxToolManager.h"
+#include "cxLogger.h"
 #include "cxVisualizationServiceBackend.h"
 
 

@@ -4,13 +4,13 @@
 #include <QTreeWidgetItem>
 #include <QStringList>
 #include <QVBoxLayout>
-#include "sscImage.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscToolManager.h"
+#include "cxImage.h"
+#include "cxMessageManager.h"
+#include "cxDataManager.h"
+#include "cxToolManager.h"
 #include "cxViewManager.h"
-#include "sscTime.h"
-#include "sscTypeConversions.h"
+#include "cxTime.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

@@ -10,13 +10,13 @@
 #include <QSlider>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxRegistrationManager.h"
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 #include "cxRegistrationHistoryWidget.h"
-#include "sscTypeConversions.h"
-#include "sscManualTool.h"
-#include "sscToolManager.h"
+#include "cxTypeConversions.h"
+#include "cxManualTool.h"
+#include "cxToolManager.h"
 
 namespace cx
 {

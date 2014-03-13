@@ -1,7 +1,7 @@
 #include "cxServer.h"
 
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
 #include "cxOpenIGTLinkSession.h"
 
 namespace cx

@@ -1,6 +1,6 @@
 #include "cxToolImagePreviewWidget.h"
 
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxToolConfigurationParser.h"
 
 namespace cx

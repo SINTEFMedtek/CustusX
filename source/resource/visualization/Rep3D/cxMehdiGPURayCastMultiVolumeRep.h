@@ -14,8 +14,8 @@
 #ifndef CXMEHDIGPURAYCASTMULTIVOLUMEREP_H
 #define CXMEHDIGPURAYCASTMULTIVOLUMEREP_H
 
-#include "sscRepImpl.h"
-#include "sscForwardDeclarations.h"
+#include "cxRepImpl.h"
+#include "cxForwardDeclarations.h"
 #include <vector>
 #include "vtkForwardDeclarations.h"
 

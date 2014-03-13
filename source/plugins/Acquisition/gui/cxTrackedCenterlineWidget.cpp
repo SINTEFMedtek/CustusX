@@ -1,20 +1,20 @@
 #include "cxTrackedCenterlineWidget.h"
 
 #include <QVBoxLayout>
-#include "sscToolManager.h"
-#include "sscDataManager.h"
-#include "sscMeshHelpers.h"
-#include "sscToolRep3D.h"
-#include "sscToolTracer.h"
+#include "cxToolManager.h"
+#include "cxDataManager.h"
+#include "cxMeshHelpers.h"
+#include "cxToolRep3D.h"
+#include "cxToolTracer.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxTrackingDataToVolume.h"
 #include "cxPatientData.h"
 #include "cxRecordSessionWidget.h"
-#include "sscTool.h"
+#include "cxTool.h"
 #include "cxPatientService.h"
-#include "sscMessageManager.h"
-#include "sscView.h"
+#include "cxMessageManager.h"
+#include "cxView.h"
 
 namespace cx
 {

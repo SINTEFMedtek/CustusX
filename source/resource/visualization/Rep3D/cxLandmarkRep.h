@@ -15,14 +15,14 @@
 #ifndef CXLANDMARKREP_H_
 #define CXLANDMARKREP_H_
 
-#include <sscRepImpl.h>
+#include "cxRepImpl.h"
 
 #include <map>
 #include <QColor>
-#include <sscImage.h>
+#include "cxImage.h"
 #include "vtkForwardDeclarations.h"
-#include "sscGraphicalPrimitives.h"
-#include "sscLandmark.h"
+#include "cxGraphicalPrimitives.h"
+#include "cxLandmark.h"
 
 namespace cx
 {

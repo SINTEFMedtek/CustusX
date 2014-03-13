@@ -8,10 +8,10 @@
 #include <QPixmap>
 #include <QMetaObject>
 
-#include "sscToolManager.h"
-#include "sscMessageManager.h"
+#include "cxToolManager.h"
+#include "cxMessageManager.h"
 #include "cxVideoConnectionManager.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxViewManager.h"
 #include "cxVideoService.h"
 #include "boost/bind.hpp"
@@ -19,9 +19,9 @@
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
 #include "cxVideoConnection.h"
-#include "sscManualTool.h"
-#include "sscTypeConversions.h"
-#include "sscDefinitionStrings.h"
+#include "cxManualTool.h"
+#include "cxTypeConversions.h"
+#include "cxDefinitionStrings.h"
 
 
 namespace cx

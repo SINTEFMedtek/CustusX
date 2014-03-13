@@ -4,7 +4,7 @@
 #include <iostream>
 #include <QDir>
 #include <QTextStream>
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxDataLocations.h"
 
 namespace cx

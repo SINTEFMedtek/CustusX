@@ -17,10 +17,10 @@
 #include "cxTimedAlgorithm.h"
 
 #include "itkImageFileReader.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "vtkMetaImageWriter.h"
 #include "cxSettings.h"
-#include "sscUtilHelpers.h"
+#include "cxUtilHelpers.h"
 
 namespace cx
 {

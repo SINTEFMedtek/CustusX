@@ -12,14 +12,14 @@
 //
 // See CustusX_License.txt for more information.
 #include "cxAlgorithmHelpers.h"
-#include "sscMessageManager.h"
-#include "sscImage.h"
-#include "sscTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxImage.h"
+#include "cxTypeConversions.h"
 #include "itkImageFileReader.h"
 #include "vtkMetaImageWriter.h"
 #include "cxSettings.h"
 #include <QDir>
-#include "sscUtilHelpers.h"
+#include "cxUtilHelpers.h"
 #include "cxDataLocations.h"
 
 #include <itkGrayscaleFillholeImageFilter.h>

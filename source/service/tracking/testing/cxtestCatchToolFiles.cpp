@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxtestTestToolMesh.h"
 
 namespace cxtest

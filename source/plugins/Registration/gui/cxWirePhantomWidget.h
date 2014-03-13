@@ -18,9 +18,9 @@
 #include "cxRegistrationBaseWidget.h"
 #include "cxPipeline.h"
 #include "cxFilter.h"
-#include "sscVector3D.h"
-#include "sscTransform3D.h"
-#include "sscBoundingBox3D.h"
+#include "cxVector3D.h"
+#include "cxTransform3D.h"
+#include "cxBoundingBox3D.h"
 
 class QPushButton;
 class QVBoxLayout;

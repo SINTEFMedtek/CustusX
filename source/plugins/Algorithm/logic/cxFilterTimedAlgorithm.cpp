@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include "cxFilterTimedAlgorithm.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxFilter.h"
 
 namespace cx

@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include "cxIgstkTrackerThread.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxIgstkTool.h"
 #include "cxIgstkToolManager.h"
 

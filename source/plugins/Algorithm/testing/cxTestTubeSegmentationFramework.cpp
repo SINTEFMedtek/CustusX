@@ -16,9 +16,9 @@
 #include "testing/cxTestTubeSegmentationFramework.h"
 
 #include <fstream>
-#include "sscData.h"
+#include "cxData.h"
 #include "cxLogicManager.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxDataInterface.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"

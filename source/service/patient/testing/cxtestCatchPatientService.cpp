@@ -13,9 +13,9 @@
 // See CustusX_License.txt for more information.
 
 #include "catch.hpp"
-#include "sscDataManagerImpl.h"
+#include "cxDataManagerImpl.h"
 #include "cxtestDummyDataManager.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 
 
 TEST_CASE("DataManagerImpl setup/shutdown works multiple times", "[unit]")

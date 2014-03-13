@@ -19,9 +19,9 @@
 #include <QDomNode>
 #include <QDateTime>
 #include <QStringList>
-#include "sscTime.h"
-#include "sscMessageManager.h"
-#include "sscToolManager.h"
+#include "cxTime.h"
+#include "cxMessageManager.h"
+#include "cxToolManager.h"
 #include "cxSettings.h"
 
 namespace cx

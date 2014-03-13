@@ -16,14 +16,14 @@
 
 #include <QApplication>
 
-#include "sscImageAlgorithms.h"
-#include "sscDataManager.h"
-#include "sscImage.h"
+#include "cxImageAlgorithms.h"
+#include "cxDataManager.h"
+#include "cxImage.h"
 #include "vtkImageData.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxSelectDataStringDataAdapter.h"
-#include "sscDoubleDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
 
 namespace cx
 {

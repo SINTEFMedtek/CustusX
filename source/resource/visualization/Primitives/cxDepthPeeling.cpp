@@ -8,7 +8,7 @@
  */
 
 #include "cxDepthPeeling.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 
 /**
  * Generate a bunch of overlapping spheres within one poly data set:

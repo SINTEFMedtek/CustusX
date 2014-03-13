@@ -2,7 +2,7 @@
 #define CXVOLUMEPROPERTIESWIDGET_H_
 
 #include "cxTabbedWidget.h"
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 #include "cxDataInterface.h"
 #include "cxActiveImageProxy.h"
 

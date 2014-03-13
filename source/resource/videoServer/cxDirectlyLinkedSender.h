@@ -5,8 +5,8 @@
 
 #include <QObject>
 #include <boost/shared_ptr.hpp>
-#include "sscImage.h"
-#include "sscTool.h"
+#include "cxImage.h"
+#include "cxTool.h"
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
 

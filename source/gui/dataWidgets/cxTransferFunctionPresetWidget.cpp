@@ -2,8 +2,8 @@
 
 #include <QInputDialog>
 #include <QMessageBox>
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
+#include "cxMessageManager.h"
+#include "cxDataManager.h"
 #include "cxSettings.h"
 #include "cxActiveImageProxy.h"
 

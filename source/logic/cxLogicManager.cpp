@@ -8,22 +8,22 @@
 #include <cxLogicManager.h>
 
 #include "cxServiceController.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxPatientService.h"
 #include "cxVideoService.h"
 #include "cxToolManagerUsingIGSTK.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"
-#include "sscDataManagerImpl.h"
+#include "cxDataManagerImpl.h"
 #include "cxRepManager.h"
-#include "sscGPUImageBuffer.h"
+#include "cxGPUImageBuffer.h"
 #include "cxSettings.h"
 #include "cxSpaceProviderImpl.h"
 #include "cxDataFactory.h"
 #include "cxVisualizationServiceBackend.h"
 #include "cxVideoServiceBackend.h"
 #include "cxStateServiceBackend.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxSharedPointerChecker.h"
 
 namespace cx

@@ -4,7 +4,7 @@
 //TODO remove, should be defined in oul instead
 #define __CL_ENABLE_EXCEPTIONS //telling the opencl c++ wrapper to throw exceptions
 
-#include <sscUSFrameData.h>
+#include "cxUSFrameData.h"
 #include "OpenCLManager.hpp"
 #include "RuntimeMeasurementManager.hpp"
 

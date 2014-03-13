@@ -1,7 +1,7 @@
 #include "cxFastImageRegistrationWidget.h"
 
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
+#include "cxMessageManager.h"
+#include "cxDataManager.h"
 #include "cxRegistrationManager.h"
 
 namespace cx

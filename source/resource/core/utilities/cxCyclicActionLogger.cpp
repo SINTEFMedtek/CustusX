@@ -16,7 +16,7 @@
 #include <numeric>
 #include <sstream>
 #include <QStringList>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include <cmath>
 
 namespace cx

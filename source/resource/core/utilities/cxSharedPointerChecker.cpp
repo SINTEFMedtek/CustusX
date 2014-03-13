@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include "cxSharedPointerChecker.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 
 namespace cx
 {

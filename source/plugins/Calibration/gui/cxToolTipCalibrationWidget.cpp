@@ -18,15 +18,15 @@
 #include <QTextStream>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscToolManager.h"
-#include "sscDataManager.h"
-#include "sscVector3D.h"
-#include "sscDefinitionStrings.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxToolManager.h"
+#include "cxDataManager.h"
+#include "cxVector3D.h"
+#include "cxDefinitionStrings.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
-#include "sscTool.h"
+#include "cxTool.h"
 //#include "cxStateService.h"
 #include "cxPatientData.h"
 

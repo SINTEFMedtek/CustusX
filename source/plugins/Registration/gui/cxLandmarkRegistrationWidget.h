@@ -11,9 +11,9 @@
 #define CXLANDMARKREGISTRATIONWIDGET_H_
 
 #include <map>
-//#include "sscVolumetricRep.h"
-#include "sscLandmark.h"
-#include "sscTransform3D.h"
+//#include "cxVolumetricRep.h"
+#include "cxLandmark.h"
+#include "cxTransform3D.h"
 #include "cxRegistrationBaseWidget.h"
 #include "cxActiveImageProxy.h"
 

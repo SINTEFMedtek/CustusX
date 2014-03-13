@@ -6,7 +6,7 @@
  */
 
 #include "cxSelectRecordSessionStringDataAdapter.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

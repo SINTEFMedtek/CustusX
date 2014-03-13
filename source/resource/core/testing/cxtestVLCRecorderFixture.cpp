@@ -1,7 +1,7 @@
 #include "cxtestVLCRecorderFixture.h"
 
-#include "sscMessageManager.h"
-#include "sscTime.h"
+#include "cxMessageManager.h"
+#include "cxTime.h"
 #include "cxDataLocations.h"
 #include "cxVLCRecorder.h"
 #include "cxtestUtilities.h"

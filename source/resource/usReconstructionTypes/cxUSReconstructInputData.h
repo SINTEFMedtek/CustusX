@@ -15,7 +15,7 @@
 #define CXUSRECONSTRUCTINPUTDATA_H
 
 #include <vector>
-#include "sscProbeSector.h"
+#include "cxProbeSector.h"
 
 namespace cx
 {

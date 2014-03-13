@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 #include "cxtestMultiVolume3DRepProducerFixture.h"
 
-#include "sscView.h"
+#include "cxView.h"
 
 namespace cxtest
 {

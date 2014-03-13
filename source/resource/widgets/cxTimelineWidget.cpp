@@ -18,11 +18,11 @@
 #include <QPainter>
 #include <QToolTip>
 #include <QMouseEvent>
-#include "sscHelperWidgets.h"
-#include "sscTime.h"
-#include "sscMessageManager.h"
-#include "sscLogger.h"
-#include "sscTypeConversions.h"
+#include "cxHelperWidgets.h"
+#include "cxTime.h"
+#include "cxMessageManager.h"
+#include "cxLogger.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

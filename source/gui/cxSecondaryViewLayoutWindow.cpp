@@ -15,11 +15,11 @@
 #include "cxSecondaryViewLayoutWindow.h"
 
 #include "cxViewManager.h"
-#include "sscLogger.h"
+#include "cxLogger.h"
 #include <QApplication>
 #include <QDesktopWidget>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxMessageManager.h"
 #include "cxLegacySingletons.h"
 
 namespace cx

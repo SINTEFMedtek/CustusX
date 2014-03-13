@@ -13,13 +13,13 @@
 // See CustusX_License.txt for more information.
 
 #include "cxMultiVolume3DRepProducer.h"
-#include "sscMessageManager.h"
-#include "sscVolumetricRep.h"
+#include "cxMessageManager.h"
+#include "cxVolumetricRep.h"
 #include <vtkImageData.h>
-#include "sscImage2DRep3D.h"
-#include "sscView.h"
-#include "sscTypeConversions.h"
-#include "sscLogger.h"
+#include "cxImage2DRep3D.h"
+#include "cxView.h"
+#include "cxTypeConversions.h"
+#include "cxLogger.h"
 #include "cxDataLocations.h"
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
 #include "cxConfig.h"

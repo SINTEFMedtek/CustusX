@@ -1,7 +1,7 @@
 #ifndef CXTESTTESTTOOLMESH_H_
 #define CXTESTTESTTOOLMESH_H_
 
-#include "sscMesh.h"
+#include "cxMesh.h"
 #include <QString>
 
 namespace cxtest {

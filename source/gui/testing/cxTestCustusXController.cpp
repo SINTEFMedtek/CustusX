@@ -11,15 +11,15 @@
 #include <QTextEdit>
 #include <QTimer>
 
-#include "sscDataManager.h"
-#include "sscDummyTool.h"
-#include "sscTypeConversions.h"
-#include "sscData.h"
-#include "sscConsoleWidget.h"
-#include "sscImage.h"
+#include "cxDataManager.h"
+#include "cxDummyTool.h"
+#include "cxTypeConversions.h"
+#include "cxData.h"
+#include "cxConsoleWidget.h"
+#include "cxImage.h"
 #include "cxPatientData.h"
 #include "cxCyclicActionLogger.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"
 #include "cxPatientService.h"
@@ -30,7 +30,7 @@
 #include "cxClippingWidget.h"
 #include "cxInteractiveClipper.h"
 #include "cxViewManager.h"
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 
 CustusXController::CustusXController(QObject* parent) : QObject(parent)
 {

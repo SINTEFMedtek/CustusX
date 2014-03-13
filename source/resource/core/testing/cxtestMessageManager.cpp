@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include "catch.hpp"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxtestDirectSignalListener.h"
 
 namespace cx

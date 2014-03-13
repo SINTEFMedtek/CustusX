@@ -16,13 +16,13 @@
 #include <vtkVolume.h>
 #include <vtkVolumeProperty.h>
 #include <QWidget>
-#include "sscImageTF3D.h"
-#include "sscImageLUT2D.h"
-#include "sscVolumetricRep.h"
+#include "cxImageTF3D.h"
+#include "cxImageLUT2D.h"
+#include "cxVolumetricRep.h"
 #include "cxRepManager.h"
 #include <QTimer>
-#include "sscImage.h"
-#include "sscMessageManager.h"
+#include "cxImage.h"
+#include "cxMessageManager.h"
 
 namespace cx
 {

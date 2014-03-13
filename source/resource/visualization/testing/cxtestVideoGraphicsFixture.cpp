@@ -14,21 +14,21 @@
 
 #include "cxtestVideoGraphicsFixture.h"
 
-#include "sscVideoGraphics.h"
+#include "cxVideoGraphics.h"
 #include <vtkImageActor.h>
 #include <vtkCamera.h>
 #include <vtkImageData.h>
 #include <vtkActor.h>
 
-#include "sscBoundingBox3D.h"
-#include "sscView.h"
-#include "sscTypeConversions.h"
+#include "cxBoundingBox3D.h"
+#include "cxView.h"
+#include "cxTypeConversions.h"
 
-#include "sscProbeData.h"
-#include "sscProbeSector.h"
-#include "sscDummyTool.h"
-#include "sscUtilHelpers.h"
-#include "sscXmlOptionItem.h"
+#include "cxProbeData.h"
+#include "cxProbeSector.h"
+#include "cxDummyTool.h"
+#include "cxUtilHelpers.h"
+#include "cxXmlOptionItem.h"
 #include "cxtestUtilities.h"
 
 #include "catch.hpp"

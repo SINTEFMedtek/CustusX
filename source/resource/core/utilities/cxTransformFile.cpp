@@ -17,8 +17,8 @@
 #include <QFileInfo>
 #include <QFile>
 
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxMessageManager.h"
 
 namespace cx
 {

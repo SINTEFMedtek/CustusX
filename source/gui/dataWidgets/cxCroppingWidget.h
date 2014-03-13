@@ -1,8 +1,8 @@
 #ifndef CXCROPPINGWIDGET_H_
 #define CXCROPPINGWIDGET_H_
 
-#include "sscForwardDeclarations.h"
-#include "sscStringDataAdapter.h"
+#include "cxForwardDeclarations.h"
+#include "cxStringDataAdapter.h"
 #include "cxViewManager.h"
 #include "cxBaseWidget.h"
 #include "cxLegacySingletons.h"

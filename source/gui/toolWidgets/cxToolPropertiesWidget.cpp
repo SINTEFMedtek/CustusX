@@ -7,17 +7,17 @@
 #include <QGroupBox>
 #include <QCheckBox>
 
-#include "sscMessageManager.h"
-#include "sscToolManager.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxToolManager.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxTypeConversions.h"
 //#include "UsConfigGui.h"
 #include "cxDataInterface.h"
-#include "sscToolManager.h"
-#include "sscTool.h"
+#include "cxToolManager.h"
+#include "cxTool.h"
 #include "cxToolDataAdapters.h"
 #include "cxActiveToolWidget.h"
-#include "sscManualTool.h"
+#include "cxManualTool.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 

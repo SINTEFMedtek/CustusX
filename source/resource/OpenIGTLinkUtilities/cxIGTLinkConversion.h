@@ -15,8 +15,8 @@
 #ifndef CXIGTLINKCONVERSION_H_
 #define CXIGTLINKCONVERSION_H_
 
-#include "sscImage.h"
-#include "sscTool.h"
+#include "cxImage.h"
+#include "cxTool.h"
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
 

@@ -16,8 +16,8 @@
 #include <QDir>
 #include <QFileInfo>
 #include "cxDataLocations.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

@@ -5,18 +5,18 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <vtkImageData.h>
-#include "sscStringDataAdapter.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscDefinitionStrings.h"
-#include "sscUtilHelpers.h"
-#include "sscMessageManager.h"
-#include "sscRegistrationTransform.h"
-#include "sscImageAlgorithms.h"
+#include "cxStringDataAdapter.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxDefinitionStrings.h"
+#include "cxUtilHelpers.h"
+#include "cxMessageManager.h"
+#include "cxRegistrationTransform.h"
+#include "cxImageAlgorithms.h"
 #include "cxInteractiveCropper.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
-#include "sscDataManager.h"
-#include "sscImage.h"
+#include "cxDataManager.h"
+#include "cxImage.h"
 
 namespace cx
 {

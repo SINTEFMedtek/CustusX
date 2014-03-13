@@ -4,8 +4,8 @@
 #include <vtkImageData.h>
 #include <QDomElement>
 #include <recConfig.h>
-#include <sscUSFrameData.h>
-#include "sscMessageManager.h"
+#include "cxUSFrameData.h"
+#include "cxMessageManager.h"
 
 namespace cx
 {

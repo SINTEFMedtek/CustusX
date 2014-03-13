@@ -14,7 +14,7 @@
 #ifndef CXSELECTDATASTRINGDATAADAPTER_H
 #define CXSELECTDATASTRINGDATAADAPTER_H
 
-#include "sscStringDataAdapter.h"
+#include "cxStringDataAdapter.h"
 #include "cxForwardDeclarations.h"
 #include "cxLegacySingletons.h"
 

@@ -20,8 +20,8 @@
 #include <limits.h>
 #include <QTimer>
 #include <boost/shared_ptr.hpp>
-#include "sscTransform3D.h"
-#include "sscDefinitions.h"
+#include "cxTransform3D.h"
+#include "cxDefinitions.h"
 #include "vtkForwardDeclarations.h"
 
 class QStringList;

@@ -6,7 +6,7 @@
 #include "cxDirectlyLinkedSender.h"
 #include "cxTestSenderController.h"
 #include "cxImageStreamerGE.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 
 #include "catch.hpp"
 

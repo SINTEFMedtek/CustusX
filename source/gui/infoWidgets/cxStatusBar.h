@@ -3,8 +3,8 @@
 
 #include <QStatusBar>
 #include <map>
-#include "sscMessageManager.h"
-#include "sscForwardDeclarations.h"
+#include "cxMessageManager.h"
+#include "cxForwardDeclarations.h"
 #include "cxLegacySingletons.h"
 
 

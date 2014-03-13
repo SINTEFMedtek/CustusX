@@ -29,7 +29,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <QCoreApplication>
 #else
 #include <QApplication>
-#include "sscApplication.h"
+#include "cxApplication.h"
 #endif
 
 #include <string>

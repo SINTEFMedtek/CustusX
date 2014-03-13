@@ -6,8 +6,8 @@
 #include <QMimeData>
 #include <QAction>
 #include <QMenu>
-#include "sscEnumConverter.h"
-#include "sscMessageManager.h"
+#include "cxEnumConverter.h"
+#include "cxMessageManager.h"
 #include "cxDataLocations.h"
 #include "cxToolConfigurationParser.h"
 

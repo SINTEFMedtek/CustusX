@@ -17,7 +17,7 @@
 #include <QProcess>
 #include "cxProcessWrapper.h"
 #include "cxtestProcessWrapperFixture.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 
 namespace cxtest
 {

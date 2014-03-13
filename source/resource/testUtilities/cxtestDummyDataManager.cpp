@@ -14,12 +14,12 @@
 
 #include "cxtestDummyDataManager.h"
 
-#include "sscDataManagerImpl.h"
+#include "cxDataManagerImpl.h"
 //#include "cxtestSpaceProviderMock.h"
 #include "cxDataFactory.h"
-#include "sscDummyToolManager.h"
+#include "cxDummyToolManager.h"
 #include "cxSpaceProviderImpl.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxSharedPointerChecker.h"
 
 namespace cxtest

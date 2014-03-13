@@ -11,14 +11,14 @@
 #include <vtkImageData.h>
 #include <vtkImageShiftScale.h>
 
-#include "sscTime.h"
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscDataManagerImpl.h"
-#include "sscDataReaderWriter.h"
-#include "sscRegistrationTransform.h"
-#include "sscDoubleDataAdapterXml.h"
+#include "cxTime.h"
+#include "cxTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxDataManager.h"
+#include "cxDataManagerImpl.h"
+#include "cxDataReaderWriter.h"
+#include "cxRegistrationTransform.h"
+#include "cxDoubleDataAdapterXml.h"
 #include "cxContourFilter.h"
 #include "cxDataLocations.h"
 #include "cxPatientService.h"

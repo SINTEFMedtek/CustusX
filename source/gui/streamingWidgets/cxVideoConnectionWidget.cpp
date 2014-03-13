@@ -21,15 +21,15 @@
 
 #include "vtkImageData.h"
 
-#include "sscFileSelectWidget.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscDataManager.h"
-#include "sscTime.h"
-#include "sscMessageManager.h"
-#include "sscProbeSector.h"
-#include "sscRegistrationTransform.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscHelperWidgets.h"
+#include "cxFileSelectWidget.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxDataManager.h"
+#include "cxTime.h"
+#include "cxMessageManager.h"
+#include "cxProbeSector.h"
+#include "cxRegistrationTransform.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxHelperWidgets.h"
 
 #include "cxDataLocations.h"
 #include "cxDataInterface.h"
@@ -38,11 +38,11 @@
 #include "cxVideoService.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxViewManager.h"
 #include "cxSimulateUSWidget.h"
 #include "cxFileInputWidget.h"
-#include "sscLogger.h"
+#include "cxLogger.h"
 
 namespace cx
 {

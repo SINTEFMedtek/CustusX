@@ -16,14 +16,14 @@
 #define CXMETRICNAMESREP_H
 
 #include <vector>
-#include "sscRepImpl.h"
-#include "sscVector3D.h"
+#include "cxRepImpl.h"
+#include "cxVector3D.h"
 #include "vtkForwardDeclarations.h"
-#include "sscBoundingBox3D.h"
+#include "cxBoundingBox3D.h"
 #include "cxForwardDeclarations.h"
 class QColor;
 
-#include "sscRepImpl.h"
+#include "cxRepImpl.h"
 
 namespace cx
 {

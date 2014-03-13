@@ -6,11 +6,11 @@
 #include <vector>
 #include <QtGui>
 #include <QGraphicsView>
-#include "sscVector3D.h"
-#include "sscDoubleWidgets.h"
-#include "sscForwardDeclarations.h"
+#include "cxVector3D.h"
+#include "cxDoubleWidgets.h"
+#include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
-#include "sscMousePadWidget.h"
+#include "cxMousePadWidget.h"
 
 namespace cx
 {

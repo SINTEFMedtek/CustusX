@@ -2,7 +2,7 @@
 #define CXOPTIONSWIDGET_H_
 
 #include <QStackedLayout>
-#include "sscDataAdapter.h"
+#include "cxDataAdapter.h"
 #include "cxSelectDataStringDataAdapter.h"
 
 namespace cx {

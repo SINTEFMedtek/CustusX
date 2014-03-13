@@ -19,8 +19,8 @@
 #include <boost/shared_ptr.hpp>
 #include <vtkSmartPointer.h>
 #include <QObject>
-#include "sscForwardDeclarations.h"
-#include "sscVector3D.h"
+#include "cxForwardDeclarations.h"
+#include "cxVector3D.h"
 #include "vtkForwardDeclarations.h"
 
 namespace cx

@@ -21,14 +21,14 @@
 #include <QAction>
 #include <QMenu>
 
-#include "sscView.h"
-#include "sscVideoRep.h"
-#include "sscDisplayTextRep.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxView.h"
+#include "cxVideoRep.h"
+#include "cxDisplayTextRep.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
 
 #include "cxSettings.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxVideoService.h"
 #include "cxVisualizationServiceBackend.h"
 

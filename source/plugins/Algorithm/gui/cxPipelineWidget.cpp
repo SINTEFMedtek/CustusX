@@ -13,11 +13,11 @@
 // See CustusX_License.txt for more information.
 
 #include "cxPipelineWidget.h"
-#include "sscHelperWidgets.h"
-#include "sscMessageManager.h"
+#include "cxHelperWidgets.h"
+#include "cxMessageManager.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include <QtGui>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxDataSelectWidget.h"
 #include "cxSettings.h"
 
