@@ -50,7 +50,6 @@ void ShadingWidget::init()
 //  mLayout->addWidget(mShadingCheckBox);
 //  mShadingCheckBox->setEnabled(true);
 //
-	std::cout << "connect shading check box"  << std::endl;
   connect(mShadingCheckBox, SIGNAL(toggled(bool)), this, SLOT(shadingToggledSlot(bool)));
 
   QGridLayout* shadingLayput = new QGridLayout();
@@ -70,7 +69,7 @@ void ShadingWidget::init()
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
 	ImagePropertiesWidget* imagePropertiesWidget = new ImagePropertiesWidget(NULL);
-	shadingLayput->addLayout(imagePropertiesWidget->getLayout(), 5, 0, 1, 2);
+	shadingLayput->addWidget(imagePropertiesWidget, 5, 0, 1, 2);
   mLayout->addLayout(shadingLayput);
 	mLayout->addStretch(1);
 

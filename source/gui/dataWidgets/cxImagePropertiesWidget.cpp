@@ -38,14 +38,9 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
 
 	QLabel* interpolationTypeLabel = new QLabel("Volume interpolation type", this);
 
-	mLayout = new QHBoxLayout();
-	mLayout->addWidget(interpolationTypeLabel);
-	mLayout->addWidget(mInterpolationType);
-}
-
-QHBoxLayout* ImagePropertiesWidget::getLayout()
-{
-	return mLayout;
+	QHBoxLayout* layout =  new QHBoxLayout(this);
+	layout->addWidget(interpolationTypeLabel);
+	layout->addWidget(mInterpolationType);
 }
 
 void ImagePropertiesWidget::interpolationTypeChanged(int index)
