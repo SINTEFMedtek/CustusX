@@ -26,14 +26,17 @@ namespace cx
 /**
  * \defgroup cx_service Service Layer
  * \ingroup cx_base
- * \brief A collection of singletons providing basic services:
- * 	      Patient Model, Tracking, Video and Visualization.
+ * \brief A collections of services each providing service within a special field.
  *
  * The service layer consists of a collection of services that are of use to
- * the entire system. Each is a singleton. All except Visualization are
- * mutually independent, i.e. no horizontal connections exist in this layer.
- * Connections are managed in the logic layer. Detailed info on some of these
- * services can be found in Implementation 5.
+ * the entire system.
+ *
+ * All services are created in the \ref cx_logic and are thus available to the
+ * entire \ref cx_gui and all \ref cx_plugins from there.
+ *
+ * Within the \ref cx_service, connection between services are limited. Each
+ * service is initialized with a list of other services it has access to, refer
+ * to each specific service for details.
  *
  *  - \ref cx_service_patient : Contains information related to the current patient.
  *    This includes entities of data, such as volumetric data, mesh data,
@@ -45,11 +48,10 @@ namespace cx
  *  - \ref cx_service_video : An interface to realtime image stream sources such as
  *    endoscopic, ultrasound and fluoroscopy video, along with means to
  *    connect to them.
- *  - \ref cx_service_state :  Global application states: Application state,
- *    workflow state.
+ *  - \ref cx_service_state :  Global application states: ApplicationState,
+ *    WorkflowState.
  *  - \ref cx_service_visualization : Handles the layout and content of the views,
- *    i.e. visualization in 2D and 3D. This service uses the other services
- *    freely, for historical reasons.
+ *    i.e. visualization in 2D and 3D.
  *
  *
  */
@@ -62,10 +64,10 @@ namespace cx
  * A model of the patient. Data sets of various modalities, fiducials
  * and labels are described in relation to each other.
  *
- * Note: This service currently is a hybrid between the old ssc::DataManager
+ * Note: This service currently is a hybrid between the old DataManager
  * and the new PatientService (they should be merged). The Patient Service
- * contains minimal functionality â€“ The PatientData class. All other info
- * can be found in the old ssc::DataManager and the subclass cx::DataManager.
+ * contains minimal functionality â the PatientData class. All other info
+ * can be found in the DataManager.
  *
  */
 
@@ -74,7 +76,7 @@ namespace cx
  * \ingroup cx_service
  * \brief Tracking hardware, US probes and navigation pointers.
  *
- * See \ref cx::ToolManager for a description of the service.
+ * See \ref ToolManager for a description of the service.
  *
  * \image html us_probe.png "Ultrasound Probe with Polaris tracking sensors attached."
  *
@@ -85,7 +87,7 @@ namespace cx
  * \ingroup cx_service
  * \brief Video input.
  *
- * See \ref cx::VideoService for a description of the service.
+ * See \ref VideoService for a description of the service.
  *
  */
 
@@ -95,7 +97,7 @@ namespace cx
  *
  * \brief 2D and 3D Visualization/Rendering engine
  *
- * See \ref cx::ViewManager for a description of the service.
+ * See \ref ViewManager for a description of the service.
  *
  */
 
@@ -104,7 +106,7 @@ namespace cx
  * \ingroup cx_service
  * \brief Global application states
  *
- * See \ref cx::StateService for a description of the service.
+ * See \ref StateService for a description of the service.
  *
  */
 
