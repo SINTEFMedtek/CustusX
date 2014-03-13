@@ -48,7 +48,7 @@ void TrackingPositionFilter::addPosition(Transform3D pos, double timestamp)
 
 Transform3D TrackingPositionFilter::getFilteredPosition()
 {
-	if (mFiltered.size() > 10) //check if mFiltered contains enough positions for the filter to be stable
+	if (mFiltered.size() > mResampleFrequency) //check if mFiltered contains enough positions for the filter to be stable
 		return mFiltered.rbegin()->second;
 	else if (!mHistory.empty())
 		return mHistory.rbegin()->second;
