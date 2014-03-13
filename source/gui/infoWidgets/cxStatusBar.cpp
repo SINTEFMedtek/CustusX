@@ -9,7 +9,7 @@
 #include <QMetaObject>
 
 #include "cxToolManager.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxVideoConnectionManager.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"
@@ -33,7 +33,7 @@ StatusBar::StatusBar() :
 //	mMessageLevelLabel(new QToolButton(this))
 //	mMessageLevelLabel(new QLabel(this))
 {
-	connect(messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
+	connect(reporter(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
 
 	connect(toolManager(), SIGNAL(configured()),      this, SLOT(connectToToolSignals()));
 	connect(toolManager(), SIGNAL(deconfigured()),    this, SLOT(disconnectFromToolSignals()));

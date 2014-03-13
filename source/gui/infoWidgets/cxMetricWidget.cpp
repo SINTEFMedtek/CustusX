@@ -27,7 +27,7 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxToolManager.h"

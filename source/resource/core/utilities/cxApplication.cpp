@@ -18,7 +18,7 @@
 // See sscLicense.txt for more information.
 
 #include "cxApplication.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include <QThread>
 
 namespace cx
@@ -41,7 +41,7 @@ void Application::reportException(QString text)
 			threadName = "SECONDARY";
 	}
 
-	messageManager()->sendError(QString("Exception caught: [%1]\nin thread [%2]").arg(text).arg(threadName));
+	reportError(QString("Exception caught: [%1]\nin thread [%2]").arg(text).arg(threadName));
 }
 
 bool Application::notify(QObject *rec, QEvent *ev)

@@ -18,7 +18,7 @@
 #include <fstream>
 #include "cxData.h"
 #include "cxLogicManager.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataInterface.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"

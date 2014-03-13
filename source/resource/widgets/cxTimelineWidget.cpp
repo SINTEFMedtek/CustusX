@@ -20,7 +20,7 @@
 #include <QMouseEvent>
 #include "cxHelperWidgets.h"
 #include "cxTime.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
 

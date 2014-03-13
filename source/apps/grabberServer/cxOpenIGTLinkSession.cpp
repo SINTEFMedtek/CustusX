@@ -1,7 +1,7 @@
 #include "cxOpenIGTLinkSession.h"
 
 #include <QHostAddress>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 
 namespace cx
@@ -24,7 +24,7 @@ void OpenIGTLinkSession::run()
   connect(mSocket, SIGNAL(disconnected()), this, SLOT(quit()), Qt::DirectConnection); // quit thread when disconnected
 
   QString clientName = mSocket->peerAddress().toString();
-  messageManager()->sendInfo("Connected to "+qstring_cast(clientName)+". Session started.");
+  report("Connected to "+qstring_cast(clientName)+". Session started.");
 
   OpenIGTLinkSender* sender = new OpenIGTLinkSender(mSocket);
   connect(this, SIGNAL(frame(Frame&)), sender, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
@@ -32,7 +32,7 @@ void OpenIGTLinkSession::run()
 
   this->exec();
 
-  messageManager()->sendInfo("Disconnected from "+qstring_cast(clientName)+". Session ended.");
+  report("Disconnected from "+qstring_cast(clientName)+". Session ended.");
   delete sender;
   delete mSocket;
 }
@@ -151,7 +151,7 @@ IGTLinkImageMessage::Pointer OpenIGTLinkSender::getLastImageMessageFromQueue()
 
 void OpenIGTLinkSender::errorSlot(QAbstractSocket::SocketError socketError)
 {
-  messageManager()->sendError("Socket error [Code="+qstring_cast(socketError)+"]\n"+mSocket->errorString());
+  reportError("Socket error [Code="+qstring_cast(socketError)+"]\n"+mSocket->errorString());
 }
 
 //------------------------------------------------------------------------------

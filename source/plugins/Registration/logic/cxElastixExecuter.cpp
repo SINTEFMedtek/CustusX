@@ -18,7 +18,7 @@
 #include <QProcess>
 #include <QFile>
 #include <QDir>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxTypeConversions.h"
@@ -72,13 +72,13 @@ bool ElastixExecuter::setInput(QString application,
 
 	if (!fixed || !moving)
 	{
-		messageManager()->sendWarning("Failed to start elastiX registration, fixed or missing image missing.");
+		reportWarning("Failed to start elastiX registration, fixed or missing image missing.");
 		return false;
 	}
 
 	if (mProcess->state() != QProcess::NotRunning)
 	{
-		messageManager()->sendWarning("Failed to start elastiX registration, process already running");
+		reportWarning("Failed to start elastiX registration, process already running");
 		return false;
 	}
 
@@ -100,7 +100,7 @@ bool ElastixExecuter::setInput(QString application,
 		cmd << "-p" << parameterfiles[i];
 
 	QString commandLine = cmd.join(" ");
-	messageManager()->sendInfo(QString("Executing registration with command line: [%1]").arg(commandLine));
+	report(QString("Executing registration with command line: [%1]").arg(commandLine));
 
 	mProcess->start(commandLine);
 	return true;
@@ -173,7 +173,7 @@ QString ElastixExecuter::writeInitTransformToElastixfile(
 	QFile initTransformFile(outdir+"/t0.txt");
 	if (!initTransformFile.open(QIODevice::WriteOnly | QIODevice::Text))
 	{
-		messageManager()->sendWarning(QString("Failed to open file %1 for writing.").arg(initTransformFile.fileName()));
+		reportWarning(QString("Failed to open file %1 for writing.").arg(initTransformFile.fileName()));
 	}
 	initTransformFile.write(elastiXText.toAscii());
 	return initTransformFile.fileName();
@@ -194,7 +194,7 @@ QString ElastixExecuter::writeInitTransformToCalfile(
 
 void ElastixExecuter::processReadyRead()
 {
-	messageManager()->sendInfo(QString(mProcess->readAllStandardOutput()));
+	report(QString(mProcess->readAllStandardOutput()));
 }
 
 void ElastixExecuter::processError(QProcess::ProcessError error)
@@ -226,13 +226,13 @@ void ElastixExecuter::processError(QProcess::ProcessError error)
 		msg += "Invalid error";
 	}
 
-	messageManager()->sendError(msg);
+	reportError(msg);
 }
 
 void ElastixExecuter::processFinished(int code, QProcess::ExitStatus status)
 {
 	if (status == QProcess::CrashExit)
-		messageManager()->sendError("Registration process crashed");
+		reportError("Registration process crashed");
 }
 
 
@@ -245,17 +245,17 @@ void ElastixExecuter::processStateChanged(QProcess::ProcessState newState)
 
 	if (newState == QProcess::Running)
 	{
-//		messageManager()->sendInfo(msg + " running.");
+//		report(msg + " running.");
 		emit started(0);
 	}
 	if (newState == QProcess::NotRunning)
 	{
 		emit finished();
-//		messageManager()->sendInfo(msg + " not running.");
+//		report(msg + " not running.");
 	}
 	if (newState == QProcess::Starting)
 	{
-//		messageManager()->sendInfo(msg + " starting.");
+//		report(msg + " starting.");
 	}
 }
 
@@ -304,7 +304,7 @@ Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 
 		if (ok && !*ok)
 		{
-			messageManager()->sendWarning("Failed to read registration results.");
+			reportWarning("Failed to read registration results.");
 		}
 
 		return mMf;
@@ -317,7 +317,7 @@ Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 		bool useDirectionCosines = file.readParameterBool("UseDirectionCosines");
 		if (useDirectionCosines)
 		{
-			messageManager()->sendWarning("Elastix UseDirectionCosines is not supported. Result is probably wrong.");
+			reportWarning("Elastix UseDirectionCosines is not supported. Result is probably wrong.");
 		}
 
 		QString transformType = file.readParameterString("Transform");
@@ -342,7 +342,7 @@ Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 			// accept invalid transforms, but emit warning.
 //			if (ok)
 //				*ok = false;
-			messageManager()->sendWarning(QString("TransformType [%1] is not supported by CustusX. Registration result from %2 ignored.").arg(transformType).arg(filename));
+			reportWarning(QString("TransformType [%1] is not supported by CustusX. Registration result from %2 ignored.").arg(transformType).arg(filename));
 		}
 
 		filename = file.readParameterString("InitialTransformParametersFileName");
@@ -379,7 +379,7 @@ QString ElastixExecuter::getNonlinearResultVolume(bool* ok)
 
 	if ((transform=="BSplineTransform") || (transform=="SplineKernelTransform"))
 	{
-		messageManager()->sendInfo(QString("Reading result file %1 created with transform %2").arg(retval).arg(transform));
+		report(QString("Reading result file %1 created with transform %2").arg(retval).arg(transform));
 		return retval;
 	}
 	else
@@ -403,12 +403,12 @@ Transform3D ElastixParameterFile::readEulerTransform()
 {
 	QString transformType = this->readParameterString("Transform");
 	if (transformType!="EulerTransform")
-		messageManager()->sendError("Assert failure: attempting to read EulerTransform");
+		reportError("Assert failure: attempting to read EulerTransform");
 
 	int numberOfParameters = this->readParameterInt("NumberOfParameters");
 	if (numberOfParameters!=6)
 	{
-		messageManager()->sendWarning(QString("Expected 6 Euler parameters, got %1").arg(numberOfParameters));
+		reportWarning(QString("Expected 6 Euler parameters, got %1").arg(numberOfParameters));
 		return Transform3D::Identity();
 	}
 	std::vector<double> tp = this->readParameterDoubleVector("TransformParameters");
@@ -426,12 +426,12 @@ Transform3D ElastixParameterFile::readAffineTransform()
 {
 	QString transformType = this->readParameterString("Transform");
 	if (transformType!="AffineTransform")
-		messageManager()->sendError("Assert failure: attempting to read AffineTransform");
+		reportError("Assert failure: attempting to read AffineTransform");
 
 	int numberOfParameters = this->readParameterInt("NumberOfParameters");
 	if (numberOfParameters!=12)
 	{
-		messageManager()->sendWarning(QString("Expected 12 Euler parameters, got %1").arg(numberOfParameters));
+		reportWarning(QString("Expected 12 Euler parameters, got %1").arg(numberOfParameters));
 		return Transform3D::Identity();
 	}
 	std::vector<double> tp = this->readParameterDoubleVector("TransformParameters");
@@ -452,7 +452,7 @@ ElastixParameterFile::ElastixParameterFile(QString filename) : mFile(filename)
 {
 	if (!mFile.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
-		messageManager()->sendWarning(QString("Can't open ElastiX result file %1").arg(filename));
+		reportWarning(QString("Can't open ElastiX result file %1").arg(filename));
 	}
 	mText = QString(mFile.readAll());
 //	std::cout << "Loaded text from " << filename << ":\n" << mText << std::endl;

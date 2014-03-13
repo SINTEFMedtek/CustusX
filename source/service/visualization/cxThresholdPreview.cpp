@@ -22,7 +22,7 @@
 #include "cxRepManager.h"
 #include <QTimer>
 #include "cxImage.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -74,7 +74,7 @@ void ThresholdPreview::revertTransferFunctions()
 //    if(volumeRep)
 //        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToLinear();
 //    else
-//        messageManager()->sendError("ThresholdPreview::revertTransferFunctions() can not find VolumetricRep");
+//        reportError("ThresholdPreview::revertTransferFunctions() can not find VolumetricRep");
 
     mTF3D_original.reset();
     mTF2D_original.reset();
@@ -146,7 +146,7 @@ void ThresholdPreview::setPreview(ImagePtr image, double setValue)
 //    if(volumeRep)
 //        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToNearest();
 //    else
-//        messageManager()->sendError("ThresholdPreview::setPreview() can not find VolumetricRep");
+//        reportError("ThresholdPreview::setPreview() can not find VolumetricRep");
 }
 
 void ThresholdPreview::removePreview()

@@ -22,7 +22,7 @@
 #include <iostream>
 #include <QDomElement>
 #include "cxTypeConversions.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDefinitionStrings.h"
 #include "cxView.h"
 
@@ -122,7 +122,7 @@ bool LayoutData::merge(LayoutRegion region)
 {
 	if (region.pos.row + region.span.row > mSize.row || region.pos.col + region.span.col > mSize.col)
 	{
-		messageManager()->sendError("Attempted to merge a region outside allocated space in LayoutData.");
+		reportError("Attempted to merge a region outside allocated space in LayoutData.");
 		return false;
 	}
 

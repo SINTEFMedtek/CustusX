@@ -23,7 +23,7 @@
 #include "cxToolRep2D.h"
 #include "cxUtilHelpers.h"
 #include "cxSlicePlanes3DRep.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxToolManager.h"
 #include "cxViewWrapper2D.h"

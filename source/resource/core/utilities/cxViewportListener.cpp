@@ -10,7 +10,7 @@
 #include "cxVector3D.h"
 #include "vtkCamera.h"
 #include "vtkCommand.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -108,7 +108,7 @@ double ViewportListenerBase::getVpnZoom()
 {
 	if (!mRenderer)
 	{
-		messageManager()->sendError("No renderer set, using zoom=1");
+		reportError("No renderer set, using zoom=1");
 		return 1;
 	}
 	//  use the focal point and focal point + vup.

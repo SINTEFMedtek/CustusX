@@ -22,7 +22,7 @@
 #include <QAction>
 #include "cxEnumConverter.h"
 #include "cxTypeConversions.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxRequestEnterStateTransition.h"
 //#include "cxStateService.h"

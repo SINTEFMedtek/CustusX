@@ -3,7 +3,7 @@
 
 #include <QStatusBar>
 #include <map>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxForwardDeclarations.h"
 #include "cxLegacySingletons.h"
 

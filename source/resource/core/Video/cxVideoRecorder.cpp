@@ -27,7 +27,7 @@
 #include "cxVideoRecorder.h"
 #include "vtkImageData.h"
 #include "cxTime.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -72,7 +72,7 @@ void VideoRecorder::newFrameSlot()
 	if (!mSynced)
 	{
 		mSyncShift = getMilliSecondsSinceEpoch() - timestamp;
-		messageManager()->sendInfo(QString("VideoRecorder found and corrected sync shift: %1 s").arg(double(mSyncShift)/1000, 6, 'f', 3));
+		report(QString("VideoRecorder found and corrected sync shift: %1 s").arg(double(mSyncShift)/1000, 6, 'f', 3));
 //    std::cout << "RealTimeStreamSourceRecorder SyncShift: " << mSyncShift << std::endl;
 		mSynced = true;
 	}

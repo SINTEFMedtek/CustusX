@@ -15,7 +15,7 @@
 #include "cx2DZoomHandler.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxUtilHelpers.h"
 
 namespace cx
@@ -115,7 +115,7 @@ void Zoom2DHandler::setConnectivityFromType(QString type)
 	}
 	else
 	{
-		messageManager()->sendWarning(QString("No zoom connectivity found for type [%1].").arg(type));
+		reportWarning(QString("No zoom connectivity found for type [%1].").arg(type));
 	}
 }
 

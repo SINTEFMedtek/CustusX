@@ -43,7 +43,7 @@
 #include "cxTypeConversions.h"
 #include "cxGPUImageBuffer.h"
 #include "cxTexture3DSlicerProxy.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataManager.h"
 
 //---------------------------------------------------------
@@ -78,7 +78,7 @@ void Slices3DRep::setImages(std::vector<ImagePtr> images)
 {
 	if (images.empty())
 	{
-		messageManager()->sendWarning("Slices3DRep::setImages: No input images (in ViewGroup)");
+		reportWarning("Slices3DRep::setImages: No input images (in ViewGroup)");
 		return;
 	}
 	for (unsigned i=0; i<mProxy.size(); ++i)

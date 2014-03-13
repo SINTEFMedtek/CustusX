@@ -16,7 +16,7 @@
 
 #include <QStringList>
 #include "cxVideoSource.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxProbeSector.h"
 #include "cxProbeAdapterRTSource.h"
 #include "cxTypeConversions.h"
@@ -303,7 +303,7 @@ void ProbeImpl::initConfigId()
 		this->applyNewConfigurationWithId(configs[0]);
 	else
 	{
-		messageManager()->sendWarning(QString("Found no probe configuration for:\n"
+		reportWarning(QString("Found no probe configuration for:\n"
 			"scanner=[%1] instrument=[%2].\n"
 			"Check that your %3 file contains entries\n"
 			"<USScanner> <Name>%1</Name> ... <USProbe> <Name>%2</Name>").arg(mScannerUid).arg(mInstrumentUid).arg(mXml->getFileName()));

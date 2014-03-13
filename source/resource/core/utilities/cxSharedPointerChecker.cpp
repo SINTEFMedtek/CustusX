@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include "cxSharedPointerChecker.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -25,7 +25,7 @@ void requireUnique(int use_count, QString objectName)
 		QString msg = QString("Detected %1 users for object [%2], should be unique. ")
 				.arg(use_count)
 				.arg(objectName);
-		cx::messageManager()->sendError(msg);
+		cx::reportError(msg);
 	}
 }
 

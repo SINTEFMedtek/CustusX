@@ -22,7 +22,7 @@
 #include <vtkImageData.h>
 #include <vtkPolyData.h>
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTool.h"
 #include "cxDataManager.h"
 #include "cxImage.h"

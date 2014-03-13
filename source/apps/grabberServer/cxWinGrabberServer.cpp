@@ -2,7 +2,7 @@
 #include "cxWinGrabberServer.h"
 
 #include "cxWinGrabber.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 
 namespace cx

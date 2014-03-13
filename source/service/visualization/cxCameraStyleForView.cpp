@@ -16,7 +16,7 @@
 
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxRepManager.h"
 #include "cxToolManager.h"
 #include "cxToolRep3D.h"
@@ -212,7 +212,7 @@ void CameraStyleForView::connectTool()
 
 	this->updateCamera();
 
-	messageManager()->sendInfo("Camera is following " + mFollowingTool->getName());
+	report("Camera is following " + mFollowingTool->getName());
 }
 
 void CameraStyleForView::disconnectTool()

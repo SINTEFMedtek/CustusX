@@ -18,7 +18,7 @@
 #include "boost/bind.hpp"
 
 #include "cxTypeConversions.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTime.h"
 #include "cxTool.h"
 #include "cxVideoSource.h"
@@ -81,14 +81,14 @@ void USSavingRecorder::startRecord(RecordSessionPtr session, ToolPtr tool, std::
 		mVideoRecorder.push_back(videoRecorder);
 	}
 
-	messageManager()->sendSuccess("Ultrasound acquisition started.");
+	reportSuccess("Ultrasound acquisition started.");
 }
 
 void USSavingRecorder::stopRecord()
 {
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 		mVideoRecorder[i]->stopRecord();
-	messageManager()->sendSuccess("Ultrasound acquisition stopped.");
+	reportSuccess("Ultrasound acquisition stopped.");
 
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 	{
@@ -101,7 +101,7 @@ void USSavingRecorder::stopRecord()
 void USSavingRecorder::cancelRecord()
 {
 	this->clearRecording();
-	messageManager()->sendInfo("Ultrasound acquisition cancelled.");
+	report("Ultrasound acquisition cancelled.");
 }
 
 USReconstructInputData USSavingRecorder::getDataForStream(QString streamUid)

@@ -22,7 +22,7 @@
 #include "cxTypeConversions.h"
 #include <iostream>
 #include "cxEnumConverter.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -214,7 +214,7 @@ void ProbeDefinition::applySoundSpeedCompensationFactor(double factor)
 	mSoundSpeedCompensationFactor = factor;
 
 	if (this->getType() != ProbeDefinition::tLINEAR)
-		messageManager()->sendWarning("Sound speed compensation is applied to spacing[1], i.e. it is correct for linear probes and approxomate for other probes. Factor: " + qstring_cast(factor));
+		reportWarning("Sound speed compensation is applied to spacing[1], i.e. it is correct for linear probes and approxomate for other probes. Factor: " + qstring_cast(factor));
 }
 
 //Should be transform_uMv(p) (input in pixels, output in mm)

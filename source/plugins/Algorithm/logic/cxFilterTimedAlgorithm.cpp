@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include "cxFilterTimedAlgorithm.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxFilter.h"
 
 namespace cx
@@ -47,13 +47,13 @@ void FilterTimedAlgorithm::postProcessingSlot()
 
 	if (success)
 	{
-		messageManager()->sendSuccess(QString("Done \"%1\": [%2s]")
+		reportSuccess(QString("Done \"%1\": [%2s]")
 		                                   .arg(mFilter->getName())
 		                                   .arg(this->getSecondsPassedAsString()));
 	}
 	else
 	{
-		messageManager()->sendWarning(QString("Failed \"%1\": [%2s]")
+		reportWarning(QString("Failed \"%1\": [%2s]")
 		                                   .arg(mFilter->getName())
 		                                   .arg(this->getSecondsPassedAsString()));
 	}

@@ -16,7 +16,7 @@
 
 #include <QMenu>
 #include "vtkCamera.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxViewGroup.h" //for class Navigation
 #include "cxMesh.h"

@@ -9,7 +9,7 @@
 #include <iostream>
 #include "cxTypeConversions.h"
 #include <QFileSystemWatcher>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "snwSyntaxHighlighter.h"
 
 namespace cx
@@ -80,13 +80,13 @@ void FilePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
 //
 //  if(!mCurrentFile->exists())
 //  {
-////    messageManager()->sendDebug("File "+absoluteFilePath+" does not exist.");
+////    reportDebug("File "+absoluteFilePath+" does not exist.");
 //    return;
 //  }
 
 //  if(!mCurrentFile->open(QIODevice::ReadOnly))
 //  {
-//    messageManager()->sendWarning("Could not open file "+absoluteFilePath);
+//    reportWarning("Could not open file "+absoluteFilePath);
 //  }
   if(!this->internalOpenNewFile(absoluteFilePath))
   	return;
@@ -112,7 +112,7 @@ void FilePreviewWidget::saveSlot()
 
   if(!mCurrentFile->open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
-    messageManager()->sendWarning("Could not open file "+mCurrentFile->fileName());
+    reportWarning("Could not open file "+mCurrentFile->fileName());
     return;
   }
 

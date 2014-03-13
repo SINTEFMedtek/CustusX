@@ -27,7 +27,7 @@ class QActionGroup;
 
 namespace cx
 {
-class MessageManager;
+class Reporter;
 class ViewManager;
 class FilePreviewWidget;
 class ToolImagePreviewWidget;

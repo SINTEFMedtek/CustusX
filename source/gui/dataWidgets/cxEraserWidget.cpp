@@ -31,7 +31,7 @@
 #include "cxDefinitionStrings.h"
 #include "cxDataManager.h"
 #include "cxUtilHelpers.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxRegistrationTransform.h"
 #include "cxImageAlgorithms.h"
 #include "cxDoubleWidgets.h"

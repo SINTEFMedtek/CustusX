@@ -15,7 +15,7 @@
 #include "cxInteractiveClipper.h"
 
 #include "cxVolumetricRep.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxRepManager.h"
 #include "cxDataManager.h"
 #include "cxSliceComputer.h"

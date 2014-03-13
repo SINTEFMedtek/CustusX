@@ -28,7 +28,7 @@ namespace cx
 
 void WorkflowState::onEntry(QEvent * event)
 {
-	messageManager()->sendInfo("Workflow change to [" + mName + "]");
+	report("Workflow change to [" + mName + "]");
 	if (mAction)
 		mAction->setChecked(true);
 }

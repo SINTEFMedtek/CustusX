@@ -8,7 +8,7 @@
  */
 
 #include "cxDepthPeeling.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 /**
  * Generate a bunch of overlapping spheres within one poly data set:
@@ -70,7 +70,7 @@ bool SetupEnvironmentForDepthPeeling(
 {
   if (!renderWindow || !renderer)
   {
-	  cx::messageManager()->sendWarning("Can't set depth peeling. No render / renderwindow");
+	  cx::reportWarning("Can't set depth peeling. No render / renderwindow");
 	  return false;
   }
 
@@ -104,7 +104,7 @@ bool TurnOffDepthPeeling(
 {
   if (!renderWindow || !renderer)
   {
-	  cx::messageManager()->sendWarning("Can't turn off depth peeling. No render / renderwindow");
+	  cx::reportWarning("Can't turn off depth peeling. No render / renderwindow");
 	  return false;
   }
 
@@ -135,7 +135,7 @@ bool IsDepthPeelingSupported(vtkSmartPointer<vtkRenderWindow> renderWindow,
 {
   if (!renderWindow || !renderer)
     {
-	  cx::messageManager()->sendWarning("Can't test depth peeling. No render / renderwindow");
+	  cx::reportWarning("Can't test depth peeling. No render / renderwindow");
 	  return false;
     }
 

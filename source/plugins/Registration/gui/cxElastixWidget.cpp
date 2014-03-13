@@ -19,7 +19,7 @@
 #include <QSpinBox>
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxRegistrationManager.h"
 #include "cxTimedAlgorithm.h"
 #include "cxPatientData.h"

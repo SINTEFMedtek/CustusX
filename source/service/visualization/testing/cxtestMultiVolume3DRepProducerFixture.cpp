@@ -20,12 +20,12 @@ namespace cxtest
 
 MultiVolume3DRepProducerFixture::MultiVolume3DRepProducerFixture()
 {
-	cx::MessageManager::initialize();
+	cx::Reporter::initialize();
 }
 
 MultiVolume3DRepProducerFixture::~MultiVolume3DRepProducerFixture()
 {
-	cx::MessageManager::shutdown();
+	cx::Reporter::shutdown();
 }
 
 void MultiVolume3DRepProducerFixture::initializeVisualizerAndImages(QString type, int imageCount)

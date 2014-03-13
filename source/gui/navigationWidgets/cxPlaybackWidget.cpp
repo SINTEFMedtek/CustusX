@@ -20,7 +20,7 @@
 #include "cxToolManager.h"
 #include "cxHelperWidgets.h"
 #include "cxTime.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxTimelineWidget.h"
@@ -160,7 +160,7 @@ void PlaybackWidget::toggleOpenSlot()
 		videoService()->setPlaybackMode(mTimer);
 		if (!toolManager()->isPlaybackMode())
 			return;
-		messageManager()->sendInfo(QString("Started Playback with start time [%1] and end time [%2]")
+		report(QString("Started Playback with start time [%1] and end time [%2]")
 						.arg(mTimer->getStartTime().toString(timestampMilliSecondsFormatNice()))
 						.arg(mTimer->getStartTime().addMSecs(mTimer->getLength()).toString(timestampMilliSecondsFormatNice())));
 

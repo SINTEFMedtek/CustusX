@@ -27,7 +27,7 @@
 #include <vtkMatrix4x4.h>
 #include <vtkTransform.h>
 #include "cxGPUImageBuffer.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include <vtkPlane.h>
 #include "cxLogger.h"
 #include "cxImageEnveloper.h"

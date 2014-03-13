@@ -13,7 +13,7 @@
 #include "cxRecordSessionWidget.h"
 #include "cxTool.h"
 #include "cxPatientService.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxView.h"
 
 namespace cx
@@ -65,7 +65,7 @@ void TrackedCenterlineWidget::postProcessingSlot(QString sessionId)
 //  TimedTransformMap transforms_prMt = this->getRecording(session);
 //  if(transforms_prMt.empty())
 //  {
-//    messageManager()->sendError("Could not find any tracking data from session "+sessionId+". Aborting volume tracking data generation.");
+//    reportError("Could not find any tracking data from session "+sessionId+". Aborting volume tracking data generation.");
 //    return;
 //  }
 //
@@ -94,7 +94,7 @@ void TrackedCenterlineWidget::preprocessResampler()
 	TimedTransformMap transforms_prMt = this->getRecording(session);
 	if(transforms_prMt.empty())
 	{
-		messageManager()->sendError("Could not find any tracking data from session "+mSessionID+". Aborting volume tracking data generation.");
+		reportError("Could not find any tracking data from session "+mSessionID+". Aborting volume tracking data generation.");
 		return;
 	}
 
@@ -167,7 +167,7 @@ TimedTransformMap TrackedCenterlineWidget::getRecording(RecordSessionPtr session
   ToolPtr tool = this->findTool(startTime, stopTime);
   if(!tool)
   {
-	messageManager()->sendWarning("Found no tool with tracking data from the given session.");
+	reportWarning("Found no tool with tracking data from the given session.");
     return retval;
   }
   this->setTool(tool);
@@ -183,18 +183,18 @@ ToolPtr TrackedCenterlineWidget::findTool(double startTime, double stopTime)
   SessionToolHistoryMap toolTransformMap = toolManager()->getSessionHistory(startTime, stopTime);
   if(toolTransformMap.size() == 1)
   {
-	messageManager()->sendInfo("Found one tool("+toolTransformMap.begin()->first->getName()+") with relevant data.");
+	report("Found one tool("+toolTransformMap.begin()->first->getName()+") with relevant data.");
 	retval = toolTransformMap.begin()->first;
   }
   else if(toolTransformMap.size() > 1)
   {
-	messageManager()->sendWarning("Found more than one tool with relevant data, user needs to choose which one to use for tracked centerline extraction.");
+	reportWarning("Found more than one tool with relevant data, user needs to choose which one to use for tracked centerline extraction.");
     //TODO make the user select which tool they wanna use!!! Pop-up???
 	retval = toolTransformMap.begin()->first;
     //TODO
   }else if(toolTransformMap.empty())
   {
-	messageManager()->sendWarning("Could not find any session history for given session.");
+	reportWarning("Could not find any session history for given session.");
   }
   return retval;
 }

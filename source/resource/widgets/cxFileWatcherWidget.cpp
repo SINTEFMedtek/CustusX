@@ -2,7 +2,7 @@
 
 #include <QFileSystemWatcher>
 #include <QFileInfo>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -37,7 +37,7 @@ bool FileWatcherWidget::internalOpenNewFile(const QString absoluteFilePath)
 
   if(!mCurrentFile->open(QIODevice::ReadOnly))
   {
-    messageManager()->sendWarning("Could not open file "+absoluteFilePath);
+    reportWarning("Could not open file "+absoluteFilePath);
     //return false; Is this missing???
   }
   return true;

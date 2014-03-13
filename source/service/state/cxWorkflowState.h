@@ -22,7 +22,7 @@
 #include <QAction>
 #include "cxTypeConversions.h"
 #include "cxRequestEnterStateTransition.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 namespace cx
 {

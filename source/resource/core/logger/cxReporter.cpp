@@ -1,4 +1,4 @@
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 #include <iostream>
 #include "boost/shared_ptr.hpp"
@@ -94,7 +94,7 @@ public:
         mBuffer.clear();
         sentry.unlock();
 
-        messageManager()->sendMessage(buffer, mMessageLevel, 0);
+        reporter()->sendMessage(buffer, mMessageLevel, 0);
       }
       else
       {
@@ -147,37 +147,37 @@ public:
 
 };
 
-MessageManager* MessageManager::mTheInstance = NULL;
-MessageManager* messageManager() { return MessageManager::getInstance(); }
+Reporter* Reporter::mTheInstance = NULL;
+Reporter* reporter() { return Reporter::getInstance(); }
 
 
-MessageManager::MessageManager() :
+Reporter::Reporter() :
 	mEnabled(false)
 {
   qRegisterMetaType<Message>("Message");
 }
 
-MessageManager::~MessageManager()
+Reporter::~Reporter()
 {
   mCout.reset();
   mCerr.reset();
 }
 
-MessageManager* MessageManager::getInstance()
+Reporter* Reporter::getInstance()
 {
   if(mTheInstance == NULL)
   {
-    mTheInstance = new MessageManager();
+    mTheInstance = new Reporter();
   }
   return mTheInstance;
 }
 
-void MessageManager::initialize()
+void Reporter::initialize()
 {
-	MessageManager::getInstance()->initializeObject();
+	Reporter::getInstance()->initializeObject();
 }
 
-void MessageManager::initializeObject()
+void Reporter::initializeObject()
 {
 	// must clear both before reinit (in case of nested initializing)
 	// otherwise we get a segfault.
@@ -189,29 +189,29 @@ void MessageManager::initializeObject()
 	mEnabled = true;
 }
 
-void MessageManager::setFormat(Format format)
+void Reporter::setFormat(Format format)
 {
 	mFormat = format;
 }
 
-void MessageManager::setEnabled(bool enabled)
+void Reporter::setEnabled(bool enabled)
 {
 	mEnabled = enabled;
 }
 
-bool MessageManager::isEnabled() const
+bool Reporter::isEnabled() const
 {
 	return mEnabled;
 }
 
 
-void MessageManager::shutdown()
+void Reporter::shutdown()
 {
   delete mTheInstance;
   mTheInstance = NULL;
 }
 
-bool MessageManager::setLogFile(QString filename)
+bool Reporter::setLogFile(QString filename)
 {
 	mEnabled = true;
 	mLogFile = filename;
@@ -231,23 +231,23 @@ bool MessageManager::setLogFile(QString filename)
 /** Backwards compatibility only
  *
  */
-void MessageManager::setLoggingFolder(QString absoluteLoggingFolderPath)
+void Reporter::setLoggingFolder(QString absoluteLoggingFolderPath)
 {
 	this->setLogFile(absoluteLoggingFolderPath + "/ConsoleLog.txt");
 }
 
-void MessageManager::setAudioSource(AudioPtr audioSource)
+void Reporter::setAudioSource(AudioPtr audioSource)
 {
   mAudioSource = audioSource;
 }
 
-bool MessageManager::hasAudioSource() const
+bool Reporter::hasAudioSource() const
 {
   return mAudioSource;
 }
 
 #ifndef SSC_PRINT_CALLER_INFO
-void MessageManager::sendInfo(QString info)
+void Reporter::sendInfo(QString info)
 #else
 void MessageManager::sendInfoRedefined(QString info)
 #endif
@@ -256,7 +256,7 @@ void MessageManager::sendInfoRedefined(QString info)
 }
 
 #ifndef SSC_PRINT_CALLER_INFO
-void MessageManager::sendSuccess(QString success)
+void Reporter::sendSuccess(QString success)
 #else
 void MessageManager::sendSuccessRedefined(QString success)
 #endif
@@ -265,7 +265,7 @@ void MessageManager::sendSuccessRedefined(QString success)
 }
 
 #ifndef SSC_PRINT_CALLER_INFO
-void MessageManager::sendWarning(QString warning)
+void Reporter::sendWarning(QString warning)
 #else
 void MessageManager::sendWarningRedefined(QString warning)
 #endif
@@ -274,7 +274,7 @@ void MessageManager::sendWarningRedefined(QString warning)
 }
 
 #ifndef SSC_PRINT_CALLER_INFO
-void MessageManager::sendError(QString error)
+void Reporter::sendError(QString error)
 #else
 void MessageManager::sendErrorRedefined(QString error)
 #endif
@@ -283,7 +283,7 @@ void MessageManager::sendErrorRedefined(QString error)
 }
 
 #ifndef SSC_PRINT_CALLER_INFO
-void MessageManager::sendDebug(QString debug)
+void Reporter::sendDebug(QString debug)
 #else
 void MessageManager::sendDebugRedefined(QString debug)
 #endif
@@ -292,7 +292,7 @@ void MessageManager::sendDebugRedefined(QString debug)
 }
 
 #ifndef SSC_PRINT_CALLER_INFO
-void MessageManager::sendVolatile(QString debug)
+void Reporter::sendVolatile(QString debug)
 #else
 void MessageManager::sendVolatileRedefined(QString debug)
 #endif
@@ -350,7 +350,7 @@ void MessageManager::sendVolatileWithCallerInfo(QString info, const std::string 
 }
 #endif
 
-void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int timeout, bool mute, QString sourceLocation)
+void Reporter::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int timeout, bool mute, QString sourceLocation)
 {
 	if (!this->isEnabled())
 		return;
@@ -377,7 +377,7 @@ void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int t
 	emit emittedMessage(message);
 }
 
-void MessageManager::playSound(MESSAGE_LEVEL messageLevel)
+void Reporter::playSound(MESSAGE_LEVEL messageLevel)
 {
 	switch (messageLevel)
 	{
@@ -395,55 +395,55 @@ void MessageManager::playSound(MESSAGE_LEVEL messageLevel)
 	}
 }
 
-void MessageManager::playStartSound()
+void Reporter::playStartSound()
 {
   if(this->hasAudioSource())
     mAudioSource->playStartSound();
 }
 
-void MessageManager::playStopSound()
+void Reporter::playStopSound()
 {
   if(this->hasAudioSource())
     mAudioSource->playStopSound();
 }
 
-void MessageManager::playCancelSound()
+void Reporter::playCancelSound()
 {
   if(this->hasAudioSource())
     mAudioSource->playCancelSound();
 }
 
-void MessageManager::playSuccessSound()
+void Reporter::playSuccessSound()
 {
   if(this->hasAudioSource())
     mAudioSource->playSuccessSound();
 }
 
-void MessageManager::playWarningSound()
+void Reporter::playWarningSound()
 {
   if(this->hasAudioSource())
     mAudioSource->playWarningSound();
 }
 
-void MessageManager::playErrorSound()
+void Reporter::playErrorSound()
 {
   if(this->hasAudioSource())
     mAudioSource->playErrorSound();
 }
 
-void MessageManager::playScreenShotSound()
+void Reporter::playScreenShotSound()
 {
   if(this->hasAudioSource())
     mAudioSource->playScreenShotSound();
 }
 
-void MessageManager::playSampleSound()
+void Reporter::playSampleSound()
 {
   if(this->hasAudioSource())
     mAudioSource->playSampleSound();
 }
 
-QString MessageManager::formatMessage(Message msg)
+QString Reporter::formatMessage(Message msg)
 {
 	QString retval;
 
@@ -472,7 +472,7 @@ QString MessageManager::formatMessage(Message msg)
 
 /** Open the logfile and append the input text to it
  */
-bool MessageManager::appendToLogfile(QString text)
+bool Reporter::appendToLogfile(QString text)
 {
 	if (mLogFile.isEmpty())
 		return false;
@@ -495,7 +495,7 @@ bool MessageManager::appendToLogfile(QString text)
 	return true;
 }
 
-MessageManager::Format::Format() :
+Reporter::Format::Format() :
 	mShowBrackets(true),
 	mShowLevel(true),
 	mShowSourceLocation(true)

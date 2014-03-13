@@ -1,6 +1,6 @@
 #include "cxImageSenderFactory.h"
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxImageStreamerOpenCV.h"
 #include "cxMHDImageStreamer.h"
 #include "cxImageStreamerSonix.h"
@@ -50,10 +50,10 @@ StreamerPtr ImageStreamerFactory::getFromArguments(StringMap args)
 	StreamerPtr streamer = this->getImageSender(type);
 
 	if (streamer)
-		messageManager()->sendSuccess("Created sender of type: "+type);
+		reportSuccess("Created sender of type: "+type);
 	else
 	{
-		messageManager()->sendError("Failed to create sender based on type: "+type);
+		reportError("Failed to create sender based on type: "+type);
 		return streamer;
 	}
 

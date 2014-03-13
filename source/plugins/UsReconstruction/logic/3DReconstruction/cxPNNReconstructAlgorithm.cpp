@@ -21,7 +21,7 @@
 
 #include <QFileInfo>
 #include "recConfig.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxVolumeHelpers.h"
 #include "cxTimeKeeper.h"
@@ -89,7 +89,7 @@ bool PNNReconstructAlgorithm::reconstruct(ProcessedUSInputDataPtr input,
 	//int* outputDims = target->GetDimensions();
 
 	if (inputDims[2] != static_cast<int> (frameInfo.size()))
-		messageManager()->sendWarning("inputDims[2] != frameInfo.size()" + qstring_cast(inputDims[2]) + " != "
+		reportWarning("inputDims[2] != frameInfo.size()" + qstring_cast(inputDims[2]) + " != "
 			+ qstring_cast(frameInfo.size()));
 
 	Vector3D inputSpacing(input->getSpacing());
@@ -105,7 +105,7 @@ bool PNNReconstructAlgorithm::reconstruct(ProcessedUSInputDataPtr input,
 	for (int record = 0; record < inputDims[2]; record++)
 	{
 		unsigned char *inputPointer = input->getFrame(record);
-		//messageManager()->sendDebug("record: " + string_cast(record));
+		//reportDebug("record: " + string_cast(record));
 		boost::array<double, 16> recordTransform = frameInfo[record].mPos.flatten();
 
 		for (int beam = 0; beam < inputDims[0]; beam++)
@@ -243,7 +243,7 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, vtkImageDataPtr ou
 	DoubleDataAdapterXmlPtr interpolationStepsOption = this->getInterpolationStepsOption(settings);
 	int interpolationSteps = static_cast<int> (interpolationStepsOption->getValue());
 
-//	messageManager()->sendInfo(QString("PNN hole filling [steps=%1] ...").arg(interpolationSteps));
+//	report(QString("PNN hole filling [steps=%1] ...").arg(interpolationSteps));
 
 	vtkImageDataPtr input = inputData->getBaseVtkImageData();
 	vtkImageDataPtr output = outputData;
@@ -261,7 +261,7 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, vtkImageDataPtr ou
 	unsigned char *maskPointer = static_cast<unsigned char*> (mask->GetScalarPointer());
 
 	if ((outputDims[0] != inputDims[0]) || (outputDims[1] != inputDims[1]) || (outputDims[2] != inputDims[2]))
-		messageManager()->sendWarning("outputDims != inputDims. output: " + qstring_cast(outputDims[0]) + " "
+		reportWarning("outputDims != inputDims. output: " + qstring_cast(outputDims[0]) + " "
 			+ qstring_cast(outputDims[1]) + " " + qstring_cast(outputDims[2]) + " input: " + qstring_cast(inputDims[0])
 			+ " " + qstring_cast(inputDims[1]) + " " + qstring_cast(inputDims[2]));
 
@@ -271,7 +271,7 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, vtkImageDataPtr ou
 //	DoubleDataAdapterXmlPtr interpolationStepsOption = this->getInterpolationStepsOption(settings);
 
 //	int interpolationSteps = static_cast<int> (interpolationStepsOption->getValue());
-//	messageManager()->sendInfo("interpolationSteps: " + qstring_cast(interpolationSteps));
+//	report("interpolationSteps: " + qstring_cast(interpolationSteps));
 
 	int total = outputDims[0] * outputDims[1] * outputDims[2];
 	int removed = 0;
@@ -279,7 +279,7 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, vtkImageDataPtr ou
 	// Traverse all voxels
 	for (int x = 0; x < outputDims[0]; x++)
 	{
-		//messageManager()->sendDebug("x: " + string_cast(x));
+		//reportDebug("x: " + string_cast(x));
 		for (int y = 0; y < outputDims[1]; y++)
 		{
 			for (int z = 0; z < outputDims[2]; z++)
@@ -311,7 +311,7 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, vtkImageDataPtr ou
 	int valid = 100*double(ignored)/double(total);
 	int outside = 100*double(removed)/double(total);
 	int holes = 100*double(total-ignored-removed)/double(total);
-	messageManager()->sendDebug(
+	reporter()->sendDebug(
 				QString("PNN: Size: %1Mb, Valid voxels: %2\%, Outside mask: %3\%  Filled holes [steps=%4, %5s]: %6\%")
 				.arg(total/1024/1024)
 				.arg(valid)

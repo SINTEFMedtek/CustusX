@@ -19,7 +19,7 @@
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 #include "cxBoolDataAdapter.h"
 #include "cxDoubleDataAdapter.h"
@@ -207,7 +207,7 @@ void Pipeline::setOption(DataAdapterPtr adapter, QVariant value)
 	}
 	else
 	{
-		messageManager()->sendWarning(QString("Attempt to set option of type %2 is not supported").arg(value.typeName()));
+		reportWarning(QString("Attempt to set option of type %2 is not supported").arg(value.typeName()));
 	}
 }
 
@@ -317,7 +317,7 @@ void Pipeline::execute(QString uid)
 
 	if (startIndex<0)
 	{
-		messageManager()->sendWarning(QString("Cannot execute filter %1: No input data set").arg(uid));
+		reportWarning(QString("Cannot execute filter %1: No input data set").arg(uid));
 		return;
 	}
 
@@ -361,7 +361,7 @@ void Pipeline::execute(QString uid)
 
 //	if (startIndex<0)
 //	{
-//		messageManager()->sendWarning(QString("Cannot execute filter %1: No input data set").arg(uid));
+//		reportWarning(QString("Cannot execute filter %1: No input data set").arg(uid));
 //		return;
 //	}
 

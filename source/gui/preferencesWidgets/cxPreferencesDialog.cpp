@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDoubleWidgets.h"
 #include "cxEnumConverter.h"
 #include "cxSettings.h"
@@ -578,7 +578,7 @@ void DebugTab::runDebugToolSlot()
 
 	cx::DummyToolPtr dummyTool(new cx::DummyTool(trackingService()));
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
-	messageManager()->sendInfo(QString("Running debug tool inside box %1").arg(qstring_cast(bb_r)));
+	report(QString("Running debug tool inside box %1").arg(qstring_cast(bb_r)));
 	toolManager()->runDummyTool(dummyTool);
 }
 

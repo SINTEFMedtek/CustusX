@@ -1,7 +1,7 @@
 #include "cxCoordinateSystemHelpers.h"
 
 //#include "cxToolManager.h"
-//#include "cxMessageManager.h"
+//#include "cxReporter.h"
 //#include "cxDataManager.h"
 //#include "cxData.h"
 #include "cxDefinitionStrings.h"

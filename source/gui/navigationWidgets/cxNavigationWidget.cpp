@@ -6,7 +6,7 @@
 #include <QLabel>
 #include <QSlider>
 #include <QToolBar>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxViewManager.h"
 #include "cxToolManager.h"
 #include "cxDoubleWidgets.h"

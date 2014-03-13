@@ -7,7 +7,7 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxToolManager.h"
@@ -265,14 +265,14 @@ void PointSamplingWidget::loadReferencePointsSlot()
   ToolPtr refTool = toolManager()->getReferenceTool();
   if(!refTool) // we only load reference points from reference tools
   {
-    messageManager()->sendDebug("No reference tool, cannot load reference points into the pointsampler");
+    reporter()->sendDebug("No reference tool, cannot load reference points into the pointsampler");
     return;
   }
 
   std::map<int, Vector3D> referencePoints_s = refTool->getReferencePoints();
   if(referencePoints_s.empty())
   {
-    messageManager()->sendWarning("No referenceppoints in reference tool "+refTool->getName());
+    reportWarning("No referenceppoints in reference tool "+refTool->getName());
     return;
   }
 

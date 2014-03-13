@@ -22,7 +22,7 @@
 #include <vtkPolyDataNormals.h>
 #include <vtkImageData.h>
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxRegistrationTransform.h"
 #include "cxTypeConversions.h"
 #include "cxImage.h"
@@ -198,7 +198,7 @@ bool ContourFilter::execute()
 	DoubleDataAdapterXmlPtr surfaceThresholdOption = this->getSurfaceThresholdOption(mCopiedOptions);
 	DoubleDataAdapterXmlPtr decimationOption = this->getDecimationOption(mCopiedOptions);
 
-	//    messageManager()->sendInfo(QString("Creating contour from \"%1\"...").arg(input->getName()));
+	//    report(QString("Creating contour from \"%1\"...").arg(input->getName()));
 
 	mRawResult = this->execute(input->getBaseVtkImageData(),
 	                           surfaceThresholdOption->getValue(),

@@ -60,7 +60,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	dataAdapters/cxColorDataAdapterXml
 	dataAdapters/cxVector3DComponentDataAdapter
 
-	logger/cxMessageManager
+	logger/cxReporter
 	logger/cxMessageListener
 
 	settings/cxSettings.h

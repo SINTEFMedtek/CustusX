@@ -24,7 +24,7 @@
 #include "cxView.h"
 #include "cxVideoRep.h"
 #include "cxDisplayTextRep.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 
 #include "cxSettings.h"
@@ -218,7 +218,7 @@ void ViewWrapperVideo::setupRep(VideoSourcePtr source, ToolPtr tool)
 	mDataNameText->setText(0, mSource->getName());
 	mStreamRep->setShowSector(settings()->value("showSectorInRTView").toBool());
 
-//	messageManager()->sendInfo(
+//	report(
 //					"Setup video rep with source="
 //					+ source->getName() + " and tool="
 //					+ (tool ? tool->getName() : "none"));

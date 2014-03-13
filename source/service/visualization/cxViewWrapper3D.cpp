@@ -31,7 +31,7 @@
 #include "cxSlicerRepSW.h"
 #include "cxToolRep2D.h"
 #include "cxDisplayTextRep.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxSlicePlanes3DRep.h"
 #include "cxDataManager.h"
 #include "cxMesh.h"
@@ -175,7 +175,7 @@ ViewWrapper3D::~ViewWrapper3D()
 void ViewWrapper3D::initializeMultiVolume3DRepProducer()
 {
 	if (!mView)
-		messageManager()->sendError("Missing View in initializeMultiVolume3DRepProducer");
+		reportError("Missing View in initializeMultiVolume3DRepProducer");
 
 	if (!mMultiVolume3DRepProducer)
 	{
@@ -946,24 +946,24 @@ void ViewWrapper3D::setTranslucentRenderingToDepthPeeling(bool setDepthPeeling)
 
 		/*if (!IsDepthPeelingSupported(mView->getRenderWindow(), mView->getRenderer(), true))
 		{
-			messageManager()->sendWarning("GPU do not support depth peeling. Rendering of translucent surfaces is not supported");
+			reportWarning("GPU do not support depth peeling. Rendering of translucent surfaces is not supported");
 			success = false;
 		}
 		else*/ if (!SetupEnvironmentForDepthPeeling(mView->getRenderWindow(), mView->getRenderer(), 100, 0.1))
 		{
-			messageManager()->sendWarning("Error setting depth peeling");
+			reportWarning("Error setting depth peeling");
 			success = false;
 		}
 		else
 		{
-			messageManager()->sendInfo("Set GPU depth peeling");
+			report("Set GPU depth peeling");
 		}
 		if(!success)
 		  settings()->setValue("View3D/depthPeeling", false);
 	} else
 	{
 		if (TurnOffDepthPeeling(mView->getRenderWindow(), mView->getRenderer()))
-			messageManager()->sendInfo("Depth peeling turned off");
+			report("Depth peeling turned off");
 	}
 }
 

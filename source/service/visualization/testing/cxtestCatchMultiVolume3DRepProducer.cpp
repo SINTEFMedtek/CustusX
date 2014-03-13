@@ -21,7 +21,7 @@
 #include "cxVolumeHelpers.h"
 #include "cxVolumetricRep.h"
 #include "cxtestUtilities.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxtestDirectSignalListener.h"
 #include "cxImage2DRep3D.h"
 #include "cxConfig.h"

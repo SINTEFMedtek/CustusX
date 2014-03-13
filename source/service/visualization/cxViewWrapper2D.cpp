@@ -40,7 +40,7 @@
 #include "cxOrientationAnnotationRep.h"
 #include "cxOrientationAnnotation2DRep.h"
 #include "cxDisplayTextRep.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxManualTool.h"
 #include "cxDataManager.h"
 #include "cxViewManager.h"
@@ -222,7 +222,7 @@ void ViewWrapper2D::orientationActionSlot()
 //	}
 //	else
 //	{
-//		messageManager()->sendWarning(QString("No zoom connectivity found for type [%1].").arg(type));
+//		reportWarning(QString("No zoom connectivity found for type [%1].").arg(type));
 //	}
 //}
 

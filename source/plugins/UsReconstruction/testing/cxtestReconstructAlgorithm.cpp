@@ -26,7 +26,7 @@
 #include "TordReconstruct/TordTest.h"
 #endif
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxtestReconstructAlgorithmFixture.h"
 #include "cxtestUtilities.h"
 
@@ -105,7 +105,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 #ifdef CX_USE_OPENCL_UTILITY
 TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconstruction][synthetic][not_win32][unstable][broken]")
 {
-	cx::messageManager()->initialize();
+	cx::Reporter::initialize();
 
 	ReconstructAlgorithmFixture fixture;
 
@@ -170,7 +170,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	//need to be sure opencl thread is finished before shutting down messagemanager,
 	//or else we could get seg fault because og a callbackk from opencl to messagemAnager after it is shut down
 	Utilities::sleep_sec(1);
-	cx::messageManager()->shutdown();
+	cx::Reporter::shutdown();
 }
 #endif//CX_USE_OPENCL_UTILITY
 

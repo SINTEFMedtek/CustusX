@@ -9,7 +9,7 @@
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDefinitionStrings.h"
 #include "cxUtilHelpers.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxRegistrationTransform.h"
 #include "cxImageAlgorithms.h"
 #include "cxInteractiveCropper.h"

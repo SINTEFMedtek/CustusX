@@ -134,7 +134,7 @@ void ElastixManager::addNonlinearData()
 
 	if (!nlVolume)
 	{
-		messageManager()->sendInfo(QString("Failed to import nonlinear volume %1").arg(nonlinearVolumeFilename));
+		report(QString("Failed to import nonlinear volume %1").arg(nonlinearVolumeFilename));
 		return;
 	}
 
@@ -144,7 +144,7 @@ void ElastixManager::addNonlinearData()
 	dataManager()->loadData(nlVolume);
 	dataManager()->saveImage(nlVolume, patientService()->getPatientData()->getActivePatientFolder());
 
-	messageManager()->sendInfo(QString("Added volume %1, created by a nonlinear transform").arg(nlVolume->getName()));
+	report(QString("Added volume %1, created by a nonlinear transform").arg(nlVolume->getName()));
 }
 
 } /* namespace cx */

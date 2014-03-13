@@ -93,12 +93,12 @@ void ReconstructManager::transferFunctionChangedSlot()
 	//Use angio reconstruction also if only transfer function is set to angio
 	if(mParams->mPresetTFAdapter->getValue() == "US Angio")
 	{
-		messageManager()->sendDebug("Reconstructing angio (Because of angio transfer function)");
+		reportDebug("Reconstructing angio (Because of angio transfer function)");
 		mParams->mAngioAdapter->setValue(true);
 	}
 	else if(mParams->mPresetTFAdapter->getValue() == "US B-Mode" && mParams->mAngioAdapter->getValue())
 	{
-		messageManager()->sendDebug("Not reconstructing angio (Because of B-Mode transfer function)");
+		reportDebug("Not reconstructing angio (Because of B-Mode transfer function)");
 		mParams->mAngioAdapter->setValue(false);
 	}
 }
@@ -109,7 +109,7 @@ std::vector<ReconstructCorePtr> ReconstructManager::startReconstruction()
 
 	if (cores.empty())
 	{
-		messageManager()->sendWarning("Failed to start reconstruction");
+		reportWarning("Failed to start reconstruction");
 		return cores;
 	}
 
@@ -184,7 +184,7 @@ bool ReconstructManager::validInputData() const
 		return false;
 	if(mOriginalFileData.mUsRaw->is4D())
 	{
-		messageManager()->sendWarning("US reconstructer do not handle 4D US data");
+		reportWarning("US reconstructer do not handle 4D US data");
 		return false;
 	}
 	return true;
@@ -203,7 +203,7 @@ cx::CompositeTimedAlgorithmPtr ReconstructManager::assembleReconstructionPipelin
 		cx::CompositeParallelTimedAlgorithmPtr parallel(new cx::CompositeParallelTimedAlgorithm());
 		pipeline->append(parallel);
 		temp = parallel;
-		messageManager()->sendDebug("Running reconstruction cores in parallel.");
+		reportDebug("Running reconstruction cores in parallel.");
 	}
 
 	for (unsigned i=0; i<cores.size(); ++i)
@@ -252,7 +252,7 @@ void ReconstructManager::selectData(QString filename, QString calFilesPath)
 {
 	if (filename.isEmpty())
 	{
-		messageManager()->sendWarning("no file selected");
+		reportWarning("no file selected");
 		return;
 	}
 

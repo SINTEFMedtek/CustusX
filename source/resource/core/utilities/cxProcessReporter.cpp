@@ -1,7 +1,7 @@
 #include "cxProcessReporter.h"
 
 #include "cxLogger.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -27,22 +27,22 @@ ProcessReporter::~ProcessReporter()
 
 void ProcessReporter::processReadyRead()
 {
-	messageManager()->sendInfo(QString(mProcess->readAllStandardOutput()));
+	report(QString(mProcess->readAllStandardOutput()));
 }
 
 void ProcessReporter::processStateChanged(QProcess::ProcessState newState)
 {
 	if (newState == QProcess::Running)
 	{
-		messageManager()->sendInfo(QString("%1 running.").arg(mName));
+		report(QString("%1 running.").arg(mName));
 	}
 	if (newState == QProcess::NotRunning)
 	{
-		messageManager()->sendInfo(QString("%1 not running.").arg(mName));
+		report(QString("%1 not running.").arg(mName));
 	}
 	if (newState == QProcess::Starting)
 	{
-		messageManager()->sendInfo(QString("%1 starting.").arg(mName));
+		report(QString("%1 starting.").arg(mName));
 	}
 }
 
@@ -75,16 +75,16 @@ void ProcessReporter::processError(QProcess::ProcessError error)
 		msg += "Invalid error";
 	}
 
-	messageManager()->sendError(msg);
+	reportError(msg);
 }
 
 void ProcessReporter::processFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
 	QString msg = QString("%1 exited with exit status %3. (%1 last exit code was %4.)").arg(mName).arg(exitStatus).arg(exitCode);
 	if(exitStatus == 0)
-		messageManager()->sendSuccess(msg);
+		reportSuccess(msg);
 	else
-		messageManager()->sendError(msg);
+		reportError(msg);
 }
 
 } /* namespace cx */

@@ -20,7 +20,7 @@
 
 //#include "cxLabeledComboBoxWidget.h"
 #include "cxTypeConversions.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxImageSenderFactory.h"
@@ -181,7 +181,7 @@ void VideoConnectionManager::launchServer()
 {
 	if (!this->useLocalServer())
 	{
-		messageManager()->sendError("Ignoring Launch local server: Must select local server");
+		reportError("Ignoring Launch local server: Must select local server");
 		return;
 	}
 	QString program = this->getLocalServerExecutable();
@@ -227,7 +227,7 @@ void VideoConnectionManager::launchAndConnectServer()
 	else if (useRemoteServer())
 		this->connectServer();
 	else
-		messageManager()->sendError("Could not determine which server to launch.");
+		reportError("Could not determine which server to launch.");
 }
 
 void VideoConnectionManager::serverProcessStateChanged(QProcess::ProcessState newState)

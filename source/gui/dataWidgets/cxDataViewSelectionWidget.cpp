@@ -18,7 +18,7 @@
 #include <QLabel>
 #include <QMenu>
 #include "cxEnumConverter.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataLocations.h"
 #include "cxToolConfigurationParser.h"
 #include "cxImageAlgorithms.h"
@@ -324,7 +324,7 @@ void SelectedDataListWidget::deleteSlot()
 {
   if(!mItemToDelete)
   {
-    messageManager()->sendDebug("Found no item to delete...");
+    reporter()->sendDebug("Found no item to delete...");
     return;
   }
   this->deleteItemSlot(mItemToDelete);
@@ -348,7 +348,7 @@ void SelectedDataListWidget::contextMenuSlot(const QPoint& point)
   QListWidgetItem* item = this->itemAt(point);
   if(!item)
   {
-    messageManager()->sendDebug("Found no item to delete...");
+    reporter()->sendDebug("Found no item to delete...");
   }
   mItemToDelete = item;
 

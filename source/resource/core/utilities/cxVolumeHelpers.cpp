@@ -18,7 +18,7 @@
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
 #include "cxRegistrationTransform.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxEnumConverter.h"
 #include "cxTime.h"
 
@@ -167,7 +167,7 @@ ImagePtr convertImageToUnsigned(DataServicePtr dataManager, ImagePtr image, vtkI
 
 		cast->Update();
 		if (verbose)
-			messageManager()->sendInfo(QString("Converting image %1 from %2 to %3, shift=%4")
+			report(QString("Converting image %1 from %2 to %3, shift=%4")
 											.arg(image->getName())
 											.arg(input->GetScalarTypeAsString())
 											.arg(cast->GetOutput()->GetScalarTypeAsString())
@@ -247,14 +247,14 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(vtkImageDataPtr image)
 
 void printDisplayFriendlyInfo(std::map<std::string, std::string> map)
 {
-	messageManager()->sendInfo("----- DisplayFriendlyInfo -----");
+	report("----- DisplayFriendlyInfo -----");
 	std::map<std::string, std::string>::iterator it;
 	for(it = map.begin(); it != map.end(); ++it)
 	{
 		QString message((it->first+": "+it->second).c_str());
-		messageManager()->sendInfo(message);
+		report(message);
 	}
-	messageManager()->sendInfo("-------------------------------");
+	report("-------------------------------");
 }
 
 int calculateNumVoxelsWithMaxValue(ImagePtr image)

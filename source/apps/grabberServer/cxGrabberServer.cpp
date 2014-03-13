@@ -1,6 +1,6 @@
 #include "cxGrabberServer.h"
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 
 namespace cx

@@ -5,7 +5,7 @@
 #include "vtkMatrix4x4.h"
 #include "vtkImageData.h"
 #include "vtkImageMask.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxSliceProxy.h"
 #include "cxProbeSector.h"
@@ -56,7 +56,7 @@ bool SimulatedImageStreamer::startStreaming(SenderPtr sender)
 {
 	if (!this->isInitialized())
 	{
-		messageManager()->sendError("SimulatedImageStreamer: Failed to start streaming: Not initialized.");
+		reportError("SimulatedImageStreamer: Failed to start streaming: Not initialized.");
 		return false;
 	}
 	mSender = sender;

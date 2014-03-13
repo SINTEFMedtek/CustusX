@@ -10,7 +10,7 @@
 #include <QTimer>
 #include <vtkImageData.h>
 #include "cxLabeledComboBoxWidget.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxData.h"
 #include "cxDataManager.h"
@@ -51,7 +51,7 @@ ExportDataDialog::ExportDataDialog(QWidget* parent) :
   mOkButton->setDefault(true);
   mOkButton->setFocus();
 
-//  messageManager()->sendInfo("Exporting data...");
+//  report("Exporting data...");
 }
 
 ExportDataDialog::~ExportDataDialog()

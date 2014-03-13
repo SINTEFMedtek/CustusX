@@ -28,7 +28,7 @@
 
 namespace cx
 {
-class MessageManager;
+class Reporter;
 typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
 
 /**

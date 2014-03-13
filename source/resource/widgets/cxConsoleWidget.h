@@ -22,7 +22,7 @@
 
 #include <QTextBrowser>
 #include <QTextCharFormat>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 
 class QContextMenuEvent;
 class QAction;

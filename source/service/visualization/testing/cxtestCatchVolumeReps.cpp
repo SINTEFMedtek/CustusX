@@ -25,7 +25,7 @@
 #include "cxtestRenderTester.h"
 #include "cxtestUtilities.h"
 #include "cxBoundingBox3D.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxImageEnveloper.h"
 
 typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;
@@ -58,11 +58,11 @@ public:
 		mAxisSize(3),
 		mViewAxisSize(30)
 	{
-		cx::MessageManager::initialize();
+		cx::Reporter::initialize();
 	}
 	~MehdiGPURayCastMultiVolumeRepFixture()
 	{
-		cx::MessageManager::shutdown();
+		cx::Reporter::shutdown();
 	}
 
 	double renderAndGetNonZeroFraction()

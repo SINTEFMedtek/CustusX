@@ -1,5 +1,5 @@
-#ifndef CXMESSAGEMANAGER_H_
-#define CXMESSAGEMANAGER_H_
+#ifndef CXREPORTER_H_
+#define CXREPORTER_H_
 
 //#define SSC_PRINT_CALLER_INFO
 
@@ -26,13 +26,13 @@ class QTextStream;
 
 namespace cx
 {
-/**\brief A representation of a MessageManager message.
+/**\brief A representation of a Reporter message.
  *
  * \author Janne Beate Lervik Bakeng, SINTEF
  * \date 24.08.2010
  *
- * \sa MessageManager
- * \ingroup sscUtility
+ * \sa Reporter
+ * \addtogroup cx_resource_core_logger
  */
 class Message
 {
@@ -60,15 +60,15 @@ private:
  * Send info in different error levels, and route
  * them to file, or to a console via qt signals.
  * Use the class ConsoleWidget for this.
- * MessageManager also captures cout and cerr.
+ * Reporter also captures cout and cerr.
  *
  * \author Janne Beate Lervik Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  * \date 16.10.2008
  *
- * \ingroup sscUtility
+ * \addtogroup cx_resource_core_logger
  */
-class MessageManager : public QObject
+class Reporter : public QObject
 {
   Q_OBJECT
 
@@ -76,7 +76,7 @@ public:
   static void initialize(); ///< initialize service. must be called before use.
   static void shutdown(); ///< shutdown service.
 
-  static MessageManager* getInstance(); ///< Returns a reference to the only MessageManager that exists.
+  static Reporter* getInstance(); ///< Returns a reference to the only MessageManager that exists.
 
   void setLoggingFolder(QString absoluteLoggingFolderPath); // deprecated
   bool setLogFile(QString filename); ///< set a file to write messages to.
@@ -138,10 +138,10 @@ signals:
 
 private:
   void initializeObject();
-  MessageManager();
-  virtual ~MessageManager();
-  MessageManager(const MessageManager&);
-  MessageManager& operator=(const MessageManager&);
+  Reporter();
+  virtual ~Reporter();
+  Reporter(const Reporter&);
+  Reporter& operator=(const Reporter&);
 
   bool appendToLogfile(QString text);
   void playSound(MESSAGE_LEVEL messageLevel);
@@ -156,12 +156,18 @@ private:
   QString mLogFile;
   AudioPtr mAudioSource;
 
-  static MessageManager *mTheInstance; ///< The unique MessageManager.
+  static Reporter *mTheInstance; // global variable
 };
 
 /**Shortcut for accessing the message manager instance.
  */
-MessageManager* messageManager();
+Reporter* reporter();
+
+static void reportDebug(QString msg) { reporter()->sendDebug(msg); }
+static void report(QString msg) { reporter()->sendInfo(msg); }
+static void reportWarning(QString msg) { reporter()->sendWarning(msg); }
+static void reportError(QString msg) { reporter()->sendError(msg); }
+static void reportSuccess(QString msg) { reporter()->sendSuccess(msg); }
 
 } //namespace cx
 
@@ -198,4 +204,4 @@ Q_DECLARE_METATYPE(Message);
  */
 
 
-#endif /* CXMESSAGEMANAGER_H_ */
+#endif /* CXREPORTER_H_ */

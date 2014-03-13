@@ -7,7 +7,7 @@
 #include <QGroupBox>
 #include <QCheckBox>
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxToolManager.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxTypeConversions.h"

@@ -12,7 +12,7 @@
 #include "cxDataManager.h"
 #include "cxToolManager.h"
 #include "cxVideoService.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxTypeConversions.h"
@@ -58,7 +58,7 @@ void ServiceController::patientChangedSlot()
 	videoService()->getUSAcquisitionVideoPlayback()->setRoot(patientService()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
 
 	toolManager()->setLoggingFolder(loggingPath);
-	messageManager()->setLoggingFolder(loggingPath);
+	reporter()->setLoggingFolder(loggingPath);
 }
 
 void ServiceController::clearPatientSlot()

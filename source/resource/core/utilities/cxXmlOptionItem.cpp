@@ -32,7 +32,7 @@
 #include <QDomElement>
 #include <QStringList>
 
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 
 namespace cx
@@ -101,7 +101,7 @@ private:
 		if (!loadedDoc.setContent(&file, &error, &line, &col))
 		{
 			QString msg = QString("error setting xml content [%1,%2] %3").arg(line).arg(col).arg(error);
-			messageManager()->sendWarning(msg);
+			reportWarning(msg);
 		}
 		file.close();
 		return loadedDoc;
@@ -361,11 +361,11 @@ void XmlOptionFile::save()
 		QTextStream stream(&file);
 		stream << mDocument.toString(4);
 		file.close();
-//		messageManager()->sendInfo("Created " + file.fileName());
+//		report("Created " + file.fileName());
 	}
 	else
 	{
-		messageManager()->sendError("XmlOptionFile::save() Could not open " + file.fileName() + " Error: "
+		reportError("XmlOptionFile::save() Could not open " + file.fileName() + " Error: "
 			+ file.errorString());
 	}
 }
@@ -376,7 +376,7 @@ void XmlOptionFile::save()
 //	if (!file.open(QIODevice::ReadOnly))
 //	{
 //		// ok to not find file - we have nice defaults.
-//		//messageManager()->sendWarning("file not found: "+ QString(defPath+filename).toStdString());
+//		//reportWarning("file not found: "+ QString(defPath+filename).toStdString());
 //	}
 //	else
 //	{
@@ -385,7 +385,7 @@ void XmlOptionFile::save()
 //		int line, col;
 //		if (!loadedDoc.setContent(&file, &error, &line, &col))
 //		{
-//			messageManager()->sendWarning("error setting xml content [" + qstring_cast(line) + "," + qstring_cast(
+//			reportWarning("error setting xml content [" + qstring_cast(line) + "," + qstring_cast(
 //				col) + "]" + qstring_cast(error));
 //		}
 //		file.close();

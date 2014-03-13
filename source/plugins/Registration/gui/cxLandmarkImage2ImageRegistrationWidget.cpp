@@ -17,7 +17,7 @@
 #include <QSlider>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxRepManager.h"

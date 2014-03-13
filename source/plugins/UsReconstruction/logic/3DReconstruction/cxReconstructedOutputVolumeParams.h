@@ -21,7 +21,7 @@
 #define CXRECONSTRUCTEDOUTPUTVOLUMEPARAMS_H_
 
 #include "cxTransform3D.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxXmlOptionItem.h"
 #include "cxTypeConversions.h"
 #include "cxImageParameters.h"

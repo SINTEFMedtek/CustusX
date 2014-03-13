@@ -4,7 +4,7 @@
  */
 #include "cxReconstructionWidget.h"
 #include "cxReconstructOutputValueParamsInterfaces.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxHelperWidgets.h"
 #include "cxTypeConversions.h"
 #include "cxTimedAlgorithmProgressBar.h"
@@ -214,7 +214,7 @@ void ReconstructionWidget::selectData(QString filename)
 {
 	if (filename.isEmpty())
 	{
-		messageManager()->sendWarning("no file selected");
+		reportWarning("no file selected");
 		return;
 	}
 

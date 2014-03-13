@@ -30,7 +30,7 @@
 #include "cxToolRep3D.h"
 #include "cxToolTracer.h"
 #include "cxBronchoscopyRegistration.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTypeConversions.h"
 
 
@@ -83,26 +83,26 @@ void BronchoscopyRegistrationWidget::registerSlot()
 
     if(!mSelectMeshWidget->getMesh())
     {
-        messageManager()->sendError("No centerline");
+        reportError("No centerline");
         return;
     }
 	vtkPolyDataPtr centerline = mSelectMeshWidget->getMesh()->getVtkPolyData();//input
 
     if(!mTool)
     {
-        messageManager()->sendError("No tool");
+        reportError("No tool");
     }
     std::cout << "Tool name: " << mTool->getName() << std::endl;
 	RecordSessionPtr session = mAquisition->getLatestSession();
     if(!session)
-        messageManager()->sendError("No session");
+        reportError("No session");
 
     TimedTransformMap trackerRecordedData_prMt = RecordSession::getToolHistory_prMt(mTool, session);//input
 //    TimedTransformMap trackerRecordedData = mTrackedCenterLine->getRecording();
 
     if(trackerRecordedData_prMt.size() == 0)
     {
-        messageManager()->sendError("No positions");
+        reportError("No positions");
         return;
     }
 

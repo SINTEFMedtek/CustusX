@@ -30,7 +30,7 @@
 
 #include "cxRep.h"
 #include "cxTypeConversions.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxBoundingBox3D.h"
 #include "cxTransform3D.h"
 /* Copy/pasted from qitemdelegate.cpp

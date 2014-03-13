@@ -14,7 +14,7 @@
 
 #include "cxPipelineWidget.h"
 #include "cxHelperWidgets.h"
-#include "cxMessageManager.h"
+#include "cxReporter.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include <QtGui>
 #include "cxTypeConversions.h"
@@ -112,7 +112,7 @@ PipelineWidget::PipelineWidget(QWidget* parent, PipelinePtr pipeline) :
 	FilterGroupPtr filters = mPipeline->getFilters();
 	std::vector<SelectDataStringDataAdapterBasePtr> nodes = mPipeline->getNodes();
 	if (filters->size()+1 != nodes.size())
-		messageManager()->sendError("Filter/Node mismatch");
+		reportError("Filter/Node mismatch");
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 //	std::cout << "PipelineWidget spacing " << topLayout->spacing() << std::endl;\
