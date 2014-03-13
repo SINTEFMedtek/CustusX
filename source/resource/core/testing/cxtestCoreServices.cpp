@@ -52,7 +52,7 @@ TEST_CASE("Core test services correctly contructed/destructed", "[unit]")
 //	CHECK(services.mTrackingService.unique());
 //	services.mTrackingService.reset();
 
-//	cx::MessageManager::shutdown();
+//	cx::Reporter::shutdown();
 }
 
 } // namespace cx

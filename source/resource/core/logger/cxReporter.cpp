@@ -65,7 +65,7 @@ namespace
 
 
 /** streambuf subclass: used to override either cout or cerr and
- * reroute text to both messagemanager and original stream.
+ * reroute text to both Reporter and original stream.
  *
  */
 class MyStreamBuf: public std::basic_streambuf<char, std::char_traits<char> >
@@ -249,7 +249,7 @@ bool Reporter::hasAudioSource() const
 #ifndef SSC_PRINT_CALLER_INFO
 void Reporter::sendInfo(QString info)
 #else
-void MessageManager::sendInfoRedefined(QString info)
+void Reporter::sendInfoRedefined(QString info)
 #endif
 {
   this->sendMessage(info, mlINFO, 1500);
@@ -258,7 +258,7 @@ void MessageManager::sendInfoRedefined(QString info)
 #ifndef SSC_PRINT_CALLER_INFO
 void Reporter::sendSuccess(QString success)
 #else
-void MessageManager::sendSuccessRedefined(QString success)
+void Reporter::sendSuccessRedefined(QString success)
 #endif
 {
   this->sendMessage(success, mlSUCCESS, 1500);
@@ -267,7 +267,7 @@ void MessageManager::sendSuccessRedefined(QString success)
 #ifndef SSC_PRINT_CALLER_INFO
 void Reporter::sendWarning(QString warning)
 #else
-void MessageManager::sendWarningRedefined(QString warning)
+void Reporter::sendWarningRedefined(QString warning)
 #endif
 {
   this->sendMessage(warning, mlWARNING, 3000);
@@ -276,7 +276,7 @@ void MessageManager::sendWarningRedefined(QString warning)
 #ifndef SSC_PRINT_CALLER_INFO
 void Reporter::sendError(QString error)
 #else
-void MessageManager::sendErrorRedefined(QString error)
+void Reporter::sendErrorRedefined(QString error)
 #endif
 {
   this->sendMessage(error, mlERROR, 0);
@@ -285,7 +285,7 @@ void MessageManager::sendErrorRedefined(QString error)
 #ifndef SSC_PRINT_CALLER_INFO
 void Reporter::sendDebug(QString debug)
 #else
-void MessageManager::sendDebugRedefined(QString debug)
+void Reporter::sendDebugRedefined(QString debug)
 #endif
 {
   this->sendMessage(debug, mlDEBUG, 0);
@@ -294,55 +294,55 @@ void MessageManager::sendDebugRedefined(QString debug)
 #ifndef SSC_PRINT_CALLER_INFO
 void Reporter::sendVolatile(QString debug)
 #else
-void MessageManager::sendVolatileRedefined(QString debug)
+void Reporter::sendVolatileRedefined(QString debug)
 #endif
 {
   this->sendMessage(debug, mlVOLATILE, 5000);
 }
 
 #ifdef SSC_PRINT_CALLER_INFO
-void MessageManager::sendCallerInformation(const std::string &caller, const std::string &file, int line)
+void Reporter::sendCallerInformation(const std::string &caller, const std::string &file, int line)
 {
 	printf("\t\t[FUNCTION] %s\n",caller.c_str());
 	printf("\t\t[FILE] %s: %i\n",file.c_str(), line);
 }
 
-void MessageManager::sendInfoWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
+void Reporter::sendInfoWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
 {
 	this->sendInfoRedefined(info);
 	this->sendCallerInformation(caller, file, line);
 	printf("\n");
 }
 
-void MessageManager::sendSuccessWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
+void Reporter::sendSuccessWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
 {
 	this->sendSuccessRedefined(info);
 	this->sendCallerInformation(caller, file, line);
 	printf("\n");
 }
 
-void MessageManager::sendWarningWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
+void Reporter::sendWarningWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
 {
 	this->sendWarningRedefined(info);
 	this->sendCallerInformation(caller, file, line);
 	printf("\n");
 }
 
-void MessageManager::sendErrorWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
+void Reporter::sendErrorWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
 {
 	this->sendErrorRedefined(info);
 	this->sendCallerInformation(caller, file, line);
 	printf("\n");
 }
 
-void MessageManager::sendDebugWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
+void Reporter::sendDebugWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
 {
 	this->sendDebugRedefined(info);
 	this->sendCallerInformation(caller, file, line);
 	printf("\n");
 }
 
-void MessageManager::sendVolatileWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
+void Reporter::sendVolatileWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
 {
 	this->sendVolatileRedefined(info);
 	this->sendCallerInformation(caller, file, line);

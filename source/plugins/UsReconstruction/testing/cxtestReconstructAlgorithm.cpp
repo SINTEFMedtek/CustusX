@@ -167,8 +167,8 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	fixture.checkCentroidDifferenceBelow(1);
 	fixture.checkMassDifferenceBelow(0.01);
 
-	//need to be sure opencl thread is finished before shutting down messagemanager,
-	//or else we could get seg fault because og a callbackk from opencl to messagemAnager after it is shut down
+	//need to be sure opencl thread is finished before shutting down Reporter,
+	//or else we could get seg fault because og a callbackk from opencl to Reporter after it is shut down
 	Utilities::sleep_sec(1);
 	cx::Reporter::shutdown();
 }
