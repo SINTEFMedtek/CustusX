@@ -45,7 +45,7 @@ private:
 	void interpolateAndFilterPositions(Transform3D pos, double timestamp);
 	float mCutOffFrequency;
 	float mResampleFrequency;
-	static const int mFilterOrder = 3;
+	static const int mFilterOrder = 2;
 	Iir::Butterworth::LowPass<mFilterOrder> fx;
 	Iir::Butterworth::LowPass<mFilterOrder> fy;
 	Iir::Butterworth::LowPass<mFilterOrder> fz;
