@@ -28,7 +28,7 @@
 #include "sscTypeConversions.h"
 
 #include "cxSettings.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxVideoService.h"
 #include "cxVisualizationServiceBackend.h"
 

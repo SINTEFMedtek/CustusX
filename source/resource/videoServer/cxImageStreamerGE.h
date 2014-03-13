@@ -27,6 +27,7 @@ QString findOpenCLPath(QString additionalLocation); ///< Find GEStreamer OpenCL 
  * it must be created within the run() method
  * of a qthread.
  *
+ * \ingroup cx_resource_videoserver
  * \author Ole Vegard Solberg, SINTEF
  * \date Sep 19, 2012
  *

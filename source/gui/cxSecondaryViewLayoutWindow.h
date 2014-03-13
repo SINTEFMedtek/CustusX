@@ -28,7 +28,7 @@ namespace cx
  *
  * \sa SecondaryMainWindow
  *
- * \ingroup cxGUI
+ * \ingroup cx_gui
  * \date 05.11.2013
  * \author christiana
  */

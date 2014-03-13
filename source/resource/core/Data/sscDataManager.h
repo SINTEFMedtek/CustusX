@@ -46,7 +46,7 @@ typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
  * Simply calling instance() will instantiate the default manager DataManagerImpl.
  * It is also possible to subclass and use setInstance() to set another type.
  *
- * \ingroup sscData
+ * \ingroup cx_resource_core_data
  */
 class DataManager: public QObject
 {
@@ -134,15 +134,9 @@ public slots:
 	virtual void setDebugMode(bool on) = 0;
 
 protected:
-//	static void setInstance(DataServicePtr instance);
 	DataManager();
 	virtual ~DataManager();
-
-//private:
-//	static DataServicePtr mInstance;
 };
-
-//DataServicePtr dataManager();
 
 } // namespace cx
 

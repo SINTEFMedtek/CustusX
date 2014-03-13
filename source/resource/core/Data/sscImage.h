@@ -33,7 +33,6 @@ typedef boost::shared_ptr<std::map<int, int> > HistogramMapPtr;
 class QDomNode;
 class QDomDocument;
 
-//#define USE_TRANSFORM_RESCLICER
 
 namespace cx
 {
@@ -44,7 +43,7 @@ typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
  * One volumetric data set, represented as a vtkImageData,
  * along with auxiliary data.
  *
- * \ingroup sscData
+ * \ingroup cx_resource_core_data
  */
 class Image : public Data
 {

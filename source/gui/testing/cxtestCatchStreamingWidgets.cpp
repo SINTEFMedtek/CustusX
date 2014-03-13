@@ -8,8 +8,8 @@
 
 #include "sscMessageManager.h"
 #include "sscDummyToolManager.h"
-#include "cxDataManager.h"
-#include "cxToolManager.h"
+#include "sscDataManager.h"
+#include "sscToolManager.h"
 #include "cxVideoService.h"
 #include "cxVideoServiceBackend.h"
 #include "cxtestDummyDataManager.h"
@@ -50,6 +50,7 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][widget][streaming]")
 //	DummyToolManager::getInstance()->shutdown();
 //	cx::cxDataManager::getInstance()->shutdown();
 //	cx::messageManager()->shutdown();
+	ts.reset();
 	cx::LogicManager::shutdown();
 }
 

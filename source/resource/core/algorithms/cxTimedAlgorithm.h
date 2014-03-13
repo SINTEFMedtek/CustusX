@@ -33,8 +33,7 @@ namespace cx
 /**
  * \brief Base class for algorithms that wants to time their
  * execution.
- * \ingroup cxResourceAlgorithms
- *
+ * \ingroup cx_resource_core_algorithms
  * \date Feb 16, 2011
  * \author Janne Beate Bakeng, SINTEF
  */

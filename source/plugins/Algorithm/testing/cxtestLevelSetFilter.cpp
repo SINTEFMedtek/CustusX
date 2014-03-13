@@ -3,7 +3,7 @@
 #include "cxLevelSetFilter.h"
 #include "sscCoordinateSystemHelpers.h"
 #include "sscToolManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "sscManualTool.h"
 #include "sscData.h"
 #include "sscImage.h"
@@ -20,30 +20,32 @@
 
 namespace cxtest {
 
-void setSeedPoint(cx::Vector3D point) {
-    cx::cxToolManager::initializeObject();
-    cx::cxToolManager * toolmanager = cx::cxToolManager::getInstance();
-    cx::ManualToolPtr tool = toolmanager->getManualTool();
+void setSeedPoint(cx::Vector3D point)
+{
+	cx::ManualToolPtr tool = cx::trackingService()->getManualTool();
     tool->set_prMt(cx::createTransformTranslate(point));
 
 }
 
 TEST_CASE("LevelSetFilter: getSeedPointFromTool", "[unit][plugins][Algorithm][LevelSetFilter]")
 {
-    cx::Vector3D toolTipPoint;
+	cx::LogicManager::initialize();
+	cx::Vector3D toolTipPoint;
     toolTipPoint.setRandom();
-    setSeedPoint(toolTipPoint);
-    cx::ImagePtr image = cxtest::Utilities::create3DImage();
-    cx::Vector3D point = cx::LevelSetFilter::getSeedPointFromTool(image);
-    REQUIRE(toolTipPoint(0) == point(0));
+	setSeedPoint(toolTipPoint);
+	cx::ImagePtr image = cxtest::Utilities::create3DImage();
+	cx::Vector3D point = cx::LevelSetFilter::getSeedPointFromTool(image);
+	REQUIRE(toolTipPoint(0) == point(0));
     REQUIRE(toolTipPoint(1) == point(1));
     REQUIRE(toolTipPoint(2) == point(2));
 
+	cx::LogicManager::shutdown();
 }
 
 TEST_CASE("LevelSetFilter: isSeedPointInsideImage", "[unit][plugins][Algorithm][LevelSetFilter]")
 {
-    cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(10,10,10), 1);
+	cx::LogicManager::initialize();
+	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(10,10,10), 1);
     cx::Vector3D point;
     point.setOnes();
 
@@ -51,6 +53,7 @@ TEST_CASE("LevelSetFilter: isSeedPointInsideImage", "[unit][plugins][Algorithm][
 
     point(1) = 12;
     CHECK_FALSE(cx::LevelSetFilter::isSeedPointInsideImage(point, image));
+	cx::LogicManager::shutdown();
 }
 
 TEST_CASE("LevelSetFilter: execute", "[integration][plugins][Algorithm][LevelSetFilter][hide][broken]")

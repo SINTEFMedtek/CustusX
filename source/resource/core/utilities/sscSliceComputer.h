@@ -10,7 +10,7 @@ namespace cx
 /**\brief A 2D slice plane in 3D.
  * i,j are perpendicular unit vectors.
  *
- * \ingroup sscUtility
+ * \ingroup cx_resource_core_utilities
  */
 class SlicePlane
 {
@@ -35,7 +35,7 @@ bool similar(const SlicePlane& a, const SlicePlane& b);
  * 
  * Most methods set the computer state, while getPlane() does all the computing.
  *
- * \ingroup sscUtility
+ * \ingroup cx_resource_core_utilities
  */
 class SliceComputer
 {

@@ -7,16 +7,10 @@
 #include <QDomDocument>
 #include "sscXmlOptionItem.h"
 
-
-/**
-* \file
-* \addtogroup cxResourceUtilities
-* @{
-*/
-
 /**
  * \brief Class that works as a interface to a ProbeCalibConfigs.xml
  *
+ * \ingroup cx_resource_core_tool
  * \date 11. mai 2010
  * \author jbake
  * \author Ole Vegard Solberg, SINTEF

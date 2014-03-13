@@ -22,7 +22,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxGUI
+ * \addtogroup cx_resource_core_dataadapters
  * @{
  */
 

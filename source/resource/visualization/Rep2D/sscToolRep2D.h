@@ -46,8 +46,8 @@ typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
  *
  * Used by CustusX and Sonowand.
  *
- * \ingroup sscRep
- * \ingroup sscRep2D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep2D
  */
 class ToolRep2D : public RepImpl
 {

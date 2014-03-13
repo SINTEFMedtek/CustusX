@@ -25,7 +25,7 @@ typedef boost::shared_ptr<Vector3D> Vector3DPtr;
 
 /**
  * \file
- * \addtogroup cxPluginRegistration
+ * \addtogroup cx_plugin_registration
  * @{
  */
 

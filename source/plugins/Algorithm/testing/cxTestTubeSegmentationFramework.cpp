@@ -35,23 +35,14 @@
 
 TestTubeSegmentationFramework::TestTubeSegmentationFramework() 
 {
-	cx::MessageManager::initialize();
+	cx::LogicManager::initialize();
 }
 
 TestTubeSegmentationFramework::~TestTubeSegmentationFramework() 
 {
-	cx::MessageManager::shutdown();
-}
-
-void TestTubeSegmentationFramework::setUp()
-{
-	cx::LogicManager::initialize();
-}
-
-void TestTubeSegmentationFramework::tearDown()
-{
 	cx::LogicManager::shutdown();
 }
+
 
 void TestTubeSegmentationFramework::testConstructor()
 {

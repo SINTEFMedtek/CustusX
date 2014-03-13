@@ -43,7 +43,7 @@ class DataManager;
 typedef boost::shared_ptr<class Slices3DRep> Slices3DRepPtr;
 typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
 
-/**\brief Display several slices through volumes in 3D.
+/** \brief Display several slices through volumes in 3D.
  *
  * Use this as an alternative to full volume rendering.
  * Define a set of planes and an ordered set of images.
@@ -55,8 +55,8 @@ typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
  *
  * \sa Texture3DSlicerProxy
  *
- * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep3D
  */
 class Slices3DRep: public RepImpl
 {

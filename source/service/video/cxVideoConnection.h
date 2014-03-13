@@ -29,7 +29,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxServiceVideo
+ * \addtogroup cx_service_video
  * @{
  */
 
@@ -47,7 +47,7 @@ typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
  *
  * Refactored from old class OpenIGTLinkRTSource.
  *
- *  \ingroup cxServiceVideo
+ *  \ingroup cx_service_video
  *  \date Oct 31, 2010
  *  \date Feb 26, 2013
  *  \author Christian Askeland, SINTEF

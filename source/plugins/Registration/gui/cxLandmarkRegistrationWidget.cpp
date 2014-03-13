@@ -16,7 +16,7 @@
 #include "cxRegistrationHistoryWidget.h"
 #include "sscTypeConversions.h"
 #include "sscManualTool.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 
 namespace cx
 {

@@ -16,7 +16,7 @@ namespace cx
 typedef boost::shared_ptr<class SelectToolStringDataAdapter> SelectToolStringDataAdapterPtr;
 /**
  * \file
- * \addtogroup cxPluginCalibration
+ * \addtogroup cx_plugin_calibration
  * @{
  */
 

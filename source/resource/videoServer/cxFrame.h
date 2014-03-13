@@ -3,6 +3,10 @@
 
 namespace cx
 {
+
+/**
+ * \ingroup cx_resource_videoserver
+ */
 class Frame
 {
 public:

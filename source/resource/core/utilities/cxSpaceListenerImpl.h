@@ -24,6 +24,7 @@ class DataManager;
 /**\brief Class that listens to changes in a coordinate system,
  * and emits a signal if that system changes.
  *
+ * \ingroup cx_resource_core_utilities
  * \date Jul 4, 2011
  * \author Christian Askeland, SINTEF
  */

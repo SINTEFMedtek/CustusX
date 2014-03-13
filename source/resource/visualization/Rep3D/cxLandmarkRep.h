@@ -36,7 +36,7 @@ class MessageManager;
 typedef boost::shared_ptr<class LandmarkRep> LandmarkRepPtr;
 
 /**
- * \addtogroup cxServiceVisualizationRep
+ * \addtogroup cx_resource_visualization
  * @{
  */
 
@@ -91,8 +91,7 @@ private:
  * \class LandmarkRep
  *
  * \brief
- * \ingroup cxServiceVisualizationRep
- *
+ * \ingroup cx_resource_visualization
  * \date Dec 10, 2008
  * \\author Janne Beate Bakeng, SINTEF
  * \\author Christian Askeland, SINTEF

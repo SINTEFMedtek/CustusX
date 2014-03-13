@@ -29,13 +29,13 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxServiceTracking
+ * \addtogroup cx_service_tracking
  * @{
  */
 
 /**
  * \brief Thread containing all of IGSTK
- * \ingroup cxServiceTracking
+ * \ingroup cx_service_tracking
  *
  * \sa ToolManager
  *

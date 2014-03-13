@@ -25,7 +25,7 @@
 #include "sscSlicePlanes3DRep.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxViewWrapper2D.h"
 #include "cxViewManager.h"
 #include "cxCameraControl.h"

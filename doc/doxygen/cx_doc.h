@@ -21,25 +21,20 @@ namespace cx
 {
 
 /**\namespace cx
+ *
+ * \brief Namespace for all CustusX production code.
+ */
+
+/**
+ * \defgroup cx_base CustusX System
+ *
  * \brief An IGT library used by Sintef Medical Technology.
- *
- */
-
-
-/**
- * \defgroup cxLogic Logic Layer
- * \brief The logic layer add blocks of functionality on top of the services.
- *
- * A few core classes exist to provide initialization of the services
- * and connections between them. The rest of the functionality is
- * provided as \ref cxPlugins .
- *
- * \ref cx::LogicManager is the main class.
- *
  */
 
 /**
- * \defgroup cxGUI GUI Layer
+ * \defgroup cx_gui GUI Layer
+ * \ingroup cx_base
+ *
  * \brief The GUI layer is all the widgets that is available to the user.
  *
  * The GUI layer is all the widgets that is available to the user. The central
@@ -53,7 +48,7 @@ namespace cx
  *  - DataAdapters: Adapters that provide a common interface to getting/setting
  *    of backend data, such as strings, scalars and integers.
  *
- *  \ref cxPlugins also provide widgets for their particular functionality.
+ *  \ref cx_plugins also provide widgets for their particular functionality.
  *
  *
  *
@@ -76,6 +71,20 @@ namespace cx
  *	widgets visible. MainWindow is created by the main() function, and this is
  *	not a singleton or similar.
  *
+ *
+ */
+
+/**
+ * \defgroup cx_logic Logic Layer
+ * \ingroup cx_base
+ *
+ * \brief The logic layer add blocks of functionality on top of the services.
+ *
+ * A few core classes exist to provide initialization of the services
+ * and connections between them. The rest of the functionality is
+ * provided as \ref cx_plugins .
+ *
+ * \ref cx::LogicManager is the main class.
  *
  */
 

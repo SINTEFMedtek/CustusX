@@ -156,7 +156,7 @@ vtkImageDataPtr RenderTester::renderToImage()
 	return this->getImageFromRenderWindow();
 }
 
-
+/*removed for testing fails on win
 vtkImageDataPtr RenderTester::getImageFromRenderWindow()
 {
 	mRenderWindow->Render();
@@ -186,20 +186,21 @@ vtkImageDataPtr RenderTester::getImageFromRenderWindow()
 
 	return import->GetOutput();
 }
+*/
 
-//vtkImageDataPtr RenderTester::getImageFromRenderWindow()
-//{
-//	vtkWindowToImageFilterPtr windowToImageFilter = vtkWindowToImageFilterPtr::New();
-//	windowToImageFilter->ShouldRerenderOff();
-//	windowToImageFilter->SetReadFrontBuffer(false); // might give less interf erence from other windows...?
-////	mRenderWindow->Render();
-////	mRenderWindow->Render();
-//	windowToImageFilter->SetInput(mRenderWindow);
-//	windowToImageFilter->Modified();
-//	windowToImageFilter->Update();
+vtkImageDataPtr RenderTester::getImageFromRenderWindow()
+{
+	vtkWindowToImageFilterPtr windowToImageFilter = vtkWindowToImageFilterPtr::New();
+	windowToImageFilter->ShouldRerenderOff();
+	windowToImageFilter->SetReadFrontBuffer(false); // might give less interf erence from other windows...?
+//	mRenderWindow->Render();
+//	mRenderWindow->Render();
+	windowToImageFilter->SetInput(mRenderWindow);
+	windowToImageFilter->Modified();
+	windowToImageFilter->Update();
 
-//	return windowToImageFilter->GetOutput();
-//}
+	return windowToImageFilter->GetOutput();
+}
 
 void RenderTester::writeToPNG(vtkImageDataPtr image, QString filename)
 {

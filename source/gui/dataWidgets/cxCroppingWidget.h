@@ -17,7 +17,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxGUI
+ * \addtogroup cx_gui
  * @{
  */
 

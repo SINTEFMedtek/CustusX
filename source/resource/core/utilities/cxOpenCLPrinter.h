@@ -13,6 +13,7 @@ namespace cx
  * NOTE: Written using OpenCL 1.1
  * WARNING: the print commands might not contain all available information.
  *
+ * \ingroup cx_resource_core_utilities
  * \date Dec 9, 2013
  * \author Janne Beate Bakeng, SINTEF
  */

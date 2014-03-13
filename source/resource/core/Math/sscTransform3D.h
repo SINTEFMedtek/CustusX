@@ -115,7 +115,7 @@ namespace cx
 class DoubleBoundingBox3D;
 
 /**
- * \addtogroup sscMath
+ * \addtogroup cx_resource_core_math
  * @{
  */
 

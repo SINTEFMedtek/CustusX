@@ -3,7 +3,7 @@
 #include <QGridLayout>
 #include <QPushButton>
 
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 
 namespace cx
 {

@@ -12,7 +12,7 @@ namespace cx
 {
 
 /**
- * \addtogroup sscUSReconstruction
+ * \addtogroup cx_plugin_usreconstruction
  * \{
  */
 
@@ -33,6 +33,11 @@ class TordTest : public ReconstructAlgorithm
 public:
 	TordTest();
 	virtual ~TordTest();
+
+	/**
+	 * Turn OpenCL profiling on
+	 */
+	void enableProfiling();
 
 	/**
 	 * Return the name of the algorithm

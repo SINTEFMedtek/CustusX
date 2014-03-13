@@ -29,7 +29,7 @@ namespace cx
 /** DataAdapter interface for QColor
  *
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_core_dataadapters
  * \date Nov 22, 2012
  * \author christiana
  */

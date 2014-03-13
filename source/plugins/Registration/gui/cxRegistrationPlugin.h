@@ -18,8 +18,8 @@
 #include "cxPluginBase.h"
 
 /**
- * \defgroup cxPluginRegistration Registration Plugin
- * \ingroup cxPlugins
+ * \defgroup cx_plugin_registration Registration Plugin
+ * \ingroup cx_plugins
  * \brief Registration collection with widgets.
  *
  * See \ref cx::RegistrationPlugin.
@@ -34,7 +34,7 @@ typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 
 /**
  * \file
- * \addtogroup cxPluginRegistration
+ * \addtogroup cx_plugin_registration
  * @{
  */
 

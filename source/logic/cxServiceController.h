@@ -16,13 +16,13 @@ namespace cx
 {
 /**
 * \file
-* \addtogroup cxLogic
+* \addtogroup cx_logic
 * @{
 */
 
 /**\brief Handles all connections between the existing
  * services, in order to keep them independent of each other.
- * \ingroup cxLogic
+ * \ingroup cx_logic
  *
  * Owned by the LogicManager.
  */

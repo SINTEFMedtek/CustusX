@@ -24,7 +24,7 @@ typedef boost::shared_ptr<class TrackingPositionFilter> TrackingPositionFilterPt
 /** \brief Common functionality for Tool subclasses
  *
  *
- * \ingroup sscTool
+ * \ingroup cx_resource_core_tool
  * \date 2014-02-21
  * \author christiana
  */

@@ -2,17 +2,22 @@
 
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
-#include "OpenCLManager.hpp"
 #include "HelperFunctions.hpp"
 #include <vtkImageData.h>
+#include <recConfig.h>
+
 
 namespace cx
 {
-TordAlgorithm::TordAlgorithm()
+TordAlgorithm::TordAlgorithm() :
+		mRuntime(new oul::RuntimeMeasurementsManager())
 {
 	oul::DeviceCriteria criteria;
 	criteria.setTypeCriteria(oul::DEVICE_TYPE_GPU);
-	mOulContex = oul::opencl()->createContext(criteria);
+	bool enableProfilling = true;
+	mOulContex = oul::opencl()->createContext(criteria, NULL, enableProfilling);
+	if(enableProfilling)
+		mRuntime->enable();
 }
 
 TordAlgorithm::~TordAlgorithm()
@@ -25,7 +30,7 @@ bool TordAlgorithm::initCL(QString kernelPath, int nMaxPlanes, int nPlanes, int 
 	std::string source = oul::readFile(kernelPath.toStdString());
 
 	// BUILD PROGRAM
-	cl::Program clprogram = this->buildCLProgram(source, nMaxPlanes, nPlanes, method, planeMethod, nStarts,brightnessWeight, newnessWeight, kernelPath);
+	cl::Program clprogram = this->buildCLProgram(source, nMaxPlanes, nPlanes, method, planeMethod, nStarts,brightnessWeight, newnessWeight);
 
 	// CREATE KERNEL
 	mKernel = mOulContex.createKernel(clprogram, "voxel_methods");
@@ -33,23 +38,19 @@ bool TordAlgorithm::initCL(QString kernelPath, int nMaxPlanes, int nPlanes, int 
 	return true;
 }
 
-cl::Program TordAlgorithm::buildCLProgram(std::string program_src, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts, float newnessWeight, float brightnessWeight, QString kernelPath)
+cl::Program TordAlgorithm::buildCLProgram(std::string program_src, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts, float newnessWeight, float brightnessWeight)
 {
 	cl::Program retval;
 	cl_int err = 0;
 	VECTOR_CLASS<cl::Device> devices;
 	try
 	{
-		cl::Program::Sources sources;
-		sources.push_back(std::make_pair(program_src.c_str(), program_src.length()));
-		retval = cl::Program(mOulContex.getContext(), sources, &err);
-		messageManager()->sendError(qstring_cast(oul::getCLErrorString(err)));
-
 		QString define = "-D MAX_PLANES=%1 -D N_PLANES=%2 -D METHOD=%3 -D PLANE_METHOD=%4 -D MAX_MULTISTART_STARTS=%5 -D NEWNESS_FACTOR=%6 -D BRIGHTNESS_FACTOR=%7";
 		define = define.arg(nMaxPlanes).arg(nPlanes).arg(method).arg(planeMethod).arg(nStarts).arg(newnessWeight).arg(brightnessWeight);
 
-		devices = mOulContex.getContext().getInfo<CL_CONTEXT_DEVICES>();
-		err = retval.build(devices, define.toStdString().c_str(), NULL, NULL);
+		int programID = mOulContex.createProgramFromString(program_src, "-I " + std::string(TORD_KERNEL_PATH) + " " + define.toStdString());
+		retval = mOulContex.getProgram(programID);
+
 	} catch (cl::Error &error)
 	{
 		messageManager()->sendError("Could not build a OpenCL program. Reason: "+QString(error.what()));
@@ -202,8 +203,22 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 
 	unsigned int queueNumber = 0;
 	cl::CommandQueue queue = mOulContex.getQueue(queueNumber);
+	if(mRuntime->isEnabled())
+	{
+		mRuntime->enable();
+		mRuntime->startCLTimer("kernel", queue);
+		mRuntime->startCLTimer("buffer", queue);
+	}
 	mOulContex.executeKernel(queue, mKernel, global_work_size, local_work_size);
+	if(mRuntime->isEnabled())
+		mRuntime->stopCLTimer("buffer", queue);
 	mOulContex.readBuffer(queue, outputBuffer, outputVolumeSize, outputData->GetScalarPointer());
+	if(mRuntime->isEnabled())
+	{
+		mRuntime->stopCLTimer("kernel", queue);
+		mRuntime->printAll();
+	}
+
 
 	// Cleaning up
 	messageManager()->sendInfo(QString("Done, freeing GPU memory"));
@@ -237,6 +252,14 @@ void TordAlgorithm::fillPlaneMatrices(float *planeMatrices, ProcessedUSInputData
 			planeMatrices[i++] = pos(j / 4, j % 4);
 		}
 	}
+}
+
+void TordAlgorithm::setProfiling(bool on)
+{
+	if(on)
+		mRuntime->enable();
+	else
+		mRuntime->disable();
 }
 
 void TordAlgorithm::freeFrameBlocks(frameBlock_t *framePointers, int numBlocks)

@@ -18,6 +18,12 @@ class QDomDocument;
 class QFile;
 class QTextStream;
 
+/**
+ * \file
+ * \addtogroup cx_resource_core_logger
+ * @{
+ */
+
 namespace cx
 {
 /**\brief A representation of a MessageManager message.
@@ -186,6 +192,10 @@ MessageManager* messageManager();
 
 typedef cx::Message Message;
 Q_DECLARE_METATYPE(Message);
+
+/**
+ * @}
+ */
 
 
 #endif /* MESSAGEMANAGER_H_ */

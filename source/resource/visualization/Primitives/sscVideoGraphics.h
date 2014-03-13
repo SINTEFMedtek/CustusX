@@ -38,7 +38,7 @@ typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
  * Clip using the mask or clip methods.
  * Can be used directly in 2D, or in 3D by setting the actor user matrix.
  *
- * \ingroup sscProxy
+ * \ingroup cx_resource_visualization
  *
  * \date april 26, 2013
  * \author christiana

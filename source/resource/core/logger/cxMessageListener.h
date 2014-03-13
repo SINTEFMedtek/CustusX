@@ -26,6 +26,7 @@ typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
 /** Utility for listening to the MessageManager
   * and storing messages from it.
   *
+ * \ingroup cx_resource_core_logger
   * \date 2014-03-09
   * \author christiana
   */

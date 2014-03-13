@@ -45,7 +45,7 @@
 #include "sscToolTracer.h"
 #include "sscOrientationAnnotation3DRep.h"
 #include "cxSettings.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxRepManager.h"
 #include "cxCameraControl.h"
 #include "cxLandmarkRep.h"

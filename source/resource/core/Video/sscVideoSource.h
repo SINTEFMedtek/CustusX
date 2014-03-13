@@ -42,7 +42,7 @@ namespace cx
  * provide data as a vtkImageData.
  *
  *
- * \ingroup sscVideo
+ * \ingroup cx_resource_core_video
  */
 class VideoSource : public QObject
 {

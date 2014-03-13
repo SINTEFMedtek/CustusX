@@ -32,7 +32,7 @@ namespace cx
  *
  * Available from Tool when Tool is a Probe.
  *
- * \ingroup sscTool
+ * \ingroup cx_resource_core_tool
  */
 class Probe: public QObject
 {

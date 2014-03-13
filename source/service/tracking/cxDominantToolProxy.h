@@ -22,7 +22,7 @@ namespace cx
 
 /**
  * \file
- * \addtogroup cxServiceTracking
+ * \addtogroup cx_service_tracking
  * @{
  */
 
@@ -31,7 +31,7 @@ class ToolManager;
 
 /**
  * \brief Helper class for connecting to the dominant tool.
- * \ingroup cxServiceTracking
+ * \ingroup cx_service_tracking
  *
  * By listening to this class, you will always listen
  * to the dominant tool.

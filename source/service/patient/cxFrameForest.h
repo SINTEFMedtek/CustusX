@@ -47,13 +47,13 @@ class DataManager;
 
 /**
 * \file
-* \addtogroup cxServicePatient
+* \addtogroup cx_service_patient
 * @{
 */
 
 /**
  * \brief A graph combining Space dependencies between all Data.
- * \ingroup cxServicePatient
+ * \ingroup cx_service_patient
  *
  * Relations between coordinate spaces among Data are created by
  * this class.

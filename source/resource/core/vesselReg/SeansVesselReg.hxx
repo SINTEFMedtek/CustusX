@@ -16,6 +16,7 @@ namespace cx
  * Basic usage: Run execute(), then get result with getLinearTransform()
  *
  *
+ * \ingroup cx_resource_core_utilities
  * \date Feb 4, 2011
  * \author Christian Askeland, SINTEF
  *

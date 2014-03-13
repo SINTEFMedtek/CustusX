@@ -12,6 +12,7 @@ namespace cx
 /**
  * \brief ImageServer
  *
+ * \ingroup cx_resource_videoserver
  * \date Oct 30, 2010
  * \author Christian Askeland
  */

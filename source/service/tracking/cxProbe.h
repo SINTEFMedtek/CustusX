@@ -31,14 +31,14 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxServiceTracking
+ * \addtogroup cx_service_tracking
  * @{
  */
 
 typedef boost::shared_ptr<class cxProbe> cxProbePtr;
 
 /**
- * \ingroup cxServiceTracking
+ * \ingroup cx_service_tracking
  */
 class cxProbe: public Probe
 {

@@ -16,7 +16,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	dataWidgets/cxShadingWidget
 	dataWidgets/cxCroppingWidget
 	dataWidgets/cxClippingWidget
-	dataWidgets/cxImagePropertiesWidget
+	dataWidgets/cxSlicePropertiesWidget
 	dataWidgets/cxMeshInfoWidget
 	dataWidgets/cxImportDataDialog
 	dataWidgets/cxExportDataDialog
@@ -32,6 +32,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	dataWidgets/cxColorWidget
 	dataWidgets/cxTransferFunction2DColorWidget
 	dataWidgets/cxTransferFunction2DOpacityWidget
+	dataWidgets/cxImagePropertiesWidget
     #----------------------
 	infoWidgets/cxStatusBar
 	infoWidgets/cxPointSamplingWidget

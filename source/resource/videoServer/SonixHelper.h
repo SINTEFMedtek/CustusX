@@ -8,6 +8,12 @@
 typedef cx::Frame Frame;
 
 /**
+* \file
+* \addtogroup cx_resource_videoserver
+* @{
+*/
+
+/**
  * \class SonixHelper
  * \brief Support Qt support for vtkSonixVideoSource
  *
@@ -25,5 +31,9 @@ public:
 public:
   void emitFrame(Frame& newFrame) {emit frame(newFrame);};
 };
+
+/**
+* @}
+*/
 
 #endif //SONIXHELPER_H_

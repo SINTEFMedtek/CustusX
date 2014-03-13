@@ -22,6 +22,12 @@ class QDomNode;
 
 namespace cx {
 
+/**
+* \file
+* \addtogroup cx_resource_videoserver
+* @{
+*/
+
 class SonixProbeFileReader
 {
 public:
@@ -43,6 +49,10 @@ private:
 	bool openDocumentElement();
 	QDomElement getChildWithTag(QDomNode parent, QString tagName);
 };
+
+/**
+* @}
+*/
 
 }
 #endif // CXSONIXPROBEFILEREADER_H

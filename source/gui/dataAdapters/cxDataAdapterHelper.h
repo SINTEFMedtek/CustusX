@@ -26,7 +26,7 @@ namespace cx {
  * If a gridLayout is provided, the widget will insert its components
  * into a row in that layout
  *
- * \ingroup cxGUI
+ * \ingroup cx_gui
  */
 QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
 

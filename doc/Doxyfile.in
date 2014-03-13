@@ -317,7 +317,7 @@ TYPEDEF_HIDES_STRUCT   = NO
 # 2^(16+SYMBOL_CACHE_SIZE). The valid range is 0..9, the default is 0, 
 # corresponding to a cache size of 2^16 = 65536 symbols
 
-SYMBOL_CACHE_SIZE      = 0
+#SYMBOL_CACHE_SIZE      = 0 # obsolete
 
 #---------------------------------------------------------------------------
 # Build related configuration options
@@ -684,12 +684,11 @@ EXCLUDE                = @CustusX3_SOURCE_DIR@/testing \
                          @CustusX3_SOURCE_DIR@/config \
                          @CustusX3_SOURCE_DIR@/data \
                          @CustusX3_SOURCE_DIR@/install \
-                         @CustusX3_SOURCE_DIR@/externals/ssc/Code/3rdParty \
-                         @CustusX3_SOURCE_DIR@/externals/ssc/Code/Ultrasound/Interface \
-                         @CustusX3_SOURCE_DIR@/source/ThirdParty/qxt_mac_compatible \
-                         @CustusX3_SOURCE_DIR@/source/ThirdParty/qxt
+                         @CustusX3_SOURCE_DIR@/modules \
+                         @CustusX3_SOURCE_DIR@/tools \
+                         @CustusX3_SOURCE_DIR@/source/resource/ssc_not_in_use \
+                         @CustusX3_SOURCE_DIR@/source/ThirdParty \
 
-#                         @CustusX3_SOURCE_DIR@/modules \
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or 
 # directories that are symbolic links (a Unix file system feature) are excluded 
@@ -703,7 +702,8 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories 
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = */.git/*
+EXCLUDE_PATTERNS       = */.git/* \
+                         */testing/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names 
 # (namespaces, classes, functions, etc.) that should be excluded from the 
@@ -737,8 +737,7 @@ EXAMPLE_RECURSIVE      = NO
 # directories that contain image that are included in the documentation (see 
 # the \image command).
 
-IMAGE_PATH             = @CustusX3_SOURCE_DIR@/doc/doxygen/images \
-                         @CustusX3_SOURCE_DIR@/externals/ssc/Doc/images
+IMAGE_PATH             = @CustusX3_SOURCE_DIR@/doc/doxygen/images
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should 
 # invoke to filter for each input file. Doxygen will invoke the filter program 
@@ -912,7 +911,8 @@ HTML_STYLESHEET        =
 # files. In the HTML_STYLESHEET file, use the file name only. Also note that 
 # the files will be copied as-is; there are no commands or markers available.
 
-HTML_EXTRA_FILES       = 
+# The code standard is linked to from the main page.
+HTML_EXTRA_FILES       = @CustusX3_SOURCE_DIR@/doc/cx_code_standard.pdf
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. 
 # Doxygen will adjust the colors in the stylesheet and background images 
