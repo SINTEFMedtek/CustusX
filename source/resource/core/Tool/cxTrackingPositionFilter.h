@@ -17,6 +17,7 @@
 #include "sscTransform3D.h"
 #include <map>
 #include <boost/shared_ptr.hpp>
+#include "iir/Butterworth.h"
 
 namespace cx
 {
@@ -42,9 +43,12 @@ private:
 	void clearIfTimestampIsOlderThanHead(Transform3D pos, double timestamp);
 	void clearIfJumpInTimestamps(Transform3D pos, double timestamp);
 	void interpolateAndFilterPositions(Transform3D pos, double timestamp);
-	int cutOffFrequency;
-	int filterOrder;
-	int resampleFrequency;
+	float mCutOffFrequency;
+	float mResampleFrequency;
+	static const int mFilterOrder = 3;
+	Iir::Butterworth::LowPass<mFilterOrder> fx;
+	Iir::Butterworth::LowPass<mFilterOrder> fy;
+	Iir::Butterworth::LowPass<mFilterOrder> fz;
 };
 typedef boost::shared_ptr<TrackingPositionFilter> TrackingPositionFilterPtr;
 
