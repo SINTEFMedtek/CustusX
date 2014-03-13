@@ -823,7 +823,7 @@ void Image::setInterpolationTypeToLinear()
 void Image::setInterpolationType(int val)
 {
 	mInterpolationType = val;
-	emit transferFunctionsChanged();
+	emit vtkImageDataChanged();
 }
 int Image::getInterpolationType() const
 {
