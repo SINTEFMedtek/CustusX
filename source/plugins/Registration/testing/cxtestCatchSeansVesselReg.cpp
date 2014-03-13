@@ -15,7 +15,7 @@
 #include <QDir>
 
 
-TEST_CASE_METHOD(cxtest::SeansVesselRegFixture, "SeansVesselReg: V2V syntectic data", "[integration][plugins][registration]")
+TEST_CASE_METHOD(cxtest::SeansVesselRegFixture, "SeansVesselReg: V2V syntectic data", "[integration][plugins][registration][not_win32]")
 //void TestRegistrationV2V::testV2V_synthetic_data()
 {
 	QStringList files = this->generateTestData();
@@ -62,7 +62,7 @@ TEST_CASE_METHOD(cxtest::SeansVesselRegFixture, "SeansVesselReg: V2V syntectic d
 //	}
 }
 
-TEST_CASE_METHOD(cxtest::SeansVesselRegFixture, "SeansVesselReg: V2V registration", "[integration][plugins][registration]")
+TEST_CASE_METHOD(cxtest::SeansVesselRegFixture, "SeansVesselReg: V2V registration", "[integration][plugins][registration][not_win32]")
 //void TestRegistrationV2V::testVessel2VesselRegistration()
 {
 	QString fname0 = cx::DataLocations::getTestDataPath() + "/testing/Centerline/US_aneurism_cl_size0.vtk";
