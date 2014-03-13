@@ -311,6 +311,7 @@ void VideoConnectionWidget::writeSettings()
 	}
 	else if (this->getVideoConnectionManager()->useSimulatedServer())
 	{
+		std::cout << "****** simulated image streamer" << std::endl;
 		this->getVideoConnectionManager()->setLocalServerArguments("--type SimulatedImageStreamer");
 	}
 }
