@@ -257,11 +257,11 @@ QStringList StateService::getDefaultGrabberServer()
 	QString filename;
 	QString relativePath = "OpenIGTLinkServer";
 	QString postfix = "";
-#ifdef __APPLE__
-	filename = "GrabberServer";
-	relativePath = "grabberServer";
-	postfix = " --auto";
-#elif WIN32
+//#ifdef __APPLE__
+//	filename = "GrabberServer";
+//	relativePath = "grabberServer";
+//	postfix = " --auto";
+#if WIN32
 	filename = "OpenIGTLinkServer.exe";
 	postfix = "--in_width 800 --in_height 600";
 #else

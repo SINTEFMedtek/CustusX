@@ -39,7 +39,12 @@ VideoConnectionManager::VideoConnectionManager(VideoServiceBackendPtr backend)
 	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("video");
 
 	QStringList connectionOptions;
-	QString defaultConnection = "Direct Link";
+
+	QString defaultConnection = "Direct Link";	
+#ifdef __APPLE__
+	defaultConnection = "Local Server";
+#endif
+
 	connectionOptions << "Local Server" << "Direct Link" << "Remote Server" << "Simulation Server";
 	mConnectionMethod = StringDataAdapterXml::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, connectionOptions, mOptions.getElement());
 	connect(mConnectionMethod.get(), SIGNAL(changed()), this, SIGNAL(connectionMethodChanged()));
