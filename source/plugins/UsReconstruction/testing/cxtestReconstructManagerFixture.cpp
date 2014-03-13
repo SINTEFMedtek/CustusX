@@ -14,7 +14,7 @@
 
 #include "cxtestReconstructManagerFixture.h"
 
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "catch.hpp"
 #include "sscPNNReconstructAlgorithm.h"
 #include <QApplication>

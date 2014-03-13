@@ -7,7 +7,7 @@
 #include <QLabel>
 #include "sscMessageManager.h"
 #include "sscToolManager.h"
-#include "cxProbe.h"
+#include "sscProbe.h"
 
 namespace cx
 {

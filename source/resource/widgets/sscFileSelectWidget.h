@@ -45,7 +45,7 @@ namespace cx
  *
  * Default name filter is .mhdmNameFilters
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_widgets
  */
 class FileSelectWidget: public QWidget
 {

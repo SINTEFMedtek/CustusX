@@ -114,6 +114,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	QDomDocument domdoc;
 	QDomElement settings = domdoc.createElement("TordTest");
 	boost::shared_ptr<cx::TordTest> algorithm(new cx::TordTest);
+	algorithm->enableProfiling();
 
 	fixture.setAlgorithm(algorithm);
 	algorithm->getRadiusOption(settings)->setValue(10);

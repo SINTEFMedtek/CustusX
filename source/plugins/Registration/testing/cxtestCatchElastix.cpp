@@ -15,7 +15,7 @@
 #include <vtkPolyData.h>
 #include <vtkPolyDataWriter.h>
 #include <vtkCellArray.h>
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "sscMesh.h"
 #include "sscVector3D.h"
 #include "cxDataLocations.h"

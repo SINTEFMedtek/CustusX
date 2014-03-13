@@ -12,6 +12,12 @@
 namespace cx
 {
 
+/**
+* \file
+* \addtogroup cx_resource_videoserver
+* @{
+*/
+
 struct Package
 {
 	IGTLinkImageMessage::Pointer mIgtLinkImageMessage;
@@ -25,6 +31,8 @@ typedef boost::shared_ptr<Package> PackagePtr;
 
 /**Interface for sending grabbed data from the ImageSender classes further to either
  * a TCP/IP socket or directly via a Qt signal.
+ *
+ * \ingroup cx_resource_videoserver
  * \author Christian Askeland, SINTEF
  * \date Oct 11, 2012
  */
@@ -91,6 +99,10 @@ private:
 	QTcpSocket* mSocket;
 	int mMaxBufferSize;
 };
+
+/**
+* @}
+*/
 
 } /* namespace cx */
 #endif /* CXSender_H_ */

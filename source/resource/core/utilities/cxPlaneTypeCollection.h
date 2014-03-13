@@ -23,6 +23,7 @@ namespace cx
 
 /** A list of PLANE_TYPE, along with utility methods
  *
+ * \ingroup cx_resource_core_utilities
  * \date 2014-03-04
  * \author Christian Askeland, SINTEF
  */

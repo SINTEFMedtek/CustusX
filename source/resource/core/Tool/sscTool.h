@@ -47,7 +47,7 @@ typedef boost::shared_ptr<TimedTransformMap> TimedTransformMapPtr;
  *  - the y axis points to the left side of the tool.
  *  - This means that in the case of an optical tracking frame, the tracking spheres points in the negative x axis
  *
- * \ingroup sscTool
+ * \ingroup cx_resource_core_tool
  */
 class Tool: public QObject
 {

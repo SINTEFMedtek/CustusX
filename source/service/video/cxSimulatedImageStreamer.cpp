@@ -13,7 +13,7 @@
 //#include "sscToolManager.h"
 #include "sscTransform3D.h"
 #include "sscVolumeHelpers.h"
-//#include "cxToolManager.h"
+//#include "sscToolManager.h"
 
 #include "sscSlicedImageProxy.h"
 #include "sscSliceProxy.h"

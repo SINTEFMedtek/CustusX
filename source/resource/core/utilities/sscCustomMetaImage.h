@@ -21,7 +21,7 @@ typedef boost::shared_ptr<class CustomMetaImage> CustomMetaImagePtr;
  * This is meant as a supplement to vtkMetaImageReader/Writer,
  * extending that interface.
  *
- * \ingroup sscUtility
+ * \ingroup cx_resource_core_utilities
  */
 class CustomMetaImage
 {

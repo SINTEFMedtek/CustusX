@@ -41,7 +41,7 @@ namespace cx
  *
  *  Refer to DoubleDataAdapter for a description.
  *
- * \ingroup sscWidget
+ * \ingroup cx_resource_core_dataadapters
  */
 class Vector3DDataAdapter: public DataAdapter
 {

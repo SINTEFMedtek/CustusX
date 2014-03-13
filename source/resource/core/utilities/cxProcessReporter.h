@@ -13,6 +13,7 @@ typedef boost::shared_ptr<class ProcessReporter> ProcessReporterPtr;
 /**
  * Listens to events from QProcess and redirects them to the messagemanager.
  *
+ * \ingroup cx_resource_core_utilities
  * \date Oct 22 2013
  * \author Janne Beate Bakeng, SINTEF
  */

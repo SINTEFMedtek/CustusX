@@ -11,7 +11,7 @@
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
 #include "cxVideoConnectionManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxViewManager.h"
 #include "cxVideoService.h"
 #include "boost/bind.hpp"

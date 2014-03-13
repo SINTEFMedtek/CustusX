@@ -51,7 +51,7 @@ enum REGISTRATION_STATUS
  *
  * Example suclasses: Image and Mesh.
  *
- * \ingroup sscData
+ * \ingroup cx_resource_core_data
  */
 class Data: public QObject
 {

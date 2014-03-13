@@ -27,7 +27,7 @@ typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 
 /**
  * \file
- * \addtogroup cxPluginUsReconstruction
+ * \addtogroup cx_plugin_usreconstruction
  * @{
  */
 

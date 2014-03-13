@@ -11,7 +11,7 @@ namespace cx {
  * \brief Helper widget for displaying the input/output/options part of a Filter.
  * Intended to be included in other Filter widgets.
  *
- * \ingroup cxPluginAlgorithm
+ * \ingroup cx_plugin_algorithm
  * \date Dec 13, 2012
  * \author Christian Askeland, SINTEF
  */

@@ -32,7 +32,7 @@ namespace cx
 
 /**
  * \brief Probe accuracy measurements using the Wire Phantom.
- * \ingroup cxPluginRegistration
+ * \ingroup cx_plugin_registration
  *
  *  \date Jun 21, 2012
  *  \date Nov 28, 2012

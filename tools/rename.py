@@ -363,8 +363,8 @@ Parses the scripts incoming arguments and does what it's told.
 '''
 def main():
     argv_parser = argparse.ArgumentParser(description='Rename a cplusplus header and source file pair.')
-    argv_parser.add_argument("header_file", help="Absolute or relative path to existing cplusplus header file. ex: ./thing.h", type=str)
-    argv_parser.add_argument("new_name", help="New base name for the header file. ex: something", type=str)
+#    argv_parser.add_argument("header_file", help="Absolute or relative path to existing cplusplus header file. ex: ./thing.h", type=str)
+#    argv_parser.add_argument("new_name", help="New base name for the header file. ex: something", type=str)
     argv_parser.add_argument("--root_dir", help="root directory, work on all files inside", type=str)
     argv_parser.add_argument("-d", "--debug", action = "store_true", help="Used for debugging the script")
     argv_parser.add_argument("-v", "--verbosity", default=2, type=int, help="Verbosity level: 0=quiet, 1=errors, 2=warnings, 3=status")

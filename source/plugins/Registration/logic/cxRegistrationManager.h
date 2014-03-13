@@ -33,7 +33,7 @@ typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
 
 /**
  * \file
- * \addtogroup cxPluginRegistration
+ * \addtogroup cx_plugin_registration
  * @{
  */
 

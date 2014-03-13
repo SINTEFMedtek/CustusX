@@ -22,7 +22,7 @@ class TransferFunctionColorWidget;
 
 /**
  * \file
- * \addtogroup cxGUI
+ * \addtogroup cx_gui
  * @{
  */
 

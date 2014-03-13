@@ -23,7 +23,7 @@ namespace cx
 /** Filter for resampling and cropping a volume into the space of another.
  *
  *
- * \ingroup cxPluginAlgorithm
+ * \ingroup cx_plugin_algorithm
  * \date Nov 26, 2012
  * \author christiana
  */

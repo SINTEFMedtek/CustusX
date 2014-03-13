@@ -28,7 +28,7 @@ typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
 /**
  * \file
- * \addtogroup cxServiceState
+ * \addtogroup cx_service_state
  * @{
  */
 

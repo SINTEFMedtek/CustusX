@@ -11,6 +11,7 @@ namespace cx
  *
  * \brief Widget for displaying images.
  *
+ * \ingroup cx_resource_widgets
  * \date Nov 7, 2012
  * \author Janne Beate Bakeng, SINTEF
  */

@@ -6,10 +6,10 @@
 #include "boost/bind.hpp"
 #include "sscTime.h"
 #include "sscMessageManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxStatusBar.h"
 #include "cxVolumePropertiesWidget.h"
 #include "cxNavigationWidget.h"
@@ -17,7 +17,7 @@
 #include "cxToolPropertiesWidget.h"
 #include "cxViewGroup.h"
 #include "cxPreferencesDialog.h"
-#include "cxImagePropertiesWidget.h"
+#include "cxSlicePropertiesWidget.h"
 #include "cxPatientData.h"
 #include "cxDataLocations.h"
 #include "cxMeshInfoWidget.h"
@@ -95,7 +95,7 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	this->addAsDockWidget(new VideoConnectionWidget(this), "Utility");
 	this->addAsDockWidget(new EraserWidget(this), "Properties");
 	this->addAsDockWidget(new MetricWidget(this), "Utility");
-	this->addAsDockWidget(new ImagePropertiesWidget(this), "Properties");
+	this->addAsDockWidget(new SlicePropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new VolumePropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new MeshInfoWidget(this), "Properties");
 #ifdef SSC_USE_DCMTK

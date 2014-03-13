@@ -31,29 +31,11 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup sscData
+ * \addtogroup cx_resource_core_data
  * @{
  */
 
 typedef boost::shared_ptr<class AngleMetric> AngleMetricPtr;
-
-///** \brief DataReader implementation for AngleMetric
-// *
-// * \date Jul 27, 2011
-// * \author Christian Askeland, SINTEF
-// */
-//class AngleMetricReader: public DataReader
-//{
-//public:
-//	virtual ~AngleMetricReader()
-//	{
-//	}
-//	virtual bool canLoad(const QString& type, const QString& filename)
-//	{
-//		return type == "angleMetric";
-//	}
-//	virtual DataPtr load(const QString& uid, const QString& filename);
-//};
 
 /**\brief Data class that represents an angle between two lines.
  *

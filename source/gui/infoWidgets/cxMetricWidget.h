@@ -48,7 +48,7 @@ typedef boost::shared_ptr<class MetricManager> MetricManagerPtr;
 
 
 /**
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  */
 class MetricWidget : public BaseWidget

@@ -44,7 +44,7 @@ namespace cx
  * every 10mm
  *
  *
- * \ingroup sscVideo
+ * \ingroup cx_resource_core_video
  */
 class TestVideoSource : public VideoSource
 {

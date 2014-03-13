@@ -32,7 +32,7 @@ typedef Eigen::Hyperplane<double, 3> Plane3D;
 
 /**
  * \file
- * \addtogroup sscData
+ * \addtogroup cx_resource_core_data
  * @{
  */
 

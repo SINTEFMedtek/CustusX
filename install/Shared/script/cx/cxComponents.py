@@ -79,6 +79,8 @@ class Component(object):
         builder.setBuildType(self.getBuildType())
         builder.setControlData(self.controlData)
         return builder
+    def isPubliclyAvailable(self):
+        return True
         
 # ---------------------------------------------------------
 
@@ -264,7 +266,7 @@ class IGSTK(CppComponent):
 
 class ISB_DataStreaming(CppComponent):
     def name(self):
-        self.mCurrentRevision = "498"
+        self.mCurrentRevision = "523"
         return "ISB_DataStreaming"
     def help(self):
         return 'ISB GE Digital Interface stuff'
@@ -286,7 +288,7 @@ class ISB_DataStreaming(CppComponent):
         add('DATASTREAMING_USE_TRACKING:BOOL', False)
         add('DATASTREAMING_USE_SC_DICOM_LOADERS:BOOL', False)
         add('DATASTREAMING_USE_OPENCL:BOOL', self.controlData.mGEStreamerUseOpenCL)
-        add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
+        add('DATASTREAMING_BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
         builder.configureCMake()
     def _svn_login_info(self):
         '''
@@ -296,6 +298,9 @@ class ISB_DataStreaming(CppComponent):
             return '--username sintef'
         else:
             return '--non-interactive --username sintef --password %s' % self.controlData.isb_password
+    def isPubliclyAvailable(self):
+        return False
+        
 # ---------------------------------------------------------
 
 class CustusX3(CppComponent):
@@ -365,6 +370,8 @@ class UltrasonixSDK(CppComponent):
         pass
     def makeClean(self):
         pass
+    def isPubliclyAvailable(self):
+        return False
 # ---------------------------------------------------------
 
 class TubeSegmentationFramework(CppComponent):
@@ -422,7 +429,7 @@ class OpenCLUtilityLibrary(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:smistad/OpenCLUtilityLibrary')
     def update(self):
-        self._getBuilder().gitCheckout('07bfdd1523d48ba95e2e43d8f2227d4bd5a95750', submodules=False)
+        self._getBuilder().gitCheckout('c59775aec5f648666ce8b35c6cb7873bc2b5476e', submodules=False)
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()
@@ -453,6 +460,8 @@ class CustusX3Data(CppComponent):
         return 'medtek.sintef.no//Volumes/medtek_HD/git/Data.git'
     def makeClean(self):
         pass
+    def isPubliclyAvailable(self):
+        return False
 # ---------------------------------------------------------
 
 

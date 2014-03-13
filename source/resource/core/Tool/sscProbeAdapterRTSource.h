@@ -37,7 +37,7 @@ namespace cx
  * from the video source. The ProbeAdapterRTSource overrides some methods of
  * a VideoSource and inserts info from a Probe instead.
  *
- * \ingroup sscTool
+ * \ingroup cx_resource_core_tool
 *
  * \date Feb 11, 2011
  * \author: Christian Askeland, SINTEF

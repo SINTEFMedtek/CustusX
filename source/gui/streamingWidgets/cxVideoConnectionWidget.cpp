@@ -38,7 +38,7 @@
 #include "cxVideoService.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxViewManager.h"
 #include "cxSimulateUSWidget.h"
 #include "cxFileInputWidget.h"

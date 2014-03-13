@@ -28,7 +28,7 @@ typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 /**
  *
  *
- * \ingroup cx
+ * \ingroup cx_service_video
  * \date 25.02.2014, 2014
  * \author christiana
  */

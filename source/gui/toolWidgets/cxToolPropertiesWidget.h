@@ -21,7 +21,7 @@ namespace cx
 
 /**
  * \class ToolPropertiesWidget
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * \date 2010.04.22
  * \\author Christian Askeland, SINTEF

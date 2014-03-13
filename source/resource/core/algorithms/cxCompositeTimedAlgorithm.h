@@ -22,6 +22,9 @@
 namespace cx
 {
 
+/**
+ *  \ingroup cx_resource_core_algorithms
+ */
 class CompositeTimedAlgorithm : public TimedBaseAlgorithm
 {
 public:
@@ -42,7 +45,7 @@ typedef boost::shared_ptr<CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
  * Usage: Append all algorithms as children then execute. All children
  * will be executed in sequence. started()/finished() will also work.
  *
- * \ingroup cxResourceAlgorithms
+ * \ingroup cx_resource_core_algorithms
  * \date Jun 27, 2012
  * \author Christian Askeland
  */
@@ -74,7 +77,7 @@ typedef boost::shared_ptr<CompositeSerialTimedAlgorithm> CompositeSerialTimedAlg
  * Usage: Append all algorithms as children then execute. All children
  * will be executed in parallel. started()/finished() will also work.
  *
- * \ingroup cxResourceAlgorithms
+ * \ingroup cx_resource_core_algorithms
  * \date Nov 06, 2012
  * \author Christian Askeland
  */

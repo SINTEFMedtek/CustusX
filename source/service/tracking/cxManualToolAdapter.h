@@ -21,13 +21,13 @@ namespace cx
 {
 /**
 * \file
-* \addtogroup cxServiceTracking
+* \addtogroup cx_service_tracking
 * @{
 */
 
 /**
  * \brief Adapter class for ManualTool.
- * \ingroup cxServiceTracking
+ * \ingroup cx_service_tracking
  *
  * A ManualToolAdapter inherits from manual tool, but also
  * contains a cx::Tool that is requests shape and probe info from.

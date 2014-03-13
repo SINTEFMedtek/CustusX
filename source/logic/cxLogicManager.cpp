@@ -14,7 +14,7 @@
 #include "cxToolManager.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"
-#include "cxDataManager.h"
+#include "sscDataManagerImpl.h"
 #include "cxRepManager.h"
 #include "sscGPUImageBuffer.h"
 #include "cxSettings.h"

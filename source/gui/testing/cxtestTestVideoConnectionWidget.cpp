@@ -9,9 +9,10 @@
 #include "cxVideoConnectionManager.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "cxSimulateUSWidget.h"
 #include "cxLegacySingletons.h"
+#include "sscImage.h"
 
 namespace cxtest
 {
