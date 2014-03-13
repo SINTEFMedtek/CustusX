@@ -69,7 +69,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
     algorithms/cxThreadedTimedAlgorithm.h
     algorithms/cxCompositeTimedAlgorithm.h
 
-	utilities/cxAcceptanceBoxWidget
     utilities/cxPlaybackTime.h
     utilities/cxProcessWrapper.h
 	utilities/cxProcessReporter
@@ -83,7 +82,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
      
 # library
 cx_add_class(cxResource_SOURCE
-	sscForwardDeclarations.h
 	cxForwardDeclarations.h
 	vtkForwardDeclarations.h
 	

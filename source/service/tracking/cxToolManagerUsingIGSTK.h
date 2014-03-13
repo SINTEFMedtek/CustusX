@@ -65,15 +65,15 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class cxToolManager: public ToolManager
+class ToolManagerUsingIGSTK: public ToolManager
 {
 Q_OBJECT
 
 public:
-	typedef boost::shared_ptr<cxToolManager> cxToolManagerPtr;
+	typedef boost::shared_ptr<ToolManagerUsingIGSTK> ToolManagerUsingIGSTKPtr;
 
-	static cxToolManagerPtr create();
-	virtual ~cxToolManager();
+	static ToolManagerUsingIGSTKPtr create();
+	virtual ~ToolManagerUsingIGSTK();
 
 //	static void initializeObject();
 //	static cxTrackingServicePtr getInstance();
@@ -145,7 +145,7 @@ private slots:
 	void globalConfigurationFileChangedSlot(QString key);
 
 private:
-	cxToolManager();
+	ToolManagerUsingIGSTK();
 	TrackingServiceWeakPtr mSelf;
 
 	void closePlayBackMode();
@@ -174,8 +174,8 @@ private:
 	double mToolTipOffset; ///< Common tool tip offset for all tools
 
 private:
-	cxToolManager(cxToolManager const&);
-	cxToolManager& operator=(cxToolManager const&);
+	ToolManagerUsingIGSTK(ToolManagerUsingIGSTK const&);
+	ToolManagerUsingIGSTK& operator=(ToolManagerUsingIGSTK const&);
 
 #ifndef WIN32
 	bool createSymlink();

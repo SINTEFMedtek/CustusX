@@ -139,7 +139,7 @@ void LogicManager::initializeServices()
 
 void LogicManager::createTrackingService()
 {
-	mTrackingService = cxToolManager::create();
+	mTrackingService = ToolManagerUsingIGSTK::create();
 	LegacySingletons::mToolManager = mTrackingService;
 }
 
