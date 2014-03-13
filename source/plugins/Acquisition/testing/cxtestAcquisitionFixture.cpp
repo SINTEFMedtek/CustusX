@@ -90,7 +90,7 @@ void AcquisitionFixture::setupProbe()
 	cx::DummyToolPtr dummyTool(new cx::DummyTool(cx::trackingService()));
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(cx::DoubleBoundingBox3D(0,0,0,10,10,10)));
 	std::pair<QString, cx::ProbeDefinition> probedata = cx::UsReconstructionFileReader::readProbeDataFromFile(mAcqDataFilename);
-	cx::cxProbePtr probe = cx::cxProbe::New("","");
+	cx::ProbeImplPtr probe = cx::ProbeImpl::New("","");
 	probe->setProbeSector(probedata.second);
 	dummyTool->setProbeSector(probe);
 	CHECK(dummyTool->getProbe());

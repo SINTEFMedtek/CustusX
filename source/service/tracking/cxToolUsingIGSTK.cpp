@@ -33,7 +33,7 @@
 namespace cx
 {
 
-cxTool::cxTool(TrackingServicePtr manager, IgstkToolPtr igstkTool) :
+ToolUsingIGSTK::ToolUsingIGSTK(TrackingServicePtr manager, IgstkToolPtr igstkTool) :
 	ToolImpl(manager, ""),
 				mTool(igstkTool), mPolyData(NULL),
 				mValid(false), mConfigured(false), mTracked(false)
@@ -53,67 +53,67 @@ cxTool::cxTool(TrackingServicePtr manager, IgstkToolPtr igstkTool) :
 
 	if (mTool->getInternalStructure().mIsProbe)
 	{
-		mProbe = cxProbe::New(mTool->getInternalStructure().mInstrumentId,
+		mProbe = ProbeImpl::New(mTool->getInternalStructure().mInstrumentId,
 						mTool->getInternalStructure().mInstrumentScannerId);
 		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 	}
 	connect(this->getTrackingService().get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }
 
-cxTool::~cxTool()
+ToolUsingIGSTK::~ToolUsingIGSTK()
 {
 }
 
-std::set<cxTool::Type> cxTool::getTypes() const
+std::set<ToolUsingIGSTK::Type> ToolUsingIGSTK::getTypes() const
 {
 	std::set<Type> retval;
 
 	if (mTool->getInternalStructure().mIsReference)
-		retval.insert(cxTool::TOOL_REFERENCE);
+		retval.insert(ToolUsingIGSTK::TOOL_REFERENCE);
 	if (mTool->getInternalStructure().mIsPointer)
-		retval.insert(cxTool::TOOL_POINTER);
+		retval.insert(ToolUsingIGSTK::TOOL_POINTER);
 	if (mTool->getInternalStructure().mIsProbe)
-		retval.insert(cxTool::TOOL_US_PROBE);
+		retval.insert(ToolUsingIGSTK::TOOL_US_PROBE);
 
 	return retval;
 }
 
-QString cxTool::getGraphicsFileName() const
+QString ToolUsingIGSTK::getGraphicsFileName() const
 {
 	return mTool->getInternalStructure().mGraphicsFileName;
 }
 
-vtkPolyDataPtr cxTool::getGraphicsPolyData() const
+vtkPolyDataPtr ToolUsingIGSTK::getGraphicsPolyData() const
 {
 	return mPolyData;
 }
 
-ProbePtr cxTool::getProbe() const
+ProbePtr ToolUsingIGSTK::getProbe() const
 {
 	return mProbe;
 }
 
-bool cxTool::getVisible() const
+bool ToolUsingIGSTK::getVisible() const
 {
 	return mTool->isVisible();
 }
 
-bool cxTool::isInitialized() const
+bool ToolUsingIGSTK::isInitialized() const
 {
 	return mTool->isInitialized();
 }
 
-QString cxTool::getUid() const
+QString ToolUsingIGSTK::getUid() const
 {
 	return Tool::mUid;
 }
 
-QString cxTool::getName() const
+QString ToolUsingIGSTK::getName() const
 {
 	return Tool::mName;
 }
 
-double cxTool::getTooltipOffset() const
+double ToolUsingIGSTK::getTooltipOffset() const
 {
 	if(this->getProbe())
 		return this->getProbe()->getProbeData().getDepthStart();
@@ -121,7 +121,7 @@ double cxTool::getTooltipOffset() const
 //		return this->getTrackingService()->getTooltipOffset();
 }
 
-void cxTool::setTooltipOffset(double val)
+void ToolUsingIGSTK::setTooltipOffset(double val)
 {
 	if(this->getProbe())
 		return;
@@ -129,12 +129,12 @@ void cxTool::setTooltipOffset(double val)
 //	this->getTrackingService()->setTooltipOffset(val);
 }
 
-bool cxTool::isValid() const
+bool ToolUsingIGSTK::isValid() const
 {
 	return mValid;
 }
 
-void cxTool::createPolyData()
+void ToolUsingIGSTK::createPolyData()
 {
 	QDir dir;
 	if (!mTool->getInternalStructure().mGraphicsFileName.isEmpty()
@@ -161,58 +161,58 @@ void cxTool::createPolyData()
 	}
 }
 
-bool cxTool::isCalibrated() const
+bool ToolUsingIGSTK::isCalibrated() const
 {
 	Transform3D identity = Transform3D::Identity();
 	Transform3D sMt = mTool->getInternalStructure().getCalibrationAsSSC();
 	return !similar(sMt, identity);
 }
 
-Transform3D cxTool::getCalibration_sMt() const
+Transform3D ToolUsingIGSTK::getCalibration_sMt() const
 {
 	Transform3D sMt = mTool->getInternalStructure().getCalibrationAsSSC();
 
 	return sMt;
 }
 
-void cxTool::setCalibration_sMt(Transform3D calibration)
+void ToolUsingIGSTK::setCalibration_sMt(Transform3D calibration)
 {
 	mTool->updateCalibration(calibration);
 }
 
-QString cxTool::getCalibrationFileName() const
+QString ToolUsingIGSTK::getCalibrationFileName() const
 {
 	return mTool->getInternalStructure().mCalibrationFilename;
 }
 
-TRACKING_SYSTEM cxTool::getTrackerType()
+TRACKING_SYSTEM ToolUsingIGSTK::getTrackerType()
 {
 	return mTool->getInternalStructure().mTrackerType;
 }
 
-void cxTool::printInternalStructure()
+void ToolUsingIGSTK::printInternalStructure()
 {
 	mTool->printInternalStructure();
 }
 
-ProbeDefinition cxTool::getProbeSector() const
+ProbeDefinition ToolUsingIGSTK::getProbeSector() const
 {
 	if (mProbe)
 		return mProbe->getProbeData();
 	return ProbeDefinition();
 }
 
-std::map<int, Vector3D> cxTool::getReferencePoints() const
+std::map<int, Vector3D> ToolUsingIGSTK::getReferencePoints() const
 {
 	return mTool->getInternalStructure().mReferencePoints;
 }
 
-bool cxTool::hasReferencePointWithId(int id)
+bool ToolUsingIGSTK::hasReferencePointWithId(int id)
 {
   return this->getReferencePoints().count(id);
 }
 
-void cxTool::addXml(QDomNode& dataNode)
+void ToolUsingIGSTK::addXml(QDomNode& dataNode)
 {
 	QDomDocument doc = dataNode.ownerDocument();
 	dataNode.toElement().setAttribute("uid", qstring_cast(this->getUid()));
@@ -224,7 +224,7 @@ void cxTool::addXml(QDomNode& dataNode)
 	}
 }
 
-void cxTool::parseXml(QDomNode& dataNode)
+void ToolUsingIGSTK::parseXml(QDomNode& dataNode)
 {
 	if (dataNode.isNull())
 		return;
@@ -235,7 +235,7 @@ void cxTool::parseXml(QDomNode& dataNode)
 	}
 }
 
-void cxTool::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)
+void ToolUsingIGSTK::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)
 {
 	Transform3D prMt_filtered = matrix;
 
@@ -252,7 +252,7 @@ void cxTool::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)
 //	ToolImpl::set_prMt(matrix, timestamp);
 }
 
-void cxTool::calculateTpsSlot()
+void ToolUsingIGSTK::calculateTpsSlot()
 {
 	int tpsNr = 0;
 
@@ -272,7 +272,7 @@ void cxTool::calculateTpsSlot()
 	emit tps(tpsNr);
 }
 
-void cxTool::toolVisibleSlot(bool on)
+void ToolUsingIGSTK::toolVisibleSlot(bool on)
 {
 	if (on)
 		mTpsTimer.start(1000); //calculate tps every 1 seconds

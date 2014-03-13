@@ -46,10 +46,10 @@
 namespace cx
 {
 
-cxToolManager::cxToolManagerPtr cxToolManager::create()
+ToolManagerUsingIGSTK::ToolManagerUsingIGSTKPtr ToolManagerUsingIGSTK::create()
 {
-	cxToolManagerPtr retval;
-	retval.reset(new cxToolManager());
+	ToolManagerUsingIGSTKPtr retval;
+	retval.reset(new ToolManagerUsingIGSTK());
 	retval->mSelf = retval;
 
 	retval->initializeManualTool(); // do this after setting self.
@@ -58,14 +58,14 @@ cxToolManager::cxToolManagerPtr cxToolManager::create()
 	return retval;
 }
 
-QStringList cxToolManager::getSupportedTrackingSystems()
+QStringList ToolManagerUsingIGSTK::getSupportedTrackingSystems()
 {
 	QStringList retval;
 	retval = IgstkTracker::getSupportedTrackingSystems();
 	return retval;
 }
 
-cxToolManager::cxToolManager() :
+ToolManagerUsingIGSTK::ToolManagerUsingIGSTK() :
 				mConfigurationFilePath(""),
 				mLoggingFolder(""),
 				mConfigured(false),
@@ -80,7 +80,7 @@ cxToolManager::cxToolManager() :
 	this->setConfigurationFile(DataLocations::getToolConfigFilePath());
 }
 
-cxToolManager::~cxToolManager()
+ToolManagerUsingIGSTK::~ToolManagerUsingIGSTK()
 {
 	if (mTrackerThread)
 	{
@@ -100,7 +100,7 @@ cxToolManager::~cxToolManager()
  * The original tools are wrapped by playback tools. The original ones are
  * not changed, only their movement is ignored.
  */
-void cxToolManager::setPlaybackMode(PlaybackTimePtr controller)
+void ToolManagerUsingIGSTK::setPlaybackMode(PlaybackTimePtr controller)
 {
 	if (!controller)
 	{
@@ -161,7 +161,7 @@ void cxToolManager::setPlaybackMode(PlaybackTimePtr controller)
 /**Close playback mode by removing the playback tools and resetting to the original tools
  *
  */
-void cxToolManager::closePlayBackMode()
+void ToolManagerUsingIGSTK::closePlayBackMode()
 {
 	ToolManager::ToolMap original = mTools; ///< all tools
 
@@ -180,7 +180,7 @@ void cxToolManager::closePlayBackMode()
 	emit initialized();
 }
 
-void cxToolManager::runDummyTool(DummyToolPtr tool)
+void ToolManagerUsingIGSTK::runDummyTool(DummyToolPtr tool)
 {
 	messageManager()->sendInfo("Running dummy tool " + tool->getUid());
 
@@ -199,7 +199,7 @@ void cxToolManager::runDummyTool(DummyToolPtr tool)
 
 
 
-void cxToolManager::initializeManualTool()
+void ToolManagerUsingIGSTK::initializeManualTool()
 {
 	if (!mManualTool)
 	{
@@ -216,19 +216,19 @@ void cxToolManager::initializeManualTool()
 	mManualTool->set_prMt(prMt);
 }
 
-bool cxToolManager::isConfigured() const
+bool ToolManagerUsingIGSTK::isConfigured() const
 {
 	return mConfigured;
 }
-bool cxToolManager::isInitialized() const
+bool ToolManagerUsingIGSTK::isInitialized() const
 {
 	return mInitialized;
 }
-bool cxToolManager::isTracking() const
+bool ToolManagerUsingIGSTK::isTracking() const
 {
 	return mTracking;
 }
-void cxToolManager::configure()
+void ToolManagerUsingIGSTK::configure()
 {
 	if (mConfigurationFilePath.isEmpty() || !QFile::exists(mConfigurationFilePath))
 	{
@@ -278,7 +278,7 @@ void cxToolManager::configure()
 		mTrackerThread->start();
 }
 
-void cxToolManager::trackerConfiguredSlot(bool on)
+void ToolManagerUsingIGSTK::trackerConfiguredSlot(bool on)
 {
 	if (!on)
 	{
@@ -300,7 +300,7 @@ void cxToolManager::trackerConfiguredSlot(bool on)
 	for (; it != igstkTools.end(); ++it)
 	{
 		IgstkToolPtr igstkTool = it->second;
-		cxToolPtr tool(new cxTool(mSelf.lock(), igstkTool));
+		cxToolPtr tool(new ToolUsingIGSTK(mSelf.lock(), igstkTool));
 		if (tool->isValid())
 		{
 			if (igstkTool == reference)
@@ -308,7 +308,7 @@ void cxToolManager::trackerConfiguredSlot(bool on)
 
 			mTools[it->first] = tool;
 			connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
-			if (tool->hasType(cxTool::TOOL_US_PROBE))
+			if (tool->hasType(ToolUsingIGSTK::TOOL_US_PROBE))
 				emit probeAvailable();
 		}
 		else
@@ -322,7 +322,7 @@ void cxToolManager::trackerConfiguredSlot(bool on)
 		{
 			if (iter->second == mManualTool)
 				continue;
-			if (iter->second->hasType(cxTool::TOOL_REFERENCE))
+			if (iter->second->hasType(ToolUsingIGSTK::TOOL_REFERENCE))
 				continue;
 			mManualTool->setBase(iter->second);
 			messageManager()->sendInfo("Manual tool imbued with properties from " + iter->first);
@@ -341,7 +341,7 @@ void cxToolManager::trackerConfiguredSlot(bool on)
 	emit configured();
 }
 
-void cxToolManager::deconfigure()
+void ToolManagerUsingIGSTK::deconfigure()
 {
 	if (this->isInitialized())
 	{
@@ -371,7 +371,7 @@ void cxToolManager::deconfigure()
 	messageManager()->sendInfo("ToolManager is deconfigured.");
 }
 
-void cxToolManager::initialize()
+void ToolManagerUsingIGSTK::initialize()
 {
 	if (!this->isConfigured())
 	{
@@ -401,7 +401,7 @@ void cxToolManager::initialize()
 						"Cannot initialize the tracking system because the tracking thread does not exist.");
 }
 
-void cxToolManager::uninitialize()
+void ToolManagerUsingIGSTK::uninitialize()
 {
 	if (this->isTracking())
 	{
@@ -425,7 +425,7 @@ void cxToolManager::uninitialize()
  *  read/write access (by installer or similar).
  *  Create that file as a symlink to the correct device.
  */
-bool cxToolManager::createSymlink()
+bool ToolManagerUsingIGSTK::createSymlink()
 {
 	bool retval = true;
 	QFileInfo symlink = this->getSymlink();
@@ -493,7 +493,7 @@ bool cxToolManager::createSymlink()
 	return retval;
 }
 
-QFileInfo cxToolManager::getSymlink() const
+QFileInfo ToolManagerUsingIGSTK::getSymlink() const
 {
 	QString name("/Library/CustusX/igstk.links");
 	QDir linkDir(name);
@@ -504,13 +504,13 @@ QFileInfo cxToolManager::getSymlink() const
 
 /** removes symlinks to tracking system created during setup
  */
-void cxToolManager::cleanupSymlink()
+void ToolManagerUsingIGSTK::cleanupSymlink()
 {
 	messageManager()->sendInfo("Cleaning up symlinks.");
 	QFile(this->getSymlink().absoluteFilePath()).remove();
 }
 #endif //WIN32
-void cxToolManager::startTracking()
+void ToolManagerUsingIGSTK::startTracking()
 {
 	if (!this->isInitialized())
 	{
@@ -528,7 +528,7 @@ void cxToolManager::startTracking()
 		mTrackerThread->track(true);
 }
 
-void cxToolManager::stopTracking()
+void ToolManagerUsingIGSTK::stopTracking()
 {
 	if (!mTracking)
 	{
@@ -539,13 +539,13 @@ void cxToolManager::stopTracking()
 		mTrackerThread->track(false);
 }
 
-void cxToolManager::saveToolsSlot()
+void ToolManagerUsingIGSTK::saveToolsSlot()
 {
 	this->savePositionHistory();
 //	messageManager()->sendInfo("Transforms and timestamps are saved for connected tools.");
 }
 
-SessionToolHistoryMap cxToolManager::getSessionHistory(double startTime, double stopTime)
+SessionToolHistoryMap ToolManagerUsingIGSTK::getSessionHistory(double startTime, double stopTime)
 {
 	SessionToolHistoryMap retval;
 
@@ -561,7 +561,7 @@ SessionToolHistoryMap cxToolManager::getSessionHistory(double startTime, double 
 	return retval;
 }
 
-ToolManager::ToolMapPtr cxToolManager::getConfiguredTools()
+ToolManager::ToolMapPtr ToolManagerUsingIGSTK::getConfiguredTools()
 {
 	ToolManager::ToolMap retval;
 	ToolManager::ToolMap::iterator it = mTools.begin();
@@ -574,7 +574,7 @@ ToolManager::ToolMapPtr cxToolManager::getConfiguredTools()
 	return ToolManager::ToolMapPtr(new ToolManager::ToolMap(retval));
 }
 
-ToolManager::ToolMapPtr cxToolManager::getInitializedTools()
+ToolManager::ToolMapPtr ToolManagerUsingIGSTK::getInitializedTools()
 {
 	ToolManager::ToolMap retval;
 	ToolManager::ToolMap::iterator it = mTools.begin();
@@ -586,12 +586,12 @@ ToolManager::ToolMapPtr cxToolManager::getInitializedTools()
 	return ToolManager::ToolMapPtr(new ToolManager::ToolMap(retval));
 }
 
-ToolManager::ToolMapPtr cxToolManager::getTools()
+ToolManager::ToolMapPtr ToolManagerUsingIGSTK::getTools()
 {
 	return ToolManager::ToolMapPtr(new ToolManager::ToolMap(mTools));
 }
 
-ToolPtr cxToolManager::getTool(const QString& uid)
+ToolPtr ToolManagerUsingIGSTK::getTool(const QString& uid)
 {
 	if (uid == "active")
 		return this->getDominantTool();
@@ -604,25 +604,25 @@ ToolPtr cxToolManager::getTool(const QString& uid)
 	return retval;
 }
 
-void cxToolManager::setTooltipOffset(double offset)
+void ToolManagerUsingIGSTK::setTooltipOffset(double offset)
 {
 	if (similar(offset, mToolTipOffset))
 		return;
 	mToolTipOffset = offset;
 	emit tooltipOffset(mToolTipOffset);
 }
-double cxToolManager::getTooltipOffset() const
+double ToolManagerUsingIGSTK::getTooltipOffset() const
 {
 	return mToolTipOffset;
 }
 ;
 
-ToolPtr cxToolManager::getDominantTool()
+ToolPtr ToolManagerUsingIGSTK::getDominantTool()
 {
 	return mDominantTool;
 }
 
-void cxToolManager::setDominantTool(const QString& uid)
+void ToolManagerUsingIGSTK::setDominantTool(const QString& uid)
 {
 	if (mDominantTool && mDominantTool->getUid() == uid)
 		return;
@@ -630,7 +630,7 @@ void cxToolManager::setDominantTool(const QString& uid)
 	if (mDominantTool)
 	{
 		// make manual tool invisible when other tools are active.
-		if (mDominantTool->hasType(cxTool::TOOL_MANUAL))
+		if (mDominantTool->hasType(ToolUsingIGSTK::TOOL_MANUAL))
 		{
 			mManualTool->setVisible(false);
 		}
@@ -640,7 +640,7 @@ void cxToolManager::setDominantTool(const QString& uid)
 	newTool = this->getTool(uid);
 
 	// special case for manual tool
-	if (newTool && newTool->hasType(cxTool::TOOL_MANUAL) && mManualTool)
+	if (newTool && newTool->hasType(ToolUsingIGSTK::TOOL_MANUAL) && mManualTool)
 	{
 		if (mDominantTool)
 		{
@@ -654,7 +654,7 @@ void cxToolManager::setDominantTool(const QString& uid)
 	mDominantTool = newTool;
 	connect(mDominantTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
 
-	if (mDominantTool->hasType(cxTool::TOOL_MANUAL))
+	if (mDominantTool->hasType(ToolUsingIGSTK::TOOL_MANUAL))
 		emit tps(0);
 
 //	messageManager()->sendInfo("Change active tool to: " + mDominantTool->getName());
@@ -662,7 +662,7 @@ void cxToolManager::setDominantTool(const QString& uid)
 	emit dominantToolChanged(uid);
 }
 
-std::map<QString, QString> cxToolManager::getToolUidsAndNames() const
+std::map<QString, QString> ToolManagerUsingIGSTK::getToolUidsAndNames() const
 {
 	std::map<QString, QString> uidsAndNames;
 
@@ -673,7 +673,7 @@ std::map<QString, QString> cxToolManager::getToolUidsAndNames() const
 	return uidsAndNames;
 }
 
-std::vector<QString> cxToolManager::getToolNames() const
+std::vector<QString> ToolManagerUsingIGSTK::getToolNames() const
 {
 	std::vector<QString> names;
 
@@ -684,7 +684,7 @@ std::vector<QString> cxToolManager::getToolNames() const
 	return names;
 }
 
-std::vector<QString> cxToolManager::getToolUids() const
+std::vector<QString> ToolManagerUsingIGSTK::getToolUids() const
 {
 	std::vector<QString> uids;
 
@@ -695,12 +695,12 @@ std::vector<QString> cxToolManager::getToolUids() const
 	return uids;
 }
 
-ToolPtr cxToolManager::getReferenceTool() const
+ToolPtr ToolManagerUsingIGSTK::getReferenceTool() const
 {
 	return mReferenceTool;
 }
 
-void cxToolManager::savePositionHistory()
+void ToolManagerUsingIGSTK::savePositionHistory()
 {
 	QString filename = mLoggingFolder + "/toolpositions.snwpos";
 
@@ -724,7 +724,7 @@ void cxToolManager::savePositionHistory()
 	mLastLoadPositionHistory = getMilliSecondsSinceEpoch();
 }
 
-void cxToolManager::loadPositionHistory()
+void ToolManagerUsingIGSTK::loadPositionHistory()
 {
 	QString filename = mLoggingFolder + "/toolpositions.snwpos";
 
@@ -766,7 +766,7 @@ void cxToolManager::loadPositionHistory()
 	mLastLoadPositionHistory = getMilliSecondsSinceEpoch();
 }
 
-void cxToolManager::setConfigurationFile(QString configurationFile)
+void ToolManagerUsingIGSTK::setConfigurationFile(QString configurationFile)
 {
 	if (configurationFile == mConfigurationFilePath)
 		return;
@@ -780,7 +780,7 @@ void cxToolManager::setConfigurationFile(QString configurationFile)
 	mConfigurationFilePath = configurationFile;
 }
 
-void cxToolManager::setLoggingFolder(QString loggingFolder)
+void ToolManagerUsingIGSTK::setLoggingFolder(QString loggingFolder)
 {
 	if (mLoggingFolder == loggingFolder)
 		return;
@@ -794,7 +794,7 @@ void cxToolManager::setLoggingFolder(QString loggingFolder)
 	mLoggingFolder = loggingFolder;
 }
 
-void cxToolManager::initializedSlot(bool value)
+void ToolManagerUsingIGSTK::initializedSlot(bool value)
 {
 	mInitialized = value;
 	if (mInitialized)
@@ -809,7 +809,7 @@ void cxToolManager::initializedSlot(bool value)
 	}
 }
 
-void cxToolManager::trackerTrackingSlot(bool value)
+void ToolManagerUsingIGSTK::trackerTrackingSlot(bool value)
 {
 	mTracking = value;
 	if (mTracking)
@@ -824,37 +824,37 @@ void cxToolManager::trackerTrackingSlot(bool value)
 	}
 }
 
-void cxToolManager::startTrackingAfterInitSlot()
+void ToolManagerUsingIGSTK::startTrackingAfterInitSlot()
 {
 	disconnect(this, SIGNAL(initialized()), this, SLOT(startTrackingAfterInitSlot()));
 	this->startTracking();
 }
 
-void cxToolManager::initializeAfterConfigSlot()
+void ToolManagerUsingIGSTK::initializeAfterConfigSlot()
 {
 	disconnect(this, SIGNAL(configured()), this, SLOT(initializeAfterConfigSlot()));
 	this->initialize();
 }
 
-void cxToolManager::uninitializeAfterTrackingStoppedSlot()
+void ToolManagerUsingIGSTK::uninitializeAfterTrackingStoppedSlot()
 {
 	disconnect(this, SIGNAL(trackingStopped()), this, SLOT(uninitializeAfterTrackingStoppedSlot()));
 	this->uninitialize();
 }
 
-void cxToolManager::deconfigureAfterUninitializedSlot()
+void ToolManagerUsingIGSTK::deconfigureAfterUninitializedSlot()
 {
 	disconnect(this, SIGNAL(uninitialized()), this, SLOT(deconfigureAfterUninitializedSlot()));
 	this->deconfigure();
 }
 
-void cxToolManager::configureAfterDeconfigureSlot()
+void ToolManagerUsingIGSTK::configureAfterDeconfigureSlot()
 {
 	disconnect(this, SIGNAL(deconfigured()), this, SLOT(configureAfterDeconfigureSlot()));
 	this->configure();
 }
 
-void cxToolManager::globalConfigurationFileChangedSlot(QString key)
+void ToolManagerUsingIGSTK::globalConfigurationFileChangedSlot(QString key)
 {
 	if (key == "toolConfigFile")
 	{
@@ -866,7 +866,7 @@ void cxToolManager::globalConfigurationFileChangedSlot(QString key)
 	}
 }
 
-void cxToolManager::resetTrackingPositionFilters()
+void ToolManagerUsingIGSTK::resetTrackingPositionFilters()
 {
 	bool enabled = settings()->value("TrackingPositionFilter/enabled", false).toInt();
 
@@ -883,7 +883,7 @@ void cxToolManager::resetTrackingPositionFilters()
 	}
 }
 
-void cxToolManager::dominantCheckSlot()
+void ToolManagerUsingIGSTK::dominantCheckSlot()
 {
 	if (this->isPlaybackMode())
 	{
@@ -895,7 +895,7 @@ void cxToolManager::dominantCheckSlot()
 		double bestTime = 0;
 		for (ToolMap::iterator it = mTools.begin(); it != mTools.end(); ++it)
 		{
-			if (it->second->hasType(cxTool::TOOL_MANUAL))
+			if (it->second->hasType(ToolUsingIGSTK::TOOL_MANUAL))
 				continue;
 			bestTime = std::max(bestTime, it->second->getTimestamp());
 		}
@@ -918,7 +918,7 @@ void cxToolManager::dominantCheckSlot()
 		//TODO need to check if init???
 		if (it->second->getVisible())
 			visibleTools.push_back(it->second);
-		else if (it->second->hasType(cxTool::TOOL_MANUAL))
+		else if (it->second->hasType(ToolUsingIGSTK::TOOL_MANUAL))
 			visibleTools.push_back(it->second);
 	}
 
@@ -938,14 +938,14 @@ namespace
  */
 int getPriority(ToolPtr tool)
 {
-	if (tool->hasType(cxTool::TOOL_MANUAL)) // place this first, in case a tool has several attributes.
+	if (tool->hasType(ToolUsingIGSTK::TOOL_MANUAL)) // place this first, in case a tool has several attributes.
 		return 2;
 
-	if (tool->hasType(cxTool::TOOL_US_PROBE))
+	if (tool->hasType(ToolUsingIGSTK::TOOL_US_PROBE))
 		return 4;
-	if (tool->hasType(cxTool::TOOL_POINTER))
+	if (tool->hasType(ToolUsingIGSTK::TOOL_POINTER))
 		return 3;
-	if (tool->hasType(cxTool::TOOL_REFERENCE))
+	if (tool->hasType(ToolUsingIGSTK::TOOL_REFERENCE))
 		return 1;
 	return 0;
 }
@@ -962,7 +962,7 @@ bool toolTypeSort(const ToolPtr tool1, const ToolPtr tool2)
 	return getPriority(tool2) < getPriority(tool1);
 }
 
-void cxToolManager::addXml(QDomNode& parentNode)
+void ToolManagerUsingIGSTK::addXml(QDomNode& parentNode)
 {
 	QDomDocument doc = parentNode.ownerDocument();
 	QDomElement base = doc.createElement("toolManager");
@@ -979,7 +979,7 @@ void cxToolManager::addXml(QDomNode& parentNode)
 	for (; toolIt != tools->end(); ++toolIt)
 	{
 		QDomElement toolNode = doc.createElement("tool");
-		cxToolPtr tool = boost::dynamic_pointer_cast<cxTool>(toolIt->second);
+		cxToolPtr tool = boost::dynamic_pointer_cast<ToolUsingIGSTK>(toolIt->second);
 		if (tool)
 		{
 			tool->addXml(toolNode);
@@ -989,12 +989,12 @@ void cxToolManager::addXml(QDomNode& parentNode)
 	base.appendChild(toolsNode);
 }
 
-void cxToolManager::clear()
+void ToolManagerUsingIGSTK::clear()
 {
 	mManualTool->set_prMt(Transform3D::Identity());
 }
 
-void cxToolManager::parseXml(QDomNode& dataNode)
+void ToolManagerUsingIGSTK::parseXml(QDomNode& dataNode)
 {
 	if (dataNode.isNull())
 		return;
@@ -1012,13 +1012,13 @@ void cxToolManager::parseXml(QDomNode& dataNode)
 		QString tool_uid = base.attribute("uid");
 		if (tools->find(tool_uid) != tools->end())
 		{
-			cxToolPtr tool = boost::dynamic_pointer_cast<cxTool>(tools->find(tool_uid)->second);
+			cxToolPtr tool = boost::dynamic_pointer_cast<ToolUsingIGSTK>(tools->find(tool_uid)->second);
 			tool->parseXml(toolNode);
 		}
 	}
 }
 
-ManualToolPtr cxToolManager::getManualTool()
+ManualToolPtr ToolManagerUsingIGSTK::getManualTool()
 {
 	return mManualTool;
 }
@@ -1031,7 +1031,7 @@ ManualToolPtr cxToolManager::getManualTool()
  *  - any probe
  *
  */
-ToolPtr cxToolManager::findFirstProbe()
+ToolPtr ToolManagerUsingIGSTK::findFirstProbe()
 {
 	ToolPtr active = this->getDominantTool();
 	if (active && active->getProbe() && active->getProbe()->isValid())

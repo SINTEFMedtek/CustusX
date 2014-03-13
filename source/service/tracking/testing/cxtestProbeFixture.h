@@ -44,7 +44,7 @@ protected:
 	QString mDefaultProbeDataUid;
 	QString mProbeDataUid;
 	QString mDefaultRtSourceName;
-	cx::cxProbePtr mProbe;
+	cx::ProbeImplPtr mProbe;
 	double mDefaultTemporalCalibration;
 	double mTemporalCalibration;
 };

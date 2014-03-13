@@ -25,7 +25,7 @@
 //Disabled for now. Test will output a warning. Use the test below with the Mock XmlParser instead
 TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Create with default XML parser", "[unit][service][tracking][hide]")
 {
-	mProbe = cx::cxProbe::New(mProbeName, mScannerName);
+	mProbe = cx::ProbeImpl::New(mProbeName, mScannerName);
 
 	REQUIRE(mProbe);
 

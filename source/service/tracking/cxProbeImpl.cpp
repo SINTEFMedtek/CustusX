@@ -28,22 +28,22 @@
 namespace cx
 {
 
-cxProbePtr cxProbe::New(QString instrumentUid, QString scannerUid, ProbeXmlConfigParserPtr xml)
+ProbeImplPtr ProbeImpl::New(QString instrumentUid, QString scannerUid, ProbeXmlConfigParserPtr xml)
 {
-	cxProbe* object = new cxProbe(instrumentUid, scannerUid);
-	cxProbePtr retval(object);
+	ProbeImpl* object = new ProbeImpl(instrumentUid, scannerUid);
+	ProbeImplPtr retval(object);
 	object->mSelf = retval;
 	retval->initProbeXmlConfigParser(xml);
 	retval->initConfigId();
 	return retval;
 }
 
-bool cxProbe::isValid() const
+bool ProbeImpl::isValid() const
 {
 	return this->getProbeData("active").getType() != ProbeDefinition::tNONE;
 }
 
-QStringList cxProbe::getAvailableVideoSources()
+QStringList ProbeImpl::getAvailableVideoSources()
 {
 	QStringList retval;
 	for (std::map<QString, VideoSourcePtr>::iterator iter=mSource.begin(); iter!=mSource.end(); ++iter)
@@ -51,7 +51,7 @@ QStringList cxProbe::getAvailableVideoSources()
 	return retval;
 }
 
-VideoSourcePtr cxProbe::getRTSource(QString uid) const
+VideoSourcePtr ProbeImpl::getRTSource(QString uid) const
 {
 	if (mSource.empty())
 		return VideoSourcePtr();
@@ -62,7 +62,7 @@ VideoSourcePtr cxProbe::getRTSource(QString uid) const
 	return mSource.begin()->second;
 }
 
-ProbeDefinition cxProbe::getProbeData(QString uid) const
+ProbeDefinition ProbeImpl::getProbeData(QString uid) const
 {
 	ProbeDefinition retval;
 
@@ -80,20 +80,20 @@ ProbeDefinition cxProbe::getProbeData(QString uid) const
 	return retval;
 }
 
-ProbeSectorPtr cxProbe::getSector(QString uid)
+ProbeSectorPtr ProbeImpl::getSector(QString uid)
 {
 	ProbeSectorPtr retval(new ProbeSector());
 	retval->setData(this->getProbeData());
 	return retval;
 }
 
-void cxProbe::addXml(QDomNode& dataNode)
+void ProbeImpl::addXml(QDomNode& dataNode)
 {
 	QDomDocument doc = dataNode.ownerDocument();
 	dataNode.toElement().setAttribute("config", mConfigurationId);
 }
 
-void cxProbe::parseXml(QDomNode& dataNode)
+void ProbeImpl::parseXml(QDomNode& dataNode)
 {
 	if (dataNode.isNull())
 		return;
@@ -103,7 +103,7 @@ void cxProbe::parseXml(QDomNode& dataNode)
 	this->applyNewConfigurationWithId(cfg);
 }
 
-QStringList cxProbe::getConfigIdList() const
+QStringList ProbeImpl::getConfigIdList() const
 {
 	if (!this->hasRtSource())
 		return QStringList();
@@ -112,18 +112,18 @@ QStringList cxProbe::getConfigIdList() const
 	return configIdList;
 }
 
-QString cxProbe::getConfigName(QString configString) ///< get a name for the given configuration
+QString ProbeImpl::getConfigName(QString configString) ///< get a name for the given configuration
 {
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration(configString);
 	return config.mName;
 }
 
-QString cxProbe::getConfigId() const
+QString ProbeImpl::getConfigId() const
 {
 	return mConfigurationId;
 }
 
-QString cxProbe::getConfigurationPath() const
+QString ProbeImpl::getConfigurationPath() const
 {
 	if (!this->hasRtSource())
 		return "";
@@ -132,7 +132,7 @@ QString cxProbe::getConfigurationPath() const
 	return retval.join(":");
 }
 
-void cxProbe::applyNewConfigurationWithId(QString uid)
+void ProbeImpl::applyNewConfigurationWithId(QString uid)
 {
 	this->setConfigId(uid);
 	this->updateProbeSector();
@@ -142,7 +142,7 @@ void cxProbe::applyNewConfigurationWithId(QString uid)
 	emit activeConfigChanged();
 }
 
-void cxProbe::setTemporalCalibration(double val)
+void ProbeImpl::setTemporalCalibration(double val)
 {
 	mOverrideTemporalCalibration = true;
 	mTemporalCalibration = val;
@@ -150,7 +150,7 @@ void cxProbe::setTemporalCalibration(double val)
 		iter->second.setTemporalCalibration(mTemporalCalibration);
 }
 
-void cxProbe::setSoundSpeedCompensationFactor(double factor)
+void ProbeImpl::setSoundSpeedCompensationFactor(double factor)
 {
 	if(similar(mSoundSpeedCompensationFactor, factor))
 		return;
@@ -160,7 +160,7 @@ void cxProbe::setSoundSpeedCompensationFactor(double factor)
 	emit sectorChanged();
 }
 
-void cxProbe::setProbeSector(ProbeDefinition probeSector)
+void ProbeImpl::setProbeSector(ProbeDefinition probeSector)
 {
 	if (probeSector.getUid().isEmpty())
 		probeSector.setUid(mActiveUid);
@@ -169,7 +169,7 @@ void cxProbe::setProbeSector(ProbeDefinition probeSector)
 	emit sectorChanged();
 }
 
-void cxProbe::setRTSource(VideoSourcePtr source)
+void ProbeImpl::setRTSource(VideoSourcePtr source)
 {
 	SSC_ASSERT(source); // not handled after refactoring - add clear method??
 	if (!source)
@@ -192,7 +192,7 @@ void cxProbe::setRTSource(VideoSourcePtr source)
 	emit sectorChanged();
 }
 
-void cxProbe::removeRTSource(VideoSourcePtr source)
+void ProbeImpl::removeRTSource(VideoSourcePtr source)
 {
 	if (!source)
 		return;
@@ -204,7 +204,7 @@ void cxProbe::removeRTSource(VideoSourcePtr source)
 	emit sectorChanged();
 }
 
-void cxProbe::setActiveStream(QString uid)
+void ProbeImpl::setActiveStream(QString uid)
 {
 	if (uid.isEmpty())
 		return;
@@ -212,18 +212,18 @@ void cxProbe::setActiveStream(QString uid)
 	emit sectorChanged();
 }
 
-QString cxProbe::getActiveStream() const
+QString ProbeImpl::getActiveStream() const
 {
 	return mActiveUid;
 }
 
-ProbeXmlConfigParser::Configuration cxProbe::getConfiguration() const
+ProbeXmlConfigParser::Configuration ProbeImpl::getConfiguration() const
 {
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration(this->getConfigId());
 	return config;
 }
 
-void cxProbe::removeCurrentConfig()
+void ProbeImpl::removeCurrentConfig()
 {
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration();
 
@@ -239,7 +239,7 @@ void cxProbe::removeCurrentConfig()
 	emit sectorChanged();
 }
 
-void cxProbe::saveCurrentConfig(QString uid, QString name)
+void ProbeImpl::saveCurrentConfig(QString uid, QString name)
 {
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration();
 	config.mConfigId = uid;
@@ -250,19 +250,19 @@ void cxProbe::saveCurrentConfig(QString uid, QString name)
 	this->applyNewConfigurationWithId(uid);
 }
 
-void cxProbe::useDigitalVideo(bool digitalStatus)
+void ProbeImpl::useDigitalVideo(bool digitalStatus)
 {
 	mDigitalInterface = digitalStatus;
 	if (mDigitalInterface)
 		this->applyNewConfigurationWithId("Digital");
 }
 
-bool cxProbe::isUsingDigitalVideo() const
+bool ProbeImpl::isUsingDigitalVideo() const
 {
 	return mDigitalInterface;
 }
 
-QString cxProbe::getRtSourceName() const
+QString ProbeImpl::getRtSourceName() const
 {
 	QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
 	if (rtSourceList.empty())
@@ -273,7 +273,7 @@ QString cxProbe::getRtSourceName() const
 	return rtSource;
 }
 
-cxProbe::cxProbe(QString instrumentUid, QString scannerUid) :
+ProbeImpl::ProbeImpl(QString instrumentUid, QString scannerUid) :
 		mInstrumentUid(instrumentUid),
 		mScannerUid(scannerUid),
 		mSoundSpeedCompensationFactor(1.0),
@@ -286,7 +286,7 @@ cxProbe::cxProbe(QString instrumentUid, QString scannerUid) :
 	mActiveUid = probeData.getUid();
 }
 
-void cxProbe::initProbeXmlConfigParser(ProbeXmlConfigParserPtr xml = ProbeXmlConfigParserPtr())
+void ProbeImpl::initProbeXmlConfigParser(ProbeXmlConfigParserPtr xml = ProbeXmlConfigParserPtr())
 {
 	if (!xml)
 	{
@@ -296,7 +296,7 @@ void cxProbe::initProbeXmlConfigParser(ProbeXmlConfigParserPtr xml = ProbeXmlCon
 		mXml = xml;
 }
 
-void cxProbe::initConfigId()
+void ProbeImpl::initConfigId()
 {
 	QStringList configs = this->getConfigIdList();
 	if (!configs.isEmpty())
@@ -310,7 +310,7 @@ void cxProbe::initConfigId()
 	}
 }
 
-ProbeXmlConfigParser::Configuration cxProbe::getConfiguration(QString uid) const
+ProbeXmlConfigParser::Configuration ProbeImpl::getConfiguration(QString uid) const
 {
 	ProbeXmlConfigParser::Configuration config;
 	if(this->hasRtSource())
@@ -318,27 +318,27 @@ ProbeXmlConfigParser::Configuration cxProbe::getConfiguration(QString uid) const
 	return config;
 }
 
-QString cxProbe::getInstrumentId() const
+QString ProbeImpl::getInstrumentId() const
 {
 	return mInstrumentUid;
 }
 
-QString cxProbe::getInstrumentScannerId() const
+QString ProbeImpl::getInstrumentScannerId() const
 {
 	return mScannerUid;
 }
 
-bool cxProbe::hasRtSource() const
+bool ProbeImpl::hasRtSource() const
 {
 	return !(this->getRtSourceName().isEmpty());
 }
 
-void cxProbe::setConfigId(QString uid)
+void ProbeImpl::setConfigId(QString uid)
 {
 	mConfigurationId = uid;
 }
 
-void cxProbe::updateProbeSector()
+void ProbeImpl::updateProbeSector()
 {
 	if(this->isValidConfigId() && !this->isUsingDigitalVideo())
 	{
@@ -347,13 +347,13 @@ void cxProbe::updateProbeSector()
 	}
 }
 
-bool cxProbe::isValidConfigId()
+bool ProbeImpl::isValidConfigId()
 {
 	//May need to create ProbeXmlConfigParser::isValidConfig(...) also
 	return !this->getConfiguration(this->getConfigId()).isEmpty();
 }
 
-ProbeDefinition cxProbe::createProbeSector()
+ProbeDefinition ProbeImpl::createProbeSector()
 {
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration(this->getConfigId());
 	ProbeDefinition probeSector = createProbeDataFromConfiguration(config);
@@ -361,7 +361,7 @@ ProbeDefinition cxProbe::createProbeSector()
 	return probeSector;
 }
 
-void cxProbe::updateTemporalCalibration()
+void ProbeImpl::updateTemporalCalibration()
 {
 	if (mOverrideTemporalCalibration)
 		this->setTemporalCalibration(mTemporalCalibration);

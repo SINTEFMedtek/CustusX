@@ -203,7 +203,7 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
 	if (tool)
 	{
-		ProbePtr probe = boost::dynamic_pointer_cast<cxProbe>(tool->getProbe());
+		ProbePtr probe = boost::dynamic_pointer_cast<ProbeImpl>(tool->getProbe());
 		if (probe)
 			probe->setProbeSector(mCurrentData.mProbeData.mData);
 	}

@@ -211,7 +211,7 @@ void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 		mUnsusedProbeDataVector.push_back(msg);
 		return;
 	}
-	cxProbePtr probe = boost::dynamic_pointer_cast<cxProbe>(tool->getProbe());
+	ProbeImplPtr probe = boost::dynamic_pointer_cast<ProbeImpl>(tool->getProbe());
 
 	// start with getting a valid data object from the probe, in order to keep
 	// existing values (such as temporal calibration).

@@ -49,7 +49,7 @@ typedef boost::shared_ptr<class IgstkTool> IgstkToolPtr;
  * @{
  */
 
-typedef boost::shared_ptr<class cxProbe> cxProbePtr;
+typedef boost::shared_ptr<class ProbeImpl> ProbeImplPtr;
 
 /**
  * \brief Class representing the tools a navigation system can recognize.
@@ -58,7 +58,7 @@ typedef boost::shared_ptr<class cxProbe> cxProbePtr;
  * \date Nov 6, 2008
  * \author Janne Beate Bakeng, SINTEF
  */
-class cxTool: public ToolImpl
+class ToolUsingIGSTK: public ToolImpl
 {
 	Q_OBJECT
 
@@ -77,8 +77,8 @@ public:
 	 TOOL_AURORA_CHANNEL_NUMBER        ///< hardware responds to Aurora channel number
 	 */
 
-	cxTool(TrackingServicePtr manager, IgstkToolPtr igstkTool);
-	virtual ~cxTool();
+	ToolUsingIGSTK(TrackingServicePtr manager, IgstkToolPtr igstkTool);
+	virtual ~ToolUsingIGSTK();
 
 	virtual std::set<Type> getTypes() const;
 
@@ -132,7 +132,7 @@ private:
 	ProbePtr mProbe;
 	QTimer mTpsTimer;
 };
-typedef boost::shared_ptr<cxTool> cxToolPtr;
+typedef boost::shared_ptr<ToolUsingIGSTK> cxToolPtr;
 
 /**
  * @}
