@@ -37,7 +37,7 @@
 #include "sscProbeData.h"
 #include "sscToolManager.h"
 #include "sscDataManager.h"
-#include "cxProbe.h"
+#include "cxProbeImpl.h"
 #include "cxVideoService.h"
 #include "sscToolManager.h"
 #include "cxImageSenderFactory.h"

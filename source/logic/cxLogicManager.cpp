@@ -11,7 +11,7 @@
 #include "sscMessageManager.h"
 #include "cxPatientService.h"
 #include "cxVideoService.h"
-#include "cxToolManager.h"
+#include "cxToolManagerUsingIGSTK.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"
 #include "sscDataManagerImpl.h"

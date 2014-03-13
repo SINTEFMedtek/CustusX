@@ -18,7 +18,7 @@
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "sscEnumConverter.h"
-#include "cxTool.h"
+#include "cxToolUsingIGSTK.h"
 #include "cxIgstkTool.h"
 #include <time.h>
 #include "cxSettings.h"

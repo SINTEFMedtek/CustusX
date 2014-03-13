@@ -16,7 +16,7 @@
 #define CXTESTPROBEFIXTURE_H
 
 #include "sscTool.h"
-#include "cxProbe.h"
+#include "cxProbeImpl.h"
 
 namespace cxtest
 {

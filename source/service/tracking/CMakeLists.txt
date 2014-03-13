@@ -4,9 +4,9 @@
 
 
 SET( CX_QT_MOC_HEADER_FILES
-    cxToolManager.h
-    cxProbe.h
-    cxTool.h
+    cxToolManagerUsingIGSTK.h
+    cxProbeImpl.h
+    cxToolUsingIGSTK.h
     cxIgstkTracker.h
     cxManualToolAdapter.h
     cxIgstkTool.h
@@ -18,12 +18,12 @@ SET( CX_QT_MOC_HEADER_FILES
 
 SET ( cxTrackingService_SOURCE
     ${CX_QT_MOC_HEADER_FILES}
-    cxToolManager.h
-    cxToolManager.cpp
-    cxProbe.h
-    cxProbe.cpp
-    cxTool.h
-    cxTool.cpp
+    cxToolManagerUsingIGSTK.h
+    cxToolManagerUsingIGSTK.cpp
+    cxProbeImpl.h
+    cxProbeImpl.cpp
+    cxToolUsingIGSTK.h
+    cxToolUsingIGSTK.cpp
     cxManualToolAdapter.h
     cxManualToolAdapter.cpp
     cxIgstkTracker.h

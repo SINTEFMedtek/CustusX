@@ -16,7 +16,7 @@
 #define CXIGSTKTOOL_H_
 
 #include <QObject>
-#include "cxTool.h"
+#include "cxToolUsingIGSTK.h"
 
 #include <limits.h>
 #include <boost/shared_ptr.hpp>

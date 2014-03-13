@@ -12,8 +12,8 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXTOOLMANAGER_H_
-#define CXTOOLMANAGER_H_
+#ifndef CXTOOLMANAGERUSINGIGSTK_H_
+#define CXTOOLMANAGERUSINGIGSTK_H_
 
 #include "sscToolManager.h"
 #include "vtkForwardDeclarations.h"
@@ -190,4 +190,4 @@ bool toolTypeSort(const ToolPtr tool1, const ToolPtr tool2); ///< function for s
  * @}
  */
 } //namespace cx
-#endif /* CXTOOLMANAGER_H_ */
+#endif /* CXTOOLMANAGERUSINGIGSTK_H_ */

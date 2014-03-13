@@ -14,7 +14,7 @@
 
 #define _USE_MATH_DEFINES
 
-#include "cxToolManager.h"
+#include "cxToolManagerUsingIGSTK.h"
 
 #include <QTimer>
 #include <QDir>
@@ -31,7 +31,7 @@
 #include "sscTime.h"
 #include "sscEnumConverter.h"
 #include "sscDummyTool.h"
-#include "cxTool.h"
+#include "cxToolUsingIGSTK.h"
 #include "cxIgstkTracker.h"
 #include "cxToolConfigurationParser.h"
 #include "cxManualToolAdapter.h"

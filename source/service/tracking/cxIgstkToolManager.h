@@ -21,7 +21,7 @@
 #include <QTimer>
 #include <QMutex>
 #include "cxIgstkTracker.h"
-#include "cxTool.h"
+#include "cxToolUsingIGSTK.h"
 #include "cxIgstkTool.h"
 
 namespace cx

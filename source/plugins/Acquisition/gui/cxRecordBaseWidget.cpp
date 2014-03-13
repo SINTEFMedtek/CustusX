@@ -14,7 +14,7 @@
 #include "sscTransform3D.h"
 #include "cxRecordSessionWidget.h"
 #include "cxVideoConnectionManager.h"
-#include "cxProbe.h"
+#include "cxProbeImpl.h"
 #include "cxSoundSpeedConversionWidget.h"
 
 namespace cx

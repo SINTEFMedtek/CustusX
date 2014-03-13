@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxProbe.h"
+#include "cxProbeImpl.h"
 
 #include <QStringList>
 #include "sscVideoSource.h"
