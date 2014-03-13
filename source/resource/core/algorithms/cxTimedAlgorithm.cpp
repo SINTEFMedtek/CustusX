@@ -15,12 +15,12 @@
 #include "cxTimedAlgorithm.h"
 
 //#include "itkImageFileReader.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 //#include "vtkMetaImageWriter.h"
 #include "cxSettings.h"
-#include "sscUtilHelpers.h"
-#include "sscMessageManager.h"
-//#include "sscImage.h"
+#include "cxUtilHelpers.h"
+#include "cxMessageManager.h"
+//#include "cxImage.h"
 
 namespace cx
 {

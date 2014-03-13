@@ -15,7 +15,7 @@
 #include "cxTimedAlgorithmProgressBar.h"
 #include <QtGui>
 #include "cxTimedAlgorithm.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxDisplayTimerWidget.h"
 
 namespace cx

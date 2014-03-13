@@ -1,7 +1,7 @@
 #include <cxActiveToolWidget.h>
 
 #include <QVBoxLayout>
-#include "sscLabeledComboBoxWidget.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxToolDataAdapters.h"
 
 namespace cx

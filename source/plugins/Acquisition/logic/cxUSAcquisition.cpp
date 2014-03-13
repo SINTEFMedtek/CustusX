@@ -14,18 +14,18 @@
 
 #include "cxUSAcquisition.h"
 
-#include "sscReconstructManager.h"
-#include "sscReconstructParams.h"
-#include "sscBoolDataAdapterXml.h"
+#include "cxReconstructManager.h"
+#include "cxReconstructParams.h"
+#include "cxBoolDataAdapterXml.h"
 
 #include "cxPatientData.h"
 #include "cxSettings.h"
 #include "cxPatientService.h"
 #include "cxVideoService.h"
 #include "cxVideoConnectionManager.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxUSSavingRecorder.h"
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 #include "cxAcquisitionData.h"
 
 namespace cx

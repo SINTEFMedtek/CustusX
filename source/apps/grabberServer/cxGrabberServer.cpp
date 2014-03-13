@@ -1,7 +1,7 @@
 #include "cxGrabberServer.h"
 
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

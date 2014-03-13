@@ -9,12 +9,12 @@
 #include <QColor>
 #include <QBrush>
 #include <QMouseEvent>
-#include "sscDataManager.h"
-#include "sscImageTF3D.h"
-#include "sscImageTFData.h"
-#include "sscMessageManager.h"
-#include "sscUtilHelpers.h"
-#include "sscTypeConversions.h"
+#include "cxDataManager.h"
+#include "cxImageTF3D.h"
+#include "cxImageTFData.h"
+#include "cxMessageManager.h"
+#include "cxUtilHelpers.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

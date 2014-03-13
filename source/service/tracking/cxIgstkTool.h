@@ -25,7 +25,7 @@
 #include <igstkTransform.h>
 #include <igstkLogger.h>
 #include <itkStdStreamLogOutput.h>
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 #include "cxIgstkTracker.h"
 #include "vtkForwardDeclarations.h"
 

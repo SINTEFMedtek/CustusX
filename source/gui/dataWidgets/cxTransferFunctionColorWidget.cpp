@@ -10,14 +10,14 @@
 #include <QColorDialog>
 #include <QMenu>
 #include <QTimer>
-#include "sscDataManager.h"
-#include "sscImageTF3D.h"
-#include "sscImageTFData.h"
-#include "sscUtilHelpers.h"
-#include "sscImageLUT2D.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
-#include "sscLogger.h"
+#include "cxDataManager.h"
+#include "cxImageTF3D.h"
+#include "cxImageTFData.h"
+#include "cxUtilHelpers.h"
+#include "cxImageLUT2D.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxLogger.h"
 
 namespace cx
 {

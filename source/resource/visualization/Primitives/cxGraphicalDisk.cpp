@@ -20,7 +20,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkSectorSource.h>
-#include "sscVtkHelperClasses.h"
+#include "cxVtkHelperClasses.h"
 #include "vtkMatrix4x4.h"
 #include "vtkLinearExtrusionFilter.h"
 #include "vtkPolyDataNormals.h"

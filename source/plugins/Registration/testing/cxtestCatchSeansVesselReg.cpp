@@ -4,13 +4,13 @@
 #include <vtkPolyData.h>
 #include <vtkPolyDataWriter.h>
 #include <vtkCellArray.h>
-#include "sscDataManager.h"
-#include "sscMesh.h"
-#include "sscVector3D.h"
+#include "cxDataManager.h"
+#include "cxMesh.h"
+#include "cxVector3D.h"
 #include "cxDataLocations.h"
 #include "vesselReg/SeansVesselReg.hxx"
-#include "sscRegistrationTransform.h"
-#include "sscTypeConversions.h"
+#include "cxRegistrationTransform.h"
+#include "cxTypeConversions.h"
 #include <QFileInfo>
 #include <QDir>
 

@@ -13,8 +13,8 @@
 // See CustusX_License.txt for more information.
 
 #include "cxFrameMetricBase.h"
-#include "sscBoundingBox3D.h"
-#include "sscTypeConversions.h"
+#include "cxBoundingBox3D.h"
+#include "cxTypeConversions.h"
 #include "cxSpaceProvider.h"
 #include "cxSpaceListener.h"
 

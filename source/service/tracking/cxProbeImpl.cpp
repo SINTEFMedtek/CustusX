@@ -15,13 +15,13 @@
 #include "cxProbeImpl.h"
 
 #include <QStringList>
-#include "sscVideoSource.h"
-#include "sscMessageManager.h"
-#include "sscProbeSector.h"
-#include "sscProbeAdapterRTSource.h"
-#include "sscTypeConversions.h"
-#include "sscVector3D.h"
-#include "sscLogger.h"
+#include "cxVideoSource.h"
+#include "cxMessageManager.h"
+#include "cxProbeSector.h"
+#include "cxProbeAdapterRTSource.h"
+#include "cxTypeConversions.h"
+#include "cxVector3D.h"
+#include "cxLogger.h"
 #include "cxDataLocations.h"
 #include "cxCreateProbeDataFromConfiguration.h"
 

@@ -4,8 +4,8 @@
 #include "cxPatientData.h"
 #include "cxDataLocations.h"
 #include "cxSelectDataStringDataAdapter.h"
-#include "sscData.h"
-#include "sscImage.h"
+#include "cxData.h"
+#include "cxImage.h"
 
 TEST_CASE("DilationFilter: execute", "[plugins][Algorithm][DilationFilter]")
 {

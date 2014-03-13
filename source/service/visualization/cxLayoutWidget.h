@@ -15,7 +15,7 @@
 #ifndef CXLAYOUTWIDGET_H
 #define CXLAYOUTWIDGET_H
 
-#include "sscView.h"
+#include "cxView.h"
 #include "cxLayoutData.h"
 #include "cxViewCache.h"
 

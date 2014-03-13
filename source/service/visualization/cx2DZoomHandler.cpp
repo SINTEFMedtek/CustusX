@@ -15,8 +15,8 @@
 #include "cx2DZoomHandler.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
-#include "sscMessageManager.h"
-#include "sscUtilHelpers.h"
+#include "cxMessageManager.h"
+#include "cxUtilHelpers.h"
 
 namespace cx
 {

@@ -24,13 +24,13 @@
 #include <vtkDoubleArray.h>
 #include <QCoreApplication>
 
-#include "sscRegistrationTransform.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
-#include "sscPositionStorageFile.h"
-#include "sscTime.h"
-#include "sscEnumConverter.h"
-#include "sscDummyTool.h"
+#include "cxRegistrationTransform.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxPositionStorageFile.h"
+#include "cxTime.h"
+#include "cxEnumConverter.h"
+#include "cxDummyTool.h"
 #include "cxToolUsingIGSTK.h"
 #include "cxIgstkTracker.h"
 #include "cxToolConfigurationParser.h"
@@ -39,7 +39,7 @@
 #include "cxDataLocations.h"
 #include "cxIgstkTrackerThread.h"
 #include "cxPlaybackTool.h"
-#include "sscLogger.h"
+#include "cxLogger.h"
 #include "cxPlaybackTime.h"
 #include "cxTrackingPositionFilter.h"
 

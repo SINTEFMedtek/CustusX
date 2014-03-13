@@ -21,10 +21,10 @@
 #include <QDateTime>
 #include "vtkSmartPointer.h"
 #include "vtkForwardDeclarations.h"
-#include "sscImage.h"
-#include "sscRegistrationTransform.h"
+#include "cxImage.h"
+#include "cxRegistrationTransform.h"
 #include "cxAcquisitionData.h"
-#include "sscLandmark.h"
+#include "cxLandmark.h"
 
 namespace cx
 {

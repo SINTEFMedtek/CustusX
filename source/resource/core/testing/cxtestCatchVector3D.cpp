@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "sscVector3D.h"
+#include "cxVector3D.h"
 #include "catch.hpp"
 
 using namespace cx;

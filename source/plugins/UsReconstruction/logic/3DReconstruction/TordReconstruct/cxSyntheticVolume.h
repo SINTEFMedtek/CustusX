@@ -1,9 +1,9 @@
 #ifndef SYNTHETIC_VOLUME_HPP
 #define SYNTHETIC_VOLUME_HPP
 
-#include "sscUSFrameData.h"
+#include "cxUSFrameData.h"
 #include <vector>
-#include "sscMathBase.h"
+#include "cxMathBase.h"
 #include <cstdlib>
 #include <time.h>
 

@@ -22,8 +22,8 @@
 #include "igtlClientSocket.h"
 #include "igtlStatusMessage.h"
 
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxMessageManager.h"
 #include "cxIGTLinkConversion.h"
 #include "cxCyclicActionLogger.h"
 

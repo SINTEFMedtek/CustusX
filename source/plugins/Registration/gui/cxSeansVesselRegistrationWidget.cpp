@@ -3,22 +3,22 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QSpinBox>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxMessageManager.h"
 #include "cxRegistrationManager.h"
 #include "cxTimedAlgorithm.h"
 #include "cxPatientData.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxDataInterface.h"
 #include "cxPatientService.h"
 #include "cxRegistrationDataAdapters.h"
 #include "vesselReg/SeansVesselReg.hxx"
-#include "sscMesh.h"
+#include "cxMesh.h"
 #include "cxViewManager.h"
-#include "sscView.h"
-#include "sscGeometricRep.h"
+#include "cxView.h"
+#include "cxGeometricRep.h"
 #include <vtkCellArray.h>
-#include "sscGraphicalPrimitives.h"
+#include "cxGraphicalPrimitives.h"
 
 namespace cx
 {

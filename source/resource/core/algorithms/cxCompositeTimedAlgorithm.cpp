@@ -15,8 +15,8 @@
 #include "cxCompositeTimedAlgorithm.h"
 
 #include <QStringList>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxMessageManager.h"
 
 namespace cx
 {

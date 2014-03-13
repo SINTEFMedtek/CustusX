@@ -17,9 +17,9 @@
 #include <vector>
 #include <map>
 #include <boost/array.hpp>
-#include "sscForwardDeclarations.h"
-#include "sscVideoSource.h"
-#include "sscProbeData.h"
+#include "cxForwardDeclarations.h"
+#include "cxVideoSource.h"
+#include "cxProbeData.h"
 
 class QTimer;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;

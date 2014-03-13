@@ -9,13 +9,13 @@
 
 #include <QDir>
 
-#include "sscDataManager.h"
-#include "sscToolManager.h"
+#include "cxDataManager.h"
+#include "cxToolManager.h"
 #include "cxVideoService.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxPlaybackUSAcquisitionVideo.h"
 #include "cxViewManager.h"
 #include "cxLegacySingletons.h"

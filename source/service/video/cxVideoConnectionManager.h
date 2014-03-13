@@ -19,7 +19,7 @@
 #include <QObject>
 #include <QProcess>
 #include "cxForwardDeclarations.h"
-#include "sscXmlOptionItem.h"
+#include "cxXmlOptionItem.h"
 
 namespace cx
 {

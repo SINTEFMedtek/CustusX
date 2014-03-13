@@ -15,10 +15,10 @@
 #define CXDATAINTERFACE_H_
 
 
-#include "sscDoubleDataAdapter.h"
-#include "sscStringDataAdapter.h"
+#include "cxDoubleDataAdapter.h"
+#include "cxStringDataAdapter.h"
 #include "cxForwardDeclarations.h"
-#include "sscCoordinateSystemHelpers.h"
+#include "cxCoordinateSystemHelpers.h"
 
 #include "cxLegacySingletons.h"
 

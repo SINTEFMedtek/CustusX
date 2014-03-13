@@ -1,6 +1,6 @@
 #include "cxImageSenderFactory.h"
 
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxImageStreamerOpenCV.h"
 #include "cxMHDImageStreamer.h"
 #include "cxImageStreamerSonix.h"

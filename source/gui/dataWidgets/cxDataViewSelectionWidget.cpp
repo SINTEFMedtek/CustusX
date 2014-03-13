@@ -7,8 +7,8 @@
 
 #include <cxDataViewSelectionWidget.h>
 #include "cxToolListWidget.h"
-#include "sscDataManager.h"
-#include "sscData.h"
+#include "cxDataManager.h"
+#include "cxData.h"
 #include <QListWidgetItem>
 #include <QDir>
 #include <QHBoxLayout>
@@ -17,12 +17,12 @@
 #include <QAction>
 #include <QLabel>
 #include <QMenu>
-#include "sscEnumConverter.h"
-#include "sscMessageManager.h"
+#include "cxEnumConverter.h"
+#include "cxMessageManager.h"
 #include "cxDataLocations.h"
 #include "cxToolConfigurationParser.h"
-#include "sscImageAlgorithms.h"
-#include "sscImage.h"
+#include "cxImageAlgorithms.h"
+#include "cxImage.h"
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"

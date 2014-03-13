@@ -14,15 +14,15 @@
 
 #include "cxDirectlyLinkedImageReceiverThread.h"
 
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscVector3D.h"
+#include "cxTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxVector3D.h"
 #include "cxImageSenderFactory.h"
 #include "cxCyclicActionLogger.h"
 #include "cxDirectlyLinkedSender.h"
 #include "cxSimulatedImageStreamer.h"
-#include "sscToolManager.h"
-#include "sscDataManager.h"
+#include "cxToolManager.h"
+#include "cxDataManager.h"
 #include "cxVideoServiceBackend.h"
 
 namespace cx

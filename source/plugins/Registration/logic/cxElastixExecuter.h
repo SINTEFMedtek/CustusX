@@ -17,13 +17,13 @@
 #define CXELASTIXEXECUTER_H_
 
 #include <QString>
-#include "sscForwardDeclarations.h"
-#include "sscTransform3D.h"
+#include "cxForwardDeclarations.h"
+#include "cxTransform3D.h"
 #include <QObject>
 #include <QProcess>
 #include <QFile>
 #include "cxTimedAlgorithm.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxLegacySingletons.h"
 
 

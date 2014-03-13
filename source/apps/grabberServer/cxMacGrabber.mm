@@ -4,7 +4,7 @@
 
 #include "cxMacGrabber.h"
 
-#include "sscTime.h"
+#include "cxTime.h"
 //#include "sscTypeConversions.h"
 #include <iostream>
 #include <QWidget>
@@ -12,7 +12,7 @@
 #include <QApplication>
 
 #include "igtlImageMessage.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 
 // utility for reporting errors
 void reportError(NSError* error)

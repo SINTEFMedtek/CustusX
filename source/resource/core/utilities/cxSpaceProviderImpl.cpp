@@ -13,12 +13,12 @@
 // See CustusX_License.txt for more information.
 #include "cxSpaceProviderImpl.h"
 
-#include "sscDataManager.h"
-#include "sscToolManager.h"
-#include "sscData.h"
-#include "sscImage.h"
+#include "cxDataManager.h"
+#include "cxToolManager.h"
+#include "cxData.h"
+#include "cxImage.h"
 #include "vtkImageData.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxSpaceListenerImpl.h"
 
 namespace cx

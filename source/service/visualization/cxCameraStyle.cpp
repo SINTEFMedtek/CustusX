@@ -15,8 +15,8 @@
 #include "cxCameraStyle.h"
 
 #include <QAction>
-#include "sscMessageManager.h"
-#include "sscView.h"
+#include "cxMessageManager.h"
+#include "cxView.h"
 #include "cxViewGroup.h"
 
 namespace cx

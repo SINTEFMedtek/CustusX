@@ -16,8 +16,8 @@
 #include "cxPatientData.h"
 #include "cxFileHelpers.h"
 #include "cxDataLocations.h"
-#include "sscTypeConversions.h"
-#include "sscDataManagerImpl.h"
+#include "cxTypeConversions.h"
+#include "cxDataManagerImpl.h"
 
 namespace cx
 {

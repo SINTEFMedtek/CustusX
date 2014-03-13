@@ -14,7 +14,7 @@
 #ifndef CXMESSAGELISTENER_H
 #define CXMESSAGELISTENER_H
 
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include <vector>
 #include <QPointer>
 

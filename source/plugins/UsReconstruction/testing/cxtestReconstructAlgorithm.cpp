@@ -15,18 +15,18 @@
 #include <vtkImageData.h>
 #include <QDomElement>
 
-#include "sscReconstructAlgorithm.h"
+#include "cxReconstructAlgorithm.h"
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #include "catch.hpp"
-#include "sscPNNReconstructAlgorithm.h"
+#include "cxPNNReconstructAlgorithm.h"
 #include "QFileInfo"
-#include "sscDummyTool.h"
+#include "cxDummyTool.h"
 
 #ifdef CX_USE_OPENCL_UTILITY
 #include "TordReconstruct/TordTest.h"
 #endif
 
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxtestReconstructAlgorithmFixture.h"
 #include "cxtestUtilities.h"
 

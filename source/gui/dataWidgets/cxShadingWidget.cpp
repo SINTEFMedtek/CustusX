@@ -23,8 +23,8 @@
 #include <QVBoxLayout>
 #include <QComboBox>
 #include <QStringList>
-#include "sscDataManager.h"
-#include "sscImageTF3D.h"
+#include "cxDataManager.h"
+#include "cxImageTF3D.h"
 
 //#include "sscAbstractInterface.h"
 #include "cxShadingParamsInterfaces.h"

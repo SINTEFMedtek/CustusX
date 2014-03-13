@@ -15,7 +15,7 @@
 #include <iostream>
 #include <QFile>
 #include <QDomDocument>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 namespace cx {
 

@@ -23,8 +23,8 @@
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
 #include "vtkMetaImageWriter.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>

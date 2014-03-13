@@ -14,13 +14,13 @@
 
 
 #include "cxImageEnveloper.h"
-#include "sscImage.h"
-#include "sscVolumeHelpers.h"
+#include "cxImage.h"
+#include "cxVolumeHelpers.h"
 #include "vtkImageData.h"
-#include "sscRegistrationTransform.h"
-#include "sscTypeConversions.h"
-#include "sscBoundingBox3D.h"
-#include "sscImageTF3D.h"
+#include "cxRegistrationTransform.h"
+#include "cxTypeConversions.h"
+#include "cxBoundingBox3D.h"
+#include "cxImageTF3D.h"
 
 
 namespace cx

@@ -20,7 +20,7 @@
 #include <vector>
 #include <QString>
 #include <QDomDocument>
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxToolUsingIGSTK.h"
 #include "cxIgstkTracker.h"
 #include "cxIgstkTool.h"

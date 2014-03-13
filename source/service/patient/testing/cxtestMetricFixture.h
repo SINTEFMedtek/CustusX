@@ -17,9 +17,9 @@
 
 #include "cxFrameMetric.h"
 #include "cxToolMetric.h"
-#include "sscDistanceMetric.h"
-#include "sscPointMetric.h"
-#include "sscPlaneMetric.h"
+#include "cxDistanceMetric.h"
+#include "cxPointMetric.h"
+#include "cxPlaneMetric.h"
 //#include "cxToolMetric.h"
 #include <QDomNode>
 #include "cxtestDummyDataManager.h"

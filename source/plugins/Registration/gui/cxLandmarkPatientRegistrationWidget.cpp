@@ -10,17 +10,17 @@
 #include <QGridLayout>
 #include <QSpinBox>
 #include <vtkDoubleArray.h>
-#include <sscVector3D.h>
+#include "cxVector3D.h"
 #include "cxViewManager.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
 #include "cxRegistrationManager.h"
-#include "sscToolManager.h"
-#include "sscDataManager.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxToolManager.h"
+#include "cxDataManager.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxRepManager.h"
 #include "cxLandmarkRep.h"
-#include "sscView.h"
+#include "cxView.h"
 
 namespace cx
 {

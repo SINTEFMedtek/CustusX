@@ -1,13 +1,13 @@
 #include "cxConnectedThresholdImageFilter.h"
 
 #include "itkConnectedThresholdImageFilter.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
 #include "cxAlgorithmHelpers.h"
 
-#include "sscDataManager.h"
-#include "sscRegistrationTransform.h"
-#include "sscImage.h"
+#include "cxDataManager.h"
+#include "cxRegistrationTransform.h"
+#include "cxImage.h"
 
 
 namespace cx

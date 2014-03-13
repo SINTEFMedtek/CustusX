@@ -16,10 +16,10 @@
 #include "cxtestProbeFixture.h"
 
 #include <QString>
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "ProbeXmlConfigParserMock.h"
-#include "sscProbeData.h"
-#include "sscTestVideoSource.h"
+#include "cxProbeData.h"
+#include "cxTestVideoSource.h"
 
 
 //Disabled for now. Test will output a warning. Use the test below with the Mock XmlParser instead

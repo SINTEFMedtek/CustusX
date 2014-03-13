@@ -25,13 +25,13 @@
 #include "vtkImageAppend.h"
 #include "vtkMetaImageWriter.h"
 
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxMessageManager.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
-#include "sscXmlOptionItem.h"
+#include "cxXmlOptionItem.h"
 #include "cxImageDataContainer.h"
-#include "sscVideoSource.h"
+#include "cxVideoSource.h"
 
 namespace cx
 {

@@ -24,11 +24,11 @@
 #include <vector>
 #include <QPointer>
 #include <QObject>
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
-#include "sscVector3D.h"
-#include "sscCoordinateSystemHelpers.h"
+#include "cxVector3D.h"
+#include "cxCoordinateSystemHelpers.h"
 
 class QAction;
 typedef vtkSmartPointer<class vtkAnnotatedCubeActor> vtkAnnotatedCubeActorPtr;

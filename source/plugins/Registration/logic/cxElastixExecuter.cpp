@@ -18,16 +18,16 @@
 #include <QProcess>
 #include <QFile>
 #include <QDir>
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
-#include "sscTypeConversions.h"
-#include "sscTime.h"
-#include "sscData.h"
-#include "sscBoundingBox3D.h"
+#include "cxTypeConversions.h"
+#include "cxTime.h"
+#include "cxData.h"
+#include "cxBoundingBox3D.h"
 #include "cxTransformFile.h"
-#include "sscCustomMetaImage.h"
-#include "sscLogger.h"
+#include "cxCustomMetaImage.h"
+#include "cxLogger.h"
 
 namespace cx
 {

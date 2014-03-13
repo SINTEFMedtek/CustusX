@@ -7,11 +7,11 @@
 
 #include <QFileInfo>
 
-#include "sscImage.h"
-#include "sscTypeConversions.h"
-#include "sscRegistrationTransform.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
+#include "cxImage.h"
+#include "cxTypeConversions.h"
+#include "cxRegistrationTransform.h"
+#include "cxMessageManager.h"
+#include "cxDataManager.h"
 #include <boost/math/special_functions/fpclassify.hpp>
 
 //#include "cxStateMachineManager.h"
@@ -33,7 +33,7 @@
 #include "vtkPointData.h"
 #include "vtkLandmarkTransform.h"
 #include "vtkFloatArray.h"
-#include "sscMesh.h"
+#include "cxMesh.h"
 
 namespace cx
 {

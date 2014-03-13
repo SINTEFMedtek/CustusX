@@ -6,10 +6,10 @@
 #include <QLabel>
 #include <QDir>
 #include <QLineEdit>
-#include "sscEnumConverter.h"
-#include "sscMessageManager.h"
+#include "cxEnumConverter.h"
+#include "cxMessageManager.h"
 #include "cxStateService.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxSelectionGroupBox.h"
 #include "cxToolListWidget.h"
 #include "cxDataLocations.h"

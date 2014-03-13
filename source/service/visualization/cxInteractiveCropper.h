@@ -25,8 +25,8 @@
 #include <QObject>
 #include <QPointer>
 #include <vtkSmartPointer.h>
-#include "sscBoundingBox3D.h"
-#include "sscForwardDeclarations.h"
+#include "cxBoundingBox3D.h"
+#include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
 
 

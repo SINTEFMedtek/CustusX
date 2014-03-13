@@ -17,18 +17,18 @@
 #include <QtConcurrentRun>
 #include "boost/bind.hpp"
 
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscTime.h"
-#include "sscTool.h"
-#include "sscVideoSource.h"
+#include "cxTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxTime.h"
+#include "cxTool.h"
+#include "cxVideoSource.h"
 
 #include "cxDataLocations.h"
 #include "cxSavingVideoRecorder.h"
 #include "cxImageDataContainer.h"
 #include "cxRecordSession.h"
 #include "cxUsReconstructionFileMaker.h"
-#include "sscLogger.h"
+#include "cxLogger.h"
 
 namespace cx
 {

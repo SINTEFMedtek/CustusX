@@ -15,17 +15,17 @@
 #include "cxtestUSSavingRecorderFixture.h"
 #include <QTimer>
 
-#include "sscLogger.h"
-#include "sscTypeConversions.h"
-#include "sscTestVideoSource.h"
+#include "cxLogger.h"
+#include "cxTypeConversions.h"
+#include "cxTestVideoSource.h"
 #include "cxUsReconstructionFileReader.h"
-#include "sscUSFrameData.h"
+#include "cxUSFrameData.h"
 #include "cxDataLocations.h"
-#include "sscTool.h"
-#include "sscTime.h"
+#include "cxTool.h"
+#include "cxTime.h"
 #include "catch.hpp"
 #include "cxFileHelpers.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 
 #ifdef CX_WINDOWS
 #include <windows.h>

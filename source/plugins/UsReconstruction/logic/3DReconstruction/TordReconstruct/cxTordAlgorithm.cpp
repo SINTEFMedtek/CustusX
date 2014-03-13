@@ -1,7 +1,7 @@
 #include "cxTordAlgorithm.h"
 
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
 #include "HelperFunctions.hpp"
 #include <vtkImageData.h>
 #include <recConfig.h>

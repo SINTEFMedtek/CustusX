@@ -16,7 +16,7 @@
 
 #include <QComboBox>
 #include <QInputDialog>
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 
 namespace cx {
 

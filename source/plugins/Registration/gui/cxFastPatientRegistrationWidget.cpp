@@ -1,6 +1,6 @@
 #include "cxFastPatientRegistrationWidget.h"
 
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxRegistrationManager.h"
 
 namespace cx

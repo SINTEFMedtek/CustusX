@@ -18,12 +18,12 @@
 
 #include "catch.hpp"
 
-#include "sscVolumeHelpers.h"
-#include "sscVolumetricRep.h"
+#include "cxVolumeHelpers.h"
+#include "cxVolumetricRep.h"
 #include "cxtestUtilities.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "cxtestDirectSignalListener.h"
-#include "sscImage2DRep3D.h"
+#include "cxImage2DRep3D.h"
 #include "cxConfig.h"
 
 #include "cxMultiVolume3DRepProducer.h"

@@ -1,6 +1,6 @@
 #include "cxtestProcessWrapperFixture.h"
 
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 
 namespace cxtest {
 

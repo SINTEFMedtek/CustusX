@@ -3,14 +3,14 @@
 //#import <Foundation/NSAutoreleasePool.h>
 //#import <QTKit/QTKit.h>
 
-//#include "sscTime.h"
-//#include "sscTypeConversions.h"
+//#include "cxTime.h"
+//#include "cxTypeConversions.h"
 //#include <iostream>
 //#include <QWidget>
 //#include <QMacCocoaViewContainer>
 
 #include "cxWinGrabber.h"
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 
 #include "vtkSonixVideoSource.h"
 

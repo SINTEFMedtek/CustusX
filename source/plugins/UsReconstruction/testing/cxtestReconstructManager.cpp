@@ -12,18 +12,18 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "sscReconstructParams.h"
-#include "sscBoolDataAdapterXml.h"
+#include "cxReconstructParams.h"
+#include "cxBoolDataAdapterXml.h"
 #include "catch.hpp"
 #include "cxtestReconstructManagerFixture.h"
 #include "cxtestReconstructRealData.h"
 #include "cxtestSyntheticReconstructInput.h"
 
-#include "sscDummyTool.h"
-#include "sscPNNReconstructAlgorithm.h"
-#include "sscReconstructPreprocessor.h"
+#include "cxDummyTool.h"
+#include "cxPNNReconstructAlgorithm.h"
+#include "cxReconstructPreprocessor.h"
 #include <vtkImageData.h>
-#include "sscStringDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
 #include "recConfig.h"
 
 #ifdef CX_USE_OPENCL_UTILITY

@@ -3,7 +3,7 @@
 
 #include <QGroupBox>
 
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 #include "cxToolConfigurationParser.h"
 #include "cxLegacySingletons.h"
 

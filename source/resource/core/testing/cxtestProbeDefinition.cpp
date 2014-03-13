@@ -1,9 +1,9 @@
 #include "catch.hpp"
 #include <QSize>
 #include <boost/shared_ptr.hpp>
-#include "sscProbeData.h"
-#include "sscVector3D.h"
-#include "sscBoundingBox3D.h"
+#include "cxProbeData.h"
+#include "cxVector3D.h"
+#include "cxBoundingBox3D.h"
 
 namespace cxtest
 {

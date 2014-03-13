@@ -15,7 +15,7 @@
 #include "cxFrameMetricWrapper.h"
 
 #include <QHBoxLayout>
-#include "sscLabeledComboBoxWidget.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 

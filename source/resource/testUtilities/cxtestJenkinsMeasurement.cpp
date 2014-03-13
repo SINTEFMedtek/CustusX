@@ -15,7 +15,7 @@
 #include "cxtestJenkinsMeasurement.h"
 
 #include <iostream>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 namespace cxtest
 {

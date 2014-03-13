@@ -13,9 +13,9 @@
 #include <vtkMatrix4x4.h>
 #include <vtkLinearTransform.h>
 #include <vtkLandmarkTransform.h>
-#include "sscTransform3D.h"
-#include "sscVector3D.h"
-#include "sscMessageManager.h"
+#include "cxTransform3D.h"
+#include "cxVector3D.h"
+#include "cxMessageManager.h"
 
 namespace cx
 {

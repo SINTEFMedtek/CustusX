@@ -18,8 +18,8 @@
 #include <QDateTime>
 #include <QStringList>
 #include <QTextStream>
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
 #include "cxSettings.h"
 #include "cxTransformFile.h"
 

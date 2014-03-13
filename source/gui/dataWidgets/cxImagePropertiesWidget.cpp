@@ -16,8 +16,8 @@
 
 #include <QComboBox>
 #include <QVBoxLayout>
-#include "sscDataManager.h"
-#include <sscImage.h>
+#include "cxDataManager.h"
+#include "cxImage.h"
 #include "cxLegacySingletons.h"
 
 namespace cx

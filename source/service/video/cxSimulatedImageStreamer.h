@@ -2,7 +2,7 @@
 #define CXSIMULATEDIMAGESTREAMER_H_
 
 #include "vtkSmartPointer.h"
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 #include "cxImageStreamer.h"
 
 typedef vtkSmartPointer<class vtkImageMask> vtkImageMaskPtr;

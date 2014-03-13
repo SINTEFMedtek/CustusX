@@ -3,7 +3,7 @@
 
 #include <QComboBox>
 #include "cxPreferenceTab.h"
-#include "sscBoolDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
 #include "cxLegacySingletons.h"
 
 namespace cx

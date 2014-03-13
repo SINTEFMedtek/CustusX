@@ -16,12 +16,12 @@
 
 #include <itkBinaryThinningImageFilter3D.h>
 
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscRegistrationTransform.h"
-#include "sscMesh.h"
-#include "sscImage.h"
-#include "sscColorDataAdapterXml.h"
+#include "cxMessageManager.h"
+#include "cxDataManager.h"
+#include "cxRegistrationTransform.h"
+#include "cxMesh.h"
+#include "cxImage.h"
+#include "cxColorDataAdapterXml.h"
 #include "vesselReg/SeansVesselReg.hxx"
 #include "cxPatientService.h"
 #include "cxPatientData.h"

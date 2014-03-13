@@ -18,11 +18,11 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QTextStream>
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
-#include "sscEnumConverter.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxEnumConverter.h"
 #include "cxDataLocations.h"
-#include "sscFrame3D.h"
+#include "cxFrame3D.h"
 #include "cxTransformFile.h"
 
 namespace cx

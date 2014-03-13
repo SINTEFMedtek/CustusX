@@ -18,16 +18,16 @@
 #include "vtkRenderWindow.h"
 #include <QTimer>
 
-//#include "sscLabeledComboBoxWidget.h"
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
+//#include "cxLabeledComboBoxWidget.h"
+#include "cxTypeConversions.h"
+#include "cxMessageManager.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxImageSenderFactory.h"
 #include "cxProcessWrapper.h"
 #include "cxVideoConnection.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscLogger.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxLogger.h"
 
 namespace cx
 {

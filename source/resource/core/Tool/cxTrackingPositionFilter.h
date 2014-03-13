@@ -14,7 +14,7 @@
 #ifndef CXTRACKINGPOSITIONFILTER_H
 #define CXTRACKINGPOSITIONFILTER_H
 
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 #include <map>
 #include <boost/shared_ptr.hpp>
 #include "iir/Butterworth.h"

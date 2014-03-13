@@ -14,15 +14,15 @@
 
 #include "cxtestReconstructManagerFixture.h"
 
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 #include "catch.hpp"
-#include "sscPNNReconstructAlgorithm.h"
+#include "cxPNNReconstructAlgorithm.h"
 #include <QApplication>
-#include "sscDoubleDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
 #include "cxTimedAlgorithm.h"
 
 #include "cxDataLocations.h"
-#include "sscReconstructPreprocessor.h"
+#include "cxReconstructPreprocessor.h"
 #include "cxLogicManager.h"
 
 namespace cxtest

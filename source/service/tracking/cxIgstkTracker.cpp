@@ -15,9 +15,9 @@
 #include "cxIgstkTracker.h"
 
 #include <QStringList>
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
-#include "sscEnumConverter.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxEnumConverter.h"
 #include "cxToolUsingIGSTK.h"
 #include "cxIgstkTool.h"
 #include <time.h>

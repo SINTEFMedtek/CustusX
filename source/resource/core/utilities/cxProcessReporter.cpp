@@ -1,7 +1,7 @@
 #include "cxProcessReporter.h"
 
-#include "sscLogger.h"
-#include "sscMessageManager.h"
+#include "cxLogger.h"
+#include "cxMessageManager.h"
 
 namespace cx
 {

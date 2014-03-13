@@ -7,15 +7,15 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
-#include "sscCoordinateSystemHelpers.h"
-#include "sscToolManager.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxCoordinateSystemHelpers.h"
+#include "cxToolManager.h"
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
-#include "sscDataManager.h"
-#include "sscManualTool.h"
+#include "cxDataManager.h"
+#include "cxManualTool.h"
 
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"

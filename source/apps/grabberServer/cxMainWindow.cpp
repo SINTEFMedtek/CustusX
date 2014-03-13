@@ -3,7 +3,7 @@
 #include <QDockWidget>
 #include <QStatusBar>
 #include "iostream"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 #ifdef __APPLE__
   #include "cxMacGrabberServerWidget.h"

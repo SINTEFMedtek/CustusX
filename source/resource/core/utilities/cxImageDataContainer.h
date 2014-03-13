@@ -15,7 +15,6 @@
 #define CXIMAGEDATACONTAINER_H
 
 #include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include <vector>
 

@@ -18,9 +18,9 @@
 #include <QApplication>
 #include <QByteArray>
 #include <QDir>
-#include "sscEnumConverter.h"
-#include "sscXmlOptionItem.h"
-#include "sscMessageManager.h"
+#include "cxEnumConverter.h"
+#include "cxXmlOptionItem.h"
+#include "cxMessageManager.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxWorkflowStateMachine.h"

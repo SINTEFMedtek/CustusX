@@ -7,9 +7,9 @@
 #include <QTextStream>
 //#include <QFileInfo>
 #include <iostream>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include <QFileSystemWatcher>
-#include "sscMessageManager.h"
+#include "cxMessageManager.h"
 #include "snwSyntaxHighlighter.h"
 
 namespace cx

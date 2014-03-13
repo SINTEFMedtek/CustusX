@@ -14,12 +14,12 @@
 
 #include "cxDataFactory.h"
 
-#include "sscImage.h"
-#include "sscMesh.h"
-#include "sscPointMetric.h"
-#include "sscDistanceMetric.h"
-#include "sscPlaneMetric.h"
-#include "sscAngleMetric.h"
+#include "cxImage.h"
+#include "cxMesh.h"
+#include "cxPointMetric.h"
+#include "cxDistanceMetric.h"
+#include "cxPlaneMetric.h"
+#include "cxAngleMetric.h"
 #include "cxShapedMetric.h"
 #include "cxSphereMetric.h"
 #include "cxFrameMetric.h"

@@ -14,20 +14,20 @@
 #include "cxMeshInfoWidget.h"
 
 #include <QVBoxLayout>
-#include "sscImage.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscRegistrationTransform.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscLabeledLineEditWidget.h"
-#include "sscMeshHelpers.h"
-#include "sscHelperWidgets.h"
-#include "sscColorDataAdapterXml.h"
+#include "cxImage.h"
+#include "cxMessageManager.h"
+#include "cxDataManager.h"
+#include "cxRegistrationTransform.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxLabeledLineEditWidget.h"
+#include "cxMeshHelpers.h"
+#include "cxHelperWidgets.h"
+#include "cxColorDataAdapterXml.h"
 #include "cxDataLocations.h"
 #include "cxDataInterface.h"
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringDataAdapter.h"
-#include "sscLogger.h"
+#include "cxLogger.h"
 
 
 namespace cx

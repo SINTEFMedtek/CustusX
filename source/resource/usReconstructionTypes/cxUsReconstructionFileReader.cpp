@@ -10,15 +10,15 @@
 #include <QFileInfo>
 #include <QStringList>
 #include <QDataStream>
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
-#include "sscDataManagerImpl.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxDataManagerImpl.h"
 #include <vtkImageData.h>
-#include "sscImage.h"
-#include "sscUtilHelpers.h"
+#include "cxImage.h"
+#include "cxUtilHelpers.h"
 #include "cxCreateProbeDataFromConfiguration.h"
-#include "sscVolumeHelpers.h"
-#include "sscUSFrameData.h"
+#include "cxVolumeHelpers.h"
+#include "cxUSFrameData.h"
 
 namespace cx
 {

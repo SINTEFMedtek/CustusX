@@ -14,7 +14,7 @@
 
 #include "cxDonutMetricRep.h"
 
-#include "sscView.h"
+#include "cxView.h"
 
 #include <vtkVectorText.h>
 #include <vtkFollower.h>
@@ -23,11 +23,11 @@
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
 #include <vtkRenderWindow.h>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "vtkTextActor.h"
-#include "sscGraphicalPrimitives.h"
+#include "cxGraphicalPrimitives.h"
 #include "cxShapedMetric.h"
-#include "sscGraphicalPrimitives.h"
+#include "cxGraphicalPrimitives.h"
 #include "vtkMatrix4x4.h"
 #include "cxGraphicalTorus3D.h"
 #include "cxGraphicalDisk.h"

@@ -22,10 +22,10 @@
 #include <QDateTime>
 #include <QStringList>
 #include <QTextStream>
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
-#include "sscProbeData.h"
-#include "sscToolManager.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxProbeData.h"
+#include "cxToolManager.h"
 #include "cxProbeImpl.h"
 #include "cxIgstkTool.h"
 #include "cxTrackingPositionFilter.h"

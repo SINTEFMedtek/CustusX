@@ -17,8 +17,8 @@
 #include <QTimer>
 #include <vtkImageData.h>
 
-#include "sscImage.h"
-#include "sscView.h"
+#include "cxImage.h"
+#include "cxView.h"
 #include "cxtestSender.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"

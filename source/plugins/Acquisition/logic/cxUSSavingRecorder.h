@@ -17,7 +17,7 @@
 #include <vector>
 #include <QFutureWatcher>
 #include "cxForwardDeclarations.h"
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 
 namespace cx
 {

@@ -2,8 +2,8 @@
 #define CXCLIPPINGWIDGET_H_
 
 #include "cxBaseWidget.h"
-#include "sscForwardDeclarations.h"
-#include "sscStringDataAdapter.h"
+#include "cxForwardDeclarations.h"
+#include "cxStringDataAdapter.h"
 //#include "cxViewManager.h"
 //#include "cxDataInterface.h"
 class QCheckBox;

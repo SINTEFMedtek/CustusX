@@ -18,7 +18,7 @@
 #include <vector>
 #include <QPointer>
 #include "cxForwardDeclarations.h"
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 
 #include "cxViewWrapper.h"
 

@@ -5,52 +5,52 @@
 include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 
 cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
-	sscView
-	sscViewContainer
+	cxView
+	cxViewContainer
     
-	Rep/sscRep.h
-	Rep/sscRepImpl
-	Rep/sscDataMetricRep
+	Rep/cxRep.h
+	Rep/cxRepImpl
+	Rep/cxDataMetricRep
 
-	Rep3D/sscToolRep3D
-	Rep3D/sscPickerRep
-	Rep3D/sscVolumetricRep
-	Rep3D/sscTexture3DSlicerRep
-	Rep3D/sscSlices3DRep
-	Rep3D/sscSlicePlanes3DRep
-	Rep3D/sscGeometricRep
-	Rep3D/sscFiberBundleRep
-	Rep3D/sscPointMetricRep
-	Rep3D/sscDistanceMetricRep
-	Rep3D/sscAngleMetricRep
-	Rep3D/sscPlaneMetricRep
+	Rep3D/cxToolRep3D
+	Rep3D/cxPickerRep
+	Rep3D/cxVolumetricRep
+	Rep3D/cxTexture3DSlicerRep
+	Rep3D/cxSlices3DRep
+	Rep3D/cxSlicePlanes3DRep
+	Rep3D/cxGeometricRep
+	Rep3D/cxFiberBundleRep
+	Rep3D/cxPointMetricRep
+	Rep3D/cxDistanceMetricRep
+	Rep3D/cxAngleMetricRep
+	Rep3D/cxPlaneMetricRep
 	Rep3D/cxFrameMetricRep
 	Rep3D/cxToolMetricRep
     Rep3D/cxLandmarkRep
-    Rep3D/sscOrientationAnnotation3DRep
-    Rep3D/sscImage2DRep3D
+    Rep3D/cxOrientationAnnotation3DRep
+    Rep3D/cxImage2DRep3D
 	Rep3D/cxSphereMetricRep
 	Rep3D/cxDonutMetricRep
 	Rep3D/cxMetricNamesRep
 
-	Rep2D/sscOrientationAnnotationRep
-	Rep2D/sscSlicerRepSW
-	Rep2D/sscToolRep2D
-	Rep2D/sscCrossHairRep2D
-	Rep2D/sscGeometricRep2D
-	Rep2D/sscPointMetricRep2D
-	Rep2D/sscGuideRep2D
-    Rep2D/sscOrientationAnnotation2DRep
+	Rep2D/cxOrientationAnnotationRep
+	Rep2D/cxSlicerRepSW
+	Rep2D/cxToolRep2D
+	Rep2D/cxCrossHairRep2D
+	Rep2D/cxGeometricRep2D
+	Rep2D/cxPointMetricRep2D
+	Rep2D/cxGuideRep2D
+    Rep2D/cxOrientationAnnotation2DRep
 
     Primitives/cxImageMapperMonitor
-	Primitives/sscTexture3DSlicerProxy
-	Primitives/sscSlicePlaneClipper
-	Primitives/sscToolTracer
+	Primitives/cxTexture3DSlicerProxy
+	Primitives/cxSlicePlaneClipper
+	Primitives/cxToolTracer
     Primitives/cxVolumeProperty
-	Primitives/sscVideoSourceGraphics
+	Primitives/cxVideoSourceGraphics
 	Primitives/cxViewFollower
 
-	RepVideo/sscVideoRep
+	RepVideo/cxVideoRep
         )
 
 if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
@@ -62,13 +62,13 @@ endif()
 cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
 	Primitives/cxDepthPeeling
 	Primitives/cxGraphicalTorus3D
-	Primitives/sscVtkHelperClasses
-	Primitives/sscTextureSlicePainter
-	Primitives/sscUltrasoundSectorSource
-    Rep3D/sscAxesRep
-    Rep/sscDisplayTextRep
-    Primitives/sscVideoGraphics
-    Primitives/sscGraphicalPrimitives
+	Primitives/cxVtkHelperClasses
+	Primitives/cxTextureSlicePainter
+	Primitives/cxUltrasoundSectorSource
+    Rep3D/cxAxesRep
+    Rep/cxDisplayTextRep
+    Primitives/cxVideoGraphics
+    Primitives/cxGraphicalPrimitives
     Primitives/cxGraphicalAxes3D
     Primitives/cxImageEnveloper
 	Primitives/cxGraphicalDisk

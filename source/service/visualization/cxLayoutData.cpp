@@ -21,10 +21,10 @@
 #include "cxLayoutData.h"
 #include <iostream>
 #include <QDomElement>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscDefinitionStrings.h"
-#include "sscView.h"
+#include "cxTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxDefinitionStrings.h"
+#include "cxView.h"
 
 namespace cx
 {

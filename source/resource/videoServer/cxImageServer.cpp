@@ -1,7 +1,7 @@
 #include "cxImageServer.h"
 
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxMessageManager.h"
+#include "cxTypeConversions.h"
 #include "cxImageSenderFactory.h"
 #include <iostream>
 #include <QCoreApplication>

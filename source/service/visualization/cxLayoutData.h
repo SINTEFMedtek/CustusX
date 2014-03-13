@@ -25,9 +25,9 @@
 #include <vector>
 class QDomNode;
 #include <QString>
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
-#include "sscView.h"
+#include "cxView.h"
 
 namespace cx
 {

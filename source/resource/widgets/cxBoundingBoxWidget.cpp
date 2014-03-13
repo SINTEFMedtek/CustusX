@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include <cxBoundingBoxWidget.h>
-#include "sscBoundingBox3D.h"
+#include "cxBoundingBox3D.h"
 #include "cxDoubleSpanSlider.h"
 
 namespace cx

@@ -15,7 +15,7 @@
 #ifndef CXTOOLMANAGERUSINGIGSTK_H_
 #define CXTOOLMANAGERUSINGIGSTK_H_
 
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "vtkForwardDeclarations.h"
 
 class QDomNode;

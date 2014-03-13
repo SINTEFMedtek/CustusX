@@ -18,7 +18,7 @@
 #include <vtkForwardDeclarations.h>
 #include <boost/shared_ptr.hpp>
 #include <QString>
-#include "sscRep.h"
+#include "cxRep.h"
 
 typedef vtkSmartPointer<class vtkProp> vtkPropPtr;
 
