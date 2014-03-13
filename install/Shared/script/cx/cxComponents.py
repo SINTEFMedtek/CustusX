@@ -429,7 +429,7 @@ class OpenCLUtilityLibrary(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:smistad/OpenCLUtilityLibrary')
     def update(self):
-        self._getBuilder().gitCheckout('8b13121582b791b16e68ef4537df81746953eb28', submodules=False)
+        self._getBuilder().gitCheckout('c59775aec5f648666ce8b35c6cb7873bc2b5476e', submodules=False)
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()
