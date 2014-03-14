@@ -179,6 +179,8 @@ void ImageStreamerGE::initialize(StringMap arguments)
 	//Setup the needed data stream types. The default is only scan converted data
 	mGEStreamer.SetupExportParameters(mExportScanconverted, mExportTissue, mExportBandwidth, mExportFrequency, mExportVelocity);
 
+	//Prevent copies of streamed data. Without this both tissue and flow frames trigger sending of data (resulting in all frames sent 2 times?)
+	mGEStreamer.SetForceTissueFrameRate(true);
 }
 
 QString findOpenCLPath(QString additionalLocation)
