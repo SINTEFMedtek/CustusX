@@ -10,7 +10,8 @@
 namespace cx
 {
 TordAlgorithm::TordAlgorithm() :
-		mRuntime(new oul::RuntimeMeasurementsManager())
+		mRuntime(new oul::RuntimeMeasurementsManager()),
+		mKernelMeasurementName("tord_execute_kernel")
 {
 	oul::DeviceCriteria criteria;
 	criteria.setTypeCriteria(oul::DEVICE_TYPE_GPU);
@@ -106,6 +107,8 @@ bool TordAlgorithm::initializeFrameBlocks(frameBlock_t* framePointers, int numBl
 
 bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr outputData, float radius, int nClosePlanes)
 {
+	mMeasurementNames.clear();
+
 	int numBlocks = 10; // FIXME? needs to be the same as the number of input bscans to the voxel_method kernel
 
 	// Split input US into blocks
@@ -203,22 +206,8 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 
 	unsigned int queueNumber = 0;
 	cl::CommandQueue queue = mOulContex.getQueue(queueNumber);
-	if(mRuntime->isEnabled())
-	{
-		mRuntime->enable();
-		mRuntime->startCLTimer("kernel", queue);
-		mRuntime->startCLTimer("buffer", queue);
-	}
-	mOulContex.executeKernel(queue, mKernel, global_work_size, local_work_size);
-	if(mRuntime->isEnabled())
-		mRuntime->stopCLTimer("buffer", queue);
-	mOulContex.readBuffer(queue, outputBuffer, outputVolumeSize, outputData->GetScalarPointer());
-	if(mRuntime->isEnabled())
-	{
-		mRuntime->stopCLTimer("kernel", queue);
-		mRuntime->printAll();
-	}
-
+	this->measureAndExecuteKernel(queue, mKernel, global_work_size, local_work_size, mKernelMeasurementName);
+	this->measureAndReadBuffer(queue, outputBuffer, outputVolumeSize, outputData->GetScalarPointer(), "tord_read_buffer");
 
 	// Cleaning up
 	messageManager()->sendInfo(QString("Done, freeing GPU memory"));
@@ -260,6 +249,25 @@ void TordAlgorithm::setProfiling(bool on)
 		mRuntime->enable();
 	else
 		mRuntime->disable();
+}
+
+double TordAlgorithm::getTotalExecutionTime()
+{
+	double totalExecutionTime = -1;
+	std::set<std::string>::iterator it;
+	for(it = mMeasurementNames.begin(); it != mMeasurementNames.end(); it++)
+	{
+		oul::RuntimeMeasurement measurement =  mRuntime->getTiming(*it);
+		totalExecutionTime += measurement.getSum();
+	}
+	return totalExecutionTime;
+}
+
+double TordAlgorithm::getKernelExecutionTime()
+{
+	double kernelExecutionTime = -1;
+	return mRuntime->getTiming(mKernelMeasurementName).getSum();
+
 }
 
 void TordAlgorithm::freeFrameBlocks(frameBlock_t *framePointers, int numBlocks)
@@ -381,5 +389,37 @@ bool TordAlgorithm::isUsingTooMuchMemory(size_t outputVolumeSize, size_t inputBl
 	messageManager()->sendInfo(QString("Using %1 of %2 global memory").arg(globalMemUse).arg(globalMemSize));
 	return usingTooMuchMemory;
 }
+
+void TordAlgorithm::measureAndExecuteKernel(cl::CommandQueue queue, cl::Kernel kernel, size_t global_work_size, size_t local_work_size, std::string measurementName)
+{
+	this->startProfiling(measurementName, queue);
+	mOulContex.executeKernel(queue, kernel, global_work_size, local_work_size);
+	this->stopProfiling(measurementName, queue);
+}
+
+void TordAlgorithm::measureAndReadBuffer(cl::CommandQueue queue, cl::Buffer outputBuffer, size_t outputVolumeSize, void *outputData, std::string measurementName)
+{
+	this->startProfiling(measurementName, queue);
+	mOulContex.readBuffer(queue, outputBuffer, outputVolumeSize, outputData);
+	this->stopProfiling(measurementName, queue);
+}
+
+void TordAlgorithm::startProfiling(std::string name, cl::CommandQueue queue) {
+	if(!mRuntime->isEnabled())
+		return;
+
+	mRuntime->startCLTimer(name, queue);
+	mMeasurementNames.insert(name);
+}
+
+void TordAlgorithm::stopProfiling(std::string name, cl::CommandQueue queue) {
+	if(!mRuntime->isEnabled())
+		return;
+
+	mRuntime->stopCLTimer(name, queue);
+	mRuntime->printAll();
+}
+
+
 
 } /* namespace cx */

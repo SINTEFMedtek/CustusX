@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include "sscTypeConversions.h"
+#include "sscMessageManager.h"
 
 namespace cxtest
 {
@@ -25,14 +26,14 @@ JenkinsMeasurement::JenkinsMeasurement()
 
 void JenkinsMeasurement::initialize()
 {
-    std::cout << "CTEST_FULL_OUTPUT" << std::endl;
+	cx::messageManager()->sendRaw("\nCTEST_FULL_OUTPUT\n");
 }
 
 void JenkinsMeasurement::createOutput(QString name, QString value)
 {
-    QString measurement("<measurement><name>%1</name><value>%2</value></measurement>");
+    QString measurement("\n<measurement><name>%1</name><value>%2</value></measurement>\n");
     measurement = measurement.arg(name).arg(value);
-    std::cout << measurement << std::endl;
+    cx::messageManager()->sendRaw(measurement);
 }
 
 } //namespace cxtest
