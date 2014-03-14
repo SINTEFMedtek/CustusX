@@ -388,13 +388,8 @@ void Reporter::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int timeout
 	{
 		if (mCout)
 		{
-//			// send text to cout if it not already comes from that stream (or cerr)
-//			mCout->setEnableRedirect(false);
-//			if (messageLevel != mlCOUT && messageLevel != mlCERR)
-//				std::cout << message.getPrintableMessage() << std::endl;
-//			mCout->setEnableRedirect(true);
 			if (messageLevel != mlCOUT && messageLevel != mlCERR)
-				mCout->sendUnredirected(message.getPrintableMessage());
+				mCout->sendUnredirected(message.getPrintableMessage()+"\n");
 		}
 
 		this->appendToLogfile(this->formatMessage(message) + "\n");
