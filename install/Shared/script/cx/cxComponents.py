@@ -337,7 +337,10 @@ class CustusX3(CppComponent):
         add('SSC_USE_GCOV:BOOL', self.controlData.mCoverage);
         if self.controlData.force_connect_sublibraries:
             self.forceConnectSublibraries(add)
-        builder.configureCMake()
+        cmakeOptions = ''
+        if self.controlData.mGraphviz:
+            cmakeOptions = '--graphviz=graph.dot'
+        builder.configureCMake(cmakeOptions)
     def forceConnectSublibraries(self, add):
         print 'CustusX force connect sublibraries.'
         add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
