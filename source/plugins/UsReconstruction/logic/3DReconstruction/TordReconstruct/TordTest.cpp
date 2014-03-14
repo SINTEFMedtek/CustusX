@@ -35,7 +35,7 @@ void TordTest::enableProfiling()
 
 double TordTest::getKernelExecutionTime()
 {
-	mAlgorithm->getKernelExecutionTime();
+	return mAlgorithm->getKernelExecutionTime();
 }
 
 QString TordTest::getName() const
