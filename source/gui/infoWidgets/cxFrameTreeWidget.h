@@ -6,7 +6,7 @@
 #include <map>
 #include <string>
 #include <QWidget>
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 #include "cxLegacySingletons.h"
 class QTreeWidget;
 class QTreeWidgetItem;

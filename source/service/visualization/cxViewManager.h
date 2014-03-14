@@ -19,8 +19,8 @@
 #include <vector>
 #include <QObject>
 
-#include "sscData.h"
-#include "sscDefinitions.h"
+#include "cxData.h"
+#include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
 
 class QActionGroup;

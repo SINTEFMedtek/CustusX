@@ -1,13 +1,13 @@
 #include "cxConnectedThresholdImageFilter.h"
 
 #include "itkConnectedThresholdImageFilter.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
 #include "cxAlgorithmHelpers.h"
 
-#include "sscDataManager.h"
-#include "sscRegistrationTransform.h"
-#include "sscImage.h"
+#include "cxDataManager.h"
+#include "cxRegistrationTransform.h"
+#include "cxImage.h"
 
 
 namespace cx
@@ -53,7 +53,7 @@ void ConnectedThresholdImageFilter::postProcessingSlot()
 	mOutput = dataManager()->createDerivedImage(rawResult,uid, name, mInput);
 	if(!mOutput)
 	{
-		messageManager()->sendError("Segmentation failed.");
+		reportError("Segmentation failed.");
 		return;
 	}
 	mOutput->resetTransferFunctions();
@@ -65,7 +65,7 @@ void ConnectedThresholdImageFilter::postProcessingSlot()
 	dataManager()->saveImage(mOutput, mOutputBasePath);
 
 	//let the user know you are finished
-	messageManager()->sendSuccess("Done segmenting: \"" + mOutput->getName()+"\"");
+	reportSuccess("Done segmenting: \"" + mOutput->getName()+"\"");
 
 	//let the system know you're finished
 	//  emit finished();
@@ -124,8 +124,8 @@ vtkImageDataPtr ConnectedThresholdImageFilter::calculate()
 	}
 	catch( itk::ExceptionObject & excep )
 	{
-		messageManager()->sendError("Error when setting seed for Connected Threshold Image Filter:");
-		messageManager()->sendError(qstring_cast(excep.GetDescription()));
+		reportError("Error when setting seed for Connected Threshold Image Filter:");
+		reportError(qstring_cast(excep.GetDescription()));
 	}
 
 	itkImage = thresholdFilter->GetOutput();

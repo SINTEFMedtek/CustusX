@@ -15,11 +15,11 @@
 #ifndef CXTOOLTIPCALIBRATIONWIDGET_H_
 #define CXTOOLTIPCALIBRATIONWIDGET_H_
 
-#include "sscTransform3D.h"
-#include "sscVector3D.h"
+#include "cxTransform3D.h"
+#include "cxVector3D.h"
 #include "cxBaseWidget.h"
-#include "sscCoordinateSystemHelpers.h"
-#include "sscForwardDeclarations.h"
+#include "cxCoordinateSystemHelpers.h"
+#include "cxForwardDeclarations.h"
 #include "cxDataInterface.h"
 
 class QPushButton;
@@ -28,6 +28,8 @@ class QLineEdit;
 
 namespace cx
 {
+class LabeledComboBoxWidget;
+
 /**
  * \file
  * \addtogroup cx_plugin_calibration

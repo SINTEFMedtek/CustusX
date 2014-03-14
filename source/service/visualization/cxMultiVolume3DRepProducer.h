@@ -17,8 +17,8 @@
 #include <QObject>
 #include <QPointer>
 #include <boost/shared_ptr.hpp>
-#include "sscImage.h"
-#include "sscRep.h"
+#include "cxImage.h"
+#include "cxRep.h"
 
 namespace cx
 {

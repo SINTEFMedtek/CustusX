@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QLabel>
-#include "sscConsoleWidget.h"
+#include "cxConsoleWidget.h"
 #include "cxGrabberServerWidget.h"
 
 namespace cx

@@ -14,7 +14,7 @@
 
 #include "cxLayoutWidget.h"
 #include <QGridLayout>
-#include "sscLogger.h"
+#include "cxLogger.h"
 
 namespace cx
 {

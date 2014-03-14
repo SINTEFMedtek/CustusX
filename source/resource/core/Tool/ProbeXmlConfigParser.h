@@ -5,7 +5,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <QDomDocument>
-#include "sscXmlOptionItem.h"
+#include "cxXmlOptionItem.h"
 
 /**
  * \brief Class that works as a interface to a ProbeCalibConfigs.xml

@@ -15,18 +15,18 @@
 #include <vtkImageData.h>
 #include <QDomElement>
 
-#include "sscReconstructAlgorithm.h"
+#include "cxReconstructAlgorithm.h"
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #include "catch.hpp"
-#include "sscPNNReconstructAlgorithm.h"
+#include "cxPNNReconstructAlgorithm.h"
 #include "QFileInfo"
-#include "sscDummyTool.h"
+#include "cxDummyTool.h"
 
 #ifdef CX_USE_OPENCL_UTILITY
 #include "TordReconstruct/TordTest.h"
 #endif
 
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 #include "cxtestReconstructAlgorithmFixture.h"
 #include "cxtestUtilities.h"
 #include "cxtestJenkinsMeasurement.h"
@@ -106,7 +106,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 #ifdef CX_USE_OPENCL_UTILITY
 TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconstruction][synthetic][not_win32][unstable][broken]")
 {
-	cx::messageManager()->initialize();
+	cx::Reporter::initialize();
 
 	ReconstructAlgorithmFixture fixture;
 
@@ -181,10 +181,10 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	fixture.checkCentroidDifferenceBelow(1);
 	fixture.checkMassDifferenceBelow(0.01);
 
-	//need to be sure opencl thread is finished before shutting down messagemanager,
-	//or else we could get seg fault because og a callbackk from opencl to messagemAnager after it is shut down
+	//need to be sure opencl thread is finished before shutting down Reporter,
+	//or else we could get seg fault because og a callbackk from opencl to Reporter after it is shut down
 	Utilities::sleep_sec(1);
-	cx::messageManager()->shutdown();
+	cx::Reporter::shutdown();
 }
 #endif//CX_USE_OPENCL_UTILITY
 

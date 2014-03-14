@@ -15,7 +15,7 @@
 #ifndef CXTESTSYNTHETICRECONSTRUCTINPUT_H
 #define CXTESTSYNTHETICRECONSTRUCTINPUT_H
 
-#include "sscReconstructAlgorithm.h"
+#include "cxReconstructAlgorithm.h"
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #include "cxtestSyntheticVolumeComparer.h"
 

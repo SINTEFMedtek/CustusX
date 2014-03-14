@@ -14,12 +14,12 @@
 
 #include "catch.hpp"
 
-#include "sscMesh.h"
-#include "sscImage.h"
-#include "sscDataMetric.h"
-#include "sscPointMetric.h"
+#include "cxMesh.h"
+#include "cxImage.h"
+#include "cxDataMetric.h"
+#include "cxPointMetric.h"
 #include "cxViewWrapper.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxtestSpaceProviderMock.h"
 
 TEST_CASE("Sort cx::Data user-frindly using getPriority()", "[unit][service][visualization]")

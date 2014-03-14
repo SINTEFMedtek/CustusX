@@ -2,7 +2,7 @@
 #define SIMPLESYNTHETICVOLUME_H
 
 #include "cxSyntheticVolume.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 namespace cx {
 

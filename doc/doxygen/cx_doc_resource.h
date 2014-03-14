@@ -1,21 +1,16 @@
-// This file is part of SSC,
-// a C++ Library supporting Image Guided Therapy Applications.
+// This file is part of CustusX, an Image Guided Therapy Application.
 //
-// Copyright (C) 2008- SINTEF Medical Technology
-// Copyright (C) 2008- Sonowand AS
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
 //
-// SSC is owned by SINTEF Medical Technology and Sonowand AS,
-// hereafter named the owners. Each particular piece of code
-// is owned by the part that added it to the library.
-// SSC source code and binaries can only be used by the owners
-// and those with explicit permission from the owners.
-// SSC shall not be distributed to anyone else.
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
 //
-// SSC is distributed WITHOUT ANY WARRANTY; without even
-// the implied warranty of MERCHANTABILITY or FITNESS FOR
-// A PARTICULAR PURPOSE.
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
 //
-// See sscLicense.txt for more information.
+// See CustusX_License.txt for more information.
 
 namespace cx
 {
@@ -26,24 +21,30 @@ namespace cx
  *
  * \brief A collection of common utility classes available to everyone.
  *
- *  - This is classes that can be used by the entire system. Utility classes and
- *    functions of various kinds.
+ * The Resource Layer consists of building blocks that are available to everyone.
+ * Everything here is/should be reusable, i.e. used by at least two other modules.
+ *
+ * The Core library is the basic component, all other libraries depend on that
+ * and are specialized in some way.
+ *
+ * In principle, this layer contains no global state, but a few exceptions exist:
+ *  - MessageManager
+ *  - Settings
+ *  - XmlOptionFile
+ *
+ * Other notable content:
  *  - A geometrical math library, using Eigen as the engine
  *    (Vector3D, Transform3D etc).
+ *  - Interfaces for some widely-used services: DataManager, ToolManager, VideoService.
  *  - Interfaces for common objects: Data, Image, Mesh,
  *    VideoSource, Tool, ...
- *  - Visualization components (Rep)
- *  - A thread-safe logging service (MessageManager). Singleton.
+ *  - Visualization components (Rep and descendants).
+ *  - A thread-safe logging service (MessageManager).
  *  - Persistent state, stored in ini files and xml files. Interface classes
  *    to these (Settings, DataLocations, XmlOptionFile).
  *
- */
-
-/**
- * \defgroup cx_resource_core_algorithms Algorithms
- * \ingroup cx_resource_core
  *
- * \brief In-house algorithms and adapters around external ones.
+ *
  *
  */
 
@@ -55,40 +56,12 @@ namespace cx
  */
 
 /**
- * \defgroup cx_resource_core_data Data
- * \ingroup cx_resource_core
- *
- * \brief A model of the patient.
- *
- * Data sets of various modalities, fiducials and labels are described in relation to each other.
- *
- * \image html sscArchitecture_data.png "Basic relation between the Data interfaces and classes."
- *
- */
-
-
-/**
- * \defgroup cx_resource_core_dataadapters DataAdapters
- * \ingroup cx_resource_core
- *
- * \brief Framework for a presenting interfaces to backend data.
- *
- */
-
-/**
- * \defgroup cx_resource_core_logger Logger
- * \ingroup cx_resource_core
- *
- * \brief Logging of status, errors, debug to console and file.
- */
-
-/**
  * \defgroup cx_resource_core_math Math
  * \ingroup cx_resource_core
  *
- * \brief The SSC Math library, based on Eigen.
+ * \brief The CustusX Math library, based on Eigen.
  *
- * The math in SSC should preferrably be done in terms of Eigen, http://eigen.tuxfamily.org/dox/
+ * The math in CustusX should preferrably be done in terms of Eigen, http://eigen.tuxfamily.org/dox/
  *
  * The core classes Vector3D and Transform3D have been reduced to typedefs of
  * Eigen structures.
@@ -103,6 +76,41 @@ namespace cx
  *
  * \image html sscArchitecture_tracking.png "Basic relation between the Tool interfaces."
  *
+ */
+
+/**
+ * \defgroup cx_resource_core_data Data
+ * \ingroup cx_resource_core
+ *
+ * \brief A model of the patient.
+ *
+ * Data sets of various modalities, fiducials and labels are described in relation to each other.
+ *
+ * \image html sscArchitecture_data.png "Basic relation between the Data interfaces and classes."
+ *
+ */
+
+/**
+ * \defgroup cx_resource_core_algorithms Algorithms
+ * \ingroup cx_resource_core
+ *
+ * \brief In-house algorithms and adapters around external ones.
+ *
+ */
+
+/**
+ * \defgroup cx_resource_core_dataadapters DataAdapters
+ * \ingroup cx_resource_core
+ *
+ * \brief Framework for a presenting interfaces to backend data.
+ *
+ */
+
+/**
+ * \defgroup cx_resource_core_logger Logger
+ * \ingroup cx_resource_core
+ *
+ * \brief Logging of status, errors, debug to console and file.
  */
 
 /**

@@ -2,9 +2,9 @@
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include "sscEnumConverter.h"
+#include "cxEnumConverter.h"
 #include "cxStateService.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxSelectionGroupBox.h"
 #include "cxToolListWidget.h"
 #include "cxApplicationStateMachine.h"

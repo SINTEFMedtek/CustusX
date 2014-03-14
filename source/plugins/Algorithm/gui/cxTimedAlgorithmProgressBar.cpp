@@ -15,7 +15,7 @@
 #include "cxTimedAlgorithmProgressBar.h"
 #include <QtGui>
 #include "cxTimedAlgorithm.h"
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 #include "cxDisplayTimerWidget.h"
 
 namespace cx
@@ -80,7 +80,7 @@ void TimedAlgorithmProgressBar::productChangedSlot()
 		product = algo->getProduct();
 
 	mLabel->setText(product);
-//	messageManager()->sendInfo(QString("Executing %1, please wait!").arg(product));
+//	report(QString("Executing %1, please wait!").arg(product));
 }
 
 void TimedAlgorithmProgressBar::setShowTextLabel(bool on)
@@ -107,7 +107,7 @@ void TimedAlgorithmProgressBar::algorithmStartedSlot(int maxSteps)
 	mProgressBar->setRange(0, maxSteps);
 	mProgressBar->setValue(0);
 	mProgressBar->show();
-//	messageManager()->sendInfo(QString("Executing %1, please wait!").arg(product));
+//	report(QString("Executing %1, please wait!").arg(product));
 }
 
 void TimedAlgorithmProgressBar::algorithmFinishedSlot()
@@ -123,7 +123,7 @@ void TimedAlgorithmProgressBar::algorithmFinished(TimedBaseAlgorithm* algo)
 	if (algo)
 		product = algo->getProduct();
 
-//	messageManager()->sendSuccess(QString("%1 complete [%2s]").arg(product).arg(mTimerWidget->elaspedSeconds()));
+//	reportSuccess(QString("%1 complete [%2s]").arg(product).arg(mTimerWidget->elaspedSeconds()));
 
 	mStartedAlgos.erase(algo);
 	if (!mStartedAlgos.empty())

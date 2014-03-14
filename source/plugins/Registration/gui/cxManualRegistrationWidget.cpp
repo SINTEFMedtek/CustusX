@@ -13,11 +13,11 @@
 // See CustusX_License.txt for more information.
 
 #include "cxManualRegistrationWidget.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxRegistrationDataAdapters.h"
 #include "cxRegistrationManager.h"
-#include "sscToolManager.h"
-#include "sscDataManager.h"
+#include "cxToolManager.h"
+#include "cxDataManager.h"
 
 namespace cx
 {

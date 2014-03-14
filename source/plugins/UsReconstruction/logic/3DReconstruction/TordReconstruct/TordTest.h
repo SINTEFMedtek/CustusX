@@ -2,10 +2,10 @@
 #ifndef TORD_TEST_H_
 #define TORD_TEST_H_
 
-#include "sscReconstructAlgorithm.h"
-#include "sscUSFrameData.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
+#include "cxReconstructAlgorithm.h"
+#include "cxUSFrameData.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
 #include "cxTordAlgorithm.h"
 
 namespace cx

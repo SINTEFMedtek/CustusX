@@ -15,9 +15,9 @@
 #ifndef CXSPHEREMETRICREP_H
 #define CXSPHEREMETRICREP_H
 
-#include "sscDataMetricRep.h"
+#include "cxDataMetricRep.h"
 #include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 
 typedef vtkSmartPointer<class vtkTextActor> vtkTextActorPtr;
 

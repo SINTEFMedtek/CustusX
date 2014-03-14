@@ -28,13 +28,13 @@
 #include "vtkRenderWindow.h"
 #include "cxLayoutData.h"
 
-#include "sscVolumetricRep.h"
-#include "sscMessageManager.h"
-#include "sscXmlOptionItem.h"
-#include "sscDataManager.h"
-#include "sscToolManager.h"
-#include "sscSlicePlanes3DRep.h"
-#include "sscSliceProxy.h"
+#include "cxVolumetricRep.h"
+#include "cxReporter.h"
+#include "cxXmlOptionItem.h"
+#include "cxDataManager.h"
+#include "cxToolManager.h"
+#include "cxSlicePlanes3DRep.h"
+#include "cxSliceProxy.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "cxViewWrapper2D.h"
@@ -47,13 +47,13 @@
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxInteractiveClipper.h"
-#include "sscImage.h"
+#include "cxImage.h"
 #include "cxCameraStyle.h"
 #include "cxCyclicActionLogger.h"
 #include "cxLayoutWidget.h"
 #include "cxRenderLoop.h"
 #include "cxLayoutRepository.h"
-#include "sscLogger.h"
+#include "cxLogger.h"
 #include "cxVisualizationServiceBackend.h"
 #include "cxXMLNodeWrapper.h"
 #include "cxCameraControl.h"
@@ -441,7 +441,7 @@ void ViewManager::setActiveLayout(const QString& layout, int widgetIndex)
 	emit activeLayoutChanged();
 
 	QString layoutName = this->getLayoutData(layout).getName();
-	messageManager()->sendInfo(QString("Layout %1 changed to %2").arg(widgetIndex).arg(layoutName));
+	report(QString("Layout %1 changed to %2").arg(widgetIndex).arg(layoutName));
 }
 
 void ViewManager::rebuildLayouts()

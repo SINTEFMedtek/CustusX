@@ -3,8 +3,8 @@
 
 #include "cxBaseWidget.h"
 
-#include <sscImage.h>
-#include "sscForwardDeclarations.h"
+#include "cxImage.h"
+#include "cxForwardDeclarations.h"
 #include "cxActiveImageProxy.h"
 #include "cxLegacySingletons.h"
 

@@ -3,16 +3,16 @@
 #include <QtTest/QtTest>
 #include <QComboBox>
 #include <QPushButton>
-#include "sscVideoSource.h"
-#include "sscStringDataAdapterXml.h"
+#include "cxVideoSource.h"
+#include "cxStringDataAdapterXml.h"
 #include "cxVideoService.h"
 #include "cxVideoConnectionManager.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 #include "cxSimulateUSWidget.h"
 #include "cxLegacySingletons.h"
-#include "sscImage.h"
+#include "cxImage.h"
 
 namespace cxtest
 {

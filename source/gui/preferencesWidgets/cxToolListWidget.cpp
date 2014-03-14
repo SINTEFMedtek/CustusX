@@ -6,8 +6,8 @@
 #include <QMimeData>
 #include <QAction>
 #include <QMenu>
-#include "sscEnumConverter.h"
-#include "sscMessageManager.h"
+#include "cxEnumConverter.h"
+#include "cxReporter.h"
 #include "cxDataLocations.h"
 #include "cxToolConfigurationParser.h"
 
@@ -149,7 +149,7 @@ QStringList FilteringToolListWidget::getAbsoluteFilePathToAllTools(QDir dir)
 
 	if (!dir.exists())
 	{
-		messageManager()->sendError("Dir " + dir.absolutePath() + " does not exits.");
+		reportError("Dir " + dir.absolutePath() + " does not exits.");
 		return retval;
 	}
 
@@ -312,7 +312,7 @@ void ConfigToolListWidget::deleteSlot()
 {
 	if (!mItemToDelete)
 	{
-		messageManager()->sendDebug("Found no item to delete...");
+		reporter()->sendDebug("Found no item to delete...");
 		return;
 	}
 	this->deleteItemSlot(mItemToDelete);
@@ -336,7 +336,7 @@ void ConfigToolListWidget::contextMenuSlot(const QPoint& point)
 	QListWidgetItem* item = this->itemAt(point);
 	if (!item)
 	{
-		messageManager()->sendDebug("Found no item to delete...");
+		reporter()->sendDebug("Found no item to delete...");
 		return;
 	}
 	mItemToDelete = item;

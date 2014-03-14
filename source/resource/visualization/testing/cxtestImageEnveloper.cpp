@@ -14,11 +14,11 @@
 #include "catch.hpp"
 #include "cxImageEnveloper.h"
 #include "cxtestUtilities.h"
-#include "sscImage.h"
+#include "cxImage.h"
 #include "vtkImageData.h"
-#include "sscTypeConversions.h"
-#include "sscRegistrationTransform.h"
-#include "sscVolumeHelpers.h"
+#include "cxTypeConversions.h"
+#include "cxRegistrationTransform.h"
+#include "cxVolumeHelpers.h"
 #include "cxImageParameters.h"
 
 namespace cxtest

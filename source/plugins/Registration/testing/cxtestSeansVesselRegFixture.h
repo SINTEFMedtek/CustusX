@@ -2,7 +2,7 @@
 #define CXTESTSEANSVESSELREGFIXTURE_H_
 
 #include <vector>
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
 

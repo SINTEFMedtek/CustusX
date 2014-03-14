@@ -16,7 +16,7 @@
 #define CATCH_CONFIG_CONSOLE_WIDTH 400
 #include "catch.hpp"
 
-#include "sscApplication.h"
+#include "cxApplication.h"
 #include "cxtestCatchImpl.h"
 #include "boost/function.hpp"
 

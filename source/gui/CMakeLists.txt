@@ -66,7 +66,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	toolWidgets/cxToolManagerWidget
 	toolWidgets/cxProbeConfigWidget
     #----------------------
-	utilities/cxAudio
+	utilities/cxAudioImpl
 	utilities/cxToolImagePreviewWidget
     #----------------------    
 	cxMainWindow

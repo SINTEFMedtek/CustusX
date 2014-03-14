@@ -1,7 +1,7 @@
 #include "cxtestVLCRecorderFixture.h"
 
-#include "sscMessageManager.h"
-#include "sscTime.h"
+#include "cxReporter.h"
+#include "cxTime.h"
 #include "cxDataLocations.h"
 #include "cxVLCRecorder.h"
 #include "cxtestUtilities.h"
@@ -15,13 +15,13 @@ namespace cxtest
 VLCRecorderFixture::VLCRecorderFixture() :
 		mMoviePath("")
 {
-	cx::messageManager()->initialize();
+	cx::reporter()->initialize();
 	cx::vlc()->getInstance();
 }
 
 VLCRecorderFixture::~VLCRecorderFixture()
 {
-	cx::messageManager()->shutdown();
+	cx::reporter()->shutdown();
 }
 
 void VLCRecorderFixture::createMovieFilePath()

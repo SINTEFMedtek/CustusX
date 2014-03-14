@@ -13,13 +13,13 @@
 // See CustusX_License.txt for more information.
 
 #include "cxMultiVolume3DRepProducer.h"
-#include "sscMessageManager.h"
-#include "sscVolumetricRep.h"
+#include "cxReporter.h"
+#include "cxVolumetricRep.h"
 #include <vtkImageData.h>
-#include "sscImage2DRep3D.h"
-#include "sscView.h"
-#include "sscTypeConversions.h"
-#include "sscLogger.h"
+#include "cxImage2DRep3D.h"
+#include "cxView.h"
+#include "cxTypeConversions.h"
+#include "cxLogger.h"
 #include "cxDataLocations.h"
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
 #include "cxConfig.h"
@@ -221,7 +221,7 @@ void MultiVolume3DRepProducer::rebuild3DReps()
 	}
 	else
 	{
-		messageManager()->sendError(QString("No visualizer found for string=%1").arg(mVisualizerType));
+		reportError(QString("No visualizer found for string=%1").arg(mVisualizerType));
 	}
 }
 
@@ -254,7 +254,7 @@ void MultiVolume3DRepProducer::buildSingleVolumeRenderer(ImagePtr image)
 	}
 	else
 	{
-		messageManager()->sendError(QString("No visualizer found for string=%1").arg(mVisualizerType));
+		reportError(QString("No visualizer found for string=%1").arg(mVisualizerType));
 		return;
 	}
 }

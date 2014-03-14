@@ -16,10 +16,10 @@
 
 #include "cxBaseWidget.h"
 
-#include "sscStringDataAdapterXml.h"
-#include "sscVector3DDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxVector3DDataAdapterXml.h"
 #include "cxDominantToolProxy.h"
-#include "sscPointMetric.h"
+#include "cxPointMetric.h"
 
 namespace cx
 {

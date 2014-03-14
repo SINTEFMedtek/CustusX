@@ -30,7 +30,6 @@ class ImagePropertiesWidget : public BaseWidget
 
 public:
 	ImagePropertiesWidget(QWidget* parent);
-	QHBoxLayout* getLayout();
 
 public slots:
 	virtual QString defaultWhatsThis() const;
@@ -42,9 +41,6 @@ private slots:
 private:
 	QComboBox* mInterpolationType;
 	ActiveImageProxyPtr mActiveImageProxy;
-
-	QHBoxLayout* mLayout;
-
 };
 
 }//end namespace cx

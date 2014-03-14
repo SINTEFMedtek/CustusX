@@ -14,8 +14,8 @@
 
 #include "cxLegacySingletons.h"
 
-#include "sscDataManager.h"
-#include "sscToolManager.h"
+#include "cxDataManager.h"
+#include "cxToolManager.h"
 #include "cxSpaceProviderImpl.h"
 
 namespace cx

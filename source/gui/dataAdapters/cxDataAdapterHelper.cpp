@@ -13,8 +13,8 @@
 // See CustusX_License.txt for more information.
 #include "cxDataAdapterHelper.h"
 
-#include "sscHelperWidgets.h"
-#include "sscLabeledLineEditWidget.h"
+#include "cxHelperWidgets.h"
+#include "cxLabeledLineEditWidget.h"
 #include "cxDataInterface.h"
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringDataAdapter.h"

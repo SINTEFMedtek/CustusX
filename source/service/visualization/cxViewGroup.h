@@ -18,9 +18,9 @@
 #include <vector>
 #include <QObject>
 #include <QDomDocument>
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
-#include "sscVector3D.h"
+#include "cxVector3D.h"
 
 class QMenu;
 class QPoint;

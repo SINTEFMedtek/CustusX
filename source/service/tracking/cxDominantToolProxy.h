@@ -15,7 +15,7 @@
 #ifndef CXDOMINANTTOOLPROXY_H_
 #define CXDOMINANTTOOLPROXY_H_
 
-#include "sscTool.h"
+#include "cxTool.h"
 
 namespace cx
 {

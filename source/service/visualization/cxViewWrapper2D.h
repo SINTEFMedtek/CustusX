@@ -24,10 +24,10 @@
 #include <vector>
 #include <QPointer>
 #include "cxForwardDeclarations.h"
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 #include "cxViewWrapper.h"
-#include "sscBoundingBox3D.h"
-#include "sscTransform3D.h"
+#include "cxBoundingBox3D.h"
+#include "cxTransform3D.h"
 #include "sscConfig.h"
 
 class QMouseEvent;

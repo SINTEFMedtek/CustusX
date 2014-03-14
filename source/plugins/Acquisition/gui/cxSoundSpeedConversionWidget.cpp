@@ -5,9 +5,9 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
-#include "sscMessageManager.h"
-#include "sscToolManager.h"
-#include "sscProbe.h"
+#include "cxReporter.h"
+#include "cxToolManager.h"
+#include "cxProbe.h"
 
 namespace cx
 {
@@ -64,7 +64,7 @@ void SoundSpeedConverterWidget::applySoundSpeedCompensationFactorSlot()
 {
   if(!mProbe)
   {
-    messageManager()->sendWarning("Don't know which probe to set the sound speed compensation for...");
+    reportWarning("Don't know which probe to set the sound speed compensation for...");
     return;
   }
 

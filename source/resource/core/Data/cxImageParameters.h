@@ -14,8 +14,8 @@
 #ifndef CXIMAGEPARAMETERS_H
 #define CXIMAGEPARAMETERS_H
 
-#include "sscVector3D.h"
-#include "sscTransform3D.h"
+#include "cxVector3D.h"
+#include "cxTransform3D.h"
 
 namespace cx
 {

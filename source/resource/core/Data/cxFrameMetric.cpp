@@ -13,8 +13,8 @@
 // See CustusX_License.txt for more information.
 
 #include "cxFrameMetric.h"
-#include "sscTool.h"
-#include "sscTypeConversions.h"
+#include "cxTool.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

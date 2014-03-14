@@ -22,9 +22,9 @@
 #include <vtkTextProperty.h>
 #include <vtkAssembly.h>
 
-#include "sscTypeConversions.h"
-#include "sscView.h"
-#include "sscGraphicalPrimitives.h"
+#include "cxTypeConversions.h"
+#include "cxView.h"
+#include "cxGraphicalPrimitives.h"
 
 namespace cx
 {

@@ -15,8 +15,8 @@
 #ifndef CXTESTPROBEFIXTURE_H
 #define CXTESTPROBEFIXTURE_H
 
-#include "sscTool.h"
-#include "cxProbe.h"
+#include "cxTool.h"
+#include "cxProbeImpl.h"
 
 namespace cxtest
 {
@@ -44,7 +44,7 @@ protected:
 	QString mDefaultProbeDataUid;
 	QString mProbeDataUid;
 	QString mDefaultRtSourceName;
-	cx::cxProbePtr mProbe;
+	cx::ProbeImplPtr mProbe;
 	double mDefaultTemporalCalibration;
 	double mTemporalCalibration;
 };

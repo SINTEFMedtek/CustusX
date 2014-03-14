@@ -25,7 +25,7 @@
 #include <QWidget>
 #include <QLayout>
 #include <vector>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxSettings.h"
 
 namespace cx

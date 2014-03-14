@@ -18,7 +18,7 @@
 #include <QObject>
 #include <map>
 #include <vector>
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
@@ -32,7 +32,7 @@ typedef std::map<QString, RepPtr> RepMap;
 typedef std::map<QString, VolumetricBaseRepPtr> VolumetricRepMap;
 typedef boost::shared_ptr<class ThresholdPreview> ThresholdPreviewPtr;
 
-class MessageManager;
+class Reporter;
 
 /**
  * \file

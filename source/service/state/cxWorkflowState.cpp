@@ -14,11 +14,11 @@
 
 #include "cxWorkflowState.h"
 #include "cxVideoConnectionManager.h"
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 #include "cxStateService.h"
 #include "cxPatientData.h"
 #include "cxSettings.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxPatientService.h"
 #include "cxVideoService.h"
 #include "cxStateServiceBackend.h"
@@ -28,7 +28,7 @@ namespace cx
 
 void WorkflowState::onEntry(QEvent * event)
 {
-	messageManager()->sendInfo("Workflow change to [" + mName + "]");
+	report("Workflow change to [" + mName + "]");
 	if (mAction)
 		mAction->setChecked(true);
 }

@@ -12,18 +12,18 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "sscReconstructParams.h"
-#include "sscBoolDataAdapterXml.h"
+#include "cxReconstructParams.h"
+#include "cxBoolDataAdapterXml.h"
 #include "catch.hpp"
 #include "cxtestReconstructManagerFixture.h"
 #include "cxtestReconstructRealData.h"
 #include "cxtestSyntheticReconstructInput.h"
 
-#include "sscDummyTool.h"
-#include "sscPNNReconstructAlgorithm.h"
-#include "sscReconstructPreprocessor.h"
+#include "cxDummyTool.h"
+#include "cxPNNReconstructAlgorithm.h"
+#include "cxReconstructPreprocessor.h"
 #include <vtkImageData.h>
-#include "sscStringDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
 #include "recConfig.h"
 
 #ifdef CX_USE_OPENCL_UTILITY
@@ -118,7 +118,7 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 	}
 }
 
-TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstruction][integration]")
+TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstruction][integration][not_win32]")
 {
 	ReconstructManagerTestFixture fixture;
 	ReconstructRealTestData realData;
@@ -138,7 +138,7 @@ TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstru
 	realData.validateAngioData(fixture.getOutput()[0]);
 }
 
-TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruction][integration]")
+TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruction][integration][not_win32]")
 {
 	ReconstructManagerTestFixture fixture;
 	ReconstructRealTestData realData;
@@ -160,7 +160,7 @@ TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruc
 
 }
 
-TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integration][usreconstruction][synthetic]")
+TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integration][usreconstruction][synthetic][not_win32]")
 {
 	ReconstructManagerTestFixture fixture;
 	fixture.setVerbose(true);

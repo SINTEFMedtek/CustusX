@@ -25,13 +25,13 @@
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
-#include "sscView.h"
-#include "sscLandmark.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscTypeConversions.h"
+#include "cxView.h"
+#include "cxLandmark.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
+#include "cxTypeConversions.h"
 #include "boost/bind.hpp"
-#include "sscVtkHelperClasses.h"
+#include "cxVtkHelperClasses.h"
 
 namespace cx
 {

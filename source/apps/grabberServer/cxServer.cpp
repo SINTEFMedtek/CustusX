@@ -1,7 +1,7 @@
 #include "cxServer.h"
 
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
 #include "cxOpenIGTLinkSession.h"
 
 namespace cx
@@ -22,11 +22,11 @@ void Server::start()
 
   if(started)
   {
-    messageManager()->sendSuccess("Server is listening to port "+qstring_cast(this->serverPort()));
+    reportSuccess("Server is listening to port "+qstring_cast(this->serverPort()));
     emit open();
   }
   else
-    messageManager()->sendError("Server failed to start: "+qstring_cast(this->errorString()));
+    reportError("Server failed to start: "+qstring_cast(this->errorString()));
 }
 
 void Server::stop()
@@ -35,7 +35,7 @@ void Server::stop()
     return;
 
   this->close(); //TODO undefined behavior????
-  messageManager()->sendSuccess("Server stopped listening and is closed.");
+  reportSuccess("Server stopped listening and is closed.");
   emit closed();
 }
 
@@ -69,7 +69,7 @@ OpenIGTLinkServer::~OpenIGTLinkServer()
 
 void OpenIGTLinkServer::incomingConnection(int socketDescriptor)
 {
-  messageManager()->sendInfo("Incoming connection from socket descriptor "+qstring_cast(socketDescriptor));
+  report("Incoming connection from socket descriptor "+qstring_cast(socketDescriptor));
 
   //create a thread
   OpenIGTLinkSession* session = new OpenIGTLinkSession(socketDescriptor);

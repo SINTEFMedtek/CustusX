@@ -10,18 +10,18 @@
 
 #include <vector>
 #include <QtGui>
-#include "sscForwardDeclarations.h"
-#include "sscLandmark.h"
-#include "sscPointMetric.h"
-#include "sscDistanceMetric.h"
-#include "sscAngleMetric.h"
-#include "sscPlaneMetric.h"
+#include "cxForwardDeclarations.h"
+#include "cxLandmark.h"
+#include "cxPointMetric.h"
+#include "cxDistanceMetric.h"
+#include "cxAngleMetric.h"
+#include "cxPlaneMetric.h"
 #include "cxSphereMetric.h"
 #include "cxShapedMetric.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscVector3DDataAdapterXml.h"
-#include "sscColorDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxVector3DDataAdapterXml.h"
+#include "cxColorDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
 
 class QVBoxLayout;
 class QTableWidget;

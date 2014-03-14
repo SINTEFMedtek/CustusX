@@ -18,8 +18,8 @@
 #include <QWidget>
 
 #include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
-#include "sscVector3D.h"
+#include "cxForwardDeclarations.h"
+#include "cxVector3D.h"
 #include "cxPlaybackTime.h"
 
 

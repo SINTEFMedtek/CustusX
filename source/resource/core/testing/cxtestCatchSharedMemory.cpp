@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "sscSharedMemory.h"
+#include "cxSharedMemory.h"
 #include "catch.hpp"
 
 using namespace cx;

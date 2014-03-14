@@ -27,7 +27,7 @@ if (BUILD_TESTING)
 		cxtestSpaceListenerMock.cpp
 		cxtestTrackingPositionFilter.cpp
 		cxtestCoreServices.cpp
-		cxtestMessageManager.cpp
+		cxtestReporter.cpp
 		)
 	if (CX_USE_OPENCL_UTILITY)
 	   	set(RESOURCE_TEST_CATCH_SOURCE_FILES

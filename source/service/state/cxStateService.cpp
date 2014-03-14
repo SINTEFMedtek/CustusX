@@ -18,9 +18,9 @@
 #include <QApplication>
 #include <QByteArray>
 #include <QDir>
-#include "sscEnumConverter.h"
-#include "sscXmlOptionItem.h"
-#include "sscMessageManager.h"
+#include "cxEnumConverter.h"
+#include "cxXmlOptionItem.h"
+#include "cxReporter.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxWorkflowStateMachine.h"
@@ -257,11 +257,11 @@ QStringList StateService::getDefaultGrabberServer()
 	QString filename;
 	QString relativePath = "OpenIGTLinkServer";
 	QString postfix = "";
-#ifdef __APPLE__
-	filename = "GrabberServer";
-	relativePath = "grabberServer";
-	postfix = " --auto";
-#elif WIN32
+//#ifdef __APPLE__
+//	filename = "GrabberServer";
+//	relativePath = "grabberServer";
+//	postfix = " --auto";
+#if WIN32
 	filename = "OpenIGTLinkServer.exe";
 	postfix = "--in_width 800 --in_height 600";
 #else

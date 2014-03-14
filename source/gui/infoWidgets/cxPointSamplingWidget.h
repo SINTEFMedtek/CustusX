@@ -5,8 +5,8 @@
 
 #include <vector>
 #include <QtGui>
-#include "sscForwardDeclarations.h"
-#include "sscLandmark.h"
+#include "cxForwardDeclarations.h"
+#include "cxLandmark.h"
 
 class QVBoxLayout;
 class QTableWidget;

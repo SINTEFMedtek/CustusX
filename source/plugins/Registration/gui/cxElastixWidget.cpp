@@ -17,24 +17,24 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QSpinBox>
-#include "sscLogger.h"
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
+#include "cxLogger.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
 #include "cxRegistrationManager.h"
 #include "cxTimedAlgorithm.h"
 #include "cxPatientData.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxDataInterface.h"
 #include "cxPatientService.h"
 #include "cxRegistrationDataAdapters.h"
-#include "sscFileSelectWidget.h"
+#include "cxFileSelectWidget.h"
 #include "cxDataLocations.h"
 #include "cxElastixSyntaxHighlighter.h"
-#include "sscCheckBoxWidget.h"
+#include "cxCheckBoxWidget.h"
 #include "cxSettings.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxElastixExecuter.h"
-#include "sscStringDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
 
 namespace cx
 {

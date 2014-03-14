@@ -18,9 +18,9 @@
 #include <QString>
 #include <map>
 #include "boost/shared_ptr.hpp"
-//#include "sscToolManager.h"
+//#include "cxToolManager.h"
 #include "cxForwardDeclarations.h"
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 
 class QDomNode;
 
