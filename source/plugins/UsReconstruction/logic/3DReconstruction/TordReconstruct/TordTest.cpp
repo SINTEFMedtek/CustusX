@@ -33,6 +33,11 @@ void TordTest::enableProfiling()
 	mAlgorithm->setProfiling(true);
 }
 
+double TordTest::getKernelExecutionTime()
+{
+	mAlgorithm->getKernelExecutionTime();
+}
+
 QString TordTest::getName() const
 {
 	return "TordTest";

@@ -131,6 +131,8 @@ public:
 	 * Enable/diable OpenCL profiling for this algorithm
 	 */
 	void setProfiling(bool on);
+	double getTotalExecutionTime();
+	double getKernelExecutionTime();
 
 private:
 	void setKernelArguments(
@@ -154,10 +156,17 @@ private:
 	        float radius);
 	size_t calculateSpaceNeededForClosePlanes(cl::Kernel kernel, cl::Device device, size_t local_work_size, size_t nPlanes_numberOfInputImages, int nClosePlanes);
 	bool isUsingTooMuchMemory(size_t outputVolumeSize, size_t inputBlocksLength, cl_ulong globalMemUse);
+	void measureAndExecuteKernel(cl::CommandQueue queue, cl::Kernel kernel, size_t global_work_size, size_t local_work_size, std::string measurementName);
+	void measureAndReadBuffer(cl::CommandQueue queue, cl::Buffer outputBuffer, size_t outputVolumeSize, void *outputData, std::string measurementName);
+
+	void startProfiling(std::string name, cl::CommandQueue queue);
+	void stopProfiling(std::string name, cl::CommandQueue queue);
 
 	cl::Kernel mKernel;
 	oul::Context mOulContex;
 	oul::RuntimeMeasurementsManagerPtr mRuntime;
+	std::set<std::string> mMeasurementNames;
+	std::string mKernelMeasurementName;
 
 };
 
