@@ -29,6 +29,7 @@
 #include "sscMessageManager.h"
 #include "cxtestReconstructAlgorithmFixture.h"
 #include "cxtestUtilities.h"
+#include "cxtestJenkinsMeasurement.h"
 
 namespace cxtest
 {
@@ -116,10 +117,16 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	boost::shared_ptr<cx::TordTest> algorithm(new cx::TordTest);
 	algorithm->enableProfiling();
 
+	JenkinsMeasurement jenkins;
+	jenkins.initialize();
+
+	QString name = "DefaultTord";
+
 	fixture.setAlgorithm(algorithm);
 	algorithm->getRadiusOption(settings)->setValue(10);
 	SECTION("VNN")
 	{
+		name = "VNN";
 		std::cerr << "Testing VNN\n";
 		algorithm->getMethodOption(settings)->setValue("VNN");
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
@@ -128,6 +135,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	}
 	SECTION("VNN2")
 	{
+		name = "VNN2";
 		std::cerr << "Testing VNN2\n";
 		algorithm->getMethodOption(settings)->setValue("VNN2");
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
@@ -136,6 +144,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	}
 	SECTION("DW")
 	{
+		name = "DW";
 		std::cerr << "Testing DW\n";
 		algorithm->getMethodOption(settings)->setValue("DW");
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
@@ -144,6 +153,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	}
 	SECTION("Anisotropic")
 	{
+		name = "Anisotropic";
 		std::cerr << "Testing Anisotropic\n";
 		algorithm->getMethodOption(settings)->setValue("Anisotropic");
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
@@ -154,6 +164,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	}
 	SECTION("Multistart search")
 	{
+		name = "Multistart search";
 		std::cerr << "Testing multistart search\n";
 		algorithm->getMethodOption(settings)->setValue("VNN");
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
@@ -162,6 +173,9 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	}
 
 	fixture.reconstruct(settings);
+
+	double executionTime = algorithm->getKernelExecutionTime();
+	jenkins.createOutput(name, QString::number(executionTime));
 
 	fixture.checkRMSBelow(20.0);
 	fixture.checkCentroidDifferenceBelow(1);

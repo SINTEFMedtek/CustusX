@@ -31,11 +31,18 @@ QString Message::getPrintableMessage() const
 	QString source = QString("");
 	if (mSourceLocation.isEmpty())
 		source = QString("[%1]").arg(mSourceLocation);
-	return QString("[%1]%2[%3] %4")
-		.arg(mTimeStamp.toString("hh:mm:ss.zzz"))
-		.arg(source)
-		.arg(qstring_cast(mMessageLevel))
-		.arg(mText);
+
+	QString printableMessage;
+	if(mMessageLevel == mlRAW)
+		printableMessage = mText;
+	else
+		printableMessage = QString("[%1]%2[%3] %4")
+							.arg(mTimeStamp.toString("hh:mm:ss.zzz"))
+							.arg(source)
+							.arg(qstring_cast(mMessageLevel))
+							.arg(mText);
+
+	return printableMessage;
 }
 
 MESSAGE_LEVEL Message::getMessageLevel() const
@@ -83,7 +90,10 @@ public:
   {
     char single = traits_type::to_char_type(meta);
     if (mOrig) // send to original stream as well
+    {
+      QMutexLocker sentry(&mOrigMutex);
       mOrig->sputc(single);
+    }
 
     if (mEnabledRedirect)
     {
@@ -109,13 +119,20 @@ public:
     mEnabledRedirect = on;
   }
 
-  //    virtual int_type overflow(int_type meta=traits_type::eof());
+  //this is threadsafe fix...
+  void sendUnredirected(const QString& sequence)
+  {
+	  QMutexLocker sentry(&mOrigMutex);
+	  mOrig->sputn(sequence.toAscii(), sequence.size());
+  }
+
 private:
   bool mEnabledRedirect;
   QString mBuffer;
   std::streambuf* mOrig;
   MESSAGE_LEVEL mMessageLevel;
   QMutex mMutex;
+  QMutex mOrigMutex;
 };
 //---------------------------------------------------------------------------
 
@@ -140,9 +157,10 @@ public:
   {
     mStream.rdbuf(OrigBuf);
   }
-  void setEnableRedirect(bool on)
+
+  void sendUnredirected(const QString& sequence)
   {
-    StreamBuf->setEnableRedirect(on);
+	  StreamBuf->sendUnredirected(sequence);
   }
 
 };
@@ -292,12 +310,21 @@ void MessageManager::sendDebugRedefined(QString debug)
 }
 
 #ifndef SSC_PRINT_CALLER_INFO
-void MessageManager::sendVolatile(QString debug)
+void MessageManager::sendVolatile(QString volatile_msg)
 #else
-void MessageManager::sendVolatileRedefined(QString debug)
+void MessageManager::sendVolatileRedefined(QString volatile_msg)
 #endif
 {
-  this->sendMessage(debug, mlVOLATILE, 5000);
+  this->sendMessage(volatile_msg, mlVOLATILE, 5000);
+}
+
+#ifndef SSC_PRINT_CALLER_INFO
+void MessageManager::sendRaw(QString raw)
+#else
+void MessageManager::sendRawRedefined(QString raw)
+#endif
+{
+  this->sendMessage(raw, mlRAW, 0);
 }
 
 #ifdef SSC_PRINT_CALLER_INFO
@@ -348,6 +375,13 @@ void MessageManager::sendVolatileWithCallerInfo(QString info, const std::string 
 	this->sendCallerInformation(caller, file, line);
 	printf("\n");
 }
+
+void MessageManager::sendRawWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
+{
+	this->sendVolatileRedefined(info);
+	this->sendCallerInformation(caller, file, line);
+	printf("\n");
+}
 #endif
 
 void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int timeout, bool mute, QString sourceLocation)
@@ -361,11 +395,13 @@ void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int t
 	{
 		if (mCout)
 		{
-			// send text to cout if it not already comes from that stream (or cerr)
-			mCout->setEnableRedirect(false);
+//			// send text to cout if it not already comes from that stream (or cerr)
+//			mCout->setEnableRedirect(false);
+//			if (messageLevel != mlCOUT && messageLevel != mlCERR)
+//				std::cout << message.getPrintableMessage() << std::endl;
+//			mCout->setEnableRedirect(true);
 			if (messageLevel != mlCOUT && messageLevel != mlCERR)
-				std::cout << message.getPrintableMessage() << std::endl;
-			mCout->setEnableRedirect(true);
+				mCout->sendUnredirected(message.getPrintableMessage());
 		}
 
 		this->appendToLogfile(this->formatMessage(message) + "\n");
