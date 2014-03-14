@@ -39,6 +39,8 @@ public:
 	 */
 	void enableProfiling();
 
+	double getKernelExecutionTime();
+
 	/**
 	 * Return the name of the algorithm
 	 */
