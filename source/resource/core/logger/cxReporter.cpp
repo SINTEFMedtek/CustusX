@@ -375,13 +375,6 @@ void Reporter::sendVolatileWithCallerInfo(QString info, const std::string &calle
 	this->sendCallerInformation(caller, file, line);
 	printf("\n");
 }
-
-void MessageManager::sendRawWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
-{
-	this->sendVolatileRedefined(info);
-	this->sendCallerInformation(caller, file, line);
-	printf("\n");
-}
 #endif
 
 void Reporter::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int timeout, bool mute, QString sourceLocation)
