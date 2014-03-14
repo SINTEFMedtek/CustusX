@@ -20,9 +20,9 @@
 #include <QStateMachine>
 #include <QString>
 #include <QAction>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxRequestEnterStateTransition.h"
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 
 namespace cx
 {

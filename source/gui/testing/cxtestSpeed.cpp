@@ -17,8 +17,8 @@
 #include <QTimer>
 #include <vtkImageData.h>
 
-#include "sscImage.h"
-#include "sscView.h"
+#include "cxImage.h"
+#include "cxView.h"
 #include "cxtestSender.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
@@ -84,11 +84,11 @@ TEST_CASE("CustusX full run emits no errors, correct service shutdown.", "[integ
 	custusX.stop();
 
 	// the original argument for this test was to check if LogicManager succeeds in deleting
-	// all services: Failure to do so sends an error to the messagemanager.
+	// all services: Failure to do so sends an error to the Reporter.
 	CHECK(!messageListener->containsErrors());
 }
 
-TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][not_win32]")
+TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][not_win32][not_win64]")
 {
 	initTest();
 
@@ -105,7 +105,7 @@ TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][n
 	REQUIRE(fps > minimumFPS);
 }
 
-TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration][not_win32]")
+TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration][not_win32][not_win64]")
 {
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
@@ -121,7 +121,7 @@ TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration][
 	REQUIRE(fps > minimumFPS);
 }
 
-TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integration][not_win32]")
+TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integration][not_win32][not_win64]")
 {
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");

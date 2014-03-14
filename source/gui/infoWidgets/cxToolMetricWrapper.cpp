@@ -14,9 +14,9 @@
 
 #include "cxToolMetricWrapper.h"
 #include <QHBoxLayout>
-#include "sscLabeledComboBoxWidget.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxDataAdapterHelper.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 

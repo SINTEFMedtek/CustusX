@@ -15,9 +15,9 @@
 #define CXELASTIXPARAMETERS_H
 
 #include <QObject>
-#include "sscForwardDeclarations.h"
-#include "sscXmlOptionItem.h"
-#include "sscStringDataAdapterXml.h"
+#include "cxForwardDeclarations.h"
+#include "cxXmlOptionItem.h"
+#include "cxStringDataAdapterXml.h"
 
 namespace cx
 {

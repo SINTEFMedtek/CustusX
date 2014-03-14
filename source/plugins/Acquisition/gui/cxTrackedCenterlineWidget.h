@@ -2,7 +2,7 @@
 #define CXTRACKEDCENTERLINEWIDGET_H_
 
 #include "cxRecordBaseWidget.h"
-#include "sscTool.h"
+#include "cxTool.h"
 
 namespace cx
 {

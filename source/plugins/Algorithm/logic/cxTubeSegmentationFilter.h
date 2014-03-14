@@ -11,8 +11,8 @@
 class TSFOutput;
 #endif //CX_USE_TSF
 
-#include "sscStringDataAdapterXml.h"
-#include "sscBoolDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;

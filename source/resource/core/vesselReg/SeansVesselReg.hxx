@@ -1,9 +1,9 @@
 #ifndef SeansVesselSegmentation_hxx
 #define SeansVesselSegmentation_hxx
 
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 #include "vtkSmartPointer.h"
 
 namespace cx

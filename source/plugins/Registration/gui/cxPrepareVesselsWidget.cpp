@@ -3,17 +3,17 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include "cxDataInterface.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscTypeConversions.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxTypeConversions.h"
 #include "cxColorSelectButton.h"
-#include "sscDataManager.h"
-#include "sscMesh.h"
+#include "cxDataManager.h"
+#include "cxMesh.h"
 #include "cxRegistrationManager.h"
 #include "cxDataLocations.h"
 
 #include "cxPipelineWidget.h"
-#include "sscHelperWidgets.h"
-#include "sscColorDataAdapterXml.h"
+#include "cxHelperWidgets.h"
+#include "cxColorDataAdapterXml.h"
 
 #include "cxResampleImageFilter.h"
 #include "cxSmoothingImageFilter.h"

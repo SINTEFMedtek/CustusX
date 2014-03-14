@@ -14,7 +14,7 @@
 #ifndef CXTESTRECONSTRUCTREALDATA_H
 #define CXTESTRECONSTRUCTREALDATA_H
 
-#include "sscImage.h"
+#include "cxImage.h"
 
 namespace cxtest
 {

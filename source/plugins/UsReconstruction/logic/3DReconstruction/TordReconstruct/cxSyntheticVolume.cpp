@@ -1,12 +1,12 @@
 #include "cxSyntheticVolume.h"
 #include "vtkImageData.h"
-#include "sscImage.h"
+#include "cxImage.h"
 #include <cstdlib>
 #include <time.h>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include <QTime>
-#include "sscLogger.h"
-#include "sscRegistrationTransform.h"
+#include "cxLogger.h"
+#include "cxRegistrationTransform.h"
 
 double noiseValue(double noiseSigma,
                          double noiseMean)

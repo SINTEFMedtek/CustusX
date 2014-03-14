@@ -3,7 +3,7 @@
 
 #ifdef CX_USE_LEVEL_SET
 #include "cxFilterImpl.h"
-#include "sscVector3D.h"
+#include "cxVector3D.h"
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;

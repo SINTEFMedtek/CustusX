@@ -4,7 +4,7 @@
 #include <iostream>
 #include <QDir>
 #include <QTextStream>
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataLocations.h"
 
 namespace cx
@@ -103,7 +103,7 @@ std::map<QString, QString> TSFPresets::readFile(QString& filePath)
 	std::map<QString, QString> retval;
 	if (!QFile::exists(filePath))
 	{
-		messageManager()->sendError("File does not exists: " + filePath);
+		reportError("File does not exists: " + filePath);
 		return retval;
 	}
 	QFile file(filePath);
@@ -129,7 +129,7 @@ void TSFPresets::saveFile(QString folderpath, std::map<QString, QString> paramet
 	QTextStream outPresetFile;
 	if (!file.open(QFile::WriteOnly))
 	{
-		messageManager()->sendError("Could not open the file " + file.fileName() + " for writing.");
+		reportError("Could not open the file " + file.fileName() + " for writing.");
 		return;
 	}
 	outPresetFile.setDevice(&file);
@@ -148,7 +148,7 @@ void TSFPresets::deleteFile(QString filePath)
 	QFile file(filePath);
 	QString customPresetName = QFileInfo(file).fileName();
 	if (!file.remove())
-		messageManager()->sendError("File: " + filePath + " not removed...");
+		reportError("File: " + filePath + " not removed...");
 }
 
 void TSFPresets::getPresetsNameAndPath()
@@ -156,7 +156,7 @@ void TSFPresets::getPresetsNameAndPath()
 	mPresetsMap.clear();
 	QDir parametersDir(mPresetPath + "/centerline-gpu");
 	if (!parametersDir.exists())
-		messageManager()->sendError("Preset directory "+parametersDir.path()+" not found.");
+		reportError("Preset directory "+parametersDir.path()+" not found.");
 
 	QFileInfoList fileInfoList = parametersDir.entryInfoList(QDir::Files);
 	foreach(QFileInfo info, fileInfoList){

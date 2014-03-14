@@ -7,9 +7,9 @@
 
 #include <cxToolManualCalibrationWidget.h>
 #include "cxActiveToolWidget.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxDataInterface.h"
-#include "sscHelperWidgets.h"
+#include "cxHelperWidgets.h"
 
 namespace cx
 {

@@ -16,7 +16,7 @@
 
 #include <vector>
 #include <QtGui>
-#include "sscMesh.h"
+#include "cxMesh.h"
 #include "cxDataInterface.h"
 #include "cxInfoWidget.h"
 

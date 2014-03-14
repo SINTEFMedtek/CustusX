@@ -15,8 +15,8 @@
 #include "cxtestJenkinsMeasurement.h"
 
 #include <iostream>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
 
 namespace cxtest
 {
@@ -26,14 +26,14 @@ JenkinsMeasurement::JenkinsMeasurement()
 
 void JenkinsMeasurement::initialize()
 {
-	cx::messageManager()->sendRaw("\nCTEST_FULL_OUTPUT\n");
+	cx::reporter()->sendRaw("\nCTEST_FULL_OUTPUT\n");
 }
 
 void JenkinsMeasurement::createOutput(QString name, QString value)
 {
     QString measurement("\n<measurement><name>%1</name><value>%2</value></measurement>\n");
     measurement = measurement.arg(name).arg(value);
-    cx::messageManager()->sendRaw(measurement);
+    cx::reporter()->sendRaw(measurement);
 }
 
 } //namespace cxtest

@@ -17,7 +17,8 @@
 
 #include "cxForwardDeclarations.h"
 #include <vector>
-#include "sscVector3D.h"
+#include <map>
+#include "cxVector3D.h"
 class QDomNode;
 
 namespace cx

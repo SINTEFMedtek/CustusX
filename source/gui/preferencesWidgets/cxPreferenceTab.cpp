@@ -4,8 +4,8 @@
 #include <QLabel>
 #include <QSpinBox>
 #include <QCheckBox>
-#include "sscDoubleWidgets.h"
-#include "sscHelperWidgets.h"
+#include "cxDoubleWidgets.h"
+#include "cxHelperWidgets.h"
 #include "cxSettings.h"
 #include "cxViewManager.h"
 #include "cxMultiVolume3DRepProducer.h"

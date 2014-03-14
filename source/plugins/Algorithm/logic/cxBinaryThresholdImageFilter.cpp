@@ -3,22 +3,22 @@
 #include "cxAlgorithmHelpers.h"
 #include <itkBinaryThresholdImageFilter.h>
 #include <vtkImageCast.h>
-#include "sscDataManager.h"
-#include "sscUtilHelpers.h"
-#include "sscRegistrationTransform.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
-#include "sscColorDataAdapterXml.h"
-#include "sscBoolDataAdapterXml.h"
-#include "sscTypeConversions.h"
+#include "cxDataManager.h"
+#include "cxUtilHelpers.h"
+#include "cxRegistrationTransform.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxColorDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
+#include "cxTypeConversions.h"
 
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxRepManager.h"
 #include "cxThresholdPreview.h"
 #include "cxContourFilter.h"
-#include "sscMesh.h"
-#include "sscImage.h"
+#include "cxMesh.h"
+#include "cxImage.h"
 #include "cxSelectDataStringDataAdapter.h"
 
 

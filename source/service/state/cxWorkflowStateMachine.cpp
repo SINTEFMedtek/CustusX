@@ -19,7 +19,7 @@
 #include "cxWorkflowState.h"
 #include "cxRequestEnterStateTransition.h"
 #include "cxStateServiceBackend.h"
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 
 namespace cx
 {

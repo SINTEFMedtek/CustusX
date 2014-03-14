@@ -72,8 +72,7 @@ typedef boost::shared_ptr<Streamer> StreamerPtr;
 typedef std::map<QString, QString> StringMap;
 /**\brief
  *
- * \ingroup cxGrabberServer
- *
+ * \ingroup cx_resource_videoserver
  * \date Apr 17, 2012
  * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF
@@ -95,8 +94,8 @@ typedef boost::shared_ptr<ImageStreamer> ImageStreamerPtr;
 
 /**\brief
  *
- * \ingroup cxGrabberServer
  *
+ * \ingroup cx_resource_videoserver
  * \date May 22, 2013
  * \author Janne Beate Bakeng, SINTEF
  */

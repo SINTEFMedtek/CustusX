@@ -15,9 +15,9 @@
 #ifndef CXDONUTMETRICREP_H
 #define CXDONUTMETRICREP_H
 
-#include "sscDataMetricRep.h"
+#include "cxDataMetricRep.h"
 #include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 class QColor;
 
 typedef vtkSmartPointer<class vtkTextActor> vtkTextActorPtr;

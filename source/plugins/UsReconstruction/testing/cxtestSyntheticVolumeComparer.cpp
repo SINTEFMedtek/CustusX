@@ -13,13 +13,13 @@
 // See CustusX_License.txt for more information.
 
 #include "cxtestSyntheticVolumeComparer.h"
-#include "sscVolumeHelpers.h"
+#include "cxVolumeHelpers.h"
 #include "catch.hpp"
-#include "sscImage.h"
+#include "cxImage.h"
 #include "cxtestUtilities.h"
 #include <vtkImageData.h>
-#include "sscRegistrationTransform.h"
-#include "sscDataReaderWriter.h"
+#include "cxRegistrationTransform.h"
+#include "cxDataReaderWriter.h"
 #include <QDir>
 
 namespace cxtest

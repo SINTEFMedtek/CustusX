@@ -16,10 +16,10 @@
 #include <QDir>
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
-#include "sscDataReaderWriter.h"
-#include "sscLogger.h"
-#include "sscTypeConversions.h"
-#include "sscUtilHelpers.h"
+#include "cxDataReaderWriter.h"
+#include "cxLogger.h"
+#include "cxTypeConversions.h"
+#include "cxUtilHelpers.h"
 
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 

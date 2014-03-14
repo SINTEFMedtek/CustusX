@@ -16,7 +16,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include "vtkForwardDeclarations.h"
-#include "sscVector3D.h"
+#include "cxVector3D.h"
 #include <QColor>
 typedef vtkSmartPointer<class vtkLinearExtrusionFilter> vtkLinearExtrusionFilterPtr;
 

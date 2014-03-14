@@ -18,11 +18,11 @@
 #include <vtkTextProperty.h>
 #include <vtkTextMapper.h>
 
-#include "sscView.h"
-#include "sscVtkHelperClasses.h"
-#include "sscTypeConversions.h"
-#include "sscDataMetric.h"
-#include "sscLogger.h"
+#include "cxView.h"
+#include "cxVtkHelperClasses.h"
+#include "cxTypeConversions.h"
+#include "cxDataMetric.h"
+#include "cxLogger.h"
 
 namespace cx
 {

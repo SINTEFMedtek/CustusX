@@ -13,14 +13,14 @@
 // See CustusX_License.txt for more information.
 #include "cxSamplerWidget.h"
 
-#include "sscCoordinateSystemHelpers.h"
+#include "cxCoordinateSystemHelpers.h"
 #include <vtkImageData.h>
-#include "sscToolManager.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscTypeConversions.h"
+#include "cxToolManager.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxTypeConversions.h"
 #include "cxSettings.h"
-#include "sscDataManager.h"
-#include "sscImage.h"
+#include "cxDataManager.h"
+#include "cxImage.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 #include "cxSpaceListener.h"

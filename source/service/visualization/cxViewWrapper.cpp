@@ -16,15 +16,15 @@
 
 #include <QMenu>
 #include "vtkCamera.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
 #include "cxViewGroup.h" //for class Navigation
-#include "sscMesh.h"
-#include "sscTypeConversions.h"
-#include "sscImageAlgorithms.h"
-#include "sscDataMetric.h"
-#include "sscView.h"
-#include "sscImage.h"
+#include "cxMesh.h"
+#include "cxTypeConversions.h"
+#include "cxImageAlgorithms.h"
+#include "cxDataMetric.h"
+#include "cxView.h"
+#include "cxImage.h"
 #include "cxViewManager.h"
 #include "cxInteractiveClipper.h"
 #include "cxRepManager.h"

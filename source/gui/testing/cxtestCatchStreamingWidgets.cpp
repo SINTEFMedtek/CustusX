@@ -6,10 +6,10 @@
 #include "cxtestQueuedSignalListener.h"
 #include "cxDataLocations.h"
 
-#include "sscMessageManager.h"
-#include "sscDummyToolManager.h"
-#include "sscDataManager.h"
-#include "sscToolManager.h"
+#include "cxReporter.h"
+#include "cxDummyToolManager.h"
+#include "cxDataManager.h"
+#include "cxToolManager.h"
 #include "cxVideoService.h"
 #include "cxVideoServiceBackend.h"
 #include "cxtestDummyDataManager.h"
@@ -22,7 +22,7 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][widget][streaming]")
 {
 	cx::LogicManager::initialize();
 //	cxtest::TestServicesPtr services = cxtest::TestServices::create();
-//	cx::messageManager()->initialize();
+//	cx::Reporter()->initialize();
 //	cx::cxDataManager::getInstance()->initialize();
 
 //	cx::cxToolManager::initializeObject();
@@ -49,7 +49,7 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][widget][streaming]")
 
 //	DummyToolManager::getInstance()->shutdown();
 //	cx::cxDataManager::getInstance()->shutdown();
-//	cx::messageManager()->shutdown();
+//	cx::Reporter()->shutdown();
 	ts.reset();
 	cx::LogicManager::shutdown();
 }

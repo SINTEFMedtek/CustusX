@@ -9,12 +9,12 @@
 #include <QColor>
 #include <QBrush>
 #include <QMouseEvent>
-#include "sscDataManager.h"
-#include "sscImageTF3D.h"
-#include "sscImageTFData.h"
-#include "sscMessageManager.h"
-#include "sscUtilHelpers.h"
-#include "sscTypeConversions.h"
+#include "cxDataManager.h"
+#include "cxImageTF3D.h"
+#include "cxImageTFData.h"
+#include "cxReporter.h"
+#include "cxUtilHelpers.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {
@@ -160,7 +160,7 @@ void TransferFunctionAlphaWidget::updateTooltip(AlphaPoint point)
 {
 	QString tip = QString("alpha(%1)=%2").arg(point.position).arg(double(point.value)/255, 0, 'f', 2);
 	this->setToolTip(tip);
-	messageManager()->sendVolatile(tip);
+	reporter()->sendVolatile(tip);
 }
 
 

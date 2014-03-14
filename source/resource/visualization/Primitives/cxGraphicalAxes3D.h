@@ -16,8 +16,8 @@
 #define CXGRAPHICALAXES3D_H
 
 #include <vector>
-#include "sscRepImpl.h"
-#include "sscTransform3D.h"
+#include "cxRepImpl.h"
+#include "cxTransform3D.h"
 #include "vtkForwardDeclarations.h"
 
 namespace cx

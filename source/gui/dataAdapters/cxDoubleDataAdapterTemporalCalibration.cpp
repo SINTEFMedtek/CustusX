@@ -6,7 +6,7 @@
  */
 
 #include <cxDoubleDataAdapterTemporalCalibration.h>
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 
 namespace cx
 {

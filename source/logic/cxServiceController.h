@@ -10,7 +10,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <QObject>
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {

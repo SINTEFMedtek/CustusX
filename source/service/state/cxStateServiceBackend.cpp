@@ -14,8 +14,8 @@
 
 #include "cxStateServiceBackend.h"
 
-#include "sscDataManager.h"
-#include "sscToolManager.h"
+#include "cxDataManager.h"
+#include "cxToolManager.h"
 #include "cxSpaceProvider.h"
 #include "cxPatientService.h"
 

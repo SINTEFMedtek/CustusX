@@ -14,9 +14,9 @@
 
 #include "cxSpaceListenerImpl.h"
 
-#include "sscDataManager.h"
-#include "sscToolManager.h"
-#include "sscData.h"
+#include "cxDataManager.h"
+#include "cxToolManager.h"
+#include "cxData.h"
 
 namespace cx
 {

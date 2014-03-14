@@ -4,9 +4,9 @@
 #include "cxBaseWidget.h"
 #include <QCheckBox>
 #include <QDomElement>
-#include <sscImage.h>
-#include "sscTransferFunctions3DPresets.h"
-#include "sscDoubleDataAdapter.h"
+#include "cxImage.h"
+#include "cxTransferFunctions3DPresets.h"
+#include "cxDoubleDataAdapter.h"
 #include "cxActiveImageProxy.h"
 
 class QVBoxLayout;

@@ -21,10 +21,10 @@
 #include "cxLayoutData.h"
 #include <iostream>
 #include <QDomElement>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscDefinitionStrings.h"
-#include "sscView.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
+#include "cxDefinitionStrings.h"
+#include "cxView.h"
 
 namespace cx
 {
@@ -122,7 +122,7 @@ bool LayoutData::merge(LayoutRegion region)
 {
 	if (region.pos.row + region.span.row > mSize.row || region.pos.col + region.span.col > mSize.col)
 	{
-		messageManager()->sendError("Attempted to merge a region outside allocated space in LayoutData.");
+		reportError("Attempted to merge a region outside allocated space in LayoutData.");
 		return false;
 	}
 

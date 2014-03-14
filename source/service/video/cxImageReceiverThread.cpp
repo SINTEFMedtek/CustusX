@@ -13,8 +13,8 @@
 // See CustusX_License.txt for more information.
 
 #include "cxImageReceiverThread.h"
-#include "sscMessageManager.h"
-#include "sscVector3D.h"
+#include "cxReporter.h"
+#include "cxVector3D.h"
 #include "cxCyclicActionLogger.h"
 #include "cxVideoService.h"
 

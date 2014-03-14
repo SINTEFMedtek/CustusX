@@ -4,9 +4,9 @@ if (BUILD_TESTING)
 
    # The following files contains test code not converted from cppunit to ctest.
    # Not working, but the code they test are still present in cx.
-   #     sscContainerWindow.cpp
-   #     sscTestViewContainer.cpp
-   #     sscTestGPURayCaster.cpp
+   #     cxContainerWindow.cpp
+   #     cxTestViewContainer.cpp
+   #     cxTestGPURayCaster.cpp
 #        cx_catch__private_define_platform_specific_linker_options()
         cx_add_class(RESOURCE_VISUALZATION_TEST_UTILITIES_SOURCE_FILES
 		cxtestRenderTester
@@ -21,12 +21,12 @@ if (BUILD_TESTING)
 
 
 	set(CXTEST_SOURCES_TO_MOC
-		sscViewsWindow.h
+		cxViewsWindow.h
 		cxViewsFixture.h
 	)
 	cx_add_class(RESOURCE_VISUALZATION_TEST_CATCH_SOURCE_FILES
 		cxViewsFixture.cpp
-		sscViewsWindow.cpp
+		cxViewsWindow.cpp
 		cxtestVideoGraphicsFixture
         cxtestVideoGraphics.cpp
 		cxtestVisualRendering.cpp

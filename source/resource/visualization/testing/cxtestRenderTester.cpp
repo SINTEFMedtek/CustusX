@@ -28,12 +28,12 @@
 #include <vtkRendererCollection.h>
 #include <vtkImageImport.h>
 
-#include "sscBoundingBox3D.h"
-#include "sscView.h"
-#include "sscTypeConversions.h"
-#include "sscDataReaderWriter.h"
+#include "cxBoundingBox3D.h"
+#include "cxView.h"
+#include "cxTypeConversions.h"
+#include "cxDataReaderWriter.h"
 #include "cxtestUtilities.h"
-#include "sscLogger.h"
+#include "cxLogger.h"
 
 typedef vtkSmartPointer<class vtkProp> vtkPropPtr;
 typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;

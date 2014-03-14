@@ -16,7 +16,7 @@
 
 #include <QObject>
 #include "cxForwardDeclarations.h"
-#include "sscCoordinateSystemHelpers.h"
+#include "cxCoordinateSystemHelpers.h"
 
 namespace cx
 {

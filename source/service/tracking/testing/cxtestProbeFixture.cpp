@@ -16,10 +16,10 @@
 #include "cxtestProbeFixture.h"
 
 #include <QString>
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 #include "ProbeXmlConfigParserMock.h"
-#include "sscProbeData.h"
-#include "sscTestVideoSource.h"
+#include "cxProbeData.h"
+#include "cxTestVideoSource.h"
 
 #include "catch.hpp"
 
@@ -29,7 +29,7 @@ namespace cxtest
 ProbeFixture::ProbeFixture()
 {
 	// this stuff will be performed just before all tests in this class
-	cx::MessageManager::initialize();
+	cx::Reporter::initialize();
 	this->createTestProbe();
 }
 
@@ -37,7 +37,7 @@ ProbeFixture::ProbeFixture()
 ProbeFixture::~ProbeFixture()
 {
 	// this stuff will be performed just after all tests in this class
-	cx::MessageManager::shutdown();
+	cx::Reporter::shutdown();
 }
 
 
@@ -48,7 +48,7 @@ void ProbeFixture::createTestProbe()
 	ProbeXmlConfigParserPtr mXml;
 	mXml.reset(new ProbeXmlConfigParserMock(xmlFileName));
 	mDefaultRtSourceName = mXml->getRtSourceList(mProbeName, mScannerName)[0];
-	mProbe = cx::cxProbe::New(mProbeName, mScannerName, mXml);
+	mProbe = cx::ProbeImpl::New(mProbeName, mScannerName, mXml);
 }
 
 void ProbeFixture::createParameters()

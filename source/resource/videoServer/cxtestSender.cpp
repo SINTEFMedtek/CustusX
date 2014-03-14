@@ -1,6 +1,6 @@
 #include "cxtestSender.h"
 
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 namespace cxtest
 {

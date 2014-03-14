@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include "cxDominantToolProxy.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 
 namespace cx
 {

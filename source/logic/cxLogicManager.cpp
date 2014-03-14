@@ -8,22 +8,22 @@
 #include <cxLogicManager.h>
 
 #include "cxServiceController.h"
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 #include "cxPatientService.h"
 #include "cxVideoService.h"
-#include "cxToolManager.h"
+#include "cxToolManagerUsingIGSTK.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"
-#include "sscDataManagerImpl.h"
+#include "cxDataManagerImpl.h"
 #include "cxRepManager.h"
-#include "sscGPUImageBuffer.h"
+#include "cxGPUImageBuffer.h"
 #include "cxSettings.h"
 #include "cxSpaceProviderImpl.h"
 #include "cxDataFactory.h"
 #include "cxVisualizationServiceBackend.h"
 #include "cxVideoServiceBackend.h"
 #include "cxStateServiceBackend.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxSharedPointerChecker.h"
 
 namespace cx
@@ -118,7 +118,7 @@ void LogicManager::shutdown()
 void LogicManager::initializeServices()
 {
 	// resources layer
-	MessageManager::initialize();
+	Reporter::initialize();
 
 	// services layer
 	this->getPatientService();
@@ -139,7 +139,7 @@ void LogicManager::initializeServices()
 
 void LogicManager::createTrackingService()
 {
-	mTrackingService = cxToolManager::create();
+	mTrackingService = ToolManagerUsingIGSTK::create();
 	LegacySingletons::mToolManager = mTrackingService;
 }
 
@@ -334,7 +334,7 @@ void LogicManager::shutdownServices()
 //	cx::PatientService::shutdown();
 
 	GPUImageBufferRepository::shutdown();
-	MessageManager::shutdown();
+	Reporter::shutdown();
 	Settings::destroyInstance();
 }
 

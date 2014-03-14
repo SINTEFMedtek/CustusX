@@ -15,8 +15,8 @@
 #ifndef CXBOUNDINGBOXWIDGET_H_
 #define CXBOUNDINGBOXWIDGET_H_
 
-#include "sscForwardDeclarations.h"
-#include "sscBoundingBox3D.h"
+#include "cxForwardDeclarations.h"
+#include "cxBoundingBox3D.h"
 #include <QWidget>
 
 namespace cx

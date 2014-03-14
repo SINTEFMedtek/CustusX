@@ -7,7 +7,7 @@
 #ifndef CXTESTACQUISITIONFIXTURE_H_
 #define CXTESTACQUISITIONFIXTURE_H_
 
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 #include "cxAcquisitionData.h"
 #include "cxUSAcquisition.h"
 #include "cxUSReconstructInputData.h"

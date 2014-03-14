@@ -16,7 +16,7 @@
 #define CXMETRICMANAGER_H
 
 #include "cxForwardDeclarations.h"
-#include "sscDataMetric.h"
+#include "cxDataMetric.h"
 
 namespace cx
 {

@@ -3,7 +3,7 @@
 
 #include "cxInfoWidget.h"
 
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 #include "cxDataInterface.h"
 
 #include <QTableWidget>

@@ -13,9 +13,9 @@
 // See CustusX_License.txt for more information.
 
 #include "catch.hpp"
-#include "sscDataManagerImpl.h"
+#include "cxDataManagerImpl.h"
 #include "cxtestDummyDataManager.h"
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 #include "cxMessageListener.h"
 
 namespace cx
@@ -52,7 +52,7 @@ TEST_CASE("Core test services correctly contructed/destructed", "[unit]")
 //	CHECK(services.mTrackingService.unique());
 //	services.mTrackingService.reset();
 
-//	cx::MessageManager::shutdown();
+//	cx::Reporter::shutdown();
 }
 
 } // namespace cx

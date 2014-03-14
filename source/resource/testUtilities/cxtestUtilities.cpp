@@ -15,9 +15,9 @@
 #include "cxtestUtilities.h"
 
 #include "vtkImageData.h"
-#include "sscImage.h"
-#include "sscVolumeHelpers.h"
-#include "sscTypeConversions.h"
+#include "cxImage.h"
+#include "cxVolumeHelpers.h"
+#include "cxTypeConversions.h"
 #include "cxDataLocations.h"
 
 #ifdef CX_WINDOWS

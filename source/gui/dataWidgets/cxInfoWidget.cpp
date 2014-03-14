@@ -3,8 +3,8 @@
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QTableWidget>
-#include "sscImage.h"
-#include "sscTypeConversions.h"
+#include "cxImage.h"
+#include "cxTypeConversions.h"
 
 namespace cx {
 

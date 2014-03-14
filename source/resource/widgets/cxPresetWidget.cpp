@@ -16,7 +16,7 @@
 
 #include <QComboBox>
 #include <QInputDialog>
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 
 namespace cx {
 
@@ -97,7 +97,7 @@ void PresetWidget::setPresets(PresetsPtr presets)
 {
 	if(!presets)
 	{
-		messageManager()->sendError("Trying to set presets to null...");
+		reportError("Trying to set presets to null...");
 		return;
 	}
 	//TODO disconnect old stuff

@@ -7,8 +7,8 @@
  *
  */
 #include "cxShadingParamsInterfaces.h"
-#include "sscDataManager.h"
-#include "sscImage.h"
+#include "cxDataManager.h"
+#include "cxImage.h"
 
 namespace cx
 {

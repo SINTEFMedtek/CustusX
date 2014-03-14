@@ -17,16 +17,16 @@
 #include <QPainter>
 #include <QToolTip>
 #include <QMouseEvent>
-#include "sscToolManager.h"
-#include "sscHelperWidgets.h"
-#include "sscTime.h"
-#include "sscMessageManager.h"
-#include "sscLogger.h"
-#include "sscTypeConversions.h"
+#include "cxToolManager.h"
+#include "cxHelperWidgets.h"
+#include "cxTime.h"
+#include "cxReporter.h"
+#include "cxLogger.h"
+#include "cxTypeConversions.h"
 #include "cxTimelineWidget.h"
-#include "sscDataManager.h"
-#include "sscData.h"
-#include "sscRegistrationTransform.h"
+#include "cxDataManager.h"
+#include "cxData.h"
+#include "cxRegistrationTransform.h"
 #include "cxVideoService.h"
 #include "cxPlaybackUSAcquisitionVideo.h"
 #include "cxSettings.h"
@@ -160,7 +160,7 @@ void PlaybackWidget::toggleOpenSlot()
 		videoService()->setPlaybackMode(mTimer);
 		if (!toolManager()->isPlaybackMode())
 			return;
-		messageManager()->sendInfo(QString("Started Playback with start time [%1] and end time [%2]")
+		report(QString("Started Playback with start time [%1] and end time [%2]")
 						.arg(mTimer->getStartTime().toString(timestampMilliSecondsFormatNice()))
 						.arg(mTimer->getStartTime().addMSecs(mTimer->getLength()).toString(timestampMilliSecondsFormatNice())));
 

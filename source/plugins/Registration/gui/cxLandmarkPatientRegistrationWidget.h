@@ -4,8 +4,8 @@
 #include "cxLandmarkRegistrationWidget.h"
 #include "cxRegistrationDataAdapters.h"
 
-#include <sscImage.h>
-#include <sscTransform3D.h>
+#include "cxImage.h"
+#include "cxTransform3D.h"
 #include "cxDominantToolProxy.h"
 
 class QVBoxLayout;

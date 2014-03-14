@@ -14,7 +14,7 @@
 #ifndef CXDATAADAPTERHELPER_H_
 #define CXDATAADAPTERHELPER_H_
 
-#include "sscDataAdapter.h"
+#include "cxDataAdapter.h"
 
 class QWidget;
 class QGridLayout;

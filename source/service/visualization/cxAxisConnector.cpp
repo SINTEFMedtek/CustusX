@@ -13,9 +13,9 @@
 // See CustusX_License.txt for more information.
 #include "cxAxisConnector.h"
 
-#include "sscPointMetric.h"
-#include "sscAxesRep.h"
-#include "sscTool.h"
+#include "cxPointMetric.h"
+#include "cxAxesRep.h"
+#include "cxTool.h"
 #include "cxSpaceListener.h"
 #include "cxSpaceProvider.h"
 

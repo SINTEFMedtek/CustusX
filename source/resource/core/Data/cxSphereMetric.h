@@ -14,9 +14,9 @@
 #ifndef CXSPHEREMETRIC_H
 #define CXSPHEREMETRIC_H
 
-#include "sscDataMetric.h"
-#include "sscPointMetric.h"
-#include "sscDataManagerImpl.h"
+#include "cxDataMetric.h"
+#include "cxPointMetric.h"
+#include "cxDataManagerImpl.h"
 #include "cxMetricReferenceArgumentList.h"
 
 namespace cx

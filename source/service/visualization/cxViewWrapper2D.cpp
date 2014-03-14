@@ -32,34 +32,34 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 
-#include "sscUtilHelpers.h"
-#include "sscView.h"
-#include "sscSliceProxy.h"
-#include "sscSlicerRepSW.h"
-#include "sscToolRep2D.h"
-#include "sscOrientationAnnotationRep.h"
-#include "sscOrientationAnnotation2DRep.h"
-#include "sscDisplayTextRep.h"
-#include "sscMessageManager.h"
-#include "sscManualTool.h"
-#include "sscDataManager.h"
+#include "cxUtilHelpers.h"
+#include "cxView.h"
+#include "cxSliceProxy.h"
+#include "cxSlicerRepSW.h"
+#include "cxToolRep2D.h"
+#include "cxOrientationAnnotationRep.h"
+#include "cxOrientationAnnotation2DRep.h"
+#include "cxDisplayTextRep.h"
+#include "cxReporter.h"
+#include "cxManualTool.h"
+#include "cxDataManager.h"
 #include "cxViewManager.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxViewGroup.h"
-#include "sscDefinitionStrings.h"
-#include "sscSlicePlanes3DRep.h"
-#include "sscDefinitionStrings.h"
-#include "sscSliceComputer.h"
-#include "sscGeometricRep2D.h"
-#include "sscTexture3DSlicerRep.h"
+#include "cxDefinitionStrings.h"
+#include "cxSlicePlanes3DRep.h"
+#include "cxDefinitionStrings.h"
+#include "cxSliceComputer.h"
+#include "cxGeometricRep2D.h"
+#include "cxTexture3DSlicerRep.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
-#include "sscGLHelpers.h"
-#include "sscData.h"
-#include "sscMesh.h"
-#include "sscImage.h"
-#include "sscPointMetricRep2D.h"
-#include "sscLogger.h"
+#include "cxGLHelpers.h"
+#include "cxData.h"
+#include "cxMesh.h"
+#include "cxImage.h"
+#include "cxPointMetricRep2D.h"
+#include "cxLogger.h"
 #include "cxViewFollower.h"
 #include "cxVisualizationServiceBackend.h"
 #include "cx2DZoomHandler.h"
@@ -222,7 +222,7 @@ void ViewWrapper2D::orientationActionSlot()
 //	}
 //	else
 //	{
-//		messageManager()->sendWarning(QString("No zoom connectivity found for type [%1].").arg(type));
+//		reportWarning(QString("No zoom connectivity found for type [%1].").arg(type));
 //	}
 //}
 

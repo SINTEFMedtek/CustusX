@@ -18,12 +18,12 @@
 #include <QTimer>
 #include <vtkImageChangeInformation.h>
 #include <vtkImageData.h>
-#include "sscImage.h"
-#include "sscBoundingBox3D.h"
-#include "sscMessageManager.h"
-#include "sscVolumeHelpers.h"
-#include "sscTypeConversions.h"
-#include "sscLogger.h"
+#include "cxImage.h"
+#include "cxBoundingBox3D.h"
+#include "cxReporter.h"
+#include "cxVolumeHelpers.h"
+#include "cxTypeConversions.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -79,7 +79,7 @@ void BasicVideoSource::timeout()
 	if (mTimeout)
 		return;
 
-	messageManager()->sendWarning("Timeout!");
+	reportWarning("Timeout!");
 	mTimeout = true;
 	emit newFrame();
 }

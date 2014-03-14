@@ -14,15 +14,15 @@
 
 #include "cxViewFollower.h"
 
-#include "sscSliceProxy.h"
+#include "cxSliceProxy.h"
 #include "cxSettings.h"
-#include "sscSliceComputer.h"
-#include "sscTool.h"
-#include "sscUtilHelpers.h"
-#include "sscDefinitionStrings.h"
+#include "cxSliceComputer.h"
+#include "cxTool.h"
+#include "cxUtilHelpers.h"
+#include "cxDefinitionStrings.h"
 
-#include "sscDataManager.h"
-#include "sscMessageManager.h"
+#include "cxDataManager.h"
+#include "cxReporter.h"
 
 namespace cx
 {
