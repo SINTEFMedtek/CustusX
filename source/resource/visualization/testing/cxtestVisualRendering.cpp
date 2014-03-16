@@ -157,7 +157,7 @@ TEST_CASE("Visual rendering: Show ACS, 3 volumes, centered hidden tool",
 }
 
 TEST_CASE("Visual rendering: Show Axial GPU slice, 1 volume",
-		  "[unit][resource][visualization][not_apple][not_win32][not_win64][ca_special1][unstable]")
+		  "[unit][resource][visualization][not_win32][not_win64]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
@@ -175,7 +175,7 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 1 volume",
 }
 
 TEST_CASE("Visual rendering: Show Axial GPU slice, 2 volumes",
-		  "[unit][resource][visualization][not_apple][not_win32][not_win64][ca_special2][unstable]")
+		  "[unit][resource][visualization][not_win32][not_win64]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
@@ -202,7 +202,7 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 2 volumes",
 }
 
 TEST_CASE("Visual rendering: Show ACS, 3 GPU volumes, moving tool",
-		  "[unit][resource][visualization][not_apple][not_win32][not_win64]")
+		  "[unit][resource][visualization][not_win32][not_win64]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;

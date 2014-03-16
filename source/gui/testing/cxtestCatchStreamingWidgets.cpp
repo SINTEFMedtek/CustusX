@@ -18,7 +18,7 @@
 namespace cxtest
 {
 
-TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][widget][streaming]")
+TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][streaming]")
 {
 	cx::LogicManager::initialize();
 //	cxtest::TestServicesPtr services = cxtest::TestServices::create();

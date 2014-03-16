@@ -7,7 +7,7 @@
 namespace cxtest
 {
 
-TEST_CASE("Correct ColorTFBoundaries calculated for default transfer function", "[unit][gui][widget]")
+TEST_CASE("Correct ColorTFBoundaries calculated for default transfer function", "[unit][gui][not_win32][widget]")
 {
 	cx::LogicManager::initialize();
 	TestTransferFunctionColorWidget*  widget = new TestTransferFunctionColorWidget();

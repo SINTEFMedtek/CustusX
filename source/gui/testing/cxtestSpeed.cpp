@@ -68,7 +68,7 @@ double calculateFPS(bool slicing)
 
 }
 
-TEST_CASE("CustusX full run emits no errors, correct service shutdown.", "[integration][not_win32]")
+TEST_CASE("CustusX full run emits no errors, correct service shutdown.", "[integration][not_win32][not_win64]")
 {
 	initTest();
 	cx::MessageListenerPtr messageListener = cx::MessageListener::create();
