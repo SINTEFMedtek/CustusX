@@ -28,7 +28,7 @@ namespace cx
  * and are specialized in some way.
  *
  * In principle, this layer contains no global state, but a few exceptions exist:
- *  - MessageManager
+ *  - Reporter
  *  - Settings
  *  - XmlOptionFile
  *
@@ -39,7 +39,7 @@ namespace cx
  *  - Interfaces for common objects: Data, Image, Mesh,
  *    VideoSource, Tool, ...
  *  - Visualization components (Rep and descendants).
- *  - A thread-safe logging service (MessageManager).
+ *  - A thread-safe logging service (Reporter).
  *  - Persistent state, stored in ini files and xml files. Interface classes
  *    to these (Settings, DataLocations, XmlOptionFile).
  *

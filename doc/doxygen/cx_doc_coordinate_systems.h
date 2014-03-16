@@ -22,7 +22,7 @@ namespace ssc
 
 /**\page ssc_page_coords Coordinate Systems
  *
- * This page describes the SSC way of handling coordinate systems. A basic
+ * This page describes the CustusX way of handling coordinate systems. A basic
  * knowledge of linear algebra and geometry is assumed. A coordinate system
  * can also be called a space or frame. Space will be preferred here.
  *
@@ -53,7 +53,7 @@ namespace ssc
  * <tt> p_q = q_M_r * p_r </tt>
  *
  * The multiplication here is done using homogenous coordinates, where a point
- * is [x,y,z,0] and a vector is [x,y,z,1].
+ * is [x,y,z,1] and a vector is [x,y,z,0].
  *
  *
  *
@@ -76,9 +76,9 @@ namespace ssc
  *
  * \section ssc_section_specific_spaces Specific Spaces
  *
- * \image html ssc_coordinate_systems.png "Major SSC Coordinate systems"
+ * \image html ssc_coordinate_systems.png "Major Coordinate systems"
  *
- * The figure and table shows the most important spaces in SSC. Some spaces
+ * The figure and table shows the most important spaces in CustusX. Some spaces
  * have a subscript; This means that there are several of them.
  *
 <TABLE>
