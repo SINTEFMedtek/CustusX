@@ -34,7 +34,7 @@
 namespace cxtest
 {
 
-TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][synthetic][ca_rec6][ca_rec]")
+TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][synthetic][not_win32][ca_rec]")
 {
 	ReconstructManagerTestFixture fixture;
 	fixture.setVerbose(true);
