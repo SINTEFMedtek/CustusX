@@ -29,6 +29,7 @@
 #include "cxInteractiveClipper.h"
 #include "cxRepManager.h"
 #include "cxVisualizationServiceBackend.h"
+#include "cxNavigation.h"
 
 namespace cx
 {

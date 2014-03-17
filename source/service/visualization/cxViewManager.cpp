@@ -57,6 +57,7 @@
 #include "cxVisualizationServiceBackend.h"
 #include "cxXMLNodeWrapper.h"
 #include "cxCameraControl.h"
+#include "cxNavigation.h"
 
 namespace cx
 {
@@ -67,31 +68,6 @@ VisualizationServicePtr ViewManager::create(VisualizationServiceBackendPtr backe
 	retval.reset(new ViewManager(backend));
 	return retval;
 }
-
-//ViewManager *ViewManager::mTheInstance = NULL;
-//ViewManager* viewManager()
-//{
-//	return ViewManager::getInstance();
-//}
-//ViewManager* ViewManager::getInstance()
-//{
-//	return mTheInstance;
-//}
-
-//ViewManager* ViewManager::createInstance(VisualizationServiceBackendPtr backend)
-//{
-//	if (mTheInstance == NULL)
-//	{
-//		mTheInstance = new ViewManager(backend);
-//		}
-//	return mTheInstance;
-//}
-
-//void ViewManager::destroyInstance()
-//{
-//	delete mTheInstance;
-//	mTheInstance = NULL;
-//}
 
 ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 				mGlobalObliqueOrientation(false)
@@ -145,18 +121,6 @@ ViewManager::~ViewManager()
 
 void ViewManager::initialize()
 {
-//	mCameraStyleInteractor.reset(new CameraStyleInteractor);
-
-//	mActiveLayout = QStringList() << "" << "";
-//	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
-
-//	mInteractiveCropper.reset(new InteractiveCropper(mBackend));
-//	mInteractiveClipper.reset(new InteractiveClipper(mBackend));
-//	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
-//	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
-//	connect(mInteractiveClipper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
-//	connect(this, SIGNAL(activeViewChanged()), this, SLOT(updateCameraStyleActions()));
-
 	// set start layout
 	this->setActiveLayout("LAYOUT_3D_ACS_SINGLE", 0);
 
@@ -279,11 +243,6 @@ ViewWrapperPtr ViewManager::getActiveView() const
 void ViewManager::setActiveView(QString uid)
 {
 	mActiveView->set(uid);
-//	if (mActiveView == uid)
-//		return;
-//	mActiveView = uid;
-
-//	emit activeViewChanged();
 }
 
 int ViewManager::getActiveViewGroup() const
@@ -661,7 +620,6 @@ void ViewManager::globalCenterChangedSlot()
 {
 	Vector3D p_r = mBackend->getDataManager()->getCenter();
 	this->getCameraControl()->translateByFocusTo(p_r);
-//	this->getNavigation()->moveManualToolToPosition(p_r);
 }
 
 } //namespace cx
