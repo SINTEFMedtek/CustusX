@@ -17,14 +17,16 @@
 
 #include <vector>
 #include <QObject>
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
+
 /**
 * \file
-* \addtogroup cxServiceVisualization
+* \addtogroup cx_service_visualization
 * @{
 */
 
@@ -37,7 +39,7 @@ class InteractiveClipper: public QObject
 {
 Q_OBJECT
 public:
-	InteractiveClipper();
+	InteractiveClipper(VisualizationServiceBackendPtr backend);
 
 	void setSlicePlane(PLANE_TYPE plane);
 	void saveClipPlaneToVolume(); ///< save the current clip to image
@@ -64,6 +66,7 @@ private:
 	SlicePlanesProxyPtr mSlicePlanesProxy;
 	bool mUseClipper;
 	ImagePtr mImage;
+	VisualizationServiceBackendPtr mBackend;
 };
 typedef boost::shared_ptr<InteractiveClipper> InteractiveClipperPtr;
 

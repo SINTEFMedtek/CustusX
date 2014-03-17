@@ -27,26 +27,29 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
-#include "sscCoordinateSystemHelpers.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
+#include "cxCoordinateSystemHelpers.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
-#include "sscPointMetric.h"
-#include "sscDistanceMetric.h"
-#include "sscDataManager.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxDataManager.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxVector3DWidget.h"
-#include "sscRegistrationTransform.h"
-#include "sscTimeKeeper.h"
-#include "sscManualTool.h"
+//#include "cxRegistrationTransform.h"
+#include "cxTimeKeeper.h"
 #include "cxFrameMetricWrapper.h"
 #include "cxToolMetricWrapper.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
-#include "sscTime.h"
+#include "cxTime.h"
+#include "cxMetricManager.h"
+
+//#include "cxManualTool.h"
+//#include "cxPointMetric.h"
+//#include "cxDistanceMetric.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -59,11 +62,22 @@ namespace cx
 MetricWidget::MetricWidget(QWidget* parent) :
   BaseWidget(parent, "MetricWidget", "Metrics/3D ruler"),
   mVerticalLayout(new QVBoxLayout(this)),
-  mTable(new QTableWidget(this)),
-  mActiveLandmark("")
+  mTable(new QTableWidget(this))
 {
-  connect(toolManager(), SIGNAL(configured()), this, SLOT(setModified()));
-  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(setModified()));
+	// the delayed timer lowers the update rate of this widget,
+	// as is is seen to strangle the render speed when many metrics are present.
+	int lowUpdateRate = 100;
+	mLocalModified = false;
+	mDelayedUpdateTimer = new QTimer(this);
+	connect(mDelayedUpdateTimer, SIGNAL(timeout()), this, SLOT(delayedUpdate())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+	mDelayedUpdateTimer->start(lowUpdateRate);
+
+
+	mModifiedCount = 0;
+	mPaintCount = 0;
+	mMetricManager.reset(new MetricManager());
+	connect(mMetricManager.get(), SIGNAL(activeMetricChanged()), this, SLOT(setModified()));
+	connect(mMetricManager.get(), SIGNAL(metricsChanged()), this, SLOT(setModified()));
 
   //table widget
   connect(mTable, SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChanged()));
@@ -74,24 +88,13 @@ MetricWidget::MetricWidget(QWidget* parent) :
 
   mEditWidgets = new QStackedWidget;
 
-  QHBoxLayout* buttonLayout = new QHBoxLayout;
   QActionGroup* group = new QActionGroup(this);
-  mPointMetricAction = this->createAction(group, ":/icons/metric_point.png", "Pt", "Create a new Point Metric", SLOT(addPointButtonClickedSlot()));
-  mFrameMetricAction = this->createAction(group, ":/icons/metric_frame.png", "Frame", "Create a new Frame Metric (position and orientation)", SLOT(addFrameButtonClickedSlot()));
-  mToolMetricAction = this->createAction(group, ":/icons/metric_tool.png", "Tool", "Create a new Tool Metric", SLOT(addToolButtonClickedSlot()));
-  this->createAction(group, ":/icons/metric_distance.png", "Dist", "Create a new Distance Metric", SLOT(addDistanceButtonClickedSlot()));
-  this->createAction(group, ":/icons/metric_angle.png", "Angle", "Create a new Angle Metric",   SLOT(addAngleButtonClickedSlot()));
-  this->createAction(group, ":/icons/metric_plane.png", "Plane", "Create a new Plane Metric",   SLOT(addPlaneButtonClickedSlot()));
-  this->createAction(group, "", "", "", NULL)->setSeparator(true);
-  mRemoveAction = this->createAction(group, ":/icons/metric_remove.png", "Remove", "Remove currently selected metric",   SLOT(removeButtonClickedSlot()));
-  mRemoveAction->setDisabled(true);
-  mLoadReferencePointsAction = this->createAction(group, ":/icons/metric_reference.png", "Import", "Import reference points from reference tool", SLOT(loadReferencePointsSlot()));
-  mLoadReferencePointsAction->setDisabled(true);
-  this->createAction(group, "", "", "", NULL)->setSeparator(true);
-  mExportFramesAction = this->createAction(group, ":/icons/save.png", "ExportFrames", "Export metrics to file",   SLOT(exportMetricsButtonClickedSlot()));
+  this->createActions(group);
 
   QToolBar* toolBar = new QToolBar("actions", this);
   toolBar->addActions(group->actions());
+
+  QHBoxLayout* buttonLayout = new QHBoxLayout;
   buttonLayout->addWidget(toolBar);
   buttonLayout->addStretch();
 
@@ -103,6 +106,26 @@ MetricWidget::MetricWidget(QWidget* parent) :
 
 MetricWidget::~MetricWidget()
 {}
+
+void MetricWidget::createActions(QActionGroup* group)
+{
+	mPointMetricAction = this->createAction(group, ":/icons/metric_point.png", "Pt", "Create a new Point Metric", SLOT(addPointButtonClickedSlot()));
+	mFrameMetricAction = this->createAction(group, ":/icons/metric_frame.png", "Frame", "Create a new Frame Metric (position and orientation)", SLOT(addFrameButtonClickedSlot()));
+	mToolMetricAction = this->createAction(group, ":/icons/metric_tool.png", "Tool", "Create a new Tool Metric", SLOT(addToolButtonClickedSlot()));
+	this->createAction(group, ":/icons/metric_distance.png", "Dist", "Create a new Distance Metric", SLOT(addDistanceButtonClickedSlot()));
+	this->createAction(group, ":/icons/metric_angle.png", "Angle", "Create a new Angle Metric",   SLOT(addAngleButtonClickedSlot()));
+	this->createAction(group, ":/icons/metric_plane.png", "Plane", "Create a new Plane Metric",   SLOT(addPlaneButtonClickedSlot()));
+	this->createAction(group, ":/icons/metric_point.png", "Sphere", "Create a new SphereMetric",   SLOT(addSphereButtonClickedSlot()));
+	this->createAction(group, ":/icons/metric_point.png", "Donut", "Create a new Donut Metric",   SLOT(addDonutButtonClickedSlot()));
+
+	this->createAction(group, "", "", "", NULL)->setSeparator(true);
+	mRemoveAction = this->createAction(group, ":/icons/metric_remove.png", "Remove", "Remove currently selected metric",   SLOT(removeButtonClickedSlot()));
+	mRemoveAction->setDisabled(true);
+	mLoadReferencePointsAction = this->createAction(group, ":/icons/metric_reference.png", "Import", "Import reference points from reference tool", SLOT(loadReferencePointsSlot()));
+	mLoadReferencePointsAction->setDisabled(true);
+	this->createAction(group, "", "", "", NULL)->setSeparator(true);
+	mExportFramesAction = this->createAction(group, ":/icons/save.png", "ExportFrames", "Export metrics to file",   SLOT(exportMetricsButtonClickedSlot()));
+}
 
 //template<class T>
 QAction* MetricWidget::createAction(QActionGroup* group, QString iconName, QString text, QString tip, const char* slot)
@@ -144,41 +167,21 @@ void MetricWidget::cellClickedSlot(int row, int column)
 		return;
 
 	  QTableWidgetItem* item = mTable->item(row,column);
-	  DataPtr data = dataManager()->getData(item->data(Qt::UserRole).toString());
-	  DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data);
-	  if (!metric)
-		  return;
-	  Vector3D p_r = metric->getRefCoord();;
-	  this->setManualToolPosition(p_r);
-}
-
-
-void MetricWidget::setManualToolPosition(Vector3D p_r)
-{
-	Transform3D rMpr = *toolManager()->get_rMpr();
-	Vector3D p_pr = rMpr.inv().coord(p_r);
-
-	// set the picked point as offset tip
-	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
-	Vector3D offset = tool->get_prMt().vector(Vector3D(0, 0, tool->getTooltipOffset()));
-	p_pr -= offset;
-	p_r = rMpr.coord(p_pr);
-
-	// TODO set center here will not do: must handle
-	dataManager()->setCenter(p_r);
-	Vector3D p0_pr = tool->get_prMt().coord(Vector3D(0, 0, 0));
-	tool->set_prMt(createTransformTranslate(p_pr - p0_pr) * tool->get_prMt());
+	  QString uid = item->data(Qt::UserRole).toString();
+	  mMetricManager->moveToMetric(uid);
 }
 
 void MetricWidget::itemSelectionChanged()
 {
   QTableWidgetItem* item = mTable->currentItem();
 
-  mActiveLandmark = item->data(Qt::UserRole).toString();
+  mMetricManager->setActiveUid(item->data(Qt::UserRole).toString());
   mEditWidgets->setCurrentIndex(mTable->currentRow());
+
+  mMetricManager->setSelection(this->getSelectedUids());
+
   enablebuttons();
 }
-
 
 void MetricWidget::showEvent(QShowEvent* event)
 {
@@ -198,32 +201,45 @@ void MetricWidget::hideEvent(QHideEvent* event)
   QWidget::hideEvent(event);
 }
 
+namespace
+{
+template<class T, class SUPER>
+boost::shared_ptr<T> castTo(boost::shared_ptr<SUPER> data)
+{
+	return boost::dynamic_pointer_cast<T>(data);
+}
+
+template<class T, class SUPER>
+bool isType(boost::shared_ptr<SUPER> data)
+{
+	return castTo<T>(data);
+}
+
+template<class WRAPPER, class METRIC, class SUPER>
+boost::shared_ptr<WRAPPER> createMetricWrapperOfType(boost::shared_ptr<SUPER> data)
+{
+	return boost::shared_ptr<WRAPPER>(new WRAPPER(castTo<METRIC>(data)));
+}
+}
+
 MetricBasePtr MetricWidget::createMetricWrapper(DataPtr data)
 {
-  if (boost::dynamic_pointer_cast<PointMetric>(data))
-  {
-    return MetricBasePtr(new PointMetricWrapper(boost::dynamic_pointer_cast<PointMetric>(data)));
-  }
-  else if (boost::dynamic_pointer_cast<DistanceMetric>(data))
-  {
-    return MetricBasePtr(new DistanceMetricWrapper(boost::dynamic_pointer_cast<DistanceMetric>(data)));
-  }
-  else if (boost::dynamic_pointer_cast<PlaneMetric>(data))
-  {
-    return MetricBasePtr(new PlaneMetricWrapper(boost::dynamic_pointer_cast<PlaneMetric>(data)));
-  }
-  else if (boost::dynamic_pointer_cast<AngleMetric>(data))
-  {
-    return MetricBasePtr(new AngleMetricWrapper(boost::dynamic_pointer_cast<AngleMetric>(data)));
-  }
-  else if (boost::dynamic_pointer_cast<cx::FrameMetric>(data))
-  {
-    return MetricBasePtr(new FrameMetricWrapper(boost::dynamic_pointer_cast<cx::FrameMetric>(data)));
-  }
-  else if (boost::dynamic_pointer_cast<cx::ToolMetric>(data))
-  {
-	return MetricBasePtr(new ToolMetricWrapper(boost::dynamic_pointer_cast<cx::ToolMetric>(data)));
-  }
+	if (isType<PointMetric>(data))
+	  return createMetricWrapperOfType<PointMetricWrapper, PointMetric>(data);
+	if (isType<DistanceMetric>(data))
+	  return createMetricWrapperOfType<DistanceMetricWrapper, DistanceMetric>(data);
+	if (isType<AngleMetric>(data))
+	  return createMetricWrapperOfType<AngleMetricWrapper, AngleMetric>(data);
+	if (isType<FrameMetric>(data))
+	  return createMetricWrapperOfType<FrameMetricWrapper, FrameMetric>(data);
+	if (isType<ToolMetric>(data))
+	  return createMetricWrapperOfType<ToolMetricWrapper, ToolMetric>(data);
+	if (isType<PlaneMetric>(data))
+	  return createMetricWrapperOfType<PlaneMetricWrapper, PlaneMetric>(data);
+	if (isType<DonutMetric>(data))
+	  return createMetricWrapperOfType<DonutMetricWrapper, DonutMetric>(data);
+	if (isType<SphereMetric>(data))
+	  return createMetricWrapperOfType<SphereMetricWrapper, SphereMetric>(data);
 
 	return MetricBasePtr();
 }
@@ -246,290 +262,235 @@ std::vector<MetricBasePtr> MetricWidget::createMetricWrappers()
   return retval;
 }
 
+
 void MetricWidget::prePaintEvent()
 {
-  mTable->blockSignals(true);
-
+//	QTime timer;
+//	timer.start();
+	mPaintCount++;
   std::vector<MetricBasePtr> newMetrics = this->createMetricWrappers();
 
-
-  bool rebuild = newMetrics.size()!=mMetrics.size();
-
-  // check if we need to rebuild the table from scratch:
-  if (!rebuild)
-  {
-  	for (unsigned i=0; i<mMetrics.size(); ++i)
-  	{
-  		rebuild = rebuild || mMetrics[i]->getData()!=newMetrics[i]->getData();
-  	}
-  }
-
-  // rebuild all:
+  bool rebuild = !this->checkEqual(newMetrics, mMetrics);
   if (rebuild)
   {
-//    std::cout << "rebuild " << newMetrics.size() << std::endl;
-    mTable->clear();
-
-    while (mEditWidgets->count())
-    {
-    	mEditWidgets->removeWidget(mEditWidgets->widget(0));
-    }
-
-    for (unsigned i=0; i<mMetrics.size(); ++i)
-    {
-        disconnect(mMetrics[i]->getData().get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
-    }
-
-    mMetrics = newMetrics;
-
-    for (unsigned i=0; i<mMetrics.size(); ++i)
-    {
-    	MetricBasePtr wrapper = mMetrics[i];
-        connect(wrapper->getData().get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
-  		QGroupBox* groupBox = new QGroupBox(wrapper->getData()->getName(), this);
-  		groupBox->setFlat(true);
-  	  QVBoxLayout* gbLayout = new QVBoxLayout(groupBox);
-  	  gbLayout->setMargin(4);
-  	  gbLayout->addWidget(wrapper->createWidget());
-  	  mEditWidgets->addWidget(groupBox);
-    }
-
-    mEditWidgets->setCurrentIndex(-1);
-
-    //ready the table widget
-    mTable->setRowCount(mMetrics.size());
-    mTable->setColumnCount(4);
-    QStringList headerItems(QStringList() << "Name" << "Value" << "Arguments" << "Type");
-    mTable->setHorizontalHeaderLabels(headerItems);
-    mTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
-    mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-    mTable->verticalHeader()->hide();
-
-    for (unsigned i = 0; i < mMetrics.size(); ++i)
-    {
-    	MetricBasePtr current = mMetrics[i];
-
-      for (unsigned j = 0; j < 4; ++j)
-      {
-      	QTableWidgetItem* item = new QTableWidgetItem("empty");
-        item->setData(Qt::UserRole, current->getData()->getUid());
-//        item->setFlags(item->flags() & (~Qt::ItemFlags(Qt::ItemIsEditable))); // turn off editable (also turned off ability to select+copy text - removed)
-        mTable->setItem(i, j, item);
-//        std::cout << "set item " << i << " " << j << std::endl;
-      }
-    }
-//    std::cout << "rebuild end"  << std::endl;
+	this->resetWrappersAndEditWidgets(newMetrics);
+	this->initializeTable();
   }
 
-  // update contents:
-  for (unsigned i = 0; i < mMetrics.size(); ++i)
+  this->updateMetricWrappers();
+  this->updateTableContents();
+
+  if (rebuild)
   {
-  	MetricBasePtr current = mMetrics[i];
-    if (!mTable->item(i,0))
-    {
-      std::cout << "no qitem for:: " << i << " " << current->getData()->getName() << std::endl;
-      continue;
-    }
-  	mTable->item(i,0)->setText(current->getData()->getName());
-    mTable->item(i,1)->setText(current->getValue());
-    mTable->item(i,2)->setText(current->getArguments());
-    mTable->item(i,3)->setText(current->getType());
-
-    //highlight selected row
-    if (current->getData()->getUid() == mActiveLandmark)
-    {
-      mTable->setCurrentCell(i,1);
-      mEditWidgets->setCurrentIndex(i);
-    }
+	  this->expensizeColumnResize();
   }
-
-  mTable->blockSignals(false);
 
   this->enablebuttons();
+//  std::cout << QString("prepaint, mod=%1, paint=%2, elapsed=%3ms").arg(mModifiedCount).arg(mPaintCount).arg(timer.elapsed()) << std::endl;
+//  std::cout << QString("prepaint, mod=%1, paint=%2").arg(mModifiedCount).arg(mPaintCount) << std::endl;
+}
+
+void MetricWidget::expensizeColumnResize()
+{
+	int valueColumn = 1;
+	mTable->resizeColumnToContents(valueColumn);
+}
+
+void MetricWidget::initializeTable()
+{
+	mTable->blockSignals(true);
+
+	mTable->clear();
+
+	mTable->setRowCount(mMetrics.size());
+	mTable->setColumnCount(4);
+	QStringList headerItems(QStringList() << "Name" << "Value" << "Arguments" << "Type");
+	mTable->setHorizontalHeaderLabels(headerItems);
+//	mTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents); // dangerous: uses lots of painting time
+	mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	mTable->verticalHeader()->hide();
+
+	for (unsigned i = 0; i < mMetrics.size(); ++i)
+	{
+		MetricBasePtr current = mMetrics[i];
+
+		for (unsigned j = 0; j < 4; ++j)
+		{
+			QTableWidgetItem* item = new QTableWidgetItem("empty");
+			item->setData(Qt::UserRole, current->getData()->getUid());
+			mTable->setItem(i, j, item);
+		}
+	}
+	mTable->blockSignals(false);
+}
+
+void MetricWidget::updateMetricWrappers()
+{
+	for (unsigned i = 0; i < mMetrics.size(); ++i)
+	{
+		mMetrics[i]->update();
+	}
+}
+
+void MetricWidget::updateTableContents()
+{
+	mTable->blockSignals(true);
+	// update contents:
+	QTime timer;
+	timer.start();
+	for (unsigned i = 0; i < mMetrics.size(); ++i)
+	{
+		MetricBasePtr current = mMetrics[i];
+		QString name = current->getData()->getName();
+		QString value = current->getValue();
+		QString arguments = current->getArguments();
+		QString type = current->getType();
+	}
+
+	for (unsigned i = 0; i < mMetrics.size(); ++i)
+	{
+		MetricBasePtr current = mMetrics[i];
+		if (!mTable->item(i,0))
+		{
+			std::cout << "no qitem for:: " << i << " " << current->getData()->getName() << std::endl;
+			continue;
+		}
+		QString name = current->getData()->getName();
+		QString value = current->getValue();
+		QString arguments = current->getArguments();
+		QString type = current->getType();
+
+		mTable->item(i,0)->setText(name);
+		mTable->item(i,1)->setText(value);
+		mTable->item(i,2)->setText(arguments);
+		mTable->item(i,3)->setText(type);
+
+		//highlight selected row
+		if (current->getData()->getUid() == mMetricManager->getActiveUid())
+		{
+			mTable->setCurrentCell(i,1);
+			mEditWidgets->setCurrentIndex(i);
+		}
+	}
+	mTable->blockSignals(false);
+}
+
+void MetricWidget::setModified()
+{
+	mLocalModified = true;
+//	BaseWidget::setModified();
+	mModifiedCount++;
+}
+
+void MetricWidget::delayedUpdate()
+{
+	if (!mLocalModified)
+		return;
+	BaseWidget::setModified();
+	mLocalModified = false;
+
+}
+
+void MetricWidget::resetWrappersAndEditWidgets(std::vector<MetricBasePtr> wrappers)
+{
+	while (mEditWidgets->count())
+	{
+		mEditWidgets->removeWidget(mEditWidgets->widget(0));
+	}
+
+	for (unsigned i=0; i<mMetrics.size(); ++i)
+	{
+		disconnect(mMetrics[i]->getData().get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
+	}
+
+	mMetrics = wrappers;
+
+	for (unsigned i=0; i<mMetrics.size(); ++i)
+	{
+		connect(mMetrics[i]->getData().get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
+	}
+
+	for (unsigned i=0; i<mMetrics.size(); ++i)
+	{
+		MetricBasePtr wrapper = mMetrics[i];
+		QGroupBox* groupBox = new QGroupBox(wrapper->getData()->getName(), this);
+		groupBox->setFlat(true);
+		QVBoxLayout* gbLayout = new QVBoxLayout(groupBox);
+		gbLayout->setMargin(4);
+		gbLayout->addWidget(wrapper->createWidget());
+		mEditWidgets->addWidget(groupBox);
+	}
+
+	mEditWidgets->setCurrentIndex(-1);
+}
+
+bool MetricWidget::checkEqual(const std::vector<MetricBasePtr>& a, const std::vector<MetricBasePtr>& b) const
+{
+	if (a.size()!=b.size())
+		return false;
+
+	for (unsigned i=0; i<a.size(); ++i)
+	{
+		if (a[i]->getData()!=b[i]->getData())
+			return false;
+	}
+
+	return true;
 }
 
 void MetricWidget::enablebuttons()
 {
-  mRemoveAction->setEnabled(mActiveLandmark!="");
+	mRemoveAction->setEnabled(!mMetricManager->getActiveUid().isEmpty());
   mLoadReferencePointsAction->setEnabled(toolManager()->getReferenceTool());
 }
 
-PointMetricPtr MetricWidget::addPoint(Vector3D point, CoordinateSystem space, QString name)
+void MetricWidget::loadReferencePointsSlot()
 {
-	PointMetricPtr p1(new PointMetric("point%1","point%1"));
-  p1->get_rMd_History()->setParentSpace("reference");
-	p1->setSpace(space);
-	p1->setCoordinate(point);
-	dataManager()->loadData(p1);
-
-	viewManager()->getViewGroups()[0]->getData()->addData(p1);
-	this->setActiveUid(p1->getUid());
-
-	return p1;
+	mMetricManager->loadReferencePointsSlot();
 }
-
-void MetricWidget::setActiveUid(QString uid)
-{
-	mActiveLandmark = uid;
-    this->setModified();
-}
-
 void MetricWidget::addPointButtonClickedSlot()
 {
-  CoordinateSystem ref = SpaceHelpers::getR();
-  Vector3D p_ref = SpaceHelpers::getDominantToolTipPoint(ref, true);
-  this->addPoint(p_ref, ref);
+	mMetricManager->addPointButtonClickedSlot();
 }
-
 void MetricWidget::addFrameButtonClickedSlot()
 {
-  FrameMetricPtr frame(new FrameMetric("frame%1", "frame%1"));
-  frame->get_rMd_History()->setParentSpace("reference");
-
-  CoordinateSystem ref = SpaceHelpers::getR();
-  Transform3D rMt = SpaceHelpers::getDominantToolTipTransform(ref, true);
-
-  frame->setSpace(ref);
-  frame->setFrame(rMt);
-
-  dataManager()->loadData(frame);
-  this->setActiveUid(frame->getUid());
-  viewManager()->getViewGroups()[0]->getData()->addData(frame);
+	mMetricManager->addFrameButtonClickedSlot();
 }
-
 void MetricWidget::addToolButtonClickedSlot()
 {
-  ToolMetricPtr frame(new ToolMetric("tool%1", "tool%1"));
-  frame->get_rMd_History()->setParentSpace("reference");
-
-  CoordinateSystem ref = SpaceHelpers::getR();
-  Transform3D rMt = SpaceHelpers::getDominantToolTipTransform(ref, true);
-
-  frame->setSpace(ref);
-  frame->setFrame(rMt);
-  frame->setToolName(toolManager()->getDominantTool()->getName());
-  frame->setToolOffset(toolManager()->getDominantTool()->getTooltipOffset());
-
-  dataManager()->loadData(frame);
-  this->setActiveUid(frame->getUid());
-  viewManager()->getViewGroups()[0]->getData()->addData(frame);
+	mMetricManager->addToolButtonClickedSlot();
 }
-
 void MetricWidget::addPlaneButtonClickedSlot()
 {
-  CoordinateSystem ref = SpaceHelpers::getR();
-//  Vector3D p_ref = SpaceHelpers::getDominantToolTipPoint(ref, true);
-
-  PlaneMetricPtr p1(new PlaneMetric("plane%1","plane%1"));
-  p1->get_rMd_History()->setParentSpace("reference");
-  p1->setSpace(ref);
-
-  ToolPtr tool = toolManager()->getDominantTool();
-  if (!tool)
-  {
-	  p1->setCoordinate(Vector3D(0,0,0));
-	  p1->setNormal(Vector3D(1,0,0));
-  }
-  else
-  {
-	  CoordinateSystem from(csTOOL_OFFSET, tool->getUid());
-	  Vector3D point_t = Vector3D(0,0,0);
-	  Transform3D rMto = CoordinateSystemHelpers::get_toMfrom(from, ref);
-
-	  p1->setCoordinate(rMto.coord(Vector3D(0,0,0)));
-	  p1->setNormal(rMto.vector(Vector3D(0,0,1)));
-  }
-
-  dataManager()->loadData(p1);
-	this->setActiveUid(p1->getUid());
-
-  viewManager()->getViewGroups()[0]->getData()->addData(p1);
+	mMetricManager->addPlaneButtonClickedSlot();
 }
-
-/**Starting with a selection of allowed arguments for a new metric,
- * refine them by removing nonselected items, and adding more point
- * metrics if there are too few arguments.
- */
-std::vector<DataPtr> MetricWidget::refinePointArguments(std::vector<DataPtr> args, unsigned argNo)
-{
-  // erase non-selected arguments if we have more than enough
-  QList<QTableWidgetItem*> selection = mTable->selectedItems();
-  std::set<QString> selectedUids;
-  for (int i=0; i<selection.size(); ++i)
-  {
-  	selectedUids.insert(selection[i]->data(Qt::UserRole).toString());
-  }
-  for (unsigned i=0; i<args.size();)
-  {
-  	if (args.size() <= argNo)
-  		break;
-  	if (!selectedUids.count(args[i]->getUid()))
-  		args.erase(args.begin()+i);
-  	else
-  		++i;
-  }
-
-  while (args.size() > argNo)
-  	args.erase(args.begin());
-
-  while (args.size() < argNo)
-  {
-	  PointMetricPtr p0 = this->addPoint(Vector3D(0,0,0), CoordinateSystem(csREF, ""));
-  	args.push_back(p0);
-  }
-
-  return args;
-}
-
-
-void MetricWidget::addDistanceButtonClickedSlot()
-{
-	DistanceMetricPtr d0(new DistanceMetric("distance%1","distance%1"));
-  d0->get_rMd_History()->setParentSpace("reference");
-	// first try to reuse existing points as distance arguments, otherwise create new ones.
-  std::vector<DataPtr> args;
-
-  for (unsigned i=0; i<mMetrics.size(); ++i)
-  {
-  	if (d0->validArgument(mMetrics[i]->getData()))
-  		args.push_back(mMetrics[i]->getData());
-  }
-
-  args = this->refinePointArguments(args, d0->getArgumentCount());
-
-  for (unsigned i=0; i<args.size(); ++i)
-    d0->setArgument(i, args[i]);
-
-	dataManager()->loadData(d0);
-
-	this->setActiveUid(d0->getUid());
-	viewManager()->getViewGroups()[0]->getData()->addData(d0);
-}
-
 void MetricWidget::addAngleButtonClickedSlot()
 {
-	AngleMetricPtr d0(new AngleMetric("angle%1","angle%1"));
-  d0->get_rMd_History()->setParentSpace("reference");
-	// first try to reuse existing points as distance arguments, otherwise create new ones.
-  std::vector<DataPtr> args;
+	mMetricManager->addAngleButtonClickedSlot();
+}
+void MetricWidget::addDistanceButtonClickedSlot()
+{
+	mMetricManager->addDistanceButtonClickedSlot();
+}
+void MetricWidget::addSphereButtonClickedSlot()
+{
+	mMetricManager->addSphereButtonClickedSlot();
+}
+void MetricWidget::addDonutButtonClickedSlot()
+{
+	mMetricManager->addDonutButtonClickedSlot();
+}
 
-  for (unsigned i=0; i<mMetrics.size(); ++i)
-  {
-  	if (d0->validArgument(mMetrics[i]->getData()))
-  		args.push_back(mMetrics[i]->getData());
-  }
+std::set<QString> MetricWidget::getSelectedUids()
+{
+	QList<QTableWidgetItem*> selection = mTable->selectedItems();
 
-  args = this->refinePointArguments(args, 3);
-
-  d0->setArgument(0, args[0]);
-  d0->setArgument(1, args[1]);
-  d0->setArgument(2, args[1]);
-  d0->setArgument(3, args[2]);
-
-  dataManager()->loadData(d0);
-
-	this->setActiveUid(d0->getUid());
-  viewManager()->getViewGroups()[0]->getData()->addData(d0);
+	std::set<QString> selectedUids;
+	for (int i=0; i<selection.size(); ++i)
+	{
+	  selectedUids.insert(selection[i]->data(Qt::UserRole).toString());
+	}
+	return selectedUids;
 }
 
 void MetricWidget::removeButtonClickedSlot()
@@ -542,38 +503,10 @@ void MetricWidget::removeButtonClickedSlot()
 		nextUid = nextItem->data(Qt::UserRole).toString();
 	}
 
-	patientService()->getPatientData()->removeData(mActiveLandmark);
+	patientService()->getPatientData()->removeData(mMetricManager->getActiveUid());
 
 	if (!nextUid.isEmpty())
-		this->setActiveUid(nextUid);
-}
-
-void MetricWidget::loadReferencePointsSlot()
-{
-  ToolPtr refTool = toolManager()->getReferenceTool();
-  if(!refTool) // we only load reference points from reference tools
-  {
-    messageManager()->sendDebug("No reference tool, cannot load reference points into the pointsampler");
-    return;
-  }
-
-  std::map<int, Vector3D> referencePoints_s = refTool->getReferencePoints();
-  if(referencePoints_s.empty())
-  {
-    messageManager()->sendWarning("No referenceppoints in reference tool "+refTool->getName());
-    return;
-  }
-
-  CoordinateSystem ref = CoordinateSystemHelpers::getR();
-  CoordinateSystem sensor = CoordinateSystemHelpers::getS(refTool);
-
-  std::map<int, Vector3D>::iterator it = referencePoints_s.begin();
-  for(; it != referencePoints_s.end(); ++it)
-  {
-    Vector3D P_ref = CoordinateSystemHelpers::get_toMfrom(sensor, ref).coord(it->second);
-//    this->addPoint(P_ref);
-    this->addPoint(P_ref, CoordinateSystem(csREF), "ref%1");
-  }
+		mMetricManager->setActiveUid(nextUid);
 }
 
 void MetricWidget::exportMetricsButtonClickedSlot()
@@ -586,28 +519,9 @@ void MetricWidget::exportMetricsButtonClickedSlot()
 													"Create/select file to export metrics to",
 													suggestion);
 	if(!filename.isEmpty())
-		this->exportMetricsToFile(filename);
+		mMetricManager->exportMetricsToFile(filename);
 }
 
-void MetricWidget::exportMetricsToFile(QString filename)
-{
-	QFile file(filename);
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-		return;	
-
-	std::map<QString, DataPtr> dataMap = dataManager()->getData();
-	std::map<QString, DataPtr>::iterator iter;
-	for (iter = dataMap.begin(); iter != dataMap.end(); ++iter)
-	{
-		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(iter->second);
-		if(metric)
-		{
-			file.write(metric->getAsSingleLineString().toAscii());
-			file.write("\n");
-		}
-	}
-	file.close();
-}
 
 
 }//end namespace cx

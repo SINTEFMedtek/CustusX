@@ -4,8 +4,8 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include "cxFrameForest.h"
-#include "sscDataManager.h"
-#include "sscData.h"
+#include "cxDataManager.h"
+#include "cxData.h"
 
 namespace cx
 {
@@ -21,7 +21,7 @@ FrameTreeWidget::FrameTreeWidget(QWidget* parent) :
   mTreeWidget->setHeaderLabels(QStringList() << "Frame");
 
   // TODO this must also listen to all changed() in all data
-  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataLoadedSlot()));
+  connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataLoadedSlot()));
 }
 
 QString FrameTreeWidget::defaultWhatsThis() const
@@ -37,24 +37,29 @@ void FrameTreeWidget::dataLoadedSlot()
 {
   for (DataManager::DataMap::iterator iter=mConnectedData.begin(); iter!=mConnectedData.end(); ++iter)
   {
-    disconnect(iter->second.get(), SIGNAL(transformChanged()), this, SLOT(rebuild()));
+	disconnect(iter->second.get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
   }
 
   mConnectedData = dataManager()->getData();
 
   for (DataManager::DataMap::iterator iter=mConnectedData.begin(); iter!=mConnectedData.end(); ++iter)
   {
-    connect(iter->second.get(), SIGNAL(transformChanged()), this, SLOT(rebuild()));
+	connect(iter->second.get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
   }
 
-  this->rebuild();
+  this->setModified();
+}
+
+void FrameTreeWidget::prePaintEvent()
+{
+	this->rebuild();
 }
 
 void FrameTreeWidget::rebuild()
 {
   mTreeWidget->clear();
 
-  FrameForest forest;
+  FrameForest forest(dataService());
   QDomElement root = forest.getDocument().documentElement();
 
   this->fill(mTreeWidget->invisibleRootItem(), root);

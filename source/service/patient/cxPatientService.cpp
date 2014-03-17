@@ -16,43 +16,52 @@
 #include "cxPatientData.h"
 #include "cxFileHelpers.h"
 #include "cxDataLocations.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
+#include "cxDataManagerImpl.h"
 
 namespace cx
 {
 
-// --------------------------------------------------------
-PatientService* PatientService::mInstance = NULL; ///< static member
-// --------------------------------------------------------
+//// --------------------------------------------------------
+//PatientService* PatientService::mInstance = NULL; ///< static member
+//// --------------------------------------------------------
 
-void PatientService::initialize()
+PatientServicePtr PatientService::create(DataServicePtr dataService)
 {
-	PatientService::getInstance();
+	PatientServicePtr retval;
+	retval.reset(new PatientService(dataService));
+//	retval->mSelf = retval;
+	return retval;
 }
 
-void PatientService::shutdown()
-{
-	delete mInstance;
-	mInstance = NULL;
-}
+//void PatientService::initialize()
+//{
+//	PatientService::getInstance();
+//}
 
-PatientService* PatientService::getInstance()
-{
-	if (!mInstance)
-	{
-		PatientService::setInstance(new PatientService());
-	}
-	return mInstance;
-}
+//void PatientService::shutdown()
+//{
+//	delete mInstance;
+//	mInstance = NULL;
+//}
 
-void PatientService::setInstance(PatientService* instance)
-{
-	if (mInstance)
-	{
-		delete mInstance;
-	}
-	mInstance = instance;
-}
+//PatientService* PatientService::getInstance()
+//{
+//	if (!mInstance)
+//	{
+//		PatientService::setInstance(new PatientService());
+//	}
+//	return mInstance;
+//}
+
+//void PatientService::setInstance(PatientService* instance)
+//{
+//	if (mInstance)
+//	{
+//		delete mInstance;
+//	}
+//	mInstance = instance;
+//}
 
 void PatientService::clearCache()
 {
@@ -61,10 +70,12 @@ void PatientService::clearCache()
 	removeNonemptyDirRecursively(DataLocations::getCachePath());
 }
 
-PatientService::PatientService()
+PatientService::PatientService(DataServicePtr dataService)
 {
 	this->clearCache();
-	mPatientData.reset(new PatientData());
+	mDataService = dataService;
+//	mDataService = DataManagerImpl::create();
+	mPatientData.reset(new PatientData(mDataService));
 }
 
 PatientService::~PatientService()
@@ -78,11 +89,16 @@ PatientDataPtr PatientService::getPatientData()
 	return mPatientData;
 }
 
+DataServicePtr PatientService::getDataService()
+{
+	return mDataService;
+}
+
 //---------------------------------------------------------
 
-PatientService* patientService()
-{
-	return PatientService::getInstance();
-}
+//PatientService* patientService()
+//{
+//	return PatientService::getInstance();
+//}
 
 }

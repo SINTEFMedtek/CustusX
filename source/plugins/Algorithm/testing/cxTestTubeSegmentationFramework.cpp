@@ -16,8 +16,9 @@
 #include "testing/cxTestTubeSegmentationFramework.h"
 
 #include <fstream>
-#include "sscData.h"
+#include "cxData.h"
 #include "cxLogicManager.h"
+#include "cxReporter.h"
 #include "cxDataInterface.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
@@ -32,15 +33,16 @@
 
 #include "catch.hpp"
 
-void TestTubeSegmentationFramework::setUp()
+TestTubeSegmentationFramework::TestTubeSegmentationFramework() 
 {
 	cx::LogicManager::initialize();
 }
 
-void TestTubeSegmentationFramework::tearDown()
+TestTubeSegmentationFramework::~TestTubeSegmentationFramework() 
 {
 	cx::LogicManager::shutdown();
 }
+
 
 void TestTubeSegmentationFramework::testConstructor()
 {

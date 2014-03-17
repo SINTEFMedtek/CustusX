@@ -28,7 +28,7 @@ namespace cx
  *
  * \sa SecondaryMainWindow
  *
- * \ingroup cxGUI
+ * \ingroup cx_gui
  * \date 05.11.2013
  * \author christiana
  */
@@ -39,7 +39,16 @@ Q_OBJECT
 public:
 	SecondaryViewLayoutWindow(QWidget* parent);
 	~SecondaryViewLayoutWindow();
+
+	void tryShowOnSecondaryScreen();
+
+protected:
+	virtual void showEvent(QShowEvent* event);
+	virtual void hideEvent(QCloseEvent* event);
+	virtual void closeEvent(QCloseEvent *event);
 private:
+	QString toString(QRect r) const;
+	int findSmallestSecondaryScreen();
 };
 
 } // namespace cx

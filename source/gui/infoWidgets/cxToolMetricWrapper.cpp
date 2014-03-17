@@ -14,9 +14,11 @@
 
 #include "cxToolMetricWrapper.h"
 #include <QHBoxLayout>
-#include "sscLabeledComboBoxWidget.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxDataAdapterHelper.h"
 #include "cxToolManager.h"
+#include "cxLegacySingletons.h"
+#include "cxSpaceProvider.h"
 
 namespace cx {
 
@@ -25,7 +27,7 @@ ToolMetricWrapper::ToolMetricWrapper(cx::ToolMetricPtr data) : mData(data)
 	mInternalUpdate = false;
 	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
 	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
-	connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
+	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* ToolMetricWrapper::createWidget()
@@ -59,6 +61,8 @@ QWidget* ToolMetricWrapper::createWidget()
 	connect(mFrameWidget, SIGNAL(changed()), this, SLOT(frameWidgetChangedSlot()));
 	topLayout->addWidget(mFrameWidget);
 
+	this->addColorWidget(topLayout);
+
 	this->dataChangedSlot();
 
 	return widget;
@@ -67,7 +71,7 @@ QWidget* ToolMetricWrapper::createWidget()
 void ToolMetricWrapper::initializeDataAdapters()
 {
 	QString value;// = qstring_cast(mData->getFrame());
-	std::vector<CoordinateSystem> spaces = SpaceHelpers::getSpacesToPresentInGUI();
+	std::vector<CoordinateSystem> spaces = spaceProvider()->getSpacesToPresentInGUI();
 	QStringList range;
 	for (unsigned i=0; i<spaces.size(); ++i)
 		range << spaces[i].toString();
@@ -101,7 +105,7 @@ QString ToolMetricWrapper::getValue() const
 	return prettyFormat(mData->getRefCoord(), 1, 3);
 }
 
-DataPtr ToolMetricWrapper::getData() const
+DataMetricPtr ToolMetricWrapper::getData() const
 {
 	return mData;
 }
@@ -119,8 +123,8 @@ QString ToolMetricWrapper::getArguments() const
 
 void ToolMetricWrapper::resampleMetric()
 {
-	CoordinateSystem ref = SpaceHelpers::getR();
-	Transform3D qMt = SpaceHelpers::getDominantToolTipTransform(mData->getSpace(), true);
+//	CoordinateSystem ref = CoordinateSystemHelpers::getR();
+	Transform3D qMt = spaceProvider()->getDominantToolTipTransform(mData->getSpace(), true);
 	mData->setFrame(qMt);
 	mData->setToolName(toolManager()->getDominantTool()->getName());
 	mData->setToolOffset(toolManager()->getDominantTool()->getTooltipOffset());
@@ -153,6 +157,18 @@ void ToolMetricWrapper::toolOffsetSet()
 
 void ToolMetricWrapper::dataChangedSlot()
 {
+//	mInternalUpdate = true;
+
+//	mSpaceSelector->setValue(mData->getSpace().toString());
+//	mFrameWidget->setMatrix(mData->getFrame());
+//	mToolNameSelector->setValue(mData->getToolName());
+//	mToolOffsetSelector->setValue(mData->getToolOffset());
+
+//	mInternalUpdate = false;
+}
+
+void ToolMetricWrapper::update()
+{
 	mInternalUpdate = true;
 
 	mSpaceSelector->setValue(mData->getSpace().toString());
@@ -162,6 +178,7 @@ void ToolMetricWrapper::dataChangedSlot()
 
 	mInternalUpdate = false;
 }
+
 
 void ToolMetricWrapper::frameWidgetChangedSlot()
 {

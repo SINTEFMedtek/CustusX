@@ -12,22 +12,22 @@
 //
 // See CustusX_License.txt for more information.
 #include "cxDataInterface.h"
-#include "sscImage.h"
+#include "cxImage.h"
 #include <QSet>
-#include "sscMesh.h"
-#include "sscMessageManager.h"
-#include "sscImageLUT2D.h"
-#include "sscDataManager.h"
-#include "sscToolManager.h"
-#include "sscTypeConversions.h"
-#include "sscDefinitionStrings.h"
-#include "sscEnumConverter.h"
-#include "sscTool.h"
-#include "sscImageAlgorithms.h"
-#include "sscRegistrationTransform.h"
-#include "sscLogger.h"
+#include "cxMesh.h"
+#include "cxReporter.h"
+#include "cxImageLUT2D.h"
+#include "cxDataManager.h"
+#include "cxToolManager.h"
+#include "cxTypeConversions.h"
+#include "cxDefinitionStrings.h"
+#include "cxEnumConverter.h"
+#include "cxTool.h"
+#include "cxImageAlgorithms.h"
+#include "cxRegistrationTransform.h"
+#include "cxLogger.h"
 #include "cxActiveImageProxy.h"
-#include "sscVideoSource.h"
+#include "cxVideoSource.h"
 #include "cxVideoService.h"
 
 namespace cx
@@ -82,7 +82,7 @@ DoubleRange DoubleDataAdapterActiveToolOffset::getValueRange() const
 
 DoubleDataAdapterActiveImageBase::DoubleDataAdapterActiveImageBase()
 {
-  mActiveImageProxy = ActiveImageProxy::New();
+	mActiveImageProxy = ActiveImageProxy::New(dataService());
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChanged()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
 }
@@ -178,7 +178,7 @@ QString SelectRTSourceStringDataAdapterBase::convertInternal2Display(QString int
 
 ActiveVideoSourceStringDataAdapter::ActiveVideoSourceStringDataAdapter()
 {
-	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SIGNAL(changed()));
+	connect(videoService().get(), SIGNAL(activeVideoSourceChanged()), this, SIGNAL(changed()));
 }
 
 QString ActiveVideoSourceStringDataAdapter::getValueName() const
@@ -450,7 +450,7 @@ ToolPtr SelectToolStringDataAdapter::getTool() const
 
 ParentFrameStringDataAdapter::ParentFrameStringDataAdapter()
 {
-  connect(dataManager(), SIGNAL(dataLoaded()), this, SIGNAL(changed()));
+  connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(changed()));
 }
 
 void ParentFrameStringDataAdapter::setData(DataPtr data)
@@ -597,7 +597,7 @@ void DataUidEditableStringDataAdapter::setData(DataPtr data)
 
 DataModalityStringDataAdapter::DataModalityStringDataAdapter()
 {
-	connect(dataManager(), SIGNAL(dataLoaded()), this, SIGNAL(changed()));
+	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(changed()));
 }
 
 void DataModalityStringDataAdapter::setData(ImagePtr data)
@@ -653,7 +653,7 @@ QStringList DataModalityStringDataAdapter::getValueRange() const
 
 ImageTypeStringDataAdapter::ImageTypeStringDataAdapter()
 {
-	connect(dataManager(), SIGNAL(dataLoaded()), this, SIGNAL(changed()));
+	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(changed()));
 }
 
 void ImageTypeStringDataAdapter::setData(ImagePtr data)

@@ -109,6 +109,7 @@ set(ALL_LIBRARY_DIRS
     ${DCMTK_DIR}/lib
     ${INCLUDE_DIRECTORIES}
     ${Tube-Segmentation-Framework_LIBRARY_DIRS}
+    ${OpenCLUtilityLibrary_LIBRARY_DIRS}
 	${CustusX3_BINARY_DIR}/source/ThirdParty/VTKMultiVolume
 	${CustusX3_BINARY_DIR}
     ${CustusX3_BINARY_DIR}/source

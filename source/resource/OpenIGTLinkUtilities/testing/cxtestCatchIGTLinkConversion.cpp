@@ -14,11 +14,11 @@
 
 #include "catch.hpp"
 
-#include "sscImage.h"
+#include "cxImage.h"
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
 #include "cxIGTLinkConversion.h"
-#include "sscVolumeHelpers.h"
+#include "cxVolumeHelpers.h"
 #include "vtkImageData.h"
 
 using namespace cx;
@@ -38,7 +38,7 @@ protected:
 		vtkImageDataPtr retval = cx::generateVtkImageData(dim,
 														  cx::Vector3D(0.5,0.6,0.7),
 														  255, components);
-		int scalarSize = dim[0]*dim[1]*dim[2]*components;
+//		int scalarSize = dim[0]*dim[1]*dim[2]*components;
 
 		unsigned char* ptr = reinterpret_cast<unsigned char*>(retval->GetScalarPointer());
 

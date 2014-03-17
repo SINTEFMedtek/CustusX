@@ -41,6 +41,8 @@ class LibraryAssembly:
              self.libraries.append(cxComponents.ISB_DataStreaming());
         self.libraries.append(cxComponents.UltrasonixSDK())
         if (platform.system() != 'Windows'):
+            self.libraries.append(cxComponents.OpenCLUtilityLibrary())
+        if (platform.system() != 'Windows'):
             self.libraries.append(cxComponents.TubeSegmentationFramework());
         if (platform.system() == 'Linux'):
             self.libraries.append(cxComponents.LevelSetSegmentation());
@@ -69,6 +71,10 @@ class LibraryAssembly:
                         
     def getSelectedLibraries(self):
         return self.selectedLibraryNames
+    
+    def selectAllPublicLibraries(self):
+        selection = [lib.name() for lib in self.libraries if lib.isPubliclyAvailable()]
+        self.selectedLibraryNames = selection
 
     def process(self, checkout=False, configure_clean=False, configure=False, clean=False, build=False):
         '''

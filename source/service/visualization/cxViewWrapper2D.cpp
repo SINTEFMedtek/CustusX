@@ -32,41 +32,46 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 
-#include "sscUtilHelpers.h"
-#include "sscView.h"
-#include "sscSliceProxy.h"
-#include "sscSlicerRepSW.h"
-#include "sscToolRep2D.h"
-#include "sscOrientationAnnotationRep.h"
-#include "sscOrientationAnnotation2DRep.h"
-#include "sscDisplayTextRep.h"
-#include "sscMessageManager.h"
-#include "sscManualTool.h"
-#include "sscDataManager.h"
+#include "cxUtilHelpers.h"
+#include "cxView.h"
+#include "cxSliceProxy.h"
+#include "cxSlicerRepSW.h"
+#include "cxToolRep2D.h"
+#include "cxOrientationAnnotationRep.h"
+#include "cxOrientationAnnotation2DRep.h"
+#include "cxDisplayTextRep.h"
+#include "cxReporter.h"
+#include "cxManualTool.h"
+#include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxToolManager.h"
 #include "cxViewGroup.h"
-#include "sscDefinitionStrings.h"
-#include "sscSlicePlanes3DRep.h"
-#include "sscDefinitionStrings.h"
-#include "sscSliceComputer.h"
-#include "sscGeometricRep2D.h"
-#include "sscTexture3DSlicerRep.h"
+#include "cxDefinitionStrings.h"
+#include "cxSlicePlanes3DRep.h"
+#include "cxDefinitionStrings.h"
+#include "cxSliceComputer.h"
+#include "cxGeometricRep2D.h"
+#include "cxTexture3DSlicerRep.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
-#include "sscGLHelpers.h"
-#include "sscData.h"
-#include "sscMesh.h"
-#include "sscImage.h"
-#include "sscPointMetricRep2D.h"
+#include "cxGLHelpers.h"
+#include "cxData.h"
+#include "cxMesh.h"
+#include "cxImage.h"
+#include "cxPointMetricRep2D.h"
+#include "cxLogger.h"
+#include "cxViewFollower.h"
+#include "cxVisualizationServiceBackend.h"
+#include "cx2DZoomHandler.h"
+#include "cxNavigation.h"
 
 namespace cx
 {
 
-ViewWrapper2D::ViewWrapper2D(ViewWidget* view) :
-				mOrientationActionGroup(new QActionGroup(view))
+ViewWrapper2D::ViewWrapper2D(ViewWidget* view, VisualizationServiceBackendPtr backend) :
+	ViewWrapper(backend),
+	mOrientationActionGroup(new QActionGroup(view))
 {
-//  std::cout << "ViewWrapper2D create" << std::endl;
 	mView = view;
 	this->connectContextMenu(mView);
 
@@ -81,10 +86,11 @@ ViewWrapper2D::ViewWrapper2D(ViewWidget* view) :
 
 	addReps();
 
-	setZoom2D(SyncedValue::create(1));
+	mZoom2D.reset(new Zoom2DHandler());
+	connect(mZoom2D.get(), SIGNAL(zoomChanged()), this, SLOT(viewportChanged()));
 	setOrientationMode(SyncedValue::create(0)); // must set after addreps()
 
-	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 	connect(mView, SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
 	connect(mView, SIGNAL(showSignal(QShowEvent*)), this, SLOT(showSlot()));
 	connect(mView, SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mousePressSlot(QMouseEvent*)));
@@ -96,7 +102,6 @@ ViewWrapper2D::ViewWrapper2D(ViewWidget* view) :
 
 ViewWrapper2D::~ViewWrapper2D()
 {
-//  std::cout << "ViewWrapper2D delete" << std::endl;
 	if (mView)
 		mView->removeReps();
 }
@@ -113,32 +118,27 @@ void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
 	ortogonalAction->setCheckable(true);
 	ortogonalAction->setData(qstring_cast(otORTHOGONAL));
 	ortogonalAction->setChecked(getOrientationType() == otORTHOGONAL);
-	//ortogonalAction->setChecked(true);
 	connect(ortogonalAction, SIGNAL(triggered()), this, SLOT(orientationActionSlot()));
 
 	//TODO remove actiongroups?
 	mOrientationActionGroup->addAction(obliqueAction);
 	mOrientationActionGroup->addAction(ortogonalAction);
 
-	QAction* global2DZoomAction = new QAction("Global 2D Zoom", &contextMenu);
-	global2DZoomAction->setCheckable(true);
-	global2DZoomAction->setChecked(viewManager()->getGlobal2DZoom());
-	connect(global2DZoomAction, SIGNAL(triggered()), this, SLOT(global2DZoomActionSlot()));
-
 	contextMenu.addSeparator();
 	contextMenu.addAction(obliqueAction);
 	contextMenu.addAction(ortogonalAction);
 	contextMenu.addSeparator();
-	contextMenu.addAction(global2DZoomAction);
+
+	mZoom2D->addActionsToMenu(&contextMenu);
 }
 
 void ViewWrapper2D::setViewGroup(ViewGroupDataPtr group)
 {
 	ViewWrapper::setViewGroup(group);
 
+	mZoom2D->setGroupData(group);
 	connect(group.get(), SIGNAL(optionsChanged()), this, SLOT(optionChangedSlot()));
 	this->optionChangedSlot();
-
 }
 
 void ViewWrapper2D::optionChangedSlot()
@@ -163,16 +163,6 @@ void ViewWrapper2D::orientationActionSlot()
 	mOrientationMode->set(type);
 }
 
-	/** Slot for the global zoom action
-	 *  Set the global zoom flag in the view manager.
-	 */
-void ViewWrapper2D::global2DZoomActionSlot()
-{
-	QAction* theAction = static_cast<QAction*>(sender());if(!theAction)
-	return;
-
-	viewManager()->setGlobal2DZoom(!viewManager()->getGlobal2DZoom());
-}
 
 void ViewWrapper2D::addReps()
 {
@@ -183,16 +173,18 @@ void ViewWrapper2D::addReps()
 
 	// plane type text rep
 	mPlaneTypeText = DisplayTextRep::New("planeTypeRep_" + mView->getName(), "");
-	mPlaneTypeText->addText(Vector3D(0, 1, 0), "not initialized", Vector3D(0.98, 0.02, 0.0));
+	mPlaneTypeText->addText(QColor(Qt::green), "not initialized", Vector3D(0.98, 0.02, 0.0));
 	mView->addRep(mPlaneTypeText);
 
 	//data name text rep
 	mDataNameText = DisplayTextRep::New("dataNameText_" + mView->getName(), "");
-	mDataNameText->addText(Vector3D(0, 1, 0), "not initialized", Vector3D(0.02, 0.02, 0.0));
+	mDataNameText->addText(QColor(Qt::green), "not initialized", Vector3D(0.02, 0.02, 0.0));
 	mView->addRep(mDataNameText);
 
 	// slice proxy
-	mSliceProxy = SliceProxy::New("sliceproxy_(" + mView->getName() + ")");
+	mSliceProxy = SliceProxy::create(mBackend->getDataManager());
+	mViewFollower = ViewFollower::create(mBackend->getDataManager());
+	mViewFollower->setSliceProxy(mSliceProxy);
 
 	// slice rep
 	//the mul
@@ -217,7 +209,7 @@ void ViewWrapper2D::addReps()
 //#endif
 
 	// tool rep
-	mToolRep2D = ToolRep2D::New("Tool2D_" + mView->getName());
+	mToolRep2D = ToolRep2D::New(mBackend->getSpaceProvider(), "Tool2D_" + mView->getName());
 	mToolRep2D->setSliceProxy(mSliceProxy);
 	mToolRep2D->setUseCrosshair(true);
 //  mToolRep2D->setUseToolLine(false);
@@ -246,12 +238,15 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 	{
 		this->updateView();
 	}
-
+	if (key == "Navigation/anyplaneViewOffset")
+	{
+		this->updateView();
+	}
 }
 
 bool ViewWrapper2D::overlayIsEnabled()
 {
-	return settings()->value("useGPU2DRendering").toBool();
+	return true;
 }
 
 /**Hack: gpu slicer recreate and fill with images every time,
@@ -276,7 +271,7 @@ void ViewWrapper2D::resetMultiSlicer()
 	mMultiSliceRep->setSliceProxy(mSliceProxy);
 	mView->addRep(mMultiSliceRep);
 	if (mGroupData)
-		mMultiSliceRep->setImages(mGroupData->getImages());
+		mMultiSliceRep->setImages(mGroupData->getImages(DataViewProperties::createSlice2D()));
 	this->viewportChanged();
 }
 
@@ -307,9 +302,10 @@ void ViewWrapper2D::viewportChanged()
 	if (!mView->getRenderer()->IsActiveCameraCreated())
 		return;
 
-	mView->setZoomFactor(mZoom2D->get().toDouble());
+	mView->setZoomFactor(mZoom2D->getFactor());
+//	mView->setZoomFactor(mZoom2D->get().toDouble());
 
-	double viewHeight = mView->heightMM() / getZoomFactor2D();
+	double viewHeight = mView->heightMM() / mZoom2D->getFactor();
 //  double parallelScale = mView->heightMM() / 2.0 / getZoomFactor2D();
 	mView->getRenderer()->GetActiveCamera()->SetParallelScale(viewHeight / 2);
 
@@ -324,16 +320,22 @@ void ViewWrapper2D::viewportChanged()
 //	std::cout << "height: " << viewHeight << ", d=" << clipDepth << std::endl;
 
 	mSliceProxy->setToolViewportHeight(viewHeight);
+	double anyplaneViewOffset = settings()->value("Navigation/anyplaneViewOffset").toDouble();
+	mSliceProxy->initializeFromPlane(mSliceProxy->getComputer().getPlaneType(), false, Vector3D(0, 0, 1), true, viewHeight, anyplaneViewOffset, true);
+//	mSliceProxy->setToolViewOffset(mSliceProxy->getComputer().get, viewHeight, anyplaneViewOffset, true);
 
 	DoubleBoundingBox3D BB_vp = getViewport();
 	Transform3D vpMs = get_vpMs();
+	DoubleBoundingBox3D BB_s = transform(vpMs.inv(), BB_vp);
 	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
 
 	mToolRep2D->setViewportData(vpMs, BB_vp);
 	if (mSlicePlanes3DMarker)
 	{
-		mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, transform(vpMs.inv(), BB_vp));
+		mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, BB_s);
 	}
+
+	mViewFollower->setView(BB_s);
 }
 
 /**Return the viewport in vtk pixels. (viewport space)
@@ -382,8 +384,10 @@ void ViewWrapper2D::initializePlane(PLANE_TYPE plane)
 {
 //  mOrientationAnnotationRep->setPlaneType(plane);
 	mPlaneTypeText->setText(0, qstring_cast(plane));
-	double viewHeight = mView->heightMM() / this->getZoomFactor2D();
+	double viewHeight = mView->heightMM() / mZoom2D->getFactor();
 	mSliceProxy->initializeFromPlane(plane, false, Vector3D(0, 0, 1), true, viewHeight, 0.25);
+//	double anyplaneViewOffset = settings()->value("Navigation/anyplaneViewOffset").toDouble();
+//	mSliceProxy->initializeFromPlane(plane, false, Vector3D(0, 0, 1), true, 1, 0);
 	mOrientationAnnotationRep->setSliceProxy(mSliceProxy);
 
 	// do this to force sync global and local type - must think on how we want this to work
@@ -453,7 +457,7 @@ void ViewWrapper2D::updateView()
 	QString text;
 	if (mGroupData)
 	{
-		std::vector<ImagePtr> images = mGroupData->getImages();
+		std::vector<ImagePtr> images = mGroupData->getImages(DataViewProperties::createSlice2D());
 		ImagePtr image;
 		if (!images.empty())
 			image = images.back(); // always show last in vector
@@ -468,7 +472,7 @@ void ViewWrapper2D::updateView()
 		if (settings()->value("useGPU2DRendering").toBool())
 		{
 			this->resetMultiSlicer();
-			text = this->getAllDataNames().join("\n");
+			text = this->getAllDataNames(DataViewProperties::createSlice2D()).join("\n");
 		}
 		else
 		{
@@ -484,34 +488,18 @@ void ViewWrapper2D::updateView()
 				mSliceRep->setSliceProxy(mSliceProxy);
 				mView->addRep(mSliceRep);
 			}
-//			std::cout << "using sw slicer" << std::endl;
 
 			QStringList textList;
 			mSliceRep->setImage(image);
 
 			// list all meshes and one image.
-			std::vector<MeshPtr> mesh = mGroupData->getMeshes();
+			std::vector<MeshPtr> mesh = mGroupData->getMeshes(DataViewProperties::createSlice2D());
 			for (unsigned i = 0; i < mesh.size(); ++i)
 			textList << qstring_cast(mesh[i]->getName());
 			if (image)
 			textList << image->getName();
 			text = textList.join("\n");
 		}
-//#ifdef USE_2D_GPU_RENDER
-//		this->resetMultiSlicer();
-//		text = this->getAllDataNames().join("\n");
-//#else
-//		QStringList textList;
-//		mSliceRep->setImage(image);
-//
-//		// list all meshes and one image.
-//		std::vector<MeshPtr> mesh = mViewGroup->getMeshes();
-//		for (unsigned i = 0; i < mesh.size(); ++i)
-//		textList << qstring_cast(mesh[i]->getName());
-//		if (image)
-//		textList << image->getName();
-//		text = textList.join("\n");
-//#endif
 	}
 
 	bool show = settings()->value("View/showDataText").value<bool>();
@@ -524,11 +512,26 @@ void ViewWrapper2D::updateView()
 
 	mOrientationAnnotationRep->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
 
+//	mViewFollower->ensureCenterWithinView();
 }
+
+
 
 void ViewWrapper2D::imageRemoved(const QString& uid)
 {
 	updateView();
+}
+
+void ViewWrapper2D::dataViewPropertiesChangedSlot(QString uid)
+{
+	DataPtr data = mBackend->getDataManager()->getData(uid);
+	DataViewProperties properties = mGroupData->getProperties(data);
+
+	if (properties.hasSlice2D())
+		this->dataAdded(data);
+	else
+		this->dataRemoved(uid);
+
 }
 
 void ViewWrapper2D::dataAdded(DataPtr data)
@@ -589,10 +592,8 @@ void ViewWrapper2D::pointMetricAdded(PointMetricPtr mesh)
 	PointMetricRep2DPtr rep = PointMetricRep2D::New(mesh->getUid() + "_rep2D");
 	rep->setSliceProxy(mSliceProxy);
     rep->setDataMetric(mesh);
-	rep->setFillVisibility(false);
-	rep->setOutlineWidth(0.25);
-	rep->setOutlineColor(1,0,0);
 	rep->setDynamicSize(true);
+	rep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
 	mView->addRep(rep);
 	mPointMetricRep[mesh->getUid()] = rep;
 	this->updateView();
@@ -611,7 +612,7 @@ void ViewWrapper2D::pointMetricRemoved(const QString& uid)
 
 void ViewWrapper2D::dominantToolChangedSlot()
 {
-	ToolPtr dominantTool = toolManager()->getDominantTool();
+	ToolPtr dominantTool = mBackend->getToolManager()->getDominantTool();
 	mSliceProxy->setTool(dominantTool);
 }
 
@@ -624,29 +625,6 @@ void ViewWrapper2D::setOrientationMode(SyncedValuePtr value)
 		connect(mOrientationMode.get(), SIGNAL(changed()), this, SLOT(orientationModeChanged()));
 
 	orientationModeChanged();
-}
-
-void ViewWrapper2D::setZoom2D(SyncedValuePtr value)
-{
-	if (mZoom2D)
-		disconnect(mZoom2D.get(), SIGNAL(changed()), this, SLOT(viewportChanged()));
-	mZoom2D = value;
-	if (mZoom2D)
-		connect(mZoom2D.get(), SIGNAL(changed()), this, SLOT(viewportChanged()));
-
-	viewportChanged();
-}
-
-void ViewWrapper2D::setZoomFactor2D(double zoomFactor)
-{
-	zoomFactor = constrainValue(zoomFactor, 0.2, 10.0);
-	mZoom2D->set(zoomFactor);
-	viewportChanged();
-}
-
-double ViewWrapper2D::getZoomFactor2D() const
-{
-	return mZoom2D->get().toDouble();
 }
 
 /**Part of the mouse interactor:
@@ -697,13 +675,14 @@ void ViewWrapper2D::mouseMoveSlot(QMouseEvent* event)
 void ViewWrapper2D::mouseWheelSlot(QWheelEvent* event)
 {
 	// scale zoom in log space
-	double val = log10(getZoomFactor2D());
+	double val = log10(mZoom2D->getFactor());
 	val += event->delta() / 120.0 / 20.0; // 120 is normal scroll resolution, x is zoom resolution
 	double newZoom = pow(10.0, val);
 
-	this->setZoomFactor2D(newZoom);
+//	this->setZoomFactor2D(newZoom);
+	mZoom2D->setFactor(newZoom);
 
-	Navigation().centerToTooltip(); // side effect: center on tool
+	Navigation(mBackend).centerToTooltip(); // side effect: center on tool
 }
 
 /**Convert a position in Qt viewport space (pixels with origin in upper-left corner)
@@ -722,10 +701,10 @@ Vector3D ViewWrapper2D::qvp2vp(QPoint pos_qvp)
 void ViewWrapper2D::shiftAxisPos(Vector3D delta_vp)
 {
 	delta_vp = -delta_vp;
-	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
+	ManualToolPtr tool = mBackend->getToolManager()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
-	Transform3D rMpr = *toolManager()->get_rMpr();
+	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 	Vector3D delta_s = get_vpMs().inv().vector(delta_vp);
 
@@ -742,10 +721,10 @@ void ViewWrapper2D::shiftAxisPos(Vector3D delta_vp)
  */
 void ViewWrapper2D::setAxisPos(Vector3D click_vp)
 {
-	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
+	ManualToolPtr tool = mBackend->getToolManager()->getManualTool();
 
 	Transform3D sMr = mSliceProxy->get_sMr();
-	Transform3D rMpr = *toolManager()->get_rMpr();
+	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 
 	// find tool position in s

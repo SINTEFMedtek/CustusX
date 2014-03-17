@@ -5,13 +5,10 @@
 SET( CX_QT_MOC_HEADER_FILES
     cxPatientData.h
     cxPatientService.h
-	cxDataManager.h
     cxActiveImageProxy.h
 )
 
 SET ( cxPatientService_SOURCE
-	cxDataManager.h
-	cxDataManager.cpp
 	cxPatientData.h
     cxPatientData.cpp
     cxPatientService.h

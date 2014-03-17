@@ -9,21 +9,21 @@
 #include <QCheckBox>
 #include <QTimer>
 #include <vtkImageData.h>
-#include "sscLabeledComboBoxWidget.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
-#include "sscData.h"
-#include "sscDataManager.h"
-#include "sscRegistrationTransform.h"
-#include "sscImageAlgorithms.h"
-#include "sscImage.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
+#include "cxData.h"
+#include "cxDataManager.h"
+#include "cxRegistrationTransform.h"
+#include "cxImageAlgorithms.h"
+#include "cxImage.h"
 #include "cxStateService.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
 #include "cxViewManager.h"
-#include "sscVolumeHelpers.h"
-#include "sscImageTF3D.h"
-#include "sscImageLUT2D.h"
+#include "cxVolumeHelpers.h"
+#include "cxImageTF3D.h"
+#include "cxImageLUT2D.h"
 
 namespace cx
 {
@@ -92,7 +92,7 @@ ImportDataDialog::ImportDataDialog(QString filename, QWidget* parent) :
   mOkButton->setDefault(true);
   mOkButton->setFocus();
 
-  messageManager()->sendInfo("Importing data...");
+  report("Importing data...");
 }
 
 ImportDataDialog::~ImportDataDialog()
@@ -219,7 +219,7 @@ void ImportDataDialog::convertFromNifti1Coordinates()
   Transform3D rMd = mData->get_rMd();
   rMd = rMd * createTransformRotateZ(M_PI);
   mData->get_rMd_History()->setRegistration(rMd);
-  messageManager()->sendInfo("Nifti import: rotated input data " + mData->getName() + " 180* around Z-axis.");
+  report("Nifti import: rotated input data " + mData->getName() + " 180* around Z-axis.");
 }
 
 /** Apply the transform from the parent frame to the imported data.
@@ -235,7 +235,7 @@ void ImportDataDialog::importParentTransform()
   if (!parent)
     return;
   mData->get_rMd_History()->setRegistration(parent->get_rMd());
-  messageManager()->sendInfo("Assigned rMd from data [" + parent->getName() + "] to data [" + mData->getName() + "]");
+  report("Assigned rMd from data [" + parent->getName() + "] to data [" + mData->getName() + "]");
 }
 
 void ImportDataDialog::convertToUnsigned()
@@ -247,12 +247,12 @@ void ImportDataDialog::convertToUnsigned()
 	if (!image)
 		return;
 
-	ImagePtr converted = convertImageToUnsigned(image);
+	ImagePtr converted = convertImageToUnsigned(dataService(), image);
 
 	image->setVtkImageData(converted->getBaseVtkImageData());
 
-	ImageTF3DPtr TF3D = converted->getTransferFunctions3D()->createCopy(image->getBaseVtkImageData());
-	ImageLUT2DPtr LUT2D = converted->getLookupTable2D()->createCopy(image->getBaseVtkImageData());
+	ImageTF3DPtr TF3D = converted->getTransferFunctions3D()->createCopy();
+	ImageLUT2DPtr LUT2D = converted->getLookupTable2D()->createCopy();
 	image->setLookupTable2D(LUT2D);
 	image->setTransferFunctions3D(TF3D);
 	dataManager()->saveImage(image, patientService()->getPatientData()->getActivePatientFolder());

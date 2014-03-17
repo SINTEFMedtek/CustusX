@@ -4,9 +4,9 @@
 #include "cxBaseWidget.h"
 #include <QCheckBox>
 #include <QDomElement>
-#include <sscImage.h>
-#include "sscTransferFunctions3DPresets.h"
-#include "sscDoubleDataAdapter.h"
+#include "cxImage.h"
+#include "cxTransferFunctions3DPresets.h"
+#include "cxDoubleDataAdapter.h"
 #include "cxActiveImageProxy.h"
 
 class QVBoxLayout;
@@ -22,7 +22,7 @@ class TransferFunctionColorWidget;
 
 /**
  * \file
- * \addtogroup cxGUI
+ * \addtogroup cx_gui
  * @{
  */
 
@@ -38,12 +38,13 @@ public:
   virtual bool setValue(double val);
   virtual void connectValueSignals(bool on) {}
 public:
-  void setImageTFData(ImageTFDataPtr tfData);
+  void setImageTFData(ImageTFDataPtr tfData, ImagePtr image);
 protected:
   virtual double getValueInternal() const = 0;
   virtual void setValueInternal(double val) = 0;
 
   ImageTFDataPtr mImageTFData;
+  ImagePtr mImage;
 };
 typedef boost::shared_ptr<DoubleDataAdapterImageTFDataBase> DoubleDataAdapterImageTFDataBasePtr;
 

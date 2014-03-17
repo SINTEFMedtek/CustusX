@@ -6,7 +6,7 @@
  */
 
 #include <cxDoubleDataAdapterTemporalCalibration.h>
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 
 namespace cx
 {
@@ -57,8 +57,8 @@ double DoubleDataAdapterTimeCalibration::getValue() const
 
 QString DoubleDataAdapterTimeCalibration::getHelp() const
 {
-  return "Set a temporal shift to add to input probe frames.\n"
-	  "Changes done here will NOT be saved.";
+	return "Set a temporal shift to add to input probe frames (the frames will be stored with this shift applied).\n"
+		"Changes done here will NOT be saved.";
 }
 
 bool DoubleDataAdapterTimeCalibration::setValue(double val)

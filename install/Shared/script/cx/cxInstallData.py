@@ -76,6 +76,7 @@ class Common(object):
         self.mBuildExAndTest = False
         self.mCoverage = False
         self.mDoxygen = False
+        self.mGraphviz = False
         self.git_tag = None # if none, use branch master
         self.force_connect_sublibraries = False
 
@@ -94,6 +95,7 @@ class Common(object):
         print '    BuildExternalsType:', self.getBuildExternalsType()
         print '    BuildTesting:', self.mBuildTesting
         print '    Coverage:', self.mCoverage
+        print '    Make dependency graph:', self.mGraphviz
         print '    Threads:', self.threads
         print '    32 bit:', self.m32bit
         print '    git tag:', self.git_tag
@@ -121,7 +123,8 @@ class Common(object):
         if platform.system() == 'Darwin':
             p.add_boolean_inverter('--xcode', default=self.xcode, dest='xcode', help='Generate xcode targets')
         p.add_boolean_inverter('--force_connect_sublibraries', default=self.force_connect_sublibraries, dest='force_connect_sublibraries', help='Force libs such as gestreamer and tsf to be connected to cx, during configuration step.')        
-        p.add_boolean_inverter('--short_pathnames', default=self.short_pathnames, dest='short_pathnames', help='Create shorter pathnames where possible. Workaround for the path length limitation on Windows.')        
+        p.add_boolean_inverter('--short_pathnames', default=self.short_pathnames, dest='short_pathnames', help='Create shorter pathnames where possible. Workaround for the path length limitation on Windows.')
+        p.add_boolean_inverter('--graph', default=self.mGraphviz, dest='mGraphviz', help='Make dependency graph.')        
         return p
 
     def getArgParser_extended_build(self):

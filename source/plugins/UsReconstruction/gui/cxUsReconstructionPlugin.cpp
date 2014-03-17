@@ -7,12 +7,12 @@
 
 #include <cxUsReconstructionPlugin.h>
 #include "cxDataLocations.h"
-#include "sscXmlOptionItem.h"
-#include "sscReconstructManager.h"
+#include "cxXmlOptionItem.h"
+#include "cxReconstructManager.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 
-#include "sscReconstructionWidget.h"
+#include "cxReconstructionWidget.h"
 
 
 namespace cx

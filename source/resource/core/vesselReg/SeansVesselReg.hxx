@@ -1,9 +1,9 @@
 #ifndef SeansVesselSegmentation_hxx
 #define SeansVesselSegmentation_hxx
 
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 #include "vtkSmartPointer.h"
 
 namespace cx
@@ -16,6 +16,7 @@ namespace cx
  * Basic usage: Run execute(), then get result with getLinearTransform()
  *
  *
+ * \ingroup cx_resource_core_utilities
  * \date Feb 4, 2011
  * \author Christian Askeland, SINTEF
  *
@@ -66,7 +67,7 @@ public:
 	double getResultLtsRatio(ContextPtr context=ContextPtr());
 	Transform3D getNonLinearTransform();
 	void checkQuality(Transform3D linearTransform);
-	ImagePtr loadMinc(char* source_file);
+//	ImagePtr loadMinc(char* source_file);
 	void setDebugOutput(bool on)
 	{
 		mt_verbose = on;

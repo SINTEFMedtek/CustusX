@@ -20,7 +20,7 @@
  */
 #include "cxInteractiveCropper.h"
 
-#include "sscView.h"
+#include "cxView.h"
 
 #include <vector>
 #include <vtkTransform.h>
@@ -30,16 +30,17 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkImageData.h>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxRepManager.h"
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 #include <vtkBoxWidget2.h>
 #include <vtkBoxWidget.h>
-#include "sscBoundingBox3D.h"
-#include "sscImage.h"
-#include "sscTransform3D.h"
-#include "sscVolumetricRep.h"
+#include "cxBoundingBox3D.h"
+#include "cxImage.h"
+#include "cxTransform3D.h"
+#include "cxVolumetricRep.h"
 #include "cxActiveImageProxy.h"
+#include "cxVisualizationServiceBackend.h"
 
 namespace cx
 {
@@ -95,9 +96,10 @@ public:
 //---------------------------------------------------------
 
 
-InteractiveCropper::InteractiveCropper()
+InteractiveCropper::InteractiveCropper(VisualizationServiceBackendPtr backend) :
+	mBackend(backend)
 {
-	mActiveImageProxy = ActiveImageProxy::New();
+	mActiveImageProxy = ActiveImageProxy::New(mBackend->getDataManager());
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(imageChangedSlot()));
 	connect(mActiveImageProxy.get(), SIGNAL(cropBoxChanged()), this, SLOT(imageCropChangedSlot()));
 }
@@ -219,7 +221,7 @@ void InteractiveCropper::resetBoundingBox()
 
 void InteractiveCropper::imageChangedSlot()
 {
-	mImage = dataManager()->getActiveImage();
+	mImage = mBackend->getDataManager()->getActiveImage();
 
 	this->imageCropChangedSlot();
 	emit changed();

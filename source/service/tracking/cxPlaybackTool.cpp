@@ -13,8 +13,8 @@
 // See CustusX_License.txt for more information.
 
 #include "cxPlaybackTool.h"
-#include "sscTime.h"
-#include "sscTypeConversions.h"
+#include "cxTime.h"
+#include "cxTypeConversions.h"
 #include "cxToolManager.h"
 #include "cxPlaybackTime.h"
 #include "cxManualToolAdapter.h"
@@ -22,8 +22,8 @@
 namespace cx
 {
 
-PlaybackTool::PlaybackTool(ToolPtr base, PlaybackTimePtr time) :
-    Tool("playback_"+base->getUid(), "playback "+base->getName()), mBase(base),
+PlaybackTool::PlaybackTool(TrackingServicePtr manager, ToolPtr base, PlaybackTimePtr time) :
+	ToolImpl(manager, "playback_"+base->getUid(), "playback "+base->getName()), mBase(base),
     mTime(time),
     mVisible(false)
 {
@@ -73,8 +73,11 @@ void PlaybackTool::timeChangedSlot()
 
 	// Overwrite manual tool pos, set timestamp to 1ms previous.
 	// This makes sure manual tool is not picked as dominant.
-	cxToolManager::getInstance()->getManualTool()->set_prMt(m_rMpr, mTimestamp-1);
-	cxToolManager::getInstance()->dominantCheckSlot();
+	if (this->getTrackingService())
+	{
+		this->getTrackingService()->getManualTool()->set_prMt(m_rMpr, mTimestamp-1);
+		this->getTrackingService()->dominantCheckSlot();
+	}
 }
 
 QString PlaybackTool::getGraphicsFileName() const

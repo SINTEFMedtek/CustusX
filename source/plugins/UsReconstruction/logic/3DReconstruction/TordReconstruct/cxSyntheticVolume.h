@@ -1,9 +1,11 @@
 #ifndef SYNTHETIC_VOLUME_HPP
 #define SYNTHETIC_VOLUME_HPP
 
-#include "sscUSFrameData.h"
+#include "cxUSFrameData.h"
 #include <vector>
-#include "sscMathBase.h"
+#include "cxMathBase.h"
+#include <cstdlib>
+#include <time.h>
 
 
 namespace cx {
@@ -23,6 +25,8 @@ public:
 
 	cxSyntheticVolume(Vector3D bounds)
 	{
+		// Seed the random number generator
+		srand(time(NULL));
 		mBounds = bounds;
 	}
 	virtual ~cxSyntheticVolume() { };

@@ -15,19 +15,19 @@
 #ifndef CXMANUALTOOLADAPTER_H_
 #define CXMANUALTOOLADAPTER_H_
 
-#include "sscManualTool.h"
+#include "cxManualTool.h"
 
 namespace cx
 {
 /**
 * \file
-* \addtogroup cxServiceTracking
+* \addtogroup cx_service_tracking
 * @{
 */
 
 /**
  * \brief Adapter class for ManualTool.
- * \ingroup cxServiceTracking
+ * \ingroup cx_service_tracking
  *
  * A ManualToolAdapter inherits from manual tool, but also
  * contains a cx::Tool that is requests shape and probe info from.
@@ -41,8 +41,8 @@ class ManualToolAdapter : public ManualTool
 {
 	Q_OBJECT
 public:
-	explicit ManualToolAdapter(ToolManager* manager, QString uid);
-	explicit ManualToolAdapter(ToolManager* manager, ToolPtr base);
+	explicit ManualToolAdapter(TrackingServicePtr manager, QString uid);
+	explicit ManualToolAdapter(TrackingServicePtr manager, ToolPtr base);
 	virtual ~ManualToolAdapter();
 
 	virtual std::set<Type> getTypes() const { return mBase->getTypes(); }

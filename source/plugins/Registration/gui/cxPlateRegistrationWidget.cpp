@@ -2,10 +2,10 @@
 
 #include <QPushButton>
 #include <QLabel>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxToolManager.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
 #include "cxRegistrationManager.h"
 #include "cxViewManager.h"
 
@@ -44,8 +44,8 @@ QString PlateRegistrationWidget::defaultWhatsThis() const
 void PlateRegistrationWidget::showEvent(QShowEvent* event)
 {
   BaseWidget::showEvent(event);
-  connect(toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
-  connect(toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
+  connect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
+  connect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
   viewManager()->setRegistrationMode(rsPATIENT_REGISTRATED);
 }
@@ -53,8 +53,8 @@ void PlateRegistrationWidget::showEvent(QShowEvent* event)
 void PlateRegistrationWidget::hideEvent(QHideEvent* event)
 {
   BaseWidget::hideEvent(event);
-  disconnect(toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
-  disconnect(toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
+  disconnect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
+  disconnect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
   viewManager()->setRegistrationMode(rsNOT_REGISTRATED);
 }
@@ -66,18 +66,18 @@ void PlateRegistrationWidget::landmarkUpdatedSlot()
 
 void PlateRegistrationWidget::plateRegistrationSlot()
 {
-  toolManager()->removeLandmarks();
+  dataManager()->getPatientLandmarks()->clear();
 
   ToolPtr refTool = toolManager()->getReferenceTool();
   if(!refTool)//cannot register without a reference tool
   {
-    messageManager()->sendDebug("No refTool");
+    reporter()->sendDebug("No refTool");
     return;
   }
   std::map<int, Vector3D> referencePoints = refTool->getReferencePoints();
   if(referencePoints.empty()) //cannot register without at least 1 reference point
   {
-    messageManager()->sendDebug("No referenceppoints in reftool "+refTool->getName());
+    reporter()->sendDebug("No referenceppoints in reftool "+refTool->getName());
     return;
   }
 
@@ -86,7 +86,7 @@ void PlateRegistrationWidget::plateRegistrationSlot()
   {
     QString uid = dataManager()->addLandmark();
     dataManager()->setLandmarkName(uid, qstring_cast(it->first));
-    toolManager()->setLandmark(Landmark(uid, it->second));
+	dataManager()->getPatientLandmarks()->setLandmark(Landmark(uid, it->second));
   }
 
   // set all landmarks as not active as default

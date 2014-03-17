@@ -17,11 +17,13 @@
 
 #include "cxFrameMetric.h"
 #include "cxToolMetric.h"
-#include "sscDistanceMetric.h"
-#include "sscPointMetric.h"
-#include "sscPlaneMetric.h"
+#include "cxDistanceMetric.h"
+#include "cxPointMetric.h"
+#include "cxPlaneMetric.h"
 //#include "cxToolMetric.h"
 #include <QDomNode>
+#include "cxtestDummyDataManager.h"
+#include "cxMessageListener.h"
 
 namespace cxtest {
 
@@ -97,7 +99,7 @@ public:
 	FrameMetricWithInput getFrameMetricWithInput();
 	ToolMetricWithInput getToolMetricWithInput();
 	PointMetricWithInput getPointMetricWithInput(cx::Vector3D point);
-	PlaneMetricWithInput getPlaneMetricWithInput(cx::Vector3D point, cx::Vector3D normal);
+	PlaneMetricWithInput getPlaneMetricWithInput(cx::Vector3D point, cx::Vector3D normal, cx::DataMetricPtr p0, cx::DataMetricPtr p1);
 	DistanceMetricWithInput getDistanceMetricWithInput(double distance, cx::DataMetricPtr p0, cx::DataMetricPtr p1);
 	DistanceMetricWithInput getDistanceMetricWithInput(double distance);
 	QStringList getSingleLineDataList(cx::DataMetricPtr metric);
@@ -108,13 +110,20 @@ public:
 	bool inputEqualsMetric(PlaneMetricWithInput data);
 	bool inputEqualsMetric(ToolMetricWithInput data);
 
+	template<class METRIC_TYPE>
+	boost::shared_ptr<METRIC_TYPE> createTestMetric(QString uid="")
+	{
+		return METRIC_TYPE::create(uid, "", this->getDataManager(), this->getSpaceProvider());
+	}
+
     template<class DATA>
     bool saveLoadXmlGivesEqualTransform(DATA data)
     {
         QDomNode xmlNode = this->createDummyXmlNode();
         data.mMetric->addXml(xmlNode);
 
-        data.mMetric = DATA::METRIC_TYPE::create(xmlNode);
+		data.mMetric = this->createTestMetric<typename DATA::METRIC_TYPE>("");
+		data.mMetric->parseXml(xmlNode);
 
 		return this->inputEqualsMetric(data);
     }
@@ -122,8 +131,15 @@ public:
     QDomNode createDummyXmlNode();
     void setPatientRegistration();
 
-//    QStringList splitStringLineIntoTextComponents(QString line);
 	bool verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric);
+
+private:
+	TestServicesPtr mServices;
+	cx::MessageListenerPtr mMessageListener;
+
+	cx::DataServicePtr getDataManager();
+	cx::SpaceProviderPtr getSpaceProvider();
+
 };
 
 } //namespace cxtest

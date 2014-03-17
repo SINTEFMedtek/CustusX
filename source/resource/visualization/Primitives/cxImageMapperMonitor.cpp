@@ -21,9 +21,9 @@
 #include <vtkPlaneCollection.h>
 #include <vtkVolumeMapper.h>
 
-#include "sscImage.h"
-#include "sscDataManager.h"
-#include "sscLogger.h"
+#include "cxImage.h"
+#include "cxDataManager.h"
+#include "cxLogger.h"
 
 namespace cx
 {

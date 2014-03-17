@@ -4,18 +4,18 @@
 #include <vtkPolyData.h>
 #include <vtkPolyDataWriter.h>
 #include <vtkCellArray.h>
-#include "sscDataManager.h"
-#include "sscMesh.h"
-#include "sscVector3D.h"
+#include "cxDataManager.h"
+#include "cxMesh.h"
+#include "cxVector3D.h"
 #include "cxDataLocations.h"
 #include "vesselReg/SeansVesselReg.hxx"
-#include "sscRegistrationTransform.h"
-#include "sscTypeConversions.h"
+#include "cxRegistrationTransform.h"
+#include "cxTypeConversions.h"
 #include <QFileInfo>
 #include <QDir>
 
 
-TEST_CASE_METHOD(cxtest::SeansVesselRegFixture, "SeansVesselReg: V2V syntectic data", "[integration][plugins][registration]")
+TEST_CASE_METHOD(cxtest::SeansVesselRegFixture, "SeansVesselReg: V2V syntectic data", "[integration][plugins][registration][not_win32]")
 //void TestRegistrationV2V::testV2V_synthetic_data()
 {
 	QStringList files = this->generateTestData();
@@ -62,7 +62,7 @@ TEST_CASE_METHOD(cxtest::SeansVesselRegFixture, "SeansVesselReg: V2V syntectic d
 //	}
 }
 
-TEST_CASE_METHOD(cxtest::SeansVesselRegFixture, "SeansVesselReg: V2V registration", "[integration][plugins][registration]")
+TEST_CASE_METHOD(cxtest::SeansVesselRegFixture, "SeansVesselReg: V2V registration", "[integration][plugins][registration][not_win32]")
 //void TestRegistrationV2V::testVessel2VesselRegistration()
 {
 	QString fname0 = cx::DataLocations::getTestDataPath() + "/testing/Centerline/US_aneurism_cl_size0.vtk";

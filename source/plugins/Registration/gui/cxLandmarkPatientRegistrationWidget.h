@@ -4,8 +4,8 @@
 #include "cxLandmarkRegistrationWidget.h"
 #include "cxRegistrationDataAdapters.h"
 
-#include <sscImage.h>
-#include <sscTransform3D.h>
+#include "cxImage.h"
+#include "cxTransform3D.h"
 #include "cxDominantToolProxy.h"
 
 class QVBoxLayout;
@@ -25,7 +25,7 @@ typedef boost::shared_ptr<Vector3D> Vector3DPtr;
 
 /**
  * \file
- * \addtogroup cxPluginRegistration
+ * \addtogroup cx_plugin_registration
  * @{
  */
 

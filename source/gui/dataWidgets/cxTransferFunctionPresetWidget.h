@@ -3,7 +3,7 @@
 
 #include "cxPresetWidget.h"
 
-#include "sscTransferFunctions3DPresets.h"
+#include "cxTransferFunctions3DPresets.h"
 #include "cxDataInterface.h"
 
 class QComboBox;
@@ -40,10 +40,6 @@ private:
 	bool use2D() const;
 	bool use3D() const;
 	void updateToggles();
-
-//  QVBoxLayout* mLayout;
-//  QComboBox* mPresetsComboBox;
-//	TransferFunctions3DPresetPtr mPresets;
 
 	QAction* mToggleAction;
 	bool mIs3D; ///< true if 3D, false if 2D

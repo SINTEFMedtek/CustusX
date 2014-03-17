@@ -21,15 +21,15 @@
 
 #include "vtkImageData.h"
 
-#include "sscFileSelectWidget.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscDataManager.h"
-#include "sscTime.h"
-#include "sscMessageManager.h"
-#include "sscProbeSector.h"
-#include "sscRegistrationTransform.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscHelperWidgets.h"
+#include "cxFileSelectWidget.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxDataManager.h"
+#include "cxTime.h"
+#include "cxReporter.h"
+#include "cxProbeSector.h"
+#include "cxRegistrationTransform.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxHelperWidgets.h"
 
 #include "cxDataLocations.h"
 #include "cxDataInterface.h"
@@ -42,7 +42,7 @@
 #include "cxViewManager.h"
 #include "cxSimulateUSWidget.h"
 #include "cxFileInputWidget.h"
-#include "sscLogger.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -372,16 +372,16 @@ void VideoConnectionWidget::importStreamImageSlot()
 {
 	if (!this->getVideoConnectionManager())
 	{
-		messageManager()->sendWarning("No video connection");
+		reportWarning("No video connection");
 		return;
 	}
 	if (!this->getVideoConnectionManager()->isConnected())
 	{
-		messageManager()->sendWarning("Video is not connected");
+		reportWarning("Video is not connected");
 		return;
 	}
 	Transform3D rMd = Transform3D::Identity();
-	ToolPtr probe = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr probe = toolManager()->findFirstProbe();
 	VideoSourcePtr videoSource;
 	if (probe)
 	{
@@ -393,12 +393,12 @@ void VideoConnectionWidget::importStreamImageSlot()
 
 	if (!videoSource)
 	{
-		messageManager()->sendWarning("No Video data source");
+		reportWarning("No Video data source");
 		return;
 	}
 	if (!videoSource->validData())
 	{
-		messageManager()->sendWarning("No valid video data");
+		reportWarning("No valid video data");
 		return;
 	}
 
@@ -406,7 +406,7 @@ void VideoConnectionWidget::importStreamImageSlot()
 	input = videoSource->getVtkImageData();
 	if (!input)
 	{
-		messageManager()->sendWarning("No Video data");
+		reportWarning("No Video data");
 		return;
 	}
 	QString filename = generateFilename(videoSource);
@@ -418,7 +418,7 @@ void VideoConnectionWidget::importStreamImageSlot()
 Transform3D VideoConnectionWidget::calculate_rMd_ForAProbeImage(ToolPtr probe)
 {
 	Transform3D rMd = Transform3D::Identity();
-	Transform3D rMpr = *cxToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = dataManager()->get_rMpr();
 	Transform3D prMt = probe->get_prMt();
 	Transform3D tMu = probe->getProbe()->getSector()->get_tMu();
 	Transform3D uMv = probe->getProbe()->getSector()->get_uMv();
@@ -451,7 +451,7 @@ void VideoConnectionWidget::saveAndImportSnapshot(vtkImageDataPtr input, QString
 	dataManager()->loadData(output);
 	dataManager()->saveImage(output, folder);
 	viewManager()->autoShowData(output);
-	messageManager()->sendInfo(QString("Saved snapshot %1 from active video source").arg(output->getName()));
+	report(QString("Saved snapshot %1 from active video source").arg(output->getName()));
 }
 
 } //end namespace cx

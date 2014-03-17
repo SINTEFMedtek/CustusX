@@ -21,8 +21,26 @@ if (BUILD_TESTING)
 		cxtestVLCRecorderFixture.h
 		cxtestVLCRecorderFixture.cpp
 		cxtestProbeDefinition.cpp
-		cxtestOpenCL.cpp
+		cxtestSpaceProviderMock.h
+		cxtestSpaceProviderMock.cpp
+		cxtestSpaceListenerMock.h
+		cxtestSpaceListenerMock.cpp
+		cxtestTrackingPositionFilter.cpp
+		cxtestCoreServices.cpp
+		cxtestReporter.cpp
 		)
+	if (CX_USE_OPENCL_UTILITY)
+	   	set(RESOURCE_TEST_CATCH_SOURCE_FILES
+	   	    ${RESOURCE_TEST_CATCH_SOURCE_FILES}
+    		cxtestOpenCLPrinter.cpp
+		) 
+
+		set(OUL_RESOURCE_TEST_CATCH_SOURCE_FILES
+            ${OpenCLUtilityLibrary_SOURCE_DIR}/testing/tests.cpp
+            ${OpenCLUtilityLibrary_SOURCE_DIR}/testing/histogramPyramidTests.cpp
+            )	
+        cx_catch_add_lib_and_exe(OpenCLUtilityLibrary "${OUL_RESOURCE_TEST_CATCH_SOURCE_FILES}" "" "TestOpenCLUtilityLibrary")
+	endif(CX_USE_OPENCL_UTILITY)
 
     cx_catch_add_lib_and_exe(cxResource "${RESOURCE_TEST_CATCH_SOURCE_FILES}" "${CXTEST_SOURCES_TO_MOC}")
 

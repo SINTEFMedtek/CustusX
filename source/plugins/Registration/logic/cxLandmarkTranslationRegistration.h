@@ -9,13 +9,13 @@
 #define CXLANDMARKTRANSLATIONREGISTRATION_H_
 
 #include <vector>
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup cxPluginRegistration
+ * \addtogroup cx_plugin_registration
  * @{
  */
 

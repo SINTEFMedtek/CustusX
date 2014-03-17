@@ -243,8 +243,16 @@ class CppFilePair:
         else:
             old_base_name = os.path.basename(self.old_source_file_abs_path)            
         old_base_name = os.path.splitext(old_base_name)[0]
+        
+        #delimiter = '^[a-zA-Z0-9]%s'
+        delimiter = '\W'
+        regex_pattern = r'(%s)(%s)(%s)' % (delimiter, old_base_name, delimiter)
+        replace_with_text = r'\1%s\3' % new_base_name
+        
         for target_file in target_files:
-            find_and_replace_text_in_file(target_file, regex_pattern=old_base_name, replace_with_text=new_base_name)
+            find_and_replace_text_in_file(target_file, 
+                                          regex_pattern=regex_pattern, 
+                                          replace_with_text=replace_with_text)
         
     def _find_cpp_file_pair(self, path_to_file):
         file = File(path_to_file)
@@ -378,8 +386,8 @@ def main():
     logger.setRootPath(os.path.abspath(args.root_dir))
     logger.setVerbosityLevel(args.verbosity)
 
-    rename_ssc_to_cx(file_repository)
-    return
+    #rename_ssc_to_cx(file_repository)
+    #return
     
     file_pair = CppFilePair(args.header_file)
     renamer = CppFileRenamer(file_pair, args.new_name, file_repository)

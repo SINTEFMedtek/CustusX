@@ -11,17 +11,19 @@
 #include <QTextStream>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscToolManager.h"
-#include "sscDataManager.h"
-#include "sscVector3D.h"
-#include "sscDefinitionStrings.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
+#include "cxToolManager.h"
+#include "cxDataManager.h"
+#include "cxVector3D.h"
+#include "cxDefinitionStrings.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
 #include "cxSelectDataStringDataAdapter.h"
+#include "cxLegacySingletons.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
@@ -95,12 +97,12 @@ void ToolTipSampleWidget::sampleSlot()
   QFile samplingFile(mSaveToFileNameLabel->text());
 
   CoordinateSystem to = this->getSelectedCoordinateSystem();
-  Vector3D toolPoint = CoordinateSystemHelpers::getDominantToolTipPoint(to, false);
+  Vector3D toolPoint = spaceProvider()->getDominantToolTipPoint(to, false);
 
   if(!samplingFile.open(QIODevice::WriteOnly | (mTruncateFile ? QIODevice::Truncate : QIODevice::Append)))
   {
-    messageManager()->sendWarning("Could not open "+samplingFile.fileName());
-    messageManager()->sendInfo("Sampled point: "+qstring_cast(toolPoint));
+    reportWarning("Could not open "+samplingFile.fileName());
+    report("Sampled point: "+qstring_cast(toolPoint));
     return;
   }
   else
@@ -115,8 +117,8 @@ void ToolTipSampleWidget::sampleSlot()
   streamer << sampledPoint;
   streamer << endl;
 
-  messageManager()->playSampleSound();
-  messageManager()->sendInfo("Sampled point in "+qstring_cast(to.mId)+" ("+to.mRefObject+") space, result: "+sampledPoint);
+  reporter()->playSampleSound();
+  report("Sampled point in "+qstring_cast(to.mId)+" ("+to.mRefObject+") space, result: "+sampledPoint);
 }
 
 void ToolTipSampleWidget::coordinateSystemChanged()
@@ -151,13 +153,13 @@ CoordinateSystem ToolTipSampleWidget::getSelectedCoordinateSystem()
   switch (retval.mId)
   {
   case csDATA:
-    retval = CoordinateSystemHelpers::getD(mData->getData());
+	retval = spaceProvider()->getD(mData->getData());
     break;
   case csTOOL:
-    retval = CoordinateSystemHelpers::getT(mTools->getTool());
+	retval = spaceProvider()->getT(mTools->getTool());
     break;
   case csSENSOR:
-    retval = CoordinateSystemHelpers::getT(mTools->getTool());
+	retval = spaceProvider()->getT(mTools->getTool());
     break;
   default:
     retval.mRefObject = "";

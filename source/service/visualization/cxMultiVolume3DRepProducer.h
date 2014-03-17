@@ -17,8 +17,8 @@
 #include <QObject>
 #include <QPointer>
 #include <boost/shared_ptr.hpp>
-#include "sscImage.h"
-#include "sscRep.h"
+#include "cxImage.h"
+#include "cxRep.h"
 
 namespace cx
 {
@@ -28,7 +28,7 @@ typedef boost::shared_ptr<class MultiVolume3DRepProducer> MultiVolume3DVisualize
 /** 
  *
  *
- * \ingroup cxServiceVisualization
+ * \ingroup cx_service_visualization
  * \date 4 Sep 2013
  * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF
@@ -67,6 +67,7 @@ private:
 
 	void updateRepsInView();
 	void fillReps();
+	bool contains(ImagePtr image) const;
 
 	void rebuildReps();
 	void rebuild2DReps();
@@ -76,7 +77,6 @@ private:
 
 	ImagePtr removeImageFromVector(QString uid, std::vector<ImagePtr> &images);
 
-	void buildSscGPURayCastMultiVolume();
 	void buildVtkOpenGLGPUMultiVolumeRayCastMapper();
 	void buildVtkVolumeTextureMapper3D(ImagePtr image);
 	void buildVtkGPUVolumeRayCastMapper(ImagePtr image);

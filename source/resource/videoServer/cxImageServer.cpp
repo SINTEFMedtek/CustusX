@@ -1,7 +1,7 @@
 #include "cxImageServer.h"
 
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
 #include "cxImageSenderFactory.h"
 #include <iostream>
 #include <QCoreApplication>
@@ -67,7 +67,7 @@ void ImageServer::incomingConnection(int socketDescriptor)
 
 	if (mSocket != 0)
 	{
-		messageManager()->sendError("The image server can only handle a single connection.");
+		reportError("The image server can only handle a single connection.");
 		return;
 	}
 
@@ -75,7 +75,7 @@ void ImageServer::incomingConnection(int socketDescriptor)
 	connect(mSocket, SIGNAL(disconnected()), this, SLOT(socketDisconnectedSlot()));
 	mSocket->setSocketDescriptor(socketDescriptor);
 	QString clientName = mSocket->localAddress().toString();
-	messageManager()->sendInfo("Connected to "+clientName+". Session started.");
+	report("Connected to "+clientName+". Session started.");
 	SenderPtr sender(new GrabberSenderQTcpSocket(mSocket));
 
 	mImageSender->startStreaming(sender);
@@ -89,7 +89,7 @@ void ImageServer::socketDisconnectedSlot()
 	if (mSocket)
 	{
 		QString clientName = mSocket->localAddress().toString();
-		messageManager()->sendInfo("Disconnected from "+clientName+". Session ended.");
+		report("Disconnected from "+clientName+". Session ended.");
 		mSocket->deleteLater();
 	}
 }

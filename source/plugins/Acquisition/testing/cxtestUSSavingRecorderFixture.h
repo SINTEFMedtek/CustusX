@@ -17,7 +17,7 @@
 
 #include <QApplication>
 #include "boost/function.hpp"
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 #include "cxAcquisitionData.h"
 #include "cxUSSavingRecorder.h"
 #include "cxUSReconstructInputData.h"

@@ -82,6 +82,12 @@ class Frame;
 }
 class VTK_ULTRASOUND_EXPORT vtkSonixVideoSource;
 
+/**
+* \file
+* \addtogroup cx_resource_videoserver
+* @{
+*/
+
 class VTK_ULTRASOUND_EXPORT vtkSonixVideoSourceCleanup
 {
 public:
@@ -263,6 +269,10 @@ private:
 
   void waitForSonixWindow();
 };
+
+/**
+* @}
+*/
 
 #endif
 

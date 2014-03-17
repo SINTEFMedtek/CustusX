@@ -18,7 +18,7 @@
 #include <vector>
 #include <QPointer>
 #include "cxForwardDeclarations.h"
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 
 #include "cxViewWrapper.h"
 
@@ -26,7 +26,7 @@ namespace cx
 {
 /**
 * \file
-* \addtogroup cxServiceVisualization
+* \addtogroup cx_service_visualization
 * @{
 */
 
@@ -41,7 +41,7 @@ class ViewWrapperVideo: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapperVideo(ViewWidget* view);
+	ViewWrapperVideo(ViewWidget* view, VisualizationServiceBackendPtr backend);
 	virtual ~ViewWrapperVideo();
 	virtual ViewWidget* getView();
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) {}
@@ -53,10 +53,12 @@ private slots:
 	void showSectorActionSlot(bool checked);
 	void connectStream();
 	void streamActionSlot();
+protected slots:
+	virtual void dataViewPropertiesChangedSlot(QString uid) {}
 
 protected:
-	virtual void dataAdded(DataPtr data) {}
-	virtual void dataRemoved(const QString& uid) {}
+//	virtual void dataAdded(DataPtr data) {}
+//	virtual void dataRemoved(const QString& uid) {}
 	virtual void videoSourceChangedSlot(QString uid);
 
 private:

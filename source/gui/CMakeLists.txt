@@ -4,13 +4,11 @@
 
 
 cx_add_class_qt_moc(cxGui_SRCS
-	infoWidgets/cxMetricManager
 	#----------------------
 	dataAdapters/cxDataInterface
 	dataAdapters/cxShadingParamsInterfaces
 	dataAdapters/cxToolDataAdapters
 	dataAdapters/cxDoubleDataAdapterTemporalCalibration
-	dataAdapters/cxDataAdapterHelper
 	dataAdapters/cxSelectDataStringDataAdapter
     #----------------------
 	dataWidgets/cxVolumePropertiesWidget
@@ -18,7 +16,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	dataWidgets/cxShadingWidget
 	dataWidgets/cxCroppingWidget
 	dataWidgets/cxClippingWidget
-	dataWidgets/cxImagePropertiesWidget
+	dataWidgets/cxSlicePropertiesWidget
 	dataWidgets/cxMeshInfoWidget
 	dataWidgets/cxImportDataDialog
 	dataWidgets/cxExportDataDialog
@@ -34,6 +32,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	dataWidgets/cxColorWidget
 	dataWidgets/cxTransferFunction2DColorWidget
 	dataWidgets/cxTransferFunction2DOpacityWidget
+	dataWidgets/cxImagePropertiesWidget
     #----------------------
 	infoWidgets/cxStatusBar
 	infoWidgets/cxPointSamplingWidget
@@ -44,6 +43,8 @@ cx_add_class_qt_moc(cxGui_SRCS
 	infoWidgets/cxFrameMetricWrapper
     infoWidgets/cxToolMetricWrapper
     infoWidgets/cxRegistrationHistoryWidget
+	infoWidgets/cxMetricManager
+
     #----------------------
 	navigationWidgets/cxNavigationWidget
 	navigationWidgets/cxTrackPadWidget
@@ -54,7 +55,6 @@ cx_add_class_qt_moc(cxGui_SRCS
 	preferencesWidgets/cxToolListWidget
 	preferencesWidgets/cxToolConfigureWidget
 	preferencesWidgets/cxLayoutEditorWidget
-	preferencesWidgets/cxLayoutEditorTab
 	preferencesWidgets/cxGeneralTab
 	preferencesWidgets/cxPreferenceTab
     #----------------------
@@ -66,12 +66,13 @@ cx_add_class_qt_moc(cxGui_SRCS
 	toolWidgets/cxToolManagerWidget
 	toolWidgets/cxProbeConfigWidget
     #----------------------
-	utilities/cxAudio
+	utilities/cxAudioImpl
 	utilities/cxToolImagePreviewWidget
     #----------------------    
 	cxMainWindow
 	cxSecondaryMainWindow
 	cxSecondaryViewLayoutWindow
+	cxLayoutInteractor
     #----------------------
 )
 
@@ -82,6 +83,7 @@ QT4_ADD_RESOURCES(cxGui_SRCS cxResources.qrc)
 cx_add_class(cxGui_SRCS
 	${cxGui_SRCS}
 	${cxGui_RCC_SRCS}
+	dataAdapters/cxDataAdapterHelper
 	)
 
 set(SUB_FOLDERS

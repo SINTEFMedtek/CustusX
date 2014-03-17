@@ -36,6 +36,7 @@ if (BUILD_TESTING)
 		cxtestSyntheticReconstructInput.h
 		cxtestSyntheticReconstructInput.cpp
 		)
+    
 	cx_catch_add_lib_and_exe(cxPluginUSReconstruction "${CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
 
 endif (BUILD_TESTING)

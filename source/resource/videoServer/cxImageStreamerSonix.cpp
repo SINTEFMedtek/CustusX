@@ -1,6 +1,6 @@
 #include "cxImageStreamerSonix.h"
 
-#include "sscVector3D.h"
+#include "cxVector3D.h"
 
 #ifdef CX_WIN32
 
@@ -23,16 +23,18 @@
 
 #include "cxDataLocations.h"
 #include "cxSonixProbeFileReader.h"
-//#include "sscTypeConversions.h"
+//#include "cxTypeConversions.h"
 
 namespace cx
 {
 
 ImageStreamerSonix::ImageStreamerSonix() :
-
 	mEmitStatusMessage(false),
 	mLastFrameTimestamp(0.0),
-	mCurrentFrameTimestamp(0.0)
+	mCurrentFrameTimestamp(0.0),
+	mMaxqueueInfo(20),
+	mDroppedImages(0),
+	mSonixHelper(new SonixHelper())
 {
 	mSendTimer = new QTimer;
 }
@@ -72,18 +74,14 @@ void ImageStreamerSonix::initialize(StringMap arguments)
 	std::cout << "Creating sender type Sonix" << std::endl;
 		  
 	CommandLineStreamer::initialize(arguments);
-	
-	mMaxqueueInfo = 20;
+
 //	mMaxBufferSize = 19200000; //800(width)*600(height)*4(bytes)*10(images)
-	mDroppedImages = 0;
 
 	typedef cx::Frame Frame;
 	qRegisterMetaType<Frame>("Frame");
 	
 	connect(this, SIGNAL(imageOnQueue(int)), this, SLOT(sendOpenIGTLinkImageSlot(int)), Qt::QueuedConnection);
 	connect(this, SIGNAL(statusOnQueue(int)), this, SLOT(sendOpenIGTLinkStatusSlot(int)), Qt::QueuedConnection);//Do not work yet
-
-	this->mSonixHelper = new SonixHelper();
 
 	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(initializeSonixSlot()));
 	this->setSendInterval(10000);
@@ -235,9 +233,11 @@ IGTLinkUSStatusMessage::Pointer ImageStreamerSonix::getFrameStatus(Frame& frame)
   long probeLenght = reader.getProbeLenght(probeNode) / 1000; //microns -> mm
   double probeWidth;
 
-  double widthReductionFactor = 0.98;
   if(frame.mSectorSizeInPercent <= 100)
+	{
+		double widthReductionFactor = 0.98;
 	  probeWidth = probeLenght * frame.mSectorSizeInPercent / 100.0 * widthReductionFactor;
+	}
   else
 	  probeWidth = probeLenght;
 

@@ -6,6 +6,7 @@
 #include <set>
 #include "boost/shared_ptr.hpp"
 #include "cxPluginBase.h"
+#include <QPointer>
 
 class QAction;
 class QMenu;
@@ -20,10 +21,11 @@ namespace cx
 {
 class LayoutData;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
+typedef boost::shared_ptr<class LayoutInteractor> LayoutInteractorPtr;
 
 /**
  * \class MainWindow
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * \brief This is the main gui class which controls the workflow.
  *
@@ -79,12 +81,6 @@ protected slots:
 	//tool menu
 	void configureSlot(); ///< lets the user choose which configuration files to use for the navigation
 
-	// layout menu
-	void layoutChangedSlot();
-	void newCustomLayoutSlot();
-	void editCustomLayoutSlot();
-	void deleteCustomLayoutSlot();
-
 	// navigation
 	void centerToImageCenterSlot();
 	void centerToTooltipSlot();
@@ -107,6 +103,7 @@ protected:
 	void changeEvent(QEvent * event);
 
 private:
+	LayoutInteractorPtr mLayoutInteractor;
 	void saveScreenShot(QPixmap pixmap);
 	void saveScreenShotThreaded(QImage pixmap, QString filename);
 	void updateWindowTitle();
@@ -117,8 +114,6 @@ private:
 	void addAsDockWidget(QWidget* widget, QString groupname = "");
 	void registerToolBar(QToolBar* toolbar, QString groupname = "");
 	void addToWidgetGroupMap(QAction* action, QString groupname);
-
-	LayoutData executeLayoutEditorDialog(QString title, bool createNew);
 
 	void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
 
@@ -164,11 +159,6 @@ private:
 	QAction* mStartStreamingAction; ///< start streaming of the default RT source.
 	QActionGroup* mToolsActionGroup; ///< grouping the actions for contacting the navigation system
 
-	QActionGroup* mLayoutActionGroup; ///< grouping the view layout actions
-	QAction* mNewLayoutAction; ///< create a new custom layout
-	QAction* mEditLayoutAction; ///< edit the current custom layout
-	QAction* mDeleteLayoutAction; ///< delete the current custom layout
-
 	// actions for image navigation
 	QAction* mCenterToImageCenterAction;
 	QAction* mCenterToTooltipAction;
@@ -193,8 +183,8 @@ private:
 	QString mLastImportDataFolder;
 
 	//widgets
-	class SecondaryMainWindow* mControlPanel;
-	class SecondaryViewLayoutWindow* mSecondaryViewLayoutWindow;
+	QPointer<class SecondaryMainWindow> mControlPanel;
+	QPointer<class SecondaryViewLayoutWindow> mSecondaryViewLayoutWindow;
 
 	//Preferences
 	CameraControlPtr mCameraControl;

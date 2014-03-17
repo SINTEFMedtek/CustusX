@@ -32,7 +32,6 @@ SET( MOC_HEADER_FILES
     gui/cxRegistrationMethodsWidget.h
     gui/cxRegistrationDataAdapters.h
     gui/cxElastixWidget.h
-    gui/cxElastixSyntaxHighlighter.h
     gui/cxWirePhantomWidget.h
     gui/cxPatientOrientationWidget.h
     gui/cxBronchoscopyRegistrationWidget.h
@@ -94,7 +93,7 @@ SET( SOURCE_FILES
     gui/cxElastixWidget.h
     gui/cxElastixWidget.cpp
     gui/cxElastixSyntaxHighlighter.h
-    gui/cxElastixSyntaxHighlighter.cpp
+	gui/cxElastixSyntaxHighlighter.cpp
     gui/cxWirePhantomWidget.h
     gui/cxWirePhantomWidget.cpp
 	gui/cxPatientOrientationWidget.h
@@ -117,6 +116,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/patient
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/service/visualization
+	${CustusX3_SOURCE_DIR}/source/logic
 
     ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
     ${CustusX3_SOURCE_DIR}/source/plugins/Acquisition/gui

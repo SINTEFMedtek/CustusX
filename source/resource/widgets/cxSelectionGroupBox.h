@@ -9,10 +9,7 @@ class QLayout;
 namespace cx
 {
 /**
- * SelectionGroupBox
- *
- * \brief
- * \ingroup cxGUI
+ * \ingroup cx_resource_widgets
  *
  * \date Mar 30, 2011
  * \author Janne Beate Bakeng, SINTEF

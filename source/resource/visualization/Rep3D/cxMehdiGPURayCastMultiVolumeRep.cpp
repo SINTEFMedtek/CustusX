@@ -18,20 +18,21 @@
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
 #include "vtkOpenGLGPUMultiVolumeRayCastMapper.h"
 #include <vtkVolumeProperty.h>
-#include "sscView.h"
+#include "cxView.h"
 #include <vtkRenderer.h>
 #include "cxVolumeProperty.h"
 #include "cxImageMapperMonitor.h"
-#include "sscImage.h"
+#include "cxImage.h"
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 #include <vtkTransform.h>
-#include "sscGPUImageBuffer.h"
-#include "sscMessageManager.h"
+#include "cxGPUImageBuffer.h"
+#include "cxReporter.h"
 #include <vtkPlane.h>
-#include "sscLogger.h"
+#include "cxLogger.h"
 #include "cxImageEnveloper.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
+#include <vtkRenderWindow.h>
 
 namespace cx
 {
@@ -113,13 +114,11 @@ void MehdiGPURayCastMultiVolumeRepBase::setMaxVolumeSize(long maxVoxels)
 
 MehdiGPURayCastMultiVolumeRep::~MehdiGPURayCastMultiVolumeRep()
 {
-
 }
 
 MehdiGPURayCastMultiVolumeRep::MehdiGPURayCastMultiVolumeRep() :
 	mVolume(vtkVolumePtr::New())
 {
-	mGenerator = ImageEnveloper::create();
 }
 
 void MehdiGPURayCastMultiVolumeRep::addRepActorsToViewRenderer(View* view)
@@ -137,64 +136,49 @@ void MehdiGPURayCastMultiVolumeRep::setImages(std::vector<ImagePtr> images)
 	if (images==mImages)
 		return;
 
-	this->clear();
+	this->disconnectImages();
+	this->clearVolume();
 
 	mImages = images;
 
-	this->setup();
+	this->setupVolume();
+	this->connectImages();
 }
 
-void MehdiGPURayCastMultiVolumeRep::clear()
+void MehdiGPURayCastMultiVolumeRep::clearVolume()
 {
-	for (unsigned i=0; i<mImages.size(); ++i)
-	{
-		disconnect(mImages[i].get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
-		disconnect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-	}
 	mMonitors.clear();
-	mImages.clear();
-
 	mVolumeProperties.clear();
+
+	// should not be necessary, but seems that mapper is not cleared by vtk.
+	// http://vtk.1045678.n5.nabble.com/quot-a-vtkShader2-object-is-being-deleted-before-ReleaseGraphicsResources-has-been-called-quot-with-r-td4872396.html
+	if (this->getView())
+		mVolume->ReleaseGraphicsResources(this->getView()->getRenderWindow());
 	mVolume->SetMapper(NULL);
+
+	mReferenceImage.reset();
+	mReferenceProperty.reset();
+	mMapper = NULL;
 }
 
 void MehdiGPURayCastMultiVolumeRep::vtkImageDataChangedSlot()
 {
-	this->clear();
-	this->setup();
+	// this call is extremly slow, as the entire rep is rebuilt (up to 5 seconds). Solution is to optimize/repalce mapper.
+	this->clearVolume();
+	this->setupVolume();
 }
 
-void MehdiGPURayCastMultiVolumeRep::setup()
+void MehdiGPURayCastMultiVolumeRep::transformChangedSlot()
 {
-	mMonitors.resize(mImages.size());
+	this->vtkImageDataChangedSlot();
 
-	if (mImages.empty())
-		return;
+	// no good: must call entire setupVolume() during init of mapper.
+//	this->setupReferenceVolumeAndPropertiesAndConnectToVolume();
+//	this->updateTransforms();
+}
 
-	mGenerator->setImages(mImages);
-	mGenerator->setMaxEnvelopeVoxels(mMaxVoxels);
-	mReferenceImage = mGenerator->getEnvelopingImage();
 
-	mReferenceProperty = VolumeProperty::create();
-	// hack: use properties from first input image.
-	// This is because some properties (at least shading) is taken from here.
-	mReferenceProperty->setImage(mImages[0]);
-	mVolume->SetProperty( mReferenceProperty->getVolumeProperty() );
-
-	mMapper = vtkOpenGLGPUMultiVolumeRayCastMapperPtr::New();
-	mMapper->setNumberOfAdditionalVolumes(mImages.size());
-	mVolume->SetMapper(mMapper);
-
-	this->transformChangedSlot();
-
-	mMapper->SetInput(0, mReferenceImage->getBaseVtkImageData());
-
-	for (unsigned i=0; i<mImages.size(); ++i)
-	{
-		VolumePropertyPtr property = VolumeProperty::create();
-		property->setImage(mImages[i]);
-		mVolumeProperties.push_back(property);
-
+// use in setupVolume:
 //		// example code for how to allocate on gpu and return uid:
 //		GPUImageDataBufferPtr dataBuffer = GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
 //			mImages[i]->getBaseVtkImageData());
@@ -202,26 +186,60 @@ void MehdiGPURayCastMultiVolumeRep::setup()
 //		dataBuffer->allocate();
 //		unsigned int glUint = dataBuffer->getTextureUid();
 
-		// index starts with main volume (and continues into additionalVolumes()), thus +1
-		mMapper->SetInput(i+1, mImages[i]->getBaseVtkImageData());
-		mMapper->SetAdditionalProperty(i, property->getVolumeProperty() );//Mehdi
-	}
 
-	// call after mVolume has been initialized
+void MehdiGPURayCastMultiVolumeRep::setupVolume()
+{
+	if (mImages.empty())
+		return;
+
+	this->setupVolumeProperties();
+
+	this->initializeMapper();
+
 	for (unsigned i=0; i<mImages.size(); ++i)
 	{
-		connect(mImages[i].get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
-		connect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-		mMonitors[i] = MehdiGPURayCastMultiVolumeRepImageMapperMonitor::create(mVolume, mImages[i], i+1);
+		// index starts with main volume (and continues into additionalVolumes()), thus +1
+		mMapper->SetInput(i+1, mImages[i]->getBaseVtkImageData());
+		mMapper->SetAdditionalProperty(i, mVolumeProperties[i]->getVolumeProperty() );//Mehdi
 	}
+
+	this->setupReferenceVolumeAndPropertiesAndConnectToVolume();
+
+	this->updateTransforms();
+
+	// call after mVolume has been initialized
+	this->setupMonitor();
 
 	mMapper->Update();
 }
 
-void MehdiGPURayCastMultiVolumeRep::transformChangedSlot()
+void MehdiGPURayCastMultiVolumeRep::initializeMapper()
+{
+	mMapper = vtkOpenGLGPUMultiVolumeRayCastMapperPtr::New();
+	mMapper->setNumberOfAdditionalVolumes(mImages.size());
+	mVolume->SetMapper(mMapper);
+}
+
+
+void MehdiGPURayCastMultiVolumeRep::setupReferenceVolumeAndPropertiesAndConnectToVolume()
+{
+	SSC_ASSERT(!mImages.empty());
+
+	mReferenceImage = this->getEnvelopingImage();
+	mReferenceProperty = VolumeProperty::create();
+	// hack: use properties from first input image.
+	// This is because some properties (at least shading) is taken from here.
+	mReferenceProperty->setImage(mImages[0]);
+	mVolume->SetProperty( mReferenceProperty->getVolumeProperty() );
+	mMapper->SetInput(0, mReferenceImage->getBaseVtkImageData());
+}
+
+void MehdiGPURayCastMultiVolumeRep::updateTransforms()
 {
 	if (mImages.empty())
 		return;
+
+	SSC_ASSERT(mReferenceImage);
 
 	Transform3D rMd0 = mReferenceImage->get_rMd(); // use on first volume
 	mVolume->SetUserMatrix(rMd0.getVtkMatrix());
@@ -229,9 +247,56 @@ void MehdiGPURayCastMultiVolumeRep::transformChangedSlot()
 	for (unsigned i=0; i<mImages.size(); ++i)
 	{
 		Transform3D rMdi = mImages[i]->get_rMd();
-		Transform3D d0Mdi = rMd0.inv() * rMdi; // use on additional volumescd
+		Transform3D d0Mdi = rMd0.inv() * rMdi; // use on additional volumes
 
 		mMapper->SetAdditionalInputUserTransform(i, d0Mdi.getVtkTransform());
+	}
+}
+
+ImagePtr MehdiGPURayCastMultiVolumeRep::getEnvelopingImage()
+{
+	ImageEnveloperPtr generator;
+	generator = ImageEnveloper::create();
+	generator->setImages(mImages);
+	generator->setMaxEnvelopeVoxels(mMaxVoxels);
+	return generator->getEnvelopingImage();
+}
+
+void MehdiGPURayCastMultiVolumeRep::disconnectImages()
+{
+	for (unsigned i=0; i<mImages.size(); ++i)
+	{
+		disconnect(mImages[i].get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
+		disconnect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+	}
+}
+
+void MehdiGPURayCastMultiVolumeRep::connectImages()
+{
+	for (unsigned i=0; i<mImages.size(); ++i)
+	{
+		connect(mImages[i].get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
+		connect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+	}
+}
+
+void MehdiGPURayCastMultiVolumeRep::setupMonitor()
+{
+	mMonitors.resize(mImages.size());
+	for (unsigned i=0; i<mImages.size(); ++i)
+	{
+		mMonitors[i] = MehdiGPURayCastMultiVolumeRepImageMapperMonitor::create(mVolume, mImages[i], i+1);
+	}
+}
+
+void MehdiGPURayCastMultiVolumeRep::setupVolumeProperties()
+{
+	mVolumeProperties.clear();
+	for (unsigned i=0; i<mImages.size(); ++i)
+	{
+		VolumePropertyPtr property = VolumeProperty::create();
+		property->setImage(mImages[i]);
+		mVolumeProperties.push_back(property);
 	}
 }
 

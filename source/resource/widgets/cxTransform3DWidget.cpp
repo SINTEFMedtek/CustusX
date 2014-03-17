@@ -5,12 +5,12 @@
 #include <QLabel>
 #include <QFontMetrics>
 
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
-#include "sscDoubleDataAdapterXml.h"
-#include "sscDoubleWidgets.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxDoubleWidgets.h"
 #include <cmath>
-#include "sscMousePadWidget.h"
+#include "cxMousePadWidget.h"
 
 #include <QtGui>
 

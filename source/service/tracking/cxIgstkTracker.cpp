@@ -15,10 +15,10 @@
 #include "cxIgstkTracker.h"
 
 #include <QStringList>
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
-#include "sscEnumConverter.h"
-#include "cxTool.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
+#include "cxEnumConverter.h"
+#include "cxToolUsingIGSTK.h"
 #include "cxIgstkTool.h"
 #include <time.h>
 #include "cxSettings.h"
@@ -63,7 +63,7 @@ IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
 	{
 	case tsNONE:
 		mUid = mName = "None";
-		messageManager()->sendError("Tracker is of type TRACKER_NONE, this means it's not valid.");
+		reportError("Tracker is of type TRACKER_NONE, this means it's not valid.");
 		mValid = false;
 		return;
 		break;
@@ -71,13 +71,13 @@ IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
 		mUid = mName = "Polaris";
 		mTempPolarisTracker = PolarisTrackerType::New();
 		mTempPolarisTracker->SetCommunication(mCommunication);
-		messageManager()->sendInfo("Tracker is set to Polaris");
+		report("Tracker is set to Polaris");
 		mTracker = mTempPolarisTracker.GetPointer();
 		mValid = true;
 		break;
 	case tsPOLARIS_CLASSIC:
 		mUid = mName = "None";
-		messageManager()->sendInfo("Polaris Classic is not supported");
+		report("Polaris Classic is not supported");
 		mValid = false;
 		break;
 		//There is no special handling of the tracking system if its spectra or vicra, polaris is polaris as we see it
@@ -85,13 +85,13 @@ IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
 		mUid = mName = "Aurora";
 		mTempAuroraTracker = AuroraTrackerType::New();
 		mTempAuroraTracker->SetCommunication(mCommunication);
-		messageManager()->sendInfo("Tracker is set to Aurora");
+		report("Tracker is set to Aurora");
 		mTracker = mTempAuroraTracker.GetPointer();
 		mValid = true;
 		break;
 	case tsMICRON:
 		mUid = mName = "Micron";
-		messageManager()->sendInfo("Tracker is set to Micron, not supported");
+		report("Tracker is set to Micron, not supported");
 		//TODO: implement support for a micron tracker...
 		mValid = false;
 		break;
@@ -137,10 +137,10 @@ void IgstkTracker::open()
 //    if(result == igstk::SerialCommunication::SUCCESS)
 //      break;
 //    else
-//      messageManager()->sendWarning("Could not open communication.");
+//      reportWarning("Could not open communication.");
 //  }
 	if (mCommunication->OpenCommunication() == false)
-		messageManager()->sendWarning("Could not open communication.");
+		reportWarning("Could not open communication.");
 	mTracker->RequestOpen();
 }
 
@@ -148,7 +148,7 @@ void IgstkTracker::close()
 {
 	mTracker->RequestClose();
 	if (mCommunication->CloseCommunication() == false)
-		messageManager()->sendWarning("Could not close communication.");
+		reportWarning("Could not close communication.");
 }
 
 void IgstkTracker::attachTools(std::map<QString, IgstkToolPtr> tools)
@@ -163,7 +163,7 @@ void IgstkTracker::attachTools(std::map<QString, IgstkToolPtr> tools)
 		if (tool && tool->getPointer())
 		{
 			if (tool->getTrackerType() != mInternalStructure.mType)
-				messageManager()->sendWarning(
+				reportWarning(
 								"Tracker is attaching a tool that is not of the correct type. Trackers type: "
 												+ qstring_cast(mInternalStructure.mType) + ", tools tracker type: "
 												+ qstring_cast(tool->getTrackerType()));
@@ -241,8 +241,8 @@ void IgstkTracker::trackerTransformCallback(const itk::EventObject &event)
 	{
 		//Never happens???
 		//this->internalInitialized(true);
-		//messageManager()->sendInfo(mUid+" is initialized.");
-		messageManager()->sendWarning("This never happens for some reason...  check code");
+		//report(mUid+" is initialized.");
+		reportWarning("This never happens for some reason...  check code");
 	}
 	else if (igstk::TrackerStartTrackingEvent().CheckEvent(&event))
 	{
@@ -254,81 +254,81 @@ void IgstkTracker::trackerTransformCallback(const itk::EventObject &event)
 	}
 	else if (igstk::TrackerUpdateStatusEvent().CheckEvent(&event))
 	{
-		//messageManager()->sendDebug(mUid+" is updated."); //SPAM!
+		//reportDebug(mUid+" is updated."); //SPAM!
 	}
 	else if (igstk::TrackerToolTransformUpdateEvent().CheckEvent(&event))
 	{
-		//messageManager()->sendDebug(mUid+" has updated a transform."); //SPAM
+		//reportDebug(mUid+" has updated a transform."); //SPAM
 	}
 	//communication success
 	else if (igstk::CompletedEvent().CheckEvent(&event))
 	{
 		// this seems to appear after every transmit (several times/second)
-		//messageManager()->sendInfo(mUid+" set up communication correctly."); //SPAM
+		//report(mUid+" set up communication correctly."); //SPAM
 	}
 	//coordinate system success
 	else if (igstk::CoordinateSystemSetTransformEvent().CheckEvent(&event))
 	{
-		//messageManager()->sendInfo();
+		//report();
 	}
 	//failures
 	else if (igstk::InvalidRequestErrorEvent().CheckEvent(&event))
 	{
-		messageManager()->sendWarning(
+		reportWarning(
 						mUid
 										+ " received an invalid request. This means that the internal igstk tracker did not accept the request. Do not know which request.");
 		this->shutdown();
 	}
 	else if (igstk::TrackerOpenErrorEvent().CheckEvent(&event))
 	{
-		messageManager()->sendError(mUid + " could not open.");
+		reportError(mUid + " could not open.");
 		//this->shutdown();
 	}
 	else if (igstk::TrackerCloseErrorEvent().CheckEvent(&event))
 	{
-		messageManager()->sendError(mUid + " could not close.");
+		reportError(mUid + " could not close.");
 		//this->shutdown();
 	}
 	else if (igstk::TrackerInitializeErrorEvent().CheckEvent(&event))
 	{
-		messageManager()->sendError(mUid + " could not initialize.");
+		reportError(mUid + " could not initialize.");
 		//this->shutdown();
 	}
 	else if (igstk::TrackerStartTrackingErrorEvent().CheckEvent(&event))
 	{
-		messageManager()->sendError(mUid + " could not start tracking.");
+		reportError(mUid + " could not start tracking.");
 		//this->shutdown();
 	}
 	else if (igstk::TrackerStopTrackingErrorEvent().CheckEvent(&event))
 	{
-		messageManager()->sendError(mUid + " could not stop tracking.");
+		reportError(mUid + " could not stop tracking.");
 		//this->shutdown();
 	}
 	else if (igstk::TrackerUpdateStatusErrorEvent().CheckEvent(&event))
 	{
-		messageManager()->sendError(mUid + " could not update.");
+		reportError(mUid + " could not update.");
 		//this->shutdown();
 	}
 	//communication failure
 	else if (igstk::InputOutputErrorEvent().CheckEvent(&event))
 	{
 		//this happens when you pull out the cable while tracking
-		messageManager()->sendError(mUid + " cannot communicate with input/output.");
+		reportError(mUid + " cannot communicate with input/output.");
 		this->shutdown();
 	}
 	else if (igstk::InputOutputTimeoutEvent().CheckEvent(&event))
 	{
-		messageManager()->sendError(mUid + " input/output communication timed out.");
+		reportError(mUid + " input/output communication timed out.");
 		//this->shutdown();
 	}
 	else if (igstk::OpenPortErrorEvent().CheckEvent(&event))
 	{
-		messageManager()->sendError(mUid + " could not open communication with tracker.");
+		reportError(mUid + " could not open communication with tracker.");
 		this->shutdown();
 	}
 	else if (igstk::ClosePortErrorEvent().CheckEvent(&event))
 	{
-		messageManager()->sendError(mUid + " could not close communication with tracker.");
+		reportError(mUid + " could not close communication with tracker.");
 		this->shutdown();
 	}
 	else
@@ -362,7 +362,7 @@ void IgstkTracker::internalOpen(bool value)
 		return;
 	mOpen = value;
 
-	messageManager()->sendInfo(mUid + " is " + (value ? "open" : "closed") + ".");
+	report(mUid + " is " + (value ? "open" : "closed") + ".");
 	emit open(mOpen);
 }
 
@@ -372,7 +372,7 @@ void IgstkTracker::internalInitialized(bool value)
 		return;
 	mInitialized = value;
 
-	messageManager()->sendInfo(mUid + " is " + (value ? "" : "un") + "initialized.");
+	report(mUid + " is " + (value ? "" : "un") + "initialized.");
 	emit initialized(mInitialized);
 }
 
@@ -382,13 +382,13 @@ void IgstkTracker::internalTracking(bool value)
 		return;
 	mTracking = value;
 
-	messageManager()->sendInfo(mUid + " is " + (value ? "" : "not ") + "tracking.");
+	report(mUid + " is " + (value ? "" : "not ") + "tracking.");
 	emit tracking(mTracking);
 }
 
 void IgstkTracker::internalError(bool value)
 {
-	messageManager()->sendWarning(mUid + " experienced a unrecoverable error, reconfiguration is required.");
+	reportWarning(mUid + " experienced a unrecoverable error, reconfiguration is required.");
 	emit error();
 }
 

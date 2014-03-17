@@ -22,7 +22,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxServiceState
+ * \addtogroup cx_service_state
  * @{
  */
 

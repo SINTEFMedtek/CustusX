@@ -12,7 +12,7 @@
 #include "igtlImageMessage.h"
 #include "cxImageSenderFactory.h"
 #include "cxIGTLinkImageMessage.h"
-#include "cxRenderTimer.h"
+#include "cxCyclicActionLogger.h"
 #include "GEStreamer.h"
 
 class QTimer;
@@ -27,6 +27,7 @@ QString findOpenCLPath(QString additionalLocation); ///< Find GEStreamer OpenCL 
  * it must be created within the run() method
  * of a qthread.
  *
+ * \ingroup cx_resource_videoserver
  * \author Ole Vegard Solberg, SINTEF
  * \date Sep 19, 2012
  *
@@ -63,7 +64,7 @@ private:
 	void printTimeIntervals();
 
 	QTimer* mGrabTimer;
-	CyclicActionTimerPtr mRenderTimer;
+	CyclicActionLoggerPtr mRenderTimer;
 
 	//The GE Connection code from ISB
 	data_streaming::GEStreamer mGEStreamer;

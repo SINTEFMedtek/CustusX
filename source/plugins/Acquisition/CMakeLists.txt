@@ -68,6 +68,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/service/video
     ${CustusX3_SOURCE_DIR}/source/service/visualization
+	${CustusX3_SOURCE_DIR}/source/logic
 
     ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic
     ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <QDir>
 #include <QTextStream>
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataLocations.h"
 
 namespace cx
@@ -50,17 +50,19 @@ void TSFPresets::save()
 		QDomElement element = node.toElement();
 
 		QString folderPath;
+		folderPath = mPresetPath + "/centerline-gpu/";
 		std::map<QString, QString> parameters;
 		QDomNamedNodeMap attributes = element.attributes();
-		for (int i = 0; i < attributes.count(); ++i)
+		for (int j = 0; j < attributes.count(); ++j)
 		{
-			QDomNode attribute = attributes.item(i);
+			QDomNode attribute = attributes.item(j);
+			if (attribute.isNull())
+					continue;
 			if (attribute.nodeName() != "name")
 				parameters[attribute.nodeName()] = attribute.nodeValue();
-			if (attribute.nodeName() == "centerline-method")
-				folderPath = mPresetPath + "/centerline-gpu/";
 		}
-		this->saveFile(folderPath, parameters);
+		if (mLastCustomPresetAdded == element.attribute("name")) //Save only current preset
+			this->saveFile(folderPath, parameters);
 	}
 }
 
@@ -72,7 +74,7 @@ void TSFPresets::remove()
 
 QStringList TSFPresets::generatePresetList(QString tag)
 {
-	this->loadPresetsFromFiles();
+	this->getPresetsNameAndPath();
 	QStringList retval;
 	std::map<QString, QString>::iterator it;
 	for (it = mPresetsMap.begin(); it != mPresetsMap.end(); ++it)
@@ -101,7 +103,7 @@ std::map<QString, QString> TSFPresets::readFile(QString& filePath)
 	std::map<QString, QString> retval;
 	if (!QFile::exists(filePath))
 	{
-		messageManager()->sendError("File does not exists: " + filePath);
+		reportError("File does not exists: " + filePath);
 		return retval;
 	}
 	QFile file(filePath);
@@ -127,7 +129,7 @@ void TSFPresets::saveFile(QString folderpath, std::map<QString, QString> paramet
 	QTextStream outPresetFile;
 	if (!file.open(QFile::WriteOnly))
 	{
-		messageManager()->sendError("Could not open the file " + file.fileName() + " for writing.");
+		reportError("Could not open the file " + file.fileName() + " for writing.");
 		return;
 	}
 	outPresetFile.setDevice(&file);
@@ -146,7 +148,7 @@ void TSFPresets::deleteFile(QString filePath)
 	QFile file(filePath);
 	QString customPresetName = QFileInfo(file).fileName();
 	if (!file.remove())
-		messageManager()->sendError("File: " + filePath + " not removed...");
+		reportError("File: " + filePath + " not removed...");
 }
 
 void TSFPresets::getPresetsNameAndPath()
@@ -154,7 +156,7 @@ void TSFPresets::getPresetsNameAndPath()
 	mPresetsMap.clear();
 	QDir parametersDir(mPresetPath + "/centerline-gpu");
 	if (!parametersDir.exists())
-		messageManager()->sendError("Preset directory "+parametersDir.path()+" not found.");
+		reportError("Preset directory "+parametersDir.path()+" not found.");
 
 	QFileInfoList fileInfoList = parametersDir.entryInfoList(QDir::Files);
 	foreach(QFileInfo info, fileInfoList){

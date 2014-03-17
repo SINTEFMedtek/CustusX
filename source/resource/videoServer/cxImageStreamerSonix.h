@@ -28,6 +28,7 @@ namespace cx
  * it must be created within the run() method
  * of a qthread.
  *
+ * \ingroup cx_resource_videoserver
  * \date Aug 15, 2011
  * \author Ole Vegard Solberg, SINTEF
  *

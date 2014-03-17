@@ -17,8 +17,8 @@ typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
 }
 
 /**
- * \defgroup cxPluginAcquisition Acquisition Plugin
- * \ingroup cxPlugins
+ * \defgroup cx_plugin_acquisition Acquisition Plugin
+ * \ingroup cx_plugins
  * \brief Handles the us acquisition process.
  *
  * See \ref cx::USAcquisition.
@@ -34,7 +34,7 @@ typedef boost::shared_ptr<class AcquisitionPlugin> AcquisitionPluginPtr;
 
 /**
 * \file
-* \addtogroup cxPluginAcquisition
+* \addtogroup cx_plugin_acquisition
 * @{
 */
 

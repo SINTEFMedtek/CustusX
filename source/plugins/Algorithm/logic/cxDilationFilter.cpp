@@ -1,21 +1,21 @@
 #include "cxDilationFilter.h"
 
-#include "sscDoubleDataAdapterXml.h"
-#include "sscColorDataAdapterXml.h"
-#include "sscBoolDataAdapterXml.h"
-#include "sscStringDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxColorDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
 #include "cxSelectDataStringDataAdapter.h"
 
 #include <itkBinaryDilateImageFilter.h>
 #include <itkBinaryBallStructuringElement.h>
 #include "cxAlgorithmHelpers.h"
 #include <vtkImageCast.h>
-#include "sscDataManager.h"
-#include "sscUtilHelpers.h"
+#include "cxDataManager.h"
+#include "cxUtilHelpers.h"
 #include "cxContourFilter.h"
-#include "sscMesh.h"
-#include "sscImage.h"
-#include "sscDataManager.h"
+#include "cxMesh.h"
+#include "cxImage.h"
+#include "cxDataManager.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 

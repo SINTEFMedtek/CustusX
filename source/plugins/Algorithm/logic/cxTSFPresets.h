@@ -4,8 +4,8 @@
 #include <map>
 #include <QDomElement>
 
-#include "sscPresets.h"
-#include "sscXmlOptionItem.h"
+#include "cxPresets.h"
+#include "cxXmlOptionItem.h"
 
 #ifdef CX_USE_TSF
 
@@ -29,7 +29,7 @@ public:
 	virtual ~TSFPresets();
 
 	static QDomElement createPresetElement(QString name, std::map<QString,QString>& parameters);
-	virtual void save();
+	virtual void save();///< Saves last custom preset (current)
 	virtual void remove();
 
 protected:

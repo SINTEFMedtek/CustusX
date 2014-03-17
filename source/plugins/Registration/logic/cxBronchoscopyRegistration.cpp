@@ -13,9 +13,9 @@
 #include <vtkMatrix4x4.h>
 #include <vtkLinearTransform.h>
 #include <vtkLandmarkTransform.h>
-#include "sscTransform3D.h"
-#include "sscVector3D.h"
-#include "sscMessageManager.h"
+#include "cxTransform3D.h"
+#include "cxVector3D.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -294,7 +294,7 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDat
 	//std::pair< M4Vector, Eigen::Matrix4d > loadPosResult = posData->loadBronchoscopeTracking(filenameNavigation, filenameDirection);
 
     if(trackingData_prMt.empty())
-		messageManager()->sendError("BronchoscopyRegistration::runBronchoscopyRegistration(): No tracking data");
+		reportError("BronchoscopyRegistration::runBronchoscopyRegistration(): No tracking data");
 
 
 //	M4Vector Tnavigation = loadPosResult.first;
@@ -342,7 +342,7 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDat
 
 	std::vector<Branch*> BL = branches->getBranches();
 
-	int totalNumberOfPoints = 0;
+//	int totalNumberOfPoints = 0;
 	std::cout << "Number of branches: " << BL.size() << std::endl;
 
 //	for (int i = 0; i < BL.size(); i++)

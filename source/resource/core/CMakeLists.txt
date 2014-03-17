@@ -3,60 +3,65 @@
 ###########################################################
 
 cx_add_class_qt_moc(cxResource_SOURCE
-	Data/sscData
-	Data/sscImage
-	Data/sscImageTF3D
-	Data/sscImageLUT2D
-	Data/sscImageTFData
-	Data/sscDataManager
-	Data/sscNavigatedVideoImage
-	Data/sscRegistrationTransform
-	Data/sscDataManagerImpl
-	Data/sscMesh
+	Data/cxData
+	Data/cxImage
+	Data/cxImageTF3D
+	Data/cxImageLUT2D
+	Data/cxImageTFData
+	Data/cxDataManager
+	Data/cxNavigatedVideoImage
+	Data/cxRegistrationTransform
+	Data/cxDataManagerImpl
+	Data/cxMesh
 #	Data/sscVtkFileMesh
-	Data/sscPresets
-	Data/sscTransferFunctions3DPresets
-	Data/sscPointMetric
-	Data/sscDistanceMetric
-	Data/sscPlaneMetric
-	Data/sscAngleMetric
-	Data/sscUnsignedDerivedImage
+	Data/cxPresets
+	Data/cxTransferFunctions3DPresets
+	Data/cxPointMetric
+	Data/cxDistanceMetric
+	Data/cxPlaneMetric
+	Data/cxAngleMetric
+	Data/cxUnsignedDerivedImage
 	Data/cxFrameMetric
 	Data/cxToolMetric
-	Data/sscCoordinateSystemListener
 	Data/cxFrameMetricBase
-	Data/cxImageParameters
+	Data/cxShapedMetric
+	Data/cxSphereMetric
+	Data/cxMetricReferenceArgumentList
+	Data/cxLandmark
+	Data/cxDataFactory
 
-	Video/sscVideoSource.h
-	Video/sscVideoRecorder
-	Video/sscVideoSourceSHM
-	Video/sscTestVideoSource
-	Video/sscImageImportVideoSource
+	Video/cxVideoSource.h
+	Video/cxVideoRecorder
+	Video/cxVideoSourceSHM
+	Video/cxTestVideoSource
+	Video/cxImageImportVideoSource
         
-	Tool/sscToolManager
-	Tool/sscTool.h
-	Tool/sscProbe.h
-	Tool/sscDummyTool
-	Tool/sscDummyToolManager
-	Tool/sscManualTool
-	Tool/sscProbeAdapterRTSource
-	Tool/sscSliceProxy
-	Tool/sscSlicedImageProxy
+	Tool/cxToolManager
+	Tool/cxTool.h
+	Tool/cxProbe.h
+	Tool/cxDummyTool
+	Tool/cxDummyToolManager
+	Tool/cxManualTool
+	Tool/cxProbeAdapterRTSource
+	Tool/cxSliceProxy
+	Tool/cxSlicedImageProxy
+	Tool/cxToolImpl
 
-	dataAdapters/sscDataAdapter
-	dataAdapters/sscDoubleDataAdapter.h
-	dataAdapters/sscStringDataAdapter.h
-	dataAdapters/sscDoubleDataAdapterXml
-	dataAdapters/sscStringDataAdapterXml
-	dataAdapters/sscBoolDataAdapter.h
-	dataAdapters/sscBoolDataAdapterXml
-	dataAdapters/sscVector3DDataAdapter.h
-	dataAdapters/sscVector3DDataAdapterXml
-	dataAdapters/sscColorDataAdapter.h
-	dataAdapters/sscColorDataAdapterXml
+	dataAdapters/cxDataAdapter
+	dataAdapters/cxDoubleDataAdapter.h
+	dataAdapters/cxStringDataAdapter.h
+	dataAdapters/cxDoubleDataAdapterXml
+	dataAdapters/cxStringDataAdapterXml
+	dataAdapters/cxBoolDataAdapter.h
+	dataAdapters/cxBoolDataAdapterXml
+	dataAdapters/cxVector3DDataAdapter.h
+	dataAdapters/cxVector3DDataAdapterXml
+	dataAdapters/cxColorDataAdapter.h
+	dataAdapters/cxColorDataAdapterXml
 	dataAdapters/cxVector3DComponentDataAdapter
 
-	logger/sscMessageManager
+	logger/cxReporter
+	logger/cxMessageListener
 
 	settings/cxSettings.h
 
@@ -64,68 +69,75 @@ cx_add_class_qt_moc(cxResource_SOURCE
     algorithms/cxThreadedTimedAlgorithm.h
     algorithms/cxCompositeTimedAlgorithm.h
 
-	utilities/sscApplication
-	utilities/sscSharedMemory
-	utilities/sscAcceptanceBoxWidget
     utilities/cxPlaybackTime.h
     utilities/cxProcessWrapper.h
 	utilities/cxProcessReporter
-	utilities/cxImageDataContainer
 	utilities/cxVLCRecorder
+	utilities/cxSpaceProvider
+	utilities/cxSpaceProviderImpl
+	utilities/cxSpaceListener
+	utilities/cxSpaceListenerImpl
 	)
 
      
 # library
 cx_add_class(cxResource_SOURCE
-	sscForwardDeclarations.h
 	cxForwardDeclarations.h
 	vtkForwardDeclarations.h
 	
-	Tool/sscProbeSector
-	Tool/sscProbeData
+	Tool/cxProbeSector
+	Tool/cxProbeData
 	Tool/ProbeXmlConfigParser.h
 	Tool/ProbeXmlConfigParserImpl
 	Tool/ProbeXmlConfigParserMock
 	Tool/cxCreateProbeDataFromConfiguration
+	Tool/cxTrackingPositionFilter
 
-	Data/sscDataMetric
-	Data/sscLandmark
-	Data/sscDataReaderWriter
-	Data/sscGPUImageBuffer
+	Data/cxDataMetric
+	Data/cxDataReaderWriter
+	Data/cxGPUImageBuffer
+	Data/cxImageDefaultTFGenerator
+	Data/cxImageParameters
+
+	Math/cxBoundingBox3D
+	Math/cxVector3D
+	Math/cxTransform3D
+	Math/cxFrame3D
 	
-	Math/sscBoundingBox3D
-	Math/sscVector3D
-	Math/sscTransform3D
-	Math/sscFrame3D
-	
-	utilities/sscXmlOptionItem
-	utilities/sscDoubleRange.h
-	utilities/cxRenderTimer
+	utilities/cxXmlOptionItem
+	utilities/cxDoubleRange.h
+	utilities/cxCyclicActionLogger
 	utilities/cxTransformFile
 	utilities/cxPlaybackTime
 	utilities/cxProcessWrapper
 	utilities/cxFileHelpers
 	utilities/cxStringHelpers
-	utilities/sscGLHelpers
-	utilities/sscTime
-	utilities/sscUtilHelpers
-	utilities/sscTypeConversions
-	utilities/sscSliceComputer
-	utilities/sscDefinitions.h
-	utilities/sscDefinitionStrings
-	utilities/sscCustomMetaImage
-	utilities/sscMD5Check
-	utilities/sscIndent
-	utilities/sscCoordinateSystemHelpers
-	utilities/sscViewportListener
-	utilities/sscVolumeHelpers
-	utilities/sscPositionStorageFile
-	utilities/sscTimeKeeper
-	utilities/sscMeshHelpers
-	utilities/cxOpenCLUtilities
-	
-	logger/sscAudio.h
-	logger/sscLogger
+	utilities/cxGLHelpers
+	utilities/cxTime
+	utilities/cxUtilHelpers
+	utilities/cxTypeConversions
+	utilities/cxSliceComputer
+	utilities/cxDefinitions.h
+	utilities/cxDefinitionStrings
+	utilities/cxCustomMetaImage
+	utilities/cxMD5Check
+	utilities/cxIndent
+	utilities/cxCoordinateSystemHelpers
+	utilities/cxViewportListener
+	utilities/cxVolumeHelpers
+	utilities/cxPositionStorageFile
+	utilities/cxTimeKeeper
+	utilities/cxMeshHelpers
+	utilities/cxApplication
+	utilities/cxSharedMemory
+	utilities/cxImageDataContainer
+	utilities/cxOptionalValue
+	utilities/cxXMLNodeWrapper
+	utilities/cxPlaneTypeCollection
+	utilities/cxSharedPointerChecker
+
+	logger/cxAudio.h
+	logger/cxLogger
 		
 	algorithms/ItkVtkGlue/itkImageToVTKImageFilter.h
 	algorithms/ItkVtkGlue/itkImageToVTKImageFilter.txx
@@ -133,7 +145,7 @@ cx_add_class(cxResource_SOURCE
 	algorithms/ItkVtkGlue/itkVTKImageToImageFilter.txx
 	algorithms/itkBinaryThinningImageFilter3D.h
 	algorithms/itkBinaryThinningImageFilter3D.txx
-	algorithms/sscImageAlgorithms
+	algorithms/cxImageAlgorithms
 	algorithms/cxTimedAlgorithm
 	algorithms/cxThreadedTimedAlgorithm
 	algorithms/cxCompositeTimedAlgorithm
@@ -145,6 +157,11 @@ cx_add_class(cxResource_SOURCE
 	vesselReg/SeansVesselReg.cxx
 	vesselReg/SeansVesselReg.hxx
 	vesselReg/HackTPSTransform.hxx
+	
+	${CustusX3_SOURCE_DIR}/source/ThirdParty/iir1/iir/Butterworth.cpp
+	${CustusX3_SOURCE_DIR}/source/ThirdParty/iir1/iir/Cascade.cpp
+	${CustusX3_SOURCE_DIR}/source/ThirdParty/iir1/iir/PoleFilter.cpp
+	${CustusX3_SOURCE_DIR}/source/ThirdParty/iir1/iir/Biquad.cpp
     )
     
 
@@ -158,7 +175,8 @@ else(WIN32)
     set( CX_RESOURCE_LIBRARIES ${CX_RESOURCE_LIBRARIES} GLU crypto ssl)
 endif(WIN32)
 
-set( CX_RESOURCE_LIBRARIES ${CX_RESOURCE_LIBRARIES}
+set( CX_RESOURCE_LIBRARIES 
+    ${CX_RESOURCE_LIBRARIES}
     vtkIO
     vtkRendering
     vtkImaging
@@ -208,6 +226,7 @@ set(CX_RESOURCE_INCLUDE_DIRECTORIES
     ${CustusX3_SOURCE_DIR}/source/resource/core/settings
     ${CustusX3_SOURCE_DIR}/source/resource/core/utilities
     ${CustusX3_SOURCE_DIR}/source/ThirdParty
+    ${CustusX3_SOURCE_DIR}/source/ThirdParty/iir1
     
     ${CustusX3_BINARY_DIR}/source/resource/core
     ${CustusX3_BINARY_DIR}/source/resource/core/utilities
@@ -223,18 +242,24 @@ set (CX_RESOURCE_LIBRARIES
     ${OPENGL_LIBRARIES}
     ${QT_LIBRARIES}
     ${Boost_LIBRARIES}
-    ${ITK_LIBRARIES})
+    ${ITK_LIBRARIES}
+    )
     
-if (SSC_USE_OpenCL)
+if (CX_USE_OPENCL_UTILITY)
+    cx_add_class(cxResource_SOURCE
+    	utilities/cxOpenCLPrinter
+    )
+
     set (CX_RESOURCE_LIBRARIES
         ${CX_RESOURCE_LIBRARIES}
+        OpenCLUtilityLibrary
         ${OPENCL_LIBRARIES}
     )    
 endif ()
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 
-ADD_LIBRARY (cxResource ${cxResource_SOURCE})
+add_library (cxResource ${cxResource_SOURCE})
 target_link_libraries(cxResource ${CX_RESOURCE_LIBRARIES} )
 CX_COTIRE_ADD_LIBRARY( cxResource "${CX_RESOURCE_LIBRARIES}")
 

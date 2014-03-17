@@ -13,32 +13,32 @@
 // See CustusX_License.txt for more information.
 
 #include "cxToolMetric.h"
-#include "sscTool.h"
-#include "sscToolManager.h"
-#include "sscTypeConversions.h"
+#include "cxTool.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {
 
-DataPtr ToolMetricReader::load(const QString& uid, const QString& filename)
+//DataPtr ToolMetricReader::load(const QString& uid, const QString& filename)
+//{
+//	return DataPtr(new ToolMetric(uid, filename));
+//}
+
+ToolMetricPtr ToolMetric::create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
-	return DataPtr(new ToolMetric(uid, filename));
+	return ToolMetricPtr(new ToolMetric(uid, name, dataManager, spaceProvider));
 }
 
-ToolMetricPtr ToolMetric::create(QString uid, QString name)
-{
-	return ToolMetricPtr(new ToolMetric(uid, name));
-}
+//ToolMetricPtr ToolMetric::create(QDomNode node)
+//{
+//	ToolMetricPtr retval = ToolMetric::create("");
+//	retval->parseXml(node);
+//	return retval;
+//}
 
-ToolMetricPtr ToolMetric::create(QDomNode node)
-{
-	ToolMetricPtr retval = ToolMetric::create("");
-	retval->parseXml(node);
-	return retval;
-}
-
-ToolMetric::ToolMetric(const QString& uid, const QString& name) :
-		cx::FrameMetricBase(uid, name)
+ToolMetric::ToolMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
+		cx::FrameMetricBase(uid, name, dataManager, spaceProvider),
+		mToolOffset(0.0)
 {
 }
 
@@ -70,7 +70,7 @@ void ToolMetric::setToolName(const QString& val)
 
 void ToolMetric::addXml(QDomNode& dataNode)
 {
-	Data::addXml(dataNode);
+	DataMetric::addXml(dataNode);
 
 	dataNode.toElement().setAttribute("space", mSpace.toString());
 	dataNode.toElement().setAttribute("frame", qstring_cast(mFrame));
@@ -81,7 +81,7 @@ void ToolMetric::addXml(QDomNode& dataNode)
 
 void ToolMetric::parseXml(QDomNode& dataNode)
 {
-	Data::parseXml(dataNode);
+	DataMetric::parseXml(dataNode);
 
 	this->setSpace(CoordinateSystem::fromString(dataNode.toElement().attribute("space", mSpace.toString())));
 	this->setFrame(Transform3D::fromString(dataNode.toElement().attribute("frame", qstring_cast(mFrame))));

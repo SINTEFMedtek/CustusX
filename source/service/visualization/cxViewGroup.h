@@ -18,9 +18,10 @@
 #include <vector>
 #include <QObject>
 #include <QDomDocument>
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
-#include "sscVector3D.h"
+#include "cxVector3D.h"
+
 class QMenu;
 class QPoint;
 
@@ -28,33 +29,16 @@ namespace cx
 {
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
+typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
+typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
+typedef boost::shared_ptr<class Navigation> NavigationPtr;
 
 /**
  * \file
- * \addtogroup cxServiceVisualization
+ * \addtogroup cx_service_visualization
  * @{
  */
 
-/**Helper for functions independent of state.
- * Not sure if we need this - think of better place.
- *
- */
-class Navigation
-{
-public:
-	void centerToData(DataPtr image);
-	void centerToView(const std::vector<DataPtr>& images);
-	void centerToGlobalDataCenter();
-	void centerToTooltip();
-
-private:
-	Vector3D findViewCenter(const std::vector<DataPtr>& images);
-	Vector3D findGlobalDataCenter();
-	Vector3D findDataCenter(std::vector<DataPtr> data);
-
-	void centerManualTool(Vector3D& p_r);
-
-};
 
 /**
  * \brief
@@ -66,7 +50,7 @@ class ViewGroup: public QObject
 {
 Q_OBJECT
 public:
-	ViewGroup();
+	explicit ViewGroup(VisualizationServiceBackendPtr backend);
 	virtual ~ViewGroup();
 
 	void addView(ViewWrapperPtr wrapper);
@@ -78,44 +62,24 @@ public:
 	virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
 	virtual void parseXml(QDomNode dataNode); ///< load internal state info from dataNode
 	void clearPatientData();
-	double getZoom2D();
-	std::vector<ImagePtr> getImages();
-//  SlicePlanesProxyPtr getSlicePlanesProxy() { return mSlicePlanesProxy; }
+	CameraStylePtr getCameraStyle() { return mCameraStyle; }
 
-	void setGlobal2DZoom(bool use, SyncedValuePtr val);
+	bool contains3DView() const;
 	void syncOrientationMode(SyncedValuePtr val);
-
-public slots:
+	void initializeActiveView(SyncedValuePtr val);
 
 private slots:
 	void activateManualToolSlot();
 	void mouseClickInViewGroupSlot();
 
 protected:
-	//zoom2d is the same for all viewwrapper2ds in a viewgroup
-	void setZoom2D(double newZoom);
-//  void setSlicePlanesProxy();
-
 	std::vector<ViewWidgetQPtr> mViews;
-
-	struct SyncGroup
-	{
-		void activateGlobal(bool val)
-		{
-			if (val)
-				mActive = mGlobal;
-			else
-				mActive = mLocal;
-		}
-		SyncedValuePtr mGlobal;
-		SyncedValuePtr mLocal;
-		SyncedValuePtr mActive;
-	};
-	SyncGroup mZoom2D;
 
 	ViewGroupDataPtr mViewGroupData;
 	std::vector<ViewWrapperPtr> mViewWrappers;
-//  SlicePlanesProxyPtr mSlicePlanesProxy;
+	CameraStylePtr mCameraStyle;
+	VisualizationServiceBackendPtr mBackend;
+	SyncedValuePtr mActiveView;
 };
 
 bool isViewWrapper2D(ViewWrapperPtr wrapper);

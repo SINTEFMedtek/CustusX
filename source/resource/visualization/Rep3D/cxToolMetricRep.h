@@ -14,10 +14,10 @@
 #ifndef CXTOOLMETRICREP_H
 #define CXTOOLMETRICREP_H
 
-#include "sscDataMetricRep.h"
-#include "sscGraphicalPrimitives.h"
+#include "cxDataMetricRep.h"
+#include "cxGraphicalPrimitives.h"
 #include "cxToolMetric.h"
-#include "sscViewportListener.h"
+#include "cxViewportListener.h"
 
 namespace cx
 {
@@ -31,8 +31,8 @@ typedef boost::shared_ptr<class ToolMetricRep> ToolMetricRepPtr;
 
 /** Rep for visualizing a ToolMetric.
  *
- * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep3D
  *
  * \date Aug 30, 2013
  * \author Christian Askeland, SINTEF
@@ -50,9 +50,7 @@ protected:
 	virtual void clear();
 	void addRepActorsToViewRenderer(View *view);
 	void removeRepActorsFromViewRenderer(View *view);
-
-protected slots:
-	virtual void changedSlot();
+	virtual void onModifiedStartRender();
 
 private:
 	ToolMetricRep(const QString& uid, const QString& name = "");

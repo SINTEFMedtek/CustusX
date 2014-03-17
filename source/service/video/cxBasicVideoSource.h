@@ -22,8 +22,8 @@
 #include <boost/array.hpp>
 class QTimer;
 
-#include "sscVideoSource.h"
-#include "sscForwardDeclarations.h"
+#include "cxVideoSource.h"
+#include "cxForwardDeclarations.h"
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageChangeInformation> vtkImageChangeInformationPtr;
@@ -38,7 +38,7 @@ namespace cx
  * Use the interface extensions to control the input:
  * Set a vtkImageData and
  *
- * \ingroup cxServiceVideo
+ * \ingroup cx_service_video
  * \date April 26, 2013
  * \author Christian Askeland, SINTEF
  */

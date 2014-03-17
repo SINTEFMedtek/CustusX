@@ -21,18 +21,19 @@
 #include <QDateTime>
 #include "vtkSmartPointer.h"
 #include "vtkForwardDeclarations.h"
-#include "sscImage.h"
-#include "sscRegistrationTransform.h"
+#include "cxImage.h"
+#include "cxRegistrationTransform.h"
 #include "cxAcquisitionData.h"
+#include "cxLandmark.h"
 
 namespace cx
 {
-class MessageManager;
+class Reporter;
 typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
 
 /**
  * \file
- * \addtogroup cxPluginRegistration
+ * \addtogroup cx_plugin_registration
  * @{
  */
 

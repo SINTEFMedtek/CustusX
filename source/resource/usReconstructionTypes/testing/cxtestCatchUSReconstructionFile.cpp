@@ -18,7 +18,7 @@
 
 #include "cxUsReconstructionFileMaker.h"
 #include "cxUsReconstructionFileReader.h"
-#include "sscUSFrameData.h"
+#include "cxUSFrameData.h"
 
 
 TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Create unique folders", "[unit][resource][usReconstructionTypes]")

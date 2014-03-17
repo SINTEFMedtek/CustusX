@@ -95,7 +95,7 @@
 #include <QObject>
 #include "sscForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 
 class QDomDocument;
 
