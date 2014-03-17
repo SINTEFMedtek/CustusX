@@ -20,15 +20,35 @@
 #include "cxToolManager.h"
 #include "cxManualTool.h"
 #include "cxVolumeHelpers.h"
+#include "cxCameraControl.h"
 
 namespace cx
 {
 
-Navigation::Navigation(VisualizationServiceBackendPtr backend) :
-	mBackend(backend)
+Navigation::Navigation(VisualizationServiceBackendPtr backend, CameraControlPtr camera3D) :
+	mBackend(backend),
+	mCamera3D(camera3D)
 {
 
 }
+
+void Navigation::centerToPosition(Vector3D p_r, QFlags<VIEW_TYPE> viewType)
+{
+	this->moveManualToolToPosition(p_r);
+
+	if (viewType.testFlag(v2D))
+	{
+		// set center to calculated position
+		mBackend->getDataManager()->setCenter(p_r);
+	}
+
+	if (viewType.testFlag(v3D))
+	{
+		if (mCamera3D)
+			mCamera3D->translateByFocusTo(p_r);
+	}
+}
+
 
 /**Place the global center to the center of the image.
  */
@@ -38,9 +58,10 @@ void Navigation::centerToData(DataPtr image)
 		return;
 	Vector3D p_r = image->get_rMd().coord(image->boundingBox().center());
 
-	// set center to calculated position
-	mBackend->getDataManager()->setCenter(p_r);
-	this->moveManualToolToPosition(p_r);
+	this->centerToPosition(p_r);
+//	// set center to calculated position
+//	mBackend->getDataManager()->setCenter(p_r);
+//	this->moveManualToolToPosition(p_r);
 }
 
 /**Place the global center to the mean center of
@@ -51,9 +72,10 @@ void Navigation::centerToView(const std::vector<DataPtr>& images)
 	Vector3D p_r = findViewCenter(images);
 	std::cout << "center ToView: " << images.size() << " - " << p_r << std::endl;
 
-	// set center to calculated position
-	mBackend->getDataManager()->setCenter(p_r);
-	this->moveManualToolToPosition(p_r);
+	this->centerToPosition(p_r);
+//	// set center to calculated position
+//	mBackend->getDataManager()->setCenter(p_r);
+//	this->moveManualToolToPosition(p_r);
 }
 
 /**Place the global center to the mean center of
@@ -66,9 +88,10 @@ void Navigation::centerToGlobalDataCenter()
 
 	Vector3D p_r = this->findGlobalDataCenter();
 
-	// set center to calculated position
-	mBackend->getDataManager()->setCenter(p_r);
-	this->moveManualToolToPosition(p_r);
+	this->centerToPosition(p_r);
+//	// set center to calculated position
+//	mBackend->getDataManager()->setCenter(p_r);
+//	this->moveManualToolToPosition(p_r);
 }
 
 /**Place the global center at the current position of the
@@ -80,8 +103,9 @@ void Navigation::centerToTooltip()
 	Vector3D p_pr = tool->get_prMt().coord(Vector3D(0, 0, tool->getTooltipOffset()));
 	Vector3D p_r = mBackend->getDataManager()->get_rMpr().coord(p_pr);
 
-	// set center to calculated position
-	mBackend->getDataManager()->setCenter(p_r);
+	this->centerToPosition(p_r);
+//	// set center to calculated position
+//	mBackend->getDataManager()->setCenter(p_r);
 }
 
 /**Find the center of all images in the view(wrapper), defined as the mean of

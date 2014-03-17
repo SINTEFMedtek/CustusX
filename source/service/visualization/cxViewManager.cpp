@@ -81,7 +81,7 @@ ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 	mLayoutRepository.reset(new LayoutRepository());
 	mCameraControl.reset(new CameraControl());
 
-	connect(mBackend->getDataManager().get(), SIGNAL(centerChanged()), this, SLOT(globalCenterChangedSlot()));
+//	connect(mBackend->getDataManager().get(), SIGNAL(centerChanged()), this, SLOT(globalCenterChangedSlot()));
 
 	this->loadGlobalSettings();
 
@@ -149,7 +149,7 @@ void ViewManager::initializeActiveView()
 
 NavigationPtr ViewManager::getNavigation()
 {
-	return NavigationPtr(new Navigation(mBackend));
+	return NavigationPtr(new Navigation(mBackend, mCameraControl));
 }
 
 QWidget *ViewManager::getLayoutWidget(int index)
@@ -614,12 +614,6 @@ void ViewManager::autoShowData(DataPtr data)
 CyclicActionLoggerPtr ViewManager::getRenderTimer()
 {
 	return mRenderLoop->getRenderTimer();
-}
-
-void ViewManager::globalCenterChangedSlot()
-{
-	Vector3D p_r = mBackend->getDataManager()->getCenter();
-	this->getCameraControl()->translateByFocusTo(p_r);
 }
 
 } //namespace cx

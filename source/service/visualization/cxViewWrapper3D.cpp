@@ -259,19 +259,8 @@ void ViewWrapper3D::updateMetricNamesRep()
 
 void ViewWrapper3D::PickerRepPointPickedSlot(Vector3D p_r)
 {
-	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
-	Vector3D p_pr = rMpr.inv().coord(p_r);
-
-	// set the picked point as offset tip
-	ManualToolPtr tool = mBackend->getToolManager()->getManualTool();
-	Vector3D offset = tool->get_prMt().vector(Vector3D(0, 0, tool->getTooltipOffset()));
-	p_pr -= offset;
-	p_r = rMpr.coord(p_pr);
-
-	// TODO set center here will not do: must handle
-	mBackend->getDataManager()->setCenter(p_r);
-	Vector3D p0_pr = tool->get_prMt().coord(Vector3D(0, 0, 0));
-	tool->set_prMt(createTransformTranslate(p_pr - p0_pr) * tool->get_prMt());
+	NavigationPtr nav = this->getNavigation();
+	nav->centerToPosition(p_r, Navigation::v2D);
 }
 
 void ViewWrapper3D::PickerRepDataPickedSlot(QString uid)
@@ -521,17 +510,28 @@ void ViewWrapper3D::resetCameraActionSlot()
 	this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
 }
 
+NavigationPtr ViewWrapper3D::getNavigation()
+{
+	CameraControlPtr camera3D(new CameraControl());
+	camera3D->setView(mView);
+
+	return NavigationPtr(new Navigation(mBackend, camera3D));
+}
+
 void ViewWrapper3D::centerImageActionSlot()
 {
+	NavigationPtr nav = this->getNavigation();
+
 	if (mBackend->getDataManager()->getActiveImage())
-		Navigation(mBackend).centerToData(mBackend->getDataManager()->getActiveImage());
+		nav->centerToData(mBackend->getDataManager()->getActiveImage());
 	else
-		Navigation(mBackend).centerToView(mGroupData->getData(DataViewProperties::create3D()));
+		nav->centerToView(mGroupData->getData(DataViewProperties::create3D()));
 }
 
 void ViewWrapper3D::centerToolActionSlot()
 {
-	Navigation(mBackend).centerToTooltip();
+	NavigationPtr nav = this->getNavigation();
+	nav->centerToTooltip();
 }
 
 void ViewWrapper3D::showSlicePlanesActionSlot(bool checked)
