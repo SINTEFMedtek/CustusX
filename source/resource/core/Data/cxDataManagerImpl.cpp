@@ -233,39 +233,16 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 
 	QString type = DataReaderWriter().findDataTypeFromFile(path);
 	DataPtr data = mDataFactory->create(type, uid);
-	data->load(path);
+	bool loaded = data->load(path);
 
-//	DataPtr current = DataReaderWriter().readData(uid, path, type);
-//	return current;
-
-//	DataPtr data = this->readData(uid, path, "unknown");
-	if (!data)
-		{
-			reportError("Error with data file: " + path);
-			return DataPtr();
-		}
+	if (!data || !loaded)
+	{
+		reportError("Error with data file: " + path);
+		return DataPtr();
+	}
 	this->loadData(data);
 	return data;
 }
-
-///** Read a data set and return it. Do NOT add it to the datamanager.
-// *  Internal method: used by loadData family.
-// */
-//DataPtr DataManagerImpl::readData(const QString& uid, const QString& path, const QString& type)
-//{
-//	if (mData.count(uid)) // dont load same image twice
-//	{
-//		return mData[uid];
-//	}
-
-//	DataPtr current = mDataFactory->create(type, uid, name);
-//	bool loaded = current->load(path);
-//	if (loaded)
-//		return current;
-
-////	DataPtr current = DataReaderWriter().readData(uid, path, type);
-////	return current;
-//}
 
 void DataManagerImpl::loadData(DataPtr data)
 {
