@@ -23,6 +23,7 @@
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {
@@ -190,7 +191,7 @@ void DataSelectWidget::toggleShowData()
     }
     else
     {
-        mCurrentViewGroup->removeData(mData->getData());
+		mCurrentViewGroup->removeData(mData->getData());
     }
 }
 
