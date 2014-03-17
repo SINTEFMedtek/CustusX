@@ -49,8 +49,8 @@
 #include "cxConfig.h"
 #ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
 	#include "vtkMultiVolumePicker.h"
-	typedef vtkSmartPointer<class vtkMultiVolumePicker> vtkMultiVolumePickerPtr;
-//    typedef vtkSmartPointer<class vtkVolumePicker> vtkMultiVolumePickerPtr;
+		typedef vtkSmartPointer<class vtkMultiVolumePicker> vtkMultiVolumePickerPtr;
+//		typedef vtkSmartPointer<class vtkVolumePicker> vtkMultiVolumePickerPtr;
 #else
     typedef vtkSmartPointer<class vtkVolumePicker> vtkMultiVolumePickerPtr;
 #endif
