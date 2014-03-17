@@ -65,6 +65,7 @@ private:
 	void storeFoundImage(vtkDataSet* image, vtkAbstractVolumeMapper* mapper, double* pickPosition);
 
 	double MultivolumePickPosition[3];
+	bool usedSingleVolumePicker;
 };
 
 #endif

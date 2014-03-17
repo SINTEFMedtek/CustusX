@@ -259,16 +259,7 @@ void ImageTFData::setWindow(double val)
 		return;
 
 	double scale = val/old;
-	std::cout << "setwindow" << std::endl;
-	std::cout << QString("  win=%1, lvl=%2, scale=%3")
-				 .arg(this->getWindow())
-				 .arg(this->getLevel())
-				 .arg(scale) << std::endl;
 	this->shiftColor(0, this->getLevel(), scale);
-	std::cout << QString("  win=%1, lvl=%2, scale=%3")
-				 .arg(this->getWindow())
-				 .arg(this->getLevel())
-				 .arg(scale) << std::endl;
 
 	this->internalsHaveChanged();
 }
