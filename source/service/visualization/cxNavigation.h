@@ -21,6 +21,7 @@
 namespace cx
 {
 typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
+typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 
 /** Functions for navigating in the visualization scene(s).
  *
@@ -29,20 +30,24 @@ typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServic
 class Navigation
 {
 public:
-	Navigation(VisualizationServiceBackendPtr backend);
+	enum VIEW_TYPE { v2D = 0x01, v3D=0x02, vBOTH=0x03 };
+	Navigation(VisualizationServiceBackendPtr backend, CameraControlPtr camera3D=CameraControlPtr());
 	void centerToData(DataPtr image);
 	void centerToView(const std::vector<DataPtr>& images);
 	void centerToGlobalDataCenter();
 	void centerToTooltip();
-	void moveManualToolToPosition(Vector3D& p_r);
+	void centerToPosition(Vector3D p_r, QFlags<VIEW_TYPE> viewType=vBOTH);
 
 private:
-	VisualizationServiceBackendPtr mBackend;
+	void moveManualToolToPosition(Vector3D& p_r);
 	Vector3D findViewCenter(const std::vector<DataPtr>& images);
 	Vector3D findGlobalDataCenter();
 	Vector3D findDataCenter(std::vector<DataPtr> data);
 
+	VisualizationServiceBackendPtr mBackend;
+	CameraControlPtr mCamera3D;
 };
+
 typedef boost::shared_ptr<Navigation> NavigationPtr;
 
 

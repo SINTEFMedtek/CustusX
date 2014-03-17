@@ -168,7 +168,7 @@ protected slots:
 //	void duringLoadPatientSlot();
 	void updateViews();
 	void updateCameraStyleActions();
-	void globalCenterChangedSlot();
+//	void globalCenterChangedSlot();
 	void setActiveView(QString viewUid);
 
 protected:
