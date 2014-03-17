@@ -13,9 +13,10 @@
 
 namespace cx
 {
+typedef boost::shared_ptr<class SelectToolStringDataAdapter> SelectToolStringDataAdapterPtr;
 /**
  * \file
- * \addtogroup cxPluginCalibration
+ * \addtogroup cx_plugin_calibration
  * @{
  */
 
@@ -38,7 +39,7 @@ private slots:
 private:
   QGroupBox* mGroup;
   Transform3DWidget* mMatrixWidget;
-
+  SelectToolStringDataAdapterPtr mTool;
 };
 
 

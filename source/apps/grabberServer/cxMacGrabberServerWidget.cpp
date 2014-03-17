@@ -3,7 +3,7 @@
 
 #include <QMacCocoaViewContainer>
 #include "cxMacGrabberServer.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

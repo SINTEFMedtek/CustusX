@@ -50,7 +50,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedCharArray.h"
 #include "vtksys/SystemTools.hxx"
 #include <ctype.h>
-#include "sscTime.h"
+#include "cxTime.h"
 #include <igtlImageMessage.h>
 
 #include "cxSonixProbeFileReader.h"
@@ -197,14 +197,14 @@ vtkSonixVideoSource* vtkSonixVideoSource::GetInstance()
   if(!vtkSonixVideoSource::Instance)
     {
     // Try the factory first
-	 vtkSonixVideoSource::Instance = (vtkSonixVideoSource*)vtkObjectFactory::CreateInstance("vtkSonixVideoSource");    
+	 vtkSonixVideoSource::Instance = dynamic_cast<vtkSonixVideoSource*>(vtkObjectFactory::CreateInstance("vtkSonixVideoSource"));
 	 if(!vtkSonixVideoSource::Instance)
 	   {
 	   vtkSonixVideoSource::Instance = new vtkSonixVideoSource();	   
 	   }
 	 if(!vtkSonixVideoSource::Instance)
 	   {
-	   int error = 0;
+//	   int error = 0;
 	   }
     }
   // return the instance
@@ -359,9 +359,7 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   //std::cout << this->FrameBufferExtent[2] << " " << this->FrameBufferExtent[3] << std::endl;
 
     int imagingDepth = 0;
-    int sectorPercent = 0;
-    long radius = 0;
-    long probeLenght = 0;
+		int sectorPercent = 0;
     bool linearProbe = true;
 
     if(!this->ult->getParamValue("b-depth", imagingDepth))
@@ -385,8 +383,8 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
     {
     	QDomNode probeNode = reader.getProbeNode(probeName);
     	linearProbe = reader.isProbeLinear(probeNode);
-    	long radius = reader.getProbeParam(probeNode, "radius"); // in microns
-    	long probeLenght = reader.getProbeLenght(probeNode); // in microns
+//    	long radius = reader.getProbeParam(probeNode, "radius"); // in microns
+//    	long probeLenght = reader.getProbeLenght(probeNode); // in microns
     }
 
 

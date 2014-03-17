@@ -12,9 +12,10 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "sscSliceComputer.h"
-#include "sscTypeConversions.h"
+#include "cxSliceComputer.h"
+#include "cxTypeConversions.h"
 #include "catch.hpp"
+#include "cxLogger.h"
 
 TEST_CASE("SliceComputer is created", "[unit][resource][core]")
 {
@@ -140,7 +141,6 @@ TEST_CASE("SliceComputer handles anyplanes using follow tool", "[unit][resource]
 	// test viewOffset
 	slicer.setToolViewOffset(true, 40, 0.25);
 	slicer.setPlaneType(cx::ptANYPLANE);
-	//std::cout << "viewoffset: \n" << slicer.getPlane() << std::endl;
 	CHECK(cx::similar(slicer.getPlane().c, c_tool-10.0*cx::Vector3D(0, 0, 1)));
 	slicer.setToolViewOffset(false, 40, 0.25);
 

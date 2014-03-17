@@ -3,15 +3,18 @@
 
 #include <vtkImageData.h>
 
-#include "sscBoundingBox3D.h"
-#include "sscDataManager.h"
-#include "sscToolManager.h"
-#include "sscRegistrationTransform.h"
-#include "sscCoordinateSystemHelpers.h"
-#include "sscVolumeHelpers.h"
-#include "sscMessageManager.h"
+#include "cxBoundingBox3D.h"
+#include "cxDataManager.h"
+#include "cxToolManager.h"
+#include "cxRegistrationTransform.h"
+#include "cxCoordinateSystemHelpers.h"
+#include "cxVolumeHelpers.h"
+#include "cxReporter.h"
 //#include "cxStateService.h"
 //#include "cxPatientData.h"
+
+#include "cxLegacySingletons.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
@@ -29,7 +32,7 @@ std::vector<Vector3D> TrackingDataToVolume::extractPoints(TimedTransformMap& map
     {
       Vector3D point_t = Vector3D(0,0,0);
       positions_pr.push_back(mapIter->second.coord(point_t));
-      mapIter++;
+			++mapIter;
     }
     return positions_pr;
 }
@@ -50,7 +53,7 @@ ImagePtr TrackingDataToVolume::createEmptyImage(DoubleBoundingBox3D bounds_pr, d
   double size = dim[0]*dim[1]*dim[2];
   if(size > maxVolumeSize)
   {
-    messageManager()->sendWarning("Tool position volume is going to be to big, making a smaller one.");
+    reportWarning("Tool position volume is going to be to big, making a smaller one.");
     spacing *= pow(size / maxVolumeSize, 1.0/3);
     dim = (ceil(bounds_pr.range() / spacing) + Vector3D(1,1,1)).cast<int>();
   }
@@ -69,9 +72,9 @@ void TrackingDataToVolume::insertPoints(ImagePtr image_d, std::vector<Vector3D> 
   vtkImageDataPtr data_pr = image_d->getBaseVtkImageData();
 
   //convert points into image space (d) and insert a binary value into the image at the points location in the image
-  CoordinateSystem pr = CoordinateSystemHelpers::getPr();
-  CoordinateSystem d = CoordinateSystemHelpers::getD(image_d);
-  Transform3D dMpr = CoordinateSystemHelpers::get_toMfrom(pr, d);
+  CoordinateSystem pr = spaceProvider()->getPr();
+  CoordinateSystem d = spaceProvider()->getD(image_d);
+  Transform3D dMpr = spaceProvider()->get_toMfrom(pr, d);
 
   std::vector<Vector3D>::iterator it = points_pr.begin();
   for(; it != points_pr.end(); ++it)
@@ -117,7 +120,7 @@ void TrackingDataToVolume::setInput(TimedTransformMap map_prMt, int padding_voxe
   bounds_mm[5] += padding_mm;
   mImage = createEmptyImage(bounds_mm, initialSpacing_mm);
 
-  Transform3D rMpr = *toolManager()->get_rMpr();
+  Transform3D rMpr = dataManager()->get_rMpr();
   //std::cout << "rMpr\n" << rMpr << std::endl;
   Transform3D rMd = rMpr * createTransformTranslate(bounds_mm.corner(0,0,0)); // TODO + eller - ?????
   //std::cout << "rMd\n" << rMd << std::endl;

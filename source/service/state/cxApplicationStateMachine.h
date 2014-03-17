@@ -24,9 +24,11 @@ class QMenu;
 
 namespace cx
 {
+typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
+
 /**
  * \file
- * \addtogroup cxServiceState
+ * \addtogroup cx_service_state
  * @{
  */
 
@@ -43,7 +45,7 @@ class ApplicationStateMachine: public QStateMachine
 {
 Q_OBJECT
 public:
-	ApplicationStateMachine();
+	ApplicationStateMachine(StateServiceBackendPtr backend);
 	virtual ~ApplicationStateMachine();
 
 	QActionGroup* getActionGroup();
@@ -67,6 +69,7 @@ private:
 	ApplicationStateMap mStates;
 	ApplicationState* mParentState;
 	QActionGroup* mActionGroup;
+	StateServiceBackendPtr mBackend;
 };
 
 typedef boost::shared_ptr<ApplicationStateMachine> ApplicationStateMachinePtr;

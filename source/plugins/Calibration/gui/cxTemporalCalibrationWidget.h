@@ -12,7 +12,7 @@
 #include "cxRecordSessionWidget.h"
 #include <QFuture>
 #include <QFutureWatcher>
-#include "sscFileSelectWidget.h"
+#include "cxFileSelectWidget.h"
 #include <cxTemporalCalibration.h>
 #include "cxUSAcqusitionWidget.h"
 
@@ -20,7 +20,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxPluginCalibration
+ * \addtogroup cx_plugin_calibration
  * @{
  */
 

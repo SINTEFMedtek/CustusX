@@ -15,7 +15,7 @@
 #ifndef CXTESTSYNTHETICRECONSTRUCTINPUT_H
 #define CXTESTSYNTHETICRECONSTRUCTINPUT_H
 
-#include "sscReconstructAlgorithm.h"
+#include "cxReconstructAlgorithm.h"
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #include "cxtestSyntheticVolumeComparer.h"
 
@@ -66,7 +66,6 @@ private:
 												int steps);
 
 	cx::cxSyntheticVolumePtr mPhantom;
-	bool mVerbose;
 
 	// setup parameters
 	cx::Vector3D mBounds;

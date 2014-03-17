@@ -6,11 +6,17 @@
 #include <qtcpsocket.h>
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
-#include "sscImage.h"
-#include "sscTool.h"
+#include "cxImage.h"
+#include "cxTool.h"
 
 namespace cx
 {
+
+/**
+* \file
+* \addtogroup cx_resource_videoserver
+* @{
+*/
 
 struct Package
 {
@@ -25,6 +31,8 @@ typedef boost::shared_ptr<Package> PackagePtr;
 
 /**Interface for sending grabbed data from the ImageSender classes further to either
  * a TCP/IP socket or directly via a Qt signal.
+ *
+ * \ingroup cx_resource_videoserver
  * \author Christian Askeland, SINTEF
  * \date Oct 11, 2012
  */
@@ -91,6 +99,10 @@ private:
 	QTcpSocket* mSocket;
 	int mMaxBufferSize;
 };
+
+/**
+* @}
+*/
 
 } /* namespace cx */
 #endif /* CXSender_H_ */

@@ -1,12 +1,11 @@
 #include "cxSimulateUSWidget.h"
 
 #include <QVBoxLayout>
-#include "sscLabeledComboBoxWidget.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxVideoService.h"
 #include "cxVideoConnectionManager.h"
 #include "cxVideoConnection.h"
-#include "cxDirectlyLinkedImageReceiverThread.h"
 
 namespace cx
 {

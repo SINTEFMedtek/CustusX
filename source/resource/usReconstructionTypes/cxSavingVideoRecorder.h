@@ -20,7 +20,7 @@
 #include <QMutex>
 
 #include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
@@ -43,7 +43,7 @@ typedef boost::shared_ptr<class CachedImageDataContainer> CachedImageDataContain
   *
   * \date Dwc 2, 2012
   * \author christiana
-  * \ingroup cxResourceUtilities
+  * \ingroup cx_resource_usreconstructiontypes
   */
 class VideoRecorderSaveThread : public QThread
 {
@@ -98,7 +98,7 @@ protected:
  *
   * \date Dwc 2, 2012
   * \author christiana
-  * \ingroup cxResourceUtilities
+  * \ingroup cx_resource_usreconstructiontypes
  */
 class SavingVideoRecorder : public QObject
 {

@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "sscSharedMemory.h"
+#include "cxSharedMemory.h"
 #include "catch.hpp"
 
 using namespace cx;
@@ -30,12 +30,12 @@ TEST_CASE("SharedMemory works", "[unit][resource][core]")
 		CHECK( cli.size() == srv.size() );
 		CHECK( cli.buffers() == srv.buffers() );
 		void *dst = srv.buffer();
-		CHECK( dst != NULL );
+        CHECK( dst );
 		strcpy((char *)dst, "text");
 		srv.release();
 		srv.release();
 		const void *src = cli.buffer();
-		CHECK( src != NULL );
+        CHECK( src );
 		CHECK( strncmp((char *)src, "text", 4) == 0 );
 		cli.release();
 		cli.release();

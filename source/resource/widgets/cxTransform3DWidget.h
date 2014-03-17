@@ -9,9 +9,9 @@
 #define CXTRANSFORM3DWIDGET_H_
 
 #include "cxBaseWidget.h"
-#include "sscDoubleDataAdapterXml.h"
-#include "sscTransform3D.h"
-#include "sscFrame3D.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxTransform3D.h"
+#include "cxFrame3D.h"
 
 class QTextEdit;
 class QVBoxLayout;
@@ -26,7 +26,8 @@ class MatrixTextEdit;
 /**
  * \brief Widget for displaying and manipulating an affine matrix,
  * i.e. a rotation+translation matrix.
- * \ingroup cxGUI
+ *
+ * \ingroup cx_resource_widgets
  *
  */
 class Transform3DWidget : public BaseWidget

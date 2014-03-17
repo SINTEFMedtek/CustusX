@@ -9,12 +9,12 @@
 #include <QToolButton>
 #include <QAction>
 #include <QMessageBox>
-#include "sscLogger.h"
-#include "sscDataManager.h"
-#include "sscImageTF3D.h"
-#include "sscImageLUT2D.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxLogger.h"
+#include "cxDataManager.h"
+#include "cxImageTF3D.h"
+#include "cxImageLUT2D.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
 #include "cxTransferFunctionPresetWidget.h"
 #include "cxTransferFunctionAlphaWidget.h"
 #include "cxTransferFunctionColorWidget.h"
@@ -34,15 +34,16 @@ DoubleDataAdapterImageTFDataBase::DoubleDataAdapterImageTFDataBase()
 {
 }
 
-void DoubleDataAdapterImageTFDataBase::setImageTFData(ImageTFDataPtr tfData)
+void DoubleDataAdapterImageTFDataBase::setImageTFData(ImageTFDataPtr tfData, ImagePtr image)
 {
   if (mImageTFData)
-    disconnect(mImageTFData.get(), SIGNAL(changed()), this, SIGNAL(changed()));
+	disconnect(mImageTFData.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
 
   mImageTFData = tfData;
+  mImage = image;
 
   if (mImageTFData)
-    connect(mImageTFData.get(), SIGNAL(changed()), this, SIGNAL(changed()));
+	connect(mImageTFData.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
 
   emit changed();
 }
@@ -78,9 +79,9 @@ void DoubleDataAdapterImageTFDataWindow::setValueInternal(double val)
 
 DoubleRange DoubleDataAdapterImageTFDataWindow::getValueRange() const
 {
-  if (!mImageTFData)
+  if (!mImage)
     return DoubleRange();
-  double range = mImageTFData->getScalarMax()-mImageTFData->getScalarMin();
+  double range = mImage->getMax() - mImage->getMin();
   return DoubleRange(1,range,range/1000.0);
 }
 
@@ -103,8 +104,8 @@ DoubleRange DoubleDataAdapterImageTFDataLevel::getValueRange() const
   if (!mImageTFData)
     return DoubleRange();
 
-  double max = mImageTFData->getScalarMax();
-  double min = mImageTFData->getScalarMin();
+  double max = mImage->getMax();
+  double min = mImage->getMin();
   return DoubleRange(min,max,1);
 }
 
@@ -124,9 +125,10 @@ DoubleRange DoubleDataAdapterImageTFDataLLR::getValueRange() const
   if (!mImageTFData)
     return DoubleRange();
 
-  double max = mImageTFData->getScalarMax();
-  double min = mImageTFData->getScalarMin();
-  return DoubleRange(min,max,(max-min)/1000.0);
+  double max = mImage->getMax();
+  double min = mImage->getMin();
+	//Set range to min - 1 to allow an llr that shows all values
+	return DoubleRange(min - 1,max,(max-min)/1000.0);
 }
 
 //---------------------------------------------------------
@@ -164,7 +166,7 @@ TransferFunction3DWidget::TransferFunction3DWidget(QWidget* parent) :
 //  mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
 //  mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
 
-  mActiveImageProxy = ActiveImageProxy::New();
+  mActiveImageProxy = ActiveImageProxy::New(dataService());
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
@@ -230,7 +232,7 @@ TransferFunction2DWidget::TransferFunction2DWidget(QWidget* parent) :
   mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
   mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
 
-  mActiveImageProxy = ActiveImageProxy::New();
+  mActiveImageProxy = ActiveImageProxy::New(dataService());
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
@@ -273,10 +275,10 @@ void TransferFunction2DWidget::activeImageChangedSlot()
   mTransferFunctionAlphaWidget->setData(image, tf);
   mTransferFunctionColorWidget->setData(image, tf);
 
-  mDataWindow->setImageTFData(tf);
-  mDataLevel->setImageTFData(tf);
-  mDataAlpha->setImageTFData(tf);
-  mDataLLR->setImageTFData(tf);
+  mDataWindow->setImageTFData(tf, image);
+  mDataLevel->setImageTFData(tf, image);
+  mDataAlpha->setImageTFData(tf, image);
+  mDataLLR->setImageTFData(tf, image);
 }
 
 

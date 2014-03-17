@@ -3,22 +3,22 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QSpinBox>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
 #include "cxRegistrationManager.h"
 #include "cxTimedAlgorithm.h"
 #include "cxPatientData.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxDataInterface.h"
 #include "cxPatientService.h"
 #include "cxRegistrationDataAdapters.h"
 #include "vesselReg/SeansVesselReg.hxx"
-#include "sscMesh.h"
+#include "cxMesh.h"
 #include "cxViewManager.h"
-#include "sscView.h"
-#include "sscGeometricRep.h"
+#include "cxView.h"
+#include "cxGeometricRep.h"
 #include <vtkCellArray.h>
-#include "sscGraphicalPrimitives.h"
+#include "cxGraphicalPrimitives.h"
 
 namespace cx
 {
@@ -28,20 +28,24 @@ SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegistrationManager
 		mLTSRatioSpinBox(new QSpinBox()), mLinearCheckBox(new QCheckBox()), mAutoLTSCheckBox(new QCheckBox()),
 		mRegisterButton(new QPushButton("Register"))
 {
-
+	mRegisterButton->setEnabled(false);
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
+
+	connect(mManager.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(inputChanged()));
+	connect(mManager.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(inputChanged()));
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 	QGridLayout* layout = new QGridLayout();
 	topLayout->addLayout(layout);
 
-	QPushButton* vesselRegOptionsButton = new QPushButton("Options", this);
-	vesselRegOptionsButton->setCheckable(true);
+	mVesselRegOptionsButton = new QPushButton("Options", this);
+	mVesselRegOptionsButton->setEnabled(false);
+	mVesselRegOptionsButton->setCheckable(true);
 
-	QGroupBox* vesselRegOptionsWidget = this->createGroupbox(this->createOptionsWidget(),
+	mVesselRegOptionsWidget = this->createGroupbox(this->createOptionsWidget(),
 		"Vessel registration options");
-	connect(vesselRegOptionsButton, SIGNAL(clicked(bool)), vesselRegOptionsWidget, SLOT(setVisible(bool)));
-	vesselRegOptionsWidget->setVisible(vesselRegOptionsButton->isChecked());
+	connect(mVesselRegOptionsButton, SIGNAL(clicked(bool)), mVesselRegOptionsWidget, SLOT(setVisible(bool)));
+	mVesselRegOptionsWidget->setVisible(mVesselRegOptionsButton->isChecked());
 
 	QGridLayout* entryLayout = new QGridLayout;
 	entryLayout->setColumnStretch(1, 1);
@@ -53,8 +57,8 @@ SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegistrationManager
 
 	layout->addLayout(entryLayout, 0, 0, 2, 2);
 	layout->addWidget(mRegisterButton, 2, 0);
-	layout->addWidget(vesselRegOptionsButton, 2, 1);
-	layout->addWidget(vesselRegOptionsWidget, 3, 0, 1, 2);
+	layout->addWidget(mVesselRegOptionsButton, 2, 1);
+	layout->addWidget(mVesselRegOptionsWidget, 3, 0, 1, 2);
 }
 
 SeansVesselRegistrationWidget::~SeansVesselRegistrationWidget()
@@ -68,6 +72,22 @@ QString SeansVesselRegistrationWidget::defaultWhatsThis() const
 		"<p>Select two datasets you want to registere to eachother, adjust the input parameters.</p>"
 		"<p><i>Adjust the parameters and click the register button.</i></p>"
 		"</html>";
+}
+
+void SeansVesselRegistrationWidget::inputChanged()
+{
+	if(mManager->getMovingData() && mManager->getFixedData())
+	{
+		mRegisterButton->setEnabled(true);
+		mVesselRegOptionsButton->setEnabled(true);
+		mVesselRegOptionsWidget->setVisible(mVesselRegOptionsButton->isChecked());
+	}
+	else
+	{
+		mRegisterButton->setEnabled(false);
+		mVesselRegOptionsButton->setEnabled(false);
+		mVesselRegOptionsWidget->setVisible(false);
+	}
 }
 
 void SeansVesselRegistrationWidget::registerSlot()
@@ -94,17 +114,28 @@ void SeansVesselRegistrationWidget::registerSlot()
 
 	if (vesselReg.mt_auto_lts)
 	{
-		messageManager()->sendDebug("Using automatic lts_ratio");
+		reporter()->sendDebug("Using automatic lts_ratio");
 	}
 	else
 	{
-		messageManager()->sendDebug("Using lts_ratio: " + qstring_cast(vesselReg.mt_ltsRatio));
+		reporter()->sendDebug("Using lts_ratio: " + qstring_cast(vesselReg.mt_ltsRatio));
+	}
+
+	if(!mManager->getMovingData())
+	{
+		reportWarning("Moving volume not set.");
+		return;
+	}
+	else if(!mManager->getFixedData())
+	{
+		reportWarning("Fixed volume not set.");
+		return;
 	}
 
 	bool success = vesselReg.execute(mManager->getMovingData(), mManager->getFixedData(), logPath);
 	if (!success)
 	{
-		messageManager()->sendWarning("Vessel registration failed.");
+		reportWarning("Vessel registration failed.");
 		return;
 	}
 
@@ -168,7 +199,7 @@ public:
 
 		this->update();
 
-		messageManager()->sendInfo("Initialized V2V algorithm (debug). Use Step to iterate.");
+		report("Initialized V2V algorithm (debug). Use Step to iterate.");
 	}
 	~SeansVesselRegistrationDebugger()
 	{
@@ -176,7 +207,7 @@ public:
 		view->removeRep(m_mRep);
 		view->removeRep(m_fRep);
 		view->removeRep(m_lineRep);
-		messageManager()->sendInfo("Closed V2V algorithm (debug).");
+		report("Closed V2V algorithm (debug).");
 	}
 	void stepL()
 	{
@@ -184,7 +215,7 @@ public:
 			return;
 		mRegistrator.performOneRegistration(mContext, true);
 		this->update();
-		messageManager()->sendInfo(QString("One Linear V2V iteration, metric=%1").arg(mContext->mMetric));
+		report(QString("One Linear V2V iteration, metric=%1").arg(mContext->mMetric));
 	}
 	void stepNL()
 	{
@@ -192,7 +223,7 @@ public:
 			return;
 		mRegistrator.performOneRegistration(mContext, false);
 		this->update();
-		messageManager()->sendInfo(QString("One Nonlinear V2V iteration, metric=%1").arg(mContext->mMetric));
+		report(QString("One Nonlinear V2V iteration, metric=%1").arg(mContext->mMetric));
 	}
 	void apply()
 	{
@@ -206,7 +237,7 @@ public:
 		Transform3D delta = linearTransform.inv();
 		mManager->applyImage2ImageRegistration(delta, "Vessel based");
 
-		messageManager()->sendInfo(QString("Applied linear registration from debug iteration."));
+		report(QString("Applied linear registration from debug iteration."));
 	}
 	void update()
 	{

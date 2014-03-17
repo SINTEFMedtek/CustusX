@@ -17,7 +17,7 @@
 
 #include <QPushButton>
 #include "cxRegistrationBaseWidget.h"
-//#include "sscStringDataAdapter.h"
+//#include "cxStringDataAdapter.h"
 #include "cxTrackedCenterlineWidget.h"
 
 namespace cx

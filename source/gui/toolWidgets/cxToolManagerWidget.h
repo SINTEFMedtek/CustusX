@@ -2,6 +2,7 @@
 #define CXTOOLMANAGERWIDGET_H_
 
 #include "cxBaseWidget.h"
+#include "cxLegacySingletons.h"
 
 class QPushButton;
 
@@ -12,7 +13,7 @@ namespace cx
  * \class ToolManagerWidget
  *
  * \brief Designed as a debugging widget for the cxToolManager
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * \date May 25, 2011
  * \author Janne Beate Bakeng, SINTEF

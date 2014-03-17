@@ -1,8 +1,8 @@
 #ifndef CXPREFERENCETAB_H_
 #define CXPREFERENCETAB_H_
 
-#include "sscDoubleDataAdapterXml.h"
-#include "sscStringDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
 
 class QLabel;
 class QSpinBox;

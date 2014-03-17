@@ -25,15 +25,18 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
 SET( SOURCE_FILES
   ${MOC_HEADER_FILES}
-  sscReconstructedOutputVolumeParams.h
-  sscReconstructedOutputVolumeParams.cpp
-  sscReconstructAlgorithm.h
-  sscPNNReconstructAlgorithm.h
-  sscPNNReconstructAlgorithm.cpp
-  sscReconstructCore.cpp
-  sscReconstructCore.h
-  sscReconstructPreprocessor.cpp
-  sscReconstructPreprocessor.h
+  cxReconstructedOutputVolumeParams.h
+  cxReconstructedOutputVolumeParams.cpp
+  cxReconstructAlgorithm.h
+  cxPNNReconstructAlgorithm.h
+  cxPNNReconstructAlgorithm.cpp
+  cxReconstructCore.cpp
+  cxReconstructCore.h
+  cxReconstructPreprocessor.cpp
+  cxReconstructPreprocessor.h
+	TordReconstruct/cxSyntheticVolume.h
+	TordReconstruct/cxSyntheticVolume.cpp
+	TordReconstruct/cxSimpleSyntheticVolume.h
       )
 
 # =========================================================
@@ -42,23 +45,22 @@ include_directories(
     .
     )
 
-if (SSC_USE_OpenCL)
+if (CX_USE_OPENCL_UTILITY)
 	include_directories(
 		TordReconstruct
 		${OPENCL_INCLUDE_DIRS}
 		)
 	SET( SOURCE_FILES
 		${SOURCE_FILES}
-		TordReconstruct/TordTest.cpp
-		TordReconstruct/cxSyntheticVolume.h
-		TordReconstruct/cxSyntheticVolume.cpp
-		TordReconstruct/cxSimpleSyntheticVolume.h
 		TordReconstruct/TordTest.h
-		TordReconstruct/kernels.ocl
+		TordReconstruct/TordTest.cpp
+		TordReconstruct/cxTordAlgorithm.h
+		TordReconstruct/cxTordAlgorithm.cpp
+		TordReconstruct/kernels.cl
 		)
    SET(TORD_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/TordReconstruct)
 
-endif (SSC_USE_OpenCL)
+endif (CX_USE_OPENCL_UTILITY)
 
 # create the target
 add_library( sscUS3DReconstruction ${SOURCE_FILES} )
@@ -66,10 +68,10 @@ add_library( sscUS3DReconstruction ${SOURCE_FILES} )
 set(sscUS3DReconstruction_LIBRARIES
     cxResource
     cxResourceUsReconstructionTypes
+	cxLogicManager
     )
     
-# Don't try to use OpenCl if we haven't got it
-if( SSC_USE_OpenCL )
+if( CX_USE_OPENCL_UTILITY )
     set(sscUS3DReconstruction_LIBRARIES
         ${sscUS3DReconstruction_LIBRARIES}
         ${OPENCL_LIBRARIES})
@@ -79,7 +81,9 @@ target_link_libraries( sscUS3DReconstruction ${sscUS3DReconstruction_LIBRARIES})
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/recConfig.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/recConfig.h" )
+  "${CMAKE_CURRENT_BINARY_DIR}/recConfig.h"
+  )
+  
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
 # =========================================================

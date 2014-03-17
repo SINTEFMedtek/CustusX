@@ -19,8 +19,8 @@ namespace cx
 {
 
 /**
- * \defgroup cxPluginUsReconstruction UsReconstruction Plugin
- * \ingroup cxPlugins
+ * \defgroup cx_plugin_usreconstruction UsReconstruction Plugin
+ * \ingroup cx_plugins
  * \brief Us Reconstruction framework with widgets.
  *
  * See \ref cx::UsReconstructionPlugin.
@@ -29,7 +29,7 @@ namespace cx
 
 /**
  * \file
- * \addtogroup cxPluginUsReconstruction
+ * \addtogroup cx_plugin_usreconstruction
  * @{
  */
 

@@ -14,19 +14,19 @@
 
 #include "cxtestReconstructAlgorithmFixture.h"
 
-#include "sscReconstructAlgorithm.h"
+#include "cxReconstructAlgorithm.h"
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #include "cxtestSphereSyntheticVolume.h"
 #include "catch.hpp"
-#include "sscPNNReconstructAlgorithm.h"
-#include "sscDataReaderWriter.h"
+#include "cxPNNReconstructAlgorithm.h"
+#include "cxDataReaderWriter.h"
 #include "vtkImageData.h"
 #include <QDomElement>
-#include "sscImage.h"
-#include "sscRegistrationTransform.h"
-#include "sscVolumeHelpers.h"
-#include "sscDummyTool.h"
-#include "sscTypeConversions.h"
+#include "cxImage.h"
+#include "cxRegistrationTransform.h"
+#include "cxVolumeHelpers.h"
+#include "cxDummyTool.h"
+#include "cxTypeConversions.h"
 #include "cxImageDataContainer.h"
 
 namespace cxtest
@@ -119,9 +119,9 @@ void ReconstructAlgorithmFixture::reconstruct(QDomElement root)
 	if (this->getVerbose())
 		std::cout << "Reconstructing\n";
 
-	mAlgorithm->reconstruct(mInputData,
+	REQUIRE(mAlgorithm->reconstruct(mInputData,
 							mOutputData->getBaseVtkImageData(),
-							root);
+							root));
 	if (this->getVerbose())
 		std::cout << "Reconstruction done\n";
 }

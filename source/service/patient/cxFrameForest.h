@@ -15,10 +15,10 @@
 #ifndef CXFRAMEFOREST_H_
 #define CXFRAMEFOREST_H_
 
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 
 #include <QDomDocument>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 /*
 
@@ -43,15 +43,17 @@
 
 namespace cx
 {
+class DataManager;
+
 /**
 * \file
-* \addtogroup cxServicePatient
+* \addtogroup cx_service_patient
 * @{
 */
 
 /**
  * \brief A graph combining Space dependencies between all Data.
- * \ingroup cxServicePatient
+ * \ingroup cx_service_patient
  *
  * Relations between coordinate spaces among Data are created by
  * this class.
@@ -64,7 +66,7 @@ namespace cx
 class FrameForest
 {
 public:
-	FrameForest();
+	explicit FrameForest(DataServicePtr dataManager);
 	QDomNode getNode(QString frame);
 	QDomNode getOldestAncestor(QDomNode node);
 
@@ -78,6 +80,7 @@ private:
 	bool isAncestorOf(QDomNode node, QDomNode ancestor);
 	void insertFrame(DataPtr data);
 	QDomDocument mDocument;
+	DataServicePtr mDataManager;
 };
 
 /**

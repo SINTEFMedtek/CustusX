@@ -7,8 +7,8 @@
 
 #include <cxDataViewSelectionWidget.h>
 #include "cxToolListWidget.h"
-#include "sscDataManager.h"
-#include "sscData.h"
+#include "cxDataManager.h"
+#include "cxData.h"
 #include <QListWidgetItem>
 #include <QDir>
 #include <QHBoxLayout>
@@ -17,12 +17,12 @@
 #include <QAction>
 #include <QLabel>
 #include <QMenu>
-#include "sscEnumConverter.h"
-#include "sscMessageManager.h"
+#include "cxEnumConverter.h"
+#include "cxReporter.h"
 #include "cxDataLocations.h"
 #include "cxToolConfigurationParser.h"
-#include "sscImageAlgorithms.h"
-#include "sscImage.h"
+#include "cxImageAlgorithms.h"
+#include "cxImage.h"
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
@@ -120,14 +120,6 @@ void DataListWidget::populateData(QString uid, bool indent, QListWidgetItem* aft
   emit listSizeChanged();
 }
 
-
-//void DataListWidget::dataClickedSlot(QListWidgetItem* item)
-//{
-//  QString uid = item->data(Qt::UserRole).toString();
-//  emit dataSelected(uid);
-//}
-
-
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
@@ -136,14 +128,10 @@ void DataListWidget::populateData(QString uid, bool indent, QListWidgetItem* aft
 AllDataListWidget::AllDataListWidget(QWidget* parent) :
     DataListWidget(parent)
 {
-//  this->setDragDropMode(QAbstractItemView::DragOnly);
-//  this->setDragEnabled(true);
   this->setDropIndicatorShown(false);
   this->setDragEnabled(true);
-//  this->setAcceptDrops(true); // if we want to back-drag items (for deletion)
 
-  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(populateAllDataList()));
-  connect(dataManager(), SIGNAL(dataRemoved(QString)), this, SLOT(populateAllDataList()));
+  connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(populateAllDataList()));
 }
 
 AllDataListWidget::~AllDataListWidget()
@@ -151,39 +139,13 @@ AllDataListWidget::~AllDataListWidget()
 
 void AllDataListWidget::mousePressEvent(QMouseEvent *event)
 {
-//  if (event->button() == Qt::LeftButton)
-//    startPos = event->pos();
   QListWidget::mousePressEvent(event);
 }
 
 void AllDataListWidget::mouseMoveEvent(QMouseEvent *event)
 {
   QListWidget::mouseMoveEvent(event);
-//  if (event->buttons() & Qt::LeftButton)
-//  {
-//    int distance = (event->pos() - startPos).manhattanLength();
-//    if (distance >= 10)
-//      this->startDrag();
-//  }
 }
-
-//void AllDataListWidget::startDrag()
-//{
-//  QListWidgetItem *item = currentItem();
-//  if (item)
-//  {
-//    QMimeData *mimeData = new QMimeData;
-//    mimeData->setText(item->data(Qt::UserRole).toString());
-//    QDrag *drag = new QDrag(this);
-//    drag->setMimeData(mimeData);
-//
-//    drag->start(Qt::CopyAction);
-//
-////    if (drag->start(Qt::MoveAction) == Qt::MoveAction)
-////      delete item;
-//  }
-//}
-
 
 void AllDataListWidget::populateAllDataList()
 {
@@ -229,19 +191,8 @@ SelectedDataListWidget::SelectedDataListWidget(QWidget* parent) :
   this->viewport()->setAcceptDrops(true);
   this->setDragDropOverwriteMode(true);
 
-//  this->viewport()->setAcceptDrops(true);
-//  this->setAcceptDrops(true);
-//  this->setDropIndicatorShown(true);
-//  this->setDefaultDropAction(Qt::CopyAction);
-//  this->setDragDropMode(QAbstractItemView::DragDrop);
-
   connect(this, SIGNAL(userChangedList()), this, SLOT(userChangedListSlot()));
   connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(contextMenuSlot(const QPoint &)));
-
-//  if (!viewManager()->getViewGroups().empty())
-//    mSelectedDataListWidget->setViewGroupData(viewManager()->getViewGroups()[0]->getData());
-  //nt ViewManager::getActiveViewGroup() const
-  //void DataViewSelectionWidget::activeViewChanged
 }
 
 
@@ -261,7 +212,7 @@ void SelectedDataListWidget::userChangedListSlot()
     DataPtr current = dataManager()->getData(data[i]);
     if (!current)
       continue;
-    mViewGroupData->addData(current);
+	mViewGroupData->addData(current);
   }
 }
 
@@ -373,7 +324,7 @@ void SelectedDataListWidget::deleteSlot()
 {
   if(!mItemToDelete)
   {
-    messageManager()->sendDebug("Found no item to delete...");
+    reporter()->sendDebug("Found no item to delete...");
     return;
   }
   this->deleteItemSlot(mItemToDelete);
@@ -397,7 +348,7 @@ void SelectedDataListWidget::contextMenuSlot(const QPoint& point)
   QListWidgetItem* item = this->itemAt(point);
   if(!item)
   {
-    messageManager()->sendDebug("Found no item to delete...");
+    reporter()->sendDebug("Found no item to delete...");
   }
   mItemToDelete = item;
 
@@ -427,8 +378,7 @@ void SelectedDataListWidget::setViewGroupData(ViewGroupDataPtr viewGroupData)
   if (mViewGroupData)
   {
     disconnect(mViewGroupData.get(), SIGNAL(initialized()), this, SLOT(populateList()));
-    disconnect(mViewGroupData.get(), SIGNAL(dataAdded(QString)), this, SLOT(populateList()));
-    disconnect(mViewGroupData.get(), SIGNAL(dataRemoved(QString)), this, SLOT(populateList()));
+	disconnect(mViewGroupData.get(), SIGNAL(dataViewPropertiesChanged(QString)), this, SLOT(populateList()));
   }
 
   mViewGroupData = viewGroupData;
@@ -436,8 +386,7 @@ void SelectedDataListWidget::setViewGroupData(ViewGroupDataPtr viewGroupData)
   if (mViewGroupData)
   {
     connect(mViewGroupData.get(), SIGNAL(initialized()), this, SLOT(populateList()));
-    connect(mViewGroupData.get(), SIGNAL(dataAdded(QString)), this, SLOT(populateList()));
-    connect(mViewGroupData.get(), SIGNAL(dataRemoved(QString)), this, SLOT(populateList()));
+	connect(mViewGroupData.get(), SIGNAL(dataViewPropertiesChanged(QString)), this, SLOT(populateList()));
   }
 
   this->populateList();

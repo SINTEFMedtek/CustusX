@@ -16,13 +16,13 @@
 #include <vtkVolume.h>
 #include <vtkVolumeProperty.h>
 #include <QWidget>
-#include "sscImageTF3D.h"
-#include "sscImageLUT2D.h"
-#include "sscVolumetricRep.h"
+#include "cxImageTF3D.h"
+#include "cxImageLUT2D.h"
+#include "cxVolumetricRep.h"
 #include "cxRepManager.h"
 #include <QTimer>
-#include "sscImage.h"
-#include "sscMessageManager.h"
+#include "cxImage.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -74,7 +74,7 @@ void ThresholdPreview::revertTransferFunctions()
 //    if(volumeRep)
 //        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToLinear();
 //    else
-//        messageManager()->sendError("ThresholdPreview::revertTransferFunctions() can not find VolumetricRep");
+//        reportError("ThresholdPreview::revertTransferFunctions() can not find VolumetricRep");
 
     mTF3D_original.reset();
     mTF2D_original.reset();
@@ -86,7 +86,6 @@ void ThresholdPreview::revertTransferFunctions()
  *
  * A timer is added that will the remove the preview when the calling widget is no longer visible.
  *
- * \param fromWidget The calling widget
  * \param image The image to modify the transfer function of
  * \param setValue The threshold value to be used
  */
@@ -105,24 +104,41 @@ void ThresholdPreview::setPreview(ImagePtr image, double setValue)
     if (!mModifiedImage)
     {
         mModifiedImage = image;
-        mTF3D_original = image->getTransferFunctions3D()->createCopy(image->getBaseVtkImageData());
-        mTF2D_original = image->getLookupTable2D()->createCopy(image->getBaseVtkImageData());
+		mTF3D_original = image->getTransferFunctions3D()->createCopy();
+		mTF2D_original = image->getLookupTable2D()->createCopy();
         mShadingOn_original = image->getShadingOn();
     }
     image->resetTransferFunctions();
     ImageTF3DPtr tf3D = image->getTransferFunctions3D();
-    tf3D->removeInitAlphaPoint();
-    tf3D->addAlphaPoint(setValue - 1, 0);
-    tf3D->addAlphaPoint(setValue, image->getMaxAlphaValue());
-    tf3D->addColorPoint(setValue, Qt::green);
-    tf3D->addColorPoint(image->getMax(), Qt::green);
+
+	ColorMap colors;
+	colors[setValue] = Qt::green;
+	colors[image->getMax()] = Qt::green;
+	tf3D->resetColor(colors);
+
+	IntIntMap opacity;
+	opacity[setValue - 1] = 0;
+	opacity[setValue] = image->getMaxAlphaValue();
+	tf3D->resetAlpha(opacity);
+
+
+//	tf3D->removeInitAlphaPoint();
+//    tf3D->addAlphaPoint(setValue - 1, 0);
+//    tf3D->addAlphaPoint(setValue, image->getMaxAlphaValue());
+//    tf3D->addColorPoint(setValue, Qt::green);
+//    tf3D->addColorPoint(image->getMax(), Qt::green);
     image->setShadingOn(true);
 
     ImageLUT2DPtr lut2D = image->getLookupTable2D();
-    lut2D->setFullRangeWinLevel();
-    lut2D->addColorPoint(setValue, Qt::green);
-    lut2D->addColorPoint(image->getMax(), Qt::green);
+	colors.clear();
+	colors[setValue] = Qt::green;
+	colors[image->getMax()] = Qt::green;
+	lut2D->resetColor(colors);
+//	lut2D->setFullRangeWinLevel(source->getVtkImageData());
+//    lut2D->addColorPoint(setValue, Qt::green);
+//    lut2D->addColorPoint(image->getMax(), Qt::green);
     lut2D->setLLR(setValue);
+
 
     //Remove VTK linear interpolation
 	mModifiedImage->setInterpolationTypeToNearest();
@@ -130,7 +146,7 @@ void ThresholdPreview::setPreview(ImagePtr image, double setValue)
 //    if(volumeRep)
 //        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToNearest();
 //    else
-//        messageManager()->sendError("ThresholdPreview::setPreview() can not find VolumetricRep");
+//        reportError("ThresholdPreview::setPreview() can not find VolumetricRep");
 }
 
 void ThresholdPreview::removePreview()

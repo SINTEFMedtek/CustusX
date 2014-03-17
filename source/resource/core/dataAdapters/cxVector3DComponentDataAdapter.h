@@ -15,14 +15,14 @@
 #ifndef CXVECTOR3DCOMPONENTDATAADAPTER_H_
 #define CXVECTOR3DCOMPONENTDATAADAPTER_H_
 
-#include <sscDoubleDataAdapter.h>
-#include "sscVector3DDataAdapter.h"
+#include "cxDoubleDataAdapter.h"
+#include "cxVector3DDataAdapter.h"
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup cxGUI
+ * \addtogroup cx_resource_core_dataadapters
  * @{
  */
 

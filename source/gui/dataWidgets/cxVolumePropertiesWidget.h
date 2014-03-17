@@ -2,7 +2,7 @@
 #define CXVOLUMEPROPERTIESWIDGET_H_
 
 #include "cxTabbedWidget.h"
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 #include "cxDataInterface.h"
 #include "cxActiveImageProxy.h"
 
@@ -11,7 +11,7 @@ namespace cx
 /**
  * \class ActiveVolumeWidget
  * \brief Widget that contains a select active image combobox.
- * \ingroup cxGUI
+ * \ingroup cx_gui
  * \date Aug 20, 2010
  * \author Christian Askeland, SINTEF
  */
@@ -28,7 +28,7 @@ public:
 /**
  * \class VolumePropertiesWidget
  * \brief Widget for displaying and manipulating various 3D Volume properties.
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * \date Aug 20, 2010
  * \author christiana

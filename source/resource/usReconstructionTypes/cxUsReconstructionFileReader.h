@@ -10,10 +10,10 @@
 
 #include <boost/shared_ptr.hpp>
 #include <QString>
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 #include "ProbeXmlConfigParserImpl.h"
-#include "sscProbeSector.h"
-#include "sscForwardDeclarations.h"
+#include "cxProbeSector.h"
+#include "cxForwardDeclarations.h"
 #include "cxUSReconstructInputData.h"
 
 namespace cx
@@ -21,7 +21,7 @@ namespace cx
 
 /**
 * \file
-* \addtogroup cxResourceUtilities
+* \addtogroup cx_resource_usreconstructiontypes
 * @{
 */
 
@@ -142,6 +142,7 @@ public:
 	static std::pair<QString, ProbeDefinition>  readProbeDataFromFile(QString mhdFileName);
 
 private:
+	bool valid(USReconstructInputData input);
 	std::vector<TimedPosition> readPositions(QString fileName);
 	bool readMaskFile(QString mhdFileName, ImagePtr mask);
 	USFrameDataPtr readUsDataFile(QString mhdFileName);

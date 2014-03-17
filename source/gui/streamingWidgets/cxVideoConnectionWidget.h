@@ -20,8 +20,8 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <QProcess>
-#include "sscTransform3D.h"
-#include "sscForwardDeclarations.h"
+#include "cxTransform3D.h"
+#include "cxForwardDeclarations.h"
 
 class QPushButton;
 class QComboBox;
@@ -47,7 +47,7 @@ class FileInputWidget;
 /**
  * \brief GUI for setting up a connection to a video stream
  *
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * \date 2010.10.27
  * \author Christian Askeland, SINTEF

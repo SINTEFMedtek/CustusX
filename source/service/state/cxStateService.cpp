@@ -18,9 +18,9 @@
 #include <QApplication>
 #include <QByteArray>
 #include <QDir>
-#include "sscEnumConverter.h"
-#include "sscXmlOptionItem.h"
-#include "sscMessageManager.h"
+#include "cxEnumConverter.h"
+#include "cxXmlOptionItem.h"
+#include "cxReporter.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxWorkflowStateMachine.h"
@@ -29,6 +29,7 @@
 #include "cxDataLocations.h"
 #include "cxConfig.h"
 #include "cxVLCRecorder.h"
+#include "cxStateServiceBackend.h"
 
 namespace cx
 {
@@ -111,6 +112,7 @@ public:
 		}
 		retval.mMainWindowState = QByteArray::fromBase64(desktopElement.attribute("mainwindowstate").toAscii());
 		retval.mLayoutUid = desktopElement.attribute("layoutuid");
+		retval.mSecondaryLayoutUid = desktopElement.attribute("secondarylayoutuid");
 
 		return retval;
 	}
@@ -121,6 +123,7 @@ public:
 						mXmlFile.descend(applicationName).descend("workflows").descend(workflowName).descend("custom").getElement();
 		desktopElement.setAttribute("mainwindowstate", QString(desktop.mMainWindowState.toBase64()));
 		desktopElement.setAttribute("layoutuid", desktop.mLayoutUid);
+		desktopElement.setAttribute("secondarylayoutuid", desktop.mSecondaryLayoutUid);
 		mXmlFile.save();
 	}
 
@@ -141,26 +144,41 @@ private:
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
-StateService *StateService::mTheInstance = NULL;
-StateService* stateService()
+StateServicePtr StateService::create(StateServiceBackendPtr backend)
 {
-	return StateService::getInstance();
-}
-StateService* StateService::getInstance()
-{
-	if (mTheInstance == NULL)
-	{
-		mTheInstance = new StateService();
-		mTheInstance->initialize();
-	}
-	return mTheInstance;
+	StateServicePtr retval;
+	retval.reset(new StateService());
+	retval->initialize(backend);
+	return retval;
 }
 
-void StateService::destroyInstance()
-{
-	delete mTheInstance;
-	mTheInstance = NULL;
-}
+//StateService *StateService::mTheInstance = NULL;
+//StateService* stateService()
+//{
+//	return StateService::getInstance();
+//}
+
+//StateService* StateService::createInstance(StateServiceBackendPtr backend)
+//{
+//	if (mTheInstance == NULL)
+//	{
+//		mTheInstance = new StateService();
+//		mTheInstance->initialize(backend);
+//	}
+//	return mTheInstance;
+//}
+
+
+//StateService* StateService::getInstance()
+//{
+//	return mTheInstance;
+//}
+
+//void StateService::destroyInstance()
+//{
+//	delete mTheInstance;
+//	mTheInstance = NULL;
+//}
 
 StateService::StateService()
 {
@@ -168,6 +186,18 @@ StateService::StateService()
 
 StateService::~StateService()
 {
+}
+
+void StateService::initialize(StateServiceBackendPtr backend)
+{
+	mBackend = backend;
+	this->fillDefaultSettings();
+
+	mApplicationStateMachine.reset(new ApplicationStateMachine(mBackend));
+	mApplicationStateMachine->start();
+
+	mWorkflowStateMachine.reset(new WorkflowStateMachine(mBackend));
+	mWorkflowStateMachine->start();
 }
 
 QString StateService::getVersionName()
@@ -227,11 +257,11 @@ QStringList StateService::getDefaultGrabberServer()
 	QString filename;
 	QString relativePath = "OpenIGTLinkServer";
 	QString postfix = "";
-#ifdef __APPLE__
-	filename = "GrabberServer";
-	relativePath = "grabberServer";
-	postfix = " --auto";
-#elif WIN32
+//#ifdef __APPLE__
+//	filename = "GrabberServer";
+//	relativePath = "grabberServer";
+//	postfix = " --auto";
+#if WIN32
 	filename = "OpenIGTLinkServer.exe";
 	postfix = "--in_width 800 --in_height 600";
 #else
@@ -318,6 +348,9 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View3D/sphereRadius", 1.0);
 	this->fillDefault("View3D/labelSize", 2.5);
 	this->fillDefault("View3D/showOrientationAnnotation", true);
+	this->fillDefault("Navigation/anyplaneViewOffset", 0.25);
+	this->fillDefault("Navigation/followTooltip", true);
+	this->fillDefault("Navigation/followTooltipBoundary", 0.1);
 
 	QStringList grabber = this->getDefaultGrabberServer();
 //	std::cout << "def grabber: " << grabber.join("--") << std::endl;
@@ -338,28 +371,27 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View3D/eyeAngle", 4.0);
 	this->fillDefault("View/showDataText", true);
 	this->fillDefault("View/showLabels", true);
-
+	this->fillDefault("View/showMetricNamesInCorner", false);
 	this->fillDefault("View3D/annotationModelSize", 0.2);
 	this->fillDefault("View3D/annotationModel", "woman.stl");
 	this->fillDefault("View3D/depthPeeling", false);
 
-//	this->fillDefault("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
-	this->fillDefault("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
+	this->fillDefault("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
+	// not working:
+//	this->fillDefault("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
 
 	this->fillDefault("View3D/maxRenderSize", 10 * pow(10.0,6));
 
+
+//	this->fillDefault("useGPUVolumeRayCastMapper", true);
+	this->fillDefault("stillUpdateRate", 0.001);
+
 #ifdef __APPLE__
-	this->fillDefault("useGPUVolumeRayCastMapper", false);
 	this->fillDefault("useGPU2DRendering", true);
-	this->fillDefault("stillUpdateRate", 8.0);
 #elif WIN32
-	this->fillDefault("useGPUVolumeRayCastMapper", true);
 	this->fillDefault("useGPU2DRendering", false);
-	this->fillDefault("stillUpdateRate", 0.001);
 #else
-	this->fillDefault("useGPUVolumeRayCastMapper", true);
 	this->fillDefault("useGPU2DRendering", true);
-	this->fillDefault("stillUpdateRate", 0.001);
 #endif
 
 
@@ -367,38 +399,32 @@ void StateService::fillDefaultSettings()
 
 	this->fillDefault("IGSTKDebugLogging", false);
 	this->fillDefault("giveManualToolPhysicalProperties", false);
+	this->fillDefault("renderSpeedLogging", false);
 
 	this->fillDefault("applyTransferFunctionPresetsToAll", false);
 }
 
-void StateService::initialize()
-{
-	this->fillDefaultSettings();
-
-	mApplicationStateMachine.reset(new ApplicationStateMachine());
-	mApplicationStateMachine->start();
-
-	mWorkflowStateMachine.reset(new WorkflowStateMachine());
-	mWorkflowStateMachine->start();
-}
 
 Desktop StateService::getActiveDesktop()
 {
 	ApplicationsParser parser;
-	return parser.getDesktop(mApplicationStateMachine->getActiveUidState(), mWorkflowStateMachine->getActiveUidState());
+	return parser.getDesktop(mApplicationStateMachine->getActiveUidState(),
+							 mWorkflowStateMachine->getActiveUidState());
 }
 
 void StateService::saveDesktop(Desktop desktop)
 {
 	ApplicationsParser parser;
-	parser.setDesktop(mApplicationStateMachine->getActiveUidState(), mWorkflowStateMachine->getActiveUidState(),
-					desktop);
+	parser.setDesktop(mApplicationStateMachine->getActiveUidState(),
+					  mWorkflowStateMachine->getActiveUidState(),
+					  desktop);
 }
 
 void StateService::resetDesktop()
 {
 	ApplicationsParser parser;
-	parser.resetDesktop(mApplicationStateMachine->getActiveUidState(), mWorkflowStateMachine->getActiveUidState());
+	parser.resetDesktop(mApplicationStateMachine->getActiveUidState(),
+						mWorkflowStateMachine->getActiveUidState());
 }
 
 } //namespace cx

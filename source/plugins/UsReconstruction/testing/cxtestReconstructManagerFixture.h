@@ -14,7 +14,7 @@
 #ifndef CXTESTRECONSTRUCTMANAGERFIXTURE_H
 #define CXTESTRECONSTRUCTMANAGERFIXTURE_H
 
-#include "sscReconstructManager.h"
+#include "cxReconstructManager.h"
 #include "cxtestSyntheticVolumeComparer.h"
 #include "cxtestSyntheticReconstructInput.h"
 

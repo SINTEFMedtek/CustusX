@@ -7,12 +7,12 @@
 
 #include <cxRegisterI2IWidget.h>
 
-#include "sscImageTF3D.h"
-#include "sscImageLUT2D.h"
-#include "sscTypeConversions.h"
-#include "sscImage.h"
-#include "sscDataManager.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxImageTF3D.h"
+#include "cxImageLUT2D.h"
+#include "cxTypeConversions.h"
+#include "cxImage.h"
+#include "cxDataManager.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxPatientData.h"
 #include "cxFrameTreeWidget.h"
 #include "cxDataInterface.h"

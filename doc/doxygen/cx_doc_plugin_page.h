@@ -17,11 +17,11 @@
 //
 // See sscLicense.txt for more information.
 
-namespace cx
-{
+namespace cx {
 
 /**
- * \defgroup cxPlugins Plugins
+ * \defgroup cx_plugins Plugins
+ * \ingroup cx_base
  *
  * \brief Plugins overview
  *
@@ -54,7 +54,6 @@ namespace cx
  * \image html cxArchitecture_Plugin_Examples.png "The Registration Plugin"
  *
  */
-
 
 } // namespace ssc
 

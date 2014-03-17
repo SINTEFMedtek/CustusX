@@ -15,13 +15,12 @@
 #define CXUSRECONSTRUCTINPUTDATAALGORITMS_H
 
 #include "cxUSReconstructInputData.h"
-#include "sscToolManager.h"
 
 namespace cx
 {
 
 /**
- * \addtogroup cxResourceUtilities
+ * \addtogroup cx_resource_usreconstructiontypes
  * \{
  */
 

@@ -8,9 +8,9 @@
 #include "cxBranchList.h"
 //#include "RegistrationFunctions.h"
 #include "cxBranch.h"
-#include "sscDataManager.h"
-#include "sscMesh.h"
-#include "sscVector3D.h"
+#include "cxDataManager.h"
+#include "cxMesh.h"
+#include "cxVector3D.h"
 #include <vtkPolyData.h>
 
 
@@ -77,14 +77,14 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 {
 	positions = sortMatrix(2,positions);
 	Eigen::MatrixXd positionsNotUsed = positions;
-	int minIndex;
+//	int minIndex;
 	int index;
 	int splitIndex;
 	Eigen::MatrixXd::Index startIndex;
 	Branch* branchToSplit;
 	while (positionsNotUsed.size() > 0)
 	{
-		if (Branches.size() > 0)
+		if (!Branches.empty())
 		{
 			double minDistance = 1000;
 			for (int i = 0; i < Branches.size(); i++)

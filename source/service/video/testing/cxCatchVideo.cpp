@@ -18,15 +18,17 @@
 #include <QString>
 #include <vtkImageData.h>
 #include "vtkForwardDeclarations.h"
-#include "sscImage.h"
-#include "sscDummyTool.h"
+#include "cxImage.h"
+#include "cxDummyTool.h"
 #include "cxDataLocations.h"
 #include "cxMHDImageStreamer.h"
 #include "cxSimulatedImageStreamer.h"
-#include "sscDummyToolManager.h"
+#include "cxDummyToolManager.h"
 #include "cxtestSender.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
+//#include "cxDataManager.h"
+#include "cxtestDummyDataManager.h"
 
 namespace cxtest
 {
@@ -46,14 +48,17 @@ cx::DummyImageStreamerPtr createRunningDummyImageStreamer(TestSenderPtr& sender,
 
 cx::SimulatedImageStreamerPtr createRunningSimulatedImageStreamer(TestSenderPtr& sender)
 {
+//	cx::TrackingServicePtr trackingService = cx::DummyToolManager::create(); not required??
+	cx::DataServicePtr dataService = cxtest::createDummyDataService();
+
 	cx::ImagePtr image = cxtest::Utilities::create3DImage();
 	REQUIRE(image);
-	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear(), cx::DummyToolManager::getInstance());
+	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear());
 	REQUIRE(tool);
 	cx::SimulatedImageStreamerPtr imagestreamer(new cx::SimulatedImageStreamer());
 	REQUIRE(imagestreamer);
 
-	imagestreamer->initialize(image, tool);
+	imagestreamer->initialize(image, tool, dataService);
 	REQUIRE(imagestreamer->startStreaming(sender));
 	return imagestreamer;
 }
@@ -110,7 +115,7 @@ TEST_CASE("SimulatedImageStreamer: Should stream 2D images from a volume given a
 	checkSenderGotImageFromStreamer(sender);
 
 	imagestreamer->stopStreaming();
-	cx::ToolManager::shutdown();
+//	cx::ToolManager::shutdown();
 }
 
 }//namespace cx

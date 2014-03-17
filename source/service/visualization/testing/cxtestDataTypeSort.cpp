@@ -14,13 +14,13 @@
 
 #include "catch.hpp"
 
-#include "sscMesh.h"
-#include "sscImage.h"
-#include "sscDataMetric.h"
-#include "sscPointMetric.h"
+#include "cxMesh.h"
+#include "cxImage.h"
+#include "cxDataMetric.h"
+#include "cxPointMetric.h"
 #include "cxViewWrapper.h"
-#include "sscTypeConversions.h"
-
+#include "cxTypeConversions.h"
+#include "cxtestSpaceProviderMock.h"
 
 TEST_CASE("Sort cx::Data user-frindly using getPriority()", "[unit][service][visualization]")
 {
@@ -35,7 +35,7 @@ TEST_CASE("Sort cx::Data user-frindly using getPriority()", "[unit][service][vis
 	cx::ImagePtr image_usa(new cx::Image("image1_usa", vtkImageDataPtr()));
 	image_usa->setModality("US");
 	image_usa->setImageType("Angio");
-	cx::PointMetricPtr point(new cx::PointMetric("point1    "));
+	cx::PointMetricPtr point = cx::PointMetric::create("point1    ", "", cx::DataServicePtr(), cxtest::SpaceProviderMock::create());
 
 	std::vector<cx::DataPtr> unsorted1;
 	unsorted1.push_back(image_us);
@@ -61,30 +61,17 @@ TEST_CASE("Sort cx::Data user-frindly using getPriority()", "[unit][service][vis
 
 	std::sort(unsorted1.begin(), unsorted1.end(), &cx::dataTypeSort);
 
-//    std::cout << std::endl;
-//    for (unsigned i=0; i<sorted.size(); ++i)
-//    {
-//        std::cout << "pri\t" << cx::getPriority(sorted[i]) << "\tbase\t" << sorted[i]->getName() << "\tsort:\t" << unsorted1[i]->getName() << std::endl;
-//    }
-
 	// check sorting success
 	CHECK(unsorted1.size()==sorted.size());
 	for (unsigned i=0; i<sorted.size(); ++i)
 		CHECK(unsorted1[i]==sorted[i]);
 
 	// test cx::ViewGroupData::addDataSorted()
-	cx::ViewGroupData vgData;
+	cx::VisualizationServiceBackendPtr nullBackend;
+	cx::ViewGroupData vgData(nullBackend);
 	for (unsigned i=0; i<unsorted2.size(); ++i)
 		vgData.addDataSorted(unsorted2[i]);
 	std::vector<cx::DataPtr> sorted2 = vgData.getData();
-
-//    std::cout << std::endl;
-//    std::cout << "sizes: " << sorted.size() << " " << sorted2.size() << std::endl;
-//    for (unsigned i=0; i<sorted.size(); ++i)
-//    {
-//        std::cout << "pri\t" << cx::getPriority(sorted[i]) << "\tbase\t" << sorted[i]->getName()
-//                   << "pri\t" << cx::getPriority(sorted2[i]) << "\tsort:\t" << sorted2[i]->getName() << std::endl;
-//    }
 
 	// check sorting success
 	CHECK(sorted2.size()==sorted.size());

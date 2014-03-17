@@ -12,23 +12,29 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "sscReconstructParams.h"
-#include "sscBoolDataAdapterXml.h"
+#include "cxReconstructParams.h"
+#include "cxBoolDataAdapterXml.h"
 #include "catch.hpp"
 #include "cxtestReconstructManagerFixture.h"
 #include "cxtestReconstructRealData.h"
 #include "cxtestSyntheticReconstructInput.h"
 
+#include "cxDummyTool.h"
+#include "cxPNNReconstructAlgorithm.h"
+#include "cxReconstructPreprocessor.h"
+#include <vtkImageData.h>
+#include "cxStringDataAdapterXml.h"
 #include "recConfig.h"
-#ifdef SSC_USE_OpenCL
-	#include "TordReconstruct/TordTest.h"
-  #include "TordReconstruct/cxSimpleSyntheticVolume.h"
-#endif // SSC_USE_OpenCL
+
+#ifdef CX_USE_OPENCL_UTILITY
+#include "TordReconstruct/TordTest.h"
+#include "TordReconstruct/cxSimpleSyntheticVolume.h"
+#endif // CX_USE_OPENCL_UTILITY
 
 namespace cxtest
 {
 
-TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][synthetic][ca_rec6][ca_rec]")
+TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][synthetic][not_win32][ca_rec]")
 {
 	ReconstructManagerTestFixture fixture;
 	fixture.setVerbose(true);
@@ -112,7 +118,7 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 	}
 }
 
-TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstruction][integration]")
+TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstruction][integration][not_win32]")
 {
 	ReconstructManagerTestFixture fixture;
 	ReconstructRealTestData realData;
@@ -132,7 +138,7 @@ TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstru
 	realData.validateAngioData(fixture.getOutput()[0]);
 }
 
-TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruction][integration]")
+TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruction][integration][not_win32]")
 {
 	ReconstructManagerTestFixture fixture;
 	ReconstructRealTestData realData;
@@ -154,8 +160,51 @@ TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruc
 
 }
 
-#ifdef SSC_USE_OpenCL
-TEST_CASE("ReconstructManager: TordTest on real data", "[usreconstruction][integration][tordtest][hide]")
+TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integration][usreconstruction][synthetic][not_win32]")
+{
+	ReconstructManagerTestFixture fixture;
+	fixture.setVerbose(true);
+
+	SyntheticReconstructInputPtr generator(new SyntheticReconstructInput);
+	Eigen::Array2i frameSize = Eigen::Array2i(150,150);
+	Eigen::Array2i extent = frameSize - 1;
+	cx::ProbeDefinition probeDefinition = cx::DummyToolTestUtilities::createProbeDataLinear(100, 100, frameSize);
+
+	//Adding 2 sections creates 3 runs: 1 with the simple case clip rect == extent, the other 2 with extent+1 and +500
+	SECTION("Set clip rect just to large")
+		probeDefinition.setClipRect_p(cx::DoubleBoundingBox3D(0, extent[0]+1, 0, extent[1]+1, 0, 0));
+    SECTION("Set clip rect very large")
+		probeDefinition.setClipRect_p(cx::DoubleBoundingBox3D(0, extent[0]+500, 0, extent[1]+500, 0, 0));
+
+	generator->defineProbe(probeDefinition);
+
+	generator->setSpherePhantom();
+	cx::USReconstructInputData inputData = generator->generateSynthetic_USReconstructInputData();
+
+	cx::ReconstructManagerPtr reconstructer = fixture.getManager();
+	reconstructer->selectData(inputData);
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
+	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
+	fixture.setPNN_InterpolationSteps(1);// set an algorithm-specific parameter
+
+	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
+	REQUIRE(preprocessor);
+	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
+	REQUIRE(!cores.empty());
+	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(cores);
+
+	REQUIRE(processedInput.size() == cores.size());
+	{
+		Eigen::Array3i dimFirstFrame = processedInput[0]->getDimensions();
+		dimFirstFrame[2] = 1;
+		INFO("Clip prect: " << probeDefinition.getClipRect_p());
+		INFO(dimFirstFrame << " == " << Eigen::Array3i(processedInput[0]->getMask()->GetDimensions()));
+		REQUIRE(dimFirstFrame.isApprox(Eigen::Array3i(processedInput[0]->getMask()->GetDimensions())));
+	}
+}
+
+#ifdef CX_USE_OPENCL_UTILITY
+TEST_CASE("ReconstructManager: TordTest on real data", "[usreconstruction][integration][tordtest][not_apple][unstable]")
 {
 	ReconstructManagerTestFixture fixture;
 	ReconstructRealTestData realData;
@@ -214,7 +263,7 @@ TEST_CASE("ReconstructManager: TordTest on real data", "[usreconstruction][integ
 	REQUIRE(fixture.getOutput().size()==1);
 	realData.validateBModeData(fixture.getOutput()[0]);
 }
-#endif // SSC_USE_OpenCL
+#endif // CX_USE_OPENCL_UTILITY
 
 
 } // namespace cxtest

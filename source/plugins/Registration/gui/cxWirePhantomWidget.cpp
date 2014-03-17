@@ -18,28 +18,34 @@
 #include <QTextEdit>
 #include <vtkPolyData.h>
 #include <vtkPoints.h>
-#include "sscDataManager.h"
-#include "sscMesh.h"
+#include "cxDataManager.h"
+#include "cxMesh.h"
 #include "cxRegistrationManager.h"
 #include "cxDataLocations.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
 #include "vesselReg/SeansVesselReg.hxx"
 #include "cxViewManager.h"
-#include "sscPointMetric.h"
-#include "sscDistanceMetric.h"
+#include "cxPointMetric.h"
+#include "cxDistanceMetric.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
-#include "sscTool.h"
-#include "sscToolManager.h"
-#include "sscTypeConversions.h"
+#include "cxTool.h"
+#include "cxToolManager.h"
+#include "cxTypeConversions.h"
 #include "cxAcquisitionData.h"
-#include "sscReconstructManager.h"
+#include "cxReconstructManager.h"
 #include "cxPipelineWidget.h"
+#include "cxDataReaderWriter.h"
+#include "cxDataFactory.h"
 
 #include "cxSmoothingImageFilter.h"
 #include "cxBinaryThinningImageFilter3DFilter.h"
 #include "cxBinaryThresholdImageFilter.h"
+
+#include "cxLegacySingletons.h"
+#include "cxSpaceProvider.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -129,7 +135,7 @@ MeshPtr WirePhantomWidget::loadNominalCross()
 
     if (!retval)
     {
-        messageManager()->sendError(QString("failed to load %s.").arg(nominalCrossFilename));
+        reportError(QString("failed to load %s.").arg(nominalCrossFilename));
     }
 
     retval->setColor(QColor("green"));
@@ -140,7 +146,7 @@ MeshPtr WirePhantomWidget::loadNominalCross()
 
 void WirePhantomWidget::showData(DataPtr data)
 {
-    viewManager()->getViewGroups()[0]->getData()->addData(data);
+	viewManager()->getViewGroups()[0]->getData()->addData(data);
 }
 
 void WirePhantomWidget::measureSlot()
@@ -188,7 +194,7 @@ void WirePhantomWidget::registration()
     MeshPtr nominalCross = this->loadNominalCross();
     if (!nominalCross || !measuredCross)
     {
-        messageManager()->sendError("Missing fixed/moving data. WirePhantom measurement failed.");
+        reportError("Missing fixed/moving data. WirePhantom measurement failed.");
         return;
     }
 
@@ -208,7 +214,7 @@ void WirePhantomWidget::registration()
     bool success = vesselReg.execute(mManager->getMovingData(), mManager->getFixedData(), logPath);
     if (!success)
     {
-        messageManager()->sendWarning("Vessel registration failed.");
+        reportWarning("Vessel registration failed.");
         return;
     }
 
@@ -265,7 +271,7 @@ void WirePhantomWidget::registration()
     result += QString("Angle: \t%1\t*\n").arg(fmt(angle / M_PI * 180.0));
 
     mResults->append(result);
-    messageManager()->sendInfo("Wire Phantom Test Results:\n"+result);
+	report("Wire Phantom Test Results:\n"+result);
 
     this->showDataMetrics(cross_r);
 }
@@ -278,33 +284,38 @@ void WirePhantomWidget::registration()
 void WirePhantomWidget::showDataMetrics(Vector3D cross_r)
 {
     // add metrics displaying the distance from cross in the nominal and us spaces:
-    Transform3D usMnom = SpaceHelpers::get_toMfrom(SpaceHelpers::getD(mManager->getFixedData()), SpaceHelpers::getD(mManager->getMovingData()));
+	Transform3D usMnom = spaceProvider()->get_toMfrom(
+				spaceProvider()->getD(mManager->getFixedData()),
+				spaceProvider()->getD(mManager->getMovingData()));
     Vector3D cross_us = usMnom.coord(cross_r);
 
     PointMetricPtr p1 = boost::dynamic_pointer_cast<PointMetric>(dataManager()->getData("cross_nominal"));
     if (!p1)
-        p1.reset(new PointMetric("cross_nominal", "cross_nominal"));
+		p1 = dataManager()->getDataFactory()->createSpecific<PointMetric>("cross_nominal");
+//		p1 = PointMetric::create("cross_nominal", "cross_nominal");
     p1->get_rMd_History()->setParentSpace(mManager->getFixedData()->getUid());
-    p1->setSpace(SpaceHelpers::getD(mManager->getFixedData()));
+	p1->setSpace(spaceProvider()->getD(mManager->getFixedData()));
     p1->setCoordinate(cross_r);
     dataManager()->loadData(p1);
     //this->showData(p1);
 
     PointMetricPtr p2 = boost::dynamic_pointer_cast<PointMetric>(dataManager()->getData("cross_us"));
     if (!p2)
-        p2.reset(new PointMetric("cross_us", "cross_us"));
+		p2 = dataManager()->getDataFactory()->createSpecific<PointMetric>("cross_us");
+//		p2 = PointMetric::create("cross_us", "cross_us");
     p2->get_rMd_History()->setParentSpace(mManager->getMovingData()->getUid());
-    p2->setSpace(SpaceHelpers::getD(mManager->getMovingData()));
+	p2->setSpace(spaceProvider()->getD(mManager->getMovingData()));
     p2->setCoordinate(cross_us);
     dataManager()->loadData(p2);
     //this->showData(p2);
 
     DistanceMetricPtr d0 = boost::dynamic_pointer_cast<DistanceMetric>(dataManager()->getData("accuracy"));
     if (!d0)
-        d0.reset(new DistanceMetric("accuracy", "accuracy"));
+		d0 = dataManager()->getDataFactory()->createSpecific<DistanceMetric>("accuracy");
+//        d0.reset(new DistanceMetric("accuracy", "accuracy"));
     d0->get_rMd_History()->setParentSpace("reference");
-    d0->setArgument(0, p1);
-    d0->setArgument(1, p2);
+	d0->getArguments()->set(0, p1);
+	d0->getArguments()->set(1, p2);
     dataManager()->loadData(d0);
     this->showData(d0);
 }
@@ -323,7 +334,7 @@ std::pair<QString, Transform3D> WirePhantomWidget::getLastProbePosition()
     if (usData.mPositions.empty())
         return std::make_pair("", Transform3D::Identity());
     prMt_us = usData.mPositions[usData.mPositions.size()/2].mPos;
-    Transform3D rMt_us = (*ToolManager::getInstance()->get_rMpr()) * prMt_us;
+	Transform3D rMt_us = dataManager()->get_rMpr() * prMt_us;
     return std::make_pair(usData.mFilename, prMt_us);
 }
 
@@ -336,7 +347,7 @@ void WirePhantomWidget::generate_sMt()
     Transform3D rMt_us = probePos.second;
     if (probePos.first.isEmpty())
     {
-        messageManager()->sendWarning("Cannot find probe position from last recording, aborting calibration test.");
+        reportWarning("Cannot find probe position from last recording, aborting calibration test.");
         return;
     }
 
@@ -344,19 +355,19 @@ void WirePhantomWidget::generate_sMt()
     ToolPtr probe = toolManager()->getTool(usData.mProbeUid);
     if (!probe || !probe->hasType(Tool::TOOL_US_PROBE))
     {
-        messageManager()->sendWarning("Cannot find probe, aborting calibration test.");
+        reportWarning("Cannot find probe, aborting calibration test.");
         return;
     }
 
 //	ToolPtr probe = toolManager()->getDominantTool();
 //	if (!probe || !probe->getVisible() || !probe->hasType(Tool::TOOL_US_PROBE))
 //	{
-//		messageManager()->sendWarning("Cannot find visible probe, aborting calibration test.");
+//		reportWarning("Cannot find visible probe, aborting calibration test.");
 //		return;
 //	}
     if (!mManager->getMovingData())
     {
-        messageManager()->sendWarning("Cannot find moving data, aborting calibration test.");
+        reportWarning("Cannot find moving data, aborting calibration test.");
         return;
     }
 
@@ -382,7 +393,7 @@ void WirePhantomWidget::generate_sMt()
 
         sQt = sMt * createTransformTranslate(diff_tus);
 
-        messageManager()->sendInfo(QString(""
+		report(QString(""
                 "Calculated new calibration matrix\n"
                 "adding only translation "
                 "from last accuracy test\n"
@@ -394,7 +405,7 @@ void WirePhantomWidget::generate_sMt()
         Transform3D prMt = rMt_us;
         Transform3D sMt = probe->getCalibration_sMt();
         Transform3D prMs = prMt * sMt.inv();
-        Transform3D usMpr = mManager->getMovingData()->get_rMd().inv() * *toolManager()->get_rMpr();
+		Transform3D usMpr = mManager->getMovingData()->get_rMd().inv() * dataManager()->get_rMpr();
         Transform3D nomMus = mLastRegistration.inv();
 
         Transform3D sQt; // Q is the new calibration matrix.
@@ -406,7 +417,7 @@ void WirePhantomWidget::generate_sMt()
 
         sQt = usMs.inv() * nomMus * usMs * sMt;
 
-		messageManager()->sendInfo(QString(""
+		report(QString(""
 												"Calculated new calibration matrix\n"
 												"from last accuracy test\n"
 												"and raw data %1.\n"

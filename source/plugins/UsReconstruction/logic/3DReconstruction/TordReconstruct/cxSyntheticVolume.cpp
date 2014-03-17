@@ -1,12 +1,12 @@
 #include "cxSyntheticVolume.h"
 #include "vtkImageData.h"
-#include "sscImage.h"
+#include "cxImage.h"
 #include <cstdlib>
 #include <time.h>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include <QTime>
-#include "sscLogger.h"
-#include "sscRegistrationTransform.h"
+#include "cxLogger.h"
+#include "cxRegistrationTransform.h"
 
 double noiseValue(double noiseSigma,
                          double noiseMean)
@@ -77,7 +77,7 @@ cxSyntheticVolume::sampleUsData(const std::vector<Transform3D>& planes_rMf,
 	// For each plane
 	for(std::vector<Transform3D>::const_iterator i = planes_rMf.begin();
 		planes_rMf.end() != i;
-	    i++)
+			++i)
 	{
 		const Transform3D rMf = *i;
 
@@ -107,8 +107,7 @@ cxSyntheticVolume::sampleUsData(const Transform3D& rMf,
 								const Eigen::Array2i& sliceDimension,
 								const double noiseSigma, const unsigned char noiseMean) const
 {
-	// Seed the random number generator
-	srand(time(NULL));
+
 
 	const Vector3D p0 = rMf.coord(Vector3D(0,0,0));
 	const Vector3D e_x = rMf.vector(Vector3D(pixelSpacing[0],0,0));

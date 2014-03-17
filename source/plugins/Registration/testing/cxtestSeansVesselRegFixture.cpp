@@ -3,13 +3,14 @@
 #include <vtkPolyData.h>
 #include <vtkPolyDataWriter.h>
 #include <vtkCellArray.h>
-#include "sscDataManager.h"
-#include "sscMesh.h"
+#include "cxDataManager.h"
+#include "cxMesh.h"
 #include "cxDataLocations.h"
 #include "vesselReg/SeansVesselReg.hxx"
-#include "sscRegistrationTransform.h"
-#include "sscTypeConversions.h"
+#include "cxRegistrationTransform.h"
+#include "cxTypeConversions.h"
 #include <QDir>
+#include "cxLogicManager.h"
 
 #include "catch.hpp"
 
@@ -28,12 +29,13 @@ SeansVesselRegFixture::~SeansVesselRegFixture()
 void SeansVesselRegFixture::setUp()
 {
 	cx::DataLocations::setTestMode();
-
+	cx::LogicManager::initialize();
 }
 
 void SeansVesselRegFixture::tearDown()
 {
-	cx::DataManager::shutdown();
+	cx::LogicManager::shutdown();
+//	cx::DataManager::shutdown();
 }
 
 /**return endpoint
@@ -190,9 +192,9 @@ void SeansVesselRegFixture::doTestVessel2VesselRegistration(
 	}
 
 	cx::DataPtr source = cx::dataManager()->loadData("source_" + filenameSource,
-			filenameSource, cx::rtAUTO);
+			filenameSource);
 	cx::DataPtr target = cx::dataManager()->loadData("target_" + filenameTarget,
-			filenameTarget, cx::rtAUTO);
+			filenameTarget);
 	CHECK(source);
 	CHECK(target);
 	source->get_rMd_History()->setRegistration(perturbation);

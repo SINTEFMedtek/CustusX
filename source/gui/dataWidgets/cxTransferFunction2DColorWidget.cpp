@@ -1,7 +1,7 @@
 #include "cxTransferFunction2DColorWidget.h"
-#include "sscDoubleWidgets.h"
-#include "sscDataManager.h"
-#include "sscImageLUT2D.h"
+#include "cxDoubleWidgets.h"
+#include "cxDataManager.h"
+#include "cxImageLUT2D.h"
 
 namespace cx
 {
@@ -18,7 +18,7 @@ TransferFunction2DColorWidget::TransferFunction2DColorWidget(QWidget* parent) :
   mDataWindow.reset(new DoubleDataAdapterImageTFDataWindow);
   mDataLevel.reset(new DoubleDataAdapterImageTFDataLevel);
 
-  mActiveImageProxy = ActiveImageProxy::New();
+  mActiveImageProxy = ActiveImageProxy::New(dataService());
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
@@ -60,8 +60,8 @@ void TransferFunction2DColorWidget::activeImageChangedSlot()
   mTransferFunctionColorWidget->setData(image, tf);
   mTransferFunctionAlphaWidget->setData(image, tf);
 
-  mDataWindow->setImageTFData(tf);
-  mDataLevel->setImageTFData(tf);
+  mDataWindow->setImageTFData(tf, image);
+  mDataLevel->setImageTFData(tf, image);
 }
 
 

@@ -23,7 +23,7 @@ namespace cx
 
 /**
 * \file
-* \addtogroup cxResourceSettings
+* \addtogroup cx_resource_core_settings
 * @{
 */
 

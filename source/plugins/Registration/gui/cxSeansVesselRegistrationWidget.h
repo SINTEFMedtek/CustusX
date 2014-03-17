@@ -2,7 +2,7 @@
 #define CXSEANSVESSELREGISTRATIONWIDGET_H_
 
 #include "cxRegistrationBaseWidget.h"
-#include "sscStringDataAdapter.h"
+#include "cxStringDataAdapter.h"
 
 class QSpinBox;
 class QPushButton;
@@ -14,7 +14,7 @@ typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegi
 
 /**
  * \file
- * \addtogroup cxPluginRegistration
+ * \addtogroup cx_plugin_registration
  * @{
  */
 
@@ -43,6 +43,7 @@ private slots:
   void debugRunOneNonlinearStep();
   void debugClear();
   void debugApply();
+	void inputChanged();
 
 private:
   QWidget* createOptionsWidget();
@@ -52,6 +53,8 @@ private:
   QCheckBox* mLinearCheckBox;
   QCheckBox* mAutoLTSCheckBox;
   QPushButton* mRegisterButton;
+	QPushButton* mVesselRegOptionsButton;
+	QGroupBox* mVesselRegOptionsWidget;
 
   StringDataAdapterPtr mFixedImage;
   StringDataAdapterPtr mMovingImage;

@@ -14,7 +14,7 @@
 
 #include "cxFrameMetricRep.h"
 
-#include "sscView.h"
+#include "cxView.h"
 #include "boost/bind.hpp"
 #include "cxGraphicalAxes3D.h"
 
@@ -43,7 +43,7 @@ FrameMetricPtr FrameMetricRep::getFrameMetric()
     return boost::dynamic_pointer_cast<FrameMetric>(mMetric);
 }
 
-void FrameMetricRep::changedSlot()
+void FrameMetricRep::onModifiedStartRender()
 {
     FrameMetricPtr metric = this->getFrameMetric();
 

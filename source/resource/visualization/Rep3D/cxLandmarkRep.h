@@ -15,12 +15,14 @@
 #ifndef CXLANDMARKREP_H_
 #define CXLANDMARKREP_H_
 
-#include <sscRepImpl.h>
+#include "cxRepImpl.h"
 
 #include <map>
-#include <sscImage.h>
+#include <QColor>
+#include "cxImage.h"
 #include "vtkForwardDeclarations.h"
-#include "sscGraphicalPrimitives.h"
+#include "cxGraphicalPrimitives.h"
+#include "cxLandmark.h"
 
 namespace cx
 {
@@ -29,11 +31,12 @@ class View;
 
 namespace cx
 {
-class MessageManager;
+class DataManager;
+class Reporter;
 typedef boost::shared_ptr<class LandmarkRep> LandmarkRepPtr;
 
 /**
- * \addtogroup cxServiceVisualizationRep
+ * \addtogroup cx_resource_visualization
  * @{
  */
 
@@ -54,12 +57,14 @@ typedef boost::shared_ptr<class PatientLandmarksSource> PatientLandmarksSourcePt
 class PatientLandmarksSource: public LandmarksSource
 {
 public:
-	static PatientLandmarksSourcePtr New() { return PatientLandmarksSourcePtr(new PatientLandmarksSource()); }
-	PatientLandmarksSource();
+	static PatientLandmarksSourcePtr New(DataServicePtr dataManager) { return PatientLandmarksSourcePtr(new PatientLandmarksSource(dataManager)); }
+	PatientLandmarksSource(DataServicePtr dataManager);
 	virtual ~PatientLandmarksSource() {}
 	virtual LandmarkMap getLandmarks() const;
 	virtual Transform3D get_rMl() const;
 	virtual Vector3D getTextPos(Vector3D p_l) const;
+private:
+	DataServicePtr mDataManager;
 };
 
 typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
@@ -86,8 +91,7 @@ private:
  * \class LandmarkRep
  *
  * \brief
- * \ingroup cxServiceVisualizationRep
- *
+ * \ingroup cx_resource_visualization
  * \date Dec 10, 2008
  * \\author Janne Beate Bakeng, SINTEF
  * \\author Christian Askeland, SINTEF
@@ -96,11 +100,11 @@ class LandmarkRep: public RepImpl
 {
 Q_OBJECT
 public:
-	static LandmarkRepPtr New(const QString& uid, const QString& name = "");
+	static LandmarkRepPtr New(DataServicePtr dataManager, const QString& uid, const QString& name = "");
 	virtual ~LandmarkRep();
 
-	void setColor(Vector3D color); ///< sets the reps color
-	void setSecondaryColor(Vector3D color); ///< sets the reps color
+	void setColor(QColor color); ///< sets the reps color
+	void setSecondaryColor(QColor color); ///< sets the reps color
 	void showLandmarks(bool on); ///< turn on or off showing landmarks
 	void setGraphicsSize(double size);
 	void setLabelSize(double size);
@@ -110,7 +114,7 @@ public:
 	void setSecondarySource(LandmarksSourcePtr secondary);
 
 protected:
-	LandmarkRep(const QString& uid, const QString& name = ""); ///< sets default text scaling to 20
+	LandmarkRep(DataServicePtr dataManager, const QString& uid, const QString& name = ""); ///< sets default text scaling to 20
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
 	void clearAll();
@@ -121,9 +125,9 @@ protected slots:
 	void internalUpdate(); ///< updates the text, color, scale etc
 
 protected:
-	Vector3D mInactiveColor; ///< color given to inactive landmarks
-	Vector3D mColor; ///< the color of the landmark actors
-	Vector3D mSecondaryColor; ///< color used on the secondary coordinate
+	QColor mInactiveColor; ///< color given to inactive landmarks
+	QColor mColor; ///< the color of the landmark actors
+	QColor mSecondaryColor; ///< color used on the secondary coordinate
 	bool mShowLandmarks; ///< whether or not the actors should be showed in (all) views
 	double mGraphicsSize;
 	double mLabelSize;
@@ -142,6 +146,8 @@ protected:
 
 	LandmarksSourcePtr mPrimary;
 	LandmarksSourcePtr mSecondary;
+
+	DataServicePtr mDataManager;
 
 private:
 	LandmarkRep(); ///< not implemented

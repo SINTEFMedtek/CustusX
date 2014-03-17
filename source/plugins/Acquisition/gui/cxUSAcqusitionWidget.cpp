@@ -3,24 +3,24 @@
 #include <QtGui>
 #include <QVBoxLayout>
 #include "boost/bind.hpp"
-#include "sscToolManager.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscDoubleWidgets.h"
-#include "sscTypeConversions.h"
+#include "cxToolManager.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxDoubleWidgets.h"
+#include "cxTypeConversions.h"
 #include "cxPatientData.h"
 #include "cxSoundSpeedConversionWidget.h"
 #include "cxRecordSessionWidget.h"
 #include "cxSettings.h"
 #include "cxToolDataAdapters.h"
 #include "cxDoubleDataAdapterTemporalCalibration.h"
-#include "sscReconstructManager.h"
+#include "cxReconstructManager.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxProbeConfigWidget.h"
 #include "cxDisplayTimerWidget.h"
-#include "sscReconstructParams.h"
+#include "cxReconstructParams.h"
 #include "cxTimedAlgorithm.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscStringDataAdapterXml.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxStringDataAdapterXml.h"
 
 namespace cx
 {
@@ -38,8 +38,9 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 
 	connect(mBase.get(), SIGNAL(stateChanged()), this, SLOT(acquisitionStateChangedSlot()));
 	connect(mBase.get(), SIGNAL(started()), this, SLOT(recordStarted()));
-	connect(mBase.get(), SIGNAL(stopped()), this, SLOT(recordStopped()));
+	connect(mBase.get(), SIGNAL(acquisitionStopped()), this, SLOT(recordStopped()), Qt::DirectConnection);
 	connect(mBase.get(), SIGNAL(cancelled()), this, SLOT(recordCancelled()));
+	connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), mPluginData->getReconstructer().get(), SIGNAL(newInputDataAvailable(QString)));
 
 	mRecordSessionWidget->setDescriptionVisibility(false);
 

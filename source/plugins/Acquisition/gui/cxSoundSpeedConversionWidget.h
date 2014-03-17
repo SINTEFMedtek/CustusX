@@ -3,6 +3,7 @@
 
 #include "cxBaseWidget.h"
 #include "cxTool.h"
+#include "cxLegacySingletons.h"
 
 class QPushButton;
 class QDoubleSpinBox;
@@ -11,7 +12,7 @@ namespace cx
 {
 /**
 * \file
-* \addtogroup cxPluginAcquisition
+* \addtogroup cx_plugin_acquisition
 * @{
 */
 

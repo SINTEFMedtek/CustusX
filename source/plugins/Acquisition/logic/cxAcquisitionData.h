@@ -19,6 +19,7 @@
 class QDomNode;
 #include <vector>
 #include "cxRecordSession.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
@@ -29,7 +30,7 @@ namespace cx
 {
 /**
 * \file
-* \addtogroup cxPluginAcquisition
+* \addtogroup cx_plugin_acquisition
 * @{
 */
 
@@ -142,7 +143,7 @@ signals:
 	/** emitted when state changes from sRUNNING
 	  * with valid recording data.
 	  */
-	void stopped();
+	void acquisitionStopped();
 	/** emitted when state changes from sRUNNING
 	  * without valid recording data.
 	  */

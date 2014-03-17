@@ -17,18 +17,18 @@
 #include <QtConcurrentRun>
 #include "boost/bind.hpp"
 
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscTime.h"
-#include "sscTool.h"
-#include "sscVideoSource.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
+#include "cxTime.h"
+#include "cxTool.h"
+#include "cxVideoSource.h"
 
 #include "cxDataLocations.h"
 #include "cxSavingVideoRecorder.h"
 #include "cxImageDataContainer.h"
 #include "cxRecordSession.h"
 #include "cxUsReconstructionFileMaker.h"
-#include "sscLogger.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -37,6 +37,15 @@ namespace cx
 USSavingRecorder::USSavingRecorder() : mDoWriteColor(true), m_rMpr(Transform3D::Identity())
 {
 
+}
+
+USSavingRecorder::~USSavingRecorder()
+{
+	std::list<QFutureWatcher<QString>*>::iterator iter;
+	for (iter=mSaveThreads.begin(); iter!=mSaveThreads.end(); ++iter)
+	{
+		(*iter)->waitForFinished();
+	}
 }
 
 void USSavingRecorder::setWriteColor(bool on)
@@ -72,14 +81,14 @@ void USSavingRecorder::startRecord(RecordSessionPtr session, ToolPtr tool, std::
 		mVideoRecorder.push_back(videoRecorder);
 	}
 
-	messageManager()->sendSuccess("Ultrasound acquisition started.");
+	reportSuccess("Ultrasound acquisition started.");
 }
 
 void USSavingRecorder::stopRecord()
 {
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 		mVideoRecorder[i]->stopRecord();
-	messageManager()->sendSuccess("Ultrasound acquisition stopped.");
+	reportSuccess("Ultrasound acquisition stopped.");
 
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 	{
@@ -92,7 +101,7 @@ void USSavingRecorder::stopRecord()
 void USSavingRecorder::cancelRecord()
 {
 	this->clearRecording();
-	messageManager()->sendInfo("Ultrasound acquisition cancelled.");
+	report("Ultrasound acquisition cancelled.");
 }
 
 USReconstructInputData USSavingRecorder::getDataForStream(QString streamUid)

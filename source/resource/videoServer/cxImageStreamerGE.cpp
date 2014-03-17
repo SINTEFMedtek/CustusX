@@ -25,8 +25,8 @@
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
 #include "vtkMetaImageWriter.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
 #include "cxDataLocations.h"
 #include "geConfig.h"
 #include "vtkImageChangeInformation.h"
@@ -46,7 +46,7 @@ ImageStreamerGE::ImageStreamerGE() :
 	mExportVelocity(false)
 {
 	//data_streaming::DataStreamApp test;
-	mRenderTimer.reset(new CyclicActionTimer("GE Grabber Timer"));
+	mRenderTimer.reset(new CyclicActionLogger("GE Grabber Timer"));
 
 	this->setSendInterval(40);
 
@@ -132,7 +132,7 @@ void ImageStreamerGE::initialize(StringMap arguments)
 		}
 		if (imageSize <= 1)
 		{
-			messageManager()->sendError("Error with calculated image size. imagesize: " + mArguments["imagesize"] + " = " + qstring_cast(imageSize));
+			reportError("Error with calculated image size. imagesize: " + mArguments["imagesize"] + " = " + qstring_cast(imageSize));
 		}
 	}
 	else
@@ -167,7 +167,7 @@ void ImageStreamerGE::initialize(StringMap arguments)
    			mExportVelocity = true;
    		}
    		else
-   			messageManager()->sendWarning("ImageStreamerGE: Unknown stream: " + streamList.at(i));
+			reportWarning("ImageStreamerGE: Unknown stream: " + streamList.at(i));
    	}
 
 	bool useOpenCL = convertStringWithDefault(mArguments["useOpenCL"], 1);
@@ -179,6 +179,8 @@ void ImageStreamerGE::initialize(StringMap arguments)
 	//Setup the needed data stream types. The default is only scan converted data
 	mGEStreamer.SetupExportParameters(mExportScanconverted, mExportTissue, mExportBandwidth, mExportFrequency, mExportVelocity);
 
+	//Prevent copies of streamed data. Without this both tissue and flow frames trigger sending of data (resulting in all frames sent 2 times?)
+	mGEStreamer.SetForceTissueFrameRate(true);
 }
 
 QString findOpenCLPath(QString additionalLocation)
@@ -195,7 +197,7 @@ QString findOpenCLPath(QString additionalLocation)
 		path = QFileInfo(paths[2] + "/ScanConvertCL.cl");
 	if (!path.exists())
 	{
-		messageManager()->sendWarning("Error: Can't find ScanConvertCL.cl in any of\n  " + paths.join("  \n"));
+		reportWarning("Error: Can't find ScanConvertCL.cl in any of\n  " + paths.join("  \n"));
 	}
 	else
 		retval = path.absolutePath();
@@ -387,16 +389,20 @@ ProbeDefinitionPtr ImageStreamerGE::getFrameStatus(QString uid, data_streaming::
 	else //sector
 		retval = ProbeDefinitionPtr( new ProbeDefinition(ProbeDefinition::tSECTOR));
 
-		std::cout << "Geometry origin: " << geometry.origin[0] << " " << geometry.origin[1] << " " << geometry.origin[2] << std::endl;
-		std::cout << "Image origin: " << img->GetOrigin()[0] << " " << img->GetOrigin()[1] << " " << img->GetOrigin()[2] << std::endl;
+//		std::cout << "Geometry origin: " << geometry.origin[0] << " " << geometry.origin[1] << " " << geometry.origin[2] << std::endl;
+//		std::cout << "Image origin: " << img->GetOrigin()[0] << " " << img->GetOrigin()[1] << " " << img->GetOrigin()[2] << std::endl;
 
-		double yOffset = geometry.origin[1] * 1000;//m -> mm
-		double correctDepthStart = geometry.depthStart + yOffset;
-		double correctDepthEnd = geometry.depthEnd + yOffset;
+        double inputDepthStart = geometry.origin[1] * 1000;//m -> mm
+        double yImageOrigin = inputDepthStart * cos(geometry.width/2.0);
+        double correctDepthStart = geometry.depthStart - inputDepthStart;
+        double correctDepthEnd = geometry.depthEnd - inputDepthStart;
 
-		std::cout << "yOffset: " << yOffset << std::endl;
-		std::cout << "correctDepthStart: " << correctDepthStart << std::endl;
-		std::cout << "correctDepthEnd: " << correctDepthEnd << std::endl;
+
+//        std::cout << "width: " << geometry.width << std::endl;
+//        std::cout << "inputDepthStart: " << inputDepthStart << " mm" << std::endl;
+//        std::cout << "yImageOrigin: " << yImageOrigin << " mm" << std::endl;
+//		std::cout << "correctDepthStart: " << correctDepthStart << std::endl;
+//		std::cout << "correctDepthEnd: " << correctDepthEnd << std::endl;
 
 	// Set start and end of sector in mm from origin
 		// Set width of sector in mm for LINEAR, width of sector in radians for SECTOR.
@@ -406,17 +412,18 @@ ProbeDefinitionPtr ImageStreamerGE::getFrameStatus(QString uid, data_streaming::
 //	retval->setOrigin_p(Vector3D(geometry.origin[0] + img->GetOrigin()[0],
 //					geometry.origin[1]+ img->GetOrigin()[1],
 //					geometry.origin[2]+ img->GetOrigin()[2]));
-		retval->setOrigin_p(Vector3D(geometry.origin[0]*1000 + img->GetOrigin()[0],
-				geometry.origin[1]*1000 + img->GetOrigin()[1],
-				geometry.origin[2]*1000+ img->GetOrigin()[2]));
+        retval->setOrigin_p(Vector3D(geometry.origin[0]*1000 / img->GetSpacing()[0] + img->GetOrigin()[0],
+                                     //geometry.origin[1]*1000 / img->GetSpacing()[1] + img->GetOrigin()[1],
+                                     yImageOrigin / img->GetSpacing()[1] + img->GetOrigin()[1],
+                /*geometry.origin[2]*1000 +*/ img->GetOrigin()[2]));
 	retval->setSize(QSize(img->GetDimensions()[0], img->GetDimensions()[1]));
 	retval->setSpacing(Vector3D(img->GetSpacing()));
 	retval->setClipRect_p(DoubleBoundingBox3D(img->GetExtent()));
 
 	retval->setUid(uid);
 
-	std::cout << "depthStart: " << geometry.depthStart << " depthEnd: " << geometry.depthEnd << std::endl;
-	std::cout << "Origin: " << retval->getOrigin_p() << std::endl;
+//	std::cout << "depthStart: " << geometry.depthStart << " depthEnd: " << geometry.depthEnd << std::endl;
+//	std::cout << "Origin: " << retval->getOrigin_p() << std::endl;
 
 	return retval;
 }
@@ -440,7 +447,7 @@ void ImageStreamerGE::printTimeIntervals()
 	{
         static int counter=0;
         if (++counter%3==0)
-            messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
+			reporter()->sendDebug(mRenderTimer->dumpStatisticsSmall());
 	          std::cout << mRenderTimer->dumpStatisticsSmall() << std::endl;
         mRenderTimer->reset();
 	}

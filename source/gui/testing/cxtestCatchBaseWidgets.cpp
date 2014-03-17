@@ -51,7 +51,7 @@
 //cxPresetWidgets
 #include "cxTransferFunctionPresetWidget.h"
 //cxTabbedWidgets
-#include "cxImagePropertiesWidget.h"
+#include "cxSlicePropertiesWidget.h"
 #include "cxVolumePropertiesWidget.h"
 
 //All these widgets in the plugins folder should also be tested
@@ -111,13 +111,12 @@ void testAndDeleteBaseWidgetChild(cx::BaseWidget* widget)
 
 void init()
 {
-
 	cx::LogicManager::initialize();
-	cx::viewManager()->initialize();
+//	cx::viewManager()->initialize();
 }
 void shutdown()
 {
-	cx::viewManager()->destroyInstance();
+//	cx::viewManager()->destroyInstance();
 	cx::LogicManager::shutdown();
 }
 }
@@ -182,7 +181,7 @@ TEST_CASE("TabbedWidgets are correctly constructed", "[unit][gui][widget][not_wi
 {
 	init();
 	//cxTabbedWidgets
-	testAndDeleteBaseWidgetChild(new cx::ImagePropertiesWidget(NULL));
+	testAndDeleteBaseWidgetChild(new cx::SlicePropertiesWidget(NULL));
 	testAndDeleteBaseWidgetChild(new cx::VolumePropertiesWidget(NULL));
 	shutdown();
 }

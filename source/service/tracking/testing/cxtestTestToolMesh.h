@@ -1,7 +1,7 @@
 #ifndef CXTESTTESTTOOLMESH_H_
 #define CXTESTTESTTOOLMESH_H_
 
-#include "sscMesh.h"
+#include "cxMesh.h"
 #include <QString>
 
 namespace cxtest {
@@ -20,8 +20,8 @@ public:
 private:
 	QString mToolToolPath;
 	QString mCurrentToolPath;
-	QString mMeshFileName;
-	cx::DataPtr mMesh;
+//	QString mMeshFileName;
+//	cx::DataPtr mMesh;
 };
 
 } /* namespace cxtest */

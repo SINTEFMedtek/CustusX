@@ -11,8 +11,8 @@
 class TSFOutput;
 #endif //CX_USE_TSF
 
-#include "sscStringDataAdapterXml.h"
-#include "sscBoolDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
@@ -29,7 +29,7 @@ typedef boost::shared_ptr<class TSFPresets> TSFPresetsPtr;
  * Algorithm written by Erik Smistad. For more information, see paper:
  * "GPU-Based Airway Segmentation and Centerline Extraction for Image Guided Bronchoscopy."
  *
- * \ingroup cxPluginAlgorithm
+ * \ingroup cx_plugin_algorithm
  * \date 14.12.2012
  * \author Janne Beate Bakeng, SINTEF
  */
@@ -39,7 +39,7 @@ class TubeSegmentationFilter : public FilterImpl
 
 public:
 	TubeSegmentationFilter();
-	virtual ~TubeSegmentationFilter() {}
+	virtual ~TubeSegmentationFilter(); 
 
 	virtual QString getType() const;
 	virtual QString getName() const;

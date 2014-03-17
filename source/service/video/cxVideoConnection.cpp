@@ -29,26 +29,27 @@
 #include <vtkImageAppendComponents.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkExtractVOI.h>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxIGTLinkedImageReceiverThread.h"
-#include "sscMessageManager.h"
-#include "sscTime.h"
-#include "sscVector3D.h"
-#include "sscProbeData.h"
-#include "sscToolManager.h"
-#include "sscDataManager.h"
-#include "cxProbe.h"
+#include "cxReporter.h"
+#include "cxTime.h"
+#include "cxVector3D.h"
+#include "cxProbeData.h"
+#include "cxToolManager.h"
+#include "cxDataManager.h"
+#include "cxProbeImpl.h"
 #include "cxVideoService.h"
 #include "cxToolManager.h"
 #include "cxImageSenderFactory.h"
 #include "cxDirectlyLinkedImageReceiverThread.h"
-#include "sscTypeConversions.h"
-#include "sscImage.h"
-#include "sscData.h"
-#include "sscLogger.h"
-#include "sscVolumeHelpers.h"
-#include "cxRenderTimer.h"
+#include "cxTypeConversions.h"
+#include "cxImage.h"
+#include "cxData.h"
+#include "cxLogger.h"
+#include "cxVolumeHelpers.h"
+#include "cxCyclicActionLogger.h"
 #include "cxBasicVideoSource.h"
+#include "cxVideoServiceBackend.h"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
@@ -56,14 +57,15 @@ typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
 namespace cx
 {
 
-VideoConnection::VideoConnection()
+VideoConnection::VideoConnection(VideoServiceBackendPtr backend)
 {
+	mBackend = backend;
 	mConnected = false;
 	mUnsusedProbeDataVector.clear();
 
-	connect(toolManager(), SIGNAL(configured()),                 this, SLOT(connectVideoToProbe()));
-	connect(toolManager(), SIGNAL(initialized()),                this, SLOT(connectVideoToProbe()));
-	connect(toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectVideoToProbe()));
+	connect(mBackend->getToolManager().get(), SIGNAL(configured()),                 this, SLOT(connectVideoToProbe()));
+	connect(mBackend->getToolManager().get(), SIGNAL(initialized()),                this, SLOT(connectVideoToProbe()));
+	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectVideoToProbe()));
 }
 
 VideoConnection::~VideoConnection()
@@ -71,10 +73,10 @@ VideoConnection::~VideoConnection()
 	this->stopClient();
 }
 
-void VideoConnection::fpsSlot(double fpsNumber)
+void VideoConnection::fpsSlot(QString source, double fpsNumber)
 {
 	mFPS = fpsNumber;
-	emit fps(fpsNumber);
+	emit fps(source, fpsNumber);
 }
 
 bool VideoConnection::isConnected() const
@@ -97,6 +99,7 @@ void VideoConnection::connectedSlot(bool on)
 void VideoConnection::runDirectLinkClient(std::map<QString, QString> args)
 {
 	DirectlyLinkedImageReceiverThreadPtr imageReceiverThread(new DirectlyLinkedImageReceiverThread(args, this));
+	imageReceiverThread->setBackend(mBackend);
 	imageReceiverThread->setImageToStream(mImageUidToStream);
 	this->runClient(imageReceiverThread);
 }
@@ -117,7 +120,7 @@ void VideoConnection::runClient(ImageReceiverThreadPtr client)
 	connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
 	connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
 	connect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(statusReceivedSlot())); // thread-bridging connection
-	connect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
+	connect(mClient.get(), SIGNAL(fps(QString, double)), this, SLOT(fpsSlot(QString, double))); // thread-bridging connection
 	connect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
 
 	mClient->start();
@@ -148,13 +151,13 @@ void VideoConnection::stopClient()
 		{
 			mClient->terminate();
 			mClient->wait(); // forever or until dead thread
-			messageManager()->sendWarning(QString("Video Client [%1] did not quit normally - terminated.").arg(mClient->hostDescription()));
+			reportWarning(QString("Video Client [%1] did not quit normally - terminated.").arg(mClient->hostDescription()));
 		}
 
 		disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
 		disconnect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
 		disconnect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(statusReceivedSlot())); // thread-bridging connection
-		disconnect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
+		disconnect(mClient.get(), SIGNAL(fps(QString, double)), this, SLOT(fpsSlot(QString, double))); // thread-bridging connection
 		disconnect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
 
 		mClient.reset();
@@ -168,7 +171,7 @@ void VideoConnection::disconnectServer()
 	for (unsigned i=0; i<mSources.size(); ++i)
 		mSources[i]->setInput(ImagePtr());
 
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
 	if (tool && tool->getProbe())
 		this->removeSourceFromProbe(tool);
 
@@ -187,7 +190,7 @@ void VideoConnection::clientFinishedSlot()
 
 void VideoConnection::useUnusedProbeDataSlot()
 {
-	disconnect(cxToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+	disconnect(mBackend->getToolManager().get(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
 	for (std::vector<ProbeDefinitionPtr>::const_iterator citer = mUnsusedProbeDataVector.begin(); citer != mUnsusedProbeDataVector.end(); ++citer)
 		this->updateStatus(*citer);
 	mUnsusedProbeDataVector.clear();
@@ -199,16 +202,16 @@ void VideoConnection::useUnusedProbeDataSlot()
  */
 void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 {
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
 	if (!tool || !tool->getProbe())
 	{
 		//Don't throw away the ProbeData. Save it until it can be used
 		if (mUnsusedProbeDataVector.empty())
-			connect(cxToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+			connect(mBackend->getToolManager().get(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
 		mUnsusedProbeDataVector.push_back(msg);
 		return;
 	}
-	cxProbePtr probe = boost::dynamic_pointer_cast<cxProbe>(tool->getProbe());
+	ProbeImplPtr probe = boost::dynamic_pointer_cast<ProbeImpl>(tool->getProbe());
 
 	// start with getting a valid data object from the probe, in order to keep
 	// existing values (such as temporal calibration).
@@ -298,7 +301,7 @@ void VideoConnection::setImageToStream(QString uid)
  */
 void VideoConnection::connectVideoToProbe()
 {
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
 	if (!tool)
 		return;
 

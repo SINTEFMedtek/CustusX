@@ -20,11 +20,11 @@
 
 #include "catch.hpp"
 
-#include "sscVolumeHelpers.h"
-#include "sscVolumetricRep.h"
+#include "cxVolumeHelpers.h"
+#include "cxVolumetricRep.h"
 #include "cxtestUtilities.h"
-#include "sscMessageManager.h"
-#include "sscImage2DRep3D.h"
+#include "cxReporter.h"
+#include "cxImage2DRep3D.h"
 
 #include "cxMultiVolume3DRepProducer.h"
 

@@ -4,8 +4,8 @@
 #include <QWhatsThis>
 #include "boost/scoped_ptr.hpp"
 #include "boost/bind.hpp"
-#include "sscTime.h"
-#include "sscMessageManager.h"
+#include "cxTime.h"
+#include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
@@ -17,11 +17,11 @@
 #include "cxToolPropertiesWidget.h"
 #include "cxViewGroup.h"
 #include "cxPreferencesDialog.h"
-#include "cxImagePropertiesWidget.h"
+#include "cxSlicePropertiesWidget.h"
 #include "cxPatientData.h"
 #include "cxDataLocations.h"
 #include "cxMeshInfoWidget.h"
-#include "cxLayoutEditorWidget.h"
+//#include "cxLayoutEditorWidget.h"
 #include "cxFrameForest.h"
 #include "cxFrameTreeWidget.h"
 #include "cxImportDataDialog.h"
@@ -29,16 +29,16 @@
 #include "cxCameraControl.h"
 #include "cxSecondaryMainWindow.h"
 #include "cxVideoConnectionWidget.h"
-#include "cxAudio.h"
+#include "cxAudioImpl.h"
 #include "cxSettings.h"
 #include "cxVideoConnectionManager.h"
 #include "cxToolManagerWidget.h"
 #include "cxVideoService.h"
 #include "cxLogicManager.h"
 #include "cxExportDataDialog.h"
-#include "sscGPUImageBuffer.h"
-#include "sscData.h"
-#include "sscConsoleWidget.h"
+#include "cxGPUImageBuffer.h"
+#include "cxData.h"
+#include "cxConsoleWidget.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"
 #include "cxPatientService.h"
@@ -55,6 +55,9 @@
 #include "cxVLCRecorder.h"
 #include "cxSecondaryViewLayoutWindow.h"
 #include "cxRegistrationHistoryWidget.h"
+#include "cxLogger.h"
+#include "cxLayoutInteractor.h"
+#include "cxNavigation.h"
 
 namespace cx
 {
@@ -66,7 +69,8 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	stylesheet.open(QIODevice::ReadOnly);
 	qApp->setStyleSheet(stylesheet.readAll());
 
-	mCameraControl.reset(new CameraControl(this));
+	mCameraControl = viewManager()->getCameraControl();
+	mLayoutInteractor.reset(new LayoutInteractor());
 
 	viewManager()->initialize();
 	this->setCentralWidget(viewManager()->getLayoutWidget(0));
@@ -76,15 +80,14 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	this->createToolBars();
 	this->setStatusBar(new StatusBar());
 
-	messageManager()->setLoggingFolder(DataLocations::getRootConfigPath());
-	messageManager()->setAudioSource(AudioPtr(new AudioImpl()));
+	reporter()->setLoggingFolder(DataLocations::getRootConfigPath());
+	reporter()->setAudioSource(AudioPtr(new AudioImpl()));
 
 	connect(stateService()->getApplication().get(), SIGNAL(activeStateChanged()), this,
 		SLOT(onApplicationStateChangedSlot()));
 	connect(stateService()->getWorkflow().get(), SIGNAL(activeStateChanged()), this, SLOT(onWorkflowStateChangedSlot()));
 	connect(stateService()->getWorkflow().get(), SIGNAL(activeStateAboutToChange()), this, SLOT(saveDesktopSlot()));
 
-	mLayoutActionGroup = NULL;
 	this->updateWindowTitle();
 
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
@@ -93,7 +96,7 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	this->addAsDockWidget(new VideoConnectionWidget(this), "Utility");
 	this->addAsDockWidget(new EraserWidget(this), "Properties");
 	this->addAsDockWidget(new MetricWidget(this), "Utility");
-	this->addAsDockWidget(new ImagePropertiesWidget(this), "Properties");
+	this->addAsDockWidget(new SlicePropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new VolumePropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new MeshInfoWidget(this), "Properties");
 #ifdef SSC_USE_DCMTK
@@ -107,9 +110,6 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
 
 	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
-
-	connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
-
 
     // insert all widgets from all plugins
     for (unsigned i = 0; i < plugins.size(); ++i)
@@ -132,8 +132,6 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	QMenu* popupMenu = this->createPopupMenu();
 	popupMenu->setTitle("Window");
 	this->menuBar()->insertMenu(mHelpMenuAction, popupMenu);
-
-	this->layoutChangedSlot();
 
 	// Restore saved window states
 	// Must be done after all DockWidgets are created
@@ -223,7 +221,8 @@ void MainWindow::addToWidgetGroupMap(QAction* action, QString groupname)
 }
 
 MainWindow::~MainWindow()
-{}
+{
+}
 
 QMenu* MainWindow::createPopupMenu()
 {
@@ -281,10 +280,10 @@ void MainWindow::createActions()
 	mDebugModeAction = new QAction(tr("&Debug Mode"), this);
 	mDebugModeAction->setShortcut(tr("Ctrl+D"));
 	mDebugModeAction->setCheckable(true);
-	mDebugModeAction->setChecked(cxDataManager::getInstance()->getDebugMode());
+	mDebugModeAction->setChecked(dataManager()->getDebugMode());
 	mDebugModeAction->setStatusTip(tr("Set debug mode, this enables lots of weird stuff."));
-	connect(mDebugModeAction, SIGNAL(triggered(bool)), cxDataManager::getInstance(), SLOT(setDebugMode(bool)));
-	connect(cxDataManager::getInstance(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
+	connect(mDebugModeAction, SIGNAL(triggered(bool)), dataManager(), SLOT(setDebugMode(bool)));
+	connect(dataManager(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
 	connect(mDebugModeAction, SIGNAL(toggled(bool)), this, SLOT(toggleDebugModeSlot(bool)));
 
 	mFullScreenAction = new QAction(tr("Fullscreen"), this);
@@ -364,16 +363,6 @@ void MainWindow::createActions()
 	connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateTrackingActionSlot()));
 	connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateTrackingActionSlot()));
 	this->updateTrackingActionSlot();
-
-	mNewLayoutAction = new QAction(tr("New Layout"), this);
-	mNewLayoutAction->setToolTip("Create a new Custom Layout");
-	connect(mNewLayoutAction, SIGNAL(triggered()), this, SLOT(newCustomLayoutSlot()));
-	mEditLayoutAction = new QAction(tr("Edit Layout"), this);
-	mEditLayoutAction->setToolTip("Edit the current Custom Layout");
-	connect(mEditLayoutAction, SIGNAL(triggered()), this, SLOT(editCustomLayoutSlot()));
-	mDeleteLayoutAction = new QAction(tr("Delete Layout"), this);
-	mDeleteLayoutAction->setToolTip("Delete the current Custom Layout");
-	connect(mDeleteLayoutAction, SIGNAL(triggered()), this, SLOT(deleteCustomLayoutSlot()));
 
 	mCenterToImageCenterAction = new QAction(tr("Center Image"), this);
 	mCenterToImageCenterAction->setIcon(QIcon(":/icons/center_image.png"));
@@ -457,8 +446,8 @@ void MainWindow::saveScreenShot(QPixmap pixmap)
 void MainWindow::saveScreenShotThreaded(QImage pixmap, QString filename)
 {
 	pixmap.save(filename, "png");
-	messageManager()->sendInfo("Saved screenshot to " + filename);
-	messageManager()->playScreenShotSound();
+	report("Saved screenshot to " + filename);
+	reporter()->playScreenShotSound();
 }
 
 void MainWindow::toggleStreamingSlot()
@@ -485,17 +474,20 @@ void MainWindow::updateStreamingActionSlot()
 
 void MainWindow::centerToImageCenterSlot()
 {
+	NavigationPtr nav = viewManager()->getNavigation();
+
 	if (dataManager()->getActiveImage())
-		Navigation().centerToData(dataManager()->getActiveImage());
+		nav->centerToData(dataManager()->getActiveImage());
 	else if (!viewManager()->getViewGroups().empty())
-		Navigation().centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
+		nav->centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
 	else
-		Navigation().centerToGlobalDataCenter();
+		nav->centerToGlobalDataCenter();
 }
 
 void MainWindow::centerToTooltipSlot()
 {
-	Navigation().centerToTooltip();
+	NavigationPtr nav = viewManager()->getNavigation();
+	nav->centerToTooltip();
 }
 
 void MainWindow::togglePointPickerActionSlot()
@@ -549,7 +541,7 @@ void MainWindow::newPatientSlot()
 	if (!QDir().exists(patientDatafolder))
 	{
 		QDir().mkdir(patientDatafolder);
-		messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder);
+		report("Made a new patient folder: " + patientDatafolder);
 	}
 
 	QString timestamp = QDateTime::currentDateTime().toString(timestampFormatFolderFriendly()) + "_";
@@ -580,14 +572,14 @@ void MainWindow::clearPatientSlot()
 {
 	patientService()->getPatientData()->clearPatient();
 	patientService()->getPatientData()->writeRecentPatientData();
-	messageManager()->sendWarning("Cleared current patient data");
+	reportWarning("Cleared current patient data");
 }
 
 void MainWindow::savePatientFileSlot()
 {
 	if (patientService()->getPatientData()->getActivePatientFolder().isEmpty())
 	{
-		messageManager()->sendWarning("No patient selected, select or create patient before saving!");
+		reportWarning("No patient selected, select or create patient before saving!");
 		this->newPatientSlot();
 		return;
 	}
@@ -630,7 +622,8 @@ void MainWindow::onWorkflowStateChangedSlot()
 	for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter != mDockWidgets.end(); ++iter)
 		(*iter)->hide();
 
-	viewManager()->setActiveLayout(desktop.mLayoutUid);
+	viewManager()->setActiveLayout(desktop.mLayoutUid, 0);
+	viewManager()->setActiveLayout(desktop.mSecondaryLayoutUid, 1);
 	this->restoreState(desktop.mMainWindowState);
 	patientService()->getPatientData()->autoSave();
 }
@@ -639,7 +632,8 @@ void MainWindow::saveDesktopSlot()
 {
 	Desktop desktop;
 	desktop.mMainWindowState = this->saveState();
-	desktop.mLayoutUid = viewManager()->getActiveLayout();
+	desktop.mLayoutUid = viewManager()->getActiveLayout(0);
+	desktop.mSecondaryLayoutUid = viewManager()->getActiveLayout(1);
 	stateService()->saveDesktop(desktop);
 }
 
@@ -656,43 +650,11 @@ void MainWindow::showControlPanelActionSlot()
 	mControlPanel->show();
 }
 
-void print(QString header, QRect r)
-{
-	std::cout << header << "  (" << r.left() << ", " << r.top() << ", " << r.width() << ", " << r.height() << ")"<< std::endl;
-}
-
 void MainWindow::showSecondaryViewLayoutWindowActionSlot()
 {
 	if (!mSecondaryViewLayoutWindow)
 		mSecondaryViewLayoutWindow = new SecondaryViewLayoutWindow(this);
-
-	QDesktopWidget* desktop = QApplication::desktop();
-	print(QString("def screen:"), desktop->screenGeometry());
-	print(QString("screen 0:"), desktop->screenGeometry(0));
-
-	mSecondaryViewLayoutWindow->show();
-
-	if (desktop->screenCount()>1)
-	{
-		print(QString("screen 1:"), desktop->screenGeometry(1));
-		int bestScreen = 1;
-		for (int i=2; i<desktop->screenCount(); ++i)
-		{
-			print(QString("screen %1:").arg(i), desktop->screenGeometry(i));
-			QRect last = desktop->screenGeometry(bestScreen);
-			QRect current = desktop->screenGeometry(i);
-			if (current.height()*current.width() < last.height()*last.width())
-				bestScreen = i;
-
-		}
-
-		std::cout << "Displaying secondary view layout on screen " << bestScreen << std::endl;
-		QRect rect = desktop->screenGeometry(bestScreen);
-		print(QString("using rect:"), rect);
-		 mSecondaryViewLayoutWindow->setGeometry(rect);
-		 //mSecondaryViewLayoutWindow->setWindowState(mSecondaryViewLayoutWindow->windowState() | Qt::WindowFullScreen);
-	}
-
+	mSecondaryViewLayoutWindow->tryShowOnSecondaryScreen();
 }
 
 void MainWindow::loadPatientFileSlot()
@@ -702,7 +664,7 @@ void MainWindow::loadPatientFileSlot()
 	if (!QDir().exists(patientDatafolder))
 	{
 		QDir().mkdir(patientDatafolder);
-		messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder);
+		report("Made a new patient folder: " + patientDatafolder);
 	}
 	// Open file dialog
 	QString choosenDir = QFileDialog::getExistingDirectory(this, tr("Select patient"), patientDatafolder,
@@ -734,7 +696,7 @@ void MainWindow::importDataSlot()
 		folder, tr("Image/Mesh (*.mhd *.mha *.stl *.vtk *.mnc)"));
 	if (fileName.empty())
 	{
-		messageManager()->sendInfo("Import canceled");
+		report("Import canceled");
 		return;
 	}
 
@@ -750,90 +712,6 @@ void MainWindow::importDataSlot()
 void MainWindow::patientChangedSlot()
 {
 	this->updateWindowTitle();
-}
-
-/** Called when the layout is changed: update the layout menu
- */
-void MainWindow::layoutChangedSlot()
-{
-	// reset list of available layouts
-
-	//Make sure all actions in the group are deleted - possibly removes a few memory leaks
-	if (mLayoutActionGroup)
-	{
-		QList<QAction*> actionList = mLayoutActionGroup->actions();
-		for (int i = 0; i < actionList.size(); i++)
-			delete actionList.at(i);
-	}
-
-	//if(mLayoutActionGroup)
-	delete mLayoutActionGroup;
-	mLayoutActionGroup = viewManager()->createLayoutActionGroup();
-
-	//  mLayoutMenu->clear(); // Clearing removes too much
-	mLayoutMenu->addActions(mLayoutActionGroup->actions());
-
-	bool editable = viewManager()->isCustomLayout(viewManager()->getActiveLayout());
-	mEditLayoutAction->setEnabled(editable);
-	mDeleteLayoutAction->setEnabled(editable);
-}
-
-/**create and execute a dialog for determining layout.
- * Return layout data, or invalid layout data if cancelled.
- */
-LayoutData MainWindow::executeLayoutEditorDialog(QString title, bool createNew)
-{
-	boost::shared_ptr<QDialog> dialog(new QDialog(NULL, Qt::Dialog));
-	dialog->setWindowTitle(title);
-	QVBoxLayout* layout = new QVBoxLayout(dialog.get());
-	layout->setMargin(0);
-
-	LayoutEditorWidget* editor = new LayoutEditorWidget(dialog.get());
-
-	LayoutData data = viewManager()->getLayoutData(viewManager()->getActiveLayout());
-
-	if (createNew)
-	{
-		data.resetUid(viewManager()->generateLayoutUid());
-	}
-	editor->setLayoutData(data);
-	layout->addWidget(editor);
-
-	QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-	connect(buttonBox, SIGNAL(accepted()), dialog.get(), SLOT(accept()));
-	connect(buttonBox, SIGNAL(rejected()), dialog.get(), SLOT(reject()));
-	layout->addWidget(buttonBox);
-
-	if (!dialog->exec())
-		return LayoutData();
-
-	return editor->getLayoutData();
-}
-
-void MainWindow::newCustomLayoutSlot()
-{
-	LayoutData data = this->executeLayoutEditorDialog("New Custom Layout", true);
-	if (data.getUid().isEmpty())
-		return;
-	viewManager()->setLayoutData(data);
-	viewManager()->setActiveLayout(data.getUid());
-}
-
-void MainWindow::editCustomLayoutSlot()
-{
-	LayoutData data = this->executeLayoutEditorDialog("Edit Current Layout", false);
-	if (data.getUid().isEmpty())
-		return;
-	viewManager()->setLayoutData(data);
-}
-
-void MainWindow::deleteCustomLayoutSlot()
-{
-	if (QMessageBox::question(this, "Delete current layout", "Do you really want to delete the current layout?",
-		QMessageBox::Cancel | QMessageBox::Ok) != QMessageBox::Ok)
-		return;
-	viewManager()->deleteLayoutData(viewManager()->getActiveLayout());
-	viewManager()->setActiveLayout(viewManager()->getAvailableLayouts().front()); // revert to existing state
 }
 
 void MainWindow::createMenus()
@@ -900,10 +778,7 @@ void MainWindow::createMenus()
 
 	//layout
 	this->menuBar()->addMenu(mLayoutMenu);
-	mLayoutMenu->addAction(mNewLayoutAction);
-	mLayoutMenu->addAction(mEditLayoutAction);
-	mLayoutMenu->addAction(mDeleteLayoutAction);
-	mLayoutMenu->addSeparator();
+	mLayoutInteractor->connectToMenu(mLayoutMenu);
 
 	this->menuBar()->addMenu(mNavigationMenu);
 	mNavigationMenu->addAction(mCenterToImageCenterAction);
@@ -1008,7 +883,7 @@ void MainWindow::preferencesSlot()
 
 void MainWindow::quitSlot()
 {
-	messageManager()->sendInfo("Shutting down CustusX");
+	report("Shutting down CustusX");
 	viewManager()->deactivateCurrentLayout();
 
 	patientService()->getPatientData()->autoSave();
@@ -1016,7 +891,7 @@ void MainWindow::quitSlot()
 	settings()->setValue("mainWindow/geometry", saveGeometry());
 	settings()->setValue("mainWindow/windowState", saveState());
 	settings()->sync();
-	messageManager()->sendInfo("Closing: Save geometry and window state");
+	report("Closing: Save geometry and window state");
 
 	qApp->quit();
 }

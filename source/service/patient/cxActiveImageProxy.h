@@ -16,20 +16,21 @@
 #define CXACTIVEIMAGEPROXY_H_
 
 #include <QObject>
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
+class DataManager;
 /**
  * \file
- * \addtogroup cxServicePatient
+ * \addtogroup cx_service_patient
  * @{
  */
 
 typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
 /**
  * \brief Helper class for connection the active image.
- * \ingroup cxServicePatient
+ * \ingroup cx_service_patient
  *
  * By listening to this class, you will always listen
  * to the active tool.
@@ -42,11 +43,11 @@ class ActiveImageProxy: public QObject
 {
 Q_OBJECT
 public:
-	static ActiveImageProxyPtr New()
+	static ActiveImageProxyPtr New(DataServicePtr dataManager)
 	{
-		return ActiveImageProxyPtr(new ActiveImageProxy());
+		return ActiveImageProxyPtr(new ActiveImageProxy(dataManager));
 	}
-	ActiveImageProxy();
+	ActiveImageProxy(DataServicePtr dataManager);
 
 signals:
 	void activeImageChanged(const QString& uid); ///< The original image changed signal from DataManager
@@ -65,6 +66,7 @@ private slots:
 	void activeImageChangedSlot(const QString&);
 private:
 	ImagePtr mImage;
+	DataServicePtr mDataManager;
 };
 
 /**

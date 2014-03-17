@@ -30,7 +30,7 @@ typedef boost::shared_ptr<class SelectDataStringDataAdapterBase> SelectDataStrin
   * and adds utility buttons such as showing the data in the
   * View, and removing it altogether.
   *
-  * \ingroup cxGUI
+  * \ingroup cx_gui
   * \date Nov 25, 2012
   * \author christiana
   */
@@ -66,7 +66,7 @@ private:
 /** Helper button for DataSelectWidget.
   * Emits a signal upon right-click
   *
-  * \ingroup cxGUI
+  * \ingroup cx_gui
   * \date Nov 25, 2012
   * \author christiana
   */

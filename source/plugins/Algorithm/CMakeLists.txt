@@ -105,9 +105,10 @@ include_directories(
     .
     ./logic
     ./gui
-    ${CustusX3_SOURCE_DIR}/source/service/patient
+	${CustusX3_SOURCE_DIR}/source/service/patient
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/service/visualization
+	${CustusX3_SOURCE_DIR}/source/logic
 
     ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
     ${CustusX3_SOURCE_DIR}/source/gui/utilities
@@ -116,12 +117,19 @@ include_directories(
 	)
 
 set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui)
+
 if (CX_USE_TSF)
-    set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} ${OPENCL_LIBRARIES} tubeSegmentationLib OCL-Utilities)
+    set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} tubeSegmentationLib)
 endif(CX_USE_TSF)
+
 if (CX_USE_LEVEL_SET)
-    set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} ${OPENCL_LIBRARIES} levelSetSegLib OCL-Utilities)
+    set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} levelSetSegLib)
 endif(CX_USE_LEVEL_SET)
+
+if (CX_USE_OPENCL_UTILITY)
+    set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} OpenCLUtilityLibrary ${OPENCL_LIBRARIES})
+    include_directories(${OpenCLUtilityLibrary_INCLUDE_DIRS})
+endif(CX_USE_OPENCL_UTILITY)
 
 
 
@@ -131,7 +139,4 @@ add_library( cxPluginAlgorithm ${SOURCE_FILES} )
 target_link_libraries( cxPluginAlgorithm ${CX_ALGORITHM_LIBRARIES})
 CX_COTIRE_ADD_LIBRARY(cxPluginAlgorithm "${CX_ALGORITHM_LIBRARIES}")
 
-# add/remove to suit your own needs.
-#add_subdirectory(logic)
-#add_subdirectory(gui)
 add_subdirectory(testing)

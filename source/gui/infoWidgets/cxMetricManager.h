@@ -12,27 +12,69 @@
 //
 // See CustusX_License.txt for more information.
 
+#ifndef CXMETRICMANAGER_H
+#define CXMETRICMANAGER_H
+
+#include "cxForwardDeclarations.h"
+#include "cxDataMetric.h"
+
 namespace cx
 {
+
+typedef boost::shared_ptr<class MetricReferenceArgumentList> MetricReferenceArgumentListPtr;
+typedef boost::shared_ptr<class MetricManager> MetricManagerPtr;
+typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
 
 /** 
  *
  *
  * \ingroup cx
- * \date 26.08.2013, 2013
+ * \date 2014-02-17
  * \author christiana
  */
+class MetricManager : public QObject
+{
+	Q_OBJECT
+public:
+	MetricManager();
+
+	DataMetricPtr getMetric(QString uid);
+	void moveToMetric(QString uid);
+	void setSelection(std::set<QString> selection);
+	void setActiveUid(QString uid);
+	QString getActiveUid() const { return mActiveLandmark; }
+	void exportMetricsToFile(QString filename);
+
+signals:
+	void activeMetricChanged();
+	void metricsChanged();
+
+public slots:
+	void loadReferencePointsSlot();
+	void addPointButtonClickedSlot();
+	void addFrameButtonClickedSlot();
+	void addToolButtonClickedSlot();
+	void addPlaneButtonClickedSlot();
+	void addAngleButtonClickedSlot();
+	void addDistanceButtonClickedSlot();
+	void addSphereButtonClickedSlot();
+	void addDonutButtonClickedSlot();
+
+private:
+	void setManualToolPosition(Vector3D p_r);
+	PointMetricPtr addPoint(Vector3D point, CoordinateSystem space=CoordinateSystem(csREF), QString name="point%1");
+	std::vector<DataPtr> refinePointArguments(std::vector<DataPtr> args, unsigned argNo);
+	std::vector<DataPtr> getSpecifiedNumberOfValidArguments(MetricReferenceArgumentListPtr arguments, int numberOfRequiredArguments=-1);
+	void installNewMetric(DataMetricPtr metric);
+	PointMetricPtr addPointInDefaultPosition();
+	std::vector<DataMetricPtr> getAllMetrics();
+	DataFactoryPtr getDataFactory();
+
+	QString mActiveLandmark; ///< uid of surrently selected landmark.
+	std::set<QString> mSelection;
+};
 
 
 } // namespace cx
-
-#ifndef CXMETRICMANAGER_H
-#define CXMETRICMANAGER_H
-
-class cxMetricManager
-{
-public:
-	cxMetricManager();
-};
 
 #endif // CXMETRICMANAGER_H
