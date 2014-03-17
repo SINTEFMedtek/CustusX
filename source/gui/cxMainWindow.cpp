@@ -57,6 +57,7 @@
 #include "cxRegistrationHistoryWidget.h"
 #include "cxLogger.h"
 #include "cxLayoutInteractor.h"
+#include "cxNavigation.h"
 
 namespace cx
 {

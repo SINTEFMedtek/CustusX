@@ -81,6 +81,7 @@
 #include "cxMultiVolume3DRepProducer.h"
 #include "cxMetricNamesRep.h"
 #include "cxVisualizationServiceBackend.h"
+#include "cxNavigation.h"
 
 namespace cx
 {
