@@ -230,7 +230,7 @@ void ViewGroupData::requestInitialize()
 void ViewGroupData::addData(DataPtr data)
 {
 	DataViewProperties properties = this->getProperties(data);
-	properties.addFlagsIn(DataViewProperties::createDefault());
+	properties = properties.addFlagsIn(DataViewProperties::createDefault());
 	this->setProperties(data, properties);
 }
 
