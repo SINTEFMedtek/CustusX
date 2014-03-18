@@ -6,7 +6,7 @@
 #include "cxDirectlyLinkedSender.h"
 #include "cxTestSenderController.h"
 #include "cxImageStreamerGE.h"
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 
 #include "catch.hpp"
 
@@ -15,12 +15,12 @@ namespace cxtest
 
 void TestGEInterface::setUp()
 {
-	cx::MessageManager::initialize();
+	cx::Reporter::initialize();
 }
 
 void TestGEInterface::tearDown()
 {
-	cx::MessageManager::shutdown();
+	cx::Reporter::shutdown();
 }
 
 void TestGEInterface::testStream(cx::StringMap args)

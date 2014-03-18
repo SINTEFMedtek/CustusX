@@ -17,7 +17,7 @@
 #include <vector>
 #include <QFutureWatcher>
 #include "cxForwardDeclarations.h"
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 
 namespace cx
 {
@@ -31,14 +31,14 @@ typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
 
 /**
  * \file
- * \addtogroup cxPluginAcquisition
+ * \addtogroup cx_plugin_acquisition
  * @{
  */
 
 
 /**
  * \brief Record and save ultrasound data.
- * \ingroup cxPluginAcquisition
+ * \ingroup cx_plugin_acquisition
  *
  * Use the start/stop pair to record video from the input streams
  * during that period. A cancel instead of stop will clear the recording.

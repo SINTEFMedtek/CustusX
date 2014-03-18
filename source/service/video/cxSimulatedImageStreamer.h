@@ -2,7 +2,7 @@
 #define CXSIMULATEDIMAGESTREAMER_H_
 
 #include "vtkSmartPointer.h"
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 #include "cxImageStreamer.h"
 
 typedef vtkSmartPointer<class vtkImageMask> vtkImageMaskPtr;
@@ -10,11 +10,13 @@ typedef vtkSmartPointer<class vtkImageMask> vtkImageMaskPtr;
 namespace cx
 {
 typedef Transform3D Transform3D;
+class DataManager;
 
 /**
  * SimulatedImageStreamer delivers a stream of 2D images
  * sliced from the incoming volume based on the tools positions.
  *
+ * \ingroup cx_service_video
  * \date May 21, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
@@ -27,8 +29,7 @@ public:
 	SimulatedImageStreamer();
 	virtual ~SimulatedImageStreamer();
 
-	void initialize(); ///< initializes with active image and first probe
-	void initialize(ImagePtr image, ToolPtr tool);
+	void initialize(ImagePtr image, ToolPtr tool, DataServicePtr dataManager);
 	virtual bool startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
 
@@ -38,7 +39,6 @@ private slots:
 	virtual void streamSlot();
 	void resetMask();
 	void sliceSlot();
-	void setSourceToActiveImageSlot();
 	void setSourceToImageSlot(QString imageUid);
 
 private:
@@ -56,6 +56,7 @@ private:
 	ToolPtr mTool;
 	mutable ImagePtr mCachedImageToSend;
 	mutable vtkImageDataPtr mCachedMask;
+	DataServicePtr mDataManager;
 
 };
 typedef boost::shared_ptr<SimulatedImageStreamer> SimulatedImageStreamerPtr;

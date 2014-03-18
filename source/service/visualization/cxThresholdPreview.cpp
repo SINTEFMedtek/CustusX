@@ -16,13 +16,13 @@
 #include <vtkVolume.h>
 #include <vtkVolumeProperty.h>
 #include <QWidget>
-#include "sscImageTF3D.h"
-#include "sscImageLUT2D.h"
-#include "sscVolumetricRep.h"
+#include "cxImageTF3D.h"
+#include "cxImageLUT2D.h"
+#include "cxVolumetricRep.h"
 #include "cxRepManager.h"
 #include <QTimer>
-#include "sscImage.h"
-#include "sscMessageManager.h"
+#include "cxImage.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -74,7 +74,7 @@ void ThresholdPreview::revertTransferFunctions()
 //    if(volumeRep)
 //        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToLinear();
 //    else
-//        messageManager()->sendError("ThresholdPreview::revertTransferFunctions() can not find VolumetricRep");
+//        reportError("ThresholdPreview::revertTransferFunctions() can not find VolumetricRep");
 
     mTF3D_original.reset();
     mTF2D_original.reset();
@@ -86,7 +86,6 @@ void ThresholdPreview::revertTransferFunctions()
  *
  * A timer is added that will the remove the preview when the calling widget is no longer visible.
  *
- * \param fromWidget The calling widget
  * \param image The image to modify the transfer function of
  * \param setValue The threshold value to be used
  */
@@ -147,7 +146,7 @@ void ThresholdPreview::setPreview(ImagePtr image, double setValue)
 //    if(volumeRep)
 //        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToNearest();
 //    else
-//        messageManager()->sendError("ThresholdPreview::setPreview() can not find VolumetricRep");
+//        reportError("ThresholdPreview::setPreview() can not find VolumetricRep");
 }
 
 void ThresholdPreview::removePreview()

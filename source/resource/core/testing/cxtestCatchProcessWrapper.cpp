@@ -17,7 +17,7 @@
 #include <QProcess>
 #include "cxProcessWrapper.h"
 #include "cxtestProcessWrapperFixture.h"
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 
 namespace cxtest
 {
@@ -40,7 +40,7 @@ TEST_CASE("ProcessWrapper can check git -version", "[unit][resource][core][Proce
 	CHECK(success);
 }
 
-TEST_CASE("ProcessWrapper can run VLC -version", "[unit][resource][core][ProcessWrapper][VLC][not_win32][not_win64][unstable]")
+TEST_CASE("ProcessWrapper can run VLC -version", "[unit][resource][core][ProcessWrapper][VLC][not_win32][not_win64]")
 {
 	bool success = ProcessWrapperFixture::canLaunchVLC_Version();
 	CHECK(success);

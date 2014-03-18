@@ -14,13 +14,13 @@
 
 #include "cxElastixSingleThreadedRunner.h"
 #include "cxElastixExecuter.h"
-#include "sscXmlOptionItem.h"
+#include "cxXmlOptionItem.h"
 #include <QDir>
 #include "cxDataLocations.h"
 #include <qapplication.h>
-#include "sscTime.h"
-#include "sscTypeConversions.h"
-#include "sscLogger.h"
+#include "cxTime.h"
+#include "cxTypeConversions.h"
+#include "cxLogger.h"
 #include "cxElastixParameters.h"
 
 namespace cx

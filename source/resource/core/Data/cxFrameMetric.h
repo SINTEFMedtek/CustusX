@@ -16,35 +16,17 @@
 #define CXTFRAMEMETRIC_H_
 
 #include "cxFrameMetricBase.h"
-#include "sscDataReaderWriter.h"
 
 namespace cx
 {
 
 typedef boost::shared_ptr<class FrameMetric> FrameMetricPtr;
 
-/** \brief DataReader implementation for FrameMetric
- *
- * \date Aug 16, 2011
- * \author Ole Vegard Solberg, SINTEF
- */
-class FrameMetricReader: public DataReader
-{
-public:
-	virtual ~FrameMetricReader()
-	{
-	}
-	virtual bool canLoad(const QString& type, const QString& filename)
-	{
-		return type == "frameMetric";
-	}
-	virtual DataPtr load(const QString& uid, const QString& filename);
-};
-
 /**\brief Data class that represents a single frame (transform).
  *
  * The transform is attached to a specific coordinate system / frame.
  *
+ * \ingroup cx_resource_core_data
  * \date Aug 25, 2013
  * \author Ole Vegard Solberg, SINTEF
  */
@@ -52,17 +34,21 @@ class FrameMetric: public cx::FrameMetricBase
 {
 Q_OBJECT
 public:
-	FrameMetric(const QString& uid, const QString& name = "");
 	virtual ~FrameMetric();
-    static FrameMetricPtr create(QDomNode node);
-    static FrameMetricPtr create(QString uid, QString name="");
+	static FrameMetricPtr create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	virtual QString getType() const
+	{
+		return getTypeName();
+	}
+	static QString getTypeName()
 	{
 		return "frameMetric";
 	}
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 	virtual QString getAsSingleLineString() const;
+private:
+	FrameMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 };
 
 } //namespace cx

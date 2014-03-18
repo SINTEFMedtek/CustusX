@@ -14,10 +14,10 @@
 
 #include "cxBronchoscopyRegistrationWidget.h"
 #include <vtkPolyData.h>
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 #include "cxDataSelectWidget.h"
-#include "sscToolManager.h"
-#include "sscMesh.h"
+#include "cxToolManager.h"
+#include "cxMesh.h"
 #include "cxRegistrationManager.h"
 #include "cxAcquisitionData.h"
 #include "cxSelectDataStringDataAdapter.h"
@@ -26,12 +26,12 @@
 #include "cxRecordSession.h"
 #include "cxRepManager.h"
 #include "cxViewManager.h"
-#include "sscView.h"
-#include "sscToolRep3D.h"
-#include "sscToolTracer.h"
+#include "cxView.h"
+#include "cxToolRep3D.h"
+#include "cxToolTracer.h"
 #include "cxBronchoscopyRegistration.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
 
 
 namespace cx
@@ -77,32 +77,32 @@ QString BronchoscopyRegistrationWidget::defaultWhatsThis() const
 
 void BronchoscopyRegistrationWidget::registerSlot()
 {
-	Transform3D old_rMpr = *toolManager()->get_rMpr();//input?
+	Transform3D old_rMpr = dataManager()->get_rMpr();//input?
     std::cout << "rMpr: " << std::endl;
     std::cout << old_rMpr << std::endl;
 
     if(!mSelectMeshWidget->getMesh())
     {
-        messageManager()->sendError("No centerline");
+        reportError("No centerline");
         return;
     }
 	vtkPolyDataPtr centerline = mSelectMeshWidget->getMesh()->getVtkPolyData();//input
 
     if(!mTool)
     {
-        messageManager()->sendError("No tool");
+        reportError("No tool");
     }
     std::cout << "Tool name: " << mTool->getName() << std::endl;
 	RecordSessionPtr session = mAquisition->getLatestSession();
     if(!session)
-        messageManager()->sendError("No session");
+        reportError("No session");
 
     TimedTransformMap trackerRecordedData_prMt = RecordSession::getToolHistory_prMt(mTool, session);//input
 //    TimedTransformMap trackerRecordedData = mTrackedCenterLine->getRecording();
 
     if(trackerRecordedData_prMt.size() == 0)
     {
-        messageManager()->sendError("No positions");
+        reportError("No positions");
         return;
     }
 

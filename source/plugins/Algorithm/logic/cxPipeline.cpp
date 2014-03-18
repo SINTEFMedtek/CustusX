@@ -12,19 +12,19 @@
 //
 // See CustusX_License.txt for more information.
 #include "cxPipeline.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 #include <QtCore>
 #include "boost/bind.hpp"
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
 
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 
-#include "sscBoolDataAdapter.h"
-#include "sscDoubleDataAdapter.h"
-#include "sscColorDataAdapter.h"
-#include "sscStringDataAdapter.h"
+#include "cxBoolDataAdapter.h"
+#include "cxDoubleDataAdapter.h"
+#include "cxColorDataAdapter.h"
+#include "cxStringDataAdapter.h"
 #include "cxCompositeTimedAlgorithm.h"
 #include "cxFilterTimedAlgorithm.h"
 
@@ -207,7 +207,7 @@ void Pipeline::setOption(DataAdapterPtr adapter, QVariant value)
 	}
 	else
 	{
-		messageManager()->sendWarning(QString("Attempt to set option of type %2 is not supported").arg(value.typeName()));
+		reportWarning(QString("Attempt to set option of type %2 is not supported").arg(value.typeName()));
 	}
 }
 
@@ -317,7 +317,7 @@ void Pipeline::execute(QString uid)
 
 	if (startIndex<0)
 	{
-		messageManager()->sendWarning(QString("Cannot execute filter %1: No input data set").arg(uid));
+		reportWarning(QString("Cannot execute filter %1: No input data set").arg(uid));
 		return;
 	}
 
@@ -361,7 +361,7 @@ void Pipeline::execute(QString uid)
 
 //	if (startIndex<0)
 //	{
-//		messageManager()->sendWarning(QString("Cannot execute filter %1: No input data set").arg(uid));
+//		reportWarning(QString("Cannot execute filter %1: No input data set").arg(uid));
 //		return;
 //	}
 

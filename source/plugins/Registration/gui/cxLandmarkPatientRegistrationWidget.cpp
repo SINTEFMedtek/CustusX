@@ -10,17 +10,17 @@
 #include <QGridLayout>
 #include <QSpinBox>
 #include <vtkDoubleArray.h>
-#include <sscVector3D.h>
+#include "cxVector3D.h"
 #include "cxViewManager.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
 #include "cxRegistrationManager.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxDataManager.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxRepManager.h"
 #include "cxLandmarkRep.h"
-#include "sscView.h"
+#include "cxView.h"
 
 namespace cx
 {
@@ -32,7 +32,7 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(Registratio
 	mImageLandmarkSource = ImageLandmarksSource::New();
 	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(regManager));
 	connect(mManager.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedDataChanged()));
-	connect(toolManager(), SIGNAL(rMprChanged()), this, SLOT(setModified()));
+	connect(dataManager(), SIGNAL(rMprChanged()), this, SLOT(setModified()));
 
 	//buttons
 	mToolSampleButton->setDisabled(true);
@@ -48,10 +48,10 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(Registratio
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
 	//toolmanager
-	mDominantToolProxy = DominantToolProxy::New();
+	mDominantToolProxy = DominantToolProxy::New(trackingService());
 	connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolSampleButton()));
 	connect(mDominantToolProxy.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateToolSampleButton()));
-	connect(cxDataManager::getInstance(), SIGNAL(debugModeChanged(bool)), this, SLOT(updateToolSampleButton()));
+	connect(dataManager(), SIGNAL(debugModeChanged(bool)), this, SLOT(updateToolSampleButton()));
 
 	//layout
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedDataAdapter));
@@ -99,7 +99,7 @@ void LandmarkPatientRegistrationWidget::updateToolSampleButton()
 	ToolPtr tool = toolManager()->getDominantTool();
 
 	bool enabled = false;
-	enabled = tool && tool->getVisible() && (!tool->hasType(Tool::TOOL_MANUAL) || cxDataManager::getInstance()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
+	enabled = tool && tool->getVisible() && (!tool->hasType(Tool::TOOL_MANUAL) || dataManager()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
 	mToolSampleButton->setEnabled(enabled);
 
 	if (toolManager()->getDominantTool())
@@ -114,7 +114,7 @@ void LandmarkPatientRegistrationWidget::toolSampleButtonClickedSlot()
 
 	if (!tool)
 	{
-		messageManager()->sendError("mToolToSample is NULL!");
+		reportError("mToolToSample is NULL!");
 		return;
 	}
 	//TODO What if the reference frame isnt visible?
@@ -125,8 +125,8 @@ void LandmarkPatientRegistrationWidget::toolSampleButtonClickedSlot()
 	if (mActiveLandmark.isEmpty() && !dataManager()->getLandmarkProperties().empty())
 		mActiveLandmark = dataManager()->getLandmarkProperties().begin()->first;
 
-	toolManager()->setLandmark(Landmark(mActiveLandmark, p_pr));
-	messageManager()->playSampleSound();
+	dataManager()->getPatientLandmarks()->setLandmark(Landmark(mActiveLandmark, p_pr));
+	reporter()->playSampleSound();
 
     this->activateLandmark(this->getNextLandmark());
 
@@ -137,8 +137,8 @@ void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
 {
 //	std::cout << "LandmarkPatientRegistrationWidget::showEvent" << std::endl;
 	LandmarkRegistrationWidget::showEvent(event);
-	connect(toolManager(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
-	connect(toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
+	connect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
+	connect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
 	viewManager()->setRegistrationMode(rsPATIENT_REGISTRATED);
 
@@ -146,8 +146,8 @@ void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
 	if (rep)
 	{
 		rep->setPrimarySource(mImageLandmarkSource);
-		rep->setSecondarySource(PatientLandmarksSource::New());
-		rep->setSecondaryColor(Vector3D(0, 0.6, 0.8));
+		rep->setSecondarySource(PatientLandmarksSource::New(dataService()));
+		rep->setSecondaryColor(QColor::fromRgbF(0, 0.6, 0.8));
 	}
 }
 
@@ -155,8 +155,8 @@ void LandmarkPatientRegistrationWidget::hideEvent(QHideEvent* event)
 {
 //	std::cout << "LandmarkPatientRegistrationWidget::hideEvent" << std::endl;
 	LandmarkRegistrationWidget::hideEvent(event);
-	disconnect(toolManager(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
-	disconnect(toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
+	disconnect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
+	disconnect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
 	if(viewManager()->get3DView(0, 0))
 	{
@@ -173,7 +173,7 @@ void LandmarkPatientRegistrationWidget::hideEvent(QHideEvent* event)
 void LandmarkPatientRegistrationWidget::removeLandmarkButtonClickedSlot()
 {
     QString next = this->getNextLandmark();
-	toolManager()->removeLandmark(mActiveLandmark);
+	dataManager()->getPatientLandmarks()->removeLandmark(mActiveLandmark);
     this->activateLandmark(next);
 }
 
@@ -196,7 +196,7 @@ void LandmarkPatientRegistrationWidget::prePaintEvent()
  */
 LandmarkMap LandmarkPatientRegistrationWidget::getTargetLandmarks() const
 {
-	return toolManager()->getLandmarks();
+	return dataManager()->getPatientLandmarks()->getLandmarks();
 }
 
 /** Return transform from target space to reference space
@@ -204,14 +204,14 @@ LandmarkMap LandmarkPatientRegistrationWidget::getTargetLandmarks() const
  */
 Transform3D LandmarkPatientRegistrationWidget::getTargetTransform() const
 {
-	Transform3D rMpr = *(toolManager()->get_rMpr());
+	Transform3D rMpr = dataManager()->get_rMpr();
 	return rMpr;
 }
 
 void LandmarkPatientRegistrationWidget::setTargetLandmark(QString uid, Vector3D p_target)
 {
-	toolManager()->setLandmark(Landmark(uid, p_target));
-	messageManager()->playSampleSound();
+	dataManager()->getPatientLandmarks()->setLandmark(Landmark(uid, p_target));
+	reporter()->playSampleSound();
 }
 
 void LandmarkPatientRegistrationWidget::performRegistration()
@@ -219,7 +219,7 @@ void LandmarkPatientRegistrationWidget::performRegistration()
 	if (!mManager->getFixedData())
 		mManager->setFixedData(dataManager()->getActiveImage());
 
-	if (toolManager()->getLandmarks().size() < 3)
+	if (dataManager()->getPatientLandmarks()->getLandmarks().size() < 3)
 		return;
 
 	mManager->doPatientRegistration();

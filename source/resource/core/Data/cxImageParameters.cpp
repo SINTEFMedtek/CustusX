@@ -12,8 +12,8 @@
 //
 // See CustusX_License.txt for more information.
 #include "cxImageParameters.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {
@@ -94,7 +94,7 @@ void ImageParameters::limitVoxelsKeepBounds(unsigned long maxVoxels)
 
 	if(mDim.minCoeff() == 1)
 	{
-			messageManager()->sendError("ImageParameters::limitVoxelsKeepBounds() only work with 3D images");
+			reportError("ImageParameters::limitVoxelsKeepBounds() only work with 3D images");
 			return;
 	}
 	// i: input spacing

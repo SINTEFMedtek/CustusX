@@ -9,12 +9,12 @@
 #include <QToolButton>
 #include <QAction>
 #include <QMessageBox>
-#include "sscLogger.h"
-#include "sscDataManager.h"
-#include "sscImageTF3D.h"
-#include "sscImageLUT2D.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxLogger.h"
+#include "cxDataManager.h"
+#include "cxImageTF3D.h"
+#include "cxImageLUT2D.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
 #include "cxTransferFunctionPresetWidget.h"
 #include "cxTransferFunctionAlphaWidget.h"
 #include "cxTransferFunctionColorWidget.h"
@@ -166,7 +166,7 @@ TransferFunction3DWidget::TransferFunction3DWidget(QWidget* parent) :
 //  mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
 //  mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
 
-  mActiveImageProxy = ActiveImageProxy::New();
+  mActiveImageProxy = ActiveImageProxy::New(dataService());
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
@@ -232,7 +232,7 @@ TransferFunction2DWidget::TransferFunction2DWidget(QWidget* parent) :
   mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
   mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
 
-  mActiveImageProxy = ActiveImageProxy::New();
+  mActiveImageProxy = ActiveImageProxy::New(dataService());
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 

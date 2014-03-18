@@ -10,12 +10,12 @@
 #include <QSlider>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 #include "cxRegistrationManager.h"
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 #include "cxRegistrationHistoryWidget.h"
-#include "sscTypeConversions.h"
-#include "sscManualTool.h"
+#include "cxTypeConversions.h"
+#include "cxManualTool.h"
 #include "cxToolManager.h"
 
 namespace cx
@@ -29,7 +29,7 @@ LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegistrationManagerPtr re
 	connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(cellClickedSlot(int, int)));
 	connect(mLandmarkTableWidget, SIGNAL(cellChanged(int,int)), this, SLOT(cellChangedSlot(int,int)));
 
-	mActiveImageProxy = ActiveImageProxy::New();
+	mActiveImageProxy = ActiveImageProxy::New(dataService());
 	connect(mActiveImageProxy.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
 	connect(mActiveImageProxy.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
@@ -70,7 +70,7 @@ void LandmarkRegistrationWidget::cellClickedSlot(int row, int column)
 		return;
 
 	if (!mLandmarkTableWidget)
-		messageManager()->sendDebug("mLandmarkTableWidget is null");
+		reporter()->sendDebug("mLandmarkTableWidget is null");
 
 	mActiveLandmark = mLandmarkTableWidget->item(row, column)->data(Qt::UserRole).toString();
 
@@ -80,7 +80,7 @@ void LandmarkRegistrationWidget::cellClickedSlot(int row, int column)
 	{
 		Vector3D p_d = targetData[mActiveLandmark].getCoord();
 		Vector3D p_r = this->getTargetTransform().coord(p_d);
-		Vector3D p_pr = toolManager()->get_rMpr()->coord(p_r);;
+		Vector3D p_pr = dataManager()->get_rMpr().coord(p_r);
 		this->setManualToolPosition(p_r);
 	}
 
@@ -88,11 +88,11 @@ void LandmarkRegistrationWidget::cellClickedSlot(int row, int column)
 
 void LandmarkRegistrationWidget::setManualToolPosition(Vector3D p_r)
 {
-	Transform3D rMpr = *toolManager()->get_rMpr();
+	Transform3D rMpr = dataManager()->get_rMpr();
 	Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
-	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
+	ManualToolPtr tool = toolManager()->getManualTool();
 	Vector3D offset = tool->get_prMt().vector(Vector3D(0, 0, tool->getTooltipOffset()));
 	p_pr -= offset;
 	p_r = rMpr.coord(p_pr);
@@ -355,7 +355,7 @@ double LandmarkRegistrationWidget::getAccuracy(QString uid)
 	if (!fixedData)
 		return 1000.0;
 
-	Landmark masterLandmark = fixedData->getLandmarks()[uid]; //TODO : sjekk ut masterimage etc etc
+	Landmark masterLandmark = fixedData->getLandmarks()->getLandmarks()[uid]; //TODO : sjekk ut masterimage etc etc
 	Landmark targetLandmark = this->getTargetLandmarks()[uid];
 	if (masterLandmark.getUid().isEmpty() || targetLandmark.getUid().isEmpty())
 		return 1000.0;

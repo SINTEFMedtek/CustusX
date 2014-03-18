@@ -18,7 +18,7 @@
 #include <QTimer>
 #include <QEventLoop>
 #include <boost/lexical_cast.hpp>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 namespace cxtest
 {

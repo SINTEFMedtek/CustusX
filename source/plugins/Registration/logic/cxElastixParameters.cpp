@@ -15,7 +15,7 @@
 #include "cxElastixParameters.h"
 
 #include <QDir>
-#include "sscLogger.h"
+#include "cxLogger.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
 

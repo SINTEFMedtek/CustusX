@@ -18,9 +18,8 @@
 #include <vector>
 #include <QVariant>
 #include <QObject>
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 #include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include "cxViewGroupData.h"
 
@@ -32,10 +31,11 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class CameraData> CameraDataPtr;
+typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
 
 /**
  * \file
- * \addtogroup cxServiceVisualization
+ * \addtogroup cx_service_visualization
  * @{
  */
 
@@ -58,61 +58,36 @@ public:
 	static SyncedValuePtr create(QVariant val = QVariant());
 	void set(QVariant val);
 	QVariant get() const;
+	template<class T>
+	T value() const { return this->get().value<T>(); }
 private:
-	QVariant mValue;signals:
+	QVariant mValue;
+signals:
 	void changed();
 };
 
-//typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
+typedef boost::shared_ptr<class DataViewPropertiesInteractor> DataViewPropertiesInteractorPtr;
+/** Provide an action list for showing data in views.
+  *
+  */
+class DataViewPropertiesInteractor : public QObject
+{
+	Q_OBJECT
+public:
+	DataViewPropertiesInteractor(VisualizationServiceBackendPtr backend, ViewGroupDataPtr groupData);
+	void addDataActions(QWidget* parent);
+	void setDataViewProperties(DataViewProperties properties);
 
-///** \brief Container for data shared between all members of a view group
-// */
-//class ViewGroupData: public QObject
-//{
-//Q_OBJECT
-//public:
-//	ViewGroupData();
-//	void requestInitialize();
-//	std::vector<DataPtr> getData() const;
-//	QString getVideoSource() const;
-//	void addData(DataPtr data);
-//	void addDataSorted(DataPtr data); ///< add data in a predefined ordering: CT/MR/SC/US/USA/Mesh/Metrics
-//	void setVideoSource(QString uid);
-//	bool removeData(DataPtr data);
-//	void clearData();
-//	std::vector<ImagePtr> getImages() const;
-//	std::vector<MeshPtr> getMeshes() const;
+private slots:
+	void dataActionSlot();
+private:
+	void addDataAction(QString uid, QWidget* parent);
+	VisualizationServiceBackendPtr mBackend;
+	ViewGroupDataPtr mGroupData;
+	DataViewProperties mProperties;
 
-//	CameraDataPtr getCamera3D() { return mCamera3D; }
-
-//	// view options for this group.
-//	struct Options
-//	{
-//		Options();
-//		bool mShowLandmarks;
-//		bool mShowPointPickerProbe;
-//		MeshPtr mPickerGlyph;
-//	};
-
-//	Options getOptions() const;
-//	void setOptions(Options options);
-
-//private slots:
-//    void removeDataSlot(QString uid);
-
-//signals:
-//	void dataAdded(QString uid);
-//	void dataRemoved(QString uid);
-//	void videoSourceChanged(QString uid);
-//	void initialized();
-//	void optionsChanged();
-
-//private:
-//	QString mVideoSource;
-//	std::vector<DataPtr> mData;
-//	CameraDataPtr mCamera3D;
-//	Options mOptions;
-//};
+	QString mLastDataActionUid;
+};
 
 /**
  * \brief Superclass for ViewWrappers.
@@ -131,7 +106,7 @@ public:
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) = 0;
 	virtual void setViewGroup(ViewGroupDataPtr group);
 
-	virtual void setZoom2D(SyncedValuePtr value) {}
+//	virtual void setZoom2D(SyncedValuePtr value) {}
 	virtual void setOrientationMode(SyncedValuePtr value) {}
 
 	virtual void updateView() = 0;
@@ -141,25 +116,26 @@ signals:
 
 protected slots:
 	void contextMenuSlot(const QPoint& point);
-	void dataActionSlot();
 
-	void dataAddedSlot(QString uid);
-	void dataRemovedSlot(QString uid);
+	virtual void dataViewPropertiesChangedSlot(QString uid);
+//	void dataAddedSlot(QString uid);
+//	void dataRemovedSlot(QString uid);
 	virtual void videoSourceChangedSlot(QString uid) {}
 
 protected:
-	virtual void dataAdded(DataPtr data) = 0;
-	virtual void dataRemoved(const QString& uid) = 0;
+	ViewWrapper(VisualizationServiceBackendPtr backend);
+//	virtual void dataAdded(DataPtr data) = 0;
+//	virtual void dataRemoved(const QString& uid) = 0;
 
 	void connectContextMenu(ViewWidget* view);
 	virtual void appendToContextMenu(QMenu& contextMenu) = 0;
-	void addDataAction(QString uid, QMenu* contextMenu);
-	QStringList getAllDataNames() const;
+	QStringList getAllDataNames(DataViewProperties properties) const;
 
 	ViewGroupDataPtr mGroupData;
+	VisualizationServiceBackendPtr mBackend;
+	DataViewPropertiesInteractorPtr mDataViewPropertiesInteractor;
+	DataViewPropertiesInteractorPtr mShow3DSlicesInteractor;
 
-private:
-	QString mLastDataActionUid;
 
 };
 

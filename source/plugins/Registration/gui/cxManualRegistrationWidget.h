@@ -16,15 +16,15 @@
 #define CXMANUALREGISTRATIONWIDGET_H_
 
 #include "cxRegistrationBaseWidget.h"
-#include "sscStringDataAdapter.h"
+#include "cxStringDataAdapter.h"
 #include "cxTransform3DWidget.h"
-#include "sscData.h"
+#include "cxData.h"
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup cxPluginRegistration
+ * \addtogroup cx_plugin_registration
  * @{
  */
 

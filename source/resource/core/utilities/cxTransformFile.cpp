@@ -17,8 +17,8 @@
 #include <QFileInfo>
 #include <QFile>
 
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -42,7 +42,7 @@ Transform3D TransformFile::read(bool* ok)
 	if (!QFileInfo(mFileName).exists() || !file.open(QIODevice::ReadOnly))
 	{
 		if (!ok)
-			messageManager()->sendWarning(QString("Failed to open file %1 for reading ").arg(file.fileName()));
+			reportWarning(QString("Failed to open file %1 for reading ").arg(file.fileName()));
 		return retval;
 	}
 	bool localOk = true;
@@ -54,7 +54,7 @@ Transform3D TransformFile::read(bool* ok)
 	if (!localOk)
 	{
 		if (!ok)
-			messageManager()->sendWarning(QString("Invalid format in file %1. Values: [%2]").arg(mFileName).arg(qstring_cast(retval(0, 0))));
+			reportWarning(QString("Invalid format in file %1. Values: [%2]").arg(mFileName).arg(qstring_cast(retval(0, 0))));
 		return retval;
 	}
 	if (ok)
@@ -67,7 +67,7 @@ void TransformFile::write(const Transform3D& transform)
 	QFile file(mFileName);
 	if (!file.open(QIODevice::Truncate | QIODevice::WriteOnly | QIODevice::Text))
 	{
-		messageManager()->sendWarning(QString("Failed to open file %1 for writing.").arg(file.fileName()));
+		reportWarning(QString("Failed to open file %1 for writing.").arg(file.fileName()));
 		return;
 	}
 	file.write(qstring_cast(transform).toAscii());

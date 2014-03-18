@@ -1,6 +1,6 @@
 #include "cxImageStreamerSonix.h"
 
-#include "sscVector3D.h"
+#include "cxVector3D.h"
 
 #ifdef CX_WIN32
 
@@ -23,7 +23,7 @@
 
 #include "cxDataLocations.h"
 #include "cxSonixProbeFileReader.h"
-//#include "sscTypeConversions.h"
+//#include "cxTypeConversions.h"
 
 namespace cx
 {

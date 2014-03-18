@@ -12,18 +12,18 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "sscReconstructParams.h"
-#include "sscBoolDataAdapterXml.h"
+#include "cxReconstructParams.h"
+#include "cxBoolDataAdapterXml.h"
 #include "catch.hpp"
 #include "cxtestReconstructManagerFixture.h"
 #include "cxtestReconstructRealData.h"
 #include "cxtestSyntheticReconstructInput.h"
 
-#include "sscDummyTool.h"
-#include "sscPNNReconstructAlgorithm.h"
-#include "sscReconstructPreprocessor.h"
+#include "cxDummyTool.h"
+#include "cxPNNReconstructAlgorithm.h"
+#include "cxReconstructPreprocessor.h"
 #include <vtkImageData.h>
-#include "sscStringDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
 #include "recConfig.h"
 
 #ifdef CX_USE_OPENCL_UTILITY
@@ -34,7 +34,7 @@
 namespace cxtest
 {
 
-TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][synthetic][ca_rec6][ca_rec]")
+TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][synthetic][not_win32][ca_rec]")
 {
 	ReconstructManagerTestFixture fixture;
 	fixture.setVerbose(true);
@@ -118,7 +118,7 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 	}
 }
 
-TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstruction][integration]")
+TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstruction][integration][not_win32]")
 {
 	ReconstructManagerTestFixture fixture;
 	ReconstructRealTestData realData;
@@ -138,7 +138,7 @@ TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstru
 	realData.validateAngioData(fixture.getOutput()[0]);
 }
 
-TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruction][integration]")
+TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruction][integration][not_win32]")
 {
 	ReconstructManagerTestFixture fixture;
 	ReconstructRealTestData realData;
@@ -160,7 +160,7 @@ TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruc
 
 }
 
-TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[unit][usreconstruction][synthetic]")
+TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integration][usreconstruction][synthetic][not_win32]")
 {
 	ReconstructManagerTestFixture fixture;
 	fixture.setVerbose(true);
@@ -173,7 +173,7 @@ TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[unit]
 	//Adding 2 sections creates 3 runs: 1 with the simple case clip rect == extent, the other 2 with extent+1 and +500
 	SECTION("Set clip rect just to large")
 		probeDefinition.setClipRect_p(cx::DoubleBoundingBox3D(0, extent[0]+1, 0, extent[1]+1, 0, 0));
-	SECTION("Set clop rect very large")
+    SECTION("Set clip rect very large")
 		probeDefinition.setClipRect_p(cx::DoubleBoundingBox3D(0, extent[0]+500, 0, extent[1]+500, 0, 0));
 
 	generator->defineProbe(probeDefinition);
@@ -190,7 +190,7 @@ TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[unit]
 	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
 	REQUIRE(preprocessor);
 	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
-	REQUIRE(cores.size() > 0);
+	REQUIRE(!cores.empty());
 	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(cores);
 
 	REQUIRE(processedInput.size() == cores.size());
@@ -227,35 +227,35 @@ TEST_CASE("ReconstructManager: TordTest on real data", "[usreconstruction][integ
 	algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
 	algorithm->getMaxPlanesOption(algo)->setValue(1);
 	algorithm->getNStartsOption(algo)->setValue(1);
-//	SECTION("VNN2")
-//	{
-//		algorithm->getMethodOption(algo)->setValue("VNN2");
-//		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-//		algorithm->getMaxPlanesOption(algo)->setValue(8);
-//	}
-//	SECTION("DW")
-//	{
-//		algorithm->getMethodOption(algo)->setValue("DW");
-//		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-//		algorithm->getMaxPlanesOption(algo)->setValue(8);
-//	}
-//	SECTION("Anisotropic")
-//	{
-//		algorithm->getMethodOption(algo)->setValue("Anisotropic");
-//		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-//		algorithm->getMaxPlanesOption(algo)->setValue(8);
-//	}
-//	SECTION("Multistart search")
-//	{
-//		algorithm->getMethodOption(algo)->setValue("VNN");
-//		algorithm->getNStartsOption(algo)->setValue(5);
-//	}
-//	SECTION("Closest")
-//	{
-//		algorithm->getMethodOption(algo)->setValue("VNN");
-//		algorithm->getPlaneMethodOption(algo)->setValue("Closest");
-//		algorithm->getMaxPlanesOption(algo)->setValue(8);
-//	}
+	SECTION("VNN2")
+	{
+		algorithm->getMethodOption(algo)->setValue("VNN2");
+		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(algo)->setValue(8);
+	}
+	SECTION("DW")
+	{
+		algorithm->getMethodOption(algo)->setValue("DW");
+		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(algo)->setValue(8);
+	}
+	SECTION("Anisotropic")
+	{
+		algorithm->getMethodOption(algo)->setValue("Anisotropic");
+		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
+		algorithm->getMaxPlanesOption(algo)->setValue(8);
+	}
+	SECTION("Multistart search")
+	{
+		algorithm->getMethodOption(algo)->setValue("VNN");
+		algorithm->getNStartsOption(algo)->setValue(5);
+	}
+	SECTION("Closest")
+	{
+		algorithm->getMethodOption(algo)->setValue("VNN");
+		algorithm->getPlaneMethodOption(algo)->setValue("Closest");
+		algorithm->getMaxPlanesOption(algo)->setValue(8);
+	}
 
 	// run the reconstruction in the main thread
 	fixture.reconstruct();

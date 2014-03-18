@@ -15,7 +15,6 @@
 #define CXIMAGEDATACONTAINER_H
 
 #include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include <vector>
 
@@ -23,14 +22,13 @@ namespace cx
 {
 
 /**
- * \addtogroup cxResourceUtilities
+ * \addtogroup cx_resource_core_utilities
  * \{
  */
 
 /** Delayed loading of one vtkImageData.
  *
  *
- * \ingroup cxResourceUtilities
  * \date Dec 04 2012
  * \author christiana
  */
@@ -62,7 +60,6 @@ typedef boost::shared_ptr<CachedImageData> CachedImageDataPtr;
 /** Container inteface for managing a list of vtkImageData.
   * Subclasses implement storage of vtkImageData in various ways.
  *
- * \ingroup cxResourceUtilities
  * \date Dec 04 2012
  * \author christiana
  */
@@ -81,7 +78,6 @@ typedef boost::shared_ptr<ImageDataContainer> ImageDataContainerPtr;
 /** Container class for delayed loading of images.
   * The images will also not be stored by this container.
  *
- * \ingroup cxResourceUtilities
  * \date Dec 04 2012
  * \author christiana
  */
@@ -111,7 +107,6 @@ typedef boost::shared_ptr<CachedImageDataContainer> CachedImageDataContainerPtr;
 
 /** Container class for extracting 2D vtkImageData from a 3D base image.
  *
- * \ingroup cxResourceUtilities
  * \date Dec 04 2012
  * \author christiana
  */
@@ -130,7 +125,6 @@ private:
 /** Primitive implementation of ImageDataContainer interface,
  *  contains a list of image planes.
  *
- * \ingroup cxResourceUtilities
  * \date Nov 28 2013
  * \author christiana
  */

@@ -18,10 +18,10 @@
 #include "cxDataLocations.h"
 #include "cxUsReconstructionFileMaker.h"
 #include "cxUsReconstructionFileReader.h"
-#include "sscTypeConversions.h"
-#include "sscDummyTool.h"
-#include "sscUSFrameData.h"
-#include "sscVolumeHelpers.h"
+#include "cxTypeConversions.h"
+#include "cxDummyTool.h"
+#include "cxUSFrameData.h"
+#include "cxVolumeHelpers.h"
 #include "vtkImageData.h"
 
 void TestUSReconstructionFileIO::setUp()

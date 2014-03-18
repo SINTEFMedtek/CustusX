@@ -13,19 +13,19 @@
 // See CustusX_License.txt for more information.
 
 #include "cxManualToolAdapter.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 
 namespace cx
 {
 
-ManualToolAdapter::ManualToolAdapter(ToolManager* manager, QString uid) :
+ManualToolAdapter::ManualToolAdapter(TrackingServicePtr manager, QString uid) :
 				ManualTool(manager, uid)
 {
 	mBase.reset(new ManualTool(manager, uid + "base"));
 	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
 }
 
-ManualToolAdapter::ManualToolAdapter(ToolManager* manager, ToolPtr base) :
+ManualToolAdapter::ManualToolAdapter(TrackingServicePtr manager, ToolPtr base) :
 				ManualTool(manager, mBase->getUid() + "_manual"), mBase(base)
 {
 }

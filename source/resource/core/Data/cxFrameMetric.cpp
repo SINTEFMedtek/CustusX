@@ -13,32 +13,19 @@
 // See CustusX_License.txt for more information.
 
 #include "cxFrameMetric.h"
-#include "sscTool.h"
-#include "sscToolManager.h"
-#include "sscTypeConversions.h"
+#include "cxTool.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {
 
-DataPtr FrameMetricReader::load(const QString& uid, const QString& filename)
+FrameMetricPtr FrameMetric::create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
-	return DataPtr(new FrameMetric(uid, filename));
+	return FrameMetricPtr(new FrameMetric(uid, name, dataManager, spaceProvider));
 }
 
-FrameMetricPtr FrameMetric::create(QString uid, QString name)
-{
-    return FrameMetricPtr(new FrameMetric(uid, name));
-}
-
-FrameMetricPtr FrameMetric::create(QDomNode node)
-{
-    FrameMetricPtr retval = FrameMetric::create("");
-    retval->parseXml(node);
-    return retval;
-}
-
-FrameMetric::FrameMetric(const QString& uid, const QString& name) :
-		cx::FrameMetricBase(uid, name)
+FrameMetric::FrameMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
+		cx::FrameMetricBase(uid, name, dataManager, spaceProvider)
 {
 }
 

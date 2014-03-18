@@ -19,8 +19,8 @@
 #include <vector>
 #include <QObject>
 
-#include "sscData.h"
-#include "sscDefinitions.h"
+#include "cxData.h"
+#include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
 
 class QActionGroup;
@@ -40,13 +40,16 @@ typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
-typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
+typedef boost::shared_ptr<class CameraStyleInteractor> CameraStyleInteractorPtr;
 typedef boost::shared_ptr<class RenderLoop> RenderLoopPtr;
 typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
+typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
+typedef boost::shared_ptr<class Navigation> NavigationPtr;
+typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 
 /**
  * \file
- * \addtogroup cxServiceVisualization
+ * \addtogroup cx_service_visualization
  * @{
  */
 
@@ -104,6 +107,8 @@ class ViewManager: public QObject
 {
 Q_OBJECT
 public:
+	static VisualizationServicePtr create(VisualizationServiceBackendPtr backend);
+	virtual ~ViewManager();
 
 	ViewWidgetQPtr get3DView(int group = 0, int index = 0);
 	std::vector<ViewGroupPtr> getViewGroups() { return mViewGroups; }
@@ -115,10 +120,12 @@ public:
 	void deleteLayoutData(const QString uid);
 	QActionGroup* createInteractorStyleActionGroup();
 	bool isCustomLayout(const QString& uid) const;
+	NavigationPtr getNavigation();
+	int findGroupContaining3DViewGivenGuess(int preferredGroup);
 
-	static ViewManager* createInstance(); ///< create the instance
-	static ViewManager* getInstance(); ///< returns the only instance of this class, NULL unless createInstance has been called.
-	static void destroyInstance(); ///< destroys the only instance of this class
+//	static ViewManager* createInstance(VisualizationServiceBackendPtr backend); ///< create the instance
+//	static ViewManager* getInstance(); ///< returns the only instance of this class, NULL unless createInstance has been called.
+//	static void destroyInstance(); ///< destroys the only instance of this class
 
 	/** Initialize the widget and fill with the default view layout.
 	  * Return the top widget, it should be added to the calling gui.
@@ -133,26 +140,20 @@ public:
 
 	ViewWrapperPtr getActiveView() const; ///< returns the active view
 	int getActiveViewGroup() const;
-	void setActiveView(QString viewUid); ///< convenient function for setting the active view
 	void storeLayoutData(const LayoutData& data);
-
-	void setGlobal2DZoom(bool global); ///< enable/disable global 2d zooming
-	bool getGlobal2DZoom(); ///< find out if global 2D zooming is enable
 
 	InteractiveClipperPtr getClipper();
 	InteractiveCropperPtr getCropper();
 
 	CyclicActionLoggerPtr getRenderTimer();// { return mRenderTimer; }
-	CameraStylePtr getCameraStyle() { return mCameraStyle; }
 
 	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
 	void autoShowData(DataPtr data);
-
-	/**
-	 * Return a list of all images used in viewGroups
-	 * Uses a map to remove duplicates
-	 */
-	std::map<QString, ImagePtr> getVisibleImages();
+	CameraControlPtr getCameraControl() { return mCameraControl; }
+	void clear();
+	//Interface for saving/loading
+	void addXml(QDomNode& parentNode);
+	void parseXml(QDomNode viewmanagerNode);
 
 signals:
 	void fps(int number); ///< Emits number of frames per second
@@ -162,18 +163,16 @@ signals:
 protected slots:
 	void settingsChangedSlot(QString key);
 
-	void clearSlot();
-	void duringSavePatientSlot();
-	void duringLoadPatientSlot();
+//	void clearSlot();
+//	void duringSavePatientSlot();
+//	void duringLoadPatientSlot();
 	void updateViews();
+	void updateCameraStyleActions();
+//	void globalCenterChangedSlot();
+	void setActiveView(QString viewUid);
 
 protected:
-	ViewManager(); ///< create all needed views
-	virtual ~ViewManager();
-
-	//Interface for saving/loading
-	void addXml(QDomNode& parentNode); ///< adds xml information about the viewmanager and its variables
-	void parseXml(QDomNode viewmanagerNode); ///< Use a XML node to load data. \param viewmanagerNode A XML data representation of the ViewManager
+	ViewManager(VisualizationServiceBackendPtr backend);
 
 	ViewWidget* getView(const QString& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
 
@@ -190,33 +189,38 @@ protected:
 	void saveGlobalSettings();
 	void activateViews(LayoutWidget *widget, LayoutData next);
 	void rebuildLayouts();
+	void initializeGlobal2DZoom();
+	void initializeActiveView();
 
-	static ViewManager* mTheInstance; ///< the only instance of this class
+//	static ViewManager* mTheInstance; ///< the only instance of this class
 
 	LayoutRepositoryPtr mLayoutRepository;
 	std::vector<QPointer<LayoutWidget> > mLayoutWidgets;
 	QStringList mActiveLayout; ///< the active layout (type)
-	QString mActiveView; ///< the active view
+//	QString mActiveView; ///< the active view
+	SyncedValuePtr mActiveView;
 	RenderLoopPtr mRenderLoop;
 	std::vector<ViewGroupPtr> mViewGroups;
+	CameraControlPtr mCameraControl;
 
-	bool mGlobal2DZoom; ///< controlling whether or not 2D zooming is global
 	bool mGlobalObliqueOrientation; ///< controlling whether or not all 2d views should be oblique or orthogonal
-	SyncedValuePtr mGlobalZoom2DVal;
+	SyncedValuePtr mGlobal2DZoomVal;
 
 	InteractiveClipperPtr mInteractiveClipper;
 	InteractiveCropperPtr mInteractiveCropper;
 	SlicePlanesProxyPtr mSlicePlanesProxy;
 
-	CameraStylePtr mCameraStyle;
+//	CameraStylePtr mCameraStyle;
+	CameraStyleInteractorPtr mCameraStyleInteractor;
+	VisualizationServiceBackendPtr mBackend;
 
 private:
 	ViewManager(ViewManager const&);
 	ViewManager& operator=(ViewManager const&);
 };
-/**Shortcut for accessing the viewmanager instance.
- */
-ViewManager* viewManager();
+///**Shortcut for accessing the viewmanager instance.
+// */
+//ViewManager* viewManager();
 
 /**
  * @}

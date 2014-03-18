@@ -16,9 +16,9 @@
 #include "testing/cxTestTubeSegmentationFramework.h"
 
 #include <fstream>
-#include "sscData.h"
+#include "cxData.h"
 #include "cxLogicManager.h"
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 #include "cxDataInterface.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
@@ -35,23 +35,14 @@
 
 TestTubeSegmentationFramework::TestTubeSegmentationFramework() 
 {
-	cx::MessageManager::initialize();
+	cx::LogicManager::initialize();
 }
 
 TestTubeSegmentationFramework::~TestTubeSegmentationFramework() 
 {
-	cx::MessageManager::shutdown();
-}
-
-void TestTubeSegmentationFramework::setUp()
-{
-	cx::LogicManager::initialize();
-}
-
-void TestTubeSegmentationFramework::tearDown()
-{
 	cx::LogicManager::shutdown();
 }
+
 
 void TestTubeSegmentationFramework::testConstructor()
 {

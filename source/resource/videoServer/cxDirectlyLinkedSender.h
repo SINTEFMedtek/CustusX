@@ -5,14 +5,18 @@
 
 #include <QObject>
 #include <boost/shared_ptr.hpp>
-#include "sscImage.h"
-#include "sscTool.h"
+#include "cxImage.h"
+#include "cxTool.h"
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
 
 namespace cx
 {
 
+/**
+ * \ingroup cx_resource_videoserver
+ *
+ */
 class DirectlyLinkedSender : public SenderImpl
 {
 	Q_OBJECT

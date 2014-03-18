@@ -1,15 +1,15 @@
 #ifndef CXTRACKINGDATATOVOLUME_H_
 #define CXTRACKINGDATATOVOLUME_H_
 
-#include "sscImage.h"
-#include "sscTool.h"
-#include "sscVector3D.h"
+#include "cxImage.h"
+#include "cxTool.h"
+#include "cxVector3D.h"
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup cxPluginAlgorithm
+ * \addtogroup cx_plugin_algorithm
  * @{
  */
 

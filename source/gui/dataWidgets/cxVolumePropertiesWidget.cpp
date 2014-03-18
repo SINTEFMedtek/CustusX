@@ -4,10 +4,10 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <QPushButton>
-#include "sscLabeledComboBoxWidget.h"
-#include "sscLabeledLineEditWidget.h"
-#include "sscImage.h"
-#include "sscDataManager.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxLabeledLineEditWidget.h"
+#include "cxImage.h"
+#include "cxDataManager.h"
 #include "cxTransferFunctionWidget.h"
 #include "cxCroppingWidget.h"
 #include "cxClippingWidget.h"
@@ -16,8 +16,8 @@
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxVolumeInfoWidget.h"
-#include "sscVolumeHelpers.h"
-#include "sscTypeConversions.h"
+#include "cxVolumeHelpers.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

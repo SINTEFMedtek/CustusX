@@ -17,15 +17,15 @@
 #include <QSlider>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxRepManager.h"
 #include "cxRegistrationManager.h"
 #include "cxViewManager.h"
 #include "cxSettings.h"
 #include "cxLandmarkRep.h"
-#include "sscView.h"
+#include "cxView.h"
 
 namespace cx
 {
@@ -101,7 +101,7 @@ void LandmarkImage2ImageRegistrationWidget::showEvent(QShowEvent* event)
 	{
 		rep->setPrimarySource(mFixedLandmarkSource);
 		rep->setSecondarySource(mMovingLandmarkSource);
-		rep->setSecondaryColor(Vector3D(0, 0.9, 0.5));
+		rep->setSecondaryColor(QColor::fromRgbF(0, 0.9, 0.5));
 	}
 }
 
@@ -130,7 +130,7 @@ LandmarkMap LandmarkImage2ImageRegistrationWidget::getTargetLandmarks() const
 	ImagePtr moving = boost::dynamic_pointer_cast<Image>(mManager->getMovingData());
 
 	if (moving)
-		return moving->getLandmarks();
+		return moving->getLandmarks()->getLandmarks();
 	else
 		return LandmarkMap();
 }
@@ -156,7 +156,7 @@ void LandmarkImage2ImageRegistrationWidget::setTargetLandmark(QString uid, Vecto
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(mManager->getMovingData());
 	if (!image)
 		return;
-	image->setLandmark(Landmark(uid, p_target));
+	image->getLandmarks()->setLandmark(Landmark(uid, p_target));
 }
 
 QString LandmarkImage2ImageRegistrationWidget::getTargetName() const

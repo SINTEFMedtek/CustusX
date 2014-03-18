@@ -15,7 +15,9 @@
 #include "cxFrameMetricWrapper.h"
 
 #include <QHBoxLayout>
-#include "sscLabeledComboBoxWidget.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxLegacySingletons.h"
+#include "cxSpaceProvider.h"
 
 namespace cx {
 
@@ -36,7 +38,7 @@ QWidget* FrameMetricWrapper::createWidget()
 	topLayout->addLayout(hLayout);
 
 	QString value;// = qstring_cast(mData->getFrame());
-	std::vector<CoordinateSystem> spaces = SpaceHelpers::getSpacesToPresentInGUI();
+	std::vector<CoordinateSystem> spaces = spaceProvider()->getSpacesToPresentInGUI();
 	QStringList range;
 	for (unsigned i=0; i<spaces.size(); ++i)
 		range << spaces[i].toString();
@@ -92,8 +94,8 @@ QString FrameMetricWrapper::getArguments() const
 
 void FrameMetricWrapper::moveToToolPosition()
 {
-	CoordinateSystem ref = SpaceHelpers::getR();
-	Transform3D qMt = SpaceHelpers::getDominantToolTipTransform(mData->getSpace(), true);
+//	CoordinateSystem ref = CoordinateSystem::reference()
+	Transform3D qMt = spaceProvider()->getDominantToolTipTransform(mData->getSpace(), true);
 	mData->setFrame(qMt);
 }
 
@@ -109,10 +111,10 @@ void FrameMetricWrapper::spaceSelected()
 
 void FrameMetricWrapper::dataChangedSlot()
 {
-	mInternalUpdate = true;
-	mSpaceSelector->setValue(mData->getSpace().toString());
-	mFrameWidget->setMatrix(mData->getFrame());
-	mInternalUpdate = false;
+//	mInternalUpdate = true;
+//	mSpaceSelector->setValue(mData->getSpace().toString());
+//	mFrameWidget->setMatrix(mData->getFrame());
+//	mInternalUpdate = false;
 }
 
 void FrameMetricWrapper::frameWidgetChangedSlot()
@@ -122,6 +124,15 @@ void FrameMetricWrapper::frameWidgetChangedSlot()
 	Transform3D matrix = mFrameWidget->getMatrix();
 	mData->setFrame(matrix);
 }
+
+void FrameMetricWrapper::update()
+{
+	mInternalUpdate = true;
+	mSpaceSelector->setValue(mData->getSpace().toString());
+	mFrameWidget->setMatrix(mData->getFrame());
+	mInternalUpdate = false;
+}
+
 
 
 } //namespace cx

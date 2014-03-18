@@ -17,15 +17,15 @@
 
 #include "catch.hpp"
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
-#include "sscVolumetricRep.h"
+#include "cxVolumetricRep.h"
 
 #include <vtkImageData.h>
 #include <vtkPlane.h>
-#include "sscImage.h"
+#include "cxImage.h"
 #include "cxtestRenderTester.h"
 #include "cxtestUtilities.h"
-#include "sscBoundingBox3D.h"
-#include "sscMessageManager.h"
+#include "cxBoundingBox3D.h"
+#include "cxReporter.h"
 #include "cxImageEnveloper.h"
 
 typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;
@@ -58,11 +58,11 @@ public:
 		mAxisSize(3),
 		mViewAxisSize(30)
 	{
-		cx::MessageManager::initialize();
+		cx::Reporter::initialize();
 	}
 	~MehdiGPURayCastMultiVolumeRepFixture()
 	{
-		cx::MessageManager::shutdown();
+		cx::Reporter::shutdown();
 	}
 
 	double renderAndGetNonZeroFraction()
@@ -209,7 +209,7 @@ TEST_CASE("MehdiGPURayCastMultiVolumeRep can remove 1 small volume with clipper.
 }
 
 // vtk emits PreRender end ERROR (x502) Invalid operation when this is run - in second part.
-TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip partially and fully 1 small volume.", "[rep][unit][visualization][not_apple][broken]")
+TEST_CASE("MehdiGPURayCastMultiVolumeRep can clip partially and fully 1 small volume.", "[rep][unit][visualization][not_apple][broken][unstable]")
 {
 	MehdiGPURayCastMultiVolumeRepFixture fixture;
 	fixture.setNumberOfImages(2);

@@ -19,8 +19,8 @@
 #include <QDomNode>
 #include <QDateTime>
 #include <QStringList>
-#include "sscTime.h"
-#include "sscMessageManager.h"
+#include "cxTime.h"
+#include "cxReporter.h"
 #include "cxToolManager.h"
 #include "cxSettings.h"
 
@@ -163,13 +163,13 @@ void Acquisition::startRecord()
 {
 	if (this->getState()!=sNOT_RUNNING)
 	{
-		messageManager()->sendInfo("Already recording a session, stop before trying to start a new record session.");
+		report("Already recording a session, stop before trying to start a new record session.");
 		return;
 	}
 
 	double startTime = getMilliSecondsSinceEpoch();
 	mLatestSession.reset(new cx::RecordSession(mPluginData->getNewUid(), startTime, startTime, settings()->value("Ultrasound/acquisitionName").toString()));
-	messageManager()->playStartSound();
+	reporter()->playStartSound();
 	this->setState(sRUNNING);
 }
 
@@ -182,8 +182,8 @@ void Acquisition::stopRecord()
 
 	mLatestSession->setStopTime(getMilliSecondsSinceEpoch());
 	mPluginData->addRecordSession(mLatestSession);
-	cxToolManager::getInstance()->saveToolsSlot(); //asks all the tools to save their transforms and timestamps
-	messageManager()->playStopSound();
+	toolManager()->saveToolsSlot(); //asks all the tools to save their transforms and timestamps
+	reporter()->playStopSound();
 	this->setState(sNOT_RUNNING);
 }
 
@@ -193,7 +193,7 @@ void Acquisition::cancelRecord()
 	{
 		return;
 	}
-	messageManager()->playCancelSound();
+	reporter()->playCancelSound();
 	mLatestSession.reset();
 	this->setState(sNOT_RUNNING);
 }

@@ -18,17 +18,20 @@
 #include <QTextStream>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscToolManager.h"
-#include "sscDataManager.h"
-#include "sscVector3D.h"
-#include "sscDefinitionStrings.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
+#include "cxToolManager.h"
+#include "cxDataManager.h"
+#include "cxVector3D.h"
+#include "cxDefinitionStrings.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
 #include "cxTool.h"
 //#include "cxStateService.h"
 #include "cxPatientData.h"
+
+#include "cxLegacySingletons.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
@@ -90,8 +93,8 @@ void ToolTipCalibrateWidget::calibrateSlot()
     return;
 
   ToolPtr tool = toolManager()->getDominantTool();
-  CoordinateSystem to = CoordinateSystemHelpers::getT(tool);
-  Vector3D P_t = CoordinateSystemHelpers::getDominantToolTipPoint(to);
+  CoordinateSystem to = spaceProvider()->getT(tool);
+  Vector3D P_t = spaceProvider()->getDominantToolTipPoint(to);
 
   ToolTipCalibrationCalculator calc(tool, refTool, P_t);
   Transform3D calibration = calc.get_calibration_sMt();
@@ -116,15 +119,15 @@ void ToolTipCalibrateWidget::testCalibrationSlot()
   if(!selectedTool || !selectedTool->hasReferencePointWithId(1))
     return;
 
-  CoordinateSystem to = CoordinateSystemHelpers::getT(toolManager()->getDominantTool());
-  Vector3D sampledPoint = CoordinateSystemHelpers::getDominantToolTipPoint(to);
+  CoordinateSystem to = spaceProvider()->getT(toolManager()->getDominantTool());
+  Vector3D sampledPoint = spaceProvider()->getDominantToolTipPoint(to);
 
   ToolTipCalibrationCalculator calc(toolManager()->getDominantTool(), selectedTool, sampledPoint);
   Vector3D delta_selectedTool = calc.get_delta_ref();
 
   mDeltaLabel->setText("<b>Delta:</b> "+qstring_cast(delta_selectedTool)+" <br> <b>Length:</b>  "+qstring_cast(delta_selectedTool.length()));
 
-  messageManager()->sendInfo("Delta: "+qstring_cast(delta_selectedTool)+" Length:   "+qstring_cast(delta_selectedTool.length()));
+  report("Delta: "+qstring_cast(delta_selectedTool)+" Length:   "+qstring_cast(delta_selectedTool.length()));
 }
 
 void ToolTipCalibrateWidget::toolSelectedSlot()
@@ -135,7 +138,7 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
 
   if(mTools->getTool())
   {
-	cxToolPtr tool = boost::dynamic_pointer_cast<cxTool>(mTools->getTool());
+	ToolPtr tool = mTools->getTool();
     if(tool && tool->hasReferencePointWithId(1))
     {
       text = "Ref. point: "+qstring_cast(tool->getReferencePoints()[1]);
@@ -143,7 +146,7 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
 //      mTestButton->setEnabled(true);
     }
     else
-		messageManager()->sendWarning("Selected tool have no known reference point");
+		reportWarning("Selected tool have no known reference point");
     if(tool)
     {
       mCalibrationLabel->setText("Calibration:\n"+qstring_cast(tool->getCalibration_sMt()));
@@ -180,10 +183,10 @@ Vector3D ToolTipCalibrationCalculator::get_sampledPoint_t()
 
 Vector3D ToolTipCalibrationCalculator::get_sampledPoint_ref()
 {
-  CoordinateSystem csT = CoordinateSystemHelpers::getT(mTool); //from
-  CoordinateSystem csRef = CoordinateSystemHelpers::getT(mRef); //to
+  CoordinateSystem csT = spaceProvider()->getT(mTool); //from
+  CoordinateSystem csRef = spaceProvider()->getT(mRef); //to
 
-  Transform3D refMt = CoordinateSystemHelpers::get_toMfrom(csT, csRef);
+  Transform3D refMt = spaceProvider()->get_toMfrom(csT, csRef);
 
   Vector3D P_ref = refMt.coord(mP_t);
 
@@ -199,9 +202,9 @@ Transform3D ToolTipCalibrationCalculator::get_sMt_new()
 {
   Transform3D sMt_old = mTool->getCalibration_sMt();
 
-  CoordinateSystem csT = CoordinateSystemHelpers::getT(mTool); //to
-  CoordinateSystem csRef = CoordinateSystemHelpers::getT(mRef); //from
-  Transform3D tMref = CoordinateSystemHelpers::get_toMfrom(csRef, csT);
+  CoordinateSystem csT = spaceProvider()->getT(mTool); //to
+  CoordinateSystem csRef = spaceProvider()->getT(mRef); //from
+  Transform3D tMref = spaceProvider()->get_toMfrom(csRef, csT);
 
   Vector3D delta_t = tMref.vector(this->get_delta_ref());
   Transform3D T_delta_t = createTransformTranslate(delta_t);

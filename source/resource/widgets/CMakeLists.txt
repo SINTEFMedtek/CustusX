@@ -5,16 +5,16 @@
 set(QXT_FOLDER ${CustusX3_SOURCE_DIR}/source/ThirdParty/qxt)
 
 cx_add_class_qt_moc(CX_RESOURCE_WIDGETS_FILES
-	sscOptimizedUpdateWidget
-	sscConsoleWidget
-	sscDoubleWidgets
-	sscLabeledComboBoxWidget
-	sscLabeledLineEditWidget
-	sscCheckBoxWidget
-	sscHelperWidgets
-	sscFileSelectWidget
-	sscMousePadWidget
-	sscColorSelectWidget
+	cxOptimizedUpdateWidget
+	cxConsoleWidget
+	cxDoubleWidgets
+	cxLabeledComboBoxWidget
+	cxLabeledLineEditWidget
+	cxCheckBoxWidget
+	cxHelperWidgets
+	cxFileSelectWidget
+	cxMousePadWidget
+	cxColorSelectWidget
 	cxColorSelectButton
 	cxDisplayTimerWidget
 	cxTimelineWidget

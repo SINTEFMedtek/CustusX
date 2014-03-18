@@ -4,8 +4,8 @@
 #include <QWhatsThis>
 #include "boost/scoped_ptr.hpp"
 #include "boost/bind.hpp"
-#include "sscTime.h"
-#include "sscMessageManager.h"
+#include "cxTime.h"
+#include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
@@ -17,7 +17,7 @@
 #include "cxToolPropertiesWidget.h"
 #include "cxViewGroup.h"
 #include "cxPreferencesDialog.h"
-#include "cxImagePropertiesWidget.h"
+#include "cxSlicePropertiesWidget.h"
 #include "cxPatientData.h"
 #include "cxDataLocations.h"
 #include "cxMeshInfoWidget.h"
@@ -29,16 +29,16 @@
 #include "cxCameraControl.h"
 #include "cxSecondaryMainWindow.h"
 #include "cxVideoConnectionWidget.h"
-#include "cxAudio.h"
+#include "cxAudioImpl.h"
 #include "cxSettings.h"
 #include "cxVideoConnectionManager.h"
 #include "cxToolManagerWidget.h"
 #include "cxVideoService.h"
 #include "cxLogicManager.h"
 #include "cxExportDataDialog.h"
-#include "sscGPUImageBuffer.h"
-#include "sscData.h"
-#include "sscConsoleWidget.h"
+#include "cxGPUImageBuffer.h"
+#include "cxData.h"
+#include "cxConsoleWidget.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"
 #include "cxPatientService.h"
@@ -55,8 +55,9 @@
 #include "cxVLCRecorder.h"
 #include "cxSecondaryViewLayoutWindow.h"
 #include "cxRegistrationHistoryWidget.h"
-#include "sscLogger.h"
+#include "cxLogger.h"
 #include "cxLayoutInteractor.h"
+#include "cxNavigation.h"
 
 namespace cx
 {
@@ -68,7 +69,7 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	stylesheet.open(QIODevice::ReadOnly);
 	qApp->setStyleSheet(stylesheet.readAll());
 
-	mCameraControl.reset(new CameraControl(this));
+	mCameraControl = viewManager()->getCameraControl();
 	mLayoutInteractor.reset(new LayoutInteractor());
 
 	viewManager()->initialize();
@@ -79,8 +80,8 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	this->createToolBars();
 	this->setStatusBar(new StatusBar());
 
-	messageManager()->setLoggingFolder(DataLocations::getRootConfigPath());
-	messageManager()->setAudioSource(AudioPtr(new AudioImpl()));
+	reporter()->setLoggingFolder(DataLocations::getRootConfigPath());
+	reporter()->setAudioSource(AudioPtr(new AudioImpl()));
 
 	connect(stateService()->getApplication().get(), SIGNAL(activeStateChanged()), this,
 		SLOT(onApplicationStateChangedSlot()));
@@ -95,7 +96,7 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	this->addAsDockWidget(new VideoConnectionWidget(this), "Utility");
 	this->addAsDockWidget(new EraserWidget(this), "Properties");
 	this->addAsDockWidget(new MetricWidget(this), "Utility");
-	this->addAsDockWidget(new ImagePropertiesWidget(this), "Properties");
+	this->addAsDockWidget(new SlicePropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new VolumePropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new MeshInfoWidget(this), "Properties");
 #ifdef SSC_USE_DCMTK
@@ -279,10 +280,10 @@ void MainWindow::createActions()
 	mDebugModeAction = new QAction(tr("&Debug Mode"), this);
 	mDebugModeAction->setShortcut(tr("Ctrl+D"));
 	mDebugModeAction->setCheckable(true);
-	mDebugModeAction->setChecked(cxDataManager::getInstance()->getDebugMode());
+	mDebugModeAction->setChecked(dataManager()->getDebugMode());
 	mDebugModeAction->setStatusTip(tr("Set debug mode, this enables lots of weird stuff."));
-	connect(mDebugModeAction, SIGNAL(triggered(bool)), cxDataManager::getInstance(), SLOT(setDebugMode(bool)));
-	connect(cxDataManager::getInstance(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
+	connect(mDebugModeAction, SIGNAL(triggered(bool)), dataManager(), SLOT(setDebugMode(bool)));
+	connect(dataManager(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
 	connect(mDebugModeAction, SIGNAL(toggled(bool)), this, SLOT(toggleDebugModeSlot(bool)));
 
 	mFullScreenAction = new QAction(tr("Fullscreen"), this);
@@ -445,8 +446,8 @@ void MainWindow::saveScreenShot(QPixmap pixmap)
 void MainWindow::saveScreenShotThreaded(QImage pixmap, QString filename)
 {
 	pixmap.save(filename, "png");
-	messageManager()->sendInfo("Saved screenshot to " + filename);
-	messageManager()->playScreenShotSound();
+	report("Saved screenshot to " + filename);
+	reporter()->playScreenShotSound();
 }
 
 void MainWindow::toggleStreamingSlot()
@@ -473,17 +474,20 @@ void MainWindow::updateStreamingActionSlot()
 
 void MainWindow::centerToImageCenterSlot()
 {
+	NavigationPtr nav = viewManager()->getNavigation();
+
 	if (dataManager()->getActiveImage())
-		Navigation().centerToData(dataManager()->getActiveImage());
+		nav->centerToData(dataManager()->getActiveImage());
 	else if (!viewManager()->getViewGroups().empty())
-		Navigation().centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
+		nav->centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
 	else
-		Navigation().centerToGlobalDataCenter();
+		nav->centerToGlobalDataCenter();
 }
 
 void MainWindow::centerToTooltipSlot()
 {
-	Navigation().centerToTooltip();
+	NavigationPtr nav = viewManager()->getNavigation();
+	nav->centerToTooltip();
 }
 
 void MainWindow::togglePointPickerActionSlot()
@@ -537,7 +541,7 @@ void MainWindow::newPatientSlot()
 	if (!QDir().exists(patientDatafolder))
 	{
 		QDir().mkdir(patientDatafolder);
-		messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder);
+		report("Made a new patient folder: " + patientDatafolder);
 	}
 
 	QString timestamp = QDateTime::currentDateTime().toString(timestampFormatFolderFriendly()) + "_";
@@ -568,14 +572,14 @@ void MainWindow::clearPatientSlot()
 {
 	patientService()->getPatientData()->clearPatient();
 	patientService()->getPatientData()->writeRecentPatientData();
-	messageManager()->sendWarning("Cleared current patient data");
+	reportWarning("Cleared current patient data");
 }
 
 void MainWindow::savePatientFileSlot()
 {
 	if (patientService()->getPatientData()->getActivePatientFolder().isEmpty())
 	{
-		messageManager()->sendWarning("No patient selected, select or create patient before saving!");
+		reportWarning("No patient selected, select or create patient before saving!");
 		this->newPatientSlot();
 		return;
 	}
@@ -660,7 +664,7 @@ void MainWindow::loadPatientFileSlot()
 	if (!QDir().exists(patientDatafolder))
 	{
 		QDir().mkdir(patientDatafolder);
-		messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder);
+		report("Made a new patient folder: " + patientDatafolder);
 	}
 	// Open file dialog
 	QString choosenDir = QFileDialog::getExistingDirectory(this, tr("Select patient"), patientDatafolder,
@@ -692,7 +696,7 @@ void MainWindow::importDataSlot()
 		folder, tr("Image/Mesh (*.mhd *.mha *.stl *.vtk *.mnc)"));
 	if (fileName.empty())
 	{
-		messageManager()->sendInfo("Import canceled");
+		report("Import canceled");
 		return;
 	}
 
@@ -879,7 +883,7 @@ void MainWindow::preferencesSlot()
 
 void MainWindow::quitSlot()
 {
-	messageManager()->sendInfo("Shutting down CustusX");
+	report("Shutting down CustusX");
 	viewManager()->deactivateCurrentLayout();
 
 	patientService()->getPatientData()->autoSave();
@@ -887,7 +891,7 @@ void MainWindow::quitSlot()
 	settings()->setValue("mainWindow/geometry", saveGeometry());
 	settings()->setValue("mainWindow/windowState", saveState());
 	settings()->sync();
-	messageManager()->sendInfo("Closing: Save geometry and window state");
+	report("Closing: Save geometry and window state");
 
 	qApp->quit();
 }

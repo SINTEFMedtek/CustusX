@@ -5,8 +5,8 @@
 
 #include <vector>
 #include <QtGui>
-#include "sscForwardDeclarations.h"
-#include "sscLandmark.h"
+#include "cxForwardDeclarations.h"
+#include "cxLandmark.h"
 
 class QVBoxLayout;
 class QTableWidget;
@@ -21,7 +21,7 @@ namespace cx
  * Early version of metric/label system.
  * Replaced by MetricWidget.
  *
- * \ingroup cxGUI
+ * \ingroup cx_gui
  * \ingroup cxNotUsed
  *
  * \sa MetricWidget

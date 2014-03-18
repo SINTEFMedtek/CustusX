@@ -7,14 +7,14 @@
 #include <QHBoxLayout>
 #include <QDoubleSpinBox>
 #include <vtkPolyData.h>
-#include "sscToolManager.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscMesh.h"
-#include "sscTransform3D.h"
+#include "cxToolManager.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
+#include "cxMesh.h"
+#include "cxTransform3D.h"
 #include "cxRecordSessionWidget.h"
 #include "cxVideoConnectionManager.h"
-#include "cxProbe.h"
+#include "cxProbeImpl.h"
 #include "cxSoundSpeedConversionWidget.h"
 
 namespace cx

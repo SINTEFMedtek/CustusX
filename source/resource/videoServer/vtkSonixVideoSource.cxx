@@ -50,7 +50,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedCharArray.h"
 #include "vtksys/SystemTools.hxx"
 #include <ctype.h>
-#include "sscTime.h"
+#include "cxTime.h"
 #include <igtlImageMessage.h>
 
 #include "cxSonixProbeFileReader.h"

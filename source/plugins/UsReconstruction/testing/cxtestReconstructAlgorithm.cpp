@@ -15,21 +15,21 @@
 #include <vtkImageData.h>
 #include <QDomElement>
 
-#include "sscReconstructAlgorithm.h"
+#include "cxReconstructAlgorithm.h"
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #include "catch.hpp"
-#include "sscPNNReconstructAlgorithm.h"
+#include "cxPNNReconstructAlgorithm.h"
 #include "QFileInfo"
-#include "sscDummyTool.h"
+#include "cxDummyTool.h"
 
 #ifdef CX_USE_OPENCL_UTILITY
 #include "TordReconstruct/TordTest.h"
-#include "cxOpenCLUtilities.h"
 #endif
 
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 #include "cxtestReconstructAlgorithmFixture.h"
 #include "cxtestUtilities.h"
+#include "cxtestJenkinsMeasurement.h"
 
 namespace cxtest
 {
@@ -104,9 +104,9 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 //}
 
 #ifdef CX_USE_OPENCL_UTILITY
-TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconstruction][synthetic][not_win32][unstable][broken]")
+TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconstruction][synthetic][not_win32]")
 {
-	cx::messageManager()->initialize();
+	cx::Reporter::initialize();
 
 	ReconstructAlgorithmFixture fixture;
 
@@ -115,11 +115,18 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	QDomDocument domdoc;
 	QDomElement settings = domdoc.createElement("TordTest");
 	boost::shared_ptr<cx::TordTest> algorithm(new cx::TordTest);
+	algorithm->enableProfiling();
+
+	JenkinsMeasurement jenkins;
+	jenkins.initialize();
+
+	QString name = "DefaultTord";
 
 	fixture.setAlgorithm(algorithm);
 	algorithm->getRadiusOption(settings)->setValue(10);
 	SECTION("VNN")
 	{
+		name = "VNN";
 		std::cerr << "Testing VNN\n";
 		algorithm->getMethodOption(settings)->setValue("VNN");
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
@@ -128,6 +135,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	}
 	SECTION("VNN2")
 	{
+		name = "VNN2";
 		std::cerr << "Testing VNN2\n";
 		algorithm->getMethodOption(settings)->setValue("VNN2");
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
@@ -136,6 +144,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	}
 	SECTION("DW")
 	{
+		name = "DW";
 		std::cerr << "Testing DW\n";
 		algorithm->getMethodOption(settings)->setValue("DW");
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
@@ -144,6 +153,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	}
 	SECTION("Anisotropic")
 	{
+		name = "Anisotropic";
 		std::cerr << "Testing Anisotropic\n";
 		algorithm->getMethodOption(settings)->setValue("Anisotropic");
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
@@ -154,6 +164,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	}
 	SECTION("Multistart search")
 	{
+		name = "Multistart search";
 		std::cerr << "Testing multistart search\n";
 		algorithm->getMethodOption(settings)->setValue("VNN");
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
@@ -163,14 +174,17 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 
 	fixture.reconstruct(settings);
 
+	double executionTime = algorithm->getKernelExecutionTime();
+	jenkins.createOutput(name, QString::number(executionTime));
+
 	fixture.checkRMSBelow(20.0);
 	fixture.checkCentroidDifferenceBelow(1);
 	fixture.checkMassDifferenceBelow(0.01);
 
-	//need to be sure opencl thread is finished before shutting down messagemanager,
-	//or else we could get seg fault because og a callbackk from opencl to messagemAnager after it is shut down
+	//need to be sure opencl thread is finished before shutting down Reporter,
+	//or else we could get seg fault because og a callbackk from opencl to Reporter after it is shut down
 	Utilities::sleep_sec(1);
-	cx::messageManager()->shutdown();
+	cx::Reporter::shutdown();
 }
 #endif//CX_USE_OPENCL_UTILITY
 

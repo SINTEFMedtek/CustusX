@@ -14,7 +14,7 @@
 
 #include "cxToolMetricRep.h"
 
-#include "sscView.h"
+#include "cxView.h"
 #include "boost/bind.hpp"
 #include "cxGraphicalAxes3D.h"
 
@@ -60,7 +60,7 @@ ToolMetricPtr ToolMetricRep::getToolMetric()
 	return boost::dynamic_pointer_cast<ToolMetric>(mMetric);
 }
 
-void ToolMetricRep::changedSlot()
+void ToolMetricRep::onModifiedStartRender()
 {
 	ToolMetricPtr metric = this->getToolMetric();
 
@@ -85,10 +85,10 @@ void ToolMetricRep::changedSlot()
 	Vector3D toolTip_r = rMt.coord(Vector3D(0,0,-metric->getToolOffset()));
 
 	mToolTip->setValue(toolTip_r);
-	mToolTip->setColor(this->getColorAsVector3D());
+	mToolTip->setColor(mMetric->getColor());
 
 	mToolOffset->setValue(p0_r, toolTip_r);
-	mToolOffset->setColor(this->getColorAsVector3D());
+	mToolOffset->setColor(mMetric->getColor());
 
 	mAxes->setTransform(metric->getRefFrame());
 	this->drawText();

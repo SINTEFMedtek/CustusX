@@ -9,7 +9,7 @@ cx_add_class_qt_moc(CX_RESOURCE_USRECONSTRUCTIONTYPES_FILES
 cx_add_class(CX_RESOURCE_USRECONSTRUCTIONTYPES_FILES
 	cxUsReconstructionFileMaker
 	cxUsReconstructionFileReader
-	sscUSFrameData
+	cxUSFrameData
 	cxUSReconstructInputData
 	cxUSReconstructInputDataAlgoritms
     )
