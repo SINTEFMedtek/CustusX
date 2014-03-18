@@ -11,21 +11,21 @@
 #include <QtGui>
 #include <QVBoxLayout>
 #include "boost/bind.hpp"
-#include "sscToolManager.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxToolManager.h"
+#include "cxLabeledComboBoxWidget.h"
 #include <vtkDoubleArray.h>
 #include <vtkPointData.h>
-#include "sscDoubleWidgets.h"
-#include "sscTypeConversions.h"
+#include "cxDoubleWidgets.h"
+#include "cxTypeConversions.h"
 #include "cxPatientData.h"
 #include "cxRecordSessionWidget.h"
 #include "cxSettings.h"
 #include "cxToolDataAdapters.h"
 #include "cxDoubleDataAdapterTemporalCalibration.h"
-#include "sscUtilHelpers.h"
-#include "sscVolumeHelpers.h"
+#include "cxUtilHelpers.h"
+#include "cxVolumeHelpers.h"
 #include "vtkImageCorrelation.h"
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 #include "cxPatientService.h"
 
 typedef vtkSmartPointer<vtkImageCorrelation> vtkImageCorrelationPtr;
@@ -154,12 +154,12 @@ void TemporalCalibrationWidget::calibrateSlot()
   double shift = mAlgorithm->calibrate(&success);
   if (success)
   {
-	  messageManager()->sendSuccess(QString("Completed temporal calibration, found shift %1 ms").arg(shift,0,'f',0));
+	  reportSuccess(QString("Completed temporal calibration, found shift %1 ms").arg(shift,0,'f',0));
 	  mResult->setText(QString("Shift = %1 ms").arg(shift, 0, 'f', 0));
   }
   else
   {
-	  messageManager()->sendError(QString("Temporal calibration failed"));
+	  reportError(QString("Temporal calibration failed"));
 	  mResult->setText(QString("failed"));
   }
 }

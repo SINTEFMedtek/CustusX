@@ -31,13 +31,13 @@ typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
 
 /**
  * \file
- * \addtogroup cxPluginAcquisition
+ * \addtogroup cx_plugin_acquisition
  * @{
  */
 
 /**
  * \brief Handles the us acquisition process.
- * \ingroup cxPluginAcquisition
+ * \ingroup cx_plugin_acquisition
  *
  * The USAcquisition object attaches itself to an
  * input Acquisition object and records ultrasound

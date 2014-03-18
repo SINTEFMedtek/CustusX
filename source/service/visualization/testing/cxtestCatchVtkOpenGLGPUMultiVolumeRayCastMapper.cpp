@@ -17,9 +17,9 @@
 #include <vtkInteractorStyleTrackballCamera.h>
 #include "vtkMultiVolumePicker.h"
 #include <vtkCamera.h>
-#include "sscLogger.h"
+#include "cxLogger.h"
 
-#include "sscVector3D.h" //Neeed to setup Eigen correctly
+#include "cxVector3D.h" //Neeed to setup Eigen correctly
 
 #include "vtkOpenGLGPUMultiVolumeRayCastMapper.h"
 
@@ -78,6 +78,21 @@ public:
 
 		vtkTransformPtr transform = vtkTransformPtr::New();
 		transform->Identity();
+		transform->Translate(translation.data());
+		transform->Update();
+
+		mMapper->SetAdditionalInputUserTransform(currentIndex,transform);
+		mMapper->SetInput(currentIndex+1, image);
+		mMapper->SetAdditionalProperty(currentIndex, property);
+	}
+
+	void addImageAndRotate(int index, vtkImageDataPtr image, vtkVolumePropertyPtr property, Eigen::Vector3d translation = Eigen::Vector3d::Zero())
+	{
+		int currentIndex = index; // index into additional volumes.
+
+		vtkTransformPtr transform = vtkTransformPtr::New();
+		transform->Identity();
+		transform->RotateX(30);
 		transform->Translate(translation.data());
 		transform->Update();
 
@@ -227,36 +242,32 @@ void requireRender()
 			return vtkMultiVolumePickerPtr();
 	}
 
-	void requireHit(int x, int y, bool hit = true)
+	void requireHit(int x, int y, bool ignoreExpected = false)
 	{
 		Eigen::Vector3d p_camera(x,y,-100);
 		Eigen::Vector3d viewdir = Eigen::Vector3d(0,0,1);
-
 		vtkMultiVolumePickerPtr picker = pickAlongRayReturnSuccessfulMultiVolumePicker(p_camera, viewdir);
-
 		Eigen::Vector3d p_expected(x,y,0);
-		if (hit)
 		{
-			{
-				INFO("Should hit point: " << x << " " << y);
-				REQUIRE(picker.GetPointer());
-			}
-			Eigen::Vector3d p_pick(picker->GetPickPosition());
-			{
-				INFO(p_pick << " == " << p_expected);
-				CHECK(p_pick.isApprox(p_expected));
-			}
+			INFO("Should hit point: " << x << " " << y);
+			REQUIRE(picker.GetPointer());
 		}
-		else
+		Eigen::Vector3d p_pick(picker->GetPickPosition());
+		if(!ignoreExpected)
 		{
-			INFO("Should not hit point: " << x << " " << y);
-			REQUIRE_FALSE(picker.GetPointer());
+			INFO(p_pick << " == " << p_expected);
+			CHECK(p_pick.isApprox(p_expected));
 		}
 	}
 
 	void requireMiss(int x, int y)
 	{
-		requireHit(x, y , false);
+		Eigen::Vector3d p_camera(x,y,-100);
+		Eigen::Vector3d viewdir = Eigen::Vector3d(0,0,1);
+		vtkMultiVolumePickerPtr picker = pickAlongRayReturnSuccessfulMultiVolumePicker(p_camera, viewdir);
+
+		INFO("Should not hit point: " << x << " " << y);
+		REQUIRE_FALSE(picker.GetPointer());
 	}
 
 
@@ -407,6 +418,43 @@ TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper vs vtkMultiVolumePicker: Small t
 	fixture.requireMiss(9, 9);
 	fixture.requireHit(10, 10);
 	fixture.requireHit(20, 20);
+
+	fixture.requireMiss(9, 10);
+	fixture.requireMiss(9, 20);
+	fixture.requireMiss(10, 9);
+	fixture.requireMiss(10, 21);
+	fixture.requireMiss(21, 10);
+	fixture.requireMiss(21, 20);
+	fixture.requireMiss(20, 21);
+	fixture.requireRender();
+}
+
+TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper vs vtkMultiVolumePicker: Rotation", "[unit]")
+{
+	int numberOfVolumes = 1;
+	VtkOpenGLGPUMultiVolumeRayCastMapperFixture fixture(numberOfVolumes);
+
+	vtkImageDataPtr refImage = fixture.createVtkImageData(Eigen::Array3i(21,21,21), Eigen::Array3d(1,1,1), 100);
+	vtkVolumePropertyPtr property = fixture.getVolumeProperty(100,300);
+
+	fixture.setReferenceImage(refImage, property);
+
+	vtkImageDataPtr image = fixture.createVtkImageData(Eigen::Array3i(11,11,11), Eigen::Array3d(1,1,1), 300);
+	fixture.addImageAndRotate(0, image, property, Eigen::Array3d(10,10,0));
+
+	fixture.requireRender();
+	fixture.requireMiss(0, 0);
+	fixture.requireMiss(9, 9);
+	fixture.requireHit(10, 10, true);
+	fixture.requireMiss(20, 20);
+
+	fixture.requireMiss(9, 10);
+	fixture.requireMiss(9, 20);
+	fixture.requireHit(10, 9, true);
+	fixture.requireMiss(10, 21);
+	fixture.requireMiss(21, 10);
+	fixture.requireMiss(21, 20);
+	fixture.requireMiss(20, 21);
 	fixture.requireRender();
 }
 
@@ -425,7 +473,8 @@ TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can be picked using vtkMultiVolu
 	vtkImageDataPtr image = fixture.createVtkImageData(Eigen::Array3i(11,11,11), Eigen::Array3d(1,1,1), 200);
 	fixture.addImage(0, image, property, Eigen::Array3d(0,0,0));
 	fixture.addImage(1, image, property, Eigen::Array3d(20,0,0));
-	fixture.addImage(2, image, property, Eigen::Array3d(20,20,0));
+	fixture.addImageAndRotate(2, image, property, Eigen::Array3d(20,20,0));
+//	fixture.addImage(2, image, property, Eigen::Array3d(20,20,0));
 
 	fixture.requireRender();
 	fixture.requireHit(5, 5);
@@ -433,10 +482,30 @@ TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can be picked using vtkMultiVolu
 	fixture.requireMiss(15, 15);
 	fixture.requireMiss(0, 15);
 	fixture.requireHit(25, 5);
-	fixture.requireHit(25, 25);
+	fixture.requireHit(25, 20, true);
 	fixture.requireMiss(40, 0);
 	fixture.requireMiss(40, 40);
 	fixture.requireRender();
+}
+
+TEST_CASE("vtkTransform translate and rotate", "[unit]")
+{
+	vtkTransformPtr transform = vtkTransformPtr::New();
+	transform->Identity();
+	transform->RotateX(60);
+	Eigen::Array3d translation = Eigen::Array3d(0,10,20);
+	transform->Translate(translation.data());
+	transform->Update();
+
+
+	double p1[3] = {10, 20, 30};
+	double p1_t[3];
+
+	transform->PreMultiply();
+	transform->TransformPoint(p1, p1_t);
+	CHECK(p1_t[0] == p1[0]);
+	CHECK(p1_t[1] != p1[1]);
+	CHECK(p1_t[2] != p1[2]);
 }
 
 } // namespace cxtest

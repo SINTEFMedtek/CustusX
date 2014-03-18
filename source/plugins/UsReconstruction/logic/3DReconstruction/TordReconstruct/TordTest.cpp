@@ -4,8 +4,8 @@
 #include <vtkImageData.h>
 #include <QDomElement>
 #include <recConfig.h>
-#include <sscUSFrameData.h>
-#include "sscMessageManager.h"
+#include "cxUSFrameData.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -26,6 +26,16 @@ TordTest::TordTest()
 TordTest::~TordTest()
 {
 
+}
+
+void TordTest::enableProfiling()
+{
+	mAlgorithm->setProfiling(true);
+}
+
+double TordTest::getKernelExecutionTime()
+{
+	return mAlgorithm->getKernelExecutionTime();
 }
 
 QString TordTest::getName() const
@@ -59,7 +69,7 @@ bool TordTest::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr output
 	float newnessWeight = getNewnessWeightOption(settings)->getValue();
 	float brightnessWeight = getBrightnessWeightOption(settings)->getValue();
 
-	messageManager()->sendInfo(
+	report(
 			QString("Method: %1, radius: %2, planeMethod: %3, nClosePlanes: %4, nPlanes: %5, nStarts: %6 ").arg(method).arg(
 					radius).arg(planeMethod).arg(nClosePlanes).arg(input->getDimensions()[2]).arg(nStarts));
 

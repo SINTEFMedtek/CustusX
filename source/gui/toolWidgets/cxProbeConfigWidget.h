@@ -18,8 +18,8 @@
 #include "cxBaseWidget.h"
 #include "cxBoundingBoxWidget.h"
 #include "cxToolDataAdapters.h"
-#include "sscVector3DDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
+#include "cxVector3DDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
 
 namespace cx
 {
@@ -27,7 +27,7 @@ namespace cx
 /**
  *
  * \brief Widget that displays/edits a probe configuration
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * \date Mar 16, 2012
  * \author Christian Askeland, SINTEF

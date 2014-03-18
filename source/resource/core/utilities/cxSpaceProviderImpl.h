@@ -15,6 +15,7 @@
 #define CXSPACEPROVIDERIMPL_H
 
 #include "cxSpaceProvider.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
@@ -24,14 +25,14 @@ class DataManager;
 /** Provides information about all the coordinate systems in the application.
  *
  *
- * \ingroup cx
+ * \ingroup cx_resource_core_utilities
  * \date 2014-02-21
  * \author christiana
  */
 class SpaceProviderImpl : public SpaceProvider
 {
 public:
-	SpaceProviderImpl(ToolManager* toolManager, DataManager* dataManager);
+	SpaceProviderImpl(TrackingServicePtr toolManager, DataServicePtr dataManager);
 	virtual ~SpaceProviderImpl() {}
 
 	virtual Transform3D get_toMfrom(CoordinateSystem from, CoordinateSystem to); ///< to_M_from
@@ -62,8 +63,8 @@ private:
 
 	CoordinateSystem getToolCoordinateSystem(ToolPtr tool);
 
-	ToolManager* mToolManager;
-	DataManager* mDataManager;
+	TrackingServicePtr mToolManager;
+	DataServicePtr mDataManager;
 };
 
 } // namespace cx

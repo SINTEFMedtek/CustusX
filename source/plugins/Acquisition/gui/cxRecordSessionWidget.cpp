@@ -5,11 +5,11 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QEvent>
-#include "sscTime.h"
-#include "sscMessageManager.h"
+#include "cxTime.h"
+#include "cxReporter.h"
 #include "cxRecordSession.h"
 #include "cxToolManager.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

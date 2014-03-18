@@ -12,9 +12,9 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 #include "vtkMatrix4x4.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "catch.hpp"
 
 using namespace cx;

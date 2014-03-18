@@ -27,7 +27,7 @@ namespace cx
 
 /**\brief A second counter widget.
  *
- * \ingroup cxResourceUtilities
+ * \ingroup cx_resource_widgets
  * \date Jan 27, 2012
  * \author Christian Askeland, SINTEF
  */

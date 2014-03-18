@@ -3,12 +3,13 @@
 
 #include "cxThreadedTimedAlgorithm.h"
 #include "cxAlgorithmHelpers.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup cxPluginAlgorithm
+ * \addtogroup cx_plugin_algorithm
  * @{
  */
 

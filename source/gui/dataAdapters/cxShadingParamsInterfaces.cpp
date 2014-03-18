@@ -7,14 +7,14 @@
  *
  */
 #include "cxShadingParamsInterfaces.h"
-#include "sscDataManager.h"
-#include "sscImage.h"
+#include "cxDataManager.h"
+#include "cxImage.h"
 
 namespace cx
 {
 DoubleDataAdapterShadingBase::DoubleDataAdapterShadingBase()
 {
-  mActiveImageProxy = ActiveImageProxy::New();
+	mActiveImageProxy = ActiveImageProxy::New(dataService());
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChanged()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
 

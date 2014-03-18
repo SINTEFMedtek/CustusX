@@ -25,15 +25,15 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
 SET( SOURCE_FILES
   ${MOC_HEADER_FILES}
-  sscReconstructedOutputVolumeParams.h
-  sscReconstructedOutputVolumeParams.cpp
-  sscReconstructAlgorithm.h
-  sscPNNReconstructAlgorithm.h
-  sscPNNReconstructAlgorithm.cpp
-  sscReconstructCore.cpp
-  sscReconstructCore.h
-  sscReconstructPreprocessor.cpp
-  sscReconstructPreprocessor.h
+  cxReconstructedOutputVolumeParams.h
+  cxReconstructedOutputVolumeParams.cpp
+  cxReconstructAlgorithm.h
+  cxPNNReconstructAlgorithm.h
+  cxPNNReconstructAlgorithm.cpp
+  cxReconstructCore.cpp
+  cxReconstructCore.h
+  cxReconstructPreprocessor.cpp
+  cxReconstructPreprocessor.h
 	TordReconstruct/cxSyntheticVolume.h
 	TordReconstruct/cxSyntheticVolume.cpp
 	TordReconstruct/cxSimpleSyntheticVolume.h
@@ -68,6 +68,7 @@ add_library( sscUS3DReconstruction ${SOURCE_FILES} )
 set(sscUS3DReconstruction_LIBRARIES
     cxResource
     cxResourceUsReconstructionTypes
+	cxLogicManager
     )
     
 if( CX_USE_OPENCL_UTILITY )

@@ -24,11 +24,11 @@
 #include <vector>
 #include <QPointer>
 #include <QObject>
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
-#include "sscVector3D.h"
-#include "sscCoordinateSystemHelpers.h"
+#include "cxVector3D.h"
+#include "cxCoordinateSystemHelpers.h"
 
 class QAction;
 typedef vtkSmartPointer<class vtkAnnotatedCubeActor> vtkAnnotatedCubeActorPtr;
@@ -44,6 +44,7 @@ typedef boost::shared_ptr<class MetricNamesRep> MetricNamesRepPtr;
 
 namespace cx
 {
+typedef boost::shared_ptr<class Navigation> NavigationPtr;
 typedef boost::shared_ptr<class ImageLandmarkRep> ImageLandmarkRepPtr;
 typedef boost::shared_ptr<class PatientLandmarkRep> PatientLandmarkRepPtr;
 typedef boost::shared_ptr<class MultiVolume3DRepProducer> MultiVolume3DRepProducerPtr;
@@ -51,7 +52,7 @@ typedef boost::shared_ptr<class AxisConnector> AxisConnectorPtr;
 
 /**
  * \file
- * \addtogroup cxServiceVisualization
+ * \addtogroup cx_service_visualization
  * @{
  */
 
@@ -79,6 +80,8 @@ public:
 	virtual void setViewGroup(ViewGroupDataPtr group);
 	void setStereoType(int type);
 
+protected slots:
+	virtual void dataViewPropertiesChangedSlot(QString uid);
 private slots:
 	void showSlices();
 	void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
@@ -106,8 +109,12 @@ private:
 	virtual void appendToContextMenu(QMenu& contextMenu);
 	void readDataRepSettings(RepPtr rep);
 	void updateSlices();
+	NavigationPtr getNavigation();
 
 	QAction* createSlicesAction(QString title, QWidget* parent);
+
+	void createSlicesActions(QWidget *parent);
+	QAction* createSlicesAction(PlaneTypeCollection planes, QWidget* parent);
 
 	void showLandmarks(bool on);
 	void showPointPickerProbe(bool on);
@@ -115,8 +122,11 @@ private:
 
 	RepPtr createDataRep3D(DataPtr data);
     DataMetricRepPtr createDataMetricRep3D(DataPtr data);
-    virtual void dataAdded(DataPtr data);
-	virtual void dataRemoved(const QString& uid);
+//    virtual void dataAdded(DataPtr data);
+//	virtual void dataRemoved(const QString& uid);
+
+	void addVolumeDataRep(DataPtr data);
+	void removeVolumeDataRep(QString uid);
 
 	void setTranslucentRenderingToDepthPeeling(bool setDepthPeeling);
 	void initializeMultiVolume3DRepProducer();
@@ -131,7 +141,7 @@ private:
 	DisplayTextRepPtr mDataNameText;
 //	DisplayTextRepPtr mMetricsText;
 	MetricNamesRepPtr mMetricNames;
-	QString mShowSlicesMode;
+//	QString mShowSlicesMode;
 	std::vector<AxisConnectorPtr> mAxis;
 
 	bool mShowAxes; ///< show 3D axes reps for all tools and ref space

@@ -6,7 +6,7 @@
 
 int main(int argc, char **argv)
 {
-  cx::MessageManager::initialize();
+  cx::Reporter::initialize();
 
   typedef cx::Message Message;
   qRegisterMetaType<Message>("Message");

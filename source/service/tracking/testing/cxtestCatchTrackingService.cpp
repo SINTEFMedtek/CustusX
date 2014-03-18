@@ -15,17 +15,22 @@
 
 #include "catch.hpp"
 
-#include "sscDummyToolManager.h"
+#include "cxDummyToolManager.h"
 
 
 TEST_CASE("DummyToolManager setup/shutdown works multiple times", "[unit]")
 {
     for (unsigned i=0; i<2; ++i)
     {
-		cx::ToolManager::setInstance(cx::DummyToolManager::getInstance());
-		CHECK(cx::toolManager());
-		cx::ToolManager::shutdown();
-        //DummyToolManager::shutdown();
-		CHECK_FALSE(cx::toolManager());
+		cx::TrackingServicePtr service = cx::DummyToolManager::create();
+		REQUIRE(service);
+		CHECK(service.unique());
+		service.reset();
+
+//		cx::ToolManager::setInstance(cx::DummyToolManager::getInstance());
+//		CHECK(cx::toolManager());
+//		cx::ToolManager::shutdown();
+//        //DummyToolManager::shutdown();
+//		CHECK_FALSE(cx::toolManager());
     }
 }

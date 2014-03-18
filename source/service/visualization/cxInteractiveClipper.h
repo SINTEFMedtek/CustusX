@@ -17,7 +17,7 @@
 
 #include <vector>
 #include <QObject>
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
 
 namespace cx
@@ -26,7 +26,7 @@ typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServic
 
 /**
 * \file
-* \addtogroup cxServiceVisualization
+* \addtogroup cx_service_visualization
 * @{
 */
 

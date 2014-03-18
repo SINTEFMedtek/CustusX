@@ -9,11 +9,11 @@
 ###########################################################
 
 SET( MOC_HEADER_FILES
-   logic/sscReconstructManager.h
-   logic/sscReconstructThreads.h
-   logic/sscReconstructParams.h
-   gui/sscReconstructionWidget.h
-   gui/sscReconstructOutputValueParamsInterfaces.h
+   logic/cxReconstructManager.h
+   logic/cxReconstructThreads.h
+   logic/cxReconstructParams.h
+   gui/cxReconstructionWidget.h
+   gui/cxReconstructOutputValueParamsInterfaces.h
    gui/cxUsReconstructionPlugin.h
     )
 
@@ -22,15 +22,15 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 # library
 SET( SOURCE_FILES
   ${MOC_HEADER_FILES}
-  logic/sscReconstructManager.h
-  logic/sscReconstructManager.cpp
-  logic/sscReconstructThreads.h
-  logic/sscReconstructThreads.cpp
-  logic/sscReconstructParams.h
-  logic/sscReconstructParams.cpp
-  gui/sscReconstructionWidget.cpp
-  gui/sscReconstructOutputValueParamsInterfaces.cpp
-  gui/sscReconstructOutputValueParamsInterfaces.h
+  logic/cxReconstructManager.h
+  logic/cxReconstructManager.cpp
+  logic/cxReconstructThreads.h
+  logic/cxReconstructThreads.cpp
+  logic/cxReconstructParams.h
+  logic/cxReconstructParams.cpp
+  gui/cxReconstructionWidget.cpp
+  gui/cxReconstructOutputValueParamsInterfaces.cpp
+  gui/cxReconstructOutputValueParamsInterfaces.h
   gui/cxUsReconstructionPlugin.h
   gui/cxUsReconstructionPlugin.cpp
   )
@@ -49,7 +49,8 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/patient
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/service/visualization
-    ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
+	${CustusX3_SOURCE_DIR}/source/logic
+	${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
     ${CustusX3_SOURCE_DIR}/source/plugins/Algorithm/gui
     ${CustusX3_SOURCE_DIR}/source/gui/utilities
     )

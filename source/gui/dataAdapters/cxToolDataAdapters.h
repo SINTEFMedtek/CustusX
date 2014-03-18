@@ -15,15 +15,16 @@
 #ifndef CXTOOLDATAADAPTERS_H_
 #define CXTOOLDATAADAPTERS_H_
 
-#include "sscStringDataAdapter.h"
-#include "sscTool.h"
+#include "cxStringDataAdapter.h"
+#include "cxTool.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
 
 /**
  * \file
- * \addtogroup cxGUI
+ * \addtogroup cx_gui
  * @{
  */
 

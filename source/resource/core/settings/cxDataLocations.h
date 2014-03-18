@@ -20,7 +20,7 @@ namespace cx
 {
 
 /**Helper functions for accessing file paths and similar stuff.
- * \ingroup cxResourceSettings
+ * \ingroup cx_resource_core_settings
  *  \date Jun 22, 2010
  *  \author christiana
  *

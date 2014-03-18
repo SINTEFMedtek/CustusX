@@ -20,13 +20,14 @@ class QBoxLayout;
 class QGridLayout;
 class QLineEdit;
 #include "cxLayoutData.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
 
 
 /**A QLineEdit
- * \ingroup cxGUI
+ * \ingroup cx_gui
  */
 class SmallLineEdit : public QLineEdit
 {
@@ -41,7 +42,7 @@ public:
 };
 
 /**
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  */
 class LayoutEditorWidget : public QWidget

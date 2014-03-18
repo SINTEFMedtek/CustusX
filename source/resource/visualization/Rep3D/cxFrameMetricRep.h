@@ -14,10 +14,10 @@
 #ifndef CXFRAMEMETRICREP_H
 #define CXFRAMEMETRICREP_H
 
-#include "sscDataMetricRep.h"
-#include "sscGraphicalPrimitives.h"
+#include "cxDataMetricRep.h"
+#include "cxGraphicalPrimitives.h"
 #include "cxFrameMetric.h"
-#include "sscViewportListener.h"
+#include "cxViewportListener.h"
 
 namespace cx
 {
@@ -31,8 +31,8 @@ typedef boost::shared_ptr<class FrameMetricRep> FrameMetricRepPtr;
 
 /** Rep for visualizing a FrameMetric.
  *
- * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep3D
  *
  * \date Aug 26, 2013
  * \author Christian Askeland, SINTEF

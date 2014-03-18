@@ -14,10 +14,10 @@
 
 #include "cxIGTLinkConversion.h"
 
-#include "sscProbeData.h"
+#include "cxProbeData.h"
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include <vtkImageExtractComponents.h>
 #include <vtkImageAppendComponents.h>
 

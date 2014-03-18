@@ -1,11 +1,11 @@
 #include "cxVolumeInfoWidget.h"
 
 #include <QPushButton>
-#include "sscDataManager.h"
-#include "sscImage.h"
-#include "sscLabeledLineEditWidget.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscVolumeHelpers.h"
+#include "cxDataManager.h"
+#include "cxImage.h"
+#include "cxLabeledLineEditWidget.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxVolumeHelpers.h"
 #include "cxActiveImageProxy.h"
 
 namespace cx
@@ -14,7 +14,7 @@ namespace cx
 VolumeInfoWidget::VolumeInfoWidget(QWidget* parent) :
   InfoWidget(parent, "VolumeInfoWidget", "Volume Info")
 {
-	mActiveImageProxy = ActiveImageProxy::New();
+	mActiveImageProxy = ActiveImageProxy::New(dataService());
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(updateSlot()));
 
 	this->addWidgets();

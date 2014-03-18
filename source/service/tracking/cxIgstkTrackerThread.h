@@ -21,7 +21,7 @@
 #include <QTimer>
 #include "cxIgstkTracker.h"
 #include "cxIgstkTrackerThread.h"
-#include "cxTool.h"
+#include "cxToolUsingIGSTK.h"
 #include "cxIgstkTool.h"
 #include "cxIgstkToolManager.h"
 
@@ -29,13 +29,13 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxServiceTracking
+ * \addtogroup cx_service_tracking
  * @{
  */
 
 /**
  * \brief Thread containing all of IGSTK
- * \ingroup cxServiceTracking
+ * \ingroup cx_service_tracking
  *
  * \sa ToolManager
  *

@@ -13,14 +13,14 @@
 // See CustusX_License.txt for more information.
 #include "cxSamplerWidget.h"
 
-#include "sscCoordinateSystemHelpers.h"
+#include "cxCoordinateSystemHelpers.h"
 #include <vtkImageData.h>
 #include "cxToolManager.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscTypeConversions.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxTypeConversions.h"
 #include "cxSettings.h"
-#include "sscDataManager.h"
-#include "sscImage.h"
+#include "cxDataManager.h"
+#include "cxImage.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 #include "cxSpaceListener.h"
@@ -36,7 +36,7 @@ SamplerWidget::SamplerWidget(QWidget* parent) :
 //	mListener.reset(new CoordinateSystemListener(Space(csREF)));
 	connect(mListener.get(), SIGNAL(changed()), this, SLOT(setModified()));
 
-	mActiveTool = DominantToolProxy::New();
+	mActiveTool = DominantToolProxy::New(trackingService());
 	connect(mActiveTool.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(setModified()));
 	connect(mActiveTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), SLOT(setModified()));
 	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(spacesChangedSlot()));

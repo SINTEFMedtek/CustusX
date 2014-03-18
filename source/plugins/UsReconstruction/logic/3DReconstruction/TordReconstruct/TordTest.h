@@ -2,17 +2,17 @@
 #ifndef TORD_TEST_H_
 #define TORD_TEST_H_
 
-#include "sscReconstructAlgorithm.h"
-#include "sscUSFrameData.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
+#include "cxReconstructAlgorithm.h"
+#include "cxUSFrameData.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
 #include "cxTordAlgorithm.h"
 
 namespace cx
 {
 
 /**
- * \addtogroup sscUSReconstruction
+ * \addtogroup cx_plugin_usreconstruction
  * \{
  */
 
@@ -33,6 +33,13 @@ class TordTest : public ReconstructAlgorithm
 public:
 	TordTest();
 	virtual ~TordTest();
+
+	/**
+	 * Turn OpenCL profiling on
+	 */
+	void enableProfiling();
+
+	double getKernelExecutionTime();
 
 	/**
 	 * Return the name of the algorithm

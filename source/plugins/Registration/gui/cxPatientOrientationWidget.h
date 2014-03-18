@@ -2,8 +2,8 @@
 #define CXPATIENTORIENTATIONWIDGET_H_
 
 #include "cxRegistrationBaseWidget.h"
-#include "sscForwardDeclarations.h"
-#include "sscTransform3D.h"
+#include "cxForwardDeclarations.h"
+#include "cxTransform3D.h"
 #include "cxDominantToolProxy.h"
 
 class QPushButton;
@@ -13,7 +13,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxPluginRegistration
+ * \addtogroup cx_plugin_registration
  * @{
  */
 

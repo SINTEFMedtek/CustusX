@@ -18,15 +18,15 @@
 #include <QToolTip>
 #include <QMouseEvent>
 #include "cxToolManager.h"
-#include "sscHelperWidgets.h"
-#include "sscTime.h"
-#include "sscMessageManager.h"
-#include "sscLogger.h"
-#include "sscTypeConversions.h"
+#include "cxHelperWidgets.h"
+#include "cxTime.h"
+#include "cxReporter.h"
+#include "cxLogger.h"
+#include "cxTypeConversions.h"
 #include "cxTimelineWidget.h"
-#include "sscDataManager.h"
-#include "sscData.h"
-#include "sscRegistrationTransform.h"
+#include "cxDataManager.h"
+#include "cxData.h"
+#include "cxRegistrationTransform.h"
 #include "cxVideoService.h"
 #include "cxPlaybackUSAcquisitionVideo.h"
 #include "cxSettings.h"
@@ -109,7 +109,6 @@ PlaybackWidget::PlaybackWidget(QWidget* parent) :
 
 PlaybackWidget::~PlaybackWidget()
 {
-	// TODO Auto-generated destructor stub
 }
 
 QString PlaybackWidget::defaultWhatsThis() const
@@ -141,38 +140,27 @@ void PlaybackWidget::showDetails()
 
 	mStartTimeLabel->setVisible(on);
 	mTotalLengthLabel->setVisible(on);
-//	mLabel->setVisible(on);
 }
 
 void PlaybackWidget::timeLineWidgetValueChangedSlot()
 {
-//	mTimer->setOffset(mToolTimelineWidget->getPos() - mTimer->get);
 	mTimer->setTime(QDateTime::fromMSecsSinceEpoch(mToolTimelineWidget->getPos()));
 }
 
-//mPlayAction->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-playback-pause-3.png"));
-//mPlayAction->setText("Pause");
-//}
-//else
-//{
-//mPlayAction->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-playback-start-3.png"));
-//mPlayAction->setText("Play");
-
 void PlaybackWidget::toggleOpenSlot()
 {
-	if (cx::cxToolManager::getInstance()->isPlaybackMode())
+	if (toolManager()->isPlaybackMode())
 	{
-//		ToolManager::getInstance()->closePlayBackMode();
-		cxToolManager::getInstance()->setPlaybackMode(PlaybackTimePtr());
+		toolManager()->setPlaybackMode(PlaybackTimePtr());
 		videoService()->setPlaybackMode(PlaybackTimePtr());
 	}
 	else
 	{
-		cxToolManager::getInstance()->setPlaybackMode(mTimer);
+		toolManager()->setPlaybackMode(mTimer);
 		videoService()->setPlaybackMode(mTimer);
-		if (!cx::cxToolManager::getInstance()->isPlaybackMode())
+		if (!toolManager()->isPlaybackMode())
 			return;
-		messageManager()->sendInfo(QString("Started Playback with start time [%1] and end time [%2]")
+		report(QString("Started Playback with start time [%1] and end time [%2]")
 						.arg(mTimer->getStartTime().toString(timestampMilliSecondsFormatNice()))
 						.arg(mTimer->getStartTime().addMSecs(mTimer->getLength()).toString(timestampMilliSecondsFormatNice())));
 
@@ -322,7 +310,7 @@ std::pair<double,double> PlaybackWidget::findTimeRange(std::vector<TimelineEvent
 
 void PlaybackWidget::toolManagerInitializedSlot()
 {
-	if (cx::cxToolManager::getInstance()->isPlaybackMode())
+	if (toolManager()->isPlaybackMode())
 	{
 		mOpenAction->setText("Close Playback");
 		mOpenAction->setIcon(QIcon(":/icons/open_icon_library/png/64x64/others/button-green.png"));

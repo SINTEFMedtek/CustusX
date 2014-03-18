@@ -26,6 +26,7 @@ typedef boost::shared_ptr<class FrameMetric> FrameMetricPtr;
  *
  * The transform is attached to a specific coordinate system / frame.
  *
+ * \ingroup cx_resource_core_data
  * \date Aug 25, 2013
  * \author Ole Vegard Solberg, SINTEF
  */
@@ -34,7 +35,7 @@ class FrameMetric: public cx::FrameMetricBase
 Q_OBJECT
 public:
 	virtual ~FrameMetric();
-	static FrameMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	static FrameMetricPtr create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	virtual QString getType() const
 	{
 		return getTypeName();
@@ -47,7 +48,7 @@ public:
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 	virtual QString getAsSingleLineString() const;
 private:
-	FrameMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	FrameMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 };
 
 } //namespace cx

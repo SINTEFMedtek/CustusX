@@ -4,7 +4,7 @@
 class QTextStream;
 class QDir;
 
-#include "sscTool.h"
+#include "cxTool.h"
 #include "cxUSReconstructInputData.h"
 #include "cxForwardDeclarations.h"
 
@@ -18,7 +18,7 @@ typedef boost::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
 
 /**
 * \file
-* \addtogroup cxResourceUtilities
+* \addtogroup cx_resource_usreconstructiontypes
 * @{
 */
 

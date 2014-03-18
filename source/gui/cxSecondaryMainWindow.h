@@ -14,7 +14,7 @@ namespace cx
 
 /**
  * \brief Experimental class for IPad usage.
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * This detached main window can be moved onto a secondary screen.
  * The use case was a IPad where scrolling etc could control the

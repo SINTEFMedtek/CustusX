@@ -17,9 +17,10 @@
 
 #include "cxBaseWidget.h"
 
-#include "sscVector3D.h"
+#include "cxVector3D.h"
 #include "vtkForwardDeclarations.h"
-#include "sscDoubleDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxLegacySingletons.h"
 typedef vtkSmartPointer<class vtkSphereWidget> vtkSphereWidgetPtr;
 
 namespace cx
@@ -27,7 +28,7 @@ namespace cx
 
 /**
  * \file
- * \addtogroup cxGUI
+ * \addtogroup cx_gui
  * @{
  */
 

@@ -14,9 +14,9 @@
 
 #include "cxUSAcquisition.h"
 
-#include "sscReconstructManager.h"
-#include "sscReconstructParams.h"
-#include "sscBoolDataAdapterXml.h"
+#include "cxReconstructManager.h"
+#include "cxReconstructParams.h"
+#include "cxBoolDataAdapterXml.h"
 
 #include "cxPatientData.h"
 #include "cxSettings.h"
@@ -25,7 +25,7 @@
 #include "cxVideoConnectionManager.h"
 #include "cxToolManager.h"
 #include "cxUSSavingRecorder.h"
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 #include "cxAcquisitionData.h"
 
 namespace cx
@@ -43,7 +43,7 @@ USAcquisition::USAcquisition(AcquisitionPtr base, QObject* parent) : QObject(par
 	connect(toolManager(), SIGNAL(configured()), this, SLOT(checkIfReadySlot()));
 	connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
 	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(checkIfReadySlot()));
-	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SLOT(checkIfReadySlot()));
+	connect(videoService().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(checkIfReadySlot()));
 	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(checkIfReadySlot()));
 
 	connect(mBase.get(), SIGNAL(started()), this, SLOT(recordStarted()));
@@ -62,7 +62,7 @@ void USAcquisition::checkIfReadySlot()
 {
 	bool tracking = toolManager()->isTracking();
 	bool streaming = videoService()->getVideoConnection()->isConnected();
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = toolManager()->findFirstProbe();
 
 	QString mWhatsMissing;
 	mWhatsMissing.clear();
@@ -109,7 +109,7 @@ void USAcquisition::recordStarted()
 {
 	mBase->getPluginData()->getReconstructer()->selectData(USReconstructInputData()); // clear old data in reconstructeer
 
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = toolManager()->findFirstProbe();
 	mCore->setWriteColor(this->getWriteColor());
 	mCore->startRecord(mBase->getLatestSession(), tool, this->getRecordingVideoSources(tool));
 }

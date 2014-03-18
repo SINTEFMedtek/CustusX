@@ -15,9 +15,9 @@
 #ifndef CXSPHEREMETRICREP_H
 #define CXSPHEREMETRICREP_H
 
-#include "sscDataMetricRep.h"
+#include "cxDataMetricRep.h"
 #include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 
 typedef vtkSmartPointer<class vtkTextActor> vtkTextActorPtr;
 
@@ -35,8 +35,8 @@ typedef boost::shared_ptr<class SphereMetric> SphereMetricPtr;
 
 /**Rep for visualizing a SphereMetric.
  *
- * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep3D
  *
  * \date 2014-02-11
  * \author Christian Askeland, SINTEF

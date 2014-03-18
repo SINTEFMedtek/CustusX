@@ -15,8 +15,8 @@
 #include "cxCompositeTimedAlgorithm.h"
 
 #include <QStringList>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -56,7 +56,7 @@ void CompositeSerialTimedAlgorithm::clear()
 	// if already started, ignore
 	if (mCurrent>=0)
 	{
-		messageManager()->sendError("Attempt to restart CompositeSerialTimedAlgorithm while running failed.");
+		reportError("Attempt to restart CompositeSerialTimedAlgorithm while running failed.");
 		return;
 	}
 
@@ -139,7 +139,7 @@ void CompositeParallelTimedAlgorithm::clear()
 	// if already started, ignore
 	if (!this->isFinished())
 	{
-		messageManager()->sendError("Attempt to restart CompositeSerialTimedAlgorithm while running failed.");
+		reportError("Attempt to restart CompositeSerialTimedAlgorithm while running failed.");
 		return;
 	}
 

@@ -4,8 +4,8 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include "cxFrameForest.h"
-#include "sscDataManager.h"
-#include "sscData.h"
+#include "cxDataManager.h"
+#include "cxData.h"
 
 namespace cx
 {
@@ -59,7 +59,7 @@ void FrameTreeWidget::rebuild()
 {
   mTreeWidget->clear();
 
-  FrameForest forest;
+  FrameForest forest(dataService());
   QDomElement root = forest.getDocument().documentElement();
 
   this->fill(mTreeWidget->invisibleRootItem(), root);

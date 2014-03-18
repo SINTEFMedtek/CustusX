@@ -14,11 +14,11 @@
 
 #include "cxFilterImpl.h"
 
-#include "sscImage.h"
-#include "sscDataManager.h"
+#include "cxImage.h"
+#include "cxDataManager.h"
 #include "cxSelectDataStringDataAdapter.h"
-#include "sscDoubleDataAdapterXml.h"
-#include "sscStringDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
 
 namespace cx
 {

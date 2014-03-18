@@ -15,9 +15,9 @@
 #include "cxImageDefaultTFGenerator.h"
 
 #include "vtkImageData.h"
-#include "sscImage.h"
-#include "sscImageLUT2D.h"
-#include "sscImageTF3D.h"
+#include "cxImage.h"
+#include "cxImageLUT2D.h"
+#include "cxImageTF3D.h"
 
 namespace cx
 {

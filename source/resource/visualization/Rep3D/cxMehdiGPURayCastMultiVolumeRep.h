@@ -14,8 +14,8 @@
 #ifndef CXMEHDIGPURAYCASTMULTIVOLUMEREP_H
 #define CXMEHDIGPURAYCASTMULTIVOLUMEREP_H
 
-#include "sscRepImpl.h"
-#include "sscForwardDeclarations.h"
+#include "cxRepImpl.h"
+#include "cxForwardDeclarations.h"
 #include <vector>
 #include "vtkForwardDeclarations.h"
 
@@ -78,7 +78,7 @@ private slots:
 /** 
  * Rep wrapping the multivolume renderer created by Mehdi.
  *
- * \ingroup cxServiceVisualizationRep
+ * \ingroup cx_resource_visualization
  * \date 9 Sep 2013
  * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF

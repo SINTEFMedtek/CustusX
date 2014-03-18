@@ -25,22 +25,22 @@
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
-#include "sscView.h"
-#include "sscLandmark.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscTypeConversions.h"
+#include "cxView.h"
+#include "cxLandmark.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
+#include "cxTypeConversions.h"
 #include "boost/bind.hpp"
-#include "sscVtkHelperClasses.h"
+#include "cxVtkHelperClasses.h"
 
 namespace cx
 {
 
-PatientLandmarksSource::PatientLandmarksSource(DataManager* dataManager) : mDataManager(dataManager)
+PatientLandmarksSource::PatientLandmarksSource(DataServicePtr dataManager) : mDataManager(dataManager)
 {
 	connect(mDataManager->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
 	connect(mDataManager->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
-	connect(mDataManager, SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+	connect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 }
 LandmarkMap PatientLandmarksSource::getLandmarks() const
 {
@@ -111,14 +111,14 @@ Vector3D ImageLandmarksSource::getTextPos(Vector3D p_l) const
 // --------------------------------------------------------
 // --------------------------------------------------------
 
-LandmarkRepPtr LandmarkRep::New(DataManager* dataManager, const QString& uid, const QString& name)
+LandmarkRepPtr LandmarkRep::New(DataServicePtr dataManager, const QString& uid, const QString& name)
 {
 	LandmarkRepPtr retval(new LandmarkRep(dataManager, uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
 
-LandmarkRep::LandmarkRep(DataManager* dataManager, const QString& uid, const QString& name) :
+LandmarkRep::LandmarkRep(DataServicePtr dataManager, const QString& uid, const QString& name) :
 	RepImpl(uid, name),
 	mDataManager(dataManager),
 	mInactiveColor(QColor::fromRgbF(0.5,0.5,0.5)),
@@ -129,7 +129,7 @@ LandmarkRep::LandmarkRep(DataManager* dataManager, const QString& uid, const QSt
 	mGraphicsSize(1),
 	mLabelSize(2.5)
 {
-	connect(mDataManager, SIGNAL(landmarkPropertiesChanged()), this, SLOT(internalUpdate()));
+	connect(mDataManager.get(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(internalUpdate()));
 
 	mViewportListener.reset(new ViewportListener);
 	mViewportListener->setCallback(boost::bind(&LandmarkRep::rescale, this));

@@ -16,8 +16,8 @@
 #define CXGRAPHICALTORUS3D_H
 
 #include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
-#include "sscVector3D.h"
+#include "cxForwardDeclarations.h"
+#include "cxVector3D.h"
 class QColor;
 
 typedef vtkSmartPointer<class vtkSuperquadricSource> vtkSuperquadricSourcePtr;
@@ -27,7 +27,7 @@ namespace cx
 
 /** \brief Helper for rendering a torus in 3D
  *
- * \ingroup cx
+ * \ingroup cx_resource_visualization
  * \date 12.02.2014-02-12
  * \author christiana
  */

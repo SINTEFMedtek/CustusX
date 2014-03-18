@@ -25,13 +25,13 @@
 #include "vtkImageAppend.h"
 #include "vtkMetaImageWriter.h"
 
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
-#include "sscXmlOptionItem.h"
+#include "cxXmlOptionItem.h"
 #include "cxImageDataContainer.h"
-#include "sscVideoSource.h"
+#include "cxVideoSource.h"
 
 namespace cx
 {
@@ -88,7 +88,7 @@ bool VideoRecorderSaveThread::openTimestampsFile()
 {
 	if(!mTimestampsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
-	  messageManager()->sendError("Cannot open "+mTimestampsFile.fileName());
+	  reportError("Cannot open "+mTimestampsFile.fileName());
 	  return false;
 	}
 	return true;
@@ -102,7 +102,7 @@ bool VideoRecorderSaveThread::closeTimestampsFile()
 	QFileInfo info(mTimestampsFile);
 	if (!mCancel)
 	{
-//		messageManager()->sendInfo(QString("Saved %1 timestamps to file %2")
+//		report(QString("Saved %1 timestamps to file %2")
 //										.arg(mImageIndex)
 //										.arg(info.fileName()));
 	}

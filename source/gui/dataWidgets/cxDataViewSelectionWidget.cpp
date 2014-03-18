@@ -7,8 +7,8 @@
 
 #include <cxDataViewSelectionWidget.h>
 #include "cxToolListWidget.h"
-#include "sscDataManager.h"
-#include "sscData.h"
+#include "cxDataManager.h"
+#include "cxData.h"
 #include <QListWidgetItem>
 #include <QDir>
 #include <QHBoxLayout>
@@ -17,12 +17,12 @@
 #include <QAction>
 #include <QLabel>
 #include <QMenu>
-#include "sscEnumConverter.h"
-#include "sscMessageManager.h"
+#include "cxEnumConverter.h"
+#include "cxReporter.h"
 #include "cxDataLocations.h"
 #include "cxToolConfigurationParser.h"
-#include "sscImageAlgorithms.h"
-#include "sscImage.h"
+#include "cxImageAlgorithms.h"
+#include "cxImage.h"
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
@@ -212,7 +212,7 @@ void SelectedDataListWidget::userChangedListSlot()
     DataPtr current = dataManager()->getData(data[i]);
     if (!current)
       continue;
-    mViewGroupData->addData(current);
+	mViewGroupData->addData(current);
   }
 }
 
@@ -324,7 +324,7 @@ void SelectedDataListWidget::deleteSlot()
 {
   if(!mItemToDelete)
   {
-    messageManager()->sendDebug("Found no item to delete...");
+    reporter()->sendDebug("Found no item to delete...");
     return;
   }
   this->deleteItemSlot(mItemToDelete);
@@ -348,7 +348,7 @@ void SelectedDataListWidget::contextMenuSlot(const QPoint& point)
   QListWidgetItem* item = this->itemAt(point);
   if(!item)
   {
-    messageManager()->sendDebug("Found no item to delete...");
+    reporter()->sendDebug("Found no item to delete...");
   }
   mItemToDelete = item;
 
@@ -378,8 +378,7 @@ void SelectedDataListWidget::setViewGroupData(ViewGroupDataPtr viewGroupData)
   if (mViewGroupData)
   {
     disconnect(mViewGroupData.get(), SIGNAL(initialized()), this, SLOT(populateList()));
-    disconnect(mViewGroupData.get(), SIGNAL(dataAdded(QString)), this, SLOT(populateList()));
-    disconnect(mViewGroupData.get(), SIGNAL(dataRemoved(QString)), this, SLOT(populateList()));
+	disconnect(mViewGroupData.get(), SIGNAL(dataViewPropertiesChanged(QString)), this, SLOT(populateList()));
   }
 
   mViewGroupData = viewGroupData;
@@ -387,8 +386,7 @@ void SelectedDataListWidget::setViewGroupData(ViewGroupDataPtr viewGroupData)
   if (mViewGroupData)
   {
     connect(mViewGroupData.get(), SIGNAL(initialized()), this, SLOT(populateList()));
-    connect(mViewGroupData.get(), SIGNAL(dataAdded(QString)), this, SLOT(populateList()));
-    connect(mViewGroupData.get(), SIGNAL(dataRemoved(QString)), this, SLOT(populateList()));
+	connect(mViewGroupData.get(), SIGNAL(dataViewPropertiesChanged(QString)), this, SLOT(populateList()));
   }
 
   this->populateList();

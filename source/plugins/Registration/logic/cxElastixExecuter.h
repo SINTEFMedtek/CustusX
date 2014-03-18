@@ -17,19 +17,21 @@
 #define CXELASTIXEXECUTER_H_
 
 #include <QString>
-#include "sscForwardDeclarations.h"
-#include "sscTransform3D.h"
+#include "cxForwardDeclarations.h"
+#include "cxTransform3D.h"
 #include <QObject>
 #include <QProcess>
 #include <QFile>
 #include "cxTimedAlgorithm.h"
-#include "sscMessageManager.h"
+#include "cxReporter.h"
+#include "cxLegacySingletons.h"
+
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup cxPluginRegistration
+ * \addtogroup cx_plugin_registration
  * @{
  */
 
@@ -204,7 +206,7 @@ public:
 		Transform3D diff = Q*M.inv();
 		std::cout << "Q*M.inv\n" << diff << std::endl;
 		if (!similar(Transform3D::Identity(), diff))
-			messageManager()->sendError("assertion failure in ElastixEulerTransform");
+			reportError("assertion failure in ElastixEulerTransform");
 	}
 private:
 	ElastixEulerTransform() {}

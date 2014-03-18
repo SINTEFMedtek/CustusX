@@ -3,7 +3,7 @@
 
 #include "cxPresetWidget.h"
 
-#include "sscTransferFunctions3DPresets.h"
+#include "cxTransferFunctions3DPresets.h"
 #include "cxDataInterface.h"
 
 class QComboBox;

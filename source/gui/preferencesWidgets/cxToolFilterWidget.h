@@ -2,7 +2,8 @@
 #define CXTOOLFILTERWIDGET_H_
 
 #include <QGroupBox>
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
+#include "cxLegacySingletons.h"
 
 class QComboBox;
 class QButtonGroup;
@@ -16,7 +17,7 @@ class FilteringToolListWidget;
  * ToolFilterWidget
  *
  * \brief Widget for easily filtering tools based on clinical application and  tracking system.
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * Used in conjunction with ToolConfigureGroupBox, it is possible to drag tools
  * from  ToolFilterGroupBox and drop them into configurations in

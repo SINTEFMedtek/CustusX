@@ -13,14 +13,14 @@
 // See CustusX_License.txt for more information.
 
 #include "cxFrameMetricBase.h"
-#include "sscBoundingBox3D.h"
-#include "sscTypeConversions.h"
+#include "cxBoundingBox3D.h"
+#include "cxTypeConversions.h"
 #include "cxSpaceProvider.h"
 #include "cxSpaceListener.h"
 
 namespace cx {
 
-FrameMetricBase::FrameMetricBase(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+FrameMetricBase::FrameMetricBase(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 		DataMetric(uid, name, dataManager, spaceProvider),
 		mSpace(CoordinateSystem::reference()),
 		mFrame(Transform3D::Identity())

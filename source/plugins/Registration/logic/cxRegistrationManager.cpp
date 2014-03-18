@@ -21,11 +21,11 @@
 #include "vtkDoubleArray.h"
 #include "vtkLandmarkTransform.h"
 #include "vtkMatrix4x4.h"
-#include "sscTransform3D.h"
-#include "sscRegistrationTransform.h"
-#include "sscMessageManager.h"
-#include "sscToolManager.h"
-#include "sscDataManager.h"
+#include "cxTransform3D.h"
+#include "cxRegistrationTransform.h"
+#include "cxReporter.h"
+#include "cxToolManager.h"
+#include "cxDataManager.h"
 #include "cxLandmarkTranslationRegistration.h"
 #include "cxFrameForest.h"
 #include "vesselReg/SeansVesselReg.hxx"
@@ -70,7 +70,7 @@ void RegistrationManager::setFixedData(DataPtr fixedData)
 
   mFixedData = fixedData;
   if (mFixedData)
-    messageManager()->sendInfo("Registration fixed data set to "+mFixedData->getUid());
+    report("Registration fixed data set to "+mFixedData->getUid());
   emit fixedDataChanged( (mFixedData) ? qstring_cast(mFixedData->getUid()) : "");
 }
 
@@ -118,7 +118,7 @@ std::vector<QString> RegistrationManager::getUsableLandmarks(const LandmarkMap& 
 void RegistrationManager::updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrameUid)
 {
 //	std::cout << "==== RegistrationManager::updateRegistration" << std::endl;
-  FrameForest forest;
+	FrameForest forest(dataService());
   QDomNode target = forest.getNode(qstring_cast(data->getUid()));
   QDomNode masterFrame = target;
   QDomNode targetBase = target;
@@ -134,7 +134,7 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, RegistrationTran
   ss << "\tFixed:\t" << masterFrameUid << std::endl;
   ss << "\tMoving:\t" << data->getUid() << std::endl;
   ss << "\tDelta matrix (rMd'=Delta*rMd)\n"+qstring_cast(deltaTransform.mValue) << std::endl;
-  messageManager()->sendInfo(qstring_cast(ss.str()));
+  report(qstring_cast(ss.str()));
 
   // update the transform on all target data:
   for (unsigned i=0; i<targetData.size(); ++i)
@@ -143,7 +143,7 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, RegistrationTran
     newTransform.mValue = deltaTransform.mValue * targetData[i]->get_rMd();
     targetData[i]->get_rMd_History()->updateRegistration(oldTime, newTransform);
 
-    messageManager()->sendInfo("Updated registration of data " + targetData[i]->getName());
+    report("Updated registration of data " + targetData[i]->getName());
     //std::cout << "rMd_new\n" << newTransform.mValue << std::endl; // too much noise for large patients
   }
 
@@ -173,7 +173,7 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, RegistrationTran
 
       if (targetData[i]->getParentSpace() == targetBaseUid)
       {
-        messageManager()->sendInfo("Reset parent frame of " + targetData[i]->getName() + " to " + masterAncestorUid + ". targetbase=" + targetBaseUid);
+        report("Reset parent frame of " + targetData[i]->getName() + " to " + masterAncestorUid + ". targetbase=" + targetBaseUid);
 //        //targetData[i]->setParentSpace(masterAncestorUid);
 //        if (targetData[i]->get_rMd_History()->getData().empty())
 //          return;
@@ -187,7 +187,7 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, RegistrationTran
   }
   // as we now have mutated the datamanager, forest is now outdated.
 
-  FrameForest forest2;
+//  FrameForest forest2;
 //	std::cout << "    ==== RegistrationManager::updateRegistration" << std::endl;
 }
 
@@ -276,7 +276,7 @@ void RegistrationManager::doPatientRegistration()
 
   if(!fixedImage)
   {
-    messageManager()->sendError("The fixed data is not a image, cannot do patient registration!");
+    reportError("The fixed data is not a image, cannot do patient registration!");
     return;
   }
   LandmarkMap fixedLandmarks = fixedImage->getLandmarks()->getLandmarks();
@@ -298,7 +298,7 @@ void RegistrationManager::doPatientRegistration()
   Transform3D rMpr = this->performLandmarkRegistration(p_pr, p_ref, &ok);
   if (!ok)
   {
-    messageManager()->sendError("P-I Landmark registration: Failed to register: [" + qstring_cast(p_pr->GetNumberOfPoints()) + "p]");
+    reportError("P-I Landmark registration: Failed to register: [" + qstring_cast(p_pr->GetNumberOfPoints()) + "p]");
     return;
   }
 
@@ -314,7 +314,7 @@ void RegistrationManager::writePreLandmarkRegistration(QString name, LandmarkMap
 	}
 
 	QString msg = QString("Preparing to register [%1] containing the landmarks: [%2]").arg(name).arg(lm.join(","));
-	messageManager()->sendInfo(msg);
+	report(msg);
 }
 
 
@@ -324,7 +324,7 @@ void RegistrationManager::doImageRegistration(bool translationOnly)
   ImagePtr fixedImage = boost::dynamic_pointer_cast<Image>(mFixedData);
   if(!fixedImage)
   {
-    messageManager()->sendError("The fixed data is not a image, cannot do landmark image registration!");
+    reportError("The fixed data is not a image, cannot do landmark image registration!");
     return;
   }
 
@@ -332,14 +332,14 @@ void RegistrationManager::doImageRegistration(bool translationOnly)
   ImagePtr movingImage = boost::dynamic_pointer_cast<Image>(mMovingData);
   if(!movingImage)
   {
-    messageManager()->sendError("The moving data is not a image, cannot do landmark image registration!");
+    reportError("The moving data is not a image, cannot do landmark image registration!");
     return;
   }
 
   // ignore self-registration, this gives no effect bestcase, buggy behaviour worstcase (has been observed)
   if(movingImage==fixedImage)
   {
-    messageManager()->sendError("The moving and fixed are equal, ignoring landmark image registration!");
+    reportError("The moving and fixed are equal, ignoring landmark image registration!");
     return;
   }
 
@@ -362,7 +362,7 @@ void RegistrationManager::doImageRegistration(bool translationOnly)
   // ignore if too few data.
   if (p_fixed_r->GetNumberOfPoints() < minNumberOfPoints)
   {
-    messageManager()->sendError(
+    reportError(
     	QString("Found %1 corresponding landmarks, need %2, cannot do landmark image registration!")
     	.arg(p_fixed_r->GetNumberOfPoints())
     	.arg(minNumberOfPoints)
@@ -389,7 +389,7 @@ void RegistrationManager::doImageRegistration(bool translationOnly)
 
   if (!ok)
   {
-    messageManager()->sendError("I-I Landmark registration: Failed to register: [" + qstring_cast(p_moving_r->GetNumberOfPoints()) + "p], "+ movingImage->getName());
+    reportError("I-I Landmark registration: Failed to register: [" + qstring_cast(p_moving_r->GetNumberOfPoints()) + "p], "+ movingImage->getName());
     return;
   }
 
@@ -429,7 +429,7 @@ void RegistrationManager::doFastRegistration_Translation()
   ImagePtr fixedImage = boost::dynamic_pointer_cast<Image>(mFixedData);
   if(!fixedImage)
   {
-    messageManager()->sendError("The fixed data is not a image, cannot do image registration!");
+    reportError("The fixed data is not a image, cannot do image registration!");
     return;
   }
 
@@ -455,7 +455,7 @@ void RegistrationManager::doFastRegistration_Translation()
   Transform3D pr_oldMpr_new = landmarkTransReg.registerPoints(p_pr_old, p_pr_new, &ok);
   if (!ok)
   {
-    messageManager()->sendError("Fast translation registration: Failed to register: [" + qstring_cast(p_pr_old.size()) + "points]");
+    reportError("Fast translation registration: Failed to register: [" + qstring_cast(p_pr_old.size()) + "points]");
     return;
   }
 
@@ -507,13 +507,13 @@ void RegistrationManager::applyPatientOrientation(const Transform3D& tMtm)
 		newTransform.mValue = regTrans.mValue * current->get_rMd();
 		current->get_rMd_History()->updateRegistration(oldTime, newTransform);
 
-		messageManager()->sendInfo("Updated registration of data " + current->getName());
+		report("Updated registration of data " + current->getName());
 		std::cout << "rMd_new\n" << newTransform.mValue << std::endl;
 	}
 
 	mLastRegistrationTime = regTrans.mTimestamp;
 
-	messageManager()->sendSuccess("Patient Orientation has been performed");
+	reportSuccess("Patient Orientation has been performed");
 }
 
 /**\brief apply a new image registration
@@ -536,7 +536,7 @@ void RegistrationManager::applyImage2ImageRegistration(Transform3D delta_pre_rMd
 	regTrans.mMoving = mMovingData ? mMovingData->getUid() : "";
 	this->updateRegistration(mLastRegistrationTime, regTrans, mMovingData, regTrans.mFixed);
 	mLastRegistrationTime = regTrans.mTimestamp;
-	messageManager()->sendSuccess(QString("Image registration [%1] has been performed on %2").arg(description).arg(regTrans.mMoving) );
+	reportSuccess(QString("Image registration [%1] has been performed on %2").arg(description).arg(regTrans.mMoving) );
 	patientService()->getPatientData()->autoSave();
 }
 
@@ -552,7 +552,7 @@ void RegistrationManager::applyPatientRegistration(Transform3D rMpr_new, QString
 	regTrans.mFixed = mFixedData ? mFixedData->getUid() : "";
 	dataManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
 	mLastRegistrationTime = regTrans.mTimestamp;
-	messageManager()->sendSuccess(QString("Patient registration [%1] has been performed.").arg(description));
+	reportSuccess(QString("Patient registration [%1] has been performed.").arg(description));
 	patientService()->getPatientData()->autoSave();
 }
 

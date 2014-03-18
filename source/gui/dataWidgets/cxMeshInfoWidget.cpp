@@ -1,20 +1,33 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
 #include "cxMeshInfoWidget.h"
 
 #include <QVBoxLayout>
-#include "sscImage.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscRegistrationTransform.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscLabeledLineEditWidget.h"
-#include "sscMeshHelpers.h"
-#include "sscHelperWidgets.h"
-#include "sscColorDataAdapterXml.h"
+#include "cxImage.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
+#include "cxRegistrationTransform.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxLabeledLineEditWidget.h"
+#include "cxMeshHelpers.h"
+#include "cxHelperWidgets.h"
+#include "cxColorDataAdapterXml.h"
 #include "cxDataLocations.h"
 #include "cxDataInterface.h"
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringDataAdapter.h"
-#include "sscLogger.h"
+#include "cxLogger.h"
 
 
 namespace cx
@@ -90,7 +103,7 @@ void MeshInfoWidget::importTransformSlot()
   if (!parent)
     return;
   mMesh->get_rMd_History()->setRegistration(parent->get_rMd());
-  messageManager()->sendInfo("Assigned rMd from volume [" + parent->getName() + "] to surface [" + mMesh->getName() + "]");
+  report("Assigned rMd from volume [" + parent->getName() + "] to surface [" + mMesh->getName() + "]");
 }
   
 void MeshInfoWidget::meshChangedSlot()

@@ -25,14 +25,14 @@
 #include <QWidget>
 #include <QLayout>
 #include <vector>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxSettings.h"
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup cxServiceVisualization
+ * \addtogroup cx_service_visualization
  * @{
  */
 

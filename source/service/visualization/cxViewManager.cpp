@@ -28,13 +28,13 @@
 #include "vtkRenderWindow.h"
 #include "cxLayoutData.h"
 
-#include "sscVolumetricRep.h"
-#include "sscMessageManager.h"
-#include "sscXmlOptionItem.h"
-#include "sscDataManager.h"
-#include "sscToolManager.h"
-#include "sscSlicePlanes3DRep.h"
-#include "sscSliceProxy.h"
+#include "cxVolumetricRep.h"
+#include "cxReporter.h"
+#include "cxXmlOptionItem.h"
+#include "cxDataManager.h"
+#include "cxToolManager.h"
+#include "cxSlicePlanes3DRep.h"
+#include "cxSliceProxy.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "cxViewWrapper2D.h"
@@ -47,45 +47,29 @@
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxInteractiveClipper.h"
-#include "sscImage.h"
+#include "cxImage.h"
 #include "cxCameraStyle.h"
 #include "cxCyclicActionLogger.h"
 #include "cxLayoutWidget.h"
 #include "cxRenderLoop.h"
 #include "cxLayoutRepository.h"
-#include "sscLogger.h"
+#include "cxLogger.h"
 #include "cxVisualizationServiceBackend.h"
+#include "cxXMLNodeWrapper.h"
+#include "cxCameraControl.h"
+#include "cxNavigation.h"
 
 namespace cx
 {
 
-ViewManager *ViewManager::mTheInstance = NULL;
-ViewManager* viewManager()
+VisualizationServicePtr ViewManager::create(VisualizationServiceBackendPtr backend)
 {
-	return ViewManager::getInstance();
-}
-ViewManager* ViewManager::getInstance()
-{
-	return mTheInstance;
-}
-
-ViewManager* ViewManager::createInstance(VisualizationServiceBackendPtr backend)
-{
-	if (mTheInstance == NULL)
-	{
-		mTheInstance = new ViewManager(backend);
-		}
-	return mTheInstance;
-}
-
-void ViewManager::destroyInstance()
-{
-	delete mTheInstance;
-	mTheInstance = NULL;
+	VisualizationServicePtr retval;
+	retval.reset(new ViewManager(backend));
+	return retval;
 }
 
 ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
-				mGlobal2DZoom(true),
 				mGlobalObliqueOrientation(false)
 {
 	mBackend = backend;
@@ -95,10 +79,9 @@ ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 
 	mSlicePlanesProxy.reset(new SlicePlanesProxy());
 	mLayoutRepository.reset(new LayoutRepository());
+	mCameraControl.reset(new CameraControl());
 
-	connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
-	connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
-	connect(patientService()->getPatientData().get(), SIGNAL(cleared()), this, SLOT(clearSlot()));
+//	connect(mBackend->getDataManager().get(), SIGNAL(centerChanged()), this, SLOT(globalCenterChangedSlot()));
 
 	this->loadGlobalSettings();
 
@@ -110,10 +93,26 @@ ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 	// initialize view groups:
 	for (unsigned i = 0; i < VIEW_GROUP_COUNT; ++i)
 	{
-		mViewGroups.push_back(ViewGroupPtr(new ViewGroup(mBackend)));
+		ViewGroupPtr group(new ViewGroup(mBackend));
+		mViewGroups.push_back(group);
 	}
 
+	this->initializeGlobal2DZoom();
+	this->initializeActiveView();
 	this->syncOrientationMode(SyncedValue::create(0));
+
+	// moved here from initialize() ... ensures object is fully callable after construction
+	mCameraStyleInteractor.reset(new CameraStyleInteractor);
+
+	mActiveLayout = QStringList() << "" << "";
+	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
+
+	mInteractiveCropper.reset(new InteractiveCropper(mBackend));
+	mInteractiveClipper.reset(new InteractiveClipper(mBackend));
+	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
+	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
+	connect(mInteractiveClipper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
+	connect(this, SIGNAL(activeViewChanged()), this, SLOT(updateCameraStyleActions()));
 }
 
 ViewManager::~ViewManager()
@@ -122,30 +121,35 @@ ViewManager::~ViewManager()
 
 void ViewManager::initialize()
 {
-	mCameraStyle.reset(new CameraStyle()); // uses the global viewmanager() instance - must be created after creation of this.
-
-	mActiveLayout = QStringList() << "" << "";
-	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
-
-	mInteractiveCropper.reset(new InteractiveCropper());
-	mInteractiveClipper.reset(new InteractiveClipper(mBackend));
-	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
-	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
-	connect(mInteractiveClipper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
-
 	// set start layout
 	this->setActiveLayout("LAYOUT_3D_ACS_SINGLE", 0);
 
 	mRenderLoop->setRenderingInterval(settings()->value("renderingInterval").toInt());
 	mRenderLoop->start();
-
-	mGlobalZoom2DVal = SyncedValue::create(1);
-	this->setGlobal2DZoom(mGlobal2DZoom);
 }
+
+void ViewManager::initializeGlobal2DZoom()
+{
+	mGlobal2DZoomVal = SyncedValue::create(1);
+
+	for (unsigned i = 0; i < mViewGroups.size(); ++i)
+		mViewGroups[i]->getData()->initializeGlobal2DZoom(mGlobal2DZoomVal);
+}
+
+void ViewManager::initializeActiveView()
+{
+	mActiveView = SyncedValue::create("");
+	connect(mActiveView.get(), SIGNAL(changed()), this, SIGNAL(activeViewChanged()));
+
+	for (unsigned i = 0; i < mViewGroups.size(); ++i)
+		mViewGroups[i]->initializeActiveView(mActiveView);
+}
+
+
 
 NavigationPtr ViewManager::getNavigation()
 {
-	return NavigationPtr(new Navigation(mBackend));
+	return NavigationPtr(new Navigation(mBackend, mCameraControl));
 }
 
 QWidget *ViewManager::getLayoutWidget(int index)
@@ -167,33 +171,6 @@ void ViewManager::updateViews()
 		for (unsigned j=0; j<group->getWrappers().size(); ++j)
 			group->getWrappers()[j]->updateView();
 	}
-}
-
-std::map<QString, ImagePtr> ViewManager::getVisibleImages()
-{
-	std::map<QString, ImagePtr> retval;
-	for(unsigned i=0; i<mViewGroups.size(); ++i)
-	{
-		ViewGroupPtr group = mViewGroups[i];
-		std::vector<ImagePtr> images = group->getImages();
-		for (unsigned j=0; j<images.size(); ++j)
-		{
-			retval[images[j]->getUid()] = images[j];
-		}
-	}
-	return retval;
-}
-
-void ViewManager::duringSavePatientSlot()
-{
-	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
-	this->addXml(managerNode);
-}
-
-void ViewManager::duringLoadPatientSlot()
-{
-	QDomElement viewmanagerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers/viewManager");
-	this->parseXml(viewmanagerNode);
 }
 
 void ViewManager::settingsChangedSlot(QString key)
@@ -254,7 +231,7 @@ ViewWrapperPtr ViewManager::getActiveView() const
 {
 	for (unsigned i = 0; i < mViewGroups.size(); ++i)
 	{
-		ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(mActiveView);
+		ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(mActiveView->get().value<QString>());
 		if (viewWrapper)
 		{
 			return viewWrapper;
@@ -263,21 +240,19 @@ ViewWrapperPtr ViewManager::getActiveView() const
 	return ViewWrapperPtr();
 }
 
-void ViewManager::setActiveView(QString viewUid)
+void ViewManager::setActiveView(QString uid)
 {
-	if (mActiveView == qstring_cast(viewUid))
-		return;
-	mActiveView = qstring_cast(viewUid);
-	emit activeViewChanged();
+	mActiveView->set(uid);
 }
 
 int ViewManager::getActiveViewGroup() const
 {
 	int retval = -1;
+	QString activeView = mActiveView->value<QString>();
 
 	for (unsigned i = 0; i < mViewGroups.size(); ++i)
 	{
-		ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(mActiveView);
+		ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(activeView);
 		if (viewWrapper)
 			retval = i;
 	}
@@ -293,91 +268,47 @@ void ViewManager::syncOrientationMode(SyncedValuePtr val)
 	}
 }
 
-void ViewManager::setGlobal2DZoom(bool global)
-{
-	mGlobal2DZoom = global;
-
-	for (unsigned i = 0; i < mViewGroups.size(); ++i)
-	{
-		mViewGroups[i]->setGlobal2DZoom(mGlobal2DZoom, mGlobalZoom2DVal);
-	}
-}
-
-bool ViewManager::getGlobal2DZoom()
-{
-	return mGlobal2DZoom;
-}
-
 void ViewManager::addXml(QDomNode& parentNode)
 {
-	QDomDocument doc = parentNode.ownerDocument();
-	QDomElement viewManagerNode = doc.createElement("viewManager");
-	parentNode.appendChild(viewManagerNode);
+	XMLNodeAdder parent(parentNode);
+	XMLNodeAdder base(parent.addElement("viewManager"));
 
-	QDomElement global2DZoomNode = doc.createElement("global2DZoom");
-	global2DZoomNode.appendChild(doc.createTextNode(string_cast(mGlobal2DZoom).c_str()));
-	viewManagerNode.appendChild(global2DZoomNode);
+	base.addTextToElement("global2DZoom", qstring_cast(mGlobal2DZoomVal->get().toDouble()));
+	base.addTextToElement("activeView", mActiveView->value<QString>());
 
-	QDomElement activeViewNode = doc.createElement("activeView");
-	activeViewNode.appendChild(doc.createTextNode(mActiveView));
-	viewManagerNode.appendChild(activeViewNode);
-
-	QDomElement slicePlanes3DNode = doc.createElement("slicePlanes3D");
+	QDomElement slicePlanes3DNode = base.addElement("slicePlanes3D");
 	slicePlanes3DNode.setAttribute("use", mSlicePlanesProxy->getVisible());
 	slicePlanes3DNode.setAttribute("opaque", mSlicePlanesProxy->getDrawPlanes());
-	viewManagerNode.appendChild(slicePlanes3DNode);
 
-	QDomElement viewGroupsNode = doc.createElement("viewGroups");
-	viewManagerNode.appendChild(viewGroupsNode);
+	XMLNodeAdder viewGroupsNode(base.addElement("viewGroups"));
 	for (unsigned i = 0; i < mViewGroups.size(); ++i)
 	{
-		QDomElement viewGroupNode = doc.createElement("viewGroup");
+		QDomElement viewGroupNode = viewGroupsNode.addElement("viewGroup");
 		viewGroupNode.setAttribute("index", i);
-		viewGroupsNode.appendChild(viewGroupNode);
-
 		mViewGroups[i]->addXml(viewGroupNode);
 	}
 
 	if (mInteractiveClipper)
 	{
-		QDomElement clippedImageNode = doc.createElement("clippedImage");
 		QString clippedImage = (mInteractiveClipper->getImage()) ? mInteractiveClipper->getImage()->getUid() : "";
-		clippedImageNode.appendChild(doc.createTextNode(clippedImage));
-		viewManagerNode.appendChild(clippedImageNode);
+		base.addTextToElement("clippedImage", clippedImage);
 	}
 }
 
 void ViewManager::parseXml(QDomNode viewmanagerNode)
 {
-	QString activeViewString;
-	QDomNode child = viewmanagerNode.firstChild();
-	while (!child.isNull())
-	{
-		if (child.toElement().tagName() == "global2DZoom")
-		{
-			const QString global2DZoomString = child.toElement().text();
-			if (!global2DZoomString.isEmpty() && global2DZoomString.toInt() == 0)
-				this->setGlobal2DZoom(false);
-			else
-				this->setGlobal2DZoom(true);
-		}
-		else if (child.toElement().tagName() == "activeView")
-		{
-			activeViewString = child.toElement().text();
-		}
-		else if (child.toElement().tagName() == "clippedImage")
-		{
-			QString clippedImage = child.toElement().text();
-			mInteractiveClipper->setImage(mBackend->getDataManager()->getImage(clippedImage));
-		}
-		child = child.nextSibling();
-	}
+	XMLNodeParser base(viewmanagerNode);
 
-	QDomElement slicePlanes3DNode = viewmanagerNode.namedItem("slicePlanes3D").toElement();
+	QString clippedImage = base.parseTextFromElement("clippedImage");
+	mInteractiveClipper->setImage(mBackend->getDataManager()->getImage(clippedImage));
+
+	base.parseDoubleFromElementWithDefault("global2DZoom", mGlobal2DZoomVal->get().toDouble());
+
+	QDomElement slicePlanes3DNode = base.parseElement("slicePlanes3D");
 	mSlicePlanesProxy->setVisible(slicePlanes3DNode.attribute("use").toInt());
 	mSlicePlanesProxy->setDrawPlanes(slicePlanes3DNode.attribute("opaque").toInt());
 
-	QDomElement viewgroups = viewmanagerNode.namedItem("viewGroups").toElement();
+	QDomElement viewgroups = base.parseElement("viewGroups");
 	QDomNode viewgroup = viewgroups.firstChild();
 	while (!viewgroup.isNull())
 	{
@@ -399,10 +330,10 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 		viewgroup = viewgroup.nextSibling();
 	}
 
-	this->setActiveView(activeViewString);
+	this->setActiveView(base.parseTextFromElement("activeView"));
 }
 
-void ViewManager::clearSlot()
+void ViewManager::clear()
 {
 	for (unsigned i = 0; i < mViewGroups.size(); ++i)
 	{
@@ -427,6 +358,7 @@ ViewWidgetQPtr ViewManager::get3DView(int group, int index)
 	}
 	return ViewWidgetQPtr();
 }
+
 
 /**deactivate the current layout, leaving an empty layout
  */
@@ -462,10 +394,13 @@ void ViewManager::setActiveLayout(const QString& layout, int widgetIndex)
 
 	this->rebuildLayouts();
 
+	if (!mViewGroups[0]->getViews().empty())
+		this->setActiveView(mViewGroups[0]->getViews()[0]->getUid());
+
 	emit activeLayoutChanged();
 
 	QString layoutName = this->getLayoutData(layout).getName();
-	messageManager()->sendInfo(QString("Layout %1 changed to %2").arg(widgetIndex).arg(layoutName));
+	report(QString("Layout %1 changed to %2").arg(widgetIndex).arg(layoutName));
 }
 
 void ViewManager::rebuildLayouts()
@@ -480,6 +415,7 @@ void ViewManager::rebuildLayouts()
 	}
 
 	this->setSlicePlanesProxyInViewsUpTo2DViewgroup();
+	mCameraControl->setView(this->get3DView());
 }
 
 void ViewManager::setSlicePlanesProxyInViewsUpTo2DViewgroup()
@@ -633,8 +569,39 @@ void ViewManager::saveGlobalSettings()
 
 QActionGroup* ViewManager::createInteractorStyleActionGroup()
 {
-	return mCameraStyle->createInteractorStyleActionGroup();
+	return mCameraStyleInteractor->createInteractorStyleActionGroup();
 }
+
+void ViewManager::updateCameraStyleActions()
+{
+	int active = this->getActiveViewGroup();
+	int index = this->findGroupContaining3DViewGivenGuess(active);
+
+	if (index<0)
+	{
+		mCameraStyleInteractor->connectCameraStyle(CameraStylePtr());
+	}
+	else
+	{
+		ViewGroupPtr group = this->getViewGroups()[index];
+		mCameraStyleInteractor->connectCameraStyle(group->getCameraStyle());
+	}
+}
+
+/**Look for the index'th 3DView in given group.
+ */
+int ViewManager::findGroupContaining3DViewGivenGuess(int preferredGroup)
+{
+	if (preferredGroup>=0)
+		if (mViewGroups[preferredGroup]->contains3DView())
+			return preferredGroup;
+
+	for (unsigned i=0; i<mViewGroups.size(); ++i)
+		if (mViewGroups[i]->contains3DView())
+			return i;
+	return -1;
+}
+
 
 void ViewManager::autoShowData(DataPtr data)
 {

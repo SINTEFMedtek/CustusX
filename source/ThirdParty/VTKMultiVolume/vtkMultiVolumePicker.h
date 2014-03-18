@@ -37,7 +37,9 @@ class VTK_VOLUMERENDERING_EXPORT vtkMultiVolumePicker : public vtkVolumePicker
 public:
   static vtkMultiVolumePicker *New();
   vtkTypeMacro(vtkMultiVolumePicker, vtkVolumePicker);
-  void PrintSelf(ostream& os, vtkIndent indent);
+	void PrintSelf(ostream& os, vtkIndent indent);
+
+	double* GetPickPosition();
 
 protected:
   vtkMultiVolumePicker();
@@ -58,10 +60,12 @@ private:
 
 	vtkTransformPtr calculate_rMdi(vtkMatrix4x4Ptr rMd0, vtkTransformPtr d0Mdi);
 	void calculateNewOrigin(double* newOrigin, vtkMatrix4x4Ptr rMd0);
-	vtkImageDataPtr generateImageCopyAndMoveOrigin(vtkImageDataPtr image, double* newOrigin);
-	vtkVolumeTextureMapper3DPtr generateSingleVolumeMapper(vtkImageDataPtr tempImage);
+	vtkGPUVolumeRayCastMapperPtr generateSingleVolumeMapper(vtkImageDataPtr tempImage);
 	bool similar(double a, double b, double tol = 1.0E-6); ///< check for equality with a tolerance: |b-a|<tol
-	void storeFoundImage(vtkDataSet* image, vtkAbstractVolumeMapper* mapper);
+	void storeFoundImage(vtkDataSet* image, vtkAbstractVolumeMapper* mapper, double* pickPosition);
+
+	double MultivolumePickPosition[3];
+	bool usedSingleVolumePicker;
 };
 
 #endif

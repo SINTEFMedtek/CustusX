@@ -11,22 +11,23 @@
 #include "catch.hpp"
 #include <QApplication>
 
-#include "sscDummyTool.h"
+#include "cxDummyTool.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
 #include "cxDataLocations.h"
 #include "cxVideoService.h"
 #include "cxVideoConnectionManager.h"
-#include "sscReconstructManager.h"
-#include "sscLogger.h"
-#include "sscUSFrameData.h"
+#include "cxReconstructManager.h"
+#include "cxLogger.h"
+#include "cxUSFrameData.h"
 #include "cxUsReconstructionFileReader.h"
 #include "cxImageDataContainer.h"
-#include "sscStringDataAdapterXml.h"
-#include "cxProbe.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxProbeImpl.h"
 #include "cxToolManager.h"
 #include "cxLogicManager.h"
 #include "cxStateService.h"
+#include "cxLegacySingletons.h"
 
 namespace cxtest
 {
@@ -86,17 +87,17 @@ void AcquisitionFixture::setupVideo()
 void AcquisitionFixture::setupProbe()
 {
 	SSC_LOG("");
-	cx::DummyToolPtr dummyTool(new cx::DummyTool(cx::cxToolManager::getInstance()));
+	cx::DummyToolPtr dummyTool(new cx::DummyTool(cx::trackingService()));
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(cx::DoubleBoundingBox3D(0,0,0,10,10,10)));
 	std::pair<QString, cx::ProbeDefinition> probedata = cx::UsReconstructionFileReader::readProbeDataFromFile(mAcqDataFilename);
-	cx::cxProbePtr probe = cx::cxProbe::New("","");
+	cx::ProbeImplPtr probe = cx::ProbeImpl::New("","");
 	probe->setProbeSector(probedata.second);
 	dummyTool->setProbeSector(probe);
 	CHECK(dummyTool->getProbe());
 	CHECK(dummyTool->getProbe()->isValid());
 	dummyTool->setVisible(true);
 	// TODO: refactor toolmanager to be runnable in dummy mode (playback might benefit from this too)
-	cx::cxToolManager::getInstance()->runDummyTool(dummyTool);
+	cx::trackingService()->runDummyTool(dummyTool);
 	CHECK(dummyTool->getProbe()->getRTSource());
 }
 

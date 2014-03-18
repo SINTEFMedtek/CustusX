@@ -14,12 +14,12 @@
 
 #include "cxDataFactory.h"
 
-#include "sscImage.h"
-#include "sscMesh.h"
-#include "sscPointMetric.h"
-#include "sscDistanceMetric.h"
-#include "sscPlaneMetric.h"
-#include "sscAngleMetric.h"
+#include "cxImage.h"
+#include "cxMesh.h"
+#include "cxPointMetric.h"
+#include "cxDistanceMetric.h"
+#include "cxPlaneMetric.h"
+#include "cxAngleMetric.h"
 #include "cxShapedMetric.h"
 #include "cxSphereMetric.h"
 #include "cxFrameMetric.h"
@@ -28,22 +28,22 @@
 namespace cx
 {
 
-DataFactory::DataFactory(DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+DataFactory::DataFactory(DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 	mDataManager(dataManager),
 	mSpaceProvider(spaceProvider)
 {
 
 }
 
-#define CREATE_IF_MATCH(name, TYPE) \
+#define CREATE_IF_MATCH(typeName, TYPE) \
 { \
-	if (name==TYPE::getTypeName()) \
-		return TYPE::create(uid, name); \
+	if (typeName==TYPE::getTypeName()) \
+		return TYPE::create(uid, ""); \
 }
-#define CREATE_METRIC_IF_MATCH(name, TYPE) \
+#define CREATE_METRIC_IF_MATCH(typeName, TYPE) \
 { \
-	if (name==TYPE::getTypeName()) \
-		return TYPE::create(uid, name, mDataManager, mSpaceProvider); \
+	if (typeName==TYPE::getTypeName()) \
+		return TYPE::create(uid, "", mDataManager, mSpaceProvider); \
 }
 
 DataPtr DataFactory::create(QString type, QString uid, QString name)

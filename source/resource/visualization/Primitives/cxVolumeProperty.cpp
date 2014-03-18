@@ -18,8 +18,8 @@
 #include <vtkColorTransferFunction.h>
 #include <vtkVolumeProperty.h>
 
-#include "sscImage.h"
-#include "sscImageTF3D.h"
+#include "cxImage.h"
+#include "cxImageTF3D.h"
 
 
 namespace cx

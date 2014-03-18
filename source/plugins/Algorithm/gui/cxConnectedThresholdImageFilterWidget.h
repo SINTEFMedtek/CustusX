@@ -8,7 +8,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxPluginAlgorithm
+ * \addtogroup cx_plugin_algorithm
  * @{
  */
 

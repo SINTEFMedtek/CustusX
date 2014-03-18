@@ -19,7 +19,7 @@
 #include "cxConfig.h"
 #include "cxSettings.h"
 #include "cxFileHelpers.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 #ifdef CX_USE_TSF
 #include "tsf-config.h"

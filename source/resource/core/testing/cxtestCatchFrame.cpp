@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "sscFrame3D.h"
+#include "cxFrame3D.h"
 #include "catch.hpp"
 
 using namespace cx;

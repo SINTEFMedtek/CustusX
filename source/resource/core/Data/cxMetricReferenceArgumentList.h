@@ -17,7 +17,8 @@
 
 #include "cxForwardDeclarations.h"
 #include <vector>
-#include "sscVector3D.h"
+#include <map>
+#include "cxVector3D.h"
 class QDomNode;
 
 namespace cx
@@ -27,6 +28,7 @@ typedef boost::shared_ptr<class MetricReferenceArgumentList> MetricReferenceArgu
 /** \brief Collection of Metric arguments that refer to another metric
  *
  *
+ * \ingroup cx_resource_core_data
  * \date 2014-02-11
  * \author Christian Askeland, SINTEF
  */

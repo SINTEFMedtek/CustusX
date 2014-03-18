@@ -15,28 +15,24 @@
 #ifndef CXDONUTMETRICREP_H
 #define CXDONUTMETRICREP_H
 
-#include "sscDataMetricRep.h"
+#include "cxDataMetricRep.h"
 #include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 class QColor;
 
 typedef vtkSmartPointer<class vtkTextActor> vtkTextActorPtr;
 
 namespace cx
 {
-//typedef boost::shared_ptr<class CaptionText3D> CaptionText3DPtr;
-//typedef boost::shared_ptr<class GraphicalArc3D> GraphicalArc3DPtr;
 typedef boost::shared_ptr<class GraphicalTorus3D> GraphicalTorus3DPtr;
-
-
 typedef boost::shared_ptr<class DonutMetricRep> DonutMetricRepPtr;
 typedef boost::shared_ptr<class DonutMetric> DonutMetricPtr;
 typedef boost::shared_ptr<class GraphicalDisk> GraphicalDiskPtr;
 
 /**Rep for visualizing a DonutMetric.
  *
- * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup cx_resource_visualization
+ * \ingroup cx_resource_visualization_rep3D
  *
  * \date 2014-02-11
  * \author Christian Askeland, SINTEF
