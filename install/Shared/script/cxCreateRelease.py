@@ -30,6 +30,10 @@ import cx.cxBuildScript
 #import cx.cxCustusXTestInstallation
 import jenkins # the python-jenkins module - alternative to jenkinsapi with ability to reconfigure job
 
+import pkg_resources
+print 'jenkinsapi version:', pkg_resources.get_distribution("jenkinsapi").version
+
+
 class Jenkins:
     '''
     Controller for monitoring jenkins and updating
@@ -241,7 +245,7 @@ Thus, we get the following pattern:
 
     def getArgParser(self):
         p = argparse.ArgumentParser(add_help=False)
-        p.add_argument('-r', '--release_type', choices=['release','beta','alpha'], help='Type of release to create, de general description for more.', default='alpha')
+        p.add_argument('-r', '--release_type', choices=['release','beta','alpha'], help='Type of release to create, see general description for more.', default='alpha')
         p.add_argument(      '--jenkins_release', action='store_true', default=False, help='Trigger a jenkins release using the generated git tag, publish to release server')
         p.add_argument('-u', '--username', default="user", help='jenkins user')
         p.add_argument('-p', '--password', default="not set", help='jenkins password')
@@ -310,8 +314,18 @@ Thus, we get the following pattern:
         self.jenkins.jobname = 'rel'
         self.jenkins.initializeJenkins()
         
+        
+        job = self.jenkins.jenkins.get_job(self.jenkins.jobname)
+
+        #PrintFormatter.printHeader('Triggering job %s' % job.id(), level=3)
+        #job.print_data()
+                #help(job)
+        #help(self.jenkins.jenkins)
+#        help(job)
+#        return
+        
         parameters = { 'CX_RELEASE_GIT_TAG':tag }
-        self.jenkins.jenkins.build_job(self.jenkins.jobname, parameters)
+        job.invoke(build_params=parameters)
         PrintFormatter.printHeader('Completed triggering the jenkins job %s' % self.jenkins.jobname, level=3)
         pass
     
