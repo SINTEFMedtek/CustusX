@@ -150,10 +150,11 @@ class Controller:#(cx.cxBuildScript.BuildScript):
         generator.verbose = False
         
         for basejob in self.basejobs:
+            PrintFormatter.printHeader('Duplicating job %s for all targets' % basejob,level=3)
             for target in self.targets:
                 generator.duplicateJob(basejob, target)
     
-        print 'enabling jobs...'
+        PrintFormatter.printHeader('Enabling jobs', level=3)
         time.sleep(2)  # give last call time to complete
         for basejob in self.basejobs:
             for target in self.targets:
