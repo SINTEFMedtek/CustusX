@@ -16,28 +16,29 @@
 #include <vtkPolyDataWriter.h>
 #include <vtkCellArray.h>
 #include "cxDataManager.h"
-#include "sscMesh.h"
-#include "sscVector3D.h"
+#include "cxMesh.h"
+#include "cxVector3D.h"
 #include "cxDataLocations.h"
 #include "vesselReg/SeansVesselReg.hxx"
-#include "sscRegistrationTransform.h"
-#include "sscTypeConversions.h"
+#include "cxRegistrationTransform.h"
+#include "cxTypeConversions.h"
 #include <QFileInfo>
 #include <QDir>
-#include "sscXmlOptionItem.h"
+#include "cxXmlOptionItem.h"
 
 #include "catch.hpp"
 
-#include "sscLogger.h"
-#include "sscTime.h"
+#include "cxLogger.h"
+#include "cxTime.h"
 #include "cxDataLocations.h"
 #include "cxElastixExecuter.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxSettings.h"
 #include "cxElastixSingleThreadedRunner.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxElastixParameters.h"
+#include "cxLogicManager.h"
 
 namespace cxtest
 {
@@ -55,14 +56,16 @@ class ElastiXFixture
 public:
 	ElastiXFixture()
 	{
-		cx::MessageManager::initialize();
-		cx::cxDataManager::initialize();
+//		cx::Reporter::initialize();
+//		cx::cxDataManager::initialize();
+		cx::LogicManager::initialize();
 	}
 
 	~ElastiXFixture()
 	{
-		cx::DataManager::shutdown();
-		cx::MessageManager::shutdown();
+		cx::LogicManager::shutdown();
+//		cx::DataManager::shutdown();
+//		cx::Reporter::shutdown();
 	}
 	bool compareTransforms(cx::Transform3D result, cx::Transform3D solution)
 	{

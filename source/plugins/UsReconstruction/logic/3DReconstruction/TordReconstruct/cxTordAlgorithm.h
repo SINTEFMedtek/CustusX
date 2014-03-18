@@ -4,9 +4,9 @@
 //TODO remove, should be defined in oul instead
 #define __CL_ENABLE_EXCEPTIONS //telling the opencl c++ wrapper to throw exceptions
 
-
-#include "cxOpenCLUtilities.h"
-#include <sscUSFrameData.h>
+#include "cxUSFrameData.h"
+#include "OpenCLManager.hpp"
+#include "RuntimeMeasurementManager.hpp"
 
 namespace cx
 {
@@ -61,21 +61,18 @@ public:
 	 * @param method The method ID. See kernels.cl for more information
 	 * @param planeMethod the plane method ID. See kernels.cl for more information
 	 * @param nStarts number of starts for multistart search for close planes
-	 * @param kernelPath The path of the kernel source code
 	 * @param brightnessWeight The extra weight to give pixels brighter than mean
 	 * @param newnessWeight The extra weight to give pixels newer than mean
 	 * @return True on suc
 	 */
-	virtual cl::Program buildCLProgram(const char* program_src,
+	virtual cl::Program buildCLProgram(std::string program_src,
 	                                  int nMaxPlanes,
 	                                  int nPlanes,
 	                                  int method,
 	                                  int planeMethod,
 	                                  int nStarts,
 	                                  float brightnessWeight,
-	                                  float newnessWeight,
-	                                  QString kernelPath,
-	                                  size_t sourceLen);
+	                                  float newnessWeight);
 	/**
 	 * Perform GPU Reconstruction.
 	 * This function initializes the CL memory objects, calls the kernel and reads back the result,
@@ -130,8 +127,16 @@ public:
 	virtual void fillPlaneMatrices(float *planeMatrices,
 	                               ProcessedUSInputDataPtr input);
 
+	/**
+	 * Enable/diable OpenCL profiling for this algorithm
+	 */
+	void setProfiling(bool on);
+	double getTotalExecutionTime();
+	double getKernelExecutionTime();
+
 private:
 	void setKernelArguments(
+			cl::Kernel kernel,
 			int volume_xsize,
 	        int volume_ysize,
 	        int volume_zsize,
@@ -149,13 +154,19 @@ private:
 	        size_t plane_eqs_size,
 	        size_t close_planes_size,
 	        float radius);
-	void executeKernel(size_t global_work_size, size_t local_work_size);
-	void readResultingVolume(cl::Buffer outputBuffer, size_t outputVolumeSize, void *outputData);
-	size_t calculateSpaceNeededForClosePlanes(size_t local_work_size, size_t nPlanes_numberOfInputImages, int nClosePlanes);
+	size_t calculateSpaceNeededForClosePlanes(cl::Kernel kernel, cl::Device device, size_t local_work_size, size_t nPlanes_numberOfInputImages, int nClosePlanes);
 	bool isUsingTooMuchMemory(size_t outputVolumeSize, size_t inputBlocksLength, cl_ulong globalMemUse);
+	void measureAndExecuteKernel(cl::CommandQueue queue, cl::Kernel kernel, size_t global_work_size, size_t local_work_size, std::string measurementName);
+	void measureAndReadBuffer(cl::CommandQueue queue, cl::Buffer outputBuffer, size_t outputVolumeSize, void *outputData, std::string measurementName);
 
-	cl::Kernel mKernel; //Todo make local
-	OpenCL::ocl* mOpenCL;
+	void startProfiling(std::string name, cl::CommandQueue queue);
+	void stopProfiling(std::string name, cl::CommandQueue queue);
+
+	cl::Kernel mKernel;
+	oul::Context mOulContex;
+	oul::RuntimeMeasurementsManagerPtr mRuntime;
+	std::set<std::string> mMeasurementNames;
+	std::string mKernelMeasurementName;
 
 };
 

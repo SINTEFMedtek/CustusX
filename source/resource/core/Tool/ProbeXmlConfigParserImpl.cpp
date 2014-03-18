@@ -5,14 +5,14 @@
 #include <QStringList>
 #include <algorithm>
 #include <qfileinfo.h>
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
 
 ProbeXmlConfigParserImpl::ProbeXmlConfigParserImpl(QString& pathToXml)
 {
 	if (!QFileInfo(pathToXml).exists())
 	{
-		cx::messageManager()->sendError(QString("Cannot find probe config file [%1]").arg(pathToXml));
+		cx::reportError(QString("Cannot find probe config file [%1]").arg(pathToXml));
 	}
 
 	mFile = cx::XmlOptionFile(pathToXml);
@@ -81,7 +81,7 @@ namespace
 		QDomNode node = parent.namedItem(name);
 		QDomElement element = node.toElement();
 		if(element.isNull())
-			cx::messageManager()->sendWarning(QString("Cannot find node %2/%1").arg(name).arg(parent.toElement().tagName()));
+			cx::reportWarning(QString("Cannot find node %2/%1").arg(name).arg(parent.toElement().tagName()));
 		return element;
 	}
 
@@ -99,7 +99,7 @@ namespace
 		if(found)
 			*retval = element.text();
 		if (!found)
-			cx::messageManager()->sendWarning(QString("Cannot find node %2/%1").arg(name).arg(parent.toElement().tagName()));
+			cx::reportWarning(QString("Cannot find node %2/%1").arg(name).arg(parent.toElement().tagName()));
 		return found;
 	}
 	template<>
@@ -112,13 +112,13 @@ namespace
 			*retval = element.text().toInt(&ok);
 		if (!found)
 		{
-			cx::messageManager()->sendWarning(QString("Cannot find node %2/%1").arg(name).arg(parent.toElement().tagName()));
+			cx::reportWarning(QString("Cannot find node %2/%1").arg(name).arg(parent.toElement().tagName()));
 		}
 		else
 		{
 			found = found && ok;
 			if (!found)
-				cx::messageManager()->sendWarning(QString("Cannot convert node %2/%1 to int").arg(name).arg(parent.toElement().tagName()));
+				cx::reportWarning(QString("Cannot convert node %2/%1 to int").arg(name).arg(parent.toElement().tagName()));
 		}
 		return found;
 	}
@@ -132,13 +132,13 @@ namespace
 			*retval = element.text().toDouble(&ok);
 		if (!found)
 		{
-			cx::messageManager()->sendWarning(QString("Cannot find node %2/%1").arg(name).arg(parent.toElement().tagName()));
+			cx::reportWarning(QString("Cannot find node %2/%1").arg(name).arg(parent.toElement().tagName()));
 		}
 		else
 		{
 			found = found && ok;
 			if (!found)
-				cx::messageManager()->sendWarning(QString("Cannot convert node %2/%1 to double").arg(name).arg(parent.toElement().tagName()));
+				cx::reportWarning(QString("Cannot convert node %2/%1 to double").arg(name).arg(parent.toElement().tagName()));
 		}
 		return found;
 	}
@@ -158,7 +158,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParserImpl::getConfiguration(Q
   QList<QDomNode> currentScannerNodeList = this->getScannerNodes(scanner);
   if(currentScannerNodeList.isEmpty())
   {
-	  cx::messageManager()->sendWarning(QString("No scanners found [%1]").arg(scanner));
+	  cx::reportWarning(QString("No scanners found [%1]").arg(scanner));
 	  return retval;
   }
   QDomNode scannerNode = currentScannerNodeList.first();
@@ -166,7 +166,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParserImpl::getConfiguration(Q
   QList<QDomNode> probeList = this->getProbeNodes(scanner, probe); ///< get a list of all probes for that scanner
   if(probeList.isEmpty())
   {
-	  cx::messageManager()->sendWarning(QString("No probes found [%1/%2]").arg(scanner, probe));
+	  cx::reportWarning(QString("No probes found [%1/%2]").arg(scanner, probe));
 	  return retval;
   }
   QDomNode probeNode = probeList.first();
@@ -178,7 +178,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParserImpl::getConfiguration(Q
   QList<QDomNode> currentRtSourceNodeList = this->getRTSourceNodes(scanner, probe, rtsource);
   if(currentRtSourceNodeList.isEmpty())
   {
-	cx::messageManager()->sendWarning(QString("No rtsources found [%1/%2/%3]").arg(scanner).arg(probe).arg(rtsource));
+	cx::reportWarning(QString("No rtsources found [%1/%2/%3]").arg(scanner).arg(probe).arg(rtsource));
     return retval;
   }
   QDomNode rtSourceNode = currentRtSourceNodeList.first();
@@ -213,7 +213,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParserImpl::getConfiguration(Q
   QList<QDomNode> currentConfigNodeList = this->getConfigNodes(scanner, probe, rtsource, configId);
   if(currentConfigNodeList.isEmpty())
   {
-	cx::messageManager()->sendWarning(QString("No nodes found in config [%1/%2/%3/%4]").arg(scanner).arg(probe).arg(rtsource).arg(configId));
+	cx::reportWarning(QString("No nodes found in config [%1/%2/%3/%4]").arg(scanner).arg(probe).arg(rtsource).arg(configId));
     return retval;
   }
   QDomNode configNode = currentConfigNodeList.first();
@@ -372,7 +372,7 @@ void ProbeXmlConfigParserImpl::removeConfig(QString scanner, QString probe, QStr
 	QList<QDomNode> configNodes = this->getConfigNodes(scanner, probe, rtsource, configId);
 	if (configNodes.empty())
 	{
-		cx::messageManager()->sendWarning(
+		cx::reportWarning(
 						QString("Failed to remove probe config: No such path %1/%2/%3/%4")
 						.arg(scanner)
 						.arg(probe)
@@ -409,7 +409,7 @@ void ProbeXmlConfigParserImpl::saveCurrentConfig(Configuration config)
 	QList<QDomNode> rtNodes = this->getRTSourceNodes(config.mUsScanner, config.mUsProbe, config.mRtSource);
 	if (rtNodes.empty())
 	{
-		cx::messageManager()->sendWarning(QString("Failed to save probe config: No such path %1/%2/%3").arg(config.mUsScanner).arg(config.mUsProbe).arg(config.mRtSource));
+		cx::reportWarning(QString("Failed to save probe config: No such path %1/%2/%3").arg(config.mUsScanner).arg(config.mUsProbe).arg(config.mRtSource));
 		return;
 	}
 	QDomElement rtSourceNode = rtNodes.first().toElement();

@@ -13,8 +13,8 @@
 // See CustusX_License.txt for more information.
 
 #include "cxImageReceiverThread.h"
-#include "sscMessageManager.h"
-#include "sscVector3D.h"
+#include "cxReporter.h"
+#include "cxVector3D.h"
 #include "cxCyclicActionLogger.h"
 #include "cxVideoService.h"
 
@@ -24,7 +24,7 @@ namespace cx
 ImageReceiverThread::ImageReceiverThread(QObject* parent) :
 		QThread(parent)
 {
-	mFPSTimer.reset(new CyclicActionLogger());
+//	mFPSTimer.reset(new CyclicActionLogger());
 	mGeneratingTimeCalibration = false;
 	mLastReferenceTimestampDiff = 0.0;
 	mLastTimeStamps.reserve(20);
@@ -32,8 +32,9 @@ ImageReceiverThread::ImageReceiverThread(QObject* parent) :
 
 void ImageReceiverThread::addImageToQueue(ImagePtr imgMsg)
 {
-	if(this->imageComesFromActiveVideoSource(imgMsg))
-		this->reportFPS();
+	this->reportFPS(imgMsg->getUid());
+//	if(this->imageComesFromActiveVideoSource(imgMsg))
+//		this->reportFPS();
 
 	bool needToCalibrateMsgTimeStamp = this->imageComesFromSonix(imgMsg);
 
@@ -121,19 +122,26 @@ void ImageReceiverThread::calibrateTimeStamp(ImagePtr imgMsg)
 
 }
 
-void ImageReceiverThread::reportFPS()
+void ImageReceiverThread::reportFPS(QString streamUid)
 {
-	mFPSTimer->begin();
-	if (mFPSTimer->intervalPassed())
+	int timeout = 2000;
+//	std::map<QString, cx::CyclicActionLoggerPtr> mFPSTimer;
+	if (!mFPSTimer.count(streamUid))
 	{
-		emit fps(mFPSTimer->getFPS());
-		mFPSTimer->reset(2000);
-	}
-}
+		mFPSTimer[streamUid].reset(new CyclicActionLogger());
+		mFPSTimer[streamUid]->reset(timeout);
 
-bool ImageReceiverThread::imageComesFromActiveVideoSource(ImagePtr imgMsg)
-{
-	return imgMsg->getUid().compare(videoService()->getActiveVideoSource()->getUid()) == 0;
+		//	mFPSTimer.reset(new CyclicActionLogger());
+	}
+
+	CyclicActionLoggerPtr logger = mFPSTimer[streamUid];
+
+	logger->begin();
+	if (logger->intervalPassed())
+	{
+		emit fps(streamUid, logger->getFPS());
+		logger->reset(timeout);
+	}
 }
 
 bool ImageReceiverThread::imageComesFromSonix(ImagePtr imgMsg)

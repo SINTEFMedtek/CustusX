@@ -10,12 +10,12 @@
 #include <QSlider>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 #include "cxRegistrationManager.h"
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 #include "cxRegistrationHistoryWidget.h"
-#include "sscTypeConversions.h"
-#include "sscManualTool.h"
+#include "cxTypeConversions.h"
+#include "cxManualTool.h"
 #include "cxToolManager.h"
 
 namespace cx
@@ -29,7 +29,7 @@ LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegistrationManagerPtr re
 	connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(cellClickedSlot(int, int)));
 	connect(mLandmarkTableWidget, SIGNAL(cellChanged(int,int)), this, SLOT(cellChangedSlot(int,int)));
 
-	mActiveImageProxy = ActiveImageProxy::New();
+	mActiveImageProxy = ActiveImageProxy::New(dataService());
 	connect(mActiveImageProxy.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
 	connect(mActiveImageProxy.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
@@ -70,7 +70,7 @@ void LandmarkRegistrationWidget::cellClickedSlot(int row, int column)
 		return;
 
 	if (!mLandmarkTableWidget)
-		messageManager()->sendDebug("mLandmarkTableWidget is null");
+		reporter()->sendDebug("mLandmarkTableWidget is null");
 
 	mActiveLandmark = mLandmarkTableWidget->item(row, column)->data(Qt::UserRole).toString();
 
@@ -92,7 +92,7 @@ void LandmarkRegistrationWidget::setManualToolPosition(Vector3D p_r)
 	Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
-	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
+	ManualToolPtr tool = toolManager()->getManualTool();
 	Vector3D offset = tool->get_prMt().vector(Vector3D(0, 0, tool->getTooltipOffset()));
 	p_pr -= offset;
 	p_r = rMpr.coord(p_pr);

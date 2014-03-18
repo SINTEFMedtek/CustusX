@@ -15,7 +15,7 @@
 #define CXPREPAREVESSELSWIDGET_H
 
 #include "cxRegistrationBaseWidget.h"
-#include "sscColorDataAdapter.h"
+#include "cxColorDataAdapter.h"
 #include "cxPipeline.h"
 #include "cxFilter.h"
 
@@ -26,7 +26,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxPluginRegistration
+ * \addtogroup cx_plugin_registration
  * @{
  */
 

@@ -14,9 +14,9 @@
 #ifndef CXCameraStyleForViewFORVIEW_H
 #define CXCameraStyleForViewFORVIEW_H
 
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
-#include "sscEnumConverter.h"
+#include "cxEnumConverter.h"
 class QIcon;
 class QWidget;
 class QMenu;
@@ -25,13 +25,14 @@ class QActionGroup;
 namespace cx
 {
 typedef boost::shared_ptr<class ViewportPreRenderListener> ViewportPreRenderListenerPtr;
+typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
 
 typedef boost::shared_ptr<class CameraStyleForView> CameraStyleForViewPtr;
 using cx::Transform3D;
 
 /**
  * \file
- * \addtogroup cxServiceVisualization
+ * \addtogroup cx_service_visualization
  * @{
  */
 
@@ -57,7 +58,7 @@ class CameraStyleForView: public QObject
 {
 Q_OBJECT
 public:
-	CameraStyleForView();
+	explicit CameraStyleForView(VisualizationServiceBackendPtr backend);
 	void setView(ViewWidgetQPtr widget);
 
 	/** Select tool style. This replaces the vtkInteractor Style.
@@ -67,7 +68,6 @@ public:
 private slots:
 	void setModified();
 	void dominantToolChangedSlot();
-	void viewChangedSlot();
 
 private:
 	ViewWidgetQPtr getView() const;
@@ -77,7 +77,6 @@ private:
 	bool isToolFollowingStyle(CAMERA_STYLE_TYPE style) const;
 	void onPreRender();
 	void moveCameraToolStyleSlot(Transform3D prMt, double timestamp); ///< receives transforms from the tool which the camera should follow
-//	void update();
 
 	void connectTool();
 	void disconnectTool();
@@ -91,6 +90,7 @@ private:
 	bool mBlockCameraUpdate; ///< for breaking a camera update loop
 
 	ViewWidgetQPtr mView;
+	VisualizationServiceBackendPtr mBackend;
 };
 
 /**

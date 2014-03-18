@@ -14,9 +14,9 @@
 
 #include "cxSphereMetric.h"
 
-#include "sscBoundingBox3D.h"
-#include "sscTypeConversions.h"
-#include "sscDataManager.h"
+#include "cxBoundingBox3D.h"
+#include "cxTypeConversions.h"
+#include "cxDataManager.h"
 
 namespace cx
 {
@@ -26,7 +26,7 @@ namespace cx
 //	return DataPtr(new SphereMetric(uid, filename));
 //}
 
-SphereMetric::SphereMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider) :
+SphereMetric::SphereMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 				DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "position"));
@@ -34,7 +34,7 @@ SphereMetric::SphereMetric(const QString& uid, const QString& name, DataManager*
 	mRadius = 5;
 }
 
-SphereMetricPtr SphereMetric::create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider)
+SphereMetricPtr SphereMetric::create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
 	return SphereMetricPtr(new SphereMetric(uid, name, dataManager, spaceProvider));
 }

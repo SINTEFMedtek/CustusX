@@ -25,7 +25,7 @@ typedef boost::shared_ptr<class LayoutInteractor> LayoutInteractorPtr;
 
 /**
  * \class MainWindow
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * \brief This is the main gui class which controls the workflow.
  *

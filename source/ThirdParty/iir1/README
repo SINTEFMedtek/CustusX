@@ -1,0 +1,38 @@
+This is a powerful filter library which implements all 
+standard IIR filters such as Bessel, Butterworth, 
+Elliptic and Chebychev. The data format is
+floating-point throughout.
+
+There is no need to resort to MATLAB/OCTAVE to calculate
+the filter coefficients because the library does it
+by itself. Just provide the sampling rate, cutoff
+frequency, filter order and the filter is
+ready to be used.
+
+Installation is done with the standard sequence:
+CXXFLAGS="-O3 -march=native" ./configure
+make
+sudo make install
+sudo ldconfig
+
+Usage is very simple. A demo program is in the
+"demo" directory which sets up a lowpass and a bandstop 
+filter. A delta pulse is sent into the filters 
+and saved as a gnuplot/octave file. 
+For the documentation have a look at
+Documentation.txt
+
+This library has been adapted form Vinnie Falco's
+original work which can be found here:
+https://github.com/vinniefalco/DSPFilters
+
+The main advancement from the original library is
+the implementation of the "filter" function
+so that the IIR filter can be used in realime
+applications. This has been achieved by just
+re-shuffling existing code and making it available
+to the user in form of the API call "filter".
+
+Enjoy!
+
+Bernd Porr

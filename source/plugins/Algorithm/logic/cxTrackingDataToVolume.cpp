@@ -3,13 +3,13 @@
 
 #include <vtkImageData.h>
 
-#include "sscBoundingBox3D.h"
-#include "sscDataManager.h"
-#include "sscToolManager.h"
-#include "sscRegistrationTransform.h"
-#include "sscCoordinateSystemHelpers.h"
-#include "sscVolumeHelpers.h"
-#include "sscMessageManager.h"
+#include "cxBoundingBox3D.h"
+#include "cxDataManager.h"
+#include "cxToolManager.h"
+#include "cxRegistrationTransform.h"
+#include "cxCoordinateSystemHelpers.h"
+#include "cxVolumeHelpers.h"
+#include "cxReporter.h"
 //#include "cxStateService.h"
 //#include "cxPatientData.h"
 
@@ -53,7 +53,7 @@ ImagePtr TrackingDataToVolume::createEmptyImage(DoubleBoundingBox3D bounds_pr, d
   double size = dim[0]*dim[1]*dim[2];
   if(size > maxVolumeSize)
   {
-    messageManager()->sendWarning("Tool position volume is going to be to big, making a smaller one.");
+    reportWarning("Tool position volume is going to be to big, making a smaller one.");
     spacing *= pow(size / maxVolumeSize, 1.0/3);
     dim = (ceil(bounds_pr.range() / spacing) + Vector3D(1,1,1)).cast<int>();
   }

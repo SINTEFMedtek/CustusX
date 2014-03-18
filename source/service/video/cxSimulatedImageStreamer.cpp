@@ -5,20 +5,20 @@
 #include "vtkMatrix4x4.h"
 #include "vtkImageData.h"
 #include "vtkImageMask.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscSliceProxy.h"
-#include "sscProbeSector.h"
-#include "sscProbeData.h"
-#include "sscToolManager.h"
-#include "sscTransform3D.h"
-#include "sscVolumeHelpers.h"
-#include "cxToolManager.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
+#include "cxSliceProxy.h"
+#include "cxProbeSector.h"
+#include "cxProbeData.h"
+//#include "cxToolManager.h"
+#include "cxTransform3D.h"
+#include "cxVolumeHelpers.h"
+//#include "cxToolManager.h"
 
-#include "sscSlicedImageProxy.h"
-#include "sscSliceProxy.h"
+#include "cxSlicedImageProxy.h"
+#include "cxSliceProxy.h"
 #include "vtkImageChangeInformation.h"
-#include "sscLogger.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -31,20 +31,15 @@ SimulatedImageStreamer::SimulatedImageStreamer()
 SimulatedImageStreamer::~SimulatedImageStreamer()
 {}
 
-void SimulatedImageStreamer::initialize()
-{
-	ImagePtr image = dataManager()->getActiveImage();
-	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
-	this->initialize(image, tool);
-}
 
-void SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool)
+void SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServicePtr dataManager)
 {
-	if(!image || !tool)
+	if(!image || !tool || !dataManager)
 	{
 		this->setInitialized(false);
 		return;
 	}
+	mDataManager = dataManager;
 	this->createSendTimer();
 
 	this->setSourceImage(image);
@@ -61,7 +56,7 @@ bool SimulatedImageStreamer::startStreaming(SenderPtr sender)
 {
 	if (!this->isInitialized())
 	{
-		messageManager()->sendError("SimulatedImageStreamer: Failed to start streaming: Not initialized.");
+		reportError("SimulatedImageStreamer: Failed to start streaming: Not initialized.");
 		return false;
 	}
 	mSender = sender;
@@ -121,15 +116,9 @@ void SimulatedImageStreamer::sliceSlot()
 	mCachedImageToSend.reset();
 }
 
-void SimulatedImageStreamer::setSourceToActiveImageSlot()
-{
-	ImagePtr image = dataManager()->getActiveImage();
-	this->setSourceImage(image);
-}
-
 void SimulatedImageStreamer::setSourceToImageSlot(QString imageUid)
 {
-	ImagePtr image = dataManager()->getImage(imageUid);
+	ImagePtr image = mDataManager->getImage(imageUid);
 	this->setSourceImage(image);
 }
 
@@ -200,7 +189,7 @@ Transform3D SimulatedImageStreamer::getTransform_vMr()
 	Transform3D vMt = vMu * uMt;
 
 	Transform3D tMpr = mTool->get_prMt().inv();
-	Transform3D prMr = dataManager()->get_rMpr().inv();
+	Transform3D prMr = mDataManager->get_rMpr().inv();
 
 	Transform3D vMr = vMt * tMpr * prMr;
 	return vMr;

@@ -24,9 +24,11 @@ class QMenu;
 
 namespace cx
 {
+typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
+
 /**
  * \file
- * \addtogroup cxServiceState
+ * \addtogroup cx_service_state
  * @{
  */
 
@@ -36,6 +38,7 @@ class WorkflowState;
  *
  *  See StateService for a description.
  *
+ * \ingroup cx_service_state
  * \date 4. aug. 2010
  * \author Janne Beate Bakeng, SINTEF
  */
@@ -43,7 +46,7 @@ class WorkflowStateMachine: public QStateMachine
 {
 Q_OBJECT
 public:
-	WorkflowStateMachine();
+	WorkflowStateMachine(StateServiceBackendPtr backend);
 	virtual ~WorkflowStateMachine();
 
 	QActionGroup* getActionGroup();
@@ -59,6 +62,7 @@ signals:
 
 private slots:
 	void startedSlot();
+	void clinicalApplicationChangedSlot();
 
 private:
 	void fillMenu(QMenu* menu, WorkflowState* current);
@@ -72,6 +76,7 @@ private:
 	WorkflowState* mParentState;
 	QActionGroup* mActionGroup;
 	bool mStarted;
+	StateServiceBackendPtr mBackend;
 };
 
 typedef boost::shared_ptr<WorkflowStateMachine> WorkflowStateMachinePtr;

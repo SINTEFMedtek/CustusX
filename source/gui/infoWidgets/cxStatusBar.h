@@ -3,8 +3,10 @@
 
 #include <QStatusBar>
 #include <map>
-#include "sscMessageManager.h"
-#include "sscForwardDeclarations.h"
+#include "cxReporter.h"
+#include "cxForwardDeclarations.h"
+#include "cxLegacySingletons.h"
+
 
 class QLabel;
 class QPixmap;
@@ -17,7 +19,7 @@ namespace cx
  * \class StatusBar
  *
  * \brief Statusbar with extended functionality.
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * \date Jan 21, 2009
  * \author Janne Beate Bakeng, SINTEF

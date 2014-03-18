@@ -13,19 +13,19 @@
 // See CustusX_License.txt for more information.
 #include "cxtestMultiVolume3DRepProducerFixture.h"
 
-#include "sscView.h"
+#include "cxView.h"
 
 namespace cxtest
 {
 
 MultiVolume3DRepProducerFixture::MultiVolume3DRepProducerFixture()
 {
-	cx::MessageManager::initialize();
+	cx::Reporter::initialize();
 }
 
 MultiVolume3DRepProducerFixture::~MultiVolume3DRepProducerFixture()
 {
-	cx::MessageManager::shutdown();
+	cx::Reporter::shutdown();
 }
 
 void MultiVolume3DRepProducerFixture::initializeVisualizerAndImages(QString type, int imageCount)

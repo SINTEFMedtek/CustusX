@@ -13,28 +13,29 @@
 // See CustusX_License.txt for more information.
 
 #include "cxMetricManager.h"
-#include "sscDataManager.h"
-#include "sscManualTool.h"
+#include "cxDataManager.h"
+#include "cxManualTool.h"
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewGroupData.h"
 #include "cxToolManager.h"
 #include <QFile>
-#include "sscMessageManager.h"
-#include "sscDataReaderWriter.h"
+#include "cxReporter.h"
+#include "cxDataReaderWriter.h"
 
-#include "sscRegistrationTransform.h"
-#include "sscPointMetric.h"
-#include "sscDistanceMetric.h"
+#include "cxRegistrationTransform.h"
+#include "cxPointMetric.h"
+#include "cxDistanceMetric.h"
 #include "cxFrameMetric.h"
 #include "cxToolMetric.h"
-#include "sscPlaneMetric.h"
+#include "cxPlaneMetric.h"
 #include "cxShapedMetric.h"
-#include "sscAngleMetric.h"
+#include "cxAngleMetric.h"
 #include "cxSphereMetric.h"
 #include "cxDataFactory.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
+#include "cxTypeConversions.h"
 
 
 namespace cx
@@ -93,7 +94,7 @@ void MetricManager::setManualToolPosition(Vector3D p_r)
 	Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
-	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
+	ManualToolPtr tool = toolManager()->getManualTool();
 	Vector3D offset = tool->get_prMt().vector(Vector3D(0, 0, tool->getTooltipOffset()));
 	p_pr -= offset;
 	p_r = rMpr.coord(p_pr);
@@ -156,7 +157,6 @@ void MetricManager::addFrameButtonClickedSlot()
 void MetricManager::addToolButtonClickedSlot()
 {
 	ToolMetricPtr frame = this->getDataFactory()->createSpecific<ToolMetric>("tool%1");
-//  ToolMetricPtr frame(new ToolMetric("tool%1", "tool%1"));
   frame->get_rMd_History()->setParentSpace("reference");
 
   CoordinateSystem ref = CoordinateSystem::reference();
@@ -172,29 +172,31 @@ void MetricManager::addToolButtonClickedSlot()
 
 void MetricManager::addPlaneButtonClickedSlot()
 {
-  CoordinateSystem ref = CoordinateSystem::reference();
-//  Vector3D p_ref = CoordinateSystemHelpers::getDominantToolTipPoint(ref, true);
+//  CoordinateSystem ref = CoordinateSystem::reference();
 
   PlaneMetricPtr p1 = this->getDataFactory()->createSpecific<PlaneMetric>("plane%1");
-//  PlaneMetricPtr p1(new PlaneMetric("plane%1","plane%1"));
   p1->get_rMd_History()->setParentSpace("reference");
-  p1->setSpace(ref);
+//  p1->setSpace(ref);
 
-  ToolPtr tool = toolManager()->getDominantTool();
-  if (!tool)
-  {
-	  p1->setCoordinate(Vector3D(0,0,0));
-	  p1->setNormal(Vector3D(1,0,0));
-  }
-  else
-  {
-	  CoordinateSystem from(csTOOL_OFFSET, tool->getUid());
-	  Vector3D point_t = Vector3D(0,0,0);
-	  Transform3D rMto = spaceProvider()->get_toMfrom(from, ref);
+  std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(p1->getArguments());
+  for (unsigned i=0; i<args.size(); ++i)
+	p1->getArguments()->set(i, args[i]);
 
-	  p1->setCoordinate(rMto.coord(Vector3D(0,0,0)));
-	  p1->setNormal(rMto.vector(Vector3D(0,0,1)));
-  }
+//  ToolPtr tool = toolManager()->getDominantTool();
+//  if (!tool)
+//  {
+//	  p1->setCoordinate(Vector3D(0,0,0));
+//	  p1->setNormal(Vector3D(1,0,0));
+//  }
+//  else
+//  {
+//	  CoordinateSystem from(csTOOL_OFFSET, tool->getUid());
+//	  Vector3D point_t = Vector3D(0,0,0);
+//	  Transform3D rMto = spaceProvider()->get_toMfrom(from, ref);
+
+//	  p1->setCoordinate(rMto.coord(Vector3D(0,0,0)));
+//	  p1->setNormal(rMto.vector(Vector3D(0,0,1)));
+//  }
 
   this->installNewMetric(p1);
 }
@@ -280,7 +282,6 @@ std::vector<DataPtr> MetricManager::getSpecifiedNumberOfValidArguments(MetricRef
 void MetricManager::addSphereButtonClickedSlot()
 {
 	SphereMetricPtr d0 = this->getDataFactory()->createSpecific<SphereMetric>("sphere%1");
-//	SphereMetricPtr d0(new SphereMetric("sphere%1","sphere%1"));
 	d0->get_rMd_History()->setParentSpace("reference");
 	std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
 	d0->getArguments()->set(0, args[0]);
@@ -291,7 +292,6 @@ void MetricManager::addSphereButtonClickedSlot()
 void MetricManager::addDonutButtonClickedSlot()
 {
 	DonutMetricPtr d0 = this->getDataFactory()->createSpecific<DonutMetric>("donut%1");
-//	DonutMetricPtr d0(new DonutMetric("donut%1","donut%1"));
 	d0->get_rMd_History()->setParentSpace("reference");
 	std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
 	d0->getArguments()->set(0, args[0]);
@@ -312,14 +312,14 @@ void MetricManager::loadReferencePointsSlot()
   ToolPtr refTool = toolManager()->getReferenceTool();
   if(!refTool) // we only load reference points from reference tools
   {
-	messageManager()->sendDebug("No reference tool, cannot load reference points into the pointsampler");
+	reporter()->sendDebug("No reference tool, cannot load reference points into the pointsampler");
 	return;
   }
 
   std::map<int, Vector3D> referencePoints_s = refTool->getReferencePoints();
   if(referencePoints_s.empty())
   {
-	messageManager()->sendWarning("No referenceppoints in reference tool "+refTool->getName());
+	reportWarning("No referenceppoints in reference tool "+refTool->getName());
 	return;
   }
 

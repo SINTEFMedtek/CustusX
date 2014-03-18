@@ -14,12 +14,12 @@
 
 #include "catch.hpp"
 
-#include "sscMesh.h"
-#include "sscImage.h"
-#include "sscDataMetric.h"
-#include "sscPointMetric.h"
+#include "cxMesh.h"
+#include "cxImage.h"
+#include "cxDataMetric.h"
+#include "cxPointMetric.h"
 #include "cxViewWrapper.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxtestSpaceProviderMock.h"
 
 TEST_CASE("Sort cx::Data user-frindly using getPriority()", "[unit][service][visualization]")
@@ -35,7 +35,7 @@ TEST_CASE("Sort cx::Data user-frindly using getPriority()", "[unit][service][vis
 	cx::ImagePtr image_usa(new cx::Image("image1_usa", vtkImageDataPtr()));
 	image_usa->setModality("US");
 	image_usa->setImageType("Angio");
-	cx::PointMetricPtr point = cx::PointMetric::create("point1    ", "", NULL, cxtest::SpaceProviderMock::create());
+	cx::PointMetricPtr point = cx::PointMetric::create("point1    ", "", cx::DataServicePtr(), cxtest::SpaceProviderMock::create());
 
 	std::vector<cx::DataPtr> unsorted1;
 	unsorted1.push_back(image_us);

@@ -13,7 +13,7 @@ namespace cx
  * \class ExportDataDialog
  *
  *\brief
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * \date Oct 03, 2012
  *\author christiana

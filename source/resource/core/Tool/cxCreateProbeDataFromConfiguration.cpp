@@ -1,5 +1,5 @@
 #include "cxCreateProbeDataFromConfiguration.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include <iostream>
 
 namespace cx

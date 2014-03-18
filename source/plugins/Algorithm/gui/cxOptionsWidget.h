@@ -2,7 +2,7 @@
 #define CXOPTIONSWIDGET_H_
 
 #include <QStackedLayout>
-#include "sscDataAdapter.h"
+#include "cxDataAdapter.h"
 #include "cxSelectDataStringDataAdapter.h"
 
 namespace cx {
@@ -10,7 +10,7 @@ namespace cx {
 /** Widget for displaying a list of DataAdapter instances.
  * A stack of widgets is created if the setOptions() is called with different uids.
  *
- * \ingroup cxPluginAlgorithm
+ * \ingroup cx_plugin_algorithm
  * \date Nov 20, 2012
  * \author Christian Askeland, SINTEF
  * \author Janne Beate Bakeng, SINTEF

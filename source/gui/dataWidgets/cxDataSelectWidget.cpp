@@ -17,12 +17,13 @@
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
-#include "sscDataManager.h"
-#include "sscHelperWidgets.h"
+#include "cxDataManager.h"
+#include "cxHelperWidgets.h"
 #include "cxDataInterface.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {
@@ -84,16 +85,16 @@ void DataSelectWidget::viewGroupChangedSlot()
 
     if (mCurrentViewGroup)
     {
-        disconnect(mCurrentViewGroup.get(), SIGNAL(dataAdded(QString)),   this, SLOT(updateDataVisibility()));
-        disconnect(mCurrentViewGroup.get(), SIGNAL(dataRemoved(QString)), this, SLOT(updateDataVisibility()));
+		disconnect(mCurrentViewGroup.get(), SIGNAL(dataViewPropertiesChanged(QString)),
+				   this, SLOT(updateDataVisibility()));
     }
 
     mCurrentViewGroup = group;
 
     if (mCurrentViewGroup)
     {
-        connect(mCurrentViewGroup.get(), SIGNAL(dataAdded(QString)),   this, SLOT(updateDataVisibility()));
-        connect(mCurrentViewGroup.get(), SIGNAL(dataRemoved(QString)), this, SLOT(updateDataVisibility()));
+		connect(mCurrentViewGroup.get(), SIGNAL(dataViewPropertiesChanged(QString)),
+				this, SLOT(updateDataVisibility()));
     }
 
     this->updateDataVisibility();
@@ -110,7 +111,7 @@ void DataSelectWidget::updateDataVisibility()
         std::vector<DataPtr> visibleData;
         if (mCurrentViewGroup)
         {
-            visibleData = mCurrentViewGroup->getData();
+			visibleData = mCurrentViewGroup->getData();
         }
         visible = std::count(visibleData.begin(), visibleData.end(), mData->getData());
     }
@@ -186,11 +187,11 @@ void DataSelectWidget::toggleShowData()
 
     if (mToggleShowAction->isChecked())
     {
-        mCurrentViewGroup->addData(mData->getData());
+		mCurrentViewGroup->addData(mData->getData());
     }
     else
     {
-        mCurrentViewGroup->removeData(mData->getData());
+		mCurrentViewGroup->removeData(mData->getData());
     }
 }
 

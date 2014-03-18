@@ -19,8 +19,8 @@
 #include "cxViewManager.h"
 #include "cxDataInterface.h"
 #include "cxCameraControl.h"
-#include "sscBoundingBox3D.h"
-#include "sscView.h"
+#include "cxBoundingBox3D.h"
+#include "cxView.h"
 
 namespace cx
 {
@@ -32,7 +32,7 @@ namespace cx
 TrackPadWidget::TrackPadWidget(QWidget* parent) :
     BaseWidget(parent, "TrackPadWidget", "Camera Control")
 {
-  mCameraControl.reset(new CameraControl());
+  mCameraControl = viewManager()->getCameraControl();
 
   mMinPadSize = QSize(50,50);
   mMinBarSize = QSize(20,50);

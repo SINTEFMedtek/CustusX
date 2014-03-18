@@ -28,7 +28,7 @@ namespace cx
 /** 
  *
  *
- * \ingroup cxGUI
+ * \ingroup cx_gui
  * \date 2014-02-05
  * \author christiana
  */

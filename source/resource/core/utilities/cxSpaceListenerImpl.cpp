@@ -14,14 +14,14 @@
 
 #include "cxSpaceListenerImpl.h"
 
-#include "sscDataManager.h"
-#include "sscToolManager.h"
-#include "sscData.h"
+#include "cxDataManager.h"
+#include "cxToolManager.h"
+#include "cxData.h"
 
 namespace cx
 {
 
-SpaceListenerImpl::SpaceListenerImpl(ToolManager* toolManager, DataManager* dataManager)
+SpaceListenerImpl::SpaceListenerImpl(TrackingServicePtr toolManager, DataServicePtr dataManager)
 {
 	mToolManager = toolManager;
 	mDataManager = dataManager;
@@ -65,7 +65,7 @@ void SpaceListenerImpl::doConnect()
 		if (data)
 		{
 			connect(data.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
-			connect(mDataManager, SIGNAL(dataAddedOrRemoved(QString)), this, SIGNAL(changed()));
+			connect(mDataManager.get(), SIGNAL(dataAddedOrRemoved(QString)), this, SIGNAL(changed()));
 		}
 	}
 
@@ -79,16 +79,16 @@ void SpaceListenerImpl::doConnect()
 
 			if (mSpace.mRefObject == "active")
 			{
-				connect(mToolManager, SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
-				connect(mToolManager, SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
+				connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
+				connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
 			}
-			connect(mDataManager, SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+			connect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 		}
 	}
 
 	if (mSpace.mId == csPATIENTREF)
 	{
-		connect(mDataManager, SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+		connect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 	}
 }
 
@@ -100,7 +100,7 @@ void SpaceListenerImpl::doDisconnect()
 		if (data)
 		{
 			disconnect(data.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
-			disconnect(mDataManager, SIGNAL(dataRemoved(QString)), this, SIGNAL(changed()));
+			disconnect(mDataManager.get(), SIGNAL(dataAddedOrRemoved(QString)), this, SIGNAL(changed()));
 		}
 	}
 
@@ -114,16 +114,16 @@ void SpaceListenerImpl::doDisconnect()
 
 			if (mSpace.mRefObject == "active")
 			{
-				disconnect(mToolManager, SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
-				disconnect(mToolManager, SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
+				disconnect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
+				disconnect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(reconnect()));
 			}
-			disconnect(mDataManager, SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+			disconnect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 		}
 	}
 
 	if (mSpace.mId == csPATIENTREF)
 	{
-		disconnect(mDataManager, SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+		disconnect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 	}
 }
 

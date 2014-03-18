@@ -19,6 +19,7 @@ int convertStringWithDefault(QString text, int def);
 /**
  * \brief Factory class for creating streamer objects.
  *
+ * \ingroup cx_resource_videoserver
  * \author Christian Askeland, SINTEF
  * \author Janne Beate Bakeng, SINTEF
  * \date Aug 9, 2011

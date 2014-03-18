@@ -6,11 +6,11 @@
 #include <vector>
 #include <QtGui>
 #include <QGraphicsView>
-#include "sscVector3D.h"
-#include "sscDoubleWidgets.h"
-#include "sscForwardDeclarations.h"
+#include "cxVector3D.h"
+#include "cxDoubleWidgets.h"
+#include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
-#include "sscMousePadWidget.h"
+#include "cxMousePadWidget.h"
 
 namespace cx
 {
@@ -23,7 +23,7 @@ typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
  * \class TrackPadWidget
  *
  * \brief Widget for controlling the camera in the 3D view.
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  *  This widget is designed for use on a touchpad device.
  *  Example is to use iPad/iPhone as a secondary screen with this widget on.

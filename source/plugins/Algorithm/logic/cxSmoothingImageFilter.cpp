@@ -19,14 +19,14 @@
 #include "cxSelectDataStringDataAdapter.h"
 
 
-#include "sscDataManager.h"
-#include "sscUtilHelpers.h"
-#include "sscRegistrationTransform.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
-#include "sscBoolDataAdapterXml.h"
-#include "sscTypeConversions.h"
-#include "sscImage.h"
+#include "cxDataManager.h"
+#include "cxUtilHelpers.h"
+#include "cxRegistrationTransform.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
+#include "cxTypeConversions.h"
+#include "cxImage.h"
 
 #include "cxPatientService.h"
 #include "cxPatientData.h"

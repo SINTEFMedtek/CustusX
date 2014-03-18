@@ -8,8 +8,8 @@
 #include <QPixmap>
 #include <QMetaObject>
 
-#include "sscToolManager.h"
-#include "sscMessageManager.h"
+#include "cxToolManager.h"
+#include "cxReporter.h"
 #include "cxVideoConnectionManager.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"
@@ -19,9 +19,9 @@
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
 #include "cxVideoConnection.h"
-#include "sscManualTool.h"
-#include "sscTypeConversions.h"
-#include "sscDefinitionStrings.h"
+#include "cxManualTool.h"
+#include "cxTypeConversions.h"
+#include "cxDefinitionStrings.h"
 
 
 namespace cx
@@ -33,7 +33,7 @@ StatusBar::StatusBar() :
 //	mMessageLevelLabel(new QToolButton(this))
 //	mMessageLevelLabel(new QLabel(this))
 {
-	connect(messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
+	connect(reporter(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
 
 	connect(toolManager(), SIGNAL(configured()),      this, SLOT(connectToToolSignals()));
 	connect(toolManager(), SIGNAL(deconfigured()),    this, SLOT(disconnectFromToolSignals()));
@@ -45,7 +45,7 @@ StatusBar::StatusBar() :
 
 	connect(viewManager(), SIGNAL(fps(int)), this, SLOT(renderingFpsSlot(int)));
 
-	connect(videoService()->getVideoConnection().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
+	connect(videoService().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
 	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));
 
 //	this->addPermanentWidget(mMessageLevelLabel);
@@ -68,7 +68,7 @@ void StatusBar::connectToToolSignals()
 		ToolPtr tool = it->second;
 		if (tool->hasType(Tool::TOOL_MANUAL))
 			continue;
-		if (tool == cxToolManager::getInstance()->getManualTool())
+		if (tool == toolManager()->getManualTool())
 			continue;
 		connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolButtons()));
 

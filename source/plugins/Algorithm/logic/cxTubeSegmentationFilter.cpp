@@ -11,14 +11,14 @@
 #include <vtkImageData.h>
 #include <vtkImageShiftScale.h>
 
-#include "sscTime.h"
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscDataManagerImpl.h"
-#include "sscDataReaderWriter.h"
-#include "sscRegistrationTransform.h"
-#include "sscDoubleDataAdapterXml.h"
+#include "cxTime.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
+#include "cxDataManagerImpl.h"
+#include "cxDataReaderWriter.h"
+#include "cxRegistrationTransform.h"
+#include "cxDoubleDataAdapterXml.h"
 #include "cxContourFilter.h"
 #include "cxDataLocations.h"
 #include "cxPatientService.h"
@@ -84,7 +84,7 @@ QDomElement TubeSegmentationFilter::generatePresetFromCurrentlySetOptions(QStrin
 		else if(doubleOption)
 			value = QString::number(doubleOption->getValue());
 		else
-			messageManager()->sendError("Could not determine what kind of option to get the value for.");
+			reportError("Could not determine what kind of option to get the value for.");
 		newPresetMap[valuename] = value;
 	}
 	StringDataAdapterPtr centerlineMethod = this->getStringOption("centerline-method");
@@ -130,7 +130,7 @@ bool TubeSegmentationFilter::execute()
 		std::cout << "=================TSF END====================" << std::endl;
 	} catch(SIPL::SIPLException& e) {
 		std::string error = e.what();
-		messageManager()->sendError("SIPL::SIPLException: "+qstring_cast(error));
+		reportError("SIPL::SIPLException: "+qstring_cast(error));
 
 		if(mOutput != NULL){
 			delete mOutput;
@@ -138,7 +138,7 @@ bool TubeSegmentationFilter::execute()
 		}
 		return false;
 	} catch(cl::Error& e) {
-		messageManager()->sendError("cl::Error:"+qstring_cast(e.what()));
+		reportError("cl::Error:"+qstring_cast(e.what()));
 
 		if(mOutput != NULL){
 			delete mOutput;
@@ -146,7 +146,7 @@ bool TubeSegmentationFilter::execute()
 		}
 		return false;
 	} catch (std::exception& e){
-		messageManager()->sendError("std::exception:"+qstring_cast(e.what()));
+		reportError("std::exception:"+qstring_cast(e.what()));
 
 		if(mOutput != NULL){
 			delete mOutput;
@@ -154,7 +154,7 @@ bool TubeSegmentationFilter::execute()
 		}
 		return false;
 	} catch (...){
-		messageManager()->sendError("Tube segmentation algorithm threw a unknown exception.");
+		reportError("Tube segmentation algorithm threw a unknown exception.");
 
 		if(mOutput != NULL){
 			delete mOutput;
@@ -169,7 +169,7 @@ bool TubeSegmentationFilter::postProcess()
 {
 	if(!mOutput)
 	{
-		messageManager()->sendWarning("No output generated from the tube segmentation filter.");
+		reportWarning("No output generated from the tube segmentation filter.");
 		return false;
 	}
 
@@ -415,7 +415,7 @@ void TubeSegmentationFilter::loadNewParametersSlot()
 			loadParameterPreset(list, cx::DataLocations::getTSFPath().toStdString()+"/parameters");
 		} catch (SIPL::SIPLException& e)
 		{
-			messageManager()->sendWarning("Error when loading a parameter file. Preset is corrupt. "+QString(e.what()));
+			reportWarning("Error when loading a parameter file. Preset is corrupt. "+QString(e.what()));
 			return;
 		}
 	}
@@ -540,7 +540,7 @@ MeshPtr TubeSegmentationFilter::loadVtkFile(QString pathToFile, QString newDatas
 	MeshPtr retval = boost::dynamic_pointer_cast<Mesh>(data);
 
 	if(!data or !retval)
-		messageManager()->sendError("Could not load "+pathToFile);
+		reportError("Could not load "+pathToFile);
 
 	return retval;
 }
@@ -595,7 +595,7 @@ paramList TubeSegmentationFilter::getParametersFromOptions()
 			setParameter(retval, stringIt->get()->getValueName().toStdString(), stringIt->get()->getValue().toStdString());
 		}catch(SIPL::SIPLException& e){
 			std::string message = "Could not process a string parameter: \""+std::string(e.what())+"\"";
-			messageManager()->sendError(qstring_cast(message));
+			reportError(qstring_cast(message));
 			continue;
 		}
 	}
@@ -608,7 +608,7 @@ paramList TubeSegmentationFilter::getParametersFromOptions()
 			setParameter(retval, boolIt->get()->getValueName().toStdString(), value);
 		}catch(SIPL::SIPLException& e){
 			std::string message = "Could not process a bool parameter: \""+std::string(e.what())+"\"";
-			messageManager()->sendError(qstring_cast(message));
+			reportError(qstring_cast(message));
 			continue;
 		}
 	}
@@ -622,7 +622,7 @@ paramList TubeSegmentationFilter::getParametersFromOptions()
 			setParameter(retval, doubleIt->get()->getValueName().toStdString(), value);
 		}catch(SIPL::SIPLException& e){
 			std::string message = "Could not process a double parameter: \""+std::string(e.what())+"\"";
-			messageManager()->sendError(qstring_cast(message));
+			reportError(qstring_cast(message));
 			continue;
 		}
 	}
@@ -738,7 +738,7 @@ void TubeSegmentationFilter::setOptionValue(QString valueName, QString value)
 	}
 	else
 	{
-		messageManager()->sendError("Could not determine what kind of option to set the value for.");
+		reportError("Could not determine what kind of option to set the value for.");
 		return;
 	}
 }
@@ -775,7 +775,7 @@ std::vector<std::string> TubeSegmentationFilter::getDifference(paramList list1, 
 	    }
 
 	}catch (SIPL::SIPLException& e){
-		messageManager()->sendError(QString(e.what()));
+		reportError(QString(e.what()));
 	}
 	return retval;
 
@@ -841,7 +841,7 @@ paramList TubeSegmentationFilter::getDefaultParameters()
 		defaultOptions = initParameters(cx::DataLocations::getTSFPath().toStdString()+"/parameters");
 	} catch (SIPL::SIPLException& e){
 		std::string message = "When creating default options, could not init parameters. \""+std::string(e.what())+"\"";
-		messageManager()->sendError(qstring_cast(message));
+		reportError(qstring_cast(message));
 	}
 	return defaultOptions;
 }

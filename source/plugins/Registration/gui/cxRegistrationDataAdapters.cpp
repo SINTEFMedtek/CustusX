@@ -7,8 +7,8 @@
 
 #include "cxRegistrationDataAdapters.h"
 #include "cxRegistrationManager.h"
-#include "sscDataManager.h"
-#include "sscTypeConversions.h"
+#include "cxDataManager.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

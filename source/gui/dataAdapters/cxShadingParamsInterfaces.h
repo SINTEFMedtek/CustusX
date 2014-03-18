@@ -9,17 +9,17 @@
 #ifndef CXSHADINGPARAMSINTERFACES_H_
 #define CXSHADINGPARAMSINTERFACES_H_
 
-#include "sscDoubleRange.h"
-#include "sscDoubleWidgets.h"
-#include "sscForwardDeclarations.h"
+#include "cxDoubleRange.h"
+#include "cxDoubleWidgets.h"
+#include "cxForwardDeclarations.h"
 #include "cxActiveImageProxy.h"
-
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup cxGUI
+ * \addtogroup cx_gui
  * @{
  */
 

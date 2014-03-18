@@ -15,11 +15,12 @@
 #include "cxSecondaryViewLayoutWindow.h"
 
 #include "cxViewManager.h"
-#include "sscLogger.h"
+#include "cxLogger.h"
 #include <QApplication>
 #include <QDesktopWidget>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
@@ -54,12 +55,12 @@ void SecondaryViewLayoutWindow::tryShowOnSecondaryScreen()
 
 	if (desktop->primaryScreen()==bestScreen)
 	{
-		messageManager()->sendInfo(QString("No secondary screen found. Displaying secondary view layout on primary screen."));
+		report(QString("No secondary screen found. Displaying secondary view layout on primary screen."));
 	}
 	else
 	{
 		QRect rect = desktop->screenGeometry(bestScreen);
-		messageManager()->sendInfo(QString("Displaying secondary view layout on fullscreen %1 of %2, size=[%3]")
+		report(QString("Displaying secondary view layout on fullscreen %1 of %2, size=[%3]")
 								   .arg(bestScreen+1)
 								   .arg(desktop->screenCount())
 								   .arg(this->toString(rect)));

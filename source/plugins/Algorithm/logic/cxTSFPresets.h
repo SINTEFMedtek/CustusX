@@ -4,8 +4,8 @@
 #include <map>
 #include <QDomElement>
 
-#include "sscPresets.h"
-#include "sscXmlOptionItem.h"
+#include "cxPresets.h"
+#include "cxXmlOptionItem.h"
 
 #ifdef CX_USE_TSF
 

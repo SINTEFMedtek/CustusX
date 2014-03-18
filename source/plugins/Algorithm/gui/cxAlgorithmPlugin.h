@@ -6,8 +6,8 @@
 namespace cx
 {
 /**
- * \defgroup cxPluginAlgorithm Algorithm Plugin
- * \ingroup cxPlugins
+ * \defgroup cx_plugin_algorithm Algorithm Plugin
+ * \ingroup cx_plugins
  * \brief Algorithm collection with widgets.
  *
  * See \ref cx::AlgorithmPlugin.
@@ -16,7 +16,7 @@ namespace cx
 
 /**
  * \file
- * \addtogroup cxPluginAlgorithm
+ * \addtogroup cx_plugin_algorithm
  * @{
  */
 

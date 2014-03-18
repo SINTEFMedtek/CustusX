@@ -2,7 +2,7 @@
 #define CXSEANSVESSELREGISTRATIONWIDGET_H_
 
 #include "cxRegistrationBaseWidget.h"
-#include "sscStringDataAdapter.h"
+#include "cxStringDataAdapter.h"
 
 class QSpinBox;
 class QPushButton;
@@ -14,7 +14,7 @@ typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegi
 
 /**
  * \file
- * \addtogroup cxPluginRegistration
+ * \addtogroup cx_plugin_registration
  * @{
  */
 

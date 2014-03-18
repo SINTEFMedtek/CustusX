@@ -14,39 +14,20 @@
 #ifndef CXSHAPEDMETRIC_H
 #define CXSHAPEDMETRIC_H
 
-#include "sscDataMetric.h"
-#include "sscPointMetric.h"
-#include "sscDataManagerImpl.h"
+#include "cxDataMetric.h"
+#include "cxPointMetric.h"
+#include "cxDataManagerImpl.h"
 #include "cxMetricReferenceArgumentList.h"
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup sscData
+ * \addtogroup cx_resource_core_data
  * @{
  */
 
 typedef boost::shared_ptr<class DonutMetric> DonutMetricPtr;
-
-///** \brief DataReader implementation for DonutMetric
-// *
-// * \date 2014-02-11
-// * \author Christian Askeland, SINTEF
-// */
-//class DonutMetricReader: public DataReader
-//{
-//public:
-//	virtual ~DonutMetricReader()
-//	{
-//	}
-//	virtual bool canLoad(const QString& type, const QString& filename)
-//	{
-//		return type == "DonutMetric";
-//	}
-//	virtual DataPtr load(const QString& uid, const QString& filename);
-//};
-
 
 /** \brief Data class that represents a donut.
  *
@@ -62,8 +43,7 @@ class DonutMetric: public DataMetric
 Q_OBJECT
 public:
 	virtual ~DonutMetric();
-//	static DonutMetricPtr create(QDomNode node);
-	static DonutMetricPtr create(QString uid, QString name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	static DonutMetricPtr create(QString uid, QString name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	virtual bool isValid() const;
 	virtual QString getAsSingleLineString() const;
@@ -72,6 +52,10 @@ public:
 	double getRadius() const;
 	void setThickness(double val);
 	double getThickness() const;
+	void setHeight(double val);
+	double getHeight() const;
+	bool getFlat() const;
+	void setFlat(bool val);
 
 	Vector3D getPosition();
 	Vector3D getDirection();
@@ -93,10 +77,12 @@ public:
 	virtual bool showValueInGraphics() const { return false; }
 
 private:
-	DonutMetric(const QString& uid, const QString& name, DataManager* dataManager, SpaceProviderPtr spaceProvider);
+	DonutMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	MetricReferenceArgumentListPtr mArguments;
 	double mRadius;
 	double mThickness;
+	double mHeight;
+	bool mFlat;
 };
 
 /**

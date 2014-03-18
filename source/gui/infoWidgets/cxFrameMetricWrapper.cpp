@@ -15,7 +15,7 @@
 #include "cxFrameMetricWrapper.h"
 
 #include <QHBoxLayout>
-#include "sscLabeledComboBoxWidget.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 
@@ -111,10 +111,10 @@ void FrameMetricWrapper::spaceSelected()
 
 void FrameMetricWrapper::dataChangedSlot()
 {
-	mInternalUpdate = true;
-	mSpaceSelector->setValue(mData->getSpace().toString());
-	mFrameWidget->setMatrix(mData->getFrame());
-	mInternalUpdate = false;
+//	mInternalUpdate = true;
+//	mSpaceSelector->setValue(mData->getSpace().toString());
+//	mFrameWidget->setMatrix(mData->getFrame());
+//	mInternalUpdate = false;
 }
 
 void FrameMetricWrapper::frameWidgetChangedSlot()
@@ -124,6 +124,15 @@ void FrameMetricWrapper::frameWidgetChangedSlot()
 	Transform3D matrix = mFrameWidget->getMatrix();
 	mData->setFrame(matrix);
 }
+
+void FrameMetricWrapper::update()
+{
+	mInternalUpdate = true;
+	mSpaceSelector->setValue(mData->getSpace().toString());
+	mFrameWidget->setMatrix(mData->getFrame());
+	mInternalUpdate = false;
+}
+
 
 
 } //namespace cx

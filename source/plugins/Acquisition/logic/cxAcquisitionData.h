@@ -19,6 +19,7 @@
 class QDomNode;
 #include <vector>
 #include "cxRecordSession.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
@@ -29,7 +30,7 @@ namespace cx
 {
 /**
 * \file
-* \addtogroup cxPluginAcquisition
+* \addtogroup cx_plugin_acquisition
 * @{
 */
 

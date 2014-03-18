@@ -6,8 +6,8 @@
 #include <QLabel>
 #include <QDir>
 #include <QLineEdit>
-#include "sscEnumConverter.h"
-#include "sscMessageManager.h"
+#include "cxEnumConverter.h"
+#include "cxReporter.h"
 #include "cxStateService.h"
 #include "cxToolManager.h"
 #include "cxSelectionGroupBox.h"
@@ -36,7 +36,7 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
   mApplicationGroupBox->setEnabledButtons(false); //< application application is determined by the application state chosen elsewhere in the system
   mApplicationGroupBox->hide(); // large and redundant box - info is only used for path generation, which can be found in the "Save Path" box
   mApplicationGroupBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
-  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", cxToolManager::getInstance()->getSupportedTrackingSystems(), Qt::Horizontal, true, NULL);
+  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", toolManager()->getSupportedTrackingSystems(), Qt::Horizontal, true, NULL);
   mToolListWidget = new ConfigToolListWidget(NULL);
 
   this->setClinicalApplicationSlot(string2enum<CLINICAL_APPLICATION>(stateService()->getApplication()->getActiveStateName()));
@@ -98,7 +98,7 @@ void ToolConfigureGroupBox::setCurrentlySelectedCofiguration(QString configAbsol
   if(currentIndex < 0)
   {
     currentIndex = 0;
-    messageManager()->sendWarning("Tool configuration doesn't exist: " + cleanPath);
+    reportWarning("Tool configuration doesn't exist: " + cleanPath);
   }
   mConfigFilesComboBox->setCurrentIndex(currentIndex);
 }
@@ -118,7 +118,7 @@ QString ToolConfigureGroupBox::requestSaveConfigurationSlot()
     return retval;
 
   // deconfigure toolmanager in order to be able to reread config data
-  cxToolManager::getInstance()->deconfigure();
+  toolManager()->deconfigure();
 
   ConfigurationFileParser::Configuration config = this->getCurrentConfiguration();
   ConfigurationFileParser::saveConfiguration(config);

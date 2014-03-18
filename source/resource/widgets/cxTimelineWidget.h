@@ -18,8 +18,8 @@
 #include <QWidget>
 
 #include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
-#include "sscVector3D.h"
+#include "cxForwardDeclarations.h"
+#include "cxVector3D.h"
 #include "cxPlaybackTime.h"
 
 
@@ -32,7 +32,7 @@ namespace cx
  * are visible in a different color than the visible
  * periods. Also other events like registration, data load.
  *
- * \ingroup cxResourceUtilities
+ * \ingroup cx_resource_widgets
  * \date Mar 29, 2012
  * \author Christian Askeland, SINTEF
  */

@@ -13,11 +13,11 @@
 // See CustusX_License.txt for more information.
 
 #include "cxMetricReferenceArgumentList.h"
-#include "sscData.h"
-#include "sscPointMetric.h"
+#include "cxData.h"
+#include "cxPointMetric.h"
 #include <QDomNode>
-#include "sscTypeConversions.h"
-#include "sscDataManager.h"
+#include "cxTypeConversions.h"
+#include "cxDataManager.h"
 
 namespace cx
 {
@@ -41,12 +41,18 @@ void MetricReferenceArgumentList::set(int index, DataPtr p)
 		return;
 
 	if (mArgument[index])
+	{
 		disconnect(mArgument[index].get(), SIGNAL(transformChanged()), this, SIGNAL(argumentsChanged()));
+		disconnect(mArgument[index].get(), SIGNAL(propertiesChanged()), this, SIGNAL(argumentsChanged()));
+	}
 
 	mArgument[index] = p;
 
 	if (mArgument[index])
+	{
 		connect(mArgument[index].get(), SIGNAL(transformChanged()), this, SIGNAL(argumentsChanged()));
+		connect(mArgument[index].get(), SIGNAL(propertiesChanged()), this, SIGNAL(argumentsChanged()));
+	}
 
 	emit argumentsChanged();
 }
@@ -58,6 +64,8 @@ DataPtr MetricReferenceArgumentList::get(int index)
 
 bool MetricReferenceArgumentList::validArgument(DataPtr p) const
 {
+	if (!p)
+		return false;
 	return mValidTypes.contains(p->getType());
 }
 
@@ -76,9 +84,10 @@ std::vector<Vector3D> MetricReferenceArgumentList::getRefCoords() const
 	std::vector<Vector3D> p(this->getCount());
 	for (unsigned i = 0; i < p.size(); ++i)
 	{
-		if (!mArgument[i])
+		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(mArgument[i]);
+		if (!metric)
 			return std::vector<Vector3D>();
-		p[i] = boost::dynamic_pointer_cast<PointMetric>(mArgument[i])->getRefCoord();
+		p[i] = metric->getRefCoord();
 	}
 	return p;
 }

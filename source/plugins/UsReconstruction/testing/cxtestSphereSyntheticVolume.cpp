@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include "cxtestSphereSyntheticVolume.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 namespace cxtest {
 

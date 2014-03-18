@@ -12,10 +12,10 @@ namespace cx
 /**
  *
  * \brief View a xml document.
- * \ingroup cxGUI
  *
- * A viewer widget for a xml file with syntax highlightning.
+ * A viewcx_guidget for a xml file with syntax highlightning.
  *
+ * \ingroup cx_resource_widgets
  * \date Mar 22, 2011
  * \author Janne Beate Bakeng, SINTEF
  */

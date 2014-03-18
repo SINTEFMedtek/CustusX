@@ -16,8 +16,9 @@
 
 #include <boost/shared_ptr.hpp>
 #include "vtkForwardDeclarations.h"
-#include "sscVector3D.h"
+#include "cxVector3D.h"
 #include <QColor>
+typedef vtkSmartPointer<class vtkLinearExtrusionFilter> vtkLinearExtrusionFilterPtr;
 
 namespace cx
 {
@@ -25,7 +26,7 @@ namespace cx
 /** Render a flat disk in 2D/3D
  *
  *
- * \ingroup cx
+ * \ingroup cx_resource_visualization
  * \date 2014-02-25
  * \author christiana
  */
@@ -41,6 +42,7 @@ public:
 	void setColor(QColor color);
 	void setFillVisible(bool val);
 	void setLighting(bool on);
+	void setHeight(double height);
 
 	void setPosition(Vector3D pos);
 	void setDirection(Vector3D direction);
@@ -56,12 +58,15 @@ private:
 	vtkRendererPtr mRenderer;
 
 	double mRadius;
+	double mHeight;
 	Vector3D mPosition;
 	Vector3D mDirection;
 
 	vtkActorPtr mCircleActor;
+	vtkLinearExtrusionFilterPtr mCircleExtruder;
 	vtkSectorSourcePtr mCircleSource;
 	vtkActorPtr mOutlineActor;
+	vtkLinearExtrusionFilterPtr mOutlineExtruder;
 	vtkSectorSourcePtr mOutlineSource;
 	double mOutlineWidth;
 	QColor mOutlineColor;

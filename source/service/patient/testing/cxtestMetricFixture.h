@@ -17,11 +17,13 @@
 
 #include "cxFrameMetric.h"
 #include "cxToolMetric.h"
-#include "sscDistanceMetric.h"
-#include "sscPointMetric.h"
-#include "sscPlaneMetric.h"
+#include "cxDistanceMetric.h"
+#include "cxPointMetric.h"
+#include "cxPlaneMetric.h"
 //#include "cxToolMetric.h"
 #include <QDomNode>
+#include "cxtestDummyDataManager.h"
+#include "cxMessageListener.h"
 
 namespace cxtest {
 
@@ -97,7 +99,7 @@ public:
 	FrameMetricWithInput getFrameMetricWithInput();
 	ToolMetricWithInput getToolMetricWithInput();
 	PointMetricWithInput getPointMetricWithInput(cx::Vector3D point);
-	PlaneMetricWithInput getPlaneMetricWithInput(cx::Vector3D point, cx::Vector3D normal);
+	PlaneMetricWithInput getPlaneMetricWithInput(cx::Vector3D point, cx::Vector3D normal, cx::DataMetricPtr p0, cx::DataMetricPtr p1);
 	DistanceMetricWithInput getDistanceMetricWithInput(double distance, cx::DataMetricPtr p0, cx::DataMetricPtr p1);
 	DistanceMetricWithInput getDistanceMetricWithInput(double distance);
 	QStringList getSingleLineDataList(cx::DataMetricPtr metric);
@@ -132,7 +134,10 @@ public:
 	bool verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric);
 
 private:
-	cx::DataManager* getDataManager();
+	TestServicesPtr mServices;
+	cx::MessageListenerPtr mMessageListener;
+
+	cx::DataServicePtr getDataManager();
 	cx::SpaceProviderPtr getSpaceProvider();
 
 };

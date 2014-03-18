@@ -14,18 +14,18 @@
 
 #include "cxInteractiveClipper.h"
 
-#include "sscVolumetricRep.h"
-#include "sscMessageManager.h"
+#include "cxVolumetricRep.h"
+#include "cxReporter.h"
 #include "cxRepManager.h"
-#include "sscDataManager.h"
-#include "sscSliceComputer.h"
+#include "cxDataManager.h"
+#include "cxSliceComputer.h"
 
-#include "sscSlicePlaneClipper.h"
-#include "sscSlicePlanes3DRep.h"
-#include "sscSliceProxy.h"
-#include "sscImage.h"
-#include "sscToolManager.h"
-#include "sscLogger.h"
+#include "cxSlicePlaneClipper.h"
+#include "cxSlicePlanes3DRep.h"
+#include "cxSliceProxy.h"
+#include "cxImage.h"
+#include "cxToolManager.h"
+#include "cxLogger.h"
 #include "cxVisualizationServiceBackend.h"
 
 
@@ -39,7 +39,7 @@ InteractiveClipper::InteractiveClipper(VisualizationServiceBackendPtr backend) :
 
 	// create a slice planes proxy containing all slice definitions,
 	// for use with the clipper
-	DataManager* dm = mBackend->getDataManager();
+	DataServicePtr dm = mBackend->getDataManager();
 	mSlicePlanesProxy = SlicePlanesProxyPtr(new SlicePlanesProxy());
 	mSlicePlanesProxy->addSimpleSlicePlane(ptSAGITTAL, dm);
 	mSlicePlanesProxy->addSimpleSlicePlane(ptCORONAL, dm);
@@ -52,7 +52,7 @@ InteractiveClipper::InteractiveClipper(VisualizationServiceBackendPtr backend) :
 
 	connect(mSlicePlaneClipper.get(), SIGNAL(slicePlaneChanged()), this, SLOT(changedSlot()));
 	connect(this, SIGNAL(changed()), this, SLOT(changedSlot()));
-	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 
 	this->dominantToolChangedSlot();
 	this->changedSlot();
@@ -178,7 +178,7 @@ std::vector<PLANE_TYPE> InteractiveClipper::getAvailableSlicePlanes() const
 
 void InteractiveClipper::dominantToolChangedSlot()
 {
-	ToolPtr dominantTool = toolManager()->getDominantTool();
+	ToolPtr dominantTool = mBackend->getToolManager()->getDominantTool();
 
 	SlicePlanesProxy::DataMap data = mSlicePlanesProxy->getData();
 	for (SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)

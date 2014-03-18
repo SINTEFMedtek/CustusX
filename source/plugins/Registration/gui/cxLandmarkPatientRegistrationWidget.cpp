@@ -10,17 +10,17 @@
 #include <QGridLayout>
 #include <QSpinBox>
 #include <vtkDoubleArray.h>
-#include <sscVector3D.h>
+#include "cxVector3D.h"
 #include "cxViewManager.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
 #include "cxRegistrationManager.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxDataManager.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxRepManager.h"
 #include "cxLandmarkRep.h"
-#include "sscView.h"
+#include "cxView.h"
 
 namespace cx
 {
@@ -48,10 +48,10 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(Registratio
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
 	//toolmanager
-	mDominantToolProxy = DominantToolProxy::New();
+	mDominantToolProxy = DominantToolProxy::New(trackingService());
 	connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolSampleButton()));
 	connect(mDominantToolProxy.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateToolSampleButton()));
-	connect(cxDataManager::getInstance(), SIGNAL(debugModeChanged(bool)), this, SLOT(updateToolSampleButton()));
+	connect(dataManager(), SIGNAL(debugModeChanged(bool)), this, SLOT(updateToolSampleButton()));
 
 	//layout
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedDataAdapter));
@@ -99,7 +99,7 @@ void LandmarkPatientRegistrationWidget::updateToolSampleButton()
 	ToolPtr tool = toolManager()->getDominantTool();
 
 	bool enabled = false;
-	enabled = tool && tool->getVisible() && (!tool->hasType(Tool::TOOL_MANUAL) || cxDataManager::getInstance()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
+	enabled = tool && tool->getVisible() && (!tool->hasType(Tool::TOOL_MANUAL) || dataManager()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
 	mToolSampleButton->setEnabled(enabled);
 
 	if (toolManager()->getDominantTool())
@@ -114,7 +114,7 @@ void LandmarkPatientRegistrationWidget::toolSampleButtonClickedSlot()
 
 	if (!tool)
 	{
-		messageManager()->sendError("mToolToSample is NULL!");
+		reportError("mToolToSample is NULL!");
 		return;
 	}
 	//TODO What if the reference frame isnt visible?
@@ -126,7 +126,7 @@ void LandmarkPatientRegistrationWidget::toolSampleButtonClickedSlot()
 		mActiveLandmark = dataManager()->getLandmarkProperties().begin()->first;
 
 	dataManager()->getPatientLandmarks()->setLandmark(Landmark(mActiveLandmark, p_pr));
-	messageManager()->playSampleSound();
+	reporter()->playSampleSound();
 
     this->activateLandmark(this->getNextLandmark());
 
@@ -146,7 +146,7 @@ void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
 	if (rep)
 	{
 		rep->setPrimarySource(mImageLandmarkSource);
-		rep->setSecondarySource(PatientLandmarksSource::New(dataManager()));
+		rep->setSecondarySource(PatientLandmarksSource::New(dataService()));
 		rep->setSecondaryColor(QColor::fromRgbF(0, 0.6, 0.8));
 	}
 }
@@ -211,7 +211,7 @@ Transform3D LandmarkPatientRegistrationWidget::getTargetTransform() const
 void LandmarkPatientRegistrationWidget::setTargetLandmark(QString uid, Vector3D p_target)
 {
 	dataManager()->getPatientLandmarks()->setLandmark(Landmark(uid, p_target));
-	messageManager()->playSampleSound();
+	reporter()->playSampleSound();
 }
 
 void LandmarkPatientRegistrationWidget::performRegistration()

@@ -7,7 +7,7 @@
 
 #include "cxtestVideoGraphicsFixture.h"
 #include "catch.hpp"
-#include "sscProbeSector.h"
+#include "cxProbeSector.h"
 
 TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Render Image", "[unit][resource][visualization]")
 {
