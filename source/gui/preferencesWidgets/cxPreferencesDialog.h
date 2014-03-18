@@ -4,9 +4,10 @@
 #include "cxPreferenceTab.h"
 #include "cxGeneralTab.h"
 #include <QDialog>
-#include "sscDoubleDataAdapterXml.h"
-#include "sscBoolDataAdapterXml.h"
-#include "sscStringDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxLegacySingletons.h"
 
 class QTabWidget;
 class QToolBox;
@@ -26,7 +27,7 @@ class QActionGroup;
 
 namespace cx
 {
-class MessageManager;
+class Reporter;
 class ViewManager;
 class FilePreviewWidget;
 class ToolImagePreviewWidget;
@@ -35,7 +36,7 @@ class ToolConfigureGroupBox;
 
 /**
  * \file
- * \addtogroup cxGUI
+ * \addtogroup cx_gui
  * @{
  */
 
@@ -57,6 +58,7 @@ protected:
   DoubleDataAdapterXmlPtr mLabelSize;
   BoolDataAdapterXmlPtr mShowDataText;
   BoolDataAdapterXmlPtr mShowLabels;
+  BoolDataAdapterXmlPtr mShowMetricNamesInCorner;
   StringDataAdapterXmlPtr mAnnotationModel;
   DoubleDataAdapterXmlPtr mAnnotationModelSize;
   DoubleDataAdapterXmlPtr mAnyplaneViewOffset;
@@ -148,7 +150,7 @@ protected:
  * \brief Interface for selecting a tool configuration.
  *
  * The tab has three parts:
- * \beginverbatim
+ * \verbatim
  *
  *  ____________________________________________
  * |                       |                    |
@@ -240,10 +242,12 @@ public:
 
 public slots:
   void saveParametersSlot();
+  void runDebugToolSlot();
 
 protected:
   QCheckBox* mIGSTKDebugLoggingCheckBox;
   QCheckBox* mManualToolPhysicalPropertiesCheckBox;
+  QCheckBox* mRenderSpeedLoggingCheckBox;
   QGridLayout *mMainLayout;
 };
 

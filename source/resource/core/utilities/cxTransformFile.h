@@ -15,13 +15,13 @@
 #ifndef CXTRANSFORMFILE_H_
 #define CXTRANSFORMFILE_H_
 
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup cxResourceUtilities
+ * \addtogroup cx_resource_core_utilities
  * @{
  */
 
@@ -46,6 +46,10 @@ public:
 private:
 	QString mFileName;
 };
+
+/**
+ * @}
+ */
 
 }
 

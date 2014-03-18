@@ -10,14 +10,14 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QGroupBox>
-#include "sscStringDataAdapter.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscDefinitionStrings.h"
+#include "cxStringDataAdapter.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxDefinitionStrings.h"
 #include "cxInteractiveClipper.h"
 #include "cxViewManager.h"
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 #include "cxSelectDataStringDataAdapter.h"
-#include "sscImage.h"
+#include "cxImage.h"
 namespace cx
 {
 

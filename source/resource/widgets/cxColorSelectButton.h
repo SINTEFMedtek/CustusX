@@ -16,10 +16,10 @@ namespace cx
 
 /**
  * \brief Convenience button for chosing color.
- * \ingroup cxGUI
  * Will open a color select dialog, and color
  * the button itself in the selected color.
  *
+ * \ingroup cx_resource_widgets
  */
 class ColorSelectButton : public QToolButton
 {

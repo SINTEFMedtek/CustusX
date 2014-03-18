@@ -16,12 +16,13 @@
 #define CXPLAYBACKWIDGET_H_
 
 #include "cxBaseWidget.h"
-#include "sscDoubleDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
 #include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
-#include "sscVector3D.h"
-#include "sscRegistrationTransform.h"
+#include "cxForwardDeclarations.h"
+#include "cxVector3D.h"
+#include "cxRegistrationTransform.h"
 #include "cxPlaybackTime.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
@@ -31,7 +32,7 @@ class TimelineWidget;
 /**\brief Widget interface to PlaybackTime
  *
  *
- * \ingroup cxGUI
+ * \ingroup cx_gui
  * \date Mar 29, 2012
  * \author Christian Askeland, SINTEF
  */

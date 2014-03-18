@@ -1,7 +1,7 @@
 #include "cxTransferFunction2DOpacityWidget.h"
-#include "sscDoubleWidgets.h"
-#include "sscDataManager.h"
-#include "sscImageLUT2D.h"
+#include "cxDoubleWidgets.h"
+#include "cxDataManager.h"
+#include "cxImageLUT2D.h"
 namespace cx
 {
 
@@ -16,7 +16,7 @@ TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(QWidget* parent
   mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
   mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
 
-  mActiveImageProxy = ActiveImageProxy::New();
+  mActiveImageProxy = ActiveImageProxy::New(dataService());
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 

@@ -1,46 +1,73 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 #include "cxImagePropertiesWidget.h"
 
-#include "cxDataInterface.h"
-#include "cxVolumeInfoWidget.h"
-#include "cxSelectDataStringDataAdapter.h"
-#include "cxDataSelectWidget.h"
-#include "cxOverlayWidget.h"
-#include "cxColorWidget.h"
-#include "cxTransferFunction2DOpacityWidget.h"
-#include "cxTransferFunction2DColorWidget.h"
+#include <QComboBox>
+#include <QVBoxLayout>
+#include "cxDataManager.h"
+#include "cxImage.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
 
 ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
-		TabbedWidget(parent, "ImagePropertiesWidget", "Slice Properties")
+		BaseWidget(parent, "ImagePropertiesWidget", "Image Properties")
 {
-  this->insertWidgetAtTop(new DataSelectWidget(this, ActiveImageStringDataAdapter::New()));
-  this->addTab(new VolumeInfoWidget(this), "Info");
-  this->addTab(new ColorWidget(this), "Color");
-  this->addTab(new OverlayWidget(this), "Overlay");
+	mInterpolationType = new QComboBox(this);
+	mInterpolationType->insertItem(0, "Nearest");
+	mInterpolationType->insertItem(1, "Linear");
+	mInterpolationType->insertItem(2, "Cubic");
+
+	connect(mInterpolationType, SIGNAL(currentIndexChanged(int)), this, SLOT(interpolationTypeChanged(int)));
+
+	mActiveImageProxy = ActiveImageProxy::New(dataService());
+	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
+
+	QLabel* interpolationTypeLabel = new QLabel("Volume interpolation type", this);
+
+	QHBoxLayout* layout =  new QHBoxLayout(this);
+	layout->addWidget(interpolationTypeLabel);
+	layout->addWidget(mInterpolationType);
 }
 
-ImagePropertiesWidget::~ImagePropertiesWidget()
-{}
+void ImagePropertiesWidget::interpolationTypeChanged(int index)
+{
+	ImagePtr image = dataManager()->getActiveImage();
+	if (image)
+		image->setInterpolationType(index);
+}
+
+void ImagePropertiesWidget::activeImageChangedSlot()
+{
+	ImagePtr activeImage = dataManager()->getActiveImage();
+	if (activeImage)
+	{
+		mInterpolationType->setCurrentIndex(activeImage->getInterpolationType());
+	}
+}
 
 QString ImagePropertiesWidget::defaultWhatsThis() const
 {
-  return "<html>"
-    "<h3>Image slice properties.</h3>"
-    "<p>Lets you set properties on a 2d image slice.</p>"
-    "<p><i></i></p>"
-    "</html>";
-}
-
-void ImagePropertiesWidget::showEvent(QShowEvent* event)
-{
-  QWidget::showEvent(event);
-}
-
-void ImagePropertiesWidget::hideEvent(QCloseEvent* event)
-{
-  QWidget::closeEvent(event);
+	return "<html>"
+		"<h3>Image properties</h3>"
+		"<p>"
+		"Set image (volume) properties."
+		"</p>"
+		"<p><i></i></p>"
+		"</html>";
 }
 
 }//end namespace cx

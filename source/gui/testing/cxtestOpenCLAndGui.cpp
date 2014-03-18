@@ -39,10 +39,20 @@ TEST_CASE("OpenCL and Gui: Show a button and init OpenCL", "[unit][OpenCL][gui][
     qApp->exec();
 }
 
-TEST_CASE("OpenCL and OpenGl: Show a OpenGL view and init OpenCL", "[unit][OpenCL][OpenGL][gui][hide][segmentation_fault]")
+TEST_CASE("OpenCL and OpenGl: Show a cx::ViewWidget (OpenGL) and init OpenCL", "[unit][OpenCL][OpenGL][gui][hide][segmentation_fault]")
 {
     TestRenderSpeed helper;
     helper.testSingleView();
+
+	cx::OpenCLPrinter::printPlatformAndDeviceInfo();
+
+	CHECK(true);
+}
+
+TEST_CASE("OpenCL and OpenGl: Show a vtkRenderWindow (OpenGL) and init OpenCL", "[unit][OpenCL][OpenGL][gui][hide][segmentation_fault]")
+{
+		TestRenderSpeed helper;
+		helper.testVtkRenderWindow();
 
 	cx::OpenCLPrinter::printPlatformAndDeviceInfo();
 

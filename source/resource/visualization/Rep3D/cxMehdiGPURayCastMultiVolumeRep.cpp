@@ -18,20 +18,20 @@
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
 #include "vtkOpenGLGPUMultiVolumeRayCastMapper.h"
 #include <vtkVolumeProperty.h>
-#include "sscView.h"
+#include "cxView.h"
 #include <vtkRenderer.h>
 #include "cxVolumeProperty.h"
 #include "cxImageMapperMonitor.h"
-#include "sscImage.h"
+#include "cxImage.h"
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 #include <vtkTransform.h>
-#include "sscGPUImageBuffer.h"
-#include "sscMessageManager.h"
+#include "cxGPUImageBuffer.h"
+#include "cxReporter.h"
 #include <vtkPlane.h>
-#include "sscLogger.h"
+#include "cxLogger.h"
 #include "cxImageEnveloper.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include <vtkRenderWindow.h>
 
 namespace cx
@@ -152,8 +152,8 @@ void MehdiGPURayCastMultiVolumeRep::clearVolume()
 
 	// should not be necessary, but seems that mapper is not cleared by vtk.
 	// http://vtk.1045678.n5.nabble.com/quot-a-vtkShader2-object-is-being-deleted-before-ReleaseGraphicsResources-has-been-called-quot-with-r-td4872396.html
-	if (!mViews.empty())
-		mVolume->ReleaseGraphicsResources((*mViews.begin())->getRenderWindow());
+	if (this->getView())
+		mVolume->ReleaseGraphicsResources(this->getView()->getRenderWindow());
 	mVolume->SetMapper(NULL);
 
 	mReferenceImage.reset();

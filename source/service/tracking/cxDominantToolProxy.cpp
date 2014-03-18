@@ -13,20 +13,21 @@
 // See CustusX_License.txt for more information.
 
 #include "cxDominantToolProxy.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 
 namespace cx
 {
 
-DominantToolProxy::DominantToolProxy()
+DominantToolProxy::DominantToolProxy(TrackingServicePtr toolManager) :
+	mToolManager(toolManager)
 {
-	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this,
+	connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this,
 					SLOT(dominantToolChangedSlot(const QString&)));
-	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this,
+	connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this,
 					SIGNAL(dominantToolChanged(const QString&)));
 
-	if (toolManager()->getDominantTool())
-		this->dominantToolChangedSlot(toolManager()->getDominantTool()->getUid());
+	if (mToolManager->getDominantTool())
+		this->dominantToolChangedSlot(mToolManager->getDominantTool()->getUid());
 }
 
 void DominantToolProxy::dominantToolChangedSlot(const QString& uid)
@@ -44,7 +45,7 @@ void DominantToolProxy::dominantToolChangedSlot(const QString& uid)
 		disconnect(mTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
 	}
 
-	mTool = toolManager()->getDominantTool();
+	mTool = mToolManager->getDominantTool();
 
 	if (mTool)
 	{

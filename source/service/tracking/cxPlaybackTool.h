@@ -15,7 +15,7 @@
 #ifndef CXPLAYBACKTOOL_H_
 #define CXPLAYBACKTOOL_H_
 
-#include "sscTool.h"
+#include "cxToolImpl.h"
 
 namespace cx
 {
@@ -24,18 +24,18 @@ typedef boost::shared_ptr<class PlaybackTool> PlaybackToolPtr;
 typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 
 
-/**\brief A tool used during playback
+/** \brief A tool used during playback
  *
  * \date Mar 29, 2012
  * \author Christian Askeland, SINTEF
  *
- * \ingroup sscTool
+ * \ingroup cx_service_tracking
  */
-class PlaybackTool: public Tool
+class PlaybackTool: public ToolImpl
 {
 Q_OBJECT
 public:
-	explicit PlaybackTool(ToolPtr base, PlaybackTimePtr time);
+	explicit PlaybackTool(TrackingServicePtr manager, ToolPtr base, PlaybackTimePtr time);
 	virtual ~PlaybackTool();
 	virtual std::set<Type> getTypes() const;
 	virtual QString getGraphicsFileName() const;

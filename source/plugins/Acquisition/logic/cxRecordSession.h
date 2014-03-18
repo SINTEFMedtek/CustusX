@@ -20,7 +20,7 @@
 #include "boost/shared_ptr.hpp"
 //#include "cxToolManager.h"
 #include "cxForwardDeclarations.h"
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 
 class QDomNode;
 
@@ -28,7 +28,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxPluginAcquisition
+ * \addtogroup cx_plugin_acquisition
  * @{
  */
 

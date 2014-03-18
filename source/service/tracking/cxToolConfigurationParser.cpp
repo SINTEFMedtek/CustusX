@@ -18,11 +18,11 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QTextStream>
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
-#include "sscEnumConverter.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
+#include "cxEnumConverter.h"
 #include "cxDataLocations.h"
-#include "sscFrame3D.h"
+#include "cxFrame3D.h"
 #include "cxTransformFile.h"
 
 namespace cx
@@ -74,7 +74,7 @@ std::vector<IgstkTracker::InternalStructure> ConfigurationFileParser::getTracker
 	}
 
 	if (retval.size() > 1)
-		messageManager()->sendError(
+		reportError(
 						"Config file " + mConfigurationFilePath
 										+ " has a invalid number of tracking systems, we only support 1 tracking system atm!");
 
@@ -165,7 +165,7 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 //      std::cout << "toolTrackerType " << toolTrackerType << " trackerType " << trackerType << std::endl;
 			if (!trackerType.contains(enum2string(toolparser.getTool().mTrackerType), Qt::CaseInsensitive))
 			{
-				messageManager()->sendWarning(
+				reportWarning(
 								"When saving configuration, skipping tool " + relativeToolFilePath + " of type "
 												+ toolTrackerType + " because tracker is set to " + trackerType);
 				continue;
@@ -189,12 +189,12 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 	QFile file(config.mFileName);
 	if (!file.open(QIODevice::WriteOnly))
 	{
-		messageManager()->sendWarning("Could not open file " + file.fileName() + ", aborting writing of config.");
+		reportWarning("Could not open file " + file.fileName() + ", aborting writing of config.");
 		return;
 	}
 	QTextStream stream(&file);
 	doc.save(stream, 4);
-	messageManager()->sendSuccess("Configuration file " + file.fileName() + " is written.");
+	reportSuccess("Configuration file " + file.fileName() + " is written.");
 }
 
 void ConfigurationFileParser::setConfigDocument(QString configAbsoluteFilePath)
@@ -202,13 +202,13 @@ void ConfigurationFileParser::setConfigDocument(QString configAbsoluteFilePath)
 	QFile configFile(configAbsoluteFilePath);
 	if (!configFile.exists())
 	{
-//    messageManager()->sendDebug("Configfile "+configAbsoluteFilePath+" does not exist.");
+//    reportDebug("Configfile "+configAbsoluteFilePath+" does not exist.");
 		return;
 	}
 
 	if (!mConfigureDoc.setContent(&configFile))
 	{
-		messageManager()->sendError("Could not set the xml content of the config file " + configAbsoluteFilePath);
+		reportError("Could not set the xml content of the config file " + configAbsoluteFilePath);
 		return;
 	}
 }
@@ -219,7 +219,7 @@ bool ConfigurationFileParser::isConfigFileValid()
 	QDomNode configNode = mConfigureDoc.elementsByTagName(mConfigTag).item(0);
 	if (configNode.isNull())
 	{
-		//messageManager()->sendDebug("Configuration file \""+mConfigurationFilePath+"\" does not contain the tag <"+mConfigTag+">.");
+		//reportDebug("Configuration file \""+mConfigurationFilePath+"\" does not contain the tag <"+mConfigTag+">.");
 		return false;
 	}
 	return true;
@@ -243,7 +243,7 @@ QString ConfigurationFileParser::getAbsoluteToolFilePath(QDomElement toolfileele
 	QFile file(configDir.absoluteFilePath(relativeToolFilePath));
 	if (!file.exists())
 	{
-		messageManager()->sendError(
+		reportError(
 						"Tool file " + file.fileName() + " in configuration " + mConfigurationFilePath
 										+ " does not exists. Skipping.");
 	}
@@ -301,7 +301,7 @@ IgstkTool::InternalStructure ToolFileParser::getTool()
 	IgstkTool::InternalStructure internalStructure;
 	if (toolNode.isNull())
 	{
-		messageManager()->sendInfo(
+		report(
 						"Could not read the <tool> tag of file: " + mToolFilePath
 										+ ", this is not a tool file, skipping.");
 		return retval;
@@ -348,7 +348,7 @@ IgstkTool::InternalStructure ToolFileParser::getTool()
 		if (application != mdCOUNT)
 			internalStructure.mClinicalApplications.push_back(application);
 		else
-			messageManager()->sendWarning(
+			reportWarning(
 							"Did not understand the tag <clinical_app>, " + string + " is invalid in tool "
 											+ mToolFilePath);
 	}
@@ -368,7 +368,7 @@ IgstkTool::InternalStructure ToolFileParser::getTool()
 	QDomElement toolInstrumentElement = toolNode.firstChildElement(mToolInstrumentTag);
 	if (toolInstrumentElement.isNull())
 	{
-		messageManager()->sendError(
+		reportError(
 						"Could not find the <instrument> tag under the <tool> tag. Aborting this tool.");
 		return retval;
 	}
@@ -383,7 +383,7 @@ IgstkTool::InternalStructure ToolFileParser::getTool()
 	QDomElement toolSensorElement = toolNode.firstChildElement(mToolSensorTag);
 	if (toolSensorElement.isNull())
 	{
-		messageManager()->sendError("Could not find the <sensor> tag under the <tool> tag. Aborting this tool.");
+		reportError("Could not find the <sensor> tag under the <tool> tag. Aborting this tool.");
 		return retval;
 	}
 	QDomElement toolSensorTypeElement = toolSensorElement.firstChildElement(mToolSensorTypeTag);
@@ -418,14 +418,14 @@ IgstkTool::InternalStructure ToolFileParser::getTool()
 		QDomNode node = toolSensorReferencePointList.item(j);
 		if (!node.hasAttributes())
 		{
-			messageManager()->sendWarning("Found reference point without id attribute. Skipping.");
+			reportWarning("Found reference point without id attribute. Skipping.");
 			continue;
 		}
 		bool ok;
 		int id = node.toElement().attribute("id").toInt(&ok);
 		if (!ok)
 		{
-			messageManager()->sendWarning("Attribute id of a reference point was not an int. Skipping.");
+			reportWarning("Attribute id of a reference point was not an int. Skipping.");
 			continue;
 		}
 		QString toolSensorReferencePointText = node.toElement().text();
@@ -442,7 +442,7 @@ IgstkTool::InternalStructure ToolFileParser::getTool()
 	QDomElement toolCalibrationElement = toolNode.firstChildElement(mToolCalibrationTag);
 	if (toolCalibrationElement.isNull())
 	{
-		messageManager()->sendError(
+		reportError(
 						"Could not find the <calibration> tag under the <tool> tag. Aborting this tool.");
 		return retval;
 	}
@@ -466,7 +466,7 @@ QDomNode ToolFileParser::getToolNode(QString toolAbsoluteFilePath)
 	QFile toolFile(toolAbsoluteFilePath);
 	if (!mToolDoc.setContent(&toolFile))
 	{
-		messageManager()->sendError("Could not set the xml content of the tool file " + toolAbsoluteFilePath);
+		reportError("Could not set the xml content of the tool file " + toolAbsoluteFilePath);
 		return retval;
 	}
 	//there can only be one tool defined in every tool.xml-file, that's why we say ...item(0)

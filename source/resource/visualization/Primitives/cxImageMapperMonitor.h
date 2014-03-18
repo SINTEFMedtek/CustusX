@@ -19,8 +19,8 @@
 #include <boost/shared_ptr.hpp>
 #include <vtkSmartPointer.h>
 #include <QObject>
-#include "sscForwardDeclarations.h"
-#include "sscVector3D.h"
+#include "cxForwardDeclarations.h"
+#include "cxVector3D.h"
 #include "vtkForwardDeclarations.h"
 
 namespace cx
@@ -31,6 +31,7 @@ typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
  *
  * Used internally by VolumetricRep - No need to use this elsewhere!
  *
+ * \ingroup cx_resource_visualization
  * \author christiana
  */
 class ImageMapperMonitor : public QObject

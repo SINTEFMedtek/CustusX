@@ -2,8 +2,8 @@
 
 #include <QInputDialog>
 #include <QMessageBox>
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
 #include "cxSettings.h"
 #include "cxActiveImageProxy.h"
 
@@ -27,7 +27,7 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent, bool
 	mApplyToAll = settings()->value("applyTransferFunctionPresetsToAll").toBool();
 	this->updateToggles();
 
-	mActiveImageProxy = ActiveImageProxy::New();
+	mActiveImageProxy = ActiveImageProxy::New(dataService());
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this,
 			SLOT(populatePresetListSlot()));
 	connect(mActiveImageProxy.get(), SIGNAL(propertiesChanged()), this,
@@ -125,7 +125,7 @@ bool TransferFunctionPresetWidget::use3D() const
 void TransferFunctionPresetWidget::deleteSlot()
 {
 	if (mPresets->isDefaultPreset(PresetWidget::getCurrentPreset())) {
-		messageManager()->sendWarning("It is not possible to delete one of the default presets");
+		reportWarning("It is not possible to delete one of the default presets");
 		return;
 	}
 

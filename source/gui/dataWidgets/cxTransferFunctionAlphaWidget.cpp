@@ -9,12 +9,12 @@
 #include <QColor>
 #include <QBrush>
 #include <QMouseEvent>
-#include "sscDataManager.h"
-#include "sscImageTF3D.h"
-#include "sscImageTFData.h"
-#include "sscMessageManager.h"
-#include "sscUtilHelpers.h"
-#include "sscTypeConversions.h"
+#include "cxDataManager.h"
+#include "cxImageTF3D.h"
+#include "cxImageTFData.h"
+#include "cxReporter.h"
+#include "cxUtilHelpers.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {
@@ -25,7 +25,7 @@ TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(QWidget* parent) :
 {
 	this->setFocusPolicy(Qt::StrongFocus);
 
-  mActiveImageProxy = ActiveImageProxy::New();
+	mActiveImageProxy = ActiveImageProxy::New(dataService());
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageTransferFunctionsChangedSlot()));
 
   mSelectedAlphaPoint.reset();
@@ -160,6 +160,7 @@ void TransferFunctionAlphaWidget::updateTooltip(AlphaPoint point)
 {
 	QString tip = QString("alpha(%1)=%2").arg(point.position).arg(double(point.value)/255, 0, 'f', 2);
 	this->setToolTip(tip);
+	reporter()->sendVolatile(tip);
 }
 
 
@@ -363,7 +364,7 @@ void TransferFunctionAlphaWidget::moveCurrentAlphaPoint(AlphaPoint newAlphaPoint
 	if(!mSelectedAlphaPoint.isValid())
 		return;
 
-//	AlphaPoint newAlphaPoint = this->getCurrentAlphaPoint(pos);
+	newAlphaPoint.value = constrainValue(newAlphaPoint.value, 0, 255);
 
 	std::pair<int,int> range = this->findAllowedMoveRangeAroundAlphaPoint(mSelectedAlphaPoint.position);
 	newAlphaPoint.position = constrainValue(newAlphaPoint.position, range.first, range.second);

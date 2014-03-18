@@ -7,17 +7,19 @@
 #include <QGroupBox>
 #include <QCheckBox>
 
-#include "sscMessageManager.h"
-#include "sscToolManager.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscTypeConversions.h"
+#include "cxReporter.h"
+#include "cxToolManager.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxTypeConversions.h"
 //#include "UsConfigGui.h"
 #include "cxDataInterface.h"
 #include "cxToolManager.h"
 #include "cxTool.h"
 #include "cxToolDataAdapters.h"
 #include "cxActiveToolWidget.h"
-#include "sscManualTool.h"
+#include "cxManualTool.h"
+#include "cxLegacySingletons.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
@@ -62,8 +64,8 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   manualGroupLayout->setMargin(0);
   mManualToolWidget = new Transform3DWidget(manualGroup);
   manualGroupLayout->addWidget(mManualToolWidget);
-  connect(cxToolManager::getInstance()->getManualTool().get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(manualToolChanged()));
-  connect(cxToolManager::getInstance()->getManualTool().get(), SIGNAL(toolVisible(bool)), this, SLOT(manualToolChanged()));
+  connect(toolManager()->getManualTool().get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(manualToolChanged()));
+  connect(toolManager()->getManualTool().get(), SIGNAL(toolVisible(bool)), this, SLOT(manualToolChanged()));
   connect(mManualToolWidget, SIGNAL(changed()), this, SLOT(manualToolWidgetChanged()));
 
   mSpaceSelector = StringDataAdapterXml::initialize("selectSpace",
@@ -74,7 +76,7 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
       QDomNode());
   connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spacesChangedSlot()));
   connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(setModified()));
-  mSpaceSelector->setValue(SpaceHelpers::getPr().toString());
+  mSpaceSelector->setValue(spaceProvider()->getPr().toString());
   manualGroupLayout->addWidget(new LabeledComboBoxWidget(this, mSpaceSelector));
 
   mUSSectorConfigBox = new LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New());
@@ -120,15 +122,15 @@ QString ToolPropertiesWidget::defaultWhatsThis() const
 
 void ToolPropertiesWidget::manualToolChanged()
 {
-	if (!cxToolManager::getInstance()->getManualTool())
+	if (!toolManager()->getManualTool())
 		return;
-  mManualGroup->setVisible(cxToolManager::getInstance()->getManualTool()->getVisible());
+  mManualGroup->setVisible(toolManager()->getManualTool()->getVisible());
   mManualToolWidget->blockSignals(true);
 
-  Transform3D prMt = cxToolManager::getInstance()->getManualTool()->get_prMt();
+  Transform3D prMt = toolManager()->getManualTool()->get_prMt();
   CoordinateSystem space_q = CoordinateSystem::fromString(mSpaceSelector->getValue());
-  CoordinateSystem space_mt = SpaceHelpers::getTO(cxToolManager::getInstance()->getManualTool());
-  Transform3D qMt = SpaceHelpers::get_toMfrom(space_mt, space_q);
+  CoordinateSystem space_mt = spaceProvider()->getTO(toolManager()->getManualTool());
+  Transform3D qMt = spaceProvider()->get_toMfrom(space_mt, space_q);
 
   mManualToolWidget->setMatrix(qMt);
   mManualToolWidget->blockSignals(false);
@@ -138,19 +140,19 @@ void ToolPropertiesWidget::manualToolWidgetChanged()
 {
 	Transform3D qMt = mManualToolWidget->getMatrix();
   CoordinateSystem space_q = CoordinateSystem::fromString(mSpaceSelector->getValue());
-  CoordinateSystem space_mt = SpaceHelpers::getTO(cxToolManager::getInstance()->getManualTool());
-  CoordinateSystem space_pr = SpaceHelpers::getPr();
-  Transform3D qMpr = SpaceHelpers::get_toMfrom(space_pr, space_q);
+  CoordinateSystem space_mt = spaceProvider()->getTO(toolManager()->getManualTool());
+  CoordinateSystem space_pr = spaceProvider()->getPr();
+  Transform3D qMpr = spaceProvider()->get_toMfrom(space_pr, space_q);
   Transform3D prMt = qMpr.inv() * qMt;
 
-  cxToolManager::getInstance()->getManualTool()->set_prMt(prMt);
+  toolManager()->getManualTool()->set_prMt(prMt);
 }
 
 void ToolPropertiesWidget::spacesChangedSlot()
 {
 	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
 
-	std::vector<CoordinateSystem> spaces = SpaceHelpers::getSpacesToPresentInGUI();
+	std::vector<CoordinateSystem> spaces = spaceProvider()->getSpacesToPresentInGUI();
 	QStringList range;
 	for (unsigned i=0; i<spaces.size(); ++i)
 	  range << spaces[i].toString();
@@ -165,8 +167,6 @@ void ToolPropertiesWidget::spacesChangedSlot()
 
 void ToolPropertiesWidget::dominantToolChangedSlot()
 {
-//  cxToolPtr cxTool = boost::dynamic_pointer_cast<cxTool>(mActiveTool);
-
   if (mActiveTool)
     disconnect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
 

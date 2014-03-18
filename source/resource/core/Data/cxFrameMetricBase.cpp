@@ -13,21 +13,26 @@
 // See CustusX_License.txt for more information.
 
 #include "cxFrameMetricBase.h"
-#include "sscBoundingBox3D.h"
-#include "sscTypeConversions.h"
+#include "cxBoundingBox3D.h"
+#include "cxTypeConversions.h"
+#include "cxSpaceProvider.h"
+#include "cxSpaceListener.h"
 
 namespace cx {
 
-FrameMetricBase::FrameMetricBase(const QString& uid, const QString& name) :
-		DataMetric(uid, name),
-		mSpace(SpaceHelpers::getR()),
+FrameMetricBase::FrameMetricBase(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider) :
+		DataMetric(uid, name, dataManager, spaceProvider),
+		mSpace(CoordinateSystem::reference()),
 		mFrame(Transform3D::Identity())
 {
-	mSpaceListener.reset(new CoordinateSystemListener(mSpace));
+	mSpaceListener = mSpaceProvider->createListener();
+	mSpaceListener->setSpace(mSpace);
+//	mSpaceListener.reset(new SpaceListener(mSpace));
 	connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
 }
 
-FrameMetricBase::~FrameMetricBase() {
+FrameMetricBase::~FrameMetricBase()
+{
 }
 
 void FrameMetricBase::setFrame(const Transform3D& rMt)
@@ -51,7 +56,7 @@ Vector3D FrameMetricBase::getCoordinate() const
   */
 Transform3D FrameMetricBase::getRefFrame() const
 {
-	Transform3D rMq = SpaceHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
+	Transform3D rMq = mSpaceProvider->get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
 	return rMq * mFrame;
 }
 
@@ -70,7 +75,7 @@ void FrameMetricBase::setSpace(CoordinateSystem space)
 		return;
 
 	// keep the absolute position (in ref) constant when changing space.
-	Transform3D new_M_old = SpaceHelpers::get_toMfrom(this->getSpace(), space);
+	Transform3D new_M_old = mSpaceProvider->get_toMfrom(this->getSpace(), space);
 	mFrame = new_M_old*mFrame;
 
 	mSpace = space;
@@ -85,7 +90,7 @@ CoordinateSystem FrameMetricBase::getSpace() const
 DoubleBoundingBox3D FrameMetricBase::boundingBox() const
 {
 	// convert both inputs to r space
-	Transform3D rM0 = SpaceHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
+	Transform3D rM0 = mSpaceProvider->get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
 	Vector3D p0_r = rM0.coord(this->getCoordinate());
 
 	return DoubleBoundingBox3D(p0_r, p0_r);

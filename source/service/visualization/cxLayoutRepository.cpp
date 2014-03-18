@@ -14,7 +14,7 @@
 
 #include "cxLayoutRepository.h"
 #include "cxLayoutData.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

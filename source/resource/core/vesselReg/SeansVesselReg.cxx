@@ -7,15 +7,13 @@
 
 #include <QFileInfo>
 
-#include "sscImage.h"
-#include "sscTypeConversions.h"
-#include "sscRegistrationTransform.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
+#include "cxImage.h"
+#include "cxTypeConversions.h"
+#include "cxRegistrationTransform.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
 #include <boost/math/special_functions/fpclassify.hpp>
 
-//#include "cxStateMachineManager.h"
-//#include "cxPatientData.h"
 #include "vtkClipPolyData.h"
 #include "vtkPlanes.h"
 
@@ -33,7 +31,7 @@
 #include "vtkPointData.h"
 #include "vtkLandmarkTransform.h"
 #include "vtkFloatArray.h"
-#include "sscMesh.h"
+#include "cxMesh.h"
 
 namespace cx
 {
@@ -66,8 +64,8 @@ bool SeansVesselReg::execute(DataPtr source, DataPtr target, QString logPath)
 {
 	if (mt_verbose)
 	{
-		messageManager()->sendDebug("SOURCE: " + source->getUid());
-		messageManager()->sendDebug("TARGET: " + target->getUid());
+		reporter()->sendDebug("SOURCE: " + source->getUid());
+		reporter()->sendDebug("TARGET: " + target->getUid());
 
 		std::cout << "stop Threshold:" << mt_distanceDeltaStopThreshold << endl;
 		std::cout << "sigma:" << mt_sigma << endl;
@@ -87,7 +85,7 @@ bool SeansVesselReg::execute(DataPtr source, DataPtr target, QString logPath)
 	if (mt_auto_lts)
 	{
 		context = this->linearRefineAllLTS(context);
-		messageManager()->sendInfo(QString("Auto LTS: Found best match using %1\%.").arg(context->mLtsRatio));
+		report(QString("Auto LTS: Found best match using %1\%.").arg(context->mLtsRatio));
 	}
 	else
 	{
@@ -730,50 +728,50 @@ void SeansVesselReg::printOutResults(QString fileNamePrefix, vtkGeneralTransform
 	file_out2.close();
 }
 
-/**Not used and probably buggy
- *
- */
-ImagePtr SeansVesselReg::loadMinc(char* p_dataFile)
-{
-	time_t sec1 = clock();
-	std::cout << "Reading " << p_dataFile << " -> ";
-	std::cout.flush();
+///**Not used and probably buggy
+// *
+// */
+//ImagePtr SeansVesselReg::loadMinc(char* p_dataFile)
+//{
+//	time_t sec1 = clock();
+//	std::cout << "Reading " << p_dataFile << " -> ";
+//	std::cout.flush();
 
-	//Read data input file
-	vtkMINCImageReaderPtr l_dataReader = vtkMINCImageReaderPtr::New();
-	l_dataReader->SetFileName(p_dataFile);
-	l_dataReader->Update();
+//	//Read data input file
+//	vtkMINCImageReaderPtr l_dataReader = vtkMINCImageReaderPtr::New();
+//	l_dataReader->SetFileName(p_dataFile);
+//	l_dataReader->Update();
 
-	double l_dataOrigin[3];
-	l_dataReader->GetOutput()->GetOrigin(l_dataOrigin);
-	std::cout << (clock() - sec1) / (double) CLOCKS_PER_SEC << " secs...DONE -> Processing...";
-	std::cout.flush();
-	int l_dimensions[3];
-	l_dataReader->GetOutput()->GetDimensions(l_dimensions);
+//	double l_dataOrigin[3];
+//	l_dataReader->GetOutput()->GetOrigin(l_dataOrigin);
+//	std::cout << (clock() - sec1) / (double) CLOCKS_PER_SEC << " secs...DONE -> Processing...";
+//	std::cout.flush();
+//	int l_dimensions[3];
+//	l_dataReader->GetOutput()->GetDimensions(l_dimensions);
 
-	//set the transform
-	vtkTransformPtr l_dataTransform = vtkTransformPtr::New();
-	l_dataTransform->SetMatrix(l_dataReader->GetDirectionCosines());
-	l_dataTransform->Translate(l_dataReader->GetDataOrigin());
-	l_dataTransform->GetInverse()->TransformPoint(l_dataOrigin, l_dataOrigin);
-	l_dataTransform->Translate(l_dataOrigin);
-	l_dataTransform->Scale(l_dataReader->GetOutput()->GetSpacing());
+//	//set the transform
+//	vtkTransformPtr l_dataTransform = vtkTransformPtr::New();
+//	l_dataTransform->SetMatrix(l_dataReader->GetDirectionCosines());
+//	l_dataTransform->Translate(l_dataReader->GetDataOrigin());
+//	l_dataTransform->GetInverse()->TransformPoint(l_dataOrigin, l_dataOrigin);
+//	l_dataTransform->Translate(l_dataOrigin);
+//	l_dataTransform->Scale(l_dataReader->GetOutput()->GetSpacing());
 
-	Transform3D rMd(l_dataTransform->GetMatrix());
+//	Transform3D rMd(l_dataTransform->GetMatrix());
 
-	// TODO: ensure rMd is correct in CustusX terms
+//	// TODO: ensure rMd is correct in CustusX terms
 
-	QFile file(p_dataFile);
-	QFileInfo info(file);
-	QString uid(info.completeBaseName() + "_minc_%1");
-	QString name = uid;
+//	QFile file(p_dataFile);
+//	QFileInfo info(file);
+//	QString uid(info.completeBaseName() + "_minc_%1");
+//	QString name = uid;
 
-	ImagePtr image = dataManager()->createImage(l_dataReader->GetOutput(), uid, name);
-	image->get_rMd_History()->addRegistration(RegistrationTransform(rMd, QDateTime::currentDateTime(),
-		"from Minc file"));
+//	ImagePtr image = dataManager()->createImage(l_dataReader->GetOutput(), uid, name);
+//	image->get_rMd_History()->addRegistration(RegistrationTransform(rMd, QDateTime::currentDateTime(),
+//		"from Minc file"));
 
-	return image;
-}
+//	return image;
+//}
 
 /** Input an image representation of centerlines.
  *  Transform to polydata, reject all data outside bounding box,
@@ -934,14 +932,14 @@ void SeansVesselReg::checkQuality(Transform3D linearTransform)
 
 	if (t_delta.length() > 20 || fabs(angle) > 10 / 180.0 * M_PI)
 	{
-		messageManager()->sendWarning(qualityText);
+		reportWarning(qualityText);
 		QString text = QString(
 						"The registration matrix' angle-axis representation shows a large shift. Retry registration.");
-		messageManager()->sendWarning(text);
+		reportWarning(text);
 	}
 	else
 	{
-		messageManager()->sendInfo(qualityText);
+		report(qualityText);
 	}
 }
 } //namespace cx

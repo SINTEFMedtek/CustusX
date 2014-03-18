@@ -7,9 +7,10 @@ namespace snw
 {
 
 /**\brief Provides syntax highlighting for sonowand log files.
- * \ingroup cxGUI
  *
  * Adapted for CustusX use: Simple xml highlighter.
+ *
+ * \ingroup cx_resource_widgets
  */
 class SyntaxHighlighter : public QSyntaxHighlighter
 {

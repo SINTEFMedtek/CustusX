@@ -21,20 +21,20 @@
 #include <QTimer>
 #include <QMutex>
 #include "cxIgstkTracker.h"
-#include "cxTool.h"
+#include "cxToolUsingIGSTK.h"
 #include "cxIgstkTool.h"
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup cxServiceTracking
+ * \addtogroup cx_service_tracking
  * @{
  */
 
 /**
  * \brief Manager for IGSTK interface.
- * \ingroup cxServiceTracking
+ * \ingroup cx_service_tracking
  *
  * The manager exists inside IgstkTrackerThread .
  *

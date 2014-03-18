@@ -4,7 +4,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QVBoxLayout>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

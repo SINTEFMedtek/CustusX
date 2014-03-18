@@ -15,14 +15,14 @@
 #ifndef CXFRAMEMETRICBASE_H_
 #define CXFRAMEMETRICBASE_H_
 
-#include "sscDataMetric.h"
-#include "sscCoordinateSystemListener.h"
+#include "cxDataMetric.h"
 
 namespace cx {
 
 /*
  * \brief Abstract base class for frame metric.
  *
+ * \ingroup cx_resource_core_data
  * \date Sep 2, 2013
  * \author Ole Vegard Solberg, SINTEF
  */
@@ -30,7 +30,7 @@ class FrameMetricBase: public DataMetric
 {
 	Q_OBJECT
 public:
-	FrameMetricBase(const QString& uid, const QString& name = "");
+	FrameMetricBase(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	virtual ~FrameMetricBase();
 	virtual QString getType() const = 0;
 
@@ -43,10 +43,13 @@ public:
 	virtual CoordinateSystem getSpace() const; // use parentframe from Data
 	virtual DoubleBoundingBox3D boundingBox() const;
 
+	virtual QString getValueAsString() const { return ""; }
+	virtual bool showValueInGraphics() const { return false; }
+
 protected:
 	QString matrixAsSingleLineString() const;
 	CoordinateSystem mSpace;
-	CoordinateSystemListenerPtr mSpaceListener;
+	SpaceListenerPtr mSpaceListener;
 	Transform3D mFrame; ///< frame qFt described in local space q = mSpace
 
 };

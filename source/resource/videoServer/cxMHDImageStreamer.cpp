@@ -6,9 +6,9 @@
 #include "vtkMetaImageReader.h"
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 #include "cxImageDataContainer.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 #include <vtkImageExtractComponents.h>
 #include <vtkImageAppendComponents.h>

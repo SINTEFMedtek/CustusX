@@ -9,14 +9,14 @@
 #include <QCheckBox>
 #include <QTimer>
 #include <vtkImageData.h>
-#include "sscLabeledComboBoxWidget.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
-#include "sscData.h"
-#include "sscDataManager.h"
-#include "sscRegistrationTransform.h"
-#include "sscImageAlgorithms.h"
-#include "sscImage.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
+#include "cxData.h"
+#include "cxDataManager.h"
+#include "cxRegistrationTransform.h"
+#include "cxImageAlgorithms.h"
+#include "cxImage.h"
 #include "cxStateService.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
@@ -51,7 +51,7 @@ ExportDataDialog::ExportDataDialog(QWidget* parent) :
   mOkButton->setDefault(true);
   mOkButton->setFocus();
 
-//  messageManager()->sendInfo("Exporting data...");
+//  report("Exporting data...");
 }
 
 ExportDataDialog::~ExportDataDialog()

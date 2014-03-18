@@ -18,7 +18,7 @@ namespace cx
  * \class NavigationWidget
  *
  * \brief Widget for controlling camera follow style.
- * \ingroup cxGUI
+ * \ingroup cx_gui
  *
  * \date 22. feb. 2010
  * \\author Janne Beate Bakeng, SINTEF
@@ -39,8 +39,6 @@ protected:
   //camera settings
   QGroupBox*    mCameraGroupBox; ///< widget to put all camera specific settings
   QVBoxLayout*  mCameraGroupLayout; ///< layout for the cameragroupbox
-
-  CameraStylePtr getCameraStyle();
 };
 }
 #endif /* CXNAVIGATIONWIDGET_H_ */

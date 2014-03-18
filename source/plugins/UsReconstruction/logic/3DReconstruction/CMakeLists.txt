@@ -25,15 +25,15 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
 SET( SOURCE_FILES
   ${MOC_HEADER_FILES}
-  sscReconstructedOutputVolumeParams.h
-  sscReconstructedOutputVolumeParams.cpp
-  sscReconstructAlgorithm.h
-  sscPNNReconstructAlgorithm.h
-  sscPNNReconstructAlgorithm.cpp
-  sscReconstructCore.cpp
-  sscReconstructCore.h
-  sscReconstructPreprocessor.cpp
-  sscReconstructPreprocessor.h
+  cxReconstructedOutputVolumeParams.h
+  cxReconstructedOutputVolumeParams.cpp
+  cxReconstructAlgorithm.h
+  cxPNNReconstructAlgorithm.h
+  cxPNNReconstructAlgorithm.cpp
+  cxReconstructCore.cpp
+  cxReconstructCore.h
+  cxReconstructPreprocessor.cpp
+  cxReconstructPreprocessor.h
 	TordReconstruct/cxSyntheticVolume.h
 	TordReconstruct/cxSyntheticVolume.cpp
 	TordReconstruct/cxSimpleSyntheticVolume.h
@@ -54,14 +54,11 @@ if (CX_USE_OPENCL_UTILITY)
 		${SOURCE_FILES}
 		TordReconstruct/TordTest.h
 		TordReconstruct/TordTest.cpp
+		TordReconstruct/cxTordAlgorithm.h
+		TordReconstruct/cxTordAlgorithm.cpp
 		TordReconstruct/kernels.cl
-		cxOpenCLReconstruction.h
-		cxOpenCLReconstruction.cpp
-		cxOpenCLReconstructionHost.h
-		cxOpenCLReconstructionHost.cpp
 		)
    SET(TORD_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/TordReconstruct)
-   SET(KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/kernels)
 
 endif (CX_USE_OPENCL_UTILITY)
 
@@ -71,9 +68,9 @@ add_library( sscUS3DReconstruction ${SOURCE_FILES} )
 set(sscUS3DReconstruction_LIBRARIES
     cxResource
     cxResourceUsReconstructionTypes
+	cxLogicManager
     )
     
-# Don't try to use OpenCl if we haven't got it
 if( CX_USE_OPENCL_UTILITY )
     set(sscUS3DReconstruction_LIBRARIES
         ${sscUS3DReconstruction_LIBRARIES}
@@ -84,7 +81,9 @@ target_link_libraries( sscUS3DReconstruction ${sscUS3DReconstruction_LIBRARIES})
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/recConfig.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/recConfig.h" )
+  "${CMAKE_CURRENT_BINARY_DIR}/recConfig.h"
+  )
+  
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
 # =========================================================

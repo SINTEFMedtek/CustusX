@@ -15,10 +15,10 @@
 #include "vtkMatrix4x4.h"
 #include <QStringList>
 
-#include "sscVector3D.h"
-#include "sscTransform3D.h"
-#include "sscTypeConversions.h"
-#include "sscBoundingBox3D.h"
+#include "cxVector3D.h"
+#include "cxTransform3D.h"
+#include "cxTypeConversions.h"
+#include "cxBoundingBox3D.h"
 
 #include "catch.hpp"
 

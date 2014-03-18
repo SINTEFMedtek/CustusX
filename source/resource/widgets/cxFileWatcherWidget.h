@@ -15,6 +15,7 @@ namespace cx
  *
  * \brief Baseclass for widgets that should watch a file.
  *
+ * \ingroup cx_resource_widgets
  * \date Nov 7, 2012
  * \author Janne Beate Bakeng, SINTEF
  */

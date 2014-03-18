@@ -15,8 +15,8 @@
 #ifndef CXIGTLINKCONVERSION_H_
 #define CXIGTLINKCONVERSION_H_
 
-#include "sscImage.h"
-#include "sscTool.h"
+#include "cxImage.h"
+#include "cxTool.h"
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
 
@@ -26,7 +26,7 @@ namespace cx
 /**
  * Encode and decode IGTLink image and status messages to and from CustusX classes
  *
- * \ingroup cxResourceOpenIGTLinkUtilities
+ * \ingroup cx_resource_OpenIGTLinkUtilities
  *
  * \date  Feb 19, 2013
  * \author olevs

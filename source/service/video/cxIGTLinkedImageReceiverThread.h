@@ -25,14 +25,14 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxServiceVideo
+ * \addtogroup cx_service_video
  * @{
  */
 
 typedef boost::shared_ptr<class IGTLinkedImageReceiverThread> IGTLinkedImageReceiverThreadPtr;
 
 /**\brief Client thread for OpenIGTLink messaging.
- * \ingroup cxServiceVideo
+ * \ingroup cx_service_video
  *
  *
  */

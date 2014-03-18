@@ -7,15 +7,18 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
-#include "sscCoordinateSystemHelpers.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
+#include "cxCoordinateSystemHelpers.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
-#include "sscDataManager.h"
-#include "sscManualTool.h"
+#include "cxDataManager.h"
+#include "cxManualTool.h"
+
+#include "cxLegacySingletons.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
@@ -188,10 +191,10 @@ void PointSamplingWidget::addPoint(Vector3D point)
 
 void PointSamplingWidget::setManualTool(const Vector3D& p_r)
 {
-  ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
+  ManualToolPtr tool = toolManager()->getManualTool();
 
   //Transform3D sMr = mSliceProxy->get_sMr();
-  Transform3D rMpr = *cxToolManager::getInstance()->get_rMpr();
+  Transform3D rMpr = dataManager()->get_rMpr();
   Transform3D prMt = tool->get_prMt();
 
   // find tool position in r
@@ -220,16 +223,8 @@ void PointSamplingWidget::addButtonClickedSlot()
 
 Vector3D PointSamplingWidget::getSample() const
 {
-// find current tool position:
-//  ToolPtr tool = toolManager()->getDominantTool();
-//  if (!tool)
-//    return Vector3D(0,0,0);
-//  Transform3D prMt = tool->get_prMt();
-//  Transform3D rMpr = *toolManager()->get_rMpr();
-//  Vector3D pos = (rMpr*prMt).coord(Vector3D(0,0,tool->getTooltipOffset()));
-
-  CoordinateSystem ref = CoordinateSystemHelpers::getR();
-  Vector3D P_ref = CoordinateSystemHelpers::getDominantToolTipPoint(ref, true);
+//  CoordinateSystem ref = spaceProvider()->getR();
+  Vector3D P_ref = spaceProvider()->getDominantToolTipPoint(CoordinateSystem::reference(), true);
 
   return P_ref;
 }
@@ -270,24 +265,24 @@ void PointSamplingWidget::loadReferencePointsSlot()
   ToolPtr refTool = toolManager()->getReferenceTool();
   if(!refTool) // we only load reference points from reference tools
   {
-    messageManager()->sendDebug("No reference tool, cannot load reference points into the pointsampler");
+    reporter()->sendDebug("No reference tool, cannot load reference points into the pointsampler");
     return;
   }
 
   std::map<int, Vector3D> referencePoints_s = refTool->getReferencePoints();
   if(referencePoints_s.empty())
   {
-    messageManager()->sendWarning("No referenceppoints in reference tool "+refTool->getName());
+    reportWarning("No referenceppoints in reference tool "+refTool->getName());
     return;
   }
 
-  CoordinateSystem ref = CoordinateSystemHelpers::getR();
-  CoordinateSystem sensor = CoordinateSystemHelpers::getS(refTool);
+  CoordinateSystem ref = spaceProvider()->getR();
+  CoordinateSystem sensor = spaceProvider()->getS(refTool);
 
   std::map<int, Vector3D>::iterator it = referencePoints_s.begin();
   for(; it != referencePoints_s.end(); ++it)
   {
-    Vector3D P_ref = CoordinateSystemHelpers::get_toMfrom(sensor, ref).coord(it->second);
+	Vector3D P_ref = spaceProvider()->get_toMfrom(sensor, ref).coord(it->second);
     this->addPoint(P_ref);
   }
 }

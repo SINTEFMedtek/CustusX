@@ -25,8 +25,8 @@
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
 #include "vtkMetaImageWriter.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
 #include "cxDataLocations.h"
 #include "geConfig.h"
 #include "vtkImageChangeInformation.h"
@@ -132,7 +132,7 @@ void ImageStreamerGE::initialize(StringMap arguments)
 		}
 		if (imageSize <= 1)
 		{
-			messageManager()->sendError("Error with calculated image size. imagesize: " + mArguments["imagesize"] + " = " + qstring_cast(imageSize));
+			reportError("Error with calculated image size. imagesize: " + mArguments["imagesize"] + " = " + qstring_cast(imageSize));
 		}
 	}
 	else
@@ -167,7 +167,7 @@ void ImageStreamerGE::initialize(StringMap arguments)
    			mExportVelocity = true;
    		}
    		else
-   			messageManager()->sendWarning("ImageStreamerGE: Unknown stream: " + streamList.at(i));
+			reportWarning("ImageStreamerGE: Unknown stream: " + streamList.at(i));
    	}
 
 	bool useOpenCL = convertStringWithDefault(mArguments["useOpenCL"], 1);
@@ -179,6 +179,8 @@ void ImageStreamerGE::initialize(StringMap arguments)
 	//Setup the needed data stream types. The default is only scan converted data
 	mGEStreamer.SetupExportParameters(mExportScanconverted, mExportTissue, mExportBandwidth, mExportFrequency, mExportVelocity);
 
+	//Prevent copies of streamed data. Without this both tissue and flow frames trigger sending of data (resulting in all frames sent 2 times?)
+	mGEStreamer.SetForceTissueFrameRate(true);
 }
 
 QString findOpenCLPath(QString additionalLocation)
@@ -195,7 +197,7 @@ QString findOpenCLPath(QString additionalLocation)
 		path = QFileInfo(paths[2] + "/ScanConvertCL.cl");
 	if (!path.exists())
 	{
-		messageManager()->sendWarning("Error: Can't find ScanConvertCL.cl in any of\n  " + paths.join("  \n"));
+		reportWarning("Error: Can't find ScanConvertCL.cl in any of\n  " + paths.join("  \n"));
 	}
 	else
 		retval = path.absolutePath();
@@ -445,7 +447,7 @@ void ImageStreamerGE::printTimeIntervals()
 	{
         static int counter=0;
         if (++counter%3==0)
-            messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
+			reporter()->sendDebug(mRenderTimer->dumpStatisticsSmall());
 	          std::cout << mRenderTimer->dumpStatisticsSmall() << std::endl;
         mRenderTimer->reset();
 	}

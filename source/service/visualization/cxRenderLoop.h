@@ -29,7 +29,7 @@ typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
  *
  * This is the main render loop in Custus.
  *
- * \ingroup cxServiceVisualization
+ * \ingroup cx_service_visualization
  * \date 2014-02-06
  * \author christiana
  */
@@ -43,6 +43,7 @@ public:
 	/** If set: Render only views with modified props using the given interval,
 	  * render nonmodified at a slower pace. */
 	void setSmartRender(bool val) { mSmartRender = val; }
+	void setLogging(bool on);
 
 	void clearViews();
 	void addView(ViewWidget* view);
@@ -66,6 +67,7 @@ private:
 	bool pollForSmartRenderingThisCycle();
 	int calculateTimeToNextRender();
 	void emitFPSIfRequired();
+	void dumpStatistics();
 
 	QTimer* mTimer; ///< timer that drives rendering
 	QDateTime mLastFullRender;
@@ -76,6 +78,7 @@ private:
 	bool mSmartRender;
 	bool mPreRenderSignalRequested;
 	int mBaseRenderInterval;
+	bool mLogging;
 
 	typedef std::set<QPointer<ViewWidget> > ViewWidgetSet;
 	ViewWidgetSet mViews;

@@ -9,8 +9,8 @@
 #define CXTOOLTIPSAMPLEWIDGET_H_
 
 #include "cxBaseWidget.h"
-#include "sscCoordinateSystemHelpers.h"
-#include "sscForwardDeclarations.h"
+#include "cxCoordinateSystemHelpers.h"
+#include "cxForwardDeclarations.h"
 #include "cxDataInterface.h"
 
 class QPushButton;
@@ -20,10 +20,11 @@ class QLineEdit;
 namespace cx
 {
 typedef boost::shared_ptr<class SelectDataStringDataAdapter> SelectDataStringDataAdapterPtr;
+class LabeledComboBoxWidget;
 
 /**
  * \file
- * \addtogroup cxPluginCalibration
+ * \addtogroup cx_plugin_calibration
  * @{
  */
 

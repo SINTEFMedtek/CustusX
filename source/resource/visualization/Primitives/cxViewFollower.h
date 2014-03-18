@@ -16,16 +16,18 @@
 
 #include <QObject>
 #include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
-#include "sscBoundingBox3D.h"
+#include "cxForwardDeclarations.h"
+#include "cxBoundingBox3D.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class ViewFollower> ViewFollowerPtr;
+class DataManager;
 
 /**
  * Ensure the tool is inside a given viewport, by moving the global center.
  *
- * \ingroup cx
+ * \ingroup cx_resource_visualization
  * \date 2014-01-14
  * \author christiana
  */
@@ -33,12 +35,14 @@ class ViewFollower : public QObject
 {
 	Q_OBJECT
 public:
+	static ViewFollowerPtr create(DataServicePtr dataManager);
 	void setSliceProxy(SliceProxyPtr sliceProxy);
 	void setView(DoubleBoundingBox3D bb_s);
 
 private slots:
 	void ensureCenterWithinView();
 private:
+	explicit ViewFollower(DataServicePtr dataManager);
 	Vector3D findCenterShift_s();
 	DoubleBoundingBox3D findStaticBox();
 	Vector3D findShiftFromBoxToTool_s(DoubleBoundingBox3D BB_s, Vector3D pt_s);
@@ -47,6 +51,7 @@ private:
 
 	SliceProxyPtr mSliceProxy;
 	DoubleBoundingBox3D mBB_s;
+	DataServicePtr mDataManager;
 private:
 };
 

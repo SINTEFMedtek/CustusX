@@ -15,12 +15,16 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkInteractorObserver.h>
 #include <vtkInteractorStyleTrackballCamera.h>
+#include "vtkMultiVolumePicker.h"
+#include <vtkCamera.h>
+#include "cxLogger.h"
 
-//#include <QString>
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/Geometry>
-#include <string>
+#include "cxVector3D.h" //Neeed to setup Eigen correctly
+
 #include "vtkOpenGLGPUMultiVolumeRayCastMapper.h"
+
+#include "cxtestRenderTester.h"
+#include "cxtestUtilities.h"
 
 typedef vtkSmartPointer<vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<vtkVolumeProperty> vtkVolumePropertyPtr;
@@ -33,6 +37,8 @@ typedef vtkSmartPointer<vtkTransform> vtkTransformPtr;
 typedef vtkSmartPointer<vtkMetaImageReader> vtkMetaImageReaderPtr;
 typedef vtkSmartPointer<vtkRenderWindowInteractor> vtkRenderWindowInteractorPtr;
 typedef vtkSmartPointer<vtkInteractorStyleTrackballCamera> vtkInteractorStyleTrackballCameraPtr;
+typedef vtkSmartPointer<vtkMultiVolumePicker> vtkMultiVolumePickerPtr;
+#include "vtkForwardDeclarations.h"
 
 typedef vtkSmartPointer<vtkOpenGLGPUMultiVolumeRayCastMapper> vtkOpenGLGPUMultiVolumeRayCastMapperPtr;
 
@@ -53,7 +59,17 @@ public:
 	void setReferenceImage(vtkImageDataPtr image, vtkVolumePropertyPtr property)
 	{
 		mMapper->SetInput(0, image);
+
+		vtkTransformPtr transform = vtkTransformPtr::New();
+		transform->Identity();
+
 		mVolume->SetProperty(property);
+
+		Eigen::Vector3d translation = Eigen::Array3d(0,0,0);
+		transform->Translate(translation.data());
+		transform->Update();
+
+		mVolume->SetUserMatrix(transform->GetMatrix()); //set rMd
 	}
 
 	void addImage(int index, vtkImageDataPtr image, vtkVolumePropertyPtr property, Eigen::Vector3d translation = Eigen::Vector3d::Zero())
@@ -69,6 +85,39 @@ public:
 		mMapper->SetInput(currentIndex+1, image);
 		mMapper->SetAdditionalProperty(currentIndex, property);
 	}
+
+	void addImageAndRotate(int index, vtkImageDataPtr image, vtkVolumePropertyPtr property, Eigen::Vector3d translation = Eigen::Vector3d::Zero())
+	{
+		int currentIndex = index; // index into additional volumes.
+
+		vtkTransformPtr transform = vtkTransformPtr::New();
+		transform->Identity();
+		transform->RotateX(30);
+		transform->Translate(translation.data());
+		transform->Update();
+
+		mMapper->SetAdditionalInputUserTransform(currentIndex,transform);
+		mMapper->SetInput(currentIndex+1, image);
+		mMapper->SetAdditionalProperty(currentIndex, property);
+	}
+
+void requireRender()
+{
+	vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
+	vtkRendererPtr renderer = vtkRendererPtr::New();
+	renderWindow->AddRenderer(renderer);
+	renderWindow->SetSize(30,30);
+	renderer->AddVolume(mVolume);
+	renderWindow->Render();
+	renderWindow->Render();
+
+	RenderTesterPtr renderTester = cxtest::RenderTester::create(renderWindow);
+	vtkImageDataPtr output = renderTester->renderToImage();
+	double fraction = cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, 0);
+//	std::cout << "fraction: " << fraction << std::endl;
+	REQUIRE(fraction > 0);
+	REQUIRE(fraction < 1);
+}
 
 	void renderLoop()
 	{
@@ -86,18 +135,24 @@ public:
 		renderWindow->SetSize(600,600);
 		renderer->AddVolume(mVolume);
 
+		renderWindow->Render();
+		iren->Initialize();
 		iren->Start();
 	}
 
 	void renderOnce()
 	{
-		vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
-		vtkRendererPtr renderer = vtkRendererPtr::New();
-		renderWindow->AddRenderer(renderer);
-		renderWindow->SetSize(200,200);
-		renderer->AddVolume(mVolume);
-		renderWindow->Render();
+		if (!mRenderWindow)
+		{
+			mRenderWindow = vtkRenderWindowPtr::New();
+			mRenderer = vtkRendererPtr::New();
+			mRenderWindow->AddRenderer(mRenderer);
+			mRenderWindow->SetSize(200,200);
+			mRenderer->AddVolume(mVolume);
+		}
+		mRenderWindow->Render();
 	}
+	vtkRendererPtr getRenderer() { return mRenderer; }
 
 	vtkVolumePropertyPtr getVolumeProperty(int minVal, int maxVal)
 	{
@@ -160,9 +215,68 @@ public:
 		return reader->GetOutput();
 	}
 
+	vtkMultiVolumePickerPtr pickAlongRayReturnSuccessfulMultiVolumePicker(Eigen::Vector3d pos, Eigen::Vector3d dir)
+	{
+		this->renderOnce();
+		vtkRendererPtr renderer = this->getRenderer();
+		vtkCameraPtr camera = renderer->GetActiveCamera();
+		Eigen::Vector3d p_camera = pos;
+		Eigen::Vector3d p_focus = p_camera + dir;
+		camera->SetPosition(p_camera.data());
+		camera->SetFocalPoint(p_focus.data());
+		renderer->ResetCameraClippingRange();
+//		std::cout << "p_camera " << p_camera << std::endl;
+//		std::cout << "p_focus " << p_focus << std::endl;
+//		this->renderOnce();
+
+		vtkMultiVolumePickerPtr picker = vtkMultiVolumePickerPtr::New();
+//		Eigen::Vector3d p_click = p_camera;
+		Eigen::Vector3d p_click(100,100,0);//In the middle of mRenderWindow size
+		int hit = picker->Pick(p_click[0], p_click[1], 0, renderer);
+//		std::cout << "p_click " << p_click << std::endl;
+//		std::cout << "hit " << hit << std::endl;
+
+		if (hit)
+			return picker;
+		else
+			return vtkMultiVolumePickerPtr();
+	}
+
+	void requireHit(int x, int y, bool ignoreExpected = false)
+	{
+		Eigen::Vector3d p_camera(x,y,-100);
+		Eigen::Vector3d viewdir = Eigen::Vector3d(0,0,1);
+		vtkMultiVolumePickerPtr picker = pickAlongRayReturnSuccessfulMultiVolumePicker(p_camera, viewdir);
+		Eigen::Vector3d p_expected(x,y,0);
+		{
+			INFO("Should hit point: " << x << " " << y);
+			REQUIRE(picker.GetPointer());
+		}
+		Eigen::Vector3d p_pick(picker->GetPickPosition());
+		if(!ignoreExpected)
+		{
+			INFO(p_pick << " == " << p_expected);
+			CHECK(p_pick.isApprox(p_expected));
+		}
+	}
+
+	void requireMiss(int x, int y)
+	{
+		Eigen::Vector3d p_camera(x,y,-100);
+		Eigen::Vector3d viewdir = Eigen::Vector3d(0,0,1);
+		vtkMultiVolumePickerPtr picker = pickAlongRayReturnSuccessfulMultiVolumePicker(p_camera, viewdir);
+
+		INFO("Should not hit point: " << x << " " << y);
+		REQUIRE_FALSE(picker.GetPointer());
+	}
+
+
 private:
 	vtkVolumePtr mVolume;
 	vtkOpenGLGPUMultiVolumeRayCastMapperPtr mMapper;
+
+	vtkRenderWindowPtr mRenderWindow;
+	vtkRendererPtr mRenderer;
 };
 
 
@@ -233,6 +347,165 @@ TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can render 1 small volume withou
 	fixture.renderOnce();
 
 	REQUIRE(1); // makes this a valid catch test
+}
+
+TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper vs vtkMultiVolumePicker: Simple test", "[unit]")
+{
+	int numberOfVolumes = 1;
+	VtkOpenGLGPUMultiVolumeRayCastMapperFixture fixture(numberOfVolumes);
+
+	// volume extent=(0..100, 0..100, 0..100)
+	vtkImageDataPtr refImage = fixture.createVtkImageData(Eigen::Array3i(101,101,101), Eigen::Array3d(2,2,2), 200);
+	vtkVolumePropertyPtr property = fixture.getVolumeProperty(100,300);
+
+	fixture.setReferenceImage(refImage, property);
+
+	// volume extent=(0..10, 0..10, 0..10)
+	vtkImageDataPtr image = fixture.createVtkImageData(Eigen::Array3i(101,101,101), Eigen::Array3d(1,1,1), 200);
+	fixture.addImage(0, image, property, Eigen::Array3d(0,0,0));
+
+	Eigen::Vector3d p_camera(55,55,-100);
+	Eigen::Vector3d viewdir = Eigen::Vector3d(0,0,1);
+
+	vtkMultiVolumePickerPtr picker = fixture.pickAlongRayReturnSuccessfulMultiVolumePicker(p_camera, viewdir);
+
+	Eigen::Vector3d p_expected(55,55,0);
+	REQUIRE(picker.GetPointer());
+
+	Eigen::Vector3d p_pick(picker->GetPickPosition());
+	{
+		INFO(p_pick << " == " << p_expected);
+		REQUIRE(p_pick.isApprox(p_expected));
+	}
+}
+
+TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper vs vtkMultiVolumePicker: Origin", "[unit]")
+{
+	int numberOfVolumes = 1;
+	VtkOpenGLGPUMultiVolumeRayCastMapperFixture fixture(numberOfVolumes);
+
+	vtkImageDataPtr refImage = fixture.createVtkImageData(Eigen::Array3i(21,21,21), Eigen::Array3d(1,1,1), 200);
+	vtkVolumePropertyPtr property = fixture.getVolumeProperty(100,300);
+
+	fixture.setReferenceImage(refImage, property);
+
+	vtkImageDataPtr image = fixture.createVtkImageData(Eigen::Array3i(11,11,11), Eigen::Array3d(1,1,1), 200);
+	fixture.addImage(0, image, property, Eigen::Array3d(0,0,0));
+
+	fixture.requireRender();
+	fixture.requireHit(0, 0);
+	fixture.requireHit(10, 10);
+	fixture.requireMiss(11, 11);
+	fixture.requireMiss(20, 20);
+	fixture.requireRender();
+}
+
+TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper vs vtkMultiVolumePicker: Small target", "[unit]")
+{
+	int numberOfVolumes = 1;
+	VtkOpenGLGPUMultiVolumeRayCastMapperFixture fixture(numberOfVolumes);
+
+	vtkImageDataPtr refImage = fixture.createVtkImageData(Eigen::Array3i(21,21,21), Eigen::Array3d(1,1,1), 100);
+	vtkVolumePropertyPtr property = fixture.getVolumeProperty(100,300);
+
+	fixture.setReferenceImage(refImage, property);
+
+	vtkImageDataPtr image = fixture.createVtkImageData(Eigen::Array3i(11,11,11), Eigen::Array3d(1,1,1), 300);
+	fixture.addImage(0, image, property, Eigen::Array3d(10,10,0));
+
+	fixture.requireRender();
+	fixture.requireMiss(0, 0);
+	fixture.requireMiss(9, 9);
+	fixture.requireHit(10, 10);
+	fixture.requireHit(20, 20);
+
+	fixture.requireMiss(9, 10);
+	fixture.requireMiss(9, 20);
+	fixture.requireMiss(10, 9);
+	fixture.requireMiss(10, 21);
+	fixture.requireMiss(21, 10);
+	fixture.requireMiss(21, 20);
+	fixture.requireMiss(20, 21);
+	fixture.requireRender();
+}
+
+TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper vs vtkMultiVolumePicker: Rotation", "[unit]")
+{
+	int numberOfVolumes = 1;
+	VtkOpenGLGPUMultiVolumeRayCastMapperFixture fixture(numberOfVolumes);
+
+	vtkImageDataPtr refImage = fixture.createVtkImageData(Eigen::Array3i(21,21,21), Eigen::Array3d(1,1,1), 100);
+	vtkVolumePropertyPtr property = fixture.getVolumeProperty(100,300);
+
+	fixture.setReferenceImage(refImage, property);
+
+	vtkImageDataPtr image = fixture.createVtkImageData(Eigen::Array3i(11,11,11), Eigen::Array3d(1,1,1), 300);
+	fixture.addImageAndRotate(0, image, property, Eigen::Array3d(10,10,0));
+
+	fixture.requireRender();
+	fixture.requireMiss(0, 0);
+	fixture.requireMiss(9, 9);
+	fixture.requireHit(10, 10, true);
+	fixture.requireMiss(20, 20);
+
+	fixture.requireMiss(9, 10);
+	fixture.requireMiss(9, 20);
+	fixture.requireHit(10, 9, true);
+	fixture.requireMiss(10, 21);
+	fixture.requireMiss(21, 10);
+	fixture.requireMiss(21, 20);
+	fixture.requireMiss(20, 21);
+	fixture.requireRender();
+}
+
+TEST_CASE("vtkOpenGLGPUMultiVolumeRayCastMapper can be picked using vtkMultiVolumePicker", "[unit]")
+{
+	int numberOfVolumes = 3;
+	VtkOpenGLGPUMultiVolumeRayCastMapperFixture fixture(numberOfVolumes);
+
+	// volume extent=(0..40, 0..40, 0..40)
+	vtkImageDataPtr refImage = fixture.createVtkImageData(Eigen::Array3i(41,41,41), Eigen::Array3d(1,1,1), 0);
+	vtkVolumePropertyPtr property = fixture.getVolumeProperty(100,300);
+
+	fixture.setReferenceImage(refImage, property);
+
+	// volume extent=(0..10, 0..10, 0..10)
+	vtkImageDataPtr image = fixture.createVtkImageData(Eigen::Array3i(11,11,11), Eigen::Array3d(1,1,1), 200);
+	fixture.addImage(0, image, property, Eigen::Array3d(0,0,0));
+	fixture.addImage(1, image, property, Eigen::Array3d(20,0,0));
+	fixture.addImageAndRotate(2, image, property, Eigen::Array3d(20,20,0));
+//	fixture.addImage(2, image, property, Eigen::Array3d(20,20,0));
+
+	fixture.requireRender();
+	fixture.requireHit(5, 5);
+	fixture.requireMiss(15, 0);
+	fixture.requireMiss(15, 15);
+	fixture.requireMiss(0, 15);
+	fixture.requireHit(25, 5);
+	fixture.requireHit(25, 20, true);
+	fixture.requireMiss(40, 0);
+	fixture.requireMiss(40, 40);
+	fixture.requireRender();
+}
+
+TEST_CASE("vtkTransform translate and rotate", "[unit]")
+{
+	vtkTransformPtr transform = vtkTransformPtr::New();
+	transform->Identity();
+	transform->RotateX(60);
+	Eigen::Array3d translation = Eigen::Array3d(0,10,20);
+	transform->Translate(translation.data());
+	transform->Update();
+
+
+	double p1[3] = {10, 20, 30};
+	double p1_t[3];
+
+	transform->PreMultiply();
+	transform->TransformPoint(p1, p1_t);
+	CHECK(p1_t[0] == p1[0]);
+	CHECK(p1_t[1] != p1[1]);
+	CHECK(p1_t[2] != p1[2]);
 }
 
 } // namespace cxtest

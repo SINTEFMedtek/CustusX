@@ -8,8 +8,8 @@
 #include <QPixmap>
 #include <QMetaObject>
 
-#include "sscToolManager.h"
-#include "sscMessageManager.h"
+#include "cxToolManager.h"
+#include "cxReporter.h"
 #include "cxVideoConnectionManager.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"
@@ -19,15 +19,21 @@
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
 #include "cxVideoConnection.h"
-#include "sscManualTool.h"
+#include "cxManualTool.h"
+#include "cxTypeConversions.h"
+#include "cxDefinitionStrings.h"
 
 
 namespace cx
 {
 StatusBar::StatusBar() :
-	mRenderingFpsLabel(new QLabel(this)), mGrabbingInfoLabel(new QLabel(this)), mTpsLabel(new QLabel(this))
+	mRenderingFpsLabel(new QLabel(this)),
+	mGrabbingInfoLabel(new QLabel(this)),
+	mTpsLabel(new QLabel(this))
+//	mMessageLevelLabel(new QToolButton(this))
+//	mMessageLevelLabel(new QLabel(this))
 {
-	connect(messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
+	connect(reporter(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
 
 	connect(toolManager(), SIGNAL(configured()),      this, SLOT(connectToToolSignals()));
 	connect(toolManager(), SIGNAL(deconfigured()),    this, SLOT(disconnectFromToolSignals()));
@@ -39,9 +45,10 @@ StatusBar::StatusBar() :
 
 	connect(viewManager(), SIGNAL(fps(int)), this, SLOT(renderingFpsSlot(int)));
 
-	connect(videoService()->getVideoConnection().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
+	connect(videoService().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
 	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));
 
+//	this->addPermanentWidget(mMessageLevelLabel);
 	this->addPermanentWidget(mRenderingFpsLabel);
 }
 
@@ -61,7 +68,7 @@ void StatusBar::connectToToolSignals()
 		ToolPtr tool = it->second;
 		if (tool->hasType(Tool::TOOL_MANUAL))
 			continue;
-		if (tool == cxToolManager::getInstance()->getManualTool())
+		if (tool == toolManager()->getManualTool())
 			continue;
 		connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolButtons()));
 
@@ -173,7 +180,16 @@ void StatusBar::grabberConnectedSlot(bool connected)
 
 void StatusBar::showMessageSlot(Message message)
 {
-	this->showMessage(message.getPrintableMessage(), message.getTimeout());
+	QString text = QString("[%1] %4")
+			.arg(qstring_cast(message.getMessageLevel()))
+			.arg(message.getText());
+
+//	this->showMessage(message.getPrintableMessage(), message.getTimeout());
+//	mMessageLevelLabel->setPixmap(QPixmap(":/images/go-home.png"));
+//	mMessageLevelLabel->setPixmap(QPixmap(":/icons/screenshot-screen.png"));
+//	mMessageLevelLabel->setIcon(QIcon(":/icons/screenshot-screen.png"));
+//	mMessageLevelLabel->show();
+	this->showMessage(text, message.getTimeout());
 }
 
 }//namespace cx

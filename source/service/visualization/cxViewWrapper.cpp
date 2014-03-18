@@ -16,19 +16,20 @@
 
 #include <QMenu>
 #include "vtkCamera.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
 #include "cxViewGroup.h" //for class Navigation
-#include "sscMesh.h"
-#include "sscTypeConversions.h"
-#include "cxCameraControl.h"
-#include "sscImageAlgorithms.h"
-#include "sscDataMetric.h"
-#include "sscView.h"
-#include "sscImage.h"
+#include "cxMesh.h"
+#include "cxTypeConversions.h"
+#include "cxImageAlgorithms.h"
+#include "cxDataMetric.h"
+#include "cxView.h"
+#include "cxImage.h"
 #include "cxViewManager.h"
 #include "cxInteractiveClipper.h"
 #include "cxRepManager.h"
+#include "cxVisualizationServiceBackend.h"
+#include "cxNavigation.h"
 
 namespace cx
 {
@@ -57,57 +58,34 @@ QVariant SyncedValue::get() const
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-
-void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
+DataViewPropertiesInteractor::DataViewPropertiesInteractor(VisualizationServiceBackendPtr backend, ViewGroupDataPtr groupData) :
+	mBackend(backend),
+	mGroupData(groupData)
 {
-	mGroupData = group;
-	connect(mGroupData.get(), SIGNAL(dataAdded(QString)), SLOT(dataAddedSlot(QString)));
-	connect(mGroupData.get(), SIGNAL(dataRemoved(QString)), SLOT(dataRemovedSlot(QString)));
-	connect(mGroupData.get(), SIGNAL(videoSourceChanged(QString)), SLOT(videoSourceChangedSlot(QString)));
-
-	std::vector<DataPtr> data = mGroupData->getData();
-	for (unsigned i = 0; i < data.size(); ++i)
-	{
-		this->dataAddedSlot(qstring_cast(data[i]->getUid()));
-	}
-
+	mProperties = DataViewProperties::createDefault();
 }
 
-void ViewWrapper::dataAddedSlot(QString uid)
+void DataViewPropertiesInteractor::addDataActions(QWidget* parent)
 {
-	this->dataAdded(dataManager()->getData(uid));
-}
-
-void ViewWrapper::dataRemovedSlot(QString uid)
-{
-	this->dataRemoved(uid);
-//	RepManager::getInstance()->purgeVolumetricReps();
-}
-
-void ViewWrapper::contextMenuSlot(const QPoint& point)
-{
-	QWidget* sender = dynamic_cast<QWidget*>(this->sender());QPoint pointGlobal = sender->mapToGlobal(point);
-	QMenu contextMenu(sender);
-
 	//add actions to the actiongroups and the contextmenu
-	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(dataManager()->getData());
+	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(mBackend->getDataManager()->getData());
 	mLastDataActionUid = "________________________";
 	for (std::vector<DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
 	{
-		this->addDataAction((*iter)->getUid(), &contextMenu);
+		this->addDataAction((*iter)->getUid(), parent);
 	}
-
-	//append specific info from derived classes
-	this->appendToContextMenu(contextMenu);
-
-	contextMenu.exec(pointGlobal);
 }
 
-void ViewWrapper::addDataAction(QString uid, QMenu* contextMenu)
+void DataViewPropertiesInteractor::setDataViewProperties(DataViewProperties properties)
 {
-	DataPtr data = dataManager()->getData(uid);
+	mProperties = properties;
+}
 
-	QAction* action = new QAction(qstring_cast(data->getName()), contextMenu);
+void DataViewPropertiesInteractor::addDataAction(QString uid, QWidget* parent)
+{
+	DataPtr data = mBackend->getDataManager()->getData(uid);
+
+	QAction* action = new QAction(qstring_cast(data->getName()), parent);
 
 	if (boost::dynamic_pointer_cast<Image>(data))
 		action->setIcon(QIcon(":/icons/volume.png"));
@@ -129,57 +107,125 @@ void ViewWrapper::addDataAction(QString uid, QMenu* contextMenu)
 
 	action->setData(QVariant(qstring_cast(uid)));
 	action->setCheckable(true);
-	std::vector<DataPtr> allVisible = mGroupData->getData();
+	std::vector<DataPtr> allVisible = mGroupData->getData(mProperties);
 	action->setChecked(std::count(allVisible.begin(), allVisible.end(), data));
 	connect(action, SIGNAL(triggered()), this, SLOT(dataActionSlot()));
-	contextMenu->addAction(action);
+	parent->addAction(action);
 }
 
-void ViewWrapper::dataActionSlot()
+void DataViewPropertiesInteractor::dataActionSlot()
 {
-	QAction* theAction = static_cast<QAction*>(sender());if(!theAction)
-	return;
+	QAction* theAction = static_cast<QAction*>(sender());
+	if(!theAction)
+		return;
 
 	QString uid = theAction->data().toString();
-	DataPtr data = dataManager()->getData(uid);
-	ImagePtr image = dataManager()->getImage(data->getUid());
+	DataPtr data = mBackend->getDataManager()->getData(uid);
+	ImagePtr image = mBackend->getDataManager()->getImage(data->getUid());
 
-	bool firstData = mGroupData->getData().empty();
+	bool firstData = mGroupData->getData(DataViewProperties::createFull()).empty();
+
+	DataViewProperties old = mGroupData->getProperties(data);
 
 	if (theAction->isChecked())
 	{
-		mGroupData->addData(data);
+		DataViewProperties props = old.addFlagsIn(mProperties);
+		mGroupData->setProperties(data, props);
+
 		if (image)
-		dataManager()->setActiveImage(image);
+			mBackend->getDataManager()->setActiveImage(image);
 	}
 	else
 	{
-		mGroupData->removeData(data);
-		//if (image)
-		//dataManager()->setActiveImage(ImagePtr());
+		DataViewProperties props = old.removeFlagsIn(mProperties);
+		mGroupData->setProperties(data, props);
 	}
 
 	if (firstData)
 	{
-		Navigation().centerToGlobalDataCenter(); // reset center for convenience
-					mGroupData->requestInitialize();
-				}
-			}
+		Navigation(mBackend).centerToGlobalDataCenter(); // reset center for convenience
+		mGroupData->requestInitialize();
+	}
+}
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+ViewWrapper::ViewWrapper(VisualizationServiceBackendPtr backend) :
+	mBackend(backend)
+{
+}
+
+void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
+{
+	mGroupData = group;
+
+	connect(mGroupData.get(), SIGNAL(dataViewPropertiesChanged(QString)), SLOT(dataViewPropertiesChangedSlot(QString)));
+//	connect(mGroupData.get(), SIGNAL(dataAdded(QString)), SLOT(dataAddedSlot(QString)));
+//	connect(mGroupData.get(), SIGNAL(dataRemoved(QString)), SLOT(dataRemovedSlot(QString)));
+	connect(mGroupData.get(), SIGNAL(videoSourceChanged(QString)), SLOT(videoSourceChangedSlot(QString)));
+
+	std::vector<DataPtr> data = mGroupData->getData();
+	for (unsigned i = 0; i < data.size(); ++i)
+		this->dataViewPropertiesChangedSlot(data[i]->getUid());
+
+	mDataViewPropertiesInteractor.reset(new DataViewPropertiesInteractor(mBackend, mGroupData));
+
+	mShow3DSlicesInteractor.reset(new DataViewPropertiesInteractor(mBackend, mGroupData));
+	mShow3DSlicesInteractor->setDataViewProperties(DataViewProperties::createSlice3D());
+}
+
+void ViewWrapper::dataViewPropertiesChangedSlot(QString uid)
+{
+}
+
+//void ViewWrapper::dataAddedSlot(QString uid)
+//{
+//	this->dataAdded(mBackend->getDataManager()->getData(uid));
+//}
+
+//void ViewWrapper::dataRemovedSlot(QString uid)
+//{
+//	this->dataRemoved(uid);
+//}
+
+void ViewWrapper::contextMenuSlot(const QPoint& point)
+{
+	QWidget* sender = dynamic_cast<QWidget*>(this->sender());
+	QPoint pointGlobal = sender->mapToGlobal(point);
+	QMenu contextMenu(sender);
+
+	mDataViewPropertiesInteractor->addDataActions(&contextMenu);
+
+	QMenu* show3DSlicesMenu = new QMenu("Show 3D slices");
+	contextMenu.addMenu(show3DSlicesMenu);
+	mShow3DSlicesInteractor->addDataActions(show3DSlicesMenu);
+
+	//append specific info from derived classes
+	this->appendToContextMenu(contextMenu);
+
+	contextMenu.exec(pointGlobal);
+}
+
 
 void ViewWrapper::connectContextMenu(ViewWidget* view)
 {
 	connect(view, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(contextMenuSlot(const QPoint &)));
 }
 
-QStringList ViewWrapper::getAllDataNames() const
+QStringList ViewWrapper::getAllDataNames(DataViewProperties properties) const
 {
 	if (!mGroupData)
 		return QStringList();
-	std::vector<DataPtr> data = mGroupData->getData();
+	std::vector<DataPtr> data = mGroupData->getData(properties);
 
 	QStringList text;
 	for (unsigned i = 0; i < data.size(); ++i)
 	{
+		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data[i]);
+		if (metric) // dont show metrics here: too much spam - use separate list is necessary
+			continue;
 		QString line = data[i]->getName();
 
 		ImagePtr image = boost::dynamic_pointer_cast<Image>(data[i]);
@@ -187,7 +233,7 @@ QStringList ViewWrapper::getAllDataNames() const
 		{
 			if (image->getCropping())
 				line += " (cropped)";
-			if (!image->getAllClipPlanes().empty() || ((viewManager()->getClipper()->getImage() == image) &&  viewManager()->getClipper()->getUseClipper()))
+			if (!image->getAllClipPlanes().empty())
 				line += " (clipped)";
 		}
 

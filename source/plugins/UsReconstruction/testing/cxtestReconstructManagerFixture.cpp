@@ -16,14 +16,14 @@
 
 #include "cxDataManager.h"
 #include "catch.hpp"
-#include "sscPNNReconstructAlgorithm.h"
+#include "cxPNNReconstructAlgorithm.h"
 #include <QApplication>
-#include "sscDoubleDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
 #include "cxTimedAlgorithm.h"
 
 #include "cxDataLocations.h"
-#include "sscReconstructPreprocessor.h"
-
+#include "cxReconstructPreprocessor.h"
+#include "cxLogicManager.h"
 
 namespace cxtest
 {
@@ -32,14 +32,16 @@ ReconstructManagerTestFixture::ReconstructManagerTestFixture()
 {
 	mVerbose = false;
 
-	cx::MessageManager::initialize();
-	cx::cxDataManager::initialize();
+//	cx::Reporter::initialize();
+//	cx::cxDataManager::initialize();
+	cx::LogicManager::initialize();
 }
 
 ReconstructManagerTestFixture::~ReconstructManagerTestFixture()
 {
-	cx::cxDataManager::shutdown();
-	cx::MessageManager::shutdown();
+	cx::LogicManager::shutdown();
+//	cx::cxDataManager::shutdown();
+//	cx::Reporter::shutdown();
 }
 
 void ReconstructManagerTestFixture::setPNN_InterpolationSteps(int value)

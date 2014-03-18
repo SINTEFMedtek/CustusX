@@ -25,17 +25,17 @@
 #include <vtkClipPolyData.h>
 #include <vtkImageData.h>
 
-#include "sscMesh.h"
-#include "sscStringDataAdapter.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscDefinitionStrings.h"
-#include "sscDataManager.h"
-#include "sscUtilHelpers.h"
-#include "sscMessageManager.h"
-#include "sscRegistrationTransform.h"
-#include "sscImageAlgorithms.h"
-#include "sscDoubleWidgets.h"
-#include "sscImage.h"
+#include "cxMesh.h"
+#include "cxStringDataAdapter.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxDefinitionStrings.h"
+#include "cxDataManager.h"
+#include "cxUtilHelpers.h"
+#include "cxReporter.h"
+#include "cxRegistrationTransform.h"
+#include "cxImageAlgorithms.h"
+#include "cxDoubleWidgets.h"
+#include "cxImage.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
 #include "cxInteractiveCropper.h"
@@ -155,7 +155,7 @@ void EraserWidget::duplicateSlot()
 	ImagePtr original = dataManager()->getActiveImage();
 	QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
 
-	ImagePtr duplicate = duplicateImage(original);
+	ImagePtr duplicate = duplicateImage(dataService(), original);
 	dataManager()->loadData(duplicate);
 	dataManager()->saveImage(duplicate, outputBasePath);
 	dataManager()->setActiveImage(duplicate);

@@ -19,19 +19,19 @@
 #include <QTextStream>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscToolManager.h"
-#include "sscDataManager.h"
-#include "sscVector3D.h"
-#include "sscDefinitionStrings.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
+#include "cxToolManager.h"
+#include "cxDataManager.h"
+#include "cxVector3D.h"
+#include "cxDefinitionStrings.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
 #include "cxTool.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxPatientData.h"
 #include <cxActiveToolWidget.h>
-#include "sscDoubleWidgets.h"
+#include "cxDoubleWidgets.h"
 
 namespace cx
 {
@@ -110,12 +110,12 @@ void LapFrameToolCalibrationWidget::calibrateSlot()
   double cameraAngle = mCameraAngleAdapter->getValue();
   if(!refTool || !tool)
   {
-    messageManager()->sendError(QString("Calibration prerequisited not met: calref:%1, tool:%2").arg(refTool!=0).arg(tool!=0) );
+    reportError(QString("Calibration prerequisited not met: calref:%1, tool:%2").arg(refTool!=0).arg(tool!=0) );
     return;
   }
   if(!refTool->getVisible() || !tool->getVisible() || !refTool->hasReferencePointWithId(1))
   {
-    messageManager()->sendError(QString("Calibration prerequisited not met: calref vis:%1, tool vis :%2, refpoint:%3").arg(refTool->getVisible()).arg(tool->getVisible()).arg(refTool->hasReferencePointWithId(1)) );
+    reportError(QString("Calibration prerequisited not met: calref vis:%1, tool vis :%2, refpoint:%3").arg(refTool->getVisible()).arg(tool->getVisible()).arg(refTool->hasReferencePointWithId(1)) );
     return;
   }
 
@@ -153,7 +153,7 @@ void LapFrameToolCalibrationWidget::testCalibrationSlot()
   QString delta = QString("%1 mm").arg(delta_selectedTool.length(), 6, 'g', 1);
   mDeltaLabel->setText("<b>Delta "+tool->getName()+":</b> "+qstring_cast(delta_selectedTool)+" <br> <b>Accuracy:</b>  " + delta);
 
-  messageManager()->sendInfo("Delta "+tool->getName()+": "+qstring_cast(delta_selectedTool)+" Length:   "+ delta);
+  report("Delta "+tool->getName()+": "+qstring_cast(delta_selectedTool)+" Length:   "+ delta);
 
 
 }

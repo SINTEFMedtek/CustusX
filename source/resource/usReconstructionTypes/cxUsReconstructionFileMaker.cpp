@@ -8,19 +8,19 @@
 #include <vtkImageData.h>
 #include "vtkImageAppend.h"
 #include "vtkMetaImageWriter.h"
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
-#include "sscXmlOptionItem.h"
-#include "sscTimeKeeper.h"
-#include "sscDataReaderWriter.h"
-#include "sscUSFrameData.h"
+#include "cxXmlOptionItem.h"
+#include "cxTimeKeeper.h"
+#include "cxDataReaderWriter.h"
+#include "cxUSFrameData.h"
 #include "cxSavingVideoRecorder.h"
 #include "cxImageDataContainer.h"
 #include "cxUSReconstructInputDataAlgoritms.h"
-#include "sscCustomMetaImage.h"
-#include "sscLogger.h"
+#include "cxCustomMetaImage.h"
+#include "cxLogger.h"
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
@@ -52,7 +52,7 @@ USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageDataCo
                                                                           bool writeColor, Transform3D rMpr)
 {
 	if(trackerRecordedData.empty())
-		messageManager()->sendWarning("No tracking data for writing to reconstruction file.");
+		reportWarning("No tracking data for writing to reconstruction file.");
 
 	USReconstructInputData retval;
 
@@ -108,7 +108,7 @@ bool UsReconstructionFileMaker::writeTrackerTimestamps(QString reconstructionFol
 	QFile file(reconstructionFolder+"/"+session+".tts");
 	if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
-		messageManager()->sendError("Cannot open "+file.fileName());
+		reportError("Cannot open "+file.fileName());
 		return success;
 	}
 	QTextStream stream(&file);
@@ -144,7 +144,7 @@ bool UsReconstructionFileMaker::writeTransforms(QString filename, std::vector<Ti
 	QFile file(filename);
 	if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
-		messageManager()->sendError("Cannot open "+file.fileName());
+		reportError("Cannot open "+file.fileName());
 		return success;
 	}
 	QTextStream stream(&file);
@@ -184,7 +184,7 @@ bool UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder, 
 	QFile file(reconstructionFolder+"/"+session+".fts");
 	if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
-		messageManager()->sendError("Cannot open "+file.fileName());
+		reportError("Cannot open "+file.fileName());
 		return success;
 	}
 	QTextStream stream(&file);
@@ -262,7 +262,7 @@ void UsReconstructionFileMaker::report()
 {
 	foreach(QString string, mReport)
 	{
-		messageManager()->sendSuccess(string);
+		reportSuccess(string);
 	}
 }
 
@@ -296,7 +296,7 @@ void UsReconstructionFileMaker::writeMask(QString path, QString session, vtkImag
 	QString filename = QString("%1/%2.mask.mhd").arg(path).arg(session);
 	if (!mask)
 	{
-		messageManager()->sendWarning(QString("No mask found, ignoring write to %1").arg(filename));
+		reportWarning(QString("No mask found, ignoring write to %1").arg(filename));
 		return;
 	}
 
@@ -403,7 +403,7 @@ void UsReconstructionFileMaker::writeREADMEFile(QString reconstructionFolder, QS
 	QFile file(reconstructionFolder+"/"+session+".README.txt");
 	if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
-		messageManager()->sendError("Cannot open "+file.fileName());
+		reportError("Cannot open "+file.fileName());
 		return;
 	}
 	QTextStream stream(&file);

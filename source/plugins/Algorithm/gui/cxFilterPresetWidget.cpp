@@ -15,7 +15,7 @@
 #include "cxFilterPresetWidget.h"
 
 #include <QMessageBox>
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 #include "cxFilter.h"
 
 namespace cx {
@@ -27,7 +27,7 @@ FilterPresetWidget::FilterPresetWidget(QWidget* parent) :
 void FilterPresetWidget::setFilter(FilterPtr filter)
 {
 	if(!filter->hasPresets()){
-		messageManager()->sendError("Cannot use filter "+filter->getName()+" in the FilterPresetWidget because it does not have any presets.");
+		reportError("Cannot use filter "+filter->getName()+" in the FilterPresetWidget because it does not have any presets.");
 		return;
 	}
 
@@ -51,7 +51,7 @@ void FilterPresetWidget::saveSlot()
 void FilterPresetWidget::deleteSlot()
 {
 	if (mPresets->isDefaultPreset(PresetWidget::getCurrentPreset())) {
-		messageManager()->sendWarning("It is not possible to delete one of the default presets");
+		reportWarning("It is not possible to delete one of the default presets");
 		return;
 	}
 

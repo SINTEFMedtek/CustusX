@@ -14,7 +14,7 @@
 
 #include "cxFileInputWidget.h"
 #include <QtGui>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include <iostream>
 
 namespace cx

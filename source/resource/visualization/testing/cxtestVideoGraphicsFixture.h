@@ -14,10 +14,10 @@
 #ifndef CXTESTVIDEOGRAPHICSFIXTURE_H_
 #define CXTESTVIDEOGRAPHICSFIXTURE_H_
 
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 
-#include "sscVideoGraphics.h"
-#include "sscProbeData.h"
+#include "cxVideoGraphics.h"
+#include "cxProbeData.h"
 #include "cxtestRenderTester.h"
 
 namespace cxtest

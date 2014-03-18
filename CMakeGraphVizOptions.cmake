@@ -1,0 +1,7 @@
+#set(GRAPHVIZ_EXECUTABLES OFF)
+#set(GRAPHVIZ_STATIC_LIBS OFF)
+#set(GRAPHVIZ_SHARED_LIBS OFF)
+#set(GRAPHVIZ_MODULE_LIBS OFF)
+set(GRAPHVIZ_EXTERNAL_LIBS OFF)
+set(GRAPHVIZ_IGNORE_TARGETS "Catch;TestGEInterface_CppUnit_CTest;cxResourceVisualizationTestUtilities;cisstTestsMain;cxMemoryTester;cxtestUtilities")
+#set(GRAPHVIZ_IGNORE_TARGETS_REGEX "*Test*")

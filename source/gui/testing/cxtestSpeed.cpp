@@ -17,8 +17,8 @@
 #include <QTimer>
 #include <vtkImageData.h>
 
-#include "sscImage.h"
-#include "sscView.h"
+#include "cxImage.h"
+#include "cxView.h"
 #include "cxtestSender.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
@@ -28,7 +28,8 @@
 #include "cxtestJenkinsMeasurement.h"
 #include "cxtestRenderTester.h"
 #include "cxViewManager.h"
-
+#include "cxLegacySingletons.h"
+#include "cxMessageListener.h"
 
 namespace cxtest
 {
@@ -67,9 +68,30 @@ double calculateFPS(bool slicing)
 
 }
 
-TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][not_win32]")
+TEST_CASE("CustusX full run emits no errors, correct service shutdown.", "[integration][not_win32][not_win64]")
 {
 	initTest();
+	cx::MessageListenerPtr messageListener = cx::MessageListener::create();
+
+	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
+	cx::settings()->setValue("Automation/autoStartStreaming", "false");
+
+	CustusXController custusX(NULL);
+	custusX.mPatientFolder = cx::DataLocations::getTestDataPath() + "/Phantoms/Kaisa/CustusX/Speed_Test_Kaisa.cx3";
+	custusX.mBaseTime = 1;
+	custusX.start();
+	qApp->exec();
+	custusX.stop();
+
+	// the original argument for this test was to check if LogicManager succeeds in deleting
+	// all services: Failure to do so sends an error to the Reporter.
+	CHECK(!messageListener->containsErrors());
+}
+
+TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][not_win32][not_win64]")
+{
+	initTest();
+
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
 
 	JenkinsMeasurement jenkins;
@@ -83,7 +105,7 @@ TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][n
 	REQUIRE(fps > minimumFPS);
 }
 
-TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration][not_win32]")
+TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration][not_win32][not_win64]")
 {
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
@@ -99,7 +121,7 @@ TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration][
 	REQUIRE(fps > minimumFPS);
 }
 
-TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integration][not_win32]")
+TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integration][not_win32][not_win64]")
 {
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
@@ -129,7 +151,7 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper renderer", "[speed][gui][
 	jenkins.createOutput("FPS_vtkOpenGLGPUMultiVolumeRayCastMapper", QString::number(fps));
 
 	// TODO: enter this value into config file
-	double minimumFPS = 5;
+//	double minimumFPS = 5;
 //	REQUIRE(fps > minimumFPS);
 	REQUIRE(true);
 }
@@ -147,9 +169,10 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper with slicing", "[speed][g
 	jenkins.createOutput("FPS_vtkOpenGLGPUMultiVolumeRayCastMapper_Slicing", QString::number(fps));
 
 	// TODO: enter this value into config file
-	double minimumFPS = 5;
+//	double minimumFPS = 5;
 //	REQUIRE(fps > minimumFPS);
 	REQUIRE(true);
 }
+
 
 }//namespace cx

@@ -11,12 +11,12 @@
 #include <QTextEdit>
 #include <QTimer>
 
-#include "sscDataManager.h"
-#include "sscDummyTool.h"
-#include "sscTypeConversions.h"
-#include "sscData.h"
-#include "sscConsoleWidget.h"
-#include "sscImage.h"
+#include "cxDataManager.h"
+#include "cxDummyTool.h"
+#include "cxTypeConversions.h"
+#include "cxData.h"
+#include "cxConsoleWidget.h"
+#include "cxImage.h"
 #include "cxPatientData.h"
 #include "cxCyclicActionLogger.h"
 #include "cxToolManager.h"
@@ -76,17 +76,17 @@ void CustusXController::loadPatientSlot()
   cx::stateService()->getWorkflow()->setActiveState("NavigationUid");
   mMainWindow->setGeometry( 0, 0, 2560, 1440);
 
-  if (!cx::DataManager::getInstance()->getImages().size())
+  if (!cx::dataService()->getImages().size())
 		return;
 
-  cx::ImagePtr image = cx::DataManager::getInstance()->getImages().begin()->second;
+  cx::ImagePtr image = cx::dataService()->getImages().begin()->second;
   cx::DoubleBoundingBox3D bb_r = transform(image->get_rMd(), image->boundingBox());
 
-  cx::DataManager::getInstance()->setCenter(bb_r.center());
+  cx::dataService()->setCenter(bb_r.center());
 
-  cx::DummyToolPtr dummyTool(new cx::DummyTool(cx::cxToolManager::getInstance()));
+  cx::DummyToolPtr dummyTool(new cx::DummyTool(cx::trackingService()));
   dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
-  cx::cxToolManager::getInstance()->runDummyTool(dummyTool);
+  cx::trackingService()->runDummyTool(dummyTool);
 }
 
 
@@ -97,7 +97,7 @@ void CustusXController::enableSlicingSlot()
 
 	//	ImagePtr image = dataManager()->getActiveImage();
 		std::map<QString, cx::ImagePtr> imageMap = cx::dataManager()->getImages();
-		if(imageMap.size() > 0)
+		if(!imageMap.empty())
 		{
 			cx::ImagePtr image = imageMap.begin()->second;
 			interactiveClipper->setImage(image);

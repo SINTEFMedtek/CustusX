@@ -15,11 +15,13 @@
 #ifndef CXLAPFRAMETOOLCALIBRATIONWIDGET_H_
 #define CXLAPFRAMETOOLCALIBRATIONWIDGET_H_
 
+#include "cxTransform3D.h"
+#include "cxVector3D.h"
 #include "cxBaseWidget.h"
-#include "sscCoordinateSystemHelpers.h"
-#include "sscForwardDeclarations.h"
+#include "cxCoordinateSystemHelpers.h"
+#include "cxForwardDeclarations.h"
 #include "cxDataInterface.h"
-#include "sscDoubleDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
 
 class QPushButton;
 class QGroupBox;
@@ -29,7 +31,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxPluginCalibration
+ * \addtogroup cx_plugin_calibration
  * @{
  */
 

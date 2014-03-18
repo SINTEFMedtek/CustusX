@@ -45,6 +45,7 @@ if (BUILD_TESTING)
             cxtestCatchImpl
 	    cxtestCatchExamples.cpp
             cxtestJenkinsMeasurement
+    		cxtestDummyDataManager
             )
 	include_directories(
 	    .

@@ -18,18 +18,21 @@
 #include "boost/shared_ptr.hpp"
 #include <QString>
 #include <QObject>
-#include "sscForwardDeclarations.h"
-#include "vtkForwardDeclarations.h"
-#include "sscTransform3D.h"
+#include "cxForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
+#include "cxTransform3D.h"
 #include <QDomDocument>
 
 class QDomDocument;
 
 namespace cx
 {
+
+class DataManager;
+
 /**
  * \file
- * \addtogroup cxServicePatient
+ * \addtogroup cx_service_patient
  * @{
  */
 
@@ -43,7 +46,7 @@ QDomElement getElementForced(QDomNode root, QString path);
 /**
  * \brief Functionality for storing patient data in a folder on the disk
  * and access to these data.
- * \ingroup cxServicePatient
+ * \ingroup cx_service_patient
  *
  * Keeps track of a single active patient (patient folder).
  * Only one such patient can be active at a time, since the
@@ -57,7 +60,7 @@ class PatientData: public QObject
 {
 Q_OBJECT
 public:
-	PatientData();
+	explicit PatientData(DataServicePtr dataManager);
 	virtual ~PatientData();
 
 	QString getActivePatientFolder() const;
@@ -121,6 +124,7 @@ private:
 	//Patient
 	QString mActivePatientFolder; ///< Folder for storing the files for the active patient. Path relative to globalPatientDataFolder.
 	QDomDocument mWorkingDocument; ///< available during load and save, used to add/extract extra info from the file.
+	DataServicePtr mDataManager;
 };
 
 typedef boost::shared_ptr<PatientData> PatientDataPtr;

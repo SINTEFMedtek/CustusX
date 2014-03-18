@@ -1,10 +1,11 @@
 #ifndef CXCROPPINGWIDGET_H_
 #define CXCROPPINGWIDGET_H_
 
-#include "sscForwardDeclarations.h"
-#include "sscStringDataAdapter.h"
+#include "cxForwardDeclarations.h"
+#include "cxStringDataAdapter.h"
 #include "cxViewManager.h"
 #include "cxBaseWidget.h"
+#include "cxLegacySingletons.h"
 
 #include "cxBoundingBoxWidget.h"
 
@@ -16,7 +17,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxGUI
+ * \addtogroup cx_gui
  * @{
  */
 

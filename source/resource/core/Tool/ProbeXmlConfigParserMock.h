@@ -11,6 +11,7 @@
  *  \brief Moc implementation of abstract interface ProbeXmlConfigParser
  *  All function return dummy values
  *
+ * \ingroup cx_resource_core_tool
  *  \date Jun 4, 2013
  *  \author Ole Vegard Solberg, SINTEF
  */

@@ -10,11 +10,16 @@
 #include <QToolButton>
 #include <QAction>
 #include <iostream>
-#include "sscOptimizedUpdateWidget.h"
+#include "cxOptimizedUpdateWidget.h"
+
+/**
+* \file
+* \addtogroup cx_resource_widgets
+* @{
+*/
 
 /** Frame descendant with dedicated style sheet: framed
   *
-  * \ingroup cxGUI
   * \date Nov 25, 2012
   * \author Christian Askeland, SINTEF
   */
@@ -28,7 +33,6 @@ public:
 
 /** QToolButton descendant with dedicated style sheet: rounded corners
   *
-  * \ingroup cxGUI
   * \date Feb 4, 2014
   * \author Christian Askeland, SINTEF
   */
@@ -41,7 +45,6 @@ public:
 
 /** QToolButton descendant with dedicated style sheet: smaller
   *
-  * \ingroup cxGUI
   * \date Nov 25, 2012
   * \author Christian Askeland, SINTEF
   */
@@ -59,7 +62,6 @@ namespace cx
  * \class BaseWidget
  *
  * \brief Interface for QWidget which handles widgets uniformly for the system.
- * \ingroup cxGUI
  *
  * \date 28. sep. 2010
  * \author Janne Beate Bakeng, SINTEF
@@ -117,4 +119,9 @@ private:
 };
 
 }
+
+/**
+* @}
+*/
+
 #endif /* CXBASEWIDGET_H_ */

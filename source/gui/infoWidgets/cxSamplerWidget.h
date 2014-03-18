@@ -16,10 +16,10 @@
 
 #include "cxBaseWidget.h"
 
-#include "sscStringDataAdapterXml.h"
-#include "sscVector3DDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxVector3DDataAdapterXml.h"
 #include "cxDominantToolProxy.h"
-#include "sscPointMetric.h"
+#include "cxPointMetric.h"
 
 namespace cx
 {
@@ -28,7 +28,7 @@ namespace cx
  * Utility for sampling the current tool point.
  * Displays the current tool tip position in a selected coordinate system.
  *
- * \ingroup cxGUI
+ * \ingroup cx_gui
  * \date feb 1, 2013, 2013
  * \author christiana
  */
@@ -50,7 +50,7 @@ private:
 
 	QHBoxLayout* mLayout;
 	StringDataAdapterXmlPtr mSpaceSelector;
-	CoordinateSystemListenerPtr mListener;
+	SpaceListenerPtr mListener;
 	DominantToolProxyPtr mActiveTool;
 	QLineEdit* mCoordLineEdit;
 	QAction* mAdvancedAction;

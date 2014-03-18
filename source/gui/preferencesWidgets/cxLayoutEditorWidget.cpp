@@ -8,9 +8,9 @@
 #include "cxLayoutEditorWidget.h"
 #include <iostream>
 #include <QtGui>
-#include "sscTypeConversions.h"
-#include "sscDefinitionStrings.h"
-#include "sscUtilHelpers.h"
+#include "cxTypeConversions.h"
+#include "cxDefinitionStrings.h"
+#include "cxUtilHelpers.h"
 #include "cxViewManager.h"
 
 namespace cx

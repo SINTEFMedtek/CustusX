@@ -10,17 +10,17 @@
 #include <QSlider>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscPickerRep.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
+#include "cxPickerRep.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxRepManager.h"
 #include "cxRegistrationManager.h"
 #include "cxViewManager.h"
 #include "cxSettings.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxLandmarkRep.h"
-#include "sscView.h"
+#include "cxView.h"
 
 namespace cx
 {
@@ -31,7 +31,7 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegistrationMan
 	mActiveImageAdapter = ActiveImageStringDataAdapter::New();
 	mImageLandmarkSource = ImageLandmarksSource::New();
 
-	mDominantToolProxy = DominantToolProxy::New();
+	mDominantToolProxy = DominantToolProxy::New(trackingService());
 	connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableButtons()));
 	connect(mDominantToolProxy.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(enableButtons()));
 
@@ -109,7 +109,7 @@ void LandmarkImageRegistrationWidget::addLandmarkButtonClickedSlot()
 	PickerRepPtr PickerRep = this->getPickerRep();
 	if (!PickerRep)
 	{
-		messageManager()->sendError("Could not find a rep to add the landmark to.");
+		reportError("Could not find a rep to add the landmark to.");
 		return;
 	}
 
@@ -120,7 +120,7 @@ void LandmarkImageRegistrationWidget::addLandmarkButtonClickedSlot()
 	QString uid = dataManager()->addLandmark();
 	Vector3D pos_r = PickerRep->getPosition();
 	Vector3D pos_d = image->get_rMd().inv().coord(pos_r);
-	image->setLandmark(Landmark(uid, pos_d));
+	image->getLandmarks()->setLandmark(Landmark(uid, pos_d));
 
     this->activateLandmark(uid);
 }
@@ -131,7 +131,7 @@ void LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot()
 	PickerRepPtr PickerRep = this->getPickerRep();
 	if (!PickerRep)
 	{
-		messageManager()->sendError("Could not find a rep to edit the landmark for.");
+		reportError("Could not find a rep to edit the landmark for.");
 		return;
 	}
 
@@ -142,7 +142,7 @@ void LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot()
 	QString uid = mActiveLandmark;
 	Vector3D pos_r = PickerRep->getPosition();
 	Vector3D pos_d = image->get_rMd().inv().coord(pos_r);
-	image->setLandmark(Landmark(uid, pos_d));
+	image->getLandmarks()->setLandmark(Landmark(uid, pos_d));
 
     this->activateLandmark(this->getNextLandmark());
 }
@@ -154,7 +154,7 @@ void LandmarkImageRegistrationWidget::removeLandmarkButtonClickedSlot()
 		return;
 
     QString next = this->getNextLandmark();
-    image->removeLandmark(mActiveLandmark);
+	image->getLandmarks()->removeLandmark(mActiveLandmark);
     this->activateLandmark(next);
 }
 
@@ -167,8 +167,6 @@ void LandmarkImageRegistrationWidget::cellClickedSlot(int row, int column)
 void LandmarkImageRegistrationWidget::enableButtons()
 {
 	bool selected = !mLandmarkTableWidget->selectedItems().isEmpty();
-//	bool tracking = toolManager()->getDominantTool() && !toolManager()->getDominantTool()->hasType(Tool::TOOL_MANUAL)
-//		&& toolManager()->getDominantTool()->getVisible();
 	bool loaded = dataManager()->getActiveImage() != 0;
 
 	// you might want to add landmarks using the tracking pointer in rare cases.
@@ -237,7 +235,7 @@ LandmarkMap LandmarkImageRegistrationWidget::getTargetLandmarks() const
 	if (!image)
 		return LandmarkMap();
 
-	return image->getLandmarks();
+	return image->getLandmarks()->getLandmarks();
 }
 
 /** Return transform from target space to reference space
@@ -256,7 +254,7 @@ void LandmarkImageRegistrationWidget::setTargetLandmark(QString uid, Vector3D p_
 	ImagePtr image = dataManager()->getActiveImage();
 	if (!image)
 		return;
-	image->setLandmark(Landmark(uid, p_target));
+	image->getLandmarks()->setLandmark(Landmark(uid, p_target));
 }
 
 QString LandmarkImageRegistrationWidget::getTargetName() const

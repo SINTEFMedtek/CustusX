@@ -22,8 +22,7 @@ namespace cx
 {
 
 /**
- * \class IGTLinkUSStatusMessage
- * \ingroup cxResourceOpenIGTLinkUtilities
+ * \ingroup cx_resource_OpenIGTLinkUtilities
  * \date Apr 16, 2012
  * \author Ole Vegard Solberg, SINTEF
  * \brief
@@ -43,7 +42,6 @@ double Width: Width of sector in mm for LINEAR, Width of sector in radians for S
 String DataFormat: Format of image. B-mode, Angio, Beamdata, etc.
 
  */
-
 class IGTLCommon_EXPORT IGTLinkUSStatusMessage : public igtl::MessageBase
 {
 public:
