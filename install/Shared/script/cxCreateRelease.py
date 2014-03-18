@@ -273,7 +273,7 @@ Thus, we get the following pattern:
             publish_tag=version.generateTag()
             self._increaseVersion(version, 'ALPHA')
         else:
-            publish_tag = ""            
+            publish_tag = '""'            
 
         if self.options.jenkins_release:
             self.jenkins_publish_release(publish_tag)

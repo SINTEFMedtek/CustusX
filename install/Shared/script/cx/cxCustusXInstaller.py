@@ -163,7 +163,7 @@ class CustusXInstaller:
         '''
         PrintFormatter.printHeader('copy/publish package to medtek server', level=2)
         remoteServer = "medtek.sintef.no"
-        remoteServerPath = "/Volumes/MedTekDisk/Software/CustusX/AutomatedReleases"
+        remoteServerPath = "/Volumes/MedTekEksternDisk/Software/CustusX/AutomatedReleases"
         #remoteServerPath = "/Users/christiana/publish_test" # test while server is down...
         targetFolder = os.path.split(path)[1]
 #        source = '%s/*' % path

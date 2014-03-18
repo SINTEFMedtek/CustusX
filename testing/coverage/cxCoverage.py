@@ -280,7 +280,7 @@ class Controller(object):
 		#print 'cwd ', os.getcwd()
 		#print 'shell.cwd ', shell.CWD
 		os.rename(self.mOutputPath, datedpath)
-		runShell('scp -r %s medtek.sintef.no:/Volumes/MedTekDisk/Software/CustusX/coverage' % datedpath)
+		runShell('scp -r %s medtek.sintef.no:/Volumes/MedTekEksternDisk/Software/CustusX/coverage' % datedpath)
 		os.rename(datedpath, self.mOutputPath)
 
 
