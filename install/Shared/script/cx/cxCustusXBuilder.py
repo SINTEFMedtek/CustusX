@@ -130,6 +130,8 @@ class CustusXBuilder:
     def removePreviousInstaller(self):
         PrintFormatter.printHeader('Removing previous installer', 3);
 
+        shell.removeTree(self._getStandardInstallerPackagePath()); # remove everything
+
         initialInstaller = self.createInstallerObject(installer_path=self._getInitialInstallerPackagePath())
         shell.rm_r(initialInstaller._getInstallerPackagePattern())
         
