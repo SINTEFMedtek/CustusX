@@ -116,7 +116,11 @@ class Controller:#(cx.cxBuildScript.BuildScript):
 ''' % (', '.join(self.basejobs), ', '.join(self.targets))
 
     def __init__(self):
-        self.basejobs = ['unit__base_', 'integration__base_', 'unstable__base_']
+        self.basejobs = ['clean_nightly_unit__base_']
+        self.basejobs = ['unit__base_', 
+                         'integration__base_', 
+                         'unstable__base_', 
+                         'clean_nightly_unit__base_']
         self.targets = ['ubuntu.12.04.x64', 'macosx.10.8', 'win32', 'win64', 'ubuntu.12.04.x64.amd']    
         self.argumentParser = self.getArgParser()
         self.options = self.argumentParser.parse_args()
