@@ -163,11 +163,21 @@ endfunction()
 #
 ###############################################################################
 function(cx_install_configuration_files)
+
+set(CONFIG_EXCLUDE_PATTERN "")
+if (NOT CX_LINUX)
+    set(CONFIG_EXCLUDE_PATTERN "elastix_linux64_v4.6/*")
+endif ()
+if (NOT CX_APPLE)
+    set(CONFIG_EXCLUDE_PATTERN "elastix_macosx64_v4.6/*")
+endif ()
+
 	install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/
 			DESTINATION ${CX_INSTALL_ROOT_DIR}/config
 			FILE_PERMISSIONS ${CX_FULL_PERMISSIONS}
 			DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
-			PATTERN "settings/*" EXCLUDE)
+			PATTERN "settings/*" EXCLUDE
+			PATTERN ${CONFIG_EXCLUDE_PATTERN} EXCLUDE)
 
 	# Install OpenCL kernels into bundle
 	install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction/TordReconstruct/kernels.cl
