@@ -80,7 +80,8 @@ class CustusXInstaller:
         PrintFormatter.printHeader('create local release folder', level=2)
         targetPath = self._generateReleaseFolderName()
         PrintFormatter.printInfo('Creating folder %s' % targetPath)
-        shell.run('mkdir -p %s' % targetPath)
+        #shell.run('mkdir -p %s' % targetPath)
+        shell.makeDirs(targetPath)
         installerFile = self.findInstallerFile()
         self._copyFile(installerFile, targetPath)
         self.copyReleaseFiles(targetPath)                        
@@ -178,7 +179,14 @@ class CustusXInstaller:
         PrintFormatter.printInfo('Publishing contents of [%s] to remote path [%s]' % (path, target))
 #        shell.run(cmd1)
 #        shell.run(cmd2)
-        cxSSH.copyFolderContentsToRemoteServer(remoteServer, path, target);
+        targetBasePath = '%s/%s' % (remoteServerPath, targetFolder) # need to create parent folder explicitly
+
+        transfer = cxSSH.RemoteFileTransfer()
+        transfer.connect(remoteServer)
+        transfer.remote_mkdir(targetBasePath)
+        transfer.copyFolderContentsToRemoteServer(path, target);
+        transfer.close()
+#        cxSSH.copyFolderContentsToRemoteServer(remoteServer, path, target);
         
     def _getUserFriendlyPlatformName(self):
         'generate a platform name understandable for users.'
