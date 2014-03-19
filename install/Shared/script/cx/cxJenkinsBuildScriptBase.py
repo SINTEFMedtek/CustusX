@@ -62,19 +62,12 @@ class JenkinsBuildScriptBase(cx.cxBuildScript.BuildScript):
         custusx = assembly.getComponent(cx.cxComponents.CustusX3)
         
         self.cxInstaller = self.cxBuilder.createInstallerObject()
-        #self.cxInstaller = cx.cxCustusXInstaller.CustusXInstaller()
-        #self.cxInstaller.setRootDir(assembly.controlData.getRootDir())
-        #self.cxInstaller.setInstallerPath(self.cxBuilder.getInstallerPackagePath())
-        #self.cxInstaller.setSourcePath(custusx.sourcePath())        
 
         self.cxInstallation = cx.cxCustusXTestInstallation.CustusXTestInstallation(
                 target_platform=self.controlData().getTargetPlatform(),                                                                    
                 root_dir=assembly.controlData.getRootDir(),
                 install_root=self.cxInstaller.getInstalledRoot(),
                 test_data_path=custusxdata.sourcePath())
-#        self.cxInstallation.setRootDir(assembly.controlData.getRootDir())
-#        self.cxInstallation.setTestDataPath(custusxdata.sourcePath())
-#        self.cxInstallation.setInstalledRoot(self.cxInstaller.getInstalledRoot()) 
 
     def resetInstallerStep(self):
         self.cxBuilder.removePreviousInstaller()
