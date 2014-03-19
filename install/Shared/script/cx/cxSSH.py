@@ -10,11 +10,13 @@ import os.path
 import cx.cxUtilities
 import platform
 import getpass
+import pkg_resources
 
 
 class RemoteFileTransfer:
     def __init__(self):
         self.paramiko = cx.cxUtilities.try_paramiko_import()
+        print 'paramiko version:', pkg_resources.get_distribution("paramiko").version
 
     def connect(self, remoteServer):
         self.host_name = remoteServer
@@ -37,7 +39,9 @@ class RemoteFileTransfer:
         https://github.com/paramiko/paramiko/pull/97
         '''
         conf = self.paramiko.SSHConfig()
-        conf.parse(open(os.path.expanduser('~/.ssh/config')))
+        path_to_config = os.path.expanduser('~/.ssh/config')
+        if os.path.exists(path_to_config):
+            conf.parse(open(path_to_config))
         host = conf.lookup(self.host_name)
         if 'user' in host:
             return host['user']
@@ -50,18 +54,27 @@ class RemoteFileTransfer:
         username = self._getUsername()
         print 'Username ', username
         agent_keys = agent.get_keys() + (rsa_private_key,)
+        success = False
         if len(agent_keys) == 0:
             print 'failed to authenticate, no keys'
             return False
         for key in agent_keys:
-            print 'Trying ssh-agent key %s' % key.get_fingerprint().encode('hex'),
-            try:
-                self.transport.auth_publickey(username, key)
-                print '... success!'
-            except self.paramiko.SSHException, e:
-                print '... failed!', e
-                return False
-        print "Authenticated successfully"
+            success = self._authenticate_using_key(username, key)
+            if success:
+                break
+        if success:
+            print "Authenticated successfully"
+        return success
+
+    def _authenticate_using_key(self, username, key):
+        print 'Trying ssh-agent key %s' % key.get_fingerprint().encode('hex'),
+        try:
+            self.transport.auth_publickey(username, key)
+            print '... success!'
+            print "more"
+        except self.paramiko.SSHException, e:
+            print '... failed!', e
+            return False
         return True
 
     def _getPrivateKey(self):
