@@ -26,8 +26,6 @@ import cx.cxComponents
 import cx.cxComponentAssembly
 import cx.cxCustusXBuilder
 import cx.cxBuildScript
-#import cx.cxCustusXInstaller
-#import cx.cxCustusXTestInstallation
 import jenkins # the python-jenkins module - alternative to jenkinsapi with ability to reconfigure job
 
 import pkg_resources

@@ -46,6 +46,9 @@ class CustusXInstaller:
         if(platform.system() == 'Windows'):
             self.install_root = '%s\\Installed' % self.root_dir
 
+    def setTargetPlatform(self, target_platform):
+        self.target_platform = target_platform  
+
     def getInstalledRoot(self):
         '''
         Return path to base of the installation 
@@ -179,14 +182,16 @@ class CustusXInstaller:
         
     def _getUserFriendlyPlatformName(self):
         'generate a platform name understandable for users.'
-        name = platform.system()
-        if platform.system() == 'Darwin':
-            # return name + platform.mac_ver() ??
-            return 'Apple'
-        elif platform.system() == 'Linux':
-            return platform.linux_distribution()[0]
-        else:
-            return platform.system()
+        name = self.target_platform.get_target_platform()
+        return name.title()
+#        name = platform.system()
+#        if platform.system() == 'Darwin':
+#            # return name + platform.mac_ver() ??
+#            return 'Apple'
+#        elif platform.system() == 'Linux':
+#            return platform.linux_distribution()[0]
+#        else:
+#            return platform.system()
 
     def installPackage(self):
         '''
