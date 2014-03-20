@@ -15,10 +15,10 @@
 
 #include <QDomDocument>
 #include <QDomElement>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscTime.h"
-#include "sscTool.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
+#include "cxTime.h"
+#include "cxTool.h"
 
 namespace cx
 {
@@ -90,7 +90,7 @@ void RecordSession::parseXml(QDomNode& parentNode)
 TimedTransformMap RecordSession::getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session)
 {
 	if(!tool)
-		messageManager()->sendError("RecordSession::getToolHistory_prMt(): Tool missing.");
+		reportError("RecordSession::getToolHistory_prMt(): Tool missing.");
 
 	TimedTransformMap retval;
 
@@ -99,7 +99,7 @@ TimedTransformMap RecordSession::getToolHistory_prMt(ToolPtr tool, RecordSession
 
 	if(retval.empty() && session)
 	{
-		messageManager()->sendError("Could not find any tracking data from session "+session->getUid()+". Volume data only will be written.");
+		reportError("Could not find any tracking data from session "+session->getUid()+". Volume data only will be written.");
 	}
 
 	return retval;

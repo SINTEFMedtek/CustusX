@@ -14,9 +14,9 @@
 
 #include <cxToolDataAdapters.h>
 
-#include "sscTypeConversions.h"
-#include "sscToolManager.h"
-#include "sscTool.h"
+#include "cxTypeConversions.h"
+#include "cxToolManager.h"
+#include "cxTool.h"
 
 namespace cx
 {

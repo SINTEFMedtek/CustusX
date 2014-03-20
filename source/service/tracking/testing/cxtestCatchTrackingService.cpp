@@ -15,7 +15,7 @@
 
 #include "catch.hpp"
 
-#include "sscDummyToolManager.h"
+#include "cxDummyToolManager.h"
 
 
 TEST_CASE("DummyToolManager setup/shutdown works multiple times", "[unit]")

@@ -25,9 +25,9 @@
 #include "vtkCamera.h"
 //#include "vtkSmartPointer.h"
 //#include "cxViewManager.h"
-#include "sscView.h"
+#include "cxView.h"
 #include <QDomNode>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

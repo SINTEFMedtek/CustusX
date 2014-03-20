@@ -13,22 +13,22 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
-#include "sscCoordinateSystemHelpers.h"
-#include "sscToolManager.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
+#include "cxCoordinateSystemHelpers.h"
+#include "cxToolManager.h"
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
-#include "sscPointMetric.h"
-#include "sscDistanceMetric.h"
-#include "sscDataManager.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxPointMetric.h"
+#include "cxDistanceMetric.h"
+#include "cxDataManager.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxVector3DWidget.h"
-#include "sscRegistrationTransform.h"
+#include "cxRegistrationTransform.h"
 #include "cxDataAdapterHelper.h"
 #include "cxBaseWidget.h"
-#include "sscBoolDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
 
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
@@ -143,7 +143,7 @@ void MetricReferenceArgumentListGui::pointSelected()
 		if (mArguments->validArgument(data))
 			mArguments->set(i, data);
 		else
-			messageManager()->sendWarning(QString("Failed to set data [%1] in metric, invalid argument.").arg(data?data->getName():"NULL"));
+			reportWarning(QString("Failed to set data [%1] in metric, invalid argument.").arg(data?data->getName():"NULL"));
 	}
 }
 

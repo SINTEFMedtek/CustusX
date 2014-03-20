@@ -118,17 +118,22 @@ class CustusXBuilder:
         shell.cp(source, dest)
 
     def createInstallerObject(self, installer_path=None):    
-        custusx = self.assembly.getComponent(cxComponents.CustusX3)
-        retval = cxCustusXInstaller.CustusXInstaller()
-        retval.setRootDir(self.assembly.controlData.getRootDir())
         if installer_path==None:
             installer_path = self._getStandardInstallerPackagePath()
+        custusx = self.assembly.getComponent(cxComponents.CustusX3)
+
+        retval = cxCustusXInstaller.CustusXInstaller()
+        retval.setRootDir(self.assembly.controlData.getRootDir())
         retval.setInstallerPath(installer_path)
         retval.setSourcePath(custusx.sourcePath())  
+        retval.setTargetPlatform(self.assembly.controlData.getTargetPlatform())  
+        
         return retval      
     
     def removePreviousInstaller(self):
         PrintFormatter.printHeader('Removing previous installer', 3);
+
+        shell.removeTree(self._getStandardInstallerPackagePath()); # remove everything
 
         initialInstaller = self.createInstallerObject(installer_path=self._getInitialInstallerPackagePath())
         shell.rm_r(initialInstaller._getInstallerPackagePattern())

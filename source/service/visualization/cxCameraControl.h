@@ -23,9 +23,9 @@
 #define CXCAMERACONTROL_H_
 
 #include <vector>
-#include "sscVector3D.h"
-//#include "sscDoubleWidgets.h"
-#include "sscForwardDeclarations.h"
+#include "cxVector3D.h"
+//#include "cxDoubleWidgets.h"
+#include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 

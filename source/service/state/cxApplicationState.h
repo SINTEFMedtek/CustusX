@@ -20,10 +20,10 @@
 #include <QStateMachine>
 #include <QString>
 #include <QAction>
-#include "sscEnumConverter.h"
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
+#include "cxEnumConverter.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
 #include "cxRequestEnterStateTransition.h"
 //#include "cxStateService.h"
 #include "cxPatientData.h"

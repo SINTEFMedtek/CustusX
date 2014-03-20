@@ -3,24 +3,24 @@
 #include <QtGui>
 #include <QVBoxLayout>
 #include "boost/bind.hpp"
-#include "sscToolManager.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscDoubleWidgets.h"
-#include "sscTypeConversions.h"
+#include "cxToolManager.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxDoubleWidgets.h"
+#include "cxTypeConversions.h"
 #include "cxPatientData.h"
 #include "cxSoundSpeedConversionWidget.h"
 #include "cxRecordSessionWidget.h"
 #include "cxSettings.h"
 #include "cxToolDataAdapters.h"
 #include "cxDoubleDataAdapterTemporalCalibration.h"
-#include "sscReconstructManager.h"
+#include "cxReconstructManager.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxProbeConfigWidget.h"
 #include "cxDisplayTimerWidget.h"
-#include "sscReconstructParams.h"
+#include "cxReconstructParams.h"
 #include "cxTimedAlgorithm.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscStringDataAdapterXml.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxStringDataAdapterXml.h"
 
 namespace cx
 {

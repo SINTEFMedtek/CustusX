@@ -26,51 +26,51 @@
 #include <vtkRenderer.h>
 #include <vtkImageData.h>
 
-#include "sscView.h"
-#include "sscSliceProxy.h"
-#include "sscSlicerRepSW.h"
-#include "sscToolRep2D.h"
-#include "sscDisplayTextRep.h"
-#include "sscMessageManager.h"
-#include "sscSlicePlanes3DRep.h"
-#include "sscDataManager.h"
-#include "sscMesh.h"
-#include "sscPickerRep.h"
-#include "sscGeometricRep.h"
-#include "sscToolRep3D.h"
-#include "sscVolumetricRep.h"
-#include "sscTypeConversions.h"
-#include "sscVideoSource.h"
-#include "sscVideoRep.h"
-#include "sscToolTracer.h"
-#include "sscOrientationAnnotation3DRep.h"
+#include "cxView.h"
+#include "cxSliceProxy.h"
+#include "cxSlicerRepSW.h"
+#include "cxToolRep2D.h"
+#include "cxDisplayTextRep.h"
+#include "cxReporter.h"
+#include "cxSlicePlanes3DRep.h"
+#include "cxDataManager.h"
+#include "cxMesh.h"
+#include "cxPickerRep.h"
+#include "cxGeometricRep.h"
+#include "cxToolRep3D.h"
+#include "cxVolumetricRep.h"
+#include "cxTypeConversions.h"
+#include "cxVideoSource.h"
+#include "cxVideoRep.h"
+#include "cxToolTracer.h"
+#include "cxOrientationAnnotation3DRep.h"
 #include "cxSettings.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxRepManager.h"
 #include "cxCameraControl.h"
 #include "cxLandmarkRep.h"
-#include "sscPointMetricRep.h"
-#include "sscDistanceMetricRep.h"
-#include "sscAngleMetricRep.h"
-#include "sscPlaneMetricRep.h"
+#include "cxPointMetricRep.h"
+#include "cxDistanceMetricRep.h"
+#include "cxAngleMetricRep.h"
+#include "cxPlaneMetricRep.h"
 #include "cxFrameMetricRep.h"
 #include "cxToolMetricRep.h"
-#include "sscDataMetricRep.h"
+#include "cxDataMetricRep.h"
 #include "cxDataLocations.h"
-#include "sscTexture3DSlicerRep.h"
-#include "sscSlices3DRep.h"
-#include "sscEnumConverter.h"
-#include "sscManualTool.h"
-#include "sscImage2DRep3D.h"
-#include "sscLogger.h"
+#include "cxTexture3DSlicerRep.h"
+#include "cxSlices3DRep.h"
+#include "cxEnumConverter.h"
+#include "cxManualTool.h"
+#include "cxImage2DRep3D.h"
+#include "cxLogger.h"
 
-#include "sscData.h"
-#include "sscAxesRep.h"
+#include "cxData.h"
+#include "cxAxesRep.h"
 #include "cxViewGroup.h"
 
-#include "sscAngleMetric.h"
-#include "sscDistanceMetric.h"
-#include "sscPointMetric.h"
+#include "cxAngleMetric.h"
+#include "cxDistanceMetric.h"
+#include "cxPointMetric.h"
 #include "cxSphereMetric.h"
 #include "cxShapedMetric.h"
 #include "cxSphereMetricRep.h"
@@ -81,6 +81,7 @@
 #include "cxMultiVolume3DRepProducer.h"
 #include "cxMetricNamesRep.h"
 #include "cxVisualizationServiceBackend.h"
+#include "cxNavigation.h"
 
 namespace cx
 {
@@ -175,7 +176,7 @@ ViewWrapper3D::~ViewWrapper3D()
 void ViewWrapper3D::initializeMultiVolume3DRepProducer()
 {
 	if (!mView)
-		messageManager()->sendError("Missing View in initializeMultiVolume3DRepProducer");
+		reportError("Missing View in initializeMultiVolume3DRepProducer");
 
 	if (!mMultiVolume3DRepProducer)
 	{
@@ -258,19 +259,8 @@ void ViewWrapper3D::updateMetricNamesRep()
 
 void ViewWrapper3D::PickerRepPointPickedSlot(Vector3D p_r)
 {
-	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
-	Vector3D p_pr = rMpr.inv().coord(p_r);
-
-	// set the picked point as offset tip
-	ManualToolPtr tool = mBackend->getToolManager()->getManualTool();
-	Vector3D offset = tool->get_prMt().vector(Vector3D(0, 0, tool->getTooltipOffset()));
-	p_pr -= offset;
-	p_r = rMpr.coord(p_pr);
-
-	// TODO set center here will not do: must handle
-	mBackend->getDataManager()->setCenter(p_r);
-	Vector3D p0_pr = tool->get_prMt().coord(Vector3D(0, 0, 0));
-	tool->set_prMt(createTransformTranslate(p_pr - p0_pr) * tool->get_prMt());
+	NavigationPtr nav = this->getNavigation();
+	nav->centerToPosition(p_r, Navigation::v2D);
 }
 
 void ViewWrapper3D::PickerRepDataPickedSlot(QString uid)
@@ -520,17 +510,28 @@ void ViewWrapper3D::resetCameraActionSlot()
 	this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
 }
 
+NavigationPtr ViewWrapper3D::getNavigation()
+{
+	CameraControlPtr camera3D(new CameraControl());
+	camera3D->setView(mView);
+
+	return NavigationPtr(new Navigation(mBackend, camera3D));
+}
+
 void ViewWrapper3D::centerImageActionSlot()
 {
+	NavigationPtr nav = this->getNavigation();
+
 	if (mBackend->getDataManager()->getActiveImage())
-		Navigation(mBackend).centerToData(mBackend->getDataManager()->getActiveImage());
+		nav->centerToData(mBackend->getDataManager()->getActiveImage());
 	else
-		Navigation(mBackend).centerToView(mGroupData->getData(DataViewProperties::create3D()));
+		nav->centerToView(mGroupData->getData(DataViewProperties::create3D()));
 }
 
 void ViewWrapper3D::centerToolActionSlot()
 {
-	Navigation(mBackend).centerToTooltip();
+	NavigationPtr nav = this->getNavigation();
+	nav->centerToTooltip();
 }
 
 void ViewWrapper3D::showSlicePlanesActionSlot(bool checked)
@@ -946,24 +947,24 @@ void ViewWrapper3D::setTranslucentRenderingToDepthPeeling(bool setDepthPeeling)
 
 		/*if (!IsDepthPeelingSupported(mView->getRenderWindow(), mView->getRenderer(), true))
 		{
-			messageManager()->sendWarning("GPU do not support depth peeling. Rendering of translucent surfaces is not supported");
+			reportWarning("GPU do not support depth peeling. Rendering of translucent surfaces is not supported");
 			success = false;
 		}
 		else*/ if (!SetupEnvironmentForDepthPeeling(mView->getRenderWindow(), mView->getRenderer(), 100, 0.1))
 		{
-			messageManager()->sendWarning("Error setting depth peeling");
+			reportWarning("Error setting depth peeling");
 			success = false;
 		}
 		else
 		{
-			messageManager()->sendInfo("Set GPU depth peeling");
+			report("Set GPU depth peeling");
 		}
 		if(!success)
 		  settings()->setValue("View3D/depthPeeling", false);
 	} else
 	{
 		if (TurnOffDepthPeeling(mView->getRenderWindow(), mView->getRenderer()))
-			messageManager()->sendInfo("Depth peeling turned off");
+			report("Depth peeling turned off");
 	}
 }
 

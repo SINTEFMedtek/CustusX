@@ -14,7 +14,7 @@
 #ifndef CXPLANETYPECOLLECTION_H
 #define CXPLANETYPECOLLECTION_H
 
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 #include <vector>
 #include <QStringList>
 

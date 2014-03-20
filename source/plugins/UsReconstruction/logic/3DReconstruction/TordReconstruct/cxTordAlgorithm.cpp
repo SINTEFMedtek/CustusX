@@ -1,7 +1,7 @@
 #include "cxTordAlgorithm.h"
 
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
 #include "HelperFunctions.hpp"
 #include <vtkImageData.h>
 #include <recConfig.h>
@@ -10,7 +10,8 @@
 namespace cx
 {
 TordAlgorithm::TordAlgorithm() :
-		mRuntime(new oul::RuntimeMeasurementsManager())
+		mRuntime(new oul::RuntimeMeasurementsManager()),
+		mKernelMeasurementName("tord_execute_kernel")
 {
 	oul::DeviceCriteria criteria;
 	criteria.setTypeCriteria(oul::DEVICE_TYPE_GPU);
@@ -26,7 +27,7 @@ TordAlgorithm::~TordAlgorithm()
 bool TordAlgorithm::initCL(QString kernelPath, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts, float brightnessWeight, float newnessWeight)
 {
 	// READ KERNEL FILE
-	messageManager()->sendInfo(QString("Kernel path: %1").arg(kernelPath));
+	report(QString("Kernel path: %1").arg(kernelPath));
 	std::string source = oul::readFile(kernelPath.toStdString());
 
 	// BUILD PROGRAM
@@ -53,8 +54,8 @@ cl::Program TordAlgorithm::buildCLProgram(std::string program_src, int nMaxPlane
 
 	} catch (cl::Error &error)
 	{
-		messageManager()->sendError("Could not build a OpenCL program. Reason: "+QString(error.what()));
-		messageManager()->sendError(qstring_cast(oul::getCLErrorString(error.err())));
+		reportError("Could not build a OpenCL program. Reason: "+QString(error.what()));
+		reportError(qstring_cast(oul::getCLErrorString(error.err())));
 	}
 	return retval;
 }
@@ -65,18 +66,18 @@ bool TordAlgorithm::initializeFrameBlocks(frameBlock_t* framePointers, int numBl
 	Eigen::Array3i dims = inputFrames->getDimensions();
 	size_t frameSize = dims[0] * dims[1];
 	size_t numFrames = dims[2];
-	messageManager()->sendInfo(QString("Input dims: (%1, %2, %3)").arg(dims[0]).arg(dims[1]).arg(dims[2]));
+	report(QString("Input dims: (%1, %2, %3)").arg(dims[0]).arg(dims[1]).arg(dims[2]));
 
 	// Find out how many frames needs to be in each block
 	size_t framesPerBlock = numFrames / numBlocks;
-	messageManager()->sendInfo(QString("Frames: %1, Blocks: %2, Frames per block: %3").arg(numFrames).arg(numBlocks).arg(framesPerBlock));
+	report(QString("Frames: %1, Blocks: %2, Frames per block: %3").arg(numFrames).arg(numBlocks).arg(framesPerBlock));
 
 	// Some blocks will need to contain one extra frame
 	// (numFrames and numBlocks is probably not evenly divisible)
 	size_t numBigBlocks = numFrames % numBlocks;
 
 	// Allocate the big blocks
-	messageManager()->sendInfo(QString("Allocating %1 big blocks outside of OpenCL").arg(numBigBlocks));
+	report(QString("Allocating %1 big blocks outside of OpenCL").arg(numBigBlocks));
 	for (unsigned int block = 0; block < numBigBlocks; block++)
 	{
 		framePointers[block].length = (1 + framesPerBlock) * frameSize;
@@ -84,7 +85,7 @@ bool TordAlgorithm::initializeFrameBlocks(frameBlock_t* framePointers, int numBl
 	}
 
 	// Then the small ones
-	messageManager()->sendInfo(QString("Allocating %1 small blocks outside of OpenCL").arg(numBlocks - numBigBlocks));
+	report(QString("Allocating %1 small blocks outside of OpenCL").arg(numBlocks - numBigBlocks));
 	for (int block = numBigBlocks; block < numBlocks; block++)
 	{
 		framePointers[block].length = (framesPerBlock) * frameSize;
@@ -106,6 +107,8 @@ bool TordAlgorithm::initializeFrameBlocks(frameBlock_t* framePointers, int numBl
 
 bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr outputData, float radius, int nClosePlanes)
 {
+	mMeasurementNames.clear();
+
 	int numBlocks = 10; // FIXME? needs to be the same as the number of input bscans to the voxel_method kernel
 
 	// Split input US into blocks
@@ -116,7 +119,7 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 
 	// Allocate CL memory for each frame block
 	VECTOR_CLASS<cl::Buffer> clBlocks;
-	messageManager()->sendInfo("Allocating OpenCL input block buffers");
+	report("Allocating OpenCL input block buffers");
 	for (int i = 0; i < numBlocks; i++)
 	{
 		//TODO why does the context suddenly contain a "dummy" device?
@@ -128,7 +131,7 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 
 	size_t outputVolumeSize = outputDims[0] * outputDims[1] * outputDims[2] * sizeof(unsigned char);
 
-	messageManager()->sendInfo(QString("Allocating CL output buffer, size %1").arg(outputVolumeSize));
+	report(QString("Allocating CL output buffer, size %1").arg(outputVolumeSize));
 
 	cl_ulong globalMemUse = 10 * inputBlocks[0].length + outputVolumeSize + sizeof(float) * 16 * nPlanes_numberOfInputImages + sizeof(cl_uchar) * input->getDimensions()[0] * input->getDimensions()[1];
 	if(isUsingTooMuchMemory(outputVolumeSize, inputBlocks[0].length, globalMemUse))
@@ -189,7 +192,7 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 			close_planes_size,
 			radius);
 
-	messageManager()->sendInfo(QString("Using %1 as local workgroup size").arg(local_work_size));
+	report(QString("Using %1 as local workgroup size").arg(local_work_size));
 
 	// We will divide the work into cubes of CUBE_DIM^3 voxels. The global work size is the total number of voxels divided by that.
 	int cube_dim = 4;
@@ -203,25 +206,11 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 
 	unsigned int queueNumber = 0;
 	cl::CommandQueue queue = mOulContex.getQueue(queueNumber);
-	if(mRuntime->isEnabled())
-	{
-		mRuntime->enable();
-		mRuntime->startCLTimer("kernel", queue);
-		mRuntime->startCLTimer("buffer", queue);
-	}
-	mOulContex.executeKernel(queue, mKernel, global_work_size, local_work_size);
-	if(mRuntime->isEnabled())
-		mRuntime->stopCLTimer("buffer", queue);
-	mOulContex.readBuffer(queue, outputBuffer, outputVolumeSize, outputData->GetScalarPointer());
-	if(mRuntime->isEnabled())
-	{
-		mRuntime->stopCLTimer("kernel", queue);
-		mRuntime->printAll();
-	}
-
+	this->measureAndExecuteKernel(queue, mKernel, global_work_size, local_work_size, mKernelMeasurementName);
+	this->measureAndReadBuffer(queue, outputBuffer, outputVolumeSize, outputData->GetScalarPointer(), "tord_read_buffer");
 
 	// Cleaning up
-	messageManager()->sendInfo(QString("Done, freeing GPU memory"));
+	report(QString("Done, freeing GPU memory"));
 	this->freeFrameBlocks(inputBlocks, numBlocks);
 	delete[] inputBlocks;
 
@@ -237,7 +226,7 @@ void TordAlgorithm::fillPlaneMatrices(float *planeMatrices, ProcessedUSInputData
 	// Sanity check on the number of frames
 	if (input->getDimensions()[2] != vecPosition.end() - vecPosition.begin())
 	{
-		messageManager()->sendError(QString("Number of frames %1 != %2 dimension 2 of US input").arg(input->getDimensions()[2]).arg(vecPosition.end() - vecPosition.begin()));
+		reportError(QString("Number of frames %1 != %2 dimension 2 of US input").arg(input->getDimensions()[2]).arg(vecPosition.end() - vecPosition.begin()));
 		return;
 	}
 
@@ -260,6 +249,25 @@ void TordAlgorithm::setProfiling(bool on)
 		mRuntime->enable();
 	else
 		mRuntime->disable();
+}
+
+double TordAlgorithm::getTotalExecutionTime()
+{
+	double totalExecutionTime = -1;
+	std::set<std::string>::iterator it;
+	for(it = mMeasurementNames.begin(); it != mMeasurementNames.end(); it++)
+	{
+		oul::RuntimeMeasurement measurement =  mRuntime->getTiming(*it);
+		totalExecutionTime += measurement.getSum();
+	}
+	return totalExecutionTime;
+}
+
+double TordAlgorithm::getKernelExecutionTime()
+{
+	double kernelExecutionTime = -1;
+	return mRuntime->getTiming(mKernelMeasurementName).getSum();
+
 }
 
 void TordAlgorithm::freeFrameBlocks(frameBlock_t *framePointers, int numBlocks)
@@ -327,7 +335,7 @@ size_t TordAlgorithm::calculateSpaceNeededForClosePlanes(cl::Kernel kernel, cl::
 	size_t constant_local_mem = sizeof(cl_float) * 4 * nPlanes_numberOfInputImages;
 
 	size_t varying_local_mem = (sizeof(cl_float) + sizeof(cl_short) + sizeof(cl_uchar) + sizeof(cl_uchar)) * (nClosePlanes + 1);  //see _close_plane struct in kernels.cl
-	messageManager()->sendInfo(QString("Device has %1 bytes of local memory").arg(dev_local_mem_size));
+	report(QString("Device has %1 bytes of local memory").arg(dev_local_mem_size));
 	dev_local_mem_size -= constant_local_mem + 128; //Hmmm? 128?
 
 	// How many work items can the local mem support?
@@ -362,24 +370,56 @@ bool TordAlgorithm::isUsingTooMuchMemory(size_t outputVolumeSize, size_t inputBl
 	cl_ulong globalMemSize = mOulContex.getDevice(deviceNumber).getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>();
 	if (maxAllocSize < outputVolumeSize)
 	{
-		messageManager()->sendError(QString("Output volume size too large! %1 > %2\n").arg(outputVolumeSize).arg(maxAllocSize));
+		reportError(QString("Output volume size too large! %1 > %2\n").arg(outputVolumeSize).arg(maxAllocSize));
 		usingTooMuchMemory = true;
 	}
 
 	if (maxAllocSize < inputBlocksLength)
 	{
-		messageManager()->sendError(QString("Input blocks too large! %1 > %2\n").arg(inputBlocksLength).arg(maxAllocSize));
+		reportError(QString("Input blocks too large! %1 > %2\n").arg(inputBlocksLength).arg(maxAllocSize));
 		usingTooMuchMemory = true;
 	}
 
 	if (globalMemSize < globalMemUse)
 	{
-		messageManager()->sendError(QString("Using too much global memory! %1 > %2").arg(globalMemUse).arg(globalMemSize));
+		reportError(QString("Using too much global memory! %1 > %2").arg(globalMemUse).arg(globalMemSize));
 		usingTooMuchMemory = true;
 	}
 
-	messageManager()->sendInfo(QString("Using %1 of %2 global memory").arg(globalMemUse).arg(globalMemSize));
+	report(QString("Using %1 of %2 global memory").arg(globalMemUse).arg(globalMemSize));
 	return usingTooMuchMemory;
 }
+
+void TordAlgorithm::measureAndExecuteKernel(cl::CommandQueue queue, cl::Kernel kernel, size_t global_work_size, size_t local_work_size, std::string measurementName)
+{
+	this->startProfiling(measurementName, queue);
+	mOulContex.executeKernel(queue, kernel, global_work_size, local_work_size);
+	this->stopProfiling(measurementName, queue);
+}
+
+void TordAlgorithm::measureAndReadBuffer(cl::CommandQueue queue, cl::Buffer outputBuffer, size_t outputVolumeSize, void *outputData, std::string measurementName)
+{
+	this->startProfiling(measurementName, queue);
+	mOulContex.readBuffer(queue, outputBuffer, outputVolumeSize, outputData);
+	this->stopProfiling(measurementName, queue);
+}
+
+void TordAlgorithm::startProfiling(std::string name, cl::CommandQueue queue) {
+	if(!mRuntime->isEnabled())
+		return;
+
+	mRuntime->startCLTimer(name, queue);
+	mMeasurementNames.insert(name);
+}
+
+void TordAlgorithm::stopProfiling(std::string name, cl::CommandQueue queue) {
+	if(!mRuntime->isEnabled())
+		return;
+
+	mRuntime->stopCLTimer(name, queue);
+	mRuntime->printAll();
+}
+
+
 
 } /* namespace cx */

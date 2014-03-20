@@ -24,9 +24,9 @@
 #include "cxVideoConnection.h"
 #include "cxVideoConnectionManager.h"
 #include "cxBasicVideoSource.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxVideoServiceBackend.h"
 
 namespace cx

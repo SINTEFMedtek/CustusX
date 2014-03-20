@@ -19,7 +19,7 @@
 #include "ItkVtkGlue/itkVTKImageToImageFilter.h"
 #include <itkImage.h>
 
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
 
 namespace cx

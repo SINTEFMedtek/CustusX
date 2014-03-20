@@ -14,10 +14,10 @@
 #ifndef CXTOOLMETRICREP_H
 #define CXTOOLMETRICREP_H
 
-#include "sscDataMetricRep.h"
-#include "sscGraphicalPrimitives.h"
+#include "cxDataMetricRep.h"
+#include "cxGraphicalPrimitives.h"
 #include "cxToolMetric.h"
-#include "sscViewportListener.h"
+#include "cxViewportListener.h"
 
 namespace cx
 {

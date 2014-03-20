@@ -22,15 +22,15 @@
 #include <vtkPolyDataNormals.h>
 #include <vtkImageData.h>
 
-#include "sscMessageManager.h"
-#include "sscRegistrationTransform.h"
-#include "sscTypeConversions.h"
-#include "sscImage.h"
-#include "sscMesh.h"
-#include "sscDataManager.h"
-#include "sscDoubleDataAdapterXml.h"
-#include "sscBoolDataAdapterXml.h"
-#include "sscColorDataAdapterXml.h"
+#include "cxReporter.h"
+#include "cxRegistrationTransform.h"
+#include "cxTypeConversions.h"
+#include "cxImage.h"
+#include "cxMesh.h"
+#include "cxDataManager.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
+#include "cxColorDataAdapterXml.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
 #include "cxRepManager.h"
@@ -198,7 +198,7 @@ bool ContourFilter::execute()
 	DoubleDataAdapterXmlPtr surfaceThresholdOption = this->getSurfaceThresholdOption(mCopiedOptions);
 	DoubleDataAdapterXmlPtr decimationOption = this->getDecimationOption(mCopiedOptions);
 
-	//    messageManager()->sendInfo(QString("Creating contour from \"%1\"...").arg(input->getName()));
+	//    report(QString("Creating contour from \"%1\"...").arg(input->getName()));
 
 	mRawResult = this->execute(input->getBaseVtkImageData(),
 	                           surfaceThresholdOption->getValue(),

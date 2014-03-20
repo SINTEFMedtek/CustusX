@@ -17,7 +17,7 @@
 
 #include <QObject>
 class QTimer;
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {

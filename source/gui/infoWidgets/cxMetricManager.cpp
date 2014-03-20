@@ -13,29 +13,29 @@
 // See CustusX_License.txt for more information.
 
 #include "cxMetricManager.h"
-#include "sscDataManager.h"
-#include "sscManualTool.h"
+#include "cxDataManager.h"
+#include "cxManualTool.h"
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewGroupData.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include <QFile>
-#include "sscMessageManager.h"
-#include "sscDataReaderWriter.h"
+#include "cxReporter.h"
+#include "cxDataReaderWriter.h"
 
-#include "sscRegistrationTransform.h"
-#include "sscPointMetric.h"
-#include "sscDistanceMetric.h"
+#include "cxRegistrationTransform.h"
+#include "cxPointMetric.h"
+#include "cxDistanceMetric.h"
 #include "cxFrameMetric.h"
 #include "cxToolMetric.h"
-#include "sscPlaneMetric.h"
+#include "cxPlaneMetric.h"
 #include "cxShapedMetric.h"
-#include "sscAngleMetric.h"
+#include "cxAngleMetric.h"
 #include "cxSphereMetric.h"
 #include "cxDataFactory.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 
 namespace cx
@@ -312,14 +312,14 @@ void MetricManager::loadReferencePointsSlot()
   ToolPtr refTool = toolManager()->getReferenceTool();
   if(!refTool) // we only load reference points from reference tools
   {
-	messageManager()->sendDebug("No reference tool, cannot load reference points into the pointsampler");
+	reporter()->sendDebug("No reference tool, cannot load reference points into the pointsampler");
 	return;
   }
 
   std::map<int, Vector3D> referencePoints_s = refTool->getReferencePoints();
   if(referencePoints_s.empty())
   {
-	messageManager()->sendWarning("No referenceppoints in reference tool "+refTool->getName());
+	reportWarning("No referenceppoints in reference tool "+refTool->getName());
 	return;
   }
 

@@ -9,9 +9,9 @@
 #define CXTRANSFORM3DWIDGET_H_
 
 #include "cxBaseWidget.h"
-#include "sscDoubleDataAdapterXml.h"
-#include "sscTransform3D.h"
-#include "sscFrame3D.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxTransform3D.h"
+#include "cxFrame3D.h"
 
 class QTextEdit;
 class QVBoxLayout;

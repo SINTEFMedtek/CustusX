@@ -2,7 +2,7 @@
 #define CXTOOLFILTERWIDGET_H_
 
 #include <QGroupBox>
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 #include "cxLegacySingletons.h"
 
 class QComboBox;

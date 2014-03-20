@@ -14,11 +14,11 @@
 
 #include "cxSelectDataStringDataAdapter.h"
 
-#include "sscImage.h"
-#include "sscImageAlgorithms.h"
-#include "sscMesh.h"
-#include "sscDataManager.h"
-#include "sscTypeConversions.h"
+#include "cxImage.h"
+#include "cxImageAlgorithms.h"
+#include "cxMesh.h"
+#include "cxDataManager.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

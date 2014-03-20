@@ -9,9 +9,9 @@
 #define BRANCH_H_
 
 #include <vector>
-#include "sscDataManager.h"
-#include "sscMesh.h"
-#include "sscVector3D.h"
+#include "cxDataManager.h"
+#include "cxMesh.h"
+#include "cxVector3D.h"
 
 typedef std::vector<double> dVector;
 typedef std::vector<dVector> dVectors;

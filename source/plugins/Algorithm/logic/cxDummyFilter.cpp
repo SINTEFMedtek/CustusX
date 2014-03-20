@@ -13,12 +13,12 @@
 // See CustusX_License.txt for more information.
 
 #include "cxDummyFilter.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxSelectDataStringDataAdapter.h"
-#include "sscData.h"
-#include "sscDoubleDataAdapterXml.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscBoolDataAdapterXml.h"
+#include "cxData.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
 
 namespace cx
 {

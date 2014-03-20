@@ -8,11 +8,11 @@
 #ifndef CXVECTOR3DWIDGET_H_
 #define CXVECTOR3DWIDGET_H_
 
-#include "sscVector3D.h"
+#include "cxVector3D.h"
 #include <QWidget>
 class QBoxLayout;
-#include "sscVector3DDataAdapter.h"
-#include "sscDoubleDataAdapterXml.h"
+#include "cxVector3DDataAdapter.h"
+#include "cxDoubleDataAdapterXml.h"
 
 namespace cx
 {

@@ -16,7 +16,7 @@
 #define CXPRESETWIDGET_H_
 
 #include "cxBaseWidget.h"
-#include "sscPresets.h"
+#include "cxPresets.h"
 
 class QComboBox;
 

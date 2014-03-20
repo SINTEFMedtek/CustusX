@@ -14,7 +14,7 @@
 #ifndef CXTOOLIMPL_H
 #define CXTOOLIMPL_H
 
-#include "sscTool.h"
+#include "cxTool.h"
 
 namespace cx
 {

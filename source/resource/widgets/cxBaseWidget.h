@@ -10,7 +10,7 @@
 #include <QToolButton>
 #include <QAction>
 #include <iostream>
-#include "sscOptimizedUpdateWidget.h"
+#include "cxOptimizedUpdateWidget.h"
 
 /**
 * \file

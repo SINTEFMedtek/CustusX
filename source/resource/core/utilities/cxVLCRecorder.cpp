@@ -1,7 +1,7 @@
 #include <cxVLCRecorder.h>
 
 #include <QFileInfo>
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 #include <QProcess>
 
 namespace cx
@@ -82,7 +82,7 @@ void VLCRecorder::startRecording(QString saveFile)
 	if(this->hasVLCApplication())
 		mCommandLine->launch("\""+mVLCPath+"\""+this->getVLCDefaultRecorderArguments(saveFile));
 	else
-		messageManager()->sendError("VLC not found.");
+		reportError("VLC not found.");
 }
 
 void VLCRecorder::stopRecording()
@@ -94,7 +94,7 @@ void VLCRecorder::stopRecording()
 void VLCRecorder::setVLCPath(QString path)
 {
 	mVLCPath = path;
-	messageManager()->sendInfo("Found valid VLC application: "+mVLCPath);
+	report("Found valid VLC application: "+mVLCPath);
 }
 
 bool VLCRecorder::isValidVLC(QString vlcPath)

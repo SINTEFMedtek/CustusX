@@ -2,7 +2,7 @@
 #define CXSOUNDSPEEDCONVERSIONWIDGET_H_
 
 #include "cxBaseWidget.h"
-#include "sscTool.h"
+#include "cxTool.h"
 #include "cxLegacySingletons.h"
 
 class QPushButton;

@@ -14,10 +14,10 @@
 
 #include "cxShapedMetric.h"
 
-#include "sscBoundingBox3D.h"
-#include "sscTypeConversions.h"
-#include "sscDataManager.h"
-#include "sscTypeConversions.h"
+#include "cxBoundingBox3D.h"
+#include "cxTypeConversions.h"
+#include "cxDataManager.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

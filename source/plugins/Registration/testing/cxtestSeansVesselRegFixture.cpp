@@ -3,12 +3,12 @@
 #include <vtkPolyData.h>
 #include <vtkPolyDataWriter.h>
 #include <vtkCellArray.h>
-#include "sscDataManager.h"
-#include "sscMesh.h"
+#include "cxDataManager.h"
+#include "cxMesh.h"
 #include "cxDataLocations.h"
 #include "vesselReg/SeansVesselReg.hxx"
-#include "sscRegistrationTransform.h"
-#include "sscTypeConversions.h"
+#include "cxRegistrationTransform.h"
+#include "cxTypeConversions.h"
 #include <QDir>
 #include "cxLogicManager.h"
 

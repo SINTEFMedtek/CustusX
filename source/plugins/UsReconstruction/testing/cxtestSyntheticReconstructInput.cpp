@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include "cxtestSyntheticReconstructInput.h"
-#include "sscDummyTool.h"
+#include "cxDummyTool.h"
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #include "cxtestSphereSyntheticVolume.h"
 

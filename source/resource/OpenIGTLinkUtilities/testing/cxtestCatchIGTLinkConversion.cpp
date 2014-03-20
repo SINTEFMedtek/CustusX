@@ -14,11 +14,11 @@
 
 #include "catch.hpp"
 
-#include "sscImage.h"
+#include "cxImage.h"
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
 #include "cxIGTLinkConversion.h"
-#include "sscVolumeHelpers.h"
+#include "cxVolumeHelpers.h"
 #include "vtkImageData.h"
 
 using namespace cx;

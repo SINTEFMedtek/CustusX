@@ -2,7 +2,7 @@
 
 #include <QPushButton>
 
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
 

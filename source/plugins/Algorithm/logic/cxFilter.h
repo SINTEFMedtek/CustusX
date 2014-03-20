@@ -17,8 +17,8 @@
 
 #include <vector>
 #include <QObject>
-#include "sscXmlOptionItem.h"
-#include "sscPresets.h"
+#include "cxXmlOptionItem.h"
+#include "cxPresets.h"
 #include "cxForwardDeclarations.h"
 class QDomElement;
 

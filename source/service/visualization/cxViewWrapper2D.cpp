@@ -32,37 +32,38 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 
-#include "sscUtilHelpers.h"
-#include "sscView.h"
-#include "sscSliceProxy.h"
-#include "sscSlicerRepSW.h"
-#include "sscToolRep2D.h"
-#include "sscOrientationAnnotationRep.h"
-#include "sscOrientationAnnotation2DRep.h"
-#include "sscDisplayTextRep.h"
-#include "sscMessageManager.h"
-#include "sscManualTool.h"
-#include "sscDataManager.h"
+#include "cxUtilHelpers.h"
+#include "cxView.h"
+#include "cxSliceProxy.h"
+#include "cxSlicerRepSW.h"
+#include "cxToolRep2D.h"
+#include "cxOrientationAnnotationRep.h"
+#include "cxOrientationAnnotation2DRep.h"
+#include "cxDisplayTextRep.h"
+#include "cxReporter.h"
+#include "cxManualTool.h"
+#include "cxDataManager.h"
 #include "cxViewManager.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxViewGroup.h"
-#include "sscDefinitionStrings.h"
-#include "sscSlicePlanes3DRep.h"
-#include "sscDefinitionStrings.h"
-#include "sscSliceComputer.h"
-#include "sscGeometricRep2D.h"
-#include "sscTexture3DSlicerRep.h"
+#include "cxDefinitionStrings.h"
+#include "cxSlicePlanes3DRep.h"
+#include "cxDefinitionStrings.h"
+#include "cxSliceComputer.h"
+#include "cxGeometricRep2D.h"
+#include "cxTexture3DSlicerRep.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
-#include "sscGLHelpers.h"
-#include "sscData.h"
-#include "sscMesh.h"
-#include "sscImage.h"
-#include "sscPointMetricRep2D.h"
-#include "sscLogger.h"
+#include "cxGLHelpers.h"
+#include "cxData.h"
+#include "cxMesh.h"
+#include "cxImage.h"
+#include "cxPointMetricRep2D.h"
+#include "cxLogger.h"
 #include "cxViewFollower.h"
 #include "cxVisualizationServiceBackend.h"
 #include "cx2DZoomHandler.h"
+#include "cxNavigation.h"
 
 namespace cx
 {
@@ -70,9 +71,7 @@ namespace cx
 ViewWrapper2D::ViewWrapper2D(ViewWidget* view, VisualizationServiceBackendPtr backend) :
 	ViewWrapper(backend),
 	mOrientationActionGroup(new QActionGroup(view))
-//	m2DZoomConnectivityActionGroup(new QActionGroup(view))
 {
-//  std::cout << "ViewWrapper2D create" << std::endl;
 	mView = view;
 	this->connectContextMenu(mView);
 
@@ -89,8 +88,6 @@ ViewWrapper2D::ViewWrapper2D(ViewWidget* view, VisualizationServiceBackendPtr ba
 
 	mZoom2D.reset(new Zoom2DHandler());
 	connect(mZoom2D.get(), SIGNAL(zoomChanged()), this, SLOT(viewportChanged()));
-//	mZoom2D->set
-//	setZoom2D(SyncedValue::create(1));
 	setOrientationMode(SyncedValue::create(0)); // must set after addreps()
 
 	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
@@ -105,7 +102,6 @@ ViewWrapper2D::ViewWrapper2D(ViewWidget* view, VisualizationServiceBackendPtr ba
 
 ViewWrapper2D::~ViewWrapper2D()
 {
-//  std::cout << "ViewWrapper2D delete" << std::endl;
 	if (mView)
 		mView->removeReps();
 }
@@ -122,7 +118,6 @@ void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
 	ortogonalAction->setCheckable(true);
 	ortogonalAction->setData(qstring_cast(otORTHOGONAL));
 	ortogonalAction->setChecked(getOrientationType() == otORTHOGONAL);
-	//ortogonalAction->setChecked(true);
 	connect(ortogonalAction, SIGNAL(triggered()), this, SLOT(orientationActionSlot()));
 
 	//TODO remove actiongroups?
@@ -133,25 +128,9 @@ void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
 	contextMenu.addAction(obliqueAction);
 	contextMenu.addAction(ortogonalAction);
 	contextMenu.addSeparator();
-//	contextMenu.addAction(global2DZoomAction);
 
 	mZoom2D->addActionsToMenu(&contextMenu);
-
-//	this->add2DZoomConnectivityAction("global", "Global 2D Zoom", contextMenu);
-//	this->add2DZoomConnectivityAction("group", "Group 2D Zoom", contextMenu);
-//	this->add2DZoomConnectivityAction("local", "Disconnected 2D Zoom", contextMenu);
-//	contextMenu.addSeparator();
 }
-
-//void ViewWrapper2D::add2DZoomConnectivityAction(QString type, QString text, QMenu& contextMenu)
-//{
-//	QAction* action = new QAction(text, &contextMenu);
-//	action->setCheckable(true);
-//	action->setData(type);
-//	action->setChecked(this->get2DZoomConnectivityType()==type);
-//	connect(action, SIGNAL(triggered()), this, SLOT(zoom2DActionSlot()));
-//	contextMenu.addAction(action);
-//}
 
 void ViewWrapper2D::setViewGroup(ViewGroupDataPtr group)
 {
@@ -184,47 +163,6 @@ void ViewWrapper2D::orientationActionSlot()
 	mOrientationMode->set(type);
 }
 
-///** Slot for the global zoom action
-//	 *  Set the global zoom flag in the view manager.
-//	 */
-//void ViewWrapper2D::zoom2DActionSlot()
-//{
-//	QAction* theAction = static_cast<QAction*>(sender());
-//	if(!theAction)
-//		return;
-
-//	QString action = theAction->data().toString();
-//	this->set2DZoomConnectivityFromType(action);
-//}
-
-//QString ViewWrapper2D::get2DZoomConnectivityType()
-//{
-//	if (mGroupData->getGroup2DZoom() == mZoom2D)
-//		return "group";
-//	if (mGroupData->getGlobal2DZoom() == mZoom2D)
-//		return "global";
-//	return "local";
-//}
-
-//void ViewWrapper2D::set2DZoomConnectivityFromType(QString type)
-//{
-//	if (type=="global")
-//	{
-//		this->setZoom2D(mGroupData->getGlobal2DZoom());
-//	}
-//	else if (type=="group")
-//	{
-//		this->setZoom2D(mGroupData->getGroup2DZoom());
-//	}
-//	else if (type=="local")
-//	{
-//		this->setZoom2D(SyncedValue::create(this->getZoomFactor2D()));
-//	}
-//	else
-//	{
-//		messageManager()->sendWarning(QString("No zoom connectivity found for type [%1].").arg(type));
-//	}
-//}
 
 void ViewWrapper2D::addReps()
 {
@@ -688,29 +626,6 @@ void ViewWrapper2D::setOrientationMode(SyncedValuePtr value)
 
 	orientationModeChanged();
 }
-
-//void ViewWrapper2D::setZoom2D(SyncedValuePtr value)
-//{
-//	if (mZoom2D)
-//		disconnect(mZoom2D.get(), SIGNAL(changed()), this, SLOT(viewportChanged()));
-//	mZoom2D = value;
-//	if (mZoom2D)
-//		connect(mZoom2D.get(), SIGNAL(changed()), this, SLOT(viewportChanged()));
-
-//	viewportChanged();
-//}
-
-//void ViewWrapper2D::setZoomFactor2D(double zoomFactor)
-//{
-//	zoomFactor = constrainValue(zoomFactor, 0.2, 10.0);
-//	mZoom2D->set(zoomFactor);
-//	viewportChanged();
-//}
-
-//double ViewWrapper2D::getZoomFactor2D() const
-//{
-//	return mZoom2D->get().toDouble();
-//}
 
 /**Part of the mouse interactor:
  * Move manual tool tip when mouse pressed

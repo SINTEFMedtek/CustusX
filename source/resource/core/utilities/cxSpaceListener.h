@@ -14,7 +14,7 @@
 #ifndef CXSPACELISTENER_H
 #define CXSPACELISTENER_H
 
-#include "sscCoordinateSystemHelpers.h"
+#include "cxCoordinateSystemHelpers.h"
 #include <QObject>
 
 namespace cx

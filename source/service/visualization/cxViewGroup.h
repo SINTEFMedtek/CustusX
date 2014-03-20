@@ -18,9 +18,9 @@
 #include <vector>
 #include <QObject>
 #include <QDomDocument>
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
-#include "sscVector3D.h"
+#include "cxVector3D.h"
 
 class QMenu;
 class QPoint;
@@ -31,6 +31,7 @@ typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
 typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
+typedef boost::shared_ptr<class Navigation> NavigationPtr;
 
 /**
  * \file
@@ -38,28 +39,6 @@ typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServic
  * @{
  */
 
-/**Helper for functions independent of state.
- * Not sure if we need this - think of better place.
- *
- */
-class Navigation
-{
-public:
-	Navigation(VisualizationServiceBackendPtr backend);
-	void centerToData(DataPtr image);
-	void centerToView(const std::vector<DataPtr>& images);
-	void centerToGlobalDataCenter();
-	void centerToTooltip();
-	void moveManualToolToPosition(Vector3D& p_r);
-
-private:
-	VisualizationServiceBackendPtr mBackend;
-	Vector3D findViewCenter(const std::vector<DataPtr>& images);
-	Vector3D findGlobalDataCenter();
-	Vector3D findDataCenter(std::vector<DataPtr> data);
-
-};
-typedef boost::shared_ptr<Navigation> NavigationPtr;
 
 /**
  * \brief

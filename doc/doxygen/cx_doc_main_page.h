@@ -75,8 +75,8 @@ namespace cx
  * The layers are organized as a directed graph. A lower layer may never access
  * components from a higher layer. I.e: Logic may never control \ref cx_gui, but
  * \ref cx_logic may freely access \ref cx_logic (and \ref cx_service + \ref
- * cx_resource ). Objects within the same layer can interact, but this should be
- * kept to a minimum.
+ * cx_resource ). Objects within the same layer can interact, but only according
+ * to the rules of that layer.
  *
  * The \ref cx_plugins extends the core by adding specific functionality. Examples of
  * plugins are: Segmentation, Registration, Data Acquisition, 3D US

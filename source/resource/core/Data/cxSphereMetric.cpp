@@ -14,9 +14,9 @@
 
 #include "cxSphereMetric.h"
 
-#include "sscBoundingBox3D.h"
-#include "sscTypeConversions.h"
-#include "sscDataManager.h"
+#include "cxBoundingBox3D.h"
+#include "cxTypeConversions.h"
+#include "cxDataManager.h"
 
 namespace cx
 {

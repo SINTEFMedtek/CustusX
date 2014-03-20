@@ -23,8 +23,8 @@
 #include <QThread>
 #include <QMutex>
 
-#include "sscImage.h"
-#include "sscTool.h"
+#include "cxImage.h"
+#include "cxTool.h"
 
 namespace cx
 {

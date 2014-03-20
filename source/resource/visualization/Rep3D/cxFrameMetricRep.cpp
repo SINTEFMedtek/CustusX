@@ -14,7 +14,7 @@
 
 #include "cxFrameMetricRep.h"
 
-#include "sscView.h"
+#include "cxView.h"
 #include "boost/bind.hpp"
 #include "cxGraphicalAxes3D.h"
 

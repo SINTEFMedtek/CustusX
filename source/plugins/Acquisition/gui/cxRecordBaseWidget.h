@@ -3,8 +3,8 @@
 
 #include <QWidget>
 #include "cxBaseWidget.h"
-#include "sscTool.h"
-#include "sscVideoRecorder.h"
+#include "cxTool.h"
+#include "cxVideoRecorder.h"
 #include "cxRecordSession.h"
 #include "cxAcquisitionData.h"
 

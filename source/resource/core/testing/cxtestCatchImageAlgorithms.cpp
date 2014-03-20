@@ -13,13 +13,13 @@
 // See CustusX_License.txt for more information.
 
 #include "catch.hpp"
-#include "sscImageAlgorithms.h"
+#include "cxImageAlgorithms.h"
 
 #include <vtkImageData.h>
-#include "sscDataManager.h"
-#include "sscImage.h"
-#include "sscImageTF3D.h"
-#include "sscImageLUT2D.h"
+#include "cxDataManager.h"
+#include "cxImage.h"
+#include "cxImageTF3D.h"
+#include "cxImageLUT2D.h"
 #include "cxDataLocations.h"
 #include "cxtestDummyDataManager.h"
 

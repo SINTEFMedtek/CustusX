@@ -2,10 +2,10 @@
 
 #include <QPushButton>
 #include <QLabel>
-#include "sscTypeConversions.h"
-#include "sscToolManager.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
+#include "cxTypeConversions.h"
+#include "cxToolManager.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
 #include "cxRegistrationManager.h"
 #include "cxViewManager.h"
 
@@ -71,13 +71,13 @@ void PlateRegistrationWidget::plateRegistrationSlot()
   ToolPtr refTool = toolManager()->getReferenceTool();
   if(!refTool)//cannot register without a reference tool
   {
-    messageManager()->sendDebug("No refTool");
+    reporter()->sendDebug("No refTool");
     return;
   }
   std::map<int, Vector3D> referencePoints = refTool->getReferencePoints();
   if(referencePoints.empty()) //cannot register without at least 1 reference point
   {
-    messageManager()->sendDebug("No referenceppoints in reftool "+refTool->getName());
+    reporter()->sendDebug("No referenceppoints in reftool "+refTool->getName());
     return;
   }
 

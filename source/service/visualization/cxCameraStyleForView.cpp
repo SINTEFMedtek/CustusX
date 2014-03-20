@@ -16,19 +16,19 @@
 
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 #include "cxRepManager.h"
-#include "sscToolManager.h"
-#include "sscToolRep3D.h"
-#include "sscDataManager.h"
-#include "sscView.h"
+#include "cxToolManager.h"
+#include "cxToolRep3D.h"
+#include "cxDataManager.h"
+#include "cxView.h"
 #include "boost/bind.hpp"
 #include <vtkRenderWindow.h>
 #include "vtkInteractorStyleUnicam.h"
 #include "vtkInteractorStyleTrackballCamera.h"
 #include "cxVisualizationServiceBackend.h"
-#include "sscViewportListener.h"
-#include "sscLogger.h"
+#include "cxViewportListener.h"
+#include "cxLogger.h"
 
 SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, CAMERA_STYLE_TYPE, cstCOUNT)
 {
@@ -212,7 +212,7 @@ void CameraStyleForView::connectTool()
 
 	this->updateCamera();
 
-	messageManager()->sendInfo("Camera is following " + mFollowingTool->getName());
+	report("Camera is following " + mFollowingTool->getName());
 }
 
 void CameraStyleForView::disconnectTool()

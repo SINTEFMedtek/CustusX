@@ -16,7 +16,7 @@
 
 #include "boost/bind.hpp"
 #include "catch.hpp"
-#include "sscDummyToolManager.h"
+#include "cxDummyToolManager.h"
 
 TEST_CASE_METHOD(cxtest::USSavingRecorderFixture, "USSavingRecorder: Use one VideoSource", "[integration][plugins][Acquisition]")
 {

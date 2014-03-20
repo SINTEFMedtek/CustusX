@@ -46,6 +46,9 @@ class CustusXInstaller:
         if(platform.system() == 'Windows'):
             self.install_root = '%s\\Installed' % self.root_dir
 
+    def setTargetPlatform(self, target_platform):
+        self.target_platform = target_platform  
+
     def getInstalledRoot(self):
         '''
         Return path to base of the installation 
@@ -77,7 +80,8 @@ class CustusXInstaller:
         PrintFormatter.printHeader('create local release folder', level=2)
         targetPath = self._generateReleaseFolderName()
         PrintFormatter.printInfo('Creating folder %s' % targetPath)
-        shell.run('mkdir -p %s' % targetPath)
+        #shell.run('mkdir -p %s' % targetPath)
+        shell.makeDirs(targetPath)
         installerFile = self.findInstallerFile()
         self._copyFile(installerFile, targetPath)
         self.copyReleaseFiles(targetPath)                        
@@ -128,21 +132,23 @@ class CustusXInstaller:
             # shutil.copy2('%s/install/Linux/copy/*'%self.source_path, targetPath)
             # shutil.copy2('%s/install/Linux/copy/run_v2u.sh'%self.source_path, targetPath)
             # shutil.copy2('%s/install/Linux/copy/v2u'%self.source_path, targetPath)
-            self._copyFolder('%s/install/Linux/script/Ubuntu12.04/NVIDIA' % self.source_path, targetPath)
+#            self._copyFolder('%s/install/Linux/script/Ubuntu12.04/NVIDIA' % self.source_path, targetPath)
             self._copyFolder('%s/install/Linux/script/vga2usb' % self.source_path, targetPath)
-            self._copyFile('%s/install/Linux/script/programmer_setup.sh' % self.source_path, targetPath)
-            self._copyFile('%s/install/Linux/script/NDIToolBox_install.sh' % self.source_path, targetPath)
+#            self._copyFile('%s/install/Linux/script/programmer_setup.sh' % self.source_path, targetPath)
+#            self._copyFile('%s/install/Linux/script/NDIToolBox_install.sh' % self.source_path, targetPath)
             if linux_distro == 'Ubuntu':
-                self._copyFile('%s/install/Linux/script/ubuntu_install_readme.txt' % self.source_path, targetPath)
-                self._copyFile('%s/install/Linux/script/ubuntu_ndi_setup.sh' % self.source_path, targetPath)
-                self._copyFile('%s/install/Linux/script/ubuntu_epiphan_setup.sh' % self.source_path, targetPath)
-                self._copyFile('%s/install/Linux/script/ubuntu_install_packages.sh' % self.source_path, targetPath)
+                self._copyFolder('%s/install/Linux/script/Ubuntu12.04' % self.source_path, targetPath)
+#                self._copyFile('%s/install/Linux/script/ubuntu_install_readme.txt' % self.source_path, targetPath)
+#                self._copyFile('%s/install/Linux/script/ubuntu_ndi_setup.sh' % self.source_path, targetPath)
+#                self._copyFile('%s/install/Linux/script/ubuntu_epiphan_setup.sh' % self.source_path, targetPath)
+#                self._copyFile('%s/install/Linux/script/ubuntu_install_packages.sh' % self.source_path, targetPath)
             if linux_distro == 'Fedora':
-                self._copyFile('%s/install/Linux/script/install_packages.sh' % self.source_path, targetPath)
-                self._copyFile('%s/install/Linux/copy/Fedora_Linux_Installation_Guide.pdf' % self.source_path, targetPath)
-                self._copyFile('%s/install/Linux/script/epiphan_setup.sh' % self.source_path, targetPath)
-                self._copyFile('%s/install/Linux/script/opencl_setup.sh' % self.source_path, targetPath)
-                self._copyFile('%s/install/Shared/script/sudo_setup.sh' % self.source_path, targetPath)
+                self._copyFolder('%s/install/Linux/script/Fedora14' % self.source_path, targetPath)
+#                self._copyFile('%s/install/Linux/script/install_packages.sh' % self.source_path, targetPath)
+#                self._copyFile('%s/install/Linux/copy/Fedora_Linux_Installation_Guide.pdf' % self.source_path, targetPath)
+#                self._copyFile('%s/install/Linux/script/epiphan_setup.sh' % self.source_path, targetPath)
+#                self._copyFile('%s/install/Linux/script/opencl_setup.sh' % self.source_path, targetPath)
+#                self._copyFile('%s/install/Shared/script/sudo_setup.sh' % self.source_path, targetPath)
         if platform.system() == 'Windows':
             self._copyFile('%s/install/Windows/Windows_Install_ReadMe.rtf' % self.source_path, targetPath)
         
@@ -163,8 +169,8 @@ class CustusXInstaller:
         '''
         PrintFormatter.printHeader('copy/publish package to medtek server', level=2)
         remoteServer = "medtek.sintef.no"
-#        remoteServerPath = "/Volumes/MedTekDisk/Software/CustusX/AutomatedReleases"
-        remoteServerPath = "/Users/christiana/publish_test" # test while server is down...
+        remoteServerPath = "/Volumes/MedTekEksternDisk/Software/CustusX/AutomatedReleases"
+        #remoteServerPath = "/Users/christiana/publish_test" # test while server is down...
         targetFolder = os.path.split(path)[1]
 #        source = '%s/*' % path
         target = '%s/%s/%s' % (remoteServerPath, targetFolder, self._getUserFriendlyPlatformName())
@@ -173,18 +179,27 @@ class CustusXInstaller:
         PrintFormatter.printInfo('Publishing contents of [%s] to remote path [%s]' % (path, target))
 #        shell.run(cmd1)
 #        shell.run(cmd2)
-        cxSSH.copyFolderContentsToRemoteServer(remoteServer, path, target);
+        targetBasePath = '%s/%s' % (remoteServerPath, targetFolder) # need to create parent folder explicitly
+
+        transfer = cxSSH.RemoteFileTransfer()
+        transfer.connect(remoteServer)
+        transfer.remote_mkdir(targetBasePath)
+        transfer.copyFolderContentsToRemoteServer(path, target);
+        transfer.close()
+#        cxSSH.copyFolderContentsToRemoteServer(remoteServer, path, target);
         
     def _getUserFriendlyPlatformName(self):
         'generate a platform name understandable for users.'
-        name = platform.system()
-        if platform.system() == 'Darwin':
-            # return name + platform.mac_ver() ??
-            return 'Apple'
-        elif platform.system() == 'Linux':
-            return platform.linux_distribution()[0]
-        else:
-            return platform.system()
+        name = self.target_platform.get_target_platform()
+        return name.title()
+#        name = platform.system()
+#        if platform.system() == 'Darwin':
+#            # return name + platform.mac_ver() ??
+#            return 'Apple'
+#        elif platform.system() == 'Linux':
+#            return platform.linux_distribution()[0]
+#        else:
+#            return platform.system()
 
     def installPackage(self):
         '''

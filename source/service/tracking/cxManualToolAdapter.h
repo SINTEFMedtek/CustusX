@@ -15,7 +15,7 @@
 #ifndef CXMANUALTOOLADAPTER_H_
 #define CXMANUALTOOLADAPTER_H_
 
-#include "sscManualTool.h"
+#include "cxManualTool.h"
 
 namespace cx
 {

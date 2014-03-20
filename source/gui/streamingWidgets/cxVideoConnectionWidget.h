@@ -20,8 +20,8 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <QProcess>
-#include "sscTransform3D.h"
-#include "sscForwardDeclarations.h"
+#include "cxTransform3D.h"
+#include "cxForwardDeclarations.h"
 
 class QPushButton;
 class QComboBox;

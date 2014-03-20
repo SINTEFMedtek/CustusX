@@ -4,8 +4,8 @@
 #include "cxBaseWidget.h"
 
 #include <limits.h>
-#include <sscImage.h>
-#include "sscForwardDeclarations.h"
+#include "cxImage.h"
+#include "cxForwardDeclarations.h"
 #include "cxActiveImageProxy.h"
 #include "cxLegacySingletons.h"
 class QRect;

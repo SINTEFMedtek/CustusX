@@ -6,10 +6,10 @@
 #include <QLabel>
 #include <QDir>
 #include <QLineEdit>
-#include "sscEnumConverter.h"
-#include "sscMessageManager.h"
+#include "cxEnumConverter.h"
+#include "cxReporter.h"
 #include "cxStateService.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxSelectionGroupBox.h"
 #include "cxToolListWidget.h"
 #include "cxDataLocations.h"
@@ -98,7 +98,7 @@ void ToolConfigureGroupBox::setCurrentlySelectedCofiguration(QString configAbsol
   if(currentIndex < 0)
   {
     currentIndex = 0;
-    messageManager()->sendWarning("Tool configuration doesn't exist: " + cleanPath);
+    reportWarning("Tool configuration doesn't exist: " + cleanPath);
   }
   mConfigFilesComboBox->setCurrentIndex(currentIndex);
 }

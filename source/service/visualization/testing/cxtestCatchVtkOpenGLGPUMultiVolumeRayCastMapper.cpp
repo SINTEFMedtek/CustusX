@@ -17,9 +17,9 @@
 #include <vtkInteractorStyleTrackballCamera.h>
 #include "vtkMultiVolumePicker.h"
 #include <vtkCamera.h>
-#include "sscLogger.h"
+#include "cxLogger.h"
 
-#include "sscVector3D.h" //Neeed to setup Eigen correctly
+#include "cxVector3D.h" //Neeed to setup Eigen correctly
 
 #include "vtkOpenGLGPUMultiVolumeRayCastMapper.h"
 

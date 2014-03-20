@@ -16,7 +16,7 @@
 
 #include "cxForwardDeclarations.h"
 #include <vector>
-#include "sscXmlOptionItem.h"
+#include "cxXmlOptionItem.h"
 
 namespace cx
 {

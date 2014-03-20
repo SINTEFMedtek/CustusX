@@ -4,9 +4,9 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QVBoxLayout>
-#include "sscMessageManager.h"
-#include "sscToolManager.h"
-#include "sscDataManager.h"
+#include "cxReporter.h"
+#include "cxToolManager.h"
+#include "cxDataManager.h"
 #include "cxRegistrationManager.h"
 
 namespace cx

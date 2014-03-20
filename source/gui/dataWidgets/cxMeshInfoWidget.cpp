@@ -14,20 +14,20 @@
 #include "cxMeshInfoWidget.h"
 
 #include <QVBoxLayout>
-#include "sscImage.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscRegistrationTransform.h"
-#include "sscLabeledComboBoxWidget.h"
-#include "sscLabeledLineEditWidget.h"
-#include "sscMeshHelpers.h"
-#include "sscHelperWidgets.h"
-#include "sscColorDataAdapterXml.h"
+#include "cxImage.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
+#include "cxRegistrationTransform.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxLabeledLineEditWidget.h"
+#include "cxMeshHelpers.h"
+#include "cxHelperWidgets.h"
+#include "cxColorDataAdapterXml.h"
 #include "cxDataLocations.h"
 #include "cxDataInterface.h"
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringDataAdapter.h"
-#include "sscLogger.h"
+#include "cxLogger.h"
 
 
 namespace cx
@@ -103,7 +103,7 @@ void MeshInfoWidget::importTransformSlot()
   if (!parent)
     return;
   mMesh->get_rMd_History()->setRegistration(parent->get_rMd());
-  messageManager()->sendInfo("Assigned rMd from volume [" + parent->getName() + "] to surface [" + mMesh->getName() + "]");
+  report("Assigned rMd from volume [" + parent->getName() + "] to surface [" + mMesh->getName() + "]");
 }
   
 void MeshInfoWidget::meshChangedSlot()

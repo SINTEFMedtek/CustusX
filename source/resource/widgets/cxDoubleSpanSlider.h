@@ -8,9 +8,9 @@
 #define CXDOUBLESPANSLIDER_H_
 
 #include <QWidget>
-#include "sscDoubleRange.h"
+#include "cxDoubleRange.h"
 #include "qxtspanslider.h"
-#include "sscDoubleWidgets.h"
+#include "cxDoubleWidgets.h"
 class QDoubleSpinBox;
 
 namespace cx

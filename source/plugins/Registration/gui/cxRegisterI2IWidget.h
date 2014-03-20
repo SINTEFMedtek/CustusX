@@ -10,8 +10,8 @@
 
 #include <vector>
 #include <QtGui>
-#include "sscDoubleDataAdapterXml.h"
-#include "sscDoubleWidgets.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxDoubleWidgets.h"
 #include "cxRegistrationBaseWidget.h"
 #include "cxBinaryThresholdImageFilter.h"
 
