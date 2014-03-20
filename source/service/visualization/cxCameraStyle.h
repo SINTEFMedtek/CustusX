@@ -22,9 +22,9 @@
 #define CXCAMERASTYLE_H_
 
 #include <QPointer>
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
-#include "sscEnumConverter.h"
+#include "cxEnumConverter.h"
 class QIcon;
 class QWidget;
 class QMenu;

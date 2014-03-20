@@ -13,9 +13,9 @@
 // See CustusX_License.txt for more information.
 
 #include "cxPlaybackTool.h"
-#include "sscTime.h"
-#include "sscTypeConversions.h"
-#include "sscToolManager.h"
+#include "cxTime.h"
+#include "cxTypeConversions.h"
+#include "cxToolManager.h"
 #include "cxPlaybackTime.h"
 #include "cxManualToolAdapter.h"
 

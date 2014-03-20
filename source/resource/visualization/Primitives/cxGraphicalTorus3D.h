@@ -16,8 +16,8 @@
 #define CXGRAPHICALTORUS3D_H
 
 #include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
-#include "sscVector3D.h"
+#include "cxForwardDeclarations.h"
+#include "cxVector3D.h"
 class QColor;
 
 typedef vtkSmartPointer<class vtkSuperquadricSource> vtkSuperquadricSourcePtr;

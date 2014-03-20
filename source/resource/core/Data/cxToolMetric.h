@@ -16,7 +16,7 @@
 #define CXTOOLMETRIC_H_
 
 #include "cxFrameMetricBase.h"
-#include "sscPointMetric.h"
+#include "cxPointMetric.h"
 
 namespace cx
 {

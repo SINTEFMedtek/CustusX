@@ -35,6 +35,7 @@ vtkStandardNewMacro(vtkMultiVolumePicker);
 //----------------------------------------------------------------------------
 vtkMultiVolumePicker::vtkMultiVolumePicker()
 {
+	usedSingleVolumePicker = false;
 }
 
 //----------------------------------------------------------------------------
@@ -74,6 +75,7 @@ double vtkMultiVolumePicker::IntersectVolumeWithLine(const double p1[3],
 	vtkOpenGLGPUMultiVolumeRayCastMapper* multivolumeMapper = dynamic_cast<vtkOpenGLGPUMultiVolumeRayCastMapper*>(mapper);
 	if(multivolumeMapper)
 	{
+		usedSingleVolumePicker = false;
 		double retval = VTK_DOUBLE_MAX;
 
 		for(int i = 0; i < multivolumeMapper->NUMBER_OF_ADDITIONAL_VOLUMES; ++i)
@@ -169,7 +171,10 @@ double vtkMultiVolumePicker::IntersectVolumeWithLine(const double p1[3],
 
 		return retval;
 	} else
+	{
+		usedSingleVolumePicker = true;
 		return this->Superclass::IntersectVolumeWithLine(p1, p2, t1, t2, prop, mapper);
+	}
 
 }
 
@@ -227,6 +232,9 @@ void vtkMultiVolumePicker::storeFoundImage(vtkDataSet* image, vtkAbstractVolumeM
 
 double* vtkMultiVolumePicker::GetPickPosition()
 {
+	if (usedSingleVolumePicker)
+		return this->Superclass::GetPickPosition();
+
 	//p1, p2 are in mapper coord -> see vtkPicker.cxx line 358 and 386
 	//Use the missing transform (this->Transform) to get world coordinates
 

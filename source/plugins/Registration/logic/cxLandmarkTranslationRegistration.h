@@ -9,7 +9,7 @@
 #define CXLANDMARKTRANSLATIONREGISTRATION_H_
 
 #include <vector>
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 
 namespace cx
 {

@@ -10,15 +10,15 @@
 #include <QFileInfo>
 #include <QStringList>
 #include <QDataStream>
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
-#include "sscDataManagerImpl.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
+#include "cxDataManagerImpl.h"
 #include <vtkImageData.h>
-#include "sscImage.h"
-#include "sscUtilHelpers.h"
+#include "cxImage.h"
+#include "cxUtilHelpers.h"
 #include "cxCreateProbeDataFromConfiguration.h"
-#include "sscVolumeHelpers.h"
-#include "sscUSFrameData.h"
+#include "cxVolumeHelpers.h"
+#include "cxUSFrameData.h"
 
 namespace cx
 {
@@ -48,7 +48,7 @@ USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName
   if (!QFileInfo(changeExtension(fileName, "fts")).exists())
   {
     // There may not be any files here due to the automatic calling of the function
-    messageManager()->sendWarning("File not found: "+changeExtension(fileName, "fts")+", reconstruct load failed");
+    reportWarning("File not found: "+changeExtension(fileName, "fts")+", reconstruct load failed");
     return retval;
   }
 
@@ -62,7 +62,7 @@ USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName
 								&& similar(probeData.getSpacing()[1], retval.mUsRaw->getSpacing()[1], 0.001);
   if (!spacingOK)
   {
-      messageManager()->sendWarning(""
+      reportWarning(""
     	  "Mismatch in spacing values from calibration and recorded image.\n"
     	  "This might be valid if the sound speed was changed prior to recording.\n"
 				"Probe definition: "+ qstring_cast(probeData.getSpacing()) + ", Acquired Image: " + qstring_cast(retval.mUsRaw->getSpacing())
@@ -84,7 +84,7 @@ USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName
   if (!retval.mFrames.empty())
   {
 	  double msecs = (retval.mFrames.rbegin()->mTime - retval.mFrames.begin()->mTime);
-	  messageManager()->sendInfo(QString("Read %1 seconds of us data from %2.").arg(msecs/1000, 0, 'g', 3).arg(fileName));
+	  report(QString("Read %1 seconds of us data from %2.").arg(msecs/1000, 0, 'g', 3).arg(fileName));
   }
 
   return retval;
@@ -94,7 +94,7 @@ bool UsReconstructionFileReader::valid(USReconstructInputData input)
 {
 	if (input.mUsRaw->getNumImages() != input.mFrames.size())
 	{
-		messageManager()->sendError("Mismatch between number of images and number of image positions.\n"
+		reportError("Mismatch between number of images and number of image positions.\n"
 																"Images: " + qstring_cast(input.mUsRaw->getNumImages()) +
 																" image positions: " + qstring_cast(input.mFrames.size()));
 		return false;
@@ -112,7 +112,7 @@ std::pair<QString, ProbeDefinition>  UsReconstructionFileReader::readProbeDataBa
 
 	if (retval.second.getType()==ProbeDefinition::tNONE)
 	{
-		messageManager()->sendInfo(QString("Invalid probe in %1, falling back to old format").arg(retval.first));
+		report(QString("Invalid probe in %1, falling back to old format").arg(retval.first));
 		QString caliFilename;
 		QStringList probeConfigPath;
 		this->readCustomMhdTags(mhdFileName, &probeConfigPath, &caliFilename);
@@ -142,7 +142,7 @@ void UsReconstructionFileReader::readCustomMhdTags(QString mhdFileName, QStringL
   QFile file(mhdFileName);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
   {
-    messageManager()->sendWarning("Error in Reconstructer::readUsDataFile(): Can't open file: "
+    reportWarning("Error in Reconstructer::readUsDataFile(): Can't open file: "
                                        + mhdFileName);
   }
   bool foundConfig = false;
@@ -169,13 +169,13 @@ void UsReconstructionFileReader::readCustomMhdTags(QString mhdFileName, QStringL
   }
   if(!foundConfig)
   {
-    messageManager()->sendWarning(QString("Error in Reconstructer::readUsDataFile(): ")
+    reportWarning(QString("Error in Reconstructer::readUsDataFile(): ")
                                        + "Can't find ConfigurationID in file: "
                                        + mhdFileName);
   }
   if(!foundCalFile)
   {
-    messageManager()->sendWarning(QString("Error in Reconstructer::readUsDataFile(): ")
+    reportWarning(QString("Error in Reconstructer::readUsDataFile(): ")
                                        + "Can't find ProbeCalibration in file: "
                                        + mhdFileName);
   }
@@ -206,7 +206,7 @@ std::pair<QString, ProbeDefinition> UsReconstructionFileReader::readProbeDataFro
 
 	if (!QFileInfo(filename).exists())
 	{
-		messageManager()->sendWarning("File not found: " + filename + ", failed to load probe data.");
+		reportWarning("File not found: " + filename + ", failed to load probe data.");
 		return retval;
 	}
 
@@ -262,7 +262,7 @@ void UsReconstructionFileReader::readTimeStampsFile(QString fileName,
   QFile file(fileName);
   if(!file.open(QIODevice::ReadOnly))
   {
-    messageManager()->sendWarning("Can't open file: " + fileName);
+    reportWarning("Can't open file: " + fileName);
     return;
   }
   bool ok = true;
@@ -279,7 +279,7 @@ void UsReconstructionFileReader::readTimeStampsFile(QString fileName,
     double time = QString(array).toDouble(&ok);
     if (!ok)
     {
-      messageManager()->sendWarning("Can't read double in file: " + fileName);
+      reportWarning("Can't read double in file: " + fileName);
       return;
     }
     timedPos->at(i).mTime = time;
@@ -293,7 +293,7 @@ void UsReconstructionFileReader::readPositionFile(QString posFile, bool alsoRead
   QFile file(posFile);
   if(!file.open(QIODevice::ReadOnly))
   {
-    messageManager()->sendWarning("Can't open file: "
+    reportWarning("Can't open file: "
                                        + posFile);
     return;
   }
@@ -316,7 +316,7 @@ void UsReconstructionFileReader::readPositionFile(QString posFile, bool alsoRead
       position.mTime = QString(array).toDouble(&ok);
       if (!ok)
       {
-        messageManager()->sendWarning("Can't read double in file: "
+        reportWarning("Can't read double in file: "
                                            + posFile);
         return;
       }
@@ -329,7 +329,7 @@ void UsReconstructionFileReader::readPositionFile(QString posFile, bool alsoRead
     position.mPos = Transform3D::fromString(positionString, &ok);
     if (!ok)
     {
-      messageManager()->sendWarning("Can't read position number: "
+      reportWarning("Can't read position number: "
                                          + qstring_cast(i)
                                          + " from file: "
                                          + posFile

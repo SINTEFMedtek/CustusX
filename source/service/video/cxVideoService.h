@@ -25,7 +25,7 @@
 #include <QObject>
 
 #include <vector>
-#include "sscVideoSource.h"
+#include "cxVideoSource.h"
 #include "cxForwardDeclarations.h"
 
 namespace cx
@@ -76,7 +76,6 @@ typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
  *
  * The OpenIGTLinkRTSource is dependent on an external IGTLink server.
  * Optionally, the VideoConnectionManager can create this server on the local machine.
- * This is typically the GrabberServer, chapter 5.7.2.
  *
  *
  */

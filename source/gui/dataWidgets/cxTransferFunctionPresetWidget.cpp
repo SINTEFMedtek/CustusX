@@ -2,8 +2,8 @@
 
 #include <QInputDialog>
 #include <QMessageBox>
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
 #include "cxSettings.h"
 #include "cxActiveImageProxy.h"
 
@@ -125,7 +125,7 @@ bool TransferFunctionPresetWidget::use3D() const
 void TransferFunctionPresetWidget::deleteSlot()
 {
 	if (mPresets->isDefaultPreset(PresetWidget::getCurrentPreset())) {
-		messageManager()->sendWarning("It is not possible to delete one of the default presets");
+		reportWarning("It is not possible to delete one of the default presets");
 		return;
 	}
 

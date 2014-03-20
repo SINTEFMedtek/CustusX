@@ -17,12 +17,13 @@
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
-#include "sscDataManager.h"
-#include "sscHelperWidgets.h"
+#include "cxDataManager.h"
+#include "cxHelperWidgets.h"
 #include "cxDataInterface.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {
@@ -190,7 +191,7 @@ void DataSelectWidget::toggleShowData()
     }
     else
     {
-        mCurrentViewGroup->removeData(mData->getData());
+		mCurrentViewGroup->removeData(mData->getData());
     }
 }
 

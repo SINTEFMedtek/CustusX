@@ -14,10 +14,10 @@
 
 #include "cxPlaybackTime.h"
 #include <iostream>
-#include "sscTime.h"
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscVector3D.h"
+#include "cxTime.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
+#include "cxVector3D.h"
 
 namespace cx
 {
@@ -40,7 +40,7 @@ void PlaybackTime::initialize(QDateTime start, qint64 length)
 	mStartTime = start;
 	mLength = length;
 
-//	messageManager()->sendInfo(QString("Initialized PlaybackTime with start time [%1] and end time [%2]")
+//	report(QString("Initialized PlaybackTime with start time [%1] and end time [%2]")
 //					.arg(mStartTime.toString(timestampMilliSecondsFormatNice()))
 //					.arg(mStartTime.addMSecs(mLength).toString(timestampMilliSecondsFormatNice())));
 }

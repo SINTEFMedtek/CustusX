@@ -13,11 +13,11 @@
 // See CustusX_License.txt for more information.
 
 #include "cxMetricReferenceArgumentList.h"
-#include "sscData.h"
-#include "sscPointMetric.h"
+#include "cxData.h"
+#include "cxPointMetric.h"
 #include <QDomNode>
-#include "sscTypeConversions.h"
-#include "sscDataManager.h"
+#include "cxTypeConversions.h"
+#include "cxDataManager.h"
 
 namespace cx
 {

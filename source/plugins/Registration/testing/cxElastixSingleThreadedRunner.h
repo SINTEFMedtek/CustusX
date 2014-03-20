@@ -16,7 +16,7 @@
 #define CXELASTIXSINGLETHREADEDRUNNER_H_
 
 #include <QObject>
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
 
 namespace cx

@@ -29,8 +29,8 @@
 #else
 #include "igstkSerialCommunicationForPosix.h"
 #endif
-#include "sscTool.h"
-#include "sscDefinitions.h"
+#include "cxTool.h"
+#include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
 
 namespace cx

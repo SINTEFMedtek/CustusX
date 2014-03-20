@@ -6,10 +6,10 @@
 #include <QLabel>
 #include <QSlider>
 #include <QToolBar>
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 #include "cxViewManager.h"
-#include "sscToolManager.h"
-#include "sscDoubleWidgets.h"
+#include "cxToolManager.h"
+#include "cxDoubleWidgets.h"
 #include "cxDataInterface.h"
 #include "cxDataAdapterHelper.h"
 

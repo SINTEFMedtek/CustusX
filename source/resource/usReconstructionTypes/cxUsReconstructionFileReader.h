@@ -10,10 +10,10 @@
 
 #include <boost/shared_ptr.hpp>
 #include <QString>
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 #include "ProbeXmlConfigParserImpl.h"
-#include "sscProbeSector.h"
-#include "sscForwardDeclarations.h"
+#include "cxProbeSector.h"
+#include "cxForwardDeclarations.h"
 #include "cxUSReconstructInputData.h"
 
 namespace cx

@@ -71,7 +71,6 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
         return p
  
     def run(self):
-        #PrintFormatter.printHeader('Building release for tag "%s"' % self.controlData().git_tag, 1);
         options = self.options        
 
         if options.reset_installer:

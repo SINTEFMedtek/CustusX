@@ -3,14 +3,14 @@
 //#import <Foundation/NSAutoreleasePool.h>
 //#import <QTKit/QTKit.h>
 
-//#include "sscTime.h"
-//#include "sscTypeConversions.h"
+//#include "cxTime.h"
+//#include "cxTypeConversions.h"
 //#include <iostream>
 //#include <QWidget>
 //#include <QMacCocoaViewContainer>
 
 #include "cxWinGrabber.h"
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 
 #include "vtkSonixVideoSource.h"
 
@@ -77,7 +77,7 @@
 //  frame.mWidth = width;
 //  frame.mHeight = height;
 //  frame.mPixelFormat = static_cast<int>(CVPixelBufferGetPixelFormatType(videoFrame));
-//  //messageManager()->sendDebug("Pixel format: "+qstring_cast(frame.mPixelFormat));
+//  //reportDebug("Pixel format: "+qstring_cast(frame.mPixelFormat));
 //  frame.mFirstPixel = reinterpret_cast<char*>(CVPixelBufferGetBaseAddress(videoFrame));
 //
 //  mGrabber->sendFrame(frame); //results in a memcpy of the frame
@@ -165,12 +165,12 @@ void WinGrabber::start()
   /*if(this->findConnectedDevice())
   {
     if(!this->openDevice())
-      messageManager()->sendError("Could not open the selected device. Aborting.");
+      reportError("Could not open the selected device. Aborting.");
     else
       this->startSession();
   } else
   {
-    messageManager()->sendError("Could not find a connected device. Aborting.");
+    reportError("Could not find a connected device. Aborting.");
   }*/
   mSonixGrabber->Record();
 }
@@ -205,7 +205,7 @@ bool WinGrabber::findConnectedDevice()
   ////find which grabber is connected to the system
   //NSArray *devices = [QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo];
   //int i = [devices count];
-  //messageManager()->sendInfo("Number of connected grabber devices: "+qstring_cast(i));
+  //report("Number of connected grabber devices: "+qstring_cast(i));
 
   //if([devices count] == 0)
   //  return found;
@@ -297,14 +297,14 @@ void WinGrabber::startSession()
 
   //NSString* grabberName = [mObjectiveC->mSelectedDevice localizedDisplayName];
   //std::string name = std::string([grabberName UTF8String]);
-  //messageManager()->sendSuccess("Started grabbing from "+qstring_cast(name));
+  //reportSuccess("Started grabbing from "+qstring_cast(name));
   emit started();
 }
 
 void WinGrabber::stopSession()
 {
   //[mObjectiveC->mCaptureSession stopRunning];
-  messageManager()->sendSuccess("Grabbing stopped.");
+  reportSuccess("Grabbing stopped.");
   emit stopped();
 }
 
@@ -356,7 +356,7 @@ void WinGrabber::setupGrabbing()
 //    return;
 //  NSString* errorString = [error localizedDescription];
 //  std::string errorStdString = std::string([errorString UTF8String]);
-//  messageManager()->sendError(qstring_cast(errorStdString));
+//  reportError(qstring_cast(errorStdString));
 //}
 
 //void WinGrabber::reportString(NSString* string)
@@ -364,7 +364,7 @@ void WinGrabber::setupGrabbing()
 //  if(!string)
 //    return;
 //  std::string stdString = std::string([string UTF8String]);
-//  messageManager()->sendInfo(qstring_cast(stdString));  
+//  report(qstring_cast(stdString));  
 //}
 
 void WinGrabber::sendFrame(Frame& frame)

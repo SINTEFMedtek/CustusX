@@ -19,8 +19,8 @@
 #include "cxViewManager.h"
 #include "cxDataInterface.h"
 #include "cxCameraControl.h"
-#include "sscBoundingBox3D.h"
-#include "sscView.h"
+#include "cxBoundingBox3D.h"
+#include "cxView.h"
 
 namespace cx
 {

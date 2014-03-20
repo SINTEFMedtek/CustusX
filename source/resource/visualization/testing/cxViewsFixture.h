@@ -17,7 +17,7 @@
 #include "cxtestDummyDataManager.h"
 #include "cxMessageListener.h"
 #include "cxForwardDeclarations.h"
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 #include <vector>
 
 namespace cxtest

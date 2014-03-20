@@ -14,7 +14,7 @@
 
 #include "catch.hpp"
 
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxtestMetricFixture.h"
 
 

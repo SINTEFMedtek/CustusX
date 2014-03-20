@@ -12,24 +12,24 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
-#include "sscDataManager.h"
-#include "sscImage.h"
-#include "sscAxesRep.h"
-#include "sscVolumetricRep.h"
-#include "sscSliceComputer.h"
-#include "sscVector3D.h"
-#include "sscTransform3D.h"
-#include "sscToolRep3D.h"
-#include "sscDummyToolManager.h"
-#include "sscDummyTool.h"
-#include "sscSliceProxy.h"
-#include "sscSlicerRepSW.h"
+#include "cxDataManager.h"
+#include "cxImage.h"
+#include "cxAxesRep.h"
+#include "cxVolumetricRep.h"
+#include "cxSliceComputer.h"
+#include "cxVector3D.h"
+#include "cxTransform3D.h"
+#include "cxToolRep3D.h"
+#include "cxDummyToolManager.h"
+#include "cxDummyTool.h"
+#include "cxSliceProxy.h"
+#include "cxSlicerRepSW.h"
 
 #include "cxViewsFixture.h"
 #include "catch.hpp"
 #include "cxtestRenderTester.h"
-#include "sscMessageManager.h"
-#include "sscImageLUT2D.h"
+#include "cxReporter.h"
+#include "cxImageLUT2D.h"
 
 using cx::Vector3D;
 using cx::Transform3D;
@@ -157,7 +157,7 @@ TEST_CASE("Visual rendering: Show ACS, 3 volumes, centered hidden tool",
 }
 
 TEST_CASE("Visual rendering: Show Axial GPU slice, 1 volume",
-		  "[unit][resource][visualization][not_apple][not_win32][not_win64][ca_special1][unstable]")
+		  "[unit][resource][visualization][not_win32][not_win64]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
@@ -175,7 +175,7 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 1 volume",
 }
 
 TEST_CASE("Visual rendering: Show Axial GPU slice, 2 volumes",
-		  "[unit][resource][visualization][not_apple][not_win32][not_win64][ca_special2][unstable]")
+		  "[unit][resource][visualization][not_win32][not_win64]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
@@ -202,7 +202,7 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 2 volumes",
 }
 
 TEST_CASE("Visual rendering: Show ACS, 3 GPU volumes, moving tool",
-		  "[unit][resource][visualization][not_apple][not_win32][not_win64]")
+		  "[unit][resource][visualization][not_win32][not_win64]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;

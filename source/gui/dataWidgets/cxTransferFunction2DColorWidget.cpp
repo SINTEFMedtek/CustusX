@@ -1,7 +1,7 @@
 #include "cxTransferFunction2DColorWidget.h"
-#include "sscDoubleWidgets.h"
-#include "sscDataManager.h"
-#include "sscImageLUT2D.h"
+#include "cxDoubleWidgets.h"
+#include "cxDataManager.h"
+#include "cxImageLUT2D.h"
 
 namespace cx
 {

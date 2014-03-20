@@ -2,18 +2,18 @@
 
 #ifdef CX_USE_LEVEL_SET
 
-#include "sscTime.h"
-#include "sscMesh.h"
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscRegistrationTransform.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
+#include "cxTime.h"
+#include "cxMesh.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
+#include "cxRegistrationTransform.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
 #include "cxSelectDataStringDataAdapter.h"
-#include "sscCoordinateSystemHelpers.h"
-#include "sscData.h"
-#include "sscImage.h"
-#include "sscDataManager.h"
+#include "cxCoordinateSystemHelpers.h"
+#include "cxData.h"
+#include "cxImage.h"
+#include "cxDataManager.h"
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
 #include <vtkImageShiftScale.h>
@@ -149,7 +149,7 @@ bool LevelSetFilter::execute()
 	} catch (SIPL::SIPLException &e)
 	{
 		std::string error = e.what();
-		messageManager()->sendError(
+		reportError(
 				"SIPL::SIPLException: " + qstring_cast(error));
 
 		return false;
@@ -158,21 +158,21 @@ bool LevelSetFilter::execute()
 		if (e.err() == CL_MEM_OBJECT_ALLOCATION_FAILURE
 				|| e.err() == CL_OUT_OF_RESOURCES)
 		{
-			messageManager()->sendError(
+			reportError(
 					"cl::Error: Not enough memory on the device to process this image. ("
 							+ qstring_cast(oul::getCLErrorString(e.err()))
 							+ ")");
 		}
 		else
 		{
-			messageManager()->sendError(
+			reportError(
 					"cl::Error: "
 							+ qstring_cast(oul::getCLErrorString(e.err())));
 		}
 		return false;
 	} catch (...)
 	{
-		messageManager()->sendError("Unknown exception occured.");
+		reportError("Unknown exception occured.");
 		return false;
 	}
 }

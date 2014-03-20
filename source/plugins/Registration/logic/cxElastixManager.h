@@ -15,11 +15,11 @@
 #define CXELASTIXMANAGER_H_
 
 #include <QObject>
-#include "sscForwardDeclarations.h"
-#include "sscXmlOptionItem.h"
+#include "cxForwardDeclarations.h"
+#include "cxXmlOptionItem.h"
 #include "cxRegistrationManager.h"
-#include "sscBoolDataAdapterXml.h"
-#include "sscStringDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
 #include "cxElastixParameters.h"
 
 namespace cx

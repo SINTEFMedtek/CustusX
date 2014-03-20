@@ -7,15 +7,13 @@
 
 #include <QFileInfo>
 
-#include "sscImage.h"
-#include "sscTypeConversions.h"
-#include "sscRegistrationTransform.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
+#include "cxImage.h"
+#include "cxTypeConversions.h"
+#include "cxRegistrationTransform.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
 #include <boost/math/special_functions/fpclassify.hpp>
 
-//#include "cxStateMachineManager.h"
-//#include "cxPatientData.h"
 #include "vtkClipPolyData.h"
 #include "vtkPlanes.h"
 
@@ -33,7 +31,7 @@
 #include "vtkPointData.h"
 #include "vtkLandmarkTransform.h"
 #include "vtkFloatArray.h"
-#include "sscMesh.h"
+#include "cxMesh.h"
 
 namespace cx
 {
@@ -66,8 +64,8 @@ bool SeansVesselReg::execute(DataPtr source, DataPtr target, QString logPath)
 {
 	if (mt_verbose)
 	{
-		messageManager()->sendDebug("SOURCE: " + source->getUid());
-		messageManager()->sendDebug("TARGET: " + target->getUid());
+		reporter()->sendDebug("SOURCE: " + source->getUid());
+		reporter()->sendDebug("TARGET: " + target->getUid());
 
 		std::cout << "stop Threshold:" << mt_distanceDeltaStopThreshold << endl;
 		std::cout << "sigma:" << mt_sigma << endl;
@@ -87,7 +85,7 @@ bool SeansVesselReg::execute(DataPtr source, DataPtr target, QString logPath)
 	if (mt_auto_lts)
 	{
 		context = this->linearRefineAllLTS(context);
-		messageManager()->sendInfo(QString("Auto LTS: Found best match using %1\%.").arg(context->mLtsRatio));
+		report(QString("Auto LTS: Found best match using %1\%.").arg(context->mLtsRatio));
 	}
 	else
 	{
@@ -934,14 +932,14 @@ void SeansVesselReg::checkQuality(Transform3D linearTransform)
 
 	if (t_delta.length() > 20 || fabs(angle) > 10 / 180.0 * M_PI)
 	{
-		messageManager()->sendWarning(qualityText);
+		reportWarning(qualityText);
 		QString text = QString(
 						"The registration matrix' angle-axis representation shows a large shift. Retry registration.");
-		messageManager()->sendWarning(text);
+		reportWarning(text);
 	}
 	else
 	{
-		messageManager()->sendInfo(qualityText);
+		report(qualityText);
 	}
 }
 } //namespace cx

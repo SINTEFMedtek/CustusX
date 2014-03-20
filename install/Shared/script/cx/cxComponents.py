@@ -266,7 +266,7 @@ class IGSTK(CppComponent):
 
 class ISB_DataStreaming(CppComponent):
     def name(self):
-        self.mCurrentRevision = "523"
+        self.mCurrentRevision = "530"
         return "ISB_DataStreaming"
     def help(self):
         return 'ISB GE Digital Interface stuff'
@@ -337,7 +337,10 @@ class CustusX3(CppComponent):
         add('SSC_USE_GCOV:BOOL', self.controlData.mCoverage);
         if self.controlData.force_connect_sublibraries:
             self.forceConnectSublibraries(add)
-        builder.configureCMake()
+        cmakeOptions = ''
+        if self.controlData.mGraphviz:
+            cmakeOptions = '--graphviz=graph.dot'
+        builder.configureCMake(cmakeOptions)
     def forceConnectSublibraries(self, add):
         print 'CustusX force connect sublibraries.'
         add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
@@ -429,7 +432,7 @@ class OpenCLUtilityLibrary(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:smistad/OpenCLUtilityLibrary')
     def update(self):
-        self._getBuilder().gitCheckout('c59775aec5f648666ce8b35c6cb7873bc2b5476e', submodules=False)
+        self._getBuilder().gitCheckout('763d96f127e1548aea53bd81152f99ca51149259', submodules=False)
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()

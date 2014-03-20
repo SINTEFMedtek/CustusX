@@ -4,13 +4,13 @@
 #include <QTreeWidgetItem>
 #include <QStringList>
 #include <QVBoxLayout>
-#include "sscImage.h"
-#include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscToolManager.h"
+#include "cxImage.h"
+#include "cxReporter.h"
+#include "cxDataManager.h"
+#include "cxToolManager.h"
 #include "cxViewManager.h"
-#include "sscTime.h"
-#include "sscTypeConversions.h"
+#include "cxTime.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {
@@ -223,7 +223,7 @@ void RegistrationHistoryWidget::removeSlot()
 	if (!active.isValid()) // if invalid: we are already at head
 		return;
 
-	messageManager()->sendInfo(
+	report(
 			"Removing all registration performed later than " + active.toString(timestampSecondsFormatNice()) + ".");
 
 	std::vector<RegistrationHistoryPtr> raw = getAllRegistrationHistories();
@@ -269,7 +269,7 @@ void RegistrationHistoryWidget::rewindSlot()
 		--current; // ignore the last entry
 
 	--current;
-	messageManager()->sendInfo(
+	report(
 			"Rewind: Setting registration time to " + current->first.toString(timestampSecondsFormatNice()) + ", ["
 					+ current->second + "]");
 	this->setActiveTime(current->first);
@@ -339,12 +339,12 @@ void RegistrationHistoryWidget::forwardSlot()
 
 	if (current == times.end() || times.rbegin()->first == current->first) // if at end or at the last position, interpret as end
 	{
-		messageManager()->sendInfo("Forward: Setting registration time to current, [" + times.rbegin()->second + "]");
+		report("Forward: Setting registration time to current, [" + times.rbegin()->second + "]");
 		this->setActiveTime(QDateTime());
 	}
 	else
 	{
-		messageManager()->sendInfo("Forward: Setting registration time to " + current->first.toString(timestampSecondsFormatNice()) + ", ["+ current->second + "]");
+		report("Forward: Setting registration time to " + current->first.toString(timestampSecondsFormatNice()) + ", ["+ current->second + "]");
 		this->setActiveTime(current->first);
 	}
 }
@@ -355,7 +355,7 @@ void RegistrationHistoryWidget::forwardSlot()
 void RegistrationHistoryWidget::fastForwardSlot()
 {
 	std::vector<RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-	messageManager()->sendInfo("Fast Forward: Setting registration time to current.");
+	report("Fast Forward: Setting registration time to current.");
 
 	for (unsigned i = 0; i < raw.size(); ++i)
 	{

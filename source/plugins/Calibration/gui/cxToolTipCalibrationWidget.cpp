@@ -18,15 +18,15 @@
 #include <QTextStream>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
-#include "sscToolManager.h"
-#include "sscDataManager.h"
-#include "sscVector3D.h"
-#include "sscDefinitionStrings.h"
-#include "sscLabeledComboBoxWidget.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
+#include "cxToolManager.h"
+#include "cxDataManager.h"
+#include "cxVector3D.h"
+#include "cxDefinitionStrings.h"
+#include "cxLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
-#include "sscTool.h"
+#include "cxTool.h"
 //#include "cxStateService.h"
 #include "cxPatientData.h"
 
@@ -127,7 +127,7 @@ void ToolTipCalibrateWidget::testCalibrationSlot()
 
   mDeltaLabel->setText("<b>Delta:</b> "+qstring_cast(delta_selectedTool)+" <br> <b>Length:</b>  "+qstring_cast(delta_selectedTool.length()));
 
-  messageManager()->sendInfo("Delta: "+qstring_cast(delta_selectedTool)+" Length:   "+qstring_cast(delta_selectedTool.length()));
+  report("Delta: "+qstring_cast(delta_selectedTool)+" Length:   "+qstring_cast(delta_selectedTool.length()));
 }
 
 void ToolTipCalibrateWidget::toolSelectedSlot()
@@ -146,7 +146,7 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
 //      mTestButton->setEnabled(true);
     }
     else
-		messageManager()->sendWarning("Selected tool have no known reference point");
+		reportWarning("Selected tool have no known reference point");
     if(tool)
     {
       mCalibrationLabel->setText("Calibration:\n"+qstring_cast(tool->getCalibration_sMt()));

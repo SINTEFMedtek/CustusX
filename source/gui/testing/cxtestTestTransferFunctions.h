@@ -2,9 +2,9 @@
 #define CXTESTTESTTRANSFERFUNCTIONS_H_
 
 #include <vtkImageData.h>
-#include "sscImage.h"
-#include "sscImageTF3D.h"
-#include "sscImageLUT2D.h"
+#include "cxImage.h"
+#include "cxImageTF3D.h"
+#include "cxImageLUT2D.h"
 
 namespace cxtest {
 

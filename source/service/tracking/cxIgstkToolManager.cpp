@@ -14,8 +14,8 @@
 
 #include "cxIgstkToolManager.h"
 
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {
@@ -72,7 +72,7 @@ void IgstkToolManager::setReferenceAndTrackerOnTools()
 {
 	if (!mReferenceTool)
 	{
-		messageManager()->sendWarning("Tracking is configured without a reference tool.");
+		reportWarning("Tracking is configured without a reference tool.");
 	}
 
 	std::map<QString, IgstkToolPtr>::iterator it;
@@ -91,7 +91,7 @@ void IgstkToolManager::createTracker(IgstkTracker::InternalStructure trackerStru
 	if (tracker->isValid())
 		mTracker = tracker;
 	else
-		messageManager()->sendWarning("Invalid tracker.");
+		reportWarning("Invalid tracker.");
 }
 
 void IgstkToolManager::createTools(std::vector<IgstkTool::InternalStructure> toolStructures,
@@ -120,7 +120,7 @@ IgstkToolPtr IgstkToolManager::addIgstkTools(IgstkTool::InternalStructure& toolS
 	}
 	else
 	{
-		messageManager()->sendWarning(toolStructure.mUid + " is not valid.");
+		reportWarning(toolStructure.mUid + " is not valid.");
 	}
 	return igstkTool;
 }

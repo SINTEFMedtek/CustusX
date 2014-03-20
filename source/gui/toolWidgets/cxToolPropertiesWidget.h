@@ -4,11 +4,11 @@
 #include "cxBaseWidget.h"
 
 #include <vector>
-#include "sscForwardDeclarations.h"
-#include "sscDoubleWidgets.h"
-#include "sscStringDataAdapterXml.h"
+#include "cxForwardDeclarations.h"
+#include "cxDoubleWidgets.h"
+#include "cxStringDataAdapterXml.h"
 #include "cxTransform3DWidget.h"
-#include "sscPointMetric.h"
+#include "cxPointMetric.h"
 
 
 class QCheckBox;
@@ -18,6 +18,7 @@ class UsConfigGui;
 
 namespace cx
 {
+class LabeledComboBoxWidget;
 
 /**
  * \class ToolPropertiesWidget

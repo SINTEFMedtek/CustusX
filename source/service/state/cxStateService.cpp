@@ -18,9 +18,9 @@
 #include <QApplication>
 #include <QByteArray>
 #include <QDir>
-#include "sscEnumConverter.h"
-#include "sscXmlOptionItem.h"
-#include "sscMessageManager.h"
+#include "cxEnumConverter.h"
+#include "cxXmlOptionItem.h"
+#include "cxReporter.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxWorkflowStateMachine.h"
@@ -257,11 +257,11 @@ QStringList StateService::getDefaultGrabberServer()
 	QString filename;
 	QString relativePath = "OpenIGTLinkServer";
 	QString postfix = "";
-#ifdef __APPLE__
-	filename = "GrabberServer";
-	relativePath = "grabberServer";
-	postfix = " --auto";
-#elif WIN32
+//#ifdef __APPLE__
+//	filename = "GrabberServer";
+//	relativePath = "grabberServer";
+//	postfix = " --auto";
+#if WIN32
 	filename = "OpenIGTLinkServer.exe";
 	postfix = "--in_width 800 --in_height 600";
 #else
@@ -378,13 +378,14 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View3D/annotationModel", "woman.stl");
 	this->fillDefault("View3D/depthPeeling", false);
 
-//	this->fillDefault("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
-	this->fillDefault("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
+	this->fillDefault("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
+	// not working:
+//	this->fillDefault("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
 
 	this->fillDefault("View3D/maxRenderSize", 10 * pow(10.0,6));
 
 
-	this->fillDefault("useGPUVolumeRayCastMapper", true);
+//	this->fillDefault("useGPUVolumeRayCastMapper", true);
 	this->fillDefault("stillUpdateRate", 0.001);
 
 #ifdef __APPLE__

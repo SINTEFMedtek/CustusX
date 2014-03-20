@@ -17,24 +17,37 @@
 
 #include <vector>
 #include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
-#include "sscVector3D.h"
+#include "cxForwardDeclarations.h"
+#include "cxVector3D.h"
+#include <string>
+#include <QString>
+#include "sscConfig.h"
 
 namespace cxtest
 {
 
-/*class TestDataStorage
+
+
+struct TestUtilities
 {
-	static TestDataStorage* getInstance();
-	static void shutdown();
+	static inline QString GetDataRoot();
+	static inline QString ExpandDataFileName(QString fileName);
+};
 
-	QString getDataRoot(QString suffix = "");
-	void setDataRoot(QString path);
+inline
+QString TestUtilities::GetDataRoot()
+{
+	QString dataRoot = SSC_DATA_ROOT;
+	return dataRoot;
+}
 
-private:
-	static TestDataStorage* mInstance;
-	QString mDataRoot;
-};*/
+inline
+QString TestUtilities::ExpandDataFileName(QString fileName)
+{
+	QString dataRoot = SSC_DATA_ROOT;
+	QString expandedName = dataRoot + fileName;
+	return expandedName;
+}
 
 /**
  * A collection of functionality used for testing.

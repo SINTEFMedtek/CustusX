@@ -18,20 +18,20 @@
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
 #include "vtkOpenGLGPUMultiVolumeRayCastMapper.h"
 #include <vtkVolumeProperty.h>
-#include "sscView.h"
+#include "cxView.h"
 #include <vtkRenderer.h>
 #include "cxVolumeProperty.h"
 #include "cxImageMapperMonitor.h"
-#include "sscImage.h"
+#include "cxImage.h"
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 #include <vtkTransform.h>
-#include "sscGPUImageBuffer.h"
-#include "sscMessageManager.h"
+#include "cxGPUImageBuffer.h"
+#include "cxReporter.h"
 #include <vtkPlane.h>
-#include "sscLogger.h"
+#include "cxLogger.h"
 #include "cxImageEnveloper.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include <vtkRenderWindow.h>
 
 namespace cx

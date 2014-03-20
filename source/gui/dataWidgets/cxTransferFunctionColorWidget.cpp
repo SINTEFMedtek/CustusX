@@ -10,14 +10,14 @@
 #include <QColorDialog>
 #include <QMenu>
 #include <QTimer>
-#include "sscDataManager.h"
-#include "sscImageTF3D.h"
-#include "sscImageTFData.h"
-#include "sscUtilHelpers.h"
-#include "sscImageLUT2D.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
-#include "sscLogger.h"
+#include "cxDataManager.h"
+#include "cxImageTF3D.h"
+#include "cxImageTFData.h"
+#include "cxUtilHelpers.h"
+#include "cxImageLUT2D.h"
+#include "cxReporter.h"
+#include "cxTypeConversions.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -126,7 +126,7 @@ void TransferFunctionColorWidget::updateTooltip(ColorPoint point)
 	QString tip = QString("color(%1)=(%2)").arg(point.intensity).arg(color2string(point.value));
 //	std::cout << "updated to " << tip << std::endl;
 	this->setToolTip(tip);
-	messageManager()->sendVolatile(tip);
+	reporter()->sendVolatile(tip);
 //	this->setStatusTip(tip);
 }
 

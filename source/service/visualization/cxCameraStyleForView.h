@@ -14,9 +14,9 @@
 #ifndef CXCameraStyleForViewFORVIEW_H
 #define CXCameraStyleForViewFORVIEW_H
 
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
-#include "sscEnumConverter.h"
+#include "cxEnumConverter.h"
 class QIcon;
 class QWidget;
 class QMenu;

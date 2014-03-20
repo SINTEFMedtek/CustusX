@@ -14,12 +14,12 @@
 
 #include "cxtestMetricFixture.h"
 
-#include "sscDataManagerImpl.h"
-#include "sscDataManager.h"
-#include "sscDummyToolManager.h"
+#include "cxDataManagerImpl.h"
+#include "cxDataManager.h"
+#include "cxDummyToolManager.h"
 #include "cxDataLocations.h"
 #include "catch.hpp"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxStringHelpers.h"
 #include "cxSpaceProviderImpl.h"
 

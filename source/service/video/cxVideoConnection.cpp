@@ -29,24 +29,24 @@
 #include <vtkImageAppendComponents.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkExtractVOI.h>
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxIGTLinkedImageReceiverThread.h"
-#include "sscMessageManager.h"
-#include "sscTime.h"
-#include "sscVector3D.h"
-#include "sscProbeData.h"
-#include "sscToolManager.h"
-#include "sscDataManager.h"
-#include "cxProbe.h"
+#include "cxReporter.h"
+#include "cxTime.h"
+#include "cxVector3D.h"
+#include "cxProbeData.h"
+#include "cxToolManager.h"
+#include "cxDataManager.h"
+#include "cxProbeImpl.h"
 #include "cxVideoService.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "cxImageSenderFactory.h"
 #include "cxDirectlyLinkedImageReceiverThread.h"
-#include "sscTypeConversions.h"
-#include "sscImage.h"
-#include "sscData.h"
-#include "sscLogger.h"
-#include "sscVolumeHelpers.h"
+#include "cxTypeConversions.h"
+#include "cxImage.h"
+#include "cxData.h"
+#include "cxLogger.h"
+#include "cxVolumeHelpers.h"
 #include "cxCyclicActionLogger.h"
 #include "cxBasicVideoSource.h"
 #include "cxVideoServiceBackend.h"
@@ -151,7 +151,7 @@ void VideoConnection::stopClient()
 		{
 			mClient->terminate();
 			mClient->wait(); // forever or until dead thread
-			messageManager()->sendWarning(QString("Video Client [%1] did not quit normally - terminated.").arg(mClient->hostDescription()));
+			reportWarning(QString("Video Client [%1] did not quit normally - terminated.").arg(mClient->hostDescription()));
 		}
 
 		disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
@@ -211,7 +211,7 @@ void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 		mUnsusedProbeDataVector.push_back(msg);
 		return;
 	}
-	cxProbePtr probe = boost::dynamic_pointer_cast<cxProbe>(tool->getProbe());
+	ProbeImplPtr probe = boost::dynamic_pointer_cast<ProbeImpl>(tool->getProbe());
 
 	// start with getting a valid data object from the probe, in order to keep
 	// existing values (such as temporal calibration).

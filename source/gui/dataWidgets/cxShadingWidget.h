@@ -25,8 +25,8 @@
 #include <QWidget>
 #include <QCheckBox>
 #include <QDomElement>
-#include <sscImage.h>
-#include "sscTransferFunctions3DPresets.h"
+#include "cxImage.h"
+#include "cxTransferFunctions3DPresets.h"
 #include "cxActiveImageProxy.h"
 #include "cxBaseWidget.h"
 

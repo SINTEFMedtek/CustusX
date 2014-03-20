@@ -12,10 +12,10 @@
 #include <QLabel>
 #include <QFontMetrics>
 
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 
 #include "cxVector3DComponentDataAdapter.h"
-#include "sscDoubleWidgets.h"
+#include "cxDoubleWidgets.h"
 
 namespace cx
 {

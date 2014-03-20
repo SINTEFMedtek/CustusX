@@ -16,7 +16,7 @@
 #define CXIGSTKTOOL_H_
 
 #include <QObject>
-#include "cxTool.h"
+#include "cxToolUsingIGSTK.h"
 
 #include <limits.h>
 #include <boost/shared_ptr.hpp>
@@ -25,7 +25,7 @@
 #include <igstkTransform.h>
 #include <igstkLogger.h>
 #include <itkStdStreamLogOutput.h>
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 #include "cxIgstkTracker.h"
 #include "vtkForwardDeclarations.h"
 

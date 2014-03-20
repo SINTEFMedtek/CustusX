@@ -16,8 +16,8 @@
 
 #include <QObject>
 #include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
-#include "sscBoundingBox3D.h"
+#include "cxForwardDeclarations.h"
+#include "cxBoundingBox3D.h"
 
 namespace cx
 {

@@ -4,9 +4,9 @@
 #include "cxPreferenceTab.h"
 #include "cxGeneralTab.h"
 #include <QDialog>
-#include "sscDoubleDataAdapterXml.h"
-#include "sscBoolDataAdapterXml.h"
-#include "sscStringDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
 #include "cxLegacySingletons.h"
 
 class QTabWidget;
@@ -27,7 +27,7 @@ class QActionGroup;
 
 namespace cx
 {
-class MessageManager;
+class Reporter;
 class ViewManager;
 class FilePreviewWidget;
 class ToolImagePreviewWidget;

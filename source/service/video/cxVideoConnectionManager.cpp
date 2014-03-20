@@ -18,16 +18,16 @@
 #include "vtkRenderWindow.h"
 #include <QTimer>
 
-//#include "sscLabeledComboBoxWidget.h"
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
+//#include "cxLabeledComboBoxWidget.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxImageSenderFactory.h"
 #include "cxProcessWrapper.h"
 #include "cxVideoConnection.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscLogger.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -39,7 +39,12 @@ VideoConnectionManager::VideoConnectionManager(VideoServiceBackendPtr backend)
 	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("video");
 
 	QStringList connectionOptions;
-	QString defaultConnection = "Direct Link";
+
+	QString defaultConnection = "Direct Link";	
+#ifdef __APPLE__
+	defaultConnection = "Local Server";
+#endif
+
 	connectionOptions << "Local Server" << "Direct Link" << "Remote Server" << "Simulation Server";
 	mConnectionMethod = StringDataAdapterXml::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, connectionOptions, mOptions.getElement());
 	connect(mConnectionMethod.get(), SIGNAL(changed()), this, SIGNAL(connectionMethodChanged()));
@@ -176,7 +181,7 @@ void VideoConnectionManager::launchServer()
 {
 	if (!this->useLocalServer())
 	{
-		messageManager()->sendError("Ignoring Launch local server: Must select local server");
+		reportError("Ignoring Launch local server: Must select local server");
 		return;
 	}
 	QString program = this->getLocalServerExecutable();
@@ -222,7 +227,7 @@ void VideoConnectionManager::launchAndConnectServer()
 	else if (useRemoteServer())
 		this->connectServer();
 	else
-		messageManager()->sendError("Could not determine which server to launch.");
+		reportError("Could not determine which server to launch.");
 }
 
 void VideoConnectionManager::serverProcessStateChanged(QProcess::ProcessState newState)

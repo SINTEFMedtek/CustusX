@@ -14,7 +14,7 @@
 #ifndef CXMESSAGELISTENER_H
 #define CXMESSAGELISTENER_H
 
-#include "sscMessageManager.h"
+#include "cxReporter.h"
 #include <vector>
 #include <QPointer>
 
@@ -23,7 +23,7 @@ namespace cx
 
 typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
 
-/** Utility for listening to the MessageManager
+/** Utility for listening to the Reporter
   * and storing messages from it.
   *
  * \ingroup cx_resource_core_logger
@@ -44,7 +44,7 @@ private slots:
 private:
 	bool isError(MESSAGE_LEVEL level) const;
 	std::vector<Message> mMessages;
-	QPointer<MessageManager> mManager;
+	QPointer<Reporter> mManager;
 };
 
 

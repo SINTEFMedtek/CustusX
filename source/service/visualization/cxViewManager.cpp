@@ -28,13 +28,13 @@
 #include "vtkRenderWindow.h"
 #include "cxLayoutData.h"
 
-#include "sscVolumetricRep.h"
-#include "sscMessageManager.h"
-#include "sscXmlOptionItem.h"
-#include "sscDataManager.h"
-#include "sscToolManager.h"
-#include "sscSlicePlanes3DRep.h"
-#include "sscSliceProxy.h"
+#include "cxVolumetricRep.h"
+#include "cxReporter.h"
+#include "cxXmlOptionItem.h"
+#include "cxDataManager.h"
+#include "cxToolManager.h"
+#include "cxSlicePlanes3DRep.h"
+#include "cxSliceProxy.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "cxViewWrapper2D.h"
@@ -47,16 +47,17 @@
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxInteractiveClipper.h"
-#include "sscImage.h"
+#include "cxImage.h"
 #include "cxCameraStyle.h"
 #include "cxCyclicActionLogger.h"
 #include "cxLayoutWidget.h"
 #include "cxRenderLoop.h"
 #include "cxLayoutRepository.h"
-#include "sscLogger.h"
+#include "cxLogger.h"
 #include "cxVisualizationServiceBackend.h"
 #include "cxXMLNodeWrapper.h"
 #include "cxCameraControl.h"
+#include "cxNavigation.h"
 
 namespace cx
 {
@@ -67,31 +68,6 @@ VisualizationServicePtr ViewManager::create(VisualizationServiceBackendPtr backe
 	retval.reset(new ViewManager(backend));
 	return retval;
 }
-
-//ViewManager *ViewManager::mTheInstance = NULL;
-//ViewManager* viewManager()
-//{
-//	return ViewManager::getInstance();
-//}
-//ViewManager* ViewManager::getInstance()
-//{
-//	return mTheInstance;
-//}
-
-//ViewManager* ViewManager::createInstance(VisualizationServiceBackendPtr backend)
-//{
-//	if (mTheInstance == NULL)
-//	{
-//		mTheInstance = new ViewManager(backend);
-//		}
-//	return mTheInstance;
-//}
-
-//void ViewManager::destroyInstance()
-//{
-//	delete mTheInstance;
-//	mTheInstance = NULL;
-//}
 
 ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 				mGlobalObliqueOrientation(false)
@@ -105,7 +81,7 @@ ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 	mLayoutRepository.reset(new LayoutRepository());
 	mCameraControl.reset(new CameraControl());
 
-	connect(mBackend->getDataManager().get(), SIGNAL(centerChanged()), this, SLOT(globalCenterChangedSlot()));
+//	connect(mBackend->getDataManager().get(), SIGNAL(centerChanged()), this, SLOT(globalCenterChangedSlot()));
 
 	this->loadGlobalSettings();
 
@@ -145,18 +121,6 @@ ViewManager::~ViewManager()
 
 void ViewManager::initialize()
 {
-//	mCameraStyleInteractor.reset(new CameraStyleInteractor);
-
-//	mActiveLayout = QStringList() << "" << "";
-//	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
-
-//	mInteractiveCropper.reset(new InteractiveCropper(mBackend));
-//	mInteractiveClipper.reset(new InteractiveClipper(mBackend));
-//	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
-//	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
-//	connect(mInteractiveClipper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
-//	connect(this, SIGNAL(activeViewChanged()), this, SLOT(updateCameraStyleActions()));
-
 	// set start layout
 	this->setActiveLayout("LAYOUT_3D_ACS_SINGLE", 0);
 
@@ -185,7 +149,7 @@ void ViewManager::initializeActiveView()
 
 NavigationPtr ViewManager::getNavigation()
 {
-	return NavigationPtr(new Navigation(mBackend));
+	return NavigationPtr(new Navigation(mBackend, mCameraControl));
 }
 
 QWidget *ViewManager::getLayoutWidget(int index)
@@ -279,11 +243,6 @@ ViewWrapperPtr ViewManager::getActiveView() const
 void ViewManager::setActiveView(QString uid)
 {
 	mActiveView->set(uid);
-//	if (mActiveView == uid)
-//		return;
-//	mActiveView = uid;
-
-//	emit activeViewChanged();
 }
 
 int ViewManager::getActiveViewGroup() const
@@ -441,7 +400,7 @@ void ViewManager::setActiveLayout(const QString& layout, int widgetIndex)
 	emit activeLayoutChanged();
 
 	QString layoutName = this->getLayoutData(layout).getName();
-	messageManager()->sendInfo(QString("Layout %1 changed to %2").arg(widgetIndex).arg(layoutName));
+	report(QString("Layout %1 changed to %2").arg(widgetIndex).arg(layoutName));
 }
 
 void ViewManager::rebuildLayouts()
@@ -655,13 +614,6 @@ void ViewManager::autoShowData(DataPtr data)
 CyclicActionLoggerPtr ViewManager::getRenderTimer()
 {
 	return mRenderLoop->getRenderTimer();
-}
-
-void ViewManager::globalCenterChangedSlot()
-{
-	Vector3D p_r = mBackend->getDataManager()->getCenter();
-	this->getCameraControl()->translateByFocusTo(p_r);
-//	this->getNavigation()->moveManualToolToPosition(p_r);
 }
 
 } //namespace cx

@@ -8,9 +8,9 @@
 #include "cxBranchList.h"
 //#include "RegistrationFunctions.h"
 #include "cxBranch.h"
-#include "sscDataManager.h"
-#include "sscMesh.h"
-#include "sscVector3D.h"
+#include "cxDataManager.h"
+#include "cxMesh.h"
+#include "cxVector3D.h"
 #include <vtkPolyData.h>
 
 

@@ -17,7 +17,7 @@
 
 #include <vector>
 #include <QObject>
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
 
 namespace cx

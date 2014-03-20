@@ -22,8 +22,8 @@
 #include <boost/array.hpp>
 class QTimer;
 
-#include "sscVideoSource.h"
-#include "sscForwardDeclarations.h"
+#include "cxVideoSource.h"
+#include "cxForwardDeclarations.h"
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageChangeInformation> vtkImageChangeInformationPtr;

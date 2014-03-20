@@ -15,7 +15,7 @@
 #ifndef CXTRANSFORMFILE_H_
 #define CXTRANSFORMFILE_H_
 
-#include "sscTransform3D.h"
+#include "cxTransform3D.h"
 
 namespace cx
 {

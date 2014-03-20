@@ -1,7 +1,7 @@
 #ifdef WIN32
 #include "cxWinGrabberServerWidget.h"
 
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxWinGrabberServer.h"
 
 namespace cx

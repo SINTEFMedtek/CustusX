@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include "cxManualToolAdapter.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 
 namespace cx
 {

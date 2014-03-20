@@ -82,7 +82,7 @@ namespace cx
  *
  * A few core classes exist to provide initialization of the services
  * and connections between them. The rest of the functionality is
- * provided as \ref cx_plugins .
+ * provided as \ref cx_plugins.
  *
  * \ref cx::LogicManager is the main class.
  *

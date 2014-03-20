@@ -1,7 +1,7 @@
 #ifndef CXTESTRENDERSPEED_H_
 #define CXTESTRENDERSPEED_H_
 
-#include "sscView.h"
+#include "cxView.h"
 class QGridLayout;
 
 typedef vtkSmartPointer<class vtkRenderWindow> vtkRenderWindowPtr;

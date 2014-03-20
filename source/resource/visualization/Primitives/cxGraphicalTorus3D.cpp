@@ -15,15 +15,15 @@
 #include "cxGraphicalTorus3D.h"
 
 #include <QColor>
-#include "sscVtkHelperClasses.h"
+#include "cxVtkHelperClasses.h"
 #include "vtkSuperquadricSource.h"
 
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
-#include "sscTypeConversions.h"
-#include "sscGraphicalPrimitives.h"
+#include "cxTypeConversions.h"
+#include "cxGraphicalPrimitives.h"
 #include "vtkMatrix4x4.h"
 #include <vtkActor.h>
 #include <vtkProperty.h>

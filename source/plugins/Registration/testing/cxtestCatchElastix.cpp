@@ -15,28 +15,28 @@
 #include <vtkPolyData.h>
 #include <vtkPolyDataWriter.h>
 #include <vtkCellArray.h>
-#include "sscDataManager.h"
-#include "sscMesh.h"
-#include "sscVector3D.h"
+#include "cxDataManager.h"
+#include "cxMesh.h"
+#include "cxVector3D.h"
 #include "cxDataLocations.h"
 #include "vesselReg/SeansVesselReg.hxx"
-#include "sscRegistrationTransform.h"
-#include "sscTypeConversions.h"
+#include "cxRegistrationTransform.h"
+#include "cxTypeConversions.h"
 #include <QFileInfo>
 #include <QDir>
-#include "sscXmlOptionItem.h"
+#include "cxXmlOptionItem.h"
 
 #include "catch.hpp"
 
-#include "sscLogger.h"
-#include "sscTime.h"
+#include "cxLogger.h"
+#include "cxTime.h"
 #include "cxDataLocations.h"
 #include "cxElastixExecuter.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxSettings.h"
 #include "cxElastixSingleThreadedRunner.h"
-#include "sscTypeConversions.h"
+#include "cxTypeConversions.h"
 #include "cxElastixParameters.h"
 #include "cxLogicManager.h"
 
@@ -56,7 +56,7 @@ class ElastiXFixture
 public:
 	ElastiXFixture()
 	{
-//		cx::MessageManager::initialize();
+//		cx::Reporter::initialize();
 //		cx::cxDataManager::initialize();
 		cx::LogicManager::initialize();
 	}
@@ -65,7 +65,7 @@ public:
 	{
 		cx::LogicManager::shutdown();
 //		cx::DataManager::shutdown();
-//		cx::MessageManager::shutdown();
+//		cx::Reporter::shutdown();
 	}
 	bool compareTransforms(cx::Transform3D result, cx::Transform3D solution)
 	{

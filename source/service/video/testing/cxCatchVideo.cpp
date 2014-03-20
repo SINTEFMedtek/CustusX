@@ -18,16 +18,16 @@
 #include <QString>
 #include <vtkImageData.h>
 #include "vtkForwardDeclarations.h"
-#include "sscImage.h"
-#include "sscDummyTool.h"
+#include "cxImage.h"
+#include "cxDummyTool.h"
 #include "cxDataLocations.h"
 #include "cxMHDImageStreamer.h"
 #include "cxSimulatedImageStreamer.h"
-#include "sscDummyToolManager.h"
+#include "cxDummyToolManager.h"
 #include "cxtestSender.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
-//#include "sscDataManager.h"
+//#include "cxDataManager.h"
 #include "cxtestDummyDataManager.h"
 
 namespace cxtest

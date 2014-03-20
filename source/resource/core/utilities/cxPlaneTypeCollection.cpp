@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 #include "cxPlaneTypeCollection.h"
 
-#include "sscDefinitionStrings.h"
+#include "cxDefinitionStrings.h"
 #include <iostream>
 
 namespace cx

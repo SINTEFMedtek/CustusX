@@ -17,9 +17,9 @@
 #include <vector>
 #include <QVariant>
 #include <QObject>
-#include "sscDefinitions.h"
+#include "cxDefinitions.h"
 #include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include "cxPlaneTypeCollection.h"
 class QDomNode;
