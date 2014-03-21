@@ -30,6 +30,7 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
 	mInterpolationType->insertItem(0, "Nearest");
 	mInterpolationType->insertItem(1, "Linear");
 	mInterpolationType->insertItem(2, "Cubic");
+	mInterpolationType->setToolTip("Change VTK interpolation type");
 
 	connect(mInterpolationType, SIGNAL(currentIndexChanged(int)), this, SLOT(interpolationTypeChanged(int)));
 
