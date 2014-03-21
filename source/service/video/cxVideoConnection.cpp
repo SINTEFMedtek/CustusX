@@ -160,6 +160,8 @@ void VideoConnection::stopClient()
 		disconnect(mClient.get(), SIGNAL(fps(QString, double)), this, SLOT(fpsSlot(QString, double))); // thread-bridging connection
 		disconnect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
 
+		this->resetProbe();
+
 		mClient.reset();
 	}
 }
@@ -194,6 +196,15 @@ void VideoConnection::useUnusedProbeDataSlot()
 	for (std::vector<ProbeDefinitionPtr>::const_iterator citer = mUnsusedProbeDataVector.begin(); citer != mUnsusedProbeDataVector.end(); ++citer)
 		this->updateStatus(*citer);
 	mUnsusedProbeDataVector.clear();
+}
+
+void VideoConnection::resetProbe()
+{
+	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
+	if (!tool || !tool->getProbe())
+		return;
+	ProbeImplPtr probe = boost::dynamic_pointer_cast<ProbeImpl>(tool->getProbe());
+	probe->useDigitalVideo(false);
 }
 
 /** extract information from the IGTLinkUSStatusMessage
