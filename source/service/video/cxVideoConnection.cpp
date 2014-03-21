@@ -204,7 +204,8 @@ void VideoConnection::resetProbe()
 	if (!tool || !tool->getProbe())
 		return;
 	ProbeImplPtr probe = boost::dynamic_pointer_cast<ProbeImpl>(tool->getProbe());
-	probe->useDigitalVideo(false);
+	if (probe)
+		probe->useDigitalVideo(false);
 }
 
 /** extract information from the IGTLinkUSStatusMessage
