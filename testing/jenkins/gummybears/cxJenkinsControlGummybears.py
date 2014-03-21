@@ -133,7 +133,8 @@ class JenkinsGummyBears():
 
     def _printSetupInfo(self):
         ''
-        print '  Authorization: ', self.jenkins.get_jenkins_auth()
+        #help(self.jenkins)
+        #print '  Authorization: ', self.jenkins.get_jenkins_auth()
         print '  Available jobs:'
         print self._generateIndentedText(self.jenkins.get_jobs_list(), 6)
         print '  Connected to jobs:'
