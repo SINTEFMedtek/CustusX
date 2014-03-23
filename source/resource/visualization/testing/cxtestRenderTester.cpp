@@ -293,7 +293,7 @@ vtkImageDataPtr RenderTester::convertToColorImage(vtkImageDataPtr image)
 
 	vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
 	for (unsigned i=0; i<3; ++i)
-		merger->SetInputData(i, image);
+		merger->AddInputData(image);
 	merger->Update();
 	return merger->GetOutput();
 }

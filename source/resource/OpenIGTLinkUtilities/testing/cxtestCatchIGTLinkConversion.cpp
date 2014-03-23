@@ -145,8 +145,8 @@ TEST_CASE_METHOD(IGTLinkConversionFixture, "IGTLinkConversion: Decode/encode ima
 	CHECK(output);
 	CHECK(time == output->getAcquisitionTime());
 	CHECK(input->getUid() == output->getUid());
-	CHECK(cx::similar(Eigen::Array3i(input->getBaseVtkImageData()->GetDimensions()), Eigen::Array3i(output->getBaseVtkImageData()->GetDimensions())));
 	CHECK(cx::similar(cx::Vector3D(input->getBaseVtkImageData()->GetSpacing()), cx::Vector3D(output->getBaseVtkImageData()->GetSpacing())));
+	REQUIRE(cx::similar(Eigen::Array3i(input->getBaseVtkImageData()->GetDimensions()), Eigen::Array3i(output->getBaseVtkImageData()->GetDimensions())));
 
 	for (ValVectorType::iterator iter=values.begin(); iter!=values.end(); ++iter)
 	{

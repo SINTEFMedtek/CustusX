@@ -116,6 +116,7 @@ cxSyntheticVolume::sampleUsData(const Transform3D& rMf,
 	vtkImageDataPtr us_frame = vtkImageDataPtr::New();
 	us_frame->SetExtent(0, sliceDimension[0]-1, 0, sliceDimension[1]-1, 0, 0);
 	us_frame->SetSpacing(pixelSpacing[0], pixelSpacing[1], 0.0);
+	us_frame->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
 	unsigned char* us_data = (unsigned char*)us_frame->GetScalarPointer();
 	// For each pixel on that plane
@@ -147,6 +148,7 @@ vtkImageDataPtr cxSyntheticVolume::createEmptyMask(const Eigen::Array2i& sliceDi
 {
 	vtkImageDataPtr mask = vtkImageDataPtr::New();
 	mask->SetExtent(0, sliceDimension[0]-1, 0, sliceDimension[1]-1, 0, 0);
+	mask->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 	unsigned char* mask_data = (unsigned char*)mask->GetScalarPointer();
 	memset(mask_data, 1, sizeof(unsigned char)*sliceDimension[0]*sliceDimension[1]);
 	return mask;
