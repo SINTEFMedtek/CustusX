@@ -37,7 +37,7 @@ mapped onto this polygon.
 #ifndef __UltrasoundSectorSource_h
 #define __UltrasoundSectorSource_h
 
-#include "vtkPolyDataSource.h"
+#include "vtkPolyDataAlgorithm.h"
 #include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<vtkPolyData> vtkPolyDataPtr;
@@ -54,11 +54,11 @@ typedef vtkSmartPointer<vtkPolyData> vtkPolyDataPtr;
  *
  * \ingroup cx_resource_visualization
  */
-class UltrasoundSectorSource : public vtkPolyDataSource 
+class UltrasoundSectorSource : public vtkPolyDataAlgorithm
 {
 public:
 	static UltrasoundSectorSource *New();
-	vtkTypeRevisionMacro(UltrasoundSectorSource,vtkPolyDataSource);
+	vtkTypeMacro(UltrasoundSectorSource,vtkPolyDataAlgorithm);
 	void PrintSelf(ostream& os, vtkIndent indent);
 
 	void setProbeSector(vtkPolyDataPtr sector);
@@ -67,7 +67,8 @@ protected:
 	UltrasoundSectorSource();
 	~UltrasoundSectorSource() {};
 
-	void Execute();
+	int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+	int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
 private:
 	vtkPolyDataPtr mSector; ///< polydata representation of the sector provided externally. Used as basis during Execute().

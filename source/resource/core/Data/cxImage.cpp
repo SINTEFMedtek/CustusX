@@ -240,12 +240,12 @@ void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D)
 
 void Image::transformChangedSlot()
 {
-	if (mReferenceImageData)
-	{
-		Transform3D rMd = this->get_rMd();
-		mOrientatorMatrix->DeepCopy(rMd.inv().getVtkMatrix());
-		mReferenceImageData->Update();
-	}
+//	if (mReferenceImageData)
+//	{
+//		Transform3D rMd = this->get_rMd();
+//		mOrientatorMatrix->DeepCopy(rMd.inv().getVtkMatrix());
+//		mReferenceImageData->Update();
+//	}
 }
 
 void Image::moveThisAndChildrenToThread(QThread* thread)
@@ -263,10 +263,10 @@ void Image::setVtkImageData(const vtkImageDataPtr& data)
 	mBaseImageData = data;
 	mBaseGrayScaleImageData = NULL;
 
-	if (mOrientator)
-	{
-		mOrientator->SetInput(mBaseImageData);
-	}
+//	if (mOrientator)
+//	{
+//		mOrientator->SetInput(mBaseImageData);
+//	}
 
 	this->resetTransferFunctions();
 	emit vtkImageDataChanged();
@@ -319,32 +319,32 @@ vtkImageDataPtr Image::getBaseVtkImageData()
 	return mBaseImageData;
 }
 
-vtkImageDataPtr Image::getRefVtkImageData()
-{
-	if (!mReferenceImageData) // optimized: don't init it if you don't need it.
-	{
-		// provide a resampled volume for algorithms requiring that (such as PickerRep)
-		mOrientatorMatrix = vtkMatrix4x4Ptr::New();
-		mOrientator = vtkImageReslicePtr::New();
-		mOrientator->SetInput(mBaseImageData);
-		mOrientator->SetInterpolationModeToLinear();
-		mOrientator->SetOutputDimensionality(3);
-		mOrientator->SetResliceAxes(mOrientatorMatrix);
-		mOrientator->AutoCropOutputOn();
-		mReferenceImageData = mOrientator->GetOutput();
+//vtkImageDataPtr Image::getRefVtkImageData()
+//{
+//	if (!mReferenceImageData) // optimized: don't init it if you don't need it.
+//	{
+//		// provide a resampled volume for algorithms requiring that (such as PickerRep)
+//		mOrientatorMatrix = vtkMatrix4x4Ptr::New();
+//		mOrientator = vtkImageReslicePtr::New();
+//		mOrientator->SetInput(mBaseImageData);
+//		mOrientator->SetInterpolationModeToLinear();
+//		mOrientator->SetOutputDimensionality(3);
+//		mOrientator->SetResliceAxes(mOrientatorMatrix);
+//		mOrientator->AutoCropOutputOn();
+//		mReferenceImageData = mOrientator->GetOutput();
 
-		mReferenceImageData->Update();
+//		mReferenceImageData->Update();
 
-		this->transformChangedSlot(); // update transform
-		std::cout << "Warning: Image::getRefVtkImageData() called. Expensive. Do not use." << std::endl;
-	}
+//		this->transformChangedSlot(); // update transform
+//		std::cout << "Warning: Image::getRefVtkImageData() called. Expensive. Do not use." << std::endl;
+//	}
 
-	return mReferenceImageData;
-}
+//	return mReferenceImageData;
+//}
 
 DoubleBoundingBox3D Image::boundingBox() const
 {
-	mBaseImageData->UpdateInformation();
+//	mBaseImageData->UpdateInformation();
 	DoubleBoundingBox3D bounds(mBaseImageData->GetBounds());
 	return bounds;
 }
@@ -359,8 +359,7 @@ vtkImageAccumulatePtr Image::getHistogram()
 	if (mHistogramPtr.GetPointer() == NULL)
 	{
 		mHistogramPtr = vtkImageAccumulatePtr::New();
-//		mHistogramPtr->SetInput(mBaseImageData);
-		mHistogramPtr->SetInput(this->getGrayScaleVtkImageData());
+		mHistogramPtr->SetInputData(this->getGrayScaleVtkImageData());
 		mHistogramPtr->IgnoreZeroOn(); // required for Sonowand CT volumes, where data are placed between 31K and 35K.
 		// Set up only a 1D histogram for now, so y and z values are set to 0
 		mHistogramPtr->SetComponentExtent(0, this->getRange(), 0, 0, 0, 0);
@@ -746,14 +745,16 @@ void Image::mergevtkSettingsIntosscTransform()
 	Vector3D extentShift = multiply_elems(extent.corner(0, 0, 0).cast<double>(), spacing);
 
 	vtkImageChangeInformationPtr info = vtkImageChangeInformationPtr::New();
-	info->SetInput(mBaseImageData);
+	info->SetInputData(mBaseImageData);
 	info->SetOutputExtentStart(0, 0, 0);
 	info->SetOutputOrigin(0, 0, 0);
+	info->Update();
+	info->UpdateInformation();
 	mBaseImageData = info->GetOutput();
 
 	mBaseImageData->ComputeBounds();
-	mBaseImageData->Update();
-	mBaseImageData->UpdateInformation();
+//	mBaseImageData->Update();
+//	mBaseImageData->UpdateInformation();
 
 	this->get_rMd_History()->setRegistration(this->get_rMd() * createTransformTranslate(origin + extentShift));
 
@@ -791,9 +792,10 @@ vtkImageDataPtr Image::createDummyImageData(int axisSize, int maxVoxelValue)
 	dummyImageData->SetExtent(0, size, 0, size, 0, size);
 	dummyImageData->SetSpacing(1, 1, 1);
 	//dummyImageData->SetScalarTypeToUnsignedShort();
-	dummyImageData->SetScalarTypeToUnsignedChar();
-	dummyImageData->SetNumberOfScalarComponents(1);
-	dummyImageData->AllocateScalars();
+//	dummyImageData->SetScalarTypeToUnsignedChar();
+//	dummyImageData->SetNumberOfScalarComponents(1);
+//	dummyImageData->AllocateScalars();
+	dummyImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 	unsigned char* dataPtr = static_cast<unsigned char*> (dummyImageData->GetScalarPointer());
 
 	//Init voxel colors
@@ -844,8 +846,9 @@ vtkImageDataPtr Image::resample(long maxVoxels)
 		resampler->SetAxisMagnificationFactor(0, factor);
 		resampler->SetAxisMagnificationFactor(1, factor);
 		resampler->SetAxisMagnificationFactor(2, factor);
-		resampler->SetInput(retval);
-		resampler->GetOutput()->Update();
+		resampler->SetInputData(retval);
+//		resampler->GetOutput()->Update();
+		resampler->Update();
 		resampler->GetOutput()->GetScalarRange();
 		retval = resampler->GetOutput();
 

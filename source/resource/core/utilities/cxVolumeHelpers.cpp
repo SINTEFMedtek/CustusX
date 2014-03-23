@@ -37,9 +37,10 @@ vtkImageDataPtr generateVtkImageDataGeneric(Eigen::Array3i dim,
 	vtkImageDataPtr data = vtkImageDataPtr::New();
 	data->SetSpacing(spacing[0], spacing[1], spacing[2]);
 	data->SetExtent(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
-	data->SetScalarType(TYPE_FROM_VTK);
-	data->SetNumberOfScalarComponents(components);
-	data->AllocateScalars();
+//	data->SetScalarType(TYPE_FROM_VTK);
+//	data->SetNumberOfScalarComponents(components);
+//	data->AllocateScalars();
+	data->AllocateScalars(TYPE_FROM_VTK, components);
 
 	int scalarSize = dim[0]*dim[1]*dim[2]*components;
 
@@ -58,7 +59,7 @@ vtkImageDataPtr generateVtkImageDataGeneric(Eigen::Array3i dim,
 		if (scalarSize > 1)
 			ptr[1] = initValue;
 	}
-	data->UpdateInformation(); // update extent etc
+//	data->UpdateInformation(); // update extent etc
 
 	return data;
 }
@@ -147,7 +148,7 @@ ImagePtr convertImageToUnsigned(DataServicePtr dataManager, ImagePtr image, vtkI
 	if (!convertedImageData)
 	{
 		vtkImageShiftScalePtr cast = vtkImageShiftScalePtr::New();
-		cast->SetInput(input);
+		cast->SetInputData(input);
 		cast->ClampOverflowOn();
 
 		cast->SetShift(shift);
@@ -306,9 +307,10 @@ vtkImageDataPtr convertImageDataToGrayScale(vtkImageDataPtr image)
 	if (image->GetNumberOfScalarComponents() > 2)
 	{
 		vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
-		luminance->SetInput(image);
+		luminance->SetInputData(image);
+		luminance->Update();
 		retval = luminance->GetOutput();
-		retval->Update();
+//		retval->Update();
 	}
 	return retval;
 }
@@ -319,7 +321,7 @@ vtkImageDataPtr convertImageDataTo8Bit(vtkImageDataPtr image, double windowWidth
 	if (image->GetScalarSize() > 8)
 		{
 			vtkImageShiftScalePtr imageCast = vtkImageShiftScalePtr::New();
-			imageCast->SetInput(image);
+			imageCast->SetInputData(image);
 
 //			double scalarMax = windowWidth/2.0 + windowLevel;
 			double scalarMin = windowWidth/2.0 - windowLevel;
@@ -331,8 +333,9 @@ vtkImageDataPtr convertImageDataTo8Bit(vtkImageDataPtr image, double windowWidth
 			imageCast->SetScale(multiplyToScalarValue);
 			imageCast->SetOutputScalarTypeToUnsignedChar();
 			imageCast->ClampOverflowOn();
+			imageCast->Update();
 			retval = imageCast->GetOutput();
-			retval->Update();
+//			retval->Update();
 		}
 	return retval;
 }

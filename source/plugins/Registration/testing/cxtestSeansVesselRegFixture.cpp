@@ -136,7 +136,7 @@ vtkPolyDataPtr SeansVesselRegFixture::generatePolyData(
 void SeansVesselRegFixture::saveVTKFile(vtkPolyDataPtr data, QString filename)
 {
 	vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();
-	writer->SetInput(data);
+	writer->SetInputData(data);
 	writer->SetFileName(cstring_cast(filename));
 	writer->Update();
 	writer->Write();

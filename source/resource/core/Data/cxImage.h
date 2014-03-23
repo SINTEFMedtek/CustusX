@@ -75,7 +75,7 @@ public:
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
 	virtual vtkImageDataPtr getGrayScaleVtkImageData(); ///< as getBaseVtkImageData(), but constrained to 1 component if multicolor.
 	virtual vtkImageDataPtr get8bitGrayScaleVtkImageData();///< Have never been used or tested. Create a test for it
-	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the reference coordinate space
+//	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the reference coordinate space
 	LandmarksPtr getLandmarks();
 	/** Return a version of this, containing image data and transfer functions converted to unsigned.
 	  * This is used for the 3D texture slicer that doesnt handle signed data.
@@ -167,9 +167,9 @@ protected slots:
 protected:
 	vtkImageDataPtr mBaseImageData; ///< image data in data space
 	vtkImageDataPtr mBaseGrayScaleImageData; ///< image data in data space
-	vtkImageReslicePtr mOrientator; ///< converts imagedata to outputimagedata
-	vtkMatrix4x4Ptr mOrientatorMatrix;
-	vtkImageDataPtr mReferenceImageData; ///< imagedata after filtering through the orientatior, given in reference space
+//	vtkImageReslicePtr mOrientator; ///< converts imagedata to outputimagedata
+//	vtkMatrix4x4Ptr mOrientatorMatrix;
+//	vtkImageDataPtr mReferenceImageData; ///< imagedata after filtering through the orientatior, given in reference space
 	vtkImageAccumulatePtr mHistogramPtr;///< Histogram
 	ImagePtr mUnsigned; ///< version of this containing unsigned data.
 

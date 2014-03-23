@@ -150,15 +150,15 @@ vtkPropPtr OrientationAnnotation3DRep::readMarkerFromFile(const QString filename
 	vtkSTLReaderPtr STLReader = vtkSTLReaderPtr::New();
 	STLReader->SetFileName(cstring_cast(filename));
 
-	vtkPolyDataPtr person = STLReader->GetOutput();
+//	vtkPolyDataPtr person = STLReader->GetOutput();
 
 	vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
-	normals->SetInput(person);
+	normals->SetInputConnection(STLReader->GetOutputPort());
 	normals->Update();
-	person = normals->GetOutput();
+//	person = normals->GetOutput();
 
 	vtkPolyDataMapperPtr polyDataMapper = vtkPolyDataMapperPtr::New();
-	polyDataMapper->SetInput(person); //read a 3D model file of the tool
+	polyDataMapper->SetInputConnection(normals->GetOutputPort()); //read a 3D model file of the tool
 	polyDataMapper->Update();
 
 	vtkActorPtr actor = vtkActorPtr::New();
@@ -168,53 +168,6 @@ vtkPropPtr OrientationAnnotation3DRep::readMarkerFromFile(const QString filename
 	actor->GetProperty()->SetSpecular(0.3);
 
 	return actor;
-}
-
-void OrientationAnnotation3DRep::reduceSTLFile(const QString source, const QString dest, double reduction)
-{
-	vtkSTLReaderPtr STLReader = vtkSTLReaderPtr::New();
-	STLReader->SetFileName(cstring_cast(source));
-
-	vtkPolyDataPtr person = STLReader->GetOutput();
-	person->Update();
-	std::cout << "base cells=" << person->GetNumberOfCells() << ", mem=" << person->GetActualMemorySize() << std::endl;
-
-	// Smooth surface model
-	vtkWindowedSincPolyDataFilterPtr smoother = vtkWindowedSincPolyDataFilterPtr::New();
-	if (true)
-	{
-		smoother->SetInput(person);
-		smoother->SetPassBand(1);
-		std::cout << "passband " << smoother->GetPassBand() << std::endl;
-		smoother->Update();
-		person = smoother->GetOutput();
-		std::cout << "smoo cells=" << person->GetNumberOfCells() << ", mem=" << person->GetActualMemorySize()
-						<< std::endl;
-	}
-
-	//Decimate surface model (remove a percentage of the polygons)
-	vtkTriangleFilterPtr trifilt = vtkTriangleFilterPtr::New();
-	trifilt->SetInput(person);
-	trifilt->Update();
-	person = trifilt->GetOutput();
-	std::cout << "trif cells=" << person->GetNumberOfCells() << ", mem=" << person->GetActualMemorySize() << std::endl;
-
-	//    vtkDecimateProPtr deci = vtkDecimateProPtr::New();
-	vtkQuadricDecimationPtr deci = vtkQuadricDecimationPtr::New();
-
-	deci->SetInput(person);
-	deci->SetTargetReduction(reduction);
-	deci->Update();
-	person = deci->GetOutput();
-	std::cout << "deci cells=" << person->GetNumberOfCells() << ", mem=" << person->GetActualMemorySize() << std::endl;
-
-	vtkSTLWriterPtr writer = vtkSTLWriterPtr::New();
-	writer->SetInput(person);
-	writer->SetFileName(cstring_cast(dest));
-	writer->SetFileTypeToASCII();
-	//    writer->SetFileTypeToBinary();
-	writer->Update();
-	writer->Write();
 }
 
 vtkAnnotatedCubeActorPtr OrientationAnnotation3DRep::createCube()

@@ -15,6 +15,7 @@
 #include "cxReporter.h"
 #include "cxUtilHelpers.h"
 #include "cxTypeConversions.h"
+#include "vtkDataArray.h"
 
 namespace cx
 {

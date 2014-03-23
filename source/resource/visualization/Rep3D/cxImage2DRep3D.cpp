@@ -91,7 +91,7 @@ void Image2DProxy::setImage(ImagePtr image)
 
 void Image2DProxy::vtkImageDataChangedSlot()
 {
-	mActor->SetInput(mImageWithLUTProxy->getOutput());
+	mActor->SetInputData(mImageWithLUTProxy->getOutput());
 }
 
 /**called when transform is changed

@@ -44,7 +44,7 @@ ApplyLUTToImage2DProxy::ApplyLUTToImage2DProxy()
 	mDummyImage = Image::createDummyImageData(1, 0);
 
 	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
-	mRedirecter->SetInput(mDummyImage);
+	mRedirecter->SetInputData(mDummyImage);
 }
 
 ApplyLUTToImage2DProxy::~ApplyLUTToImage2DProxy()
@@ -65,7 +65,7 @@ void ApplyLUTToImage2DProxy::setInput(vtkImageDataPtr image, vtkLookupTablePtr l
 			for (int i = 0; i < 3; ++i)
 			{
 				vtkImageMapToColorsPtr compWindowLevel = vtkImageMapToColorsPtr::New();
-				compWindowLevel->SetInput(image);
+				compWindowLevel->SetInputData(image);
 				compWindowLevel->SetActiveComponent(i);
 				compWindowLevel->SetLookupTable(lut);
 				if (i==2) //TODO the only thing missing here is the alpha channel. Should be able to pass that on from the last pipe.
@@ -77,26 +77,32 @@ void ApplyLUTToImage2DProxy::setInput(vtkImageDataPtr image, vtkLookupTablePtr l
 					compWindowLevel->SetOutputFormatToLuminance();
 				}
 
-				merger->SetInput(i, compWindowLevel->GetOutput());
+				merger->SetInputConnection(i, compWindowLevel->GetOutputPort());
 			}
 
-			mRedirecter->SetInput(merger->GetOutput());
-			//mRedirecter->SetInput(mReslicer->GetOutput());
+			mRedirecter->SetInputConnection(merger->GetOutputPort());
 		}
 		else // grayscale
 		{
 			vtkImageMapToColorsPtr windowLevel = vtkImageMapToColorsPtr::New();
 			windowLevel->SetOutputFormatToRGBA();
-			windowLevel->SetInput(image);
+			windowLevel->SetInputData(image);
 			windowLevel->SetLookupTable(lut);
-			windowLevel->Update();
-			mRedirecter->SetInput(windowLevel->GetOutput());
+//			windowLevel->Update();
+			mRedirecter->SetInputConnection(windowLevel->GetOutputPort());
 		}
 	}
 	else // no image
 	{
-		mRedirecter->SetInput(mDummyImage);
+		mRedirecter->SetInputData(mDummyImage);
 	}
+
+	mRedirecter->Update();
+}
+
+vtkImageAlgorithmPtr ApplyLUTToImage2DProxy::getOutputPort()
+{
+	return mRedirecter;
 }
 
 vtkImageDataPtr ApplyLUTToImage2DProxy::getOutput()
@@ -151,7 +157,7 @@ void SlicedImageProxy::setSliceProxy(SliceProxyInterfacePtr slicer)
 
 void SlicedImageProxy::transferFunctionsChangedSlot()
 {
-	mReslicer->SetInput(mImage->getBaseVtkImageData());
+	mReslicer->SetInputData(mImage->getBaseVtkImageData());
 	mReslicer->SetBackgroundLevel(mImage->getMin());
 
 	vtkImageDataPtr input = mReslicer->GetOutput();
@@ -200,6 +206,11 @@ ImagePtr SlicedImageProxy::getImage() const
 vtkImageDataPtr SlicedImageProxy::getOutput()
 {
 	return mImageWithLUTProxy->getOutput();
+}
+
+vtkImageAlgorithmPtr SlicedImageProxy::getOutputPort()
+{
+	return mImageWithLUTProxy->getOutputPort();
 }
 
 void SlicedImageProxy::update()

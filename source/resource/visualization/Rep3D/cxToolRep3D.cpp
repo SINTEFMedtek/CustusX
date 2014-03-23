@@ -56,7 +56,7 @@ ToolRep3D::ToolRep3D(SpaceProviderPtr spaceProvider, const QString& uid, const Q
 	mOffsetPointVisibleAtZeroOffset = false;
 	mToolActor = vtkActorPtr::New();
 	mPolyDataMapper = vtkPolyDataMapperPtr::New();
-	mSTLReader = vtkSTLReaderPtr::New();
+//	mSTLReader = vtkSTLReaderPtr::New();
 
 	mOffsetPoint.reset(new GraphicalPoint3D());
 	mOffsetLine.reset(new GraphicalLine3D());
@@ -124,8 +124,10 @@ void ToolRep3D::setTool(ToolPtr tool)
 		QString filename = mTool->getGraphicsFileName();
 		if (!filename.isEmpty() && filename.endsWith("STL"))
 		{
-			mSTLReader->SetFileName(cstring_cast(filename));
-			model = mSTLReader->GetOutput(); //read a 3D model file of the tool
+			vtkSTLReaderPtr STLReader = vtkSTLReaderPtr::New();
+			STLReader->SetFileName(cstring_cast(filename));
+			STLReader->Update();
+			model = STLReader->GetOutput(); //read a 3D model file of the tool
 		}
 		else
 		{
@@ -135,10 +137,11 @@ void ToolRep3D::setTool(ToolPtr tool)
 		if (model)
 		{
 			vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
-			normals->SetInput(model);
+			normals->SetInputData(model);
 			normals->Update();
-			model = normals->GetOutput();
-			mPolyDataMapper->SetInput(model);
+//			model = normals->GetOutput();
+//			mPolyDataMapper->SetInput(model);
+			mPolyDataMapper->SetInputConnection(normals->GetOutputPort());
 
 			mToolActor->SetMapper(mPolyDataMapper);
 		}
@@ -324,7 +327,7 @@ void ToolRep3D::probeSectorChanged()
 		mProbeSector->setData(mTool->getProbeSector());
 		Transform3D tMu = mProbeSector->get_tMu();
 
-		mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSectorLinesOnly());
+		mProbeSectorPolyDataMapper->SetInputData(mProbeSector->getSectorLinesOnly());
 		if (mProbeSectorPolyDataMapper->GetInput())
 		{
 			mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);

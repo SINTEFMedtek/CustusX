@@ -224,7 +224,7 @@ vtkPolyDataPtr ContourFilter::execute(vtkImageDataPtr input,
 	if(reduceResolution)
 	{
 //		std::cout << "smooth" << std::endl;
-		shrinker->SetInput(input);
+		shrinker->SetInputData(input);
 		shrinker->SetShrinkFactors(2,2,2);
 		shrinker->Update();
 	}
@@ -232,22 +232,23 @@ vtkPolyDataPtr ContourFilter::execute(vtkImageDataPtr input,
 	// Find countour
 	vtkMarchingCubesPtr convert = vtkMarchingCubesPtr::New();
 	if(reduceResolution)
-		convert->SetInput(shrinker->GetOutput());
+		convert->SetInputConnection(shrinker->GetOutputPort());
 	else
-		convert->SetInput(input);
+		convert->SetInputData(input);
 
 	convert->SetValue(0, threshold);
 	convert->Update();
 
-	vtkPolyDataPtr cubesPolyData = vtkPolyDataPtr::New();
-	cubesPolyData = convert->GetOutput();
+	vtkPolyDataPtr cubesPolyData = convert->GetOutput();
+//	vtkPolyDataPtr cubesPolyData = vtkPolyDataPtr::New();
+//	cubesPolyData = convert->GetOutput();
 //	std::cout << "convert->GetOutput(); " << cubesPolyData.GetPointer() << std::endl;
 
 	// Smooth surface model
 	vtkWindowedSincPolyDataFilterPtr smoother = vtkWindowedSincPolyDataFilterPtr::New();
 	if(smoothing)
 	{
-		smoother->SetInput(cubesPolyData);
+		smoother->SetInputData(cubesPolyData);
 		smoother->SetNumberOfIterations(15);// Higher number = more smoothing
 		smoother->SetBoundarySmoothing(false);
 		smoother->SetFeatureEdgeSmoothing(false);
@@ -266,9 +267,9 @@ vtkPolyDataPtr ContourFilter::execute(vtkImageDataPtr input,
 	vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
 	if (decimation > 0.000001)
 	{
-		trifilt->SetInput(cubesPolyData);
+		trifilt->SetInputData(cubesPolyData);
 		trifilt->Update();
-		deci->SetInput(trifilt->GetOutput());
+		deci->SetInputConnection(trifilt->GetOutputPort());
 		deci->SetTargetReduction(decimation);
 		deci->SetPreserveTopology(preserveTopology);
 		//    deci->PreserveTopologyOn();
@@ -276,7 +277,7 @@ vtkPolyDataPtr ContourFilter::execute(vtkImageDataPtr input,
 		cubesPolyData = deci->GetOutput();
 	}
 
-	normals->SetInput(cubesPolyData);
+	normals->SetInputData(cubesPolyData);
 	normals->Update();
 
 	cubesPolyData->DeepCopy(normals->GetOutput());
