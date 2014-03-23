@@ -69,11 +69,13 @@ ImageTestData ImageTestData::initializePrimaryData(vtkImageDataPtr source, QStri
 		vtkImageExtractComponentsPtr splitterRGB = vtkImageExtractComponentsPtr::New();
 		splitterRGB->SetInputData(source);
 		splitterRGB->SetComponents(0, 1, 2);
-		merger->SetInputConnection(0, splitterRGB->GetOutputPort());
+//		merger->AddInputConnection(0, splitterRGB->GetOutputPort());
+		merger->AddInputConnection(splitterRGB->GetOutputPort());
 		vtkImageExtractComponentsPtr splitterA = vtkImageExtractComponentsPtr::New();
 		splitterA->SetInputData(source);
 		splitterA->SetComponents(0);
-		merger->SetInputConnection(1, splitterA->GetOutputPort());
+		merger->AddInputConnection(splitterA->GetOutputPort());
+//		merger->AddInputConnection(1, splitterA->GetOutputPort());
 		merger->Update();
 		retval.mImageData = merger->GetOutput();
 		colorFormat = "RGBA";

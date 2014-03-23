@@ -77,7 +77,8 @@ void ApplyLUTToImage2DProxy::setInput(vtkImageDataPtr image, vtkLookupTablePtr l
 					compWindowLevel->SetOutputFormatToLuminance();
 				}
 
-				merger->SetInputConnection(i, compWindowLevel->GetOutputPort());
+				merger->AddInputConnection(compWindowLevel->GetOutputPort());
+//				merger->AddInputConnection(i, compWindowLevel->GetOutputPort());
 			}
 
 			mRedirecter->SetInputConnection(merger->GetOutputPort());

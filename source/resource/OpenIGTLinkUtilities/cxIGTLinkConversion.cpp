@@ -210,6 +210,7 @@ ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 	imageImport->SetImportVoidPointer(message->GetScalarPointer());
 
 	imageImport->Modified();
+	imageImport->Update();
 
 	ImagePtr retval(new Image(deviceName, imageImport->GetOutput()));
 	retval->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestampMS));
@@ -358,7 +359,8 @@ vtkImageDataPtr IGTLinkConversion::createFilterAny2RGB(int R, int G, int B, vtkI
 	vtkImageExtractComponentsPtr splitterRGB = vtkImageExtractComponentsPtr::New();
 	splitterRGB->SetInputData(input);
 	splitterRGB->SetComponents(R, G, B);
-	merger->SetInputConnection(0, splitterRGB->GetOutputPort());
+	merger->AddInputConnection(splitterRGB->GetOutputPort());
+//	merger->AddInputConnection(0, splitterRGB->GetOutputPort());
 	merger->Update();
 	return merger->GetOutput();
 }
