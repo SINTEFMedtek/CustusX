@@ -130,7 +130,7 @@ vtkImageDataPtr UnsignedDerivedImage::convertImage()
     vtkImageDataPtr input = base->getBaseVtkImageData();
 
     vtkImageShiftScalePtr cast = vtkImageShiftScalePtr::New();
-    cast->SetInput(input);
+	cast->SetInputData(input);
     cast->ClampOverflowOn();
 
     cast->SetShift(shift);

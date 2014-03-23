@@ -195,7 +195,7 @@ bool Mesh::getFrontfaceCulling()
 
 DoubleBoundingBox3D Mesh::boundingBox() const
 {
-	getVtkPolyData()->Update();
+//	getVtkPolyData()->Update();
 	DoubleBoundingBox3D bounds(getVtkPolyData()->GetBounds());
 	return bounds;
 }
@@ -206,7 +206,7 @@ vtkPolyDataPtr Mesh::getTransformedPolyData(Transform3D transform)
 	if (similar(transform, Transform3D::Identity()))
 		return getVtkPolyData();
 
-	getVtkPolyData()->Update();
+//	getVtkPolyData()->Update();
 	vtkPolyDataPtr poly = vtkPolyDataPtr::New();
 	poly->DeepCopy(getVtkPolyData());
 	vtkPointsPtr points = poly->GetPoints();
@@ -222,7 +222,7 @@ vtkPolyDataPtr Mesh::getTransformedPolyData(Transform3D transform)
 	}
 	poly->SetPoints(floatPoints.GetPointer());
 	poly->Modified();
-	poly->Update();
+//	poly->Update();
 
 	return poly;
 }

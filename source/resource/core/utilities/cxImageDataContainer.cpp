@@ -173,7 +173,8 @@ SplitFramesContainer::SplitFramesContainer(vtkImageDataPtr image3D)
 		import->SetDataScalarType(image3D->GetScalarType());
 		import->SetDataSpacing(image3D->GetSpacing());
 		import->SetNumberOfScalarComponents(image3D->GetNumberOfScalarComponents());
-		int* extent = image3D->GetWholeExtent();
+//		int* extent = image3D->GetWholeExtent();
+		int* extent = image3D->GetExtent();
 		extent[4] = 0;
 		extent[5] = 0;
 		import->SetWholeExtent(extent);

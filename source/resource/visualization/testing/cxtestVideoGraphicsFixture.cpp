@@ -71,7 +71,7 @@ cx::ProbeDefinition VideoGraphicsFixture::readProbeData(QString filename)
 void VideoGraphicsFixture::addImageToRenderer(vtkImageDataPtr image)
 {
 	vtkImageActorPtr imageActor = vtkImageActorPtr::New();
-	imageActor->SetInput(image);
+	imageActor->SetInputData(image);
 	mMachine->addProp(imageActor);
 }
 

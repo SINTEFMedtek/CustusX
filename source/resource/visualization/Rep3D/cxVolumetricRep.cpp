@@ -24,9 +24,9 @@
 #include <vtkVolumeProperty.h>
 #include <vtkVolumeTextureMapper3D.h>
 
-#if VTK_MINOR_VERSION >= 6
+//#if VTK_MINOR_VERSION >= 6
 	#include <vtkGPUVolumeRayCastMapper.h>
-#endif
+//#endif
 
 #include <vtkImageData.h>
 #include <vtkVolume.h>
@@ -112,7 +112,7 @@ void VolumetricRep::setImage(ImagePtr image)
 		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		mMonitor.reset();
-		mMapper->SetInput( (vtkImageData*)NULL );
+		mMapper->SetInputData( (vtkImageData*)NULL );
 	}
 
 	mImage = image;
@@ -145,7 +145,7 @@ void VolumetricRep::vtkImageDataChangedSlot()
 	}
 
 	vtkImageDataPtr volume = mImage->resample(this->mMaxVoxels);
-	mMapper->SetInput(volume);
+	mMapper->SetInputData(volume);
 
 	transformChangedSlot();
 }

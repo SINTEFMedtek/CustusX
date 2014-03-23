@@ -153,7 +153,7 @@ vtkImageDataPtr SimulatedImageStreamer::frameGrab(ImagePtr source)
 	imageSlicer->setOutputFormat(Vector3D(0,0,0), outDim, probedata.getSpacing());
 
 	imageSlicer->update();
-	imageSlicer->getOutput()->Update();
+	imageSlicer->getOutputPort()->Update();
 
 	vtkImageDataPtr retval = vtkImageDataPtr::New();
 	retval->DeepCopy(imageSlicer->getOutput());
@@ -163,8 +163,8 @@ vtkImageDataPtr SimulatedImageStreamer::frameGrab(ImagePtr source)
 vtkImageDataPtr SimulatedImageStreamer::maskSlice(vtkImageDataPtr unmaskedSlice)
 {
 	vtkImageMaskPtr maskFilter = vtkImageMaskPtr::New();
-	maskFilter->SetMaskInput(this->getMask());
-	maskFilter->SetImageInput(unmaskedSlice);
+	maskFilter->SetMaskInputData(this->getMask());
+	maskFilter->SetImageInputData(unmaskedSlice);
 	maskFilter->SetMaskedOutputValue(0.0);
 	maskFilter->Update();
 

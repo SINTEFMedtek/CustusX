@@ -124,27 +124,6 @@ public:
 	virtual vtkImageDataPtr loadVtkImageData(QString filename);
 };
 
-/**\brief Reader for minc files.
- *
- */
-class MincImageReader: public DataReader
-{
-public:
-	virtual ~MincImageReader()
-	{
-	}
-	virtual bool canLoad(const QString& type, const QString& filename)
-	{
-		QString fileType = QFileInfo(filename).suffix();
-		return (fileType.compare("mnc", Qt::CaseInsensitive) == 0);
-	}
-	virtual bool readInto(DataPtr data, QString path);
-	bool readInto(ImagePtr image, QString filename);
-
-//	virtual vtkImageDataPtr loadVtkImageData(QString filename);
-	virtual QString canLoadDataType() const { return "image"; }
-	virtual DataPtr load(const QString& uid, const QString& filename);
-};
 
 /**\brief Reader for .vtk files.
  *

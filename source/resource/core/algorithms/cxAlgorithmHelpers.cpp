@@ -32,28 +32,6 @@ itkImageType::ConstPointer AlgorithmHelper::getITKfromVTKImage(vtkImageDataPtr i
 {
   //HACK
   return AlgorithmHelper::getITKfromVTKImageViaFile(image);
-
-//  if(!image)
-//  {
-//    std::cout << "getITKfromSSCImage(): NO image!!!" << std::endl;
-//    return itkImageType::ConstPointer();
-//  }
-//  itkVTKImageToImageFilterType::Pointer vtk2itkFilter = itkVTKImageToImageFilterType::New();
-//  //itkToVtkFilter->SetInput(data);
-//  vtkImageDataPtr input = image->getBaseVtkImageData();
-//  if (input->GetScalarType() != VTK_UNSIGNED_SHORT)
-//  //if (input->GetScalarType() == VTK_UNSIGNED_CHAR)
-//  {
-//    // convert
-//    // May need to use vtkImageShiftScale instead if we got data types other than unsigned char?
-//    vtkImageCastPtr imageCast = vtkImageCastPtr::New();
-//    imageCast->SetInput(input);
-//    imageCast->SetOutputScalarTypeToUnsignedShort();
-//    input = imageCast->GetOutput();
-//  }
-//  vtk2itkFilter->SetInput(input);
-//  vtk2itkFilter->Update();
-//  return vtk2itkFilter->GetOutput();
 }
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -94,7 +72,7 @@ itkImageType::ConstPointer AlgorithmHelper::getITKfromVTKImageViaFile(vtkImageDa
   QString filename = tempFolder + "/"+qstring_cast(writer.GetPointer())+".mhd";
 
 
-  writer->SetInput(input);
+  writer->SetInputData(input);
   writer->SetFileName(cstring_cast(filename));
   writer->SetCompression(false);
   writer->Write();

@@ -28,6 +28,7 @@
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 
+typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
 //---------------------------------------------------------
 namespace cx
 {
@@ -123,6 +124,7 @@ private:
 	vtkPolyDataPtr mPolyData;
 	vtkPlaneSourcePtr mPlaneSource;
 	vtkPainterPolyDataMapperPtr mPainterPolyDatamapper;
+	vtkPolyDataAlgorithmPtr mPolyDataAlgorithm;
 };
 
 #endif // WIN32

@@ -120,14 +120,15 @@ void VideoRecorderSaveThread::write(VideoRecorderSaveThread::DataType data)
 	if (!mWriteColor && data.mImage->GetNumberOfScalarComponents()>2)
 	{
 		  vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
-		  luminance->SetInput(data.mImage);
+		  luminance->SetInputData(data.mImage);
+		  luminance->Update();
 		  data.mImage = luminance->GetOutput();
-		  data.mImage->Update();
+//		  data.mImage->Update();
 	}
 
 	// write image
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
-	writer->SetInput(data.mImage);
+	writer->SetInputData(data.mImage);
 	writer->SetFileName(cstring_cast(data.mImageFilename));
 	writer->SetCompression(mCompressed);
 	writer->Write();
@@ -208,7 +209,7 @@ void SavingVideoRecorder::newFrameSlot()
 		return;
 
 	vtkImageDataPtr image = mSource->getVtkImageData();
-	image->Update();
+//	image->Update();
 	double timestamp = mSource->getTimestamp();
 	QString filename = mSaveThread->addData(timestamp, image);
 

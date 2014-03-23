@@ -38,7 +38,7 @@ ProbeAdapterRTSource::ProbeAdapterRTSource(QString uid, ProbePtr probe, VideoSou
 	connect(mBase.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
 
 	mRedirecter = vtkImageChangeInformationPtr::New();
-	mRedirecter->SetInput(mBase->getVtkImageData());
+	mRedirecter->SetInputData(mBase->getVtkImageData());
 	this->probeChangedSlot();
 }
 

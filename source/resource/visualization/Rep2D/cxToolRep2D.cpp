@@ -220,7 +220,7 @@ void ToolRep2D::update()
 
 		mProbeSector->setData(mSlicer->getTool()->getProbeSector());
 		Transform3D tMu = mProbeSector->get_tMu();
-		mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSectorLinesOnly());
+		mProbeSectorPolyDataMapper->SetInputData(mProbeSector->getSectorLinesOnly());
 		if (mProbeSectorPolyDataMapper->GetInput())
 		{
 			mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);

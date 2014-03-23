@@ -178,14 +178,29 @@ endif(WIN32)
 
 set( CX_RESOURCE_LIBRARIES 
     ${CX_RESOURCE_LIBRARIES}
-    vtkIO
-    vtkRendering
-    vtkImaging
-    vtkCommon
-    vtkHybrid
-    vtkWidgets
-    vtkFiltering
-    vtkVolumeRendering
+vtkCommonCore
+vtkCommonDataModel
+vtkIOImage
+vtkIOGeometry
+vtkIOLegacy
+vtkImagingStatistics
+vtkImagingColor
+vtkFiltersCore
+vtkFiltersGeneral
+vtkFiltersSources
+vtkRenderingFreeTypeOpenGL
+vtkRenderingFreeType
+vtkRenderingCore
+vtkRenderingVolume
+vtkInteractionStyle
+#    vtkIO
+#    vtkRendering
+#    vtkImaging
+#    vtkCommon
+#    vtkHybrid
+#    vtkWidgets
+#    vtkFiltering
+#    vtkVolumeRendering
     )
 
 
@@ -238,7 +253,7 @@ set(CX_RESOURCE_INCLUDE_DIRECTORIES
 
 set (CX_RESOURCE_LIBRARIES
     ${CX_RESOURCE_LIBRARIES}
-    QVTK
+	#QVTK
     ${SSC_GCOV_LIBRARY}
     ${OPENGL_LIBRARIES}
     ${QT_LIBRARIES}

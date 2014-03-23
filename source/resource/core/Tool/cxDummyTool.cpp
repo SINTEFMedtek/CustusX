@@ -229,7 +229,7 @@ vtkPolyDataPtr DummyTool::createPolyData(double h1, double h2, double r1, double
 	cone1->SetCenter(Vector3D(0,0,center1).begin());
 
 	vtkClipPolyDataPtr clipper1 = vtkClipPolyDataPtr::New();
-	clipper1->SetInput(cone1->GetOutput());
+	clipper1->SetInputConnection(cone1->GetOutputPort());
 	clipper1->SetClipFunction(plane);    
 
 	vtkConeSourcePtr cone2 = vtkConeSourcePtr::New();
@@ -240,9 +240,10 @@ vtkPolyDataPtr DummyTool::createPolyData(double h1, double h2, double r1, double
 	double center2 = -h2/2;
 	cone2->SetCenter(Vector3D(0,0,center2).begin());
 
-	assembly->AddInput(clipper1->GetOutput());
-	assembly->AddInput(cone2->GetOutput());
+	assembly->AddInputConnection(clipper1->GetOutputPort());
+	assembly->AddInputConnection(cone2->GetOutputPort());
 //    mPolyData = assembly->GetOutput();
+	assembly->Update();
 	return assembly->GetOutput();
 }
 

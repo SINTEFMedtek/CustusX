@@ -46,24 +46,21 @@ ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, Transform3D q
   // provide a resampled volume for algorithms requiring that (such as PickerRep)
   vtkMatrix4x4Ptr orientatorMatrix = vtkMatrix4x4Ptr::New();
   vtkImageReslicePtr orientator = vtkImageReslicePtr::New();
-  orientator->SetInput(image->getBaseVtkImageData());
+  orientator->SetInputData(image->getBaseVtkImageData());
   orientator->SetInterpolationModeToLinear();
   orientator->SetOutputDimensionality(3);
   orientator->SetResliceAxes(qMd.inv().getVtkMatrix());
   orientator->AutoCropOutputOn();
+  orientator->Update();
   vtkImageDataPtr rawResult = orientator->GetOutput();
 
-  rawResult->Update();
-//  rawResult->Print(std::cout);
+//  rawResult->Update();
 
   QString uid = image->getUid() + "_or%1";
   QString name = image->getName()+" or%1";
   ImagePtr oriented = dataManager->createDerivedImage(rawResult, uid, name, image);
-  //oriented->get_rMd_History()->setRegistration(reference->get_rMd());
   oriented->get_rMd_History()->setRegistration(image->get_rMd() * qMd.inv());
-//  std::cout << "rMd pre merge oriented\n" << oriented->get_rMd() << std::endl;
   oriented->mergevtkSettingsIntosscTransform();
-//  std::cout << "rMd finished oriented\n" << oriented->get_rMd() << std::endl;
 
   return oriented;
 }
@@ -76,13 +73,14 @@ ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, const Vector3
 //  std::cout << "oldspacing: " << Vector3D(image->getBaseVtkImageData()->GetSpacing()) << std::endl;
 //  std::cout << "spacing: " << spacing << std::endl;
   vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
-  resampler->SetInput(image->getBaseVtkImageData());
+  resampler->SetInputData(image->getBaseVtkImageData());
   resampler->SetAxisOutputSpacing(0, spacing[0]);
   resampler->SetAxisOutputSpacing(1, spacing[1]);
   resampler->SetAxisOutputSpacing(2, spacing[2]);
+  resampler->Update();
   vtkImageDataPtr rawResult = resampler->GetOutput();
 
-  rawResult->Update();
+//  rawResult->Update();
 
   if (uid.isEmpty())
   {
@@ -109,13 +107,14 @@ ImagePtr duplicateImage(DataServicePtr dataManager, ImagePtr image)
 vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox)
 {
   vtkImageClipPtr clip = vtkImageClipPtr::New();
-  clip->SetInput(input);
+  clip->SetInputData(input);
   clip->SetOutputWholeExtent(cropbox.begin());
   clip->ClipDataOn();
+  clip->Update();
   vtkImageDataPtr rawResult = clip->GetOutput();
 
-  rawResult->Update();
-  rawResult->UpdateInformation();
+//  rawResult->Update();
+//  rawResult->UpdateInformation();
   rawResult->ComputeBounds();
   return rawResult;
 }

@@ -167,8 +167,9 @@ bool BinaryThresholdImageFilter::execute()
 	rawResult->DeepCopy(itkToVtkFilter->GetOutput());
 
 	vtkImageCastPtr imageCast = vtkImageCastPtr::New();
-	imageCast->SetInput(rawResult);
+	imageCast->SetInputData(rawResult);
 	imageCast->SetOutputScalarTypeToUnsignedChar();
+	imageCast->Update();
 	rawResult = imageCast->GetOutput();
 
 	// TODO: possible memory problem here - check debug mem system of itk/vtk

@@ -58,14 +58,14 @@ SET(ALL_LINK_LIBRARIES
 	${BOOST_LIBRARIES}
 	${QT_LIBRARIES}
 	OpenIGTLink
-	vtkIO 
-	vtkRendering 
-	vtkImaging 
-	vtkCommon 
-	vtkHybrid 
-	vtkWidgets 
-	vtkFiltering 
-	vtkVolumeRendering 
+	#vtkIO
+	#vtkRendering
+	#vtkImaging
+	#vtkCommon
+	#vtkHybrid
+	#vtkWidgets
+	#vtkFiltering
+	#vtkVolumeRendering
     cxResource
     cxOpenIGTLinkUtilities
 	)

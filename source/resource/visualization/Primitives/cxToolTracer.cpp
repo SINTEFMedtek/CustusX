@@ -54,7 +54,7 @@ ToolTracer::ToolTracer()
 	mActor = vtkActorPtr::New();
 	mPolyDataMapper = vtkPolyDataMapperPtr::New();
 
-	mPolyDataMapper->SetInput(mPolyData);
+	mPolyDataMapper->SetInputData(mPolyData);
 	mActor->SetMapper(mPolyDataMapper);
 
 	mProperty = vtkPropertyPtr::New();

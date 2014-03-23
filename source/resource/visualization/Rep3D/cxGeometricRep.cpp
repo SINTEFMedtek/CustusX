@@ -98,7 +98,7 @@ void GeometricRep::meshChangedSlot()
 //	std::cout << "GeometricRep::meshChangedSlot()" << std::endl;
 	mMesh->connectToRep(mSelf);
 
-	mMapper->SetInput(mMesh->getVtkPolyData());
+	mMapper->SetInputData(mMesh->getVtkPolyData());
 	mMapper->ScalarVisibilityOff();//Don't use the LUT from the VtkPolyData
 
 	//Set mesh color

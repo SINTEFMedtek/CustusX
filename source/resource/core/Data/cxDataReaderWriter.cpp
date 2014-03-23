@@ -83,67 +83,6 @@ StaticMutexVtkLocker::~StaticMutexVtkLocker()
 boost::shared_ptr<QMutex> StaticMutexVtkLocker::mMutex;
 //---------------------------------------------------------
 
-bool MincImageReader::readInto(DataPtr data, QString filename)
-{
-	return this->readInto(boost::dynamic_pointer_cast<Image>(data), filename);
-}
-
-bool MincImageReader::readInto(ImagePtr image, QString filename)
-{
-	vtkImageDataPtr raw = this->loadVtkImageData(filename);
-	if(!raw)
-		return false;
-
-	//Read data input file
-	vtkMINCImageReaderPtr l_dataReader = vtkMINCImageReaderPtr::New();
-	l_dataReader->SetFileName(cstring_cast(filename));
-	l_dataReader->Update();
-
-	double l_dataOrigin[3];
-	l_dataReader->GetOutput()->GetOrigin(l_dataOrigin);
-	int l_dimensions[3];
-	l_dataReader->GetOutput()->GetDimensions(l_dimensions);
-
-	//set the transform
-	vtkTransformPtr l_dataTransform = vtkTransformPtr::New();
-	l_dataTransform->SetMatrix(l_dataReader->GetDirectionCosines());
-	l_dataTransform->Translate(l_dataReader->GetDataOrigin());
-	//l_dataTransform->GetInverse()->TransformPoint(l_dataOrigin, l_dataOrigin);
-	//l_dataTransform->Translate(l_dataOrigin);
-	//l_dataTransform->Scale(l_dataReader->GetOutput()->GetSpacing());
-
-	Transform3D rMd(l_dataTransform->GetMatrix());
-
-	// TODO: ensure rMd is correct in CustusX terms
-
-	vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
-	zeroer->SetInput(l_dataReader->GetOutput());
-	zeroer->SetOutputOrigin(0, 0, 0);
-	zeroer->Update();
-	//  vtkImageDataPtr imageData = zeroer->GetOutput();
-	vtkImageDataPtr imageData = zeroer->GetOutput();
-
-	QFile file(filename);
-	QFileInfo info(file);
-	//QString uid(info.completeBaseName()+"_minc_%1");
-//	QString name = uid;
-
-//	ImagePtr image(new Image(uid, imageData));
-	image->setVtkImageData(imageData);
-	image->get_rMd_History()->addRegistration(RegistrationTransform(rMd, info.lastModified(), "from Minc file"));
-	image->getBaseVtkImageData()->Print(std::cout);
-
-	return true;
-}
-
-//-----
-DataPtr MincImageReader::load(const QString& uid, const QString& filename)
-{
-	ImagePtr image(new Image(uid, vtkImageDataPtr()));
-	this->readInto(image, filename);
-	return image;
-}
-
 /** Wrapper for vtkAlgorithm::Update(),
   * prints error message upon error,
   * also wraps the call inside a global mutex (see below for why).
@@ -202,7 +141,7 @@ vtkImageDataPtr MetaImageReader::loadVtkImageData(QString filename)
 		return vtkImageDataPtr();
 
 	vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
-	zeroer->SetInput(reader->GetOutput());
+	zeroer->SetInputConnection(reader->GetOutputPort());
 	zeroer->SetOutputOrigin(0, 0, 0);
 	zeroer->Update();
 	return zeroer->GetOutput();
@@ -258,7 +197,7 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 void MetaImageReader::saveImage(ImagePtr image, const QString& filename)
 {
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
-	writer->SetInput(image->getBaseVtkImageData());
+	writer->SetInputData(image->getBaseVtkImageData());
 	writer->SetFileDimensionality(3);
 	writer->SetFileName(cstring_cast(filename));
 	QDir().mkpath(QFileInfo(filename).path());
@@ -390,7 +329,6 @@ DataPtr StlMeshReader::load(const QString& uid, const QString& filename)
 DataReaderWriter::DataReaderWriter()
 {
 	mDataReaders.insert(DataReaderPtr(new MetaImageReader()));
-	mDataReaders.insert(DataReaderPtr(new MincImageReader()));
 	mDataReaders.insert(DataReaderPtr(new PolyDataMeshReader()));
 	mDataReaders.insert(DataReaderPtr(new StlMeshReader()));
 	mDataReaders.insert(DataReaderPtr(new PNGImageReader()));

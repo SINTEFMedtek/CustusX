@@ -58,7 +58,7 @@ VideoGraphics::VideoGraphics()
 
 	// set the filter that applies a mask to the stream data
 	mMaskFilter = vtkImageMaskPtr::New();
-	mMaskFilter->SetMaskInput(vtkImageDataPtr());
+	mMaskFilter->SetMaskInputData(vtkImageDataPtr());
 	mMaskFilter->SetMaskedOutputValue(0.0);
 
 	// generate texture coords for mPlaneSource
@@ -107,36 +107,36 @@ void VideoGraphics::setupPipeline()
 {
 	if (!mInputVideo)
 	{
-		mTexture->SetInput(NULL);
+		mTexture->SetInputData(NULL);
 		return;
 	}
 
 	if (mInputMask)
 	{
-		mTextureMapToPlane->SetInput(mPlaneSource->GetOutput());
-		mTransformTextureCoords->SetInput(mTextureMapToPlane->GetOutput() );
-		mDataSetMapper->SetInput(mTransformTextureCoords->GetOutput() );
+		mTextureMapToPlane->SetInputConnection(mPlaneSource->GetOutputPort());
+		mTransformTextureCoords->SetInputConnection(mTextureMapToPlane->GetOutputPort() );
+		mDataSetMapper->SetInputConnection(mTransformTextureCoords->GetOutputPort() );
 
-		mMaskFilter->SetMaskInput(mInputMask);
-		mMapZeroToOne->SetInput(mDataRedirecter->GetOutput());
-		mMaskFilter->SetImageInput(mMapZeroToOne->GetOutput());
-		mTexture->SetInput(mMaskFilter->GetOutput());
+		mMaskFilter->SetMaskInputData(mInputMask);
+		mMapZeroToOne->SetInputConnection(mDataRedirecter->GetOutputPort());
+		mMaskFilter->SetInputConnection(1, mMapZeroToOne->GetOutputPort(1));
+		mTexture->SetInputConnection(mMaskFilter->GetOutputPort());
 	}
 	else if (mInputSector)
 	{
 		mUSSource->setProbeSector(mInputSector);
-		mTransformTextureCoords->SetInput(mUSSource->GetOutput() );
-		mDataSetMapper->SetInput(mTransformTextureCoords->GetOutput() );
+		mTransformTextureCoords->SetInputConnection(mUSSource->GetOutputPort() );
+		mDataSetMapper->SetInputConnection(mTransformTextureCoords->GetOutputPort() );
 
-		mTexture->SetInput(mDataRedirecter->GetOutput());
+		mTexture->SetInputConnection(mDataRedirecter->GetOutputPort());
 	}
 	else
 	{
-		mTextureMapToPlane->SetInput(mPlaneSource->GetOutput());
-		mTransformTextureCoords->SetInput(mTextureMapToPlane->GetOutput() );
-		mDataSetMapper->SetInput(mTransformTextureCoords->GetOutput() );
+		mTextureMapToPlane->SetInputConnection(mPlaneSource->GetOutputPort());
+		mTransformTextureCoords->SetInputConnection(mTextureMapToPlane->GetOutputPort() );
+		mDataSetMapper->SetInputConnection(mTransformTextureCoords->GetOutputPort() );
 
-		mTexture->SetInput(mDataRedirecter->GetOutput());
+		mTexture->SetInputConnection(mDataRedirecter->GetOutputPort());
 	}
 
 	this->setLookupTable();
@@ -200,7 +200,7 @@ void VideoGraphics::connectVideoImageToPipeline()
 {
 	if (mInputVideo == NULL)
 	{
-		mTexture->SetInput(NULL); // TODO trouble - will destroy the pipeline
+		mTexture->SetInputData(NULL); // TODO trouble - will destroy the pipeline
 		return;
 	}
 
@@ -212,18 +212,19 @@ void VideoGraphics::connectVideoImageToPipeline()
 		if (slice < 0) slice = 0;
 //		std::cout << "Got 3D volume, showing middle slice: " << slice << std::endl;
 		vtkSmartPointer<vtkExtractVOI> extractVOI = vtkSmartPointer<vtkExtractVOI>::New();
-		extractVOI->SetInput(mInputVideo);
+		extractVOI->SetInputData(mInputVideo);
 		extractVOI->SetVOI(extent[0], extent[1], extent[2], extent[3], slice, slice);
 		extractVOI->Update();
-		mDataRedirecter->SetInput(extractVOI->GetOutput());
+		mDataRedirecter->SetInputConnection(extractVOI->GetOutputPort());
 	}
 	else //2D
 	{
-		mDataRedirecter->SetInput(mInputVideo);
+		mDataRedirecter->SetInputData(mInputVideo);
 	}
 
 	mDataRedirecter->UpdateWholeExtent(); // important! syncs update extent to whole extent
-	mDataRedirecter->GetOutput()->Update(); //???
+	mDataRedirecter->Update();
+//	mDataRedirecter->GetOutput()->Update(); //???
 }
 
 void VideoGraphics::updatePlaneSourceBounds()
@@ -304,7 +305,7 @@ bool VideoGraphics::inputImageIsEmpty()
 {
 	if (mInputVideo == NULL)
 		return true;
-	mInputVideo->Update();
+//	mInputVideo->Update();
 	//Don't do anything if we get an empty image
 	int* dim = mInputVideo->GetDimensions();
 	if(dim[0] == 0 || dim[1] == 0)

@@ -108,7 +108,7 @@ private:
 	ToolPtr mTool;
 	vtkActorPtr mToolActor;
 	vtkPolyDataMapperPtr mPolyDataMapper;
-	vtkSTLReaderPtr mSTLReader;
+//	vtkSTLReaderPtr mSTLReader;
 	GraphicalPoint3DPtr mTooltipPoint;
 	GraphicalPoint3DPtr mOffsetPoint;
 	GraphicalLine3DPtr mOffsetLine;
