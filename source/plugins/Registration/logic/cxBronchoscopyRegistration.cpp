@@ -137,12 +137,10 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
 	  //std::cout << std::endl;
   }
 
-  if (QString::number(tar_M_src(0,0))=="nan") // harry but quick way to check badness of transform...
-  {
-    return Eigen::Matrix4d::Identity();
-  }
+  if ( std::isnan(tar_M_src.sum()) )
+      return Eigen::Matrix4d::Identity();
 
-  //*ok = true;
+
   return tar_M_src;
 }
 
@@ -188,16 +186,7 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 	Eigen::MatrixXd CTOrientations;
 	Eigen::MatrixXd trackingPositions(3 , Tnavigation.size());
 	Eigen::MatrixXd trackingOrientations(3, Tnavigation.size());
-	Eigen::Matrix4d TtoCTcoordinates;
 
-//    TtoCTcoordinates << 0, -1, 0, 0,
-//                        -1, 0, 0, 0,
-//                        0, 0, -1, 0,
-//                        0, 0, 0, 1;
-//    TtoCTcoordinates << 1, 0, 0, 0,
-//                        0, 1, 0, 0,
-//                        0, 0, -1, 0,
-//                        0, 0, 0, 1;
 
 	std::vector<Branch*> branchVector = branches->getBranches();
 	CTPositions = branchVector[0]->getPositions();
@@ -217,18 +206,17 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 
 	for (int i = 0; i < Tnavigation.size(); i++)
 	{
-//        Tnavigation[i] = TtoCTcoordinates * Tnavigation[i];
         Tnavigation[i] = old_rMpr * Tnavigation[i];
 		trackingPositions.block(0 , i , 3 , 1) = Tnavigation[i].topRightCorner(3 , 1);
 		trackingOrientations.block(0 , i , 3 , 1) = Tnavigation[i].block(0 , 2 , 3 , 1);
 	}
 
 	//debug start
-    std::cout << "Tracking data: " << Tnavigation[0] << std::endl;
-    std::cout << "Tracking position: " << trackingPositions.col(0) << std::endl;
-    std::cout << "Tracking orientation: " << trackingOrientations.col(0) << std::endl;
-    std::cout << "CT position: " << CTPositions.col(0) << std::endl;
-    std::cout << "CT orientation: " << CTOrientations.col(0) << std::endl;
+    //std::cout << "Tracking data: " << Tnavigation[0] << std::endl;
+    //std::cout << "Tracking position: " << trackingPositions.col(0) << std::endl;
+    //std::cout << "Tracking orientation: " << trackingOrientations.col(0) << std::endl;
+    //std::cout << "CT position: " << CTPositions.col(0) << std::endl;
+    //std::cout << "CT orientation: " << CTOrientations.col(0) << std::endl;
 	//debug end
 
 
@@ -254,7 +242,6 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 		{
 			nearestCTPositions.col(i) = CTPositions.col(indexVector[i]);
 			nearestCTOrientations.col(i) = CTOrientations.col(indexVector[i]);
-			//DAngle(i) = ( trackingOrientations.col(i) - nearestCTOrientations.col(i) ).squaredNorm();
 			float o0 = fmod( trackingOrientations(0,i) - nearestCTOrientations(0,i) , 2 );
 			float o1 = fmod( trackingOrientations(1,i) - nearestCTOrientations(1,i) , 2 );
 			float o2 = fmod( trackingOrientations(2,i) - nearestCTOrientations(2,i) , 2 );
@@ -264,7 +251,9 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 		std::pair<Eigen::MatrixXd , Eigen::MatrixXd> result = findPositionsWithSmallesAngleDifference(70 , DAngle , trackingPositions , nearestCTPositions);
 		vtkPointsPtr trackingPositions_vtk = convertTovtkPoints(result.first);
 		vtkPointsPtr CTPositions_vtk = convertTovtkPoints(result.second);
+
 		Eigen::Matrix4d tempMatrix = performLandmarkRegistration(trackingPositions_vtk, CTPositions_vtk);
+
 		registrationMatrix = tempMatrix * registrationMatrix;
 		translation << tempMatrix(0,3), tempMatrix(1,3), tempMatrix(2,3);
 		rotation = tempMatrix.topLeftCorner(3,3);
@@ -277,7 +266,6 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
             std::cout << tempMatrix.row(i) << std::endl;
 	}
 
-//    registrationMatrix = registrationMatrix * TtoCTcoordinates;
 	return registrationMatrix;
 }
 
@@ -285,33 +273,18 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 
 Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDataPtr centerline, TimedTransformMap trackingData_prMt, Transform3D old_rMpr)
 {
-//	const char * filenameNavigation = "/Users/ehofstad/Data/Lunge/LungNav - pilot study/Patient 004/Navigation bronchoscope removed bad fit.csv";
-//	const char * filenameNavigation = "/Users/ehofstad/Data/Lunge/LungNav - pilot study/Patient 018/Navigation_RemovedBadFit.csv";
-//	const char * filenameDirection = "/Users/ehofstad/Data/Lunge/LungNav - pilot study/Patient 004/Fast registration - pointer direction.csv";
-//	const char * filenameDirection = "/Users/ehofstad/Data/Lunge/LungNav - pilot study/Patient 018/Direction2.csv";
-
-	//PositionData* posData = new PositionData();
-	//std::pair< M4Vector, Eigen::Matrix4d > loadPosResult = posData->loadBronchoscopeTracking(filenameNavigation, filenameDirection);
 
     if(trackingData_prMt.empty())
 		reportError("BronchoscopyRegistration::runBronchoscopyRegistration(): No tracking data");
 
-
-//	M4Vector Tnavigation = loadPosResult.first;
 	M4Vector Tnavigation;
     for(TimedTransformMap::iterator iter=trackingData_prMt.begin(); iter!=trackingData_prMt.end(); ++iter)
 	{
 		Tnavigation.push_back(iter->second.	matrix());
 	}
 
-//	Eigen::Matrix4d TtoCTcoordinates = loadPosResult.second;
 
-//	QString CLname = "/Users/ehofstad/Data/Lunge/LungNav - pilot study/Patient 004/Patient_004_segmented_osirix_20111216T141209_seg1_cl1.vtk";
-//	QString CLname = "/Users/ehofstad/Data/Lunge/LungNav - pilot study/Patient 018/Patient018_SegmentedAirways_Mimics_20130506T152436_seg1_cl1.vtk";
-//	MeshPtr mesh = dataManager()->loadMesh(CLname, CLname, rtPOLYDATA);
-
-//	vtkPolyDataPtr poly = mesh->getVtkPolyData();
-	vtkPointsPtr points = centerline->GetPoints();
+    //vtkPointsPtr points = centerline->GetPoints();
 
 	int N = centerline->GetNumberOfPoints();
 	Eigen::MatrixXd CLpoints(3,N);
@@ -332,7 +305,6 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDat
 
     Eigen::Matrix4d regMatrix = registrationAlgorithm(branches, Tnavigation, old_rMpr);
 
-	//Eigen::Matrix4d regMatrixForCustusX = regMatrix * TtoCTcoordinates.inverse();
 	Eigen::Matrix4d regMatrixForCustusX = regMatrix;
 
 	std::cout << "regMatrixForCustusX: " << std::endl;
@@ -342,17 +314,23 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDat
 
 	std::vector<Branch*> BL = branches->getBranches();
 
-//	int totalNumberOfPoints = 0;
-	std::cout << "Number of branches: " << BL.size() << std::endl;
+    std::cout << "Number of branches in CT centerline: " << BL.size() << std::endl;
 
-//	for (int i = 0; i < BL.size(); i++)
-//	{
-//		totalNumberOfPoints += BL[i]->getPositions().cols();
-//	}
-//	std::cout << "totalNumberOfPoints: " << totalNumberOfPoints << std::endl;
-//	branches->~BranchList();
+
+    if ( std::isnan(regMatrixForCustusX.sum()) )
+    {
+        std::cout << "Warning: Registration matrix contains 'nan' number, using identity matrix." << std::endl;
+        return Eigen::Matrix4d::Identity();
+    }
+
+    if ( std::isinf(regMatrixForCustusX.sum()) )
+    {
+        std::cout << "Warning: Registration matrix contains 'inf' number, using identity matrix." << std::endl;
+        return Eigen::Matrix4d::Identity();
+    }
 
 	return regMatrixForCustusX;
+
 
 }
 
