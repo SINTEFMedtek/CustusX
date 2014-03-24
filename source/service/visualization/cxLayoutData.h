@@ -39,7 +39,7 @@ namespace cx
 
 struct LayoutPosition
 {
-	LayoutPosition() {}
+	LayoutPosition() : row(0), col(0) {}
 	LayoutPosition(int r, int c) : row(r), col(c) {}
 	int row; ///< row
 	int col; ///< column

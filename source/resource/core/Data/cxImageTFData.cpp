@@ -177,7 +177,7 @@ void ImageTFData::shiftOpacity(int shift)
 	for (IntIntMap::iterator it = mOpacityMap.begin(); it != mOpacityMap.end(); ++it)
 	{
 		double newVal = it->first + shift;
-		int roundedVal = floor(newVal + 0.5);
+//		int roundedVal = floor(newVal + 0.5);
 		newOpacipyMap[it->first + shift] = it->second;
 	}
 	mOpacityMap = newOpacipyMap;

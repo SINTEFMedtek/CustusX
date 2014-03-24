@@ -76,10 +76,6 @@ class uDataDesc;
 class ulterius;
 class uROI;
 
-namespace cx
-{
-class Frame;
-}
 class VTK_ULTRASOUND_EXPORT vtkSonixVideoSource;
 
 /**
