@@ -32,6 +32,7 @@
 #include "cxBronchoscopyRegistration.h"
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
+#include "cxThresholdPreview.h"
 
 
 namespace cx
@@ -67,6 +68,11 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegistrationManag
 	mVerticalLayout->addWidget(mRegisterButton);
 
 	mVerticalLayout->addStretch();
+
+    boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
+
+    mObscuredListener.reset(new WidgetObscuredListener(this));
+    connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
 }
 
 
@@ -77,9 +83,9 @@ QString BronchoscopyRegistrationWidget::defaultWhatsThis() const
 
 void BronchoscopyRegistrationWidget::registerSlot()
 {
-	Transform3D old_rMpr = dataManager()->get_rMpr();//input?
-    std::cout << "rMpr: " << std::endl;
-    std::cout << old_rMpr << std::endl;
+    Transform3D old_rMpr = dataManager()->get_rMpr();//input to registrationAlgorithm
+    //std::cout << "rMpr: " << std::endl;
+    //std::cout << old_rMpr << std::endl;
 
     if(!mSelectMeshWidget->getMesh())
     {
@@ -113,7 +119,13 @@ void BronchoscopyRegistrationWidget::registerSlot()
 	mManager->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
 
     ToolRep3DPtr activeRep3D = getToolRepIn3DView(mTool);
-	activeRep3D->getTracer()->clear();
+    activeRep3D->getTracer()->clear();
+
+    //QColor colorRed = QColor(255, 0, 0, 255);
+    //activeRep3D->getTracer()->setColor(colorRed);
+    activeRep3D->getTracer()->addManyPositions(trackerRecordedData_prMt);
+
+
 }
 
 void BronchoscopyRegistrationWidget::acquisitionStarted()
@@ -142,6 +154,19 @@ ToolRep3DPtr BronchoscopyRegistrationWidget::getToolRepIn3DView(ToolPtr tool)
 	ViewWidgetQPtr view = viewManager()->get3DView();
     ToolRep3DPtr retval = RepManager::findFirstRep<ToolRep3D>(view->getReps(),tool);
 	return retval;
+}
+
+void BronchoscopyRegistrationWidget::obscuredSlot(bool obscured)
+{
+    //std::cout << "Checking slot" << std::endl;
+    if (!obscured)
+        return;
+
+    ToolRep3DPtr activeRep3D = this->getToolRepIn3DView(mTool);
+    if (!activeRep3D)
+        return;
+    //std::cout << "Slot is cleared" << std::endl;
+    activeRep3D->getTracer()->clear();
 }
 
 } //namespace cx
