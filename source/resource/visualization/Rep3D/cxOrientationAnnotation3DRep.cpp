@@ -107,8 +107,10 @@ void OrientationAnnotation3DRep::setSize(double size)
 
 void OrientationAnnotation3DRep::rebuild(vtkRenderWindowInteractorPtr interactor)
 {
+	bool enable = true;
 	if (mMarker)
 	{
+		enable = mMarker->GetEnabled();
 		mMarker->SetInteractor(NULL);
 	}
 
@@ -120,8 +122,9 @@ void OrientationAnnotation3DRep::rebuild(vtkRenderWindowInteractorPtr interactor
 	if (interactor)
 	{
 		mMarker->SetInteractor(interactor);
-		mMarker->SetEnabled(1);
-		mMarker->InteractiveOff();
+		mMarker->SetEnabled(true);
+		mMarker->InteractiveOff();//This line prints a VTK warning if enabled is false
+		mMarker->SetEnabled(enable);
 	}
 }
 
