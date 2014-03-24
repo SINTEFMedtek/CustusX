@@ -26,7 +26,9 @@
 namespace cxtest
 {
 
-ProbeFixture::ProbeFixture()
+ProbeFixture::ProbeFixture() :
+	mDefaultTemporalCalibration(0),
+	mTemporalCalibration(0)
 {
 	// this stuff will be performed just before all tests in this class
 	cx::Reporter::initialize();
