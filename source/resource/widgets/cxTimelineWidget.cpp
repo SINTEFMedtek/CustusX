@@ -136,7 +136,7 @@ void TimelineWidget::createCompactingTransforms()
 	for (unsigned i = 0; i < temp.size(); ++i)
 		totalUsedTime += temp[i].mEndTime - temp[i].mStartTime;
 	// fraction of total time used in events:
-	double usageFactor = totalUsedTime / (mStop-mStart);
+//	double usageFactor = totalUsedTime / (mStop-mStart);
 
 	// function from real time (x) to compact time (y)
 	mForward = vtkPiecewiseFunctionPtr::New();
@@ -417,7 +417,7 @@ bool TimelineWidget::showHelp(QPoint pos)
 	else
 	{
 //	  QToolTip::hideText();
-//	  QToolTip::showText(this->mapToGlobal(pos), "", this); // hide - caused undefinable hiding of text after a sec.
+//	  QToolTip::showText(this->mapToGlobal(pos), "", this); // hide - caused undefinable hiding of text after a sec.
 		QToolTip::showText(this->mapToGlobal(pos), text.join("\n"), this); // show in new place
 		return true;
 	}
