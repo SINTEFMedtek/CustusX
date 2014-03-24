@@ -429,7 +429,7 @@ std::vector<double> TemporalCalibration::computeProbeMovement()
   std::vector<double> retval;
 
   double maxSingleStep = 5; // assume max 5mm movement per frame
-  double currentMaxShift = 5;
+	double currentMaxShift;
   double lastVal = 0;
 
 	mMask = mFileData.getMask();

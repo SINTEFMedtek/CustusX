@@ -65,7 +65,7 @@ void ImageDataContainer::purgeAll()
 		if (this->purge(i))
 			count++;
 	}
-	double fraction = double(count)/this->size();
+//	double fraction = double(count)/this->size();
 //	std::cout << QString("PurgeAll imagecache: purged %1\% of %2 frames.").arg(fraction).arg(this->size()) << std::endl;
 }
 
