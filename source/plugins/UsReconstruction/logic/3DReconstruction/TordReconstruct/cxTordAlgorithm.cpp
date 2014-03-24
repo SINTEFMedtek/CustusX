@@ -255,7 +255,7 @@ double TordAlgorithm::getTotalExecutionTime()
 {
 	double totalExecutionTime = -1;
 	std::set<std::string>::iterator it;
-	for(it = mMeasurementNames.begin(); it != mMeasurementNames.end(); it++)
+	for(it = mMeasurementNames.begin(); it != mMeasurementNames.end(); ++it)
 	{
 		oul::RuntimeMeasurement measurement =  mRuntime->getTiming(*it);
 		totalExecutionTime += measurement.getSum();

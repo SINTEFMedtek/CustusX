@@ -504,6 +504,10 @@ void Image::addXml(QDomNode& dataNode)
 	imageTypeNode.appendChild(doc.createTextNode(mImageType));
 	imageNode.appendChild(imageTypeNode);
 
+	QDomElement interpolationNode = doc.createElement("vtk_interpolation");
+	interpolationNode.setAttribute("type", mInterpolationType);
+	imageNode.appendChild(interpolationNode);
+
 	QDomElement initialWindowNode = doc.createElement("initialWindow");
 	initialWindowNode.setAttribute("width", mInitialWindowWidth);
 	initialWindowNode.setAttribute("level", mInitialWindowLevel);
@@ -589,6 +593,13 @@ void Image::parseXml(QDomNode& dataNode)
 
 	mModality = dataNode.namedItem("modality").toElement().text();
 	mImageType = dataNode.namedItem("imageType").toElement().text();
+
+	QDomElement interpoationNode = dataNode.namedItem("vtk_interpolation").toElement();
+	if (!interpoationNode.isNull())
+	{
+		mInterpolationType = interpoationNode.attribute("type").toInt();
+		emit vtkImageDataChanged();
+	}
 }
 
 void Image::setInitialWindowLevel(double width, double level)

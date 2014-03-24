@@ -331,7 +331,7 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData, vtkImageDataPtr gr
 //	printStuff("Clipped color in", inData);
 //	printStuff("Grayscale in", outData);
 
-	int* inExt = inData->GetWholeExtent();
+//	int* inExt = inData->GetWholeExtent();
 	int* outExt = outData->GetWholeExtent();
 
 	// Remember that the input might (and do due to vtkImageClip) contain leaps.
