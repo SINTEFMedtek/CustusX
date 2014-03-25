@@ -7,6 +7,7 @@
 #################################################  
 
 import subprocess
+import platform
 
 class ShellCommand:
     class ReturnValue:
@@ -55,16 +56,23 @@ class ShellCommandReal(ShellCommand):
     def _runDirectly(self, cmd):
         p = subprocess.Popen(cmd, shell=True, cwd=self.cwd)
         p.communicate("") # wait for process to complete
-        # TODO: Fix this in a better way
-        # Retcode 139 means faulty memory modules, but may sometimes be returned instead of -11 (segfaults) on Ubuntu
-        # https://wiki.ubuntu.com/DebuggingInstallationIssues#Segmentation_Fault_-_Exit_status_139
-        # http://ubuntuforums.org/archive/index.php/t-2128220.html
-        # We may have to run memory tests first to determine if the memory are faulty,
-        # so the temporary fix below will hide this info
-        # Memory test on AMD lab rack found no errors
-        if p.returncode == 139:
-            p.returncode = -11
+        p.returncode = self._convertCatchReturnCode139ToSegfault(p.returncode)
         return ShellCommand.ReturnValue(returncode=p.returncode, process=p)
+
+    def _convertCatchReturnCode139ToSegfault(self, returncode):
+        '''
+        TODO: Fix this in a better way
+        Retcode 139 means faulty memory modules, but may sometimes be returned instead of -11 (segfaults) on Ubuntu
+        https://wiki.ubuntu.com/DebuggingInstallationIssues#Segmentation_Fault_-_Exit_status_139
+        http://ubuntuforums.org/archive/index.php/t-2128220.html
+        We may have to run memory tests first to determine if the memory are faulty,
+        so the temporary fix below will hide this info
+        Memory test on AMD lab rack found no errors
+        '''
+        if (platform.system() == 'Linux'):
+            if returncode == 139:
+                returncode = -11
+        return returncode
 
     def _runAndRedirectOutput(self, cmd):
         output = []
