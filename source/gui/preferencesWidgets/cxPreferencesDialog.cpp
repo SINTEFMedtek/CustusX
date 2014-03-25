@@ -530,11 +530,12 @@ void PreferencesDialog::addTab(PreferenceTab* widget, QString name)
 // UltrasoundTab
 //------------------------------------------------------------------------------
 DebugTab::DebugTab(QWidget *parent) :
-		PreferenceTab(parent)
+		PreferenceTab(parent),
+		mIGSTKDebugLoggingCheckBox(NULL),
+		mManualToolPhysicalPropertiesCheckBox(NULL),
+		mRenderSpeedLoggingCheckBox(NULL),
+		mMainLayout(NULL)
 {
-	mIGSTKDebugLoggingCheckBox = NULL;
-	mManualToolPhysicalPropertiesCheckBox = NULL;
-	mMainLayout = NULL;
 }
 
 void DebugTab::init()

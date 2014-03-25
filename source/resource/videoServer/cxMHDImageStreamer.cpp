@@ -140,7 +140,10 @@ PackagePtr ImageTestData::createPackage(ImageTestData* data)
 }
 
 DummyImageStreamer::DummyImageStreamer() :
-		 mSendOnce(false)
+		 mSendOnce(false),
+		 mUseSecondaryStream(false),
+		 mPrimaryDataSource(),
+		 mSecondaryDataSource()
 {
 	this->setSendInterval(40);
 }

@@ -6,6 +6,7 @@
 #include "vtkRenderWindow.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
+#include "cxLogger.h"
 //#include "cxForwardDeclarations.h"
 
 namespace cxtest
@@ -83,12 +84,14 @@ void TestRenderSpeed::create2Dviews(int num)
 
 void TestRenderSpeed::showViews()
 {
-	QWidget* mainWidget = new QWidget;
-	mainWidget->resize(1000,500);
+	SSC_ASSERT(!mMainWidget);
+
+	mMainWidget.reset(new QWidget);
+	mMainWidget->resize(1000,500);
 	QGridLayout* layout = new QGridLayout();
-	mainWidget->setLayout(layout);
+	mMainWidget->setLayout(layout);
 	this->addViewsToGridLayout(layout);
-	mainWidget->show();
+	mMainWidget->show();
 }
 
 void TestRenderSpeed::renderNumTimes(int num)
