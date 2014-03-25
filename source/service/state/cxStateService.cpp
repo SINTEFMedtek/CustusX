@@ -336,6 +336,8 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("Automation/autoLoadRecentPatientWithinHours", 8);
 	this->fillDefault("Automation/autoShowNewData", false);
 
+	this->fillDefault("TrackingPositionFilter/enabled", false);
+
 	this->fillDefault("renderingInterval", 33);
 	this->fillDefault("backgroundColor", QColor("black"));
 	this->fillDefault("globalPatientDataFolder", QDir::homePath() + "/Patients");

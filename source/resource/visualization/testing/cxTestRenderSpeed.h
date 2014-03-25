@@ -46,6 +46,7 @@ private:
 
 	std::vector<cx::ViewWidget*> mViews;
 	std::vector<vtkRenderWindowPtr> mVtkRenderWindows;
+	boost::shared_ptr<QWidget> mMainWidget;
 	int mNumRenderings;
 	int mRenderTimeInMs;
 	int mNumViews;

@@ -125,11 +125,6 @@ void ImageLUT2D::internalsHaveChanged()
 
 std::pair<int,int> ImageLUT2D::getMapsRange()
 {
-	std::pair<int,int> retval;
-
-	int imin = 0;
-	int imax = 0;
-
 	if (!mColorMap.empty() && !mOpacityMap.empty())
 	{
 		int imin = std::min(mColorMap.begin()->first, mOpacityMap.begin()->first);

@@ -244,14 +244,14 @@ void ToolConfigureGroupBox::populateConfigurations()
   dir.setNameFilters(nameFilters);
 
   QString newConfig("<new config>");
-  int index = this->addConfigurationToComboBox(newConfig, this->generateConfigName());
+	this->addConfigurationToComboBox(newConfig, this->generateConfigName());
 
   QStringList configlist = dir.entryList();
   foreach(QString filename, configlist)
   {
     QFile file(dir.absolutePath()+"/"+filename);
     QFileInfo info(file);
-    index = this->addConfigurationToComboBox(filename, info.absoluteFilePath());
+		this->addConfigurationToComboBox(filename, info.absoluteFilePath());
   }
 
   int currentIndex = mConfigFilesComboBox->findText(newConfig);
