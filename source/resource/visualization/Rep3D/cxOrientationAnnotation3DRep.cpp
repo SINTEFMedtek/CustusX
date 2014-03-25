@@ -121,6 +121,7 @@ void OrientationAnnotation3DRep::rebuild(vtkRenderWindowInteractorPtr interactor
 
 	if (interactor)
 	{
+		mMarker->KeyPressActivationOff();
 		mMarker->SetInteractor(interactor);
 		mMarker->SetEnabled(true);
 		mMarker->InteractiveOff();//This line prints a VTK warning if enabled is false
