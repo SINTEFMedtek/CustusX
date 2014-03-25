@@ -265,7 +265,7 @@ double TordAlgorithm::getTotalExecutionTime()
 
 double TordAlgorithm::getKernelExecutionTime()
 {
-	double kernelExecutionTime = -1;
+//	double kernelExecutionTime = -1;
 	return mRuntime->getTiming(mKernelMeasurementName).getSum();
 
 }
