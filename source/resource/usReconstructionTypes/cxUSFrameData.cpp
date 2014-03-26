@@ -331,7 +331,7 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData, vtkImageDataPtr gr
 //	printStuff("Grayscale in", outData);
 
 //	int* inExt = inData->GetWholeExtent();
-	int* outExt = outData->GetWholeExtent();
+	int* outExt = outData->GetExtent();
 
 	// Remember that the input might (and do due to vtkImageClip) contain leaps.
 	// This means that the wholeextent might be larger than the extent, thus
