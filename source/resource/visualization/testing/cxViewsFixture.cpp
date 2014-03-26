@@ -26,6 +26,7 @@
 #include "cxDataLocations.h"
 #include "cxtestRenderTester.h"
 #include "cxViewsWindow.h"
+#include <QApplication>
 
 #include "catch.hpp"
 
@@ -200,6 +201,13 @@ bool ViewsFixture::quickRunWidget()
 {
 	return mWindow->quickRunWidget();
 }
+
+bool ViewsFixture::runWidget()
+{
+	mWindow->show();
+	return qApp->exec();
+}
+
 
 } // namespace cxtest
 

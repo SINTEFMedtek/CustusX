@@ -52,11 +52,21 @@ ApplyLUTToImage2DProxy::~ApplyLUTToImage2DProxy()
 
 }
 
-void ApplyLUTToImage2DProxy::setInput(vtkImageDataPtr image, vtkLookupTablePtr lut)
+void ApplyLUTToImage2DProxy::setInputData(vtkImageDataPtr image, vtkLookupTablePtr lut)
 {
-	if (image)
+	vtkImageChangeInformationPtr redirecter = vtkImageChangeInformationPtr::New();
+	redirecter->SetInputData(image);
+	redirecter->Update();
+	this->setInput(redirecter, lut);
+}
+
+void ApplyLUTToImage2DProxy::setInput(vtkImageAlgorithmPtr input, vtkLookupTablePtr lut)
+{
+	input->Update();
+
+	if (input->GetOutput())
 	{
-		if (image->GetNumberOfScalarComponents() == 3) // color
+		if (input->GetOutput()->GetNumberOfScalarComponents() == 3) // color
 		{
 			// split the image into the components, apply the lut, then merge.
 
@@ -65,7 +75,7 @@ void ApplyLUTToImage2DProxy::setInput(vtkImageDataPtr image, vtkLookupTablePtr l
 			for (int i = 0; i < 3; ++i)
 			{
 				vtkImageMapToColorsPtr compWindowLevel = vtkImageMapToColorsPtr::New();
-				compWindowLevel->SetInputData(image);
+				compWindowLevel->SetInputConnection(input->GetOutputPort());
 				compWindowLevel->SetActiveComponent(i);
 				compWindowLevel->SetLookupTable(lut);
 				if (i==2) //TODO the only thing missing here is the alpha channel. Should be able to pass that on from the last pipe.
@@ -87,7 +97,7 @@ void ApplyLUTToImage2DProxy::setInput(vtkImageDataPtr image, vtkLookupTablePtr l
 		{
 			vtkImageMapToColorsPtr windowLevel = vtkImageMapToColorsPtr::New();
 			windowLevel->SetOutputFormatToRGBA();
-			windowLevel->SetInputData(image);
+			windowLevel->SetInputConnection(input->GetOutputPort());
 			windowLevel->SetLookupTable(lut);
 //			windowLevel->Update();
 			mRedirecter->SetInputConnection(windowLevel->GetOutputPort());
@@ -98,6 +108,7 @@ void ApplyLUTToImage2DProxy::setInput(vtkImageDataPtr image, vtkLookupTablePtr l
 		mRedirecter->SetInputData(mDummyImage);
 	}
 
+	std::cout << "ApplyLUTToImage2DProxy mRedirecter->Update()" << std::endl;
 	mRedirecter->Update();
 }
 
@@ -161,12 +172,18 @@ void SlicedImageProxy::transferFunctionsChangedSlot()
 	mReslicer->SetInputData(mImage->getBaseVtkImageData());
 	mReslicer->SetBackgroundLevel(mImage->getMin());
 
-	vtkImageDataPtr input = mReslicer->GetOutput();
+	vtkImageChangeInformationPtr redirecter = vtkImageChangeInformationPtr::New();
+//	vtkImageDataPtr input = mReslicer->GetOutput();
+//	mReslicer->Update();
 	// if input is 2D - use directly
 	if (mImage->getBaseVtkImageData()->GetDimensions()[2]==1)
-		input = mImage->getBaseVtkImageData();
+//		input = mImage->getBaseVtkImageData();
+		redirecter->SetInputData(mImage->getBaseVtkImageData());
+	else
+		redirecter->SetInputConnection(mReslicer->GetOutputPort());
 
-	mImageWithLUTProxy->setInput(input, mImage->getLookupTable2D()->getOutputLookupTable());
+//	redirecter->Update();
+	mImageWithLUTProxy->setInput(redirecter, mImage->getLookupTable2D()->getOutputLookupTable());
 }
 
 void SlicedImageProxy::setImage(ImagePtr image)
@@ -193,7 +210,7 @@ void SlicedImageProxy::setImage(ImagePtr image)
 	}
 	else // no image
 	{
-		mImageWithLUTProxy->setInput(vtkImageDataPtr(), vtkLookupTablePtr());
+		mImageWithLUTProxy->setInput(vtkImageAlgorithmPtr(), vtkLookupTablePtr());
 	}
 
 	this->update();
@@ -226,6 +243,7 @@ void SlicedImageProxy::update()
 	Transform3D M = iMr * rMs;
 
 	mMatrixAxes->DeepCopy(M.getVtkMatrix());
+//	mReslicer->Update();
 }
 
 void SlicedImageProxy::transformChangedSlot()
