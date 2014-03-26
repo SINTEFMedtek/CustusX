@@ -429,14 +429,14 @@ std::vector<double> TemporalCalibration::computeProbeMovement()
   std::vector<double> retval;
 
   double maxSingleStep = 5; // assume max 5mm movement per frame
-  double currentMaxShift = 5;
+//	double currentMaxShift;
   double lastVal = 0;
 
 	mMask = mFileData.getMask();
   for (int i=0; i<N_frames; ++i)
   {
     double val = this->findCorrelation(mFileData.mUsRaw, 0, i, maxSingleStep, lastVal);
-    currentMaxShift =  fabs(val) + maxSingleStep;
+//    currentMaxShift =  fabs(val) + maxSingleStep;
     lastVal = val;
     retval.push_back(val);
   }

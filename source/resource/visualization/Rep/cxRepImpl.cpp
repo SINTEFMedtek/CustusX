@@ -119,6 +119,8 @@ void RepImpl::onStartRenderPrivate()
 void RepImpl::setModified()
 {
 	mModified = true;
+	if (mView)
+		mView->forceUpdate();
 }
 
 

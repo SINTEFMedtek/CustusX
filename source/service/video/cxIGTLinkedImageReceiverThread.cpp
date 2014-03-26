@@ -132,7 +132,11 @@ namespace cx
 {
 
 IGTLinkedImageReceiverThread::IGTLinkedImageReceiverThread(QString address, int port, QObject* parent) :
-		ImageReceiverThread(parent), mHeadingReceived(false), mAddress(address), mPort(port)
+	ImageReceiverThread(parent),
+	mHeadingReceived(false),
+	mAddress(address),
+	mPort(port),
+	mSocket(NULL)
 {
 //  std::cout << "client::create thread: " << QThread::currentThread() << std::endl;
 }

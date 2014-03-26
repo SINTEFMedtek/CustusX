@@ -148,9 +148,8 @@ class Version:
         elements = [
              self._get('major'), 
              self._get('minor'),
-             self._get('patch'), 
-             self._getPostfix()]
-        retval = 'v%s' % '.'.join(elements)
+             self._get('patch')]
+        retval = 'v%s%s' % ('.'.join(elements), self._getPostfix())
         return retval
      
     def _getPostfix(self):
@@ -158,9 +157,9 @@ class Version:
         if type=='RELEASE':
             return ''
         if type=='ALPHA':
-            return 'alpha'
+            return '.alpha'
         if type=='BETA':
-            return 'beta'
+            return '.beta'
         return type
     
     def commitToGit(self):

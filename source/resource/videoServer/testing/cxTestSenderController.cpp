@@ -2,7 +2,10 @@
 
 #include "catch.hpp"
 
-TestSenderController::TestSenderController(QObject* parent) : QObject(parent)
+TestSenderController::TestSenderController(QObject* parent) :
+	QObject(parent),
+	mImageReceived(false),
+	mStatusReceived(false)
 {
 }
 
