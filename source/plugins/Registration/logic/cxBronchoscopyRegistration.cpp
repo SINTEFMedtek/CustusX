@@ -211,19 +211,23 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 		trackingOrientations.block(0 , i , 3 , 1) = Tnavigation[i].block(0 , 2 , 3 , 1);
 	}
 
-	//debug start
-    //std::cout << "Tracking data: " << Tnavigation[0] << std::endl;
-    //std::cout << "Tracking position: " << trackingPositions.col(0) << std::endl;
-    //std::cout << "Tracking orientation: " << trackingOrientations.col(0) << std::endl;
-    //std::cout << "CT position: " << CTPositions.col(0) << std::endl;
-    //std::cout << "CT orientation: " << CTOrientations.col(0) << std::endl;
-	//debug end
-
 
 	//Adjusting points for centeroids
-	Eigen::Vector3d translation = CTPositions.rowwise().mean() - trackingPositions.rowwise().mean();
+    Eigen::MatrixXd::Index maxIndex;
+    trackingPositions.col(2).maxCoeff( &maxIndex );
+    Eigen::Vector3d translation = CTPositions.row(0) - trackingPositions.row(maxIndex);
+    //Eigen::Vector3d translation = CTPositions.rowwise().mean() - trackingPositions.rowwise().mean();
 	Eigen::Matrix3d rotation;
 	trackingPositions = trackingPositions.colwise() + translation;
+
+    //debug start
+    std::cout << "Tracking data: " << Tnavigation[0] << std::endl;
+    std::cout << "Tracking position: " << trackingPositions.col(0) << std::endl;
+    std::cout << "Tracking orientation: " << trackingOrientations.col(0) << std::endl;
+    std::cout << "CT position: " << CTPositions.col(0) << std::endl;
+    std::cout << "CT orientation: " << CTOrientations.col(0) << std::endl;
+    //debug end
+
 
 	registrationMatrix << 1, 0, 0, translation(0),
 						  0, 1, 0, translation(1),
