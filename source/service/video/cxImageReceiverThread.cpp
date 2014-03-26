@@ -68,9 +68,9 @@ ImagePtr ImageReceiverThread::getLastImageMessage()
 
 	// this happens when the main thread is busy. This is bad, but happens a lot during operation.
 	// Removed this in order to remove spam from console
-	static int mQueueSizeOnLastGet = 0;
-	int queueSize = mMutexedImageMessageQueue.size();
-	mQueueSizeOnLastGet = queueSize;
+//	static int mQueueSizeOnLastGet = 0;
+//	int queueSize = mMutexedImageMessageQueue.size();
+//	mQueueSizeOnLastGet = queueSize;
 	return retval;
 }
 

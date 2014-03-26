@@ -242,7 +242,7 @@ void ImageStreamerOpenCV::grab()
 //	QTime start = QTime::currentTime();
 	// grab images from camera to opencv internal buffer, do not process
 	mVideoCapture->grab();
-	int val = mCounter.elapsed();
+//	int val = mCounter.elapsed();
 	mLastGrabTime = QDateTime::currentDateTime();
 	mAvailableImage = true;
 //	static int counter=0;

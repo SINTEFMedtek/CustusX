@@ -94,7 +94,7 @@ void fillShortImageDataWithGradient(vtkImageDataPtr data, int maxValue)
 
 	unsigned short* ptr = reinterpret_cast<unsigned short*>(data->GetScalarPointer());
 
-	int scalarSize = dim[0]*dim[1]*dim[2]*1;
+//	int scalarSize = dim[0]*dim[1]*dim[2]*1;
 	for (int z=0; z<dim[2]; ++z)
 		for (int y=0; y<dim[1]; ++y)
 			for (int x=0; x<dim[0]; ++x)

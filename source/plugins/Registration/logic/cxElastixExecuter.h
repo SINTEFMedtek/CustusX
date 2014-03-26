@@ -198,7 +198,7 @@ public:
 		std::cout << "==========TEST==============" << std::endl;
 		Transform3D M = createTransformRotateX(M_PI/3)*createTransformRotateY(M_PI/4)*createTransformTranslate(Vector3D(0,2,3));
 
-		ElastixEulerTransform E = ElastixEulerTransform::create(M, Vector3D(30,40,50));
+		ElastixEulerTransform E = create(M, Vector3D(30,40,50));
 		Transform3D Q = E.toMatrix();
 
 		std::cout << "M\n" << M << std::endl;

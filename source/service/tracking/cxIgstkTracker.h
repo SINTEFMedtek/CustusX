@@ -137,7 +137,6 @@ signals:
 protected:
 	typedef itk::ReceptorMemberCommand<IgstkTracker> ObserverType;
 
-	IgstkTracker() {} ///< do not use this one
 	void trackerTransformCallback(const itk::EventObject &eventVar); ///< callback receiving events from the observer
 	void addLogging(); ///< adds logging to the internal igstk components
 
@@ -165,6 +164,9 @@ protected:
 	bool mOpen; ///< whether or not the tracker is open
 	bool mInitialized; ///< whether or not the tracker is initialized
 	bool mTracking; ///< whether or not the tracker is tracking
+
+private:
+	IgstkTracker() {} ///< do not use this one
 };
 typedef boost::shared_ptr<IgstkTracker> TrackerPtr;
 typedef boost::weak_ptr<IgstkTracker> TrackerWeakPtr;

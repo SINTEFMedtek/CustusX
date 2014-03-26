@@ -87,6 +87,7 @@ private:
 	void updateImage(ImagePtr message); // called by receiving thread when new data arrives.
 	void runClient(ImageReceiverThreadPtr client);
 	void stopClient(); ///< Get rid of the mClient thread.
+	void resetProbe();///< Tell probe it is no longer connected to a digital interface
 	void updateStatus(ProbeDefinitionPtr message);
 	void startAllSources();
 	void removeSourceFromProbe(ToolPtr tool);

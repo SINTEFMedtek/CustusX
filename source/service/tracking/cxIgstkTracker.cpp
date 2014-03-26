@@ -38,6 +38,7 @@ IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
 				mValid(false),
 				mUid(""),
 				mName(""),
+				mTracker(NULL),
 				mCommunication(CommunicationType::New()),
 				mTrackerObserver(ObserverType::New()),
 				mOpen(false),

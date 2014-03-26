@@ -55,7 +55,8 @@ void WidgetObscuredListener::timeoutSlot()
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-ThresholdPreview::ThresholdPreview()
+ThresholdPreview::ThresholdPreview() :
+	mShadingOn_original(false)
 {
 }
 

@@ -42,7 +42,7 @@ ImageLUT2DPtr ImageDefaultTFGenerator::generate2DTFPreset()
 	double_pair range = this->guessInitialScalarRange();
 	double smin = range.first;
 	double smax = range.second;
-	double srange = smax - smin;
+//	double srange = smax - smin;
 //	std::cout << "TF2D: " << smin << ", " << smax << std::endl;
 
 	IntIntMap opacity;

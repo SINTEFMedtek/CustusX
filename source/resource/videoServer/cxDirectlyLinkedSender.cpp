@@ -56,7 +56,6 @@ void DirectlyLinkedSender::send(ProbeDefinitionPtr msg)
 ImagePtr DirectlyLinkedSender::popImage()
 {
 	return mImage;
-	mImage.reset();
 }
 ProbeDefinitionPtr DirectlyLinkedSender::popUSStatus()
 {
