@@ -87,12 +87,14 @@ void BronchoscopyRegistrationWidget::registerSlot()
     //std::cout << "rMpr: " << std::endl;
     //std::cout << old_rMpr << std::endl;
 
+
     if(!mSelectMeshWidget->getMesh())
     {
         reportError("No centerline");
         return;
     }
 	vtkPolyDataPtr centerline = mSelectMeshWidget->getMesh()->getVtkPolyData();//input
+    Transform3D rMd = mSelectMeshWidget->getMesh()->get_rMd();
 
     if(!mTool)
     {
@@ -113,7 +115,7 @@ void BronchoscopyRegistrationWidget::registerSlot()
     }
 
 	BronchoscopyRegistration reg;
-    Transform3D new_rMpr = Transform3D(reg.runBronchoscopyRegistration(centerline,trackerRecordedData_prMt,old_rMpr));
+    Transform3D new_rMpr = Transform3D(reg.runBronchoscopyRegistration(centerline,trackerRecordedData_prMt,old_rMpr,rMd));
 
     new_rMpr = new_rMpr*old_rMpr;//output
 	mManager->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");

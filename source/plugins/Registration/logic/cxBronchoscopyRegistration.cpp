@@ -275,7 +275,7 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 
 
 
-Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDataPtr centerline, TimedTransformMap trackingData_prMt, Transform3D old_rMpr)
+Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDataPtr centerline, TimedTransformMap trackingData_prMt, Transform3D old_rMpr, Transform3D rMd)
 {
 
     if(trackingData_prMt.empty())
@@ -291,13 +291,14 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDat
     //vtkPointsPtr points = centerline->GetPoints();
 
 	int N = centerline->GetNumberOfPoints();
-	Eigen::MatrixXd CLpoints(3,N);
-
+    Eigen::MatrixXd CLpoints(3,N);
 	for(vtkIdType i = 0; i < N; i++)
 	    {
 	    double p[3];
 		centerline->GetPoint(i,p);
-	    CLpoints(0,i) = p[0]; CLpoints(1,i) = p[1]; CLpoints(2,i) = p[2];
+        Eigen::Vector3d position;
+        position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
+        CLpoints.block(0 , i , 3 , 1) = rMd.coord(position);
 	    }
 
 	Tnavigation = excludeClosePositions(Tnavigation);
