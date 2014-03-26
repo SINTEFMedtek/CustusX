@@ -55,7 +55,8 @@ Q_OBJECT
 public:
 	ApplyLUTToImage2DProxy();
 	virtual ~ApplyLUTToImage2DProxy();
-	void setInput(vtkImageDataPtr image, vtkLookupTablePtr lut);
+	void setInputData(vtkImageDataPtr image, vtkLookupTablePtr lut);
+	void setInput(vtkImageAlgorithmPtr input, vtkLookupTablePtr lut);
 	vtkImageDataPtr getOutput();
 	vtkImageAlgorithmPtr getOutputPort(); ///< output 2D sliced image
 
