@@ -7,29 +7,29 @@ cmake_minimum_required(VERSION 2.6)
 # Boost
 #----------
 
-find_package( Boost REQUIRED )
+#find_package( Boost REQUIRED )
 
 # VTK
 #----------
-FIND_PACKAGE(VTK REQUIRED)
-INCLUDE(${VTK_USE_FILE})
+#FIND_PACKAGE(VTK REQUIRED)
+#INCLUDE(${VTK_USE_FILE})
 
 # Qt
 #----------
 # find and setup Qt4 for this project
-SET (QT_USE_QTXML TRUE)
-find_package(Qt4 REQUIRED)
-set(QT_USE_QTNETWORK 1)
-IF(QT_USE_FILE)
-	INCLUDE(${QT_USE_FILE})
-ELSE(QT_USE_FILE)
-	SET(QT_LIBRARIES   ${QT_QT_LIBRARY})
-ENDIF(QT_USE_FILE)
+#SET (QT_USE_QTXML TRUE)
+#find_package(Qt4 REQUIRED)
+#set(QT_USE_QTNETWORK 1)
+#IF(QT_USE_FILE)
+#	INCLUDE(${QT_USE_FILE})
+#ELSE(QT_USE_FILE)
+#	SET(QT_LIBRARIES   ${QT_QT_LIBRARY})
+#ENDIF(QT_USE_FILE)
 
 # OpenIGTLink
 #----------
-find_package(OpenIGTLink REQUIRED)
-include(${OpenIGTLink_USE_FILE})
+#find_package(OpenIGTLink REQUIRED)
+#include(${OpenIGTLink_USE_FILE})
 
 #-------------------------------
 # Include directories

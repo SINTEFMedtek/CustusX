@@ -287,7 +287,7 @@ bool TubeSegmentationFilter::postProcess()
 			return false;
 
 		vtkImageShiftScalePtr cast = vtkImageShiftScalePtr::New();
-		cast->SetInput(convertedImageData);
+		cast->SetInputData(convertedImageData);
 		cast->ClampOverflowOn();
 
 		//tdfs voxels contains values [0.0,1.0]
@@ -522,7 +522,8 @@ vtkImageDataPtr TubeSegmentationFilter::importRawImageData(void * data, int size
 	imageImport->SetNumberOfScalarComponents(1);
 	imageImport->SetDataSpacing(input->getBaseVtkImageData()->GetSpacing());
 	imageImport->SetImportVoidPointer(data);
-	imageImport->GetOutput()->Update();
+//	imageImport->GetOutput()->Update();
+	imageImport->Update();
 	imageImport->Modified();
 
 	vtkImageDataPtr retval = vtkImageDataPtr::New();
