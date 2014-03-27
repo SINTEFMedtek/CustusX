@@ -69,7 +69,6 @@ private:
 	vtkAxesActorPtr createAxes();
 	vtkAnnotatedCubeActorPtr createCube();
 	vtkPropPtr readMarkerFromFile(const QString filename);
-	void reduceSTLFile(const QString source, const QString dest, double reduction);
 };
 
 }

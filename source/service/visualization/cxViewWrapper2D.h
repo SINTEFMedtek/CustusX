@@ -38,6 +38,7 @@ namespace cx
 typedef boost::shared_ptr<class OrientationAnnotationSmartRep> OrientationAnnotationSmartRepPtr;
 typedef boost::shared_ptr<class ViewFollower> ViewFollowerPtr;
 typedef boost::shared_ptr<class Zoom2DHandler> Zoom2DHandlerPtr;
+typedef boost::shared_ptr<class DataRepContainer> DataRepContainerPtr;
 }
 
 
@@ -61,7 +62,6 @@ public:
 	virtual ~ViewWrapper2D();
 	virtual void initializePlane(PLANE_TYPE plane);
 	virtual ViewWidget* getView();
-//	virtual void setZoom2D(SyncedValuePtr value);
 	virtual void setOrientationMode(SyncedValuePtr value);
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy);
 	virtual void setViewGroup(ViewGroupDataPtr group);
@@ -79,19 +79,12 @@ private slots:
 	void mouseMoveSlot(QMouseEvent* event);
 	void mouseWheelSlot(QWheelEvent* event);
 	void orientationActionSlot();
-//	void global2DZoomActionSlot();
 	void orientationModeChanged();
 	void settingsChangedSlot(QString key);
 	void optionChangedSlot();
-//	void zoom2DActionSlot();
 
 private:
 	void moveManualTool(QPoint point);
-//	virtual void setZoomFactor2D(double zoomFactor);
-//	virtual double getZoomFactor2D() const;
-//	void set2DZoomConnectivityFromType(QString type);
-//	QString get2DZoomConnectivityType();
-//	void add2DZoomConnectivityAction(QString type, QString text, QMenu &contextMenu);
 
 	virtual void appendToContextMenu(QMenu& contextMenu);
 	void addReps();
@@ -108,23 +101,24 @@ private:
 	Vector3D viewToDisplay(Vector3D p_v) const;
 
 	virtual void imageAdded(ImagePtr image);
-	virtual void meshAdded(MeshPtr mesh);
+//	virtual void meshAdded(MeshPtr mesh);
 	virtual void imageRemoved(const QString& uid);
-	virtual void meshRemoved(const QString& uid);
-	virtual void pointMetricAdded(PointMetricPtr mesh);
-	virtual void pointMetricRemoved(const QString& uid);
+//	virtual void meshRemoved(const QString& uid);
+//	virtual void pointMetricAdded(PointMetricPtr mesh);
+//	virtual void pointMetricRemoved(const QString& uid);
 
 	virtual void dataAdded(DataPtr data);
 	virtual void dataRemoved(const QString& uid);
 
 	void resetMultiSlicer();
 	Texture3DSlicerRepPtr mMultiSliceRep;
+	DataRepContainerPtr mDataRepContainer;
 
 	GeometricRep2DPtr mPickerGlyphRep;
 	SliceProxyPtr mSliceProxy;
 	SliceRepSWPtr mSliceRep;
-	std::map<QString, GeometricRep2DPtr> mGeometricRep;
-	std::map<QString, PointMetricRep2DPtr> mPointMetricRep;
+//	std::map<QString, GeometricRep2DPtr> mGeometricRep;
+//	std::map<QString, PointMetricRep2DPtr> mPointMetricRep;
 	ToolRep2DPtr mToolRep2D;
 //  OrientationAnnotationSmartRepPtr mOrientationAnnotationRep;
 	OrientationAnnotationSmartRepPtr mOrientationAnnotationRep;
@@ -133,6 +127,7 @@ private:
 	SlicePlanes3DMarkerIn2DRepPtr mSlicePlanes3DMarker;
 	QPointer<ViewWidget> mView;
 	ViewFollowerPtr mViewFollower;
+
 
 	// synchronized data
 //	SyncedValuePtr mZoom2D;

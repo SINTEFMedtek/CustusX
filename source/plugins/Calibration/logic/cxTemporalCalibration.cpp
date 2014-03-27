@@ -506,8 +506,8 @@ vtkImageDataPtr TemporalCalibration::extractLine_y(USFrameDataPtr data, int line
 
   // run the base frame through the mask. Result is source.
   vtkImageMaskPtr maskFilter = vtkImageMaskPtr::New();
-	maskFilter->SetMaskInput(mMask);
-  maskFilter->SetImageInput(base);
+	maskFilter->SetMaskInputData(mMask);
+  maskFilter->SetImageInputData(base);
   maskFilter->SetMaskedOutputValue(0.0);
   maskFilter->Update();
   uchar* source = static_cast<uchar*>(maskFilter->GetOutput()->GetScalarPointer());

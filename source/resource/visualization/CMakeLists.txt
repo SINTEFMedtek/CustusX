@@ -39,6 +39,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	Rep2D/cxCrossHairRep2D
 	Rep2D/cxGeometricRep2D
 	Rep2D/cxPointMetricRep2D
+	Rep2D/cxSphereMetricRep2D
 	Rep2D/cxGuideRep2D
     Rep2D/cxOrientationAnnotation2DRep
 
@@ -75,14 +76,20 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     )
 
 set( CX_RESOURCE_VISUALIZATION_LIBRARIES ${CX_RESOURCE_VISUALIZATION_LIBRARIES}
-    vtkIO
-    vtkRendering
-    vtkImaging
-    vtkCommon
-    vtkHybrid
-    vtkWidgets
-    vtkFiltering
-    vtkVolumeRendering
+	vtkRenderingVolumeOpenGL
+	vtkGUISupportQt
+	vtkRenderingAnnotation
+	vtkFiltersModeling
+	vtkInteractionWidgets
+	vtkFiltersTexture
+#    vtkIO
+#    vtkRendering
+#    vtkImaging
+#   vtkCommon
+#    vtkHybrid
+#    vtkWidgets
+#    vtkFiltering
+#    vtkVolumeRendering
     )
 
 # =========================================================
@@ -130,7 +137,7 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 set(CX_RESOURCE_VISUALIZATION_LIBRARIES
     ${CX_RESOURCE_VISUALIZATION_LIBRARIES}
     cxResource
-    QVTK
+	#QVTK
     ${SSC_GCOV_LIBRARY}
     ${OPENGL_LIBRARIES}
     ${QT_LIBRARIES}

@@ -206,7 +206,7 @@ void RenderTester::writeToPNG(vtkImageDataPtr image, QString filename)
 {
 	vtkPNGWriterPtr pngWriter = vtkPNGWriterPtr::New();
 	pngWriter->SetFileName(filename.toStdString().c_str());
-	pngWriter->SetInput(image);
+	pngWriter->SetInputData(image);
 	pngWriter->Write();
 }
 
@@ -237,9 +237,9 @@ vtkImageDataPtr RenderTester::clipImage(vtkImageDataPtr input)
 {
 	vtkImageClipPtr imageClip = vtkImageClipPtr::New();
 	imageClip->SetClipData(1);
-	imageClip->SetInput(input);
+	imageClip->SetInputData(input);
 
-	int* wExt1 = imageClip->GetInput()->GetWholeExtent();
+	int* wExt1 = input->GetExtent();
 	imageClip->SetOutputWholeExtent(wExt1[0] + this->mBorderOffset,
 									wExt1[1] - this->mBorderOffset,
 									wExt1[2] + this->mBorderOffset,
@@ -253,9 +253,9 @@ vtkImageDataPtr RenderTester::clipImage(vtkImageDataPtr input)
 bool RenderTester::equalExtent(vtkImageDataPtr input1, vtkImageDataPtr input2)
 {
 	int ext1[6], ext2[6];
-	input1->Update();
+//	input1->Update();
 	input1->GetExtent(ext1);
-	input2->Update();
+//	input2->Update();
 	input2->GetExtent(ext2);
 
 	if ((ext2[1]-ext2[0]) == (ext1[1]-ext1[0]) &&
@@ -293,7 +293,7 @@ vtkImageDataPtr RenderTester::convertToColorImage(vtkImageDataPtr image)
 
 	vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
 	for (unsigned i=0; i<3; ++i)
-		merger->SetInput(i, image);
+		merger->AddInputData(image);
 	merger->Update();
 	return merger->GetOutput();
 }
@@ -323,8 +323,8 @@ bool RenderTester::findDifference(vtkImageDataPtr input1, vtkImageDataPtr input2
 	}
 
 	vtkImageDifferencePtr imageDifference = vtkImageDifferencePtr::New();
-	imageDifference->SetInput(clipped1);
-	imageDifference->SetImage(clipped2);
+	imageDifference->SetInputData(clipped1);
+	imageDifference->SetImageData(clipped2);
 	imageDifference->Update();
 	double minError = imageDifference->GetThresholdedError();
 	bool validdims = this->hasValidDimensions(imageDifference->GetOutput());

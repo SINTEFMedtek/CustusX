@@ -20,6 +20,7 @@
 #include "vtkCaptionActor2D.h"
 #include "vtkTextProperty.h"
 #include "cxVtkHelperClasses.h"
+#include "vtkPolyDataNormals.h"
 
 namespace cx
 {
@@ -79,7 +80,7 @@ void GraphicalPolyData3D::setData(vtkPolyDataPtr data)
 	mData = data;
 
 	if (mData)
-		mMapper->SetInput(mData);
+		mMapper->SetInputData(mData);
 }
 
 Vector3D GraphicalPolyData3D::getPosition() const
@@ -122,8 +123,13 @@ GraphicalPoint3D::GraphicalPoint3D(vtkRendererPtr renderer)
 	source->SetThetaResolution(16);
 	source->SetPhiResolution(12);
 	source->LatLongTessellationOn();
+
+	vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
+	normals->SetInputConnection(source->GetOutputPort());
+	normals->Update();
+
 	mapper = vtkPolyDataMapperPtr::New();
-	mapper->SetInputConnection(source->GetOutputPort());
+	mapper->SetInputConnection(normals->GetOutputPort());
 
 	actor = vtkActorPtr::New();
 	actor->SetMapper(mapper);
@@ -376,7 +382,7 @@ Rect3D::Rect3D(vtkRendererPtr renderer, QColor color)
 	mSide->InsertNextCell(5, cells);
 
 	mPolyData->SetPoints(mPoints);
-	mapper->SetInput(mPolyData);
+	mapper->SetInputData(mPolyData);
 }
 
 void Rect3D::setLine(bool on, int width)
@@ -424,7 +430,7 @@ void Rect3D::updatePosition(const DoubleBoundingBox3D bb, const Transform3D& M)
 	mPoints->InsertPoint(2, M.coord(bb.corner(1,1,0)).begin());
 	mPoints->InsertPoint(3, M.coord(bb.corner(1,0,0)).begin());
 	mPolyData->SetPoints(mPoints);
-	mPolyData->Update();
+//	mPolyData->Update();
 }
 
 ///--------------------------------------------------------
@@ -440,7 +446,7 @@ FollowerText3D::FollowerText3D( vtkRendererPtr renderer)
 
 	mText = vtkVectorTextPtr::New();
 	vtkPolyDataMapperPtr mapper = vtkPolyDataMapperPtr::New();
-	mapper->SetInput(mText->GetOutput());
+	mapper->SetInputConnection(mText->GetOutputPort());
 	mFollower = vtkFollowerPtr::New();
 	mFollower->SetMapper(mapper);
 //  mFollower->SetCamera(mRenderer->GetActiveCamera());

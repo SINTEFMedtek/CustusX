@@ -166,21 +166,25 @@ class VTK(CppComponent):
         self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/VTK')
     def update(self):
         # this fix should rebase repo from the original Kitware/VTK to our own fork on GitHub.
-        self._getBuilder().gitSetRemoteURL('git@github.com:SINTEFMedisinskTeknologi/VTK', branch='VTK-5-10-1.patch_branch')
-        self._getBuilder().gitCheckout('VTK-5-10-1.cx_patch_2')
+        repo = 'git@github.com:SINTEFMedisinskTeknologi/VTK'
+        branch = 'VTK-CX-modifications'
+        tag = 'VTK-6-1-0.cx_patch_1'
+        self._getBuilder().gitSetRemoteURL(repo, branch=branch)
+        self._getBuilder().gitCheckout(tag)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         add('VTK_USE_PARALLEL:BOOL', True)
         # Note: DVTK_REQUIRED_OBJCXX_FLAGS is required on v5.6 in order to avoid garbage-collection (!)
         add('VTK_REQUIRED_OBJCXX_FLAGS:STRING', "")
-        add('VTK_USE_GUISUPPORT:BOOL', True)
-        add('VTK_USE_QT:BOOL', True)
-        add('VTK_USE_QVTK:BOOL', True)
+        #add('VTK_USE_GUISUPPORT:BOOL', True)
+        #add('VTK_USE_QT:BOOL', True)
+        #add('VTK_USE_QVTK:BOOL', True)
         add('VTK_USE_RPATH:BOOL', True)
         add('DESIRED_QT_VERSION:STRING', 4)
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
+        add('Module_vtkGUISupportQt:BOOL', True)
         builder.configureCMake()
 # ---------------------------------------------------------
 
@@ -246,7 +250,13 @@ class IGSTK(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git://igstk.org/IGSTK.git')
     def update(self):
-        self._getBuilder().gitCheckout('v5.2', patch='IGSTK-5-2.patch')
+        #self._getBuilder().gitCheckout('v5.2', patch='IGSTK-5-2.patch')
+        # this fix should rebase repo from the original Kitware/IGSTK to our own fork on GitHub.
+        repo = 'git@github.com:SINTEFMedisinskTeknologi/IGSTK'
+        branch = 'IGSTK-CX-modifications'
+        tag = 'IGSTK-5-2.cx_patch_3-6-0'
+        self._getBuilder().gitSetRemoteURL(repo, branch=branch)
+        self._getBuilder().gitCheckout(tag)
     def configure(self):        
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -313,7 +323,8 @@ class CustusX3(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/CustusX3.git')
     def update(self):
-        self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag(), submodules=True)    
+#        self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag(), submodules=True)    
+        self._getBuilder().gitUpdate('migrate_to_vtk610', tag=self.controlData.getGitTag(), submodules=True)    
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption

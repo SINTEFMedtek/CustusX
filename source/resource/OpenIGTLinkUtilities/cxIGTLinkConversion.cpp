@@ -210,6 +210,7 @@ ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 	imageImport->SetImportVoidPointer(message->GetScalarPointer());
 
 	imageImport->Modified();
+	imageImport->Update();
 
 	ImagePtr retval(new Image(deviceName, imageImport->GetOutput()));
 	retval->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestampMS));
@@ -294,7 +295,7 @@ ImagePtr IGTLinkConversion::decode(ImagePtr msg)
 	QString newUid = msg->getUid();
 	QString format = this->extractColorFormat(msg->getUid(), &newUid);
 	vtkImageDataPtr imageRGB = this->createFilterFormat2RGB(format, msg->getBaseVtkImageData());
-	imageRGB->Update();
+//	imageRGB->Update();
 
 	// copy because the image will eventually be passed to another thread, and we cannot have the entire pipeline dragged along.
 	vtkImageDataPtr copy = vtkImageDataPtr::New();
@@ -348,7 +349,7 @@ vtkImageDataPtr IGTLinkConversion::createFilterFormat2RGB(QString format, vtkIma
 
 vtkImageDataPtr IGTLinkConversion::createFilterAny2RGB(int R, int G, int B, vtkImageDataPtr input)
 {
-	input->Update();
+//	input->Update();
 	if (input->GetNumberOfScalarComponents() == 1)
 		return input;
 	if (( input->GetNumberOfScalarComponents()==3 )&&( R==0 )&&( G==1 )&&( B==2 ))
@@ -356,9 +357,11 @@ vtkImageDataPtr IGTLinkConversion::createFilterAny2RGB(int R, int G, int B, vtkI
 
 	vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
 	vtkImageExtractComponentsPtr splitterRGB = vtkImageExtractComponentsPtr::New();
-	splitterRGB->SetInput(input);
+	splitterRGB->SetInputData(input);
 	splitterRGB->SetComponents(R, G, B);
-	merger->SetInput(0, splitterRGB->GetOutput());
+	merger->AddInputConnection(splitterRGB->GetOutputPort());
+//	merger->AddInputConnection(0, splitterRGB->GetOutputPort());
+	merger->Update();
 	return merger->GetOutput();
 }
 

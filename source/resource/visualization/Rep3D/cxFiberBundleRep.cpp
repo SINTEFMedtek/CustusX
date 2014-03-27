@@ -136,7 +136,7 @@ void FiberBundleRep::bundleChanged()
 			 * This filter enables shading and enhances the otherwise hard to differentiate lines.
 			 */
 			vtkSmartPointer<vtkRibbonFilter> ribbonFilter = vtkSmartPointer<vtkRibbonFilter>::New();
-			ribbonFilter->SetInput(model);
+			ribbonFilter->SetInputData(model);
 			ribbonFilter->SetWidth(mFiberWidth);
 			ribbonFilter->SetWidthFactor(3);
 
@@ -146,11 +146,11 @@ void FiberBundleRep::bundleChanged()
 		{
 			{
 				vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
-				normals->SetInput(model);
+				normals->SetInputData(model);
 				normals->Update();
 				model = normals->GetOutput();
 			}
-			mPolyDataMapper->SetInput(model);
+			mPolyDataMapper->SetInputData(model);
 			mActor->SetMapper(mPolyDataMapper);
 		}
 

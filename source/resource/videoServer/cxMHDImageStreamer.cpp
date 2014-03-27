@@ -43,7 +43,7 @@ vtkLookupTablePtr createLookupTable(int numberOfTableValues)
 vtkImageDataPtr applyLUTToImage(vtkImageDataPtr input, vtkLookupTablePtr lut)
 {
 	vtkImageMapToColorsPtr mapper = vtkImageMapToColorsPtr::New();
-	mapper->SetInput(input);
+	mapper->SetInputData(input);
 	mapper->SetLookupTable(lut);
 	mapper->Update();
 	vtkImageDataPtr retval = mapper->GetOutput();
@@ -67,13 +67,15 @@ ImageTestData ImageTestData::initializePrimaryData(vtkImageDataPtr source, QStri
 	{
 		vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
 		vtkImageExtractComponentsPtr splitterRGB = vtkImageExtractComponentsPtr::New();
-		splitterRGB->SetInput(source);
+		splitterRGB->SetInputData(source);
 		splitterRGB->SetComponents(0, 1, 2);
-		merger->SetInput(0, splitterRGB->GetOutput());
+//		merger->AddInputConnection(0, splitterRGB->GetOutputPort());
+		merger->AddInputConnection(splitterRGB->GetOutputPort());
 		vtkImageExtractComponentsPtr splitterA = vtkImageExtractComponentsPtr::New();
-		splitterA->SetInput(source);
+		splitterA->SetInputData(source);
 		splitterA->SetComponents(0);
-		merger->SetInput(1, splitterA->GetOutput());
+		merger->AddInputConnection(splitterA->GetOutputPort());
+//		merger->AddInputConnection(1, splitterA->GetOutputPort());
 		merger->Update();
 		retval.mImageData = merger->GetOutput();
 		colorFormat = "RGBA";
@@ -102,9 +104,10 @@ ImageTestData ImageTestData::initializeSecondaryData(vtkImageDataPtr source, QSt
 	if (source->GetNumberOfScalarComponents() == 3)
 	{
 		vtkSmartPointer < vtkImageLuminance > luminance = vtkSmartPointer < vtkImageLuminance > ::New();
-		luminance->SetInput(source);
+		luminance->SetInputData(source);
+		luminance->Update();
 		vtkImageDataPtr outData = luminance->GetOutput();
-		outData->Update();
+//		outData->Update();
 		retval.mImageData = outData;
 		colorFormat = "R";
 	}

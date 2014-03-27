@@ -382,7 +382,7 @@ void ImageTFData::fillOpacityTFFromMap(vtkPiecewiseFunctionPtr tf) const
 	tf->RemoveAllPoints();
 	for (IntIntMap::const_iterator iter = mOpacityMap.begin(); iter != mOpacityMap.end(); ++iter)
 		tf->AddPoint(iter->first, iter->second / 255.0);
-	tf->Update();
+//	tf->Update();
 }
 
 }

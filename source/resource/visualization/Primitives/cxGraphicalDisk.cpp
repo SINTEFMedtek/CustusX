@@ -156,13 +156,13 @@ void GraphicalDisk::createActors()
 	mCircleSource->SetCircumferentialResolution(resolution);
 
 	mCircleExtruder = vtkLinearExtrusionFilterPtr::New();
-	mCircleExtruder->SetInput(mCircleSource->GetOutput());
+	mCircleExtruder->SetInputConnection(mCircleSource->GetOutputPort());
 	mCircleExtruder->SetScaleFactor(mHeight);
 	mCircleExtruder->SetExtrusionTypeToVectorExtrusion();
 	mCircleExtruder->SetVector(0,0,1);
 
 	vtkPolyDataMapperPtr mapper = vtkPolyDataMapperPtr::New();
-	mapper->SetInput(mCircleExtruder->GetOutput());
+	mapper->SetInputConnection(mCircleExtruder->GetOutputPort());
 	mapper->ScalarVisibilityOff();
 	mCircleActor = vtkActorPtr::New();
 	mCircleActor->SetMapper(mapper);
@@ -176,17 +176,16 @@ void GraphicalDisk::createActors()
 	mOutlineSource->SetCircumferentialResolution(resolution);
 
 	mOutlineExtruder = vtkLinearExtrusionFilterPtr::New();
-	mOutlineExtruder->SetInput(mOutlineSource->GetOutput());
+	mOutlineExtruder->SetInputConnection(mOutlineSource->GetOutputPort());
 	mOutlineExtruder->SetScaleFactor(mHeight);
 	mOutlineExtruder->SetExtrusionTypeToVectorExtrusion();
 	mOutlineExtruder->SetVector(0,0,1);
 
 	vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
-	normals->SetInput(mOutlineExtruder->GetOutput());
+	normals->SetInputConnection(mOutlineExtruder->GetOutputPort());
 
 	vtkPolyDataMapperPtr outlineMapper = vtkPolyDataMapperPtr::New();
-	outlineMapper->SetInput(normals->GetOutput());
-//	outlineMapper->SetInput(mOutlineExtruder->GetOutput());
+	outlineMapper->SetInputConnection(normals->GetOutputPort());
 	outlineMapper->ScalarVisibilityOff();
 	mOutlineActor = vtkActorPtr::New();
 	mOutlineActor->SetMapper(outlineMapper);
@@ -227,6 +226,29 @@ void GraphicalDisk::updateOrientation()
 //		mOutlineActor->SetPosition(mPosition[0], mPosition[1], mPosition[2]);
 
 }
+
+void GraphicalDisk::setRadiusBySlicingSphere(double sphereRadius, double sliceHeight)
+{
+	double r = this->getRadiusOfCircleSlicedFromSphere(sphereRadius, sliceHeight);
+	this->setRadius(r);
+}
+
+double GraphicalDisk::getRadiusOfCircleSlicedFromSphere(double sphereRadius, double sliceHeight) const
+{
+	double retval = 0;
+
+	if (abs(sliceHeight) > sphereRadius)
+	{
+		retval = 0;
+	}
+	else
+	{
+		retval = sphereRadius*cos(asin(sliceHeight/sphereRadius));
+	}
+
+	return retval;
+}
+
 
 } // namespace cx
 

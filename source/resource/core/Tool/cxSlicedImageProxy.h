@@ -55,8 +55,10 @@ Q_OBJECT
 public:
 	ApplyLUTToImage2DProxy();
 	virtual ~ApplyLUTToImage2DProxy();
-	void setInput(vtkImageDataPtr image, vtkLookupTablePtr lut);
+	void setInputData(vtkImageDataPtr image, vtkLookupTablePtr lut);
+	void setInput(vtkImageAlgorithmPtr input, vtkLookupTablePtr lut);
 	vtkImageDataPtr getOutput();
+	vtkImageAlgorithmPtr getOutputPort(); ///< output 2D sliced image
 
 private:
 	vtkImageDataPtr mDummyImage; ///< need this to fool the vtk pipeline when no image is set
@@ -87,6 +89,7 @@ public:
 	void setOutputFormat(Vector3D origin, Eigen::Array3i dim, Vector3D spacing);
 	void update();
 	vtkImageDataPtr getOutput(); ///< output 2D sliced image
+	vtkImageAlgorithmPtr getOutputPort(); ///< output 2D sliced image
 	void printSelf(std::ostream & os, Indent indent);
 
 private slots:

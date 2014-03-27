@@ -39,7 +39,7 @@ BasicVideoSource::BasicVideoSource(QString uid)
 														   0);
 	mEmptyImage.reset(new Image(uid, emptyImage));
 	mReceivedImage = mEmptyImage;
-	mRedirecter->SetInput(mEmptyImage->getBaseVtkImageData());
+	mRedirecter->SetInputData(mEmptyImage->getBaseVtkImageData());
 
 	mTimeout = true; // must start invalid
 	mTimeoutTimer = new QTimer(this);
@@ -183,7 +183,7 @@ void BasicVideoSource::setInput(ImagePtr input)
 		}
 		mReceivedImage = mEmptyImage;
 	}
-	mRedirecter->SetInput(mReceivedImage->getBaseVtkImageData());
+	mRedirecter->SetInputData(mReceivedImage->getBaseVtkImageData());
 	mRedirecter->Update();
 
 	if (mTimeoutTimer)

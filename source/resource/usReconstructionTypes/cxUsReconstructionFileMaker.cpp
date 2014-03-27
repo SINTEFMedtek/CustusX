@@ -276,7 +276,7 @@ void UsReconstructionFileMaker::writeUSImages(QString path, ImageDataContainerPt
 		vtkImageDataPtr currentImage = images->get(i);
 		QString filename = QString("%1/%2_%3.mhd").arg(path).arg(mSessionDescription).arg(i);
 
-		writer->SetInput(currentImage);
+		writer->SetInputData(currentImage);
 		writer->SetFileName(cstring_cast(filename));
 		writer->SetCompression(compression);
 		{
@@ -301,7 +301,7 @@ void UsReconstructionFileMaker::writeMask(QString path, QString session, vtkImag
 	}
 
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
-	writer->SetInput(mask);
+	writer->SetInputData(mask);
 	writer->SetFileName(cstring_cast(filename));
 	writer->SetCompression(false);
 	writer->Write();

@@ -17,8 +17,9 @@ vtkImageDataPtr MemHolder::generateVtkImageData()
 	vtkImageDataPtr data = vtkImageDataPtr::New();
 	data->SetSpacing(1, 1, 1);
 	data->SetExtent(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
-	data->SetScalarTypeToUnsignedChar();
-	data->SetNumberOfScalarComponents(numComp);
+//	data->SetScalarTypeToUnsignedChar();
+//	data->SetScalarType(VTK_UNSIGNED_CHAR, 3);
+//	data->SetNumberOfScalarComponents(numComp);
 
 	int scalarSize = dim[0]*dim[1]*dim[2]*numComp;
 

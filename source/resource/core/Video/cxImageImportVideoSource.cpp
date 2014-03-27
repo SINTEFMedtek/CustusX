@@ -120,10 +120,8 @@ void ImageImportVideoSource::setEmptyImage()
 	mImageImport->SetNumberOfScalarComponents(1);
 	std::fill(mZero.begin(), mZero.end(), 0);
 	mImageImport->SetImportVoidPointer(mZero.begin());
-//	mImageImport->GetOutput()->ComputeBounds();
-//	mImageImport->GetOutput()->UpdateInformation();
-//	mImageImport->GetOutput()->UpdateData();
-	mImageImport->GetOutput()->Update();
+//	mImageImport->GetOutput()->Update();
+	mImageImport->Update();
 	mImageImport->Modified();
 }
 
