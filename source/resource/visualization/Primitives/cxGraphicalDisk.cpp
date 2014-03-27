@@ -227,6 +227,29 @@ void GraphicalDisk::updateOrientation()
 
 }
 
+void GraphicalDisk::setRadiusBySlicingSphere(double sphereRadius, double sliceHeight)
+{
+	double r = this->getRadiusOfCircleSlicedFromSphere(sphereRadius, sliceHeight);
+	this->setRadius(r);
+}
+
+double GraphicalDisk::getRadiusOfCircleSlicedFromSphere(double sphereRadius, double sliceHeight) const
+{
+	double retval = 0;
+
+	if (abs(sliceHeight) > sphereRadius)
+	{
+		retval = 0;
+	}
+	else
+	{
+		retval = sphereRadius*cos(asin(sliceHeight/sphereRadius));
+	}
+
+	return retval;
+}
+
+
 } // namespace cx
 
 

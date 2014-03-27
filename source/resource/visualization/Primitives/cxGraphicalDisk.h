@@ -49,11 +49,14 @@ public:
 
 	void update();
 
+	void setRadiusBySlicingSphere(double sphereRadius, double sliceHeight);
+
 private:
 	void createActors();
 	void addActors();
 	void removeActors();
 	void updateOrientation();
+	double getRadiusOfCircleSlicedFromSphere(double sphereRadius, double sliceHeight) const;
 
 	vtkRendererPtr mRenderer;
 

@@ -20,6 +20,7 @@
 #include "vtkCaptionActor2D.h"
 #include "vtkTextProperty.h"
 #include "cxVtkHelperClasses.h"
+#include "vtkPolyDataNormals.h"
 
 namespace cx
 {
@@ -122,8 +123,13 @@ GraphicalPoint3D::GraphicalPoint3D(vtkRendererPtr renderer)
 	source->SetThetaResolution(16);
 	source->SetPhiResolution(12);
 	source->LatLongTessellationOn();
+
+	vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
+	normals->SetInputConnection(source->GetOutputPort());
+	normals->Update();
+
 	mapper = vtkPolyDataMapperPtr::New();
-	mapper->SetInputConnection(source->GetOutputPort());
+	mapper->SetInputConnection(normals->GetOutputPort());
 
 	actor = vtkActorPtr::New();
 	actor->SetMapper(mapper);
