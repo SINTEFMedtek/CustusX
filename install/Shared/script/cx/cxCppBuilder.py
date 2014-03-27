@@ -86,7 +86,7 @@ class CppBuilder:
         self._changeDirToSource()
 
         runShell('git checkout %s' % branch)
-        runShell('git pull')
+        runShell('git pull origin %s' % branch)
         if submodules:
             self._gitSubmoduleUpdate()
         
