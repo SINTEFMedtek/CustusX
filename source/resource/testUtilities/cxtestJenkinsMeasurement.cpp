@@ -24,11 +24,6 @@ namespace cxtest
 JenkinsMeasurement::JenkinsMeasurement()
 {}
 
-void JenkinsMeasurement::initialize()
-{
-	cx::reporter()->sendRaw("\nCTEST_FULL_OUTPUT\n");
-}
-
 void JenkinsMeasurement::createOutput(QString name, QString value)
 {
     QString measurement("\n<measurement><name>%1</name><value>%2</value></measurement>\n");

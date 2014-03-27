@@ -23,8 +23,7 @@ namespace cxtest
 class JenkinsMeasurement
 {
 public:
-    JenkinsMeasurement();
-    void initialize();
+		JenkinsMeasurement();
 
     // create output in a way friendly to the Jenkins measurement plugin:
     void createOutput(QString name, QString value);

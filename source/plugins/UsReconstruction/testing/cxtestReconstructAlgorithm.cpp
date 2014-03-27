@@ -117,9 +117,6 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	boost::shared_ptr<cx::TordTest> algorithm(new cx::TordTest);
 	algorithm->enableProfiling();
 
-	JenkinsMeasurement jenkins;
-	jenkins.initialize();
-
 	QString name = "DefaultTord";
 
 	fixture.setAlgorithm(algorithm);
@@ -175,6 +172,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	fixture.reconstruct(settings);
 
 	double executionTime = algorithm->getKernelExecutionTime();
+	JenkinsMeasurement jenkins;
 	jenkins.createOutput(name, QString::number(executionTime));
 
 	fixture.checkRMSBelow(20.0);

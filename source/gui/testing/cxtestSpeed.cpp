@@ -94,10 +94,8 @@ TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][n
 
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
 
-	JenkinsMeasurement jenkins;
-	jenkins.initialize();
-
 	int fps = calculateFPS(false);
+	JenkinsMeasurement jenkins;
 	jenkins.createOutput("FPS_vtkVolumeTextureMapper3D", QString::number(fps));
 
 	// TODO: enter this value into config file
@@ -110,10 +108,8 @@ TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration][
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
 
-	JenkinsMeasurement jenkins;
-	jenkins.initialize();
-
 	int fps = calculateFPS(false);
+	JenkinsMeasurement jenkins;
 	jenkins.createOutput("FPS_vtkGPUVolumeRayCastMapper", QString::number(fps));
 
 	// TODO: enter this value into config file
@@ -126,11 +122,9 @@ TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integra
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
 
-	JenkinsMeasurement jenkins;
-	jenkins.initialize();
-
 	bool slicing = true;
 	int fps = calculateFPS(slicing);
+	JenkinsMeasurement jenkins;
 	jenkins.createOutput("FPS_vtkGPUVolumeRayCastMapper_Slicing", QString::number(fps));
 
 	// TODO: enter this value into config file
@@ -144,10 +138,8 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper renderer", "[speed][gui][
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
 
-	JenkinsMeasurement jenkins;
-	jenkins.initialize();
-
 	int fps = calculateFPS(false);
+	JenkinsMeasurement jenkins;
 	jenkins.createOutput("FPS_vtkOpenGLGPUMultiVolumeRayCastMapper", QString::number(fps));
 
 	// TODO: enter this value into config file
@@ -161,11 +153,9 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper with slicing", "[speed][g
 	initTest();
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
 
-	JenkinsMeasurement jenkins;
-	jenkins.initialize();
-
 	bool slicing = true;
 	int fps = calculateFPS(slicing);
+	JenkinsMeasurement jenkins;
 	jenkins.createOutput("FPS_vtkOpenGLGPUMultiVolumeRayCastMapper_Slicing", QString::number(fps));
 
 	// TODO: enter this value into config file

@@ -21,26 +21,24 @@ namespace cxtest
 
 TEST_CASE("Speed: Render 10 empty viewWidgets", "[speed][gui][integration]")
 {
-    JenkinsMeasurement jenkins;
-    jenkins.initialize();
     TestRenderSpeed helper;
     helper.testSeveralViews();
 
     REQUIRE(helper.getRenderFPS() > 10);
 
+		JenkinsMeasurement jenkins;
     jenkins.createOutput("FPS", QString::number(helper.getRenderFPS()));
 //    helper.printResult();
 }
 
 TEST_CASE("Speed: Render 10 empty vtkRenderWindows", "[speed][gui][integration]")
 {
-    JenkinsMeasurement jenkins;
-    jenkins.initialize();
     TestRenderSpeed helper;
     helper.testSeveralVtkRenderWindows();
 
     REQUIRE(helper.getRenderFPS() > 10);
 
+		JenkinsMeasurement jenkins;
     jenkins.createOutput("FPS", QString::number(helper.getRenderFPS()));
 //    helper.printResult();
 }
