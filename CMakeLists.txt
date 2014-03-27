@@ -94,4 +94,12 @@ add_subdirectory( source )
 #------------------------------------------------------------------------------
 # CTest
 #------------------------------------------------------------------------------
+configure_file(
+  "${CustusX3_SOURCE_DIR}/CMake/CTestCustom.cmake.in"
+  "${CustusX3_BINARY_DIR}/CTestCustom.cmake"
+  )
+configure_file(
+  "${CustusX3_SOURCE_DIR}/CMake/CTestCustom.cmake.in"
+  "${CustusX3_BINARY_DIR}/source/testing/CTestCustom.cmake"
+  )
 enable_testing()
