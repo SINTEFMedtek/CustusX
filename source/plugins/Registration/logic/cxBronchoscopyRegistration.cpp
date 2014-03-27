@@ -114,6 +114,7 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
   // too few data samples: ignore
   if (source->GetNumberOfPoints() < 3)
   {
+    std::cout << "Warning in performLandmarkRegistration: Need >3 positions, returning identity matrix." << std::endl;
     return Eigen::Matrix4d::Identity();
   }
 
@@ -132,14 +133,16 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
 	  for (int j = 0; j < 4; j++)
 	  {
 		  tar_M_src(i,j) = temp->GetElement(i,j);
-		  //std::cout << tar_M_src(i,j) << " ";
+          std::cout << tar_M_src(i,j) << " ";
 	  }
 	  //std::cout << std::endl;
   }
 
   if ( std::isnan(tar_M_src.sum()) )
-      return Eigen::Matrix4d::Identity();
-
+  {
+       std::cout << "Warning in performLandmarkRegistration: Returning identity matrix due to nan." << std::endl;
+       return Eigen::Matrix4d::Identity();
+  }
 
   return tar_M_src;
 }
@@ -169,9 +172,17 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
                 
                 P(j) = sqrt( p0*p0 + p1*p1 + p2*p2 );
                 O(j) = sqrt( o0*o0 + o1*o1 + o2*o2 );
+
+                if (std::isnan( O(j) ))
+                    O(j) = 4;
+
                 R(j) = P(j) / O(j);
+
             }
             float alpha = sqrt( R.mean() );
+            if (std::isnan( alpha ))
+                alpha = 0;
+
             D = P + alpha * O;
             D.minCoeff(&index);
             indexVector.push_back(index);
@@ -214,18 +225,27 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 
 	//Adjusting points for centeroids
     Eigen::MatrixXd::Index maxIndex;
-    trackingPositions.col(2).maxCoeff( &maxIndex );
-    Eigen::Vector3d translation = CTPositions.row(0) - trackingPositions.row(maxIndex);
+    trackingPositions.row(2).maxCoeff( &maxIndex );
+    std::cout << "maxIndex: " << maxIndex << std::endl;
+    Eigen::Vector3d translation = CTPositions.col(0) - trackingPositions.col(maxIndex);
+    std::cout << "CTPositions.col(0): " << CTPositions.col(0) << std::endl;
+    std::cout << "trackingPositions.col(maxIndex): " << trackingPositions.col(maxIndex) << std::endl;
     //Eigen::Vector3d translation = CTPositions.rowwise().mean() - trackingPositions.rowwise().mean();
 	Eigen::Matrix3d rotation;
-	trackingPositions = trackingPositions.colwise() + translation;
+    trackingPositions = trackingPositions.colwise() + translation;
+    //Eigen::MatrixXd temp(3 , Tnavigation.size());
+    //temp.setOnes();
+    //trackingPositions = trackingPositions + temp;
 
     //debug start
-    std::cout << "Tracking data: " << Tnavigation[0] << std::endl;
-    std::cout << "Tracking position: " << trackingPositions.col(0) << std::endl;
-    std::cout << "Tracking orientation: " << trackingOrientations.col(0) << std::endl;
-    std::cout << "CT position: " << CTPositions.col(0) << std::endl;
-    std::cout << "CT orientation: " << CTOrientations.col(0) << std::endl;
+   // std::cout << "translation: " << translation << std::endl;
+    //std::cout << "Tracking data: " << Tnavigation[0] << std::endl;
+    //std::cout << "Tracking position: " << trackingPositions.col(0) << std::endl;
+    //std::cout << "Tracking orientation: " << trackingOrientations.col(0) << std::endl;
+    //std::cout << "CT position: " << CTPositions.col(0) << std::endl;
+    //std::cout << "CT orientation: " << CTOrientations.col(0) << std::endl;
+    //std::cout << "translation.array().abs().sum(): " << translation.array().abs().sum() << std::endl;
+    //std::cout << "CTPositions.cols(): " << CTPositions.cols() << std::endl;
     //debug end
 
 
@@ -233,6 +253,9 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 						  0, 1, 0, translation(1),
 						  0, 0, 1, translation(2),
 						  0, 0, 0, 1;
+
+    //debug
+    //return registrationMatrix;
 
     int iterationNumber = 0;
     while ( translation.array().abs().sum() > 1 && iterationNumber < 30)
@@ -253,10 +276,36 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 		}
 
 		std::pair<Eigen::MatrixXd , Eigen::MatrixXd> result = findPositionsWithSmallesAngleDifference(70 , DAngle , trackingPositions , nearestCTPositions);
-		vtkPointsPtr trackingPositions_vtk = convertTovtkPoints(result.first);
+        vtkPointsPtr trackingPositions_vtk = convertTovtkPoints(result.first);
 		vtkPointsPtr CTPositions_vtk = convertTovtkPoints(result.second);
 
-		Eigen::Matrix4d tempMatrix = performLandmarkRegistration(trackingPositions_vtk, CTPositions_vtk);
+        //debug
+       // std::cout << "Tracking pos:" << std::endl;
+        //for (int i = 0; i < result.first.cols(); i++)
+        //{
+        //    std::cout << result.first.col(i) << std::endl;
+        //}
+        //std::cout << "CT pos:" << std::endl;
+        //for (int i = 0; i < result.second.cols(); i++)
+        //{
+         //   std::cout << result.second.col(i) << std::endl;
+        //}
+
+        ///std::cout << "trackingPositions_vtk cols: " << result.first.cols() << std::endl;
+        //std::cout << "trackingPositions_vtk rows: " << result.first.rows() << std::endl;
+        //std::cout << "CTPositions_vtk cols: " << result.second.cols() << std::endl;
+        //std::cout << "CTPositions_vtk rows: " << result.second.rows() << std::endl;
+        //DEBUG
+        //Eigen::MatrixXd tM1(3,4);
+        //tM1 << 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4;
+        //Eigen::MatrixXd tM2(3,4);
+        //tM2 << 3, 4, 6, 2, 5, 2, 3, 6, 6, 4, 5, 4;
+        //vtkPointsPtr t1 = convertTovtkPoints(tM1);
+        //vtkPointsPtr t2 = convertTovtkPoints(tM2);
+        //Eigen::Matrix4d tempMatrix = performLandmarkRegistration(t1, t2);
+
+        Eigen::Matrix4d tempMatrix = performLandmarkRegistration(trackingPositions_vtk, CTPositions_vtk);
+        //std::cout << "tempMatrix: " << tempMatrix << std::endl;
 
 		registrationMatrix = tempMatrix * registrationMatrix;
 		translation << tempMatrix(0,3), tempMatrix(1,3), tempMatrix(2,3);
