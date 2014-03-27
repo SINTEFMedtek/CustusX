@@ -232,7 +232,7 @@ bool LevelSetFilter::postProcess()
 		rawResult->DeepCopy(itkToVtkFilter->GetOutput());
 
 		vtkImageCastPtr imageCast = vtkImageCastPtr::New();
-		imageCast->SetInput(rawResult);
+		imageCast->SetInputData(rawResult);
 		imageCast->SetOutputScalarTypeToUnsignedChar();
 		rawResult = imageCast->GetOutput();
 
@@ -349,7 +349,7 @@ vtkImageDataPtr LevelSetFilter::importRawImageData(void * data, int size_x,
 	imageImport->SetNumberOfScalarComponents(1);
 	imageImport->SetDataSpacing(input->getBaseVtkImageData()->GetSpacing());
 	imageImport->SetImportVoidPointer(data);
-	imageImport->GetOutput()->Update();
+	imageImport->Update();
 	imageImport->Modified();
 
 	vtkImageDataPtr retval = vtkImageDataPtr::New();
