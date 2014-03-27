@@ -129,6 +129,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
 		algorithm->getMaxPlanesOption(settings)->setValue(8);
 		algorithm->getNStartsOption(settings)->setValue(1);
+		REQUIRE(true);
 	}
 	SECTION("VNN2")
 	{
@@ -138,6 +139,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
 		algorithm->getMaxPlanesOption(settings)->setValue(8);
 		algorithm->getNStartsOption(settings)->setValue(1);
+		REQUIRE(true);
 	}
 	SECTION("DW")
 	{
@@ -147,6 +149,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
 		algorithm->getMaxPlanesOption(settings)->setValue(8);
 		algorithm->getNStartsOption(settings)->setValue(1);
+		REQUIRE(true);
 	}
 	SECTION("Anisotropic")
 	{
@@ -158,6 +161,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 		algorithm->getNStartsOption(settings)->setValue(1);
 		algorithm->getBrightnessWeightOption(settings)->setValue(0);
 		algorithm->getNewnessWeightOption(settings)->setValue(0);
+		REQUIRE(true);
 	}
 	SECTION("Multistart search")
 	{
@@ -167,6 +171,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 		algorithm->getPlaneMethodOption(settings)->setValue("Heuristic");
 		algorithm->getMaxPlanesOption(settings)->setValue(8);
 		algorithm->getNStartsOption(settings)->setValue(5);
+		REQUIRE(true);
 	}
 
 	fixture.reconstruct(settings);
