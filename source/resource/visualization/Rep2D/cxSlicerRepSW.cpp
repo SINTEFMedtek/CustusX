@@ -26,6 +26,8 @@
 #include "cxView.h"
 #include "cxImage.h"
 #include "cxSlicedImageProxy.h"
+#include "vtkImageMapper3D.h"
+#include "vtkImageAlgorithm.h"
 
 namespace cx
 {
@@ -35,7 +37,8 @@ SliceRepSW::SliceRepSW(const QString& uid) :
 {
 	mImageSlicer.reset(new SlicedImageProxy());
 	mImageActor = vtkImageActorPtr::New();
-	mImageActor->SetInput( mImageSlicer->getOutput());
+	mImageActor->GetMapper()->SetInputConnection(mImageSlicer->getOutputPort()->GetOutputPort());
+//	mImageActor->SetInput(mImageSlicer->getOutputPort());
 }
 
 SliceRepSW::~SliceRepSW()

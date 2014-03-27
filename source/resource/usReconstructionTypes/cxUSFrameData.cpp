@@ -209,11 +209,8 @@ Eigen::Array3i USFrameData::getDimensions() const
 		// WARNING: cannot use dimensions from the cropImage function - it uses extent,
 		// which may be larger. We need the real size, given by wholeextent/updateextent.
 		vtkImageDataPtr sample = this->cropImageExtent(mImageContainer->get(0), mCropbox);
-//		retval[0] = sample->GetDimensions()[0];
-//		retval[1] = sample->GetDimensions()[1];
-		Eigen::Array<int, 6, 1> extent(sample->GetWholeExtent());
-//		std::cout << "wholeextent " << extent << std::endl;
-//		std::cout << "dim " << retval << std::endl;
+//		Eigen::Array<int, 6, 1> extent(sample->GetWholeExtent());
+		Eigen::Array<int, 6, 1> extent(sample->GetExtent());
 		retval[0] = extent[1]-extent[0]+1;
 		retval[1] = extent[3]-extent[2]+1;
 //		std::cout << "extent dim: " << retval[0] << " " << retval[1] << std::endl;
@@ -250,11 +247,13 @@ void USFrameData::setCropBox(IntBoundingBox3D cropbox)
 vtkImageDataPtr USFrameData::cropImageExtent(vtkImageDataPtr input, IntBoundingBox3D cropbox) const
 {
   vtkImageClipPtr clip = vtkImageClipPtr::New();
-  clip->SetInput(input);
+  clip->SetInputData(input);
   clip->SetOutputWholeExtent(cropbox.begin());
 //  clip->ClipDataOn(); // this line sets wholeextent==extent, but uses lots of time (~6ms/frame)
+  clip->Update();
   vtkImageDataPtr rawResult = clip->GetOutput();
-  rawResult->Update();
+//  rawResult->Update();
+  rawResult->Crop(cropbox.begin()); // moved in from toGrayscaleAndEffectuateCropping when VTK5->6
   return rawResult;
 }
 
@@ -269,7 +268,7 @@ vtkImageDataPtr USFrameData::toGrayscaleAndEffectuateCropping(vtkImageDataPtr in
 	{
 		// crop (slow)
 		outData = input;
-		outData->Crop();
+//		outData->Crop();
 	}
 	else
 	{
@@ -326,31 +325,31 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData, vtkImageDataPtr gr
 
 	vtkImageDataPtr outData = vtkImageDataPtr::New();
 	outData->DeepCopy(grayFrame);
-	outData->Update(); // updates whole extent.
+//	outData->Update(); // updates whole extent.
 
 //	printStuff("Clipped color in", inData);
 //	printStuff("Grayscale in", outData);
 
 //	int* inExt = inData->GetWholeExtent();
-	int* outExt = outData->GetWholeExtent();
+	int* outExt = outData->GetExtent();
 
 	// Remember that the input might (and do due to vtkImageClip) contain leaps.
 	// This means that the wholeextent might be larger than the extent, thus
 	// we must use a startoffset and leaps between lines.
 
-	unsigned char *inPtr = static_cast<unsigned char*> (inData->GetScalarPointerForExtent(inData->GetWholeExtent()));
-	unsigned char *outPtr = static_cast<unsigned char*> (outData->GetScalarPointerForExtent(outData->GetWholeExtent()));
+	unsigned char *inPtr = static_cast<unsigned char*> (inData->GetScalarPointerForExtent(inData->GetExtent()));
+	unsigned char *outPtr = static_cast<unsigned char*> (outData->GetScalarPointerForExtent(outData->GetExtent()));
 
 	int maxX = outExt[1] - outExt[0];
 	int maxY = outExt[3] - outExt[2];
 	int maxZ = outExt[5] - outExt[4];
 
 	Eigen::Array<vtkIdType,3,1> inInc;
-	inData->GetContinuousIncrements(inData->GetWholeExtent(), inInc[0], inInc[1], inInc[2]);
+	inData->GetContinuousIncrements(inData->GetExtent(), inInc[0], inInc[1], inInc[2]);
 	SSC_ASSERT(inInc[0]==0);
 	// we assume (wholeextent == extent) for the outData in the algorithm below. assert here.
 	Eigen::Array<vtkIdType,3,1> outInc;
-	outData->GetContinuousIncrements(outData->GetWholeExtent(), outInc[0], outInc[1], outInc[2]);
+	outData->GetContinuousIncrements(outData->GetExtent(), outInc[0], outInc[1], outInc[2]);
 	SSC_ASSERT(outInc[0]==0);
 	SSC_ASSERT(outInc[1]==0);
 	SSC_ASSERT(outInc[2]==0);
@@ -475,13 +474,14 @@ void USFrameData::fillImageImport(vtkImageImportPtr import, int index)
 //	vtkImageDataPtr grayFrame = this->toGrayscale(current);
 //	static vtkImageDataPtr source;
 //	source = this->useAngio(current, grayFrame);
-	source->Update();
+
+//	source->Update(); // VTK5->6
 
 	import->SetImportVoidPointer(source->GetScalarPointer());
 	import->SetDataScalarType(source->GetScalarType());
 	import->SetDataSpacing(source->GetSpacing());
 	import->SetNumberOfScalarComponents(source->GetNumberOfScalarComponents());
-	import->SetWholeExtent(source->GetWholeExtent());
+	import->SetWholeExtent(source->GetExtent());
 	import->SetDataExtentToWholeExtent();
 }
 

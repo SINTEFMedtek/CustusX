@@ -21,28 +21,16 @@
 
 #include "vtkObjectFactory.h"
 #include <vtkPointData.h>
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
-vtkCxxRevisionMacro(UltrasoundSectorSource, "$Revision: 3.0 $")
-;
-vtkStandardNewMacro(UltrasoundSectorSource)
-;
+
+vtkStandardNewMacro(UltrasoundSectorSource);
 
 UltrasoundSectorSource::UltrasoundSectorSource()
 {
-}
-
-void UltrasoundSectorSource::Execute()
-{
-	if (!mSector)
-		return;
-
-	vtkPolyData *output = this->GetOutput();
-
-	output->SetPoints(mSector->GetPoints());
-	output->GetPointData()->SetTCoords(mSector->GetPointData()->GetTCoords());
-	//output->SetLines(mSector->GetLines());
-	//output->SetPolys(mSector->GetPolys());
-	output->SetStrips(mSector->GetStrips());
+	this->SetNumberOfInputPorts(0);
 }
 
 void UltrasoundSectorSource::setProbeSector(vtkPolyDataPtr sector)
@@ -54,4 +42,52 @@ void UltrasoundSectorSource::setProbeSector(vtkPolyDataPtr sector)
 void UltrasoundSectorSource::PrintSelf(ostream& os, vtkIndent indent)
 {
 	this->Superclass::PrintSelf(os, indent);
+}
+
+
+//----------------------------------------------------------------------------
+int UltrasoundSectorSource::RequestData(
+  vtkInformation *vtkNotUsed(request),
+  vtkInformationVector **vtkNotUsed(inputVector),
+  vtkInformationVector *outputVector)
+{
+	if (!mSector)
+		return 1;
+
+	// get the info object
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+  // get the ouptut
+  vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  output->SetPoints(mSector->GetPoints());
+  output->GetPointData()->SetTCoords(mSector->GetPointData()->GetTCoords());
+  output->SetStrips(mSector->GetStrips());
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int UltrasoundSectorSource::RequestInformation(
+  vtkInformation *vtkNotUsed(request),
+  vtkInformationVector **vtkNotUsed(inputVector),
+  vtkInformationVector *outputVector)
+{
+  // get the info object
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),
+			   -1);
+
+  double* bounds = mSector->GetBounds();
+  if (mSector)
+	  outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
+				   bounds[0],
+				   bounds[1],
+				   bounds[2],
+				   bounds[3],
+				   bounds[4],
+				   bounds[5]);
+
+  return 1;
 }

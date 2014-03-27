@@ -107,6 +107,8 @@ TEST_CASE("Visual rendering: Show ACS+3D, centered hidden tool",
 	fixture.defineSlice("S", imagenames.image[0], cx::ptSAGITTAL, 0, 1);
 	REQUIRE(fixture.quickRunWidget());
 
+//	REQUIRE(fixture.runWidget());
+
 	fixture.dumpDebugViewToDisk("acs3d0", 0);
 	fixture.dumpDebugViewToDisk("acs3d1", 1);
 	fixture.dumpDebugViewToDisk("acs3d2", 2);

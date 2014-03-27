@@ -598,64 +598,6 @@ void ViewWrapper3D::removeVolumeDataRep(QString uid)
 	}
 }
 
-//void ViewWrapper3D::dataAdded(DataPtr data)
-//{
-//	if (!data)
-//		return;
-
-//	DataViewProperties properties = mGroupData->getProperties(data);
-
-//	if (properties.hasVolume3D())
-//	{
-//		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
-//		if (image)
-//		{
-//			mMultiVolume3DRepProducer->addImage(image);
-//		}
-//		else
-//		{
-//			if (!mDataReps.count(data->getUid()))
-//			{
-//				RepPtr rep = this->createDataRep3D(data);
-//				if (!rep)
-//					return;
-//				mDataReps[data->getUid()] = rep;
-//				mView->addRep(rep);
-//			}
-//		}
-//	}
-//	if (properties.hasSlice3D())
-//	{
-//		this->updateSlices();
-//	}
-
-//	this->activeImageChangedSlot();
-//	this->updateView();
-//}
-
-//void ViewWrapper3D::dataRemoved(const QString& uid)
-//{
-//	DataViewProperties properties = mGroupData->getProperties(mBackend->getDataManager()->getData(uid));
-
-//	if (!properties.hasVolume3D())
-//	{
-//		mMultiVolume3DRepProducer->removeImage(uid);
-//		if (mDataReps.count(uid))
-//		{
-//			mView->removeRep(mDataReps[uid]);
-//			mDataReps.erase(uid);
-//		}
-//	}
-
-//	if (!properties.hasSlice3D())
-//	{
-//		this->updateSlices();
-//	}
-
-//	this->activeImageChangedSlot();
-//	this->updateView();
-//}
-
 /**Construct a 3D standard rep for a given data.
  *
  */

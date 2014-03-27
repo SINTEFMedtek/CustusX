@@ -363,7 +363,7 @@ void ImageStreamerGE::send(const QString& uid, const vtkImageDataPtr& img, data_
 
 	// CustusX does not handle nonzero origin - set to zero, but AFTER getFrameStatus() is called.
 	vtkImageChangeInformationPtr center = vtkImageChangeInformationPtr::New();
-	center->SetInput(img);
+	center->SetInputData(img);
 	center->SetOutputOrigin(0,0,0);
 	center->Update();
 	mRenderTimer->time("orgnull");

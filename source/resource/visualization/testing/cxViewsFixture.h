@@ -61,6 +61,7 @@ public:
 	cx::ViewWidget* addView(QString caption, int row, int col);
 
 	bool quickRunWidget();
+	bool runWidget();
 
 	double getFractionOfBrightPixelsInView(int viewIndex, int threshold, int component=0);
 	void dumpDebugViewToDisk(QString text, int viewIndex);

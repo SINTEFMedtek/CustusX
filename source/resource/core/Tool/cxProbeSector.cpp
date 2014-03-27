@@ -232,10 +232,10 @@ vtkPolyDataPtr ProbeSector::getSectorLinesOnly()
 
 	// also display the cliprect
 	vtkAppendPolyDataPtr retval = vtkAppendPolyDataPtr::New();
-	retval->AddInput(output);
+	retval->AddInputData(output);
 
 	if (this->clipRectIntersectsSector())
-		retval->AddInput(this->getClipRectPolyData());
+		retval->AddInputData(this->getClipRectPolyData());
 
 	retval->Update();
 	return retval->GetOutput();
@@ -251,7 +251,7 @@ vtkPolyDataPtr ProbeSector::getSectorSectorOnlyLinesOnly()
 	output->SetPoints(mPolyData->GetPoints());
 	output->SetLines(mPolyData->GetLines());
 
-	output->Update();
+//	output->Update();
 	return output;
 }
 

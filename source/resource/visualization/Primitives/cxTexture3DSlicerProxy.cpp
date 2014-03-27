@@ -97,14 +97,16 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl()
 
 	vtkStripperPtr stripper = vtkStripperPtr::New();
 	stripper->SetInputConnection(triangleFilter->GetOutputPort());
-	stripper->Update();
+//	stripper->Update();
+	mPolyDataAlgorithm = stripper;
+	mPolyDataAlgorithm->Update();
 
-	mPolyData = stripper->GetOutput();
+	mPolyData = mPolyDataAlgorithm->GetOutput();
 	mPolyData->GetPointData()->SetNormals(NULL);
 
 	mPainter->SetDelegatePainter(mPainterPolyDatamapper->GetPainter());
 	mPainterPolyDatamapper->SetPainter(mPainter);
-	mPainterPolyDatamapper->SetInput(mPolyData);
+	mPainterPolyDatamapper->SetInputData(mPolyData);
 	mActor->SetMapper(mPainterPolyDatamapper);
 }
 
@@ -196,7 +198,8 @@ void Texture3DSlicerProxyImpl::createGeometryPlane( Vector3D point1_s,  Vector3D
 	mPlaneSource->SetPoint2( point2_s.begin() );
 	mPlaneSource->SetOrigin( origin_s.begin() );
 //  std::cout << "createGeometryPlane update begin" << std::endl;
-	mPolyData->Update();
+	mPolyDataAlgorithm->Update();
+//	mPolyData->Update();
 //  std::cout << "createGeometryPlane update end" << std::endl;
 	// each stripper->update() resets the contents of polydata, thus we must reinsert the data here.
 	for (unsigned i=0; i<mImages.size(); ++i)
@@ -295,7 +298,8 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 	// create a bb describing the volume in physical (raw data) space
 	Vector3D origin(volume->GetOrigin());
 	Vector3D spacing(volume->GetSpacing());
-	DoubleBoundingBox3D imageSize(volume->GetWholeExtent());
+//	DoubleBoundingBox3D imageSize(volume->GetWholeExtent());
+	DoubleBoundingBox3D imageSize(volume->GetExtent());
 
 	for (int i = 0; i < 3; ++i)
 	{

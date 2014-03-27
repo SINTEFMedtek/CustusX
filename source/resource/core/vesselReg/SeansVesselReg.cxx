@@ -214,8 +214,8 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(DataPtr source, DataPtr
 {
 	vtkPolyDataPtr targetPolyData = this->convertToPolyData(target);
 	vtkPolyDataPtr inputSourcePolyData = this->convertToPolyData(source);
-	targetPolyData->Update();
-	inputSourcePolyData->Update();
+//	targetPolyData->Update();
+//	inputSourcePolyData->Update();
 	//Make sure we have stuff to work with
 	if (!inputSourcePolyData->GetNumberOfPoints() || !targetPolyData->GetNumberOfPoints())
 	{
@@ -440,11 +440,11 @@ vtkAbstractTransformPtr SeansVesselReg::nonLinearRegistration(vtkPointsPtr sorte
 	vtkPolyDataPtr tpsTargetPolyData = this->convertToPolyData(sortedTargetPoints);
 
 	vtkMaskPointsPtr mask1 = vtkMaskPointsPtr::New();
-	mask1->SetInput(tpsSourcePolyData);
+	mask1->SetInputData(tpsSourcePolyData);
 	mask1->SetOnRatio(mt_sampleRatio);
 	mask1->Update();
 	vtkMaskPointsPtr mask2 = vtkMaskPointsPtr::New();
-	mask2->SetInput(tpsTargetPolyData);
+	mask2->SetInputData(tpsTargetPolyData);
 	mask2->SetOnRatio(mt_sampleRatio);
 	mask2->Update();
 
@@ -559,7 +559,7 @@ vtkPolyDataPtr SeansVesselReg::crop(vtkPolyDataPtr input, vtkPolyDataPtr fixed, 
 	if (mt_verbose)
 		std::cout << "bb: " << DoubleBoundingBox3D(targetBounds) << std::endl;
 	vtkClipPolyDataPtr clipper = vtkClipPolyDataPtr::New();
-	clipper->SetInput(input);
+	clipper->SetInputData(input);
 	clipper->SetClipFunction(box);
 	clipper->SetInsideOut(true);
 	clipper->Update();

@@ -310,7 +310,7 @@ void DataManagerImpl::saveData(DataPtr data, const QString& basePath)
 void DataManagerImpl::saveMesh(MeshPtr mesh, const QString& basePath)
 {
 	vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();
-	writer->SetInput(mesh->getVtkPolyData());
+	writer->SetInputData(mesh->getVtkPolyData());
 	QString filename = basePath + "/Images/" + mesh->getUid() + ".vtk";
 	mesh->setFilename(QDir(basePath).relativeFilePath(filename));
 	writer->SetFileName(cstring_cast(filename));

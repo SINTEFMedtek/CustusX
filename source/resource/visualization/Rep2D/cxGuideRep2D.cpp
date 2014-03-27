@@ -70,7 +70,7 @@ void GuideRep2D::onModifiedStartRender()
 		mCircleSource->SetEndAngle(360);
 		mCircleSource->SetCircumferentialResolution(60);
 		vtkPolyDataMapperPtr mapper = vtkPolyDataMapper::New();
-		mapper->SetInput(mCircleSource->GetOutput());
+		mapper->SetInputConnection(mCircleSource->GetOutputPort());
 		mapper->ScalarVisibilityOff();
 		mCircleActor = vtkActor::New();
 		mCircleActor->SetMapper(mapper);

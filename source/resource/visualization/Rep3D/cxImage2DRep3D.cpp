@@ -78,11 +78,11 @@ void Image2DProxy::setImage(ImagePtr image)
 	{
 		SSC_ASSERT(mImage->getBaseVtkImageData()->GetDimensions()[2]==1); // class only treats 2d images.
 
-		mImageWithLUTProxy->setInput(mImage->getBaseVtkImageData(), mImage->getLookupTable2D()->getOutputLookupTable());
+		mImageWithLUTProxy->setInputData(mImage->getBaseVtkImageData(), mImage->getLookupTable2D()->getOutputLookupTable());
 	}
 	else
 	{
-		mImageWithLUTProxy->setInput(vtkImageDataPtr(), vtkLookupTablePtr());
+		mImageWithLUTProxy->setInputData(vtkImageDataPtr(), vtkLookupTablePtr());
 	}
 
 	this->vtkImageDataChangedSlot();
@@ -91,7 +91,7 @@ void Image2DProxy::setImage(ImagePtr image)
 
 void Image2DProxy::vtkImageDataChangedSlot()
 {
-	mActor->SetInput(mImageWithLUTProxy->getOutput());
+	mActor->SetInputData(mImageWithLUTProxy->getOutput());
 }
 
 /**called when transform is changed
@@ -107,7 +107,7 @@ void Image2DProxy::transformChangedSlot()
 
 void Image2DProxy::transferFunctionsChangedSlot()
 {
-	mImageWithLUTProxy->setInput(mImage->getBaseVtkImageData(), mImage->getLookupTable2D()->getOutputLookupTable());
+	mImageWithLUTProxy->setInputData(mImage->getBaseVtkImageData(), mImage->getLookupTable2D()->getOutputLookupTable());
 }
 
 

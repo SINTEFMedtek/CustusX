@@ -64,6 +64,7 @@
 #include "cxVisualizationServiceBackend.h"
 #include "cx2DZoomHandler.h"
 #include "cxNavigation.h"
+#include "cxDataRepContainer.h"
 
 namespace cx
 {
@@ -83,6 +84,16 @@ ViewWrapper2D::ViewWrapper2D(ViewWidget* view, VisualizationServiceBackendPtr ba
 	mView->getRenderer()->GetActiveCamera()->SetPosition(0,0,length);
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(length-clipDepth, length+0.1);
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
+
+	// slice proxy
+	mSliceProxy = SliceProxy::create(mBackend->getDataManager());
+
+	mDataRepContainer.reset(new DataRepContainer());
+	mDataRepContainer->setSliceProxy(mSliceProxy);
+	mDataRepContainer->setView(mView);
+
+	mViewFollower = ViewFollower::create(mBackend->getDataManager());
+	mViewFollower->setSliceProxy(mSliceProxy);
 
 	addReps();
 
@@ -181,33 +192,6 @@ void ViewWrapper2D::addReps()
 	mDataNameText->addText(QColor(Qt::green), "not initialized", Vector3D(0.02, 0.02, 0.0));
 	mView->addRep(mDataNameText);
 
-	// slice proxy
-	mSliceProxy = SliceProxy::create(mBackend->getDataManager());
-	mViewFollower = ViewFollower::create(mBackend->getDataManager());
-	mViewFollower->setSliceProxy(mSliceProxy);
-
-	// slice rep
-	//the mul
-	if (settings()->value("useGPU2DRendering").toBool())
-	{
-		//  this->resetMultiSlicer(); ignore until addimage
-	}
-	else
-	{
-//		mSliceRep = SliceRepSW::New("SliceRep_"+mView->getName());
-//		mSliceRep->setSliceProxy(mSliceProxy);
-//		mView->addRep(mSliceRep);
-	}
-
-
-//#ifdef USE_2D_GPU_RENDER
-////  this->resetMultiSlicer(); ignore until addimage
-//#else
-//	mSliceRep = SliceRepSW::New("SliceRep_"+mView->getName());
-//	mSliceRep->setSliceProxy(mSliceProxy);
-//	mView->addRep(mSliceRep);
-//#endif
-
 	// tool rep
 	mToolRep2D = ToolRep2D::New(mBackend->getSpaceProvider(), "Tool2D_" + mView->getName());
 	mToolRep2D->setSliceProxy(mSliceProxy);
@@ -303,7 +287,6 @@ void ViewWrapper2D::viewportChanged()
 		return;
 
 	mView->setZoomFactor(mZoom2D->getFactor());
-//	mView->setZoomFactor(mZoom2D->get().toDouble());
 
 	double viewHeight = mView->heightMM() / mZoom2D->getFactor();
 //  double parallelScale = mView->heightMM() / 2.0 / getZoomFactor2D();
@@ -512,6 +495,7 @@ void ViewWrapper2D::updateView()
 
 	mOrientationAnnotationRep->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
 
+	mDataRepContainer->updateSettings();
 //	mViewFollower->ensureCenterWithinView();
 }
 
@@ -540,75 +524,18 @@ void ViewWrapper2D::dataAdded(DataPtr data)
 	{
 		this->imageAdded(boost::dynamic_pointer_cast<Image>(data));
 	}
-	else if (boost::dynamic_pointer_cast<Mesh>(data))
+	else
 	{
-		this->meshAdded(boost::dynamic_pointer_cast<Mesh>(data));
+		mDataRepContainer->addData(data);
 	}
-	else if (boost::dynamic_pointer_cast<PointMetric>(data))
-	{
-		this->pointMetricAdded(boost::dynamic_pointer_cast<PointMetric>(data));
-	}
+	this->updateView();
 }
 
 void ViewWrapper2D::dataRemoved(const QString& uid)
 {
-	this->imageRemoved(uid);
-	this->meshRemoved(uid);
-	this->pointMetricRemoved(uid);
-}
-
-void ViewWrapper2D::meshAdded(MeshPtr mesh)
-{
-	if (!mesh)
-		return;
-	if (mGeometricRep.count(mesh->getUid()))
-		return;
-
-	GeometricRep2DPtr rep = GeometricRep2D::New(mesh->getUid() + "_rep2D");
-	rep->setSliceProxy(mSliceProxy);
-	rep->setMesh(mesh);
-	mView->addRep(rep);
-	mGeometricRep[mesh->getUid()] = rep;
+	mDataRepContainer->removeData(uid);
 	this->updateView();
 }
-
-void ViewWrapper2D::meshRemoved(const QString& uid)
-{
-	if (!mGeometricRep.count(uid))
-		return;
-
-	mView->removeRep(mGeometricRep[uid]);
-	mGeometricRep.erase(uid);
-	this->updateView();
-}
-
-void ViewWrapper2D::pointMetricAdded(PointMetricPtr mesh)
-{
-	if (!mesh)
-		return;
-	if (mPointMetricRep.count(mesh->getUid()))
-		return;
-
-	PointMetricRep2DPtr rep = PointMetricRep2D::New(mesh->getUid() + "_rep2D");
-	rep->setSliceProxy(mSliceProxy);
-    rep->setDataMetric(mesh);
-	rep->setDynamicSize(true);
-	rep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
-	mView->addRep(rep);
-	mPointMetricRep[mesh->getUid()] = rep;
-	this->updateView();
-}
-
-void ViewWrapper2D::pointMetricRemoved(const QString& uid)
-{
-	if (!mPointMetricRep.count(uid))
-		return;
-
-	mView->removeRep(mPointMetricRep[uid]);
-	mPointMetricRep.erase(uid);
-	this->updateView();
-}
-
 
 void ViewWrapper2D::dominantToolChangedSlot()
 {

@@ -62,7 +62,7 @@ private:
 	PointMetricRep2D(const QString& uid, const QString& name = "");
 	PointMetricRep2D(); ///< not implemented
 
-	double findDiskRadius(Vector3D position);
+	double findSphereRadius();
 
 	ViewportListenerPtr mViewportListener;
 	SliceProxyPtr mSliceProxy;
