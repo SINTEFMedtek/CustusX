@@ -36,6 +36,7 @@ cx_add_class(cxVisualizationService_SOURCE
 	cxLayoutRepository
 	cxVisualizationServiceBackend
 	cxNavigation
+	cxDataRepContainer
 	)
 
 include_directories(

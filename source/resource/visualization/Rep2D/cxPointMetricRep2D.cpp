@@ -101,7 +101,7 @@ void PointMetricRep2D::onModifiedStartRender()
 	mDisk->setOutlineWidth(0.25);
 	mDisk->setFillVisible(false);
 
-	mDisk->setRadius(this->findDiskRadius(position));
+	mDisk->setRadiusBySlicingSphere(this->findSphereRadius(), position[2]);
 
 	Vector3D projectedPosition = position;
 	double offsetFromXYPlane = 0.01;
@@ -111,23 +111,13 @@ void PointMetricRep2D::onModifiedStartRender()
 	mDisk->update();
 }
 
-double PointMetricRep2D::findDiskRadius(Vector3D position)
+double PointMetricRep2D::findSphereRadius()
 {
 	double radius = mGraphicsSize;
 	if (mViewportListener)
 	{
 		double size = mViewportListener->getVpnZoom();
 		radius = mGraphicsSize / 100 / size * 2.5;
-	}
-
-//	double radius = mGraphicsSize;
-	if (abs(position[2]) > radius)
-	{
-		radius = 0;
-	}
-	else
-	{
-		radius = radius*cos(asin(position[2]/radius));
 	}
 
 	return radius;
