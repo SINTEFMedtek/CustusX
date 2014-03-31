@@ -67,7 +67,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #define __vtkSonixVideoSource_h
 
 #include "vtkUltrasoundWin32Header.h"
-#include "vtkVideoSource.h"
+#include <vtkVideoSource.h>
 #include "SonixHelper.h"
 
 //BTX
