@@ -911,7 +911,7 @@ int vtkSonixVideoSource::RequestInformation(
 
 //----------------------------------------------------------------------------
 int vtkSonixVideoSource::RequestData(
-  vtkInformation *vtkNotUsed(request),
+	vtkInformation *request,
   vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *vtkNotUsed(outputVector))
 {
