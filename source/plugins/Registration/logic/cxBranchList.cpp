@@ -221,7 +221,7 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd > findConnectedPointsInCT(int startInd
 		std::pair<Eigen::MatrixXd::Index, double > minDistance = dsearch(thisPosition, positionsNotUsed);
 		Eigen::MatrixXd::Index index = minDistance.first;
 		double d = minDistance.second;
-		if (d > 2)
+		if (d > 3) // more than 3 mm distance to closest point --> branch is compledted
 			break;
 
 		thisPosition = positionsNotUsed.col(index);
