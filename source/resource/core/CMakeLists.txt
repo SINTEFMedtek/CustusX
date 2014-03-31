@@ -183,6 +183,7 @@ vtkCommonDataModel
 vtkIOImage
 vtkIOGeometry
 vtkIOLegacy
+vtkIOVideo
 vtkImagingStatistics
 vtkImagingColor
 vtkFiltersCore
