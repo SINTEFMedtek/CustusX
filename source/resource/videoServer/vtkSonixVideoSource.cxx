@@ -915,7 +915,7 @@ int vtkSonixVideoSource::RequestData(
   vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *vtkNotUsed(outputVector))
 {
-  vtkImageData *data = this->AllocateOutputData(this->GetOutput());
+	vtkImageData *data = this->AllocateOutputData(this->GetOutput(), request);
   int i,j;
 
   int outputExtent[6];     // will later be clipped in Z to a single frame
