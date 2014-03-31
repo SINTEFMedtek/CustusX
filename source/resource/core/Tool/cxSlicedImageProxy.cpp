@@ -108,7 +108,6 @@ void ApplyLUTToImage2DProxy::setInput(vtkImageAlgorithmPtr input, vtkLookupTable
 		mRedirecter->SetInputData(mDummyImage);
 	}
 
-	std::cout << "ApplyLUTToImage2DProxy mRedirecter->Update()" << std::endl;
 	mRedirecter->Update();
 }
 
