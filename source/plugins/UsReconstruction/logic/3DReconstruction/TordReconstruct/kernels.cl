@@ -401,8 +401,6 @@ int2 toImgCoord_int(float4 voxel, float16 plane_matrix, float2 in_spacing)
 	float2 transformed_voxel = transform_inv_xy(plane_matrix, voxel);
 
 	int2 retval;
-//	*x = ((transformed_voxel.x / in_spacing.x) + 0.5f);
-//	*y = ((transformed_voxel.y / in_spacing.y) + 0.5f);
 	retval.x = ((transformed_voxel.x / in_spacing.x) + 0.5f);
 	retval.y = ((transformed_voxel.y / in_spacing.y) + 0.5f);
 	
@@ -412,13 +410,16 @@ int2 toImgCoord_int(float4 voxel, float16 plane_matrix, float2 in_spacing)
 /**
  * Transform to floating point image coordinates
  */
-void toImgCoord_float(float* x, float* y, float4 voxel, float16 plane_matrix, float2 in_spacing)
+float2 toImgCoord_float(float4 voxel, float16 plane_matrix, float2 in_spacing)
 {
 
 	float2 transformed_voxel = transform_inv_xy(plane_matrix, voxel);
 
-	*x = ((transformed_voxel.x / in_spacing.x));
-	*y = ((transformed_voxel.y / in_spacing.y));
+	float2 retval;
+	retval.x = ((transformed_voxel.x / in_spacing.x));
+	retval.y = ((transformed_voxel.y / in_spacing.y));
+	
+	return retval;
 }
 
 /**
@@ -612,16 +613,13 @@ performInterpolation_dw(__local close_plane_t *close_planes,
 
 		translated_voxel.w = 1.0f;
 		// And then we get the pixel space coordinates
-		float x, y;
-		toImgCoord_float(&x,
-				&y,
-				translated_voxel,
+		float2 p = toImgCoord_float(translated_voxel,
 				plane_matrices[plane_id],
 				in_spacing);
 
 		int ix, iy;
-		ix = x;
-		iy = y;
+		ix = p.x;
+		iy = p.y;
 		if(!isValidPixel(ix,iy, mask, in_size)
 				|| !isValidPixel(ix+1, iy, mask, in_size)
 				|| !isValidPixel(ix+1, iy+1, mask, in_size)
@@ -631,7 +629,7 @@ performInterpolation_dw(__local close_plane_t *close_planes,
 			continue;
 		}
 
-		float interpolated_value = bilinearInterpolation(x, y, image, in_size.x);
+		float interpolated_value = bilinearInterpolation(p.x, p.y, image, in_size.x);
 
 		float dist = fabs(plane.dist);
 		if(dist < 0.001f) dist = 0.001f;
@@ -679,15 +677,13 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 		translated_voxel.w = 1.0f;
 
 		float x, y;
-		toImgCoord_float(&x,
-				&y,
-				translated_voxel,
+		float2 p = toImgCoord_float(translated_voxel,
 				plane_matrices[plane_id],
 				in_spacing);
 
 		int ix, iy;
-		ix = x;
-		iy = y;
+		ix = p.x;
+		iy = p.y;
 		if(!isValidPixel(ix,iy, mask, in_size)
 				|| !isValidPixel(ix+1, iy, mask, in_size)
 				|| !isValidPixel(ix+1, iy+1, mask, in_size)
@@ -696,8 +692,8 @@ performInterpolation_anisotropic(__local close_plane_t *close_planes,
 		{
 			continue;
 		}
-		CLOSE_PLANE_IDX(close_planes, i).intensity = bilinearInterpolation(x,
-				y,
+		CLOSE_PLANE_IDX(close_planes, i).intensity = bilinearInterpolation(p.x,
+				p.y,
 				image,
 				in_size.x);
 	}
