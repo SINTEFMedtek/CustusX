@@ -1,6 +1,22 @@
 #ifndef KERNELS_CLH_
 #define KERNELS_CLH_
 
+
+/*******************/
+/* Begin compile time definitions */
+/*******************/
+//MAX_PLANES - number of planes to include in closest planes
+//N_PLANES - number of planes/images (the z dimension)
+//METHOD - the reconstruction method
+//PLANE_METHOD - the method used to find the closes planes
+//MAX_MULTISTART_STARTS - how many guesses the algorithm should produce as starting points for finding the closes planes
+//NEWNESS_FACTOR - Newness weight, should newer (pixels in newer planes) be preferred
+//BRIGHTNESS_FACTOR - Brightness weight, when selecting pixrls, should similarity in intensity count
+
+/*******************/
+/* End compile time definitions */
+/*******************/
+
 /*******************/
 /* Begin constants */
 /*******************/
@@ -73,14 +89,13 @@ typedef struct _output_volume_type
 #define CHECK_PLANE_INDICES
 
 #ifdef DEBUG
-#define DEBUG_PRINTF(...) if((get_global_id(0) % 5000) == 0) printf(##__VA_ARGS__)
-//#define DEBUG_PRINTF(...) printf(##__VA_ARGS__)
-//#define BOUNDS_CHECK(x, min, ma x) if(x < min || x >= max) printf("Line %d: %s out of range: %d min: %d max: %d\n", __LINE__, #x, x, min, max)
-#define BOUNDS_CHECK(x, min, max)
-
+	#define DEBUG_PRINTF(...) if((get_global_id(0) % 5000) == 0) printf(##__VA_ARGS__)
+	//#define DEBUG_PRINTF(...) printf(##__VA_ARGS__)
+	//#define BOUNDS_CHECK(x, min, ma x) if(x < min || x >= max) printf("Line %d: %s out of range: %d min: %d max: %d\n", __LINE__, #x, x, min, max)
+	#define BOUNDS_CHECK(x, min, max)
 #else
-#define DEBUG_PRINTF(...)
-#define BOUNDS_CHECK(x, min, max)
+	#define DEBUG_PRINTF(...)
+	#define BOUNDS_CHECK(x, min, max)
 #endif
 
 //#define PLANE_DIST(voxel, matrix) (dot(matrix.s26AE,voxel) - dot(matrix.s26AE, matrix.s37BF))
@@ -108,14 +123,15 @@ typedef struct _output_volume_type
 #define ANISOTROPIC_GAUSS_WEIGHT(px, var, mean, mean_id, sigma) WEIGHT_GAUSS(px.dist, sigma)
 
 #ifndef ANISOTROPIC_WEIGHT_METHOD
-#define ANISOTROPIC_WEIGHT_METHOD ANISOTROPIC_WEIGHT_METHOD_BOTH
+	#define ANISOTROPIC_WEIGHT_METHOD ANISOTROPIC_WEIGHT_METHOD_BOTH
 #endif
 
 #ifndef BRIGHTNESS_FACTOR
-#define BRIGHTNESS_FACTOR 5.0f
+	#define BRIGHTNESS_FACTOR 5.0f
 #endif
+
 #ifndef NEWNESS_FACTOR
-#define NEWNESS_FACTOR 5.0f
+	#define NEWNESS_FACTOR 5.0f
 #endif
 
 #define ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, mean_id, sigma)    \
@@ -130,13 +146,13 @@ typedef struct _output_volume_type
      + (WEIGHT_TERNARY(px.intensity, mean, BRIGHTNESS_FACTOR)))
 
 #if ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_DISTANCE
-#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_GAUSS_WEIGHT(px, var, mean, mean_id, sigma)
+	#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_GAUSS_WEIGHT(px, var, mean, mean_id, sigma)
 #elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_BRIGHTNESS
-#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, mean_id, sigma)
+	#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_BRIGHTNESS(px, var, mean, mean_id, sigma)
 #elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_LATENESS
-#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_LATENESS(px, var, mean, mean_id, sigma)
+	#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_LATENESS(px, var, mean, mean_id, sigma)
 #elif ANISOTROPIC_WEIGHT_METHOD == ANISOTROPIC_WEIGHT_METHOD_BOTH
-#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_BOTH(px, var, mean, mean_id, sigma)
+	#define ANISOTROPIC_WEIGHT(px, var, mean, mean_id, sigma) ANISOTROPIC_WEIGHT_BOTH(px, var, mean, mean_id, sigma)
 #endif
 
 // Gaussian weight function
@@ -171,9 +187,7 @@ typedef struct _output_volume_type
 // Declare all the functions, as Apple seems to need that
 //---------------------DEBUGGING-FUNCTIONALITY---------------------
 #ifdef DEBUG
-
-void printMatrix(float16 matrix);
-
+	void printMatrix(float16 matrix);
 #endif /* DEBUG */
 
 //---------------------DEBUGGING-FUNCTIONALITY---------------------
@@ -209,15 +223,14 @@ int2 findClosestPlanes_multistart(__local close_plane_t *close_planes,
 		float2 in_spacing);
 
 #if PLANE_METHOD == PLANE_EXACT
-#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j) findClosestPlanes_multistart(a, b, c, d, e, f, g, 1, h, i, j)
+	#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j) findClosestPlanes_multistart(a, b, c, d, e, f, g, 1, h, i, j)
 #elif PLANE_METHOD == PLANE_CLOSEST
+	#ifdef MAX_MULTISTART_STARTS
+	#undef MAX_MULTISTART_STARTS
+	#define MAX_MULTISTART_STARTS 1
+	#endif
 
-#ifdef MAX_MULTISTART_STARTS
-#undef MAX_MULTISTART_STARTS
-#define MAX_MULTISTART_STARTS 1
-#endif
-
-#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j) findClosestPlanes_multistart(a, b, c, d, e, f, g, 0, h, i, j)
+	#define FIND_CLOSE_PLANES(a, b, c, d, e, f, g, h, i, j) findClosestPlanes_multistart(a, b, c, d, e, f, g, 0, h, i, j)
 #endif
 
 __global const unsigned char* getImageData(int plane_id,
@@ -240,17 +253,17 @@ float bilinearInterpolation(float x,
 		int in_xsize);
 
 #if METHOD == METHOD_VNN
-#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
-		performInterpolation_vnn(a, b, c, d, e, f, g, h, i)
+	#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
+			performInterpolation_vnn(a, b, c, d, e, f, g, h, i)
 #elif METHOD == METHOD_VNN2
-#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
-		performInterpolation_vnn2(a, b, c, d, e, f, g, h, i)
+	#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
+			performInterpolation_vnn2(a, b, c, d, e, f, g, h, i)
 #elif METHOD == METHOD_DW
-#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
-		performInterpolation_dw(a, b, c, d, e, f, g, h, i)
+	#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
+			performInterpolation_dw(a, b, c, d, e, f, g, h, i)
 #elif METHOD == METHOD_ANISOTROPIC
-#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
-		performInterpolation_anisotropic(a, b, c, d, e, f, g, h, i)
+	#define PERFORM_INTERPOLATION(a, b, c, d, e, f, g, h, i)	  \
+			performInterpolation_anisotropic(a, b, c, d, e, f, g, h, i)
 #endif
 
 unsigned char performInterpolation_vnn(__local close_plane_t *close_planes,
