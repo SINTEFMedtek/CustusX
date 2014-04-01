@@ -347,7 +347,7 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDat
 		centerline->GetPoint(i,p);
         Eigen::Vector3d position;
         position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
-        CLpoints.block(0 , i , 3 , 1) = rMd.coord(position);
+        CLpoints.block(0 , i , 3 , 1) = rMd.inv().coord(position);
 	    }
 
 	Tnavigation = excludeClosePositions(Tnavigation);
