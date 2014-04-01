@@ -7,6 +7,7 @@
 #include "cxDataLocations.h"
 #include "cxSettings.h"
 #include "cxLogger.h"
+#include "cxReporter.h"
 //#include "cxForwardDeclarations.h"
 
 namespace cxtest
@@ -14,6 +15,12 @@ namespace cxtest
 TestRenderSpeed::TestRenderSpeed():
 		mNumViews(0)
 {
+	cx::reporter()->initialize();
+}
+
+TestRenderSpeed::~TestRenderSpeed()
+{
+	cx::Reporter::shutdown();
 }
 
 void TestRenderSpeed::testSingleView()
