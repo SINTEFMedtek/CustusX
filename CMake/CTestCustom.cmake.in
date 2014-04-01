@@ -1,5 +1,0 @@
-# See http://www.vtk.org/Wiki/CMake_Testing_With_CTest#Customizing_CTest for more variables
-
-# Set output size for tests (in characters/bytes)
-set(CTEST_CUSTOM_MAXIMUM_PASSED_TEST_OUTPUT_SIZE 30000)
-set(CTEST_CUSTOM_MAXIMUM_FAILED_TEST_OUTPUT_SIZE 30000)
