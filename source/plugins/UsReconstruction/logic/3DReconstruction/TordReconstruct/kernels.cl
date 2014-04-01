@@ -471,7 +471,9 @@ performInterpolation_vnn(__local close_plane_t *close_planes,
 		__global const unsigned char* mask,
 		float4 voxel)
 {
-	if(n_close_planes == 0) return 1;
+	if(n_close_planes == 0){
+		return 1;
+	}
 
 	int plane_id = 0;
 	float lowest_dist = 10.0f;
@@ -531,7 +533,10 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
 		__global const unsigned char* mask,
 		float4 voxel)
 {
-	if(n_close_planes == 0) return 1;
+	if(n_close_planes == 0)
+	{
+		return 1;
+	}
 
 	float scale = 0.0f;
 
@@ -591,7 +596,10 @@ performInterpolation_dw(__local close_plane_t *close_planes,
 		float4 voxel)
 {
 
-	if(n_close_planes == 0) return 1;
+	if(n_close_planes == 0)
+	{
+		return 1;
+	}
 
 	float scale = 0.0f;
 
