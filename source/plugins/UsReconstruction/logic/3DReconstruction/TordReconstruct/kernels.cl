@@ -227,17 +227,14 @@ int2 findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 		{
 			BOUNDS_CHECK(idx.x, 0, N_PLANES);
 			BOUNDS_CHECK(max_idx, 0, MAX_PLANES);
-			int px, py;
 			float4 translated_voxel = PROJECTONTOPLANEEQ(voxel,
 					plane_eqs[idx.x],
 					dists.x);
-			toImgCoord_int(&px,
-					&py,
-					translated_voxel,
-					plane_matrices[idx.x],
-					in_spacing);
+			int2 p = toImgCoord_int(translated_voxel,
+							plane_matrices[idx.x],
+							in_spacing);
 
-			if(isValidPixel(px, py, mask, in_size))
+			if(isValidPixel(p.x, p.y, mask, in_size))
 			{
 
 				// If yes, swap out the one with the longest distance for this plane
@@ -268,17 +265,14 @@ int2 findClosestPlanes_heuristic(__local close_plane_t *close_planes,
 			BOUNDS_CHECK(idx.y, 0, N_PLANES);
 			BOUNDS_CHECK(max_idx, 0, MAX_PLANES);
 			// If yes, swap out the one with the longest distance for this plane
-			int px, py;
 			float4 translated_voxel = PROJECTONTOPLANEEQ(voxel,
 					plane_eqs[idx.y],
 					dists.y);
 
-			toImgCoord_int(&px,
-					&py,
-					translated_voxel,
+			int2 p = toImgCoord_int(translated_voxel,
 					plane_matrices[idx.y],
 					in_spacing);
-			if(isValidPixel(px, py, mask, in_size))
+			if(isValidPixel(p.x, p.y, mask, in_size))
 			{
 				tmp.dist = dists.y;
 				tmp.plane_id = idx.y;
@@ -401,13 +395,18 @@ float2 transform_inv_xy(float16 matrix, float4 voxel)
 /**
  * Transform to integer image coordinates - i.e. pixel coordinates
  */
-void toImgCoord_int(int* x, int* y, float4 voxel, float16 plane_matrix, float2 in_spacing)
+int2 toImgCoord_int(float4 voxel, float16 plane_matrix, float2 in_spacing)
 {
 
 	float2 transformed_voxel = transform_inv_xy(plane_matrix, voxel);
 
-	*x = ((transformed_voxel.x / in_spacing.x) + 0.5f);
-	*y = ((transformed_voxel.y / in_spacing.y) + 0.5f);
+	int2 retval;
+//	*x = ((transformed_voxel.x / in_spacing.x) + 0.5f);
+//	*y = ((transformed_voxel.y / in_spacing.y) + 0.5f);
+	retval.x = ((transformed_voxel.x / in_spacing.x) + 0.5f);
+	retval.y = ((transformed_voxel.y / in_spacing.y) + 0.5f);
+	
+	return retval;
 }
 
 /**
@@ -502,20 +501,17 @@ performInterpolation_vnn(__local close_plane_t *close_planes,
 	translated_voxel.w = 1.0f;
 
 	// And then we get the pixel space coordinates
-	int x, y;
-	toImgCoord_int(&x,
-			&y,
-			translated_voxel,
+	int2 p = toImgCoord_int(translated_voxel,
 			plane_matrices[plane_id],
 			in_spacing);
 
-	if(!isValidPixel(x,y, mask, in_size))
+	if(!isValidPixel(p.x,p.y, mask, in_size))
 	{
 		return 1;
 	}
-	BOUNDS_CHECK(x, 0, in_size.x);
-	BOUNDS_CHECK(y, 0, in_size.y);
-	return max((unsigned char)1, image[y*in_size.x + x]);
+	BOUNDS_CHECK(p.x, 0, in_size.x);
+	BOUNDS_CHECK(p.y, 0, in_size.y);
+	return max((unsigned char)1, image[p.y*in_size.x + p.x]);
 
 }
 
@@ -556,14 +552,11 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
 
 		translated_voxel.w = 1.0f;
 		// And then we get the pixel space coordinates
-		int x, y;
-		toImgCoord_int(&x,
-				&y,
-				translated_voxel,
+		int2 p = toImgCoord_int(translated_voxel,
 				plane_matrices[plane_id],
 				in_spacing);
 
-		if(!isValidPixel(x,y, mask, in_size))
+		if(!isValidPixel(p.x,p.y, mask, in_size))
 		{
 			continue;
 		}
@@ -574,7 +567,7 @@ performInterpolation_vnn2(__local close_plane_t *close_planes,
 		float weight = VNN2_WEIGHT(dist);
 
 		scale += weight;
-		val += (image[y*in_size.x + x] * weight);
+		val += (image[p.y*in_size.x + p.x] * weight);
 	}
 
 	return max((unsigned char)1, (unsigned char) (val / scale));
