@@ -192,10 +192,7 @@ typedef struct _output_volume_type
 
 //---------------------DEBUGGING-FUNCTIONALITY---------------------
 
-int isValidPixel(int x,
-		int y,
-		const __global unsigned char* mask,
-		int2 in_size);
+int isValidPixel(int2 point, const __global unsigned char* mask, int2 in_size);
 
 int findHighestIdx(__local close_plane_t *planes, int n);
 
@@ -242,6 +239,8 @@ float4 transform(float16 matrix, float4 voxel);
 float4 transform_inv(float16 matrix, float4 voxel);
 
 float2 transform_inv_xy(float16 matrix, float4 voxel);
+
+int2 round_int(float2 value);
 
 int2 toImgCoord_int(float4 voxel, float16 plane_matrix, float2 in_spacing);
 
