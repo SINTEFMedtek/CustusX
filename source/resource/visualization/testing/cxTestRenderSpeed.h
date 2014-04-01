@@ -20,6 +20,7 @@ class TestRenderSpeed
 {
 public:
 	TestRenderSpeed();
+	~TestRenderSpeed();
 	void testSingleView();
 	void testSeveralViews();
 	void testLotsOfViews();
