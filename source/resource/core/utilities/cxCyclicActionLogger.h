@@ -51,6 +51,9 @@ public:
 	QString dumpStatistics();
 	QString dumpStatisticsSmall();
 
+	int getTime(QString id);
+	int getTotalLoggedTime();///< Total time contained in entered id's (id outside is not counted)
+
 private:
 	QString mName;
 	struct Entry
@@ -62,6 +65,10 @@ private:
 	QTime mRenderClock; ///< clock for counting time between and inside renderings
 	int mInterval; ///< the interval between each readout+reset of the calculated values.
 	QTime mIntervalClock; ///< Time object used to calculate number of renderings per second (FPS)
+
+	double getMeanTime(std::vector<double> &time);
+	double getMaxTime(std::vector<double> &time);
+	std::vector<Entry>::iterator getTimingVectorIterator(QString id);
 };
 
 /**

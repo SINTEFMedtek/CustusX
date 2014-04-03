@@ -1,5 +1,7 @@
 #include "cxSimulatedImageStreamer.h"
 
+#include <boost/math/special_functions/round.hpp>
+
 #include "vtkPNGWriter.h"
 #include "vtkImageReslice.h"
 #include "vtkMatrix4x4.h"
@@ -19,11 +21,13 @@
 #include "cxSliceProxy.h"
 #include "vtkImageChangeInformation.h"
 #include "cxLogger.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {
 
-SimulatedImageStreamer::SimulatedImageStreamer()
+SimulatedImageStreamer::SimulatedImageStreamer() :
+	mTimer(new CyclicActionLogger())
 {
 	this->setSendInterval(40);
 }
@@ -131,9 +135,14 @@ void SimulatedImageStreamer::setSourceImage(ImagePtr image)
 
 ImagePtr SimulatedImageStreamer::calculateSlice(ImagePtr source)
 {
+	mTimer->begin();
 	vtkImageDataPtr framegrabbedSlice = this->frameGrab(source);
+	mTimer->time("Grab");
 	vtkImageDataPtr maskedFramedgrabbedSlice = this->maskSlice(framegrabbedSlice);
+	mTimer->time("Mask");
+	mTimer->time("Simulate");
 	ImagePtr slice = this->convertToSscImage(maskedFramedgrabbedSlice, source);
+	mTimer->time("Convert");
 
 	return slice;
 }
@@ -193,6 +202,15 @@ Transform3D SimulatedImageStreamer::getTransform_vMr()
 
 	Transform3D vMr = vMt * tMpr * prMr;
 	return vMr;
+}
+
+int SimulatedImageStreamer::getAverageTimePerSimulatedFrame()
+{
+	cx::reporter()->sendDebug("Grab frame: " + qstring_cast(mTimer->getTime(QString("Grab"))));
+	cx::reporter()->sendDebug("Mask frame: " + qstring_cast(mTimer->getTime(QString("Mask"))));
+	cx::reporter()->sendDebug("Run simulation: " + qstring_cast(mTimer->getTime(QString("Simulate"))));
+	cx::reporter()->sendDebug("Convert frame to Image: " + qstring_cast(mTimer->getTime(QString("Convert"))));
+	return mTimer->getTotalLoggedTime();
 }
 
 } /* namespace cx */

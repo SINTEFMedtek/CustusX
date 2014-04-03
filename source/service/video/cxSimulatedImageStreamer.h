@@ -4,6 +4,7 @@
 #include "vtkSmartPointer.h"
 #include "cxTransform3D.h"
 #include "cxImageStreamer.h"
+#include "cxCyclicActionLogger.h"
 
 typedef vtkSmartPointer<class vtkImageMask> vtkImageMaskPtr;
 
@@ -35,6 +36,8 @@ public:
 
 	virtual QString getType();
 
+	int getAverageTimePerSimulatedFrame();
+
 private slots:
 	virtual void streamSlot();
 	void resetMask();
@@ -57,6 +60,8 @@ private:
 	mutable ImagePtr mCachedImageToSend;
 	mutable vtkImageDataPtr mCachedMask;
 	DataServicePtr mDataManager;
+
+	CyclicActionLoggerPtr mTimer;///< Timer for timing parts of the simulation
 
 };
 typedef boost::shared_ptr<SimulatedImageStreamer> SimulatedImageStreamerPtr;
