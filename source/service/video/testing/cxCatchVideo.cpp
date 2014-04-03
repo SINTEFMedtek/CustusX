@@ -27,8 +27,10 @@
 #include "cxtestSender.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
-//#include "cxDataManager.h"
 #include "cxtestDummyDataManager.h"
+
+#include "cxtestJenkinsMeasurement.h"
+#include "cxReporter.h"
 
 namespace cxtest
 {
@@ -71,6 +73,15 @@ void checkSenderGotImageFromStreamer(TestSenderPtr sender)
 	REQUIRE(image);
 }
 
+void checkSimulatedFrames(int numFrames, TestSenderPtr sender, bool silentAtArrive = false)
+{
+	for(int i = 0; i < numFrames; ++i)
+	{
+		REQUIRE(waitForQueuedSignal(sender.get(), SIGNAL(newPackage()), 200, silentAtArrive));
+		checkSenderGotImageFromStreamer(sender);
+	}
+}
+
 TEST_CASE("DummyImageStreamer: File should be read and sent only once", "[streaming][unit]")
 {
 	TestSenderPtr sender(new TestSender());
@@ -78,8 +89,7 @@ TEST_CASE("DummyImageStreamer: File should be read and sent only once", "[stream
 	bool sendTwoStreams = false;
 	cx::ImageStreamerPtr imagestreamer = createRunningDummyImageStreamer(sender, sendTwoStreams, sendImageOnce);
 
-	REQUIRE(waitForQueuedSignal(sender.get(), SIGNAL(newPackage())));
-	checkSenderGotImageFromStreamer(sender);
+	checkSimulatedFrames(1, sender);
 
 	REQUIRE_FALSE(waitForQueuedSignal(sender.get(), SIGNAL(newPackage())));
 
@@ -92,11 +102,8 @@ TEST_CASE("DummyImageStreamer: File should be read and send slices with a given 
 	bool sendTwoStreams = false;
 	cx::ImageStreamerPtr imagestreamer = createRunningDummyImageStreamer(sender,sendTwoStreams);
 
-	REQUIRE(waitForQueuedSignal(sender.get(), SIGNAL(newPackage())));
-	checkSenderGotImageFromStreamer(sender);
-
-	REQUIRE(waitForQueuedSignal(sender.get(), SIGNAL(newPackage())));
-	checkSenderGotImageFromStreamer(sender);
+	int numFrames = 2;
+	checkSimulatedFrames(numFrames, sender);
 
 	imagestreamer->stopStreaming();
 }
@@ -108,14 +115,30 @@ TEST_CASE("SimulatedImageStreamer: Should stream 2D images from a volume given a
 
 	cx::SimulatedImageStreamerPtr imagestreamer = createRunningSimulatedImageStreamer(sender);
 
-	REQUIRE(waitForQueuedSignal(sender.get(), SIGNAL(newPackage()), 200));
-	checkSenderGotImageFromStreamer(sender);
-
-	REQUIRE(waitForQueuedSignal(sender.get(), SIGNAL(newPackage()), 200));
-	checkSenderGotImageFromStreamer(sender);
+	int numFrames = 2;
+	checkSimulatedFrames(numFrames, sender);
 
 	imagestreamer->stopStreaming();
-//	cx::ToolManager::shutdown();
+}
+
+TEST_CASE("SimulatedImageStreamer: Speed", "[streaming][unit][speed]")
+{
+	cx::reporter()->initialize();
+	TestSenderPtr sender(new TestSender());
+	REQUIRE(sender);
+
+	JenkinsMeasurement jenkins;
+
+	cx::SimulatedImageStreamerPtr imagestreamer = createRunningSimulatedImageStreamer(sender);
+
+	int numFrames = 100;
+	bool silent = true;
+	checkSimulatedFrames(numFrames, sender, silent);
+
+	jenkins.createOutput("Average time in ms per frame (No conversion)", QString::number(imagestreamer->getAverageTimePerSimulatedFrame()));
+
+	imagestreamer->stopStreaming();
+	cx::Reporter::shutdown();
 }
 
 }//namespace cx

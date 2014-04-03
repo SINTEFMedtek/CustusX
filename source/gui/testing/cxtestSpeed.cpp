@@ -30,7 +30,6 @@
 #include "cxViewManager.h"
 #include "cxLegacySingletons.h"
 #include "cxMessageListener.h"
-#include "cxReporter.h"
 
 namespace cxtest
 {
@@ -41,14 +40,6 @@ void initTest()
 {
 	cx::DataLocations::setTestMode();
 	cx::settings()->setValue("renderingInterval", 4);
-}
-
-void printFpsReport(QString name, QString value)
-{
-	cx::reporter()->initialize();
-	JenkinsMeasurement jenkins;
-	jenkins.createOutput(name, value);
-	cx::Reporter::shutdown();
 }
 
 void requireVolumeIn3DScene()
@@ -104,7 +95,8 @@ TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][n
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
 
 	int fps = calculateFPS(false);
-	printFpsReport("FPS_vtkVolumeTextureMapper3D", QString::number(fps));
+	JenkinsMeasurement jenkins;
+	jenkins.printMeasurementWithCxReporter("FPS_vtkVolumeTextureMapper3D", QString::number(fps));
 
 	// TODO: enter this value into config file
 	double minimumFPS = 5;
@@ -118,7 +110,8 @@ TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration][
 
 	int fps = calculateFPS(false);
 
-	printFpsReport("FPS_vtkGPUVolumeRayCastMapper", QString::number(fps));
+	JenkinsMeasurement jenkins;
+	jenkins.printMeasurementWithCxReporter("FPS_vtkGPUVolumeRayCastMapper", QString::number(fps));
 
 	// TODO: enter this value into config file
 	double minimumFPS = 5;
@@ -132,7 +125,8 @@ TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integra
 
 	bool slicing = true;
 	int fps = calculateFPS(slicing);
-	printFpsReport("FPS_vtkGPUVolumeRayCastMapper_Slicing", QString::number(fps));
+	JenkinsMeasurement jenkins;
+	jenkins.printMeasurementWithCxReporter("FPS_vtkGPUVolumeRayCastMapper_Slicing", QString::number(fps));
 
 	// TODO: enter this value into config file
 	double minimumFPS = 5;
@@ -146,7 +140,8 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper renderer", "[speed][gui][
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
 
 	int fps = calculateFPS(false);
-	printFpsReport("FPS_vtkOpenGLGPUMultiVolumeRayCastMapper", QString::number(fps));
+	JenkinsMeasurement jenkins;
+	jenkins.printMeasurementWithCxReporter("FPS_vtkOpenGLGPUMultiVolumeRayCastMapper", QString::number(fps));
 
 	// TODO: enter this value into config file
 //	double minimumFPS = 5;
@@ -161,7 +156,8 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper with slicing", "[speed][g
 
 	bool slicing = true;
 	int fps = calculateFPS(slicing);
-	printFpsReport("FPS_vtkOpenGLGPUMultiVolumeRayCastMapper_Slicing", QString::number(fps));
+	JenkinsMeasurement jenkins;
+	jenkins.printMeasurementWithCxReporter("FPS_vtkOpenGLGPUMultiVolumeRayCastMapper_Slicing", QString::number(fps));
 
 	// TODO: enter this value into config file
 //	double minimumFPS = 5;

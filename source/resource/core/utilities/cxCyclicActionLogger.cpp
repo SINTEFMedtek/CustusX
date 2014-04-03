@@ -18,6 +18,7 @@
 #include <QStringList>
 #include "cxTypeConversions.h"
 #include <cmath>
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -140,9 +141,9 @@ QString CyclicActionLogger::dumpStatisticsSmall()
 
 	  std::vector<Entry>::iterator entry;
 	  for (entry=mTiming.begin(); entry!=mTiming.end(); ++entry)
-	  {
-		  double maxTime = *std::max_element(entry->time.begin(), entry->time.end());
-		  double meanTime = std::accumulate(entry->time.begin(), entry->time.end(), 0)/entry->time.size();
+		{
+			double maxTime = this->getMaxTime(entry->time);
+			double meanTime = this->getMeanTime(entry->time);
 		  totalTime += meanTime;
 
 		  meanTimes << qstring_cast(int(meanTime));
@@ -157,5 +158,51 @@ QString CyclicActionLogger::dumpStatisticsSmall()
 	  return qstring_cast(ss.str());
 }
 
+double CyclicActionLogger::getMeanTime(std::vector<double> &time)
+{
+	return std::accumulate(time.begin(), time.end(), 0)/time.size();
+}
+
+double CyclicActionLogger::getMaxTime(std::vector<double> &time)
+{
+	return *std::max_element(time.begin(), time.end());
+}
+
+int CyclicActionLogger::getTime(QString id)
+{
+	std::vector<Entry>::iterator entry = getTimingVectorIterator(id);
+	if(entry == mTiming.end())
+	{
+		cx::reporter()->sendWarning("CyclicActionLogger::getTime() unknown id: " + id);
+		return 0;
+	}
+	return getMeanTime(entry->time);
+}
+
+std::vector<CyclicActionLogger::Entry>::iterator CyclicActionLogger::getTimingVectorIterator(QString id)
+{
+	std::vector<Entry>::iterator entry;
+	for (entry=mTiming.begin(); entry!=mTiming.end(); ++entry)
+	{
+		if(entry->id == id)
+			break;
+	}
+	return entry;
+}
+
+int CyclicActionLogger::getTotalLoggedTime()
+{
+	double totalTime = 0;
+	std::vector<Entry>::iterator entry;
+	for (entry=mTiming.begin(); entry!=mTiming.end(); ++entry)
+	{
+		if(entry->id != "outside")
+		{
+			double meanTime = this->getMeanTime(entry->time);
+			totalTime += meanTime;
+		}
+	}
+	return totalTime;
+}
 
 } // namespace cx

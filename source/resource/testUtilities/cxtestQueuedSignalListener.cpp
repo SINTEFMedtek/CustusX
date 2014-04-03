@@ -23,13 +23,14 @@
 namespace cxtest
 {
 
-bool waitForQueuedSignal(QObject* object, const char* signal, int maxWaitMilliSeconds)
+bool waitForQueuedSignal(QObject* object, const char* signal, int maxWaitMilliSeconds, bool silentAtArrive)
 {
 	QueuedSignalListener listener(object, signal, maxWaitMilliSeconds);
 	listener.exec();
 	bool signalArrived = !listener.timedOut();
 	std::string feedback = signalArrived ? " arrived." : " did NOT arrive. Timed out. ";
-	std::cout << "[QueuedSignalListener] " << signal << feedback << std::endl;
+	if(!silentAtArrive)
+		std::cout << "[QueuedSignalListener] " << signal << feedback << std::endl;
 	return signalArrived;
 }
 
