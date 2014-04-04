@@ -84,9 +84,6 @@ Eigen::VectorXd findMedian(Eigen::MatrixXd matrix)
             medianValues(i) = ( sortedMatrix(i,sortedMatrix.cols()/2) + sortedMatrix(i,sortedMatrix.cols()/2 - 1) ) / 2;
         }
     }
-
-    std::cout << "Median values: " << medianValues << std::endl;
-
         return medianValues;
 }
 
@@ -223,7 +220,6 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 	Eigen::MatrixXd trackingPositions(3 , Tnavigation.size());
 	Eigen::MatrixXd trackingOrientations(3, Tnavigation.size());
 
-
 	std::vector<Branch*> branchVector = branches->getBranches();
 	CTPositions = branchVector[0]->getPositions();
 	CTOrientations = branchVector[0]->getOrientations();
@@ -240,9 +236,13 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
         CTOrientations.swap(CTOrientationsNew);
     }
 
-    //std::cout << "Number of centerline positions: " << CTPositions.cols() << std::endl;
+    for (int i = 0; i < CTPositions.cols(); i++)  {
+        if (CTPositions.block(0 , i , 1 , 1).sum() == 0 && CTPositions.block(1 , i , 1 , 1).sum() == 0 && CTPositions.block(2 , i , 1 , 1).sum() == 0)
+             std::cout << "CL position number after sorting: " << i << ": " << CTPositions.col(i) << std::endl;
+     }
 
-    for (int i = 1; i < CTPositions.size(); i++)
+
+    for (int i = 1; i < CTPositions.cols(); i++)
     {
         if (std::isinf( CTPositions.col(i).sum() ))
         {
@@ -265,11 +265,8 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 
     }
 
-    //std::cout << "Number of centerline positions: " << CTPositions.cols() << std::endl;
 
-
-    //std::cout << "Tracking data 1 before old_rMpr: " << Tnavigation[0] << std::endl;
-	for (int i = 0; i < Tnavigation.size(); i++)
+    for (int i = 0; i < Tnavigation.size(); i++)
 	{
         Tnavigation[i] = old_rMpr * Tnavigation[i];
 		trackingPositions.block(0 , i , 3 , 1) = Tnavigation[i].topRightCorner(3 , 1);
