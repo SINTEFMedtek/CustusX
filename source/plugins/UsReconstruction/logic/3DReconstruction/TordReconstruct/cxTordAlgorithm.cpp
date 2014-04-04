@@ -16,7 +16,7 @@ TordAlgorithm::TordAlgorithm() :
 	oul::DeviceCriteria criteria;
 	criteria.setTypeCriteria(oul::DEVICE_TYPE_GPU);
 	bool enableProfilling = true;
-	mOulContex = oul::opencl()->createContext(criteria, NULL, enableProfilling);
+	mOulContex = oul::opencl()->createContextPtr(criteria, NULL, enableProfilling);
 	if(enableProfilling)
 		mRuntime->enable();
 }
@@ -34,7 +34,7 @@ bool TordAlgorithm::initCL(QString kernelPath, int nMaxPlanes, int nPlanes, int 
 	cl::Program clprogram = this->buildCLProgram(source, nMaxPlanes, nPlanes, method, planeMethod, nStarts,brightnessWeight, newnessWeight);
 
 	// CREATE KERNEL
-	mKernel = mOulContex.createKernel(clprogram, "voxel_methods");
+	mKernel = mOulContex->createKernel(clprogram, "voxel_methods");
 
 	return true;
 }
@@ -49,8 +49,8 @@ cl::Program TordAlgorithm::buildCLProgram(std::string program_src, int nMaxPlane
 		QString define = "-D MAX_PLANES=%1 -D N_PLANES=%2 -D METHOD=%3 -D PLANE_METHOD=%4 -D MAX_MULTISTART_STARTS=%5 -D NEWNESS_FACTOR=%6 -D BRIGHTNESS_FACTOR=%7";
 		define = define.arg(nMaxPlanes).arg(nPlanes).arg(method).arg(planeMethod).arg(nStarts).arg(newnessWeight).arg(brightnessWeight);
 
-		int programID = mOulContex.createProgramFromString(program_src, "-I " + std::string(TORD_KERNEL_PATH) + " " + define.toStdString());
-		retval = mOulContex.getProgram(programID);
+		int programID = mOulContex->createProgramFromString(program_src, "-I " + std::string(TORD_KERNEL_PATH) + " " + define.toStdString());
+		retval = mOulContex->getProgram(programID);
 
 	} catch (cl::Error &error)
 	{
@@ -123,7 +123,7 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	for (int i = 0; i < numBlocks; i++)
 	{
 		//TODO why does the context suddenly contain a "dummy" device?
-		cl::Buffer buffer = mOulContex.createBuffer(mOulContex.getContext(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, inputBlocks[i].length, inputBlocks[i].data, "block buffer "+QString::number(i).toStdString());
+		cl::Buffer buffer = mOulContex->createBuffer(mOulContex->getContext(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, inputBlocks[i].length, inputBlocks[i].data, "block buffer "+QString::number(i).toStdString());
 		clBlocks.push_back(buffer);
 	}
 	// Allocate output memory
@@ -137,16 +137,16 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	if(isUsingTooMuchMemory(outputVolumeSize, inputBlocks[0].length, globalMemUse))
 		return false;
 
-	cl::Buffer outputBuffer = mOulContex.createBuffer(mOulContex.getContext(), CL_MEM_WRITE_ONLY, outputVolumeSize, NULL, "output volume buffer");
+	cl::Buffer outputBuffer = mOulContex->createBuffer(mOulContex->getContext(), CL_MEM_WRITE_ONLY, outputVolumeSize, NULL, "output volume buffer");
 
 	// Fill the plane matrices
 	float *planeMatrices = new float[16 * nPlanes_numberOfInputImages]; //4x4 (matrix) = 16
 	this->fillPlaneMatrices(planeMatrices, input);
 
-	cl::Buffer clPlaneMatrices = mOulContex.createBuffer(mOulContex.getContext(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, nPlanes_numberOfInputImages * sizeof(float) * 16, planeMatrices, "plane matrices buffer");
+	cl::Buffer clPlaneMatrices = mOulContex->createBuffer(mOulContex->getContext(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, nPlanes_numberOfInputImages * sizeof(float) * 16, planeMatrices, "plane matrices buffer");
 
 	// US Probe mask
-	cl::Buffer clMask = mOulContex.createBuffer(mOulContex.getContext(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+	cl::Buffer clMask = mOulContex->createBuffer(mOulContex->getContext(), CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 			sizeof(cl_uchar) * input->getMask()->GetDimensions()[0] * input->getMask()->GetDimensions()[1],
 			input->getMask()->GetScalarPointer(), "mask buffer");
 
@@ -167,7 +167,7 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	// Find the optimal local work size
 	size_t local_work_size;
 	unsigned int deviceNumber = 0;
-	cl::Device device = mOulContex.getDevice(deviceNumber);
+	cl::Device device = mOulContex->getDevice(deviceNumber);
 	mKernel.getWorkGroupInfo(device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &local_work_size);
 
 	size_t close_planes_size = this->calculateSpaceNeededForClosePlanes(mKernel, device, local_work_size, nPlanes_numberOfInputImages, nClosePlanes);
@@ -205,7 +205,7 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 		global_work_size = ((global_work_size / local_work_size) + 1) * local_work_size; // ceil(...)
 
 	unsigned int queueNumber = 0;
-	cl::CommandQueue queue = mOulContex.getQueue(queueNumber);
+	cl::CommandQueue queue = mOulContex->getQueue(queueNumber);
 	this->measureAndExecuteKernel(queue, mKernel, global_work_size, local_work_size, mKernelMeasurementName);
 	this->measureAndReadBuffer(queue, outputBuffer, outputVolumeSize, outputData->GetScalarPointer(), "tord_read_buffer");
 
@@ -366,8 +366,8 @@ bool TordAlgorithm::isUsingTooMuchMemory(size_t outputVolumeSize, size_t inputBl
 	bool usingTooMuchMemory = false;
 
 	unsigned int deviceNumber = 0;
-	cl_ulong maxAllocSize = mOulContex.getDevice(deviceNumber).getInfo<CL_DEVICE_MAX_MEM_ALLOC_SIZE>();
-	cl_ulong globalMemSize = mOulContex.getDevice(deviceNumber).getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>();
+	cl_ulong maxAllocSize = mOulContex->getDevice(deviceNumber).getInfo<CL_DEVICE_MAX_MEM_ALLOC_SIZE>();
+	cl_ulong globalMemSize = mOulContex->getDevice(deviceNumber).getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>();
 	if (maxAllocSize < outputVolumeSize)
 	{
 		reportError(QString("Output volume size too large! %1 > %2\n").arg(outputVolumeSize).arg(maxAllocSize));
@@ -393,14 +393,14 @@ bool TordAlgorithm::isUsingTooMuchMemory(size_t outputVolumeSize, size_t inputBl
 void TordAlgorithm::measureAndExecuteKernel(cl::CommandQueue queue, cl::Kernel kernel, size_t global_work_size, size_t local_work_size, std::string measurementName)
 {
 	this->startProfiling(measurementName, queue);
-	mOulContex.executeKernel(queue, kernel, global_work_size, local_work_size);
+	mOulContex->executeKernel(queue, kernel, global_work_size, local_work_size);
 	this->stopProfiling(measurementName, queue);
 }
 
 void TordAlgorithm::measureAndReadBuffer(cl::CommandQueue queue, cl::Buffer outputBuffer, size_t outputVolumeSize, void *outputData, std::string measurementName)
 {
 	this->startProfiling(measurementName, queue);
-	mOulContex.readBuffer(queue, outputBuffer, outputVolumeSize, outputData);
+	mOulContex->readBuffer(queue, outputBuffer, outputVolumeSize, outputData);
 	this->stopProfiling(measurementName, queue);
 }
 
