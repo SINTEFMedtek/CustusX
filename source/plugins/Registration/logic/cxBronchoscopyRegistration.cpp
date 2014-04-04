@@ -71,6 +71,26 @@ Eigen::VectorXd sortVector(Eigen::VectorXd v)
 return v;
 }
 
+
+Eigen::VectorXd findMedian(Eigen::MatrixXd matrix)
+{
+    Eigen::VectorXd medianValues(matrix.rows());
+    for (int i = 0; i < matrix.rows(); i++)  {
+        Eigen::MatrixXd sortedMatrix = sortMatrix(i, matrix);
+        if (sortedMatrix.cols()%2==1) {// odd number
+            medianValues(i) = (sortedMatrix(i,(sortedMatrix.cols()+1)/2) );
+        }
+        else { // even number
+            medianValues(i) = ( sortedMatrix(i,sortedMatrix.cols()/2) + sortedMatrix(i,sortedMatrix.cols()/2 - 1) ) / 2;
+        }
+    }
+
+    std::cout << "Median values: " << medianValues << std::endl;
+
+        return medianValues;
+}
+
+
 std::pair<Eigen::MatrixXd , Eigen::MatrixXd> findPositionsWithSmallesAngleDifference(int percentage , Eigen::VectorXd DAngle , Eigen::MatrixXd trackingPositions , Eigen::MatrixXd nearestCTPositions)
 {
 	Eigen::VectorXd DAngleSorted = sortVector(DAngle);
@@ -124,7 +144,7 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
   landmarktransform->SetModeToRigidBody();
   source->Modified();
   target->Modified();
-  landmarktransform->Update();
+  //landmarktransform->Update();
 
   vtkMatrix4x4* temp = landmarktransform->GetMatrix();
   Eigen::Matrix4d tar_M_src;
@@ -133,7 +153,7 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
 	  for (int j = 0; j < 4; j++)
 	  {
 		  tar_M_src(i,j) = temp->GetElement(i,j);
-          std::cout << tar_M_src(i,j) << " ";
+          //std::cout << tar_M_src(i,j) << " ";
 	  }
 	  //std::cout << std::endl;
   }
@@ -146,6 +166,7 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
 
   return tar_M_src;
 }
+
 
 
 
@@ -176,6 +197,9 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
                 if (std::isnan( O(j) ))
                     O(j) = 4;
 
+                if ( o0>2 | o1>2 | o2>2 )
+                    std::cout << "Warning in bronchoscopyRegistration.cpp: Error on oriantation calculation in dsearch2n. Orientation > 2." << std::endl;
+
                 R(j) = P(j) / O(j);
 
             }
@@ -185,6 +209,7 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
 
             D = P + alpha * O;
             D.minCoeff(&index);
+            //std::cout << "index: " << index << std::endl;
             indexVector.push_back(index);
         }
         return indexVector;
@@ -204,62 +229,102 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 	CTOrientations = branchVector[0]->getOrientations();
 
 	for (int i = 1; i < branchVector.size(); i++)
-		{
-			Eigen::MatrixXd CTPositionsNew(CTPositions.rows() , CTPositions.cols() + branchVector[i]->getPositions().cols());
-			Eigen::MatrixXd CTOrientationsNew(CTOrientations.rows() , CTOrientations.cols() + branchVector[i]->getOrientations().cols());
-			CTPositionsNew.leftCols(CTPositions.cols()) = CTPositions;
-			CTPositionsNew.rightCols(branchVector[i]->getPositions().cols()) = branchVector[i]->getPositions();
-			CTOrientationsNew.leftCols(CTOrientations.cols()) = CTOrientations;
-			CTOrientationsNew.rightCols(branchVector[i]->getOrientations().cols()) = branchVector[i]->getOrientations();
-			CTPositions.swap(CTPositionsNew);
-			CTOrientations.swap(CTOrientationsNew);
-		}
+    {
+        Eigen::MatrixXd CTPositionsNew(CTPositions.rows() , CTPositions.cols() + branchVector[i]->getPositions().cols());
+        Eigen::MatrixXd CTOrientationsNew(CTOrientations.rows() , CTOrientations.cols() + branchVector[i]->getOrientations().cols());
+        CTPositionsNew.leftCols(CTPositions.cols()) = CTPositions;
+        CTPositionsNew.rightCols(branchVector[i]->getPositions().cols()) = branchVector[i]->getPositions();
+        CTOrientationsNew.leftCols(CTOrientations.cols()) = CTOrientations;
+        CTOrientationsNew.rightCols(branchVector[i]->getOrientations().cols()) = branchVector[i]->getOrientations();
+        CTPositions.swap(CTPositionsNew);
+        CTOrientations.swap(CTOrientationsNew);
+    }
 
+    for (int i = 1; i < CTPositions.size(); i++)
+    {
+        if (std::isinf( CTPositions.col(i).sum() ))
+        {
+            std::cout << "Warning in bronchoscopyRegistration: Removed centerline position containing inf number: " << CTPositions.col(i) << std::endl;
+            eraseCol(i,CTPositions);
+            eraseCol(i,CTOrientations);
+        }
+        if (std::isnan( CTPositions.col(i).sum() ))
+        {
+            std::cout << "Warning in bronchoscopyRegistration: Removed centerline position containing nan number: " << CTPositions.col(i) << std::endl;
+            eraseCol(i,CTPositions);
+            eraseCol(i,CTOrientations);
+        }
+        if (CTPositions.col(i).sum() == 0)
+        {
+            std::cout << "Warning in bronchoscopyRegistration: Removed centerline position at origo: " << CTPositions.col(i) << std::endl;
+            eraseCol(i,CTPositions);
+            eraseCol(i,CTOrientations);
+        }
+
+    }
+
+
+
+    //std::cout << "Tracking data 1 before old_rMpr: " << Tnavigation[0] << std::endl;
 	for (int i = 0; i < Tnavigation.size(); i++)
 	{
         Tnavigation[i] = old_rMpr * Tnavigation[i];
 		trackingPositions.block(0 , i , 3 , 1) = Tnavigation[i].topRightCorner(3 , 1);
 		trackingOrientations.block(0 , i , 3 , 1) = Tnavigation[i].block(0 , 2 , 3 , 1);
+
+        if ( std::isinf( trackingOrientations.block(0 , i , 3 , 1).sum() ))
+        {
+            std::cout << "Warning in bronchoscopyRegistration: Removed tool position containing inf number: " << trackingOrientations.block(0 , i , 3 , 1) << std::endl;
+             eraseCol(i,trackingOrientations);
+        }
+        if (std::isnan( trackingOrientations.block(0 , i , 3 , 1).sum() ))
+        {
+            std::cout << "Warning in bronchoscopyRegistration: Removed tool position containing nan number: " << trackingOrientations.block(0 , i , 3 , 1) << std::endl;
+             eraseCol(i,trackingOrientations);
+        }
+        if (trackingOrientations.block(0 , i , 3 , 1).sum() == 0)
+        {
+            std::cout << "Warning in bronchoscopyRegistration: Removed tool position at origo: " << trackingOrientations.block(0 , i , 3 , 1) << std::endl;
+             eraseCol(i,trackingOrientations);
+        }
 	}
 
 
 	//Adjusting points for centeroids
     Eigen::MatrixXd::Index maxIndex;
     trackingPositions.row(2).maxCoeff( &maxIndex );
-    std::cout << "maxIndex: " << maxIndex << std::endl;
-    Eigen::Vector3d translation = CTPositions.col(0) - trackingPositions.col(maxIndex);
-    std::cout << "CTPositions.col(0): " << CTPositions.col(0) << std::endl;
-    std::cout << "trackingPositions.col(maxIndex): " << trackingPositions.col(maxIndex) << std::endl;
-    //Eigen::Vector3d translation = CTPositions.rowwise().mean() - trackingPositions.rowwise().mean();
-	Eigen::Matrix3d rotation;
-    trackingPositions = trackingPositions.colwise() + translation;
-    //Eigen::MatrixXd temp(3 , Tnavigation.size());
-    //temp.setOnes();
-    //trackingPositions = trackingPositions + temp;
-
-    //debug start
-   // std::cout << "translation: " << translation << std::endl;
-    //std::cout << "Tracking data: " << Tnavigation[0] << std::endl;
-    //std::cout << "Tracking position: " << trackingPositions.col(0) << std::endl;
-    //std::cout << "Tracking orientation: " << trackingOrientations.col(0) << std::endl;
-    //std::cout << "CT position: " << CTPositions.col(0) << std::endl;
-    //std::cout << "CT orientation: " << CTOrientations.col(0) << std::endl;
-    //std::cout << "translation.array().abs().sum(): " << translation.array().abs().sum() << std::endl;
-    //std::cout << "CTPositions.cols(): " << CTPositions.cols() << std::endl;
-    //debug end
+    //std::cout << "maxIndex: " << maxIndex << std::endl;
+    //Eigen::Vector3d translation = CTPositions.col(0) - trackingPositions.col(maxIndex);
+    //std::cout << "CTPositions.col(0): " << CTPositions.col(0) << std::endl;
+    Eigen::Vector3d translation = findMedian(CTPositions) - findMedian(trackingPositions);
+    //Eigen::Matrix3d rotation;
+    //trackingPositions = trackingPositions.colwise() + translation;
+    //std::cout << "trackingPositions.col(maxIndex): " << trackingPositions.col(maxIndex) << std::endl;
 
 
-	registrationMatrix << 1, 0, 0, translation(0),
-						  0, 1, 0, translation(1),
-						  0, 0, 1, translation(2),
+    registrationMatrix << 1, 0, 0, translation(0),
+                          0, 1, 0, translation(1),
+                          0, 0, 1, translation(2),
 						  0, 0, 0, 1;
 
-    //debug
-    //return registrationMatrix;
+    for (int i = 0; i < Tnavigation.size(); i++)
+    {
+        Tnavigation[i] = registrationMatrix * Tnavigation[i];
+    }
+    //std::cout << "Tracking data 1 after initial translation: " << Tnavigation[0] << std::endl;
+    //std::cout << "Tracking data maxIndex after initial translation: " << Tnavigation[maxIndex] << std::endl;
 
     int iterationNumber = 0;
-    while ( translation.array().abs().sum() > 1 && iterationNumber < 30)
+    int maxIterations = 50;
+    while ( translation.array().abs().sum() > 1 && iterationNumber < maxIterations)
 	{
+        for (int i = 0; i < Tnavigation.size(); i++)
+        {
+            trackingPositions.block(0 , i , 3 , 1) = Tnavigation[i].topRightCorner(3 , 1);
+            trackingOrientations.block(0 , i , 3 , 1) = Tnavigation[i].block(0 , 2 , 3 , 1);
+        }
+
+
         iterationNumber++;
 		std::vector<Eigen::MatrixXd::Index> indexVector = dsearch2n( trackingPositions, CTPositions, trackingOrientations, CTOrientations );
 		Eigen::MatrixXd nearestCTPositions(3,indexVector.size());
@@ -279,45 +344,24 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
         vtkPointsPtr trackingPositions_vtk = convertTovtkPoints(result.first);
 		vtkPointsPtr CTPositions_vtk = convertTovtkPoints(result.second);
 
-        //debug
-       // std::cout << "Tracking pos:" << std::endl;
-        //for (int i = 0; i < result.first.cols(); i++)
-        //{
-        //    std::cout << result.first.col(i) << std::endl;
-        //}
-        //std::cout << "CT pos:" << std::endl;
-        //for (int i = 0; i < result.second.cols(); i++)
-        //{
-         //   std::cout << result.second.col(i) << std::endl;
-        //}
-
-        ///std::cout << "trackingPositions_vtk cols: " << result.first.cols() << std::endl;
-        //std::cout << "trackingPositions_vtk rows: " << result.first.rows() << std::endl;
-        //std::cout << "CTPositions_vtk cols: " << result.second.cols() << std::endl;
-        //std::cout << "CTPositions_vtk rows: " << result.second.rows() << std::endl;
-        //DEBUG
-        //Eigen::MatrixXd tM1(3,4);
-        //tM1 << 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4;
-        //Eigen::MatrixXd tM2(3,4);
-        //tM2 << 3, 4, 6, 2, 5, 2, 3, 6, 6, 4, 5, 4;
-        //vtkPointsPtr t1 = convertTovtkPoints(tM1);
-        //vtkPointsPtr t2 = convertTovtkPoints(tM2);
-        //Eigen::Matrix4d tempMatrix = performLandmarkRegistration(t1, t2);
-
         Eigen::Matrix4d tempMatrix = performLandmarkRegistration(trackingPositions_vtk, CTPositions_vtk);
-        //std::cout << "tempMatrix: " << tempMatrix << std::endl;
 
 		registrationMatrix = tempMatrix * registrationMatrix;
-		translation << tempMatrix(0,3), tempMatrix(1,3), tempMatrix(2,3);
-		rotation = tempMatrix.topLeftCorner(3,3);
 
-		for (int i = 0; i < trackingPositions.cols(); i++)
-			trackingPositions.col(i) = rotation * trackingPositions.col(i) + translation;
+        for (int i = 0; i < Tnavigation.size(); i++)
+        {
+            Tnavigation[i] = tempMatrix * Tnavigation[i];
+        }
 
-		std::cout << "translation: " << translation.array().abs().sum() << std::endl;
-        for (int i = 0; i < 4; i++)
-            std::cout << tempMatrix.row(i) << std::endl;
+        translation << tempMatrix(0,3), tempMatrix(1,3), tempMatrix(2,3);
+
+        std::cout << "Iteration nr " << iterationNumber << " translation: " << translation.array().abs().sum() << std::endl;
+        //for (int i = 0; i < 4; i++)
+        //    std::cout << tempMatrix.row(i) << std::endl;
 	}
+
+    if (translation.array().abs().sum() > 1)
+        std::cout << "Warning: Registration did not converge within " << maxIterations <<" iterations, which is max number of iterations." << std::endl;
 
 	return registrationMatrix;
 }
@@ -347,7 +391,7 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDat
 		centerline->GetPoint(i,p);
         Eigen::Vector3d position;
         position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
-        CLpoints.block(0 , i , 3 , 1) = rMd.inv().coord(position);
+        CLpoints.block(0 , i , 3 , 1) = rMd.coord(position);
 	    }
 
 	Tnavigation = excludeClosePositions(Tnavigation);
@@ -360,11 +404,6 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDat
     Eigen::Matrix4d regMatrix = registrationAlgorithm(branches, Tnavigation, old_rMpr);
 
 	Eigen::Matrix4d regMatrixForCustusX = regMatrix;
-
-	std::cout << "regMatrixForCustusX: " << std::endl;
-		for (int i = 0; i < 4; i++)
-			std::cout << regMatrixForCustusX.row(i) << std::endl;
-
 
 	std::vector<Branch*> BL = branches->getBranches();
 
@@ -382,6 +421,10 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDat
         std::cout << "Warning: Registration matrix contains 'inf' number, using identity matrix." << std::endl;
         return Eigen::Matrix4d::Identity();
     }
+
+    std::cout << "prMt from bronchoscopyRegistration: " << std::endl;
+        for (int i = 0; i < 4; i++)
+            std::cout << regMatrixForCustusX.row(i) << std::endl;
 
 	return regMatrixForCustusX;
 
