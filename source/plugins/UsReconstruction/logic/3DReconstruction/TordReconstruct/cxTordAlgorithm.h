@@ -163,7 +163,7 @@ private:
 	void stopProfiling(std::string name, cl::CommandQueue queue);
 
 	cl::Kernel mKernel;
-	oul::Context mOulContex;
+	oul::ContextPtr mOulContex;
 	oul::RuntimeMeasurementsManagerPtr mRuntime;
 	std::set<std::string> mMeasurementNames;
 	std::string mKernelMeasurementName;
