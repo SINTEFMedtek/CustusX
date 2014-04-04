@@ -120,11 +120,17 @@ void BronchoscopyRegistrationWidget::registerSlot()
     new_rMpr = new_rMpr*old_rMpr;//output
 	mManager->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
 
+    Eigen::Matrix4d display_rMpr = Eigen::Matrix4d::Identity();
+            display_rMpr = new_rMpr*display_rMpr;
+    std::cout << "New prMt: " << std::endl;
+        for (int i = 0; i < 4; i++)
+            std::cout << display_rMpr.row(i) << std::endl;
+
     ToolRep3DPtr activeRep3D = getToolRepIn3DView(mTool);
     activeRep3D->getTracer()->clear();
 
-    //QColor colorRed = QColor(255, 0, 0, 255);
-    //activeRep3D->getTracer()->setColor(colorRed);
+    QColor colorGreen = QColor(0, 255, 0, 255);
+    activeRep3D->getTracer()->setColor(colorGreen);
     activeRep3D->getTracer()->addManyPositions(trackerRecordedData_prMt);
 
 
