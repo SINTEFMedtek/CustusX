@@ -77,12 +77,13 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 {
 	positions = sortMatrix(2,positions);
 	Eigen::MatrixXd positionsNotUsed = positions;
+
 //	int minIndex;
 	int index;
 	int splitIndex;
 	Eigen::MatrixXd::Index startIndex;
 	Branch* branchToSplit;
-	while (positionsNotUsed.size() > 0)
+    while (positionsNotUsed.cols() > 0)
 	{
 		if (!Branches.empty())
 		{
@@ -217,7 +218,7 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd > findConnectedPointsInCT(int startInd
     branchPositionsVector.push_back(thisPosition); //add first position to branch
 	positionsNotUsed = eraseCol(startIndex,positionsNotUsed);; //remove first position from list of remaining points
 
-	while (positionsNotUsed.size() > 0)
+    while (positionsNotUsed.cols() > 0)
 	{
 		std::pair<Eigen::MatrixXd::Index, double > minDistance = dsearch(thisPosition, positionsNotUsed);
 		Eigen::MatrixXd::Index index = minDistance.first;
