@@ -240,29 +240,32 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
         CTOrientations.swap(CTOrientationsNew);
     }
 
+    //std::cout << "Number of centerline positions: " << CTPositions.cols() << std::endl;
+
     for (int i = 1; i < CTPositions.size(); i++)
     {
         if (std::isinf( CTPositions.col(i).sum() ))
         {
             std::cout << "Warning in bronchoscopyRegistration: Removed centerline position containing inf number: " << CTPositions.col(i) << std::endl;
-            eraseCol(i,CTPositions);
-            eraseCol(i,CTOrientations);
+            CTPositions = eraseCol(i,CTPositions);
+            CTOrientations = eraseCol(i,CTOrientations);
         }
-        if (std::isnan( CTPositions.col(i).sum() ))
+        else if (std::isnan( CTPositions.col(i).sum() ))
         {
             std::cout << "Warning in bronchoscopyRegistration: Removed centerline position containing nan number: " << CTPositions.col(i) << std::endl;
-            eraseCol(i,CTPositions);
-            eraseCol(i,CTOrientations);
+            CTPositions = eraseCol(i,CTPositions);
+            CTOrientations = eraseCol(i,CTOrientations);
         }
-        if (CTPositions.col(i).sum() == 0)
+        else if (CTPositions.block(0 , i , 1 , 1).sum() == 0 && CTPositions.block(1 , i , 1 , 1).sum() == 0 && CTPositions.block(2 , i , 1 , 1).sum() == 0)
         {
             std::cout << "Warning in bronchoscopyRegistration: Removed centerline position at origo: " << CTPositions.col(i) << std::endl;
-            eraseCol(i,CTPositions);
-            eraseCol(i,CTOrientations);
+            CTPositions = eraseCol(i,CTPositions);
+            CTOrientations = eraseCol(i,CTOrientations);
         }
 
     }
 
+    //std::cout << "Number of centerline positions: " << CTPositions.cols() << std::endl;
 
 
     //std::cout << "Tracking data 1 before old_rMpr: " << Tnavigation[0] << std::endl;
@@ -272,20 +275,24 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 		trackingPositions.block(0 , i , 3 , 1) = Tnavigation[i].topRightCorner(3 , 1);
 		trackingOrientations.block(0 , i , 3 , 1) = Tnavigation[i].block(0 , 2 , 3 , 1);
 
-        if ( std::isinf( trackingOrientations.block(0 , i , 3 , 1).sum() ))
+        if ( std::isinf( trackingOrientations.block(0 , i , 3 , 1).sum() ) | std::isinf( trackingPositions.block(0 , i , 3 , 1).sum() ))
         {
             std::cout << "Warning in bronchoscopyRegistration: Removed tool position containing inf number: " << trackingOrientations.block(0 , i , 3 , 1) << std::endl;
-             eraseCol(i,trackingOrientations);
+            trackingPositions = eraseCol(i,trackingPositions);
+            trackingOrientations = eraseCol(i,trackingOrientations);
         }
-        if (std::isnan( trackingOrientations.block(0 , i , 3 , 1).sum() ))
+        else if (std::isnan( trackingOrientations.block(0 , i , 3 , 1).sum() ) | std::isnan( trackingPositions.block(0 , i , 3 , 1).sum() ))
         {
             std::cout << "Warning in bronchoscopyRegistration: Removed tool position containing nan number: " << trackingOrientations.block(0 , i , 3 , 1) << std::endl;
-             eraseCol(i,trackingOrientations);
+            trackingPositions = eraseCol(i,trackingPositions);
+            trackingOrientations = eraseCol(i,trackingOrientations);
         }
-        if (trackingOrientations.block(0 , i , 3 , 1).sum() == 0)
+        else if ( (trackingOrientations.block(0 , i , 1 , 1).sum() == 0 && trackingOrientations.block(1 , i , 1 , 1).sum() == 0 && trackingOrientations.block(2 , i , 1 , 1).sum() == 0) |
+                  (trackingPositions.block(0 , i , 1 , 1).sum() == 0 && trackingPositions.block(1 , i , 1 , 1).sum() == 0 && trackingPositions.block(2 , i , 1 , 1).sum() == 0))
         {
             std::cout << "Warning in bronchoscopyRegistration: Removed tool position at origo: " << trackingOrientations.block(0 , i , 3 , 1) << std::endl;
-             eraseCol(i,trackingOrientations);
+            trackingPositions = eraseCol(i,trackingPositions);
+            trackingOrientations = eraseCol(i,trackingOrientations);
         }
 	}
 
