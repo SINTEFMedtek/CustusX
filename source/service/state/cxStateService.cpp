@@ -404,6 +404,8 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("renderSpeedLogging", false);
 
 	this->fillDefault("applyTransferFunctionPresetsToAll", false);
+
+	this->fillDefault("USsimulation/type", "Original data");
 }
 
 

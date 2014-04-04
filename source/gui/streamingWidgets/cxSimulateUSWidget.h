@@ -5,6 +5,9 @@
 
 #include "boost/shared_ptr.hpp"
 
+#include "cxXmlOptionItem.h"
+#include "cxStringDataAdapterXml.h"
+
 class QVBoxLayout;
 
 namespace cx
@@ -35,10 +38,13 @@ signals:
 
 private slots:
 	void imageChangedSlot(QString imageUid);
+	void simulationTypeChanged();
 
 private:
 	QVBoxLayout* mTopLayout;
 	SelectImageStringDataAdapterPtr mImageSelector;
+
+	StringDataAdapterXmlPtr mSimulationType;
 
 };
 
