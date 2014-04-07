@@ -177,5 +177,17 @@ void ToolTracer::receiveTransforms(Transform3D prMt, double timestamp)
 	}
 }
 
+void ToolTracer::addManyPositions(TimedTransformMap trackerRecordedData_prMt)
+{
+    for(TimedTransformMap::iterator iter=trackerRecordedData_prMt.begin(); iter!=trackerRecordedData_prMt.end(); ++iter)
+        {
+            double timestamp = iter->first;
+            Transform3D prMt = iter->second;
+            this->receiveTransforms(prMt, timestamp);
+        }
+
+}
+
+
 
 }
