@@ -65,6 +65,7 @@ public:
 	bool isRunning() const; // true if started and not stopped.
 	void setMinDistance(double distance) { mMinDistance = distance; }
 	int getSkippedPoints() { return mSkippedPoints; }
+    void addManyPositions(TimedTransformMap trackerRecordedData_prMt);
 
 private slots:
 	void receiveTransforms(Transform3D prMt, double timestamp);
