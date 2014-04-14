@@ -16,6 +16,7 @@
 #include "cxTransform3D.h"
 #include "cxVector3D.h"
 #include "cxReporter.h"
+#include <boost/math/special_functions/fpclassify.hpp> // isnan
 
 namespace cx
 {
@@ -155,7 +156,7 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
 	  //std::cout << std::endl;
   }
 
-  if ( std::isnan(tar_M_src.sum()) )
+	if ( boost::math::isnan(tar_M_src.sum()) )
   {
        std::cout << "Warning in performLandmarkRegistration: Returning identity matrix due to nan." << std::endl;
        return Eigen::Matrix4d::Identity();
@@ -191,7 +192,7 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
                 P(j) = sqrt( p0*p0 + p1*p1 + p2*p2 );
                 O(j) = sqrt( o0*o0 + o1*o1 + o2*o2 );
 
-                if (std::isnan( O(j) ))
+								if (boost::math::isnan( O(j) ))
                     O(j) = 4;
 
                 if ( o0>2 | o1>2 | o2>2 )
@@ -201,7 +202,7 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
 
             }
             float alpha = sqrt( R.mean() );
-            if (std::isnan( alpha ))
+						if (boost::math::isnan( alpha ))
                 alpha = 0;
 
             D = P + alpha * O;
@@ -250,7 +251,7 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
             CTPositions = eraseCol(i,CTPositions);
             CTOrientations = eraseCol(i,CTOrientations);
         }
-        else if (std::isnan( CTPositions.col(i).sum() ))
+				else if (boost::math::isnan( CTPositions.col(i).sum() ))
         {
             std::cout << "Warning in bronchoscopyRegistration: Removed centerline position containing nan number: " << CTPositions.col(i) << std::endl;
             CTPositions = eraseCol(i,CTPositions);
@@ -278,7 +279,7 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
             trackingPositions = eraseCol(i,trackingPositions);
             trackingOrientations = eraseCol(i,trackingOrientations);
         }
-        else if (std::isnan( trackingOrientations.block(0 , i , 3 , 1).sum() ) | std::isnan( trackingPositions.block(0 , i , 3 , 1).sum() ))
+				else if (boost::math::isnan( trackingOrientations.block(0 , i , 3 , 1).sum() ) | boost::math::isnan( trackingPositions.block(0 , i , 3 , 1).sum() ))
         {
             std::cout << "Warning in bronchoscopyRegistration: Removed tool position containing nan number: " << trackingOrientations.block(0 , i , 3 , 1) << std::endl;
             trackingPositions = eraseCol(i,trackingPositions);
@@ -414,7 +415,7 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDat
     std::cout << "Number of branches in CT centerline: " << BL.size() << std::endl;
 
 
-    if ( std::isnan(regMatrixForCustusX.sum()) )
+		if ( boost::math::isnan(regMatrixForCustusX.sum()) )
     {
         std::cout << "Warning: Registration matrix contains 'nan' number, using identity matrix." << std::endl;
         return Eigen::Matrix4d::Identity();
