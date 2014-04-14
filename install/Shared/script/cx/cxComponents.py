@@ -144,7 +144,7 @@ class ITK(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git://itk.org/ITK.git')
     def update(self):
-        self._getBuilder().gitCheckout('v4.4.1')
+        self._getBuilder().gitCheckout('v4.5.1')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -200,7 +200,7 @@ class OpenCV(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('https://github.com/Itseez/opencv.git', 'OpenCV')
     def update(self):
-        self._getBuilder().gitCheckout('2.4.2')
+        self._getBuilder().gitCheckout('2.4.8.2')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
