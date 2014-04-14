@@ -245,7 +245,7 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 
     for (int i = 1; i < CTPositions.cols(); i++)
     {
-        if (std::isinf( CTPositions.col(i).sum() ))
+				if (boost::math::isinf( CTPositions.col(i).sum() ))
         {
             std::cout << "Warning in bronchoscopyRegistration: Removed centerline position containing inf number: " << CTPositions.col(i) << std::endl;
             CTPositions = eraseCol(i,CTPositions);
@@ -273,7 +273,7 @@ Eigen::Matrix4d registrationAlgorithm(BranchList* branches, M4Vector Tnavigation
 		trackingPositions.block(0 , i , 3 , 1) = Tnavigation[i].topRightCorner(3 , 1);
 		trackingOrientations.block(0 , i , 3 , 1) = Tnavigation[i].block(0 , 2 , 3 , 1);
 
-        if ( std::isinf( trackingOrientations.block(0 , i , 3 , 1).sum() ) | std::isinf( trackingPositions.block(0 , i , 3 , 1).sum() ))
+				if ( boost::math::isinf( trackingOrientations.block(0 , i , 3 , 1).sum() ) | boost::math::isinf( trackingPositions.block(0 , i , 3 , 1).sum() ))
         {
             std::cout << "Warning in bronchoscopyRegistration: Removed tool position containing inf number: " << trackingOrientations.block(0 , i , 3 , 1) << std::endl;
             trackingPositions = eraseCol(i,trackingPositions);
@@ -421,7 +421,7 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(vtkPolyDat
         return Eigen::Matrix4d::Identity();
     }
 
-    if ( std::isinf(regMatrixForCustusX.sum()) )
+		if ( boost::math::isinf(regMatrixForCustusX.sum()) )
     {
         std::cout << "Warning: Registration matrix contains 'inf' number, using identity matrix." << std::endl;
         return Eigen::Matrix4d::Identity();
