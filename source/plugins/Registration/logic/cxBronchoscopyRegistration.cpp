@@ -195,7 +195,7 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
 								if (boost::math::isnan( O(j) ))
                     O(j) = 4;
 
-                if ( o0>2 | o1>2 | o2>2 )
+								if ( (o0>2) || (o1>2) || (o2>2) )
                     std::cout << "Warning in bronchoscopyRegistration.cpp: Error on oriantation calculation in dsearch2n. Orientation > 2." << std::endl;
 
                 R(j) = P(j) / O(j);
