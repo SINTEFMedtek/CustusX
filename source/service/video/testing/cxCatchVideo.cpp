@@ -32,6 +32,7 @@
 #include "cxtestJenkinsMeasurement.h"
 #include "cxReporter.h"
 #include "cxSettings.h"
+#include "cxTypeConversions.h"
 
 namespace cxtest
 {
@@ -138,6 +139,20 @@ TEST_CASE("SimulatedImageStreamer: Should stream 2D images from a volume given a
 	checkSimulatedFrames(numFrames, sender);
 
 	imagestreamer->stopStreaming();
+}
+
+TEST_CASE("SimulatedImageStreamer: Basic test of streamers", "[streaming][unit]")
+{
+	cx::DataLocations::setTestMode();
+	int numFrames = 1;
+	QStringList simulationTypes;
+	simulationTypes << "Original data" << "CT to US" << "MR to US";
+	for (int i = 0; i < 3; ++i)
+	{
+		cx::settings()->setValue("USsimulation/type", simulationTypes[i]);
+		INFO("Simulation failed: " + string_cast(simulationTypes[i]));
+		simulateAndCheckUS(numFrames);
+	}
 }
 
 TEST_CASE("SimulatedImageStreamer: Speed", "[streaming][integration][speed]")
