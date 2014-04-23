@@ -185,9 +185,7 @@ void ToolTracer::addManyPositions(TimedTransformMap trackerRecordedData_prMt)
             Transform3D prMt = iter->second;
             this->receiveTransforms(prMt, timestamp);
         }
-
 }
-
 
 
 }
