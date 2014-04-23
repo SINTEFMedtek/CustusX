@@ -26,7 +26,7 @@ class BronchoscopyRegistration
 {
 public:
 	BronchoscopyRegistration();
-    Eigen::Matrix4d runBronchoscopyRegistration(vtkPolyDataPtr centerline, TimedTransformMap trackingData_prMt, Transform3D old_rMpr);
+    Eigen::Matrix4d runBronchoscopyRegistration(vtkPolyDataPtr centerline, TimedTransformMap trackingData_prMt, Transform3D old_rMpr, Transform3D rMd);
 	virtual ~BronchoscopyRegistration();
 };
 

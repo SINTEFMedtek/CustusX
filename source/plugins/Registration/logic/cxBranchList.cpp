@@ -77,12 +77,13 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 {
 	positions = sortMatrix(2,positions);
 	Eigen::MatrixXd positionsNotUsed = positions;
+
 //	int minIndex;
 	int index;
 	int splitIndex;
 	Eigen::MatrixXd::Index startIndex;
 	Branch* branchToSplit;
-	while (positionsNotUsed.size() > 0)
+    while (positionsNotUsed.cols() > 0)
 	{
 		if (!Branches.empty())
 		{
@@ -210,29 +211,36 @@ std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd > dsearchn(Eigen:
 
 std::pair<Eigen::MatrixXd,Eigen::MatrixXd > findConnectedPointsInCT(int startIndex , Eigen::MatrixXd positionsNotUsed)
 {
-	Eigen::MatrixXd branchPositions(3,1);
+    //Eigen::MatrixXd branchPositions(positionsNotUsed.rows(), positionsNotUsed.cols());
 	Eigen::MatrixXd thisPosition(3,1);
+    std::vector<Eigen::MatrixXd> branchPositionsVector;
 	thisPosition = positionsNotUsed.col(startIndex);
-	branchPositions = thisPosition; //add first position to branch
+    branchPositionsVector.push_back(thisPosition); //add first position to branch
 	positionsNotUsed = eraseCol(startIndex,positionsNotUsed);; //remove first position from list of remaining points
 
-	while (positionsNotUsed.size() > 0)
+    while (positionsNotUsed.cols() > 0)
 	{
 		std::pair<Eigen::MatrixXd::Index, double > minDistance = dsearch(thisPosition, positionsNotUsed);
 		Eigen::MatrixXd::Index index = minDistance.first;
-		double d = minDistance.second;
-		if (d > 2)
+        double d = minDistance.second;
+		if (d > 3) // more than 3 mm distance to closest point --> branch is compledted
 			break;
 
 		thisPosition = positionsNotUsed.col(index);
 		positionsNotUsed = eraseCol(index,positionsNotUsed);
 		//add position to branch
-		Eigen::MatrixXd newBranchPositions(branchPositions.rows(), branchPositions.cols() + 1);
-		newBranchPositions.rightCols(1) = thisPosition;
-		newBranchPositions.leftCols(branchPositions.cols()) = branchPositions;
-		branchPositions.swap(newBranchPositions);
+        branchPositionsVector.push_back(thisPosition);
+
 	}
-	return std::make_pair(branchPositions, positionsNotUsed);
+
+    Eigen::MatrixXd branchPositions(3,branchPositionsVector.size());
+
+    for (int j = 0; j < branchPositionsVector.size(); j++)
+    {
+        branchPositions.block(0,j,3,1) = branchPositionsVector[j];
+    }
+
+    return std::make_pair(branchPositions, positionsNotUsed);
 }
 
 

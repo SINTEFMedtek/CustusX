@@ -31,9 +31,12 @@
 
 #include "cxtestJenkinsMeasurement.h"
 #include "cxReporter.h"
+#include "cxSettings.h"
+#include "cxTypeConversions.h"
 
 namespace cxtest
 {
+namespace {
 
 cx::DummyImageStreamerPtr createRunningDummyImageStreamer(TestSenderPtr& sender, bool secondaryStream = false, bool sendonce = false)
 {
@@ -82,6 +85,23 @@ void checkSimulatedFrames(int numFrames, TestSenderPtr sender, bool silentAtArri
 	}
 }
 
+int simulateAndCheckUS(int numFrames)
+{
+	TestSenderPtr sender(new TestSender());
+	REQUIRE(sender);
+
+	cx::SimulatedImageStreamerPtr imagestreamer = createRunningSimulatedImageStreamer(sender);
+
+	bool silent = true;
+	checkSimulatedFrames(numFrames, sender, silent);
+
+	int retval = imagestreamer->getAverageTimePerSimulatedFrame();
+	imagestreamer->stopStreaming();
+	return retval;
+}
+
+} //empty namespace
+
 TEST_CASE("DummyImageStreamer: File should be read and sent only once", "[streaming][unit]")
 {
 	TestSenderPtr sender(new TestSender());
@@ -121,23 +141,36 @@ TEST_CASE("SimulatedImageStreamer: Should stream 2D images from a volume given a
 	imagestreamer->stopStreaming();
 }
 
-TEST_CASE("SimulatedImageStreamer: Speed", "[streaming][unit][speed]")
+TEST_CASE("SimulatedImageStreamer: Basic test of streamers", "[streaming][unit]")
 {
+	cx::DataLocations::setTestMode();
+	int numFrames = 1;
+	QStringList simulationTypes;
+	simulationTypes << "Original data" << "CT to US" << "MR to US";
+	for (int i = 0; i < 3; ++i)
+	{
+		cx::settings()->setValue("USsimulation/type", simulationTypes[i]);
+		INFO("Simulation failed: " + string_cast(simulationTypes[i]));
+		simulateAndCheckUS(numFrames);
+	}
+}
+
+TEST_CASE("SimulatedImageStreamer: Speed", "[streaming][integration][speed]")
+{
+	cx::DataLocations::setTestMode();
 	cx::reporter()->initialize();
-	TestSenderPtr sender(new TestSender());
-	REQUIRE(sender);
-
-	JenkinsMeasurement jenkins;
-
-	cx::SimulatedImageStreamerPtr imagestreamer = createRunningSimulatedImageStreamer(sender);
 
 	int numFrames = 100;
-	bool silent = true;
-	checkSimulatedFrames(numFrames, sender, silent);
+	JenkinsMeasurement jenkins;
+	QStringList simulationTypes;
+	simulationTypes << "Original data" << "CT to US" << "MR to US";
+	for (int i = 0; i < 3; ++i)
+	{
+		cx::settings()->setValue("USsimulation/type", simulationTypes[i]);
+		int simTime = simulateAndCheckUS(numFrames);
+		jenkins.createOutput("Average time in ms per frame with simtype " + simulationTypes[i], QString::number(simTime));
+	}
 
-	jenkins.createOutput("Average time in ms per frame (No conversion)", QString::number(imagestreamer->getAverageTimePerSimulatedFrame()));
-
-	imagestreamer->stopStreaming();
 	cx::Reporter::shutdown();
 }
 

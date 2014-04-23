@@ -22,6 +22,7 @@
 #include "vtkImageChangeInformation.h"
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -140,8 +141,9 @@ ImagePtr SimulatedImageStreamer::calculateSlice(ImagePtr source)
 	mTimer->time("Grab");
 	vtkImageDataPtr maskedFramedgrabbedSlice = this->maskSlice(framegrabbedSlice);
 	mTimer->time("Mask");
+	vtkImageDataPtr simulatedSlice = this->simulateUS(maskedFramedgrabbedSlice);
 	mTimer->time("Simulate");
-	ImagePtr slice = this->convertToSscImage(maskedFramedgrabbedSlice, source);
+	ImagePtr slice = this->convertToSscImage(simulatedSlice, source);
 	mTimer->time("Convert");
 
 	return slice;
@@ -179,6 +181,41 @@ vtkImageDataPtr SimulatedImageStreamer::maskSlice(vtkImageDataPtr unmaskedSlice)
 
 	vtkImageDataPtr maskedSlice = maskFilter->GetOutput();
 	return maskedSlice;
+}
+
+vtkImageDataPtr SimulatedImageStreamer::simulateUS(vtkImageDataPtr maskedFramedgrabbedSlice)
+{
+	vtkImageDataPtr simulatedSlice;
+	QString simulationType = settings()->value("USsimulation/type").toString();
+	if(simulationType == "CT to US")
+		simulatedSlice = simulateUSFromCTSlice(maskedFramedgrabbedSlice);
+	else if(simulationType == "MR to US")
+		simulatedSlice = simulateUSFromMRSlice(maskedFramedgrabbedSlice);
+	else if(simulationType == "Original data")
+		simulatedSlice = maskedFramedgrabbedSlice;
+	else
+	{
+		cx::reporter()->sendWarning("SimulatedImageStreamer::simulateUS(): Unknown simulation: " + simulationType);
+		simulatedSlice = maskedFramedgrabbedSlice;
+	}
+
+	return simulatedSlice;
+}
+
+//TODO: implement, and put in a separate class
+vtkImageDataPtr SimulatedImageStreamer::simulateUSFromCTSlice(vtkImageDataPtr maskedFramedgrabbedSlice)
+{
+	vtkImageDataPtr simulatedSlice;
+	simulatedSlice = maskedFramedgrabbedSlice;
+	return simulatedSlice;
+}
+
+//TODO: implement, and put in a separate class
+vtkImageDataPtr SimulatedImageStreamer::simulateUSFromMRSlice(vtkImageDataPtr maskedFramedgrabbedSlice)
+{
+	vtkImageDataPtr simulatedSlice;
+	simulatedSlice = maskedFramedgrabbedSlice;
+	return simulatedSlice;
 }
 
 ImagePtr SimulatedImageStreamer::convertToSscImage(vtkImageDataPtr slice, ImagePtr volume)
