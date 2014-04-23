@@ -6,6 +6,8 @@
 #include "cxVideoService.h"
 #include "cxVideoConnectionManager.h"
 #include "cxVideoConnection.h"
+#include "cxDataLocations.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -13,11 +15,20 @@ SimulateUSWidget::SimulateUSWidget(QWidget* parent) :
 		BaseWidget(parent, "SimulateUSWidget", "Simulated US"),
 		mImageSelector(SelectImageStringDataAdapter::New())
 {
+	QString selectedSimulation = settings()->value("USsimulation/type", "Original data").toString();
+	QStringList simulationTypes;
+	simulationTypes << "Original data" << "CT to US" << "MR to US";
+	mSimulationType = StringDataAdapterXml::initialize("Simulation type", "",
+																										 "Simulation run on data extracted from input volume",
+																										 selectedSimulation, simulationTypes);
+	connect(mSimulationType.get(), SIGNAL(changed()), this, SLOT(simulationTypeChanged()));
+
 	LabeledComboBoxWidget* imageCombo = new LabeledComboBoxWidget(this, mImageSelector);
 	connect(mImageSelector.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
 	this->imageChangedSlot(mImageSelector->getValue());
 
 	mTopLayout = new QVBoxLayout(this);
+	mTopLayout->addWidget(new LabeledComboBoxWidget(this, mSimulationType));
 	mTopLayout->addWidget(imageCombo);
 }
 
@@ -46,6 +57,11 @@ void SimulateUSWidget::setImageUidToSimulate(QString uid)
 void SimulateUSWidget::imageChangedSlot(QString imageUid)
 {
 	videoService()->getVideoConnection()->getVideoConnection()->setImageToStream(imageUid);
+}
+
+void SimulateUSWidget::simulationTypeChanged()
+{
+	settings()->setValue("USsimulation/type", mSimulationType->getValue());
 }
 
 } /* namespace cx */

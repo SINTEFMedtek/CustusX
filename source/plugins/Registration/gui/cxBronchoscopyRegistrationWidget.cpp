@@ -32,6 +32,7 @@
 #include "cxBronchoscopyRegistration.h"
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
+#include "cxThresholdPreview.h"
 
 
 namespace cx
@@ -67,6 +68,11 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegistrationManag
 	mVerticalLayout->addWidget(mRegisterButton);
 
 	mVerticalLayout->addStretch();
+
+    boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
+
+    mObscuredListener.reset(new WidgetObscuredListener(this));
+    connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
 }
 
 
@@ -77,9 +83,10 @@ QString BronchoscopyRegistrationWidget::defaultWhatsThis() const
 
 void BronchoscopyRegistrationWidget::registerSlot()
 {
-	Transform3D old_rMpr = dataManager()->get_rMpr();//input?
-    std::cout << "rMpr: " << std::endl;
-    std::cout << old_rMpr << std::endl;
+    Transform3D old_rMpr = dataManager()->get_rMpr();//input to registrationAlgorithm
+    //std::cout << "rMpr: " << std::endl;
+    //std::cout << old_rMpr << std::endl;
+
 
     if(!mSelectMeshWidget->getMesh())
     {
@@ -87,6 +94,7 @@ void BronchoscopyRegistrationWidget::registerSlot()
         return;
     }
 	vtkPolyDataPtr centerline = mSelectMeshWidget->getMesh()->getVtkPolyData();//input
+    Transform3D rMd = mSelectMeshWidget->getMesh()->get_rMd();
 
     if(!mTool)
     {
@@ -107,13 +115,25 @@ void BronchoscopyRegistrationWidget::registerSlot()
     }
 
 	BronchoscopyRegistration reg;
-    Transform3D new_rMpr = Transform3D(reg.runBronchoscopyRegistration(centerline,trackerRecordedData_prMt,old_rMpr));
+    Transform3D new_rMpr = Transform3D(reg.runBronchoscopyRegistration(centerline,trackerRecordedData_prMt,old_rMpr,rMd));
 
     new_rMpr = new_rMpr*old_rMpr;//output
 	mManager->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
 
+    Eigen::Matrix4d display_rMpr = Eigen::Matrix4d::Identity();
+            display_rMpr = new_rMpr*display_rMpr;
+    std::cout << "New prMt: " << std::endl;
+        for (int i = 0; i < 4; i++)
+            std::cout << display_rMpr.row(i) << std::endl;
+
     ToolRep3DPtr activeRep3D = getToolRepIn3DView(mTool);
-	activeRep3D->getTracer()->clear();
+    activeRep3D->getTracer()->clear();
+
+    QColor colorGreen = QColor(0, 255, 0, 255);
+    activeRep3D->getTracer()->setColor(colorGreen);
+    activeRep3D->getTracer()->addManyPositions(trackerRecordedData_prMt);
+
+
 }
 
 void BronchoscopyRegistrationWidget::acquisitionStarted()
@@ -142,6 +162,19 @@ ToolRep3DPtr BronchoscopyRegistrationWidget::getToolRepIn3DView(ToolPtr tool)
 	ViewWidgetQPtr view = viewManager()->get3DView();
     ToolRep3DPtr retval = RepManager::findFirstRep<ToolRep3D>(view->getReps(),tool);
 	return retval;
+}
+
+void BronchoscopyRegistrationWidget::obscuredSlot(bool obscured)
+{
+    //std::cout << "Checking slot" << std::endl;
+    if (!obscured)
+        return;
+
+    ToolRep3DPtr activeRep3D = this->getToolRepIn3DView(mTool);
+    if (!activeRep3D)
+        return;
+    //std::cout << "Slot is cleared" << std::endl;
+    activeRep3D->getTracer()->clear();
 }
 
 } //namespace cx
