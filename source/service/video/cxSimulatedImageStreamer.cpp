@@ -186,16 +186,13 @@ vtkImageDataPtr SimulatedImageStreamer::maskSlice(vtkImageDataPtr unmaskedSlice)
 vtkImageDataPtr SimulatedImageStreamer::simulateUS(vtkImageDataPtr maskedFramedgrabbedSlice)
 {
 	vtkImageDataPtr simulatedSlice;
-	QString simulationType = settings()->value("USsimulation/type", "Original data").toString();
+	QString simulationType = settings()->value("USsimulation/type").toString();
 	if(simulationType == "CT to US")
 		simulatedSlice = simulateUSFromCTSlice(maskedFramedgrabbedSlice);
 	else if(simulationType == "MR to US")
 		simulatedSlice = simulateUSFromMRSlice(maskedFramedgrabbedSlice);
 	else if(simulationType == "Original data")
-	{
-//		cx::reporter()->sendDebug("SimulatedImageStreamer::simulateUS(): Original data selected");
 		simulatedSlice = maskedFramedgrabbedSlice;
-	}
 	else
 	{
 		cx::reporter()->sendWarning("SimulatedImageStreamer::simulateUS(): Unknown simulation: " + simulationType);
@@ -208,7 +205,6 @@ vtkImageDataPtr SimulatedImageStreamer::simulateUS(vtkImageDataPtr maskedFramedg
 //TODO: implement, and put in a separate class
 vtkImageDataPtr SimulatedImageStreamer::simulateUSFromCTSlice(vtkImageDataPtr maskedFramedgrabbedSlice)
 {
-//	cx::reporter()->sendDebug("SimulatedImageStreamer: CT to US");
 	vtkImageDataPtr simulatedSlice;
 	simulatedSlice = maskedFramedgrabbedSlice;
 	return simulatedSlice;
@@ -217,7 +213,6 @@ vtkImageDataPtr SimulatedImageStreamer::simulateUSFromCTSlice(vtkImageDataPtr ma
 //TODO: implement, and put in a separate class
 vtkImageDataPtr SimulatedImageStreamer::simulateUSFromMRSlice(vtkImageDataPtr maskedFramedgrabbedSlice)
 {
-//	cx::reporter()->sendDebug("SimulatedImageStreamer MR to US");
 	vtkImageDataPtr simulatedSlice;
 	simulatedSlice = maskedFramedgrabbedSlice;
 	return simulatedSlice;
