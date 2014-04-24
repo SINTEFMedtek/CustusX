@@ -41,7 +41,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthe
 	QDomElement settings = domdoc.createElement("PNN");
 
 	fixture.setOverallBoundsAndSpacing(100, 5);
-	fixture.setVerbose(true);
+	fixture.setVerbose(false);
 	fixture.getInputGenerator()->setSpherePhantom();
 
 	fixture.setAlgorithm(cx::PNNReconstructAlgorithm::create());
@@ -53,8 +53,8 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthe
 
 	if (fixture.getVerbose())
 	{
-		fixture.saveOutputToFile("/Users/christiana/test/sphere_rec.mhd");
-		fixture.saveNominalOutputToFile("/Users/christiana/test/sphere_nom.mhd");
+		fixture.saveOutputToFile("test/sphere_rec.mhd");
+		fixture.saveNominalOutputToFile("test/sphere_nom.mhd");
 	}
 }
 
@@ -64,7 +64,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 	QDomElement settings = domdoc.createElement("PNN");
 
 	ReconstructAlgorithmFixture fixture;
-	fixture.setVerbose(true);
+	fixture.setVerbose(false);
 
 	SyntheticReconstructInputPtr generator = fixture.getInputGenerator();
 	generator->defineProbeMovementSteps(40);
@@ -83,8 +83,8 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 
 	if (fixture.getVerbose())
 	{
-		fixture.saveOutputToFile("/Users/christiana/test/sphere_rec.mhd");
-		fixture.saveNominalOutputToFile("/Users/christiana/test/sphere_nom.mhd");
+		fixture.saveOutputToFile("test/sphere_rec.mhd");
+		fixture.saveNominalOutputToFile("test/sphere_nom.mhd");
 	}
 }
 
