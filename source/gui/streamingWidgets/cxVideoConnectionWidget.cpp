@@ -44,6 +44,8 @@
 #include "cxFileInputWidget.h"
 #include "cxLogger.h"
 
+#include "cxImageSenderFactory.h"
+
 namespace cx
 {
 
@@ -116,21 +118,57 @@ void VideoConnectionWidget::initScriptSelected(QString filename)
 	getVideoConnectionManager()->setInitScript(filename);
 }
 
+//QWidget* VideoConnectionWidget::createDirectLinkWidget()
+//{
+//	QWidget* retval = new QWidget();
+//	QGridLayout* layout = new QGridLayout(retval);
+//	layout->setMargin(0);
+//	layout->addWidget(new QLabel("Arguments", this), 0, 0);
+//	mDirectLinkArguments = new QComboBox(this);
+//	mDirectLinkArguments->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
+//	mDirectLinkArguments->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+//	mDirectLinkArguments->setEditable(true);
+//	mDirectLinkArguments->setInsertPolicy(QComboBox::InsertAtTop);
+//	mDirectLinkArguments->setToolTip(ImageServer::getArgumentHelpText(""));
+//	this->updateDirectLinkArgumentHistory();
+//	layout->addWidget(mDirectLinkArguments, 0, 1);
+//	return retval;
+//}
+
+
 QWidget* VideoConnectionWidget::createDirectLinkWidget()
 {
 	QWidget* retval = new QWidget();
 	QGridLayout* layout = new QGridLayout(retval);
 	layout->setMargin(0);
-	layout->addWidget(new QLabel("Arguments", this), 0, 0);
-	mDirectLinkArguments = new QComboBox(this);
-	mDirectLinkArguments->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
-	mDirectLinkArguments->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	mDirectLinkArguments->setEditable(true);
-	mDirectLinkArguments->setInsertPolicy(QComboBox::InsertAtTop);
-	mDirectLinkArguments->setToolTip(ImageServer::getArgumentHelpText(""));
-	this->updateDirectLinkArgumentHistory();
-	layout->addWidget(mDirectLinkArguments, 0, 1);
+
+	cx::ImageStreamerFactory factory;
+	QString selectedSender = factory.getDefaultSenderType();
+	QStringList senderTypes = factory.getSenderTypes();
+	mSenderType = StringDataAdapterXml::initialize("Grabber type", "",
+																								 "Video grabber/sender type",
+																								 selectedSender, senderTypes);
+	connect(mSenderType.get(), SIGNAL(changed()), this, SLOT(senderTypeChanged()));
+
+
+	layout->addWidget(new LabeledComboBoxWidget(this, mSenderType), 0, 1);
 	return retval;
+}
+
+//When type is changed generate/use widget with arguments for this grabber/sender
+void VideoConnectionWidget::senderTypeChanged()
+{
+	cx::ImageStreamerFactory factory;
+	StreamerPtr streamer = factory.getImageSender(mSenderType->getValue());
+
+	//TODO: Get available arguments from streamer
+//	QStringList args = streamer->getArgumentList();
+//	for (int i = 0; i < args.size(); ++i)
+//	{
+//		//TODO: Generate correct GUI item based on argument type. Can this be done similarly to the TSF GUI?
+//		QStringList values = streamer->getArgumentValues(args.at(i));
+//	}
+
 }
 
 QWidget* VideoConnectionWidget::createLocalServerWidget()

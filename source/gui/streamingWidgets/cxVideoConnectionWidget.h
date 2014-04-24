@@ -73,6 +73,8 @@ protected slots:
 	void selectGuiForConnectionMethodSlot();
 	void initScriptSelected(QString filename);
 
+	void senderTypeChanged();
+
 protected:
 	void connectServer();
 	void disconnectServer();
@@ -112,6 +114,9 @@ protected:
 	ActiveVideoSourceStringDataAdapterPtr mActiveVideoSourceSelector;
 	SimulateUSWidget* mSimulationWidget;
 	FileInputWidget* mLocalServerFile;
+
+private:
+	StringDataAdapterXmlPtr mSenderType;
 
 };
 
