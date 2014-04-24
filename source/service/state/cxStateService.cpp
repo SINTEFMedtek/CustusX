@@ -300,6 +300,8 @@ QStringList StateService::getGrabberServer(QString filename, QString relativePat
 	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../apps/" + relativePath, filename, postfix);
 	if (!result.isEmpty())
 		return result;
+	else
+		cx::reporter()->sendWarning("StateService::getGrabberServer() can't locate grabber server");
 
 	return result;
 }
