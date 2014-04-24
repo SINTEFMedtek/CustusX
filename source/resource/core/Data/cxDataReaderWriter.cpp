@@ -201,10 +201,9 @@ void MetaImageReader::saveImage(ImagePtr image, const QString& filename)
 	writer->SetFileDimensionality(3);
 	writer->SetFileName(cstring_cast(filename));
 	QDir().mkpath(QFileInfo(filename).path());
-//	std::cout << "saving to " << filename << std::endl;
 
 	writer->SetCompression(false);
-	writer->Update();
+//	writer->Update(); // caused writing of (null).0 files - not necessary
 	writer->Write();
 
 	writer = 0;
