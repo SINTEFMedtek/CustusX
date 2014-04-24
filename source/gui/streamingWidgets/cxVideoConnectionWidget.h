@@ -73,7 +73,7 @@ protected slots:
 	void selectGuiForConnectionMethodSlot();
 	void initScriptSelected(QString filename);
 
-	void senderTypeChanged();
+//	void senderTypeChanged();
 
 protected:
 	void connectServer();
@@ -116,7 +116,7 @@ protected:
 	FileInputWidget* mLocalServerFile;
 
 private:
-	StringDataAdapterXmlPtr mSenderType;
+//	StringDataAdapterXmlPtr mSenderType;
 
 };
 
