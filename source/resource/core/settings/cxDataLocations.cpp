@@ -180,6 +180,19 @@ QString DataLocations::getTSFPath()
 
 	return "";
 }
+
+// TODO this method should be independent of TSF
+QString DataLocations::getTSFOULPath()
+{
+	QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED + "/tsf"; // look for installed location
+	if (QDir(path).exists())
+		return path;
+
+	if (QDir(OUL_DIR).exists()) // look for folder in source code
+		return OUL_DIR;
+
+	return "";
+}
 #endif
 
 } // namespace cx

@@ -198,10 +198,6 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
 
 	mDataViewPropertiesInteractor->addDataActions(&contextMenu);
 
-	QMenu* show3DSlicesMenu = new QMenu("Show 3D slices");
-	contextMenu.addMenu(show3DSlicesMenu);
-	mShow3DSlicesInteractor->addDataActions(show3DSlicesMenu);
-
 	//append specific info from derived classes
 	this->appendToContextMenu(contextMenu);
 

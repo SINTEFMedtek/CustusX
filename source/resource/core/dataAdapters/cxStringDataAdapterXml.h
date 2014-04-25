@@ -55,8 +55,8 @@ public:
 	 * If not present, fill inn the input defaults.
 	 */
 	static StringDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, QString value,
-		QStringList range, QDomNode root);
-	static StringDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, QString value, QDomNode root);
+		QStringList range, QDomNode root = QDomNode());
+	static StringDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, QString value, QDomNode root = QDomNode());
 
 public:
 	// inherited interface

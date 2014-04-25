@@ -180,6 +180,7 @@ set( CX_RESOURCE_LIBRARIES
     ${CX_RESOURCE_LIBRARIES}
 vtkCommonCore
 vtkCommonDataModel
+vtkCommonExecutionModel
 vtkIOImage
 vtkIOGeometry
 vtkIOLegacy

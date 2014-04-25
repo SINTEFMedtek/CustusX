@@ -125,8 +125,9 @@ bool TubeSegmentationFilter::execute()
 		std::cout << "Input: " <<  input->getName().toStdString() << std::endl;
 		std::cout << "Preset: " <<  getParamStr(mParameters, "parameters") << std::endl;
 		std::cout << "Centerline-method: " <<  getParamStr(mParameters, "centerline-method") << std::endl;
+		std::cout << "Kernel paths: " << cx::DataLocations::getTSFPath().toStdString() << " and " << cx::DataLocations::getTSFOULPath().toStdString() << std::endl;
 		std::cout << "--------------" << std::endl;
-		mOutput = run(filename, mParameters, cx::DataLocations::getTSFPath().toStdString());
+		mOutput = run(filename, mParameters, cx::DataLocations::getTSFPath().toStdString(), cx::DataLocations::getTSFOULPath().toStdString());
 		std::cout << "=================TSF END====================" << std::endl;
 	} catch(SIPL::SIPLException& e) {
 		std::string error = e.what();

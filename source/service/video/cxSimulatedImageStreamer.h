@@ -53,6 +53,9 @@ private:
 	void setSourceImage(ImagePtr image);
 	ImagePtr calculateSlice(ImagePtr source);
 	vtkImageDataPtr maskSlice(vtkImageDataPtr unmaskedSlice);
+	vtkImageDataPtr simulateUS(vtkImageDataPtr maskedFramedgrabbedSlice);
+	vtkImageDataPtr simulateUSFromCTSlice(vtkImageDataPtr maskedFramedgrabbedSlice);
+	vtkImageDataPtr simulateUSFromMRSlice(vtkImageDataPtr maskedFramedgrabbedSlice);
 	ImagePtr convertToSscImage(vtkImageDataPtr slice, ImagePtr volume);
 
 	ImagePtr mSourceImage;

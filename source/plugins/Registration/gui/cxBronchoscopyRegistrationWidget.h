@@ -51,6 +51,7 @@ private slots:
 	void registerSlot();
 	void acquisitionStarted();
 	void acquisitionStopped();
+    void obscuredSlot(bool obscured);
 
 private:
 	QVBoxLayout* mVerticalLayout;

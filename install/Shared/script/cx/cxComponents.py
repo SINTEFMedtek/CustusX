@@ -144,7 +144,7 @@ class ITK(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git://itk.org/ITK.git')
     def update(self):
-        self._getBuilder().gitCheckout('v4.4.1')
+        self._getBuilder().gitCheckout('v4.5.1')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -200,7 +200,7 @@ class OpenCV(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('https://github.com/Itseez/opencv.git', 'OpenCV')
     def update(self):
-        self._getBuilder().gitCheckout('2.4.2')
+        self._getBuilder().gitCheckout('2.4.8')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -444,7 +444,7 @@ class OpenCLUtilityLibrary(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:smistad/OpenCLUtilityLibrary')
     def update(self):
-        self._getBuilder().gitCheckout('763d96f127e1548aea53bd81152f99ca51149259', submodules=False)
+        self._getBuilder().gitCheckout('924d31f45eca2c077733ceb1e8f09e62e155b9f1', submodules=False)
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()
