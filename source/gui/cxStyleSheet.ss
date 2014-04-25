@@ -23,6 +23,11 @@ CXFrame#FilterBackground
 								  stop: 0 #f6f7fa, stop: 1 #dadbde);
 */
 
+CXNoBorderToolButton
+{
+	border: 0px;
+}
+
 CXToolButton
 {
 	border: 1px solid palette(dark);

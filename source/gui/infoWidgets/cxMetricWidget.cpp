@@ -51,6 +51,7 @@
 //#include "cxDistanceMetric.h"
 #include "cxLogger.h"
 
+
 namespace cx
 {
 
@@ -91,8 +92,32 @@ MetricWidget::MetricWidget(QWidget* parent) :
   QActionGroup* group = new QActionGroup(this);
   this->createActions(group);
 
-  QToolBar* toolBar = new QToolBar("actions", this);
-  toolBar->addActions(group->actions());
+//  QToolBar* toolBar = new QToolBar("actions", this);
+//  toolBar->addActions(group->actions());
+
+  QWidget* toolBar = new QWidget(this);
+  QHBoxLayout* toolLayout = new QHBoxLayout(toolBar);
+  toolLayout->setMargin(0);
+  toolLayout->setSpacing(0);
+  QList<QAction*> actions = group->actions();
+  for (unsigned i=0; i<actions.size(); ++i)
+  {
+	  if (actions[i]->isSeparator())
+	  {
+		  toolLayout->addSpacing(4);
+		  QFrame* frame = new QFrame();
+		  frame->setFrameStyle(QFrame::Sunken + QFrame::VLine);
+		  toolLayout->addWidget(frame);
+		  toolLayout->addSpacing(4);
+	  }
+	  else
+	  {
+		  CXNoBorderToolButton* button = new CXNoBorderToolButton;
+		  button->setDefaultAction(actions[i]);
+		  button->setIconSize(QSize(32,32));
+		  toolLayout->addWidget(button);
+	  }
+  }
 
   QHBoxLayout* buttonLayout = new QHBoxLayout;
   buttonLayout->addWidget(toolBar);
@@ -115,8 +140,8 @@ void MetricWidget::createActions(QActionGroup* group)
 	this->createAction(group, ":/icons/metric_distance.png", "Dist", "Create a new Distance Metric", SLOT(addDistanceButtonClickedSlot()));
 	this->createAction(group, ":/icons/metric_angle.png", "Angle", "Create a new Angle Metric",   SLOT(addAngleButtonClickedSlot()));
 	this->createAction(group, ":/icons/metric_plane.png", "Plane", "Create a new Plane Metric",   SLOT(addPlaneButtonClickedSlot()));
-	this->createAction(group, ":/icons/metric_point.png", "Sphere", "Create a new SphereMetric",   SLOT(addSphereButtonClickedSlot()));
-	this->createAction(group, ":/icons/metric_point.png", "Donut", "Create a new Donut Metric",   SLOT(addDonutButtonClickedSlot()));
+	this->createAction(group, ":/icons/metric_sphere.png", "Sphere", "Create a new SphereMetric",   SLOT(addSphereButtonClickedSlot()));
+	this->createAction(group, ":/icons/metric_torus.png", "Torus", "Create a new Torus Metric",   SLOT(addDonutButtonClickedSlot()));
 
 	this->createAction(group, "", "", "", NULL)->setSeparator(true);
 	mRemoveAction = this->createAction(group, ":/icons/metric_remove.png", "Remove", "Remove currently selected metric",   SLOT(removeButtonClickedSlot()));

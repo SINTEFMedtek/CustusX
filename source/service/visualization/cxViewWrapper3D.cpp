@@ -269,7 +269,7 @@ void ViewWrapper3D::PickerRepDataPickedSlot(QString uid)
 }
 
 void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
-{
+{	
 	QAction* slicePlanesAction = NULL;
 	QAction* fillSlicePlanesAction = NULL;
 	if (mSlicePlanes3DRep)
@@ -315,6 +315,9 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	showToolPath->setChecked(settings()->value("showToolPath").toBool());
 	connect(showToolPath, SIGNAL(triggered(bool)), this, SLOT(showToolPathSlot(bool)));
 
+	QMenu* show3DSlicesMenu = new QMenu("Show 3D slices");
+	mShow3DSlicesInteractor->addDataActions(show3DSlicesMenu);
+
 	QMenu* showSlicesMenu = new QMenu("Slice Type", &contextMenu);
 	this->createSlicesActions(showSlicesMenu);
 
@@ -331,7 +334,9 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	}
 
 	contextMenu.addSeparator();
+	contextMenu.addMenu(show3DSlicesMenu);
 	contextMenu.addMenu(showSlicesMenu);
+	contextMenu.addSeparator();
 	contextMenu.addAction(resetCameraAction);
 	contextMenu.addAction(centerImageAction);
 	contextMenu.addAction(centerToolAction);

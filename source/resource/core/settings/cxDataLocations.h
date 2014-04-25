@@ -42,6 +42,7 @@ public:
 	static QString getCachePath(); ///< return path to a folder that is used during execution, will be cleared at start and stop.
 #ifdef CX_USE_TSF
   static QString getTSFPath(); ///< return path to a folder where files needed for tube segmentation framework are located
+  static QString getTSFOULPath(); ///< return path to a folder where files needed for tube segmentation framework are located
 #endif
 
   static void setTestMode(); ///< set a testing mode that changes location of settings files to a temp folder.
