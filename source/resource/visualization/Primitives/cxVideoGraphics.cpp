@@ -119,7 +119,7 @@ void VideoGraphics::setupPipeline()
 
 		mMaskFilter->SetMaskInputData(mInputMask);
 		mMapZeroToOne->SetInputConnection(mDataRedirecter->GetOutputPort());
-		mMaskFilter->SetInputConnection(1, mMapZeroToOne->GetOutputPort(1));
+		mMaskFilter->SetInputConnection(0, mMapZeroToOne->GetOutputPort());
 		mTexture->SetInputConnection(mMaskFilter->GetOutputPort());
 	}
 	else if (mInputSector)
