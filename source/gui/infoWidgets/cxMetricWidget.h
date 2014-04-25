@@ -42,6 +42,18 @@ class QVBoxLayout;
 class QTableWidget;
 class QPushButton;
 
+/** QToolButton descendant with dedicated style sheet: no border
+  *
+  * \date 2014-04-25
+  * \author Christian Askeland, SINTEF
+  */
+class CXNoBorderToolButton : public QToolButton
+{
+	Q_OBJECT
+public:
+	CXNoBorderToolButton(QWidget* parent=0) : QToolButton(parent) {}
+};
+
 namespace cx
 {
 typedef boost::shared_ptr<class MetricManager> MetricManagerPtr;
