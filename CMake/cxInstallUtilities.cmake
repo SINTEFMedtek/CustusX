@@ -199,7 +199,7 @@ endif ()
 				DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
 	endif()
 	
-	if(TSF_USE_EXTRNAL_OUL)
+	if(CX_USE_OPENCL_UTILITY)
 		install(FILES
 				${OpenCLUtilityLibrary_KERNELS_DIR}/HistogramPyramids.cl
 				${OpenCLUtilityLibrary_KERNELS_DIR}/HistogramPyramids.clh
