@@ -258,7 +258,10 @@ void ToolUsingIGSTK::calculateTpsSlot()
 
 	int numberOfTransformsToCheck = ((mPositionHistory->size() >= 10) ? 10 : mPositionHistory->size());
 	if (	numberOfTransformsToCheck <= 1)
+	{
+		emit tps(0);
 		return;
+	}
 
 	TimedTransformMap::reverse_iterator it = mPositionHistory->rbegin();
 	double lastTransform = it->first;
@@ -267,7 +270,8 @@ void ToolUsingIGSTK::calculateTpsSlot()
 	double firstTransform = it->first;
 	double secondsPassed = (lastTransform - firstTransform) / 1000;
 
-	tpsNr = (int) (numberOfTransformsToCheck / secondsPassed);
+	if (!similar(secondsPassed, 0))
+		tpsNr = (int) (numberOfTransformsToCheck / secondsPassed);
 
 	emit tps(tpsNr);
 }
