@@ -119,7 +119,7 @@ bool ElastixExecuter::isFinished() const
 
 bool ElastixExecuter::isRunning() const
 {
-    return !mProcess->state()!=QProcess::NotRunning;
+	return mProcess->state()!=QProcess::NotRunning;
 }
 
 QString ElastixExecuter::writeInitTransformToElastixfile(
