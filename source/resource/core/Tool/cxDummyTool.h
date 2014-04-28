@@ -137,7 +137,6 @@ public:
 	virtual std::set<Type> getTypes() const;
 	virtual void setType(Type);
 
-	virtual QString getGraphicsFileName() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual void saveTransformsAndTimestamps();
 	virtual void setTransformSaveFile(const QString& filename);

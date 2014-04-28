@@ -78,11 +78,6 @@ std::set<ToolUsingIGSTK::Type> ToolUsingIGSTK::getTypes() const
 	return retval;
 }
 
-QString ToolUsingIGSTK::getGraphicsFileName() const
-{
-	return mTool->getInternalStructure().mGraphicsFileName;
-}
-
 vtkPolyDataPtr ToolUsingIGSTK::getGraphicsPolyData() const
 {
 	return mPolyData;

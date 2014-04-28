@@ -72,11 +72,6 @@ void ManualTool::set_prMt(const Transform3D& prMt, double timestamp)
 	ToolImpl::set_prMt(prMt, timestamp);
 }
 
-QString ManualTool::getGraphicsFileName() const
-{
-	return "";
-}
-
 std::set<Tool::Type> ManualTool::getTypes() const
 {
 	std::set<Type> retval;

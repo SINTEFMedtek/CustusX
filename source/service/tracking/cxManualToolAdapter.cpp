@@ -43,30 +43,10 @@ void ManualToolAdapter::setBase(ToolPtr base)
 	emit toolProbeSector();
 }
 
-//Tool::Type ManualToolAdapter::getType() const
-//{
-//  return mBase->getType();
-//}
-
-QString ManualToolAdapter::getGraphicsFileName() const
-{
-	return mBase->getGraphicsFileName();
-}
-
 vtkPolyDataPtr ManualToolAdapter::getGraphicsPolyData() const
 {
 	return mBase->getGraphicsPolyData();
 }
-
-//QString ManualToolAdapter::getUid() const
-//{
-//  return mBase->getUid();
-//}
-//
-//QString ManualToolAdapter::getName() const
-//{
-//  return mBase->getName();
-//}
 
 bool ManualToolAdapter::isCalibrated() const
 {

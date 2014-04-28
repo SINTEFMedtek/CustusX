@@ -46,7 +46,6 @@ public:
 	virtual ~ManualToolAdapter();
 
 	virtual std::set<Type> getTypes() const { return mBase->getTypes(); }
-	virtual QString getGraphicsFileName() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual bool isCalibrated() const;
 	virtual ProbeDefinition getProbeSector() const;
