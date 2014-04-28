@@ -39,5 +39,14 @@ QString changeExtension(QString name, QString ext)
 	return splitName.join(".");
 }
 
+void sleep_ms(int ms)
+{
+#ifndef CX_WINDOWS
+		usleep(ms*1000);
+#else
+		Sleep(ms);
+#endif
+}
+
 } // namespace cx
 
