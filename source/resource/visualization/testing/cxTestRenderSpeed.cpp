@@ -4,10 +4,12 @@
 #include <QGridLayout>
 #include <QBoxLayout>
 #include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
 #include "cxLogger.h"
 #include "cxReporter.h"
+#include "vtkRenderWindowInteractor.h"
 //#include "cxForwardDeclarations.h"
 
 namespace cxtest
@@ -64,7 +66,9 @@ void TestRenderSpeed::createVtkRenderWindows(int num)
 	for(int i = 0; i < num; ++i)
 	{
 		vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
-		mVtkRenderWindows.push_back(renderWindow);
+		vtkRenderWindowInteractorPtr interactor = vtkRenderWindowInteractorPtr::New();
+		interactor->SetRenderWindow(renderWindow);
+		mInteractors.push_back(interactor);
 	}
 }
 
@@ -106,7 +110,6 @@ void TestRenderSpeed::renderNumTimes(int num)
 	mNumRenderings = num;
 	QTime clock;
 	clock.start();
-	std::vector<cx::ViewWidget*>::iterator iter;
 	for(int i = 0; i < mNumRenderings; ++i)
 		for(int v = 0; v < this->getNumViews(); v++)
 			this->renderViewNum(v);
@@ -117,8 +120,8 @@ void TestRenderSpeed::renderViewNum(int viewNum)
 {
 	if(mViews.size() != 0)
 		mViews[viewNum]->getRenderWindow()->Render();
-	else if(mVtkRenderWindows.size() != 0)
-		mVtkRenderWindows[viewNum]->Render();
+	else if(mInteractors.size() != 0)
+		mInteractors[viewNum]->GetRenderWindow()->Render();
 }
 
 void TestRenderSpeed::printResult()
@@ -168,6 +171,8 @@ void TestRenderSpeed::setTotalRenderTimeInMs(int time)
 
 double TestRenderSpeed::getAverageRenderTimeInMs()
 {
+	if (mNumRenderings==0)
+		return 1000000;
 	double time = mRenderTimeInMs / (double)mNumRenderings;
 	return time;
 }
