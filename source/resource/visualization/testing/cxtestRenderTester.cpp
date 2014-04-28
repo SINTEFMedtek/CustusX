@@ -196,8 +196,10 @@ vtkImageDataPtr RenderTester::getImageFromRenderWindow()
 {
 	vtkWindowToImageFilterPtr windowToImageFilter = vtkWindowToImageFilterPtr::New();
 //	windowToImageFilter->ShouldRerenderOff();
-//	windowToImageFilter->SetReadFrontBuffer(false); // might give less interf erence from other windows...?
-
+#ifdef CX_WINDOWS
+	// for windows: read the back buffer. Determined experimentally, no idea why. Ubuntu/AMD: Must use front buffer
+	windowToImageFilter->SetReadFrontBuffer(false); // might give less interf erence from other windows...?
+#endif
 //	mRenderWindow->Render();
 //	mRenderWindow->Render();
 	windowToImageFilter->SetInput(mRenderWindow);
