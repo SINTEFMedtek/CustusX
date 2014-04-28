@@ -1,5 +1,6 @@
 #include "cxUtilHelpers.h"
 #include <QStringList>
+#include <unistd.h>
 
 namespace cx
 {
