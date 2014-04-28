@@ -142,6 +142,7 @@ void ToolUsingIGSTK::createPolyData()
 	{
 		vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
 		reader->SetFileName(cstring_cast(mTool->getInternalStructure().mGraphicsFileName));
+		reader->Update();
 		mPolyData = reader->GetOutput();
 	}
 	else
@@ -157,6 +158,7 @@ void ToolUsingIGSTK::createPolyData()
 		newCenter[2] = newCenter[2] - coneSource->GetHeight() / 2;
 		coneSource->SetCenter(newCenter);
 
+		coneSource->Update();
 		mPolyData = coneSource->GetOutput();
 	}
 }

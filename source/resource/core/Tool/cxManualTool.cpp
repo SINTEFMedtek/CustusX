@@ -54,7 +54,7 @@ void ManualTool::read3DCrossHairSlot(double toolTipOffset)
 	int s = 60;
 	mCrossHair->SetModelBounds(-s, s, -s, s, -s, s + toolTipOffset);
 	mCrossHair->SetFocalPoint(0, 0, toolTipOffset);
-	mCrossHair->Modified();
+	mCrossHair->Update();
 }
 
 /**Set tool position, use current time as timestamp
