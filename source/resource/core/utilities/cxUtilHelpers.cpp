@@ -2,6 +2,10 @@
 #include <QStringList>
 #include <unistd.h>
 
+#ifdef CX_WINDOWS
+#include <windows.h>
+#endif
+
 namespace cx
 {
 
