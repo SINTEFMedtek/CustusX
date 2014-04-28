@@ -82,7 +82,6 @@ public:
 
 	virtual std::set<Type> getTypes() const;
 
-	virtual QString getGraphicsFileName() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual bool getVisible() const;
 	virtual bool isInitialized() const;
