@@ -74,7 +74,6 @@ ImageTF3DPtr ImageDefaultTFGenerator::generate3DTFPreset()
 //	opacity[smin - 1] = 0;
 	// Note the ordering: add in descending order to ensure zero is
 	// always written into smin, also for binary volumes
-	opacity[smax             ] = 255;
 	opacity[smin + 0.5*srange] = 255;
 	opacity[smin + 0.3*srange] = 255.0 * 0.7;
 	opacity[smin + 0.1*srange] = 0;
