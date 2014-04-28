@@ -39,6 +39,8 @@ void ManualToolAdapter::setBase(ToolPtr base)
 	disconnect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
 	mBase = base;
 	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
+
+	emit toolProbeSector();
 }
 
 //Tool::Type ManualToolAdapter::getType() const
