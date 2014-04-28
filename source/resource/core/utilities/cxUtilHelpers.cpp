@@ -1,6 +1,9 @@
 #include "cxUtilHelpers.h"
 #include <QStringList>
+
+#ifndef CX_WINDOWS
 #include <unistd.h>
+#endif
 
 #ifdef CX_WINDOWS
 #include <windows.h>
