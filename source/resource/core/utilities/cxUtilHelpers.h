@@ -39,6 +39,7 @@ template<class ITER> std::ostream& stream_range(std::ostream& s, ITER begin, ITE
 double constrainValue(double val, double min, double max);
 int sign(double x);
 QString changeExtension(QString name, QString ext);
+void sleep_ms(int ms);
 
 /**
  * \}

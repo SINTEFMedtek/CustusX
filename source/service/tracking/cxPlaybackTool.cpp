@@ -80,11 +80,6 @@ void PlaybackTool::timeChangedSlot()
 	}
 }
 
-QString PlaybackTool::getGraphicsFileName() const
-{
-	return mBase->getGraphicsFileName();
-}
-
 std::set<Tool::Type> PlaybackTool::getTypes() const
 {
 	return mBase->getTypes();

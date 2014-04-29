@@ -85,12 +85,6 @@ protected:
 	virtual void onModifiedStartRender();
 
 private slots:
-//	/**
-//	 * Receive transform and timestamp from a tool
-//	 *\param matrix		The tools transform
-//	 *\param timestamp	The time at which the transform was recorded
-//	 */
-//	void receiveTransforms(Transform3D matrix, double timestamp);
 	void probeSectorChanged();
 	/**
 	 * Receive whether or not the tool is visible to the tracking system
@@ -98,6 +92,7 @@ private slots:
 	 */
 	void receiveVisible(bool visible);
 	void tooltipOffsetSlot(double val); ///< receive the virtual tool tip extension.
+	void updateToolActor();
 
 private:
 	void update();
@@ -108,7 +103,6 @@ private:
 	ToolPtr mTool;
 	vtkActorPtr mToolActor;
 	vtkPolyDataMapperPtr mPolyDataMapper;
-//	vtkSTLReaderPtr mSTLReader;
 	GraphicalPoint3DPtr mTooltipPoint;
 	GraphicalPoint3DPtr mOffsetPoint;
 	GraphicalLine3DPtr mOffsetLine;

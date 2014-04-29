@@ -239,7 +239,7 @@ double TimelineWidget::mapPlotX2Time(int plotX) const
 
 void TimelineWidget::paintEvent(QPaintEvent* event)
 {
-	if (!mStart == mStop)
+	if (similar(mStart,mStop))
 		return;
 	QWidget::paintEvent(event);
 
