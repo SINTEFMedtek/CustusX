@@ -1,0 +1,149 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
+#include "cxSmoothingImageFilter.h"
+
+#include "cxAlgorithmHelpers.h"
+#include <itkSmoothingRecursiveGaussianImageFilter.h>
+#include "cxSelectDataStringDataAdapter.h"
+
+
+#include "cxDataManager.h"
+#include "cxUtilHelpers.h"
+#include "cxRegistrationTransform.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
+#include "cxTypeConversions.h"
+#include "cxImage.h"
+
+#include "cxPatientService.h"
+#include "cxPatientData.h"
+
+namespace cx
+{
+
+QString SmoothingImageFilter::getName() const
+{
+	return "Smoothing";
+}
+
+QString SmoothingImageFilter::getType() const
+{
+	return "SmoothingImageFilter";
+}
+
+QString SmoothingImageFilter::getHelp() const
+{
+	return "<html>"
+	        "<h3>Smoothing.</h3>"
+	        "<p>Wrapper for a itk::SmoothingRecursiveGaussianImageFilter.</p>"
+	        "<p>Computes the smoothing of an image by convolution with "
+	        "the Gaussian kernels implemented as IIR filters."
+	        "This filter is implemented using the recursive gaussian filters.</p>"
+	        "</html>";
+}
+
+DoubleDataAdapterXmlPtr SmoothingImageFilter::getSigma(QDomElement root)
+{
+	return DoubleDataAdapterXml::initialize("Smoothing sigma", "",
+	                                             "Used for smoothing the segmented volume. Measured in units of image spacing.",
+	                                             0.10, DoubleRange(0, 5, 0.01), 2, root);
+}
+
+void SmoothingImageFilter::createOptions()
+{
+	mOptionsAdapters.push_back(this->getSigma(mOptions));
+}
+
+void SmoothingImageFilter::createInputTypes()
+{
+	SelectDataStringDataAdapterBasePtr temp;
+
+	temp = SelectImageStringDataAdapter::New();
+	temp->setValueName("Input");
+	temp->setHelp("Select image input for smoothing");
+	mInputTypes.push_back(temp);
+}
+
+void SmoothingImageFilter::createOutputTypes()
+{
+	SelectDataStringDataAdapterBasePtr temp;
+
+	temp = SelectDataStringDataAdapter::New();
+	temp->setValueName("Output");
+	temp->setHelp("Output smoothed image");
+	mOutputTypes.push_back(temp);
+}
+
+bool SmoothingImageFilter::execute()
+{
+	ImagePtr input = this->getCopiedInputImage();
+	if (!input)
+		return false;
+
+	DoubleDataAdapterXmlPtr sigma = this->getSigma(mCopiedOptions);
+
+	itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(input);
+
+	typedef itk::SmoothingRecursiveGaussianImageFilter<itkImageType, itkImageType> smoothingFilterType;
+	smoothingFilterType::Pointer smoohingFilter = smoothingFilterType::New();
+	smoohingFilter->SetSigma(sigma->getValue());
+	smoohingFilter->SetInput(itkImage);
+	smoohingFilter->Update();
+	itkImage = smoohingFilter->GetOutput();
+
+	//Convert ITK to VTK
+	itkToVtkFilterType::Pointer itkToVtkFilter = itkToVtkFilterType::New();
+	itkToVtkFilter->SetInput(itkImage);
+	itkToVtkFilter->Update();
+
+	vtkImageDataPtr rawResult = vtkImageDataPtr::New();
+	rawResult->DeepCopy(itkToVtkFilter->GetOutput());
+	// TODO: possible memory problem here - check debug mem system of itk/vtk
+
+	mRawResult =  rawResult;
+	return true;
+}
+
+bool SmoothingImageFilter::postProcess()
+{
+	if (!mRawResult)
+		return false;
+
+	ImagePtr input = this->getCopiedInputImage();
+
+	if (!input)
+		return false;
+
+	QString uid = input->getUid() + "_sm%1";
+	QString name = input->getName()+" sm%1";
+	ImagePtr output = dataManager()->createDerivedImage(mRawResult,uid, name, input);
+	mRawResult = NULL;
+	if (!output)
+		return false;
+
+	//    output->resetTransferFunctions();
+	dataManager()->loadData(output);
+	dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
+
+	// set output
+	mOutputTypes.front()->setValue(output->getUid());
+
+	return true;
+}
+
+
+} // namespace cx
+

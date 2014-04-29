@@ -1,0 +1,142 @@
+###########################################################
+##               Algorithm Plugin
+##
+##               Plugin
+##
+##  Description: A collection of all algorithms and associated widgets not in
+##               other plugins. 
+##
+##
+##  Dependencies: resource layer, service layer
+##                 
+##
+###########################################################
+
+SET( MOC_HEADER_FILES
+	logic/cxFilter.h
+	logic/cxFilterImpl.h
+	logic/cxFilterTimedAlgorithm.h
+	logic/cxDummyFilter.h
+	logic/cxPipeline.h
+    logic/cxBinaryThresholdImageFilter.h
+    logic/cxConnectedThresholdImageFilter.h
+	logic/cxContourFilter.h
+	logic/cxBinaryThinningImageFilter3DFilter.h
+	logic/cxSmoothingImageFilter.h
+	logic/cxResampleImageFilter.h
+	logic/cxTubeSegmentationFilter.h
+	logic/cxLevelSetFilter.h
+	logic/cxTSFPresets.h
+	logic/cxDilationFilter.h
+    gui/cxAlgorithmPlugin.h
+    gui/cxConnectedThresholdImageFilterWidget.h
+    gui/cxTimedAlgorithmProgressBar.h
+	gui/cxFilterWidget.h
+	gui/cxPipelineWidget.h
+	gui/cxFilterPresetWidget.h
+	gui/cxAllFiltersWidget.h
+	gui/cxCompactFilterSetupWidget.h
+	gui/cxOptionsWidget.h
+	)
+
+QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
+
+# library
+SET( SOURCE_FILES
+    ${MOC_HEADER_FILES}
+	logic/cxFilter.h
+	logic/cxFilter.cpp
+	logic/cxFilterImpl.h
+	logic/cxFilterImpl.cpp
+	logic/cxFilterTimedAlgorithm.h
+	logic/cxFilterTimedAlgorithm.cpp
+	logic/cxDummyFilter.h
+	logic/cxDummyFilter.cpp
+	logic/cxTubeSegmentationFilter.h
+	logic/cxTubeSegmentationFilter.cpp
+	logic/cxLevelSetFilter.h
+	logic/cxLevelSetFilter.cpp
+	logic/cxDilationFilter.h
+	logic/cxDilationFilter.cpp
+	logic/cxPipeline.h
+	logic/cxPipeline.cpp
+	logic/cxTrackingDataToVolume.h
+    logic/cxTrackingDataToVolume.cpp
+    logic/cxBinaryThresholdImageFilter.h
+    logic/cxBinaryThresholdImageFilter.cpp
+    logic/cxConnectedThresholdImageFilter.h
+    logic/cxConnectedThresholdImageFilter.cpp
+	logic/cxContourFilter.h
+	logic/cxContourFilter.cpp
+	logic/cxBinaryThinningImageFilter3DFilter.h
+	logic/cxBinaryThinningImageFilter3DFilter.cpp
+	logic/cxSmoothingImageFilter.h
+	logic/cxSmoothingImageFilter.cpp
+	logic/cxResampleImageFilter.h
+	logic/cxResampleImageFilter.cpp
+	logic/cxTSFPresets.h
+	logic/cxTSFPresets.cpp
+    gui/cxAlgorithmPlugin.h
+    gui/cxAlgorithmPlugin.cpp
+    gui/cxConnectedThresholdImageFilterWidget.h
+    gui/cxConnectedThresholdImageFilterWidget.cpp
+    gui/cxTimedAlgorithmProgressBar.h
+    gui/cxTimedAlgorithmProgressBar.cpp
+	gui/cxFilterWidget.h
+	gui/cxFilterWidget.cpp
+	gui/cxPipelineWidget.h
+	gui/cxPipelineWidget.cpp
+	gui/cxFilterPresetWidget.h
+	gui/cxFilterPresetWidget.cpp
+	gui/cxAllFiltersWidget.h
+	gui/cxAllFiltersWidget.cpp
+	gui/cxCompactFilterSetupWidget.h
+	gui/cxCompactFilterSetupWidget.cpp
+	gui/cxOptionsWidget.h
+	gui/cxOptionsWidget.cpp
+  )
+
+# =========================================================
+
+include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
+
+include_directories(
+    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
+    .
+    ./logic
+    ./gui
+	${CustusX3_SOURCE_DIR}/source/service/patient
+    ${CustusX3_SOURCE_DIR}/source/service/tracking
+    ${CustusX3_SOURCE_DIR}/source/service/visualization
+	${CustusX3_SOURCE_DIR}/source/logic
+
+    ${CustusX3_SOURCE_DIR}/source/modules/PluginBase
+    ${CustusX3_SOURCE_DIR}/source/gui/utilities
+    ${CustusX3_SOURCE_DIR}/source/gui/dataAdapters
+	${CustusX3_SOURCE_DIR}/source/gui/dataWidgets
+	)
+
+set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui)
+
+if (CX_USE_TSF)
+    set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} tubeSegmentationLib)
+endif(CX_USE_TSF)
+
+if (CX_USE_LEVEL_SET)
+    set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} levelSetSegLib)
+endif(CX_USE_LEVEL_SET)
+
+if (CX_USE_OPENCL_UTILITY)
+    set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} OpenCLUtilityLibrary ${OPENCL_LIBRARIES})
+    include_directories(${OpenCLUtilityLibrary_INCLUDE_DIRS})
+endif(CX_USE_OPENCL_UTILITY)
+
+
+
+# =========================================================
+# create the target
+add_library( cxPluginAlgorithm ${SOURCE_FILES} )
+target_link_libraries( cxPluginAlgorithm ${CX_ALGORITHM_LIBRARIES})
+CX_COTIRE_ADD_LIBRARY(cxPluginAlgorithm "${CX_ALGORITHM_LIBRARIES}")
+
+add_subdirectory(testing)
