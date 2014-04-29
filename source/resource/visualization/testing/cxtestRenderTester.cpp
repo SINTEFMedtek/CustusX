@@ -34,6 +34,7 @@
 #include "cxDataReaderWriter.h"
 #include "cxtestUtilities.h"
 #include "cxLogger.h"
+#include "cxUtilHelpers.h"
 
 typedef vtkSmartPointer<class vtkProp> vtkPropPtr;
 typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;
@@ -153,6 +154,9 @@ vtkImageDataPtr RenderTester::renderToImage()
 	// extra render, as suggested by http://read.pudn.com/downloads115/ebook/487640/VTK/Common/Testing/Cxx/vtkRegressionTestImage.h__.htm
 	// tests show that black windows appear less often with two renders.
 	mRenderWindow->Render();
+
+	cx::sleep_ms(200);
+
 	return this->getImageFromRenderWindow();
 }
 
@@ -191,8 +195,11 @@ vtkImageDataPtr RenderTester::getImageFromRenderWindow()
 vtkImageDataPtr RenderTester::getImageFromRenderWindow()
 {
 	vtkWindowToImageFilterPtr windowToImageFilter = vtkWindowToImageFilterPtr::New();
-	windowToImageFilter->ShouldRerenderOff();
+//	windowToImageFilter->ShouldRerenderOff();
+#ifdef CX_WINDOWS
+	// for windows: read the back buffer. Determined experimentally, no idea why. Ubuntu/AMD: Must use front buffer
 	windowToImageFilter->SetReadFrontBuffer(false); // might give less interf erence from other windows...?
+#endif
 //	mRenderWindow->Render();
 //	mRenderWindow->Render();
 	windowToImageFilter->SetInput(mRenderWindow);

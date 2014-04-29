@@ -78,11 +78,6 @@ std::set<ToolUsingIGSTK::Type> ToolUsingIGSTK::getTypes() const
 	return retval;
 }
 
-QString ToolUsingIGSTK::getGraphicsFileName() const
-{
-	return mTool->getInternalStructure().mGraphicsFileName;
-}
-
 vtkPolyDataPtr ToolUsingIGSTK::getGraphicsPolyData() const
 {
 	return mPolyData;
@@ -142,6 +137,7 @@ void ToolUsingIGSTK::createPolyData()
 	{
 		vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
 		reader->SetFileName(cstring_cast(mTool->getInternalStructure().mGraphicsFileName));
+		reader->Update();
 		mPolyData = reader->GetOutput();
 	}
 	else
@@ -157,6 +153,7 @@ void ToolUsingIGSTK::createPolyData()
 		newCenter[2] = newCenter[2] - coneSource->GetHeight() / 2;
 		coneSource->SetCenter(newCenter);
 
+		coneSource->Update();
 		mPolyData = coneSource->GetOutput();
 	}
 }
@@ -257,8 +254,11 @@ void ToolUsingIGSTK::calculateTpsSlot()
 	int tpsNr = 0;
 
 	int numberOfTransformsToCheck = ((mPositionHistory->size() >= 10) ? 10 : mPositionHistory->size());
-	if (	numberOfTransformsToCheck == 0)
+	if (	numberOfTransformsToCheck <= 1)
+	{
+		emit tps(0);
 		return;
+	}
 
 	TimedTransformMap::reverse_iterator it = mPositionHistory->rbegin();
 	double lastTransform = it->first;
@@ -267,7 +267,8 @@ void ToolUsingIGSTK::calculateTpsSlot()
 	double firstTransform = it->first;
 	double secondsPassed = (lastTransform - firstTransform) / 1000;
 
-	tpsNr = (int) (numberOfTransformsToCheck / secondsPassed);
+	if (!similar(secondsPassed, 0))
+		tpsNr = (int) (numberOfTransformsToCheck / secondsPassed);
 
 	emit tps(tpsNr);
 }

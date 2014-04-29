@@ -54,7 +54,7 @@ void ManualTool::read3DCrossHairSlot(double toolTipOffset)
 	int s = 60;
 	mCrossHair->SetModelBounds(-s, s, -s, s, -s, s + toolTipOffset);
 	mCrossHair->SetFocalPoint(0, 0, toolTipOffset);
-	mCrossHair->Modified();
+	mCrossHair->Update();
 }
 
 /**Set tool position, use current time as timestamp
@@ -70,11 +70,6 @@ void ManualTool::set_prMt(const Transform3D& prMt, double timestamp)
 {
 	mTimestamp = timestamp;
 	ToolImpl::set_prMt(prMt, timestamp);
-}
-
-QString ManualTool::getGraphicsFileName() const
-{
-	return "";
 }
 
 std::set<Tool::Type> ManualTool::getTypes() const

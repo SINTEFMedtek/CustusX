@@ -1,6 +1,14 @@
 #include "cxUtilHelpers.h"
 #include <QStringList>
 
+#ifndef CX_WINDOWS
+#include <unistd.h>
+#endif
+
+#ifdef CX_WINDOWS
+#include <windows.h>
+#endif
+
 namespace cx
 {
 
@@ -37,6 +45,15 @@ QString changeExtension(QString name, QString ext)
 	}
 
 	return splitName.join(".");
+}
+
+void sleep_ms(int ms)
+{
+#ifndef CX_WINDOWS
+		usleep(ms*1000);
+#else
+		Sleep(ms);
+#endif
 }
 
 } // namespace cx

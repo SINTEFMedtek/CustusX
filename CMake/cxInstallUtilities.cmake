@@ -198,6 +198,13 @@ endif ()
 				FILE_PERMISSIONS ${CX_FULL_PERMISSIONS}
 				DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
 	endif()
+	
+	if(CX_USE_OPENCL_UTILITY)
+		install(FILES
+				${OpenCLUtilityLibrary_KERNELS_DIR}/HistogramPyramids.cl
+				${OpenCLUtilityLibrary_KERNELS_DIR}/HistogramPyramids.clh
+				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/)
+	endif()
 endfunction()
 
 ###############################################################################

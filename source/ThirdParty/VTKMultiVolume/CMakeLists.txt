@@ -11,7 +11,7 @@
 if(DEFINED CX_WINDOWS)
         option(CX_BUILD_MEHDI_VTKMULTIVOLUME "Build the multi volume renderer by Medhi" OFF)
 else()
-        option(CX_BUILD_MEHDI_VTKMULTIVOLUME "Build the multi volume renderer by Medhi" ON)
+        option(CX_BUILD_MEHDI_VTKMULTIVOLUME "Build the multi volume renderer by Medhi" OFF) # off until stable
 endif()
 
 if(CX_BUILD_MEHDI_VTKMULTIVOLUME)

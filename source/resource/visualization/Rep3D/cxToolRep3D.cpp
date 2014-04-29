@@ -97,6 +97,36 @@ ToolPtr ToolRep3D::getTool()
 	return mTool;
 }
 
+void ToolRep3D::updateToolActor()
+{
+	if (!mTool)
+	{
+		mToolActor->SetMapper(NULL);
+		return;
+	}
+
+	vtkPolyDataPtr model = mTool->getGraphicsPolyData();
+
+	if (model)
+	{
+		vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
+		normals->SetInputData(model);
+		mPolyDataMapper->SetInputConnection(normals->GetOutputPort());
+		mPolyDataMapper->Update();
+		mToolActor->SetMapper(mPolyDataMapper);
+	}
+
+	//some color to 3D cursor
+	mToolActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+	if (mTool->hasType(Tool::TOOL_MANUAL))
+	{
+		setColorAndOpacity(mToolActor->GetProperty(), mTooltipPointColor);
+	}
+
+	this->setModified();
+	mToolActor->SetVisibility(mTool->getVisible());
+}
+
 void ToolRep3D::setTool(ToolPtr tool)
 {
 	if (tool == mTool)
@@ -110,60 +140,23 @@ void ToolRep3D::setTool(ToolPtr tool)
 		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
 		disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));
 		disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChanged()));
-
-		mToolActor->SetMapper(NULL);
+		disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(updateToolActor()));
 	}
 
 	mTool = tool;
 
-	// setup new
 	if (mTool)
 	{
-		vtkPolyDataPtr model;
-
-		QString filename = mTool->getGraphicsFileName();
-		if (!filename.isEmpty() && filename.endsWith("STL"))
-		{
-			vtkSTLReaderPtr STLReader = vtkSTLReaderPtr::New();
-			STLReader->SetFileName(cstring_cast(filename));
-			STLReader->Update();
-			model = STLReader->GetOutput(); //read a 3D model file of the tool
-		}
-		else
-		{
-			model = mTool->getGraphicsPolyData(); // creates a cone, default
-		}
-
-		if (model)
-		{
-			vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
-			normals->SetInputData(model);
-			normals->Update();
-//			model = normals->GetOutput();
-//			mPolyDataMapper->SetInput(model);
-			mPolyDataMapper->SetInputConnection(normals->GetOutputPort());
-
-			mToolActor->SetMapper(mPolyDataMapper);
-		}
-
-		//some color to 3D cursor
-		mToolActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-		if (mTool->hasType(Tool::TOOL_MANUAL))
-		{
-			setColorAndOpacity(mToolActor->GetProperty(), mTooltipPointColor);
-//			mToolActor->GetProperty()->SetColor(mTooltipPointColor.begin());
-		}
-
-		this->setModified();
-		mToolActor->SetVisibility(mTool->getVisible());
-
 		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(setModified()));
 		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
 		connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));
 		connect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChanged()));
-
-        this->probeSectorChanged();
+		connect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(updateToolActor()));
 	}
+
+	this->updateToolActor();
+	this->setModified();
+	this->probeSectorChanged();
 }
 
 bool ToolRep3D::hasTool(ToolPtr tool) const

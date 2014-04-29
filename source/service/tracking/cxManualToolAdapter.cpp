@@ -39,32 +39,14 @@ void ManualToolAdapter::setBase(ToolPtr base)
 	disconnect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
 	mBase = base;
 	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
-}
 
-//Tool::Type ManualToolAdapter::getType() const
-//{
-//  return mBase->getType();
-//}
-
-QString ManualToolAdapter::getGraphicsFileName() const
-{
-	return mBase->getGraphicsFileName();
+	emit toolProbeSector();
 }
 
 vtkPolyDataPtr ManualToolAdapter::getGraphicsPolyData() const
 {
 	return mBase->getGraphicsPolyData();
 }
-
-//QString ManualToolAdapter::getUid() const
-//{
-//  return mBase->getUid();
-//}
-//
-//QString ManualToolAdapter::getName() const
-//{
-//  return mBase->getName();
-//}
 
 bool ManualToolAdapter::isCalibrated() const
 {

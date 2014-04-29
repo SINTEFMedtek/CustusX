@@ -98,20 +98,12 @@ public:
 	{
 		return this->getTypes().count(type);
 	}
-	/**\return a file containing a graphical description of the tool,
-	 * if any. The file format is given by the file extension, for example
-	 * usprobe_12L.stl for the SolidWorks format.
-	 * \sa getGraphicsPolyData().
-	 */
-	virtual QString getGraphicsFileName() const = 0;
-	/**Get a pointer to the tools graphical data in the form of vtkPolyData,
-	 * if any. Either getGraphicsPolyData() or getGraphicsFileName() or both
-	 * should return valid data. \sa getGraphicsFileName().
+	/**Get a pointer to the tools graphical data in the form of vtkPolyData.
 	 */
 	virtual vtkPolyDataPtr getGraphicsPolyData() const = 0;
 
-	//	/**Saves the tools internal buffers of transforms and timestamps to file.
-	//	 */
+	/**Saves the tools internal buffers of transforms and timestamps to file.
+	 */
 	virtual TimedTransformMapPtr getPositionHistory() = 0;
 
 	virtual bool getVisible() const = 0; ///< \return the visibility status of the tool

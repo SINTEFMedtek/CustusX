@@ -110,12 +110,6 @@ void DummyTool::setType(Tool::Type type)
 	mTypes.insert(type);
 }
 
-QString DummyTool::getGraphicsFileName() const
-{
-	//return "DummyToolsDoNotHaveAGraphicsFile";
-
-	return "DummyToolsDoNotHaveAGraphicsFile";
-}
 vtkPolyDataPtr DummyTool::getGraphicsPolyData() const
 {
 	return mPolyData;
