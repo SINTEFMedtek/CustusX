@@ -20,7 +20,7 @@
 namespace cx {
 
 /**
- * \defgroup cx_plugins Plugins
+ * \defgroup cx_modules Plugins
  * \ingroup cx_base
  *
  * \brief Plugins overview

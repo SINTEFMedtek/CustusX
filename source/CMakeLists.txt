@@ -31,7 +31,7 @@ add_subdirectory(ThirdParty)
 add_subdirectory(resource)
 add_subdirectory(service)
 add_subdirectory(logic)
-add_subdirectory(plugins)
+add_subdirectory(modules)
 add_subdirectory(gui)
 
 # Testing for CustusX

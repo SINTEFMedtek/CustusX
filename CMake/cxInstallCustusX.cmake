@@ -127,12 +127,12 @@ set(ALL_LIBRARY_DIRS
 	${CustusX3_BINARY_DIR}/source/service/video
 	${CustusX3_BINARY_DIR}/source/service/visualization
 
-	${CustusX3_BINARY_DIR}/source/plugins/Acquisition
-    ${CustusX3_BINARY_DIR}/source/plugins/Algorithm
-    ${CustusX3_BINARY_DIR}/source/plugins/Calibration
-    ${CustusX3_BINARY_DIR}/source/plugins/Registration
-    ${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction
-    ${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction
+	${CustusX3_BINARY_DIR}/source/modules/Acquisition
+    ${CustusX3_BINARY_DIR}/source/modules/Algorithm
+    ${CustusX3_BINARY_DIR}/source/modules/Calibration
+    ${CustusX3_BINARY_DIR}/source/modules/Registration
+    ${CustusX3_BINARY_DIR}/source/modules/UsReconstruction
+    ${CustusX3_BINARY_DIR}/source/modules/UsReconstruction/logic/3DReconstruction
 
     ${CustusX3_BINARY_DIR}/source/gui
     ${CustusX3_BINARY_DIR}/source/logic/

@@ -78,7 +78,7 @@ namespace cx
  * cx_resource ). Objects within the same layer can interact, but only according
  * to the rules of that layer.
  *
- * The \ref cx_plugins extends the core by adding specific functionality. Examples of
+ * The \ref cx_modules extends the core by adding specific functionality. Examples of
  * plugins are: Segmentation, Registration, Data Acquisition, 3D US
  * Reconstruction and Calibration. They can be added by people not necessarily
  * part of the core team, and can depend on other plugins. A plugin typically

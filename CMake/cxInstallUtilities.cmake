@@ -180,7 +180,7 @@ endif ()
 			PATTERN ${CONFIG_EXCLUDE_PATTERN} EXCLUDE)
 
 	# Install OpenCL kernels into bundle
-	install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction/TordReconstruct/kernels.cl
+	install(FILES ${CustusX3_SOURCE_DIR}/source/modules/UsReconstruction/logic/3DReconstruction/TordReconstruct/kernels.cl
 			DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/)
 
 	if(CX_USE_ISB_GE)
@@ -296,7 +296,7 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR INST
 	# collect all installations here. They will be used by fixup_bundle to collect dependencies.
 	# this is a sum of the input pattern (if any) and the qtplugins
 	set(INSTALL_LIBRARIES_PATTERN_LOCAL
-		${INSTALL_BINARY_DIR}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}
+		${INSTALL_BINARY_DIR}/modules/*${CMAKE_SHARED_LIBRARY_SUFFIX}
 		${INSTALL_LIBRARIES_PATTERN_LOCAL}
 		)
 
