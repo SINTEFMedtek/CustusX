@@ -17,12 +17,12 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/gui
     ${CustusX3_SOURCE_DIR}/source/gui/utilities
     ${CustusX3_SOURCE_DIR}/source/logic
-    ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
-    ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/gui
-    ${CustusX3_SOURCE_DIR}/source/plugins/Acquisition/gui
-    ${CustusX3_SOURCE_DIR}/source/plugins/Calibration/gui
-    ${CustusX3_SOURCE_DIR}/source/plugins/Algorithm/gui
-    ${CustusX3_SOURCE_DIR}/source/plugins/Registration/gui
+    ${CustusX3_SOURCE_DIR}/source/modules/PluginBase
+    ${CustusX3_SOURCE_DIR}/source/modules/UsReconstruction/gui
+    ${CustusX3_SOURCE_DIR}/source/modules/Acquisition/gui
+    ${CustusX3_SOURCE_DIR}/source/modules/Calibration/gui
+    ${CustusX3_SOURCE_DIR}/source/modules/Algorithm/gui
+    ${CustusX3_SOURCE_DIR}/source/modules/Registration/gui
     )
 
 #------------------------------------------------------------------------------

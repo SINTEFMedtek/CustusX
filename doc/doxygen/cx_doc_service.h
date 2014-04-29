@@ -32,7 +32,7 @@ namespace cx
  * the entire system.
  *
  * All services are created in the \ref cx_logic and are thus available to the
- * entire \ref cx_gui and all \ref cx_plugins from there.
+ * entire \ref cx_gui and all \ref cx_modules from there.
  *
  * Within the \ref cx_service, connection between services are limited. Each
  * service is initialized with a list of other services it has access to, refer

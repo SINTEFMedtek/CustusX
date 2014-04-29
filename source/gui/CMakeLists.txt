@@ -119,7 +119,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/state
     
     ${CustusX3_SOURCE_DIR}/source/logic
-    ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
+    ${CustusX3_SOURCE_DIR}/source/modules/PluginBase
     )
     
 set(CX_GUI_LIBRARIES cxLogicManager cxStateService cxResourceWidgets)

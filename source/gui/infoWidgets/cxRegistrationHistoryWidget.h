@@ -11,7 +11,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cx_plugin_registration
+ * \addtogroup cx_module_registration
  * @{
  */
 
