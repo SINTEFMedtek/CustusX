@@ -198,7 +198,6 @@ void MultiFileInputWidget::evaluateTextChanges()
 	{
 		mLastFilenames = current;
 		emit fileChanged();
-		qDebug() << "emit fileChanged()";
 	}
 }
 

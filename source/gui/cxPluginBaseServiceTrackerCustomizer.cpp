@@ -17,7 +17,7 @@ PluginBaseServiceTrackerCustomizer::~PluginBaseServiceTrackerCustomizer()
 
 PluginBase* PluginBaseServiceTrackerCustomizer::addingService(const ctkServiceReference &reference)
 {
-	std::cout << "adding service" << std::endl;
+//	std::cout << "adding service" << std::endl;
 	PluginBase* service = reference.getPlugin()->getPluginContext()->getService<PluginBase>(reference);
 	emit serviceAdded(service);
 	return service;
@@ -30,7 +30,7 @@ void PluginBaseServiceTrackerCustomizer::modifiedService(const ctkServiceReferen
 
 void PluginBaseServiceTrackerCustomizer::removedService(const ctkServiceReference &reference, PluginBase* service)
 {
-	std::cout << "removing service" << std::endl;
+//	std::cout << "removing service" << std::endl;
 	emit serviceRemoved(service);
 	reference.getPlugin()->getPluginContext()->ungetService(reference);
 }

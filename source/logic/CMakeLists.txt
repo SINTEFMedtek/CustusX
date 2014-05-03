@@ -19,6 +19,8 @@ SET (cxLogicManager_SOURCE
 	cxLegacySingletons.cpp
 	cxPluginFramework.h
 	cxPluginFramework.cpp
+	cxPluginFrameworkUtilities.h
+	cxPluginFrameworkUtilities.cpp
 )
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})

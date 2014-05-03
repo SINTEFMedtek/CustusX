@@ -43,6 +43,8 @@
 #include <ctkPluginContext.h>
 #include <iostream>
 
+#include "cxPluginFrameworkUtilities.h"
+
 namespace cx
 {
 
@@ -95,9 +97,9 @@ QVariant ctkPluginTableModel::data(const QModelIndex& index, int role) const
     else if (col == 2)
     {
     	if (plugin)
-    		return QVariant(getStringForState(plugin->getState()));
+    		return QVariant(getStringForctkPluginState(plugin->getState()));
     	else
-    		return getStringForState(ctkPlugin::UNINSTALLED);
+    		return getStringForctkPluginState(ctkPlugin::UNINSTALLED);
     }
   }
   else if (role == Qt::UserRole)
@@ -141,27 +143,6 @@ int ctkPluginTableModel::rowCount(const QModelIndex& parent) const
   Q_UNUSED(parent)
 
 		return mPlugins.size();
-}
-
-QString ctkPluginTableModel::getStringForState(const ctkPlugin::State state) const
-{
-  static const QString uninstalled("UNINSTALLED");
-  static const QString installed("INSTALLED");
-  static const QString resolved("RESOLVED");
-  static const QString starting("STARTING");
-  static const QString stopping("STOPPING");
-  static const QString active("ACTIVE");
-
-  switch(state)
-  {
-  case ctkPlugin::UNINSTALLED: return uninstalled;
-  case ctkPlugin::INSTALLED: return installed;
-  case ctkPlugin::RESOLVED: return resolved;
-  case ctkPlugin::STARTING: return starting;
-  case ctkPlugin::STOPPING: return stopping;
-  case ctkPlugin::ACTIVE: return active;
-  default: return QString("unknown");
-  }
 }
 
 void ctkPluginTableModel::pluginChanged(const ctkPluginEvent& event)

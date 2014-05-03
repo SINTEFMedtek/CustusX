@@ -15,6 +15,25 @@ namespace cx
 {
 
 
+void convertQtMessagesToCxMessages(QtMsgType type, const char *msg)
+{
+	switch (type)
+	{
+	case QtDebugMsg:
+		reportDebug(QString(msg));
+		break;
+	case QtWarningMsg:
+		reportWarning(QString(msg));
+		break;
+	case QtCriticalMsg:
+		reportError(QString(msg));
+		break;
+	case QtFatalMsg:
+		reportError(QString(msg));
+		//abort(); here we hope for the best instead of aborting...
+	}
+}
+
 Message::Message(QString text, MESSAGE_LEVEL messageLevel, int timeoutTime, QString sourceLocation) :
   mText(text),
   mMessageLevel(messageLevel),
@@ -172,6 +191,7 @@ Reporter* reporter() { return Reporter::getInstance(); }
 Reporter::Reporter() :
 	mEnabled(false)
 {
+  qInstallMsgHandler(convertQtMessagesToCxMessages);
   qRegisterMetaType<Message>("Message");
 }
 
