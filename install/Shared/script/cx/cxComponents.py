@@ -188,6 +188,34 @@ class VTK(CppComponent):
         builder.configureCMake()
 # ---------------------------------------------------------
 
+class CTK(CppComponent):
+    def name(self):
+        return "CTK"
+    def help(self):
+        return 'commontk.org'
+    def path(self):
+        return self.controlData.getExternalPath() + "/CTK"
+#    def buildFolder(self):
+#        return "%s/CTK-build" % self.controlData.getBuildFolder()
+#    def configPath(self):
+#        return self.buildPath() + "/CTK-build/"
+    def getBuildType(self):
+        return self.controlData.getBuildExternalsType()
+    def _rawCheckout(self):
+        self._getBuilder().gitClone('git@github.com:commontk/CTK')
+    def update(self):
+        latestTestedSHA = '3fe3cdbe9d0ef95b3810a12484f035ae1f66524c'
+        self._getBuilder().gitCheckout(latestTestedSHA)
+    def configure(self):
+        builder = self._getBuilder()
+        add = builder.addCMakeOption
+        add('CTK_ENABLE_DICOM:BOOL', True)
+        add('CTK_LIB_DICOM/Widgets:BOOL', True)
+        add('CTK_ENABLE_PluginFramework:BOOL', True)
+        add('CTK_BUILD_SHARED_LIBS:BOOL', self.controlData.getBuildShared())
+        builder.configureCMake()
+# ---------------------------------------------------------
+
 class OpenCV(CppComponent):
     def name(self):
         return "OpenCV"
@@ -332,6 +360,7 @@ class CustusX3(CppComponent):
         add('IGSTK_DIR:PATH', self._createSibling(IGSTK).configPath())
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
         add('OpenCV_DIR:PATH', self._createSibling(OpenCV).configPath())
+        add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
         add('ULTERIUS_INCLUDE_DIR:PATH', self._createSibling(UltrasonixSDK).includePath())
         add('ULTERIUS_LIBRARY:FILEPATH', self._createSibling(UltrasonixSDK).libFile())
         add('ULTERIUS_BIN_DIR:FILEPATH', self._createSibling(UltrasonixSDK).binDir())

@@ -14,8 +14,11 @@ class QWidget;
 class QToolBar;
 #include <vector>
 
-namespace cx
-{
+#define PluginBase_iid "PluginBase"
+//#define PluginBase_iid "org.custusx.service.PluginBase"
+
+//namespace cx
+//{
 typedef boost::shared_ptr<class PluginBase> PluginBasePtr;
 
 /** Interface for plugins.
@@ -23,6 +26,7 @@ typedef boost::shared_ptr<class PluginBase> PluginBasePtr;
  */
 class PluginBase : public QObject
 {
+	Q_OBJECT
 public:
 	struct PluginWidget
 	{
@@ -40,6 +44,10 @@ public:
 //	virtual void parseXml(QDomNode& dataNode);
 };
 
-}
+//} // namespace cx
+//using cx::PluginBase;
+//Q_DECLARE_INTERFACE(cx::PluginBase, PluginBase_iid)
+Q_DECLARE_INTERFACE(PluginBase, PluginBase_iid)
+
 
 #endif /* CXPLUGINBASE_H_ */
