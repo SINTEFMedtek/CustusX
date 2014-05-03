@@ -2,6 +2,7 @@
 ##               Plugins
 ###########################################################
 
+add_subdirectory(PluginBase)
 add_subdirectory(Calibration)
 add_subdirectory(Algorithm)
 add_subdirectory(UsReconstruction)

@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 
   cx::LogicManager::initialize();
 
-	std::vector<cx::PluginBasePtr> plugins;
+	std::vector<PluginBasePtr> plugins;
 
 	cx::UsReconstructionPluginPtr reconstructionPlugin(new cx::UsReconstructionPlugin());
 	plugins.push_back(reconstructionPlugin);

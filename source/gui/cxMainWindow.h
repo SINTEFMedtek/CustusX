@@ -7,6 +7,7 @@
 #include "boost/shared_ptr.hpp"
 #include "cxPluginBase.h"
 #include <QPointer>
+#include "ctkServiceTracker.h"
 
 class QAction;
 class QMenu;
@@ -15,6 +16,9 @@ class QActionGroup;
 namespace cx
 {
 class ConsoleWidget;
+typedef ctkServiceTracker<PluginBase*> PluginBaseServiceTracker;
+typedef boost::shared_ptr<PluginBaseServiceTracker> PluginBaseServiceTrackerPtr;
+typedef boost::shared_ptr<class PluginBaseServiceTrackerCustomizer> PluginBaseServiceTrackerCustomizerPtr;
 }
 
 namespace cx
@@ -99,6 +103,9 @@ protected slots:
 
 	void startupLoadPatient();
 
+    void onPluginBaseAdded(PluginBase* service);
+    void onPluginBaseRemoved(PluginBase* service);
+
 protected:
 	void changeEvent(QEvent * event);
 
@@ -111,9 +118,12 @@ private:
 	void createMenus(); ///< creates and add (gui-)menues
 	void createToolBars(); ///< creates and adds toolbars for convenience
 
-	void addAsDockWidget(QWidget* widget, QString groupname = "");
+	QWidget* addAsDockWidget(QWidget* widget, QString groupname = "");
 	void registerToolBar(QToolBar* toolbar, QString groupname = "");
 	void addToWidgetGroupMap(QAction* action, QString groupname);
+	void addPlugin(PluginBase* service);
+	void removePlugin(PluginBase* service);
+	void setupPlugins();
 
 	void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
 
@@ -181,6 +191,10 @@ private:
 	std::map<QString, QActionGroup*> mWidgetGroupsMap; ///< map containing groups
 
 	QString mLastImportDataFolder;
+
+	PluginBaseServiceTrackerPtr mPluginBaseServiceTracker;
+	PluginBaseServiceTrackerCustomizerPtr mPluginBaseServiceTrackerCustomizer;
+	std::map<PluginBase*, std::vector<QWidget*> > mWidgetsByPlugin;
 
 	//widgets
 	QPointer<class SecondaryMainWindow> mControlPanel;

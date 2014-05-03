@@ -116,7 +116,7 @@ include_directories(
 	${CustusX3_SOURCE_DIR}/source/gui/dataWidgets
 	)
 
-set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui)
+set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui cxPluginBase)
 
 if (CX_USE_TSF)
     set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} tubeSegmentationLib)

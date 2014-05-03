@@ -260,6 +260,15 @@ macro(cx_initialize_IGSTK)
 endmacro()
 
 ###############################################################################
+# Initialize CTK library
+# Find the package and run the include USE file.
+###############################################################################
+macro(cx_initialize_CTK)
+    find_package(CTK REQUIRED)
+    include(${CTK_USE_FILE})
+endmacro()
+
+###############################################################################
 # Initialize Code coverage
 #
 # Add option SSC_USE_GCOV and generate variable SSC_GCOV_LIBRARY containing

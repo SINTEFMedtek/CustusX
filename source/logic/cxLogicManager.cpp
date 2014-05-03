@@ -25,6 +25,7 @@
 #include "cxStateServiceBackend.h"
 #include "cxTypeConversions.h"
 #include "cxSharedPointerChecker.h"
+#include "cxPluginFramework.h"
 
 namespace cx
 {
@@ -239,7 +240,12 @@ void LogicManager::createStateService()
 	LegacySingletons::mStateService = mStateService;
 }
 
+void LogicManager::createPluginFramework()
+{
+	mPluginFramework = PluginFrameworkManager::create();
+	mPluginFramework->start();
 
+}
 
 DataFactoryPtr LogicManager::getDataFactory()
 {
@@ -297,6 +303,13 @@ SpaceProviderPtr LogicManager::getSpaceProvider()
 	return mSpaceProvider;
 }
 
+PluginFrameworkManagerPtr LogicManager::getPluginFramework()
+{
+	if (!mPluginFramework)
+		this->createPluginFramework();
+	return mPluginFramework;
+}
+
 //void LogicManager::resetService(mStateService)
 //{
 
@@ -314,6 +327,8 @@ void LogicManager::shutdownServices()
 //	this->resetService(mDataFactory);
 //	this->resetService(mPatientService);
 //	this->resetService(mTrackingService);
+
+	this->shutdownPluginFramework();
 
 	this->shutdownStateService();
 	this->shutdownVisualizationService();
@@ -392,6 +407,14 @@ void LogicManager::shutdownTrackingService()
 	requireUnique(mTrackingService, "TrackingService");
 	mTrackingService.reset();
 }
+
+void LogicManager::shutdownPluginFramework()
+{
+	requireUnique(mPluginFramework, "PluginFramework");
+	mPluginFramework.reset();
+}
+
+
 
 LogicManager* LogicManager::getInstance()
 {

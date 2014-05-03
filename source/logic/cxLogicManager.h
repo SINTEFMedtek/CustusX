@@ -21,6 +21,8 @@ namespace cx
 * @{
 */
 
+typedef boost::shared_ptr<class PluginFrameworkManager> PluginFrameworkManagerPtr;
+
 //typedef class ToolManager TrackingService;
 //typedef class ViewManager VisualizationService;
 
@@ -59,6 +61,8 @@ public:
 	*/
   static void shutdown();
 
+  PluginFrameworkManagerPtr getPluginFramework();
+
 //  SpaceProviderPtr getSpaceProvider();
   DataFactoryPtr getDataFactory();
   DataServicePtr getDataService();
@@ -90,6 +94,7 @@ private:
   void createVideoService();
   void createVisualizationService();
   void createStateService();
+  void createPluginFramework();
 
   void createInterconnectedDataAndSpace();
 
@@ -99,6 +104,7 @@ private:
   void shutdownPatientService();
   void shutdownInterconnectedDataAndSpace();
   void shutdownTrackingService();
+  void shutdownPluginFramework();
 
   static LogicManager* mInstance;
   static void setInstance(LogicManager* instance);
@@ -121,6 +127,8 @@ private:
 	VisualizationServicePtr mVisualizationService;
 	StateServicePtr mStateService;
 	DataManagerImplPtr mDataService;
+
+	PluginFrameworkManagerPtr mPluginFramework;
 };
 
 LogicManager* logicManager(); // if necessary
