@@ -61,6 +61,7 @@ public:
 	QStringList getSearchPaths() const;
 	QStringList getPluginSymbolicNames();
 	QSharedPointer<ctkPlugin> getInstalledPluginFromSymbolicName(QString symbolicName);
+	ctkPlugin::State getStateFromSymbolicName(QString name);
 
 signals:
 	void pluginPoolChanged();
@@ -80,6 +81,7 @@ private:
 
 	void loadState();
 	void saveState();
+	void loadPluginFromStoredState(QString symbolicName, QString storedState);
 
 	QStringList mPluginSearchPaths;
 	QStringList mPluginLibFilter;

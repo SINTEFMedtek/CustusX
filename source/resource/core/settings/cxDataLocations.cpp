@@ -84,6 +84,18 @@ QString DataLocations::getBundlePath()
 #endif
 }
 
+QString DataLocations::getDefaultPluginsPath()
+{
+	QString bundlePath = DataLocations::getBundlePath();
+
+	QString buildLocation = bundlePath + "/../../plugins";
+	if (QFile(buildLocation).exists())
+		return buildLocation;
+
+	QString installLocation = bundlePath + "/plugins";
+	return installLocation;
+}
+
 QString DataLocations::getRootConfigPath()
 {
   QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED; // look for installed location

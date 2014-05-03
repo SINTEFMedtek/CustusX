@@ -29,6 +29,8 @@
 
 #include "cxSettings.h"
 #include "cxDataLocations.h"
+#include "cxPluginFrameworkUtilities.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -55,16 +57,61 @@ PluginFrameworkManager::~PluginFrameworkManager()
 
 void PluginFrameworkManager::loadState()
 {
-	QStringList paths = settings()->value(mSettingsSearchPaths).toStringList();
+	QStringList defPaths(DataLocations::getDefaultPluginsPath());
+	qDebug() << "defPaths: " << defPaths;
+	QStringList paths = settings()->value(mSettingsSearchPaths, defPaths).toStringList();
+	qDebug() << "paths: " << paths;
 	if (!paths.isEmpty())
 		this->setSearchPaths(paths);
+
+	QStringList names = this->getPluginSymbolicNames();
+	for (unsigned i=0; i<names.size(); ++i)
+	{
+		QString name = names[i];
+		QString storedState = settings()->value(mSettingsBase+"/"+name).toString();
+		this->loadPluginFromStoredState(name, storedState);
+	}
+}
+
+void PluginFrameworkManager::loadPluginFromStoredState(QString symbolicName, QString storedState)
+{
+	if (storedState.isEmpty())
+	{
+		report(QString("Detected new plugin [%1], autostarting...").arg(symbolicName));
+		storedState = getStringForctkPluginState(ctkPlugin::ACTIVE);
+	}
+
+	ctkPlugin::State state = getctkPluginStateForString(storedState);
+
+	if (state==ctkPlugin::UNINSTALLED)
+		return;
+
+	if (state==ctkPlugin::ACTIVE)
+		this->start(symbolicName, ctkPlugin::START_TRANSIENT);
+	else
+		this->install(symbolicName);
 }
 
 void PluginFrameworkManager::saveState()
 {
 	settings()->setValue(mSettingsSearchPaths, this->getSearchPaths());
 
+	QStringList names = this->getPluginSymbolicNames();
+	for (unsigned i=0; i<names.size(); ++i)
+	{
+		QString name = names[i];
+		ctkPlugin::State state = this->getStateFromSymbolicName(name);
+		settings()->setValue(mSettingsBase+"/"+name, getStringForctkPluginState(state));
+	}
+}
 
+ctkPlugin::State PluginFrameworkManager::getStateFromSymbolicName(QString name)
+{
+	ctkPlugin::State state = ctkPlugin::UNINSTALLED;
+	QSharedPointer<ctkPlugin> plugin = this->getInstalledPluginFromSymbolicName(name);
+	if (plugin)
+		state = plugin->getState();
+	return state;
 }
 
 void PluginFrameworkManager::addSearchPath(const QString& searchPath)

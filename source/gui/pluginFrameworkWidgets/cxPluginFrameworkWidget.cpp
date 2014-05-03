@@ -19,6 +19,7 @@
 namespace cx
 {
 
+
 PluginFrameworkWidget::PluginFrameworkWidget(QWidget* parent) :
     BaseWidget(parent, "PluginFrameworkWidget", "Plugin Framework"),
     mVerticalLayout(new QVBoxLayout(this))

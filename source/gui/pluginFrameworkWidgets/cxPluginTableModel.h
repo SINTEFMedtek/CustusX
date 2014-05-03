@@ -71,9 +71,6 @@ protected Q_SLOTS:
   void resetAll();
 
 private:
-
-  QString getStringForState(const ctkPlugin::State state) const;
-
 	std::map<QString, ctkPluginPtr> mPlugins;
   PluginFrameworkManagerPtr mFramework;
 };
