@@ -48,6 +48,7 @@ endmacro()
 #> Create a list of available plug-ins and make them known to the build system
 set(CX_PLUGINS
   plugins/org.custusx.dicom:ON
+  plugins/org.custusx.example:ON
 )
 
 ctkMacroSetupPlugins(${CX_PLUGINS})
