@@ -5,7 +5,7 @@
  *      \author christiana
  */
 
-#include "cxPluginBase.h"
+#include "cxGUIExtenderService.h"
 
 namespace cx
 {

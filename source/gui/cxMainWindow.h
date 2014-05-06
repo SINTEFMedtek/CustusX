@@ -5,7 +5,7 @@
 #include <map>
 #include <set>
 #include "boost/shared_ptr.hpp"
-#include "cxPluginBase.h"
+#include "cxGUIExtenderService.h"
 #include <QPointer>
 #include "ctkServiceTracker.h"
 
@@ -16,9 +16,9 @@ class QActionGroup;
 namespace cx
 {
 class ConsoleWidget;
-typedef ctkServiceTracker<PluginBase*> PluginBaseServiceTracker;
-typedef boost::shared_ptr<PluginBaseServiceTracker> PluginBaseServiceTrackerPtr;
-typedef boost::shared_ptr<class PluginBaseServiceTrackerCustomizer> PluginBaseServiceTrackerCustomizerPtr;
+typedef ctkServiceTracker<GUIExtenderService*> GUIExtenderServiceTracker;
+typedef boost::shared_ptr<GUIExtenderServiceTracker> GUIExtenderServiceTrackerPtr;
+typedef boost::shared_ptr<class GUIExtenderServiceTrackerCustomizer> GUIExtenderServiceTrackerCustomizerPtr;
 }
 
 namespace cx
@@ -43,7 +43,7 @@ class MainWindow: public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWindow(std::vector<PluginBasePtr> plugins);
+	MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders);
 	virtual ~MainWindow();
 
 	virtual QMenu* createPopupMenu();
@@ -103,8 +103,8 @@ protected slots:
 
 	void startupLoadPatient();
 
-    void onPluginBaseAdded(PluginBase* service);
-    void onPluginBaseRemoved(PluginBase* service);
+    void onPluginBaseAdded(GUIExtenderService* service);
+    void onPluginBaseRemoved(GUIExtenderService* service);
 
 protected:
 	void changeEvent(QEvent * event);
@@ -121,9 +121,9 @@ private:
 	QWidget* addAsDockWidget(QWidget* widget, QString groupname = "");
 	void registerToolBar(QToolBar* toolbar, QString groupname = "");
 	void addToWidgetGroupMap(QAction* action, QString groupname);
-	void addPlugin(PluginBase* service);
-	void removePlugin(PluginBase* service);
-	void setupPlugins();
+	void addGUIExtender(GUIExtenderService* service);
+	void removeGUIExtender(GUIExtenderService* service);
+	void setupGUIExtenders();
 
 	void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
 
@@ -192,9 +192,9 @@ private:
 
 	QString mLastImportDataFolder;
 
-	PluginBaseServiceTrackerPtr mPluginBaseServiceTracker;
-	PluginBaseServiceTrackerCustomizerPtr mPluginBaseServiceTrackerCustomizer;
-	std::map<PluginBase*, std::vector<QWidget*> > mWidgetsByPlugin;
+	GUIExtenderServiceTrackerPtr mPluginBaseServiceTracker;
+	GUIExtenderServiceTrackerCustomizerPtr mPluginBaseServiceTrackerCustomizer;
+	std::map<GUIExtenderService*, std::vector<QWidget*> > mWidgetsByPlugin;
 
 	//widgets
 	QPointer<class SecondaryMainWindow> mControlPanel;

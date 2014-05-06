@@ -43,6 +43,8 @@ PluginFrameworkManager::PluginFrameworkManager()
 	ctkProperties fwProps;
 	QString storagePath = DataLocations::getSettingsPath() + "/pluginFramework";
 	fwProps[ctkPluginConstants::FRAMEWORK_STORAGE] = storagePath;
+
+	// uncomment to clear settings stored by ctk
 	//	  fwProps[ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN] = ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT;
 
 	mFrameworkFactory.reset(new ctkPluginFrameworkFactory(fwProps));
@@ -217,23 +219,23 @@ bool PluginFrameworkManager::start()
 bool PluginFrameworkManager::stop()
 {
 	ctkPluginContext* pc = this->getPluginContext();
-    // stop the framework
-    QSharedPointer<ctkPluginFramework> fw = qSharedPointerCast<ctkPluginFramework>(pc->getPlugin(0));
-    try
-    {
-      fw->stop();
-      ctkPluginFrameworkEvent fe = fw->waitForStop(5000);
-      if (fe.getType() == ctkPluginFrameworkEvent::FRAMEWORK_WAIT_TIMEDOUT)
-      {
-        qWarning() << "Stopping the plugin framework timed out";
-        return false;
-      }
-    }
-    catch (const ctkRuntimeException& e)
-    {
-      qWarning() << "Stopping the plugin framework failed: " << e;
-      return false;
-    }
+	// stop the framework
+	QSharedPointer<ctkPluginFramework> fw = qSharedPointerCast<ctkPluginFramework>(pc->getPlugin(0));
+	try
+	{
+		fw->stop();
+		ctkPluginFrameworkEvent fe = fw->waitForStop(5000);
+		if (fe.getType() == ctkPluginFrameworkEvent::FRAMEWORK_WAIT_TIMEDOUT)
+		{
+			reportWarning("Stopping the plugin framework timed out");
+			return false;
+		}
+	}
+	catch (const ctkRuntimeException& e)
+	{
+		reportWarning(QString("Stopping the plugin framework failed: %1").arg(e.what()));
+		return false;
+	}
 
 	return !this->frameworkStarted();
 }
@@ -251,7 +253,7 @@ void PluginFrameworkManager::uninstall(const QString& symbolicName)
 	}
 	catch (const ctkPluginException& exc)
 	{
-		qWarning() << "Failed to uninstall plugin:" << symbolicName << ", " << exc;
+		reportWarning(QString("Failed to uninstall plugin: %1, %2").arg(symbolicName).arg(exc.what()));
 		return;
 	}
 
@@ -273,7 +275,7 @@ bool PluginFrameworkManager::start(const QString& symbolicName, ctkPlugin::Start
 	}
 	catch (const ctkPluginException& exc)
 	{
-		qWarning() << "Failed to start plugin:" << symbolicName << ", " << exc;
+		reportWarning(QString("Failed to start plugin: %1, %2").arg(symbolicName).arg(exc.what()));
 		return false;
 	}
 
@@ -292,7 +294,7 @@ bool PluginFrameworkManager::stop(const QString& symbolicName, ctkPlugin::StopOp
 
 	if (!plugin)
 	{
-		qWarning() << "Plug-in" << symbolicName << "not found";
+		reportWarning(QString("Plugin: %1 not found").arg(symbolicName));
 		return false;
 	}
 
@@ -302,7 +304,7 @@ bool PluginFrameworkManager::stop(const QString& symbolicName, ctkPlugin::StopOp
 	}
 	catch (const ctkPluginException& exc)
 	{
-		qWarning() << "Failed to stop plug-in:" << exc;
+		reportWarning(QString("Failed to stop plugin %1: ").arg(symbolicName).arg(exc.what()));
 		return false;
 	}
 
@@ -380,11 +382,22 @@ QStringList PluginFrameworkManager::getPluginSymbolicNames(const QString& search
 		if (fileBaseName.startsWith("lib"))
 			fileBaseName = fileBaseName.mid(3);
 		QString name = fileBaseName.replace("_", ".");
-		if (name.contains(".")) // heuristic check for plugin-ish name
+		if (this->nameIsProbablyPlugin(name))
 			result << name;
 	}
 
 	return result;
+}
+
+bool PluginFrameworkManager::nameIsProbablyPlugin(QString name) const
+{
+	// heuristic check for plugin-ish name
+	if (!name.contains("."))
+		return false;
+	if (name.contains("cxtest"))
+		return false;
+	return true;
+
 }
 
 } /* namespace cx */
