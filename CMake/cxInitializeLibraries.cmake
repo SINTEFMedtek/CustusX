@@ -213,6 +213,7 @@ endmacro()
 ###############################################################################
 macro(cx_initialize_QT)
     set(QT_USE_QTXML TRUE)
+    set(QT_USE_QTSQL TRUE)
     set(QT_USE_QTTEST TRUE)
     set(QT_USE_QTNETWORK 1)
     find_package(Qt4 REQUIRED)

@@ -58,9 +58,7 @@ PluginFrameworkManager::~PluginFrameworkManager()
 void PluginFrameworkManager::loadState()
 {
 	QStringList defPaths(DataLocations::getDefaultPluginsPath());
-	qDebug() << "defPaths: " << defPaths;
 	QStringList paths = settings()->value(mSettingsSearchPaths, defPaths).toStringList();
-	qDebug() << "paths: " << paths;
 	if (!paths.isEmpty())
 		this->setSearchPaths(paths);
 

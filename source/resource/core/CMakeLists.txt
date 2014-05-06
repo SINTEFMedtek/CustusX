@@ -187,6 +187,7 @@ vtkIOLegacy
 vtkIOVideo
 vtkImagingStatistics
 vtkImagingColor
+vtkImagingMath
 vtkFiltersCore
 vtkFiltersGeneral
 vtkFiltersSources
