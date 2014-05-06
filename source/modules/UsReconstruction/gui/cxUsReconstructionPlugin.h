@@ -8,7 +8,7 @@
 #ifndef CXUSRECONSTRUCTIONPLUGIN_H_
 #define CXUSRECONSTRUCTIONPLUGIN_H_
 
-#include "cxPluginBase.h"
+#include "cxGUIExtenderService.h"
 
 namespace cx
 {
@@ -33,7 +33,7 @@ namespace cx
  * @{
  */
 
-class UsReconstructionPlugin : public PluginBase
+class UsReconstructionPlugin : public GUIExtenderService
 {
 	Q_OBJECT
 public:
@@ -41,7 +41,7 @@ public:
 	virtual ~UsReconstructionPlugin();
 
   ReconstructManagerPtr getReconstructer() { return mReconstructer; }
-  std::vector<PluginWidget> createWidgets() const;
+  std::vector<CategorizedWidget> createWidgets() const;
 
 private:
   ReconstructManagerPtr mReconstructer;

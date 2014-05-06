@@ -12,17 +12,34 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXPLUGINFRAMEWORKUTILITIES_H_
-#define CXPLUGINFRAMEWORKUTILITIES_H_
-
-#include <ctkPlugin.h>
+#include "cxDicomGUIExtenderService.h"
+#include <QLabel>
+#include "cxDicomWidget.h"
+#include <QResource>
 
 namespace cx
 {
 
 
-QString getStringForctkPluginState(const ctkPlugin::State state);
-ctkPlugin::State getctkPluginStateForString(QString text);
+DicomGUIExtenderService::DicomGUIExtenderService()
+{
+	QResource::registerResource("./Resources/ctkDICOM.qrc");
+}
+
+DicomGUIExtenderService::~DicomGUIExtenderService()
+{
+}
+
+std::vector<GUIExtenderService::CategorizedWidget> DicomGUIExtenderService::createWidgets() const
+{
+	std::vector<CategorizedWidget> retval;
+
+	retval.push_back(GUIExtenderService::CategorizedWidget(
+			new DicomWidget(),
+			"Plugins"));
+
+	return retval;
+}
+
 
 } /* namespace cx */
-#endif /* CXPLUGINFRAMEWORKUTILITIES_H_ */

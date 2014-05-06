@@ -74,7 +74,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/modules/UsReconstruction/logic/3DReconstruction
     ${CustusX3_SOURCE_DIR}/source/modules/Algorithm/logic
     ${CustusX3_SOURCE_DIR}/source/modules/Algorithm/gui
-    ${CustusX3_SOURCE_DIR}/source/modules/PluginBase
+    ${CustusX3_SOURCE_DIR}/source/modules/GUIExtender
 
     ${CustusX3_SOURCE_DIR}/source/algorithms
     ${CustusX3_SOURCE_DIR}/source/gui/utilities

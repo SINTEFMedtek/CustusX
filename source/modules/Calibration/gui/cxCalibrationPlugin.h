@@ -8,7 +8,7 @@
 #ifndef CXCALIBRATIONPLUGIN_H_
 #define CXCALIBRATIONPLUGIN_H_
 
-#include "cxPluginBase.h"
+#include "cxGUIExtenderService.h"
 
 /**
  * \defgroup cx_module_calibration Calibration Plugin
@@ -31,10 +31,10 @@ typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
  * @{
  */
 
-/**Rewrite to be a descendant of PluginBase, with generic API for creating plugins...
+/**
  *
  */
-class CalibrationPlugin : public PluginBase
+class CalibrationPlugin : public GUIExtenderService
 {
 	Q_OBJECT
 public:
@@ -42,7 +42,7 @@ public:
 	virtual ~CalibrationPlugin();
 
 //  AcquisitionDataPtr getAcquisitionData() { return mAcquisitionData; }
-	virtual std::vector<PluginWidget> createWidgets() const;
+	virtual std::vector<CategorizedWidget> createWidgets() const;
 
 signals:
 

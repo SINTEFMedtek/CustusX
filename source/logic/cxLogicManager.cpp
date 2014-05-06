@@ -310,11 +310,6 @@ PluginFrameworkManagerPtr LogicManager::getPluginFramework()
 	return mPluginFramework;
 }
 
-//void LogicManager::resetService(mStateService)
-//{
-
-//}
-
 void LogicManager::shutdownServices()
 {
 	// gui layer
@@ -433,10 +428,5 @@ LogicManager::~LogicManager()
 {
 
 }
-
-//SpaceProviderPtr LogicManager::getSpaceProvider()
-//{
-//	return mSpaceProvider;
-//}
 
 }

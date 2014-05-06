@@ -69,6 +69,7 @@ signals:
 private:
 	QString getPluginPath(const QString& symbolicName);
 	QStringList getPluginSymbolicNames(const QString& searchPath);
+	bool nameIsProbablyPlugin(QString name) const;
 
 	QScopedPointer<ctkPluginFrameworkFactory> mFrameworkFactory;
 	QSharedPointer<ctkPluginFramework> mFramework;

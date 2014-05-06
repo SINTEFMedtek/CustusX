@@ -77,7 +77,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	cxSecondaryMainWindow
 	cxSecondaryViewLayoutWindow
 	cxLayoutInteractor
-	cxPluginBaseServiceTrackerCustomizer
+	cxGUIExtenderServiceTrackerCustomizer
     #----------------------
 )
 
@@ -125,7 +125,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/state
     
     ${CustusX3_SOURCE_DIR}/source/logic
-    ${CustusX3_SOURCE_DIR}/source/modules/PluginBase
+    ${CustusX3_SOURCE_DIR}/source/modules/GUIExtender
     )
     
 set(CX_GUI_LIBRARIES cxLogicManager cxStateService cxResourceWidgets)

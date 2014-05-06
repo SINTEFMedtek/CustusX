@@ -110,13 +110,13 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/visualization
 	${CustusX3_SOURCE_DIR}/source/logic
 
-    ${CustusX3_SOURCE_DIR}/source/modules/PluginBase
+    ${CustusX3_SOURCE_DIR}/source/modules/GUIExtender
     ${CustusX3_SOURCE_DIR}/source/gui/utilities
     ${CustusX3_SOURCE_DIR}/source/gui/dataAdapters
 	${CustusX3_SOURCE_DIR}/source/gui/dataWidgets
 	)
 
-set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui cxPluginBase)
+set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui cxGUIExtenderService)
 
 if (CX_USE_TSF)
     set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} tubeSegmentationLib)

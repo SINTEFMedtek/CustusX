@@ -12,45 +12,36 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXDICOMWIDGET_H_
-#define CXDICOMWIDGET_H_
+#ifndef CXDICOMGUIEXTENDERSERVICE_H_
+#define CXDICOMGUIEXTENDERSERVICE_H_
 
-#include "cxBaseWidget.h"
-class ctkDICOMBrowser;
+#include "cxGUIExtenderService.h"
+#include "org_custusx_dicom_Export.h"
 
 namespace cx
 {
 
 /**
- * Widget for dicom interaction
+ * Implementation of Dicom service.
  *
  * \ingroup org_custusx_dicom
  *
- * \date 2014-05-02
+ * \date 2014-04-01
  * \author Christian Askeland
  */
-class DicomWidget : public BaseWidget
+class org_custusx_dicom_EXPORT DicomGUIExtenderService : public GUIExtenderService
 {
-	Q_OBJECT
+	Q_INTERFACES(cx::GUIExtenderService)
 public:
-	DicomWidget(QWidget* parent = 0);
-	virtual ~DicomWidget();
+	DicomGUIExtenderService();
+	virtual ~DicomGUIExtenderService();
 
-	virtual QString defaultWhatsThis() const;
+	std::vector<CategorizedWidget> createWidgets() const;
 
-private slots:
-	void onViewHeader();
-	void onImportIntoCustusXAction();
-private:
-	QVBoxLayout*  mVerticalLayout; ///< vertical layout is used
-	ctkDICOMBrowser* mBrowser;
-
-	QAction* mViewHeaderAction;
-	QAction* mImportIntoCustusXAction;
-	void setupDatabaseDirectory();
-	void importSeries(QString seriesUid);
 };
+typedef boost::shared_ptr<DicomGUIExtenderService> DicomGUIExtenderServicePtr;
 
 } /* namespace cx */
 
-#endif /* CXDICOMWIDGET_H_ */
+#endif /* CXDICOMGUIEXTENDERSERVICE_H_ */
+

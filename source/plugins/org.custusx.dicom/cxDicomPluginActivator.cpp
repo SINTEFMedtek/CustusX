@@ -1,28 +1,32 @@
-/*
- * DicomPluginActivator.cpp
- *
- *  Created on: Apr 15, 2014
- *      Author: christiana
- */
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
 
 #include "cxDicomPluginActivator.h"
 
 #include <QtPlugin>
 #include <iostream>
 
-#include "cxDicomPlugin.h"
-
-//DicomPluginActivator* DicomPluginActivator::instance = 0;
+#include "cxDicomGUIExtenderService.h"
+#include "cxReporter.h"
 
 namespace cx
 {
 
 DicomPluginActivator::DicomPluginActivator()
-  : context(0)
+	: mContext(0)
 {
-//	int* val = 0;
-//	*val = 0;
-	std::cout << "Created DicomPluginActivator" << std::endl;
+//	std::cout << "Created DicomPluginActivator" << std::endl;
 }
 
 DicomPluginActivator::~DicomPluginActivator()
@@ -32,48 +36,32 @@ DicomPluginActivator::~DicomPluginActivator()
 
 void DicomPluginActivator::start(ctkPluginContext* context)
 {
-	std::cout << "Started DicomPluginActivator" << std::endl;
-//  instance = this;
-  this->context = context;
+	//	std::cout << "Started DicomPluginActivator" << std::endl;
+	this->mContext = context;
 
-  mDicomPlugin.reset(new DicomPlugin);
-  std::cout << "created dicomplugin service" << std::endl;
-  try
-  {
-	  context->registerService(QStringList(PluginBase_iid), mDicomPlugin.get());
-  }
-  catch(ctkRuntimeException& e)
-  {
-	  std::cout << e.what() << std::endl;;
-  }
-  std::cout << "registered dicomplugin service" << std::endl;
-//  mBackendInterface = new BackendInterfaceImpl2();
-//  std::cout << "create BackendInterfaceImpl2 object " << mBackendInterface << std::endl;
-//  context->registerService(QStringList("BackendInterface"), mBackendInterface);
-
+	mDicomPlugin.reset(new DicomGUIExtenderService);
+	//  std::cout << "created dicomplugin service" << std::endl;
+	try
+	{
+		context->registerService(QStringList(GUIExtenderService_iid), mDicomPlugin.get());
+	}
+	catch(ctkRuntimeException& e)
+	{
+		reportError(QString(e.what()));
+		mDicomPlugin.reset();
+	}
+	//  std::cout << "registered dicomplugin service" << std::endl;
 }
 
 void DicomPluginActivator::stop(ctkPluginContext* context)
 {
 	mDicomPlugin.reset();
-//	delete mTestService;
-	std::cout << "Stopped DicomPluginActivator" << std::endl;
-  Q_UNUSED(context)
+	//	std::cout << "Stopped DicomPluginActivator" << std::endl;
+	Q_UNUSED(context)
 }
-
-//DicomPluginActivator* DicomPluginActivator::getInstance()
-//{
-//	return instance;
-//}
-//
-//ctkPluginContext* DicomPluginActivator::getPluginContext() const
-//{
-//	return context;
-//}
 
 } // namespace cx
 
-//Q_EXPORT_PLUGIN2(org_mydomain_testplugin, DicomPluginActivator)
 Q_EXPORT_PLUGIN2(DicomPluginActivator_irrelevant_string, cx::DicomPluginActivator)
 
 

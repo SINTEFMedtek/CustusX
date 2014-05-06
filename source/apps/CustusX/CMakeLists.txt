@@ -17,7 +17,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/gui
     ${CustusX3_SOURCE_DIR}/source/gui/utilities
     ${CustusX3_SOURCE_DIR}/source/logic
-    ${CustusX3_SOURCE_DIR}/source/modules/PluginBase
+    ${CustusX3_SOURCE_DIR}/source/modules/GUIExtender
     ${CustusX3_SOURCE_DIR}/source/modules/UsReconstruction/gui
     ${CustusX3_SOURCE_DIR}/source/modules/Acquisition/gui
     ${CustusX3_SOURCE_DIR}/source/modules/Calibration/gui

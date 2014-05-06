@@ -64,12 +64,12 @@
 #include "cxLogicManager.h"
 #include "cxPluginFramework.h"
 #include "ctkPluginContext.h"
-#include "cxPluginBaseServiceTrackerCustomizer.h"
+#include "cxGUIExtenderServiceTrackerCustomizer.h"
 
 namespace cx
 {
 
-MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
+MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	mFullScreenAction(NULL), mStandard3DViewActions(NULL), mControlPanel(NULL)
 {
 	QFile stylesheet(":/cxStyleSheet.ss");
@@ -119,11 +119,11 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 
 	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
-    // insert all widgets from all plugins
-    for (unsigned i = 0; i < plugins.size(); ++i)
-    	this->addPlugin(plugins[i].get());
+	// insert all widgets from all guiExtenders
+	for (unsigned i = 0; i < guiExtenders.size(); ++i)
+		this->addGUIExtender(guiExtenders[i].get());
 
-    this->setupPlugins();
+	this->setupGUIExtenders();
 
 	// window menu must be created after all dock widgets are created
 	QMenu* popupMenu = this->createPopupMenu();
@@ -159,44 +159,38 @@ void MainWindow::changeEvent(QEvent * event)
 	}
 }
 
-void MainWindow::setupPlugins()
+void MainWindow::setupGUIExtenders()
 {
-	PluginBaseServiceTrackerCustomizerPtr customizer(new PluginBaseServiceTrackerCustomizer);
-    connect(customizer.get(), SIGNAL(serviceAdded(PluginBase*)), this, SLOT(onPluginBaseAdded(PluginBase*)));
-    connect(customizer.get(), SIGNAL(serviceRemoved(PluginBase*)), this, SLOT(onPluginBaseRemoved(PluginBase*)));
+	GUIExtenderServiceTrackerCustomizerPtr customizer(new GUIExtenderServiceTrackerCustomizer);
+	connect(customizer.get(), SIGNAL(serviceAdded(GUIExtenderService*)), this, SLOT(onPluginBaseAdded(GUIExtenderService*)));
+	connect(customizer.get(), SIGNAL(serviceRemoved(GUIExtenderService*)), this, SLOT(onPluginBaseRemoved(GUIExtenderService*)));
     mPluginBaseServiceTrackerCustomizer = customizer;
 
 	PluginFrameworkManagerPtr pluginFramework = LogicManager::getInstance()->getPluginFramework();
 
-	mPluginBaseServiceTracker.reset(new PluginBaseServiceTracker(
+	mPluginBaseServiceTracker.reset(new GUIExtenderServiceTracker(
 			pluginFramework->getPluginContext(),
 			mPluginBaseServiceTrackerCustomizer.get()));
 	mPluginBaseServiceTracker->open();
 }
 
-void MainWindow::addPlugin(PluginBase* service)
+void MainWindow::addGUIExtender(GUIExtenderService* service)
 {
 
-    std::vector<PluginBase::PluginWidget> widgets = service->createWidgets();
+	std::vector<GUIExtenderService::CategorizedWidget> widgets = service->createWidgets();
     for (unsigned j = 0; j < widgets.size(); ++j)
     {
         QWidget* widget = this->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory);
         mWidgetsByPlugin[service].push_back(widget);
     }
-
-    std::vector<QToolBar*> toolBars = service->createToolBars();
-    for (unsigned j = 0; j < toolBars.size(); ++j)
-    {
-        this->addToolBar(toolBars[j]);
-        this->registerToolBar(toolBars[j], "Toolbar");
-    }
 }
 
 
-void MainWindow::removePlugin(PluginBase* service)
+void MainWindow::removeGUIExtender(GUIExtenderService* service)
 {
 	while (!mWidgetsByPlugin[service].empty())
 	{
+		// TODO: must remove widget from several difference data structures: simplify!
 		QWidget* widget = mWidgetsByPlugin[service].back();
 		mWidgetsByPlugin[service].pop_back();
 
@@ -212,19 +206,17 @@ void MainWindow::removePlugin(PluginBase* service)
 				iter->second->removeAction(dockWidget->toggleViewAction());
 			}
 		}
-
-		//TODO toolbars not removed!
 	}
 }
 
-void MainWindow::onPluginBaseAdded(PluginBase* service)
+void MainWindow::onPluginBaseAdded(GUIExtenderService* service)
 {
-	this->addPlugin(service);
+	this->addGUIExtender(service);
 }
 
-void MainWindow::onPluginBaseRemoved(PluginBase* service)
+void MainWindow::onPluginBaseRemoved(GUIExtenderService* service)
 {
-	this->removePlugin(service);
+	this->removeGUIExtender(service);
 }
 
 /**Parse the command line and load a patient if the switch --patient is found

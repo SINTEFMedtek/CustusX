@@ -8,7 +8,7 @@
 #ifndef CXACQUISITIONPLUGIN_H_
 #define CXACQUISITIONPLUGIN_H_
 
-#include "cxPluginBase.h"
+#include "cxGUIExtenderService.h"
 class QDomNode;
 
 namespace cx
@@ -38,10 +38,10 @@ typedef boost::shared_ptr<class AcquisitionPlugin> AcquisitionPluginPtr;
 * @{
 */
 
-/**Rewrite to be a descendant of PluginBase, with generic API for creating plugins...
+/**
  *
  */
-class AcquisitionPlugin: public PluginBase
+class AcquisitionPlugin: public GUIExtenderService
 {
 Q_OBJECT
 public:
@@ -52,7 +52,7 @@ public:
 	{
 		return mAcquisitionData;
 	}
-	virtual std::vector<PluginWidget> createWidgets() const;
+	virtual std::vector<CategorizedWidget> createWidgets() const;
 
 signals:
 
