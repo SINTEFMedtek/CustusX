@@ -15,6 +15,14 @@
 namespace cx
 {
 
+/**
+ * Implementation of Dicom service.
+ *
+ * \ingroup org_custusx_dicom
+ *
+ * \date 2014-04-01
+ * \author Christian Askeland
+ */
 class org_custusx_dicom_EXPORT DicomPlugin : public PluginBase
 {
 	//Q_INTERFACES(cx::PluginBase)

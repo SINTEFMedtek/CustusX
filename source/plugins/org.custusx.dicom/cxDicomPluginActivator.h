@@ -16,6 +16,14 @@ namespace cx
 //class BackendInterface;
 typedef boost::shared_ptr<class DicomPlugin> DicomPluginPtr;
 
+/**
+ * Activator for the dicom plugin
+ *
+ * \ingroup org_custusx_dicom
+ *
+ * \date 2014-04-15
+ * \author Christian Askeland
+ */
 class DicomPluginActivator :  public QObject, public ctkPluginActivator
 {
   Q_OBJECT

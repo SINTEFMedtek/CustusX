@@ -11,6 +11,8 @@ set(PLUGIN_SRCS
   cxDicomPluginActivator.cpp
   cxDicomPlugin.cpp
   cxDicomWidget.cpp
+  cxDicomConverter.h
+  cxDicomConverter.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -50,3 +52,6 @@ ctkMacroBuildPlugin(
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
 )
+
+add_subdirectory(testing)
+

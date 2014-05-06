@@ -17,7 +17,7 @@ namespace cx
 /**
  * Widget for dicom interaction
  *
- * \ingroup cx_gui
+ * \ingroup org_custusx_dicom
  *
  * \date 2014-05-02
  * \author Christian Askeland
@@ -31,9 +31,17 @@ public:
 
 	virtual QString defaultWhatsThis() const;
 
-protected:
+private slots:
+	void onViewHeader();
+	void onImportIntoCustusXAction();
+private:
 	QVBoxLayout*  mVerticalLayout; ///< vertical layout is used
 	ctkDICOMBrowser* mBrowser;
+
+	QAction* mViewHeaderAction;
+	QAction* mImportIntoCustusXAction;
+	void setupDatabaseDirectory();
+	void importSeries(QString seriesUid);
 };
 
 } /* namespace cx */
