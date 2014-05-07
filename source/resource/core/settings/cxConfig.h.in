@@ -14,3 +14,4 @@
 
 #cmakedefine CX_USE_OpenCV
 #cmakedefine CX_BUILD_MEHDI_VTKMULTIVOLUME
+#cmakedefine CX_BUILD_US_SIMULATOR
