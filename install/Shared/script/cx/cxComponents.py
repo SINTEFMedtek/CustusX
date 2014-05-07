@@ -21,6 +21,7 @@ import platform
 
 from cxShell import *    
 import cxCppBuilder
+from cxPrintFormatter import PrintFormatter
 
 class Component(object):
     '''
@@ -214,6 +215,8 @@ class CTK(CppComponent):
         add('CTK_ENABLE_PluginFramework:BOOL', True)
         add('CTK_BUILD_SHARED_LIBS:BOOL', self.controlData.getBuildShared())
         builder.configureCMake()
+        PrintFormatter.printInfo('Build CTK during configure step, in order to create CTKConfig.cmake')
+        self.build()
 # ---------------------------------------------------------
 
 class OpenCV(CppComponent):
