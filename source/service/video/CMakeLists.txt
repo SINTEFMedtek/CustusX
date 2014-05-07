@@ -16,6 +16,8 @@
 #               Video Service
 ###########################################################
 
+option(CX_BUILD_US_SIMULATOR "Build the US from CT/MR simulator" OFF)
+
 SET( CX_QT_MOC_HEADER_FILES
 	cxBasicVideoSource.h
 	cxVideoService.h
@@ -54,6 +56,17 @@ SET (cxVideoService_SOURCE
 	cxVideoServiceBackend.h
 	cxVideoServiceBackend.cpp
 )
+
+# Build all files from the UltrasoundSimulation lib
+IF(CX_BUILD_US_SIMULATOR)
+    SET(cxVideoService_SOURCE
+        ${cxVideoService_SOURCE}
+        ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageSimulator.h
+        ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageSimulator.cpp
+        ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageArray.h
+        ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageArray.cpp
+    )
+ENDIF(CX_BUILD_US_SIMULATOR)
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
