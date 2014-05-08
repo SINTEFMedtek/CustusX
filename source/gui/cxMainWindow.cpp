@@ -667,6 +667,7 @@ void MainWindow::loadPatientFileSlot()
 		report("Made a new patient folder: " + patientDatafolder);
 	}
 	// Open file dialog
+	std::cout << "dir: " << string_cast(patientDatafolder) << std::endl;
 	QString choosenDir = QFileDialog::getExistingDirectory(this, tr("Select patient"), patientDatafolder,
 		QFileDialog::ShowDirsOnly);
 	if (choosenDir == QString::null)

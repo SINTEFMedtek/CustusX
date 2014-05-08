@@ -6,6 +6,11 @@
 #include "cxImageStreamer.h"
 #include "cxCyclicActionLogger.h"
 
+#include "cxConfig.h"
+#ifdef CX_BUILD_US_SIMULATOR
+#include "../../../../../UltrasoundSimulation/UltrasoundSimulation/ImageSimulator.h"
+#endif //CX_BUILD_US_SIMULATOR
+
 typedef vtkSmartPointer<class vtkImageMask> vtkImageMaskPtr;
 
 namespace cx
@@ -65,6 +70,10 @@ private:
 	DataServicePtr mDataManager;
 
 	CyclicActionLoggerPtr mTimer;///< Timer for timing parts of the simulation
+
+#ifdef CX_BUILD_US_SIMULATOR
+	boost::shared_ptr<ImageSimulator> mUSSimulator;
+#endif //CX_BUILD_US_SIMULATOR
 
 };
 typedef boost::shared_ptr<SimulatedImageStreamer> SimulatedImageStreamerPtr;
