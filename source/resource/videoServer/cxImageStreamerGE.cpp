@@ -117,7 +117,7 @@ void ImageStreamerGE::initialize(StringMap arguments)
 
 	data_streaming::OutputSizeComputationType imageCompType = data_streaming::AUTO;
    	long imageSize = -1;// -1 = auto
-	if (!mArguments["imagesize"].compare("auto", Qt::CaseInsensitive) == 0)
+	if (!(mArguments["imagesize"].compare("auto", Qt::CaseInsensitive) == 0))
 	{
 		if (mArguments["isotropic"].compare("yes", Qt::CaseInsensitive) == 0)
 			imageCompType = data_streaming::ISOTROPIC;
