@@ -15,7 +15,7 @@
 #ifndef CXREGISTRATIONPLUGIN_H_
 #define CXREGISTRATIONPLUGIN_H_
 
-#include "cxPluginBase.h"
+#include "cxGUIExtenderService.h"
 
 /**
  * \defgroup cx_module_registration Registration Plugin
@@ -38,19 +38,19 @@ typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
  * @{
  */
 
-/**Rewrite to be a descendant of PluginBase, with generic API for creating plugins...
+/**
  *
  *  \date Jun 16, 2011
  *  \author christiana
  */
-class RegistrationPlugin : public PluginBase
+class RegistrationPlugin : public GUIExtenderService
 {
 	Q_OBJECT
 public:
 	RegistrationPlugin(AcquisitionDataPtr acquisitionData);
 	virtual ~RegistrationPlugin() {}
 
-	virtual std::vector<PluginWidget> createWidgets() const;
+	virtual std::vector<CategorizedWidget> createWidgets() const;
 signals:
 
 private slots:
