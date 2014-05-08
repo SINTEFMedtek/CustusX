@@ -40,7 +40,7 @@ def printIntro():
 def testStreaming():
     return deque(["make -j8".split(" "),
                    "./source/testing/Catch -g [streaming]".split(" "),
-                   "./source[modules]Acquisition/testing/cxTestAcquisition_CppUnit_CTest -r".split(" "),
+                   "./source/modules/Acquisition/testing/cxTestAcquisition_CppUnit_CTest -r".split(" "),
                    "./source/resource/videoServer/testing/cxTestGEInterface_CppUnit_CTest -r".split(" ")
                    ])
     

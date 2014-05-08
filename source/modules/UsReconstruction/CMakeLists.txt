@@ -50,7 +50,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/service/visualization
 	${CustusX3_SOURCE_DIR}/source/logic
-	${CustusX3_SOURCE_DIR}/source/modules/PluginBase
+	${CustusX3_SOURCE_DIR}/source/modules/GUIExtender
     ${CustusX3_SOURCE_DIR}/source/modules/Algorithm/gui
     ${CustusX3_SOURCE_DIR}/source/gui/utilities
     )

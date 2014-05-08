@@ -28,7 +28,8 @@ cx_add_class_qt_moc(CX_RESOURCE_WIDGETS_FILES
 	cxFilePreviewWidget
 	cxImagePreviewWidget
 	cxPresetWidget
-        cxFileInputWidget
+    cxFileInputWidget
+    cxMultiFileInputWidget
 	${QXT_FOLDER}/qxtspanslider_p.h
 	${QXT_FOLDER}/qxtspanslider
 	)

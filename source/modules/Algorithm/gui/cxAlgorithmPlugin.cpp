@@ -18,11 +18,11 @@ AlgorithmPlugin::AlgorithmPlugin()
 AlgorithmPlugin::~AlgorithmPlugin()
 {}
 
-std::vector<PluginBase::PluginWidget> AlgorithmPlugin::createWidgets() const
+std::vector<GUIExtenderService::CategorizedWidget> AlgorithmPlugin::createWidgets() const
 {
-	std::vector<PluginWidget> retval;
+	std::vector<CategorizedWidget> retval;
 
-	retval.push_back(PluginBase::PluginWidget(
+	retval.push_back(GUIExtenderService::CategorizedWidget(
 	                     new AllFiltersWidget(NULL),
 	                     "Algorithms"));
 

@@ -23,11 +23,11 @@ CalibrationPlugin::~CalibrationPlugin()
 
 }
 
-std::vector<PluginBase::PluginWidget> CalibrationPlugin::createWidgets() const
+std::vector<GUIExtenderService::CategorizedWidget> CalibrationPlugin::createWidgets() const
 {
-	std::vector<PluginWidget> retval;
+	std::vector<CategorizedWidget> retval;
 
-	retval.push_back(PluginBase::PluginWidget(
+	retval.push_back(GUIExtenderService::CategorizedWidget(
 			new CalibrationMethodsWidget(mAcquisitionData, NULL, "CalibrationMethodsWidget", "Calibration Methods"),
 			"Algorithms"));
 
