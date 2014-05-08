@@ -24,10 +24,6 @@
 #include "cxTypeConversions.h"
 #include "cxSettings.h"
 
-#ifdef CX_BUILD_US_SIMULATOR
-#include "/../../UltrasoundSimulation/ImageSimulator.h"
-#endif //CX_BUILD_US_SIMULATOR
-
 namespace cx
 {
 
@@ -35,6 +31,10 @@ SimulatedImageStreamer::SimulatedImageStreamer() :
 	mTimer(new CyclicActionLogger())
 {
 	this->setSendInterval(40);
+
+#ifdef CX_BUILD_US_SIMULATOR
+	mUSSimulator.reset(new ImageSimulator());
+#endif //CX_BUILD_US_SIMULATOR
 }
 
 SimulatedImageStreamer::~SimulatedImageStreamer()
@@ -203,22 +203,35 @@ vtkImageDataPtr SimulatedImageStreamer::simulateUS(vtkImageDataPtr maskedFramedg
 		simulatedSlice = maskedFramedgrabbedSlice;
 	}
 
+
+	std::cout << "dims in: " << maskedFramedgrabbedSlice->GetDimensions()[0] << " " << maskedFramedgrabbedSlice->GetDimensions()[0] << std::endl;
+	std::cout << "dims out: " << simulatedSlice->GetDimensions()[0] << " " << simulatedSlice->GetDimensions()[0] << std::endl;
+
 	return simulatedSlice;
 }
 
-//TODO: implement, and put in a separate class
 vtkImageDataPtr SimulatedImageStreamer::simulateUSFromCTSlice(vtkImageDataPtr maskedFramedgrabbedSlice)
 {
 	vtkImageDataPtr simulatedSlice;
+
+#ifdef CX_BUILD_US_SIMULATOR
+	std::cout << "CT to US simulator running" << std::endl;
+//	ImageSimulator mUSSimulator;
+	simulatedSlice = mUSSimulator->simulateFromCT(maskedFramedgrabbedSlice);
+#else
+	std::cout << "CT to US simulator not running" << std::endl;
 	simulatedSlice = maskedFramedgrabbedSlice;
+#endif //CX_BUILD_US_SIMULATOR
+
 	return simulatedSlice;
 }
 
-//TODO: implement, and put in a separate class
+//TODO: implement
 vtkImageDataPtr SimulatedImageStreamer::simulateUSFromMRSlice(vtkImageDataPtr maskedFramedgrabbedSlice)
 {
 	vtkImageDataPtr simulatedSlice;
 	simulatedSlice = maskedFramedgrabbedSlice;
+	std::cout << "MR to US simulator not running" << std::endl;
 	return simulatedSlice;
 }
 
