@@ -44,11 +44,11 @@ void UsReconstructionPlugin::patientChangedSlot()
 //  this->updateWindowTitle();
 }
 
-std::vector<PluginBase::PluginWidget> UsReconstructionPlugin::createWidgets() const
+std::vector<GUIExtenderService::CategorizedWidget> UsReconstructionPlugin::createWidgets() const
 {
-	std::vector<PluginWidget> retval;
+	std::vector<CategorizedWidget> retval;
 
-	retval.push_back(PluginBase::PluginWidget(
+	retval.push_back(GUIExtenderService::CategorizedWidget(
 			new ReconstructionWidget(NULL, mReconstructer),
 			"Algorithms"));
 

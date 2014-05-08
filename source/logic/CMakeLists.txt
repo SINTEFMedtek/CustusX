@@ -7,6 +7,7 @@
 SET( CX_QT_MOC_HEADER_FILES
 	cxServiceController.h
 	cxLogicManager.h
+	cxPluginFramework.h
 )
 
 SET (cxLogicManager_SOURCE
@@ -16,6 +17,10 @@ SET (cxLogicManager_SOURCE
     cxLogicManager.cpp
 	cxLegacySingletons.h
 	cxLegacySingletons.cpp
+	cxPluginFramework.h
+	cxPluginFramework.cpp
+	cxPluginFrameworkUtilities.h
+	cxPluginFrameworkUtilities.cpp
 )
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
@@ -35,6 +40,7 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 ADD_LIBRARY ( cxLogicManager ${cxLogicManager_SOURCE} ${MOC_HEADER_FILES} )
 
 target_link_libraries(cxLogicManager
+	CTKPluginFramework
     cxResource
     cxPatientService
     cxTrackingService

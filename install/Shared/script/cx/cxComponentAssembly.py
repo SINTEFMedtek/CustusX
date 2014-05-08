@@ -37,6 +37,7 @@ class LibraryAssembly:
         self.libraries.append(cxComponents.OpenCV())
         self.libraries.append(cxComponents.OpenIGTLink())
         self.libraries.append(cxComponents.IGSTK())
+        self.libraries.append(cxComponents.CTK())
         if (platform.system() != 'Windows'):
              self.libraries.append(cxComponents.ISB_DataStreaming());
         self.libraries.append(cxComponents.UltrasonixSDK())

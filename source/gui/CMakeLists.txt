@@ -69,10 +69,15 @@ cx_add_class_qt_moc(cxGui_SRCS
 	utilities/cxAudioImpl
 	utilities/cxToolImagePreviewWidget
     #----------------------    
+    pluginFrameworkWidgets/cxPluginBrowser
+    pluginFrameworkWidgets/cxPluginTableModel
+    pluginFrameworkWidgets/cxPluginFrameworkWidget
+    #----------------------    
 	cxMainWindow
 	cxSecondaryMainWindow
 	cxSecondaryViewLayoutWindow
 	cxLayoutInteractor
+	cxGUIExtenderServiceTrackerCustomizer
     #----------------------
 )
 
@@ -95,6 +100,7 @@ set(SUB_FOLDERS
     streamingWidgets
     toolWidgets
     utilities
+    pluginFrameworkWidgets
     )
 
 # Use the include path and library for Qt that is used by VTK.
@@ -119,7 +125,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/state
     
     ${CustusX3_SOURCE_DIR}/source/logic
-    ${CustusX3_SOURCE_DIR}/source/modules/PluginBase
+    ${CustusX3_SOURCE_DIR}/source/modules/GUIExtender
     )
     
 set(CX_GUI_LIBRARIES cxLogicManager cxStateService cxResourceWidgets)

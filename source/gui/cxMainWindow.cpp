@@ -58,11 +58,18 @@
 #include "cxLogger.h"
 #include "cxLayoutInteractor.h"
 #include "cxNavigation.h"
+#include "cxPluginFrameworkWidget.h"
+
+#include "ctkServiceTracker.h"
+#include "cxLogicManager.h"
+#include "cxPluginFramework.h"
+#include "ctkPluginContext.h"
+#include "cxGUIExtenderServiceTrackerCustomizer.h"
 
 namespace cx
 {
 
-MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
+MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	mFullScreenAction(NULL), mStandard3DViewActions(NULL), mControlPanel(NULL)
 {
 	QFile stylesheet(":/cxStyleSheet.ss");
@@ -108,25 +115,15 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	this->addAsDockWidget(new ConsoleWidget(this), "Utility");
 	this->addAsDockWidget(new FrameTreeWidget(this), "Browsing");
 	this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
+	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
 
 	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
-    // insert all widgets from all plugins
-    for (unsigned i = 0; i < plugins.size(); ++i)
-    {
-        std::vector<PluginBase::PluginWidget> widgets = plugins[i]->createWidgets();
-        for (unsigned j = 0; j < widgets.size(); ++j)
-        {
-            this->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory);
-        }
+	// insert all widgets from all guiExtenders
+	for (unsigned i = 0; i < guiExtenders.size(); ++i)
+		this->addGUIExtender(guiExtenders[i].get());
 
-        std::vector<QToolBar*> toolBars = plugins[i]->createToolBars();
-        for (unsigned j = 0; j < toolBars.size(); ++j)
-        {
-            this->addToolBar(toolBars[j]);
-            this->registerToolBar(toolBars[j], "Toolbar");
-        }
-    }
+	this->setupGUIExtenders();
 
 	// window menu must be created after all dock widgets are created
 	QMenu* popupMenu = this->createPopupMenu();
@@ -162,6 +159,66 @@ void MainWindow::changeEvent(QEvent * event)
 	}
 }
 
+void MainWindow::setupGUIExtenders()
+{
+	GUIExtenderServiceTrackerCustomizerPtr customizer(new GUIExtenderServiceTrackerCustomizer);
+	connect(customizer.get(), SIGNAL(serviceAdded(GUIExtenderService*)), this, SLOT(onPluginBaseAdded(GUIExtenderService*)));
+	connect(customizer.get(), SIGNAL(serviceRemoved(GUIExtenderService*)), this, SLOT(onPluginBaseRemoved(GUIExtenderService*)));
+    mPluginBaseServiceTrackerCustomizer = customizer;
+
+	PluginFrameworkManagerPtr pluginFramework = LogicManager::getInstance()->getPluginFramework();
+
+	mPluginBaseServiceTracker.reset(new GUIExtenderServiceTracker(
+			pluginFramework->getPluginContext(),
+			mPluginBaseServiceTrackerCustomizer.get()));
+	mPluginBaseServiceTracker->open();
+}
+
+void MainWindow::addGUIExtender(GUIExtenderService* service)
+{
+
+	std::vector<GUIExtenderService::CategorizedWidget> widgets = service->createWidgets();
+    for (unsigned j = 0; j < widgets.size(); ++j)
+    {
+        QWidget* widget = this->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory);
+        mWidgetsByPlugin[service].push_back(widget);
+    }
+}
+
+
+void MainWindow::removeGUIExtender(GUIExtenderService* service)
+{
+	while (!mWidgetsByPlugin[service].empty())
+	{
+		// TODO: must remove widget from several difference data structures: simplify!
+		QWidget* widget = mWidgetsByPlugin[service].back();
+		mWidgetsByPlugin[service].pop_back();
+
+		QDockWidget* dockWidget = dynamic_cast<QDockWidget*>(widget);
+		this->removeDockWidget(dockWidget);
+
+		mDockWidgets.erase(dockWidget);
+
+		if (dockWidget)
+		{
+			for (std::map<QString, QActionGroup*>::iterator iter=mWidgetGroupsMap.begin(); iter!=mWidgetGroupsMap.end(); ++iter)
+			{
+				iter->second->removeAction(dockWidget->toggleViewAction());
+			}
+		}
+	}
+}
+
+void MainWindow::onPluginBaseAdded(GUIExtenderService* service)
+{
+	this->addGUIExtender(service);
+}
+
+void MainWindow::onPluginBaseRemoved(GUIExtenderService* service)
+{
+	this->removeGUIExtender(service);
+}
+
 /**Parse the command line and load a patient if the switch --patient is found
  */
 void MainWindow::startupLoadPatient()
@@ -169,7 +226,7 @@ void MainWindow::startupLoadPatient()
 	patientService()->getPatientData()->startupLoadPatient();
 }
 
-void MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
+QWidget* MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
 {
 	// add a scroller to allow for very large widgets in the vertical direction
 	QScrollArea* scroller = new QScrollArea(NULL);
@@ -196,10 +253,14 @@ void MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
 		}
 	}
 
+
 	mDockWidgets.insert(dockWidget);
 	dockWidget->setVisible(false); // default visibility
+	this->restoreDockWidget(dockWidget); // restore if added after construction
 
 	this->addToWidgetGroupMap(dockWidget->toggleViewAction(), groupname);
+
+	return dockWidget;
 }
 
 void MainWindow::addToWidgetGroupMap(QAction* action, QString groupname)

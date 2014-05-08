@@ -1,7 +1,7 @@
 #ifndef CXALGORITHMPLUGIN_H_
 #define CXALGORITHMPLUGIN_H_
 
-#include "cxPluginBase.h"
+#include "cxGUIExtenderService.h"
 
 namespace cx
 {
@@ -26,14 +26,14 @@ namespace cx
  * \date Jun 15, 2011
  * \author christiana
  */
-class AlgorithmPlugin : public PluginBase
+class AlgorithmPlugin : public GUIExtenderService
 {
 	Q_OBJECT
 public:
 	AlgorithmPlugin();
 	virtual ~AlgorithmPlugin();
 
-	virtual std::vector<PluginWidget> createWidgets() const;
+	virtual std::vector<CategorizedWidget> createWidgets() const;
 };
 typedef boost::shared_ptr<class AlgorithmPlugin> AlgorithmPluginPtr;
 

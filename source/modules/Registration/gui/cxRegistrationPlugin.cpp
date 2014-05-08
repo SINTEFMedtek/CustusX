@@ -30,17 +30,17 @@ RegistrationPlugin::RegistrationPlugin(AcquisitionDataPtr acquisitionData)
 	mRegistrationManager.reset(new RegistrationManager(acquisitionData));
 }
 
-std::vector<PluginBase::PluginWidget> RegistrationPlugin::createWidgets() const
+std::vector<GUIExtenderService::CategorizedWidget> RegistrationPlugin::createWidgets() const
 {
-	std::vector<PluginWidget> retval;
+	std::vector<CategorizedWidget> retval;
 
-	retval.push_back(PluginBase::PluginWidget(
+	retval.push_back(GUIExtenderService::CategorizedWidget(
 			new RegistrationHistoryWidget(NULL),
 			"Browsing"));
-	retval.push_back(PluginBase::PluginWidget(
+	retval.push_back(GUIExtenderService::CategorizedWidget(
 			new RegistrationMethodsWidget(mRegistrationManager, NULL, "RegistrationMethodsWidget", "Registration Methods"),
 			"Algorithms"));
-	retval.push_back(PluginBase::PluginWidget(
+	retval.push_back(GUIExtenderService::CategorizedWidget(
 			new WirePhantomWidget(mRegistrationManager, NULL),
 			"Algorithms"));
 
