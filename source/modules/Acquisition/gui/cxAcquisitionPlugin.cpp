@@ -36,13 +36,13 @@ AcquisitionPlugin::~AcquisitionPlugin()
 
 }
 
-std::vector<PluginBase::PluginWidget> AcquisitionPlugin::createWidgets() const
+std::vector<GUIExtenderService::CategorizedWidget> AcquisitionPlugin::createWidgets() const
 {
-	std::vector<PluginWidget> retval;
+	std::vector<CategorizedWidget> retval;
 
-	retval.push_back(PluginBase::PluginWidget(new USAcqusitionWidget(mAcquisitionData, NULL), "Utility"));
+	retval.push_back(GUIExtenderService::CategorizedWidget(new USAcqusitionWidget(mAcquisitionData, NULL), "Utility"));
 
-	retval.push_back(PluginBase::PluginWidget(new TrackedCenterlineWidget(mAcquisitionData, NULL), "Utility"));
+	retval.push_back(GUIExtenderService::CategorizedWidget(new TrackedCenterlineWidget(mAcquisitionData, NULL), "Utility"));
 
 	return retval;
 

@@ -213,6 +213,7 @@ endmacro()
 ###############################################################################
 macro(cx_initialize_QT)
     set(QT_USE_QTXML TRUE)
+    set(QT_USE_QTSQL TRUE)
     set(QT_USE_QTTEST TRUE)
     set(QT_USE_QTNETWORK 1)
     find_package(Qt4 REQUIRED)
@@ -257,6 +258,15 @@ endmacro()
 macro(cx_initialize_IGSTK)
     find_package(IGSTK REQUIRED)
     include(${IGSTK_USE_FILE})
+endmacro()
+
+###############################################################################
+# Initialize CTK library
+# Find the package and run the include USE file.
+###############################################################################
+macro(cx_initialize_CTK)
+    find_package(CTK REQUIRED)
+    include(${CTK_USE_FILE})
 endmacro()
 
 ###############################################################################

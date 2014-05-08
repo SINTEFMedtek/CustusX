@@ -50,7 +50,7 @@ void CustusXController::start()
 
   cx::LogicManager::initialize();
 
-  mMainWindow = new cx::MainWindow(std::vector<cx::PluginBasePtr>());
+  mMainWindow = new cx::MainWindow(std::vector<cx::GUIExtenderServicePtr>());
   mMainWindow->show();
 #ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
   mMainWindow->activateWindow();

@@ -36,6 +36,8 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
+#cmake_policy(SET CMP0012 NEW)
+
 if(SSC_PRINT_CALLER_INFO)
         add_definitions(-DSSC_PRINT_CALLER_INFO)
 endif()

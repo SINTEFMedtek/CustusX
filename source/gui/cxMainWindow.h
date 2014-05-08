@@ -5,8 +5,9 @@
 #include <map>
 #include <set>
 #include "boost/shared_ptr.hpp"
-#include "cxPluginBase.h"
+#include "cxGUIExtenderService.h"
 #include <QPointer>
+#include "ctkServiceTracker.h"
 
 class QAction;
 class QMenu;
@@ -15,6 +16,9 @@ class QActionGroup;
 namespace cx
 {
 class ConsoleWidget;
+typedef ctkServiceTracker<GUIExtenderService*> GUIExtenderServiceTracker;
+typedef boost::shared_ptr<GUIExtenderServiceTracker> GUIExtenderServiceTrackerPtr;
+typedef boost::shared_ptr<class GUIExtenderServiceTrackerCustomizer> GUIExtenderServiceTrackerCustomizerPtr;
 }
 
 namespace cx
@@ -39,7 +43,7 @@ class MainWindow: public QMainWindow
 	Q_OBJECT
 
 public:
-	MainWindow(std::vector<PluginBasePtr> plugins);
+	MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders);
 	virtual ~MainWindow();
 
 	virtual QMenu* createPopupMenu();
@@ -99,6 +103,9 @@ protected slots:
 
 	void startupLoadPatient();
 
+    void onPluginBaseAdded(GUIExtenderService* service);
+    void onPluginBaseRemoved(GUIExtenderService* service);
+
 protected:
 	void changeEvent(QEvent * event);
 
@@ -111,9 +118,12 @@ private:
 	void createMenus(); ///< creates and add (gui-)menues
 	void createToolBars(); ///< creates and adds toolbars for convenience
 
-	void addAsDockWidget(QWidget* widget, QString groupname = "");
+	QWidget* addAsDockWidget(QWidget* widget, QString groupname = "");
 	void registerToolBar(QToolBar* toolbar, QString groupname = "");
 	void addToWidgetGroupMap(QAction* action, QString groupname);
+	void addGUIExtender(GUIExtenderService* service);
+	void removeGUIExtender(GUIExtenderService* service);
+	void setupGUIExtenders();
 
 	void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
 
@@ -181,6 +191,10 @@ private:
 	std::map<QString, QActionGroup*> mWidgetGroupsMap; ///< map containing groups
 
 	QString mLastImportDataFolder;
+
+	GUIExtenderServiceTrackerPtr mPluginBaseServiceTracker;
+	GUIExtenderServiceTrackerCustomizerPtr mPluginBaseServiceTrackerCustomizer;
+	std::map<GUIExtenderService*, std::vector<QWidget*> > mWidgetsByPlugin;
 
 	//widgets
 	QPointer<class SecondaryMainWindow> mControlPanel;
