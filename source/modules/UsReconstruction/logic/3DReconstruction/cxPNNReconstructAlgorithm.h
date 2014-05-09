@@ -40,10 +40,10 @@ typedef boost::shared_ptr<class PNNReconstructAlgorithm> PNNReconstructAlgorithm
  *  \date June 23, 2010
  *  \author Ole Vegard Solberg
  */
-class PNNReconstructAlgorithm: public ReconstructAlgorithm
+class PNNReconstructAlgorithm: public ReconstructionService
 {
 public:
-	static ReconstructAlgorithmPtr create() { return ReconstructAlgorithmPtr(new PNNReconstructAlgorithm()); }
+	static ReconstructionServicePtr create() { return ReconstructionServicePtr(new PNNReconstructAlgorithm()); }
 	PNNReconstructAlgorithm();
 	virtual ~PNNReconstructAlgorithm()
 	{

@@ -41,7 +41,7 @@ class ReconstructAlgorithmFixture
 public:
 	ReconstructAlgorithmFixture();
 
-	void setAlgorithm(cx::ReconstructAlgorithmPtr algorithm);
+	void setAlgorithm(cx::ReconstructionServicePtr algorithm);
 	void defineOutputVolume(double bounds, double spacing);
 	void setOverallBoundsAndSpacing(double size, double spacing);
 
@@ -66,7 +66,7 @@ private:
 	void printConfiguration();
 	cx::ImagePtr createOutputVolume(QString name);
 
-	cx::ReconstructAlgorithmPtr mAlgorithm;
+	cx::ReconstructionServicePtr mAlgorithm;
 	cx::ProcessedUSInputDataPtr mInputData;
 	cx::ImagePtr mOutputData;
 	bool mVerbose;

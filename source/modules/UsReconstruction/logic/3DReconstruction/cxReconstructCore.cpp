@@ -63,19 +63,19 @@ void ReconstructCore::initialize(ProcessedUSInputDataPtr fileData, OutputVolumeP
 	mAlgorithm = this->createAlgorithm(mInput.mAlgorithmUid);
 }
 
-ReconstructAlgorithmPtr ReconstructCore::createAlgorithm(QString name)
+ReconstructionServicePtr ReconstructCore::createAlgorithm(QString name)
 {
-	ReconstructAlgorithmPtr retval;
+    ReconstructionServicePtr retval;
 
 	if (mAlgorithm && mAlgorithm->getName() == name)
 		return mAlgorithm;
 
 	if (name == "PNN")
-		retval = ReconstructAlgorithmPtr(new PNNReconstructAlgorithm());
+		retval = ReconstructionServicePtr(new PNNReconstructAlgorithm());
 #ifdef CX_USE_OPENCL_UTILITY
 	else if (name == "TordTest")
 	{
-		retval = ReconstructAlgorithmPtr(new TordTest());
+		retval = ReconstructionServicePtr(new TordTest());
 	}
 #endif // CX_USE_OPENCL_UTILITY
 	else

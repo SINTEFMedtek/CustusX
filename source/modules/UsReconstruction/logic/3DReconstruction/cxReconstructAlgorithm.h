@@ -27,6 +27,8 @@
 
 class QDomElement;
 
+#define ReconstructionService_iid "cx::ReconstructionService"
+
 namespace cx
 {
 
@@ -37,7 +39,7 @@ typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
  * \{
  */
 
-typedef boost::shared_ptr<class ReconstructAlgorithm> ReconstructAlgorithmPtr;
+typedef boost::shared_ptr<class ReconstructionService> ReconstructionServicePtr;
 
 /**
  * \brief Abstract interface for reconstruction algorithm.
@@ -46,11 +48,13 @@ typedef boost::shared_ptr<class ReconstructAlgorithm> ReconstructAlgorithmPtr;
  *
  *  \date June 23, 2010
  *  \author Ole Vegard Solberg
+ *  \author Janne Beate Bakeng
  */
-class ReconstructAlgorithm
+class ReconstructionService //: public QObject
 {
+    //Q_OBJECT
 public:
-	virtual ~ReconstructAlgorithm() {}
+	virtual ~ReconstructionService() {}
 	virtual QString getName() const = 0;
 	/**
 	 *  Fill settings for this algorithm.
@@ -72,6 +76,7 @@ public:
  * \}
  */
 
+}//namespace cx
+Q_DECLARE_INTERFACE(cx::ReconstructionService, ReconstructionService_iid)
 
-}//namespace
 #endif //CXRECONSTRUCTALGORITHM_H_
