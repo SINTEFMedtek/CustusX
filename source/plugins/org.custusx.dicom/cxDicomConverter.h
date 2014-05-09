@@ -39,6 +39,7 @@ public:
 	ImagePtr convertToImage(QString seriesUid);
 
 private:
+	ImagePtr createCxImageFromDicomFile(QString filename);
 	ctkDICOMDatabase* mDatabase;
 };
 
