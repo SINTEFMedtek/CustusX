@@ -289,7 +289,7 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR INST
 
 	# Install needed Qt plugins by copying directories from the qt installation
 	# One can cull what gets copied by using 'REGEX "..." EXCLUDE'
-	install(DIRECTORY "${QT_PLUGINS_DIR}/imageformats"
+	install(DIRECTORY "${QT_PLUGINS_DIR}/imageformats" "${QT_PLUGINS_DIR}/sqldrivers"
 		DESTINATION ${INSTALL_BINARY_DIR}/plugins
 		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
 
