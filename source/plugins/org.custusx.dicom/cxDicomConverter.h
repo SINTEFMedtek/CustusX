@@ -16,6 +16,7 @@
 #define CXDICOMCONVERTER_H_
 
 #include "cxImage.h"
+#include "org_custusx_dicom_Export.h"
 class ctkDICOMDatabase;
 
 namespace cx
@@ -29,7 +30,7 @@ namespace cx
  * \date 2014-04-04
  * \author Christian Askeland
  */
-class DicomConverter
+class org_custusx_dicom_EXPORT DicomConverter
 {
 public:
 	DicomConverter();
