@@ -15,6 +15,7 @@
 #include "vtkImageAccumulate.h"
 #include "vtkImageData.h"
 #include "cxDataLocations.h"
+#include "org_custusx_dicom_Export.h"
 
 typedef vtkSmartPointer<vtkImageAccumulate> vtkImageAccumulatePtr;
 typedef vtkSmartPointer<vtkImageMathematics> vtkImageMathematicsPtr;
