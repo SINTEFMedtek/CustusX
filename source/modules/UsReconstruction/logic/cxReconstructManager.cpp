@@ -58,19 +58,19 @@ ReconstructManager::~ReconstructManager()
 
 }
 
-ReconstructAlgorithmPtr ReconstructManager::createAlgorithm()
+ReconstructionServicePtr ReconstructManager::createAlgorithm()
 {
 	QString name = mParams->mAlgorithmAdapter->getValue();
 
 	ReconstructCorePtr core; ///< in progress: algorithm part of class moved here.
 	core.reset(new ReconstructCore());
-	ReconstructAlgorithmPtr algo = core->createAlgorithm(name);
+	ReconstructionServicePtr algo = core->createAlgorithm(name);
 	return algo;
 }
 
 void ReconstructManager::initAlgorithm()
 {
-	ReconstructAlgorithmPtr algo = this->createAlgorithm();
+    ReconstructionServicePtr algo = this->createAlgorithm();
 
 	// generate settings for new algo
 	if (algo)

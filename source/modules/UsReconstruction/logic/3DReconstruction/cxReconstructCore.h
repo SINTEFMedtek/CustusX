@@ -27,7 +27,7 @@
 
 namespace cx
 {
-typedef boost::shared_ptr<class ReconstructAlgorithm> ReconstructAlgorithmPtr;
+typedef boost::shared_ptr<class ReconstructionService> ReconstructionServicePtr;
 
 typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 
@@ -73,7 +73,7 @@ public:
 	ImagePtr getOutput();
 
 	// published helper methods, also needed for parameter display outside of reconstruction execution:
-	ReconstructAlgorithmPtr createAlgorithm(QString uid);
+	ReconstructionServicePtr createAlgorithm(QString uid);
 	InputParams getInputParams() { return mInput; }
 
 private:
@@ -89,7 +89,7 @@ private:
 	ProcessedUSInputDataPtr mFileData;
 
 	// generated data
-	ReconstructAlgorithmPtr mAlgorithm;///< The used reconstruction algorithm
+	ReconstructionServicePtr mAlgorithm;///< The used reconstruction algorithm
 	vtkImageDataPtr mRawOutput; ///< Output image, prior to conversion to Image.
 	ImagePtr mOutput;///< Output image from reconstruction
 	OutputVolumeParams mOutputVolumeParams;

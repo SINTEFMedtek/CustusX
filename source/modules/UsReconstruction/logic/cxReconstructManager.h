@@ -39,7 +39,7 @@ typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
 typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
 typedef boost::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
-typedef boost::shared_ptr<class ReconstructAlgorithm> ReconstructAlgorithmPtr;
+typedef boost::shared_ptr<class ReconstructionService> ReconstructionServicePtr;
 
 /**
  * \file
@@ -118,7 +118,7 @@ public:
 	  * This is usually created internally during reconstruction,
 	  * published for use in unit testing.
 	  */
-	ReconstructAlgorithmPtr createAlgorithm();
+	ReconstructionServicePtr createAlgorithm();
 
 private slots:
 	void setSettings();

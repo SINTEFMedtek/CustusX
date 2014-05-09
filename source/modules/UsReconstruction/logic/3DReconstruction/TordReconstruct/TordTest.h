@@ -28,7 +28,7 @@ namespace cx
  * The algorithms share a lot of common code, both CL boilerplate code as well as
  * actual OpenCL kernel code.
  */
-class TordTest : public ReconstructAlgorithm
+class TordTest : public ReconstructionService
 {
 public:
 	TordTest();
