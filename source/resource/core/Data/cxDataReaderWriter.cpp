@@ -49,6 +49,7 @@
 #include "cxUtilHelpers.h"
 #include "cxVideoSource.h"
 #include "cxCustomMetaImage.h"
+#include "cxConfig.h"
 
 //#include "cxPointMetric.h"
 //#include "cxDistanceMetric.h"
@@ -212,6 +213,9 @@ void MetaImageReader::saveImage(ImagePtr image, const QString& filename)
 	customReader->setTransform(image->get_rMd());
 	customReader->setModality(image->getModality());
 	customReader->setImageType(image->getImageType());
+	customReader->setKey("WindowLevel", qstring_cast(image->getInitialWindowLevel()));
+	customReader->setKey("WindowWidth", qstring_cast(image->getInitialWindowWidth()));
+	customReader->setKey("Creator", QString("CustusX_%1").arg(CustusX3_VERSION_STRING));
 }
 
 
