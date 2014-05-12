@@ -287,16 +287,29 @@ endfunction()
 function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR INSTALL_CONFIG_DIR INSTALL_LIBRARIES_PATTERN_LOCAL DIRS_LOCAL)
 	cx_assert_variable_exists(${QT_PLUGINS_DIR})
 
+
+# Install plugins in the default location as given by http://qt-project.org/doc/qt-4.8/qt-conf.html
+if(CX_LINUX)
+	SET(INSTALL_PLUGIN_DIR "${INSTALL_BINARY_DIR}")
+endif()
+if(CX_WINDOWS)
+	SET(INSTALL_PLUGIN_DIR "${INSTALL_BINARY_DIR}")
+endif()
+IF(APPLE)
+	SET(INSTALL_PLUGIN_DIR "${INSTALL_BINARY_DIR}/../plugins")
+ENDIF(APPLE)
+
 	# Install needed Qt plugins by copying directories from the qt installation
 	# One can cull what gets copied by using 'REGEX "..." EXCLUDE'
 	install(DIRECTORY "${QT_PLUGINS_DIR}/imageformats" "${QT_PLUGINS_DIR}/sqldrivers"
-		DESTINATION ${INSTALL_BINARY_DIR}/plugins
+		DESTINATION ${INSTALL_PLUGIN_DIR}
 		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
 
 	# collect all installations here. They will be used by fixup_bundle to collect dependencies.
 	# this is a sum of the input pattern (if any) and the qtplugins
 	set(INSTALL_LIBRARIES_PATTERN_LOCAL
-		${INSTALL_BINARY_DIR}/modules/*${CMAKE_SHARED_LIBRARY_SUFFIX}
+#		${INSTALL_BINARY_DIR}/modules/*${CMAKE_SHARED_LIBRARY_SUFFIX}
+		${INSTALL_BINARY_DIR}/../plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}
 		${INSTALL_LIBRARIES_PATTERN_LOCAL}
 		)
 
