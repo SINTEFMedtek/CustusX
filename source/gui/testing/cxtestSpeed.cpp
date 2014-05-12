@@ -133,7 +133,7 @@ TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integra
 	REQUIRE(fps > minimumFPS);
 }
 
-
+#ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
 TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper renderer", "[speed][gui][integration][not_win32][not_win64][unstable]")
 {
 	initTest();
@@ -148,7 +148,9 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper renderer", "[speed][gui][
 //	REQUIRE(fps > minimumFPS);
 	REQUIRE(true);
 }
+#endif
 
+#ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
 TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper with slicing", "[speed][gui][integration][not_win32][not_win64][unstable]")
 {
 	initTest();
@@ -164,6 +166,6 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper with slicing", "[speed][g
 //	REQUIRE(fps > minimumFPS);
 	REQUIRE(true);
 }
-
+#endif
 
 }//namespace cx
