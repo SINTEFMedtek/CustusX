@@ -31,15 +31,23 @@ SimulatedImageStreamer::SimulatedImageStreamer() :
 	mTimer(new CyclicActionLogger())
 {
 	this->setSendInterval(40);
-
-#ifdef CX_BUILD_US_SIMULATOR
-	mUSSimulator.reset(new ImageSimulator());
-#endif //CX_BUILD_US_SIMULATOR
+    this->initUSSimulator();
 }
 
 SimulatedImageStreamer::~SimulatedImageStreamer()
 {}
 
+void SimulatedImageStreamer::initUSSimulator()
+{
+#ifdef CX_BUILD_US_SIMULATOR
+    mUSSimulator.reset(new ImageSimulator());
+    mUSSimulator->setShadowsAir(false);
+    mUSSimulator->setShadowsBone(false);
+    mUSSimulator->setReflections(false);
+    mUSSimulator->setAbsorption(false);
+    mUSSimulator->setSpeckle(false);
+#endif //CX_BUILD_US_SIMULATOR
+}
 
 void SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServicePtr dataManager)
 {

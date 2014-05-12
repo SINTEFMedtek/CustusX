@@ -50,6 +50,7 @@ private slots:
 	void setSourceToImageSlot(QString imageUid);
 
 private:
+    void initUSSimulator();
 	ImagePtr getSlice();
 	vtkImageDataPtr getMask();
 
