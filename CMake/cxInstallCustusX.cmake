@@ -100,11 +100,13 @@ set(ALL_LIBRARY_DIRS
     ${QT_LIBRARY_DIRS}
     ${QT_BINARY_DIR}
     ${GEStreamer_LIBRARY_DIRS}
-    ${VTK_LIBRARY_DIRS}
+#    ${VTK_LIBRARY_DIRS}
     ${OpenCV_LIB_DIR}
     ${OPENCL_LIBRARY_DIRS}
     ${IGSTK_LIBRARY_DIRS}
     ${OpenIGTLink_LIBRARY_DIRS}
+    ${VTK_DIR}/lib
+    ${CTK_DIR}/CTK-build/bin
     ${ITK_DIR}/lib
     ${DCMTK_DIR}/lib
  #   ${INCLUDE_DIRECTORIES}
