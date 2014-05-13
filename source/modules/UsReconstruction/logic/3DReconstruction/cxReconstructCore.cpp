@@ -38,6 +38,12 @@
 namespace cx
 {
 
+ReconstructionService::~ReconstructionService()
+{
+
+}
+
+
 ReconstructCore::ReconstructCore() :
 	mInput(InputParams())
 {

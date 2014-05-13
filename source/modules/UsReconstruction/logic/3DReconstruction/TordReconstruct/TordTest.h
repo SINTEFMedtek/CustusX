@@ -30,6 +30,7 @@ namespace cx
  */
 class TordTest : public ReconstructionService
 {
+    Q_OBJECT
 public:
 	TordTest();
 	virtual ~TordTest();

@@ -18,7 +18,15 @@ include_directories(
     )
 
 SET( MOC_HEADER_FILES
+  cxReconstructAlgorithm.h
+  cxPNNReconstructAlgorithm.h
     )
+if (CX_USE_OPENCL_UTILITY)
+	SET( MOC_HEADER_FILES
+		${MOC_HEADER_FILES}
+		TordReconstruct/TordTest.h
+		)
+endif (CX_USE_OPENCL_UTILITY)
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
@@ -27,8 +35,6 @@ SET( SOURCE_FILES
   ${MOC_HEADER_FILES}
   cxReconstructedOutputVolumeParams.h
   cxReconstructedOutputVolumeParams.cpp
-  cxReconstructAlgorithm.h
-  cxPNNReconstructAlgorithm.h
   cxPNNReconstructAlgorithm.cpp
   cxReconstructCore.cpp
   cxReconstructCore.h

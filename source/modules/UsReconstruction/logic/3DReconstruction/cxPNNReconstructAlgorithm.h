@@ -21,6 +21,7 @@
 #define CXPNNRECONSTRUCTALGORITHM_H_
 
 #include "cxReconstructAlgorithm.h"
+#include "cxTransform3D.h"
 
 namespace cx
 {
@@ -42,6 +43,7 @@ typedef boost::shared_ptr<class PNNReconstructAlgorithm> PNNReconstructAlgorithm
  */
 class PNNReconstructAlgorithm: public ReconstructionService
 {
+    Q_OBJECT
 public:
 	static ReconstructionServicePtr create() { return ReconstructionServicePtr(new PNNReconstructAlgorithm()); }
 	PNNReconstructAlgorithm();
