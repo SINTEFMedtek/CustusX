@@ -13,6 +13,8 @@ set(PLUGIN_SRCS
   cxDicomWidget.cpp
   cxDicomConverter.h
   cxDicomConverter.cpp
+  cxDicomImageReader.h
+  cxDicomImageReader.cpp
 )
 
 # Files which should be processed by Qts moc

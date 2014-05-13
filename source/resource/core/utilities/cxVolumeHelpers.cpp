@@ -81,6 +81,14 @@ vtkImageDataPtr generateVtkImageDataUnsignedShort(Eigen::Array3i dim,
 	return generateVtkImageDataGeneric<unsigned short, VTK_UNSIGNED_SHORT>(dim, spacing, initValue, components);
 }
 
+vtkImageDataPtr generateVtkImageDataSignedShort(Eigen::Array3i dim,
+									 Vector3D spacing,
+									 const short initValue,
+									 int components)
+{
+	return generateVtkImageDataGeneric<short, VTK_SHORT>(dim, spacing, initValue, components);
+}
+
 vtkImageDataPtr generateVtkImageDataDouble(Eigen::Array3i dim,
                                            Vector3D spacing,
                                            double initValue)
