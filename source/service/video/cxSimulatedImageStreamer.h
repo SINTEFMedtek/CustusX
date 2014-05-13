@@ -48,6 +48,7 @@ private slots:
 	void resetMask();
 	void sliceSlot();
 	void setSourceToImageSlot(QString imageUid);
+	void defineSectorInSimulator();
 
 private:
     void initUSSimulator();
