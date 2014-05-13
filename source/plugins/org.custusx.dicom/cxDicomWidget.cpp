@@ -19,6 +19,10 @@
 #include "ctkDICOMTableManager.h"
 #include "ctkDICOMObjectListWidget.h"
 #include "cxTypeConversions.h"
+#include "cxDicomConverter.h"
+#include "cxReporter.h"
+//#include "cxLegacySingletons.h"
+//#include "cxDataManager.h"
 
 namespace cx
 {
@@ -112,10 +116,23 @@ void DicomWidget::onImportIntoCustusXAction()
 
 void DicomWidget::importSeries(QString seriesUid)
 {
-	QStringList files = mBrowser->database()->filesForSeries(seriesUid);
+//	QStringList files = mBrowser->database()->filesForSeries(seriesUid);
 
-	std::cout << "import files from " << seriesUid  << ": " << std::endl;
-	std::cout << "  " << files.join("\n  ").toStdString() << std::endl;
+	cx::DicomConverter converter;
+	converter.setDicomDatabase(mBrowser->database());
+	cx::ImagePtr convertedImage = converter.convertToImage(seriesUid);
+
+	if (!convertedImage)
+	{
+		reportError(QString("Failed to load DICOM series %1").arg(seriesUid));
+		return;
+	}
+
+//	dataManager()->loadData(convertedImage);
+	report(QString("Loaded DICOM series %1 as %2").arg(seriesUid).arg(convertedImage->getName()));
+
+//	std::cout << "import files from " << seriesUid  << ": " << std::endl;
+//	std::cout << "  " << files.join("\n  ").toStdString() << std::endl;
 }
 
 } /* namespace cx */
