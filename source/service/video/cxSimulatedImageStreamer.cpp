@@ -65,6 +65,8 @@ void SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServic
 	connect(mTool->getProbe().get(), SIGNAL(activeConfigChanged()), this, SLOT(resetMask()));
 	connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(defineSectorInSimulator()));
 
+	this->defineSectorInSimulator();
+
 //	this->generateMaskSlot();
 
 	this->setInitialized(true);
@@ -214,11 +216,16 @@ void SimulatedImageStreamer::defineSectorInSimulator()
 	ProbeDefinition sectorParams = sector->mData;
 
 	mUSSimulator->setProbeType(static_cast<ImageSimulator::PROBE_TYPE>(sectorParams.getType()));//Make ImageSimulator use ProbeDefinition::TYPE
-//	mUSSimulator->setOrigin(sectorParams.getOrigin_p());
+
+	Eigen::Vector3d origin_p = sectorParams.getOrigin_p();
+	Eigen::Vector3d spacing = sectorParams.getSpacing();
+	Eigen::Vector3d origin_v = multiply_elems(origin_p, spacing);
+	mUSSimulator->setOrigin(origin_v);
+
 	double width = sectorParams.getWidth();
 	double depth = sectorParams.getDepthEnd() - sectorParams.getDepthStart();
 	double offset = sectorParams.getDepthStart();
-	std::cout << "width: " << width << " depth: " << depth << " offset: " << offset << std::endl;
+//	std::cout << "width: " << width << " depth: " << depth << " offset: " << offset << std::endl;
 	mUSSimulator->setSectorSize(width, depth, offset);
 
 #endif //CX_BUILD_US_SIMULATOR
