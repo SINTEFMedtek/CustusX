@@ -21,18 +21,26 @@
 #define CXRECONSTRUCTALGORITHM_H_
 
 #include <vector>
-#include "cxForwardDeclarations.h"
-#include "cxTransform3D.h"
+#include <QObject>
+//#include "cxForwardDeclarations.h"
+//#include "cxTransform3D.h"
+#include <vtkSmartPointer.h>
 #include "cxDataAdapter.h"
+#include  "boost/shared_ptr.hpp"
+
 
 class QDomElement;
 
 #define ReconstructionService_iid "cx::ReconstructionService"
 
+typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
+
 namespace cx
 {
-
+typedef boost::shared_ptr<class DoubleDataAdapterXml> DoubleDataAdapterXmlPtr;
+typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
+//typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
 
 /**
  * \addtogroup cx_module_usreconstruction
@@ -50,11 +58,11 @@ typedef boost::shared_ptr<class ReconstructionService> ReconstructionServicePtr;
  *  \author Ole Vegard Solberg
  *  \author Janne Beate Bakeng
  */
-class ReconstructionService //: public QObject
+class ReconstructionService : public QObject
 {
-    //Q_OBJECT
+    Q_OBJECT
 public:
-	virtual ~ReconstructionService() {}
+	virtual ~ReconstructionService();
 	virtual QString getName() const = 0;
 	/**
 	 *  Fill settings for this algorithm.

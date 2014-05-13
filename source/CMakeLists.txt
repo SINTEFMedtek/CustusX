@@ -49,6 +49,7 @@ endmacro()
 set(CX_PLUGINS
   plugins/org.custusx.dicom:ON
   plugins/org.custusx.example:ON
+  plugins/org.custusx.tordreconstruction:ON
 )
 
 ctkMacroSetupPlugins(${CX_PLUGINS})
