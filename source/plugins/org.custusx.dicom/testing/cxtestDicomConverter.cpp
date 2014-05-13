@@ -15,12 +15,14 @@
 #include "vtkImageAccumulate.h"
 #include "vtkImageData.h"
 #include "cxDataLocations.h"
+#include "cxVolumeHelpers.h"
 #include "org_custusx_dicom_Export.h"
 
 typedef vtkSmartPointer<vtkImageAccumulate> vtkImageAccumulatePtr;
 typedef vtkSmartPointer<vtkImageMathematics> vtkImageMathematicsPtr;
 typedef vtkSmartPointer<vtkMetaImageWriter> vtkMetaImageWriterPtr;
 typedef QSharedPointer<ctkDICOMDatabase> ctkDICOMDatabasePtr;
+
 class DicomConverterTestFixture
 {
 public:
@@ -76,7 +78,6 @@ public:
 	ctkDICOMDatabasePtr loadDirectory(QString folder)
 	{
 		QString databaseFileName = cx::DataLocations::getTestDataPath()+"/temp/testDatabase";
-//		QString databaseFileName = "/Users/christiana/dev/temp/testDatabase";
 		QFile(databaseFileName).remove();
 
 		ctkDICOMDatabasePtr DICOMDatabase;
@@ -95,21 +96,41 @@ public:
 		return strings.front();
 	}
 
-//	QSharedPointer<ctkDICOMDatabase> DICOMDatabase;
-//	QSharedPointer<ctkDICOMDatabase> database() { return DICOMDatabase; }
+	//	QSharedPointer<ctkDICOMDatabase> DICOMDatabase;
+	//	QSharedPointer<ctkDICOMDatabase> database() { return DICOMDatabase; }
 };
+
+TEST_CASE("DicomConverter: Fixture test", "[unit][plugins][org.custusx.dicom][hide]")
+{
+	DicomConverterTestFixture fixture;
+//	QString referenceImageFilename = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/MetaImage/Kaisa.mhd";
+//	cx::ImagePtr referenceImage = fixture.loadImageFromFile(referenceImageFilename, "reference");
+//	referenceImage->setModality("SC"); // hack: "SC" is not supported by mhd, it is instead set to "OTHER"
+
+	cx::ImagePtr flatImage = cx::Image::create("uid1", "name1");
+	vtkImageDataPtr flatVtkImage = cx::generateVtkImageDataSignedShort(Eigen::Array3i(30,30,20), cx::Vector3D(1,1,1), 1);
+	flatImage->setVtkImageData(flatVtkImage);
+
+	cx::ImagePtr zeroImage = cx::Image::create("uid1", "name1");
+	vtkImageDataPtr zeroVtkImage = cx::generateVtkImageDataSignedShort(Eigen::Array3i(30,30,20), cx::Vector3D(1,1,1), 0);
+	zeroImage->setVtkImageData(zeroVtkImage);
+
+	fixture.checkImagesEqual(flatImage, flatImage);
+	fixture.checkImagesEqual(flatImage, flatImage);
+//	fixture.checkImagesEqual(referenceImage, referenceImage);
+	CHECK(true);
+}
+
 
 TEST_CASE("DicomConverter: Convert Kaisa", "[unit][plugins][org.custusx.dicom][hide]")
 {
+	bool verbose = false;
 	DicomConverterTestFixture fixture;
 	// input  I: kaisa dicom data -> pass dicom data through converter
 	// input II: kaisa mhd file   -> load
 	//
 	// verify converter output equals loaded mhd file output
 
-//	QString databaseFileName = "/Users/christiana/dev/temp/testDatabase";
-//	QString inputDicomDataDirectory = "/Users/christiana/dev/dicom/kaisa_korrigert/";
-//	QString referenceImageFilename = "/Users/christiana/Patients/data/kaisa_series5353.mhd";
 	QString inputDicomDataDirectory = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/DICOM/";
 	QString referenceImageFilename = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/MetaImage/Kaisa.mhd";
 
@@ -120,10 +141,13 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[unit][plugins][org.custusx.dicom][h
 	QString series = fixture.getOneFromList(db->seriesForStudy(study));
 	QStringList files = db->filesForSeries(series);
 
-	std::cout << "patient " << patient << std::endl;
-	std::cout << "study " << study << std::endl;
-	std::cout << "series " << series << std::endl;
-	std::cout << "files " << files.join("\n") << std::endl;
+	if (verbose)
+	{
+		std::cout << "patient " << patient << std::endl;
+		std::cout << "study " << study << std::endl;
+		std::cout << "series " << series << std::endl;
+		std::cout << "files " << files.join("\n") << std::endl;
+	}
 
 	cx::DicomConverter converter;
 	converter.setDicomDatabase(db.data());
@@ -132,21 +156,19 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[unit][plugins][org.custusx.dicom][h
 	cx::ImagePtr referenceImage = fixture.loadImageFromFile(referenceImageFilename, "reference");
 	referenceImage->setModality("SC"); // hack: "SC" is not supported by mhd, it is instead set to "OTHER"
 
-	std::cout << "image: " << streamXml2String(*referenceImage) << std::endl;
-	std::cout << "converted: " << streamXml2String(*convertedImage) << std::endl;
-	referenceImage->getBaseVtkImageData()->Print(std::cout);
+	if (verbose)
+	{
+		std::cout << "image: " << streamXml2String(*referenceImage) << std::endl;
+		referenceImage->getBaseVtkImageData()->Print(std::cout);
+		if (convertedImage)
+		{
+			std::cout << "converted: " << streamXml2String(*convertedImage) << std::endl;
+			convertedImage->getBaseVtkImageData()->Print(std::cout);
+			cx::MetaImageReader().saveImage(convertedImage, "/Users/christiana/Patients/data/kaisa_series5353_out.mhd");
+		}
+	}
 
-	fixture.checkImagesEqual(referenceImage, referenceImage);
+	fixture.checkImagesEqual(referenceImage, referenceImage); //
 	fixture.checkImagesEqual(convertedImage, referenceImage);
-
-//	// write to disk
-	cx::MetaImageReader().saveImage(convertedImage, "/Users/christiana/Patients/data/kaisa_series5353_out.mhd");
-//	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
-//	writer->SetInputData(convertedImage->getBaseVtkImageData());
-//	writer->SetFileName("/Users/christiana/Patients/data/kaisa_series5353_out.mhd");
-//	writer->SetCompression(false);
-//	writer->Write();
-
-	CHECK(true);
 }
 
