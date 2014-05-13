@@ -100,7 +100,7 @@ public:
 	//	QSharedPointer<ctkDICOMDatabase> database() { return DICOMDatabase; }
 };
 
-TEST_CASE("DicomConverter: Fixture test", "[unit][plugins][org.custusx.dicom][hide]")
+TEST_CASE("DicomConverter: Fixture test", "[unit][plugins][org.custusx.dicom]")
 {
 	DicomConverterTestFixture fixture;
 //	QString referenceImageFilename = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/MetaImage/Kaisa.mhd";
@@ -116,13 +116,13 @@ TEST_CASE("DicomConverter: Fixture test", "[unit][plugins][org.custusx.dicom][hi
 	zeroImage->setVtkImageData(zeroVtkImage);
 
 	fixture.checkImagesEqual(flatImage, flatImage);
-	fixture.checkImagesEqual(flatImage, flatImage);
+//	fixture.checkImagesEqual(flatImage, flatImage);
 //	fixture.checkImagesEqual(referenceImage, referenceImage);
 	CHECK(true);
 }
 
 
-TEST_CASE("DicomConverter: Convert Kaisa", "[unit][plugins][org.custusx.dicom][hide]")
+TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.dicom]")
 {
 	bool verbose = false;
 	DicomConverterTestFixture fixture;
@@ -164,7 +164,7 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[unit][plugins][org.custusx.dicom][h
 		{
 			std::cout << "converted: " << streamXml2String(*convertedImage) << std::endl;
 			convertedImage->getBaseVtkImageData()->Print(std::cout);
-			cx::MetaImageReader().saveImage(convertedImage, "/Users/christiana/Patients/data/kaisa_series5353_out.mhd");
+			cx::MetaImageReader().saveImage(convertedImage, cx::DataLocations::getTestDataPath()+"/temp/kaisa_series5353_out.mhd");
 		}
 	}
 
