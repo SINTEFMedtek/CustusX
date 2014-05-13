@@ -41,11 +41,11 @@ void SimulatedImageStreamer::initUSSimulator()
 {
 #ifdef CX_BUILD_US_SIMULATOR
     mUSSimulator.reset(new ImageSimulator());
-    mUSSimulator->setShadowsAir(false);
+		/*mUSSimulator->setShadowsAir(false);
     mUSSimulator->setShadowsBone(false);
     mUSSimulator->setReflections(false);
     mUSSimulator->setAbsorption(false);
-    mUSSimulator->setSpeckle(false);
+		mUSSimulator->setSpeckle(false);*/
 #endif //CX_BUILD_US_SIMULATOR
 }
 
@@ -63,6 +63,7 @@ void SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServic
 	mTool = tool;
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(sliceSlot()));
 	connect(mTool->getProbe().get(), SIGNAL(activeConfigChanged()), this, SLOT(resetMask()));
+	connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(defineSectorInSimulator()));
 
 //	this->generateMaskSlot();
 
@@ -178,7 +179,7 @@ vtkImageDataPtr SimulatedImageStreamer::simulateUSFromCTSlice(ImagePtr source)
 	simulatedSlice = mUSSimulator->simulateFromCT(simInput);
 	mTimer->time("Simulate");
 #else
-	std::cout << "CT to US simulator not running" << std::endl;
+	cx::reporter()->sendError("CT to US simulator not running");
 	simulatedSlice = sliceOriginal(source);
 #endif //CX_BUILD_US_SIMULATOR
 
@@ -191,7 +192,7 @@ vtkImageDataPtr SimulatedImageStreamer::simulateUSFromMRSlice(ImagePtr source)
 	vtkImageDataPtr simulatedSlice;
 //	vtkImageDataPtr simInput = this->createSimulatorInputSlice(source);
 	simulatedSlice = sliceOriginal(source);
-	std::cout << "MR to US simulator not running" << std::endl;
+	cx::reporter()->sendError("MR to US simulator not running");
 	return simulatedSlice;
 }
 
@@ -202,6 +203,25 @@ vtkImageDataPtr SimulatedImageStreamer::createSimulatorInputSlice(ImagePtr sourc
 	mTimer->time("Grab");
 	mTimer->time("Mask");
 	return framegrabbedSlice;
+}
+
+void SimulatedImageStreamer::defineSectorInSimulator()
+{
+#ifdef CX_BUILD_US_SIMULATOR
+	if (!mUSSimulator)
+		return;
+	ProbeSectorPtr sector = mTool->getProbe()->getSector();
+	ProbeDefinition sectorParams = sector->mData;
+
+	mUSSimulator->setProbeType(static_cast<ImageSimulator::PROBE_TYPE>(sectorParams.getType()));//Make ImageSimulator use ProbeDefinition::TYPE
+//	mUSSimulator->setOrigin(sectorParams.getOrigin_p());
+	double width = sectorParams.getWidth();
+	double depth = sectorParams.getDepthEnd() - sectorParams.getDepthStart();
+	double offset = sectorParams.getDepthStart();
+	std::cout << "width: " << width << " depth: " << depth << " offset: " << offset << std::endl;
+	mUSSimulator->setSectorSize(width, depth, offset);
+
+#endif //CX_BUILD_US_SIMULATOR
 }
 
 vtkImageDataPtr SimulatedImageStreamer::sliceOriginal(ImagePtr source)
