@@ -41,12 +41,15 @@ public:
 private slots:
 	void onViewHeader();
 	void onImportIntoCustusXAction();
+protected:
+	virtual void prePaintEvent();
 private:
 	QVBoxLayout*  mVerticalLayout; ///< vertical layout is used
 	ctkDICOMBrowser* mBrowser;
 
 	QAction* mViewHeaderAction;
 	QAction* mImportIntoCustusXAction;
+	void createUI();
 	void setupDatabaseDirectory();
 	void importSeries(QString seriesUid);
 };
