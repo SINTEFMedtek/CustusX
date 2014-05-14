@@ -19,6 +19,8 @@
 
 #include "cxReconstructManager.h"
 
+#include <boost/bind.hpp>
+
 #include "cxStringDataAdapterXml.h"
 #include "cxDoubleDataAdapterXml.h"
 #include "cxBoolDataAdapterXml.h"
@@ -30,6 +32,9 @@
 #include "cxReconstructParams.h"
 #include "cxReconstructAlgorithm.h"
 
+#include "cxServiceTrackerListener.h"
+#include "cxLogicManager.h"
+#include "cxPluginFramework.h"
 
 //Windows fix
 #ifndef M_PI
@@ -51,11 +56,17 @@ ReconstructManager::ReconstructManager(XmlOptionFile settings, QString shaderPat
 	connect(mParams.get(), SIGNAL(transferFunctionChanged()), this, SLOT(transferFunctionChangedSlot()));
 
 	this->initAlgorithm();
+
+	mServiceListener.reset(new ServiceTrackerListener<ReconstructionService>(
+	        LogicManager::getInstance()->getPluginFramework(),
+	        boost::bind(&ReconstructManager::onServiceAdded, this),
+	        boost::function<void ()>(),
+	        boost::bind(&ReconstructManager::onServiceRemoved, this)
+	));
 }
 
 ReconstructManager::~ReconstructManager()
 {
-
 }
 
 ReconstructionServicePtr ReconstructManager::createAlgorithm()

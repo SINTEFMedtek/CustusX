@@ -39,7 +39,7 @@ void TordPluginActivator::start(ctkPluginContext* context)
 	this->mContext = context;
 
 	mPlugin.reset(new TordReconstructionService);
-	std::cout << "created dicomplugin service" << std::endl;
+	std::cout << "created tordreconstruction service" << std::endl;
 	try
 	{
 		context->registerService(QStringList(ReconstructionService_iid), mPlugin.get());
@@ -49,7 +49,7 @@ void TordPluginActivator::start(ctkPluginContext* context)
 		std::cout << e.what() << std::endl;
 		mPlugin.reset();
 	}
-	std::cout << "registered dicomplugin service" << std::endl;
+	std::cout << "registered tordreconstruction service" << std::endl;
 }
 
 void TordPluginActivator::stop(ctkPluginContext* context)
