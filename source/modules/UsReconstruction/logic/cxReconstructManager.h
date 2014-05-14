@@ -26,31 +26,27 @@
 #include "cxReconstructCore.h"
 #include "cxUSReconstructInputData.h"
 #include "cxReconstructedOutputVolumeParams.h"
+#include "cxReconstructAlgorithm.h"
+#include "cxServiceTrackerListener.h"
 
 namespace cx
 {
 typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
-}
-
-namespace cx
-{
 typedef boost::shared_ptr<class CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
 typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
 typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
 typedef boost::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
 typedef boost::shared_ptr<class ReconstructionService> ReconstructionServicePtr;
+typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
+typedef boost::shared_ptr<class ThreadedTimedReconstructPreprocessor> ThreadedTimedReconstructPreprocessorPtr;
+typedef boost::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedReconstructCorePtr;
 
 /**
  * \file
  * \addtogroup cx_module_usreconstruction
  * @{
  */
-
-typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
-typedef boost::shared_ptr<class ThreadedTimedReconstructPreprocessor> ThreadedTimedReconstructPreprocessorPtr;
-typedef boost::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedReconstructCorePtr;
-
 
 /**
  * \brief Manager for the us reconstruction process.
@@ -68,6 +64,7 @@ typedef boost::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedRecon
  *
  * \author Ole Vegard Solberg
  * \author Christian Askeland
+ * \author Janne Beate Bakeng
  * \date May 4, 2010
  */
 class ReconstructManager: public QObject
@@ -120,10 +117,6 @@ public:
 	  */
 	ReconstructionServicePtr createAlgorithm();
 
-private slots:
-	void setSettings();
-	void transferFunctionChangedSlot();
-
 signals:
 	void paramsChanged();
 	void algorithmChanged();
@@ -132,6 +125,8 @@ signals:
 	void newInputDataAvailable(QString mhdFileName);
 
 private slots:
+	void setSettings();
+	void transferFunctionChangedSlot();
 	void threadFinishedSlot();
 
 private:
@@ -151,6 +146,9 @@ private:
 	cx::CompositeTimedAlgorithmPtr assembleReconstructionPipeline(std::vector<ReconstructCorePtr> cores); ///< assembles the different steps that is needed to reconstruct
 	bool canCoresRunInParallel(std::vector<ReconstructCorePtr> cores);
 
+    void onServiceAdded();
+    void onServiceRemoved();
+
 	ReconstructParamsPtr mParams;
 	std::vector<DataAdapterPtr> mAlgoOptions;
 	std::set<cx::TimedAlgorithmPtr> mThreadedReconstruction;
@@ -162,6 +160,7 @@ private:
 	QString mOutputBasePath;///< Global path where the relative path starts, for the output image
 	QString mShaderPath; ///< name of shader folder
 
+	boost::shared_ptr<ServiceTrackerListener<ReconstructionService> > mServiceListener;
 };
 
 /**

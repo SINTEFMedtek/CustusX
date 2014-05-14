@@ -55,7 +55,6 @@ private slots:
 
 private:
 	ReconstructManagerPtr mReconstructer;
-//	ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;
 
 	FileSelectWidget* mFileSelectWidget;
 	QPushButton* mReconstructButton;
