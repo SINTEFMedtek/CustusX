@@ -23,27 +23,45 @@
 #include "cxReporter.h"
 //#include "cxLegacySingletons.h"
 //#include "cxDataManager.h"
+#include "cxLogger.h"
 
 namespace cx
 {
 
 DicomWidget::DicomWidget(QWidget* parent) :
     BaseWidget(parent, "DicomWidget", "Dicom"),
-    mVerticalLayout(new QVBoxLayout(this))
+	mVerticalLayout(new QVBoxLayout(this)),
+	mBrowser(NULL)
 {
+	this->setModified();
+}
+
+void DicomWidget::prePaintEvent()
+{
+	if (!mBrowser)
+	{
+		this->createUI();
+	}
+}
+
+void DicomWidget::createUI()
+{
+	if (mBrowser)
+		return;
+
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
 
 	//Add detailed button
 	mViewHeaderAction = this->createAction(this,
-		  QIcon(),
-		  "View Header", "View header info for first selected series",
-		  SLOT(onViewHeader()),
-		  buttonsLayout);
+										   QIcon(),
+										   "View Header", "View header info for first selected series",
+										   SLOT(onViewHeader()),
+										   buttonsLayout);
 	mImportIntoCustusXAction = this->createAction(this,
-		  QIcon(),
-		  "Import", "Import selected series into application",
-		  SLOT(onImportIntoCustusXAction()),
-		  buttonsLayout);
+												  QIcon(),
+												  "Import", "Import selected series into application",
+												  SLOT(onImportIntoCustusXAction()),
+												  buttonsLayout);
 
 	mBrowser = new ctkDICOMBrowser;
 
@@ -52,6 +70,7 @@ DicomWidget::DicomWidget(QWidget* parent) :
 
 	this->setupDatabaseDirectory();
 }
+
 
 DicomWidget::~DicomWidget()
 {
