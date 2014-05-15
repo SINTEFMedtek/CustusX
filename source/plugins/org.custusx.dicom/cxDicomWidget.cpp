@@ -19,27 +19,49 @@
 #include "ctkDICOMTableManager.h"
 #include "ctkDICOMObjectListWidget.h"
 #include "cxTypeConversions.h"
+#include "cxDicomConverter.h"
+#include "cxReporter.h"
+//#include "cxLegacySingletons.h"
+//#include "cxDataManager.h"
+#include "cxLogger.h"
 
 namespace cx
 {
 
 DicomWidget::DicomWidget(QWidget* parent) :
     BaseWidget(parent, "DicomWidget", "Dicom"),
-    mVerticalLayout(new QVBoxLayout(this))
+	mVerticalLayout(new QVBoxLayout(this)),
+	mBrowser(NULL)
 {
+	this->setModified();
+}
+
+void DicomWidget::prePaintEvent()
+{
+	if (!mBrowser)
+	{
+		this->createUI();
+	}
+}
+
+void DicomWidget::createUI()
+{
+	if (mBrowser)
+		return;
+
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
 
 	//Add detailed button
 	mViewHeaderAction = this->createAction(this,
-		  QIcon(),
-		  "View Header", "View header info for first selected series",
-		  SLOT(onViewHeader()),
-		  buttonsLayout);
+										   QIcon(),
+										   "View Header", "View header info for first selected series",
+										   SLOT(onViewHeader()),
+										   buttonsLayout);
 	mImportIntoCustusXAction = this->createAction(this,
-		  QIcon(),
-		  "Import", "Import selected series into application",
-		  SLOT(onImportIntoCustusXAction()),
-		  buttonsLayout);
+												  QIcon(),
+												  "Import", "Import selected series into application",
+												  SLOT(onImportIntoCustusXAction()),
+												  buttonsLayout);
 
 	mBrowser = new ctkDICOMBrowser;
 
@@ -48,6 +70,7 @@ DicomWidget::DicomWidget(QWidget* parent) :
 
 	this->setupDatabaseDirectory();
 }
+
 
 DicomWidget::~DicomWidget()
 {
@@ -112,10 +135,23 @@ void DicomWidget::onImportIntoCustusXAction()
 
 void DicomWidget::importSeries(QString seriesUid)
 {
-	QStringList files = mBrowser->database()->filesForSeries(seriesUid);
+//	QStringList files = mBrowser->database()->filesForSeries(seriesUid);
 
-	std::cout << "import files from " << seriesUid  << ": " << std::endl;
-	std::cout << "  " << files.join("\n  ").toStdString() << std::endl;
+	cx::DicomConverter converter;
+	converter.setDicomDatabase(mBrowser->database());
+	cx::ImagePtr convertedImage = converter.convertToImage(seriesUid);
+
+	if (!convertedImage)
+	{
+		reportError(QString("Failed to load DICOM series %1").arg(seriesUid));
+		return;
+	}
+
+//	dataManager()->loadData(convertedImage);
+	report(QString("Loaded DICOM series %1 as %2").arg(seriesUid).arg(convertedImage->getName()));
+
+//	std::cout << "import files from " << seriesUid  << ": " << std::endl;
+//	std::cout << "  " << files.join("\n  ").toStdString() << std::endl;
 }
 
 } /* namespace cx */

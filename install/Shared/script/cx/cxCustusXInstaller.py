@@ -274,7 +274,7 @@ class CustusXInstaller:
         changeDir(path)
         coreName = os.path.splitext(basename)[0]
         if not pkgName:
-            pkgName = coreName + '.pkg'
+            pkgName = coreName + '.mpkg'
         PrintFormatter.printInfo("install package %s from file %s" % (pkgName, coreName))
         shell.run('hdiutil attach -mountpoint /Volumes/%s %s' % (coreName, dmgfile))
         target = '/'  # TODO: mount on another (test) volume - this one requires sudo
