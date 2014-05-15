@@ -16,6 +16,8 @@ SimulateUSWidget::SimulateUSWidget(QWidget* parent) :
 		mImageSelector(SelectImageStringDataAdapter::New())
 {
 	QString selectedSimulation = settings()->value("USsimulation/type", "Original data").toString();
+	QString selectedVolume = settings()->value("USsimulation/volume", "").toString();
+	mImageSelector->setValue(selectedVolume);
 	QStringList simulationTypes;
 	simulationTypes << "Original data" << "CT to US" << "MR to US";
 	mSimulationType = StringDataAdapterXml::initialize("Simulation type", "",
@@ -57,6 +59,7 @@ void SimulateUSWidget::setImageUidToSimulate(QString uid)
 void SimulateUSWidget::imageChangedSlot(QString imageUid)
 {
 	videoService()->getVideoConnection()->getVideoConnection()->setImageToStream(imageUid);
+	settings()->setValue("USsimulation/volume", mImageSelector->getValue());
 }
 
 void SimulateUSWidget::simulationTypeChanged()
