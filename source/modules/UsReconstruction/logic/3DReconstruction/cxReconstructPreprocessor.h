@@ -28,8 +28,6 @@
 
 namespace cx
 {
-typedef boost::shared_ptr<class ReconstructAlgorithm> ReconstructAlgorithmPtr;
-
 typedef boost::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
 
 /** \brief Algorithm part of reconstruction -

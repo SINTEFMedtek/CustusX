@@ -12,33 +12,33 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxDicomGUIExtenderService.h"
-#include <QLabel>
-#include "cxDicomWidget.h"
-#include <QResource>
+#include "cxPatientModelImplService.h"
+
+#include "cxData.h"
+#include "cxReporter.h"
+#include "cxLogicManager.h"
+#include "cxDataManager.h"
+#include "cxPatientData.h"
+#include "cxPatientService.h"
 
 namespace cx
 {
 
 
-DicomGUIExtenderService::DicomGUIExtenderService(ctkPluginContext *context) : mContext(context)
-{
-	QResource::registerResource("./Resources/ctkDICOM.qrc");
-}
-
-DicomGUIExtenderService::~DicomGUIExtenderService()
+PatientModelImplService::PatientModelImplService()
 {
 }
 
-std::vector<GUIExtenderService::CategorizedWidget> DicomGUIExtenderService::createWidgets() const
+PatientModelImplService::~PatientModelImplService()
 {
-	std::vector<CategorizedWidget> retval;
+}
 
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new DicomWidget(mContext),
-			"Plugins"));
-
-	return retval;
+void PatientModelImplService::insertData(DataPtr data)
+{
+	LogicManager* lm = LogicManager::getInstance();
+	lm->getDataService()->loadData(data);
+	QString outputBasePath = lm->getPatientService()->getPatientData()->getActivePatientFolder();
+	lm->getDataService()->saveData(data, outputBasePath);
 }
 
 

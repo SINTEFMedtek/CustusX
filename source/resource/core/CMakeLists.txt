@@ -29,6 +29,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Data/cxMetricReferenceArgumentList
 	Data/cxLandmark
 	Data/cxDataFactory
+	Data/cxPatientModelService
 
 	Video/cxVideoSource.h
 	Video/cxVideoRecorder

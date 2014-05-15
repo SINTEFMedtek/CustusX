@@ -12,38 +12,36 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXDICOMGUIEXTENDERSERVICE_H_
-#define CXDICOMGUIEXTENDERSERVICE_H_
+#ifndef CXPATIENTMODELIMPLSERVICE_H_
+#define CXPATIENTMODELIMPLSERVICE_H_
 
-#include "cxGUIExtenderService.h"
-#include "org_custusx_dicom_Export.h"
-
-class ctkPluginContext;
+#include "cxPatientModelService.h"
+#include "org_custusx_patientmodel_Export.h"
 
 namespace cx
 {
 
 /**
- * Implementation of Dicom service.
+ * Implementation of PatientModelService.
  *
- * \ingroup org_custusx_dicom
+ * \ingroup org_custusx_patientmodel
  *
- * \date 2014-04-01
+ * \date 2014-05-15
  * \author Christian Askeland
  */
-class org_custusx_dicom_EXPORT DicomGUIExtenderService : public GUIExtenderService
+class org_custusx_patientmodel_EXPORT PatientModelImplService : public PatientModelService
 {
-	Q_INTERFACES(cx::GUIExtenderService)
+	Q_INTERFACES(cx::PatientModelService)
 public:
-	DicomGUIExtenderService(ctkPluginContext* context);
-	virtual ~DicomGUIExtenderService();
+	PatientModelImplService();
+	virtual ~PatientModelImplService();
 
-	std::vector<CategorizedWidget> createWidgets() const;
-	ctkPluginContext* mContext;
+	virtual void insertData(DataPtr data);
+
 };
-typedef boost::shared_ptr<DicomGUIExtenderService> DicomGUIExtenderServicePtr;
+typedef boost::shared_ptr<PatientModelImplService> PatientModelImplServicePtr;
 
 } /* namespace cx */
 
-#endif /* CXDICOMGUIEXTENDERSERVICE_H_ */
+#endif /* CXPATIENTMODELIMPLSERVICE_H_ */
 

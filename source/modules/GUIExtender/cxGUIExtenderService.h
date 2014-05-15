@@ -1,10 +1,3 @@
-/*
- * cxPluginBase.h
- *
- *  \date Jun 14, 2011
- *      \author christiana
- */
-
 #ifndef CXGUIEXTENDERSERVICE_H_
 #define CXGUIEXTENDERSERVICE_H_
 

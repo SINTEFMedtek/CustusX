@@ -23,27 +23,51 @@
 #include "cxReporter.h"
 //#include "cxLegacySingletons.h"
 //#include "cxDataManager.h"
+#include "cxLogger.h"
+
+#include "cxPatientModelService.h"
+
+#include "ctkPluginContext.h"
+#include "ctkServiceTracker.h"
 
 namespace cx
 {
 
-DicomWidget::DicomWidget(QWidget* parent) :
+DicomWidget::DicomWidget(ctkPluginContext *context, QWidget *parent) :
     BaseWidget(parent, "DicomWidget", "Dicom"),
-    mVerticalLayout(new QVBoxLayout(this))
+	mVerticalLayout(new QVBoxLayout(this)),
+	mBrowser(NULL),
+	mContext(context)
 {
+	this->setModified();
+}
+
+void DicomWidget::prePaintEvent()
+{
+	if (!mBrowser)
+	{
+		this->createUI();
+	}
+}
+
+void DicomWidget::createUI()
+{
+	if (mBrowser)
+		return;
+
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
 
 	//Add detailed button
 	mViewHeaderAction = this->createAction(this,
-		  QIcon(),
-		  "View Header", "View header info for first selected series",
-		  SLOT(onViewHeader()),
-		  buttonsLayout);
+										   QIcon(),
+										   "View Header", "View header info for first selected series",
+										   SLOT(onViewHeader()),
+										   buttonsLayout);
 	mImportIntoCustusXAction = this->createAction(this,
-		  QIcon(),
-		  "Import", "Import selected series into application",
-		  SLOT(onImportIntoCustusXAction()),
-		  buttonsLayout);
+												  QIcon(),
+												  "Import", "Import selected series into application",
+												  SLOT(onImportIntoCustusXAction()),
+												  buttonsLayout);
 
 	mBrowser = new ctkDICOMBrowser;
 
@@ -52,6 +76,7 @@ DicomWidget::DicomWidget(QWidget* parent) :
 
 	this->setupDatabaseDirectory();
 }
+
 
 DicomWidget::~DicomWidget()
 {
@@ -116,8 +141,6 @@ void DicomWidget::onImportIntoCustusXAction()
 
 void DicomWidget::importSeries(QString seriesUid)
 {
-//	QStringList files = mBrowser->database()->filesForSeries(seriesUid);
-
 	cx::DicomConverter converter;
 	converter.setDicomDatabase(mBrowser->database());
 	cx::ImagePtr convertedImage = converter.convertToImage(seriesUid);
@@ -128,11 +151,26 @@ void DicomWidget::importSeries(QString seriesUid)
 		return;
 	}
 
-//	dataManager()->loadData(convertedImage);
-	report(QString("Loaded DICOM series %1 as %2").arg(seriesUid).arg(convertedImage->getName()));
-
-//	std::cout << "import files from " << seriesUid  << ": " << std::endl;
-//	std::cout << "  " << files.join("\n  ").toStdString() << std::endl;
+	this->loadIntoPatientModel(convertedImage, seriesUid);
 }
+
+void DicomWidget::loadIntoPatientModel(ImagePtr image, QString seriesUid)
+{
+	ctkServiceTracker<PatientModelService*> tracker(mContext);
+	tracker.open();
+	PatientModelService* service = tracker.getService(); // get arbitrary instance of this type
+
+	if (service)
+	{
+		service->insertData(image);
+		report(QString("Loaded DICOM series %1 as %2").arg(seriesUid).arg(image->getName()));
+	}
+	else
+	{
+		reportWarning(QString("Failed to load DICOM series %1 as %2: no PatientModelService.").arg(seriesUid).arg(image->getName()));
+	}
+}
+
+
 
 } /* namespace cx */

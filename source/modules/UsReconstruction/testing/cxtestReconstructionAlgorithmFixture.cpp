@@ -12,9 +12,9 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxtestReconstructAlgorithmFixture.h"
+#include "cxtestReconstructionAlgorithmFixture.h"
 
-#include "cxReconstructAlgorithm.h"
+#include "cxReconstructionService.h"
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #include "cxtestSphereSyntheticVolume.h"
 #include "catch.hpp"
@@ -32,7 +32,7 @@
 namespace cxtest
 {
 
-ReconstructAlgorithmFixture::ReconstructAlgorithmFixture()
+ReconstructionAlgorithmFixture::ReconstructionAlgorithmFixture()
 {
 	mInputGenerator.reset(new SyntheticReconstructInput);
 
@@ -40,14 +40,14 @@ ReconstructAlgorithmFixture::ReconstructAlgorithmFixture()
 	this->defineOutputVolume(mInputGenerator->getBounds()[0], 1);
 }
 
-void ReconstructAlgorithmFixture::defineOutputVolume(double bounds, double spacing)
+void ReconstructionAlgorithmFixture::defineOutputVolume(double bounds, double spacing)
 {
 	mOutputVolumeDefinition.mBounds = cx::Vector3D::Ones() * bounds;
 	mOutputVolumeDefinition.mSpacing = cx::Vector3D::Ones() * spacing;
 }
 
 
-void ReconstructAlgorithmFixture::setOverallBoundsAndSpacing(double size, double spacing)
+void ReconstructionAlgorithmFixture::setOverallBoundsAndSpacing(double size, double spacing)
 {
 	// factors controlling sample rate:
 	//  - output volume spacing
@@ -60,7 +60,7 @@ void ReconstructAlgorithmFixture::setOverallBoundsAndSpacing(double size, double
 	this->defineOutputVolume(size, spacing);
 }
 
-void ReconstructAlgorithmFixture::printConfiguration()
+void ReconstructionAlgorithmFixture::printConfiguration()
 {
 	QString indent("");
 	std::cout << "=== ReconstructAlgorithmFixture: Configuration: ===" << std::endl;
@@ -71,12 +71,12 @@ void ReconstructAlgorithmFixture::printConfiguration()
 	std::cout << "======" << std::endl;
 }
 
-void ReconstructAlgorithmFixture::setAlgorithm(cx::ReconstructAlgorithmPtr algorithm)
+void ReconstructionAlgorithmFixture::setAlgorithm(cx::ReconstructionServicePtr algorithm)
 {
 	mAlgorithm = algorithm;
 }
 
-void ReconstructAlgorithmFixture::generateInput()
+void ReconstructionAlgorithmFixture::generateInput()
 {
 	REQUIRE(this->getPhantom());
 	REQUIRE(mOutputData);
@@ -85,7 +85,7 @@ void ReconstructAlgorithmFixture::generateInput()
 	REQUIRE(mInputData);
 }
 
-cx::ImagePtr ReconstructAlgorithmFixture::createOutputVolume(QString name)
+cx::ImagePtr ReconstructionAlgorithmFixture::createOutputVolume(QString name)
 {
 	cx::Vector3D bounds = this->getPhantom()->getBounds();
 	Eigen::Array3i dim = Eigen::Array3i((bounds.array()/mOutputVolumeDefinition.mSpacing.array()).cast<int>())+1;
@@ -98,12 +98,12 @@ cx::ImagePtr ReconstructAlgorithmFixture::createOutputVolume(QString name)
 	return retval;
 }
 
-void ReconstructAlgorithmFixture::generateOutputVolume()
+void ReconstructionAlgorithmFixture::generateOutputVolume()
 {
 	mOutputData = this->createOutputVolume("output");
 }
 
-void ReconstructAlgorithmFixture::reconstruct(QDomElement root)
+void ReconstructionAlgorithmFixture::reconstruct(QDomElement root)
 {
 	if (this->getVerbose())
 		this->printConfiguration();
@@ -126,7 +126,7 @@ void ReconstructAlgorithmFixture::reconstruct(QDomElement root)
 		std::cout << "Reconstruction done\n";
 }
 
-SyntheticVolumeComparerPtr ReconstructAlgorithmFixture::getComparer()
+SyntheticVolumeComparerPtr ReconstructionAlgorithmFixture::getComparer()
 {
 	if (!mComparer)
 	{
@@ -138,27 +138,27 @@ SyntheticVolumeComparerPtr ReconstructAlgorithmFixture::getComparer()
 	return mComparer;
 }
 
-void ReconstructAlgorithmFixture::checkRMSBelow(double threshold)
+void ReconstructionAlgorithmFixture::checkRMSBelow(double threshold)
 {
 	this->getComparer()->checkRMSBelow(threshold);
 }
 
-void ReconstructAlgorithmFixture::checkCentroidDifferenceBelow(double val)
+void ReconstructionAlgorithmFixture::checkCentroidDifferenceBelow(double val)
 {
 	this->getComparer()->checkCentroidDifferenceBelow(val);
 }
 
-void ReconstructAlgorithmFixture::checkMassDifferenceBelow(double val)
+void ReconstructionAlgorithmFixture::checkMassDifferenceBelow(double val)
 {
 	this->getComparer()->checkMassDifferenceBelow(val);
 }
 
-void ReconstructAlgorithmFixture::saveNominalOutputToFile(QString filename)
+void ReconstructionAlgorithmFixture::saveNominalOutputToFile(QString filename)
 {
 	this->getComparer()->saveNominalOutputToFile(filename);
 }
 
-void ReconstructAlgorithmFixture::saveOutputToFile(QString filename)
+void ReconstructionAlgorithmFixture::saveOutputToFile(QString filename)
 {
 	this->getComparer()->saveOutputToFile(filename);
 }

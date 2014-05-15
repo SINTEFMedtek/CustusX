@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxtestReconstructManagerFixture.h"
+#include "cxtestReconstructionManagerFixture.h"
 
 #include "cxDataManager.h"
 #include "catch.hpp"
@@ -28,25 +28,20 @@
 namespace cxtest
 {
 
-ReconstructManagerTestFixture::ReconstructManagerTestFixture()
+ReconstructionManagerTestFixture::ReconstructionManagerTestFixture()
 {
 	mVerbose = false;
-
-//	cx::Reporter::initialize();
-//	cx::cxDataManager::initialize();
 	cx::LogicManager::initialize();
 }
 
-ReconstructManagerTestFixture::~ReconstructManagerTestFixture()
+ReconstructionManagerTestFixture::~ReconstructionManagerTestFixture()
 {
 	cx::LogicManager::shutdown();
-//	cx::cxDataManager::shutdown();
-//	cx::Reporter::shutdown();
 }
 
-void ReconstructManagerTestFixture::setPNN_InterpolationSteps(int value)
+void ReconstructionManagerTestFixture::setPNN_InterpolationSteps(int value)
 {
-	cx::ReconstructManagerPtr manager = this->getManager();
+	cx::ReconstructionManagerPtr manager = this->getManager();
 	// set an algorithm-specific parameter
 	QDomElement algo = manager->getSettings().getElement("algorithms", "PNN");
 	boost::shared_ptr<cx::PNNReconstructAlgorithm> algorithm;
@@ -56,10 +51,10 @@ void ReconstructManagerTestFixture::setPNN_InterpolationSteps(int value)
 	algorithm->getInterpolationStepsOption(algo)->setValue(value);
 }
 
-void ReconstructManagerTestFixture::reconstruct()
+void ReconstructionManagerTestFixture::reconstruct()
 {
 	mOutput.clear();
-	cx::ReconstructManagerPtr manager = this->getManager();
+	cx::ReconstructionManagerPtr manager = this->getManager();
 	cx::ReconstructPreprocessorPtr preprocessor = manager->createPreprocessor();
 	std::vector<cx::ReconstructCorePtr> cores = manager->createCores();
 	preprocessor->initializeCores(cores);
@@ -71,21 +66,19 @@ void ReconstructManagerTestFixture::reconstruct()
 
 }
 
-void ReconstructManagerTestFixture::threadedReconstruct()
+void ReconstructionManagerTestFixture::threadedReconstruct()
 {
 	mOutput.clear();
-	cx::ReconstructManagerPtr manager = this->getManager();
+	cx::ReconstructionManagerPtr manager = this->getManager();
 
 	// start threaded reconstruction
 	std::vector<cx::ReconstructCorePtr> cores = manager->startReconstruction();
-//	REQUIRE(cores.size()==2);
 	std::set<cx::TimedAlgorithmPtr> threads = manager->getThreadedReconstruction();
 	REQUIRE(threads.size()==1);
 	cx::TimedAlgorithmPtr thread = *threads.begin();
 	QObject::connect(thread.get(), SIGNAL(finished()), qApp, SLOT(quit()));
 	qApp->exec();
 
-	// threaded exec is now complete
 
 	// validate output
 	REQUIRE(thread->isFinished());
@@ -97,28 +90,26 @@ void ReconstructManagerTestFixture::threadedReconstruct()
 	}
 }
 
-std::vector<cx::ImagePtr> ReconstructManagerTestFixture::getOutput()
+std::vector<cx::ImagePtr> ReconstructionManagerTestFixture::getOutput()
 {
 	return mOutput;
 }
 
-SyntheticVolumeComparerPtr ReconstructManagerTestFixture::getComparerForOutput(SyntheticReconstructInputPtr input, int index)
+SyntheticVolumeComparerPtr ReconstructionManagerTestFixture::getComparerForOutput(SyntheticReconstructInputPtr input, int index)
 {
 	SyntheticVolumeComparerPtr comparer(new SyntheticVolumeComparer());
 	comparer->setVerbose(this->getVerbose());
 	comparer->setPhantom(input->getPhantom());
-	//	comparer->setTestImage(cores[0]->getOutput());
 	comparer->setTestImage(this->getOutput()[index]);
 	return comparer;
 }
 
-cx::ReconstructManagerPtr ReconstructManagerTestFixture::getManager()
+cx::ReconstructionManagerPtr ReconstructionManagerTestFixture::getManager()
 {
 	if (!mManager)
 	{
-		//	std::cout << "testAngioReconstruction running" << std::endl;
 		cx::XmlOptionFile settings;
-		cx::ReconstructManagerPtr reconstructer(new cx::ReconstructManager(settings,""));
+		cx::ReconstructionManagerPtr reconstructer(new cx::ReconstructionManager(settings,""));
 
 		reconstructer->setOutputBasePath(cx::DataLocations::getTestDataPath() + "/temp/");
 		reconstructer->setOutputRelativePath("Images");
