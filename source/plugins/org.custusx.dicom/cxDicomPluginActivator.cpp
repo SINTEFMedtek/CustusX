@@ -39,7 +39,7 @@ void DicomPluginActivator::start(ctkPluginContext* context)
 	//	std::cout << "Started DicomPluginActivator" << std::endl;
 	this->mContext = context;
 
-	mDicomPlugin.reset(new DicomGUIExtenderService);
+	mDicomPlugin.reset(new DicomGUIExtenderService(context));
 	//  std::cout << "created dicomplugin service" << std::endl;
 	try
 	{

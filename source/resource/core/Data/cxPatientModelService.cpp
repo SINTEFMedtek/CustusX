@@ -12,34 +12,14 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxDicomGUIExtenderService.h"
-#include <QLabel>
-#include "cxDicomWidget.h"
-#include <QResource>
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
-
-DicomGUIExtenderService::DicomGUIExtenderService(ctkPluginContext *context) : mContext(context)
+PatientModelService::~PatientModelService()
 {
-	QResource::registerResource("./Resources/ctkDICOM.qrc");
+
 }
 
-DicomGUIExtenderService::~DicomGUIExtenderService()
-{
-}
-
-std::vector<GUIExtenderService::CategorizedWidget> DicomGUIExtenderService::createWidgets() const
-{
-	std::vector<CategorizedWidget> retval;
-
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new DicomWidget(mContext),
-			"Plugins"));
-
-	return retval;
-}
-
-
-} /* namespace cx */
+} // namespace cx

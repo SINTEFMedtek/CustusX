@@ -2,7 +2,7 @@
 #ifndef TORD_TEST_H_
 #define TORD_TEST_H_
 
-#include "cxReconstructAlgorithm.h"
+#include "cxReconstructionService.h"
 #include "cxUSFrameData.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxDoubleDataAdapterXml.h"
@@ -28,8 +28,9 @@ namespace cx
  * The algorithms share a lot of common code, both CL boilerplate code as well as
  * actual OpenCL kernel code.
  */
-class TordTest : public ReconstructAlgorithm
+class TordTest : public ReconstructionService
 {
+    Q_OBJECT
 public:
 	TordTest();
 	virtual ~TordTest();

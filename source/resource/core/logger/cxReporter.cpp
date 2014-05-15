@@ -48,7 +48,7 @@ Message::~Message(){};
 QString Message::getPrintableMessage() const
 {
 	QString source = QString("");
-	if (mSourceLocation.isEmpty())
+	if (!mSourceLocation.isEmpty())
 		source = QString("[%1]").arg(mSourceLocation);
 
 	QString printableMessage;

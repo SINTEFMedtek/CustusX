@@ -18,12 +18,9 @@
 namespace cx
 {
 
-ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructManagerPtr reconstructer) :
+ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructionManagerPtr reconstructer) :
 	BaseWidget(parent, "", "US Reconstruction"), mReconstructer(reconstructer)
 {
-//	ThreadedTimedReconstructerPtr threadedReconstructer = mReconstructer->getThreadedTimedReconstructer();
-//	connect(threadedReconstructer.get(), SIGNAL(started(int)), this, SLOT(reconstructStartedSlot()));
-//	connect(threadedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
 	connect(mReconstructer.get(), SIGNAL(reconstructAboutToStart()), this, SLOT(reconstructAboutToStartSlot()));
 
 	connect(mReconstructer.get(), SIGNAL(paramsChanged()), this, SLOT(paramsChangedSlot()));
@@ -43,7 +40,6 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructManagerPt
 	extentLayout->addWidget(new QLabel("Extent", this));
 	extentLayout->addWidget(mExtentLineEdit);
 
-//	QHBoxLayout* inputSpacingLayout = new QHBoxLayout;
 	mInputSpacingLineEdit = new QLineEdit(this);
 	mInputSpacingLineEdit->setReadOnly(true);
 	QLabel* inputSpacingLabel = new QLabel("Spacing In", this);
@@ -52,7 +48,6 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructManagerPt
 	connect(mReconstructButton, SIGNAL(clicked()), this, SLOT(reconstruct()));
 
 	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
-//	mTimedAlgorithmProgressBar->attach(threadedReconstructer);
 
 	QGridLayout* sizesLayout = new QGridLayout;
 	mMaxVolSizeWidget = new SpinBoxGroupWidget(this, mReconstructer->getParams()->mMaxVolumeSize);
@@ -152,9 +147,6 @@ void ReconstructionWidget::repopulateAlgorithmGroup()
 	if (mAlgoLayout->currentWidget() && (algoName == mAlgoLayout->currentWidget()->objectName()))
 		return;
 
-//	mAlgorithmGroup->setTitle("<removed>");
-//	mAlgorithmGroup->setTitle(algoName);
-
 	for (int i=0; i<mAlgoLayout->count(); ++i)
 	{
 		if (algoName==mAlgoLayout->widget(i)->objectName())
@@ -226,8 +218,6 @@ void ReconstructionWidget::selectData(QString filename)
  */
 void ReconstructionWidget::paramsChangedSlot()
 {
-//	repopulateAlgorithmGroup();
-
 	Vector3D range = mReconstructer->getOutputVolumeParams().getExtent().range();
 
 	QString extText =
@@ -252,7 +242,6 @@ void ReconstructionWidget::reconstructAboutToStartSlot()
 
 void ReconstructionWidget::reconstructFinishedSlot()
 {
-//	std::cout << "ReconstructionWidget::reconstructFinishedSlot()" << std::endl;
 	// stop if all threads are finished
 	bool finished = true;
 	std::set<cx::TimedAlgorithmPtr> reconstructer = mReconstructer->getThreadedReconstruction();
@@ -260,7 +249,6 @@ void ReconstructionWidget::reconstructFinishedSlot()
 	for(iter=reconstructer.begin(); iter!=reconstructer.end(); ++iter)
 	{
 		finished = finished && (*iter)->isFinished();
-//		std::cout << "   (*iter)->isFinished()" << (*iter)->isFinished() << std::endl;
 		if ((*iter)->isFinished())
 			mTimedAlgorithmProgressBar->detach(*iter);
 	}
@@ -273,7 +261,5 @@ void ReconstructionWidget::reconstructStartedSlot()
 {
 	mReconstructButton->setEnabled(false);
 }
-
-
 
 }//namespace

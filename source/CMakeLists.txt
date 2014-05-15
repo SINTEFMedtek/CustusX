@@ -50,6 +50,8 @@ cmake_policy(SET CMP0012 NEW)
 set(CX_PLUGINS
   plugins/org.custusx.dicom:ON
   plugins/org.custusx.example:ON
+  plugins/org.custusx.tordreconstruction:ON
+  plugins/org.custusx.patientmodel:ON
 )
 
 ctkMacroSetupPlugins(${CX_PLUGINS})
