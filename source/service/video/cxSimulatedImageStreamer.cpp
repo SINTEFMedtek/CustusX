@@ -227,7 +227,8 @@ void SimulatedImageStreamer::defineSectorInSimulator()
 	double depth = sectorParams.getDepthEnd() - sectorParams.getDepthStart();
 	double offset = sectorParams.getDepthStart();
 //	std::cout << "width: " << width << " depth: " << depth << " offset: " << offset << std::endl;
-	mUSSimulator->verifyAndSetSectorSize(width, depth, offset);
+	if(!mUSSimulator->verifyAndSetSectorSize(width, depth, offset))
+		cx::reporter()->sendWarning("Simulator is not accepting sector size");
 
 	this->sliceSlot();
 #endif //CX_BUILD_US_SIMULATOR
