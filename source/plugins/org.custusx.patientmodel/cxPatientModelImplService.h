@@ -33,9 +33,10 @@ class org_custusx_patientmodel_EXPORT PatientModelImplService : public PatientMo
 {
 	Q_INTERFACES(cx::PatientModelService)
 public:
-		PatientModelImplService();
+	PatientModelImplService();
 	virtual ~PatientModelImplService();
 
+	virtual void insertData(DataPtr data);
 
 };
 typedef boost::shared_ptr<PatientModelImplService> PatientModelImplServicePtr;
