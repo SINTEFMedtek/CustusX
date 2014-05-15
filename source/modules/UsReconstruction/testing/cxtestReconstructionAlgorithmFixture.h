@@ -12,10 +12,10 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXTESTRECONSTRUCTALGORITHMFIXTURE_H
-#define CXTESTRECONSTRUCTALGORITHMFIXTURE_H
+#ifndef CXTESTRECONSTRUCTIONALGORITHMFIXTURE_H
+#define CXTESTRECONSTRUCTIONALGORITHMFIXTURE_H
 
-#include "cxReconstructAlgorithm.h"
+#include "cxReconstructionService.h"
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #include "cxtestSyntheticVolumeComparer.h"
 #include "cxtestSyntheticReconstructInput.h"
@@ -36,10 +36,10 @@ namespace cxtest
  *          dMf = dMr*rMf, where rMf is the plane position on ref space.
  *
  */
-class ReconstructAlgorithmFixture
+class ReconstructionAlgorithmFixture
 {
 public:
-	ReconstructAlgorithmFixture();
+	ReconstructionAlgorithmFixture();
 
 	void setAlgorithm(cx::ReconstructionServicePtr algorithm);
 	void defineOutputVolume(double bounds, double spacing);
@@ -88,4 +88,4 @@ private:
 } // namespace cxtest
 
 
-#endif // CXTESTRECONSTRUCTALGORITHMFIXTURE_H
+#endif // CXTESTRECONSTRUCTIONALGORITHMFIXTURE_H

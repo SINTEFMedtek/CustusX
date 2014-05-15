@@ -19,7 +19,7 @@
 #ifndef CXRECONSTRUCTCORE_H_
 #define CXRECONSTRUCTCORE_H_
 
-//#include "cxReconstructAlgorithm.h"
+//#include "cxReconstructionService.h"
 #include "cxBoundingBox3D.h"
 #include "cxForwardDeclarations.h"
 #include "cxReconstructedOutputVolumeParams.h"

@@ -15,7 +15,7 @@
 #include <vtkImageData.h>
 #include <QDomElement>
 
-#include "cxReconstructAlgorithm.h"
+#include "cxReconstructionService.h"
 #include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #include "catch.hpp"
 #include "cxPNNReconstructAlgorithm.h"
@@ -27,7 +27,7 @@
 #endif
 
 #include "cxReporter.h"
-#include "cxtestReconstructAlgorithmFixture.h"
+#include "cxtestReconstructionAlgorithmFixture.h"
 #include "cxtestUtilities.h"
 #include "cxtestJenkinsMeasurement.h"
 
@@ -36,7 +36,7 @@ namespace cxtest
 
 TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthetic][ca_rec1][ca_rec]")
 {
-	ReconstructAlgorithmFixture fixture;
+	ReconstructionAlgorithmFixture fixture;
 	QDomDocument domdoc;
 	QDomElement settings = domdoc.createElement("PNN");
 
@@ -63,7 +63,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 	QDomDocument domdoc;
 	QDomElement settings = domdoc.createElement("PNN");
 
-	ReconstructAlgorithmFixture fixture;
+	ReconstructionAlgorithmFixture fixture;
 	fixture.setVerbose(false);
 
 	SyntheticReconstructInputPtr generator = fixture.getInputGenerator();
@@ -108,7 +108,7 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 {
 	cx::Reporter::initialize();
 
-	ReconstructAlgorithmFixture fixture;
+	ReconstructionAlgorithmFixture fixture;
 
 	fixture.setOverallBoundsAndSpacing(100, 5);
 	fixture.getInputGenerator()->setSpherePhantom();

@@ -15,10 +15,10 @@
 #ifndef CXTORDRECONSTRUCTIONSERVICE_H_
 #define CXTORDRECONSTRUCTIONSERVICE_H_
 
-#include "cxReconstructAlgorithm.h"
+#include "cxReconstructionService.h"
 #include "org_custusx_tordreconstruction_Export.h"
 
-#include "cxReconstructAlgorithm.h"
+#include "cxReconstructionService.h"
 #include "cxUSFrameData.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxDoubleDataAdapterXml.h"

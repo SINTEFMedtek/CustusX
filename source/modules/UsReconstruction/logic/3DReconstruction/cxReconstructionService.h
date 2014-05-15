@@ -17,13 +17,11 @@
 //
 // See sscLicense.txt for more information.
 
-#ifndef CXRECONSTRUCTALGORITHM_H_
-#define CXRECONSTRUCTALGORITHM_H_
+#ifndef CXRECONSTRUCTIONSERVICE_H_
+#define CXRECONSTRUCTIONSERVICE_H_
 
 #include <vector>
 #include <QObject>
-//#include "cxForwardDeclarations.h"
-//#include "cxTransform3D.h"
 #include <vtkSmartPointer.h>
 #include "cxDataAdapter.h"
 #include  "boost/shared_ptr.hpp"
@@ -40,7 +38,6 @@ namespace cx
 typedef boost::shared_ptr<class DoubleDataAdapterXml> DoubleDataAdapterXmlPtr;
 typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
-//typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
 
 /**
  * \addtogroup cx_module_usreconstruction
@@ -87,4 +84,4 @@ public:
 }//namespace cx
 Q_DECLARE_INTERFACE(cx::ReconstructionService, ReconstructionService_iid)
 
-#endif //CXRECONSTRUCTALGORITHM_H_
+#endif //CXRECONSTRUCTIONSERVICE_H_

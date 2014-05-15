@@ -2,7 +2,7 @@
 #ifndef TORD_TEST_H_
 #define TORD_TEST_H_
 
-#include "cxReconstructAlgorithm.h"
+#include "cxReconstructionService.h"
 #include "cxUSFrameData.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxDoubleDataAdapterXml.h"
