@@ -70,7 +70,6 @@ typedef boost::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedRecon
 class ReconstructManager: public QObject
 {
 Q_OBJECT
-	friend class ThreadedReconstructer;
 
 public:
 	ReconstructManager(XmlOptionFile settings, QString shaderPath);
