@@ -232,7 +232,6 @@ QStringList StateService::checkGrabberServerExist(QString path, QString filename
 	path = QDir::cleanPath(path);
 	if (QDir(path).exists(filename))
 		retval << QDir(DataLocations::getBundlePath()).relativeFilePath(path + "/" + filename) << args;
-
 	return retval;
 }
 
@@ -283,23 +282,23 @@ QStringList StateService::getGrabberServer(QString filename, QString relativePat
 
 	QStringList result;
 #ifdef __APPLE__
-	// run from installed folder
+	// run from installed folder on mac
 	result = this->checkGrabberServerExist(qApp->applicationDirPath(), filename, postfix);
 	if (!result.isEmpty())
 		return result;
 #endif
-	// run from installed folder
+	// run from installed or build bin folder
 	result = this->checkGrabberServerExist(DataLocations::getBundlePath(), filename, postfix);
 	if (!result.isEmpty())
 		return result;
-	// run from build folder
-	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../" + relativePath, filename, postfix);
-	if (!result.isEmpty())
-		return result;
-	// run from test folders
-	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../apps/" + relativePath, filename, postfix);
-	if (!result.isEmpty())
-		return result;
+//	// run from build folder
+//	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../" + relativePath, filename, postfix);
+//	if (!result.isEmpty())
+//		return result;
+//	// run from test folders
+//	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../apps/" + relativePath, filename, postfix);
+//	if (!result.isEmpty())
+//		return result;
 	else
 		cx::reporter()->sendWarning("StateService::getGrabberServer() can't locate grabber server");
 
@@ -317,7 +316,8 @@ QString StateService::getDefaultGrabberInitScript()
 	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/..", "run_v2u.sh", "");
 	if (!result.isEmpty())
 		return result[0];
-	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../../CustusX3/install/Linux/copy/", "run_v2u.sh", "");
+//	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../../CustusX3/install/Linux/copy/", "run_v2u.sh", "");
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../CustusX3/install/Linux/copy/", "run_v2u.sh", "");
 	if (!result.isEmpty())
 		return result[0];
 	return "";
