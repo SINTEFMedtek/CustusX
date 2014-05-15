@@ -23,6 +23,8 @@
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxSettings.h"
+#include "cxProbeImpl.h"
+#include <boost/make_shared.hpp>
 
 namespace cx
 {
@@ -41,11 +43,11 @@ void SimulatedImageStreamer::initUSSimulator()
 {
 #ifdef CX_BUILD_US_SIMULATOR
     mUSSimulator.reset(new ImageSimulator());
-		/*mUSSimulator->setShadowsAir(false);
-    mUSSimulator->setShadowsBone(false);
-    mUSSimulator->setReflections(false);
-    mUSSimulator->setAbsorption(false);
-		mUSSimulator->setSpeckle(false);*/
+		/*mUSSimulator->setShadowsAirOn(false);
+		mUSSimulator->setShadowsBoneOn(false);
+		mUSSimulator->setReflectionsOn(false);
+		mUSSimulator->setAbsorptionOn(false);
+		mUSSimulator->setSpeckleOn(false);*/
 #endif //CX_BUILD_US_SIMULATOR
 }
 
@@ -215,18 +217,17 @@ void SimulatedImageStreamer::defineSectorInSimulator()
 	ProbeSectorPtr sector = mTool->getProbe()->getSector();
 	ProbeDefinition sectorParams = sector->mData;
 
-	mUSSimulator->setProbeType(static_cast<ImageSimulator::PROBE_TYPE>(sectorParams.getType()));//Make ImageSimulator use ProbeDefinition::TYPE
+	mUSSimulator->setProbeType(static_cast<ImageSimulator::PROBE_TYPE>(sectorParams.getType()));//TODO: Make ImageSimulator use ProbeDefinition::TYPE
 
 	Eigen::Vector3d origin_p = sectorParams.getOrigin_p();
 	Eigen::Vector3d spacing = sectorParams.getSpacing();
-	Eigen::Vector3d origin_v = multiply_elems(origin_p, spacing);
+	Vector3D origin_v = multiply_elems(origin_p, spacing);
 	mUSSimulator->setOrigin(origin_v);
-
 	double width = sectorParams.getWidth();
 	double depth = sectorParams.getDepthEnd() - sectorParams.getDepthStart();
 	double offset = sectorParams.getDepthStart();
-//	std::cout << "width: " << width << " depth: " << depth << " offset: " << offset << std::endl;
-	mUSSimulator->setSectorSize(width, depth, offset);
+	std::cout << "width: " << width << " depth: " << depth << " offset: " << offset << std::endl;
+	mUSSimulator->verifyAndSetSectorSize(width, depth, offset);
 
 #endif //CX_BUILD_US_SIMULATOR
 }
