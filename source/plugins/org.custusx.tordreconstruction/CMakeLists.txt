@@ -3,28 +3,28 @@ project(org_custusx_tordreconstruction)
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 include_directories(
-    ${CustusX3_BINARY_DIR}/source/modules/USReconstruction/logic/3DReconstruction
+    ${CustusX3_BINARY_DIR}/source/modules/UsReconstruction/logic/3DReconstruction
     ${CustusX3_SOURCE_DIR}/source/resource/core
     ${CustusX3_SOURCE_DIR}/source/resource/core/utilities
     ${CustusX3_SOURCE_DIR}/source/resource/core/Math
     ${CustusX3_SOURCE_DIR}/source/resource/core/dataAdapters
     ${CustusX3_SOURCE_DIR}/source/resource/core/Tool
-    ${CustusX3_SOURCE_DIR}/source/resource/core/Logger
+    ${CustusX3_SOURCE_DIR}/source/resource/core/logger
     ${CustusX3_SOURCE_DIR}/source/resource/usReconstructionTypes
-    ${CustusX3_SOURCE_DIR}/source/modules/USReconstruction/logic/3DReconstruction
-    ${CustusX3_SOURCE_DIR}/source/modules/USReconstruction/logic/3DReconstruction/TordReconstruct
+    ${CustusX3_SOURCE_DIR}/source/modules/UsReconstruction/logic/3DReconstruction
+    ${CustusX3_SOURCE_DIR}/source/modules/UsReconstruction/logic/3DReconstruction/TordReconstruct
     ${CustusX3_SOURCE_DIR}/source/ThirdParty
     )
 
 set(PLUGIN_SRCS
   cxTordPluginActivator.cpp
   cxTordReconstructionService.cpp
+  cxTordReconstructionService.h
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxTordPluginActivator.h
-  cxTordReconstructionService.h
 )
 
 # Qt Designer files which should be processed by Qts uic
