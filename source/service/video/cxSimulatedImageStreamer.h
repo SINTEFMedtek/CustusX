@@ -48,19 +48,23 @@ private slots:
 	void resetMask();
 	void sliceSlot();
 	void setSourceToImageSlot(QString imageUid);
+	void defineSectorInSimulator();
 
 private:
+    void initUSSimulator();
 	ImagePtr getSlice();
 	vtkImageDataPtr getMask();
 
-	vtkImageDataPtr frameGrab(ImagePtr source);
+	vtkImageDataPtr frameGrab(ImagePtr source, bool applyLUT = true);
 	Transform3D getTransform_vMr(); ///< from reference space to video image space
 	void setSourceImage(ImagePtr image);
 	ImagePtr calculateSlice(ImagePtr source);
 	vtkImageDataPtr maskSlice(vtkImageDataPtr unmaskedSlice);
-	vtkImageDataPtr simulateUS(vtkImageDataPtr maskedFramedgrabbedSlice);
-	vtkImageDataPtr simulateUSFromCTSlice(vtkImageDataPtr maskedFramedgrabbedSlice);
-	vtkImageDataPtr simulateUSFromMRSlice(vtkImageDataPtr maskedFramedgrabbedSlice);
+//	vtkImageDataPtr simulateUS(vtkImageDataPtr maskedFramedgrabbedSlice);
+	vtkImageDataPtr simulateUSFromCTSlice(ImagePtr source);
+	vtkImageDataPtr simulateUSFromMRSlice(ImagePtr source);
+	vtkImageDataPtr createSimulatorInputSlice(ImagePtr source);
+	vtkImageDataPtr sliceOriginal(ImagePtr source);
 	ImagePtr convertToSscImage(vtkImageDataPtr slice, ImagePtr volume);
 
 	ImagePtr mSourceImage;
