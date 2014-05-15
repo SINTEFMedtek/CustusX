@@ -381,5 +381,13 @@ ReconstructCorePtr ReconstructManager::createBModeCore()
 	return retval;
 }
 
+void ReconstructManager::onServiceAdded()
+{
+    std::cout << "ReconstructManager::Added!!!" << std::endl;
+}
+void ReconstructManager::onServiceRemoved()
+{
+    std::cout << "ReconstructManager::Removed!!!" << std::endl;
+}
 
 }
