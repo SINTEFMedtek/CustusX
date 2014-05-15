@@ -85,14 +85,14 @@ class CustusXBuilder:
         PrintFormatter.printHeader('Run catch tests using tag %s' % tag, level=3)
         # Run all Catch tests and write them in xml format to ./Catch.<tagname>.TestResults.xml
         custusx = self._createComponent(cxComponents.CustusX3)
-        catchDir = '%s/source/testing' % custusx.buildPath()
+        catchDir = '%s/bin' % custusx.buildPath()
         outpath = self._getTestResultsPath()
         self._getTestRunner().runCatch(catchDir, tag=tag, outpath=outpath)
         
     def runCatchTestsWrappedInCTest(self, tag):
         PrintFormatter.printHeader('Run catch tests wrapped in ctest', level=2)
         custusx = self._createComponent(cxComponents.CustusX3)
-        appPath = '%s/source/testing' % custusx.buildPath()
+        appPath = '%s/bin' % custusx.buildPath()
         outpath = self._getTestResultsPath()
         testRunner = self._getTestRunner()
         testRunner.runCatchTestsWrappedInCTestGenerateJUnit(tag, appPath, outpath)
@@ -244,7 +244,6 @@ class CustusXBuilder:
                 '--enable=all',
                 '--xml-version=2',
                 '-i%s/source/ThirdParty/' % sourceDir,
-                '-i%s/source/resource/ssc_not_in_use/' % sourceDir,
                 '-i%s/source/resource/testUtilities/cisst_code/' % sourceDir,
                 '%s/source 2> %s/cppcheck-result.xml' % (sourceDir, rootDir)
                 ])
