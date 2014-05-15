@@ -14,6 +14,13 @@
 
 #include "cxPatientModelImplService.h"
 
+#include "cxData.h"
+#include "cxReporter.h"
+#include "cxLogicManager.h"
+#include "cxDataManager.h"
+#include "cxPatientData.h"
+#include "cxPatientService.h"
+
 namespace cx
 {
 
@@ -25,5 +32,14 @@ PatientModelImplService::PatientModelImplService()
 PatientModelImplService::~PatientModelImplService()
 {
 }
+
+void PatientModelImplService::insertData(DataPtr data)
+{
+	LogicManager* lm = LogicManager::getInstance();
+	lm->getDataService()->loadData(data);
+	QString outputBasePath = lm->getPatientService()->getPatientData()->getActivePatientFolder();
+	lm->getDataService()->saveData(data, outputBasePath);
+}
+
 
 } /* namespace cx */
