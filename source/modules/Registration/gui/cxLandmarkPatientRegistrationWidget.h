@@ -21,7 +21,6 @@ class QSpinBox;
 namespace cx
 {
 typedef Transform3D Transform3D;
-typedef boost::shared_ptr<Vector3D> Vector3DPtr;
 
 /**
  * \file

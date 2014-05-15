@@ -408,6 +408,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("applyTransferFunctionPresetsToAll", false);
 
 	this->fillDefault("USsimulation/type", "Original data");
+	this->fillDefault("USsimulation/volume", "");
 }
 
 
