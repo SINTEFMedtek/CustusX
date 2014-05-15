@@ -21,6 +21,7 @@ class ctkDICOMDatabase;
 
 namespace cx
 {
+typedef boost::shared_ptr<class DicomImageReader> DicomImageReaderPtr;
 
 /**
  * Import dicom series into cx Image.
@@ -40,7 +41,14 @@ public:
 	ImagePtr convertToImage(QString seriesUid);
 
 private:
+	QString generateUid(DicomImageReaderPtr reader);
+	QString generateName(DicomImageReaderPtr reader);
+	std::map<double, ImagePtr> createImagesSortedAlongDirection(QStringList files, Vector3D  e_sort);
+	ImagePtr mergeSlices(std::map<double, ImagePtr> sorted) const;
+	bool getMeanSliceDistance(std::map<double, ImagePtr> sorted) const;
+	bool slicesFormRegularGrid(std::map<double, ImagePtr> sorted, Vector3D e_sort) const;
 	ImagePtr createCxImageFromDicomFile(QString filename);
+
 	ctkDICOMDatabase* mDatabase;
 };
 

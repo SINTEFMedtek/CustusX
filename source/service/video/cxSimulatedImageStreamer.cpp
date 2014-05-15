@@ -24,6 +24,10 @@
 #include "cxTypeConversions.h"
 #include "cxSettings.h"
 
+#ifdef CX_BUILD_US_SIMULATOR
+#include "/../../UltrasoundSimulation/ImageSimulator.h"
+#endif //CX_BUILD_US_SIMULATOR
+
 namespace cx
 {
 
