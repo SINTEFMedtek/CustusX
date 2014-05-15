@@ -25,7 +25,6 @@ namespace cx
 PatientModelPluginActivator::PatientModelPluginActivator()
 : mContext(0)
 {
-	std::cout << "Created PatientModelPluginActivator" << std::endl;
 }
 
 PatientModelPluginActivator::~PatientModelPluginActivator()
@@ -35,11 +34,9 @@ PatientModelPluginActivator::~PatientModelPluginActivator()
 
 void PatientModelPluginActivator::start(ctkPluginContext* context)
 {
-	std::cout << "Started PatientModelPluginActivator" << std::endl;
 	this->mContext = context;
 
 	mPatientModelService.reset(new cx::PatientModelImplService);
-	std::cout << "created PatientModelService" << std::endl;
 	try
 	{
 		context->registerService(QStringList(PatientModelService_iid), mPatientModelService.get());
@@ -49,13 +46,11 @@ void PatientModelPluginActivator::start(ctkPluginContext* context)
 		std::cout << e.what() << std::endl;
 		mPatientModelService.reset();
 	}
-	std::cout << "registered PatientModelService service" << std::endl;
 }
 
 void PatientModelPluginActivator::stop(ctkPluginContext* context)
 {
 	mPatientModelService.reset();
-	std::cout << "Stopped PatientModelPluginActivator" << std::endl;
 	Q_UNUSED(context)
 }
 

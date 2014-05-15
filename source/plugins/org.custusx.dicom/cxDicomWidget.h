@@ -16,10 +16,13 @@
 #define CXDICOMWIDGET_H_
 
 #include "cxBaseWidget.h"
+#include "boost/shared_ptr.hpp"
 class ctkDICOMBrowser;
+class ctkPluginContext;
 
 namespace cx
 {
+	typedef boost::shared_ptr<class Image> ImagePtr;
 
 /**
  * Widget for dicom interaction
@@ -33,7 +36,7 @@ class DicomWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	DicomWidget(QWidget* parent = 0);
+	DicomWidget(ctkPluginContext* context, QWidget* parent = 0);
 	virtual ~DicomWidget();
 
 	virtual QString defaultWhatsThis() const;
@@ -46,12 +49,13 @@ protected:
 private:
 	QVBoxLayout*  mVerticalLayout; ///< vertical layout is used
 	ctkDICOMBrowser* mBrowser;
-
+	ctkPluginContext* mContext;
 	QAction* mViewHeaderAction;
 	QAction* mImportIntoCustusXAction;
 	void createUI();
 	void setupDatabaseDirectory();
 	void importSeries(QString seriesUid);
+	void loadIntoPatientModel(ImagePtr image, QString seriesUid);
 };
 
 } /* namespace cx */

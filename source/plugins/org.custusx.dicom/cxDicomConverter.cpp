@@ -56,7 +56,7 @@ QString DicomConverter::generateUid(DicomImageReaderPtr reader)
 
 	// uid: uid _ <timestamp>
 	// name: find something from series
-	QString currentTimestamp = timestampSecondsFormat();
+	QString currentTimestamp = QDateTime::currentDateTime().toString(timestampSecondsFormat());
 	QString uid = QString("%1_%2_%3").arg(seriesDescription).arg(seriesNumber).arg(currentTimestamp);
 	return uid;
 }

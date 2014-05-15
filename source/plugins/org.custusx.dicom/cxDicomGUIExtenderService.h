@@ -18,6 +18,8 @@
 #include "cxGUIExtenderService.h"
 #include "org_custusx_dicom_Export.h"
 
+class ctkPluginContext;
+
 namespace cx
 {
 
@@ -33,11 +35,11 @@ class org_custusx_dicom_EXPORT DicomGUIExtenderService : public GUIExtenderServi
 {
 	Q_INTERFACES(cx::GUIExtenderService)
 public:
-	DicomGUIExtenderService();
+	DicomGUIExtenderService(ctkPluginContext* context);
 	virtual ~DicomGUIExtenderService();
 
 	std::vector<CategorizedWidget> createWidgets() const;
-
+	ctkPluginContext* mContext;
 };
 typedef boost::shared_ptr<DicomGUIExtenderService> DicomGUIExtenderServicePtr;
 
