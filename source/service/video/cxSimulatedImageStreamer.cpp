@@ -196,7 +196,7 @@ vtkImageDataPtr SimulatedImageStreamer::simulateUSFromMRSlice(ImagePtr source)
 	vtkImageDataPtr simulatedSlice;
 //	vtkImageDataPtr simInput = this->createSimulatorInputSlice(source);
 	simulatedSlice = sliceOriginal(source);
-	cx::reporter()->sendError("MR to US simulator not running");
+//	cx::reporter()->sendError("MR to US simulator not running");
 	return simulatedSlice;
 }
 
@@ -226,9 +226,10 @@ void SimulatedImageStreamer::defineSectorInSimulator()
 	double width = sectorParams.getWidth();
 	double depth = sectorParams.getDepthEnd() - sectorParams.getDepthStart();
 	double offset = sectorParams.getDepthStart();
-	std::cout << "width: " << width << " depth: " << depth << " offset: " << offset << std::endl;
+//	std::cout << "width: " << width << " depth: " << depth << " offset: " << offset << std::endl;
 	mUSSimulator->verifyAndSetSectorSize(width, depth, offset);
 
+	this->sliceSlot();
 #endif //CX_BUILD_US_SIMULATOR
 }
 
