@@ -18,7 +18,7 @@ include_directories(
     )
 
 SET( MOC_HEADER_FILES
-  cxReconstructAlgorithm.h
+  cxReconstructionService.h
   cxPNNReconstructAlgorithm.h
     )
 if (CX_USE_OPENCL_UTILITY)

@@ -8,11 +8,11 @@
 #define CXRECONSTRUCTOUTPUTVALUEPARAMSINTERFACES_H_
 
 #include "cxDoubleDataAdapter.h"
-#include "cxReconstructManager.h"
+#include "cxReconstructionManager.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
+typedef boost::shared_ptr<class ReconstructionManager> ReconstructManagerPtr;
 class OutputVolumeParams;
 
 /**

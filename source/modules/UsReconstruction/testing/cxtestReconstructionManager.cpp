@@ -15,7 +15,7 @@
 #include "cxReconstructParams.h"
 #include "cxBoolDataAdapterXml.h"
 #include "catch.hpp"
-#include "cxtestReconstructManagerFixture.h"
+#include "cxtestReconstructionManagerFixture.h"
 #include "cxtestReconstructRealData.h"
 #include "cxtestSyntheticReconstructInput.h"
 
@@ -36,7 +36,7 @@ namespace cxtest
 
 TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][synthetic][not_win32][ca_rec]")
 {
-	ReconstructManagerTestFixture fixture;
+	ReconstructionManagerTestFixture fixture;
 	fixture.setVerbose(true);
 
 	SyntheticReconstructInputPtr input(new SyntheticReconstructInput);
@@ -45,7 +45,7 @@ TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][syntheti
 	input->setSpherePhantom();
 	cx::USReconstructInputData inputData = input->generateSynthetic_USReconstructInputData();
 
-	cx::ReconstructManagerPtr reconstructer = fixture.getManager();
+	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 	reconstructer->selectData(inputData);
 	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
 //	reconstructer->getParams()->mAngioAdapter->setValue(true);
@@ -80,7 +80,7 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 	  * BMode reconstructs only the gray.
 	  *
 	  */
-	ReconstructManagerTestFixture fixture;
+	ReconstructionManagerTestFixture fixture;
 	fixture.setVerbose(true);
 
 	SyntheticReconstructInputPtr input(new SyntheticReconstructInput);
@@ -90,7 +90,7 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 //	REQUIRE(!input.mFrames.empty());
 //	CHECK(input.mFrames[0]->);
 
-	cx::ReconstructManagerPtr reconstructer = fixture.getManager();
+	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 	reconstructer->selectData(inputData);
 	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
 	reconstructer->getParams()->mAngioAdapter->setValue(true);
@@ -120,9 +120,9 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 
 TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstruction][integration][not_win32]")
 {
-	ReconstructManagerTestFixture fixture;
+	ReconstructionManagerTestFixture fixture;
 	ReconstructRealTestData realData;
-	cx::ReconstructManagerPtr reconstructer = fixture.getManager();
+	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 
 	reconstructer->selectData(realData.getSourceFilename());
 	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");
@@ -140,9 +140,9 @@ TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstru
 
 TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruction][integration][not_win32]")
 {
-	ReconstructManagerTestFixture fixture;
+	ReconstructionManagerTestFixture fixture;
 	ReconstructRealTestData realData;
-	cx::ReconstructManagerPtr reconstructer = fixture.getManager();
+	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 
 	reconstructer->selectData(realData.getSourceFilename());
 	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");
@@ -162,7 +162,7 @@ TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruc
 
 TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integration][usreconstruction][synthetic][not_win32]")
 {
-	ReconstructManagerTestFixture fixture;
+	ReconstructionManagerTestFixture fixture;
 	fixture.setVerbose(true);
 
 	SyntheticReconstructInputPtr generator(new SyntheticReconstructInput);
@@ -181,7 +181,7 @@ TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integ
 	generator->setSpherePhantom();
 	cx::USReconstructInputData inputData = generator->generateSynthetic_USReconstructInputData();
 
-	cx::ReconstructManagerPtr reconstructer = fixture.getManager();
+	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 	reconstructer->selectData(inputData);
 	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
@@ -206,9 +206,9 @@ TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integ
 #ifdef CX_USE_OPENCL_UTILITY
 TEST_CASE("ReconstructManager: TordTest on real data", "[usreconstruction][integration][tordtest][not_apple][unstable]")
 {
-	ReconstructManagerTestFixture fixture;
+	ReconstructionManagerTestFixture fixture;
 	ReconstructRealTestData realData;
-	cx::ReconstructManagerPtr reconstructer = fixture.getManager();
+	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 
 	reconstructer->selectData(realData.getSourceFilename());
 	reconstructer->getParams()->mAlgorithmAdapter->setValue("TordTest");

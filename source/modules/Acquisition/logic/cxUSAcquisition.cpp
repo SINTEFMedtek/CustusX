@@ -14,7 +14,7 @@
 
 #include "cxUSAcquisition.h"
 
-#include "cxReconstructManager.h"
+#include "cxReconstructionManager.h"
 #include "cxReconstructParams.h"
 #include "cxBoolDataAdapterXml.h"
 

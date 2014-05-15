@@ -20,7 +20,7 @@
 #ifndef CXPNNRECONSTRUCTALGORITHM_H_
 #define CXPNNRECONSTRUCTALGORITHM_H_
 
-#include "cxReconstructAlgorithm.h"
+#include "cxReconstructionService.h"
 #include "cxTransform3D.h"
 
 namespace cx

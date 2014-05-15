@@ -13,7 +13,7 @@ class QDomNode;
 
 namespace cx
 {
-typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
+typedef boost::shared_ptr<class ReconstructionManager> ReconstructManagerPtr;
 }
 
 /**

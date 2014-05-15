@@ -17,8 +17,8 @@
 //
 // See sscLicense.txt for more information.
 
-#ifndef CXRECONSTRUCTMANAGER_H_
-#define CXRECONSTRUCTMANAGER_H_
+#ifndef CXRECONSTRUCTIONMANAGER_H_
+#define CXRECONSTRUCTIONMANAGER_H_
 
 #include <set>
 #include "cxForwardDeclarations.h"
@@ -26,14 +26,14 @@
 #include "cxReconstructCore.h"
 #include "cxUSReconstructInputData.h"
 #include "cxReconstructedOutputVolumeParams.h"
-#include "cxReconstructAlgorithm.h"
+#include "cxReconstructionService.h"
 #include "cxServiceTrackerListener.h"
 
 namespace cx
 {
 typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
 typedef boost::shared_ptr<class CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
-typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
+typedef boost::shared_ptr<class ReconstructionManager> ReconstructionManagerPtr;
 typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
 typedef boost::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
@@ -67,17 +67,19 @@ typedef boost::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedRecon
  * \author Janne Beate Bakeng
  * \date May 4, 2010
  */
-class ReconstructManager: public QObject
+class ReconstructionManager: public QObject
 {
 Q_OBJECT
 
 public:
-	ReconstructManager(XmlOptionFile settings, QString shaderPath);
-	virtual ~ReconstructManager();
+	ReconstructionManager(XmlOptionFile settings, QString shaderPath);
+	virtual ~ReconstructionManager();
 
-	void selectData(QString filename, QString calFilesPath = ""); ///< Set input data for reconstruction
+	//SET INPUT
+	/*TEST*/void selectData(QString filename, QString calFilesPath = ""); ///< Set input data for reconstruction
 	void selectData(USReconstructInputData data); ///< Set input data for reconstruction
 
+	//GETTERS
 	QString getSelectedFilename() const; ///< Get the currently selected filename
 	USReconstructInputData getSelectedFileData(); ///< Return the currently selected input data
 	ReconstructParamsPtr getParams(); ///< Return control parameters that can be adjusted by the GUI or similar prior to reconstruction
@@ -85,6 +87,7 @@ public:
 	XmlOptionFile getSettings(); ///< Return the settings xml file where parameters are stored
 	OutputVolumeParams getOutputVolumeParams() const; ///< Return params controlling the output data. These are data-dependent.
 
+	//SETTERS
 	void setOutputVolumeParams(const OutputVolumeParams& par); ///< Control the output volume
 	void setOutputRelativePath(QString path); ///< Set location of output relative to base
 	void setOutputBasePath(QString path); ///< Set base location of output
@@ -167,4 +170,4 @@ private:
  */
 }
 
-#endif /* CXRECONSTRUCTMANAGER_H_ */
+#endif /* CXRECONSTRUCTIONMANAGER_H_ */
