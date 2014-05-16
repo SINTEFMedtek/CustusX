@@ -29,6 +29,8 @@
 #include <string.h>
 #include "cxForwardDeclarations.h"
 
+typedef boost::shared_ptr<class ctkDICOMItem> ctkDICOMItemPtr;
+
 namespace cx
 {
 typedef boost::shared_ptr<class DicomImageReader> DicomImageReaderPtr;
@@ -46,18 +48,28 @@ public:
 	static DicomImageReaderPtr createFromFile(QString filename);
 	Transform3D getImageTransformPatient() const;
 	vtkImageDataPtr createVtkImageData();
-	ctkDICOMItem& item();
+	ctkDICOMItemPtr item();
 
 private:
 	DcmFileFormat mFileFormat;
 	DcmDataset *mDataset;
-	ctkDICOMItem mDicomItem;
+	ctkDICOMItemPtr mDicomItem;
 	QString mFilename;
 
 	DicomImageReader();
 	bool loadFile(QString filename);
 	Eigen::Array3d getSpacing() const;
 	Eigen::Array3i getDim(const DicomImage& dicomImage) const;
+
+	Transform3D getImageTransformPatient_multifile() const;
+	Transform3D getImageTransformPatient_singlefile() const;
+	bool isSingleFile() const;
+	DcmItem* findAndGetSequenceItem(DcmItem* parent, DcmTagKey tagKey, int number=0) const;
+	ctkDICOMItemPtr wrapInCTK(DcmItem* item) const;
+	Eigen::Array3d getSpacing_multifile() const;
+	Eigen::Array3d getSpacing_singlefile() const;
+	Eigen::Array3d getSpacing(ctkDICOMItemPtr item) const;
+	Transform3D getImageTransformPatient(ctkDICOMItemPtr planePosition, ctkDICOMItemPtr planeOrientation) const;
 };
 
 

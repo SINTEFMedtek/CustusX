@@ -131,7 +131,6 @@ void DicomWidget::onViewHeader()
 void DicomWidget::onImportIntoCustusXAction()
 {
 	QStringList series = mBrowser->dicomTableManager()->currentSeriesSelection();
-	std::cout << series.join("\n").toStdString() << std::endl;
 
 	for (unsigned i=0; i<series.size(); ++i)
 	{
@@ -147,7 +146,7 @@ void DicomWidget::importSeries(QString seriesUid)
 
 	if (!convertedImage)
 	{
-		reportError(QString("Failed to load DICOM series %1").arg(seriesUid));
+		reportError(QString("Failed to convert DICOM series %1").arg(seriesUid));
 		return;
 	}
 

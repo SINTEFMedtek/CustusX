@@ -26,7 +26,7 @@
 #include "dcdeftag.h" // defines all dcm tags
 #include "dcmimage.h"
 #include <string.h>
-
+#include "cxLogger.h"
 #include "cxDicomImageReader.h"
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
@@ -51,8 +51,8 @@ void DicomConverter::setDicomDatabase(ctkDICOMDatabase* database)
 
 QString DicomConverter::generateUid(DicomImageReaderPtr reader)
 {
-	QString seriesDescription = reader->item().GetElementAsString(DCM_SeriesDescription);
-	QString seriesNumber = reader->item().GetElementAsString(DCM_SeriesNumber);
+	QString seriesDescription = reader->item()->GetElementAsString(DCM_SeriesDescription);
+	QString seriesNumber = reader->item()->GetElementAsString(DCM_SeriesNumber);
 
 	// uid: uid _ <timestamp>
 	// name: find something from series
@@ -63,7 +63,7 @@ QString DicomConverter::generateUid(DicomImageReaderPtr reader)
 
 QString DicomConverter::generateName(DicomImageReaderPtr reader)
 {
-	QString seriesDescription = reader->item().GetElementAsString(DCM_SeriesDescription);
+	QString seriesDescription = reader->item()->GetElementAsString(DCM_SeriesDescription);
 	QString name = QString("%1").arg(seriesDescription);
 	return name;
 }
@@ -76,11 +76,13 @@ ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename)
 	QString name = this->generateName(reader);
 	cx::ImagePtr image = cx::Image::create(uid, name);
 
-	QString modality = reader->item().GetElementAsString(DCM_Modality);
+	QString modality = reader->item()->GetElementAsString(DCM_Modality);
 	image->setModality(modality);
 
-	double windowCenter = reader->item().GetElementAsDouble(DCM_WindowCenter);
-	double windowWidth = reader->item().GetElementAsDouble(DCM_WindowWidth);
+	double windowCenter = reader->item()->GetElementAsDouble(DCM_WindowCenter);
+	double windowWidth = reader->item()->GetElementAsDouble(DCM_WindowWidth);
+//	std::cout << "windowCenter " << windowCenter << std::endl;
+//	std::cout << "windowWidth: " << windowWidth << std::endl;
 	image->setInitialWindowLevel(windowWidth, windowCenter);
 
 	Transform3D M = reader->getImageTransformPatient();
@@ -194,6 +196,11 @@ ImagePtr DicomConverter::convertToImage(QString series)
 
 	ImagePtr startImage = this->createCxImageFromDicomFile(files.front());
 	Vector3D e_sort = startImage->get_rMd().vector(Vector3D(0,0,1));
+
+	if (files.size()==1)
+	{
+		return startImage;
+	}
 
 	std::map<double, ImagePtr> sorted = this->createImagesSortedAlongDirection(files, e_sort);
 
