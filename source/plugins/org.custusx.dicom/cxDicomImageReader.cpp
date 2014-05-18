@@ -11,7 +11,9 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
+
 #include "cxDicomImageReader.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -32,6 +34,7 @@ DicomImageReader::DicomImageReader() :
 
 bool DicomImageReader::loadFile(QString filename)
 {
+//	std::cout << "*** load file: " << filename << std::endl;
 	mFilename = filename;
 	OFCondition status = mFileFormat.loadFile(filename.toLatin1().data());
 	if( !status.good() )
@@ -40,37 +43,64 @@ bool DicomImageReader::loadFile(QString filename)
 	}
 
 	mDataset = mFileFormat.getDataset();
-	mDicomItem = this->wrapInCTK(mDataset);
+//	mDicomItem = this->wrapInCTK(mDataset);
 	return true;
 }
 
 ctkDICOMItemPtr DicomImageReader::item()
 {
-	return mDicomItem;
+	return this->wrapInCTK(mDataset);
 }
 
-bool DicomImageReader::isSingleFile() const
+double DicomImageReader::getDouble(const DcmTagKey& tag, const unsigned long pos, const OFBool searchIntoSub) const
 {
-	int numberOfFrames = mDicomItem->GetElementAsInteger(DCM_NumberOfFrames);
-//	std::cout << "numberOfFrames: " << numberOfFrames << std::endl;
-	return numberOfFrames > 1;
+	double retval = 0;
+	OFCondition condition;
+	condition = mDataset->findAndGetFloat64(tag, retval, pos, searchIntoSub);
+	if (!condition.good())
+	{
+		QString tagName = this->wrapInCTK(mDataset)->TagDescription(tag);
+		this->error(QString("Failed to get tag %1/%2").arg(tagName).arg(pos));
+	}
+	return retval;
 }
+
+DicomImageReader::WindowLevel DicomImageReader::getWindowLevel() const
+{
+	WindowLevel retval;
+	retval.center = this->getDouble(DCM_WindowCenter, 0, OFTrue);
+	retval.width = this->getDouble(DCM_WindowWidth, 0, OFTrue);
+	return retval;
+}
+
+//bool DicomImageReader::isSingleFile() const
+//{
+//	int numberOfFrames = mDicomItem->GetElementAsInteger(DCM_NumberOfFrames);
+//	std::cout << "numberOfFrames: " << numberOfFrames << std::endl;
+//	return numberOfFrames > 1;
+//}
 
 Transform3D DicomImageReader::getImageTransformPatient() const
 {
-	if (this->isSingleFile())
-		return this->getImageTransformPatient_singlefile();
-	else
-		return this->getImageTransformPatient_multifile();
-}
+	Vector3D pos;
+	Vector3D e_x;
+	Vector3D e_y;
 
-DcmItem* DicomImageReader::findAndGetSequenceItem(DcmItem* parent, DcmTagKey tagKey, int number) const
-{
-	if (!parent)
-		return NULL;
-	DcmItem* item = NULL;
-	parent->findAndGetSequenceItem(tagKey, item, number);
-	return item;
+	for (int i=0; i<3; ++i)
+	{
+		OFCondition condition;
+		e_x[i] = this->getDouble(DCM_ImageOrientationPatient, i, OFTrue);
+		e_y[i] = this->getDouble(DCM_ImageOrientationPatient, i+3, OFTrue);
+		pos[i] = this->getDouble(DCM_ImagePositionPatient, i, OFTrue);
+	}
+
+
+//	std::cout << "imagePositionPatient: " << pos << std::endl;
+//	std::cout << "imageOrientationPatientX: " << e_x << std::endl;
+//	std::cout << "imageOrientationPatientY: " << e_y << std::endl;
+
+	Transform3D retval = cx::createTransformIJC(e_x, e_y, pos);
+	return retval;
 }
 
 ctkDICOMItemPtr DicomImageReader::wrapInCTK(DcmItem* item) const
@@ -82,69 +112,40 @@ ctkDICOMItemPtr DicomImageReader::wrapInCTK(DcmItem* item) const
 	return retval;
 }
 
-Transform3D DicomImageReader::getImageTransformPatient_singlefile() const
+void DicomImageReader::error(QString message) const
 {
-	// orientation
-	DcmItem* sharedFunctionalGroupsSequence = this->findAndGetSequenceItem(mDataset,
-																		   DCM_SharedFunctionalGroupsSequence);
-	DcmItem* planeOrientationSequence = this->findAndGetSequenceItem(sharedFunctionalGroupsSequence,
-																	 DCM_PlaneOrientationSequence);
-
-	// position
-	DcmItem* perFrameFunctionalGroupsSequence = this->findAndGetSequenceItem(mDataset,
-																		   DCM_PerFrameFunctionalGroupsSequence);
-	DcmItem* planePositionSequence = this->findAndGetSequenceItem(perFrameFunctionalGroupsSequence,
-																	 DCM_PlanePositionSequence);
-
-	// merge into transform
-	return this->getImageTransformPatient(this->wrapInCTK(planePositionSequence),
-										  this->wrapInCTK(planeOrientationSequence));
+	reportError(QString("Dicom convert: [%1] in %2").arg(message).arg(mFilename));
 }
 
-Transform3D DicomImageReader::getImageTransformPatient_multifile() const
-{
-	return this->getImageTransformPatient(mDicomItem, mDicomItem);
-}
-
-Transform3D DicomImageReader::getImageTransformPatient(ctkDICOMItemPtr planePositionItem, ctkDICOMItemPtr planeOrientationItem) const
-{
-	if (!planePositionItem || !planeOrientationItem)
-		return Transform3D::Identity();
-
-	Vector3D imagePositionPatient;
-	Vector3D imageOrientationPatientX;
-	Vector3D imageOrientationPatientY;
-	for(int i=0; i<3; ++i)
-	{
-		imagePositionPatient[i] = planePositionItem->GetElementAsDouble(DCM_ImagePositionPatient, i);
-		imageOrientationPatientX[i] = planeOrientationItem->GetElementAsDouble(DCM_ImageOrientationPatient, i);
-		imageOrientationPatientY[i] = planeOrientationItem->GetElementAsDouble(DCM_ImageOrientationPatient, i+3);
-	}
-
-	//	std::cout << "singlefile: " << std::endl;
-	//	std::cout << "imagePositionPatient: " << imagePositionPatient << std::endl;
-	//	std::cout << "imageOrientationPatientX: " << imageOrientationPatientX << std::endl;
-	//	std::cout << "imageOrientationPatientY: " << imageOrientationPatientY << std::endl;
-
-	Transform3D retval = cx::createTransformIJC(imageOrientationPatientX,
-												imageOrientationPatientY,
-												imagePositionPatient);
-	return retval;
-}
+//void DicomImageReader::localDebug(QString message) const
+//{
+//	if (true)
+//		reportDebug(message);
+//}
 
 vtkImageDataPtr DicomImageReader::createVtkImageData()
 {
 	DicomImage dicomImage(mFilename.toLatin1().data()); //, CIF_MayDetachPixelData );
 	const DiPixel *pixels = dicomImage.getInterData();
+	if (!pixels)
+	{
+		this->error("Found no pixel data");
+		return vtkImageDataPtr();
+	}
 
 	vtkImageDataPtr data = vtkImageDataPtr::New();
 
 	data->SetSpacing(this->getSpacing().data());
+//	this->localDebug(QString("  spacing: %1").arg(qstring_cast(this->getSpacing())));
+//	std::cout << "  this->getSpacing(): " << this->getSpacing() << std::endl;
 
 	Eigen::Array3i dim = this->getDim(dicomImage);
 	data->SetExtent(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
 
-	int samplesPerPixel = mDicomItem->GetElementAsUnsignedShort(DCM_SamplesPerPixel);
+//	std::cout << "pixels->getCount(): " << pixels->getCount() << std::endl;
+
+	int samplesPerPixel = pixels->getPlanes();
+//	int samplesPerPixel = mDicomItem->GetElementAsUnsignedShort(DCM_SamplesPerPixel);
 	int scalarSize = dim.prod() * samplesPerPixel;
 	int pixelDepth = dicomImage.getDepth();
 
@@ -159,7 +160,7 @@ vtkImageDataPtr DicomImageReader::createVtkImageData()
 		data->AllocateScalars(VTK_UNSIGNED_SHORT, samplesPerPixel);
 		break;
 	case EPR_Uint32:
-		reportError("Dicom convert: : DICOM EPR_Uint32 not supported");
+		this->error("DICOM EPR_Uint32 not supported");
 		return vtkImageDataPtr();
 		break;
 	case EPR_Sint8:
@@ -171,7 +172,7 @@ vtkImageDataPtr DicomImageReader::createVtkImageData()
 		data->AllocateScalars(VTK_SHORT, samplesPerPixel);
 		break;
 	case EPR_Sint32:
-		reportError("Dicom convert: : DICOM EPR_Sint32 not supported");
+		this->error("DICOM EPR_Sint32 not supported");
 		return vtkImageDataPtr();
 		break;
 	}
@@ -186,41 +187,18 @@ vtkImageDataPtr DicomImageReader::createVtkImageData()
 
 	memcpy(data->GetScalarPointer(), pixels->getData(), pixels->getCount()*bytesPerPixel);
 	if (pixels->getCount()!=scalarSize)
-		reportError("Dicom convert: : Mismatch in pixel counts");
+		this->error("Mismatch in pixel counts");
 
 	return data;
 }
 
 Eigen::Array3d DicomImageReader::getSpacing() const
 {
-	if (this->isSingleFile())
-		return this->getSpacing_singlefile();
-	else
-		return this->getSpacing_multifile();
-}
-
-Eigen::Array3d DicomImageReader::getSpacing_multifile() const
-{
-	return this->getSpacing(mDicomItem);
-}
-
-Eigen::Array3d DicomImageReader::getSpacing_singlefile() const
-{
-	DcmItem* sharedFunctionalGroupsSequence = this->findAndGetSequenceItem(mDataset,
-																		   DCM_SharedFunctionalGroupsSequence);
-	DcmItem* pixelMeasuresSequence = this->findAndGetSequenceItem(sharedFunctionalGroupsSequence,
-																	 DCM_PixelMeasuresSequence);
-	ctkDICOMItemPtr pixelMeasuresSequenceItem = this->wrapInCTK(pixelMeasuresSequence);
-
-	return this->getSpacing(pixelMeasuresSequenceItem);
-}
-
-Eigen::Array3d DicomImageReader::getSpacing(ctkDICOMItemPtr item) const
-{
 	Eigen::Array3d spacing;
-	spacing[0] = item->GetElementAsDouble(DCM_PixelSpacing, 0);
-	spacing[1] = item->GetElementAsDouble(DCM_PixelSpacing, 1);
-	spacing[2] = item->GetElementAsDouble(DCM_SliceThickness);
+	spacing[0] = this->getDouble(DCM_PixelSpacing, 0, OFTrue);
+	spacing[1] = this->getDouble(DCM_PixelSpacing, 1, OFTrue);
+	spacing[2] = this->getDouble(DCM_SliceThickness, 0, OFTrue);
+//	std::cout << "  spacing: " << spacing << std::endl;
 	return spacing;
 }
 

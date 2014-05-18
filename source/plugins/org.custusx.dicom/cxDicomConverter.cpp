@@ -47,8 +47,6 @@ void DicomConverter::setDicomDatabase(ctkDICOMDatabase* database)
 	mDatabase = database;
 }
 
-
-
 QString DicomConverter::generateUid(DicomImageReaderPtr reader)
 {
 	QString seriesDescription = reader->item()->GetElementAsString(DCM_SeriesDescription);
@@ -58,7 +56,17 @@ QString DicomConverter::generateUid(DicomImageReaderPtr reader)
 	// name: find something from series
 	QString currentTimestamp = QDateTime::currentDateTime().toString(timestampSecondsFormat());
 	QString uid = QString("%1_%2_%3").arg(seriesDescription).arg(seriesNumber).arg(currentTimestamp);
+	uid = this->convertToValidFilename(uid);
 	return uid;
+}
+
+QString DicomConverter::convertToValidFilename(QString text) const
+{
+	QStringList illegal;
+	illegal << "\\s" << "\\." << ":" << ";" << "\\<" << "\\>" << "\\*" << "\\^" << ",";
+	QRegExp regexp(QString("(%1)").arg(illegal.join("|")));
+	text = text.replace(regexp, "_");
+	return text	;
 }
 
 QString DicomConverter::generateName(DicomImageReaderPtr reader)
@@ -71,6 +79,8 @@ QString DicomConverter::generateName(DicomImageReaderPtr reader)
 ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename)
 {
 	DicomImageReaderPtr reader = DicomImageReader::createFromFile(filename);
+	if (!reader)
+		return ImagePtr();
 
 	QString uid = this->generateUid(reader);
 	QString name = this->generateName(reader);
@@ -79,31 +89,41 @@ ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename)
 	QString modality = reader->item()->GetElementAsString(DCM_Modality);
 	image->setModality(modality);
 
-	double windowCenter = reader->item()->GetElementAsDouble(DCM_WindowCenter);
-	double windowWidth = reader->item()->GetElementAsDouble(DCM_WindowWidth);
-//	std::cout << "windowCenter " << windowCenter << std::endl;
-//	std::cout << "windowWidth: " << windowWidth << std::endl;
-	image->setInitialWindowLevel(windowWidth, windowCenter);
+	DicomImageReader::WindowLevel windowLevel = reader->getWindowLevel();
+	image->setInitialWindowLevel(windowLevel.width, windowLevel.center);
 
 	Transform3D M = reader->getImageTransformPatient();
 	image->get_rMd_History()->setRegistration(M);
 
 	vtkImageDataPtr imageData = reader->createVtkImageData();
+	if (!imageData)
+		return ImagePtr();
 	image->setVtkImageData(imageData);
 
 	return image;
 }
 
-std::map<double, ImagePtr> DicomConverter::createImagesSortedAlongDirection(QStringList files, Vector3D  e_sort)
+std::vector<ImagePtr> DicomConverter::createImages(QStringList files)
 {
-	std::map<double, ImagePtr> sorted;
+	std::vector<ImagePtr> retval;
 	for (int i=0; i<files.size(); ++i)
 	{
 		ImagePtr image = this->createCxImageFromDicomFile(files[i]);
-		Vector3D pos = image->get_rMd().coord(Vector3D(0,0,0));
+		if (image)
+			retval.push_back(image);
+	}
+	return retval;
+}
+
+std::map<double, ImagePtr> DicomConverter::sortImagesAlongDirection(std::vector<ImagePtr> images, Vector3D  e_sort)
+{
+	std::map<double, ImagePtr> sorted;
+	for (int i=0; i<images.size(); ++i)
+	{
+		Vector3D pos = images[i]->get_rMd().coord(Vector3D(0,0,0));
 		double dist = dot(pos, e_sort);
 
-		sorted[dist] = image;
+		sorted[dist] = images[i];
 	}
 	return sorted;
 }
@@ -194,15 +214,19 @@ ImagePtr DicomConverter::convertToImage(QString series)
 {
 	QStringList files = mDatabase->filesForSeries(series);
 
-	ImagePtr startImage = this->createCxImageFromDicomFile(files.front());
-	Vector3D e_sort = startImage->get_rMd().vector(Vector3D(0,0,1));
+	std::vector<ImagePtr> images = this->createImages(files);
 
-	if (files.size()==1)
+	if (images.empty())
+		return ImagePtr();
+
+	if (images.size()==1)
 	{
-		return startImage;
+		return images.front();
 	}
 
-	std::map<double, ImagePtr> sorted = this->createImagesSortedAlongDirection(files, e_sort);
+	Vector3D e_sort = images.front()->get_rMd().vector(Vector3D(0,0,1));
+
+	std::map<double, ImagePtr> sorted = this->sortImagesAlongDirection(images, e_sort);
 
 	if (!this->slicesFormRegularGrid(sorted, e_sort))
 		return ImagePtr();

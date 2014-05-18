@@ -29,6 +29,8 @@
 
 #include "ctkPluginContext.h"
 #include "ctkServiceTracker.h"
+#include <QApplication>
+#include <QDesktopWidget>
 
 namespace cx
 {
@@ -125,6 +127,12 @@ void DicomWidget::onViewHeader()
 	ctkDICOMObjectListWidget* window = new ctkDICOMObjectListWidget;
     window->setWindowTitle("DICOM File Header");
     window->setFileList(files);
+
+	QWidget* screen = qApp->desktop()->screen(qApp->desktop()->screenNumber(this));
+	QRect rect = screen->geometry();
+	rect.setWidth(rect.width()*0.66);
+	window->setGeometry(rect);
+
     window->show();
 }
 
