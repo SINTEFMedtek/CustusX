@@ -43,11 +43,13 @@ public:
 private:
 	QString generateUid(DicomImageReaderPtr reader);
 	QString generateName(DicomImageReaderPtr reader);
-	std::map<double, ImagePtr> createImagesSortedAlongDirection(QStringList files, Vector3D  e_sort);
+	std::map<double, ImagePtr> sortImagesAlongDirection(std::vector<ImagePtr> images, Vector3D  e_sort);
 	ImagePtr mergeSlices(std::map<double, ImagePtr> sorted) const;
 	bool getMeanSliceDistance(std::map<double, ImagePtr> sorted) const;
 	bool slicesFormRegularGrid(std::map<double, ImagePtr> sorted, Vector3D e_sort) const;
 	ImagePtr createCxImageFromDicomFile(QString filename);
+	std::vector<ImagePtr> createImages(QStringList files);
+	QString convertToValidFilename(QString text) const;
 
 	ctkDICOMDatabase* mDatabase;
 };

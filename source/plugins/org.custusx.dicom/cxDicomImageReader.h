@@ -45,31 +45,34 @@ typedef boost::shared_ptr<class DicomImageReader> DicomImageReaderPtr;
 class DicomImageReader
 {
 public:
+	struct WindowLevel
+	{
+		double center;
+		double width;
+	};
+
+public:
 	static DicomImageReaderPtr createFromFile(QString filename);
 	Transform3D getImageTransformPatient() const;
 	vtkImageDataPtr createVtkImageData();
 	ctkDICOMItemPtr item();
+	WindowLevel getWindowLevel() const;
 
 private:
 	DcmFileFormat mFileFormat;
 	DcmDataset *mDataset;
-	ctkDICOMItemPtr mDicomItem;
+//	ctkDICOMItemPtr mDicomItem;
 	QString mFilename;
 
 	DicomImageReader();
 	bool loadFile(QString filename);
 	Eigen::Array3d getSpacing() const;
 	Eigen::Array3i getDim(const DicomImage& dicomImage) const;
+	void error(QString message) const;
+//	void localDebug(QString message) const;
+	double getDouble(const DcmTagKey& tag, const unsigned long pos=0, const OFBool searchIntoSub = OFFalse) const;
 
-	Transform3D getImageTransformPatient_multifile() const;
-	Transform3D getImageTransformPatient_singlefile() const;
-	bool isSingleFile() const;
-	DcmItem* findAndGetSequenceItem(DcmItem* parent, DcmTagKey tagKey, int number=0) const;
 	ctkDICOMItemPtr wrapInCTK(DcmItem* item) const;
-	Eigen::Array3d getSpacing_multifile() const;
-	Eigen::Array3d getSpacing_singlefile() const;
-	Eigen::Array3d getSpacing(ctkDICOMItemPtr item) const;
-	Transform3D getImageTransformPatient(ctkDICOMItemPtr planePosition, ctkDICOMItemPtr planeOrientation) const;
 };
 
 
