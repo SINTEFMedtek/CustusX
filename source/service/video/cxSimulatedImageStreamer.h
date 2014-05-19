@@ -63,6 +63,7 @@ private:
 //	vtkImageDataPtr simulateUS(vtkImageDataPtr maskedFramedgrabbedSlice);
 	vtkImageDataPtr simulateUSFromCTSlice(ImagePtr source);
 	vtkImageDataPtr simulateUSFromMRSlice(ImagePtr source);
+	void setSimulatorParameters();
 	vtkImageDataPtr createSimulatorInputSlice(ImagePtr source);
 	vtkImageDataPtr sliceOriginal(ImagePtr source);
 	ImagePtr convertToSscImage(vtkImageDataPtr slice, ImagePtr volume);

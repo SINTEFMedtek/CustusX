@@ -1,6 +1,7 @@
 #include "cxSimulateUSWidget.h"
 
 #include <QVBoxLayout>
+#include <QDial.h>
 #include "cxLabeledComboBoxWidget.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxVideoService.h"
@@ -32,10 +33,25 @@ SimulateUSWidget::SimulateUSWidget(QWidget* parent) :
 	mTopLayout = new QVBoxLayout(this);
 	mTopLayout->addWidget(new LabeledComboBoxWidget(this, mSimulationType));
 	mTopLayout->addWidget(imageCombo);
+	this->createAndAddGainController();
 }
 
 SimulateUSWidget::~SimulateUSWidget()
 {}
+
+void SimulateUSWidget::createAndAddGainController()
+{
+	double gain = settings()->value("USsimulation/gain").value<double>();
+	QDial* mGain = new QDial(this);
+	mGain->setMaximum(100);
+	mGain->setMinimum(0);
+	mGain->setSingleStep(1);
+	mGain->setValue(gain*100);
+	connect(mGain, SIGNAL(valueChanged(int)), this, SLOT(gainChanged(int)));
+
+	mTopLayout->addWidget(new QLabel("Gain:"));
+	mTopLayout->addWidget(mGain, 0, Qt::AlignLeft);
+}
 
 QString SimulateUSWidget::defaultWhatsThis() const
 {
@@ -65,6 +81,11 @@ void SimulateUSWidget::imageChangedSlot(QString imageUid)
 void SimulateUSWidget::simulationTypeChanged()
 {
 	settings()->setValue("USsimulation/type", mSimulationType->getValue());
+}
+
+void SimulateUSWidget::gainChanged(int gain)
+{
+	settings()->setValue("USsimulation/gain", gain/100.0);
 }
 
 } /* namespace cx */

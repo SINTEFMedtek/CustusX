@@ -39,8 +39,11 @@ signals:
 private slots:
 	void imageChangedSlot(QString imageUid);
 	void simulationTypeChanged();
+	void gainChanged(int gain);
 
 private:
+	void createAndAddGainController();
+
 	QVBoxLayout* mTopLayout;
 	SelectImageStringDataAdapterPtr mImageSelector;
 
