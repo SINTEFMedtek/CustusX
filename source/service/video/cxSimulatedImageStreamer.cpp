@@ -180,6 +180,7 @@ vtkImageDataPtr SimulatedImageStreamer::simulateUSFromCTSlice(ImagePtr source)
 #ifdef CX_BUILD_US_SIMULATOR
 //	std::cout << "CT to US simulator running" << std::endl;
 	vtkImageDataPtr simInput = this->createSimulatorInputSlice(source);
+	this->setSimulatorParameters();
 	simulatedSlice = mUSSimulator->simulateFromCT(simInput);
 	mTimer->time("Simulate");
 #else
@@ -195,9 +196,16 @@ vtkImageDataPtr SimulatedImageStreamer::simulateUSFromMRSlice(ImagePtr source)
 {
 	vtkImageDataPtr simulatedSlice;
 //	vtkImageDataPtr simInput = this->createSimulatorInputSlice(source);
+//	this->setSimulatorParameters();
 	simulatedSlice = sliceOriginal(source);
 //	cx::reporter()->sendError("MR to US simulator not running");
 	return simulatedSlice;
+}
+
+void SimulatedImageStreamer::setSimulatorParameters()
+{
+	double gain = settings()->value("USsimulation/gain").value<double>();
+	mUSSimulator->setGain(gain);
 }
 
 vtkImageDataPtr SimulatedImageStreamer::createSimulatorInputSlice(ImagePtr source)
