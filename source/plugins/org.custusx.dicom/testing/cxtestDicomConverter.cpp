@@ -149,7 +149,7 @@ TEST_CASE("DicomConverter: Fixture test", "[unit][plugins][org.custusx.dicom]")
 	CHECK(true);
 }
 
-TEST_CASE("DicomConverter: Open database", "[unit][plugins][org.custusx.dicom]")
+TEST_CASE("DicomConverter: Open database", "[unstable][unit][plugins][org.custusx.dicom]")
 {
 	cx::Reporter::initialize();
 
@@ -166,7 +166,7 @@ TEST_CASE("DicomConverter: Open database", "[unit][plugins][org.custusx.dicom]")
 	cx::Reporter::shutdown();
 }
 
-TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.dicom]")
+TEST_CASE("DicomConverter: Convert Kaisa", "[unstable][integration][plugins][org.custusx.dicom]")
 {
 	cx::Reporter::initialize();
 	SSC_LOG("");
