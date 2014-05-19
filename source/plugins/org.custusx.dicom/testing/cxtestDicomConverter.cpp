@@ -17,6 +17,8 @@
 #include "cxDataLocations.h"
 #include "cxVolumeHelpers.h"
 #include "org_custusx_dicom_Export.h"
+#include "cxLogger.h"
+#include "cxReporter.h"
 
 typedef vtkSmartPointer<vtkImageAccumulate> vtkImageAccumulatePtr;
 typedef vtkSmartPointer<vtkImageMathematics> vtkImageMathematicsPtr;
@@ -75,15 +77,41 @@ public:
 		return image;
 	}
 
-	ctkDICOMDatabasePtr loadDirectory(QString folder)
+	QString getDatabaseFileName() const
 	{
-		QString databaseFileName = cx::DataLocations::getTestDataPath()+"/temp/testDatabase";
-		QFile(databaseFileName).remove();
+		return cx::DataLocations::getTestDataPath()+"/temp/testDatabase";
+	}
 
+	void eraseDatabase()
+	{
+		QString databaseFileName = this->getDatabaseFileName();
+		QFile(databaseFileName).remove();
+	}
+
+	ctkDICOMDatabasePtr openDatabase()
+	{
+		QString databaseFileName = this->getDatabaseFileName();
 		ctkDICOMDatabasePtr DICOMDatabase;
 		DICOMDatabase = ctkDICOMDatabasePtr(new ctkDICOMDatabase);
+		SSC_LOG("");
 		DICOMDatabase->openDatabase( databaseFileName );
+		SSC_LOG("");
+		//DICOMDatabase->isOpen();
 
+		return DICOMDatabase;
+	}
+
+	ctkDICOMDatabasePtr loadDirectory(QString folder)
+	{
+		this->eraseDatabase();
+		QString databaseFileName = cx::DataLocations::getTestDataPath()+"/temp/testDatabase";
+//		QFile(databaseFileName).remove();
+		ctkDICOMDatabasePtr DICOMDatabase = this->openDatabase();
+
+//		ctkDICOMDatabasePtr DICOMDatabase;
+//		DICOMDatabase = ctkDICOMDatabasePtr(new ctkDICOMDatabase);
+//		DICOMDatabase->openDatabase( databaseFileName );
+DICOMDatabase->isOpen();
 		QSharedPointer<ctkDICOMIndexer> DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer);
 		DICOMIndexer->addDirectory(*DICOMDatabase,folder,"");
 
@@ -121,10 +149,28 @@ TEST_CASE("DicomConverter: Fixture test", "[unit][plugins][org.custusx.dicom]")
 	CHECK(true);
 }
 
+TEST_CASE("DicomConverter: Open database", "[unit][plugins][org.custusx.dicom]")
+{
+	cx::Reporter::initialize();
+
+	SSC_LOG("");
+	DicomConverterTestFixture fixture;
+	fixture.eraseDatabase();
+	SSC_LOG("");
+	ctkDICOMDatabasePtr db = fixture.openDatabase();
+	SSC_LOG("");
+
+	CHECK(db->isOpen());
+	SSC_LOG("");
+
+	cx::Reporter::shutdown();
+}
 
 TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.dicom]")
 {
-	bool verbose = false;
+	cx::Reporter::initialize();
+	SSC_LOG("");
+	bool verbose = true;
 	DicomConverterTestFixture fixture;
 	// input  I: kaisa dicom data -> pass dicom data through converter
 	// input II: kaisa mhd file   -> load
@@ -134,12 +180,15 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 	QString inputDicomDataDirectory = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/DICOM/";
 	QString referenceImageFilename = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/MetaImage/Kaisa.mhd";
 
+	SSC_LOG("");
 	ctkDICOMDatabasePtr db = fixture.loadDirectory(inputDicomDataDirectory);
+	SSC_LOG("");
 
 	QString patient = fixture.getOneFromList(db->patients());
 	QString study = fixture.getOneFromList(db->studiesForPatient(patient));
 	QString series = fixture.getOneFromList(db->seriesForStudy(study));
 	QStringList files = db->filesForSeries(series);
+	SSC_LOG("");
 
 	if (verbose)
 	{
@@ -150,8 +199,11 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 	}
 
 	cx::DicomConverter converter;
+	SSC_LOG("");
 	converter.setDicomDatabase(db.data());
+	SSC_LOG("");
 	cx::ImagePtr convertedImage = converter.convertToImage(series);
+	SSC_LOG("");
 
 	cx::ImagePtr referenceImage = fixture.loadImageFromFile(referenceImageFilename, "reference");
 	referenceImage->setModality("SC"); // hack: "SC" is not supported by mhd, it is instead set to "OTHER"
