@@ -127,8 +127,8 @@ endif(CX_WINDOWS)
 SET ( cxOpenIGTLinkServer_FILES
 		cxImageServer.h
 		cxImageServer.cpp
-		cxImageSenderFactory.h
-		cxImageSenderFactory.cpp
+		cxCommandlineImageStreamerFactory.h
+		cxCommandlineImageStreamerFactory.cpp
 		cxMHDImageStreamer.h
 		cxMHDImageStreamer.cpp
 		cxImageStreamerOpenCV.h

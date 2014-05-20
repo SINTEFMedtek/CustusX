@@ -17,34 +17,26 @@
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
 #include "cxVector3D.h"
-#include "cxImageSenderFactory.h"
 #include "cxCyclicActionLogger.h"
 #include "cxDirectlyLinkedSender.h"
-#include "cxSimulatedImageStreamer.h"
 #include "cxToolManager.h"
 #include "cxDataManager.h"
 #include "cxVideoServiceBackend.h"
+#include "cxImageStreamerInterface.h"
+#include "cxImageStreamer.h"
 
 namespace cx
 {
 
-DirectlyLinkedImageReceiverThread::DirectlyLinkedImageReceiverThread(StringMap args, QObject* parent) :
-		ImageReceiverThread(parent), mArguments(args)
+DirectlyLinkedImageReceiverThread::DirectlyLinkedImageReceiverThread(ImageStreamerInterfacePtr streamerInterface, QObject* parent) :
+		ImageReceiverThread(parent), mStreamerInterface(streamerInterface)
 {}
-
-void DirectlyLinkedImageReceiverThread::setBackend(VideoServiceBackendPtr backend)
-{
-	mBackend = backend;
-}
 
 void DirectlyLinkedImageReceiverThread::run()
 {
 	report("Starting direct link grabber.");
 
-	if(mArguments["type"] == "SimulatedImageStreamer")
-		mImageStreamer = this->createSimulatedImageStreamer();
-	else
-		mImageStreamer = ImageStreamerFactory().getFromArguments(mArguments);
+	mImageStreamer = mStreamerInterface->createStreamer();
 
 	if(!mImageStreamer)
 	{
@@ -83,42 +75,6 @@ void DirectlyLinkedImageReceiverThread::addSonixStatusToQueueSlot()
 QString DirectlyLinkedImageReceiverThread::hostDescription() const
 {
 	return "Direct Link";
-}
-
-void DirectlyLinkedImageReceiverThread::setImageToStream(QString imageUid)
-{
-	mImageUidToSimulate = imageUid;
-	reporter()->sendDebug("Setting image to stream to be "+imageUid);
-	emit imageToStream(imageUid);
-}
-
-SimulatedImageStreamerPtr DirectlyLinkedImageReceiverThread::createSimulatedImageStreamer()
-{
-	SimulatedImageStreamerPtr streamer(new SimulatedImageStreamer());
-
-	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
-	if(!tool)
-		reporter()->sendDebug("No tool");
-	ImagePtr image = mBackend->getDataManager()->getImage(mImageUidToSimulate);
-	if(!image)
-		reporter()->sendDebug("No image with uid "+mImageUidToSimulate);
-
-	streamer->initialize(image, tool, mBackend->getDataManager());
-	connect(this, SIGNAL(imageToStream(QString)), streamer.get(), SLOT(setSourceToImageSlot(QString)));
-
-	return streamer;
-}
-
-void DirectlyLinkedImageReceiverThread::printArguments()
-{
-	reporter()->sendDebug("-------------");
-	reporter()->sendDebug("DirectlyLinkedImageReceiverThread arguments:");
-	StringMap::iterator it;
-	for(it = mArguments.begin(); it != mArguments.end(); ++it)
-	{
-		reporter()->sendDebug(it->first+": "+it->second);
-	}
-	reporter()->sendDebug("-------------");
 }
 
 } //end namespace cx

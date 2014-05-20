@@ -1,4 +1,4 @@
-#include "cxImageSenderFactory.h"
+#include "cxCommandlineImageStreamerFactory.h"
 
 #include "cxReporter.h"
 #include "cxImageStreamerOpenCV.h"
@@ -41,7 +41,7 @@ StringMap extractCommandlineOptions(QStringList cmdline)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-StreamerPtr ImageStreamerFactory::getFromArguments(StringMap args)
+StreamerPtr CommandlineImageStreamerFactory::getFromArguments(StringMap args)
 {
 	QString type = this->getDefaultSenderType();
 	if (args.count("type"))
@@ -71,7 +71,7 @@ StreamerPtr ImageStreamerFactory::getFromArguments(StringMap args)
 }
 
 
-ImageStreamerFactory::ImageStreamerFactory()
+CommandlineImageStreamerFactory::CommandlineImageStreamerFactory()
 {
 #ifdef CX_WIN32
 	mCommandLineStreamers.push_back(CommandLineStreamerPtr(new ImageStreamerSonix()));
@@ -85,14 +85,14 @@ ImageStreamerFactory::ImageStreamerFactory()
 	mImageStreamers.push_back(DummyImageStreamerPtr(new DummyImageStreamer()));
 }
 
-QString ImageStreamerFactory::getDefaultSenderType() const
+QString CommandlineImageStreamerFactory::getDefaultSenderType() const
 {
 	// use the FIRST sender available
   QString retval = mCommandLineStreamers.front()->getType();
   return retval;
 }
 
-QStringList ImageStreamerFactory::getSenderTypes() const
+QStringList CommandlineImageStreamerFactory::getSenderTypes() const
 {
 	QStringList retval;
 	for (unsigned i=0; i< mCommandLineStreamers.size(); ++i)
@@ -102,7 +102,7 @@ QStringList ImageStreamerFactory::getSenderTypes() const
 	return retval;
 }
 
-QStringList ImageStreamerFactory::getArgumentDescription(QString type) const
+QStringList CommandlineImageStreamerFactory::getArgumentDescription(QString type) const
 {
 	QStringList retval;
 	for (unsigned i=0; i< mCommandLineStreamers.size(); ++i)
@@ -113,7 +113,7 @@ QStringList ImageStreamerFactory::getArgumentDescription(QString type) const
 	return retval;
 }
 
-StreamerPtr ImageStreamerFactory::getImageSender(QString type)
+StreamerPtr CommandlineImageStreamerFactory::getImageSender(QString type)
 {
 	for (unsigned i=0; i< mCommandLineStreamers.size(); ++i)
 	{

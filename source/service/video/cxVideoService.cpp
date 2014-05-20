@@ -213,15 +213,4 @@ void VideoService::fpsSlot(QString source, int val)
 	if (source==mActiveVideoSource->getUid())
 		emit fps(val);
 }
-
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-//VideoServicePtr videoService()
-//{
-//	return VideoService::getInstance();
-//}
-
 }

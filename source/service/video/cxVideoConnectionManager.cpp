@@ -23,11 +23,12 @@
 #include "cxReporter.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
-#include "cxImageSenderFactory.h"
 #include "cxProcessWrapper.h"
 #include "cxVideoConnection.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxLogger.h"
+#include "cxImageStreamer.h"
+#include "cxCommandlineImageStreamerFactory.h"
 
 namespace cx
 {

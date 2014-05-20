@@ -15,10 +15,10 @@
 #ifndef CXDirectlyLinkedImageReceiverThread_H_
 #define CXDirectlyLinkedImageReceiverThread_H_
 
-#include <vector>
 #include "boost/shared_ptr.hpp"
 
 #include "cxImageReceiverThread.h"
+#include "cxImageStreamerInterface.h"
 
 namespace cx
 {
@@ -47,11 +47,8 @@ class DirectlyLinkedImageReceiverThread: public ImageReceiverThread
 	Q_OBJECT
 
 public:
-	DirectlyLinkedImageReceiverThread(std::map<QString, QString> args, QObject* parent = NULL);
-	void setBackend(VideoServiceBackendPtr backend);
+	DirectlyLinkedImageReceiverThread(ImageStreamerInterfacePtr streamerInterface, QObject* parent = NULL);
 	virtual QString hostDescription() const; ///< threadsafe
-
-	void setImageToStream(QString imageUid);
 
 signals:
 	void imageToStream(QString imageUid);
@@ -65,13 +62,10 @@ private slots:
 
 private:
 	SimulatedImageStreamerPtr createSimulatedImageStreamer();
-	void printArguments(); ///< for debugging
 
-	std::map<QString, QString> mArguments;
+	ImageStreamerInterfacePtr mStreamerInterface;
 	StreamerPtr mImageStreamer;
 	DirectlyLinkedSenderPtr mSender;
-	QString mImageUidToSimulate;
-	VideoServiceBackendPtr mBackend;
 };
 
 /**

@@ -1,3 +1,17 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 #include "cxSimulatedImageStreamer.h"
 
 #include <boost/math/special_functions/round.hpp>
@@ -180,7 +194,6 @@ vtkImageDataPtr SimulatedImageStreamer::simulateUSFromCTSlice(ImagePtr source)
 #ifdef CX_BUILD_US_SIMULATOR
 //	std::cout << "CT to US simulator running" << std::endl;
 	vtkImageDataPtr simInput = this->createSimulatorInputSlice(source);
-	this->setSimulatorParameters();
 	simulatedSlice = mUSSimulator->simulateFromCT(simInput);
 	mTimer->time("Simulate");
 #else
@@ -196,16 +209,15 @@ vtkImageDataPtr SimulatedImageStreamer::simulateUSFromMRSlice(ImagePtr source)
 {
 	vtkImageDataPtr simulatedSlice;
 //	vtkImageDataPtr simInput = this->createSimulatorInputSlice(source);
-//	this->setSimulatorParameters();
 	simulatedSlice = sliceOriginal(source);
 //	cx::reporter()->sendError("MR to US simulator not running");
 	return simulatedSlice;
 }
 
-void SimulatedImageStreamer::setSimulatorParameters()
+void SimulatedImageStreamer::setGain(double gain)
 {
-	double gain = settings()->value("USsimulation/gain").value<double>();
 	mUSSimulator->setGain(gain);
+	this->sliceSlot();
 }
 
 vtkImageDataPtr SimulatedImageStreamer::createSimulatorInputSlice(ImagePtr source)

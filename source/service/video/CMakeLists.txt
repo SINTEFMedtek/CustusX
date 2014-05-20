@@ -19,24 +19,22 @@
 option(CX_BUILD_US_SIMULATOR "Build the US from CT/MR simulator" OFF)
 
 SET( CX_QT_MOC_HEADER_FILES
-	cxBasicVideoSource.h
-	cxVideoService.h
+    cxBasicVideoSource.h
+    cxVideoService.h
     cxVideoConnectionManager.h
     cxVideoConnection.h
     cxPlaybackUSAcquisitionVideo.h
-
     cxImageReceiverThread.h
     cxDirectlyLinkedImageReceiverThread.h
-	cxIGTLinkedImageReceiverThread.h
-	
-	cxSimulatedImageStreamer.h
+    cxIGTLinkedImageReceiverThread.h
+    cxSimulatedImageStreamer.h
 )
 
 SET (cxVideoService_SOURCE
-	cxBasicVideoSource.h
-	cxBasicVideoSource.cpp
-	cxVideoService.h
-	cxVideoService.cpp
+    cxBasicVideoSource.h
+    cxBasicVideoSource.cpp
+    cxVideoService.h
+    cxVideoService.cpp
     cxVideoConnectionManager.cpp
     cxVideoConnectionManager.h
     cxVideoConnection.h
@@ -46,15 +44,23 @@ SET (cxVideoService_SOURCE
 
     cxImageReceiverThread.h
     cxImageReceiverThread.cpp
-	cxIGTLinkedImageReceiverThread.h
-	cxIGTLinkedImageReceiverThread.cpp
+    cxIGTLinkedImageReceiverThread.h
+    cxIGTLinkedImageReceiverThread.cpp
     cxDirectlyLinkedImageReceiverThread.h
     cxDirectlyLinkedImageReceiverThread.cpp
     
     cxSimulatedImageStreamer.h
     cxSimulatedImageStreamer.cpp
-	cxVideoServiceBackend.h
-	cxVideoServiceBackend.cpp
+    cxVideoServiceBackend.h
+    cxVideoServiceBackend.cpp
+    cxImageStreamerInterface.h
+    cxImageStreamerInterface.cpp
+    cxSimulatedImageStreamerInterface.h
+    cxSimulatedImageStreamerInterface.cpp
+    cxCommandlineImageStreamerInterface.h
+    cxCommandlineImageStreamerInterface.cpp
+    cxImageStreamerFactory.h
+    cxImageStreamerFactory.cpp
 )
 
 # Build all files from the UltrasoundSimulation lib
