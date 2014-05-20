@@ -24,10 +24,10 @@ int convertStringWithDefault(QString text, int def);
  * \author Janne Beate Bakeng, SINTEF
  * \date Aug 9, 2011
  */
-class ImageStreamerFactory
+class CommandlineImageStreamerFactory
 {
 public:
-	ImageStreamerFactory();
+	CommandlineImageStreamerFactory();
 	QString getDefaultSenderType() const;
 	QStringList getSenderTypes() const; ///< all available sender types
 	QStringList getArgumentDescription(QString type) const; ///< arguments for one streamer

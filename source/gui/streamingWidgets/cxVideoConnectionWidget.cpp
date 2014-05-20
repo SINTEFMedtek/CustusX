@@ -44,8 +44,6 @@
 #include "cxFileInputWidget.h"
 #include "cxLogger.h"
 
-#include "cxImageSenderFactory.h"
-
 namespace cx
 {
 

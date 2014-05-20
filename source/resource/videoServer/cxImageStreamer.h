@@ -27,6 +27,9 @@
 namespace cx
 {
 
+typedef boost::shared_ptr<class Streamer> StreamerPtr;
+typedef boost::shared_ptr<class ImageStreamer> ImageStreamerPtr;
+
 /**\brief
  *
  * \ingroup cx_resource_videoserver
@@ -66,8 +69,6 @@ private:
 	bool mInitialized;
 
 };
-typedef boost::shared_ptr<Streamer> StreamerPtr;
-
 
 typedef std::map<QString, QString> StringMap;
 /**\brief
@@ -90,7 +91,6 @@ protected:
 private:
 
 };
-typedef boost::shared_ptr<ImageStreamer> ImageStreamerPtr;
 
 /**\brief
  *
