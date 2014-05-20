@@ -44,7 +44,6 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][st
 
 	TestVideoConnectionWidget* widget = new TestVideoConnectionWidget();
 	REQUIRE(widget->canStream(filename, "MHDFile"));
-	REQUIRE(widget->canStream(filename, "SimulatedImageStreamer"));
 	delete widget;
 
 //	DummyToolManager::getInstance()->shutdown();
