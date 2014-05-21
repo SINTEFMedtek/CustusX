@@ -47,7 +47,7 @@ bool DicomImageReader::loadFile(QString filename)
 	return true;
 }
 
-ctkDICOMItemPtr DicomImageReader::item()
+ctkDICOMItemPtr DicomImageReader::item() const
 {
 	return this->wrapInCTK(mDataset);
 }
@@ -59,7 +59,7 @@ double DicomImageReader::getDouble(const DcmTagKey& tag, const unsigned long pos
 	condition = mDataset->findAndGetFloat64(tag, retval, pos, searchIntoSub);
 	if (!condition.good())
 	{
-		QString tagName = this->wrapInCTK(mDataset)->TagDescription(tag);
+		QString tagName = this->item()->TagDescription(tag);
 		this->error(QString("Failed to get tag %1/%2").arg(tagName).arg(pos));
 	}
 	return retval;
@@ -71,6 +71,16 @@ DicomImageReader::WindowLevel DicomImageReader::getWindowLevel() const
 	retval.center = this->getDouble(DCM_WindowCenter, 0, OFTrue);
 	retval.width = this->getDouble(DCM_WindowWidth, 0, OFTrue);
 	return retval;
+}
+
+
+int DicomImageReader::getNumberOfFrames() const
+{
+	int numberOfFrames = this->item()->GetElementAsInteger(DCM_NumberOfFrames);
+//	std::cout << "numberOfFrames: " << numberOfFrames << std::endl;
+	if (numberOfFrames==0)
+		numberOfFrames = 1; // nonexistent entry propably means that this is a single frame.
+	return numberOfFrames;
 }
 
 //bool DicomImageReader::isSingleFile() const

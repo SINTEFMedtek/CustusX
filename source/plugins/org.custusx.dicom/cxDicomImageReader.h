@@ -55,8 +55,9 @@ public:
 	static DicomImageReaderPtr createFromFile(QString filename);
 	Transform3D getImageTransformPatient() const;
 	vtkImageDataPtr createVtkImageData();
-	ctkDICOMItemPtr item();
+	ctkDICOMItemPtr item() const;
 	WindowLevel getWindowLevel() const;
+	int getNumberOfFrames() const;
 
 private:
 	DcmFileFormat mFileFormat;
