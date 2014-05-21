@@ -63,7 +63,7 @@ cx::SimulatedImageStreamerPtr createRunningSimulatedImageStreamer(TestSenderPtr&
 	cx::SimulatedImageStreamerPtr imagestreamer(new cx::SimulatedImageStreamer());
 	REQUIRE(imagestreamer);
 
-	imagestreamer->initialize(image, tool, dataService);
+	REQUIRE(imagestreamer->initialize(image, tool, dataService));
 	REQUIRE(imagestreamer->startStreaming(sender));
 	return imagestreamer;
 }

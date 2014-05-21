@@ -47,30 +47,32 @@ SimulatedImageStreamer::SimulatedImageStreamer() :
 	mTimer(new CyclicActionLogger())
 {
 	this->setSendInterval(40);
-    this->initUSSimulator();
 }
 
 SimulatedImageStreamer::~SimulatedImageStreamer()
 {}
 
-void SimulatedImageStreamer::initUSSimulator()
+bool SimulatedImageStreamer::initUSSimulator()
 {
+	bool retval = false;
 #ifdef CX_BUILD_US_SIMULATOR
-    mUSSimulator.reset(new ImageSimulator());
-		/*mUSSimulator->setShadowsAirOn(false);
+	mUSSimulator.reset(new ImageSimulator());
+	retval = mUSSimulator->init();
+	/*mUSSimulator->setShadowsAirOn(false);
 		mUSSimulator->setShadowsBoneOn(false);
 		mUSSimulator->setReflectionsOn(false);
 		mUSSimulator->setAbsorptionOn(false);
 		mUSSimulator->setSpeckleOn(false);*/
 #endif //CX_BUILD_US_SIMULATOR
+	return retval;
 }
 
-void SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServicePtr dataManager)
+bool SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServicePtr dataManager)
 {
 	if(!image || !tool || !dataManager)
 	{
 		this->setInitialized(false);
-		return;
+		return false;
 	}
 	mDataManager = dataManager;
 	this->createSendTimer();
@@ -85,7 +87,9 @@ void SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServic
 
 //	this->generateMaskSlot();
 
-	this->setInitialized(true);
+	bool initialized = this->initUSSimulator();
+	this->setInitialized(initialized);
+	return initialized;
 }
 
 bool SimulatedImageStreamer::startStreaming(SenderPtr sender)
