@@ -17,11 +17,15 @@
 
 #include "cxBaseWidget.h"
 #include "boost/shared_ptr.hpp"
-class ctkDICOMBrowser;
+class QItemSelection;
+//class ctkDICOMBrowser;
+class ctkDICOMAppWidget;
 class ctkPluginContext;
+class ctkDICOMDatabase;
 
 namespace cx
 {
+class DICOMAppWidget;
 	typedef boost::shared_ptr<class Image> ImagePtr;
 
 /**
@@ -44,11 +48,13 @@ public:
 private slots:
 	void onViewHeader();
 	void onImportIntoCustusXAction();
+//	void onModelSelected(const QItemSelection &item1, const QItemSelection &item2);
 protected:
 	virtual void prePaintEvent();
 private:
 	QVBoxLayout*  mVerticalLayout; ///< vertical layout is used
-	ctkDICOMBrowser* mBrowser;
+//	ctkDICOMBrowser* mBrowser;
+	DICOMAppWidget* mBrowser;
 	ctkPluginContext* mContext;
 	QAction* mViewHeaderAction;
 	QAction* mImportIntoCustusXAction;
@@ -56,6 +62,10 @@ private:
 	void setupDatabaseDirectory();
 	void importSeries(QString seriesUid);
 	void loadIntoPatientModel(ImagePtr image, QString seriesUid);
+	void printFrameCountForSeries(QString series) const;
+	QStringList currentSeriesSelection();
+	ctkDICOMDatabase* getDatabase() const;
+
 };
 
 } /* namespace cx */

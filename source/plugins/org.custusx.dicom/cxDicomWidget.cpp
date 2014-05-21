@@ -14,6 +14,8 @@
 
 #include "cxDicomWidget.h"
 #include "ctkDICOMBrowser.h"
+#include "ctkDICOMAppWidget.h"
+#include "cxDICOMAppWidget.h"
 #include "cxDataLocations.h"
 #include <QDir>
 #include "ctkDICOMTableManager.h"
@@ -31,12 +33,13 @@
 #include "ctkServiceTracker.h"
 #include <QApplication>
 #include <QDesktopWidget>
+#include "cxDicomImageReader.h"
 
 namespace cx
 {
 
 DicomWidget::DicomWidget(ctkPluginContext *context, QWidget *parent) :
-    BaseWidget(parent, "DicomWidget", "Dicom"),
+	BaseWidget(parent, "DicomWidget", "Dicom"),
 	mVerticalLayout(new QVBoxLayout(this)),
 	mBrowser(NULL),
 	mContext(context)
@@ -71,10 +74,17 @@ void DicomWidget::createUI()
 												  SLOT(onImportIntoCustusXAction()),
 												  buttonsLayout);
 
-	mBrowser = new ctkDICOMBrowser;
+	mBrowser = new DICOMAppWidget;
 
 	mVerticalLayout->addWidget(mBrowser);
 	mVerticalLayout->addLayout(buttonsLayout);
+
+
+//	connect(mBrowser->dicomTableManager(),
+//	        SIGNAL(seriesSelectionChanged(const QItemSelection&, const QItemSelection&)),
+//	        this,
+//	        SLOT(onModelSelected(const QItemSelection&,const QItemSelection&)));
+
 
 	this->setupDatabaseDirectory();
 }
@@ -86,11 +96,11 @@ DicomWidget::~DicomWidget()
 
 QString DicomWidget::defaultWhatsThis() const
 {
-  return "<html>"
-      "<h3>Dicom plugin.</h3>"
-      "<p>Import data from dicom</p>"
-      "<p>The dicom widgets are taken from the ctk project.</p>"
-      "</html>";
+	return "<html>"
+			"<h3>Dicom plugin.</h3>"
+			"<p>Import data from dicom</p>"
+			"<p>The dicom widgets are taken from the ctk project.</p>"
+			"</html>";
 }
 
 void DicomWidget::setupDatabaseDirectory()
@@ -106,18 +116,24 @@ void DicomWidget::setupDatabaseDirectory()
 		}
 	}
 
+	std::cout << "databaseDirectory: " << databaseDirectory << std::endl;
 	mBrowser->setDatabaseDirectory(databaseDirectory);
+}
+
+QStringList DicomWidget::currentSeriesSelection()
+{
+	return mBrowser->getSelectedSeries();
 }
 
 void DicomWidget::onViewHeader()
 {
-	QStringList series = mBrowser->dicomTableManager()->currentSeriesSelection();
+	QStringList series = this->currentSeriesSelection();
 	std::cout << series.join("\n").toStdString() << std::endl;
 
 	QStringList files;
 	for (int i=0; i<series.size(); ++i)
 	{
-		QStringList current = mBrowser->database()->filesForSeries(series[i]);
+		QStringList current = this->getDatabase()->filesForSeries(series[i]);
 		files.append(current);
 	}
 	files.sort();
@@ -125,20 +141,20 @@ void DicomWidget::onViewHeader()
 	std::cout << files.join("\n").toStdString() << std::endl;
 
 	ctkDICOMObjectListWidget* window = new ctkDICOMObjectListWidget;
-    window->setWindowTitle("DICOM File Header");
-    window->setFileList(files);
+	window->setWindowTitle("DICOM File Header");
+	window->setFileList(files);
 
 	QWidget* screen = qApp->desktop()->screen(qApp->desktop()->screenNumber(this));
 	QRect rect = screen->geometry();
 	rect.setWidth(rect.width()*0.66);
 	window->setGeometry(rect);
 
-    window->show();
+	window->show();
 }
 
 void DicomWidget::onImportIntoCustusXAction()
 {
-	QStringList series = mBrowser->dicomTableManager()->currentSeriesSelection();
+	QStringList series = this->currentSeriesSelection();
 
 	for (unsigned i=0; i<series.size(); ++i)
 	{
@@ -149,7 +165,7 @@ void DicomWidget::onImportIntoCustusXAction()
 void DicomWidget::importSeries(QString seriesUid)
 {
 	cx::DicomConverter converter;
-	converter.setDicomDatabase(mBrowser->database());
+	converter.setDicomDatabase(this->getDatabase());
 	cx::ImagePtr convertedImage = converter.convertToImage(seriesUid);
 
 	if (!convertedImage)
@@ -178,6 +194,40 @@ void DicomWidget::loadIntoPatientModel(ImagePtr image, QString seriesUid)
 	}
 }
 
+//void DicomWidget::onModelSelected(const QItemSelection &item1, const QItemSelection &item2)
+//{
+//	Q_UNUSED(item1);
+//	Q_UNUSED(item2);
 
+//	QStringList series = this->currentSeriesSelection();
+
+//	for (int i=0; i<series.size(); ++i)
+//	{
+//		this->printFrameCountForSeries(series[i]);
+//	}
+
+////	std::cout << "selected: " << series.join("\n") << std::endl;
+//}
+
+void DicomWidget::printFrameCountForSeries(QString series) const
+{
+	QString seriesDescription;
+	int frameCount = 0;
+	QStringList files = this->getDatabase()->filesForSeries(series);
+	for (unsigned i=0; i<files.size(); ++i)
+	{
+		DicomImageReaderPtr reader = DicomImageReader::createFromFile(files[i]);
+		if (!reader)
+			continue;
+		frameCount += reader->getNumberOfFrames();
+		seriesDescription = reader->item()->GetElementAsString(DCM_SeriesDescription);
+	}
+	std::cout << QString("%1 frames for series %2").arg(frameCount).arg(seriesDescription) << std::endl;
+}
+
+ctkDICOMDatabase* DicomWidget::getDatabase() const
+{
+	return mBrowser->database();
+}
 
 } /* namespace cx */
