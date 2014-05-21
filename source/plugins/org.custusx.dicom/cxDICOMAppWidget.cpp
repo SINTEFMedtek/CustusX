@@ -60,6 +60,7 @@
 #include "ctkDICOMQueryWidget.h"
 #include <QToolBar>
 #include "ctkDICOMThumbnailListWidget.h"
+#include "cxDicomImporter.h"
 
 //#include "ui_DICOMAppWidget.h"
 
@@ -90,40 +91,24 @@ public:
   QToolBar* ToolBar;
   ctkDICOMThumbnailListWidget* ThumbnailsWidget;
   QSlider* ThumbnailWidthSlider;
-  //"ctkDICOMItemView" name="ImagePreview"
   QAction* ActionImport;
   QAction* ActionQuery;
   QAction* ActionRemove;
+  DicomImporter Importer;
 
-  ctkFileDialog* ImportDialog;
   ctkDICOMQueryRetrieveWidget* QueryRetrieveWidget;
 
   QSharedPointer<ctkDICOMDatabase> DICOMDatabase;
   QSharedPointer<ctkDICOMThumbnailGenerator> ThumbnailGenerator;
   ctkDICOMModel DICOMModel;
   ctkDICOMFilterProxyModel DICOMProxyModel;
-  QSharedPointer<ctkDICOMIndexer> DICOMIndexer;
-  QProgressDialog *IndexerProgress;
   QProgressDialog *UpdateSchemaProgress;
 
-  void showIndexerDialog();
   void showUpdateSchemaDialog();
   std::map<ctkDICOMModel::IndexType, QStringList> getSelection() const;
 
   // used when suspending the ctkDICOMModel
   QSqlDatabase EmptyDatabase;
-
-//  QTimer* AutoPlayTimer;
-
-  bool IsSearchWidgetPopUpMode;
-
-  // local count variables to keep track of the number of items
-  // added to the database during an import operation
-  bool DisplayImportSummary;
-  int PatientsAddedDuringImport;
-  int StudiesAddedDuringImport;
-  int SeriesAddedDuringImport;
-  int InstancesAddedDuringImport;
 };
 
 //----------------------------------------------------------------------------
@@ -134,22 +119,11 @@ DICOMAppWidgetPrivate::DICOMAppWidgetPrivate(DICOMAppWidget* parent): q_ptr(pare
   DICOMDatabase = QSharedPointer<ctkDICOMDatabase> (new ctkDICOMDatabase);
   ThumbnailGenerator = QSharedPointer <ctkDICOMThumbnailGenerator> (new ctkDICOMThumbnailGenerator);
   DICOMDatabase->setThumbnailGenerator(ThumbnailGenerator.data());
-  DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer);
-  IndexerProgress = 0;
   UpdateSchemaProgress = 0;
-  DisplayImportSummary = true;
-  PatientsAddedDuringImport = 0;
-  StudiesAddedDuringImport = 0;
-  SeriesAddedDuringImport = 0;
-  InstancesAddedDuringImport = 0;
 }
 
 DICOMAppWidgetPrivate::~DICOMAppWidgetPrivate()
 {
-  if ( IndexerProgress )
-    {
-    delete IndexerProgress;
-    }
   if ( UpdateSchemaProgress )
     {
     delete UpdateSchemaProgress;
@@ -172,7 +146,7 @@ void DICOMAppWidgetPrivate::setupUi(DICOMAppWidget* parent)
 
 	ActionImport = new QAction("Import", this);
 	ActionImport->setToolTip("Import a DICOM file or folder");
-	q->connect(ActionImport, SIGNAL(triggered()), q, SLOT(openImportDialog()));
+	q->connect(ActionImport, SIGNAL(triggered()), &Importer, SLOT(openImportDialog()));
 	ToolBar->addAction(ActionImport);
 
 	ActionQuery = new QAction("Query", this);
@@ -247,56 +221,6 @@ void DICOMAppWidgetPrivate::showUpdateSchemaDialog()
   UpdateSchemaProgress->show();
 }
 
-void DICOMAppWidgetPrivate::showIndexerDialog()
-{
-  Q_Q(DICOMAppWidget);
-  if (IndexerProgress == 0)
-    {
-    //
-    // Set up the Indexer Progress Dialog
-    //
-    IndexerProgress = new QProgressDialog( q->tr("DICOM Import"), "Cancel", 0, 100, q,
-         Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
-
-    // We don't want the progress dialog to resize itself, so we bypass the label
-    // by creating our own
-    QLabel* progressLabel = new QLabel(q->tr("Initialization..."));
-    IndexerProgress->setLabel(progressLabel);
-    IndexerProgress->setWindowModality(Qt::ApplicationModal);
-    IndexerProgress->setMinimumDuration(0);
-    IndexerProgress->setValue(0);
-
-    q->connect(IndexerProgress, SIGNAL(canceled()), 
-                 DICOMIndexer.data(), SLOT(cancel()));
-
-    q->connect(DICOMIndexer.data(), SIGNAL(progress(int)),
-            IndexerProgress, SLOT(setValue(int)));
-    q->connect(DICOMIndexer.data(), SIGNAL(indexingFilePath(QString)),
-            progressLabel, SLOT(setText(QString)));
-    q->connect(DICOMIndexer.data(), SIGNAL(indexingFilePath(QString)),
-            q, SLOT(onFileIndexed(QString)));
-
-    // close the dialog
-    q->connect(DICOMIndexer.data(), SIGNAL(indexingComplete()),
-            IndexerProgress, SLOT(close()));
-    // reset the database to show new data
-    q->connect(DICOMIndexer.data(), SIGNAL(indexingComplete()),
-            &DICOMModel, SLOT(reset()));
-    // stop indexing and reset the database if canceled
-    q->connect(IndexerProgress, SIGNAL(canceled()), 
-            DICOMIndexer.data(), SLOT(cancel()));
-    q->connect(IndexerProgress, SIGNAL(canceled()), 
-            &DICOMModel, SLOT(reset()));
-
-    // allow users of this widget to know that the process has finished
-    q->connect(IndexerProgress, SIGNAL(canceled()), 
-            q, SIGNAL(directoryImported()));
-    q->connect(DICOMIndexer.data(), SIGNAL(indexingComplete()),
-            q, SIGNAL(directoryImported()));
-    }
-  IndexerProgress->show();
-}
-
 std::map<ctkDICOMModel::IndexType, QStringList> DICOMAppWidgetPrivate::getSelection() const
 {
 //	Q_Q(DICOMAppWidget);
@@ -329,6 +253,11 @@ DICOMAppWidget::DICOMAppWidget(QWidget* _parent):Superclass(_parent),
 
   d->setupUi(this);
 
+  connect(&d->Importer, SIGNAL(indexingCompleted()),
+		  &d->DICOMModel, SLOT(reset()));
+  connect(&d->Importer, SIGNAL(directoryImported()),
+		  this, SIGNAL(directoryImported()));
+
   //Enable sorting in tree view
   d->TreeView->setSortingEnabled(true);
   d->TreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -337,13 +266,6 @@ DICOMAppWidget::DICOMAppWidget(QWidget* _parent):Superclass(_parent),
 
   d->ThumbnailsWidget->setThumbnailSize(
     QSize(d->ThumbnailWidthSlider->value(), d->ThumbnailWidthSlider->value()));
-
-  // signals related to tracking inserts
-  connect(d->DICOMDatabase.data(), SIGNAL(patientAdded(int,QString,QString,QString)), this,
-                              SLOT(onPatientAdded(int,QString,QString,QString)));
-  connect(d->DICOMDatabase.data(), SIGNAL(studyAdded(QString)), this, SLOT(onStudyAdded(QString)));
-  connect(d->DICOMDatabase.data(), SIGNAL(seriesAdded(QString)), this, SLOT(onSeriesAdded(QString)));
-  connect(d->DICOMDatabase.data(), SIGNAL(instanceAdded(QString)), this, SLOT(onInstanceAdded(QString)));
 
   // Treeview signals
   connect(d->TreeView, SIGNAL(collapsed(QModelIndex)), this, SLOT(onTreeCollapsed(QModelIndex)));
@@ -369,17 +291,6 @@ DICOMAppWidget::DICOMAppWidget(QWidget* _parent):Superclass(_parent),
 //  this->setDatabaseDirectory(databaseDirectory);
 //  d->DirectoryButton->setDirectory(databaseDirectory);
 
-//  connect(d->DirectoryButton, SIGNAL(directoryChanged(QString)), this, SLOT(setDatabaseDirectory(QString)));
-
-  //Initialize import widget
-  d->ImportDialog = new ctkFileDialog();
-  QCheckBox* importCheckbox = new QCheckBox("Copy on import", d->ImportDialog);
-  d->ImportDialog->setBottomWidget(importCheckbox);
-  d->ImportDialog->setFileMode(QFileDialog::Directory);
-  d->ImportDialog->setLabelText(QFileDialog::Accept,"Import");
-  d->ImportDialog->setWindowTitle("Import DICOM files from directory ...");
-  d->ImportDialog->setWindowModality(Qt::ApplicationModal);
-
   connect(d->TreeView->selectionModel(),
 		  SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
 		  this,
@@ -391,86 +302,64 @@ DICOMAppWidget::DICOMAppWidget(QWidget* _parent):Superclass(_parent),
 
   //connect signal and slots
   connect(d->TreeView, SIGNAL(clicked(QModelIndex)), d->ThumbnailsWidget, SLOT(addThumbnails(QModelIndex)));
-//  connect(d->TreeView, SIGNAL(clicked(QModelIndex)), d->ImagePreview, SLOT(onModelSelected(QModelIndex)));
   connect(d->TreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(onModelSelected(QModelIndex)));
-
-//  connect(d->ThumbnailsWidget, SIGNAL(selected(ctkThumbnailLabel)), this, SLOT(onThumbnailSelected(ctkThumbnailLabel)));
-//  connect(d->ThumbnailsWidget, SIGNAL(doubleClicked(ctkThumbnailLabel)), this, SLOT(onThumbnailDoubleClicked(ctkThumbnailLabel)));
-  connect(d->ImportDialog, SIGNAL(fileSelected(QString)),this,SLOT(onImportDirectory(QString)));
 
   connect(d->QueryRetrieveWidget, SIGNAL(canceled()), d->QueryRetrieveWidget, SLOT(hide()) );
   connect(d->QueryRetrieveWidget, SIGNAL(canceled()), this, SLOT(onQueryRetrieveFinished()) );
-
-//  connect(d->ImagePreview, SIGNAL(requestNextImage()), this, SLOT(onNextImage()));
-//  connect(d->ImagePreview, SIGNAL(requestPreviousImage()), this, SLOT(onPreviousImage()));
-//  connect(d->ImagePreview, SIGNAL(imageDisplayed(int,int)), this, SLOT(onImagePreviewDisplayed(int,int)));
-
-//  connect(d->SearchOption, SIGNAL(parameterChanged()), this, SLOT(onSearchParameterChanged()));
-
-//  connect(d->PlaySlider, SIGNAL(valueChanged(int)), d->ImagePreview, SLOT(displayImage(int)));
 }
 
 //----------------------------------------------------------------------------
 DICOMAppWidget::~DICOMAppWidget()
 {
   Q_D(DICOMAppWidget);
-
   d->QueryRetrieveWidget->deleteLater();
-  d->ImportDialog->deleteLater();
 }
 
 //----------------------------------------------------------------------------
 bool DICOMAppWidget::displayImportSummary()
 {
   Q_D(DICOMAppWidget);
-
-  return d->DisplayImportSummary;
+  return d->Importer.displayImportSummary();
 }
 
 //----------------------------------------------------------------------------
 void DICOMAppWidget::setDisplayImportSummary(bool onOff)
 {
   Q_D(DICOMAppWidget);
-
-  d->DisplayImportSummary = onOff;
+	return d->Importer.setDisplayImportSummary(onOff);
 }
 
 //----------------------------------------------------------------------------
 int DICOMAppWidget::patientsAddedDuringImport()
 {
   Q_D(DICOMAppWidget);
-
-  return d->PatientsAddedDuringImport;
+  return d->Importer.patientsAddedDuringImport();
 }
 
 //----------------------------------------------------------------------------
 int DICOMAppWidget::studiesAddedDuringImport()
 {
   Q_D(DICOMAppWidget);
-
-  return d->StudiesAddedDuringImport;
+	return d->Importer.studiesAddedDuringImport();
 }
 
 //----------------------------------------------------------------------------
 int DICOMAppWidget::seriesAddedDuringImport()
 {
   Q_D(DICOMAppWidget);
-
-  return d->SeriesAddedDuringImport;
+	return d->Importer.seriesAddedDuringImport();
 }
 
 //----------------------------------------------------------------------------
 int DICOMAppWidget::instancesAddedDuringImport()
 {
   Q_D(DICOMAppWidget);
-
-  return d->InstancesAddedDuringImport;
+	return d->Importer.instancesAddedDuringImport();
 }
 
 //----------------------------------------------------------------------------
 void DICOMAppWidget::updateDatabaseSchemaIfNeeded()
 {
-
   Q_D(DICOMAppWidget);
 
   d->showUpdateSchemaDialog();
@@ -508,15 +397,10 @@ void DICOMAppWidget::setDatabaseDirectory(const QString& directory)
   d->DICOMModel.setDatabase(d->DICOMDatabase->database());
   d->DICOMModel.setEndLevel(ctkDICOMModel::SeriesType);
   d->TreeView->resizeColumnToContents(0);
+  d->Importer.setDatabase(d->DICOMDatabase);
 
-  //pass DICOM database instance to Import widget
-  // d->ImportDialog->setDICOMDatabase(d->DICOMDatabase);
   d->QueryRetrieveWidget->setRetrieveDatabase(d->DICOMDatabase);
-
-  // update the button and let any connected slots know about the change
-//  d->DirectoryButton->setDirectory(directory);
   d->ThumbnailsWidget->setDatabaseDirectory(directory);
-//  d->ImagePreview->setDatabaseDirectory(directory);
   emit databaseDirectoryChanged(directory);
 }
 
@@ -547,25 +431,6 @@ const QStringList DICOMAppWidget::tagsToPrecache()
 ctkDICOMDatabase* DICOMAppWidget::database(){
   Q_D(DICOMAppWidget);
   return d->DICOMDatabase.data();
-}
-
-//----------------------------------------------------------------------------
-void DICOMAppWidget::onFileIndexed(const QString& filePath)
-{
-  // Update the progress dialog when the file name changes
-  // - also allows for cancel button
-  QCoreApplication::instance()->processEvents();
-  qDebug() << "Indexing \n\n\n\n" << filePath <<"\n\n\n";
-  
-}
-
-//----------------------------------------------------------------------------
-void DICOMAppWidget::openImportDialog()
-{
-  Q_D(DICOMAppWidget);
-
-  d->ImportDialog->show();
-  d->ImportDialog->raise();
 }
 
 //----------------------------------------------------------------------------
@@ -660,75 +525,11 @@ void DICOMAppWidget::resetModel()
   d->DICOMModel.reset();
 }
 
-//----------------------------------------------------------------------------
-void DICOMAppWidget::onPatientAdded(int databaseID, QString patientID, QString patientName, QString patientBirthDate )
-{
-  Q_D(DICOMAppWidget);
-  Q_UNUSED(databaseID);
-  Q_UNUSED(patientID);
-  Q_UNUSED(patientName);
-  Q_UNUSED(patientBirthDate);
-  ++d->PatientsAddedDuringImport;
-}
-
-//----------------------------------------------------------------------------
-void DICOMAppWidget::onStudyAdded(QString studyUID)
-{
-  Q_D(DICOMAppWidget);
-  Q_UNUSED(studyUID);
-  ++d->StudiesAddedDuringImport;
-}
-
-//----------------------------------------------------------------------------
-void DICOMAppWidget::onSeriesAdded(QString seriesUID)
-{
-  Q_D(DICOMAppWidget);
-  Q_UNUSED(seriesUID);
-  ++d->SeriesAddedDuringImport;
-}
-
-//----------------------------------------------------------------------------
-void DICOMAppWidget::onInstanceAdded(QString instanceUID)
-{
-  Q_D(DICOMAppWidget);
-  Q_UNUSED(instanceUID);
-  ++d->InstancesAddedDuringImport;
-}
-
-//----------------------------------------------------------------------------
+////----------------------------------------------------------------------------
 void DICOMAppWidget::onImportDirectory(QString directory)
 {
   Q_D(DICOMAppWidget);
-  if (QDir(directory).exists())
-    {
-    QCheckBox* copyOnImport = qobject_cast<QCheckBox*>(d->ImportDialog->bottomWidget());
-    QString targetDirectory;
-    if (copyOnImport->checkState() == Qt::Checked)
-      {
-      targetDirectory = d->DICOMDatabase->databaseDirectory();
-      }
-
-    // reset counts
-    d->PatientsAddedDuringImport = 0;
-    d->StudiesAddedDuringImport = 0;
-    d->SeriesAddedDuringImport = 0;
-    d->InstancesAddedDuringImport = 0;
-
-    // show progress dialog and perform indexing
-    d->showIndexerDialog();
-    d->DICOMIndexer->addDirectory(*d->DICOMDatabase,directory,targetDirectory);
-
-    // display summary result
-    if (d->DisplayImportSummary)
-      {
-      QString message = "Directory import completed.\n\n";
-      message += QString("%1 New Patients\n").arg(QString::number(d->PatientsAddedDuringImport));
-      message += QString("%1 New Studies\n").arg(QString::number(d->StudiesAddedDuringImport));
-      message += QString("%1 New Series\n").arg(QString::number(d->SeriesAddedDuringImport));
-      message += QString("%1 New Instances\n").arg(QString::number(d->InstancesAddedDuringImport));
-      QMessageBox::information(this,"DICOM Directory Import", message);
-      }
-  }
+	d->Importer.onImportDirectory(directory);
 }
 
 void DICOMAppWidget::onSelectionChanged(const QItemSelection&, const QItemSelection&)
