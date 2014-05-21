@@ -48,7 +48,7 @@ public:
 	SimulatedImageStreamer();
 	virtual ~SimulatedImageStreamer();
 
-	void initialize(ImagePtr image, ToolPtr tool, DataServicePtr dataManager);
+	bool initialize(ImagePtr image, ToolPtr tool, DataServicePtr dataManager);
 	virtual bool startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
 
@@ -65,7 +65,7 @@ private slots:
 	void defineSectorInSimulator();
 
 private:
-    void initUSSimulator();
+	bool initUSSimulator();
 	ImagePtr getSlice();
 	vtkImageDataPtr getMask();
 
