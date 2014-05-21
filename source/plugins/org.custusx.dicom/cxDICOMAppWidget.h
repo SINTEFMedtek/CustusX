@@ -85,10 +85,8 @@ public:
 
 public Q_SLOTS:
   void setDatabaseDirectory(const QString& directory);
-  void onFileIndexed(const QString& filePath);
   void onSelectionChanged(const QItemSelection&, const QItemSelection&);
 
-  void openImportDialog();
   void openQueryDialog();
   void onRemoveAction();
 
@@ -102,13 +100,6 @@ public Q_SLOTS:
   void onImportDirectory(QString directory);
 
   void onCurrentChanged(const QModelIndex&, const QModelIndex&);
-
-  /// slots to capture status updates from the database during an 
-  /// import operation
-  void onPatientAdded(int, QString, QString, QString);
-  void onStudyAdded(QString);
-  void onSeriesAdded(QString);
-  void onInstanceAdded(QString);
 
 Q_SIGNALS:
   void databaseDirectoryChanged(const QString&);

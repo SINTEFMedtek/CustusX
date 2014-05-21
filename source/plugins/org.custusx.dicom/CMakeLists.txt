@@ -17,6 +17,7 @@ set(PLUGIN_SRCS
   cxDicomImageReader.cpp
   cxDICOMAppWidget.cpp
   cxDICOMModel.cpp
+  cxDicomImporter.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -26,6 +27,7 @@ set(PLUGIN_MOC_SRCS
   cxDicomPluginActivator.h
   cxDicomGUIExtenderService.h
   cxDicomWidget.h
+  cxDicomImporter.h
 )
 
 # Qt Designer files which should be processed by Qts uic
