@@ -89,8 +89,19 @@ public:
 	int instancesAddedDuringImport();
 
 
+public slots:
+	  /// Import a directory - this is used when the user selects a directory
+	  /// from the Import Dialog, but can also be used externally to trigger
+	  /// an import (i.e. for testing or to support drag-and-drop)
+	  void onImportDirectory(QString directory);
+
+signals:
+	void directoryImported();
+	void indexingCompleted();
+	void fileIndexed(QString);
 
 
+private:
 	void showIndexerDialog();
 
 	ctkFileDialog* ImportDialog;
@@ -106,12 +117,6 @@ public:
 	int SeriesAddedDuringImport;
 	int InstancesAddedDuringImport;
 
-public slots:
-	  /// Import a directory - this is used when the user selects a directory
-	  /// from the Import Dialog, but can also be used externally to trigger
-	  /// an import (i.e. for testing or to support drag-and-drop)
-	  void onImportDirectory(QString directory);
-
 private slots:
 	void onFileIndexed(const QString& filePath);
 	void openImportDialog();
@@ -123,10 +128,6 @@ private slots:
 	void onSeriesAdded(QString);
 	void onInstanceAdded(QString);
 
-signals:
-	void directoryImported();
-	void indexingCompleted();
-	void fileIndexed(QString);
 };
 
 

@@ -472,34 +472,20 @@ void DICOMAppWidget::onRemoveAction()
 {
   Q_D(DICOMAppWidget);
 
-  //d->QueryRetrieveWidget->show();
-  // d->QueryRetrieveWidget->raise();
-  std::cout << "on remove" << std::endl;
-  QModelIndexList selection = d->TreeView->selectionModel()->selectedIndexes();
-  std::cout << selection.size() << std::endl;
-  QModelIndex index;
-  foreach(index,selection)
-  {
-    QModelIndex index0 = index.sibling(index.row(), 0);
-    if ( d->DICOMModel.data(index0,ctkDICOMModel::TypeRole) == static_cast<int>(ctkDICOMModel::SeriesType))
-    {
-      QString seriesUID = d->DICOMModel.data(index0,ctkDICOMModel::UIDRole).toString();
-      d->DICOMDatabase->removeSeries(seriesUID);
-    }
-    else if ( d->DICOMModel.data(index0,ctkDICOMModel::TypeRole) == static_cast<int>(ctkDICOMModel::StudyType))
-    {
-      QString studyUID = d->DICOMModel.data(index0,ctkDICOMModel::UIDRole).toString();
-      d->DICOMDatabase->removeStudy(studyUID);
-    }
-    else if ( d->DICOMModel.data(index0,ctkDICOMModel::TypeRole) == static_cast<int>(ctkDICOMModel::PatientType))
-    {
-      QString patientUID = d->DICOMModel.data(index0,ctkDICOMModel::UIDRole).toString();
-      d->DICOMDatabase->removePatient(patientUID);
-    }
-  }
-  d->DICOMModel.reset();
-}
+	QStringList series = this->getSelectedSeries();
+	for (int i=0; i<series.size(); ++i)
+		d->DICOMDatabase->removeSeries(series[i]);
 
+	QStringList studies = this->getSelectedStudies();
+	for (int i=0; i<studies.size(); ++i)
+		d->DICOMDatabase->removeStudy(studies[i]);
+
+	QStringList patients = this->getSelectedPatients();
+	for (int i=0; i<patients.size(); ++i)
+		d->DICOMDatabase->removePatient(patients[i]);
+
+	d->DICOMModel.reset();
+}
 
 //----------------------------------------------------------------------------
 void DICOMAppWidget::suspendModel()
