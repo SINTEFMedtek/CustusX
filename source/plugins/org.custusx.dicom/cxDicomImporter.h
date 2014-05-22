@@ -15,49 +15,15 @@
 #ifndef CXDICOMIMPORTER_H
 #define CXDICOMIMPORTER_H
 
-// std includes
-#include <iostream>
-
-#include <dcmimage.h>
-
 // Qt includes
-#include <QAction>
-#include <QCoreApplication>
-#include <QCheckBox>
-#include <QDebug>
-#include <QMessageBox>
-#include <QMetaType>
-#include <QModelIndex>
-#include <QPersistentModelIndex>
-#include <QProgressDialog>
-#include <QSettings>
-#include <QSlider>
-#include <QTabBar>
-#include <QTimer>
-#include <QTreeView>
-#include <QLabel>
-#include <QHBoxLayout>
+#include <QString>
+#include <QObject>
+#include <QSharedPointer>
 
-// ctkWidgets includes
-#include "ctkDirectoryButton.h"
-#include "ctkFileDialog.h"
-
-// ctkDICOMCore includes
-#include "ctkDICOMDatabase.h"
-#include "ctkDICOMFilterProxyModel.h"
-#include "ctkDICOMIndexer.h"
-#include "ctkDICOMModel.h"
-
-// ctkDICOMWidgets includes
-#include "cxDICOMAppWidget.h"
-#include "ctkDICOMThumbnailGenerator.h"
-#include "ctkThumbnailLabel.h"
-#include "ctkDICOMQueryResultsTabWidget.h"
-#include "ctkDICOMQueryRetrieveWidget.h"
-#include "ctkDICOMQueryWidget.h"
-#include <QToolBar>
-#include "ctkDICOMThumbnailListWidget.h"
-#include "cxDicomImporter.h"
+class ctkDICOMDatabase;
+class ctkDICOMIndexer;
+class ctkFileDialog;
+class QProgressDialog;
 
 namespace cx
 {
