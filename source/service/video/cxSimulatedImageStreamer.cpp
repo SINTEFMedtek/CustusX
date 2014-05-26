@@ -39,6 +39,8 @@
 #include "cxSettings.h"
 #include "cxProbeImpl.h"
 #include <boost/make_shared.hpp>
+#include "simConfig.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -57,7 +59,8 @@ bool SimulatedImageStreamer::initUSSimulator()
 	bool retval = false;
 #ifdef CX_BUILD_US_SIMULATOR
 	mUSSimulator.reset(new ImageSimulator());
-	retval = mUSSimulator->init();
+	QString specklePath = DataLocations::getInstalledPath("/simulator", SIMULATOR_SPECKLE_PATH);
+	retval = mUSSimulator->init(specklePath);
 	/*mUSSimulator->setShadowsAirOn(false);
 		mUSSimulator->setShadowsBoneOn(false);
 		mUSSimulator->setReflectionsOn(false);
