@@ -207,14 +207,14 @@ QString DataLocations::getTSFOULPath()
 }
 #endif
 
-QString DataLocations::getInstalledPath(QString pathRelativeToConfigRoot, QString alternativePath)
+QString DataLocations::getExistingConfigPath(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath)
 {
 	QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED + pathRelativeToConfigRoot; // look for installed location
 	if (QDir(path).exists())
 		return path;
 
-	if (QDir(alternativePath).exists())
-		return alternativePath;
+	if (QDir(alternativeAbsolutePath).exists())
+		return alternativeAbsolutePath;
 
 	return "";
 }

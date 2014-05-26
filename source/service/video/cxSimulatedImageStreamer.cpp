@@ -59,7 +59,7 @@ bool SimulatedImageStreamer::initUSSimulator()
 	bool retval = false;
 #ifdef CX_BUILD_US_SIMULATOR
 	mUSSimulator.reset(new ImageSimulator());
-	QString specklePath = DataLocations::getInstalledPath("/simulator", SIMULATOR_SPECKLE_PATH);
+	QString specklePath = DataLocations::getExistingConfigPath("/simulator", SIMULATOR_SPECKLE_PATH);
 	retval = mUSSimulator->init(specklePath);
 	/*mUSSimulator->setShadowsAirOn(false);
 		mUSSimulator->setShadowsBoneOn(false);
