@@ -1,0 +1,18 @@
+
+if (BUILD_TESTING)
+    include_directories(
+    )
+
+
+    set(CX_TEST_CATCH_ORG_CUSTUSX_PATIENTMODEL_MOC_SOURCE_FILES
+    )
+	set(CX_TEST_CATCH_ORG_CUSTUSX_PATIENTMODEL_SOURCE_FILES
+		${CX_TEST_CATCH_ORG_CUSTUSX_PATIENTMODEL_MOC_SOURCE_FILES}
+		cxtestPatientModelPlugin.cpp
+		)
+
+    cx_catch_add_lib_and_exe(org_custusx_patientmodel 
+        "${CX_TEST_CATCH_ORG_CUSTUSX_PATIENTMODEL_SOURCE_FILES}" 
+        "${CX_TEST_CATCH_ORG_CUSTUSX_PATIENTMODEL_MOC_SOURCE_FILES}")
+
+endif (BUILD_TESTING)

@@ -21,7 +21,7 @@ namespace cx
 {
 
 
-DicomGUIExtenderService::DicomGUIExtenderService()
+DicomGUIExtenderService::DicomGUIExtenderService(ctkPluginContext *context) : mContext(context)
 {
 	QResource::registerResource("./Resources/ctkDICOM.qrc");
 }
@@ -35,7 +35,7 @@ std::vector<GUIExtenderService::CategorizedWidget> DicomGUIExtenderService::crea
 	std::vector<CategorizedWidget> retval;
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new DicomWidget(),
+			new DicomWidget(mContext),
 			"Plugins"));
 
 	return retval;

@@ -13,7 +13,7 @@
 #include "cxSettings.h"
 #include "cxToolDataAdapters.h"
 #include "cxDoubleDataAdapterTemporalCalibration.h"
-#include "cxReconstructManager.h"
+#include "cxReconstructionManager.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxProbeConfigWidget.h"
 #include "cxDisplayTimerWidget.h"

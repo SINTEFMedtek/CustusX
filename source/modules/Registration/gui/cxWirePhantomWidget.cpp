@@ -34,7 +34,7 @@
 #include "cxToolManager.h"
 #include "cxTypeConversions.h"
 #include "cxAcquisitionData.h"
-#include "cxReconstructManager.h"
+#include "cxReconstructionManager.h"
 #include "cxPipelineWidget.h"
 #include "cxDataReaderWriter.h"
 #include "cxDataFactory.h"

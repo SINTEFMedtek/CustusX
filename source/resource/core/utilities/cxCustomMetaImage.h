@@ -38,6 +38,7 @@ public:
   void setImageType(QString value);
 
   QString readKey(QString key);
+  void setKey(QString key, QString value);
 
 private:
   QString mFilename;

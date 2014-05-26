@@ -21,12 +21,12 @@ if (BUILD_TESTING)
 	#QT4_WRAP_CPP(CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES
 	#	)
 	set(CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES ${CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES}
-		cxtestReconstructManagerFixture.h
-		cxtestReconstructManagerFixture.cpp
-		cxtestReconstructManager.cpp
-		cxtestReconstructAlgorithm.cpp
-		cxtestReconstructAlgorithmFixture.h
-		cxtestReconstructAlgorithmFixture.cpp
+		cxtestReconstructionManagerFixture.h
+		cxtestReconstructionManagerFixture.cpp
+		cxtestReconstructionManager.cpp
+		cxtestReconstructionAlgorithm.cpp
+		cxtestReconstructionAlgorithmFixture.h
+		cxtestReconstructionAlgorithmFixture.cpp
 		cxtestSyntheticVolumeComparer.h
 		cxtestSyntheticVolumeComparer.cpp
 		cxtestSphereSyntheticVolume.h

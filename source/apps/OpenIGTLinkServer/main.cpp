@@ -6,7 +6,7 @@
 #include <QApplication>
 #include <QString>
 #include "cxImageServer.h"
-//
+#include "cxReporter.h"
 #include "cxImageStreamerOpenCV.h"
 #include "cxCommandlineImageStreamerFactory.h"
 
@@ -92,6 +92,7 @@ int main(int argc, char* argv[])
   //------------------------------------------------------------
   // Parse Arguments
   cx::StringMap args = cx::extractCommandlineOptions(app.arguments());
+  cx::Reporter::initialize();
 
   cx::ImageServer server;
   if (args.count("help") || args.count("h"))
@@ -116,6 +117,7 @@ int main(int argc, char* argv[])
   }
 
   int retVal = app.exec();
+  cx::Reporter::shutdown();
   return retVal;
 
 }

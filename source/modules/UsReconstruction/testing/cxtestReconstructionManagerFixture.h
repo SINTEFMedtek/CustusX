@@ -11,10 +11,10 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-#ifndef CXTESTRECONSTRUCTMANAGERFIXTURE_H
-#define CXTESTRECONSTRUCTMANAGERFIXTURE_H
+#ifndef CXTESTRECONSTRUCTIONMANAGERFIXTURE_H
+#define CXTESTRECONSTRUCTIONMANAGERFIXTURE_H
 
-#include "cxReconstructManager.h"
+#include "cxReconstructionManager.h"
 #include "cxtestSyntheticVolumeComparer.h"
 #include "cxtestSyntheticReconstructInput.h"
 
@@ -28,13 +28,13 @@ namespace cxtest
  * \date june 25, 2013
  * \author christiana
  */
-class ReconstructManagerTestFixture
+class ReconstructionManagerTestFixture
 {
 public:
-	ReconstructManagerTestFixture();
-	~ReconstructManagerTestFixture();
+	ReconstructionManagerTestFixture();
+	~ReconstructionManagerTestFixture();
 
-	cx::ReconstructManagerPtr getManager();
+	cx::ReconstructionManagerPtr getManager();
 	void reconstruct();	///< run the reconstruction in the main thread
 	void threadedReconstruct();
 	std::vector<cx::ImagePtr> getOutput();
@@ -45,7 +45,7 @@ public:
 	bool getVerbose() const { return mVerbose; }
 
 private:
-	cx::ReconstructManagerPtr mManager;
+	cx::ReconstructionManagerPtr mManager;
 	std::vector<cx::ImagePtr> mOutput; // valid after (threaded)reconstruct() has been run
 	bool mVerbose;
 };
@@ -55,4 +55,4 @@ private:
 } // namespace cxtest
 
 
-#endif // CXTESTRECONSTRUCTMANAGERFIXTURE_H
+#endif // CXTESTRECONSTRUCTIONMANAGERFIXTURE_H

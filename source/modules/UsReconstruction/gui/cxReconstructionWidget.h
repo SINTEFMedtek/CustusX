@@ -2,7 +2,7 @@
 #define CXRECONSTRUCTIONWIDGET_H_
 
 #include <QtGui>
-#include "cxReconstructManager.h"
+#include "cxReconstructionManager.h"
 #include "cxDoubleWidgets.h"
 #include "cxXmlOptionItem.h"
 #include "cxLabeledComboBoxWidget.h"
@@ -32,8 +32,8 @@ class ReconstructionWidget: public BaseWidget
 {
 Q_OBJECT
 public:
-	ReconstructionWidget(QWidget* parent, ReconstructManagerPtr reconstructer);
-	ReconstructManagerPtr reconstructer()
+	ReconstructionWidget(QWidget* parent, ReconstructionManagerPtr reconstructer);
+	ReconstructionManagerPtr reconstructer()
 	{
 		return mReconstructer;
 	}
@@ -54,8 +54,7 @@ private slots:
 	void reconstructAboutToStartSlot();
 
 private:
-	ReconstructManagerPtr mReconstructer;
-//	ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;
+	ReconstructionManagerPtr mReconstructer;
 
 	FileSelectWidget* mFileSelectWidget;
 	QPushButton* mReconstructButton;
