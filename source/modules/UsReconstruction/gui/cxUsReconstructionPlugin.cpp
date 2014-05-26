@@ -8,7 +8,7 @@
 #include <cxUsReconstructionPlugin.h>
 #include "cxDataLocations.h"
 #include "cxXmlOptionItem.h"
-#include "cxReconstructManager.h"
+#include "cxReconstructionManager.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 
@@ -21,7 +21,7 @@ namespace cx
 UsReconstructionPlugin::UsReconstructionPlugin()
 {
   XmlOptionFile xmlFile = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction");
-  mReconstructer.reset(new ReconstructManager(xmlFile, DataLocations::getShaderPath()));
+  mReconstructer.reset(new ReconstructionManager(xmlFile, DataLocations::getShaderPath()));
 
   connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
@@ -33,15 +33,10 @@ UsReconstructionPlugin::~UsReconstructionPlugin()
 
 void UsReconstructionPlugin::patientChangedSlot()
 {
-	mReconstructer->selectData(patientService()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
-  mReconstructer->setOutputBasePath(patientService()->getPatientData()->getActivePatientFolder());
-  mReconstructer->setOutputRelativePath("Images");
+    mReconstructer->selectData(patientService()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
+    mReconstructer->setOutputBasePath(patientService()->getPatientData()->getActivePatientFolder());
+    mReconstructer->setOutputRelativePath("Images");
 
-//  mReconstructionWidget->selectData(patientService()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
-//  mReconstructionWidget->reconstructer()->setOutputBasePath(patientService()->getPatientData()->getActivePatientFolder());
-//  mReconstructionWidget->reconstructer()->setOutputRelativePath("Images");
-
-//  this->updateWindowTitle();
 }
 
 std::vector<GUIExtenderService::CategorizedWidget> UsReconstructionPlugin::createWidgets() const

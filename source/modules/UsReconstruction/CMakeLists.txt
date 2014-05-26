@@ -9,7 +9,7 @@
 ###########################################################
 
 SET( MOC_HEADER_FILES
-   logic/cxReconstructManager.h
+   logic/cxReconstructionManager.h
    logic/cxReconstructThreads.h
    logic/cxReconstructParams.h
    gui/cxReconstructionWidget.h
@@ -22,8 +22,8 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 # library
 SET( SOURCE_FILES
   ${MOC_HEADER_FILES}
-  logic/cxReconstructManager.h
-  logic/cxReconstructManager.cpp
+  logic/cxReconstructionManager.h
+  logic/cxReconstructionManager.cpp
   logic/cxReconstructThreads.h
   logic/cxReconstructThreads.cpp
   logic/cxReconstructParams.h

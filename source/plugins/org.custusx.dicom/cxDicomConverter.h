@@ -16,10 +16,12 @@
 #define CXDICOMCONVERTER_H_
 
 #include "cxImage.h"
+#include "org_custusx_dicom_Export.h"
 class ctkDICOMDatabase;
 
 namespace cx
 {
+typedef boost::shared_ptr<class DicomImageReader> DicomImageReaderPtr;
 
 /**
  * Import dicom series into cx Image.
@@ -29,7 +31,7 @@ namespace cx
  * \date 2014-04-04
  * \author Christian Askeland
  */
-class DicomConverter
+class org_custusx_dicom_EXPORT DicomConverter
 {
 public:
 	DicomConverter();
@@ -39,6 +41,16 @@ public:
 	ImagePtr convertToImage(QString seriesUid);
 
 private:
+	QString generateUid(DicomImageReaderPtr reader);
+	QString generateName(DicomImageReaderPtr reader);
+	std::map<double, ImagePtr> sortImagesAlongDirection(std::vector<ImagePtr> images, Vector3D  e_sort);
+	ImagePtr mergeSlices(std::map<double, ImagePtr> sorted) const;
+	bool getMeanSliceDistance(std::map<double, ImagePtr> sorted) const;
+	bool slicesFormRegularGrid(std::map<double, ImagePtr> sorted, Vector3D e_sort) const;
+	ImagePtr createCxImageFromDicomFile(QString filename);
+	std::vector<ImagePtr> createImages(QStringList files);
+	QString convertToValidFilename(QString text) const;
+
 	ctkDICOMDatabase* mDatabase;
 };
 

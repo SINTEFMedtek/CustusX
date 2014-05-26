@@ -45,10 +45,13 @@ macro(GetMyTargetLibraries all_target_libraries varname)
 endmacro()
 #>
 
+cmake_policy(SET CMP0012 NEW)
 #> Create a list of available plug-ins and make them known to the build system
 set(CX_PLUGINS
   plugins/org.custusx.dicom:ON
   plugins/org.custusx.example:ON
+  plugins/org.custusx.tordreconstruction:ON
+  plugins/org.custusx.patientmodel:ON
 )
 
 ctkMacroSetupPlugins(${CX_PLUGINS})

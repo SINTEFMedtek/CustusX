@@ -17,7 +17,7 @@
 #include "cxDataLocations.h"
 #include "cxVideoService.h"
 #include "cxVideoConnectionManager.h"
-#include "cxReconstructManager.h"
+#include "cxReconstructionManager.h"
 #include "cxLogger.h"
 #include "cxUSFrameData.h"
 #include "cxUsReconstructionFileReader.h"
@@ -60,7 +60,7 @@ cx::ReconstructManagerPtr AcquisitionFixture::createReconstructionManager()
 {
 	mRecordDuration = 3000;
 	cx::XmlOptionFile settings;
-	cx::ReconstructManagerPtr reconstructer(new cx::ReconstructManager(settings,""));
+	cx::ReconstructionManagerPtr reconstructer(new cx::ReconstructionManager(settings,""));
 
 	reconstructer->setOutputBasePath(cx::DataLocations::getTestDataPath() + "/temp/");
 	reconstructer->setOutputRelativePath("Images");

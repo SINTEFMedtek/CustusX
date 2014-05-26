@@ -16,10 +16,17 @@
 #define CXDICOMWIDGET_H_
 
 #include "cxBaseWidget.h"
-class ctkDICOMBrowser;
+#include "boost/shared_ptr.hpp"
+class QItemSelection;
+//class ctkDICOMBrowser;
+class ctkDICOMAppWidget;
+class ctkPluginContext;
+class ctkDICOMDatabase;
 
 namespace cx
 {
+class DICOMAppWidget;
+	typedef boost::shared_ptr<class Image> ImagePtr;
 
 /**
  * Widget for dicom interaction
@@ -33,7 +40,7 @@ class DicomWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	DicomWidget(QWidget* parent = 0);
+	DicomWidget(ctkPluginContext* context, QWidget* parent = 0);
 	virtual ~DicomWidget();
 
 	virtual QString defaultWhatsThis() const;
@@ -41,14 +48,24 @@ public:
 private slots:
 	void onViewHeader();
 	void onImportIntoCustusXAction();
+//	void onModelSelected(const QItemSelection &item1, const QItemSelection &item2);
+protected:
+	virtual void prePaintEvent();
 private:
 	QVBoxLayout*  mVerticalLayout; ///< vertical layout is used
-	ctkDICOMBrowser* mBrowser;
-
+//	ctkDICOMBrowser* mBrowser;
+	DICOMAppWidget* mBrowser;
+	ctkPluginContext* mContext;
 	QAction* mViewHeaderAction;
 	QAction* mImportIntoCustusXAction;
+	void createUI();
 	void setupDatabaseDirectory();
 	void importSeries(QString seriesUid);
+	void loadIntoPatientModel(ImagePtr image, QString seriesUid);
+	void printFrameCountForSeries(QString series) const;
+	QStringList currentSeriesSelection();
+	ctkDICOMDatabase* getDatabase() const;
+
 };
 
 } /* namespace cx */

@@ -24,6 +24,10 @@ vtkImageDataPtr generateVtkImageDataUnsignedShort(Eigen::Array3i dim,
 									 Vector3D spacing,
 									 const unsigned short initValue,
 									 int components = 1);
+vtkImageDataPtr generateVtkImageDataSignedShort(Eigen::Array3i dim,
+									 Vector3D spacing,
+									 const short initValue,
+									 int components = 1);
 vtkImageDataPtr generateVtkImageDataDouble(Eigen::Array3i dim, Vector3D spacing, double initValue);
 void fillShortImageDataWithGradient(vtkImageDataPtr data, int maxValue);
 

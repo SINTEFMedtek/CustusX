@@ -64,7 +64,8 @@ QString CustomMetaImage::readModality()
 		return "US";
 	if (mod.contains("OTHER", Qt::CaseInsensitive))
 		return "OTHER";
-	return "UNKNOWN";
+	mod = mod.remove("MET_MOD_");
+	return mod;
 }
 
 QString CustomMetaImage::readImageType()
@@ -90,49 +91,71 @@ void CustomMetaImage::remove(QStringList* data, QStringList keys)
   */
 void CustomMetaImage::append(QStringList* data, QString key, QString value)
 {
-	// fine index of ElementDataFile - this is the last element according to MHD standard (but we might have appended something else after it).
+	// find index of ElementDataFile - this is the last element according to MHD standard (but we might have appended something else after it).
     int last = data->lastIndexOf(QRegExp("^ElementDataFile.*"));
 	data->insert(last, QString("%1 = %2").arg(key).arg(value));
 }
 
-void CustomMetaImage::setModality(QString value)
+void CustomMetaImage::setKey(QString key, QString value)
 {
 	QFile file(mFilename);
 
-    if (!file.open(QIODevice::ReadWrite))
-    {
-      reportError("Failed to open file " + mFilename + ".");
-      return;
-    }
+	if (!file.open(QIODevice::ReadWrite))
+	{
+	  reportError("Failed to open file " + mFilename + ".");
+	  return;
+	}
 
-    QStringList data = QTextStream(&file).readAll().split("\n");
+	QStringList data = QTextStream(&file).readAll().split("\n");
 
-	this->remove(&data, QStringList()<<"Modality");
-	this->append(&data, "Modality", value);
+	this->remove(&data, QStringList()<<key);
+	this->append(&data, key, value);
 
-    file.resize(0);
-    file.write(data.join("\n").toAscii());
+	file.resize(0);
+	file.write(data.join("\n").toAscii());
+}
+
+void CustomMetaImage::setModality(QString value)
+{
+	this->setKey("Modality", value);
+
+//	QFile file(mFilename);
+
+//    if (!file.open(QIODevice::ReadWrite))
+//    {
+//      reportError("Failed to open file " + mFilename + ".");
+//      return;
+//    }
+
+//    QStringList data = QTextStream(&file).readAll().split("\n");
+
+//	this->remove(&data, QStringList()<<"Modality");
+//	this->append(&data, "Modality", value);
+
+//    file.resize(0);
+//    file.write(data.join("\n").toAscii());
 }
 
 void CustomMetaImage::setImageType(QString value)
 {
 	if (value.isEmpty())
 		return;
-	QFile file(mFilename);
+	this->setKey("ImageType3", value);
+//	QFile file(mFilename);
 
-    if (!file.open(QIODevice::ReadWrite))
-    {
-      reportError("Failed to open file " + mFilename + ".");
-      return;
-    }
+//    if (!file.open(QIODevice::ReadWrite))
+//    {
+//      reportError("Failed to open file " + mFilename + ".");
+//      return;
+//    }
 
-    QStringList data = QTextStream(&file).readAll().split("\n");
+//    QStringList data = QTextStream(&file).readAll().split("\n");
 
-	this->remove(&data, QStringList()<<"ImageType3");
-	this->append(&data, "ImageType3", value);
+//	this->remove(&data, QStringList()<<"ImageType3");
+//	this->append(&data, "ImageType3", value);
 
-    file.resize(0);
-    file.write(data.join("\n").toAscii());
+//    file.resize(0);
+//    file.write(data.join("\n").toAscii());
 }
 
 

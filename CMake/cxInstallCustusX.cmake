@@ -96,49 +96,22 @@ ENDIF(APPLE)
 
 set(ALL_LIBRARY_DIRS
     ${ULTERIUS_BIN_DIR}
-    ${QT_INCLUDES}
     ${QT_LIBRARY_DIRS}
     ${QT_BINARY_DIR}
     ${GEStreamer_LIBRARY_DIRS}
-    ${VTK_LIBRARY_DIRS}
     ${OpenCV_LIB_DIR}
     ${OPENCL_LIBRARY_DIRS}
     ${IGSTK_LIBRARY_DIRS}
     ${OpenIGTLink_LIBRARY_DIRS}
+    ${VTK_DIR}/lib
+    ${CTK_DIR}/CTK-build/bin
     ${ITK_DIR}/lib
     ${DCMTK_DIR}/lib
-    ${INCLUDE_DIRECTORIES}
     ${Tube-Segmentation-Framework_LIBRARY_DIRS}
     ${OpenCLUtilityLibrary_LIBRARY_DIRS}
-	${CustusX3_BINARY_DIR}/source/ThirdParty/VTKMultiVolume
-	${CustusX3_BINARY_DIR}
-    ${CustusX3_BINARY_DIR}/source
 
-	${CustusX3_BINARY_DIR}/source/resource/core
-	${CustusX3_BINARY_DIR}/source/resource/OpenIGTLinkUtilities
-	${CustusX3_BINARY_DIR}/source/resource/videoServer
-	${CustusX3_BINARY_DIR}/source/resource/usReconstructionTypes
-	${CustusX3_BINARY_DIR}/source/resource/visualization
-	${CustusX3_BINARY_DIR}/source/resource/widgets
-
-	${CustusX3_BINARY_DIR}/source/service/patient
-	${CustusX3_BINARY_DIR}/source/service/state
-	${CustusX3_BINARY_DIR}/source/service/tracking
-	${CustusX3_BINARY_DIR}/source/service/video
-	${CustusX3_BINARY_DIR}/source/service/visualization
-
-	${CustusX3_BINARY_DIR}/source/modules/Acquisition
-    ${CustusX3_BINARY_DIR}/source/modules/Algorithm
-    ${CustusX3_BINARY_DIR}/source/modules/Calibration
-    ${CustusX3_BINARY_DIR}/source/modules/Registration
-    ${CustusX3_BINARY_DIR}/source/modules/UsReconstruction
-    ${CustusX3_BINARY_DIR}/source/modules/UsReconstruction/logic/3DReconstruction
-
-    ${CustusX3_BINARY_DIR}/source/gui
-    ${CustusX3_BINARY_DIR}/source/logic/
-    ${CustusX3_BINARY_DIR}/source/apps/grabberServer
-    ${CustusX3_BINARY_DIR}/source/apps/OpenIGTLinkServer
-    ${CustusX3_BINARY_DIR}/source/testing
+	${PROJECT_BINARY_DIR}/bin # new standard: all own binaries stored here
+	${PROJECT_BINARY_DIR}/bin/plugins
 	)
 
 cx_install_all_stored_targets(${CX_INSTALL_BINARY_DIR})
