@@ -45,6 +45,7 @@ public:
   static QString getTSFPath(); ///< return path to a folder where files needed for tube segmentation framework are located
   static QString getTSFOULPath(); ///< return path to a folder where files needed for tube segmentation framework are located
 #endif
+	static QString getInstalledPath(QString pathRelativeToConfigRoot, QString alternativePath); ///< Return path to folder with additional files copied into the config path during installation
 
   static void setTestMode(); ///< set a testing mode that changes location of settings files to a temp folder.
 

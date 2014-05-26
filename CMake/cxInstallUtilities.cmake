@@ -205,6 +205,13 @@ endif ()
 				${OpenCLUtilityLibrary_KERNELS_DIR}/HistogramPyramids.clh
 				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/)
 	endif()
+
+	if(CX_BUILD_US_SIMULATOR)
+		install(FILES
+				${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/speckle.mhd
+				${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/speckle.raw
+				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/simulator)
+	endif()
 endfunction()
 
 ###############################################################################
