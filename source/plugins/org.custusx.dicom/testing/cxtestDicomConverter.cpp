@@ -30,8 +30,8 @@ class DicomConverterTestFixture
 public:
 	void checkImagesEqual(vtkImageDataPtr input1, vtkImageDataPtr input2)
 	{
-		REQUIRE(input1.Get()!=NULL);
-		REQUIRE(input2.Get()!=NULL);
+		REQUIRE(input1.Get()!=(vtkImageData*)NULL);
+		REQUIRE(input2.Get()!=(vtkImageData*)NULL);
 		REQUIRE(input1->GetDataDimension() == input2->GetDataDimension());
 		REQUIRE(input1->GetScalarType() == input2->GetScalarType());
 		REQUIRE(input1->GetNumberOfScalarComponents() == input2->GetNumberOfScalarComponents());
