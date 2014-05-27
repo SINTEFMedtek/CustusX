@@ -125,9 +125,12 @@ bool TubeSegmentationFilter::execute()
 		std::cout << "Input: " <<  input->getName().toStdString() << std::endl;
 		std::cout << "Preset: " <<  getParamStr(mParameters, "parameters") << std::endl;
 		std::cout << "Centerline-method: " <<  getParamStr(mParameters, "centerline-method") << std::endl;
-		std::cout << "Kernel paths: " << cx::DataLocations::getTSFPath().toStdString() << " and " << cx::DataLocations::getTSFOULPath().toStdString() << std::endl;
+		QString kernelDir = cx::DataLocations::getExistingConfigPath("/tsf", KERNELS_DIR);
+		QString oulDir = cx::DataLocations::getExistingConfigPath("/tsf", OUL_DIR);
+		std::cout << "Kernel paths: " << kernelDir.toStdString();
+		std::cout << " and " << oulDir.toStdString() << std::endl;
 		std::cout << "--------------" << std::endl;
-		mOutput = run(filename, mParameters, cx::DataLocations::getTSFPath().toStdString(), cx::DataLocations::getTSFOULPath().toStdString());
+		mOutput = run(filename, mParameters, kernelDir.toStdString(), oulDir.toStdString());
 		std::cout << "=================TSF END====================" << std::endl;
 	} catch(SIPL::SIPLException& e) {
 		std::string error = e.what();
@@ -413,7 +416,7 @@ void TubeSegmentationFilter::loadNewParametersSlot()
 		try
 		{
 			setParameter(list, "parameters", mParameterFile.toStdString());
-			loadParameterPreset(list, cx::DataLocations::getTSFPath().toStdString()+"/parameters");
+			loadParameterPreset(list, cx::DataLocations::getExistingConfigPath("/tsf", QString(KERNELS_DIR)).toStdString()+"/parameters");
 		} catch (SIPL::SIPLException& e)
 		{
 			reportWarning("Error when loading a parameter file. Preset is corrupt. "+QString(e.what()));
@@ -840,7 +843,7 @@ paramList TubeSegmentationFilter::getDefaultParameters()
 	//get list with default options
 	paramList defaultOptions;
 	try{
-		defaultOptions = initParameters(cx::DataLocations::getTSFPath().toStdString()+"/parameters");
+		defaultOptions = initParameters(cx::DataLocations::getExistingConfigPath("/tsf", QString(KERNELS_DIR)).toStdString() + "/parameters");
 	} catch (SIPL::SIPLException& e){
 		std::string message = "When creating default options, could not init parameters. \""+std::string(e.what())+"\"";
 		reportError(qstring_cast(message));

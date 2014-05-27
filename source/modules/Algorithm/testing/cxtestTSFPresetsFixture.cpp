@@ -6,6 +6,7 @@
 #include <QTextStream>
 #include "cxLogicManager.h"
 #include "cxDataLocations.h"
+#include "tsf-config.h"
 
 namespace cxtest {
 
@@ -23,7 +24,7 @@ void TSFPresetsFixture::setUp()
 {
 	cx::LogicManager::initialize();
 
-	mFolderPath = cx::DataLocations::getTSFPath()+"/parameters/";
+	mFolderPath = cx::DataLocations::getExistingConfigPath("/tsf", QString(KERNELS_DIR)) + "/parameters";
 	mPresetFileName = "CPPUNIT_TEST";
 	mPresetFilePath = mFolderPath+"centerline-gpu/"+mPresetFileName;
 }
