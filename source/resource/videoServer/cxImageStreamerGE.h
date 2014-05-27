@@ -10,10 +10,10 @@
 #include <QSize>
 #include <QStringList>
 #include "igtlImageMessage.h"
-#include "cxImageSenderFactory.h"
 #include "cxIGTLinkImageMessage.h"
 #include "cxCyclicActionLogger.h"
 #include "GEStreamer.h"
+#include "cxImageStreamer.h"
 
 class QTimer;
 

@@ -20,6 +20,7 @@
 #include "cxForwardDeclarations.h"
 #include "cxVideoSource.h"
 #include "cxProbeData.h"
+#include "cxImageStreamerInterface.h"
 
 class QTimer;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
@@ -66,7 +67,7 @@ public:
 	void disconnectServer();
 
 	std::vector<VideoSourcePtr> getVideoSources();
-	void setImageToStream(QString uid);
+	ImageStreamerInterfacePtr getStreamerInterface();
 
 
 signals:
@@ -91,6 +92,7 @@ private:
 	void updateStatus(ProbeDefinitionPtr message);
 	void startAllSources();
 	void removeSourceFromProbe(ToolPtr tool);
+	QString getImageToStream();
 
 	ImageReceiverThreadPtr mClient;
 	bool mConnected;
@@ -99,8 +101,9 @@ private:
 
 	std::vector<BasicVideoSourcePtr> mSources;
 
-	QString mImageUidToStream;
 	VideoServiceBackendPtr mBackend;
+
+	ImageStreamerInterfacePtr mStreamerInterface;
 };
 typedef boost::shared_ptr<VideoConnection> VideoConnectionPtr;
 

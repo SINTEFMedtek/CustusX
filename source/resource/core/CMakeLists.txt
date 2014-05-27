@@ -189,9 +189,12 @@ vtkIOVideo
 vtkImagingStatistics
 vtkImagingColor
 vtkImagingMath
+vtkImagingGeneral
+vtkImagingMorphological
 vtkFiltersCore
 vtkFiltersGeneral
 vtkFiltersSources
+vtkFiltersParallel
 vtkRenderingFreeTypeOpenGL
 vtkRenderingFreeType
 vtkRenderingCore
@@ -199,14 +202,6 @@ vtkRenderingVolume
 vtkInteractionStyle
 vtkFiltersParallel
 vtkImagingMorphological
-#    vtkIO
-#    vtkRendering
-#    vtkImaging
-#    vtkCommon
-#    vtkHybrid
-#    vtkWidgets
-#    vtkFiltering
-#    vtkVolumeRendering
     )
 
 

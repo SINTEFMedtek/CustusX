@@ -40,7 +40,6 @@
 #include "cxProbeImpl.h"
 #include "cxVideoService.h"
 #include "cxToolManager.h"
-#include "cxImageSenderFactory.h"
 #include "cxDirectlyLinkedImageReceiverThread.h"
 #include "cxTypeConversions.h"
 #include "cxImage.h"
@@ -50,6 +49,8 @@
 #include "cxCyclicActionLogger.h"
 #include "cxBasicVideoSource.h"
 #include "cxVideoServiceBackend.h"
+#include "cxImageStreamerFactory.h"
+#include "cxSettings.h"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
@@ -96,12 +97,26 @@ void VideoConnection::connectedSlot(bool on)
 	emit connected(on);
 }
 
+ImageStreamerInterfacePtr VideoConnection::getStreamerInterface()
+{
+	return mStreamerInterface;
+}
+
 void VideoConnection::runDirectLinkClient(std::map<QString, QString> args)
 {
-	DirectlyLinkedImageReceiverThreadPtr imageReceiverThread(new DirectlyLinkedImageReceiverThread(args, this));
-	imageReceiverThread->setBackend(mBackend);
-	imageReceiverThread->setImageToStream(mImageUidToStream);
+	ImageStreamerFactory imageStreamerFactory;
+	imageStreamerFactory.setBackend(mBackend);
+	imageStreamerFactory.setArguments(args);
+	imageStreamerFactory.setImageToStream(this->getImageToStream());
+	mStreamerInterface = imageStreamerFactory.getStreamerInterface();
+
+	DirectlyLinkedImageReceiverThreadPtr imageReceiverThread(new DirectlyLinkedImageReceiverThread(mStreamerInterface, this));
 	this->runClient(imageReceiverThread);
+}
+
+QString VideoConnection::getImageToStream()
+{
+	return settings()->value("USsimulation/volume", "").toString();
 }
 
 void VideoConnection::runIGTLinkedClient(QString address, int port)
@@ -294,14 +309,6 @@ std::vector<VideoSourcePtr> VideoConnection::getVideoSources()
 	std::vector<VideoSourcePtr> retval;
 	std::copy(mSources.begin(), mSources.end(), std::back_inserter(retval));
 	return retval;
-}
-
-void VideoConnection::setImageToStream(QString uid)
-{
-	mImageUidToStream = uid;
-	DirectlyLinkedImageReceiverThreadPtr casted_client = boost::dynamic_pointer_cast<DirectlyLinkedImageReceiverThread>(mClient);
-	if(casted_client)
-		casted_client->setImageToStream(mImageUidToStream);
 }
 
 /** Imbue probe with all stream and probe info from grabber.
