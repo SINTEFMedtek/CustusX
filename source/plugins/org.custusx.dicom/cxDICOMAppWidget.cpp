@@ -49,7 +49,7 @@
 #include "ctkDICOMDatabase.h"
 #include "ctkDICOMFilterProxyModel.h"
 #include "ctkDICOMIndexer.h"
-#include "ctkDICOMModel.h"
+#include "cxDICOMModel.h"
 
 // ctkDICOMWidgets includes
 #include "cxDICOMAppWidget.h"
@@ -73,7 +73,7 @@ Q_DECLARE_METATYPE(QPersistentModelIndex);
 
 namespace cx
 {
-
+typedef DICOMModel ctkDICOMModel;
 
 //----------------------------------------------------------------------------
 class DICOMAppWidgetPrivate: public QWidget
@@ -100,7 +100,7 @@ public:
 
   QSharedPointer<ctkDICOMDatabase> DICOMDatabase;
   QSharedPointer<ctkDICOMThumbnailGenerator> ThumbnailGenerator;
-  ctkDICOMModel DICOMModel;
+  ctkDICOMModel mDICOMModel;
   ctkDICOMFilterProxyModel DICOMProxyModel;
   QProgressDialog *UpdateSchemaProgress;
 
@@ -108,7 +108,7 @@ public:
   std::map<ctkDICOMModel::IndexType, QStringList> getSelection() const;
 
   // used when suspending the ctkDICOMModel
-  QSqlDatabase EmptyDatabase;
+//  QSqlDatabase EmptyDatabase;
 };
 
 //----------------------------------------------------------------------------
@@ -120,6 +120,9 @@ DICOMAppWidgetPrivate::DICOMAppWidgetPrivate(DICOMAppWidget* parent): q_ptr(pare
   ThumbnailGenerator = QSharedPointer <ctkDICOMThumbnailGenerator> (new ctkDICOMThumbnailGenerator);
   DICOMDatabase->setThumbnailGenerator(ThumbnailGenerator.data());
   UpdateSchemaProgress = 0;
+
+  mDICOMModel.setHeaderData(3, Qt::Horizontal, "MyValue", Qt::DisplayRole);
+
 }
 
 DICOMAppWidgetPrivate::~DICOMAppWidgetPrivate()
@@ -213,10 +216,10 @@ void DICOMAppWidgetPrivate::showUpdateSchemaDialog()
             UpdateSchemaProgress, SLOT(close()));
     // reset the database to show new data
     q->connect(DICOMDatabase.data(), SIGNAL(schemaUpdated()),
-            &DICOMModel, SLOT(reset()));
+			&mDICOMModel, SLOT(reset()));
     // reset the database if canceled
     q->connect(UpdateSchemaProgress, SIGNAL(canceled()), 
-            &DICOMModel, SLOT(reset()));
+			&mDICOMModel, SLOT(reset()));
     }
   UpdateSchemaProgress->show();
 }
@@ -231,8 +234,8 @@ std::map<ctkDICOMModel::IndexType, QStringList> DICOMAppWidgetPrivate::getSelect
 	foreach(index,selection)
 	{
 	  QModelIndex index0 = index.sibling(index.row(), 0);
-	  ctkDICOMModel::IndexType type = static_cast<ctkDICOMModel::IndexType>(DICOMModel.data(index0,ctkDICOMModel::TypeRole).toInt());
-	  QString uid = DICOMModel.data(index0,ctkDICOMModel::UIDRole).toString();
+	  ctkDICOMModel::IndexType type = static_cast<ctkDICOMModel::IndexType>(mDICOMModel.data(index0,ctkDICOMModel::TypeRole).toInt());
+	  QString uid = mDICOMModel.data(index0,ctkDICOMModel::UIDRole).toString();
 
 	  if (!retval.count(type))
 		  retval[type] << uid;
@@ -254,15 +257,15 @@ DICOMAppWidget::DICOMAppWidget(QWidget* _parent):Superclass(_parent),
   d->setupUi(this);
 
   connect(&d->Importer, SIGNAL(indexingCompleted()),
-		  &d->DICOMModel, SLOT(reset()));
+		  &d->mDICOMModel, SLOT(reset()));
   connect(&d->Importer, SIGNAL(directoryImported()),
 		  this, SIGNAL(directoryImported()));
 
   //Enable sorting in tree view
   d->TreeView->setSortingEnabled(true);
   d->TreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
-  d->DICOMProxyModel.setSourceModel(&d->DICOMModel);
-  d->TreeView->setModel(&d->DICOMModel);
+  d->DICOMProxyModel.setSourceModel(&d->mDICOMModel);
+  d->TreeView->setModel(&d->mDICOMModel);
 
   d->ThumbnailsWidget->setThumbnailSize(
     QSize(d->ThumbnailWidthSlider->value(), d->ThumbnailWidthSlider->value()));
@@ -394,8 +397,8 @@ void DICOMAppWidget::setDatabaseDirectory(const QString& directory)
   // update the database schema if needed and provide progress
   this->updateDatabaseSchemaIfNeeded();
 
-  d->DICOMModel.setDatabase(d->DICOMDatabase->database());
-  d->DICOMModel.setEndLevel(ctkDICOMModel::SeriesType);
+  d->mDICOMModel.setDatabase(d->DICOMDatabase);
+  d->mDICOMModel.setEndLevel(ctkDICOMModel::SeriesType);
   d->TreeView->resizeColumnToContents(0);
   d->Importer.setDatabase(d->DICOMDatabase);
 
@@ -447,7 +450,7 @@ void DICOMAppWidget::openQueryDialog()
 void DICOMAppWidget::onQueryRetrieveFinished()
 {
   Q_D(DICOMAppWidget);
-  d->DICOMModel.reset();
+  d->mDICOMModel.reset();
   emit this->queryRetrieveFinished();
 }
 
@@ -472,49 +475,35 @@ void DICOMAppWidget::onRemoveAction()
 {
   Q_D(DICOMAppWidget);
 
-  //d->QueryRetrieveWidget->show();
-  // d->QueryRetrieveWidget->raise();
-  std::cout << "on remove" << std::endl;
-  QModelIndexList selection = d->TreeView->selectionModel()->selectedIndexes();
-  std::cout << selection.size() << std::endl;
-  QModelIndex index;
-  foreach(index,selection)
-  {
-    QModelIndex index0 = index.sibling(index.row(), 0);
-    if ( d->DICOMModel.data(index0,ctkDICOMModel::TypeRole) == static_cast<int>(ctkDICOMModel::SeriesType))
-    {
-      QString seriesUID = d->DICOMModel.data(index0,ctkDICOMModel::UIDRole).toString();
-      d->DICOMDatabase->removeSeries(seriesUID);
-    }
-    else if ( d->DICOMModel.data(index0,ctkDICOMModel::TypeRole) == static_cast<int>(ctkDICOMModel::StudyType))
-    {
-      QString studyUID = d->DICOMModel.data(index0,ctkDICOMModel::UIDRole).toString();
-      d->DICOMDatabase->removeStudy(studyUID);
-    }
-    else if ( d->DICOMModel.data(index0,ctkDICOMModel::TypeRole) == static_cast<int>(ctkDICOMModel::PatientType))
-    {
-      QString patientUID = d->DICOMModel.data(index0,ctkDICOMModel::UIDRole).toString();
-      d->DICOMDatabase->removePatient(patientUID);
-    }
-  }
-  d->DICOMModel.reset();
+	QStringList series = this->getSelectedSeries();
+	for (int i=0; i<series.size(); ++i)
+		d->DICOMDatabase->removeSeries(series[i]);
+
+	QStringList studies = this->getSelectedStudies();
+	for (int i=0; i<studies.size(); ++i)
+		d->DICOMDatabase->removeStudy(studies[i]);
+
+	QStringList patients = this->getSelectedPatients();
+	for (int i=0; i<patients.size(); ++i)
+		d->DICOMDatabase->removePatient(patients[i]);
+
+	d->mDICOMModel.reset();
 }
 
+////----------------------------------------------------------------------------
+//void DICOMAppWidget::suspendModel()
+//{
+//  Q_D(DICOMAppWidget);
 
-//----------------------------------------------------------------------------
-void DICOMAppWidget::suspendModel()
-{
-  Q_D(DICOMAppWidget);
-
-  d->DICOMModel.setDatabase(d->EmptyDatabase);
-}
+//  d->mDICOMModel.setDatabase(d->EmptyDatabase);
+//}
 
 //----------------------------------------------------------------------------
 void DICOMAppWidget::resumeModel()
 {
   Q_D(DICOMAppWidget);
 
-  d->DICOMModel.setDatabase(d->DICOMDatabase->database());
+  d->mDICOMModel.setDatabase(d->DICOMDatabase);
 }
 
 //----------------------------------------------------------------------------
@@ -522,7 +511,7 @@ void DICOMAppWidget::resetModel()
 {
   Q_D(DICOMAppWidget);
 
-  d->DICOMModel.reset();
+  d->mDICOMModel.reset();
 }
 
 ////----------------------------------------------------------------------------
