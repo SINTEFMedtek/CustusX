@@ -38,6 +38,7 @@
 #include "boost/shared_ptr.hpp"
 #include "ctkDICOMDatabase.h"
 #include "cxDicomImageReader.h"
+#include "cxDicomModelNode.h"
 
 static ctkLogger logger ( "org.commontk.dicom.DICOMModel" );
 
@@ -46,8 +47,6 @@ Q_DECLARE_METATYPE(QStringList);
 
 namespace cx
 {
-struct Node;
-typedef boost::shared_ptr<Node> NodePtr;
 
 //------------------------------------------------------------------------------
 class DICOMModelPrivate
@@ -80,42 +79,6 @@ public:
   QStringList Headers;
 };
 
-//------------------------------------------------------------------------------
-// 1 node per row
-
-/** One node representing one of <root/patient/study/series>
-  *
-  * Children are constructed lazily, using the fetchMore system
-  * from QAbstractItemModel.
-  */
-struct Node
-{
-  DICOMModel::IndexType Type;
-  Node*                           Parent;
-  std::vector<NodePtr>            FetchedChildren; ///< all children currently loaded (filled by fetchMore())
-  QStringList                     ChildrenUID; ///< uids of all loaded and unloaded children.
-  int                             Row;
-  QString                         UID;
-  std::map<int, QVariant>         CachedValues;
-
-  bool canFetchMore() const
-  {
-	  return FetchedChildren.size() != ChildrenUID.size();
-  }
-  bool hasChildren() const
-  {
-	  return !ChildrenUID.empty();
-  }
-  NodePtr getFetchedChildForRow(int row) const
-  {
-	  if (row < this->FetchedChildren.size())
-		  return this->FetchedChildren[row];
-	  return NodePtr();
-  }
-
-
-
-};
 
 //------------------------------------------------------------------------------
 DICOMModelPrivate::DICOMModelPrivate(DICOMModel& o):q_ptr(&o)
@@ -144,57 +107,15 @@ Node* DICOMModelPrivate::nodeFromIndex(const QModelIndex& indexValue)const
 	return indexValue.isValid() ? reinterpret_cast<Node*>(indexValue.internalPointer()) : this->RootNode.get();
 }
 //------------------------------------------------------------------------------
+
+
+
 NodePtr DICOMModelPrivate::createNode(int row, const QModelIndex& parentValue)const
 {
-	NodePtr node(new Node);
-	Node* nodeParent = 0;
-	if (row == -1)
-	{// root node
-		node->Type = DICOMModel::RootType;
-		node->Parent = 0;
-	}
-	else
-	{
-		nodeParent = this->nodeFromIndex(parentValue);
-		nodeParent->FetchedChildren.push_back(node);
-		node->Parent = nodeParent;
-		node->Type = DICOMModel::IndexType(nodeParent->Type + 1);
-	}
-	node->Row = row;
-	if (node->Type != DICOMModel::RootType)
-	{
-		node->UID = nodeParent->ChildrenUID[row];
-	}
-
-	this->fillChildrenUids(node);
-	qDebug() << "created node" << node->UID;
-	qDebug() << "        node children " << node->ChildrenUID.join(",");
-
+	NodePtr node = cx::createNode(row, this->nodeFromIndex(parentValue), DataBase);
 	return node;
 }
 
-// add test uid data
-void DICOMModelPrivate::fillChildrenUids(NodePtr node) const
-{
-	if (!DataBase)
-		return;
-
-	if (node->Type == DICOMModel::RootType)
-	{
-		node->ChildrenUID << DataBase->patients();
-		node->ChildrenUID << "Patient1" << "Patient2" << "Patient3";
-	}
-	if (node->Type == DICOMModel::PatientType)
-	{
-		node->ChildrenUID << DataBase->studiesForPatient(node->UID);
-//		node->ChildrenUID << "Study1" << "Study2" << "Study3";
-	}
-	if (node->Type == DICOMModel::StudyType)
-	{
-		node->ChildrenUID << DataBase->seriesForStudy(node->UID);
-//		node->ChildrenUID << "Series1" << "Series2" << "Series3";
-	}
-}
 
 
 QString DICOMModelPrivate::getFirstDICOMFilename(Node* node) const
