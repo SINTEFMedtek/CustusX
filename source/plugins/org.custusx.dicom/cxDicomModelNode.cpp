@@ -17,18 +17,15 @@
 namespace cx
 {
 
-NodePtr createNode(int row, Node* parent, QSharedPointer<ctkDICOMDatabase> dataBase)
+NodePtr createNode(int row, DicomModelNode* parent, QSharedPointer<ctkDICOMDatabase> dataBase)
 {
 	if (!dataBase)
 		return NodePtr();
-	qDebug() << "database " << dataBase.data();
 	Q_ASSERT(dataBase.data());
 	NodePtr node;
-//	Node* nodeParent = 0;
 	if (row == -1)
-	{// root node
-		node.reset(new RootNode);
-//		node->Type = DICOMModel::RootType;
+	{
+		node.reset(new RootDicomModelNode);
 		node->Parent = 0;
 	}
 	else
@@ -36,11 +33,11 @@ NodePtr createNode(int row, Node* parent, QSharedPointer<ctkDICOMDatabase> dataB
 		DICOMModel::IndexType type = DICOMModel::IndexType(parent->Type + 1);
 
 		if (type==DICOMModel::PatientType)
-			node.reset(new PatientNode);
+			node.reset(new PatientDicomModelNode);
 		if (type==DICOMModel::StudyType)
-			node.reset(new StudyNode);
+			node.reset(new StudyDicomModelNode);
 		if (type==DICOMModel::SeriesType)
-			node.reset(new SeriesNode);
+			node.reset(new SeriesDicomModelNode);
 
 		parent->FetchedChildren.push_back(node);
 		node->Parent = parent;
@@ -51,8 +48,6 @@ NodePtr createNode(int row, Node* parent, QSharedPointer<ctkDICOMDatabase> dataB
 	node->DataBase = dataBase;
 
 	node->fillChildrenUids();
-	qDebug() << "created node" << node->UID;
-	qDebug() << "        node children " << node->ChildrenUID.join(",");
 
 	return node;
 }
