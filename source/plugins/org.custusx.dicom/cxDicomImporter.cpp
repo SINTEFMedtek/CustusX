@@ -11,14 +11,24 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
+
 #include "cxDicomImporter.h"
+
+#include <QCheckBox>
+#include <QMessageBox>
+#include <QProgressDialog>
+#include <QLabel>
+// ctkWidgets includes
+#include "ctkFileDialog.h"
+// ctkDICOMCore includes
+#include "ctkDICOMDatabase.h"
+#include "ctkDICOMIndexer.h"
 
 namespace cx
 {
 
 DicomImporter::DicomImporter(QObject* parent): QObject(parent)
 {
-//	DICOMDatabase = QSharedPointer<ctkDICOMDatabase> (new ctkDICOMDatabase);
 	DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer);
 	IndexerProgress = 0;
 	DisplayImportSummary = true;

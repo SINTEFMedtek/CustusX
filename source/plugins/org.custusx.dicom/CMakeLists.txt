@@ -18,6 +18,8 @@ set(PLUGIN_SRCS
   cxDICOMAppWidget.cpp
   cxDICOMModel.cpp
   cxDicomImporter.cpp
+  cxDicomModelNode.cpp
+  cxDicomModelNode.h
 )
 
 # Files which should be processed by Qts moc

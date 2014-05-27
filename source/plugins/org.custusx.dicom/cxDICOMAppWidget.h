@@ -90,7 +90,7 @@ public Q_SLOTS:
   void openQueryDialog();
   void onRemoveAction();
 
-  void suspendModel();
+//  void suspendModel();
   void resumeModel();
   void resetModel();
 
