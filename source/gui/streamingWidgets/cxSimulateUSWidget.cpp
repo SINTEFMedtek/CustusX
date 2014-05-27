@@ -15,7 +15,7 @@
 #include "cxSimulateUSWidget.h"
 
 #include <QVBoxLayout>
-#include <QDial.h>
+#include <QDial>
 #include "cxLabeledComboBoxWidget.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxVideoService.h"
