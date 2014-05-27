@@ -39,8 +39,11 @@
 #include "cxSettings.h"
 #include "cxProbeImpl.h"
 #include <boost/make_shared.hpp>
-#include "simConfig.h"
 #include "cxDataLocations.h"
+
+#ifdef CX_BUILD_US_SIMULATOR
+#include "simConfig.h"
+#endif //CX_BUILD_US_SIMULATOR
 
 namespace cx
 {
