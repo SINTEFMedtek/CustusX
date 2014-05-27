@@ -75,11 +75,13 @@ TEST_CASE("DummyImageStreamer: File should be read and send slices with a given 
 	imagestreamer->stopStreaming();
 }
 
+#ifdef CX_BUILD_US_SIMULATOR
 TEST_CASE("ImageSimulator: Constructor", "[streaming][unit]")
 {
 	SimulatedImageStreamerFixture::constructImageSimulatorVariable();
 	SimulatedImageStreamerFixture::constructImageSimulatorBoostPtr();
 }
+#endif //CX_BUILD_US_SIMULATOR
 
 TEST_CASE("SimulatedImageStreamer: Init", "[streaming][unit]")
 {
