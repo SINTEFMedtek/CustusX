@@ -24,7 +24,7 @@ void TSFPresetsFixture::setUp()
 {
 	cx::LogicManager::initialize();
 
-	mFolderPath = cx::DataLocations::getExistingConfigPath("/tsf", QString(KERNELS_DIR)) + "/parameters";
+	mFolderPath = cx::DataLocations::getExistingConfigPath("/tsf", QString(KERNELS_DIR)) + "/parameters/";
 	mPresetFileName = "CPPUNIT_TEST";
 	mPresetFilePath = mFolderPath+"centerline-gpu/"+mPresetFileName;
 }

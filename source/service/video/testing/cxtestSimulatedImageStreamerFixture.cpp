@@ -93,6 +93,7 @@ void SimulatedImageStreamerFixture::checkSimulatedFrames(int numFrames, bool sil
 		this->checkSimulatedFrame(silentAtArrive);
 }
 
+#ifdef CX_BUILD_US_SIMULATOR
 ImageSimulator SimulatedImageStreamerFixture::constructImageSimulatorVariable()
 {
 	ImageSimulator mUSSimulator;
@@ -104,5 +105,6 @@ boost::shared_ptr<ImageSimulator> SimulatedImageStreamerFixture::constructImageS
 	boost::shared_ptr<ImageSimulator> mUSSimulator(new ImageSimulator());
 	return mUSSimulator;
 }
+#endif //CX_BUILD_US_SIMULATOR
 
 }//namespace cxtest
