@@ -2,11 +2,11 @@
 
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
-#include "cxImageSenderFactory.h"
 #include <iostream>
 #include <QCoreApplication>
 #include <QHostAddress>
 #include <QNetworkInterface>
+#include "cxCommandlineImageStreamerFactory.h"
 
 namespace cx
 {
@@ -20,7 +20,7 @@ bool ImageServer::initialize()
 	bool ok = false;
 
 	StringMap args = cx::extractCommandlineOptions(QCoreApplication::arguments());
-	mImageSender = ImageStreamerFactory().getFromArguments(args);
+	mImageSender = CommandlineImageStreamerFactory().getFromArguments(args);
 	if(!mImageSender)
 		return false;
 
@@ -106,7 +106,7 @@ void ImageServer::printHelpText()
 QString ImageServer::getArgumentHelpText(QString applicationName)
 {
 	std::stringstream ss;
-	cx::ImageStreamerFactory factory;
+	cx::CommandlineImageStreamerFactory factory;
 
 	ss << "Usage: " << applicationName << " (--arg <argval>)*" << std::endl;
 	ss << "    --port   : Tcp/IP port # (default=18333)" << std::endl;

@@ -7,6 +7,7 @@
 #include "cxTestSenderController.h"
 #include "cxImageStreamerGE.h"
 #include "cxReporter.h"
+#include "cxCommandlineImageStreamerFactory.h"
 
 #include "catch.hpp"
 
@@ -27,7 +28,7 @@ void TestGEInterface::testStream(cx::StringMap args)
 {
 	TestGEInterface::setUp();
 
-	cx::StreamerPtr imageSender = cx::ImageStreamerFactory().getFromArguments(args);
+	cx::StreamerPtr imageSender = cx::CommandlineImageStreamerFactory().getFromArguments(args);
 	REQUIRE(imageSender);
 	REQUIRE(imageSender->getType().compare(args["type"]) == 0);
 

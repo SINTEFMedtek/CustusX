@@ -207,4 +207,16 @@ QString DataLocations::getTSFOULPath()
 }
 #endif
 
+QString DataLocations::getExistingConfigPath(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath)
+{
+	QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED + pathRelativeToConfigRoot; // look for installed location
+	if (QDir(path).exists())
+		return path;
+
+	if (QDir(alternativeAbsolutePath).exists())
+		return alternativeAbsolutePath;
+
+	return "";
+}
+
 } // namespace cx

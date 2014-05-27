@@ -26,6 +26,7 @@ bool similar(double a, double b, double tol = 1.0E-6); ///< check for equality w
  *
  */
 typedef Eigen::Vector3d Vector3D;
+typedef boost::shared_ptr<Vector3D> Vector3DPtr;
 
 Vector3D multiply_elems(const Vector3D& a, const Vector3D& b); ///< perform element-wise multiplication of a and b.
 Vector3D divide_elems(const Vector3D& a, const Vector3D& b); ///< perform element-wise division of a and b.

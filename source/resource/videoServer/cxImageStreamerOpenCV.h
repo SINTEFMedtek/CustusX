@@ -11,9 +11,10 @@
 #include <QSize>
 #include "igtlImageMessage.h"
 #include <QStringList>
-#include "cxImageSenderFactory.h"
 #include "cxIGTLinkImageMessage.h"
 #include "cxSender.h"
+#include "cxImageStreamer.h"
+
 
 class QTimer;
 

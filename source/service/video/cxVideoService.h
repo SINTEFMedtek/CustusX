@@ -85,10 +85,6 @@ Q_OBJECT
 public:
 	static VideoServicePtr create(VideoServiceBackendPtr backend);
 	virtual ~VideoService();
-//	static VideoServicePtr getInstance();
-
-//	static void initialize(VideoServiceBackendPtr videoBackend);
-//	static void shutdown();
 
 	VideoConnectionManagerPtr getVideoConnection();
 	USAcquisitionVideoPlaybackPtr getUSAcquisitionVideoPlayback();
@@ -117,8 +113,6 @@ private slots:
 	void fpsSlot(QString source, int val);
 
 private:
-//	static VideoServicePtr mInstance;
-//	static void setInstance(VideoServicePtr instance);
 
 	VideoService(VideoServiceBackendPtr videoBackend);
 

@@ -31,6 +31,7 @@
 #include "geConfig.h"
 #include "vtkImageChangeInformation.h"
 #include "vtkForwardDeclarations.h"
+#include "cxCommandlineImageStreamerFactory.h"
 
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
 
