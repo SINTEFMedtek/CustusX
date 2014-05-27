@@ -63,7 +63,7 @@ bool SimulatedImageStreamer::initUSSimulator()
 #ifdef CX_BUILD_US_SIMULATOR
 	mUSSimulator.reset(new ImageSimulator());
 	QString specklePath = DataLocations::getExistingConfigPath("/simulator", SIMULATOR_SPECKLE_PATH);
-	retval = mUSSimulator->init(specklePath);
+	retval = mUSSimulator->init(specklePath.toStdString());
 	/*mUSSimulator->setShadowsAirOn(false);
 		mUSSimulator->setShadowsBoneOn(false);
 		mUSSimulator->setReflectionsOn(false);
@@ -264,8 +264,7 @@ void SimulatedImageStreamer::defineSectorInSimulator()
 	double depth = sectorParams.getDepthEnd() - sectorParams.getDepthStart();
 	double offset = sectorParams.getDepthStart();
 //	std::cout << "width: " << width << " depth: " << depth << " offset: " << offset << std::endl;
-	if(!mUSSimulator->verifyAndSetSectorSize(width, depth, offset))
-		cx::reporter()->sendWarning("Simulator is not accepting sector size");
+	mUSSimulator->setSectorSize(width, depth, offset);
 
 	this->sliceSlot();
 #endif //CX_BUILD_US_SIMULATOR
