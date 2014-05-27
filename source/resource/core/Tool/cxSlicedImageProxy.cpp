@@ -139,6 +139,8 @@ SlicedImageProxy::SlicedImageProxy()
 	mReslicer->AutoCropOutputOn(); // fix used in 2.0.9, but slower update rate
 
 	mImageWithLUTProxy.reset(new ApplyLUTToImage2DProxy());
+
+	mRedirecter = vtkImageChangeInformationPtr::New();
 }
 
 SlicedImageProxy::~SlicedImageProxy()
@@ -170,19 +172,18 @@ void SlicedImageProxy::transferFunctionsChangedSlot()
 {
 	mReslicer->SetInputData(mImage->getBaseVtkImageData());
 	mReslicer->SetBackgroundLevel(mImage->getMin());
+	mImageWithLUTProxy->setInput(mRedirecter, mImage->getLookupTable2D()->getOutputLookupTable());
+}
 
-	vtkImageChangeInformationPtr redirecter = vtkImageChangeInformationPtr::New();
-//	vtkImageDataPtr input = mReslicer->GetOutput();
-//	mReslicer->Update();
+void SlicedImageProxy::updateRedirecterSlot()
+{
 	// if input is 2D - use directly
 	if (mImage->getBaseVtkImageData()->GetDimensions()[2]==1)
-//		input = mImage->getBaseVtkImageData();
-		redirecter->SetInputData(mImage->getBaseVtkImageData());
+		mRedirecter->SetInputData(mImage->getBaseVtkImageData());
 	else
-		redirecter->SetInputConnection(mReslicer->GetOutputPort());
+		mRedirecter->SetInputConnection(mReslicer->GetOutputPort());
 
-//	redirecter->Update();
-	mImageWithLUTProxy->setInput(redirecter, mImage->getLookupTable2D()->getOutputLookupTable());
+	update();
 }
 
 void SlicedImageProxy::setImage(ImagePtr image)
@@ -191,7 +192,7 @@ void SlicedImageProxy::setImage(ImagePtr image)
 	{
 		disconnect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
 		disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(transformChangedSlot()));
+		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(updateRedirecterSlot()));
 	}
 
 	mImage = image;
@@ -200,11 +201,12 @@ void SlicedImageProxy::setImage(ImagePtr image)
 	{
 		connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
 		connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(transformChangedSlot()));
+		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(updateRedirecterSlot()));
 	}
 
 	if (mImage)
 	{
+		this->updateRedirecterSlot();
 		this->transferFunctionsChangedSlot();
 	}
 	else // no image
@@ -228,6 +230,16 @@ vtkImageDataPtr SlicedImageProxy::getOutput()
 vtkImageAlgorithmPtr SlicedImageProxy::getOutputPort()
 {
 	return mImageWithLUTProxy->getOutputPort();
+}
+
+vtkImageDataPtr SlicedImageProxy::getOutputWithoutLUT()
+{
+	return mRedirecter->GetOutput();
+}
+
+vtkImageAlgorithmPtr SlicedImageProxy::getOutputPortWithoutLUT()
+{
+	return mRedirecter;
 }
 
 void SlicedImageProxy::update()

@@ -6,10 +6,9 @@
 #include <QApplication>
 #include <QString>
 #include "cxImageServer.h"
-#include "cxImageSenderFactory.h"
 #include "cxReporter.h"
-//
 #include "cxImageStreamerOpenCV.h"
+#include "cxCommandlineImageStreamerFactory.h"
 
 #ifdef WIN32
 #include <windows.h>
