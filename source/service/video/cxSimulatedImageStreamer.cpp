@@ -1,3 +1,17 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 #include "cxSimulatedImageStreamer.h"
 
 #include <boost/math/special_functions/round.hpp>
@@ -23,10 +37,10 @@
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxSettings.h"
-
-#ifdef CX_BUILD_US_SIMULATOR
-#include "/../../UltrasoundSimulation/ImageSimulator.h"
-#endif //CX_BUILD_US_SIMULATOR
+#include "cxProbeImpl.h"
+#include <boost/make_shared.hpp>
+#include "simConfig.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -40,13 +54,28 @@ SimulatedImageStreamer::SimulatedImageStreamer() :
 SimulatedImageStreamer::~SimulatedImageStreamer()
 {}
 
+bool SimulatedImageStreamer::initUSSimulator()
+{
+	bool retval = false;
+#ifdef CX_BUILD_US_SIMULATOR
+	mUSSimulator.reset(new ImageSimulator());
+	QString specklePath = DataLocations::getExistingConfigPath("/simulator", SIMULATOR_SPECKLE_PATH);
+	retval = mUSSimulator->init(specklePath);
+	/*mUSSimulator->setShadowsAirOn(false);
+		mUSSimulator->setShadowsBoneOn(false);
+		mUSSimulator->setReflectionsOn(false);
+		mUSSimulator->setAbsorptionOn(false);
+		mUSSimulator->setSpeckleOn(false);*/
+#endif //CX_BUILD_US_SIMULATOR
+	return retval;
+}
 
-void SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServicePtr dataManager)
+bool SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServicePtr dataManager)
 {
 	if(!image || !tool || !dataManager)
 	{
 		this->setInitialized(false);
-		return;
+		return false;
 	}
 	mDataManager = dataManager;
 	this->createSendTimer();
@@ -55,10 +84,15 @@ void SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServic
 	mTool = tool;
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(sliceSlot()));
 	connect(mTool->getProbe().get(), SIGNAL(activeConfigChanged()), this, SLOT(resetMask()));
+	connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(defineSectorInSimulator()));
+
+	this->defineSectorInSimulator();
 
 //	this->generateMaskSlot();
 
-	this->setInitialized(true);
+	bool initialized = this->initUSSimulator();
+	this->setInitialized(initialized);
+	return initialized;
 }
 
 bool SimulatedImageStreamer::startStreaming(SenderPtr sender)
@@ -140,20 +174,105 @@ void SimulatedImageStreamer::setSourceImage(ImagePtr image)
 
 ImagePtr SimulatedImageStreamer::calculateSlice(ImagePtr source)
 {
-	mTimer->begin();
-	vtkImageDataPtr framegrabbedSlice = this->frameGrab(source);
-	mTimer->time("Grab");
-	vtkImageDataPtr maskedFramedgrabbedSlice = this->maskSlice(framegrabbedSlice);
-	mTimer->time("Mask");
-	vtkImageDataPtr simulatedSlice = this->simulateUS(maskedFramedgrabbedSlice);
-	mTimer->time("Simulate");
-	ImagePtr slice = this->convertToSscImage(simulatedSlice, source);
-	mTimer->time("Convert");
+	vtkImageDataPtr simulatedSlice;
+	QString simulationType = settings()->value("USsimulation/type").toString();
 
+	if(simulationType == "CT to US")
+		simulatedSlice = simulateUSFromCTSlice(source);
+	else if(simulationType == "MR to US")
+		simulatedSlice = simulateUSFromMRSlice(source);
+	else if(simulationType == "Original data")
+		simulatedSlice = sliceOriginal(source);
+	else
+	{
+		cx::reporter()->sendWarning("SimulatedImageStreamer::calculateSlice(): Unknown simulation: " + simulationType);
+		simulatedSlice = sliceOriginal(source);
+	}
+
+	ImagePtr slice = this->convertToSscImage(simulatedSlice, source);
 	return slice;
 }
 
-vtkImageDataPtr SimulatedImageStreamer::frameGrab(ImagePtr source)
+
+vtkImageDataPtr SimulatedImageStreamer::simulateUSFromCTSlice(ImagePtr source)
+{
+	vtkImageDataPtr simulatedSlice;
+
+#ifdef CX_BUILD_US_SIMULATOR
+//	std::cout << "CT to US simulator running" << std::endl;
+	vtkImageDataPtr simInput = this->createSimulatorInputSlice(source);
+	simulatedSlice = mUSSimulator->simulateFromCT(simInput);
+	mTimer->time("Simulate");
+#else
+	cx::reporter()->sendError("CT to US simulator not running");
+	simulatedSlice = sliceOriginal(source);
+#endif //CX_BUILD_US_SIMULATOR
+
+	return simulatedSlice;
+}
+
+//TODO: implement
+vtkImageDataPtr SimulatedImageStreamer::simulateUSFromMRSlice(ImagePtr source)
+{
+	vtkImageDataPtr simulatedSlice;
+//	vtkImageDataPtr simInput = this->createSimulatorInputSlice(source);
+	simulatedSlice = sliceOriginal(source);
+//	cx::reporter()->sendError("MR to US simulator not running");
+	return simulatedSlice;
+}
+
+void SimulatedImageStreamer::setGain(double gain)
+{
+	mUSSimulator->setGain(gain);
+	this->sliceSlot();
+}
+
+vtkImageDataPtr SimulatedImageStreamer::createSimulatorInputSlice(ImagePtr source)
+{
+	mTimer->begin();
+	vtkImageDataPtr framegrabbedSlice = this->frameGrab(source, false);
+	mTimer->time("Grab");
+	mTimer->time("Mask");
+	return framegrabbedSlice;
+}
+
+void SimulatedImageStreamer::defineSectorInSimulator()
+{
+#ifdef CX_BUILD_US_SIMULATOR
+	if (!mUSSimulator)
+		return;
+	ProbeSectorPtr sector = mTool->getProbe()->getSector();
+	ProbeDefinition sectorParams = sector->mData;
+
+	mUSSimulator->setProbeType(static_cast<ImageSimulator::PROBE_TYPE>(sectorParams.getType()));//TODO: Make ImageSimulator use ProbeDefinition::TYPE
+
+	Eigen::Vector3d origin_p = sectorParams.getOrigin_p();
+	Eigen::Vector3d spacing = sectorParams.getSpacing();
+	Vector3D origin_v = multiply_elems(origin_p, spacing);
+	mUSSimulator->setOrigin(origin_v);
+	double width = sectorParams.getWidth();
+	double depth = sectorParams.getDepthEnd() - sectorParams.getDepthStart();
+	double offset = sectorParams.getDepthStart();
+//	std::cout << "width: " << width << " depth: " << depth << " offset: " << offset << std::endl;
+	if(!mUSSimulator->verifyAndSetSectorSize(width, depth, offset))
+		cx::reporter()->sendWarning("Simulator is not accepting sector size");
+
+	this->sliceSlot();
+#endif //CX_BUILD_US_SIMULATOR
+}
+
+vtkImageDataPtr SimulatedImageStreamer::sliceOriginal(ImagePtr source)
+{
+		mTimer->begin();
+		vtkImageDataPtr framegrabbedSlice = this->frameGrab(source);
+		mTimer->time("Grab");
+		vtkImageDataPtr maskedFramedgrabbedSlice = this->maskSlice(framegrabbedSlice);
+		mTimer->time("Mask");
+		mTimer->time("Simulate");
+		return maskedFramedgrabbedSlice;
+}
+
+vtkImageDataPtr SimulatedImageStreamer::frameGrab(ImagePtr source, bool applyLUT)
 {
 	SlicedImageProxyPtr imageSlicer(new SlicedImageProxy);
 	imageSlicer->setImage(source);
@@ -167,11 +286,20 @@ vtkImageDataPtr SimulatedImageStreamer::frameGrab(ImagePtr source)
 	Eigen::Array3i outDim(probedata.getSize().width(), probedata.getSize().height(), 1);
 	imageSlicer->setOutputFormat(Vector3D(0,0,0), outDim, probedata.getSpacing());
 
-	imageSlicer->update();
-	imageSlicer->getOutputPort()->Update();
-
 	vtkImageDataPtr retval = vtkImageDataPtr::New();
-	retval->DeepCopy(imageSlicer->getOutput());
+
+	imageSlicer->update();
+	if (applyLUT)
+	{
+		imageSlicer->getOutputPort()->Update();
+		retval->DeepCopy(imageSlicer->getOutput());
+	}
+	else //Don't use LUT
+	{
+		imageSlicer->getOutputPortWithoutLUT()->Update();
+		retval->DeepCopy(imageSlicer->getOutputWithoutLUT());
+	}
+
 	return retval;
 }
 
@@ -187,44 +315,10 @@ vtkImageDataPtr SimulatedImageStreamer::maskSlice(vtkImageDataPtr unmaskedSlice)
 	return maskedSlice;
 }
 
-vtkImageDataPtr SimulatedImageStreamer::simulateUS(vtkImageDataPtr maskedFramedgrabbedSlice)
-{
-	vtkImageDataPtr simulatedSlice;
-	QString simulationType = settings()->value("USsimulation/type").toString();
-	if(simulationType == "CT to US")
-		simulatedSlice = simulateUSFromCTSlice(maskedFramedgrabbedSlice);
-	else if(simulationType == "MR to US")
-		simulatedSlice = simulateUSFromMRSlice(maskedFramedgrabbedSlice);
-	else if(simulationType == "Original data")
-		simulatedSlice = maskedFramedgrabbedSlice;
-	else
-	{
-		cx::reporter()->sendWarning("SimulatedImageStreamer::simulateUS(): Unknown simulation: " + simulationType);
-		simulatedSlice = maskedFramedgrabbedSlice;
-	}
-
-	return simulatedSlice;
-}
-
-//TODO: implement, and put in a separate class
-vtkImageDataPtr SimulatedImageStreamer::simulateUSFromCTSlice(vtkImageDataPtr maskedFramedgrabbedSlice)
-{
-	vtkImageDataPtr simulatedSlice;
-	simulatedSlice = maskedFramedgrabbedSlice;
-	return simulatedSlice;
-}
-
-//TODO: implement, and put in a separate class
-vtkImageDataPtr SimulatedImageStreamer::simulateUSFromMRSlice(vtkImageDataPtr maskedFramedgrabbedSlice)
-{
-	vtkImageDataPtr simulatedSlice;
-	simulatedSlice = maskedFramedgrabbedSlice;
-	return simulatedSlice;
-}
-
 ImagePtr SimulatedImageStreamer::convertToSscImage(vtkImageDataPtr slice, ImagePtr volume)
 {
 	ImagePtr retval = ImagePtr(new Image("Simulated US", slice, "Simulated US"));
+	mTimer->time("Convert");
 	return retval;
 }
 

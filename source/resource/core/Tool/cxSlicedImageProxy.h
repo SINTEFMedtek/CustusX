@@ -90,11 +90,14 @@ public:
 	void update();
 	vtkImageDataPtr getOutput(); ///< output 2D sliced image
 	vtkImageAlgorithmPtr getOutputPort(); ///< output 2D sliced image
+	vtkImageDataPtr getOutputWithoutLUT();
+	vtkImageAlgorithmPtr getOutputPortWithoutLUT();
 	void printSelf(std::ostream & os, Indent indent);
 
 private slots:
 	void transformChangedSlot();
 	void transferFunctionsChangedSlot();
+	void updateRedirecterSlot();
 
 private: 
 	ApplyLUTToImage2DProxyPtr mImageWithLUTProxy;
@@ -104,6 +107,8 @@ private:
 
 	vtkImageReslicePtr mReslicer;
 	vtkMatrix4x4Ptr mMatrixAxes;
+
+	vtkImageChangeInformationPtr mRedirecter;
 };
 
 //---------------------------------------------------------

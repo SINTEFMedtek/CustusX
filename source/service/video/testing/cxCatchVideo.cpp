@@ -19,20 +19,14 @@
 #include <vtkImageData.h>
 #include "vtkForwardDeclarations.h"
 #include "cxImage.h"
-#include "cxDummyTool.h"
 #include "cxDataLocations.h"
 #include "cxMHDImageStreamer.h"
-#include "cxSimulatedImageStreamer.h"
-#include "cxDummyToolManager.h"
-#include "cxtestSender.h"
-#include "cxtestQueuedSignalListener.h"
-#include "cxtestUtilities.h"
-#include "cxtestDummyDataManager.h"
 
 #include "cxtestJenkinsMeasurement.h"
 #include "cxReporter.h"
 #include "cxSettings.h"
 #include "cxTypeConversions.h"
+#include "cxtestSimulatedImageStreamerFixture.h"
 
 namespace cxtest
 {
@@ -51,55 +45,6 @@ cx::DummyImageStreamerPtr createRunningDummyImageStreamer(TestSenderPtr& sender,
 	return imagestreamer;
 }
 
-cx::SimulatedImageStreamerPtr createRunningSimulatedImageStreamer(TestSenderPtr& sender)
-{
-//	cx::TrackingServicePtr trackingService = cx::DummyToolManager::create(); not required??
-	cx::DataServicePtr dataService = cxtest::createDummyDataService();
-
-	cx::ImagePtr image = cxtest::Utilities::create3DImage();
-	REQUIRE(image);
-	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear());
-	REQUIRE(tool);
-	cx::SimulatedImageStreamerPtr imagestreamer(new cx::SimulatedImageStreamer());
-	REQUIRE(imagestreamer);
-
-	imagestreamer->initialize(image, tool, dataService);
-	REQUIRE(imagestreamer->startStreaming(sender));
-	return imagestreamer;
-}
-
-void checkSenderGotImageFromStreamer(TestSenderPtr sender)
-{
-	cx::PackagePtr package = sender->getSentPackage();
-	REQUIRE(package);
-	cx::ImagePtr image = package->mImage;
-	REQUIRE(image);
-}
-
-void checkSimulatedFrames(int numFrames, TestSenderPtr sender, bool silentAtArrive = false)
-{
-	for(int i = 0; i < numFrames; ++i)
-	{
-		REQUIRE(waitForQueuedSignal(sender.get(), SIGNAL(newPackage()), 200, silentAtArrive));
-		checkSenderGotImageFromStreamer(sender);
-	}
-}
-
-int simulateAndCheckUS(int numFrames)
-{
-	TestSenderPtr sender(new TestSender());
-	REQUIRE(sender);
-
-	cx::SimulatedImageStreamerPtr imagestreamer = createRunningSimulatedImageStreamer(sender);
-
-	bool silent = true;
-	checkSimulatedFrames(numFrames, sender, silent);
-
-	int retval = imagestreamer->getAverageTimePerSimulatedFrame();
-	imagestreamer->stopStreaming();
-	return retval;
-}
-
 } //empty namespace
 
 TEST_CASE("DummyImageStreamer: File should be read and sent only once", "[streaming][unit]")
@@ -109,7 +54,8 @@ TEST_CASE("DummyImageStreamer: File should be read and sent only once", "[stream
 	bool sendTwoStreams = false;
 	cx::ImageStreamerPtr imagestreamer = createRunningDummyImageStreamer(sender, sendTwoStreams, sendImageOnce);
 
-	checkSimulatedFrames(1, sender);
+	SimulatedImageStreamerFixture fixture(sender);
+	fixture.checkSimulatedFrames(1);
 
 	REQUIRE_FALSE(waitForQueuedSignal(sender.get(), SIGNAL(newPackage())));
 
@@ -123,26 +69,50 @@ TEST_CASE("DummyImageStreamer: File should be read and send slices with a given 
 	cx::ImageStreamerPtr imagestreamer = createRunningDummyImageStreamer(sender,sendTwoStreams);
 
 	int numFrames = 2;
-	checkSimulatedFrames(numFrames, sender);
+	SimulatedImageStreamerFixture fixture(sender);
+	fixture.checkSimulatedFrames(numFrames);
+
+	imagestreamer->stopStreaming();
+}
+
+TEST_CASE("ImageSimulator: Constructor", "[streaming][unit]")
+{
+	SimulatedImageStreamerFixture::constructImageSimulatorVariable();
+	SimulatedImageStreamerFixture::constructImageSimulatorBoostPtr();
+}
+
+TEST_CASE("SimulatedImageStreamer: Init", "[streaming][unit]")
+{
+	SimulatedImageStreamerFixture fixture;
+	cx::SimulatedImageStreamerPtr imagestreamer = fixture.createRunningSimulatedImageStreamer();
 
 	imagestreamer->stopStreaming();
 }
 
 TEST_CASE("SimulatedImageStreamer: Should stream 2D images from a volume given a probe", "[streaming][unit]")
 {
-	TestSenderPtr sender(new TestSender());
-	REQUIRE(sender);
-
-	cx::SimulatedImageStreamerPtr imagestreamer = createRunningSimulatedImageStreamer(sender);
+	SimulatedImageStreamerFixture fixture;
+	cx::SimulatedImageStreamerPtr imagestreamer = fixture.createRunningSimulatedImageStreamer();
 
 	int numFrames = 2;
-	checkSimulatedFrames(numFrames, sender);
+	fixture.checkSimulatedFrames(numFrames);
 
 	imagestreamer->stopStreaming();
 }
 
+TEST_CASE("SimulatedImageStreamer: Won't return an image if not initialized", "[streaming][unit]")
+{
+	SimulatedImageStreamerFixture fixture;
+	cx::SimulatedImageStreamerPtr imagestreamer = fixture.createSimulatedImageStreamer();
+
+	fixture.requireNoSimulatedFrame();
+
+	REQUIRE_FALSE(imagestreamer->startStreaming(fixture.getSender()));
+}
+
 TEST_CASE("SimulatedImageStreamer: Basic test of streamers", "[streaming][unit]")
 {
+	SimulatedImageStreamerFixture fixture;
 	cx::DataLocations::setTestMode();
 	int numFrames = 1;
 	QStringList simulationTypes;
@@ -151,12 +121,13 @@ TEST_CASE("SimulatedImageStreamer: Basic test of streamers", "[streaming][unit]"
 	{
 		cx::settings()->setValue("USsimulation/type", simulationTypes[i]);
 		INFO("Simulation failed: " + string_cast(simulationTypes[i]));
-		simulateAndCheckUS(numFrames);
+		fixture.simulateAndCheckUS(numFrames);
 	}
 }
 
 TEST_CASE("SimulatedImageStreamer: Speed", "[streaming][integration][speed]")
 {
+	SimulatedImageStreamerFixture fixture;
 	cx::DataLocations::setTestMode();
 	cx::reporter()->initialize();
 
@@ -167,11 +138,11 @@ TEST_CASE("SimulatedImageStreamer: Speed", "[streaming][integration][speed]")
 	for (int i = 0; i < 3; ++i)
 	{
 		cx::settings()->setValue("USsimulation/type", simulationTypes[i]);
-		int simTime = simulateAndCheckUS(numFrames);
+		int simTime = fixture.simulateAndCheckUS(numFrames);
 		jenkins.createOutput("Average time in ms per frame with simtype " + simulationTypes[i], QString::number(simTime));
 	}
 
 	cx::Reporter::shutdown();
 }
 
-}//namespace cx
+}//namespace cxtest

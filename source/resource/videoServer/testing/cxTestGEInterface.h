@@ -4,7 +4,7 @@
 #ifdef CX_USE_ISB_GE
 #include <vtkSmartPointer.h>
 #include <vtkImageData.h>
-#include "cxImageSenderFactory.h"
+#include "cxImageStreamer.h"
 
 namespace cxtest
 {
