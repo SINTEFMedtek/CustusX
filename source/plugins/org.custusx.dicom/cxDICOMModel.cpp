@@ -58,25 +58,14 @@ protected:
 public:
   DICOMModelPrivate(DICOMModel&);
   virtual ~DICOMModelPrivate();
-  void init();
-
-//  QString getFirstDICOMFilename(Node* node) const;
+//  void init();
   void fetchChildren(const QModelIndex& indexValue);
   NodePtr createNode(int row, const QModelIndex& parentValue)const;
   DicomModelNode* nodeFromIndex(const QModelIndex& indexValue)const;
-//  void fillChildrenUids(NodePtr node) const;
-//  QString getName(DICOMModel::IndexType type, cx::DicomImageReaderPtr reader) const;
-  QVariant getValue(DicomModelNode* node, int column) const;
-  QVariant getUncachedValue(DicomModelNode* node, int column) const;
-
-//  QString getTimestamp(DICOMModel::IndexType type, DicomImageReaderPtr reader) const;
-//  QString getModality(DICOMModel::IndexType type, DicomImageReaderPtr reader) const;
-//  int getFrameCountForSeries(QString series) const;
-//  QString getImageCount(DICOMModel::IndexType type, QString series) const;
 
   NodePtr RootNode;
   QSharedPointer<ctkDICOMDatabase> DataBase;
-  QStringList Headers;
+//  QStringList Headers;
 };
 
 
@@ -91,15 +80,15 @@ DICOMModelPrivate::~DICOMModelPrivate()
 }
 
 //------------------------------------------------------------------------------
-void DICOMModelPrivate::init()
-{
-	Headers.clear();
-	Headers << "Name";
-	Headers << "Date";
-	Headers << "Modality";
-	Headers << "Images";
-//	Headers << "Info";
-}
+//void DICOMModelPrivate::init()
+//{
+//	Headers.clear();
+//	Headers << "Name";
+//	Headers << "Date";
+//	Headers << "Modality";
+//	Headers << "Images";
+////	Headers << "Info";
+//}
 
 //------------------------------------------------------------------------------
 DicomModelNode* DICOMModelPrivate::nodeFromIndex(const QModelIndex& indexValue)const
@@ -108,193 +97,14 @@ DicomModelNode* DICOMModelPrivate::nodeFromIndex(const QModelIndex& indexValue)c
 }
 //------------------------------------------------------------------------------
 
-
-
 NodePtr DICOMModelPrivate::createNode(int row, const QModelIndex& parentValue)const
 {
-	NodePtr node = cx::createNode(row, this->nodeFromIndex(parentValue), DataBase);
+	NodePtr node = DicomModelNode::createNode(row, this->nodeFromIndex(parentValue), DataBase);
 	return node;
 }
 
-
-
-//QString DICOMModelPrivate::getFirstDICOMFilename(Node* node) const
-//{
-//	QStringList series;
-
-//	if (node->Type == DICOMModel::RootType)
-//	{
-//		qDebug() << "value for root!!!";
-//		return "";
-//	}
-//	else if (node->Type == DICOMModel::PatientType)
-//	{
-//		QStringList studies = DataBase->studiesForPatient(node->UID);
-//		if (studies.empty())
-//			return "";
-//		series = DataBase->seriesForStudy(studies[0]);
-//	}
-//	else if (node->Type == DICOMModel::StudyType)
-//	{
-//		series = DataBase->seriesForStudy(node->UID);
-//	}
-//	else if (node->Type == DICOMModel::SeriesType)
-//	{
-//		series << node->UID;
-//	}
-
-//	if (series.empty())
-//		return "";
-
-//	QStringList files = DataBase->filesForSeries(series[0]);
-
-//	if (files.empty())
-//		return "";
-//	return files[0];
-//}
-
-QVariant DICOMModelPrivate::getValue(DicomModelNode* node, int column) const
-{
-	if (!node->CachedValues.count(column))
-	{
-		QVariant value = this->getUncachedValue(node, column);
-		node->CachedValues[column] = value;
-	}
-
-	return node->CachedValues[column];
-}
-
-QVariant DICOMModelPrivate::getUncachedValue(DicomModelNode* node, int column) const
-{
-//	QString filename = this->getFirstDICOMFilename(node);
-
-//	DicomImageReaderPtr reader = DicomImageReader::createFromFile(filename);
-//	if (!reader)
-//		return QVariant();
-
-	if (column==0)
-	{
-		return node->getName();
-	}
-	if (column==1)
-	{
-		return node->getTimestamp();
-	}
-	if (column==2)
-	{
-		return node->getModality();
-	}
-	if (column==3)
-	{
-		return node->getImageCount();
-	}
-
-	return QVariant();
-}
-
-
-//QString DICOMModelPrivate::getName(DICOMModel::IndexType type, DicomImageReaderPtr reader) const
-//{
-//	QString retval;
-//	if (type == DICOMModel::PatientType)
-//	{
-//		retval = reader->getPatientName();
-//	}
-//	else if (type == DICOMModel::StudyType)
-//	{
-//		retval = reader->item()->GetElementAsString(DCM_StudyDescription);
-//	}
-//	else if (type == DICOMModel::SeriesType)
-//	{
-//		retval = reader->item()->GetElementAsString(DCM_SeriesDescription);
-//	}
-
-//	if (retval.isEmpty())
-//		retval = "No description";
-
-//	return retval;
-//}
-
-//QString DICOMModelPrivate::getTimestamp(DICOMModel::IndexType type, DicomImageReaderPtr reader) const
-//{
-//	QString format_date("yyyy-MM-dd");
-//	QString format_time("hh:mm");
-
-//	QString retval;
-//	if (type == DICOMModel::PatientType)
-//	{
-//		retval = reader->item()->GetElementAsDate(DCM_PatientBirthDate).toString(format_date);
-//	}
-//	else if (type == DICOMModel::StudyType)
-//	{
-//		QString date = reader->item()->GetElementAsDate(DCM_StudyDate).toString(format_date);
-//		QString time = reader->item()->GetElementAsTime(DCM_StudyTime).toString(format_time);
-//		retval = QString("%1 %2").arg(date).arg(time);
-//	}
-//	else if (type == DICOMModel::SeriesType)
-//	{
-//		QString date = reader->item()->GetElementAsDate(DCM_SeriesDate).toString(format_date);
-//		QString time = reader->item()->GetElementAsTime(DCM_SeriesTime).toString(format_time);
-//		retval = QString("%1 %2").arg(date).arg(time);
-//	}
-
-//	return retval;
-//}
-
-//QString DICOMModelPrivate::getModality(DICOMModel::IndexType type, DicomImageReaderPtr reader) const
-//{
-//	QString retval;
-//	if (type == DICOMModel::PatientType)
-//	{
-//	}
-//	else if (type == DICOMModel::StudyType)
-//	{
-//	}
-//	else if (type == DICOMModel::SeriesType)
-//	{
-//		retval = reader->item()->GetElementAsString(DCM_Modality);
-//	}
-
-//	return retval;
-//}
-
-//int DICOMModelPrivate::getFrameCountForSeries(QString series) const
-//{
-//	QString seriesDescription;
-//	int frameCount = 0;
-//	QStringList files = DataBase->filesForSeries(series);
-//	for (unsigned i=0; i<files.size(); ++i)
-//	{
-//		DicomImageReaderPtr reader = DicomImageReader::createFromFile(files[i]);
-//		if (!reader)
-//			continue;
-//		frameCount += reader->getNumberOfFrames();
-//		seriesDescription = reader->item()->GetElementAsString(DCM_SeriesDescription);
-//	}
-//	return frameCount;
-////	std::cout << QString("%1 frames for series %2").arg(frameCount).arg(seriesDescription) << std::endl;
-//}
-
-//QString DICOMModelPrivate::getImageCount(DICOMModel::IndexType type, QString series) const
-//{
-//	QString retval;
-//	if (type == DICOMModel::PatientType)
-//	{
-//	}
-//	else if (type == DICOMModel::StudyType)
-//	{
-//	}
-//	else if (type == DICOMModel::SeriesType)
-//	{
-//		retval = QString("%1").arg(this->getFrameCountForSeries(series));
-//	}
-
-//	return retval;
-//}
-
 void DICOMModelPrivate::fetchChildren(const QModelIndex& indexValue)
 {
-//	qDebug() << "DICOMModelPrivate::fetchChildren";
   Q_Q(DICOMModel);
   DicomModelNode* node = this->nodeFromIndex(indexValue);
 
@@ -303,9 +113,9 @@ void DICOMModelPrivate::fetchChildren(const QModelIndex& indexValue)
   if (!node->hasChildren())
 	  return;
 
-  q->beginInsertRows(indexValue, std::max<int>(0, node->FetchedChildren.size()-1), node->ChildrenUID.size()-1);
+  q->beginInsertRows(indexValue, std::max<int>(0, node->getFetchedChildren().size()-1), node->getChildrenUID().size()-1);
 
-  for (int i=node->FetchedChildren.size(); i<node->ChildrenUID.size(); ++i)
+  for (int i=node->getFetchedChildren().size(); i<node->getChildrenUID().size(); ++i)
   {
 	  this->createNode(i, indexValue);
   }
@@ -324,7 +134,7 @@ DICOMModel::DICOMModel(QObject* parentObject)
   , d_ptr(new DICOMModelPrivate(*this))
 {
   Q_D(DICOMModel);
-  d->init();
+//  d->init();
 }
 
 //------------------------------------------------------------------------------
@@ -337,7 +147,6 @@ bool DICOMModel::canFetchMore ( const QModelIndex & parentValue ) const
 {
   Q_D(const DICOMModel);
   DicomModelNode* node = d->nodeFromIndex(parentValue);
-//  /*qDebug()*/ << "DICOMModel::canFetchMore " << node ;
   if (!node)
 	  return false;
   return node->canFetchMore();
@@ -346,10 +155,11 @@ bool DICOMModel::canFetchMore ( const QModelIndex & parentValue ) const
 //------------------------------------------------------------------------------
 int DICOMModel::columnCount ( const QModelIndex & _parent ) const
 {
-  Q_D(const DICOMModel);
-  Q_UNUSED(_parent);
-	return d->Headers.size();
-//  return d->RootNode != 0 ? d->Headers.size() : 0;
+	Q_D(const DICOMModel);
+	Q_UNUSED(_parent);
+	if (!d->RootNode)
+		return 0;
+	return d->RootNode->getHeaders().size();
 }
 
 //------------------------------------------------------------------------------
@@ -360,17 +170,17 @@ QVariant DICOMModel::data ( const QModelIndex & dataIndex, int role ) const
 	if ( role == UIDRole )
 	{
 		DicomModelNode* node = d->nodeFromIndex(dataIndex);
-		return node ? node->UID : QString() ;
+		return node ? node->getUid() : QString() ;
 	}
 	else if ( role == TypeRole )
 	{
 		DicomModelNode* node = d->nodeFromIndex(dataIndex);
-		return node ? node->Type : 0;
+		return node ? node->getType() : 0;
 	}
 	else if (( role==Qt::DisplayRole )||( role==Qt::EditRole ))
 	{
 		DicomModelNode* node = d->nodeFromIndex(dataIndex);
-		return node ? d->getValue(node, dataIndex.column()) : QVariant();
+		return node ? node->getValue(dataIndex.column()) : QVariant();
 	}
 
 	return QVariant();
@@ -409,10 +219,14 @@ QVariant DICOMModel::headerData(int section, Qt::Orientation orientation, int ro
 
 	if (orientation == Qt::Horizontal)
 	{
-		if (section < 0 || section >= d->Headers.size())
+		if (!d->RootNode)
+			return 0;
+		QStringList headers = d->RootNode->getHeaders();
+
+		if (section < 0 || section >= headers.size())
 			return QVariant();
 
-		return d->Headers[section];
+		return headers[section];
 	}
 
 	return QVariant("");
@@ -441,14 +255,14 @@ QModelIndex DICOMModel::parent ( const QModelIndex & indexValue ) const
 
 	DicomModelNode* node = d->nodeFromIndex(indexValue);
 	Q_ASSERT(node);
-	DicomModelNode* parentNode = node->Parent;
+	DicomModelNode* parentNode = node->getParent();
 
 	if (parentNode == 0)
 		return QModelIndex(); // node is root
 	if (parentNode == d->RootNode.get())
 		return QModelIndex();
 
-	return this->createIndex(parentNode->Row, 0, parentNode);
+	return this->createIndex(parentNode->getRow(), 0, parentNode);
 }
 
 //------------------------------------------------------------------------------
@@ -464,7 +278,7 @@ int DICOMModel::rowCount ( const QModelIndex & parentValue ) const
 	// Returns the amount of rows currently cached on the client.
 //	qDebug() << "node ? node->FetchedChildren.size() : " << (node ? node->FetchedChildren.size() : 0);
 
-	return node ? node->FetchedChildren.size() : 0;
+	return node ? node->getFetchedChildren().size() : 0;
 }
 
 //------------------------------------------------------------------------------
