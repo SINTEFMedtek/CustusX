@@ -200,8 +200,6 @@ vtkRenderingFreeType
 vtkRenderingCore
 vtkRenderingVolume
 vtkInteractionStyle
-vtkFiltersParallel
-vtkImagingMorphological
     )
 
 
