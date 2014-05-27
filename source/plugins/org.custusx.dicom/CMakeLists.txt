@@ -25,6 +25,7 @@ set(PLUGIN_SRCS
   widgets/cxDICOMModel.cpp
   widgets/cxDicomModelNode.cpp
   widgets/cxDicomModelNode.h
+  widgets/cxDICOMThumbnailListWidget.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -36,6 +37,7 @@ set(PLUGIN_MOC_SRCS
   widgets/cxDICOMAppWidget.h
   widgets/cxDICOMModel.h
   widgets/cxDicomWidget.h
+  widgets/cxDICOMThumbnailListWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic
