@@ -93,7 +93,12 @@ bool SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServic
 
 //	this->generateMaskSlot();
 
-	bool initialized = this->initUSSimulator();
+	bool initialized = true;
+
+#ifdef CX_BUILD_US_SIMULATOR
+	initialized = this->initUSSimulator();
+#endif //CX_BUILD_US_SIMULATOR
+
 	this->setInitialized(initialized);
 	return initialized;
 }
