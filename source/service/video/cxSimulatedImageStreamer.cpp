@@ -226,8 +226,10 @@ vtkImageDataPtr SimulatedImageStreamer::simulateUSFromMRSlice(ImagePtr source)
 
 void SimulatedImageStreamer::setGain(double gain)
 {
+#ifdef CX_BUILD_US_SIMULATOR
 	mUSSimulator->setGain(gain);
 	this->sliceSlot();
+#endif //CX_BUILD_US_SIMULATOR
 }
 
 vtkImageDataPtr SimulatedImageStreamer::createSimulatorInputSlice(ImagePtr source)
