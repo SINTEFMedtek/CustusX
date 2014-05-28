@@ -26,6 +26,7 @@
 
 class QModelIndex;
 class ctkThumbnailWidget;
+class ctkDICOMDatabase;
 
 namespace cx
 {
@@ -48,6 +49,7 @@ public:
   virtual ~DICOMThumbnailListWidget();
 
   void setDatabaseDirectory(const QString& directory);
+  void setDatabase(QSharedPointer<ctkDICOMDatabase> database);
 
   void selectThumbnailFromIndex(const QModelIndex& index);
 
