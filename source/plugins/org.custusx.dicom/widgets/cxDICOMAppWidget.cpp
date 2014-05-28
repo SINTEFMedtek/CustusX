@@ -59,7 +59,9 @@
 #include "ctkDICOMQueryRetrieveWidget.h"
 #include "ctkDICOMQueryWidget.h"
 #include <QToolBar>
-#include "ctkDICOMThumbnailListWidget.h"
+//#include "ctkDICOMThumbnailListWidget.h"
+#include "cxDICOMThumbnailListWidget.h"
+
 #include "cxDicomImporter.h"
 
 //#include "ui_DICOMAppWidget.h"
@@ -89,7 +91,8 @@ public:
   QVBoxLayout* TopLayout;
   QTreeView* TreeView;
   QToolBar* ToolBar;
-  ctkDICOMThumbnailListWidget* ThumbnailsWidget;
+//  ctkDICOMThumbnailListWidget* ThumbnailsWidget;
+  DICOMThumbnailListWidget* ThumbnailsWidget;
   QSlider* ThumbnailWidthSlider;
   QAction* ActionImport;
   QAction* ActionQuery;
@@ -166,7 +169,8 @@ void DICOMAppWidgetPrivate::setupUi(DICOMAppWidget* parent)
 	TreeView->setAlternatingRowColors(true);
 	TopLayout->addWidget(TreeView);
 
-	ThumbnailsWidget = new ctkDICOMThumbnailListWidget;
+	ThumbnailsWidget = new DICOMThumbnailListWidget;
+//	ThumbnailsWidget = new ctkDICOMThumbnailListWidget;
 	ThumbnailsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	ThumbnailsWidget->setMinimumSize(QSize(0,200));
 	TopLayout->addWidget(ThumbnailsWidget);

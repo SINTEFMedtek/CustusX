@@ -58,57 +58,46 @@ protected:
 public:
   DICOMModelPrivate(DICOMModel&);
   virtual ~DICOMModelPrivate();
-//  void init();
   void fetchChildren(const QModelIndex& indexValue);
   NodePtr createNode(int row, const QModelIndex& parentValue)const;
   DicomModelNode* nodeFromIndex(const QModelIndex& indexValue)const;
 
   NodePtr RootNode;
   QSharedPointer<ctkDICOMDatabase> DataBase;
-//  QStringList Headers;
 };
 
-
-//------------------------------------------------------------------------------
 DICOMModelPrivate::DICOMModelPrivate(DICOMModel& o):q_ptr(&o)
 {
+	RootNode = DicomModelNode::getNullNode();
 }
 
-//------------------------------------------------------------------------------
 DICOMModelPrivate::~DICOMModelPrivate()
 {
 }
 
-//------------------------------------------------------------------------------
-//void DICOMModelPrivate::init()
-//{
-//	Headers.clear();
-//	Headers << "Name";
-//	Headers << "Date";
-//	Headers << "Modality";
-//	Headers << "Images";
-////	Headers << "Info";
-//}
-
-//------------------------------------------------------------------------------
 DicomModelNode* DICOMModelPrivate::nodeFromIndex(const QModelIndex& indexValue)const
 {
-	return indexValue.isValid() ? reinterpret_cast<DicomModelNode*>(indexValue.internalPointer()) : this->RootNode.get();
+	if (!indexValue.isValid())
+		return this->RootNode.get();
+	DicomModelNode* retval = reinterpret_cast<DicomModelNode*>(indexValue.internalPointer());
+	if (retval)
+		return retval;
+	return DicomModelNode::getNullNode().get();
 }
-//------------------------------------------------------------------------------
 
 NodePtr DICOMModelPrivate::createNode(int row, const QModelIndex& parentValue)const
 {
-	NodePtr node = DicomModelNode::createNode(row, this->nodeFromIndex(parentValue), DataBase);
-	return node;
+	DicomModelNode* parent = this->nodeFromIndex(parentValue);
+	return DicomModelNode::createNode(row, parent, DataBase);
 }
 
 void DICOMModelPrivate::fetchChildren(const QModelIndex& indexValue)
 {
   Q_Q(DICOMModel);
-  DicomModelNode* node = this->nodeFromIndex(indexValue);
 
-  if (!node || !node->canFetchMore())
+	DicomModelNode* node = this->nodeFromIndex(indexValue);
+
+  if (!node->canFetchMore())
 	  return;
   if (!node->hasChildren())
 	  return;
@@ -134,7 +123,6 @@ DICOMModel::DICOMModel(QObject* parentObject)
   , d_ptr(new DICOMModelPrivate(*this))
 {
   Q_D(DICOMModel);
-//  d->init();
 }
 
 //------------------------------------------------------------------------------
@@ -147,8 +135,6 @@ bool DICOMModel::canFetchMore ( const QModelIndex & parentValue ) const
 {
   Q_D(const DICOMModel);
   DicomModelNode* node = d->nodeFromIndex(parentValue);
-  if (!node)
-	  return false;
   return node->canFetchMore();
 }
 
@@ -157,8 +143,6 @@ int DICOMModel::columnCount ( const QModelIndex & _parent ) const
 {
 	Q_D(const DICOMModel);
 	Q_UNUSED(_parent);
-	if (!d->RootNode)
-		return 0;
 	return d->RootNode->getHeaders().size();
 }
 
@@ -170,17 +154,17 @@ QVariant DICOMModel::data ( const QModelIndex & dataIndex, int role ) const
 	if ( role == UIDRole )
 	{
 		DicomModelNode* node = d->nodeFromIndex(dataIndex);
-		return node ? node->getUid() : QString() ;
+		return node->getUid();
 	}
 	else if ( role == TypeRole )
 	{
 		DicomModelNode* node = d->nodeFromIndex(dataIndex);
-		return node ? node->getType() : 0;
+		return node->getType();
 	}
 	else if (( role==Qt::DisplayRole )||( role==Qt::EditRole ))
 	{
 		DicomModelNode* node = d->nodeFromIndex(dataIndex);
-		return node ? node->getValue(dataIndex.column()) : QVariant();
+		return node->getValue(dataIndex.column());
 	}
 
 	return QVariant();
@@ -197,15 +181,11 @@ void DICOMModel::fetchMore ( const QModelIndex & parentValue )
 bool DICOMModel::hasChildren ( const QModelIndex & parentIndex ) const
 {
 	Q_D(const DICOMModel);
-	// only items in the first columns have index, shortcut the following for
-	// speed issues.
+	// only items in the first columns have index, shortcut the following for speed issues.
 	if (parentIndex.column() > 0)
 		return false;
 
 	DicomModelNode* node = d->nodeFromIndex(parentIndex);
-	if (!node)
-		return false;
-
 	return node->hasChildren();
 }
 
@@ -219,8 +199,6 @@ QVariant DICOMModel::headerData(int section, Qt::Orientation orientation, int ro
 
 	if (orientation == Qt::Horizontal)
 	{
-		if (!d->RootNode)
-			return 0;
 		QStringList headers = d->RootNode->getHeaders();
 
 		if (section < 0 || section >= headers.size())
@@ -237,11 +215,17 @@ QModelIndex DICOMModel::index ( int row, int column, const QModelIndex & parentI
 {
 	Q_D(const DICOMModel);
 
-	if (d->RootNode == 0 || parentIndex.column() > 0) // only the first column has children
+	if (parentIndex.column() > 0) // only the first column has children
 		return QModelIndex();
 
 	DicomModelNode* parentNode = d->nodeFromIndex(parentIndex);
 	NodePtr node = parentNode->getFetchedChildForRow(row);
+
+	if (node->isNull())
+	{
+		qDebug() << "DICOMModel::index() failed to get node for index";
+		return QModelIndex();
+	}
 
 	return this->createIndex(row, column, node.get());
 }
@@ -254,10 +238,9 @@ QModelIndex DICOMModel::parent ( const QModelIndex & indexValue ) const
 		return QModelIndex();
 
 	DicomModelNode* node = d->nodeFromIndex(indexValue);
-	Q_ASSERT(node);
 	DicomModelNode* parentNode = node->getParent();
 
-	if (parentNode == 0)
+	if (parentNode->isNull())
 		return QModelIndex(); // node is root
 	if (parentNode == d->RootNode.get())
 		return QModelIndex();
@@ -269,36 +252,25 @@ QModelIndex DICOMModel::parent ( const QModelIndex & indexValue ) const
 int DICOMModel::rowCount ( const QModelIndex & parentValue ) const
 {
 	Q_D(const DICOMModel);
-	if (d->RootNode == 0 || parentValue.column() > 0)
-	{
+	if (parentValue.column() > 0)
 		return 0;
-	}
 	DicomModelNode* node = d->nodeFromIndex(parentValue);
-	Q_ASSERT(node);
 	// Returns the amount of rows currently cached on the client.
-//	qDebug() << "node ? node->FetchedChildren.size() : " << (node ? node->FetchedChildren.size() : 0);
-
-	return node ? node->getFetchedChildren().size() : 0;
+	return node->getFetchedChildren().size();
 }
 
 //------------------------------------------------------------------------------
 void DICOMModel::setDatabase(QSharedPointer<ctkDICOMDatabase> db)
 {
-  Q_D(DICOMModel);
+	Q_D(DICOMModel);
 
-  this->beginResetModel();
-  d->DataBase = db;
+	this->beginResetModel();
 
-  d->RootNode.reset();
-//  delete d->RootNode;
-//  d->RootNode = 0;
+	d->DataBase = db;
+	d->RootNode.reset();
+	d->RootNode = d->createNode(-1, QModelIndex());
 
-//  if (!d->DataBase->patients().empty())
-//  {
-	  d->RootNode = d->createNode(-1, QModelIndex());
-//  }
-
-  this->endResetModel();
+	this->endResetModel();
 }
 
 

@@ -105,19 +105,28 @@ void DICOMThumbnailListWidgetPrivate
 
   if(model)
     {
+	  qDebug() << "  ==DICOMThumbnailListWidget::addPatientThumbnails" ;
+
     model->fetchMore(patientIndex);
-    const int studyCount = model->rowCount(patientIndex);
+	qDebug() << "  ==DICOMThumbnailListWidget::addPatientThumbnails2" ;
+	const int studyCount = model->rowCount(patientIndex);
+	qDebug() << "  ==DICOMThumbnailListWidget::addPatientThumbnails3" ;
 
     for(int i=0; i<studyCount; i++)
       {
-      QModelIndex studyIndex = patientIndex.child(i, 0);
-      QModelIndex seriesIndex = studyIndex.child(0, 0);
-      model->fetchMore(seriesIndex);
+		qDebug() << "  ==DICOMThumbnailListWidget::addPatientThumbnails4.1" ;
+	  QModelIndex studyIndex = patientIndex.child(i, 0);
+	  model->fetchMore(studyIndex);
+	  qDebug() << "  ==DICOMThumbnailListWidget::addPatientThumbnails4.1.1" ;
+	  QModelIndex seriesIndex = studyIndex.child(0, 0);
+	  qDebug() << "  ==DICOMThumbnailListWidget::addPatientThumbnails4.1.2" ;
+	  model->fetchMore(seriesIndex);
       const int imageCount = model->rowCount(seriesIndex);
       QModelIndex imageIndex = seriesIndex.child(imageCount/2, 0);
       QString study = model->data(studyIndex, Qt::DisplayRole).toString();
       this->addThumbnailWidget(imageIndex, studyIndex, study);
-      }
+	  qDebug() << "  ==DICOMThumbnailListWidget::addPatientThumbnails4.2" ;
+	  }
     }
 }
 
@@ -239,7 +248,7 @@ void DICOMThumbnailListWidget::setDatabaseDirectory(const QString &directory){
 //----------------------------------------------------------------------------
 void DICOMThumbnailListWidget::selectThumbnailFromIndex(const QModelIndex &index){
   Q_D(DICOMThumbnailListWidget);
-	qDebug() << "DICOMThumbnailListWidget::selectThumbnailFromIndex" ;
+	qDebug() << "=====DICOMThumbnailListWidget::selectThumbnailFromIndex" ;
 
   if(!d->CurrentSelectedModel.isValid())
     {
@@ -275,24 +284,29 @@ void DICOMThumbnailListWidget::selectThumbnailFromIndex(const QModelIndex &index
 //----------------------------------------------------------------------------
 void DICOMThumbnailListWidget::addThumbnails(const QModelIndex &index)
 {
-	qDebug() << "DICOMThumbnailListWidget::addThumbnails" ;
+	qDebug() << "==DICOMThumbnailListWidget::addThumbnails" ;
 
   Q_D(DICOMThumbnailListWidget);
 
   this->clearThumbnails();
+	qDebug() << "==DICOMThumbnailListWidget::addThumbnails2" ;
 
   ctkDICOMModel* model = const_cast<ctkDICOMModel*>(qobject_cast<const ctkDICOMModel*>(index.model()));
+  qDebug() << "==DICOMThumbnailListWidget::addThumbnails3" ;
 
   if(model)
     {
     QModelIndex index0 = index.sibling(index.row(), 0);
+	qDebug() << "==DICOMThumbnailListWidget::addThumbnails4" ;
 
     d->CurrentSelectedModel = index0;
 
     if ( model->data(index0,ctkDICOMModel::TypeRole) == static_cast<int>(ctkDICOMModel::PatientType) )
       {
-      d->addPatientThumbnails(index0);
-      }
+		qDebug() << "==DICOMThumbnailListWidget::addThumbnails5" ;
+	  d->addPatientThumbnails(index0);
+	  qDebug() << "==DICOMThumbnailListWidget::addThumbnails6" ;
+	  }
     else if ( model->data(index0,ctkDICOMModel::TypeRole) == static_cast<int>(ctkDICOMModel::StudyType) )
       {
       d->addStudyThumbnails(index0);
