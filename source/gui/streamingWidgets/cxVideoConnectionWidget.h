@@ -94,7 +94,7 @@ protected:
 	QWidget* createDirectLinkWidget();
 	QWidget* createLocalServerWidget();
 	QWidget* createRemoteWidget();
-	QWidget* createSimulationWidget();
+//	QWidget* createSimulationWidget();
 	QWidget* wrapVerticalStretch(QWidget* input);
 	Transform3D calculate_rMd_ForAProbeImage(ToolPtr probe);
 	QString generateFilename(VideoSourcePtr videoSource);
@@ -112,7 +112,7 @@ protected:
 	QStackedWidget* mStackedWidget;
 	StringDataAdapterXmlPtr mConnectionSelector;
 	ActiveVideoSourceStringDataAdapterPtr mActiveVideoSourceSelector;
-	SimulateUSWidget* mSimulationWidget;
+//	SimulateUSWidget* mSimulationWidget;
 	FileInputWidget* mLocalServerFile;
 
 private:

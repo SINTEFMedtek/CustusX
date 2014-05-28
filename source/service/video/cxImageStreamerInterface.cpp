@@ -15,7 +15,7 @@
 namespace cx
 {
 
-ImageStreamerInterface::ImageStreamerInterface()
+StreamerService::StreamerService()
 {
 }
 

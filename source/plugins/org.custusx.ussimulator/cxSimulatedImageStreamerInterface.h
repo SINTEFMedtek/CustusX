@@ -32,7 +32,7 @@ typedef boost::shared_ptr<class SimulatedImageStreamerInterface> SimulatedImageS
  * \date May 20, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class SimulatedImageStreamerInterface : public ImageStreamerInterface
+class SimulatedImageStreamerInterface : public StreamerService
 {
 public:
 	SimulatedImageStreamerInterface();
@@ -42,6 +42,7 @@ public:
 	void setGain(double gain);
 
 	virtual StreamerPtr createStreamer();
+	virtual BaseWidget* createWidget();
 
 private:
 	VideoServiceBackendPtr mBackend;

@@ -10,7 +10,7 @@
 #include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
 #include "cxDataManager.h"
-#include "cxSimulateUSWidget.h"
+//#include "cxSimulateUSWidget.h"
 #include "cxLegacySingletons.h"
 #include "cxImage.h"
 

@@ -14,26 +14,32 @@
 #define CXIMAGESTREAMERINTERFACE_H
 
 #include "boost/shared_ptr.hpp"
+#include "cxBaseWidget.h"
+
+#define StreamerService_iid "cx::StreamerService"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class ImageStreamerInterface> ImageStreamerInterfacePtr;
+// Use of smart pointer not possible for plugin service. Replace with serviceAdded and serviceRemoved signals
+// The smart pointer can still be used if StreamerService is coming from another source than a ctk plugin
+typedef boost::shared_ptr<class StreamerService> ImageStreamerInterfacePtr;
 typedef boost::shared_ptr<class Streamer> StreamerPtr;
 
 /**
- * \brief Abstract class. Interface to ImageStreamers
+ * \brief Abstract class. Interface to Streamers
  *
  * \ingroup cx_service_video
  *
  * \date May 20, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class ImageStreamerInterface
+class StreamerService
 {
 public:
-	ImageStreamerInterface();
+	StreamerService();
 	virtual StreamerPtr createStreamer() = 0;
+	virtual BaseWidget* createWidget() = 0;
 };
 
 } //end namespace cx

@@ -190,11 +190,11 @@ vtkImagingStatistics
 vtkImagingColor
 vtkImagingMath
 vtkImagingGeneral
-vtkImagingMorphological
+#vtkImagingMorphological
 vtkFiltersCore
 vtkFiltersGeneral
 vtkFiltersSources
-vtkFiltersParallel
+#vtkFiltersParallel
 vtkRenderingFreeTypeOpenGL
 vtkRenderingFreeType
 vtkRenderingCore
