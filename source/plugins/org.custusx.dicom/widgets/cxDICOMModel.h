@@ -52,7 +52,8 @@ public:
     PatientType,
     StudyType,
     SeriesType,
-    ImageType
+	ImageType,
+	NoneType
   };
 
   explicit DICOMModel(QObject* parent = 0);

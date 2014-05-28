@@ -17,16 +17,30 @@
 namespace cx
 {
 
+NodePtr DicomModelNode::NullNode;
+
+NodePtr DicomModelNode::getNullNode()
+{
+	if (!NullNode)
+	{
+		NullNode.reset(new NullDicomModelNode);
+		NullNode->Parent = NullNode.get();
+		NullNode->Row = -1;
+	}
+
+	return NullNode;
+}
+
 NodePtr DicomModelNode::createNode(int row, DicomModelNode* parent, QSharedPointer<ctkDICOMDatabase> dataBase)
 {
 	if (!dataBase)
 		return NodePtr();
-	Q_ASSERT(dataBase.data());
+
 	NodePtr node;
 	if (row == -1)
 	{
 		node.reset(new RootDicomModelNode);
-		node->Parent = 0;
+		node->Parent = DicomModelNode::getNullNode().get();
 	}
 	else
 	{
@@ -50,6 +64,13 @@ NodePtr DicomModelNode::createNode(int row, DicomModelNode* parent, QSharedPoint
 	node->fillChildrenUids();
 
 	return node;
+}
+
+DicomModelNode::DicomModelNode() :
+	Row(-1),
+	Parent(0)
+{
+
 }
 
 //---------------------------------------------------------
@@ -81,7 +102,7 @@ NodePtr DicomModelNode::getFetchedChildForRow(int row) const
 {
 	if (row < this->FetchedChildren.size())
 		return this->FetchedChildren[row];
-	return NodePtr();
+	return DicomModelNode::getNullNode();
 }
 
 DicomImageReaderPtr DicomModelNode::createReader() const
@@ -121,6 +142,9 @@ QVariant DicomModelNode::getUncachedValue(int column) const
 
 void RootDicomModelNode::fillChildrenUids()
 {
+//	qDebug() << "using db " << DataBase.data();
+//	qDebug() << "using patients " << DataBase->patients();
+
 	this->ChildrenUID << DataBase->patients();
 }
 

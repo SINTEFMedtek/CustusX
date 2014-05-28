@@ -40,8 +40,10 @@ class DicomModelNode
 {
 public:
 	static NodePtr createNode(int row, DicomModelNode* parent, QSharedPointer<ctkDICOMDatabase> dataBase);
+	static NodePtr getNullNode();
 
-	~DicomModelNode() {}
+	DicomModelNode();
+	virtual ~DicomModelNode() {}
 
 	bool canFetchMore() const;
 	bool hasChildren() const;
@@ -68,6 +70,7 @@ public:
 
 	QVariant getValue(int column) const;
 	QStringList getHeaders() const;
+	bool isNull() const { return this->getType()==DICOMModel::NoneType; }
 
 protected:
 	QVariant getUncachedValue(int column) const;
@@ -79,8 +82,22 @@ protected:
 	QString                         UID;
 	mutable std::map<int, QVariant> CachedValues;
 	QSharedPointer<ctkDICOMDatabase> DataBase;
+	static NodePtr NullNode;
 };
 
+
+/**
+  *
+  */
+class NullDicomModelNode : public DicomModelNode
+{
+public:
+	NullDicomModelNode() {}
+	virtual ~NullDicomModelNode() {}
+
+	virtual DICOMModel::IndexType getType() const { return DICOMModel::NoneType; }
+	virtual void fillChildrenUids() {}
+};
 
 /**
   *
@@ -89,9 +106,8 @@ class RootDicomModelNode : public DicomModelNode
 {
 public:
 	RootDicomModelNode() {}
-	~RootDicomModelNode() {}
+	virtual ~RootDicomModelNode() {}
 
-	//	void initialize();
 	virtual DICOMModel::IndexType getType() const { return DICOMModel::RootType; }
 	virtual void fillChildrenUids();
 };
@@ -104,9 +120,8 @@ class PatientDicomModelNode : public DicomModelNode
 {
 public:
 	PatientDicomModelNode() {}
-	~PatientDicomModelNode() {}
+	virtual ~PatientDicomModelNode() {}
 
-	//	void initialize();
 	virtual DICOMModel::IndexType getType() const { return DICOMModel::PatientType; }
 	virtual void fillChildrenUids();
 	virtual QVariant getName() const;
@@ -121,7 +136,7 @@ class StudyDicomModelNode : public DicomModelNode
 {
 public:
 	StudyDicomModelNode() {}
-	~StudyDicomModelNode() {}
+	virtual ~StudyDicomModelNode() {}
 
 	virtual DICOMModel::IndexType getType() const { return DICOMModel::StudyType; }
 	virtual void fillChildrenUids();
@@ -137,7 +152,7 @@ class SeriesDicomModelNode : public DicomModelNode
 {
 public:
 	SeriesDicomModelNode() {}
-	~SeriesDicomModelNode() {}
+	virtual ~SeriesDicomModelNode() {}
 
 	virtual DICOMModel::IndexType getType() const { return DICOMModel::SeriesType; }
 	virtual void fillChildrenUids()	{}
