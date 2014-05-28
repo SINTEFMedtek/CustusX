@@ -40,6 +40,7 @@
 #include <QTreeView>
 #include <QLabel>
 #include <QHBoxLayout>
+#include <QSplitter>
 
 // ctkWidgets includes
 #include "ctkDirectoryButton.h"
@@ -165,15 +166,24 @@ void DICOMAppWidgetPrivate::setupUi(DICOMAppWidget* parent)
 	q->connect(ActionRemove, SIGNAL(triggered()), q, SLOT(onRemoveAction()));
 	ToolBar->addAction(ActionRemove);
 
+	QSplitter* splitter = new QSplitter;
+	splitter->setOrientation(Qt::Vertical);
+	TopLayout->addWidget(splitter);
+
 	TreeView = new QTreeView;
 	TreeView->setAlternatingRowColors(true);
-	TopLayout->addWidget(TreeView);
+	splitter->addWidget(TreeView);
+
+	QWidget* ThumbnailsFullWidget = new QWidget;
+	splitter->addWidget(ThumbnailsFullWidget);
+	QVBoxLayout* ThumbnailsFullWidgetLayout = new QVBoxLayout(ThumbnailsFullWidget);
+	ThumbnailsFullWidgetLayout->setMargin(0);
 
 	ThumbnailsWidget = new DICOMThumbnailListWidget;
 //	ThumbnailsWidget = new ctkDICOMThumbnailListWidget;
 	ThumbnailsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	ThumbnailsWidget->setMinimumSize(QSize(0,200));
-	TopLayout->addWidget(ThumbnailsWidget);
+	ThumbnailsFullWidgetLayout->addWidget(ThumbnailsWidget);
 
 	ThumbnailWidthSlider = new QSlider;
 	ThumbnailWidthSlider->setMinimum(64);
@@ -181,8 +191,7 @@ void DICOMAppWidgetPrivate::setupUi(DICOMAppWidget* parent)
 	ThumbnailWidthSlider->setValue(64);
 	ThumbnailWidthSlider->setOrientation(Qt::Horizontal);
 	connect(ThumbnailWidthSlider, SIGNAL(valueChanged(int)), q, SLOT(onThumbnailWidthSliderValueChanged(int)));
-
-		TopLayout->addWidget(ThumbnailWidthSlider);
+	ThumbnailsFullWidgetLayout->addWidget(ThumbnailWidthSlider);
 }
 
 void DICOMAppWidgetPrivate::showUpdateSchemaDialog()
@@ -308,7 +317,7 @@ DICOMAppWidget::DICOMAppWidget(QWidget* _parent):Superclass(_parent),
 		  SLOT(onCurrentChanged(const QModelIndex&, const QModelIndex&)));
 
   //connect signal and slots
-  connect(d->TreeView, SIGNAL(clicked(QModelIndex)), d->ThumbnailsWidget, SLOT(addThumbnails(QModelIndex)));
+//  connect(d->TreeView, SIGNAL(clicked(QModelIndex)), d->ThumbnailsWidget, SLOT(addThumbnails(QModelIndex)));
   connect(d->TreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(onModelSelected(QModelIndex)));
 
   connect(d->QueryRetrieveWidget, SIGNAL(canceled()), d->QueryRetrieveWidget, SLOT(hide()) );
@@ -408,6 +417,7 @@ void DICOMAppWidget::setDatabaseDirectory(const QString& directory)
 
   d->QueryRetrieveWidget->setRetrieveDatabase(d->DICOMDatabase);
   d->ThumbnailsWidget->setDatabaseDirectory(directory);
+  d->ThumbnailsWidget->setDatabase(d->DICOMDatabase);
   emit databaseDirectoryChanged(directory);
 }
 
@@ -535,28 +545,30 @@ void DICOMAppWidget::onSelectionChanged(const QItemSelection&, const QItemSelect
 void DICOMAppWidget::onCurrentChanged(const QModelIndex& next, const QModelIndex& last)
 {
 	Q_D(DICOMAppWidget);
-	d->ThumbnailsWidget->selectThumbnailFromIndex(next);
+	d->ThumbnailsWidget->addThumbnails(next);
+	//  connect(d->TreeView, SIGNAL(clicked(QModelIndex)), d->ThumbnailsWidget, SLOT(addThumbnails(QModelIndex)));
+//	d->ThumbnailsWidget->selectThumbnailFromIndex(next);
 }
 
-void DICOMAppWidget::onModelSelected(const QModelIndex &index){
-Q_D(DICOMAppWidget);
+void DICOMAppWidget::onModelSelected(const QModelIndex &index)
+{
+	Q_D(DICOMAppWidget);
 
-    ctkDICOMModel* model = const_cast<ctkDICOMModel*>(qobject_cast<const ctkDICOMModel*>(index.model()));
+	ctkDICOMModel* model = const_cast<ctkDICOMModel*>(qobject_cast<const ctkDICOMModel*>(index.model()));
 
-    if(model)
-      {
-        QModelIndex index0 = index.sibling(index.row(), 0);
+	if(model)
+	{
+		QModelIndex index0 = index.sibling(index.row(), 0);
 
-        d->ActionRemove->setEnabled(
-            model->data(index0,ctkDICOMModel::TypeRole) == static_cast<int>(ctkDICOMModel::SeriesType) ||
-            model->data(index0,ctkDICOMModel::TypeRole) == static_cast<int>(ctkDICOMModel::StudyType) ||
-            model->data(index0,ctkDICOMModel::TypeRole) == static_cast<int>(ctkDICOMModel::PatientType) );
-        }
-
-      else
-        {
-        d->ActionRemove->setEnabled(false);
-        }
+		d->ActionRemove->setEnabled(
+					model->data(index0,ctkDICOMModel::TypeRole) == static_cast<int>(ctkDICOMModel::SeriesType) ||
+					model->data(index0,ctkDICOMModel::TypeRole) == static_cast<int>(ctkDICOMModel::StudyType) ||
+					model->data(index0,ctkDICOMModel::TypeRole) == static_cast<int>(ctkDICOMModel::PatientType) );
+	}
+	else
+	{
+		d->ActionRemove->setEnabled(false);
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -571,6 +583,7 @@ void DICOMAppWidget::onTreeExpanded(const QModelIndex &index){
     Q_UNUSED(index);
     Q_D(DICOMAppWidget);
     d->TreeView->resizeColumnToContents(0);
+	d->TreeView->resizeColumnToContents(1);
 }
 
 //----------------------------------------------------------------------------

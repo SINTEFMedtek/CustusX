@@ -73,6 +73,7 @@ void DicomWidget::createUI()
 												  "Import", "Import selected series into application",
 												  SLOT(onImportIntoCustusXAction()),
 												  buttonsLayout);
+	buttonsLayout->addStretch();
 
 	mBrowser = new DICOMAppWidget;
 
