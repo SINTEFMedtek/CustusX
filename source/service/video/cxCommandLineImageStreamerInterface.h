@@ -30,11 +30,12 @@ typedef boost::shared_ptr<class CommandlineImageStreamerInterface> CommandlineIm
  * \date May 20, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class CommandlineImageStreamerInterface : public ImageStreamerInterface
+class CommandlineImageStreamerInterface : public StreamerService
 {
 public:
 	CommandlineImageStreamerInterface();
 	virtual StreamerPtr createStreamer();
+	virtual BaseWidget* createWidget();
 
 	void setArguments(std::map<QString, QString> arguments) {mArguments = arguments;}
 

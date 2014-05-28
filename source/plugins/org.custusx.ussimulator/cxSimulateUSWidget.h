@@ -31,9 +31,11 @@ typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringD
 
 /**
  * \brief Gui for interacting with us simulation.
+ * \ingroup org_custusx_ussimulator
  *
  * \date Jun 18, 2013
  * \author Janne Beate Bakeng, SINTEF
+ * \author Ole Vegard Solberg, SINTEF
  */
 class SimulateUSWidget : public BaseWidget
 {

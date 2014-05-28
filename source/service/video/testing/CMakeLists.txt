@@ -28,8 +28,8 @@ if (BUILD_TESTING)
 	#	)
 	set(CXTEST_VIDEOSERVICE_SOURCES ${CXTEST_VIDEOSERVICE_SOURCES}
 	    cxCatchVideo.cpp
-	    cxtestSimulatedImageStreamerFixture.h
-	    cxtestSimulatedImageStreamerFixture.cpp
+	    #cxtestSimulatedImageStreamerFixture.h
+	    #cxtestSimulatedImageStreamerFixture.cpp
 	    )
 
 	cx_catch_add_lib_and_exe(cxVideoService "${CXTEST_VIDEOSERVICE_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")

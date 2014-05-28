@@ -31,7 +31,7 @@
 #include "cxProbeConfigWidget.h"
 #include "cxSamplerWidget.h"
 #include "cxShadingWidget.h"
-#include "cxSimulateUSWidget.h"
+//#include "cxSimulateUSWidget.h"
 #include "cxToolPropertiesWidget.h"
 #include "cxTrackPadWidget.h"
 #include "cxTransferFunction2DColorWidget.h"

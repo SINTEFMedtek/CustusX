@@ -16,6 +16,7 @@
 #include "cxToolManager.h"
 #include "cxDataManager.h"
 #include "cxReporter.h"
+#include "cxSimulateUSWidget.h"
 
 namespace cx
 {
@@ -60,6 +61,12 @@ StreamerPtr SimulatedImageStreamerInterface::createStreamer()
 	mStreamer->initialize(image, tool, mBackend->getDataManager());
 
 	return mStreamer;
+}
+
+BaseWidget* SimulatedImageStreamerInterface::createWidget()
+{
+	SimulateUSWidget* mSimulationWidget = new SimulateUSWidget();
+	return mSimulationWidget;
 }
 
 } //end namespace cx

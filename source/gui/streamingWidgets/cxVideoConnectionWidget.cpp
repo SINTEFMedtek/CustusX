@@ -40,7 +40,7 @@
 #include "cxPatientData.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"
-#include "cxSimulateUSWidget.h"
+//#include "cxSimulateUSWidget.h"
 #include "cxFileInputWidget.h"
 #include "cxLogger.h"
 
@@ -48,7 +48,7 @@ namespace cx
 {
 
 VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
-		BaseWidget(parent, "IGTLinkWidget", "Video Connection"), mSimulationWidget(NULL)
+		BaseWidget(parent, "IGTLinkWidget", "Video Connection")//, mSimulationWidget(NULL)
 {
 	mInitScriptWidget=NULL;
 
@@ -232,11 +232,11 @@ QWidget* VideoConnectionWidget::createRemoteWidget()
 	return retval;
 }
 
-QWidget* VideoConnectionWidget::createSimulationWidget()
-{
-	mSimulationWidget = new SimulateUSWidget();
-	return mSimulationWidget;
-}
+//QWidget* VideoConnectionWidget::createSimulationWidget()
+//{
+//	mSimulationWidget = new SimulateUSWidget();
+//	return mSimulationWidget;
+//}
 
 QString VideoConnectionWidget::defaultWhatsThis() const
 {
@@ -375,7 +375,10 @@ QStackedWidget* VideoConnectionWidget::initializeStackedWidget()
 	stackedWidget->addWidget(this->wrapVerticalStretch(this->createDirectLinkWidget()));
 	stackedWidget->addWidget(this->wrapVerticalStretch(this->createLocalServerWidget()));
 	stackedWidget->addWidget(this->wrapVerticalStretch(this->createRemoteWidget()));
-	stackedWidget->addWidget(this->wrapVerticalStretch(this->createSimulationWidget()));
+//	stackedWidget->addWidget(this->wrapVerticalStretch(this->createSimulationWidget()));
+
+	//TODO: Get widget from StreamerService (plugin)
+
 	return stackedWidget;
 }
 
