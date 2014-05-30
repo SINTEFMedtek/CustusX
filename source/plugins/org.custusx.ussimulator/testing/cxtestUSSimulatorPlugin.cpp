@@ -103,19 +103,29 @@ TEST_CASE("SimulatedImageStreamer: Speed", "[streaming][integration][speed]")
 	cx::Reporter::shutdown();
 }
 
-TEST_CASE("StreamerService: Service availalbe", "[streaming][service][unit]")
+TEST_CASE("StreamerService: Service available", "[streaming][service][unit]")
 {
 	cx::LogicManager::initialize();
 
 	cx::PluginFrameworkManagerPtr pluginFramework = cx::logicManager()->getPluginFramework();
-//	ctkPluginContext* context = pluginFramework->getPluginContext();
+	ctkPluginContext* context = pluginFramework->getPluginContext();
 
-//	ctkServiceTracker<cx::StreamerService*> tracker(context);
-//	tracker.open();
-//	QList<cx::StreamerService*> serviceList = tracker.getServices();
-//	REQUIRE(serviceList.size() > 0);
+	ctkServiceTracker<cx::StreamerService*> tracker(context);
+	tracker.open();
 
-	REQUIRE(true);
+	cx::StreamerService* service = tracker.getService();
+	REQUIRE(service);
+
+	QList<cx::StreamerService*> serviceList = tracker.getServices();
+	REQUIRE(serviceList.size() > 0);
+
+	for(int i = 0; i < serviceList.size(); ++i)
+	{
+		cx::StreamerService* service = serviceList.at(i);
+		INFO(service->getName());
+		REQUIRE(service->createStreamer());
+	}
+
 	cx::LogicManager::shutdown();
 }
 }//namespace cxtest
