@@ -14,6 +14,8 @@
 
 #include "cxVideoConnectionWidget.h"
 
+#include <boost/bind.hpp>
+
 #include <QDir>
 #include <QStackedWidget>
 #include <QPushButton>
@@ -43,6 +45,7 @@
 //#include "cxSimulateUSWidget.h"
 #include "cxFileInputWidget.h"
 #include "cxLogger.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -73,11 +76,28 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 	mToptopLayout->addWidget(sscCreateDataWidget(this, mActiveVideoSourceSelector));
 	mToptopLayout->addStretch();
 
+	mServiceListener.reset(new ServiceTrackerListener<StreamerService>(
+			LogicManager::getInstance()->getPluginFramework(),
+			boost::bind(&VideoConnectionWidget::onServiceAdded, this),
+			boost::function<void ()>(),
+			boost::bind(&VideoConnectionWidget::onServiceRemoved, this)
+	));
+
 	this->selectGuiForConnectionMethodSlot();
 }
 
 VideoConnectionWidget::~VideoConnectionWidget()
 {}
+
+void VideoConnectionWidget::onServiceAdded()
+{
+	std::cout << "VideoConnectionWidget::Added!!!" << std::endl;
+//	mStackedWidget->addWidget(this->wrapVerticalStretch(service->createWidget));
+}
+void VideoConnectionWidget::onServiceRemoved()
+{
+	std::cout << "VideoConnectionWidget::Removed!!!" << std::endl;
+}
 
 void VideoConnectionWidget::initializeScriptWidget()
 {

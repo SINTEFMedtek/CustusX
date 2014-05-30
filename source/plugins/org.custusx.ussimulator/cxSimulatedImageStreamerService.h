@@ -19,6 +19,8 @@
 #include "cxVideoServiceBackend.h"
 #include "cxSimulatedImageStreamer.h"
 
+#include "org_custusx_ussimulator_Export.h"
+
 namespace cx
 {
 
@@ -32,7 +34,7 @@ typedef boost::shared_ptr<class SimulatedImageStreamerService> SimulatedImageStr
  * \date May 20, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class SimulatedImageStreamerService : public StreamerService
+class org_custusx_ussimulator_EXPORT SimulatedImageStreamerService : public StreamerService
 {
 	Q_INTERFACES(cx::StreamerService)
 public:

@@ -22,6 +22,8 @@
 #include <QProcess>
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
+#include "cxServiceTrackerListener.h"
+#include "cxStreamerService.h"
 
 class QPushButton;
 class QComboBox;
@@ -116,7 +118,11 @@ protected:
 	FileInputWidget* mLocalServerFile;
 
 private:
+	void onServiceAdded();
+	void onServiceRemoved();
+
 //	StringDataAdapterXmlPtr mSenderType;
+	boost::shared_ptr<ServiceTrackerListener<StreamerService> > mServiceListener;
 
 };
 
