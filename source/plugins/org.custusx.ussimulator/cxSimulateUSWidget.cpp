@@ -108,7 +108,7 @@ void SimulateUSWidget::gainChanged(int gain)
 SimulatedImageStreamerInterfacePtr SimulateUSWidget::getStreamerInterface()
 {
 	ImageStreamerInterfacePtr imageStreamerInt = videoService()->getVideoConnection()->getVideoConnection()->getStreamerInterface();
-	mSimulatedStreamerInterface = boost::dynamic_pointer_cast<SimulatedImageStreamerInterface>(imageStreamerInt);
+	mSimulatedStreamerInterface = boost::dynamic_pointer_cast<SimulatedImageStreamerService>(imageStreamerInt);
 	return mSimulatedStreamerInterface;
 }
 

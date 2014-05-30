@@ -14,7 +14,7 @@
 #ifndef CXSIMULATEDIMAGESTREAMERINTERFACE_H
 #define CXSIMULATEDIMAGESTREAMERINTERFACE_H
 
-#include "cxImageStreamerInterface.h"
+#include "cxStreamerService.h"
 
 #include "cxVideoServiceBackend.h"
 #include "cxSimulatedImageStreamer.h"
@@ -22,20 +22,21 @@
 namespace cx
 {
 
-typedef boost::shared_ptr<class SimulatedImageStreamerInterface> SimulatedImageStreamerInterfacePtr;
+typedef boost::shared_ptr<class SimulatedImageStreamerService> SimulatedImageStreamerInterfacePtr;
 
 /**
  * \brief Interface to image streamer simulator
  *
- * \ingroup cx_service_video
+ * \ingroup org_custusx_ussimulator
  *
  * \date May 20, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class SimulatedImageStreamerInterface : public StreamerService
+class SimulatedImageStreamerService : public StreamerService
 {
+	Q_INTERFACES(cx::StreamerService)
 public:
-	SimulatedImageStreamerInterface();
+	SimulatedImageStreamerService();
 
 	void setBackend(VideoServiceBackendPtr backend);
 	void setImageToStream(QString imageUid);
@@ -43,6 +44,7 @@ public:
 
 	virtual StreamerPtr createStreamer();
 	virtual BaseWidget* createWidget();
+	virtual QString getName();
 
 private:
 	VideoServiceBackendPtr mBackend;

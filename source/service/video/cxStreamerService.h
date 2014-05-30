@@ -34,13 +34,17 @@ typedef boost::shared_ptr<class Streamer> StreamerPtr;
  * \date May 20, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class StreamerService
+class StreamerService : public QObject
 {
+	Q_OBJECT
 public:
 	StreamerService();
 	virtual StreamerPtr createStreamer() = 0;
 	virtual BaseWidget* createWidget() = 0;
+	virtual QString getName() = 0;
 };
 
 } //end namespace cx
+Q_DECLARE_INTERFACE(cx::StreamerService, StreamerService_iid)
+
 #endif // CXIMAGESTREAMERINTERFACE_H

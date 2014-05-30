@@ -16,7 +16,7 @@
 
 #include <map>
 #include <QString>
-#include "cxImageStreamerInterface.h"
+#include "cxStreamerService.h"
 
 namespace cx
 {

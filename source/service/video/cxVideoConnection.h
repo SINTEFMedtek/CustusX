@@ -20,7 +20,7 @@
 #include "cxForwardDeclarations.h"
 #include "cxVideoSource.h"
 #include "cxProbeData.h"
-#include "cxImageStreamerInterface.h"
+#include "cxStreamerService.h"
 
 class QTimer;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;

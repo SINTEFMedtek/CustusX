@@ -34,7 +34,6 @@
 #include "cxVideoConnectionManager.h"
 #include "cxToolManagerWidget.h"
 #include "cxVideoService.h"
-#include "cxLogicManager.h"
 #include "cxExportDataDialog.h"
 #include "cxGPUImageBuffer.h"
 #include "cxData.h"

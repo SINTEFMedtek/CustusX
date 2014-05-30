@@ -17,7 +17,7 @@
 namespace cxtest
 {
 
-TestVideoConnectionWidget::TestVideoConnectionWidget() :
+/*TestVideoConnectionWidget::TestVideoConnectionWidget() :
 		VideoConnectionWidget(NULL)
 {
 }
@@ -56,6 +56,6 @@ void TestVideoConnectionWidget::setupWidgetToRunStreamer(QString filename, QStri
 	mSimulationWidget->setImageUidToSimulate(image->getUid());
 	mDirectLinkArguments->addItem(connectionArguments);
 	mDirectLinkArguments->setCurrentIndex(mDirectLinkArguments->findText(connectionArguments));
-}
+}*/
 
 } /* namespace cxtest */

@@ -21,7 +21,7 @@
 
 #include "cxXmlOptionItem.h"
 #include "cxStringDataAdapterXml.h"
-#include "cxSimulatedImageStreamerInterface.h"
+#include "cxSimulatedImageStreamerService.h"
 
 class QVBoxLayout;
 

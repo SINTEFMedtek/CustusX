@@ -18,13 +18,17 @@
 #include "vtkForwardDeclarations.h"
 #include "cxImage.h"
 #include "cxDataLocations.h"
-//#include "cxMHDImageStreamer.h"
 
 #include "cxtestJenkinsMeasurement.h"
 #include "cxReporter.h"
 #include "cxSettings.h"
 #include "cxTypeConversions.h"
 #include "cxtestSimulatedImageStreamerFixture.h"
+
+#include <ctkServiceTracker.h>
+#include "cxStreamerService.h"
+#include "cxPluginFramework.h"
+#include "cxLogicManager.h"
 
 namespace cxtest
 {
@@ -99,4 +103,19 @@ TEST_CASE("SimulatedImageStreamer: Speed", "[streaming][integration][speed]")
 	cx::Reporter::shutdown();
 }
 
+TEST_CASE("StreamerService: Service availalbe", "[streaming][service][unit]")
+{
+	cx::LogicManager::initialize();
+
+	cx::PluginFrameworkManagerPtr pluginFramework = cx::logicManager()->getPluginFramework();
+//	ctkPluginContext* context = pluginFramework->getPluginContext();
+
+//	ctkServiceTracker<cx::StreamerService*> tracker(context);
+//	tracker.open();
+//	QList<cx::StreamerService*> serviceList = tracker.getServices();
+//	REQUIRE(serviceList.size() > 0);
+
+	REQUIRE(true);
+	cx::LogicManager::shutdown();
+}
 }//namespace cxtest
