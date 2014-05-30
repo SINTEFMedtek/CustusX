@@ -21,6 +21,11 @@ CommandlineImageStreamerInterface::CommandlineImageStreamerInterface()
 {
 }
 
+QString CommandlineImageStreamerInterface::getName()
+{
+	return "CommandlineImageStreamerInterface";
+}
+
 StreamerPtr CommandlineImageStreamerInterface::createStreamer()
 {
 	return CommandlineImageStreamerFactory().getFromArguments(mArguments);

@@ -18,7 +18,8 @@
 namespace cxtest
 {
 
-TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][streaming]")
+//Test disabled. Create new tests for the pugin
+TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][streaming][hide]")
 {
 	cx::LogicManager::initialize();
 //	cxtest::TestServicesPtr services = cxtest::TestServices::create();
@@ -42,10 +43,10 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][st
 	QString filename = cx::DataLocations::getTestDataPath() + "/testing/TubeSegmentationFramework/Default.mhd";
 	REQUIRE(QFile::exists(filename));
 
-	TestVideoConnectionWidget* widget = new TestVideoConnectionWidget();
-	REQUIRE(widget->canStream(filename, "MHDFile"));
-	REQUIRE(widget->canStream(filename, "SimulatedImageStreamer"));
-	delete widget;
+//	TestVideoConnectionWidget* widget = new TestVideoConnectionWidget();
+//	REQUIRE(widget->canStream(filename, "MHDFile"));
+//	REQUIRE(widget->canStream(filename, "SimulatedImageStreamer"));
+//	delete widget;
 
 //	DummyToolManager::getInstance()->shutdown();
 //	cx::cxDataManager::getInstance()->shutdown();

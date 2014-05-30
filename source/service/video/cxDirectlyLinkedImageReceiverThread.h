@@ -18,7 +18,7 @@
 #include "boost/shared_ptr.hpp"
 
 #include "cxImageReceiverThread.h"
-#include "cxImageStreamerInterface.h"
+#include "cxStreamerService.h"
 
 namespace cx
 {

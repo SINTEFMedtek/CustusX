@@ -16,7 +16,7 @@
 
 #include <map>
 #include <QString>
-#include "cxImageStreamerInterface.h"
+#include "cxStreamerService.h"
 
 namespace cx
 {
@@ -36,6 +36,7 @@ public:
 	CommandlineImageStreamerInterface();
 	virtual StreamerPtr createStreamer();
 	virtual BaseWidget* createWidget();
+	virtual QString getName();
 
 	void setArguments(std::map<QString, QString> arguments) {mArguments = arguments;}
 

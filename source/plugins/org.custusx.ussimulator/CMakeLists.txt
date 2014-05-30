@@ -20,8 +20,7 @@ set(PLUGIN_SRCS
   cxUSSimulatorPluginActivator.cpp
   cxUSSImulatorGUIExtenderService.cpp
   cxSimulateUSWidget.cpp
-  cxSimulatedImageStreamerInterface.cpp
-  cxSimulatedImageStreamerInterface.h
+  cxSimulatedImageStreamerService.cpp
   cxSimulatedImageStreamer.cpp
 )
 
@@ -31,6 +30,7 @@ set(PLUGIN_MOC_SRCS
   cxUSSImulatorGUIExtenderService.h
   cxSimulateUSWidget.h
   cxSimulatedImageStreamer.h
+  cxSimulatedImageStreamerService.h
 )
 
 # Build all files from the UltrasoundSimulation lib

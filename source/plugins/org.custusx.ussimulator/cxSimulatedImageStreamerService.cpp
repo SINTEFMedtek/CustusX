@@ -11,7 +11,7 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-#include "cxSimulatedImageStreamerInterface.h"
+#include "cxSimulatedImageStreamerService.h"
 
 #include "cxToolManager.h"
 #include "cxDataManager.h"
@@ -21,28 +21,33 @@
 namespace cx
 {
 
-SimulatedImageStreamerInterface::SimulatedImageStreamerInterface()
+SimulatedImageStreamerService::SimulatedImageStreamerService()
 {
 }
 
-void SimulatedImageStreamerInterface::setBackend(VideoServiceBackendPtr backend)
+QString SimulatedImageStreamerService::getName()
+{
+	return "SimulatedImageStreamerService";
+}
+
+void SimulatedImageStreamerService::setBackend(VideoServiceBackendPtr backend)
 {
 	mBackend = backend;
 }
 
-void SimulatedImageStreamerInterface::setImageToStream(QString imageUid)
+void SimulatedImageStreamerService::setImageToStream(QString imageUid)
 {
 	mImageUidToSimulate = imageUid;
 }
 
-void SimulatedImageStreamerInterface::setGain(double gain)
+void SimulatedImageStreamerService::setGain(double gain)
 {
 	//must mutex mStreamer
 	if(mStreamer)
 		mStreamer->setGain(gain);
 }
 
-StreamerPtr SimulatedImageStreamerInterface::createStreamer()
+StreamerPtr SimulatedImageStreamerService::createStreamer()
 {
 	mStreamer.reset(new SimulatedImageStreamer());
 	if(!mBackend)
@@ -63,7 +68,7 @@ StreamerPtr SimulatedImageStreamerInterface::createStreamer()
 	return mStreamer;
 }
 
-BaseWidget* SimulatedImageStreamerInterface::createWidget()
+BaseWidget* SimulatedImageStreamerService::createWidget()
 {
 	SimulateUSWidget* mSimulationWidget = new SimulateUSWidget();
 	return mSimulationWidget;

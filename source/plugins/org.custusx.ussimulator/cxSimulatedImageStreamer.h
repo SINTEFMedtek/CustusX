@@ -35,7 +35,7 @@ class DataManager;
  * SimulatedImageStreamer delivers a stream of 2D images
  * sliced from the incoming volume based on the tools positions.
  *
- * \ingroup cx_service_video
+ * \ingroup org_custusx_ussimulator
  * \date May 21, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
