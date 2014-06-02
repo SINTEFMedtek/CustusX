@@ -18,7 +18,7 @@ include_directories(
 
 set(PLUGIN_SRCS
   cxUSSimulatorPluginActivator.cpp
-  cxUSSImulatorGUIExtenderService.cpp
+  #cxUSSimulatorGUIExtenderService.cpp
   cxSimulateUSWidget.cpp
   cxSimulatedImageStreamerService.cpp
   cxSimulatedImageStreamer.cpp
@@ -27,7 +27,7 @@ set(PLUGIN_SRCS
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxUSSimulatorPluginActivator.h
-  cxUSSImulatorGUIExtenderService.h
+  #cxUSSimulatorGUIExtenderService.h
   cxSimulateUSWidget.h
   cxSimulatedImageStreamer.h
   cxSimulatedImageStreamerService.h
