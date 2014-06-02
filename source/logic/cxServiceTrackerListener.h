@@ -35,7 +35,10 @@ class ServiceTrackerListener
 {
 
 public:
-    ServiceTrackerListener(PluginFrameworkManagerPtr pluginFramework, boost::function<void ()> serviceAdded, boost::function<void ()> serviceModified, boost::function<void ()> serviceRemoved)
+		ServiceTrackerListener(PluginFrameworkManagerPtr pluginFramework,
+													 boost::function<void (T*)> serviceAdded,
+													 boost::function<void (T*)> serviceModified,
+													 boost::function<void (T*)> serviceRemoved)
     {
         boost::shared_ptr<ServiceTrackerCustomizer<T> > customizer(new ServiceTrackerCustomizer<T>);
         mServiceTrackerCustomizer = customizer;
