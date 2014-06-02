@@ -22,6 +22,8 @@
 #include <QProcess>
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
+#include "cxServiceTrackerListener.h"
+#include "cxStreamerService.h"
 
 class QPushButton;
 class QComboBox;
@@ -94,7 +96,7 @@ protected:
 	QWidget* createDirectLinkWidget();
 	QWidget* createLocalServerWidget();
 	QWidget* createRemoteWidget();
-	QWidget* createSimulationWidget();
+//	QWidget* createSimulationWidget();
 	QWidget* wrapVerticalStretch(QWidget* input);
 	Transform3D calculate_rMd_ForAProbeImage(ToolPtr probe);
 	QString generateFilename(VideoSourcePtr videoSource);
@@ -112,11 +114,15 @@ protected:
 	QStackedWidget* mStackedWidget;
 	StringDataAdapterXmlPtr mConnectionSelector;
 	ActiveVideoSourceStringDataAdapterPtr mActiveVideoSourceSelector;
-	SimulateUSWidget* mSimulationWidget;
+//	SimulateUSWidget* mSimulationWidget;
 	FileInputWidget* mLocalServerFile;
 
 private:
+	void onServiceAdded(StreamerService *service);
+	void onServiceRemoved(StreamerService *service);
+
 //	StringDataAdapterXmlPtr mSenderType;
+	boost::shared_ptr<ServiceTrackerListener<StreamerService> > mServiceListener;
 
 };
 

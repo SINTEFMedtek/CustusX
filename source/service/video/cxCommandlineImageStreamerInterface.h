@@ -16,7 +16,7 @@
 
 #include <map>
 #include <QString>
-#include "cxImageStreamerInterface.h"
+#include "cxStreamerService.h"
 
 namespace cx {
 
@@ -29,10 +29,13 @@ typedef boost::shared_ptr<class CommandlineImageStreamerInterface> CommandlineIm
  * \date May 20, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class CommandlineImageStreamerInterface: public ImageStreamerInterface {
+class CommandlineImageStreamerInterface : public StreamerService
+{
 public:
 	CommandlineImageStreamerInterface();
 	virtual StreamerPtr createStreamer();
+	virtual BaseWidget* createWidget();
+	virtual QString getName();
 
 	void setArguments(std::map<QString, QString> arguments) {
 		mArguments = arguments;

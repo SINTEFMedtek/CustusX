@@ -59,7 +59,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	preferencesWidgets/cxPreferenceTab
     #----------------------
 	streamingWidgets/cxVideoConnectionWidget
-	streamingWidgets/cxSimulateUSWidget
+	#streamingWidgets/cxSimulateUSWidget
     #----------------------
 	toolWidgets/cxToolPropertiesWidget
 	toolWidgets/cxActiveToolWidget

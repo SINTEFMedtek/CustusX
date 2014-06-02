@@ -59,9 +59,9 @@ ReconstructionManager::ReconstructionManager(XmlOptionFile settings, QString sha
 
 	mServiceListener.reset(new ServiceTrackerListener<ReconstructionService>(
 	        LogicManager::getInstance()->getPluginFramework(),
-	        boost::bind(&ReconstructionManager::onServiceAdded, this),
-	        boost::function<void ()>(),
-	        boost::bind(&ReconstructionManager::onServiceRemoved, this)
+					boost::bind(&ReconstructionManager::onServiceAdded, this, _1),
+					boost::function<void (ReconstructionService*)>(),
+					boost::bind(&ReconstructionManager::onServiceRemoved, this, _1)
 	));
 }
 
@@ -381,11 +381,11 @@ ReconstructCorePtr ReconstructionManager::createBModeCore()
 	return retval;
 }
 
-void ReconstructionManager::onServiceAdded()
+void ReconstructionManager::onServiceAdded(ReconstructionService* service)
 {
     std::cout << "ReconstructManager::Added!!!" << std::endl;
 }
-void ReconstructionManager::onServiceRemoved()
+void ReconstructionManager::onServiceRemoved(ReconstructionService *service)
 {
     std::cout << "ReconstructManager::Removed!!!" << std::endl;
 }

@@ -11,30 +11,30 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-#include "cxCommandlineImageStreamerInterface.h"
-#include "cxCommandlineImageStreamerFactory.h"
+
+#include "cxUSSimulatorGUIExtenderService.h"
+#include "cxSimulateUSWidget.h"
 
 namespace cx
 {
 
-CommandlineImageStreamerInterface::CommandlineImageStreamerInterface()
+USSimulatorGUIExtenderService::USSimulatorGUIExtenderService()
 {
 }
 
-QString CommandlineImageStreamerInterface::getName()
+USSimulatorGUIExtenderService::~USSimulatorGUIExtenderService()
 {
-	return "CommandlineImageStreamerInterface";
 }
 
-StreamerPtr CommandlineImageStreamerInterface::createStreamer()
+std::vector<GUIExtenderService::CategorizedWidget> USSimulatorGUIExtenderService::createWidgets() const
 {
-	return CommandlineImageStreamerFactory().getFromArguments(mArguments);
+	std::vector<CategorizedWidget> retval;
+
+	retval.push_back(GUIExtenderService::CategorizedWidget(
+			new SimulateUSWidget(),
+			"Plugins"));
+
+	return retval;
 }
 
-BaseWidget* CommandlineImageStreamerInterface::createWidget()
-{
-	//TODO: Move widget creation here. Impelemnt same way as SimulatedImageStreamerInterface
-	return NULL;
-}
-
-} //end namespace cx
+} // namespace cx

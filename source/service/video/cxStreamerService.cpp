@@ -10,12 +10,12 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-#include "cxImageStreamerInterface.h"
+#include "cxStreamerService.h"
 
 namespace cx
 {
 
-ImageStreamerInterface::ImageStreamerInterface()
+StreamerService::StreamerService()
 {
 }
 

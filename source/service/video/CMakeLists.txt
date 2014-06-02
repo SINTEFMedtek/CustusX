@@ -16,7 +16,7 @@
 #               Video Service
 ###########################################################
 
-option(CX_BUILD_US_SIMULATOR "Build the US from CT/MR simulator" OFF)
+#option(CX_BUILD_US_SIMULATOR "Build the US from CT/MR simulator" OFF)
 
 SET( CX_QT_MOC_HEADER_FILES
     cxBasicVideoSource.h
@@ -27,7 +27,8 @@ SET( CX_QT_MOC_HEADER_FILES
     cxImageReceiverThread.h
     cxDirectlyLinkedImageReceiverThread.h
     cxIGTLinkedImageReceiverThread.h
-    cxSimulatedImageStreamer.h
+    #cxSimulatedImageStreamer.h
+    cxStreamerService.h
 )
 
 SET (cxVideoService_SOURCE
@@ -49,14 +50,13 @@ SET (cxVideoService_SOURCE
     cxDirectlyLinkedImageReceiverThread.h
     cxDirectlyLinkedImageReceiverThread.cpp
     
-    cxSimulatedImageStreamer.h
-    cxSimulatedImageStreamer.cpp
+    #cxSimulatedImageStreamer.h
+    #cxSimulatedImageStreamer.cpp
     cxVideoServiceBackend.h
     cxVideoServiceBackend.cpp
-    cxImageStreamerInterface.h
-    cxImageStreamerInterface.cpp
-    cxSimulatedImageStreamerInterface.h
-    cxSimulatedImageStreamerInterface.cpp
+    cxStreamerService.cpp
+    #cxSimulatedImageStreamerInterface.h
+    #cxSimulatedImageStreamerInterface.cpp
     cxCommandlineImageStreamerInterface.h
     cxCommandlineImageStreamerInterface.cpp
     cxImageStreamerFactory.h
@@ -64,22 +64,22 @@ SET (cxVideoService_SOURCE
 )
 
 # Build all files from the UltrasoundSimulation lib
-IF(CX_BUILD_US_SIMULATOR)
-   SET(SIMULATOR_SPECKLE_PATH ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation)
+#IF(CX_BUILD_US_SIMULATOR)
+#   SET(SIMULATOR_SPECKLE_PATH ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation)
 
-    configure_file(
-        "${CMAKE_CURRENT_SOURCE_DIR}/simConfig.h.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/simConfig.h"
-    )
+#    configure_file(
+#        "${CMAKE_CURRENT_SOURCE_DIR}/simConfig.h.in"
+#        "${CMAKE_CURRENT_BINARY_DIR}/simConfig.h"
+#    )
 
-    SET(cxVideoService_SOURCE
-        ${cxVideoService_SOURCE}
-        ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageSimulator.h
-        ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageSimulator.cpp
-        ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageArray.h
-        ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageArray.cpp
-    )
-ENDIF(CX_BUILD_US_SIMULATOR)
+#    SET(cxVideoService_SOURCE
+#        ${cxVideoService_SOURCE}
+#        ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageSimulator.h
+#        ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageSimulator.cpp
+#        ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageArray.h
+#        ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageArray.cpp
+#    )
+#ENDIF(CX_BUILD_US_SIMULATOR)
 
 include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
@@ -89,6 +89,8 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CMAKE_CURRENT_BINARY_DIR}
+    ${CustusX3_SOURCE_DIR}/source/resource/widgets
+#cxResourceWidgets
     )
 
 

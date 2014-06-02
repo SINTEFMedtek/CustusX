@@ -14,6 +14,8 @@
 
 #include "cxVideoConnectionWidget.h"
 
+#include <boost/bind.hpp>
+
 #include <QDir>
 #include <QStackedWidget>
 #include <QPushButton>
@@ -40,15 +42,16 @@
 #include "cxPatientData.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"
-#include "cxSimulateUSWidget.h"
+//#include "cxSimulateUSWidget.h"
 #include "cxFileInputWidget.h"
 #include "cxLogger.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
 
 VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
-		BaseWidget(parent, "IGTLinkWidget", "Video Connection"), mSimulationWidget(NULL)
+		BaseWidget(parent, "IGTLinkWidget", "Video Connection")//, mSimulationWidget(NULL)
 {
 	mInitScriptWidget=NULL;
 
@@ -73,11 +76,29 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 	mToptopLayout->addWidget(sscCreateDataWidget(this, mActiveVideoSourceSelector));
 	mToptopLayout->addStretch();
 
+	mServiceListener.reset(new ServiceTrackerListener<StreamerService>(
+													 LogicManager::getInstance()->getPluginFramework(),
+													 boost::bind(&VideoConnectionWidget::onServiceAdded, this, _1),
+													 boost::function<void (StreamerService*)>(),
+//													 boost::bind(&VideoConnectionWidget::onServiceAdded, this, _1),
+													 boost::bind(&VideoConnectionWidget::onServiceRemoved, this, _1)
+													 ));
+
 	this->selectGuiForConnectionMethodSlot();
 }
 
 VideoConnectionWidget::~VideoConnectionWidget()
 {}
+
+void VideoConnectionWidget::onServiceAdded(StreamerService* service)
+{
+	std::cout << "VideoConnectionWidget::Added!!!" << std::endl;
+//	mStackedWidget->addWidget(this->wrapVerticalStretch(service->createWidget()));
+}
+void VideoConnectionWidget::onServiceRemoved(StreamerService *service)
+{
+	std::cout << "VideoConnectionWidget::Removed!!!" << std::endl;
+}
 
 void VideoConnectionWidget::initializeScriptWidget()
 {
@@ -232,11 +253,11 @@ QWidget* VideoConnectionWidget::createRemoteWidget()
 	return retval;
 }
 
-QWidget* VideoConnectionWidget::createSimulationWidget()
-{
-	mSimulationWidget = new SimulateUSWidget();
-	return mSimulationWidget;
-}
+//QWidget* VideoConnectionWidget::createSimulationWidget()
+//{
+//	mSimulationWidget = new SimulateUSWidget();
+//	return mSimulationWidget;
+//}
 
 QString VideoConnectionWidget::defaultWhatsThis() const
 {
@@ -375,7 +396,10 @@ QStackedWidget* VideoConnectionWidget::initializeStackedWidget()
 	stackedWidget->addWidget(this->wrapVerticalStretch(this->createDirectLinkWidget()));
 	stackedWidget->addWidget(this->wrapVerticalStretch(this->createLocalServerWidget()));
 	stackedWidget->addWidget(this->wrapVerticalStretch(this->createRemoteWidget()));
-	stackedWidget->addWidget(this->wrapVerticalStretch(this->createSimulationWidget()));
+//	stackedWidget->addWidget(this->wrapVerticalStretch(this->createSimulationWidget()));
+
+	//TODO: Get widget from StreamerService (plugin)
+
 	return stackedWidget;
 }
 

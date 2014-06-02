@@ -52,6 +52,7 @@ set(CX_PLUGINS
   plugins/org.custusx.example:ON
   plugins/org.custusx.tordreconstruction:ON
   plugins/org.custusx.patientmodel:ON
+  plugins/org.custusx.ussimulator:ON
 )
 
 ctkMacroSetupPlugins(${CX_PLUGINS})
