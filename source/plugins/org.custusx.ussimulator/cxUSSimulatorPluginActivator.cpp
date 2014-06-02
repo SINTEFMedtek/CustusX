@@ -17,7 +17,7 @@
 #include <QtPlugin>
 #include <iostream>
 
-#include "cxUSSimulatorGUIExtenderService.h"
+#include "cxSimulatedImageStreamerService.h"
 
 namespace cx
 {
@@ -38,11 +38,11 @@ void USSimulatorPluginActivator::start(ctkPluginContext* context)
 	std::cout << "Started USSimulatorPluginActivator" << std::endl;
 	this->mContext = context;
 
-	mPlugin.reset(new USSimulatorGUIExtenderService);
+	mPlugin.reset(new cx::SimulatedImageStreamerService);
 	std::cout << "created ussimulator plugin service" << std::endl;
 	try
 	{
-		context->registerService(QStringList(GUIExtenderService_iid), mPlugin.get());
+		context->registerService(QStringList(StreamerService_iid), mPlugin.get());
 	}
 	catch(ctkRuntimeException& e)
 	{

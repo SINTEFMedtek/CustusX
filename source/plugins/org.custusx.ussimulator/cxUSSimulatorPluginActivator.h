@@ -21,7 +21,7 @@
 namespace cx
 {
 
-typedef boost::shared_ptr<class USSimulatorGUIExtenderService> USSimulatorGUIExtenderServicePtr;
+typedef boost::shared_ptr<class SimulatedImageStreamerService> SimulatedImageStreamerServicePtr;
 
 /**
  * Activator for the ussimulator plugin
@@ -46,7 +46,7 @@ public:
 
 private:
 	ctkPluginContext* mContext;
-	USSimulatorGUIExtenderServicePtr mPlugin;
+	SimulatedImageStreamerServicePtr mPlugin;
 };
 
 }// namespace cx
