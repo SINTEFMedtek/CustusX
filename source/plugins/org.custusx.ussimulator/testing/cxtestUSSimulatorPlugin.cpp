@@ -29,6 +29,32 @@
 #include "cxStreamerService.h"
 #include "cxPluginFramework.h"
 #include "cxLogicManager.h"
+#include "org_custusx_ussimulator_Export.h" //Needed?
+
+namespace {
+
+cx::StreamerService* getStreamerService(QString name)
+{
+	cx::PluginFrameworkManagerPtr pluginFramework = cx::logicManager()->getPluginFramework();
+	ctkPluginContext* context = pluginFramework->getPluginContext();
+
+	ctkServiceTracker<cx::StreamerService*> tracker(context);
+	tracker.open();
+
+	QList<cx::StreamerService*> serviceList = tracker.getServices();
+//	REQUIRE(serviceList.size() > 0);
+
+	for(int i = 0; i < serviceList.size(); ++i)
+	{
+		cx::StreamerService* service = serviceList.at(i);
+		if (service->getName() == name)
+		return service;
+	}
+
+	return NULL;
+}
+
+}
 
 namespace cxtest
 {
@@ -126,6 +152,16 @@ TEST_CASE("StreamerService: Service available", "[streaming][service][unit]")
 		REQUIRE(service->createStreamer());
 	}
 
+
 	cx::LogicManager::shutdown();
 }
+
+TEST_CASE("StreamerService: SimulatedImageStreamerService available", "[streaming][service][unit]")
+{
+	cx::LogicManager::initialize();
+	cx::StreamerService* service = getStreamerService("SimulatedImageStreamerService");
+	REQUIRE(service);
+	cx::LogicManager::shutdown();
+}
+
 }//namespace cxtest
