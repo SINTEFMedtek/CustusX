@@ -25,8 +25,10 @@ public:
 	void requireNoSimulatedFrame(bool silentAtArrive = false);
 	void checkSimulatedFrames(int numFrames, bool silentAtArrive = false);
 
+#ifdef CX_BUILD_US_SIMULATOR
 	static ImageSimulator constructImageSimulatorVariable();
 	static boost::shared_ptr<ImageSimulator> constructImageSimulatorBoostPtr();
+#endif //CX_BUILD_US_SIMULATOR
 
 private:
 	TestSenderPtr mSender;

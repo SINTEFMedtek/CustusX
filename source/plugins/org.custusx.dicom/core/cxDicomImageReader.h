@@ -58,6 +58,7 @@ public:
 	ctkDICOMItemPtr item() const;
 	WindowLevel getWindowLevel() const;
 	int getNumberOfFrames() const;
+	QString getPatientName() const;
 
 private:
 	DcmFileFormat mFileFormat;
@@ -72,6 +73,7 @@ private:
 	void error(QString message) const;
 //	void localDebug(QString message) const;
 	double getDouble(const DcmTagKey& tag, const unsigned long pos=0, const OFBool searchIntoSub = OFFalse) const;
+	QString formatPatientName(QString rawName) const;
 
 	ctkDICOMItemPtr wrapInCTK(DcmItem* item) const;
 };

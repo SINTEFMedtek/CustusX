@@ -5,29 +5,37 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 include_directories(
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CustusX3_SOURCE_DIR}/source/modules/GUIExtender
+    ./core
+    ./widgets
     )
 
 set(PLUGIN_SRCS
   cxDicomPluginActivator.cpp
   cxDicomGUIExtenderService.cpp
-  cxDicomWidget.cpp
-  cxDicomConverter.h
-  cxDicomConverter.cpp
-  cxDicomImageReader.h
-  cxDicomImageReader.cpp
-  cxDICOMAppWidget.cpp
-  cxDICOMModel.cpp
-  cxDicomImporter.cpp
+  cxDicomGUIExtenderService.h
+
+  core/cxDicomConverter.h
+  core/cxDicomConverter.cpp
+  core/cxDicomImageReader.h
+  core/cxDicomImageReader.cpp
+  core/cxDicomImporter.cpp
+
+  widgets/cxDicomWidget.cpp
+  widgets/cxDICOMAppWidget.cpp
+  widgets/cxDICOMModel.cpp
+  widgets/cxDicomModelNode.cpp
+  widgets/cxDicomModelNode.h
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-  cxDICOMAppWidget.h
-  cxDICOMModel.h
   cxDicomPluginActivator.h
-  cxDicomGUIExtenderService.h
-  cxDicomWidget.h
-  cxDicomImporter.h
+
+  core/cxDicomImporter.h
+
+  widgets/cxDICOMAppWidget.h
+  widgets/cxDICOMModel.h
+  widgets/cxDicomWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic
