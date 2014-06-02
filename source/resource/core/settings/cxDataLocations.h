@@ -29,7 +29,7 @@ class DataLocations
 {
 public:
   static QString getBundlePath(); ///< return the folder where the bundle or executable are located.
-  static QString getRootConfigPath(); ///< return path to root config folder
+	static QString getRootConfigPath(); ///< return path to root config folder. May be replaced with getExistingConfigPath()
   static QString getTestDataPath(); ///< return path to test data folder
   static QString getToolsPath(); ///< return path to folder containing all defined tools
   static QString getApplicationToolConfigPath(); ///< return path to tool config folder, based on choosen application
@@ -41,10 +41,7 @@ public:
   static QString getXmlSettingsFile(); ///< return a filename for a xml file containing global custusX data (equal to settings above)
 	static QString getCachePath(); ///< return path to a folder that is used during execution, will be cleared at start and stop.
 	static QString getDefaultPluginsPath(); ///< return the folder where plugins should be located, by default.
-#ifdef CX_USE_TSF
-  static QString getTSFPath(); ///< return path to a folder where files needed for tube segmentation framework are located
-  static QString getTSFOULPath(); ///< return path to a folder where files needed for tube segmentation framework are located
-#endif
+
 	static QString getExistingConfigPath(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath); ///< Return folder path. Path is typically either relative to config root (created during installation), or an alternative absolute path (typically in the source tree)
 
   static void setTestMode(); ///< set a testing mode that changes location of settings files to a temp folder.

@@ -15,6 +15,8 @@
 #include "cxDicomImageReader.h"
 #include "cxLogger.h"
 
+#include "dcvrpn.h"
+
 namespace cx
 {
 
@@ -219,6 +221,60 @@ Eigen::Array3i DicomImageReader::getDim(const DicomImage& dicomImage) const
 	dim[1] = dicomImage.getHeight();
 	dim[2] = dicomImage.getFrameCount();
 	return dim;
+}
+
+QString DicomImageReader::getPatientName() const
+{
+	QString rawName = this->item()->GetElementAsString(DCM_PatientName);
+	return this->formatPatientName(rawName);
+}
+
+QString DicomImageReader::formatPatientName(QString rawName) const
+{
+	// ripped from ctkDICOMModel
+
+	OFString dicomName = rawName.toStdString().c_str();
+	OFString formattedName;
+	OFString lastName, firstName, middleName, namePrefix, nameSuffix;
+	OFCondition l_error = DcmPersonName::getNameComponentsFromString(dicomName,
+																	 lastName, firstName, middleName, namePrefix, nameSuffix);
+	if (l_error.good())
+	{
+		formattedName.clear();
+		/* concatenate name components per this convention
+   * Last, First Middle, Suffix (Prefix)
+   * */
+		if (!lastName.empty())
+		{
+			formattedName += lastName;
+			if ( !(firstName.empty() && middleName.empty()) )
+			{
+				formattedName += ",";
+			}
+		}
+		if (!firstName.empty())
+		{
+			formattedName += " ";
+			formattedName += firstName;
+		}
+		if (!middleName.empty())
+		{
+			formattedName += " ";
+			formattedName += middleName;
+		}
+		if (!nameSuffix.empty())
+		{
+			formattedName += ", ";
+			formattedName += nameSuffix;
+		}
+		if (!namePrefix.empty())
+		{
+			formattedName += " (";
+			formattedName += namePrefix;
+			formattedName += ")";
+		}
+	}
+	return QString(formattedName.c_str());
 }
 
 

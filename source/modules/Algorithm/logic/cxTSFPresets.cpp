@@ -6,6 +6,7 @@
 #include <QTextStream>
 #include "cxReporter.h"
 #include "cxDataLocations.h"
+#include "tsf-config.h"
 
 namespace cx
 {
@@ -13,7 +14,7 @@ namespace cx
 TSFPresets::TSFPresets() :
 		Presets(XmlOptionFile("Preset"), XmlOptionFile("Custom"))
 {
-	mPresetPath = cx::DataLocations::getTSFPath() + "/parameters";
+	mPresetPath = cx::DataLocations::getExistingConfigPath("/tsf", QString(KERNELS_DIR)) + "/parameters";
 	this->loadPresetsFromFiles();
 }
 

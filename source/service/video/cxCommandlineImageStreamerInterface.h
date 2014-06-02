@@ -18,8 +18,7 @@
 #include <QString>
 #include "cxStreamerService.h"
 
-namespace cx
-{
+namespace cx {
 
 typedef boost::shared_ptr<class CommandlineImageStreamerInterface> CommandlineImageStreamerInterfacePtr;
 /**
@@ -38,10 +37,12 @@ public:
 	virtual BaseWidget* createWidget();
 	virtual QString getName();
 
-	void setArguments(std::map<QString, QString> arguments) {mArguments = arguments;}
+	void setArguments(std::map<QString, QString> arguments) {
+		mArguments = arguments;
+	}
 
-	private:
-		std::map<QString, QString> mArguments;
+private:
+	std::map<QString, QString> mArguments;
 };
 
 } //end namespace cx

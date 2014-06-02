@@ -15,49 +15,15 @@
 #ifndef CXDICOMIMPORTER_H
 #define CXDICOMIMPORTER_H
 
-// std includes
-#include <iostream>
-
-#include <dcmimage.h>
-
 // Qt includes
-#include <QAction>
-#include <QCoreApplication>
-#include <QCheckBox>
-#include <QDebug>
-#include <QMessageBox>
-#include <QMetaType>
-#include <QModelIndex>
-#include <QPersistentModelIndex>
-#include <QProgressDialog>
-#include <QSettings>
-#include <QSlider>
-#include <QTabBar>
-#include <QTimer>
-#include <QTreeView>
-#include <QLabel>
-#include <QHBoxLayout>
+#include <QString>
+#include <QObject>
+#include <QSharedPointer>
 
-// ctkWidgets includes
-#include "ctkDirectoryButton.h"
-#include "ctkFileDialog.h"
-
-// ctkDICOMCore includes
-#include "ctkDICOMDatabase.h"
-#include "ctkDICOMFilterProxyModel.h"
-#include "ctkDICOMIndexer.h"
-#include "ctkDICOMModel.h"
-
-// ctkDICOMWidgets includes
-#include "cxDICOMAppWidget.h"
-#include "ctkDICOMThumbnailGenerator.h"
-#include "ctkThumbnailLabel.h"
-#include "ctkDICOMQueryResultsTabWidget.h"
-#include "ctkDICOMQueryRetrieveWidget.h"
-#include "ctkDICOMQueryWidget.h"
-#include <QToolBar>
-#include "ctkDICOMThumbnailListWidget.h"
-#include "cxDicomImporter.h"
+class ctkDICOMDatabase;
+class ctkDICOMIndexer;
+class ctkFileDialog;
+class QProgressDialog;
 
 namespace cx
 {
@@ -89,8 +55,19 @@ public:
 	int instancesAddedDuringImport();
 
 
+public slots:
+	  /// Import a directory - this is used when the user selects a directory
+	  /// from the Import Dialog, but can also be used externally to trigger
+	  /// an import (i.e. for testing or to support drag-and-drop)
+	  void onImportDirectory(QString directory);
+
+signals:
+	void directoryImported();
+	void indexingCompleted();
+	void fileIndexed(QString);
 
 
+private:
 	void showIndexerDialog();
 
 	ctkFileDialog* ImportDialog;
@@ -106,12 +83,6 @@ public:
 	int SeriesAddedDuringImport;
 	int InstancesAddedDuringImport;
 
-public slots:
-	  /// Import a directory - this is used when the user selects a directory
-	  /// from the Import Dialog, but can also be used externally to trigger
-	  /// an import (i.e. for testing or to support drag-and-drop)
-	  void onImportDirectory(QString directory);
-
 private slots:
 	void onFileIndexed(const QString& filePath);
 	void openImportDialog();
@@ -123,10 +94,6 @@ private slots:
 	void onSeriesAdded(QString);
 	void onInstanceAdded(QString);
 
-signals:
-	void directoryImported();
-	void indexingCompleted();
-	void fileIndexed(QString);
 };
 
 
