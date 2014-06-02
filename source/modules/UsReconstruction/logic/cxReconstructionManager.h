@@ -148,8 +148,8 @@ private:
 	cx::CompositeTimedAlgorithmPtr assembleReconstructionPipeline(std::vector<ReconstructCorePtr> cores); ///< assembles the different steps that is needed to reconstruct
 	bool canCoresRunInParallel(std::vector<ReconstructCorePtr> cores);
 
-    void onServiceAdded();
-    void onServiceRemoved();
+		void onServiceAdded(ReconstructionService *service);
+		void onServiceRemoved(ReconstructionService *service);
 
 	ReconstructParamsPtr mParams;
 	std::vector<DataAdapterPtr> mAlgoOptions;

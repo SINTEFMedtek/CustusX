@@ -118,8 +118,8 @@ protected:
 	FileInputWidget* mLocalServerFile;
 
 private:
-	void onServiceAdded();
-	void onServiceRemoved();
+	void onServiceAdded(StreamerService *service);
+	void onServiceRemoved(StreamerService *service);
 
 //	StringDataAdapterXmlPtr mSenderType;
 	boost::shared_ptr<ServiceTrackerListener<StreamerService> > mServiceListener;

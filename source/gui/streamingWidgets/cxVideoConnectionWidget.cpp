@@ -77,11 +77,12 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 	mToptopLayout->addStretch();
 
 	mServiceListener.reset(new ServiceTrackerListener<StreamerService>(
-			LogicManager::getInstance()->getPluginFramework(),
-			boost::bind(&VideoConnectionWidget::onServiceAdded, this),
-			boost::function<void ()>(),
-			boost::bind(&VideoConnectionWidget::onServiceRemoved, this)
-	));
+													 LogicManager::getInstance()->getPluginFramework(),
+													 boost::bind(&VideoConnectionWidget::onServiceAdded, this, _1),
+													 boost::function<void (StreamerService*)>(),
+//													 boost::bind(&VideoConnectionWidget::onServiceAdded, this, _1),
+													 boost::bind(&VideoConnectionWidget::onServiceRemoved, this, _1)
+													 ));
 
 	this->selectGuiForConnectionMethodSlot();
 }
@@ -89,12 +90,12 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 VideoConnectionWidget::~VideoConnectionWidget()
 {}
 
-void VideoConnectionWidget::onServiceAdded()
+void VideoConnectionWidget::onServiceAdded(StreamerService* service)
 {
 	std::cout << "VideoConnectionWidget::Added!!!" << std::endl;
-//	mStackedWidget->addWidget(this->wrapVerticalStretch(service->createWidget));
+//	mStackedWidget->addWidget(this->wrapVerticalStretch(service->createWidget()));
 }
-void VideoConnectionWidget::onServiceRemoved()
+void VideoConnectionWidget::onServiceRemoved(StreamerService *service)
 {
 	std::cout << "VideoConnectionWidget::Removed!!!" << std::endl;
 }
