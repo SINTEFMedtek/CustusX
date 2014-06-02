@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 #include "cxImageStreamerFactory.h"
 
-#include "cxSimulatedImageStreamerInterface.h"
+//#include "cxSimulatedImageStreamerInterface.h"
 #include "cxCommandlineImageStreamerInterface.h"
 
 namespace cx
@@ -38,13 +38,13 @@ void ImageStreamerFactory::setImageToStream(QString imageUid)
 	mImageUidToSimulate = imageUid;
 }
 
-ImageStreamerInterfacePtr ImageStreamerFactory::getSimulatedStreamerInterface()
-{
-	SimulatedImageStreamerInterfacePtr streamerInterface(new SimulatedImageStreamerInterface());
-	streamerInterface->setBackend(mBackend);
-	streamerInterface->setImageToStream(mImageUidToSimulate);
-	return streamerInterface;
-}
+//ImageStreamerInterfacePtr ImageStreamerFactory::getSimulatedStreamerInterface()
+//{
+//	SimulatedImageStreamerInterfacePtr streamerInterface(new SimulatedImageStreamerInterface());
+//	streamerInterface->setBackend(mBackend);
+//	streamerInterface->setImageToStream(mImageUidToSimulate);
+//	return streamerInterface;
+//}
 
 ImageStreamerInterfacePtr ImageStreamerFactory::getCommandlineStreamerInterface()
 {
@@ -55,9 +55,9 @@ ImageStreamerInterfacePtr ImageStreamerFactory::getCommandlineStreamerInterface(
 
 ImageStreamerInterfacePtr ImageStreamerFactory::getStreamerInterface()
 {
-	if(mArguments["type"] == "SimulatedImageStreamer")
-		return this->getSimulatedStreamerInterface();
-	else
+//	if(mArguments["type"] == "SimulatedImageStreamer")
+//		return this->getSimulatedStreamerInterface();
+//	else
 		return this->getCommandlineStreamerInterface();
 }
 

@@ -22,7 +22,7 @@
 #include "cxToolManager.h"
 #include "cxDataManager.h"
 #include "cxVideoServiceBackend.h"
-#include "cxImageStreamerInterface.h"
+#include "cxStreamerService.h"
 #include "cxImageStreamer.h"
 
 namespace cx

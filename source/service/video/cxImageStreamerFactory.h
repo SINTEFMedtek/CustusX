@@ -16,7 +16,7 @@
 
 #include <map>
 #include <QString>
-#include "cxImageStreamerInterface.h"
+#include "cxStreamerService.h"
 
 namespace cx
 {
@@ -39,7 +39,7 @@ public:
 	void setArguments(std::map<QString, QString> arguments);
 	void setImageToStream(QString imageUid);
 
-	ImageStreamerInterfacePtr getSimulatedStreamerInterface();
+//	ImageStreamerInterfacePtr getSimulatedStreamerInterface();
 	ImageStreamerInterfacePtr getCommandlineStreamerInterface();
 	ImageStreamerInterfacePtr getStreamerInterface();
 
