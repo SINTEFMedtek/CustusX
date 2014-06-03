@@ -42,7 +42,7 @@ class SimulateUSWidget : public BaseWidget
 	Q_OBJECT
 
 public:
-	SimulateUSWidget(QWidget* parent = NULL);
+	SimulateUSWidget(SimulatedImageStreamerService* service, QWidget* parent = NULL);
 	~SimulateUSWidget();
 
 	virtual QString defaultWhatsThis() const;
@@ -60,13 +60,11 @@ private slots:
 
 private:
 	void createAndAddGainController();
-	SimulatedImageStreamerInterfacePtr getStreamerInterface();
-
 	QVBoxLayout* mTopLayout;
 	SelectImageStringDataAdapterPtr mImageSelector;
 
 	StringDataAdapterXmlPtr mSimulationType;
-	SimulatedImageStreamerInterfacePtr mSimulatedStreamerInterface;
+	SimulatedImageStreamerServicePtr mService;
 
 };
 

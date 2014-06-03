@@ -67,7 +67,7 @@ public:
 	void disconnectServer();
 
 	std::vector<VideoSourcePtr> getVideoSources();
-	ImageStreamerInterfacePtr getStreamerInterface();
+	StreamerServicePtr getStreamerInterface();
 
 
 signals:
@@ -103,7 +103,7 @@ private:
 
 	VideoServiceBackendPtr mBackend;
 
-	ImageStreamerInterfacePtr mStreamerInterface;
+	StreamerServicePtr mStreamerInterface;
 };
 typedef boost::shared_ptr<VideoConnection> VideoConnectionPtr;
 

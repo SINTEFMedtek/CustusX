@@ -26,8 +26,9 @@
 
 namespace cx
 {
-SimulateUSWidget::SimulateUSWidget(QWidget* parent) :
+SimulateUSWidget::SimulateUSWidget(SimulatedImageStreamerService *service, QWidget* parent) :
 		BaseWidget(parent, "SimulateUSWidget", "Simulated US"),
+		mService(service),
 		mImageSelector(SelectImageStringDataAdapter::New())
 {
 	QString selectedSimulation = settings()->value("USsimulation/type", "Original data").toString();
@@ -93,23 +94,16 @@ void SimulateUSWidget::simulationTypeChanged()
 
 void SimulateUSWidget::imageChangedSlot(QString imageUid)
 {
-	if(this->getStreamerInterface())
-		mSimulatedStreamerInterface->setImageToStream(imageUid);
+	if(mService)
+		mService->setImageToStream(imageUid);
 	settings()->setValue("USsimulation/volume", mImageSelector->getValue());
 }
 
 void SimulateUSWidget::gainChanged(int gain)
 {
-	if(this->getStreamerInterface())
-		mSimulatedStreamerInterface->setGain(gain/100.0);
+	if(mService)
+		mService->setGain(gain/100.0);
 	settings()->setValue("USsimulation/gain", gain/100.0);
-}
-
-SimulatedImageStreamerInterfacePtr SimulateUSWidget::getStreamerInterface()
-{
-	ImageStreamerInterfacePtr imageStreamerInt = videoService()->getVideoConnection()->getVideoConnection()->getStreamerInterface();
-	mSimulatedStreamerInterface = boost::dynamic_pointer_cast<SimulatedImageStreamerService>(imageStreamerInt);
-	return mSimulatedStreamerInterface;
 }
 
 } /* namespace cx */
