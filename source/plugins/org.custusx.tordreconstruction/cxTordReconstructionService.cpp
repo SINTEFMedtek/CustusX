@@ -14,9 +14,6 @@
 
 #include "cxTordReconstructionService.h"
 #include "cxReporter.h"
-//#include "cxTypeConversions.h"
-//#include "HelperFunctions.hpp"
-//#include <vtkImageData.h>
 #include "recConfig.h"
 
 namespace cx
@@ -70,7 +67,6 @@ std::vector<DataAdapterPtr> TordReconstructionService::getSettings(QDomElement r
 
 bool TordReconstructionService::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr outputData, QDomElement settings)
 {
-
     int nClosePlanes = getMaxPlanesOption(settings)->getValue();
 
     int method = getMethodID(settings);

@@ -42,6 +42,72 @@ typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconst
 typedef boost::shared_ptr<class ThreadedTimedReconstructPreprocessor> ThreadedTimedReconstructPreprocessorPtr;
 typedef boost::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedReconstructCorePtr;
 
+
+class ReconstructionManager : public QObject
+{
+	Q_OBJECT
+public:
+	ReconstructionManager(XmlOptionFile settings, QString shaderPath){};
+	virtual ~ReconstructionManager(){};
+
+	virtual void init() = 0;
+
+	//SET INPUT
+	virtual void selectData(QString filename, QString calFilesPath = "") = 0; ///< Set input data for reconstruction
+	virtual void selectData(USReconstructInputData data) = 0; ///< Set input data for reconstruction
+
+	//GETTERS
+	virtual QString getSelectedFilename() const = 0; ///< Get the currently selected filename
+	virtual USReconstructInputData getSelectedFileData() = 0; ///< Return the currently selected input data
+	virtual ReconstructParamsPtr getParams() = 0; ///< Return control parameters that can be adjusted by the GUI or similar prior to reconstruction
+	virtual std::vector<DataAdapterPtr> getAlgoOptions() = 0; ///< Return control parameters for the currently selected algorithm, adjustable like getParams()
+	virtual XmlOptionFile getSettings() = 0; ///< Return the settings xml file where parameters are stored
+	virtual OutputVolumeParams getOutputVolumeParams() const = 0; ///< Return params controlling the output data. These are data-dependent.
+
+	//SETTERS
+	virtual void setOutputVolumeParams(const OutputVolumeParams& par) = 0; ///< Control the output volume
+	virtual void setOutputRelativePath(QString path) = 0; ///< Set location of output relative to base
+	virtual void setOutputBasePath(QString path) = 0; ///< Set base location of output
+
+	/** Execute the reconstruction in another thread.
+	  *
+	  * The returned cores can be used to retrieve output,
+	  * but this must be done AFTER the threads have completed.
+	  * In general, dont use the retval, it is for unit testing.
+	  */
+	virtual std::vector<ReconstructCorePtr> startReconstruction() = 0;
+	virtual std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction() = 0; ///< Return the currently reconstructing thread object(s).
+	/**
+	  * Create the reconstruct preprocessor object.
+	  * This is usually created internally during reconstruction,
+	  * published for use in unit testing.
+	  */
+	virtual ReconstructPreprocessorPtr createPreprocessor() = 0;
+	/**
+	  * Create the reconstruct core object.
+	  * This is usually created internally during reconstruction,
+	  * published for use in unit testing.
+	  */
+	virtual std::vector<ReconstructCorePtr> createCores() = 0; ///< create reconstruct cores matching the current parameters
+	/**
+	  * Create the reconstruct algorithm object.
+	  * This is usually created internally during reconstruction,
+	  * published for use in unit testing.
+	  */
+	virtual ReconstructionServicePtr createAlgorithm() = 0;
+
+protected:
+};
+
+//--------------------------------------------------------------------------------------------------------
+
+class TestableReconstructionManager : public ReconstructionManager
+{
+	Q_OBJECT
+public:
+protected:
+};
+//--------------------------------------------------------------------------------------------------------
 /**
  * \file
  * \addtogroup cx_module_usreconstruction
@@ -67,30 +133,32 @@ typedef boost::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedRecon
  * \author Janne Beate Bakeng
  * \date May 4, 2010
  */
-class ReconstructionManager: public QObject
+class ReconstructionManagerImpl: public ReconstructionManager
 {
 Q_OBJECT
 
 public:
-	ReconstructionManager(XmlOptionFile settings, QString shaderPath);
-	virtual ~ReconstructionManager();
+	ReconstructionManagerImpl(XmlOptionFile settings, QString shaderPath);
+	virtual ~ReconstructionManagerImpl();
+
+	virtual void init();
 
 	//SET INPUT
-	/*TEST*/void selectData(QString filename, QString calFilesPath = ""); ///< Set input data for reconstruction
-	void selectData(USReconstructInputData data); ///< Set input data for reconstruction
+	virtual void selectData(QString filename, QString calFilesPath = ""); ///< Set input data for reconstruction
+	virtual void selectData(USReconstructInputData data); ///< Set input data for reconstruction
 
 	//GETTERS
-	QString getSelectedFilename() const; ///< Get the currently selected filename
-	USReconstructInputData getSelectedFileData(); ///< Return the currently selected input data
-	ReconstructParamsPtr getParams(); ///< Return control parameters that can be adjusted by the GUI or similar prior to reconstruction
-	std::vector<DataAdapterPtr> getAlgoOptions(); ///< Return control parameters for the currently selected algorithm, adjustable like getParams()
-	XmlOptionFile getSettings(); ///< Return the settings xml file where parameters are stored
-	OutputVolumeParams getOutputVolumeParams() const; ///< Return params controlling the output data. These are data-dependent.
+	virtual QString getSelectedFilename() const; ///< Get the currently selected filename
+	virtual USReconstructInputData getSelectedFileData(); ///< Return the currently selected input data
+	virtual ReconstructParamsPtr getParams(); ///< Return control parameters that can be adjusted by the GUI or similar prior to reconstruction
+	virtual std::vector<DataAdapterPtr> getAlgoOptions(); ///< Return control parameters for the currently selected algorithm, adjustable like getParams()
+	virtual XmlOptionFile getSettings(); ///< Return the settings xml file where parameters are stored
+	virtual OutputVolumeParams getOutputVolumeParams() const; ///< Return params controlling the output data. These are data-dependent.
 
 	//SETTERS
-	void setOutputVolumeParams(const OutputVolumeParams& par); ///< Control the output volume
-	void setOutputRelativePath(QString path); ///< Set location of output relative to base
-	void setOutputBasePath(QString path); ///< Set base location of output
+	virtual void setOutputVolumeParams(const OutputVolumeParams& par); ///< Control the output volume
+	virtual void setOutputRelativePath(QString path); ///< Set location of output relative to base
+	virtual void setOutputBasePath(QString path); ///< Set base location of output
 
 	/** Execute the reconstruction in another thread.
 	  *
@@ -98,26 +166,26 @@ public:
 	  * but this must be done AFTER the threads have completed.
 	  * In general, dont use the retval, it is for unit testing.
 	  */
-	std::vector<ReconstructCorePtr> startReconstruction();
-	std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction(); ///< Return the currently reconstructing thread object(s).
+	virtual std::vector<ReconstructCorePtr> startReconstruction();
+	virtual std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction(); ///< Return the currently reconstructing thread object(s).
 	/**
 	  * Create the reconstruct preprocessor object.
 	  * This is usually created internally during reconstruction,
 	  * published for use in unit testing.
 	  */
-	ReconstructPreprocessorPtr createPreprocessor();
+	virtual ReconstructPreprocessorPtr createPreprocessor();
 	/**
 	  * Create the reconstruct core object.
 	  * This is usually created internally during reconstruction,
 	  * published for use in unit testing.
 	  */
-	std::vector<ReconstructCorePtr> createCores(); ///< create reconstruct cores matching the current parameters
+	virtual std::vector<ReconstructCorePtr> createCores(); ///< create reconstruct cores matching the current parameters
 	/**
 	  * Create the reconstruct algorithm object.
 	  * This is usually created internally during reconstruction,
 	  * published for use in unit testing.
 	  */
-	ReconstructionServicePtr createAlgorithm();
+	virtual ReconstructionServicePtr createAlgorithm();
 
 signals:
 	void paramsChanged();
@@ -148,8 +216,9 @@ private:
 	cx::CompositeTimedAlgorithmPtr assembleReconstructionPipeline(std::vector<ReconstructCorePtr> cores); ///< assembles the different steps that is needed to reconstruct
 	bool canCoresRunInParallel(std::vector<ReconstructCorePtr> cores);
 
-		void onServiceAdded(ReconstructionService *service);
-		void onServiceRemoved(ReconstructionService *service);
+    void onServiceAdded(ReconstructionService* service);
+    void onServiceModified(ReconstructionService* service);
+    void onServiceRemoved(ReconstructionService* service);
 
 	ReconstructParamsPtr mParams;
 	std::vector<DataAdapterPtr> mAlgoOptions;

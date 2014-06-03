@@ -19,9 +19,9 @@ namespace cx
  *  boost::shared_ptr<ServiceTrackerListener<ReconstructionService> > mServiceListener;
  *  mServiceListener.reset(new ServiceTrackerListener<ReconstructionService>(
  *          LogicManager::getInstance()->getPluginFramework(),
- *          boost::bind(&ReconstructManager::onServiceAdded, this),
- *          boost::function<void ()>(),
- *          boost::bind(&ReconstructManager::onServiceRemoved, this)
+ *          boost::bind(&ReconstructManager::onServiceAdded, this, _1),
+ *          boost::bind(&ReconstructManager::onServiceModified, this, _1),
+ *          boost::bind(&ReconstructManager::onServiceRemoved, this, _1)
  *  ));
  *
  *
@@ -47,7 +47,27 @@ public:
         mServiceTrackerCustomizer->setServiceRemovedCallback(serviceRemoved);
 
         mServiceTracker.reset(new ctkServiceTracker<T*>(pluginFramework->getPluginContext(), mServiceTrackerCustomizer.get()));
-        mServiceTracker->open();
+    }
+
+    void open()
+    {
+    	mServiceTracker->open();
+    }
+
+    T* getService(QString name)
+    {
+    	QList<ctkServiceReference> serviceReferences = mServiceTracker->getServiceReferences();
+    	T* service;
+    	foreach(ctkServiceReference ref, serviceReferences)
+    	{
+    		T* temp = mServiceTracker->getService(ref);
+    		QString serviceName = temp->getName();
+    		if(serviceName == name)
+    		{
+    			service = temp;
+    		}
+    	}
+    	return service;
     }
 
 private:
