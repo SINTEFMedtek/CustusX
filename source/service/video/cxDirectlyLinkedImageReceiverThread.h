@@ -47,7 +47,7 @@ class DirectlyLinkedImageReceiverThread: public ImageReceiverThread
 	Q_OBJECT
 
 public:
-	DirectlyLinkedImageReceiverThread(ImageStreamerInterfacePtr streamerInterface, QObject* parent = NULL);
+	DirectlyLinkedImageReceiverThread(StreamerServicePtr streamerInterface, QObject* parent = NULL);
 	virtual QString hostDescription() const; ///< threadsafe
 
 signals:
@@ -63,7 +63,7 @@ private slots:
 private:
 	SimulatedImageStreamerPtr createSimulatedImageStreamer();
 
-	ImageStreamerInterfacePtr mStreamerInterface;
+	StreamerServicePtr mStreamerInterface;
 	StreamerPtr mImageStreamer;
 	DirectlyLinkedSenderPtr mSender;
 };

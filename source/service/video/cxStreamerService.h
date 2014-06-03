@@ -23,7 +23,7 @@ namespace cx
 
 // Use of smart pointer not possible for plugin service. Replace with serviceAdded and serviceRemoved signals
 // The smart pointer can still be used if StreamerService is coming from another source than a ctk plugin
-typedef boost::shared_ptr<class StreamerService> ImageStreamerInterfacePtr;
+typedef boost::shared_ptr<class StreamerService> StreamerServicePtr;
 typedef boost::shared_ptr<class Streamer> StreamerPtr;
 
 /**
