@@ -46,14 +46,14 @@ void ImageStreamerFactory::setImageToStream(QString imageUid)
 //	return streamerInterface;
 //}
 
-ImageStreamerInterfacePtr ImageStreamerFactory::getCommandlineStreamerInterface()
+StreamerServicePtr ImageStreamerFactory::getCommandlineStreamerInterface()
 {
 	CommandlineImageStreamerInterfacePtr streamerInterface(new CommandlineImageStreamerInterface());
 	streamerInterface->setArguments(mArguments);
 	return streamerInterface;
 }
 
-ImageStreamerInterfacePtr ImageStreamerFactory::getStreamerInterface()
+StreamerServicePtr ImageStreamerFactory::getStreamerInterface()
 {
 //	if(mArguments["type"] == "SimulatedImageStreamer")
 //		return this->getSimulatedStreamerInterface();

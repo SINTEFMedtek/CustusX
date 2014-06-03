@@ -28,7 +28,7 @@
 namespace cx
 {
 
-DirectlyLinkedImageReceiverThread::DirectlyLinkedImageReceiverThread(ImageStreamerInterfacePtr streamerInterface, QObject* parent) :
+DirectlyLinkedImageReceiverThread::DirectlyLinkedImageReceiverThread(StreamerServicePtr streamerInterface, QObject* parent) :
 		ImageReceiverThread(parent), mStreamerInterface(streamerInterface)
 {}
 

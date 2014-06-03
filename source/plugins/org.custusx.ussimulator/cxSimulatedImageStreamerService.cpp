@@ -27,7 +27,7 @@ SimulatedImageStreamerService::SimulatedImageStreamerService()
 
 QString SimulatedImageStreamerService::getName()
 {
-	return "SimulatedImageStreamerService";
+	return "Simulator";
 }
 
 void SimulatedImageStreamerService::setBackend(VideoServiceBackendPtr backend)
@@ -70,7 +70,7 @@ StreamerPtr SimulatedImageStreamerService::createStreamer()
 
 BaseWidget* SimulatedImageStreamerService::createWidget()
 {
-	SimulateUSWidget* mSimulationWidget = new SimulateUSWidget();
+	SimulateUSWidget* mSimulationWidget = new SimulateUSWidget(this);
 	return mSimulationWidget;
 }
 

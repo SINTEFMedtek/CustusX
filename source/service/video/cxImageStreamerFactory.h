@@ -40,8 +40,8 @@ public:
 	void setImageToStream(QString imageUid);
 
 //	ImageStreamerInterfacePtr getSimulatedStreamerInterface();
-	ImageStreamerInterfacePtr getCommandlineStreamerInterface();
-	ImageStreamerInterfacePtr getStreamerInterface();
+	StreamerServicePtr getCommandlineStreamerInterface();
+	StreamerServicePtr getStreamerInterface();
 
 private:
 	std::map<QString, QString> mArguments;

@@ -24,7 +24,7 @@
 namespace cx
 {
 
-typedef boost::shared_ptr<class SimulatedImageStreamerService> SimulatedImageStreamerInterfacePtr;
+typedef boost::shared_ptr<class SimulatedImageStreamerService> SimulatedImageStreamerServicePtr;
 
 /**
  * \brief Interface to image streamer simulator
