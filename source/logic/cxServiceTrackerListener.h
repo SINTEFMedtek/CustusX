@@ -56,13 +56,13 @@ public:
 
     T* getService(QString name)
     {
-    	QList<ctkServiceReference> serviceReferences = mServiceTracker->getServiceReferences();
-    	T* service;
-    	foreach(ctkServiceReference ref, serviceReferences)
+		QList<T*> services = mServiceTracker->getServices();
+
+    	T* service = NULL;
+    	foreach(T* temp, services)
     	{
-    		T* temp = mServiceTracker->getService(ref);
     		QString serviceName = temp->getName();
-    		if(serviceName == name)
+    		if(serviceName.compare(name) == 0)
     		{
     			service = temp;
     		}

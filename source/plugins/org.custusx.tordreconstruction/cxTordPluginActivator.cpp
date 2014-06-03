@@ -25,7 +25,6 @@ namespace cx
 TordPluginActivator::TordPluginActivator()
 : mContext(0)
 {
-	std::cout << "Created TordPluginActivator" << std::endl;
 }
 
 TordPluginActivator::~TordPluginActivator()
@@ -35,27 +34,25 @@ TordPluginActivator::~TordPluginActivator()
 
 void TordPluginActivator::start(ctkPluginContext* context)
 {
-	std::cout << "Started TordPluginActivator" << std::endl;
 	this->mContext = context;
 
 	mPlugin.reset(new TordReconstructionService);
-	std::cout << "created tordreconstruction service" << std::endl;
 	try
 	{
-		context->registerService(QStringList(ReconstructionService_iid), mPlugin.get());
+		mRegistration = context->registerService(QStringList(ReconstructionService_iid), mPlugin.get());
 	}
 	catch(ctkRuntimeException& e)
 	{
 		std::cout << e.what() << std::endl;
 		mPlugin.reset();
 	}
-	std::cout << "registered tordreconstruction service" << std::endl;
 }
 
 void TordPluginActivator::stop(ctkPluginContext* context)
 {
-	mPlugin.reset();
-	std::cout << "Stopped TordPluginActivator" << std::endl;
+	mRegistration.unregister();
+	if(mPlugin)
+		mPlugin.reset();
 	Q_UNUSED(context)
 }
 
