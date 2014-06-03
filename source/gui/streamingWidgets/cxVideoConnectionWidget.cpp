@@ -116,7 +116,11 @@ void VideoConnectionWidget::addServiceToSelector(QString name)
 void VideoConnectionWidget::removeServiceFromSelector(QString name)
 {
 	QStringList range = mConnectionSelector->getValueRange();
-	range.removeAll(name);
+//	range.removeAll(name);
+	int index = range.indexOf(name);
+	if(mConnectionSelector->getValue() == name)
+		mConnectionSelector->setValue(range[0]);
+	range.removeAt(index);
 	mConnectionSelector->setValueRange(range);
 }
 
