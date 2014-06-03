@@ -47,6 +47,7 @@ public:
 private:
   ctkPluginContext* mContext;
   TordReconstructionServicePtr mPlugin;
+  ctkServiceRegistration mRegistration;
 };
 
 } // namespace cx

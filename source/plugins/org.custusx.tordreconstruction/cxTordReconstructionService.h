@@ -43,9 +43,6 @@ public:
     TordReconstructionService();
 	virtual ~TordReconstructionService();
 
-//    virtual QString getName() const {};
-//    virtual std::vector<DataAdapterPtr> getSettings(QDomElement root){};
-//    virtual bool reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr outputData, QDomElement settings){};
     /**
      * Turn OpenCL profiling on
      */
