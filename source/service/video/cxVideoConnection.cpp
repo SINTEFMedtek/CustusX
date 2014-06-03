@@ -97,7 +97,7 @@ void VideoConnection::connectedSlot(bool on)
 	emit connected(on);
 }
 
-ImageStreamerInterfacePtr VideoConnection::getStreamerInterface()
+StreamerServicePtr VideoConnection::getStreamerInterface()
 {
 	return mStreamerInterface;
 }

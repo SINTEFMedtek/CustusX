@@ -42,7 +42,6 @@
 #include "cxPatientData.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"
-//#include "cxSimulateUSWidget.h"
 #include "cxFileInputWidget.h"
 #include "cxLogger.h"
 #include "cxLogicManager.h"
@@ -80,7 +79,6 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 													 LogicManager::getInstance()->getPluginFramework(),
 													 boost::bind(&VideoConnectionWidget::onServiceAdded, this, _1),
 													 boost::function<void (StreamerService*)>(),
-//													 boost::bind(&VideoConnectionWidget::onServiceAdded, this, _1),
 													 boost::bind(&VideoConnectionWidget::onServiceRemoved, this, _1)
 													 ));
 
@@ -92,12 +90,41 @@ VideoConnectionWidget::~VideoConnectionWidget()
 
 void VideoConnectionWidget::onServiceAdded(StreamerService* service)
 {
-	std::cout << "VideoConnectionWidget::Added!!!" << std::endl;
-//	mStackedWidget->addWidget(this->wrapVerticalStretch(service->createWidget()));
+	std::cout << "VideoConnectionWidget:: Service added!!!" << std::endl;
+	QWidget* serviceWidget = this->wrapVerticalStretch(service->createWidget());
+	mStackedWidget->addWidget(serviceWidget);
+	mStreamerServiceWidgets[service->getName()] = serviceWidget;
+
+	this->addServiceToSelector(service->getName());
 }
+
 void VideoConnectionWidget::onServiceRemoved(StreamerService *service)
 {
-	std::cout << "VideoConnectionWidget::Removed!!!" << std::endl;
+	std::cout << "VideoConnectionWidget::Service removed!!!" << std::endl;
+	this->removeServiceFromSelector(service->getName());
+	this->removeServiceWidget(service->getName());
+}
+
+void VideoConnectionWidget::addServiceToSelector(QString name)
+{
+	QStringList range = mConnectionSelector->getValueRange();
+	range.append(name);
+	range.removeDuplicates();
+	mConnectionSelector->setValueRange(range);
+}
+
+void VideoConnectionWidget::removeServiceFromSelector(QString name)
+{
+	QStringList range = mConnectionSelector->getValueRange();
+	range.removeAll(name);
+	mConnectionSelector->setValueRange(range);
+}
+
+void VideoConnectionWidget::removeServiceWidget(QString name)
+{
+	QWidget* serviceWidget = mStreamerServiceWidgets[name];
+	mStackedWidget->removeWidget(serviceWidget);
+	mStreamerServiceWidgets.erase(name);
 }
 
 void VideoConnectionWidget::initializeScriptWidget()
@@ -253,12 +280,6 @@ QWidget* VideoConnectionWidget::createRemoteWidget()
 	return retval;
 }
 
-//QWidget* VideoConnectionWidget::createSimulationWidget()
-//{
-//	mSimulationWidget = new SimulateUSWidget();
-//	return mSimulationWidget;
-//}
-
 QString VideoConnectionWidget::defaultWhatsThis() const
 {
 	return "<html>"
@@ -292,8 +313,13 @@ void VideoConnectionWidget::selectGuiForConnectionMethodSlot()
 		mStackedWidget->setCurrentIndex(1);
 	else if(this->getVideoConnectionManager()->useRemoteServer())
 		mStackedWidget->setCurrentIndex(2);
-	else if(this->getVideoConnectionManager()->useSimulatedServer())
-		mStackedWidget->setCurrentIndex(3);
+//	else if(this->getVideoConnectionManager()->useSimulatedServer())
+//		mStackedWidget->setCurrentIndex(3);
+	else
+	{
+		QWidget* serviceWidget = mStreamerServiceWidgets[mConnectionSelector->getValue()];
+		mStackedWidget->setCurrentWidget(serviceWidget);
+	}
 }
 
 void VideoConnectionWidget::updateHostHistory()
@@ -397,8 +423,6 @@ QStackedWidget* VideoConnectionWidget::initializeStackedWidget()
 	stackedWidget->addWidget(this->wrapVerticalStretch(this->createLocalServerWidget()));
 	stackedWidget->addWidget(this->wrapVerticalStretch(this->createRemoteWidget()));
 //	stackedWidget->addWidget(this->wrapVerticalStretch(this->createSimulationWidget()));
-
-	//TODO: Get widget from StreamerService (plugin)
 
 	return stackedWidget;
 }

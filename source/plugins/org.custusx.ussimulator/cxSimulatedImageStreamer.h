@@ -18,8 +18,9 @@
 #include "cxTransform3D.h"
 #include "cxImageStreamer.h"
 #include "cxCyclicActionLogger.h"
-
 #include "cxConfig.h"
+#include "org_custusx_ussimulator_Export.h"
+
 #ifdef CX_BUILD_US_SIMULATOR
 #include "../../../../../UltrasoundSimulation/UltrasoundSimulation/ImageSimulator.h"
 #endif //CX_BUILD_US_SIMULATOR
@@ -40,7 +41,7 @@ class DataManager;
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class SimulatedImageStreamer : public ImageStreamer
+class org_custusx_ussimulator_EXPORT SimulatedImageStreamer : public ImageStreamer
 {
 	Q_OBJECT
 

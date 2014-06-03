@@ -75,8 +75,6 @@ protected slots:
 	void selectGuiForConnectionMethodSlot();
 	void initScriptSelected(QString filename);
 
-//	void senderTypeChanged();
-
 protected:
 	void connectServer();
 	void disconnectServer();
@@ -96,7 +94,6 @@ protected:
 	QWidget* createDirectLinkWidget();
 	QWidget* createLocalServerWidget();
 	QWidget* createRemoteWidget();
-//	QWidget* createSimulationWidget();
 	QWidget* wrapVerticalStretch(QWidget* input);
 	Transform3D calculate_rMd_ForAProbeImage(ToolPtr probe);
 	QString generateFilename(VideoSourcePtr videoSource);
@@ -114,16 +111,17 @@ protected:
 	QStackedWidget* mStackedWidget;
 	StringDataAdapterXmlPtr mConnectionSelector;
 	ActiveVideoSourceStringDataAdapterPtr mActiveVideoSourceSelector;
-//	SimulateUSWidget* mSimulationWidget;
 	FileInputWidget* mLocalServerFile;
 
 private:
 	void onServiceAdded(StreamerService *service);
 	void onServiceRemoved(StreamerService *service);
+	void addServiceToSelector(QString name);
+	void removeServiceFromSelector(QString name);
+	void removeServiceWidget(QString name);
 
-//	StringDataAdapterXmlPtr mSenderType;
 	boost::shared_ptr<ServiceTrackerListener<StreamerService> > mServiceListener;
-
+	std::map<QString, QWidget*> mStreamerServiceWidgets;
 };
 
 }//end namespace cx

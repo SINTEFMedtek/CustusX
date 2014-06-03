@@ -161,7 +161,7 @@ TEST_CASE("StreamerService: Service available", "[streaming][service][unit]")
 TEST_CASE("StreamerService: SimulatedImageStreamerService available", "[streaming][service][unit]")
 {
 	cx::LogicManager::initialize();
-	cx::StreamerService* service = getStreamerService("SimulatedImageStreamerService");
+	cx::StreamerService* service = getStreamerService("Simulator");
 	REQUIRE(service);
 	cx::LogicManager::shutdown();
 }

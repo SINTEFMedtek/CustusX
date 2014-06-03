@@ -14,11 +14,11 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/gui/dataAdapters
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/logic
+    ${CustusX3_SOURCE_DIR}/source/gui/pluginFrameworkWidgets
     )
 
 set(PLUGIN_SRCS
   cxUSSimulatorPluginActivator.cpp
-  #cxUSSimulatorGUIExtenderService.cpp
   cxSimulateUSWidget.cpp
   cxSimulatedImageStreamerService.cpp
   cxSimulatedImageStreamer.cpp
@@ -27,7 +27,6 @@ set(PLUGIN_SRCS
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxUSSimulatorPluginActivator.h
-  #cxUSSimulatorGUIExtenderService.h
   cxSimulateUSWidget.h
   cxSimulatedImageStreamer.h
   cxSimulatedImageStreamerService.h
