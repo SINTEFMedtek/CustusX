@@ -109,7 +109,7 @@ cx::ReconstructionManagerPtr ReconstructionManagerTestFixture::getManager()
 	if (!mManager)
 	{
 		cx::XmlOptionFile settings;
-		cx::ReconstructionManagerPtr reconstructer(new cx::ReconstructionManager(settings,""));
+		cx::ReconstructionManagerPtr reconstructer(new cx::ReconstructionManagerImpl(settings,""));
 
 		reconstructer->setOutputBasePath(cx::DataLocations::getTestDataPath() + "/temp/");
 		reconstructer->setOutputRelativePath("Images");

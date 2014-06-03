@@ -45,9 +45,10 @@ namespace cx
 {
 
 
-ReconstructionManager::ReconstructionManager(XmlOptionFile settings, QString shaderPath) :
-	mOutputRelativePath(""), mOutputBasePath(""), mShaderPath(shaderPath)
+ReconstructionManagerImpl::ReconstructionManagerImpl(XmlOptionFile settings, QString shaderPath) :
+		ReconstructionManager(settings, shaderPath), mOutputRelativePath(""), mOutputBasePath(""), mShaderPath(shaderPath)
 {
+
 	mSettings = settings;
 	mSettings.getElement("algorithms");
 
@@ -57,29 +58,43 @@ ReconstructionManager::ReconstructionManager(XmlOptionFile settings, QString sha
 
 	this->initAlgorithm();
 
-	mServiceListener.reset(new ServiceTrackerListener<ReconstructionService>(
+	mServiceListener = boost::shared_ptr<ServiceTrackerListener<ReconstructionService> >(new ServiceTrackerListener<ReconstructionService>(
 	        LogicManager::getInstance()->getPluginFramework(),
-					boost::bind(&ReconstructionManager::onServiceAdded, this, _1),
-					boost::function<void (ReconstructionService*)>(),
-					boost::bind(&ReconstructionManager::onServiceRemoved, this, _1)
+	        boost::bind(&ReconstructionManagerImpl::onServiceAdded, this, _1),
+	        boost::bind(&ReconstructionManagerImpl::onServiceModified, this, _1),
+	        boost::bind(&ReconstructionManagerImpl::onServiceRemoved, this, _1)
 	));
 }
 
-ReconstructionManager::~ReconstructionManager()
+ReconstructionManagerImpl::~ReconstructionManagerImpl()
 {
 }
 
-ReconstructionServicePtr ReconstructionManager::createAlgorithm()
+void ReconstructionManagerImpl::init()
+{
+	mServiceListener->open();
+}
+
+ReconstructionServicePtr ReconstructionManagerImpl::createAlgorithm()
 {
 	QString name = mParams->mAlgorithmAdapter->getValue();
 
 	ReconstructCorePtr core; ///< in progress: algorithm part of class moved here.
 	core.reset(new ReconstructCore());
-	ReconstructionServicePtr algo = core->createAlgorithm(name);
+	ReconstructionServicePtr algo;
+	if(name == "TordReconstructionService")
+	{
+		algo = ReconstructionServicePtr(mServiceListener->getService(name));
+	}
+	else
+	{
+		algo = core->createAlgorithm(name);
+	}
+
 	return algo;
 }
 
-void ReconstructionManager::initAlgorithm()
+void ReconstructionManagerImpl::initAlgorithm()
 {
     ReconstructionServicePtr algo = this->createAlgorithm();
 
@@ -92,14 +107,14 @@ void ReconstructionManager::initAlgorithm()
 	}
 }
 
-void ReconstructionManager::setSettings()
+void ReconstructionManagerImpl::setSettings()
 {
 	this->initAlgorithm();
 	this->updateFromOriginalFileData();
 	emit paramsChanged();
 }
 
-void ReconstructionManager::transferFunctionChangedSlot()
+void ReconstructionManagerImpl::transferFunctionChangedSlot()
 {
 	//Use angio reconstruction also if only transfer function is set to angio
 	if(mParams->mPresetTFAdapter->getValue() == "US Angio")
@@ -114,7 +129,7 @@ void ReconstructionManager::transferFunctionChangedSlot()
 	}
 }
 
-std::vector<ReconstructCorePtr> ReconstructionManager::startReconstruction()
+std::vector<ReconstructCorePtr> ReconstructionManagerImpl::startReconstruction()
 {
 	std::vector<ReconstructCorePtr> cores = this->createCores();
 
@@ -131,12 +146,12 @@ std::vector<ReconstructCorePtr> ReconstructionManager::startReconstruction()
 	return cores;
 }
 
-std::set<cx::TimedAlgorithmPtr> ReconstructionManager::getThreadedReconstruction()
+std::set<cx::TimedAlgorithmPtr> ReconstructionManagerImpl::getThreadedReconstruction()
 {
 	return mThreadedReconstruction;
 }
 
-void ReconstructionManager::launch(cx::TimedAlgorithmPtr thread)
+void ReconstructionManagerImpl::launch(cx::TimedAlgorithmPtr thread)
 {
 	mThreadedReconstruction.insert(thread);
 	emit reconstructAboutToStart();
@@ -144,7 +159,7 @@ void ReconstructionManager::launch(cx::TimedAlgorithmPtr thread)
 	thread->execute();
 }
 
-void ReconstructionManager::threadFinishedSlot()
+void ReconstructionManagerImpl::threadFinishedSlot()
 {
 	std::set<cx::TimedAlgorithmPtr>::iterator iter;
 	for(iter=mThreadedReconstruction.begin(); iter!=mThreadedReconstruction.end(); )
@@ -162,34 +177,34 @@ void ReconstructionManager::threadFinishedSlot()
 		mOriginalFileData.mUsRaw->purgeAll();
 }
 
-void ReconstructionManager::clearAll()
+void ReconstructionManagerImpl::clearAll()
 {
 	mOriginalFileData = USReconstructInputData();
 	mOutputVolumeParams = OutputVolumeParams();
 }
 
-OutputVolumeParams ReconstructionManager::getOutputVolumeParams() const
+OutputVolumeParams ReconstructionManagerImpl::getOutputVolumeParams() const
 {
 	return mOutputVolumeParams;
 }
 
-void ReconstructionManager::setOutputVolumeParams(const OutputVolumeParams& par)
+void ReconstructionManagerImpl::setOutputVolumeParams(const OutputVolumeParams& par)
 {
 	mOutputVolumeParams = par;
 	this->setSettings();
 }
 
-void ReconstructionManager::setOutputRelativePath(QString path)
+void ReconstructionManagerImpl::setOutputRelativePath(QString path)
 {
 	mOutputRelativePath = path;
 }
 
-void ReconstructionManager::setOutputBasePath(QString path)
+void ReconstructionManagerImpl::setOutputBasePath(QString path)
 {
 	mOutputBasePath = path;
 }
 
-bool ReconstructionManager::validInputData() const
+bool ReconstructionManagerImpl::validInputData() const
 {
 	if (mOriginalFileData.mFrames.empty() || !mOriginalFileData.mUsRaw || mOriginalFileData.mPositions.empty())
 		return false;
@@ -201,7 +216,7 @@ bool ReconstructionManager::validInputData() const
 	return true;
 }
 
-cx::CompositeTimedAlgorithmPtr ReconstructionManager::assembleReconstructionPipeline(std::vector<ReconstructCorePtr> cores)
+cx::CompositeTimedAlgorithmPtr ReconstructionManagerImpl::assembleReconstructionPipeline(std::vector<ReconstructCorePtr> cores)
 {
 	cx::CompositeSerialTimedAlgorithmPtr pipeline(new cx::CompositeSerialTimedAlgorithm("US Reconstruction"));
 
@@ -223,7 +238,7 @@ cx::CompositeTimedAlgorithmPtr ReconstructionManager::assembleReconstructionPipe
 	return pipeline;
 }
 
-bool ReconstructionManager::canCoresRunInParallel(std::vector<ReconstructCorePtr> cores)
+bool ReconstructionManagerImpl::canCoresRunInParallel(std::vector<ReconstructCorePtr> cores)
 {
 	bool parallelizable = true;
 
@@ -234,32 +249,32 @@ bool ReconstructionManager::canCoresRunInParallel(std::vector<ReconstructCorePtr
 	return parallelizable;
 }
 
-ReconstructParamsPtr ReconstructionManager::getParams()
+ReconstructParamsPtr ReconstructionManagerImpl::getParams()
 {
 	return mParams;
 }
 
-std::vector<DataAdapterPtr> ReconstructionManager::getAlgoOptions()
+std::vector<DataAdapterPtr> ReconstructionManagerImpl::getAlgoOptions()
 {
 	return mAlgoOptions;
 }
 
-XmlOptionFile ReconstructionManager::getSettings()
+XmlOptionFile ReconstructionManagerImpl::getSettings()
 {
 	return mSettings;
 }
 
-QString ReconstructionManager::getSelectedFilename() const
+QString ReconstructionManagerImpl::getSelectedFilename() const
 {
 	return mOriginalFileData.mFilename;
 }
 
-USReconstructInputData ReconstructionManager::getSelectedFileData()
+USReconstructInputData ReconstructionManagerImpl::getSelectedFileData()
 {
 	return mOriginalFileData;
 }
 
-void ReconstructionManager::selectData(QString filename, QString calFilesPath)
+void ReconstructionManagerImpl::selectData(QString filename, QString calFilesPath)
 {
 	if (filename.isEmpty())
 	{
@@ -273,7 +288,7 @@ void ReconstructionManager::selectData(QString filename, QString calFilesPath)
 	this->selectData(fileData);
 }
 
-void ReconstructionManager::selectData(USReconstructInputData fileData)
+void ReconstructionManagerImpl::selectData(USReconstructInputData fileData)
 {
 	this->clearAll();
 	mOriginalFileData = fileData;
@@ -281,7 +296,7 @@ void ReconstructionManager::selectData(USReconstructInputData fileData)
 	emit inputDataSelected(fileData.mFilename);
 }
 
-void ReconstructionManager::updateFromOriginalFileData()
+void ReconstructionManagerImpl::updateFromOriginalFileData()
 {
 	if (!this->validInputData())
 		return;
@@ -292,7 +307,7 @@ void ReconstructionManager::updateFromOriginalFileData()
 	emit paramsChanged();
 }
 
-ReconstructCore::InputParams ReconstructionManager::createCoreParameters()
+ReconstructCore::InputParams ReconstructionManagerImpl::createCoreParameters()
 {
 	ReconstructCore::InputParams par;
 	par.mAlgorithmUid = mParams->mAlgorithmAdapter->getValue();
@@ -310,7 +325,7 @@ ReconstructCore::InputParams ReconstructionManager::createCoreParameters()
 	return par;
 }
 
-ReconstructPreprocessorPtr ReconstructionManager::createPreprocessor()
+ReconstructPreprocessorPtr ReconstructionManagerImpl::createPreprocessor()
 {
 	if (!this->validInputData())
 		return ReconstructPreprocessorPtr();
@@ -327,7 +342,7 @@ ReconstructPreprocessorPtr ReconstructionManager::createPreprocessor()
 	return retval;
 }
 
-std::vector<ReconstructCorePtr> ReconstructionManager::createCores()
+std::vector<ReconstructCorePtr> ReconstructionManagerImpl::createCores()
 {
 	std::vector<ReconstructCorePtr> retval;
 
@@ -352,7 +367,7 @@ std::vector<ReconstructCorePtr> ReconstructionManager::createCores()
 	return retval;
 }
 
-ReconstructCorePtr ReconstructionManager::createCore()
+ReconstructCorePtr ReconstructionManagerImpl::createCore()
 {
 	if (!this->validInputData())
 		return ReconstructCorePtr();
@@ -365,7 +380,7 @@ ReconstructCorePtr ReconstructionManager::createCore()
 	return retval;
 }
 
-ReconstructCorePtr ReconstructionManager::createBModeCore()
+ReconstructCorePtr ReconstructionManagerImpl::createBModeCore()
 {
 	if (!this->validInputData())
 		return ReconstructCorePtr();
@@ -381,13 +396,21 @@ ReconstructCorePtr ReconstructionManager::createBModeCore()
 	return retval;
 }
 
-void ReconstructionManager::onServiceAdded(ReconstructionService* service)
+void ReconstructionManagerImpl::onServiceAdded(ReconstructionService* service)
 {
-    std::cout << "ReconstructManager::Added!!!" << std::endl;
+    QStringList range = mParams->mAlgorithmAdapter->getValueRange();
+    range << service->getName();
+    mParams->mAlgorithmAdapter->setValueRange(range);
 }
-void ReconstructionManager::onServiceRemoved(ReconstructionService *service)
+
+void ReconstructionManagerImpl::onServiceModified(ReconstructionService* service)
 {
-    std::cout << "ReconstructManager::Removed!!!" << std::endl;
+	//TODO
+}
+
+void ReconstructionManagerImpl::onServiceRemoved(ReconstructionService* service)
+{
+    //TODO
 }
 
 }

@@ -21,7 +21,8 @@ namespace cx
 UsReconstructionPlugin::UsReconstructionPlugin()
 {
   XmlOptionFile xmlFile = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction");
-  mReconstructer.reset(new ReconstructionManager(xmlFile, DataLocations::getShaderPath()));
+  mReconstructer.reset(new ReconstructionManagerImpl(xmlFile, DataLocations::getShaderPath()));
+  mReconstructer->init();
 
   connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
