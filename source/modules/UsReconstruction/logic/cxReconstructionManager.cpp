@@ -56,14 +56,14 @@ ReconstructionManagerImpl::ReconstructionManagerImpl(XmlOptionFile settings, QSt
 	connect(mParams.get(), SIGNAL(changedInputSettings()), this, SLOT(setSettings()));
 	connect(mParams.get(), SIGNAL(transferFunctionChanged()), this, SLOT(transferFunctionChangedSlot()));
 
-	this->initAlgorithm();
-
 	mServiceListener = boost::shared_ptr<ServiceTrackerListener<ReconstructionService> >(new ServiceTrackerListener<ReconstructionService>(
 	        LogicManager::getInstance()->getPluginFramework(),
 	        boost::bind(&ReconstructionManagerImpl::onServiceAdded, this, _1),
 	        boost::bind(&ReconstructionManagerImpl::onServiceModified, this, _1),
 	        boost::bind(&ReconstructionManagerImpl::onServiceRemoved, this, _1)
 	));
+
+	this->initAlgorithm();
 }
 
 ReconstructionManagerImpl::~ReconstructionManagerImpl()
@@ -75,6 +75,14 @@ void ReconstructionManagerImpl::init()
 	mServiceListener->open();
 }
 
+namespace
+{
+struct null_deleter
+{
+	void operator()(void const *) const {}
+};
+}
+
 ReconstructionServicePtr ReconstructionManagerImpl::createAlgorithm()
 {
 	QString name = mParams->mAlgorithmAdapter->getValue();
@@ -84,13 +92,13 @@ ReconstructionServicePtr ReconstructionManagerImpl::createAlgorithm()
 	ReconstructionServicePtr algo;
 	if(name == "TordReconstructionService")
 	{
-		algo = ReconstructionServicePtr(mServiceListener->getService(name));
+		ReconstructionServicePtr pointer(ReconstructionServicePtr(mServiceListener->getService(name), null_deleter()));
+		algo = pointer;
 	}
 	else
 	{
 		algo = core->createAlgorithm(name);
 	}
-
 	return algo;
 }
 
@@ -410,7 +418,9 @@ void ReconstructionManagerImpl::onServiceModified(ReconstructionService* service
 
 void ReconstructionManagerImpl::onServiceRemoved(ReconstructionService* service)
 {
-    //TODO
+    QStringList range = mParams->mAlgorithmAdapter->getValueRange();
+    range.removeAll(service->getName());
+    mParams->mAlgorithmAdapter->setValueRange(range);
 }
 
 }
