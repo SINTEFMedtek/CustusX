@@ -19,7 +19,8 @@
 namespace cx
 {
 
-TordReconstructionService::TordReconstructionService()
+TordReconstructionService::TordReconstructionService() :
+		ReconstructionService()
 {
     mAlgorithm = TordAlgorithmPtr(new TordAlgorithm);
 
@@ -33,7 +34,6 @@ TordReconstructionService::TordReconstructionService()
 
 TordReconstructionService::~TordReconstructionService()
 {
-
 }
 
 void TordReconstructionService::enableProfiling()
