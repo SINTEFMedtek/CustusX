@@ -21,8 +21,11 @@
 #include "cxDoubleDataAdapterXml.h"
 #include "cxTimedAlgorithm.h"
 
+#include "cxBoolDataAdapterXml.h"
+
 #include "cxDataLocations.h"
 #include "cxReconstructPreprocessor.h"
+#include "cxReconstructionExecuter.h"
 #include "cxLogicManager.h"
 
 namespace cxtest
@@ -54,9 +57,15 @@ void ReconstructionManagerTestFixture::setPNN_InterpolationSteps(int value)
 void ReconstructionManagerTestFixture::reconstruct()
 {
 	mOutput.clear();
-	cx::ReconstructionManagerPtr manager = this->getManager();
-	cx::ReconstructPreprocessorPtr preprocessor = manager->createPreprocessor();
-	std::vector<cx::ReconstructCorePtr> cores = manager->createCores();
+	cx::ReconstructionManagerPtr reconstructer = this->getManager();
+	cx::ReconstructionExecuterPtr executor(new cx::ReconstructionExecuter);
+//	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
+	bool validInputData = true; //TODO should be checked in some way???
+	cx::ReconstructPreprocessorPtr preprocessor = executor->createPreprocessor(reconstructer->createCoreParameters(), reconstructer->getSelectedFileData(), validInputData);
+	bool createBModeWhenAngio = reconstructer->getParams()->mCreateBModeWhenAngio->getValue();
+	std::vector<cx::ReconstructCorePtr> cores = executor->createCores(reconstructer->createAlgorithm(), reconstructer->createCoreParameters(), createBModeWhenAngio, validInputData);
+//	cx::ReconstructPreprocessorPtr preprocessor = manager->createPreprocessor();
+//	std::vector<cx::ReconstructCorePtr> cores = manager->createCores();
 	preprocessor->initializeCores(cores);
 	for (unsigned i=0; i<cores.size(); ++i)
 	{

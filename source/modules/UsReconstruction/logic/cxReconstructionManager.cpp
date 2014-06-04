@@ -35,6 +35,12 @@
 #include "cxServiceTrackerListener.h"
 #include "cxLogicManager.h"
 #include "cxPluginFramework.h"
+#include "cxReconstructionExecuter.h"
+
+#ifdef CX_USE_OPENCL_UTILITY
+	#include "TordReconstruct/TordTest.h"
+#endif // CX_USE_OPENCL_UTILITY
+#include "cxPNNReconstructAlgorithm.h"
 
 //Windows fix
 #ifndef M_PI
@@ -48,6 +54,10 @@ namespace cx
 ReconstructionManagerImpl::ReconstructionManagerImpl(XmlOptionFile settings, QString shaderPath) :
 		ReconstructionManager(settings, shaderPath), mOutputRelativePath(""), mOutputBasePath(""), mShaderPath(shaderPath)
 {
+	mExecuter.reset(new ReconstructionExecuter());
+	connect(mExecuter.get(), SIGNAL(reconstructAboutToStart()), this, SIGNAL(reconstructAboutToStart()));
+	connect(mExecuter.get(), SIGNAL(reconstructFinished()), this, SLOT(reconstructFinishedSlot()));
+
 
 	mSettings = settings;
 	mSettings.getElement("algorithms");
@@ -87,8 +97,6 @@ ReconstructionServicePtr ReconstructionManagerImpl::createAlgorithm()
 {
 	QString name = mParams->mAlgorithmAdapter->getValue();
 
-	ReconstructCorePtr core; ///< in progress: algorithm part of class moved here.
-	core.reset(new ReconstructCore());
 	ReconstructionServicePtr algo;
 	if(name == "TordReconstructionService")
 	{
@@ -97,7 +105,14 @@ ReconstructionServicePtr ReconstructionManagerImpl::createAlgorithm()
 	}
 	else
 	{
-		algo = core->createAlgorithm(name);
+		if (name == "PNN")
+			algo = ReconstructionServicePtr(new PNNReconstructAlgorithm());
+	#ifdef CX_USE_OPENCL_UTILITY
+		else if (name == "TordTest")
+		{
+			algo = ReconstructionServicePtr(new TordTest());
+		}
+	#endif // CX_USE_OPENCL_UTILITY
 	}
 	return algo;
 }
@@ -139,51 +154,24 @@ void ReconstructionManagerImpl::transferFunctionChangedSlot()
 
 std::vector<ReconstructCorePtr> ReconstructionManagerImpl::startReconstruction()
 {
-	std::vector<ReconstructCorePtr> cores = this->createCores();
+	ReconstructionServicePtr algo = this->createAlgorithm();
+	ReconstructCore::InputParams par = this->createCoreParameters();
+	USReconstructInputData fileData = mOriginalFileData;
+	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
 
-	if (cores.empty())
-	{
-		reportWarning("Failed to start reconstruction");
-		return cores;
-	}
-
-	cx::CompositeTimedAlgorithmPtr algorithm = this->assembleReconstructionPipeline(cores);
-
-	this->launch(algorithm);
-
-	return cores;
+	return mExecuter->startReconstruction(algo, par, fileData, mParams->mCreateBModeWhenAngio->getValue(), this->validInputData());
 }
 
 std::set<cx::TimedAlgorithmPtr> ReconstructionManagerImpl::getThreadedReconstruction()
 {
-	return mThreadedReconstruction;
+	return mExecuter->getThreadedReconstruction();
 }
 
-void ReconstructionManagerImpl::launch(cx::TimedAlgorithmPtr thread)
+void ReconstructionManagerImpl::reconstructFinishedSlot()
 {
-	mThreadedReconstruction.insert(thread);
-	emit reconstructAboutToStart();
-	connect(thread.get(), SIGNAL(finished()), this, SLOT(threadFinishedSlot())); // connect after emit, to allow listeners to get thread at finish
-	thread->execute();
+	mOriginalFileData.mUsRaw->purgeAll();
 }
 
-void ReconstructionManagerImpl::threadFinishedSlot()
-{
-	std::set<cx::TimedAlgorithmPtr>::iterator iter;
-	for(iter=mThreadedReconstruction.begin(); iter!=mThreadedReconstruction.end(); )
-	{
-		if ((*iter)->isFinished())
-		{
-			mThreadedReconstruction.erase(iter);
-			iter = mThreadedReconstruction.begin();
-		}
-		else
-			++iter;
-	}
-
-	if (mThreadedReconstruction.empty())
-		mOriginalFileData.mUsRaw->purgeAll();
-}
 
 void ReconstructionManagerImpl::clearAll()
 {
@@ -222,39 +210,6 @@ bool ReconstructionManagerImpl::validInputData() const
 		return false;
 	}
 	return true;
-}
-
-cx::CompositeTimedAlgorithmPtr ReconstructionManagerImpl::assembleReconstructionPipeline(std::vector<ReconstructCorePtr> cores)
-{
-	cx::CompositeSerialTimedAlgorithmPtr pipeline(new cx::CompositeSerialTimedAlgorithm("US Reconstruction"));
-
-	ReconstructPreprocessorPtr preprocessor = this->createPreprocessor();
-	pipeline->append(ThreadedTimedReconstructPreprocessor::create(preprocessor, cores));
-
-	cx::CompositeTimedAlgorithmPtr temp = pipeline;
-	if(this->canCoresRunInParallel(cores))
-	{
-		cx::CompositeParallelTimedAlgorithmPtr parallel(new cx::CompositeParallelTimedAlgorithm());
-		pipeline->append(parallel);
-		temp = parallel;
-		reportDebug("Running reconstruction cores in parallel.");
-	}
-
-	for (unsigned i=0; i<cores.size(); ++i)
-		temp->append(ThreadedTimedReconstructCore::create(cores[i]));
-
-	return pipeline;
-}
-
-bool ReconstructionManagerImpl::canCoresRunInParallel(std::vector<ReconstructCorePtr> cores)
-{
-	bool parallelizable = true;
-
-	std::vector<ReconstructCorePtr>::iterator it;
-	for(it = cores.begin(); it != cores.end(); ++it)
-		parallelizable = parallelizable && (it->get()->getInputParams().mAlgorithmUid == "PNN");
-
-	return parallelizable;
 }
 
 ReconstructParamsPtr ReconstructionManagerImpl::getParams()
@@ -309,7 +264,10 @@ void ReconstructionManagerImpl::updateFromOriginalFileData()
 	if (!this->validInputData())
 		return;
 
-	ReconstructPreprocessorPtr preprocessor = this->createPreprocessor();
+	ReconstructCore::InputParams par;
+	USReconstructInputData fileData = mOriginalFileData;
+	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
+	ReconstructPreprocessorPtr preprocessor = mExecuter->createPreprocessor(this->createCoreParameters(), fileData, this->validInputData());
 	mOutputVolumeParams = preprocessor->getOutputVolumeParams();
 
 	emit paramsChanged();
@@ -331,77 +289,6 @@ ReconstructCore::InputParams ReconstructionManagerImpl::createCoreParameters()
 	par.mMaskReduce = mParams->mMaskReduce->getValue().toDouble();
 	par.mOrientation = mParams->mOrientationAdapter->getValue();
 	return par;
-}
-
-ReconstructPreprocessorPtr ReconstructionManagerImpl::createPreprocessor()
-{
-	if (!this->validInputData())
-		return ReconstructPreprocessorPtr();
-
-	ReconstructPreprocessorPtr retval(new ReconstructPreprocessor());
-
-	ReconstructCore::InputParams par = this->createCoreParameters();
-
-	USReconstructInputData fileData = mOriginalFileData;
-	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
-
-	retval->initialize(par, fileData);
-
-	return retval;
-}
-
-std::vector<ReconstructCorePtr> ReconstructionManagerImpl::createCores()
-{
-	std::vector<ReconstructCorePtr> retval;
-
-	// create both
-	if (mParams->mCreateBModeWhenAngio->getValue() && mParams->mAngioAdapter->getValue())
-	{
-		ReconstructCorePtr core = this->createBModeCore();
-		if (core)
-			retval.push_back(core);
-		core = this->createCore();
-		if (core)
-			retval.push_back(core);
-	}
-	// only one thread
-	else
-	{
-		ReconstructCorePtr core = this->createCore();
-		if (core)
-			retval.push_back(core);
-	}
-
-	return retval;
-}
-
-ReconstructCorePtr ReconstructionManagerImpl::createCore()
-{
-	if (!this->validInputData())
-		return ReconstructCorePtr();
-
-	ReconstructCorePtr retval(new ReconstructCore());
-
-	ReconstructCore::InputParams par = this->createCoreParameters();
-	retval->initialize(par);
-
-	return retval;
-}
-
-ReconstructCorePtr ReconstructionManagerImpl::createBModeCore()
-{
-	if (!this->validInputData())
-		return ReconstructCorePtr();
-
-	ReconstructCorePtr retval(new ReconstructCore());
-
-	ReconstructCore::InputParams par = this->createCoreParameters();
-	par.mAngio = false;
-	par.mTransferFunctionPreset = "US B-Mode";
-
-	retval->initialize(par);
-
-	return retval;
 }
 
 void ReconstructionManagerImpl::onServiceAdded(ReconstructionService* service)

@@ -59,7 +59,7 @@ class ReconstructionService : public QObject
 {
     Q_OBJECT
 public:
-	virtual ~ReconstructionService();
+	virtual ~ReconstructionService() {}
 	virtual QString getName() const = 0;
 	/**
 	 *  Fill settings for this algorithm.

@@ -22,10 +22,10 @@
 #include <vtkImageData.h>
 #include "cxDataManager.h"
 #include "cxToolManager.h"
-#ifdef CX_USE_OPENCL_UTILITY
-	#include "TordReconstruct/TordTest.h"
-#endif // CX_USE_OPENCL_UTILITY
-#include "cxPNNReconstructAlgorithm.h"
+//#ifdef CX_USE_OPENCL_UTILITY
+//	#include "TordReconstruct/TordTest.h"
+//#endif // CX_USE_OPENCL_UTILITY
+//#include "cxPNNReconstructAlgorithm.h"
 #include "cxTime.h"
 #include "cxTypeConversions.h"
 #include "cxRegistrationTransform.h"
@@ -34,13 +34,14 @@
 #include "cxTimeKeeper.h"
 #include "cxLogger.h"
 #include "cxUSFrameData.h"
+#include "cxReconstructionService.h"
 
 namespace cx
 {
 
-ReconstructionService::~ReconstructionService()
-{
-}
+//ReconstructionService::~ReconstructionService()
+//{
+//}
 
 
 ReconstructCore::ReconstructCore() :
@@ -54,9 +55,10 @@ ReconstructCore::~ReconstructCore()
 {
 }
 
-void ReconstructCore::initialize(InputParams input)
+void ReconstructCore::initialize(InputParams input, ReconstructionServicePtr algorithm)
 {
 	mInput = input;
+	mAlgorithm = algorithm;
 }
 
 void ReconstructCore::initialize(ProcessedUSInputDataPtr fileData, OutputVolumeParams outputVolumeParams)
@@ -65,29 +67,29 @@ void ReconstructCore::initialize(ProcessedUSInputDataPtr fileData, OutputVolumeP
 	mFileData = fileData;
 //	this->updateFromOriginalFileData();
 
-	mAlgorithm = this->createAlgorithm(mInput.mAlgorithmUid);
+//	mAlgorithm = this->createAlgorithm(mInput.mAlgorithmUid);
 }
 
-ReconstructionServicePtr ReconstructCore::createAlgorithm(QString name)
-{
-    ReconstructionServicePtr retval;
-
-	if (mAlgorithm && mAlgorithm->getName() == name)
-		return mAlgorithm;
-
-	if (name == "PNN")
-		retval = ReconstructionServicePtr(new PNNReconstructAlgorithm());
-#ifdef CX_USE_OPENCL_UTILITY
-	else if (name == "TordTest")
-	{
-		retval = ReconstructionServicePtr(new TordTest());
-	}
-#endif // CX_USE_OPENCL_UTILITY
-	else
-		retval.reset();
-
-	return retval;
-}
+//ReconstructionServicePtr ReconstructCore::createAlgorithm(QString name)
+//{
+//    ReconstructionServicePtr retval;
+//
+//	if (mAlgorithm && mAlgorithm->getName() == name)
+//		return mAlgorithm;
+//
+//	if (name == "PNN")
+//		retval = ReconstructionServicePtr(new PNNReconstructAlgorithm());
+//#ifdef CX_USE_OPENCL_UTILITY
+//	else if (name == "TordTest")
+//	{
+//		retval = ReconstructionServicePtr(new TordTest());
+//	}
+//#endif // CX_USE_OPENCL_UTILITY
+//	else
+//		retval.reset();
+//
+//	return retval;
+//}
 
 ImagePtr ReconstructCore::reconstruct()
 {

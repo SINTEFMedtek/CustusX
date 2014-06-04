@@ -42,6 +42,8 @@ typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconst
 typedef boost::shared_ptr<class ThreadedTimedReconstructPreprocessor> ThreadedTimedReconstructPreprocessorPtr;
 typedef boost::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedReconstructCorePtr;
 
+typedef boost::shared_ptr<class ReconstructionExecuter> ReconstructionExecuterPtr;
+
 
 class ReconstructionManager : public QObject
 {
@@ -77,18 +79,18 @@ public:
 	  */
 	virtual std::vector<ReconstructCorePtr> startReconstruction() = 0;
 	virtual std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction() = 0; ///< Return the currently reconstructing thread object(s).
-	/**
-	  * Create the reconstruct preprocessor object.
-	  * This is usually created internally during reconstruction,
-	  * published for use in unit testing.
-	  */
-	virtual ReconstructPreprocessorPtr createPreprocessor() = 0;
-	/**
-	  * Create the reconstruct core object.
-	  * This is usually created internally during reconstruction,
-	  * published for use in unit testing.
-	  */
-	virtual std::vector<ReconstructCorePtr> createCores() = 0; ///< create reconstruct cores matching the current parameters
+//	/**
+//	  * Create the reconstruct preprocessor object.
+//	  * This is usually created internally during reconstruction,
+//	  * published for use in unit testing.
+//	  */
+//	virtual ReconstructPreprocessorPtr createPreprocessor() = 0;
+//	/**
+//	  * Create the reconstruct core object.
+//	  * This is usually created internally during reconstruction,
+//	  * published for use in unit testing.
+//	  */
+//	virtual std::vector<ReconstructCorePtr> createCores() = 0; ///< create reconstruct cores matching the current parameters
 	/**
 	  * Create the reconstruct algorithm object.
 	  * This is usually created internally during reconstruction,
@@ -96,7 +98,8 @@ public:
 	  */
 	virtual ReconstructionServicePtr createAlgorithm() = 0;
 
-protected:
+	virtual ReconstructCore::InputParams createCoreParameters() = 0;
+
 };
 
 //--------------------------------------------------------------------------------------------------------
@@ -168,24 +171,26 @@ public:
 	  */
 	virtual std::vector<ReconstructCorePtr> startReconstruction();
 	virtual std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction(); ///< Return the currently reconstructing thread object(s).
-	/**
-	  * Create the reconstruct preprocessor object.
-	  * This is usually created internally during reconstruction,
-	  * published for use in unit testing.
-	  */
-	virtual ReconstructPreprocessorPtr createPreprocessor();
-	/**
-	  * Create the reconstruct core object.
-	  * This is usually created internally during reconstruction,
-	  * published for use in unit testing.
-	  */
-	virtual std::vector<ReconstructCorePtr> createCores(); ///< create reconstruct cores matching the current parameters
+//	/**
+//	  * Create the reconstruct preprocessor object.
+//	  * This is usually created internally during reconstruction,
+//	  * published for use in unit testing.
+//	  */
+//	virtual ReconstructPreprocessorPtr createPreprocessor();
+//	/**
+//	  * Create the reconstruct core object.
+//	  * This is usually created internally during reconstruction,
+//	  * published for use in unit testing.
+//	  */
+//	virtual std::vector<ReconstructCorePtr> createCores(); ///< create reconstruct cores matching the current parameters
 	/**
 	  * Create the reconstruct algorithm object.
 	  * This is usually created internally during reconstruction,
 	  * published for use in unit testing.
 	  */
 	virtual ReconstructionServicePtr createAlgorithm();
+
+	virtual ReconstructCore::InputParams createCoreParameters();
 
 signals:
 	void paramsChanged();
@@ -197,24 +202,25 @@ signals:
 private slots:
 	void setSettings();
 	void transferFunctionChangedSlot();
-	void threadFinishedSlot();
+//	void threadFinishedSlot();
+	void reconstructFinishedSlot();
 
 private:
-	void launch(cx::TimedAlgorithmPtr thread);
+//	void launch(cx::TimedAlgorithmPtr thread);
 	void clearAll();
-	ReconstructCorePtr createCore(); ///< used for threaded reconstruction
-	ReconstructCorePtr createBModeCore(); ///< core version for B-mode in case of angio recording.
+
+//	ReconstructCorePtr createCore(); ///< used for threaded reconstruction
+//	ReconstructCorePtr createBModeCore(); ///< core version for B-mode in case of angio recording.
 
 	void initAlgorithm();
 	/** Use the mOriginalFileData structure to rebuild all internal data.
 	 *  Useful when settings have changed or data is loaded.
 	 */
 	void updateFromOriginalFileData();
-	ReconstructCore::InputParams createCoreParameters();
 
 	bool validInputData() const;///< checks if internal states is valid (that it actually has frames to reconstruct)
-	cx::CompositeTimedAlgorithmPtr assembleReconstructionPipeline(std::vector<ReconstructCorePtr> cores); ///< assembles the different steps that is needed to reconstruct
-	bool canCoresRunInParallel(std::vector<ReconstructCorePtr> cores);
+//	cx::CompositeTimedAlgorithmPtr assembleReconstructionPipeline(std::vector<ReconstructCorePtr> cores); ///< assembles the different steps that is needed to reconstruct
+//	bool canCoresRunInParallel(std::vector<ReconstructCorePtr> cores);
 
     void onServiceAdded(ReconstructionService* service);
     void onServiceModified(ReconstructionService* service);
@@ -222,7 +228,7 @@ private:
 
 	ReconstructParamsPtr mParams;
 	std::vector<DataAdapterPtr> mAlgoOptions;
-	std::set<cx::TimedAlgorithmPtr> mThreadedReconstruction;
+//	std::set<cx::TimedAlgorithmPtr> mThreadedReconstruction;
 	USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
 
 	OutputVolumeParams mOutputVolumeParams;
@@ -232,6 +238,7 @@ private:
 	QString mShaderPath; ///< name of shader folder
 
 	boost::shared_ptr<ServiceTrackerListener<ReconstructionService> > mServiceListener;
+	ReconstructionExecuterPtr mExecuter;
 };
 
 /**
