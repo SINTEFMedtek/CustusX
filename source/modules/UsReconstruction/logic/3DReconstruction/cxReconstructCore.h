@@ -64,7 +64,7 @@ public:
 	virtual ~ReconstructCore();
 
 	// used for reconstruction algo
-	void initialize(InputParams input);
+	void initialize(InputParams input, ReconstructionServicePtr algorithm);
 	void initialize(ProcessedUSInputDataPtr fileData, OutputVolumeParams outputVolumeParams);
 	ImagePtr reconstruct();
 	void threadedPreReconstruct();
@@ -73,7 +73,7 @@ public:
 	ImagePtr getOutput();
 
 	// published helper methods, also needed for parameter display outside of reconstruction execution:
-	ReconstructionServicePtr createAlgorithm(QString uid);
+//	ReconstructionServicePtr createAlgorithm(QString uid);
 	InputParams getInputParams() { return mInput; }
 
 private:

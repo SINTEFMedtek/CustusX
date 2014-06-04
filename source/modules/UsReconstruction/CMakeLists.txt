@@ -12,6 +12,7 @@ SET( MOC_HEADER_FILES
    logic/cxReconstructionManager.h
    logic/cxReconstructThreads.h
    logic/cxReconstructParams.h
+   logic/3DReconstruction/cxReconstructionExecuter.h
    gui/cxReconstructionWidget.h
    gui/cxReconstructOutputValueParamsInterfaces.h
    gui/cxUsReconstructionPlugin.h
@@ -28,6 +29,7 @@ SET( SOURCE_FILES
   logic/cxReconstructThreads.cpp
   logic/cxReconstructParams.h
   logic/cxReconstructParams.cpp
+  logic/3DReconstruction/cxReconstructionExecuter.cpp
   gui/cxReconstructionWidget.cpp
   gui/cxReconstructOutputValueParamsInterfaces.cpp
   gui/cxReconstructOutputValueParamsInterfaces.h

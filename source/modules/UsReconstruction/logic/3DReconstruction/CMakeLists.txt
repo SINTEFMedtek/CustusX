@@ -20,6 +20,7 @@ include_directories(
 SET( MOC_HEADER_FILES
   cxReconstructionService.h
   cxPNNReconstructAlgorithm.h
+  #cxReconstructionExecuter.h
     )
 if (CX_USE_OPENCL_UTILITY)
 	SET( MOC_HEADER_FILES
@@ -40,6 +41,7 @@ SET( SOURCE_FILES
   cxReconstructCore.h
   cxReconstructPreprocessor.cpp
   cxReconstructPreprocessor.h
+  #cxReconstructionExecuter.cpp
 	TordReconstruct/cxSyntheticVolume.h
 	TordReconstruct/cxSyntheticVolume.cpp
 	TordReconstruct/cxSimpleSyntheticVolume.h

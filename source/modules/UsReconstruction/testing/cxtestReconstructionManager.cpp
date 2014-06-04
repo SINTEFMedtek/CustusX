@@ -25,6 +25,7 @@
 #include <vtkImageData.h>
 #include "cxStringDataAdapterXml.h"
 #include "recConfig.h"
+#include "cxReconstructionExecuter.h"
 
 #ifdef CX_USE_OPENCL_UTILITY
 #include "TordReconstruct/TordTest.h"
@@ -187,9 +188,14 @@ TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integ
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
 	fixture.setPNN_InterpolationSteps(1);// set an algorithm-specific parameter
 
-	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
+	cx::ReconstructionExecuterPtr executor(new cx::ReconstructionExecuter);
+//	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
+	bool validInputData = true; //TODO should be checked in some way???
+	cx::ReconstructPreprocessorPtr preprocessor = executor->createPreprocessor(reconstructer->createCoreParameters(), reconstructer->getSelectedFileData(), validInputData);
 	REQUIRE(preprocessor);
-	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
+//	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
+	bool createBModeWhenAngio = reconstructer->getParams()->mCreateBModeWhenAngio->getValue();
+	std::vector<cx::ReconstructCorePtr> cores = executor->createCores(reconstructer->createAlgorithm(), reconstructer->createCoreParameters(), createBModeWhenAngio, validInputData);
 	REQUIRE(!cores.empty());
 	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(cores);
 
