@@ -68,7 +68,7 @@ StreamerPtr SimulatedImageStreamerService::createStreamer()
 	return mStreamer;
 }
 
-BaseWidget* SimulatedImageStreamerService::createWidget()
+QWidget *SimulatedImageStreamerService::createWidget()
 {
 	SimulateUSWidget* mSimulationWidget = new SimulateUSWidget(this);
 	return mSimulationWidget;

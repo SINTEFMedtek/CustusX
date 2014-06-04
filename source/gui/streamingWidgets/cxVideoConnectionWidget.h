@@ -24,6 +24,7 @@
 #include "cxForwardDeclarations.h"
 #include "cxServiceTrackerListener.h"
 #include "cxStreamerService.h"
+#include "cxXmlOptionItem.h"
 
 class QPushButton;
 class QComboBox;
@@ -79,7 +80,6 @@ protected:
 	void connectServer();
 	void disconnectServer();
 	void initializeScriptWidget();
-	StringDataAdapterXmlPtr initializeConnectionSelector();
 	ActiveVideoSourceStringDataAdapterPtr initializeActiveVideoSourceSelector();
 	QFrame* wrapStackedWidgetInAFrame();
 	void updateHostHistory();
@@ -112,6 +112,7 @@ protected:
 	StringDataAdapterXmlPtr mConnectionSelector;
 	ActiveVideoSourceStringDataAdapterPtr mActiveVideoSourceSelector;
 	FileInputWidget* mLocalServerFile;
+	XmlOptionFile mOptions;
 
 private:
 	void onServiceAdded(StreamerService *service);

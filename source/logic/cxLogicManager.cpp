@@ -192,12 +192,13 @@ void LogicManager::createVideoService()
 	this->getTrackingService();
 	this->getDataService();
 	this->getSpaceProvider();
+	this->getPluginFramework();
 
 	// build object(s):
 	VideoServiceBackendPtr videoBackend;
 	videoBackend = VideoServiceBackend::create(mDataService,
 											   mTrackingService,
-											   mSpaceProvider);
+												 mSpaceProvider, mPluginFramework->getPluginContext());
 	mVideoService = VideoService::create(videoBackend);
 	LegacySingletons::mVideoService = mVideoService;
 }

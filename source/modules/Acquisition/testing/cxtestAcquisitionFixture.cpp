@@ -71,7 +71,7 @@ cx::ReconstructManagerPtr AcquisitionFixture::createReconstructionManager()
 void AcquisitionFixture::setupVideo()
 {
 	SSC_LOG("");
-	cx::videoService()->getVideoConnection()->getConnectionMethod()->setValue(mConnectionMethod);
+	cx::videoService()->getVideoConnection()->setConnectionMethod(mConnectionMethod);
 	INFO("bundle path: "+cx::DataLocations::getBundlePath());
 	REQUIRE(!cx::stateService()->getOpenIGTLinkServer().isEmpty());
 	cx::videoService()->getVideoConnection()->setLocalServerExecutable(cx::stateService()->getOpenIGTLinkServer()[0]);

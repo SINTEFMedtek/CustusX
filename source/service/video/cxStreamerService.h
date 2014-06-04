@@ -14,14 +14,15 @@
 #define CXIMAGESTREAMERINTERFACE_H
 
 #include "boost/shared_ptr.hpp"
-#include "cxBaseWidget.h"
+#include <QObject>
+class QWidget;
 
 #define StreamerService_iid "cx::StreamerService"
 
 namespace cx
 {
 
-// Use of smart pointer not possible for plugin service. Replace with serviceAdded and serviceRemoved signals
+// Use of smart pointer not possible for plugin service. Replace with serviceAdded and serviceRemoved signals using regular pointers
 // The smart pointer can still be used if StreamerService is coming from another source than a ctk plugin
 typedef boost::shared_ptr<class StreamerService> StreamerServicePtr;
 typedef boost::shared_ptr<class Streamer> StreamerPtr;
@@ -40,7 +41,7 @@ class StreamerService : public QObject
 public:
 	StreamerService();
 	virtual StreamerPtr createStreamer() = 0;
-	virtual BaseWidget* createWidget() = 0;
+	virtual QWidget* createWidget() = 0;
 	virtual QString getName() = 0;
 };
 

@@ -13,12 +13,13 @@
 // See CustusX_License.txt for more information.
 
 #include "cxVideoConnectionManager.h"
-#include <QStringList>
 
-#include "vtkRenderWindow.h"
+#include <boost/bind.hpp>
+#include <QStringList>
 #include <QTimer>
 
-//#include "cxLabeledComboBoxWidget.h"
+#include "vtkRenderWindow.h"
+
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
 #include "cxSettings.h"
@@ -29,6 +30,7 @@
 #include "cxLogger.h"
 #include "cxImageStreamer.h"
 #include "cxCommandlineImageStreamerFactory.h"
+#include "cxVideoServiceBackend.h"
 
 namespace cx
 {
@@ -37,18 +39,12 @@ VideoConnectionManager::VideoConnectionManager(VideoServiceBackendPtr backend)
 {
 	mBackend = backend;
 	mReconnectInterval = 400;
-	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("video");
 
-	QStringList connectionOptions;
-
-	QString defaultConnection = "Direct Link";	
+	mConnectionMethod = "Direct Link";
 #ifdef __APPLE__
-	defaultConnection = "Local Server";
+	mConnectionMethod = "Local Server";
 #endif
 
-	connectionOptions << "Local Server" << "Direct Link" << "Remote Server" << "Simulation Server";
-	mConnectionMethod = StringDataAdapterXml::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, connectionOptions, mOptions.getElement());
-	connect(mConnectionMethod.get(), SIGNAL(changed()), this, SIGNAL(connectionMethodChanged()));
 	mConnectWhenLocalServerRunning = 0;
 	mIniScriptProcess.reset(new ProcessWrapper("Init Script"));
 	mLocalVideoServerProcess.reset(new ProcessWrapper("Local Video Server"));
@@ -57,6 +53,14 @@ VideoConnectionManager::VideoConnectionManager(VideoServiceBackendPtr backend)
 	connect(mVideoConnection.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
 	connect(mVideoConnection.get(), SIGNAL(fps(QString, int)), this, SIGNAL(fps(QString, int)));
 	connect(mVideoConnection.get(), SIGNAL(videoSourcesChanged()), this, SIGNAL(videoSourcesChanged()));
+
+	mServiceListener.reset(new ServiceTrackerListener<StreamerService>(
+													 mBackend->getPluginContext(),
+													 boost::bind(&VideoConnectionManager::onServiceAdded, this, _1),
+													 boost::function<void (StreamerService*)>(),
+													 boost::bind(&VideoConnectionManager::onServiceRemoved, this, _1)
+													 ));
+	mServiceListener->open();
 }
 
 VideoConnectionManager::~VideoConnectionManager()
@@ -64,9 +68,27 @@ VideoConnectionManager::~VideoConnectionManager()
 	mVideoConnection->disconnectServer();
 }
 
-StringDataAdapterXmlPtr VideoConnectionManager::getConnectionMethod()
+void VideoConnectionManager::onServiceAdded(StreamerService* service)
+{
+	std::cout << "VideoConnectionManager:: Service added!!!" << std::endl;
+}
+
+void VideoConnectionManager::onServiceRemoved(StreamerService *service)
+{
+	std::cout << "VideoConnectionManager::Service removed!!!" << std::endl;
+}
+
+QString VideoConnectionManager::getConnectionMethod()
 {
 	return mConnectionMethod;
+}
+
+void VideoConnectionManager::setConnectionMethod(QString connectionMethod)
+{
+	if(!connectionMethod.isEmpty())
+		mConnectionMethod = connectionMethod;
+	else
+		reporter()->sendWarning("Trying to set connection method to empty string");
 }
 
 void VideoConnectionManager::setLocalServerExecutable(QString commandline)
@@ -111,23 +133,23 @@ QProcess* VideoConnectionManager::getLocalVideoServerProcess()
 
 bool VideoConnectionManager::useLocalServer()
 {
-	return mConnectionMethod->getValue() == "Local Server";
+	return mConnectionMethod == "Local Server";
 }
 
 bool VideoConnectionManager::useDirectLink()
 {
-	return mConnectionMethod->getValue() == "Direct Link";
+	return mConnectionMethod == "Direct Link";
 }
 
 bool VideoConnectionManager::useRemoteServer()
 {
-	return mConnectionMethod->getValue() == "Remote Server";
+	return mConnectionMethod == "Remote Server";
 }
 
-bool VideoConnectionManager::useSimulatedServer()
-{
-	return mConnectionMethod->getValue() == "Simulation Server";
-}
+//bool VideoConnectionManager::useSimulatedServer()
+//{
+//	return mConnectionMethod->getValue() == "Simulation Server";
+//}
 
 QStringList VideoConnectionManager::getHostHistory()
 {
@@ -214,6 +236,12 @@ void VideoConnectionManager::delayedAutoConnectServer()
 	}
 }
 
+void VideoConnectionManager::launchAndConnectServer(QString connectionMethod)
+{
+	mConnectionMethod = connectionMethod;
+	this->launchAndConnectServer();
+}
+
 void VideoConnectionManager::launchAndConnectServer()
 {
 	if (mVideoConnection->isConnected())
@@ -221,14 +249,20 @@ void VideoConnectionManager::launchAndConnectServer()
 
 	this->runScript();
 
-	if (useDirectLink() || useSimulatedServer())
+	if (useDirectLink())// || useSimulatedServer())
 		this->setupAndRunDirectLinkClient();
 	else if (useLocalServer())
 		this->launchAndConnectUsingLocalServer();
 	else if (useRemoteServer())
 		this->connectServer();
 	else
-		reportError("Could not determine which server to launch.");
+	{
+		StreamerService* service = mServiceListener->getService(mConnectionMethod);
+		if (service)
+			mVideoConnection->runDirectLinkClient(service);
+		else
+			reportError("Could not determine which server to launch.");
+	}
 }
 
 void VideoConnectionManager::serverProcessStateChanged(QProcess::ProcessState newState)

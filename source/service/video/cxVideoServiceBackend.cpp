@@ -23,17 +23,18 @@ namespace cx
 
 VideoServiceBackendPtr VideoServiceBackend::create(DataServicePtr dataManager,
 							TrackingServicePtr toolManager,
-							SpaceProviderPtr spaceProvider)
+							SpaceProviderPtr spaceProvider, ctkPluginContext *pluginContext)
 {
-	return VideoServiceBackendPtr(new VideoServiceBackend(dataManager, toolManager, spaceProvider));
+	return VideoServiceBackendPtr(new VideoServiceBackend(dataManager, toolManager, spaceProvider, pluginContext));
 }
 
 VideoServiceBackend::VideoServiceBackend(DataServicePtr dataManager,
 							TrackingServicePtr toolManager,
-							SpaceProviderPtr spaceProvider) :
+							SpaceProviderPtr spaceProvider, ctkPluginContext *pluginContext) :
 	mDataManager(dataManager),
 	mToolManager(toolManager),
-	mSpaceProvider(spaceProvider)
+	mSpaceProvider(spaceProvider),
+	mPluginContext(pluginContext)
 {
 
 }
@@ -51,6 +52,11 @@ TrackingServicePtr VideoServiceBackend::getToolManager()
 SpaceProviderPtr VideoServiceBackend::getSpaceProvider()
 {
 	return mSpaceProvider;
+}
+
+ctkPluginContext* VideoServiceBackend::getPluginContext()
+{
+	return mPluginContext;
 }
 
 } // namespace cx
