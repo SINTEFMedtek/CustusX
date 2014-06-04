@@ -101,6 +101,7 @@ private:
 	bool localVideoServerIsRunning();
 	void setupAndRunDirectLinkClient();
 	void launchAndConnectUsingLocalServer();
+	bool connectToService();
 
 	QString mConnectionMethod;
 	VideoConnectionPtr mVideoConnection;

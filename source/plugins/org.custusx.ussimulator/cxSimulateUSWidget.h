@@ -64,7 +64,7 @@ private:
 	SelectImageStringDataAdapterPtr mImageSelector;
 
 	StringDataAdapterXmlPtr mSimulationType;
-	SimulatedImageStreamerServicePtr mService;
+	SimulatedImageStreamerService* mService;
 
 };
 
