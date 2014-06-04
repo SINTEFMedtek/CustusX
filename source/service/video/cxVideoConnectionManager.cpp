@@ -32,6 +32,8 @@
 #include "cxCommandlineImageStreamerFactory.h"
 #include "cxVideoServiceBackend.h"
 
+//#include "cxSimulatedImageStreamerService.h"
+
 namespace cx
 {
 
@@ -76,6 +78,7 @@ void VideoConnectionManager::onServiceAdded(StreamerService* service)
 void VideoConnectionManager::onServiceRemoved(StreamerService *service)
 {
 	std::cout << "VideoConnectionManager::Service removed!!!" << std::endl;
+	this->disconnectServer();//Disconnect to be safe. Can be improved by only disconneting if the removed service is running
 }
 
 QString VideoConnectionManager::getConnectionMethod()
@@ -255,14 +258,19 @@ void VideoConnectionManager::launchAndConnectServer()
 		this->launchAndConnectUsingLocalServer();
 	else if (useRemoteServer())
 		this->connectServer();
-	else
-	{
-		StreamerService* service = mServiceListener->getService(mConnectionMethod);
-		if (service)
-			mVideoConnection->runDirectLinkClient(service);
-		else
-			reportError("Could not determine which server to launch.");
-	}
+	else if(!this->connectToService())
+		reportError("Could not determine which server to launch.");
+}
+
+bool VideoConnectionManager::connectToService()
+{
+	StreamerService* service = mServiceListener->getService(mConnectionMethod);
+	if (!service)
+		return false;
+
+	service->setBackend(mBackend);
+	mVideoConnection->runDirectLinkClient(service);
+	return true;
 }
 
 void VideoConnectionManager::serverProcessStateChanged(QProcess::ProcessState newState)

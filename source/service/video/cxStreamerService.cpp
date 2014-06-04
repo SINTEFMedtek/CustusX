@@ -15,8 +15,9 @@
 namespace cx
 {
 
-StreamerService::StreamerService()
+void StreamerService::setBackend(VideoServiceBackendPtr backend)
 {
+	mBackend = backend;
 }
 
 } //end namespace cx

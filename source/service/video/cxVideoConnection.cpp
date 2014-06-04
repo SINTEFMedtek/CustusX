@@ -209,6 +209,7 @@ void VideoConnection::disconnectServer()
 		this->removeSourceFromProbe(tool);
 
 	mSources.clear();
+	mStreamerInterface.reset();
 	emit videoSourcesChanged();
 }
 

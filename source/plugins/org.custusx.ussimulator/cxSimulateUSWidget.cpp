@@ -94,15 +94,13 @@ void SimulateUSWidget::simulationTypeChanged()
 
 void SimulateUSWidget::imageChangedSlot(QString imageUid)
 {
-	if(mService)
-		mService->setImageToStream(imageUid);
+	mService->setImageToStream(imageUid);
 	settings()->setValue("USsimulation/volume", mImageSelector->getValue());
 }
 
 void SimulateUSWidget::gainChanged(int gain)
 {
-	if(mService)
-		mService->setGain(gain/100.0);
+	mService->setGain(gain/100.0);
 	settings()->setValue("USsimulation/gain", gain/100.0);
 }
 
