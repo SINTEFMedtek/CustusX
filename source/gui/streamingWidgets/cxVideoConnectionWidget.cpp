@@ -44,22 +44,27 @@
 #include "cxViewManager.h"
 #include "cxFileInputWidget.h"
 #include "cxLogger.h"
-#include "cxLogicManager.h"
 
 namespace cx
 {
 
 VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
-		BaseWidget(parent, "IGTLinkWidget", "Video Connection")//, mSimulationWidget(NULL)
+		BaseWidget(parent, "IGTLinkWidget", "Video Connection")
 {
 	mInitScriptWidget=NULL;
 
+	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("video");
+
+	QStringList connectionOptions;
+	QString defaultConnection = this->getVideoConnectionManager()->getConnectionMethod();
+	connectionOptions << "Local Server" << "Direct Link" << "Remote Server";
+	mConnectionSelector = StringDataAdapterXml::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, connectionOptions, mOptions.getElement());
+	connect(mConnectionSelector.get(), SIGNAL(changed()), this, SLOT(selectGuiForConnectionMethodSlot()));
+
 	connect(this->getVideoConnectionManager().get(), SIGNAL(connected(bool)), this, SLOT(serverStatusChangedSlot()));
-	connect(this->getVideoConnectionManager().get(), SIGNAL(connectionMethodChanged()), this, SLOT(selectGuiForConnectionMethodSlot()));
 	connect(this->getServerProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
 
 	this->initializeScriptWidget();
-	mConnectionSelector = this->initializeConnectionSelector();
 	mStackedWidget = this->initializeStackedWidget();
 	QFrame* frame = this->wrapStackedWidgetInAFrame();
 	mConnectButton = this->initializeConnectButton();
@@ -76,11 +81,12 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 	mToptopLayout->addStretch();
 
 	mServiceListener.reset(new ServiceTrackerListener<StreamerService>(
-													 LogicManager::getInstance()->getPluginFramework(),
+													 videoService()->getPluginContext(),
 													 boost::bind(&VideoConnectionWidget::onServiceAdded, this, _1),
 													 boost::function<void (StreamerService*)>(),
 													 boost::bind(&VideoConnectionWidget::onServiceRemoved, this, _1)
 													 ));
+	mServiceListener->open();
 
 	this->selectGuiForConnectionMethodSlot();
 }
@@ -128,6 +134,7 @@ void VideoConnectionWidget::removeServiceWidget(QString name)
 {
 	QWidget* serviceWidget = mStreamerServiceWidgets[name];
 	mStackedWidget->removeWidget(serviceWidget);
+	delete serviceWidget;
 	mStreamerServiceWidgets.erase(name);
 }
 
@@ -140,11 +147,6 @@ void VideoConnectionWidget::initializeScriptWidget()
 	mInitScriptWidget->setHelp("A script that will be run prior to starting the server. Useful for grabber-specific initialization");
 	mInitScriptWidget->setBrowseHelp("Select an init script");
 	mInitScriptWidget->setUseRelativePath(true);
-}
-
-StringDataAdapterXmlPtr VideoConnectionWidget::initializeConnectionSelector()
-{
-	return this->getVideoConnectionManager()->getConnectionMethod();
 }
 
 ActiveVideoSourceStringDataAdapterPtr VideoConnectionWidget::initializeActiveVideoSourceSelector()
@@ -311,6 +313,10 @@ VideoConnectionManagerPtr VideoConnectionWidget::getVideoConnectionManager()
 
 void VideoConnectionWidget::selectGuiForConnectionMethodSlot()
 {
+	QString name = mConnectionSelector->getValue();
+	//Need to set connection method in VideoConneectionManager before calling useDirectLink(), useLocalServer() and useRemoteServer()
+	this->getVideoConnectionManager()->setConnectionMethod(mConnectionSelector->getValue());
+
 	if (this->getVideoConnectionManager()->useDirectLink())
 		mStackedWidget->setCurrentIndex(0);
 	else if (this->getVideoConnectionManager()->useLocalServer())
@@ -321,7 +327,7 @@ void VideoConnectionWidget::selectGuiForConnectionMethodSlot()
 //		mStackedWidget->setCurrentIndex(3);
 	else
 	{
-		QWidget* serviceWidget = mStreamerServiceWidgets[mConnectionSelector->getValue()];
+		QWidget* serviceWidget = mStreamerServiceWidgets[name];
 		mStackedWidget->setCurrentWidget(serviceWidget);
 	}
 }
@@ -380,6 +386,9 @@ void VideoConnectionWidget::writeSettings()
 {
 	this->getVideoConnectionManager()->setInitScript(mInitScriptWidget->getFilename());
 
+	//Need to set connection method in VideoConneectionManager before calling useDirectLink(), useLocalServer() and useRemoteServer()
+	this->getVideoConnectionManager()->setConnectionMethod(mConnectionSelector->getValue());
+
 	if (this->getVideoConnectionManager()->useDirectLink())
 	{
 		this->getVideoConnectionManager()->setLocalServerArguments(mDirectLinkArguments->currentText());
@@ -396,10 +405,10 @@ void VideoConnectionWidget::writeSettings()
 		this->getVideoConnectionManager()->setPort(mPortEdit->text().toInt());
 		this->updateHostHistory();
 	}
-	else if (this->getVideoConnectionManager()->useSimulatedServer())
-	{
-		this->getVideoConnectionManager()->setLocalServerArguments("--type SimulatedImageStreamer");
-	}
+//	else if (this->getVideoConnectionManager()->useSimulatedServer())
+//	{
+//		this->getVideoConnectionManager()->setLocalServerArguments("--type SimulatedImageStreamer");
+//	}
 }
 
 QPushButton* VideoConnectionWidget::initializeConnectButton()
@@ -436,7 +445,7 @@ void VideoConnectionWidget::connectServer()
 	if (!this->getVideoConnectionManager()->isConnected())
 	{
 		this->writeSettings();
-		this->getVideoConnectionManager()->launchAndConnectServer();
+		this->getVideoConnectionManager()->launchAndConnectServer(mConnectionSelector->getValue());
 	}
 }
 

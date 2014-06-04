@@ -45,7 +45,7 @@ public:
 	void setGain(double gain);
 
 	virtual StreamerPtr createStreamer();
-	virtual BaseWidget* createWidget();
+	virtual QWidget* createWidget();
 	virtual QString getName();
 
 private:

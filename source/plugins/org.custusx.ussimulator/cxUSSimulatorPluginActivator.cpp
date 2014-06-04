@@ -42,7 +42,7 @@ void USSimulatorPluginActivator::start(ctkPluginContext* context)
 	std::cout << "created ussimulator plugin service" << std::endl;
 	try
 	{
-		context->registerService(QStringList(StreamerService_iid), mPlugin.get());
+		mRegistration = context->registerService(QStringList(StreamerService_iid), mPlugin.get());
 	}
 	catch(ctkRuntimeException& e)
 	{
@@ -54,7 +54,9 @@ void USSimulatorPluginActivator::start(ctkPluginContext* context)
 
 void USSimulatorPluginActivator::stop(ctkPluginContext* context)
 {
-	mPlugin.reset();
+	mRegistration.unregister();
+	if(mPlugin)
+		mPlugin.reset();
 	std::cout << "Stopped USSimulatorPluginActivator" << std::endl;
 	Q_UNUSED(context)
 }

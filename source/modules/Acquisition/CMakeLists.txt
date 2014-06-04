@@ -68,7 +68,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/service/video
     ${CustusX3_SOURCE_DIR}/source/service/visualization
-	${CustusX3_SOURCE_DIR}/source/logic
+        ${CustusX3_SOURCE_DIR}/source/logic
 
     ${CustusX3_SOURCE_DIR}/source/modules/UsReconstruction/logic
     ${CustusX3_SOURCE_DIR}/source/modules/UsReconstruction/logic/3DReconstruction
@@ -80,6 +80,8 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/gui/utilities
     ${CustusX3_SOURCE_DIR}/source/gui/dataAdapters
     ${CustusX3_SOURCE_DIR}/source/gui/toolWidgets
+
+    ${CustusX3_SOURCE_DIR}/source/resource/pluginUtilities
     )
 
 set(CX_ACQUISITION_LIBRARIES

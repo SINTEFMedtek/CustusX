@@ -89,7 +89,10 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${CustusX3_SOURCE_DIR}/source/resource/widgets
+    #${CustusX3_SOURCE_DIR}/source/resource/widgets
+    #${CustusX3_SOURCE_DIR}/source/logic
+    ${CustusX3_SOURCE_DIR}/source/resource/pluginUtilities
+
 #cxResourceWidgets
     )
 
@@ -97,7 +100,7 @@ include_directories(
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( cxVideoService ${cxVideoService_SOURCE} ${MOC_HEADER_FILES} )
-target_link_libraries(cxVideoService cxResource cxResourceUsReconstructionTypes OpenIGTLink cxTrackingService cxGrabber)
+target_link_libraries(cxVideoService cxResource cxResourceUsReconstructionTypes OpenIGTLink cxTrackingService cxGrabber CTKPluginFramework)
 
 add_subdirectory(testing)
 

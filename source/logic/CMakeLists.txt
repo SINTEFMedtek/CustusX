@@ -21,8 +21,6 @@ SET (cxLogicManager_SOURCE
 	cxPluginFramework.cpp
 	cxPluginFrameworkUtilities.h
 	cxPluginFrameworkUtilities.cpp
-    cxServiceTrackerCustomizer.h
-    cxServiceTrackerListener.h
 )
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})

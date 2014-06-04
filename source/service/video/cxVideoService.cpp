@@ -20,6 +20,9 @@
  */
 
 #include "cxVideoService.h"
+
+#include "ctkPluginContext.h"
+
 #include "cxPlaybackUSAcquisitionVideo.h"
 #include "cxVideoConnection.h"
 #include "cxVideoConnectionManager.h"
@@ -175,6 +178,11 @@ VideoConnectionManagerPtr VideoService::getVideoConnection()
 VideoSourcePtr VideoService::getActiveVideoSource()
 {
 	return mActiveVideoSource;
+}
+
+ctkPluginContext* VideoService::getPluginContext()
+{
+	return mBackend->getPluginContext();
 }
 
 void VideoService::setPlaybackMode(PlaybackTimePtr controller)

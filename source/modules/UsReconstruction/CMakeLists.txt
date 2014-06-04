@@ -53,6 +53,7 @@ include_directories(
 	${CustusX3_SOURCE_DIR}/source/modules/GUIExtender
     ${CustusX3_SOURCE_DIR}/source/modules/Algorithm/gui
     ${CustusX3_SOURCE_DIR}/source/gui/utilities
+    ${CustusX3_SOURCE_DIR}/source/resource/pluginUtilities
     )
 
 SET( cxPluginUSReconstruction_LIB_FILES

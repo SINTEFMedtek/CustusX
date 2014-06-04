@@ -130,6 +130,8 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/gui/dataAdapters
     ${CustusX3_SOURCE_DIR}/source/gui/infoWidgets
     ${CustusX3_SOURCE_DIR}/source/gui/dataWidgets
+
+    ${CustusX3_SOURCE_DIR}/source/resource/pluginUtilities
     )
 
 

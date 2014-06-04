@@ -27,6 +27,7 @@
 #include <vector>
 #include "cxVideoSource.h"
 #include "cxForwardDeclarations.h"
+class ctkPluginContext;
 
 namespace cx
 {
@@ -94,6 +95,7 @@ public:
 	/** Get all existing video sources.
 	  */
 	std::vector<VideoSourcePtr> getVideoSources();
+	ctkPluginContext* getPluginContext();
 
 signals:
 	/** Emitted when a video source is set to active,

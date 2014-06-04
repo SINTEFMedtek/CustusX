@@ -58,6 +58,11 @@ typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
 namespace cx
 {
 
+struct null_deleter
+{
+	void operator()(void const *) const {}
+};
+
 VideoConnection::VideoConnection(VideoServiceBackendPtr backend)
 {
 	mBackend = backend;
@@ -110,8 +115,19 @@ void VideoConnection::runDirectLinkClient(std::map<QString, QString> args)
 	imageStreamerFactory.setImageToStream(this->getImageToStream());
 	mStreamerInterface = imageStreamerFactory.getStreamerInterface();
 
+	this->runImageReceiverThread();
+}
+
+void VideoConnection::runImageReceiverThread()
+{
 	DirectlyLinkedImageReceiverThreadPtr imageReceiverThread(new DirectlyLinkedImageReceiverThread(mStreamerInterface, this));
 	this->runClient(imageReceiverThread);
+}
+
+void VideoConnection::runDirectLinkClient(StreamerService* service)
+{
+	mStreamerInterface.reset(service, null_deleter());//Can't allow boost to delete service
+	this->runImageReceiverThread();
 }
 
 QString VideoConnection::getImageToStream()
