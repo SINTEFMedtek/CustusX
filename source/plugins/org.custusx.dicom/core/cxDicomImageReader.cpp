@@ -36,7 +36,6 @@ DicomImageReader::DicomImageReader() :
 
 bool DicomImageReader::loadFile(QString filename)
 {
-//	std::cout << "*** load file: " << filename << std::endl;
 	mFilename = filename;
 	OFCondition status = mFileFormat.loadFile(filename.toLatin1().data());
 	if( !status.good() )
@@ -45,7 +44,6 @@ bool DicomImageReader::loadFile(QString filename)
 	}
 
 	mDataset = mFileFormat.getDataset();
-//	mDicomItem = this->wrapInCTK(mDataset);
 	return true;
 }
 
@@ -75,22 +73,20 @@ DicomImageReader::WindowLevel DicomImageReader::getWindowLevel() const
 	return retval;
 }
 
-
 int DicomImageReader::getNumberOfFrames() const
 {
 	int numberOfFrames = this->item()->GetElementAsInteger(DCM_NumberOfFrames);
-//	std::cout << "numberOfFrames: " << numberOfFrames << std::endl;
 	if (numberOfFrames==0)
-		numberOfFrames = 1; // nonexistent entry propably means that this is a single frame.
+	{
+		unsigned short rows = 0;
+		unsigned short columns = 0;
+		mDataset->findAndGetUint16(DCM_Rows, rows, 0, OFTrue);
+		mDataset->findAndGetUint16(DCM_Columns, columns, 0, OFTrue);
+		if (rows*columns > 0)
+			numberOfFrames = 1; // seems like we have a 2D image
+	}
 	return numberOfFrames;
 }
-
-//bool DicomImageReader::isSingleFile() const
-//{
-//	int numberOfFrames = mDicomItem->GetElementAsInteger(DCM_NumberOfFrames);
-//	std::cout << "numberOfFrames: " << numberOfFrames << std::endl;
-//	return numberOfFrames > 1;
-//}
 
 Transform3D DicomImageReader::getImageTransformPatient() const
 {
@@ -105,11 +101,6 @@ Transform3D DicomImageReader::getImageTransformPatient() const
 		e_y[i] = this->getDouble(DCM_ImageOrientationPatient, i+3, OFTrue);
 		pos[i] = this->getDouble(DCM_ImagePositionPatient, i, OFTrue);
 	}
-
-
-//	std::cout << "imagePositionPatient: " << pos << std::endl;
-//	std::cout << "imageOrientationPatientX: " << e_x << std::endl;
-//	std::cout << "imageOrientationPatientY: " << e_y << std::endl;
 
 	Transform3D retval = cx::createTransformIJC(e_x, e_y, pos);
 	return retval;
@@ -129,12 +120,6 @@ void DicomImageReader::error(QString message) const
 	reportError(QString("Dicom convert: [%1] in %2").arg(message).arg(mFilename));
 }
 
-//void DicomImageReader::localDebug(QString message) const
-//{
-//	if (true)
-//		reportDebug(message);
-//}
-
 vtkImageDataPtr DicomImageReader::createVtkImageData()
 {
 	DicomImage dicomImage(mFilename.toLatin1().data()); //, CIF_MayDetachPixelData );
@@ -148,16 +133,11 @@ vtkImageDataPtr DicomImageReader::createVtkImageData()
 	vtkImageDataPtr data = vtkImageDataPtr::New();
 
 	data->SetSpacing(this->getSpacing().data());
-//	this->localDebug(QString("  spacing: %1").arg(qstring_cast(this->getSpacing())));
-//	std::cout << "  this->getSpacing(): " << this->getSpacing() << std::endl;
 
 	Eigen::Array3i dim = this->getDim(dicomImage);
 	data->SetExtent(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
 
-//	std::cout << "pixels->getCount(): " << pixels->getCount() << std::endl;
-
 	int samplesPerPixel = pixels->getPlanes();
-//	int samplesPerPixel = mDicomItem->GetElementAsUnsignedShort(DCM_SamplesPerPixel);
 	int scalarSize = dim.prod() * samplesPerPixel;
 	int pixelDepth = dicomImage.getDepth();
 
@@ -190,12 +170,6 @@ vtkImageDataPtr DicomImageReader::createVtkImageData()
 	}
 
 	int bytesPerPixel = data->GetScalarSize() * samplesPerPixel;
-
-//	std::cout << "  dim: " << dim << std::endl;
-//	std::cout << "  pixelDepth: " << pixelDepth << std::endl;
-//	std::cout << "  pixels->getRepresentation(): " << pixels->getRepresentation() << std::endl;
-//	std::cout << "  pixels->getCount(): " << pixels->getCount() << std::endl;
-//	std::cout << "  bytesPerPixel: " << bytesPerPixel << std::endl;
 
 	memcpy(data->GetScalarPointer(), pixels->getData(), pixels->getCount()*bytesPerPixel);
 	if (pixels->getCount()!=scalarSize)

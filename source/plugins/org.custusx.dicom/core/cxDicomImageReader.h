@@ -63,7 +63,6 @@ public:
 private:
 	DcmFileFormat mFileFormat;
 	DcmDataset *mDataset;
-//	ctkDICOMItemPtr mDicomItem;
 	QString mFilename;
 
 	DicomImageReader();
@@ -71,7 +70,6 @@ private:
 	Eigen::Array3d getSpacing() const;
 	Eigen::Array3i getDim(const DicomImage& dicomImage) const;
 	void error(QString message) const;
-//	void localDebug(QString message) const;
 	double getDouble(const DcmTagKey& tag, const unsigned long pos=0, const OFBool searchIntoSub = OFFalse) const;
 	QString formatPatientName(QString rawName) const;
 

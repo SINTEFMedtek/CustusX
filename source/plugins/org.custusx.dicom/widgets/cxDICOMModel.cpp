@@ -61,6 +61,7 @@ public:
   void fetchChildren(const QModelIndex& indexValue);
   NodePtr createNode(int row, const QModelIndex& parentValue)const;
   DicomModelNode* nodeFromIndex(const QModelIndex& indexValue)const;
+  void remove(const QModelIndex& index);
 
   NodePtr RootNode;
   QSharedPointer<ctkDICOMDatabase> DataBase;
@@ -111,6 +112,26 @@ void DICOMModelPrivate::fetchChildren(const QModelIndex& indexValue)
 
   q->endInsertRows();
 }
+
+void DICOMModelPrivate::remove(const QModelIndex& index)
+{
+	DicomModelNode* node = this->nodeFromIndex(index);
+
+	qDebug() << "Remove DICOM node " << node->getValue(0).toString();
+
+	switch (node->getType())
+	{
+	case DICOMModel::SeriesType :
+		DataBase->removeSeries(node->getUid());
+	case DICOMModel::StudyType :
+		DataBase->removeStudy(node->getUid());
+	case DICOMModel::PatientType :
+		DataBase->removePatient(node->getUid());
+	}
+
+	node->getParent()->removeChild(node->getRow());
+}
+
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -295,6 +316,24 @@ void DICOMModel::reset()
   Q_D(DICOMModel);
   // this could probably be done in a more elegant way
   this->setDatabase(d->DataBase);
+}
+
+bool DICOMModel::removeRows(int row, int count, const QModelIndex& parent)
+{
+	Q_D(DICOMModel);
+
+	if (count==0)
+		return false;
+
+	this->beginRemoveRows(parent, row, row+count-1);
+
+	for (int i=row; i<row+count; ++i)
+	{
+		QModelIndex index = this->index(i, 0, parent);
+		d->remove(index);
+	}
+
+	this->endRemoveRows();
 }
 
 //------------------------------------------------------------------------------
