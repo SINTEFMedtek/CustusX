@@ -18,26 +18,27 @@ set(PLUGIN_SRCS
   core/cxDicomConverter.cpp
   core/cxDicomImageReader.h
   core/cxDicomImageReader.cpp
-  core/cxDicomImporter.cpp
-
+  
+  widgets/cxDicomImporter.cpp
   widgets/cxDicomWidget.cpp
   widgets/cxDICOMAppWidget.cpp
   widgets/cxDICOMModel.cpp
   widgets/cxDicomModelNode.cpp
   widgets/cxDicomModelNode.h
   widgets/cxDICOMThumbnailListWidget.cpp
-)
+  widgets/cxDICOMThumbnailGenerator.cpp
+  )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxDicomPluginActivator.h
 
-  core/cxDicomImporter.h
-
+  widgets/cxDicomImporter.h
   widgets/cxDICOMAppWidget.h
   widgets/cxDICOMModel.h
   widgets/cxDicomWidget.h
   widgets/cxDICOMThumbnailListWidget.h
+  widgets/cxDICOMThumbnailGenerator.h
 )
 
 # Qt Designer files which should be processed by Qts uic
