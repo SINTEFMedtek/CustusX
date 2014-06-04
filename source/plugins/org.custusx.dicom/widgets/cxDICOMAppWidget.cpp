@@ -54,7 +54,7 @@
 
 // ctkDICOMWidgets includes
 #include "cxDICOMAppWidget.h"
-#include "ctkDICOMThumbnailGenerator.h"
+#include "cxDICOMThumbnailGenerator.h"
 #include "ctkThumbnailLabel.h"
 #include "ctkDICOMQueryResultsTabWidget.h"
 #include "ctkDICOMQueryRetrieveWidget.h"
@@ -111,8 +111,7 @@ public:
   void showUpdateSchemaDialog();
   std::map<ctkDICOMModel::IndexType, QStringList> getSelection() const;
 
-  // used when suspending the ctkDICOMModel
-//  QSqlDatabase EmptyDatabase;
+  void removeSelection();
 };
 
 //----------------------------------------------------------------------------
@@ -124,9 +123,6 @@ DICOMAppWidgetPrivate::DICOMAppWidgetPrivate(DICOMAppWidget* parent): q_ptr(pare
   ThumbnailGenerator = QSharedPointer <ctkDICOMThumbnailGenerator> (new ctkDICOMThumbnailGenerator);
   DICOMDatabase->setThumbnailGenerator(ThumbnailGenerator.data());
   UpdateSchemaProgress = 0;
-
-  mDICOMModel.setHeaderData(3, Qt::Horizontal, "MyValue", Qt::DisplayRole);
-
 }
 
 DICOMAppWidgetPrivate::~DICOMAppWidgetPrivate()
@@ -136,7 +132,6 @@ DICOMAppWidgetPrivate::~DICOMAppWidgetPrivate()
     delete UpdateSchemaProgress;
     }
 }
-
 
 void DICOMAppWidgetPrivate::setupUi(DICOMAppWidget* parent)
 {
@@ -151,8 +146,8 @@ void DICOMAppWidgetPrivate::setupUi(DICOMAppWidget* parent)
 	ToolBar = new QToolBar;
 	TopLayout->addWidget(ToolBar);
 
-	ActionImport = new QAction("Import", this);
-	ActionImport->setToolTip("Import a DICOM file or folder");
+	ActionImport = new QAction("Open", this);
+	ActionImport->setToolTip("Open and load a DICOM file or folder");
 	q->connect(ActionImport, SIGNAL(triggered()), &Importer, SLOT(openImportDialog()));
 	ToolBar->addAction(ActionImport);
 
@@ -162,7 +157,7 @@ void DICOMAppWidgetPrivate::setupUi(DICOMAppWidget* parent)
 	ToolBar->addAction(ActionQuery);
 
 	ActionRemove = new QAction("Remove", this);
-	ActionRemove->setToolTip("Remove from database");
+	ActionRemove->setToolTip("Remove selection from database");
 	q->connect(ActionRemove, SIGNAL(triggered()), q, SLOT(onRemoveAction()));
 	ToolBar->addAction(ActionRemove);
 
@@ -180,7 +175,6 @@ void DICOMAppWidgetPrivate::setupUi(DICOMAppWidget* parent)
 	ThumbnailsFullWidgetLayout->setMargin(0);
 
 	ThumbnailsWidget = new DICOMThumbnailListWidget;
-//	ThumbnailsWidget = new ctkDICOMThumbnailListWidget;
 	ThumbnailsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	ThumbnailsWidget->setMinimumSize(QSize(0,200));
 	ThumbnailsFullWidgetLayout->addWidget(ThumbnailsWidget);
@@ -235,6 +229,20 @@ void DICOMAppWidgetPrivate::showUpdateSchemaDialog()
 			&mDICOMModel, SLOT(reset()));
     }
   UpdateSchemaProgress->show();
+}
+
+void DICOMAppWidgetPrivate::removeSelection()
+{
+	QModelIndexList selection = TreeView->selectionModel()->selectedIndexes();
+	QModelIndex index;
+
+	foreach(index,selection)
+	{
+		if (index.column()!=0)
+			continue;
+		mDICOMModel.removeRows(index.row(), 1, index.parent());
+//		this->remove(index);
+	}
 }
 
 std::map<ctkDICOMModel::IndexType, QStringList> DICOMAppWidgetPrivate::getSelection() const
@@ -294,19 +302,6 @@ DICOMAppWidget::DICOMAppWidget(QWidget* _parent):Superclass(_parent),
   d->QueryRetrieveWidget = new ctkDICOMQueryRetrieveWidget();
   d->QueryRetrieveWidget->setWindowModality ( Qt::ApplicationModal );
 
-  //TODO CA move outside class
-//  //initialize directory from settings, then listen for changes
-//  QSettings settings;
-//  if ( settings.value("DatabaseDirectory", "") == "" )
-//    {
-//    QString directory = QString("./ctkDICOM-Database");
-//    settings.setValue("DatabaseDirectory", directory);
-//    settings.sync();
-//    }
-//  QString databaseDirectory = settings.value("DatabaseDirectory").toString();
-//  this->setDatabaseDirectory(databaseDirectory);
-//  d->DirectoryButton->setDirectory(databaseDirectory);
-
   connect(d->TreeView->selectionModel(),
 		  SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
 		  this,
@@ -317,7 +312,6 @@ DICOMAppWidget::DICOMAppWidget(QWidget* _parent):Superclass(_parent),
 		  SLOT(onCurrentChanged(const QModelIndex&, const QModelIndex&)));
 
   //connect signal and slots
-//  connect(d->TreeView, SIGNAL(clicked(QModelIndex)), d->ThumbnailsWidget, SLOT(addThumbnails(QModelIndex)));
   connect(d->TreeView, SIGNAL(clicked(QModelIndex)), this, SLOT(onModelSelected(QModelIndex)));
 
   connect(d->QueryRetrieveWidget, SIGNAL(canceled()), d->QueryRetrieveWidget, SLOT(hide()) );
@@ -442,8 +436,6 @@ const QStringList DICOMAppWidget::tagsToPrecache()
   return d->DICOMDatabase->tagsToPrecache();
 }
 
-
-
 //----------------------------------------------------------------------------
 ctkDICOMDatabase* DICOMAppWidget::database(){
   Q_D(DICOMAppWidget);
@@ -487,36 +479,14 @@ QStringList DICOMAppWidget::getSelectedSeries()
 //----------------------------------------------------------------------------
 void DICOMAppWidget::onRemoveAction()
 {
-  Q_D(DICOMAppWidget);
-
-	QStringList series = this->getSelectedSeries();
-	for (int i=0; i<series.size(); ++i)
-		d->DICOMDatabase->removeSeries(series[i]);
-
-	QStringList studies = this->getSelectedStudies();
-	for (int i=0; i<studies.size(); ++i)
-		d->DICOMDatabase->removeStudy(studies[i]);
-
-	QStringList patients = this->getSelectedPatients();
-	for (int i=0; i<patients.size(); ++i)
-		d->DICOMDatabase->removePatient(patients[i]);
-
-	d->mDICOMModel.reset();
+	Q_D(DICOMAppWidget);
+	d->removeSelection();
 }
-
-////----------------------------------------------------------------------------
-//void DICOMAppWidget::suspendModel()
-//{
-//  Q_D(DICOMAppWidget);
-
-//  d->mDICOMModel.setDatabase(d->EmptyDatabase);
-//}
 
 //----------------------------------------------------------------------------
 void DICOMAppWidget::resumeModel()
 {
   Q_D(DICOMAppWidget);
-
   d->mDICOMModel.setDatabase(d->DICOMDatabase);
 }
 
@@ -524,7 +494,6 @@ void DICOMAppWidget::resumeModel()
 void DICOMAppWidget::resetModel()
 {
   Q_D(DICOMAppWidget);
-
   d->mDICOMModel.reset();
 }
 
@@ -537,17 +506,12 @@ void DICOMAppWidget::onImportDirectory(QString directory)
 
 void DICOMAppWidget::onSelectionChanged(const QItemSelection&, const QItemSelection&)
 {
-	std::cout << "selected patients:\n " << this->getSelectedPatients().join("\n").toStdString() << std::endl;
-	std::cout << "selected studies:\n " << this->getSelectedStudies().join("\n").toStdString() << std::endl;
-	std::cout << "selected series:\n " << this->getSelectedSeries().join("\n").toStdString() << std::endl;
 }
 
 void DICOMAppWidget::onCurrentChanged(const QModelIndex& next, const QModelIndex& last)
 {
 	Q_D(DICOMAppWidget);
 	d->ThumbnailsWidget->addThumbnails(next);
-	//  connect(d->TreeView, SIGNAL(clicked(QModelIndex)), d->ThumbnailsWidget, SLOT(addThumbnails(QModelIndex)));
-//	d->ThumbnailsWidget->selectThumbnailFromIndex(next);
 }
 
 void DICOMAppWidget::onModelSelected(const QModelIndex &index)
@@ -592,6 +556,13 @@ void DICOMAppWidget::onThumbnailWidthSliderValueChanged(int val)
   Q_D(DICOMAppWidget);
   d->ThumbnailsWidget->setThumbnailSize(QSize(val, val));
 }
+
+void DICOMAppWidget::addActionToToolbar(QAction* action)
+{
+	Q_D(DICOMAppWidget);
+	d->ToolBar->addAction(action);
+}
+
 
 
 } // namespace cx
