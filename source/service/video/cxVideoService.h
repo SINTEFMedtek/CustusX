@@ -96,6 +96,7 @@ public:
 	  */
 	std::vector<VideoSourcePtr> getVideoSources();
 	ctkPluginContext* getPluginContext();
+	VideoServiceBackendPtr getBackend();
 
 signals:
 	/** Emitted when a video source is set to active,

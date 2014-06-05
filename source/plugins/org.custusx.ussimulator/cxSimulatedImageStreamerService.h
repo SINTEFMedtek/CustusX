@@ -47,7 +47,6 @@ public:
 	virtual QString getName();
 
 private:
-//	VideoServiceBackendPtr mBackend;
 	QString mImageUidToSimulate;
 	SimulatedImageStreamerPtr mStreamer;//Access must be mutexed, as it can be accessed from several threads
 };
