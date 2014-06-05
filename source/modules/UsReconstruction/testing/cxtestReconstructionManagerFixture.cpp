@@ -59,7 +59,6 @@ void ReconstructionManagerTestFixture::reconstruct()
 	mOutput.clear();
 	cx::ReconstructionManagerPtr reconstructer = this->getManager();
 	cx::ReconstructionExecuterPtr executor(new cx::ReconstructionExecuter);
-	bool validInputData = true; //TODO should be checked in some way???
 	cx::ReconstructPreprocessorPtr preprocessor = executor->createPreprocessor(reconstructer->createCoreParameters(), reconstructer->getSelectedFileData());
 	bool createBModeWhenAngio = reconstructer->getParams()->mCreateBModeWhenAngio->getValue();
 	std::vector<cx::ReconstructCorePtr> cores = executor->createCores(reconstructer->createAlgorithm(), reconstructer->createCoreParameters(), createBModeWhenAngio);
@@ -93,7 +92,8 @@ void ReconstructionManagerTestFixture::threadedReconstruct()
 	cx::ReconstructionManagerPtr manager = this->getManager();
 
 	// start threaded reconstruction
-	std::vector<cx::ReconstructCorePtr> cores = manager->startReconstruction();
+	manager->startReconstruction();
+	std::vector<cx::ReconstructCorePtr> cores = manager->getOutput();
 	std::set<cx::TimedAlgorithmPtr> threads = manager->getThreadedReconstruction();
 	REQUIRE(threads.size()==1);
 	cx::TimedAlgorithmPtr thread = *threads.begin();

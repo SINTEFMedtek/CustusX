@@ -77,7 +77,8 @@ public:
 	  * but this must be done AFTER the threads have completed.
 	  * In general, dont use the retval, it is for unit testing.
 	  */
-	virtual std::vector<ReconstructCorePtr> startReconstruction() = 0;
+	virtual void startReconstruction() = 0;
+	virtual std::vector<ReconstructCorePtr> getOutput() = 0;
 	virtual std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction() = 0; ///< Return the currently reconstructing thread object(s).
 //	/**
 //	  * Create the reconstruct preprocessor object.
@@ -169,20 +170,10 @@ public:
 	  * but this must be done AFTER the threads have completed.
 	  * In general, dont use the retval, it is for unit testing.
 	  */
-	virtual std::vector<ReconstructCorePtr> startReconstruction();
+	virtual void startReconstruction();
+	virtual std::vector<ReconstructCorePtr> getOutput();
+
 	virtual std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction(); ///< Return the currently reconstructing thread object(s).
-//	/**
-//	  * Create the reconstruct preprocessor object.
-//	  * This is usually created internally during reconstruction,
-//	  * published for use in unit testing.
-//	  */
-//	virtual ReconstructPreprocessorPtr createPreprocessor();
-//	/**
-//	  * Create the reconstruct core object.
-//	  * This is usually created internally during reconstruction,
-//	  * published for use in unit testing.
-//	  */
-//	virtual std::vector<ReconstructCorePtr> createCores(); ///< create reconstruct cores matching the current parameters
 	/**
 	  * Create the reconstruct algorithm object.
 	  * This is usually created internally during reconstruction,
@@ -205,17 +196,10 @@ signals:
 private slots:
 	void setSettings();
 	void transferFunctionChangedSlot();
-//	void threadFinishedSlot();
 	void reconstructFinishedSlot();
 
-
-
 private:
-//	void launch(cx::TimedAlgorithmPtr thread);
 	void clearAll();
-
-//	ReconstructCorePtr createCore(); ///< used for threaded reconstruction
-//	ReconstructCorePtr createBModeCore(); ///< core version for B-mode in case of angio recording.
 
 	void initAlgorithm();
 	/** Use the mOriginalFileData structure to rebuild all internal data.
@@ -223,17 +207,12 @@ private:
 	 */
 	void updateFromOriginalFileData();
 
-//	bool validInputData() const;///< checks if internal states is valid (that it actually has frames to reconstruct)
-//	cx::CompositeTimedAlgorithmPtr assembleReconstructionPipeline(std::vector<ReconstructCorePtr> cores); ///< assembles the different steps that is needed to reconstruct
-//	bool canCoresRunInParallel(std::vector<ReconstructCorePtr> cores);
-
     void onServiceAdded(ReconstructionService* service);
     void onServiceModified(ReconstructionService* service);
     void onServiceRemoved(ReconstructionService* service);
 
 	ReconstructParamsPtr mParams;
 	std::vector<DataAdapterPtr> mAlgoOptions;
-//	std::set<cx::TimedAlgorithmPtr> mThreadedReconstruction;
 	USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
 
 	OutputVolumeParams mOutputVolumeParams;
@@ -244,6 +223,8 @@ private:
 
 	boost::shared_ptr<ServiceTrackerListener<ReconstructionService> > mServiceListener;
 	ReconstructionExecuterPtr mExecuter;
+
+	std::vector<ReconstructCorePtr> mOutput;
 };
 
 /**

@@ -192,18 +192,10 @@ TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integ
 	cx::ReconstructPreprocessorPtr preprocessor = executor->createPreprocessor(reconstructer->createCoreParameters(), reconstructer->getSelectedFileData());
 	REQUIRE(preprocessor);
 
-	bool createBModeWhenAngio = reconstructer->getParams()->mCreateBModeWhenAngio->getValue();
-	std::vector<cx::ReconstructCorePtr> cores = executor->createCores(reconstructer->createAlgorithm(), reconstructer->createCoreParameters(), createBModeWhenAngio);
-	REQUIRE(!cores.empty());
-
-	std::vector<bool> angio;
-	for (unsigned i=0; i<cores.size(); ++i)
-		angio.push_back(cores[i]->getInputParams().mAngio);
-
-//	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(cores);
+	std::vector<bool> angio(1, false);
 	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(angio);
+	REQUIRE(processedInput.size() == 1);
 
-	REQUIRE(processedInput.size() == cores.size());
 	{
 		Eigen::Array3i dimFirstFrame = processedInput[0]->getDimensions();
 		dimFirstFrame[2] = 1;
