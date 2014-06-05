@@ -33,6 +33,9 @@
 #include "cxReporter.h"
 #include "cxFileHelpers.h"
 
+#include <iostream>
+#include "cxTypeConversions.h"
+
 namespace cx
 {
 
@@ -83,6 +86,7 @@ void PluginFrameworkManager::loadState()
 
 void PluginFrameworkManager::loadPluginFromStoredState(QString symbolicName, QString storedState)
 {
+	std::cout << "load plugin: " << symbolicName << std::endl;
 	if (storedState.isEmpty())
 	{
 		report(QString("Detected new plugin [%1], autostarting...").arg(symbolicName));

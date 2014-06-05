@@ -11,16 +11,19 @@ std::set<cx::TimedAlgorithmPtr> ReconstructionExecuter::getThreadedReconstructio
 	return mThreadedReconstruction;
 }
 
-std::vector<ReconstructCorePtr> ReconstructionExecuter::startReconstruction(ReconstructionServicePtr algo, ReconstructCore::InputParams par, USReconstructInputData fileData, bool createBModeWhenAngio, bool validInputData)
+std::vector<ReconstructCorePtr> ReconstructionExecuter::startReconstruction(ReconstructionServicePtr algo, ReconstructCore::InputParams par, USReconstructInputData fileData, bool createBModeWhenAngio)
 {
-	std::vector<ReconstructCorePtr> cores = this->createCores(algo, par, createBModeWhenAngio, validInputData);
+	if (!fileData.isValid())
+		return std::vector<ReconstructCorePtr>();
+
+	std::vector<ReconstructCorePtr> cores = this->createCores(algo, par, createBModeWhenAngio);
 
 	if (cores.empty())
 	{
 		reportWarning("Failed to start reconstruction");
 		return cores;
 	}
-	cx::CompositeTimedAlgorithmPtr algorithm = this->assembleReconstructionPipeline(cores, par, fileData, validInputData);
+	cx::CompositeTimedAlgorithmPtr algorithm = this->assembleReconstructionPipeline(cores, par, fileData);
 
 	this->launch(algorithm);
 
@@ -33,6 +36,7 @@ void ReconstructionExecuter::launch(cx::TimedAlgorithmPtr thread)
 	emit reconstructAboutToStart();
 	connect(thread.get(), SIGNAL(finished()), this, SLOT(threadFinishedSlot())); // connect after emit, to allow listeners to get thread at finish
 	thread->execute();
+	emit reconstructStarted();
 }
 
 void ReconstructionExecuter::threadFinishedSlot()
@@ -56,11 +60,11 @@ void ReconstructionExecuter::threadFinishedSlot()
 //		mOriginalFileData.mUsRaw->purgeAll();
 }
 
-cx::CompositeTimedAlgorithmPtr ReconstructionExecuter::assembleReconstructionPipeline(std::vector<ReconstructCorePtr> cores, ReconstructCore::InputParams par, USReconstructInputData fileData, bool validInputData)
+cx::CompositeTimedAlgorithmPtr ReconstructionExecuter::assembleReconstructionPipeline(std::vector<ReconstructCorePtr> cores, ReconstructCore::InputParams par, USReconstructInputData fileData)
 {
 	cx::CompositeSerialTimedAlgorithmPtr pipeline(new cx::CompositeSerialTimedAlgorithm("US Reconstruction"));
 
-	ReconstructPreprocessorPtr preprocessor = this->createPreprocessor(par, fileData, validInputData);
+	ReconstructPreprocessorPtr preprocessor = this->createPreprocessor(par, fileData);
 	pipeline->append(ThreadedTimedReconstructPreprocessor::create(preprocessor, cores));
 
 	cx::CompositeTimedAlgorithmPtr temp = pipeline;
@@ -89,43 +93,31 @@ bool ReconstructionExecuter::canCoresRunInParallel(std::vector<ReconstructCorePt
 	return parallelizable;
 }
 
-ReconstructPreprocessorPtr ReconstructionExecuter::createPreprocessor(ReconstructCore::InputParams par, USReconstructInputData fileData, bool validInputData)
+ReconstructPreprocessorPtr ReconstructionExecuter::createPreprocessor(ReconstructCore::InputParams par, USReconstructInputData fileData)
 {
-	if (!validInputData)
-		return ReconstructPreprocessorPtr();
-
 	ReconstructPreprocessorPtr retval(new ReconstructPreprocessor());
-
-//	ReconstructCore::InputParams par = this->createCoreParameters();
-
-//	USReconstructInputData fileData = mOriginalFileData;
-//	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
-
 	retval->initialize(par, fileData);
 
 	return retval;
 }
 
-std::vector<ReconstructCorePtr> ReconstructionExecuter::createCores(ReconstructionServicePtr algo, ReconstructCore::InputParams par, bool createBModeWhenAngio, bool validInputData)
+std::vector<ReconstructCorePtr> ReconstructionExecuter::createCores(ReconstructionServicePtr algo, ReconstructCore::InputParams par, bool createBModeWhenAngio)
 {
 	std::vector<ReconstructCorePtr> retval;
 
-//	par.mAngio = mParams->mAngioAdapter->getValue();
-	// create both
-//	if (mParams->mCreateBModeWhenAngio->getValue() && mParams->mAngioAdapter->getValue())
 	if (createBModeWhenAngio && par.mAngio)
 	{
-		ReconstructCorePtr core = this->createBModeCore(par, algo, validInputData);
+		ReconstructCorePtr core = this->createBModeCore(par, algo);
 		if (core)
 			retval.push_back(core);
-		core = this->createCore(par, algo, validInputData);
+		core = this->createCore(par, algo);
 		if (core)
 			retval.push_back(core);
 	}
 	// only one thread
 	else
 	{
-		ReconstructCorePtr core = this->createCore(par, algo, validInputData);
+		ReconstructCorePtr core = this->createCore(par, algo);
 		if (core)
 			retval.push_back(core);
 	}
@@ -133,35 +125,19 @@ std::vector<ReconstructCorePtr> ReconstructionExecuter::createCores(Reconstructi
 	return retval;
 }
 
-ReconstructCorePtr ReconstructionExecuter::createCore(ReconstructCore::InputParams par, ReconstructionServicePtr algo, bool validInputData)
+ReconstructCorePtr ReconstructionExecuter::createCore(ReconstructCore::InputParams par, ReconstructionServicePtr algo)
 {
-	if (!validInputData)
-		return ReconstructCorePtr();
-
 	ReconstructCorePtr retval(new ReconstructCore());
-
-//	ReconstructCore::InputParams par = this->createCoreParameters();
-//	ReconstructionServicePtr algo = this->createAlgorithm();
-
 	retval->initialize(par, algo);
-
 	return retval;
 }
 
-ReconstructCorePtr ReconstructionExecuter::createBModeCore(ReconstructCore::InputParams par, ReconstructionServicePtr algo, bool validInputData)
+ReconstructCorePtr ReconstructionExecuter::createBModeCore(ReconstructCore::InputParams par, ReconstructionServicePtr algo)
 {
-	if (!validInputData)
-		return ReconstructCorePtr();
-
 	ReconstructCorePtr retval(new ReconstructCore());
-
-//	ReconstructCore::InputParams par = this->createCoreParameters();
 	par.mAngio = false;
 	par.mTransferFunctionPreset = "US B-Mode";
-//	ReconstructionServicePtr algo = this->createAlgorithm();
-
 	retval->initialize(par, algo);
-
 	return retval;
 }
 

@@ -39,10 +39,6 @@
 namespace cx
 {
 
-//ReconstructionService::~ReconstructionService()
-//{
-//}
-
 
 ReconstructCore::ReconstructCore() :
 	mInput(InputParams())
@@ -65,31 +61,7 @@ void ReconstructCore::initialize(ProcessedUSInputDataPtr fileData, OutputVolumeP
 {
 	mOutputVolumeParams = outputVolumeParams;
 	mFileData = fileData;
-//	this->updateFromOriginalFileData();
-
-//	mAlgorithm = this->createAlgorithm(mInput.mAlgorithmUid);
 }
-
-//ReconstructionServicePtr ReconstructCore::createAlgorithm(QString name)
-//{
-//    ReconstructionServicePtr retval;
-//
-//	if (mAlgorithm && mAlgorithm->getName() == name)
-//		return mAlgorithm;
-//
-//	if (name == "PNN")
-//		retval = ReconstructionServicePtr(new PNNReconstructAlgorithm());
-//#ifdef CX_USE_OPENCL_UTILITY
-//	else if (name == "TordTest")
-//	{
-//		retval = ReconstructionServicePtr(new TordTest());
-//	}
-//#endif // CX_USE_OPENCL_UTILITY
-//	else
-//		retval.reset();
-//
-//	return retval;
-//}
 
 ImagePtr ReconstructCore::reconstruct()
 {

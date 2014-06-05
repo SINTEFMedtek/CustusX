@@ -197,6 +197,9 @@ signals:
 	void algorithmChanged();
 	void inputDataSelected(QString mhdFileName);
 	void reconstructAboutToStart();
+	void reconstructStarted();
+	void reconstructFinished();
+
 	void newInputDataAvailable(QString mhdFileName);
 
 private slots:
@@ -204,6 +207,8 @@ private slots:
 	void transferFunctionChangedSlot();
 //	void threadFinishedSlot();
 	void reconstructFinishedSlot();
+
+
 
 private:
 //	void launch(cx::TimedAlgorithmPtr thread);
@@ -218,7 +223,7 @@ private:
 	 */
 	void updateFromOriginalFileData();
 
-	bool validInputData() const;///< checks if internal states is valid (that it actually has frames to reconstruct)
+//	bool validInputData() const;///< checks if internal states is valid (that it actually has frames to reconstruct)
 //	cx::CompositeTimedAlgorithmPtr assembleReconstructionPipeline(std::vector<ReconstructCorePtr> cores); ///< assembles the different steps that is needed to reconstruct
 //	bool canCoresRunInParallel(std::vector<ReconstructCorePtr> cores);
 

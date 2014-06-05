@@ -22,10 +22,13 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructionManage
 	BaseWidget(parent, "", "US Reconstruction"), mReconstructer(reconstructer)
 {
 	connect(mReconstructer.get(), SIGNAL(reconstructAboutToStart()), this, SLOT(reconstructAboutToStartSlot()));
+	connect(mReconstructer.get(), SIGNAL(reconstructStarted()), this, SLOT(reconstructStartedSlot()));
+	connect(mReconstructer.get(), SIGNAL(reconstructFinished()), this, SLOT(reconstructFinishedSlot()));
 
 	connect(mReconstructer.get(), SIGNAL(paramsChanged()), this, SLOT(paramsChangedSlot()));
 	connect(mReconstructer.get(), SIGNAL(inputDataSelected(QString)), this, SLOT(inputDataSelected(QString)));
 	connect(mReconstructer.get(), SIGNAL(algorithmChanged()), this, SLOT(repopulateAlgorithmGroup()));
+
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 
@@ -229,37 +232,21 @@ void ReconstructionWidget::paramsChangedSlot()
 
 void ReconstructionWidget::reconstructAboutToStartSlot()
 {
-	std::set<cx::TimedAlgorithmPtr> reconstructer = mReconstructer->getThreadedReconstruction();
-	std::set<cx::TimedAlgorithmPtr>::iterator iter;
-	for(iter=reconstructer.begin(); iter!=reconstructer.end(); ++iter)
-	{
-		connect((*iter).get(), SIGNAL(started(int)), this, SLOT(reconstructStartedSlot()));
-		connect((*iter).get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
-
-		mTimedAlgorithmProgressBar->attach(*iter);
-	}
-}
-
-void ReconstructionWidget::reconstructFinishedSlot()
-{
-	// stop if all threads are finished
-	bool finished = true;
-	std::set<cx::TimedAlgorithmPtr> reconstructer = mReconstructer->getThreadedReconstruction();
-	std::set<cx::TimedAlgorithmPtr>::iterator iter;
-	for(iter=reconstructer.begin(); iter!=reconstructer.end(); ++iter)
-	{
-		finished = finished && (*iter)->isFinished();
-		if ((*iter)->isFinished())
-			mTimedAlgorithmProgressBar->detach(*iter);
-	}
-
-	if (finished)
-		mReconstructButton->setEnabled(true);
+	std::set<cx::TimedAlgorithmPtr> threads = mReconstructer->getThreadedReconstruction();
+	mTimedAlgorithmProgressBar->attach(threads);
 }
 
 void ReconstructionWidget::reconstructStartedSlot()
 {
 	mReconstructButton->setEnabled(false);
 }
+
+void ReconstructionWidget::reconstructFinishedSlot()
+{
+	std::set<cx::TimedAlgorithmPtr> threads = mReconstructer->getThreadedReconstruction();
+	mTimedAlgorithmProgressBar->detach(threads);
+		mReconstructButton->setEnabled(true);
+}
+
 
 }//namespace
