@@ -51,7 +51,7 @@ public:
   void setDatabaseDirectory(const QString& directory);
   void setDatabase(QSharedPointer<ctkDICOMDatabase> database);
 
-  void selectThumbnailFromIndex(const QModelIndex& index);
+//  void selectThumbnailFromIndex(const QModelIndex& index);
 
 private:
   Q_DECLARE_PRIVATE(DICOMThumbnailListWidget);

@@ -34,19 +34,11 @@ class ImageStreamerFactory
 {
 public:
 	ImageStreamerFactory();
-
-	void setBackend(VideoServiceBackendPtr backend);
 	void setArguments(std::map<QString, QString> arguments);
-	void setImageToStream(QString imageUid);
-
-//	ImageStreamerInterfacePtr getSimulatedStreamerInterface();
 	StreamerServicePtr getCommandlineStreamerInterface();
-	StreamerServicePtr getStreamerInterface();
 
 private:
 	std::map<QString, QString> mArguments;
-	VideoServiceBackendPtr mBackend;
-	QString mImageUidToSimulate;
 };
 
 } //namespace cx

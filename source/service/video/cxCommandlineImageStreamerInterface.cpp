@@ -31,7 +31,7 @@ StreamerPtr CommandlineImageStreamerInterface::createStreamer()
 	return CommandlineImageStreamerFactory().getFromArguments(mArguments);
 }
 
-BaseWidget* CommandlineImageStreamerInterface::createWidget()
+QWidget *CommandlineImageStreamerInterface::createWidget()
 {
 	//TODO: Move widget creation here. Impelemnt same way as SimulatedImageStreamerInterface
 	return NULL;

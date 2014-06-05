@@ -19,7 +19,8 @@
 #include <QObject>
 #include <QProcess>
 #include "cxForwardDeclarations.h"
-#include "cxXmlOptionItem.h"
+#include "cxStreamerService.h"
+#include "cxServiceTrackerListener.h"
 
 namespace cx
 {
@@ -48,7 +49,8 @@ public:
 	explicit VideoConnectionManager(VideoServiceBackendPtr backend);
 	virtual ~VideoConnectionManager();
 
-	StringDataAdapterXmlPtr getConnectionMethod();
+	QString getConnectionMethod();
+	void setConnectionMethod(QString connectionMethod);
 
 	void setLocalServerExecutable(QString commandline);
 	QString getLocalServerExecutable();
@@ -64,12 +66,13 @@ public:
 	bool useLocalServer();
 	bool useDirectLink();
 	bool useRemoteServer();
-	bool useSimulatedServer();
+//	bool useSimulatedServer();
 
 	void setInitScript(QString filename);
 	QString getInitScript();
 
 	void launchServer();
+	void launchAndConnectServer(QString connectionMethod);
 	void launchAndConnectServer();
 	void disconnectServer();
 
@@ -91,21 +94,25 @@ public slots:
 	void serverProcessStateChanged(QProcess::ProcessState newState);
 
 private:
+	void onServiceAdded(StreamerService* service);
+	void onServiceRemoved(StreamerService *service);
 	void delayedAutoConnectServer();
 	void runScript();
 	bool localVideoServerIsRunning();
 	void setupAndRunDirectLinkClient();
 	void launchAndConnectUsingLocalServer();
+	bool connectToService();
 
+	QString mConnectionMethod;
 	VideoConnectionPtr mVideoConnection;
 	int mConnectWhenLocalServerRunning;
 	int mReconnectInterval;
 	ProcessWrapperPtr mLocalVideoServerProcess;
 	ProcessWrapperPtr mIniScriptProcess;
 
-	StringDataAdapterXmlPtr mConnectionMethod;
-	XmlOptionFile mOptions;
 	VideoServiceBackendPtr mBackend;
+
+	boost::shared_ptr<ServiceTrackerListener<StreamerService> > mServiceListener;
 
 };
 typedef boost::shared_ptr<VideoConnectionManager> VideoConnectionManagerPtr;

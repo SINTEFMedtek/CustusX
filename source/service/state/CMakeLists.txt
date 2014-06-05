@@ -24,7 +24,7 @@ SET ( cxStateService_SOURCE
 	cxApplicationStateMachine.cpp
 	cxApplicationStateMachine.h
 	cxApplicationState.h
-    cxApplicationState.cpp
+	cxApplicationState.cpp
 	cxRequestEnterStateTransition.h
 	cxStateServiceBackend.cpp
 )
@@ -36,6 +36,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/tracking     
     ${CustusX3_SOURCE_DIR}/source/service/visualization
     ${CustusX3_SOURCE_DIR}/source/service/video
+    ${CustusX3_SOURCE_DIR}/source/resource/pluginUtilities
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

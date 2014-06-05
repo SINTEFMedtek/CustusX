@@ -237,7 +237,7 @@ QStringList DICOMThumbnailListWidgetPrivate::getFilesForImage(QString studyUid, 
 
 	for (int i=0; true; ++i)
 	{
-		splitPath.back() = QString("frame%1.png").arg(i);
+		splitPath.back() = QString("frame_%1.png").arg(i);
 		QString frameFilename = splitPath.join(".");
 		retval << frameFilename;
 
@@ -251,7 +251,7 @@ void DICOMThumbnailListWidgetPrivate::addThumbnailWidget(QString filename, const
 {
   if(!QFileInfo(filename).exists())
 	{
-	  qDebug() << "Thumbnail not found: " << filename;
+//	  qDebug() << "Thumbnail not found: " << filename;
 	  return;
 	}
 
@@ -260,60 +260,16 @@ void DICOMThumbnailListWidgetPrivate::addThumbnailWidget(QString filename, const
   QString widgetLabel = text;
   widget->setText( widgetLabel );
   QPixmap pix(filename);
-  logger.debug("Setting pixmap to " + filename);
+//  logger.debug("Setting pixmap to " + filename);
   if(this->ThumbnailSize.isValid())
 	{
 	widget->setFixedSize(this->ThumbnailSize);
 	}
   widget->setPixmap(pix);
 
-//  QVariant var;
-//  var.setValue(QPersistentModelIndex(sourceIndex));
-//  widget->setProperty("sourceIndex", var);
-
   this->addThumbnail(widget);
 }
 
-//void DICOMThumbnailListWidgetPrivate
-//::addThumbnailWidget(const QModelIndex& imageIndex,
-//                     const QModelIndex& sourceIndex, const QString &text)
-//{
-//  ctkDICOMModel* model = const_cast<ctkDICOMModel*>(
-//    qobject_cast<const ctkDICOMModel*>(imageIndex.model()));
-
-//  if(!model)
-//    {
-//    return;
-//    }
-//  QModelIndex seriesIndex = imageIndex.parent();
-//  QModelIndex studyIndex = seriesIndex.parent();
-
-//  QString thumbnailPath = this->DatabaseDirectory +
-//						  "/thumbs/" + model->data(studyIndex ,ctkDICOMModel::UIDRole).toString() + "/" +
-//                          model->data(seriesIndex ,ctkDICOMModel::UIDRole).toString() + "/" +
-//                          model->data(imageIndex, ctkDICOMModel::UIDRole).toString() + ".png";
-//  if(!QFileInfo(thumbnailPath).exists())
-//    {
-//    return;
-//    }
-//  ctkThumbnailLabel* widget = new ctkThumbnailLabel(this->ScrollAreaContentWidget);
-
-//  QString widgetLabel = text;
-//  widget->setText( widgetLabel );
-//  QPixmap pix(thumbnailPath);
-//  logger.debug("Setting pixmap to " + thumbnailPath);
-//  if(this->ThumbnailSize.isValid())
-//    {
-//    widget->setFixedSize(this->ThumbnailSize);
-//    }
-//  widget->setPixmap(pix);
-
-//  QVariant var;
-//  var.setValue(QPersistentModelIndex(sourceIndex));
-//  widget->setProperty("sourceIndex", var);
-
-//  this->addThumbnail(widget);
-//}
 
 //----------------------------------------------------------------------------
 // DICOMThumbnailListWidget methods
@@ -344,47 +300,10 @@ void DICOMThumbnailListWidget::setDatabase(QSharedPointer<ctkDICOMDatabase> data
 	d->Database = database;
 }
 
-
-void DICOMThumbnailListWidget::selectThumbnailFromIndex(const QModelIndex &index){
-  Q_D(DICOMThumbnailListWidget);
-	qDebug() << "=====DICOMThumbnailListWidget::selectThumbnailFromIndex" ;
-
-  if(!d->CurrentSelectedModel.isValid())
-    {
-    return;
-    }
-  if(index.parent() != d->CurrentSelectedModel)
-    {
-    return;
-    }
-
-  ctkDICOMModel* model = const_cast<ctkDICOMModel*>(qobject_cast<const ctkDICOMModel*>(index.model()));
-
-  if(model)
-    {
-    int count = d->ScrollAreaContentWidget->layout()->count();
-
-    for(int i=0; i<count; i++)
-      {
-      ctkThumbnailLabel* thumbnailWidget = qobject_cast<ctkThumbnailLabel*>(d->ScrollAreaContentWidget->layout()->itemAt(i)->widget());
-      if(thumbnailWidget->property("sourceIndex").value<QPersistentModelIndex>() == index)
-        {
-        thumbnailWidget->setSelected(true);
-        d->ScrollArea->ensureWidgetVisible(thumbnailWidget);
-		qDebug() << "     DICOMThumbnailListWidget::selectThumbnailFromIndex successfully selected" ;
-		}
-      else
-        {
-        thumbnailWidget->setSelected(false);
-        }
-      }
-    }
-}
-
 //----------------------------------------------------------------------------
 void DICOMThumbnailListWidget::addThumbnails(const QModelIndex &index)
 {
-	qDebug() << "==DICOMThumbnailListWidget::addThumbnails" ;
+//	qDebug() << "==DICOMThumbnailListWidget::addThumbnails" ;
 
   Q_D(DICOMThumbnailListWidget);
 

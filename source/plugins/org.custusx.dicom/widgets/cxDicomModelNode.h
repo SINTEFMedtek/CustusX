@@ -63,10 +63,11 @@ public:
 	DicomImageReaderPtr createReader() const;
 	virtual QString getFirstDICOMFilename() const { return ""; }
 	QString getUid() const { return UID; }
-	int getRow() const { return Row; }
+	int getRow() const;
 	DicomModelNode* getParent() const { return Parent; }
 	const std::vector<NodePtr>& getFetchedChildren() const { return FetchedChildren; }  ///< all children currently loaded (filled by fetchMore())
 	QStringList getChildrenUID() const { return ChildrenUID; } ///< uids of all loaded and unloaded children.
+	void removeChild(int index);
 
 	QVariant getValue(int column) const;
 	QStringList getHeaders() const;
@@ -78,7 +79,7 @@ protected:
 	DicomModelNode*                 Parent;
 	std::vector<NodePtr>            FetchedChildren; ///< all children currently loaded (filled by fetchMore())
 	QStringList                     ChildrenUID; ///< uids of all loaded and unloaded children.
-	int                             Row;
+//	int                             Row;
 	QString                         UID;
 	mutable std::map<int, QVariant> CachedValues;
 	QSharedPointer<ctkDICOMDatabase> DataBase;

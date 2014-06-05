@@ -16,7 +16,6 @@
 
 #include "cxStreamerService.h"
 
-#include "cxVideoServiceBackend.h"
 #include "cxSimulatedImageStreamer.h"
 
 #include "org_custusx_ussimulator_Export.h"
@@ -40,16 +39,15 @@ class org_custusx_ussimulator_EXPORT SimulatedImageStreamerService : public Stre
 public:
 	SimulatedImageStreamerService();
 
-	void setBackend(VideoServiceBackendPtr backend);
 	void setImageToStream(QString imageUid);
 	void setGain(double gain);
 
 	virtual StreamerPtr createStreamer();
-	virtual BaseWidget* createWidget();
+	virtual QWidget* createWidget();
 	virtual QString getName();
 
 private:
-	VideoServiceBackendPtr mBackend;
+//	VideoServiceBackendPtr mBackend;
 	QString mImageUidToSimulate;
 	SimulatedImageStreamerPtr mStreamer;//Access must be mutexed, as it can be accessed from several threads
 };

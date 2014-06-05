@@ -82,6 +82,7 @@ public:
   int studiesAddedDuringImport();
   int seriesAddedDuringImport();
   int instancesAddedDuringImport();
+  void addActionToToolbar(QAction* action);
 
 public Q_SLOTS:
   void setDatabaseDirectory(const QString& directory);

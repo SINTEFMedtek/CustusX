@@ -5,7 +5,8 @@
 #include <boost/shared_ptr.hpp>
 #include "ctkServiceTracker.h"
 #include "ctkServiceTrackerCustomizer.h"
-#include "cxPluginFramework.h"
+#include "ctkPluginContext.h"
+//#include "cxPluginFramework.h"
 #include "cxServiceTrackerCustomizer.h"
 
 namespace cx
@@ -35,7 +36,7 @@ class ServiceTrackerListener
 {
 
 public:
-		ServiceTrackerListener(PluginFrameworkManagerPtr pluginFramework,
+		ServiceTrackerListener(ctkPluginContext* context,//PluginFrameworkManagerPtr pluginFramework,
 													 boost::function<void (T*)> serviceAdded,
 													 boost::function<void (T*)> serviceModified,
 													 boost::function<void (T*)> serviceRemoved)
@@ -46,7 +47,7 @@ public:
         mServiceTrackerCustomizer->setServiceModifiedCallback(serviceModified);
         mServiceTrackerCustomizer->setServiceRemovedCallback(serviceRemoved);
 
-        mServiceTracker.reset(new ctkServiceTracker<T*>(pluginFramework->getPluginContext(), mServiceTrackerCustomizer.get()));
+				mServiceTracker.reset(new ctkServiceTracker<T*>(context, mServiceTrackerCustomizer.get()));
     }
 
     void open()
@@ -55,11 +56,11 @@ public:
     }
 
     T* getService(QString name)
-    {
+		{
 		QList<T*> services = mServiceTracker->getServices();
 
     	T* service = NULL;
-    	foreach(T* temp, services)
+			foreach(T* temp, services)
     	{
     		QString serviceName = temp->getName();
     		if(serviceName.compare(name) == 0)

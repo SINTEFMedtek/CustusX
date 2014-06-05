@@ -47,6 +47,7 @@ public:
 private:
 	ctkPluginContext* mContext;
 	SimulatedImageStreamerServicePtr mPlugin;
+	ctkServiceRegistration mRegistration;
 };
 
 }// namespace cx
