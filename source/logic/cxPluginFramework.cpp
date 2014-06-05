@@ -31,6 +31,7 @@
 #include "cxDataLocations.h"
 #include "cxPluginFrameworkUtilities.h"
 #include "cxReporter.h"
+#include "cxFileHelpers.h"
 
 namespace cx
 {
@@ -38,14 +39,19 @@ namespace cx
 PluginFrameworkManager::PluginFrameworkManager()
 {
 	mSettingsBase = "pluginFramework";
-	mSettingsSearchPaths = mSettingsBase + "/searchPaths";
+//	mSettingsSearchPaths = mSettingsBase + "/searchPaths";
 
 	ctkProperties fwProps;
 	QString storagePath = DataLocations::getSettingsPath() + "/pluginFramework";
+
+	// remove settings as stored by CTK, because full paths are stored here, causing
+	// problems when running both debug and release on the same machine (and similar).
+	//removeNonemptyDirRecursively(storagePath);
+
 	fwProps[ctkPluginConstants::FRAMEWORK_STORAGE] = storagePath;
 
 	// uncomment to clear settings stored by ctk
-	//	  fwProps[ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN] = ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT;
+	fwProps[ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN] = ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT;
 
 	mFrameworkFactory.reset(new ctkPluginFrameworkFactory(fwProps));
 	mPluginLibFilter << "*.dll" << "*.so" << "*.dylib";
@@ -57,12 +63,14 @@ PluginFrameworkManager::~PluginFrameworkManager()
 	this->saveState();
 }
 
+
 void PluginFrameworkManager::loadState()
 {
 	QStringList defPaths(DataLocations::getDefaultPluginsPath());
-	QStringList paths = settings()->value(mSettingsSearchPaths, defPaths).toStringList();
-	if (!paths.isEmpty())
-		this->setSearchPaths(paths);
+	this->setSearchPaths(defPaths);
+//	QStringList paths = settings()->value(mSettingsSearchPaths, defPaths).toStringList();
+//	if (!paths.isEmpty())
+//		this->setSearchPaths(paths);
 
 	QStringList names = this->getPluginSymbolicNames();
 	for (unsigned i=0; i<names.size(); ++i)
@@ -94,7 +102,7 @@ void PluginFrameworkManager::loadPluginFromStoredState(QString symbolicName, QSt
 
 void PluginFrameworkManager::saveState()
 {
-	settings()->setValue(mSettingsSearchPaths, this->getSearchPaths());
+//	settings()->setValue(mSettingsSearchPaths, this->getSearchPaths());
 
 	QStringList names = this->getPluginSymbolicNames();
 	for (unsigned i=0; i<names.size(); ++i)
@@ -114,17 +122,25 @@ ctkPlugin::State PluginFrameworkManager::getStateFromSymbolicName(QString name)
 	return state;
 }
 
-void PluginFrameworkManager::addSearchPath(const QString& searchPath)
-{
-	mPluginSearchPaths << searchPath;
-	QApplication::addLibraryPath(searchPath);
-}
+//void PluginFrameworkManager::addSearchPath(const QString& searchPath)
+//{
+//	mPluginSearchPaths << searchPath;
+//	QApplication::addLibraryPath(searchPath);
+//}
 
 void PluginFrameworkManager::setSearchPaths(const QStringList& searchPath)
 {
+//	mPluginSearchPaths.clear();
+
+//	QDir basePath = qApp->applicationDirPath();
+//	for (int i=0; i<searchPath.size(); ++i)
+//		mPluginSearchPaths << basePath.relativeFilePath(searchPath[i]);
+
 	mPluginSearchPaths = searchPath;
 	for (int i=0; i<searchPath.size(); ++i)
+	{
 		QApplication::addLibraryPath(searchPath[i]);
+	}
 	emit pluginPoolChanged();
 }
 
