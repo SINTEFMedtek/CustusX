@@ -39,7 +39,6 @@ public:
 	virtual ~PlaybackTool();
 	virtual std::set<Type> getTypes() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
-	virtual void saveTransformsAndTimestamps() {}
 	virtual void setTransformSaveFile(const QString& filename) {}
 	virtual Transform3D get_prMt() const;
 	virtual bool getVisible() const;

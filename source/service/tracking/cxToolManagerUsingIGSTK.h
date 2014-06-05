@@ -85,19 +85,13 @@ public:
 	virtual bool isTracking() const; ///< checks if the system is tracking
 	virtual bool isPlaybackMode() const { return mPlayBackMode; }
 
-	virtual ToolManager::ToolMapPtr getConfiguredTools(); ///< get all configured, but not initialized tools
-	virtual ToolManager::ToolMapPtr getInitializedTools(); ///< get all initialized tools
-	virtual ToolManager::ToolMapPtr getTools(); ///< get all configured and initialized tools
+	virtual ToolManager::ToolMap getTools(); ///< get all configured and initialized tools
 	virtual ToolPtr getTool(const QString& uid); ///< get a specific tool
 	virtual void setTooltipOffset(double offset); ///< set the tool tip offset
 	virtual double getTooltipOffset() const; ///< get the tool tip offset
 
 	virtual ToolPtr getDominantTool(); ///< get the dominant tool
 	virtual void setDominantTool(const QString& uid); ///< can be set to either a connected or configured tool
-
-	virtual std::map<QString, QString> getToolUidsAndNames() const; ///< both from configured and connected tools
-	virtual std::vector<QString> getToolNames() const; ///< both from configured and connected tools
-	virtual std::vector<QString> getToolUids() const; ///< both from configured and connected tools
 
 	virtual ToolPtr getReferenceTool() const; ///< get the tool that is used as a reference, if any
 

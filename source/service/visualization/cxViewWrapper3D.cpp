@@ -466,9 +466,9 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		}
 
 		// tool spaces
-		ToolManager::ToolMapPtr tools = mBackend->getToolManager()->getTools();
-		ToolManager::ToolMapPtr::element_type::iterator iter;
-		for (iter = tools->begin(); iter != tools->end(); ++iter)
+		ToolManager::ToolMap tools = mBackend->getToolManager()->getTools();
+		ToolManager::ToolMap::iterator iter;
+		for (iter = tools.begin(); iter != tools.end(); ++iter)
 		{
 			ToolPtr tool = iter->second;
 
@@ -759,9 +759,9 @@ void ViewWrapper3D::dominantToolChangedSlot()
 
 void ViewWrapper3D::toolsAvailableSlot()
 {
-	ToolManager::ToolMapPtr tools = mBackend->getToolManager()->getTools();
-	ToolManager::ToolMapPtr::element_type::iterator iter;
-	for (iter = tools->begin(); iter != tools->end(); ++iter)
+	ToolManager::ToolMap tools = mBackend->getToolManager()->getTools();
+	ToolManager::ToolMap::iterator iter;
+	for (iter = tools.begin(); iter != tools.end(); ++iter)
 	{
 		ToolPtr tool = iter->second;
 		if (tool->hasType(Tool::TOOL_REFERENCE))

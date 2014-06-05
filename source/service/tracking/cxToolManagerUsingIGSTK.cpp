@@ -207,7 +207,6 @@ void ToolManagerUsingIGSTK::initializeManualTool()
 		mManualTool.reset(new ManualToolAdapter(mSelf.lock(), "ManualTool"));
 		mTools["ManualTool"] = mManualTool;
 		mManualTool->setVisible(true);
-//    mManualTool->setVisible(settings()->value("showManualTool").toBool());
 		connect(mManualTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
 	}
 
@@ -269,8 +268,6 @@ void ToolManagerUsingIGSTK::configure()
 	connect(mTrackerThread.get(), SIGNAL(configured(bool)), this, SLOT(trackerConfiguredSlot(bool)));
 	connect(mTrackerThread.get(), SIGNAL(initialized(bool)), this, SLOT(initializedSlot(bool)));
 	connect(mTrackerThread.get(), SIGNAL(tracking(bool)), this, SLOT(trackerTrackingSlot(bool)));
-// too strong: config is independent of tracker thread errors
-//	connect(mTrackerThread.get(), SIGNAL(error()), this, SLOT(deconfigure()));
 	connect(mTrackerThread.get(), SIGNAL(error()), this, SLOT(uninitialize()));
 
 	//start threads
@@ -549,9 +546,9 @@ SessionToolHistoryMap ToolManagerUsingIGSTK::getSessionHistory(double startTime,
 {
 	SessionToolHistoryMap retval;
 
-	ToolManager::ToolMapPtr tools = this->getTools();
-	ToolManager::ToolMap::iterator it = tools->begin();
-	for (; it != tools->end(); ++it)
+	ToolManager::ToolMap tools = this->getTools();
+	ToolManager::ToolMap::iterator it = tools.begin();
+	for (; it != tools.end(); ++it)
 	{
 		TimedTransformMap toolMap = it->second->getSessionHistory(startTime, stopTime);
 		if (toolMap.empty())
@@ -561,34 +558,9 @@ SessionToolHistoryMap ToolManagerUsingIGSTK::getSessionHistory(double startTime,
 	return retval;
 }
 
-ToolManager::ToolMapPtr ToolManagerUsingIGSTK::getConfiguredTools()
+ToolManager::ToolMap ToolManagerUsingIGSTK::getTools()
 {
-	ToolManager::ToolMap retval;
-	ToolManager::ToolMap::iterator it = mTools.begin();
-	for (; it != mTools.end(); ++it)
-	{
-		if (!it->second->isInitialized())
-			retval[it->first] = it->second;
-	}
-
-	return ToolManager::ToolMapPtr(new ToolManager::ToolMap(retval));
-}
-
-ToolManager::ToolMapPtr ToolManagerUsingIGSTK::getInitializedTools()
-{
-	ToolManager::ToolMap retval;
-	ToolManager::ToolMap::iterator it = mTools.begin();
-	for (; it != mTools.end(); ++it)
-	{
-		if (it->second->isInitialized())
-			retval[it->first] = it->second;
-	}
-	return ToolManager::ToolMapPtr(new ToolManager::ToolMap(retval));
-}
-
-ToolManager::ToolMapPtr ToolManagerUsingIGSTK::getTools()
-{
-	return ToolManager::ToolMapPtr(new ToolManager::ToolMap(mTools));
+	return mTools;
 }
 
 ToolPtr ToolManagerUsingIGSTK::getTool(const QString& uid)
@@ -611,11 +583,11 @@ void ToolManagerUsingIGSTK::setTooltipOffset(double offset)
 	mToolTipOffset = offset;
 	emit tooltipOffset(mToolTipOffset);
 }
+
 double ToolManagerUsingIGSTK::getTooltipOffset() const
 {
 	return mToolTipOffset;
 }
-;
 
 ToolPtr ToolManagerUsingIGSTK::getDominantTool()
 {
@@ -660,39 +632,6 @@ void ToolManagerUsingIGSTK::setDominantTool(const QString& uid)
 //	report("Change active tool to: " + mDominantTool->getName());
 
 	emit dominantToolChanged(uid);
-}
-
-std::map<QString, QString> ToolManagerUsingIGSTK::getToolUidsAndNames() const
-{
-	std::map<QString, QString> uidsAndNames;
-
-	ToolManager::ToolMap::const_iterator it = mTools.begin();
-	for (; it != mTools.end(); ++it)
-		uidsAndNames[it->second->getUid()] = it->second->getName();
-
-	return uidsAndNames;
-}
-
-std::vector<QString> ToolManagerUsingIGSTK::getToolNames() const
-{
-	std::vector<QString> names;
-
-	ToolManager::ToolMap::const_iterator it = mTools.begin();
-	for (; it != mTools.end(); ++it)
-		names.push_back(it->second->getName());
-
-	return names;
-}
-
-std::vector<QString> ToolManagerUsingIGSTK::getToolUids() const
-{
-	std::vector<QString> uids;
-
-	ToolManager::ToolMap::const_iterator it = mTools.begin();
-	for (; it != mTools.end(); ++it)
-		uids.push_back(it->second->getUid());
-
-	return uids;
 }
 
 ToolPtr ToolManagerUsingIGSTK::getReferenceTool() const
@@ -974,9 +913,9 @@ void ToolManagerUsingIGSTK::addXml(QDomNode& parentNode)
 
 	//Tools
 	QDomElement toolsNode = doc.createElement("tools");
-	ToolManager::ToolMapPtr tools = this->getTools();
-	ToolManager::ToolMap::iterator toolIt = tools->begin();
-	for (; toolIt != tools->end(); ++toolIt)
+	ToolManager::ToolMap tools = this->getTools();
+	ToolManager::ToolMap::iterator toolIt = tools.begin();
+	for (; toolIt != tools.end(); ++toolIt)
 	{
 		QDomElement toolNode = doc.createElement("tool");
 		cxToolPtr tool = boost::dynamic_pointer_cast<ToolUsingIGSTK>(toolIt->second);
@@ -1003,16 +942,16 @@ void ToolManagerUsingIGSTK::parseXml(QDomNode& dataNode)
 	mManualTool->set_prMt(Transform3D::fromString(manualToolText));
 
 	//Tools
-	ToolManager::ToolMapPtr tools = this->getTools();
+	ToolManager::ToolMap tools = this->getTools();
 	QDomNode toolssNode = dataNode.namedItem("tools");
 	QDomElement toolNode = toolssNode.firstChildElement("tool");
 	for (; !toolNode.isNull(); toolNode = toolNode.nextSiblingElement("tool"))
 	{
 		QDomElement base = toolNode.toElement();
 		QString tool_uid = base.attribute("uid");
-		if (tools->find(tool_uid) != tools->end())
+		if (tools.find(tool_uid) != tools.end())
 		{
-			cxToolPtr tool = boost::dynamic_pointer_cast<ToolUsingIGSTK>(tools->find(tool_uid)->second);
+			cxToolPtr tool = boost::dynamic_pointer_cast<ToolUsingIGSTK>(tools.find(tool_uid)->second);
 			tool->parseXml(toolNode);
 		}
 	}
@@ -1035,29 +974,19 @@ ToolPtr ToolManagerUsingIGSTK::findFirstProbe()
 {
 	ToolPtr active = this->getDominantTool();
 	if (active && active->getProbe() && active->getProbe()->isValid())
-	{
 		return active;
-	}
 
-	ToolManager::ToolMapPtr tools = this->getTools();
+	ToolManager::ToolMap tools = this->getTools();
 
 	// look for visible probes
-	for (ToolManager::ToolMap::iterator iter = tools->begin(); iter != tools->end(); ++iter)
-	{
+	for (ToolManager::ToolMap::iterator iter = tools.begin(); iter != tools.end(); ++iter)
 		if (iter->second->getProbe() && iter->second->getProbe()->isValid() && iter->second->getVisible())
-		{
 			return iter->second;
-		}
-	}
 
 	// pick the first probe, visible or not.
-	for (ToolManager::ToolMap::iterator iter = tools->begin(); iter != tools->end(); ++iter)
-	{
+	for (ToolManager::ToolMap::iterator iter = tools.begin(); iter != tools.end(); ++iter)
 		if (iter->second->getProbe() && iter->second->getProbe()->isValid())
-		{
 			return iter->second;
-		}
-	}
 
 	return ToolPtr();
 }
