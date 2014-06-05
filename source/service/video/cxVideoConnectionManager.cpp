@@ -72,12 +72,12 @@ VideoConnectionManager::~VideoConnectionManager()
 
 void VideoConnectionManager::onServiceAdded(StreamerService* service)
 {
-	std::cout << "VideoConnectionManager:: Service added!!!" << std::endl;
+//	std::cout << "VideoConnectionManager:: Service added!!!" << std::endl;
 }
 
 void VideoConnectionManager::onServiceRemoved(StreamerService *service)
 {
-	std::cout << "VideoConnectionManager::Service removed!!!" << std::endl;
+//	std::cout << "VideoConnectionManager::Service removed!!!" << std::endl;
 	this->disconnectServer();//Disconnect to be safe. Can be improved by only disconneting if the removed service is running
 }
 
