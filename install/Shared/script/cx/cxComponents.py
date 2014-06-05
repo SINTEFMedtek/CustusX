@@ -419,6 +419,29 @@ class UltrasonixSDK(CppComponent):
         pass
     def isPubliclyAvailable(self):
         return False
+
+# ---------------------------------------------------------
+
+class UltrasoundSimulation(CppComponent):
+    def name(self):
+        return "UltrasoundSimulation"
+    def help(self):
+        return 'UltrasoundSimulation'
+    def path(self):
+        return self.controlData.getWorkingPath() + "/UltrasoundSimulation"
+    def _rawCheckout(self):
+        self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/UltrasoundSimulation.git')
+    def update(self):
+        self._getBuilder().gitCheckout('ed7bc28fd13d42d3233b3b909b68c97e2a58bf4c')
+    def configure(self):
+        pass
+    def build(self):
+        pass
+    def makeClean(self):
+        pass
+    def isPubliclyAvailable(self):
+        return False
+
 # ---------------------------------------------------------
 
 class TubeSegmentationFramework(CppComponent):
