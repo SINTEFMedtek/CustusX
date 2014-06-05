@@ -15,6 +15,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/logic
     ${CustusX3_SOURCE_DIR}/source/gui/pluginFrameworkWidgets
+    ${CustusX3_SOURCE_DIR}/source/resource/pluginUtilities
     )
 
 set(PLUGIN_SRCS
@@ -61,7 +62,6 @@ set(PLUGIN_resources
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}
-    #${CX_RESOURCE_LIBRARIES}
     cxGUIExtenderService
     vtkRenderingOpenGL
     vtkRenderingFreeTypeOpenGL
@@ -75,7 +75,6 @@ set(PLUGIN_target_libraries
     cxResource
     cxResourceWidgets
     cxVideoService
-    cxLogicManager
     cxGui
     #cxGrabber #Rename to cxVideoServer?
 )

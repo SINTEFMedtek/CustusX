@@ -60,36 +60,24 @@ void DicomWidget::createUI()
 	if (mBrowser)
 		return;
 
-	QHBoxLayout* buttonsLayout = new QHBoxLayout;
-
 	//Add detailed button
 	mViewHeaderAction = this->createAction(this,
 										   QIcon(),
-										   "View Header", "View header info for first selected series",
-										   SLOT(onViewHeader()),
-										   buttonsLayout);
+										   "View", "View header info for first selected series",
+										   SLOT(onViewHeader()));
 	mImportIntoCustusXAction = this->createAction(this,
 												  QIcon(),
 												  "Import", "Import selected series into application",
-												  SLOT(onImportIntoCustusXAction()),
-												  buttonsLayout);
-	buttonsLayout->addStretch();
+												  SLOT(onImportIntoCustusXAction()));
 
 	mBrowser = new DICOMAppWidget;
+	mBrowser->addActionToToolbar(mViewHeaderAction);
+	mBrowser->addActionToToolbar(mImportIntoCustusXAction);
 
 	mVerticalLayout->addWidget(mBrowser);
-	mVerticalLayout->addLayout(buttonsLayout);
-
-
-//	connect(mBrowser->dicomTableManager(),
-//	        SIGNAL(seriesSelectionChanged(const QItemSelection&, const QItemSelection&)),
-//	        this,
-//	        SLOT(onModelSelected(const QItemSelection&,const QItemSelection&)));
-
 
 	this->setupDatabaseDirectory();
 }
-
 
 DicomWidget::~DicomWidget()
 {
@@ -138,8 +126,8 @@ void DicomWidget::onViewHeader()
 		files.append(current);
 	}
 	files.sort();
-	std::cout << "files:" << std::endl;
-	std::cout << files.join("\n").toStdString() << std::endl;
+//	std::cout << "files:" << std::endl;
+//	std::cout << files.join("\n").toStdString() << std::endl;
 
 	ctkDICOMObjectListWidget* window = new ctkDICOMObjectListWidget;
 	window->setWindowTitle("DICOM File Header");
@@ -193,37 +181,6 @@ void DicomWidget::loadIntoPatientModel(ImagePtr image, QString seriesUid)
 	{
 		reportWarning(QString("Failed to load DICOM series %1 as %2: no PatientModelService.").arg(seriesUid).arg(image->getName()));
 	}
-}
-
-//void DicomWidget::onModelSelected(const QItemSelection &item1, const QItemSelection &item2)
-//{
-//	Q_UNUSED(item1);
-//	Q_UNUSED(item2);
-
-//	QStringList series = this->currentSeriesSelection();
-
-//	for (int i=0; i<series.size(); ++i)
-//	{
-//		this->printFrameCountForSeries(series[i]);
-//	}
-
-////	std::cout << "selected: " << series.join("\n") << std::endl;
-//}
-
-void DicomWidget::printFrameCountForSeries(QString series) const
-{
-	QString seriesDescription;
-	int frameCount = 0;
-	QStringList files = this->getDatabase()->filesForSeries(series);
-	for (unsigned i=0; i<files.size(); ++i)
-	{
-		DicomImageReaderPtr reader = DicomImageReader::createFromFile(files[i]);
-		if (!reader)
-			continue;
-		frameCount += reader->getNumberOfFrames();
-		seriesDescription = reader->item()->GetElementAsString(DCM_SeriesDescription);
-	}
-	std::cout << QString("%1 frames for series %2").arg(frameCount).arg(seriesDescription) << std::endl;
 }
 
 ctkDICOMDatabase* DicomWidget::getDatabase() const

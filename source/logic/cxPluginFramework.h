@@ -56,8 +56,7 @@ public:
 	ctkPluginContext* getPluginContext();
 	QSharedPointer<ctkPluginFramework> getPluginFramework();
 
-	void addSearchPath(const QString& searchPath);
-	void setSearchPaths(const QStringList& searchPath);
+//	void addSearchPath(const QString& searchPath);
 	QStringList getSearchPaths() const;
 	QStringList getPluginSymbolicNames();
 	QSharedPointer<ctkPlugin> getInstalledPluginFromSymbolicName(QString symbolicName);
@@ -67,6 +66,7 @@ signals:
 	void pluginPoolChanged();
 
 private:
+	void setSearchPaths(const QStringList& searchPath);
 	QString getPluginPath(const QString& symbolicName);
 	QStringList getPluginSymbolicNames(const QString& searchPath);
 	bool nameIsProbablyPlugin(QString name) const;
@@ -87,7 +87,7 @@ private:
 	QStringList mPluginSearchPaths;
 	QStringList mPluginLibFilter;
 
-	QString mSettingsSearchPaths;
+//	QString mSettingsSearchPaths;
 	QString mSettingsBase;
 
 };

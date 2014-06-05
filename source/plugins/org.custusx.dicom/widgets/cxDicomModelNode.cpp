@@ -25,7 +25,7 @@ NodePtr DicomModelNode::getNullNode()
 	{
 		NullNode.reset(new NullDicomModelNode);
 		NullNode->Parent = NullNode.get();
-		NullNode->Row = -1;
+//		NullNode->Row = -1;
 	}
 
 	return NullNode;
@@ -34,7 +34,7 @@ NodePtr DicomModelNode::getNullNode()
 NodePtr DicomModelNode::createNode(int row, DicomModelNode* parent, QSharedPointer<ctkDICOMDatabase> dataBase)
 {
 	if (!dataBase)
-		return NodePtr();
+		return DicomModelNode::getNullNode();
 
 	NodePtr node;
 	if (row == -1)
@@ -58,7 +58,7 @@ NodePtr DicomModelNode::createNode(int row, DicomModelNode* parent, QSharedPoint
 		node->UID = parent->ChildrenUID[row];
 	}
 
-	node->Row = row;
+//	node->Row = row;
 	node->DataBase = dataBase;
 
 	node->fillChildrenUids();
@@ -67,7 +67,7 @@ NodePtr DicomModelNode::createNode(int row, DicomModelNode* parent, QSharedPoint
 }
 
 DicomModelNode::DicomModelNode() :
-	Row(-1),
+//	Row(-1),
 	Parent(0)
 {
 
@@ -133,6 +133,28 @@ QVariant DicomModelNode::getUncachedValue(int column) const
 	if (column==3)
 		return this->getImageCount();
 	return QVariant();
+}
+
+void DicomModelNode::removeChild(int index)
+{
+	if (index < ChildrenUID.size())
+		ChildrenUID.removeAt(index);
+	if (index < FetchedChildren.size())
+	{
+		std::vector<NodePtr>::iterator iter = FetchedChildren.begin();
+		std::advance(iter, index);
+		FetchedChildren.erase(iter);
+	}
+	CachedValues.erase(index);
+}
+
+int DicomModelNode::getRow() const
+{
+	const std::vector<NodePtr>& siblings = Parent->getFetchedChildren();
+	for (int i=0; i<siblings.size(); ++i)
+		if (siblings[i].get()==this)
+			return i;
+	return -1;
 }
 
 

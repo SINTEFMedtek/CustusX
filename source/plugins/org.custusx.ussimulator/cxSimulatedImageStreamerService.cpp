@@ -30,11 +30,6 @@ QString SimulatedImageStreamerService::getName()
 	return "Simulator";
 }
 
-void SimulatedImageStreamerService::setBackend(VideoServiceBackendPtr backend)
-{
-	mBackend = backend;
-}
-
 void SimulatedImageStreamerService::setImageToStream(QString imageUid)
 {
 	mImageUidToSimulate = imageUid;
@@ -68,7 +63,7 @@ StreamerPtr SimulatedImageStreamerService::createStreamer()
 	return mStreamer;
 }
 
-BaseWidget* SimulatedImageStreamerService::createWidget()
+QWidget *SimulatedImageStreamerService::createWidget()
 {
 	SimulateUSWidget* mSimulationWidget = new SimulateUSWidget(this);
 	return mSimulationWidget;

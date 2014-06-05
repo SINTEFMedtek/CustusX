@@ -80,11 +80,28 @@ ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename)
 {
 	DicomImageReaderPtr reader = DicomImageReader::createFromFile(filename);
 	if (!reader)
+	{
+		reportWarning(QString("File not found: %1").arg(filename));
 		return ImagePtr();
+	}
+
+	if (reader->getNumberOfFrames()==0)
+	{
+		reportWarning(QString("Found no images in %1, skipping.").arg(filename));
+		return ImagePtr();
+	}
 
 	QString uid = this->generateUid(reader);
 	QString name = this->generateName(reader);
 	cx::ImagePtr image = cx::Image::create(uid, name);
+
+	vtkImageDataPtr imageData = reader->createVtkImageData();
+	if (!imageData)
+	{
+		reportWarning(QString("Failed to create image for %1.").arg(filename));
+		return ImagePtr();
+	}
+	image->setVtkImageData(imageData);
 
 	QString modality = reader->item()->GetElementAsString(DCM_Modality);
 	image->setModality(modality);
@@ -95,11 +112,7 @@ ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename)
 	Transform3D M = reader->getImageTransformPatient();
 	image->get_rMd_History()->setRegistration(M);
 
-	vtkImageDataPtr imageData = reader->createVtkImageData();
-	if (!imageData)
-		return ImagePtr();
-	image->setVtkImageData(imageData);
-
+	report(QString("Image created from %1").arg(filename));
 	return image;
 }
 

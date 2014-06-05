@@ -63,6 +63,7 @@ public:
 	virtual bool isConnected() const;
 
 	void runDirectLinkClient(std::map<QString, QString> args);
+	void runDirectLinkClient(StreamerService* service);
 	void runIGTLinkedClient(QString address, int port);
 	void disconnectServer();
 
@@ -93,6 +94,7 @@ private:
 	void startAllSources();
 	void removeSourceFromProbe(ToolPtr tool);
 	QString getImageToStream();
+	void runImageReceiverThread();
 
 	ImageReceiverThreadPtr mClient;
 	bool mConnected;

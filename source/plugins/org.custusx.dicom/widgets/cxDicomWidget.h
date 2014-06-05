@@ -48,12 +48,10 @@ public:
 private slots:
 	void onViewHeader();
 	void onImportIntoCustusXAction();
-//	void onModelSelected(const QItemSelection &item1, const QItemSelection &item2);
 protected:
 	virtual void prePaintEvent();
 private:
 	QVBoxLayout*  mVerticalLayout; ///< vertical layout is used
-//	ctkDICOMBrowser* mBrowser;
 	DICOMAppWidget* mBrowser;
 	ctkPluginContext* mContext;
 	QAction* mViewHeaderAction;
@@ -62,7 +60,6 @@ private:
 	void setupDatabaseDirectory();
 	void importSeries(QString seriesUid);
 	void loadIntoPatientModel(ImagePtr image, QString seriesUid);
-	void printFrameCountForSeries(QString series) const;
 	QStringList currentSeriesSelection();
 	ctkDICOMDatabase* getDatabase() const;
 

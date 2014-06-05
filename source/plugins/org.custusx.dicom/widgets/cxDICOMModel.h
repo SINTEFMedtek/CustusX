@@ -79,6 +79,7 @@ public:
   virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
   // Sorting resets the model because fetched/unfetched items could disappear/appear respectively.
 //  virtual void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
+  virtual bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex());
 public Q_SLOTS:
   virtual void reset();
 protected:

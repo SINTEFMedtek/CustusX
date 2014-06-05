@@ -34,7 +34,7 @@ class CommandlineImageStreamerInterface : public StreamerService
 public:
 	CommandlineImageStreamerInterface();
 	virtual StreamerPtr createStreamer();
-	virtual BaseWidget* createWidget();
+	virtual QWidget* createWidget();
 	virtual QString getName();
 
 	void setArguments(std::map<QString, QString> arguments) {
