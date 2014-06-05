@@ -58,7 +58,11 @@ public:
     void setShowTextLabel(bool on);
 
 	void attach(TimedAlgorithmPtr algorithm);
+	void attach(std::set<cx::TimedAlgorithmPtr> threads);
+
 	void detach(TimedAlgorithmPtr algorithm);
+	void detach(std::set<cx::TimedAlgorithmPtr> threads);
+
 
 private slots:
 	void algorithmStartedSlot(int maxSteps);
@@ -70,7 +74,6 @@ private:
 	std::set<TimedAlgorithmPtr> mAlgorithm;
 	QProgressBar* mProgressBar;
 	QLabel* mLabel;
-//	int mStartedAlgos;
 	std::set<TimedBaseAlgorithm*> mStartedAlgos;
 	DisplayTimerWidget* mTimerWidget;
     bool mShowTextLabel;

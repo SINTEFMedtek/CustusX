@@ -59,14 +59,26 @@ void ReconstructionManagerTestFixture::reconstruct()
 	mOutput.clear();
 	cx::ReconstructionManagerPtr reconstructer = this->getManager();
 	cx::ReconstructionExecuterPtr executor(new cx::ReconstructionExecuter);
-//	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
 	bool validInputData = true; //TODO should be checked in some way???
-	cx::ReconstructPreprocessorPtr preprocessor = executor->createPreprocessor(reconstructer->createCoreParameters(), reconstructer->getSelectedFileData(), validInputData);
+	cx::ReconstructPreprocessorPtr preprocessor = executor->createPreprocessor(reconstructer->createCoreParameters(), reconstructer->getSelectedFileData());
 	bool createBModeWhenAngio = reconstructer->getParams()->mCreateBModeWhenAngio->getValue();
-	std::vector<cx::ReconstructCorePtr> cores = executor->createCores(reconstructer->createAlgorithm(), reconstructer->createCoreParameters(), createBModeWhenAngio, validInputData);
-//	cx::ReconstructPreprocessorPtr preprocessor = manager->createPreprocessor();
-//	std::vector<cx::ReconstructCorePtr> cores = manager->createCores();
-	preprocessor->initializeCores(cores);
+	std::vector<cx::ReconstructCorePtr> cores = executor->createCores(reconstructer->createAlgorithm(), reconstructer->createCoreParameters(), createBModeWhenAngio);
+//	preprocessor->initializeCores(cores);
+
+
+	//......
+	std::vector<bool> angio;
+	for (unsigned i=0; i<cores.size(); ++i)
+		angio.push_back(cores[i]->getInputParams().mAngio);
+
+	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(angio);
+	REQUIRE(cores.size() == processedInput.size());
+
+	for (unsigned i=0; i<cores.size(); ++i)
+	{
+		cores[i]->initialize(processedInput[i], preprocessor->getOutputVolumeParams());
+	}
+	//......
 	for (unsigned i=0; i<cores.size(); ++i)
 	{
 		cores[i]->reconstruct();

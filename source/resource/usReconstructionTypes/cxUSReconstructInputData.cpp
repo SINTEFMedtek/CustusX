@@ -13,6 +13,8 @@
 // See CustusX_License.txt for more information.
 
 #include "cxUSReconstructInputData.h"
+#include "cxUSFrameData.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -20,6 +22,18 @@ vtkImageDataPtr USReconstructInputData::getMask()
 {
 	vtkImageDataPtr retval = mProbeData.getMask();
 	return retval;
+}
+
+bool USReconstructInputData::isValid() const
+{
+	if (mFrames.empty() || !mUsRaw || mPositions.empty())
+		return false;
+	if(mUsRaw->is4D())
+	{
+		reportWarning("US reconstructer do not handle 4D US data");
+		return false;
+	}
+	return true;
 }
 
 } // namespace cx

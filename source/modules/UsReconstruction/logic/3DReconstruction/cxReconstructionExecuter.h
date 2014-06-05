@@ -27,24 +27,25 @@ public:
 	  * but this must be done AFTER the threads have completed.
 	  * In general, dont use the retval, it is for unit testing.
 	  */
-	virtual std::vector<ReconstructCorePtr> startReconstruction(ReconstructionServicePtr algo, ReconstructCore::InputParams par, USReconstructInputData fileData, bool createBModeWhenAngio, bool validInputData);
+	virtual std::vector<ReconstructCorePtr> startReconstruction(ReconstructionServicePtr algo, ReconstructCore::InputParams par, USReconstructInputData fileData, bool createBModeWhenAngio);
 	virtual std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction(); ///< Return the currently reconstructing thread object(s).
 	/**
 	  * Create the reconstruct preprocessor object.
 	  * This is usually created internally during reconstruction,
 	  * published for use in unit testing.
 	  */
-	virtual ReconstructPreprocessorPtr createPreprocessor(ReconstructCore::InputParams par, USReconstructInputData fileData, bool validInputData);
+	virtual ReconstructPreprocessorPtr createPreprocessor(ReconstructCore::InputParams par, USReconstructInputData fileData);
 	/**
 	  * Create the reconstruct core object.
 	  * This is usually created internally during reconstruction,
 	  * published for use in unit testing.
 	  */
-	virtual std::vector<ReconstructCorePtr> createCores(ReconstructionServicePtr algo, ReconstructCore::InputParams par, bool createBModeWhenAngio, bool validInputData); ///< create reconstruct cores matching the current parameters
+	virtual std::vector<ReconstructCorePtr> createCores(ReconstructionServicePtr algo, ReconstructCore::InputParams par, bool createBModeWhenAngio); ///< create reconstruct cores matching the current parameters
 
 
 signals:
-	void reconstructAboutToStart();
+	void reconstructAboutToStart(); ///< emitted before reconstruction threads are fired
+	void reconstructStarted();
 	void reconstructFinished();
 
 private slots:
@@ -52,9 +53,9 @@ private slots:
 
 private:
 	void launch(cx::TimedAlgorithmPtr thread);
-	ReconstructCorePtr createCore(ReconstructCore::InputParams par, ReconstructionServicePtr algo, bool validInputData); ///< used for threaded reconstruction
-	ReconstructCorePtr createBModeCore(ReconstructCore::InputParams par, ReconstructionServicePtr algo, bool validInputData); ///< core version for B-mode in case of angio recording.
-	cx::CompositeTimedAlgorithmPtr assembleReconstructionPipeline(std::vector<ReconstructCorePtr> cores, ReconstructCore::InputParams par, USReconstructInputData fileData, bool validInputData); ///< assembles the different steps that is needed to reconstruct
+	ReconstructCorePtr createCore(ReconstructCore::InputParams par, ReconstructionServicePtr algo); ///< used for threaded reconstruction
+	ReconstructCorePtr createBModeCore(ReconstructCore::InputParams par, ReconstructionServicePtr algo); ///< core version for B-mode in case of angio recording.
+	cx::CompositeTimedAlgorithmPtr assembleReconstructionPipeline(std::vector<ReconstructCorePtr> cores, ReconstructCore::InputParams par, USReconstructInputData fileData); ///< assembles the different steps that is needed to reconstruct
 	bool canCoresRunInParallel(std::vector<ReconstructCorePtr> cores);
 
 

@@ -56,8 +56,10 @@ ReconstructionManagerImpl::ReconstructionManagerImpl(XmlOptionFile settings, QSt
 {
 	mExecuter.reset(new ReconstructionExecuter());
 	connect(mExecuter.get(), SIGNAL(reconstructAboutToStart()), this, SIGNAL(reconstructAboutToStart()));
-	connect(mExecuter.get(), SIGNAL(reconstructFinished()), this, SLOT(reconstructFinishedSlot()));
+	connect(mExecuter.get(), SIGNAL(reconstructStarted()), this, SIGNAL(reconstructStarted()));
+	connect(mExecuter.get(), SIGNAL(reconstructFinished()), this, SIGNAL(reconstructFinished()));
 
+	connect(mExecuter.get(), SIGNAL(reconstructFinished()), this, SLOT(reconstructFinishedSlot()));
 
 	mSettings = settings;
 	mSettings.getElement("algorithms");
@@ -159,7 +161,7 @@ std::vector<ReconstructCorePtr> ReconstructionManagerImpl::startReconstruction()
 	USReconstructInputData fileData = mOriginalFileData;
 	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
 
-	return mExecuter->startReconstruction(algo, par, fileData, mParams->mCreateBModeWhenAngio->getValue(), this->validInputData());
+	return mExecuter->startReconstruction(algo, par, fileData, mParams->mCreateBModeWhenAngio->getValue());
 }
 
 std::set<cx::TimedAlgorithmPtr> ReconstructionManagerImpl::getThreadedReconstruction()
@@ -198,18 +200,6 @@ void ReconstructionManagerImpl::setOutputRelativePath(QString path)
 void ReconstructionManagerImpl::setOutputBasePath(QString path)
 {
 	mOutputBasePath = path;
-}
-
-bool ReconstructionManagerImpl::validInputData() const
-{
-	if (mOriginalFileData.mFrames.empty() || !mOriginalFileData.mUsRaw || mOriginalFileData.mPositions.empty())
-		return false;
-	if(mOriginalFileData.mUsRaw->is4D())
-	{
-		reportWarning("US reconstructer do not handle 4D US data");
-		return false;
-	}
-	return true;
 }
 
 ReconstructParamsPtr ReconstructionManagerImpl::getParams()
@@ -261,13 +251,13 @@ void ReconstructionManagerImpl::selectData(USReconstructInputData fileData)
 
 void ReconstructionManagerImpl::updateFromOriginalFileData()
 {
-	if (!this->validInputData())
+	if (!mOriginalFileData.isValid())
 		return;
 
-	ReconstructCore::InputParams par;
-	USReconstructInputData fileData = mOriginalFileData;
-	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
-	ReconstructPreprocessorPtr preprocessor = mExecuter->createPreprocessor(this->createCoreParameters(), fileData, this->validInputData());
+//	ReconstructCore::InputParams par;
+//	USReconstructInputData fileData = mOriginalFileData;
+//	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
+	ReconstructPreprocessorPtr preprocessor = mExecuter->createPreprocessor(this->createCoreParameters(), mOriginalFileData);
 	mOutputVolumeParams = preprocessor->getOutputVolumeParams();
 
 	emit paramsChanged();

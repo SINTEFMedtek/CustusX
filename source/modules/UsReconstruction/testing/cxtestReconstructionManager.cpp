@@ -189,15 +189,19 @@ TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integ
 	fixture.setPNN_InterpolationSteps(1);// set an algorithm-specific parameter
 
 	cx::ReconstructionExecuterPtr executor(new cx::ReconstructionExecuter);
-//	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
-	bool validInputData = true; //TODO should be checked in some way???
-	cx::ReconstructPreprocessorPtr preprocessor = executor->createPreprocessor(reconstructer->createCoreParameters(), reconstructer->getSelectedFileData(), validInputData);
+	cx::ReconstructPreprocessorPtr preprocessor = executor->createPreprocessor(reconstructer->createCoreParameters(), reconstructer->getSelectedFileData());
 	REQUIRE(preprocessor);
-//	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
+
 	bool createBModeWhenAngio = reconstructer->getParams()->mCreateBModeWhenAngio->getValue();
-	std::vector<cx::ReconstructCorePtr> cores = executor->createCores(reconstructer->createAlgorithm(), reconstructer->createCoreParameters(), createBModeWhenAngio, validInputData);
+	std::vector<cx::ReconstructCorePtr> cores = executor->createCores(reconstructer->createAlgorithm(), reconstructer->createCoreParameters(), createBModeWhenAngio);
 	REQUIRE(!cores.empty());
-	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(cores);
+
+	std::vector<bool> angio;
+	for (unsigned i=0; i<cores.size(); ++i)
+		angio.push_back(cores[i]->getInputParams().mAngio);
+
+//	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(cores);
+	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(angio);
 
 	REQUIRE(processedInput.size() == cores.size());
 	{

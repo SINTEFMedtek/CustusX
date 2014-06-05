@@ -55,6 +55,7 @@ struct USReconstructInputData
 	Transform3D rMpr; ///< patient registration
 
 	vtkImageDataPtr getMask();
+	bool isValid() const;
 };
 
 /**

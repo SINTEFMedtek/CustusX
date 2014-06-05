@@ -46,22 +46,22 @@ public:
     void initialize(ReconstructCore::InputParams input, USReconstructInputData fileData);
     OutputVolumeParams getOutputVolumeParams() { return mOutputVolumeParams; }
     ReconstructCore::InputParams getInputParams() { return mInput; }
-    /** Return the filedata after preprocessing, ready to be sent to reconstruction
-      */
-    void initializeCores(std::vector<ReconstructCorePtr> cores); ///< fill input cores with relevant processed input
-		std::vector<ProcessedUSInputDataPtr> createProcessedInput(std::vector<ReconstructCorePtr> cores);
+
+//    void initializeCores(std::vector<ReconstructCorePtr> cores); ///< fill input cores with relevant processed input, Return the filedata after preprocessing, ready to be sent to reconstruction
+    std::vector<ProcessedUSInputDataPtr> createProcessedInput(std::vector<bool> angio);
+//	std::vector<ProcessedUSInputDataPtr> createProcessedInput(std::vector<ReconstructCorePtr> cores);
 
 private:
     void cropInputData();
     void updateFromOriginalFileData();
     void findExtentAndOutputTransform();
     Transform3D applyOutputOrientation();
-		std::vector<Vector3D> generateInputRectangle();
-		void interpolatePositions();
-		double timeToPosition(unsigned i_frame, unsigned i_pos);
+	std::vector<Vector3D> generateInputRectangle();
+	void interpolatePositions();
+	double timeToPosition(unsigned i_frame, unsigned i_pos);
     void applyTimeCalibration();
     void alignTimeSeries();
-		void calibrateTimeStamps(double offset, double scale);
+	void calibrateTimeStamps(double offset, double scale);
 
     // input data
     ReconstructCore::InputParams mInput;

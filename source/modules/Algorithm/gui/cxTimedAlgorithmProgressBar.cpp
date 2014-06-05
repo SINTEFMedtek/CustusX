@@ -41,6 +41,20 @@ TimedAlgorithmProgressBar::TimedAlgorithmProgressBar(QWidget* parent) :
 	layout->addWidget(mProgressBar);
 }
 
+void TimedAlgorithmProgressBar::attach(std::set<cx::TimedAlgorithmPtr> threads)
+{
+	std::set<cx::TimedAlgorithmPtr>::iterator iter;
+	for(iter=threads.begin(); iter!=threads.end(); ++iter)
+		this->attach(*iter);
+}
+
+void TimedAlgorithmProgressBar::detach(std::set<cx::TimedAlgorithmPtr> threads)
+{
+	std::set<cx::TimedAlgorithmPtr>::iterator iter;
+	for(iter=threads.begin(); iter!=threads.end(); ++iter)
+		this->detach(*iter);
+}
+
 void TimedAlgorithmProgressBar::attach(TimedAlgorithmPtr algorithm)
 {
 	if (mAlgorithm.count(algorithm))
@@ -80,7 +94,6 @@ void TimedAlgorithmProgressBar::productChangedSlot()
 		product = algo->getProduct();
 
 	mLabel->setText(product);
-//	report(QString("Executing %1, please wait!").arg(product));
 }
 
 void TimedAlgorithmProgressBar::setShowTextLabel(bool on)
@@ -107,7 +120,6 @@ void TimedAlgorithmProgressBar::algorithmStartedSlot(int maxSteps)
 	mProgressBar->setRange(0, maxSteps);
 	mProgressBar->setValue(0);
 	mProgressBar->show();
-//	report(QString("Executing %1, please wait!").arg(product));
 }
 
 void TimedAlgorithmProgressBar::algorithmFinishedSlot()
@@ -118,18 +130,13 @@ void TimedAlgorithmProgressBar::algorithmFinishedSlot()
 
 void TimedAlgorithmProgressBar::algorithmFinished(TimedBaseAlgorithm* algo)
 {
-//	TimedBaseAlgorithm* algo = dynamic_cast<TimedBaseAlgorithm*>(sender());
 	QString product = "algorithm";
 	if (algo)
 		product = algo->getProduct();
 
-//	reportSuccess(QString("%1 complete [%2s]").arg(product).arg(mTimerWidget->elaspedSeconds()));
-
 	mStartedAlgos.erase(algo);
 	if (!mStartedAlgos.empty())
 		return;
-//	if (--mStartedAlgos >0) // dont hide before the last algo has completed.
-//		return;
 
 	mProgressBar->setValue(0);
 	mProgressBar->hide();

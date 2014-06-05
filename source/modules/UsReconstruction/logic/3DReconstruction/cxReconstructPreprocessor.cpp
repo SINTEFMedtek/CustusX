@@ -49,32 +49,37 @@ ReconstructPreprocessor::~ReconstructPreprocessor()
 {
 }
 
-void ReconstructPreprocessor::initializeCores(std::vector<ReconstructCorePtr> cores)
+//void ReconstructPreprocessor::initializeCores(std::vector<ReconstructCorePtr> cores)
+//{
+//	TimeKeeper timer;
+//
+//	std::vector<bool> angio;
+//	for (unsigned i=0; i<cores.size(); ++i)
+//		angio.push_back(cores[i]->getInputParams().mAngio);
+//
+//	std::vector<ProcessedUSInputDataPtr> processedInput = this->createProcessedInput(angio);
+//	SSC_ASSERT(cores.size() == processedInput.size());
+//
+//	for (unsigned i=0; i<cores.size(); ++i)
+//	{
+//		cores[i]->initialize(processedInput[i], this->getOutputVolumeParams());
+//	}
+//
+//	timer.printElapsedSeconds("Reconstruct preprocess time");
+//}
+
+std::vector<ProcessedUSInputDataPtr> ReconstructPreprocessor::createProcessedInput(std::vector<bool> angio)
+//std::vector<ProcessedUSInputDataPtr> ReconstructPreprocessor::createProcessedInput(std::vector<ReconstructCorePtr> cores)
 {
-	TimeKeeper timer;
-
-	std::vector<ProcessedUSInputDataPtr> processedInput = this->createProcessedInput(cores);
-	SSC_ASSERT(cores.size() == processedInput.size());
-
-	for (unsigned i=0; i<cores.size(); ++i)
-	{
-		cores[i]->initialize(processedInput[i], this->getOutputVolumeParams());
-	}
-
-	timer.printElapsedSeconds("Reconstruct preprocess time");
-}
-
-std::vector<ProcessedUSInputDataPtr> ReconstructPreprocessor::createProcessedInput(std::vector<ReconstructCorePtr> cores)
-{
-	std::vector<bool> angio;
-	for (unsigned i=0; i<cores.size(); ++i)
-		angio.push_back(cores[i]->getInputParams().mAngio);
+//	std::vector<bool> angio;
+//	for (unsigned i=0; i<cores.size(); ++i)
+//		angio.push_back(cores[i]->getInputParams().mAngio);
 
 	std::vector<std::vector<vtkImageDataPtr> > frames = mFileData.mUsRaw->initializeFrames(angio);
 
 	std::vector<ProcessedUSInputDataPtr> retval;
 
-	for (unsigned i=0; i<cores.size(); ++i)
+	for (unsigned i=0; i<angio.size(); ++i)
 	{
 		ProcessedUSInputDataPtr input;
 		input.reset(new ProcessedUSInputData(frames[i],

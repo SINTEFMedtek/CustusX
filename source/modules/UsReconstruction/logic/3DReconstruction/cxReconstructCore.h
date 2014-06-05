@@ -73,7 +73,6 @@ public:
 	ImagePtr getOutput();
 
 	// published helper methods, also needed for parameter display outside of reconstruction execution:
-//	ReconstructionServicePtr createAlgorithm(QString uid);
 	InputParams getInputParams() { return mInput; }
 
 private:

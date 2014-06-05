@@ -33,6 +33,9 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 
 	// connect to reconstructer signals
 	connect(mPluginData->getReconstructer().get(), SIGNAL(reconstructAboutToStart()), this, SLOT(reconstructAboutToStartSlot()));
+	connect(mPluginData->getReconstructer().get(), SIGNAL(reconstructStarted()), this, SLOT(reconstructStartedSlot()));
+	connect(mPluginData->getReconstructer().get(), SIGNAL(reconstructFinished()), this, SLOT(reconstructFinishedSlot()));
+
 	mAcquisition.reset(new USAcquisition(mBase));
 	connect(mAcquisition.get(), SIGNAL(acquisitionDataReady()), this, SLOT(acquisitionDataReadySlot()));
 
@@ -92,18 +95,6 @@ QString USAcqusitionWidget::defaultWhatsThis() const
 		"</html>";
 }
 
-void USAcqusitionWidget::reconstructAboutToStartSlot()
-{
-	std::set<cx::TimedAlgorithmPtr> reconstructer = mPluginData->getReconstructer()->getThreadedReconstruction();
-	std::set<cx::TimedAlgorithmPtr>::iterator iter;
-	for(iter=reconstructer.begin(); iter!=reconstructer.end(); ++iter)
-	{
-		connect((*iter).get(), SIGNAL(started(int)), this, SLOT(reconstructStartedSlot()));
-		connect((*iter).get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
-
-		mTimedAlgorithmProgressBar->attach(*iter);
-	}
-}
 
 void USAcqusitionWidget::toggleDetailsSlot()
 {
@@ -130,13 +121,6 @@ QWidget* USAcqusitionWidget::createOptionsWidget()
 	layout->addWidget(this->wrapGroupBox(probeWidget, "Probe", "Probe Definition"), line++, 0);
 	layout->addWidget(this->wrapGroupBox(soundSpeedWidget, "Sound Speed", "Sound Speed"), line++, 0);
 	layout->addWidget(temporalCalibrationWidget, line++, 0);
-
-// alternative: group advanced widgets as tabs:
-//	QTabWidget* tabWidget = new QTabWidget(this);
-//	layout->addWidget(tabWidget, 0, 0);
-//	tabWidget->addTab(this->addVerticalStretch(probeWidget), "Probe");
-//	tabWidget->addTab(this->addVerticalStretch(soundSpeedWidget), "Sound Speed");
-//	tabWidget->addTab(this->addVerticalStretch(temporalCalibrationWidget), "Temporal Calibration");
 
 	return retval;
 }
@@ -199,31 +183,22 @@ void USAcqusitionWidget::recordCancelled()
 	mDisplayTimerWidget->stop();
 }
 
-
+void USAcqusitionWidget::reconstructAboutToStartSlot()
+{
+	std::set<cx::TimedAlgorithmPtr> threads = mPluginData->getReconstructer()->getThreadedReconstruction();
+	mTimedAlgorithmProgressBar->attach(threads);
+}
 
 void USAcqusitionWidget::reconstructStartedSlot()
 {
-	// TODO reconstruction is still controlled from the widget. Move this to USAcquisition, but keep in mind
-	// that temp cal also uses that class. - configurable
-
 	mBase->startPostProcessing();
 }
 
 void USAcqusitionWidget::reconstructFinishedSlot()
 {
-	// stop if all threads are finished
-	bool finished = true;
-	std::set<cx::TimedAlgorithmPtr> reconstructer = mPluginData->getReconstructer()->getThreadedReconstruction();
-	std::set<cx::TimedAlgorithmPtr>::iterator iter;
-	for(iter=reconstructer.begin(); iter!=reconstructer.end(); ++iter)
-	{
-		finished = finished && (*iter)->isFinished();
-		if ((*iter)->isFinished())
-			mTimedAlgorithmProgressBar->detach(*iter);
-	}
-
-	if (finished)
-		mBase->stopPostProcessing();
+	std::set<cx::TimedAlgorithmPtr> threads = mPluginData->getReconstructer()->getThreadedReconstruction();
+	mTimedAlgorithmProgressBar->detach(threads);
+	mBase->stopPostProcessing();
 }
 
 }//namespace cx
