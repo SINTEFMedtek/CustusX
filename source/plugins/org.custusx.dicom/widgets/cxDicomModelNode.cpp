@@ -34,7 +34,7 @@ NodePtr DicomModelNode::getNullNode()
 NodePtr DicomModelNode::createNode(int row, DicomModelNode* parent, QSharedPointer<ctkDICOMDatabase> dataBase)
 {
 	if (!dataBase)
-		return NodePtr();
+		return DicomModelNode::getNullNode();
 
 	NodePtr node;
 	if (row == -1)
