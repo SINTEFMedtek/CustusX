@@ -56,7 +56,7 @@ public:
   PatientServicePtr getPatientService();
   VideoServicePtr getVideoService();
   VisualizationServicePtr getVisualizationService();
-  StateServicePtr getStateService();
+	StateServicePtr getStateService();
 
 private:
   /**

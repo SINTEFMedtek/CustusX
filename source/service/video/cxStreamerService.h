@@ -15,7 +15,6 @@
 
 #include "boost/shared_ptr.hpp"
 #include <QObject>
-#include "cxVideoServiceBackend.h"
 class QWidget;
 
 #define StreamerService_iid "cx::StreamerService"
@@ -41,13 +40,9 @@ class StreamerService : public QObject
 	Q_OBJECT
 public:
 	StreamerService() {}
-	void setBackend(VideoServiceBackendPtr backend);
 	virtual StreamerPtr createStreamer() = 0;
 	virtual QWidget* createWidget() = 0;
 	virtual QString getName() = 0;
-
-protected:
-	VideoServiceBackendPtr mBackend;
 };
 
 } //end namespace cx

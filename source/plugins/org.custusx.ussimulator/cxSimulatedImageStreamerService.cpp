@@ -18,6 +18,11 @@
 #include "cxReporter.h"
 #include "cxSimulateUSWidget.h"
 
+//These 3 includes should be removed when TrackingManager are a plugin
+#include "cxLogicManager.h"
+#include "cxVideoService.h"
+#include "cxVideoServiceBackend.h"
+
 namespace cx
 {
 
@@ -37,7 +42,7 @@ void SimulatedImageStreamerService::setImageToStream(QString imageUid)
 
 void SimulatedImageStreamerService::setGain(double gain)
 {
-	//must mutex mStreamer
+	//must mutex mStreamer?
 	if(mStreamer)
 		mStreamer->setGain(gain);
 }
@@ -45,20 +50,22 @@ void SimulatedImageStreamerService::setGain(double gain)
 StreamerPtr SimulatedImageStreamerService::createStreamer()
 {
 	mStreamer.reset(new SimulatedImageStreamer());
-	if(!mBackend)
+	//TODO: remove this dependency when TrackingManager are a plugin
+	cx::VideoServiceBackendPtr backend = cx::logicManager()->getVideoService()->getBackend();
+	if(!backend)
 	{
 		reporter()->sendError("SimulatedImageStreamerInterface got no VideoServiceBackend");
 		return mStreamer;
 	}
 
-	ToolPtr tool = mBackend->getToolManager()->findFirstProbe();
+	ToolPtr tool = backend->getToolManager()->findFirstProbe();
 	if(!tool)
-		reporter()->sendDebug("No tool");
-	ImagePtr image = mBackend->getDataManager()->getImage(mImageUidToSimulate);
+		reporter()->sendWarning("No tool");
+	ImagePtr image = backend->getDataManager()->getImage(mImageUidToSimulate);
 	if(!image)
-		reporter()->sendDebug("No image with uid: "+mImageUidToSimulate);
+		reporter()->sendWarning("No image with uid: "+mImageUidToSimulate);
 
-	mStreamer->initialize(image, tool, mBackend->getDataManager());
+	mStreamer->initialize(image, tool, backend->getDataManager());
 
 	return mStreamer;
 }
