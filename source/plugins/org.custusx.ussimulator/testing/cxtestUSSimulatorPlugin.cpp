@@ -133,6 +133,7 @@ TEST_CASE("SimulatedImageStreamer: Speed", "[streaming][integration][speed]")
 
 TEST_CASE("StreamerService: Service available", "[streaming][service][unit]")
 {
+	cx::DataLocations::setTestMode();
 	cx::LogicManager::initialize();
 
 	cx::PluginFrameworkManagerPtr pluginFramework = cx::logicManager()->getPluginFramework();
@@ -150,8 +151,9 @@ TEST_CASE("StreamerService: Service available", "[streaming][service][unit]")
 	for(int i = 0; i < serviceList.size(); ++i)
 	{
 		cx::StreamerService* service = serviceList.at(i);
-		INFO(service->getName());
-		REQUIRE(service->createStreamer());
+		INFO("Streamer: " + service->getName());
+		cx::StreamerPtr streamer = service->createStreamer();
+		REQUIRE(streamer);
 	}
 
 	cx::LogicManager::shutdown();
@@ -159,6 +161,7 @@ TEST_CASE("StreamerService: Service available", "[streaming][service][unit]")
 
 TEST_CASE("StreamerService: SimulatedImageStreamerService available", "[streaming][service][unit]")
 {
+	cx::DataLocations::setTestMode();
 	cx::LogicManager::initialize();
 	cx::StreamerService* service = getStreamerService("Simulator");
 	REQUIRE(service);

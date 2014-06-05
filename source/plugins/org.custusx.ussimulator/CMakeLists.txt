@@ -76,6 +76,7 @@ set(PLUGIN_target_libraries
     cxResourceWidgets
     cxVideoService
     cxGui
+    #cxLogicManager
     #cxGrabber #Rename to cxVideoServer?
 )
 
