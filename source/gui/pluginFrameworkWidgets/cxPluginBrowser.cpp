@@ -201,7 +201,8 @@ void ctkPluginBrowser::searchPathChanged()
 		if (QFileInfo(files[i]).exists())
 			validFiles << files[i];
 
-	framework->setSearchPaths(validFiles);
+	// disabled
+//	framework->setSearchPaths(validFiles);
 }
 
 void ctkPluginBrowser::pluginSelected(const QModelIndex &index)

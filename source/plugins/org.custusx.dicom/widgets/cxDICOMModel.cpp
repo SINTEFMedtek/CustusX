@@ -123,10 +123,15 @@ void DICOMModelPrivate::remove(const QModelIndex& index)
 	{
 	case DICOMModel::SeriesType :
 		DataBase->removeSeries(node->getUid());
+		break;
 	case DICOMModel::StudyType :
 		DataBase->removeStudy(node->getUid());
+		break;
 	case DICOMModel::PatientType :
 		DataBase->removePatient(node->getUid());
+		break;
+	default:
+		break;
 	}
 
 	node->getParent()->removeChild(node->getRow());
@@ -334,6 +339,8 @@ bool DICOMModel::removeRows(int row, int count, const QModelIndex& parent)
 	}
 
 	this->endRemoveRows();
+
+	return true;
 }
 
 //------------------------------------------------------------------------------
