@@ -42,7 +42,6 @@ namespace cx
  */
 
 typedef std::map<QString, ToolPtr> ToolMap;
-typedef boost::shared_ptr<ToolMap> ToolMapPtr;
 
 class IgstkTool;
 typedef boost::shared_ptr<IgstkTool> IgstkToolPtr;

@@ -122,12 +122,12 @@ void TrackedCenterlineWidget::centerlineFinishedSlot()
 void TrackedCenterlineWidget::startedSlot(QString sessionId)
 {
   //show preview of tool path
-  ToolManager::ToolMapPtr tools = toolManager()->getTools();
-  ToolManager::ToolMap::iterator toolIt = tools->begin();
+  ToolManager::ToolMap tools = toolManager()->getTools();
+  ToolManager::ToolMap::iterator toolIt = tools.begin();
 
   ViewWidgetQPtr view = viewManager()->get3DView(0,0);
   ToolRep3DPtr activeRep3D;
-  for(; toolIt != tools->end(); ++toolIt)
+  for(; toolIt != tools.end(); ++toolIt)
   {
 	activeRep3D = RepManager::findFirstRep<ToolRep3D>(view->getReps(), toolIt->second);
     if(!activeRep3D)
@@ -140,12 +140,12 @@ void TrackedCenterlineWidget::startedSlot(QString sessionId)
 void TrackedCenterlineWidget::stoppedSlot(bool)
 {
   //hide preview of tool path
-  ToolManager::ToolMapPtr tools = toolManager()->getTools();
-  ToolManager::ToolMap::iterator toolIt = tools->begin();
+  ToolManager::ToolMap tools = toolManager()->getTools();
+  ToolManager::ToolMap::iterator toolIt = tools.begin();
 
   ViewWidgetQPtr view = viewManager()->get3DView(0,0);
   ToolRep3DPtr activeRep3D;
-  for(; toolIt != tools->end(); ++toolIt)
+  for(; toolIt != tools.end(); ++toolIt)
   {
 	activeRep3D = RepManager::findFirstRep<ToolRep3D>(view->getReps(), toolIt->second);
     if(!activeRep3D)

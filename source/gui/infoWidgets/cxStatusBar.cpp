@@ -62,8 +62,8 @@ void StatusBar::connectToToolSignals()
 
 	this->addPermanentWidget(mTpsLabel);
 
-	ToolManager::ToolMapPtr tools = toolManager()->getTools();
-	for (ToolManager::ToolMap::iterator it = tools->begin(); it != tools->end(); ++it)
+	ToolManager::ToolMap tools = toolManager()->getTools();
+	for (ToolManager::ToolMap::iterator it = tools.begin(); it != tools.end(); ++it)
 	{
 		ToolPtr tool = it->second;
 		if (tool->hasType(Tool::TOOL_MANUAL))

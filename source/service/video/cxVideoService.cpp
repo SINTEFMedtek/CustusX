@@ -116,7 +116,7 @@ void VideoService::setActiveVideoSource(QString uid)
 //	std::cout << "VideoService::setActiveVideoSource() " << mActiveVideoSource->getUid() << std::endl;
 
 	// set active stream in all probes if stream is present:
-	ToolManager::ToolMap tools = *mBackend->getToolManager()->getTools();
+	ToolManager::ToolMap tools = mBackend->getToolManager()->getTools();
 	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 	{
 		ProbePtr probe = iter->second->getProbe();
@@ -191,7 +191,7 @@ void VideoService::setPlaybackMode(PlaybackTimePtr controller)
 	this->autoSelectActiveVideoSource();
 
 	VideoSourcePtr playbackSource = mUSAcquisitionVideoPlayback->getVideoSource();
-	ToolManager::ToolMap tools = *mBackend->getToolManager()->getTools();
+	ToolManager::ToolMap tools = mBackend->getToolManager()->getTools();
 	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 	{
 		ProbePtr probe = iter->second->getProbe();
