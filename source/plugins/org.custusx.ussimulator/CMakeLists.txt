@@ -2,7 +2,7 @@ project(org_custusx_ussimulator)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-option(CX_BUILD_US_SIMULATOR "Build the US simulator (US from CT/MR)" OFF)
+option(CX_BUILD_US_SIMULATOR "Build the US simulator (US from CT/MR)" ON)
 
 include_directories(
     #${CX_RESOURCE_INCLUDE_DIRECTORIES}
