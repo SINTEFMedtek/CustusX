@@ -252,7 +252,7 @@ void VideoConnectionManager::launchAndConnectServer()
 
 	this->runScript();
 
-	if (useDirectLink())// || useSimulatedServer())
+	if (useDirectLink())
 		this->setupAndRunDirectLinkClient();
 	else if (useLocalServer())
 		this->launchAndConnectUsingLocalServer();
@@ -268,7 +268,6 @@ bool VideoConnectionManager::connectToService()
 	if (!service)
 		return false;
 
-	service->setBackend(mBackend);
 	mVideoConnection->runDirectLinkClient(service);
 	return true;
 }
