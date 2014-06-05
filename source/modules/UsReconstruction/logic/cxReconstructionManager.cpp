@@ -154,14 +154,21 @@ void ReconstructionManagerImpl::transferFunctionChangedSlot()
 	}
 }
 
-std::vector<ReconstructCorePtr> ReconstructionManagerImpl::startReconstruction()
+void ReconstructionManagerImpl::startReconstruction()
 {
+	mOutput.clear();
+
 	ReconstructionServicePtr algo = this->createAlgorithm();
 	ReconstructCore::InputParams par = this->createCoreParameters();
 	USReconstructInputData fileData = mOriginalFileData;
 	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
 
-	return mExecuter->startReconstruction(algo, par, fileData, mParams->mCreateBModeWhenAngio->getValue());
+	mOutput = mExecuter->startReconstruction(algo, par, fileData, mParams->mCreateBModeWhenAngio->getValue());
+}
+
+std::vector<ReconstructCorePtr> ReconstructionManagerImpl::getOutput()
+{
+	return mOutput;
 }
 
 std::set<cx::TimedAlgorithmPtr> ReconstructionManagerImpl::getThreadedReconstruction()
@@ -254,9 +261,6 @@ void ReconstructionManagerImpl::updateFromOriginalFileData()
 	if (!mOriginalFileData.isValid())
 		return;
 
-//	ReconstructCore::InputParams par;
-//	USReconstructInputData fileData = mOriginalFileData;
-//	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
 	ReconstructPreprocessorPtr preprocessor = mExecuter->createPreprocessor(this->createCoreParameters(), mOriginalFileData);
 	mOutputVolumeParams = preprocessor->getOutputVolumeParams();
 

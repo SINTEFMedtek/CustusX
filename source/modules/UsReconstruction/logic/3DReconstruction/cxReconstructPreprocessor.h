@@ -47,9 +47,7 @@ public:
     OutputVolumeParams getOutputVolumeParams() { return mOutputVolumeParams; }
     ReconstructCore::InputParams getInputParams() { return mInput; }
 
-//    void initializeCores(std::vector<ReconstructCorePtr> cores); ///< fill input cores with relevant processed input, Return the filedata after preprocessing, ready to be sent to reconstruction
     std::vector<ProcessedUSInputDataPtr> createProcessedInput(std::vector<bool> angio);
-//	std::vector<ProcessedUSInputDataPtr> createProcessedInput(std::vector<ReconstructCorePtr> cores);
 
 private:
     void cropInputData();
