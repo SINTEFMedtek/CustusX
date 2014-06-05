@@ -29,7 +29,7 @@
 #include "cxStreamerService.h"
 #include "cxPluginFramework.h"
 #include "cxLogicManager.h"
-#include "org_custusx_ussimulator_Export.h" //Needed?
+#include "org_custusx_ussimulator_Export.h"
 
 namespace {
 
@@ -153,7 +153,6 @@ TEST_CASE("StreamerService: Service available", "[streaming][service][unit]")
 		INFO(service->getName());
 		REQUIRE(service->createStreamer());
 	}
-
 
 	cx::LogicManager::shutdown();
 }

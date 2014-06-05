@@ -110,10 +110,8 @@ StreamerServicePtr VideoConnection::getStreamerInterface()
 void VideoConnection::runDirectLinkClient(std::map<QString, QString> args)
 {
 	ImageStreamerFactory imageStreamerFactory;
-	imageStreamerFactory.setBackend(mBackend);
 	imageStreamerFactory.setArguments(args);
-	imageStreamerFactory.setImageToStream(this->getImageToStream());
-	mStreamerInterface = imageStreamerFactory.getStreamerInterface();
+	mStreamerInterface = imageStreamerFactory.getCommandlineStreamerInterface();
 
 	this->runImageReceiverThread();
 }
