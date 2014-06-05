@@ -23,42 +23,16 @@ ImageStreamerFactory::ImageStreamerFactory()
 {
 }
 
-void ImageStreamerFactory::setBackend(VideoServiceBackendPtr backend)
-{
-	mBackend = backend;
-}
-
 void ImageStreamerFactory::setArguments(std::map<QString, QString> arguments)
 {
 	mArguments = arguments;
 }
-
-void ImageStreamerFactory::setImageToStream(QString imageUid)
-{
-	mImageUidToSimulate = imageUid;
-}
-
-//ImageStreamerInterfacePtr ImageStreamerFactory::getSimulatedStreamerInterface()
-//{
-//	SimulatedImageStreamerInterfacePtr streamerInterface(new SimulatedImageStreamerInterface());
-//	streamerInterface->setBackend(mBackend);
-//	streamerInterface->setImageToStream(mImageUidToSimulate);
-//	return streamerInterface;
-//}
 
 StreamerServicePtr ImageStreamerFactory::getCommandlineStreamerInterface()
 {
 	CommandlineImageStreamerInterfacePtr streamerInterface(new CommandlineImageStreamerInterface());
 	streamerInterface->setArguments(mArguments);
 	return streamerInterface;
-}
-
-StreamerServicePtr ImageStreamerFactory::getStreamerInterface()
-{
-//	if(mArguments["type"] == "SimulatedImageStreamer")
-//		return this->getSimulatedStreamerInterface();
-//	else
-		return this->getCommandlineStreamerInterface();
 }
 
 } //namespace cx

@@ -96,7 +96,7 @@ VideoConnectionWidget::~VideoConnectionWidget()
 
 void VideoConnectionWidget::onServiceAdded(StreamerService* service)
 {
-	std::cout << "VideoConnectionWidget:: Service added!!!" << std::endl;
+//	std::cout << "VideoConnectionWidget:: Service added!!!" << std::endl;
 	QWidget* serviceWidget = this->wrapVerticalStretch(service->createWidget());
 	mStackedWidget->addWidget(serviceWidget);
 	mStreamerServiceWidgets[service->getName()] = serviceWidget;
@@ -106,7 +106,7 @@ void VideoConnectionWidget::onServiceAdded(StreamerService* service)
 
 void VideoConnectionWidget::onServiceRemoved(StreamerService *service)
 {
-	std::cout << "VideoConnectionWidget::Service removed!!!" << std::endl;
+//	std::cout << "VideoConnectionWidget::Service removed!!!" << std::endl;
 	this->removeServiceFromSelector(service->getName());
 	this->removeServiceWidget(service->getName());
 }
