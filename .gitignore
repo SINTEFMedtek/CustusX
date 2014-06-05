@@ -19,4 +19,6 @@ config/settings/
 ./data/
 data
 *.pyc
+CMakeLists.txt.user
+*_.xml
 
