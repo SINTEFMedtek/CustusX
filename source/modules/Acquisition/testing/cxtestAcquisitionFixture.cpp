@@ -60,7 +60,7 @@ cx::ReconstructManagerPtr AcquisitionFixture::createReconstructionManager()
 {
 	mRecordDuration = 3000;
 	cx::XmlOptionFile settings;
-	cx::ReconstructionManagerPtr reconstructer(new cx::ReconstructionManagerImpl(settings,""));
+	cx::ReconstructionManagerPtr reconstructer(new cx::ReconstructionManager(settings,""));
 
 	reconstructer->setOutputBasePath(cx::DataLocations::getTestDataPath() + "/temp/");
 	reconstructer->setOutputRelativePath("Images");
