@@ -243,8 +243,8 @@ std::vector<TimelineEvent> PlaybackWidget::createEvents()
 
 	// find all valid regions (i.e. time sequences with tool navigation)
 	TimelineEventVector events;
-	ToolManager::ToolMapPtr tools = toolManager()->getTools();
-	for (ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)
+	ToolManager::ToolMap tools = toolManager()->getTools();
+	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 	{
 		TimelineEventVector current = convertHistoryToEvents(iter->second);
 		copy(current.begin(), current.end(), std::back_inserter(events));

@@ -225,12 +225,12 @@ SelectToolStringDataAdapterBase::SelectToolStringDataAdapterBase()
 
 QStringList SelectToolStringDataAdapterBase::getValueRange() const
 {
-  std::vector<QString> uids = toolManager()->getToolUids();
-  QStringList retval;
-  retval << "";
-  for (unsigned i=0; i<uids.size(); ++i)
-    retval << qstring_cast(uids[i]);
-  return retval;
+	ToolManager::ToolMap tools = toolManager()->getTools();
+
+	QStringList retval;
+	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+		retval << iter->second->getUid();
+	return retval;
 }
 
 QString SelectToolStringDataAdapterBase::convertInternal2Display(QString internal)
