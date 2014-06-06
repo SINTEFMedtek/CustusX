@@ -2,6 +2,8 @@ project(org_custusx_ussimulator)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
+SET ( CMAKE_CXX_FLAGS "-ftemplate-depth=1024" CACHE STRING "Allow heavy templated Eigen code" FORCE)
+
 option(CX_BUILD_US_SIMULATOR "Build the US simulator (US from CT/MR)" ON)
 
 include_directories(
@@ -36,6 +38,9 @@ set(PLUGIN_MOC_SRCS
 # Build all files from the UltrasoundSimulation lib
 IF(CX_BUILD_US_SIMULATOR)
   set(SIMULATOR_SPECKLE_PATH ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation)
+#include_directories(
+#${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation
+#)
 
   configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/simConfig.h.in"
