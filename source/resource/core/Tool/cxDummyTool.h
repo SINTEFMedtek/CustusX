@@ -138,7 +138,6 @@ public:
 	virtual void setType(Type);
 
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
-	virtual void saveTransformsAndTimestamps();
 	virtual void setTransformSaveFile(const QString& filename);
 	virtual bool getVisible() const;
 	virtual QString getUid() const;

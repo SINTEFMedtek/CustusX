@@ -21,4 +21,4 @@ data
 *.pyc
 CMakeLists.txt.user
 *_.xml
-
+*~

@@ -114,10 +114,6 @@ vtkPolyDataPtr DummyTool::getGraphicsPolyData() const
 {
 	return mPolyData;
 }
-void DummyTool::saveTransformsAndTimestamps()
-{
-	std::cout << "DummyTools are to dumb to save themselves..." << std::endl;
-}
 void DummyTool::setTransformSaveFile(const QString& filename)
 {
 	mTransformSaveFileName = filename;

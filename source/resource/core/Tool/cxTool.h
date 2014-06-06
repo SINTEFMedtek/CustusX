@@ -71,7 +71,7 @@ public:
 		TOOL_NONE,
 		TOOL_REFERENCE, ///< Reference tool.
 		TOOL_MANUAL,    ///< Representation of a mouse/keyboard-controlled virtual tool
-		TOOL_POINTER,   ///> Navigation pointer. Pointing functionality such as tool offset.
+		TOOL_POINTER,   ///< Navigation pointer. Pointing functionality such as tool offset.
 		TOOL_US_PROBE,  ///< Ultrasond probe. The tool has a Probe subinterface with a sector and a video stream.
 		TOOL_MICROSCOPE ///< A tool following the focus point of a microscope
 	};
@@ -129,9 +129,9 @@ public:
 	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime) = 0;
 	virtual Transform3D get_prMt() const = 0;
 
-	virtual CoordinateSystem getSensorCoordinateSystem() { return CoordinateSystem(csSENSOR, this->getUid()); }
-	virtual CoordinateSystem getToolCoordinateSystem() { return CoordinateSystem(csTOOL, this->getUid()); }
-	virtual CoordinateSystem getToolOffsetCoordinateSystem() { return CoordinateSystem(csTOOL_OFFSET, this->getUid()); }
+//	virtual CoordinateSystem getSensorCoordinateSystem() { return CoordinateSystem(csSENSOR, this->getUid()); }
+//	virtual CoordinateSystem getToolCoordinateSystem() { return CoordinateSystem(csTOOL, this->getUid()); }
+//	virtual CoordinateSystem getToolOffsetCoordinateSystem() { return CoordinateSystem(csTOOL_OFFSET, this->getUid()); }
 
 #ifdef WIN32
 	typedef Transform3D Transform3D;
@@ -143,7 +143,7 @@ signals:
 	void tooltipOffset(double offset);
 	void toolProbeSector();///< Only used by sscDummyTool
 	void tps(int);
-	void probeChanged(); ///< Deprecated: Use sscProbe::sectorChanged() instead.  (Probe/tool characteristics changed)
+//	void probeChanged(); ///< Deprecated: Use sscProbe::sectorChanged() instead.  (Probe/tool characteristics changed)
 
 protected:
 	QString mUid;

@@ -32,6 +32,7 @@ QString ActiveToolStringDataAdapter::getValueName() const
 {
   return "Active Tool";
 }
+
 bool ActiveToolStringDataAdapter::setValue(const QString& value)
 {
   ToolPtr newTool = toolManager()->getTool(value);
@@ -42,25 +43,29 @@ bool ActiveToolStringDataAdapter::setValue(const QString& value)
   toolManager()->setDominantTool(newTool->getUid());
   return true;
 }
+
 QString ActiveToolStringDataAdapter::getValue() const
 {
   if (!toolManager()->getDominantTool())
     return "";
   return qstring_cast(toolManager()->getDominantTool()->getUid());
 }
+
 QString ActiveToolStringDataAdapter::getHelp() const
 {
   return "select the active (dominant) tool";
 }
+
 QStringList ActiveToolStringDataAdapter::getValueRange() const
 {
-  std::vector<QString> uids = toolManager()->getToolUids();
-  QStringList retval;
-  //retval << ""; //Don't add "no tool" choice
-  for (unsigned i=0; i<uids.size(); ++i)
-    retval << qstring_cast(uids[i]);
-  return retval;
+	ToolManager::ToolMap tools = toolManager()->getTools();
+
+	QStringList retval;
+	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+		retval << iter->second->getUid();
+	return retval;
 }
+
 QString ActiveToolStringDataAdapter::convertInternal2Display(QString internal)
 {
   ToolPtr tool = toolManager()->getTool(internal);
