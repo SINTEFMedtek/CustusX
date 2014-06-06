@@ -31,7 +31,6 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	this->setObjectName("USAcqusitionWidget");
 	this->setWindowTitle("US Acquisition");
 
-	// connect to reconstructer signals
 	connect(mPluginData->getReconstructer().get(), SIGNAL(reconstructAboutToStart()), this, SLOT(reconstructAboutToStartSlot()));
 	connect(mPluginData->getReconstructer().get(), SIGNAL(reconstructStarted()), this, SLOT(reconstructStartedSlot()));
 	connect(mPluginData->getReconstructer().get(), SIGNAL(reconstructFinished()), this, SLOT(reconstructFinishedSlot()));
@@ -56,7 +55,6 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	timerLayout->addStretch();
 
 	QGridLayout* editsLayout = new QGridLayout;
-//	editsLayout->setMargin(0);
 	editsLayout->setColumnStretch(0,0);
 	editsLayout->setColumnStretch(1,1);
 	RecordBaseWidget::mLayout->addLayout(editsLayout);
@@ -69,9 +67,9 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	      SLOT(toggleDetailsSlot()),
 	      NULL);
 
-	  QToolButton* optionsButton = new QToolButton();
-	  optionsButton->setDefaultAction(optionsAction);
-	  editsLayout->addWidget(optionsButton, 0, 2);
+	QToolButton* optionsButton = new QToolButton();
+	optionsButton->setDefaultAction(optionsAction);
+	editsLayout->addWidget(optionsButton, 0, 2);
 
 	mOptionsWidget = this->createOptionsWidget();
 	mOptionsWidget->setVisible(settings()->value("acquisition/UsAcqShowDetails").toBool());

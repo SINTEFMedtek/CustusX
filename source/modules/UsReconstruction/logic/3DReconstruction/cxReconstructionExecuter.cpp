@@ -6,58 +6,71 @@
 namespace cx
 {
 
-std::set<cx::TimedAlgorithmPtr> ReconstructionExecuter::getThreadedReconstruction()
+cx::TimedAlgorithmPtr ReconstructionExecuter::getThread()
 {
-	return mThreadedReconstruction;
+	return mPipeline;
 }
 
-std::vector<ReconstructCorePtr> ReconstructionExecuter::startReconstruction(ReconstructionServicePtr algo, ReconstructCore::InputParams par, USReconstructInputData fileData, bool createBModeWhenAngio)
+void ReconstructionExecuter::startNonThreadedReconstruction(ReconstructionServicePtr algo, ReconstructCore::InputParams par, USReconstructInputData fileData, bool createBModeWhenAngio)
 {
-	if (!fileData.isValid())
-		return std::vector<ReconstructCorePtr>();
+	cx::ReconstructPreprocessorPtr preprocessor = this->createPreprocessor(par, fileData);
+	mCores = this->createCores(algo, par, createBModeWhenAngio);
 
-	std::vector<ReconstructCorePtr> cores = this->createCores(algo, par, createBModeWhenAngio);
+	std::vector<bool> angio;
+	for (unsigned i=0; i<mCores.size(); ++i)
+		angio.push_back(mCores[i]->getInputParams().mAngio);
 
-	if (cores.empty())
+	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(angio);
+
+	for (unsigned i=0; i<mCores.size(); ++i)
 	{
-		reportWarning("Failed to start reconstruction");
-		return cores;
+		mCores[i]->initialize(processedInput[i], preprocessor->getOutputVolumeParams());
 	}
-	cx::CompositeTimedAlgorithmPtr algorithm = this->assembleReconstructionPipeline(cores, par, fileData);
+	for (unsigned i=0; i<mCores.size(); ++i)
+	{
+		mCores[i]->reconstruct();
+	}
 
+}
+
+void ReconstructionExecuter::startReconstruction(ReconstructionServicePtr algo, ReconstructCore::InputParams par, USReconstructInputData fileData, bool createBModeWhenAngio)
+{
+	if (mPipeline)
+	{
+		reportError("Reconstruct Executer can only be run once. Ignoring start.");
+		return;
+	}
+
+	if (!fileData.isValid())
+		return;
+
+	mCores = this->createCores(algo, par, createBModeWhenAngio);
+	if (mCores.empty())
+		reportWarning("Failed to start reconstruction");
+
+	cx::CompositeTimedAlgorithmPtr algorithm = this->assembleReconstructionPipeline(mCores, par, fileData);
 	this->launch(algorithm);
+}
 
-	return cores;
+std::vector<cx::ImagePtr> ReconstructionExecuter::getResult()
+{
+	std::vector<cx::ImagePtr> retval;
+	if (mPipeline && !mPipeline->isFinished())
+		return retval;
+
+	for (unsigned i=0; i<mCores.size(); ++i)
+		retval.push_back(mCores[i]->getOutput());
+
+	return retval;
 }
 
 void ReconstructionExecuter::launch(cx::TimedAlgorithmPtr thread)
 {
-	mThreadedReconstruction.insert(thread);
+	mPipeline = thread;
 	emit reconstructAboutToStart();
-	connect(thread.get(), SIGNAL(finished()), this, SLOT(threadFinishedSlot())); // connect after emit, to allow listeners to get thread at finish
+	connect(thread.get(), SIGNAL(finished()), this, SIGNAL(reconstructFinished()));
 	thread->execute();
 	emit reconstructStarted();
-}
-
-void ReconstructionExecuter::threadFinishedSlot()
-{
-	std::set<cx::TimedAlgorithmPtr>::iterator iter;
-	for(iter=mThreadedReconstruction.begin(); iter!=mThreadedReconstruction.end(); )
-	{
-		if ((*iter)->isFinished())
-		{
-			mThreadedReconstruction.erase(iter);
-			iter = mThreadedReconstruction.begin();
-		}
-		else
-			++iter;
-	}
-
-	if (mThreadedReconstruction.empty())
-		emit reconstructFinished();
-
-//	if (mThreadedReconstruction.empty())
-//		mOriginalFileData.mUsRaw->purgeAll();
 }
 
 cx::CompositeTimedAlgorithmPtr ReconstructionExecuter::assembleReconstructionPipeline(std::vector<ReconstructCorePtr> cores, ReconstructCore::InputParams par, USReconstructInputData fileData)

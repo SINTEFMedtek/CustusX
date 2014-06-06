@@ -45,73 +45,6 @@ typedef boost::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedRecon
 typedef boost::shared_ptr<class ReconstructionExecuter> ReconstructionExecuterPtr;
 
 
-class ReconstructionManager : public QObject
-{
-	Q_OBJECT
-public:
-	ReconstructionManager(XmlOptionFile settings, QString shaderPath){};
-	virtual ~ReconstructionManager(){};
-
-	virtual void init() = 0;
-
-	//SET INPUT
-	virtual void selectData(QString filename, QString calFilesPath = "") = 0; ///< Set input data for reconstruction
-	virtual void selectData(USReconstructInputData data) = 0; ///< Set input data for reconstruction
-
-	//GETTERS
-	virtual QString getSelectedFilename() const = 0; ///< Get the currently selected filename
-	virtual USReconstructInputData getSelectedFileData() = 0; ///< Return the currently selected input data
-	virtual ReconstructParamsPtr getParams() = 0; ///< Return control parameters that can be adjusted by the GUI or similar prior to reconstruction
-	virtual std::vector<DataAdapterPtr> getAlgoOptions() = 0; ///< Return control parameters for the currently selected algorithm, adjustable like getParams()
-	virtual XmlOptionFile getSettings() = 0; ///< Return the settings xml file where parameters are stored
-	virtual OutputVolumeParams getOutputVolumeParams() const = 0; ///< Return params controlling the output data. These are data-dependent.
-
-	//SETTERS
-	virtual void setOutputVolumeParams(const OutputVolumeParams& par) = 0; ///< Control the output volume
-	virtual void setOutputRelativePath(QString path) = 0; ///< Set location of output relative to base
-	virtual void setOutputBasePath(QString path) = 0; ///< Set base location of output
-
-	/** Execute the reconstruction in another thread.
-	  *
-	  * The returned cores can be used to retrieve output,
-	  * but this must be done AFTER the threads have completed.
-	  * In general, dont use the retval, it is for unit testing.
-	  */
-	virtual void startReconstruction() = 0;
-	virtual std::vector<ReconstructCorePtr> getOutput() = 0;
-	virtual std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction() = 0; ///< Return the currently reconstructing thread object(s).
-//	/**
-//	  * Create the reconstruct preprocessor object.
-//	  * This is usually created internally during reconstruction,
-//	  * published for use in unit testing.
-//	  */
-//	virtual ReconstructPreprocessorPtr createPreprocessor() = 0;
-//	/**
-//	  * Create the reconstruct core object.
-//	  * This is usually created internally during reconstruction,
-//	  * published for use in unit testing.
-//	  */
-//	virtual std::vector<ReconstructCorePtr> createCores() = 0; ///< create reconstruct cores matching the current parameters
-	/**
-	  * Create the reconstruct algorithm object.
-	  * This is usually created internally during reconstruction,
-	  * published for use in unit testing.
-	  */
-	virtual ReconstructionServicePtr createAlgorithm() = 0;
-
-	virtual ReconstructCore::InputParams createCoreParameters() = 0;
-
-};
-
-//--------------------------------------------------------------------------------------------------------
-
-class TestableReconstructionManager : public ReconstructionManager
-{
-	Q_OBJECT
-public:
-protected:
-};
-//--------------------------------------------------------------------------------------------------------
 /**
  * \file
  * \addtogroup cx_module_usreconstruction
@@ -137,21 +70,19 @@ protected:
  * \author Janne Beate Bakeng
  * \date May 4, 2010
  */
-class ReconstructionManagerImpl: public ReconstructionManager
+class ReconstructionManager : public QObject
 {
 Q_OBJECT
 
 public:
-	ReconstructionManagerImpl(XmlOptionFile settings, QString shaderPath);
-	virtual ~ReconstructionManagerImpl();
+	ReconstructionManager(XmlOptionFile settings, QString shaderPath);
+	virtual ~ReconstructionManager();
 
 	virtual void init();
 
-	//SET INPUT
 	virtual void selectData(QString filename, QString calFilesPath = ""); ///< Set input data for reconstruction
 	virtual void selectData(USReconstructInputData data); ///< Set input data for reconstruction
 
-	//GETTERS
 	virtual QString getSelectedFilename() const; ///< Get the currently selected filename
 	virtual USReconstructInputData getSelectedFileData(); ///< Return the currently selected input data
 	virtual ReconstructParamsPtr getParams(); ///< Return control parameters that can be adjusted by the GUI or similar prior to reconstruction
@@ -159,7 +90,6 @@ public:
 	virtual XmlOptionFile getSettings(); ///< Return the settings xml file where parameters are stored
 	virtual OutputVolumeParams getOutputVolumeParams() const; ///< Return params controlling the output data. These are data-dependent.
 
-	//SETTERS
 	virtual void setOutputVolumeParams(const OutputVolumeParams& par); ///< Control the output volume
 	virtual void setOutputRelativePath(QString path); ///< Set location of output relative to base
 	virtual void setOutputBasePath(QString path); ///< Set base location of output
@@ -171,8 +101,6 @@ public:
 	  * In general, dont use the retval, it is for unit testing.
 	  */
 	virtual void startReconstruction();
-	virtual std::vector<ReconstructCorePtr> getOutput();
-
 	virtual std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction(); ///< Return the currently reconstructing thread object(s).
 	/**
 	  * Create the reconstruct algorithm object.
@@ -222,9 +150,7 @@ private:
 	QString mShaderPath; ///< name of shader folder
 
 	boost::shared_ptr<ServiceTrackerListener<ReconstructionService> > mServiceListener;
-	ReconstructionExecuterPtr mExecuter;
-
-	std::vector<ReconstructCorePtr> mOutput;
+	std::vector<ReconstructionExecuterPtr> mExecuters;
 };
 
 /**

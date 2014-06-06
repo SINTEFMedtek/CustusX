@@ -42,14 +42,12 @@ TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][syntheti
 
 	SyntheticReconstructInputPtr input(new SyntheticReconstructInput);
 	input->setOverallBoundsAndSpacing(100, 5);
-//	input->setOverallBoundsAndSpacing(100, 0.2);
 	input->setSpherePhantom();
 	cx::USReconstructInputData inputData = input->generateSynthetic_USReconstructInputData();
 
 	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 	reconstructer->selectData(inputData);
 	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
-//	reconstructer->getParams()->mAngioAdapter->setValue(true);
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
 	// set an algorithm-specific parameter
 	fixture.setPNN_InterpolationSteps(1);
@@ -88,8 +86,6 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 	input->setOverallBoundsAndSpacing(100, 5);
 	input->setSpherePhantom();
 	cx::USReconstructInputData inputData = input->generateSynthetic_USReconstructInputData();
-//	REQUIRE(!input.mFrames.empty());
-//	CHECK(input.mFrames[0]->);
 
 	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 	reconstructer->selectData(inputData);

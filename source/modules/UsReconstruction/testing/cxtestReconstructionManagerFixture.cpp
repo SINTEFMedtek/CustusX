@@ -58,57 +58,39 @@ void ReconstructionManagerTestFixture::reconstruct()
 {
 	mOutput.clear();
 	cx::ReconstructionManagerPtr reconstructer = this->getManager();
-	cx::ReconstructionExecuterPtr executor(new cx::ReconstructionExecuter);
-	cx::ReconstructPreprocessorPtr preprocessor = executor->createPreprocessor(reconstructer->createCoreParameters(), reconstructer->getSelectedFileData());
 	bool createBModeWhenAngio = reconstructer->getParams()->mCreateBModeWhenAngio->getValue();
-	std::vector<cx::ReconstructCorePtr> cores = executor->createCores(reconstructer->createAlgorithm(), reconstructer->createCoreParameters(), createBModeWhenAngio);
-//	preprocessor->initializeCores(cores);
 
+	cx::ReconstructionExecuterPtr executer(new cx::ReconstructionExecuter());
 
-	//......
-	std::vector<bool> angio;
-	for (unsigned i=0; i<cores.size(); ++i)
-		angio.push_back(cores[i]->getInputParams().mAngio);
+	executer->startNonThreadedReconstruction(reconstructer->createAlgorithm(),
+			reconstructer->createCoreParameters(),
+			reconstructer->getSelectedFileData(),
+			createBModeWhenAngio);
 
-	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(angio);
-	REQUIRE(cores.size() == processedInput.size());
-
-	for (unsigned i=0; i<cores.size(); ++i)
-	{
-		cores[i]->initialize(processedInput[i], preprocessor->getOutputVolumeParams());
-	}
-	//......
-	for (unsigned i=0; i<cores.size(); ++i)
-	{
-		cores[i]->reconstruct();
-		mOutput.push_back(cores[i]->getOutput());
-	}
-
+	mOutput = executer->getResult();
 }
 
 void ReconstructionManagerTestFixture::threadedReconstruct()
 {
 	mOutput.clear();
-	cx::ReconstructionManagerPtr manager = this->getManager();
+	cx::ReconstructionManagerPtr reconstructer = this->getManager();
 
-	// start threaded reconstruction
-	manager->startReconstruction();
-	std::vector<cx::ReconstructCorePtr> cores = manager->getOutput();
-	std::set<cx::TimedAlgorithmPtr> threads = manager->getThreadedReconstruction();
-	REQUIRE(threads.size()==1);
-	cx::TimedAlgorithmPtr thread = *threads.begin();
+	cx::ReconstructionExecuterPtr executer(new cx::ReconstructionExecuter());
+
+	bool createBModeWhenAngio = reconstructer->getParams()->mCreateBModeWhenAngio->getValue();
+	executer->startReconstruction(reconstructer->createAlgorithm(),
+			reconstructer->createCoreParameters(),
+			reconstructer->getSelectedFileData(),
+			createBModeWhenAngio);
+	cx::TimedAlgorithmPtr thread = executer->getThread();
+
 	QObject::connect(thread.get(), SIGNAL(finished()), qApp, SLOT(quit()));
 	qApp->exec();
 
-
-	// validate output
 	REQUIRE(thread->isFinished());
 	REQUIRE(!thread->isRunning());
 
-	for (unsigned i=0; i<cores.size(); ++i)
-	{
-		mOutput.push_back(cores[i]->getOutput());
-	}
+	mOutput = executer->getResult();
 }
 
 std::vector<cx::ImagePtr> ReconstructionManagerTestFixture::getOutput()
@@ -130,7 +112,7 @@ cx::ReconstructionManagerPtr ReconstructionManagerTestFixture::getManager()
 	if (!mManager)
 	{
 		cx::XmlOptionFile settings;
-		cx::ReconstructionManagerPtr reconstructer(new cx::ReconstructionManagerImpl(settings,""));
+		cx::ReconstructionManagerPtr reconstructer(new cx::ReconstructionManager(settings,""));
 
 		reconstructer->setOutputBasePath(cx::DataLocations::getTestDataPath() + "/temp/");
 		reconstructer->setOutputRelativePath("Images");
