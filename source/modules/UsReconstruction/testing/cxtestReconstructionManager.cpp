@@ -178,19 +178,12 @@ TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integ
 		probeDefinition.setClipRect_p(cx::DoubleBoundingBox3D(0, extent[0]+500, 0, extent[1]+500, 0, 0));
 
 	generator->defineProbe(probeDefinition);
-
 	generator->setSpherePhantom();
+
+	cx::ReconstructPreprocessorPtr preprocessor(new cx::ReconstructPreprocessor());
 	cx::USReconstructInputData inputData = generator->generateSynthetic_USReconstructInputData();
-
-	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
-	reconstructer->selectData(inputData);
-	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
-	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
-	fixture.setPNN_InterpolationSteps(1);// set an algorithm-specific parameter
-
-	cx::ReconstructionExecuterPtr executor(new cx::ReconstructionExecuter);
-	cx::ReconstructPreprocessorPtr preprocessor = executor->createPreprocessor(reconstructer->createCoreParameters(), reconstructer->getSelectedFileData());
-	REQUIRE(preprocessor);
+	cx::ReconstructCore::InputParams par;
+	preprocessor->initialize(par, inputData);
 
 	std::vector<bool> angio(1, false);
 	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(angio);
