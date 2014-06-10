@@ -4,6 +4,7 @@
 #include "cxtestUtilities.h"
 #include "cxDummyTool.h"
 #include "cxDummyToolManager.h"
+#include "cxConfig.h"
 
 namespace cxtest
 {
@@ -92,5 +93,19 @@ void SimulatedImageStreamerFixture::checkSimulatedFrames(int numFrames, bool sil
 	for(int i = 0; i < numFrames; ++i)
 		this->checkSimulatedFrame(silentAtArrive);
 }
+
+#ifdef CX_BUILD_US_SIMULATOR
+ImageSimulator SimulatedImageStreamerFixture::constructImageSimulatorVariable()
+{
+	ImageSimulator mUSSimulator;
+	return mUSSimulator;
+}
+
+boost::shared_ptr<ImageSimulator> SimulatedImageStreamerFixture::constructImageSimulatorBoostPtr()
+{
+	boost::shared_ptr<ImageSimulator> mUSSimulator(new ImageSimulator());
+	return mUSSimulator;
+}
+#endif //CX_BUILD_US_SIMULATOR
 
 }//namespace cxtest

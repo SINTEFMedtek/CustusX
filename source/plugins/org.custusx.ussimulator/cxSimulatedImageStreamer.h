@@ -23,7 +23,6 @@
 
 #ifdef CX_BUILD_US_SIMULATOR
 #include "ImageSimulator.h"
-//#include "../../../../../UltrasoundSimulation/UltrasoundSimulation/ImageSimulator.h"
 #endif //CX_BUILD_US_SIMULATOR
 
 typedef vtkSmartPointer<class vtkImageMask> vtkImageMaskPtr;

@@ -6,6 +6,7 @@
 #include "cxtestSender.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxForwardDeclarations.h"
+#include "cxConfig.h"
 
 namespace cxtest
 {
@@ -24,6 +25,11 @@ public:
 	void checkSimulatedFrame(bool silentAtArrive = false);
 	void requireNoSimulatedFrame(bool silentAtArrive = false);
 	void checkSimulatedFrames(int numFrames, bool silentAtArrive = false);
+
+#ifdef CX_BUILD_US_SIMULATOR
+	static ImageSimulator constructImageSimulatorVariable();
+	static boost::shared_ptr<ImageSimulator> constructImageSimulatorBoostPtr();
+#endif //CX_BUILD_US_SIMULATOR
 
 private:
 	TestSenderPtr mSender;
