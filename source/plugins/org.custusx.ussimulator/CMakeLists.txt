@@ -37,9 +37,10 @@ set(PLUGIN_MOC_SRCS
 
 # Build all files from the UltrasoundSimulation lib
 IF(CX_BUILD_US_SIMULATOR)
-  set(SIMULATOR_SPECKLE_PATH ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation)
+    set(SIMULATOR_SPECKLE_PATH ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation)
+
 include_directories(
-${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation
+    ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation
 )
 
   configure_file(

@@ -59,6 +59,14 @@ cx::StreamerService* getStreamerService(QString name)
 namespace cxtest
 {
 
+#ifdef CX_BUILD_US_SIMULATOR
+TEST_CASE("ImageSimulator: Constructor", "[streaming][unit]")
+{
+	SimulatedImageStreamerFixture::constructImageSimulatorVariable();
+	SimulatedImageStreamerFixture::constructImageSimulatorBoostPtr();
+}
+#endif //CX_BUILD_US_SIMULATOR
+
 TEST_CASE("SimulatedImageStreamer: Init", "[streaming][unit]")
 {
 	SimulatedImageStreamerFixture fixture;
