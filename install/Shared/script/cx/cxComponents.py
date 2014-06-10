@@ -433,7 +433,7 @@ class UltrasoundSimulation(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/UltrasoundSimulation.git')
     def update(self):
-        self._getBuilder().gitCheckout('ed7bc28fd13d42d3233b3b909b68c97e2a58bf4c')
+        self._getBuilder().gitCheckout('978f9980781303d626dc390df4f8dd73ecb3b717')
     def configure(self):
         pass
     def build(self):
