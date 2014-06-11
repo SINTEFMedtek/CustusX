@@ -23,7 +23,8 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/modules/Calibration/gui
     ${CustusX3_SOURCE_DIR}/source/modules/Algorithm/gui
     ${CustusX3_SOURCE_DIR}/source/modules/Registration/gui
-    )
+	${CustusX3_SOURCE_DIR}/source/resource/pluginUtilities
+	)
 
 #------------------------------------------------------------------------------
 # Set variables

@@ -7,7 +7,7 @@
 #include "boost/shared_ptr.hpp"
 #include "cxGUIExtenderService.h"
 #include <QPointer>
-#include "ctkServiceTracker.h"
+#include "cxServiceTrackerListener.h"
 
 class QAction;
 class QMenu;
@@ -15,10 +15,9 @@ class QActionGroup;
 
 namespace cx
 {
+class GUIExtenderService;
+
 class ConsoleWidget;
-typedef ctkServiceTracker<GUIExtenderService*> GUIExtenderServiceTracker;
-typedef boost::shared_ptr<GUIExtenderServiceTracker> GUIExtenderServiceTrackerPtr;
-typedef boost::shared_ptr<class GUIExtenderServiceTrackerCustomizer> GUIExtenderServiceTrackerCustomizerPtr;
 }
 
 namespace cx
@@ -105,6 +104,7 @@ protected slots:
 
     void onPluginBaseAdded(GUIExtenderService* service);
     void onPluginBaseRemoved(GUIExtenderService* service);
+	void onPluginBaseModified(GUIExtenderService* service);
 
 protected:
 	void changeEvent(QEvent * event);
@@ -192,8 +192,7 @@ private:
 
 	QString mLastImportDataFolder;
 
-	GUIExtenderServiceTrackerPtr mPluginBaseServiceTracker;
-	GUIExtenderServiceTrackerCustomizerPtr mPluginBaseServiceTrackerCustomizer;
+	boost::shared_ptr<ServiceTrackerListener<GUIExtenderService> > mServiceListener;
 	std::map<GUIExtenderService*, std::vector<QWidget*> > mWidgetsByPlugin;
 
 	//widgets
