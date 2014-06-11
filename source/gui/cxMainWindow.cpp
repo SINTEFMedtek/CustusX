@@ -63,7 +63,6 @@
 #include "cxLogicManager.h"
 #include "cxPluginFramework.h"
 #include "ctkPluginContext.h"
-#include "cxGUIExtenderServiceTrackerCustomizer.h"
 
 namespace cx
 {
@@ -160,22 +159,18 @@ void MainWindow::changeEvent(QEvent * event)
 
 void MainWindow::setupGUIExtenders()
 {
-	GUIExtenderServiceTrackerCustomizerPtr customizer(new GUIExtenderServiceTrackerCustomizer);
-	connect(customizer.get(), SIGNAL(serviceAdded(GUIExtenderService*)), this, SLOT(onPluginBaseAdded(GUIExtenderService*)));
-	connect(customizer.get(), SIGNAL(serviceRemoved(GUIExtenderService*)), this, SLOT(onPluginBaseRemoved(GUIExtenderService*)));
-    mPluginBaseServiceTrackerCustomizer = customizer;
-
 	PluginFrameworkManagerPtr pluginFramework = LogicManager::getInstance()->getPluginFramework();
-
-	mPluginBaseServiceTracker.reset(new GUIExtenderServiceTracker(
-			pluginFramework->getPluginContext(),
-			mPluginBaseServiceTrackerCustomizer.get()));
-	mPluginBaseServiceTracker->open();
+	mServiceListener.reset(new ServiceTrackerListener<GUIExtenderService>(
+							   pluginFramework->getPluginContext(),
+							   boost::bind(&MainWindow::onPluginBaseAdded, this, _1),
+							   boost::bind(&MainWindow::onPluginBaseModified, this, _1),
+							   boost::bind(&MainWindow::onPluginBaseRemoved, this, _1)
+							   ));
+	mServiceListener->open();
 }
 
 void MainWindow::addGUIExtender(GUIExtenderService* service)
 {
-
 	std::vector<GUIExtenderService::CategorizedWidget> widgets = service->createWidgets();
     for (unsigned j = 0; j < widgets.size(); ++j)
     {
@@ -211,6 +206,10 @@ void MainWindow::removeGUIExtender(GUIExtenderService* service)
 void MainWindow::onPluginBaseAdded(GUIExtenderService* service)
 {
 	this->addGUIExtender(service);
+}
+
+void MainWindow::onPluginBaseModified(GUIExtenderService* service)
+{
 }
 
 void MainWindow::onPluginBaseRemoved(GUIExtenderService* service)
