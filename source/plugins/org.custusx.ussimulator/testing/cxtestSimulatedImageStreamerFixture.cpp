@@ -4,6 +4,7 @@
 #include "cxtestUtilities.h"
 #include "cxDummyTool.h"
 #include "cxDummyToolManager.h"
+#include "cxConfig.h"
 
 namespace cxtest
 {

@@ -6,6 +6,7 @@
 #include "cxtestSender.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxForwardDeclarations.h"
+#include "cxConfig.h"
 
 namespace cxtest
 {
