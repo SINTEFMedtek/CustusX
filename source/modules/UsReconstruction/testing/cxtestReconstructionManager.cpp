@@ -24,13 +24,7 @@
 #include "cxReconstructPreprocessor.h"
 #include <vtkImageData.h>
 #include "cxStringDataAdapterXml.h"
-#include "recConfig.h"
 #include "cxReconstructionExecuter.h"
-
-#ifdef CX_USE_OPENCL_UTILITY
-#include "TordReconstruct/TordTest.h"
-#include "TordReconstruct/cxSimpleSyntheticVolume.h"
-#endif // CX_USE_OPENCL_UTILITY
 
 namespace cxtest
 {
@@ -193,69 +187,6 @@ TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integ
 		REQUIRE(dimFirstFrame.isApprox(Eigen::Array3i(processedInput[0]->getMask()->GetDimensions())));
 	}
 }
-
-#ifdef CX_USE_OPENCL_UTILITY
-TEST_CASE("ReconstructManager: TordTest on real data", "[usreconstruction][integration][tordtest][not_apple][unstable]")
-{
-	ReconstructionManagerTestFixture fixture;
-	ReconstructRealTestData realData;
-	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
-
-	reconstructer->selectData(realData.getSourceFilename());
-	reconstructer->getParams()->mAlgorithmAdapter->setValue("TordTest");
-	reconstructer->getParams()->mAngioAdapter->setValue(false);
-	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
-	
-	boost::shared_ptr<cx::TordTest> algorithm;
-	algorithm = boost::dynamic_pointer_cast<cx::TordTest>(reconstructer->createAlgorithm());
-	REQUIRE(algorithm);// Check if we got the algorithm
-
-	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "TordTest");
-	algorithm->getRadiusOption(algo)->setValue(1.0);
-
-	// First test with VNN
-	algorithm->getMethodOption(algo)->setValue("VNN");
-	algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-	algorithm->getMaxPlanesOption(algo)->setValue(1);
-	algorithm->getNStartsOption(algo)->setValue(1);
-	SECTION("VNN2")
-	{
-		algorithm->getMethodOption(algo)->setValue("VNN2");
-		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-		algorithm->getMaxPlanesOption(algo)->setValue(8);
-	}
-	SECTION("DW")
-	{
-		algorithm->getMethodOption(algo)->setValue("DW");
-		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-		algorithm->getMaxPlanesOption(algo)->setValue(8);
-	}
-	SECTION("Anisotropic")
-	{
-		algorithm->getMethodOption(algo)->setValue("Anisotropic");
-		algorithm->getPlaneMethodOption(algo)->setValue("Heuristic");
-		algorithm->getMaxPlanesOption(algo)->setValue(8);
-	}
-	SECTION("Multistart search")
-	{
-		algorithm->getMethodOption(algo)->setValue("VNN");
-		algorithm->getNStartsOption(algo)->setValue(5);
-	}
-	SECTION("Closest")
-	{
-		algorithm->getMethodOption(algo)->setValue("VNN");
-		algorithm->getPlaneMethodOption(algo)->setValue("Closest");
-		algorithm->getMaxPlanesOption(algo)->setValue(8);
-	}
-
-	// run the reconstruction in the main thread
-	fixture.reconstruct();
-	// check validity of output:
-	REQUIRE(fixture.getOutput().size()==1);
-	realData.validateBModeData(fixture.getOutput()[0]);
-}
-#endif // CX_USE_OPENCL_UTILITY
-
 
 } // namespace cxtest
 

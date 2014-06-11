@@ -20,7 +20,6 @@
 #include "cxPNNReconstructAlgorithm.h"
 
 #include <QFileInfo>
-#include "recConfig.h"
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxVolumeHelpers.h"

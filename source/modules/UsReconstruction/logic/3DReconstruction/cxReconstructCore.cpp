@@ -18,14 +18,9 @@
 // See sscLicense.txt for more information.
 
 #include "cxReconstructCore.h"
-#include "recConfig.h"
 #include <vtkImageData.h>
 #include "cxDataManager.h"
 #include "cxToolManager.h"
-//#ifdef CX_USE_OPENCL_UTILITY
-//	#include "TordReconstruct/TordTest.h"
-//#endif // CX_USE_OPENCL_UTILITY
-//#include "cxPNNReconstructAlgorithm.h"
 #include "cxTime.h"
 #include "cxTypeConversions.h"
 #include "cxRegistrationTransform.h"
