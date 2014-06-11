@@ -3,7 +3,8 @@ project(org_custusx_tordreconstruction)
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 include_directories(
-    ${CustusX3_BINARY_DIR}/source/modules/UsReconstruction/logic/3DReconstruction
+    ${CustusX3_BINARY_DIR}/source/modules/UsReconstruction/logic
+    ${CustusX3_SOURCE_DIR}/source/modules/UsReconstruction/logic
     ${CustusX3_SOURCE_DIR}/source/resource/core
     ${CustusX3_SOURCE_DIR}/source/resource/core/utilities
     ${CustusX3_SOURCE_DIR}/source/resource/core/Math
@@ -11,7 +12,6 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/resource/core/Tool
     ${CustusX3_SOURCE_DIR}/source/resource/core/logger
     ${CustusX3_SOURCE_DIR}/source/resource/usReconstructionTypes
-    ${CustusX3_SOURCE_DIR}/source/modules/UsReconstruction/logic/3DReconstruction
     ${CustusX3_SOURCE_DIR}/source/ThirdParty
     )
 
@@ -46,7 +46,7 @@ configure_file(
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}
-    sscUS3DReconstruction
+    cxPluginUSReconstruction
     )
 
 ctkMacroBuildPlugin(
