@@ -42,13 +42,14 @@ void SimulatedImageStreamerService::setImageToStream(QString imageUid)
 
 void SimulatedImageStreamerService::setGain(double gain)
 {
-	//must mutex mStreamer?
+	QMutexLocker lock(&mStreamerMutex);
 	if(mStreamer)
 		mStreamer->setGain(gain);
 }
 
 StreamerPtr SimulatedImageStreamerService::createStreamer()
 {
+	QMutexLocker lock(&mStreamerMutex);
 	mStreamer.reset(new SimulatedImageStreamer());
 	//TODO: remove this dependency when TrackingManager are a plugin
 	cx::VideoServiceBackendPtr backend = cx::logicManager()->getVideoService()->getBackend();

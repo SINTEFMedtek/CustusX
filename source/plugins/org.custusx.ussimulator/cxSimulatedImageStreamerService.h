@@ -15,9 +15,8 @@
 #define CXSIMULATEDIMAGESTREAMERINTERFACE_H
 
 #include "cxStreamerService.h"
-
+#include <QMutexLocker>
 #include "cxSimulatedImageStreamer.h"
-
 #include "org_custusx_ussimulator_Export.h"
 
 namespace cx
@@ -49,6 +48,7 @@ public:
 private:
 	QString mImageUidToSimulate;
 	SimulatedImageStreamerPtr mStreamer;//Access must be mutexed, as it can be accessed from several threads
+	QMutex mStreamerMutex;
 };
 
 } //end namespace cx
