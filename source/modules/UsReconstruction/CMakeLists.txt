@@ -8,11 +8,18 @@
 ##
 ###########################################################
 
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
+
+
 SET( MOC_HEADER_FILES
    logic/cxReconstructionManager.h
    logic/cxReconstructThreads.h
    logic/cxReconstructParams.h
-   logic/3DReconstruction/cxReconstructionExecuter.h
+   logic/cxReconstructionExecuter.h
+   logic/cxReconstructionService.h
+   logic/cxPNNReconstructAlgorithm.h
    gui/cxReconstructionWidget.h
    gui/cxReconstructOutputValueParamsInterfaces.h
    gui/cxUsReconstructionPlugin.h
@@ -22,32 +29,49 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
 # library
 SET( SOURCE_FILES
-  ${MOC_HEADER_FILES}
-  logic/cxReconstructionManager.h
-  logic/cxReconstructionManager.cpp
-  logic/cxReconstructThreads.h
-  logic/cxReconstructThreads.cpp
-  logic/cxReconstructParams.h
-  logic/cxReconstructParams.cpp
-  logic/3DReconstruction/cxReconstructionExecuter.cpp
-  gui/cxReconstructionWidget.cpp
-  gui/cxReconstructOutputValueParamsInterfaces.cpp
-  gui/cxReconstructOutputValueParamsInterfaces.h
-  gui/cxUsReconstructionPlugin.h
-  gui/cxUsReconstructionPlugin.cpp
+    ${MOC_HEADER_FILES}
+    logic/cxReconstructionManager.h
+    logic/cxReconstructionManager.cpp
+    logic/cxReconstructThreads.h
+    logic/cxReconstructThreads.cpp
+    logic/cxReconstructParams.h
+    logic/cxReconstructParams.cpp
+    logic/cxReconstructionExecuter.cpp
+    logic/cxReconstructedOutputVolumeParams.h
+    logic/cxReconstructedOutputVolumeParams.cpp
+    logic/cxPNNReconstructAlgorithm.cpp
+    logic/cxReconstructCore.cpp
+    logic/cxReconstructCore.h
+    logic/cxReconstructPreprocessor.cpp
+    logic/cxReconstructPreprocessor.h
+    logic/cxSyntheticVolume.h
+    logic/cxSyntheticVolume.cpp
+    logic/cxSimpleSyntheticVolume.h
+    gui/cxReconstructionWidget.cpp
+    gui/cxReconstructOutputValueParamsInterfaces.cpp
+    gui/cxReconstructOutputValueParamsInterfaces.h
+    gui/cxUsReconstructionPlugin.h
+    gui/cxUsReconstructionPlugin.cpp
   )
+  
 
 # =========================================================
+if (CX_USE_OPENCL_UTILITY)
+	include_directories(
+		${OPENCL_INCLUDE_DIRS}
+		)
+endif (CX_USE_OPENCL_UTILITY)
 
-include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
+    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     .
     ./logic
     ./logic/3DReconstruction
     ./gui
-	${CMAKE_CURRENT_BINARY_DIR}/logic/3DReconstruction
+    ${CMAKE_CURRENT_BINARY_DIR}
+	${CMAKE_CURRENT_BINARY_DIR}/logic
     ${CustusX3_SOURCE_DIR}/source/service/patient
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/service/visualization
@@ -61,13 +85,20 @@ include_directories(
 SET( cxPluginUSReconstruction_LIB_FILES
     cxResource
     cxResourceWidgets
-    sscUS3DReconstruction
     cxResource
     cxPatientService
     cxTrackingService
     cxVisualizationService
     cxPluginAlgorithm
+    cxResourceUsReconstructionTypes
+    cxLogicManager
     )
+    
+if( CX_USE_OPENCL_UTILITY )
+    set(cxPluginUSReconstruction_LIB_FILES
+        ${cxPluginUSReconstruction_LIB_FILES}
+        ${OPENCL_LIBRARIES})
+endif()
 
 # =========================================================
 # create the target
@@ -76,4 +107,4 @@ target_link_libraries( cxPluginUSReconstruction ${cxPluginUSReconstruction_LIB_F
 CX_COTIRE_ADD_LIBRARY( cxPluginUSReconstruction "${cxPluginUSReconstruction_LIB_FILES}")
 
 add_subdirectory(testing)
-add_subdirectory(logic/3DReconstruction)
+#add_subdirectory(logic/3DReconstruction)
