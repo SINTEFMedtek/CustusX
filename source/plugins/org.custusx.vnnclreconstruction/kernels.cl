@@ -1,5 +1,9 @@
 #include "kernels.cl.h"
 
+/**
+ *  Original author Tord ¯ygard
+ */
+
 //---------------------DEBUGGING-FUNCTIONALITY---------------------
 /**
  * Print a matrix - useful for debugging

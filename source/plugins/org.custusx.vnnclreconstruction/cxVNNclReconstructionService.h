@@ -12,36 +12,39 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXTORDRECONSTRUCTIONSERVICE_H_
-#define CXTORDRECONSTRUCTIONSERVICE_H_
+#ifndef CXVNNCLRECONSTRUCTIONSERVICE_H_
+#define CXVNNCLRECONSTRUCTIONSERVICE_H_
 
 #include "cxReconstructionService.h"
-#include "org_custusx_tordreconstruction_Export.h"
+#include "org_custusx_vnnclreconstruction_Export.h"
 
 #include "cxReconstructionService.h"
 #include "cxUSFrameData.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxDoubleDataAdapterXml.h"
-#include "cxTordAlgorithm.h"
+#include "cxVNNclAlgorithm.h"
 
 
 namespace cx
 {
+/**
+ *  Original author Tord ¯ygard
+ */
 
 /**
- * Implementation of Tords reconstruction service.
+ * Implementation of Tord ¯ygards reconstruction service.
  *
- * \ingroup org_custusx_tordreconstruction
+ * \ingroup org_custusx_vnnclreconstruction
  *
  * \date 2014-05-09
  * \author Janne Beate Bakeng
  */
-class org_custusx_tordreconstruction_EXPORT TordReconstructionService : public ReconstructionService
+class org_custusx_vnnclreconstruction_EXPORT VNNclReconstructionService : public ReconstructionService
 {
 	Q_INTERFACES(cx::ReconstructionService)
 public:
-    TordReconstructionService();
-	virtual ~TordReconstructionService();
+    VNNclReconstructionService();
+	virtual ~VNNclReconstructionService();
 
     /**
      * Turn OpenCL profiling on
@@ -143,13 +146,13 @@ protected:
     std::vector<QString> mMethods;
     std::vector<QString> mPlaneMethods;
 
-    TordAlgorithmPtr mAlgorithm;
+    VNNclAlgorithmPtr mAlgorithm;
 
 
 };
-typedef boost::shared_ptr<TordReconstructionService> TordReconstructionServicePtr;
+typedef boost::shared_ptr<VNNclReconstructionService> VNNclReconstructionServicePtr;
 
 } /* namespace cx */
 
-#endif /* CXTORDRECONSTRUCTIONSERVICE_H_ */
+#endif /* CXVNNCLRECONSTRUCTIONSERVICE_H_ */
 

@@ -1,4 +1,4 @@
-#include "cxTordAlgorithm.h"
+#include "cxVNNclAlgorithm.h"
 
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
@@ -9,9 +9,9 @@
 
 namespace cx
 {
-TordAlgorithm::TordAlgorithm() :
+VNNclAlgorithm::VNNclAlgorithm() :
 		mRuntime(new oul::RuntimeMeasurementsManager()),
-		mKernelMeasurementName("tord_execute_kernel")
+		mKernelMeasurementName("vnncl_execute_kernel")
 {
 	oul::DeviceCriteria criteria;
 	criteria.setTypeCriteria(oul::DEVICE_TYPE_GPU);
@@ -21,10 +21,10 @@ TordAlgorithm::TordAlgorithm() :
 		mRuntime->enable();
 }
 
-TordAlgorithm::~TordAlgorithm()
+VNNclAlgorithm::~VNNclAlgorithm()
 {}
 
-bool TordAlgorithm::initCL(QString kernelPath, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts, float brightnessWeight, float newnessWeight)
+bool VNNclAlgorithm::initCL(QString kernelPath, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts, float brightnessWeight, float newnessWeight)
 {
 	// READ KERNEL FILE
 	report(QString("Kernel path: %1").arg(kernelPath));
@@ -39,7 +39,7 @@ bool TordAlgorithm::initCL(QString kernelPath, int nMaxPlanes, int nPlanes, int 
 	return true;
 }
 
-cl::Program TordAlgorithm::buildCLProgram(std::string program_src, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts, float newnessWeight, float brightnessWeight)
+cl::Program VNNclAlgorithm::buildCLProgram(std::string program_src, int nMaxPlanes, int nPlanes, int method, int planeMethod, int nStarts, float newnessWeight, float brightnessWeight)
 {
 	cl::Program retval;
 	cl_int err = 0;
@@ -49,7 +49,7 @@ cl::Program TordAlgorithm::buildCLProgram(std::string program_src, int nMaxPlane
 		QString define = "-D MAX_PLANES=%1 -D N_PLANES=%2 -D METHOD=%3 -D PLANE_METHOD=%4 -D MAX_MULTISTART_STARTS=%5 -D NEWNESS_FACTOR=%6 -D BRIGHTNESS_FACTOR=%7";
 		define = define.arg(nMaxPlanes).arg(nPlanes).arg(method).arg(planeMethod).arg(nStarts).arg(newnessWeight).arg(brightnessWeight);
 
-		int programID = mOulContex->createProgramFromString(program_src, "-I " + std::string(TORD_KERNEL_PATH) + " " + define.toStdString());
+		int programID = mOulContex->createProgramFromString(program_src, "-I " + std::string(VNNCL_KERNEL_PATH) + " " + define.toStdString());
 		retval = mOulContex->getProgram(programID);
 
 	} catch (cl::Error &error)
@@ -60,7 +60,7 @@ cl::Program TordAlgorithm::buildCLProgram(std::string program_src, int nMaxPlane
 	return retval;
 }
 
-bool TordAlgorithm::initializeFrameBlocks(frameBlock_t* framePointers, int numBlocks, ProcessedUSInputDataPtr inputFrames)
+bool VNNclAlgorithm::initializeFrameBlocks(frameBlock_t* framePointers, int numBlocks, ProcessedUSInputDataPtr inputFrames)
 {
 	// Compute the size of each frame in bytes
 	Eigen::Array3i dims = inputFrames->getDimensions();
@@ -105,7 +105,7 @@ bool TordAlgorithm::initializeFrameBlocks(frameBlock_t* framePointers, int numBl
 	return true;
 }
 
-bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr outputData, float radius, int nClosePlanes)
+bool VNNclAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr outputData, float radius, int nClosePlanes)
 {
 	mMeasurementNames.clear();
 
@@ -207,7 +207,7 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	unsigned int queueNumber = 0;
 	cl::CommandQueue queue = mOulContex->getQueue(queueNumber);
 	this->measureAndExecuteKernel(queue, mKernel, global_work_size, local_work_size, mKernelMeasurementName);
-	this->measureAndReadBuffer(queue, outputBuffer, outputVolumeSize, outputData->GetScalarPointer(), "tord_read_buffer");
+	this->measureAndReadBuffer(queue, outputBuffer, outputVolumeSize, outputData->GetScalarPointer(), "vnncl_read_buffer");
 
 	// Cleaning up
 	report(QString("Done, freeing GPU memory"));
@@ -219,7 +219,7 @@ bool TordAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr o
 	return true;
 }
 
-void TordAlgorithm::fillPlaneMatrices(float *planeMatrices, ProcessedUSInputDataPtr input)
+void VNNclAlgorithm::fillPlaneMatrices(float *planeMatrices, ProcessedUSInputDataPtr input)
 {
 	std::vector<TimedPosition> vecPosition = input->getFrames();
 
@@ -243,7 +243,7 @@ void TordAlgorithm::fillPlaneMatrices(float *planeMatrices, ProcessedUSInputData
 	}
 }
 
-void TordAlgorithm::setProfiling(bool on)
+void VNNclAlgorithm::setProfiling(bool on)
 {
 	if(on)
 		mRuntime->enable();
@@ -251,7 +251,7 @@ void TordAlgorithm::setProfiling(bool on)
 		mRuntime->disable();
 }
 
-double TordAlgorithm::getTotalExecutionTime()
+double VNNclAlgorithm::getTotalExecutionTime()
 {
 	double totalExecutionTime = -1;
 	std::set<std::string>::iterator it;
@@ -263,14 +263,14 @@ double TordAlgorithm::getTotalExecutionTime()
 	return totalExecutionTime;
 }
 
-double TordAlgorithm::getKernelExecutionTime()
+double VNNclAlgorithm::getKernelExecutionTime()
 {
 //	double kernelExecutionTime = -1;
 	return mRuntime->getTiming(mKernelMeasurementName).getSum();
 
 }
 
-void TordAlgorithm::freeFrameBlocks(frameBlock_t *framePointers, int numBlocks)
+void VNNclAlgorithm::freeFrameBlocks(frameBlock_t *framePointers, int numBlocks)
 {
 	for (int i = 0; i < numBlocks; i++)
 	{
@@ -278,7 +278,7 @@ void TordAlgorithm::freeFrameBlocks(frameBlock_t *framePointers, int numBlocks)
 	}
 }
 
-void TordAlgorithm::setKernelArguments(
+void VNNclAlgorithm::setKernelArguments(
 		cl::Kernel kernel,
 		int volume_xsize,
         int volume_ysize,
@@ -321,7 +321,7 @@ void TordAlgorithm::setKernelArguments(
 	kernel.setArg(arg++, radius);
 }
 
-size_t TordAlgorithm::calculateSpaceNeededForClosePlanes(cl::Kernel kernel, cl::Device device, size_t local_work_size, size_t nPlanes_numberOfInputImages, int nClosePlanes)
+size_t VNNclAlgorithm::calculateSpaceNeededForClosePlanes(cl::Kernel kernel, cl::Device device, size_t local_work_size, size_t nPlanes_numberOfInputImages, int nClosePlanes)
 {
 	// Find out how much local memory the device has
 	size_t dev_local_mem_size;
@@ -361,7 +361,7 @@ size_t TordAlgorithm::calculateSpaceNeededForClosePlanes(cl::Kernel kernel, cl::
 	return close_planes_size;
 }
 
-bool TordAlgorithm::isUsingTooMuchMemory(size_t outputVolumeSize, size_t inputBlocksLength, cl_ulong globalMemUse)
+bool VNNclAlgorithm::isUsingTooMuchMemory(size_t outputVolumeSize, size_t inputBlocksLength, cl_ulong globalMemUse)
 {
 	bool usingTooMuchMemory = false;
 
@@ -390,21 +390,21 @@ bool TordAlgorithm::isUsingTooMuchMemory(size_t outputVolumeSize, size_t inputBl
 	return usingTooMuchMemory;
 }
 
-void TordAlgorithm::measureAndExecuteKernel(cl::CommandQueue queue, cl::Kernel kernel, size_t global_work_size, size_t local_work_size, std::string measurementName)
+void VNNclAlgorithm::measureAndExecuteKernel(cl::CommandQueue queue, cl::Kernel kernel, size_t global_work_size, size_t local_work_size, std::string measurementName)
 {
 	this->startProfiling(measurementName, queue);
 	mOulContex->executeKernel(queue, kernel, global_work_size, local_work_size);
 	this->stopProfiling(measurementName, queue);
 }
 
-void TordAlgorithm::measureAndReadBuffer(cl::CommandQueue queue, cl::Buffer outputBuffer, size_t outputVolumeSize, void *outputData, std::string measurementName)
+void VNNclAlgorithm::measureAndReadBuffer(cl::CommandQueue queue, cl::Buffer outputBuffer, size_t outputVolumeSize, void *outputData, std::string measurementName)
 {
 	this->startProfiling(measurementName, queue);
 	mOulContex->readBuffer(queue, outputBuffer, outputVolumeSize, outputData);
 	this->stopProfiling(measurementName, queue);
 }
 
-void TordAlgorithm::startProfiling(std::string name, cl::CommandQueue queue) {
+void VNNclAlgorithm::startProfiling(std::string name, cl::CommandQueue queue) {
 	if(!mRuntime->isEnabled())
 		return;
 
@@ -412,7 +412,7 @@ void TordAlgorithm::startProfiling(std::string name, cl::CommandQueue queue) {
 	mMeasurementNames.insert(name);
 }
 
-void TordAlgorithm::stopProfiling(std::string name, cl::CommandQueue queue) {
+void VNNclAlgorithm::stopProfiling(std::string name, cl::CommandQueue queue) {
 	if(!mRuntime->isEnabled())
 		return;
 

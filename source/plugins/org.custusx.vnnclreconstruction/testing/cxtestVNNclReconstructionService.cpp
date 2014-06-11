@@ -1,8 +1,8 @@
 #include "catch.hpp"
 
 #include "cxReporter.h"
-#include "cxTordAlgorithm.h"
-#include "cxTordReconstructionService.h"
+#include "cxVNNclAlgorithm.h"
+#include "cxVNNclReconstructionService.h"
 #include "cxReconstructParams.h"
 #include "cxBoolDataAdapterXml.h"
 #include "cxtestUtilities.h"
@@ -20,7 +20,7 @@ namespace cxtest
 {
 
 #ifdef CX_USE_OPENCL_UTILITY
-TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconstruction][synthetic][not_win32]")
+TEST_CASE("ReconstructAlgorithm: VNNcl on sphere","[unit][VNNcl][usreconstruction][synthetic][not_win32]")
 {
 	cx::Reporter::initialize();
 
@@ -29,11 +29,11 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 	fixture.setOverallBoundsAndSpacing(100, 5);
 	fixture.getInputGenerator()->setSpherePhantom();
 	QDomDocument domdoc;
-	QDomElement settings = domdoc.createElement("TordReconstructionService");
-	cx::TordReconstructionServicePtr algorithm(new cx::TordReconstructionService);
+	QDomElement settings = domdoc.createElement("VNNcl");
+	cx::VNNclReconstructionServicePtr algorithm(new cx::VNNclReconstructionService);
 	algorithm->enableProfiling();
 
-	QString name = "DefaultTord";
+	QString name = "DefaultVNNcl";
 
 	fixture.setAlgorithm(algorithm);
 	algorithm->getRadiusOption(settings)->setValue(10);
@@ -109,22 +109,22 @@ TEST_CASE("ReconstructAlgorithm: Tord/VNN on sphere","[unit][tordtest][usreconst
 
 
 #ifdef CX_USE_OPENCL_UTILITY
-TEST_CASE("ReconstructManager: TordTest on real data", "[usreconstruction][integration][tordtest][not_apple][unstable]")
+TEST_CASE("ReconstructManager: VNNcl on real data", "[usreconstruction][integration][VNNcl][not_apple][unstable]")
 {
 	ReconstructionManagerTestFixture fixture;
 	ReconstructRealTestData realData;
 	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 
 	reconstructer->selectData(realData.getSourceFilename());
-	reconstructer->getParams()->mAlgorithmAdapter->setValue("TordReconstructionService");
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("VNNcl");
 	reconstructer->getParams()->mAngioAdapter->setValue(false);
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
 
-	boost::shared_ptr<cx::TordReconstructionService> algorithm;
-	algorithm = boost::dynamic_pointer_cast<cx::TordReconstructionService>(reconstructer->createAlgorithm());
+	boost::shared_ptr<cx::VNNclReconstructionService> algorithm;
+	algorithm = boost::dynamic_pointer_cast<cx::VNNclReconstructionService>(reconstructer->createAlgorithm());
 	REQUIRE(algorithm);// Check if we got the algorithm
 
-	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "TordReconstructionService");
+	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "VNNcl");
 	algorithm->getRadiusOption(algo)->setValue(1.0);
 
 	// First test with VNN

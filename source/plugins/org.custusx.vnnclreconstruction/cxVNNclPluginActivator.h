@@ -12,8 +12,8 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXTORDRECONSTRUCTIONSERVICEPLUGINACTIVATOR_H_
-#define CXTORDRECONSTRUCTIONSERVICEPLUGINACTIVATOR_H_
+#ifndef CXVNNCLRECONSTRUCTIONSERVICEPLUGINACTIVATOR_H_
+#define CXVNNCLRECONSTRUCTIONSERVICEPLUGINACTIVATOR_H_
 
 #include <ctkPluginActivator.h>
 #include "boost/shared_ptr.hpp"
@@ -21,35 +21,35 @@
 namespace cx
 {
 
-typedef boost::shared_ptr<class TordReconstructionService> TordReconstructionServicePtr;
+typedef boost::shared_ptr<class VNNclReconstructionService> VNNclReconstructionServicePtr;
 
 /**
- * Activator for the tord reconstruction service
+ * Activator for the Tord ¯ygard reconstruction service
  *
- * \ingroup org_custusx_tordreconstruction
+ * \ingroup org_custusx_vnnclreconstruction
  *
  * \date 2014-05-09
  * \author Janne Beate Bakeng
  */
-class TordPluginActivator :  public QObject, public ctkPluginActivator
+class VNNclPluginActivator :  public QObject, public ctkPluginActivator
 {
   Q_OBJECT
   Q_INTERFACES(ctkPluginActivator)
 
 public:
 
-  TordPluginActivator();
-  ~TordPluginActivator();
+  VNNclPluginActivator();
+  ~VNNclPluginActivator();
 
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
 
 private:
   ctkPluginContext* mContext;
-  TordReconstructionServicePtr mPlugin;
+  VNNclReconstructionServicePtr mPlugin;
   ctkServiceRegistration mRegistration;
 };
 
 } // namespace cx
 
-#endif /* CXTORDRECONSTRUCTIONSERVICEPLUGINACTIVATOR_H_ */
+#endif /* CXVNNCLRECONSTRUCTIONSERVICEPLUGINACTIVATOR_H_ */

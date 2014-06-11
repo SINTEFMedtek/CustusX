@@ -1,5 +1,5 @@
-#ifndef CXTORDALGORITHM_H_
-#define CXTORDALGORITHM_H_
+#ifndef CXVNNCLALGORITHM_H_
+#define CXVNNCLALGORITHM_H_
 
 //TODO remove, should be defined in oul instead
 #define __CL_ENABLE_EXCEPTIONS //telling the opencl c++ wrapper to throw exceptions
@@ -10,12 +10,14 @@
 
 namespace cx
 {
-
-class TordAlgorithm
+/**
+ *  Original author Tord ¯ygard
+ */
+class VNNclAlgorithm
 {
 public:
-	TordAlgorithm();
-	~TordAlgorithm();
+	VNNclAlgorithm();
+	~VNNclAlgorithm();
 
 	/**
 	 * A representation of a Frame block in CPU memory.
@@ -170,7 +172,7 @@ private:
 
 };
 
-typedef boost::shared_ptr<TordAlgorithm> TordAlgorithmPtr;
+typedef boost::shared_ptr<VNNclAlgorithm> VNNclAlgorithmPtr;
 
 } /* namespace cx */
-#endif /* CXTORDALGORITHM_H_ */
+#endif /* CXVNNCLALGORITHM_H_ */

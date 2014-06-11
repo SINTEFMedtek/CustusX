@@ -12,31 +12,30 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxTordPluginActivator.h"
+#include "cxVNNclPluginActivator.h"
 
 #include <QtPlugin>
 #include <iostream>
-
-#include "cxTordReconstructionService.h"
+#include "cxVNNclReconstructionService.h"
 
 namespace cx
 {
 
-TordPluginActivator::TordPluginActivator()
+VNNclPluginActivator::VNNclPluginActivator()
 : mContext(0)
 {
 }
 
-TordPluginActivator::~TordPluginActivator()
+VNNclPluginActivator::~VNNclPluginActivator()
 {
 
 }
 
-void TordPluginActivator::start(ctkPluginContext* context)
+void VNNclPluginActivator::start(ctkPluginContext* context)
 {
 	this->mContext = context;
 
-	mPlugin.reset(new TordReconstructionService);
+	mPlugin.reset(new VNNclReconstructionService);
 	try
 	{
 		mRegistration = context->registerService(QStringList(ReconstructionService_iid), mPlugin.get());
@@ -48,7 +47,7 @@ void TordPluginActivator::start(ctkPluginContext* context)
 	}
 }
 
-void TordPluginActivator::stop(ctkPluginContext* context)
+void VNNclPluginActivator::stop(ctkPluginContext* context)
 {
 	mRegistration.unregister();
 	if(mPlugin)
@@ -58,6 +57,6 @@ void TordPluginActivator::stop(ctkPluginContext* context)
 
 } // namespace cx
 
-Q_EXPORT_PLUGIN2(TordPluginActivator_irrelevant_string, cx::TordPluginActivator)
+Q_EXPORT_PLUGIN2(VNNclPluginActivator_irrelevant_string, cx::VNNclPluginActivator)
 
 
