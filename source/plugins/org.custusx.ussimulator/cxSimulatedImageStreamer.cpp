@@ -89,6 +89,7 @@ bool SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServic
 	connect(mTool->getProbe().get(), SIGNAL(activeConfigChanged()), this, SLOT(resetMask()));
 	connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(defineSectorInSimulator()));
 
+	this->resetMask();
 	this->defineSectorInSimulator();
 
 //	this->generateMaskSlot();
