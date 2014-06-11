@@ -19,6 +19,6 @@ config/settings/
 ./data/
 data
 *.pyc
-CMakeLists.txt.user
+CMakeLists.txt.user*
 *_.xml
 *~

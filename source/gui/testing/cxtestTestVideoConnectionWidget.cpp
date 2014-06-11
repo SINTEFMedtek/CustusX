@@ -10,14 +10,13 @@
 #include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
 #include "cxDataManager.h"
-//#include "cxSimulateUSWidget.h"
 #include "cxLegacySingletons.h"
 #include "cxImage.h"
 
 namespace cxtest
 {
 
-/*TestVideoConnectionWidget::TestVideoConnectionWidget() :
+TestVideoConnectionWidget::TestVideoConnectionWidget() :
 		VideoConnectionWidget(NULL)
 {
 }
@@ -53,9 +52,8 @@ void TestVideoConnectionWidget::setupWidgetToRunStreamer(QString filename, QStri
 	QString connectionMethod("Direct Link");
 	mConnectionSelector->setValue(connectionMethod);
 	QString connectionArguments("--type "+streamerType+" --filename " + filename);
-	mSimulationWidget->setImageUidToSimulate(image->getUid());
 	mDirectLinkArguments->addItem(connectionArguments);
 	mDirectLinkArguments->setCurrentIndex(mDirectLinkArguments->findText(connectionArguments));
-}*/
+}
 
 } /* namespace cxtest */

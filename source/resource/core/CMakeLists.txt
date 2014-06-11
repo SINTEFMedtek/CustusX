@@ -122,7 +122,6 @@ cx_add_class(cxResource_SOURCE
 	utilities/cxDefinitions.h
 	utilities/cxDefinitionStrings
 	utilities/cxCustomMetaImage
-	utilities/cxMD5Check
 	utilities/cxIndent
 	utilities/cxCoordinateSystemHelpers
 	utilities/cxViewportListener
