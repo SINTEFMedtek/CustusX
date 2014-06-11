@@ -31,17 +31,17 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
 
 SET( SOURCE_FILES
-  ${MOC_HEADER_FILES}
-  cxReconstructedOutputVolumeParams.h
-  cxReconstructedOutputVolumeParams.cpp
-  cxPNNReconstructAlgorithm.cpp
-  cxReconstructCore.cpp
-  cxReconstructCore.h
-  cxReconstructPreprocessor.cpp
-  cxReconstructPreprocessor.h
-	TordReconstruct/cxSyntheticVolume.h
-	TordReconstruct/cxSyntheticVolume.cpp
-	TordReconstruct/cxSimpleSyntheticVolume.h
+        ${MOC_HEADER_FILES}
+        cxReconstructedOutputVolumeParams.h
+        cxReconstructedOutputVolumeParams.cpp
+        cxPNNReconstructAlgorithm.cpp
+        cxReconstructCore.cpp
+        cxReconstructCore.h
+        cxReconstructPreprocessor.cpp
+        cxReconstructPreprocessor.h
+        cxSyntheticVolume.h
+        cxSyntheticVolume.cpp
+        cxSimpleSyntheticVolume.h
       )
 
 # =========================================================
@@ -52,7 +52,6 @@ include_directories(
 
 if (CX_USE_OPENCL_UTILITY)
 	include_directories(
-		TordReconstruct
 		${OPENCL_INCLUDE_DIRS}
 		)
 	SET( SOURCE_FILES

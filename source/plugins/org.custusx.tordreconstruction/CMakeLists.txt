@@ -12,7 +12,6 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/resource/core/logger
     ${CustusX3_SOURCE_DIR}/source/resource/usReconstructionTypes
     ${CustusX3_SOURCE_DIR}/source/modules/UsReconstruction/logic/3DReconstruction
-    ${CustusX3_SOURCE_DIR}/source/modules/UsReconstruction/logic/3DReconstruction/TordReconstruct
     ${CustusX3_SOURCE_DIR}/source/ThirdParty
     )
 
