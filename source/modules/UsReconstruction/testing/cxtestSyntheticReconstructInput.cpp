@@ -14,7 +14,7 @@
 
 #include "cxtestSyntheticReconstructInput.h"
 #include "cxDummyTool.h"
-#include "TordReconstruct/cxSimpleSyntheticVolume.h"
+#include "cxSimpleSyntheticVolume.h"
 #include "cxtestSphereSyntheticVolume.h"
 
 namespace cxtest

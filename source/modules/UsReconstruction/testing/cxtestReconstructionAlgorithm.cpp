@@ -16,7 +16,7 @@
 #include <QDomElement>
 
 #include "cxReconstructionService.h"
-#include "TordReconstruct/cxSimpleSyntheticVolume.h"
+#include "cxSimpleSyntheticVolume.h"
 #include "catch.hpp"
 #include "cxPNNReconstructAlgorithm.h"
 #include "QFileInfo"
