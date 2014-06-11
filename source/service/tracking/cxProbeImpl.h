@@ -93,6 +93,7 @@ private:
 	bool isValidConfigId();
 	ProbeDefinition createProbeSector();
 	void updateTemporalCalibration();
+	void applyConfig();
 
 	QString mActiveUid;
 	std::map<QString, ProbeDefinition> mProbeData; ///< all defined probe definitions
