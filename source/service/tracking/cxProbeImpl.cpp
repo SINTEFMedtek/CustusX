@@ -83,7 +83,7 @@ ProbeDefinition ProbeImpl::getProbeData(QString uid) const
 ProbeSectorPtr ProbeImpl::getSector(QString uid)
 {
 	ProbeSectorPtr retval(new ProbeSector());
-	retval->setData(this->getProbeData());
+	retval->setData(this->getProbeData(uid));
 	return retval;
 }
 
@@ -135,11 +135,16 @@ QString ProbeImpl::getConfigurationPath() const
 void ProbeImpl::applyNewConfigurationWithId(QString uid)
 {
 	this->setConfigId(uid);
+	this->applyConfig();
+	emit activeConfigChanged();
+}
+
+void ProbeImpl::applyConfig()
+{
 	this->updateProbeSector();
 	this->updateTemporalCalibration();
 	this->setSoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
 	emit sectorChanged();
-	emit activeConfigChanged();
 }
 
 void ProbeImpl::setTemporalCalibration(double val)
@@ -201,7 +206,7 @@ void ProbeImpl::removeRTSource(VideoSourcePtr source)
 
 	mSource.erase(source->getUid());
 	mProbeData.erase(source->getUid());
-	emit sectorChanged();
+	this->applyConfig();//May need to re-create config, as the old ProbeDefinition may be deleted
 }
 
 void ProbeImpl::setActiveStream(QString uid)
