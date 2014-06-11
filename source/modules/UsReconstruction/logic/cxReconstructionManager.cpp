@@ -87,16 +87,14 @@ ReconstructionServicePtr ReconstructionManager::createAlgorithm()
 	QString name = mParams->mAlgorithmAdapter->getValue();
 
 	ReconstructionServicePtr algo;
-	if(name == "TordReconstructionService")
+	if(name != "PNN") //there is just one reconstruction algorithm that's not a plugin
 	{
 		ReconstructionServicePtr pointer(ReconstructionServicePtr(mServiceListener->getService(name), null_deleter()));
 		algo = pointer;
 	}
 	else
 	{
-		//TODO make service, so remove....
-		if (name == "PNN")
-			algo = ReconstructionServicePtr(new PNNReconstructAlgorithm());
+		algo = ReconstructionServicePtr(new PNNReconstructAlgorithm());
 	}
 	return algo;
 }
@@ -292,6 +290,7 @@ void ReconstructionManager::onServiceAdded(ReconstructionService* service)
 {
     QStringList range = mParams->mAlgorithmAdapter->getValueRange();
     range << service->getName();
+    std::cout << "NAME: "<< service->getName() << std::endl;
     mParams->mAlgorithmAdapter->setValueRange(range);
 }
 

@@ -1,4 +1,4 @@
-project(org_custusx_tordreconstruction)
+project(org_custusx_vnnclreconstruction)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
@@ -16,16 +16,16 @@ include_directories(
     )
 
 set(PLUGIN_SRCS
-  cxTordPluginActivator.cpp
-  cxTordReconstructionService.cpp
-  cxTordReconstructionService.h
-  cxTordAlgorithm.h
-  cxTordAlgorithm.cpp
+  cxVNNclPluginActivator.cpp
+  cxVNNclReconstructionService.cpp
+  cxVNNclReconstructionService.h
+  cxVNNclAlgorithm.h
+  cxVNNclAlgorithm.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-  cxTordPluginActivator.h
+  cxVNNclPluginActivator.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -36,7 +36,7 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
-SET(TORD_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+SET(VNNCL_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/recConfig.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/recConfig.h"

@@ -12,17 +12,17 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxTordReconstructionService.h"
+#include "cxVNNclReconstructionService.h"
 #include "cxReporter.h"
 #include "recConfig.h"
 
 namespace cx
 {
 
-TordReconstructionService::TordReconstructionService() :
+VNNclReconstructionService::VNNclReconstructionService() :
 		ReconstructionService()
 {
-    mAlgorithm = TordAlgorithmPtr(new TordAlgorithm);
+    mAlgorithm = VNNclAlgorithmPtr(new VNNclAlgorithm);
 
     mMethods.push_back("VNN");
     mMethods.push_back("VNN2");
@@ -32,26 +32,26 @@ TordReconstructionService::TordReconstructionService() :
     mPlaneMethods.push_back("Closest");
 }
 
-TordReconstructionService::~TordReconstructionService()
+VNNclReconstructionService::~VNNclReconstructionService()
 {
 }
 
-void TordReconstructionService::enableProfiling()
+void VNNclReconstructionService::enableProfiling()
 {
     mAlgorithm->setProfiling(true);
 }
 
-double TordReconstructionService::getKernelExecutionTime()
+double VNNclReconstructionService::getKernelExecutionTime()
 {
     return mAlgorithm->getKernelExecutionTime();
 }
 
-QString TordReconstructionService::getName() const
+QString VNNclReconstructionService::getName() const
 {
-    return "TordReconstructionService";
+    return "VNNcl";
 }
 
-std::vector<DataAdapterPtr> TordReconstructionService::getSettings(QDomElement root)
+std::vector<DataAdapterPtr> VNNclReconstructionService::getSettings(QDomElement root)
 {
     std::vector<DataAdapterPtr> retval;
 
@@ -65,7 +65,7 @@ std::vector<DataAdapterPtr> TordReconstructionService::getSettings(QDomElement r
     return retval;
 }
 
-bool TordReconstructionService::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr outputData, QDomElement settings)
+bool VNNclReconstructionService::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr outputData, QDomElement settings)
 {
     int nClosePlanes = getMaxPlanesOption(settings)->getValue();
 
@@ -80,7 +80,7 @@ bool TordReconstructionService::reconstruct(ProcessedUSInputDataPtr input, vtkIm
             QString("Method: %1, radius: %2, planeMethod: %3, nClosePlanes: %4, nPlanes: %5, nStarts: %6 ").arg(method).arg(
                     radius).arg(planeMethod).arg(nClosePlanes).arg(input->getDimensions()[2]).arg(nStarts));
 
-    if (!mAlgorithm->initCL(QString(TORD_KERNEL_PATH) + "/kernels.cl", nClosePlanes, input->getDimensions()[2], method, planeMethod, nStarts, newnessWeight, brightnessWeight))
+    if (!mAlgorithm->initCL(QString(VNNCL_KERNEL_PATH) + "/kernels.cl", nClosePlanes, input->getDimensions()[2], method, planeMethod, nStarts, newnessWeight, brightnessWeight))
         return false;
 
     bool ret = mAlgorithm->reconstruct(input, outputData, radius, nClosePlanes);
@@ -88,7 +88,7 @@ bool TordReconstructionService::reconstruct(ProcessedUSInputDataPtr input, vtkIm
     return ret;
 }
 
-StringDataAdapterXmlPtr TordReconstructionService::getMethodOption(QDomElement root)
+StringDataAdapterXmlPtr VNNclReconstructionService::getMethodOption(QDomElement root)
 {
     QStringList methods;
     for (std::vector<QString>::iterator it = mMethods.begin(); it != mMethods.end(); ++it)
@@ -100,19 +100,19 @@ StringDataAdapterXmlPtr TordReconstructionService::getMethodOption(QDomElement r
             methods, root);
 }
 
-DoubleDataAdapterXmlPtr TordReconstructionService::getNewnessWeightOption(QDomElement root)
+DoubleDataAdapterXmlPtr VNNclReconstructionService::getNewnessWeightOption(QDomElement root)
 {
     return DoubleDataAdapterXml::initialize("Newness weight", "", "Newness weight", 0, DoubleRange(0.0, 10, 0.1), 1,
             root);
 }
 
-DoubleDataAdapterXmlPtr TordReconstructionService::getBrightnessWeightOption(QDomElement root)
+DoubleDataAdapterXmlPtr VNNclReconstructionService::getBrightnessWeightOption(QDomElement root)
 {
     return DoubleDataAdapterXml::initialize("Brightness weight", "", "Brightness weight", 0, DoubleRange(0.0, 10, 0.1),
             1, root);
 }
 
-StringDataAdapterXmlPtr TordReconstructionService::getPlaneMethodOption(QDomElement root)
+StringDataAdapterXmlPtr VNNclReconstructionService::getPlaneMethodOption(QDomElement root)
 {
     QStringList methods;
     for (std::vector<QString>::iterator it = mPlaneMethods.begin(); it != mPlaneMethods.end(); ++it)
@@ -124,30 +124,30 @@ StringDataAdapterXmlPtr TordReconstructionService::getPlaneMethodOption(QDomElem
             methods[0], methods, root);
 }
 
-DoubleDataAdapterXmlPtr TordReconstructionService::getRadiusOption(QDomElement root)
+DoubleDataAdapterXmlPtr VNNclReconstructionService::getRadiusOption(QDomElement root)
 {
     return DoubleDataAdapterXml::initialize("Radius (mm)", "", "Radius of kernel. mm.", 1, DoubleRange(0.1, 10, 0.1), 1,
             root);
 }
 
-DoubleDataAdapterXmlPtr TordReconstructionService::getMaxPlanesOption(QDomElement root)
+DoubleDataAdapterXmlPtr VNNclReconstructionService::getMaxPlanesOption(QDomElement root)
 {
     return DoubleDataAdapterXml::initialize("nPlanes", "", "Number of planes to include in closest planes", 8,
             DoubleRange(1, 200, 1), 0, root);
 }
 
-DoubleDataAdapterXmlPtr TordReconstructionService::getNStartsOption(QDomElement root)
+DoubleDataAdapterXmlPtr VNNclReconstructionService::getNStartsOption(QDomElement root)
 {
     return DoubleDataAdapterXml::initialize("nStarts", "", "Number of starts for multistart searchs", 3,
             DoubleRange(1, 16, 1), 0, root);
 }
 
-int TordReconstructionService::getMethodID(QDomElement root)
+int VNNclReconstructionService::getMethodID(QDomElement root)
 {
     return find(mMethods.begin(), mMethods.end(), this->getMethodOption(root)->getValue()) - mMethods.begin();
 }
 
-int TordReconstructionService::getPlaneMethodID(QDomElement root)
+int VNNclReconstructionService::getPlaneMethodID(QDomElement root)
 {
     return find(mPlaneMethods.begin(), mPlaneMethods.end(), this->getPlaneMethodOption(root)->getValue())
             - mPlaneMethods.begin();

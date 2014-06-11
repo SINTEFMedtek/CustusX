@@ -1,6 +1,9 @@
 #ifndef KERNELS_CLH_
 #define KERNELS_CLH_
 
+/**
+ *  Original author Tord ¯ygard
+ */
 
 /*******************/
 /* Begin compile time definitions */
