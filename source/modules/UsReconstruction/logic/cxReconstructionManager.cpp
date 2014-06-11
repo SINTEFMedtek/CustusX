@@ -31,15 +31,10 @@
 #include "cxReconstructPreprocessor.h"
 #include "cxReconstructParams.h"
 #include "cxReconstructionService.h"
-
 #include "cxServiceTrackerListener.h"
 #include "cxLogicManager.h"
 #include "cxPluginFramework.h"
 #include "cxReconstructionExecuter.h"
-
-#ifdef CX_USE_OPENCL_UTILITY
-	#include "TordReconstruct/TordTest.h"
-#endif // CX_USE_OPENCL_UTILITY
 #include "cxPNNReconstructAlgorithm.h"
 
 //Windows fix
@@ -99,14 +94,9 @@ ReconstructionServicePtr ReconstructionManager::createAlgorithm()
 	}
 	else
 	{
+		//TODO make service, so remove....
 		if (name == "PNN")
 			algo = ReconstructionServicePtr(new PNNReconstructAlgorithm());
-	#ifdef CX_USE_OPENCL_UTILITY
-		else if (name == "TordTest")
-		{
-			algo = ReconstructionServicePtr(new TordTest());
-		}
-	#endif // CX_USE_OPENCL_UTILITY
 	}
 	return algo;
 }
@@ -307,7 +297,7 @@ void ReconstructionManager::onServiceAdded(ReconstructionService* service)
 
 void ReconstructionManager::onServiceModified(ReconstructionService* service)
 {
-	//TODO
+	reportWarning("ReconstructionService modified... Do not know what to do. Contact developer.");
 }
 
 void ReconstructionManager::onServiceRemoved(ReconstructionService* service)

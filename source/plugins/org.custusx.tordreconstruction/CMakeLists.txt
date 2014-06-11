@@ -20,6 +20,8 @@ set(PLUGIN_SRCS
   cxTordPluginActivator.cpp
   cxTordReconstructionService.cpp
   cxTordReconstructionService.h
+  cxTordAlgorithm.h
+  cxTordAlgorithm.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -35,7 +37,12 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
-
+SET(TORD_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/recConfig.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/recConfig.h"
+  )
+  
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 

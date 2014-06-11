@@ -5,13 +5,13 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
-        include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
         include_directories(
-		../logic
-		../logic/3DReconstruction
-		${CustusX3_BINARY_DIR}/source/service/patient
-		${CustusX3_SOURCE_DIR}/source/service/patient
-		${CustusX3_SOURCE_DIR}/source/service/tracking
+            ${CX_RESOURCE_INCLUDE_DIRECTORIES}
+    		../logic
+    		../logic/3DReconstruction
+    		${CustusX3_BINARY_DIR}/source/service/patient
+    		${CustusX3_SOURCE_DIR}/source/service/patient
+    		${CustusX3_SOURCE_DIR}/source/service/tracking
 		)
 
 	# Catch unit test framework stuff:

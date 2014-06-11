@@ -20,12 +20,10 @@ include_directories(
 SET( MOC_HEADER_FILES
   cxReconstructionService.h
   cxPNNReconstructAlgorithm.h
-  #cxReconstructionExecuter.h
     )
 if (CX_USE_OPENCL_UTILITY)
 	SET( MOC_HEADER_FILES
 		${MOC_HEADER_FILES}
-		TordReconstruct/TordTest.h
 		)
 endif (CX_USE_OPENCL_UTILITY)
 
@@ -41,7 +39,6 @@ SET( SOURCE_FILES
   cxReconstructCore.h
   cxReconstructPreprocessor.cpp
   cxReconstructPreprocessor.h
-  #cxReconstructionExecuter.cpp
 	TordReconstruct/cxSyntheticVolume.h
 	TordReconstruct/cxSyntheticVolume.cpp
 	TordReconstruct/cxSimpleSyntheticVolume.h
@@ -60,13 +57,7 @@ if (CX_USE_OPENCL_UTILITY)
 		)
 	SET( SOURCE_FILES
 		${SOURCE_FILES}
-		TordReconstruct/TordTest.h
-		TordReconstruct/TordTest.cpp
-		TordReconstruct/cxTordAlgorithm.h
-		TordReconstruct/cxTordAlgorithm.cpp
-		TordReconstruct/kernels.cl
 		)
-   SET(TORD_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/TordReconstruct)
 
 endif (CX_USE_OPENCL_UTILITY)
 
@@ -86,11 +77,6 @@ if( CX_USE_OPENCL_UTILITY )
 endif()
 
 target_link_libraries( sscUS3DReconstruction ${sscUS3DReconstruction_LIBRARIES})
-
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/recConfig.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/recConfig.h"
-  )
   
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
