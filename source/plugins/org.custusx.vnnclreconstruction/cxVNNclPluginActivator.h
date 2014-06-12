@@ -12,8 +12,8 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXEXAMPLEPLUGINACTIVATOR_H_
-#define CXEXAMPLEPLUGINACTIVATOR_H_
+#ifndef CXVNNCLRECONSTRUCTIONSERVICEPLUGINACTIVATOR_H_
+#define CXVNNCLRECONSTRUCTIONSERVICEPLUGINACTIVATOR_H_
 
 #include <ctkPluginActivator.h>
 #include "boost/shared_ptr.hpp"
@@ -21,35 +21,35 @@
 namespace cx
 {
 
-typedef boost::shared_ptr<class ExampleGUIExtenderService> ExampleGUIExtenderServicePtr;
+typedef boost::shared_ptr<class VNNclReconstructionService> VNNclReconstructionServicePtr;
 
 /**
- * Activator for the example plugin
+ * Activator for the Tord ¯ygard reconstruction service
  *
- * \ingroup org_custusx_example
+ * \ingroup org_custusx_vnnclreconstruction
  *
- * \date 2014-04-15
- * \author Christian Askeland
+ * \date 2014-05-09
+ * \author Janne Beate Bakeng
  */
-class ExamplePluginActivator :  public QObject, public ctkPluginActivator
+class VNNclPluginActivator :  public QObject, public ctkPluginActivator
 {
   Q_OBJECT
   Q_INTERFACES(ctkPluginActivator)
 
 public:
 
-  ExamplePluginActivator();
-  ~ExamplePluginActivator();
+  VNNclPluginActivator();
+  ~VNNclPluginActivator();
 
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
 
 private:
   ctkPluginContext* mContext;
-  ExampleGUIExtenderServicePtr mPlugin;
+  VNNclReconstructionServicePtr mPlugin;
   ctkServiceRegistration mRegistration;
 };
 
 } // namespace cx
 
-#endif /* CXEXAMPLEPLUGINACTIVATOR_H_ */
+#endif /* CXVNNCLRECONSTRUCTIONSERVICEPLUGINACTIVATOR_H_ */

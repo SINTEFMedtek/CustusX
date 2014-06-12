@@ -16,7 +16,6 @@
 #define CXTESTRECONSTRUCTIONALGORITHMFIXTURE_H
 
 #include "cxReconstructionService.h"
-#include "TordReconstruct/cxSimpleSyntheticVolume.h"
 #include "cxtestSyntheticVolumeComparer.h"
 #include "cxtestSyntheticReconstructInput.h"
 

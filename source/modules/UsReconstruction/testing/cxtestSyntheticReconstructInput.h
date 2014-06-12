@@ -16,7 +16,7 @@
 #define CXTESTSYNTHETICRECONSTRUCTINPUT_H
 
 #include "cxReconstructionService.h"
-#include "TordReconstruct/cxSimpleSyntheticVolume.h"
+#include "cxSimpleSyntheticVolume.h"
 #include "cxtestSyntheticVolumeComparer.h"
 
 namespace cxtest
