@@ -82,9 +82,10 @@ public:
 	virtual Transform3D get_rMl() const;
 	virtual Vector3D getTextPos(Vector3D p_l) const;
 
-	void setImage(ImagePtr image);
+	void setData(DataPtr image);
+	DataPtr getData();
 private:
-	ImagePtr mImage;
+	DataPtr mData;
 };
 
 /**
