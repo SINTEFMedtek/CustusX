@@ -90,7 +90,6 @@ void PickerRep::scaleSphere()
 	double size = mViewportListener->getVpnZoom();
 	double sphereSize = mSphereRadius / 100 / size;
 	mGraphicalPoint->setRadius(sphereSize);
-//	mGraphicalPoint->getActor()->GetProperty()->SetRepresentationToWireframe();
 }
 
 PickerRep::~PickerRep()
@@ -161,6 +160,11 @@ void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr rende
 		return;
 	vtkMultiVolumePickerPtr picker = vtkMultiVolumePickerPtr::New();
 	int hit = picker->Pick(clickPosition[0], clickPosition[1], 0, renderer);
+	if (!hit)
+	{
+		mIsDragging = false;
+		return;
+	}
 
 	// search for picked data in manager, emit uid if found.
 	vtkDataSetPtr data = picker->GetDataSet();
@@ -199,9 +203,6 @@ void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr rende
 		mIsDragging = false;
 	}
 
-//	if (!hit)
-//		return;
-
 	if (hit && mSnapToSurface)
 	{
 		mPickedPoint = pick_w;
@@ -212,13 +213,10 @@ void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr rende
 
 		emit pointPicked(mPickedPoint);
 	}
-
-//	return mPickedPoint;
 }
 
 void PickerRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 {
-//	std::cout << "PickerRep::pickLandmarkSlot" << std::endl;
 	vtkRenderWindowInteractorPtr iren = vtkRenderWindowInteractor::SafeDownCast(renderWindowInteractor);
 
 	if (iren == NULL)
@@ -228,7 +226,6 @@ void PickerRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 	iren->GetEventPosition(pickedPoint); //mouse positions are measured in pixels
 
 	vtkRendererPtr renderer = this->getRenderer();
-//	vtkRendererPtr renderer = this->getRendererFromRenderWindow(*iren);
 	if (renderer == NULL)
 		return;
 
@@ -241,7 +238,6 @@ void PickerRep::onModifiedStartRender()
 	this->toolHasChanged();
 }
 
-//void PickerRep::receiveTransforms(Transform3D prMt, double timestamp)
 void PickerRep::toolHasChanged()
 {
 	if (!mTool)
@@ -267,13 +263,11 @@ void PickerRep::setEnabled(bool on)
 
 	if (mSnapToSurface)
 	{
-//		this->connectInteractor();
 		if (mGraphicalPoint)
 			mGraphicalPoint->getActor()->SetVisibility(true);
 	}
 	else
 	{
-//		this->disconnectInteractor();
 		if (mGraphicalPoint)
 			mGraphicalPoint->getActor()->SetVisibility(false);
 	}
@@ -375,8 +369,6 @@ void PickerRep::setGlyphCenter(Vector3D pos)
 	if (mGlyph)
 	{
 		mGlyph->get_rMd_History()->setRegistration(createTransformTranslate(pos));
-//		vtkSphereSourcePtr sphere = vtkSphereSource::SafeDownCast(mGlyph->getSource());
-//		sphere->SetCenter(pos.data());
 	}
 }
 
@@ -435,9 +427,6 @@ void PickerRep::addRepActorsToViewRenderer(View *view)
 	mGraphicalPoint->setRadius(mSphereRadius);
 	mGraphicalPoint->getActor()->SetVisibility(mSnapToSurface);
 
-//	 if (mGlyphRep)
-//		 mGlyphRep->setRenderer(mView->getRenderer());
-
 	// show even if disabled
 	if (mGlyphRep)
 	{
@@ -460,22 +449,8 @@ void PickerRep::removeRepActorsFromViewRenderer(View *view)
 	if (mGlyphRep)
 		view->removeRep(mGlyphRep);
 
-//	if (mGlyphRep)
-//		mGlyphRep->setRenderer(NULL);
 	mView = NULL;
 }
-
-//vtkRendererPtr PickerRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
-//{
-//	vtkRendererPtr renderer = NULL;
-//	std::set<View *>::const_iterator it = mViews.begin();
-//	for (; it != mViews.end(); ++it)
-//	{
-//		if (iren.GetRenderWindow() == (*it)->getRenderWindow())
-//			renderer = (*it)->getRenderer();
-//	}
-//	return renderer;
-//}
 
 Vector3D PickerRep::getPosition() const
 {
