@@ -128,11 +128,6 @@ void VideoConnection::runDirectLinkClient(StreamerService* service)
 	this->runImageReceiverThread();
 }
 
-QString VideoConnection::getImageToStream()
-{
-	return settings()->value("USsimulation/volume", "").toString();
-}
-
 void VideoConnection::runIGTLinkedClient(QString address, int port)
 {
 	this->runClient(ImageReceiverThreadPtr(new IGTLinkedImageReceiverThread(address, port, this)));
