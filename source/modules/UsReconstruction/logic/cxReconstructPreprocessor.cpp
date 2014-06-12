@@ -25,7 +25,6 @@
 #include <QFileInfo>
 #include "cxDataManager.h"
 #include "cxToolManager.h"
-#include "cxPNNReconstructAlgorithm.h"
 #include "cxTime.h"
 #include "cxTypeConversions.h"
 #include "cxRegistrationTransform.h"

@@ -84,8 +84,7 @@ ReconstructParams::ReconstructParams(XmlOptionFile settings)
 	connect(mCreateBModeWhenAngio.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
 
 	mAlgorithmAdapter = StringDataAdapterXml::initialize("Algorithm", "", "Choose algorithm to use for reconstruction",
-		"PNN", QString("PNN").split(" "),
-		mSettings.getElement());
+			QString(), QStringList(), mSettings.getElement());
 	connect(mAlgorithmAdapter.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
 }
 

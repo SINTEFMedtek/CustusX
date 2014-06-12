@@ -16,7 +16,6 @@
 
 #include "cxDataManager.h"
 #include "catch.hpp"
-#include "cxPNNReconstructAlgorithm.h"
 #include <QApplication>
 #include "cxDoubleDataAdapterXml.h"
 #include "cxTimedAlgorithm.h"
@@ -45,13 +44,21 @@ ReconstructionManagerTestFixture::~ReconstructionManagerTestFixture()
 void ReconstructionManagerTestFixture::setPNN_InterpolationSteps(int value)
 {
 	cx::ReconstructionManagerPtr manager = this->getManager();
-	// set an algorithm-specific parameter
+	manager->init();
 	QDomElement algo = manager->getSettings().getElement("algorithms", "PNN");
-	boost::shared_ptr<cx::PNNReconstructAlgorithm> algorithm;
-	algorithm = boost::dynamic_pointer_cast<cx::PNNReconstructAlgorithm>(manager->createAlgorithm());
-	REQUIRE(algorithm);// Check if we got the PNN algorithm
+	cx::ReconstructionServicePtr algorithm = manager->createAlgorithm();
+	REQUIRE(algorithm.get());
 
-	algorithm->getInterpolationStepsOption(algo)->setValue(value);
+	std::vector<DataAdapterPtr> adaptors = algorithm->getSettings(algo);
+	for(int i=0; i<adaptors.size(); ++i)
+	{
+		cx::DoubleDataAdapterXmlPtr adapter = boost::dynamic_pointer_cast<cx::DoubleDataAdapterXml>(adaptors[i]);
+		if(adapter && adapter->getValueName() == "interpolationSteps")
+		{
+			adapter->setValue(value);
+			break;
+		}
+	}
 }
 
 void ReconstructionManagerTestFixture::reconstruct()
