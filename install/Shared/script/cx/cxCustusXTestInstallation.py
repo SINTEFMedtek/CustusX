@@ -73,7 +73,6 @@ class CustusXTestInstallation:
             self._testExecutable(appPath, 'Catch', '-h')
             self._testExecutable(appPath, 'CustusX')
             self._testExecutable(appPath, 'OpenIGTLinkServer')
-            self._testExecutable(appPath, 'GrabberServer')
         elif target == 'win32':
             self._testExecutable(appPath, 'Catch.exe', '-h')
             self._testExecutable(appPath, 'UltrasonixServer.exe')

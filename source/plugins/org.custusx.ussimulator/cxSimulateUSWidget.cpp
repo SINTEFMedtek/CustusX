@@ -35,7 +35,7 @@ SimulateUSWidget::SimulateUSWidget(SimulatedImageStreamerService *service, QWidg
 	QString selectedVolume = settings()->value("USsimulation/volume", "").toString();
 	mImageSelector->setValue(selectedVolume);
 	QStringList simulationTypes;
-	simulationTypes << "Original data" << "CT to US" << "MR to US";
+	simulationTypes << "Original data" << "CT to US";// << "MR to US";
 	mSimulationType = StringDataAdapterXml::initialize("Simulation type", "",
 																										 "Simulation run on data extracted from input volume",
 																										 selectedSimulation, simulationTypes);
