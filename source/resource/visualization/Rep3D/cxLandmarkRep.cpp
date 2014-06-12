@@ -64,44 +64,53 @@ Vector3D PatientLandmarksSource::getTextPos(Vector3D p_l) const
 ImageLandmarksSource::ImageLandmarksSource()
 {
 }
-void ImageLandmarksSource::setImage(ImagePtr image)
+
+DataPtr ImageLandmarksSource::getData()
 {
-	if (image == mImage)
+	return mData;
+}
+
+void ImageLandmarksSource::setData(DataPtr image)
+{
+	if (image == mData)
 		return;
 
-	if (mImage)
+	if (mData)
 	{
-		disconnect(mImage->getLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
-		disconnect(mImage->getLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
-		disconnect(mImage.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
+		disconnect(mData->getLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
+		disconnect(mData->getLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
+		disconnect(mData.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
 	}
 
-	mImage = image;
+	mData = image;
 
-	if (mImage)
+	if (mData)
 	{
-		connect(mImage->getLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
-		connect(mImage->getLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
-		connect(mImage.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
+		connect(mData->getLandmarks().get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
+		connect(mData->getLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
+		connect(mData.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
 	}
 
 	emit changed();
 }
+
 LandmarkMap ImageLandmarksSource::getLandmarks() const
 {
-	if (!mImage)
+	if (!mData)
 		return LandmarkMap();
-	return mImage->getLandmarks()->getLandmarks();
+	return mData->getLandmarks()->getLandmarks();
 }
+
 Transform3D ImageLandmarksSource::get_rMl() const
 {
-	if (!mImage)
+	if (!mData)
 		return Transform3D::Identity();
-	return mImage->get_rMd();
+	return mData->get_rMd();
 }
+
 Vector3D ImageLandmarksSource::getTextPos(Vector3D p_l) const
 {
-	Vector3D imageCenter = mImage->boundingBox().center();
+	Vector3D imageCenter = mData->boundingBox().center();
 	Vector3D centerToSkinVector = (p_l - imageCenter).normal();
 	Vector3D numberPosition = p_l + 10.0 * centerToSkinVector;
 	return numberPosition;

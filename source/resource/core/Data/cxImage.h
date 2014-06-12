@@ -36,7 +36,7 @@ class QDomDocument;
 
 namespace cx
 {
-typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
+//typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 
 /**\brief A volumetric data set.
  *
@@ -76,7 +76,7 @@ public:
 	virtual vtkImageDataPtr getGrayScaleVtkImageData(); ///< as getBaseVtkImageData(), but constrained to 1 component if multicolor.
 	virtual vtkImageDataPtr get8bitGrayScaleVtkImageData();///< Have never been used or tested. Create a test for it
 //	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the reference coordinate space
-	LandmarksPtr getLandmarks();
+//	LandmarksPtr getLandmarks();
 	/** Return a version of this, containing image data and transfer functions converted to unsigned.
 	  * This is used for the 3D texture slicer that doesnt handle signed data.
 	  */
@@ -173,7 +173,7 @@ protected:
 	vtkImageAccumulatePtr mHistogramPtr;///< Histogram
 	ImagePtr mUnsigned; ///< version of this containing unsigned data.
 
-	LandmarksPtr mLandmarks;
+//	LandmarksPtr mLandmarks;
 
 	ShadingStruct mShading;
 

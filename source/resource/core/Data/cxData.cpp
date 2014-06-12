@@ -24,6 +24,7 @@
 #include <QRegExp>
 #include "cxRegistrationTransform.h"
 #include "cxTime.h"
+#include "cxLandmark.h"
 
 namespace cx
 {
@@ -40,6 +41,8 @@ Data::Data(const QString& uid, const QString& name) :
 	m_rMd_History.reset(new RegistrationHistory());
 	connect(m_rMd_History.get(), SIGNAL(currentChanged()), this, SIGNAL(transformChanged()));
 	connect(m_rMd_History.get(), SIGNAL(currentChanged()), this, SLOT(transformChangedSlot()));
+
+	mLandmarks = Landmarks::create();
 }
 
 Data::~Data()
@@ -141,6 +144,13 @@ void Data::addXml(QDomNode& dataNode)
 	QDomElement acqTimeNode = doc.createElement("acqusitionTime");
 	acqTimeNode.appendChild(doc.createTextNode(mAcquisitionTime.toString(timestampMilliSecondsFormat())));
 	dataNode.appendChild(acqTimeNode);
+
+	if (!mLandmarks->getLandmarks().empty())
+	{
+		QDomElement landmarksNode = doc.createElement("landmarks");
+		mLandmarks->addXml(landmarksNode);
+		dataNode.appendChild(landmarksNode);
+	}
 }
 
 void Data::parseXml(QDomNode& dataNode)
@@ -154,6 +164,9 @@ void Data::parseXml(QDomNode& dataNode)
 	if (!dataNode.namedItem("acqusitionTime").toElement().isNull())
 		mAcquisitionTime = QDateTime::fromString(dataNode.namedItem("acqusitionTime").toElement().text(),
 			timestampMilliSecondsFormat());
+
+	if (mLandmarks)
+		mLandmarks->parseXml(dataNode.namedItem("landmarks"));
 }
 
 /**Get the time the data was created from a data source.
@@ -178,6 +191,11 @@ QDateTime Data::getAcquisitionTime() const
 void Data::setAcquisitionTime(QDateTime time)
 {
 	mAcquisitionTime = time;
+}
+
+LandmarksPtr Data::getLandmarks()
+{
+	return mLandmarks;
 }
 
 } // namespace cx

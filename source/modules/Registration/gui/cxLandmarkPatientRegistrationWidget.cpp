@@ -88,10 +88,7 @@ void LandmarkPatientRegistrationWidget::registerSlot()
 
 void LandmarkPatientRegistrationWidget::fixedDataChanged()
 {
-	LandmarkRegistrationWidget::activeImageChangedSlot();
-//	ImagePtr image = dataManager()->getActiveImage();
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(mManager->getFixedData());
-	mImageLandmarkSource->setImage(image);
+	mImageLandmarkSource->setData(mManager->getFixedData());
 }
 
 void LandmarkPatientRegistrationWidget::updateToolSampleButton()
