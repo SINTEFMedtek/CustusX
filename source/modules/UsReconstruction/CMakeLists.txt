@@ -19,7 +19,6 @@ SET( MOC_HEADER_FILES
    logic/cxReconstructParams.h
    logic/cxReconstructionExecuter.h
    logic/cxReconstructionService.h
-   logic/cxPNNReconstructAlgorithm.h
    gui/cxReconstructionWidget.h
    gui/cxReconstructOutputValueParamsInterfaces.h
    gui/cxUsReconstructionPlugin.h
@@ -39,7 +38,6 @@ SET( SOURCE_FILES
     logic/cxReconstructionExecuter.cpp
     logic/cxReconstructedOutputVolumeParams.h
     logic/cxReconstructedOutputVolumeParams.cpp
-    logic/cxPNNReconstructAlgorithm.cpp
     logic/cxReconstructCore.cpp
     logic/cxReconstructCore.h
     logic/cxReconstructPreprocessor.cpp

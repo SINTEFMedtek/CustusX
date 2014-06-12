@@ -35,7 +35,6 @@
 #include "cxLogicManager.h"
 #include "cxPluginFramework.h"
 #include "cxReconstructionExecuter.h"
-#include "cxPNNReconstructAlgorithm.h"
 
 //Windows fix
 #ifndef M_PI
@@ -87,15 +86,9 @@ ReconstructionServicePtr ReconstructionManager::createAlgorithm()
 	QString name = mParams->mAlgorithmAdapter->getValue();
 
 	ReconstructionServicePtr algo;
-	if(name != "PNN") //there is just one reconstruction algorithm that's not a plugin
-	{
-		ReconstructionServicePtr pointer(ReconstructionServicePtr(mServiceListener->getService(name), null_deleter()));
-		algo = pointer;
-	}
-	else
-	{
-		algo = ReconstructionServicePtr(new PNNReconstructAlgorithm());
-	}
+	if(!name.isEmpty())
+		algo = ReconstructionServicePtr(mServiceListener->getService(name), null_deleter());
+
 	return algo;
 }
 
@@ -290,7 +283,6 @@ void ReconstructionManager::onServiceAdded(ReconstructionService* service)
 {
     QStringList range = mParams->mAlgorithmAdapter->getValueRange();
     range << service->getName();
-    std::cout << "NAME: "<< service->getName() << std::endl;
     mParams->mAlgorithmAdapter->setValueRange(range);
 }
 

@@ -24,7 +24,6 @@ if (BUILD_TESTING)
 		cxtestReconstructionManagerFixture.h
 		cxtestReconstructionManagerFixture.cpp
 		cxtestReconstructionManager.cpp
-		cxtestReconstructionAlgorithm.cpp
 		cxtestReconstructionAlgorithmFixture.h
 		cxtestReconstructionAlgorithmFixture.cpp
 		cxtestSyntheticVolumeComparer.h

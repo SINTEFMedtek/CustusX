@@ -1,23 +1,18 @@
-// This file is part of SSC,
-// a C++ Library supporting Image Guided Therapy Applications.
+// This file is part of CustusX, an Image Guided Therapy Application.
 //
-// Copyright (C) 2008- SINTEF Medical Technology
-// Copyright (C) 2008- Sonowand AS
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
 //
-// SSC is owned by SINTEF Medical Technology and Sonowand AS,
-// hereafter named the owners. Each particular piece of code
-// is owned by the part that added it to the library.
-// SSC source code and binaries can only be used by the owners
-// and those with explicit permission from the owners.
-// SSC shall not be distributed to anyone else.
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
 //
-// SSC is distributed WITHOUT ANY WARRANTY; without even
-// the implied warranty of MERCHANTABILITY or FITNESS FOR
-// A PARTICULAR PURPOSE.
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
 //
-// See sscLicense.txt for more information.
+// See CustusX_License.txt for more information.
 
-#include "cxPNNReconstructAlgorithm.h"
+#include "cxPNNReconstructionService.h"
 
 #include <QFileInfo>
 #include "cxReporter.h"
@@ -31,18 +26,26 @@
 
 namespace cx
 {
-PNNReconstructAlgorithm::PNNReconstructAlgorithm()
+PNNReconstructionService::PNNReconstructionService()
 {
 }
 
-std::vector<DataAdapterPtr> PNNReconstructAlgorithm::getSettings(QDomElement root)
+PNNReconstructionService::~PNNReconstructionService()
+{}
+
+QString PNNReconstructionService::getName() const
+{
+	return "PNN";
+}
+
+std::vector<DataAdapterPtr> PNNReconstructionService::getSettings(QDomElement root)
 {
 	std::vector<DataAdapterPtr> retval;
 	retval.push_back(this->getInterpolationStepsOption(root));
 	return retval;
 }
 
-DoubleDataAdapterXmlPtr PNNReconstructAlgorithm::getInterpolationStepsOption(QDomElement root)
+DoubleDataAdapterXmlPtr PNNReconstructionService::getInterpolationStepsOption(QDomElement root)
 {
 	DoubleDataAdapterXmlPtr retval;
 	retval = DoubleDataAdapterXml::initialize("interpolationSteps", "Distance (voxels)",
@@ -61,18 +64,15 @@ void optimizedCoordTransform(Vector3D* p, boost::array<double, 16> tt)
 	(*p)[2] = t[8] * x + t[9] * y + t[10] * z + t[11];
 }
 
-bool PNNReconstructAlgorithm::reconstruct(ProcessedUSInputDataPtr input,
+bool PNNReconstructionService::reconstruct(ProcessedUSInputDataPtr input,
 		vtkImageDataPtr outputData, QDomElement settings)
 {
 	std::vector<TimedPosition> frameInfo = input->getFrames();
-	//std::vector<Planes> planes = generate_planes(frameInfo, frameData);
 	if (frameInfo.empty())
 		return false;
 	if (input->getDimensions()[2]==0)
 		return false;
 
-	//vtkImageDataPtr input = frameData->getBaseVtkImageData();
-//	USFrameDataPtr input = frameData;
 	vtkImageDataPtr target = outputData;
 
 	Eigen::Array3i inputDims = input->getDimensions();
@@ -95,16 +95,13 @@ bool PNNReconstructAlgorithm::reconstruct(ProcessedUSInputDataPtr input,
 	Vector3D outputSpacing(tempOutput->GetSpacing());
 
 	//Get raw data pointers
-	//unsigned char *inputPointer = static_cast<unsigned char*>( input->GetScalarPointer() );
 	unsigned char *outputPointer = static_cast<unsigned char*> (tempOutput->GetScalarPointer());
-	//unsigned char *outputPointer = static_cast<unsigned char*>(target->GetScalarPointer());
 	unsigned char* maskPointer = static_cast<unsigned char*> (input->getMask()->GetScalarPointer());
 
 	// Traverse all input pixels
 	for (int record = 0; record < inputDims[2]; record++)
 	{
 		unsigned char *inputPointer = input->getFrame(record);
-		//reportDebug("record: " + string_cast(record));
 		boost::array<double, 16> recordTransform = frameInfo[record].mPos.flatten();
 
 		for (int beam = 0; beam < inputDims[0]; beam++)
@@ -114,10 +111,8 @@ bool PNNReconstructAlgorithm::reconstruct(ProcessedUSInputDataPtr input,
 				if (!validPixel(beam, sample, inputDims, maskPointer))
 					continue;
 				Vector3D inputPoint(beam * inputSpacing[0], sample * inputSpacing[1], 0.0);
-				//Vector3D outputPoint = frameInfo[record].mPos.coord(inputPoint);
 				Vector3D outputPoint = inputPoint;
 				optimizedCoordTransform(&outputPoint, recordTransform);
-				//Vector3D outputVoxel;
 				int outputVoxelX = static_cast<int> ((outputPoint[0] / outputSpacing[0]) + 0.5);
 				int outputVoxelY = static_cast<int> ((outputPoint[1] / outputSpacing[1]) + 0.5);
 				int outputVoxelZ = static_cast<int> ((outputPoint[2] / outputSpacing[2]) + 0.5);
@@ -127,8 +122,6 @@ bool PNNReconstructAlgorithm::reconstruct(ProcessedUSInputDataPtr input,
 					int outputIndex = outputVoxelX + outputVoxelY * outputDims[0] + outputVoxelZ * outputDims[0]
 						* outputDims[1];
 					int inputIndex = beam + sample * inputDims[0];
-					//+ record*inputDims[0]*inputDims[1];//get new pointer for each record
-//					outputPointer[outputIndex] = inputPointer[inputIndex];
 
 					// assign the max value found from all frames hitting this voxel. This removes black areas where (some of) multiple sweeps contains shadows.
 					outputPointer[outputIndex] = std::max<unsigned char>(inputPointer[inputIndex], outputPointer[outputIndex]);
@@ -218,9 +211,8 @@ void maskAlongDim(int a_dim, int b_dim, int c_dim, const Eigen::Array3i& dim, un
  * Optimized code: Change with care!
  *
  */
-vtkImageDataPtr PNNReconstructAlgorithm::createMask(vtkImageDataPtr inputData)
+vtkImageDataPtr PNNReconstructionService::createMask(vtkImageDataPtr inputData)
 {
-//	QTime startTime = QTime::currentTime();
 	Eigen::Array3i dim(inputData->GetDimensions());
 	Vector3D spacing(inputData->GetSpacing());
 	vtkImageDataPtr mask = generateVtkImageData(dim, spacing, 0);
@@ -232,28 +224,22 @@ vtkImageDataPtr PNNReconstructAlgorithm::createMask(vtkImageDataPtr inputData)
 	maskAlongDim(dim[1], dim[2], dim[0], dim, inputPtr, maskPtr, &getIndex_x_last);
 	maskAlongDim(dim[2], dim[0], dim[1], dim, inputPtr, maskPtr, &getIndex_y_last);
 
-//	std::cout << QString("mask generation: %1ms").arg(startTime.msecsTo(QTime::currentTime())) << std::endl;
 	return mask;
 }
 
-void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, vtkImageDataPtr outputData, QDomElement settings)
+void PNNReconstructionService::interpolate(ImagePtr inputData, vtkImageDataPtr outputData, QDomElement settings)
 {
 	TimeKeeper timer;
 	DoubleDataAdapterXmlPtr interpolationStepsOption = this->getInterpolationStepsOption(settings);
 	int interpolationSteps = static_cast<int> (interpolationStepsOption->getValue());
 
-//	report(QString("PNN hole filling [steps=%1] ...").arg(interpolationSteps));
-
 	vtkImageDataPtr input = inputData->getBaseVtkImageData();
 	vtkImageDataPtr output = outputData;
 	vtkImageDataPtr mask = this->createMask(input);
 
-	//int* inputDims = input->GetDimensions();
 	Eigen::Array3i outputDims(output->GetDimensions());
 
 	Eigen::Array3i inputDims(input->GetDimensions());
-	//Vector3D outputDims(output->GetDimensions());
-
 
 	unsigned char *inputPointer = static_cast<unsigned char*> (input->GetScalarPointer());
 	unsigned char *outputPointer = static_cast<unsigned char*> (output->GetScalarPointer());
@@ -264,21 +250,12 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, vtkImageDataPtr ou
 			+ qstring_cast(outputDims[1]) + " " + qstring_cast(outputDims[2]) + " input: " + qstring_cast(inputDims[0])
 			+ " " + qstring_cast(inputDims[1]) + " " + qstring_cast(inputDims[2]));
 
-	//Vector3D spacing(output->GetSpacing());
-	// Assume output spacing is equal in all directions
-	//int interpolationSteps = static_cast<int>((mInterpolationDistanceOption->getValue() / spacing[0]) + 0.5);
-//	DoubleDataAdapterXmlPtr interpolationStepsOption = this->getInterpolationStepsOption(settings);
-
-//	int interpolationSteps = static_cast<int> (interpolationStepsOption->getValue());
-//	report("interpolationSteps: " + qstring_cast(interpolationSteps));
-
 	int total = outputDims[0] * outputDims[1] * outputDims[2];
 	int removed = 0;
 	int ignored = 0;
 	// Traverse all voxels
 	for (int x = 0; x < outputDims[0]; x++)
 	{
-		//reportDebug("x: " + string_cast(x));
 		for (int y = 0; y < outputDims[1]; y++)
 		{
 			for (int z = 0; z < outputDims[2]; z++)
@@ -303,10 +280,8 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, vtkImageDataPtr ou
 				}
 			}//z
 		}//y
-//		std::cout << QString("[%1/%2]").arg(x).arg(outputDims[0]);
-//		std::cout.flush();
 	}//x
-//	std::cout << std::endl;
+
 	int valid = 100*double(ignored)/double(total);
 	int outside = 100*double(removed)/double(total);
 	int holes = 100*double(total-ignored-removed)/double(total);
@@ -324,10 +299,9 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, vtkImageDataPtr ou
  * The box is as small a possible, up to a maximum of 2*interpolationSteps+1.
  *
  */
-void PNNReconstructAlgorithm::fillHole(unsigned char *inputPointer, unsigned char *outputPointer, int x, int y, int z, const Eigen::Array3i& dim, int interpolationSteps)
+void PNNReconstructionService::fillHole(unsigned char *inputPointer, unsigned char *outputPointer, int x, int y, int z, const Eigen::Array3i& dim, int interpolationSteps)
 {
 	int outputIndex = x + y * dim[0] + z * dim[0] * dim[1];
-//	this->fillHole(inputPointer, outputPointer, x, y, z, outputDims);
 	bool interpolated = false;
 	int localArea = 0;
 

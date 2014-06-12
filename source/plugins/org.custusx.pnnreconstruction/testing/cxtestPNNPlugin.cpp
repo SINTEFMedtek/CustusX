@@ -12,34 +12,28 @@
 //
 // See CustusX_License.txt for more information.
 
-#include <vtkImageData.h>
-#include <QDomElement>
-
-#include "cxReconstructionService.h"
-#include "cxSimpleSyntheticVolume.h"
 #include "catch.hpp"
-#include "cxPNNReconstructAlgorithm.h"
-#include "QFileInfo"
+#include <QDomElement>
+#include "cxPNNReconstructionService.h"
 #include "cxDummyTool.h"
 #include "cxReporter.h"
 #include "cxtestReconstructionAlgorithmFixture.h"
 #include "cxtestUtilities.h"
-//#include "cxtestJenkinsMeasurement.h"
 
 namespace cxtest
 {
 
-TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthetic][ca_rec1][ca_rec]")
+TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthetic][pnn]")
 {
 	ReconstructionAlgorithmFixture fixture;
 	QDomDocument domdoc;
-	QDomElement settings = domdoc.createElement("PNN");
+	QDomElement settings = domdoc.createElement("PNNService");
 
 	fixture.setOverallBoundsAndSpacing(100, 5);
-	fixture.setVerbose(false);
+	fixture.setVerbose(true);
 	fixture.getInputGenerator()->setSpherePhantom();
 
-	fixture.setAlgorithm(cx::PNNReconstructAlgorithm::create());
+	fixture.setAlgorithm(cx::PNNReconstructionService::create());
 	fixture.reconstruct(settings);
 
 	fixture.checkRMSBelow(20.0);
@@ -53,10 +47,10 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthe
 	}
 }
 
-TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][synthetic][ca_rec5][ca_rec]")
+TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][synthetic][pnn]")
 {
 	QDomDocument domdoc;
-	QDomElement settings = domdoc.createElement("PNN");
+	QDomElement settings = domdoc.createElement("PNNService");
 
 	ReconstructionAlgorithmFixture fixture;
 	fixture.setVerbose(false);
@@ -69,7 +63,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 	generator->setSpherePhantom();
 	fixture.defineOutputVolume(100, 2);
 
-	fixture.setAlgorithm(cx::PNNReconstructAlgorithm::create());
+	fixture.setAlgorithm(cx::PNNReconstructionService::create());
 	fixture.reconstruct(settings);
 
 	fixture.checkRMSBelow(30.0);

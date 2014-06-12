@@ -18,9 +18,7 @@
 #include "cxtestReconstructionManagerFixture.h"
 #include "cxtestReconstructRealData.h"
 #include "cxtestSyntheticReconstructInput.h"
-
 #include "cxDummyTool.h"
-#include "cxPNNReconstructAlgorithm.h"
 #include "cxReconstructPreprocessor.h"
 #include <vtkImageData.h>
 #include "cxStringDataAdapterXml.h"
@@ -29,7 +27,7 @@
 namespace cxtest
 {
 
-TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][synthetic][not_win32][ca_rec]")
+TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][synthetic][not_win32][pnn]")
 {
 	ReconstructionManagerTestFixture fixture;
 	fixture.setVerbose(true);
@@ -41,7 +39,7 @@ TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][syntheti
 
 	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 	reconstructer->selectData(inputData);
-	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNNService");
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
 	// set an algorithm-specific parameter
 	fixture.setPNN_InterpolationSteps(1);
@@ -66,7 +64,7 @@ TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][syntheti
 	}
 }
 
-TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][synthetic][ca_rec7][ca_rec][hide]")
+TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][synthetic][pnn][hide]")
 {
 	/** Test on a phantom containing a colored sphere and a gray sphere.
 	  * Verify that the angio algo reconstructs only the colored, and the
@@ -74,7 +72,7 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 	  *
 	  */
 	ReconstructionManagerTestFixture fixture;
-	fixture.setVerbose(true);
+	fixture.setVerbose(false);
 
 	SyntheticReconstructInputPtr input(new SyntheticReconstructInput);
 	input->setOverallBoundsAndSpacing(100, 5);
@@ -83,7 +81,7 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 
 	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 	reconstructer->selectData(inputData);
-	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNNService");//default
 	reconstructer->getParams()->mAngioAdapter->setValue(true);
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
 	// set an algorithm-specific parameter
@@ -116,7 +114,7 @@ TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstru
 	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 
 	reconstructer->selectData(realData.getSourceFilename());
-	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNNService");
 	reconstructer->getParams()->mAngioAdapter->setValue(true);
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
 	// set an algorithm-specific parameter
@@ -136,7 +134,7 @@ TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruc
 	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 
 	reconstructer->selectData(realData.getSourceFilename());
-	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNNService");
 	reconstructer->getParams()->mAngioAdapter->setValue(true);
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(true);
 	// set an algorithm-specific parameter
@@ -154,7 +152,7 @@ TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruc
 TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integration][usreconstruction][synthetic][not_win32]")
 {
 	ReconstructionManagerTestFixture fixture;
-	fixture.setVerbose(true);
+	fixture.setVerbose(false);
 
 	SyntheticReconstructInputPtr generator(new SyntheticReconstructInput);
 	Eigen::Array2i frameSize = Eigen::Array2i(150,150);
