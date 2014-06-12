@@ -70,7 +70,6 @@ macro(cx_initialize_custusx_install)
 
         set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_SYSTEM})
         set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Linux/copy/linux_install_readme.txt")
-        #set(CPACK_GENERATOR "TGZ;STGZ")
         set(CPACK_GENERATOR "TGZ")
         set(CPACK_PACKAGING_INSTALL_PREFIX "/")
     endif(CX_LINUX)
@@ -86,11 +85,6 @@ macro(cx_initialize_custusx_install)
         endif()
         set(CPACK_PACKAGE_EXECUTABLES
             "CustusX" "CustusX")
-        if(CX_WIN32 AND BUILD_GRABBER_SERVER)
-            set(CPACK_PACKAGE_EXECUTABLES
-                ${CPACK_PACKAGE_EXECUTABLES}
-                "GrabberServer" "GrabberServer")
-        endif()
         set(CPACK_PACKAGE_EXECUTABLES
             ${CPACK_PACKAGE_EXECUTABLES}
             "${OpenIGTLinkServerName}" "${OpenIGTLinkServerName}")
@@ -364,7 +358,6 @@ function(cxCreateConfigurationDescription)
 	cx_assert_variable_exists(${CX_USE_TSF})
 	cx_assert_variable_exists(${CX_USE_LEVEL_SET})
 	cx_assert_variable_exists(${CX_USE_OPENCL_UTILITY})
-	cx_assert_variable_exists(${BUILD_GRABBER_SERVER})
 	cx_assert_variable_exists(${CX_USE_ISB_GE})
 	cx_assert_variable_exists(${CX_USE_OpenCV})
 	# this text can be inserted into the about box with some effort...
@@ -398,7 +391,6 @@ Configuration for CustusX ${CustusX3_VERSION_STRING}
 		OpenCL Utility Library: ${CX_USE_OPENCL_UTILITY}
 	
 	Grabber Servers:
-		Mac QuickTime Grabber Server: ${BUILD_GRABBER_SERVER}
 		ISB GE Scanner Grabber Interface: ${CX_USE_ISB_GE}
 		OpenCV Grabber Interface: ${CX_USE_OpenCV}
 

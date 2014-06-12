@@ -152,33 +152,6 @@ StateServicePtr StateService::create(StateServiceBackendPtr backend)
 	return retval;
 }
 
-//StateService *StateService::mTheInstance = NULL;
-//StateService* stateService()
-//{
-//	return StateService::getInstance();
-//}
-
-//StateService* StateService::createInstance(StateServiceBackendPtr backend)
-//{
-//	if (mTheInstance == NULL)
-//	{
-//		mTheInstance = new StateService();
-//		mTheInstance->initialize(backend);
-//	}
-//	return mTheInstance;
-//}
-
-
-//StateService* StateService::getInstance()
-//{
-//	return mTheInstance;
-//}
-
-//void StateService::destroyInstance()
-//{
-//	delete mTheInstance;
-//	mTheInstance = NULL;
-//}
 
 StateService::StateService()
 {
@@ -256,10 +229,6 @@ QStringList StateService::getDefaultGrabberServer()
 	QString filename;
 	QString relativePath = "OpenIGTLinkServer";
 	QString postfix = "";
-//#ifdef __APPLE__
-//	filename = "GrabberServer";
-//	relativePath = "grabberServer";
-//	postfix = " --auto";
 #if WIN32
 	filename = "OpenIGTLinkServer.exe";
 	postfix = "--in_width 800 --in_height 600";
@@ -291,14 +260,6 @@ QStringList StateService::getGrabberServer(QString filename, QString relativePat
 	result = this->checkGrabberServerExist(DataLocations::getBundlePath(), filename, postfix);
 	if (!result.isEmpty())
 		return result;
-//	// run from build folder
-//	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../" + relativePath, filename, postfix);
-//	if (!result.isEmpty())
-//		return result;
-//	// run from test folders
-//	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../apps/" + relativePath, filename, postfix);
-//	if (!result.isEmpty())
-//		return result;
 	else
 		cx::reporter()->sendWarning("StateService::getGrabberServer() can't locate grabber server");
 
@@ -316,7 +277,6 @@ QString StateService::getDefaultGrabberInitScript()
 	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/..", "run_v2u.sh", "");
 	if (!result.isEmpty())
 		return result[0];
-//	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../../CustusX3/install/Linux/copy/", "run_v2u.sh", "");
 	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../CustusX3/install/Linux/copy/", "run_v2u.sh", "");
 	if (!result.isEmpty())
 		return result[0];
@@ -357,12 +317,10 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("Navigation/followTooltipBoundary", 0.1);
 
 	QStringList grabber = this->getDefaultGrabberServer();
-//	std::cout << "def grabber: " << grabber.join("--") << std::endl;
 	this->fillDefault("IGTLink/localServer", grabber[0]);
 	grabber.pop_front();
 	if (grabber.size()>0)
 	{
-//		std::cout << "def grabber2: " << grabber.join("--") << std::endl;
 		this->fillDefault("IGTLink/arguments", grabber.join(" "));
 		this->fillDefault("IGTLink/directLinkArgumentHistory", QStringList() << grabber.join(" "));
 	}
@@ -370,7 +328,6 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("IGTLink/initScript", this->getDefaultGrabberInitScript());
 
 	this->fillDefault("showSectorInRTView", true);
-//  this->fillDefault("autoLandmarkRegistration", true);
 	this->fillDefault("View3D/stereoType", stFRAME_SEQUENTIAL);
 	this->fillDefault("View3D/eyeAngle", 4.0);
 	this->fillDefault("View/showDataText", true);
@@ -379,15 +336,9 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View3D/annotationModelSize", 0.2);
 	this->fillDefault("View3D/annotationModel", "woman.stl");
 	this->fillDefault("View3D/depthPeeling", false);
-
 	this->fillDefault("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
-	// not working:
-//	this->fillDefault("View3D/ImageRender3DVisualizer", "vtkOpenGLGPUMultiVolumeRayCastMapper");
-
 	this->fillDefault("View3D/maxRenderSize", 10 * pow(10.0,6));
 
-
-//	this->fillDefault("useGPUVolumeRayCastMapper", true);
 	this->fillDefault("stillUpdateRate", 0.001);
 
 #ifdef __APPLE__
