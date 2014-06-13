@@ -147,16 +147,6 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, RegistrationTran
     //std::cout << "rMd_new\n" << newTransform.mValue << std::endl; // too much noise for large patients
   }
 
-//  skriv om update registration:
-//  - ta inn enten transform3D eller parent frame + time, modifiser transformen men behold gamle data.
-//  - sjekk ut alle setParentSpace (spesielt den nedenfor)
-
-  //error:
-  // reconnect only if the registration is done relative to a base.
-  // if target==targetBase, the registration is done inside an already connected
-  // tree and we dont need (or want - leads to error) to reconnect.
-  //if (target!=targetBase)
-
   // reconnect only if master and target are unconnected, i.e. share a common ancestor.
   // If we are registrating inside an already connected tree we only want to change transforms,
   // not change the topology of the tree.
@@ -165,7 +155,6 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, RegistrationTran
     // connect the target to the master's ancestor, i.e. replace targetBase with masterAncestor:
     QDomNode masterAncestor = forest.getOldestAncestor(masterFrame);
     // iterate over all target data,
-    //forest.reconnectFrame(targetBase, masterAncestor); // alternative if we move operation below into forest
     for (unsigned i=0; i<targetData.size(); ++i)
     {
       QString masterAncestorUid = masterAncestor.toElement().tagName();
@@ -174,21 +163,10 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, RegistrationTran
       if (targetData[i]->getParentSpace() == targetBaseUid)
       {
         report("Reset parent frame of " + targetData[i]->getName() + " to " + masterAncestorUid + ". targetbase=" + targetBaseUid);
-//        //targetData[i]->setParentSpace(masterAncestorUid);
-//        if (targetData[i]->get_rMd_History()->getData().empty())
-//          return;
-//        RegistrationTransform t = targetData[i]->get_rMd_History()->getData().back();
-//        t.mParentFrame = masterAncestorUid;
-//        void updateParentSpace(const QDateTime& oldTime, const ParentSpace& newTransform);
-
         targetData[i]->get_rMd_History()->updateParentSpace(oldTime, ParentSpace(masterAncestorUid, deltaTransform.mTimestamp, deltaTransform.mType));
       }
     }
   }
-  // as we now have mutated the datamanager, forest is now outdated.
-
-//  FrameForest forest2;
-//	std::cout << "    ==== RegistrationManager::updateRegistration" << std::endl;
 }
 
 /**Convert the landmarks given by uids to vtk points.
@@ -350,8 +328,6 @@ void RegistrationManager::doImageRegistration(bool translationOnly)
   this->writePreLandmarkRegistration(movingImage->getName(), movingImage->getLandmarks()->getLandmarks());
 
   std::vector<QString> landmarks = getUsableLandmarks(fixedLandmarks, imageLandmarks);
-//  vtkPointsPtr p_ref = convertTovtkPoints(landmarks, fixedLandmarks, fixedImage->get_rMd());
-//  vtkPointsPtr p_data = convertTovtkPoints(landmarks, imageLandmarks, Transform3D::Identity());
   vtkPointsPtr p_fixed_r = convertTovtkPoints(landmarks, fixedLandmarks, fixedImage->get_rMd());
   vtkPointsPtr p_moving_r = convertTovtkPoints(landmarks, imageLandmarks, movingImage->get_rMd());
 
