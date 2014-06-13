@@ -65,7 +65,7 @@ void RegistrationManager::duringLoadPatientSlot()
 
 void RegistrationManager::setFixedData(DataPtr fixedData)
 {
-  if(boost::dynamic_pointer_cast<Image>(mFixedData) == fixedData)
+  if(mFixedData == fixedData)
     return;
 
   mFixedData = fixedData;
@@ -272,11 +272,11 @@ void RegistrationManager::doPatientRegistration()
   if(!mFixedData)
     return;
 
-  ImagePtr fixedImage = boost::dynamic_pointer_cast<Image>(mFixedData);
+  DataPtr fixedImage = mFixedData;
 
   if(!fixedImage)
   {
-    reportError("The fixed data is not a image, cannot do patient registration!");
+	reportError("The fixed data is not set, cannot do patient registration!");
     return;
   }
   LandmarkMap fixedLandmarks = fixedImage->getLandmarks()->getLandmarks();
@@ -321,18 +321,18 @@ void RegistrationManager::writePreLandmarkRegistration(QString name, LandmarkMap
 void RegistrationManager::doImageRegistration(bool translationOnly)
 {
   //check that the fixed data is set
-  ImagePtr fixedImage = boost::dynamic_pointer_cast<Image>(mFixedData);
+  DataPtr fixedImage = mFixedData;
   if(!fixedImage)
   {
-    reportError("The fixed data is not a image, cannot do landmark image registration!");
+	reportError("The fixed data is not set, cannot do landmark image registration!");
     return;
   }
 
   //check that the moving data is set
-  ImagePtr movingImage = boost::dynamic_pointer_cast<Image>(mMovingData);
+  DataPtr movingImage = mMovingData;
   if(!movingImage)
   {
-    reportError("The moving data is not a image, cannot do landmark image registration!");
+	reportError("The moving data is not set, cannot do landmark image registration!");
     return;
   }
 
@@ -426,10 +426,10 @@ void RegistrationManager::doFastRegistration_Translation()
   if(!mFixedData)
     return;
 
-  ImagePtr fixedImage = boost::dynamic_pointer_cast<Image>(mFixedData);
+  DataPtr fixedImage = mFixedData;
   if(!fixedImage)
   {
-    reportError("The fixed data is not a image, cannot do image registration!");
+	reportError("The fixed data is not set, cannot do image registration!");
     return;
   }
 

@@ -128,7 +128,6 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& nam
 	//  mShading.diffuse = 0.9;
 	//  mShading.specular = 0.3;
 	//  mShading.specularPower = 15.0;
-	mLandmarks = Landmarks::create();
 
 	mImageLookupTable2D.reset();
 	mImageTransferFunctions3D.reset();
@@ -451,10 +450,10 @@ int Image::getMaxAlphaValue()
 	return 255;
 }
 
-LandmarksPtr Image::getLandmarks()
-{
-	return mLandmarks;
-}
+//LandmarksPtr Image::getLandmarks()
+//{
+//	return mLandmarks;
+//}
 
 void Image::addXml(QDomNode& dataNode)
 {
@@ -474,9 +473,9 @@ void Image::addXml(QDomNode& dataNode)
 	mShading.addXml(shadingNode);
 	imageNode.appendChild(shadingNode);
 
-	QDomElement landmarksNode = doc.createElement("landmarks");
-	mLandmarks->addXml(landmarksNode);
-	imageNode.appendChild(landmarksNode);
+//	QDomElement landmarksNode = doc.createElement("landmarks");
+//	mLandmarks->addXml(landmarksNode);
+//	imageNode.appendChild(landmarksNode);
 
 	QDomElement cropNode = doc.createElement("crop");
 	cropNode.setAttribute("use", mUseCropping);
@@ -569,7 +568,7 @@ void Image::parseXml(QDomNode& dataNode)
 	// new way:
 	mShading.parseXml(dataNode.namedItem("shading"));
 
-	mLandmarks->parseXml(dataNode.namedItem("landmarks"));
+//	mLandmarks->parseXml(dataNode.namedItem("landmarks"));
 
 	QDomElement cropNode = dataNode.namedItem("crop").toElement();
 	if (!cropNode.isNull())

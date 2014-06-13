@@ -51,7 +51,6 @@ public:
 	virtual QString defaultWhatsThis() const;
 
 protected slots:
-	virtual void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
 	virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
 
 	void cellChangedSlot(int row, int column); ///< reacts when the user types in a (landmark) name
@@ -71,7 +70,6 @@ protected:
     QString getNextLandmark();
     void activateLandmark(QString uid);
 
-//	void nextRow(); ///< jump to the next line in the tablewidget, updates active landmark and highlighted row
 	std::vector<Landmark> getAllLandmarks() const; ///< get all the landmarks from the image and the datamanager
 	QString getLandmarkName(QString uid);
 	double getAccuracy(QString uid);
@@ -85,11 +83,8 @@ protected:
 	//data
 	QString mActiveLandmark; ///< uid of surrently selected landmark.
 
-	ActiveImageProxyPtr mActiveImageProxy;
-
 private:
 	LandmarkRegistrationWidget(); ///< not implemented
-	ImagePtr mCurrentImage; ///< the image currently used in image registration
 };
 
 /**

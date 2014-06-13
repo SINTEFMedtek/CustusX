@@ -70,8 +70,8 @@ void LandmarkImage2ImageRegistrationWidget::translationCheckBoxChanged()
 
 void LandmarkImage2ImageRegistrationWidget::updateRep()
 {
-	mFixedLandmarkSource->setImage(boost::dynamic_pointer_cast<Image>(mManager->getFixedData()));
-	mMovingLandmarkSource->setImage(boost::dynamic_pointer_cast<Image>(mManager->getMovingData()));
+	mFixedLandmarkSource->setData(mManager->getFixedData());
+	mMovingLandmarkSource->setData(mManager->getMovingData());
 }
 
 void LandmarkImage2ImageRegistrationWidget::registerSlot()

@@ -15,10 +15,9 @@
 #include "cxtestReconstructionAlgorithmFixture.h"
 
 #include "cxReconstructionService.h"
-#include "TordReconstruct/cxSimpleSyntheticVolume.h"
+#include "cxSimpleSyntheticVolume.h"
 #include "cxtestSphereSyntheticVolume.h"
 #include "catch.hpp"
-#include "cxPNNReconstructAlgorithm.h"
 #include "cxDataReaderWriter.h"
 #include "vtkImageData.h"
 #include <QDomElement>

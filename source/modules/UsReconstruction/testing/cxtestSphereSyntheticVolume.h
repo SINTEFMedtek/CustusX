@@ -14,7 +14,7 @@
 #ifndef CXTESTSPHERESYNTETICVOLUME_H
 #define CXTESTSPHERESYNTETICVOLUME_H
 
-#include "TordReconstruct/cxSyntheticVolume.h"
+#include "cxSyntheticVolume.h"
 
 namespace cxtest {
 
