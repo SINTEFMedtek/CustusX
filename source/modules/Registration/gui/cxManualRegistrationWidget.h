@@ -47,6 +47,10 @@ public:
 	}
 	virtual QString defaultWhatsThis() const;
 
+protected:
+	virtual void showEvent(QShowEvent* event);
+	DataPtr mConnectedMovingImage;
+
 private slots:
 	void matrixWidgetChanged();
 	void imageMatrixChanged();
@@ -59,8 +63,49 @@ private:
 	StringDataAdapterPtr mFixedImage;
 	StringDataAdapterPtr mMovingImage;
 	Transform3DWidget* mMatrixWidget;
-	DataPtr mConnectedMovingImage;
 
+	virtual QString getDescription() = 0;
+	virtual Transform3D getMatrixFromBackend() = 0;
+	virtual void setMatrixFromWidget(Transform3D M) = 0;
+};
+
+/**\brief Direct setting of image registration
+ *
+ * The matrix is the fMm transform, i.e. from moving to fixed image
+ *
+ *  \date 2014-06-13
+ *  \author christiana
+ */
+class ManualImage2ImageRegistrationWidget : public ManualImageRegistrationWidget
+{
+public:
+	ManualImage2ImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
+		ManualImageRegistrationWidget(regManager, parent) {}
+	virtual QString getDescription();
+	virtual Transform3D getMatrixFromBackend();
+	virtual void setMatrixFromWidget(Transform3D M);
+
+	bool isValid() const;
+
+};
+
+/**\brief Direct setting of image registration
+ *
+ * Manipulate the image matrix rMd via a matrix
+ * or xyz+angles. The writing of the matrix is handled
+ * exactly like an image registration.
+ *
+ *  \date Feb 16, 2012
+ *  \author christiana
+ */
+class ManualImageTransformRegistrationWidget : public ManualImageRegistrationWidget
+{
+public:
+	ManualImageTransformRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
+		ManualImageRegistrationWidget(regManager, parent) {}
+	virtual QString getDescription();
+	virtual Transform3D getMatrixFromBackend();
+	virtual void setMatrixFromWidget(Transform3D M);
 };
 
 /**\brief Direct setting of patient registration
