@@ -145,7 +145,7 @@ PreOpPlanningWorkflowState::PreOpPlanningWorkflowState(QState* parent, StateServ
 
 bool PreOpPlanningWorkflowState::canEnter() const
 {
-	return !mBackend->getDataManager()->getImages().empty();
+	return !mBackend->getDataManager()->getData().empty();
 }
 
 // --------------------------------------------------------
@@ -184,7 +184,7 @@ PostOpControllWorkflowState::PostOpControllWorkflowState(QState* parent, StateSe
 
 bool PostOpControllWorkflowState::canEnter() const
 {
-	return !mBackend->getDataManager()->getImages().empty();
+	return !mBackend->getDataManager()->getData().empty();
 }
 
 }
