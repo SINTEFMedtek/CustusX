@@ -29,11 +29,6 @@ LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegistrationManagerPtr re
 	connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(cellClickedSlot(int, int)));
 	connect(mLandmarkTableWidget, SIGNAL(cellChanged(int,int)), this, SLOT(cellChangedSlot(int,int)));
 
-	mActiveImageProxy = ActiveImageProxy::New(dataService());
-	connect(mActiveImageProxy.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
-	connect(mActiveImageProxy.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
-	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
-
 	this->setLayout(mVerticalLayout);
 }
 
@@ -48,20 +43,6 @@ QString LandmarkRegistrationWidget::defaultWhatsThis() const
 		"<p>Interface for registrating.</p>"
 		"<p><i></i></p>"
 		"</html>";
-}
-
-void LandmarkRegistrationWidget::activeImageChangedSlot()
-{
-	if (!this->isVisible())
-		return;
-	ImagePtr activeImage = dataManager()->getActiveImage();
-	if (mCurrentImage == activeImage)
-		return;
-
-	mCurrentImage = activeImage;
-
-	//get the images landmarks and populate the landmark table
-    this->setModified();
 }
 
 void LandmarkRegistrationWidget::cellClickedSlot(int row, int column)
@@ -107,7 +88,6 @@ void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 {
 	QWidget::showEvent(event);
 	connect(dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(landmarkUpdatedSlot()));
-	this->activeImageChangedSlot();
 
 	mManager->restart();
     this->setModified();
@@ -117,8 +97,6 @@ void LandmarkRegistrationWidget::hideEvent(QHideEvent* event)
 {
 	QWidget::hideEvent(event);
 	disconnect(dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(landmarkUpdatedSlot()));
-
-	mCurrentImage.reset();
 }
 
 void LandmarkRegistrationWidget::prePaintEvent()
@@ -130,12 +108,6 @@ void LandmarkRegistrationWidget::prePaintEvent()
 	DataPtr fixedData = boost::dynamic_pointer_cast<Data>(mManager->getFixedData());
 	if (fixedData)
 		fixedName = fixedData->getName();
-
-	// active image is irrelevant here: remove
-//	ImagePtr image = dataManager()->getActiveImage();
-//
-//	if (!image) //Image is deleted
-//		return;
 
 	std::vector<Landmark> landmarks = this->getAllLandmarks();
 	LandmarkMap targetData = this->getTargetLandmarks();
@@ -199,35 +171,6 @@ void LandmarkRegistrationWidget::prePaintEvent()
 	this->updateAvarageAccuracyLabel();
 	mLandmarkTableWidget->blockSignals(false);
 }
-
-//void LandmarkRegistrationWidget::nextRow()
-//{
-//    if (mLandmarkTableWidget->rowCount()==0)
-//    {
-//        std::cout << "LandmarkRegistrationWidget::nextRow() no rows!" << std::endl;
-//        return;
-//    }
-//	int selectedRow = mLandmarkTableWidget->currentRow();
-
-//	if (selectedRow == -1 && mLandmarkTableWidget->rowCount() != 0) //no row is selected yet
-//	{
-//		mLandmarkTableWidget->selectRow(0);
-//		selectedRow = mLandmarkTableWidget->currentRow();
-//	}
-
-//	int nextRow = selectedRow + 1;
-//	int lastRow = mLandmarkTableWidget->rowCount() - 1;
-//	if (nextRow > lastRow)
-//	{
-//		nextRow = lastRow;
-//	}
-
-//	selectedRow = nextRow;
-//	mLandmarkTableWidget->selectRow(selectedRow);
-//	mLandmarkTableWidget->setCurrentCell(selectedRow, 0);
-
-//	mActiveLandmark = mLandmarkTableWidget->currentItem()->data(Qt::UserRole).toString();
-//}
 
 void LandmarkRegistrationWidget::activateLandmark(QString uid)
 {
@@ -351,11 +294,11 @@ double LandmarkRegistrationWidget::getAvarageAccuracy()
 
 double LandmarkRegistrationWidget::getAccuracy(QString uid)
 {
-	ImagePtr fixedData = boost::dynamic_pointer_cast<Image>(mManager->getFixedData());
+	DataPtr fixedData = mManager->getFixedData();
 	if (!fixedData)
 		return 1000.0;
 
-	Landmark masterLandmark = fixedData->getLandmarks()->getLandmarks()[uid]; //TODO : sjekk ut masterimage etc etc
+	Landmark masterLandmark = fixedData->getLandmarks()->getLandmarks()[uid];
 	Landmark targetLandmark = this->getTargetLandmarks()[uid];
 	if (masterLandmark.getUid().isEmpty() || targetLandmark.getUid().isEmpty())
 		return 1000.0;

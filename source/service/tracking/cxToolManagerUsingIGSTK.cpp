@@ -42,6 +42,7 @@
 #include "cxLogger.h"
 #include "cxPlaybackTime.h"
 #include "cxTrackingPositionFilter.h"
+#include "cxXMLNodeWrapper.h"
 
 namespace cx
 {
@@ -903,29 +904,39 @@ bool toolTypeSort(const ToolPtr tool1, const ToolPtr tool2)
 
 void ToolManagerUsingIGSTK::addXml(QDomNode& parentNode)
 {
-	QDomDocument doc = parentNode.ownerDocument();
-	QDomElement base = doc.createElement("toolManager");
-	parentNode.appendChild(base);
+	XMLNodeAdder parent(parentNode);
+//	QDomElement dataNode = parent.addElement("toolManager");
+	XMLNodeAdder base(parent.addElement("toolManager"));
 
-	QDomElement manualToolNode = doc.createElement("manualTool");
-	manualToolNode.appendChild(doc.createTextNode("\n" + qstring_cast(mManualTool->get_prMt())));
-	base.appendChild(manualToolNode);
+//	QDomDocument doc = parentNode.ownerDocument();
+//	QDomElement base = doc.createElement("toolManager");
+//	parentNode.appendChild(base);
+
+	base.addTextToElement("toolTipOffset", qstring_cast(mToolTipOffset));
+
+	base.addTextToElement("manualTool", "\n" + qstring_cast(mManualTool->get_prMt()));
+//	QDomElement manualToolNode = doc.createElement("manualTool");
+//	manualToolNode.appendChild(doc.createTextNode("\n" + qstring_cast(mManualTool->get_prMt())));
+//	base.appendChild(manualToolNode);
 
 	//Tools
-	QDomElement toolsNode = doc.createElement("tools");
+	XMLNodeAdder toolsNode(base.addElement("tools"));
+//	QDomElement toolsNode = base.createElement("tools");
+//	QDomElement toolsNode = doc.createElement("tools");
 	ToolManager::ToolMap tools = this->getTools();
 	ToolManager::ToolMap::iterator toolIt = tools.begin();
 	for (; toolIt != tools.end(); ++toolIt)
 	{
-		QDomElement toolNode = doc.createElement("tool");
+//		QDomElement toolNode = doc.createElement("tool");
 		cxToolPtr tool = boost::dynamic_pointer_cast<ToolUsingIGSTK>(toolIt->second);
 		if (tool)
 		{
-			tool->addXml(toolNode);
-			toolsNode.appendChild(toolNode);
+			toolsNode.addObjectToElement("tool", tool);
+//			tool->addXml(toolNode);
+//			toolsNode.appendChild(toolNode);
 		}
 	}
-	base.appendChild(toolsNode);
+//	base.appendChild(toolsNode);
 }
 
 void ToolManagerUsingIGSTK::clear()
@@ -938,23 +949,41 @@ void ToolManagerUsingIGSTK::parseXml(QDomNode& dataNode)
 	if (dataNode.isNull())
 		return;
 
+	XMLNodeParser base(dataNode);
+
 	QString manualToolText = dataNode.namedItem("manualTool").toElement().text();
 	mManualTool->set_prMt(Transform3D::fromString(manualToolText));
 
+	mToolTipOffset = base.parseDoubleFromElementWithDefault("toolTipOffset", 0.0);
+
 	//Tools
 	ToolManager::ToolMap tools = this->getTools();
-	QDomNode toolssNode = dataNode.namedItem("tools");
-	QDomElement toolNode = toolssNode.firstChildElement("tool");
-	for (; !toolNode.isNull(); toolNode = toolNode.nextSiblingElement("tool"))
+//	QDomNode toolssNode = dataNode.namedItem("tools");
+	XMLNodeParser toolssNode(dataNode.namedItem("tools"));
+	std::vector<QDomElement> toolNodes = toolssNode.getDuplicateElements("tool");
+
+	for (unsigned i=0; i<toolNodes.size(); ++i)
 	{
-		QDomElement base = toolNode.toElement();
-		QString tool_uid = base.attribute("uid");
+		QDomElement toolNode = toolNodes[i];
+		QString tool_uid = toolNode.attribute("uid");
 		if (tools.find(tool_uid) != tools.end())
 		{
 			cxToolPtr tool = boost::dynamic_pointer_cast<ToolUsingIGSTK>(tools.find(tool_uid)->second);
 			tool->parseXml(toolNode);
 		}
 	}
+
+//	QDomElement toolNode = toolssNode.firstChildElement("tool");
+//	for (; !toolNode.isNull(); toolNode = toolNode.nextSiblingElement("tool"))
+//	{
+//		QDomElement base = toolNode.toElement();
+//		QString tool_uid = base.attribute("uid");
+//		if (tools.find(tool_uid) != tools.end())
+//		{
+//			cxToolPtr tool = boost::dynamic_pointer_cast<ToolUsingIGSTK>(tools.find(tool_uid)->second);
+//			tool->parseXml(toolNode);
+//		}
+//	}
 }
 
 ManualToolPtr ToolManagerUsingIGSTK::getManualTool()

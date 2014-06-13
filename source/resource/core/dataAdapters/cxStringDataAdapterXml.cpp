@@ -40,8 +40,7 @@ StringDataAdapterXml::StringDataAdapterXml() : 	mIsReadOnly(false)
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
-StringDataAdapterXmlPtr StringDataAdapterXml::initialize(const QString& uid, QString name, QString help, QString value,
-	QStringList range, QDomNode root)
+StringDataAdapterXmlPtr StringDataAdapterXml::initialize(const QString& uid, QString name, QString help, QString value, QStringList range, QDomNode root)
 {
 	StringDataAdapterXmlPtr retval(new StringDataAdapterXml());
 	retval->mUid = uid;

@@ -14,7 +14,7 @@
 #ifndef CXTESTSYNTHETICVOLUMECOMPARER_H
 #define CXTESTSYNTHETICVOLUMECOMPARER_H
 
-#include "TordReconstruct/cxSimpleSyntheticVolume.h"
+#include "cxSimpleSyntheticVolume.h"
 
 namespace cxtest
 {

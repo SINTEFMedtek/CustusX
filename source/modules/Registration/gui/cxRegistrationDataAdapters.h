@@ -28,18 +28,12 @@ class RegistrationFixedImageStringDataAdapter : public SelectDataStringDataAdapt
 {
   Q_OBJECT
 public:
-//  static RegistrationFixedImageStringDataAdapterPtr New() { return RegistrationFixedImageStringDataAdapterPtr(new RegistrationFixedImageStringDataAdapter()); }
   RegistrationFixedImageStringDataAdapter(RegistrationManagerPtr regManager);
   virtual ~RegistrationFixedImageStringDataAdapter() {}
 
 public: // basic methods
-//  virtual QString getValueName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
-
-public: // optional methods
-//  virtual QString getHelp() const;
-//  virtual DataPtr getData() const;
 
 private:
   RegistrationManagerPtr mManager;
@@ -53,18 +47,12 @@ class RegistrationMovingImageStringDataAdapter : public SelectDataStringDataAdap
 {
   Q_OBJECT
 public:
-//  static RegistrationMovingImageStringDataAdapterPtr New() { return RegistrationMovingImageStringDataAdapterPtr(new RegistrationMovingImageStringDataAdapter()); }
   RegistrationMovingImageStringDataAdapter(RegistrationManagerPtr regManager);
   virtual ~RegistrationMovingImageStringDataAdapter() {}
 
 public: // basic methods
-//  virtual QString getValueName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
-
-public: // optional methods
-//  virtual QString getHelp() const;
-//  virtual DataPtr getData() const;
 
 private:
   RegistrationManagerPtr mManager;

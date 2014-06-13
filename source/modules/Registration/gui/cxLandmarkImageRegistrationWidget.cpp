@@ -21,6 +21,7 @@
 #include "cxToolManager.h"
 #include "cxLandmarkRep.h"
 #include "cxView.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {
@@ -28,7 +29,8 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegistrationMan
 	QString objectName, QString windowTitle) :
 	LandmarkRegistrationWidget(regManager, parent, objectName, windowTitle)
 {
-	mActiveImageAdapter = ActiveImageStringDataAdapter::New();
+	mCurrentDataAdapter = SelectDataStringDataAdapter::New();
+	connect(mCurrentDataAdapter.get(), SIGNAL(changed()), this, SLOT(onCurrentImageChanged()));
 	mImageLandmarkSource = ImageLandmarksSource::New();
 
 	mDominantToolProxy = DominantToolProxy::New(trackingService());
@@ -52,7 +54,7 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegistrationMan
 	connect(mRemoveLandmarkButton, SIGNAL(clicked()), this, SLOT(removeLandmarkButtonClickedSlot()));
 
 	//layout
-	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mActiveImageAdapter));
+	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mCurrentDataAdapter));
 	mVerticalLayout->addWidget(mLandmarkTableWidget);
 	mVerticalLayout->addWidget(mAvarageAccuracyLabel);
 
@@ -77,23 +79,15 @@ QString LandmarkImageRegistrationWidget::defaultWhatsThis() const
 		"</html>";
 }
 
-void LandmarkImageRegistrationWidget::activeImageChangedSlot()
+void LandmarkImageRegistrationWidget::onCurrentImageChanged()
 {
-	LandmarkRegistrationWidget::activeImageChangedSlot();
+	DataPtr data = mCurrentDataAdapter->getData();
 
-	ImagePtr image = dataManager()->getActiveImage();
-
-	if (image)
-	{
-		if (!mManager->getFixedData())
-			mManager->setFixedData(image);
-	}
-
-	mImageLandmarkSource->setImage(image);
-
-	//enable the add point button
-	//  mAddLandmarkButton->setEnabled(image!=0);
+	mImageLandmarkSource->setData(data);
 	this->enableButtons();
+
+	if (data && !mManager->getFixedData())
+		mManager->setFixedData(data);
 }
 
 PickerRepPtr LandmarkImageRegistrationWidget::getPickerRep()
@@ -102,6 +96,11 @@ PickerRepPtr LandmarkImageRegistrationWidget::getPickerRep()
 		return PickerRepPtr();
 
 	return RepManager::findFirstRep<PickerRep>(viewManager()->get3DView(0, 0)->getReps());
+}
+
+DataPtr LandmarkImageRegistrationWidget::getCurrentData() const
+{
+	return mImageLandmarkSource->getData();
 }
 
 void LandmarkImageRegistrationWidget::addLandmarkButtonClickedSlot()
@@ -113,7 +112,7 @@ void LandmarkImageRegistrationWidget::addLandmarkButtonClickedSlot()
 		return;
 	}
 
-	ImagePtr image = dataManager()->getActiveImage();
+	DataPtr image = this->getCurrentData();
 	if (!image)
 		return;
 
@@ -135,7 +134,7 @@ void LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot()
 		return;
 	}
 
-	ImagePtr image = dataManager()->getActiveImage();
+	DataPtr image = this->getCurrentData();
 	if (!image)
 		return;
 
@@ -149,7 +148,7 @@ void LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot()
 
 void LandmarkImageRegistrationWidget::removeLandmarkButtonClickedSlot()
 {
-	ImagePtr image = dataManager()->getActiveImage();
+	DataPtr image = this->getCurrentData();
 	if (!image)
 		return;
 
@@ -167,31 +166,32 @@ void LandmarkImageRegistrationWidget::cellClickedSlot(int row, int column)
 void LandmarkImageRegistrationWidget::enableButtons()
 {
 	bool selected = !mLandmarkTableWidget->selectedItems().isEmpty();
-	bool loaded = dataManager()->getActiveImage() != 0;
-
-	// you might want to add landmarks using the tracking pointer in rare cases.
-	// Thus is must be allowed to do that.
-//	mEditLandmarkButton->setEnabled(selected && !tracking);
-//	mRemoveLandmarkButton->setEnabled(selected && !tracking);
-//	mAddLandmarkButton->setEnabled(loaded && !tracking);
+	bool loaded = this->getCurrentData() != 0;
 
 	mEditLandmarkButton->setEnabled(selected);
 	mRemoveLandmarkButton->setEnabled(selected);
 	mAddLandmarkButton->setEnabled(loaded);
 
-	ImagePtr image = dataManager()->getActiveImage();
+	DataPtr image = this->getCurrentData();
 	if (image)
 	{
 		mAddLandmarkButton->setToolTip(QString("Add landmark to image %1").arg(image->getName()));
 		mEditLandmarkButton->setToolTip(QString("Resample landmark in image %1").arg(image->getName()));
 	}
-
-
+//	this->setModified();
 }
 
 void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
 {
 	LandmarkRegistrationWidget::showEvent(event);
+
+	ImagePtr image = dataManager()->getActiveImage();
+	if (image)
+		mCurrentDataAdapter->setValue(image->getUid());
+//	if (image && !mManager->getFixedData())
+//		mManager->setFixedData(image);
+//	if (image && !mImageLandmarkSource->getData())
+//		mImageLandmarkSource->setData(image);
 
 	viewManager()->setRegistrationMode(rsIMAGE_REGISTRATED);
 	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0, 0)->getReps());
@@ -231,7 +231,7 @@ void LandmarkImageRegistrationWidget::prePaintEvent()
 
 LandmarkMap LandmarkImageRegistrationWidget::getTargetLandmarks() const
 {
-	ImagePtr image = dataManager()->getActiveImage();
+	DataPtr image = this->getCurrentData();
 	if (!image)
 		return LandmarkMap();
 
@@ -243,7 +243,7 @@ LandmarkMap LandmarkImageRegistrationWidget::getTargetLandmarks() const
  */
 Transform3D LandmarkImageRegistrationWidget::getTargetTransform() const
 {
-	ImagePtr image = dataManager()->getActiveImage();
+	DataPtr image = this->getCurrentData();
 	if (!image)
 		return Transform3D::Identity();
 	return image->get_rMd();
@@ -251,7 +251,7 @@ Transform3D LandmarkImageRegistrationWidget::getTargetTransform() const
 
 void LandmarkImageRegistrationWidget::setTargetLandmark(QString uid, Vector3D p_target)
 {
-	ImagePtr image = dataManager()->getActiveImage();
+	DataPtr image = this->getCurrentData();
 	if (!image)
 		return;
 	image->getLandmarks()->setLandmark(Landmark(uid, p_target));
@@ -259,7 +259,7 @@ void LandmarkImageRegistrationWidget::setTargetLandmark(QString uid, Vector3D p_
 
 QString LandmarkImageRegistrationWidget::getTargetName() const
 {
-	ImagePtr image = dataManager()->getActiveImage();
+	DataPtr image = this->getCurrentData();
 	if (!image)
 		return "None";
 	return image->getName();

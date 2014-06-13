@@ -12,57 +12,52 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxExamplePluginActivator.h"
+#include "cxPNNReconstructionPluginActivator.h"
 
 #include <QtPlugin>
 #include <iostream>
 
-#include "cxExampleGUIExtenderService.h"
+#include "cxPNNReconstructionService.h"
 
 namespace cx
 {
 
-ExamplePluginActivator::ExamplePluginActivator()
+PNNReconstructionPluginActivator::PNNReconstructionPluginActivator()
 : mContext(0)
 {
-	std::cout << "Created ExamplePluginActivator" << std::endl;
 }
 
-ExamplePluginActivator::~ExamplePluginActivator()
+PNNReconstructionPluginActivator::~PNNReconstructionPluginActivator()
 {
 
 }
 
-void ExamplePluginActivator::start(ctkPluginContext* context)
+void PNNReconstructionPluginActivator::start(ctkPluginContext* context)
 {
-	std::cout << "Started ExamplePluginActivator" << std::endl;
 	this->mContext = context;
 
-	mPlugin.reset(new ExampleGUIExtenderService);
-	std::cout << "created example service" << std::endl;
+	mPlugin.reset(new PNNReconstructionService);
 	try
 	{
-		mRegistration = context->registerService(QStringList(GUIExtenderService_iid), mPlugin.get());
+		mRegistration = context->registerService(QStringList(ReconstructionService_iid), mPlugin.get());
 	}
 	catch(ctkRuntimeException& e)
 	{
 		std::cout << e.what() << std::endl;
 		mPlugin.reset();
 	}
-	std::cout << "registered example service" << std::endl;
 }
 
-void ExamplePluginActivator::stop(ctkPluginContext* context)
+void PNNReconstructionPluginActivator::stop(ctkPluginContext* context)
 {
 	mRegistration.unregister();
 	if(mPlugin)
 		mPlugin.reset();
-	std::cout << "Stopped ExamplePluginActivator" << std::endl;
 	Q_UNUSED(context)
 }
 
 } // namespace cx
 
-Q_EXPORT_PLUGIN2(ExamplePluginActivator_irrelevant_string, cx::ExamplePluginActivator)
+Q_EXPORT_PLUGIN2(PNNReconstructionPluginActivator_irrelevant_string, cx::PNNReconstructionPluginActivator)
 
 

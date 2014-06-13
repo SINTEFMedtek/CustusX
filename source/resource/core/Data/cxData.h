@@ -38,6 +38,7 @@ namespace cx
 {
 typedef boost::weak_ptr<class Rep> RepWeakPtr;
 typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
+typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 
 /**Denotes the various states
  * of registration an object is in.
@@ -67,6 +68,7 @@ public:
 	void setAcquisitionTime(QDateTime time);
 	void setRegistrationStatus(REGISTRATION_STATUS regStat);
 	virtual RegistrationHistoryPtr get_rMd_History();
+	LandmarksPtr getLandmarks();
 
 	virtual QString getUid() const; ///< \return unique id for this instance
 	virtual QString getName() const; /// \return a descriptive name for this instance
@@ -114,6 +116,7 @@ protected:
 	QString mName;
 	QString mFilename;
 	QDateTime mAcquisitionTime;
+	LandmarksPtr mLandmarks;
 
 	REGISTRATION_STATUS mRegistrationStatus;
 	RegistrationHistoryPtr m_rMd_History;
