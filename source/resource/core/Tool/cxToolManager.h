@@ -37,6 +37,8 @@ namespace cx
 typedef std::map<ToolPtr, TimedTransformMap> SessionToolHistoryMap;
 typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
+typedef boost::shared_ptr<class TrackerConfiguration> TrackerConfigurationPtr;
+
 
 /**\brief Manager interface for tools and tracking systems.
  *
@@ -91,6 +93,7 @@ public:
 	virtual void setLoggingFolder(QString loggingFolder) {}
 	virtual void runDummyTool(DummyToolPtr tool) {}
 	virtual QStringList getSupportedTrackingSystems() { return QStringList(); }
+	virtual TrackerConfigurationPtr getConfiguration() = 0;
 
 public slots:
 	virtual void saveToolsSlot() {}

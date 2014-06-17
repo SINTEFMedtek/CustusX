@@ -112,6 +112,7 @@ public:
 	virtual ToolPtr findFirstProbe();
 
 	virtual void setPlaybackMode(PlaybackTimePtr controller);
+	virtual TrackerConfigurationPtr getConfiguration();
 
 signals:
 	void probeAvailable(); ///< Emitted when a probe is configured

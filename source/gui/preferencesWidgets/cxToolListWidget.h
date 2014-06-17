@@ -3,7 +3,7 @@
 
 #include <QListWidget>
 
-#include "cxIgstkTool.h"
+//#include "cxIgstkTool.h"
 class QDir;
 class QListWidgetItem;
 
@@ -37,7 +37,7 @@ protected:
   void populate(QStringList toolsAbsoluteFilePath);
   void addTool(QString absoluteFilePath);
 
-  IgstkTool::InternalStructure getToolInternal(QString toolAbsoluteFilePath);
+//  IgstkTool::InternalStructure getToolInternal(QString toolAbsoluteFilePath);
 
 private slots:
   void selectionChangedSlot();
@@ -71,7 +71,7 @@ protected:
   void startDrag();
 
 private:
-  QStringList getAbsoluteFilePathToAllTools(QDir dir); ///< get absolute file path to all tool.xml files in folder dir and all subfolders
+//  QStringList getAbsoluteFilePathToAllTools(QDir dir); ///< get absolute file path to all tool.xml files in folder dir and all subfolders
   QStringList filter(QStringList toolsToFilter, QStringList applicationsFilter, QStringList trackingsystemsFilter); ///<
   QPoint startPos;
 };

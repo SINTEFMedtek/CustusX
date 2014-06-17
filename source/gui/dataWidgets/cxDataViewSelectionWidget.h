@@ -25,7 +25,6 @@ namespace cx
 /**
  * Base class for displaying Data items.
  */
-
 class DataListWidget : public QListWidget
 {
   Q_OBJECT
@@ -33,23 +32,17 @@ class DataListWidget : public QListWidget
 public:
   DataListWidget(QWidget* parent = NULL);
   virtual ~DataListWidget();
-//	virtual QSize minimumSizeHint () const;
   virtual QSize sizeHint() const;
 
 signals:
-//  void dataSelected(QString uid);
   void userChangedList(); ///< emitted whenever the user changes the list
   void listSizeChanged(); ///< emitted whenever the count changes
 
 protected:
   void populate(QStringList dataUids);
-//  void populateData(QString uid);
   void populateData(QString uid, bool indent=false, QListWidgetItem* after = NULL);
 
-//  Tool::InternalStructure getToolInternal(QString toolAbsoluteFilePath);
-
 private slots:
-//  void dataClickedSlot(QListWidgetItem* item);
   void itemSelectionChangedSlot();
 };
 
