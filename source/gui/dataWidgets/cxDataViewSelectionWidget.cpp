@@ -20,7 +20,7 @@
 #include "cxEnumConverter.h"
 #include "cxReporter.h"
 #include "cxDataLocations.h"
-#include "cxToolConfigurationParser.h"
+//#include "cxToolConfigurationParser.h"
 #include "cxImageAlgorithms.h"
 #include "cxImage.h"
 #include "cxViewManager.h"

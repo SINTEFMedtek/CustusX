@@ -194,21 +194,24 @@ endmacro()
 # Create testing lib and small catch executable for the incoming lib.
 ###############################################################################
 function(_cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES ADDITIONAL_LIBS)
-    message(STATUS "Adding catch test targets based on: ${LIB_TO_TEST}")
-    include_directories(
+	set(TEST_LIB_NAME "cxtestCatch${LIB_TO_TEST}")
+
+	message(STATUS "Adding catch test targets based on: ${LIB_TO_TEST}")
+#    message(STATUS "          Lib name : ${TEST_LIB_NAME}")
+
+	include_directories(
         .
         ${CustusX3_SOURCE_DIR}/source/resource/testUtilities
         ${CustusX3_SOURCE_DIR}/source/ThirdParty/catch)
 
     cx_catch__private_define_platform_specific_linker_options()
-    set(TEST_LIB_NAME "cxtestCatch${LIB_TO_TEST}")
 
     QT4_WRAP_CPP(MOCCED ${MOC_SOURCES})
 
 
     cx_add_test_library(${TEST_LIB_NAME} ${SOURCES} ${MOCCED})
 #    add_library(${TEST_LIB_NAME} ${CX_CATCH_SHARED_LIB_TYPE} ${SOURCES} ${MOCCED})
-    message(STATUS "          Lib name : ${TEST_LIB_NAME}")
+#    message(STATUS "          Lib name : ${TEST_LIB_NAME}")
 	target_link_libraries(${TEST_LIB_NAME} ${LIB_TO_TEST} cxtestUtilities ${ADDITIONAL_LIBS})
     
     set(CX_TEST_CATCH_GENERATED_LIBRARIES
