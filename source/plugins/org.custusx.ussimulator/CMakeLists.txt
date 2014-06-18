@@ -16,7 +16,6 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/gui/dataAdapters
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/logic
-    ${CustusX3_SOURCE_DIR}/source/gui/pluginFrameworkWidgets
     ${CustusX3_SOURCE_DIR}/source/resource/pluginUtilities
     )
 
