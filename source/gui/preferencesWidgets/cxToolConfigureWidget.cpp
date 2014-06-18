@@ -14,6 +14,7 @@
 #include "cxToolListWidget.h"
 #include "cxDataLocations.h"
 #include "cxApplicationStateMachine.h"
+#include "cxTrackerConfiguration.h"
 
 namespace cx
 {
@@ -120,10 +121,13 @@ QString ToolConfigureGroupBox::requestSaveConfigurationSlot()
   // deconfigure toolmanager in order to be able to reread config data
   toolManager()->deconfigure();
 
-  ConfigurationFileParser::Configuration config = this->getCurrentConfiguration();
-  ConfigurationFileParser::saveConfiguration(config);
+  TrackerConfiguration::Configuration current = this->getCurrentConfiguration();
+  TrackerConfigurationPtr config = toolManager()->getConfiguration();
+  config->saveConfiguration(current);
+//  ConfigurationFileParser::Configuration config = this->getCurrentConfiguration();
+//  ConfigurationFileParser::saveConfiguration(config);
 
-  retval = config.mFileName;
+  retval = current.mFileName;
 
   this->populateConfigurations();
 
@@ -160,22 +164,29 @@ void ToolConfigureGroupBox::configChangedSlot()
 	}
 	else
 	{
-		ConfigurationFileParser parser(absoluteConfigFilePath);
+		TrackerConfigurationPtr config = toolManager()->getConfiguration();
+		TrackerConfiguration::Configuration data = config->getConfiguration(absoluteConfigFilePath);
 
-		CLINICAL_APPLICATION application = parser.getApplicationapplication();
-		selectedApplications << enum2string(application);
+		selectedApplications << data.mClinicalApplication;
+		selectedTrackingSystems << data.mTrackingSystem;
+		selectedTools = data.mTools;
 
-		std::vector<IgstkTracker::InternalStructure> trackers = parser.getTrackers();
-		for (unsigned i = 0; i < trackers.size(); ++i)
-		{
-			selectedTrackingSystems << enum2string(trackers[i].mType);
-		}
+//		ConfigurationFileParser parser(absoluteConfigFilePath);
 
-		std::vector<QString> tools = parser.getAbsoluteToolFilePaths();
-		for (unsigned i = 0; i < tools.size(); ++i)
-		{
-			selectedTools << tools[i];
-		}
+//		CLINICAL_APPLICATION application = parser.getApplicationapplication();
+//		selectedApplications << enum2string(application);
+
+//		std::vector<IgstkTracker::InternalStructure> trackers = parser.getTrackers();
+//		for (unsigned i = 0; i < trackers.size(); ++i)
+//		{
+//			selectedTrackingSystems << enum2string(trackers[i].mType);
+//		}
+
+//		std::vector<QString> tools = parser.getAbsoluteToolFilePaths();
+//		for (unsigned i = 0; i < tools.size(); ++i)
+//		{
+//			selectedTools << tools[i];
+//		}
 		suggestDefaultNames = false;
 	}
 
@@ -287,39 +298,43 @@ void ToolConfigureGroupBox::setState(QComboBox* box, int index, bool edited)
   }
 }
 
-ConfigurationFileParser::Configuration ToolConfigureGroupBox::getCurrentConfiguration()
+TrackerConfiguration::Configuration ToolConfigureGroupBox::getCurrentConfiguration()
 {
-  ConfigurationFileParser::Configuration retval;
+  TrackerConfiguration::Configuration retval;
   QString filename = mConfigFileLineEdit->text();
   QString filepath = mConfigFilePathLineEdit->text();
   retval.mFileName = filepath+"/"+filename;
-  retval.mClinical_app = string2enum<CLINICAL_APPLICATION>(mApplicationGroupBox->getSelected()[0]);
+//  retval.mClinical_app = string2enum<CLINICAL_APPLICATION>(mApplicationGroupBox->getSelected()[0]);
+  retval.mClinicalApplication = mApplicationGroupBox->getSelected()[0];
+  retval.mTrackingSystem = mTrackingSystemGroupBox->getSelected()[0];
+  retval.mTools = mToolListWidget->getTools();
+  retval.mReferenceTool = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
 
-  QStringList selectedTools = mToolListWidget->getTools();
-  QString referencePath = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
+//  QStringList selectedTools = mToolListWidget->getTools();
+//  QString referencePath = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
 
-  TRACKING_SYSTEM selectedTracker = string2enum<TRACKING_SYSTEM>(mTrackingSystemGroupBox->getSelected()[0]);
+//  TRACKING_SYSTEM selectedTracker = string2enum<TRACKING_SYSTEM>(mTrackingSystemGroupBox->getSelected()[0]);
 
-  ConfigurationFileParser::ToolFilesAndReferenceVector toolfilesAndRefVector;
-  QFile configFile(retval.mFileName);
-  QFileInfo info(configFile);
-  QDir dir = info.dir();
-  foreach(QString absoluteToolPath, selectedTools)
-  {
-    QString relativeToolFilePath = dir.relativeFilePath(absoluteToolPath);
-//    std::cout << "Relative tool file path: " << relativeToolFilePath << std::endl;
+//  ConfigurationFileParser::ToolFilesAndReferenceVector toolfilesAndRefVector;
+//  QFile configFile(retval.mFileName);
+//  QFileInfo info(configFile);
+//  QDir dir = info.dir();
+//  foreach(QString absoluteToolPath, selectedTools)
+//  {
+//    QString relativeToolFilePath = dir.relativeFilePath(absoluteToolPath);
+////    std::cout << "Relative tool file path: " << relativeToolFilePath << std::endl;
 
-    ConfigurationFileParser::ToolFileAndReference tool;
-    tool.first = relativeToolFilePath;
+//    ConfigurationFileParser::ToolFileAndReference tool;
+//    tool.first = relativeToolFilePath;
 
-//    std::cout << "====" << std::endl;
-//    std::cout << "absoluteToolPath " << absoluteToolPath << std::endl;
-//    std::cout << "referencePath " << referencePath << std::endl;
-    tool.second = (absoluteToolPath == referencePath);
-    toolfilesAndRefVector.push_back(tool);
-  }
+////    std::cout << "====" << std::endl;
+////    std::cout << "absoluteToolPath " << absoluteToolPath << std::endl;
+////    std::cout << "referencePath " << referencePath << std::endl;
+//    tool.second = (absoluteToolPath == referencePath);
+//    toolfilesAndRefVector.push_back(tool);
+//  }
 
-  retval.mTrackersAndTools[selectedTracker] = toolfilesAndRefVector;
+//  retval.mTrackersAndTools[selectedTracker] = toolfilesAndRefVector;
 
   return retval;
 }
@@ -371,13 +386,16 @@ void ToolConfigureGroupBox::populateReference()
 
 	int currentIndex = -1;
 
+	TrackerConfigurationPtr config = toolManager()->getConfiguration();
+
 	// populate list
 	QStringList selectedTools = mToolListWidget->getTools();
 	foreach(QString string, selectedTools)
 	{
-		ToolFileParser parser(string);
-		IgstkTool::InternalStructure internal = parser.getTool();
-		if (internal.mIsReference)
+		if (config->getTool(string).mIsReference)
+//		ToolFileParser parser(string);
+//		IgstkTool::InternalStructure internal = parser.getTool();
+//		if (internal.mIsReference)
 		{
 			currentIndex = this->addRefrenceToComboBox(string);
 		}
@@ -385,8 +403,9 @@ void ToolConfigureGroupBox::populateReference()
 
 	// look for a selected reference
 	QString configAbsoluteFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
-	ConfigurationFileParser parser(configAbsoluteFilePath);
-	QString reference = parser.getAbsoluteReferenceFilePath();
+//	ConfigurationFileParser parser(configAbsoluteFilePath);
+//	QString reference = parser.getAbsoluteReferenceFilePath();
+	QString reference = config->getConfiguration(configAbsoluteFilePath).mReferenceTool;
 	currentIndex = this->addRefrenceToComboBox(reference);
 
 	// always select a reference if available:

@@ -39,7 +39,7 @@ TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][syntheti
 
 	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 	reconstructer->selectData(inputData);
-	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNNService");
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
 	// set an algorithm-specific parameter
 	fixture.setPNN_InterpolationSteps(1);
@@ -81,7 +81,7 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 
 	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 	reconstructer->selectData(inputData);
-	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNNService");//default
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
 	reconstructer->getParams()->mAngioAdapter->setValue(true);
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
 	// set an algorithm-specific parameter
@@ -114,7 +114,7 @@ TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstru
 	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 
 	reconstructer->selectData(realData.getSourceFilename());
-	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNNService");
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");
 	reconstructer->getParams()->mAngioAdapter->setValue(true);
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
 	// set an algorithm-specific parameter
@@ -134,7 +134,7 @@ TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruc
 	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 
 	reconstructer->selectData(realData.getSourceFilename());
-	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNNService");
+	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");
 	reconstructer->getParams()->mAngioAdapter->setValue(true);
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(true);
 	// set an algorithm-specific parameter

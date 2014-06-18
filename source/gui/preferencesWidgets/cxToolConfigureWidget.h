@@ -4,8 +4,9 @@
 #include <QGroupBox>
 
 #include "cxDefinitions.h"
-#include "cxToolConfigurationParser.h"
+//#include "cxToolConfigurationParser.h"
 #include "cxLegacySingletons.h"
+#include "cxTrackerConfiguration.h"
 
 class QComboBox;
 class QLineEdit;
@@ -67,7 +68,8 @@ private:
   void populateConfigurations(); ///< populates the combobox with all config files from the current application application
   int addConfigurationToComboBox(QString displayName, QString absoluteFilePath, bool edited = false); ///< adds a new configuration file item to the combobox
   void setState(QComboBox* box, int index, bool edited); ///< sets the state of a configuration file to be either edited or not, decides whether to save or not
-  ConfigurationFileParser::Configuration getCurrentConfiguration();
+//  ConfigurationFileParser::Configuration getCurrentConfiguration();
+  TrackerConfiguration::Configuration getCurrentConfiguration();
   QString generateConfigName(); ///< generates a name based on the current configuration
 
   void setState(QLineEdit* line, bool userEdited);
