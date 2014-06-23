@@ -75,7 +75,13 @@ bool SimulatedImageStreamer::initUSSimulator()
 
 bool SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServicePtr dataManager)
 {
-	if(!image || !tool || !dataManager)
+	this->setSourceImage(image);
+	return initialize(tool, dataManager);
+}
+
+bool SimulatedImageStreamer::initialize(ToolPtr tool, DataServicePtr dataManager)
+{
+	if(!mSourceImage || !tool || !dataManager)
 	{
 		this->setInitialized(false);
 		return false;
@@ -83,7 +89,6 @@ bool SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServic
 	mDataManager = dataManager;
 	this->createSendTimer();
 
-	this->setSourceImage(image);
 	mTool = tool;
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(sliceSlot()));
 	connect(mTool->getProbe().get(), SIGNAL(activeConfigChanged()), this, SLOT(resetMask()));
@@ -91,8 +96,6 @@ bool SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServic
 
 	this->resetMask();
 	this->defineSectorInSimulator();
-
-//	this->generateMaskSlot();
 
 	bool initialized = true;
 
