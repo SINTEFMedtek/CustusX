@@ -88,6 +88,8 @@ void LandmarkImageRegistrationWidget::onCurrentImageChanged()
 
 	if (data && !mManager->getFixedData())
 		mManager->setFixedData(data);
+
+	this->setModified();
 }
 
 PickerRepPtr LandmarkImageRegistrationWidget::getPickerRep()

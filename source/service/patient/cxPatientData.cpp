@@ -133,7 +133,7 @@ void PatientData::clearPatient()
 {
 	mDataManager->clear();
 
-	QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
+//	QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
 
 	this->setActivePatient(this->getNullFolder());
 
@@ -194,8 +194,10 @@ void PatientData::startupLoadPatient()
 			report(QString("Startup Load [%1] as recent patient").arg(folder));
 	}
 
+//	if (folder.isEmpty())
+//		return;
 	if (folder.isEmpty())
-		return;
+		folder = this->getNullFolder();
 
 	this->loadPatient(folder);
 }

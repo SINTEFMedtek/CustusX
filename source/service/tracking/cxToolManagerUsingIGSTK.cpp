@@ -43,6 +43,7 @@
 #include "cxPlaybackTime.h"
 #include "cxTrackingPositionFilter.h"
 #include "cxXMLNodeWrapper.h"
+#include "cxTrackerConfigurationImpl.h"
 
 namespace cx
 {
@@ -1018,6 +1019,14 @@ ToolPtr ToolManagerUsingIGSTK::findFirstProbe()
 			return iter->second;
 
 	return ToolPtr();
+}
+
+
+TrackerConfigurationPtr ToolManagerUsingIGSTK::getConfiguration()
+{
+	TrackerConfigurationPtr retval;
+	retval.reset(new TrackerConfigurationImpl());
+	return retval;
 }
 
 

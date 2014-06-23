@@ -2,6 +2,7 @@
 ##               Tracking Service
 ###########################################################
 
+cx_initialize_IGSTK()
 
 SET( CX_QT_MOC_HEADER_FILES
     cxToolManagerUsingIGSTK.h
@@ -40,6 +41,8 @@ SET ( cxTrackingService_SOURCE
     cxDominantToolProxy.cpp
     cxPlaybackTool.h
     cxPlaybackTool.cpp
+	cxTrackerConfigurationImpl.h
+	cxTrackerConfigurationImpl.cpp
 )
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
@@ -47,6 +50,6 @@ include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( cxTrackingService ${cxTrackingService_SOURCE} ${MOC_HEADER_FILES})
-target_link_libraries(cxTrackingService IGSTK cxResource)
+target_link_libraries(cxTrackingService LINK_PUBLIC cxResource LINK_PRIVATE IGSTK)
 
 ADD_SUBDIRECTORY( testing )

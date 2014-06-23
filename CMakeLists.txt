@@ -85,8 +85,8 @@ include_directories( /opt/X11/include )
 # External libraries
 #------------------------------------------------------------------------------
 
-cx_initialize_cppunit()
-cx_initialize_opencv()
+#cx_initialize_cppunit()
+#cx_initialize_opencv()
 
 #------------------------------------------------------------------------------
 # Add subdirectories

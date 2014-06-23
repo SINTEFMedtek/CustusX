@@ -353,6 +353,12 @@ endfunction()
 #
 ###############################################################################
 function(cxCreateConfigurationDescription)
+
+cx_initialize_cppunit()
+cx_initialize_opencv()
+cx_initialize_OpenIGTLink()
+cx_initialize_IGSTK()
+
 	cx_assert_variable_exists(${CustusX3_VERSION_STRING})
 	cx_assert_variable_exists(${SSC_USE_GCOV})
 	cx_assert_variable_exists(${CX_USE_TSF})

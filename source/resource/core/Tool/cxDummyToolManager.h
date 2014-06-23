@@ -80,6 +80,7 @@ public:
 
 	void addTool(DummyToolPtr tool);
 	virtual ToolPtr findFirstProbe() { return ToolPtr(); }
+	virtual TrackerConfigurationPtr getConfiguration() { return TrackerConfigurationPtr(); }
 
 private:
 	typedef DummyToolMap::iterator DummyToolMapIter;

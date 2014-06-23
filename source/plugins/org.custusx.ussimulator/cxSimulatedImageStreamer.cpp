@@ -167,12 +167,6 @@ void SimulatedImageStreamer::sliceSlot()
 	mCachedImageToSend.reset();
 }
 
-void SimulatedImageStreamer::setSourceToImageSlot(QString imageUid)
-{
-	ImagePtr image = mDataManager->getImage(imageUid);
-	this->setSourceImage(image);
-}
-
 void SimulatedImageStreamer::setSourceImage(ImagePtr image)
 {
 	mSourceImage = image;

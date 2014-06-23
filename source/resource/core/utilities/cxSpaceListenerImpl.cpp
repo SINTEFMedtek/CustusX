@@ -65,7 +65,7 @@ void SpaceListenerImpl::doConnect()
 		if (data)
 		{
 			connect(data.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
-			connect(mDataManager.get(), SIGNAL(dataAddedOrRemoved(QString)), this, SIGNAL(changed()));
+			connect(mDataManager.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(changed()));
 		}
 	}
 
@@ -100,7 +100,7 @@ void SpaceListenerImpl::doDisconnect()
 		if (data)
 		{
 			disconnect(data.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
-			disconnect(mDataManager.get(), SIGNAL(dataAddedOrRemoved(QString)), this, SIGNAL(changed()));
+			disconnect(mDataManager.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(changed()));
 		}
 	}
 

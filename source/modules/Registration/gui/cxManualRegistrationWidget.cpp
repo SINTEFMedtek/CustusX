@@ -41,13 +41,16 @@ ManualImageRegistrationWidget::ManualImageRegistrationWidget(RegistrationManager
 	mVerticalLayout->addStretch();
 
 	connect(mManager.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingDataChanged()));
+}
 
+void ManualImageRegistrationWidget::showEvent(QShowEvent* event)
+{
 	this->imageMatrixChanged();
 	this->movingDataChanged();
 }
 
-/**Called when the moving data in the RegistrationManager has changed.
- * Update connections.
+/** Called when the moving data in the RegistrationManager has changed.
+ *  Update connections.
  */
 void ManualImageRegistrationWidget::movingDataChanged()
 {
@@ -59,10 +62,7 @@ void ManualImageRegistrationWidget::movingDataChanged()
 	if (mConnectedMovingImage)
 		connect(mConnectedMovingImage.get(), SIGNAL(transformChanged()), this, SLOT(imageMatrixChanged()));
 
-	if (mConnectedMovingImage)
-		mLabel->setText(QString("<b>Position Matrix rMd for data %1</b>").arg(mConnectedMovingImage->getName()));
-	else
-		mLabel->setText("Data matrix rMd");
+	mLabel->setText(this->getDescription());
 
 	mMatrixWidget->setEnabled(mConnectedMovingImage!=0);
 	this->imageMatrixChanged();
@@ -76,34 +76,97 @@ void ManualImageRegistrationWidget::matrixWidgetChanged()
 {
 	if (!mConnectedMovingImage)
 		return;
-
-	Transform3D rMd = mConnectedMovingImage->get_rMd();
-	Transform3D rMMd = mMatrixWidget->getMatrix();
-
-	Transform3D delta_pre_rMd = rMMd * rMd.inv(); // gives delta on the r (left) side.
-	mManager->applyImage2ImageRegistration(delta_pre_rMd, "Manual Image");
+	this->setMatrixFromWidget(mMatrixWidget->getMatrix());
 }
 
-/**Called when moving image has changed.
- * Updates the displayed matrix.
+/** Called when moving image has changed.
+ *  Updates the displayed matrix.
  */
 void ManualImageRegistrationWidget::imageMatrixChanged()
 {
 	mMatrixWidget->blockSignals(true);
 	if (mConnectedMovingImage)
-	{
-		mMatrixWidget->setMatrix(mConnectedMovingImage->get_rMd());
-	}
+		mMatrixWidget->setMatrix(this->getMatrixFromBackend());
 	else
-	{
 		mMatrixWidget->setMatrix(Transform3D::Identity());
-	}
 	mMatrixWidget->blockSignals(false);
 }
 
 QString ManualImageRegistrationWidget::defaultWhatsThis() const
 {
 	return QString();
+}
+
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+
+QString ManualImage2ImageRegistrationWidget::getDescription()
+{
+	if (this->isValid())
+		return QString("<b>Matrix fMm from moving to fixed image</b>");
+	else
+		return "<Invalid matrix>";
+}
+
+bool ManualImage2ImageRegistrationWidget::isValid() const
+{
+	return mManager->getMovingData() && mManager->getFixedData();
+}
+
+Transform3D ManualImage2ImageRegistrationWidget::getMatrixFromBackend()
+{
+	if (!this->isValid())
+		return Transform3D::Identity();
+
+	Transform3D rMm = mManager->getMovingData()->get_rMd();
+	Transform3D rMf = mManager->getFixedData()->get_rMd();
+	Transform3D fMm = rMf.inv() * rMm;
+	return fMm;
+}
+
+void ManualImage2ImageRegistrationWidget::setMatrixFromWidget(Transform3D M)
+{
+	if (!this->isValid())
+		return;
+
+	Transform3D rMm = mManager->getMovingData()->get_rMd();
+	Transform3D rMf = mManager->getFixedData()->get_rMd();
+	Transform3D fQm = M; // the modified fMm matrix
+
+	// start with
+	//   new registration = new registration
+	//                fQm = fMr * rMm'
+	//                fQm = fMr * delta * rMm
+	Transform3D delta = rMf * fQm * rMm.inv();
+
+	mManager->applyImage2ImageRegistration(delta, "Manual Image");
+}
+
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+
+QString ManualImageTransformRegistrationWidget::getDescription()
+{
+	if (mConnectedMovingImage)
+		return QString("<b>Position Matrix rMd for data %1</b>").arg(mConnectedMovingImage->getName());
+	else
+		return "<Invalid matrix>";
+}
+
+Transform3D ManualImageTransformRegistrationWidget::getMatrixFromBackend()
+{
+	return mConnectedMovingImage->get_rMd();
+}
+
+void ManualImageTransformRegistrationWidget::setMatrixFromWidget(Transform3D M)
+{
+	Transform3D rMd = mConnectedMovingImage->get_rMd();
+	Transform3D rMMd = M;
+
+	Transform3D delta_pre_rMd = rMMd * rMd.inv(); // gives delta on the r (left) side.
+	mManager->applyImage2ImageRegistration(delta_pre_rMd, "Manual Image rMd");
 }
 
 // --------------------------------------------------------
