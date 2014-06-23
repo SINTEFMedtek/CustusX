@@ -15,6 +15,9 @@
 
 #include "boost/shared_ptr.hpp"
 #include <QObject>
+#include <QDomElement>
+#include "cxDataAdapter.h"
+#include <vector>
 class QWidget;
 
 #define StreamerService_iid "cx::StreamerService"
@@ -26,6 +29,7 @@ namespace cx
 // The smart pointer can still be used if StreamerService is coming from another source than a ctk plugin
 typedef boost::shared_ptr<class StreamerService> StreamerServicePtr;
 typedef boost::shared_ptr<class Streamer> StreamerPtr;
+//typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
 
 /**
  * \brief Abstract class. Interface to Streamers
@@ -40,9 +44,14 @@ class StreamerService : public QObject
 	Q_OBJECT
 public:
 	StreamerService() {}
-	virtual StreamerPtr createStreamer() = 0;
-	virtual QWidget* createWidget() = 0;
 	virtual QString getName() = 0;
+	/**
+	 *  Fill settings for this algorithm.
+	 *  Input is the root node for this algo, filled with stored settings (if any).
+	 *  On completion, the root is filled with default values for settings.
+	 */
+	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root) = 0;
+	virtual StreamerPtr createStreamer(QDomElement root) = 0;
 };
 
 } //end namespace cx

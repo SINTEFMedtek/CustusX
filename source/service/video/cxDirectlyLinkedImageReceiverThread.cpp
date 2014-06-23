@@ -24,6 +24,8 @@
 #include "cxVideoServiceBackend.h"
 #include "cxStreamerService.h"
 #include "cxImageStreamer.h"
+#include "cxDataLocations.h"
+#include "cxXmlOptionItem.h"
 
 namespace cx
 {
@@ -36,7 +38,9 @@ void DirectlyLinkedImageReceiverThread::run()
 {
 	report("Starting direct link grabber.");
 
-	mImageStreamer = mStreamerInterface->createStreamer();
+	XmlOptionFile xmlFile = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("video");
+	QDomElement element = xmlFile.getElement("video");
+	mImageStreamer = mStreamerInterface->createStreamer(element);
 
 	if(!mImageStreamer)
 	{
