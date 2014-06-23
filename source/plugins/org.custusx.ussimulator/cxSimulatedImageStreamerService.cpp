@@ -16,7 +16,7 @@
 #include "cxToolManager.h"
 #include "cxDataManager.h"
 #include "cxReporter.h"
-#include "cxSimulateUSWidget.h"
+#include "cxSettings.h"
 
 //These 3 includes should be removed when TrackingManager are a plugin
 #include "cxLogicManager.h"
@@ -30,6 +30,11 @@ SimulatedImageStreamerService::SimulatedImageStreamerService()
 {
 }
 
+SimulatedImageStreamerService::~SimulatedImageStreamerService()
+{
+
+}
+
 QString SimulatedImageStreamerService::getName()
 {
 	return "Simulator";
@@ -37,20 +42,38 @@ QString SimulatedImageStreamerService::getName()
 
 void SimulatedImageStreamerService::setImageToStream(QString imageUid)
 {
-	mImageUidToSimulate = imageUid;
+	std::cout << "setting image to " << imageUid.toStdString() << std::endl;
+	settings()->setValue("USsimulation/volume", imageUid);
+}
+
+void SimulatedImageStreamerService::updateGain()
+{
+	this->setGain(this->getGainOption(mXmlSettings)->getValue());
 }
 
 void SimulatedImageStreamerService::setGain(double gain)
 {
 	QMutexLocker lock(&mStreamerMutex);
 	if(mStreamer)
-		mStreamer->setGain(gain);
+		mStreamer->setGain(gain/100);
 }
 
-StreamerPtr SimulatedImageStreamerService::createStreamer()
+std::vector<DataAdapterPtr> SimulatedImageStreamerService::getSettings(QDomElement root)
+{
+	std::vector<DataAdapterPtr> retval;
+	retval.push_back(this->getSimulationTypeOption(root));
+	retval.push_back(this->getInputImageOption(root));
+	retval.push_back(this->getGainOption(root));
+
+	return retval;
+}
+
+StreamerPtr SimulatedImageStreamerService::createStreamer(QDomElement root)
 {
 	QMutexLocker lock(&mStreamerMutex);
-	mStreamer.reset(new SimulatedImageStreamer());
+	mStreamer.reset(new SimulatedImageStreamer);
+	mXmlSettings = root;
+
 	//TODO: remove this dependency when TrackingManager are a plugin
 	cx::VideoServiceBackendPtr backend = cx::logicManager()->getVideoService()->getBackend();
 	if(!backend)
@@ -59,22 +82,61 @@ StreamerPtr SimulatedImageStreamerService::createStreamer()
 		return mStreamer;
 	}
 
+
+	QString selectedVolume = settings()->value("USsimulation/volume", "").toString();
 	ToolPtr tool = backend->getToolManager()->findFirstProbe();
 	if(!tool)
 		reporter()->sendWarning("No tool");
-	ImagePtr image = backend->getDataManager()->getImage(mImageUidToSimulate);
+	ImagePtr image = backend->getDataManager()->getImage(selectedVolume);
 	if(!image)
-		reporter()->sendWarning("No image with uid: "+mImageUidToSimulate);
+		reporter()->sendWarning("No image with uid: "+selectedVolume);
 
-	mStreamer->initialize(image, tool, backend->getDataManager());
+	QString simulationType = this->getSimulationTypeOption(mXmlSettings)->getValue();
+	std::cout << "simulationType: " << simulationType.toStdString() << std::endl;
+	mStreamer->initialize(image, tool, backend->getDataManager(), simulationType);
+
+	lock.unlock();
+	this->updateGain();
+	lock.relock();
 
 	return mStreamer;
 }
 
-QWidget *SimulatedImageStreamerService::createWidget()
+DoubleDataAdapterXmlPtr SimulatedImageStreamerService::getGainOption(QDomElement root)
 {
-	SimulateUSWidget* mSimulationWidget = new SimulateUSWidget(this);
-	return mSimulationWidget;
+	if(!mSelectedGainDataAdapter)
+	{
+		mSelectedGainDataAdapter = DoubleDataAdapterXml::initialize("gain", "Gain","Simulates ultrasound scanners gain function.", 70, DoubleRange(1, 100, 1), 0, root);
+		connect(mSelectedGainDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(updateGain()));
+		this->updateGain();
+	}
+
+	return mSelectedGainDataAdapter;
+}
+
+SelectImageStringDataAdapterPtr SimulatedImageStreamerService::getInputImageOption(QDomElement root)
+{
+	if(!mSelectImageDataAdapter)
+	{
+		mSelectImageDataAdapter = SelectImageStringDataAdapter::New();
+		QString selectedVolume = settings()->value("USsimulation/volume", "").toString();
+		connect(mSelectImageDataAdapter.get(), SIGNAL(dataChanged(QString)), this, SLOT(setImageToStream(QString)));
+		mSelectImageDataAdapter->setValue(selectedVolume);
+	}
+
+	return mSelectImageDataAdapter;
+}
+
+StringDataAdapterXmlPtr SimulatedImageStreamerService::getSimulationTypeOption(QDomElement root)
+{
+	QString defaultValue = "Original data";
+	QStringList simulationTypes;
+	simulationTypes << defaultValue << "CT to US";// << "MR to US";
+
+	StringDataAdapterXmlPtr retval;
+	retval = StringDataAdapterXml::initialize("simulation_type", "Simulation type", "Simulate us from this kind of image modality", defaultValue, simulationTypes, root);
+
+	return retval;
 }
 
 } //end namespace cx

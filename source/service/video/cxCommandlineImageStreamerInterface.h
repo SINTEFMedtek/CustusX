@@ -33,8 +33,8 @@ class CommandlineImageStreamerInterface : public StreamerService
 {
 public:
 	CommandlineImageStreamerInterface();
-	virtual StreamerPtr createStreamer();
-	virtual QWidget* createWidget();
+	virtual StreamerPtr createStreamer(QDomElement root);
+	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
 	virtual QString getName();
 
 	void setArguments(std::map<QString, QString> arguments) {

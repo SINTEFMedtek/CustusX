@@ -42,7 +42,6 @@ cx::StreamerService* getStreamerService(QString name)
 	tracker.open();
 
 	QList<cx::StreamerService*> serviceList = tracker.getServices();
-//	REQUIRE(serviceList.size() > 0);
 
 	for(int i = 0; i < serviceList.size(); ++i)
 	{
@@ -102,6 +101,7 @@ TEST_CASE("SimulatedImageStreamer: Basic test of streamers", "[streaming][unit]"
 	cx::DataLocations::setTestMode();
 	int numFrames = 1;
 	QStringList simulationTypes;
+	//TODO get from simulatedImageStreamerService->getOptions()->getSomething()->getRange();
 	simulationTypes << "Original data" << "CT to US" << "MR to US";
 	for (int i = 0; i < 3; ++i)
 	{
@@ -148,11 +148,14 @@ TEST_CASE("StreamerService: Service available", "[streaming][service][unit]")
 	QList<cx::StreamerService*> serviceList = tracker.getServices();
 	REQUIRE(serviceList.size() > 0);
 
+	cx::XmlOptionFile options = cx::XmlOptionFile(cx::DataLocations::getXmlSettingsFile(), "CustusX").descend("video");
+
 	for(int i = 0; i < serviceList.size(); ++i)
 	{
 		cx::StreamerService* service = serviceList.at(i);
 		INFO("Streamer: " + service->getName());
-		cx::StreamerPtr streamer = service->createStreamer();
+		QDomElement element = options.getElement("video", service->getName());
+		cx::StreamerPtr streamer = service->createStreamer(element);
 		REQUIRE(streamer);
 	}
 
