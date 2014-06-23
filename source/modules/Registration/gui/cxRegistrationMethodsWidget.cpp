@@ -140,9 +140,11 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regM
 
   //fast
   ManualRegistrationsWidget* manRegWidget = new ManualRegistrationsWidget(this, "ManualRegistrationWidget", "Manual Registrations");
-  ManualImageRegistrationWidget* manImageRegWidget = new ManualImageRegistrationWidget(regManager, manRegWidget);
+  ManualImage2ImageRegistrationWidget* manImage2ImageRegWidget = new ManualImage2ImageRegistrationWidget(regManager, manRegWidget);
+  ManualImageTransformRegistrationWidget* manImageTransformRegWidget = new ManualImageTransformRegistrationWidget(regManager, manRegWidget);
   ManualPatientRegistrationWidget* manPatientRegWidget = new ManualPatientRegistrationWidget(regManager, manRegWidget);
-  manRegWidget->addTab(manImageRegWidget, "Image");
+  manRegWidget->addTab(manImage2ImageRegWidget, "Image2Image");
+  manRegWidget->addTab(manImageTransformRegWidget, "Image Transform");
   manRegWidget->addTab(manPatientRegWidget, "Patient");
 
 

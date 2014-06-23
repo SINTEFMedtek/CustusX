@@ -6,12 +6,13 @@
 # External libraries
 #-----------------------------------------------------------------------------
 
+
 cx_initialize_Boost()
 cx_initialize_QT()
 cx_initialize_VTK()
 cx_initialize_ITK()
+
 cx_initialize_OpenIGTLink()
-cx_initialize_IGSTK()
 cx_initialize_CTK()
 
 cx_initialize_ISB_GE()

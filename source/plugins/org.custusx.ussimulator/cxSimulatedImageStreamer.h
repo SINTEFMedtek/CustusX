@@ -63,7 +63,6 @@ private slots:
 	virtual void streamSlot();
 	void resetMask();
 	void sliceSlot();
-	void setSourceToImageSlot(QString imageUid);
 	void defineSectorInSimulator();
 	void inputImageChangedSlot(QString);
 

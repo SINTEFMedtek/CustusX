@@ -5,6 +5,8 @@ cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
+	cx_initialize_cppunit()
+
 	include_directories(
             ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
             ${CustusX3_SOURCE_DIR}/source/resource/videoServer

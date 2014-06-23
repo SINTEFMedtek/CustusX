@@ -93,7 +93,6 @@ private:
 	void updateStatus(ProbeDefinitionPtr message);
 	void startAllSources();
 	void removeSourceFromProbe(ToolPtr tool);
-	QString getImageToStream();
 	void runImageReceiverThread();
 
 	ImageReceiverThreadPtr mClient;
