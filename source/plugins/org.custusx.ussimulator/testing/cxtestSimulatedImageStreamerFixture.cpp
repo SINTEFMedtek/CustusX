@@ -5,6 +5,7 @@
 #include "cxDummyTool.h"
 #include "cxDummyToolManager.h"
 #include "cxConfig.h"
+#include "cxSettings.h"
 
 namespace cxtest
 {
@@ -22,7 +23,6 @@ SimulatedImageStreamerFixture::SimulatedImageStreamerFixture(TestSenderPtr sende
 
 void SimulatedImageStreamerFixture::init()
 {
-	//	cx::TrackingServicePtr trackingService = cx::DummyToolManager::create(); not required??
 	mDataService = cxtest::createDummyDataService();
 	REQUIRE(mDataService);
 	mImage = cxtest::Utilities::create3DImage();
@@ -43,7 +43,8 @@ cx::SimulatedImageStreamerPtr SimulatedImageStreamerFixture::createRunningSimula
 {
 	this->createSimulatedImageStreamer();
 
-	REQUIRE(mImagestreamer->initialize(mImage, mTool, mDataService));
+	QString simulationType = cx::settings()->value("USsimulation/type").toString();
+	REQUIRE(mImagestreamer->initialize(mImage, mTool, mDataService, simulationType));
 	REQUIRE(mImagestreamer->startStreaming(mSender));
 	return mImagestreamer;
 }
@@ -85,7 +86,6 @@ void SimulatedImageStreamerFixture::requireNoSimulatedFrame(bool silentAtArrive)
 {
 	REQUIRE(mSender);
 	REQUIRE_FALSE(waitForQueuedSignal(mSender.get(), SIGNAL(newPackage()), 200, silentAtArrive));
-//	REQUIRE_FALSE(mSender->getSentPackage());
 }
 
 void SimulatedImageStreamerFixture::checkSimulatedFrames(int numFrames, bool silentAtArrive)

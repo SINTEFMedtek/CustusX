@@ -25,21 +25,17 @@ namespace cx
 USSimulatorPluginActivator::USSimulatorPluginActivator()
 	: mContext(0)
 {
-//	std::cout << "Created USSimulatorPluginActivator" << std::endl;
 }
 
 USSimulatorPluginActivator::~USSimulatorPluginActivator()
 {
-
 }
 
 void USSimulatorPluginActivator::start(ctkPluginContext* context)
 {
-//	std::cout << "Started USSimulatorPluginActivator" << std::endl;
 	this->mContext = context;
 
 	mPlugin.reset(new cx::SimulatedImageStreamerService);
-//	std::cout << "created ussimulator plugin service" << std::endl;
 	try
 	{
 		mRegistration = context->registerService(QStringList(StreamerService_iid), mPlugin.get());
@@ -49,7 +45,6 @@ void USSimulatorPluginActivator::start(ctkPluginContext* context)
 		std::cout << e.what() << std::endl;
 		mPlugin.reset();
 	}
-//	std::cout << "registered ussimulator plugin service" << std::endl;
 }
 
 void USSimulatorPluginActivator::stop(ctkPluginContext* context)

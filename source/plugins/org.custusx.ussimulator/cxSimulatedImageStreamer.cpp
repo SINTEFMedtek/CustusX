@@ -15,30 +15,28 @@
 #include "cxSimulatedImageStreamer.h"
 
 #include <boost/math/special_functions/round.hpp>
+#include <boost/make_shared.hpp>
 
 #include "vtkPNGWriter.h"
 #include "vtkImageReslice.h"
 #include "vtkMatrix4x4.h"
 #include "vtkImageData.h"
 #include "vtkImageMask.h"
+#include "vtkImageChangeInformation.h"
+
 #include "cxReporter.h"
 #include "cxDataManager.h"
 #include "cxSliceProxy.h"
 #include "cxProbeSector.h"
 #include "cxProbeData.h"
-//#include "cxToolManager.h"
 #include "cxTransform3D.h"
 #include "cxVolumeHelpers.h"
-//#include "cxToolManager.h"
-
 #include "cxSlicedImageProxy.h"
 #include "cxSliceProxy.h"
-#include "vtkImageChangeInformation.h"
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxSettings.h"
 #include "cxProbeImpl.h"
-#include <boost/make_shared.hpp>
 #include "cxDataLocations.h"
 
 #ifdef CX_BUILD_US_SIMULATOR
@@ -49,6 +47,7 @@ namespace cx
 {
 
 SimulatedImageStreamer::SimulatedImageStreamer() :
+	mSimulationType("Original data"),
 	mTimer(new CyclicActionLogger())
 {
 	this->setSendInterval(40);
@@ -73,8 +72,9 @@ bool SimulatedImageStreamer::initUSSimulator()
 	return retval;
 }
 
-bool SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServicePtr dataManager)
+bool SimulatedImageStreamer::initialize(ImagePtr image, ToolPtr tool, DataServicePtr dataManager, QString simulationType)
 {
+	mSimulationType = simulationType;
 	this->setSourceImage(image);
 	return initialize(tool, dataManager);
 }
@@ -181,17 +181,16 @@ void SimulatedImageStreamer::setSourceImage(ImagePtr image)
 ImagePtr SimulatedImageStreamer::calculateSlice(ImagePtr source)
 {
 	vtkImageDataPtr simulatedSlice;
-	QString simulationType = settings()->value("USsimulation/type").toString();
 
-	if(simulationType == "CT to US")
+	if(mSimulationType == "CT to US")
 		simulatedSlice = simulateUSFromCTSlice(source);
-	else if(simulationType == "MR to US")
+	else if(mSimulationType == "MR to US")
 		simulatedSlice = simulateUSFromMRSlice(source);
-	else if(simulationType == "Original data")
+	else if(mSimulationType == "Original data")
 		simulatedSlice = sliceOriginal(source);
 	else
 	{
-		cx::reporter()->sendWarning("SimulatedImageStreamer::calculateSlice(): Unknown simulation: " + simulationType);
+		cx::reporter()->sendWarning("SimulatedImageStreamer::calculateSlice(): Unknown simulation: " + mSimulationType);
 		simulatedSlice = sliceOriginal(source);
 	}
 
@@ -205,7 +204,6 @@ vtkImageDataPtr SimulatedImageStreamer::simulateUSFromCTSlice(ImagePtr source)
 	vtkImageDataPtr simulatedSlice;
 
 #ifdef CX_BUILD_US_SIMULATOR
-//	std::cout << "CT to US simulator running" << std::endl;
 	vtkImageDataPtr simInput = this->createSimulatorInputSlice(source);
 	simulatedSlice = mUSSimulator->simulateFromCT(simInput);
 	mTimer->time("Simulate");
@@ -230,8 +228,11 @@ vtkImageDataPtr SimulatedImageStreamer::simulateUSFromMRSlice(ImagePtr source)
 void SimulatedImageStreamer::setGain(double gain)
 {
 #ifdef CX_BUILD_US_SIMULATOR
-	mUSSimulator->setGain(gain);
-	this->sliceSlot();
+	if (mUSSimulator)
+	{
+		mUSSimulator->setGain(gain);
+		this->sliceSlot();
+	}
 #endif //CX_BUILD_US_SIMULATOR
 }
 
@@ -261,11 +262,15 @@ void SimulatedImageStreamer::defineSectorInSimulator()
 	double width = sectorParams.getWidth();
 	double depth = sectorParams.getDepthEnd() - sectorParams.getDepthStart();
 	double offset = sectorParams.getDepthStart();
-//	std::cout << "width: " << width << " depth: " << depth << " offset: " << offset << std::endl;
 	mUSSimulator->setSectorSize(width, depth, offset);
 
 	this->sliceSlot();
 #endif //CX_BUILD_US_SIMULATOR
+}
+
+void SimulatedImageStreamer::inputImageChangedSlot(QString)
+{
+	std::cout << "IMPLEMENT: void SimulatedImageStreamer::inputImageChangedSlot(QString)" << std::endl;
 }
 
 vtkImageDataPtr SimulatedImageStreamer::sliceOriginal(ImagePtr source)

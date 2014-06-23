@@ -115,6 +115,7 @@ protected:
 	XmlOptionFile mOptions;
 
 private:
+	QWidget* createStreamerWidget(StreamerService* service);
 	void onServiceAdded(StreamerService *service);
 	void onServiceRemoved(StreamerService *service);
 	void addServiceToSelector(QString name);

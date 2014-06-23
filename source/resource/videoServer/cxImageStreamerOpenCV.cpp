@@ -6,6 +6,7 @@
  */
 
 #include "cxImageStreamerOpenCV.h"
+#include "cxConfig.h"
 
 #ifdef CX_USE_OpenCV
 

@@ -7,7 +7,7 @@ SET ( CMAKE_CXX_FLAGS "-ftemplate-depth=1024" CACHE STRING "Allow heavy template
 option(CX_BUILD_US_SIMULATOR "Build the US simulator (US from CT/MR)" ON)
 
 include_directories(
-    #${CX_RESOURCE_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CustusX3_SOURCE_DIR}/source/modules/GUIExtender
     ${CustusX3_SOURCE_DIR}/source/service/video
@@ -17,11 +17,11 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/logic
     ${CustusX3_SOURCE_DIR}/source/resource/pluginUtilities
+    ${CustusX3_SOURCE_DIR}/source/resource/core/dataAdapters
     )
 
 set(PLUGIN_SRCS
   cxUSSimulatorPluginActivator.cpp
-  cxSimulateUSWidget.cpp
   cxSimulatedImageStreamerService.cpp
   cxSimulatedImageStreamer.cpp
 )
@@ -29,7 +29,6 @@ set(PLUGIN_SRCS
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxUSSimulatorPluginActivator.h
-  cxSimulateUSWidget.h
   cxSimulatedImageStreamer.h
   cxSimulatedImageStreamerService.h
 )
@@ -67,6 +66,7 @@ set(PLUGIN_resources
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}
+    cxResource
     cxGUIExtenderService
     vtkRenderingOpenGL
     vtkRenderingFreeTypeOpenGL
@@ -77,7 +77,6 @@ set(PLUGIN_target_libraries
     vtkImagingMorphological
     vtkFiltersParallel
     vtkFiltersGeneral
-    cxResource
     cxResourceWidgets
     cxVideoService
     cxGui

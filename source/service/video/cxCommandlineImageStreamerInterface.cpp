@@ -26,15 +26,15 @@ QString CommandlineImageStreamerInterface::getName()
 	return "CommandlineImageStreamerInterface";
 }
 
-StreamerPtr CommandlineImageStreamerInterface::createStreamer()
+StreamerPtr CommandlineImageStreamerInterface::createStreamer(QDomElement root)
 {
 	return CommandlineImageStreamerFactory().getFromArguments(mArguments);
 }
 
-QWidget *CommandlineImageStreamerInterface::createWidget()
+std::vector<DataAdapterPtr> CommandlineImageStreamerInterface::getSettings(QDomElement root)
 {
-	//TODO: Move widget creation here. Impelemnt same way as SimulatedImageStreamerInterface
-	return NULL;
+	std::vector<DataAdapterPtr> retval;
+	return retval;
 }
 
 } //end namespace cx
