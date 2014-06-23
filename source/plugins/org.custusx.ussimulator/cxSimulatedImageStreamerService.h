@@ -19,9 +19,14 @@
 #include "cxSimulatedImageStreamer.h"
 #include "org_custusx_ussimulator_Export.h"
 
+
+#include "cxDataAdapter.h"
+#include "cxDoubleDataAdapter.h"
+#include "cxDoubleDataAdapterXml.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxSelectDataStringDataAdapter.h" //dependent on datamanager
 namespace cx
 {
-
 typedef boost::shared_ptr<class SimulatedImageStreamerService> SimulatedImageStreamerServicePtr;
 
 /**
@@ -34,23 +39,35 @@ typedef boost::shared_ptr<class SimulatedImageStreamerService> SimulatedImageStr
  */
 class org_custusx_ussimulator_EXPORT SimulatedImageStreamerService : public StreamerService
 {
+	Q_OBJECT
 	Q_INTERFACES(cx::StreamerService)
 public:
 	SimulatedImageStreamerService();
+	~SimulatedImageStreamerService();
 
-	void setImageToStream(QString imageUid);
-	void setGain(double gain);
+	void setGain(double gain); //TODO: make private, fix test
 
-	virtual StreamerPtr createStreamer();
-	virtual QWidget* createWidget();
 	virtual QString getName();
+	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
+	virtual StreamerPtr createStreamer(QDomElement root);
+
+private slots:
+	void setImageToStream(QString imageUid);
+	void updateGain();
 
 private:
 	ImagePtr createImageCopy(QString imageUid);
+	DoubleDataAdapterXmlPtr getGainOption(QDomElement root);
+	SelectImageStringDataAdapterPtr getInputImageOption(QDomElement root);
+	StringDataAdapterXmlPtr getSimulationTypeOption(QDomElement root);
 
 	QString mImageUidToSimulate;
+	DoubleDataAdapterXmlPtr mSelectedGainDataAdapter;
+	SelectImageStringDataAdapterPtr mSelectImageDataAdapter;
 	SimulatedImageStreamerPtr mStreamer;//Access must be mutexed, as it can be accessed from several threads
+	QDomElement mXmlSettings;
 	QMutex mStreamerMutex;
+
 };
 
 } //end namespace cx

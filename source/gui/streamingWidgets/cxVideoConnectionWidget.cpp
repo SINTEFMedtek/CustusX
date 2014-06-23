@@ -32,7 +32,7 @@
 #include "cxRegistrationTransform.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxHelperWidgets.h"
-
+#include "cxDataAdapterHelper.h"
 #include "cxDataLocations.h"
 #include "cxDataInterface.h"
 #include "cxVideoConnectionManager.h"
@@ -58,7 +58,7 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 	QStringList connectionOptions;
 	QString defaultConnection = this->getVideoConnectionManager()->getConnectionMethod();
 	connectionOptions << "Local Server" << "Direct Link" << "Remote Server";
-	mConnectionSelector = StringDataAdapterXml::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, connectionOptions, mOptions.getElement());
+	mConnectionSelector = StringDataAdapterXml::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, connectionOptions, mOptions.getElement("video"));
 	connect(mConnectionSelector.get(), SIGNAL(changed()), this, SLOT(selectGuiForConnectionMethodSlot()));
 
 	connect(this->getVideoConnectionManager().get(), SIGNAL(connected(bool)), this, SLOT(serverStatusChangedSlot()));
@@ -96,17 +96,40 @@ VideoConnectionWidget::~VideoConnectionWidget()
 
 void VideoConnectionWidget::onServiceAdded(StreamerService* service)
 {
-//	std::cout << "VideoConnectionWidget:: Service added!!!" << std::endl;
-	QWidget* serviceWidget = this->wrapVerticalStretch(service->createWidget());
+
+	QWidget* algoWidget = this->createStreamerWidget(service);
+
+	QWidget* serviceWidget = this->wrapVerticalStretch(algoWidget);
+
 	mStackedWidget->addWidget(serviceWidget);
 	mStreamerServiceWidgets[service->getName()] = serviceWidget;
 
 	this->addServiceToSelector(service->getName());
 }
 
+
+QWidget* VideoConnectionWidget::createStreamerWidget(StreamerService* service)
+{
+	QString algoName = service->getName();
+	QDomElement element = mOptions.getElement("video");
+	std::vector<DataAdapterPtr> adapters = service->getSettings(element);
+
+	// No existing found,
+	//  create a new stack element for this algo:
+	QWidget* oneAlgoWidget = new QWidget(this);
+	oneAlgoWidget->setObjectName(algoName);
+	QGridLayout* oneAlgoLayout = new QGridLayout(oneAlgoWidget);
+	oneAlgoLayout->setMargin(0);
+
+	for (unsigned i = 0; i < adapters.size(); ++i)
+	{
+		createDataWidget(oneAlgoWidget, adapters[i], oneAlgoLayout, i);
+	}
+	return oneAlgoWidget;
+}
+
 void VideoConnectionWidget::onServiceRemoved(StreamerService *service)
 {
-//	std::cout << "VideoConnectionWidget::Service removed!!!" << std::endl;
 	this->removeServiceFromSelector(service->getName());
 	this->removeServiceWidget(service->getName());
 }
@@ -323,8 +346,6 @@ void VideoConnectionWidget::selectGuiForConnectionMethodSlot()
 		mStackedWidget->setCurrentIndex(1);
 	else if(this->getVideoConnectionManager()->useRemoteServer())
 		mStackedWidget->setCurrentIndex(2);
-//	else if(this->getVideoConnectionManager()->useSimulatedServer())
-//		mStackedWidget->setCurrentIndex(3);
 	else
 	{
 		QWidget* serviceWidget = mStreamerServiceWidgets[name];
@@ -435,7 +456,6 @@ QStackedWidget* VideoConnectionWidget::initializeStackedWidget()
 	stackedWidget->addWidget(this->wrapVerticalStretch(this->createDirectLinkWidget()));
 	stackedWidget->addWidget(this->wrapVerticalStretch(this->createLocalServerWidget()));
 	stackedWidget->addWidget(this->wrapVerticalStretch(this->createRemoteWidget()));
-//	stackedWidget->addWidget(this->wrapVerticalStretch(this->createSimulationWidget()));
 
 	return stackedWidget;
 }

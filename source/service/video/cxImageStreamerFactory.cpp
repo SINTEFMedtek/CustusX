@@ -13,7 +13,6 @@
 // See CustusX_License.txt for more information.
 #include "cxImageStreamerFactory.h"
 
-//#include "cxSimulatedImageStreamerInterface.h"
 #include "cxCommandlineImageStreamerInterface.h"
 
 namespace cx

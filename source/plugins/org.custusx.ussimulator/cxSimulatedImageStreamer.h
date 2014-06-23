@@ -19,6 +19,7 @@
 #include "cxImageStreamer.h"
 #include "cxCyclicActionLogger.h"
 #include "cxConfig.h"
+#include "cxXmlOptionItem.h"
 #include "org_custusx_ussimulator_Export.h"
 
 #ifdef CX_BUILD_US_SIMULATOR
@@ -50,8 +51,7 @@ public:
 	virtual ~SimulatedImageStreamer();
 
 	void setSourceImage(ImagePtr image);
-	bool initialize(ToolPtr tool, DataServicePtr dataManager);
-	bool initialize(ImagePtr image, ToolPtr tool, DataServicePtr dataManager);
+	bool initialize(ImagePtr image, ToolPtr tool, DataServicePtr dataManager, QString simulationType);
 	virtual bool startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
 
@@ -65,8 +65,10 @@ private slots:
 	void resetMask();
 	void sliceSlot();
 	void defineSectorInSimulator();
+	void inputImageChangedSlot(QString);
 
 private:
+	bool initialize(ToolPtr tool, DataServicePtr dataManager);
 	bool initUSSimulator();
 	ImagePtr getSlice();
 	vtkImageDataPtr getMask();
@@ -88,6 +90,8 @@ private:
 	DataServicePtr mDataManager;
 
 	CyclicActionLoggerPtr mTimer;///< Timer for timing parts of the simulation
+
+	QString mSimulationType;
 
 #ifdef CX_BUILD_US_SIMULATOR
 	boost::shared_ptr<ImageSimulator> mUSSimulator;
