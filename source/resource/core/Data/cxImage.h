@@ -67,9 +67,11 @@ public:
 	};
 
 	static ImagePtr create(const QString& uid, const QString& name);
+	ImagePtr copy();
 
 	virtual ~Image();
 	Image(const QString& uid, const vtkImageDataPtr& data, const QString& name = "");
+
 	virtual void setVtkImageData(const vtkImageDataPtr& data);
 
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
@@ -188,6 +190,8 @@ protected:
 
 
 private:
+	Image(const Image& other);
+	Image& operator=(const Image& other);
 	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D);
 	void resetTransferFunction(ImageLUT2DPtr imageLookupTable2D);
 	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D);

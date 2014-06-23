@@ -46,6 +46,8 @@ public:
 	virtual QString getName();
 
 private:
+	ImagePtr createImageCopy(QString imageUid);
+
 	QString mImageUidToSimulate;
 	SimulatedImageStreamerPtr mStreamer;//Access must be mutexed, as it can be accessed from several threads
 	QMutex mStreamerMutex;

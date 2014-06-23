@@ -38,6 +38,33 @@ QString SimulatedImageStreamerService::getName()
 void SimulatedImageStreamerService::setImageToStream(QString imageUid)
 {
 	mImageUidToSimulate = imageUid;
+	//Change image if streamer already exist
+	if(!mStreamer)
+	{
+//		reporter()->sendInfo("SimulatedImageStreamerService::setImageToStream: No streamer yet. Image will be applied when streamer is created");
+		return;
+	}
+	ImagePtr imageCopy = this->createImageCopy(imageUid);
+
+	mStreamer->setSourceImage(imageCopy);
+}
+
+ImagePtr SimulatedImageStreamerService::createImageCopy(QString imageUid)
+{
+	cx::VideoServiceBackendPtr backend = cx::logicManager()->getVideoService()->getBackend();
+	if(!backend)
+	{
+		reporter()->sendError("SimulatedImageStreamerService::createImageCopy: No VideoServiceBackend");
+		return ImagePtr();
+	}
+	ImagePtr image = backend->getDataManager()->getImage(imageUid);
+	if(!image)
+	{
+		reporter()->sendWarning("SimulatedImageStreamerService::createImageCopy: No image with uid: "+imageUid);
+		return ImagePtr();
+	}
+	ImagePtr imageCopy = image->copy();
+	return imageCopy;
 }
 
 void SimulatedImageStreamerService::setGain(double gain)
@@ -62,11 +89,9 @@ StreamerPtr SimulatedImageStreamerService::createStreamer()
 	ToolPtr tool = backend->getToolManager()->findFirstProbe();
 	if(!tool)
 		reporter()->sendWarning("No tool");
-	ImagePtr image = backend->getDataManager()->getImage(mImageUidToSimulate);
-	if(!image)
-		reporter()->sendWarning("No image with uid: "+mImageUidToSimulate);
 
-	mStreamer->initialize(image, tool, backend->getDataManager());
+	ImagePtr imageCopy = this->createImageCopy(mImageUidToSimulate);
+	mStreamer->initialize(imageCopy, tool, backend->getDataManager());
 
 	return mStreamer;
 }

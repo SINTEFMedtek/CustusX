@@ -49,6 +49,8 @@ public:
 	SimulatedImageStreamer();
 	virtual ~SimulatedImageStreamer();
 
+	void setSourceImage(ImagePtr image);
+	bool initialize(ToolPtr tool, DataServicePtr dataManager);
 	bool initialize(ImagePtr image, ToolPtr tool, DataServicePtr dataManager);
 	virtual bool startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
@@ -71,7 +73,6 @@ private:
 
 	vtkImageDataPtr frameGrab(ImagePtr source, bool applyLUT = true);
 	Transform3D getTransform_vMr(); ///< from reference space to video image space
-	void setSourceImage(ImagePtr image);
 	ImagePtr calculateSlice(ImagePtr source);
 	vtkImageDataPtr maskSlice(vtkImageDataPtr unmaskedSlice);
 	vtkImageDataPtr simulateUSFromCTSlice(ImagePtr source);

@@ -123,6 +123,10 @@ protected:
 
 	std::set<RepWeakPtr> mReps; ///< links to Rep users.
 
+private:
+	Data(const Data& other);
+	Data& operator=(const Data& other);
+
 };
 
 typedef boost::shared_ptr<Data> DataPtr;

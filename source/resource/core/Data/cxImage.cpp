@@ -133,6 +133,34 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& nam
 	mImageTransferFunctions3D.reset();
 }
 
+ImagePtr Image::copy()
+{
+	vtkImageDataPtr baseImageDataCopy;
+	if(mBaseImageData)
+	{
+		baseImageDataCopy = vtkImageDataPtr::New();
+		baseImageDataCopy->DeepCopy(mBaseImageData);
+	}
+
+	ImagePtr retval = ImagePtr(new Image(mUid, baseImageDataCopy, mName));
+
+	retval->mUnsigned = mUnsigned;
+	retval->mModality = mModality;
+	retval->mImageType = mImageType;
+	retval->mMaxRGBIntensity = mMaxRGBIntensity;
+	retval->mInterpolationType = mInterpolationType;
+	retval->mImageLookupTable2D = mImageLookupTable2D;
+	retval->mImageTransferFunctions3D = mImageTransferFunctions3D;
+	retval->mInitialWindowWidth = mInitialWindowWidth;
+	retval->mInitialWindowLevel = mInitialWindowLevel;
+
+	//From cx::Data
+	retval->mRegistrationStatus = mRegistrationStatus;
+	retval->m_rMd_History = m_rMd_History;
+
+	return retval;
+}
+
 DoubleBoundingBox3D Image::getInitialBoundingBox() const
 {
 	return DoubleBoundingBox3D(-1, -1, -1, -1, -1, -1);
