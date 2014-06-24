@@ -31,6 +31,10 @@
 
 namespace cx
 {
+DoubleDataAdapterXml::DoubleDataAdapterXml()
+{
+	mFactor = 1.0;
+}
 
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
@@ -100,12 +104,6 @@ void DoubleDataAdapterXml::setValueRange(DoubleRange range)
 int DoubleDataAdapterXml::getValueDecimals() const
 {
 	return mDecimals;
-}
-
-DoubleDataAdapterXml::DoubleDataAdapterXml()
-{
-	mFactor = 1.0;
-    mAddSlider = false;
 }
 
 } // namespace cx

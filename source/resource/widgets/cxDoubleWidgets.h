@@ -17,23 +17,16 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- * sscDoubleWidgets.h
- *
- *  Created on: Jun 23, 2010
- *      Author: christiana
- */
-
 #ifndef CXDOUBLEWIDGETS_H_
 #define CXDOUBLEWIDGETS_H_
 
-//#include <boost/shared_ptr.hpp>
 #include <QWidget>
 #include <QSlider>
 #include <QLineEdit>
 #include <QDoubleSpinBox>
 #include <QLabel>
 #include <QGridLayout>
+#include <QDial>
 
 #include "cxDoubleRange.h"
 #include "cxDoubleDataAdapter.h"
@@ -41,7 +34,6 @@
 
 namespace cx
 {
-//typedef boost::shared_ptr<class DoubleDataAdapterDoDoubleDataAdapter
 class MousePadWidget;
 
 /**\brief Custom widget for display of double-valued data.
@@ -109,7 +101,6 @@ public:
 		QLineEdit(parent)
 	{
 	}
-	//virtual QSize sizeHint() const { return QSize(30,20); }
 	virtual QSize sizeHint() const;
 	virtual QSize minimumSizeHint() const;
 	double getDoubleValue(double defVal = 0.0) const
@@ -141,11 +132,11 @@ class ScalarInteractionWidget: public OptimizedUpdateWidget
 {
 Q_OBJECT
 public:
-	//  ScalarInteractionWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout=0, int row=0);
 	ScalarInteractionWidget(QWidget* parent, DoubleDataAdapterPtr);
 
 	void enableLabel();
 	void enableSlider();
+	void enableDial();
 	void enableEdit();
 	void enableSpinBox();
 	void enableInfiniteSlider();
@@ -154,13 +145,11 @@ public:
 	void addToGridLayout(QGridLayout* gridLayout = 0, int row = 0);
 	void build(QGridLayout* gridLayout = 0, int row = 0);
 
-public slots:
-//    virtual void setModified();
 
 private slots:
 	void textEditedSlot();
 	void doubleValueChanged(double val);
-	//  void doubleValueChanged(double val);
+	void intValueChanged(int val); //expecting a value that is 100 times as big as the double value (because QDial uses ints, not double, we scale)
 	void infiniteSliderMouseMoved(QPointF delta);
 
 protected:
@@ -171,6 +160,7 @@ private:
 	void enableAll(bool);
 
 	DoubleSlider* mSlider;
+	QDial* mDial;
 	QDoubleSpinBox* mSpinBox;
 	QLabel* mLabel;
 	DoubleLineEdit* mEdit;
@@ -210,7 +200,7 @@ public:
 /**\brief Composite widget for scalar data manipulation.
  *
  * Consists of <namelabel, valueedit, slider>.
- * Insert a subclass of DoubDoubleDataAdapter order to connect to data.
+ * Insert a subclass of DoubDoubleDataAdapter in order to connect to data.
  *
  * Uses both a slider and a spin box
  *
@@ -223,6 +213,24 @@ public:
 	SpinBoxAndSliderGroupWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
 };
 typedef boost::shared_ptr<SpinBoxAndSliderGroupWidget> SpinBoxAndSliderGroupWidgetPtr;
+
+/**\brief Composite widget for scalar data manipulation.
+ *
+ * Consists of <namelabel, valueedit, dial>.
+ * Insert a subclass of DoubDoubleDataAdapter in order to connect to data.
+ *
+ * Uses both a dial and a spin box
+ *
+ * \ingroup cx_resource_widgets
+ */
+class SpinBoxAndDialGroupWidget: public ScalarInteractionWidget
+{
+Q_OBJECT
+public:
+SpinBoxAndDialGroupWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
+};
+typedef boost::shared_ptr<SpinBoxAndDialGroupWidget> SpinBoxAndDialGroupWidgetPtr;
+
 
 /**\brief Composite widget for scalar data manipulation.
  *

@@ -76,16 +76,24 @@ class DoubleDataAdapter: public DataAdapter
 {
 Q_OBJECT
 public:
-	virtual ~DoubleDataAdapter()
-	{
-	}
+	DoubleDataAdapter() : mGuiRepresentation(grSPINBOX){}
+	virtual ~DoubleDataAdapter(){}
 
 public:
+	enum GuiRepresentation
+	{
+		grSPINBOX,
+		grSLIDER,
+		grDIAL
+	};
+
 	// basic methods
 	virtual QString getValueName() const = 0; ///< name of data entity. Used for display to user.
 	virtual bool setValue(double value) = 0; ///< set the data value.
 	virtual double getValue() const = 0; ///< get the data value.
-    virtual bool addSlider() const { return false; } ///< request gui to add a slider in addition to editbox etc.
+
+	virtual void setGuiRepresentation(GuiRepresentation type) { mGuiRepresentation = type; };
+	virtual GuiRepresentation getGuiRepresentation() { return mGuiRepresentation; };
 
 public:
 	// optional methods
@@ -110,11 +118,9 @@ public:
 		return 0;
 	} ///< number of relevant decimals in value
 
-	//virtual double legendStep() const {return 0.2;} ///< step between each pos on the legend
-	//virtual void connectValueSignals(bool on) {} ///< set object to emit changed() when applicable
+protected:
+    GuiRepresentation mGuiRepresentation;
 
-	//  signals:
-	//  void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
 };
 typedef boost::shared_ptr<DoubleDataAdapter> DoubleDataAdapterPtr;
 

@@ -35,8 +35,6 @@ PipelineWidgetFilterLine::PipelineWidgetFilterLine(QWidget* parent, FilterPtr fi
 	buttonGroup->addButton(mRadioButton);
 	connect(mRadioButton, SIGNAL(toggled(bool)), this, SLOT(radioButtonSelectedSlot(bool)));
 	layout->addWidget(mRadioButton);
-	//    std::cout << QString("PipelineWidgetFilterLine margin=%1, spacing=%2").arg(layout->margin()).arg(layout->spacing()) << std::endl;
-	//    layout->setMargin(layout->margin()/2);
 	layout->setMargin(0);
 	layout->setSpacing(2);
 
@@ -60,16 +58,6 @@ PipelineWidgetFilterLine::PipelineWidgetFilterLine(QWidget* parent, FilterPtr fi
 	button->setDefaultAction(mAction);
 	layout->addWidget(button);
 
-//	mDetailsAction = this->createAction(this,
-//	                                    QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
-//	                                    "Run Filter", "",
-//	                                    SIGNAL(showDetails()),
-//	                                    NULL);
-//	mDetailsAction->setData(mFilter->getUid());
-
-//	button = new CXSmallToolButton();
-//	button->setDefaultAction(mDetailsAction);
-//	layout->addWidget(button);
 }
 
 void PipelineWidgetFilterLine::requestRunFilterSlot()
@@ -81,9 +69,6 @@ void PipelineWidgetFilterLine::radioButtonSelectedSlot(bool on)
 {
 	if (!on)
 		return;
-
-	//    std::cout << "mAlgoNameLabel " << mAlgoNameLabel->width() << " " << mAlgoNameLabel->height() << std::endl;
-	//    std::cout << "mRadioButton " << mRadioButton->width() << " " << mRadioButton->height() << std::endl << std::endl;
 
 	emit filterSelected(mFilter->getUid());
 }
@@ -106,8 +91,7 @@ QString PipelineWidgetFilterLine::defaultWhatsThis() const
 
 PipelineWidget::PipelineWidget(QWidget* parent, PipelinePtr pipeline) :
     BaseWidget(parent, "PipelineWidget", "Pipeline"),
-    mPipeline(pipeline)//,
-  //mCurrentlyRunningPipelineWidgetFilterLine(NULL)
+    mPipeline(pipeline)
 {
 	FilterGroupPtr filters = mPipeline->getFilters();
 	std::vector<SelectDataStringDataAdapterBasePtr> nodes = mPipeline->getNodes();
@@ -115,8 +99,6 @@ PipelineWidget::PipelineWidget(QWidget* parent, PipelinePtr pipeline) :
 		reportError("Filter/Node mismatch");
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
-//	std::cout << "PipelineWidget spacing " << topLayout->spacing() << std::endl;\
-	topLayout->setSpacing(4);
 	mButtonGroup = new QButtonGroup(this);
 
 	struct Inner
@@ -133,44 +115,30 @@ PipelineWidget::PipelineWidget(QWidget* parent, PipelinePtr pipeline) :
 	for (unsigned i=0; i<filters->size(); ++i)
 	{
 		topLayout->addLayout(Inner::addHMargin(new DataSelectWidget(this, nodes[i])));
-		//        topLayout->addWidget(new DataSelectWidget(this, nodes[i]));
 
 		PipelineWidgetFilterLine* algoLine = new PipelineWidgetFilterLine(this, filters->get(i), mButtonGroup);
 		connect(algoLine, SIGNAL(requestRunFilter()), this, SLOT(runFilterSlot()));
-//		connect(algoLine, SIGNAL(showDetails()), this, SLOT(toggleDetailsSlot()));
 		connect(algoLine, SIGNAL(filterSelected(QString)), this, SLOT(filterSelectedSlot(QString)));
 		algoLine->mTimedAlgorithmProgressBar->attach(mPipeline->getTimedAlgorithm(filters->get(i)->getUid()));
 
 		mAlgoLines.push_back(algoLine);
 		QFrame* frame = this->wrapInFrame(algoLine);
-		//        frame->layout()->setContentsMargins(4,0,4,0); // nice on mac
 		frame->layout()->setContentsMargins(4,4,4,4); // nice on linux
 		frame->setObjectName("FilterBackground");
 		topLayout->addWidget(frame);
-		//        topLayout->addWidget(algoLine);
 	}
-	//    topLayout->addWidget(new DataSelectWidget(this, nodes.back()));
 	topLayout->addLayout(Inner::addHMargin(new DataSelectWidget(this, nodes.back())));
 
 	topLayout->addSpacing(12);
 
 	mSetupWidget = new CompactFilterSetupWidget(this, filters->getOptions(), true);
 	topLayout->addWidget(mSetupWidget);
-//	mSetupWidget->setVisible(settings()->value("pipeline/showDetails").toBool());
 
 	topLayout->addStretch();
 
 	this->filterSelectedSlot(filters->get(0)->getUid());
 }
 
-///**
-//  * Not used - reuse if you would like to toggle visibility in some way.
-//  */
-//void PipelineWidget::toggleDetailsSlot()
-//{
-//	mSetupWidget->setVisible(!mSetupWidget->isVisible());
-//	settings()->setValue("pipeline/showDetails", mSetupWidget->isVisible());
-//}
 
 void PipelineWidget::filterSelectedSlot(QString uid)
 {
