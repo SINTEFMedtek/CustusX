@@ -17,12 +17,6 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- * sscDoubleWidgets.cpp
- *
- *  Created on: Jun 23, 2010
- *      Author: christiana
- */
 #include "cxDoubleWidgets.h"
 
 #include <iostream>
@@ -35,7 +29,7 @@ namespace cx
 {
 
 ScalarInteractionWidget::ScalarInteractionWidget(QWidget* parent, DoubleDataAdapterPtr dataInterface) :
-    OptimizedUpdateWidget(parent), mSlider(NULL), mSpinBox(NULL), mLabel(NULL), mEdit(NULL), mInfiniteSlider(NULL)
+    OptimizedUpdateWidget(parent), mSlider(NULL), mDial(NULL), mSpinBox(NULL), mLabel(NULL), mEdit(NULL), mInfiniteSlider(NULL)
 {
 	mData = dataInterface;
     connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
@@ -54,6 +48,15 @@ void ScalarInteractionWidget::enableSlider()
     mSlider->setMinimumWidth(50);
     mSlider->setOrientation(Qt::Horizontal);
     connect(mSlider, SIGNAL(doubleValueChanged(double)), this, SLOT(doubleValueChanged(double)));
+}
+
+void ScalarInteractionWidget::enableDial()
+{
+	mDial = new QDial(this);
+	mDial->setMaximumWidth(50);
+	mDial->setMaximumHeight(50);
+	mDial->setNotchesVisible(true);
+    connect(mDial, SIGNAL(valueChanged(int)), this, SLOT(intValueChanged(int)));
 }
 
 void ScalarInteractionWidget::enableInfiniteSlider()
@@ -100,6 +103,8 @@ void ScalarInteractionWidget::addToOwnLayout()
 		topLayout->addWidget(mEdit, 0);
 	if (mSpinBox)
 		topLayout->addWidget(mSpinBox, 0);
+	if (mDial)
+		topLayout->addWidget(mDial, 0);
 	if (mSlider)
 		topLayout->addWidget(mSlider, 1);
 	if (mInfiniteSlider)
@@ -120,18 +125,17 @@ void ScalarInteractionWidget::addToGridLayout(QGridLayout* gridLayout, int row)
     controlsLayout->setMargin(0);
     gridLayout->addLayout(controlsLayout, row, 1);
 
+
     if (mEdit)
         controlsLayout->addWidget(mEdit);
 	if (mSpinBox)
         controlsLayout->addWidget(mSpinBox);
+	if (mDial)
+		gridLayout->addWidget(mDial, row, 2);
 	if (mSlider)
-	{
         controlsLayout->addWidget(mSlider, 1);
-	}
 	if (mInfiniteSlider)
-	{
         controlsLayout->addWidget(mInfiniteSlider, 1);
-	}
 }
 
 void ScalarInteractionWidget::build(QGridLayout* gridLayout, int row)
@@ -143,6 +147,13 @@ void ScalarInteractionWidget::build(QGridLayout* gridLayout, int row)
 
     this->setModified();
 }
+
+
+void ScalarInteractionWidget::intValueChanged(int val)
+{
+	this->doubleValueChanged(val/100.0);
+}
+
 
 void ScalarInteractionWidget::doubleValueChanged(double val)
 {
@@ -218,6 +229,17 @@ void ScalarInteractionWidget::prePaintEvent()
 		mSpinBox->blockSignals(false);
 	}
 
+	if (mDial)
+	{
+		mDial->blockSignals(true);
+		mDial->setContentsMargins(0,0,0,0);
+		mDial->setRange(dRange.min()*100, dRange.max()*100);
+		mDial->setSingleStep(dRange.step()*100);
+		mDial->setValue(mData->convertInternal2Display(mData->getValue())*100);
+		mDial->setToolTip(mData->getHelp());
+		mDial->blockSignals(false);
+	}
+
 	if (mLabel)
 	{
 		mLabel->setToolTip(mData->getHelp());
@@ -249,9 +271,7 @@ void ScalarInteractionWidget::enableAll(bool enable)
 
 QSize DoubleLineEdit::sizeHint() const
 {
-	//  return QLineEdit::sizeHint();
 	QSize size = QLineEdit::minimumSizeHint();
-	//std::cout << "DoubleLineEdit::minimumSizeHint() " << size.width() << ", " << size.height() << std::endl;
 	size.setWidth(size.height() * 3);
 	return size;
 }
@@ -259,8 +279,6 @@ QSize DoubleLineEdit::sizeHint() const
 QSize DoubleLineEdit::minimumSizeHint() const
 {
 	QSize size = QLineEdit::minimumSizeHint();
-	//std::cout << "DoubleLineEdit::minimumSizeHint() " << size.width() << ", " << size.height() << std::endl;
-	//size.setWidth(size.height()*2);
 	return size;
 }
 
@@ -274,7 +292,6 @@ SliderGroupWidget::SliderGroupWidget(QWidget* parent, DoubleDataAdapterPtr dataI
 	this->enableLabel();
 	this->enableSlider();
 	this->enableEdit();
-	//  this->enableSpinBox(true);
 
 	this->build(gridLayout, row);
 }
@@ -301,6 +318,17 @@ SpinBoxAndSliderGroupWidget::SpinBoxAndSliderGroupWidget(QWidget* parent, Double
 	this->enableLabel();
 	this->enableSpinBox();
 	this->enableSlider();
+
+	this->build(gridLayout, row);
+}
+// --------------------------------------------------------
+SpinBoxAndDialGroupWidget::SpinBoxAndDialGroupWidget(QWidget* parent, DoubleDataAdapterPtr dataInterface,
+	QGridLayout* gridLayout, int row) :
+	ScalarInteractionWidget(parent, dataInterface)
+{
+	this->enableLabel();
+	this->enableSpinBox();
+	this->enableDial();
 
 	this->build(gridLayout, row);
 }

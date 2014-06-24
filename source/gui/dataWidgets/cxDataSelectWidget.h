@@ -38,7 +38,7 @@ class DataSelectWidget : public BaseWidget
 {
     Q_OBJECT
 public:
-    DataSelectWidget(QWidget* parent, SelectDataStringDataAdapterBasePtr data);
+    DataSelectWidget(QWidget* parent, SelectDataStringDataAdapterBasePtr data, QGridLayout* gridLayout = NULL, int row=0);
     QString defaultWhatsThis() const;
 
 signals:
