@@ -919,7 +919,7 @@ DoubleDataAdapterXmlPtr TubeSegmentationFilter::makeDoubleOption(QDomElement roo
 	int decimals = 2;
 
 	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize(qstring_cast("tsf_"+name), qstring_cast(name), helptext, value, range, decimals, root);
-	retval->setAddSlider(true);
+	retval->setGuiRepresentation(DoubleDataAdapter::grSLIDER);
 	return retval;
 }
 

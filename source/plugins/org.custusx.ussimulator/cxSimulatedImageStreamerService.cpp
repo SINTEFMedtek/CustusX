@@ -132,7 +132,8 @@ DoubleDataAdapterXmlPtr SimulatedImageStreamerService::getGainOption(QDomElement
 {
 	if(!mSelectedGainDataAdapter)
 	{
-		mSelectedGainDataAdapter = DoubleDataAdapterXml::initialize("gain", "Gain","Simulates ultrasound scanners gain function.", 70, DoubleRange(1, 100, 1), 0, root);
+		mSelectedGainDataAdapter = DoubleDataAdapterXml::initialize("gain", "Gain","Simulates ultrasound scanners gain function.", 0.70, DoubleRange(0, 1, 0.01), 2, root);
+		mSelectedGainDataAdapter->setGuiRepresentation(DoubleDataAdapter::grDIAL);
 		connect(mSelectedGainDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(updateGain()));
 		this->updateGain();
 	}

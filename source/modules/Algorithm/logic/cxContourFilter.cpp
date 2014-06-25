@@ -86,7 +86,7 @@ DoubleDataAdapterXmlPtr ContourFilter::getSurfaceThresholdOption(QDomElement roo
 	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Threshold", "",
 	                                                                            "Values from this threshold and above will be included",
 	                                                                            100.0, DoubleRange(-1000, 1000, 1), 0, root);
-	retval->setAddSlider(true);
+	retval->setGuiRepresentation(DoubleDataAdapter::grSLIDER);
 	return retval;
 }
 

@@ -45,7 +45,7 @@ DoubleDataAdapterXmlPtr DilationFilter::getDilationRadiusOption(QDomElement root
 	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Dilation radius (mm)", "",
     "Set dilation radius in mm", 1, DoubleRange(1, 20, 1), 0,
                     root);
-	retval->setAddSlider(true);
+	retval->setGuiRepresentation(DoubleDataAdapter::grSLIDER);
 	return retval;
 }
 

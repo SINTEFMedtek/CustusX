@@ -51,10 +51,18 @@ QWidget* sscCreateDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* 
 	DoubleDataAdapterPtr dbl = boost::dynamic_pointer_cast<DoubleDataAdapter>(data);
 	if (dbl)
 	{
-        if (dbl->addSlider())
+		DoubleDataAdapter::GuiRepresentation gui = dbl->getGuiRepresentation();
+        switch(gui)
+        {
+        case DoubleDataAdapter::grSLIDER:
             return new SpinBoxAndSliderGroupWidget(parent, dbl, gridLayout, row);
-        else
+            break;
+        case DoubleDataAdapter::grSPINBOX:
             return new SpinBoxGroupWidget(parent, dbl, gridLayout, row);
+            break;
+        case DoubleDataAdapter::grDIAL:
+        	return new SpinBoxAndDialGroupWidget(parent, dbl, gridLayout, row);
+        }
 	}
 
 	BoolDataAdapterPtr bl = boost::dynamic_pointer_cast<BoolDataAdapter>(data);
