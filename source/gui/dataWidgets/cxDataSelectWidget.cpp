@@ -28,16 +28,16 @@
 namespace cx
 {
 
-DataSelectWidget::DataSelectWidget(QWidget* parent, SelectDataStringDataAdapterBasePtr data) :
+DataSelectWidget::DataSelectWidget(QWidget* parent, SelectDataStringDataAdapterBasePtr data, QGridLayout* gridLayout, int row) :
     BaseWidget(parent, "DataSelectWidget", "DataSelectWidget"),
     mData(data)
 {
+
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setMargin(0);
     layout->setSpacing(0);
 
-	QWidget* dataAdapter = sscCreateDataWidget(this, mData);
-    layout->addWidget(dataAdapter);
+	QWidget* dataAdapter = sscCreateDataWidget(this, mData, gridLayout, row);
 
     mToggleShowAction = this->createAction(this,
                     QIcon(":/icons/open_icon_library/png/64x64/others/eye.png.png"),
@@ -47,7 +47,6 @@ DataSelectWidget::DataSelectWidget(QWidget* parent, SelectDataStringDataAdapterB
     mToggleShowAction->setCheckable(true);
     CXSmallToolButton* toggleShowButton = new CXSmallToolButton();
     toggleShowButton->setDefaultAction(mToggleShowAction);
-    layout->addWidget(toggleShowButton);
 
     mRemoveAction = this->createAction(this,
                                        QIcon(),
@@ -60,7 +59,21 @@ DataSelectWidget::DataSelectWidget(QWidget* parent, SelectDataStringDataAdapterB
     EraseDataToolButton* removeButton = new EraseDataToolButton(this);
     connect(removeButton, SIGNAL(rightClick()), this, SLOT(cancelRemovalSlot()));
     removeButton->setDefaultAction(mRemoveAction);
-    layout->addWidget(removeButton);
+
+    if(gridLayout)
+    {
+    	gridLayout->setMargin(0);
+    	gridLayout->setSpacing(0);
+    	QHBoxLayout* lay = new QHBoxLayout;
+    	lay->addWidget(toggleShowButton);
+    	lay->addWidget(removeButton);
+    	gridLayout->addLayout(lay, row, 2);
+    }else
+    {
+		layout->addWidget(dataAdapter);
+		layout->addWidget(toggleShowButton);
+		layout->addWidget(removeButton);
+    }
 
     connect(viewManager(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
     connect(mData.get(), SIGNAL(changed()), this, SLOT(updateDataVisibility()));

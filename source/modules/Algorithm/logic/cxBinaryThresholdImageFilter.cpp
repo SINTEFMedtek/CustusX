@@ -52,7 +52,7 @@ DoubleDataAdapterXmlPtr BinaryThresholdImageFilter::getLowerThresholdOption(QDom
 	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Threshold", "",
 	                                                                            "Select lower threshold for the segmentation", 1, DoubleRange(0, 100, 1), 0,
 	                                                                            root);
-	retval->setAddSlider(true);
+	retval->setGuiRepresentation(DoubleDataAdapter::grSLIDER);
 	return retval;
 }
 

@@ -30,8 +30,7 @@ QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gri
 	SelectDataStringDataAdapterBasePtr dsda = boost::dynamic_pointer_cast<SelectDataStringDataAdapterBase>(data);
 	if (dsda)
 	{
-		retval = new DataSelectWidget(parent, dsda);
-		gridLayout->addWidget(retval, row, 0, 1, 2);
+		retval = new DataSelectWidget(parent, dsda, gridLayout, row);
 		return retval;
 	}
 	if(retval != NULL)

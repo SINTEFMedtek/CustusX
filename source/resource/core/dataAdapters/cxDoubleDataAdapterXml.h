@@ -52,13 +52,13 @@ typedef boost::shared_ptr<class DoubleDataAdapterXml> DoubleDataAdapterXmlPtr;
  */
 class DoubleDataAdapterXml: public DoubleDataAdapter
 {
-Q_OBJECT
+
+	Q_OBJECT
 public:
 	/** Make sure one given option exists witin root.
 	 * If not present, fill inn the input defaults.
 	 */
-	static DoubleDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, double value,
-		DoubleRange range, int decimals, QDomNode root = QDomNode());
+	static DoubleDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, double value, DoubleRange range, int decimals, QDomNode root = QDomNode());
 	void setInternal2Display(double factor);
 
 public:
@@ -79,9 +79,6 @@ public:
 		return display / mFactor;
 	} ///< conversion from internal value to display value
 
-    virtual bool addSlider() const { return mAddSlider; }
-    void setAddSlider(bool add) { mAddSlider = add; }
-
 public:
 	QString getUid() const;
 
@@ -98,7 +95,6 @@ private:
 	DoubleRange mRange;
 	XmlOptionItem mStore;
 	double mFactor;
-    bool mAddSlider;
 };
 
 } // namespace cx
