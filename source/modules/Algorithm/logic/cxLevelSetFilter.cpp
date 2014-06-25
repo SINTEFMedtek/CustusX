@@ -363,7 +363,6 @@ DoubleDataAdapterXmlPtr LevelSetFilter::getThresholdOption(QDomElement root)
 	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize(
 			"Threshold", "", "Select threshold for the segmentation", 1,
 			DoubleRange(-5000, 5000, 0.0000001), 0, root);
-	//retval->setAddSlider(true);
 	return retval;
 
 }
@@ -373,7 +372,6 @@ DoubleDataAdapterXmlPtr LevelSetFilter::getEpsilonOption(QDomElement root)
 	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Epsilon",
 			"", "Select epsilon for the segmentation", 1,
 			DoubleRange(-5000, 5000, 0.0000001), 0, root);
-	//retval->setAddSlider(true);
 	return retval;
 
 }
@@ -383,7 +381,7 @@ DoubleDataAdapterXmlPtr LevelSetFilter::getAlphaOption(QDomElement root)
 	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Alpha",
 			"", "Select alpha for the segmentation", 0.1,
 			DoubleRange(0, 1, 0.01), 2, root);
-	retval->setAddSlider(true);
+	retval->setGuiRepresentation(DoubleDataAdapter::grSLIDER);
 	return retval;
 
 }
@@ -395,7 +393,7 @@ DoubleDataAdapterXmlPtr LevelSetFilter::getRadiusOption(QDomElement root)
 					"",
 					"Select radius (in mm) for the morphological closing of the final result. Radius at 0 will skip this process.",
 					0.0, DoubleRange(0, 20, 0.5), 2, root);
-	retval->setAddSlider(true);
+	retval->setGuiRepresentation(DoubleDataAdapter::grSLIDER);
 	return retval;
 
 }
