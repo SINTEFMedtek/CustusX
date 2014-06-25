@@ -129,6 +129,11 @@ void ReconstructionManager::transferFunctionChangedSlot()
 
 void ReconstructionManager::startReconstruction()
 {
+	if(!mOutputVolumeParams.isValid())
+	{
+		reportError("Cannot reconstruct from invalid ultrasound data");
+		return;
+	}
 	ReconstructionServicePtr algo = this->createAlgorithm();
 	ReconstructCore::InputParams par = this->createCoreParameters();
 	USReconstructInputData fileData = mOriginalFileData;
@@ -142,7 +147,6 @@ void ReconstructionManager::startReconstruction()
 	mExecuters.push_back(executer);
 
 	executer->startReconstruction(algo, par, fileData, mParams->mCreateBModeWhenAngio->getValue());
-
 }
 
 std::set<cx::TimedAlgorithmPtr> ReconstructionManager::getThreadedReconstruction()
@@ -256,7 +260,13 @@ void ReconstructionManager::updateFromOriginalFileData()
 	ReconstructPreprocessorPtr preprocessor(new ReconstructPreprocessor());
 	preprocessor->initialize(this->createCoreParameters(), mOriginalFileData);
 
-	mOutputVolumeParams = preprocessor->getOutputVolumeParams();
+	if (preprocessor->getOutputVolumeParams().isValid())
+		mOutputVolumeParams = preprocessor->getOutputVolumeParams();
+	else
+	{
+		reportError("Input ultrasound data not valid for reconstruction");
+		return;
+	}
 
 	emit paramsChanged();
 }

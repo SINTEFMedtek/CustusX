@@ -393,15 +393,12 @@ void ReconstructPreprocessor::findExtentAndOutputTransform()
 
 	// Calculate optimal output image spacing and dimensions based on US frame spacing
 	double inputSpacing = std::min(mFileData.mUsRaw->getSpacing()[0], mFileData.mUsRaw->getSpacing()[1]);
-	mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing);
-	mOutputVolumeParams.setMaxVolumeSize(mInput.mMaxOutputVolumeSize);
+	mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing, mInput.mMaxOutputVolumeSize);
 
 	if (dataManager())
 		mOutputVolumeParams.set_rMd((dataManager()->get_rMpr()) * prMd);
 	else
 		mOutputVolumeParams.set_rMd(prMd);
-
-	mOutputVolumeParams.constrainVolumeSize();
 }
 
 /**Use the mOriginalFileData structure to rebuild all internal data.
