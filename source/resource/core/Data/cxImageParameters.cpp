@@ -92,7 +92,7 @@ void ImageParameters::limitVoxelsKeepBounds(unsigned long maxVoxels)
 	if (this->getNumVoxels() <= maxVoxels)
 		return;
 
-	if(mDim.minCoeff() == 1)
+	if(mDim.minCoeff() == 1) //At least one of the dimensions == 1
 	{
 			reportError("ImageParameters::limitVoxelsKeepBounds() only work with 3D images");
 			return;

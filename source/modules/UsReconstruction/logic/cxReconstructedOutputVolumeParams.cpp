@@ -24,19 +24,25 @@ namespace cx
 
 OutputVolumeParams::OutputVolumeParams() :
 	mInputSpacing(0),
-	mMaxVolumeSize(32*1000)
+	mMaxVolumeSize(32*1000),
+	mValid(false)
 {
 
 }
 /** Initialize the volue parameters with sensible defaults.
  */
-OutputVolumeParams::OutputVolumeParams(DoubleBoundingBox3D extent, double inputSpacing) :
-	mInputSpacing(inputSpacing), mMaxVolumeSize(32*1000)
+OutputVolumeParams::OutputVolumeParams(DoubleBoundingBox3D extent, double inputSpacing, double maxVolumeSize) :
+	mInputSpacing(inputSpacing), mMaxVolumeSize(maxVolumeSize), mValid(false)
 {
 	mImage.setSpacingKeepDim(Eigen::Array3d(inputSpacing, inputSpacing, inputSpacing));
 	mImage.setDimKeepBoundsAlignSpacing(extent.range());
 
 	this->constrainVolumeSize();
+
+	if(mImage.getDim().minCoeff() <= 1) //At least one of the dimensions <= 1
+		mValid = false;
+	else
+		mValid = true;
 }
 
 unsigned long OutputVolumeParams::getVolumeSize() const

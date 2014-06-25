@@ -45,7 +45,9 @@ class OutputVolumeParams
 {
 public:
 	OutputVolumeParams();
-	OutputVolumeParams(DoubleBoundingBox3D extent, double inputSpacing);
+	OutputVolumeParams(DoubleBoundingBox3D extent, double inputSpacing, double maxVolumeSize/* = 32*1000*/);
+
+	bool isValid() {return mValid;}
 
 	unsigned long getVolumeSize() const;
 
@@ -78,6 +80,7 @@ private:
 	double mInputSpacing;
 
 	ImageParameters mImage;
+	bool mValid;
 
 	void suggestSpacingKeepBounds(double spacing);
 };
