@@ -23,6 +23,7 @@
 #include <vtkImageData.h>
 #include "cxStringDataAdapterXml.h"
 #include "cxReconstructionExecuter.h"
+#include "cxDataLocations.h"
 
 namespace cxtest
 {
@@ -109,6 +110,7 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 
 TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstruction][integration][not_win32]")
 {
+	cx::DataLocations::setTestMode();
 	ReconstructionManagerTestFixture fixture;
 	ReconstructRealTestData realData;
 	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
@@ -129,6 +131,7 @@ TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstru
 
 TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruction][integration][not_win32]")
 {
+	cx::DataLocations::setTestMode();
 	ReconstructionManagerTestFixture fixture;
 	ReconstructRealTestData realData;
 	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
