@@ -273,13 +273,15 @@ QString StateService::getDefaultGrabberInitScript()
 #elif WIN32
 	return "";
 #else
-	QStringList result;
-	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/..", "run_v2u.sh", "");
-	if (!result.isEmpty())
-		return result[0];
-	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../CustusX3/install/Linux/copy/", "run_v2u.sh", "");
-	if (!result.isEmpty())
-		return result[0];
+	// this applies to VGA-based used of the Epiphan DVI2USB converter. Too specialized to be a general default.
+	// Also causes script to ask for root access, which thrashes the command line.
+//	QStringList result;
+//	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/..", "run_v2u.sh", "");
+//	if (!result.isEmpty())
+//		return result[0];
+//	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../CustusX3/install/Linux/copy/", "run_v2u.sh", "");
+//	if (!result.isEmpty())
+//		return result[0];
 	return "";
 #endif
 }

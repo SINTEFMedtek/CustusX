@@ -22,7 +22,7 @@ UsReconstructionPlugin::UsReconstructionPlugin()
 {
   XmlOptionFile xmlFile = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction");
   mReconstructer.reset(new ReconstructionManager(xmlFile, DataLocations::getShaderPath()));
-  mReconstructer->init();
+  //mReconstructer->init();
 
   connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 

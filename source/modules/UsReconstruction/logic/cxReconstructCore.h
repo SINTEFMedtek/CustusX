@@ -27,7 +27,8 @@
 
 namespace cx
 {
-typedef boost::shared_ptr<class ReconstructionService> ReconstructionServicePtr;
+typedef class ReconstructionService* ReconstructionServicePtr;
+//typedef boost::shared_ptr<class ReconstructionService> ReconstructionServicePtr;
 
 typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 

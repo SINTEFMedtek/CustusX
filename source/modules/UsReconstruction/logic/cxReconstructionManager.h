@@ -37,7 +37,7 @@ typedef boost::shared_ptr<class ReconstructionManager> ReconstructionManagerPtr;
 typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
 typedef boost::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
-typedef boost::shared_ptr<class ReconstructionService> ReconstructionServicePtr;
+//typedef boost::shared_ptr<class ReconstructionService> ReconstructionServicePtr;
 typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
 typedef boost::shared_ptr<class ThreadedTimedReconstructPreprocessor> ThreadedTimedReconstructPreprocessorPtr;
 typedef boost::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedReconstructCorePtr;
@@ -78,7 +78,7 @@ public:
 	ReconstructionManager(XmlOptionFile settings, QString shaderPath);
 	virtual ~ReconstructionManager();
 
-	virtual void init();
+//	virtual void init();
 
 	virtual void selectData(QString filename, QString calFilesPath = ""); ///< Set input data for reconstruction
 	virtual void selectData(USReconstructInputData data); ///< Set input data for reconstruction

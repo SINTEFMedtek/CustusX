@@ -35,7 +35,7 @@ TEST_CASE("ReconstructAlgorithm: VNNcl on sphere","[unit][VNNcl][usreconstructio
 
 	QString name = "DefaultVNNcl";
 
-	fixture.setAlgorithm(algorithm);
+	fixture.setAlgorithm(algorithm.get());
 	algorithm->getRadiusOption(settings)->setValue(10);
 	SECTION("VNN")
 	{
@@ -115,16 +115,16 @@ TEST_CASE("ReconstructManager: VNNcl on real data", "[usreconstruction][integrat
 	ReconstructRealTestData realData;
 	cx::ReconstructionManagerPtr reconstructer = fixture.getManager();
 
-	reconstructer->init();
+//	reconstructer->init();
 	reconstructer->selectData(realData.getSourceFilename());
 	reconstructer->getParams()->mAlgorithmAdapter->setValue("VNNcl");
 	reconstructer->getParams()->mAngioAdapter->setValue(false);
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
 
-	boost::shared_ptr<cx::VNNclReconstructionService> algorithm;
+	cx::VNNclReconstructionService* algorithm;
 	cx::ReconstructionServicePtr algorithmService = reconstructer->createAlgorithm();
 	REQUIRE(algorithmService);
-	algorithm = boost::dynamic_pointer_cast<cx::VNNclReconstructionService>(algorithmService);
+	algorithm = dynamic_cast<cx::VNNclReconstructionService*>(algorithmService);
 	REQUIRE(algorithm);// Check if we got the algorithm
 
 	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "VNNcl");
