@@ -31,7 +31,8 @@ bool DataLocations::mTestMode = false;
 void DataLocations::setTestMode()
 {
 	mTestMode = true;
-	cx::removeNonemptyDirRecursively(getTestDataPath() + "/temp/settings");
+	cx::removeNonemptyDirRecursively(getTestDataPath() + "/temp");
+//	cx::removeNonemptyDirRecursively(getTestDataPath() + "/temp/settings");
 }
 
 QString DataLocations::getTestDataPath()
