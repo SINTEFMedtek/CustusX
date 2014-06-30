@@ -1,0 +1,8 @@
+<?xml version = "1.0"?>
+<configuration clinical_app="Laboratory">
+    <tracker type="polaris">
+        <toolfile reference="no">../Tools/Shared/L14-5-Probe-03-065-0153_Ultrasonix_POLARIS/tool.xml</toolfile>
+        <toolfile reference="yes">../Tools/Neurology/SW-Invite/SW-RefFrame-02-077-0191_POLARIS/tool.xml</toolfile>
+        <toolfile reference="no">../Tools/Laboratory/SW-Pointer-07-081-0229_POLARIS/SW-Pointer-07-081-0229_POLARIS.xml</toolfile>
+    </tracker>
+</configuration>
