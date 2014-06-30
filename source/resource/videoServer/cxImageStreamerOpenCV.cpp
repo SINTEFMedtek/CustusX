@@ -8,8 +8,6 @@
 #include "cxImageStreamerOpenCV.h"
 #include "cxConfig.h"
 
-#ifdef CX_USE_OpenCV
-
 #include <QCoreApplication>
 #include <QTimer>
 #include <QTime>
@@ -28,8 +26,10 @@
 #include "cxTypeConversions.h"
 #include "cxCommandlineImageStreamerFactory.h"
 
+#ifdef CX_USE_OpenCV
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#endif
 
 namespace
 {
@@ -70,7 +70,9 @@ ImageStreamerOpenCV::ImageStreamerOpenCV() :
 	mAvailableImage = false;
 	setSendInterval(40);
 
+#ifdef CX_USE_OpenCV
 	mVideoCapture.reset(new cv::VideoCapture());
+#endif
 	mGrabTimer = new QTimer(this);
 	connect(mGrabTimer, SIGNAL(timeout()), this, SLOT(grab())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 	mSendTimer = new QTimer(this);
@@ -89,14 +91,16 @@ QString ImageStreamerOpenCV::getType()
 
 QStringList ImageStreamerOpenCV::getArgumentDescription()
 {
-    QStringList retval;
-    retval << "--videoport:		video id,     default=0";
-    retval << "--in_width:		width of incoming image, default=camera";
-    retval << "--in_height:		height of incoming image, default=camera";
-    retval << "--out_width:		width of outgoing image, default=camera";
-    retval << "--out_height:		width of outgoing image, default=camera";
-    retval << "--properties:		dump image properties";
-    return retval;
+	QStringList retval;
+#ifdef CX_USE_OpenCV
+	retval << "--videoport:		video id,     default=0";
+	retval << "--in_width:		width of incoming image, default=camera";
+	retval << "--in_height:		height of incoming image, default=camera";
+	retval << "--out_width:		width of outgoing image, default=camera";
+	retval << "--out_height:		width of outgoing image, default=camera";
+	retval << "--properties:		dump image properties";
+#endif
+	return retval;
 }
 
 
@@ -107,8 +111,10 @@ void ImageStreamerOpenCV::initialize(StringMap arguments)
 
 void ImageStreamerOpenCV::deinitialize_local()
 {
+#ifdef CX_USE_OpenCV
 	mVideoCapture->release();
 	mVideoCapture.reset(new cv::VideoCapture());
+#endif
 }
 
 void ImageStreamerOpenCV::initialize_local()
@@ -130,6 +136,7 @@ void ImageStreamerOpenCV::initialize_local()
 	bool sourceIsInt = false;
 	videoSource.toInt(&sourceIsInt);
 
+#ifdef CX_USE_OpenCV
 	if (sourceIsInt){
 	    // open device (camera)
 		mVideoCapture->open(videoport);
@@ -173,6 +180,7 @@ void ImageStreamerOpenCV::initialize_local()
 
 		std::cout << std::endl;
 	}
+#endif
 }
 
 bool ImageStreamerOpenCV::startStreaming(SenderPtr sender)
@@ -206,6 +214,7 @@ void ImageStreamerOpenCV::stopStreaming()
 
 void ImageStreamerOpenCV::dumpProperties()
 {
+#ifdef CX_USE_OpenCV
 	this->dumpProperty(CV_CAP_PROP_POS_MSEC, "CV_CAP_PROP_POS_MSEC");
 	this->dumpProperty(CV_CAP_PROP_POS_FRAMES, "CV_CAP_PROP_POS_FRAMES");
 	this->dumpProperty(CV_CAP_PROP_POS_AVI_RATIO, "CV_CAP_PROP_POS_AVI_RATIO");
@@ -225,45 +234,34 @@ void ImageStreamerOpenCV::dumpProperties()
 	this->dumpProperty(CV_CAP_PROP_CONVERT_RGB, "CV_CAP_PROP_CONVERT_RGB");
 	//  this->dumpProperty(CV_CAP_PROP_WHITE_BALANCE, "CV_CAP_PROP_WHITE_BALANCE");
 	this->dumpProperty(CV_CAP_PROP_RECTIFICATION, "CV_CAP_PROP_RECTIFICATION");
+#endif
 }
 
 void ImageStreamerOpenCV::dumpProperty(int val, QString name)
 {
+#ifdef CX_USE_OpenCV
 	double value = mVideoCapture->get(val);
 	if (value != -1)
 		std::cout << "Property " << name.toStdString() << " : " << mVideoCapture->get(val) << std::endl;
+#endif
 }
 
 void ImageStreamerOpenCV::grab()
 {
-//	return;
+#ifdef CX_USE_OpenCV
 	if (!mVideoCapture->isOpened())
 	{
 		return;
 	}
-//	QTime start = QTime::currentTime();
 	// grab images from camera to opencv internal buffer, do not process
 	mVideoCapture->grab();
-//	int val = mCounter.elapsed();
 	mLastGrabTime = QDateTime::currentDateTime();
 	mAvailableImage = true;
-//	static int counter=0;
-//	if (++counter%50==0)
-//		std::cout << "=== ImageStreamerOpenCV   - grab: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
-
+#endif
 }
 
 void ImageStreamerOpenCV::send()
 {
-//	static int counter = 0;
-//	if (++counter==150)
-//	{
-//		std::cout << " ImageStreamerOpenCV::send()" << std::endl;
-//		this->stopStreaming();
-//	}
-//	return;
-//	QTime start = QTime::currentTime();
-
 	if (!mSender || !mSender->isReady())
 		return;
 	if (!mAvailableImage)
@@ -283,6 +281,9 @@ void ImageStreamerOpenCV::send()
 
 IGTLinkImageMessage::Pointer ImageStreamerOpenCV::getImageMessage()
 {
+	IGTLinkImageMessage::Pointer imgMsg = IGTLinkImageMessage::New();
+
+#ifdef CX_USE_OpenCV
 	if (!mVideoCapture->isOpened())
 		return IGTLinkImageMessage::Pointer();
 
@@ -356,7 +357,7 @@ IGTLinkImageMessage::Pointer ImageStreamerOpenCV::getImageMessage()
 	}
 	//------------------------------------------------------------
 	// Create a new IMAGE type message
-	IGTLinkImageMessage::Pointer imgMsg = IGTLinkImageMessage::New();
+//	IGTLinkImageMessage::Pointer imgMsg = IGTLinkImageMessage::New();
 	imgMsg->SetDimensions(size);
 	imgMsg->SetSpacing(spacingF);
 	imgMsg->SetScalarType(scalarType);
@@ -427,7 +428,7 @@ IGTLinkImageMessage::Pointer ImageStreamerOpenCV::getImageMessage()
 	imgMsg->SetMatrix(matrix);
 
 //	  std::cout << "   grab+process " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
-
+#endif
 	return imgMsg;
 }
 
@@ -436,5 +437,3 @@ IGTLinkImageMessage::Pointer ImageStreamerOpenCV::getImageMessage()
 //------------------------------------------------------------
 
 }
-
-#endif // CX_USE_OpenCV
