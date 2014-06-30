@@ -85,8 +85,7 @@ void PluginFrameworkManager::loadState()
 }
 
 void PluginFrameworkManager::loadPluginFromStoredState(QString symbolicName, QString storedState)
-{
-	std::cout << "load plugin: " << symbolicName << std::endl;
+{	
 	if (storedState.isEmpty())
 	{
 		report(QString("Detected new plugin [%1], autostarting...").arg(symbolicName));
@@ -94,6 +93,8 @@ void PluginFrameworkManager::loadPluginFromStoredState(QString symbolicName, QSt
 	}
 
 	ctkPlugin::State state = getctkPluginStateForString(storedState);
+
+	report(QString("Initializing plugin to state [%2]: %1").arg(symbolicName).arg(getStringForctkPluginState(state)));
 
 	if (state==ctkPlugin::UNINSTALLED)
 		return;
@@ -106,8 +107,6 @@ void PluginFrameworkManager::loadPluginFromStoredState(QString symbolicName, QSt
 
 void PluginFrameworkManager::saveState()
 {
-//	settings()->setValue(mSettingsSearchPaths, this->getSearchPaths());
-
 	QStringList names = this->getPluginSymbolicNames();
 	for (unsigned i=0; i<names.size(); ++i)
 	{

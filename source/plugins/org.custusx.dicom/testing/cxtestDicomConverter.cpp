@@ -28,6 +28,11 @@ typedef QSharedPointer<ctkDICOMDatabase> ctkDICOMDatabasePtr;
 class DicomConverterTestFixture
 {
 public:
+	DicomConverterTestFixture()
+	{
+		cx::DataLocations::setTestMode();
+	}
+
 	void checkImagesEqual(vtkImageDataPtr input1, vtkImageDataPtr input2)
 	{
 		REQUIRE(input1.Get()!=(vtkImageData*)NULL);
@@ -91,12 +96,13 @@ public:
 	ctkDICOMDatabasePtr openDatabase()
 	{
 		QString databaseFileName = this->getDatabaseFileName();
+
+		QString dbPath = QFileInfo(databaseFileName).absolutePath();
+		QDir(dbPath).mkpath(".");
+
 		ctkDICOMDatabasePtr DICOMDatabase;
 		DICOMDatabase = ctkDICOMDatabasePtr(new ctkDICOMDatabase);
-		SSC_LOG("");
 		DICOMDatabase->openDatabase( databaseFileName );
-		SSC_LOG("");
-		//DICOMDatabase->isOpen();
 
 		return DICOMDatabase;
 	}
@@ -104,14 +110,7 @@ public:
 	ctkDICOMDatabasePtr loadDirectory(QString folder)
 	{
 		this->eraseDatabase();
-		QString databaseFileName = cx::DataLocations::getTestDataPath()+"/temp/testDatabase";
-//		QFile(databaseFileName).remove();
 		ctkDICOMDatabasePtr DICOMDatabase = this->openDatabase();
-
-//		ctkDICOMDatabasePtr DICOMDatabase;
-//		DICOMDatabase = ctkDICOMDatabasePtr(new ctkDICOMDatabase);
-//		DICOMDatabase->openDatabase( databaseFileName );
-DICOMDatabase->isOpen();
 		QSharedPointer<ctkDICOMIndexer> DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer);
 		DICOMIndexer->addDirectory(*DICOMDatabase,folder,"");
 
@@ -123,9 +122,6 @@ DICOMDatabase->isOpen();
 		REQUIRE(strings.size()==1);
 		return strings.front();
 	}
-
-	//	QSharedPointer<ctkDICOMDatabase> DICOMDatabase;
-	//	QSharedPointer<ctkDICOMDatabase> database() { return DICOMDatabase; }
 };
 
 TEST_CASE("DicomConverter: Fixture test", "[unit][plugins][org.custusx.dicom]")
@@ -149,7 +145,7 @@ TEST_CASE("DicomConverter: Fixture test", "[unit][plugins][org.custusx.dicom]")
 	CHECK(true);
 }
 
-TEST_CASE("DicomConverter: Open database", "[unstable][unit][plugins][org.custusx.dicom]")
+TEST_CASE("DicomConverter: Open database", "[unit][plugins][org.custusx.dicom]")
 {
 	cx::Reporter::initialize();
 

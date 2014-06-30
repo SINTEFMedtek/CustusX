@@ -78,7 +78,6 @@ CommandlineImageStreamerFactory::CommandlineImageStreamerFactory()
 	mCommandLineStreamers.push_back(CommandLineStreamerPtr(new ImageStreamerSonix()));
 #endif
 #ifdef CX_USE_OpenCV
-	std::cout << "!" << std::endl;
 	mCommandLineStreamers.push_back(CommandLineStreamerPtr(new ImageStreamerOpenCV()));
 #endif
 #ifdef CX_USE_ISB_GE
