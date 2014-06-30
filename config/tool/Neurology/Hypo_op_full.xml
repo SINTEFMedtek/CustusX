@@ -1,9 +1,0 @@
-<?xml version = "1.0"?>
-<configuration clinical_app="Neurology">
-    <tracker type="aurora">
-        <toolfile reference="no">../Tools/Neurology/Hypofyse-Probe_Vivid7-Karkirurgen_AURORA_port2/Hypofyse-Probe_Vivid7-Karkirurgen_AURORA_port2.xml</toolfile>
-        <toolfile reference="no">../Tools/Neurology/Pituitary-Pointer_AURORA_port4/Pituitary_Pointer_AURORA_port4.xml</toolfile>
-        <toolfile reference="no">../Tools/Shared/Pointer_AURORA_port3/Pointer_AURORA_port3.xml</toolfile>
-        <toolfile reference="yes">../Tools/Shared/Reference_AURORA_port1/Reference_AURORA_port1.xml</toolfile>
-    </tracker>
-</configuration>

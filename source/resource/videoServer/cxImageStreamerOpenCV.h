@@ -4,7 +4,6 @@
 #include <QObject> //needed for the mocer when OpenCv is not used...
 #include "cxConfig.h"
 
-#ifdef CX_USE_OpenCV
 #include "boost/shared_ptr.hpp"
 #include <QTcpSocket>
 #include <QDateTime>
@@ -77,5 +76,4 @@ private:
 
 }
 
-#endif // CX_USE_OpenCV
 #endif /* CXIMAGESTREAMEROPENCV_H_ */
