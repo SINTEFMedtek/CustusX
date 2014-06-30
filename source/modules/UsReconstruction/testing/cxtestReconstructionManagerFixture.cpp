@@ -44,10 +44,9 @@ ReconstructionManagerTestFixture::~ReconstructionManagerTestFixture()
 void ReconstructionManagerTestFixture::setPNN_InterpolationSteps(int value)
 {
 	cx::ReconstructionManagerPtr manager = this->getManager();
-	manager->init();
 	QDomElement algo = manager->getSettings().getElement("algorithms", "PNN");
 	cx::ReconstructionServicePtr algorithm = manager->createAlgorithm();
-	REQUIRE(algorithm.get());
+	REQUIRE(algorithm);
 
 	std::vector<DataAdapterPtr> adaptors = algorithm->getSettings(algo);
 	for(int i=0; i<adaptors.size(); ++i)

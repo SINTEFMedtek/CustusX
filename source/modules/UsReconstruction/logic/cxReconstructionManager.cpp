@@ -61,6 +61,7 @@ ReconstructionManager::ReconstructionManager(XmlOptionFile settings, QString sha
 	        boost::bind(&ReconstructionManager::onServiceRemoved, this, _1)
 	));
 
+	mServiceListener->open();
 	this->initAlgorithm();
 }
 
@@ -68,10 +69,10 @@ ReconstructionManager::~ReconstructionManager()
 {
 }
 
-void ReconstructionManager::init()
-{
-	mServiceListener->open();
-}
+//void ReconstructionManager::init()
+//{
+//	mServiceListener->open();
+//}
 
 namespace
 {
@@ -85,24 +86,28 @@ ReconstructionServicePtr ReconstructionManager::createAlgorithm()
 {
 	QString name = mParams->mAlgorithmAdapter->getValue();
 
-	ReconstructionServicePtr algo;
-	if(!name.isEmpty())
-		algo = ReconstructionServicePtr(mServiceListener->getService(name), null_deleter());
+	if(name.isEmpty())
+		return ReconstructionServicePtr();
 
-	return algo;
+	return mServiceListener->getService(name);
 }
 
 void ReconstructionManager::initAlgorithm()
 {
-    ReconstructionServicePtr algo = this->createAlgorithm();
+	ReconstructionService* algo = this->createAlgorithm();
 
 	// generate settings for new algo
 	if (algo)
 	{
 		QDomElement element = mSettings.getElement("algorithms", algo->getName());
 		mAlgoOptions = algo->getSettings(element);
-		emit algorithmChanged();
 	}
+	else
+	{
+		mAlgoOptions.clear();
+	}
+
+	emit algorithmChanged();
 }
 
 void ReconstructionManager::setSettings()
@@ -134,7 +139,7 @@ void ReconstructionManager::startReconstruction()
 		reportError("Cannot reconstruct from invalid ultrasound data");
 		return;
 	}
-	ReconstructionServicePtr algo = this->createAlgorithm();
+	ReconstructionService* algo = this->createAlgorithm();
 	ReconstructCore::InputParams par = this->createCoreParameters();
 	USReconstructInputData fileData = mOriginalFileData;
 	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
