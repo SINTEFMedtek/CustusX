@@ -310,9 +310,9 @@ ENDIF(APPLE)
 	# collect all installations here. They will be used by fixup_bundle to collect dependencies.
 	# this is a sum of the input pattern (if any) and the qtplugins
 	set(INSTALL_LIBRARIES_PATTERN_LOCAL
-#		${INSTALL_BINARY_DIR}/modules/*${CMAKE_SHARED_LIBRARY_SUFFIX}
 		${INSTALL_BINARY_DIR}/../plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}
-		${INSTALL_LIBRARIES_PATTERN_LOCAL}
+                ${INSTALL_BINARY_DIR}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}
+                ${INSTALL_LIBRARIES_PATTERN_LOCAL}
 		)
 
 	# install a qt.conf file
