@@ -66,7 +66,7 @@ private:
   };
 
   void populateConfigurations(); ///< populates the combobox with all config files from the current application application
-  int addConfigurationToComboBox(QString displayName, QString absoluteFilePath, bool edited = false); ///< adds a new configuration file item to the combobox
+	int addConfigurationToComboBox(QString displayName, QString absoluteFilePath); ///< adds a new configuration file item to the combobox
   void setState(QComboBox* box, int index, bool edited); ///< sets the state of a configuration file to be either edited or not, decides whether to save or not
 //  ConfigurationFileParser::Configuration getCurrentConfiguration();
   TrackerConfiguration::Configuration getCurrentConfiguration();
