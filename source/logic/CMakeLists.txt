@@ -49,4 +49,5 @@ target_link_libraries(cxLogicManager
 	cxStateService
     )
 
+add_subdirectory(testing)
 
