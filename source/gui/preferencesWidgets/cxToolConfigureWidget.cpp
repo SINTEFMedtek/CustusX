@@ -269,7 +269,7 @@ void ToolConfigureGroupBox::populateConfigurations()
   mConfigFilesComboBox->setCurrentIndex(currentIndex);
 }
 
-int ToolConfigureGroupBox::addConfigurationToComboBox(QString displayName, QString absoluteFilePath, bool edited)
+int ToolConfigureGroupBox::addConfigurationToComboBox(QString displayName, QString absoluteFilePath)
 {
   mConfigFilesComboBox->addItem(displayName);
   int index = mConfigFilesComboBox->findText(displayName);
