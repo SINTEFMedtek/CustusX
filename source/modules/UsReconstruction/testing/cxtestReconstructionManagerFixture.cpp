@@ -33,6 +33,7 @@ namespace cxtest
 ReconstructionManagerTestFixture::ReconstructionManagerTestFixture()
 {
 	mVerbose = false;
+	cx::DataLocations::setTestMode();
 	cx::LogicManager::initialize();
 }
 
