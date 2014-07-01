@@ -77,6 +77,7 @@ private:
 	QString getCurrentPath();
 	void updateComboBox();
 	QString defaultWhatsThis() const;
+	void createNewStackedWidget(QString algoName);
 };
 
 /**
