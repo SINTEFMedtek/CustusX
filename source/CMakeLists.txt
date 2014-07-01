@@ -6,7 +6,6 @@
 # External libraries
 #-----------------------------------------------------------------------------
 
-
 cx_initialize_Boost()
 cx_initialize_QT()
 cx_initialize_VTK()

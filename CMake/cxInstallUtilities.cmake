@@ -94,6 +94,15 @@ macro(cx_initialize_custusx_install)
 	# used as a global variable: clear at start of run
 	unset(CX_APPLE_TARGETS_TO_COPY CACHE)
 
+
+    SET(CX_INSTALL_BINARY_DIR ${CX_INSTALL_ROOT_DIR}/bin)
+    SET(CX_INSTALL_CONFIG_DIR ${CX_INSTALL_ROOT_DIR}/bin)
+    IF(APPLE)
+        SET(CX_INSTALL_BINARY_DIR "${CX_INSTALL_ROOT_DIR}/CustusX.app/Contents/MacOS")
+        SET(CX_INSTALL_CONFIG_DIR "${CX_INSTALL_ROOT_DIR}/CustusX.app/Contents/Resources")
+   ENDIF(APPLE)
+
+
 endmacro()
 
 ###############################################################################
@@ -285,6 +294,9 @@ endfunction()
 #     http://lists.trolltech.com/qt-interest/2008-09/thread00258-0.html
 #     http://doc.qt.nokia.com/4.7-snapshot/qt-conf.html
 #
+# How to debug install: cpack --debug --verbose
+#  ( from http://www.cmake.org/Wiki/CMake:Packaging_With_CPack)
+#
 ###############################################################################
 function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR INSTALL_CONFIG_DIR INSTALL_LIBRARIES_PATTERN_LOCAL DIRS_LOCAL)
 	cx_assert_variable_exists(${QT_PLUGINS_DIR})
@@ -301,6 +313,7 @@ IF(APPLE)
 	SET(INSTALL_PLUGIN_DIR "${INSTALL_BINARY_DIR}/../plugins")
 ENDIF(APPLE)
 
+
 	# Install needed Qt plugins by copying directories from the qt installation
 	# One can cull what gets copied by using 'REGEX "..." EXCLUDE'
 	install(DIRECTORY "${QT_PLUGINS_DIR}/imageformats" "${QT_PLUGINS_DIR}/sqldrivers"
@@ -310,7 +323,7 @@ ENDIF(APPLE)
 	# collect all installations here. They will be used by fixup_bundle to collect dependencies.
 	# this is a sum of the input pattern (if any) and the qtplugins
 	set(INSTALL_LIBRARIES_PATTERN_LOCAL
-		${INSTALL_BINARY_DIR}/../plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}
+#		${INSTALL_BINARY_DIR}/../plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}
                 ${INSTALL_BINARY_DIR}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}
                 ${INSTALL_LIBRARIES_PATTERN_LOCAL}
 		)

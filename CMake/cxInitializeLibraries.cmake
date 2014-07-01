@@ -267,6 +267,11 @@ endmacro()
 macro(cx_initialize_CTK)
     find_package(CTK REQUIRED)
     include(${CTK_USE_FILE})
+
+# override internal settings from CTK - otherwise the plugins will appear within ctk-named folders.
+    set(CTK_INSTALL_PLUGIN_DIR "${CX_INSTALL_BINARY_DIR}")
+    set(CTK_INSTALL_PLUGIN_INCLUDE_DIR "${CX_INSTALL_ROOT_DIR}/include/plugins")
+
 endmacro()
 
 ###############################################################################
