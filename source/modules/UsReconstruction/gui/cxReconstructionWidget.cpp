@@ -158,9 +158,11 @@ void ReconstructionWidget::repopulateAlgorithmGroup()
 			return;
 		}
 	}
+	this->createNewStackedWidget(algoName);
+}
 
-	// No existing found,
-	//  create a new stack element for this algo:
+void ReconstructionWidget::createNewStackedWidget(QString algoName)
+{
 	QWidget* oneAlgoWidget = new QWidget(this);
 	oneAlgoWidget->setObjectName(algoName);
 	mAlgoLayout->addWidget(oneAlgoWidget);
@@ -168,10 +170,12 @@ void ReconstructionWidget::repopulateAlgorithmGroup()
 	oneAlgoLayout->setMargin(0);
 
 	std::vector<DataAdapterPtr> algoOption = mReconstructer->getAlgoOptions();
-	for (unsigned i = 0; i < algoOption.size(); ++i)
+	unsigned row = 0;
+	for (;row < algoOption.size(); ++row)
 	{
-		sscCreateDataWidget(oneAlgoWidget, algoOption[i], oneAlgoLayout, i);
+		sscCreateDataWidget(oneAlgoWidget, algoOption[row], oneAlgoLayout, row);
 	}
+	oneAlgoLayout->setRowStretch(row, 1); // Set stretch on last row
 
 	mAlgoLayout->setCurrentWidget(oneAlgoWidget);
 }

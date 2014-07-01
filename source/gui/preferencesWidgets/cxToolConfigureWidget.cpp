@@ -342,33 +342,10 @@ TrackerConfiguration::Configuration ToolConfigureGroupBox::getCurrentConfigurati
 QString ToolConfigureGroupBox::generateConfigName()
 {
   QString retval;
-
-  QStringList applicationFilter = mApplicationGroupBox->getSelected();
-  QStringList trackingsystemFilter = mTrackingSystemGroupBox->getSelected();
-  QStringList absoluteToolFilePathsFilter = mToolListWidget->getTools();
-
-  QString absoluteDirPath;
-  QString trackingSystems;
-  QString tools;
-
+	QStringList applicationFilter = mApplicationGroupBox->getSelected();
+	QString absoluteDirPath;
   absoluteDirPath = DataLocations::getRootConfigPath()+"/tool/"+((applicationFilter.size() >= 1) ? applicationFilter[0]+"/" : "")+""; //a config can only belong to one application
-
-  foreach(QString string, trackingsystemFilter)
-  {
-    trackingSystems.append(string+"_");
-  }
-
-  foreach(QString string, absoluteToolFilePathsFilter)
-  {
-    QFile file(string);
-    QFileInfo info(file);
-    trackingSystems.append(info.baseName()+"_");
-  }
-  if(retval.endsWith("_", Qt::CaseInsensitive))
-    retval.remove(retval.size()-2, 1);
-
-  retval = absoluteDirPath+trackingSystems+tools+".xml";
-
+	retval = absoluteDirPath+"MyConfig.xml";
   return retval;
 }
 
