@@ -90,7 +90,10 @@ QString DataLocations::getDefaultPluginsPath()
 		return buildLocation;
 
 	QString installLocation = bundlePath + "/plugins";
-	return installLocation;
+	if (QFile(installLocation).exists())
+		return installLocation;
+
+	return bundlePath;
 }
 
 QString DataLocations::getRootConfigPath()
