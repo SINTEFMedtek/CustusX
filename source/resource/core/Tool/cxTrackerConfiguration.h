@@ -61,6 +61,7 @@ public:
 	virtual QString getToolPictureFilename(QString uid) = 0;
 	virtual Tool getTool(QString uid) = 0;
 	virtual QStringList getAbsoluteFilePathToAllTools() = 0;
+	virtual bool verifyTool(QString uid) = 0;
 };
 
 } // namespace cx

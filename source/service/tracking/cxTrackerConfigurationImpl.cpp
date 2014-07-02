@@ -200,5 +200,11 @@ QStringList TrackerConfigurationImpl::getAbsoluteFilePathToAllTools()
 	return getAbsolutePathToXmlFiles(toolFilePath, includeSubDirs);
 }
 
+bool TrackerConfigurationImpl::verifyTool(QString uid)
+{
+	IgstkTool::InternalStructure internal = this->getToolInternal(uid);
+	return internal.verify();
+}
+
 } // namespace cx
 
