@@ -60,15 +60,7 @@ public:
 	virtual QString getToolTrackingSystem(QString uid) = 0;
 	virtual QString getToolPictureFilename(QString uid) = 0;
 	virtual Tool getTool(QString uid) = 0;
-
-
-//	virtual QStringList getTools() = 0;
-//	virtual QStringList getToolsForApplications(QStringList tools,
-//	                                QStringList applicationsFilter) = 0;
-//	virtual QStringList getToolsForTrackingSystems(QStringList applicationsFilter,
-//	                                QStringList trackingsystemsFilter) = 0;
-
-
+	virtual QStringList getAbsoluteFilePathToAllTools() = 0;
 };
 
 } // namespace cx

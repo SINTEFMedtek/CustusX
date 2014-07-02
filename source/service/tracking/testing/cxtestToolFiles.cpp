@@ -3,52 +3,13 @@
 #include "cxReporter.h"
 #include "cxtestTestToolMesh.h"
 
-#include <QDir>
 #include <QStringList>
 #include "cxToolManagerUsingIGSTK.h"
-#include "cxDataLocations.h"
 #include "cxEnumConverter.h"
 #include "cxDefinitions.h"
 #include "cxTrackerConfiguration.h"
-
-namespace
-{
-
-QFileInfoList getDirs(QString path)
-{
-//	std::cout << "getDirs path: " << path << std::endl;
-	QDir dir(path);
-	dir.setFilter(QDir::AllDirs|QDir::NoDotAndDotDot);
-	QFileInfoList retval = dir.entryInfoList();
-	return retval;
-}
-
-QStringList getXmlFiles(QString path, bool includeSubDirs = false)
-{
-//	std::cout << "getXmlFiles path: " << path << std::endl;
-	QStringList retval;
-	QDir dir(path);
-	dir.setFilter(QDir::Files);
-	dir.setNameFilters(QStringList("*.xml"));
-
-	foreach(QFileInfo file, dir.entryInfoList())
-		retval << file.absoluteFilePath();
-
-	if (includeSubDirs)
-		foreach(QFileInfo directory, getDirs(path))
-			retval << getXmlFiles(directory.absoluteFilePath(), includeSubDirs);
-
-	return retval;
-}
-
-QStringList getAllToolFiles()
-{
-	bool includeSubDirs = true;
-	QString toolFilePath = cx::DataLocations::getRootConfigPath() + "/tool/Tools/";
-	return getXmlFiles(toolFilePath, includeSubDirs);
-}
-
-} //namespace
+#include "cxFileHelpers.h"
+#include "cxDataLocations.h"
 
 namespace cxtest
 {
@@ -74,7 +35,7 @@ TEST_CASE("Tool xml files use tracking systems supported by ToolManagerUsingIGST
 	QStringList trackingSystems = trackingService->getSupportedTrackingSystems();
 
 	//Verify tool uses supported tracking system
-	foreach(QString filename, getAllToolFiles())
+	foreach(QString filename, config->getAbsoluteFilePathToAllTools())
 	{
 		QString toolTrackingSystem = config->getToolTrackingSystem(filename);
 
@@ -90,9 +51,9 @@ TEST_CASE("Tool configuration files link to existing files", "[unit][tool][xml]"
 	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
 	QString configFilePath = cx::DataLocations::getRootConfigPath() + "/tool/";
 
-	foreach(QFileInfo dir, getDirs(configFilePath))
+	foreach(QFileInfo dir, cx::getDirs(configFilePath))
 	{
-		foreach(QString filename, getXmlFiles(dir.absoluteFilePath()))
+		foreach(QString filename, cx::getAbsolutePathToXmlFiles(dir.absoluteFilePath()))
 		{
 //			std::cout << "Tool config: " << filename << std::endl;
 			cx::TrackerConfiguration::Configuration data = config->getConfiguration(filename);
@@ -114,7 +75,7 @@ TEST_CASE("Tool xml files got existing image files", "[unit][tool][xml]")
 	cx::TrackingServicePtr trackingService = cx::ToolManagerUsingIGSTK::create();
 	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
 
-	foreach(QString filename, getAllToolFiles())
+	foreach(QString filename, config->getAbsoluteFilePathToAllTools())
 	{
 		QString imageFile = config->getToolPictureFilename(filename);
 		{
