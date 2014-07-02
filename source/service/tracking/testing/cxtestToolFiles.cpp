@@ -45,7 +45,7 @@ TEST_CASE("Tool xml files use tracking systems supported by ToolManagerUsingIGST
 	}
 }
 
-TEST_CASE("Tool configuration files link to existing files", "[unit][tool][xml]")
+TEST_CASE("Tool configuration files", "[unit][tool][xml]")
 {
 	cx::TrackingServicePtr trackingService = cx::ToolManagerUsingIGSTK::create();
 	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
@@ -55,17 +55,17 @@ TEST_CASE("Tool configuration files link to existing files", "[unit][tool][xml]"
 	{
 		foreach(QString filename, cx::getAbsolutePathToXmlFiles(dir.absoluteFilePath()))
 		{
-//			std::cout << "Tool config: " << filename << std::endl;
-			cx::TrackerConfiguration::Configuration data = config->getConfiguration(filename);
-			QStringList selectedTools = data.mTools;
+			INFO("Tool config file: " + filename.toStdString());
+			cx::TrackerConfiguration::Configuration configData = config->getConfiguration(filename);
+			QStringList selectedTools = configData.mTools;
 			foreach(QString toolFileName, selectedTools)
 			{
-//				std::cout << "Tool: " << toolFileName.toStdString() << std::endl;
 				QFileInfo file(toolFileName);
-				INFO("File: " + toolFileName.toStdString() + " don't exist");
+				INFO("Tool file: " + toolFileName.toStdString());
 				REQUIRE(file.exists());
+
+				REQUIRE(configData.mTrackingSystem == config->getToolTrackingSystem(toolFileName));
 			}
-//			std::cout << std::endl;
 		}
 	}
 }
