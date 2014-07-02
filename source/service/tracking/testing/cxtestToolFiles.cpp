@@ -63,7 +63,6 @@ TEST_CASE("Tool configuration files", "[unit][tool][xml]")
 				QFileInfo file(toolFileName);
 				INFO("Tool file: " + toolFileName.toStdString());
 				REQUIRE(file.exists());
-
 				REQUIRE(configData.mTrackingSystem == config->getToolTrackingSystem(toolFileName));
 			}
 		}
@@ -77,16 +76,14 @@ TEST_CASE("Tool xml files got existing image files", "[unit][tool][xml]")
 
 	foreach(QString filename, config->getAbsoluteFilePathToAllTools())
 	{
-		QString imageFile = config->getToolPictureFilename(filename);
+		QString imageFileName = config->getToolPictureFilename(filename);
+		INFO("Tool file: " + filename);
+//		CHECK(!imageFileName.isEmpty());
+		if(!imageFileName.isEmpty())
 		{
-//			INFO("Tool: " + filename + " got no image");
-//			CHECK(!imageFile.isEmpty());
-		}
-		if(!imageFile.isEmpty())
-		{
-			QFileInfo file(imageFile);
-			INFO("File: " + imageFile.toStdString() + " don't exist");
-			REQUIRE(file.exists());
+			QFileInfo imageFile(imageFileName);
+			INFO("Image file: " + imageFileName);
+			REQUIRE(imageFile.exists());
 		}
 	}
 }
