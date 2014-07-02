@@ -36,6 +36,7 @@ public:
 	virtual QString getToolPictureFilename(QString uid);
 	virtual Tool getTool(QString uid);
 	virtual QStringList getAbsoluteFilePathToAllTools();
+	virtual bool verifyTool(QString uid);
 
 private:
 	QStringList filter(QStringList toolsToFilter, QStringList applicationsFilter,

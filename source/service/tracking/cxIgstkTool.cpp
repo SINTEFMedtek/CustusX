@@ -80,6 +80,77 @@ void IgstkTool::InternalStructure::saveCalibrationToFile()
 	report("Replaced calibration in " + filename);
 }
 
+
+bool IgstkTool::InternalStructure::verify()
+{
+	bool retval = true;
+	QString verificationError("Internal verification of tool " + mUid + " failed! REASON: ");
+	if (!mIsPointer && !mIsReference && !mIsProbe)
+	{
+//    reportError(verificationError+" Tag <tool>::<type> is invalid ["+qstring_cast(mType)+"]. Valid types: [pointer, usprobe, reference]");
+		reportError(
+						verificationError
+										+ " Tag <tool>::<type> is invalid, must be one one of pointer/probe/reference ");
+		retval = false;
+	}
+	if (mUid.isEmpty())
+	{
+		reportError(verificationError + " Tag <tool>::<uid> is empty. Give tool a unique id.");
+		retval = false;
+	}
+	if (mTrackerType == tsNONE)
+	{
+		reportError(
+						verificationError + " Tag <sensor>::<type> is invalid ["
+										+ qstring_cast(mTrackerType)
+										+ "]. Valid types: [polaris, spectra, vicra, aurora, micron (NOT SUPPORTED YET)]");
+		retval = false;
+	}
+	if ((mTrackerType == tsAURORA) && (mPortNumber >= 4))
+	{
+		reportError(
+						verificationError + " Tag <sensor>::<portnumber> is invalid ["
+										+ qstring_cast(mPortNumber)
+										+ "]. Valid numbers: [0, 1, 2, 3]");
+		retval = false;
+	}
+	if ((mTrackerType == tsAURORA) && (mChannelNumber >= 1))
+	{
+		reportError(
+						verificationError + " Tag <sensor>::<channelnumber> is invalid ["
+										+ qstring_cast(mChannelNumber) + "]. Valid numbers: [0, 1]");
+		retval = false;
+	}
+	QDir dir;
+	if (!mSROMFilename.isEmpty() && !dir.exists(mSROMFilename))
+	{
+		reportError(
+						verificationError + " Tag <sensor>::<rom_file> is invalid [" + mSROMFilename
+										+ "]. Valid path: relative path to existing rom file.");
+		retval = false;
+	}
+	if (!mCalibrationFilename.isEmpty() && !dir.exists(mCalibrationFilename))
+	{
+		reportError(
+						verificationError + " Tag <calibration>::<cal_file> is invalid ["
+										+ mCalibrationFilename
+										+ "]. Valid path: relative path to existing calibration file.");
+		retval = false;
+	}
+	if (!mTransformSaveFileName.isEmpty() && !dir.exists(mTransformSaveFileName))
+	{
+		reportError(verificationError + " Logging folder is invalid. Contact programmer! :)");
+		retval = false;
+	}
+	if (!mLoggingFolderName.isEmpty() && !dir.exists(mLoggingFolderName))
+	{
+		reportError(verificationError + " Logging folder is invalid. Contact programmer! :)");
+		retval = false;
+	}
+
+	return retval;
+}
+
 void IgstkTool::updateCalibration(const Transform3D& cal)
 {
 	//apply the calibration
@@ -107,7 +178,7 @@ IgstkTool::IgstkTool(IgstkTool::InternalStructure internalStructure) :
 
 	mToolObserver->SetCallbackFunction(this, &IgstkTool::toolTransformCallback);
 
-	if (this->verifyInternalStructure())
+	if (mInternalStructure.verify())
 	{
 		mTool = this->buildInternalTool();
 		this->addLogging();
@@ -324,76 +395,6 @@ void IgstkTool::toolTransformCallback(const itk::EventObject &event)
 						mInternalStructure.mUid + " has an invalid channel number:"
 										+ qstring_cast(mInternalStructure.mChannelNumber) + ".");
 	}
-}
-
-bool IgstkTool::verifyInternalStructure()
-{
-	bool retval = true;
-	QString verificationError("Internal verification of tool " + mInternalStructure.mUid + " failed! REASON: ");
-	if (!mInternalStructure.mIsPointer && !mInternalStructure.mIsReference && !mInternalStructure.mIsProbe)
-	{
-//    reportError(verificationError+" Tag <tool>::<type> is invalid ["+qstring_cast(mInternalStructure.mType)+"]. Valid types: [pointer, usprobe, reference]");
-		reportError(
-						verificationError
-										+ " Tag <tool>::<type> is invalid, must be one one of pointer/probe/reference ");
-		retval = false;
-	}
-	if (mInternalStructure.mUid.isEmpty())
-	{
-		reportError(verificationError + " Tag <tool>::<uid> is empty. Give tool a unique id.");
-		retval = false;
-	}
-	if (mInternalStructure.mTrackerType == tsNONE)
-	{
-		reportError(
-						verificationError + " Tag <sensor>::<type> is invalid ["
-										+ qstring_cast(mInternalStructure.mTrackerType)
-										+ "]. Valid types: [polaris, spectra, vicra, aurora, micron (NOT SUPPORTED YET)]");
-		retval = false;
-	}
-	if ((mInternalStructure.mTrackerType == tsAURORA) && (mInternalStructure.mPortNumber >= 4))
-	{
-		reportError(
-						verificationError + " Tag <sensor>::<portnumber> is invalid ["
-										+ qstring_cast(mInternalStructure.mPortNumber)
-										+ "]. Valid numbers: [0, 1, 2, 3]");
-		retval = false;
-	}
-	if ((mInternalStructure.mTrackerType == tsAURORA) && (mInternalStructure.mChannelNumber >= 1))
-	{
-		reportError(
-						verificationError + " Tag <sensor>::<channelnumber> is invalid ["
-										+ qstring_cast(mInternalStructure.mChannelNumber) + "]. Valid numbers: [0, 1]");
-		retval = false;
-	}
-	QDir dir;
-	if (!mInternalStructure.mSROMFilename.isEmpty() && !dir.exists(mInternalStructure.mSROMFilename))
-	{
-		reportError(
-						verificationError + " Tag <sensor>::<rom_file> is invalid [" + mInternalStructure.mSROMFilename
-										+ "]. Valid path: relative path to existing rom file.");
-		retval = false;
-	}
-	if (!mInternalStructure.mCalibrationFilename.isEmpty() && !dir.exists(mInternalStructure.mCalibrationFilename))
-	{
-		reportError(
-						verificationError + " Tag <calibration>::<cal_file> is invalid ["
-										+ mInternalStructure.mCalibrationFilename
-										+ "]. Valid path: relative path to existing calibration file.");
-		retval = false;
-	}
-	if (!mInternalStructure.mTransformSaveFileName.isEmpty() && !dir.exists(mInternalStructure.mTransformSaveFileName))
-	{
-		reportError(verificationError + " Logging folder is invalid. Contact programmer! :)");
-		retval = false;
-	}
-	if (!mInternalStructure.mLoggingFolderName.isEmpty() && !dir.exists(mInternalStructure.mLoggingFolderName))
-	{
-		reportError(verificationError + " Logging folder is invalid. Contact programmer! :)");
-		retval = false;
-	}
-
-	return retval;
 }
 
 igstk::TrackerTool::Pointer IgstkTool::buildInternalTool()

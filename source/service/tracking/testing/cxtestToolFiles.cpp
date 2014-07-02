@@ -91,4 +91,16 @@ TEST_CASE("Tool xml files got existing image files", "[unit][tool][xml]")
 	}
 }
 
+TEST_CASE("Verify tool xml files", "[unit][tool][xml]")
+{
+	cx::TrackingServicePtr trackingService = cx::ToolManagerUsingIGSTK::create();
+	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
+
+	foreach(QString filename, config->getAbsoluteFilePathToAllTools())
+	{
+		INFO("Tool file is faulty: " + filename.toStdString());
+		REQUIRE(config->verifyTool(filename));
+	}
+}
+
 } //namespace cxtest
