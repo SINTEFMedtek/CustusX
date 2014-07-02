@@ -1,9 +1,9 @@
 <?xml version = "1.0"?>
 <configuration clinical_app="Neurology">
     <tracker type="polaris">
-        <toolfile reference="yes">../Tools/Neurology/SW-Invite/SW-RefFrame-02-077-0191_POLARIS/tool.xml</toolfile>
-        <toolfile reference="no">../Tools/Neurology/SW-Invite/SW-Intraoperative-Navigator-07-081-0223_POLARIS/tool.xml</toolfile>
-        <toolfile reference="no">../Tools/Shared/11L-Probe-32-105-0289_VividE9_POLARIS/tool.xml</toolfile>
-        <toolfile reference="no">../Tools/Neurology/SW-Invite/SW-Small-Custom-Navigator-05-080-0214_POLARIS/tool.xml</toolfile>
+        <toolfile reference="yes">../Tools/Neurology/SW-Invite/SW-RefFrame-02-077-0191_POLARIS/SW_ref.xml</toolfile>
+        <toolfile reference="no">../Tools/Neurology/SW-Invite/SW-Intraoperative-Navigator-07-081-0223_POLARIS/SW_nav_I.xml</toolfile>
+        <toolfile reference="no">../Tools/Shared/11L-Probe-32-105-0289_VividE9_POLARIS/E9_prb_11L.xml</toolfile>
+        <toolfile reference="no">../Tools/Neurology/SW-Invite/SW-Small-Custom-Navigator-05-080-0214_POLARIS/SW_nav_SC.xml</toolfile>
     </tracker>
 </configuration>
