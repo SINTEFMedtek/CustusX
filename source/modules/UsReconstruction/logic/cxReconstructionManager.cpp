@@ -69,19 +69,6 @@ ReconstructionManager::~ReconstructionManager()
 {
 }
 
-//void ReconstructionManager::init()
-//{
-//	mServiceListener->open();
-//}
-
-namespace
-{
-struct null_deleter
-{
-	void operator()(void const *) const {}
-};
-}
-
 ReconstructionServicePtr ReconstructionManager::createAlgorithm()
 {
 	QString name = mParams->mAlgorithmAdapter->getValue();
