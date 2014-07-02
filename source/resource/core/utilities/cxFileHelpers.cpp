@@ -43,4 +43,29 @@ bool removeNonemptyDirRecursively(const QString & dirName)
 	return result;
 }
 
+QFileInfoList getDirs(QString path)
+{
+	QDir dir(path);
+	dir.setFilter(QDir::AllDirs|QDir::NoDotAndDotDot);
+	QFileInfoList retval = dir.entryInfoList();
+	return retval;
+}
+
+QStringList getAbsolutePathToXmlFiles(QString path, bool includeSubDirs)
+{
+	QStringList retval;
+	QDir dir(path);
+	dir.setFilter(QDir::Files);
+	dir.setNameFilters(QStringList("*.xml"));
+
+	foreach(QFileInfo file, dir.entryInfoList())
+		retval << file.absoluteFilePath();
+
+	if (includeSubDirs)
+		foreach(QFileInfo directory, getDirs(path))
+			retval << getAbsolutePathToXmlFiles(directory.absoluteFilePath(), includeSubDirs);
+
+	return retval;
+}
+
 } // namespace cx
