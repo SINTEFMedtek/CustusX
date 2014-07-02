@@ -207,7 +207,7 @@ void ConfigToolListWidget::filterSlot(QStringList trackingsystemFilter)
 //		ToolFileParser parser(absoluteFilePath);
 		QBrush brush = item->foreground();
 //		QString toolTrackingSystem = enum2string(parser.getTool().mTrackerType);
-		if (!trackingsystemFilter.contains(toolTrackingSystem, Qt::CaseInsensitive))
+		if (!trackingsystemFilter.contains(toolTrackingSystem, Qt::CaseInsensitive) || !config->verifyTool(absoluteFilePath))
 			brush.setColor(Qt::red);
 		else
 			brush.setColor(Qt::black);
