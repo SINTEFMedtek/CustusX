@@ -222,12 +222,6 @@ QString ProbeImpl::getActiveStream() const
 	return mActiveUid;
 }
 
-ProbeXmlConfigParser::Configuration ProbeImpl::getConfiguration() const
-{
-	ProbeXmlConfigParser::Configuration config = this->getConfiguration(this->getConfigId());
-	return config;
-}
-
 void ProbeImpl::removeCurrentConfig()
 {
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration();
@@ -315,12 +309,25 @@ void ProbeImpl::initConfigId()
 	}
 }
 
+ProbeXmlConfigParser::Configuration ProbeImpl::getConfiguration()
+{
+	if (mConfig.mConfigId != this->getConfigId())
+	{
+		mConfig = this->getConfiguration(this->getConfigId());
+	}
+	return mConfig;
+}
+
 ProbeXmlConfigParser::Configuration ProbeImpl::getConfiguration(QString uid) const
 {
-	ProbeXmlConfigParser::Configuration config;
-	if(this->hasRtSource())
-		config = mXml->getConfiguration(mScannerUid, mInstrumentUid, this->getRtSourceName(), uid);
-	return config;
+	if (mConfig.mConfigId != uid)
+	{
+		ProbeXmlConfigParser::Configuration config;
+		if(this->hasRtSource())
+			config = mXml->getConfiguration(mScannerUid, mInstrumentUid, this->getRtSourceName(), uid);
+		return config;
+	}
+	return mConfig;
 }
 
 QString ProbeImpl::getInstrumentId() const
@@ -355,12 +362,12 @@ void ProbeImpl::updateProbeSector()
 bool ProbeImpl::isValidConfigId()
 {
 	//May need to create ProbeXmlConfigParser::isValidConfig(...) also
-	return !this->getConfiguration(this->getConfigId()).isEmpty();
+	return !this->getConfiguration().isEmpty();
 }
 
 ProbeDefinition ProbeImpl::createProbeSector()
 {
-	ProbeXmlConfigParser::Configuration config = this->getConfiguration(this->getConfigId());
+	ProbeXmlConfigParser::Configuration config = this->getConfiguration();
 	ProbeDefinition probeSector = createProbeDataFromConfiguration(config);
 	probeSector.setUid(mActiveUid);
 	return probeSector;

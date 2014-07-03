@@ -71,7 +71,7 @@ public:
 	virtual void setActiveStream(QString uid);
 	virtual QString getActiveStream() const;
 
-	ProbeXmlConfigParser::Configuration getConfiguration() const;
+	ProbeXmlConfigParser::Configuration getConfiguration();
 	void removeCurrentConfig(); ///< remove the current config from disk
 	void saveCurrentConfig(QString uid, QString name); ///< save current config to disk under ids (uid,name).
 
@@ -109,6 +109,8 @@ private:
 
 	ProbeXmlConfigParserPtr mXml; ///< the xml parser for the ultrasoundImageConfigs.xml
 	QString mConfigurationId; ///< The probe sector configuration matching the config id in ultrasoundImageConfigs.xml
+
+	ProbeXmlConfigParser::Configuration mConfig;
 };
 
 /**
