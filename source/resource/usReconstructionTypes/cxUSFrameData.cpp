@@ -55,7 +55,28 @@ ProcessedUSInputData::ProcessedUSInputData(std::vector<vtkImageDataPtr> frames, 
 	mPath(path),
 	mUid(uid)
 {
+	this->validate();
+}
 
+bool ProcessedUSInputData::validate() const
+{
+	std::vector<TimedPosition> frameInfo = this->getFrames();
+	Eigen::Array3i inputDims = this->getDimensions();
+
+	if (inputDims[2] != static_cast<int>(frameInfo.size()))
+	{
+		QString msg("Mismatch in US input data: inputDims[2] != frameInfo.size() : %1 != %2");
+		reportWarning(msg.arg(inputDims[2]).arg(frameInfo.size()));
+		return false;
+	}
+
+	if (inputDims[2]==0)
+	{
+		reportWarning("Empty US input data");
+		return false;
+	}
+
+	return true;
 }
 
 unsigned char* ProcessedUSInputData::getFrame(unsigned int index) const
@@ -83,7 +104,7 @@ Vector3D ProcessedUSInputData::getSpacing() const
 	return retval;
 }
 
-std::vector<TimedPosition> ProcessedUSInputData::getFrames()
+std::vector<TimedPosition> ProcessedUSInputData::getFrames() const
 {
 	return mFrames;
 }
@@ -114,7 +135,7 @@ USFrameDataPtr USFrameData::create(ImagePtr inputFrameData)
 
 	retval->mName = QFileInfo(inputFrameData->getName()).completeBaseName();
 	retval->mImageContainer.reset(new cx::SplitFramesContainer(inputFrameData->getBaseVtkImageData()));
-	retval->initialize();
+	retval->resetRemovedFrames();
 
 	return retval;
 }
@@ -146,7 +167,7 @@ USFrameDataPtr USFrameData::create(QString inputFilename)
 		USFrameDataPtr retval(new USFrameData());
 		retval->mName = QFileInfo(inputFilename).completeBaseName();
 		retval->mImageContainer.reset(new cx::CachedImageDataContainer(inputFilename, -1));
-		retval->initialize();
+		retval->resetRemovedFrames();
 		return retval;
 	}
 }
@@ -158,7 +179,7 @@ USFrameDataPtr USFrameData::create(QString name, cx::ImageDataContainerPtr image
 	USFrameDataPtr retval(new USFrameData());
 	retval->mName = name;
 	retval->mImageContainer = images;
-	retval->initialize();
+	retval->resetRemovedFrames();
 
 	return retval;
 }
@@ -176,7 +197,7 @@ USFrameData::USFrameData() :
 {
 }
 
-void USFrameData::initialize()
+void USFrameData::resetRemovedFrames()
 {
 	if (mImageContainer->empty())
 		return;
@@ -398,6 +419,7 @@ void USFrameData::setPurgeInputDataAfterInitialize(bool value)
 
 std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::vector<bool> angio)
 {
+
 	std::vector<std::vector<vtkImageDataPtr> > raw(angio.size());
 
 	for (unsigned i=0; i<raw.size(); ++i)
@@ -408,7 +430,7 @@ std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::ve
 	// apply cropping and angio
 	for (unsigned i=0; i<mReducedToFull.size(); ++i)
 	{
-		SSC_ASSERT(mImageContainer->size()>mReducedToFull[i]);
+		SSC_ASSERT(mImageContainer->size() > mReducedToFull[i]);
 		vtkImageDataPtr current = mImageContainer->get(mReducedToFull[i]);
 
 		if (mCropbox.range()[0]!=0)
@@ -449,7 +471,7 @@ void USFrameData::purgeAll()
 USFrameDataPtr USFrameData::copy()
 {
 	USFrameDataPtr retval(new USFrameData(*this));
-	this->initialize();
+	this->resetRemovedFrames();
 	return retval;
 }
 
