@@ -17,6 +17,7 @@
 #include "cxReporter.h"
 #include "cxDefinitionStrings.h"
 #include "cxToolConfigurationParser.h"
+#include "cxFileHelpers.h"
 
 namespace cx
 {
@@ -91,8 +92,7 @@ TrackerConfigurationImpl::Configuration TrackerConfigurationImpl::getConfigurati
 QStringList TrackerConfigurationImpl::getToolsGivenFilter(QStringList applicationsFilter,
 														  QStringList trackingsystemsFilter)
 {
-	QDir toolDir(DataLocations::getToolsPath());
-	QStringList allTools = this->getAbsoluteFilePathToAllTools(toolDir);
+	QStringList allTools = this->getAbsoluteFilePathToAllTools();
 	QStringList filteredTools = this->filter(allTools, applicationsFilter, trackingsystemsFilter);
 	return filteredTools;
 }
@@ -144,48 +144,6 @@ QString TrackerConfigurationImpl::getToolPictureFilename(QString uid)
 	return tool.mPictureFileName;
 }
 
-QStringList TrackerConfigurationImpl::getAbsoluteFilePathToAllTools(QDir dir)
-{
-	QStringList retval;
-
-	if (!dir.exists())
-	{
-		reportError("Dir " + dir.absolutePath() + " does not exits.");
-		return retval;
-	}
-
-	//find xml files add and return
-	dir.setFilter(QDir::Files);
-	QStringList nameFilters;
-	nameFilters << "*.xml";
-	dir.setNameFilters(nameFilters);
-
-	QStringList toolXmlFiles = dir.entryList();
-	foreach(QString filename, toolXmlFiles)
-	{
-		QFile file(dir.absolutePath()+"/"+filename);
-		QFileInfo info(file);
-		retval << info.absoluteFilePath();
-	}
-
-	//find dirs and recursivly check them
-	dir.setFilter(QDir::AllDirs);
-
-	QStringList subdirs = dir.entryList();
-	foreach(QString dirString, subdirs)
-	{
-		if(dirString == "." || dirString == "..")
-		continue;
-		if(dir.cd(dirString))
-		{
-			retval << this->getAbsoluteFilePathToAllTools(dir);
-			dir.cdUp();
-		}
-
-	}
-	return retval;
-}
-
 QStringList TrackerConfigurationImpl::filter(QStringList toolsToFilter, QStringList applicationsFilter,
 		QStringList trackingsystemsFilter)
 {
@@ -235,6 +193,18 @@ IgstkTool::InternalStructure TrackerConfigurationImpl::getToolInternal(QString t
 	return retval;
 }
 
+QStringList TrackerConfigurationImpl::getAbsoluteFilePathToAllTools()
+{
+	bool includeSubDirs = true;
+	QString toolFilePath = cx::DataLocations::getToolsPath();
+	return getAbsolutePathToXmlFiles(toolFilePath, includeSubDirs);
+}
+
+bool TrackerConfigurationImpl::verifyTool(QString uid)
+{
+	IgstkTool::InternalStructure internal = this->getToolInternal(uid);
+	return internal.verify();
+}
 
 } // namespace cx
 

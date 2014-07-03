@@ -20,7 +20,7 @@ namespace cxtest
 {
 
 #ifdef CX_USE_OPENCL_UTILITY
-TEST_CASE("ReconstructAlgorithm: VNNcl on sphere","[unit][VNNcl][usreconstruction][synthetic][not_win32]")
+TEST_CASE("ReconstructAlgorithm: VNNcl on sphere","[unit][VNNcl][usreconstruction][synthetic][not_win32][broken]")
 {
 	cx::Reporter::initialize();
 

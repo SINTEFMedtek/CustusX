@@ -57,16 +57,6 @@ void ToolListWidget::addTool(QString absoluteFilePath)
 	emit listSizeChanged();
 }
 
-//IgstkTool::InternalStructure ToolListWidget::getToolInternal(QString toolAbsoluteFilePath)
-//{
-//	IgstkTool::InternalStructure retval;
-
-//	ToolFileParser parser(toolAbsoluteFilePath);
-//	retval = parser.getTool();
-
-//	return retval;
-//}
-
 void ToolListWidget::selectionChangedSlot()
 {
 	QListWidgetItem* selectedItem = this->currentItem();
@@ -132,93 +122,8 @@ void FilteringToolListWidget::filterSlot(QStringList applicationsFilter, QString
 	QStringList filteredTools = config->getToolsGivenFilter(applicationsFilter,
 														  trackingsystemsFilter);
 
-//	QDir toolDir(DataLocations::getToolsPath());
-//	QStringList allTools = this->getAbsoluteFilePathToAllTools(toolDir);
-//	QStringList filteredTools = this->filter(allTools, applicationsFilter, trackingsystemsFilter);
-
 	this->populate(filteredTools);
 }
-
-//QStringList FilteringToolListWidget::getAbsoluteFilePathToAllTools(QDir dir)
-//{
-//	QStringList retval;
-
-//	if (!dir.exists())
-//	{
-//		reportError("Dir " + dir.absolutePath() + " does not exits.");
-//		return retval;
-//	}
-
-//	//find xml files add and return
-//	dir.setFilter(QDir::Files);
-//	QStringList nameFilters;
-//	nameFilters << "*.xml";
-//	dir.setNameFilters(nameFilters);
-
-//	QStringList toolXmlFiles = dir.entryList();
-//	foreach(QString filename, toolXmlFiles)
-//	{
-//		QFile file(dir.absolutePath()+"/"+filename);
-//		QFileInfo info(file);
-//		retval << info.absoluteFilePath();
-//	}
-
-//	//find dirs and recursivly check them
-//	dir.setFilter(QDir::AllDirs);
-
-//	QStringList subdirs = dir.entryList();
-//	foreach(QString dirString, subdirs)
-//	{
-//		if(dirString == "." || dirString == "..")
-//		continue;
-//		if(dir.cd(dirString))
-//		{
-//			retval << this->getAbsoluteFilePathToAllTools(dir);
-//			dir.cdUp();
-//		}
-
-//	}
-//	return retval;
-//}
-
-//QStringList FilteringToolListWidget::filter(QStringList toolsToFilter, QStringList applicationsFilter,
-//		QStringList trackingsystemsFilter)
-//{
-//	QStringList retval;
-//	TrackerConfigurationPtr config = toolManager()->getConfiguration();
-////	std::vector<ToolConfigurationPtr> tools = config->getTools();
-
-//	foreach(QString toolFilePath, toolsToFilter)
-//	{
-//		//get internal tool
-//		IgstkTool::InternalStructure internal = this->getToolInternal(toolFilePath);
-
-//		//check tracking systems
-//		QString trackerName = enum2string(internal.mTrackerType);
-//		if(!trackingsystemsFilter.contains(trackerName, Qt::CaseInsensitive))
-//		continue;
-
-//		//check applications
-//		bool passedApplicationFilter = false;
-//		std::vector<CLINICAL_APPLICATION>::iterator it = internal.mClinicalApplications.begin();
-//		while(it != internal.mClinicalApplications.end() && !passedApplicationFilter)
-//		{
-//			QString applicationName = enum2string(*it);
-//			if(applicationsFilter.contains(applicationName, Qt::CaseInsensitive))
-//			{
-//				passedApplicationFilter = true;
-//			}
-//			++it;
-//		}
-//		if(!passedApplicationFilter)
-//		continue;
-
-//		//add if filters passed
-//		retval << toolFilePath;
-//	}
-
-//	return retval;
-//}
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -302,7 +207,7 @@ void ConfigToolListWidget::filterSlot(QStringList trackingsystemFilter)
 //		ToolFileParser parser(absoluteFilePath);
 		QBrush brush = item->foreground();
 //		QString toolTrackingSystem = enum2string(parser.getTool().mTrackerType);
-		if (!trackingsystemFilter.contains(toolTrackingSystem, Qt::CaseInsensitive))
+		if (!trackingsystemFilter.contains(toolTrackingSystem, Qt::CaseInsensitive) || !config->verifyTool(absoluteFilePath))
 			brush.setColor(Qt::red);
 		else
 			brush.setColor(Qt::black);

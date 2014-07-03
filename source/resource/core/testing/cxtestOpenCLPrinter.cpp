@@ -4,7 +4,7 @@
 namespace cxtest
 {
 
-TEST_CASE("OpenCLPrinter: print info about platform and devices", "[integration][broken][OpenCL][OpenCLPrinter]")
+TEST_CASE("OpenCLPrinter: print info about platform and devices", "[unit][OpenCL][OpenCLPrinter]")
 {
 	cx::OpenCLPrinter::printPlatformAndDeviceInfo();
 	CHECK(true);

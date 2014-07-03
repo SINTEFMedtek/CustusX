@@ -20,5 +20,4 @@ config/settings/
 data
 *.pyc
 CMakeLists.txt.user*
-*_.xml
 *~
