@@ -67,6 +67,8 @@ void optimizedCoordTransform(Vector3D* p, boost::array<double, 16> tt)
 bool PNNReconstructionService::reconstruct(ProcessedUSInputDataPtr input,
 		vtkImageDataPtr outputData, QDomElement settings)
 {
+	input->validate();
+
 	std::vector<TimedPosition> frameInfo = input->getFrames();
 	if (frameInfo.empty())
 		return false;

@@ -54,11 +54,12 @@ public:
 	unsigned char* getFrame(unsigned int index) const;
 	Eigen::Array3i getDimensions() const;
 	Vector3D getSpacing() const;
-	std::vector<TimedPosition> getFrames();
+	std::vector<TimedPosition> getFrames() const;
 	vtkImageDataPtr getMask();
 
 	QString getFilePath();
 	QString getUid();
+	bool validate() const;
 
 private:
 	std::vector<vtkImageDataPtr> mProcessedImage;
@@ -103,6 +104,7 @@ public:
 	cx::ImageDataContainerPtr getImageContainer() { return mImageContainer; }
 	unsigned getNumImages();
 
+	void resetRemovedFrames();
 	void removeFrame(unsigned int index);
 	void setCropBox(IntBoundingBox3D mCropbox);
 	void fillImageImport(vtkImageImportPtr import, int index); ///< fill import with a single frame
@@ -120,7 +122,6 @@ public:
 	bool is4D();//Do this object contain 4D data? (Opposed to the usual 3D data)
 
 protected:
-	void initialize();
 	USFrameData();
 	vtkImageDataPtr useAngio(vtkImageDataPtr inData, vtkImageDataPtr grayFrame) const;/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
 

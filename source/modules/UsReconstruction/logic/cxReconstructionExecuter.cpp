@@ -81,7 +81,7 @@ cx::CompositeTimedAlgorithmPtr ReconstructionExecuter::assembleReconstructionPip
 	pipeline->append(ThreadedTimedReconstructPreprocessor::create(preprocessor, cores));
 
 	cx::CompositeTimedAlgorithmPtr temp = pipeline;
-	if(this->canCoresRunInParallel(cores))
+	if(this->canCoresRunInParallel(cores) && cores.size()>1)
 	{
 		cx::CompositeParallelTimedAlgorithmPtr parallel(new cx::CompositeParallelTimedAlgorithm());
 		pipeline->append(parallel);

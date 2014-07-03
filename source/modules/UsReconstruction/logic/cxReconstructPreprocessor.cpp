@@ -188,6 +188,7 @@ struct RemoveDataType
  */
 void ReconstructPreprocessor::interpolatePositions()
 {
+	mFileData.mUsRaw->resetRemovedFrames();
 	int startFrames = mFileData.mFrames.size();
 
 	std::map<int,RemoveDataType> removedData;
@@ -421,6 +422,7 @@ void ReconstructPreprocessor::updateFromOriginalFileData()
 
 	cx::USReconstructInputDataAlgorithm::transformTrackingPositionsTo_prMu(&mFileData);
 	//mPos (in mPositions) is now prMu
+
 	this->interpolatePositions();
 	// mFrames: now mPos as prMu
 
