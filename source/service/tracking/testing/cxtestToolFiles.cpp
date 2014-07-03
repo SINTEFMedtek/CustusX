@@ -62,8 +62,9 @@ TEST_CASE("Tool configuration files", "[unit][tool][xml]")
 			{
 				QFileInfo file(toolFileName);
 				INFO("Tool file: " + toolFileName.toStdString());
-				REQUIRE(file.exists());
-				REQUIRE(configData.mTrackingSystem == config->getToolTrackingSystem(toolFileName));
+				CHECK(file.exists());
+				if(file.exists())
+					REQUIRE(configData.mTrackingSystem == config->getToolTrackingSystem(toolFileName));
 			}
 		}
 	}
