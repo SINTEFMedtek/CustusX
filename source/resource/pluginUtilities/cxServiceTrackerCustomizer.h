@@ -28,8 +28,6 @@ public:
    virtual T* addingService(const ctkServiceReference &reference)
    {
        T* service = reference.getPlugin()->getPluginContext()->getService<T>(reference);
-	   std::cout << "ServiceTrackerCustomizer: service: " << service << std::endl;
-//	   std::cout << "ServiceTrackerCustomizer: service: " << service->getName().toStdString() << std::endl;
 	   if(mServiceAddedFunction)
     	   mServiceAddedFunction(service);
        return service;
