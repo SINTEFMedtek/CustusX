@@ -5,6 +5,7 @@
 
 #include "ctkServiceTracker.h"
 #include "ctkServiceTrackerCustomizer.h"
+#include <iostream>
 
 namespace cx {
 /**
@@ -27,7 +28,9 @@ public:
    virtual T* addingService(const ctkServiceReference &reference)
    {
        T* service = reference.getPlugin()->getPluginContext()->getService<T>(reference);
-       if(mServiceAddedFunction)
+	   std::cout << "ServiceTrackerCustomizer: service: " << service << std::endl;
+//	   std::cout << "ServiceTrackerCustomizer: service: " << service->getName().toStdString() << std::endl;
+	   if(mServiceAddedFunction)
     	   mServiceAddedFunction(service);
        return service;
 	 }

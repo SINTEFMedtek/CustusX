@@ -36,44 +36,43 @@ class ServiceTrackerListener
 {
 
 public:
-		ServiceTrackerListener(ctkPluginContext* context,//PluginFrameworkManagerPtr pluginFramework,
-													 boost::function<void (T*)> serviceAdded,
-													 boost::function<void (T*)> serviceModified,
-													 boost::function<void (T*)> serviceRemoved)
-    {
-        boost::shared_ptr<ServiceTrackerCustomizer<T> > customizer(new ServiceTrackerCustomizer<T>);
-        mServiceTrackerCustomizer = customizer;
-        mServiceTrackerCustomizer->setServiceAddedCallback(serviceAdded);
-        mServiceTrackerCustomizer->setServiceModifiedCallback(serviceModified);
-        mServiceTrackerCustomizer->setServiceRemovedCallback(serviceRemoved);
+	ServiceTrackerListener(ctkPluginContext* context,//PluginFrameworkManagerPtr pluginFramework,
+						   boost::function<void (T*)> serviceAdded,
+						   boost::function<void (T*)> serviceModified,
+						   boost::function<void (T*)> serviceRemoved)
+	{
+		boost::shared_ptr<ServiceTrackerCustomizer<T> > customizer(new ServiceTrackerCustomizer<T>);
+		mServiceTrackerCustomizer = customizer;
+		mServiceTrackerCustomizer->setServiceAddedCallback(serviceAdded);
+		mServiceTrackerCustomizer->setServiceModifiedCallback(serviceModified);
+		mServiceTrackerCustomizer->setServiceRemovedCallback(serviceRemoved);
+		mServiceTracker.reset(new ctkServiceTracker<T*>(context, mServiceTrackerCustomizer.get()));
+	}
 
-				mServiceTracker.reset(new ctkServiceTracker<T*>(context, mServiceTrackerCustomizer.get()));
-    }
+	void open()
+	{
+		mServiceTracker->open();
+	}
 
-    void open()
-    {
-    	mServiceTracker->open();
-    }
-
-    T* getService(QString name)
-		{
+	T* getService(QString name)
+	{
 		QList<T*> services = mServiceTracker->getServices();
 
-    	T* service = NULL;
-			foreach(T* temp, services)
-    	{
-    		QString serviceName = temp->getName();
-    		if(serviceName.compare(name) == 0)
-    		{
-    			service = temp;
-    		}
-    	}
-    	return service;
-    }
+		T* service = NULL;
+		foreach(T* temp, services)
+		{
+			QString serviceName = temp->getName();
+			if(serviceName.compare(name) == 0)
+			{
+				service = temp;
+			}
+		}
+		return service;
+	}
 
 private:
-    boost::shared_ptr<ServiceTrackerCustomizer<T> > mServiceTrackerCustomizer;
-    boost::shared_ptr<ctkServiceTracker<T*> > mServiceTracker;
+	boost::shared_ptr<ServiceTrackerCustomizer<T> > mServiceTrackerCustomizer;
+	boost::shared_ptr<ctkServiceTracker<T*> > mServiceTracker;
 };
 }//namespace cx
 

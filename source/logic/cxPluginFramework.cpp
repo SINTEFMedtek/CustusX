@@ -100,13 +100,15 @@ void PluginFrameworkManager::loadPluginFromStoredState(QString symbolicName, QSt
 {	
 	if (storedState.isEmpty())
 	{
-		report(QString("Detected new plugin [%1], autostarting...").arg(symbolicName));
+		report(QString("Initializing new plugin, autostarting: %1").arg(symbolicName));
 		storedState = getStringForctkPluginState(ctkPlugin::ACTIVE);
+	}
+	else
+	{
+		report(QString("Initializing plugin to state [%2]: %1").arg(symbolicName).arg(storedState));
 	}
 
 	ctkPlugin::State state = getctkPluginStateForString(storedState);
-
-	report(QString("Initializing plugin to state [%2]: %1").arg(symbolicName).arg(getStringForctkPluginState(state)));
 
 	if (state==ctkPlugin::UNINSTALLED)
 		return;
