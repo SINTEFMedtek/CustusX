@@ -15,6 +15,7 @@
 #define CXFILEHELPERS_H
 
 #include <QString>
+#include <QDir>
 
 namespace cx
 {
@@ -34,6 +35,9 @@ namespace cx
  * \author christiana
  */
 bool removeNonemptyDirRecursively(const QString& dirName);
+
+QFileInfoList getDirs(QString path);
+QStringList getAbsolutePathToXmlFiles(QString path, bool includeSubDirs = false);
 
 /**
  * @\}

@@ -9,7 +9,6 @@
 #define CXDATAVIEWSELECTIONWIDGET_H_
 
 #include <QListWidget>
-//#include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
 #include "cxLegacySingletons.h"
 class QLabel;
@@ -56,21 +55,14 @@ public:
   AllDataListWidget(QWidget* parent = NULL);
   virtual ~AllDataListWidget();
 
-
-public slots:
-//  void filterSlot(QStringList applicationsFilter, QStringList trackingsystemsFilter);
-
 protected:
   void mousePressEvent(QMouseEvent *event);
-  void mouseMoveEvent(QMouseEvent *event);
-//  void startDrag();
+	void mouseMoveEvent(QMouseEvent *event);
 
 private slots:
   void populateAllDataList();
 
 private:
-//  QStringList getAbsoluteFilePathToAllTools(QDir dir); ///< get absolute file path to all tool.xml files in folder dir and all subfolders
-//  QStringList filter(QStringList toolsToFilter, QStringList applicationsFilter, QStringList trackingsystemsFilter); ///<
   QPoint startPos;
 };
 
@@ -89,8 +81,6 @@ public:
   QStringList getData(); ///< get absolute file path to all tools currently in the list
 
 public slots:
-//  void configSlot(QStringList toolsAbsoluteFilePath); ///< adds all input tools to the list
-//  void filterSlot(QStringList trackingsystemFilter); ///< filters the tools on tracking system
   void populateList();
   void userChangedListSlot();
 
@@ -101,15 +91,7 @@ private slots:
   void keyPressEvent(QKeyEvent* event);
 
 protected:
-  QMap<int, QVariant> convertFromCustomQtMimeFormat(const QMimeData* mimeData) const;
-
-//  void dragEnterEvent(QDragEnterEvent *event);
-//  void dragMoveEvent(QDragMoveEvent *event);
-//  bool dropMimeData(int index, const QMimeData* data, Qt::DropAction action);
-
-//  void mousePressEvent(QMouseEvent *event);
-//  void mouseMoveEvent(QMouseEvent *event);
-//  void startDrag();
+	QMap<int, QVariant> convertFromCustomQtMimeFormat(const QMimeData* mimeData) const;
 
 private:
   QListWidgetItem* mItemToDelete;
@@ -129,7 +111,6 @@ public:
   virtual ~DataViewSelectionWidget();
 
 private slots:
-//  void populateAllDataList();
   void viewGroupChangedSlot();
 
 private:

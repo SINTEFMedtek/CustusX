@@ -62,6 +62,7 @@ public:
 		Transform3D getCalibrationAsSSC() const;
 		void setCalibration(const Transform3D& cal);
 		void saveCalibrationToFile();
+		bool verify();
 
 		bool mIsReference;
 		bool mIsPointer;
@@ -136,7 +137,6 @@ signals:
 
 private:
 	void toolTransformCallback(const itk::EventObject &event);
-	bool verifyInternalStructure();
 	igstk::TrackerTool::Pointer buildInternalTool();
 	void determineToolsCalibration();
 	void internalAttachedToTracker(bool value);

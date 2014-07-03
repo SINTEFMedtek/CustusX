@@ -5,6 +5,7 @@
 
 #include "ctkServiceTracker.h"
 #include "ctkServiceTrackerCustomizer.h"
+#include <iostream>
 
 namespace cx {
 /**
@@ -27,7 +28,7 @@ public:
    virtual T* addingService(const ctkServiceReference &reference)
    {
        T* service = reference.getPlugin()->getPluginContext()->getService<T>(reference);
-       if(mServiceAddedFunction)
+	   if(mServiceAddedFunction)
     	   mServiceAddedFunction(service);
        return service;
 	 }

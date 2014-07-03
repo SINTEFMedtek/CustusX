@@ -3,45 +3,13 @@
 #include "cxReporter.h"
 #include "cxtestTestToolMesh.h"
 
-#include <QDir>
 #include <QStringList>
 #include "cxToolManagerUsingIGSTK.h"
-#include "cxDataLocations.h"
 #include "cxEnumConverter.h"
 #include "cxDefinitions.h"
 #include "cxTrackerConfiguration.h"
-
-namespace
-{
-
-QFileInfoList getDirs(QString path)
-{
-//	std::cout << "getDirs path: " << path << std::endl;
-	QDir dir(path);
-	dir.setFilter(QDir::AllDirs|QDir::NoDotAndDotDot);
-	QFileInfoList retval = dir.entryInfoList();
-	return retval;
-}
-
-QStringList getXmlFiles(QString path, bool includeSubDirs = false)
-{
-//	std::cout << "getXmlFiles path: " << path << std::endl;
-	QStringList retval;
-	QDir dir(path);
-	dir.setFilter(QDir::Files);
-	dir.setNameFilters(QStringList("*.xml"));
-
-	foreach(QFileInfo file, dir.entryInfoList())
-		retval << file.absoluteFilePath();
-
-	if (includeSubDirs)
-		foreach(QFileInfo directory, getDirs(path))
-			retval << getXmlFiles(directory.absoluteFilePath(), includeSubDirs);
-
-	return retval;
-}
-
-} //namespace
+#include "cxFileHelpers.h"
+#include "cxDataLocations.h"
 
 namespace cxtest
 {
@@ -60,18 +28,14 @@ TEST_CASE("Sonowand tools' STL files are readable", "[unit][tool]")
 	cx::Reporter::shutdown();
 }
 
-TEST_CASE("Verify tool xml files use tracking systems supported by ToolManagerUsingIGSTK", "[unit][tool][xml]")
+TEST_CASE("Tool xml files use tracking systems supported by ToolManagerUsingIGSTK", "[unit][tool][xml]")
 {
 	cx::TrackingServicePtr trackingService = cx::ToolManagerUsingIGSTK::create();
 	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
-	QString toolFilePath = cx::DataLocations::getRootConfigPath() + "/tool/Tools/";
-//	std::cout << toolFilePath.toStdString() << std::endl;
-
 	QStringList trackingSystems = trackingService->getSupportedTrackingSystems();
 
-	bool includeSubDirs = true;
 	//Verify tool uses supported tracking system
-	foreach(QString filename, getXmlFiles(toolFilePath, includeSubDirs))
+	foreach(QString filename, config->getAbsoluteFilePathToAllTools())
 	{
 		QString toolTrackingSystem = config->getToolTrackingSystem(filename);
 
@@ -81,27 +45,59 @@ TEST_CASE("Verify tool xml files use tracking systems supported by ToolManagerUs
 	}
 }
 
-TEST_CASE("Verify that tool configuration files use existing files", "[unit][tool][xml]")
+TEST_CASE("Tool configuration files", "[unit][tool][xml]")
 {
 	cx::TrackingServicePtr trackingService = cx::ToolManagerUsingIGSTK::create();
 	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
 	QString configFilePath = cx::DataLocations::getRootConfigPath() + "/tool/";
 
-	foreach(QFileInfo dir, getDirs(configFilePath))
+	foreach(QFileInfo dir, cx::getDirs(configFilePath))
 	{
-		foreach(QString filename, getXmlFiles(dir.absoluteFilePath()))
+		foreach(QString filename, cx::getAbsolutePathToXmlFiles(dir.absoluteFilePath()))
 		{
-//			std::cout << "Tool config: " << filename << std::endl;
-			cx::TrackerConfiguration::Configuration data = config->getConfiguration(filename);
-			QStringList selectedTools = data.mTools;
+			INFO("Tool config file: " + filename.toStdString());
+			cx::TrackerConfiguration::Configuration configData = config->getConfiguration(filename);
+			QStringList selectedTools = configData.mTools;
 			foreach(QString toolFileName, selectedTools)
 			{
-//				std::cout << "Tool: " << toolFileName.toStdString() << std::endl;
 				QFileInfo file(toolFileName);
-				REQUIRE(file.exists());
+				INFO("Tool file: " + toolFileName.toStdString());
+				CHECK(file.exists());
+				if(file.exists())
+					REQUIRE(configData.mTrackingSystem == config->getToolTrackingSystem(toolFileName));
 			}
-//			std::cout << std::endl;
 		}
+	}
+}
+
+TEST_CASE("Tool xml files got existing image files", "[unit][tool][xml]")
+{
+	cx::TrackingServicePtr trackingService = cx::ToolManagerUsingIGSTK::create();
+	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
+
+	foreach(QString filename, config->getAbsoluteFilePathToAllTools())
+	{
+		QString imageFileName = config->getToolPictureFilename(filename);
+		INFO("Tool file: " + filename);
+//		CHECK(!imageFileName.isEmpty());
+		if(!imageFileName.isEmpty())
+		{
+			QFileInfo imageFile(imageFileName);
+			INFO("Image file: " + imageFileName);
+			REQUIRE(imageFile.exists());
+		}
+	}
+}
+
+TEST_CASE("Verify tool xml files", "[unit][tool][xml]")
+{
+	cx::TrackingServicePtr trackingService = cx::ToolManagerUsingIGSTK::create();
+	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
+
+	foreach(QString filename, config->getAbsoluteFilePathToAllTools())
+	{
+		INFO("Tool file is faulty: " + filename.toStdString());
+		REQUIRE(config->verifyTool(filename));
 	}
 }
 

@@ -35,9 +35,10 @@ public:
 	virtual QString getToolTrackingSystem(QString uid);
 	virtual QString getToolPictureFilename(QString uid);
 	virtual Tool getTool(QString uid);
+	virtual QStringList getAbsoluteFilePathToAllTools();
+	virtual bool verifyTool(QString uid);
 
 private:
-	QStringList getAbsoluteFilePathToAllTools(QDir dir);
 	QStringList filter(QStringList toolsToFilter, QStringList applicationsFilter,
 			QStringList trackingsystemsFilter);
 	IgstkTool::InternalStructure getToolInternal(QString toolAbsoluteFilePath);
