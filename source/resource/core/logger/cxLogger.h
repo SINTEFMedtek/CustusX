@@ -53,7 +53,6 @@ extern "C"
 	if (!(STATEMENT))					\
 	{									\
 		SSC_ERROR("%s","Assert failure!");\
-		exit(1);						\
 	}									\
 }
 
