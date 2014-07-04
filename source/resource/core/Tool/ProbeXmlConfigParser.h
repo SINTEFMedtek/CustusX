@@ -50,6 +50,7 @@ public:
     bool mEmpty;
     
     Configuration() :
+		mConfigId(""),
     	mImageWidth(0),
     	mImageHeight(0),
     	mWidthDeg(0),
