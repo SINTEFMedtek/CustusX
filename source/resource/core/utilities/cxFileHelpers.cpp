@@ -63,7 +63,7 @@ QStringList getAbsolutePathToFiles(QString path, QStringList nameFilters, bool i
 
 	if (includeSubDirs)
 		foreach(QFileInfo directory, getDirs(path))
-			retval << getAbsolutePathToXmlFiles(directory.absoluteFilePath(), includeSubDirs);
+			retval << getAbsolutePathToFiles(directory.absoluteFilePath(), nameFilters, includeSubDirs);
 
 	return retval;
 }
