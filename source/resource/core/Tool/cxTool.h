@@ -79,13 +79,13 @@ public:
 	 * \return the type of the tool. Deprecated: Use getTypes() instead,
 	 * in order to support multiple types.
 	 */
-	virtual Type getType() const
+	/*virtual Type getType() const
 	{
 		std::set<Type> types = this->getTypes();
 		if (types.empty())
 			return TOOL_NONE;
 		return *types.begin();
-	}
+	}*/
 	/**
 	 * \return the types of the tool.
 	 * Implement this one instead of the deprecated getType()
