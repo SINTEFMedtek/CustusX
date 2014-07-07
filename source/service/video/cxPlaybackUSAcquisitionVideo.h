@@ -61,7 +61,7 @@ private slots:
 private:
 	void updateFrame(QString filename);
 	void loadFullData(QString filename);
-	QStringList getAllFiles(QString folder);
+	QStringList getAbsolutePathToFtsFiles(QString folder);
 	QString mRoot;
 	PlaybackTimePtr mTimer;
 //	ImageImportVideoSourcePtr mVideoSource;
