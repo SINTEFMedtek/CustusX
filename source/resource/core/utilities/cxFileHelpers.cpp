@@ -51,21 +51,26 @@ QFileInfoList getDirs(QString path)
 	return retval;
 }
 
-QStringList getAbsolutePathToXmlFiles(QString path, bool includeSubDirs)
+QStringList getAbsolutePathToFiles(QString path, QStringList nameFilters, bool includeSubDirs)
 {
 	QStringList retval;
 	QDir dir(path);
 	dir.setFilter(QDir::Files);
-	dir.setNameFilters(QStringList("*.xml"));
+	dir.setNameFilters(nameFilters);
 
 	foreach(QFileInfo file, dir.entryInfoList())
 		retval << file.absoluteFilePath();
 
 	if (includeSubDirs)
 		foreach(QFileInfo directory, getDirs(path))
-			retval << getAbsolutePathToXmlFiles(directory.absoluteFilePath(), includeSubDirs);
+			retval << getAbsolutePathToFiles(directory.absoluteFilePath(), nameFilters, includeSubDirs);
 
 	return retval;
+}
+
+QStringList getAbsolutePathToXmlFiles(QString path, bool includeSubDirs)
+{
+	return getAbsolutePathToFiles(path, QStringList("*.xml"), includeSubDirs);
 }
 
 } // namespace cx

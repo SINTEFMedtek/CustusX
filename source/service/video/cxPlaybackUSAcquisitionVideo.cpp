@@ -32,6 +32,7 @@
 #include "cxImage.h"
 #include "cxImageDataContainer.h"
 #include "cxVideoServiceBackend.h"
+#include "cxFileHelpers.h"
 
 namespace cx
 {
@@ -89,7 +90,7 @@ std::vector<TimelineEvent> USAcquisitionVideoPlayback::getEvents()
 {
 	std::vector<TimelineEvent> events;
 
-	QStringList allFiles = this->getAllFiles(mRoot);
+	QStringList allFiles = this->getAbsolutePathToFtsFiles(mRoot);
 	for (int i=0; i<allFiles.size(); ++i)
 	{
 		UsReconstructionFileReader reader;
@@ -114,32 +115,10 @@ std::vector<TimelineEvent> USAcquisitionVideoPlayback::getEvents()
 }
 
 /**Get all mhd files in folder, recursively.
- *
- * Cut and paste from FileSelectWidget .
- *
  */
-QStringList USAcquisitionVideoPlayback::getAllFiles(QString folder)
+QStringList USAcquisitionVideoPlayback::getAbsolutePathToFtsFiles(QString folder)
 {
-	QStringList mNameFilters;
-	mNameFilters << "*.fts";
-
-	QDir dir(folder);
-	QStringList files = dir.entryList(mNameFilters, QDir::Files);
-
-	QStringList retval;
-	for (int i = 0; i < files.size(); ++i)
-	{
-		retval << (dir.absolutePath() + "/" + files[i]);
-	}
-	QStringList folders = dir.entryList(QStringList(), QDir::AllDirs | QDir::NoDotAndDotDot);
-
-	for (int i = 0; i < folders.size(); ++i)
-	{
-		files = this->getAllFiles(folder + "/" + folders[i]);
-		retval.append(files);
-	}
-
-	return retval;
+	return getAbsolutePathToFiles(folder, QStringList("*.fts"), true);
 }
 
 void USAcquisitionVideoPlayback::timerChangedSlot()

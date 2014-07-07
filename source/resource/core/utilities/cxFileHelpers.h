@@ -37,6 +37,7 @@ namespace cx
 bool removeNonemptyDirRecursively(const QString& dirName);
 
 QFileInfoList getDirs(QString path);
+QStringList getAbsolutePathToFiles(QString path, QStringList nameFilters, bool includeSubDirs = false);
 QStringList getAbsolutePathToXmlFiles(QString path, bool includeSubDirs = false);
 
 /**
