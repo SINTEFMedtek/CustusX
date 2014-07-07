@@ -23,6 +23,178 @@ set(CX_READ_PERMISSIONS
 	OWNER_READ GROUP_READ WORLD_READ)
 
 include( cxUtilities )
+
+###############################################################################
+#
+# Define which generators to use, i.e what kind of installers to create
+#
+###############################################################################
+macro(cx_install_set_generators)
+
+	if(APPLE)
+		# keep only packagemaker
+		option (CPACK_BINARY_STGZ "Enable to build STGZ packages" OFF)
+		option (CPACK_BINARY_TGZ "Enable to build TGZ packages" OFF)
+		option (CPACK_SOURCE_TBZ2 "Enable to build TBZ2 source packages" OFF)
+		option (CPACK_SOURCE_TGZ "Enable to build TGZ source packages" OFF)
+	endif(APPLE)
+
+	if(CX_LINUX)
+		set(CPACK_GENERATOR "TGZ")
+	endif(CX_LINUX)
+
+	if(CX_WINDOWS)
+		# looks like NSIS is the default
+	endif (CX_WINDOWS)
+
+endmacro()
+
+###############################################################################
+#
+# Define variables used by various installer generators to customize
+# the installer look&feel.
+#
+###############################################################################
+macro(cx_install_decorate_generators)
+
+	set(CPACK_RESOURCE_FILE_WELCOME "${PROJECT_SOURCE_DIR}/install/Shared/install_text/install_welcome.txt")
+	set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/install/Shared/install_text/install_license.txt")
+
+	if(APPLE)
+		set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/Apple/apple_install_readme.rtf")
+	endif(APPLE)
+
+	if(CX_LINUX)
+		set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/Linux/copy/linux_install_readme.txt")
+	endif(CX_LINUX)
+
+	if(CX_WINDOWS)
+		set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.ico")
+		set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.png")
+		set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/Windows\\\\Windows_Install_ReadMe.rtf")
+		set(CPACK_NSIS_INSTALLED_ICON_NAME "bin/CustusX.exe")
+		set(CPACK_NSIS_MENU_LINKS "doc/Windows_Install_ReadMe.rtf" "README")
+
+		set(OpenIGTLinkServerName OpenIGTLinkServer)
+		if(CX_WIN32)
+			set(OpenIGTLinkServerName UltrasonixServer)
+		endif()
+		set(CPACK_PACKAGE_EXECUTABLES
+			"CustusX" "CustusX")
+		set(CPACK_PACKAGE_EXECUTABLES
+			${CPACK_PACKAGE_EXECUTABLES}
+			"${OpenIGTLinkServerName}" "${OpenIGTLinkServerName}")
+
+	endif (CX_WINDOWS)
+endmacro()
+
+###############################################################################
+#
+# Make sure that binaries can use paths relative to itself when looking up
+# libraries. This enables packaging of libs and exes without depending on
+# system locations.
+#
+###############################################################################
+macro(cx_install_set_relative_path)
+	if(CX_LINUX)
+		# Enable relative paths in Linux:
+		# http://www.cmake.org/Wiki/CMake_RPATH_handling
+		# http://www.cmake.org/pipermail/cmake/2008-January/019329.html
+		# Mac handles this differently
+		SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:\\\$ORIGIN/")
+	endif(CX_LINUX)
+endmacro()
+
+
+###############################################################################
+#
+# Define variable CPACK_PACKAGE_FILE_NAME which sets the name of the installer file.
+#
+###############################################################################
+macro(cx_install_set_generator_filename)
+	set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_${${PROJECT_NAME}_VERSION_STRING}")
+	# append build type to name if not Release:
+	if(NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
+		set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_BUILD_TYPE})
+	endif()
+	# append system info if linux:
+	if(CX_LINUX)
+		set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_SYSTEM})
+	endif(CX_LINUX)
+endmacro()
+
+###############################################################################
+#
+# Set version info in CPACK
+#
+###############################################################################
+macro(cx_install_set_version_info)
+	set(CPACK_PACKAGE_VERSION ${${PROJECT_NAME}_VERSION_STRING})
+	set(CPACK_PACKAGE_VERSION_MAJOR "${${PROJECT_NAME}_VERSION_MAJOR}")
+	set(CPACK_PACKAGE_VERSION_MINOR "${${PROJECT_NAME}_VERSION_MINOR}")
+	set(CPACK_PACKAGE_VERSION_PATCH "${${PROJECT_NAME}_VERSION_PATCH}")
+endmacro()
+
+###############################################################################
+#
+# Setup a folder structure for the installed system.
+#
+# Structure on linux
+#
+#   bundle/bin/bundle
+#              binary*
+#              lib*.so
+#              qt.conf
+#              liborg_plugin*.so
+#   bundle/doc/something.txt
+#   bundle/config/...
+#
+# Structure on mac
+#
+#   bundle/bundle.app/Contents/MacOS/bundle
+#                                    binary*
+#                                    lib*.so
+#                                    liborg_plugin*.so
+#   bundle/bundle.app/Contents/Resources/qt.conf
+#   bundle/doc/something.txt
+#   bundle/config/...
+#
+#
+#  Creates the following variables:
+#    CX_BUNDLE_NAME          Name used to identify bundle.
+#    CX_INSTALL_ROOT_DIR     Base folder for installation, relative to CMAKE_INSTALL_PREFIX
+#                            All files are installed into this location.
+#    CX_INSTALL_BINARY_DIR   Location of binaries
+#    CX_INSTALL_CONFIG_DIR   Location of config stuff... (qt.conf fex)
+#    CX_INSTALL_PLUGIN_DIR   Location of runtime plugins
+#
+###############################################################################
+macro(cx_install_set_folder_structure)
+
+	set(CX_BUNDLE_NAME "CustusX")
+
+	set(CX_INSTALL_ROOT_DIR .)
+	if(APPLE)
+		set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+		set(CX_INSTALL_ROOT_DIR "Applications/${CX_BUNDLE_NAME}")
+	endif(APPLE)
+	if(CX_LINUX)
+		set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+		set(CX_INSTALL_ROOT_DIR ${CX_BUNDLE_NAME})
+	endif(CX_LINUX)
+
+	set(CX_INSTALL_BINARY_DIR ${CX_INSTALL_ROOT_DIR}/bin)
+	if(APPLE)
+		set(CX_INSTALL_BINARY_DIR "${CX_INSTALL_ROOT_DIR}/${CX_BUNDLE_NAME}.app/Contents/MacOS")
+	endif(APPLE)
+
+#	set(CX_INSTALL_PLUGIN_DIR "${CX_INSTALL_BINARY_DIR}/plugins") - did not work: get into trouble with relative paths and fixup_bundle
+	set(CX_INSTALL_PLUGIN_DIR "${CX_INSTALL_BINARY_DIR}")
+
+endmacro()
+
+
+
 ###############################################################################
 #
 # Set variables used throughout the build.
@@ -30,78 +202,20 @@ include( cxUtilities )
 #
 ###############################################################################
 macro(cx_initialize_custusx_install)
+	set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME "Core")
 
-    set(CPACK_PACKAGE_VERSION ${CustusX3_VERSION_STRING})
-    set(CPACK_PACKAGE_VERSION_MAJOR "${CustusX3_VERSION_MAJOR}")
-    set(CPACK_PACKAGE_VERSION_MINOR "${CustusX3_VERSION_MINOR}")
-    set(CPACK_PACKAGE_VERSION_PATCH "${CustusX3_VERSION_PATCH}")
+	cx_install_set_version_info()
 
-    set(CPACK_PACKAGE_FILE_NAME "CustusX_${CustusX3_VERSION_STRING}")
-    set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/Shared/install_text/install_welcome.txt")
-    set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/Shared/install_text/install_license.txt")
+	cx_install_set_relative_path()
 
-    # append build type to name if not Release:
-    if(NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
-        set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_BUILD_TYPE})
-    endif()
+	cx_install_set_generators()
+	cx_install_decorate_generators()
+	cx_install_set_generator_filename()
 
-    # Set root folder for entire installation
-    set(CX_INSTALL_ROOT_DIR .)
-
-    if(APPLE)
-        set(CPACK_PACKAGING_INSTALL_PREFIX "/")
-        set(CX_INSTALL_ROOT_DIR "Applications/CustusX")
-        set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Apple/apple_install_readme.rtf")
-
-        option (CPACK_BINARY_STGZ "Enable to build STGZ packages" OFF)
-		option (CPACK_BINARY_TGZ "Enable to build TGZ packages" OFF)
-        option (CPACK_SOURCE_TBZ2 "Enable to build TBZ2 source packages" OFF)
-        option (CPACK_SOURCE_TGZ "Enable to build TGZ source packages" OFF)
-    endif(APPLE)
-
-    if(CX_LINUX)
-        set(CX_INSTALL_ROOT_DIR "CustusX")
-
-        # Enable relative paths in Linux:
-        # http://www.cmake.org/Wiki/CMake_RPATH_handling
-        # http://www.cmake.org/pipermail/cmake/2008-January/019329.html
-        # Mac handles this differently
-        SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:\\\$ORIGIN/")
-
-        set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_SYSTEM})
-        set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Linux/copy/linux_install_readme.txt")
-        set(CPACK_GENERATOR "TGZ")
-        set(CPACK_PACKAGING_INSTALL_PREFIX "/")
-    endif(CX_LINUX)
-
-    if(CX_WINDOWS)
-        set(CPACK_NSIS_MUI_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons\\\\CustusX.ico")
-        set(CPACK_PACKAGE_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons\\\\CustusX.png")
-        set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Windows\\\\Windows_Install_ReadMe.rtf")
-        set(CPACK_NSIS_INSTALLED_ICON_NAME "bin/CustusX.exe")
-        set(OpenIGTLinkServerName OpenIGTLinkServer)
-        if(CX_WIN32)
-            set(OpenIGTLinkServerName UltrasonixServer)
-        endif()
-        set(CPACK_PACKAGE_EXECUTABLES
-            "CustusX" "CustusX")
-        set(CPACK_PACKAGE_EXECUTABLES
-            ${CPACK_PACKAGE_EXECUTABLES}
-            "${OpenIGTLinkServerName}" "${OpenIGTLinkServerName}")
-        set(CPACK_NSIS_MENU_LINKS "doc/Windows_Install_ReadMe.rtf" "README")
-    endif (CX_WINDOWS)
+	cx_install_set_folder_structure()
 
 	# used as a global variable: clear at start of run
 	unset(CX_APPLE_TARGETS_TO_COPY CACHE)
-
-
-    SET(CX_INSTALL_BINARY_DIR ${CX_INSTALL_ROOT_DIR}/bin)
-    SET(CX_INSTALL_CONFIG_DIR ${CX_INSTALL_ROOT_DIR}/bin)
-    IF(APPLE)
-        SET(CX_INSTALL_BINARY_DIR "${CX_INSTALL_ROOT_DIR}/CustusX.app/Contents/MacOS")
-        SET(CX_INSTALL_CONFIG_DIR "${CX_INSTALL_ROOT_DIR}/CustusX.app/Contents/Resources")
-   ENDIF(APPLE)
-
 
 endmacro()
 
@@ -298,42 +412,76 @@ endfunction()
 #  ( from http://www.cmake.org/Wiki/CMake:Packaging_With_CPack)
 #
 ###############################################################################
-function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR INSTALL_CONFIG_DIR INSTALL_LIBRARIES_PATTERN_LOCAL DIRS_LOCAL)
+function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS_LOCAL)
 	cx_assert_variable_exists(${QT_PLUGINS_DIR})
+	cx_assert_variable_exists(${CX_INSTALL_ROOT_DIR})
+	cx_assert_variable_exists(${INSTALL_BINARY_DIR})
+	cx_assert_variable_exists(${CX_INSTALL_PLUGIN_DIR})
 
+
+	# Install plugins in the default location as given by http://qt-project.org/doc/qt-4.8/qt-conf.html
+	if(CX_LINUX)
+		SET(INSTALL_QTPLUGIN_DIR "${INSTALL_BINARY_DIR}/plugins")
+		SET(INSTALL_QTCONF_DIR "${INSTALL_BINARY_DIR}")
+	endif()
+	if(CX_WINDOWS)
+		SET(INSTALL_QTPLUGIN_DIR "${INSTALL_BINARY_DIR}/plugins")
+		SET(INSTALL_QTCONF_DIR "${INSTALL_BINARY_DIR}")
+	endif()
+	IF(APPLE)
+		SET(INSTALL_QTPLUGIN_DIR "${CX_INSTALL_ROOT_DIR}/${CX_BUNDLE_NAME}.app/Contents/plugins")
+		SET(INSTALL_QTCONF_DIR   "${CX_INSTALL_ROOT_DIR}/${CX_BUNDLE_NAME}.app/Contents/Resources")
+	ENDIF(APPLE)
 
 # Install plugins in the default location as given by http://qt-project.org/doc/qt-4.8/qt-conf.html
-if(CX_LINUX)
-	SET(INSTALL_PLUGIN_DIR "${INSTALL_BINARY_DIR}")
-endif()
-if(CX_WINDOWS)
-	SET(INSTALL_PLUGIN_DIR "${INSTALL_BINARY_DIR}")
-endif()
-IF(APPLE)
-	SET(INSTALL_PLUGIN_DIR "${INSTALL_BINARY_DIR}/../plugins")
-ENDIF(APPLE)
-
+#if(CX_LINUX)
+#	SET(INSTALL_PLUGIN_DIR "${INSTALL_BINARY_DIR}")
+#endif()
+#if(CX_WINDOWS)#
+#	SET(INSTALL_PLUGIN_DIR "${INSTALL_BINARY_DIR}")
+#endif()
+#IF(APPLE)
+#	SET(INSTALL_PLUGIN_DIR "${INSTALL_BINARY_DIR}/../plugins")
+#ENDIF(APPLE)
 
 	# Install needed Qt plugins by copying directories from the qt installation
 	# One can cull what gets copied by using 'REGEX "..." EXCLUDE'
 	install(DIRECTORY "${QT_PLUGINS_DIR}/imageformats" "${QT_PLUGINS_DIR}/sqldrivers"
-		DESTINATION ${INSTALL_PLUGIN_DIR}
+		DESTINATION ${INSTALL_QTPLUGIN_DIR}
+		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
+
+	# install runtime plugins
+	install(DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/plugins/" # trailing slash copies contents, not plugin folder
+		DESTINATION ${CX_INSTALL_PLUGIN_DIR}
 		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
 
 	# collect all installations here. They will be used by fixup_bundle to collect dependencies.
 	# this is a sum of the input pattern (if any) and the qtplugins
 	set(INSTALL_LIBRARIES_PATTERN_LOCAL
-#		${INSTALL_BINARY_DIR}/../plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}
-                ${INSTALL_BINARY_DIR}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}
-				${INSTALL_PLUGIN_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}
-				${INSTALL_LIBRARIES_PATTERN_LOCAL}
+		${CX_INSTALL_PLUGIN_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}
+		${INSTALL_QTPLUGIN_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}
 		)
+
+	# Install needed Qt plugins by copying directories from the qt installation
+	# One can cull what gets copied by using 'REGEX "..." EXCLUDE'
+#	install(DIRECTORY "${QT_PLUGINS_DIR}/imageformats" "${QT_PLUGINS_DIR}/sqldrivers"
+#		DESTINATION ${INSTALL_PLUGIN_DIR}
+#		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
+
+	# collect all installations here. They will be used by fixup_bundle to collect dependencies.
+	# this is a sum of the input pattern (if any) and the qtplugins
+#	set(INSTALL_LIBRARIES_PATTERN_LOCAL
+#		${INSTALL_BINARY_DIR}/../plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}
+#                ${INSTALL_BINARY_DIR}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}
+#				${INSTALL_PLUGIN_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}
+#				${INSTALL_LIBRARIES_PATTERN_LOCAL}
+#		)
 
 	# install a qt.conf file
 	# this inserts some cmake code into the install script to write the file
 	# This is a requirement to get qt plugins in a relative path working!
 	install(CODE "
-		file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${INSTALL_CONFIG_DIR}/qt.conf\" \"\")
+		file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${INSTALL_QTCONF_DIR}/qt.conf\" \"\")
 		")
 
 	# create a code snippet : Search for the files in pattern,
@@ -358,6 +506,12 @@ ENDIF(APPLE)
 		)
 endfunction()
 
+function (getListOfVarsStartingWith _prefix _varResult)
+	get_cmake_property(_vars VARIABLES)
+	string (REGEX MATCHALL "(^|;)${_prefix}[A-Za-z0-9_\\.]*" _matchedVars "${_vars}")
+#	string (REGEX MATCHALL "(^|;)${_prefix}.*" _matchedVars "${_vars}")
+	set (${_varResult} ${_matchedVars} PARENT_SCOPE)
+endfunction()
 
 ###############################################################################
 # Create a text string describing essential build information
@@ -372,6 +526,18 @@ cx_initialize_cppunit()
 cx_initialize_opencv()
 cx_initialize_OpenIGTLink()
 cx_initialize_IGSTK()
+
+set(PLUGINS_DESCRIPTION
+"	Plugins:
+")
+getListOfVarsStartingWith("plugins/" matchedVars)
+foreach (_var IN LISTS matchedVars)
+	string(REPLACE "BUILD_plugins/" "" PLUGIN_NAME ${${_var}})
+	#	message("${_var}=${${_var}} :: ${${${_var}}} :: ${PLUGIN_NAME}")
+	set(PLUGINS_DESCRIPTION ${PLUGINS_DESCRIPTION}
+"		${PLUGIN_NAME}: ${${${_var}}}
+")
+endforeach()
 
 	cx_assert_variable_exists(${CustusX3_VERSION_STRING})
 	cx_assert_variable_exists(${SSC_USE_GCOV})
@@ -414,6 +580,7 @@ Configuration for CustusX ${CustusX3_VERSION_STRING}
 		ISB GE Scanner Grabber Interface: ${CX_USE_ISB_GE}
 		OpenCV Grabber Interface: ${CX_USE_OpenCV}
 
+${PLUGINS_DESCRIPTION}
 ")
 	set(CX_CONFIGURATION_DESCRIPTION ${CONFIGURATION_TEXT} PARENT_SCOPE)
 endfunction()
