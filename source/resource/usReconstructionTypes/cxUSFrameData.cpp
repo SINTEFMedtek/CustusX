@@ -274,7 +274,7 @@ vtkImageDataPtr USFrameData::cropImageExtent(vtkImageDataPtr input, IntBoundingB
   clip->Update();
   vtkImageDataPtr rawResult = clip->GetOutput();
 //  rawResult->Update();
-  rawResult->Crop(cropbox.begin()); // moved in from toGrayscaleAndEffectuateCropping when VTK5->6
+	rawResult->Crop(cropbox.begin()); // moved in from toGrayscaleAndEffectuateCropping when VTK5->6
   return rawResult;
 }
 

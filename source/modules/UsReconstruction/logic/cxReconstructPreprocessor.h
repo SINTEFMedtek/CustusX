@@ -51,6 +51,7 @@ public:
 
 private:
     void cropInputData();
+		IntBoundingBox3D reduceCropboxToImageSize(IntBoundingBox3D cropbox, QSize size);
     void updateFromOriginalFileData();
     void findExtentAndOutputTransform();
     Transform3D applyOutputOrientation();
