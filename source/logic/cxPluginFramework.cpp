@@ -83,7 +83,7 @@ QString PluginFrameworkManager::convertToAbsolutePath(QString path) const
 
 void PluginFrameworkManager::loadState()
 {
-	QStringList defPaths(DataLocations::getDefaultPluginsPath());
+	QStringList defPaths = DataLocations::getDefaultPluginsPath();
 	QStringList paths = settings()->value(mSettingsSearchPaths, defPaths).toStringList();
 	this->setSearchPaths(paths);
 
@@ -151,9 +151,13 @@ void PluginFrameworkManager::setSearchPaths(const QStringList& searchPath)
 	for (int i=0; i<searchPath.size(); ++i)
 		mPluginSearchPaths <<  this->convertToAbsolutePath(searchPath[i]);
 
-	QString defPath = this->convertToAbsolutePath(DataLocations::getDefaultPluginsPath());
-	if (!mPluginSearchPaths.count(defPath))
-		mPluginSearchPaths << defPath;
+	QStringList defPaths = DataLocations::getDefaultPluginsPath();
+	for (unsigned i=0; i<defPaths.size(); ++i)
+	{
+		QString defPath = this->convertToAbsolutePath(defPaths[i]);
+		if (!mPluginSearchPaths.count(defPath))
+			mPluginSearchPaths << defPath;
+	}
 
 	mPluginSearchPaths.removeDuplicates();
 
@@ -429,7 +433,7 @@ QStringList PluginFrameworkManager::getPluginSymbolicNames(const QString& search
 bool PluginFrameworkManager::nameIsProbablyPlugin(QString name) const
 {
 	// heuristic check for plugin-ish name
-	if (!name.count(".")>1) // some libs contain a _, they generate too much spam in installed version
+	if (name.count(".")<2) // some libs contain a _, they generate too much spam in installed version
 		return false;
 	if (name.contains("cxtest"))
 		return false;
