@@ -75,7 +75,7 @@ QString PluginFrameworkManager::convertToRelativePath(QString path) const
 QString PluginFrameworkManager::convertToAbsolutePath(QString path) const
 {
 	if (QDir(path).isAbsolute())
-		return path;
+		return QDir(path).absolutePath();
 
 	QDir base = qApp->applicationDirPath();
 	return QDir(base.path() + "/" + path).absolutePath();
@@ -154,6 +154,8 @@ void PluginFrameworkManager::setSearchPaths(const QStringList& searchPath)
 	QString defPath = this->convertToAbsolutePath(DataLocations::getDefaultPluginsPath());
 	if (!mPluginSearchPaths.count(defPath))
 		mPluginSearchPaths << defPath;
+
+	mPluginSearchPaths.removeDuplicates();
 
 	for (int i=0; i<searchPath.size(); ++i)
 	{
@@ -427,7 +429,7 @@ QStringList PluginFrameworkManager::getPluginSymbolicNames(const QString& search
 bool PluginFrameworkManager::nameIsProbablyPlugin(QString name) const
 {
 	// heuristic check for plugin-ish name
-	if (!name.contains("."))
+	if (!name.count(".")>1) // some libs contain a _, they generate too much spam in installed version
 		return false;
 	if (name.contains("cxtest"))
 		return false;

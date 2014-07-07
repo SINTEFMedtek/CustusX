@@ -20,23 +20,6 @@
 ###############################################################################
 
 
-#--------------------------------------------------------------------------------
-# Installer
-#--------------------------------------------------------------------------------
-# The installer creates the following file structure:
-#
-# CustusX - bin
-#         - config - tool
-#                  - shader
-#                  - settings
-#                  - tsf
-#
-# On Apple, the bin folder is replaced by a bundle.
-#
-
-
-#message(STATUS "CX_INSTALL_ROOT_DIR " ${CX_INSTALL_ROOT_DIR})
-
 include(cxInstallUtilities)
 
 cx_install_configuration_files()
@@ -76,23 +59,20 @@ endif(APPLE)
 # Bundle utilities
 #--------------------------------------------------------------------------------
 
-if(CX_LINUX)
-	set( CUSTUSX_EXECUTABLE "${CX_INSTALL_ROOT_DIR}/bin/CustusX")
-endif()
+set(CUSTUSX_EXECUTABLE "${CX_INSTALL_BINARY_DIR}/${CX_BUNDLE_NAME}")
 if(CX_WINDOWS)
-	set( CUSTUSX_EXECUTABLE "bin/CustusX.exe")
-endif()
-if(APPLE)
-	set( CUSTUSX_EXECUTABLE "${CX_INSTALL_ROOT_DIR}/CustusX.app/Contents/MacOS/CustusX")
+	set( CUSTUSX_EXECUTABLE ${CUSTUSX_EXECUTABLE}".exe")
 endif()
 
-#SET(CX_INSTALL_BINARY_DIR ${CX_INSTALL_ROOT_DIR}/bin)
-#SET(CX_INSTALL_CONFIG_DIR ${CX_INSTALL_ROOT_DIR}/bin)
-#IF(APPLE)
-#	SET(CX_INSTALL_BINARY_DIR "${CX_INSTALL_ROOT_DIR}/CustusX.app/Contents/MacOS")
-#	SET(CX_INSTALL_CONFIG_DIR "${CX_INSTALL_ROOT_DIR}/CustusX.app/Contents/Resources")
-#ENDIF(APPLE)
-
+#if(CX_LINUX)
+#	set( CUSTUSX_EXECUTABLE "${CX_INSTALL_ROOT_DIR}/bin/CustusX")
+#endif()
+#if(CX_WINDOWS)
+#	set( CUSTUSX_EXECUTABLE "bin/CustusX.exe")
+#endif()
+#if(APPLE)
+#	set( CUSTUSX_EXECUTABLE "${CX_INSTALL_ROOT_DIR}/CustusX.app/Contents/MacOS/CustusX")
+#endif()
 
 set(ALL_LIBRARY_DIRS
     ${ULTERIUS_BIN_DIR}
@@ -110,8 +90,8 @@ set(ALL_LIBRARY_DIRS
     ${Tube-Segmentation-Framework_LIBRARY_DIRS}
     ${OpenCLUtilityLibrary_LIBRARY_DIRS}
 
-	${PROJECT_BINARY_DIR}/bin # new standard: all own binaries stored here
-	${PROJECT_BINARY_DIR}/bin/plugins
+	${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+	${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/plugins
 	)
 
 cx_install_all_stored_targets(${CX_INSTALL_BINARY_DIR})
@@ -119,8 +99,6 @@ cx_install_all_stored_targets(${CX_INSTALL_BINARY_DIR})
 cx_fixup_and_add_qtplugins_to_bundle(
 	"${CUSTUSX_EXECUTABLE}"
 	${CX_INSTALL_BINARY_DIR}
-	${CX_INSTALL_CONFIG_DIR}
-	"${CX_INSTALL_LIBRARIES_PATTERN}"
 	"${ALL_LIBRARY_DIRS}")
 
 cxCreateConfigurationDescription()
@@ -128,3 +106,6 @@ message(STATUS ${CX_CONFIGURATION_DESCRIPTION})
 
 include(CPack)
 
+  #hiding packages created by ctk: we install the plugins ourselves
+  cpack_add_component(Development HIDDEN DISABLED)
+  cpack_add_component(RuntimePlugins HIDDEN DISABLED)
