@@ -81,7 +81,7 @@ double TimelineWidget::findCompactedTime(double timeInterval, double totalUsedTi
 	double w = timeInterval/totalTime;
 	double c = w*compactingFactor1 + (1-w)*compactingFactor0;
 	// use c to compact, but also set an absolute limit of fraction of total used time. This handles pauses of days or months.
-	double compactedTime = std::min(timeInterval * c, 0.3*totalUsedTime);
+	double compactedTime = std::min(timeInterval * c, 0.2*totalUsedTime);
 
 	return compactedTime;
 }
