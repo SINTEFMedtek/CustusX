@@ -64,7 +64,8 @@ class JenkinsGummyBears():
     def getJobsToTest(self):
         retval = ['CustusX_nightly']
         templates = ['unit__base_', 'integration__base_']
-        targets = ['ubuntu.12.04.x64', 'macosx.10.8', 'win32', 'win64']
+#        targets = ['ubuntu.12.04.x64', 'macosx.10.8', 'win32', 'win64'] # win disabled temporarily
+        targets = ['ubuntu.12.04.x64', 'macosx.10.8']
         for target in targets:
             for template in templates:
                 jobname = template.replace('_base_', target)
