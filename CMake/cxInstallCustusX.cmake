@@ -64,16 +64,6 @@ if(CX_WINDOWS)
 	set( CUSTUSX_EXECUTABLE ${CUSTUSX_EXECUTABLE}".exe")
 endif()
 
-#if(CX_LINUX)
-#	set( CUSTUSX_EXECUTABLE "${CX_INSTALL_ROOT_DIR}/bin/CustusX")
-#endif()
-#if(CX_WINDOWS)
-#	set( CUSTUSX_EXECUTABLE "bin/CustusX.exe")
-#endif()
-#if(APPLE)
-#	set( CUSTUSX_EXECUTABLE "${CX_INSTALL_ROOT_DIR}/CustusX.app/Contents/MacOS/CustusX")
-#endif()
-
 set(ALL_LIBRARY_DIRS
     ${ULTERIUS_BIN_DIR}
     ${QT_LIBRARY_DIRS}
