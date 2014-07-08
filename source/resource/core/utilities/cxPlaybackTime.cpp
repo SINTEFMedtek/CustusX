@@ -168,15 +168,9 @@ void PlaybackTime::setOffset(qint64 val)
 		return;
 
 	TemporaryPausePlay sentry(this);
-//	bool playing = this->isPlaying();
-//	if (playing)
-//		this->stop();
 
 	mOffset = std::max<quint64>(0, val);
 	this->timeoutSlot();
-
-//	if (playing)
-//		this->start();
 }
 
 qint64 PlaybackTime::getLength() const
