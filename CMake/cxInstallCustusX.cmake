@@ -32,17 +32,12 @@ if (CX_LINUX)
     install(FILES
         ${CustusX3_SOURCE_DIR}/install/Linux/copy/run_v2u.sh
         ${CustusX3_SOURCE_DIR}/install/Linux/copy/v2u
-        ${CustusX3_SOURCE_DIR}/install/Linux/copy/runCustusX.sh
-        ${CustusX3_SOURCE_DIR}/install/Linux/copy/runOpenIGTLinkServer.sh
         DESTINATION ${CX_INSTALL_ROOT_DIR}
         PERMISSIONS ${CX_FULL_PERMISSIONS})
 endif (CX_LINUX)
 
 # Install Apple-specific files
 if(APPLE)
-    install(FILES ${CustusX3_SOURCE_DIR}/install/Apple/SupportedGrabbers.txt
-            DESTINATION ${CX_INSTALL_ROOT_DIR})
-
     # Install folder for storage of igstk<->CustusX symlinks.
     # The symlinks must be in an absolute location.
     # Apple only (Win uses COM-ports, Linux installs with OS)
@@ -63,16 +58,6 @@ set(CUSTUSX_EXECUTABLE "${CX_INSTALL_BINARY_DIR}/${CX_BUNDLE_NAME}")
 if(CX_WINDOWS)
 	set( CUSTUSX_EXECUTABLE ${CUSTUSX_EXECUTABLE}".exe")
 endif()
-
-#if(CX_LINUX)
-#	set( CUSTUSX_EXECUTABLE "${CX_INSTALL_ROOT_DIR}/bin/CustusX")
-#endif()
-#if(CX_WINDOWS)
-#	set( CUSTUSX_EXECUTABLE "bin/CustusX.exe")
-#endif()
-#if(APPLE)
-#	set( CUSTUSX_EXECUTABLE "${CX_INSTALL_ROOT_DIR}/CustusX.app/Contents/MacOS/CustusX")
-#endif()
 
 set(ALL_LIBRARY_DIRS
     ${ULTERIUS_BIN_DIR}

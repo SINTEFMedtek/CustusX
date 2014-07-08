@@ -418,7 +418,6 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 	cx_assert_variable_exists(${INSTALL_BINARY_DIR})
 	cx_assert_variable_exists(${CX_INSTALL_PLUGIN_DIR})
 
-
 	# Install plugins in the default location as given by http://qt-project.org/doc/qt-4.8/qt-conf.html
 	if(CX_LINUX)
 		SET(INSTALL_QTPLUGIN_DIR "${INSTALL_BINARY_DIR}/plugins")
@@ -432,17 +431,6 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 		SET(INSTALL_QTPLUGIN_DIR "${CX_INSTALL_ROOT_DIR}/${CX_BUNDLE_NAME}.app/Contents/plugins")
 		SET(INSTALL_QTCONF_DIR   "${CX_INSTALL_ROOT_DIR}/${CX_BUNDLE_NAME}.app/Contents/Resources")
 	ENDIF(APPLE)
-
-# Install plugins in the default location as given by http://qt-project.org/doc/qt-4.8/qt-conf.html
-#if(CX_LINUX)
-#	SET(INSTALL_PLUGIN_DIR "${INSTALL_BINARY_DIR}")
-#endif()
-#if(CX_WINDOWS)#
-#	SET(INSTALL_PLUGIN_DIR "${INSTALL_BINARY_DIR}")
-#endif()
-#IF(APPLE)
-#	SET(INSTALL_PLUGIN_DIR "${INSTALL_BINARY_DIR}/../plugins")
-#ENDIF(APPLE)
 
 	# Install needed Qt plugins by copying directories from the qt installation
 	# One can cull what gets copied by using 'REGEX "..." EXCLUDE'
@@ -461,21 +449,6 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 		${CX_INSTALL_PLUGIN_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}
 		${INSTALL_QTPLUGIN_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}
 		)
-
-	# Install needed Qt plugins by copying directories from the qt installation
-	# One can cull what gets copied by using 'REGEX "..." EXCLUDE'
-#	install(DIRECTORY "${QT_PLUGINS_DIR}/imageformats" "${QT_PLUGINS_DIR}/sqldrivers"
-#		DESTINATION ${INSTALL_PLUGIN_DIR}
-#		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
-
-	# collect all installations here. They will be used by fixup_bundle to collect dependencies.
-	# this is a sum of the input pattern (if any) and the qtplugins
-#	set(INSTALL_LIBRARIES_PATTERN_LOCAL
-#		${INSTALL_BINARY_DIR}/../plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}
-#                ${INSTALL_BINARY_DIR}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}
-#				${INSTALL_PLUGIN_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}
-#				${INSTALL_LIBRARIES_PATTERN_LOCAL}
-#		)
 
 	# install a qt.conf file
 	# this inserts some cmake code into the install script to write the file
@@ -506,10 +479,14 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 		)
 endfunction()
 
+###############################################################################
+#
+# Get a list of all variables with _prefix, return in _varResult
+#
+###############################################################################
 function (getListOfVarsStartingWith _prefix _varResult)
 	get_cmake_property(_vars VARIABLES)
 	string (REGEX MATCHALL "(^|;)${_prefix}[A-Za-z0-9_\\.]*" _matchedVars "${_vars}")
-#	string (REGEX MATCHALL "(^|;)${_prefix}.*" _matchedVars "${_vars}")
 	set (${_varResult} ${_matchedVars} PARENT_SCOPE)
 endfunction()
 
