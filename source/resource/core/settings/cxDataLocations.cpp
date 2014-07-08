@@ -81,19 +81,24 @@ QString DataLocations::getBundlePath()
 #endif
 }
 
-QString DataLocations::getDefaultPluginsPath()
+QStringList DataLocations::getDefaultPluginsPath()
 {
+	QStringList retval;
 	QString bundlePath = DataLocations::getBundlePath();
 
 	QString buildLocation = bundlePath + "/../../plugins";
 	if (QFile(buildLocation).exists())
-		return buildLocation;
+		retval <<  buildLocation;
 
 	QString installLocation = bundlePath + "/plugins";
 	if (QFile(installLocation).exists())
-		return installLocation;
+		retval << installLocation;
 
-	return bundlePath;
+	QString fallbackInstallLocation = bundlePath;
+	if (QFile(fallbackInstallLocation).exists())
+		retval << fallbackInstallLocation;
+
+	return retval;
 }
 
 QString DataLocations::getRootConfigPath()
