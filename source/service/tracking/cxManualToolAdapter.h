@@ -45,7 +45,7 @@ public:
 	explicit ManualToolAdapter(TrackingServicePtr manager, ToolPtr base);
 	virtual ~ManualToolAdapter();
 
-	virtual std::set<Type> getTypes() const { return mBase->getTypes(); }
+	virtual std::set<Type> getTypes() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual bool isCalibrated() const;
 	virtual ProbeDefinition getProbeSector() const;
