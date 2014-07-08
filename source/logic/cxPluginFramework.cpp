@@ -83,8 +83,7 @@ QString PluginFrameworkManager::convertToAbsolutePath(QString path) const
 
 void PluginFrameworkManager::loadState()
 {
-	QStringList defPaths = DataLocations::getDefaultPluginsPath();
-	QStringList paths = settings()->value(mSettingsSearchPaths, defPaths).toStringList();
+	QStringList paths = settings()->value(mSettingsSearchPaths, QStringList()).toStringList();
 	this->setSearchPaths(paths);
 
 	QStringList names = this->getPluginSymbolicNames();
