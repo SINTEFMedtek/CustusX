@@ -71,18 +71,22 @@ void CameraData::addXml(QDomNode dataNode) const
 
 void CameraData::parseXml(QDomNode dataNode)
 {
-	Vector3D vup = Vector3D::fromString(dataNode.namedItem("viewUp").toElement().text());
-	if (similar(vup.length(), 0.0))
-		return; // ignore reading if undefined data
-
-	this->getCamera();
-
 	Vector3D position = Vector3D::fromString(dataNode.namedItem("position").toElement().text());
 	Vector3D focalPoint = Vector3D::fromString(dataNode.namedItem("focalPoint").toElement().text());
 	Vector3D viewUp = Vector3D::fromString(dataNode.namedItem("viewUp").toElement().text());
 	double nearClip = dataNode.namedItem("nearClip").toElement().text().toDouble();
 	double farClip = dataNode.namedItem("farClip").toElement().text().toDouble();
 	double parallelScale = dataNode.namedItem("parallelScale").toElement().text().toDouble();
+
+	if (similar(viewUp.length(), 0.0))
+		return; // ignore reading if undefined data
+	double LARGE_NUMBER = 1.0E6; // corresponding to a distance of 1km - unphysical for human-sized data
+	if ((position-focalPoint).length() > LARGE_NUMBER)
+		return;
+	if (fabs(parallelScale) > LARGE_NUMBER)
+		return;
+
+	this->getCamera();
 
 	mCamera->SetClippingRange(nearClip, farClip);
 	mCamera->SetPosition(position.begin());
