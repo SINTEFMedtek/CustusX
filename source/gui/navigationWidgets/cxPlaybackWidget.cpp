@@ -246,8 +246,11 @@ std::vector<TimelineEvent> PlaybackWidget::createEvents()
 	ToolManager::ToolMap tools = toolManager()->getTools();
 	for (ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 	{
-		TimelineEventVector current = convertHistoryToEvents(iter->second);
-		copy(current.begin(), current.end(), std::back_inserter(events));
+		if(!iter->second->hasType(Tool::TOOL_MANUAL))
+		{
+			TimelineEventVector current = convertHistoryToEvents(iter->second);
+			copy(current.begin(), current.end(), std::back_inserter(events));
+		}
 	}
 
 	std::map<QString, DataPtr> data = dataManager()->getData();
