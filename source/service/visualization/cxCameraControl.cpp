@@ -83,6 +83,8 @@ void CameraData::parseXml(QDomNode dataNode)
 	double LARGE_NUMBER = 1.0E6; // corresponding to a distance of 1km - unphysical for human-sized data
 	if ((position-focalPoint).length() > LARGE_NUMBER)
 		return;
+	if (focalPoint.length() > LARGE_NUMBER)
+		return;
 	if (fabs(parallelScale) > LARGE_NUMBER)
 		return;
 
