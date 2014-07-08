@@ -129,26 +129,11 @@ class CustusXInstaller:
             self._copyFile('%s/install/Apple/apple_install_readme.rtf' % self.source_path, targetPath)
         if platform.system() == 'Linux':
             linux_distro = 'Ubuntu'
-            # shutil.copy2('%s/install/Linux/copy/*'%self.source_path, targetPath)
-            # shutil.copy2('%s/install/Linux/copy/run_v2u.sh'%self.source_path, targetPath)
-            # shutil.copy2('%s/install/Linux/copy/v2u'%self.source_path, targetPath)
-#            self._copyFolder('%s/install/Linux/script/Ubuntu12.04/NVIDIA' % self.source_path, targetPath)
-            self._copyFolder('%s/install/Linux/script/vga2usb' % self.source_path, targetPath)
-#            self._copyFile('%s/install/Linux/script/programmer_setup.sh' % self.source_path, targetPath)
-#            self._copyFile('%s/install/Linux/script/NDIToolBox_install.sh' % self.source_path, targetPath)
+#            self._copyFolder('%s/install/Linux/script/vga2usb' % self.source_path, targetPath)
             if linux_distro == 'Ubuntu':
                 self._copyFolder('%s/install/Linux/script/Ubuntu12.04' % self.source_path, targetPath)
-#                self._copyFile('%s/install/Linux/script/ubuntu_install_readme.txt' % self.source_path, targetPath)
-#                self._copyFile('%s/install/Linux/script/ubuntu_ndi_setup.sh' % self.source_path, targetPath)
-#                self._copyFile('%s/install/Linux/script/ubuntu_epiphan_setup.sh' % self.source_path, targetPath)
-#                self._copyFile('%s/install/Linux/script/ubuntu_install_packages.sh' % self.source_path, targetPath)
             if linux_distro == 'Fedora':
                 self._copyFolder('%s/install/Linux/script/Fedora14' % self.source_path, targetPath)
-#                self._copyFile('%s/install/Linux/script/install_packages.sh' % self.source_path, targetPath)
-#                self._copyFile('%s/install/Linux/copy/Fedora_Linux_Installation_Guide.pdf' % self.source_path, targetPath)
-#                self._copyFile('%s/install/Linux/script/epiphan_setup.sh' % self.source_path, targetPath)
-#                self._copyFile('%s/install/Linux/script/opencl_setup.sh' % self.source_path, targetPath)
-#                self._copyFile('%s/install/Shared/script/sudo_setup.sh' % self.source_path, targetPath)
         if platform.system() == 'Windows':
             self._copyFile('%s/install/Windows/Windows_Install_ReadMe.rtf' % self.source_path, targetPath)
         
