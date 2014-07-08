@@ -34,7 +34,7 @@ BasicVideoSource::BasicVideoSource(QString uid)
 	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
 
 
-	vtkImageDataPtr emptyImage = generateVtkImageData(Eigen::Array3i(3,3,3),
+	vtkImageDataPtr emptyImage = generateVtkImageData(Eigen::Array3i(3,3,1),
 														   Vector3D(1,1,1),
 														   0);
 	mEmptyImage.reset(new Image(uid, emptyImage));
