@@ -248,7 +248,7 @@ function(cx_install_target TARGET_ID)
 		#message(STATUS "########### List content: " ${CX_APPLE_TARGETS_TO_COPY})
 	else()
 		install(TARGETS ${TARGET_ID}
-			DESTINATION ${CX_INSTALL_ROOT_DIR}/bin)
+                        DESTINATION ${CX_INSTALL_BINARY_DIR})
 	endif()
 
 endfunction()
@@ -266,7 +266,7 @@ function(cx_install_all_stored_targets BUNDLE_BINARY_DIR)
 			message(STATUS "Install target by file copy: " ${EXE})
 			install(FILES
 				${EXE}
-				DESTINATION ${BUNDLE_BINARY_DIR}
+                                DESTINATION ${CX_INSTALL_BINARY_DIR}
 				PERMISSIONS ${CX_FULL_PERMISSIONS})
 		endforeach()
 	else()
@@ -443,9 +443,26 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 		DESTINATION ${CX_INSTALL_PLUGIN_DIR}
 		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
 
+	# explicitly tell which executables that should be fixed up.
+	# why: fixup_bundle seems to fail to asseble exes in some cases.
+	foreach(TARGET ${CX_APPLE_TARGETS_TO_COPY})
+		get_filename_component(TARGET_FILENAME ${TARGET} NAME)
+		set(TARGET_FILEPATH ${INSTALL_BINARY_DIR}/${TARGET_FILENAME})
+#		set(INSTALL_LIBRARIES_PATTERN_LOCAL
+#			${INSTALL_LIBRARIES_PATTERN_LOCAL}
+#			${INSTALL_BINARY_DIR}/${TARGET_FILENAME}
+#			)
+		set(LIB_PATTERN_CODE
+			"${LIB_PATTERN_CODE}
+			set\(TEMP \"\${CMAKE_INSTALL_PREFIX}/${TARGET_FILEPATH}\"\)
+			set(PLUGINS \${PLUGINS} \${TEMP})"
+			)
+	endforeach()
+
 	# collect all installations here. They will be used by fixup_bundle to collect dependencies.
 	# this is a sum of the input pattern (if any) and the qtplugins
 	set(INSTALL_LIBRARIES_PATTERN_LOCAL
+		${INSTALL_LIBRARIES_PATTERN_LOCAL}
 		${CX_INSTALL_PLUGIN_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}
 		${INSTALL_QTPLUGIN_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}
 		)
@@ -462,21 +479,21 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 	foreach(PATTERN ${INSTALL_LIBRARIES_PATTERN_LOCAL} )
 		set(LIB_PATTERN_CODE
 			"${LIB_PATTERN_CODE}
-			set(TEMP)
+                        set(TEMP)
 			file\(GLOB_RECURSE TEMP \"\${CMAKE_INSTALL_PREFIX}/${PATTERN}\"\)
 			set(PLUGINS \${PLUGINS} \${TEMP})"
 			)
 	endforeach()
 
-	# fixup_bundle resets link paths for all targets within the bundle.
-	# this code appears in cmake_install.cmake in the CURRENT_BINARY_DIR. Check there when changing.
-	install(CODE "
-		# Begin inserted fixup_bundle snippet
-		${LIB_PATTERN_CODE}
-		include(BundleUtilities)
-		fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${APPS_LOCAL}\"   \"\${PLUGINS}\"   \"${DIRS_LOCAL}\") "
-		# End inserted fixup_bundle snippet
-		)
+        # fixup_bundle resets link paths for all targets within the bundle.
+        # this code appears in cmake_install.cmake in the CURRENT_BINARY_DIR. Check there when changing.
+        install(CODE "
+                # Begin inserted fixup_bundle snippet
+                ${LIB_PATTERN_CODE}
+                include(BundleUtilities)
+                fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${APPS_LOCAL}\"   \"\${PLUGINS}\"   \"${DIRS_LOCAL}\") "
+                # End inserted fixup_bundle snippet
+                )
 endfunction()
 
 ###############################################################################
