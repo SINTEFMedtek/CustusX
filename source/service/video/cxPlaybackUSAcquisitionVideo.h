@@ -64,7 +64,6 @@ private:
 	QStringList getAbsolutePathToFtsFiles(QString folder);
 	QString mRoot;
 	PlaybackTimePtr mTimer;
-//	ImageImportVideoSourcePtr mVideoSource;
 	BasicVideoSourcePtr mVideoSource;
 	std::vector<TimelineEvent> mEvents;
 	const QString mVideoSourceUid;
