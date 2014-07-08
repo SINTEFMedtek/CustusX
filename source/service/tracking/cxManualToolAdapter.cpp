@@ -83,4 +83,11 @@ void ManualToolAdapter::setTooltipOffset(double val)
 	mBase->setTooltipOffset(val);
 }
 
+std::set<Tool::Type> ManualToolAdapter::getTypes() const
+{
+	std::set<Tool::Type> retval = mBase->getTypes();
+	retval.insert(Tool::TOOL_MANUAL);
+	return retval;
+}
+
 }
