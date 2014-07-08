@@ -32,17 +32,12 @@ if (CX_LINUX)
     install(FILES
         ${CustusX3_SOURCE_DIR}/install/Linux/copy/run_v2u.sh
         ${CustusX3_SOURCE_DIR}/install/Linux/copy/v2u
-        ${CustusX3_SOURCE_DIR}/install/Linux/copy/runCustusX.sh
-        ${CustusX3_SOURCE_DIR}/install/Linux/copy/runOpenIGTLinkServer.sh
         DESTINATION ${CX_INSTALL_ROOT_DIR}
         PERMISSIONS ${CX_FULL_PERMISSIONS})
 endif (CX_LINUX)
 
 # Install Apple-specific files
 if(APPLE)
-    install(FILES ${CustusX3_SOURCE_DIR}/install/Apple/SupportedGrabbers.txt
-            DESTINATION ${CX_INSTALL_ROOT_DIR})
-
     # Install folder for storage of igstk<->CustusX symlinks.
     # The symlinks must be in an absolute location.
     # Apple only (Win uses COM-ports, Linux installs with OS)
