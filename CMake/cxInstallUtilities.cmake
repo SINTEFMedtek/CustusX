@@ -443,9 +443,26 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 		DESTINATION ${CX_INSTALL_PLUGIN_DIR}
 		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
 
+	# explicitly tell which executables that should be fixed up.
+	# why: fixup_bundle seems to fail to asseble exes in some cases.
+	foreach(TARGET ${CX_APPLE_TARGETS_TO_COPY})
+		get_filename_component(TARGET_FILENAME ${TARGET} NAME)
+		set(TARGET_FILEPATH ${INSTALL_BINARY_DIR}/${TARGET_FILENAME})
+#		set(INSTALL_LIBRARIES_PATTERN_LOCAL
+#			${INSTALL_LIBRARIES_PATTERN_LOCAL}
+#			${INSTALL_BINARY_DIR}/${TARGET_FILENAME}
+#			)
+		set(LIB_PATTERN_CODE
+			"${LIB_PATTERN_CODE}
+			set\(TEMP \"\${CMAKE_INSTALL_PREFIX}/${TARGET_FILEPATH}\"\)
+			set(PLUGINS \${PLUGINS} \${TEMP})"
+			)
+	endforeach()
+
 	# collect all installations here. They will be used by fixup_bundle to collect dependencies.
 	# this is a sum of the input pattern (if any) and the qtplugins
 	set(INSTALL_LIBRARIES_PATTERN_LOCAL
+		${INSTALL_LIBRARIES_PATTERN_LOCAL}
 		${CX_INSTALL_PLUGIN_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}
 		${INSTALL_QTPLUGIN_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}
 		)
