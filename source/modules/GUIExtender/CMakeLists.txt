@@ -11,4 +11,4 @@ set(GUIExtender_LIBRARIES
     )
 
 add_library( cxGUIExtenderService ${GUIExtender_FILES})
-target_link_libraries(cxGUIExtenderService ${GUIExtender_LIBRARIES} )
+target_link_libraries(cxGUIExtenderService ${GUIExtender_LIBRARIES} ${SSC_GCOV_LIBRARY})
