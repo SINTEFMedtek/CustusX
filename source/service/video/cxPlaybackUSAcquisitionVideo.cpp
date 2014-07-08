@@ -22,7 +22,6 @@
 #include "cxTypeConversions.h"
 #include "cxUsReconstructionFileReader.h"
 #include "cxTestVideoSource.h"
-#include "cxImageImportVideoSource.h"
 #include "cxToolManager.h"
 #include "cxProbeImpl.h"
 #include "cxUSFrameData.h"

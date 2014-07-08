@@ -126,7 +126,6 @@ typedef boost::shared_ptr<class ColorDataAdapterXml> ColorDataAdapterXmlPtr;
 
 // other stuff
 typedef boost::shared_ptr<class Presets> PresetsPtr;
-typedef boost::shared_ptr<class ImageImportVideoSource> ImageImportVideoSourcePtr;
 typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
 typedef boost::shared_ptr<class USFrameData> USFrameDataPtr;
 typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
