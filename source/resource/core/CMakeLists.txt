@@ -35,7 +35,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Video/cxVideoRecorder
 	Video/cxVideoSourceSHM
 	Video/cxTestVideoSource
-	Video/cxImageImportVideoSource
         
 	Tool/cxToolManager
 	Tool/cxTool.h
