@@ -290,6 +290,7 @@ void VideoGraphics::setLookupTable()
 	lut->SetSaturationRange (0, 0);
 	lut->SetHueRange (0, 0);
 	lut->SetValueRange (0, 1);
+	lut->SetRampToLinear();
 	lut->Build();
 
 	if (mInputMask)
