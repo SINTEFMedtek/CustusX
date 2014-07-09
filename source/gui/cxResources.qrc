@@ -91,5 +91,6 @@
         <file>icons/metric_frame.png</file>
         <file>icons/metric_sphere.png</file>
         <file>icons/metric_torus.png</file>
+        <file>icons/matrix_inverse.png</file>
     </qresource>
 </RCC>

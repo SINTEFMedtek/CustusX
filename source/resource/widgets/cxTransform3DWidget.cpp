@@ -74,12 +74,27 @@ Transform3DWidget::Transform3DWidget(QWidget* parent) :
 
   mLayout->addWidget(mTextEdit, 1);
 
+  QVBoxLayout* buttonLayout = new QVBoxLayout;
+  mLayout->addLayout(buttonLayout);
+  buttonLayout->setMargin(0);
+
   mEditAction = this->createAction(this,
       QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
       "Edit",
       "Toggle Edit Matrix",
       SLOT(toggleEditSlot()),
-      mLayout);
+	  buttonLayout);
+  mEditAction->setCheckable(true);
+
+  mInvertAction = this->createAction(this,
+	  QIcon(":/icons/matrix_inverse.png"),
+	  "Invert",
+	  "Toggle Invert Matrix",
+	  SLOT(toggleInvertSlot()),
+	  buttonLayout);
+  mInvertAction->setCheckable(true);
+  mInvertAction->setChecked(false);
+  this->updateInvertAction();
 
 //  mLayout->addStretch();
 
@@ -107,7 +122,7 @@ Transform3DWidget::Transform3DWidget(QWidget* parent) :
   this->addTranslationControls("yTranslation", "Y", 1, tLayout);
   this->addTranslationControls("zTranslation", "Z", 2, tLayout);
 
-  this->setMatrix(Transform3D::Identity());
+  this->setMatrixInternal(Transform3D::Identity());
 
   toptopLayout->addStretch();
 
@@ -130,16 +145,47 @@ void Transform3DWidget::textEditChangedSlot()
   // ignore setting if invalid matrix or no real change done (hopefully, this allows trivial editing without text reset)
   if (!ok)
     return;
-  if (similar(M, this->getMatrix()))
+  if (similar(M, this->getMatrixInternal()))
     return;
 
-  this->setMatrix(M);
+  this->setMatrixInternal(M);
 }
 
 void Transform3DWidget::toggleEditSlot()
 {
   bool visible = tGroupBox->isVisible();
   this->setEditable(!visible);
+}
+
+
+void Transform3DWidget::toggleInvertSlot()
+{
+	// the interpretation of matrix is dependent on mInvertAction->isChecked()!
+	mDecomposition.reset(mDecomposition.getMatrix().inverse());
+	this->updateValues();
+//	this->updateInvertAction();
+}
+
+void Transform3DWidget::updateInvertAction()
+{
+	if (mInvertAction->isChecked())
+	{
+		this->setActionText(mInvertAction, "Inverted Matrix", "The matrix is shown inverted");
+	}
+	else
+	{
+		this->setActionText(mInvertAction, "Noninverted Matrix", "The matrix is shown as is. Press to show inverted");
+	}
+}
+
+void Transform3DWidget::setActionText(QAction* action, QString text, QString tip)
+{
+	if (tip.isEmpty())
+		tip = text;
+  action->setText(text);
+  action->setStatusTip(tip);
+  action->setWhatsThis(tip);
+  action->setToolTip(tip);
 }
 
 void Transform3DWidget::setEditable(bool edit)
@@ -216,14 +262,36 @@ Transform3DWidget::~Transform3DWidget()
 
 void Transform3DWidget::setMatrix(const Transform3D& M)
 {
-  mDecomposition.reset(M);
-  this->updateValues();
-  emit changed();
+	this->setMatrixInternal(this->convertToFromExternal(M));
 }
 
 Transform3D Transform3DWidget::getMatrix() const
 {
-  return mDecomposition.getMatrix();
+  return this->convertToFromExternal(this->getMatrixInternal());
+}
+
+Transform3D Transform3DWidget::convertToFromExternal(const Transform3D& M) const
+{
+	if (mInvertAction->isChecked())
+	{
+		return M.inverse();
+	}
+	else
+	{
+		return M;
+	}
+}
+
+void Transform3DWidget::setMatrixInternal(const Transform3D& M)
+{
+	mDecomposition.reset(M);
+	this->updateValues();
+	emit changed();
+}
+
+Transform3D Transform3DWidget::getMatrixInternal() const
+{
+	return mDecomposition.getMatrix();
 }
 
 // http://en.wikipedia.org/wiki/Rotation_matrix
@@ -263,7 +331,7 @@ namespace
 
 void Transform3DWidget::updateValues()
 {
-  QString M = qstring_cast(this->getMatrix());
+  QString M = qstring_cast(this->getMatrixInternal());
 
   mTextEdit->blockSignals(true);
   int textPos = mTextEdit->textCursor().position();
@@ -285,6 +353,8 @@ void Transform3DWidget::updateValues()
   mTranslationAdapter[0]->setValue(t[0]);
   mTranslationAdapter[1]->setValue(t[1]);
   mTranslationAdapter[2]->setValue(t[2]);
+
+  this->updateInvertAction();
 
   mBlockChanges = false;
 }
