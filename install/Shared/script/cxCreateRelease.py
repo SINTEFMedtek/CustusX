@@ -274,6 +274,9 @@ Thus, we get the following pattern:
 
         if self.options.jenkins_release:
             self.jenkins_publish_release(publish_tag)
+        else:
+            PrintFormatter.printInfo('Jenkins release not selected, skipping...')
+
             
         self.cxBuilder.finish()
         
@@ -283,6 +286,7 @@ Thus, we get the following pattern:
         return custusx.sourcePath()
 
     def _pullFromGit(self):
+        PrintFormatter.printHeader('Update to latest git', level=3)
         shell.changeDir(self._getSourcePath())
         shell.run('git checkout master')
         shell.run('git pull')
