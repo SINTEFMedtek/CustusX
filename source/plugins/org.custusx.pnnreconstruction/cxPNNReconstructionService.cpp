@@ -138,6 +138,7 @@ bool PNNReconstructionService::reconstruct(ProcessedUSInputDataPtr input,
 	// Fill holes
 	this->interpolate(tempOutputData, outputData, settings);
 
+	setDeepModified(outputData);
 	return true;
 }
 

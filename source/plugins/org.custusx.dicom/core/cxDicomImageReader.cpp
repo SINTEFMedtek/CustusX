@@ -14,7 +14,7 @@
 
 #include "cxDicomImageReader.h"
 #include "cxLogger.h"
-
+#include "cxVolumeHelpers.h"
 #include "dcvrpn.h"
 
 namespace cx
@@ -174,7 +174,7 @@ vtkImageDataPtr DicomImageReader::createVtkImageData()
 	memcpy(data->GetScalarPointer(), pixels->getData(), pixels->getCount()*bytesPerPixel);
 	if (pixels->getCount()!=scalarSize)
 		this->error("Mismatch in pixel counts");
-
+	setDeepModified(data);
 	return data;
 }
 

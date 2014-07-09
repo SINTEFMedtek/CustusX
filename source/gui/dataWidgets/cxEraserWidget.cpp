@@ -43,6 +43,7 @@
 #include "cxToolManager.h"
 #include "cxViewWrapper.h"
 #include "cxViewGroup.h"
+#include "cxVolumeHelpers.h"
 
 namespace cx
 {
@@ -314,7 +315,8 @@ void EraserWidget::removeSlot()
 	ImageLUT2DPtr tf2D = image->getLookupTable2D();
 	ImageTF3DPtr tf3D = image->getTransferFunctions3D();
 
-	img->Modified();
+//	img->Modified();
+	setDeepModified(img);
 	image->setVtkImageData(img);
 
 	// keep existing transfer functions

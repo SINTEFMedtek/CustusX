@@ -7,6 +7,8 @@
 #include <QTime>
 #include "cxLogger.h"
 #include "cxRegistrationTransform.h"
+#include "cxVolumeHelpers.h"
+
 
 double noiseValue(double noiseSigma,
                          double noiseMean)
@@ -141,6 +143,7 @@ cxSyntheticVolume::sampleUsData(const Transform3D& rMf,
 		}
 	}
 
+	setDeepModified(us_frame);
 	return us_frame;
 }
 
@@ -151,6 +154,7 @@ vtkImageDataPtr cxSyntheticVolume::createEmptyMask(const Eigen::Array2i& sliceDi
 	mask->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 	unsigned char* mask_data = (unsigned char*)mask->GetScalarPointer();
 	memset(mask_data, 1, sizeof(unsigned char)*sliceDimension[0]*sliceDimension[1]);
+	setDeepModified(mask);
 	return mask;
 }
 
@@ -204,6 +208,7 @@ void cxSyntheticVolume::fillVolume(cx::ImagePtr vol)
 			}
 		}
 	}
+	setDeepModified(raw);
 }
 
 double calculateRMSError(vtkImageDataPtr a, vtkImageDataPtr b)
