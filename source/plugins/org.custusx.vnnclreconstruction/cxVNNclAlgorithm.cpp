@@ -5,7 +5,7 @@
 #include "HelperFunctions.hpp"
 #include <vtkImageData.h>
 #include <recConfig.h>
-
+#include "cxVolumeHelpers.h"
 
 namespace cx
 {
@@ -208,7 +208,7 @@ bool VNNclAlgorithm::reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr 
 	cl::CommandQueue queue = mOulContex->getQueue(queueNumber);
 	this->measureAndExecuteKernel(queue, mKernel, global_work_size, local_work_size, mKernelMeasurementName);
 	this->measureAndReadBuffer(queue, outputBuffer, outputVolumeSize, outputData->GetScalarPointer(), "vnncl_read_buffer");
-
+	setDeepModified(outputData);
 	// Cleaning up
 	report(QString("Done, freeing GPU memory"));
 	this->freeFrameBlocks(inputBlocks, numBlocks);
