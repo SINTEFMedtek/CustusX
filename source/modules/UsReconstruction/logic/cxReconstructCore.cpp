@@ -30,6 +30,8 @@
 #include "cxLogger.h"
 #include "cxUSFrameData.h"
 #include "cxReconstructionService.h"
+#include "vtkPointData.h"
+#include "vtkDataArray.h"
 
 namespace cx
 {
@@ -129,6 +131,8 @@ void ReconstructCore::threadedPostReconstruct()
  */
 ImagePtr ReconstructCore::generateOutputVolume(vtkImageDataPtr rawOutput)
 {
+	setDeepModified(rawOutput);
+
 	//If no output path is selecetd, use the same path as the input
 	QString filePath;
 	if (mInput.mOutputBasePath.isEmpty() && mInput.mOutputRelativePath.isEmpty())
@@ -149,6 +153,7 @@ ImagePtr ReconstructCore::generateOutputVolume(vtkImageDataPtr rawOutput)
 
 	PresetTransferFunctions3DPtr presets = dataManager()->getPresetTransferFunctions3D();
 	presets->load(mInput.mTransferFunctionPreset, image, true, false);//Only apply to 2D, not 3D
+	presets->load("US B-Mode", image, false, true);//Only apply to 3D, not 2D
 
 	return image;
 }

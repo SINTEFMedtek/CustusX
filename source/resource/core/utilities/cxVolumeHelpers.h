@@ -57,6 +57,13 @@ vtkImageDataPtr convertImageDataToGrayScale(vtkImageDataPtr image);
 
 vtkImageDataPtr convertImageDataTo8Bit(vtkImageDataPtr image, double windowWidth, double windowLevel);///< Have never been used or tested. Create a test for it
 
+/** Call after the image contents has been changed throug GetScalarPointer()
+  *
+  * Set modified on a vtkImageData and inner classes.
+  * This ensures that GetScalarRange() returns the correct
+  * value.
+  */
+void setDeepModified(vtkImageDataPtr image);
 
 
 /**

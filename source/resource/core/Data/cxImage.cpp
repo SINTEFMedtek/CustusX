@@ -849,6 +849,7 @@ vtkImageDataPtr Image::createDummyImageData(int axisSize, int maxVoxelValue)
 		else
 			dataPtr[i] = maxVoxelValue;
 	}
+	setDeepModified(dummyImageData);
 	return dummyImageData;
 }
 
