@@ -32,6 +32,7 @@ if (CX_LINUX)
     install(FILES
         ${CustusX3_SOURCE_DIR}/install/Linux/copy/run_v2u.sh
         ${CustusX3_SOURCE_DIR}/install/Linux/copy/v2u
+        ${CustusX3_SOURCE_DIR}/install/Linux/copy/CustusX.sh
         DESTINATION ${CX_INSTALL_ROOT_DIR}
         PERMISSIONS ${CX_FULL_PERMISSIONS})
 endif (CX_LINUX)
