@@ -47,19 +47,22 @@ vtkImageDataPtr generateVtkImageDataGeneric(Eigen::Array3i dim,
 	TYPE* ptr = reinterpret_cast<TYPE*>(data->GetScalarPointer());
 	std::fill(ptr, ptr+scalarSize, initValue);
 
+	// FIXED: replace with setDeepModified(image)
 	// A trick to get a full LUT in Image (automatic LUT generation)
 	// Can't seem to fix this by calling Image::resetTransferFunctions() after volume is modified
-	if (scalarSize > 0)
+/*	if (scalarSize > 0)
 	{
-		ptr[0] = 255;
+		ptr[0] = 150;
+//		ptr[0] = 255;
 		if (scalarSize > 1)
-			ptr[1] = 0;
+			ptr[1] = 50;
 		data->GetScalarRange();// Update internal data in vtkImageData. Seems like it is not possible to update this data after the volume has been changed.
 		ptr[0] = initValue;
 		if (scalarSize > 1)
 			ptr[1] = initValue;
-	}
+	}*/
 //	data->UpdateInformation(); // update extent etc
+	setDeepModified(data);
 
 	return data;
 }
@@ -125,6 +128,7 @@ void fillShortImageDataWithGradient(vtkImageDataPtr data, int maxValue)
 	//				val = val/3;
 	//				ptr[z*dim[0]*dim[1] + y*dim[0] + x] = val;
 	//			}
+	setDeepModified(data);
 }
 
 /**Convert the input image to the smallest unsigned format.
@@ -346,6 +350,13 @@ vtkImageDataPtr convertImageDataTo8Bit(vtkImageDataPtr image, double windowWidth
 //			retval->Update();
 		}
 	return retval;
+}
+
+void setDeepModified(vtkImageDataPtr image)
+{
+	image->Modified();
+	image->GetPointData()->Modified();
+	image->GetPointData()->GetScalars()->Modified();
 }
 
 } // namespace cx

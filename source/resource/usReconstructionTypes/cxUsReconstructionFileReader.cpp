@@ -362,6 +362,7 @@ bool UsReconstructionFileReader::readMaskFile(QString mhdFileName, ImagePtr mask
   char *rawchars = reinterpret_cast<char*>(dataPtr);
 
   stream.readRawData(rawchars, file.size());
+  setDeepModified(data);
 
   return true;
 }
