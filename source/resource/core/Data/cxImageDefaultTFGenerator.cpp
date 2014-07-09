@@ -103,6 +103,11 @@ double_pair ImageDefaultTFGenerator::guessInitialScalarRange()
 	// no initial window: add heuristics for each modality
 	if (!this->hasValidInitialWindow())
 	{
+		if (this->isUnsignedChar())
+		{
+			srange.first = 0;
+			srange.second = 255;
+		}
 		if (mImage->getModality().contains("CT"))
 		{
 			srange = this->guessCTRange();
@@ -115,6 +120,11 @@ double_pair ImageDefaultTFGenerator::guessInitialScalarRange()
 
 	srange = this->ensureNonZeroRoundedRange(srange);
 	return srange;
+}
+
+bool ImageDefaultTFGenerator::isUnsignedChar() const
+{
+	return mImage->getBaseVtkImageData()->GetScalarType() == VTK_UNSIGNED_CHAR;
 }
 
 double_pair ImageDefaultTFGenerator::ensureNonZeroRoundedRange(double_pair range)

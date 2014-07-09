@@ -48,6 +48,7 @@ private:
 	double_pair guessMRRange();
 	double_pair guessCTRange();
 	double_pair ensureNonZeroRoundedRange(double_pair range);
+	bool isUnsignedChar() const;
 };
 
 
