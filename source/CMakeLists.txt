@@ -46,8 +46,23 @@ endmacro()
 #>
 
 cmake_policy(SET CMP0012 NEW)
+
+# Find all variables prefixed with CX_EXTERNAL_PLUGIN_,
+# then add them as plugins.
+# Usage: add paths to external plugin this way.
+getListOfVarsStartingWith("CX_EXTERNAL_PLUGIN_" matchedVars)
+foreach (_var IN LISTS matchedVars)
+	#message("${_var} = ${${_var}}")
+    set(CX_PLUGINS ${CX_PLUGINS} "${${_var}}:ON")
+	#message("${_var}=${${_var}} :: ${${${_var}}}")
+endforeach()
+
+#set (CX_EXTERNAL_PLUGINS "" CACHE INTERNAL "list of plugins originating outside of custusx. Add to list in order to build.")
+
+
 #> Create a list of available plug-ins and make them known to the build system
 set(CX_PLUGINS
+  ${CX_PLUGINS}
   plugins/org.custusx.dicom:ON
   plugins/org.custusx.example:OFF
   plugins/org.custusx.vnnclreconstruction:ON
@@ -56,7 +71,7 @@ set(CX_PLUGINS
   plugins/org.custusx.ussimulator:ON
 )
 
-ctkMacroSetupPlugins(${CX_PLUGINS})
+ctkMacroSetupPlugins(${CX_PLUGINS} BUILD_OPTION_PREFIX CX_BUILD_PLUGIN_)
 
 # Testing for CustusX
 add_subdirectory(testing)

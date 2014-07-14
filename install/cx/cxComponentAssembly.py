@@ -25,34 +25,37 @@ from cxPrintFormatter import PrintFormatter
 import cxInstallData
 import cxComponents
 
-class LibraryAssembly:
+class LibraryAssembly(object):
     '''
     Manages the work of all libraries
     '''
     def __init__(self):
         self.controlData = cxInstallData.Common()
         self.libraries = []
-        self.libraries.append(cxComponents.ITK())
-        self.libraries.append(cxComponents.VTK())
-        self.libraries.append(cxComponents.OpenCV())
-        self.libraries.append(cxComponents.OpenIGTLink())
-        self.libraries.append(cxComponents.IGSTK())
-        self.libraries.append(cxComponents.CTK())
+
+        self.addComponent(cxComponents.ITK())
+        self.addComponent(cxComponents.VTK())
+        self.addComponent(cxComponents.OpenCV())
+        self.addComponent(cxComponents.OpenIGTLink())
+        self.addComponent(cxComponents.IGSTK())
+        self.addComponent(cxComponents.CTK())
         if (platform.system() != 'Windows'):
-             self.libraries.append(cxComponents.ISB_DataStreaming());
-        self.libraries.append(cxComponents.UltrasonixSDK())
+             self.addComponent(cxComponents.ISB_DataStreaming());
+        self.addComponent(cxComponents.UltrasonixSDK())
         if (platform.system() != 'Windows'):
-            self.libraries.append(cxComponents.OpenCLUtilityLibrary())
+            self.addComponent(cxComponents.OpenCLUtilityLibrary())
         if (platform.system() != 'Windows'):
-            self.libraries.append(cxComponents.TubeSegmentationFramework());
+            self.addComponent(cxComponents.TubeSegmentationFramework());
         if (platform.system() == 'Linux'):
-            self.libraries.append(cxComponents.LevelSetSegmentation());
-        self.libraries.append(cxComponents.UltrasoundSimulation())
-        self.libraries.append(cxComponents.CustusX3())
-        self.libraries.append(cxComponents.CustusX3Data())
+            self.addComponent(cxComponents.LevelSetSegmentation());
+        self.addComponent(cxComponents.UltrasoundSimulation())
+        self.addComponent(cxComponents.CustusX3())
+        self.addComponent(cxComponents.CustusX3Data())
         
-        for lib in self.libraries:
-            lib.setControlData(self.controlData)
+    def addComponent(self, component):
+        self.libraries.append(component)
+        component.setControlData(self.controlData)
+        component.assembly = self # why: config in custusx need all other libs
 
     def getComponent(self, type):
         for comp in self.libraries:

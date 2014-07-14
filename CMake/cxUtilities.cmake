@@ -369,3 +369,15 @@ macro(cx_opengl_version)
     ENDIF (OPENGL_FOUND AND NOT DEFINED CX_WINDOWS AND NOT DEFINED CX_APPLE)
     
 endmacro(cx_opengl_version)
+
+###############################################################################
+#
+# Get a list of all variables with _prefix, return in _varResult
+#
+###############################################################################
+function (getListOfVarsStartingWith _prefix _varResult)
+	get_cmake_property(_vars VARIABLES)
+	string (REGEX MATCHALL "(^|;)${_prefix}[A-Za-z0-9/_\\.]*" _matchedVars "${_vars}")
+	set (${_varResult} ${_matchedVars} PARENT_SCOPE)
+endfunction()
+

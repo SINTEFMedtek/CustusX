@@ -82,6 +82,9 @@ class Component(object):
         return builder
     def isPubliclyAvailable(self):
         return True
+    def pluginPath(self):
+        'if this component contains a plugin: return path to plugin, absolute or relative to CustusX/source'
+        return None
         
 # ---------------------------------------------------------
 
@@ -377,6 +380,13 @@ class CustusX3(CppComponent):
         add('COTIRE_ADD_UNITY_BUILDS:BOOL', self.controlData.mUseCotire);
         add('COTIRE_ENABLE_PRECOMPILED_HEADERS:BOOL', self.controlData.mUseCotire);
         add('SSC_USE_GCOV:BOOL', self.controlData.mCoverage);
+        
+        libs = self.assembly.libraries
+        for lib in libs:
+            if lib.pluginPath():
+                add('CX_EXTERNAL_PLUGIN_%s'%lib.name(), lib.pluginPath())
+#                add('CX_EXTERNAL_PLUGIN_%s'%lib.name(), '%s:ON'%lib.pluginPath())
+        
         if self.controlData.force_connect_sublibraries:
             self.forceConnectSublibraries(add)
         cmakeOptions = ''
