@@ -60,21 +60,21 @@ macro(cx_install_decorate_generators)
 	cx_install_set_generator_filename()
 	set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX.png")
     set(CPACK_PACKAGE_VENDOR "SINTEF Medical Technology")
-	set(CPACK_RESOURCE_FILE_WELCOME "${PROJECT_SOURCE_DIR}/install/Shared/install_text/install_welcome.txt")
-	set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/install/Shared/install_text/install_license.txt")
+	set(CPACK_RESOURCE_FILE_WELCOME "${PROJECT_SOURCE_DIR}/install/install_text/install_welcome.txt")
+	set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/install/install_text/install_license.txt")
 
-	if(APPLE)
-		set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/Apple/apple_install_readme.rtf")
-	endif(APPLE)
+#	if(APPLE)
+#		set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/Apple/apple_install_readme.rtf")
+#	endif(APPLE)
 
-	if(CX_LINUX)
-		set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/Linux/copy/linux_install_readme.txt")
-	endif(CX_LINUX)
+#	if(CX_LINUX)
+#		set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/Linux/copy/linux_install_readme.txt")
+#	endif(CX_LINUX)
 
 	if(CX_WINDOWS)
 		set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.ico")
 #		set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons\\\\CustusX.png")
-		set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/Windows\\\\Windows_Install_ReadMe.rtf")
+#		set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/Windows\\\\Windows_Install_ReadMe.rtf")
 		set(CPACK_NSIS_INSTALLED_ICON_NAME "bin/CustusX.exe")
 		set(CPACK_NSIS_MENU_LINKS "doc/Windows_Install_ReadMe.rtf" "README")
 
@@ -340,33 +340,6 @@ endfunction()
 #
 ###############################################################################
 function(cx_install_documentation_files)
-	# Install Shared files
-	install(FILES
-		${CustusX3_SOURCE_DIR}/install/Shared/doc/ChangeLog.rtf
-		${CustusX3_SOURCE_DIR}/install/Shared/doc/CustusX_Tutorial.pdf
-		${CustusX3_SOURCE_DIR}/install/Shared/doc/CustusX_Specifications.pdf
-		DESTINATION ${CX_INSTALL_ROOT_DIR}/doc/
-		PERMISSIONS ${CX_FULL_PERMISSIONS})
-
-	# Install Windows-specific files
-	if(CX_WINDOWS)
-		install(FILES ${CustusX3_SOURCE_DIR}/install/Windows/Windows_Install_ReadMe.rtf
-				DESTINATION ${CX_INSTALL_ROOT_DIR}/doc)
-	endif(CX_WINDOWS)
-
-	# Install Linux-specific files
-	if (CX_LINUX)
-		install(FILES
-				${CustusX3_SOURCE_DIR}/install/Linux/copy/Fedora_Linux_Installation_Guide.pdf
-				DESTINATION ${CX_INSTALL_ROOT_DIR}
-				PERMISSIONS ${CX_FULL_PERMISSIONS})
-	endif (CX_LINUX)
-
-	# Install Apple-specific files
-	if(APPLE)
-		install(FILES ${CustusX3_SOURCE_DIR}/install/Apple/apple_install_readme.rtf
-				DESTINATION ${CX_INSTALL_ROOT_DIR}/doc)
-	endif(APPLE)
 endfunction()
 
 ###############################################################################
@@ -499,17 +472,6 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 endfunction()
 
 ###############################################################################
-#
-# Get a list of all variables with _prefix, return in _varResult
-#
-###############################################################################
-function (getListOfVarsStartingWith _prefix _varResult)
-	get_cmake_property(_vars VARIABLES)
-	string (REGEX MATCHALL "(^|;)${_prefix}[A-Za-z0-9_\\.]*" _matchedVars "${_vars}")
-	set (${_varResult} ${_matchedVars} PARENT_SCOPE)
-endfunction()
-
-###############################################################################
 # Create a text string describing essential build information
 # for CustusX, such as library versions, built modules etc.
 #
@@ -526,14 +488,15 @@ cx_initialize_IGSTK()
 set(PLUGINS_DESCRIPTION
 "	Plugins:
 ")
-getListOfVarsStartingWith("plugins/" matchedVars)
+getListOfVarsStartingWith("CX_BUILD_PLUGIN_" matchedVars)
 foreach (_var IN LISTS matchedVars)
-	string(REPLACE "BUILD_plugins/" "" PLUGIN_NAME ${${_var}})
-	#	message("${_var}=${${_var}} :: ${${${_var}}} :: ${PLUGIN_NAME}")
+	string(REPLACE "CX_BUILD_PLUGIN_" "" PLUGIN_NAME ${_var})
+	#message("${_var}=${${_var}} :: ${${${_var}}} :: ${PLUGIN_NAME}")
 	set(PLUGINS_DESCRIPTION ${PLUGINS_DESCRIPTION}
-"		${PLUGIN_NAME}: ${${${_var}}}
+"		${PLUGIN_NAME}: ${${_var}}
 ")
 endforeach()
+
 
 	cx_assert_variable_exists(${CustusX3_VERSION_STRING})
 	cx_assert_variable_exists(${SSC_USE_GCOV})

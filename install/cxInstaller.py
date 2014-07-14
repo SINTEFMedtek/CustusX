@@ -66,7 +66,7 @@ Installer script for CustusX and its components.
 
 Available components are:
    %s.
-''' % '\n   '.join(self.cxBuilder.assembly.getLibnames())
+''' % '\n   '.join(self.assembly.getLibnames())
        
     def setDefaults(self):                
         super(Controller, self).setDefaults()
@@ -105,7 +105,7 @@ Available components are:
 
     def run(self):
         options = self.options
-        assembly = self.cxBuilder.assembly
+        assembly = self.assembly
                 
         if options.all:
             assembly.selectAllLibraries()
@@ -131,7 +131,8 @@ Available components are:
                          clean = options.clean, 
                          build = options.full or options.build)        
         
-        self.cxBuilder.finish()
+        #self.cxBuilder.finish()
+        PrintFormatter.finish()
 
 
 #This idiom means the below code only runs when executed from command line

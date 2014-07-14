@@ -14,19 +14,24 @@ import sys
 import argparse   
 import pprint     
 
-from cx.cxShell import *
-import cx.cxInstallData
-import cx.cxComponents
-import cx.cxComponentAssembly
-import cx.cxCustusXBuilder
+from cxShell import *
+import cxInstallData
+import cxComponents
+import cxComponentAssembly
+#import cx.cxCustusXBuilder
 
 class BuildScript(object):
     '''
     Base for all scripts working on CustusX
     '''
-    def __init__(self):
+    def __init__(self, assembly=None):
         ''                
-        self.cxBuilder = cx.cxCustusXBuilder.CustusXBuilder()
+        #self.cxBuilder = cx.cxCustusXBuilder.CustusXBuilder()
+        if assembly:
+            self.assembly = assembly
+        else:
+            self.assembly = cxComponentAssembly.LibraryAssembly()
+
         self.setDefaults()
         
         self.additionalParsers = []
@@ -68,5 +73,5 @@ class BuildScript(object):
         return arguments
 
     def controlData(self):
-        return self.cxBuilder.assembly.controlData
+        return self.assembly.controlData
 

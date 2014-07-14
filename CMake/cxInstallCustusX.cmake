@@ -27,30 +27,6 @@ cx_install_documentation_files()
 
 cx_install_windows_runtime_libs(${CX_INSTALL_ROOT_DIR}/bin)
 
-# Install Linux-specific files
-if (CX_LINUX)
-    install(FILES
-        ${CustusX3_SOURCE_DIR}/install/Linux/copy/run_v2u.sh
-        ${CustusX3_SOURCE_DIR}/install/Linux/copy/v2u
-        ${CustusX3_SOURCE_DIR}/install/Linux/copy/CustusX.sh
-        DESTINATION ${CX_INSTALL_ROOT_DIR}
-        PERMISSIONS ${CX_FULL_PERMISSIONS})
-endif (CX_LINUX)
-
-# Install Apple-specific files
-if(APPLE)
-    # Install folder for storage of igstk<->CustusX symlinks.
-    # The symlinks must be in an absolute location.
-    # Apple only (Win uses COM-ports, Linux installs with OS)
-    # Because CPACK_PACKAGING_INSTALL_PREFIX is "/", this will install
-    # in /Library/CustusX.
-    install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Apple/igstk.links
-            DESTINATION Library/CustusX
-            FILE_PERMISSIONS ${CX_FULL_PERMISSIONS}
-            DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
-            )
-endif(APPLE)
-
 #--------------------------------------------------------------------------------
 # Bundle utilities
 #--------------------------------------------------------------------------------
