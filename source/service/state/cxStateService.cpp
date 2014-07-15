@@ -175,7 +175,7 @@ void StateService::initialize(StateServiceBackendPtr backend)
 
 QString StateService::getVersionName()
 {
-    return QString("%1").arg(CustusX3_VERSION_STRING);
+    return QString("%1").arg(CustusX_VERSION_STRING);
 }
 
 WorkflowStateMachinePtr StateService::getWorkflow()
@@ -279,7 +279,7 @@ QString StateService::getDefaultGrabberInitScript()
 //	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/..", "run_v2u.sh", "");
 //	if (!result.isEmpty())
 //		return result[0];
-//	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../CustusX3/install/Linux/copy/", "run_v2u.sh", "");
+//	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../CustusX/install/Linux/copy/", "run_v2u.sh", "");
 //	if (!result.isEmpty())
 //		return result[0];
 	return "";

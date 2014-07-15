@@ -9,15 +9,15 @@ option(CX_BUILD_US_SIMULATOR "Build the US simulator (US from CT/MR)" ON)
 include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-    ${CustusX3_SOURCE_DIR}/source/modules/GUIExtender
-    ${CustusX3_SOURCE_DIR}/source/service/video
-    ${CustusX3_SOURCE_DIR}/source/resource/videoServer
-    ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-    ${CustusX3_SOURCE_DIR}/source/gui/dataAdapters
-    ${CustusX3_SOURCE_DIR}/source/service/tracking
-    ${CustusX3_SOURCE_DIR}/source/logic
-    ${CustusX3_SOURCE_DIR}/source/resource/pluginUtilities
-    ${CustusX3_SOURCE_DIR}/source/resource/core/dataAdapters
+    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
+    ${CustusX_SOURCE_DIR}/source/service/video
+    ${CustusX_SOURCE_DIR}/source/resource/videoServer
+    ${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
+    ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
+    ${CustusX_SOURCE_DIR}/source/service/tracking
+    ${CustusX_SOURCE_DIR}/source/logic
+    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
+    ${CustusX_SOURCE_DIR}/source/resource/core/dataAdapters
     )
 
 set(PLUGIN_SRCS
@@ -35,10 +35,10 @@ set(PLUGIN_MOC_SRCS
 
 # Build all files from the UltrasoundSimulation lib
 IF(CX_BUILD_US_SIMULATOR)
-    set(SIMULATOR_SPECKLE_PATH ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation)
+    set(SIMULATOR_SPECKLE_PATH ${CustusX_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation)
 
 include_directories(
-    ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation
+    ${CustusX_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation
 )
 
   configure_file(
@@ -47,10 +47,10 @@ include_directories(
   )
   set(PLUGIN_SRCS
     ${PLUGIN_SRCS}
-    ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageSimulator.h
-    ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageSimulator.cpp
-    ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageArray.h
-    ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageArray.cpp
+    ${CustusX_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageSimulator.h
+    ${CustusX_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageSimulator.cpp
+    ${CustusX_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageArray.h
+    ${CustusX_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageArray.cpp
 )
 ENDIF(CX_BUILD_US_SIMULATOR)
 

@@ -76,11 +76,11 @@ function(cx_catch_add_master_exe)
 
     include_directories(
             .
-            ${CustusX3_SOURCE_DIR}/source/resource/testUtilities
-            ${CustusX3_SOURCE_DIR}/source/ThirdParty/catch)
+            ${CustusX_SOURCE_DIR}/source/resource/testUtilities
+            ${CustusX_SOURCE_DIR}/source/ThirdParty/catch)
 
     set(TEST_EXE_NAME "Catch")
-    set(cxtest_MAIN ${CustusX3_SOURCE_DIR}/source/resource/testUtilities/cxtestCatchMain.cpp)
+    set(cxtest_MAIN ${CustusX_SOURCE_DIR}/source/resource/testUtilities/cxtestCatchMain.cpp)
 
     if(CX_WINDOWS)
 		_cx_catch_generate_master_catch_using_sources(${TEST_EXE_NAME} ${cxtest_MAIN})
@@ -201,8 +201,8 @@ function(_cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES ADDITIONAL_LI
 
 	include_directories(
         .
-        ${CustusX3_SOURCE_DIR}/source/resource/testUtilities
-        ${CustusX3_SOURCE_DIR}/source/ThirdParty/catch)
+        ${CustusX_SOURCE_DIR}/source/resource/testUtilities
+        ${CustusX_SOURCE_DIR}/source/ThirdParty/catch)
 
     cx_catch__private_define_platform_specific_linker_options()
 
@@ -222,7 +222,7 @@ function(_cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES ADDITIONAL_LI
 #    set(TEST_EXE_NAME "Catch${LIB_TO_TEST}")
 #    message(STATUS "          Exe name : ${TEST_EXE_NAME}")
 
-#    set(cxtest_MAIN ${CustusX3_SOURCE_DIR}/source/resource/testUtilities/cxtestCatchMain.cpp)
+#    set(cxtest_MAIN ${CustusX_SOURCE_DIR}/source/resource/testUtilities/cxtestCatchMain.cpp)
 #    add_executable(${TEST_EXE_NAME} ${cxtest_MAIN})
 #    target_link_libraries(${TEST_EXE_NAME} ${CX_CATCH_PRE_WHOLE_ARCHIVE} ${TEST_LIB_NAME} ${CX_CATCH_POST_WHOLE_ARCHIVE})
 endfunction()

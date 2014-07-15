@@ -17,15 +17,6 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- *  sscUSFrameData.cpp
- *  CustusX3
- *
- *  Created by Ole Vegard Solberg on 8/17/10.
- *  Copyright 2010 SINTEF. All rights reserved.
- *
- */
-
 #include "cxUSFrameData.h"
 #include "cxReporter.h"
 #include <vtkImageData.h>

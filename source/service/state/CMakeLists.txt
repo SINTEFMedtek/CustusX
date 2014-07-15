@@ -32,11 +32,11 @@ SET ( cxStateService_SOURCE
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
     .
-    ${CustusX3_SOURCE_DIR}/source/service/patient     
-    ${CustusX3_SOURCE_DIR}/source/service/tracking     
-    ${CustusX3_SOURCE_DIR}/source/service/visualization
-    ${CustusX3_SOURCE_DIR}/source/service/video
-    ${CustusX3_SOURCE_DIR}/source/resource/pluginUtilities
+    ${CustusX_SOURCE_DIR}/source/service/patient     
+    ${CustusX_SOURCE_DIR}/source/service/tracking     
+    ${CustusX_SOURCE_DIR}/source/service/visualization
+    ${CustusX_SOURCE_DIR}/source/service/video
+    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

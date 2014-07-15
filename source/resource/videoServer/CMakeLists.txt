@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 2.6)
 include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 include_directories(
         ${Boost_INCLUDE_DIRS}
-     	${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
+     	${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
         )
 
 #-------------------------------

@@ -42,9 +42,9 @@ cx_add_class(cxVisualizationService_SOURCE
 include_directories(
     ${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     .
-    ${CustusX3_SOURCE_DIR}/source/service/patient
-    ${CustusX3_SOURCE_DIR}/source/service/tracking
-    ${CustusX3_SOURCE_DIR}/source/service/video
+    ${CustusX_SOURCE_DIR}/source/service/patient
+    ${CustusX_SOURCE_DIR}/source/service/tracking
+    ${CustusX_SOURCE_DIR}/source/service/video
     )
 
 set(cxVisualizationService_LIBS

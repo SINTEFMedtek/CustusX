@@ -17,7 +17,7 @@ cx_add_class(CX_RESOURCE_USRECONSTRUCTIONTYPES_FILES
 unset(CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES)
 set(CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    ${CustusX3_SOURCE_DIR}/source/resource/usReconstructionTypes
+    ${CustusX_SOURCE_DIR}/source/resource/usReconstructionTypes
     CACHE INTERNAL "Include directories for resource US Reconstruction Types library")
 include_directories(${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES} )
 

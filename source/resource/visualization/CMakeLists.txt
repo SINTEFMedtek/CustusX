@@ -108,8 +108,8 @@ configure_file(Rep/Shaders/glsl/raycasting_shader.frag Rep COPYONLY)
 configure_file(Rep/Shaders/glsl/raycasting_shader.vert Rep COPYONLY)
 #configure_file(Rep/Shaders/glsl/Texture3DOverlay.frag Rep COPYONLY)
 
-#set(SHADER_FROM_PATH ${CustusX3_SOURCE_DIR}/source/resource/ssc/Code/Rep/Shaders/glsl)
-#set(SHADER_TO_PATH ${CustusX3_SOURCE_DIR}/config/shaders)
+#set(SHADER_FROM_PATH ${CustusX_SOURCE_DIR}/source/resource/ssc/Code/Rep/Shaders/glsl)
+#set(SHADER_TO_PATH ${CustusX_SOURCE_DIR}/config/shaders)
 #configure_file(${SHADER_FROM_PATH}/upscale.frag ${SHADER_TO_PATH} COPYONLY)
 #configure_file(${SHADER_FROM_PATH}/upscale.vert ${SHADER_TO_PATH} COPYONLY)
 #configure_file(${SHADER_FROM_PATH}/raycasting_shader.frag ${SHADER_TO_PATH} COPYONLY)
@@ -120,16 +120,16 @@ configure_file(Rep/Shaders/glsl/raycasting_shader.vert Rep COPYONLY)
 unset(CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES)
 set(CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    ${CustusX3_SOURCE_DIR}/source/resource/visualization
-    ${CustusX3_SOURCE_DIR}/source/resource/visualization/Rep
-    ${CustusX3_SOURCE_DIR}/source/resource/visualization/Rep2D
-    ${CustusX3_SOURCE_DIR}/source/resource/visualization/Rep3D
-    ${CustusX3_SOURCE_DIR}/source/resource/visualization/RepVideo
-    ${CustusX3_SOURCE_DIR}/source/resource/visualization/Primitives
+    ${CustusX_SOURCE_DIR}/source/resource/visualization
+    ${CustusX_SOURCE_DIR}/source/resource/visualization/Rep
+    ${CustusX_SOURCE_DIR}/source/resource/visualization/Rep2D
+    ${CustusX_SOURCE_DIR}/source/resource/visualization/Rep3D
+    ${CustusX_SOURCE_DIR}/source/resource/visualization/RepVideo
+    ${CustusX_SOURCE_DIR}/source/resource/visualization/Primitives
     CACHE INTERNAL "Include directories for resource visualization library")
 
 include_directories(${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
-    ${CustusX3_SOURCE_DIR}/source/ThirdParty/VTKMultiVolume
+    ${CustusX_SOURCE_DIR}/source/ThirdParty/VTKMultiVolume
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

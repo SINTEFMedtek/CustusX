@@ -21,9 +21,9 @@
 
 if (BUILD_TESTING)
     include_directories(
-        ${CustusX3_SOURCE_DIR}/source/ThirdParty/VTKMultiVolume
-		${CustusX3_SOURCE_DIR}/source/resource/visualization/testing
-		${CustusX3_SOURCE_DIR}/source/resource/core/testing
+        ${CustusX_SOURCE_DIR}/source/ThirdParty/VTKMultiVolume
+		${CustusX_SOURCE_DIR}/source/resource/visualization/testing
+		${CustusX_SOURCE_DIR}/source/resource/core/testing
 		)
 
     cx_add_class(CX_CPPUNIT_VISUALIZATIONSERVICE_SOURCES

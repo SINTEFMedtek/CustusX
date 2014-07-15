@@ -347,13 +347,13 @@ class ISB_DataStreaming(CppComponent):
         
 # ---------------------------------------------------------
 
-class CustusX3(CppComponent):
+class CustusX(CppComponent):
     def name(self):
-        return "CustusX3"
+        return "CustusX"
     def help(self):
         return 'CustusX from SINTEF'
     def path(self):
-        return self.controlData.getWorkingPath() + "/CustusX3"    
+        return self.controlData.getWorkingPath() + "/CustusX"    
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/CustusX3.git')
     def update(self):
@@ -519,13 +519,13 @@ class OpenCLUtilityLibrary(CppComponent):
         
 # ---------------------------------------------------------
 
-class CustusX3Data(CppComponent):
+class CustusXData(CppComponent):
     def name(self):
-        return "CustusX3-Data"
+        return "CustusX-Data"
     def help(self):
         return 'data files for CustusX'
     def path(self):
-        custusx = self._createSibling(CustusX3)
+        custusx = self._createSibling(CustusX)
         return custusx.path() + "/" + custusx.sourceFolder()
     def sourceFolder(self):
         return 'data'

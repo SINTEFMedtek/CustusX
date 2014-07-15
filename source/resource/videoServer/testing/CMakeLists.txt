@@ -8,8 +8,8 @@ if (BUILD_TESTING)
 	cx_initialize_cppunit()
 
 	include_directories(
-            ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-            ${CustusX3_SOURCE_DIR}/source/resource/videoServer
+            ${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
+            ${CustusX_SOURCE_DIR}/source/resource/videoServer
 	)
 
 	set(CXTEST_SOURCES_TO_MOC

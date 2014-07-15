@@ -1,6 +1,6 @@
 
 if (BUILD_TESTING)
-	include_directories(${CustusX3_SOURCE_DIR}/source/resource/testUtilities)
+	include_directories(${CustusX_SOURCE_DIR}/source/resource/testUtilities)
 
    # The following files contains test code not converted from cppunit to ctest.
    # Not working, but the code they test are still present in cx.

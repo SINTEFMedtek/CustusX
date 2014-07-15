@@ -3,7 +3,7 @@ project(org_custusx_example)
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 include_directories(
-    ${CustusX3_SOURCE_DIR}/source/modules/GUIExtender
+    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
     )
 
 set(PLUGIN_SRCS

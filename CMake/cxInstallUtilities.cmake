@@ -292,7 +292,7 @@ if (NOT CX_APPLE)
     set(CONFIG_EXCLUDE_PATTERN "elastix_macosx64_v4.6/*")
 endif ()
 
-	install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/
+	install(DIRECTORY ${CustusX_SOURCE_DIR}/config/
 			DESTINATION ${CX_INSTALL_ROOT_DIR}/config
 			FILE_PERMISSIONS ${CX_FULL_PERMISSIONS}
 			DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
@@ -300,7 +300,7 @@ endif ()
 			PATTERN ${CONFIG_EXCLUDE_PATTERN} EXCLUDE)
 
 	# Install OpenCL kernels into bundle
-	install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/org.custusx.vnnclreconstruction/kernels.cl
+	install(FILES ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.vnnclreconstruction/kernels.cl
 			DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/)
 
 	if(CX_USE_ISB_GE)
@@ -328,8 +328,8 @@ endif ()
 
 	if(CX_BUILD_US_SIMULATOR)
 		install(FILES
-				${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/speckle.mhd
-				${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/speckle.raw
+				${CustusX_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/speckle.mhd
+				${CustusX_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/speckle.raw
 				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/simulator)
 	endif()
 endfunction()
@@ -498,7 +498,7 @@ foreach (_var IN LISTS matchedVars)
 endforeach()
 
 
-	cx_assert_variable_exists(${CustusX3_VERSION_STRING})
+	cx_assert_variable_exists(${CustusX_VERSION_STRING})
 	cx_assert_variable_exists(${SSC_USE_GCOV})
 	cx_assert_variable_exists(${CX_USE_TSF})
 	cx_assert_variable_exists(${CX_USE_LEVEL_SET})
@@ -508,7 +508,7 @@ endforeach()
 	# this text can be inserted into the about box with some effort...
 	set(CONFIGURATION_TEXT
 "
-Configuration for CustusX ${CustusX3_VERSION_STRING}
+Configuration for CustusX ${CustusX_VERSION_STRING}
 
 	Build Settings:
 		Built on system: ${CMAKE_SYSTEM} ${CMAKE_ARCHITECTURE} ${CMAKE_SYSTEM_PROCESSOR}

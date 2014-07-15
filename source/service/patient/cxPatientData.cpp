@@ -479,7 +479,7 @@ void PatientData::createPatientFolders(QString choosenDir)
 
 QString PatientData::getVersionName()
 {
-    return QString("%1").arg(CustusX3_VERSION_STRING);
+    return QString("%1").arg(CustusX_VERSION_STRING);
 }
 
 /**

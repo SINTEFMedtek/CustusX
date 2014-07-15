@@ -9,8 +9,8 @@ if(BUILD_TESTING)
   include_directories(
 	../logic
 	..
-	${CustusX3_SOURCE_DIR}/source/service/patient
-	${CustusX3_SOURCE_DIR}/source/service/tracking
+	${CustusX_SOURCE_DIR}/source/service/patient
+	${CustusX_SOURCE_DIR}/source/service/tracking
 	)
 
     set(CXTEST_SOURCES_TO_MOC

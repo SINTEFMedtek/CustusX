@@ -64,24 +64,24 @@ include_directories(
     .
     ./logic
     ./gui
-    ${CustusX3_SOURCE_DIR}/source/service/patient
-    ${CustusX3_SOURCE_DIR}/source/service/tracking
-    ${CustusX3_SOURCE_DIR}/source/service/video
-    ${CustusX3_SOURCE_DIR}/source/service/visualization
-        ${CustusX3_SOURCE_DIR}/source/logic
+    ${CustusX_SOURCE_DIR}/source/service/patient
+    ${CustusX_SOURCE_DIR}/source/service/tracking
+    ${CustusX_SOURCE_DIR}/source/service/video
+    ${CustusX_SOURCE_DIR}/source/service/visualization
+        ${CustusX_SOURCE_DIR}/source/logic
 
-    ${CustusX3_SOURCE_DIR}/source/modules/UsReconstruction/logic
-    ${CustusX3_SOURCE_DIR}/source/modules/UsReconstruction/logic/3DReconstruction
-    ${CustusX3_SOURCE_DIR}/source/modules/Algorithm/logic
-    ${CustusX3_SOURCE_DIR}/source/modules/Algorithm/gui
-    ${CustusX3_SOURCE_DIR}/source/modules/GUIExtender
+    ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/logic
+    ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/logic/3DReconstruction
+    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
+    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
+    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
 
-    ${CustusX3_SOURCE_DIR}/source/algorithms
-    ${CustusX3_SOURCE_DIR}/source/gui/utilities
-    ${CustusX3_SOURCE_DIR}/source/gui/dataAdapters
-    ${CustusX3_SOURCE_DIR}/source/gui/toolWidgets
+    ${CustusX_SOURCE_DIR}/source/algorithms
+    ${CustusX_SOURCE_DIR}/source/gui/utilities
+    ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
+    ${CustusX_SOURCE_DIR}/source/gui/toolWidgets
 
-    ${CustusX3_SOURCE_DIR}/source/resource/pluginUtilities
+    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     )
 
 set(CX_ACQUISITION_LIBRARIES

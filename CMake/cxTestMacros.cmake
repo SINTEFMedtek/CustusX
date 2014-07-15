@@ -52,7 +52,7 @@ macro(SSC_ADD_CTEST_CPPUNIT_TESTS TEST_NAME CPPUNIT_MAIN SOURCE_FILES LIBRARIES 
 		# --   Use CISST_ADD_TESTS() to convert each CppUnit test to a CTest test.
 
 		# Initialize cisst routines
-		set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CustusX3_SOURCE_DIR}/source/resource/testUtilities/cisst_code)
+		set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CustusX_SOURCE_DIR}/source/resource/testUtilities/cisst_code)
 		include(cisstMacros)
 		#add_subdirectory(cisst_code)
 

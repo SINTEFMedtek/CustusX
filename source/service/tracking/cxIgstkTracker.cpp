@@ -55,7 +55,7 @@ IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
 	bool logging = settings()->value("IGSTKDebugLogging", true).toBool();
 	if (logging)
 	{
-		QString comLogging = mInternalStructure.mLoggingFolderName + "RecordedStreamByCustusX3.txt";
+		QString comLogging = mInternalStructure.mLoggingFolderName + "RecordedStreamByCustusX.txt";
 		mCommunication->SetCaptureFileName(cstring_cast(comLogging));
 		mCommunication->SetCapture(true);
 	}

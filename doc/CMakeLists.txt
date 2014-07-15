@@ -34,14 +34,14 @@ IF (BUILD_DOCUMENTATION)
   ENDIF(DOT)
 
   CONFIGURE_FILE(
-    ${CustusX3_SOURCE_DIR}/doc/Doxyfile.in
-    ${CustusX3_BINARY_DIR}/doc/Doxyfile)
+    ${CustusX_SOURCE_DIR}/doc/Doxyfile.in
+    ${CustusX_BINARY_DIR}/doc/Doxyfile)
 
   ADD_CUSTOM_TARGET(DoxygenDoc
     ALL
     ${DOXYGEN_EXECUTABLE}
-    ${CustusX3_BINARY_DIR}/doc/Doxyfile)
+    ${CustusX_BINARY_DIR}/doc/Doxyfile)
 
-    ADD_DEPENDENCIES(DoxygenDoc CustusX3)
+    ADD_DEPENDENCIES(DoxygenDoc CustusX)
 
 ENDIF (BUILD_DOCUMENTATION)

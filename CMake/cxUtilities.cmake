@@ -245,7 +245,7 @@ MACRO(cx_read_version)
 	STRING(REGEX REPLACE "(\r?\n)+$" "" VERSION_TYPE "${VERSION_TYPE}")
 
 	cx_define_version(${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_PATCH} ${VERSION_TYPE})
-	message(STATUS "Version: ${CustusX3_VERSION_STRING}")
+	message(STATUS "Version: ${CustusX_VERSION_STRING}")
 
 ENDMACRO()
 

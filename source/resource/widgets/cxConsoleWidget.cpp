@@ -56,7 +56,7 @@ ConsoleWidget::~ConsoleWidget()
 QString ConsoleWidget::defaultWhatsThis() const
 {
 	return "<html>"
-		"<h3>CustusX3 console.</h3>"
+		"<h3>CustusX console.</h3>"
 		"<p>Display device for system administration messages.</p>"
 		"<p><i>Right click for addition options.</i></p>"
 		"</html>";

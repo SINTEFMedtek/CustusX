@@ -44,7 +44,7 @@ void CustusXController::start()
 {
   qApp->setOrganizationName("SINTEF");
   qApp->setOrganizationDomain("test.sintef.no");
-  qApp->setApplicationName("CustusX3");
+  qApp->setApplicationName("CustusX");
 //  qApp->setWindowIcon(QIcon(":/icons/CustusX.png"));
 //  qApp->setWindowIcon(QIcon(":/icons/.png"));
 
