@@ -932,7 +932,7 @@ void MainWindow::aboutSlot()
 		"<p>Created by SINTEF Medical Technology."
 		"<p><a href=http://www.sintef.no/Home/Technology-and-Society/Medical-technology> www.sintef.no </a>"
 		"<p>An application for Image Guided Surgery."
-		"<p>Created using Qt, VTK, ITK, IGSTK, CTK.").arg(CustusX3_VERSION_STRING));
+		"<p>Created using Qt, VTK, ITK, IGSTK, CTK.").arg(CustusX_VERSION_STRING));
 }
 
 void MainWindow::preferencesSlot()

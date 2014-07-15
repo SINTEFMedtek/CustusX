@@ -49,7 +49,7 @@ if (BUILD_TESTING)
             )
 	include_directories(
 	    .
-	    ${CustusX3_SOURCE_DIR}/source/ThirdParty/catch
+	    ${CustusX_SOURCE_DIR}/source/ThirdParty/catch
 	    )
 #        add_library( cxtestUtilities ${CX_CATCH_SHARED_LIB_TYPE} ${CX_TESTUTILITIES_SOURCE_FILES} )
         cx_add_test_library(cxtestUtilities ${CX_TESTUTILITIES_SOURCE_FILES})

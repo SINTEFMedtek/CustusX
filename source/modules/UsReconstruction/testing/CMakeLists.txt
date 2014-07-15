@@ -9,9 +9,9 @@ if (BUILD_TESTING)
             ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     		../logic
     		../logic/3DReconstruction
-    		${CustusX3_BINARY_DIR}/source/service/patient
-    		${CustusX3_SOURCE_DIR}/source/service/patient
-    		${CustusX3_SOURCE_DIR}/source/service/tracking
+    		${CustusX_BINARY_DIR}/source/service/patient
+    		${CustusX_SOURCE_DIR}/source/service/patient
+    		${CustusX_SOURCE_DIR}/source/service/tracking
 		)
 
 	# Catch unit test framework stuff:

@@ -29,7 +29,7 @@ namespace cx
  *
  * \section cx_section_intro Introduction
  *
- * This page describes the architecture of CustusX3.
+ * This page describes the architecture of CustusX.
  *
  * The <a href="modules.html">module list</a> is a recommended starting point.
  * The modules break down the library into manageable chunks. Also read the

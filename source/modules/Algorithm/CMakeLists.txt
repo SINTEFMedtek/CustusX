@@ -105,15 +105,15 @@ include_directories(
     .
     ./logic
     ./gui
-	${CustusX3_SOURCE_DIR}/source/service/patient
-    ${CustusX3_SOURCE_DIR}/source/service/tracking
-    ${CustusX3_SOURCE_DIR}/source/service/visualization
-	${CustusX3_SOURCE_DIR}/source/logic
+	${CustusX_SOURCE_DIR}/source/service/patient
+    ${CustusX_SOURCE_DIR}/source/service/tracking
+    ${CustusX_SOURCE_DIR}/source/service/visualization
+	${CustusX_SOURCE_DIR}/source/logic
 
-    ${CustusX3_SOURCE_DIR}/source/modules/GUIExtender
-    ${CustusX3_SOURCE_DIR}/source/gui/utilities
-    ${CustusX3_SOURCE_DIR}/source/gui/dataAdapters
-	${CustusX3_SOURCE_DIR}/source/gui/dataWidgets
+    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
+    ${CustusX_SOURCE_DIR}/source/gui/utilities
+    ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
+	${CustusX_SOURCE_DIR}/source/gui/dataWidgets
 	)
 
 set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui cxGUIExtenderService)

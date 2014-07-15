@@ -7,7 +7,7 @@ endif(COMMAND cmake_policy)
 if (BUILD_TESTING)
 include_directories(
     ..
-    ${CustusX3_SOURCE_DIR}/source/logic
+    ${CustusX_SOURCE_DIR}/source/logic
 )
 
 set(CXTEST_SOURCES_TO_MOC

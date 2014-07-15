@@ -17,9 +17,9 @@ else (APPLE) # Windows and Linux
 endif (APPLE)
 
 # location of configuration files during development (in the source tree)
-set (CX_CONFIG_ROOT ${CustusX3_SOURCE_DIR}/config)
+set (CX_CONFIG_ROOT ${CustusX_SOURCE_DIR}/config)
 
-set (CX_DATA_ROOT ${CustusX3_SOURCE_DIR}/data CACHE PATH "path to CustusX data root")
+set (CX_DATA_ROOT ${CustusX_SOURCE_DIR}/data CACHE PATH "path to CustusX data root")
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/cxConfig.h.in"

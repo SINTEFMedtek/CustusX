@@ -159,10 +159,10 @@ cx_add_class(cxResource_SOURCE
 	vesselReg/SeansVesselReg.hxx
 	vesselReg/HackTPSTransform.hxx
 	
-	${CustusX3_SOURCE_DIR}/source/ThirdParty/iir1/iir/Butterworth.cpp
-	${CustusX3_SOURCE_DIR}/source/ThirdParty/iir1/iir/Cascade.cpp
-	${CustusX3_SOURCE_DIR}/source/ThirdParty/iir1/iir/PoleFilter.cpp
-	${CustusX3_SOURCE_DIR}/source/ThirdParty/iir1/iir/Biquad.cpp
+	${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/Butterworth.cpp
+	${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/Cascade.cpp
+	${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/PoleFilter.cpp
+	${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/Biquad.cpp
     )
     
 
@@ -204,7 +204,7 @@ vtkInteractionStyle
 
 # Configure the default SSC_DATA_ROOT for the location of SSCData.
 unset(SSC_DATA_ROOT)
-set (SSC_DATA_ROOT ${CustusX3_SOURCE_DIR}/data CACHE INTERNAL "path to ssc data root")
+set (SSC_DATA_ROOT ${CustusX_SOURCE_DIR}/data CACHE INTERNAL "path to ssc data root")
 
 # Configure the USE_GLX_SHARED_CONTEXT - used in sscConfig.h
 #if(X11_FOUND)
@@ -219,8 +219,8 @@ set (SSC_DATA_ROOT ${CustusX3_SOURCE_DIR}/data CACHE INTERNAL "path to ssc data 
 #endif(X11_FOUND)
 
 configure_file(
-  "${CustusX3_SOURCE_DIR}/source/resource/core/utilities/sscConfig.h.in"
-  "${CustusX3_BINARY_DIR}/source/resource/core/utilities/sscConfig.h"
+  "${CustusX_SOURCE_DIR}/source/resource/core/utilities/sscConfig.h.in"
+  "${CustusX_BINARY_DIR}/source/resource/core/utilities/sscConfig.h"
   )
 
 # extra definitions:
@@ -229,22 +229,22 @@ add_subdirectory(settings)
 unset(CX_RESOURCE_INCLUDE_DIRECTORIES)
 
 set(CX_RESOURCE_INCLUDE_DIRECTORIES
-    ${CustusX3_SOURCE_DIR}/source/resource/core
-    ${CustusX3_SOURCE_DIR}/source/resource/core/logger
-    ${CustusX3_SOURCE_DIR}/source/resource/core/Math
-    ${CustusX3_SOURCE_DIR}/source/resource/core/Data
-    ${CustusX3_SOURCE_DIR}/source/resource/core/Video
-    ${CustusX3_SOURCE_DIR}/source/resource/core/Tool
-    ${CustusX3_SOURCE_DIR}/source/resource/core/dataAdapters
-    ${CustusX3_SOURCE_DIR}/source/resource/core/algorithms
-    ${CustusX3_SOURCE_DIR}/source/resource/core/settings
-    ${CustusX3_SOURCE_DIR}/source/resource/core/utilities
-    ${CustusX3_SOURCE_DIR}/source/ThirdParty
-    ${CustusX3_SOURCE_DIR}/source/ThirdParty/iir1
+    ${CustusX_SOURCE_DIR}/source/resource/core
+    ${CustusX_SOURCE_DIR}/source/resource/core/logger
+    ${CustusX_SOURCE_DIR}/source/resource/core/Math
+    ${CustusX_SOURCE_DIR}/source/resource/core/Data
+    ${CustusX_SOURCE_DIR}/source/resource/core/Video
+    ${CustusX_SOURCE_DIR}/source/resource/core/Tool
+    ${CustusX_SOURCE_DIR}/source/resource/core/dataAdapters
+    ${CustusX_SOURCE_DIR}/source/resource/core/algorithms
+    ${CustusX_SOURCE_DIR}/source/resource/core/settings
+    ${CustusX_SOURCE_DIR}/source/resource/core/utilities
+    ${CustusX_SOURCE_DIR}/source/ThirdParty
+    ${CustusX_SOURCE_DIR}/source/ThirdParty/iir1
     
-    ${CustusX3_BINARY_DIR}/source/resource/core
-    ${CustusX3_BINARY_DIR}/source/resource/core/utilities
-    ${CustusX3_BINARY_DIR}/source/resource/core/settings
+    ${CustusX_BINARY_DIR}/source/resource/core
+    ${CustusX_BINARY_DIR}/source/resource/core/utilities
+    ${CustusX_BINARY_DIR}/source/resource/core/settings
     CACHE INTERNAL "Include directories for resource libraries")
 
 

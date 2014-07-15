@@ -114,17 +114,17 @@ include_directories(
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     .
-    ${CustusX3_SOURCE_DIR}/source/resource/videoServer
-    ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-    ${CustusX3_SOURCE_DIR}/source/service/patient     
-    ${CustusX3_SOURCE_DIR}/source/service/tracking     
-    ${CustusX3_SOURCE_DIR}/source/service/visualization
-    ${CustusX3_SOURCE_DIR}/source/service/video
-    ${CustusX3_SOURCE_DIR}/source/service/state
+    ${CustusX_SOURCE_DIR}/source/resource/videoServer
+    ${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
+    ${CustusX_SOURCE_DIR}/source/service/patient     
+    ${CustusX_SOURCE_DIR}/source/service/tracking     
+    ${CustusX_SOURCE_DIR}/source/service/visualization
+    ${CustusX_SOURCE_DIR}/source/service/video
+    ${CustusX_SOURCE_DIR}/source/service/state
     
-    ${CustusX3_SOURCE_DIR}/source/logic
-    ${CustusX3_SOURCE_DIR}/source/modules/GUIExtender
-    ${CustusX3_SOURCE_DIR}/source/resource/pluginUtilities
+    ${CustusX_SOURCE_DIR}/source/logic
+    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
+    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     )
     
 set(CX_GUI_LIBRARIES cxLogicManager cxStateService cxResourceWidgets)

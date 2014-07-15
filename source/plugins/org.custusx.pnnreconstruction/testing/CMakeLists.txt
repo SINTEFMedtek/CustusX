@@ -2,13 +2,13 @@
 if (BUILD_TESTING)
     include_directories(
         ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-        ${CustusX3_BINARY_DIR}/source/resource/core/utilities/
-        ${CustusX3_SOURCE_DIR}/source/modules/UsReconstruction/testing
-		${CustusX3_SOURCE_DIR}/source/modules/UsReconstruction/logic
-		${CustusX3_SOURCE_DIR}/source/logic
-		${CustusX3_SOURCE_DIR}/source/resource/pluginUtilities
-		${CustusX3_SOURCE_DIR}/source/resource/testUtilities
-		${CustusX3_SOURCE_DIR}/source/resource/core/dataAdapters
+        ${CustusX_BINARY_DIR}/source/resource/core/utilities/
+        ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/testing
+		${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/logic
+		${CustusX_SOURCE_DIR}/source/logic
+		${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
+		${CustusX_SOURCE_DIR}/source/resource/testUtilities
+		${CustusX_SOURCE_DIR}/source/resource/core/dataAdapters
     )
 
 

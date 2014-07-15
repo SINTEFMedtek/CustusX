@@ -14,16 +14,16 @@ set(SOURCES cxMain.cpp)
 include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 include_directories(
     .
-    ${CustusX3_SOURCE_DIR}/source/gui
-    ${CustusX3_SOURCE_DIR}/source/gui/utilities
-    ${CustusX3_SOURCE_DIR}/source/logic
-    ${CustusX3_SOURCE_DIR}/source/modules/GUIExtender
-    ${CustusX3_SOURCE_DIR}/source/modules/UsReconstruction/gui
-    ${CustusX3_SOURCE_DIR}/source/modules/Acquisition/gui
-    ${CustusX3_SOURCE_DIR}/source/modules/Calibration/gui
-    ${CustusX3_SOURCE_DIR}/source/modules/Algorithm/gui
-    ${CustusX3_SOURCE_DIR}/source/modules/Registration/gui
-	${CustusX3_SOURCE_DIR}/source/resource/pluginUtilities
+    ${CustusX_SOURCE_DIR}/source/gui
+    ${CustusX_SOURCE_DIR}/source/gui/utilities
+    ${CustusX_SOURCE_DIR}/source/logic
+    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
+    ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/gui
+    ${CustusX_SOURCE_DIR}/source/modules/Acquisition/gui
+    ${CustusX_SOURCE_DIR}/source/modules/Calibration/gui
+    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
+    ${CustusX_SOURCE_DIR}/source/modules/Registration/gui
+	${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
 	)
 
 #------------------------------------------------------------------------------
@@ -31,12 +31,12 @@ include_directories(
 #-----------------------------------------------------------------------------
 if(APPLE) # For Apple set the icns file containing icons
     set(MACOSX_BUNDLE_ICON_FILE "application.icns") # set how it shows up in the Info.plist file
-    set_source_files_properties(${CustusX3_SOURCE_DIR}/source/gui/icons/application.icns
+    set_source_files_properties(${CustusX_SOURCE_DIR}/source/gui/icons/application.icns
                                 PROPERTIES MACOSX_PACKAGE_LOCATION Resources)  # set where in the bundle to put the icns file
-    set(SOURCES ${SOURCES} ${CustusX3_SOURCE_DIR}/source/gui/icons/application.icns)  # include the icns file in the target
+    set(SOURCES ${SOURCES} ${CustusX_SOURCE_DIR}/source/gui/icons/application.icns)  # include the icns file in the target
     set(MACOSX_BUNDLE_INFO_STRING "CustusX")
     set(MACOSX_BUNDLE_BUNDLE_NAME "CustusX")
-    set(MACOSX_BUNDLE_BUNDLE_VERSION "${CustusX3_VERSION_STRING}")
+    set(MACOSX_BUNDLE_BUNDLE_VERSION "${CustusX_VERSION_STRING}")
     set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${MACOSX_BUNDLE_BUNDLE_VERSION}")
     set(MACOSX_BUNDLE_LONG_VERSION_STRING "CustusX ${MACOSX_BUNDLE_BUNDLE_VERSION}")
     set(MACOSX_BUNDLE_COPYRIGHT "Copyright SINTEF\nAll rights reserved")

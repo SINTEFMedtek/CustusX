@@ -29,7 +29,7 @@ namespace cx
 {
 
 /**
- * \brief Class for reading the files defining a CustusX3 tool
+ * \brief Class for reading the files defining a CustusX tool
  * \ingroup cx_service_tracking
  *
  * \date 21. march 2011
@@ -75,7 +75,7 @@ private:
 };
 
 /**
- * \brief Class for reading the files defining a CustusX3 tool
+ * \brief Class for reading the files defining a CustusX tool
  * \ingroup cx_service_tracking
  *
  * \date 21. march 2011

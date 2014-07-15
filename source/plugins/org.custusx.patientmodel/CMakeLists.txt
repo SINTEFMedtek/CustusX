@@ -4,8 +4,8 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    ${CustusX3_SOURCE_DIR}/source/logic
-    ${CustusX3_SOURCE_DIR}/source/service/patient
+    ${CustusX_SOURCE_DIR}/source/logic
+    ${CustusX_SOURCE_DIR}/source/service/patient
     )
 
 set(PLUGIN_SRCS

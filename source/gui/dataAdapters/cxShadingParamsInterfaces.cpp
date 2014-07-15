@@ -1,11 +1,3 @@
-/*
- *  cxShadingParamsInterfaces.cpp
- *  CustusX3
- *
- *  Created by Ole Vegard Solberg on 6/17/10.
- *  Copyright 2010 SINTEF. All rights reserved.
- *
- */
 #include "cxShadingParamsInterfaces.h"
 #include "cxDataManager.h"
 #include "cxImage.h"

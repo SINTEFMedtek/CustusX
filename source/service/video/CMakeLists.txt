@@ -65,7 +65,7 @@ SET (cxVideoService_SOURCE
 
 # Build all files from the UltrasoundSimulation lib
 #IF(CX_BUILD_US_SIMULATOR)
-#   SET(SIMULATOR_SPECKLE_PATH ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation)
+#   SET(SIMULATOR_SPECKLE_PATH ${CustusX_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation)
 
 #    configure_file(
 #        "${CMAKE_CURRENT_SOURCE_DIR}/simConfig.h.in"
@@ -74,10 +74,10 @@ SET (cxVideoService_SOURCE
 
 #    SET(cxVideoService_SOURCE
 #        ${cxVideoService_SOURCE}
-#        ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageSimulator.h
-#        ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageSimulator.cpp
-#        ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageArray.h
-#        ${CustusX3_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageArray.cpp
+#        ${CustusX_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageSimulator.h
+#        ${CustusX_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageSimulator.cpp
+#        ${CustusX_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageArray.h
+#        ${CustusX_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/ImageArray.cpp
 #    )
 #ENDIF(CX_BUILD_US_SIMULATOR)
 
@@ -85,13 +85,13 @@ include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     .
-    ${CustusX3_SOURCE_DIR}/source/resource/videoServer
-    ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-    ${CustusX3_SOURCE_DIR}/source/service/tracking
+    ${CustusX_SOURCE_DIR}/source/resource/videoServer
+    ${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
+    ${CustusX_SOURCE_DIR}/source/service/tracking
     ${CMAKE_CURRENT_BINARY_DIR}
-    #${CustusX3_SOURCE_DIR}/source/resource/widgets
-    #${CustusX3_SOURCE_DIR}/source/logic
-    ${CustusX3_SOURCE_DIR}/source/resource/pluginUtilities
+    #${CustusX_SOURCE_DIR}/source/resource/widgets
+    #${CustusX_SOURCE_DIR}/source/logic
+    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
 
 #cxResourceWidgets
     )

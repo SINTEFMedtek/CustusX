@@ -49,8 +49,8 @@ class LibraryAssembly(object):
         if (platform.system() == 'Linux'):
             self.addComponent(cxComponents.LevelSetSegmentation());
         self.addComponent(cxComponents.UltrasoundSimulation())
-        self.addComponent(cxComponents.CustusX3())
-        self.addComponent(cxComponents.CustusX3Data())
+        self.addComponent(cxComponents.CustusX())
+        self.addComponent(cxComponents.CustusXData())
         
     def addComponent(self, component):
         self.libraries.append(component)

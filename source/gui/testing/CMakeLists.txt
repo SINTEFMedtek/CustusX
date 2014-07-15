@@ -18,8 +18,8 @@
 
 if (BUILD_TESTING)
 include_directories(
-	${CustusX3_SOURCE_DIR}/source/resource/testUtilities
-	${CustusX3_SOURCE_DIR}/source/resource/visualization/testing
+	${CustusX_SOURCE_DIR}/source/resource/testUtilities
+	${CustusX_SOURCE_DIR}/source/resource/visualization/testing
 	)
 
     set(CXTEST_SOURCES_TO_MOC

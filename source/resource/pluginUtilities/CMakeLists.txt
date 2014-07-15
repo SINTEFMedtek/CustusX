@@ -14,11 +14,11 @@ SET (cxPluginUtilities_SOURCE
 include_directories(
     #${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     #.
-    #${CustusX3_SOURCE_DIR}/source/service/patient     
-    #${CustusX3_SOURCE_DIR}/source/service/tracking     
-    #${CustusX3_SOURCE_DIR}/source/service/visualization
-    #${CustusX3_SOURCE_DIR}/source/service/video
-    #${CustusX3_SOURCE_DIR}/source/service/state
+    #${CustusX_SOURCE_DIR}/source/service/patient     
+    #${CustusX_SOURCE_DIR}/source/service/tracking     
+    #${CustusX_SOURCE_DIR}/source/service/visualization
+    #${CustusX_SOURCE_DIR}/source/service/video
+    #${CustusX_SOURCE_DIR}/source/service/state
     )
 
 

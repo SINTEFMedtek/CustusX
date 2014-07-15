@@ -215,7 +215,7 @@ void MetaImageReader::saveImage(ImagePtr image, const QString& filename)
 	customReader->setImageType(image->getImageType());
 	customReader->setKey("WindowLevel", qstring_cast(image->getInitialWindowLevel()));
 	customReader->setKey("WindowWidth", qstring_cast(image->getInitialWindowWidth()));
-	customReader->setKey("Creator", QString("CustusX_%1").arg(CustusX3_VERSION_STRING));
+	customReader->setKey("Creator", QString("CustusX_%1").arg(CustusX_VERSION_STRING));
 }
 
 
