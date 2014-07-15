@@ -104,9 +104,6 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	this->addAsDockWidget(new SlicePropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new VolumePropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new MeshInfoWidget(this), "Properties");
-#ifdef SSC_USE_DCMTK
-	this->addAsDockWidget(new DICOMWidget(this), "Utility");
-#endif // SSC_USE_DCMTK
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
 	this->addAsDockWidget(new ToolPropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new NavigationWidget(this), "Properties");

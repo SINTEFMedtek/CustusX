@@ -128,9 +128,6 @@ include_directories(
     )
     
 set(CX_GUI_LIBRARIES cxLogicManager cxStateService cxResourceWidgets)
-if (SSC_USE_DCMTK)
-    set(CX_GUI_LIBRARIES ${CX_GUI_LIBRARIES} DICOMLib)
-endif (SSC_USE_DCMTK)
     
 add_library( cxGui ${cxGui_SRCS} )
 target_link_libraries( cxGui ${CX_GUI_LIBRARIES} )
