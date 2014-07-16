@@ -529,6 +529,7 @@ Configuration for CustusX ${CustusX_VERSION_STRING}
 		Boost Version: ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}
 		OpenCL Version: ${OPENCL_VERSION}
 		OpenGL Version: ${OPENGL_VERSION}
+		Eigen Version: ${EIGEN_VERSION}
 
 	Internal libraries:
 		Tube-Segmentation-Framework: ${CX_USE_TSF}

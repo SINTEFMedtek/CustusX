@@ -299,3 +299,16 @@ macro(cx_initialize_coverage)
         add_definitions(--coverage)
     endif()
 endmacro()
+
+
+###############################################################################
+# Initialize eigen library
+# Find the package and include folders
+###############################################################################
+macro(cx_initialize_Eigen)
+    find_package(Eigen REQUIRED)
+    #message(STATUS "Eigen version: " ${EIGEN_VERSION})
+    #message(STATUS "Eigen inc: " ${EIGEN_INCLUDE_DIR})
+    include_directories(${EIGEN_INCLUDE_DIR})
+endmacro()
+

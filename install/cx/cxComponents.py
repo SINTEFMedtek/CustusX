@@ -249,6 +249,37 @@ class OpenCV(CppComponent):
         builder.configureCMake()
 # ---------------------------------------------------------
 
+class Eigen(CppComponent):
+    def name(self):
+        return "eigen"
+    def help(self):
+        return 'http://eigen.tuxfamily.org/'
+    def path(self):
+        return self.controlData.getExternalPath() + "/eigen"
+    def configPath(self):
+        return self.sourcePath()
+    def getBuildType(self):
+        return self.controlData.getBuildExternalsType()
+    def _rawCheckout(self):
+        self._getBuilder().gitClone('git@github.com:RLovelett/eigen.git', 'eigen')
+    def update(self):
+        #did not find a 3.2.1 release on the github fork... using a sha instead
+        testedSHA = '36cd8ffd9dfcdded4717efb96daad9f6353f6351'
+        self._getBuilder().gitCheckout(testedSHA)
+        pass
+    def configure(self):
+        pass
+    def reset(self):
+        pass
+    def build(self):
+        pass
+    def makeClean(self):
+        pass
+    def getBuildType(self):
+        pass
+# ---------------------------------------------------------
+
+
 
 class OpenIGTLink(CppComponent):
     def name(self):
@@ -361,6 +392,8 @@ class CustusX(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
+        #add('EIGEN_DIR:PATH', '%s/CMake' % self._createSibling(Eigen).configPath())
+        add('EIGEN_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         add('ITK_DIR:PATH', self._createSibling(ITK).configPath())
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('IGSTK_DIR:PATH', self._createSibling(IGSTK).configPath())

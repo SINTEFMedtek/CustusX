@@ -48,8 +48,8 @@ typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
 #define EIGEN_DONT_ALIGN
 
 // Eigen library
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/Geometry>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
 /**
  * @}
