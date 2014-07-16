@@ -12,7 +12,7 @@ TestToolMesh::TestToolMesh()
 
 void TestToolMesh::setToolPath(QString path)
 {
-	mCurrentToolPath = cx::DataLocations::getExistingConfigPath("/tool/Tools/"+path, "unknown");
+	mCurrentToolPath = cx::DataLocations::getExistingConfigPath("/tool/Tools/"+path, "");
 //	mCurrentToolPath = mToolToolPath + path;
 }
 

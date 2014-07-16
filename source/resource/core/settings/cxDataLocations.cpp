@@ -207,12 +207,12 @@ QString DataLocations::getCachePath()
     return path;
 }
 
-QString DataLocations::getExistingConfigPath(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath)
+QString DataLocations::getExistingConfigPath(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath, QString filename)
 {
 	foreach (QString root, getRootConfigPaths())
 	{
-		QString path = root + "/" + pathRelativeToConfigRoot;
-		if (QDir(path).exists())
+		QString path = root + "/" + pathRelativeToConfigRoot + "/" + filename;
+		if (QFileInfo(path).exists())
 			return path;
 	}
 
@@ -220,7 +220,7 @@ QString DataLocations::getExistingConfigPath(QString pathRelativeToConfigRoot, Q
 //	if (QDir(path).exists())
 //		return path;
 
-	if (QDir(alternativeAbsolutePath).exists())
+	if (QFileInfo(alternativeAbsolutePath + "/" + filename).exists())
 		return alternativeAbsolutePath;
 
 	return "";
