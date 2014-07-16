@@ -79,7 +79,7 @@ Transform3DWidget::Transform3DWidget(QWidget* parent) :
   buttonLayout->setMargin(0);
 
   mEditAction = this->createAction(this,
-      QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
+      QIcon(":/icons/open_icon_library/system-run-5.png"),
       "Edit",
       "Toggle Edit Matrix",
       SLOT(toggleEditSlot()),

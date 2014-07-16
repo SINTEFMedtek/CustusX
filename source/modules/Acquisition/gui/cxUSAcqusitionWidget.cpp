@@ -62,7 +62,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	new LabeledComboBoxWidget(this, mPluginData->getReconstructer()->getParams()->mPresetTFAdapter, editsLayout, 1);
 
 	QAction* optionsAction = this->createAction(this,
-	      QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
+	      QIcon(":/icons/open_icon_library/system-run-5.png"),
 	      "Details", "Show Details",
 	      SLOT(toggleDetailsSlot()),
 	      NULL);

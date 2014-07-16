@@ -99,9 +99,9 @@ ctkPluginBrowser::ctkPluginBrowser(PluginFrameworkManagerPtr framework)
 			this,
 			SLOT(pluginSelected(const QModelIndex&)));
 
-	startPluginNowAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-double-3.png"), "Start Plugin (ignore activation policy)", this);
-	startPluginAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"), "Start Plugin", this);
-	stopPluginAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/media-record-3.png"), "Stop Plugin", this);
+	startPluginNowAction = new QAction(QIcon(":/icons/open_icon_library/arrow-right-double-3.png"), "Start Plugin (ignore activation policy)", this);
+	startPluginAction = new QAction(QIcon(":/icons/open_icon_library/arrow-right-3.png"), "Start Plugin", this);
+	stopPluginAction = new QAction(QIcon(":/icons/open_icon_library/media-record-3.png"), "Stop Plugin", this);
 	toggleInstallPluginAction = new QAction(QIcon(":/icons/preset_reset.png"), "Toggle Install", this);
 
 	connect(startPluginNowAction, SIGNAL(triggered()), this, SLOT(startPluginNow()));

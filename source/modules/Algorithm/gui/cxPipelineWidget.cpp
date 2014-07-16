@@ -47,7 +47,7 @@ PipelineWidgetFilterLine::PipelineWidgetFilterLine(QWidget* parent, FilterPtr fi
 	layout->addWidget(mTimedAlgorithmProgressBar, 1);
 
 	mAction = this->createAction(this,
-	                             QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"),
+	                             QIcon(":/icons/open_icon_library/arrow-right-3.png"),
 	                             "Run Filter", "",
 	                             SIGNAL(requestRunFilter()),
 	                             NULL);

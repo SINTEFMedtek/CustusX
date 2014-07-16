@@ -298,15 +298,15 @@ void MainWindow::createActions()
 	mStandard3DViewActions = mCameraControl->createStandard3DViewActions();
 
 	// File
-	mNewPatientAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-new-8.png"), tr(
+	mNewPatientAction = new QAction(QIcon(":/icons/open_icon_library/document-new-8.png"), tr(
 		"&New patient"), this);
 	mNewPatientAction->setShortcut(tr("Ctrl+N"));
 	mNewPatientAction->setStatusTip(tr("Create a new patient file"));
-	mSaveFileAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-save-5.png"), tr(
+	mSaveFileAction = new QAction(QIcon(":/icons/open_icon_library/document-save-5.png"), tr(
 		"&Save Patient"), this);
 	mSaveFileAction->setShortcut(tr("Ctrl+S"));
 	mSaveFileAction->setStatusTip(tr("Save patient file"));
-	mLoadFileAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-open-7.png"), tr(
+	mLoadFileAction = new QAction(QIcon(":/icons/open_icon_library/document-open-7.png"), tr(
 		"&Load Patient"), this);
 	mLoadFileAction->setShortcut(tr("Ctrl+L"));
 	mLoadFileAction->setStatusTip(tr("Load patient file"));
@@ -375,7 +375,7 @@ void MainWindow::createActions()
 	connect(mRecordFullscreenAction, SIGNAL(triggered()), this, SLOT(recordFullscreen()));
 
 	//data
-	mImportDataAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-import-2.png"), tr("&Import data"), this);
+	mImportDataAction = new QAction(QIcon(":/icons/open_icon_library/document-import-2.png"), tr("&Import data"), this);
 	mImportDataAction->setShortcut(tr("Ctrl+I"));
 	mImportDataAction->setStatusTip(tr("Import image data"));
 
