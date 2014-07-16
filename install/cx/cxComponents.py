@@ -475,7 +475,7 @@ class UltrasoundSimulation(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/UltrasoundSimulation.git')
     def update(self):
-        self._getBuilder().gitCheckout('master')
+        self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag())    
         #self._getBuilder().gitCheckout('978f9980781303d626dc390df4f8dd73ecb3b717')
     def configure(self):
         pass
