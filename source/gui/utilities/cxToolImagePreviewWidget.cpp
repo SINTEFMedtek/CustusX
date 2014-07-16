@@ -1,7 +1,6 @@
 #include "cxToolImagePreviewWidget.h"
 
 #include "cxReporter.h"
-//#include "cxToolConfigurationParser.h"
 #include "cxTrackerConfiguration.h"
 #include "cxLegacySingletons.h"
 #include "cxToolManager.h"
@@ -28,14 +27,7 @@ QString ToolImagePreviewWidget::defaultWhatsThis() const
 void ToolImagePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
 {
 	TrackerConfigurationPtr config = toolManager()->getConfiguration();
-	const QString imageAbsoluteFilePath = config->getToolPictureFilename(absoluteFilePath);
-
-//	IgstkTool::InternalStructure tool;
-
-//	ToolFileParser parser(absoluteFilePath);
-//	tool = parser.getTool();
-
-//	const QString imageAbsoluteFilePath = tool.mPictureFileName;
+	const QString imageAbsoluteFilePath = config->getTool(absoluteFilePath).mPictureFilename;
 	ImagePreviewWidget::previewFileSlot(imageAbsoluteFilePath);
 }
 }//namespace cx

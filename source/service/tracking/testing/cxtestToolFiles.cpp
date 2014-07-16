@@ -35,9 +35,9 @@ TEST_CASE("Tool xml files use tracking systems supported by ToolManagerUsingIGST
 	QStringList trackingSystems = trackingService->getSupportedTrackingSystems();
 
 	//Verify tool uses supported tracking system
-	foreach(QString filename, config->getAbsoluteFilePathToAllTools())
+	foreach(QString filename, config->getAllTools())
 	{
-		QString toolTrackingSystem = config->getToolTrackingSystem(filename);
+		QString toolTrackingSystem = config->getTool(filename).mTrackingSystem;
 
 		INFO("Filename: " + filename.toStdString());
 		INFO("Tracking system: " + toolTrackingSystem.toStdString());
@@ -49,23 +49,21 @@ TEST_CASE("Tool configuration files", "[unit][tool][xml]")
 {
 	cx::TrackingServicePtr trackingService = cx::ToolManagerUsingIGSTK::create();
 	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
-	QString configFilePath = cx::DataLocations::getRootConfigPath() + "/tool/";
 
-	foreach(QFileInfo dir, cx::getDirs(configFilePath))
+	QStringList configurations = config->getAllConfigurations();
+
+	foreach(QString filename, configurations)
 	{
-		foreach(QString filename, cx::getAbsolutePathToXmlFiles(dir.absoluteFilePath()))
+		INFO("Tool config file: " + filename.toStdString());
+		cx::TrackerConfiguration::Configuration configData = config->getConfiguration(filename);
+		QStringList selectedTools = configData.mTools;
+		foreach(QString toolFileName, selectedTools)
 		{
-			INFO("Tool config file: " + filename.toStdString());
-			cx::TrackerConfiguration::Configuration configData = config->getConfiguration(filename);
-			QStringList selectedTools = configData.mTools;
-			foreach(QString toolFileName, selectedTools)
-			{
-				QFileInfo file(toolFileName);
-				INFO("Tool file: " + toolFileName.toStdString());
-				CHECK(file.exists());
-				if(file.exists())
-					REQUIRE(configData.mTrackingSystem == config->getToolTrackingSystem(toolFileName));
-			}
+			QFileInfo file(toolFileName);
+			INFO("Tool file: " + toolFileName.toStdString());
+			CHECK(file.exists());
+			if(file.exists())
+				REQUIRE(configData.mTrackingSystem == config->getTool(toolFileName).mTrackingSystem);
 		}
 	}
 }
@@ -75,11 +73,10 @@ TEST_CASE("Tool xml files got existing image files", "[unit][tool][xml]")
 	cx::TrackingServicePtr trackingService = cx::ToolManagerUsingIGSTK::create();
 	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
 
-	foreach(QString filename, config->getAbsoluteFilePathToAllTools())
+	foreach(QString filename, config->getAllTools())
 	{
-		QString imageFileName = config->getToolPictureFilename(filename);
+		QString imageFileName = config->getTool(filename).mPictureFilename;
 		INFO("Tool file: " + filename);
-//		CHECK(!imageFileName.isEmpty());
 		if(!imageFileName.isEmpty())
 		{
 			QFileInfo imageFile(imageFileName);
@@ -94,7 +91,7 @@ TEST_CASE("Verify tool xml files", "[unit][tool][xml]")
 	cx::TrackingServicePtr trackingService = cx::ToolManagerUsingIGSTK::create();
 	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
 
-	foreach(QString filename, config->getAbsoluteFilePathToAllTools())
+	foreach(QString filename, config->getAllTools())
 	{
 		INFO("Tool file is faulty: " + filename.toStdString());
 		REQUIRE(config->verifyTool(filename));

@@ -31,12 +31,13 @@ public:
 
 	virtual QStringList getToolsGivenFilter(QStringList applicationsFilter,
 											QStringList trackingsystemsFilter);
-	virtual QString getToolName(QString uid);
-	virtual QString getToolTrackingSystem(QString uid);
-	virtual QString getToolPictureFilename(QString uid);
 	virtual Tool getTool(QString uid);
-	virtual QStringList getAbsoluteFilePathToAllTools();
 	virtual bool verifyTool(QString uid);
+
+	virtual QString getConfigurationApplicationsPath(QString application);
+	virtual QStringList getConfigurationsGivenApplication(QString application);
+	virtual QStringList getAllConfigurations();
+	virtual QStringList getAllTools();
 
 private:
 	QStringList filter(QStringList toolsToFilter, QStringList applicationsFilter,

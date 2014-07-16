@@ -124,10 +124,8 @@ QString ToolConfigureGroupBox::requestSaveConfigurationSlot()
   TrackerConfiguration::Configuration current = this->getCurrentConfiguration();
   TrackerConfigurationPtr config = toolManager()->getConfiguration();
   config->saveConfiguration(current);
-//  ConfigurationFileParser::Configuration config = this->getCurrentConfiguration();
-//  ConfigurationFileParser::saveConfiguration(config);
 
-  retval = current.mFileName;
+  retval = current.mUid;
 
   this->populateConfigurations();
 
@@ -150,6 +148,7 @@ void ToolConfigureGroupBox::configChangedSlot()
 	QString absoluteConfigFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(),
 					Qt::ToolTipRole).toString();
 	bool suggestDefaultNames;
+	TrackerConfigurationPtr config = toolManager()->getConfiguration();
 
 	if (mConfigFilesComboBox->currentText().contains("<new config>"))
 	{
@@ -157,40 +156,19 @@ void ToolConfigureGroupBox::configChangedSlot()
 		selectedTrackingSystems << enum2string(tsPOLARIS); //just want a default
 		suggestDefaultNames = true;
 
-		absoluteConfigFilePath = DataLocations::getRootConfigPath()
-			+"/tool/"
-			+enum2string(mClinicalApplication)
-			+ "/";
+		absoluteConfigFilePath = config->getConfigurationApplicationsPath(enum2string(mClinicalApplication));
 	}
 	else
 	{
-		TrackerConfigurationPtr config = toolManager()->getConfiguration();
 		TrackerConfiguration::Configuration data = config->getConfiguration(absoluteConfigFilePath);
 
 		selectedApplications << data.mClinicalApplication;
 		selectedTrackingSystems << data.mTrackingSystem;
 		selectedTools = data.mTools;
 
-//		ConfigurationFileParser parser(absoluteConfigFilePath);
-
-//		CLINICAL_APPLICATION application = parser.getApplicationapplication();
-//		selectedApplications << enum2string(application);
-
-//		std::vector<IgstkTracker::InternalStructure> trackers = parser.getTrackers();
-//		for (unsigned i = 0; i < trackers.size(); ++i)
-//		{
-//			selectedTrackingSystems << enum2string(trackers[i].mType);
-//		}
-
-//		std::vector<QString> tools = parser.getAbsoluteToolFilePaths();
-//		for (unsigned i = 0; i < tools.size(); ++i)
-//		{
-//			selectedTools << tools[i];
-//		}
 		suggestDefaultNames = false;
 	}
 
-//  std::cout << "absoluteConfigFilePath" << absoluteConfigFilePath << std::endl;
 	QFile file(absoluteConfigFilePath);
 	QFileInfo info(file);
 	QString filePath = info.path();
@@ -247,23 +225,16 @@ void ToolConfigureGroupBox::populateConfigurations()
 {
   mConfigFilesComboBox->clear();
 
-  QDir dir(DataLocations::getRootConfigPath()+"/tool/"+enum2string(mClinicalApplication));
-  dir.setFilter(QDir::Files);
+  TrackerConfigurationPtr config = toolManager()->getConfiguration();
+  QStringList configurations = config->getConfigurationsGivenApplication(enum2string(mClinicalApplication));
 
-  QStringList nameFilters;
-  nameFilters << "*.xml";
-  dir.setNameFilters(nameFilters);
-
-  QString newConfig("<new config>");
-	this->addConfigurationToComboBox(newConfig, this->generateConfigName());
-
-  QStringList configlist = dir.entryList();
-  foreach(QString filename, configlist)
+  foreach(QString filename, configurations)
   {
-    QFile file(dir.absolutePath()+"/"+filename);
-    QFileInfo info(file);
-		this->addConfigurationToComboBox(filename, info.absoluteFilePath());
+	  TrackerConfiguration::Configuration configuration = config->getConfiguration(filename);
+	  this->addConfigurationToComboBox(configuration.mName, configuration.mUid);
   }
+	QString newConfig("<new config>");
+	this->addConfigurationToComboBox(newConfig, this->generateConfigName());
 
   int currentIndex = mConfigFilesComboBox->findText(newConfig);
   mConfigFilesComboBox->setCurrentIndex(currentIndex);
@@ -282,11 +253,9 @@ int ToolConfigureGroupBox::addConfigurationToComboBox(QString displayName, QStri
 void ToolConfigureGroupBox::setState(QComboBox* box, int index, bool edited)
 {
   box->setItemData(index, edited, sEdited);
-//  std::cout << "Config file " << box->itemText(index) << " now is set as " << (edited ? "" : "un") << "edited." << std::endl;
 
   if(edited && !mConfigFilePathLineEdit->property("userEdited").toBool() && !mConfigFileLineEdit->property("userEdited").toBool())
   {
-//    std::cout << "Generating name..." << std::endl;
     QString absoluteConfigPaht = this->generateConfigName();
     QFile file(absoluteConfigPaht);
     QFileInfo info(file);
@@ -303,56 +272,27 @@ TrackerConfiguration::Configuration ToolConfigureGroupBox::getCurrentConfigurati
   TrackerConfiguration::Configuration retval;
   QString filename = mConfigFileLineEdit->text();
   QString filepath = mConfigFilePathLineEdit->text();
-  retval.mFileName = filepath+"/"+filename;
-//  retval.mClinical_app = string2enum<CLINICAL_APPLICATION>(mApplicationGroupBox->getSelected()[0]);
+  retval.mUid = filepath+"/"+filename;
   retval.mClinicalApplication = mApplicationGroupBox->getSelected()[0];
   retval.mTrackingSystem = mTrackingSystemGroupBox->getSelected()[0];
   retval.mTools = mToolListWidget->getTools();
   retval.mReferenceTool = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
-
-//  QStringList selectedTools = mToolListWidget->getTools();
-//  QString referencePath = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
-
-//  TRACKING_SYSTEM selectedTracker = string2enum<TRACKING_SYSTEM>(mTrackingSystemGroupBox->getSelected()[0]);
-
-//  ConfigurationFileParser::ToolFilesAndReferenceVector toolfilesAndRefVector;
-//  QFile configFile(retval.mFileName);
-//  QFileInfo info(configFile);
-//  QDir dir = info.dir();
-//  foreach(QString absoluteToolPath, selectedTools)
-//  {
-//    QString relativeToolFilePath = dir.relativeFilePath(absoluteToolPath);
-////    std::cout << "Relative tool file path: " << relativeToolFilePath << std::endl;
-
-//    ConfigurationFileParser::ToolFileAndReference tool;
-//    tool.first = relativeToolFilePath;
-
-////    std::cout << "====" << std::endl;
-////    std::cout << "absoluteToolPath " << absoluteToolPath << std::endl;
-////    std::cout << "referencePath " << referencePath << std::endl;
-//    tool.second = (absoluteToolPath == referencePath);
-//    toolfilesAndRefVector.push_back(tool);
-//  }
-
-//  retval.mTrackersAndTools[selectedTracker] = toolfilesAndRefVector;
 
   return retval;
 }
 
 QString ToolConfigureGroupBox::generateConfigName()
 {
-  QString retval;
 	QStringList applicationFilter = mApplicationGroupBox->getSelected();
-	QString absoluteDirPath;
-  absoluteDirPath = DataLocations::getRootConfigPath()+"/tool/"+((applicationFilter.size() >= 1) ? applicationFilter[0]+"/" : "")+""; //a config can only belong to one application
-	retval = absoluteDirPath+"MyConfig.xml";
-  return retval;
+	QString app = ((applicationFilter.size() >= 1) ? applicationFilter[0] : "");
+	TrackerConfigurationPtr config = toolManager()->getConfiguration();
+	QString root = config->getConfigurationApplicationsPath(app);
+	return root + "/MyConfig.xml";
 }
 
 
 void ToolConfigureGroupBox::setState(QLineEdit* line, bool userEdited)
 {
-//  std::cout << "line set to " << (userEdited ? "edited (should not generate new names from now)" : "not editet (generate from now)") << std::endl;
   QVariant value(userEdited);
   line->setProperty("userEdited", value);
 }
@@ -370,28 +310,17 @@ void ToolConfigureGroupBox::populateReference()
 	foreach(QString string, selectedTools)
 	{
 		if (config->getTool(string).mIsReference)
-//		ToolFileParser parser(string);
-//		IgstkTool::InternalStructure internal = parser.getTool();
-//		if (internal.mIsReference)
-		{
 			currentIndex = this->addRefrenceToComboBox(string);
-		}
 	}
 
 	// look for a selected reference
 	QString configAbsoluteFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
-//	ConfigurationFileParser parser(configAbsoluteFilePath);
-//	QString reference = parser.getAbsoluteReferenceFilePath();
 	QString reference = config->getConfiguration(configAbsoluteFilePath).mReferenceTool;
 	currentIndex = this->addRefrenceToComboBox(reference);
 
 	// always select a reference if available:
 	if (currentIndex<0)
 		currentIndex = 0;
-
-//	// if new: select the first one anyway
-//	if (mConfigFilesComboBox->currentText().contains("<new config>") && (currentIndex==-1))
-//		currentIndex = 0;
 
 	mReferenceComboBox->setCurrentIndex(currentIndex);
 }

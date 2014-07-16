@@ -106,28 +106,47 @@ QStringList DataLocations::getDefaultPluginsPath()
 
 QString DataLocations::getRootConfigPath()
 {
+	QStringList paths = getRootConfigPaths();
+	if (paths.empty())
+		return "";
+	return paths.front();
+}
+
+QStringList DataLocations::getRootConfigPaths()
+{
   QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED; // look for installed location
   if (QDir(path).exists())
-    return path;
+    return QStringList() << path;
 
+  QStringList retval;
   if (QDir(CX_CONFIG_ROOT).exists()) // look for folder in source code
-    return CX_CONFIG_ROOT;
+    retval << CX_CONFIG_ROOT;
+  if (QDir(CX__OPTIONAL_CONFIG_ROOT).exists()) // look for folder in source code
+    retval << CX__OPTIONAL_CONFIG_ROOT;
 
-  return "";
+  return retval;
 }
 
-QString DataLocations::getToolsPath()
+QStringList DataLocations::appendStringToAllElements(QStringList root, QString suffix)
 {
-  QString path(getRootConfigPath()+"/tool/Tools/");
-  return path;
+	QStringList retval;
+	for (int i=0; i<root.size(); ++i)
+		retval << root[i] + suffix;
+	return retval;
+}
+
+QStringList DataLocations::getToolsPaths()
+{
+	QString suffix("/tool/Tools/");
+	QStringList root = getRootConfigPaths();
+	return appendStringToAllElements(root, "/tool/Tools/");
 }
   
-QString DataLocations::getApplicationToolConfigPath()
+QStringList DataLocations::getApplicationToolConfigPaths()
 {
-  QString path(getRootConfigPath()+"/tool/" +
-               settings()->value("globalApplicationName").toString());
-  //std::cout << "getApplicationToolConfigPath: " << path.toStdString() << std::endl;
-  return path;
+	QString suffix("/tool/" + settings()->value("globalApplicationName").toString());
+	QStringList root = getRootConfigPaths();
+	return appendStringToAllElements(root, suffix);
 }
   
 QString DataLocations::getToolConfigFilePath()

@@ -18,6 +18,10 @@ endif (APPLE)
 
 # location of configuration files during development (in the source tree)
 set (CX_CONFIG_ROOT ${CustusX_SOURCE_DIR}/config)
+# hack: the internal project CustusXSetup need a way to inject its own config for use 
+# when running from build location. This might be interesting for others as well. 
+# TODO: generalize.
+set (CX__OPTIONAL_CONFIG_ROOT ${CustusX_SOURCE_DIR}/../../CustusXSetup/CustusXSetup/config)
 
 set (CX_DATA_ROOT ${CustusX_SOURCE_DIR}/data CACHE PATH "path to CustusX data root")
 

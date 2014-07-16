@@ -34,7 +34,8 @@ class TrackerConfiguration
 public:
 	struct Configuration
 	{
-		QString mFileName; ///< absolute path and filename for the new config file
+		QString mUid; ///< absolute path and filename for the new config file
+		QString mName;
 		QString mClinicalApplication;
 		QString mTrackingSystem;
 		QStringList mTools;
@@ -51,16 +52,18 @@ public:
 
 	virtual ~TrackerConfiguration() {}
 
+	virtual QString getConfigurationApplicationsPath(QString application) = 0;
 	virtual void saveConfiguration(const Configuration& config) = 0;
 	virtual Configuration getConfiguration(QString uid) = 0;
 
+	virtual QStringList getConfigurationsGivenApplication(QString application) = 0;
+	virtual QStringList getAllConfigurations() = 0;
+
 	virtual QStringList getToolsGivenFilter(QStringList applicationsFilter,
 											QStringList trackingsystemsFilter) = 0;
-	virtual QString getToolName(QString uid) = 0;
-	virtual QString getToolTrackingSystem(QString uid) = 0;
-	virtual QString getToolPictureFilename(QString uid) = 0;
+	virtual QStringList getAllTools() = 0;
+
 	virtual Tool getTool(QString uid) = 0;
-	virtual QStringList getAbsoluteFilePathToAllTools() = 0;
 	virtual bool verifyTool(QString uid) = 0;
 };
 

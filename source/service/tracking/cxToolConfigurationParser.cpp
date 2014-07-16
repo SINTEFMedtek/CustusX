@@ -150,7 +150,7 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 		for (; it2 != it1->second.end(); ++it2)
 		{
 			QString relativeToolFilePath = it2->first;
-//      std::cout << "relativeToolFilePath" << relativeToolFilePath << std::endl;
+			//std::cout << "relativeToolFilePath" << relativeToolFilePath << std::endl;
 
 			QFileInfo configFileInfo(config.mFileName);
 			const QDir configDir(configFileInfo.absolutePath());
@@ -159,14 +159,13 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 			const QDir toolFileDir(toolFileInfo.absolutePath());
 
 			QString absoluteToolFilePath = toolFileDir.absoluteFilePath(toolFileInfo.fileName());
-//      std::cout << "absoluteToolFilePath " << absoluteToolFilePath << std::endl;
+			//      std::cout << "absoluteToolFilePath " << absoluteToolFilePath << std::endl;
 			ToolFileParser toolparser(absoluteToolFilePath);
 			QString toolTrackerType = enum2string(toolparser.getTool().mTrackerType);
-//      std::cout << "toolTrackerType " << toolTrackerType << " trackerType " << trackerType << std::endl;
+			//      std::cout << "toolTrackerType " << toolTrackerType << " trackerType " << trackerType << std::endl;
 			if (!trackerType.contains(enum2string(toolparser.getTool().mTrackerType), Qt::CaseInsensitive))
 			{
-				reportWarning(
-								"When saving configuration, skipping tool " + relativeToolFilePath + " of type "
+				reportWarning("When saving configuration, skipping tool " + relativeToolFilePath + " of type "
 												+ toolTrackerType + " because tracker is set to " + trackerType);
 				continue;
 			}
@@ -187,6 +186,8 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 
 	//write to file
 	QFile file(config.mFileName);
+	QDir().mkpath(QFileInfo(config.mFileName).absolutePath());
+
 	if (!file.open(QIODevice::WriteOnly))
 	{
 		reportWarning("Could not open file " + file.fileName() + ", aborting writing of config.");
@@ -225,48 +226,38 @@ bool ConfigurationFileParser::isConfigFileValid()
 	return true;
 }
 
+QString ConfigurationFileParser::findXmlFileWithDirNameInPath(QString path)
+{
+	QDir dir(path);
+	QStringList filter;
+	filter << dir.dirName() + ".xml";
+	QStringList filepaths = dir.entryList(filter);
+	if (!filepaths.isEmpty())
+		return dir.absoluteFilePath(filter[0]);
+	return "";
+}
+
 QString ConfigurationFileParser::getAbsoluteToolFilePath(QDomElement toolfileelement)
 {
 	QString absoluteToolFilePath;
 
 	QFile configFile(mConfigurationFilePath);
 	QDir configDir = QFileInfo(configFile).dir();
-//  std::cout << "configDir.absolutePath(): " << configDir.absolutePath() << std::endl;
 
 	QString relativeToolFilePath = toolfileelement.text();
-//  std::cout << "relativeToolFilePath " << relativeToolFilePath << std::endl;
 	if (relativeToolFilePath.isEmpty())
-		return absoluteToolFilePath;
+		return "";
 
-//  configDir.cd(relativeToolFilePath);
-//  QFile file((configDir.absolutePath()+"/"+relativeToolFilePath));
 	QFile file(configDir.absoluteFilePath(relativeToolFilePath));
 	if (!file.exists())
-	{
-		reportError(
-						"Tool file " + file.fileName() + " in configuration " + mConfigurationFilePath
-										+ " does not exists. Skipping.");
-	}
-	QFileInfo info(file);
-	if (info.isDir())
-	{
-//    std::cout << "IS DIR: " << absoluteToolFilePath << std::endl;
-		QDir dir(info.absoluteFilePath());
-		QStringList filter;
-		filter << dir.dirName() + ".xml";
-		QStringList filepaths = dir.entryList(filter);
-		if (!filepaths.isEmpty())
-			absoluteToolFilePath = dir.absoluteFilePath(filter[0]);
-//    else
-//      std::cout << "Found no files ending with xml in dir " << dir.absolutePath() << " filter is "<< filter[0] << std::endl;
-	}
-	else
-	{
-		absoluteToolFilePath = info.absoluteFilePath();
-//    std::cout << "IS FILE: "<< absoluteToolFilePath << std::endl;
-	}
+		reportError("Tool file " + file.fileName() + " in configuration " + mConfigurationFilePath
+					+ " does not exists. Skipping.");
 
-//  std::cout << "Found toolfile " << absoluteToolFilePath << std::endl;
+	QFileInfo info(file);
+	absoluteToolFilePath = info.absoluteFilePath();
+	if (info.isDir())
+		absoluteToolFilePath = this->findXmlFileWithDirNameInPath(absoluteToolFilePath);
+
 	return absoluteToolFilePath;
 }
 //----------------------------------------------------------------------------------------------------------------------

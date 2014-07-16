@@ -45,7 +45,7 @@ void ToolListWidget::populate(QStringList toolsAbsoluteFilePath)
 void ToolListWidget::addTool(QString absoluteFilePath)
 {
 	TrackerConfigurationPtr config = toolManager()->getConfiguration();
-	QString name = config->getToolName(absoluteFilePath);
+	QString name = config->getTool(absoluteFilePath).mName;
 
 //	QFile file(absoluteFilePath);
 //	QFileInfo info(file);
@@ -202,11 +202,9 @@ void ConfigToolListWidget::filterSlot(QStringList trackingsystemFilter)
 		QListWidgetItem* item = this->item(i);
 		QString absoluteFilePath = item->data(Qt::ToolTipRole).toString();
 
-		QString toolTrackingSystem = config->getToolTrackingSystem(absoluteFilePath);
+		QString toolTrackingSystem = config->getTool(absoluteFilePath).mTrackingSystem;
 
-//		ToolFileParser parser(absoluteFilePath);
 		QBrush brush = item->foreground();
-//		QString toolTrackingSystem = enum2string(parser.getTool().mTrackerType);
 		if (!trackingsystemFilter.contains(toolTrackingSystem, Qt::CaseInsensitive) || !config->verifyTool(absoluteFilePath))
 			brush.setColor(Qt::red);
 		else

@@ -25,12 +25,8 @@ namespace cx
 void TrackerConfigurationImpl::saveConfiguration(const Configuration& config)
 {
 	ConfigurationFileParser::Configuration data;
-	data.mFileName = config.mFileName;
+	data.mFileName = config.mUid;
 	data.mClinical_app = string2enum<CLINICAL_APPLICATION>(config.mClinicalApplication);
-//    retval.mClinicalApplication = mApplicationGroupBox->getSelected()[0];
-//    retval.mTrackingSystem = mTrackingSystemGroupBox->getSelected()[0];
-//    retval.mTools = mToolListWidget->getTools();
-//    retval.mReferenceTool = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
 
 	QStringList selectedTools = config.mTools;
 	QString referencePath = config.mReferenceTool;
@@ -44,14 +40,8 @@ void TrackerConfigurationImpl::saveConfiguration(const Configuration& config)
 	foreach(QString absoluteToolPath, selectedTools)
 	{
 	  QString relativeToolFilePath = dir.relativeFilePath(absoluteToolPath);
-  //    std::cout << "Relative tool file path: " << relativeToolFilePath << std::endl;
-
 	  ConfigurationFileParser::ToolFileAndReference tool;
 	  tool.first = relativeToolFilePath;
-
-  //    std::cout << "====" << std::endl;
-  //    std::cout << "absoluteToolPath " << absoluteToolPath << std::endl;
-  //    std::cout << "referencePath " << referencePath << std::endl;
 	  tool.second = (absoluteToolPath == referencePath);
 	  toolfilesAndRefVector.push_back(tool);
 	}
@@ -66,7 +56,8 @@ TrackerConfigurationImpl::Configuration TrackerConfigurationImpl::getConfigurati
 	ConfigurationFileParser parser(uid);
 
 	Configuration retval;
-	retval.mFileName = uid;
+	retval.mUid = uid;
+	retval.mName = QFileInfo(uid).fileName();
 
 	CLINICAL_APPLICATION application = parser.getApplicationapplication();
 	retval.mClinicalApplication = enum2string(application);
@@ -92,7 +83,7 @@ TrackerConfigurationImpl::Configuration TrackerConfigurationImpl::getConfigurati
 QStringList TrackerConfigurationImpl::getToolsGivenFilter(QStringList applicationsFilter,
 														  QStringList trackingsystemsFilter)
 {
-	QStringList allTools = this->getAbsoluteFilePathToAllTools();
+	QStringList allTools = this->getAllTools();
 	QStringList filteredTools = this->filter(allTools, applicationsFilter, trackingsystemsFilter);
 	return filteredTools;
 }
@@ -117,39 +108,10 @@ TrackerConfigurationImpl::Tool TrackerConfigurationImpl::getTool(QString uid)
 	return retval;
 }
 
-QString TrackerConfigurationImpl::getToolName(QString uid)
-{
-	QString absoluteFilePath = uid;
-	QFile file(absoluteFilePath);
-	QFileInfo info(file);
-	return info.dir().dirName();
-}
-
-QString TrackerConfigurationImpl::getToolTrackingSystem(QString uid)
-{
-	QString absoluteFilePath = uid;
-	ToolFileParser parser(absoluteFilePath);
-	QString toolTrackingSystem = enum2string(parser.getTool().mTrackerType);
-	return toolTrackingSystem;
-}
-
-QString TrackerConfigurationImpl::getToolPictureFilename(QString uid)
-{
-	QString absoluteFilePath = uid;
-	IgstkTool::InternalStructure tool;
-
-	ToolFileParser parser(absoluteFilePath);
-	tool = parser.getTool();
-
-	return tool.mPictureFileName;
-}
-
 QStringList TrackerConfigurationImpl::filter(QStringList toolsToFilter, QStringList applicationsFilter,
 		QStringList trackingsystemsFilter)
 {
 	QStringList retval;
-//	TrackerConfigurationPtr config = toolManager()->getConfiguration();
-//	std::vector<ToolConfigurationPtr> tools = config->getTools();
 
 	foreach(QString toolFilePath, toolsToFilter)
 	{
@@ -193,17 +155,57 @@ IgstkTool::InternalStructure TrackerConfigurationImpl::getToolInternal(QString t
 	return retval;
 }
 
-QStringList TrackerConfigurationImpl::getAbsoluteFilePathToAllTools()
-{
-	bool includeSubDirs = true;
-	QString toolFilePath = cx::DataLocations::getToolsPath();
-	return getAbsolutePathToXmlFiles(toolFilePath, includeSubDirs);
-}
-
 bool TrackerConfigurationImpl::verifyTool(QString uid)
 {
 	IgstkTool::InternalStructure internal = this->getToolInternal(uid);
 	return internal.verify();
+}
+
+QString TrackerConfigurationImpl::getConfigurationApplicationsPath(QString application)
+{
+	QStringList path;
+	path << DataLocations::getRootConfigPath() << "tool" << application;
+	return path.join("/");
+}
+
+QStringList TrackerConfigurationImpl::getConfigurationsGivenApplication(QString application)
+{
+	QStringList retval;
+
+	QStringList configPaths = DataLocations::getRootConfigPaths();
+
+	for (int i=0; i< configPaths.size(); ++i)
+	{
+		QDir dir(configPaths[i]+"/tool/"+application);
+		retval << cx::getAbsolutePathToXmlFiles(dir.absolutePath());
+	}
+	return retval;
+}
+
+QStringList TrackerConfigurationImpl::getAllConfigurations()
+{
+	QStringList retval;
+	QStringList rootPaths = DataLocations::getRootConfigPaths();
+
+	for (int i=0; i< rootPaths.size(); ++i)
+	{
+		QString configFilePath = rootPaths[i] + "/tool/";
+		foreach(QFileInfo dir, cx::getDirs(configFilePath))
+		{
+			retval << cx::getAbsolutePathToXmlFiles(dir.absoluteFilePath());
+		}
+	}
+	return retval;
+}
+
+QStringList TrackerConfigurationImpl::getAllTools()
+{
+	bool includeSubDirs = true;
+	QStringList toolFilePath = cx::DataLocations::getToolsPaths();
+	QStringList retval;
+	for (int i=0; i<toolFilePath.size(); ++i)
+		retval << getAbsolutePathToXmlFiles(toolFilePath[i], includeSubDirs);
+	return retval;
 }
 
 } // namespace cx
