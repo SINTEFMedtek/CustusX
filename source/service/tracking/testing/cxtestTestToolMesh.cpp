@@ -8,12 +8,12 @@ namespace cxtest {
 
 TestToolMesh::TestToolMesh()
 {
-	mToolToolPath = cx::DataLocations::getRootConfigPath()+QString("/tool/Tools/");
 }
 
 void TestToolMesh::setToolPath(QString path)
 {
-	mCurrentToolPath = mToolToolPath + path;
+	mCurrentToolPath = cx::DataLocations::getExistingConfigPath("/tool/Tools/"+path, "unknown");
+//	mCurrentToolPath = mToolToolPath + path;
 }
 
 bool TestToolMesh::canLoadMesh(QString filename)
@@ -28,12 +28,7 @@ bool TestToolMesh::canLoadMesh(QString filename)
 	cx::MeshPtr mesh = cx::Mesh::create("test");
 	success = success && mesh->load(fullFileName);
 
-//	mMesh = mesh;
 	return success;
-
-
-//	mMesh = cx::dataManager()->loadData(mMeshFileName, mMeshFileName);
-//	return (mesh!=NULL && mesh->);
 }
 
 

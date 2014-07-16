@@ -209,9 +209,16 @@ QString DataLocations::getCachePath()
 
 QString DataLocations::getExistingConfigPath(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath)
 {
-	QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED + pathRelativeToConfigRoot; // look for installed location
-	if (QDir(path).exists())
-		return path;
+	foreach (QString root, getRootConfigPaths())
+	{
+		QString path = root + "/" + pathRelativeToConfigRoot;
+		if (QDir(path).exists())
+			return path;
+	}
+
+//	QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED + pathRelativeToConfigRoot; // look for installed location
+//	if (QDir(path).exists())
+//		return path;
 
 	if (QDir(alternativeAbsolutePath).exists())
 		return alternativeAbsolutePath;
