@@ -14,32 +14,32 @@
         <file>icons/preset_save.png</file>
         <file>icons/preset_reset.png</file>
         <file>icons/preset_remove.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/arrow-left-3.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/arrow-right-3.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/arrow-right-double-3.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/dialog-close.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/media-record-3.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/media-playback-stop.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/process-stop-7.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/document-new-8.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/document-import-2.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/document-save-5.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/document-open-7.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/system-run-5.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/edit-delete-2.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/media-playback-start-3.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/media-playback-stop-3.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/media-playback-pause-3.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/media-seek-backward-3.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/media-seek-forward-3.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/edit-undo-8.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/go-down-4.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/tool-animator.png</file>
-        <file>icons/open_icon_library/png/64x64/actions/view-fullscreen-4.png</file>
-        <file>icons/open_icon_library/png/64x64/others/oval_red.png</file>
-        <file>icons/open_icon_library/png/64x64/others/oval_green.png</file>
-        <file>icons/open_icon_library/png/64x64/others/button-red.png</file>
-        <file>icons/open_icon_library/png/64x64/others/button-green.png</file>
+        <file>icons/open_icon_library/arrow-left-3.png</file>
+        <file>icons/open_icon_library/arrow-right-3.png</file>
+        <file>icons/open_icon_library/arrow-right-double-3.png</file>
+        <file>icons/open_icon_library/dialog-close.png</file>
+        <file>icons/open_icon_library/media-record-3.png</file>
+        <file>icons/open_icon_library/media-playback-stop.png</file>
+        <file>icons/open_icon_library/process-stop-7.png</file>
+        <file>icons/open_icon_library/document-new-8.png</file>
+        <file>icons/open_icon_library/document-import-2.png</file>
+        <file>icons/open_icon_library/document-save-5.png</file>
+        <file>icons/open_icon_library/document-open-7.png</file>
+        <file>icons/open_icon_library/system-run-5.png</file>
+        <file>icons/open_icon_library/edit-delete-2.png</file>
+        <file>icons/open_icon_library/media-playback-start-3.png</file>
+        <file>icons/open_icon_library/media-playback-stop-3.png</file>
+        <file>icons/open_icon_library/media-playback-pause-3.png</file>
+        <file>icons/open_icon_library/media-seek-backward-3.png</file>
+        <file>icons/open_icon_library/media-seek-forward-3.png</file>
+        <file>icons/open_icon_library/edit-undo-8.png</file>
+        <file>icons/open_icon_library/go-down-4.png</file>
+        <file>icons/open_icon_library/tool-animator.png</file>
+        <file>icons/open_icon_library/view-fullscreen-4.png</file>
+        <file>icons/open_icon_library/oval_red.png</file>
+        <file>icons/open_icon_library/oval_green.png</file>
+        <file>icons/open_icon_library/button-red.png</file>
+        <file>icons/open_icon_library/button-green.png</file>
         <file>icons/workflow_state_patient_data.png</file>
         <file>icons/workflow_state_planning.png</file>
         <file>icons/workflow_state_registration.png</file>
@@ -84,7 +84,7 @@
         <file>icons/camera-u.png</file>
         <file>icons/camera-n.png</file>
         <file>icons/camera-o.png</file>
-        <file>icons/open_icon_library/png/64x64/others/eye.png.png</file>
+        <file>icons/open_icon_library/eye.png.png</file>
         <file>icons/eye.png</file>
         <file>icons/camera-t.png</file>
         <file>icons/camera-at.png</file>

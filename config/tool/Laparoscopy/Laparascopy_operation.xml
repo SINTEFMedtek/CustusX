@@ -1,8 +1,0 @@
-<?xml version = "1.0"?>
-<configuration clinical_app="Laparoscopy">
-    <tracker type="polaris">
-        <toolfile reference="yes">../Tools/Shared/NDI-Reference-frame_small_POLARIS/NDI_ref_small.xml</toolfile>
-        <toolfile reference="no">../Tools/Shared/NDI-Pointer-8700340_POLARIS/NDI_pnt.xml</toolfile>
-        <toolfile reference="no">../Tools/Shared/NDI-Pointer2_POLARIS/NDI_pnt2.xml</toolfile>
-    </tracker>
-</configuration>
