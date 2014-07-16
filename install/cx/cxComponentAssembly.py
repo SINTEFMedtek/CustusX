@@ -33,6 +33,7 @@ class LibraryAssembly(object):
         self.controlData = cxInstallData.Common()
         self.libraries = []
 
+        self.addComponent(cxComponents.Eigen())
         self.addComponent(cxComponents.ITK())
         self.addComponent(cxComponents.VTK())
         self.addComponent(cxComponents.OpenCV())
