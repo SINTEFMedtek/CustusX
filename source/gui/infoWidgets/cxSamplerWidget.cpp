@@ -47,7 +47,7 @@ SamplerWidget::SamplerWidget(QWidget* parent) :
 	mLayout->setSpacing(4);
 
 	mAdvancedAction = this->createAction(this,
-	                                     QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
+	                                     QIcon(":/icons/open_icon_library/system-run-5.png"),
 	                                     "Details",
 	                                     "Show Advanced options",
 	                                     SLOT(toggleAdvancedSlot()),

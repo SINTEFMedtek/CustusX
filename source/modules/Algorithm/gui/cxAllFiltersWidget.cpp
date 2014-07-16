@@ -68,7 +68,7 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
 
 	//Add detailed button
 	QAction* detailsAction = this->createAction(this,
-		  QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
+		  QIcon(":/icons/open_icon_library/system-run-5.png"),
 		  "Details", "Show Details",
 		  SLOT(toggleDetailsSlot()),
 		  NULL);
@@ -81,7 +81,7 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
 
 	//Add run button
 	QAction* runAction = this->createAction(this,
-	                                        QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"),
+	                                        QIcon(":/icons/open_icon_library/arrow-right-3.png"),
 	                                        "Run Filter", "",
 	                                        SLOT(runFilterSlot()),
 	                                        NULL);

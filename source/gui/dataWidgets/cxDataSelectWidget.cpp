@@ -40,7 +40,7 @@ DataSelectWidget::DataSelectWidget(QWidget* parent, SelectDataStringDataAdapterB
 	QWidget* dataAdapter = sscCreateDataWidget(this, mData, gridLayout, row);
 
     mToggleShowAction = this->createAction(this,
-                    QIcon(":/icons/open_icon_library/png/64x64/others/eye.png.png"),
+                    QIcon(":/icons/open_icon_library/eye.png.png"),
                     "Toggle show data in view", "",
                     SLOT(toggleShowData()),
                     NULL);
@@ -166,7 +166,7 @@ void DataSelectWidget::setRemoveIcon()
     }
     else
     {
-        mRemoveAction->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/edit-delete-2.png"));
+        mRemoveAction->setIcon(QIcon(":/icons/open_icon_library/edit-delete-2.png"));
     }
 }
 
@@ -174,7 +174,7 @@ void DataSelectWidget::setShowIcon()
 {
     if (mToggleShowAction->isChecked())
     {
-        mToggleShowAction->setIcon(QIcon(":/icons/open_icon_library/png/64x64/others/eye.png.png"));
+        mToggleShowAction->setIcon(QIcon(":/icons/open_icon_library/eye.png.png"));
     }
     else
     {

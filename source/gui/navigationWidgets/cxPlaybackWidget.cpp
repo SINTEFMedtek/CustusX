@@ -64,32 +64,32 @@ PlaybackWidget::PlaybackWidget(QWidget* parent) :
 	topLayout->addLayout(playButtonsLayout);
 
 	mOpenAction = this->createAction(this,
-	        		QIcon(":/icons/open_icon_library/png/64x64/others/button-red.png"),
+	        		QIcon(":/icons/open_icon_library/button-red.png"),
 					"Open Playback", "",
 	                SLOT(toggleOpenSlot()),
 	                playButtonsLayout);
 	this->createAction(this,
-	                QIcon(":/icons/open_icon_library/png/64x64/actions/media-seek-backward-3.png"),
+	                QIcon(":/icons/open_icon_library/media-seek-backward-3.png"),
 					"Rewind", "",
 	                SLOT(rewindSlot()),
 	                playButtonsLayout);
 	mPlayAction = this->createAction(this,
-	                QIcon(":/icons/open_icon_library/png/64x64/actions/media-playback-start-3.png"),
+	                QIcon(":/icons/open_icon_library/media-playback-start-3.png"),
 					"Play", "",
 	                SLOT(playSlot()),
 	                playButtonsLayout);
 	this->createAction(this,
-	                QIcon(":/icons/open_icon_library/png/64x64/actions/media-seek-forward-3.png"),
+	                QIcon(":/icons/open_icon_library/media-seek-forward-3.png"),
 					"Forward", "",
 	                SLOT(forwardSlot()),
 	                playButtonsLayout);
 	this->createAction(this,
-	                QIcon(":/icons/open_icon_library/png/64x64/actions/media-playback-stop-3.png"),
+	                QIcon(":/icons/open_icon_library/media-playback-stop-3.png"),
 					"Stop", "",
 	                SLOT(stopSlot()),
 	                playButtonsLayout);
 	this->createAction(this,
-	      QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
+	      QIcon(":/icons/open_icon_library/system-run-5.png"),
 	      "Details", "Details",
 	      SLOT(toggleDetailsSlot()),
 	      playButtonsLayout);
@@ -316,12 +316,12 @@ void PlaybackWidget::toolManagerInitializedSlot()
 	if (toolManager()->isPlaybackMode())
 	{
 		mOpenAction->setText("Close Playback");
-		mOpenAction->setIcon(QIcon(":/icons/open_icon_library/png/64x64/others/button-green.png"));
+		mOpenAction->setIcon(QIcon(":/icons/open_icon_library/button-green.png"));
 	}
 	else
 	{
 		mOpenAction->setText("Open Playback");
-		mOpenAction->setIcon(QIcon(":/icons/open_icon_library/png/64x64/others/button-red.png"));
+		mOpenAction->setIcon(QIcon(":/icons/open_icon_library/button-red.png"));
 		return;
 	}
 
@@ -405,12 +405,12 @@ void PlaybackWidget::timeChangedSlot()
 
 	if (mTimer->isPlaying())
 	{
-		mPlayAction->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-playback-pause-3.png"));
+		mPlayAction->setIcon(QIcon(":/icons/open_icon_library/media-playback-pause-3.png"));
 		mPlayAction->setText("Pause");
 	}
 	else
 	{
-		mPlayAction->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-playback-start-3.png"));
+		mPlayAction->setIcon(QIcon(":/icons/open_icon_library/media-playback-start-3.png"));
 		mPlayAction->setText("Play");
 	}
 

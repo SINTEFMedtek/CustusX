@@ -17,8 +17,8 @@ RecordSessionWidget::RecordSessionWidget(AcquisitionPtr base, QWidget* parent, Q
     BaseWidget(parent, "RecordSessionWidget", "Record Session"),
     mBase(base),
     mInfoLabel(new QLabel("")),
-    mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/png/64x64/actions/media-record-3.png"), "Start")),
-    mCancelButton(new QPushButton(QIcon(":/icons/open_icon_library/png/64x64/actions/process-stop-7.png"), "Cancel")),
+    mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/media-record-3.png"), "Start")),
+    mCancelButton(new QPushButton(QIcon(":/icons/open_icon_library/process-stop-7.png"), "Cancel")),
     mDescriptionLine(new QLineEdit(defaultDescription))
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
@@ -95,21 +95,21 @@ void RecordSessionWidget::recordStateChangedSlot()
 	case Acquisition::sRUNNING :
 	    mStartStopButton->setChecked(true);
 		mStartStopButton->setText("Stop");
-		mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-playback-stop.png"));
+		mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/media-playback-stop.png"));
 	    mStartStopButton->setEnabled(true);
 	    mCancelButton->setEnabled(true);
 		break;
 	case Acquisition::sNOT_RUNNING :
 	    mStartStopButton->setChecked(false);
 		mStartStopButton->setText("Start");
-		mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-record-3.png"));
+		mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/media-record-3.png"));
 	    mStartStopButton->setEnabled(true);
 		mCancelButton->setEnabled(false);
 		break;
 	case Acquisition::sPOST_PROCESSING :
 	    mStartStopButton->setChecked(false);
 		mStartStopButton->setText("Processing...");
-	    mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-record-3.png"));
+	    mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/media-record-3.png"));
 	    mStartStopButton->setEnabled(false);
 	    mCancelButton->setEnabled(false);
 		break;

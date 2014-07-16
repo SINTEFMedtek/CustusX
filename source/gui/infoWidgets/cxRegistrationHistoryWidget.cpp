@@ -66,18 +66,18 @@ QString RegistrationHistoryWidget::defaultWhatsThis() const
 
 void RegistrationHistoryWidget::createControls(QHBoxLayout* layout)
 {
-	mRemoveAction = this->createAction(layout, ":/icons/open_icon_library/png/64x64/actions/dialog-close.png", "Remove",
+	mRemoveAction = this->createAction(layout, ":/icons/open_icon_library/dialog-close.png", "Remove",
 			"Delete all registrations after the active time", SLOT(removeSlot()));
 
 	mBehindLabel = new QLabel(this);
 	mBehindLabel->setToolTip("Number of registrations before the active time");
 	layout->addWidget(mBehindLabel);
 
-	mRewindAction = this->createAction(layout, ":/icons/open_icon_library/png/64x64/actions/arrow-left-3.png", "Rewind",
+	mRewindAction = this->createAction(layout, ":/icons/open_icon_library/arrow-left-3.png", "Rewind",
 					"One step back in registration history, changing active time.\nThis enables looking at a previous system state,\nbut take care to not add more registrations while this state.",
 					SLOT(rewindSlot()));
 
-	mForwardAction = this->createAction(layout, ":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png",
+	mForwardAction = this->createAction(layout, ":/icons/open_icon_library/arrow-right-3.png",
 			"Rewind", "One step forward in registration history", SLOT(forwardSlot()));
 
 	mInFrontLabel = new QLabel(this);
@@ -85,7 +85,7 @@ void RegistrationHistoryWidget::createControls(QHBoxLayout* layout)
 	layout->addWidget(mInFrontLabel);
 
 	mFastForwardAction = this->createAction(layout,
-			":/icons/open_icon_library/png/64x64/actions/arrow-right-double-3.png", "Fast Forward",
+			":/icons/open_icon_library/arrow-right-double-3.png", "Fast Forward",
 			"Step to latest registration", SLOT(fastForwardSlot()));
 }
 
