@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<!-- Tool -->
+<!-- ==== -->
+<tool>
+  <type>pointer</type>
+  <id>8700340</id>
+  <name>NDI pointer 8700340</name>
+  <description>Unsteril pointer</description>
+  <manufacturer>NDI</manufacturer>
+  <clinical_app>Laboratory Laparoscopy</clinical_app>
+  <geo_file></geo_file>
+  <pic_file>NDI-Pointer-8700340_POLARIS.png</pic_file>
+  <doc_file></doc_file>  
+
+  <!-- Instrument -->
+  <instrument>
+    <type>pointer</type>
+    <id></id>
+    <name></name>
+    <manufacturer>NDI</manufacturer>
+    <description></description>
+  </instrument>
+
+  <!-- Sensor -->
+  <sensor>
+    <type>Polaris</type>
+    <id>8700340</id>
+    <name>8700340</name>
+    <wireless>yes</wireless>
+    <DOF></DOF>
+    <portnumber></portnumber>
+    <channelnumber></channelnumber>
+    <manufacturer>NDI</manufacturer>
+    <description></description>
+    <rom_file>8700340.rom</rom_file>
+  </sensor>
+
+  <!-- Calibration -->
+  <calibration>
+    <cal_file>8700340.cal</cal_file>
+  </calibration>
+</tool>

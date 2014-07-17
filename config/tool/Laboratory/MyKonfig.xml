@@ -1,0 +1,10 @@
+<?xml version = "1.0"?>
+<configuration clinical_app="Laboratory">
+    <tracker type="polaris">
+        <toolfile reference="no">../Tools/Shared/NDI-Pointer-8700340_POLARIS/NDI_pnt.xml</toolfile>
+        <toolfile reference="yes">../Tools/Shared/NDI-Reference-frame_small_POLARIS/NDI_ref_small.xml</toolfile>
+        <toolfile reference="no">../Tools/Laboratory/SW-Pointer-07-081-0229_POLARIS/SW_nav_I.xml</toolfile>
+        <toolfile reference="no">../Tools/Shared/M12L-Probe-8700449_Vivid7-Karkirurgen_POLARIS/Vivid7_prb_M12L.xml</toolfile>
+        <toolfile reference="no">../Tools/Laboratory/SW-Pointer-07-241-1224_POLARIS/SW_nav_I.xml</toolfile>
+    </tracker>
+</configuration>

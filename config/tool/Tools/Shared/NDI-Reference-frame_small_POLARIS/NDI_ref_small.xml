@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<!-- Tool -->
+<!-- ==== -->
+<tool>
+  <type>reference</type>
+  <id>REFERENCE_frame_small</id>
+  <name>NDI Reference frame</name>
+  <description>Reference frame</description>
+  <manufacturer>NDI</manufacturer>
+  <clinical_app>Laboratory Laparoscopy</clinical_app>
+  <geo_file></geo_file>
+  <pic_file></pic_file>
+  <doc_file></doc_file>  
+
+  <!-- Instrument -->
+  <instrument>
+    <type></type>
+    <id></id>
+    <name></name>
+    <manufacturer></manufacturer>
+    <description></description>
+  </instrument>
+
+  <!-- Sensor -->
+  <sensor>
+    <type>Polaris</type>
+    <id>REFERENCE_frame_small</id>
+    <name>REFERENCE_frame_small</name>
+    <wireless>yes</wireless>
+    <DOF></DOF>
+    <portnumber></portnumber>
+    <channelnumber></channelnumber>
+    <manufacturer>NDI</manufacturer>
+    <description></description>
+    <rom_file>8700339.rom</rom_file>
+  </sensor>
+
+  <!-- Calibration -->
+  <calibration>
+    <cal_file></cal_file>
+  </calibration>
+</tool>
