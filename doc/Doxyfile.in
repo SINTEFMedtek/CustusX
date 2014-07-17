@@ -31,7 +31,7 @@ PROJECT_NAME           = CustusX
 # This could be handy for archiving the generated documentation or 
 # if some version control system is used.
 
-PROJECT_NUMBER         = @CustusX3_VERSION_MAJOR@.@CustusX3_VERSION_MINOR@.@CustusX3_VERSION_PATCH@
+PROJECT_NUMBER         = @CustusX_VERSION_STRING@
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description 
 # for a project that appears at the top of each page and should give viewer 
@@ -44,14 +44,14 @@ PROJECT_BRIEF          = "An IGT application"
 # exceed 55 pixels and the maximum width should not exceed 200 pixels. 
 # Doxygen will copy the logo to the output directory.
 
-PROJECT_LOGO           = @CustusX3_SOURCE_DIR@/source/gui/icons/CustusX_64x64.png
+PROJECT_LOGO           = @CustusX_SOURCE_DIR@/source/gui/icons/CustusX_64x64.png
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) 
 # base path where the generated documentation will be put. 
 # If a relative path is entered, it will be relative to the location 
 # where doxygen was started. If left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = @CustusX3_BINARY_DIR@/doc/doxygen
+OUTPUT_DIRECTORY       = @CustusX_BINARY_DIR@/doc/doxygen
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 
 # 4096 sub-directories (in 2 levels) under the output directory of each output 
@@ -619,7 +619,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = @CustusX3_SOURCE_DIR@
+INPUT                  = @CustusX_SOURCE_DIR@
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
@@ -680,14 +680,14 @@ RECURSIVE              = YES
 # excluded from the INPUT source files. This way you can easily exclude a 
 # subdirectory from a directory tree whose root is specified with the INPUT tag.
 
-EXCLUDE                = @CustusX3_SOURCE_DIR@/testing \
-                         @CustusX3_SOURCE_DIR@/config \
-                         @CustusX3_SOURCE_DIR@/data \
-                         @CustusX3_SOURCE_DIR@/install \
-                         @CustusX3_SOURCE_DIR@/modules \
-                         @CustusX3_SOURCE_DIR@/tools \
-                         @CustusX3_SOURCE_DIR@/source/resource/ssc_not_in_use \
-                         @CustusX3_SOURCE_DIR@/source/ThirdParty \
+EXCLUDE                = @CustusX_SOURCE_DIR@/testing \
+                         @CustusX_SOURCE_DIR@/config \
+                         @CustusX_SOURCE_DIR@/data \
+                         @CustusX_SOURCE_DIR@/install \
+                         @CustusX_SOURCE_DIR@/modules \
+                         @CustusX_SOURCE_DIR@/tools \
+                         @CustusX_SOURCE_DIR@/source/resource/ssc_not_in_use \
+                         @CustusX_SOURCE_DIR@/source/ThirdParty \
 
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or 
@@ -737,7 +737,7 @@ EXAMPLE_RECURSIVE      = NO
 # directories that contain image that are included in the documentation (see 
 # the \image command).
 
-IMAGE_PATH             = @CustusX3_SOURCE_DIR@/doc/doxygen/images
+IMAGE_PATH             = @CustusX_SOURCE_DIR@/doc/doxygen/images
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should 
 # invoke to filter for each input file. Doxygen will invoke the filter program 
@@ -912,7 +912,7 @@ HTML_STYLESHEET        =
 # the files will be copied as-is; there are no commands or markers available.
 
 # The code standard is linked to from the main page.
-HTML_EXTRA_FILES       = @CustusX3_SOURCE_DIR@/doc/cx_code_standard.pdf
+HTML_EXTRA_FILES       = @CustusX_SOURCE_DIR@/doc/cx_code_standard.pdf
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. 
 # Doxygen will adjust the colors in the stylesheet and background images 
