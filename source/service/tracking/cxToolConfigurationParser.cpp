@@ -83,6 +83,9 @@ std::vector<IgstkTracker::InternalStructure> ConfigurationFileParser::getTracker
 
 std::vector<QString> ConfigurationFileParser::getAbsoluteToolFilePaths()
 {
+//	std::cout << "*******************************************************" << std::endl;
+//	std::cout << "*** ConfigurationFileParser::getAbsoluteToolFilePaths()" << std::endl;
+//	std::cout << "*******************************************************" << std::endl;
 	std::vector<QString> retval;
 
 	if (!this->isConfigFileValid())
@@ -131,6 +134,28 @@ QString ConfigurationFileParser::getTemplatesAbsoluteFilePath()
 	return retval;
 }
 
+QString ConfigurationFileParser::convertToRelativeToolFilePath(QString configFilename, QString absoluteToolFilePath)
+{
+	QDir configDir = QFileInfo(configFilename).dir();
+	std::map<int, QString> candicates;
+
+	foreach (QString configroot, DataLocations::getRootConfigPaths())
+	{
+		QString relConfigPath = QDir(configroot).relativeFilePath(configDir.path());
+
+		foreach (QString configroot2, DataLocations::getRootConfigPaths())
+		{
+			QString absConfigPath = configroot2 + "/" + relConfigPath;
+			QString relToolFilePath = QDir(absConfigPath).relativeFilePath(absoluteToolFilePath);
+			relToolFilePath = compactVirtualPath(relToolFilePath);
+			candicates[relToolFilePath.size()] = relToolFilePath;
+		}
+	}
+
+	// return smallest result
+	return candicates.begin()->second;
+}
+
 void ConfigurationFileParser::saveConfiguration(Configuration& config)
 {
 	QDomDocument doc;
@@ -149,16 +174,18 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 		ToolFilesAndReferenceVector::iterator it2 = it1->second.begin();
 		for (; it2 != it1->second.end(); ++it2)
 		{
-			QString relativeToolFilePath = it2->first;
+			QString absoluteToolFilePath = it2->first;
+//			QString relativeToolFilePath = it2->first;
 			//std::cout << "relativeToolFilePath" << relativeToolFilePath << std::endl;
+			QString relativeToolFilePath = convertToRelativeToolFilePath(config.mFileName, absoluteToolFilePath);
 
-			QFileInfo configFileInfo(config.mFileName);
-			const QDir configDir(configFileInfo.absolutePath());
+//			QFileInfo configFileInfo(config.mFileName);
+//			const QDir configDir(configFileInfo.absolutePath());
 
-			QFileInfo toolFileInfo(configDir, relativeToolFilePath);
-			const QDir toolFileDir(toolFileInfo.absolutePath());
+//			QFileInfo toolFileInfo(configDir, relativeToolFilePath);
+//			const QDir toolFileDir(toolFileInfo.absolutePath());
 
-			QString absoluteToolFilePath = toolFileDir.absoluteFilePath(toolFileInfo.fileName());
+//			QString absoluteToolFilePath = toolFileDir.absoluteFilePath(toolFileInfo.fileName());
 			//      std::cout << "absoluteToolFilePath " << absoluteToolFilePath << std::endl;
 			ToolFileParser toolparser(absoluteToolFilePath);
 			QString toolTrackerType = enum2string(toolparser.getTool().mTrackerType);
@@ -171,11 +198,10 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 			}
 
 			QDomElement toolFileNode = doc.createElement("toolfile");
-			toolFileNode.appendChild(
-							doc.createTextNode(
-											toolFileInfo.isDir() ?
-															it2->first :
-															configDir.relativeFilePath(toolFileInfo.filePath())));
+			toolFileNode.appendChild(doc.createTextNode(relativeToolFilePath));
+//											toolFileInfo.isDir() ?
+//															it2->first :
+//															configDir.relativeFilePath(toolFileInfo.filePath())));
 			toolFileNode.setAttribute("reference", (it2->second ? "yes" : "no"));
 			trackerTagNode.appendChild(toolFileNode);
 		}
@@ -237,27 +263,81 @@ QString ConfigurationFileParser::findXmlFileWithDirNameInPath(QString path)
 	return "";
 }
 
+/** Remove ".." elements in filepath, ignoring existence of the input
+  * path. This replaces QFileInfo::canonicalPath(), which requires
+  * all intervening dirs to exist.
+  */
+QString ConfigurationFileParser::compactVirtualPath(QString filepath)
+{
+	// remove ../ elements
+	QStringList elems = filepath.split("/");
+	while (elems.count(".."))
+	{
+		int index = elems.indexOf("..");
+		if (index<=0)
+			break;
+		elems.removeAt(index-1); // remove prefix dir
+		elems.removeAt(index-1); // remove ..
+	}
+	return elems.join("/");
+}
+
+QString ConfigurationFileParser::searchForExistingToolFilePath(QString relativeToolFilePath)
+{
+//	std::cout << "QString ConfigurationFileParser::searchForExistingToolFilePath(QString relativeToolFilePath)" << std::endl;
+	// find rconfigfilepath relative to all configroots
+	// pick shortest rconfigfilepath
+	// find toolfilepath as shortest of configroot + rconfigfilepath + rtoolfilepath
+
+	QDir configDir = QFileInfo(mConfigurationFilePath).dir();
+//	std::cout <<  "      == configdir " << configDir.absolutePath() << std::endl;
+
+	foreach (QString configroot, DataLocations::getRootConfigPaths())
+	{
+//		std::cout << "      == configroot " << configroot << std::endl;
+		QString relConfigFilePath = QDir(configroot).relativeFilePath(configDir.path());
+//		std::cout << "      == relConfigFilePath " << relConfigFilePath << std::endl;
+
+		foreach (QString configroot2, DataLocations::getRootConfigPaths())
+		{
+			QString toolFilePath = configroot2 + "/" + relConfigFilePath + "/" + relativeToolFilePath;
+//			std::cout << "      ==== configroot2 " << configroot2 << std::endl;
+//			std::cout << "      ==== toolFilePath " << toolFilePath << std::endl;
+			toolFilePath = this->compactVirtualPath(toolFilePath);
+//			std::cout << "      ==== toolFilePath mod " << toolFilePath << std::endl;
+//			std::cout << "      ==== ctoolFilePath " << QFileInfo(toolFilePath).canonicalFilePath() << std::endl;
+//			std::cout << "      ==== exists " << QFileInfo(toolFilePath).exists() << std::endl;
+			if (QFileInfo(toolFilePath).exists())
+				return QFileInfo(toolFilePath).canonicalFilePath();
+		}
+	}
+
+	return "";
+}
+
 QString ConfigurationFileParser::getAbsoluteToolFilePath(QDomElement toolfileelement)
 {
-	QString absoluteToolFilePath;
-
-	QFile configFile(mConfigurationFilePath);
-	QDir configDir = QFileInfo(configFile).dir();
-
 	QString relativeToolFilePath = toolfileelement.text();
+//	std::cout << "   ============================================================" << std::endl;
+//	std::cout << QString("   ===== QString ConfigurationFileParser::getAbsoluteToolFilePath(%1) ").arg(relativeToolFilePath) << std::endl;
 	if (relativeToolFilePath.isEmpty())
 		return "";
 
-	QFile file(configDir.absoluteFilePath(relativeToolFilePath));
-	if (!file.exists())
-		reportError("Tool file " + file.fileName() + " in configuration " + mConfigurationFilePath
-					+ " does not exists. Skipping.");
+	QString absoluteToolFilePath = this->searchForExistingToolFilePath(relativeToolFilePath);
 
-	QFileInfo info(file);
-	absoluteToolFilePath = info.absoluteFilePath();
+	QFileInfo info(absoluteToolFilePath);
+	if (!info.exists())
+		reportError(QString("Tool file %1 in configuration %2 not found. Skipping.")
+					.arg(info.fileName())
+					.arg(mConfigurationFilePath));
+
+//	std::cout << QString("  [%1] ").arg(relativeToolFilePath) << std::endl;
+//	std::cout << QString("       -> ") << std::endl;
+//	std::cout << QString("            [%2] ").arg(absoluteToolFilePath) << std::endl;
+//	std::cout << "   exist: " << info.exists() << ", dir: " << info.isDir() << std::endl;
+
 	if (info.isDir())
 		absoluteToolFilePath = this->findXmlFileWithDirNameInPath(absoluteToolFilePath);
-
 	return absoluteToolFilePath;
 }
 //----------------------------------------------------------------------------------------------------------------------
