@@ -44,10 +44,8 @@ VideoGraphicsFixture::VideoGraphicsFixture()
 
 vtkImageDataPtr VideoGraphicsFixture::readImageData(QString filename, QString description)
 {
-	QString path = cxtest::Utilities::getDataRoot("ssc/test/"+filename);
+	QString path = cxtest::Utilities::getDataRoot("testing/videographics/"+filename);
 
-//	QString folder = QString("%1%2/").arg(SSC_DATA_ROOT).arg("ssc/test");
-//	std::cout << folder << " -------- " << filename << std::endl;
 	vtkImageDataPtr retval = mMachine->readFromFile(path);
 	INFO(("Looking for "+description).toStdString());
 	REQUIRE(retval);
@@ -56,15 +54,13 @@ vtkImageDataPtr VideoGraphicsFixture::readImageData(QString filename, QString de
 
 cx::ProbeDefinition VideoGraphicsFixture::readProbeData(QString filename)
 {
-	QString path = cxtest::Utilities::getDataRoot("ssc/test/"+filename);
-//	QString folder = QString("%1%2/").arg(SSC_DATA_ROOT).arg("ssc/test");
+	QString path = cxtest::Utilities::getDataRoot("testing/videographics/"+filename);
 	QString probeDataFilename = cx::changeExtension(path, "probedata.xml");
 
 	cx::ProbeDefinition retval;
 	cx::XmlOptionFile file = cx::XmlOptionFile(probeDataFilename, "navnet");
 	retval.parseXml(file.getElement("configuration"));
 
-//	std::cout << probeDataFilename << " -- " << streamXml2String(retval) << std::endl;
 	return retval;
 }
 

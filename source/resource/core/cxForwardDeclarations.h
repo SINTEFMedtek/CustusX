@@ -18,7 +18,6 @@ typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
 namespace cx {
 
 class View;
-class ViewContainer;
 class ViewItem;
 class ViewWidget;
 typedef QPointer<ViewWidget> ViewWidgetQPtr;

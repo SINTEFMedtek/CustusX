@@ -6,7 +6,6 @@ include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 
 cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	cxView
-	cxViewContainer
     
 	Rep/cxRep.h
 	Rep/cxRepImpl
