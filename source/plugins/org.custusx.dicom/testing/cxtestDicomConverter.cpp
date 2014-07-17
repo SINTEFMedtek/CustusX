@@ -127,9 +127,6 @@ public:
 TEST_CASE("DicomConverter: Fixture test", "[unit][plugins][org.custusx.dicom]")
 {
 	DicomConverterTestFixture fixture;
-//	QString referenceImageFilename = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/MetaImage/Kaisa.mhd";
-//	cx::ImagePtr referenceImage = fixture.loadImageFromFile(referenceImageFilename, "reference");
-//	referenceImage->setModality("SC"); // hack: "SC" is not supported by mhd, it is instead set to "OTHER"
 
 	cx::ImagePtr flatImage = cx::Image::create("uid1", "name1");
 	vtkImageDataPtr flatVtkImage = cx::generateVtkImageDataSignedShort(Eigen::Array3i(30,30,20), cx::Vector3D(1,1,1), 1);

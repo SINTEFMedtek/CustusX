@@ -39,10 +39,9 @@ class ImageTestList
 public:
 	ImageTestList()
 	{
-		image.push_back("ssc/Person5/person5_t1_unsigned.mhd");
-		image.push_back("ssc/Person5/person5_t2_unsigned.mhd");
-		image.push_back("ssc/Person5/person5_flair_unsigned.mhd");
-		image.push_back("ssc/DTI/dti_eigenvector_rgb.mhd");
+		image.push_back("Person5/person5_t1_unsigned.mhd");
+		image.push_back("Person5/person5_t2_unsigned.mhd");
+		image.push_back("Person5/person5_flair_unsigned.mhd");
 	}
 	QStringList image;
 };

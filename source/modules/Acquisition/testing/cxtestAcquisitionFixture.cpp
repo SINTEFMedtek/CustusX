@@ -104,10 +104,6 @@ void AcquisitionFixture::setupProbe()
 void AcquisitionFixture::initialize()
 {
 	// select video source: use a small one because old machines cannot handle RT streaming of 1024x768 color data.
-//	mAcqDataFilename = cx::DataLocations::getTestDataPath() +
-//			"/testing/"
-//			"2012-10-24_12-39_Angio_i_US3.cx3/US_Acq/US-Acq_03_20121024T132330.mhd";
-//	mAcqDataFilename = cx::DataLocations::getTestDataPath() + "/testing/us_videos/acq_512x384.mhd";
 	mAcqDataFilename = cx::DataLocations::getTestDataPath() + "/testing/us_videos/acq_256x192.mhd";
 
 	qApp->processEvents(); // wait for stateservice to finish init of application states - needed before load patient.

@@ -203,6 +203,8 @@ void MetaImageReader::saveImage(ImagePtr image, const QString& filename)
 	writer->SetFileName(cstring_cast(filename));
 	QDir().mkpath(QFileInfo(filename).path());
 
+//	std::cout << "SAVING MHD COMPRESSED " << filename << std::endl;
+//	writer->SetCompression(true);
 	writer->SetCompression(false);
 //	writer->Update(); // caused writing of (null).0 files - not necessary
 	writer->Write();
