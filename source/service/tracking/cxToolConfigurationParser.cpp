@@ -271,6 +271,13 @@ QString ConfigurationFileParser::compactVirtualPath(QString filepath)
 {
 	// remove ../ elements
 	QStringList elems = filepath.split("/");
+	while (elems.count("."))
+	{
+		int index = elems.indexOf(".");
+		if (index<0)
+			break;
+		elems.removeAt(index); // remove .
+	}
 	while (elems.count(".."))
 	{
 		int index = elems.indexOf("..");
