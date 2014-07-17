@@ -31,6 +31,7 @@
 #include "cxInteractiveClipper.h"
 #include "cxViewManager.h"
 #include "cxDataManager.h"
+#include "cxSettings.h"
 
 CustusXController::CustusXController(QObject* parent) : QObject(parent)
 {
@@ -49,6 +50,7 @@ void CustusXController::start()
 //  qApp->setWindowIcon(QIcon(":/icons/.png"));
 
   cx::LogicManager::initialize();
+  cx::settings()->setValue("Automation/autoSave", "false");
 
   mMainWindow = new cx::MainWindow(std::vector<cx::GUIExtenderServicePtr>());
   mMainWindow->show();
