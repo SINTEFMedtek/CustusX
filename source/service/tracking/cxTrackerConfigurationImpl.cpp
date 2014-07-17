@@ -34,14 +34,15 @@ void TrackerConfigurationImpl::saveConfiguration(const Configuration& config)
 	TRACKING_SYSTEM selectedTracker = string2enum<TRACKING_SYSTEM>(config.mTrackingSystem);
 
 	ConfigurationFileParser::ToolFilesAndReferenceVector toolfilesAndRefVector;
-	QFile configFile(data.mFileName);
-	QFileInfo info(configFile);
-	QDir dir = info.dir();
+//	QFile configFile(data.mFileName);
+//	QFileInfo info(configFile);
+//	QDir dir = info.dir();
 	foreach(QString absoluteToolPath, selectedTools)
 	{
-	  QString relativeToolFilePath = dir.relativeFilePath(absoluteToolPath);
+//	  QString relativeToolFilePath = dir.relativeFilePath(absoluteToolPath);
 	  ConfigurationFileParser::ToolFileAndReference tool;
-	  tool.first = relativeToolFilePath;
+//	  tool.first = relativeToolFilePath;
+	  tool.first = absoluteToolPath;
 	  tool.second = (absoluteToolPath == referencePath);
 	  toolfilesAndRefVector.push_back(tool);
 	}

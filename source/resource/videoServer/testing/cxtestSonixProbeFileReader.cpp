@@ -54,7 +54,8 @@ void testLinearProbe(cx::SonixProbeFileReader &reader)
 
 TEST_CASE("SonixProbeFileReader can process XML file", "[resource][sonix][unit]")
 {
-	QString probeFile = cx::DataLocations::getRootConfigPath() + "/ultrasonix/probes.xml";
+	QString probeFile = cx::DataLocations::getExistingConfigPath("/ultrasonix", "", "probes.xml");
+//	QString probeFile = cx::DataLocations::getRootConfigPath() + "/ultrasonix/probes.xml";
 	cx::SonixProbeFileReader reader(probeFile);
 	REQUIRE(reader.init());
 	REQUIRE(!reader.getProbes().isNull());

@@ -66,6 +66,9 @@ private:
 	bool isConfigFileValid();
 	QString getAbsoluteToolFilePath(QDomElement toolfileelement); ///< get the absolute toolfile path for a toolfile element containg a relative toolfile path
 	QString findXmlFileWithDirNameInPath(QString path);
+	QString searchForExistingToolFilePath(QString relativeToolFilePath);
+	static QString convertToRelativeToolFilePath(QString configFilename, QString absoluteToolFilePath);
+	static QString compactVirtualPath(QString filepath);
 
 	QString mConfigurationFilePath; ///< absolute path to the configuration file
 	QString mLoggingFolder; ///< absolutepath to the logging folder

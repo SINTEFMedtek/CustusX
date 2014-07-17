@@ -116,13 +116,13 @@ QStringList DataLocations::getRootConfigPaths()
 {
   QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED; // look for installed location
   if (QDir(path).exists())
-    return QStringList() << path;
+	return QStringList() << QDir(path).canonicalPath();
 
   QStringList retval;
   if (QDir(CX_CONFIG_ROOT).exists()) // look for folder in source code
-    retval << CX_CONFIG_ROOT;
+	retval << QDir(CX_CONFIG_ROOT).canonicalPath();
   if (QDir(CX__OPTIONAL_CONFIG_ROOT).exists()) // look for folder in source code
-    retval << CX__OPTIONAL_CONFIG_ROOT;
+	retval << QDir(CX__OPTIONAL_CONFIG_ROOT).canonicalPath();
 
   return retval;
 }
