@@ -418,7 +418,6 @@ class CustusX(CppComponent):
         for lib in libs:
             if lib.pluginPath():
                 add('CX_EXTERNAL_PLUGIN_%s'%lib.name(), lib.pluginPath())
-#                add('CX_EXTERNAL_PLUGIN_%s'%lib.name(), '%s:ON'%lib.pluginPath())
         
         if self.controlData.force_connect_sublibraries:
             self.forceConnectSublibraries(add)
