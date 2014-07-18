@@ -79,6 +79,10 @@ class CppBuilder:
         '''
         pull latest version of branch, include submodules if asked.
         '''
+        if tag!=None:
+            print "--------- gitUpdate tag [%s], length=%i" % (tag, len(tag))
+        else:
+            print "--------- gitUpdate tag None"
         if (tag!=None) and (tag!=""):
             self.gitCheckout(tag, submodules=submodules)
             return
