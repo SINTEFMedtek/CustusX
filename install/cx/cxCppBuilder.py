@@ -83,7 +83,7 @@ class CppBuilder:
             print "--------- gitUpdate tag [%s], length=%i" % (tag, len(tag))
         else:
             print "--------- gitUpdate tag None"
-        if (tag!=None) and (tag!=""):
+        if (tag!=None) and (tag!="\"\""):
             self.gitCheckout(tag, submodules=submodules)
             return
         
