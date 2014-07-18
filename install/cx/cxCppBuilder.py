@@ -79,7 +79,7 @@ class CppBuilder:
         '''
         pull latest version of branch, include submodules if asked.
         '''
-        if tag!=None:
+        if (tag!=None) and (tag!=""):
             self.gitCheckout(tag, submodules=submodules)
             return
         
