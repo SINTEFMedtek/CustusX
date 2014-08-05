@@ -15,6 +15,7 @@
 #include <cxBoundingBoxWidget.h>
 #include "cxBoundingBox3D.h"
 #include "cxDoubleSpanSlider.h"
+#include "cxDoublePairDataAdapterXml.h"
 
 namespace cx
 {
@@ -30,10 +31,8 @@ BoundingBoxWidget::BoundingBoxWidget(QWidget* parent) :
 
 	for (int i=0; i<caption.size(); ++i)
 	{
-		mRange[i] = new SliderRangeGroupWidget(this);
-		mRange[i]->setName(caption[i]);
-		mRange[i]->setRange(DoubleRange(-2000, 2000, 1));
-		mRange[i]->setDecimals(0);
+		DoublePairDataAdapterXmlPtr dataAdapter = DoublePairDataAdapterXml::initialize(caption[i], caption[i], caption[i], DoubleRange(-2000, 2000, 1), 0);
+		mRange[i] = new SliderRangeGroupWidget(this, dataAdapter);
 		connect(mRange[i], SIGNAL(valueChanged(double,double)), this, SIGNAL(changed()));
 		layout->addWidget(mRange[i]);
 	}
@@ -50,7 +49,7 @@ void BoundingBoxWidget::setValue(const DoubleBoundingBox3D& value, const DoubleB
 	{
 		mRange[i]->blockSignals(true);
 		mRange[i]->setRange(DoubleRange(range.begin()[2*i], range.begin()[2*i+1], 1));
-		mRange[i]->setValue(std::make_pair(  value.begin()[2*i], value.begin()[2*i+1]));
+		mRange[i]->setValue(value.begin()[2*i], value.begin()[2*i+1]);
 		mRange[i]->blockSignals(false);
 	}
 }

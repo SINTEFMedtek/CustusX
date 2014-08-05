@@ -11,6 +11,8 @@
 #include "cxDoubleRange.h"
 #include "qxtspanslider.h"
 #include "cxDoubleWidgets.h"
+#include "cxDoublePairDataAdapter.h"
+#include "cxOptimizedUpdateWidget.h"
 class QDoubleSpinBox;
 
 namespace cx
@@ -29,8 +31,7 @@ public:
   virtual ~DoubleSpanSlider() {}
   DoubleSpanSlider(QWidget* parent = 0) : QxtSpanSlider(parent)
   {
-    connect(this, SIGNAL(spanChanged(int,int)), this, SLOT(spanChangedSlot(int,int)));
-//    connect(this, SIGNAL(valueChanged(int)), this, SLOT(valueChangedSlot(int)));
+		connect(this, SIGNAL(spanChanged(int,int)), this, SLOT(spanChangedSlot(int,int)));
     this->setDoubleRange(DoubleRange(0,1,0.1));
   }
   void setDoubleRange(const DoubleRange& range)
@@ -81,18 +82,17 @@ private:
  * \ingroup cx_guisource_widgets
  *
  */
-class SliderRangeGroupWidget : public QWidget
+class SliderRangeGroupWidget : public OptimizedUpdateWidget
 {
   Q_OBJECT
 public:
-  SliderRangeGroupWidget(QWidget* parent);
+	SliderRangeGroupWidget(QWidget* parent, DoublePairDataAdapterPtr dataInterface, QGridLayout* gridLayout = 0, int row = 0);
 
-  void addToGridLayout(QGridLayout* gridLayout, int row);
-  void setName(QString text);
+	void addToGridLayout(QGridLayout* gridLayout, int row);
   void setRange(const DoubleRange& range);
-  void setDecimals(int decimals);
-  void setValue(std::pair<double,double> val);
+	void setDecimals(int decimals);
   std::pair<double,double> getValue() const;
+	bool setValue(double lower, double upper);
 
 signals:
    void valueChanged(double lower, double upper);
@@ -102,14 +102,15 @@ private slots:
   void textEditedSlot();
 
 private:
-  void dataChanged(std::pair<double,double> val);
-  QLabel* mLabel;
-//  DoubleLineEdit* mLowerEdit;
-//  DoubleLineEdit* mUpperEdit;
+	void init(QGridLayout *gridLayout, int row);
+	void dataChanged();
+	QLabel* mLabel;
   QDoubleSpinBox* mLowerEdit;
   QDoubleSpinBox* mUpperEdit;
-  DoubleSpanSlider* mSpanSlider;
-  std::pair<double,double> mValue;
+	DoubleSpanSlider* mSpanSlider;
+
+	DoublePairDataAdapterPtr mData;
+
 };
 
 

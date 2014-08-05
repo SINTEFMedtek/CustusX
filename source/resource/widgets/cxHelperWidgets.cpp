@@ -33,6 +33,7 @@
 #include "cxColorSelectWidget.h"
 #include "cxTypeConversions.h"
 #include "cxLabeledLineEditWidget.h"
+#include "cxDoubleSpanSlider.h"
 
 namespace cx
 {
@@ -71,13 +72,18 @@ QWidget* sscCreateDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* 
 		return new CheckBoxWidget(parent, bl, gridLayout, row);
 	}
 
-    ColorDataAdapterPtr cl = boost::dynamic_pointer_cast<ColorDataAdapter>(data);
-    if (cl)
-    {
-        return new ColorSelectWidget(parent, cl, gridLayout, row);
-    }
+	ColorDataAdapterPtr cl = boost::dynamic_pointer_cast<ColorDataAdapter>(data);
+	if (cl)
+	{
+		return new ColorSelectWidget(parent, cl, gridLayout, row);
+	}
+	DoublePairDataAdapterPtr doublepair = boost::dynamic_pointer_cast<DoublePairDataAdapter>(data);
+	if (doublepair)
+	{
+		return new SliderRangeGroupWidget(parent, doublepair, gridLayout, row);
+	}
 
-    std::cout << "Failed to create Data Widget for " << (data ? data->getValueName() : "NULL") << std::endl;
+	std::cout << "Failed to create Data Widget for " << (data ? data->getValueName() : "NULL") << std::endl;
 
     return NULL;
 }

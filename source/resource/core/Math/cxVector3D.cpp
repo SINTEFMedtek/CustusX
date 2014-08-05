@@ -92,6 +92,13 @@ QString prettyFormat(Vector3D val, int decimals, int fieldWidth)
 			.arg(val[2], fieldWidth, 'f', decimals);
 }
 
+Eigen::Vector2d fromString(const QString& text)
+{
+	std::vector<double> raw = convertQString2DoubleVector(text);
+	if (raw.size() != 2)
+		return Eigen::Vector2d(0, 0);
+	return Eigen::Vector2d((double*) &(*raw.begin()));
+}
 
 } // namespace cx
 // --------------------------------------------------------

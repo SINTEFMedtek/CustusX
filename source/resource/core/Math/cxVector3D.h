@@ -44,6 +44,8 @@ bool similar(const Eigen::Array3i& a, const Eigen::Array3i& b); ///< identical t
 
 QString prettyFormat(Vector3D val, int decimals=1, int fieldWidth=3);
 
+Eigen::Vector2d fromString(const QString& text);
+
 /**
  * @}
  */

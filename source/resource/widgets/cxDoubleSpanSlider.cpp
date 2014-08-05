@@ -6,10 +6,10 @@
  */
 #include "cxDoubleSpanSlider.h"
 #include <QDoubleSpinBox>
+#include "cxHelperWidgets.h"
 
 namespace cx
 {
-
 
 void SliderRangeGroupWidget::addToGridLayout(QGridLayout* gridLayout, int row)
 {
@@ -19,69 +19,62 @@ void SliderRangeGroupWidget::addToGridLayout(QGridLayout* gridLayout, int row)
   gridLayout->addWidget(mSpanSlider, row, 2);
 }
 
-void SliderRangeGroupWidget::setName(QString text)
+SliderRangeGroupWidget::SliderRangeGroupWidget(QWidget* parent, DoublePairDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) : OptimizedUpdateWidget(parent)
 {
-  mLabel->setText(text);
+	mData = dataInterface;
+	init(gridLayout, row);
+	connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 }
 
-SliderRangeGroupWidget::SliderRangeGroupWidget(QWidget* parent) : QWidget(parent)
+void SliderRangeGroupWidget::init(QGridLayout *gridLayout, int row)
 {
-//  mData = dataInterface;
-//  connect(mData.get(), SIGNAL(changed()), this, SLOT(dataChanged()));
+	mLabel = new QLabel(this);
+	mLabel->setText(mData->getValueName());
+	mLowerEdit = new QDoubleSpinBox(this);
+	mSpanSlider = new DoubleSpanSlider(this);
+	mSpanSlider->setOrientation(Qt::Horizontal);
+	mSpanSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
+	mUpperEdit = new QDoubleSpinBox(this);
 
-  QHBoxLayout* topLayout = new QHBoxLayout;
-  topLayout->setMargin(0);
-  this->setLayout(topLayout);
+	this->setDecimals(mData->getValueDecimals());
 
-  mLabel = new QLabel(this);
-  //mLabel->setText(mData->getValueName());
-  topLayout->addWidget(mLabel);
+	if (gridLayout) // add to input gridlayout
+	{
+			gridLayout->addLayout(mergeWidgetsIntoHBoxLayout(mLabel, addDummyMargin(this)), row, 0);
 
-//  mLowerEdit = new DoubleLineEdit(this);
-//  topLayout->addWidget(mLowerEdit);
-//  connect(mLowerEdit, SIGNAL(editingFinished()), this, SLOT(textEditedSlot()));
+			QHBoxLayout* controlsLayout = new QHBoxLayout;
+			controlsLayout->setSpacing(0);
+			controlsLayout->setMargin(0);
+			gridLayout->addLayout(controlsLayout, row, 1);
 
-  mLowerEdit = new QDoubleSpinBox(this);
-  topLayout->addWidget(mLowerEdit);
-  connect(mLowerEdit, SIGNAL(valueChanged(double)), this, SLOT(textEditedSlot()));
+			controlsLayout->addWidget(mLowerEdit);
+			controlsLayout->addWidget(mSpanSlider, 1);
+			controlsLayout->addWidget(mUpperEdit);
+	}
+	else // add directly to this
+	{
+		QHBoxLayout* topLayout = new QHBoxLayout;
+		topLayout->setMargin(0);
+		this->setLayout(topLayout);
 
+		topLayout->addWidget(mLabel);
+		topLayout->addWidget(mLowerEdit);
+		topLayout->addWidget(mSpanSlider, 1);
+		topLayout->addWidget(mUpperEdit);
+	}
 
-  mSpanSlider = new DoubleSpanSlider(this);
-  mSpanSlider->setOrientation(Qt::Horizontal);
-//  mSpanSlider->setRange(-500, 500);
-//  mSpanSlider->setLowerValue(-200);
-//  mSpanSlider->setUpperValue(200);
-  mSpanSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
-  topLayout->addWidget(mSpanSlider, 1);
-  // connect to slider
-  connect(mSpanSlider, SIGNAL(doubleSpanChanged(double, double)), this, SLOT(doubleSpanChangedSlot(double, double)));
-
-//  mUpperEdit = new DoubleLineEdit(this);
-//  topLayout->addWidget(mUpperEdit);
-//  connect(mUpperEdit, SIGNAL(editingFinished()), this, SLOT(textEditedSlot()));
-
-  mUpperEdit = new QDoubleSpinBox(this);
-  topLayout->addWidget(mUpperEdit);
-  connect(mUpperEdit, SIGNAL(valueChanged(double)), this, SLOT(textEditedSlot()));
-
-//  mSlider = new DoubleSlider(this);
-//  mSlider->setOrientation(Qt::Horizontal);
-//  //mSlider->setDoubleRange(mData->getValueRange());
-//  topLayout->addWidget(mSlider);
-//  connect(mSlider, SIGNAL(doubleValueChanged(double)), this, SLOT(doubleValueChanged(double)));
-
-
-//  dataChanged();
+	connect(mLowerEdit, SIGNAL(valueChanged(double)), this, SLOT(textEditedSlot()));
+	// connect to slider
+	connect(mSpanSlider, SIGNAL(doubleSpanChanged(double, double)), this, SLOT(doubleSpanChangedSlot(double, double)));
+	connect(mUpperEdit, SIGNAL(valueChanged(double)), this, SLOT(textEditedSlot()));
 }
 
 void SliderRangeGroupWidget::setRange(const DoubleRange& range)
 {
-//  std::cout << "SliderRangeGroupWidget::setRange " << mLabel->text() << " " << range.min() <<  "," << range.max() << std::endl;
   mSpanSlider->setDoubleRange(range);
 
   mLowerEdit->setRange(range.min(), range.max());
-  mLowerEdit->setSingleStep(range.step());
-//  mLowerEdit->setDecimals(mData->getValueDecimals());
+	mLowerEdit->setSingleStep(range.step());
   mUpperEdit->setRange(range.min(), range.max());
   mUpperEdit->setSingleStep(range.step());
 }
@@ -92,45 +85,48 @@ void SliderRangeGroupWidget::setDecimals(int decimals)
 	mUpperEdit->setDecimals(decimals);
 }
 
-void SliderRangeGroupWidget::setValue(std::pair<double,double> val)
-{
-  mValue = val;
-  this->dataChanged(val);
-}
-
 std::pair<double,double> SliderRangeGroupWidget::getValue() const
 {
-  return mValue;
+	return std::make_pair(mData->getValue()[0], mData->getValue()[1]);
 }
 
 void SliderRangeGroupWidget::doubleSpanChangedSlot(double lower, double upper)
 {
-  mValue = std::make_pair(lower,upper);
-  dataChanged(mValue);
-  emit valueChanged(mValue.first, mValue.second);
+	this->setValue(lower, upper);
+}
+
+bool SliderRangeGroupWidget::setValue(double lower, double upper)
+{
+	Eigen::Vector2d val = Eigen::Vector2d(lower, upper);
+	if (val == mData->getValue()) // Using Eigen operator== instead if creating similar()
+		return false;
+
+	mData->setValue(val);
+	dataChanged();
+	return true;
 }
 
 void SliderRangeGroupWidget::textEditedSlot()
 {
-  mValue = std::make_pair(mLowerEdit->value(), mUpperEdit->value());
-  dataChanged(mValue);
-  emit valueChanged(mValue.first, mValue.second);
+	this->setValue(mLowerEdit->value(), mUpperEdit->value());
 }
 
-void SliderRangeGroupWidget::dataChanged(std::pair<double,double> val)
+void SliderRangeGroupWidget::dataChanged()
 {
   mSpanSlider->blockSignals(true);
   mLowerEdit->blockSignals(true);
   mUpperEdit->blockSignals(true);
 
-  mSpanSlider->setDoubleLowerValue(val.first);
-  mSpanSlider->setDoubleUpperValue(val.second);
-  mLowerEdit->setValue(val.first);
-  mUpperEdit->setValue(val.second);
+	mSpanSlider->setDoubleLowerValue(mData->getValue()[0]);
+	mSpanSlider->setDoubleUpperValue(mData->getValue()[1]);
+	mLowerEdit->setValue(mData->getValue()[0]);
+	mUpperEdit->setValue(mData->getValue()[1]);
 
   mSpanSlider->blockSignals(false);
   mLowerEdit->blockSignals(false);
   mUpperEdit->blockSignals(false);
+
+	emit valueChanged(mData->getValue()[0], mData->getValue()[1]);
 }
 
 

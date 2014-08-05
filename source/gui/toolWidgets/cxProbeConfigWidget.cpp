@@ -23,6 +23,7 @@
 #include "cxDoubleSpanSlider.h"
 #include "cxHelperWidgets.h"
 #include "cxTypeConversions.h"
+#include "cxDoublePairDataAdapterXml.h"
 
 namespace cx
 {
@@ -69,11 +70,8 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 	topLayout->addWidget(sectorGroupBox);
 
 	sectorLayout->addWidget(mOriginWidget);
-	mDepthWidget = new SliderRangeGroupWidget(this);
-	mDepthWidget->setName("Depth");
-	mDepthWidget->setRange(DoubleRange(0, 1000, 1));
-	mDepthWidget->setDecimals(1);
-	mDepthWidget->setToolTip("Define probe depth.\nUnits in pixels.");
+	DoublePairDataAdapterXmlPtr dataAdapter = DoublePairDataAdapterXml::initialize("Depth", "Depth", "Define probe depth.\nUnits in pixels.", DoubleRange(0, 1000, 1), 1);
+	mDepthWidget = new SliderRangeGroupWidget(this, dataAdapter);
 	connect(mDepthWidget, SIGNAL(valueChanged(double, double)), this, SLOT(guiProbeSectorChanged()));
 	sectorLayout->addWidget(mDepthWidget);
 
@@ -218,7 +216,7 @@ void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 	double sx = data.getSpacing()[0]; // mm/pix
 	double sy = data.getSpacing()[1];
 
-	mDepthWidget->setValue(std::make_pair(data.getDepthStart()/sy, data.getDepthEnd()/sy));
+	mDepthWidget->setValue(data.getDepthStart()/sy, data.getDepthEnd()/sy);
 	mDepthWidget->setRange(DoubleRange(0, range.range()[1]*1.5, 1));
 
 	mWidth->setValue(data.getWidth());
