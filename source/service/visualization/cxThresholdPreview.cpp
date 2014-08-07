@@ -82,6 +82,15 @@ void ThresholdPreview::revertTransferFunctions()
     mModifiedImage.reset();
 }
 
+
+void ThresholdPreview::setPreview(ImagePtr image, double lower)
+{
+	if (!image)
+		return;
+
+	this->setPreview(image, Eigen::Vector2d(lower, image->getMax()));
+}
+
 /**
  * Apply the preview transfer function
  *
@@ -90,70 +99,62 @@ void ThresholdPreview::revertTransferFunctions()
  * \param image The image to modify the transfer function of
  * \param setValue The threshold value to be used
  */
-void ThresholdPreview::setPreview(ImagePtr image, double setValue)
+void ThresholdPreview::setPreview(ImagePtr image, const Eigen::Vector2d& threshold)
 {
-    if (!image)
-        return;
+	if (!image)
+		return;
 
-    if (image!=mModifiedImage)
-    {
-        this->removePreview();
-    }
+	if (image!=mModifiedImage)
+		this->removePreview();
 
-//    std::cout << "ThresholdPreview::setPreview " << image->getName() << " - " << setValue << std::endl;
+	this->storeOriginalTransferfunctions(image);
+	image->resetTransferFunctions();
 
-    if (!mModifiedImage)
-    {
-        mModifiedImage = image;
-		mTF3D_original = image->getTransferFunctions3D()->createCopy();
-		mTF2D_original = image->getLookupTable2D()->createCopy();
-        mShadingOn_original = image->getShadingOn();
-    }
-    image->resetTransferFunctions();
-    ImageTF3DPtr tf3D = image->getTransferFunctions3D();
+	ImageTF3DPtr tf3D = image->getTransferFunctions3D();
+
+	double lower = threshold[0];
+	double upper = threshold[1];
 
 	ColorMap colors;
-	colors[setValue] = Qt::green;
+	colors[lower] = Qt::green;
 	colors[image->getMax()] = Qt::green;
 	tf3D->resetColor(colors);
 
 	IntIntMap opacity;
-	opacity[setValue - 1] = 0;
-	opacity[setValue] = image->getMaxAlphaValue();
+	opacity[lower - 1] = 0;
+	opacity[lower] = image->getMaxAlphaValue();
+	opacity[upper] = image->getMaxAlphaValue();
+	opacity[upper + 1] = 0;
 	tf3D->resetAlpha(opacity);
 
+	image->setShadingOn(true);
 
-//	tf3D->removeInitAlphaPoint();
-//    tf3D->addAlphaPoint(setValue - 1, 0);
-//    tf3D->addAlphaPoint(setValue, image->getMaxAlphaValue());
-//    tf3D->addColorPoint(setValue, Qt::green);
-//    tf3D->addColorPoint(image->getMax(), Qt::green);
-    image->setShadingOn(true);
-
-    ImageLUT2DPtr lut2D = image->getLookupTable2D();
+	ImageLUT2DPtr lut2D = image->getLookupTable2D();
 	colors.clear();
-	colors[setValue] = Qt::green;
+	colors[lower] = Qt::green;
 	colors[image->getMax()] = Qt::green;
 	lut2D->resetColor(colors);
-//	lut2D->setFullRangeWinLevel(source->getVtkImageData());
-//    lut2D->addColorPoint(setValue, Qt::green);
-//    lut2D->addColorPoint(image->getMax(), Qt::green);
-    lut2D->setLLR(setValue);
+	lut2D->setLLR(lower);
 
-
-    //Remove VTK linear interpolation
+	//Remove VTK linear interpolation
 	mModifiedImage->setInterpolationTypeToNearest();
-//	VolumetricBaseRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(image);
-//    if(volumeRep)
-//        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToNearest();
-//    else
-//        reportError("ThresholdPreview::setPreview() can not find VolumetricRep");
 }
 
 void ThresholdPreview::removePreview()
 {
 //    std::cout << "ThresholdPreview::removePreview " << std::endl;
     this->revertTransferFunctions();
+}
+
+void ThresholdPreview::storeOriginalTransferfunctions(ImagePtr image)
+{
+	if (!mModifiedImage)
+	{
+		mModifiedImage = image;
+		mTF3D_original = image->getTransferFunctions3D()->createCopy();
+		mTF2D_original = image->getLookupTable2D()->createCopy();
+		mShadingOn_original = image->getShadingOn();
+	}
 }
 
 }

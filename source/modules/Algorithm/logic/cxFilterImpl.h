@@ -63,6 +63,7 @@ protected:
       * Call if you have an image threshold dataAdapter that need update from an image change.
 	  */
 	void updateThresholdFromImageChange(QString uid, DoubleDataAdapterXmlPtr threshold);
+	void updateThresholdPairFromImageChange(QString uid, DoublePairDataAdapterXmlPtr threshold);
 
 	virtual void createOptions() = 0;
 	virtual void createInputTypes() = 0;

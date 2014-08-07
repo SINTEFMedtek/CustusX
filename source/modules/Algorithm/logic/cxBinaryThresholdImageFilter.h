@@ -34,7 +34,7 @@ public:
 	virtual bool postProcess();
 
 	// extensions:
-	DoubleDataAdapterXmlPtr getLowerThresholdOption(QDomElement root);
+	DoublePairDataAdapterXmlPtr getThresholdOption(QDomElement root);
 	ColorDataAdapterXmlPtr getColorOption(QDomElement root);
 	BoolDataAdapterXmlPtr getGenerateSurfaceOption(QDomElement root);
 
@@ -50,7 +50,7 @@ private slots:
 	void thresholdSlot();
 
 private:
-	DoubleDataAdapterXmlPtr mLowerThresholdOption;
+	DoublePairDataAdapterXmlPtr mThresholdOption;
 	vtkImageDataPtr mRawResult;
 	vtkPolyDataPtr mRawContour;
 };

@@ -100,10 +100,12 @@ signals:
 private slots:
   void doubleSpanChangedSlot(double lower, double upper);
   void textEditedSlot();
+	void dataChanged();
 
 private:
+	SliderRangeGroupWidget();
 	void init(QGridLayout *gridLayout, int row);
-	void dataChanged();
+	void updateGuiRange();
 	QLabel* mLabel;
   QDoubleSpinBox* mLowerEdit;
   QDoubleSpinBox* mUpperEdit;

@@ -18,6 +18,7 @@
 #include "cxDataManager.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxDoubleDataAdapterXml.h"
+#include "cxDoublePairDataAdapterXml.h"
 #include "cxStringDataAdapterXml.h"
 
 namespace cx
@@ -109,16 +110,28 @@ void FilterImpl::updateThresholdFromImageChange(QString uid, DoubleDataAdapterXm
 	if(!image)
 		return;
 	threshold->setValueRange(DoubleRange(image->getMin(), image->getMax(), 1));
-	int oldValue = threshold->getValue();
+	int oldLower = threshold->getValue();
 	// avoid reset if old value is still within range,
 	// but reset anyway if old val is 0..1, this can indicate old image was binary.
-	if ((image->getMin() > oldValue )||( oldValue > image->getMax() )||( oldValue<=1 ))
+	if ((image->getMin() > oldLower )||( oldLower > image->getMax() )||( oldLower<=1 ))
 	{
-		int initValue = ::ceil(double(image->getMin()) + double(image->getRange())/10); // round up
-		threshold->setValue(initValue);
+		int initLower = ::ceil(double(image->getMin()) + double(image->getRange())/10); // round up
+		threshold->setValue(initLower);
 	}
 //	std::cout << "FilterImpl::imageChangedSlot " << image->getMin() << " "  << image->getMax() << std::endl;
 //	std::cout << "            imageChangedSlot() " << threshold->getValue() << std::endl;
+}
+
+void FilterImpl::updateThresholdPairFromImageChange(QString uid, DoublePairDataAdapterXmlPtr threshold)
+{
+	ImagePtr image = dataManager()->getImage(uid);
+	if(!image)
+		return;
+	threshold->setValueRange(DoubleRange(image->getMin(), image->getMax(), 1));
+
+	int initLower = ::ceil(double(image->getMin()) + double(image->getRange())/10); // round up
+	int initUpper = image->getMax();
+	threshold->setValue(Eigen::Vector2d(initLower, initUpper));
 }
 
 

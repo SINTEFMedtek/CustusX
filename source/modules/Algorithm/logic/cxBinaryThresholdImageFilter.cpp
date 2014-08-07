@@ -7,10 +7,11 @@
 #include "cxUtilHelpers.h"
 #include "cxRegistrationTransform.h"
 #include "cxStringDataAdapterXml.h"
-#include "cxDoubleDataAdapterXml.h"
+//#include "cxDoubleDataAdapterXml.h"
 #include "cxColorDataAdapterXml.h"
 #include "cxBoolDataAdapterXml.h"
 #include "cxTypeConversions.h"
+#include "cxDoublePairDataAdapterXml.h"
 
 #include "cxPatientService.h"
 #include "cxPatientData.h"
@@ -47,12 +48,11 @@ QString BinaryThresholdImageFilter::getHelp() const
 	        "</html>";
 }
 
-DoubleDataAdapterXmlPtr BinaryThresholdImageFilter::getLowerThresholdOption(QDomElement root)
+DoublePairDataAdapterXmlPtr BinaryThresholdImageFilter::getThresholdOption(QDomElement root)
 {
-	DoubleDataAdapterXmlPtr retval = DoubleDataAdapterXml::initialize("Threshold", "",
-	                                                                            "Select lower threshold for the segmentation", 1, DoubleRange(0, 100, 1), 0,
-	                                                                            root);
-	retval->setGuiRepresentation(DoubleDataAdapter::grSLIDER);
+	DoublePairDataAdapterXmlPtr retval = DoublePairDataAdapterXml::initialize("Thresholds", "",
+																																							"Select lower and upper threshold for the segmentation", DoubleRange(0, 100, 1), 0,
+																																							root);
 	return retval;
 }
 
@@ -73,9 +73,9 @@ ColorDataAdapterXmlPtr BinaryThresholdImageFilter::getColorOption(QDomElement ro
 
 void BinaryThresholdImageFilter::createOptions()
 {
-	mLowerThresholdOption = this->getLowerThresholdOption(mOptions);
-	connect(mLowerThresholdOption.get(), SIGNAL(changed()), this, SLOT(thresholdSlot()));
-	mOptionsAdapters.push_back(mLowerThresholdOption);
+	mThresholdOption = this->getThresholdOption(mOptions);
+	connect(mThresholdOption.get(), SIGNAL(changed()), this, SLOT(thresholdSlot()));
+	mOptionsAdapters.push_back(mThresholdOption);
 	mOptionsAdapters.push_back(this->getGenerateSurfaceOption(mOptions));
 	mOptionsAdapters.push_back(this->getColorOption(mOptions));
 }
@@ -116,7 +116,7 @@ void BinaryThresholdImageFilter::setActive(bool on)
 
 void BinaryThresholdImageFilter::imageChangedSlot(QString uid)
 {
-	this->updateThresholdFromImageChange(uid, mLowerThresholdOption);
+	this->updateThresholdPairFromImageChange(uid, mThresholdOption);
 	RepManager::getInstance()->getThresholdPreview()->removePreview();
 }
 
@@ -125,8 +125,7 @@ void BinaryThresholdImageFilter::thresholdSlot()
 	if (mActive)
 	{
 		ImagePtr image = boost::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
-		RepManager::getInstance()->getThresholdPreview()->setPreview(image,
-		                                                             mLowerThresholdOption->getValue());
+		RepManager::getInstance()->getThresholdPreview()->setPreview(image, mThresholdOption->getValue());
 	}
 }
 
@@ -143,7 +142,7 @@ bool BinaryThresholdImageFilter::execute()
 	if (!input)
 		return false;
 
-	DoubleDataAdapterXmlPtr lowerThreshold = this->getLowerThresholdOption(mCopiedOptions);
+	DoublePairDataAdapterXmlPtr thresholds = this->getThresholdOption(mCopiedOptions);
 	BoolDataAdapterXmlPtr generateSurface = this->getGenerateSurfaceOption(mCopiedOptions);
 
 	itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(input);
@@ -154,7 +153,8 @@ bool BinaryThresholdImageFilter::execute()
 	thresholdFilter->SetInput(itkImage);
 	thresholdFilter->SetOutsideValue(0);
 	thresholdFilter->SetInsideValue(1);
-	thresholdFilter->SetLowerThreshold(lowerThreshold->getValue());
+	thresholdFilter->SetLowerThreshold(thresholds->getValue()[0]);
+	thresholdFilter->SetUpperThreshold(thresholds->getValue()[1]);
 	thresholdFilter->Update();
 	itkImage = thresholdFilter->GetOutput();
 

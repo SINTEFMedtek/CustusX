@@ -18,6 +18,7 @@
 #include <QObject>
 class QTimer;
 #include "cxForwardDeclarations.h"
+#include "cxMathBase.h"
 
 namespace cx
 {
@@ -64,11 +65,13 @@ Q_OBJECT
 public:
 	ThresholdPreview();
 
-    void setPreview(ImagePtr image, double setValue);
+		void setPreview(ImagePtr image, double lower);
+		void setPreview(ImagePtr image, const Eigen::Vector2d &threshold);
     void removePreview();
 
 private:
 	void revertTransferFunctions();
+	void storeOriginalTransferfunctions(ImagePtr image);
 
 	ImagePtr mModifiedImage; ///< image that have its TF changed temporarily
 //	QWidget* mFromWidget; ///< The calling widget

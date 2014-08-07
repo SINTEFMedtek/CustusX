@@ -17,7 +17,7 @@
 
 #include "cxDataAdapter.h"
 #include "cxDoubleRange.h"
-#include "cxVector3D.h"
+#include "cxMathBase.h"
 
 namespace cx
 {
@@ -43,6 +43,8 @@ public:
 	virtual bool setValue(const Eigen::Vector2d& value) = 0; ///< set the data value.
 //	virtual std::pair<double,double> getValue() const = 0; ///< get the data value.
 	virtual Eigen::Vector2d getValue() const = 0; ///< get the data value.
+
+	virtual void setValueRange(DoubleRange range) = 0;
 
 public:
 	// optional methods

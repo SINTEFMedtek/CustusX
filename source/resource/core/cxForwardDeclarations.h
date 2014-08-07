@@ -122,6 +122,7 @@ typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
 typedef boost::shared_ptr<class DoubleDataAdapterXml> DoubleDataAdapterXmlPtr;
 typedef boost::shared_ptr<class BoolDataAdapterXml> BoolDataAdapterXmlPtr;
 typedef boost::shared_ptr<class ColorDataAdapterXml> ColorDataAdapterXmlPtr;
+typedef boost::shared_ptr<class DoublePairDataAdapterXml> DoublePairDataAdapterXmlPtr;
 
 // other stuff
 typedef boost::shared_ptr<class Presets> PresetsPtr;

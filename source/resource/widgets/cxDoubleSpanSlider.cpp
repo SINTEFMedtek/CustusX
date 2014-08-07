@@ -22,8 +22,8 @@ void SliderRangeGroupWidget::addToGridLayout(QGridLayout* gridLayout, int row)
 SliderRangeGroupWidget::SliderRangeGroupWidget(QWidget* parent, DoublePairDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) : OptimizedUpdateWidget(parent)
 {
 	mData = dataInterface;
-	init(gridLayout, row);
-	connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
+	this->init(gridLayout, row);
+	connect(mData.get(), SIGNAL(changed()), this, SLOT(dataChanged()));
 }
 
 void SliderRangeGroupWidget::init(QGridLayout *gridLayout, int row)
@@ -71,12 +71,8 @@ void SliderRangeGroupWidget::init(QGridLayout *gridLayout, int row)
 
 void SliderRangeGroupWidget::setRange(const DoubleRange& range)
 {
-  mSpanSlider->setDoubleRange(range);
-
-  mLowerEdit->setRange(range.min(), range.max());
-	mLowerEdit->setSingleStep(range.step());
-  mUpperEdit->setRange(range.min(), range.max());
-  mUpperEdit->setSingleStep(range.step());
+	mData->setValueRange(range);
+	this->updateGuiRange();
 }
 
 void SliderRangeGroupWidget::setDecimals(int decimals)
@@ -98,11 +94,10 @@ void SliderRangeGroupWidget::doubleSpanChangedSlot(double lower, double upper)
 bool SliderRangeGroupWidget::setValue(double lower, double upper)
 {
 	Eigen::Vector2d val = Eigen::Vector2d(lower, upper);
-	if (val == mData->getValue()) // Using Eigen operator== instead if creating similar()
+	if (val == mData->getValue())
 		return false;
 
 	mData->setValue(val);
-	dataChanged();
 	return true;
 }
 
@@ -113,22 +108,34 @@ void SliderRangeGroupWidget::textEditedSlot()
 
 void SliderRangeGroupWidget::dataChanged()
 {
-  mSpanSlider->blockSignals(true);
-  mLowerEdit->blockSignals(true);
-  mUpperEdit->blockSignals(true);
+	this->updateGuiRange();
+
+	mSpanSlider->blockSignals(true);
+	mLowerEdit->blockSignals(true);
+	mUpperEdit->blockSignals(true);
 
 	mSpanSlider->setDoubleLowerValue(mData->getValue()[0]);
 	mSpanSlider->setDoubleUpperValue(mData->getValue()[1]);
 	mLowerEdit->setValue(mData->getValue()[0]);
 	mUpperEdit->setValue(mData->getValue()[1]);
 
-  mSpanSlider->blockSignals(false);
-  mLowerEdit->blockSignals(false);
-  mUpperEdit->blockSignals(false);
+	mSpanSlider->blockSignals(false);
+	mLowerEdit->blockSignals(false);
+	mUpperEdit->blockSignals(false);
 
 	emit valueChanged(mData->getValue()[0], mData->getValue()[1]);
+	this->setModified();
 }
 
+void SliderRangeGroupWidget::updateGuiRange()
+{
+	DoubleRange range = mData->getValueRange();
+	mSpanSlider->setDoubleRange(range);
+	mLowerEdit->setRange(range.min(), range.max());
+	mLowerEdit->setSingleStep(range.step());
+	mUpperEdit->setRange(range.min(), range.max());
+	mUpperEdit->setSingleStep(range.step());
+}
 
 
 } // namespace cx

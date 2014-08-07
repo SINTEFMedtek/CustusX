@@ -14,6 +14,7 @@
 
 #include "cxDoublePairDataAdapterXml.h"
 #include "cxTypeConversions.h"
+#include "cxVector3D.h"
 
 namespace cx
 {
@@ -72,10 +73,8 @@ bool DoublePairDataAdapterXml::setValue(const Eigen::Vector2d& val)
 
 	mValue = val;
 	mStore.writeValue(qstring_cast(val));
-	emit
-	valueWasSet();
-	emit
-	changed();
+	emit valueWasSet();
+	emit changed();
 	return true;
 }
 
