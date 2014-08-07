@@ -1,0 +1,18 @@
+
+if (BUILD_TESTING)
+    include_directories(
+    )
+
+
+    set(CX_TEST_CATCH_ORG_CUSTUSX_GESTREAMER_MOC_SOURCE_FILES
+    )
+	set(CX_TEST_CATCH_ORG_CUSTUSX_GESTREAMER_SOURCE_FILES
+		${CX_TEST_CATCH_ORG_CUSTUSX_GESTREAMER_MOC_SOURCE_FILES}
+		cxtestGEStreamerPlugin.cpp
+		)
+
+    cx_catch_add_lib_and_exe(org_custusx_gestreamer 
+        "${CX_TEST_CATCH_ORG_CUSTUSX_GESTREAMER_SOURCE_FILES}" 
+        "${CX_TEST_CATCH_ORG_CUSTUSX_GESTREAMER_MOC_SOURCE_FILES}")
+
+endif (BUILD_TESTING)
