@@ -19,6 +19,9 @@
 #include "org_custusx_gestreamer_Export.h"
 
 #include "cxGEImageStreamer.h"
+#include "cxStringDataAdapterXml.h"
+#include "cxBoolDataAdapterXml.h"
+#include "cxDoubleDataAdapterXml.h"
 
 namespace cx
 {
@@ -44,6 +47,40 @@ public:
 
 private:
 	ImageStreamerPtr mStreamer;
+
+	StringDataAdapterXmlPtr getIPOption(QDomElement root);
+	DoubleDataAdapterXmlPtr getStreamPortOption(QDomElement root);
+	DoubleDataAdapterXmlPtr getCommandPortOption(QDomElement root);
+	DoubleDataAdapterXmlPtr getBufferSizeOption(QDomElement root);
+	StringDataAdapterXmlPtr getImageSizeOption(QDomElement root);
+	BoolDataAdapterXmlPtr	getIsotropicOption(QDomElement root);
+	StringDataAdapterXmlPtr	getTestModeOption(QDomElement root);
+	BoolDataAdapterXmlPtr	getUseOpenCLOption(QDomElement root);
+	BoolDataAdapterXmlPtr	getScanconvertedStreamOption(QDomElement root);
+	BoolDataAdapterXmlPtr	getTissueStreamOption(QDomElement root);
+	BoolDataAdapterXmlPtr	getBandwidthStreamOption(QDomElement root);
+	BoolDataAdapterXmlPtr	getFrequencyStreamOption(QDomElement root);
+	BoolDataAdapterXmlPtr	getVelocityStreamOption(QDomElement root);
+
+
+	StringDataAdapterXmlPtr mSelectIPDataAdapter;
+	StringDataAdapterXmlPtr mIPDataAdapter;
+	DoubleDataAdapterXmlPtr mStreamPortDataAdapter;
+	DoubleDataAdapterXmlPtr mCommandPortDataAdapter;
+	DoubleDataAdapterXmlPtr mBufferSizeDataAdapter;
+	StringDataAdapterXmlPtr mImageSizeDataAdapter;
+	BoolDataAdapterXmlPtr	mIsotropicDataAdapter;
+	StringDataAdapterXmlPtr	mTestModeDataAdapter;
+	BoolDataAdapterXmlPtr	mUseOpenCLDataAdapter;
+	BoolDataAdapterXmlPtr	mScanconvertedStreamDataAdapter;
+	BoolDataAdapterXmlPtr	mTissueStreamDataAdapter;
+	BoolDataAdapterXmlPtr	mBandwidthStreamDataAdapter;
+	BoolDataAdapterXmlPtr	mFrequencyStreamDataAdapter;
+	BoolDataAdapterXmlPtr	mVelocityStreamDataAdapter;
+
+
+//	QDomElement mXmlSettings;
+//	QMutex mStreamerMutex;
 
 };
 typedef boost::shared_ptr<GEStreamerService> GEStreamerServicePtr;
