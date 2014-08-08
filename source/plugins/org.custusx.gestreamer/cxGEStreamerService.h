@@ -18,7 +18,8 @@
 #include "cxStreamerService.h"
 #include "org_custusx_gestreamer_Export.h"
 
-#include "cxGEImageStreamer.h"
+#include <QMutex>
+#include "cxGEStreamer.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxBoolDataAdapterXml.h"
 #include "cxDoubleDataAdapterXml.h"
@@ -36,7 +37,9 @@ namespace cx
  */
 class org_custusx_gestreamer_EXPORT GEStreamerService : public StreamerService
 {
+	Q_OBJECT
 	Q_INTERFACES(cx::StreamerService)
+
 public:
 	GEStreamerService();
 	virtual ~GEStreamerService();
@@ -45,12 +48,15 @@ public:
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
 	virtual StreamerPtr createStreamer(QDomElement root);
 
-private:
-	ImageStreamerPtr mStreamer;
+private slots:
+	void sendOptions();
 
+private:
+	GEStreamer::Options generateOptions();
+	long translateToValue(QString value);
 	StringDataAdapterXmlPtr getIPOption(QDomElement root);
 	DoubleDataAdapterXmlPtr getStreamPortOption(QDomElement root);
-	DoubleDataAdapterXmlPtr getCommandPortOption(QDomElement root);
+	BoolDataAdapterXmlPtr	getUseAutoImageSizeOption(QDomElement root);
 	DoubleDataAdapterXmlPtr getBufferSizeOption(QDomElement root);
 	StringDataAdapterXmlPtr getImageSizeOption(QDomElement root);
 	BoolDataAdapterXmlPtr	getIsotropicOption(QDomElement root);
@@ -62,11 +68,11 @@ private:
 	BoolDataAdapterXmlPtr	getFrequencyStreamOption(QDomElement root);
 	BoolDataAdapterXmlPtr	getVelocityStreamOption(QDomElement root);
 
+	GEStreamerPtr mStreamer;
 
-	StringDataAdapterXmlPtr mSelectIPDataAdapter;
 	StringDataAdapterXmlPtr mIPDataAdapter;
 	DoubleDataAdapterXmlPtr mStreamPortDataAdapter;
-	DoubleDataAdapterXmlPtr mCommandPortDataAdapter;
+	BoolDataAdapterXmlPtr	mUseAutoImageSizeDataAdapter;
 	DoubleDataAdapterXmlPtr mBufferSizeDataAdapter;
 	StringDataAdapterXmlPtr mImageSizeDataAdapter;
 	BoolDataAdapterXmlPtr	mIsotropicDataAdapter;
@@ -79,8 +85,8 @@ private:
 	BoolDataAdapterXmlPtr	mVelocityStreamDataAdapter;
 
 
-//	QDomElement mXmlSettings;
-//	QMutex mStreamerMutex;
+	QDomElement mXmlSettings;
+	QMutex mStreamerMutex;
 
 };
 typedef boost::shared_ptr<GEStreamerService> GEStreamerServicePtr;

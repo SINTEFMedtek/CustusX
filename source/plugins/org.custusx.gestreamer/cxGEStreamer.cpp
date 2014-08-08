@@ -1,4 +1,4 @@
-#include "cxGEImageStreamer.h"
+#include "cxGEStreamer.h"
 
 #ifdef CX_USE_ISB_GE
 
@@ -25,20 +25,19 @@
 #include "vtkImageChangeInformation.h"
 #include "vtkForwardDeclarations.h"
 #include "cxCommandlineImageStreamerFactory.h"
-#include "cxStringHelpers.h"
 
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
 
 namespace cx
 {
 
-GEImageStreamer::GEImageStreamer() :
-	mGrabTimer(0),
-	mExportScanconverted(true),
-	mExportTissue(false),
-	mExportBandwidth(false),
-	mExportFrequency(false),
-	mExportVelocity(false)
+GEStreamer::GEStreamer() :
+	mGrabTimer(0)
+//	mExportScanconverted(true),
+//	mExportTissue(false),
+//	mExportBandwidth(false),
+//	mExportFrequency(false),
+//	mExportVelocity(false)
 {
 	//data_streaming::DataStreamApp test;
 	mRenderTimer.reset(new CyclicActionLogger("GE Grabber Timer"));
@@ -52,127 +51,131 @@ GEImageStreamer::GEImageStreamer() :
 	mSendTimer = new QTimer(this);
 }
 
-QString GEImageStreamer::getType()
+QString GEStreamer::getType()
 {
 	return "ISB_GE";
 }
 
-QStringList GEImageStreamer::getArgumentDescription()
-{
-	QStringList retval;
-	//Tabs are set so that tool tip looks nice
-	retval << "--ip:		GE scanner IP address";//default = 127.0.0.1, find a typical direct link address
-	retval << "--streamport:		GE scanner streaming port, default = 6543";
-	retval << "--commandport:	GE scanner command port, default = -1";//Unnecessary for us?
-	retval << "--buffersize:		Size of GEStreamer buffer, default = 10";
-	retval << "--imagesize:		Returned image/volume size in pixels (eg. 500x500x1), default = auto";
-	retval << "--isotropic:		Use cubic voxels for the scan conversion, default = no";
-	retval << "--openclpath:		Path to ScanConvert.cl";
-	retval << "--test:		GEStreamer test mode (no, 2D or 3D), default = no";
-	retval << "--useOpenCL:		Use OpenCL for scan conversion, default = 1";
-	retval << "--streams:		Used video streams (separated by , with no spaces), default = scanconverted,bandwidth  Available streams (only 2D for now): scanconverted,tissue,bandwidth,frequency,velocity (all)";
-	return retval;
-}
+//QStringList GEStreamer::getArgumentDescription()
+//{
+//	QStringList retval;
+//	//Tabs are set so that tool tip looks nice
+//	retval << "--ip:		GE scanner IP address";//default = 127.0.0.1, find a typical direct link address
+//	retval << "--streamport:		GE scanner streaming port, default = 6543";
+//	retval << "--commandport:	GE scanner command port, default = -1";//Unnecessary for us?
+//	retval << "--buffersize:		Size of GEStreamer buffer, default = 10";
+//	retval << "--imagesize:		Returned image/volume size in pixels (eg. 500x500x1), default = auto";
+//	retval << "--isotropic:		Use cubic voxels for the scan conversion, default = no";
+//	retval << "--openclpath:		Path to ScanConvert.cl";
+//	retval << "--test:		GEStreamer test mode (no, 2D or 3D), default = no";
+//	retval << "--useOpenCL:		Use OpenCL for scan conversion, default = 1";
+//	retval << "--streams:		Used video streams (separated by , with no spaces), default = scanconverted,bandwidth  Available streams (only 2D for now): scanconverted,tissue,bandwidth,frequency,velocity (all)";
+//	return retval;
+//}
 
-void GEImageStreamer::initialize(StringMap arguments)
+//void GEStreamer::initialize(StringMap arguments)
+void GEStreamer::applyOptions()
 {
-	CommandLineStreamer::initialize(arguments);
+//	CommandLineStreamer::initialize(arguments);
 
-	//where to dump the hdf files
 	std::string fileRoot = "c:\\test";
-	//is dumping enabled
 	bool dumpHdfToDisk = false;
 
-	//interpolation type
 	data_streaming::InterpolationType interpType = data_streaming::Bilinear;
 
 	//Set defaults
-	if (!mArguments.count("ip"))
-		mArguments["ip"] = "127.0.0.1";
-	if (!mArguments.count("streamport"))
-		mArguments["streamport"] = "6543";
-	if (!mArguments.count("commandport"))
-		mArguments["commandport"] = "-1";
-	if (!mArguments.count("buffersize"))
-		mArguments["buffersize"] = "10";
-    if (!mArguments.count("openclpath"))
-        mArguments["openclpath"] = "";
-    if (!mArguments.count("test"))
-        mArguments["test"] = "no";
-    if (!mArguments.count("imagesize"))
-        mArguments["imagesize"] = "auto";
-    if (!mArguments.count("isotropic"))
-        mArguments["isotropic"] = "no";
-    if (!mArguments.count("useOpenCL"))
-        mArguments["useOpenCL"] = "1";
-    if (!mArguments.count("streams"))
-        mArguments["streams"] = "scanconverted,bandwidth";
+//	if (!mOptions.IP.count("ip"))
+//		mOptions.IP = "127.0.0.1";
+//	if (!mOptions.count("streamport"))
+//		mArguments["streamport"] = "6543";
+//	if (!mArguments.count("commandport"))
+//		mArguments["commandport"] = "-1";
+//	if (!mArguments.count("buffersize"))
+//		mArguments["buffersize"] = "10";
+//    if (!mArguments.count("openclpath"))
+//        mArguments["openclpath"] = "";
+//    if (!mArguments.count("test"))
+//        mArguments["test"] = "no";
+//    if (!mArguments.count("imagesize"))
+//        mArguments["imagesize"] = "auto";
+//    if (!mArguments.count("isotropic"))
+//        mArguments["isotropic"] = "no";
+//    if (!mArguments.count("useOpenCL"))
+//        mArguments["useOpenCL"] = "1";
+//    if (!mArguments.count("streams"))
+//        mArguments["streams"] = "scanconverted,bandwidth";
 
-   	int bufferSize = convertStringWithDefault(mArguments["buffersize"], -1);
+   	int bufferSize = mOptions.bufferSize;//convertStringWithDefault(mArguments["buffersize"], -1);
 
 	data_streaming::OutputSizeComputationType imageCompType = data_streaming::AUTO;
-   	long imageSize = -1;// -1 = auto
-	if (!(mArguments["imagesize"].compare("auto", Qt::CaseInsensitive) == 0))
+//   	long imageSize = -1;// -1 = auto
+//	if (!(QString(mOptions.imageSize.c_str()).compare("auto", Qt::CaseInsensitive) == 0))
+//	{
+//		if (mArguments["isotropic"].compare("yes", Qt::CaseInsensitive) == 0)
+//			imageCompType = data_streaming::ISOTROPIC;
+//		else
+//			imageCompType = data_streaming::ANISOTROPIC;
+//		imageSize = 1;
+//	   	QStringList sizeList = QString(mArguments["imagesize"]).split(QRegExp("[x,X,*]"), QString::SkipEmptyParts);
+//		for (int i = 0; i < sizeList.length(); i++)
+//		{
+//			int dimSize = convertStringWithDefault(sizeList.at(i), 1);
+//			imageSize *= dimSize;
+//		}
+//		if (imageSize <= 1)
+//		{
+//			reportError("Error with calculated image size. imagesize: " + mArguments["imagesize"] + " = " + qstring_cast(imageSize));
+//		}
+//	}
+//	else
+//		imageCompType = data_streaming::AUTO;
+
+	long imageSize = -1;
+	if(mOptions.computationType != data_streaming::AUTO)
 	{
-		if (mArguments["isotropic"].compare("yes", Qt::CaseInsensitive) == 0)
-			imageCompType = data_streaming::ISOTROPIC;
-		else
-			imageCompType = data_streaming::ANISOTROPIC;
-		imageSize = 1;
-	   	QStringList sizeList = QString(mArguments["imagesize"]).split(QRegExp("[x,X,*]"), QString::SkipEmptyParts);
-		for (int i = 0; i < sizeList.length(); i++)
-		{
-			int dimSize = convertStringWithDefault(sizeList.at(i), 1);
-			imageSize *= dimSize;
-		}
-		if (imageSize <= 1)
-		{
-			reportError("Error with calculated image size. imagesize: " + mArguments["imagesize"] + " = " + qstring_cast(imageSize));
-		}
+		imageSize = mOptions.imageSize;
 	}
-	else
-		imageCompType = data_streaming::AUTO;
 
    	//Select image streams to export
    	//Accept , ; . as separators
-   	QStringList streamList = QString(mArguments["streams"]).split(",", QString::SkipEmptyParts);
-   	mExportScanconverted = false;
-   	mExportTissue = false;
-   	mExportBandwidth = false;
-   	mExportFrequency = false;
-   	mExportVelocity = false;
-   	for (int i = 0; i < streamList.length(); i++)
-   	{
-   		if (streamList.at(i).compare("scanconverted", Qt::CaseInsensitive) == 0)
-   			mExportScanconverted = true;
-   		else if (streamList.at(i).compare("tissue", Qt::CaseInsensitive) == 0)
-   			mExportTissue = true;
-   		else if (streamList.at(i).compare("bandwidth", Qt::CaseInsensitive) == 0)
-   			mExportBandwidth = true;
-   		else if (streamList.at(i).compare("frequency", Qt::CaseInsensitive) == 0)
-   			mExportFrequency = true;
-   		else if (streamList.at(i).compare("velocity", Qt::CaseInsensitive) == 0)
-   			mExportVelocity = true;
-   		else if (streamList.at(i).compare("all", Qt::CaseInsensitive) == 0)
-   		{
-   			mExportScanconverted = true;
-   			mExportTissue = true;
-   			mExportBandwidth = true;
-   			mExportFrequency = true;
-   			mExportVelocity = true;
-   		}
-   		else
-			reportWarning("ImageStreamerGE: Unknown stream: " + streamList.at(i));
-   	}
+//   	QStringList streamList = QString(mArguments["streams"]).split(",", QString::SkipEmptyParts);
+//   	mExportScanconverted = false;
+//   	mExportTissue = false;
+//   	mExportBandwidth = false;
+//   	mExportFrequency = false;
+//   	mExportVelocity = false;
+//   	for (int i = 0; i < streamList.length(); i++)
+//   	{
+//   		if (streamList.at(i).compare("scanconverted", Qt::CaseInsensitive) == 0)
+//   			mExportScanconverted = true;
+//   		else if (streamList.at(i).compare("tissue", Qt::CaseInsensitive) == 0)
+//   			mExportTissue = true;
+//   		else if (streamList.at(i).compare("bandwidth", Qt::CaseInsensitive) == 0)
+//   			mExportBandwidth = true;
+//   		else if (streamList.at(i).compare("frequency", Qt::CaseInsensitive) == 0)
+//   			mExportFrequency = true;
+//   		else if (streamList.at(i).compare("velocity", Qt::CaseInsensitive) == 0)
+//   			mExportVelocity = true;
+//   		else if (streamList.at(i).compare("all", Qt::CaseInsensitive) == 0)
+//   		{
+//   			mExportScanconverted = true;
+//   			mExportTissue = true;
+//   			mExportBandwidth = true;
+//   			mExportFrequency = true;
+//   			mExportVelocity = true;
+//   		}
+//   		else
+//			reportWarning("ImageStreamerGE: Unknown stream: " + streamList.at(i));
+//   	}
 
-	bool useOpenCL = convertStringWithDefault(mArguments["useOpenCL"], 1);
+	bool useOpenCL = mOptions.useOpenCL; //convertStringWithDefault(mArguments["useOpenCL"], 1);
 
-	std::string openclpath = findOpenCLPath(mArguments["openclpath"]).toStdString();
+	std::string openclpath = findOpenCLPath("").toStdString();
 
 	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageCompType, imageSize, interpType, bufferSize, openclpath, useOpenCL);
 
 	//Setup the needed data stream types. The default is only scan converted data
-	mGEStreamer.SetupExportParameters(mExportScanconverted, mExportTissue, mExportBandwidth, mExportFrequency, mExportVelocity);
+	mGEStreamer.SetupExportParameters(mOptions.scanconvertedStream, mOptions.tissueStream, mOptions.bandwidthStream, mOptions.frequencyStream, mOptions.velocityStream);
 
 	//Prevent copies of streamed data. Without this both tissue and flow frames trigger sending of data (resulting in all frames sent 2 times?)
 	mGEStreamer.SetForceTissueFrameRate(true);
@@ -200,7 +203,32 @@ QString findOpenCLPath(QString additionalLocation)
 	return retval;
 }
 
-void GEImageStreamer::deinitialize_local()
+bool GEStreamer::initialize_local()
+{
+//	std::string hostIp = mArguments["ip"].toStdString();
+//	int streamPort = convertStringWithDefault(mArguments["streamport"], -1);
+//	int commandPort = convertStringWithDefault(mArguments["commandport"], -1);
+//
+	std::string hostIp = mOptions.IP;
+	int streamPort = mOptions.streamPort;
+	int commandPort = mOptions.commandPort;
+	data_streaming::TestMode test;
+	QString testMode(mOptions.testMode.c_str());
+	if (testMode.compare("2D", Qt::CaseInsensitive) == 0)
+		test = data_streaming::test2D;
+	else if (testMode.compare("1", Qt::CaseInsensitive) == 0) //Also accept 1 as 2D test
+		test = data_streaming::test2D;
+	else if (testMode.compare("3D", Qt::CaseInsensitive) == 0)
+		test = data_streaming::test3D;
+	else //no
+		test = data_streaming::noTest;
+
+	this->applyOptions();
+
+	return mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, test);
+}
+
+void GEStreamer::deinitialize_local()
 {
 	//Set mImgStream as an empty pointer
 	mImgExportedStream = vtkSmartPointer<data_streaming::vtkExportedStreamData>();
@@ -212,32 +240,19 @@ void GEImageStreamer::deinitialize_local()
 	mGEStreamer.DisconnectFromScanner();
 }
 
-bool GEImageStreamer::initialize_local()
+void GEStreamer::setOptions(const Options& options)
 {
-	std::string hostIp = mArguments["ip"].toStdString();
-	int streamPort = convertStringWithDefault(mArguments["streamport"], -1);
-	int commandPort = convertStringWithDefault(mArguments["commandport"], -1);
-
-	data_streaming::TestMode test;
-	if (mArguments["test"].compare("2D", Qt::CaseInsensitive) == 0)
-		test = data_streaming::test2D;
-	else if (mArguments["test"].compare("1", Qt::CaseInsensitive) == 0) //Also accept 1 as 2D test
-		test = data_streaming::test2D;
-	else if (mArguments["test"].compare("3D", Qt::CaseInsensitive) == 0)
-		test = data_streaming::test3D;
-	else //no
-		test = data_streaming::noTest;
-
-	return mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, test);
+	mOptions = options;
+	this->applyOptions();
 }
 
-bool GEImageStreamer::startStreaming(SenderPtr sender)
+bool GEStreamer::startStreaming(SenderPtr sender)
 {
 	this->setInitialized(this->initialize_local());
 
 	if (!this->isInitialized() || !mGrabTimer || !mSendTimer)
 	{
-		std::cout << "ImageStreamerGE: Failed to start streaming: Not initialized." << std::endl;
+		std::cout << "GEStreamer: Failed to start streaming: Not initialized." << std::endl;
 		return false;
 	}
 
@@ -247,7 +262,7 @@ bool GEImageStreamer::startStreaming(SenderPtr sender)
 	return true;
 }
 
-void GEImageStreamer::stopStreaming()
+void GEStreamer::stopStreaming()
 {
 	if (!this->isInitialized() || !mGrabTimer || !mSendTimer)
 		return;
@@ -257,7 +272,17 @@ void GEImageStreamer::stopStreaming()
 	this->deinitialize_local();
 }
 
-void GEImageStreamer::grab()
+void GEStreamer::streamSlot()
+{
+//	if (!this->isReadyToSend())
+//		return;
+//
+//	this->sendTestDataFrames();
+
+	std::cout << "GEStreamer::streamSlot()" << std::endl;
+}
+
+void GEStreamer::grab()
 {
 	if (!mGEStreamer.HasNewImageData())
 		return;
@@ -306,33 +331,33 @@ void GEImageStreamer::grab()
 //	this->printTimeIntervals();
 }
 
-void GEImageStreamer::send()
+void GEStreamer::send()
 {
 	if (!this->isReadyToSend())
 		return;
 
 	QString uid;
-	if (mExportScanconverted && mImgExportedStream->GetScanConvertedImage())
+	if (mOptions.scanconvertedStream && mImgExportedStream->GetScanConvertedImage())
 	{
 		uid = "ScanConverted [RGBA]";
 		send(uid, mImgExportedStream->GetScanConvertedImage(), mFrameGeometry, mFrameGeometryChanged);
 	}
-	if (mExportTissue && mImgExportedStream->GetTissueImage())
+	if (mOptions.tissueStream && mImgExportedStream->GetTissueImage())
 	{
 		uid = "Tissue [R]";
 		send(uid, mImgExportedStream->GetTissueImage(), mFrameGeometry, mFrameGeometryChanged);
 	}
-	if (mExportBandwidth && mImgExportedStream->GetBandwidthImage())
+	if (mOptions.bandwidthStream && mImgExportedStream->GetBandwidthImage())
 	{
 		uid = "Bandwidth [R]";
 		send(uid, mImgExportedStream->GetBandwidthImage(), mFlowGeometry, mFlowGeometryChanged);
 	}
-	if (mExportFrequency && mImgExportedStream->GetFrequencyImage())
+	if (mOptions.frequencyStream && mImgExportedStream->GetFrequencyImage())
 	{
 		uid = "Frequency [R]";
 		send(uid, mImgExportedStream->GetFrequencyImage(), mFlowGeometry, mFlowGeometryChanged);
 	}
-	if (mExportVelocity && mImgExportedStream->GetVelocityImage())
+	if (mOptions.velocityStream && mImgExportedStream->GetVelocityImage())
 	{
 		uid = "Velocity [R]";
 		send(uid, mImgExportedStream->GetVelocityImage(), mFlowGeometry, mFlowGeometryChanged);
@@ -340,7 +365,7 @@ void GEImageStreamer::send()
 }
 
 
-void GEImageStreamer::send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged)
+void GEStreamer::send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged)
 {
 	mRenderTimer->time("startsend");
 
@@ -372,7 +397,7 @@ void GEImageStreamer::send(const QString& uid, const vtkImageDataPtr& img, data_
 	mRenderTimer->time("sendersend");
 }
 
-ProbeDefinitionPtr GEImageStreamer::getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img)
+ProbeDefinitionPtr GEStreamer::getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img)
 {
 	ProbeDefinitionPtr retval;
 	if (!img || !mImgExportedStream)
@@ -423,7 +448,7 @@ ProbeDefinitionPtr GEImageStreamer::getFrameStatus(QString uid, data_streaming::
 	return retval;
 }
 
-bool GEImageStreamer::equal(data_streaming::frame_geometry a, data_streaming::frame_geometry b)
+bool GEStreamer::equal(data_streaming::frame_geometry a, data_streaming::frame_geometry b)
 {
 	return !((a.origin[0] != b.origin[0]) || (a.origin[1] != b.origin[1]) || (a.origin[2] != b.origin[2])
 			|| (a.imageType != b.imageType)
@@ -436,7 +461,7 @@ bool GEImageStreamer::equal(data_streaming::frame_geometry a, data_streaming::fr
 			|| !similar(a.vNyquist, b.vNyquist, 0.0001)
 			|| !similar(a.PRF, b.PRF, 0.0001));
 }
-void GEImageStreamer::printTimeIntervals()
+void GEStreamer::printTimeIntervals()
 {
 	if (mRenderTimer->intervalPassed())
 	{

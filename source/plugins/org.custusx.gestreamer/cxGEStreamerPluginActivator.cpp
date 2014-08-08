@@ -15,7 +15,6 @@
 #include "cxGEStreamerPluginActivator.h"
 
 #include <QtPlugin>
-//#include <iostream>
 
 #include "cxGEStreamerService.h"
 
@@ -25,7 +24,6 @@ namespace cx
 GEStreamerPluginActivator::GEStreamerPluginActivator()
 : mContext(0)
 {
-	std::cout << "Created GEStreamerPluginActivator" << std::endl;
 }
 
 GEStreamerPluginActivator::~GEStreamerPluginActivator()
@@ -35,11 +33,9 @@ GEStreamerPluginActivator::~GEStreamerPluginActivator()
 
 void GEStreamerPluginActivator::start(ctkPluginContext* context)
 {
-	std::cout << "Started GEStreamerPluginActivator" << std::endl;
 	this->mContext = context;
 
 	mPlugin.reset(new GEStreamerService);
-	std::cout << "created gestreamer service" << std::endl;
 	try
 	{
 		mRegistration = context->registerService(QStringList(StreamerService_iid), mPlugin.get());
@@ -49,7 +45,6 @@ void GEStreamerPluginActivator::start(ctkPluginContext* context)
 		std::cout << e.what() << std::endl;
 		mPlugin.reset();
 	}
-	std::cout << "registered gestreamer service" << std::endl;
 }
 
 void GEStreamerPluginActivator::stop(ctkPluginContext* context)
@@ -57,7 +52,6 @@ void GEStreamerPluginActivator::stop(ctkPluginContext* context)
 	mRegistration.unregister();
 	if(mPlugin)
 		mPlugin.reset();
-	std::cout << "Stopped GEStreamerPluginActivator" << std::endl;
 	Q_UNUSED(context)
 }
 

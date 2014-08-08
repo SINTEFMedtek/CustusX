@@ -14,6 +14,9 @@
 
 #include "cxGEStreamerService.h"
 
+#include <QMutexLocker>
+#include "cxStringHelpers.h"
+
 namespace cx
 {
 
@@ -36,11 +39,10 @@ std::vector<DataAdapterPtr> GEStreamerService::getSettings(QDomElement root)
 	std::vector<DataAdapterPtr> retval;
 	retval.push_back(this->getIPOption(root));
 	retval.push_back(this->getStreamPortOption(root));
-	retval.push_back(this->getCommandPortOption(root));
 	retval.push_back(this->getBufferSizeOption(root));
+	retval.push_back(this->getUseAutoImageSizeOption(root));
 	retval.push_back(this->getImageSizeOption(root));
 	retval.push_back(this->getIsotropicOption(root));
-	retval.push_back(this->getKernelPathOption(root));
 	retval.push_back(this->getTestModeOption(root));
 	retval.push_back(this->getUseOpenCLOption(root));
 	retval.push_back(this->getScanconvertedStreamOption(root));
@@ -54,49 +56,91 @@ std::vector<DataAdapterPtr> GEStreamerService::getSettings(QDomElement root)
 
 StreamerPtr GEStreamerService::createStreamer(QDomElement root)
 {
-	//TODO
-	return StreamerPtr();
+	QMutexLocker lock(&mStreamerMutex);
+	mStreamer.reset(new GEStreamer);
+	mXmlSettings = root;
+	this->sendOptions();
+
+	return mStreamer;
+}
+
+void GEStreamerService::sendOptions()
+{
+	if(mStreamer)
+		mStreamer->setOptions(this->generateOptions());
+}
+
+GEStreamer::Options GEStreamerService::generateOptions()
+{
+	GEStreamer::Options options;
+	options.IP = mIPDataAdapter->getValue().toStdString();
+	options.streamPort = mStreamPortDataAdapter->getValue();
+	options.commandPort = -1;
+	options.bufferSize = mBufferSizeDataAdapter->getValue();
+	options.imageSize = mUseAutoImageSizeDataAdapter->getValue() ? -1 : this->translateToValue(mImageSizeDataAdapter->getValue());
+	options.computationType = mUseAutoImageSizeDataAdapter->getValue() ? data_streaming::ANISOTROPIC : (mIsotropicDataAdapter->getValue() ? data_streaming::ANISOTROPIC : data_streaming::ISOTROPIC);
+	options.testMode = mTestModeDataAdapter->getValue().toStdString();
+	options.useOpenCL = mUseOpenCLDataAdapter->getValue();
+	options.scanconvertedStream = mScanconvertedStreamDataAdapter->getValue();
+	options.tissueStream = mTissueStreamDataAdapter->getValue();
+	options.bandwidthStream = mBandwidthStreamDataAdapter->getValue();
+	options.frequencyStream = mFrequencyStreamDataAdapter->getValue();
+	options.velocityStream = mVelocityStreamDataAdapter->getValue();
+
+	return options;
+}
+
+long GEStreamerService::translateToValue(QString value)
+{
+	long retval = 1;
+	QStringList sizeList = value.split(QRegExp("[x,X,*]"), QString::SkipEmptyParts);
+	for (int i = 0; i < sizeList.length(); i++)
+	{
+		int dimSize = convertStringWithDefault(sizeList.at(i), 1);
+		retval *= dimSize;
+	}
+	return retval;
 }
 
 StringDataAdapterXmlPtr GEStreamerService::getIPOption(QDomElement root)
 {
-	if(!mSelectIPDataAdapter)
+	if(!mIPDataAdapter)
 	{
 		QString defaultValue = "127.0.0.1";
-		mSelectIPDataAdapter = StringDataAdapterXml::initialize("ge_ip_scanner", "IP GE scanner", "IP of the GE scanner", defaultValue, root);
-//		connect(mBufferSizeDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(updateBufferSize()));
-//		this->updateBufferSize();
+		mIPDataAdapter = StringDataAdapterXml::initialize("ge_ip_scanner", "IP GE scanner", "IP of the GE scanner", defaultValue, root);
+		mIPDataAdapter->setGroup("Connection");
+		connect(mIPDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}
 
-	return mSelectIPDataAdapter;
+	return mIPDataAdapter;
 }
 
 DoubleDataAdapterXmlPtr GEStreamerService::getStreamPortOption(QDomElement root)
 {
 	if(!mStreamPortDataAdapter)
 	{
-		//TODO -1????
 		mStreamPortDataAdapter = DoubleDataAdapterXml::initialize("ge_stream_port", "Stream port", "Set the stream for the GE stream port.", 6543, DoubleRange(1024, 49151, 1), 0, root);
 		mStreamPortDataAdapter->setGuiRepresentation(DoubleDataAdapter::grSPINBOX);
-//		connect(mStreamPortDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(updateStreamPort()));
-//		this->updateStreamPort();
+		mStreamPortDataAdapter->setAdvanced(true);
+		mStreamPortDataAdapter->setGroup("Connection");
+		connect(mStreamPortDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}
 
 	return mStreamPortDataAdapter;
 }
 
-DoubleDataAdapterXmlPtr GEStreamerService::getCommandPortOption(QDomElement root)
+BoolDataAdapterXmlPtr	GEStreamerService::getUseAutoImageSizeOption(QDomElement root)
 {
-	if(!mCommandPortDataAdapter)
+	if(!mUseAutoImageSizeDataAdapter)
 	{
-		//TODO -1????
-		mCommandPortDataAdapter = DoubleDataAdapterXml::initialize("ge_command_port", "Command port", "Set the command for the GE stream port.", 6543, DoubleRange(1024, 49151, 1), 0, root);
-		mCommandPortDataAdapter->setGuiRepresentation(DoubleDataAdapter::grSPINBOX);
-//		connect(mCommandPortDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(updateCommandPort()));
-//		this->updateCommandPort();
+		bool defaultValue = true;
+		mUseAutoImageSizeDataAdapter = BoolDataAdapterXml::initialize("ge_use_auto_image_size", "Use automatic imagesize", "Setting this to true will ignore imagesize and use anisotropic voxels/pixels.", defaultValue);
+		mUseAutoImageSizeDataAdapter->setAdvanced(true);
+		mUseAutoImageSizeDataAdapter->setGroup("US Image");
+		connect(mUseAutoImageSizeDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}
 
-	return mCommandPortDataAdapter;
+	return mUseAutoImageSizeDataAdapter;
 }
 
 DoubleDataAdapterXmlPtr GEStreamerService::getBufferSizeOption(QDomElement root)
@@ -105,8 +149,9 @@ DoubleDataAdapterXmlPtr GEStreamerService::getBufferSizeOption(QDomElement root)
 	{
 		mBufferSizeDataAdapter = DoubleDataAdapterXml::initialize("ge_buffer_size", "Buffer size", "Select the buffer size of the GE streamer in number of images.", 10, DoubleRange(0, 100, 1), 0, root);
 		mBufferSizeDataAdapter->setGuiRepresentation(DoubleDataAdapter::grSPINBOX);
-//		connect(mBufferSizeDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(updateBufferSize()));
-//		this->updateBufferSize();
+		mBufferSizeDataAdapter->setAdvanced(true);
+		mBufferSizeDataAdapter->setGroup("Image processing");
+		connect(mBufferSizeDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}
 
 	return mBufferSizeDataAdapter;
@@ -118,8 +163,9 @@ StringDataAdapterXmlPtr GEStreamerService::getImageSizeOption(QDomElement root)
 	{
 		QString defaultValue = "auto";
 		mImageSizeDataAdapter = StringDataAdapterXml::initialize("ge_image_size", "Size of requested image", "Approximate number of voxels for 3D volumes or number of pixels for 2D images.", defaultValue, root);
-//		connect(mBufferSizeDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(updateBufferSize()));
-//		this->updateBufferSize();
+		mImageSizeDataAdapter->setAdvanced(true);
+		mImageSizeDataAdapter->setGroup("US Image");
+		connect(mImageSizeDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}
 
 	return mImageSizeDataAdapter;
@@ -131,26 +177,13 @@ BoolDataAdapterXmlPtr	GEStreamerService::getIsotropicOption(QDomElement root)
 	{
 		bool defaultValue = false;
 		mIsotropicDataAdapter = BoolDataAdapterXml::initialize("ge_isotropic", "Use isotropic", "Force quadratic pixel or cubic voxels.", defaultValue);
-//		connect(mBufferSizeDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(updateBufferSize()));
-//		this->updateBufferSize();
+		mIsotropicDataAdapter->setAdvanced(true);
+		mIsotropicDataAdapter->setGroup("US Image");
+		connect(mIsotropicDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}
 
 	return mIsotropicDataAdapter;
 }
-
-//DEPRECATED
-//StringDataAdapterXmlPtr GEStreamerService::getKernelPathOption(QDomElement root)
-//{
-//	if(!mKernelPathDataAdapter)
-//	{
-//		QString defaultValue = "/kernel/path/";
-//		mKernelPathDataAdapter = StringDataAdapterXml::initialize("ge_kernel_path", "Path to OpenCL scanconversion", "Path to kernel code for scanconversion.", defaultValue, root);
-////		connect(mBufferSizeDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(updateBufferSize()));
-////		this->updateBufferSize();
-//	}
-//
-//	return mKernelPathDataAdapter;
-//}
 
 StringDataAdapterXmlPtr	GEStreamerService::getTestModeOption(QDomElement root)
 {
@@ -160,8 +193,9 @@ StringDataAdapterXmlPtr	GEStreamerService::getTestModeOption(QDomElement root)
 		QStringList testModes;
 		testModes << defaultValue << "2D" << "3D";
 		mTestModeDataAdapter = StringDataAdapterXml::initialize("ge_test_mode", "Test mode", "Test mode.", defaultValue, testModes, root);
-//		connect(mBufferSizeDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(updateBufferSize()));
-//		this->updateBufferSize();
+		mTestModeDataAdapter->setAdvanced(true);
+		mTestModeDataAdapter->setGroup("Debug");
+		connect(mTestModeDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}
 
 	return mTestModeDataAdapter;
@@ -173,8 +207,9 @@ BoolDataAdapterXmlPtr	GEStreamerService::getUseOpenCLOption(QDomElement root)
 	{
 		bool defaultValue = true;
 		mUseOpenCLDataAdapter = BoolDataAdapterXml::initialize("ge_use_opencl", "Use OpenCL scanconversion", "Scanconvert using OpenCL kernels.", defaultValue);
-//		connect(mBufferSizeDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(updateBufferSize()));
-//		this->updateBufferSize();
+		mUseOpenCLDataAdapter->setAdvanced(true);
+		mUseOpenCLDataAdapter->setGroup("Image processing");
+		connect(mUseOpenCLDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}
 
 	return mUseOpenCLDataAdapter;
@@ -186,8 +221,8 @@ BoolDataAdapterXmlPtr	GEStreamerService::getScanconvertedStreamOption(QDomElemen
 	{
 		bool defaultValue = true;
 		mScanconvertedStreamDataAdapter = BoolDataAdapterXml::initialize("ge_get_scanconverted_stream", "B-Mode stream", "Request the B-Mode stream data.", defaultValue);
-//		connect(mBufferSizeDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(updateBufferSize()));
-//		this->updateBufferSize();
+		mScanconvertedStreamDataAdapter->setGroup("Streams");
+		connect(mScanconvertedStreamDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}
 
 	return mScanconvertedStreamDataAdapter;
@@ -199,8 +234,8 @@ BoolDataAdapterXmlPtr	GEStreamerService::getTissueStreamOption(QDomElement root)
 	{
 		bool defaultValue = false;
 		mTissueStreamDataAdapter = BoolDataAdapterXml::initialize("ge_get_tissue_stream", "Tissue stream", "Request the tissue stream, the doppler data is removed.", defaultValue);
-//		connect(mBufferSizeDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(updateBufferSize()));
-//		this->updateBufferSize();
+		mTissueStreamDataAdapter->setGroup("Streams");
+		connect(mTissueStreamDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}
 
 	return mTissueStreamDataAdapter;
@@ -212,8 +247,8 @@ BoolDataAdapterXmlPtr	GEStreamerService::getBandwidthStreamOption(QDomElement ro
 	{
 		bool defaultValue = true;
 		mBandwidthStreamDataAdapter = BoolDataAdapterXml::initialize("ge_get_bandwidth_stream", "Bandwidth stream", "Request the bandwidth stream data.", defaultValue);
-//		connect(mBufferSizeDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(updateBufferSize()));
-//		this->updateBufferSize();
+		mBandwidthStreamDataAdapter->setGroup("Streams");
+		connect(mBandwidthStreamDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}
 
 	return mBandwidthStreamDataAdapter;
@@ -225,8 +260,8 @@ BoolDataAdapterXmlPtr	GEStreamerService::getFrequencyStreamOption(QDomElement ro
 	{
 		bool defaultValue = false;
 		mFrequencyStreamDataAdapter = BoolDataAdapterXml::initialize("ge_get_frequency_stream", "Frequency stream", "Request the frequency stream data.", defaultValue);
-//		connect(mBufferSizeDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(updateBufferSize()));
-//		this->updateBufferSize();
+		mFrequencyStreamDataAdapter->setGroup("Streams");
+		connect(mFrequencyStreamDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}
 
 	return mFrequencyStreamDataAdapter;
@@ -238,8 +273,8 @@ BoolDataAdapterXmlPtr	GEStreamerService::getVelocityStreamOption(QDomElement roo
 	{
 		bool defaultValue = false;
 		mVelocityStreamDataAdapter = BoolDataAdapterXml::initialize("ge_get_velocity_stream", "Velocity stream", "Request the velocity stream data.", defaultValue);
-//		connect(mBufferSizeDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(updateBufferSize()));
-//		this->updateBufferSize();
+		mVelocityStreamDataAdapter->setGroup("Streams");
+		connect(mVelocityStreamDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}
 
 	return mVelocityStreamDataAdapter;

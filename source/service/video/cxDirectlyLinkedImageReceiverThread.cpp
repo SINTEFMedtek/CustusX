@@ -45,6 +45,7 @@ void DirectlyLinkedImageReceiverThread::run()
 	if(!mImageStreamer)
 	{
 		this->quit();
+		std::cout << "quitting..." << std::endl;
 		return;
 	}
 	mSender.reset(new DirectlyLinkedSender());

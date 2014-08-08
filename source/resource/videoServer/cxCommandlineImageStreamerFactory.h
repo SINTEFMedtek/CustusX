@@ -14,7 +14,7 @@ namespace cx
 
 typedef std::map<QString, QString> StringMap;
 StringMap extractCommandlineOptions(QStringList cmdline);
-int convertStringWithDefault(QString text, int def);
+
 
 /**
  * \brief Factory class for creating streamer objects.

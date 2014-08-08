@@ -3,6 +3,7 @@ project(org_custusx_gestreamer)
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 include_directories(
+    ${CustusX_BINARY_DIR}/source/resource/videoServer
     ${CustusX_SOURCE_DIR}/source/service/video
     ${CustusX_SOURCE_DIR}/source/resource/videoServer
     ${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
@@ -12,17 +13,24 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/resource/core/Data
     ${CustusX_SOURCE_DIR}/source/resource/core/Math
     ${CustusX_SOURCE_DIR}/source/resource/core/Tool
+    ${CustusX_SOURCE_DIR}/source/resource/core/logger
+    ${CustusX_SOURCE_DIR}/source/resource/core/settings
     )
 
 set(PLUGIN_SRCS
   cxGEStreamerPluginActivator.cpp
+  cxGEStreamerPluginActivator.h
   cxGEStreamerService.cpp
+  cxGEStreamerService.h
+  cxGEStreamer.cpp
+  cxGEStreamer.h
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxGEStreamerPluginActivator.h
   cxGEStreamerService.h
+  cxGEStreamer.h
 )
 
 # Qt Designer files which should be processed by Qts uic
