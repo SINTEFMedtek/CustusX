@@ -18,6 +18,8 @@
 #include "cxStreamerService.h"
 #include "org_custusx_gestreamer_Export.h"
 
+#include "cxGEImageStreamer.h"
+
 namespace cx
 {
 
@@ -39,6 +41,9 @@ public:
 	virtual QString getName();
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
 	virtual StreamerPtr createStreamer(QDomElement root);
+
+private:
+	ImageStreamerPtr mStreamer;
 
 };
 typedef boost::shared_ptr<GEStreamerService> GEStreamerServicePtr;

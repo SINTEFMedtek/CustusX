@@ -1,11 +1,4 @@
-/*
- * cxImageStreamerGE.cpp
- *
- *  Created on: Sep 19, 2012
- *      Author: olevs
- */
-
-#include "cxImageStreamerGE.h"
+#include "cxGEImageStreamer.h"
 
 #ifdef CX_USE_ISB_GE
 
@@ -38,7 +31,7 @@ typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
 namespace cx
 {
 
-ImageStreamerGE::ImageStreamerGE() :
+GEImageStreamer::GEImageStreamer() :
 	mGrabTimer(0),
 	mExportScanconverted(true),
 	mExportTissue(false),
@@ -58,12 +51,12 @@ ImageStreamerGE::ImageStreamerGE() :
 	mSendTimer = new QTimer(this);
 }
 
-QString ImageStreamerGE::getType()
+QString GEImageStreamer::getType()
 {
 	return "ISB_GE";
 }
 
-QStringList ImageStreamerGE::getArgumentDescription()
+QStringList GEImageStreamer::getArgumentDescription()
 {
 	QStringList retval;
 	//Tabs are set so that tool tip looks nice
@@ -80,7 +73,7 @@ QStringList ImageStreamerGE::getArgumentDescription()
 	return retval;
 }
 
-void ImageStreamerGE::initialize(StringMap arguments)
+void GEImageStreamer::initialize(StringMap arguments)
 {
 	CommandLineStreamer::initialize(arguments);
 
@@ -206,7 +199,7 @@ QString findOpenCLPath(QString additionalLocation)
 	return retval;
 }
 
-void ImageStreamerGE::deinitialize_local()
+void GEImageStreamer::deinitialize_local()
 {
 	//Set mImgStream as an empty pointer
 	mImgExportedStream = vtkSmartPointer<data_streaming::vtkExportedStreamData>();
@@ -218,7 +211,7 @@ void ImageStreamerGE::deinitialize_local()
 	mGEStreamer.DisconnectFromScanner();
 }
 
-bool ImageStreamerGE::initialize_local()
+bool GEImageStreamer::initialize_local()
 {
 	std::string hostIp = mArguments["ip"].toStdString();
 	int streamPort = convertStringWithDefault(mArguments["streamport"], -1);
@@ -237,7 +230,7 @@ bool ImageStreamerGE::initialize_local()
 	return mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, test);
 }
 
-bool ImageStreamerGE::startStreaming(SenderPtr sender)
+bool GEImageStreamer::startStreaming(SenderPtr sender)
 {
 	this->setInitialized(this->initialize_local());
 
@@ -253,7 +246,7 @@ bool ImageStreamerGE::startStreaming(SenderPtr sender)
 	return true;
 }
 
-void ImageStreamerGE::stopStreaming()
+void GEImageStreamer::stopStreaming()
 {
 	if (!this->isInitialized() || !mGrabTimer || !mSendTimer)
 		return;
@@ -263,7 +256,7 @@ void ImageStreamerGE::stopStreaming()
 	this->deinitialize_local();
 }
 
-void ImageStreamerGE::grab()
+void GEImageStreamer::grab()
 {
 	if (!mGEStreamer.HasNewImageData())
 		return;
@@ -312,7 +305,7 @@ void ImageStreamerGE::grab()
 //	this->printTimeIntervals();
 }
 
-void ImageStreamerGE::send()
+void GEImageStreamer::send()
 {
 	if (!this->isReadyToSend())
 		return;
@@ -346,7 +339,7 @@ void ImageStreamerGE::send()
 }
 
 
-void ImageStreamerGE::send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged)
+void GEImageStreamer::send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged)
 {
 	mRenderTimer->time("startsend");
 
@@ -378,7 +371,7 @@ void ImageStreamerGE::send(const QString& uid, const vtkImageDataPtr& img, data_
 	mRenderTimer->time("sendersend");
 }
 
-ProbeDefinitionPtr ImageStreamerGE::getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img)
+ProbeDefinitionPtr GEImageStreamer::getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img)
 {
 	ProbeDefinitionPtr retval;
 	if (!img || !mImgExportedStream)
@@ -429,7 +422,7 @@ ProbeDefinitionPtr ImageStreamerGE::getFrameStatus(QString uid, data_streaming::
 	return retval;
 }
 
-bool ImageStreamerGE::equal(data_streaming::frame_geometry a, data_streaming::frame_geometry b)
+bool GEImageStreamer::equal(data_streaming::frame_geometry a, data_streaming::frame_geometry b)
 {
 	return !((a.origin[0] != b.origin[0]) || (a.origin[1] != b.origin[1]) || (a.origin[2] != b.origin[2])
 			|| (a.imageType != b.imageType)
@@ -442,7 +435,7 @@ bool ImageStreamerGE::equal(data_streaming::frame_geometry a, data_streaming::fr
 			|| !similar(a.vNyquist, b.vNyquist, 0.0001)
 			|| !similar(a.PRF, b.PRF, 0.0001));
 }
-void ImageStreamerGE::printTimeIntervals()
+void GEImageStreamer::printTimeIntervals()
 {
 	if (mRenderTimer->intervalPassed())
 	{

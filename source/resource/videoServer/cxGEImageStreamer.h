@@ -34,12 +34,12 @@ QString findOpenCLPath(QString additionalLocation); ///< Find GEStreamer OpenCL 
  * This version uses the NTNU ISB data streamer module (provided by Gabriel Kiss)
  * to grab images from the E9 EG scanner (and similar)
  */
-class ImageStreamerGE: public CommandLineStreamer
+class GEImageStreamer: public CommandLineStreamer
 {
 	Q_OBJECT
 public:
-	ImageStreamerGE();
-	virtual ~ImageStreamerGE() {}
+	GEImageStreamer();
+	virtual ~GEImageStreamer() {}
 
 	virtual void initialize(StringMap arguments);
 	virtual bool startStreaming(SenderPtr sender);
