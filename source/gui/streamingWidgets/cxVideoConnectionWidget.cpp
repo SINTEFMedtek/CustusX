@@ -45,6 +45,8 @@
 #include "cxFileInputWidget.h"
 #include "cxLogger.h"
 
+#include "cxOptionsWidget.h"
+
 namespace cx
 {
 
@@ -107,22 +109,13 @@ void VideoConnectionWidget::onServiceAdded(StreamerService* service)
 
 QWidget* VideoConnectionWidget::createStreamerWidget(StreamerService* service)
 {
-	QString algoName = service->getName();
+	QString serviceName = service->getName();
 	QDomElement element = mOptions.getElement("video");
 	std::vector<DataAdapterPtr> adapters = service->getSettings(element);
 
-	// No existing found,
-	//  create a new stack element for this algo:
-	QWidget* oneAlgoWidget = new QWidget(this);
-	oneAlgoWidget->setObjectName(algoName);
-	QGridLayout* oneAlgoLayout = new QGridLayout(oneAlgoWidget);
-	oneAlgoLayout->setMargin(0);
-
-	for (unsigned i = 0; i < adapters.size(); ++i)
-	{
-		createDataWidget(oneAlgoWidget, adapters[i], oneAlgoLayout, i);
-	}
-	return oneAlgoWidget;
+	OptionsWidget* widget = new OptionsWidget(this);
+	widget->setOptions(serviceName, adapters, true);
+	return widget;
 }
 
 void VideoConnectionWidget::onServiceRemoved(StreamerService *service)
@@ -206,42 +199,6 @@ QWidget* VideoConnectionWidget::createDirectLinkWidget()
 	layout->addWidget(mDirectLinkArguments, 0, 1);
 	return retval;
 }
-
-//TODO: This commented out code is a start of a fix of #884. Not finisehd yet
-//QWidget* VideoConnectionWidget::createDirectLinkWidget()
-//{
-//	QWidget* retval = new QWidget();
-//	QGridLayout* layout = new QGridLayout(retval);
-//	layout->setMargin(0);
-
-//	cx::ImageStreamerFactory factory;
-//	QString selectedSender = factory.getDefaultSenderType();
-//	QStringList senderTypes = factory.getSenderTypes();
-//	mSenderType = StringDataAdapterXml::initialize("Grabber type", "",
-//																								 "Video grabber/sender type",
-//																								 selectedSender, senderTypes);
-//	connect(mSenderType.get(), SIGNAL(changed()), this, SLOT(senderTypeChanged()));
-
-
-//	layout->addWidget(new LabeledComboBoxWidget(this, mSenderType), 0, 1);
-//	return retval;
-//}
-
-//When type is changed generate/use widget with arguments for this grabber/sender
-//void VideoConnectionWidget::senderTypeChanged()
-//{
-//	cx::ImageStreamerFactory factory;
-//	StreamerPtr streamer = factory.getImageSender(mSenderType->getValue());
-
-//	//TODO: Get available arguments from streamer
-////	QStringList args = streamer->getArgumentList();
-////	for (int i = 0; i < args.size(); ++i)
-////	{
-////		//TODO: Generate correct GUI item based on argument type. Can this be done similarly to the TSF GUI?
-////		QStringList values = streamer->getArgumentValues(args.at(i));
-////	}
-
-//}
 
 QWidget* VideoConnectionWidget::createLocalServerWidget()
 {
@@ -424,10 +381,6 @@ void VideoConnectionWidget::writeSettings()
 		this->getVideoConnectionManager()->setPort(mPortEdit->text().toInt());
 		this->updateHostHistory();
 	}
-//	else if (this->getVideoConnectionManager()->useSimulatedServer())
-//	{
-//		this->getVideoConnectionManager()->setLocalServerArguments("--type SimulatedImageStreamer");
-//	}
 }
 
 QPushButton* VideoConnectionWidget::initializeConnectButton()

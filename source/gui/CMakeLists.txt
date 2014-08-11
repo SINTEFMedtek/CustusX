@@ -10,6 +10,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	dataAdapters/cxToolDataAdapters
 	dataAdapters/cxDoubleDataAdapterTemporalCalibration
 	dataAdapters/cxSelectDataStringDataAdapter
+	dataAdapters/cxOptionsWidget
     #----------------------
 	dataWidgets/cxVolumePropertiesWidget
 	dataWidgets/cxVolumeInfoWidget
