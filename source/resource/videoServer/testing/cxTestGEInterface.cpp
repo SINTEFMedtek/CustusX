@@ -57,7 +57,7 @@ void TestGEInterface::testGEStreamer()
 	std::cout << std::endl << "*** Test GE 3D scanconverted stream. GPU scanconversion  ***" << std::endl;
 	data_streaming::GEStreamer geStreamer;
 
-	std::string openclpath = cx::findOpenCLPath("").toStdString();
+	std::string openclpath = cx::findGEOpenCLKernels("").toStdString();
 
 	//Initialize GEStreamer
 	geStreamer.InitializeClientData("", false, data_streaming::AUTO, -1, data_streaming::Bilinear, 10,   openclpath,     true);

@@ -33,13 +33,7 @@ namespace cx
 
 GEStreamer::GEStreamer() :
 	mGrabTimer(0)
-//	mExportScanconverted(true),
-//	mExportTissue(false),
-//	mExportBandwidth(false),
-//	mExportFrequency(false),
-//	mExportVelocity(false)
 {
-	//data_streaming::DataStreamApp test;
 	mRenderTimer.reset(new CyclicActionLogger("GE Grabber Timer"));
 
 	this->setSendInterval(40);
@@ -56,79 +50,16 @@ QString GEStreamer::getType()
 	return "ISB_GE";
 }
 
-//QStringList GEStreamer::getArgumentDescription()
-//{
-//	QStringList retval;
-//	//Tabs are set so that tool tip looks nice
-//	retval << "--ip:		GE scanner IP address";//default = 127.0.0.1, find a typical direct link address
-//	retval << "--streamport:		GE scanner streaming port, default = 6543";
-//	retval << "--commandport:	GE scanner command port, default = -1";//Unnecessary for us?
-//	retval << "--buffersize:		Size of GEStreamer buffer, default = 10";
-//	retval << "--imagesize:		Returned image/volume size in pixels (eg. 500x500x1), default = auto";
-//	retval << "--isotropic:		Use cubic voxels for the scan conversion, default = no";
-//	retval << "--openclpath:		Path to ScanConvert.cl";
-//	retval << "--test:		GEStreamer test mode (no, 2D or 3D), default = no";
-//	retval << "--useOpenCL:		Use OpenCL for scan conversion, default = 1";
-//	retval << "--streams:		Used video streams (separated by , with no spaces), default = scanconverted,bandwidth  Available streams (only 2D for now): scanconverted,tissue,bandwidth,frequency,velocity (all)";
-//	return retval;
-//}
-
-//void GEStreamer::initialize(StringMap arguments)
 void GEStreamer::applyOptions()
 {
-//	CommandLineStreamer::initialize(arguments);
-
 	std::string fileRoot = "c:\\test";
 	bool dumpHdfToDisk = false;
 
 	data_streaming::InterpolationType interpType = data_streaming::Bilinear;
 
-	//Set defaults
-//	if (!mOptions.IP.count("ip"))
-//		mOptions.IP = "127.0.0.1";
-//	if (!mOptions.count("streamport"))
-//		mArguments["streamport"] = "6543";
-//	if (!mArguments.count("commandport"))
-//		mArguments["commandport"] = "-1";
-//	if (!mArguments.count("buffersize"))
-//		mArguments["buffersize"] = "10";
-//    if (!mArguments.count("openclpath"))
-//        mArguments["openclpath"] = "";
-//    if (!mArguments.count("test"))
-//        mArguments["test"] = "no";
-//    if (!mArguments.count("imagesize"))
-//        mArguments["imagesize"] = "auto";
-//    if (!mArguments.count("isotropic"))
-//        mArguments["isotropic"] = "no";
-//    if (!mArguments.count("useOpenCL"))
-//        mArguments["useOpenCL"] = "1";
-//    if (!mArguments.count("streams"))
-//        mArguments["streams"] = "scanconverted,bandwidth";
-
-   	int bufferSize = mOptions.bufferSize;//convertStringWithDefault(mArguments["buffersize"], -1);
+   	int bufferSize = mOptions.bufferSize;
 
 	data_streaming::OutputSizeComputationType imageCompType = data_streaming::AUTO;
-//   	long imageSize = -1;// -1 = auto
-//	if (!(QString(mOptions.imageSize.c_str()).compare("auto", Qt::CaseInsensitive) == 0))
-//	{
-//		if (mArguments["isotropic"].compare("yes", Qt::CaseInsensitive) == 0)
-//			imageCompType = data_streaming::ISOTROPIC;
-//		else
-//			imageCompType = data_streaming::ANISOTROPIC;
-//		imageSize = 1;
-//	   	QStringList sizeList = QString(mArguments["imagesize"]).split(QRegExp("[x,X,*]"), QString::SkipEmptyParts);
-//		for (int i = 0; i < sizeList.length(); i++)
-//		{
-//			int dimSize = convertStringWithDefault(sizeList.at(i), 1);
-//			imageSize *= dimSize;
-//		}
-//		if (imageSize <= 1)
-//		{
-//			reportError("Error with calculated image size. imagesize: " + mArguments["imagesize"] + " = " + qstring_cast(imageSize));
-//		}
-//	}
-//	else
-//		imageCompType = data_streaming::AUTO;
 
 	long imageSize = -1;
 	if(mOptions.computationType != data_streaming::AUTO)
@@ -136,41 +67,9 @@ void GEStreamer::applyOptions()
 		imageSize = mOptions.imageSize;
 	}
 
-   	//Select image streams to export
-   	//Accept , ; . as separators
-//   	QStringList streamList = QString(mArguments["streams"]).split(",", QString::SkipEmptyParts);
-//   	mExportScanconverted = false;
-//   	mExportTissue = false;
-//   	mExportBandwidth = false;
-//   	mExportFrequency = false;
-//   	mExportVelocity = false;
-//   	for (int i = 0; i < streamList.length(); i++)
-//   	{
-//   		if (streamList.at(i).compare("scanconverted", Qt::CaseInsensitive) == 0)
-//   			mExportScanconverted = true;
-//   		else if (streamList.at(i).compare("tissue", Qt::CaseInsensitive) == 0)
-//   			mExportTissue = true;
-//   		else if (streamList.at(i).compare("bandwidth", Qt::CaseInsensitive) == 0)
-//   			mExportBandwidth = true;
-//   		else if (streamList.at(i).compare("frequency", Qt::CaseInsensitive) == 0)
-//   			mExportFrequency = true;
-//   		else if (streamList.at(i).compare("velocity", Qt::CaseInsensitive) == 0)
-//   			mExportVelocity = true;
-//   		else if (streamList.at(i).compare("all", Qt::CaseInsensitive) == 0)
-//   		{
-//   			mExportScanconverted = true;
-//   			mExportTissue = true;
-//   			mExportBandwidth = true;
-//   			mExportFrequency = true;
-//   			mExportVelocity = true;
-//   		}
-//   		else
-//			reportWarning("ImageStreamerGE: Unknown stream: " + streamList.at(i));
-//   	}
+	bool useOpenCL = mOptions.useOpenCL;
 
-	bool useOpenCL = mOptions.useOpenCL; //convertStringWithDefault(mArguments["useOpenCL"], 1);
-
-	std::string openclpath = findOpenCLPath("").toStdString();
+	std::string openclpath = findGEOpenCLKernels("").toStdString();
 
 	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageCompType, imageSize, interpType, bufferSize, openclpath, useOpenCL);
 
@@ -181,7 +80,7 @@ void GEStreamer::applyOptions()
 	mGEStreamer.SetForceTissueFrameRate(true);
 }
 
-QString findOpenCLPath(QString additionalLocation)
+QString findGEOpenCLKernels(QString additionalLocation)
 {
 	//Look in arg in, GEStreamer source dir, and installed dir
 	QString retval;
@@ -205,10 +104,6 @@ QString findOpenCLPath(QString additionalLocation)
 
 bool GEStreamer::initialize_local()
 {
-//	std::string hostIp = mArguments["ip"].toStdString();
-//	int streamPort = convertStringWithDefault(mArguments["streamport"], -1);
-//	int commandPort = convertStringWithDefault(mArguments["commandport"], -1);
-//
 	std::string hostIp = mOptions.IP;
 	int streamPort = mOptions.streamPort;
 	int commandPort = mOptions.commandPort;
@@ -274,11 +169,6 @@ void GEStreamer::stopStreaming()
 
 void GEStreamer::streamSlot()
 {
-//	if (!this->isReadyToSend())
-//		return;
-//
-//	this->sendTestDataFrames();
-
 	std::cout << "GEStreamer::streamSlot()" << std::endl;
 }
 
@@ -327,8 +217,6 @@ void GEStreamer::grab()
 	this->send();
 
 	mRenderTimer->time("sent");
-
-//	this->printTimeIntervals();
 }
 
 void GEStreamer::send()
@@ -409,41 +297,24 @@ ProbeDefinitionPtr GEStreamer::getFrameStatus(QString uid, data_streaming::frame
 	else //sector
 		retval = ProbeDefinitionPtr( new ProbeDefinition(ProbeDefinition::tSECTOR));
 
-//		std::cout << "Geometry origin: " << geometry.origin[0] << " " << geometry.origin[1] << " " << geometry.origin[2] << std::endl;
-//		std::cout << "Image origin: " << img->GetOrigin()[0] << " " << img->GetOrigin()[1] << " " << img->GetOrigin()[2] << std::endl;
-
-        double inputDepthStart = geometry.origin[1] * 1000;//m -> mm
-        double yImageOrigin = inputDepthStart * cos(geometry.width/2.0);
-        double correctDepthStart = geometry.depthStart - inputDepthStart;
-        double correctDepthEnd = geometry.depthEnd - inputDepthStart;
-
-
-//        std::cout << "width: " << geometry.width << std::endl;
-//        std::cout << "inputDepthStart: " << inputDepthStart << " mm" << std::endl;
-//        std::cout << "yImageOrigin: " << yImageOrigin << " mm" << std::endl;
-//		std::cout << "correctDepthStart: " << correctDepthStart << std::endl;
-//		std::cout << "correctDepthEnd: " << correctDepthEnd << std::endl;
+	double inputDepthStart = geometry.origin[1] * 1000;//m -> mm
+	double yImageOrigin = inputDepthStart * cos(geometry.width/2.0);
+	double correctDepthStart = geometry.depthStart - inputDepthStart;
+	double correctDepthEnd = geometry.depthEnd - inputDepthStart;
 
 	// Set start and end of sector in mm from origin
-		// Set width of sector in mm for LINEAR, width of sector in radians for SECTOR.
-//    retval->setSector(geometry.depthStart, geometry.depthEnd, geometry.width);
-		retval->setSector(correctDepthStart, correctDepthEnd, geometry.width);
+	// Set width of sector in mm for LINEAR, width of sector in radians for SECTOR.
+	retval->setSector(correctDepthStart, correctDepthEnd, geometry.width);
 
-//	retval->setOrigin_p(Vector3D(geometry.origin[0] + img->GetOrigin()[0],
-//					geometry.origin[1]+ img->GetOrigin()[1],
-//					geometry.origin[2]+ img->GetOrigin()[2]));
-        retval->setOrigin_p(Vector3D(geometry.origin[0]*1000 / img->GetSpacing()[0] + img->GetOrigin()[0],
-                                     //geometry.origin[1]*1000 / img->GetSpacing()[1] + img->GetOrigin()[1],
-                                     yImageOrigin / img->GetSpacing()[1] + img->GetOrigin()[1],
-                /*geometry.origin[2]*1000 +*/ img->GetOrigin()[2]));
+	retval->setOrigin_p(Vector3D(geometry.origin[0]*1000 / img->GetSpacing()[0] + img->GetOrigin()[0],
+								 //geometry.origin[1]*1000 / img->GetSpacing()[1] + img->GetOrigin()[1],
+								 yImageOrigin / img->GetSpacing()[1] + img->GetOrigin()[1],
+			/*geometry.origin[2]*1000 +*/ img->GetOrigin()[2]));
 	retval->setSize(QSize(img->GetDimensions()[0], img->GetDimensions()[1]));
 	retval->setSpacing(Vector3D(img->GetSpacing()));
 	retval->setClipRect_p(DoubleBoundingBox3D(img->GetExtent()));
 
 	retval->setUid(uid);
-
-//	std::cout << "depthStart: " << geometry.depthStart << " depthEnd: " << geometry.depthEnd << std::endl;
-//	std::cout << "Origin: " << retval->getOrigin_p() << std::endl;
 
 	return retval;
 }

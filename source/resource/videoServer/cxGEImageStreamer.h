@@ -20,7 +20,7 @@ class QTimer;
 namespace cx
 {
 
-QString findOpenCLPath(QString additionalLocation); ///< Find GEStreamer OpenCL kernel code
+QString findGEOpenCLKernels(QString additionalLocation); ///< Find GEStreamer OpenCL kernel code
 
 /**An object sending images out on an ip port.
  * In order to operate within a nongui thread,

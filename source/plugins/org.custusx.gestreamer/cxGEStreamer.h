@@ -20,7 +20,7 @@ class QTimer;
 namespace cx
 {
 
-QString findOpenCLPath(QString additionalLocation); ///< Find GEStreamer OpenCL kernel code
+QString findGEOpenCLKernels(QString additionalLocation); ///< Find GEStreamer OpenCL kernel code
 
 
 typedef boost::shared_ptr<class GEStreamer> GEStreamerPtr;
@@ -98,13 +98,6 @@ private:
 
 	data_streaming::frame_geometry mFlowGeometry;///<Frame geometry for flow data (doppler) from GE
 	bool mFlowGeometryChanged; ///< Have flow data frame geometry changed since last frame
-
-	//What kind of video streams are requested?
-//   	bool mExportScanconverted;
-//   	bool mExportTissue;
-//   	bool mExportBandwidth;
-//   	bool mExportFrequency;
-//   	bool mExportVelocity;
 
    	Options mOptions;
 

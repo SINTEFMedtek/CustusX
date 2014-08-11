@@ -167,7 +167,7 @@ void GEImageStreamer::initialize(StringMap arguments)
 
 	bool useOpenCL = convertStringWithDefault(mArguments["useOpenCL"], 1);
 
-	std::string openclpath = findOpenCLPath(mArguments["openclpath"]).toStdString();
+	std::string openclpath = findGEOpenCLKernels(mArguments["openclpath"]).toStdString();
 
 	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageCompType, imageSize, interpType, bufferSize, openclpath, useOpenCL);
 
@@ -178,7 +178,7 @@ void GEImageStreamer::initialize(StringMap arguments)
 	mGEStreamer.SetForceTissueFrameRate(true);
 }
 
-QString findOpenCLPath(QString additionalLocation)
+QString findGEOpenCLKernels(QString additionalLocation)
 {
 	//Look in arg in, GEStreamer source dir, and installed dir
 	QString retval;
