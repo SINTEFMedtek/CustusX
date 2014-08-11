@@ -44,7 +44,7 @@ typedef boost::shared_ptr<class ImageTestData> ImageTestDataPtr;
  * \author Christian Askeland, SINTEF
  * \date Jun 21, 2011
  */
-class DummyImageStreamer: public ImageStreamer
+class DummyImageStreamer: public Streamer
 {
 Q_OBJECT
 

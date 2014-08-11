@@ -79,7 +79,7 @@ TEST_CASE("DummyImageStreamer: File should be read and sent only once", "[stream
 	TestSenderPtr sender(new TestSender());
 	bool sendImageOnce = true;
 	bool sendTwoStreams = false;
-	cx::ImageStreamerPtr imagestreamer = createRunningDummyImageStreamer(sender, sendTwoStreams, sendImageOnce);
+	cx::StreamerPtr imagestreamer = createRunningDummyImageStreamer(sender, sendTwoStreams, sendImageOnce);
 
 //	SimulatedImageStreamerFixture fixture(sender);
 //	fixture.checkSimulatedFrames(1);
@@ -94,7 +94,7 @@ TEST_CASE("DummyImageStreamer: File should be read and send slices with a given 
 {
 	TestSenderPtr sender(new TestSender());
 	bool sendTwoStreams = false;
-	cx::ImageStreamerPtr imagestreamer = createRunningDummyImageStreamer(sender,sendTwoStreams);
+	cx::StreamerPtr imagestreamer = createRunningDummyImageStreamer(sender,sendTwoStreams);
 
 	int numFrames = 2;
 //	SimulatedImageStreamerFixture fixture(sender);

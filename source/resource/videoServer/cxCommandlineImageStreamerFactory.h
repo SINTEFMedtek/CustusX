@@ -36,7 +36,7 @@ public:
 
 private:
 	std::vector<CommandLineStreamerPtr> mCommandLineStreamers;
-	std::vector<ImageStreamerPtr> mImageStreamers;
+	std::vector<StreamerPtr> mImageStreamers;
 };
 
 }
