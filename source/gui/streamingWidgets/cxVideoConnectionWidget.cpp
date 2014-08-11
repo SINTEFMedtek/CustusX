@@ -96,15 +96,8 @@ VideoConnectionWidget::~VideoConnectionWidget()
 
 void VideoConnectionWidget::onServiceAdded(StreamerService* service)
 {
-
-	QWidget* algoWidget = this->createStreamerWidget(service);
-	if(!algoWidget)
-		std::cout << "algowidget NULL" << std::endl;
-
-	QWidget* serviceWidget = this->wrapVerticalStretch(algoWidget);
-	if(!serviceWidget)
-		std::cout << "serviceWidget NULL" << std::endl;
-
+	QWidget* widget = this->createStreamerWidget(service);
+	QWidget* serviceWidget = this->wrapVerticalStretch(widget);
 	mStackedWidget->addWidget(serviceWidget);
 	mStreamerServiceWidgets[service->getName()] = serviceWidget;
 
@@ -353,9 +346,8 @@ void VideoConnectionWidget::selectGuiForConnectionMethodSlot()
 	else
 	{
 		QWidget* serviceWidget = mStreamerServiceWidgets[name];
-		if(!serviceWidget)
-			std::cout << "serviceWidget is NULL " << name.toStdString() << std::endl;
-		mStackedWidget->setCurrentWidget(serviceWidget);
+		if(serviceWidget)
+			mStackedWidget->setCurrentWidget(serviceWidget);
 	}
 }
 

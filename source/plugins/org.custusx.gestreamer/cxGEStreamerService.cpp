@@ -31,7 +31,7 @@ GEStreamerService::~GEStreamerService()
 
 QString GEStreamerService::getName()
 {
-	return "GEStreamerService";
+	return "GE Interface";
 }
 
 std::vector<DataAdapterPtr> GEStreamerService::getSettings(QDomElement root)
