@@ -72,6 +72,8 @@ void GEStreamerService::sendOptions()
 
 GEStreamer::Options GEStreamerService::generateOptions()
 {
+	this->getSettings(mXmlSettings);
+
 	GEStreamer::Options options;
 	options.IP = mIPDataAdapter->getValue().toStdString();
 	options.streamPort = mStreamPortDataAdapter->getValue();
