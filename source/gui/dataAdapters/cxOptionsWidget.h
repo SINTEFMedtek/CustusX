@@ -31,6 +31,9 @@ public:
 	void showAdvanced(bool show); //whether or not to display adapters marked as advanced
 	void rebuild();
 
+public slots:
+	void toggleAdvanced();
+
 private:
 	void clear();
 	void populate(bool showAdvanced);

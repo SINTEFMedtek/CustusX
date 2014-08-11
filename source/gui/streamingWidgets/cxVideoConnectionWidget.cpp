@@ -24,7 +24,6 @@
 #include "vtkImageData.h"
 
 #include "cxFileSelectWidget.h"
-#include "cxLabeledComboBoxWidget.h"
 #include "cxDataManager.h"
 #include "cxTime.h"
 #include "cxReporter.h"
@@ -72,10 +71,11 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 	mConnectButton = this->initializeConnectButton();
 	mImportStreamImageButton = this->initializeImportStreamImageButton();
 	mActiveVideoSourceSelector = this->initializeActiveVideoSourceSelector();
+	mConnectionSelectionWidget = new DetailedLabeledComboBoxWidget(this, mConnectionSelector);
 
 	mToptopLayout = new QVBoxLayout(this);
 	mToptopLayout->addWidget(mInitScriptWidget);
-	mToptopLayout->addWidget(new LabeledComboBoxWidget(this, mConnectionSelector));
+	mToptopLayout->addWidget(mConnectionSelectionWidget);
 	mToptopLayout->addWidget(frame);
 	mToptopLayout->addWidget(mConnectButton);
 	mToptopLayout->addWidget(mImportStreamImageButton);
@@ -114,7 +114,10 @@ QWidget* VideoConnectionWidget::createStreamerWidget(StreamerService* service)
 	std::vector<DataAdapterPtr> adapters = service->getSettings(element);
 
 	OptionsWidget* widget = new OptionsWidget(this);
-	widget->setOptions(serviceName, adapters, true);
+	widget->setOptions(serviceName, adapters, false);
+
+	connect(mConnectionSelectionWidget, SIGNAL(detailsTriggered()), widget, SLOT(toggleAdvanced()));
+
 	return widget;
 }
 
@@ -385,7 +388,7 @@ void VideoConnectionWidget::writeSettings()
 
 QPushButton* VideoConnectionWidget::initializeConnectButton()
 {
-	QPushButton* connectButton = new QPushButton("Connect Server", this);
+	QPushButton* connectButton = new QPushButton("Connect", this);
 	connectButton->setToolTip("Connect/disconnect to the video server using the seleted method");
 	connect(connectButton, SIGNAL(clicked()), this, SLOT(toggleConnectServer()));
 	return connectButton;

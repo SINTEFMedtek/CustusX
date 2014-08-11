@@ -119,7 +119,7 @@ DoubleDataAdapterXmlPtr GEStreamerService::getStreamPortOption(QDomElement root)
 {
 	if(!mStreamPortDataAdapter)
 	{
-		mStreamPortDataAdapter = DoubleDataAdapterXml::initialize("ge_stream_port", "Stream port", "Set the stream for the GE stream port.", 6543, DoubleRange(1024, 49151, 1), 0, root);
+		mStreamPortDataAdapter = DoubleDataAdapterXml::initialize("ge_stream_port", "Stream port", "Set the stream for the GE stream port. (6534)", 6543, DoubleRange(1024, 49151, 1), 0, root);
 		mStreamPortDataAdapter->setGuiRepresentation(DoubleDataAdapter::grSPINBOX);
 		mStreamPortDataAdapter->setAdvanced(true);
 		mStreamPortDataAdapter->setGroup("Connection");
@@ -134,7 +134,7 @@ BoolDataAdapterXmlPtr	GEStreamerService::getUseAutoImageSizeOption(QDomElement r
 	if(!mUseAutoImageSizeDataAdapter)
 	{
 		bool defaultValue = true;
-		mUseAutoImageSizeDataAdapter = BoolDataAdapterXml::initialize("ge_use_auto_image_size", "Use automatic imagesize", "Setting this to true will ignore imagesize and use anisotropic voxels/pixels.", defaultValue);
+		mUseAutoImageSizeDataAdapter = BoolDataAdapterXml::initialize("ge_use_auto_image_size", "Automatic image size", "Setting this to true will ignore imagesize and use anisotropic voxels/pixels.", defaultValue);
 		mUseAutoImageSizeDataAdapter->setAdvanced(true);
 		mUseAutoImageSizeDataAdapter->setGroup("US Image");
 		connect(mUseAutoImageSizeDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
@@ -176,7 +176,7 @@ BoolDataAdapterXmlPtr	GEStreamerService::getIsotropicOption(QDomElement root)
 	if(!mIsotropicDataAdapter)
 	{
 		bool defaultValue = false;
-		mIsotropicDataAdapter = BoolDataAdapterXml::initialize("ge_isotropic", "Use isotropic", "Force quadratic pixel or cubic voxels.", defaultValue);
+		mIsotropicDataAdapter = BoolDataAdapterXml::initialize("ge_isotropic", "Isotropic", "Force quadratic pixel or cubic voxels.", defaultValue);
 		mIsotropicDataAdapter->setAdvanced(true);
 		mIsotropicDataAdapter->setGroup("US Image");
 		connect(mIsotropicDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
@@ -206,7 +206,7 @@ BoolDataAdapterXmlPtr	GEStreamerService::getUseOpenCLOption(QDomElement root)
 	if(!mUseOpenCLDataAdapter)
 	{
 		bool defaultValue = true;
-		mUseOpenCLDataAdapter = BoolDataAdapterXml::initialize("ge_use_opencl", "Use OpenCL scanconversion", "Scanconvert using OpenCL kernels.", defaultValue);
+		mUseOpenCLDataAdapter = BoolDataAdapterXml::initialize("ge_use_opencl", "OpenCL scanconversion", "Scanconvert using OpenCL kernels.", defaultValue);
 		mUseOpenCLDataAdapter->setAdvanced(true);
 		mUseOpenCLDataAdapter->setGroup("Image processing");
 		connect(mUseOpenCLDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
@@ -220,7 +220,7 @@ BoolDataAdapterXmlPtr	GEStreamerService::getScanconvertedStreamOption(QDomElemen
 	if(!mScanconvertedStreamDataAdapter)
 	{
 		bool defaultValue = true;
-		mScanconvertedStreamDataAdapter = BoolDataAdapterXml::initialize("ge_get_scanconverted_stream", "B-Mode stream", "Request the B-Mode stream data.", defaultValue);
+		mScanconvertedStreamDataAdapter = BoolDataAdapterXml::initialize("ge_get_scanconverted_stream", "B-Mode", "Request the B-Mode stream data.", defaultValue);
 		mScanconvertedStreamDataAdapter->setGroup("Streams");
 		connect(mScanconvertedStreamDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}
@@ -233,7 +233,7 @@ BoolDataAdapterXmlPtr	GEStreamerService::getTissueStreamOption(QDomElement root)
 	if(!mTissueStreamDataAdapter)
 	{
 		bool defaultValue = false;
-		mTissueStreamDataAdapter = BoolDataAdapterXml::initialize("ge_get_tissue_stream", "Tissue stream", "Request the tissue stream, the doppler data is removed.", defaultValue);
+		mTissueStreamDataAdapter = BoolDataAdapterXml::initialize("ge_get_tissue_stream", "Tissue", "Request the tissue stream, the doppler data is removed.", defaultValue);
 		mTissueStreamDataAdapter->setGroup("Streams");
 		connect(mTissueStreamDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}
@@ -246,7 +246,7 @@ BoolDataAdapterXmlPtr	GEStreamerService::getBandwidthStreamOption(QDomElement ro
 	if(!mBandwidthStreamDataAdapter)
 	{
 		bool defaultValue = true;
-		mBandwidthStreamDataAdapter = BoolDataAdapterXml::initialize("ge_get_bandwidth_stream", "Bandwidth stream", "Request the bandwidth stream data.", defaultValue);
+		mBandwidthStreamDataAdapter = BoolDataAdapterXml::initialize("ge_get_bandwidth_stream", "Bandwidth", "Request the bandwidth stream data.", defaultValue);
 		mBandwidthStreamDataAdapter->setGroup("Streams");
 		connect(mBandwidthStreamDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}
@@ -259,7 +259,7 @@ BoolDataAdapterXmlPtr	GEStreamerService::getFrequencyStreamOption(QDomElement ro
 	if(!mFrequencyStreamDataAdapter)
 	{
 		bool defaultValue = false;
-		mFrequencyStreamDataAdapter = BoolDataAdapterXml::initialize("ge_get_frequency_stream", "Frequency stream", "Request the frequency stream data.", defaultValue);
+		mFrequencyStreamDataAdapter = BoolDataAdapterXml::initialize("ge_get_frequency_stream", "Frequency", "Request the frequency stream data.", defaultValue);
 		mFrequencyStreamDataAdapter->setGroup("Streams");
 		connect(mFrequencyStreamDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}
@@ -272,7 +272,7 @@ BoolDataAdapterXmlPtr	GEStreamerService::getVelocityStreamOption(QDomElement roo
 	if(!mVelocityStreamDataAdapter)
 	{
 		bool defaultValue = false;
-		mVelocityStreamDataAdapter = BoolDataAdapterXml::initialize("ge_get_velocity_stream", "Velocity stream", "Request the velocity stream data.", defaultValue);
+		mVelocityStreamDataAdapter = BoolDataAdapterXml::initialize("ge_get_velocity_stream", "Velocity", "Request the velocity stream data.", defaultValue);
 		mVelocityStreamDataAdapter->setGroup("Streams");
 		connect(mVelocityStreamDataAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(sendOptions()));
 	}

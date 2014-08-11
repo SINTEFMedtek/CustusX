@@ -50,6 +50,11 @@ void OptionsWidget::rebuild()
 	this->populate(mShowAdvanced);
 }
 
+void OptionsWidget::toggleAdvanced()
+{
+	this->showAdvanced(!mShowAdvanced);
+}
+
 void OptionsWidget::clear()
 {
 	QLayoutItem *child;

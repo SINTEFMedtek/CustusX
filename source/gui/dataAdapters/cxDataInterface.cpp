@@ -183,7 +183,7 @@ ActiveVideoSourceStringDataAdapter::ActiveVideoSourceStringDataAdapter()
 
 QString ActiveVideoSourceStringDataAdapter::getValueName() const
 {
-	return "VideoSource";
+	return "Stream";
 }
 
 bool ActiveVideoSourceStringDataAdapter::setValue(const QString& value)
