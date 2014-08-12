@@ -5,10 +5,14 @@ if (BUILD_TESTING)
 
 
     set(CX_TEST_CATCH_ORG_CUSTUSX_GESTREAMER_MOC_SOURCE_FILES
+		cxTestSenderController.h
     )
 	set(CX_TEST_CATCH_ORG_CUSTUSX_GESTREAMER_SOURCE_FILES
 		${CX_TEST_CATCH_ORG_CUSTUSX_GESTREAMER_MOC_SOURCE_FILES}
 		cxtestGEStreamerPlugin.cpp
+		cxTestGEInterface.h
+		cxTestGEInterface.cpp
+		cxTestSenderController.cpp
 		)
 
     cx_catch_add_lib_and_exe(org_custusx_gestreamer 
