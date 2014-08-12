@@ -2,7 +2,7 @@
 #define CXMHDIMAGESTREAMER_H_
 
 #include "boost/shared_ptr.hpp"
-#include "cxImageStreamer.h"
+#include "cxStreamer.h"
 
 class QTimer;
 

@@ -13,7 +13,7 @@
 #include "cxIGTLinkImageMessage.h"
 #include "cxCyclicActionLogger.h"
 #include "GEStreamer.h"
-#include "cxImageStreamer.h"
+#include "cxStreamer.h"
 
 class QTimer;
 

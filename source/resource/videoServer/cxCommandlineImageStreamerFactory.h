@@ -5,7 +5,7 @@
 #include <QStringList>
 #include <map>
 #include <vector>
-#include "cxImageStreamer.h"
+#include "cxStreamer.h"
 
 class QTcpSocket;
 

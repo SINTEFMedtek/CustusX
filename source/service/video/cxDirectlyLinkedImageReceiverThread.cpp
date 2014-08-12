@@ -23,7 +23,7 @@
 #include "cxDataManager.h"
 #include "cxVideoServiceBackend.h"
 #include "cxStreamerService.h"
-#include "cxImageStreamer.h"
+#include "cxStreamer.h"
 #include "cxDataLocations.h"
 #include "cxXmlOptionItem.h"
 

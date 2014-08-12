@@ -4,7 +4,6 @@
 #include "cxImageStreamerOpenCV.h"
 #include "cxMHDImageStreamer.h"
 #include "cxImageStreamerSonix.h"
-#include "cxGEImageStreamer.h"
 #include "cxConfig.h"
 
 namespace cx
@@ -70,9 +69,6 @@ CommandlineImageStreamerFactory::CommandlineImageStreamerFactory()
 #endif
 #ifdef CX_USE_OpenCV
 	mCommandLineStreamers.push_back(CommandLineStreamerPtr(new ImageStreamerOpenCV()));
-#endif
-#ifdef CX_USE_ISB_GE
-	mCommandLineStreamers.push_back(CommandLineStreamerPtr(new GEImageStreamer()));
 #endif
 	mImageStreamers.push_back(DummyImageStreamerPtr(new DummyImageStreamer()));
 }

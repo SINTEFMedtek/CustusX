@@ -16,7 +16,7 @@
 
 #include "vtkSmartPointer.h"
 #include "cxTransform3D.h"
-#include "cxImageStreamer.h"
+#include "cxStreamer.h"
 #include "cxCyclicActionLogger.h"
 #include "cxConfig.h"
 #include "cxXmlOptionItem.h"

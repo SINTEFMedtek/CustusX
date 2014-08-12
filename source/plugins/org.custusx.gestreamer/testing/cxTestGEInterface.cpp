@@ -5,7 +5,7 @@
 #include "GEStreamer.h"
 #include "cxDirectlyLinkedSender.h"
 #include "cxTestSenderController.h"
-#include "cxGEImageStreamer.h"
+#include "cxGEStreamer.h"
 #include "cxReporter.h"
 #include "cxCommandlineImageStreamerFactory.h"
 
