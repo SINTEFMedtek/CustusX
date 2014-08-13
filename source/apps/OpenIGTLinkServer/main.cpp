@@ -9,6 +9,7 @@
 #include "cxReporter.h"
 #include "cxImageStreamerOpenCV.h"
 #include "cxCommandlineImageStreamerFactory.h"
+#include "cxStringHelpers.h"
 
 #ifdef WIN32
 #include <windows.h>

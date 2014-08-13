@@ -25,6 +25,7 @@
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxCommandlineImageStreamerFactory.h"
+#include "cxStringHelpers.h"
 
 #ifdef CX_USE_OpenCV
 #include <opencv2/highgui/highgui.hpp>

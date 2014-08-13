@@ -28,7 +28,7 @@
 #include "cxVideoConnection.h"
 #include "cxStringDataAdapterXml.h"
 #include "cxLogger.h"
-#include "cxImageStreamer.h"
+#include "cxStreamer.h"
 #include "cxCommandlineImageStreamerFactory.h"
 #include "cxVideoServiceBackend.h"
 

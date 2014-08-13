@@ -1,4 +1,4 @@
-#include "cxImageStreamer.h"
+#include "cxStreamer.h"
 
 namespace cx
 {

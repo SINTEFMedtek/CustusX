@@ -4,20 +4,10 @@
 #include "cxImageStreamerOpenCV.h"
 #include "cxMHDImageStreamer.h"
 #include "cxImageStreamerSonix.h"
-#include "cxImageStreamerGE.h"
 #include "cxConfig.h"
 
 namespace cx
 {
-
-int convertStringWithDefault(QString text, int def)
-{
-	bool ok = true;
-	int retval = text.toInt(&ok,0);
-	if (ok)
-		return retval;
-	return def;
-}
 
 StringMap extractCommandlineOptions(QStringList cmdline)
 {
@@ -79,9 +69,6 @@ CommandlineImageStreamerFactory::CommandlineImageStreamerFactory()
 #endif
 #ifdef CX_USE_OpenCV
 	mCommandLineStreamers.push_back(CommandLineStreamerPtr(new ImageStreamerOpenCV()));
-#endif
-#ifdef CX_USE_ISB_GE
-	mCommandLineStreamers.push_back(CommandLineStreamerPtr(new ImageStreamerGE()));
 #endif
 	mImageStreamers.push_back(DummyImageStreamerPtr(new DummyImageStreamer()));
 }

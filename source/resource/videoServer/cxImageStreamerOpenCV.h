@@ -12,7 +12,7 @@
 #include <QStringList>
 #include "cxIGTLinkImageMessage.h"
 #include "cxSender.h"
-#include "cxImageStreamer.h"
+#include "cxStreamer.h"
 
 
 class QTimer;

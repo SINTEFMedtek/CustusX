@@ -16,7 +16,7 @@
 
 #include "vtkSmartPointer.h"
 #include "cxTransform3D.h"
-#include "cxImageStreamer.h"
+#include "cxStreamer.h"
 #include "cxCyclicActionLogger.h"
 #include "cxConfig.h"
 #include "cxXmlOptionItem.h"
@@ -42,7 +42,7 @@ class DataManager;
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class org_custusx_ussimulator_EXPORT SimulatedImageStreamer : public ImageStreamer
+class org_custusx_ussimulator_EXPORT SimulatedImageStreamer : public Streamer
 {
 	Q_OBJECT
 

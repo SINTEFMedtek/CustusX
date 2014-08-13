@@ -5,7 +5,7 @@
 #include <QStringList>
 #include <map>
 #include <vector>
-#include "cxImageStreamer.h"
+#include "cxStreamer.h"
 
 class QTcpSocket;
 
@@ -14,7 +14,7 @@ namespace cx
 
 typedef std::map<QString, QString> StringMap;
 StringMap extractCommandlineOptions(QStringList cmdline);
-int convertStringWithDefault(QString text, int def);
+
 
 /**
  * \brief Factory class for creating streamer objects.
@@ -36,7 +36,7 @@ public:
 
 private:
 	std::vector<CommandLineStreamerPtr> mCommandLineStreamers;
-	std::vector<ImageStreamerPtr> mImageStreamers;
+	std::vector<StreamerPtr> mImageStreamers;
 };
 
 }

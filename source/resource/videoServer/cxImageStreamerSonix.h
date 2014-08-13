@@ -15,7 +15,7 @@
 #include "cxIGTLinkUSStatusMessage.h"
 #include "vtkSonixVideoSource.h"
 #include "SonixHelper.h"
-#include "cxImageStreamer.h"
+#include "cxStreamer.h"
 
 class QTimer;
 typedef vtkSmartPointer<class vtkSonixVideoSource> vtkSonixVideoSourcePtr;

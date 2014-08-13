@@ -25,6 +25,7 @@
 #include "cxServiceTrackerListener.h"
 #include "cxStreamerService.h"
 #include "cxXmlOptionItem.h"
+#include "cxDetailedLabeledComboBoxWidget.h"
 
 class QPushButton;
 class QComboBox;
@@ -113,6 +114,7 @@ protected:
 	ActiveVideoSourceStringDataAdapterPtr mActiveVideoSourceSelector;
 	FileInputWidget* mLocalServerFile;
 	XmlOptionFile mOptions;
+	DetailedLabeledComboBoxWidget* mConnectionSelectionWidget;
 
 private:
 	QWidget* createStreamerWidget(StreamerService* service);

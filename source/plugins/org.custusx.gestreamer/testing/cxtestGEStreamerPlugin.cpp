@@ -11,7 +11,6 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-
 #ifdef CX_USE_ISB_GE
 #include "catch.hpp"
 #include "cxTestGEInterface.h"
@@ -19,7 +18,7 @@
 namespace cxtest
 {
 
-TEST_CASE("GEInterface can stream 2D CPU scanconverted stream with auto size", "[integration]")
+TEST_CASE("GEInterface can stream 2D CPU scanconverted stream with auto size", "[integration][GE]")
 {
 	cx::StringMap args;
 	args["type"] = "ISB_GE";
@@ -30,7 +29,7 @@ TEST_CASE("GEInterface can stream 2D CPU scanconverted stream with auto size", "
 	helper.testStream(args);
 }
 
-TEST_CASE("GEInterface can stream 2D CPU scanconverted stream with defined size", "[integration]")
+TEST_CASE("GEInterface can stream 2D CPU scanconverted stream with defined size", "[integration][GE]")
 {
 	cx::StringMap args;
 	args["type"] = "ISB_GE";
@@ -41,7 +40,7 @@ TEST_CASE("GEInterface can stream 2D CPU scanconverted stream with defined size"
 	TestGEInterface helper;
 	helper.testStream(args);
 }
-TEST_CASE("GEInterface can stream 3D CPU scanconverted stream with auto size", "[integration]")
+TEST_CASE("GEInterface can stream 3D CPU scanconverted stream with auto size", "[integration][GE]")
 {
 	cx::StringMap args;
 	args["type"] = "ISB_GE";
@@ -53,7 +52,7 @@ TEST_CASE("GEInterface can stream 3D CPU scanconverted stream with auto size", "
 	TestGEInterface helper;
 	helper.testStream(args); //3D
 }
-TEST_CASE("GEInterface can stream 3D CPU scanconverted stream with defined size", "[integration]")
+TEST_CASE("GEInterface can stream 3D CPU scanconverted stream with defined size", "[integration][GE]")
 {
 	cx::StringMap args;
 	args["type"] = "ISB_GE";
@@ -66,7 +65,7 @@ TEST_CASE("GEInterface can stream 3D CPU scanconverted stream with defined size"
 	helper.testStream(args); //set size
 }
 
-TEST_CASE("GEInterface can stream all 2D streams with GPU scanconversion where available", "[integration]")
+TEST_CASE("GEInterface can stream all 2D streams with GPU scanconversion where available", "[integration][GE]")
 {
 	cx::StringMap args;
 	args["type"] = "ISB_GE";
@@ -80,7 +79,7 @@ TEST_CASE("GEInterface can stream all 2D streams with GPU scanconversion where a
 	helper.testStream(args);
 }
 
-TEST_CASE("GEInterface can stream 2D scanconverted stream, with GPU scanconversion where available", "[integration]")
+TEST_CASE("GEInterface can stream 2D scanconverted stream, with GPU scanconversion where available", "[integration][GE]")
 {
 	cx::StringMap args;
 	args["type"] = "ISB_GE";
@@ -92,7 +91,7 @@ TEST_CASE("GEInterface can stream 2D scanconverted stream, with GPU scanconversi
 	helper.testStream(args);
 }
 
-TEST_CASE("GEInterface can stream 2D tissue stream, with GPU scanconversion where available", "[integration]")
+TEST_CASE("GEInterface can stream 2D tissue stream, with GPU scanconversion where available", "[integration][GE]")
 {
 	cx::StringMap args;
 	args["type"] = "ISB_GE";
@@ -103,7 +102,7 @@ TEST_CASE("GEInterface can stream 2D tissue stream, with GPU scanconversion wher
 	TestGEInterface helper;
 	helper.testStream(args);
 }
-TEST_CASE("GEInterface can stream 2D frequency stream with GPU scanconversion where available", "[integration]")
+TEST_CASE("GEInterface can stream 2D frequency stream with GPU scanconversion where available", "[integration][GE]")
 {
 	cx::StringMap args;
 	args["type"] = "ISB_GE";
@@ -114,7 +113,7 @@ TEST_CASE("GEInterface can stream 2D frequency stream with GPU scanconversion wh
 	TestGEInterface helper;
 	helper.testStream(args);
 }
-TEST_CASE("GEInterface can stream 2D bandwidth stream with GPU scanconversion where available", "[integration]")
+TEST_CASE("GEInterface can stream 2D bandwidth stream with GPU scanconversion where available", "[integration][GE]")
 {
 	cx::StringMap args;
 	args["type"] = "ISB_GE";
@@ -125,7 +124,7 @@ TEST_CASE("GEInterface can stream 2D bandwidth stream with GPU scanconversion wh
 	TestGEInterface helper;
 	helper.testStream(args);
 }
-TEST_CASE("GEInterface can stream 2D velocity stream with GPU scanconversion where available", "[integration]")
+TEST_CASE("GEInterface can stream 2D velocity stream with GPU scanconversion where available", "[integration][GE]")
 {
 	cx::StringMap args;
 	args["type"] = "ISB_GE";
@@ -136,7 +135,7 @@ TEST_CASE("GEInterface can stream 2D velocity stream with GPU scanconversion whe
 	TestGEInterface helper;
 	helper.testStream(args);
 }
-TEST_CASE("GEInterface can stream default 2D streams with GPU scanconversion where available", "[integration]")
+TEST_CASE("GEInterface can stream default 2D streams with GPU scanconversion where available", "[integration][GE]")
 {
 	cx::StringMap args;
 	args["type"] = "ISB_GE";
@@ -147,11 +146,12 @@ TEST_CASE("GEInterface can stream default 2D streams with GPU scanconversion whe
 	helper.testStream(args);
 }
 
-TEST_CASE("GEStreamer can stream 3D scanconverted stream with GPU scanconversion", "[integration]")
+TEST_CASE("GEStreamer can stream 3D scanconverted stream with GPU scanconversion", "[integration][GE]")
 {
 	TestGEInterface helper;
 	helper.testGEStreamer();
 }
+
 
 } // namespace cxtest
 

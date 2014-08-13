@@ -13,15 +13,17 @@
 #include "cxIGTLinkImageMessage.h"
 #include "cxCyclicActionLogger.h"
 #include "GEStreamer.h"
-#include "cxImageStreamer.h"
+#include "cxStreamer.h"
 
 class QTimer;
 
 namespace cx
 {
 
-QString findOpenCLPath(QString additionalLocation); ///< Find GEStreamer OpenCL kernel code
+QString findGEOpenCLKernels(QString additionalLocation); ///< Find GEStreamer OpenCL kernel code
 
+
+typedef boost::shared_ptr<class GEStreamer> GEStreamerPtr;
 /**An object sending images out on an ip port.
  * In order to operate within a nongui thread,
  * it must be created within the run() method
@@ -34,25 +36,44 @@ QString findOpenCLPath(QString additionalLocation); ///< Find GEStreamer OpenCL 
  * This version uses the NTNU ISB data streamer module (provided by Gabriel Kiss)
  * to grab images from the E9 EG scanner (and similar)
  */
-class ImageStreamerGE: public CommandLineStreamer
+class GEStreamer: public Streamer
 {
 	Q_OBJECT
-public:
-	ImageStreamerGE();
-	virtual ~ImageStreamerGE() {}
 
-	virtual void initialize(StringMap arguments);
+public:
+	struct Options{
+		std::string IP;
+		int streamPort;
+		int commandPort;
+		int bufferSize;
+		long imageSize;
+		data_streaming::OutputSizeComputationType computationType;
+		std::string	testMode;
+		bool useOpenCL;
+		bool scanconvertedStream;
+		bool tissueStream;
+		bool bandwidthStream;
+		bool frequencyStream;
+		bool velocityStream;
+	};
+
+public:
+	GEStreamer();
+	virtual ~GEStreamer() {}
+
+	void setOptions(const Options& options);
 	virtual bool startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
 
 	virtual QString getType();
-	virtual QStringList getArgumentDescription();
 
 private slots:
+	virtual void streamSlot();
 	void grab();
 	void send();
 
 private:
+	void applyOptions();
 	bool initialize_local();
 	void deinitialize_local();
 
@@ -78,12 +99,7 @@ private:
 	data_streaming::frame_geometry mFlowGeometry;///<Frame geometry for flow data (doppler) from GE
 	bool mFlowGeometryChanged; ///< Have flow data frame geometry changed since last frame
 
-	//What kind of video streams are requested?
-   	bool mExportScanconverted;
-   	bool mExportTissue;
-   	bool mExportBandwidth;
-   	bool mExportFrequency;
-   	bool mExportVelocity;
+   	Options mOptions;
 
 };
 

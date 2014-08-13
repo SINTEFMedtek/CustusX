@@ -37,6 +37,7 @@ namespace cx
   */
 QStringList splitStringContaingQuotes(QString line);
 
+int convertStringWithDefault(QString text, int def);
 
 } // namespace cx
 

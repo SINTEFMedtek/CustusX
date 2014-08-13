@@ -31,14 +31,6 @@ SET(ALL_LINK_LIBRARIES
 	${BOOST_LIBRARIES}
 	${QT_LIBRARIES}
 	OpenIGTLink
-	#vtkIO
-	#vtkRendering
-	#vtkImaging
-	#vtkCommon
-	#vtkHybrid
-	#vtkWidgets
-	#vtkFiltering
-	#vtkVolumeRendering
     cxResource
     cxOpenIGTLinkUtilities
 	)
@@ -79,15 +71,12 @@ SET( CX_QT_MOC_HEADER_FILES
 		cxMHDImageStreamer.h
 		cxImageStreamerSonix.h
 		cxImageStreamerOpenCV.h
-		cxImageStreamerGE.h
-		cxImageStreamer.h
+		cxStreamer.h
 		cxSender.h
 		cxDirectlyLinkedSender.h
 		SonixHelper.h
 		cxtestSender.h
 )
-
-#QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 if(CX_WINDOWS)
 	QT4_WRAP_CPP(MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} OPTIONS "-D_WINDOWS")
@@ -110,10 +99,8 @@ SET ( cxOpenIGTLinkServer_FILES
 		cxImageStreamerOpenCV.cpp
 		cxImageStreamerSonix.h
 		cxImageStreamerSonix.cpp
-		cxImageStreamerGE.h
-		cxImageStreamerGE.cpp
-		cxImageStreamer.h
-		cxImageStreamer.cpp
+		cxStreamer.h
+		cxStreamer.cpp
 		cxSender.h
 		cxSender.cpp
 		cxDirectlyLinkedSender.h

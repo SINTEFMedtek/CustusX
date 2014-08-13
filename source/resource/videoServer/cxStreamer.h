@@ -12,8 +12,8 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXIMAGESTREAMER_H_
-#define CXIMAGESTREAMER_H_
+#ifndef CXSTREAMER_H_
+#define CXSTREAMER_H_
 
 #include <QObject>
 #include <QString>
@@ -28,7 +28,6 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class Streamer> StreamerPtr;
-typedef boost::shared_ptr<class ImageStreamer> ImageStreamerPtr;
 
 /**\brief
  *
@@ -71,26 +70,6 @@ private:
 };
 
 typedef std::map<QString, QString> StringMap;
-/**\brief
- *
- * \ingroup cx_resource_videoserver
- * \date Apr 17, 2012
- * \author Christian Askeland, SINTEF
- * \author Ole Vegard Solberg, SINTEF
- * \author Janne Beate Bakeng, SINTEF
- */
-class ImageStreamer : public Streamer
-{
-	Q_OBJECT
-public:
-	ImageStreamer() {}
-	virtual ~ImageStreamer() {}
-
-protected:
-
-private:
-
-};
 
 /**\brief
  *
@@ -121,4 +100,4 @@ protected:
 typedef boost::shared_ptr<CommandLineStreamer> CommandLineStreamerPtr;
 }
 
-#endif /* CXIMAGESTREAMER_H_ */
+#endif /* CXSTREAMER_H_ */

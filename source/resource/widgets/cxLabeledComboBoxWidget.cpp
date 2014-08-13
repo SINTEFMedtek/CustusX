@@ -26,11 +26,9 @@
 namespace cx
 {
 
-///----------------
-
 LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, StringDataAdapterPtr dataInterface,
 	QGridLayout* gridLayout, int row) :
-    OptimizedUpdateWidget(parent)
+    BaseWidget(parent, "LabeledComboBoxWidget", "LabeledComboBoxWidget")
 {
 	SSC_ASSERT(dataInterface->getAllowOnlyValuesInRange()==true);
 
@@ -52,15 +50,20 @@ LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, StringDataAdapterP
 	}
 	else // add directly to this
 	{
-        QHBoxLayout* topLayout = new QHBoxLayout;
-		topLayout->setMargin(0);
-        this->setLayout(topLayout);
+        mTopLayout = new QHBoxLayout;
+        mTopLayout->setMargin(0);
+        this->setLayout(mTopLayout);
 
-        topLayout->addWidget(mLabel);
-		topLayout->addWidget(mCombo, 1);
+        mTopLayout->addWidget(mLabel);
+        mTopLayout->addWidget(mCombo, 1);
 	}
 
     this->setModified();
+}
+
+QString LabeledComboBoxWidget::defaultWhatsThis() const
+{
+	return "";
 }
 
 void LabeledComboBoxWidget::comboIndexChanged(int index)

@@ -26,7 +26,7 @@
 #include <QLabel>
 #include <QGridLayout>
 #include "cxStringDataAdapter.h"
-#include "cxOptimizedUpdateWidget.h"
+#include "cxBaseWidget.h"
 
 namespace cx
 {
@@ -38,15 +38,24 @@ namespace cx
  *
  * \ingroup cx_resource_widgets
  */
-class LabeledComboBoxWidget: public OptimizedUpdateWidget
+class LabeledComboBoxWidget: public BaseWidget
 {
 Q_OBJECT
 public:
 	LabeledComboBoxWidget(QWidget* parent, StringDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
+	virtual ~LabeledComboBoxWidget(){};
+
+	virtual QString defaultWhatsThis() const;
+
 	void showLabel(bool on);
+
+protected:
+	QHBoxLayout* mTopLayout;
+
 private slots:
     void prePaintEvent();
 	void comboIndexChanged(int val);
+
 private:
 	QLabel* mLabel;
 	QComboBox* mCombo;

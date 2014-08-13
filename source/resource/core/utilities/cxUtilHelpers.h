@@ -13,7 +13,6 @@ namespace cx
  * \{
  */
 
-
 /**stream the range |begin,end> to the ostream.
  * insert separator between each element..
  */

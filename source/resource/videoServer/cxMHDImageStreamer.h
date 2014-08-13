@@ -2,7 +2,7 @@
 #define CXMHDIMAGESTREAMER_H_
 
 #include "boost/shared_ptr.hpp"
-#include "cxImageStreamer.h"
+#include "cxStreamer.h"
 
 class QTimer;
 
@@ -44,7 +44,7 @@ typedef boost::shared_ptr<class ImageTestData> ImageTestDataPtr;
  * \author Christian Askeland, SINTEF
  * \date Jun 21, 2011
  */
-class DummyImageStreamer: public ImageStreamer
+class DummyImageStreamer: public Streamer
 {
 Q_OBJECT
 
