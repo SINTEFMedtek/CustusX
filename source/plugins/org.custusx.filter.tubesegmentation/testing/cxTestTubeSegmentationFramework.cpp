@@ -22,7 +22,7 @@
 #include "cxDataInterface.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
-#include "cxTubeSegmentationFilter.h"
+#include "cxTubeSegmentationFilterService.h"
 #include "cxDataLocations.h"
 #include "cxFilterTimedAlgorithm.h"
 #include "cxSelectDataStringDataAdapter.h"

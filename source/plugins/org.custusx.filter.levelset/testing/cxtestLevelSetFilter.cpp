@@ -1,6 +1,6 @@
 #ifdef CX_USE_LEVEL_SET
 #include "catch.hpp"
-#include "cxLevelSetFilter.h"
+#include "cxLevelSetFilterService.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxToolManager.h"
 #include "cxToolManager.h"

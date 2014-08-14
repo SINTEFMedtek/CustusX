@@ -15,11 +15,16 @@
 #include "cxResampleImageFilter.h"
 #include "cxFilterPresetWidget.h"
 #include "cxDilationFilter.h"
+#include "cxPluginFramework.h"
+#include "cxLogicManager.h"
+#include <boost/bind.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #ifdef CX_USE_TSF
-#include "cxTubeSegmentationFilter.h"
+//#include "cxTubeSegmentationFilter.h"
 #endif //CX_USE_TSF
 #ifdef CX_USE_LEVEL_SET
-#include "cxLevelSetFilter.h"
+//#include "cxLevelSetFilter.h"
 #endif
 
 namespace cx {
@@ -36,11 +41,20 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
 	mFilters->append(FilterPtr(new ResampleImageFilter()));
 	mFilters->append(FilterPtr(new DilationFilter()));
 #ifdef CX_USE_TSF
-	mFilters->append(FilterPtr(new TubeSegmentationFilter()));
+//	mFilters->append(FilterPtr(new TubeSegmentationFilter()));
 #endif //CX_USE_TSF
 #ifdef CX_USE_LEVEL_SET
-	mFilters->append(FilterPtr(new LevelSetFilter()));
+//	mFilters->append(FilterPtr(new LevelSetFilter()));
 #endif
+
+	PluginFrameworkManagerPtr pluginFramework = LogicManager::getInstance()->getPluginFramework();
+	mServiceListener.reset(
+			new ServiceTrackerListener<Filter>(
+					pluginFramework->getPluginContext(),
+					boost::bind(&AllFiltersWidget::onServiceAdded, this, _1),
+					boost::function<void(Filter*)>(),
+					boost::bind(&AllFiltersWidget::onServiceRemoved, this, _1)));
+	mServiceListener->open();
 
 	QStringList availableFilters;
 	std::map<QString,QString> names;
@@ -156,4 +170,25 @@ void AllFiltersWidget::finishedSlot()
 	disconnect(mThread.get(), SIGNAL(finished()), this, SLOT(finishedSlot()));
 	mThread.reset();
 }
+
+void AllFiltersWidget::onServiceAdded(Filter* service)
+{
+		mFilters->append(FilterPtr(service, boost::serialization::null_deleter()));
+
+//	QWidget* widget = this->createStreamerWidget(service);
+//	QWidget* serviceWidget = this->wrapVerticalStretch(widget);
+//	mStackedWidget->addWidget(serviceWidget);
+//	mStreamerServiceWidgets[service->getName()] = serviceWidget;
+//
+//	this->addServiceToSelector(service->getName());
+}
+
+void AllFiltersWidget::onServiceRemoved(Filter *service)
+{
+	mFilters->remove(service);
+//	this->removeServiceFromSelector(service->getName());
+//	this->removeServiceWidget(service->getName());
+}
+
+
 } /* namespace cx */

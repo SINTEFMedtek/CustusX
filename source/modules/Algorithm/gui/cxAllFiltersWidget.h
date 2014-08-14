@@ -5,6 +5,7 @@
 #include "cxFilter.h"
 #include "cxFilterTimedAlgorithm.h"
 #include "cxFilterWidget.h"
+#include "cxServiceTrackerListener.h"
 
 namespace cx {
 
@@ -39,6 +40,10 @@ private:
 
 	FilterSetupWidget* mSetupWidget;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
+
+	boost::shared_ptr<ServiceTrackerListener<Filter> > mServiceListener;
+	void onServiceAdded(Filter* service);
+	void onServiceRemoved(Filter *service);
 };
 
 } /* namespace cx */

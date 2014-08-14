@@ -24,9 +24,6 @@ SET( MOC_HEADER_FILES
 	logic/cxBinaryThinningImageFilter3DFilter.h
 	logic/cxSmoothingImageFilter.h
 	logic/cxResampleImageFilter.h
-	logic/cxTubeSegmentationFilter.h
-	logic/cxLevelSetFilter.h
-	logic/cxTSFPresets.h
 	logic/cxDilationFilter.h
     gui/cxAlgorithmPlugin.h
     gui/cxConnectedThresholdImageFilterWidget.h
@@ -51,10 +48,6 @@ SET( SOURCE_FILES
 	logic/cxFilterTimedAlgorithm.cpp
 	logic/cxDummyFilter.h
 	logic/cxDummyFilter.cpp
-	logic/cxTubeSegmentationFilter.h
-	logic/cxTubeSegmentationFilter.cpp
-	logic/cxLevelSetFilter.h
-	logic/cxLevelSetFilter.cpp
 	logic/cxDilationFilter.h
 	logic/cxDilationFilter.cpp
 	logic/cxPipeline.h
@@ -73,8 +66,6 @@ SET( SOURCE_FILES
 	logic/cxSmoothingImageFilter.cpp
 	logic/cxResampleImageFilter.h
 	logic/cxResampleImageFilter.cpp
-	logic/cxTSFPresets.h
-	logic/cxTSFPresets.cpp
     gui/cxAlgorithmPlugin.h
     gui/cxAlgorithmPlugin.cpp
     gui/cxConnectedThresholdImageFilterWidget.h
@@ -102,6 +93,7 @@ include_directories(
     .
     ./logic
     ./gui
+	${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
 	${CustusX_SOURCE_DIR}/source/service/patient
     ${CustusX_SOURCE_DIR}/source/service/tracking
     ${CustusX_SOURCE_DIR}/source/service/visualization
@@ -115,18 +107,6 @@ include_directories(
 
 set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui cxGUIExtenderService)
 
-if (CX_USE_TSF)
-    set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} tubeSegmentationLib)
-endif(CX_USE_TSF)
-
-if (CX_USE_LEVEL_SET)
-    set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} levelSetSegLib)
-endif(CX_USE_LEVEL_SET)
-
-if (CX_USE_OPENCL_UTILITY)
-    set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} OpenCLUtilityLibrary ${OPENCL_LIBRARIES})
-    include_directories(${OpenCLUtilityLibrary_INCLUDE_DIRS})
-endif(CX_USE_OPENCL_UTILITY)
 
 
 

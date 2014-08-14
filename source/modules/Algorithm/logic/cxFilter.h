@@ -28,6 +28,8 @@ typedef boost::shared_ptr<class SelectDataStringDataAdapterBase> SelectDataStrin
 
 typedef boost::shared_ptr<class Filter> FilterPtr;
 
+#define FilterService_iid "cx::Filter"
+
 /** Base class for CustusX filters/algorithms
  *
  * Intended for use in a multithreaded environment.
@@ -181,6 +183,7 @@ public:
 	  * Append a filter to group
 	  */
 	void append(FilterPtr filter);
+	void remove(Filter* filter);
 
 	size_t size() const { return mFilters.size(); }
 	bool empty() const { return mFilters.empty(); }
@@ -203,5 +206,7 @@ typedef boost::shared_ptr<FilterGroup> FilterGroupPtr;
 
 
 } // namespace cx
+
+Q_DECLARE_INTERFACE(cx::Filter, FilterService_iid)
 
 #endif // CXFILTER_H

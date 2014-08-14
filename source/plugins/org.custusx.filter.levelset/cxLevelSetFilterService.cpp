@@ -1,4 +1,4 @@
-#include "cxLevelSetFilter.h"
+#include "cxLevelSetFilterService.h"
 
 #ifdef CX_USE_LEVEL_SET
 

@@ -381,3 +381,58 @@ function (getListOfVarsStartingWith _prefix _varResult)
 	set (${_varResult} ${_matchedVars} PARENT_SCOPE)
 endfunction()
 
+
+
+
+###############################################################################
+#
+# Create a list of all subdirs in curdir. 
+# Return as list of paths relative to curdir. 
+#
+###############################################################################
+MACRO(SUBDIRLIST result curdir)
+  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  #message(STATUS "children: " ${children})
+  SET(dirlist "")
+  FOREACH(child ${children})
+    IF(IS_DIRECTORY ${curdir}/${child})
+        LIST(APPEND dirlist ${child})
+    ENDIF()
+  ENDFOREACH()
+  SET(${result} ${dirlist})
+ENDMACRO()
+
+###############################################################################
+#
+# Given a list of plugin name:VAL pairs, look for other plugins not defined in the list.
+# Undefined plugins are added with the default value of OFF.
+#
+# PLUGINS_VARIABLE: variable containing <pluginname>:<val> pairs
+# RELATIVE_PATH: path relative to CMAKE_CURRENT_SOURCE_DIR to look for plugins
+# PLUGIN_BUILD_OPTION_PREFIX: prefix used by ctkMacroSetupPlugins to generate build variables
+#
+###############################################################################
+function(cx_insert_undefined_plugins PLUGINS_VARIABLE RELATIVE_PATH PLUGIN_BUILD_OPTION_PREFIX)
+    SUBDIRLIST(SUBDIRS ${CMAKE_CURRENT_SOURCE_DIR}/${RELATIVE_PATH})
+    #message(STATUS "PLUGINS_VARIABLE: " ${PLUGINS_VARIABLE})
+    set(plugins_list ${${PLUGINS_VARIABLE}})
+    #message(STATUS "subdirs: " ${SUBDIRS})
+    foreach(subdir ${SUBDIRS})
+        set(plugin_name ${RELATIVE_PATH}/${subdir})
+        list(FIND plugins_list ${plugin_name}:OFF FOUND_OFF)
+        list(FIND plugins_list ${plugin_name}:ON FOUND_ON)
+        getListOfVarsStartingWith(${PLUGIN_BUILD_OPTION_PREFIX}${plugin_name} matchedVars)
+        list(LENGTH matchedVars VAR_DEFINED)
+        #message(STATUS "subdir " ${subdir} "  found OFF=" ${FOUND_OFF} " ON=" ${FOUND_ON} " DEFINED=" ${VAR_DEFINED})
+#        if((${FOUND_OFF} EQUAL -1) AND (${FOUND_ON} EQUAL -1) AND (${VAR_DEFINED} EQUAL 0))
+        if((${FOUND_OFF} EQUAL -1) AND (${FOUND_ON} EQUAL -1))
+            if(${VAR_DEFINED} EQUAL 0)
+                message("Found new plugin " ${subdir} ", adding option OFF.")
+#                set(plugins_list ${plugins_list} ${plugin_name}:OFF)
+            else()
+            endif()
+                set(plugins_list ${plugins_list} ${plugin_name}:OFF)
+        endif()
+    endforeach()
+    set(${PLUGINS_VARIABLE} ${plugins_list} PARENT_SCOPE)
+endfunction()

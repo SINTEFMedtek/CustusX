@@ -1,27 +1,26 @@
-project(org_custusx_example)
+project(org_custusx_filter_levelset)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-message(STATUS "===================================== parsing example")
-
 include_directories(
-    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
+    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
+    ${CustusX_SOURCE_DIR}/source/service/patient
+    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
+    ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
+	${CustusX_SOURCE_DIR}/source/logic
     )
 
 set(PLUGIN_SRCS
-  cxExamplePluginActivator.cpp
-  cxExampleGUIExtenderService.cpp
-  cxExampleWidget.cpp
+    cxFilterLevelSetPluginActivator.cpp
+    cxLevelSetFilterService.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-  cxExamplePluginActivator.h
-  cxExampleGUIExtenderService.h
-  cxExampleWidget.h
+    cxFilterLevelSetPluginActivator.h
+    cxLevelSetFilterService.h
 )
 
-# Qt Designer files which should be processed by Qts uic
 set(PLUGIN_UI_FORMS
 )
 
@@ -29,13 +28,18 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
-
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
-    cxGUIExtenderService
+    cxPluginAlgorithm
+    levelSetSegLib
     )
+
+if (CX_USE_OPENCL_UTILITY)
+    set(PLUGIN_target_libraries ${PLUGIN_target_libraries} OpenCLUtilityLibrary ${OPENCL_LIBRARIES})
+    include_directories(${OpenCLUtilityLibrary_INCLUDE_DIRS})
+endif(CX_USE_OPENCL_UTILITY)
 
 ctkMacroBuildPlugin(
   NAME ${PROJECT_NAME}

@@ -56,5 +56,16 @@ void FilterGroup::append(FilterPtr filter)
 	filter->initialize(node.getElement(), uid);
 }
 
+void FilterGroup::remove(Filter* filter)
+{
+	for (unsigned i=0; i<mFilters.size(); )
+	{
+		if (filter == mFilters[i].get())
+			mFilters.erase(mFilters.begin()+i);
+		else
+			++i;
+	}
+}
+
 
 } // namespace cx

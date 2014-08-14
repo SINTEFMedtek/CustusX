@@ -1,5 +1,5 @@
-#ifndef CXTUBESEGMENTATIONFILTER_H_
-#define CXTUBESEGMENTATIONFILTER_H_
+#ifndef CXTUBESEGMENTATIONFILTERSERVICE_H_
+#define CXTUBESEGMENTATIONFILTERSERVICE_H_
 
 #include "cxFilterImpl.h"
 
@@ -13,6 +13,7 @@ class TSFOutput;
 
 #include "cxStringDataAdapterXml.h"
 #include "cxBoolDataAdapterXml.h"
+#include "org_custusx_filter_tubesegmentation_Export.h"
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
@@ -33,9 +34,10 @@ typedef boost::shared_ptr<class TSFPresets> TSFPresetsPtr;
  * \date 14.12.2012
  * \author Janne Beate Bakeng, SINTEF
  */
-class TubeSegmentationFilter : public FilterImpl
+class org_custusx_filter_tubesegmentation_EXPORT TubeSegmentationFilter : public FilterImpl
 {
 	Q_OBJECT
+	Q_INTERFACES(cx::Filter)
 
 public:
 	TubeSegmentationFilter();
@@ -112,4 +114,4 @@ typedef boost::shared_ptr<class TubeSegmentationFilter> TubeSegmentationFilterPt
 #endif //CX_USE_TSF
 
 } /* namespace cx */
-#endif /* CXTUBESEGMENTATIONFILTER_H_ */
+#endif /* CXTUBESEGMENTATIONFILTERSERVICE_H_ */

@@ -60,7 +60,6 @@ endforeach()
 
 #set (CX_EXTERNAL_PLUGINS "" CACHE INTERNAL "list of plugins originating outside of custusx. Add to list in order to build.")
 
-
 #> Create a list of available plug-ins and make them known to the build system
 set(CX_PLUGINS
   ${CX_PLUGINS}
@@ -69,11 +68,23 @@ set(CX_PLUGINS
   plugins/org.custusx.vnnclreconstruction:ON
   plugins/org.custusx.pnnreconstruction:ON
   plugins/org.custusx.patientmodel:ON
+  plugins/org.custusx.filter.tubesegmentation:OFF
   #plugins/org.custusx.ussimulator:ON
   #plugins/org.custusx.gestreamer:ON
 )
+ 
+set(PLUGIN_BUILD_OPTION_PREFIX CX_BUILD_PLUGIN_)
+#message(STATUS "CX_PLUGINS PRE: " ${CX_PLUGINS})
+cx_insert_undefined_plugins(CX_PLUGINS "plugins" ${PLUGIN_BUILD_OPTION_PREFIX})
+#message(STATUS "CX_PLUGINS POST: " ${CX_PLUGINS})
 
-ctkMacroSetupPlugins(${CX_PLUGINS} BUILD_OPTION_PREFIX CX_BUILD_PLUGIN_)
+#foreach(var ${CX_PLUGINS})
+#  message("==plugin: " ${var})
+#endforeach(var ${CX_PLUGINS})
+
+ctkMacroSetupPlugins(
+    ${CX_PLUGINS} 
+    BUILD_OPTION_PREFIX ${PLUGIN_BUILD_OPTION_PREFIX})
 
 # Testing for CustusX
 add_subdirectory(testing)

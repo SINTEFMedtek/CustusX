@@ -6,6 +6,7 @@
 
 #include "cxPresets.h"
 #include "cxXmlOptionItem.h"
+#include "org_custusx_filter_tubesegmentation_Export.h"
 
 #ifdef CX_USE_TSF
 
@@ -20,7 +21,7 @@ namespace cx {
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class TSFPresets : public Presets
+class org_custusx_filter_tubesegmentation_EXPORT TSFPresets : public Presets
 {
 	Q_OBJECT
 
