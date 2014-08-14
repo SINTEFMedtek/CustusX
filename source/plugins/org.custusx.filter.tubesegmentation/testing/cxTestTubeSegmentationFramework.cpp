@@ -12,7 +12,6 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifdef CX_USE_TSF
 #include "testing/cxTestTubeSegmentationFramework.h"
 
 #include <fstream>
@@ -223,5 +222,3 @@ void TestTubeSegmentationFramework::runFilter(QString preset)
 	//TODO clean up temp folder...
 
 }
-
-#endif //CX_USE_TSF

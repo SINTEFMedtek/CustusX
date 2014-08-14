@@ -8,7 +8,6 @@
 #include "cxtestTSFPresetsFixture.h"
 #include "catch.hpp"
 
-#ifdef CX_USE_TSF
 #include <QStringList>
 #include <QFile>
 #include <QTextStream>
@@ -56,4 +55,3 @@ TEST_CASE_METHOD(cxtest::TSFPresetsFixture, "TSFPresets: Delete presets", "[unit
 	INFO("Preset file was not removed when deleted: "+mPresetFilePath.toStdString());
 	CHECK(!QFile::exists(mPresetFilePath));
 }
-#endif //CX_USE_TSF

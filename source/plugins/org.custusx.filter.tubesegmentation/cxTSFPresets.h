@@ -8,8 +8,6 @@
 #include "cxXmlOptionItem.h"
 #include "org_custusx_filter_tubesegmentation_Export.h"
 
-#ifdef CX_USE_TSF
-
 namespace cx {
 
 /*
@@ -49,7 +47,5 @@ protected:
 typedef boost::shared_ptr<class TSFPresets> TSFPresetsPtr;
 
 } /* namespace cx */
-
-#endif // CX_USE_TSF
 
 #endif /* CXTSFPRESETS_H_ */

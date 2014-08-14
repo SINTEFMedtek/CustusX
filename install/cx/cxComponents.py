@@ -428,8 +428,10 @@ class CustusX(CppComponent):
     def forceConnectSublibraries(self, add):
         print 'CustusX force connect sublibraries.'
         add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
-        add('CX_USE_LEVEL_SET:BOOL', platform.system() == 'Linux')
-        add('CX_USE_TSF:BOOL', platform.system() != 'Windows');
+#        add('CX_USE_LEVEL_SET:BOOL', platform.system() == 'Linux')
+#        add('CX_USE_TSF:BOOL', platform.system() != 'Windows');
+        add('CX_BUILD_PLUGIN_plugins/org.custusx.filter.levelset:BOOL', platform.system() == 'Linux');
+        add('CX_BUILD_PLUGIN_plugins/org.custusx.filter.tubesegmentation:BOOL', platform.system() != 'Windows');
         add('CX_USE_ISB_GE:BOOL', platform.system() != 'Windows');
         add('CX_BUILD_MEHDI_VTKMULTIVOLUME:BOOL', False);
         add('CX_BUILD_US_SIMULATOR:BOOL', True);

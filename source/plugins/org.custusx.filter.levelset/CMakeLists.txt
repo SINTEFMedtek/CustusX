@@ -1,5 +1,16 @@
 project(org_custusx_filter_levelset)
 
+###############################################################################
+# Initialize Level-Set-Segmentation library
+# Find the package and run the include USE file.
+###############################################################################
+macro(cx_initialize_level_set_segmentation)
+    find_package( Level-Set-Segmentation REQUIRED)
+    include(${Level-Set-Segmentation_USE_FILE})
+endmacro()
+
+cx_initialize_level_set_segmentation()
+
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 include_directories(

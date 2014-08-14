@@ -14,7 +14,6 @@
 
 #include "catch.hpp"
 
-#ifdef CX_USE_TSF
 
 //=================================================================
 // TSF library tests
@@ -115,4 +114,3 @@ TEST_CASE("should load tsf presets from file location and get more than 0 preset
 //	foreach ( QString item, presetList)
 //		std::cout << item.toStdString() << std::endl;
 }
-#endif //CX_USE_TSF

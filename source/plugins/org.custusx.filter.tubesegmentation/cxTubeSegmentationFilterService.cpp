@@ -1,6 +1,5 @@
 #include "cxTubeSegmentationFilterService.h"
 
-#ifdef CX_USE_TSF
 #include "tube-segmentation.hpp"
 #include "tsf-config.h"
 #include "Exceptions.hpp"
@@ -936,5 +935,4 @@ TubeSegmentationFilter::~TubeSegmentationFilter() {
 }
 
 } /* namespace cx */
-#endif //CX_USE_TSF
 

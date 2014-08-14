@@ -85,58 +85,24 @@ macro(cx_initialize_opencl)
 endmacro()
 
 ###############################################################################
-# Initialize Tube-Segmentation-Framework library
-#
+# Initialize Level-Set-Segmentation library
 # Find the package and run the include USE file.
-#
-# Define variables:
-#    CX_USE_TSF : cache option
-#
 ###############################################################################
-macro(cx_initialize_TSF)
-    if(CX_USE_TSF)
-        find_package( Tube-Segmentation-Framework REQUIRED)
-    else()
-        find_package( Tube-Segmentation-Framework QUIET)
-    endif()
-
-    if(Tube-Segmentation-Framework_FOUND)
-        option(CX_USE_TSF "use TSF (Tube-Segmentation-Framework)" ON)
-    else()
-        option(CX_USE_TSF "use TSF (Tube-Segmentation-Framework)" OFF)
-    endif()
-
-    if( CX_USE_TSF )
-        add_definitions(-DCX_USE_TSF)
-        include(${Tube-Segmentation-Framework_USE_FILE})
+macro(cx_initialize_level_set_segmentation)
+    find_package( Level-Set-Segmentation QUIET)
+    if(Level-Set-Segmentation_FOUND)
+        include(${Level-Set-Segmentation_USE_FILE})
     endif()
 endmacro()
 
 ###############################################################################
-# Initialize Level-Set-Segmentation library
-#
+# Initialize Tube-Segmentation-Framework library
 # Find the package and run the include USE file.
-#
-# Define variables:
-#    CX_USE_LEVEL_SET : cache option
-#
 ###############################################################################
-macro(cx_initialize_level_set_segmentation)
-    if(CX_USE_LEVEL_SET)
-        find_package( Level-Set-Segmentation REQUIRED)
-    else()
-        find_package( Level-Set-Segmentation QUIET)
-    endif()
-
-    if(Level-Set-Segmentation_FOUND)
-        option(CX_USE_LEVEL_SET "use Level Set Segmentation" ON)
-    else()
-        option(CX_USE_LEVEL_SET "use Level Set Segmentation" OFF)
-    endif()
-
-    if( CX_USE_LEVEL_SET )
-        ADD_DEFINITIONS(-DCX_USE_LEVEL_SET)
-        include(${Level-Set-Segmentation_USE_FILE})
+macro(cx_initialize_TSF)
+    find_package( Tube-Segmentation-Framework REQUIRED)
+    if(Tube-Segmentation-Framework_FOUND)
+        include(${Tube-Segmentation-Framework_USE_FILE})
     endif()
 endmacro()
 

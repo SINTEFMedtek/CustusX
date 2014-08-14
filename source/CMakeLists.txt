@@ -68,7 +68,9 @@ set(CX_PLUGINS
   plugins/org.custusx.vnnclreconstruction:ON
   plugins/org.custusx.pnnreconstruction:ON
   plugins/org.custusx.patientmodel:ON
+  
   plugins/org.custusx.filter.tubesegmentation:OFF
+  
   #plugins/org.custusx.ussimulator:ON
   #plugins/org.custusx.gestreamer:ON
 )

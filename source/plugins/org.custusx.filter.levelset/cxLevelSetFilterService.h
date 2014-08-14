@@ -1,7 +1,6 @@
 #ifndef CXLEVELSETFILTER_H_
 #define CXLEVELSETFILTER_H_
 
-#ifdef CX_USE_LEVEL_SET
 #include "cxFilterImpl.h"
 #include "cxVector3D.h"
 #include "org_custusx_filter_levelset_Export.h"
@@ -60,5 +59,4 @@ typedef boost::shared_ptr<class LevelSetFilter> LevelSetFilterPtr;
 
 } // end namespace
 
-#endif // CX_USE_LEVEL_SET
 #endif /* CXLEVELSETFILTER_H_ */

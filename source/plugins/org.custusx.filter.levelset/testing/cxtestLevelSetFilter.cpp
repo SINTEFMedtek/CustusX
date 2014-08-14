@@ -1,4 +1,3 @@
-#ifdef CX_USE_LEVEL_SET
 #include "catch.hpp"
 #include "cxLevelSetFilterService.h"
 #include "cxCoordinateSystemHelpers.h"
@@ -131,4 +130,3 @@ TEST_CASE("LevelSetFilter: execute", "[integration][modules][Algorithm][LevelSet
 }
 
 }; // end cxtest namespace
-#endif // end ifdef CX_USE_LEVEL_SET

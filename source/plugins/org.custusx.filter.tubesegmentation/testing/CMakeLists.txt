@@ -24,6 +24,12 @@ if(BUILD_TESTING)
 
 	cx_catch_add_lib_and_exe(org_custusx_filter_tubesegmentation
         "${CXTEST_SOURCES}"
-        "${CXTEST_SOURCES_TO_MOC}")
+        "${CXTEST_SOURCES_TO_MOC}" tubeSegmentationLib)
+#        "LINK_PRIVATE tubeSegmentationLib")
+
+#    LINK_PUBLIC
+#    ${PLUGIN_target_libraries}   
+#    cxPluginAlgorithm
+#    LINK_PRIVATE tubeSegmentationLib
 
 endif(BUILD_TESTING)

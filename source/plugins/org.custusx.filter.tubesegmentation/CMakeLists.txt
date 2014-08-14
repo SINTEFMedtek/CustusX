@@ -1,5 +1,23 @@
 project(org_custusx_filter_tubesegmentation)
 
+include(cxInstallUtilities)
+
+###############################################################################
+# Initialize Tube-Segmentation-Framework library
+# Find the package and run the include USE file.
+###############################################################################
+macro(cx_initialize_TSF)
+    find_package( Tube-Segmentation-Framework REQUIRED)
+    include(${Tube-Segmentation-Framework_USE_FILE})
+
+    set(CX_ALL_LIBRARY_DIRS
+        ${CX_ALL_LIBRARY_DIRS}
+        ${Tube-Segmentation-Framework_LIBRARY_DIRS}
+        CACHE INTERNAL "List of dirs to look for libraries to use in fixup_bundle")
+endmacro()
+
+cx_initialize_TSF()
+
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 include_directories(
@@ -31,14 +49,27 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
+install(FILES
+		${Tube-Segmentation-Framework_KERNELS_DIR}/kernels.cl
+		${Tube-Segmentation-Framework_KERNELS_DIR}/kernels_no_3d_write.cl
+		DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/)
+install(DIRECTORY ${Tube-Segmentation-Framework_PARAMETERS_DIR}
+		DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/
+		FILE_PERMISSIONS ${CX_FULL_PERMISSIONS}
+		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
 
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
-set(PLUGIN_target_libraries 
+set(PLUGIN_target_libraries
+    LINK_PUBLIC 
     ${PLUGIN_target_libraries}   
     cxPluginAlgorithm
-    tubeSegmentationLib
+    LINK_PRIVATE tubeSegmentationLib
     )
+    
+#    LINK_PUBLIC
+    #target_link_libraries(cxTrackingService LINK_PUBLIC cxResource LINK_PRIVATE IGSTK)
+    
 
 if (CX_USE_OPENCL_UTILITY)
     set(PLUGIN_target_libraries ${PLUGIN_target_libraries} OpenCLUtilityLibrary ${OPENCL_LIBRARIES})

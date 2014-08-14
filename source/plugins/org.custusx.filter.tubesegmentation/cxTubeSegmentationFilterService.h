@@ -6,10 +6,8 @@
 #include <boost/unordered_map.hpp>
 #include <boost/shared_ptr.hpp>
 
-#ifdef CX_USE_TSF
 #include "parameters.hpp"
 class TSFOutput;
-#endif //CX_USE_TSF
 
 #include "cxStringDataAdapterXml.h"
 #include "cxBoolDataAdapterXml.h"
@@ -21,7 +19,6 @@ typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 namespace cx {
 typedef boost::shared_ptr<class TSFPresets> TSFPresetsPtr;
 
-#ifdef CX_USE_TSF
 /**
  * Filter for segmenting and extract the centerline of a volume.
  *
@@ -110,8 +107,6 @@ private:
 
 };
 typedef boost::shared_ptr<class TubeSegmentationFilter> TubeSegmentationFilterPtr;
-
-#endif //CX_USE_TSF
 
 } /* namespace cx */
 #endif /* CXTUBESEGMENTATIONFILTERSERVICE_H_ */
