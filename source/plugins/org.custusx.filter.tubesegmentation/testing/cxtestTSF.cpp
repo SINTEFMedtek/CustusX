@@ -14,7 +14,7 @@
 
 #include "catch.hpp"
 
-#include "cxTestTubeSegmentationFramework.h"
+#include "cxtestTSFFixture.h"
 
 namespace cxtest
 {

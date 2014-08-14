@@ -12,8 +12,8 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXTESTTUBESEGMENTATIONFRAMEWORK_H_
-#define CXTESTTUBESEGMENTATIONFRAMEWORK_H_
+#ifndef CXTESTTSFFIXTURE_H_
+#define CXTESTTSFFIXTURE_H_
 
 class QString;
 class paramList;
@@ -43,4 +43,4 @@ private:
 	void runFilter(QString preset);
 };
 
-#endif /* CXTESTTUBESEGMENTATIONFRAMEWORK_H_ */
+#endif /* CXTESTTSFFIXTURE_H_ */

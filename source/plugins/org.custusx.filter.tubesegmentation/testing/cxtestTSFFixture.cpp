@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "testing/cxTestTubeSegmentationFramework.h"
+#include "cxtestTSFFixture.h"
 
 #include <fstream>
 #include "cxData.h"

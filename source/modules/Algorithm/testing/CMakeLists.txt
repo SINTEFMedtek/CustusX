@@ -29,10 +29,10 @@ if(BUILD_TESTING)
 	)
 
     cx_add_class(CXTEST_PLUGINALGORITHM_SOURCES ${CXTEST_PLUGINALGORITHM_SOURCES}
-  #      cxTestTubeSegmentationFramework
- #       cxtestCatchTubeSegmentationFramework.cpp
+  #      cxtestTSFFixture
+ #       cxtestTSF.cpp
 #		cxtestTSFPresetsFixture
-#		cxtestCatchTSFPresets.cpp
+#		cxtestTSFPresets.cpp
 #        cxtestLevelSetFilter.cpp
         cxtestDilationFilter.cpp
     )
