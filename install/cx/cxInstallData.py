@@ -204,12 +204,12 @@ class Common(object):
         return self.root_dir
     
     def getWorkingPath(self):
-        if use_old_directory_structure:
+        if self.use_old_directory_structure:
             return "%s/%s" % (self.root_dir, self._getWorkingFolder())
         return self.root_dir
     
     def getExternalPath(self):
-        if use_old_directory_structure:
+        if self.use_old_directory_structure:
             return "%s/%s" % (self.root_dir, self._getExternalFolder())                        
         return self.root_dir
     
@@ -242,7 +242,7 @@ class Common(object):
             return long_name
             
     def _initPaths(self):        
-        if use_old_directory_structure:                
+        if self.use_old_directory_structure:                
             if platform.system() == 'Windows':
                 self.root_dir = "C:/Dev"
             else:
