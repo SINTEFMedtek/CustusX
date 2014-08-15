@@ -68,6 +68,7 @@ class Common(object):
     def __init__(self):
         self.root_dir = None
         self.m32bit = False
+        self.use_old_directory_structure = True
         self._initPaths()
         self.isb_password = ""
         self.static = False # build as shared or static libraries
@@ -97,7 +98,6 @@ class Common(object):
         self.mGraphviz = False
         self.git_tag = None # if none, use branch master
         self.force_connect_sublibraries = False
-        self.use_old_directory_structure = True
 
     def printSettings(self):
         print ''
