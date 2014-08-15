@@ -85,6 +85,10 @@ class Component(object):
     def pluginPath(self):
         'if this component contains a plugin: return path to plugin, absolute or relative to CustusX/source'
         return None
+    def addConfigurationToDownstreamLib(self, builder):
+        'called during the configuration step of CustusX: insert necessary cmake stuff into builder'
+        pass
+
         
 # ---------------------------------------------------------
 
@@ -416,9 +420,8 @@ class CustusX(CppComponent):
         
         libs = self.assembly.libraries
         for lib in libs:
-            #print "*********", lib.pluginPath()
+            lib.addConfigurationToDownstreamLib(builder)
             if lib.pluginPath() and os.path.exists(lib.pluginPath()):
-                #print "    adding "
                 add('CX_EXTERNAL_PLUGIN_%s'%lib.name(), lib.pluginPath())
         
         if self.controlData.force_connect_sublibraries:

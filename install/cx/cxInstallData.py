@@ -12,6 +12,24 @@
 #
 # default folder setup
 #
+# --root----ITK---ITK
+#    |       |----build_Debug  
+#    |       |----build_Release
+#    |       |----build32_Debug
+#    |
+#    |------VTK---VTK
+#    |       |----build_Debug  
+#    |       |----build_Release
+#    |       |----build32_Debug
+#    |
+#    |------CustusX---CustusX
+#            |--------build_Debug  
+#            |--------build_Release
+#            |--------build32_Debug
+#
+#
+# old, deprecated structure:
+# 
 # --root---external---ITK---ITK
 #    |         |       |----build_Debug  
 #    |         |       |----build_Release
@@ -79,6 +97,7 @@ class Common(object):
         self.mGraphviz = False
         self.git_tag = None # if none, use branch master
         self.force_connect_sublibraries = False
+        self.use_old_directory_structure = True
 
     def printSettings(self):
         print ''
@@ -108,6 +127,7 @@ class Common(object):
         p = cxArgParse.ArgumentParser(add_help=False)
         p.add_argument('--root_dir', default=self.root_dir, help='specify root folder, default=%s' % self.root_dir)
         p.add_argument('--print_control_data', action='store_true', default=False, help='Print all control data at startup')
+        p.add_argument('--use_old_directory_structure', action='store_true', default=False, help='use obsolete external/working folder structure')
         return p
 
     def getArgParser_core_build(self):
@@ -184,10 +204,14 @@ class Common(object):
         return self.root_dir
     
     def getWorkingPath(self):
-        return "%s/%s" % (self.root_dir, self._getWorkingFolder())
+        if use_old_directory_structure:
+            return "%s/%s" % (self.root_dir, self._getWorkingFolder())
+        return self.root_dir
     
     def getExternalPath(self):
-        return "%s/%s" % (self.root_dir, self._getExternalFolder())                        
+        if use_old_directory_structure:
+            return "%s/%s" % (self.root_dir, self._getExternalFolder())                        
+        return self.root_dir
     
     def setBuildShared(self, value):
         self.static = not value
@@ -217,11 +241,17 @@ class Common(object):
         else:
             return long_name
             
-    def _initPaths(self):                
-        if platform.system() == 'Windows':
-            self.root_dir = "C:/Dev"
+    def _initPaths(self):        
+        if use_old_directory_structure:                
+            if platform.system() == 'Windows':
+                self.root_dir = "C:/Dev"
+            else:
+                self.root_dir = os.path.expanduser("~") + "/dev" #+ getpass.getuser() - use new default
         else:
-            self.root_dir = os.path.expanduser("~") + "/dev" #+ getpass.getuser() - use new default
+            if platform.system() == 'Windows':
+                self.root_dir = "C:/Dev/cx"
+            else:
+                self.root_dir = os.path.expanduser("~") + "/dev/cx" #+ getpass.getuser() - use new default
         
     def _getExternalFolder(self):
         '''external dir: Used as base dir for all externals, such as VTK, ITK, ...'''
