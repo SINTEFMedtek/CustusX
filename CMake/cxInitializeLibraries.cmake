@@ -100,7 +100,7 @@ endmacro()
 # Find the package and run the include USE file.
 ###############################################################################
 macro(cx_initialize_TSF)
-    find_package( Tube-Segmentation-Framework REQUIRED)
+    find_package( Tube-Segmentation-Framework QUIET)
     if(Tube-Segmentation-Framework_FOUND)
         include(${Tube-Segmentation-Framework_USE_FILE})
     endif()

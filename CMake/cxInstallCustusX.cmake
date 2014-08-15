@@ -51,7 +51,8 @@ set(CX_ALL_LIBRARY_DIRS
     ${CTK_DIR}/CTK-build/bin
     ${ITK_DIR}/lib
     ${DCMTK_DIR}/lib
-#    ${Tube-Segmentation-Framework_LIBRARY_DIRS}
+    ${Level-Set-Segmentation_LIBRARY_DIRS}
+    ${Tube-Segmentation-Framework_LIBRARY_DIRS}
     ${OpenCLUtilityLibrary_LIBRARY_DIRS}
 
 	${CMAKE_LIBRARY_OUTPUT_DIRECTORY}

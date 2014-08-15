@@ -65,11 +65,7 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}   
     cxPluginAlgorithm
     LINK_PRIVATE tubeSegmentationLib
-    )
-    
-#    LINK_PUBLIC
-    #target_link_libraries(cxTrackingService LINK_PUBLIC cxResource LINK_PRIVATE IGSTK)
-    
+    )    
 
 if (CX_USE_OPENCL_UTILITY)
     set(PLUGIN_target_libraries ${PLUGIN_target_libraries} OpenCLUtilityLibrary ${OPENCL_LIBRARIES})

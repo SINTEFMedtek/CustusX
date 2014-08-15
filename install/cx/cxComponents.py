@@ -416,7 +416,9 @@ class CustusX(CppComponent):
         
         libs = self.assembly.libraries
         for lib in libs:
-            if lib.pluginPath():
+            #print "*********", lib.pluginPath()
+            if lib.pluginPath() and os.path.exists(lib.pluginPath()):
+                #print "    adding "
                 add('CX_EXTERNAL_PLUGIN_%s'%lib.name(), lib.pluginPath())
         
         if self.controlData.force_connect_sublibraries:
@@ -430,11 +432,11 @@ class CustusX(CppComponent):
         add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
 #        add('CX_USE_LEVEL_SET:BOOL', platform.system() == 'Linux')
 #        add('CX_USE_TSF:BOOL', platform.system() != 'Windows');
-        add('CX_BUILD_PLUGIN_plugins/org.custusx.filter.levelset:BOOL', platform.system() == 'Linux');
-        add('CX_BUILD_PLUGIN_plugins/org.custusx.filter.tubesegmentation:BOOL', platform.system() != 'Windows');
+        add('CX_PLUGIN_org.custusx.filter.levelset:BOOL', platform.system() == 'Linux');
+        add('CX_PLUGIN_org.custusx.filter.tubesegmentation:BOOL', platform.system() != 'Windows');
+        add('CX_PLUGIN_org.custusx.ussimulator:BOOL', True);
         add('CX_USE_ISB_GE:BOOL', platform.system() != 'Windows');
         add('CX_BUILD_MEHDI_VTKMULTIVOLUME:BOOL', False);
-        add('CX_BUILD_US_SIMULATOR:BOOL', True);
         
 # ---------------------------------------------------------
 
@@ -464,28 +466,6 @@ class UltrasonixSDK(CppComponent):
     def isPubliclyAvailable(self):
         return False
 
-# ---------------------------------------------------------
-
-class UltrasoundSimulation(CppComponent):
-    def name(self):
-        return "UltrasoundSimulation"
-    def help(self):
-        return 'UltrasoundSimulation'
-    def path(self):
-        return self.controlData.getWorkingPath() + "/UltrasoundSimulation"
-    def _rawCheckout(self):
-        self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/UltrasoundSimulation.git')
-    def update(self):
-        self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag())    
-        #self._getBuilder().gitCheckout('978f9980781303d626dc390df4f8dd73ecb3b717')
-    def configure(self):
-        pass
-    def build(self):
-        pass
-    def makeClean(self):
-        pass
-    def isPubliclyAvailable(self):
-        return False
 
 # ---------------------------------------------------------
 

@@ -315,13 +315,6 @@ endif ()
 				${OpenCLUtilityLibrary_KERNELS_DIR}/HistogramPyramids.clh
 				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/)
 	endif()
-
-	if(CX_BUILD_US_SIMULATOR)
-		install(FILES
-				${CustusX_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/speckle.mhd
-				${CustusX_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/speckle.raw
-				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/simulator)
-	endif()
 endfunction()
 
 ###############################################################################
@@ -478,9 +471,9 @@ cx_initialize_IGSTK()
 set(PLUGINS_DESCRIPTION
 "	Plugins:
 ")
-getListOfVarsStartingWith("CX_BUILD_PLUGIN_" matchedVars)
+getListOfVarsStartingWith("CX_PLUGIN_" matchedVars)
 foreach (_var IN LISTS matchedVars)
-	string(REPLACE "CX_BUILD_PLUGIN_" "" PLUGIN_NAME ${_var})
+	string(REPLACE "CX_PLUGIN_" "" PLUGIN_NAME ${_var})
 	#message("${_var}=${${_var}} :: ${${${_var}}} :: ${PLUGIN_NAME}")
 	set(PLUGINS_DESCRIPTION ${PLUGINS_DESCRIPTION}
 "		${PLUGIN_NAME}: ${${_var}}

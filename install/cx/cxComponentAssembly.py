@@ -49,7 +49,6 @@ class LibraryAssembly(object):
             self.addComponent(cxComponents.TubeSegmentationFramework());
         if (platform.system() == 'Linux'):
             self.addComponent(cxComponents.LevelSetSegmentation());
-        self.addComponent(cxComponents.UltrasoundSimulation())
         self.addComponent(cxComponents.CustusX())
         self.addComponent(cxComponents.CustusXData())
         
