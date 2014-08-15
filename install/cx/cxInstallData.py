@@ -68,7 +68,7 @@ class Common(object):
     def __init__(self):
         self.root_dir = None
         self.m32bit = False
-        self.use_old_directory_structure = True
+        self.use_old_directory_structure = False
         self._initPaths()
         self.isb_password = ""
         self.static = False # build as shared or static libraries
