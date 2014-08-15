@@ -440,34 +440,6 @@ class CustusX(CppComponent):
         
 # ---------------------------------------------------------
 
-class UltrasonixSDK(CppComponent):
-    def name(self):
-        return "UltrasonixSDK"
-    def help(self):
-        return 'UltrasonixSDK'
-    def includePath(self):
-        return self.path() + "/" + self.sourceFolder() + "/ulterius/inc"
-    def libFile(self):
-        return self.path() + "/" + self.sourceFolder() + "/ulterius/lib/ulterius.lib"
-    def binDir(self):
-        return self.path() + "/" + self.sourceFolder() + "/bin"
-    def path(self):
-        return self.controlData.getWorkingPath() + "/UltrasonixSDK"
-    def _rawCheckout(self):
-        self._getBuilder().gitClone('ssh://medtek.sintef.no/git/UltrasonixSDK.git')
-    def update(self):
-        self._getBuilder().gitCheckout('v5.7.4')    
-    def configure(self):
-        pass
-    def build(self):
-        pass
-    def makeClean(self):
-        pass
-    def isPubliclyAvailable(self):
-        return False
-
-
-# ---------------------------------------------------------
 
 class TubeSegmentationFramework(CppComponent):
     def name(self):
@@ -544,15 +516,17 @@ class CustusXData(CppComponent):
     def sourceFolder(self):
         return 'data'
     def _rawCheckout(self):
-        self._getBuilder().gitClone('ssh://%s'%self.gitRepository(), self.sourceFolder())
+        self._getBuilder().gitClone(self.gitRepository(), self.sourceFolder())
     def update(self):
+        self._getBuilder().gitSetRemoteURL(self.getRepository())
         self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag())    
     def configure(self):
         pass
     def build(self):
         pass
     def gitRepository(self):
-        return 'medtek.sintef.no//Volumes/medtek_HD/git/Data.git'
+        return 'git@github.com:SINTEFMedisinskTeknologi/CustusXData.git'
+        #return 'medtek.sintef.no//Volumes/medtek_HD/git/Data.git'
     def makeClean(self):
         pass
     def isPubliclyAvailable(self):

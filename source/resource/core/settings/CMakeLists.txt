@@ -24,6 +24,7 @@ set (CX_CONFIG_ROOT ${CustusX_SOURCE_DIR}/config)
 set (CX__OPTIONAL_CONFIG_ROOT ${CustusX_SOURCE_DIR}/../../CustusXSetup/CustusXSetup/config)
 
 set (CX_DATA_ROOT ${CustusX_SOURCE_DIR}/data CACHE PATH "path to CustusX data root")
+set (CX_LARGE_DATA_ROOT ${CustusX_SOURCE_DIR}/largedata CACHE PATH "path to CustusX large data root")
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/cxConfig.h.in"

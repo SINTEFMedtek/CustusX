@@ -49,6 +49,36 @@ QString DataLocations::getTestDataPath()
 	}
 }
 
+QString DataLocations::getLargeTestDataPath()
+{
+	QString settingsPath = cx::DataLocations::getRootConfigPath() + "/settings";
+	QString dataRootConfigFile = settingsPath + "/large_data_root_location.txt";
+	if (QFileInfo(dataRootConfigFile).exists())
+	{
+		return readTestDataPathFromFile(dataRootConfigFile);
+	}
+	else
+	{
+		return CX_LARGE_DATA_ROOT;
+	}
+}
+
+QString DataLocations::getExistingTestData(QString pathRelativeToTestDataRoot, QString filename)
+{
+	QString path;
+
+	path = QString("%1/%2/%3").arg(getTestDataPath()).arg(pathRelativeToTestDataRoot).arg(filename);
+	if (QFileInfo(path).exists())
+		return path;
+
+	path = QString("%1/%2/%3").arg(getLargeTestDataPath()).arg(pathRelativeToTestDataRoot).arg(filename);
+	if (QFileInfo(path).exists())
+		return path;
+
+	return "";
+}
+
+
 QString DataLocations::readTestDataPathFromFile(QString filename)
 {
 	QFile file(filename);

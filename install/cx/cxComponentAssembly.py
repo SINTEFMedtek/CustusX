@@ -42,7 +42,6 @@ class LibraryAssembly(object):
         self.addComponent(cxComponents.CTK())
         if (platform.system() != 'Windows'):
              self.addComponent(cxComponents.ISB_DataStreaming());
-        self.addComponent(cxComponents.UltrasonixSDK())
         if (platform.system() != 'Windows'):
             self.addComponent(cxComponents.OpenCLUtilityLibrary())
         if (platform.system() != 'Windows'):
