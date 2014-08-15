@@ -518,7 +518,7 @@ class CustusXData(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone(self.gitRepository(), self.sourceFolder())
     def update(self):
-        self._getBuilder().gitSetRemoteURL(self.getRepository())
+        self._getBuilder().gitSetRemoteURL(self.gitRepository())
         self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag())    
     def configure(self):
         pass
