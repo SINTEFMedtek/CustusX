@@ -75,9 +75,7 @@ CommandlineImageStreamerFactory::CommandlineImageStreamerFactory()
 
 QString CommandlineImageStreamerFactory::getDefaultSenderType() const
 {
-	// use the FIRST sender available
-  QString retval = mCommandLineStreamers.front()->getType();
-  return retval;
+	return this->getSenderTypes().front();
 }
 
 QStringList CommandlineImageStreamerFactory::getSenderTypes() const
