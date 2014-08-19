@@ -1,6 +1,6 @@
-CustusX3
+CustusX
 ========
-# CustusX, a Research Platform for Image-Guided Therapy
+## a Research Platform for Image-Guided Therapy
 
 The system aids surgeons during interventions, enabling the surgeon to navigate 3D image data using tracked instruments. Focus is on use of ultrasound in surgery.
 
@@ -14,18 +14,25 @@ The code is free to download and use under a BSD-3 license. However, the code ba
 
 CustusX uses a Python-based superbuild. Select a root folder, then all libs will be downloaded and built in separate folders beneath it, as follows:
 
-<root> -- <lib1> -- <lib1-source>
-                        | -- <build_type>
-               <lib1> -- <lib1-source>
-                        | -- <build_type>
+|        |          |                |
+| ------ | ----     | -------------- |
+| root   | CustusX  | CustusX        |
+|        |          | build_Release  |
+|        | VTK      | VTK            |
+|        |          | build_Release  |
+|        | CTK      | CTK            |
+|        |          | build_Release  |
+|        | some_lib | some_lib       |
+|        |          | build_Release  |
 
-´´´bash
-mkdir -p CustusX
-cd CustusX
-git clone git@github.com:SINTEFMedisinskTeknologi/CustusX3.git CustusX
-cd ..
-./CustusX/install/cxInstaller.py --root_dir . --full --all
-´´´
+Run the following lines to get it right:
+```bash
+cd <root_dir>
+git clone git@github.com:SINTEFMedisinskTeknologi/CustusX3.git CustusX/CustusX
+./CustusX/CustusX/install/cxInstaller.py --root_dir . --full --all
+```
+The default root_dir is ~/dev/cx. Run cxInstaller.py -h for more options.
+
 ## Structure
 
 CustusX is written in C++ using CMake, Qt, CTK, VTK, ITK, Eigen, OpenCV, IGSTK, OpenIGTLink and other libraries. The OSGi plugin framework implemented by CTK is used, and is the recommended way to extend CustusX yourself. The platform contains the CustusX application, but it is straightforward to build your own applications using the same platform.
