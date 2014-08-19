@@ -181,14 +181,9 @@ QStringList DataLocations::getApplicationToolConfigPaths()
   
 QString DataLocations::getToolConfigFilePath()
 {
+	QString relPath("/tool/" + settings()->value("globalApplicationName").toString());
 	QString filename = settings()->value("toolConfigFile").toString();
-	foreach (QString root, getApplicationToolConfigPaths())
-	{
-		QString path = root + "/" + filename;
-		if (QFileInfo(path).exists())
-			return path;
-	}
-	return "";
+	return getExistingConfigPath(relPath, "", filename);
 }
 
 QString DataLocations::getAudioConfigFilePath()
@@ -199,22 +194,10 @@ QString DataLocations::getAudioConfigFilePath()
   
 QString DataLocations::getShaderPath()
 {
-//  QString path(qApp->applicationDirPath()+"/../Resources/shaders");
   QString path = getRootConfigPath()+"/shaders";
   if (QDir(path).exists())
     return path;
   return "";
-}
-
-QString DataLocations::getAppDataPath()
-{
-  QString path = getBundlePath()+"/config/appdata";
-  if (!QDir(path).exists())
-  {
-//    std::cout << "did not find " << path << std::endl;
-    path = qApp->applicationDirPath();
-  }
-  return path;
 }
 
 namespace
