@@ -35,12 +35,12 @@ SET(ALL_LINK_LIBRARIES
     cxOpenIGTLinkUtilities
 	)
 
-if(CX_USE_ISB_GE)
-	SET(ALL_LINK_LIBRARIES
-		${ALL_LINK_LIBRARIES}
-		${GEStreamer_LIBRARIES}
-		)
-endif()
+#if(CX_USE_ISB_GE)
+SET(ALL_LINK_LIBRARIES
+	${ALL_LINK_LIBRARIES}
+	${GEStreamer_LIBRARIES}
+	)
+#endif()
 
 cx_initialize_opencv()
 
@@ -128,9 +128,9 @@ target_link_libraries(cxGrabber
     )
 
 #Make GE defines available in source
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/geConfig.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/geConfig.h" )
-include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
+#configure_file(
+#  "${CMAKE_CURRENT_SOURCE_DIR}/geConfig.h.in"
+#  "${CMAKE_CURRENT_BINARY_DIR}/geConfig.h" )
+#include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
 add_subdirectory(testing)

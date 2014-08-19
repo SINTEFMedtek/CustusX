@@ -35,7 +35,6 @@ add_subdirectory(service)
 add_subdirectory(logic)
 add_subdirectory(modules)
 add_subdirectory(gui)
-#add_subdirectory(plugins)
 
 #> Extract all library names starting with org_mydomain_
 macro(GetMyTargetLibraries all_target_libraries varname)
@@ -43,7 +42,7 @@ macro(GetMyTargetLibraries all_target_libraries varname)
   set(_tmp_list)
   list(APPEND _tmp_list ${all_target_libraries})
   ctkMacroListFilter(_tmp_list re_ctkplugin OUTPUT_VARIABLE ${varname})
-endmacro()
+endmacro() 
 #>
 
 cmake_policy(SET CMP0012 NEW)
@@ -58,7 +57,7 @@ foreach (_var IN LISTS matchedVars)
 	#message("${_var}=${${_var}} :: ${${${_var}}}")
 endforeach()
 
-#set (CX_EXTERNAL_PLUGINS "" CACHE INTERNAL "list of plugins originating outside of custusx. Add to list in order to build.")
+#message(STATUS "Plugins1: " ${CX_PLUGINS})
 
 
 #> Create a list of available plug-ins and make them known to the build system
@@ -69,9 +68,9 @@ set(CX_PLUGINS
   plugins/org.custusx.vnnclreconstruction:ON
   plugins/org.custusx.pnnreconstruction:ON
   plugins/org.custusx.patientmodel:ON
-  #plugins/org.custusx.ussimulator:ON
-  #plugins/org.custusx.gestreamer:ON
 )
+
+#message(STATUS "Plugins2: " ${CX_PLUGINS})
 
 ctkMacroSetupPlugins(${CX_PLUGINS} BUILD_OPTION_PREFIX CX_BUILD_PLUGIN_)
 
