@@ -12,6 +12,27 @@
 #
 # See CustusX_License.txt for more information.
 
+###############################################################################
+# Initialize GEStreamer library
+#
+# Find the package and run the include USE file.
+#
+# Define variables:
+#
+###############################################################################
+macro(cx_initialize_ISB_GE)
+    if(CX_USE_ISB_GE)
+        find_package( GEStreamer REQUIRED)
+    else()
+        find_package( GEStreamer QUIET)
+    endif()
+
+    if(CX_USE_ISB_GE)
+        include(${GEStreamer_USE_FILE})
+    endif()
+endmacro()
+###############################################################################
+
 
 ###############################################################################
 # Initialize cppunit library
@@ -131,35 +152,6 @@ macro(cx_initialize_OpenCLUtilityLibrary)
     if( CX_USE_OPENCL_UTILITY )
         ADD_DEFINITIONS(-DCX_USE_OPENCL_UTILITY)
         include(${OpenCLUtilityLibrary_USE_FILE})
-    endif()
-endmacro()
-
-
-###############################################################################
-# Initialize GEStreamer library
-#
-# Find the package and run the include USE file.
-#
-# Define variables:
-#    CX_USE_ISB_GE : cache option
-#
-###############################################################################
-macro(cx_initialize_ISB_GE)
-    if(CX_USE_ISB_GE)
-        find_package( GEStreamer REQUIRED)
-    else()
-        find_package( GEStreamer QUIET)
-    endif()
-
-    if(GEStreamer_FOUND)
-        option(CX_USE_ISB_GE "use ISB GE scanner interface" ON)
-    else()
-        option(CX_USE_ISB_GE "use ISB GE scanner interface" OFF)
-    endif()
-
-    if(CX_USE_ISB_GE)
-        ADD_DEFINITIONS(-DCX_USE_ISB_GE)
-        include(${GEStreamer_USE_FILE})
     endif()
 endmacro()
 
