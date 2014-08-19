@@ -1,7 +1,8 @@
-// position of test data
+// location of test data
 #define CX_DATA_ROOT "@CX_DATA_ROOT@"
+#define CX_LARGE_DATA_ROOT "@CX_LARGE_DATA_ROOT@"
 
-// position of configuration folders during compilation
+// location of configuration folders during compilation
 #define CX_CONFIG_ROOT "@CX_CONFIG_ROOT@"
 #define CX__OPTIONAL_CONFIG_ROOT "@CX__OPTIONAL_CONFIG_ROOT@"
 
@@ -10,7 +11,7 @@
 #define CustusX_VERSION_MINOR "@CustusX_VERSION_MINOR@"
 #define CustusX_VERSION_PATCH "@CustusX_VERSION_PATCH@"
 
-// position of configuration folders after install, relative to executable.
+// location of configuration folders after install, relative to executable.
 #define CX_CONFIG_ROOT_RELATIVE_INSTALLED "@CX_CONFIG_ROOT_RELATIVE_INSTALLED@"
 
 #cmakedefine CX_USE_OpenCV

@@ -212,7 +212,7 @@ function(_cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES ADDITIONAL_LI
     cx_add_test_library(${TEST_LIB_NAME} ${SOURCES} ${MOCCED})
 #    add_library(${TEST_LIB_NAME} ${CX_CATCH_SHARED_LIB_TYPE} ${SOURCES} ${MOCCED})
 #    message(STATUS "          Lib name : ${TEST_LIB_NAME}")
-	target_link_libraries(${TEST_LIB_NAME} ${LIB_TO_TEST} cxtestUtilities ${ADDITIONAL_LIBS})
+	target_link_libraries(${TEST_LIB_NAME} LINK_PUBLIC ${LIB_TO_TEST} cxtestUtilities ${ADDITIONAL_LIBS})
     
     set(CX_TEST_CATCH_GENERATED_LIBRARIES
         "${TEST_LIB_NAME}" "${CX_TEST_CATCH_GENERATED_LIBRARIES}"

@@ -28,17 +28,12 @@ if(BUILD_TESTING)
 	    ${CustusX_SOURCE_DIR}/source/service/tracking/
 	)
 
-    cx_add_class(CXTEST_PLUGINALGORITHM_SOURCES ${CXTEST_PLUGINALGORITHM_SOURCES}
-  #      cxtestTSFFixture
- #       cxtestTSF.cpp
-#		cxtestTSFPresetsFixture
-#		cxtestTSFPresets.cpp
-#        cxtestLevelSetFilter.cpp
-        cxtestDilationFilter.cpp
+    cx_add_class(CXTEST_SOURCES ${CXTEST_SOURCES}
+        cxtestLevelSetFilter.cpp
     )
     set(CXTEST_SOURCES_TO_MOC
     )
 
-	cx_catch_add_lib_and_exe(cxPluginAlgorithm "${CXTEST_PLUGINALGORITHM_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
+	cx_catch_add_lib_and_exe(org_custusx_filter_levelset "${CXTEST_SOURCES}" "${CXTEST_SOURCES_TO_MOC}")
 
 endif(BUILD_TESTING)

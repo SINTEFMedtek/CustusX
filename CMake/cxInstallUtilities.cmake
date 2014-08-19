@@ -218,6 +218,7 @@ macro(cx_initialize_custusx_install)
 
 	# used as a global variable: clear at start of run
 	unset(CX_APPLE_TARGETS_TO_COPY CACHE)
+	unset(CX_ALL_LIBRARY_DIRS CACHE)
 
 endmacro()
 
@@ -302,30 +303,12 @@ endif ()
 	# Install OpenCL kernels into bundle
 	install(FILES ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.vnnclreconstruction/kernels.cl
 			DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/)
-
-	if(CX_USE_TSF)
-		install(FILES
-				${Tube-Segmentation-Framework_KERNELS_DIR}/kernels.cl
-				${Tube-Segmentation-Framework_KERNELS_DIR}/kernels_no_3d_write.cl
-				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/)
-		install(DIRECTORY ${Tube-Segmentation-Framework_PARAMETERS_DIR}
-				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/
-				FILE_PERMISSIONS ${CX_FULL_PERMISSIONS}
-				DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
-	endif()
 	
 	if(CX_USE_OPENCL_UTILITY)
 		install(FILES
 				${OpenCLUtilityLibrary_KERNELS_DIR}/HistogramPyramids.cl
 				${OpenCLUtilityLibrary_KERNELS_DIR}/HistogramPyramids.clh
 				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/)
-	endif()
-
-	if(CX_BUILD_US_SIMULATOR)
-		install(FILES
-				${CustusX_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/speckle.mhd
-				${CustusX_SOURCE_DIR}/../../UltrasoundSimulation/UltrasoundSimulation/speckle.raw
-				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/simulator)
 	endif()
 endfunction()
 
@@ -483,20 +466,17 @@ cx_initialize_IGSTK()
 set(PLUGINS_DESCRIPTION
 "	Plugins:
 ")
-getListOfVarsStartingWith("CX_BUILD_PLUGIN_" matchedVars)
+getListOfVarsStartingWith("CX_PLUGIN_" matchedVars)
 foreach (_var IN LISTS matchedVars)
-	string(REPLACE "CX_BUILD_PLUGIN_" "" PLUGIN_NAME ${_var})
+	string(REPLACE "CX_PLUGIN_" "" PLUGIN_NAME ${_var})
 	#message("${_var}=${${_var}} :: ${${${_var}}} :: ${PLUGIN_NAME}")
 	set(PLUGINS_DESCRIPTION ${PLUGINS_DESCRIPTION}
 "		${PLUGIN_NAME}: ${${_var}}
 ")
 endforeach()
 
-
 	cx_assert_variable_exists(${CustusX_VERSION_STRING})
 	cx_assert_variable_exists(${SSC_USE_GCOV})
-	cx_assert_variable_exists(${CX_USE_TSF})
-	cx_assert_variable_exists(${CX_USE_LEVEL_SET})
 	cx_assert_variable_exists(${CX_USE_OPENCL_UTILITY})
 	cx_assert_variable_exists(${CX_USE_OpenCV})
 	# this text can be inserted into the about box with some effort...
@@ -526,8 +506,6 @@ Configuration for CustusX ${CustusX_VERSION_STRING}
 		Eigen Version: ${EIGEN_VERSION}
 
 	Internal libraries:
-		Tube-Segmentation-Framework: ${CX_USE_TSF}
-		Level Set Segmentation: ${CX_USE_LEVEL_SET}
 		OpenCL Utility Library: ${CX_USE_OPENCL_UTILITY}
 	
 	Grabber Servers:

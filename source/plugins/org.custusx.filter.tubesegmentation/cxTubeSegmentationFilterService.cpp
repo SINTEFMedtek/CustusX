@@ -1,6 +1,5 @@
-#include "cxTubeSegmentationFilter.h"
+#include "cxTubeSegmentationFilterService.h"
 
-#ifdef CX_USE_TSF
 #include "tube-segmentation.hpp"
 #include "tsf-config.h"
 #include "Exceptions.hpp"
@@ -50,7 +49,7 @@ QString TubeSegmentationFilter::getHelp() const
 {
 	return "<html>"
 	        "<h3>Tube-Segmentation.</h3>"
-	        "<p><i>Extracts the centerline and creates a segementation. </br>GPU-base algorithm written by Erik Smistad (NTNU).</i></p>"
+	        "<p><i>Extracts the centerline and creates a segmentation. </br>GPU-based algorithm written by Erik Smistad (NTNU).</i></p>"
 	        "</html>";
 }
 
@@ -936,5 +935,4 @@ TubeSegmentationFilter::~TubeSegmentationFilter() {
 }
 
 } /* namespace cx */
-#endif //CX_USE_TSF
 

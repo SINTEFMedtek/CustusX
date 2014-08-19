@@ -1,6 +1,5 @@
-#include "cxLevelSetFilter.h"
+#include "cxLevelSetFilterService.h"
 
-#ifdef CX_USE_LEVEL_SET
 
 #include "cxTime.h"
 #include "cxMesh.h"
@@ -400,4 +399,3 @@ DoubleDataAdapterXmlPtr LevelSetFilter::getRadiusOption(QDomElement root)
 
 } // end namespace cx
 
-#endif

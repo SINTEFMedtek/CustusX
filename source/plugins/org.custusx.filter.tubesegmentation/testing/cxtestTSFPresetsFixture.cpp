@@ -1,6 +1,6 @@
 #include "cxtestTSFPresetsFixture.h"
 
-#ifdef CX_USE_TSF
+
 #include <QStringList>
 #include <QFile>
 #include <QTextStream>
@@ -63,4 +63,4 @@ void TSFPresetsFixture::deletePreset(cx::TSFPresetsPtr preset)
 
 } /* namespace cxtest */
 
-#endif //CX_USE_TSF
+

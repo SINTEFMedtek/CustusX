@@ -4,7 +4,6 @@
 
 #include <QDomElement>
 
-#ifdef CX_USE_TSF
 #include "cxTSFPresets.h"
 
 namespace cxtest {
@@ -36,6 +35,5 @@ protected:
 };
 
 } /* namespace cxtest */
-#endif //CX_USE_TSF
 
 #endif /* CXTESTTSFPRESETSFIXTURE_H_ */

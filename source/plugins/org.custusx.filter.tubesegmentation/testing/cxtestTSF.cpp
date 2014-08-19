@@ -12,10 +12,9 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifdef CX_USE_TSF
 #include "catch.hpp"
 
-#include "cxTestTubeSegmentationFramework.h"
+#include "cxtestTSFFixture.h"
 
 namespace cxtest
 {
@@ -77,4 +76,3 @@ TEST_CASE("TubeSegmentationFramework testLungAirwaysCTPreset works", "[integrati
 }
 
 } // namespace cxtest
-#endif //CX_USE_TSF

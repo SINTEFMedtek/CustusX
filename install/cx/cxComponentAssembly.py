@@ -42,14 +42,12 @@ class LibraryAssembly(object):
         self.addComponent(cxComponents.CTK())
         if (platform.system() != 'Windows'):
              self.addComponent(cxComponents.ISB_DataStreaming());
-        self.addComponent(cxComponents.UltrasonixSDK())
         if (platform.system() != 'Windows'):
             self.addComponent(cxComponents.OpenCLUtilityLibrary())
         if (platform.system() != 'Windows'):
             self.addComponent(cxComponents.TubeSegmentationFramework());
         if (platform.system() == 'Linux'):
             self.addComponent(cxComponents.LevelSetSegmentation());
-        self.addComponent(cxComponents.UltrasoundSimulation())
         self.addComponent(cxComponents.CustusX())
         self.addComponent(cxComponents.CustusXData())
         

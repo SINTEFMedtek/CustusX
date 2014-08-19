@@ -47,13 +47,19 @@ class Component(object):
     def path(self):
         'return path where component will be installed'
         raise "Not Implemented"
+    def _checkout_check_exist(self, path):
+        if os.path.exists(path):
+            print "*** %s already exists, checkout ignored." % path
+            return True
+        return False
     def checkout(self):
         'checkout the component source from external source to this computer (svn co or similar)'
         path = self.path()+'/'+self.sourceFolder()
-        if os.path.exists(path) and len(os.listdir(path))!=0:
-            print "*** %s already exists, checkout ignored." % self.name()
-        else:
-            self._rawCheckout()
+        if self._checkout_check_exist('%s/.git'%path):
+            return
+        if self._checkout_check_exist('%s/.svn'%path):
+            return
+        self._rawCheckout()
     def _rawCheckout(self):
         'checkout the component source from external source to this computer (svn co or similar)'
         raise "Not Implemented"
@@ -85,6 +91,10 @@ class Component(object):
     def pluginPath(self):
         'if this component contains a plugin: return path to plugin, absolute or relative to CustusX/source'
         return None
+    def addConfigurationToDownstreamLib(self, builder):
+        'called during the configuration step of CustusX: insert necessary cmake stuff into builder'
+        pass
+
         
 # ---------------------------------------------------------
 
@@ -386,7 +396,7 @@ class CustusX(CppComponent):
     def path(self):
         return self.controlData.getWorkingPath() + "/CustusX"    
     def _rawCheckout(self):
-        self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/CustusX3.git')
+        self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/CustusX3.git', 'CustusX')
     def update(self):
         self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag(), submodules=True)    
     def configure(self):
@@ -400,9 +410,9 @@ class CustusX(CppComponent):
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
         add('OpenCV_DIR:PATH', self._createSibling(OpenCV).configPath())
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
-        add('ULTERIUS_INCLUDE_DIR:PATH', self._createSibling(UltrasonixSDK).includePath())
-        add('ULTERIUS_LIBRARY:FILEPATH', self._createSibling(UltrasonixSDK).libFile())
-        add('ULTERIUS_BIN_DIR:FILEPATH', self._createSibling(UltrasonixSDK).binDir())
+#        add('ULTERIUS_INCLUDE_DIR:PATH', self._createSibling(UltrasonixSDK).includePath())
+#        add('ULTERIUS_LIBRARY:FILEPATH', self._createSibling(UltrasonixSDK).libFile())
+#        add('ULTERIUS_BIN_DIR:FILEPATH', self._createSibling(UltrasonixSDK).binDir())
         add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).configPath())
         add('Level-Set-Segmentation_DIR:PATH', self._createSibling(LevelSetSegmentation).configPath())
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
@@ -416,7 +426,8 @@ class CustusX(CppComponent):
         
         libs = self.assembly.libraries
         for lib in libs:
-            if lib.pluginPath():
+            lib.addConfigurationToDownstreamLib(builder)
+            if lib.pluginPath() and os.path.exists(lib.pluginPath()):
                 add('CX_EXTERNAL_PLUGIN_%s'%lib.name(), lib.pluginPath())
         
         if self.controlData.force_connect_sublibraries:
@@ -428,64 +439,16 @@ class CustusX(CppComponent):
     def forceConnectSublibraries(self, add):
         print 'CustusX force connect sublibraries.'
         add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
-        add('CX_USE_LEVEL_SET:BOOL', platform.system() == 'Linux')
-        add('CX_USE_TSF:BOOL', platform.system() != 'Windows');
+#        add('CX_USE_LEVEL_SET:BOOL', platform.system() == 'Linux')
+#        add('CX_USE_TSF:BOOL', platform.system() != 'Windows');
+        add('CX_PLUGIN_org.custusx.filter.levelset:BOOL', platform.system() == 'Linux');
+        add('CX_PLUGIN_org.custusx.filter.tubesegmentation:BOOL', platform.system() != 'Windows');
+        add('CX_PLUGIN_org.custusx.ussimulator:BOOL', True);
         add('CX_USE_ISB_GE:BOOL', platform.system() != 'Windows');
         add('CX_BUILD_MEHDI_VTKMULTIVOLUME:BOOL', False);
-        add('CX_BUILD_US_SIMULATOR:BOOL', True);
         
 # ---------------------------------------------------------
 
-class UltrasonixSDK(CppComponent):
-    def name(self):
-        return "UltrasonixSDK"
-    def help(self):
-        return 'UltrasonixSDK'
-    def includePath(self):
-        return self.path() + "/" + self.sourceFolder() + "/ulterius/inc"
-    def libFile(self):
-        return self.path() + "/" + self.sourceFolder() + "/ulterius/lib/ulterius.lib"
-    def binDir(self):
-        return self.path() + "/" + self.sourceFolder() + "/bin"
-    def path(self):
-        return self.controlData.getWorkingPath() + "/UltrasonixSDK"
-    def _rawCheckout(self):
-        self._getBuilder().gitClone('ssh://medtek.sintef.no/git/UltrasonixSDK.git')
-    def update(self):
-        self._getBuilder().gitCheckout('v5.7.4')    
-    def configure(self):
-        pass
-    def build(self):
-        pass
-    def makeClean(self):
-        pass
-    def isPubliclyAvailable(self):
-        return False
-
-# ---------------------------------------------------------
-
-class UltrasoundSimulation(CppComponent):
-    def name(self):
-        return "UltrasoundSimulation"
-    def help(self):
-        return 'UltrasoundSimulation'
-    def path(self):
-        return self.controlData.getWorkingPath() + "/UltrasoundSimulation"
-    def _rawCheckout(self):
-        self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/UltrasoundSimulation.git')
-    def update(self):
-        self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag())    
-        #self._getBuilder().gitCheckout('978f9980781303d626dc390df4f8dd73ecb3b717')
-    def configure(self):
-        pass
-    def build(self):
-        pass
-    def makeClean(self):
-        pass
-    def isPubliclyAvailable(self):
-        return False
-
-# ---------------------------------------------------------
 
 class TubeSegmentationFramework(CppComponent):
     def name(self):
@@ -562,15 +525,17 @@ class CustusXData(CppComponent):
     def sourceFolder(self):
         return 'data'
     def _rawCheckout(self):
-        self._getBuilder().gitClone('ssh://%s'%self.gitRepository(), self.sourceFolder())
+        self._getBuilder().gitClone(self.gitRepository(), self.sourceFolder())
     def update(self):
+        self._getBuilder().gitSetRemoteURL(self.gitRepository(), 'master')
         self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag())    
     def configure(self):
         pass
     def build(self):
         pass
     def gitRepository(self):
-        return 'medtek.sintef.no//Volumes/medtek_HD/git/Data.git'
+        return 'git@github.com:SINTEFMedisinskTeknologi/CustusXData.git'
+        #return 'medtek.sintef.no//Volumes/medtek_HD/git/Data.git'
     def makeClean(self):
         pass
     def isPubliclyAvailable(self):

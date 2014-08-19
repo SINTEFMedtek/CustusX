@@ -1,6 +1,5 @@
 #include "cxTSFPresets.h"
 
-#ifdef CX_USE_TSF
 #include <iostream>
 #include <QDir>
 #include <QTextStream>
@@ -175,4 +174,3 @@ void TSFPresets::addAsCustomPreset(std::map<QString,QString>::iterator it)
 
 } /* namespace cx */
 
-#endif //CX_USE_TSF

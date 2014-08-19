@@ -12,8 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifdef CX_USE_TSF
-#include "testing/cxTestTubeSegmentationFramework.h"
+#include "cxtestTSFFixture.h"
 
 #include <fstream>
 #include "cxData.h"
@@ -22,7 +21,7 @@
 #include "cxDataInterface.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
-#include "cxTubeSegmentationFilter.h"
+#include "cxTubeSegmentationFilterService.h"
 #include "cxDataLocations.h"
 #include "cxFilterTimedAlgorithm.h"
 #include "cxSelectDataStringDataAdapter.h"
@@ -162,7 +161,8 @@ void TestTubeSegmentationFramework::runFilter(QString preset)
 	tsf->getOptions();
 
 	//create a new patient
-	QString filename = cx::DataLocations::getTestDataPath()+ "/testing/TubeSegmentationFramework/"+preset+".mhd";
+	QString filename = cx::DataLocations::getExistingTestData("testing/TubeSegmentationFramework", preset+".mhd");
+//	QString filename = cx::DataLocations::getTestDataPath()+ "/testing/TubeSegmentationFramework/"+preset+".mhd";
 	cx::patientService()->getPatientData()->newPatient(cx::DataLocations::getTestDataPath()+ "/temp/TubeSegmentationFramework/");
 	QString info;
 	cx::DataPtr data = cx::patientService()->getPatientData()->importData(filename, info);
@@ -223,5 +223,3 @@ void TestTubeSegmentationFramework::runFilter(QString preset)
 	//TODO clean up temp folder...
 
 }
-
-#endif //CX_USE_TSF

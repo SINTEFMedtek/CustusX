@@ -36,7 +36,9 @@ if(CX_WINDOWS)
 	set( CUSTUSX_EXECUTABLE ${CUSTUSX_EXECUTABLE}".exe")
 endif()
 
-set(ALL_LIBRARY_DIRS
+set(CX_ALL_LIBRARY_DIRS CACHE INTERNAL "List of dirs to look for libraries to use in fixup_bundle")
+set(CX_ALL_LIBRARY_DIRS
+    ${CX_ALL_LIBRARY_DIRS}
     ${ULTERIUS_BIN_DIR}
     ${QT_LIBRARY_DIRS}
     ${QT_BINARY_DIR}
@@ -49,6 +51,7 @@ set(ALL_LIBRARY_DIRS
     ${CTK_DIR}/CTK-build/bin
     ${ITK_DIR}/lib
     ${DCMTK_DIR}/lib
+    ${Level-Set-Segmentation_LIBRARY_DIRS}
     ${Tube-Segmentation-Framework_LIBRARY_DIRS}
     ${OpenCLUtilityLibrary_LIBRARY_DIRS}
 
@@ -61,7 +64,7 @@ cx_install_all_stored_targets(${CX_INSTALL_BINARY_DIR})
 cx_fixup_and_add_qtplugins_to_bundle(
 	"${CUSTUSX_EXECUTABLE}"
 	${CX_INSTALL_BINARY_DIR}
-	"${ALL_LIBRARY_DIRS}")
+	"${CX_ALL_LIBRARY_DIRS}")
 
 cxCreateConfigurationDescription()
 message(STATUS ${CX_CONFIGURATION_DESCRIPTION})
