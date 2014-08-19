@@ -1,6 +1,8 @@
 CustusX
 ========
-## a Research Platform for Image-Guided Therapy
+### A Research Platform for Image-Guided Therapy
+
+
 
 The system aids surgeons during interventions, enabling the surgeon to navigate 3D image data using tracked instruments. Focus is on use of ultrasound in surgery.
 
