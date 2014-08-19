@@ -181,11 +181,14 @@ QStringList DataLocations::getApplicationToolConfigPaths()
   
 QString DataLocations::getToolConfigFilePath()
 {
-  QString path(getRootConfigPath()+"/tool/" +
-               settings()->value("globalApplicationName").toString() + "/" +
-               settings()->value("toolConfigFile").toString());
-  //std::cout << "getToolConfigFilePath: " << path.toStdString() << std::endl;
-  return path;
+	QString filename = settings()->value("toolConfigFile").toString();
+	foreach (QString root, getApplicationToolConfigPaths())
+	{
+		QString path = root + "/" + filename;
+		if (QFileInfo(path).exists())
+			return path;
+	}
+	return "";
 }
 
 QString DataLocations::getAudioConfigFilePath()

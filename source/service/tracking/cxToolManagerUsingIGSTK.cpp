@@ -233,7 +233,7 @@ void ToolManagerUsingIGSTK::configure()
 {
 	if (mConfigurationFilePath.isEmpty() || !QFile::exists(mConfigurationFilePath))
 	{
-		reportWarning("Configuration file is not valid, could not configure the toolmanager.");
+		reportWarning(QString("Configuration file [%1] is not valid, could not configure the toolmanager.").arg(mConfigurationFilePath));
 		return;
 	}
 
