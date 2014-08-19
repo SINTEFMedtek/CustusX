@@ -227,8 +227,6 @@ QString changeExtension(QString name, QString ext)
 QString DataLocations::getXmlSettingsFile()
 {
 	return getSettingsPath() + "/settings.xml";
-//  return changeExtension(settings()->fileName(), "xml");
-//  return getAppDataPath() + "/CustusX.xml";
 }
 
 QString DataLocations::getCachePath()
@@ -245,10 +243,6 @@ QString DataLocations::getExistingConfigPath(QString pathRelativeToConfigRoot, Q
 		if (QFileInfo(path).exists())
 			return path;
 	}
-
-//	QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED + pathRelativeToConfigRoot; // look for installed location
-//	if (QDir(path).exists())
-//		return path;
 
 	if (QFileInfo(alternativeAbsolutePath + "/" + filename).exists())
 		return alternativeAbsolutePath;

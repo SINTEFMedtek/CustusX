@@ -142,9 +142,10 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServ
 	mAnnotationMarker = RepManager::getInstance()->getCachedRep<OrientationAnnotation3DRep>(
 					"annotation_" + mView->getName());
 //  mAnnotationMarker = OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
-	mAnnotationMarker->setMarkerFilename(
-					DataLocations::getRootConfigPath() + "/models/"
-									+ settings()->value("View3D/annotationModel").toString());
+	QString annotationFile = settings()->value("View3D/annotationModel").toString();
+	mAnnotationMarker->setMarkerFilename(DataLocations::getExistingConfigPath("/models", "", annotationFile));
+//					DataLocations::getRootConfigPath() + "/models/"
+//									+ settings()->value("View3D/annotationModel").toString());
 	mAnnotationMarker->setSize(settings()->value("View3D/annotationModelSize").toDouble());
 
 	mView->addRep(mAnnotationMarker);

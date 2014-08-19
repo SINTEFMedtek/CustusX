@@ -70,7 +70,10 @@ void VisualizationTab::init()
   double annotationModelSize = settings()->value("View3D/annotationModelSize").toDouble();
   mAnnotationModelSize = DoubleDataAdapterXml::initialize("AnnotationModelSize", "Annotation Model Size", "Size (0..1) of the annotation model in the 3D scene.", annotationModelSize, DoubleRange(0.01,1,0.01), 2, QDomNode());
   QStringList annotationModelRange;
-  annotationModelRange = QDir(DataLocations::getRootConfigPath()+"/models/").entryList(QStringList()<<"*.stl");
+  foreach(QString path, DataLocations::getRootConfigPaths())
+  {
+	  annotationModelRange << QDir(path+"/models/").entryList(QStringList()<<"*.stl");
+  }
   annotationModelRange.prepend("<default>");
   QString annotationModel = settings()->value("View3D/annotationModel").toString();
   mAnnotationModel = StringDataAdapterXml::initialize("AnnotationModel", "Annotation Model", "Name of annotation model in the 3D scene.", annotationModel, annotationModelRange, QDomNode());
