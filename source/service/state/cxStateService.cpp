@@ -217,7 +217,7 @@ QStringList StateService::getOpenIGTLinkServer()
 	filename = "OpenIGTLinkServer.exe";
 	postfix = "--in_width 800 --in_height 600";
 #endif
-	return this->getGrabberServer(filename, filename, postfix);
+	return this->getGrabberServer(filename, postfix);
 }
 
 /**Return the location of external video grabber application that
@@ -226,16 +226,7 @@ QStringList StateService::getOpenIGTLinkServer()
  */
 QStringList StateService::getDefaultGrabberServer()
 {
-	QString filename;
-	QString relativePath = "OpenIGTLinkServer";
-	QString postfix = "";
-#if WIN32
-	filename = "OpenIGTLinkServer.exe";
-	postfix = "--in_width 800 --in_height 600";
-#else
-	filename = "OpenIGTLinkServer";
-#endif
-	QStringList retval =  this->getGrabberServer(filename, relativePath, postfix);
+	QStringList retval = this->getOpenIGTLinkServer();
 
 	// Only UltrasonixServer.exe is available in 32 bit Windows
 #ifdef WIN32
@@ -246,7 +237,7 @@ QStringList StateService::getDefaultGrabberServer()
 	return retval;
 }
 
-QStringList StateService::getGrabberServer(QString filename, QString relativePath, QString postfix)
+QStringList StateService::getGrabberServer(QString filename, QString postfix)
 {
 
 	QStringList result;
@@ -319,12 +310,15 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("Navigation/followTooltipBoundary", 0.1);
 
 	QStringList grabber = this->getDefaultGrabberServer();
-	this->fillDefault("IGTLink/localServer", grabber[0]);
-	grabber.pop_front();
 	if (grabber.size()>0)
 	{
-		this->fillDefault("IGTLink/arguments", grabber.join(" "));
-		this->fillDefault("IGTLink/directLinkArgumentHistory", QStringList() << grabber.join(" "));
+		this->fillDefault("IGTLink/localServer", grabber[0]);
+		grabber.pop_front();
+		if (grabber.size()>0)
+		{
+			this->fillDefault("IGTLink/arguments", grabber.join(" "));
+			this->fillDefault("IGTLink/directLinkArgumentHistory", QStringList() << grabber.join(" "));
+		}
 	}
 
 	this->fillDefault("IGTLink/initScript", this->getDefaultGrabberInitScript());

@@ -99,7 +99,7 @@ QString DataLocations::getBundlePath()
 {
 #ifdef __APPLE__
   QString path(qApp->applicationDirPath()+"/../../..");
-  QString bundle(qApp->applicationDirPath()+"/../..");
+  QString bundle = QDir(qApp->applicationDirPath()+"/../..").canonicalPath();
 //  std::cout << "check bundle: " << bundle << ", isbundle=" << QFileInfo(bundle).isBundle() << std::endl;
   if (QFileInfo(bundle).isBundle())
 	  return path;
