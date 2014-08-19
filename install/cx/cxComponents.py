@@ -47,13 +47,19 @@ class Component(object):
     def path(self):
         'return path where component will be installed'
         raise "Not Implemented"
+    def _checkout_check_exist(self, path):
+        if os.path.exists(path):
+            print "*** %s already exists, checkout ignored." % path
+            return True
+        return False
     def checkout(self):
         'checkout the component source from external source to this computer (svn co or similar)'
         path = self.path()+'/'+self.sourceFolder()
-        if os.path.exists(path) and len(os.listdir(path))!=0:
-            print "*** %s already exists, checkout ignored." % self.name()
-        else:
-            self._rawCheckout()
+        if self._checkout_check_exist('%s/.git'%path):
+            return
+        if self._checkout_check_exist('%s/.svn'%path):
+            return
+        self._rawCheckout()
     def _rawCheckout(self):
         'checkout the component source from external source to this computer (svn co or similar)'
         raise "Not Implemented"
