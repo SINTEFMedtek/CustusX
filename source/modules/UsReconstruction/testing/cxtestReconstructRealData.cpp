@@ -45,7 +45,7 @@ void ReconstructRealTestData::validateAngioData(cx::ImagePtr angioOut)
 	CHECK(angioOut->getImageType().contains("Angio"));
 
 	this->checkSamples(angioOut, getCrossVolumeSamples(), 1, true);
-	this->checkSamples(angioOut, getLightVolumeSamples(), 190);
+	this->checkSamples(angioOut, getLightVolumeSamples(), 100);
 	this->checkSamples(angioOut, getDarkVolumeSamples(), 1, true);
 }
 
@@ -80,7 +80,7 @@ void ReconstructRealTestData::validateBModeData(cx::ImagePtr bmodeOut)
 //	CHECK(this->getValue(bmodeOut, 316, 108,  65) == 1);
 
 	this->checkSamples(bmodeOut, getCrossVolumeSamples(), 190);
-	this->checkSamples(bmodeOut, getLightVolumeSamples(), 190);
+	this->checkSamples(bmodeOut, getLightVolumeSamples(), 100);
 	this->checkSamples(bmodeOut, getDarkVolumeSamples(), 1, true);
 }
 
