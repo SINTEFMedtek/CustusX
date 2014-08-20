@@ -303,11 +303,6 @@ endif ()
 	# Install OpenCL kernels into bundle
 	install(FILES ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.vnnclreconstruction/kernels.cl
 			DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/)
-
-	if(CX_USE_ISB_GE)
-		install(FILES ${GEStreamer_KERNEL_PATH}/ScanConvertCL.cl
-				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/)
-	endif()
 	
 	if(CX_USE_OPENCL_UTILITY)
 		install(FILES
@@ -483,7 +478,6 @@ endforeach()
 	cx_assert_variable_exists(${CustusX_VERSION_STRING})
 	cx_assert_variable_exists(${SSC_USE_GCOV})
 	cx_assert_variable_exists(${CX_USE_OPENCL_UTILITY})
-	cx_assert_variable_exists(${CX_USE_ISB_GE})
 	cx_assert_variable_exists(${CX_USE_OpenCV})
 	# this text can be inserted into the about box with some effort...
 	set(CONFIGURATION_TEXT
@@ -515,7 +509,6 @@ Configuration for CustusX ${CustusX_VERSION_STRING}
 		OpenCL Utility Library: ${CX_USE_OPENCL_UTILITY}
 	
 	Grabber Servers:
-		ISB GE Scanner Grabber Interface: ${CX_USE_ISB_GE}
 		OpenCV Grabber Interface: ${CX_USE_OpenCV}
 
 ${PLUGINS_DESCRIPTION}

@@ -99,7 +99,7 @@ QString DataLocations::getBundlePath()
 {
 #ifdef __APPLE__
   QString path(qApp->applicationDirPath()+"/../../..");
-  QString bundle(qApp->applicationDirPath()+"/../..");
+  QString bundle = QDir(qApp->applicationDirPath()+"/../..").canonicalPath();
 //  std::cout << "check bundle: " << bundle << ", isbundle=" << QFileInfo(bundle).isBundle() << std::endl;
   if (QFileInfo(bundle).isBundle())
 	  return path;
@@ -181,11 +181,9 @@ QStringList DataLocations::getApplicationToolConfigPaths()
   
 QString DataLocations::getToolConfigFilePath()
 {
-  QString path(getRootConfigPath()+"/tool/" +
-               settings()->value("globalApplicationName").toString() + "/" +
-               settings()->value("toolConfigFile").toString());
-  //std::cout << "getToolConfigFilePath: " << path.toStdString() << std::endl;
-  return path;
+	QString relPath("/tool/" + settings()->value("globalApplicationName").toString());
+	QString filename = settings()->value("toolConfigFile").toString();
+	return getExistingConfigPath(relPath, "", filename);
 }
 
 QString DataLocations::getAudioConfigFilePath()
@@ -196,22 +194,10 @@ QString DataLocations::getAudioConfigFilePath()
   
 QString DataLocations::getShaderPath()
 {
-//  QString path(qApp->applicationDirPath()+"/../Resources/shaders");
   QString path = getRootConfigPath()+"/shaders";
   if (QDir(path).exists())
     return path;
   return "";
-}
-
-QString DataLocations::getAppDataPath()
-{
-  QString path = getBundlePath()+"/config/appdata";
-  if (!QDir(path).exists())
-  {
-//    std::cout << "did not find " << path << std::endl;
-    path = qApp->applicationDirPath();
-  }
-  return path;
 }
 
 namespace
@@ -227,8 +213,6 @@ QString changeExtension(QString name, QString ext)
 QString DataLocations::getXmlSettingsFile()
 {
 	return getSettingsPath() + "/settings.xml";
-//  return changeExtension(settings()->fileName(), "xml");
-//  return getAppDataPath() + "/CustusX.xml";
 }
 
 QString DataLocations::getCachePath()
@@ -245,10 +229,6 @@ QString DataLocations::getExistingConfigPath(QString pathRelativeToConfigRoot, Q
 		if (QFileInfo(path).exists())
 			return path;
 	}
-
-//	QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED + pathRelativeToConfigRoot; // look for installed location
-//	if (QDir(path).exists())
-//		return path;
 
 	if (QFileInfo(alternativeAbsolutePath + "/" + filename).exists())
 		return alternativeAbsolutePath;

@@ -145,7 +145,7 @@ private:
 	void fillDefault(QString name, T value);
 
 	QStringList getDefaultGrabberServer();
-	QStringList getGrabberServer(QString filename, QString relativePath, QString postfix);
+	QStringList getGrabberServer(QString filename, QString postfix);
 	QStringList checkGrabberServerExist(QString path, QString filename, QString args);
 	QString getDefaultGrabberInitScript();
 

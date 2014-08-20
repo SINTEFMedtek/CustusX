@@ -139,16 +139,10 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServ
 	connect(mBackend->getDataManager().get(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
 	this->toolsAvailableSlot();
 
-	mAnnotationMarker = RepManager::getInstance()->getCachedRep<OrientationAnnotation3DRep>(
-					"annotation_" + mView->getName());
-//  mAnnotationMarker = OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
-	mAnnotationMarker->setMarkerFilename(
-					DataLocations::getRootConfigPath() + "/models/"
-									+ settings()->value("View3D/annotationModel").toString());
-	mAnnotationMarker->setSize(settings()->value("View3D/annotationModelSize").toDouble());
-
+	mAnnotationMarker = RepManager::getInstance()->getCachedRep<OrientationAnnotation3DRep>("annotation_" + mView->getName());
+	this->settingsChangedSlot("View3D/annotationModel");
+	this->settingsChangedSlot("View3D/annotationModelSize");
 	mView->addRep(mAnnotationMarker);
-//  mAnnotationMarker->setVisible(settings()->value("View3D/showOrientationAnnotation").toBool());
 
 //Stereo
 //  mView->getRenderWindow()->StereoCapableWindowOn(); // Moved to cxView3D
@@ -206,9 +200,11 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	}
 	if ((key == "View3D/annotationModelSize" )||( key == "View3D/annotationModel"))
 	{
-		mAnnotationMarker->setMarkerFilename(
-					DataLocations::getRootConfigPath() + "/models/"
-					+ settings()->value("View3D/annotationModel").toString());
+		QString annotationFile = settings()->value("View3D/annotationModel").toString();
+		mAnnotationMarker->setMarkerFilename(DataLocations::getExistingConfigPath("/models", "", annotationFile));
+//		mAnnotationMarker->setMarkerFilename(
+//					DataLocations::getRootConfigPath() + "/models/"
+//					+ settings()->value("View3D/annotationModel").toString());
 		mAnnotationMarker->setSize(settings()->value("View3D/annotationModelSize").toDouble());
 	}
 	if (key == "showManualTool")

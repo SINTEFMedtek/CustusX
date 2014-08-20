@@ -160,6 +160,7 @@ class Common(object):
         if self.print_control_data:
             #self.printSettings()
             pprint.pprint(vars(self))
+        self.root_dir = os.path.abspath(self.root_dir)
         return arguments
 
     def getCMakeGenerator(self):

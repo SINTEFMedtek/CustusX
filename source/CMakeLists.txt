@@ -38,7 +38,6 @@ add_subdirectory(gui)
 
 add_subdirectory(plugins)
 
-
 # Testing for CustusX
 add_subdirectory(testing)
 
