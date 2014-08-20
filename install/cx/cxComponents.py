@@ -347,44 +347,6 @@ class IGSTK(CppComponent):
         if (platform.system() == 'Windows'):
             serialPort = "COM9"
         return serialPort
-# ---------------------------------------------------------
-
-class ISB_DataStreaming(CppComponent):
-    def name(self):
-        self.mCurrentRevision = "591"
-        return "ISB_DataStreaming"
-    def help(self):
-        return 'ISB GE Digital Interface stuff'
-    def configPath(self):
-        return self.buildPath() + "/vtkDataStreamClient/"
-    def path(self):
-        return self.controlData.getWorkingPath() + "/ISB_DataStreaming"
-    def _rawCheckout(self):
-        self._changeDirToBase()
-        runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ -r%s %s %s' % (self.mCurrentRevision, self._svn_login_info(), self.sourceFolder()))
-    def update(self):
-        self._changeDirToSource()
-        runShell('svn up -r%s %s' % (self.mCurrentRevision, self._svn_login_info()))
-    def configure(self):
-        builder = self._getBuilder()
-        add = builder.addCMakeOption
-        add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
-        add('DATASTREAMING_USE_HDF:BOOL', False)
-        add('DATASTREAMING_USE_TRACKING:BOOL', False)
-        add('DATASTREAMING_USE_SC_DICOM_LOADERS:BOOL', False)
-        add('DATASTREAMING_USE_OPENCL:BOOL', self.controlData.mGEStreamerUseOpenCL)
-        add('DATASTREAMING_BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
-        builder.configureCMake()
-    def _svn_login_info(self):
-        '''
-        return login info to be added as arguments to the svn co and up calls.
-        '''
-        if self.controlData.isb_password == "":
-            return '--username sintef'
-        else:
-            return '--non-interactive --username sintef --password %s' % self.controlData.isb_password
-    def isPubliclyAvailable(self):
-        return False
         
 # ---------------------------------------------------------
 
@@ -410,13 +372,9 @@ class CustusX(CppComponent):
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
         add('OpenCV_DIR:PATH', self._createSibling(OpenCV).configPath())
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
-#        add('ULTERIUS_INCLUDE_DIR:PATH', self._createSibling(UltrasonixSDK).includePath())
-#        add('ULTERIUS_LIBRARY:FILEPATH', self._createSibling(UltrasonixSDK).libFile())
-#        add('ULTERIUS_BIN_DIR:FILEPATH', self._createSibling(UltrasonixSDK).binDir())
         add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).configPath())
         add('Level-Set-Segmentation_DIR:PATH', self._createSibling(LevelSetSegmentation).configPath())
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
-        add('GEStreamer_DIR:PATH', self._createSibling(ISB_DataStreaming).configPath())
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.mDoxygen)            
         add('SSC_BUILD_EXAMPLES:BOOL', self.controlData.mBuildSSCExamples);
         add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);

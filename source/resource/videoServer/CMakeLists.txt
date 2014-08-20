@@ -35,13 +35,6 @@ SET(ALL_LINK_LIBRARIES
     cxOpenIGTLinkUtilities
 	)
 
-#if(CX_USE_ISB_GE)
-SET(ALL_LINK_LIBRARIES
-	${ALL_LINK_LIBRARIES}
-	${GEStreamer_LIBRARIES}
-	)
-#endif()
-
 cx_initialize_opencv()
 
 if(CX_USE_OpenCV)

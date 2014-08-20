@@ -41,8 +41,6 @@ class LibraryAssembly(object):
         self.addComponent(cxComponents.IGSTK())
         self.addComponent(cxComponents.CTK())
         if (platform.system() != 'Windows'):
-             self.addComponent(cxComponents.ISB_DataStreaming());
-        if (platform.system() != 'Windows'):
             self.addComponent(cxComponents.OpenCLUtilityLibrary())
         if (platform.system() != 'Windows'):
             self.addComponent(cxComponents.TubeSegmentationFramework());
