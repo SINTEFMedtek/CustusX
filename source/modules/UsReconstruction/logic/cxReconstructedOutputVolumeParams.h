@@ -45,7 +45,7 @@ class OutputVolumeParams
 {
 public:
 	OutputVolumeParams();
-	OutputVolumeParams(DoubleBoundingBox3D extent, double inputSpacing, double maxVolumeSize = 32*1000);
+	OutputVolumeParams(DoubleBoundingBox3D extent, double inputSpacing, double maxVolumeSize);
 
 	bool isValid() {return mValid;}
 
