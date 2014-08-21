@@ -9,6 +9,7 @@ if (BUILD_TESTING)
 	set(CX_TEST_CATCH_LOGIC_SOURCE_FILES
 		${CX_TEST_CATCH_LOGIC_MOC_SOURCE_FILES}
 		cxtestPlugins.cpp
+		cxtestStreamerService.cpp
 		)
 
     cx_catch_add_lib_and_exe(cxLogicManager 
