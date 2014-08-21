@@ -17,17 +17,12 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- * sscDoubleDataAdapterXml.cpp
- *
- *  Created on: Jun 27, 2010
- *      Author: christiana
- */
 #include "cxDoubleDataAdapterXml.h"
 
 #include <iostream>
 #include <QDomElement>
 #include <QStringList>
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -58,14 +53,29 @@ void DoubleDataAdapterXml::setInternal2Display(double factor)
 	mFactor = factor;
 }
 
-QString DoubleDataAdapterXml::getUid() const
-{
-	return mUid;
-}
-
 QString DoubleDataAdapterXml::getDisplayName() const
 {
 	return mName;
+}
+
+QString DoubleDataAdapterXml::getValueAsString() const
+{
+	return QString::number(mValue);
+}
+
+void DoubleDataAdapterXml::setValueFromString(QString value)
+{
+	bool ok;
+	double val = value.toDouble(&ok);
+	if(ok)
+		this->setValue(val);
+	else
+		reportError("Could not convert "+value+" to double.");
+}
+
+QString DoubleDataAdapterXml::getUid() const
+{
+	return mUid;
 }
 
 QString DoubleDataAdapterXml::getHelp() const

@@ -49,9 +49,9 @@ public:
 public:
 	// basic methods
 	virtual QString getDisplayName() const = 0; ///< name of data entity. Used for display to user.
-//	virtual QString getValue() const = 0;
-//	virtual void setValue(QString value) = 0;
-//	virtual QString getUid() const = 0;
+	virtual QString getValueAsString() const = 0;
+	virtual void setValueFromString(QString value) = 0;
+	virtual QString getUid() const = 0;
 
 	virtual bool getEnabled() const; ///< Get the enabled/disabled state of the dataadapter.
 	virtual bool getAdvanced() const; ///< Set the advanced flag of the adapter

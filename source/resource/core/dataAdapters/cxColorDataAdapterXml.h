@@ -51,21 +51,20 @@ public:
 public:
     // basic methods
     virtual QString getDisplayName() const; ///< name of data entity. Used for display to user.
+	virtual QString getValueAsString() const;
+	virtual void setValueFromString(QString value);
+    virtual QString getUid() const;
     virtual bool setValue(QColor value); ///< set the data value.
     virtual QColor getValue() const; ///< get the data value.
 
 public:
     // optional methods
     virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.
-    QString getUid() const;
 
 signals:
     void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
 
 private:
-//    QString color2string(QColor color) const;
-//    QColor string2color(QString input) const;
-
     QString mName;
     QString mUid;
     QString mHelp;

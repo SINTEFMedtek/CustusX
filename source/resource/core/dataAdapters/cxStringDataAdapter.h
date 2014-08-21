@@ -69,15 +69,16 @@ namespace cx
  */
 class StringDataAdapter: public DataAdapter
 {
-Q_OBJECT
+	Q_OBJECT
 public:
-	virtual ~StringDataAdapter()
-	{
-	}
+	virtual ~StringDataAdapter(){}
 
 public:
 	// basic methods
 	virtual QString getDisplayName() const = 0;///< name of data entity. Used for display to user.
+	virtual QString getValueAsString() const { return this->getValue(); }
+	virtual void setValueFromString(QString value) { this->setValue(value); }
+	virtual QString getUid() const { return this->getDisplayName()+"_uid"; }
 	virtual bool setValue(const QString& value) = 0; ///< set the data value.
 	virtual QString getValue() const = 0; ///< get the data value.
 
@@ -121,6 +122,18 @@ public:
 	virtual QString getDisplayName() const
 	{
 		return "dummy";
+	}
+	virtual QString getValueAsString() const
+	{
+		return "dummy";
+	}
+	virtual void setValueFromString(QString value)
+	{
+
+	}
+	virtual QString getUid() const
+	{
+		return "dummy_id";
 	}
 	virtual bool setValue(const QString& value)
 	{

@@ -20,6 +20,7 @@
 #include "cxColorDataAdapterXml.h"
 #include "cxVector3D.h"
 #include "cxTypeConversions.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -39,28 +40,28 @@ ColorDataAdapterXmlPtr ColorDataAdapterXml::initialize(const QString& uid, QStri
     return retval;
 }
 
-//QString ColorDataAdapterXml::color2string(QColor color) const
-//{
-//    return qstring_cast(Eigen::Vector4f(color.redF(), color.greenF(), color.blueF(), color.alphaF()));
-//}
+QString ColorDataAdapterXml::getDisplayName() const
+{
+    return mName;
+}
 
-//QColor ColorDataAdapterXml::string2color(QString input) const
-//{
-//    QStringList c = input.split(" ");
-//    if (c.size()<4)
-//        return QColor("green");
-//    bool ok;
-//    return QColor::fromRgbF(c[0].toDouble(&ok), c[1].toDouble(&ok), c[2].toDouble(&ok), c[3].toDouble(&ok));
-//}
+QString ColorDataAdapterXml::getValueAsString() const
+{
+	return mValue.name();
+}
+
+void ColorDataAdapterXml::setValueFromString(QString value)
+{
+	QColor val(value);
+	if(val.isValid())
+		this->setValue(val);
+	else
+		reportError("Could not convert "+value+" to QColor.");
+}
 
 QString ColorDataAdapterXml::getUid() const
 {
     return mUid;
-}
-
-QString ColorDataAdapterXml::getDisplayName() const
-{
-    return mName;
 }
 
 QString ColorDataAdapterXml::getHelp() const
