@@ -53,7 +53,7 @@ void ReconstructionManagerTestFixture::setPNN_InterpolationSteps(int value)
 	for(int i=0; i<adaptors.size(); ++i)
 	{
 		cx::DoubleDataAdapterXmlPtr adapter = boost::dynamic_pointer_cast<cx::DoubleDataAdapterXml>(adaptors[i]);
-		if(adapter && adapter->getValueName() == "interpolationSteps")
+		if(adapter && adapter->getDisplayName() == "interpolationSteps")
 		{
 			adapter->setValue(value);
 			break;

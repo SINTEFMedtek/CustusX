@@ -83,7 +83,7 @@ QWidget* sscCreateDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* 
 		return new SliderRangeGroupWidget(parent, doublepair, gridLayout, row);
 	}
 
-	std::cout << "Failed to create Data Widget for " << (data ? data->getValueName() : "NULL") << std::endl;
+	std::cout << "Failed to create Data Widget for " << (data ? data->getDisplayName() : "NULL") << std::endl;
 
     return NULL;
 }

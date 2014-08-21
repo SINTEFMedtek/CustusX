@@ -51,7 +51,7 @@ QString DoublePairDataAdapterXml::getUid() const
 	return mUid;
 }
 
-QString DoublePairDataAdapterXml::getValueName() const
+QString DoublePairDataAdapterXml::getDisplayName() const
 {
 	return mName;
 }

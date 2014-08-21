@@ -71,7 +71,7 @@ QDomElement TubeSegmentationFilter::generatePresetFromCurrentlySetOptions(QStrin
 	std::vector<DataAdapterPtr>::iterator it;
 	for(it = newPresetOptions.begin(); it != newPresetOptions.end(); ++it){
 		DataAdapterPtr option = *it;
-		QString valuename = option->getValueName();
+		QString valuename = option->getDisplayName();
 		QString value;
 		StringDataAdapterXmlPtr stringOption = boost::dynamic_pointer_cast<StringDataAdapterXml>(option);
 		BoolDataAdapterXmlPtr boolOption = boost::dynamic_pointer_cast<BoolDataAdapterXml>(option);
@@ -87,7 +87,7 @@ QDomElement TubeSegmentationFilter::generatePresetFromCurrentlySetOptions(QStrin
 		newPresetMap[valuename] = value;
 	}
 	StringDataAdapterPtr centerlineMethod = this->getStringOption("centerline-method");
-	newPresetMap[centerlineMethod->getValueName()] = centerlineMethod->getValue();
+	newPresetMap[centerlineMethod->getDisplayName()] = centerlineMethod->getValue();
 
 	//create xml
 	QDomElement retval = TSFPresets::createPresetElement(name, newPresetMap);
@@ -444,7 +444,7 @@ void TubeSegmentationFilter::resetOptionsAdvancedSlot()
 	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); ++stringIt)
 	{
 		StringDataAdapterXmlPtr adapter = *stringIt;
-		if(adapter->getValueName() == "parameters")
+		if(adapter->getDisplayName() == "parameters")
 		{
 			adapter->setAdvanced(false);
 		}
@@ -596,7 +596,7 @@ paramList TubeSegmentationFilter::getParametersFromOptions()
 	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); ++stringIt)
 	{
 		try{
-			setParameter(retval, stringIt->get()->getValueName().toStdString(), stringIt->get()->getValue().toStdString());
+			setParameter(retval, stringIt->get()->getDisplayName().toStdString(), stringIt->get()->getValue().toStdString());
 		}catch(SIPL::SIPLException& e){
 			std::string message = "Could not process a string parameter: \""+std::string(e.what())+"\"";
 			reportError(qstring_cast(message));
@@ -609,7 +609,7 @@ paramList TubeSegmentationFilter::getParametersFromOptions()
 	{
 		try{
 			std::string value = boolIt->get()->getValue() ? "true" : "false";
-			setParameter(retval, boolIt->get()->getValueName().toStdString(), value);
+			setParameter(retval, boolIt->get()->getDisplayName().toStdString(), value);
 		}catch(SIPL::SIPLException& e){
 			std::string message = "Could not process a bool parameter: \""+std::string(e.what())+"\"";
 			reportError(qstring_cast(message));
@@ -623,7 +623,7 @@ paramList TubeSegmentationFilter::getParametersFromOptions()
 		try{
 			double dbl = doubleIt->get()->getValue();
 			std::string value = boost::lexical_cast<std::string>(dbl);
-			setParameter(retval, doubleIt->get()->getValueName().toStdString(), value);
+			setParameter(retval, doubleIt->get()->getDisplayName().toStdString(), value);
 		}catch(SIPL::SIPLException& e){
 			std::string message = "Could not process a double parameter: \""+std::string(e.what())+"\"";
 			reportError(qstring_cast(message));
@@ -656,7 +656,7 @@ StringDataAdapterXmlPtr TubeSegmentationFilter::getStringOption(QString valueNam
 	std::vector<StringDataAdapterXmlPtr>::iterator stringIt;
 	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); ++stringIt)
 	{
-		if(stringIt->get()->getValueName().compare(valueName) == 0)
+		if(stringIt->get()->getDisplayName().compare(valueName) == 0)
 		{
 			retval = *stringIt;
 			return retval;
@@ -671,7 +671,7 @@ BoolDataAdapterXmlPtr TubeSegmentationFilter::getBoolOption(QString valueName)
 	std::vector<BoolDataAdapterXmlPtr>::iterator boolIt;
 	for(boolIt = mBoolOptions.begin(); boolIt != mBoolOptions.end(); ++boolIt)
 	{
-		if(boolIt->get()->getValueName().compare(valueName) == 0)
+		if(boolIt->get()->getDisplayName().compare(valueName) == 0)
 		{
 			retval = *boolIt;
 			return retval;
@@ -686,7 +686,7 @@ DoubleDataAdapterXmlPtr TubeSegmentationFilter::getDoubleOption(QString valueNam
 	std::vector<DoubleDataAdapterXmlPtr>::iterator doubleIt;
 	for(doubleIt = mDoubleOptions.begin(); doubleIt != mDoubleOptions.end(); ++doubleIt)
 	{
-		if(doubleIt->get()->getValueName().compare(valueName) == 0)
+		if(doubleIt->get()->getDisplayName().compare(valueName) == 0)
 		{
 			retval = *doubleIt;
 			return retval;
@@ -798,7 +798,7 @@ std::vector<DataAdapterPtr> TubeSegmentationFilter::getNotDefaultOptions()
 	    boost::unordered_map<std::string, StringParameter>::iterator stringIt;
 	    for(stringIt = defaultOptions.strings.begin(); stringIt != defaultOptions.strings.end(); ++stringIt )
 	    {
-	    	if(stringDAIt->get()->getValueName().toStdString() == stringIt->first)
+	    	if(stringDAIt->get()->getDisplayName().toStdString() == stringIt->first)
 	    	{
 	    		if(stringDAIt->get()->getValue().toStdString() != stringIt->second.get())
 	    			retval.push_back(*stringDAIt);
@@ -812,7 +812,7 @@ std::vector<DataAdapterPtr> TubeSegmentationFilter::getNotDefaultOptions()
 	    boost::unordered_map<std::string, BoolParameter>::iterator boolIt;
 	    for(boolIt = defaultOptions.bools.begin(); boolIt != defaultOptions.bools.end(); ++boolIt )
 	    {
-	    	if(boolDAIt->get()->getValueName().toStdString() == boolIt->first)
+	    	if(boolDAIt->get()->getDisplayName().toStdString() == boolIt->first)
 	    	{
 	    		if(boolDAIt->get()->getValue() != boolIt->second.get())
 	    			retval.push_back(*boolDAIt);
@@ -826,7 +826,7 @@ std::vector<DataAdapterPtr> TubeSegmentationFilter::getNotDefaultOptions()
 	    boost::unordered_map<std::string, NumericParameter>::iterator numericIt;
 	    for(numericIt = defaultOptions.numerics.begin(); numericIt != defaultOptions.numerics.end(); ++numericIt )
 			{
-				if(doubleDAIt->get()->getValueName().toStdString() == numericIt->first)
+				if(doubleDAIt->get()->getDisplayName().toStdString() == numericIt->first)
 				{
 					if(!similar(doubleDAIt->get()->getValue(), numericIt->second.get()))
 						retval.push_back(*doubleDAIt);

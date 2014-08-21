@@ -58,7 +58,7 @@ public:
 
 public:
 	// basic methods
-	virtual QString getValueName() const; ///< name of data entity. Used for display to user.
+	virtual QString getDisplayName() const; ///< name of data entity. Used for display to user.
 	virtual bool setValue(bool value); ///< set the data value.
 	virtual bool getValue() const; ///< get the data value.
 

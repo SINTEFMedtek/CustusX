@@ -41,7 +41,7 @@ public:
 
 public:
     // basic methods
-    virtual QString getValueName() const = 0; ///< name of data entity. Used for display to user.
+    virtual QString getDisplayName() const = 0; ///< name of data entity. Used for display to user.
     virtual bool setValue(QColor value) = 0; ///< set the data value.
     virtual QColor getValue() const = 0; ///< get the data value.
 

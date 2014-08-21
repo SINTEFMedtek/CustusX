@@ -38,7 +38,7 @@ namespace cx
  *
  * Minimal implementation:
   \verbatim
-       virtual QString getValueName() const;
+       virtual QString getDisplayName() const;
        virtual bool setValue(QString value);
        virtual QString getValue() const;
        void changed();
@@ -77,7 +77,7 @@ public:
 
 public:
 	// basic methods
-	virtual QString getValueName() const = 0;///< name of data entity. Used for display to user.
+	virtual QString getDisplayName() const = 0;///< name of data entity. Used for display to user.
 	virtual bool setValue(const QString& value) = 0; ///< set the data value.
 	virtual QString getValue() const = 0; ///< get the data value.
 
@@ -118,7 +118,7 @@ public:
 	virtual ~StringDataAdapterNull()
 	{
 	}
-	virtual QString getValueName() const
+	virtual QString getDisplayName() const
 	{
 		return "dummy";
 	}

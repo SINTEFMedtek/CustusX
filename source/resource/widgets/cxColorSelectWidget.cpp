@@ -27,7 +27,7 @@ ColorSelectWidget::ColorSelectWidget(QWidget* parent, ColorDataAdapterPtr dataIn
     connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 
     mLabel = new QLabel(this);
-    mLabel->setText(dataInterface->getValueName());
+    mLabel->setText(dataInterface->getDisplayName());
 
     mColorButton = new cx::ColorSelectButton("");
     connect(mColorButton, SIGNAL(colorChanged(QColor)), this, SLOT(valueChanged(QColor)));

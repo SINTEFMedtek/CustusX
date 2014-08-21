@@ -51,7 +51,7 @@ QString BoolDataAdapterXml::getUid() const
 	return mUid;
 }
 
-QString BoolDataAdapterXml::getValueName() const
+QString BoolDataAdapterXml::getDisplayName() const
 {
 	return mName;
 }

@@ -77,7 +77,7 @@ QString StringDataAdapterXml::getUid() const
 	return mUid;
 }
 
-QString StringDataAdapterXml::getValueName() const
+QString StringDataAdapterXml::getDisplayName() const
 {
 	return mName;
 }

@@ -181,7 +181,7 @@ ActiveVideoSourceStringDataAdapter::ActiveVideoSourceStringDataAdapter()
 	connect(videoService().get(), SIGNAL(activeVideoSourceChanged()), this, SIGNAL(changed()));
 }
 
-QString ActiveVideoSourceStringDataAdapter::getValueName() const
+QString ActiveVideoSourceStringDataAdapter::getDisplayName() const
 {
 	return "Stream";
 }
@@ -295,7 +295,7 @@ SelectRTSourceStringDataAdapter::SelectRTSourceStringDataAdapter() :
   this->setDefaultSlot();
 }
 
-QString SelectRTSourceStringDataAdapter::getValueName() const
+QString SelectRTSourceStringDataAdapter::getDisplayName() const
 {
   return mValueName;
 }
@@ -361,7 +361,7 @@ SelectCoordinateSystemStringDataAdapter::SelectCoordinateSystemStringDataAdapter
   connect(toolManager(), SIGNAL(configured()), this, SLOT(setDefaultSlot()));
 }
 
-QString SelectCoordinateSystemStringDataAdapter::getValueName() const
+QString SelectCoordinateSystemStringDataAdapter::getDisplayName() const
 {
   return "Select coordinate system";
 }
@@ -408,7 +408,7 @@ void SelectToolStringDataAdapter::setValueName(QString name)
   mValueName = name;
 }
 
-QString SelectToolStringDataAdapter::getValueName() const
+QString SelectToolStringDataAdapter::getDisplayName() const
 {
   return mValueName;
 }
@@ -463,7 +463,7 @@ void ParentFrameStringDataAdapter::setData(DataPtr data)
   emit changed();
 }
 
-QString ParentFrameStringDataAdapter::getValueName() const
+QString ParentFrameStringDataAdapter::getDisplayName() const
 {
   return "Parent Frame";
 }
@@ -534,7 +534,7 @@ DataNameEditableStringDataAdapter::DataNameEditableStringDataAdapter()
 {
 }
 
-QString DataNameEditableStringDataAdapter::getValueName() const
+QString DataNameEditableStringDataAdapter::getDisplayName() const
 {
   return "Name";
 }
@@ -568,7 +568,7 @@ DataUidEditableStringDataAdapter::DataUidEditableStringDataAdapter()
 {
 }
 
-QString DataUidEditableStringDataAdapter::getValueName() const
+QString DataUidEditableStringDataAdapter::getDisplayName() const
 {
   return "Uid";
 }
@@ -610,7 +610,7 @@ void DataModalityStringDataAdapter::setData(ImagePtr data)
 	emit changed();
 }
 
-QString DataModalityStringDataAdapter::getValueName() const
+QString DataModalityStringDataAdapter::getDisplayName() const
 {
 	return "Modality";
 }
@@ -666,7 +666,7 @@ void ImageTypeStringDataAdapter::setData(ImagePtr data)
 	emit changed();
 }
 
-QString ImageTypeStringDataAdapter::getValueName() const
+QString ImageTypeStringDataAdapter::getDisplayName() const
 {
 	return "Image Type";
 }

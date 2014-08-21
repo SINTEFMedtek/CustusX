@@ -63,7 +63,7 @@ QString DoubleDataAdapterXml::getUid() const
 	return mUid;
 }
 
-QString DoubleDataAdapterXml::getValueName() const
+QString DoubleDataAdapterXml::getDisplayName() const
 {
 	return mName;
 }

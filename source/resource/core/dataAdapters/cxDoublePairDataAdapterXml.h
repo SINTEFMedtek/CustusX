@@ -51,7 +51,7 @@ public:
 
 public:
 	// inherited interface
-	virtual QString getValueName() const;///< name of data entity. Used for display to user.
+	virtual QString getDisplayName() const;///< name of data entity. Used for display to user.
 	virtual bool setValue(const Eigen::Vector2d& value); ///< set the data value.
 	virtual Eigen::Vector2d getValue() const; ///< get the data value.
 	virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.

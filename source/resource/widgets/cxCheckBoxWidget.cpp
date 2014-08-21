@@ -40,7 +40,7 @@ CheckBoxWidget::CheckBoxWidget(QWidget* parent, BoolDataAdapterPtr dataInterface
     connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 
     mLabel = new QLabel(this);
-    mLabel->setText(dataInterface->getValueName());
+    mLabel->setText(dataInterface->getDisplayName());
 
 	mCheckBox = new QCheckBox(this);
 	connect(mCheckBox, SIGNAL(toggled(bool)), this, SLOT(valueChanged(bool)));

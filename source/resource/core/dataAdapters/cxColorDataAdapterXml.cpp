@@ -58,7 +58,7 @@ QString ColorDataAdapterXml::getUid() const
     return mUid;
 }
 
-QString ColorDataAdapterXml::getValueName() const
+QString ColorDataAdapterXml::getDisplayName() const
 {
     return mName;
 }

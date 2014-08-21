@@ -42,7 +42,7 @@ public:
 	static FusedInputOutputSelectDataStringDataAdapterPtr create(SelectDataStringDataAdapterBasePtr base, SelectDataStringDataAdapterBasePtr input);
 
 public: // basic methods
-	virtual QString getValueName() const;
+	virtual QString getDisplayName() const;
 	virtual bool setValue(const QString& value);
 	virtual QString getValue() const;
 

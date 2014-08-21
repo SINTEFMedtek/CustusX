@@ -66,7 +66,7 @@ QString Vector3DDataAdapterXml::getUid() const
 	return mUid;
 }
 
-QString Vector3DDataAdapterXml::getValueName() const
+QString Vector3DDataAdapterXml::getDisplayName() const
 {
 	return mName;
 }

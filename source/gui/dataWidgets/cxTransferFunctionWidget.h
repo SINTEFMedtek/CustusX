@@ -55,7 +55,7 @@ class DoubleDataAdapterImageTFDataWindow : public DoubleDataAdapterImageTFDataBa
 {
 public:
   virtual ~DoubleDataAdapterImageTFDataWindow() {}
-  virtual QString getValueName() const { return "Window width"; }
+  virtual QString getDisplayName() const { return "Window width"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
   virtual DoubleRange getValueRange() const;
@@ -68,7 +68,7 @@ class DoubleDataAdapterImageTFDataLevel : public DoubleDataAdapterImageTFDataBas
   Q_OBJECT
 public:
   virtual ~DoubleDataAdapterImageTFDataLevel() {}
-  virtual QString getValueName() const { return "Window level"; }
+  virtual QString getDisplayName() const { return "Window level"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
   virtual DoubleRange getValueRange() const;
@@ -81,7 +81,7 @@ class DoubleDataAdapterImageTFDataLLR : public DoubleDataAdapterImageTFDataBase
   Q_OBJECT
 public:
   virtual ~DoubleDataAdapterImageTFDataLLR() {}
-  virtual QString getValueName() const { return "LLR"; }
+  virtual QString getDisplayName() const { return "LLR"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
   virtual DoubleRange getValueRange() const;
@@ -94,7 +94,7 @@ class DoubleDataAdapterImageTFDataAlpha : public DoubleDataAdapterImageTFDataBas
   Q_OBJECT
 public:
   virtual ~DoubleDataAdapterImageTFDataAlpha() {}
-  virtual QString getValueName() const { return "Alpha"; }
+  virtual QString getDisplayName() const { return "Alpha"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
   virtual DoubleRange getValueRange() const;

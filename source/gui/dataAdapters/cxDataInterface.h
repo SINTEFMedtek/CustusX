@@ -46,7 +46,7 @@ public:
 
   DoubleDataAdapterActiveToolOffset();
   virtual ~DoubleDataAdapterActiveToolOffset() {}
-  virtual QString getValueName() const { return "Offset"; }
+  virtual QString getDisplayName() const { return "Offset"; }
   virtual QString getHelp() const
   {
 	  return "Tool tip virtual offset, in mm.";
@@ -91,7 +91,7 @@ class DoubleDataAdapter2DWindow : public DoubleDataAdapterActiveImageBase
 {
 public:
   virtual ~DoubleDataAdapter2DWindow() {}
-  virtual QString getValueName() const { return "Window"; }
+  virtual QString getDisplayName() const { return "Window"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
   virtual DoubleRange getValueRange() const;
@@ -105,7 +105,7 @@ class DoubleDataAdapter2DLevel : public DoubleDataAdapterActiveImageBase
   Q_OBJECT
 public:
   virtual ~DoubleDataAdapter2DLevel() {}
-  virtual QString getValueName() const { return "Level"; }
+  virtual QString getDisplayName() const { return "Level"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
   virtual DoubleRange getValueRange() const;
@@ -180,7 +180,7 @@ public:
   virtual ~SelectRTSourceStringDataAdapter() {}
 
 public: // basic methods
-  virtual QString getValueName() const;
+  virtual QString getDisplayName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
 
@@ -212,7 +212,7 @@ public:
   virtual ~ActiveVideoSourceStringDataAdapter() {}
 
 public: // basic methods
-  virtual QString getValueName() const;
+  virtual QString getDisplayName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
   virtual QStringList getValueRange() const;
@@ -237,7 +237,7 @@ public:
   virtual ~SelectCoordinateSystemStringDataAdapter() {}
 
 public: // basic methods
-  virtual QString getValueName() const;
+  virtual QString getDisplayName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
 
@@ -275,7 +275,7 @@ public:
   void setValueName(QString name);
 
 public: // basic methods
-  virtual QString getValueName() const;
+  virtual QString getDisplayName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
 
@@ -307,7 +307,7 @@ public:
   virtual ~ParentFrameStringDataAdapter() {}
 
 public: // basic methods
-  virtual QString getValueName() const;
+  virtual QString getDisplayName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
 
@@ -352,7 +352,7 @@ public:
   virtual ~DataNameEditableStringDataAdapter() {}
 
 public: // basic methods
-  virtual QString getValueName() const;
+  virtual QString getDisplayName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
 
@@ -379,7 +379,7 @@ public:
   virtual ~DataUidEditableStringDataAdapter() {}
 
 public: // basic methods
-  virtual QString getValueName() const;
+  virtual QString getDisplayName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
 
@@ -404,7 +404,7 @@ public:
   virtual ~DataModalityStringDataAdapter() {}
 
 public: // basic methods
-  virtual QString getValueName() const;
+  virtual QString getDisplayName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
 
@@ -431,7 +431,7 @@ public:
   virtual ~ImageTypeStringDataAdapter() {}
 
 public: // basic methods
-  virtual QString getValueName() const;
+  virtual QString getDisplayName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
 

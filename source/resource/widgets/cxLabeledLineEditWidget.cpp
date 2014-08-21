@@ -40,7 +40,7 @@ LabeledLineEditWidget::LabeledLineEditWidget(QWidget* parent, StringDataAdapterP
 	this->setLayout(topLayout);
 
 	mLabel = new QLabel(this);
-	mLabel->setText(mData->getValueName());
+	mLabel->setText(mData->getDisplayName());
 	topLayout->addWidget(mLabel);
 
 	mLine = new QLineEdit(this);
