@@ -13,9 +13,10 @@
  * Include this file when the types and not the
  * full definitions of the ssc is needed.
  */
-typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
 
 namespace cx {
+
+typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
 
 class View;
 class ViewItem;

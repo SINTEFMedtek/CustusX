@@ -49,7 +49,7 @@ void ReconstructionManagerTestFixture::setPNN_InterpolationSteps(int value)
 	cx::ReconstructionServicePtr algorithm = manager->createAlgorithm();
 	REQUIRE(algorithm);
 
-	std::vector<DataAdapterPtr> adaptors = algorithm->getSettings(algo);
+	std::vector<cx::DataAdapterPtr> adaptors = algorithm->getSettings(algo);
 	for(int i=0; i<adaptors.size(); ++i)
 	{
 		cx::DoubleDataAdapterXmlPtr adapter = boost::dynamic_pointer_cast<cx::DoubleDataAdapterXml>(adaptors[i]);

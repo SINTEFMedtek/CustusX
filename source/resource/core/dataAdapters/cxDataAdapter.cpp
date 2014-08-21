@@ -19,12 +19,8 @@
 
 #include "cxDataAdapter.h"
 
-/*
- * cxDataAdapter.cpp
- *
- * \date Dec 21, 2012
- * \author Janne Beate Bakeng, SINTEF
- */
+namespace cx
+{
 
 DataAdapter::DataAdapter() :
 		QObject(), mEnabled(true), mAdvanced(false), mGroup("")
@@ -80,3 +76,4 @@ bool DataAdapter::setGroup(QString name)
 }
 
 
+} //namespace cx

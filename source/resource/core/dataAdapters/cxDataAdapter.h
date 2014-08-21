@@ -23,6 +23,7 @@
 #include <QString>
 #include <QObject>
 
+namespace cx {
 /**\brief Superclass for all data adapters.
  *
  * The data adapters are an abstraction mechanism that separates
@@ -42,9 +43,7 @@ class DataAdapter: public QObject
 
 public:
 	DataAdapter();
-	virtual ~DataAdapter()
-	{
-	}
+	virtual ~DataAdapter(){}
 
 public:
 	// basic methods
@@ -74,5 +73,6 @@ protected:
 	QString mGroup; //< tag marking this adapter as part of a group with this name
 };
 typedef boost::shared_ptr<DataAdapter> DataAdapterPtr;
+} //namespace cx
 
 #endif /* CXDATAADAPTER_H_ */
