@@ -20,10 +20,13 @@
 #define CXDATAADAPTER_H_
 
 #include <boost/shared_ptr.hpp>
+#include <vector>
 #include <QString>
 #include <QObject>
 
 namespace cx {
+typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
+
 /**\brief Superclass for all data adapters.
  *
  * The data adapters are an abstraction mechanism that separates
@@ -34,9 +37,11 @@ namespace cx {
  *
  * \ingroup cx_resource_core_dataadapters
  * \author Christian Askeland, SINTEF
+ * \author Janne Beate Bakeng, SINTEF
  * \date Jun 27, 2010
  *
  */
+
 class DataAdapter: public QObject
 {
 	Q_OBJECT
@@ -44,6 +49,8 @@ class DataAdapter: public QObject
 public:
 	DataAdapter();
 	virtual ~DataAdapter(){}
+
+	static DataAdapterPtr findAdapter(std::vector<DataAdapterPtr> adapters, QString id);
 
 public:
 	// basic methods
@@ -61,9 +68,6 @@ public slots:
 	virtual bool setAdvanced(bool advanced); ///< Set the advanced flag of the adapter
 	virtual bool setGroup(QString name); ///< Flag the adapter as part of a group
 
-public:
-	// optional methods
-
 signals:
 	void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
 
@@ -72,7 +76,6 @@ protected:
 	bool mAdvanced; //< flag marking this adapters value as a advanced option
 	QString mGroup; //< tag marking this adapter as part of a group with this name
 };
-typedef boost::shared_ptr<DataAdapter> DataAdapterPtr;
 } //namespace cx
 
 #endif /* CXDATAADAPTER_H_ */
