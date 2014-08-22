@@ -130,6 +130,9 @@ class TextDisplay
 		vtkRendererPtr mRenderer;
 		int maxWidth;
 		QString text;
+
+		void removeVtkTextMapperOverrides();
+		void verifyVtkTextMapper();
 };
 typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
 
