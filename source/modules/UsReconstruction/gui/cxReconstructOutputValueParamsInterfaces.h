@@ -52,7 +52,7 @@ class DoubleDataAdapterSpacing : public DoubleDataAdapterOutputValueParams
 public:
   DoubleDataAdapterSpacing(ReconstructManagerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
   virtual ~DoubleDataAdapterSpacing() {}
-  virtual QString getValueName() const { return "Spacing Out"; }
+  virtual QString getDisplayName() const { return "Spacing Out"; }
   virtual QString getHelp() const { return "Output Volume Spacing (mm)"; }
   DoubleRange getValueRange() const {  return DoubleRange(0.001,10,0.001); }
   virtual int getValueDecimals() const { return 3; } ///< number of relevant decimals in value
@@ -70,7 +70,7 @@ class DoubleDataAdapterXDim : public DoubleDataAdapterOutputValueParams
 public:
   DoubleDataAdapterXDim(ReconstructManagerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
   virtual ~DoubleDataAdapterXDim() {}
-  virtual QString getValueName() const { return "X"; }
+  virtual QString getDisplayName() const { return "X"; }
   virtual QString getHelp() const { return "X dimension"; }
   DoubleRange getValueRange() const {  return DoubleRange(1,1000,1); }
 protected:
@@ -85,7 +85,7 @@ class DoubleDataAdapterYDim : public DoubleDataAdapterOutputValueParams
 public:
   DoubleDataAdapterYDim(ReconstructManagerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
   virtual ~DoubleDataAdapterYDim() {}
-  virtual QString getValueName() const { return "Y"; }
+  virtual QString getDisplayName() const { return "Y"; }
   virtual QString getHelp() const { return "Y dimension"; }
   DoubleRange getValueRange() const {  return DoubleRange(1,1000,1); }
 protected:
@@ -100,7 +100,7 @@ class DoubleDataAdapterZDim : public DoubleDataAdapterOutputValueParams
 public:
   DoubleDataAdapterZDim(ReconstructManagerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
   virtual ~DoubleDataAdapterZDim() {}
-  virtual QString getValueName() const { return "Z"; }
+  virtual QString getDisplayName() const { return "Z"; }
   virtual QString getHelp() const { return "Z dimension"; }
   DoubleRange getValueRange() const {  return DoubleRange(1,1000,1); }
 protected:

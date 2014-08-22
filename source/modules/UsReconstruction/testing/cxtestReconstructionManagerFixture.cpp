@@ -49,16 +49,12 @@ void ReconstructionManagerTestFixture::setPNN_InterpolationSteps(int value)
 	cx::ReconstructionServicePtr algorithm = manager->createAlgorithm();
 	REQUIRE(algorithm);
 
-	std::vector<DataAdapterPtr> adaptors = algorithm->getSettings(algo);
-	for(int i=0; i<adaptors.size(); ++i)
-	{
-		cx::DoubleDataAdapterXmlPtr adapter = boost::dynamic_pointer_cast<cx::DoubleDataAdapterXml>(adaptors[i]);
-		if(adapter && adapter->getValueName() == "interpolationSteps")
-		{
-			adapter->setValue(value);
-			break;
-		}
-	}
+	std::vector<cx::DataAdapterPtr> adaptors = algorithm->getSettings(algo);
+	cx::DataAdapterPtr adapter = cx::DataAdapter::findAdapter(adaptors, "interpolationSteps");
+	if(adapter)
+		adapter->setValueFromString(QString::number(value));
+	else
+		cx::reportError("Could not find adapter interpolationSteps");
 }
 
 void ReconstructionManagerTestFixture::reconstruct()

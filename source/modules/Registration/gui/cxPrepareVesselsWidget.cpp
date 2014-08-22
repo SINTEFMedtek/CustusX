@@ -73,7 +73,7 @@ PrepareVesselsWidget::PrepareVesselsWidget(RegistrationManagerPtr regManager, QW
 
 void PrepareVesselsWidget::setColorSlot()
 {
-  mPipeline->setOption(mColorDataAdapter->getValueName(), QVariant(mColorDataAdapter->getValue()));
+  mPipeline->setOption(mColorDataAdapter->getDisplayName(), QVariant(mColorDataAdapter->getValue()));
 }
 
 void PrepareVesselsWidget::toMovingSlot()

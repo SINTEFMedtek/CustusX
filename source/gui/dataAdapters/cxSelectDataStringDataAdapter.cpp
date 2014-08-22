@@ -75,7 +75,7 @@ QString SelectDataStringDataAdapterBase::getHelp() const
   return mHelp;
 }
 
-QString SelectDataStringDataAdapterBase::getValueName() const
+QString SelectDataStringDataAdapterBase::getDisplayName() const
 {
   return mValueName;
 }

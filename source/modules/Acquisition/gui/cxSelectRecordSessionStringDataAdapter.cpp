@@ -18,7 +18,7 @@ SelectRecordSessionStringDataAdapter::SelectRecordSessionStringDataAdapter(Acqui
   connect(mPluginData.get(), SIGNAL(recordedSessionsChanged()), this, SLOT(setDefaultSlot()));
   this->setDefaultSlot();
 }
-QString SelectRecordSessionStringDataAdapter::getValueName() const
+QString SelectRecordSessionStringDataAdapter::getDisplayName() const
 {
   return "Select a record session";
 }

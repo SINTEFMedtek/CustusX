@@ -38,7 +38,7 @@ public:
 
 public:
 	// basic methods
-	virtual QString getValueName() const = 0; ///< name of data entity. Used for display to user.
+	virtual QString getDisplayName() const = 0; ///< name of data entity. Used for display to user.
 //	virtual bool setValue(const std::pair<double,double>& value) = 0; ///< set the data value.
 	virtual bool setValue(const Eigen::Vector2d& value) = 0; ///< set the data value.
 //	virtual std::pair<double,double> getValue() const = 0; ///< get the data value.
@@ -81,7 +81,7 @@ public:
 	virtual ~DoubleSpanSliderAdapterNull()
 	{
 	}
-	virtual QString getValueName() const
+	virtual QString getDisplayName() const
 	{
 		return "dummy";
 	}

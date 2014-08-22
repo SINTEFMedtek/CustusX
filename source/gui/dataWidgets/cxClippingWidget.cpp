@@ -27,7 +27,7 @@ ClipPlaneStringDataAdapter::ClipPlaneStringDataAdapter(InteractiveClipperPtr cli
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SIGNAL(changed()));
 }
 
-QString ClipPlaneStringDataAdapter::getValueName() const
+QString ClipPlaneStringDataAdapter::getDisplayName() const
 {
 	return "Slice Plane";
 }

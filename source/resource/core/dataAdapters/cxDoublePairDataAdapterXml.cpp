@@ -46,14 +46,25 @@ void DoublePairDataAdapterXml::setInternal2Display(double factor)
 	mFactor = factor;
 }
 
+QString DoublePairDataAdapterXml::getDisplayName() const
+{
+	return mName;
+}
+
+QString DoublePairDataAdapterXml::getValueAsString() const
+{
+	return qstring_cast(mValue);;
+}
+
+void DoublePairDataAdapterXml::setValueFromString(QString value)
+{
+	Eigen::Vector2d val = fromString(value);
+	this->setValue(val);
+}
+
 QString DoublePairDataAdapterXml::getUid() const
 {
 	return mUid;
-}
-
-QString DoublePairDataAdapterXml::getValueName() const
-{
-	return mName;
 }
 
 QString DoublePairDataAdapterXml::getHelp() const

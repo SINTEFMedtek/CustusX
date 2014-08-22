@@ -19,16 +19,26 @@
 
 #include "cxDataAdapter.h"
 
-/*
- * cxDataAdapter.cpp
- *
- * \date Dec 21, 2012
- * \author Janne Beate Bakeng, SINTEF
- */
+namespace cx
+{
 
 DataAdapter::DataAdapter() :
 		QObject(), mEnabled(true), mAdvanced(false), mGroup("")
 {}
+
+
+DataAdapterPtr DataAdapter::findAdapter(std::vector<DataAdapterPtr> adapters, QString id)
+{
+	for(int i=0; i<adapters.size(); ++i)
+	{
+		DataAdapterPtr adapter = adapters[i];
+		if(QString::compare(adapter->getUid(), id) == 0)
+		{
+			return adapter;
+		}
+	}
+	return DataAdapterPtr();
+}
 
 bool DataAdapter::getEnabled() const
 {
@@ -80,3 +90,4 @@ bool DataAdapter::setGroup(QString name)
 }
 
 
+} //namespace cx

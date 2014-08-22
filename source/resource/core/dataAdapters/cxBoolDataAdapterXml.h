@@ -58,14 +58,16 @@ public:
 
 public:
 	// basic methods
-	virtual QString getValueName() const; ///< name of data entity. Used for display to user.
+	virtual QString getDisplayName() const; ///< name of data entity. Used for display to user.
+	virtual QString getValueAsString() const;
+	virtual void setValueFromString(QString value);
+	virtual QString getUid() const;
 	virtual bool setValue(bool value); ///< set the data value.
 	virtual bool getValue() const; ///< get the data value.
 
 public:
 	// optional methods
 	virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.
-	QString getUid() const;
     void setHelp(QString val);
     /*
 	virtual bool getEnabled() const; ///< Get the enabled/disabled state of the dataadapter.

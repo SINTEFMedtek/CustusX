@@ -72,14 +72,24 @@ void StringDataAdapterXml::setReadOnly(bool val)
 	emit changed();
 }
 
+QString StringDataAdapterXml::getDisplayName() const
+{
+	return mName;
+}
+
+QString StringDataAdapterXml::getValueAsString() const
+{
+	return mValue;
+}
+
+void StringDataAdapterXml::setValueFromString(QString value)
+{
+	this->setValue(value);
+}
+
 QString StringDataAdapterXml::getUid() const
 {
 	return mUid;
-}
-
-QString StringDataAdapterXml::getValueName() const
-{
-	return mName;
 }
 
 QString StringDataAdapterXml::getHelp() const

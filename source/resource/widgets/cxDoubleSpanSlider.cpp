@@ -29,7 +29,7 @@ SliderRangeGroupWidget::SliderRangeGroupWidget(QWidget* parent, DoublePairDataAd
 void SliderRangeGroupWidget::init(QGridLayout *gridLayout, int row)
 {
 	mLabel = new QLabel(this);
-	mLabel->setText(mData->getValueName());
+	mLabel->setText(mData->getDisplayName());
 	mLowerEdit = new QDoubleSpinBox(this);
 	mSpanSlider = new DoubleSpanSlider(this);
 	mSpanSlider->setOrientation(Qt::Horizontal);

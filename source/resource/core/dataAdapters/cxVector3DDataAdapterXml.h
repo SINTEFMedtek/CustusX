@@ -62,7 +62,10 @@ public:
 
 public:
 	// inherited interface
-	virtual QString getValueName() const;///< name of data entity. Used for display to user.
+	virtual QString getDisplayName() const;///< name of data entity. Used for display to user.
+	virtual QString getValueAsString() const;
+	virtual void setValueFromString(QString value);
+	virtual QString getUid() const;
 	virtual bool setValue(const Vector3D& value); ///< set the data value.
 	virtual Vector3D getValue() const; ///< get the data value.
 	virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.
@@ -78,8 +81,6 @@ public:
 		return display / mFactor;
 	} ///< conversion from internal value to display value
 
-public:
-	QString getUid() const;
 
 signals:
 	void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)

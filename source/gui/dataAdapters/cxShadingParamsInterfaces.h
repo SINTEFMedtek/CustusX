@@ -41,7 +41,7 @@ class DoubleDataAdapterShadingAmbient : public DoubleDataAdapterShadingBase
 public:
   DoubleDataAdapterShadingAmbient() {}
   virtual ~DoubleDataAdapterShadingAmbient() {}
-  virtual QString getValueName() const { return "Ambient"; }
+  virtual QString getDisplayName() const { return "Ambient"; }
   DoubleRange getValueRange() const  { return DoubleRange(0.0, 1.0, 0.01); }
   virtual double getValue() const;
   virtual bool setValue(double val);
@@ -55,7 +55,7 @@ class DoubleDataAdapterShadingDiffuse : public DoubleDataAdapterShadingBase
 public:
   DoubleDataAdapterShadingDiffuse() {}
   virtual ~DoubleDataAdapterShadingDiffuse() {}
-  virtual QString getValueName() const { return "Diffuse"; }
+  virtual QString getDisplayName() const { return "Diffuse"; }
   DoubleRange getValueRange() const  { return DoubleRange(0.0, 1.0, 0.01); }
   virtual double getValue() const;
   virtual bool setValue(double val);
@@ -69,7 +69,7 @@ class DoubleDataAdapterShadingSpecular : public DoubleDataAdapterShadingBase
 public:
   DoubleDataAdapterShadingSpecular() {}
   virtual ~DoubleDataAdapterShadingSpecular() {}
-  virtual QString getValueName() const { return "Specular"; }
+  virtual QString getDisplayName() const { return "Specular"; }
   DoubleRange getValueRange() const  { return DoubleRange(0.0, 4.0, 0.01); }
   virtual double getValue() const;
   virtual bool setValue(double val);
@@ -83,7 +83,7 @@ class DoubleDataAdapterShadingSpecularPower : public DoubleDataAdapterShadingBas
 public:
   DoubleDataAdapterShadingSpecularPower() {}
   virtual ~DoubleDataAdapterShadingSpecularPower() {}
-  virtual QString getValueName() const { return "Specular Power"; }
+  virtual QString getDisplayName() const { return "Specular Power"; }
   DoubleRange getValueRange() const  { return DoubleRange(0.0, 50.0, 0.01); }
   virtual double getValue() const;
   virtual bool setValue(double val);

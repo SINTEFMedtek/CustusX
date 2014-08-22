@@ -50,6 +50,8 @@ SET (cxVideoService_SOURCE
     cxVideoServiceBackend.h
     cxVideoServiceBackend.cpp
     cxStreamerService.cpp
+    cxStreamerServiceUtilities.h
+    cxStreamerServiceUtilities.cpp
     cxCommandlineImageStreamerInterface.h
     cxCommandlineImageStreamerInterface.cpp
     cxImageStreamerFactory.h

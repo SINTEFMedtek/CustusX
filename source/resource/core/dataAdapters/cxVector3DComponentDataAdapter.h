@@ -38,9 +38,9 @@ public:
   virtual ~Vector3DComponentDataAdapter() {}
 
 public: // basic methods
-  virtual QString getValueName() const;
-  virtual bool setValue(double value);
-  virtual double getValue() const;
+	virtual QString getDisplayName() const;
+	virtual bool setValue(double value);
+	virtual double getValue() const;
 
 public: // optional methods
   virtual QString getHelp() const;

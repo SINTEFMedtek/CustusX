@@ -60,10 +60,10 @@ QString FusedInputOutputSelectDataStringDataAdapter::getValue() const
 	return mBase->getValue();
 }
 
-QString FusedInputOutputSelectDataStringDataAdapter::getValueName() const
+QString FusedInputOutputSelectDataStringDataAdapter::getDisplayName() const
 {
 	if (mValueName.isEmpty())
-		return mBase->getValueName();
+		return mBase->getDisplayName();
 	return mValueName;
 }
 
@@ -173,7 +173,7 @@ void Pipeline::setOption(QString valueName, QVariant value)
 
 		for (unsigned j=0; j<options.size(); ++j)
 		{
-			if (options[j]->getValueName()==valueName)
+			if (options[j]->getDisplayName()==valueName)
 				this->setOption(options[j], value);
 		}
 	}

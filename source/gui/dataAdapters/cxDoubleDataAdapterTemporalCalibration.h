@@ -29,7 +29,7 @@ public:
   static DoubleDataAdapterPtr New();
   DoubleDataAdapterTimeCalibration();
   virtual ~DoubleDataAdapterTimeCalibration() {}
-  virtual QString getValueName() const { return "Temporal Calibration"; }
+  virtual QString getDisplayName() const { return "Temporal Calibration"; }
   virtual double getValue() const;
   virtual QString getHelp() const;
   virtual bool setValue(double val);
