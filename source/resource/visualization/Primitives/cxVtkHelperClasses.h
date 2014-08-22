@@ -131,7 +131,7 @@ class TextDisplay
 		int maxWidth;
 		QString text;
 
-		void removeVtkTextMapperOverrides();
+		void forceUseVtkTextMapper();
 		void verifyVtkTextMapper();
 };
 typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
