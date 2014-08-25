@@ -73,6 +73,7 @@ class Common(object):
         self.isb_password = ""
         self.static = False # build as shared or static libraries
         self.jom = False
+        self.eclipse_version = '3.6'
         if platform.system() == 'Windows':
             self.static = True
             self.jom = True
@@ -109,6 +110,8 @@ class Common(object):
         print '    ExternalDir:', self.getExternalPath()
         print '    WorkingDir:', self.getWorkingPath()
         print '    CMakeGenerator:', self.getCMakeGenerator()
+        if('Eclipse' in self.getCMakeGenerator()):
+            print '    Eclipse version:', self.getEclipseVersion()
         print '    BuildShared:', self.getBuildShared()
         print '    BuildType:', self.getBuildType()
         print '    BuildExternalsType:', self.getBuildExternalsType()
@@ -144,7 +147,8 @@ class Common(object):
             p.add_boolean_inverter('--xcode', default=self.xcode, dest='xcode', help='Generate xcode targets')
         p.add_boolean_inverter('--force_connect_sublibraries', default=self.force_connect_sublibraries, dest='force_connect_sublibraries', help='Force libs such as gestreamer and tsf to be connected to cx, during configuration step.')        
         p.add_boolean_inverter('--short_pathnames', default=self.short_pathnames, dest='short_pathnames', help='Create shorter pathnames where possible. Workaround for the path length limitation on Windows.')
-        p.add_boolean_inverter('--graph', default=self.mGraphviz, dest='mGraphviz', help='Make dependency graph.')        
+        p.add_boolean_inverter('--graph', default=self.mGraphviz, dest='mGraphviz', help='Make dependency graph.')
+        p.add_argument('-ev', '--eclipse_version', default='3.6', dest='eclipse_version', choices=['3.2', '3.3', '3.4', '3.5', '3.6', '3.7', '4.2', '4.3'], help='The Eclipse version number')
         return p
 
     def getArgParser_extended_build(self):
@@ -171,6 +175,9 @@ class Common(object):
         if platform.system() == 'Windows':
             return 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
         return "Eclipse CDT4 - Unix Makefiles" 
+    
+    def getEclipseVersion(self):
+        return self.eclipse_version
     
     def setBuild32(self, value):
         self.m32bit = value        

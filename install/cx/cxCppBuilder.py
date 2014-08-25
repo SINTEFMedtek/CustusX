@@ -179,16 +179,15 @@ class CppBuilder:
         runShell(cmd)
 
     def _addDefaultCmakeOptions(self):
-            add = self.addCMakeOption
-            if(platform.system() != 'Windows'):
-                add('CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated')
-            add('CMAKE_BUILD_TYPE:STRING', self.mBuildType)        
-            if self.controlData.m32bit: # todo: add if darwin
-                add('CMAKE_OSX_ARCHITECTURES', 'i386')
-            add('BUILD_SHARED_LIBS:BOOL', self.controlData.getBuildShared())
-#            add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
-#            add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
-#            add('BUILD_DOCUMENTATION:BOOL', self.controlData.mDoxygen)            
+        add = self.addCMakeOption
+        if(platform.system() != 'Windows'):
+            add('CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated')
+        add('CMAKE_BUILD_TYPE:STRING', self.mBuildType)        
+        if self.controlData.m32bit: # todo: add if darwin
+            add('CMAKE_OSX_ARCHITECTURES', 'i386')
+        add('BUILD_SHARED_LIBS:BOOL', self.controlData.getBuildShared())
+        add('CMAKE_ECLIPSE_VERSION', self.controlData.getEclipseVersion())
+        add('CMAKE_ECLIPSE_GENERATE_LINKED_RESOURCES', False)            
     
     def _assembleOptions(self):
         return " ".join(["-D%s=%s"%(key,val) for key,val in self.cmakeOptions.iteritems()])
