@@ -26,7 +26,13 @@ set (CX__OPTIONAL_CONFIG_ROOT ${CustusX_SOURCE_DIR}/../../CustusXSetup/CustusXSe
 set (CX_DATA_ROOT ${CustusX_SOURCE_DIR}/data CACHE PATH "path to CustusX data root")
 set (CX_LARGE_DATA_ROOT ${CustusX_SOURCE_DIR}/largedata CACHE PATH "path to CustusX large data root")
 
+# location of documentation files during compilation
+set (CX_DOC_ROOT ${CustusX_BINARY_DIR}/documentation)
+# location of documentation files after install, relative to executable
+set(CX_DOC_ROOT_RELATIVE_INSTALLED ../documentation)
+  
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/cxConfig.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/cxConfig.h"
   )
+

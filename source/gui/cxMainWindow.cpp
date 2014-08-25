@@ -925,11 +925,33 @@ void MainWindow::registerToolBar(QToolBar* toolbar, QString groupname)
 
 void MainWindow::aboutSlot()
 {
-	QMessageBox::about(this, tr("About CustusX"), tr("<h2>CustusX version %1</h2> "
-		"<p>Created by SINTEF Medical Technology."
-		"<p><a href=http://www.sintef.no/Home/Technology-and-Society/Medical-technology> www.sintef.no </a>"
-		"<p>An application for Image Guided Surgery."
-		"<p>Created using Qt, VTK, ITK, IGSTK, CTK.").arg(CustusX_VERSION_STRING));
+	QString doc_path = DataLocations::getDocPath();
+	QString url_github("https://github.com/SINTEFMedisinskTeknologi/CustusX3");
+	QString url_license = QString("file://%1/license.txt").arg(doc_path);
+	QString url_config = QString("file://%1/cxConfigDescription.txt").arg(doc_path);
+
+	QString text(""
+	"<h2>CustusX</h2>"
+	"<h4>%1</h4>"
+	"<p>A Research Platform for Image-Guided Therapy<p>"
+	"<p>CustusX is NOT approved for medical use.<p>"
+	""
+	"<p><a href=%2> website </a><p>"
+	"<p><a href=%3> license </a><p>"
+	"<p><a href=%4> configuration </a><p>");
+
+	QMessageBox::about(this, tr("About CustusX"), text
+			.arg(CustusX_VERSION_STRING)
+			.arg(url_github)
+			.arg(url_license)
+			.arg(url_config)
+			);
+
+//	QMessageBox::about(this, tr("About CustusX"), tr("<h2>CustusX version %1</h2> "
+//		"<p>Created by SINTEF Medical Technology."
+//		"<p><a href=http://www.sintef.no/Home/Technology-and-Society/Medical-technology> www.sintef.no </a>"
+//		"<p>An application for Image Guided Surgery."
+//		"<p>Created using Qt, VTK, ITK, IGSTK, CTK.").arg(CustusX_VERSION_STRING));
 }
 
 void MainWindow::preferencesSlot()

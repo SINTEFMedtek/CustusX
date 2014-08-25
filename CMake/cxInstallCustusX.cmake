@@ -66,8 +66,6 @@ cx_fixup_and_add_qtplugins_to_bundle(
 	${CX_INSTALL_BINARY_DIR}
 	"${CX_ALL_LIBRARY_DIRS}")
 
-cxCreateConfigurationDescription()
-message(STATUS ${CX_CONFIGURATION_DESCRIPTION})
 
 include(CPack)
 
