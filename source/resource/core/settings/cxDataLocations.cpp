@@ -157,6 +157,18 @@ QStringList DataLocations::getRootConfigPaths()
   return retval;
 }
 
+QString DataLocations::getDocPath()
+{
+  QString path = getBundlePath() + "/" + CX_DOC_ROOT_RELATIVE_INSTALLED; // look for installed location
+  if (QDir(path).exists())
+	return QDir(path).canonicalPath();
+
+  if (QDir(CX_DOC_ROOT).exists()) // look for folder in source code
+	return QDir(CX_DOC_ROOT).canonicalPath();
+
+  return "";
+}
+
 QStringList DataLocations::appendStringToAllElements(QStringList root, QString suffix)
 {
 	QStringList retval;

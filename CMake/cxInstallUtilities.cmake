@@ -33,10 +33,11 @@ macro(cx_install_set_generators)
 
 	if(APPLE)
 		# keep only packagemaker
-		option (CPACK_BINARY_STGZ "Enable to build STGZ packages" OFF)
-		option (CPACK_BINARY_TGZ "Enable to build TGZ packages" OFF)
-		option (CPACK_SOURCE_TBZ2 "Enable to build TBZ2 source packages" OFF)
-		option (CPACK_SOURCE_TGZ "Enable to build TGZ source packages" OFF)
+#		option (CPACK_BINARY_STGZ "Enable to build STGZ packages" OFF)
+#		option (CPACK_BINARY_TGZ "Enable to build TGZ packages" OFF)
+#		option (CPACK_SOURCE_TBZ2 "Enable to build TBZ2 source packages" OFF)
+#		option (CPACK_SOURCE_TGZ "Enable to build TGZ source packages" OFF)
+		set(CPACK_GENERATOR "PackageMaker")
 	endif(APPLE)
 
 	if(CX_LINUX)
@@ -318,6 +319,12 @@ endfunction()
 #
 ###############################################################################
 function(cx_install_documentation_files)
+	install(DIRECTORY
+		${CustusX_BINARY_DIR}/documentation/
+		DESTINATION ${CX_INSTALL_ROOT_DIR}/documentation
+		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
+		FILE_PERMISSIONS ${CX_FULL_PERMISSIONS})
+
 endfunction()
 
 ###############################################################################

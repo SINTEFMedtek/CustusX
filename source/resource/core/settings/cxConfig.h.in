@@ -17,3 +17,10 @@
 #cmakedefine CX_USE_OpenCV
 #cmakedefine CX_BUILD_MEHDI_VTKMULTIVOLUME
 #cmakedefine CX_BUILD_US_SIMULATOR
+
+// location of documentation files during compilation
+#define CX_DOC_ROOT "@CX_DOC_ROOT@"
+// location of documentation files after install, relative to executable
+#define CX_DOC_ROOT_RELATIVE_INSTALLED "@CX_DOC_ROOT_RELATIVE_INSTALLED@"
+
+

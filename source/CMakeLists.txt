@@ -44,4 +44,19 @@ add_subdirectory(testing)
 # Applications: add last (create bundle last).
 add_subdirectory(apps)
 
+cxCreateConfigurationDescription()
+message(STATUS ${CX_CONFIGURATION_DESCRIPTION})
+configure_file(
+  "${CustusX_SOURCE_DIR}/source/resource/core/settings/cxConfigDescription.txt.in"
+  "${CustusX_BINARY_DIR}/documentation/cxConfigDescription.txt"
+#  "${CustusX_BINARY_DIR}/source/resource/core/settings/cxConfigDescription.txt"
+  )
+
+configure_file(
+  "${CustusX_SOURCE_DIR}/License.txt"
+  "${CustusX_BINARY_DIR}/documentation/License.txt"
+  )
+
+
+
 

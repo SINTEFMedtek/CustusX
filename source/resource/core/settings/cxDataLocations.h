@@ -36,6 +36,7 @@ public:
   static QString getLargeTestDataPath(); ///< return path to test data folder containing large data sets
   static QString getExistingTestData(QString pathRelativeToTestDataRoot, QString filename=""); ///< Return full path to test data, both normal and large repositories are searched.
 
+  static QString getDocPath(); ///< return path to folder containing documentation files
   static QStringList getToolsPaths(); ///< return path to folder containing all defined tools
   static QStringList getApplicationToolConfigPaths(); ///< return path to tool config folder, based on choosen application
   static QString getToolConfigFilePath(); ///< return users path to tool config file
