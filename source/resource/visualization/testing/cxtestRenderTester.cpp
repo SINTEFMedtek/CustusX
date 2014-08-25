@@ -36,6 +36,14 @@
 #include "cxLogger.h"
 #include "cxUtilHelpers.h"
 
+
+#include "vtkTextMapper.h"
+#include "vtkActor2D.h"
+#include "vtkTextProperty.h"
+#include "vtkRendererCollection.h"
+
+#include "catch.hpp"
+
 typedef vtkSmartPointer<class vtkProp> vtkPropPtr;
 typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;
 typedef vtkSmartPointer<class vtkPNGWriter> vtkPNGWriterPtr;
@@ -158,6 +166,12 @@ vtkImageDataPtr RenderTester::renderToImage()
 	cx::sleep_ms(200);
 
 	return this->getImageFromRenderWindow();
+}
+
+void RenderTester::render(int num)
+{
+	for (int i = 0; i < num; ++i)
+		mRenderWindow->Render();
 }
 
 /*removed for testing fails on win
@@ -366,5 +380,20 @@ void RenderTester::printFractionOfVoxelsAboveZero(QString desc, vtkImageDataPtr 
 	std::cout << QString("Save image to %1").arg(path) << std::endl;
 }
 
+void RenderTester::addTextToVtkRenderWindow()
+{
+	vtkTextMapperPtr mapper = vtkTextMapperPtr::New();
+	mapper->SetInput("Test text");
+	mapper->GetTextProperty()->SetColor(1, 0, 0);
+	mapper->GetTextProperty()->SetFontSize(10);
+	mapper->GetTextProperty()->SetFontFamilyToArial();
+
+	vtkActor2DPtr actor = vtkActor2DPtr::New();
+	actor->SetMapper(mapper);
+
+	REQUIRE(mRenderWindow->GetRenderers()->GetNumberOfItems()==1);
+
+	mRenderWindow->GetRenderers()->GetFirstRenderer()->AddActor(actor);
+}
 
 } // namespace cxtest

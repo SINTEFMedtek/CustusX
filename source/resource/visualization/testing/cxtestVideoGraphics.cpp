@@ -75,3 +75,12 @@ TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Test Sector", "[u
 
 	this->renderImageAndCompareToExpected(videoImage0, expected);
 }
+
+TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Render Image with text", "[integration][resource][visualization][textrender]")
+{
+	vtkImageDataPtr videoImage0 = this->readImageData("testImage01.png", "input image");
+	this->addImageToRenderer(videoImage0);
+
+	mMachine->addTextToVtkRenderWindow();
+	mMachine->render(5000);
+}
