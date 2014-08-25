@@ -63,6 +63,7 @@ public:
 //	ViewWidget* getView();
 	void addProp(vtkPropPtr prop);
 	void renderToFile(QString filename);
+	void render(int num);
 
 	void resetCamera();
 	void alignRenderWindowWithImage(vtkImageDataPtr input);
@@ -76,6 +77,8 @@ public:
 	void setImageErrorThreshold(double value);
 	void printFractionOfVoxelsAboveZero(QString desc, vtkImageDataPtr image);
 	vtkImageDataPtr getImageFromRenderWindow();
+
+	void addTextToVtkRenderWindow();
 
 private:
 	vtkImageDataPtr clipImage(vtkImageDataPtr input);
