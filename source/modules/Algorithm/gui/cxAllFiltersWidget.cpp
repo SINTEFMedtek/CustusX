@@ -50,10 +50,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPluginFramework.h"
 #include "cxLogicManager.h"
 #include <boost/bind.hpp>
-#include <boost/serialization/shared_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
 namespace cx {
+
+struct null_deleter
+{
+	void operator()(void const *) const {}
+};
 
 AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
     BaseWidget(parent, "FilterWidget", "Configurable Filter")
@@ -193,7 +198,7 @@ void AllFiltersWidget::finishedSlot()
 
 void AllFiltersWidget::onServiceAdded(Filter* service)
 {
-	mFilters->append(FilterPtr(service, boost::serialization::null_deleter()));
+	mFilters->append(FilterPtr(service, null_deleter()));
 }
 
 void AllFiltersWidget::onServiceRemoved(Filter *service)
