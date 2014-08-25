@@ -46,14 +46,25 @@ BoolDataAdapterXmlPtr BoolDataAdapterXml::initialize(const QString& uid, QString
 	return retval;
 }
 
+QString BoolDataAdapterXml::getDisplayName() const
+{
+	return mName;
+}
+
+QString BoolDataAdapterXml::getValueAsString() const
+{
+	return mValue ? "true" : "false";
+}
+
+void BoolDataAdapterXml::setValueFromString(QString value)
+{
+	bool val = QString::compare(value, "true", Qt::CaseInsensitive) == 0 ? true : false;
+	this->setValue(val);
+}
+
 QString BoolDataAdapterXml::getUid() const
 {
 	return mUid;
-}
-
-QString BoolDataAdapterXml::getValueName() const
-{
-	return mName;
 }
 
 QString BoolDataAdapterXml::getHelp() const

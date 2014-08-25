@@ -23,9 +23,9 @@ Vector3DComponentDataAdapter::Vector3DComponentDataAdapter(Vector3DDataAdapterPt
 	connect(mBase.get(), SIGNAL(changed()), this, SIGNAL(changed()));
 }
 
-QString Vector3DComponentDataAdapter::getValueName() const
+QString Vector3DComponentDataAdapter::getDisplayName() const
 {
-	return mName.isEmpty() ? mBase->getValueName() : mName;
+	return mName.isEmpty() ? mBase->getDisplayName() : mName;
 }
 
 bool Vector3DComponentDataAdapter::setValue(double value)

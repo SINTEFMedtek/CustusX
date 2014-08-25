@@ -27,7 +27,7 @@ bool DoubleDataAdapterOutputValueParams::setValue(double val)
   OutputVolumeParams par = mReconstructer->getOutputVolumeParams();
   if (similar(val, this->getValue(&par)))
     return false;
-  //std::cout << "DoubleDataAdapterOutputValueParams::setValue():" << this->getValueName() << std::endl;
+  //std::cout << "DoubleDataAdapterOutputValueParams::setValue():" << this->getDisplayName() << std::endl;
   this->setValue(&par, val);
   mReconstructer->setOutputVolumeParams(par);
   return true;

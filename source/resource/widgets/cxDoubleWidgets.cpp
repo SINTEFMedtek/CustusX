@@ -39,7 +39,7 @@ ScalarInteractionWidget::ScalarInteractionWidget(QWidget* parent, DoubleDataAdap
 void ScalarInteractionWidget::enableLabel()
 {
 	mLabel = new QLabel(this);
-	mLabel->setText(mData->getValueName());
+	mLabel->setText(mData->getDisplayName());
 }
 
 void ScalarInteractionWidget::enableSlider()
@@ -196,7 +196,7 @@ void ScalarInteractionWidget::prePaintEvent()
 {
 	this->enableAll(mData->getEnabled());
 
-//    std::cout << "ScalarInteractionWidget::prePaintEvent() " << this << " " << mData->getValueName() << std::endl;
+//    std::cout << "ScalarInteractionWidget::prePaintEvent() " << this << " " << mData->getDisplayName() << std::endl;
 	DoubleRange range = mData->getValueRange();
 	DoubleRange dRange(mData->convertInternal2Display(range.min()), mData->convertInternal2Display(range.max()),
 		mData->convertInternal2Display(range.step()));

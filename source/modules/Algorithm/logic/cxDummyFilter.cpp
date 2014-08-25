@@ -105,9 +105,9 @@ bool DummyFilter::execute()
 	BoolDataAdapterPtr boolOption = this->getBoolOption(mCopiedOptions);
 
 	std::cout << "Running dummy algorithm..." << std::endl;
-	std::cout << QString("  String option [%1]: %2").arg(stringOption->getValueName()).arg(stringOption->getValue()) << std::endl;
-	std::cout << QString("  Double option [%1]: %2").arg(doubleOption->getValueName()).arg(doubleOption->getValue()) << std::endl;
-	std::cout << QString("  Bool   option [%1]: %2").arg(boolOption->getValueName()).arg(boolOption->getValue()) << std::endl;
+	std::cout << QString("  String option [%1]: %2").arg(stringOption->getDisplayName()).arg(stringOption->getValue()) << std::endl;
+	std::cout << QString("  Double option [%1]: %2").arg(doubleOption->getDisplayName()).arg(doubleOption->getValue()) << std::endl;
+	std::cout << QString("  Bool   option [%1]: %2").arg(boolOption->getDisplayName()).arg(boolOption->getValue()) << std::endl;
 
 	for (unsigned i=0; i< mCopiedInput.size(); ++i)
 		std::cout << QString("  Input %1: %2").arg(mCopiedInput[i] ? mCopiedInput[i]->getName() : "NULL") << std::endl;

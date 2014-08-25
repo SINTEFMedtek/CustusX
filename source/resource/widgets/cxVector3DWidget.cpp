@@ -32,7 +32,7 @@ Vector3DWidget* Vector3DWidget::createSmallHorizontal(QWidget* parent, Vector3DD
 
 	QHBoxLayout* aLayout = new QHBoxLayout(retval);
 	aLayout->setMargin(0);
-	aLayout->addWidget(new QLabel(data->getValueName(), retval), 0);
+	aLayout->addWidget(new QLabel(data->getDisplayName(), retval), 0);
 	retval->addSmallControlsForIndex("x", "X", 0, aLayout);
 	retval->addSmallControlsForIndex("y", "Y", 1, aLayout);
 	retval->addSmallControlsForIndex("z", "Z", 2, aLayout);

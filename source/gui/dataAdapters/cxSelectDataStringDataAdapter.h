@@ -30,7 +30,7 @@ public:
   virtual ~SelectDataStringDataAdapterBase() {}
 
 public: // basic methods
-	virtual QString getValueName() const;
+	virtual QString getDisplayName() const;
 
 public: // optional methods
   virtual QStringList getValueRange() const;

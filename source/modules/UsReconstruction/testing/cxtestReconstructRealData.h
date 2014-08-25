@@ -35,6 +35,10 @@ public:
 	void validateAngioData(cx::ImagePtr angioOut);
 	void validateBModeData(cx::ImagePtr bmodeOut);
 private:
+	std::vector<int> getCrossVolumeSamples();
+	std::vector<int> getLightVolumeSamples();
+	std::vector<int> getDarkVolumeSamples();
+	void checkSamples(cx::ImagePtr image, std::vector<int> samples, int lowerThreshold, bool matchThresholdExactly = false);
 	int getValue(cx::ImagePtr data, int x, int y, int z);
 };
 

@@ -28,7 +28,7 @@ ActiveToolStringDataAdapter::ActiveToolStringDataAdapter()
   connect(toolManager(), SIGNAL(configured()), this, SIGNAL(changed()));
 }
 
-QString ActiveToolStringDataAdapter::getValueName() const
+QString ActiveToolStringDataAdapter::getDisplayName() const
 {
   return "Active Tool";
 }
@@ -112,7 +112,7 @@ void ActiveProbeConfigurationStringDataAdapter::dominantToolChanged()
 	emit changed();
 }
 
-QString ActiveProbeConfigurationStringDataAdapter::getValueName() const
+QString ActiveProbeConfigurationStringDataAdapter::getDisplayName() const
 {
   return "Probe Config";
 }

@@ -53,7 +53,7 @@ public:
 
 public:
 	// basic methods
-	virtual QString getValueName() const = 0; ///< name of data entity. Used for display to user.
+	virtual QString getDisplayName() const = 0; ///< name of data entity. Used for display to user.
 	virtual bool setValue(const Vector3D& value) = 0; ///< set the data value.
 	virtual Vector3D getValue() const = 0; ///< get the data value.
 
@@ -91,7 +91,7 @@ public:
 	virtual ~Vector3DDataAdapterNull()
 	{
 	}
-	virtual QString getValueName() const
+	virtual QString getDisplayName() const
 	{
 		return "dummy";
 	}

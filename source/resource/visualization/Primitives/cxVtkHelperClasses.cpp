@@ -35,6 +35,10 @@
 #include "cxTypeConversions.h"
 #include <vtkProperty.h>
 #include "cxBoundingBox3D.h"
+#include "cxReporter.h"
+
+#include "vtkOverrideInformationCollection.h"
+#include "vtkObjectFactory.h"
 
 // --------------------------------------------------------
 namespace cx
@@ -303,6 +307,7 @@ TextDisplay::TextDisplay( const QString& text, const QColor &color, int fontsize
 {
 	this->text = text;
 //	Vector3D c = color;
+	this->forceUseVtkTextMapper();
 	mapper = vtkTextMapperPtr::New();
 	mapper->SetInput( cstring_cast(text) );
 	this->setColor(color);
@@ -311,6 +316,36 @@ TextDisplay::TextDisplay( const QString& text, const QColor &color, int fontsize
 	actor= vtkActor2DPtr::New();
 	actor->SetMapper( mapper );
 	maxWidth = 0;
+}
+
+void TextDisplay::forceUseVtkTextMapper()
+{
+	//Force the use of vtkTextMapper instead of vtkOpenGLFreeTypeTextMapper
+	//Copied from TestFreeTypeTextMapper.cxx
+
+	// Remove any override to the class to ensure that the actual vtkTextMapper
+	// class is being tested:
+	vtkNew<vtkOverrideInformationCollection> overrides;
+	vtkObjectFactory::GetOverrideInformation("vtkTextMapper",
+											 overrides.GetPointer());
+	overrides->InitTraversal();
+	while (vtkOverrideInformation *override = overrides->GetNextItem())
+	{
+		if (vtkObjectFactory *factory = override->GetObjectFactory())
+		{
+			vtkObjectFactory::UnRegisterFactory(factory);
+		}
+	}
+	this->verifyVtkTextMapper();
+}
+
+void TextDisplay::verifyVtkTextMapper()
+{
+	vtkNew<vtkTextMapper> nameChecker;
+	if (vtkStdString(nameChecker->GetClassName()) != "vtkTextMapper")
+	{
+		reportError("Needed a vtkTextMapper instance, got " + QString(nameChecker->GetClassName()));
+	}
 }
 
 void TextDisplay::setColor(QColor color)
@@ -338,6 +373,7 @@ void TextDisplay::setMaxWidth( int width, vtkViewport *vp)
 	QStringList components = text.split("\n");
 	for (QStringList::iterator it = components.begin(); it != components.end(); ++it)
 	{
+		this->verifyVtkTextMapper();
 		vtkTextMapperPtr line = vtkTextMapperPtr::New();
 		bool changed = false;
 		line->SetInput( it->toLatin1().constData() );

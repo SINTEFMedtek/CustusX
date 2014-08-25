@@ -32,6 +32,7 @@ class LibraryAssembly(object):
     def __init__(self):
         self.controlData = cxInstallData.Common()
         self.libraries = []
+	self.custusx = cxComponents.CustusX()
 
         self.addComponent(cxComponents.Eigen())
         self.addComponent(cxComponents.ITK())
@@ -41,14 +42,12 @@ class LibraryAssembly(object):
         self.addComponent(cxComponents.IGSTK())
         self.addComponent(cxComponents.CTK())
         if (platform.system() != 'Windows'):
-             self.addComponent(cxComponents.ISB_DataStreaming());
-        if (platform.system() != 'Windows'):
             self.addComponent(cxComponents.OpenCLUtilityLibrary())
         if (platform.system() != 'Windows'):
             self.addComponent(cxComponents.TubeSegmentationFramework());
         if (platform.system() == 'Linux'):
             self.addComponent(cxComponents.LevelSetSegmentation());
-        self.addComponent(cxComponents.CustusX())
+        self.addComponent(self.custusx)
         self.addComponent(cxComponents.CustusXData())
         
     def addComponent(self, component):
