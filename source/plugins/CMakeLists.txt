@@ -45,6 +45,7 @@ set(CX_PLUGINS
   org.custusx.pnnreconstruction:ON
   org.custusx.patientmodel:ON
 #  org.custusx.filter.tubesegmentation:OFF
+  org.custusx.ctusreg:OFF
 )
 
 #foreach(var ${CX_PLUGINS})
