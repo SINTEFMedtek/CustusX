@@ -102,7 +102,6 @@ endif()
 # create the target
 add_library( cxPluginUSReconstruction ${SOURCE_FILES} )
 target_link_libraries( cxPluginUSReconstruction ${cxPluginUSReconstruction_LIB_FILES})
-CX_COTIRE_ADD_LIBRARY( cxPluginUSReconstruction "${cxPluginUSReconstruction_LIB_FILES}")
 
 add_subdirectory(testing)
 #add_subdirectory(logic/3DReconstruction)

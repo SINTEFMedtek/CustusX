@@ -140,7 +140,6 @@ include_directories(
 add_library( cxPluginRegistration ${SOURCE_FILES} )
 set(LINK_LIBRARIES cxPluginAcquisition cxPluginAlgorithm)
 target_link_libraries( cxPluginRegistration ${LINK_LIBRARIES})
-CX_COTIRE_ADD_LIBRARY( cxPluginRegistration "${LINK_LIBRARIES}")
 
 # add/remove to suit your own needs.
 #add_subdirectory(logic)

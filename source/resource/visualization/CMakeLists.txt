@@ -152,6 +152,5 @@ endif()
 
 ADD_LIBRARY ( cxResourceVisualization ${CX_RESOURCE_VISUALIZATION_FILES})
 target_link_libraries(cxResourceVisualization ${CX_RESOURCE_VISUALIZATION_LIBRARIES} )
-CX_COTIRE_ADD_LIBRARY( cxResourceVisualization "cxResource")
 
 add_subdirectory(testing)

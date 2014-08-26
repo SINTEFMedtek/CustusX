@@ -378,8 +378,6 @@ class CustusX(CppComponent):
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.mDoxygen)            
         add('SSC_BUILD_EXAMPLES:BOOL', self.controlData.mBuildSSCExamples);
         add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
-        add('COTIRE_ADD_UNITY_BUILDS:BOOL', self.controlData.mUseCotire);
-        add('COTIRE_ENABLE_PRECOMPILED_HEADERS:BOOL', self.controlData.mUseCotire);
         add('SSC_USE_GCOV:BOOL', self.controlData.mCoverage);
         
         libs = self.assembly.libraries

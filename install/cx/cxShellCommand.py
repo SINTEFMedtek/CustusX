@@ -28,17 +28,22 @@ class ShellCommandDummy(ShellCommand):
         return ShellCommand.ReturnValue()
 
 class ShellCommandReal(ShellCommand):
+    '''
+    If silent is true, don't print output to commandline.
+    '''
     def __init__(self, command, 
                  cwd,
                  terminate_on_error=True, 
                  redirect_output=False, 
-                 keep_output=False):
+                 keep_output=False,
+                 silent=False):
         self.command = command
         self.cwd = cwd
         
         self.redirect_output = redirect_output
         self.keep_output = keep_output
         self.terminate_on_error = terminate_on_error
+        self.silent = silent
     
     def run(self):
         '''
@@ -78,7 +83,8 @@ class ShellCommandReal(ShellCommand):
         output = []
         p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=self.cwd)        
         for line in self._readFromProcess(p):
-            self._printOutput(line.rstrip())
+            if(not self.silent):
+                self._printOutput(line.rstrip())
             if self.keep_output:
                 output.append(line) 
         return ShellCommand.ReturnValue(stdout="".join(output), returncode=p.returncode, process=p)

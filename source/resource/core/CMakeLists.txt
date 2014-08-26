@@ -279,7 +279,6 @@ include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 
 add_library (cxResource ${cxResource_SOURCE})
 target_link_libraries(cxResource ${CX_RESOURCE_LIBRARIES} )
-CX_COTIRE_ADD_LIBRARY( cxResource "${CX_RESOURCE_LIBRARIES}")
 
 add_subdirectory(testing)
 

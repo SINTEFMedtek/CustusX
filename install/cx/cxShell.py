@@ -36,6 +36,7 @@ class Shell (object):
         self.VERBOSE = False
         self.REDIRECT_OUTPUT = False
         self.TERMINATE_ON_ERROR = True
+        self.SILENT = False
 
     def getArgParser(self):
         p = cxArgParse.ArgumentParser(add_help=False)
@@ -53,7 +54,10 @@ class Shell (object):
         arguments = self.getArgParser().parse_known_args(args=arguments, namespace=self)[1]
         print 'CommandLine: ', vars(self)
         return arguments
-        
+    
+    def setSilent(self, value):
+        self.SILENT = value
+            
     def setDummyMode(self, value):
         shell.DUMMY = value
         if value == True:
@@ -62,14 +66,16 @@ class Shell (object):
     def setRedirectOutput(self, value):
         self.REDIRECT_OUTPUT = value
 
-    def run(self, cmd, ignoreFailure=False, convertToString=True, keep_output=False):
+    def run(self, cmd, ignoreFailure=False, convertToString=True, keep_output=False, silent=False):
         '''
         Run a shell script, return success/failure in a ShellCommand.ReturnValue object.
         If keep_output is true, include full output from the command as well.
+        If silent is true, don't print output to commandline.
         '''
         if(convertToString):
             cmd = self._convertToString(cmd)
-        self._printCommand(cmd)
+        if(not silent):
+            self._printCommand(cmd)
         if self.DUMMY is True:
             return ShellCommandDummy().run()
                         
@@ -77,7 +83,8 @@ class Shell (object):
                         cwd=self.CWD, 
                         terminate_on_error=self.TERMINATE_ON_ERROR and not ignoreFailure,
                         redirect_output=self.REDIRECT_OUTPUT,
-                        keep_output=keep_output)
+                        keep_output=keep_output,
+                        silent=silent)
         return command.run()
 
     def evaluate(self, cmd, convertToString=True):
@@ -154,9 +161,12 @@ class Shell (object):
                 shutil.rmtree(path, False)
 
     def _printInfo(self, text):
-        print '[shell info] %s' % text
+        if(not self.SILENT):
+            print '[shell info] %s' % text
+            
     def _printCommand(self, text):
-        print '[shell cmd] %s' % text
+        if(not self.SILENT):
+                print '[shell cmd] %s' % text
 
     @staticmethod
     def create():

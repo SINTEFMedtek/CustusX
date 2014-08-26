@@ -70,7 +70,6 @@ SET(LINK_LIBRARIES
 		)
 
 target_link_libraries(CustusX ${LINK_LIBRARIES} )
-CX_COTIRE_ADD_LIBRARY(CustusX "${LINK_LIBRARIES}")
 
 # Install CustusX
 install(TARGETS CustusX

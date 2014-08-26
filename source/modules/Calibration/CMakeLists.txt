@@ -76,6 +76,5 @@ set(LINK_LIBRARIES
     cxPluginAcquisition
       )
 target_link_libraries( cxPluginCalibration ${LINK_LIBRARIES} )
-CX_COTIRE_ADD_LIBRARY(cxPluginCalibration "${LINK_LIBRARIES}")
 
 add_subdirectory(testing)

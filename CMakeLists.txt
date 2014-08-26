@@ -55,9 +55,6 @@ message( STATUS "The " ${CMAKE_GENERATOR} " was used." )
 
 cx_read_version()
 
-include(cxCotireMacros)
-CX_COTIRE_INITIALIZE()
-
 set(CMAKE_BUILD_TYPE:STRING=Debug)
 
 
