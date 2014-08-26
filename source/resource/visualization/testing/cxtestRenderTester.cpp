@@ -168,12 +168,6 @@ vtkImageDataPtr RenderTester::renderToImage()
 	return this->getImageFromRenderWindow();
 }
 
-void RenderTester::render(int num)
-{
-	for (int i = 0; i < num; ++i)
-		mRenderWindow->Render();
-}
-
 /*removed for testing fails on win
 vtkImageDataPtr RenderTester::getImageFromRenderWindow()
 {
@@ -380,16 +374,26 @@ void RenderTester::printFractionOfVoxelsAboveZero(QString desc, vtkImageDataPtr 
 	std::cout << QString("Save image to %1").arg(path) << std::endl;
 }
 
-void RenderTester::addTextToVtkRenderWindow()
+void RenderTester::renderAndUpdateText(int num)
 {
-	vtkTextMapperPtr mapper = vtkTextMapperPtr::New();
-	mapper->SetInput("Test text");
-	mapper->GetTextProperty()->SetColor(1, 0, 0);
-	mapper->GetTextProperty()->SetFontSize(10);
-	mapper->GetTextProperty()->SetFontFamilyToArial();
+	for (int i = 0; i < num; ++i)
+	{
+		QString text(qstring_cast("Test: ")+qstring_cast(i));
+		mMapper->SetInput(cstring_cast(text));
+		mRenderWindow->Render();
+	}
+}
+
+void RenderTester::addTextToVtkRenderWindow(QString text)
+{
+	mMapper = vtkTextMapperPtr::New();
+	mMapper->SetInput(cstring_cast(text));
+	mMapper->GetTextProperty()->SetColor(1, 0, 0);
+	mMapper->GetTextProperty()->SetFontSize(10);
+	mMapper->GetTextProperty()->SetFontFamilyToArial();
 
 	vtkActor2DPtr actor = vtkActor2DPtr::New();
-	actor->SetMapper(mapper);
+	actor->SetMapper(mMapper);
 
 	REQUIRE(mRenderWindow->GetRenderers()->GetNumberOfItems()==1);
 

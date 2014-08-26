@@ -81,6 +81,6 @@ TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Render Image with
 	vtkImageDataPtr videoImage0 = this->readImageData("testImage01.png", "input image");
 	this->addImageToRenderer(videoImage0);
 
-	mMachine->addTextToVtkRenderWindow();
-	mMachine->render(5000);
+	mMachine->addTextToVtkRenderWindow("test text");
+	mMachine->renderAndUpdateText(5000);
 }
