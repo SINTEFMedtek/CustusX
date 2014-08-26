@@ -63,7 +63,6 @@ public:
 //	ViewWidget* getView();
 	void addProp(vtkPropPtr prop);
 	void renderToFile(QString filename);
-	void render(int num);
 
 	void resetCamera();
 	void alignRenderWindowWithImage(vtkImageDataPtr input);
@@ -78,7 +77,8 @@ public:
 	void printFractionOfVoxelsAboveZero(QString desc, vtkImageDataPtr image);
 	vtkImageDataPtr getImageFromRenderWindow();
 
-	void addTextToVtkRenderWindow();
+	void renderAndUpdateText(int num);
+	void addTextToVtkRenderWindow(QString text);
 
 private:
 	vtkImageDataPtr clipImage(vtkImageDataPtr input);
@@ -92,6 +92,8 @@ private:
 	vtkRendererPtr mRenderer;
 	double mImageErrorThreshold;
 	int mBorderOffset;
+
+	vtkTextMapperPtr mMapper;
 };
 
 } // namespace cxtest
