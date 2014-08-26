@@ -1,4 +1,4 @@
-project(org_custusx_example)
+project(org_custusx_registration_ctus)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
