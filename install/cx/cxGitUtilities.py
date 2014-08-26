@@ -122,7 +122,7 @@ class Reporter(object):
         if repo.modified_files:
             text += TextColor.MODIFIED + ' modified ' + TextColor.ENDC 
         if repo.deleted_files:
-            text += TextColor.DELTED + ' deleted ' + TextColor.ENDC
+            text += TextColor.DELETED + ' deleted ' + TextColor.ENDC
         if repo.untracked_files:
             text += TextColor.UNTRACKED + ' untracked ' + TextColor.ENDC
         if repo.renamed_files:
