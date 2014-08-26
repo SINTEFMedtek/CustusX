@@ -30,57 +30,57 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxExamplePluginActivator.h"
+#include "cxRegistrationPluginActivator.h"
 
 #include <QtPlugin>
 #include <iostream>
 
-#include "cxExampleGUIExtenderService.h"
+#include "cxRegistrationImplService.h"
 
 namespace cx
 {
 
-ExamplePluginActivator::ExamplePluginActivator()
+RegistrationPluginActivator::RegistrationPluginActivator()
 : mContext(0)
 {
-	std::cout << "Created ExamplePluginActivator" << std::endl;
+	std::cout << "Created RegistrationPluginActivator" << std::endl;
 }
 
-ExamplePluginActivator::~ExamplePluginActivator()
+RegistrationPluginActivator::~RegistrationPluginActivator()
 {
 
 }
 
-void ExamplePluginActivator::start(ctkPluginContext* context)
+void RegistrationPluginActivator::start(ctkPluginContext* context)
 {
-	std::cout << "Started ExamplePluginActivator" << std::endl;
+	std::cout << "Started RegistrationPluginActivator" << std::endl;
 	this->mContext = context;
 
-	mPlugin.reset(new ExampleGUIExtenderService);
-	std::cout << "created example service" << std::endl;
+	mPlugin.reset(new RegistrationImplService);
+	std::cout << "created Registration service" << std::endl;
 	try
 	{
-		mRegistration = context->registerService(QStringList(GUIExtenderService_iid), mPlugin.get());
+		mRegistration = context->registerService(QStringList(RegistrationService_iid), mPlugin.get());
 	}
 	catch(ctkRuntimeException& e)
 	{
 		std::cout << e.what() << std::endl;
 		mPlugin.reset();
 	}
-	std::cout << "registered example service" << std::endl;
+	std::cout << "registered Registration service" << std::endl;
 }
 
-void ExamplePluginActivator::stop(ctkPluginContext* context)
+void RegistrationPluginActivator::stop(ctkPluginContext* context)
 {
 	mRegistration.unregister();
 	if(mPlugin)
 		mPlugin.reset();
-	std::cout << "Stopped ExamplePluginActivator" << std::endl;
+	std::cout << "Stopped RegistrationPluginActivator" << std::endl;
 	Q_UNUSED(context)
 }
 
 } // namespace cx
 
-Q_EXPORT_PLUGIN2(ExamplePluginActivator_irrelevant_string, cx::ExamplePluginActivator)
+Q_EXPORT_PLUGIN2(RegistrationPluginActivator_irrelevant_string, cx::RegistrationPluginActivator)
 
 

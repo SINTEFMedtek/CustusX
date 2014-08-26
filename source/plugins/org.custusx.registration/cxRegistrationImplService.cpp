@@ -30,36 +30,38 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXEXAMPLEGUIEXTENDERSERVICE_H_
-#define CXEXAMPLEGUIEXTENDERSERVICE_H_
-
-#include "cxGUIExtenderService.h"
-#include "org_custusx_example_Export.h"
+#include "cxRegistrationImplService.h"
 
 namespace cx
 {
 
-/**
- * Implementation of Example service.
- *
- * \ingroup org_custusx_example
- *
- * \date 2014-04-01
- * \author Christian Askeland
- */
-class org_custusx_example_EXPORT ExampleGUIExtenderService : public GUIExtenderService
+RegistrationImplService::RegistrationImplService()
 {
-	Q_INTERFACES(cx::GUIExtenderService)
-public:
-	ExampleGUIExtenderService();
-	virtual ~ExampleGUIExtenderService();
+}
 
-	std::vector<CategorizedWidget> createWidgets() const;
+RegistrationImplService::~RegistrationImplService()
+{
+}
 
-};
-typedef boost::shared_ptr<ExampleGUIExtenderService> ExampleGUIExtenderServicePtr;
+DataPtr RegistrationImplService::getMovingData()
+{
+	return DataPtr();
+}
+
+DataPtr RegistrationImplService::getFixedData()
+{
+	return DataPtr();
+}
+
+void RegistrationImplService::applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
+{
+
+}
+
+void RegistrationImplService::applyPatientRegistration(Transform3D rMpr_new, QString description)
+{
+
+}
+
 
 } /* namespace cx */
-
-#endif /* CXEXAMPLEGUIEXTENDERSERVICE_H_ */
-

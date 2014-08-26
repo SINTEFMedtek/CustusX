@@ -30,31 +30,45 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxExampleGUIExtenderService.h"
-#include "cxExampleWidget.h"
+#ifndef CXREGISTRATIONPLUGINACTIVATOR_H_
+#define CXREGISTRATIONPLUGINACTIVATOR_H_
+
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
 
 namespace cx
 {
 
+typedef boost::shared_ptr<class RegistrationImplService> RegistrationImplServicePtr;
 
-ExampleGUIExtenderService::ExampleGUIExtenderService()
+/**
+ * Activator for the registration plugin
+ *
+ * \ingroup org_custusx_registration
+ *
+ *  \date 2014-08-26
+ *  \author Ole Vegard Solberg, SINTEF
+ *  \author Geir Arne Tangen, SINTEF
+ */
+class RegistrationPluginActivator :  public QObject, public ctkPluginActivator
 {
-}
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
 
-ExampleGUIExtenderService::~ExampleGUIExtenderService()
-{
-}
+public:
 
-std::vector<GUIExtenderService::CategorizedWidget> ExampleGUIExtenderService::createWidgets() const
-{
-	std::vector<CategorizedWidget> retval;
+  RegistrationPluginActivator();
+  ~RegistrationPluginActivator();
 
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new ExampleWidget(),
-			"Plugins"));
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
 
-	return retval;
-}
+private:
+  ctkPluginContext* mContext;
+  RegistrationImplServicePtr mPlugin;
+  ctkServiceRegistration mRegistration;
+};
 
+} // namespace cx
 
-} /* namespace cx */
+#endif /* CXREGISTRATIONPLUGINACTIVATOR_H_ */

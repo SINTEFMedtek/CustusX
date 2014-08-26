@@ -30,44 +30,43 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXEXAMPLEPLUGINACTIVATOR_H_
-#define CXEXAMPLEPLUGINACTIVATOR_H_
+#ifndef CXREGISTRATIONIMPLSERVICE_H_
+#define CXREGISTRATIONIMPLSERVICE_H_
 
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
+#include "cxRegistrationService.h"
+#include "org_custusx_registration_Export.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class ExampleGUIExtenderService> ExampleGUIExtenderServicePtr;
-
 /**
- * Activator for the example plugin
+ * Implementation of Registration service.
  *
- * \ingroup org_custusx_example
+ * \ingroup org_custusx_registration
  *
- * \date 2014-04-15
- * \author Christian Askeland
+ *  \date 2014-08-26
+ *  \author Ole Vegard Solberg, SINTEF
+ *  \author Geir Arne Tangen, SINTEF
  */
-class ExamplePluginActivator :  public QObject, public ctkPluginActivator
+class org_custusx_registration_EXPORT RegistrationImplService : public RegistrationService
 {
-  Q_OBJECT
-  Q_INTERFACES(ctkPluginActivator)
-
+	//Q_INTERFACES(cx::RegistrationService)
 public:
+	RegistrationImplService();
+	virtual ~RegistrationImplService();
 
-  ExamplePluginActivator();
-  ~ExamplePluginActivator();
+	virtual DataPtr getMovingData();
+	virtual DataPtr getFixedData();
+	//virtual void setMovingData(DataPtr data);
+	//virtual void setFixedData(DataPtr data);
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
-
-private:
-  ctkPluginContext* mContext;
-  ExampleGUIExtenderServicePtr mPlugin;
-  ctkServiceRegistration mRegistration;
+	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
+	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description);
 };
 
-} // namespace cx
+typedef boost::shared_ptr<RegistrationImplService> RegistrationImplServicePtr;
 
-#endif /* CXEXAMPLEPLUGINACTIVATOR_H_ */
+} /* namespace cx */
+
+#endif /* CXREGISTRATIONIMPLSERVICE_H_ */
+

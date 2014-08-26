@@ -5,18 +5,19 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 message(STATUS "===================================== parsing example")
 
 include_directories(
-    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
+    ${CustusX_SOURCE_DIR}/source/resource/core/registration
+    ${CustusX_SOURCE_DIR}/source/resource/core/math
     )
 
 set(PLUGIN_SRCS
-  cxExamplePluginActivator.cpp
-  cxExampleGUIExtenderService.cpp
+  cxRegistrationPluginActivator.cpp
+  cxRegistrationImplService.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-  cxExamplePluginActivator.h
-  cxExampleGUIExtenderService.h
+  cxRegistrationPluginActivator.h
+  cxRegistrationImplService.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -31,8 +32,8 @@ set(PLUGIN_resources
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
-    ${PLUGIN_target_libraries}   
-    cxGUIExtenderService
+    ${PLUGIN_target_libraries}
+    cxResource
     )
 
 ctkMacroBuildPlugin(
