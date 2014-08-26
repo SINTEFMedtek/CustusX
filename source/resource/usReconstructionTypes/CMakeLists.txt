@@ -23,6 +23,5 @@ include_directories(${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES} )
 
 add_library( cxResourceUsReconstructionTypes ${CX_RESOURCE_USRECONSTRUCTIONTYPES_FILES})
 target_link_libraries(cxResourceUsReconstructionTypes cxResource )
-CX_COTIRE_ADD_LIBRARY( cxResourceUsReconstructionTypes "cxResource")
 
 add_subdirectory(testing)

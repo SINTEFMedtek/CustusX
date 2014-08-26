@@ -93,9 +93,6 @@ set(CX_ACQUISITION_LIBRARIES
 add_library( cxPluginAcquisition ${SOURCE_FILES} )
 target_link_libraries( cxPluginAcquisition ${CX_ACQUISITION_LIBRARIES} )
 
-CX_COTIRE_ADD_LIBRARY(cxPluginAcquisition "${CX_ACQUISITION_LIBRARIES}")
-
-
 # add/remove to suit your own needs.
 #add_subdirectory(logic)
 #add_subdirectory(gui)

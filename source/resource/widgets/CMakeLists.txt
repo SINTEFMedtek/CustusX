@@ -55,6 +55,5 @@ set(CX_RESOURCE_WIDGETS_LIBRARIES
 
 add_library( cxResourceWidgets ${CX_RESOURCE_WIDGETS_FILES})
 target_link_libraries(cxResourceWidgets ${CX_RESOURCE_WIDGETS_LIBRARIES} )
-CX_COTIRE_ADD_LIBRARY( cxResourceWidgets "cxResource")
 
 #add_subdirectory(testing)

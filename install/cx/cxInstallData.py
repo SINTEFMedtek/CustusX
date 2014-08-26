@@ -82,7 +82,6 @@ class Common(object):
         self.xcode = False
         self.mBuildSSCExamples = True
         self.mBuildTesting = True
-        self.mUseCotire = False
         self.mGEStreamerUseOpenCL = True
         self.mOSX_DEPLOYMENT_TARGET = "10.6" # Deploy for OSX 10.6 Snow Leopard and later
         self.short_pathnames = False
@@ -90,7 +89,6 @@ class Common(object):
             self.short_pathnames = True
             self.mBuildSSCExamples = False
             self.mBuildTesting = True
-            self.mUseCotire = False
         if (platform.system() == "Darwin"):
             self.mGEStreamerUseOpenCL = False # Turn off OpenCL for Mac as Jenkins tests are run on olevs mac, and OpenCL code don't work there yet
         self.mBuildExAndTest = False

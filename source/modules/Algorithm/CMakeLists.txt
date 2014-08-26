@@ -114,6 +114,5 @@ set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui c
 # create the target
 add_library( cxPluginAlgorithm ${SOURCE_FILES} )
 target_link_libraries( cxPluginAlgorithm ${CX_ALGORITHM_LIBRARIES})
-CX_COTIRE_ADD_LIBRARY(cxPluginAlgorithm "${CX_ALGORITHM_LIBRARIES}")
 
 add_subdirectory(testing)

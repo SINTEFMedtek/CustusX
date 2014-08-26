@@ -132,7 +132,6 @@ set(CX_GUI_LIBRARIES cxLogicManager cxStateService cxResourceWidgets)
     
 add_library( cxGui ${cxGui_SRCS} )
 target_link_libraries( cxGui ${CX_GUI_LIBRARIES} )
-CX_COTIRE_ADD_LIBRARY(cxGui "${CX_GUI_LIBRARIES}")
 
 add_subdirectory(testing)
 
