@@ -42,6 +42,7 @@ class GitRepository(object):
         self.modified_files = False
         self.deleted_files = False
         self.untracked_files = False
+        self.renamed_files = False
         
     def get_name(self):
         return self.name
@@ -64,6 +65,8 @@ class GitRepository(object):
             self.deleted_files = True
         if 'Untracked files:' in return_value.stdout:
             self.untracked_files = True
+        if 'renamed:' in return_value.stdout:
+            self.renamed_files = True
         
 
 #################################################
@@ -74,11 +77,15 @@ class GitRepository(object):
 #################################################
 class TextColor:
     INFO = '\033[95m' #light magenta
+    
     CLEAN = '\033[0m' #white
     DIRTY = '\033[93m' #light yellow
+    
     MODIFIED = '\033[94m' #light blue
     DELETED = '\033[91m' #light red
     UNTRACKED = '\033[96m' #light cyan
+    RENAMED = '\033[92m' #light green
+    
     ENDC = '\033[0m' #white
 
 #################################################
@@ -118,6 +125,8 @@ class Reporter(object):
             text += TextColor.DELTED + ' deleted ' + TextColor.ENDC
         if repo.untracked_files:
             text += TextColor.UNTRACKED + ' untracked ' + TextColor.ENDC
+        if repo.renamed_files:
+            text += TextColor.RENAMED + ' renamed ' + TextColor.ENDC
         text += ']' 
         text += TextColor.ENDC
         
