@@ -50,7 +50,7 @@ namespace cx
  */
 class org_custusx_registration_EXPORT RegistrationImplService : public RegistrationService
 {
-	//Q_INTERFACES(cx::RegistrationService)
+	Q_INTERFACES(cx::RegistrationService)
 public:
 	RegistrationImplService();
 	virtual ~RegistrationImplService();
