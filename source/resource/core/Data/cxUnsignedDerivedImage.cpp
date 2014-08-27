@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxReporter.h"
 #include "cxLogger.h"
+#include "cxCoordinateSystemHelpers.h"
 
 typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
 
@@ -167,6 +168,11 @@ vtkImageDataPtr UnsignedDerivedImage::convertImage()
       report(QString("Converting image %1 from %2 to %3").arg(this->getName()).arg(input->GetScalarTypeAsString()).arg(cast->GetOutput()->GetScalarTypeAsString()));
     retval = cast->GetOutput();
     return retval;
+}
+
+CoordinateSystem UnsignedDerivedImage::getCoordinateSystem()
+{
+	CALL_IN_WEAK_PTR(mBase, getCoordinateSystem, CoordinateSystem(csCOUNT));
 }
 
 }

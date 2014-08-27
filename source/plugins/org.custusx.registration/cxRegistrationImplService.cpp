@@ -31,6 +31,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxRegistrationImplService.h"
+#include "cxData.h"
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -43,14 +46,31 @@ RegistrationImplService::~RegistrationImplService()
 {
 }
 
+void RegistrationImplService::setMovingData(DataPtr movingData)
+{
+  mMovingData = movingData;
+  emit movingDataChanged( (mMovingData) ? qstring_cast(mMovingData->getUid()) : "");
+}
+
+void RegistrationImplService::setFixedData(DataPtr fixedData)
+{
+  if(mFixedData == fixedData)
+	return;
+
+  mFixedData = fixedData;
+  if (mFixedData)
+	report("Registration fixed data set to "+mFixedData->getUid());
+  emit fixedDataChanged( (mFixedData) ? qstring_cast(mFixedData->getUid()) : "");
+}
+
 DataPtr RegistrationImplService::getMovingData()
 {
-	return DataPtr();
+  return mMovingData;
 }
 
 DataPtr RegistrationImplService::getFixedData()
 {
-	return DataPtr();
+  return mFixedData;
 }
 
 void RegistrationImplService::applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)

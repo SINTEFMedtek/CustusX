@@ -103,31 +103,36 @@ void RegistrationManager::duringLoadPatientSlot()
   this->parseXml(registrationManager);
 }
 
-void RegistrationManager::setFixedData(DataPtr fixedData)
-{
-  if(mFixedData == fixedData)
-    return;
-
-  mFixedData = fixedData;
-  if (mFixedData)
-    report("Registration fixed data set to "+mFixedData->getUid());
-  emit fixedDataChanged( (mFixedData) ? qstring_cast(mFixedData->getUid()) : "");
-}
-
 DataPtr RegistrationManager::getFixedData()
 {
-  return mFixedData;
-}
-
-void RegistrationManager::setMovingData(DataPtr movingData)
-{
-  mMovingData = movingData;
-  emit movingDataChanged( (mMovingData) ? qstring_cast(mMovingData->getUid()) : "");
+	if(mRegistrationService)
+		return mRegistrationService->getFixedData();
+	else
+		return DataPtr();
 }
 
 DataPtr RegistrationManager::getMovingData()
 {
-  return mMovingData;
+	if(mRegistrationService)
+		return mRegistrationService->getMovingData();
+	else
+		return DataPtr();
+}
+
+void RegistrationManager::setFixedData(DataPtr fixedData)
+{
+	if(mRegistrationService)
+		return mRegistrationService->setFixedData(fixedData);
+	else
+		reportError("Got no RegistrationService. Can't set fixedData");
+}
+
+void RegistrationManager::setMovingData(DataPtr movingData)
+{
+	if(mRegistrationService)
+		return mRegistrationService->setMovingData(movingData);
+	else
+		reportError("Got no RegistrationService. Can't set movingData");
 }
 
 
@@ -287,10 +292,7 @@ Transform3D RegistrationManager::performLandmarkRegistration(vtkPointsPtr source
 
 void RegistrationManager::doPatientRegistration()
 {
-  if(!mFixedData)
-    return;
-
-  DataPtr fixedImage = mFixedData;
+  DataPtr fixedImage = this->getFixedData();
 
   if(!fixedImage)
   {
@@ -335,11 +337,10 @@ void RegistrationManager::writePreLandmarkRegistration(QString name, LandmarkMap
 	report(msg);
 }
 
-
 void RegistrationManager::doImageRegistration(bool translationOnly)
 {
   //check that the fixed data is set
-  DataPtr fixedImage = mFixedData;
+  DataPtr fixedImage = this->getFixedData();
   if(!fixedImage)
   {
 	reportError("The fixed data is not set, cannot do landmark image registration!");
@@ -347,7 +348,7 @@ void RegistrationManager::doImageRegistration(bool translationOnly)
   }
 
   //check that the moving data is set
-  DataPtr movingImage = mMovingData;
+  DataPtr movingImage = this->getMovingData();
   if(!movingImage)
   {
 	reportError("The moving data is not set, cannot do landmark image registration!");
@@ -439,10 +440,7 @@ void RegistrationManager::doFastRegistration_Orientation(const Transform3D& tMtm
 
 void RegistrationManager::doFastRegistration_Translation()
 {
-  if(!mFixedData)
-    return;
-
-  DataPtr fixedImage = mFixedData;
+  DataPtr fixedImage = this->getFixedData();
   if(!fixedImage)
   {
 	reportError("The fixed data is not set, cannot do image registration!");
@@ -548,9 +546,11 @@ void RegistrationManager::applyPatientOrientation(const Transform3D& tMtm)
 void RegistrationManager::applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
 {
 	RegistrationTransform regTrans(delta_pre_rMd, QDateTime::currentDateTime(), description);
-	regTrans.mFixed = mFixedData ? mFixedData->getUid() : "";
-	regTrans.mMoving = mMovingData ? mMovingData->getUid() : "";
-	this->updateRegistration(mLastRegistrationTime, regTrans, mMovingData, regTrans.mFixed);
+	DataPtr fixedData = this->getFixedData();
+	regTrans.mFixed = fixedData ? fixedData->getUid() : "";
+	DataPtr movingData = this->getMovingData();
+	regTrans.mMoving = movingData ? movingData->getUid() : "";
+	this->updateRegistration(mLastRegistrationTime, regTrans, movingData, regTrans.mFixed);
 	mLastRegistrationTime = regTrans.mTimestamp;
 	reportSuccess(QString("Image registration [%1] has been performed on %2").arg(description).arg(regTrans.mMoving) );
 	patientService()->getPatientData()->autoSave();
@@ -565,7 +565,8 @@ void RegistrationManager::applyImage2ImageRegistration(Transform3D delta_pre_rMd
 void RegistrationManager::applyPatientRegistration(Transform3D rMpr_new, QString description)
 {
 	RegistrationTransform regTrans(rMpr_new, QDateTime::currentDateTime(), description);
-	regTrans.mFixed = mFixedData ? mFixedData->getUid() : "";
+	DataPtr fixedData = this->getFixedData();
+	regTrans.mFixed = fixedData ? fixedData->getUid() : "";
 	dataManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
 	mLastRegistrationTime = regTrans.mTimestamp;
 	reportSuccess(QString("Patient registration [%1] has been performed.").arg(description));
@@ -579,16 +580,18 @@ void RegistrationManager::addXml(QDomNode& parentNode)
   parentNode.appendChild(base);
 
   QDomElement fixedDataNode = doc.createElement("fixedDataUid");
-  if(mFixedData)
+  DataPtr fixedData = this->getFixedData();
+  if(fixedData)
   {
-    fixedDataNode.appendChild(doc.createTextNode(mFixedData->getUid()));
+	fixedDataNode.appendChild(doc.createTextNode(fixedData->getUid()));
   }
   base.appendChild(fixedDataNode);
 
   QDomElement movingDataNode = doc.createElement("movingDataUid");
-  if(mMovingData)
+  DataPtr movingData = this->getMovingData();
+  if(movingData)
   {
-    movingDataNode.appendChild(doc.createTextNode(mMovingData->getUid()));
+	movingDataNode.appendChild(doc.createTextNode(movingData->getUid()));
   }
   base.appendChild(movingDataNode);
 }
@@ -596,16 +599,16 @@ void RegistrationManager::addXml(QDomNode& parentNode)
 void RegistrationManager::parseXml(QDomNode& dataNode)
 {
   QString fixedData = dataNode.namedItem("fixedDataUid").toElement().text();
-  this->setFixedData(dataManager()->getData(fixedData));
+  mRegistrationService->setFixedData(dataManager()->getData(fixedData));
 
   QString movingData = dataNode.namedItem("movingDataUid").toElement().text();
-  this->setMovingData(dataManager()->getData(movingData));
+  mRegistrationService->setMovingData(dataManager()->getData(movingData));
 }
 
 void RegistrationManager::clearSlot()
 {
   mLastRegistrationTime = QDateTime();
-  this->setFixedData(DataPtr());
+  mRegistrationService->setFixedData(DataPtr());
 }
 
 }//namespace cx

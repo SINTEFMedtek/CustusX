@@ -43,13 +43,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "vtkForwardDeclarations.h"
 #include "cxTransform3D.h"
-#include "cxCoordinateSystemHelpers.h"
+#include "cxForwardDeclarations.h"
 
 #include <QDateTime>
 class QDomNode;
 
 namespace cx
 {
+struct CoordinateSystem;
 typedef boost::weak_ptr<class Rep> RepWeakPtr;
 typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
@@ -114,7 +115,7 @@ public:
 
 	virtual bool load(QString path) = 0;
 
-	virtual CoordinateSystem getCoordinateSystem() { return CoordinateSystem(csDATA, this->getUid()); }
+	virtual CoordinateSystem getCoordinateSystem();
 
 signals:
 	void transformChanged(); ///< emitted when transform is changed

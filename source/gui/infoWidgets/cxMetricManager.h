@@ -35,10 +35,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxForwardDeclarations.h"
 #include "cxDataMetric.h"
+#include "cxDefinitions.h"
+#include "cxCoordinateSystemHelpers.h"
 
 namespace cx
 {
-
 typedef boost::shared_ptr<class MetricReferenceArgumentList> MetricReferenceArgumentListPtr;
 typedef boost::shared_ptr<class MetricManager> MetricManagerPtr;
 typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;

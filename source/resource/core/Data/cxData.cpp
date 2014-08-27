@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxTime.h"
 #include "cxLandmark.h"
+#include "cxCoordinateSystemHelpers.h"
 
 namespace cx
 {
@@ -210,6 +211,12 @@ void Data::setAcquisitionTime(QDateTime time)
 LandmarksPtr Data::getLandmarks()
 {
 	return mLandmarks;
+}
+
+
+CoordinateSystem Data::getCoordinateSystem()
+{
+	return CoordinateSystem(csDATA, this->getUid());
 }
 
 } // namespace cx

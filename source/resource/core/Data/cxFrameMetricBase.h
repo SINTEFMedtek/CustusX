@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXFRAMEMETRICBASE_H_
 
 #include "cxDataMetric.h"
+#include "cxCoordinateSystemHelpers.h"
 
 namespace cx {
 

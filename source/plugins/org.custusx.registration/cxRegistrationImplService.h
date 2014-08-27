@@ -55,13 +55,17 @@ public:
 	RegistrationImplService();
 	virtual ~RegistrationImplService();
 
+	virtual void setMovingData(DataPtr data);
+	virtual void setFixedData(DataPtr data);
 	virtual DataPtr getMovingData();
 	virtual DataPtr getFixedData();
-	//virtual void setMovingData(DataPtr data);
-	//virtual void setFixedData(DataPtr data);
 
 	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
 	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description);
+
+private:
+	DataPtr mFixedData; ///< the data that shouldn't update its matrices during a registrations
+	DataPtr mMovingData; ///< the data that should update its matrices during a registration
 };
 
 typedef boost::shared_ptr<RegistrationImplService> RegistrationImplServicePtr;

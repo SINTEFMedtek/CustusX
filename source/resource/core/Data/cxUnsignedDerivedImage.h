@@ -46,6 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+struct CoordinateSystem;
+
 /** \brief Class that holds an unsigned version of a base Image
  *
  * This class provides read-only access to the base image only.
@@ -75,7 +77,7 @@ public:
     virtual QString getSpace()                       { CALL_IN_WEAK_PTR(mBase, getSpace, QString()); }
     virtual QString getParentSpace()                 { CALL_IN_WEAK_PTR(mBase, getParentSpace, QString()); }
     virtual DoubleBoundingBox3D boundingBox() const  { CALL_IN_WEAK_PTR(mBase, boundingBox, DoubleBoundingBox3D()); }
-    virtual CoordinateSystem getCoordinateSystem()   { CALL_IN_WEAK_PTR(mBase, getCoordinateSystem, CoordinateSystem(csCOUNT)); }
+	virtual CoordinateSystem getCoordinateSystem();
 
     virtual QString getModality() const              { CALL_IN_WEAK_PTR(mBase, getModality, QString()); }
     virtual QString getImageType() const             { CALL_IN_WEAK_PTR(mBase, getImageType, QString()); }

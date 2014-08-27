@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxSpaceProvider.h"
 #include "cxSpaceListener.h"
+#include "cxCoordinateSystemHelpers.h"
 
 namespace cx
 {

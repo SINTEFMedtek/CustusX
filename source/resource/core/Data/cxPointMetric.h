@@ -36,9 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDataMetric.h"
 #include "cxOptionalValue.h"
+#include "cxCoordinateSystemHelpers.h"
 
 namespace cx
 {
+struct CoordinateSystem;
+
 /**
  * \file
  * \addtogroup cx_resource_core_data

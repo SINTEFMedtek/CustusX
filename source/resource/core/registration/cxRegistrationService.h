@@ -63,10 +63,10 @@ class RegistrationService : public QObject
 public:
 	virtual ~RegistrationService() {}
 
+	virtual void setMovingData(DataPtr data) = 0;
+	virtual void setFixedData(DataPtr data) = 0;
 	virtual DataPtr getMovingData() = 0;
 	virtual DataPtr getFixedData() = 0;
-	//virtual void setMovingData(DataPtr data);
-	//virtual void setFixedData(DataPtr data);
 
 	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description) = 0;
 	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description) = 0;

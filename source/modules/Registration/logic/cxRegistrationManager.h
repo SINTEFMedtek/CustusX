@@ -78,11 +78,11 @@ public:
 
   void restart();
 
-  void setFixedData(DataPtr fixedData);
+  //make these 4 private?
   DataPtr getFixedData();
-
-  void setMovingData(DataPtr movingData);
   DataPtr getMovingData();
+  void setFixedData(DataPtr fixedData);
+  void setMovingData(DataPtr movingData);
 
   void doPatientRegistration(); ///< registrates the fixed image to the patient
   void doImageRegistration(bool translationOnly); ///< registrates the image to the fixed image
@@ -100,9 +100,9 @@ private slots:
 	void duringSavePatientSlot();
 	void duringLoadPatientSlot();
 
-signals:
-  void fixedDataChanged(QString uid);
-  void movingDataChanged(QString uid);
+//signals:
+//  void fixedDataChanged(QString uid);
+//  void movingDataChanged(QString uid);
 
 protected:
   //Interface for saving/loading
@@ -117,8 +117,8 @@ protected:
   void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame);
   void writePreLandmarkRegistration(QString name, LandmarkMap landmarks);
 
-  DataPtr mFixedData; ///< the data that shouldn't update its matrices during a registrations
-  DataPtr mMovingData; ///< the data that should update its matrices during a registration
+//  DataPtr mFixedData; ///< the data that shouldn't update its matrices during a registrations
+//  DataPtr mMovingData; ///< the data that should update its matrices during a registration
 
   QDateTime mLastRegistrationTime; ///< last timestamp for registration during this session. All registrations in one session results in only one reg transform.
 
