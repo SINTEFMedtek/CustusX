@@ -43,9 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-RegistrationPlugin::RegistrationPlugin(AcquisitionDataPtr acquisitionData)
+RegistrationPlugin::RegistrationPlugin(AcquisitionDataPtr acquisitionData, ctkPluginContext* pluginContext)
 {
-	mRegistrationManager.reset(new RegistrationManager(acquisitionData));
+	mRegistrationManager.reset(new RegistrationManager(acquisitionData, pluginContext));
 }
 
 std::vector<GUIExtenderService::CategorizedWidget> RegistrationPlugin::createWidgets() const

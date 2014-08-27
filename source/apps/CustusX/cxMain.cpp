@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxLogicManager.h"
 #include "cxApplication.h"
+#include "cxPluginFramework.h"
 
 #ifdef WIN32
 int __stdcall WinMain(int argc, char *argv[])
@@ -71,7 +72,8 @@ int main(int argc, char *argv[])
 	plugins.push_back(   calibrationPlugin);
 	cx::AlgorithmPluginPtr algorithmPlugin(new cx::AlgorithmPlugin());
 	plugins.push_back(   algorithmPlugin);
-	cx::RegistrationPluginPtr registrationPlugin(new cx::RegistrationPlugin(acquisitionPlugin->getAcquisitionData()));
+	cx::RegistrationPluginPtr registrationPlugin(new cx::RegistrationPlugin(acquisitionPlugin->getAcquisitionData(),
+																			cx::LogicManager::getInstance()->getPluginFramework()->getPluginContext()));
 	plugins.push_back(   registrationPlugin);
 
 

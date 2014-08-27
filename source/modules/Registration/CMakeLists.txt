@@ -132,6 +132,7 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/gui/dataWidgets
 
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
+    ${CustusX_SOURCE_DIR}/source/resource/core/registration
     )
 
 

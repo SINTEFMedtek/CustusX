@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegistrationManager.h"
 
+#include <boost/bind.hpp>
 #include <QtCore>
 #include <QDomElement>
 #include "vtkMath.h"
@@ -49,24 +50,45 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vesselReg/SeansVesselReg.hxx"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
+#include "cxPluginFramework.h"
 
 namespace cx
 {
 
 
-RegistrationManager::RegistrationManager(AcquisitionDataPtr acquisitionData) :
-		mAcquisitionData(acquisitionData)
+RegistrationManager::RegistrationManager(AcquisitionDataPtr acquisitionData, ctkPluginContext* pluginContext) :
+		mAcquisitionData(acquisitionData),
+		mPluginContext(pluginContext)
 {
 	this->restart();
-  connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
-  connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
-  connect(patientService()->getPatientData().get(), SIGNAL(cleared()), this, SLOT(clearSlot()));
+	connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
+	connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
+	connect(patientService()->getPatientData().get(), SIGNAL(cleared()), this, SLOT(clearSlot()));
+
+//	PluginFrameworkManagerPtr pluginFramework = LogicManager::getInstance()->getPluginFramework();
+	mServiceListener.reset(new ServiceTrackerListener<RegistrationService>(
+							   mPluginContext,
+							   boost::bind(&RegistrationManager::onServiceAdded, this, _1),
+							   boost::function<void (RegistrationService*)>(),
+							   boost::bind(&RegistrationManager::onServiceRemoved, this, _1)
+							   ));
+	mServiceListener->open();
 }
 
 void RegistrationManager::restart()
 {
 //  mPatientRegistrationOffset = Transform3D::Identity();
   mLastRegistrationTime = QDateTime::currentDateTime();
+}
+
+void RegistrationManager::onServiceAdded(RegistrationService* service)
+{
+	mRegistrationService.reset(service);
+}
+
+void RegistrationManager::onServiceRemoved(RegistrationService *service)
+{
+	mRegistrationService.reset();
 }
 
 void RegistrationManager::duringSavePatientSlot()
