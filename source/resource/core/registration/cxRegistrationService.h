@@ -61,7 +61,7 @@ class RegistrationService : public QObject
 {
 	Q_OBJECT
 public:
-	virtual ~RegistrationService() = 0;
+	virtual ~RegistrationService() {}
 
 	virtual DataPtr getMovingData() = 0;
 	virtual DataPtr getFixedData() = 0;
@@ -77,5 +77,7 @@ signals:
 };
 
 } //namespace cx
+Q_DECLARE_INTERFACE(cx::RegistrationService, RegistrationService_iid)
+
 
 #endif // CXREGISTRATIONSERVICE_H
