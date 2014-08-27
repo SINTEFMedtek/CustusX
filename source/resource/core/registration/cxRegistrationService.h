@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/shared_ptr.hpp"
 #include "cxTransform3D.h"
 
+class QDateTime;
+
 namespace cx
 {
 typedef boost::shared_ptr<class Data> DataPtr;
@@ -46,6 +48,7 @@ typedef boost::shared_ptr<class Data> DataPtr;
 
 namespace cx
 {
+class RegistrationTransform;
 typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
 
 /** \brief Registration services
@@ -70,6 +73,11 @@ public:
 
 	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description) = 0;
 	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description) = 0;
+
+	virtual QDateTime getLastRegistrationTime() = 0;
+	virtual void setLastRegistrationTime(QDateTime time) = 0;
+
+	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame) = 0;
 
 signals:
 	void fixedDataChanged(QString uid);

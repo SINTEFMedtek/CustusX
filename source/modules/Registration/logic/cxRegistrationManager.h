@@ -76,9 +76,10 @@ public:
   typedef std::pair<QString, bool> StringBoolPair; ///< name and if the point is active or not
   typedef std::map<int, StringBoolPair> NameListType; ///< landmarkindex, name and if point is active or not
 
+  //TODO: Remove
   void restart();
 
-  //make these 4 private?
+  //TODO: make these 4 private
   DataPtr getFixedData();
   DataPtr getMovingData();
   void setFixedData(DataPtr fixedData);
@@ -120,7 +121,7 @@ protected:
 //  DataPtr mFixedData; ///< the data that shouldn't update its matrices during a registrations
 //  DataPtr mMovingData; ///< the data that should update its matrices during a registration
 
-  QDateTime mLastRegistrationTime; ///< last timestamp for registration during this session. All registrations in one session results in only one reg transform.
+//  QDateTime mLastRegistrationTime; ///< last timestamp for registration during this session. All registrations in one session results in only one reg transform.
 
 	AcquisitionDataPtr mAcquisitionData;
 

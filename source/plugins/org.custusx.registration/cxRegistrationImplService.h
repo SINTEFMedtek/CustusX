@@ -35,9 +35,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegistrationService.h"
 #include "org_custusx_registration_Export.h"
+#include "qdatetime.h"
 
 namespace cx
 {
+class RegistrationTransform;
 
 /**
  * Implementation of Registration service.
@@ -63,9 +65,17 @@ public:
 	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
 	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description);
 
+	virtual QDateTime getLastRegistrationTime();
+	virtual void setLastRegistrationTime(QDateTime time);
+
+	//TODO: Make private
+	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame);
+
 private:
 	DataPtr mFixedData; ///< the data that shouldn't update its matrices during a registrations
 	DataPtr mMovingData; ///< the data that should update its matrices during a registration
+
+	QDateTime mLastRegistrationTime; ///< last timestamp for registration during this session. All registrations in one session results in only one reg transform.
 };
 
 typedef boost::shared_ptr<RegistrationImplService> RegistrationImplServicePtr;
