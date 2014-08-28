@@ -30,65 +30,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXREGISTRATIONSERVICE_H
-#define CXREGISTRATIONSERVICE_H
-
-#include <QObject>
-#include "boost/shared_ptr.hpp"
-#include "cxTransform3D.h"
-
-class QDateTime;
+#include "cxRegistrationService.h"
+#include "cxRegistrationServiceNull.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class Data> DataPtr;
+RegistrationServicePtr RegistrationService::getNullObject()
+{
+	static RegistrationServicePtr mNull;
+	if (!mNull)
+		mNull.reset(new RegistrationServiceNull);
+	return mNull;
 }
-
-#define RegistrationService_iid "cx::RegistrationService"
-
-namespace cx
-{
-class RegistrationTransform;
-typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
-
-/** \brief Registration services
- *
- * This service replaces the old RegistrationManager class.
- *
- *  \ingroup cx_resource_core_registration
- *  \date 2014-08-26
- *  \author Ole Vegard Solberg, SINTEF
- *  \author Geir Arne Tangen, SINTEF
- */
-class RegistrationService : public QObject
-{
-	Q_OBJECT
-public:
-	virtual ~RegistrationService() {}
-
-	virtual void setMovingData(DataPtr data) = 0;
-	virtual void setFixedData(DataPtr data) = 0;
-	virtual DataPtr getMovingData() = 0;
-	virtual DataPtr getFixedData() = 0;
-
-	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description) = 0;
-	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description) = 0;
-
-	virtual QDateTime getLastRegistrationTime() = 0;
-	virtual void setLastRegistrationTime(QDateTime time) = 0;
-
-	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame) = 0;
-
-	virtual bool isNull() = 0;
-	static RegistrationServicePtr getNullObject();
-
-signals:
-	void fixedDataChanged(QString uid);
-	void movingDataChanged(QString uid);
-};
-
-} //namespace cx
-Q_DECLARE_INTERFACE(cx::RegistrationService, RegistrationService_iid)
-
-
-#endif // CXREGISTRATIONSERVICE_H
+}

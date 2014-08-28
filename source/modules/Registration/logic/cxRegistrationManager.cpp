@@ -73,6 +73,8 @@ RegistrationManager::RegistrationManager(AcquisitionDataPtr acquisitionData, ctk
 							   boost::bind(&RegistrationManager::onServiceRemoved, this, _1)
 							   ));
 	mServiceListener->open();
+
+	mRegistrationService.reset(RegistrationService::getNullObject().get());
 }
 
 void RegistrationManager::restart()
@@ -83,18 +85,21 @@ void RegistrationManager::restart()
 void RegistrationManager::onServiceAdded(RegistrationService* service)
 {
 	mRegistrationService.reset(service);
-	connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
-	connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+//	if(!mRegistrationService->isNull())
+//	{
+		connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
+		connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+//	}
 }
 
 void RegistrationManager::onServiceRemoved(RegistrationService *service)
 {
-	if(mRegistrationService)
-	{
+//	if(!mRegistrationService->isNull())
+//	{
 		disconnect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
 		disconnect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
-	}
-	mRegistrationService.reset();
+//	}
+	mRegistrationService.reset(RegistrationService::getNullObject().get());
 }
 
 void RegistrationManager::duringSavePatientSlot()
@@ -111,34 +116,23 @@ void RegistrationManager::duringLoadPatientSlot()
 
 DataPtr RegistrationManager::getFixedData()
 {
-	if(mRegistrationService)
-		return mRegistrationService->getFixedData();
-	else
-		return DataPtr();
+	return mRegistrationService->getFixedData();
 }
 
 DataPtr RegistrationManager::getMovingData()
 {
-	if(mRegistrationService)
-		return mRegistrationService->getMovingData();
-	else
-		return DataPtr();
+	return mRegistrationService->getMovingData();
+
 }
 
 void RegistrationManager::setFixedData(DataPtr fixedData)
 {
-	if(mRegistrationService)
-		return mRegistrationService->setFixedData(fixedData);
-	else
-		reportError("Got no RegistrationService. Can't set fixedData");
+	return mRegistrationService->setFixedData(fixedData);
 }
 
 void RegistrationManager::setMovingData(DataPtr movingData)
 {
-	if(mRegistrationService)
-		return mRegistrationService->setMovingData(movingData);
-	else
-		reportError("Got no RegistrationService. Can't set movingData");
+	return mRegistrationService->setMovingData(movingData);
 }
 
 
@@ -168,8 +162,7 @@ std::vector<QString> RegistrationManager::getUsableLandmarks(const LandmarkMap& 
  */
 void RegistrationManager::updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrameUid)
 {
-	if(mRegistrationService)
-		mRegistrationService->updateRegistration(oldTime, deltaTransform, data, masterFrameUid);
+	mRegistrationService->updateRegistration(oldTime, deltaTransform, data, masterFrameUid);
 ////	std::cout << "==== RegistrationManager::updateRegistration" << std::endl;
 //	FrameForest forest(dataService());
 //  QDomNode target = forest.getNode(qstring_cast(data->getUid()));
@@ -553,7 +546,6 @@ void RegistrationManager::applyPatientOrientation(const Transform3D& tMtm)
  */
 void RegistrationManager::applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
 {
-	if (mRegistrationService)
 	mRegistrationService->applyImage2ImageRegistration(delta_pre_rMd, description);
 //	RegistrationTransform regTrans(delta_pre_rMd, QDateTime::currentDateTime(), description);
 //	DataPtr fixedData = this->getFixedData();
@@ -574,8 +566,7 @@ void RegistrationManager::applyImage2ImageRegistration(Transform3D delta_pre_rMd
  */
 void RegistrationManager::applyPatientRegistration(Transform3D rMpr_new, QString description)
 {
-	if (mRegistrationService)
-		mRegistrationService->applyPatientRegistration(rMpr_new, description);
+	mRegistrationService->applyPatientRegistration(rMpr_new, description);
 //	RegistrationTransform regTrans(rMpr_new, QDateTime::currentDateTime(), description);
 //	DataPtr fixedData = this->getFixedData();
 //	regTrans.mFixed = fixedData ? fixedData->getUid() : "";

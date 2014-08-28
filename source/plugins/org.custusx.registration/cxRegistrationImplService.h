@@ -68,6 +68,8 @@ public:
 	virtual QDateTime getLastRegistrationTime();
 	virtual void setLastRegistrationTime(QDateTime time);
 
+	virtual bool isNull();
+
 	//TODO: Make private
 	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame);
 

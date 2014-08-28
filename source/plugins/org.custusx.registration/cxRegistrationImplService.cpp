@@ -177,4 +177,9 @@ void RegistrationImplService::updateRegistration(QDateTime oldTime, Registration
   }
 }
 
+bool RegistrationImplService::isNull()
+{
+	return false;
+}
+
 } /* namespace cx */
