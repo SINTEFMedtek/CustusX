@@ -30,8 +30,24 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
+#include "cxRegistrationServiceNull.h"
+#include "cxRegistrationImplService.h"
 
-TEST_CASE("RegistrationPlugin: Check nothing", "[unit][plugins][org.custusx.registration][hide]")
+TEST_CASE("RegistrationPlugin: Check RegistrationServiceNull", "[unit][plugins][org.custusx.registration]")
 {
-	CHECK(true);
+	cx::RegistrationServicePtr service = cx::RegistrationService::getNullObject();
+	REQUIRE(service);
+	REQUIRE_FALSE(service->getFixedData());
+	REQUIRE_FALSE(service->getMovingData());
+	REQUIRE(service->isNull());
+}
+
+TEST_CASE("RegistrationPlugin: Check empty RegistrationImplService", "[unit][plugins][org.custusx.registration]")
+{
+	cx::RegistrationServicePtr service;
+	service.reset(new cx::RegistrationImplService);
+	REQUIRE(service);
+	REQUIRE_FALSE(service->getFixedData());
+	REQUIRE_FALSE(service->getMovingData());
+	REQUIRE_FALSE(service->isNull());
 }
