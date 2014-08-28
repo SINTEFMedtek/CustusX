@@ -83,10 +83,17 @@ void RegistrationManager::restart()
 void RegistrationManager::onServiceAdded(RegistrationService* service)
 {
 	mRegistrationService.reset(service);
+	connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
+	connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
 }
 
 void RegistrationManager::onServiceRemoved(RegistrationService *service)
 {
+	if(mRegistrationService)
+	{
+		disconnect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
+		disconnect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+	}
 	mRegistrationService.reset();
 }
 

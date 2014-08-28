@@ -101,9 +101,9 @@ private slots:
 	void duringSavePatientSlot();
 	void duringLoadPatientSlot();
 
-//signals:
-//  void fixedDataChanged(QString uid);
-//  void movingDataChanged(QString uid);
+signals:
+  void fixedDataChanged(QString uid);
+  void movingDataChanged(QString uid);
 
 protected:
   //Interface for saving/loading
