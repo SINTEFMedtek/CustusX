@@ -70,14 +70,12 @@ public:
 
 	virtual bool isNull();
 
-	//TODO: Make private
-	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame);
-
 private:
 	DataPtr mFixedData; ///< the data that shouldn't update its matrices during a registrations
 	DataPtr mMovingData; ///< the data that should update its matrices during a registration
 
 	QDateTime mLastRegistrationTime; ///< last timestamp for registration during this session. All registrations in one session results in only one reg transform.
+	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame);
 };
 
 typedef boost::shared_ptr<RegistrationImplService> RegistrationImplServicePtr;

@@ -77,8 +77,6 @@ public:
 	virtual QDateTime getLastRegistrationTime() = 0;
 	virtual void setLastRegistrationTime(QDateTime time) = 0;
 
-	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame) = 0;
-
 	virtual bool isNull() = 0;
 	static RegistrationServicePtr getNullObject();
 
