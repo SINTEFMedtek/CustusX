@@ -58,7 +58,7 @@ void RegistrationPluginActivator::start(ctkPluginContext* context)
 	std::cout << "Started RegistrationPluginActivator" << std::endl;
 	this->mContext = context;
 
-	mPlugin.reset(new RegistrationImplService);
+	mPlugin.reset(new RegistrationImplService(context));
 	std::cout << "created Registration service" << std::endl;
 	try
 	{
