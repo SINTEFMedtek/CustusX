@@ -21,11 +21,15 @@
 #
 ###############################################################################
 macro(cx_initialize_ISB_GE)
-    find_package( GEStreamer REQUIRED)
-
-    if(GEStreamer_FOUND)
-        include(${GEStreamer_USE_FILE})
-    endif(GEStreamer_FOUND)
+    if(CX_WINDOWS)
+        #not working on windows atm
+    else(CX_WINDOWS)
+        find_package( GEStreamer REQUIRED)
+    
+        if(GEStreamer_FOUND)
+            include(${GEStreamer_USE_FILE})
+        endif(GEStreamer_FOUND)
+    endif(CX_WINDOWS)
     
 endmacro(cx_initialize_ISB_GE)
 ###############################################################################

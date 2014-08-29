@@ -40,6 +40,7 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class RegistrationImplService> RegistrationImplServicePtr;
+typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
 
 /**
  * Activator for the registration plugin
@@ -65,7 +66,7 @@ public:
 
 private:
   ctkPluginContext* mContext;
-  RegistrationImplServicePtr mPlugin;
+	RegistrationServicePtr mPlugin;
   ctkServiceRegistration mRegistration;
 };
 

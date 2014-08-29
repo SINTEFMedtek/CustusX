@@ -32,12 +32,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPatientModelImplService.h"
 
+#include <QDateTime>
 #include "cxData.h"
 #include "cxReporter.h"
 #include "cxLogicManager.h"
 #include "cxDataManager.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
+#include "cxRegistrationTransform.h"
 
 namespace cx
 {
@@ -59,5 +61,10 @@ void PatientModelImplService::insertData(DataPtr data)
 	lm->getDataService()->saveData(data, outputBasePath);
 }
 
+void PatientModelImplService::updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform)
+{
+	dataService()->get_rMpr_History()->updateRegistration(oldTime, newTransform);
+	patientService()->getPatientData()->autoSave();
+}
 
 } /* namespace cx */

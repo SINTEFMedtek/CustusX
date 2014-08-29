@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include "boost/shared_ptr.hpp"
+class QDateTime;
 
 namespace cx
 {
@@ -45,6 +46,7 @@ typedef boost::shared_ptr<class Data> DataPtr;
 
 namespace cx
 {
+class RegistrationTransform;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 
 /** \brief The virtual patient
@@ -72,6 +74,7 @@ public:
 	virtual ~PatientModelService();
 
 	virtual void insertData(DataPtr data) = 0;
+	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform) = 0;
 };
 
 } // namespace cx

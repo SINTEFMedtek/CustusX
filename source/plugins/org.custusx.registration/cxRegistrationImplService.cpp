@@ -31,12 +31,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxRegistrationImplService.h"
+
+#include "ctkPluginContext.h"
+#include "ctkServiceTracker.h"
+
 #include "cxData.h"
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
-
 #include "cxRegistrationTransform.h"
 #include "cxFrameForest.h"
+#include "cxPatientModelService.h"
 
  //TODO: Remove these by moving functionality to PatientModelService
 #include "cxLogicManager.h"
@@ -49,7 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-RegistrationImplService::RegistrationImplService()
+RegistrationImplService::RegistrationImplService(ctkPluginContext *context) :
+	mContext(context)
 {
 	mLastRegistrationTime = QDateTime::currentDateTime();
 }
@@ -109,14 +114,23 @@ void RegistrationImplService::applyImage2ImageRegistration(Transform3D delta_pre
 	cx::logicManager()->getPatientService()->getPatientData()->autoSave();//TODO
 }
 
+PatientModelService* RegistrationImplService::getPatientModelService()
+{
+	ctkServiceTracker<PatientModelService*> tracker(mContext);
+	tracker.open();
+	PatientModelService* service = tracker.getService(); // get arbitrary instance of this type
+	if(!service)
+		reportError("RegistrationImplService can't access PatientModelService");
+	return service;
+}
+
 void RegistrationImplService::applyPatientRegistration(Transform3D rMpr_new, QString description)
 {
 	RegistrationTransform regTrans(rMpr_new, QDateTime::currentDateTime(), description);
 	regTrans.mFixed = mFixedData ? mFixedData->getUid() : "";
-	dataManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
+	this->getPatientModelService()->updateRegistration_rMpr(mLastRegistrationTime, regTrans);
 	mLastRegistrationTime = regTrans.mTimestamp;
 	reportSuccess(QString("Patient registration [%1] has been performed.").arg(description));
-	patientService()->getPatientData()->autoSave();
 }
 
 /** Update the registration for data and all data connected to its space.
