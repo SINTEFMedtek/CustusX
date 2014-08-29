@@ -41,14 +41,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxFrameForest.h"
 #include "cxPatientModelService.h"
+#include "cxRegistrationApplicator.h"
 
  //TODO: Remove these by moving functionality to PatientModelService
-#include "cxLogicManager.h"
-#include "cxPatientService.h"
-#include "cxDataManager.h"
-#include "cxLegacySingletons.h"
-#include "cxPatientData.h"
-#include "cxRegistrationApplicator.h"
+//#include "cxLogicManager.h"
+//#include "cxPatientService.h"
+//#include "cxDataManager.h"
+//#include "cxLegacySingletons.h"
+//#include "cxPatientData.h"
 
 namespace cx
 {
@@ -111,7 +111,7 @@ void RegistrationImplService::applyImage2ImageRegistration(Transform3D delta_pre
 	reportSuccess(QString("Image registration [%1] has been performed on %2").arg(description).arg(regTrans.mMoving) );
 //	patientService()->getPatientData()->autoSave();
 
-	cx::logicManager()->getPatientService()->getPatientData()->autoSave();//TODO
+//	cx::logicManager()->getPatientService()->getPatientData()->autoSave();//TODO
 }
 
 PatientModelService* RegistrationImplService::getPatientModelService()
@@ -128,7 +128,9 @@ void RegistrationImplService::applyPatientRegistration(Transform3D rMpr_new, QSt
 {
 	RegistrationTransform regTrans(rMpr_new, QDateTime::currentDateTime(), description);
 	regTrans.mFixed = mFixedData ? mFixedData->getUid() : "";
+
 	this->getPatientModelService()->updateRegistration_rMpr(mLastRegistrationTime, regTrans);
+
 	mLastRegistrationTime = regTrans.mTimestamp;
 	reportSuccess(QString("Patient registration [%1] has been performed.").arg(description));
 }
@@ -140,8 +142,9 @@ void RegistrationImplService::applyPatientRegistration(Transform3D rMpr_new, QSt
  */
 void RegistrationImplService::updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrameUid)
 {
-	RegistrationApplicator applicator(dataService()->getData());
+	RegistrationApplicator applicator(getPatientModelService()->getData());
 	applicator.updateRegistration(oldTime, deltaTransform, data, masterFrameUid);
+	getPatientModelService()->autoSave();
 }
 
 bool RegistrationImplService::isNull()

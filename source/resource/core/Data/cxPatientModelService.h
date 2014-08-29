@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXPATIENTMODELSERVICE_H_
 
 #include <QObject>
+#include <map>
 #include "boost/shared_ptr.hpp"
 class QDateTime;
 
@@ -75,6 +76,8 @@ public:
 
 	virtual void insertData(DataPtr data) = 0;
 	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform) = 0;
+	virtual std::map<QString, DataPtr> getData() const = 0;
+	virtual void autoSave() = 0;//TODO remove, and integrate into other functions
 };
 
 } // namespace cx

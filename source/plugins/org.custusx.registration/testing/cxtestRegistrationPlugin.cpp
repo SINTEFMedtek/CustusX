@@ -75,9 +75,9 @@ TEST_CASE("RegistrationPlugin: RegistrationPluginActivator start/stop", "[unit][
 {
 	cx::RegistrationPluginActivator activator;
 	ctkPluginContext* context = getPluginContext();
+	REQUIRE(context);
 	activator.start(context);
 	activator.stop(context);
-	REQUIRE(true);
 }
 
 TEST_CASE("RegistrationPlugin: RegistrationService available", "[unit][plugins][org.custusx.registration]")
