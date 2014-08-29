@@ -30,10 +30,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
+#include "ctkServiceTracker.h"
+
 #include "cxRegistrationServiceNull.h"
 #include "cxRegistrationImplService.h"
 #include "cxRegistrationPluginActivator.h"
-
 #include "cxLogicManager.h"
 #include "cxPluginFramework.h"
 
@@ -77,4 +78,14 @@ TEST_CASE("RegistrationPlugin: RegistrationPluginActivator start/stop", "[unit][
 	activator.start(context);
 	activator.stop(context);
 	REQUIRE(true);
+}
+
+TEST_CASE("RegistrationPlugin: RegistrationService available", "[unit][plugins][org.custusx.registration]")
+{
+	ctkPluginContext* context = getPluginContext();
+	ctkServiceTracker<cx::RegistrationService*> tracker(context);
+	tracker.open();
+	cx::RegistrationService* service = tracker.getService();
+	REQUIRE(service);
+	REQUIRE_FALSE(service->isNull());
 }
