@@ -127,10 +127,9 @@ void RegistrationImplService::applyPatientRegistration(Transform3D rMpr_new, QSt
 {
 	RegistrationTransform regTrans(rMpr_new, QDateTime::currentDateTime(), description);
 	regTrans.mFixed = mFixedData ? mFixedData->getUid() : "";
-	dataManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
+	this->getPatientModelService()->updateRegistration_rMpr(mLastRegistrationTime, regTrans);
 	mLastRegistrationTime = regTrans.mTimestamp;
 	reportSuccess(QString("Patient registration [%1] has been performed.").arg(description));
-	patientService()->getPatientData()->autoSave();
 }
 
 /** Update the registration for data and all data connected to its space.
