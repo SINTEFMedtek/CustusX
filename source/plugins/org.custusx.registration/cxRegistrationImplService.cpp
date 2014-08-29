@@ -127,7 +127,7 @@ void RegistrationImplService::applyPatientRegistration(Transform3D rMpr_new, QSt
 void RegistrationImplService::updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrameUid)
 {
 	RegistrationApplicator applicator(dataService()->getData());
-	applicator.updateRegistration(oldTime, deltaTransform, data, masterFrameUid);
+	applicator.updateRegistration(oldTime, deltaTransform, data);
 }
 
 bool RegistrationImplService::isNull()

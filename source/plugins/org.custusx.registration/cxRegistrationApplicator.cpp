@@ -65,59 +65,111 @@ RegistrationApplicator::~RegistrationApplicator()
  * Registration is done relative to masterFrame, i.e. data is moved relative to the masterFrame.
  *
  */
-void RegistrationApplicator::updateRegistration(QDateTime oldTime, RegistrationTransform delta_pre_rMd, DataPtr data, QString masterFrameUid)
+void RegistrationApplicator::updateRegistration(QDateTime oldTime, RegistrationTransform delta_pre_rMd, DataPtr movingData)
 {
-//	std::cout << "==== RegistrationManager::updateRegistration" << std::endl;
-	FrameForest forest(mSource);
-  QDomNode target = forest.getNode(qstring_cast(data->getUid()));
-  QDomNode masterFrame = target;
-  QDomNode targetBase = target;
-  if (masterFrameUid!="")
+  FrameForest forest(mSource);
+  QDomNode moving = forest.getNode(movingData->getUid());
+  if (delta_pre_rMd.mFixed == "")
   {
-	  masterFrame = forest.getNode(masterFrameUid);
-	  targetBase = forest.getOldestAncestorNotCommonToRef(target, masterFrame);
+	  report("No fixed data found, ignoring registration.");
+	  return;
   }
-  std::vector<DataPtr> targetData = forest.getDataFromDescendantsAndSelf(targetBase);
+  QDomNode fixed = forest.getNode(delta_pre_rMd.mFixed);
+  QDomNode movingBase = forest.getOldestAncestorNotCommonToRef(moving, fixed);
 
-  std::stringstream ss;
-  ss << "Update Registration using " << std::endl;
-  ss << "\tFixed:\t" << masterFrameUid << std::endl;
-  ss << "\tMoving:\t" << data->getUid() << std::endl;
-  ss << "\tDelta matrix (rMd'=Delta*rMd)\n"+qstring_cast(delta_pre_rMd.mValue) << std::endl;
-  report(qstring_cast(ss.str()));
+  std::vector<DataPtr> allMovingData = forest.getDataFromDescendantsAndSelf(movingBase);
 
-  // update the transform on all target data:
-  for (unsigned i=0; i<targetData.size(); ++i)
-  {
-	RegistrationTransform newTransform = delta_pre_rMd;
-	newTransform.mValue = delta_pre_rMd.mValue * targetData[i]->get_rMd();
-	targetData[i]->get_rMd_History()->updateRegistration(oldTime, newTransform);
+  report(QString(""
+				 "Update Registration using\n"
+				 "\tFixed:\t%1\n"
+				 "\tMoving:\t%2\n"
+				 "\tDelta matrix (rMd'=Delta*rMd)\n"
+				 "%3")
+		 .arg(delta_pre_rMd.mFixed)
+		 .arg(movingData->getUid())
+		 .arg(qstring_cast(delta_pre_rMd.mValue)));
 
-	report("Updated registration of data " + targetData[i]->getName());
-	//std::cout << "rMd_new\n" << newTransform.mValue << std::endl; // too much noise for large patients
-  }
+  this->updateTransform(oldTime, allMovingData, delta_pre_rMd);
 
-  // reconnect only if master and target are unconnected, i.e. share a common ancestor.
+  // reconnect only if master and target are unconnected, i.e. doesnt share a common ancestor.
   // If we are registrating inside an already connected tree we only want to change transforms,
   // not change the topology of the tree.
-  if (forest.getOldestAncestor(target) != forest.getOldestAncestor(masterFrame))
+  if (forest.getOldestAncestor(moving) != forest.getOldestAncestor(fixed))
   {
 	// connect the target to the master's ancestor, i.e. replace targetBase with masterAncestor:
-	QDomNode masterAncestor = forest.getOldestAncestor(masterFrame);
-	// iterate over all target data,
-	for (unsigned i=0; i<targetData.size(); ++i)
-	{
-	  QString masterAncestorUid = masterAncestor.toElement().tagName();
-	  QString targetBaseUid = targetBase.toElement().tagName();
 
-	  if (targetData[i]->getParentSpace() == targetBaseUid)
-	  {
-		report("Reset parent frame of " + targetData[i]->getName() + " to " + masterAncestorUid + ". targetbase=" + targetBaseUid);
-		targetData[i]->get_rMd_History()->updateParentSpace(oldTime, ParentSpace(masterAncestorUid, delta_pre_rMd.mTimestamp, delta_pre_rMd.mType));
-	  }
+	QDomNode fixedAncestor = forest.getOldestAncestor(fixed);
+	QString fixedAncestorUid = fixedAncestor.toElement().tagName();
+
+	QString newFixedSpace = fixedAncestorUid;
+
+	// if fixedAncestor is a data, insert a pure space above it
+	if (mSource.count(fixedAncestorUid) && mSource[fixedAncestorUid]->getParentSpace()=="")
+	{
+		newFixedSpace = this->generateNewSpaceUid();
+		ParentSpace newParentSpace(newFixedSpace, delta_pre_rMd.mTimestamp, delta_pre_rMd.mType);
+		this->changeParentSpace(oldTime, mSource[fixedAncestorUid], newParentSpace);
 	}
+
+	QString movingBaseUid = movingBase.toElement().tagName();
+	// if movingBaseUid is a data, then move the space above it
+	if (mSource.count(movingBaseUid))
+	{
+		movingBaseUid = mSource[movingBaseUid]->getParentSpace();
+	}
+
+	// change parent space of all moving spaces connected to base
+	ParentSpace newParentSpace(newFixedSpace, delta_pre_rMd.mTimestamp, delta_pre_rMd.mType);
+	this->changeParentSpace(oldTime, allMovingData, movingBaseUid, newParentSpace);
   }
 }
 
+QString RegistrationApplicator::generateNewSpaceUid() const
+{
+	int max = 0;
+	std::map<QString, DataPtr>::const_iterator iter;
+	for (iter = mSource.begin(); iter != mSource.end(); ++iter)
+	{
+		QStringList parentList = qstring_cast(iter->second->getParentSpace()).split("_");
+		if (parentList.size() < 2)
+			continue;
+		max = std::max(max, parentList[1].toInt());
+	}
+	QString parentFrame = "frame_" + qstring_cast(max + 1);
+	return parentFrame;
+}
+
+void RegistrationApplicator::updateTransform(QDateTime oldTime, std::vector<DataPtr> data, RegistrationTransform delta_pre_rMd)
+{
+	// update the transform on all target data:
+	for (unsigned i=0; i<data.size(); ++i)
+	{
+	  RegistrationTransform newTransform = delta_pre_rMd;
+	  newTransform.mValue = delta_pre_rMd.mValue * data[i]->get_rMd();
+	  data[i]->get_rMd_History()->updateRegistration(oldTime, newTransform);
+
+	  report("Updated registration of data " + data[i]->getName());
+	}
+}
+
+void RegistrationApplicator::changeParentSpace(QDateTime oldTime, std::vector<DataPtr> data, QString oldParentSpace, ParentSpace newParentSpace)
+{
+	for (unsigned i=0; i<data.size(); ++i)
+	{
+		if (data[i]->getParentSpace() != oldParentSpace)
+			continue;
+		this->changeParentSpace(oldTime, data[i], newParentSpace);
+	}
+}
+
+void RegistrationApplicator::changeParentSpace(QDateTime oldTime, DataPtr data, ParentSpace newParentSpace)
+{
+	report(QString("Reset parent frame of %1 from [%2] to [%3].")
+		   .arg(data->getName())
+		   .arg(data->getParentSpace())
+		   .arg(newParentSpace.mValue));
+
+	data->get_rMd_History()->updateParentSpace(oldTime, newParentSpace);
+}
 
 } // namespace cx
