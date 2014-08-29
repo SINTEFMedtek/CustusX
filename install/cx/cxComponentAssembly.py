@@ -32,7 +32,7 @@ class LibraryAssembly(object):
     def __init__(self):
         self.controlData = cxInstallData.Common()
         self.libraries = []
-	self.custusx = cxComponents.CustusX()
+        self.custusx = cxComponents.CustusX()
 
         self.addComponent(cxComponents.Eigen())
         self.addComponent(cxComponents.ITK())
