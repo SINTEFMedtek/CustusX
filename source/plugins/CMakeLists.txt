@@ -23,6 +23,7 @@ foreach (_var IN LISTS matchedVars)
 #	message(STATUS "REL_NAME " ${REL_NAME})
 #	message(STATUS "  FULL_NAME " ${FULL_NAME})
 #	message(STATUS "  FOUND_DOTDOT " ${FOUND_DOTDOT})
+    file(TO_CMAKE_PATH ${REL_NAME} REL_NAME) #fixing the paths on windows
 	if(${FOUND_DOTDOT} EQUAL -1)
         set(CX_PLUGINS ${CX_PLUGINS} "${REL_NAME}:ON")
 	else()
