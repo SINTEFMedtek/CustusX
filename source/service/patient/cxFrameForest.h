@@ -84,7 +84,7 @@ class DataManager;
 class FrameForest
 {
 public:
-	explicit FrameForest(DataServicePtr dataManager);
+	explicit FrameForest(const std::map<QString, DataPtr>& source);
 	QDomNode getNode(QString frame);
 	QDomNode getOldestAncestor(QDomNode node);
 
@@ -98,7 +98,8 @@ private:
 	bool isAncestorOf(QDomNode node, QDomNode ancestor);
 	void insertFrame(DataPtr data);
 	QDomDocument mDocument;
-	DataServicePtr mDataManager;
+
+	std::map<QString, DataPtr> mSource;
 };
 
 /**

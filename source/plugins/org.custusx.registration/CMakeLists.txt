@@ -19,6 +19,8 @@ include_directories(
 set(PLUGIN_SRCS
   cxRegistrationPluginActivator.cpp
   cxRegistrationImplService.cpp
+  cxRegistrationApplicator.cpp
+  cxRegistrationApplicator.h
 )
 
 # Files which should be processed by Qts moc
