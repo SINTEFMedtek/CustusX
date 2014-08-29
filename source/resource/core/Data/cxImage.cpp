@@ -58,6 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumeHelpers.h"
 #include "cxImageDefaultTFGenerator.h"
 #include "cxDataReaderWriter.h"
+#include "cxNullDeleter.h"
 
 #include "cxUnsignedDerivedImage.h"
 
@@ -65,12 +66,6 @@ typedef vtkSmartPointer<vtkImageChangeInformation> vtkImageChangeInformationPtr;
 
 namespace cx
 {
-
-struct null_deleter
-{
-	void operator()(void const *) const {}
-};
-
 
 Image::ShadingStruct::ShadingStruct()
 {

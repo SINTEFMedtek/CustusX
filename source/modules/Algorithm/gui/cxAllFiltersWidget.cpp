@@ -52,13 +52,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/shared_ptr.hpp>
+#include "cxNullDeleter.h"
 
 namespace cx {
-
-struct null_deleter
-{
-	void operator()(void const *) const {}
-};
 
 AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
     BaseWidget(parent, "FilterWidget", "Configurable Filter")

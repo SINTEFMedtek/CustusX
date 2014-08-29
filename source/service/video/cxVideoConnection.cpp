@@ -69,17 +69,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoServiceBackend.h"
 #include "cxImageStreamerFactory.h"
 #include "cxSettings.h"
+#include "cxNullDeleter.h"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
 
 namespace cx
 {
-
-struct null_deleter
-{
-	void operator()(void const *) const {}
-};
 
 VideoConnection::VideoConnection(VideoServiceBackendPtr backend)
 {

@@ -55,6 +55,7 @@ public:
 	virtual ~PatientModelImplService();
 
 	virtual void insertData(DataPtr data);
+	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform);
 
 };
 typedef boost::shared_ptr<PatientModelImplService> PatientModelImplServicePtr;

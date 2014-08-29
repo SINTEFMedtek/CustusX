@@ -141,6 +141,7 @@ cx_add_class(cxResource_SOURCE
 	utilities/cxXMLNodeWrapper
 	utilities/cxPlaneTypeCollection
 	utilities/cxSharedPointerChecker
+	utilities/cxNullDeleter.h
 
 	logger/cxAudio.h
 	logger/cxLogger

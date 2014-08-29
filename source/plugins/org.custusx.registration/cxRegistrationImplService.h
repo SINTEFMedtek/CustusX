@@ -36,10 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include "org_custusx_registration_Export.h"
 #include "qdatetime.h"
+class ctkPluginContext;
 
 namespace cx
 {
 class RegistrationTransform;
+class PatientModelService;
 
 /**
  * Implementation of Registration service.
@@ -54,7 +56,7 @@ class org_custusx_registration_EXPORT RegistrationImplService : public Registrat
 {
 	Q_INTERFACES(cx::RegistrationService)
 public:
-	RegistrationImplService();
+	RegistrationImplService(ctkPluginContext *context);
 	virtual ~RegistrationImplService();
 
 	virtual void setMovingData(DataPtr data);
@@ -75,7 +77,11 @@ private:
 	DataPtr mMovingData; ///< the data that should update its matrices during a registration
 
 	QDateTime mLastRegistrationTime; ///< last timestamp for registration during this session. All registrations in one session results in only one reg transform.
+
+	ctkPluginContext* mContext;
+
 	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame);
+	PatientModelService* getPatientModelService();
 };
 
 typedef boost::shared_ptr<RegistrationImplService> RegistrationImplServicePtr;
