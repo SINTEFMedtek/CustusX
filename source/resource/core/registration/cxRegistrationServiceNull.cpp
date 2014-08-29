@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationServiceNull.h"
 #include "qdatetime.h"
 #include "cxRegistrationTransform.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -43,10 +44,12 @@ RegistrationServiceNull::RegistrationServiceNull()
 
 void RegistrationServiceNull::setMovingData(DataPtr data)
 {
+	printWarning();
 }
 
 void RegistrationServiceNull::setFixedData(DataPtr data)
 {
+	printWarning();
 }
 
 DataPtr RegistrationServiceNull::getMovingData()
@@ -61,10 +64,12 @@ DataPtr RegistrationServiceNull::getFixedData()
 
 void RegistrationServiceNull::applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
 {
+	printWarning();
 }
 
 void RegistrationServiceNull::applyPatientRegistration(Transform3D rMpr_new, QString description)
 {
+	printWarning();
 }
 
 QDateTime RegistrationServiceNull::getLastRegistrationTime()
@@ -74,15 +79,22 @@ QDateTime RegistrationServiceNull::getLastRegistrationTime()
 
 void RegistrationServiceNull::setLastRegistrationTime(QDateTime time)
 {
+	printWarning();
 }
 
 void RegistrationServiceNull::updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame)
 {
+	printWarning();
 }
 
 bool RegistrationServiceNull::isNull()
 {
 	return true;
+}
+
+void RegistrationServiceNull::printWarning()
+{
+	reportWarning("Trying to use RegistrationServiceNull. Is RegistrationService (org.custusx.registration) disabled?");
 }
 
 } // namespace cx
