@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataManager.h"
 #include "cxLegacySingletons.h"
 #include "cxPatientData.h"
+#include "cxRegistrationApplicator.h"
 
 namespace cx
 {
@@ -125,56 +126,8 @@ void RegistrationImplService::applyPatientRegistration(Transform3D rMpr_new, QSt
  */
 void RegistrationImplService::updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrameUid)
 {
-//	std::cout << "==== RegistrationManager::updateRegistration" << std::endl;
-	FrameForest forest(dataService());
-  QDomNode target = forest.getNode(qstring_cast(data->getUid()));
-  QDomNode masterFrame = target;
-  QDomNode targetBase = target;
-  if (masterFrameUid!="")
-  {
-	  masterFrame = forest.getNode(masterFrameUid);
-	  targetBase = forest.getOldestAncestorNotCommonToRef(target, masterFrame);
-  }
-  std::vector<DataPtr> targetData = forest.getDataFromDescendantsAndSelf(targetBase);
-
-  std::stringstream ss;
-  ss << "Update Registration using " << std::endl;
-  ss << "\tFixed:\t" << masterFrameUid << std::endl;
-  ss << "\tMoving:\t" << data->getUid() << std::endl;
-  ss << "\tDelta matrix (rMd'=Delta*rMd)\n"+qstring_cast(deltaTransform.mValue) << std::endl;
-  report(qstring_cast(ss.str()));
-
-  // update the transform on all target data:
-  for (unsigned i=0; i<targetData.size(); ++i)
-  {
-	RegistrationTransform newTransform = deltaTransform;
-	newTransform.mValue = deltaTransform.mValue * targetData[i]->get_rMd();
-	targetData[i]->get_rMd_History()->updateRegistration(oldTime, newTransform);
-
-	report("Updated registration of data " + targetData[i]->getName());
-	//std::cout << "rMd_new\n" << newTransform.mValue << std::endl; // too much noise for large patients
-  }
-
-  // reconnect only if master and target are unconnected, i.e. share a common ancestor.
-  // If we are registrating inside an already connected tree we only want to change transforms,
-  // not change the topology of the tree.
-  if (forest.getOldestAncestor(target) != forest.getOldestAncestor(masterFrame))
-  {
-	// connect the target to the master's ancestor, i.e. replace targetBase with masterAncestor:
-	QDomNode masterAncestor = forest.getOldestAncestor(masterFrame);
-	// iterate over all target data,
-	for (unsigned i=0; i<targetData.size(); ++i)
-	{
-	  QString masterAncestorUid = masterAncestor.toElement().tagName();
-	  QString targetBaseUid = targetBase.toElement().tagName();
-
-	  if (targetData[i]->getParentSpace() == targetBaseUid)
-	  {
-		report("Reset parent frame of " + targetData[i]->getName() + " to " + masterAncestorUid + ". targetbase=" + targetBaseUid);
-		targetData[i]->get_rMd_History()->updateParentSpace(oldTime, ParentSpace(masterAncestorUid, deltaTransform.mTimestamp, deltaTransform.mType));
-	  }
-	}
-  }
+	RegistrationApplicator applicator(dataService()->getData());
+	applicator.updateRegistration(oldTime, deltaTransform, data, masterFrameUid);
 }
 
 bool RegistrationImplService::isNull()
