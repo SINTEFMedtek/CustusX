@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxPluginFramework.h"
+#include "cxNullDeleter.h"
 
 namespace cx
 {
@@ -74,7 +75,7 @@ RegistrationManager::RegistrationManager(AcquisitionDataPtr acquisitionData, ctk
 							   ));
 	mServiceListener->open();
 
-	mRegistrationService.reset(RegistrationService::getNullObject().get());
+	mRegistrationService = RegistrationService::getNullObject();
 }
 
 void RegistrationManager::restart()
@@ -84,7 +85,7 @@ void RegistrationManager::restart()
 
 void RegistrationManager::onServiceAdded(RegistrationService* service)
 {
-	mRegistrationService.reset(service);
+	mRegistrationService.reset(service, null_deleter());
 //	if(!mRegistrationService->isNull())
 //	{
 		connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
@@ -99,7 +100,7 @@ void RegistrationManager::onServiceRemoved(RegistrationService *service)
 		disconnect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
 		disconnect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
 //	}
-	mRegistrationService.reset(RegistrationService::getNullObject().get());
+	mRegistrationService = RegistrationService::getNullObject();
 }
 
 void RegistrationManager::duringSavePatientSlot()

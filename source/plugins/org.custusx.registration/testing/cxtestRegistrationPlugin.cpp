@@ -32,6 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 #include "cxRegistrationServiceNull.h"
 #include "cxRegistrationImplService.h"
+#include "cxRegistrationPluginActivator.h"
+
+#include "cxLogicManager.h"
+#include "cxPluginFramework.h"
 
 TEST_CASE("RegistrationPlugin: Check RegistrationServiceNull", "[unit][plugins][org.custusx.registration]")
 {
@@ -40,14 +44,34 @@ TEST_CASE("RegistrationPlugin: Check RegistrationServiceNull", "[unit][plugins][
 	REQUIRE_FALSE(service->getFixedData());
 	REQUIRE_FALSE(service->getMovingData());
 	REQUIRE(service->isNull());
+
+	cx::RegistrationServicePtr service2 = cx::RegistrationService::getNullObject();
+	REQUIRE(service == service2);
+	REQUIRE(service.get() == service2.get());
 }
 
 TEST_CASE("RegistrationPlugin: Check empty RegistrationImplService", "[unit][plugins][org.custusx.registration]")
 {
-	cx::RegistrationServicePtr service;
+	cx::RegistrationServicePtr service = cx::RegistrationService::getNullObject();
 	service.reset(new cx::RegistrationImplService);
 	REQUIRE(service);
 	REQUIRE_FALSE(service->getFixedData());
 	REQUIRE_FALSE(service->getMovingData());
 	REQUIRE_FALSE(service->isNull());
+}
+
+
+TEST_CASE("RegistrationPlugin: RegistrationPluginActivator start/stop", "[unit][plugins][org.custusx.registration]")
+{
+	std::cout << "start test" << std::endl;
+	cx::RegistrationPluginActivator activator;
+	cx::LogicManager::getInstance()->getPluginFramework()->start();
+
+	std::cout << "Get context" << std::endl;
+	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginFramework()->getPluginContext();
+
+	std::cout << "Start activator" << std::endl;
+	activator.start(context);
+	activator.stop(context);
+	REQUIRE(true);
 }

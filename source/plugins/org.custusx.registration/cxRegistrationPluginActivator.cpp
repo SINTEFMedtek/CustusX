@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "cxRegistrationImplService.h"
+#include "cxRegistrationServiceNull.h"
 
 namespace cx
 {
@@ -44,6 +45,7 @@ RegistrationPluginActivator::RegistrationPluginActivator()
 : mContext(0)
 {
 	std::cout << "Created RegistrationPluginActivator" << std::endl;
+	mPlugin = RegistrationService::getNullObject();
 }
 
 RegistrationPluginActivator::~RegistrationPluginActivator()
@@ -65,7 +67,7 @@ void RegistrationPluginActivator::start(ctkPluginContext* context)
 	catch(ctkRuntimeException& e)
 	{
 		std::cout << e.what() << std::endl;
-		mPlugin.reset();
+		mPlugin = RegistrationService::getNullObject();
 	}
 	std::cout << "registered Registration service" << std::endl;
 }
@@ -73,10 +75,9 @@ void RegistrationPluginActivator::start(ctkPluginContext* context)
 void RegistrationPluginActivator::stop(ctkPluginContext* context)
 {
 	mRegistration.unregister();
-	if(mPlugin)
-		mPlugin.reset();
+		mPlugin = RegistrationService::getNullObject();
 	std::cout << "Stopped RegistrationPluginActivator" << std::endl;
-	Q_UNUSED(context)
+	Q_UNUSED(context);
 }
 
 } // namespace cx
