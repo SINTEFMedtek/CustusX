@@ -75,7 +75,7 @@ void RegistrationPluginActivator::start(ctkPluginContext* context)
 void RegistrationPluginActivator::stop(ctkPluginContext* context)
 {
 	mRegistration.unregister();
-		mPlugin = RegistrationService::getNullObject();
+	mPlugin = RegistrationService::getNullObject();
 	std::cout << "Stopped RegistrationPluginActivator" << std::endl;
 	Q_UNUSED(context);
 }

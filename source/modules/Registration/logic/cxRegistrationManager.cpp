@@ -59,9 +59,9 @@ namespace cx
 
 RegistrationManager::RegistrationManager(AcquisitionDataPtr acquisitionData, ctkPluginContext* pluginContext) :
 		mAcquisitionData(acquisitionData),
-		mPluginContext(pluginContext)
+		mPluginContext(pluginContext),
+		mRegistrationService(RegistrationService::getNullObject())
 {
-//	this->restart();
 	connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
 	connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
 	connect(patientService()->getPatientData().get(), SIGNAL(cleared()), this, SLOT(clearSlot()));
@@ -74,8 +74,6 @@ RegistrationManager::RegistrationManager(AcquisitionDataPtr acquisitionData, ctk
 							   boost::bind(&RegistrationManager::onServiceRemoved, this, _1)
 							   ));
 	mServiceListener->open();
-
-	mRegistrationService = RegistrationService::getNullObject();
 }
 
 void RegistrationManager::restart()
@@ -91,14 +89,16 @@ void RegistrationManager::onServiceAdded(RegistrationService* service)
 		connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
 		connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
 //	}
+		if(mRegistrationService->isNull())
+			reportWarning("RegistrationManager::onServiceAdded mRegistrationService->isNull()");
 }
 
 void RegistrationManager::onServiceRemoved(RegistrationService *service)
 {
 //	if(!mRegistrationService->isNull())
 //	{
-		disconnect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
-		disconnect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+		disconnect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
+		disconnect(service, SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
 //	}
 	mRegistrationService = RegistrationService::getNullObject();
 }
