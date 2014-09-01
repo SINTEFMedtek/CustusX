@@ -131,7 +131,7 @@ public:
 
 protected:
 	DataManagerImpl();
-	virtual void verifyParentFrame(DataPtr data); ///< checks if data has a valid frameOfReferenceUid, generates and adds it if not
+//	virtual void verifyParentFrame(DataPtr data); ///< checks if data has a valid frameOfReferenceUid, generates and adds it if not
 
 protected:
 	std::map<QString, VideoSourcePtr> mStreams;

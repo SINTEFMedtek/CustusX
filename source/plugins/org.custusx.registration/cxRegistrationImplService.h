@@ -80,7 +80,7 @@ private:
 
 	ctkPluginContext* mContext;
 
-	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame);
+	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data);
 	PatientModelService* getPatientModelService();
 };
 

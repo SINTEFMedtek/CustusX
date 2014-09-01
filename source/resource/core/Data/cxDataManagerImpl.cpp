@@ -271,7 +271,7 @@ void DataManagerImpl::loadData(DataPtr data)
 
 	if (data)
 	{
-		this->verifyParentFrame(data);
+//		this->verifyParentFrame(data);
 		mData[data->getUid()] = data;
 		emit dataAddedOrRemoved();
 	}
@@ -341,24 +341,24 @@ DataPtr DataManagerImpl::getData(const QString& uid) const
 	return iter->second;
 }
 
-void DataManagerImpl::verifyParentFrame(DataPtr data)
-{
-	if (data->getParentSpace().isEmpty())
-	{
-		int max = 0;
-		std::map<QString, DataPtr>::iterator iter;
-		for (iter = mData.begin(); iter != mData.end(); ++iter)
-		{
-			//max = std::max(max, qstring_cast(iter->first).toInt());
-			QStringList parentList = qstring_cast(iter->second->getParentSpace()).split("_");
-			if (parentList.size() < 2)
-				continue;
-			max = std::max(max, parentList[1].toInt());
-		}
-		QString parentFrame = "frame_" + qstring_cast(max + 1);
-		data->get_rMd_History()->setParentSpace(parentFrame);
-	}
-}
+//void DataManagerImpl::verifyParentFrame(DataPtr data)
+//{
+//	if (data->getParentSpace().isEmpty())
+//	{
+//		int max = 0;
+//		std::map<QString, DataPtr>::iterator iter;
+//		for (iter = mData.begin(); iter != mData.end(); ++iter)
+//		{
+//			//max = std::max(max, qstring_cast(iter->first).toInt());
+//			QStringList parentList = qstring_cast(iter->second->getParentSpace()).split("_");
+//			if (parentList.size() < 2)
+//				continue;
+//			max = std::max(max, parentList[1].toInt());
+//		}
+//		QString parentFrame = "frame_" + qstring_cast(max + 1);
+//		data->get_rMd_History()->setParentSpace(parentFrame);
+//	}
+//}
 
 ImagePtr DataManagerImpl::getImage(const QString& uid) const
 {

@@ -100,7 +100,7 @@ void RegistrationImplService::applyImage2ImageRegistration(Transform3D delta_pre
 	regTrans.mFixed = mFixedData ? mFixedData->getUid() : "";
 	regTrans.mMoving = mMovingData ? mMovingData->getUid() : "";
 
-	this->updateRegistration(mLastRegistrationTime, regTrans, mMovingData, regTrans.mFixed);
+	this->updateRegistration(mLastRegistrationTime, regTrans, mMovingData);
 
 	mLastRegistrationTime = regTrans.mTimestamp;
 	reportSuccess(QString("Image registration [%1] has been performed on %2").arg(description).arg(regTrans.mMoving) );
@@ -132,10 +132,10 @@ void RegistrationImplService::applyPatientRegistration(Transform3D rMpr_new, QSt
  * Registration is done relative to masterFrame, i.e. data is moved relative to the masterFrame.
  *
  */
-void RegistrationImplService::updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrameUid)
+void RegistrationImplService::updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data)
 {
 	RegistrationApplicator applicator(getPatientModelService()->getData());
-	applicator.updateRegistration(oldTime, deltaTransform, data, masterFrameUid);
+	applicator.updateRegistration(oldTime, deltaTransform, data);
 	getPatientModelService()->autoSave();
 }
 
