@@ -32,7 +32,8 @@ if (BUILD_TESTING)
         cxtestCatchViewRenderSpeed.cpp
         cxtestCatchVolumeReps.cpp
         cxtestCatchVtkOpenGLGPUMultiVolumeRayCastMapper.cpp
-		cxtestDataTypeSort.cpp
+	cxtestDataTypeSort.cpp
+	cxtestRendering.cpp
         )
 
 	cx_catch_add_lib_and_exe(cxVisualizationService
