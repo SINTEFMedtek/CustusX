@@ -48,6 +48,8 @@ ctkPluginContext* getPluginContext()
 }
 } // namespace
 
+namespace cxtest
+{
 TEST_CASE("RegistrationPlugin: Check RegistrationServiceNull", "[unit][plugins][org.custusx.registration]")
 {
 	cx::RegistrationServicePtr service = cx::RegistrationService::getNullObject();
@@ -89,3 +91,4 @@ TEST_CASE("RegistrationPlugin: RegistrationService available", "[unit][plugins][
 	REQUIRE(service);
 	REQUIRE_FALSE(service->isNull());
 }
+} //namespace cxtest
