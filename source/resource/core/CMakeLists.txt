@@ -188,6 +188,11 @@ set( CX_RESOURCE_LIBRARIES
 vtkCommonCore
 vtkCommonDataModel
 vtkCommonExecutionModel
+vtkCommonMath
+vtkCommonMisc
+vtkCommonSystem
+vtkCommonTransforms
+vtkIOCore
 vtkIOImage
 vtkIOGeometry
 vtkIOLegacy
@@ -196,6 +201,7 @@ vtkImagingStatistics
 vtkImagingColor
 vtkImagingMath
 vtkImagingGeneral
+vtkImagingCore
 #vtkImagingMorphological
 vtkFiltersCore
 vtkFiltersGeneral
@@ -203,6 +209,7 @@ vtkFiltersSources
 #vtkFiltersParallel
 vtkRenderingFreeTypeOpenGL
 vtkRenderingFreeType
+vtkRenderingOpenGL
 vtkRenderingCore
 vtkRenderingVolume
 vtkInteractionStyle
