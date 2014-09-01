@@ -1,6 +1,8 @@
 
 if (BUILD_TESTING)
     include_directories(
+        ${CustusX_SOURCE_DIR}/source/service/patient
+        ${CustusX_SOURCE_DIR}/source/logic
     )
 
 

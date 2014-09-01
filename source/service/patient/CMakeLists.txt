@@ -13,8 +13,6 @@ SET ( cxPatientService_SOURCE
     cxPatientData.cpp
     cxPatientService.h
     cxPatientService.cpp
-    cxFrameForest.h
-    cxFrameForest.cpp
     cxActiveImageProxy.h
     cxActiveImageProxy.cpp
     

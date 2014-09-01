@@ -43,13 +43,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxRegistrationApplicator.h"
 
- //TODO: Remove these by moving functionality to PatientModelService
-//#include "cxLogicManager.h"
-//#include "cxPatientService.h"
-//#include "cxDataManager.h"
-//#include "cxLegacySingletons.h"
-//#include "cxPatientData.h"
-
 namespace cx
 {
 
@@ -106,12 +99,11 @@ void RegistrationImplService::applyImage2ImageRegistration(Transform3D delta_pre
 	RegistrationTransform regTrans(delta_pre_rMd, QDateTime::currentDateTime(), description);
 	regTrans.mFixed = mFixedData ? mFixedData->getUid() : "";
 	regTrans.mMoving = mMovingData ? mMovingData->getUid() : "";
+
 	this->updateRegistration(mLastRegistrationTime, regTrans, mMovingData, regTrans.mFixed);
+
 	mLastRegistrationTime = regTrans.mTimestamp;
 	reportSuccess(QString("Image registration [%1] has been performed on %2").arg(description).arg(regTrans.mMoving) );
-//	patientService()->getPatientData()->autoSave();
-
-//	cx::logicManager()->getPatientService()->getPatientData()->autoSave();//TODO
 }
 
 PatientModelService* RegistrationImplService::getPatientModelService()

@@ -104,6 +104,7 @@ cx_add_class(cxResource_SOURCE
 	Data/cxGPUImageBuffer
 	Data/cxImageDefaultTFGenerator
 	Data/cxImageParameters
+	Data/cxFrameForest
 
 	Math/cxBoundingBox3D
 	Math/cxVector3D
