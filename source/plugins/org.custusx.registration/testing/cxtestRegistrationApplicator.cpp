@@ -78,7 +78,7 @@ public:
 	{
 		cx::DataPtr data = mData[frame];
 		INFO(QString("Checking %1").arg(frame));
-		REQUIRE(data.get() != NULL);
+		REQUIRE(data.get());
 		INFO(QString("parent=%1, expected %2").arg(data->getParentSpace()).arg(parentFrame_expected));
 		CHECK(data->getParentSpace() == parentFrame_expected);
 		INFO(QString("rMd=\n%1\n, expected\n%2")
