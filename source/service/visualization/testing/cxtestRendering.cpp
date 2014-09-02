@@ -55,9 +55,7 @@ namespace cxtest
 
 TEST_CASE("Render volume with texture mapper and text overlay", "[integration][resource][visualization][textrender]")
 {
-//	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(3,3,3));
 	vtkImageDataPtr image = cx::generateVtkImageData(Eigen::Array3i(3,3,3), Eigen::Vector3d(1, 1, 1), 100);
-
 
 	vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
 	vtkRenderWindowInteractorPtr interactor = vtkRenderWindowInteractorPtr::New();
@@ -82,45 +80,21 @@ TEST_CASE("Render volume with texture mapper and text overlay", "[integration][r
 	vtkActor2DPtr textActor = vtkActor2DPtr::New();
 	textActor->SetMapper(mapper);
 
-//	REQUIRE(renderWindow->GetRenderers()->GetNumberOfItems()==1);
-//	vtkRenderer*  renderer = renderWindow->GetRenderers()->GetFirstRenderer();
-
 	mRenderer->AddActor(textActor);
 
-
 	//Volume
-
-//	vtkPiecewiseFunctionPtr opacityTransferFuction = vtkPiecewiseFunctionPtr::New();
-//	opacityTransferFuction->AddSegment(0, 1, 255, 1);
-//	vtkVolumePropertyPtr mVolumeProperty = vtkVolumePropertyPtr::New();
-//	mVolumeProperty->SetColor(opacityTransferFuction);
-//	mVolumeProperty->SetScalarOpacity(opacityTransferFuction);
-//	mVolumeProperty->SetShade(true);
-//	mVolumeProperty->SetAmbient(0.01);
-//	mVolumeProperty->SetDiffuse(0.7);
-//	mVolumeProperty->SetSpecular(0.5);
-//	mVolumeProperty->SetSpecularPower(70.0);
-//	mVolumeProperty->SetInterpolationTypeToLinear();
-
 	vtkVolumeTextureMapper3DPtr volumeMapper = vtkVolumeTextureMapper3DPtr::New();
 	volumeMapper->SetInputData(image);
 
 	vtkVolumePtr volume = vtkVolumePtr::New();
-//	volume->SetProperty(mVolumeProperty);
 	volume->SetMapper(volumeMapper);
 	mRenderer->AddVolume(volume);
 
-//	vtkImageActorPtr imageActor = vtkImageActorPtr::New();
-//	imageActor->SetInputData(image);
-////	imageActor->SetMapper(volumeMapper);
-//	mRenderer->AddViewProp(imageActor);
-
 	mRenderer->ResetCamera();
-
 	renderWindow->Render();
 	REQUIRE(volumeMapper->IsRenderSupported(volume->GetProperty(), mRenderer));
 
-	int numRenders = 5000;
+	int numRenders = 3000;
 	for (int i = 0; i < numRenders; ++i)
 	{
 		QString text(qstring_cast("Test: ")+qstring_cast(i));
