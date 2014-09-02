@@ -5,6 +5,7 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
+
 include_directories(
     ..
     ${CustusX_SOURCE_DIR}/source/logic

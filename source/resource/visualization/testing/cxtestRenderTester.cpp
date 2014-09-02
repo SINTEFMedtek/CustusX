@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxtestRenderTester.h"
 
+#include "catch.hpp"
+
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkWindowToImageFilter.h>
@@ -60,7 +62,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTextProperty.h"
 #include "vtkRendererCollection.h"
 
-#include "catch.hpp"
 
 typedef vtkSmartPointer<class vtkProp> vtkPropPtr;
 typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;
