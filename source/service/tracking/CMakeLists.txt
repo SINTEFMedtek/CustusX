@@ -50,6 +50,6 @@ include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES} ${IGSTK_LIBRARY_DIRS})
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( cxTrackingService ${cxTrackingService_SOURCE} ${MOC_HEADER_FILES})
-target_link_libraries(cxTrackingService PUBLIC cxResource PRIVATE IGSTK)
+target_link_libraries(cxTrackingService LINK_PUBLIC cxResource LINK_PRIVATE IGSTK)
 
 ADD_SUBDIRECTORY( testing )
