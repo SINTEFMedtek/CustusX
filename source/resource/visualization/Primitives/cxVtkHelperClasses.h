@@ -138,6 +138,8 @@ class TextDisplay
 		int getWidth( vtkViewport *vp );
 		vtkTextMapperPtr getMapper() { return mapper; }
 
+		static void forceUseVtkTextMapper();
+
 	private:
 		vtkTextMapperPtr mapper;
 		vtkActor2DPtr actor;
@@ -145,8 +147,7 @@ class TextDisplay
 		int maxWidth;
 		QString text;
 
-		void forceUseVtkTextMapper();
-		void verifyVtkTextMapper();
+		static void verifyVtkTextMapper();
 };
 typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
 

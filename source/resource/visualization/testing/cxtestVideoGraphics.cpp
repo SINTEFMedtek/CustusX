@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestVideoGraphicsFixture.h"
 #include "catch.hpp"
 #include "cxProbeSector.h"
+#include "cxVtkHelperClasses.h"
 
 TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Render Image", "[unit][resource][visualization]")
 {
@@ -105,6 +106,7 @@ TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Render Image with
 	vtkImageDataPtr videoImage0 = this->readImageData("testImage01.png", "input image");
 	this->addImageToRenderer(videoImage0);
 
+//	cx::TextDisplay::forceUseVtkTextMapper();
 	mMachine->addTextToVtkRenderWindow("test text");
 	mMachine->renderAndUpdateText(5000);
 }

@@ -60,6 +60,7 @@ endif (APPLE)
 #------------------------------------------------------------------------------
 # Linking
 #------------------------------------------------------------------------------
+# Add link directories needed to use IGSTK.
 SET(LINK_LIBRARIES
                 cxGui
                 cxPluginCalibration
