@@ -47,6 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageData.h>
 #include <vtkCamera.h>
 #include <vtkVolumeTextureMapper3D.h>
+#include <vtkVolumeProperty.h>
+#include <vtkPiecewiseFunction.h>
 
 namespace cxtest
 {
@@ -87,17 +89,36 @@ TEST_CASE("Render volume with texture mapper and text overlay", "[integration][r
 
 
 	//Volume
+
+//	vtkPiecewiseFunctionPtr opacityTransferFuction = vtkPiecewiseFunctionPtr::New();
+//	opacityTransferFuction->AddSegment(0, 1, 255, 1);
+//	vtkVolumePropertyPtr mVolumeProperty = vtkVolumePropertyPtr::New();
+//	mVolumeProperty->SetColor(opacityTransferFuction);
+//	mVolumeProperty->SetScalarOpacity(opacityTransferFuction);
+//	mVolumeProperty->SetShade(true);
+//	mVolumeProperty->SetAmbient(0.01);
+//	mVolumeProperty->SetDiffuse(0.7);
+//	mVolumeProperty->SetSpecular(0.5);
+//	mVolumeProperty->SetSpecularPower(70.0);
+//	mVolumeProperty->SetInterpolationTypeToLinear();
+
 	vtkVolumeTextureMapper3DPtr volumeMapper = vtkVolumeTextureMapper3DPtr::New();
 	volumeMapper->SetInputData(image);
+
 	vtkVolumePtr volume = vtkVolumePtr::New();
+//	volume->SetProperty(mVolumeProperty);
 	volume->SetMapper(volumeMapper);
 	mRenderer->AddVolume(volume);
 
-	vtkImageActorPtr imageActor = vtkImageActorPtr::New();
-	imageActor->SetInputData(image);
-//	imageActor->SetMapper(volumeMapper);
-	mRenderer->AddViewProp(imageActor);
+//	vtkImageActorPtr imageActor = vtkImageActorPtr::New();
+//	imageActor->SetInputData(image);
+////	imageActor->SetMapper(volumeMapper);
+//	mRenderer->AddViewProp(imageActor);
 
+	mRenderer->ResetCamera();
+
+	renderWindow->Render();
+	REQUIRE(volumeMapper->IsRenderSupported(volume->GetProperty(), mRenderer));
 
 	int numRenders = 5000;
 	for (int i = 0; i < numRenders; ++i)
