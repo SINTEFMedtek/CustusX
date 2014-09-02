@@ -42,6 +42,7 @@ namespace
 {
 ctkPluginContext* getPluginContext()
 {
+    cx::LogicManager::initialize();
 	cx::LogicManager::getInstance()->getPluginFramework()->start();
 	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginFramework()->getPluginContext();
 	return context;
@@ -66,11 +67,11 @@ TEST_CASE("RegistrationPlugin: Check RegistrationServiceNull", "[unit][plugins][
 TEST_CASE("RegistrationPlugin: Check empty RegistrationImplService", "[unit][plugins][org.custusx.registration]")
 {
 	cx::RegistrationServicePtr service = cx::RegistrationService::getNullObject();
-	service.reset(new cx::RegistrationImplService(getPluginContext()));
-	REQUIRE(service);
-	REQUIRE_FALSE(service->getFixedData());
-	REQUIRE_FALSE(service->getMovingData());
-	REQUIRE_FALSE(service->isNull());
+    service.reset(new cx::RegistrationImplService(getPluginContext()));
+    REQUIRE(service);
+    REQUIRE_FALSE(service->getFixedData());
+    REQUIRE_FALSE(service->getMovingData());
+    REQUIRE_FALSE(service->isNull());
 }
 
 TEST_CASE("RegistrationPlugin: RegistrationPluginActivator start/stop", "[unit][plugins][org.custusx.registration]")
