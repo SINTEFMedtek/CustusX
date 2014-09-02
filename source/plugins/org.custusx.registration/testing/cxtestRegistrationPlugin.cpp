@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 #include "cxRegistrationServiceNull.h"
 #include "cxRegistrationImplService.h"
-#include "cxRegistrationPluginActivator.h"
 
 #include "cxLogicManager.h"
 #include "cxPluginFramework.h"
@@ -68,13 +67,4 @@ TEST_CASE("RegistrationPlugin: Check empty RegistrationImplService", "[unit][plu
 	REQUIRE_FALSE(service->getFixedData());
 	REQUIRE_FALSE(service->getMovingData());
 	REQUIRE_FALSE(service->isNull());
-}
-
-TEST_CASE("RegistrationPlugin: RegistrationPluginActivator start/stop", "[unit][plugins][org.custusx.registration]")
-{
-	cx::RegistrationPluginActivator activator;
-	ctkPluginContext* context = getPluginContext();
-	activator.start(context);
-	activator.stop(context);
-	REQUIRE(true);
 }

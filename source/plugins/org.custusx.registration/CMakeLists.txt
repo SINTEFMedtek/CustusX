@@ -18,6 +18,7 @@ include_directories(
 
 set(PLUGIN_SRCS
   cxRegistrationPluginActivator.cpp
+  cxRegistrationPluginActivator.h
   cxRegistrationImplService.cpp
   cxRegistrationApplicator.cpp
   cxRegistrationApplicator.h
