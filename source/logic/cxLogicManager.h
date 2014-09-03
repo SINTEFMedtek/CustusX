@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxLegacySingletons.h"
 
+class ctkPluginContext;
+
 namespace cx
 {
 /**
@@ -72,6 +74,7 @@ public:
   static void shutdown();
 
   PluginFrameworkManagerPtr getPluginFramework();
+	ctkPluginContext* getPluginContext();
 
   DataFactoryPtr getDataFactory();
   DataServicePtr getDataService();

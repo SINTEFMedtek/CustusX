@@ -188,9 +188,8 @@ void MainWindow::changeEvent(QEvent * event)
 
 void MainWindow::setupGUIExtenders()
 {
-	PluginFrameworkManagerPtr pluginFramework = LogicManager::getInstance()->getPluginFramework();
 	mServiceListener.reset(new ServiceTrackerListener<GUIExtenderService>(
-							   pluginFramework->getPluginContext(),
+								 LogicManager::getInstance()->getPluginContext(),
 							   boost::bind(&MainWindow::onPluginBaseAdded, this, _1),
 							   boost::bind(&MainWindow::onPluginBaseModified, this, _1),
 							   boost::bind(&MainWindow::onPluginBaseRemoved, this, _1)

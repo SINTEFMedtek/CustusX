@@ -36,47 +36,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "cxExampleGUIExtenderService.h"
+#include "cxRegisteredService.h"
 
 namespace cx
 {
 
 ExamplePluginActivator::ExamplePluginActivator()
-: mContext(0)
 {
 	std::cout << "Created ExamplePluginActivator" << std::endl;
 }
 
 ExamplePluginActivator::~ExamplePluginActivator()
-{
-
-}
+{}
 
 void ExamplePluginActivator::start(ctkPluginContext* context)
 {
-	std::cout << "Started ExamplePluginActivator" << std::endl;
-	this->mContext = context;
-
-	mPlugin.reset(new ExampleGUIExtenderService);
-	std::cout << "created example service" << std::endl;
-	try
-	{
-		mRegistration = context->registerService(QStringList(GUIExtenderService_iid), mPlugin.get());
-	}
-	catch(ctkRuntimeException& e)
-	{
-		std::cout << e.what() << std::endl;
-		mPlugin.reset();
-	}
-	std::cout << "registered example service" << std::endl;
+  mRegistration = RegisteredService::create<ExampleGUIExtenderService>(context, GUIExtenderService_iid);
 }
 
 void ExamplePluginActivator::stop(ctkPluginContext* context)
 {
-	mRegistration.unregister();
-	if(mPlugin)
-		mPlugin.reset();
-	std::cout << "Stopped ExamplePluginActivator" << std::endl;
-	Q_UNUSED(context)
+  mRegistration.reset();
+    Q_UNUSED(context);
 }
 
 } // namespace cx

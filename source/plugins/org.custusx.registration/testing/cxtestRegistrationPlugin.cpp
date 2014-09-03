@@ -41,7 +41,7 @@ namespace
 ctkPluginContext* getPluginContext()
 {
 	cx::LogicManager::getInstance()->getPluginFramework()->start();
-	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginFramework()->getPluginContext();
+	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
 	return context;
 }
 } // namespace
