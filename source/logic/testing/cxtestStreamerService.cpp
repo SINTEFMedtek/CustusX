@@ -43,13 +43,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cxtest
 {
+
 TEST_CASE("StreamerService: Service available", "[streaming][service][unit]")
 {
 	cx::DataLocations::setTestMode();
 	cx::LogicManager::initialize();
 
-	cx::PluginFrameworkManagerPtr pluginFramework = cx::logicManager()->getPluginFramework();
-	ctkPluginContext* context = pluginFramework->getPluginContext();
+	ctkPluginContext* context = cx::logicManager()->getPluginContext();
 
 	ctkServiceTracker<cx::StreamerService*> tracker(context);
 	tracker.open();

@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientData.h"
 #include "cxSettings.h"
 #include "cxDataReaderWriter.h"
+#include "cxDataManager.h"
 
 namespace cx
 {
