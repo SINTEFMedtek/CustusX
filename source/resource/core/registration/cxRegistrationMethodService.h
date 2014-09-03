@@ -34,22 +34,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXREGISTRATIONMETHODSERVICE_H
 
 #include <QObject>
-#include "boost/shared_ptr.hpp"
-#include "cxTransform3D.h"
 
-class QDateTime;
-
-namespace cx
-{
-typedef boost::shared_ptr<class Data> DataPtr;
-}
+//class QDateTime;
 
 #define RegistrationMethodService_iid "cx::RegistrationMethodService"
 
 namespace cx
 {
-class RegistrationTransform;
-typedef boost::shared_ptr<class RegistrationMethodService> RegistrationMethodServicePtr;
 
 /** \brief Registration Method services
  *
@@ -66,23 +57,13 @@ class RegistrationMethodService : public QObject
 public:
     virtual ~RegistrationMethodService() {}
 
-    virtual void setMovingData(DataPtr data) = 0;
-    virtual void setFixedData(DataPtr data) = 0;
-    virtual DataPtr getMovingData() = 0;
-    virtual DataPtr getFixedData() = 0;
+    virtual void showPatientRegistrationGUI(/*parent widget reference*/) = 0;
+    virtual void showImage2ImageRegistrationGUI(/*parent widget reference*/) = 0;
+    virtual void showImageTransformGUI(/*parent widget reference*/) = 0;
 
-    virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description) = 0;
-    virtual void applyPatientRegistration(Transform3D rMpr_new, QString description) = 0;
+//    virtual QDateTime getLastRegistrationTime() = 0;
+//    virtual void setLastRegistrationTime(QDateTime time) = 0;
 
-    virtual QDateTime getLastRegistrationTime() = 0;
-    virtual void setLastRegistrationTime(QDateTime time) = 0;
-
-//	virtual bool isNull() = 0;
-//	static RegistrationServicePtr getNullObject();
-
-signals:
-    void fixedDataChanged(QString uid);
-    void movingDataChanged(QString uid);
 };
 
 } //namespace cx
