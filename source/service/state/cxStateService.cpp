@@ -244,15 +244,7 @@ QStringList StateService::getOpenIGTLinkServer()
  */
 QStringList StateService::getDefaultGrabberServer()
 {
-	QStringList retval = this->getOpenIGTLinkServer();
-
-	// Only UltrasonixServer.exe is available in 32 bit Windows
-#ifdef WIN32
-	if(retval.isEmpty())
-		retval = this->getGrabberServer(filename, "UltrasonixServer.exe", "");
-#endif
-
-	return retval;
+	return this->getOpenIGTLinkServer();
 }
 
 QStringList StateService::getGrabberServer(QString filename, QString postfix)

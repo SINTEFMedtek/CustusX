@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegistrationServiceNull.h"
 #include "cxRegistrationImplService.h"
-#include "cxRegistrationPluginActivator.h"
 #include "cxLogicManager.h"
 #include "cxPluginFramework.h"
 
@@ -44,7 +43,7 @@ ctkPluginContext* getPluginContext()
 {
     cx::LogicManager::initialize();
 	cx::LogicManager::getInstance()->getPluginFramework()->start();
-	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginFramework()->getPluginContext();
+	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
 	return context;
 }
 } // namespace
@@ -72,15 +71,6 @@ TEST_CASE("RegistrationPlugin: Check empty RegistrationImplService", "[unit][plu
     REQUIRE_FALSE(service->getFixedData());
     REQUIRE_FALSE(service->getMovingData());
     REQUIRE_FALSE(service->isNull());
-}
-
-TEST_CASE("RegistrationPlugin: RegistrationPluginActivator start/stop", "[unit][plugins][org.custusx.registration]")
-{
-	cx::RegistrationPluginActivator activator;
-	ctkPluginContext* context = getPluginContext();
-	REQUIRE(context);
-	activator.start(context);
-	activator.stop(context);
 }
 
 TEST_CASE("RegistrationPlugin: RegistrationService available", "[unit][plugins][org.custusx.registration]")

@@ -350,7 +350,7 @@ void TextDisplay::forceUseVtkTextMapper()
 			vtkObjectFactory::UnRegisterFactory(factory);
 		}
 	}
-	this->verifyVtkTextMapper();
+	verifyVtkTextMapper();
 }
 
 void TextDisplay::verifyVtkTextMapper()

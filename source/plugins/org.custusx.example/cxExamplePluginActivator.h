@@ -63,9 +63,7 @@ public:
   void stop(ctkPluginContext* context);
 
 private:
-  ctkPluginContext* mContext;
-  ExampleGUIExtenderServicePtr mPlugin;
-  ctkServiceRegistration mRegistration;
+  RegisteredServicePtr mRegistration;
 };
 
 } // namespace cx

@@ -45,7 +45,7 @@ TEST_CASE("LogicManager: Load one core plugin (PatientModelService)", "[integrat
 	cx::DataLocations::setTestMode();
 	cx::LogicManager::initialize();
 
-	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginFramework()->getPluginContext();
+	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
 	ctkServiceTracker<cx::PatientModelService*> tracker(context);
 	tracker.open();
 	cx::PatientModelService* service = tracker.getService(); // get arbitrary instance of this type

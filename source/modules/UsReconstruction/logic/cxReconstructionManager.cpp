@@ -69,7 +69,7 @@ ReconstructionManager::ReconstructionManager(XmlOptionFile settings, QString sha
 	connect(mParams.get(), SIGNAL(transferFunctionChanged()), this, SLOT(transferFunctionChangedSlot()));
 
 	mServiceListener = boost::shared_ptr<ServiceTrackerListener<ReconstructionService> >(new ServiceTrackerListener<ReconstructionService>(
-					LogicManager::getInstance()->getPluginFramework()->getPluginContext(),//Should get pluginContext in constructor to make it independant of LogicManager
+					LogicManager::getInstance()->getPluginContext(),//Should get pluginContext in constructor to make it independant of LogicManager
 	        boost::bind(&ReconstructionManager::onServiceAdded, this, _1),
 	        boost::bind(&ReconstructionManager::onServiceModified, this, _1),
 	        boost::bind(&ReconstructionManager::onServiceRemoved, this, _1)

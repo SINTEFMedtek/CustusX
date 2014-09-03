@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 	cx::AlgorithmPluginPtr algorithmPlugin(new cx::AlgorithmPlugin());
 	plugins.push_back(   algorithmPlugin);
 	cx::RegistrationPluginPtr registrationPlugin(new cx::RegistrationPlugin(acquisitionPlugin->getAcquisitionData(),
-																			cx::LogicManager::getInstance()->getPluginFramework()->getPluginContext()));
+																			cx::LogicManager::getInstance()->getPluginContext()));
 	plugins.push_back(   registrationPlugin);
 
 

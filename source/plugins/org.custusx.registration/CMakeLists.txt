@@ -6,7 +6,7 @@ message(STATUS "===================================== parsing example")
 
 include_directories(
     ${CustusX_SOURCE_DIR}/source/resource/core/registration
-    ${CustusX_SOURCE_DIR}/source/resource/core/math
+    ${CustusX_SOURCE_DIR}/source/resource/core/Math
     ${CustusX_SOURCE_DIR}/source/resource/core/Data
     ${CustusX_SOURCE_DIR}/source/resource/core/utilities
     ${CustusX_SOURCE_DIR}/source/resource/core/logger
@@ -15,6 +15,7 @@ include_directories(
 
 set(PLUGIN_SRCS
   cxRegistrationPluginActivator.cpp
+  cxRegistrationPluginActivator.h
   cxRegistrationImplService.cpp
   cxRegistrationApplicator.cpp
   cxRegistrationApplicator.h
