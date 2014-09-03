@@ -218,7 +218,8 @@ class CTK(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:commontk/CTK')
     def update(self):
-        latestTestedSHA = '3fe3cdbe9d0ef95b3810a12484f035ae1f66524c'
+        #latestTestedSHA = '3fe3cdbe9d0ef95b3810a12484f035ae1f66524c'
+        latestTestedSHA = 'fd3ecf9630b93be700ab97364c24556e59732374' #working on windows
         self._getBuilder().gitCheckout(latestTestedSHA)
     def configure(self):
         builder = self._getBuilder()
