@@ -159,6 +159,9 @@ private:
     void registerToolBar(QToolBar* toolbar, QString groupname = "");
 	void addToWidgetGroupMap(QAction* action, QString groupname);
 	void addGUIExtender(GUIExtenderService* service);
+	QWidget *addCategorizedWidget(GUIExtenderService::CategorizedWidget categorizedWidget);
+	QTabWidget *getCategoryWidget(GUIExtenderService::CategorizedWidget categorizedWidget);
+	QTabWidget *createCategoryWidget(GUIExtenderService::CategorizedWidget categorizedWidget);
 	void removeGUIExtender(GUIExtenderService* service);
 	void setupGUIExtenders();
 

@@ -200,13 +200,49 @@ void MainWindow::setupGUIExtenders()
 void MainWindow::addGUIExtender(GUIExtenderService* service)
 {
 	std::vector<GUIExtenderService::CategorizedWidget> widgets = service->createWidgets();
-    for (unsigned j = 0; j < widgets.size(); ++j)
-    {
-        QWidget* widget = this->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory);
-        mWidgetsByPlugin[service].push_back(widget);
-    }
+	for (unsigned j = 0; j < widgets.size(); ++j)
+	{
+		QWidget* widget = this->addCategorizedWidget(widgets[j]);
+		mWidgetsByPlugin[service].push_back(widget);
+	}
 }
 
+QWidget *MainWindow::addCategorizedWidget(GUIExtenderService::CategorizedWidget categorizedWidget)
+{
+	QWidget* retval;
+	if(!categorizedWidget.mSubCategory.isEmpty())
+	{
+		QTabWidget* widget = this->getCategoryWidget(categorizedWidget);
+		if(widget)
+			widget->addTab(categorizedWidget.mWidget, categorizedWidget.mSubCategory);
+		else
+			widget = this->createCategoryWidget(categorizedWidget);
+		retval = widget;
+	}
+	else
+	{
+		retval = this->addAsDockWidget(categorizedWidget.mWidget, categorizedWidget.mCategory);
+	}
+	return retval;
+}
+
+QTabWidget *MainWindow::getCategoryWidget(GUIExtenderService::CategorizedWidget categorizedWidget)
+{
+	QTabWidget *retval;
+	if (mWidgetGroupsMap.find(categorizedWidget.mCategory) != mWidgetGroupsMap.end())
+	{
+		//Add to the widget of the first action. Not finised.
+		retval = dynamic_cast<QTabWidget*>(mWidgetGroupsMap[categorizedWidget.mCategory]->actions()[0]->parentWidget());
+	}
+	return retval;
+}
+
+QTabWidget *MainWindow::createCategoryWidget(GUIExtenderService::CategorizedWidget categorizedWidget)
+{
+	QTabWidget *retval = new QTabWidget(this);
+	retval->addTab(categorizedWidget.mWidget, categorizedWidget.mSubCategory);
+	return retval;
+}
 
 void MainWindow::removeGUIExtender(GUIExtenderService* service)
 {
