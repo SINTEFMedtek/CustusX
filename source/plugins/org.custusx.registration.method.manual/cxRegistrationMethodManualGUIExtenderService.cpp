@@ -30,44 +30,33 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXGUIEXTENDERSERVICE_H_
-#define CXGUIEXTENDERSERVICE_H_
-
-#include <QObject>
-#include "boost/shared_ptr.hpp"
-class QWidget;
-class QToolBar;
-#include <vector>
-
-#define GUIExtenderService_iid "cx::GUIExtenderService"
+#include "cxRegistrationMethodManualGUIExtenderService.h"
+#include "ctkPluginContext.h"
+#include "cxExampleWidget.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class GUIExtenderService> GUIExtenderServicePtr;
 
-/** Interface for service that extends the user interface with more widgets.
- *
- */
-class GUIExtenderService : public QObject
+
+RegistrationMethodManualGUIExtenderService::RegistrationMethodManualGUIExtenderService(ctkPluginContext *context) :
+  mContext(context)
 {
-	Q_OBJECT
-public:
-	struct CategorizedWidget
-	{
-		CategorizedWidget() {}
-        CategorizedWidget(QWidget* widget, QString category, QString subCategory="") : mWidget(widget), mCategory(category), mSubCategory(subCategory) {}
-		QWidget* mWidget;
-		QString mCategory;
-        QString mSubCategory;
-	};
-	virtual ~GUIExtenderService() {}
+}
 
-	virtual std::vector<CategorizedWidget> createWidgets() const = 0;
-//	virtual std::vector<QToolBar*> createToolBars() const { return std::vector<QToolBar*>(); }
-};
+RegistrationMethodManualGUIExtenderService::~RegistrationMethodManualGUIExtenderService()
+{
+}
 
-} // namespace cx
-Q_DECLARE_INTERFACE(cx::GUIExtenderService, GUIExtenderService_iid)
+std::vector<GUIExtenderService::CategorizedWidget> RegistrationMethodManualGUIExtenderService::createWidgets() const
+{
+	std::vector<CategorizedWidget> retval;
+
+	retval.push_back(GUIExtenderService::CategorizedWidget(
+			new ExampleWidget(),
+            "Registration", "Manual"));
+
+	return retval;
+}
 
 
-#endif /* CXGUIEXTENDERSERVICE_H_ */
+} /* namespace cx */

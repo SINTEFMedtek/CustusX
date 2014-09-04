@@ -44,6 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QAction;
 class QMenu;
 class QActionGroup;
+class QDockWidget;
+class QScrollArea;
 
 namespace cx
 {
@@ -150,8 +152,11 @@ private:
 	void createMenus(); ///< creates and add (gui-)menues
 	void createToolBars(); ///< creates and adds toolbars for convenience
 
-	QWidget* addAsDockWidget(QWidget* widget, QString groupname = "");
-	void registerToolBar(QToolBar* toolbar, QString groupname = "");
+    QWidget* addAsDockWidget(QWidget* widget, QString groupname = "");
+    QDockWidget* createDockWidget(QWidget* widget);
+    QScrollArea *addVerticalScroller(QWidget* widget);
+    void tabifyWidget(QDockWidget* dockWidget);
+    void registerToolBar(QToolBar* toolbar, QString groupname = "");
 	void addToWidgetGroupMap(QAction* action, QString groupname);
 	void addGUIExtender(GUIExtenderService* service);
 	void removeGUIExtender(GUIExtenderService* service);

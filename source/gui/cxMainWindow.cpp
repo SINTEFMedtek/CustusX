@@ -254,39 +254,52 @@ void MainWindow::startupLoadPatient()
 
 QWidget* MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
 {
-	// add a scroller to allow for very large widgets in the vertical direction
-	QScrollArea* scroller = new QScrollArea(NULL);
-	scroller->setWidget(widget);
-	scroller->setWidgetResizable(true);
-	scroller->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	QSizePolicy policy = scroller->sizePolicy();
-	policy.setHorizontalPolicy(QSizePolicy::Minimum);
-	scroller->setSizePolicy(policy);
-
-	QDockWidget* dockWidget = new QDockWidget(widget->windowTitle(), this);
-	dockWidget->setObjectName(widget->objectName() + "DockWidget");
-	dockWidget->setWidget(scroller);
+    QDockWidget* dockWidget = this->createDockWidget(widget);
 
 	QMainWindow::addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
 
-	// tabify the widget onto one of the left widgets.
-	for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter != mDockWidgets.end(); ++iter)
-	{
-		if (this->dockWidgetArea(*iter) == Qt::LeftDockWidgetArea)
-		{
-			this->tabifyDockWidget(*iter, dockWidget);
-			break;
-		}
-	}
+    this->tabifyWidget(dockWidget);
+
+    mDockWidgets.insert(dockWidget);
+    dockWidget->setVisible(false); // default visibility
+    this->restoreDockWidget(dockWidget); // restore if added after construction
+
+    this->addToWidgetGroupMap(dockWidget->toggleViewAction(), groupname);
+    return dockWidget;
+}
 
 
-	mDockWidgets.insert(dockWidget);
-	dockWidget->setVisible(false); // default visibility
-	this->restoreDockWidget(dockWidget); // restore if added after construction
+QDockWidget* MainWindow::createDockWidget(QWidget* widget)
+{
+    QScrollArea* scroller = this->addVerticalScroller(widget);
+    QDockWidget* dockWidget = new QDockWidget(widget->windowTitle(), this);
+    dockWidget->setObjectName(widget->objectName() + "DockWidget");
+    dockWidget->setWidget(scroller);
+    return dockWidget;
+}
 
-	this->addToWidgetGroupMap(dockWidget->toggleViewAction(), groupname);
+QScrollArea* MainWindow::addVerticalScroller(QWidget *widget)
+{
+    QScrollArea* scroller = new QScrollArea(NULL);
+    scroller->setWidget(widget);
+    scroller->setWidgetResizable(true);
+    scroller->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    QSizePolicy policy = scroller->sizePolicy();
+    policy.setHorizontalPolicy(QSizePolicy::Minimum);
+    scroller->setSizePolicy(policy);
+    return scroller;
+}
 
-	return dockWidget;
+void MainWindow::tabifyWidget(QDockWidget* dockWidget)
+{
+    for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter != mDockWidgets.end(); ++iter)
+    {
+        if (this->dockWidgetArea(*iter) == Qt::LeftDockWidgetArea)
+        {
+            this->tabifyDockWidget(*iter, dockWidget);
+            break;
+        }
+    }
 }
 
 void MainWindow::addToWidgetGroupMap(QAction* action, QString groupname)

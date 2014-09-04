@@ -30,44 +30,38 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXGUIEXTENDERSERVICE_H_
-#define CXGUIEXTENDERSERVICE_H_
+#include "cxRegistrationMethodManualPluginActivator.h"
 
-#include <QObject>
-#include "boost/shared_ptr.hpp"
-class QWidget;
-class QToolBar;
-#include <vector>
+#include <QtPlugin>
+#include <iostream>
 
-#define GUIExtenderService_iid "cx::GUIExtenderService"
+#include "cxRegistrationMethodManualGUIExtenderService.h"
+#include "cxRegisteredService.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class GUIExtenderService> GUIExtenderServicePtr;
 
-/** Interface for service that extends the user interface with more widgets.
- *
- */
-class GUIExtenderService : public QObject
+RegistrationMethodManualPluginActivator::RegistrationMethodManualPluginActivator()
 {
-	Q_OBJECT
-public:
-	struct CategorizedWidget
-	{
-		CategorizedWidget() {}
-        CategorizedWidget(QWidget* widget, QString category, QString subCategory="") : mWidget(widget), mCategory(category), mSubCategory(subCategory) {}
-		QWidget* mWidget;
-		QString mCategory;
-        QString mSubCategory;
-	};
-	virtual ~GUIExtenderService() {}
+    std::cout << "Created RegistrationMethodManualPluginActivator" << std::endl;
+}
 
-	virtual std::vector<CategorizedWidget> createWidgets() const = 0;
-//	virtual std::vector<QToolBar*> createToolBars() const { return std::vector<QToolBar*>(); }
-};
+RegistrationMethodManualPluginActivator::~RegistrationMethodManualPluginActivator()
+{}
+
+void RegistrationMethodManualPluginActivator::start(ctkPluginContext* context)
+{
+  mRegistration = RegisteredService::create<RegistrationMethodManualGUIExtenderService>(context, GUIExtenderService_iid);
+}
+
+void RegistrationMethodManualPluginActivator::stop(ctkPluginContext* context)
+{
+  mRegistration.reset();
+    Q_UNUSED(context);
+}
 
 } // namespace cx
-Q_DECLARE_INTERFACE(cx::GUIExtenderService, GUIExtenderService_iid)
+
+Q_EXPORT_PLUGIN2(RegistrationMethodManualPluginActivator_irrelevant_string, cx::RegistrationMethodManualPluginActivator)
 
 
-#endif /* CXGUIEXTENDERSERVICE_H_ */

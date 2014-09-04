@@ -30,44 +30,43 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXGUIEXTENDERSERVICE_H_
-#define CXGUIEXTENDERSERVICE_H_
+#ifndef CXREGISTRATIONMETHODMANUALPLUGINACTIVATOR_H_
+#define CXREGISTRATIONMETHODMANUALPLUGINACTIVATOR_H_
 
-#include <QObject>
+#include <ctkPluginActivator.h>
 #include "boost/shared_ptr.hpp"
-class QWidget;
-class QToolBar;
-#include <vector>
-
-#define GUIExtenderService_iid "cx::GUIExtenderService"
 
 namespace cx
 {
-typedef boost::shared_ptr<class GUIExtenderService> GUIExtenderServicePtr;
 
-/** Interface for service that extends the user interface with more widgets.
+typedef boost::shared_ptr<class RegistrationMethodManualGUIExtenderService> RegistrationMethodManualGUIExtenderServicePtr;
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+
+/**
+ * Activator for the example plugin
  *
+ * \ingroup org_custusx_registration_method_manual
+ *
+ * \date 2014-04-15
+ * \author Christian Askeland
  */
-class GUIExtenderService : public QObject
+class RegistrationMethodManualPluginActivator :  public QObject, public ctkPluginActivator
 {
-	Q_OBJECT
-public:
-	struct CategorizedWidget
-	{
-		CategorizedWidget() {}
-        CategorizedWidget(QWidget* widget, QString category, QString subCategory="") : mWidget(widget), mCategory(category), mSubCategory(subCategory) {}
-		QWidget* mWidget;
-		QString mCategory;
-        QString mSubCategory;
-	};
-	virtual ~GUIExtenderService() {}
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
 
-	virtual std::vector<CategorizedWidget> createWidgets() const = 0;
-//	virtual std::vector<QToolBar*> createToolBars() const { return std::vector<QToolBar*>(); }
+public:
+
+  RegistrationMethodManualPluginActivator();
+  ~RegistrationMethodManualPluginActivator();
+
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
+
+private:
+  RegisteredServicePtr mRegistration;
 };
 
 } // namespace cx
-Q_DECLARE_INTERFACE(cx::GUIExtenderService, GUIExtenderService_iid)
 
-
-#endif /* CXGUIEXTENDERSERVICE_H_ */
+#endif /* CXREGISTRATIONMETHODMANUALPLUGINACTIVATOR_H_ */

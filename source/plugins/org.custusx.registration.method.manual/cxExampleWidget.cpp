@@ -30,44 +30,36 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXGUIEXTENDERSERVICE_H_
-#define CXGUIEXTENDERSERVICE_H_
-
-#include <QObject>
-#include "boost/shared_ptr.hpp"
-class QWidget;
-class QToolBar;
-#include <vector>
-
-#define GUIExtenderService_iid "cx::GUIExtenderService"
+#include "cxExampleWidget.h"
+#include <QLabel>
+#include <QVBoxLayout>
 
 namespace cx
 {
-typedef boost::shared_ptr<class GUIExtenderService> GUIExtenderServicePtr;
 
-/** Interface for service that extends the user interface with more widgets.
- *
- */
-class GUIExtenderService : public QObject
+ExampleWidget::ExampleWidget(QWidget* parent) :
+    QWidget(parent),
+    mVerticalLayout(new QVBoxLayout(this))
 {
-	Q_OBJECT
-public:
-	struct CategorizedWidget
-	{
-		CategorizedWidget() {}
-        CategorizedWidget(QWidget* widget, QString category, QString subCategory="") : mWidget(widget), mCategory(category), mSubCategory(subCategory) {}
-		QWidget* mWidget;
-		QString mCategory;
-        QString mSubCategory;
-	};
-	virtual ~GUIExtenderService() {}
+    this->setObjectName("ExampleWidget");
+    this->setWindowTitle("Example");
+    this->setWhatsThis(this->defaultWhatsThis());
 
-	virtual std::vector<CategorizedWidget> createWidgets() const = 0;
-//	virtual std::vector<QToolBar*> createToolBars() const { return std::vector<QToolBar*>(); }
-};
+    mVerticalLayout->addWidget(new QLabel("Hello Plugin!"));
+}
 
-} // namespace cx
-Q_DECLARE_INTERFACE(cx::GUIExtenderService, GUIExtenderService_iid)
+ExampleWidget::~ExampleWidget()
+{
+}
+
+QString ExampleWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Example plugin.</h3>"
+      "<p>Used for developers as a starting points for developing a new plugin</p>"
+      "</html>";
+}
 
 
-#endif /* CXGUIEXTENDERSERVICE_H_ */
+
+} /* namespace cx */

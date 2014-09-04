@@ -48,6 +48,7 @@ set(CX_PLUGINS
 #  org.custusx.filter.tubesegmentation:OFF
   org.custusx.registration:ON
 #  org.custusx.registration.ctus:ON
+  org.custusx.registration.method.manual:ON
 )
 
 #foreach(var ${CX_PLUGINS})

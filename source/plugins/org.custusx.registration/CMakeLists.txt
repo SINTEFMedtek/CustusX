@@ -43,7 +43,7 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}
     cxResource
 #TODO: Remove these dependencies
-    cxPatientService
+#    cxPatientService
     cxLogicManager
     )
 
