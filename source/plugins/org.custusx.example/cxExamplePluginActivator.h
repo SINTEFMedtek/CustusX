@@ -40,6 +40,7 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class ExampleGUIExtenderService> ExampleGUIExtenderServicePtr;
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
  * Activator for the example plugin
