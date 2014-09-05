@@ -82,6 +82,7 @@ PluginFrameworkManager::PluginFrameworkManager()
 PluginFrameworkManager::~PluginFrameworkManager()
 {
 	this->saveState();
+	this->stop();
 }
 
 QString PluginFrameworkManager::convertToRelativePath(QString path) const

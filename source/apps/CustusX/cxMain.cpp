@@ -45,6 +45,49 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxApplication.h"
 #include "cxPluginFramework.h"
 
+
+#include <langinfo.h>
+#include <locale>
+#include "cxReporter.h"
+void force_C_locale_decimalseparator()
+{
+	QString radixChar = nl_langinfo(RADIXCHAR);
+	QString C_radixChar = ".";
+
+	if (radixChar != C_radixChar)
+	{
+		setlocale(LC_NUMERIC,"C");
+
+		cx::reportWarning(QString("Detected non-standard decimal separator [%1], changing to standard [%1].")
+				.arg(radixChar)
+				.arg(C_radixChar));
+
+		QString number = QString("%1").arg(0.5);
+//		QString setRadixChar = nl_langinfo(RADIXCHAR);
+//		if (setRadixChar!=C_radicChar)
+		if (!number.contains(C_radixChar))
+			cx::reportError(QString("Failed to set decimal separator."));
+	}
+
+//	std::cout << "locale: " << QLocale::system().nativeLanguageName() << std::endl;
+//	std::cout << "locale radix: " << QLocale::system().decimalPoint() << std::endl;
+//	std::cout << "RADIXCHAR " << std::string(nl_langinfo(RADIXCHAR)) << std::endl;
+//	std::cout << "___________ " << std::endl;
+//	std::cout << "c locale: " << QLocale::c().nativeLanguageName() << std::endl;
+//	std::cout << "clocale radix: " << QLocale::c().decimalPoint() << std::endl;
+//	std::cout << "formatted double: " << 2.5 << std::endl;
+
+//	std::cout << std::endl << "change locale: " << std::endl;
+//	//  setlocale(LC_NUMERIC,"C");
+//	//  QLocale::setDefault(QLocale::c());
+
+//	std::cout << "locale: " << QLocale::system().nativeLanguageName() << std::endl;
+//	std::cout << "locale radix: " << QLocale::system().decimalPoint() << std::endl;
+//	std::cout << "RADIXCHAR " << std::string(nl_langinfo(RADIXCHAR)) << std::endl;
+//	std::cout << "formatted double: " << 2.5 << std::endl;
+
+}
+
 #ifdef WIN32
 int __stdcall WinMain(int argc, char *argv[])
 #else
@@ -60,6 +103,21 @@ int main(int argc, char *argv[])
   app.setWindowIcon(QIcon(":/icons/CustusX.png"));
   app.setAttribute(Qt::AA_DontShowIconsInMenus, false);
 
+  force_C_locale_decimalseparator();
+
+//  std::cout << "native lang: " <<  QLocale::system().nativeLanguageName() << std::endl;
+//  std::cout << "native sep: " <<  QLocale::system().decimalPoint() << std::endl;
+//  std::cout << "native lang: " <<  QLocale::c().nativeLanguageName() << std::endl;
+//  std::cout << "native sep: " <<  QLocale::c().decimalPoint() << std::endl;
+
+//  std::cout << "**change locale: " << std::endl;
+//  setlocale(LC_ALL,"C");
+
+//  std::cout << "native lang: " <<  QLocale::system().nativeLanguageName() << std::endl;
+//  std::cout << "native sep: " <<  QLocale::system().decimalPoint() << std::endl;
+//  std::cout << "native lang: " <<  QLocale::c().nativeLanguageName() << std::endl;
+//  std::cout << "native sep: " <<  QLocale::c().decimalPoint() << std::endl;
+
   cx::LogicManager::initialize();
 
 	std::vector<cx::GUIExtenderServicePtr> plugins;
@@ -73,7 +131,7 @@ int main(int argc, char *argv[])
 	cx::AlgorithmPluginPtr algorithmPlugin(new cx::AlgorithmPlugin());
 	plugins.push_back(   algorithmPlugin);
 	cx::RegistrationPluginPtr registrationPlugin(new cx::RegistrationPlugin(acquisitionPlugin->getAcquisitionData(),
-																			cx::LogicManager::getInstance()->getPluginFramework()->getPluginContext()));
+																			cx::LogicManager::getInstance()->getPluginContext()));
 	plugins.push_back(   registrationPlugin);
 
 

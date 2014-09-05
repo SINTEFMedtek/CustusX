@@ -40,14 +40,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include "cxImage.h"
 #include "cxMesh.h"
-#include "cxDataManager.h"
 #include <QFileInfo>
 #include "boost/scoped_ptr.hpp"
 
 namespace cx
 {
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-class DataManager;
 
 /**
  * \file

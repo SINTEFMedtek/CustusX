@@ -8,15 +8,15 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
 1. Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
+	 this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+	 this list of conditions and the following disclaimer in the documentation
+	 and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors
-   may be used to endorse or promote products derived from this software
-   without specific prior written permission.
+	 may be used to endorse or promote products derived from this software
+	 without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -29,42 +29,34 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXREGISTRATIONSERVICENULL_H
-#define CXREGISTRATIONSERVICENULL_H
 
-#include "cxRegistrationService.h"
+#include "cxRegisteredService.h"
+#include <iostream>
+#include "cxTypeConversions.h"
 
 namespace cx
 {
 
-/** \brief Null Object Pattern for Registration service
- *
- *
- *  \ingroup cx_resource_core_registration
- *  \date 2014-08-28
- *  \author Ole Vegard Solberg, SINTEF
- */
-class RegistrationServiceNull : public RegistrationService
+RegisteredService::RegisteredService(ctkPluginContext* context, QObject* instance, QString iid)
 {
+	mService.reset(instance);
+//	std::cout << "created service " << iid << std::endl;
+	try
+	{
+		mReference= context->registerService(QStringList(iid), mService.get());
+	}
+	catch(ctkRuntimeException& e)
+	{
+		std::cout << e.what() << std::endl;
+		mService.reset();
+	}
+//	std::cout << "registered service " << iid << std::endl;
+}
 
-public:
-	RegistrationServiceNull();
-	virtual void setMovingData(DataPtr data);
-	virtual void setFixedData(DataPtr data);
-	virtual DataPtr getMovingData();
-	virtual DataPtr getFixedData();
-
-	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
-	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description);
-
-	virtual QDateTime getLastRegistrationTime();
-	virtual void setLastRegistrationTime(QDateTime time);
-
-	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame);
-
-	virtual bool isNull();
-private:
-	void printWarning();
-};
-} // namespace cx
-#endif // CXREGISTRATIONSERVICENULL_H
+RegisteredService::~RegisteredService()
+{
+	if(mReference)
+		mReference.unregister();
+	mService.reset();
+}
+} //namespace cx

@@ -15,12 +15,14 @@ SET (cxLogicManager_SOURCE
     cxServiceController.cpp
     cxLogicManager.h
     cxLogicManager.cpp
-	cxLegacySingletons.h
-	cxLegacySingletons.cpp
-	cxPluginFramework.h
-	cxPluginFramework.cpp
-	cxPluginFrameworkUtilities.h
-	cxPluginFrameworkUtilities.cpp
+    cxLegacySingletons.h
+    cxLegacySingletons.cpp
+    cxPluginFramework.h
+    cxPluginFramework.cpp
+    cxPluginFrameworkUtilities.h
+    cxPluginFrameworkUtilities.cpp
+    cxRegisteredService.h
+    cxRegisteredService.cpp
 )
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})

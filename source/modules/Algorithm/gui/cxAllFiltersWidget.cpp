@@ -68,10 +68,9 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
 	mFilters->append(FilterPtr(new ResampleImageFilter()));
 	mFilters->append(FilterPtr(new DilationFilter()));
 
-	PluginFrameworkManagerPtr pluginFramework = LogicManager::getInstance()->getPluginFramework();
 	mServiceListener.reset(
 			new ServiceTrackerListener<Filter>(
-					pluginFramework->getPluginContext(),
+					LogicManager::getInstance()->getPluginContext(),
 					boost::bind(&AllFiltersWidget::onServiceAdded, this, _1),
 					boost::function<void(Filter*)>(),
 					boost::bind(&AllFiltersWidget::onServiceRemoved, this, _1)));

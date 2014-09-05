@@ -29,42 +29,5 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXREGISTRATIONSERVICENULL_H
-#define CXREGISTRATIONSERVICENULL_H
 
-#include "cxRegistrationService.h"
-
-namespace cx
-{
-
-/** \brief Null Object Pattern for Registration service
- *
- *
- *  \ingroup cx_resource_core_registration
- *  \date 2014-08-28
- *  \author Ole Vegard Solberg, SINTEF
- */
-class RegistrationServiceNull : public RegistrationService
-{
-
-public:
-	RegistrationServiceNull();
-	virtual void setMovingData(DataPtr data);
-	virtual void setFixedData(DataPtr data);
-	virtual DataPtr getMovingData();
-	virtual DataPtr getFixedData();
-
-	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
-	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description);
-
-	virtual QDateTime getLastRegistrationTime();
-	virtual void setLastRegistrationTime(QDateTime time);
-
-	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame);
-
-	virtual bool isNull();
-private:
-	void printWarning();
-};
-} // namespace cx
-#endif // CXREGISTRATIONSERVICENULL_H
+#include "cxRegistrationMethodService.h"

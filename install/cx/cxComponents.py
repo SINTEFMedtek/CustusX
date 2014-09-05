@@ -182,7 +182,7 @@ class VTK(CppComponent):
         # this fix should rebase repo from the original Kitware/VTK to our own fork on GitHub.
         repo = 'git@github.com:SINTEFMedisinskTeknologi/VTK'
         branch = 'VTK-CX-modifications'
-        tag = 'VTK-6-1-0.cx_patch_1'
+        tag = 'VTK-6-1-0.cx_patch_2'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
         self._getBuilder().gitCheckout(tag)
     def configure(self):
@@ -462,7 +462,7 @@ class OpenCLUtilityLibrary(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:smistad/OpenCLUtilityLibrary')
     def update(self):
-        self._getBuilder().gitCheckout('d3b05fd1539d7d62e6c5f696ca8a31fd98e571b2', submodules=False)
+        self._getBuilder().gitUpdate('custusx', submodules=False)
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()

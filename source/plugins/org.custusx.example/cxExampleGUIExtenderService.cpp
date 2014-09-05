@@ -31,13 +31,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxExampleGUIExtenderService.h"
+#include "ctkPluginContext.h"
 #include "cxExampleWidget.h"
 
 namespace cx
 {
 
 
-ExampleGUIExtenderService::ExampleGUIExtenderService()
+ExampleGUIExtenderService::ExampleGUIExtenderService(ctkPluginContext *context) :
+  mContext(context)
 {
 }
 

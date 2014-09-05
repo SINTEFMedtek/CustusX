@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxGUIExtenderService.h"
 #include "org_custusx_example_Export.h"
+class ctkPluginContext;
 
 namespace cx
 {
@@ -51,10 +52,13 @@ class org_custusx_example_EXPORT ExampleGUIExtenderService : public GUIExtenderS
 {
 	Q_INTERFACES(cx::GUIExtenderService)
 public:
-	ExampleGUIExtenderService();
+	ExampleGUIExtenderService(ctkPluginContext *context);
 	virtual ~ExampleGUIExtenderService();
 
 	std::vector<CategorizedWidget> createWidgets() const;
+
+private:
+  ctkPluginContext* mContext;
 
 };
 typedef boost::shared_ptr<ExampleGUIExtenderService> ExampleGUIExtenderServicePtr;

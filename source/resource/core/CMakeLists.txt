@@ -81,6 +81,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	utilities/cxSpaceListenerImpl
 
 	registration/cxRegistrationService
+        registration/cxRegistrationMethodService
 	registration/cxRegistrationServiceNull
 	)
 
@@ -104,6 +105,7 @@ cx_add_class(cxResource_SOURCE
 	Data/cxGPUImageBuffer
 	Data/cxImageDefaultTFGenerator
 	Data/cxImageParameters
+	Data/cxFrameForest
 
 	Math/cxBoundingBox3D
 	Math/cxVector3D
@@ -187,6 +189,11 @@ set( CX_RESOURCE_LIBRARIES
 vtkCommonCore
 vtkCommonDataModel
 vtkCommonExecutionModel
+vtkCommonMath
+vtkCommonMisc
+vtkCommonSystem
+vtkCommonTransforms
+vtkIOCore
 vtkIOImage
 vtkIOGeometry
 vtkIOLegacy
@@ -195,6 +202,7 @@ vtkImagingStatistics
 vtkImagingColor
 vtkImagingMath
 vtkImagingGeneral
+vtkImagingCore
 #vtkImagingMorphological
 vtkFiltersCore
 vtkFiltersGeneral
@@ -202,6 +210,7 @@ vtkFiltersSources
 #vtkFiltersParallel
 vtkRenderingFreeTypeOpenGL
 vtkRenderingFreeType
+vtkRenderingOpenGL
 vtkRenderingCore
 vtkRenderingVolume
 vtkInteractionStyle

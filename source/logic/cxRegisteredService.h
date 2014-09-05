@@ -8,15 +8,15 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
 1. Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
+	 this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+	 this list of conditions and the following disclaimer in the documentation
+	 and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors
-   may be used to endorse or promote products derived from this software
-   without specific prior written permission.
+	 may be used to endorse or promote products derived from this software
+	 without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -29,42 +29,42 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXREGISTRATIONSERVICENULL_H
-#define CXREGISTRATIONSERVICENULL_H
 
-#include "cxRegistrationService.h"
+#ifndef CXREGISTEREDSERVICE_H
+#define CXREGISTEREDSERVICE_H
+
+#include "boost/shared_ptr.hpp"
+#include <ctkPluginActivator.h>
+
+typedef boost::shared_ptr<class QObject> QObjectPtr;
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 namespace cx
 {
-
-/** \brief Null Object Pattern for Registration service
+/**
+ * Activator for the registration plugin
  *
+ * \ingroup org_custusx_registration
  *
- *  \ingroup cx_resource_core_registration
- *  \date 2014-08-28
+ *  \date 2014-09-03
  *  \author Ole Vegard Solberg, SINTEF
+ *  \author Christian Askeland, SINTEF
  */
-class RegistrationServiceNull : public RegistrationService
+class RegisteredService
 {
-
 public:
-	RegistrationServiceNull();
-	virtual void setMovingData(DataPtr data);
-	virtual void setFixedData(DataPtr data);
-	virtual DataPtr getMovingData();
-	virtual DataPtr getFixedData();
+	template <class SERVICE_TYPE>
+	static RegisteredServicePtr create(ctkPluginContext* context, QString iid)
+	{
+		return RegisteredServicePtr(new RegisteredService(context, new SERVICE_TYPE(context), iid));
+	}
 
-	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
-	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description);
-
-	virtual QDateTime getLastRegistrationTime();
-	virtual void setLastRegistrationTime(QDateTime time);
-
-	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame);
-
-	virtual bool isNull();
-private:
-	void printWarning();
+	explicit RegisteredService(ctkPluginContext* context, QObject* instance, QString iid);
+	~RegisteredService();
+	QObjectPtr mService;
+	ctkServiceRegistration mReference;
 };
+
 } // namespace cx
-#endif // CXREGISTRATIONSERVICENULL_H
+
+#endif // CXREGISTEREDSERVICE_H

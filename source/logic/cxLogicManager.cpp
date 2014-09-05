@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxSharedPointerChecker.h"
 #include "cxPluginFramework.h"
+#include "ctkPluginContext.h"
 
 namespace cx
 {
@@ -333,6 +334,11 @@ PluginFrameworkManagerPtr LogicManager::getPluginFramework()
 	if (!mPluginFramework)
 		this->createPluginFramework();
 	return mPluginFramework;
+}
+
+ctkPluginContext* LogicManager::getPluginContext()
+{
+	return this->getPluginFramework()->getPluginContext();
 }
 
 void LogicManager::shutdownServices()

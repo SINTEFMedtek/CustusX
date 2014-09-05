@@ -37,46 +37,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegistrationImplService.h"
 #include "cxRegistrationServiceNull.h"
+#include "cxRegisteredService.h"
 
 namespace cx
 {
 
 RegistrationPluginActivator::RegistrationPluginActivator()
-: mContext(0)
 {
 	std::cout << "Created RegistrationPluginActivator" << std::endl;
-	mPlugin = RegistrationService::getNullObject();
 }
 
 RegistrationPluginActivator::~RegistrationPluginActivator()
-{
-
-}
+{}
 
 void RegistrationPluginActivator::start(ctkPluginContext* context)
 {
-	std::cout << "Started RegistrationPluginActivator" << std::endl;
-	this->mContext = context;
-
-	mPlugin.reset(new RegistrationImplService(context));
-	std::cout << "created Registration service" << std::endl;
-	try
-	{
-		mRegistration = context->registerService(QStringList(RegistrationService_iid), mPlugin.get());
-	}
-	catch(ctkRuntimeException& e)
-	{
-		std::cout << e.what() << std::endl;
-		mPlugin = RegistrationService::getNullObject();
-	}
-	std::cout << "registered Registration service" << std::endl;
+	mRegistration = RegisteredService::create<RegistrationImplService>(context, RegistrationService_iid);
 }
 
 void RegistrationPluginActivator::stop(ctkPluginContext* context)
 {
-	mRegistration.unregister();
-	mPlugin = RegistrationService::getNullObject();
-	std::cout << "Stopped RegistrationPluginActivator" << std::endl;
+	mRegistration.reset();
 	Q_UNUSED(context);
 }
 
