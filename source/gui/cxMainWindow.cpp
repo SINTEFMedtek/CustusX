@@ -226,30 +226,47 @@ QWidget *MainWindow::addCategorizedWidget(GUIExtenderService::CategorizedWidget 
 QWidget *MainWindow::addCategorizedWidgetToDockWidget(GUIExtenderService::CategorizedWidget categorizedWidget)
 {
     QWidget *retval = NULL;
+
+		//Category
     QTabWidget *categoryWidget = NULL;
     if (mCategoryWidgetsMap.find(categorizedWidget.mCategory) != mCategoryWidgetsMap.end())
     {
-        std::cout << "found categoryWidget" << std::endl;
+				std::cout << "found categoryWidget: " << categorizedWidget.mCategory << std::endl;
         retval = mCategorizedDockWidgets.at(categorizedWidget.mCategory);
         categoryWidget = mCategoryWidgetsMap.at(categorizedWidget.mCategory);
     }
     else
     {
-        std::cout << "create categoryWidget" << std::endl;
-        categoryWidget = this->createCategoryWidget(categorizedWidget);
+				std::cout << "create categoryWidget: " << categorizedWidget.mCategory << std::endl;
+				categoryWidget = this->createCategoryWidget(categorizedWidget.mCategory);
         retval = this->addAsDockWidget(categoryWidget, categorizedWidget.mCategory);
         mCategorizedDockWidgets[categorizedWidget.mCategory] = retval;
     }
-    categoryWidget->addTab(categorizedWidget.mWidget, categorizedWidget.mSubCategory);
+
+		//SubCategory
+		QTabWidget *subCategoryWidget = NULL;
+		if (mCategoryWidgetsMap.find(categorizedWidget.mSubCategory) != mCategoryWidgetsMap.end())
+		{
+			std::cout << "found subCategoryWidget: " << categorizedWidget.mSubCategory << std::endl;
+			subCategoryWidget = mCategoryWidgetsMap.at(categorizedWidget.mSubCategory);
+		}
+		else
+		{
+			std::cout << "create subCategoryWidget: " << categorizedWidget.mSubCategory << std::endl;
+			subCategoryWidget = this->createCategoryWidget(categorizedWidget.mSubCategory);
+			categoryWidget->addTab(subCategoryWidget, categorizedWidget.mSubCategory);
+		}
+
+		subCategoryWidget->addTab(categorizedWidget.mWidget, categorizedWidget.mWidget->windowTitle());
     return retval;
 }
 
-QTabWidget *MainWindow::createCategoryWidget(GUIExtenderService::CategorizedWidget categorizedWidget)
+QTabWidget *MainWindow::createCategoryWidget(QString category)
 {
     QTabWidget *categoryWidget = new QTabWidget(this);
-    categoryWidget->setWindowTitle(categorizedWidget.mCategory);
-    categoryWidget->setObjectName(categorizedWidget.mCategory);
-    mCategoryWidgetsMap[categorizedWidget.mCategory] = categoryWidget;
+		categoryWidget->setWindowTitle(category);
+		categoryWidget->setObjectName(category);
+		mCategoryWidgetsMap[category] = categoryWidget;
     return categoryWidget;
 }
 

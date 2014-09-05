@@ -161,7 +161,7 @@ private:
 	void addGUIExtender(GUIExtenderService* service);
     QWidget *addCategorizedWidget(GUIExtenderService::CategorizedWidget categorizedWidget);
     QWidget *addCategorizedWidgetToDockWidget(GUIExtenderService::CategorizedWidget categorizedWidget);
-	QTabWidget *createCategoryWidget(GUIExtenderService::CategorizedWidget categorizedWidget);
+	QTabWidget *createCategoryWidget(QString category);
 	void removeGUIExtender(GUIExtenderService* service);
 	void setupGUIExtenders();
 

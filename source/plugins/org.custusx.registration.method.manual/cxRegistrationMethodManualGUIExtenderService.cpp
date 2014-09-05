@@ -54,6 +54,13 @@ std::vector<GUIExtenderService::CategorizedWidget> RegistrationMethodManualGUIEx
 	retval.push_back(GUIExtenderService::CategorizedWidget(
 			new ExampleWidget(),
             "Registration", "Manual"));
+	retval.push_back(GUIExtenderService::CategorizedWidget(
+			new ExampleWidget(),
+						"Registration", "Manual"));
+
+	retval.push_back(GUIExtenderService::CategorizedWidget(
+			new ExampleWidget(),
+						"Registration", "NotManual"));
 
 	return retval;
 }
