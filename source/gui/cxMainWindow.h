@@ -159,8 +159,8 @@ private:
     void registerToolBar(QToolBar* toolbar, QString groupname = "");
 	void addToWidgetGroupMap(QAction* action, QString groupname);
 	void addGUIExtender(GUIExtenderService* service);
-	QWidget *addCategorizedWidget(GUIExtenderService::CategorizedWidget categorizedWidget);
-	QTabWidget *getCategoryWidget(GUIExtenderService::CategorizedWidget categorizedWidget);
+    QWidget *addCategorizedWidget(GUIExtenderService::CategorizedWidget categorizedWidget);
+    QWidget *addCategorizedWidgetToDockWidget(GUIExtenderService::CategorizedWidget categorizedWidget);
 	QTabWidget *createCategoryWidget(GUIExtenderService::CategorizedWidget categorizedWidget);
 	void removeGUIExtender(GUIExtenderService* service);
 	void setupGUIExtenders();
@@ -230,7 +230,9 @@ private:
 
 	std::map<QString, QActionGroup*> mWidgetGroupsMap; ///< map containing groups
 
-	QString mLastImportDataFolder;
+    std::map<QString, QTabWidget*> mCategoryWidgetsMap; ///< map containing groups
+
+    QString mLastImportDataFolder;
 
 	boost::shared_ptr<ServiceTrackerListener<GUIExtenderService> > mServiceListener;
 	std::map<GUIExtenderService*, std::vector<QWidget*> > mWidgetsByPlugin;
@@ -242,6 +244,7 @@ private:
 	//Preferences
 	CameraControlPtr mCameraControl;
 	std::set<QDockWidget*> mDockWidgets;
+    std::map<QString, QWidget*> mCategorizedDockWidgets;
 };
 }//namespace cx
 
