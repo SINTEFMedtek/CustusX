@@ -228,7 +228,7 @@ QWidget *MainWindow::addCategorizedWidget(GUIExtenderService::CategorizedWidget 
 
 QTabWidget *MainWindow::getCategoryWidget(GUIExtenderService::CategorizedWidget categorizedWidget)
 {
-	QTabWidget *retval;
+	QTabWidget *retval = NULL;
 	if (mWidgetGroupsMap.find(categorizedWidget.mCategory) != mWidgetGroupsMap.end())
 	{
 		//Add to the widget of the first action. Not finised.
