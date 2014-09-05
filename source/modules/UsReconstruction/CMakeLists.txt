@@ -8,11 +8,6 @@
 ##
 ###########################################################
 
-if(COMMAND cmake_policy)
-  cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
-
-
 SET( MOC_HEADER_FILES
    logic/cxReconstructionManager.h
    logic/cxReconstructThreads.h
@@ -24,7 +19,7 @@ SET( MOC_HEADER_FILES
    gui/cxUsReconstructionPlugin.h
     )
 
-QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
+QT5_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
 # library
 SET( SOURCE_FILES

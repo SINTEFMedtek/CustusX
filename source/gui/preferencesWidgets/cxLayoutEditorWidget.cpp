@@ -31,7 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxLayoutEditorWidget.h"
 #include <iostream>
-#include <QtGui>
+#include <QtWidgets>
+
 #include "cxTypeConversions.h"
 #include "cxDefinitionStrings.h"
 #include "cxUtilHelpers.h"

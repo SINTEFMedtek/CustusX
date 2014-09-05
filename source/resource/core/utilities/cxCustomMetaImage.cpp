@@ -136,7 +136,7 @@ void CustomMetaImage::setKey(QString key, QString value)
 	this->append(&data, key, value);
 
 	file.resize(0);
-	file.write(data.join("\n").toAscii());
+	file.write(data.join("\n").toLatin1());
 }
 
 void CustomMetaImage::setModality(QString value)
@@ -270,7 +270,7 @@ void CustomMetaImage::setTransform(const Transform3D M)
   this->append(&data, "Offset", qstring_cast(posList.str()));
 
   file.resize(0);
-  file.write(data.join("\n").toAscii());
+  file.write(data.join("\n").toLatin1());
 }
 
 }

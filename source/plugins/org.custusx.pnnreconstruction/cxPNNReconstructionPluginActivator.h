@@ -54,6 +54,7 @@ class PNNReconstructionPluginActivator :  public QObject, public ctkPluginActiva
 {
   Q_OBJECT
   Q_INTERFACES(ctkPluginActivator)
+  Q_PLUGIN_METADATA(IID "org_custusx_pnnreconstruction")
 
 public:
 

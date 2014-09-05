@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 2.6)
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES}
         ${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities

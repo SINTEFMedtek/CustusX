@@ -54,6 +54,7 @@ class FilterTubeSegmentationPluginActivator :  public QObject, public ctkPluginA
 {
   Q_OBJECT
   Q_INTERFACES(ctkPluginActivator)
+  Q_PLUGIN_METADATA(IID "org_custusx_filter_tubesegmentation")
 
 public:
 

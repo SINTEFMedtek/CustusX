@@ -32,12 +32,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxViewsWindow.h"
 
-#include <QtGui>
+#include <QtWidgets>
+
 
 #include <vtkRenderer.h>
 #include "vtkRenderWindow.h"
 #include "vtkCamera.h"
 #include "cxBoundingBox3D.h"
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QVBoxLayout>
+#include <QLabel>
 
 namespace cxtest
 {
@@ -45,7 +50,8 @@ namespace cxtest
 ViewsWindow::ViewsWindow()
 {
 	mZoomFactor = 1;
-	QRect screen = qApp->desktop()->screenGeometry(qApp->desktop()->primaryScreen());
+	QDesktopWidget* desktop = dynamic_cast<QApplication*>(QApplication::instance())->desktop();
+	QRect screen = desktop->screenGeometry(desktop->primaryScreen());
 	screen.adjust(screen.width()*0.15, screen.height()*0.15, -screen.width()*0.15, -screen.height()*0.15);
 	this->setGeometry(screen);
 	this->setCentralWidget( new QWidget(this) );

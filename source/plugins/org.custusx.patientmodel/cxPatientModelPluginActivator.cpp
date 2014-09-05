@@ -74,6 +74,5 @@ void PatientModelPluginActivator::stop(ctkPluginContext* context)
 
 } // namespace cx
 
-Q_EXPORT_PLUGIN2(PatientModelPluginActivator_irrelevant_string, cx::PatientModelPluginActivator)
 
 

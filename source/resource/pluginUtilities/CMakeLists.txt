@@ -22,7 +22,7 @@ include_directories(
     )
 
 
-#QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
+#QT5_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 #ADD_LIBRARY ( cxPluginUtilities ${cxPluginUtilities_SOURCE} ${MOC_HEADER_FILES} )
 

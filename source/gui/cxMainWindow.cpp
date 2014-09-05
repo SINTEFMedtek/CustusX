@@ -32,7 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxMainWindow.h"
 
-#include <QtGui>
+#include <QtWidgets>
+
+#include <QtConcurrent>
 #include <QWhatsThis>
 #include "boost/scoped_ptr.hpp"
 #include "boost/bind.hpp"

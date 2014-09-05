@@ -39,7 +39,7 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     )
 
-QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
+QT5_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( cxStateService ${cxStateService_SOURCE} ${MOC_HEADER_FILES})
 target_link_libraries(cxStateService cxVisualizationService cxVideoService)

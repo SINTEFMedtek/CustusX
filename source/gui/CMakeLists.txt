@@ -82,7 +82,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 
 
 # generate rules for building source files from the resources
-QT4_ADD_RESOURCES(cxGui_SRCS cxResources.qrc)
+QT5_ADD_RESOURCES(cxGui_SRCS cxResources.qrc)
 
 cx_add_class(cxGui_SRCS
 	${cxGui_SRCS}

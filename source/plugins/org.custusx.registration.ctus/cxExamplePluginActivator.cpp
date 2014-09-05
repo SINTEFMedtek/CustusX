@@ -81,6 +81,5 @@ void ExamplePluginActivator::stop(ctkPluginContext* context)
 
 } // namespace cx
 
-Q_EXPORT_PLUGIN2(ExamplePluginActivator_irrelevant_string, cx::ExamplePluginActivator)
 
 

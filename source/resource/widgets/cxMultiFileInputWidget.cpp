@@ -31,7 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxMultiFileInputWidget.h"
 
-#include <QtGui>
+#include <QtWidgets>
+
 #include <iostream>
 
 namespace cx

@@ -195,7 +195,21 @@ class VTK(CppComponent):
         #add('VTK_USE_QT:BOOL', True)
         #add('VTK_USE_QVTK:BOOL', True)
         add('VTK_USE_RPATH:BOOL', True)
-        add('DESIRED_QT_VERSION:STRING', 4)
+#        add('DESIRED_QT_VERSION:STRING', 4)
+        
+        use_qt5 = True
+        if use_qt5:
+#            qt5_root = '/Users/christiana/Qt/5.3/clang_64'
+            add('VTK_QT_VERSION:STRING', "5")
+#            add('QT_QMAKE_EXECUTABLE:PATH', "%s/bin/qmake"%qt5_root)
+            add('VTK_Group_Qt:BOOL', "ON")
+#            add('CMAKE_PREFIX_PATH:PATH', "%s/lib/cmake"%qt5_root)
+        else:
+            add('DESIRED_QT_VERSION:STRING', 4)
+            add('Module_vtkGUISupportQt:BOOL', True)
+            add('VTK_USE_PARALLEL:BOOL', True)
+            add('VTK_USE_RPATH:BOOL', True)        
+        
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
         add('Module_vtkGUISupportQt:BOOL', True)
@@ -216,13 +230,15 @@ class CTK(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def _rawCheckout(self):
-        self._getBuilder().gitClone('git@github.com:commontk/CTK')
+        self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/CTK.git')
     def update(self):
-        latestTestedSHA = '3fe3cdbe9d0ef95b3810a12484f035ae1f66524c'
-        self._getBuilder().gitCheckout(latestTestedSHA)
+        #latestTestedSHA = '3fe3cdbe9d0ef95b3810a12484f035ae1f66524c'
+        modBranch = 'CTK-CX-modifications'
+        self._getBuilder().gitUpdate(modBranch)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
+        add('CTK_QT_VERSION:STRING', 5)
         add('CTK_ENABLE_DICOM:BOOL', True)
         add('CTK_LIB_DICOM/Widgets:BOOL', True)
         add('CTK_ENABLE_PluginFramework:BOOL', True)

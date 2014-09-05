@@ -17,13 +17,6 @@ if(NOT CX_WINDOWS)
 
 cx_initialize_cppunit()
 
-# backward compatibility
-CMAKE_MINIMUM_REQUIRED(VERSION 2.0)
-# kill warning about mixing full and partial paths in libs:
-if(COMMAND cmake_policy)
-	cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
-
 PROJECT(cisstTests)
 
 # clipped from cisst/tests/CMakeLists.txt
@@ -33,6 +26,6 @@ SET(CISST_TESTS_MAIN_SRC
     cisstTestParameters.cpp
     cisstTestParameters.h)
 ADD_LIBRARY(cisstTestsMain ${CISST_TESTS_MAIN_SRC})
-target_link_libraries(cisstTestsMain ${CPPUNIT_LIBRARIES} ${QT_LIBRARIES} ${SSC_GCOV_LIBRARY} cxResource)
+target_link_libraries(cisstTestsMain ${CPPUNIT_LIBRARIES} ${SSC_GCOV_LIBRARY} cxResource)
 
 endif()

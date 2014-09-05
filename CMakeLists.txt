@@ -4,7 +4,13 @@
 
 project(CustusX)
 
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.11)
+
+# kill warning about mixing full and partial paths in libs:
+# http://www.cmake.org/cmake/help/v2.8.10/cmake.html#policy%3aCMP0003
+if(COMMAND cmake_policy)
+	cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
 
 set(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
@@ -21,21 +27,10 @@ include(cxCatchUtilities)
 
 cx_set_os_identifiers()
 
-#if(SSC_USE_GCOV)
-#	add_definitions(--coverage)
-#endif()
-
 # _USE_MATH_DEFINES Must be defined before math.h is included
 if (CX_WINDOWS)
     add_definitions(-D_USE_MATH_DEFINES)
 endif(CX_WINDOWS)
-
-# TODO check this and try to remove.
-if(COMMAND cmake_policy)
-  cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
-
-#cmake_policy(SET CMP0012 NEW)
 
 if(SSC_PRINT_CALLER_INFO)
         add_definitions(-DSSC_PRINT_CALLER_INFO)
@@ -70,13 +65,6 @@ include(Dart)
 include_directories( /usr/local/include )
 include_directories( /opt/local/include )
 include_directories( /opt/X11/include )
-
-#------------------------------------------------------------------------------
-# External libraries
-#------------------------------------------------------------------------------
-
-#cx_initialize_cppunit()
-#cx_initialize_opencv()
 
 #------------------------------------------------------------------------------
 # Add subdirectories

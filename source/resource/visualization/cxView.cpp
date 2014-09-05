@@ -32,7 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "cxView.h"
-#include <QtGui>
+#include <QtWidgets>
+
+#include <QApplication>
+#include <QDesktopWidget>
 #include <vtkImageActor.h>
 #include <vtkImageData.h>
 #include "cxVector3D.h"
@@ -83,7 +86,7 @@ View::~View()
 {
 }
 
-ViewWidget::ViewWidget(QWidget *parent, Qt::WFlags f) :
+ViewWidget::ViewWidget(QWidget *parent, Qt::WindowFlags f) :
 	widget(parent, f),
 	View(this, this->size()),
 	mRenderWindow(vtkRenderWindowPtr::New())
@@ -92,7 +95,7 @@ ViewWidget::ViewWidget(QWidget *parent, Qt::WFlags f) :
 	clear();
 }
 
-ViewWidget::ViewWidget(const QString& uid, const QString& name, QWidget *parent, Qt::WFlags f) :
+ViewWidget::ViewWidget(const QString& uid, const QString& name, QWidget *parent, Qt::WindowFlags f) :
 	widget(parent, f),
 	View(this, this->size(), uid, name),
 	mRenderWindow(vtkRenderWindowPtr::New())
@@ -389,7 +392,8 @@ DoubleBoundingBox3D View::getViewport() const
 
 double View::mmPerPix() const
 {
-	QWidget* screen = qApp->desktop()->screen(qApp->desktop()->screenNumber(mParent));
+	QDesktopWidget* desktop = dynamic_cast<QApplication*>(QApplication::instance())->desktop();
+	QWidget* screen = desktop->screen(desktop->screenNumber(mParent));
 	double r_h = (double) screen->heightMM() / (double) screen->geometry().height();
 	double r_w = (double) screen->widthMM() / (double) screen->geometry().width();
 	double retval = (r_h + r_w) / 2.0;

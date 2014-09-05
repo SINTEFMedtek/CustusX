@@ -37,7 +37,7 @@ SET( MOC_HEADER_FILES
     gui/cxBronchoscopyRegistrationWidget.h
     )
 
-QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
+QT5_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
 # library
 SET( SOURCE_FILES

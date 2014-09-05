@@ -34,7 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXREGISTRATIONHISTORYWIDGET_H_
 
 #include <vector>
-#include <QtGui>
+#include <QtWidgets>
+
 #include "cxRegistrationTransform.h"
 #include "cxBaseWidget.h"
 #include "cxLegacySingletons.h"

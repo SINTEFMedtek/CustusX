@@ -32,7 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxTemporalCalibration.h>
 
 
-#include <QtGui>
+#include <QtWidgets>
+
 #include <QVBoxLayout>
 #include "boost/bind.hpp"
 #include "cxToolManager.h"
@@ -164,7 +165,7 @@ void TemporalCalibration::saveDebugFile()
     return;
   }
 
-  file.write(qstring_cast(mDebugStream.str()).toAscii());
+  file.write(qstring_cast(mDebugStream.str()).toLatin1());
   report("Saved temporal calibration details to " + file.fileName());
   file.close();
 }

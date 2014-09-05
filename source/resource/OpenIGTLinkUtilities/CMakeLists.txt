@@ -1,8 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
-
 cx_initialize_OpenIGTLink()
-#find_package(OpenIGTLink REQUIRED)
-#include(${OpenIGTLink_USE_FILE})
 
 include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 

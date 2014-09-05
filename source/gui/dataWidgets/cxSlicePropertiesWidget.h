@@ -33,7 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXSlicePropertiesWidget_H_
 
 #include <vector>
-#include <QtGui>
+#include <QtWidgets>
+
 #include "cxTabbedWidget.h"
 
 namespace cx

@@ -33,7 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXDATAMETRICWRAPPERS_H_
 
 #include <vector>
-#include <QtGui>
+#include <QtWidgets>
+
 #include "cxForwardDeclarations.h"
 #include "cxLandmark.h"
 #include "cxPointMetric.h"

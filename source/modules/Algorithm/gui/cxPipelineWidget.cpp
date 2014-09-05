@@ -34,7 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxHelperWidgets.h"
 #include "cxReporter.h"
 #include "cxTimedAlgorithmProgressBar.h"
-#include <QtGui>
+#include <QtWidgets>
+
 #include "cxTypeConversions.h"
 #include "cxDataSelectWidget.h"
 #include "cxSettings.h"

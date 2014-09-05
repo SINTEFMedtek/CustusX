@@ -75,6 +75,5 @@ void VNNclPluginActivator::stop(ctkPluginContext* context)
 
 } // namespace cx
 
-Q_EXPORT_PLUGIN2(VNNclPluginActivator_irrelevant_string, cx::VNNclPluginActivator)
 
 

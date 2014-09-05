@@ -33,7 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTIMEDALGORITHM_H_
 #define CXTIMEDALGORITHM_H_
 
-//#include <QtGui>
+//#include <QtWidgets>
+
 
 #include <QObject>
 #include <QDateTime>

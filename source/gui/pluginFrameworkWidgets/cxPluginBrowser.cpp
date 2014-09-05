@@ -54,7 +54,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =============================================================================*/
 
 #include "cxPluginBrowser.h"
-#include <QtGui>
+#include <QtWidgets>
+
 
 #include "cxPluginTableModel.h"
 #include "ctkServiceReference.h"

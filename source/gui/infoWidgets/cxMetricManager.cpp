@@ -366,7 +366,7 @@ void MetricManager::exportMetricsToFile(QString filename)
 		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(iter->second);
 		if(metric)
 		{
-			file.write(metric->getAsSingleLineString().toAscii());
+			file.write(metric->getAsSingleLineString().toLatin1());
 			file.write("\n");
 		}
 	}

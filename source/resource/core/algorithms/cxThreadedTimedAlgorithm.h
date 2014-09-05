@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXTHREADEDTIMEDALGORITHM_H_
 
 #include <QFutureWatcher>
-#include <QtConcurrentRun>
+#include <QtConcurrent/QtConcurrentRun>
 
 #include "cxTimedAlgorithm.h"
 

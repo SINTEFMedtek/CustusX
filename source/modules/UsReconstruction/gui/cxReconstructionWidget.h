@@ -33,7 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRECONSTRUCTIONWIDGET_H_
 #define CXRECONSTRUCTIONWIDGET_H_
 
-#include <QtGui>
+#include <QtWidgets>
+
 #include "cxReconstructionManager.h"
 #include "cxDoubleWidgets.h"
 #include "cxXmlOptionItem.h"

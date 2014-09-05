@@ -31,7 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxFileInputWidget.h"
-#include <QtGui>
+#include <QtWidgets>
+
 #include "cxTypeConversions.h"
 #include <iostream>
 

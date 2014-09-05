@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxReporter.h"
 
+#include <QtGlobal>
 #include <iostream>
 #include "boost/shared_ptr.hpp"
 #include <QString>
@@ -47,21 +48,22 @@ namespace cx
 {
 
 
-void convertQtMessagesToCxMessages(QtMsgType type, const char *msg)
+void convertQtMessagesToCxMessages(QtMsgType type, const QMessageLogContext &, const QString &msg)
+//void convertQtMessagesToCxMessages(QtMsgType type, const char *msg)
 {
 	switch (type)
 	{
 	case QtDebugMsg:
-		reportDebug(QString(msg));
+		reportDebug(msg);
 		break;
 	case QtWarningMsg:
-		reportWarning(QString(msg));
+		reportWarning(msg);
 		break;
 	case QtCriticalMsg:
-		reportError(QString(msg));
+		reportError(msg);
 		break;
 	case QtFatalMsg:
-		reportError(QString(msg));
+		reportError(msg);
 		//abort(); here we hope for the best instead of aborting...
 	}
 }
@@ -174,7 +176,7 @@ public:
   void sendUnredirected(const QString& sequence)
   {
 	  QMutexLocker sentry(&mOrigMutex);
-	  mOrig->sputn(sequence.toAscii(), sequence.size());
+	  mOrig->sputn(sequence.toLatin1(), sequence.size());
   }
 
 private:
@@ -223,7 +225,7 @@ Reporter* reporter() { return Reporter::getInstance(); }
 Reporter::Reporter() :
 	mEnabled(false)
 {
-  qInstallMsgHandler(convertQtMessagesToCxMessages);
+  qInstallMessageHandler(convertQtMessagesToCxMessages);
   qRegisterMetaType<Message>("Message");
 }
 

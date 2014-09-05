@@ -80,6 +80,6 @@ void DicomPluginActivator::stop(ctkPluginContext* context)
 
 } // namespace cx
 
-Q_EXPORT_PLUGIN2(DicomPluginActivator_irrelevant_string, cx::DicomPluginActivator)
+//Q_EXPORT_PLUGIN2(DicomPluginActivator_irrelevant_string, cx::DicomPluginActivator)
 
 

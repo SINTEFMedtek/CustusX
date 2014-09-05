@@ -76,6 +76,5 @@ void FilterTubeSegmentationPluginActivator::stop(ctkPluginContext* context)
 
 } // namespace cx
 
-Q_EXPORT_PLUGIN2(FilterTubeSegmentationPluginActivator_irrelevant_string, cx::FilterTubeSegmentationPluginActivator)
 
 

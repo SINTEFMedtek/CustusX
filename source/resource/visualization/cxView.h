@@ -138,8 +138,8 @@ Q_OBJECT
 	typedef QVTKWidget widget;
 
 public:
-	ViewWidget(QWidget *parent = NULL, Qt::WFlags f = 0);
-	ViewWidget(const QString& uid, const QString& name = "", QWidget *parent = NULL, Qt::WFlags f = 0); ///< constructor
+	ViewWidget(QWidget *parent = NULL, Qt::WindowFlags f = 0);
+	ViewWidget(const QString& uid, const QString& name = "", QWidget *parent = NULL, Qt::WindowFlags f = 0); ///< constructor
 	virtual ~ViewWidget();
 
 	void print(std::ostream& os);

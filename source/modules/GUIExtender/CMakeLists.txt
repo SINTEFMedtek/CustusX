@@ -7,7 +7,7 @@ cx_add_class(GUIExtender_FILES
     )
 
 set(GUIExtender_LIBRARIES
-    ${QT_LIBRARIES}
+    Qt5::Core
     )
 
 add_library( cxGUIExtenderService ${GUIExtender_FILES})

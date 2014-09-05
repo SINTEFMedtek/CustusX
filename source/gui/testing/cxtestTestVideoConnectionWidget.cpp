@@ -56,7 +56,7 @@ TestVideoConnectionWidget::TestVideoConnectionWidget() :
 bool TestVideoConnectionWidget::canStream(QString filename, QString streamerType)
 {
 	this->show();
-	QTest::qWaitForWindowShown(this);
+	QTest::qWaitForWindowActive(this);
 
 	this->setupWidgetToRunStreamer(filename, streamerType);
 

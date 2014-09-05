@@ -76,6 +76,5 @@ void PNNReconstructionPluginActivator::stop(ctkPluginContext* context)
 
 } // namespace cx
 
-Q_EXPORT_PLUGIN2(PNNReconstructionPluginActivator_irrelevant_string, cx::PNNReconstructionPluginActivator)
 
 

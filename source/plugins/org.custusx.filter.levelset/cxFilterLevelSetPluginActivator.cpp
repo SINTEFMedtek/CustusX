@@ -76,6 +76,5 @@ void FilterLevelSetPluginActivator::stop(ctkPluginContext* context)
 
 } // namespace cx
 
-Q_EXPORT_PLUGIN2(FilterLevelSetPluginActivator_irrelevant_string, cx::FilterLevelSetPluginActivator)
 
 

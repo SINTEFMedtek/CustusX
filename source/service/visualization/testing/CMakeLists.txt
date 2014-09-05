@@ -12,12 +12,6 @@
 #
 # See CustusX_License.txt for more information.
 
-#cmake_minimum_required( VERSION 2.4 )
-
-# http://www.cmake.org/cmake/help/v2.8.10/cmake.html#policy%3aCMP0003
-#if(COMMAND cmake_policy)
-#  cmake_policy(SET CMP0003 NEW)
-#endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
     include_directories(
