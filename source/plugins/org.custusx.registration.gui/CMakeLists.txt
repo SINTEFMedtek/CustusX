@@ -7,6 +7,8 @@ message(STATUS "===================================== parsing example")
 include_directories(
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
     ${CustusX_SOURCE_DIR}/source/logic
+    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
+    ${CustusX_SOURCE_DIR}/source/resource/core/registration
 )
 
 set(PLUGIN_SRCS

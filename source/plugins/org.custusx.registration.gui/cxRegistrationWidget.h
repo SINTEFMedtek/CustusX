@@ -34,7 +34,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXREGISTRATIONWIDGET_H_
 
 #include <QWidget>
+#include "cxServiceTrackerListener.h"
+#include "cxRegistrationMethodService.h"
 class QVBoxLayout;
+class QTabWidget;
 
 namespace cx
 {
@@ -56,7 +59,17 @@ public:
 
 private:
 	QString defaultWhatsThis() const;
+
+	void onServiceAdded(RegistrationMethodService *service);
+	void onServiceRemoved(RegistrationMethodService *service);
+	QTabWidget *findTypeWidget(QString registrationType);
+	QTabWidget *createTypeWidget(QString registrationType);
+
 	QVBoxLayout*  mVerticalLayout;
+	boost::shared_ptr<ServiceTrackerListener<RegistrationMethodService> > mServiceListener;
+
+	std::map<QString, QTabWidget*> mCategoryWidgetsMap; ///< map containing groups
+	std::map<QString, QWidget*> mCategorizedWidgets;
 };
 
 } /* namespace cx */

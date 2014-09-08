@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationWidget.h"
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QTabWidget>
 
 namespace cx
 {
@@ -46,10 +47,61 @@ RegistrationWidget::RegistrationWidget(QWidget* parent) :
     this->setWhatsThis(this->defaultWhatsThis());
 
 		mVerticalLayout->addWidget(new QLabel("Registration Plugin!"));
+
+		mServiceListener.reset(new ServiceTrackerListener<RegistrationMethodService>(
+									 mPluginContext,
+									 boost::bind(&RegistrationWidget::onServiceAdded, this, _1),
+									 boost::function<void (RegistrationMethodService*)>(),
+									 boost::bind(&RegistrationWidget::onServiceRemoved, this, _1)
+									 ));
+		mServiceListener->open();
+
 }
 
 RegistrationWidget::~RegistrationWidget()
 {
+}
+
+void RegistrationWidget::onServiceAdded(RegistrationMethodService* service)
+{
+	QWidget* widget = service->getWidget();
+	QString registrationType = service->getRegistrationType();
+
+	QTabWidget *typeWidget = this->findTypeWidget(registrationType);
+	typeWidget->addTab(widget, widget->windowTitle());
+}
+
+QTabWidget *RegistrationWidget::findTypeWidget(QString registrationType)
+{
+	QTabWidget *typeWidget = NULL;
+	if (mCategoryWidgetsMap.find(registrationType) != mCategoryWidgetsMap.end())
+	{
+			std::cout << "found typeWidget: " << registrationType << std::endl;
+			retval = mCategorizedWidgets.at(registrationType);
+			typeWidget = mCategoryWidgetsMap.at(registrationType);
+	}
+	else
+	{
+			std::cout << "create typeWidget: " << registrationType << std::endl;
+			typeWidget = this->createTypeWidget(registrationType);
+//      retval = this->addAsDockWidget(categoryWidget, registrationType);
+			mCategorizedWidgets[registrationType] = retval;
+	}
+	return typeWidget;
+}
+
+void RegistrationWidget::onServiceRemoved(RegistrationMethodService *service)
+{
+
+}
+
+QTabWidget *RegistrationWidget::createTypeWidget(QString registrationType)
+{
+		QTabWidget *categoryWidget = new QTabWidget(this);
+		categoryWidget->setWindowTitle(registrationType);
+		categoryWidget->setObjectName(registrationType);
+		mCategoryWidgetsMap[category] = categoryWidget;
+		return categoryWidget;
 }
 
 QString RegistrationWidget::defaultWhatsThis() const
