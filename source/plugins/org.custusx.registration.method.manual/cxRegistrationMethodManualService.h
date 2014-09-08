@@ -30,40 +30,73 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXREGISTRATIONMETHODMANUALGUIEXTENDERSERVICE_H_
-#define CXREGISTRATIONMETHODMANUALGUIEXTENDERSERVICE_H_
+#ifndef CXREGISTRATIONMETHODMANUALSERVICE_H_
+#define CXREGISTRATIONMETHODMANUALSERVICE_H_
 
-#include "cxGUIExtenderService.h"
+#include "cxRegistrationMethodService.h"
 #include "org_custusx_registration_method_manual_Export.h"
+//#include "org_custusx_registration_method_manual_ImageToPatient_Export.h"
+//#include "org_custusx_registration_method_manual_ImageTransform_Export.h"
 class ctkPluginContext;
 
 namespace cx
 {
 
 /**
- * Implementation of Example service.
+ * Implementation of registration method manual service.
  *
  * \ingroup org_custusx_registration_method_manual
  *
  * \date 2014-04-01
  * \author Christian Askeland
  */
-class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualGUIExtenderService : public GUIExtenderService
+class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualImageToImageService : public RegistrationMethodService
 {
-	Q_INTERFACES(cx::GUIExtenderService)
+	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-    RegistrationMethodManualGUIExtenderService(ctkPluginContext *context);
-    virtual ~RegistrationMethodManualGUIExtenderService();
+	RegistrationMethodManualImageToImageService(ctkPluginContext *context);
+	virtual ~RegistrationMethodManualImageToImageService() {}
+	virtual QString getRegistrationType() {return QString("ImageToImage");}
+	virtual QWidget* getWidget();
+private:
+  ctkPluginContext* mContext;
 
-	std::vector<CategorizedWidget> createWidgets() const;
+};
+//typedef boost::shared_ptr<RegistrationMethodManualService> RegistrationMethodManualServicePtr;
+
+
+class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualImageToPatientService : public RegistrationMethodService
+{
+	Q_INTERFACES(cx::RegistrationMethodService)
+public:
+	RegistrationMethodManualImageToPatientService(ctkPluginContext *context);
+	virtual ~RegistrationMethodManualImageToPatientService() {}
+	virtual QString getRegistrationType() {return QString("ImageToPatient");}
+	virtual QWidget* getWidget();
 
 private:
   ctkPluginContext* mContext;
 
 };
-typedef boost::shared_ptr<RegistrationMethodManualGUIExtenderService> RegistrationMethodManualGUIExtenderServicePtr;
+//typedef boost::shared_ptr<RegistrationMethodManualService> RegistrationMethodManualServicePtr;
+
+
+class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualImageTransformService : public RegistrationMethodService
+{
+	Q_INTERFACES(cx::RegistrationMethodService)
+public:
+	RegistrationMethodManualImageTransformService(ctkPluginContext *context);
+	virtual ~RegistrationMethodManualImageTransformService() {}
+	virtual QString getRegistrationType() {return QString("ImageTransform");}
+	virtual QWidget* getWidget();
+
+private:
+  ctkPluginContext* mContext;
+
+};
+//typedef boost::shared_ptr<RegistrationMethodManualService> RegistrationMethodManualServicePtr;
 
 } /* namespace cx */
 
-#endif /* CXREGISTRATIONMETHODMANUALGUIEXTENDERSERVICE_H_ */
+#endif /* CXREGISTRATIONMETHODMANUALSERVICE_H_ */
 

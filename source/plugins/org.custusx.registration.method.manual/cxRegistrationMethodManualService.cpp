@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxRegistrationMethodManualGUIExtenderService.h"
+#include "cxRegistrationMethodManualService.h"
 #include "ctkPluginContext.h"
 #include "cxExampleWidget.h"
 
@@ -38,32 +38,37 @@ namespace cx
 {
 
 
-RegistrationMethodManualGUIExtenderService::RegistrationMethodManualGUIExtenderService(ctkPluginContext *context) :
+RegistrationMethodManualImageToImageService::RegistrationMethodManualImageToImageService(ctkPluginContext *context) :
   mContext(context)
 {
 }
 
-RegistrationMethodManualGUIExtenderService::~RegistrationMethodManualGUIExtenderService()
+RegistrationMethodManualImageToPatientService::RegistrationMethodManualImageToPatientService(ctkPluginContext *context) :
+  mContext(context)
+{
+}
+RegistrationMethodManualImageTransformService::RegistrationMethodManualImageTransformService(ctkPluginContext *context) :
+  mContext(context)
 {
 }
 
-std::vector<GUIExtenderService::CategorizedWidget> RegistrationMethodManualGUIExtenderService::createWidgets() const
+QWidget* RegistrationMethodManualImageToImageService::getWidget()
 {
-	std::vector<CategorizedWidget> retval;
-
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new ExampleWidget(),
-            "Registration", "Manual"));
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new ExampleWidget(),
-						"Registration", "Manual"));
-
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new ExampleWidget(),
-						"Registration", "NotManual"));
-
-	return retval;
+	QWidget* example = new ExampleWidget();
+	return example;
 }
 
+QWidget* RegistrationMethodManualImageToPatientService::getWidget()
+{
+	QWidget* example = new ExampleWidget();
+	return example;
+
+}
+
+QWidget* RegistrationMethodManualImageTransformService::getWidget()
+{
+	QWidget* example = new ExampleWidget();
+	return example;
+}
 
 } /* namespace cx */

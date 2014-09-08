@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtPlugin>
 #include <iostream>
 
-#include "cxRegistrationMethodManualGUIExtenderService.h"
+#include "cxRegistrationMethodManualService.h"
 #include "cxRegisteredService.h"
 
 namespace cx
@@ -51,13 +51,17 @@ RegistrationMethodManualPluginActivator::~RegistrationMethodManualPluginActivato
 
 void RegistrationMethodManualPluginActivator::start(ctkPluginContext* context)
 {
-  mRegistration = RegisteredService::create<RegistrationMethodManualGUIExtenderService>(context, GUIExtenderService_iid);
+	mRegistrationImageToImage = RegisteredService::create<RegistrationMethodManualImageToImageService>(context, RegistrationMethodService_iid);
+	mRegistrationImageToPatient = RegisteredService::create<RegistrationMethodManualImageToPatientService>(context, RegistrationMethodService_iid);
+	mRegistrationImageTransform = RegisteredService::create<RegistrationMethodManualImageTransformService>(context, RegistrationMethodService_iid);
 }
 
 void RegistrationMethodManualPluginActivator::stop(ctkPluginContext* context)
 {
-  mRegistration.reset();
-    Q_UNUSED(context);
+	mRegistrationImageToImage.reset();
+	mRegistrationImageToPatient.reset();
+	mRegistrationImageTransform.reset();
+	Q_UNUSED(context);
 }
 
 } // namespace cx

@@ -57,12 +57,8 @@ class RegistrationMethodService : public QObject
 public:
     virtual ~RegistrationMethodService() {}
 
-    virtual void showPatientRegistrationGUI(/*parent widget reference*/) = 0;
-    virtual void showImage2ImageRegistrationGUI(/*parent widget reference*/) = 0;
-    virtual void showImageTransformGUI(/*parent widget reference*/) = 0;
-
-//    virtual QDateTime getLastRegistrationTime() = 0;
-//    virtual void setLastRegistrationTime(QDateTime time) = 0;
+	virtual QWidget* getWidget() = 0;
+	virtual QString getRegistrationType() = 0;
 
 };
 

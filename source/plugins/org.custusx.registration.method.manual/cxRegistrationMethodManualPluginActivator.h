@@ -64,7 +64,9 @@ public:
   void stop(ctkPluginContext* context);
 
 private:
-  RegisteredServicePtr mRegistration;
+  RegisteredServicePtr mRegistrationImageToImage;
+  RegisteredServicePtr mRegistrationImageToPatient;
+  RegisteredServicePtr mRegistrationImageTransform;
 };
 
 } // namespace cx

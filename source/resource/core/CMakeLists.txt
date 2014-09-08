@@ -81,7 +81,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	utilities/cxSpaceListenerImpl
 
 	registration/cxRegistrationService
-        registration/cxRegistrationMethodService
+        registration/cxRegistrationMethodService.h
 	registration/cxRegistrationServiceNull
 	)
 

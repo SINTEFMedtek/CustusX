@@ -5,21 +5,21 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 message(STATUS "===================================== parsing example")
 
 include_directories(
-    ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
+    ${CustusX_SOURCE_DIR}/source/resource/core/registration
     ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
     ${CustusX_SOURCE_DIR}/source/logic
 )
 
 set(PLUGIN_SRCS
   cxRegistrationMethodManualPluginActivator.cpp
-  cxRegistrationMethodManualGUIExtenderService.cpp
+  cxRegistrationMethodManualService.cpp
   cxExampleWidget.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxRegistrationMethodManualPluginActivator.h
-  cxRegistrationMethodManualGUIExtenderService.h
+  cxRegistrationMethodManualService.h
   cxExampleWidget.h
 )
 
@@ -36,7 +36,7 @@ set(PLUGIN_resources
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
-    cxGUIExtenderService
+    #cxGUIExtenderService
     cxLogicManager
     #cxRegistrationService
 )
