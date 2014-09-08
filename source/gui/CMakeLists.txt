@@ -88,6 +88,7 @@ cx_add_class(cxGui_SRCS
 	${cxGui_SRCS}
 	${cxGui_RCC_SRCS}
 	dataAdapters/cxDataAdapterHelper
+	utilities/cxDockWidgets
 	)
 
 set(SUB_FOLDERS

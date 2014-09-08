@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxMainWindow.h"
 
-#include <QtGui>
 #include <QWhatsThis>
 #include "boost/scoped_ptr.hpp"
 #include "boost/bind.hpp"
@@ -95,12 +94,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogicManager.h"
 #include "cxPluginFramework.h"
 #include "ctkPluginContext.h"
+#include "cxDockWidgets.h"
 
 namespace cx
 {
 
 MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
-	mFullScreenAction(NULL), mStandard3DViewActions(NULL), mControlPanel(NULL)
+	mFullScreenAction(NULL), mStandard3DViewActions(NULL), mControlPanel(NULL), mDockWidgets(new DockWidgets(this))
 {
 	QFile stylesheet(":/cxStyleSheet.ss");
 	stylesheet.open(QIODevice::ReadOnly);
@@ -281,7 +281,7 @@ void MainWindow::removeGUIExtender(GUIExtenderService* service)
 		QDockWidget* dockWidget = dynamic_cast<QDockWidget*>(widget);
 		this->removeDockWidget(dockWidget);
 
-		mDockWidgets.erase(dockWidget);
+		mDockWidgets->erase(dockWidget);
 
 		if (dockWidget)
 		{
@@ -314,55 +314,6 @@ void MainWindow::startupLoadPatient()
 	patientService()->getPatientData()->startupLoadPatient();
 }
 
-QWidget* MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
-{
-    QDockWidget* dockWidget = this->createDockWidget(widget);
-
-	QMainWindow::addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
-
-    this->tabifyWidget(dockWidget);
-
-    mDockWidgets.insert(dockWidget);
-    dockWidget->setVisible(false); // default visibility
-    this->restoreDockWidget(dockWidget); // restore if added after construction
-
-    this->addToWidgetGroupMap(dockWidget->toggleViewAction(), groupname);
-    return dockWidget;
-}
-
-
-QDockWidget* MainWindow::createDockWidget(QWidget* widget)
-{
-    QScrollArea* scroller = this->addVerticalScroller(widget);
-    QDockWidget* dockWidget = new QDockWidget(widget->windowTitle(), this);
-    dockWidget->setObjectName(widget->objectName() + "DockWidget");
-    dockWidget->setWidget(scroller);
-    return dockWidget;
-}
-
-QScrollArea* MainWindow::addVerticalScroller(QWidget *widget)
-{
-    QScrollArea* scroller = new QScrollArea(NULL);
-    scroller->setWidget(widget);
-    scroller->setWidgetResizable(true);
-    scroller->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    QSizePolicy policy = scroller->sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Minimum);
-    scroller->setSizePolicy(policy);
-    return scroller;
-}
-
-void MainWindow::tabifyWidget(QDockWidget* dockWidget)
-{
-    for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter != mDockWidgets.end(); ++iter)
-    {
-        if (this->dockWidgetArea(*iter) == Qt::LeftDockWidgetArea)
-        {
-            this->tabifyDockWidget(*iter, dockWidget);
-            break;
-        }
-    }
-}
 
 void MainWindow::addToWidgetGroupMap(QAction* action, QString groupname)
 {
@@ -586,14 +537,7 @@ void MainWindow::toggleDebugModeSlot(bool checked)
 	foreach(action, debugActions)
 		{
 			action->setVisible(checked);
-			for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter != mDockWidgets.end(); ++iter)
-			{
-				if (action == (*iter)->toggleViewAction())
-				{
-					if (!checked)
-						(*iter)->hide();
-				}
-			}
+			this->mDockWidgets->toggleDebug(action, checked);
 		}
 }
 void MainWindow::saveScreenShot(QPixmap pixmap)
@@ -781,8 +725,7 @@ void MainWindow::onWorkflowStateChangedSlot()
 {
 	Desktop desktop = stateService()->getActiveDesktop();
 
-	for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter != mDockWidgets.end(); ++iter)
-		(*iter)->hide();
+	this->mDockWidgets->hideAll();
 
 	viewManager()->setActiveLayout(desktop.mLayoutUid, 0);
 	viewManager()->setActiveLayout(desktop.mSecondaryLayoutUid, 1);
@@ -1101,4 +1044,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	QMainWindow::closeEvent(event);
 	this->quitSlot();
 }
+
+QDockWidget* MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
+{
+	QDockWidget* dockWidget = mDockWidgets->addAsDockWidget(widget, groupname);
+	this->addToWidgetGroupMap(dockWidget->toggleViewAction(), groupname);
+	QMainWindow::addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
+	this->restoreDockWidget(dockWidget); // restore if added after construction
+	return dockWidget;
+}
+
 }//namespace cx

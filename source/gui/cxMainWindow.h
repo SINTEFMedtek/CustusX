@@ -49,14 +49,10 @@ class QScrollArea;
 
 namespace cx
 {
-class GUIExtenderService;
-
-class ConsoleWidget;
-}
-
-namespace cx
-{
 class LayoutData;
+class GUIExtenderService;
+class ConsoleWidget;
+class DockWidgets;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 typedef boost::shared_ptr<class LayoutInteractor> LayoutInteractorPtr;
 
@@ -152,10 +148,6 @@ private:
 	void createMenus(); ///< creates and add (gui-)menues
 	void createToolBars(); ///< creates and adds toolbars for convenience
 
-    QWidget* addAsDockWidget(QWidget* widget, QString groupname = "");
-    QDockWidget* createDockWidget(QWidget* widget);
-    QScrollArea *addVerticalScroller(QWidget* widget);
-    void tabifyWidget(QDockWidget* dockWidget);
     void registerToolBar(QToolBar* toolbar, QString groupname = "");
 	void addToWidgetGroupMap(QAction* action, QString groupname);
 	void addGUIExtender(GUIExtenderService* service);
@@ -166,6 +158,7 @@ private:
 	void setupGUIExtenders();
 
 	void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
+	QDockWidget* addAsDockWidget(QWidget* widget, QString groupname);
 
 	//menus
 	QMenu* mCustusXMenu; ///< Application menu
@@ -243,9 +236,11 @@ private:
 
 	//Preferences
 	CameraControlPtr mCameraControl;
-	std::set<QDockWidget*> mDockWidgets;
-    std::map<QString, QWidget*> mCategorizedDockWidgets;
+	std::map<QString, QWidget*> mCategorizedDockWidgets;
+
+	DockWidgets* mDockWidgets;
 };
+
 }//namespace cx
 
 #endif /* CXMAINWINDOW_H_ */
