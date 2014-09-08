@@ -30,36 +30,32 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxExampleWidget.h"
-#include <QLabel>
-#include <QVBoxLayout>
+#include "cxRegistrationGUIExtenderService.h"
+#include "ctkPluginContext.h"
+#include "cxRegistrationWidget.h"
 
 namespace cx
 {
 
-ExampleWidget::ExampleWidget(QWidget* parent) :
-    QWidget(parent),
-    mVerticalLayout(new QVBoxLayout(this))
-{
-    this->setObjectName("ExampleWidget");
-    this->setWindowTitle("Example");
-    this->setWhatsThis(this->defaultWhatsThis());
 
-    mVerticalLayout->addWidget(new QLabel("Hello Plugin!"));
-}
-
-ExampleWidget::~ExampleWidget()
+RegistrationGUIExtenderService::RegistrationGUIExtenderService(ctkPluginContext *context) :
+  mContext(context)
 {
 }
 
-QString ExampleWidget::defaultWhatsThis() const
+RegistrationGUIExtenderService::~RegistrationGUIExtenderService()
 {
-  return "<html>"
-      "<h3>Example plugin.</h3>"
-      "<p>Used for developers as a starting points for developing a new plugin</p>"
-      "</html>";
 }
 
+std::vector<GUIExtenderService::CategorizedWidget> RegistrationGUIExtenderService::createWidgets() const
+{
+	std::vector<CategorizedWidget> retval;
+
+	retval.push_back(GUIExtenderService::CategorizedWidget(
+										 new RegistrationWidget(), "Algorithms"));
+
+	return retval;
+}
 
 
 } /* namespace cx */

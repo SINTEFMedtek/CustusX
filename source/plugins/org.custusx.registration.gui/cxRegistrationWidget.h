@@ -30,36 +30,35 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXEXAMPLEGUIEXTENDERSERVICE_H_
-#define CXEXAMPLEGUIEXTENDERSERVICE_H_
+#ifndef CXREGISTRATIONWIDGET_H_
+#define CXREGISTRATIONWIDGET_H_
 
-#include "cxGUIExtenderService.h"
-#include "org_custusx_example_Export.h"
+#include <QWidget>
+class QVBoxLayout;
 
 namespace cx
 {
 
 /**
- * Implementation of Example service.
+ * Widget for use in the Registration GUI plugin
  *
- * \ingroup org_custusx_example
+ * \ingroup org_custusx_registration_gui
  *
- * \date 2014-04-01
- * \author Christian Askeland
+ * \date Sep 08 2014
+ * \author Ole Vegard Solberg, SINTEF
  */
-class org_custusx_example_EXPORT ExampleGUIExtenderService : public GUIExtenderService
+class RegistrationWidget : public QWidget
 {
-	Q_INTERFACES(cx::GUIExtenderService)
+	Q_OBJECT
 public:
-	ExampleGUIExtenderService();
-	virtual ~ExampleGUIExtenderService();
+	RegistrationWidget(QWidget* parent = 0);
+	virtual ~RegistrationWidget();
 
-	std::vector<CategorizedWidget> createWidgets() const;
-
+private:
+	QString defaultWhatsThis() const;
+	QVBoxLayout*  mVerticalLayout;
 };
-typedef boost::shared_ptr<ExampleGUIExtenderService> ExampleGUIExtenderServicePtr;
 
 } /* namespace cx */
 
-#endif /* CXEXAMPLEGUIEXTENDERSERVICE_H_ */
-
+#endif /* CXREGISTRATIONWIDGET_H_ */

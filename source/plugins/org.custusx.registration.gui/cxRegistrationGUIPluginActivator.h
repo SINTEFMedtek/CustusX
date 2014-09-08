@@ -30,35 +30,43 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXEXAMPLEWIDGET_H_
-#define CXEXAMPLEWIDGET_H_
+#ifndef CXREGISTRATIONGUIPLUGINACTIVATOR_H_
+#define CXREGISTRATIONGUIPLUGINACTIVATOR_H_
 
-#include <QWidget>
-class QVBoxLayout;
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
 
 namespace cx
 {
 
+typedef boost::shared_ptr<class ExampleGUIExtenderService> ExampleGUIExtenderServicePtr;
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+
 /**
- * Widget for use in the plugin example
+ * Activator for the Registration GUI plugin
  *
- * \ingroup org_custusx_example
+ * \ingroup org_custusx_registration_gui
  *
- * \date 2014-05-02
- * \author Christian Askeland
+ * \date Sep 08 2014
+ * \author Ole Vegard Solberg, SINTEF
  */
-class ExampleWidget : public QWidget
+class RegistrationGUIPluginActivator :  public QObject, public ctkPluginActivator
 {
-	Q_OBJECT
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
+
 public:
-	ExampleWidget(QWidget* parent = 0);
-	virtual ~ExampleWidget();
+
+	RegistrationGUIPluginActivator();
+	~RegistrationGUIPluginActivator();
+
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
 
 private:
-	QString defaultWhatsThis() const;
-	QVBoxLayout*  mVerticalLayout;
+  RegisteredServicePtr mRegistration;
 };
 
-} /* namespace cx */
+} // namespace cx
 
-#endif /* CXEXAMPLEWIDGET_H_ */
+#endif /* CXREGISTRATIONGUIPLUGINACTIVATOR_H_ */

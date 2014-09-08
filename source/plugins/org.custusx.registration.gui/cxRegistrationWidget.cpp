@@ -30,57 +30,36 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxExamplePluginActivator.h"
-
-#include <QtPlugin>
-#include <iostream>
-
-#include "cxExampleGUIExtenderService.h"
+#include "cxRegistrationWidget.h"
+#include <QLabel>
+#include <QVBoxLayout>
 
 namespace cx
 {
 
-ExamplePluginActivator::ExamplePluginActivator()
-: mContext(0)
+RegistrationWidget::RegistrationWidget(QWidget* parent) :
+    QWidget(parent),
+    mVerticalLayout(new QVBoxLayout(this))
 {
-	std::cout << "Created ExamplePluginActivator" << std::endl;
+		this->setObjectName("RegistrationWidget");
+		this->setWindowTitle("Registration");
+    this->setWhatsThis(this->defaultWhatsThis());
+
+		mVerticalLayout->addWidget(new QLabel("Registration Plugin!"));
 }
 
-ExamplePluginActivator::~ExamplePluginActivator()
+RegistrationWidget::~RegistrationWidget()
 {
-
 }
 
-void ExamplePluginActivator::start(ctkPluginContext* context)
+QString RegistrationWidget::defaultWhatsThis() const
 {
-	std::cout << "Started ExamplePluginActivator" << std::endl;
-	this->mContext = context;
-
-	mPlugin.reset(new ExampleGUIExtenderService);
-	std::cout << "created example service" << std::endl;
-	try
-	{
-		mRegistration = context->registerService(QStringList(GUIExtenderService_iid), mPlugin.get());
-	}
-	catch(ctkRuntimeException& e)
-	{
-		std::cout << e.what() << std::endl;
-		mPlugin.reset();
-	}
-	std::cout << "registered example service" << std::endl;
+  return "<html>"
+      "<h3>Example plugin.</h3>"
+      "<p>Used for developers as a starting points for developing a new plugin</p>"
+      "</html>";
 }
 
-void ExamplePluginActivator::stop(ctkPluginContext* context)
-{
-	mRegistration.unregister();
-	if(mPlugin)
-		mPlugin.reset();
-	std::cout << "Stopped ExamplePluginActivator" << std::endl;
-	Q_UNUSED(context)
-}
-
-} // namespace cx
-
-Q_EXPORT_PLUGIN2(ExamplePluginActivator_irrelevant_string, cx::ExamplePluginActivator)
 
 
+} /* namespace cx */

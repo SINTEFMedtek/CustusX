@@ -1,4 +1,4 @@
-project(org_custusx_registration_ctus)
+project(org_custusx_registration_gui)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
@@ -6,19 +6,20 @@ message(STATUS "===================================== parsing example")
 
 include_directories(
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
-    )
+    ${CustusX_SOURCE_DIR}/source/logic
+)
 
 set(PLUGIN_SRCS
-  cxExamplePluginActivator.cpp
-  cxExampleGUIExtenderService.cpp
-  cxExampleWidget.cpp
+  cxRegistrationGUIPluginActivator.cpp
+  cxRegistrationGUIExtenderService.cpp
+  cxRegistrationWidget.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-  cxExamplePluginActivator.h
-  cxExampleGUIExtenderService.h
-  cxExampleWidget.h
+  cxRegistrationGUIPluginActivator.h
+  cxRegistrationGUIExtenderService.h
+  cxRegistrationWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -35,6 +36,7 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
     cxGUIExtenderService
+    cxLogicManager
     )
 
 ctkMacroBuildPlugin(
@@ -47,5 +49,5 @@ ctkMacroBuildPlugin(
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
 )
 
-add_subdirectory(testing)
+#add_subdirectory(testing)
 

@@ -30,31 +30,40 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxExampleGUIExtenderService.h"
-#include "cxExampleWidget.h"
+#ifndef CXREGISTRATIONGUIEXTENDERSERVICE_H_
+#define CXREGISTRATIONGUIEXTENDERSERVICE_H_
+
+#include "cxGUIExtenderService.h"
+#include "org_custusx_registration_gui_Export.h"
+class ctkPluginContext;
 
 namespace cx
 {
 
-
-ExampleGUIExtenderService::ExampleGUIExtenderService()
+/**
+ * Implementation of Registration GUI service.
+ *
+ * \ingroup org_custusx_registration_gui
+ *
+ * \date Sep 08 2014
+ * \author Ole Vegard Solberg, SINTEF
+ */
+class org_custusx_registration_gui_EXPORT RegistrationGUIExtenderService : public GUIExtenderService
 {
-}
+	Q_INTERFACES(cx::GUIExtenderService)
+public:
+	RegistrationGUIExtenderService(ctkPluginContext *context);
+	virtual ~RegistrationGUIExtenderService();
 
-ExampleGUIExtenderService::~ExampleGUIExtenderService()
-{
-}
+	std::vector<CategorizedWidget> createWidgets() const;
 
-std::vector<GUIExtenderService::CategorizedWidget> ExampleGUIExtenderService::createWidgets() const
-{
-	std::vector<CategorizedWidget> retval;
+private:
+  ctkPluginContext* mContext;
 
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new ExampleWidget(),
-			"Plugins"));
-
-	return retval;
-}
-
+};
+//typedef boost::shared_ptr<ExampleGUIExtenderService> ExampleGUIExtenderServicePtr;
 
 } /* namespace cx */
+
+#endif /* CXREGISTRATIONGUIEXTENDERSERVICE_H_ */
+
