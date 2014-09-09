@@ -60,13 +60,14 @@ public:
 	virtual ~RegistrationWidget();
 
 private:
-	void init();
+	void initRegistrationTypesWidgets();
+	void initServiceListener();
 	QString defaultWhatsThis() const;
 
 	void onServiceAdded(RegistrationMethodService *service);
 	void onServiceRemoved(RegistrationMethodService *service);
-	QStackedWidget *findMethodWidget(QString registrationMethod);
-	QStackedWidget *createMethodWidget(QString registrationMethod);
+//	QStackedWidget *findMethodWidget(QString registrationMethod);
+//	QStackedWidget *createMethodWidget(QString registrationMethod);
 
 	ctkPluginContext* mPluginContext;
 	QVBoxLayout*  mVerticalLayout;
@@ -77,9 +78,6 @@ private:
 
 	std::map<QString, QComboBox*> mMethodsSelectorMap;
 	std::map<QString, QStackedWidget*> mRegistrationTypeMap;
-//	QTabWidget *mImageToImageTypeWidget;
-//	QTabWidget *mPatientTypeWidget;
-//	QTabWidget *mImageTransformTypeWidget;
 	QStringList mRegistrationTypes;
 
 };
