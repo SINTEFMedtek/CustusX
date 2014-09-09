@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "cxMousePadWidget.h"
-#include <QtGui>
+#include <QtWidgets>
 #include "cxVector3D.h"
 
 namespace cx

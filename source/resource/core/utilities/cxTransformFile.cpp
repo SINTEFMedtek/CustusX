@@ -88,7 +88,7 @@ void TransformFile::write(const Transform3D& transform)
 		reportWarning(QString("Failed to open file %1 for writing.").arg(file.fileName()));
 		return;
 	}
-	file.write(qstring_cast(transform).toAscii());
+	file.write(qstring_cast(transform).toLatin1());
 }
 
 }

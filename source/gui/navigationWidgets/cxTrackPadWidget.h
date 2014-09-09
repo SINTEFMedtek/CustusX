@@ -36,7 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBaseWidget.h"
 
 #include <vector>
-#include <QtGui>
+#include <QtWidgets>
+
 #include <QGraphicsView>
 #include "cxVector3D.h"
 #include "cxDoubleWidgets.h"

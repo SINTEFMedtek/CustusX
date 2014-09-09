@@ -77,6 +77,7 @@ ctkPluginTableModel::ctkPluginTableModel(PluginFrameworkManagerPtr framework, QO
 
 void ctkPluginTableModel::resetAll()
 {
+	this->beginResetModel();
 	QStringList names = mFramework->getPluginSymbolicNames();
 	std::map<QString, ctkPluginPtr> plugins;
 	for (int i=0; i<names.size(); ++i)
@@ -88,7 +89,7 @@ void ctkPluginTableModel::resetAll()
 
 	mPlugins = plugins;
 
-	this->reset();
+	this->endResetModel();
 }
 
 QVariant ctkPluginTableModel::data(const QModelIndex& index, int role) const
@@ -179,8 +180,8 @@ void ctkPluginTableModel::pluginChanged(const ctkPluginEvent& event)
 
 		iter->second = event.getPlugin();
 
-		QModelIndex topLeftIndex = createIndex(i, 0, 0);
-		QModelIndex bottomRightIndex = createIndex(topLeftIndex.row(), columnCount()-1, 0);
+		QModelIndex topLeftIndex = createIndex(i, 0);
+		QModelIndex bottomRightIndex = createIndex(topLeftIndex.row(), columnCount()-1);
 		emit dataChanged(topLeftIndex, bottomRightIndex);
 	}
 }

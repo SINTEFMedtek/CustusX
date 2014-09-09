@@ -1,8 +1,3 @@
-cmake_minimum_required( VERSION 2.4 )
-
-if(COMMAND cmake_policy)
-	cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
         include_directories(
@@ -18,7 +13,7 @@ if (BUILD_TESTING)
 
     set(CXTEST_SOURCES_TO_MOC
     )
-	#QT4_WRAP_CPP(CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES
+	#QT5_WRAP_CPP(CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES
 	#	)
 	set(CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES ${CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES}
 		cxtestReconstructionManagerFixture.h

@@ -33,7 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXREGISTERI2IWIDGET_H_
 
 #include <vector>
-#include <QtGui>
+#include <QtWidgets>
+
 #include "cxDoubleDataAdapterXml.h"
 #include "cxDoubleWidgets.h"
 #include "cxRegistrationBaseWidget.h"

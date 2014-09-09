@@ -248,7 +248,7 @@ void PositionStorageWriter::write(Transform3D matrix, uint64_t timestamp, QStrin
 {
   if (toolUid!=mCurrentToolUid)
   {
-    QByteArray name = toolUid.toAscii();
+    QByteArray name = toolUid.toLatin1();
 
     stream << (quint8)2;  // Type - tool change
     stream << (quint8)(name.size()+4); // Size of data following this point

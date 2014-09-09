@@ -102,7 +102,7 @@ function(_cx_catch_generate_master_catch_using_sources EXE_NAME PATH_TO_MAIN)
         ${CX_TEST_CATCH_INCLUDE_DIRS}
     )
     
-    QT4_WRAP_CPP(MOCCED ${CX_TEST_CATCH_MOC_SOURCES})
+    QT5_WRAP_CPP(MOCCED ${CX_TEST_CATCH_MOC_SOURCES})
     
     add_executable(${EXE_NAME} ${PATH_TO_MAIN} ${CX_TEST_CATCH_SOURCES} ${MOCCED})
     target_link_libraries(${EXE_NAME} ${CX_TEST_CATCH_LINKER_LIBS} cxtestUtilities)
@@ -206,7 +206,7 @@ function(_cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES ADDITIONAL_LI
 
     cx_catch__private_define_platform_specific_linker_options()
 
-    QT4_WRAP_CPP(MOCCED ${MOC_SOURCES})
+    QT5_WRAP_CPP(MOCCED ${MOC_SOURCES})
 
 
     cx_add_test_library(${TEST_LIB_NAME} ${SOURCES} ${MOCCED})

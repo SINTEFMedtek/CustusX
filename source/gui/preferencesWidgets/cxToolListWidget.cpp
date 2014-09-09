@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMimeData>
 #include <QAction>
 #include <QMenu>
+#include <QDrag>
 #include "cxEnumConverter.h"
 #include "cxReporter.h"
 #include "cxDataLocations.h"

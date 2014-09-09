@@ -171,16 +171,14 @@ endmacro()
 # Find the package and run the include USE file.
 ###############################################################################
 macro(cx_initialize_QT)
-    set(QT_USE_QTXML TRUE)
-    set(QT_USE_QTSQL TRUE)
-    set(QT_USE_QTTEST TRUE)
-    set(QT_USE_QTNETWORK 1)
-    find_package(Qt4 REQUIRED)
-    if(QT_USE_FILE)
-        include(${QT_USE_FILE})
-    else(QT_USE_FILE)
-        set(QT_LIBRARIES  ${QT_QT_LIBRARY})
-    endif(QT_USE_FILE)
+    find_package(Qt5Core REQUIRED) # attempt to remove warning in cmake
+    find_package(Qt5Widgets REQUIRED)
+    find_package(Qt5Xml REQUIRED)
+    find_package(Qt5Sql REQUIRED)
+    find_package(Qt5Test REQUIRED)
+    find_package(Qt5Network REQUIRED)
+    find_package(Qt5Concurrent REQUIRED) # attempt to remove warning in cmake
+    find_package(Qt5Multimedia REQUIRED)
 endmacro()
 
 ###############################################################################

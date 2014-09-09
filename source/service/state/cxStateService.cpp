@@ -103,7 +103,7 @@ public:
 	void addDefaultDesktops(QString workflowStateUid, QString layoutUid, QString mainwindowstate)
 	{
 		mWorkflowDefaultDesktops[workflowStateUid] = Desktop(layoutUid,
-						QByteArray::fromBase64(mainwindowstate.toAscii()));
+						QByteArray::fromBase64(mainwindowstate.toLatin1()));
 	}
 
 	Desktop getDefaultDesktop(QString applicationName, QString workflowName)
@@ -128,7 +128,7 @@ public:
 		{
 			desktopElement = workflowElement.namedItem("custom").toElement();
 		}
-		retval.mMainWindowState = QByteArray::fromBase64(desktopElement.attribute("mainwindowstate").toAscii());
+		retval.mMainWindowState = QByteArray::fromBase64(desktopElement.attribute("mainwindowstate").toLatin1());
 		retval.mLayoutUid = desktopElement.attribute("layoutuid");
 		retval.mSecondaryLayoutUid = desktopElement.attribute("secondarylayoutuid");
 

@@ -373,7 +373,8 @@ endfunction()
 #
 ###############################################################################
 function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS_LOCAL)
-	cx_assert_variable_exists(${QT_PLUGINS_DIR})
+#	cx_assert_variable_exists(${QT_PLUGINS_DIR})
+# temporarily removed QT_PLUGINS_DIR - must adapt to qt5!
 	cx_assert_variable_exists(${CX_INSTALL_ROOT_DIR})
 	cx_assert_variable_exists(${INSTALL_BINARY_DIR})
 	cx_assert_variable_exists(${CX_INSTALL_PLUGIN_DIR})
@@ -408,10 +409,6 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 	foreach(TARGET ${CX_APPLE_TARGETS_TO_COPY})
 		get_filename_component(TARGET_FILENAME ${TARGET} NAME)
 		set(TARGET_FILEPATH ${INSTALL_BINARY_DIR}/${TARGET_FILENAME})
-#		set(INSTALL_LIBRARIES_PATTERN_LOCAL
-#			${INSTALL_LIBRARIES_PATTERN_LOCAL}
-#			${INSTALL_BINARY_DIR}/${TARGET_FILENAME}
-#			)
 		set(LIB_PATTERN_CODE
 			"${LIB_PATTERN_CODE}
 			set\(TEMP \"\${CMAKE_INSTALL_PREFIX}/${TARGET_FILEPATH}\"\)

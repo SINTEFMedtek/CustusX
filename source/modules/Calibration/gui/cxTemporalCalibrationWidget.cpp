@@ -32,7 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cxTemporalCalibrationWidget.h>
 
 
-#include <QtGui>
+#include <QtWidgets>
+
 #include <QVBoxLayout>
 #include "boost/bind.hpp"
 #include "cxToolManager.h"

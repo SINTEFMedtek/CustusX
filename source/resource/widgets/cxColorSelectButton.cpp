@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxColorSelectButton.h"
 #include <iostream>
-#include <QtGui>
+#include <QtWidgets>
 
 namespace cx
 {

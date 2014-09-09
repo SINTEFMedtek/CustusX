@@ -193,7 +193,7 @@ QString ElastixExecuter::writeInitTransformToElastixfile(
 	{
 		reportWarning(QString("Failed to open file %1 for writing.").arg(initTransformFile.fileName()));
 	}
-	initTransformFile.write(elastiXText.toAscii());
+	initTransformFile.write(elastiXText.toLatin1());
 	return initTransformFile.fileName();
 }
 

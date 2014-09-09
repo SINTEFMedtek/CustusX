@@ -260,7 +260,10 @@ set (CX_RESOURCE_LIBRARIES
 	#QVTK
     ${SSC_GCOV_LIBRARY}
     ${OPENGL_LIBRARIES}
-    ${QT_LIBRARIES}
+    Qt5::Widgets
+    Qt5::Xml
+    Qt5::Multimedia
+    Qt5::Sql
     ${Boost_LIBRARIES}
     ${ITK_LIBRARIES}
     )

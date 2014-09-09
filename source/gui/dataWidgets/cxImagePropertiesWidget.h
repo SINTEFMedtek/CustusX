@@ -33,7 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGEPROPERTIESWIDGET_H
 #define CXIMAGEPROPERTIESWIDGET_H
 
-#include <QtGui>
+#include <QtWidgets>
+
 #include "cxBaseWidget.h"
 #include "cxActiveImageProxy.h"
 

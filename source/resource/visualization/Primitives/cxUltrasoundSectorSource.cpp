@@ -90,18 +90,18 @@ int UltrasoundSectorSource::RequestInformation(
   // get the info object
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),
-			   -1);
-
-  double* bounds = mSector->GetBounds();
-  if (mSector)
-	  outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
-				   bounds[0],
-				   bounds[1],
-				   bounds[2],
-				   bounds[3],
-				   bounds[4],
-				   bounds[5]);
+//  outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),
+//			   -1);
+//
+//  double* bounds = mSector->GetBounds();
+//  if (mSector)
+//	  outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
+//				   bounds[0],
+//				   bounds[1],
+//				   bounds[2],
+//				   bounds[3],
+//				   bounds[4],
+//				   bounds[5]);
 
   return 1;
 }

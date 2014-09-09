@@ -54,6 +54,7 @@ class ExamplePluginActivator :  public QObject, public ctkPluginActivator
 {
   Q_OBJECT
   Q_INTERFACES(ctkPluginActivator)
+  Q_PLUGIN_METADATA(IID "org_custusx_example")
 
 public:
 

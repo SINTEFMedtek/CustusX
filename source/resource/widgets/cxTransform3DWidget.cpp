@@ -44,7 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cmath>
 #include "cxMousePadWidget.h"
 
-#include <QtGui>
+#include <QtWidgets>
+
 
 #include "boost/bind.hpp"
 #include "libQtSignalAdapters/Qt2Func.h"

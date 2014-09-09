@@ -33,7 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMEMORYTESTER_H_
 #define CXMEMORYTESTER_H_
 
-#include <QtGui>
+#include <QtWidgets>
+
 #include <vector>
 #include "vtkForwardDeclarations.h"
 #include <boost/shared_ptr.hpp>

@@ -321,7 +321,7 @@ TextDisplay::TextDisplay( const QString& text, const QColor &color, int fontsize
 {
 	this->text = text;
 //	Vector3D c = color;
-	this->forceUseVtkTextMapper();
+//	this->forceUseVtkTextMapper();
 	mapper = vtkTextMapperPtr::New();
 	mapper->SetInput( cstring_cast(text) );
 	this->setColor(color);

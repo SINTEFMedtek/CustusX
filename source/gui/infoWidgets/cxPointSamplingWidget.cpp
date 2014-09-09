@@ -148,7 +148,7 @@ void PointSamplingWidget::updateSlot()
   mTable->setColumnCount(3);
   QStringList headerItems(QStringList() << "Name" << "Coordinates(r)" << "Delta (mm)");
   mTable->setHorizontalHeaderLabels(headerItems);
-  mTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+  mTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 
   for (unsigned i = 0; i < mSamples.size(); ++i)

@@ -39,9 +39,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "cxFileSelectWidget.h"
-#include <QtGui>
+#include <QtWidgets>
+
 #include "cxTypeConversions.h"
 #include <iostream>
+#include <QHBoxLayout>
+#include <QtWidgets>
 
 namespace cx
 {

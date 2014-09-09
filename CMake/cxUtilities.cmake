@@ -343,8 +343,8 @@ function(cx_add_class_qt_moc SOURCE_FILES_ARGUMENT)
 		_cx_add_header_name(HEADER_NAMES ${CLASS_NAME})
 	endforeach()
 	
-	# optimized: QT4_WRAP_CPP has large overhead: call once.
-	QT4_WRAP_CPP( RESULT_add_class_qt_moc ${HEADER_NAMES} )
+	# optimized: QT5_WRAP_CPP has large overhead: call once.
+	QT5_WRAP_CPP( RESULT_add_class_qt_moc ${HEADER_NAMES} )
 
     set(${SOURCE_FILES_ARGUMENT} ${${SOURCE_FILES_ARGUMENT}} ${RESULT_add_class_qt_moc} PARENT_SCOPE)
 endfunction()

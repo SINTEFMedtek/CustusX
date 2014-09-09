@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxBaseWidget.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {
@@ -39,7 +40,7 @@ BaseWidget::BaseWidget(QWidget* parent, QString objectName, QString windowTitle)
     OptimizedUpdateWidget(parent), mObjectName(objectName), mWindowTitle(windowTitle)
 {
     if (mObjectName=="US Reconstruction")
-        std::cout << ":: [" <<  this->objectName().toAscii().constData() << "]" << std::endl;
+        std::cout << ":: [" <<  this->objectName() << "]" << std::endl;
     this->setObjectName(mObjectName);
     this->setWindowTitle(mWindowTitle);
 }

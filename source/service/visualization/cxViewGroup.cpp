@@ -33,7 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewGroup.h"
 
 #include <vector>
-#include <QtGui>
+#include <QtWidgets>
+
 #include <vtkRenderWindow.h>
 #include "cxView.h"
 #include "cxSliceProxy.h"

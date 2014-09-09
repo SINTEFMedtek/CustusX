@@ -150,7 +150,7 @@ void LandmarkRegistrationWidget::prePaintEvent()
 	mLandmarkTableWidget->setColumnCount(4);
 	QStringList headerItems(QStringList() << "Name" << "Status" << "Coordinates" << "Accuracy (mm)");
 	mLandmarkTableWidget->setHorizontalHeaderLabels(headerItems);
-	mLandmarkTableWidget->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+	mLandmarkTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	mLandmarkTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
 
 	for (unsigned i = 0; i < landmarks.size(); ++i)

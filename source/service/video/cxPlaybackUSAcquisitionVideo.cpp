@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageDataContainer.h"
 #include "cxVideoServiceBackend.h"
 #include "cxFileHelpers.h"
+#include <QtConcurrent>
 
 namespace cx
 {

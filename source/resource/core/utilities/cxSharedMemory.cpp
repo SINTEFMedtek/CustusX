@@ -63,7 +63,7 @@ SharedMemoryServer::SharedMemoryServer(QString key, int buffers, int sizeEach, Q
 		else
 		{
 			qWarning("Failed to create shared memory buffer of size %d: %s",
-			         size, mBuffer.errorString().toAscii().constData());
+			         size, mBuffer.errorString().toLatin1().constData());
 			return;
 		}
 	}
