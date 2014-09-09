@@ -57,6 +57,7 @@ public:
 	RegistrationMethodManualImageToImageService(ctkPluginContext *context);
 	virtual ~RegistrationMethodManualImageToImageService() {}
 	virtual QString getRegistrationType() {return QString("ImageToImage");}
+	virtual QString getRegistrationMethod() {return QString("Manual");}
 	virtual QWidget* getWidget();
 private:
   ctkPluginContext* mContext;
@@ -72,6 +73,7 @@ public:
 	RegistrationMethodManualImageToPatientService(ctkPluginContext *context);
 	virtual ~RegistrationMethodManualImageToPatientService() {}
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}
+	virtual QString getRegistrationMethod() {return QString("Manual");}
 	virtual QWidget* getWidget();
 
 private:
@@ -88,6 +90,7 @@ public:
 	RegistrationMethodManualImageTransformService(ctkPluginContext *context);
 	virtual ~RegistrationMethodManualImageTransformService() {}
 	virtual QString getRegistrationType() {return QString("ImageTransform");}
+	virtual QString getRegistrationMethod() {return QString("Manual");}
 	virtual QWidget* getWidget();
 
 private:

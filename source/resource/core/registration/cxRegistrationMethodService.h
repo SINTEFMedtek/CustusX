@@ -59,6 +59,7 @@ public:
 
 	virtual QWidget* getWidget() = 0;
 	virtual QString getRegistrationType() = 0;
+	virtual QString getRegistrationMethod() = 0;
 
 };
 

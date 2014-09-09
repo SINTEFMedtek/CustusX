@@ -33,11 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONWIDGET_H_
 #define CXREGISTRATIONWIDGET_H_
 
-#include <QWidget>
+#include <QTabWidget>
 #include "cxServiceTrackerListener.h"
 #include "cxRegistrationMethodService.h"
 class QVBoxLayout;
-class QTabWidget;
+class QComboBox;
+class QStackedWidget;
 
 namespace cx
 {
@@ -49,8 +50,9 @@ namespace cx
  *
  * \date Sep 08 2014
  * \author Ole Vegard Solberg, SINTEF
+ * \author Geir Arne Tangen, SINTEF
  */
-class RegistrationWidget : public QWidget
+class RegistrationWidget : public QTabWidget
 {
 	Q_OBJECT
 public:
@@ -58,19 +60,28 @@ public:
 	virtual ~RegistrationWidget();
 
 private:
+	void init();
 	QString defaultWhatsThis() const;
 
 	void onServiceAdded(RegistrationMethodService *service);
 	void onServiceRemoved(RegistrationMethodService *service);
-	QTabWidget *findTypeWidget(QString registrationType);
-	QTabWidget *createTypeWidget(QString registrationType);
+	QStackedWidget *findMethodWidget(QString registrationMethod);
+	QStackedWidget *createMethodWidget(QString registrationMethod);
 
 	ctkPluginContext* mPluginContext;
 	QVBoxLayout*  mVerticalLayout;
 	boost::shared_ptr<ServiceTrackerListener<RegistrationMethodService> > mServiceListener;
 
-	std::map<QString, QTabWidget*> mCategoryWidgetsMap; ///< map containing groups
+	std::map<QString, QStackedWidget*> mMethodsWidgetsMap; ///< map containing groups
 	std::map<QString, QWidget*> mCategorizedWidgets;
+
+	std::map<QString, QComboBox*> mMethodsSelectorMap;
+	std::map<QString, QStackedWidget*> mRegistrationTypeMap;
+//	QTabWidget *mImageToImageTypeWidget;
+//	QTabWidget *mPatientTypeWidget;
+//	QTabWidget *mImageTransformTypeWidget;
+	QStringList mRegistrationTypes;
+
 };
 
 } /* namespace cx */

@@ -10,6 +10,7 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     ${CustusX_SOURCE_DIR}/source/resource/core/registration
     ${CustusX_SOURCE_DIR}/source/resource/core/utilities
+    ${CustusX_SOURCE_DIR}/source/resource/core/logger
 )
 
 set(PLUGIN_SRCS
