@@ -31,16 +31,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxRegistrationWidget.h"
+#include <boost/bind.hpp>
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QTabWidget>
+#include "cxTypeConversions.h"
 
 namespace cx
 {
 
-RegistrationWidget::RegistrationWidget(QWidget* parent) :
-    QWidget(parent),
-    mVerticalLayout(new QVBoxLayout(this))
+RegistrationWidget::RegistrationWidget(ctkPluginContext *context, QWidget* parent) :
+	mPluginContext(context),
+	QWidget(parent),
+	mVerticalLayout(new QVBoxLayout(this))
 {
 		this->setObjectName("RegistrationWidget");
 		this->setWindowTitle("Registration");
@@ -77,7 +80,7 @@ QTabWidget *RegistrationWidget::findTypeWidget(QString registrationType)
 	if (mCategoryWidgetsMap.find(registrationType) != mCategoryWidgetsMap.end())
 	{
 			std::cout << "found typeWidget: " << registrationType << std::endl;
-			retval = mCategorizedWidgets.at(registrationType);
+//			retval = mCategorizedWidgets.at(registrationType);
 			typeWidget = mCategoryWidgetsMap.at(registrationType);
 	}
 	else
@@ -85,7 +88,7 @@ QTabWidget *RegistrationWidget::findTypeWidget(QString registrationType)
 			std::cout << "create typeWidget: " << registrationType << std::endl;
 			typeWidget = this->createTypeWidget(registrationType);
 //      retval = this->addAsDockWidget(categoryWidget, registrationType);
-			mCategorizedWidgets[registrationType] = retval;
+			mCategorizedWidgets[registrationType] = typeWidget;
 	}
 	return typeWidget;
 }
@@ -100,7 +103,7 @@ QTabWidget *RegistrationWidget::createTypeWidget(QString registrationType)
 		QTabWidget *categoryWidget = new QTabWidget(this);
 		categoryWidget->setWindowTitle(registrationType);
 		categoryWidget->setObjectName(registrationType);
-		mCategoryWidgetsMap[category] = categoryWidget;
+		mCategoryWidgetsMap[registrationType] = categoryWidget;
 		return categoryWidget;
 }
 

@@ -52,7 +52,7 @@ std::vector<GUIExtenderService::CategorizedWidget> RegistrationGUIExtenderServic
 	std::vector<CategorizedWidget> retval;
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-										 new RegistrationWidget(), "Algorithms"));
+										 new RegistrationWidget(mContext), "Algorithms"));
 
 	return retval;
 }

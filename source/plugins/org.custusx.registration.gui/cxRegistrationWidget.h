@@ -54,7 +54,7 @@ class RegistrationWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	RegistrationWidget(QWidget* parent = 0);
+	RegistrationWidget(ctkPluginContext *context, QWidget* parent = 0);
 	virtual ~RegistrationWidget();
 
 private:
@@ -65,6 +65,7 @@ private:
 	QTabWidget *findTypeWidget(QString registrationType);
 	QTabWidget *createTypeWidget(QString registrationType);
 
+	ctkPluginContext* mPluginContext;
 	QVBoxLayout*  mVerticalLayout;
 	boost::shared_ptr<ServiceTrackerListener<RegistrationMethodService> > mServiceListener;
 
