@@ -43,14 +43,32 @@ namespace cx
 {
 
 /**
+ * Registration method manual service interface.
+ *
+ * \ingroup org_custusx_registration_method_manual
+ *
+ * \date Sep 09, 2014
+ * \author Ole Vegard Solberg, SINTEF
+ */
+class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualService : public RegistrationMethodService
+{
+	Q_OBJECT
+public:
+	RegistrationMethodManualService(ctkPluginContext *context);
+protected:
+	ctkPluginContext* mContext;
+};
+
+/**
  * Implementation of registration method manual service.
  *
  * \ingroup org_custusx_registration_method_manual
  *
- * \date 2014-04-01
- * \author Christian Askeland
+ * \date Sep 08, 2014
+ * \author Ole Vegard Solberg, SINTEF
+ * \author Geir Arne Tangen, SINTEF
  */
-class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualImageToImageService : public RegistrationMethodService
+class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualImageToImageService : public RegistrationMethodManualService
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
@@ -60,13 +78,13 @@ public:
 	virtual QString getRegistrationMethod() {return QString("Manual");}
 	virtual QWidget* getWidget();
 private:
-  ctkPluginContext* mContext;
+//  ctkPluginContext* mContext;
 
 };
 //typedef boost::shared_ptr<RegistrationMethodManualService> RegistrationMethodManualServicePtr;
 
 
-class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualImageToPatientService : public RegistrationMethodService
+class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualImageToPatientService : public RegistrationMethodManualService
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
@@ -77,13 +95,13 @@ public:
 	virtual QWidget* getWidget();
 
 private:
-  ctkPluginContext* mContext;
+//  ctkPluginContext* mContext;
 
 };
 //typedef boost::shared_ptr<RegistrationMethodManualService> RegistrationMethodManualServicePtr;
 
 
-class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualImageTransformService : public RegistrationMethodService
+class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualImageTransformService : public RegistrationMethodManualService
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
@@ -94,7 +112,7 @@ public:
 	virtual QWidget* getWidget();
 
 private:
-  ctkPluginContext* mContext;
+//  ctkPluginContext* mContext;
 
 };
 //typedef boost::shared_ptr<RegistrationMethodManualService> RegistrationMethodManualServicePtr;

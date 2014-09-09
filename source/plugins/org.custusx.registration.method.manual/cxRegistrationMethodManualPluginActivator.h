@@ -47,8 +47,9 @@ typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
  *
  * \ingroup org_custusx_registration_method_manual
  *
- * \date 2014-04-15
- * \author Christian Askeland
+ * \date Sep 08, 2014
+ * \author Ole Vegard Solberg, SINTEF
+ * \author Geir Arne Tangen, SINTEF
  */
 class RegistrationMethodManualPluginActivator :  public QObject, public ctkPluginActivator
 {
