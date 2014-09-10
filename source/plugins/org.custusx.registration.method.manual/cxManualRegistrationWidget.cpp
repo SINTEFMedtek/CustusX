@@ -32,23 +32,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxManualRegistrationWidget.h"
 #include <boost/bind.hpp>
+#include <ctkPluginContext.h>
 #include "cxLabeledComboBoxWidget.h"
 //#include "cxRegistrationDataAdapters.h"
 //#include "cxRegistrationManager.h"
 //#include "cxToolManager.h"
 //#include "cxDataManager.h"
-#include "cxNullDeleter.h"
 #include "cxReporter.h"
+#include "cxRegistrationServiceProxy.h"
 
 namespace cx
 {
 
-ManualImageRegistrationWidget::ManualImageRegistrationWidget(ctkPluginContext *context, QWidget* parent) :
+ManualImageRegistrationWidget::ManualImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
 	BaseWidget(parent, "ManualPatientRegistrationWidget",
 						 "Manual Patient Registration"),
 	mVerticalLayout(new QVBoxLayout(this)),
-	mPluginContext(context),
-	mRegistrationService(RegistrationService::getNullObject())
+	mRegistrationService(new cx::RegistrationServiceProxy(pluginContext))
 {
 	//TODO: Need to create/add these comboboxes from RegistrationService functions
 
@@ -66,35 +66,7 @@ ManualImageRegistrationWidget::ManualImageRegistrationWidget(ctkPluginContext *c
 
 	mVerticalLayout->addStretch();
 
-//	connect(mManager.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingDataChanged()));
-	this->initServiceListener();
-}
-
-void ManualImageRegistrationWidget::initServiceListener()
-{
-	mServiceListener.reset(new ServiceTrackerListener<RegistrationService>(
-								 mPluginContext,
-								 boost::bind(&ManualImageRegistrationWidget::onServiceAdded, this, _1),
-								 boost::function<void (RegistrationService*)>(),
-								 boost::bind(&ManualImageRegistrationWidget::onServiceRemoved, this, _1)
-								 ));
-	mServiceListener->open();
-}
-
-void ManualImageRegistrationWidget::onServiceAdded(RegistrationService* service)
-{
-	mRegistrationService.reset(service, null_deleter());
-	connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
-	connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
-	if(mRegistrationService->isNull())
-		reportWarning("ManualImageRegistrationWidget::onServiceAdded mRegistrationService->isNull()");
-}
-
-void ManualImageRegistrationWidget::onServiceRemoved(RegistrationService *service)
-{
-	disconnect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
-	disconnect(service, SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
-	mRegistrationService = RegistrationService::getNullObject();
+	connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingDataChanged()));
 }
 
 void ManualImageRegistrationWidget::showEvent(QShowEvent* event)

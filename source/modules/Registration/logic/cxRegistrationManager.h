@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxAcquisitionData.h"
 #include "cxLandmark.h"
-#include "ctkPluginContext.h"
+class ctkPluginContext;
 
 namespace cx
 {

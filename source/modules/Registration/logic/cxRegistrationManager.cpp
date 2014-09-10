@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationManager.h"
 
 #include <boost/bind.hpp>
+#include <ctkPluginContext.h>
 #include <QtCore>
 #include <QDomElement>
 #include "vtkMath.h"

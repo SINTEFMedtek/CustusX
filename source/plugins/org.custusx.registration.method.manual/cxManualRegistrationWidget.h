@@ -37,8 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStringDataAdapter.h"
 #include "cxTransform3DWidget.h"
 #include "cxData.h"
-#include "cxServiceTrackerListener.h"
 #include "cxRegistrationService.h"
+class ctkPluginContext;
 
 namespace cx
 {
@@ -52,13 +52,14 @@ typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
  * exactly like an image registration.
  *
  *  \date Feb 16, 2012
- *  \author christiana
+ *  \author Christian Askeland, SINTEF
+ *  \author Ole Vegard Solberg, SINTEF
  */
 class ManualImageRegistrationWidget: public BaseWidget
 {
 Q_OBJECT
 public:
-	ManualImageRegistrationWidget(ctkPluginContext *context, QWidget* parent);
+	ManualImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent);
 	virtual ~ManualImageRegistrationWidget()
 	{
 	}
@@ -79,20 +80,12 @@ private:
 	virtual Transform3D getMatrixFromBackend() = 0;
 	virtual void setMatrixFromWidget(Transform3D M) = 0;
 
-	void initServiceListener();
-	void onServiceAdded(RegistrationService* service);
-	void onServiceRemoved(RegistrationService *service);
-
 	QVBoxLayout* mVerticalLayout;
 	QLabel* mLabel;
 
 	StringDataAdapterPtr mFixedImage;
 	StringDataAdapterPtr mMovingImage;
 	Transform3DWidget* mMatrixWidget;
-
-	boost::shared_ptr<ServiceTrackerListener<RegistrationService> > mServiceListener;
-	ctkPluginContext *mPluginContext;
-
 };
 
 /**\brief Direct setting of image registration
@@ -100,7 +93,8 @@ private:
  * The matrix is the fMm transform, i.e. from moving to fixed image
  *
  *  \date 2014-06-13
- *  \author christiana
+ *  \author Christian Askeland, SINTEF
+ *  \author Ole Vegard Solberg, SINTEF
  */
 class ManualImage2ImageRegistrationWidget : public ManualImageRegistrationWidget
 {
@@ -122,7 +116,8 @@ public:
  * exactly like an image registration.
  *
  *  \date Feb 16, 2012
- *  \author christiana
+ *  \author Christian Askeland, SINTEF
+ *  \author Ole Vegard Solberg, SINTEF
  */
 class ManualImageTransformRegistrationWidget : public ManualImageRegistrationWidget
 {
@@ -141,7 +136,8 @@ public:
  * exactly like an image registration.
  *
  *  \date Feb 16, 2012
- *  \author christiana
+ *  \author Christian Askeland, SINTEF
+ *  \author Ole Vegard Solberg, SINTEF
  */
 //class ManualPatientRegistrationWidget: public BaseWidget
 //{
