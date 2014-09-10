@@ -64,6 +64,17 @@ foreach (_var IN LISTS matchedVars)
     cx_insert_plugin_if_not_in_list(CX_PLUGINS ${plugin_name} "OFF" ${PLUGIN_BUILD_OPTION_PREFIX})
 endforeach()
 
+######
+# CTK requires QT_QMAKE_EXECUTABLE to be set.
+# https://www.libreoffice.org/bugzilla/attachment.cgi?id=95589
+######
+IF(NOT QT_QMAKE_EXECUTABLE)
+  FIND_PROGRAM(QT_QMAKE_EXECUTABLE_FINDQT NAMES qmake qmake5 qmake-qt5
+               PATHS "${QT_SEARCH_PATH}/bin" "$ENV{QTDIR}/bin")
+  SET(QT_QMAKE_EXECUTABLE ${QT_QMAKE_EXECUTABLE_FINDQT} CACHE PATH "Qt qmake program.")
+ENDIF(NOT QT_QMAKE_EXECUTABLE)
+######
+
 ctkMacroSetupPlugins(
     ${CX_PLUGINS} 
     BUILD_OPTION_PREFIX ${PLUGIN_BUILD_OPTION_PREFIX})

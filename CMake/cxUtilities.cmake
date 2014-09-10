@@ -448,3 +448,16 @@ function(cx_insert_undefined_plugins PLUGINS_VARIABLE PLUGIN_BUILD_OPTION_PREFIX
     set(${PLUGINS_VARIABLE} ${plugins_list} PARENT_SCOPE)
 endfunction()
 
+###############################################################################
+#
+# Utility funciton for printing all variables known to CMake at a given point.
+#
+###############################################################################
+function(cx_print_variables REGEX_TO_MATCH)
+    get_cmake_property(_variableNames VARIABLES)
+    foreach (_variableName ${_variableNames})
+        if(_variableName MATCHES ${REGEX_TO_MATCH})
+            message(STATUS "${_variableName}=${${_variableName}}")
+        endif()
+    endforeach()
+endfunction()

@@ -105,7 +105,6 @@ set(SUB_FOLDERS
 # Use the include path and library for Qt that is used by VTK.
 INCLUDE_DIRECTORIES(
   ${SUB_FOLDERS}
-  ${QT_INCLUDE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
