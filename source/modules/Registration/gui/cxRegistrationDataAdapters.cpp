@@ -30,33 +30,36 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxRegistrationDataAdapters.h"
-#include "cxRegistrationManager.h"
-#include "cxDataManager.h"
+#include <ctkPluginContext.h>
 #include "cxTypeConversions.h"
+#include "cxRegistrationServiceProxy.h"
+#include "cxPatientModelServiceProxy.h"
+#include "cxData.h"
 
 namespace cx
 {
 
 
-RegistrationFixedImageStringDataAdapter::RegistrationFixedImageStringDataAdapter(RegistrationManagerPtr regManager) :
-		mManager(regManager)
+RegistrationFixedImageStringDataAdapter::RegistrationFixedImageStringDataAdapter(ctkPluginContext *pluginContext) :
+	mRegistrationService(new cx::RegistrationServiceProxy(pluginContext)),
+	mPatientModelService(new cx::PatientModelServiceProxy(pluginContext))
 {
   mValueName = "Fixed Volume";
   mHelp = "Select the fixed registration data";
-  connect(mManager.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(changed()));
+	connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(changed()));
 }
 
 bool RegistrationFixedImageStringDataAdapter::setValue(const QString& value)
 {
-  DataPtr newImage = dataManager()->getData(value);
-  if (newImage==mManager->getFixedData())
+	DataPtr newImage = mPatientModelService->getData(value);
+	if (newImage == mRegistrationService->getFixedData())
     return false;
-  mManager->setFixedData(newImage);
+	mRegistrationService->setFixedData(newImage);
   return true;
 }
 QString RegistrationFixedImageStringDataAdapter::getValue() const
 {
-  DataPtr image = mManager->getFixedData();
+	DataPtr image = mRegistrationService->getFixedData();
   if (!image)
     return "";
   return qstring_cast(image->getUid());
@@ -66,26 +69,27 @@ QString RegistrationFixedImageStringDataAdapter::getValue() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-RegistrationMovingImageStringDataAdapter::RegistrationMovingImageStringDataAdapter(RegistrationManagerPtr regManager) :
-		mManager(regManager)
+RegistrationMovingImageStringDataAdapter::RegistrationMovingImageStringDataAdapter(ctkPluginContext *pluginContext) :
+	mRegistrationService(new cx::RegistrationServiceProxy(pluginContext)),
+	mPatientModelService(new cx::PatientModelServiceProxy(pluginContext))
 {
-    mValueName = "Moving Volume";
-    mHelp = "Select the moving registration data";
-  connect(mManager.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(changed()));
+	mValueName = "Moving Volume";
+	mHelp = "Select the moving registration data";
+	connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(changed()));
 }
 
 bool RegistrationMovingImageStringDataAdapter::setValue(const QString& value)
 {
-  DataPtr newImage = dataManager()->getData(value);
-  if (newImage==mManager->getMovingData())
+	DataPtr newImage = mPatientModelService->getData(value);
+	if (newImage == mRegistrationService->getMovingData())
     return false;
-  mManager->setMovingData(newImage);
+	mRegistrationService->setMovingData(newImage);
   return true;
 }
 
 QString RegistrationMovingImageStringDataAdapter::getValue() const
 {
-  DataPtr image = mManager->getMovingData();
+	DataPtr image = mRegistrationService->getMovingData();
   if (!image)
     return "";
   return qstring_cast(image->getUid());

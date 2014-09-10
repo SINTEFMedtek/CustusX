@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRepManager.h"
 #include "cxLandmarkRep.h"
 #include "cxView.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -62,7 +63,7 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(Registratio
 		"Sample Tool", this))
 {
 	mImageLandmarkSource = ImageLandmarksSource::New();
-	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(regManager));
+	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(logicManager()->getPluginContext()));
 	connect(mManager.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedDataChanged()));
 	connect(dataManager(), SIGNAL(rMprChanged()), this, SLOT(setModified()));
 

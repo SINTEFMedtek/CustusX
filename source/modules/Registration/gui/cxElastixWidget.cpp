@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxElastixExecuter.h"
 #include "cxStringDataAdapterXml.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -78,9 +79,9 @@ ElastixWidget::ElastixWidget(RegistrationManagerPtr regManager, QWidget* parent)
 	QGridLayout* entryLayout = new QGridLayout;
 	entryLayout->setColumnStretch(1, 1);
 
-	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(regManager));
+	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(logicManager()->getPluginContext()));
 	new LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
-	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(regManager));
+	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(logicManager()->getPluginContext()));
 	new LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
 
 //	StringDataAdapterXmlPtr mSettings;

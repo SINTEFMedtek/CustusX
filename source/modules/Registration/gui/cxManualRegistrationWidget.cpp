@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationManager.h"
 #include "cxToolManager.h"
 #include "cxDataManager.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -44,9 +45,9 @@ ManualImageRegistrationWidget::ManualImageRegistrationWidget(RegistrationManager
 				RegistrationBaseWidget(regManager, parent, "ManualImageRegistrationWidget",
 								"Manual Image Registration"), mVerticalLayout(new QVBoxLayout(this))
 {
-	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(regManager));
+	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(logicManager()->getPluginContext()));
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedImage));
-	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(regManager));
+	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(logicManager()->getPluginContext()));
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mMovingImage));
 
 	mLabel = new QLabel("Data matrix rMd");

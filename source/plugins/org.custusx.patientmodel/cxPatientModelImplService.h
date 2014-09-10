@@ -57,7 +57,10 @@ public:
 	virtual void insertData(DataPtr data);
 	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform);
 	virtual std::map<QString, DataPtr> getData() const;
+	virtual DataPtr getData(const QString& uid) const;
 	virtual void autoSave();
+
+	virtual bool isNull();
 
 };
 typedef boost::shared_ptr<PatientModelImplService> PatientModelImplServicePtr;

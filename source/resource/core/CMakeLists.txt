@@ -29,7 +29,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Data/cxMetricReferenceArgumentList
 	Data/cxLandmark
 	Data/cxDataFactory
-	Data/cxPatientModelService
 
 	Video/cxVideoSource.h
 	Video/cxVideoRecorder
@@ -84,6 +83,10 @@ cx_add_class_qt_moc(cxResource_SOURCE
         registration/cxRegistrationMethodService.h
         registration/cxRegistrationServiceNull
         registration/cxRegistrationServiceProxy
+
+	patientModel/cxPatientModelService
+	patientModel/cxPatientModelServiceNull
+	patientModel/cxPatientModelServiceProxy
 	)
 
      
@@ -255,14 +258,15 @@ set(CX_RESOURCE_INCLUDE_DIRECTORIES
     ${CustusX_SOURCE_DIR}/source/resource/core/algorithms
     ${CustusX_SOURCE_DIR}/source/resource/core/settings
     ${CustusX_SOURCE_DIR}/source/resource/core/utilities
+    ${CustusX_SOURCE_DIR}/source/resource/core/registration
+    ${CustusX_SOURCE_DIR}/source/resource/core/patientModel
+    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     ${CustusX_SOURCE_DIR}/source/ThirdParty
     ${CustusX_SOURCE_DIR}/source/ThirdParty/iir1
     
     ${CustusX_BINARY_DIR}/source/resource/core
     ${CustusX_BINARY_DIR}/source/resource/core/utilities
     ${CustusX_BINARY_DIR}/source/resource/core/settings
-    ${CustusX_SOURCE_DIR}/source/resource/core/registration
-    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     CACHE INTERNAL "Include directories for resource libraries")
 
 

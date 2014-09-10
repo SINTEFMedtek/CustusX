@@ -30,58 +30,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXPATIENTMODELSERVICE_H_
-#define CXPATIENTMODELSERVICE_H_
-
-#include <QObject>
-#include <map>
-#include "boost/shared_ptr.hpp"
-class QDateTime;
+#include "cxPatientModelService.h"
+#include "cxPatientModelServiceNull.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class Data> DataPtr;
+PatientModelServicePtr PatientModelService::getNullObject()
+{
+	static PatientModelServicePtr mNull;
+	if (!mNull)
+		mNull.reset(new PatientModelServiceNull);
+	return mNull;
 }
-
-#define PatientModelService_iid "cx::PatientModelService"
-
-namespace cx
-{
-class RegistrationTransform;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-
-/** \brief The virtual patient
- *
- * PatientModelService provides access to the Patient Specific Model (PaSM).
- *   - data entities
- *   	- volumes
- *   	- surfaces
- *   	- metrics
- *   	- etc
- *   - relations between entities in space, time and structure
- *   - load/save
- *
- * This service replaces the old DataManager and PatientData classes. They
- * are deprecated.
- *
- *  \ingroup cx_resource_core_data
- *  \date 2014-05-15
- *  \author Christian Askeland
- */
-class PatientModelService : public QObject
-{
-	Q_OBJECT
-public:
-	virtual ~PatientModelService();
-
-	virtual void insertData(DataPtr data) = 0;
-	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform) = 0;
-	virtual std::map<QString, DataPtr> getData() const = 0;
-	virtual void autoSave() = 0;//TODO remove, and integrate into other functions
-};
-
-} // namespace cx
-Q_DECLARE_INTERFACE(cx::PatientModelService, PatientModelService_iid)
-
-
-#endif /* CXPATIENTMODELSERVICE_H_ */
+} //cx

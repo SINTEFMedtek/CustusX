@@ -30,64 +30,52 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXREGISTRATIONSERVICEADAPTER_H
-#define CXREGISTRATIONSERVICEADAPTER_H
+#ifndef CXPATIENTMODELSERVICEPROXY_H
+#define CXPATIENTMODELSERVICEPROXY_H
 
-#include "cxRegistrationService.h"
+#include "cxPatientModelService.h"
 #include <boost/shared_ptr.hpp>
-#include <QObject>
 #include "cxServiceTrackerListener.h"
-#include "cxTransform3D.h"
-class QString;
-class QDateTime;
 class ctkPluginContext;
 
 namespace cx
 {
 
 typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
-typedef boost::shared_ptr<class Data> DataPtr;
 
-/** \brief Always provides a RegistrationService
+/** \brief Always provides a PatientModelService
  *
  * Use the Proxy design pattern.
  * Uses ServiceTrackerListener to either provide an
- * implementation of RegistrationService or
- * the null object (RegistrationServiceNull)
+ * implementation of PatientModelService or
+ * the null object (PatientModelServiceNull)
  *
  *  \ingroup cx_resource_core_registration
  *  \date 2014-09-10
  *  \author Ole Vegard Solberg, SINTEF
  */
-class RegistrationServiceProxy : public RegistrationService
+class PatientModelServiceProxy : public PatientModelService
 {
-	Q_OBJECT
 public:
-	RegistrationServiceProxy(ctkPluginContext *context);
+	PatientModelServiceProxy(ctkPluginContext *context);
 
-	virtual void setMovingData(DataPtr data);
-	virtual void setFixedData(DataPtr data);
-	virtual DataPtr getMovingData();
-	virtual DataPtr getFixedData();
-	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
-	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description);
-	virtual QDateTime getLastRegistrationTime();
-	virtual void setLastRegistrationTime(QDateTime time);
+	virtual void insertData(DataPtr data);
+	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform);
+	virtual std::map<QString, DataPtr> getData() const;
+	virtual DataPtr getData(const QString& uid) const;
+	virtual void autoSave();
+
 	virtual bool isNull();
-
-//signals:
-//	void fixedDataChanged(QString uid);
-//	void movingDataChanged(QString uid);
 
 private:
 	void initServiceListener();
-	void onServiceAdded(RegistrationService* service);
-	void onServiceRemoved(RegistrationService *service);
+	void onServiceAdded(PatientModelService* service);
+	void onServiceRemoved(PatientModelService *service);
 
 	ctkPluginContext *mPluginContext;
-	RegistrationServicePtr mRegistrationService;
-	boost::shared_ptr<ServiceTrackerListener<RegistrationService> > mServiceListener;
+	PatientModelServicePtr mPatientModelService;
+	boost::shared_ptr<ServiceTrackerListener<PatientModelService> > mServiceListener;
 };
 
-} //cx
-#endif // CXREGISTRATIONSERVICEADAPTER_H
+} // cx
+#endif // CXPATIENTMODELSERVICEPROXY_H

@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDataInterface.h"
 #include "cxSelectDataStringDataAdapter.h"
+class ctkPluginContext;
 
 namespace cx
 {
@@ -43,7 +44,8 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
+typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
+typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 
 typedef boost::shared_ptr<class RegistrationFixedImageStringDataAdapter> RegistrationFixedImageStringDataAdapterPtr;
 /** Adapter that connects to the fixed image in the registration manager.
@@ -52,7 +54,7 @@ class RegistrationFixedImageStringDataAdapter : public SelectDataStringDataAdapt
 {
   Q_OBJECT
 public:
-  RegistrationFixedImageStringDataAdapter(RegistrationManagerPtr regManager);
+	RegistrationFixedImageStringDataAdapter(ctkPluginContext *pluginContext);
   virtual ~RegistrationFixedImageStringDataAdapter() {}
 
 public: // basic methods
@@ -60,7 +62,8 @@ public: // basic methods
   virtual QString getValue() const;
 
 private:
-  RegistrationManagerPtr mManager;
+	RegistrationServicePtr mRegistrationService;
+	PatientModelServicePtr mPatientModelService;
 };
 
 
@@ -71,7 +74,7 @@ class RegistrationMovingImageStringDataAdapter : public SelectDataStringDataAdap
 {
   Q_OBJECT
 public:
-  RegistrationMovingImageStringDataAdapter(RegistrationManagerPtr regManager);
+	RegistrationMovingImageStringDataAdapter(ctkPluginContext *pluginContext);
   virtual ~RegistrationMovingImageStringDataAdapter() {}
 
 public: // basic methods
@@ -79,7 +82,8 @@ public: // basic methods
   virtual QString getValue() const;
 
 private:
-  RegistrationManagerPtr mManager;
+	RegistrationServicePtr mRegistrationService;
+	PatientModelServicePtr mPatientModelService;
 };
 
 /**

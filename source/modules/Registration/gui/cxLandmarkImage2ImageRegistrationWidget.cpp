@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxLandmarkRep.h"
 #include "cxView.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -65,8 +66,8 @@ LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(Reg
 	connect(mManager.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(updateRep()));
 	connect(mManager.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(updateRep()));
 
-	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(regManager));
-	mMovingDataAdapter.reset(new RegistrationMovingImageStringDataAdapter(regManager));
+	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(logicManager()->getPluginContext()));
+	mMovingDataAdapter.reset(new RegistrationMovingImageStringDataAdapter(logicManager()->getPluginContext()));
 
 	mTranslationCheckBox = new QCheckBox("Translation only", this);
 	mTranslationCheckBox->setChecked(settings()->value("registration/I2ILandmarkTranslation", false).toBool());

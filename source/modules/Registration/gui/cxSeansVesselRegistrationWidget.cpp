@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGeometricRep.h"
 #include <vtkCellArray.h>
 #include "cxGraphicalPrimitives.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -82,9 +83,9 @@ SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegistrationManager
 	QGridLayout* entryLayout = new QGridLayout;
 	entryLayout->setColumnStretch(1, 1);
 
-	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(regManager));
+	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(logicManager()->getPluginContext()));
 	new LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
-	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(regManager));
+	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(logicManager()->getPluginContext()));
 	new LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
 
 	layout->addLayout(entryLayout, 0, 0, 2, 2);

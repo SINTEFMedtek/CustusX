@@ -71,9 +71,23 @@ std::map<QString, DataPtr> PatientModelImplService::getData() const
 	return dataService()->getData();
 }
 
+DataPtr PatientModelImplService::getData(const QString& uid) const
+{
+	std::map<QString, DataPtr> dataMap = this->getData();
+	std::map<QString, DataPtr>::const_iterator iter = dataMap.find(uid);
+	if (iter == dataMap.end())
+		return DataPtr();
+	return iter->second;
+}
+
 void PatientModelImplService::autoSave()
 {
 	patientService()->getPatientData()->autoSave();
+}
+
+bool PatientModelImplService::isNull()
+{
+	return false;
 }
 
 } /* namespace cx */
