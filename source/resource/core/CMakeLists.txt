@@ -82,7 +82,8 @@ cx_add_class_qt_moc(cxResource_SOURCE
 
 	registration/cxRegistrationService
         registration/cxRegistrationMethodService.h
-	registration/cxRegistrationServiceNull
+        registration/cxRegistrationServiceNull
+        registration/cxRegistrationServiceProxy
 	)
 
      
@@ -260,6 +261,8 @@ set(CX_RESOURCE_INCLUDE_DIRECTORIES
     ${CustusX_BINARY_DIR}/source/resource/core
     ${CustusX_BINARY_DIR}/source/resource/core/utilities
     ${CustusX_BINARY_DIR}/source/resource/core/settings
+    ${CustusX_SOURCE_DIR}/source/resource/core/registration
+    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     CACHE INTERNAL "Include directories for resource libraries")
 
 
@@ -272,6 +275,7 @@ set (CX_RESOURCE_LIBRARIES
     ${QT_LIBRARIES}
     ${Boost_LIBRARIES}
     ${ITK_LIBRARIES}
+    CTKPluginFramework
     )
     
 if (CX_USE_OPENCL_UTILITY)

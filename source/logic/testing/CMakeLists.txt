@@ -10,6 +10,7 @@ if (BUILD_TESTING)
 		${CX_TEST_CATCH_LOGIC_MOC_SOURCE_FILES}
 		cxtestPlugins.cpp
 		cxtestStreamerService.cpp
+		cxtestRegistrationServiceProxy.cpp
 		)
 
     cx_catch_add_lib_and_exe(cxLogicManager 
