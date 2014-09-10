@@ -234,7 +234,7 @@ class CTK(CppComponent):
     def update(self):
         #latestTestedSHA = '3fe3cdbe9d0ef95b3810a12484f035ae1f66524c'
         modBranch = 'CTK-CX-modifications'
-        self._getBuilder().gitUpdate(modBranch)
+        self._getBuilder().gitCheckoutBranch(modBranch)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -320,7 +320,7 @@ class OpenIGTLink(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git://github.com/openigtlink/OpenIGTLink.git')
     def update(self):
-        self._getBuilder().gitUpdate('master')
+        self._getBuilder().gitCheckoutBranch('master')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -377,7 +377,8 @@ class CustusX(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/CustusX3.git', 'CustusX')
     def update(self):
-        self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag(), submodules=True)    
+        self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
+        #self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag(), submodules=True)    
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -434,7 +435,8 @@ class TubeSegmentationFramework(CppComponent):
         self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/Tube-Segmentation-Framework.git')
     def update(self):
         #self._getBuilder().gitCheckout('e83582d2cae965f5a135cfa2b49c5ba68f7cb3f0', submodules=True)
-        self._getBuilder().gitUpdate('master', submodules=True)
+        self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
+        #self._getBuilder().gitUpdate('master', submodules=True)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -501,7 +503,8 @@ class CustusXData(CppComponent):
         self._getBuilder().gitClone(self.gitRepository(), self.sourceFolder())
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.gitRepository(), 'master')
-        self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag())    
+        self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
+        #self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag())    
     def configure(self):
         pass
     def build(self):
