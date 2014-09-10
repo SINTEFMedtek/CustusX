@@ -346,9 +346,9 @@ class IGSTK(CppComponent):
         # this fix should rebase repo from the original Kitware/IGSTK to our own fork on GitHub.
         repo = 'git@github.com:SINTEFMedisinskTeknologi/IGSTK'
         branch = 'IGSTK-CX-modifications'
-        tag = 'IGSTK-5-2.cx_patch_3-6-0'
+        #tag = 'IGSTK-5-2.cx_patch_3-6-0'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
-        self._getBuilder().gitCheckout(tag)
+        self._getBuilder().gitUpdate(branch)
     def configure(self):        
         builder = self._getBuilder()
         add = builder.addCMakeOption
