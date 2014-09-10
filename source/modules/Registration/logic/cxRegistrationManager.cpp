@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPluginFramework.h"
 #include "cxNullDeleter.h"
 #include "cxTypeConversions.h"
+#include "cxRegistrationServiceProxy.h"
 
 namespace cx
 {
@@ -59,48 +60,19 @@ namespace cx
 
 RegistrationManager::RegistrationManager(AcquisitionDataPtr acquisitionData, ctkPluginContext* pluginContext) :
 		mAcquisitionData(acquisitionData),
-		mPluginContext(pluginContext),
-		mRegistrationService(RegistrationService::getNullObject())
+		mRegistrationService(new cx::RegistrationServiceProxy(pluginContext))
 {
 	connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
 	connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
 	connect(patientService()->getPatientData().get(), SIGNAL(cleared()), this, SLOT(clearSlot()));
 
-//	PluginFrameworkManagerPtr pluginFramework = LogicManager::getInstance()->getPluginFramework();
-	mServiceListener.reset(new ServiceTrackerListener<RegistrationService>(
-							   mPluginContext,
-							   boost::bind(&RegistrationManager::onServiceAdded, this, _1),
-							   boost::function<void (RegistrationService*)>(),
-							   boost::bind(&RegistrationManager::onServiceRemoved, this, _1)
-							   ));
-	mServiceListener->open();
+	connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
+	connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
 }
 
 void RegistrationManager::restart()
 {
   mRegistrationService->setLastRegistrationTime(QDateTime::currentDateTime());
-}
-
-void RegistrationManager::onServiceAdded(RegistrationService* service)
-{
-	mRegistrationService.reset(service, null_deleter());
-//	if(!mRegistrationService->isNull())
-//	{
-		connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
-		connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
-//	}
-		if(mRegistrationService->isNull())
-			reportWarning("RegistrationManager::onServiceAdded mRegistrationService->isNull()");
-}
-
-void RegistrationManager::onServiceRemoved(RegistrationService *service)
-{
-//	if(!mRegistrationService->isNull())
-//	{
-		disconnect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
-		disconnect(service, SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
-//	}
-	mRegistrationService = RegistrationService::getNullObject();
 }
 
 void RegistrationManager::duringSavePatientSlot()

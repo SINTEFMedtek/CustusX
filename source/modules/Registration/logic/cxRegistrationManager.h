@@ -43,13 +43,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxAcquisitionData.h"
 #include "cxLandmark.h"
-#include "cxRegistrationService.h"
-#include "cxServiceTrackerListener.h"
+#include "ctkPluginContext.h"
 
 namespace cx
 {
 class Reporter;
 typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
+typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
 
 /**
  * \file
@@ -70,7 +70,7 @@ class RegistrationManager : public QObject
   Q_OBJECT
 
 public:
-  RegistrationManager(AcquisitionDataPtr acquisitionData, ctkPluginContext* pluginContext); ///< use getInstance instead
+	RegistrationManager(AcquisitionDataPtr acquisitionData, ctkPluginContext* pluginContext); ///< use getInstance instead
   virtual ~RegistrationManager() {} ///< destructor
 
   typedef std::pair<QString, bool> StringBoolPair; ///< name and if the point is active or not
@@ -129,12 +129,7 @@ private:
   RegistrationManager(RegistrationManager const&); ///< not implemented
   RegistrationManager& operator=(RegistrationManager const&); ///< not implemented
 
-  void onServiceAdded(RegistrationService *service);
-  void onServiceRemoved(RegistrationService *service);
-
-  boost::shared_ptr<ServiceTrackerListener<RegistrationService> > mServiceListener;
-  RegistrationServicePtr mRegistrationService;
-  ctkPluginContext* mPluginContext;
+	RegistrationServicePtr mRegistrationService;
 };
 
 /**Shortcut for accessing the registrationmanager instance.
