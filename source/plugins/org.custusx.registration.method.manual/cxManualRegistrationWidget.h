@@ -43,7 +43,7 @@ class ctkPluginContext;
 namespace cx
 {
 
-typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
+//typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
 
 /**\brief Direct setting of image registration
  *

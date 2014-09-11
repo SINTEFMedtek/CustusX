@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/bind.hpp>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QGroupBox>
 #include <QStackedWidget>
 #include <QComboBox>
 #include <QStringList>
@@ -75,10 +76,20 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 		QComboBox *methodSelector = new QComboBox(registrationTypeWidget );
 		mMethodsSelectorMap[mRegistrationTypes[i]] = methodSelector;
 
-		QVBoxLayout *layout = new QVBoxLayout(widget);
+		QGroupBox	*groupBox = new QGroupBox(registrationTypeWidget);
 
-		layout->addWidget(methodSelector);
-		layout->addWidget(registrationTypeWidget);
+		QVBoxLayout *layoutV = new QVBoxLayout(widget);
+		QVBoxLayout *layoutGroupBox = new QVBoxLayout(groupBox);
+		QHBoxLayout *layoutH = new QHBoxLayout(widget);
+
+		layoutH->addWidget(methodSelector);
+		layoutH->addStretch();
+
+		layoutV->addLayout(layoutH);
+		layoutV->addWidget(groupBox);
+
+		layoutGroupBox->addWidget(registrationTypeWidget);
+
 		mVerticalLayout->addWidget(widget);
 		this->addTab(widget, mRegistrationTypes[i]);
 	}
