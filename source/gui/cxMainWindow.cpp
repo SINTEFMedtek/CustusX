@@ -97,6 +97,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogicManager.h"
 #include "cxPluginFramework.h"
 #include "ctkPluginContext.h"
+#include "cxHelpWidget.h"
 
 namespace cx
 {
@@ -135,6 +136,7 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	this->addAsDockWidget(new VideoConnectionWidget(this), "Utility");
 	this->addAsDockWidget(new EraserWidget(this), "Properties");
 	this->addAsDockWidget(new MetricWidget(this), "Utility");
+	this->addAsDockWidget(new HelpWidget(this), "Browsing");
 	this->addAsDockWidget(new SlicePropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new VolumePropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new MeshInfoWidget(this), "Properties");

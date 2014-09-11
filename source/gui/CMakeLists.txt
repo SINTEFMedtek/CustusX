@@ -45,6 +45,7 @@ cx_add_class_qt_moc(cxGui_SRCS
     infoWidgets/cxToolMetricWrapper
     infoWidgets/cxRegistrationHistoryWidget
 	infoWidgets/cxMetricManager
+	infoWidgets/cxHelpWidget
 
     #----------------------
 	navigationWidgets/cxNavigationWidget
@@ -128,7 +129,7 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     )
     
-set(CX_GUI_LIBRARIES cxLogicManager cxStateService cxResourceWidgets)
+set(CX_GUI_LIBRARIES cxLogicManager cxStateService cxResourceWidgets Qt5::Help)
     
 add_library( cxGui ${cxGui_SRCS} )
 target_link_libraries( cxGui ${CX_GUI_LIBRARIES} )

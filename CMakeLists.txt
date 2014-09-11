@@ -71,7 +71,12 @@ include_directories( /opt/X11/include )
 #------------------------------------------------------------------------------
 #add_subdirectory( source/resource/ssc )
 add_subdirectory( doc )
+add_subdirectory( documentation )
 add_subdirectory( source )
+
+#message(STATUS "QT_QCOLLECTIONGENERATOR_EXECUTABLE " ${QT_QCOLLECTIONGENERATOR_EXECUTABLE})
+
+
 
 #------------------------------------------------------------------------------
 # CTest

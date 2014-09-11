@@ -174,6 +174,7 @@ macro(cx_initialize_QT)
     find_package(Qt5Core REQUIRED) # attempt to remove warning in cmake
     find_package(Qt5Widgets REQUIRED)
     find_package(Qt5Xml REQUIRED)
+    find_package(Qt5Help REQUIRED)
     find_package(Qt5Sql REQUIRED)
     find_package(Qt5Test REQUIRED)
     find_package(Qt5Network REQUIRED)

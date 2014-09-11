@@ -466,6 +466,8 @@ cx_initialize_cppunit()
 cx_initialize_opencv()
 cx_initialize_OpenIGTLink()
 cx_initialize_IGSTK()
+find_package(Qt5Core)
+
 
 set(PLUGINS_DESCRIPTION
 "	Plugins:
@@ -496,7 +498,7 @@ Configuration for CustusX ${CustusX_VERSION_STRING}
 		Doxygen: ${BUILD_DOCUMENTATION}
 
 	Libraries:
-		Qt Version ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}
+		Qt Version ${Qt5Core_VERSION_STRING}
 		VTK Version: ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION}
 		ITK Version: ${ITK_VERSION}
 		CTK Version: ${CTK_VERSION}
