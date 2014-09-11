@@ -65,14 +65,11 @@ foreach (_var IN LISTS matchedVars)
 endforeach()
 
 ######
-# CTK requires QT_QMAKE_EXECUTABLE to be set.
-# https://www.libreoffice.org/bugzilla/attachment.cgi?id=95589
+# CTK requires QT_QMAKE_EXECUTABLE to be set on Windows.
 ######
-IF(NOT QT_QMAKE_EXECUTABLE)
-  FIND_PROGRAM(QT_QMAKE_EXECUTABLE_FINDQT NAMES qmake qmake5 qmake-qt5
-               PATHS "${QT_SEARCH_PATH}/bin" "$ENV{QTDIR}/bin")
-  SET(QT_QMAKE_EXECUTABLE ${QT_QMAKE_EXECUTABLE_FINDQT} CACHE PATH "Qt qmake program.")
-ENDIF(NOT QT_QMAKE_EXECUTABLE)
+if(NOT QT_QMAKE_EXECUTABLE)
+    get_target_property(QT_QMAKE_EXECUTABLE Qt5::qmake LOCATION)
+endif(NOT QT_QMAKE_EXECUTABLE)
 ######
 
 ctkMacroSetupPlugins(

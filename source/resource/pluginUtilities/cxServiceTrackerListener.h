@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
+#undef REGISTERED //Needed on windows to avoid compiler error. Not sure why.
+#include <ctkServiceEvent.h>
 #include "ctkServiceTracker.h"
 #include "ctkServiceTrackerCustomizer.h"
 #include "ctkPluginContext.h"

@@ -46,9 +46,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPluginFramework.h"
 
 
+#if !defined(WIN32)
 #include <langinfo.h>
 #include <locale>
 #include "cxReporter.h"
+
 void force_C_locale_decimalseparator()
 {
 	QString radixChar = nl_langinfo(RADIXCHAR);
@@ -87,6 +89,7 @@ void force_C_locale_decimalseparator()
 //	std::cout << "formatted double: " << 2.5 << std::endl;
 
 }
+#endif
 
 #ifdef WIN32
 int __stdcall WinMain(int argc, char *argv[])
@@ -103,7 +106,9 @@ int main(int argc, char *argv[])
   app.setWindowIcon(QIcon(":/icons/CustusX.png"));
   app.setAttribute(Qt::AA_DontShowIconsInMenus, false);
 
+#if !defined(WIN32)
   force_C_locale_decimalseparator();
+#endif
 
 //  std::cout << "native lang: " <<  QLocale::system().nativeLanguageName() << std::endl;
 //  std::cout << "native sep: " <<  QLocale::system().decimalPoint() << std::endl;

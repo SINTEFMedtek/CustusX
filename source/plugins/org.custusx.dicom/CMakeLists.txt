@@ -49,6 +49,12 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
+# needed on windows to where <windows.h> is included
+# http://qt-project.org/forums/viewthread/22133
+if(WIN32)
+    add_definitions(-DNOMINMAX)
+endif(WIN32)
+
 
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)

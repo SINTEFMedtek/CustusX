@@ -255,7 +255,7 @@ boost::shared_ptr<T> castTo(boost::shared_ptr<SUPER> data)
 template<class T, class SUPER>
 bool isType(boost::shared_ptr<SUPER> data)
 {
-	return castTo<T>(data);
+	return (castTo<T>(data) ? true : false);
 }
 
 template<class WRAPPER, class METRIC, class SUPER>
@@ -484,7 +484,7 @@ bool MetricWidget::checkEqual(const std::vector<MetricBasePtr>& a, const std::ve
 void MetricWidget::enablebuttons()
 {
 	mRemoveAction->setEnabled(!mMetricManager->getActiveUid().isEmpty());
-  mLoadReferencePointsAction->setEnabled(toolManager()->getReferenceTool());
+  mLoadReferencePointsAction->setEnabled(toolManager()->getReferenceTool() ? true : false);
 }
 
 void MetricWidget::loadReferencePointsSlot()

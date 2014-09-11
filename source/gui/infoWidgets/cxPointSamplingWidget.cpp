@@ -200,7 +200,7 @@ void PointSamplingWidget::enablebuttons()
   mAddButton->setEnabled(true);
   mEditButton->setEnabled(mActiveLandmark!="");
   mRemoveButton->setEnabled(mActiveLandmark!="");
-  mLoadReferencePointsButton->setEnabled(toolManager()->getReferenceTool());
+  mLoadReferencePointsButton->setEnabled(toolManager()->getReferenceTool() ? true : false);
 }
 
 void PointSamplingWidget::addPoint(Vector3D point)

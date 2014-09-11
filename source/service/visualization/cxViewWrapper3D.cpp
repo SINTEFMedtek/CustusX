@@ -343,7 +343,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	{
 		showRefTool->setText("Show " + refTool->getName());
 		showRefTool->setEnabled(true);
-		showRefTool->setChecked(RepManager::findFirstRep<ToolRep3D>(mView->getReps(), refTool));
+		showRefTool->setChecked(RepManager::findFirstRep<ToolRep3D>(mView->getReps(), refTool) ? true : false);
 		connect(showRefTool, SIGNAL(toggled(bool)), this, SLOT(showRefToolSlot(bool)));
 	}
 
