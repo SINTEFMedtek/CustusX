@@ -344,7 +344,6 @@ function(cx_install_windows_runtime_libs DESTINATION_FOLDER)
 	endif(CX_WINDOWS)
 endfunction()
 
-
 ###############################################################################
 # wrapper around the fixup_bundle function.
 #   - will add qtplugins to bundle automatically.
@@ -373,8 +372,9 @@ endfunction()
 #
 ###############################################################################
 function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS_LOCAL)
-#	cx_assert_variable_exists(${QT_PLUGINS_DIR})
-# temporarily removed QT_PLUGINS_DIR - must adapt to qt5!
+    find_qt_plugin_dir(QT_PLUGINS_DIR)
+
+	cx_assert_variable_exists(${QT_PLUGINS_DIR})
 	cx_assert_variable_exists(${CX_INSTALL_ROOT_DIR})
 	cx_assert_variable_exists(${INSTALL_BINARY_DIR})
 	cx_assert_variable_exists(${CX_INSTALL_PLUGIN_DIR})
@@ -394,8 +394,11 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 	ENDIF(APPLE)
 
 	# Install needed Qt plugins by copying directories from the qt installation
-	# One can cull what gets copied by using 'REGEX "..." EXCLUDE'
-	install(DIRECTORY "${QT_PLUGINS_DIR}/imageformats" "${QT_PLUGINS_DIR}/sqldrivers"
+	install(DIRECTORY "${QT_PLUGINS_DIR}/" 
+#	install(DIRECTORY "${QT_PLUGINS_DIR}/imageformats" 
+#	                  "${QT_PLUGINS_DIR}/sqldrivers"
+#	                  "${QT_PLUGINS_DIR}/platforms"
+#	                  "${QT_PLUGINS_DIR}/iconengines"	                  
 		DESTINATION ${INSTALL_QTPLUGIN_DIR}
 		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
 

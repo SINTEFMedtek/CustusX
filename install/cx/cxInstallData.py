@@ -71,6 +71,7 @@ class Common(object):
         self.use_old_directory_structure = False
         self._initPaths()
         self.isb_password = ""
+        self.main_branch = "master"
         self.static = False # build as shared or static libraries
         self.jom = False
         self.eclipse_version = '3.6'
@@ -138,6 +139,7 @@ class Common(object):
         p.add_argument('-g', '--git_tag', default=None, metavar='TAG', dest='git_tag', help='Git tag to use when checking out CustusX. None means checkout master branch.')
         p.add_argument('-t', '--build_type', default=self.build_type, dest='build_type', choices=self._getAllowedBuildTypes(), help='Build type')
         p.add_boolean_inverter('--b32', default=self.m32bit, dest='m32bit', help='Build 32 bit.')
+        p.add_argument('--main_branch', default=self.main_branch, dest='main_branch', help='Default branch to checkout/pull, for projects not using a custom branch or tag, default=%s. When empty, checkout is skipped.' % self.main_branch)
         p.add_boolean_inverter('--static', default=self.static, dest='static', help='Link statically.')        
         if platform.system() == 'Windows':
             p.add_boolean_inverter('--jom', default=self.jom, dest='jom', help='Use jom to build.')

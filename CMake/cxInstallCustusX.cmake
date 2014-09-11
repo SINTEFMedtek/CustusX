@@ -49,6 +49,7 @@ set(CX_ALL_LIBRARY_DIRS
     ${OpenIGTLink_LIBRARY_DIRS}
     ${VTK_DIR}/lib
     ${CTK_DIR}/CTK-build/bin
+    ${CTK_DIR}/DCMTK-build/lib
     ${ITK_DIR}/lib
     ${Level-Set-Segmentation_LIBRARY_DIRS}
     ${Tube-Segmentation-Framework_LIBRARY_DIRS}
@@ -57,12 +58,6 @@ set(CX_ALL_LIBRARY_DIRS
 	${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
 	${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/plugins
 	)
-if(${DCMTK_DIR})
-set(CX_ALL_LIBRARY_DIRS
-    ${CX_ALL_LIBRARY_DIRS}
-    ${DCMTK_DIR}/lib
-    )
-endif()
 
 cx_install_all_stored_targets(${CX_INSTALL_BINARY_DIR})
 
