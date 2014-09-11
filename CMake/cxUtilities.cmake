@@ -382,6 +382,34 @@ function (getListOfVarsStartingWith _prefix _varResult)
 endfunction()
 
 
+###############################################################################
+# Borrowed from
+#          https://github.com/lxde/lxqt-qtplugin/blob/master/qt5/CMakeLists.txt
+#
+# quote:
+#   there is no standard way to get the plugin dir of Qt5 with cmake
+#   The best way is get_target_property(QT_PLUGINS_DIR Qt5::QGtk2ThemePlugin LOCATION).
+#   This directly returns the platformthemes dir. However, this does not work
+#   in some distros, such as ubuntu.
+#   Finally, I came up with a more reliable way by using qmake.
+###############################################################################
+function (find_qt_plugin_dir _varResult)
+    get_target_property(QT_QMAKE_EXECUTABLE ${Qt5Core_QMAKE_EXECUTABLE} IMPORTED_LOCATION)
+    if(NOT QT_QMAKE_EXECUTABLE)
+        message(FATAL_ERROR "qmake is not found.")
+    endif()
+    # execute the command "qmake -query QT_INSTALL_PLUGINS" to get the path of plugins dir.
+    execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_INSTALL_PLUGINS
+        OUTPUT_VARIABLE _QT_PLUGINS_DIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+    if(_QT_PLUGINS_DIR)
+        message(STATUS "Qt5 plugin directory:" ${_QT_PLUGINS_DIR})
+    else()
+        message(FATAL_ERROR "Qt5 plugin directory cannot be detected.")
+    endif()
+	set (${_varResult} ${_QT_PLUGINS_DIR} PARENT_SCOPE)
+endfunction()
 
 
 ###############################################################################
