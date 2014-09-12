@@ -97,6 +97,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogicManager.h"
 #include "cxPluginFramework.h"
 #include "ctkPluginContext.h"
+#include <QDesktopWidget>
 
 namespace cx
 {
@@ -479,12 +480,23 @@ void MainWindow::toggleFullScreenSlot()
 
 void MainWindow::shootScreen()
 {
-	this->saveScreenShot(QPixmap::grabWindow(QApplication::desktop()->winId()));
+	QDesktopWidget* desktop = qApp->desktop();
+	QList<QScreen*> screens = qApp->screens();
+
+	for (int i=0; i<desktop->screenCount(); ++i)
+	{
+		QWidget* screenWidget = desktop->screen(i);
+		QString name = "";
+		if (desktop->screenCount()>1)
+			name = QString(i);
+		this->saveScreenShot(screens[i]->grabWindow(screenWidget->winId()));
+	}
 }
 
 void MainWindow::shootWindow()
 {
-	this->saveScreenShot(QPixmap::grabWindow(this->winId()));
+	QScreen* screen = qApp->primaryScreen();
+	this->saveScreenShot(screen->grabWindow(this->winId()));
 }
 
 void MainWindow::recordFullscreen()
@@ -523,9 +535,12 @@ void MainWindow::toggleDebugModeSlot(bool checked)
 			}
 		}
 }
-void MainWindow::saveScreenShot(QPixmap pixmap)
+void MainWindow::saveScreenShot(QPixmap pixmap, QString id)
 {
-	QString path = patientService()->getPatientData()->generateFilePath("Screenshots", "png");
+	QString ending = "png";
+	if (!id.isEmpty())
+		ending = id + "." + ending;
+	QString path = patientService()->getPatientData()->generateFilePath("Screenshots", ending);
 	QtConcurrent::run(boost::bind(&MainWindow::saveScreenShotThreaded, this, pixmap.toImage(), path));
 }
 

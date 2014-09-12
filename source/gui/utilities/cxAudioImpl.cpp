@@ -33,7 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAudioImpl.h"
 
 #include <QSound>
+#include <iostream>
 #include "cxDataLocations.h"
+#include <QFileInfo>
+#include "cxTypeConversions.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -50,7 +54,17 @@ void AudioInternal::playSound(QString file)
 
 void AudioInternal::playSoundSlot(QString file)
 {
-  QSound::play(file);
+	if (!QFileInfo(file).isAbsolute())
+		file = QString("%1/%2").arg(DataLocations::getAudioConfigFilePath()).arg(file);
+
+	if (!QFileInfo(file).exists())
+	{
+		QString text = QString("Audio file %1 not found").arg(file);
+		reporter()->sendMessage(text, mlWARNING, 3000, true);
+		return;
+	}
+
+	QSound::play(file);
 }
 
 //---------------------------------------------------------
@@ -68,42 +82,42 @@ AudioImpl::~AudioImpl()
 
 void AudioImpl::playStartSound()
 {
-	mInternal->playSound(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Hardware Insert.wav");
+	mInternal->playSound("Windows XP Hardware Insert.wav");
 }
 
 void AudioImpl::playStopSound()
 {
-	mInternal->playSound(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Hardware Remove.wav");
+	mInternal->playSound("Windows XP Hardware Remove.wav");
 }
 
 void AudioImpl::playCancelSound()
 {
-	mInternal->playSound(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Hardware Fail.wav");
+	mInternal->playSound("Windows XP Hardware Fail.wav");
 }
 
 void AudioImpl::playSuccessSound()
 {
-	mInternal->playSound(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Print complete.wav");
+	mInternal->playSound("Windows XP Print complete.wav");
 }
 
 void AudioImpl::playWarningSound()
 {
-	mInternal->playSound(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows xp Navigation.wav");
+	mInternal->playSound("Windows XP Navigation.wav");
 }
 
 void AudioImpl::playErrorSound()
 {
-	mInternal->playSound(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Critical Stop.wav");
+	mInternal->playSound("Windows XP Critical Stop.wav");
 }
 
 void AudioImpl::playScreenShotSound()
 {
-	mInternal->playSound(DataLocations::getAudioConfigFilePath()+"camera_shutter.wav");
+	mInternal->playSound("camera_shutter.wav");
 }
 
 void AudioImpl::playSampleSound()
 {
-	mInternal->playSound(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Information Bar.wav");
+	mInternal->playSound("Windows XP Information Bar.wav");
 }
 
 }//namespace cx
