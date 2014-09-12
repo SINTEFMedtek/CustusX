@@ -486,10 +486,14 @@ void MainWindow::shootScreen()
 	for (int i=0; i<desktop->screenCount(); ++i)
 	{
 		QWidget* screenWidget = desktop->screen(i);
+		WId screenWinId = screenWidget->winId();
+		QRect geo = desktop->screenGeometry(i);
 		QString name = "";
 		if (desktop->screenCount()>1)
-			name = QString(i);
-		this->saveScreenShot(screens[i]->grabWindow(screenWidget->winId()));
+			name = screens[i]->name().split(" ").join("");
+//		std::cout << "screen id " << screens[i]->name() << std::endl;
+//		std::cout << "screen get " << geo.left() <<","<< geo.top() <<","<< geo.width() <<","<< geo.height() << std::endl;
+		this->saveScreenShot(screens[i]->grabWindow(screenWinId, geo.left(), geo.top(), geo.width(), geo.height()), name);
 	}
 }
 
