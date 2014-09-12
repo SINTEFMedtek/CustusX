@@ -58,14 +58,21 @@ class PatientModelServiceProxy : public PatientModelService
 {
 public:
 	PatientModelServiceProxy(ctkPluginContext *context);
+	virtual ~PatientModelServiceProxy();
 
 	virtual void insertData(DataPtr data);
 	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform);
 	virtual std::map<QString, DataPtr> getData() const;
 	virtual DataPtr getData(const QString& uid) const;
-	virtual void autoSave();
+	virtual LandmarksPtr getPatientLandmarks() const;
+	virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const;
+	virtual Transform3D get_rMpr() const;
 
+	virtual void autoSave();
 	virtual bool isNull();
+
+	virtual bool getDebugMode() const;
+	virtual void setDebugMode(bool on);
 
 private:
 	void initServiceListener();

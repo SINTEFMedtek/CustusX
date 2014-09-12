@@ -30,41 +30,59 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXPATIENTMODELSERVICENULL_H
-#define CXPATIENTMODELSERVICENULL_H
+#ifndef CXSELECTDATASTRINGDATAADAPTERBASE_H
+#define CXSELECTDATASTRINGDATAADAPTERBASE_H
 
-#include "cxPatientModelService.h"
+#include "cxStringDataAdapter.h"
+#include "cxForwardDeclarations.h"
+class ctkPluginContext;
 
 namespace cx
 {
 
-/** \brief Null Object Pattern for Registration service
+typedef boost::shared_ptr<class SelectDataStringDataAdapterBase> SelectDataStringDataAdapterBasePtr;
+typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+
+/** Base class for all DataAdapters that selects a Data or descendants.
  *
- *
- *  \ingroup cx_resource_core_patientModel
- *  \date 2014-09-10
+ *  \ingroup cx_resource_core_dataAdapters
+ *  \date 2014-09-11
+ *  \author Christian Askeland, SINTEF
  *  \author Ole Vegard Solberg, SINTEF
  */
-class PatientModelServiceNull : public PatientModelService
+class SelectDataStringDataAdapterBase : public StringDataAdapter
 {
+	Q_OBJECT
 public:
-	PatientModelServiceNull();
-	virtual void insertData(DataPtr data);
-	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform);
-	virtual std::map<QString, DataPtr> getData() const;
-	virtual DataPtr getData(const QString& uid) const;
-	virtual LandmarksPtr getPatientLandmarks() const;
-	virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const;
-	virtual Transform3D get_rMpr() const;
+	virtual ~SelectDataStringDataAdapterBase() {}
 
-	virtual void autoSave();
-	virtual bool isNull();
+public: // basic methods
+	virtual QString getDisplayName() const;
 
-	virtual bool getDebugMode() const;
-	virtual void setDebugMode(bool on);
-private:
-	void printWarning();
+public: // optional methods
+	virtual QStringList getValueRange() const;
+	virtual QString convertInternal2Display(QString internal);
+	virtual QString getHelp() const;
+
+public: // interface extension
+	virtual DataPtr getData() const;
+	virtual void setValueName(const QString name);
+	virtual void setHelp(QString text);
+
+signals:
+	void dataChanged(QString);
+protected:
+	/** Construct base with a filter that determined allowed Data types based
+		* on their getType() return value. The default of ".*" means any type.
+		*/
+	explicit SelectDataStringDataAdapterBase(ctkPluginContext *pluginContext, QString typeRegexp = ".*");
+	std::map<QString, DataPtr> filterOnType(std::map<QString, DataPtr> input, QString regexp) const;
+	QString mTypeRegexp;
+	QString mValueName;
+	QString mHelp;
+
+	PatientModelServicePtr mPatientModelService;
 };
 
-} //cx
-#endif // CXPATIENTMODELSERVICENULL_H
+} // cx
+#endif // CXSELECTDATASTRINGDATAADAPTERBASE_H

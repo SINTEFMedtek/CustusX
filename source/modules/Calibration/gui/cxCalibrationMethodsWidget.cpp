@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include <cxCalibrationMethodsWidget.h>
 
+#include <ctkPluginContext.h>
 #include <cxToolTipSampleWidget.h>
 #include "cxToolTipCalibrationWidget.h"
 #include "cxToolManualCalibrationWidget.h"
@@ -41,12 +42,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-CalibrationMethodsWidget::CalibrationMethodsWidget(AcquisitionDataPtr acquisitionData, QWidget* parent, QString objectName, QString windowTitle) :
+CalibrationMethodsWidget::CalibrationMethodsWidget(ctkPluginContext *pluginContext, AcquisitionDataPtr acquisitionData, QWidget* parent, QString objectName, QString windowTitle) :
   TabbedWidget(parent, objectName, windowTitle)
 {
   this->addTab(new ToolTipCalibrateWidget(this), "Tool Tip");
   this->addTab(new LapFrameToolCalibrationWidget(this), "Lap Frame");
-  this->addTab(new ToolTipSampleWidget(this), "Sample");
+	this->addTab(new ToolTipSampleWidget(pluginContext, this), "Sample");
   this->addTab(new TemporalCalibrationWidget(acquisitionData, this), "Temporal");
   this->addTab(new ToolManualCalibrationWidget(this), "Tool Manual");
   this->addTab(new ProbeConfigWidget(this), "Probe");

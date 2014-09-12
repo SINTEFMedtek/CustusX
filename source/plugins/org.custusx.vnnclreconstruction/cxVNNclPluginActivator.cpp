@@ -35,12 +35,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtPlugin>
 #include <iostream>
 #include "cxVNNclReconstructionService.h"
+#include "cxRegisteredService.h"
 
 namespace cx
 {
 
 VNNclPluginActivator::VNNclPluginActivator()
-: mContext(0)
 {
 }
 
@@ -51,26 +51,13 @@ VNNclPluginActivator::~VNNclPluginActivator()
 
 void VNNclPluginActivator::start(ctkPluginContext* context)
 {
-	this->mContext = context;
-
-	mPlugin.reset(new VNNclReconstructionService);
-	try
-	{
-		mRegistration = context->registerService(QStringList(ReconstructionService_iid), mPlugin.get());
-	}
-	catch(ctkRuntimeException& e)
-	{
-		std::cout << e.what() << std::endl;
-		mPlugin.reset();
-	}
+	mRegistration = RegisteredService::create<VNNclReconstructionService>(context, ReconstructionService_iid);
 }
 
 void VNNclPluginActivator::stop(ctkPluginContext* context)
 {
-	mRegistration.unregister();
-	if(mPlugin)
-		mPlugin.reset();
-	Q_UNUSED(context)
+	mRegistration.reset();
+	Q_UNUSED(context);
 }
 
 } // namespace cx

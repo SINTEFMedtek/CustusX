@@ -57,14 +57,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(RegistrationManagerPtr regManager,
+LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(ctkPluginContext *pluginContext,
 	QWidget* parent, QString objectName, QString windowTitle) :
-	LandmarkRegistrationWidget(regManager, parent, objectName, windowTitle), mToolSampleButton(new QPushButton(
+	LandmarkRegistrationWidget(pluginContext, parent, objectName, windowTitle), mToolSampleButton(new QPushButton(
 		"Sample Tool", this))
 {
 	mImageLandmarkSource = ImageLandmarksSource::New();
 	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(logicManager()->getPluginContext()));
-	connect(mManager.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedDataChanged()));
+	connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedDataChanged()));
 	connect(dataManager(), SIGNAL(rMprChanged()), this, SLOT(setModified()));
 
 	//buttons
@@ -121,7 +121,7 @@ void LandmarkPatientRegistrationWidget::registerSlot()
 
 void LandmarkPatientRegistrationWidget::fixedDataChanged()
 {
-	mImageLandmarkSource->setData(mManager->getFixedData());
+	mImageLandmarkSource->setData(mRegistrationService->getFixedData());
 }
 
 void LandmarkPatientRegistrationWidget::updateToolSampleButton()
@@ -246,13 +246,13 @@ void LandmarkPatientRegistrationWidget::setTargetLandmark(QString uid, Vector3D 
 
 void LandmarkPatientRegistrationWidget::performRegistration()
 {
-	if (!mManager->getFixedData())
-		mManager->setFixedData(dataManager()->getActiveImage());
+	if (!mRegistrationService->getFixedData())
+		mRegistrationService->setFixedData(dataManager()->getActiveImage());
 
 	if (dataManager()->getPatientLandmarks()->getLandmarks().size() < 3)
 		return;
 
-	mManager->doPatientRegistration();
+	mRegistrationService->doPatientRegistration();
 
 	this->updateAvarageAccuracyLabel();
 }

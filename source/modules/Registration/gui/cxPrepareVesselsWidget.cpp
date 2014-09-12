@@ -55,17 +55,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 //------------------------------------------------------------------------------
-PrepareVesselsWidget::PrepareVesselsWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-    RegistrationBaseWidget(regManager, parent, "PrepareVesselsWidget", "PrepareVesselsWidget")
+PrepareVesselsWidget::PrepareVesselsWidget(ctkPluginContext *pluginContext, QWidget* parent) :
+		RegistrationBaseWidget(pluginContext, parent, "PrepareVesselsWidget", "PrepareVesselsWidget")
 {  
     XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("registration").descend("PrepareVesselsWidget");
   // fill the pipeline with filters:
-  mPipeline.reset(new Pipeline());
+	mPipeline.reset(new Pipeline(pluginContext));
   FilterGroupPtr filters(new FilterGroup(options.descend("pipeline")));
-  filters->append(FilterPtr(new ResampleImageFilter()));
-  filters->append(FilterPtr(new SmoothingImageFilter()));
-  filters->append(FilterPtr(new BinaryThresholdImageFilter()));
-  filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter()));
+	filters->append(FilterPtr(new ResampleImageFilter(pluginContext)));
+	filters->append(FilterPtr(new SmoothingImageFilter(pluginContext)));
+	filters->append(FilterPtr(new BinaryThresholdImageFilter(pluginContext)));
+	filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(pluginContext)));
   mPipeline->initialize(filters);
 
 //  mPipeline->getNodes()[0]->setValueName("US Image:");
@@ -112,14 +112,14 @@ void PrepareVesselsWidget::toMovingSlot()
 {
     DataPtr data = mPipeline->getNodes().back()->getData();
   if (data)
-    mManager->setMovingData(data);
+		mRegistrationService->setMovingData(data);
 }
 
 void PrepareVesselsWidget::toFixedSlot()
 {
   DataPtr data = mPipeline->getNodes().back()->getData();
   if (data)
-    mManager->setFixedData(data);
+		mRegistrationService->setFixedData(data);
 }
 
 PrepareVesselsWidget::~PrepareVesselsWidget()

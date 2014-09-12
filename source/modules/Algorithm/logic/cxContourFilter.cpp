@@ -54,10 +54,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRepManager.h"
 #include "cxThresholdPreview.h"
 #include "cxSelectDataStringDataAdapter.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
 
+ContourFilter::ContourFilter(ctkPluginContext *pluginContext) :
+	FilterImpl(pluginContext)
+{
+}
 
 QString ContourFilter::getName() const
 {
@@ -144,7 +149,7 @@ void ContourFilter::createInputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New();
+	temp = SelectImageStringDataAdapter::New(mPluginContext);
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for contouring");
 	connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
@@ -155,7 +160,7 @@ void ContourFilter::createOutputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectMeshStringDataAdapter::New();
+	temp = SelectMeshStringDataAdapter::New(mPluginContext);
 	temp->setValueName("Output");
 	temp->setHelp("Output contour");
 	mOutputTypes.push_back(temp);

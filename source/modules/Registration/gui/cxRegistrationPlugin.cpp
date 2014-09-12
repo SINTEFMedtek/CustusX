@@ -43,7 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-RegistrationPlugin::RegistrationPlugin(AcquisitionDataPtr acquisitionData, ctkPluginContext* pluginContext)
+RegistrationPlugin::RegistrationPlugin(AcquisitionDataPtr acquisitionData, ctkPluginContext* pluginContext) :
+	mPluginContext(pluginContext),
+	mAquisitionData(acquisitionData)
 {
 	mRegistrationManager.reset(new RegistrationManager(acquisitionData, pluginContext));
 }
@@ -56,10 +58,10 @@ std::vector<GUIExtenderService::CategorizedWidget> RegistrationPlugin::createWid
 			new RegistrationHistoryWidget(NULL),
 			"Browsing"));
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new RegistrationMethodsWidget(mRegistrationManager, NULL, "RegistrationMethodsWidget", "Registration Methods"),
+			new RegistrationMethodsWidget(mPluginContext, NULL, "RegistrationMethodsWidget", "Registration Methods"),
 			"Algorithms"));
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new WirePhantomWidget(mRegistrationManager, NULL),
+			new WirePhantomWidget(mPluginContext, mAquisitionData, NULL),
 			"Algorithms"));
 
 	return retval;

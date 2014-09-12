@@ -32,8 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONDATAADAPTERS_H_
 #define CXREGISTRATIONDATAADAPTERS_H_
 
-#include "cxDataInterface.h"
-#include "cxSelectDataStringDataAdapter.h"
+//#include "cxDataInterface.h"
+#include "cxSelectDataStringDataAdapterBase.h"
 class ctkPluginContext;
 
 namespace cx

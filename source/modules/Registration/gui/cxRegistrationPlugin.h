@@ -76,6 +76,8 @@ private slots:
 
 private:
 	RegistrationManagerPtr mRegistrationManager;
+	ctkPluginContext *mPluginContext;
+	AcquisitionDataPtr mAquisitionData;
 };
 
 /**

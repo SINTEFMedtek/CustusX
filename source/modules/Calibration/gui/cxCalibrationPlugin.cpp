@@ -37,8 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-CalibrationPlugin::CalibrationPlugin(AcquisitionDataPtr acquisitionData) :
-		mAcquisitionData(acquisitionData)
+CalibrationPlugin::CalibrationPlugin(ctkPluginContext *pluginContext, AcquisitionDataPtr acquisitionData) :
+		mAcquisitionData(acquisitionData),
+		mPluginContext(pluginContext)
 {
 }
 
@@ -52,7 +53,7 @@ std::vector<GUIExtenderService::CategorizedWidget> CalibrationPlugin::createWidg
 	std::vector<CategorizedWidget> retval;
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new CalibrationMethodsWidget(mAcquisitionData, NULL, "CalibrationMethodsWidget", "Calibration Methods"),
+			new CalibrationMethodsWidget(mPluginContext, mAcquisitionData, NULL, "CalibrationMethodsWidget", "Calibration Methods"),
 			"Algorithms"));
 
 	return retval;

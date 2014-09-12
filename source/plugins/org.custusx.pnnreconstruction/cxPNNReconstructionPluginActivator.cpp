@@ -36,42 +36,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "cxPNNReconstructionService.h"
+#include "cxRegisteredService.h"
 
 namespace cx
 {
 
 PNNReconstructionPluginActivator::PNNReconstructionPluginActivator()
-: mContext(0)
 {
 }
 
 PNNReconstructionPluginActivator::~PNNReconstructionPluginActivator()
 {
-
 }
 
 void PNNReconstructionPluginActivator::start(ctkPluginContext* context)
 {
-	this->mContext = context;
-
-	mPlugin.reset(new PNNReconstructionService);
-	try
-	{
-		mRegistration = context->registerService(QStringList(ReconstructionService_iid), mPlugin.get());
-	}
-	catch(ctkRuntimeException& e)
-	{
-		std::cout << e.what() << std::endl;
-		mPlugin.reset();
-	}
+	mRegistration = RegisteredService::create<PNNReconstructionService>(context, ReconstructionService_iid);
 }
 
 void PNNReconstructionPluginActivator::stop(ctkPluginContext* context)
 {
-	mRegistration.unregister();
-	if(mPlugin)
-		mPlugin.reset();
-	Q_UNUSED(context)
+	mRegistration.reset();
+	Q_UNUSED(context);
 }
 
 } // namespace cx

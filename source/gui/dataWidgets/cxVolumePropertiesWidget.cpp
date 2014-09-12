@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxVolumePropertiesWidget.h"
 
+#include <ctkPluginContext.h>
 #include <QComboBox>
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -39,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledComboBoxWidget.h"
 #include "cxLabeledLineEditWidget.h"
 #include "cxImage.h"
-#include "cxDataManager.h"
+//#include "cxDataManager.h"
 #include "cxTransferFunctionWidget.h"
 #include "cxCroppingWidget.h"
 #include "cxClippingWidget.h"
@@ -58,12 +59,12 @@ namespace cx
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
-ActiveVolumeWidget::ActiveVolumeWidget(QWidget* parent) :
+ActiveVolumeWidget::ActiveVolumeWidget(ctkPluginContext *pluginContext, QWidget* parent) :
   BaseWidget(parent, "ActiveVolumeWidget", "Active Volume")
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setMargin(0);
-  layout->addWidget(new DataSelectWidget(this, ActiveImageStringDataAdapter::New()));
+	layout->addWidget(new DataSelectWidget(this, ActiveImageStringDataAdapter::New(pluginContext)));
 }
 
 QString ActiveVolumeWidget::defaultWhatsThis() const
@@ -79,16 +80,16 @@ QString ActiveVolumeWidget::defaultWhatsThis() const
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
-VolumePropertiesWidget::VolumePropertiesWidget(QWidget* parent) :
+VolumePropertiesWidget::VolumePropertiesWidget(ctkPluginContext *pluginContext, QWidget *parent) :
 		TabbedWidget(parent, "VolumePropertiesWidget", "Volume Properties")
 {
-	this->insertWidgetAtTop(new ActiveVolumeWidget(this));
+	this->insertWidgetAtTop(new ActiveVolumeWidget(pluginContext, this));
 
 	this->addTab(new VolumeInfoWidget(this), "Info");
 	this->addTab(new TransferFunctionWidget(this), QString("Transfer Functions"));
 	this->addTab(new ShadingWidget(this), "Shading");
 	this->addTab(new CroppingWidget(this), "Crop");
-	this->addTab(new ClippingWidget(this), "Clip");
+	this->addTab(new ClippingWidget(pluginContext, this), "Clip");
 }
 
 QString VolumePropertiesWidget::defaultWhatsThis() const

@@ -67,19 +67,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-//------------------------------------------------------------------------------
-WirePhantomWidget::WirePhantomWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-        RegistrationBaseWidget(regManager, parent, "WirePhantomWidget", "Wire Phantom Test")
+
+
+WirePhantomWidget::WirePhantomWidget(ctkPluginContext *pluginContext, AcquisitionDataPtr aquisitionData, QWidget* parent) :
+				RegistrationBaseWidget(pluginContext, parent, "WirePhantomWidget", "Wire Phantom Test"),
+				mAquisitionData(aquisitionData)
 {
     mLastRegistration = Transform3D::Identity();
 
     // fill the pipeline with filters:
-    mPipeline.reset(new Pipeline());
+		mPipeline.reset(new Pipeline(pluginContext));
     XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("registration").descend("WirePhantomWidget");
     FilterGroupPtr filters(new FilterGroup(options));
-    filters->append(FilterPtr(new SmoothingImageFilter()));
-    filters->append(FilterPtr(new BinaryThresholdImageFilter()));
-    filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter()));
+		filters->append(FilterPtr(new SmoothingImageFilter(pluginContext)));
+		filters->append(FilterPtr(new BinaryThresholdImageFilter(pluginContext)));
+		filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(pluginContext)));
     mPipeline->initialize(filters);
 
     mPipeline->getNodes()[0]->setValueName("US Image:");
@@ -216,8 +218,8 @@ void WirePhantomWidget::registration()
         return;
     }
 
-    mManager->setFixedData(nominalCross);
-    mManager->setMovingData(measuredCross);
+		mRegistrationService->setFixedData(nominalCross);
+		mRegistrationService->setMovingData(measuredCross);
 
     this->showData(nominalCross);
     this->showData(measuredCross);
@@ -229,7 +231,7 @@ void WirePhantomWidget::registration()
     QString logPath = patientService()->getPatientData()->getActivePatientFolder() + "/Logs/";
 //	vesselReg.setDebugOutput(true);
 
-    bool success = vesselReg.execute(mManager->getMovingData(), mManager->getFixedData(), logPath);
+		bool success = vesselReg.execute(mRegistrationService->getMovingData(), mRegistrationService->getFixedData(), logPath);
     if (!success)
     {
         reportWarning("Vessel registration failed.");
@@ -246,8 +248,9 @@ void WirePhantomWidget::registration()
     // new one as rM'd = Q * rMd, where Q is the inverted registration output.
     // Delta is thus equal to Q:
     Transform3D delta = linearTransform.inv();
-    mManager->restart();
-    mManager->applyImage2ImageRegistration(delta, "Wire Phantom Measurement");
+//		mRegistrationService->restart();
+		mRegistrationService->setLastRegistrationTime(QDateTime::currentDateTime());//Instead of restart
+		mRegistrationService->applyImage2ImageRegistration(delta, "Wire Phantom Measurement");
 
 
     Vector3D t_delta = linearTransform.matrix().block<3, 1>(0, 3);
@@ -281,7 +284,7 @@ void WirePhantomWidget::registration()
     Fmt fmt;
 
     QString result;
-    result += QString("Results for: %1\n").arg(mManager->getMovingData()->getName());
+		result += QString("Results for: %1\n").arg(mRegistrationService->getMovingData()->getName());
     result += QString("Shift vector (r): \t%1\t%2\t%3\n").arg(fmt(diff_r[0])).arg(fmt(diff_r[1])).arg(fmt(diff_r[2]));
     if (!probePos.first.isEmpty())
         result += QString("Shift vector (probe): \t%1\t%2\t%3\t(used tracking data from %4)\n").arg(fmt(diff_tus[0])).arg(fmt(diff_tus[1])).arg(fmt(diff_tus[2])).arg(probePos.first);
@@ -303,16 +306,16 @@ void WirePhantomWidget::showDataMetrics(Vector3D cross_r)
 {
     // add metrics displaying the distance from cross in the nominal and us spaces:
 	Transform3D usMnom = spaceProvider()->get_toMfrom(
-				spaceProvider()->getD(mManager->getFixedData()),
-				spaceProvider()->getD(mManager->getMovingData()));
+				spaceProvider()->getD(mRegistrationService->getFixedData()),
+				spaceProvider()->getD(mRegistrationService->getMovingData()));
     Vector3D cross_us = usMnom.coord(cross_r);
 
     PointMetricPtr p1 = boost::dynamic_pointer_cast<PointMetric>(dataManager()->getData("cross_nominal"));
     if (!p1)
 		p1 = dataManager()->getDataFactory()->createSpecific<PointMetric>("cross_nominal");
 //		p1 = PointMetric::create("cross_nominal", "cross_nominal");
-    p1->get_rMd_History()->setParentSpace(mManager->getFixedData()->getUid());
-	p1->setSpace(spaceProvider()->getD(mManager->getFixedData()));
+		p1->get_rMd_History()->setParentSpace(mRegistrationService->getFixedData()->getUid());
+	p1->setSpace(spaceProvider()->getD(mRegistrationService->getFixedData()));
     p1->setCoordinate(cross_r);
     dataManager()->loadData(p1);
     //this->showData(p1);
@@ -321,8 +324,8 @@ void WirePhantomWidget::showDataMetrics(Vector3D cross_r)
     if (!p2)
 		p2 = dataManager()->getDataFactory()->createSpecific<PointMetric>("cross_us");
 //		p2 = PointMetric::create("cross_us", "cross_us");
-    p2->get_rMd_History()->setParentSpace(mManager->getMovingData()->getUid());
-	p2->setSpace(spaceProvider()->getD(mManager->getMovingData()));
+		p2->get_rMd_History()->setParentSpace(mRegistrationService->getMovingData()->getUid());
+	p2->setSpace(spaceProvider()->getD(mRegistrationService->getMovingData()));
     p2->setCoordinate(cross_us);
     dataManager()->loadData(p2);
     //this->showData(p2);
@@ -347,7 +350,7 @@ void WirePhantomWidget::showDataMetrics(Vector3D cross_r)
 std::pair<QString, Transform3D> WirePhantomWidget::getLastProbePosition()
 {
     // find transform to probe space t_us, i.e. the middle position from the us acquisition
-    USReconstructInputData usData = mManager->getAcquisitionData()->getReconstructer()->getSelectedFileData();
+		USReconstructInputData usData = mAquisitionData->getReconstructer()->getSelectedFileData();
     Transform3D prMt_us = Transform3D::Identity();
     if (usData.mPositions.empty())
         return std::make_pair("", Transform3D::Identity());
@@ -369,7 +372,7 @@ void WirePhantomWidget::generate_sMt()
         return;
     }
 
-    USReconstructInputData usData = mManager->getAcquisitionData()->getReconstructer()->getSelectedFileData();
+		USReconstructInputData usData = mAquisitionData->getReconstructer()->getSelectedFileData();
     ToolPtr probe = toolManager()->getTool(usData.mProbeUid);
     if (!probe || !probe->hasType(Tool::TOOL_US_PROBE))
     {
@@ -383,7 +386,7 @@ void WirePhantomWidget::generate_sMt()
 //		reportWarning("Cannot find visible probe, aborting calibration test.");
 //		return;
 //	}
-    if (!mManager->getMovingData())
+		if (!mRegistrationService->getMovingData())
     {
         reportWarning("Cannot find moving data, aborting calibration test.");
         return;
@@ -423,7 +426,7 @@ void WirePhantomWidget::generate_sMt()
         Transform3D prMt = rMt_us;
         Transform3D sMt = probe->getCalibration_sMt();
         Transform3D prMs = prMt * sMt.inv();
-		Transform3D usMpr = mManager->getMovingData()->get_rMd().inv() * dataManager()->get_rMpr();
+		Transform3D usMpr = mRegistrationService->getMovingData()->get_rMd().inv() * dataManager()->get_rMpr();
         Transform3D nomMus = mLastRegistration.inv();
 
         Transform3D sQt; // Q is the new calibration matrix.

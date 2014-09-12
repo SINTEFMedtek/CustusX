@@ -5,13 +5,8 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 message(STATUS "===================================== parsing example")
 
 include_directories(
-    ${CustusX_SOURCE_DIR}/source/resource/core/registration
-    ${CustusX_SOURCE_DIR}/source/resource/core/Math
-    ${CustusX_SOURCE_DIR}/source/resource/core/Data
-    ${CustusX_SOURCE_DIR}/source/resource/core/utilities
-    ${CustusX_SOURCE_DIR}/source/resource/core/logger
-    ${CustusX_SOURCE_DIR}/source/resource/core/patientModel
-    ${CustusX_SOURCE_DIR}/source/resource/core
+    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/logic
     )
 
@@ -21,6 +16,8 @@ set(PLUGIN_SRCS
   cxRegistrationImplService.cpp
   cxRegistrationApplicator.cpp
   cxRegistrationApplicator.h
+  cxLandmarkTranslationRegistration.cpp
+  cxLandmarkTranslationRegistration.h
 )
 
 # Files which should be processed by Qts moc
@@ -40,7 +37,7 @@ set(PLUGIN_resources
 
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
-set(PLUGIN_target_libraries 
+set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}
     cxResource
 #TODO: Remove these dependencies

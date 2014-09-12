@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPatientModelImplService.h"
 
+#include <ctkPluginContext.h>
 #include "cxData.h"
 #include "cxReporter.h"
 #include "cxLogicManager.h"
@@ -43,13 +44,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-
-PatientModelImplService::PatientModelImplService()
+PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
+	mContext(context )
 {
+	connect(dataService().get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
+	connect(dataService().get(), SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
+	connect(dataService().get(), SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
 }
 
 PatientModelImplService::~PatientModelImplService()
 {
+	disconnect(dataService().get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
+	disconnect(dataService().get(), SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
+	disconnect(dataService().get(), SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
 }
 
 void PatientModelImplService::insertData(DataPtr data)
@@ -80,6 +87,21 @@ DataPtr PatientModelImplService::getData(const QString& uid) const
 	return iter->second;
 }
 
+LandmarksPtr PatientModelImplService::getPatientLandmarks() const
+{
+	return dataService()->getPatientLandmarks();
+}
+
+std::map<QString, LandmarkProperty> PatientModelImplService::getLandmarkProperties() const
+{
+	return dataService()->getLandmarkProperties();
+}
+
+Transform3D PatientModelImplService::get_rMpr() const
+{
+	return dataService()->get_rMpr();
+}
+
 void PatientModelImplService::autoSave()
 {
 	patientService()->getPatientData()->autoSave();
@@ -88,6 +110,15 @@ void PatientModelImplService::autoSave()
 bool PatientModelImplService::isNull()
 {
 	return false;
+}
+
+bool PatientModelImplService::getDebugMode() const
+{
+	return dataService()->getDebugMode();
+}
+void PatientModelImplService::setDebugMode(bool on)
+{
+	dataService()->setDebugMode(on);
 }
 
 } /* namespace cx */

@@ -63,7 +63,7 @@ class FastOrientationRegistrationWidget : public RegistrationBaseWidget
   Q_OBJECT
 
 public:
-  FastOrientationRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent);
+	FastOrientationRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent);
   ~FastOrientationRegistrationWidget();
   virtual QString defaultWhatsThis() const;
 

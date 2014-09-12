@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include <cxToolTipSampleWidget.h>
 
+#include <ctkPluginContext.h>
 #include <QPushButton>
 #include <QTextStream>
 #include <QFileDialog>
@@ -52,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ToolTipSampleWidget::ToolTipSampleWidget(QWidget* parent) :
+ToolTipSampleWidget::ToolTipSampleWidget(ctkPluginContext *pluginContext, QWidget* parent) :
     BaseWidget(parent, "ToolTipSampleWidget", "ToolTip Sample"),
     mSampleButton(new QPushButton("Sample")),
     mSaveToFileNameLabel(new QLabel("<font color=red> No file selected </font>")),
@@ -63,7 +64,7 @@ ToolTipSampleWidget::ToolTipSampleWidget(QWidget* parent) :
 
   mCoordinateSystems = SelectCoordinateSystemStringDataAdapter::New();
   mTools = SelectToolStringDataAdapter::New();
-  mData = SelectDataStringDataAdapter::New();
+	mData = SelectDataStringDataAdapter::New(pluginContext);
 
   mCoordinateSystemComboBox = new LabeledComboBoxWidget(this, mCoordinateSystems);
   mToolComboBox = new LabeledComboBoxWidget(this, mTools);

@@ -110,19 +110,6 @@ protected:
   void addXml(QDomNode& parentNode); ///< adds xml information about the registrationmanger and its variabels
   void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of the RegistrationManager.
 
-  Transform3D performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok) const;
-  vtkPointsPtr convertTovtkPoints(const std::vector<QString>& uids, const LandmarkMap& data, Transform3D M);
-  std::vector<Vector3D> convertAndTransformToPoints(const std::vector<QString>& uids, const LandmarkMap& data, Transform3D M);
-  std::vector<Vector3D> convertVtkPointsToPoints(vtkPointsPtr base);
-  std::vector<QString> getUsableLandmarks(const LandmarkMap& data_a, const LandmarkMap& data_b);
-//  void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame);
-  void writePreLandmarkRegistration(QString name, LandmarkMap landmarks);
-
-//  DataPtr mFixedData; ///< the data that shouldn't update its matrices during a registrations
-//  DataPtr mMovingData; ///< the data that should update its matrices during a registration
-
-//  QDateTime mLastRegistrationTime; ///< last timestamp for registration during this session. All registrations in one session results in only one reg transform.
-
 	AcquisitionDataPtr mAcquisitionData;
 
 private:
@@ -132,9 +119,6 @@ private:
 	RegistrationServicePtr mRegistrationService;
 };
 
-/**Shortcut for accessing the registrationmanager instance.
- */
-//RegistrationManager* registrationManager();
 
 /**
  * @}

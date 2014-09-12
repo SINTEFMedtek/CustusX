@@ -43,8 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-    RegistrationBaseWidget(regManager, parent, "FastOrientationRegistrationWidget", "Fast Orientation Registration"),
+FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
+		RegistrationBaseWidget(pluginContext, parent, "FastOrientationRegistrationWidget", "Fast Orientation Registration"),
     mSetOrientationButton(new QPushButton("Define Orientation")),
     mInvertButton(new QCheckBox("Back face"))
 {
@@ -95,7 +95,8 @@ void FastOrientationRegistrationWidget::hideEvent(QHideEvent* event)
 
 void FastOrientationRegistrationWidget::setOrientationSlot()
 {
-  mManager->doFastRegistration_Orientation(this->get_tMtm());
+	Transform3D prMt = toolManager()->getDominantTool()->get_prMt();
+	mRegistrationService->doFastRegistration_Orientation(this->get_tMtm(), prMt);
 }
 
 Transform3D FastOrientationRegistrationWidget::get_tMtm() const

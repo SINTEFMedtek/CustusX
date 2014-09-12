@@ -126,9 +126,9 @@ int main(int argc, char *argv[])
 	plugins.push_back(reconstructionPlugin);
 	cx::AcquisitionPluginPtr acquisitionPlugin(new cx::AcquisitionPlugin(reconstructionPlugin->getReconstructer()));
 	plugins.push_back(   acquisitionPlugin);
-	cx::CalibrationPluginPtr calibrationPlugin(new cx::CalibrationPlugin(acquisitionPlugin->getAcquisitionData()));
+	cx::CalibrationPluginPtr calibrationPlugin(new cx::CalibrationPlugin(cx::LogicManager::getInstance()->getPluginContext(), acquisitionPlugin->getAcquisitionData()));
 	plugins.push_back(   calibrationPlugin);
-	cx::AlgorithmPluginPtr algorithmPlugin(new cx::AlgorithmPlugin());
+	cx::AlgorithmPluginPtr algorithmPlugin(new cx::AlgorithmPlugin(cx::LogicManager::getInstance()->getPluginContext()));
 	plugins.push_back(   algorithmPlugin);
 	cx::RegistrationPluginPtr registrationPlugin(new cx::RegistrationPlugin(acquisitionPlugin->getAcquisitionData(),
 																			cx::LogicManager::getInstance()->getPluginContext()));

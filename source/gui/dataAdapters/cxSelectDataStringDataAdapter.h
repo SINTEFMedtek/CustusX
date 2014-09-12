@@ -32,48 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSELECTDATASTRINGDATAADAPTER_H
 #define CXSELECTDATASTRINGDATAADAPTER_H
 
-#include "cxStringDataAdapter.h"
-#include "cxForwardDeclarations.h"
-#include "cxLegacySingletons.h"
+#include "cxSelectDataStringDataAdapterBase.h"
 
 namespace cx
 {
-
-/** Base class for all DataAdapters that selects a Data or descendants.
- */
-class SelectDataStringDataAdapterBase : public StringDataAdapter
-{
-  Q_OBJECT
-public:
-  virtual ~SelectDataStringDataAdapterBase() {}
-
-public: // basic methods
-	virtual QString getDisplayName() const;
-
-public: // optional methods
-  virtual QStringList getValueRange() const;
-  virtual QString convertInternal2Display(QString internal);
-  virtual QString getHelp() const;
-
-public: // interface extension
-  virtual DataPtr getData() const;
-  virtual void setValueName(const QString name);
-  virtual void setHelp(QString text);
-
-signals:
-  void dataChanged(QString);
-protected:
-	/** Construct base with a filter that determined allowed Data types based
-	  * on their getType() return value. The default of ".*" means any type.
-	  */
-	explicit SelectDataStringDataAdapterBase(QString typeRegexp = ".*");
-	std::map<QString, DataPtr> filterOnType(std::map<QString, DataPtr> input, QString regexp) const;
-	QString mTypeRegexp;
-	QString mValueName;
-	QString mHelp;
-
-};
-typedef boost::shared_ptr<class SelectDataStringDataAdapterBase> SelectDataStringDataAdapterBasePtr;
 
 typedef boost::shared_ptr<class ActiveImageStringDataAdapter> ActiveImageStringDataAdapterPtr;
 /** Adapter that connects to the current active image.
@@ -85,8 +47,8 @@ class ActiveImageStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
-  static ActiveImageStringDataAdapterPtr New() { return ActiveImageStringDataAdapterPtr(new ActiveImageStringDataAdapter()); }
-  ActiveImageStringDataAdapter();
+	static ActiveImageStringDataAdapterPtr New(ctkPluginContext *pluginContext) { return ActiveImageStringDataAdapterPtr(new ActiveImageStringDataAdapter(pluginContext)); }
+	ActiveImageStringDataAdapter(ctkPluginContext *pluginContext);
   virtual ~ActiveImageStringDataAdapter() {}
 
 public: // basic methods
@@ -104,7 +66,7 @@ class SelectImageStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
-  static SelectImageStringDataAdapterPtr New() { return SelectImageStringDataAdapterPtr(new SelectImageStringDataAdapter()); }
+	static SelectImageStringDataAdapterPtr New(ctkPluginContext *pluginContext) { return SelectImageStringDataAdapterPtr(new SelectImageStringDataAdapter(pluginContext)); }
   virtual ~SelectImageStringDataAdapter() {}
 
 public: // basic methods
@@ -115,7 +77,7 @@ public: // interface extension
   ImagePtr getImage();
 
 protected:
-  SelectImageStringDataAdapter();
+	SelectImageStringDataAdapter(ctkPluginContext *pluginContext);
 private:
   QString mImageUid;
 };
@@ -129,7 +91,7 @@ class SelectDataStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
-  static SelectDataStringDataAdapterPtr New() { return SelectDataStringDataAdapterPtr(new SelectDataStringDataAdapter()); }
+	static SelectDataStringDataAdapterPtr New(ctkPluginContext *pluginContext) { return SelectDataStringDataAdapterPtr(new SelectDataStringDataAdapter(pluginContext)); }
   virtual ~SelectDataStringDataAdapter() {}
 
 public: // basic methods
@@ -140,7 +102,7 @@ public: // interface extension
   virtual DataPtr getData() const;
 
 protected:
-  SelectDataStringDataAdapter();
+	SelectDataStringDataAdapter(ctkPluginContext *pluginContext);
 private:
 //  DataPtr mData;
   QString mUid;
@@ -156,7 +118,7 @@ class SelectMeshStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
-  static SelectMeshStringDataAdapterPtr New() { return SelectMeshStringDataAdapterPtr(new SelectMeshStringDataAdapter()); }
+	static SelectMeshStringDataAdapterPtr New(ctkPluginContext *pluginContext) { return SelectMeshStringDataAdapterPtr(new SelectMeshStringDataAdapter(pluginContext)); }
   virtual ~SelectMeshStringDataAdapter() {}
 
 public: // basic methods
@@ -167,7 +129,7 @@ public: // interface extension
   MeshPtr getMesh();
 
 protected:
-  SelectMeshStringDataAdapter();
+	SelectMeshStringDataAdapter(ctkPluginContext *pluginContext);
 private:
   QString mMeshUid;
 };

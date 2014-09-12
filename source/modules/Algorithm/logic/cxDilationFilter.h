@@ -41,6 +41,7 @@ class DilationFilter : public FilterImpl
 	Q_OBJECT
 
 public:
+	DilationFilter(ctkPluginContext *pluginContext);
 	virtual ~DilationFilter() {}
 
 	virtual QString getType() const;

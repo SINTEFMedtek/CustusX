@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxDataInterface.h"
 #include "cxInfoWidget.h"
+class ctkPluginContext;
 
 namespace cx
 {
@@ -58,7 +59,7 @@ class MeshInfoWidget : public InfoWidget
   Q_OBJECT
 
 public:
-  MeshInfoWidget(QWidget* parent);
+	MeshInfoWidget(ctkPluginContext *pluginContext, QWidget* parent);
   virtual ~MeshInfoWidget();
 
 protected slots:
@@ -73,7 +74,7 @@ protected:
   virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
 
 private:
-  void addWidgets();
+	void addWidgets(ctkPluginContext *pluginContext);
 
   MeshPtr mMesh;
   ParentFrameStringDataAdapterPtr mParentFrameAdapter;

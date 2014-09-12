@@ -39,10 +39,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-typedef boost::shared_ptr<class VNNclReconstructionService> VNNclReconstructionServicePtr;
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
- * Activator for the Tord ¯ygard reconstruction service
+ * Activator for the Tord Ã˜ygard reconstruction service
  *
  * \ingroup org_custusx_vnnclreconstruction
  *
@@ -63,9 +63,7 @@ public:
   void stop(ctkPluginContext* context);
 
 private:
-  ctkPluginContext* mContext;
-  VNNclReconstructionServicePtr mPlugin;
-  ctkServiceRegistration mRegistration;
+	RegisteredServicePtr mRegistration;
 };
 
 } // namespace cx

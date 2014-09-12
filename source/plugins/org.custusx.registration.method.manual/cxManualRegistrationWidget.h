@@ -83,8 +83,8 @@ private:
 	QVBoxLayout* mVerticalLayout;
 	QLabel* mLabel;
 
-	StringDataAdapterPtr mFixedImage;
-	StringDataAdapterPtr mMovingImage;
+//	StringDataAdapterPtr mFixedImage;
+//	StringDataAdapterPtr mMovingImage;
 	Transform3DWidget* mMatrixWidget;
 };
 

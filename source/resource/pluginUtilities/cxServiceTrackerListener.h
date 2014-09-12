@@ -81,6 +81,11 @@ public:
 		mServiceTracker.reset(new ctkServiceTracker<T*>(context, mServiceTrackerCustomizer.get()));
 	}
 
+	~ServiceTrackerListener()
+	{
+		mServiceTracker->close();
+	}
+
 	void open()
 	{
 		mServiceTracker->open();

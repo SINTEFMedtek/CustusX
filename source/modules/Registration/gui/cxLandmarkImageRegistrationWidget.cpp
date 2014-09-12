@@ -54,14 +54,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLandmarkRep.h"
 #include "cxView.h"
 #include "cxTypeConversions.h"
+#include "cxSelectDataStringDataAdapter.h"
 
 namespace cx
 {
-LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent,
+LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent,
 	QString objectName, QString windowTitle) :
-	LandmarkRegistrationWidget(regManager, parent, objectName, windowTitle)
+	LandmarkRegistrationWidget(pluginContext, parent, objectName, windowTitle)
 {
-	mCurrentDataAdapter = SelectDataStringDataAdapter::New();
+	mCurrentDataAdapter = SelectDataStringDataAdapter::New(pluginContext);
 	connect(mCurrentDataAdapter.get(), SIGNAL(changed()), this, SLOT(onCurrentImageChanged()));
 	mImageLandmarkSource = ImageLandmarksSource::New();
 
@@ -118,8 +119,8 @@ void LandmarkImageRegistrationWidget::onCurrentImageChanged()
 	mImageLandmarkSource->setData(data);
 	this->enableButtons();
 
-	if (data && !mManager->getFixedData())
-		mManager->setFixedData(data);
+	if (data && !mRegistrationService->getFixedData())
+		mRegistrationService->setFixedData(data);
 
 	this->setModified();
 }

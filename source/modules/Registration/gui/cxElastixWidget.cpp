@@ -58,10 +58,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ElastixWidget::ElastixWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-				RegistrationBaseWidget(regManager, parent, "ElastiXWidget", "ElastiX Registration")
+ElastixWidget::ElastixWidget(ctkPluginContext *pluginContext, QWidget* parent) :
+				RegistrationBaseWidget(pluginContext, parent, "ElastiXWidget", "ElastiX Registration")
 {
-	mElastixManager.reset(new ElastixManager(regManager));
+	mElastixManager.reset(new ElastixManager(pluginContext));
 	connect(mElastixManager.get(), SIGNAL(elastixChanged()), this, SLOT(elastixChangedSlot()));
 
 	mRegisterButton = new QPushButton("Register");

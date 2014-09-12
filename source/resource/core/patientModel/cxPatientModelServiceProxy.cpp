@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctkPluginContext.h>
 #include "cxNullDeleter.h"
 #include "cxReporter.h"
+#include "cxLandmark.h"
 
 namespace cx
 {
@@ -45,6 +46,11 @@ PatientModelServiceProxy::PatientModelServiceProxy(ctkPluginContext *context) :
 	mPatientModelService(PatientModelService::getNullObject())
 {
 	this->initServiceListener();
+}
+
+PatientModelServiceProxy::~PatientModelServiceProxy()
+{
+	mServiceListener.reset();//Needed?
 }
 
 void PatientModelServiceProxy::initServiceListener()
@@ -57,15 +63,22 @@ void PatientModelServiceProxy::initServiceListener()
 								 ));
 	mServiceListener->open();
 }
+
 void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 {
 	mPatientModelService.reset(service, null_deleter());
+	connect(service, SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
+	connect(service, SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
+	connect(service, SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
 	if(mPatientModelService->isNull())
-		reportWarning("ManualImageRegistrationWidget::onServiceAdded mRegistrationService->isNull()");
+		reportWarning("PatientModelServiceProxy::onServiceAdded mPatientModelService->isNull()");
 }
 
 void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 {
+	disconnect(service, SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
+	disconnect(service, SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
+	disconnect(service, SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
 	mPatientModelService = PatientModelService::getNullObject();
 }
 
@@ -89,6 +102,21 @@ DataPtr PatientModelServiceProxy::getData(const QString& uid) const
 	return mPatientModelService->getData(uid);
 }
 
+LandmarksPtr PatientModelServiceProxy::getPatientLandmarks() const
+{
+	return mPatientModelService->getPatientLandmarks();
+}
+
+std::map<QString, LandmarkProperty> PatientModelServiceProxy::getLandmarkProperties() const
+{
+	return mPatientModelService->getLandmarkProperties();
+}
+
+Transform3D PatientModelServiceProxy::get_rMpr() const
+{
+	return mPatientModelService->get_rMpr();
+}
+
 void PatientModelServiceProxy::autoSave()
 {
 	mPatientModelService->autoSave();
@@ -97,6 +125,16 @@ void PatientModelServiceProxy::autoSave()
 bool PatientModelServiceProxy::isNull()
 {
 	return mPatientModelService->isNull();
+}
+
+bool PatientModelServiceProxy::getDebugMode() const
+{
+	return mPatientModelService->getDebugMode();
+}
+
+void PatientModelServiceProxy::setDebugMode(bool on)
+{
+	mPatientModelService->setDebugMode(on);
 }
 
 } //cx

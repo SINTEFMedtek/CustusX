@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxMeshInfoWidget.h"
 
+#include <ctkPluginContext.h>
 #include <QVBoxLayout>
 #include "cxImage.h"
 #include "cxReporter.h"
@@ -52,10 +53,10 @@ namespace cx
 {
 
 
-MeshInfoWidget::MeshInfoWidget(QWidget* parent) :
+MeshInfoWidget::MeshInfoWidget(ctkPluginContext *pluginContext, QWidget* parent) :
 		InfoWidget(parent, "MeshInfoWidget", "Mesh Properties")//, mMeshPropertiesGroupBox(new QGroupBox(this))
 {
-	this->addWidgets();
+	this->addWidgets(pluginContext);
 	this->meshSelectedSlot();
 }
 
@@ -141,9 +142,9 @@ void MeshInfoWidget::hideEvent(QCloseEvent* event)
   QWidget::closeEvent(event);
 }
 
-void MeshInfoWidget::addWidgets()
+void MeshInfoWidget::addWidgets(ctkPluginContext *pluginContext)
 {
-	mSelectMeshWidget = SelectMeshStringDataAdapter::New();
+	mSelectMeshWidget = SelectMeshStringDataAdapter::New(pluginContext);
 	mSelectMeshWidget->setValueName("Surface: ");
 	connect(mSelectMeshWidget.get(), SIGNAL(changed()), this, SLOT(meshSelectedSlot()));
 

@@ -129,13 +129,15 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
+	ctkPluginContext *pluginContext = LogicManager::getInstance()->getPluginContext();
+
 	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
 	this->addAsDockWidget(new VideoConnectionWidget(this), "Utility");
 	this->addAsDockWidget(new EraserWidget(this), "Properties");
 	this->addAsDockWidget(new MetricWidget(this), "Utility");
-	this->addAsDockWidget(new SlicePropertiesWidget(this), "Properties");
-	this->addAsDockWidget(new VolumePropertiesWidget(this), "Properties");
-	this->addAsDockWidget(new MeshInfoWidget(this), "Properties");
+	this->addAsDockWidget(new SlicePropertiesWidget(pluginContext, this), "Properties");
+	this->addAsDockWidget(new VolumePropertiesWidget(pluginContext, this), "Properties");
+	this->addAsDockWidget(new MeshInfoWidget(pluginContext, this), "Properties");
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
 	this->addAsDockWidget(new ToolPropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new NavigationWidget(this), "Properties");

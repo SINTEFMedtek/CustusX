@@ -64,7 +64,7 @@ class RegisterI2IWidget : public RegistrationBaseWidget
   Q_OBJECT
 
 public:
-  RegisterI2IWidget(RegistrationManagerPtr regManager, QWidget* parent);
+	RegisterI2IWidget(ctkPluginContext *pluginContext, QWidget* parent);
   ~RegisterI2IWidget();
   virtual QString defaultWhatsThis() const;
 

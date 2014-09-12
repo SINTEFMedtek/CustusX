@@ -70,14 +70,8 @@ DataManagerImplPtr DataManagerImpl::create()
 {
 	DataManagerImplPtr retval;
 	retval.reset(new DataManagerImpl());
-//	retval->mSelf = retval;
 	return retval;
 }
-
-//void DataManagerImpl::initialize()
-//{
-//	setInstance(new DataManagerImpl());
-//}
 
 DataManagerImpl::DataManagerImpl() :
 	mDebugMode(false)
@@ -91,6 +85,7 @@ DataManagerImpl::DataManagerImpl() :
 
 DataManagerImpl::~DataManagerImpl()
 {
+	std::cout << "DataManagerImpl destr" << std::endl;
 }
 
 void DataManagerImpl::setSpaceProvider(SpaceProviderPtr spaceProvider)
@@ -763,7 +758,6 @@ RegistrationHistoryPtr DataManagerImpl::get_rMpr_History()
 	return m_rMpr_History;
 }
 
-
 PresetTransferFunctions3DPtr DataManagerImpl::getPresetTransferFunctions3D() const
 {
 	///< create from filename, create trivial document of type name and root node if no file exists.
@@ -790,8 +784,6 @@ void DataManagerImpl::setDebugMode(bool on)
 	mDebugMode = on;
 	emit debugModeChanged(mDebugMode);
 }
-
-
 
 } // namespace cx
 

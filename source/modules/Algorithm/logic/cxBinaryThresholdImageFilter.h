@@ -54,6 +54,7 @@ class BinaryThresholdImageFilter : public FilterImpl
 	Q_OBJECT
 
 public:
+	BinaryThresholdImageFilter(ctkPluginContext *pluginContext);
 	virtual ~BinaryThresholdImageFilter() {}
 
 	virtual QString getType() const;

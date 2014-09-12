@@ -30,7 +30,6 @@ SET( MOC_HEADER_FILES
     gui/cxSeansVesselRegistrationWidget.h
     gui/cxRegisterI2IWidget.h
     gui/cxRegistrationMethodsWidget.h
-    gui/cxRegistrationDataAdapters.h
     gui/cxElastixWidget.h
     gui/cxWirePhantomWidget.h
     gui/cxPatientOrientationWidget.h
@@ -44,7 +43,6 @@ SET( SOURCE_FILES
     ${MOC_HEADER_FILES}
    logic/cxRegistrationManager.h
    logic/cxRegistrationManager.cpp
-   logic/cxLandmarkTranslationRegistration.cpp
    logic/cxElastixManager.h
    logic/cxElastixManager.cpp
    logic/cxElastixExecuter.h
@@ -88,8 +86,6 @@ SET( SOURCE_FILES
     gui/cxRegisterI2IWidget.cpp
     gui/cxRegistrationMethodsWidget.h
     gui/cxRegistrationMethodsWidget.cpp
-    gui/cxRegistrationDataAdapters.h
-    gui/cxRegistrationDataAdapters.cpp
     gui/cxElastixWidget.h
     gui/cxElastixWidget.cpp
     gui/cxElastixSyntaxHighlighter.h

@@ -49,6 +49,7 @@ class SmoothingImageFilter : public FilterImpl
 	Q_OBJECT
 
 public:
+	SmoothingImageFilter(ctkPluginContext *pluginContext);
 	virtual ~SmoothingImageFilter() {}
 
 	virtual QString getType() const;

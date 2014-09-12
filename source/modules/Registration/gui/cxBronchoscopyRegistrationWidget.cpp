@@ -55,11 +55,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-	RegistrationBaseWidget(regManager, parent, "BronchoscopyRegistrationWidget",
+BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
+	RegistrationBaseWidget(pluginContext, parent, "BronchoscopyRegistrationWidget",
 						   "Bronchoscopy Registration"), mVerticalLayout(new QVBoxLayout(this))
 {
-	mSelectMeshWidget = SelectMeshStringDataAdapter::New();
+	mSelectMeshWidget = SelectMeshStringDataAdapter::New(pluginContext);
 	mSelectMeshWidget->setValueName("Centerline: ");
 
 	mRegisterButton = new QPushButton("Register");
@@ -136,7 +136,7 @@ void BronchoscopyRegistrationWidget::registerSlot()
     Transform3D new_rMpr = Transform3D(reg.runBronchoscopyRegistration(centerline,trackerRecordedData_prMt,old_rMpr,rMd));
 
     new_rMpr = new_rMpr*old_rMpr;//output
-	mManager->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
+		mRegistrationService->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
 
     Eigen::Matrix4d display_rMpr = Eigen::Matrix4d::Identity();
             display_rMpr = new_rMpr*display_rMpr;

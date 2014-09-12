@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestJenkinsMeasurement.h"
 #include "cxtestReconstructionAlgorithmFixture.h"
 #include "cxtestReconstructionManagerFixture.h"
+#include "cxLogicManager.h"
 
 #ifdef CX_USE_OPENCL_UTILITY
 #include "cxSimpleSyntheticVolume.h"
@@ -54,7 +55,10 @@ namespace cxtest
 #ifdef CX_USE_OPENCL_UTILITY
 TEST_CASE("ReconstructAlgorithm: VNNcl on sphere","[unit][VNNcl][usreconstruction][synthetic][not_win32][broken]")
 {
+	cx::LogicManager::initialize();
 	cx::Reporter::initialize();
+
+	ctkPluginContext* pluginContext = cx::logicManager()->getPluginContext();
 
 	ReconstructionAlgorithmFixture fixture;
 
@@ -62,7 +66,7 @@ TEST_CASE("ReconstructAlgorithm: VNNcl on sphere","[unit][VNNcl][usreconstructio
 	fixture.getInputGenerator()->setSpherePhantom();
 	QDomDocument domdoc;
 	QDomElement settings = domdoc.createElement("VNNcl");
-	cx::VNNclReconstructionServicePtr algorithm(new cx::VNNclReconstructionService);
+	cx::VNNclReconstructionServicePtr algorithm(new cx::VNNclReconstructionService(pluginContext));
 	algorithm->enableProfiling();
 
 	QString name = "DefaultVNNcl";
@@ -136,6 +140,7 @@ TEST_CASE("ReconstructAlgorithm: VNNcl on sphere","[unit][VNNcl][usreconstructio
 	//or else we could get seg fault because og a callbackk from opencl to Reporter after it is shut down
 	Utilities::sleep_sec(1);
 	cx::Reporter::shutdown();
+	cx::LogicManager::shutdown();
 }
 #endif//CX_USE_OPENCL_UTILITY
 

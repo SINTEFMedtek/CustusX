@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "cxFilter.h"
 #include <QDomElement>
+#include <ctkPluginContext.h>
 
 namespace cx
 {
@@ -72,7 +73,7 @@ public slots:
 	virtual void requestSetPresetSlot(QString name){};
 
 protected:
-	explicit FilterImpl();
+	explicit FilterImpl(ctkPluginContext *pluginContext);
 
 	/** Helper: Return the index'th input type as an image.
 	  * Return zero if not available (as image). */
@@ -96,6 +97,7 @@ protected:
 	std::vector<DataPtr> mCopiedInput;
 	QDomElement mCopiedOptions;
 	bool mActive;
+	ctkPluginContext *mPluginContext;
 
 private:
 	QString mUid;

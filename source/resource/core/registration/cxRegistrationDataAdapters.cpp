@@ -41,6 +41,7 @@ namespace cx
 
 
 RegistrationFixedImageStringDataAdapter::RegistrationFixedImageStringDataAdapter(ctkPluginContext *pluginContext) :
+	SelectDataStringDataAdapterBase(pluginContext),
 	mRegistrationService(new cx::RegistrationServiceProxy(pluginContext)),
 	mPatientModelService(new cx::PatientModelServiceProxy(pluginContext))
 {
@@ -70,6 +71,7 @@ QString RegistrationFixedImageStringDataAdapter::getValue() const
 //---------------------------------------------------------
 
 RegistrationMovingImageStringDataAdapter::RegistrationMovingImageStringDataAdapter(ctkPluginContext *pluginContext) :
+	SelectDataStringDataAdapterBase(pluginContext),
 	mRegistrationService(new cx::RegistrationServiceProxy(pluginContext)),
 	mPatientModelService(new cx::PatientModelServiceProxy(pluginContext))
 {

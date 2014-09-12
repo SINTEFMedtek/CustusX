@@ -38,11 +38,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleDataAdapterXml.h"
 #include "cxDoublePairDataAdapterXml.h"
 #include "cxStringDataAdapterXml.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
 
-FilterImpl::FilterImpl() : mActive(false)
+FilterImpl::FilterImpl(ctkPluginContext *pluginContext) :
+	mActive(false), mPluginContext(pluginContext)
 {
 }
 

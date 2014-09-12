@@ -5,12 +5,10 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 message(STATUS "===================================== parsing example")
 
 include_directories(
+    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
+    ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
     ${CustusX_SOURCE_DIR}/source/logic
-    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
-    ${CustusX_SOURCE_DIR}/source/resource/core/registration
-    ${CustusX_SOURCE_DIR}/source/resource/core/utilities
-    ${CustusX_SOURCE_DIR}/source/resource/core/logger
 )
 
 set(PLUGIN_SRCS
@@ -41,6 +39,7 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}   
     cxGUIExtenderService
     cxLogicManager
+    cxResourceWidgets
     )
 
 ctkMacroBuildPlugin(

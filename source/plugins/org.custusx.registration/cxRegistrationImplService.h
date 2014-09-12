@@ -34,14 +34,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXREGISTRATIONIMPLSERVICE_H_
 
 #include "cxRegistrationService.h"
+#include <vector>
 #include "org_custusx_registration_Export.h"
 #include "qdatetime.h"
+#include "cxLandmark.h"
+#include "vtkForwardDeclarations.h"
 class ctkPluginContext;
 
 namespace cx
 {
 class RegistrationTransform;
 class PatientModelService;
+typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 
 /**
  * Implementation of Registration service.
@@ -64,8 +68,13 @@ public:
 	virtual DataPtr getMovingData();
 	virtual DataPtr getFixedData();
 
+	virtual void doPatientRegistration();
+	virtual void doFastRegistration_Translation();
+	virtual void doFastRegistration_Orientation(const Transform3D& tMtm, const Transform3D &prMt);
+	virtual void doImageRegistration(bool translationOnly);
 	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
 	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description);
+	virtual void applyPatientOrientation(const Transform3D &tMtm, const Transform3D &prMt);
 
 	virtual QDateTime getLastRegistrationTime();
 	virtual void setLastRegistrationTime(QDateTime time);
@@ -73,15 +82,22 @@ public:
 	virtual bool isNull();
 
 private:
+	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data);
+//	PatientModelService* getPatientModelService();
+	void writePreLandmarkRegistration(QString name, LandmarkMap landmarks);
+	vtkPointsPtr convertTovtkPoints(const std::vector<QString> &uids, const LandmarkMap &data, Transform3D M);
+	std::vector<QString> getUsableLandmarks(const LandmarkMap &data_a, const LandmarkMap &data_b);
+	Transform3D performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool *ok) const;
+	std::vector<Vector3D> convertAndTransformToPoints(const std::vector<QString> &uids, const LandmarkMap &data, Transform3D M);
+	std::vector<Vector3D> convertVtkPointsToPoints(vtkPointsPtr base);
+
 	DataPtr mFixedData; ///< the data that shouldn't update its matrices during a registrations
 	DataPtr mMovingData; ///< the data that should update its matrices during a registration
 
 	QDateTime mLastRegistrationTime; ///< last timestamp for registration during this session. All registrations in one session results in only one reg transform.
 
 	ctkPluginContext* mContext;
-
-	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data);
-	PatientModelService* getPatientModelService();
+	PatientModelServicePtr mPatientModelService;
 };
 
 typedef boost::shared_ptr<RegistrationImplService> RegistrationImplServicePtr;

@@ -60,6 +60,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	dataAdapters/cxVector3DComponentDataAdapter
 	dataAdapters/cxDoublePairDataAdapter.h
 	dataAdapters/cxDoublePairDataAdapterXml
+	dataAdapters/cxSelectDataStringDataAdapterBase
 
 	logger/cxReporter
 	logger/cxMessageListener
@@ -83,6 +84,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
         registration/cxRegistrationMethodService.h
         registration/cxRegistrationServiceNull
         registration/cxRegistrationServiceProxy
+        registration/cxRegistrationDataAdapters
 
 	patientModel/cxPatientModelService
 	patientModel/cxPatientModelServiceNull
@@ -248,7 +250,6 @@ add_subdirectory(settings)
 unset(CX_RESOURCE_INCLUDE_DIRECTORIES)
 
 set(CX_RESOURCE_INCLUDE_DIRECTORIES
-    ${CustusX_SOURCE_DIR}/source/resource/core
     ${CustusX_SOURCE_DIR}/source/resource/core/logger
     ${CustusX_SOURCE_DIR}/source/resource/core/Math
     ${CustusX_SOURCE_DIR}/source/resource/core/Data
@@ -260,6 +261,7 @@ set(CX_RESOURCE_INCLUDE_DIRECTORIES
     ${CustusX_SOURCE_DIR}/source/resource/core/utilities
     ${CustusX_SOURCE_DIR}/source/resource/core/registration
     ${CustusX_SOURCE_DIR}/source/resource/core/patientModel
+    ${CustusX_SOURCE_DIR}/source/resource/core
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     ${CustusX_SOURCE_DIR}/source/ThirdParty
     ${CustusX_SOURCE_DIR}/source/ThirdParty/iir1

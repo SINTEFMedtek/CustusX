@@ -57,7 +57,7 @@ class FusedInputOutputSelectDataStringDataAdapter : public SelectDataStringDataA
 	Q_OBJECT
 public:
 	virtual ~FusedInputOutputSelectDataStringDataAdapter() {}
-	static FusedInputOutputSelectDataStringDataAdapterPtr create(SelectDataStringDataAdapterBasePtr base, SelectDataStringDataAdapterBasePtr input);
+	static FusedInputOutputSelectDataStringDataAdapterPtr create(ctkPluginContext *pluginContext, SelectDataStringDataAdapterBasePtr base, SelectDataStringDataAdapterBasePtr input);
 
 public: // basic methods
 	virtual QString getDisplayName() const;
@@ -79,7 +79,7 @@ protected slots:
 	void changedSlot();
 
 protected:
-	FusedInputOutputSelectDataStringDataAdapter(SelectDataStringDataAdapterBasePtr base, SelectDataStringDataAdapterBasePtr input);
+	FusedInputOutputSelectDataStringDataAdapter(ctkPluginContext *pluginContext, SelectDataStringDataAdapterBasePtr base, SelectDataStringDataAdapterBasePtr input);
 	SelectDataStringDataAdapterBasePtr mInput;
 	SelectDataStringDataAdapterBasePtr mBase;
 	QString mValueName;
@@ -98,7 +98,7 @@ class Pipeline : public QObject
 {
 	Q_OBJECT
 public:
-	explicit Pipeline(QObject *parent = 0);
+	explicit Pipeline(ctkPluginContext *pluginContext, QObject *parent = 0);
 	/**
 	  * Initialize pipeline. Do once before use.
 	  */
@@ -160,6 +160,7 @@ private:
 	std::vector<SelectDataStringDataAdapterBasePtr> mNodes;
 	std::map<QString, TimedAlgorithmPtr> mTimedAlgorithm;
 	CompositeTimedAlgorithmPtr mCompositeTimedAlgorithm;
+	ctkPluginContext *mPluginContext;
 };
 typedef boost::shared_ptr<Pipeline> PipelinePtr;
 

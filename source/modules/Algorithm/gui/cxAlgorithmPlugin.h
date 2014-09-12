@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXALGORITHMPLUGIN_H_
 
 #include "cxGUIExtenderService.h"
+class ctkPluginContext;
 
 namespace cx
 {
@@ -62,10 +63,12 @@ class AlgorithmPlugin : public GUIExtenderService
 {
 	Q_OBJECT
 public:
-	AlgorithmPlugin();
+	AlgorithmPlugin(ctkPluginContext *pluginContext);
 	virtual ~AlgorithmPlugin();
 
 	virtual std::vector<CategorizedWidget> createWidgets() const;
+private:
+	ctkPluginContext *mPluginContext;
 };
 typedef boost::shared_ptr<class AlgorithmPlugin> AlgorithmPluginPtr;
 

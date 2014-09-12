@@ -94,6 +94,26 @@ DataPtr RegistrationServiceProxy::getFixedData()
 	return mRegistrationService->getFixedData();
 }
 
+void RegistrationServiceProxy::doPatientRegistration()
+{
+	return mRegistrationService->doPatientRegistration();
+}
+
+void RegistrationServiceProxy::doFastRegistration_Translation()
+{
+	return mRegistrationService->doFastRegistration_Translation();
+}
+
+void RegistrationServiceProxy::doFastRegistration_Orientation(const Transform3D &tMtm, const Transform3D &prMt)
+{
+	return mRegistrationService->doFastRegistration_Orientation(tMtm, prMt);
+}
+
+void RegistrationServiceProxy::doImageRegistration(bool translationOnly)
+{
+	return mRegistrationService->doImageRegistration(translationOnly);
+}
+
 void RegistrationServiceProxy::applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
 {
 	mRegistrationService->applyImage2ImageRegistration(delta_pre_rMd, description);
@@ -102,6 +122,11 @@ void RegistrationServiceProxy::applyImage2ImageRegistration(Transform3D delta_pr
 void RegistrationServiceProxy::applyPatientRegistration(Transform3D rMpr_new, QString description)
 {
 	mRegistrationService->applyPatientRegistration( rMpr_new, description);
+}
+
+void RegistrationServiceProxy::applyPatientOrientation(const Transform3D &tMtm, const Transform3D &prMt)
+{
+	mRegistrationService->applyPatientOrientation(tMtm, prMt);
 }
 
 QDateTime RegistrationServiceProxy::getLastRegistrationTime()

@@ -46,7 +46,7 @@ class QTextEdit;
 
 namespace cx
 {
-
+typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 
 /**
  * \brief Probe accuracy measurements using the Wire Phantom.
@@ -61,7 +61,7 @@ class WirePhantomWidget: public RegistrationBaseWidget
 Q_OBJECT
 
 public:
-	WirePhantomWidget(RegistrationManagerPtr regManager, QWidget* parent);
+	WirePhantomWidget(ctkPluginContext *pluginContext, AcquisitionDataPtr aquisitionData, QWidget* parent);
 	virtual ~WirePhantomWidget();
 	virtual QString defaultWhatsThis() const;
 
@@ -86,6 +86,7 @@ private:
 	QPushButton* mCalibrationButton;
 	QTextEdit* mResults;
 	Transform3D mLastRegistration;
+	AcquisitionDataPtr mAquisitionData;
 
 };
 

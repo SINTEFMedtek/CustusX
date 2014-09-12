@@ -85,17 +85,19 @@ VideoConnectionManager::VideoConnectionManager(VideoServiceBackendPtr backend)
 
 VideoConnectionManager::~VideoConnectionManager()
 {
+//	std::cout << "VideoConnectionManager destructor" << std::endl;
+	mServiceListener.reset();//needed?
 	mVideoConnection->disconnectServer();
 }
 
 void VideoConnectionManager::onServiceAdded(StreamerService* service)
 {
-//	std::cout << "VideoConnectionManager:: Service added!!!" << std::endl;
+//	std::cout << "VideoConnectionManager:: Service added!!! " << service->getName() << std::endl;
 }
 
 void VideoConnectionManager::onServiceRemoved(StreamerService *service)
 {
-//	std::cout << "VideoConnectionManager::Service removed!!!" << std::endl;
+//	std::cout << "VideoConnectionManager::Service removed!!! " << service->getName() << std::endl;
 	this->disconnectServer();//Disconnect to be safe. Can be improved by only disconneting if the removed service is running
 }
 

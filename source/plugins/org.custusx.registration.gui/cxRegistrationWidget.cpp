@@ -40,12 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
+#include "cxRegistrationDataAdapters.h"
+#include "cxLabeledComboBoxWidget.h"
 
 namespace cx
 {
 
-RegistrationWidget::RegistrationWidget(ctkPluginContext *context, QWidget* parent) :
-	mPluginContext(context),
+RegistrationWidget::RegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
+	mPluginContext(pluginContext),
 	QTabWidget(parent),
 	mVerticalLayout(new QVBoxLayout(this))
 {
@@ -66,6 +68,7 @@ RegistrationWidget::~RegistrationWidget()
 void RegistrationWidget::initRegistrationTypesWidgets()
 {
 	mRegistrationTypes << "ImageToImage" << "ImageToPatient" << "ImageTransform";
+	std::vector<QVBoxLayout*> layouts (3);
 	for(int i = 0; i < mRegistrationTypes.count(); ++i)
 	{
 		QWidget *widget = new QWidget(this);
@@ -76,12 +79,25 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 		mMethodsSelectorMap[mRegistrationTypes[i]] = methodSelector;
 
 		QVBoxLayout *layout = new QVBoxLayout(widget);
+		layouts[i] = layout;
 
 		layout->addWidget(methodSelector);
 		layout->addWidget(registrationTypeWidget);
 		mVerticalLayout->addWidget(widget);
 		this->addTab(widget, mRegistrationTypes[i]);
 	}
+
+
+	StringDataAdapterPtr fixedImage(new RegistrationFixedImageStringDataAdapter(mPluginContext));
+	StringDataAdapterPtr movingImage(new RegistrationMovingImageStringDataAdapter(mPluginContext));
+	LabeledComboBoxWidget* fixedImageCombo = new LabeledComboBoxWidget(this, fixedImage);
+	LabeledComboBoxWidget* movingImageCombo = new LabeledComboBoxWidget(this, movingImage);
+
+	layouts[0]->insertWidget(1, fixedImageCombo);
+	layouts[0]->insertWidget(2, movingImageCombo);
+	movingImageCombo = new LabeledComboBoxWidget(this, movingImage);
+	layouts[1]->insertWidget(1, movingImageCombo);
+//	layouts[2]->insertWidget(1, movingImageCombo);
 }
 
 void RegistrationWidget::initServiceListener()

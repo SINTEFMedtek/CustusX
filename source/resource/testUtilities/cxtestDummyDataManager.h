@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxForwardDeclarations.h"
 #include <QStringList>
+class ctkPluginContext;
 
 namespace cxtest
 {

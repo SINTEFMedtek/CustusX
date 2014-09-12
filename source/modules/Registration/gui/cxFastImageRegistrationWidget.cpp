@@ -39,8 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-FastImageRegistrationWidget::FastImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle) :
-    LandmarkImageRegistrationWidget(regManager, parent, objectName, windowTitle)
+FastImageRegistrationWidget::FastImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName, QString windowTitle) :
+		LandmarkImageRegistrationWidget(pluginContext, parent, objectName, windowTitle)
 {
 }
 
@@ -61,15 +61,15 @@ QString FastImageRegistrationWidget::defaultWhatsThis() const
 void FastImageRegistrationWidget::performRegistration()
 {
   //make sure the masterImage is set
-  DataPtr fixedData = mManager->getFixedData();
+	DataPtr fixedData = mRegistrationService->getFixedData();
   if(!fixedData)
-    mManager->setFixedData(dataManager()->getActiveImage());
+		mRegistrationService->setFixedData(dataManager()->getActiveImage());
 
   this->updateAvarageAccuracyLabel();
 }
 //------------------------------------------------------------------------------
-PlateImageRegistrationWidget::PlateImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-    FastImageRegistrationWidget(regManager, parent, "PlateImageRegistrationWidget", "Plate Image Registration")
+PlateImageRegistrationWidget::PlateImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
+		FastImageRegistrationWidget(pluginContext, parent, "PlateImageRegistrationWidget", "Plate Image Registration")
 {
 }
 
@@ -94,7 +94,7 @@ void PlateImageRegistrationWidget::editLandmarkButtonClickedSlot()
 void PlateImageRegistrationWidget::performRegistration()
 {
   FastImageRegistrationWidget::performRegistration();
-  mManager->doFastRegistration_Translation();
+	mRegistrationService->doFastRegistration_Translation();
 }
 //------------------------------------------------------------------------------
 

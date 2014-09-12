@@ -41,16 +41,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStringDataAdapterXml.h"
 #include "cxDoubleDataAdapterXml.h"
 #include "cxVNNclAlgorithm.h"
+class ctkPluginContext;
 
 
 namespace cx
 {
 /**
- *  Original author Tord ¯ygard
+ *  Original author Tord Ã˜ygard
  */
 
 /**
- * Implementation of Tord ¯ygards reconstruction service.
+ * Implementation of Tord Ã˜ygards reconstruction service.
  *
  * \ingroup org_custusx_vnnclreconstruction
  *
@@ -61,7 +62,7 @@ class org_custusx_vnnclreconstruction_EXPORT VNNclReconstructionService : public
 {
 	Q_INTERFACES(cx::ReconstructionService)
 public:
-    VNNclReconstructionService();
+		VNNclReconstructionService(ctkPluginContext* context);
 	virtual ~VNNclReconstructionService();
 
     /**

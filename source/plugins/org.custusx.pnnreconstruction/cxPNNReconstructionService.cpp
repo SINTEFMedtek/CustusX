@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-PNNReconstructionService::PNNReconstructionService()
+PNNReconstructionService::PNNReconstructionService(ctkPluginContext* context)
 {
 }
 

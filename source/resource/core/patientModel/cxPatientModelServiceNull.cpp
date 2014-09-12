@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include "cxData.h"
 #include "cxReporter.h"
+#include "cxLandmark.h"
 
 namespace cx
 {
@@ -62,6 +63,22 @@ DataPtr PatientModelServiceNull::getData(const QString& uid) const
 	return DataPtr();
 }
 
+LandmarksPtr PatientModelServiceNull::getPatientLandmarks() const
+{
+	return boost::shared_ptr<Landmarks>();
+}
+
+
+std::map<QString, LandmarkProperty> PatientModelServiceNull::getLandmarkProperties() const
+{
+	return std::map<QString, LandmarkProperty>();
+}
+
+Transform3D PatientModelServiceNull::get_rMpr() const
+{
+	return Transform3D();
+}
+
 void PatientModelServiceNull::autoSave()
 {
 	printWarning();
@@ -70,6 +87,16 @@ void PatientModelServiceNull::autoSave()
 bool PatientModelServiceNull::isNull()
 {
 	return true;
+}
+
+bool PatientModelServiceNull::getDebugMode() const
+{
+	return false;
+}
+
+void PatientModelServiceNull::setDebugMode(bool on)
+{
+	printWarning();
 }
 
 void PatientModelServiceNull::printWarning()

@@ -143,10 +143,11 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 {
 	init();
 	QWidget* testParent = new QWidget();
+	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
 
 	testAndDeleteBaseWidgetChild(new cx::ActiveToolWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::ActiveVolumeWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::ClippingWidget(testParent));
+	testAndDeleteBaseWidgetChild(new cx::ActiveVolumeWidget(pluginContext, testParent));
+	testAndDeleteBaseWidgetChild(new cx::ClippingWidget(pluginContext, testParent));
 	testAndDeleteBaseWidgetChild(new cx::ColorWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::CroppingWidget(testParent));
 //	testAndDeleteBaseWidgetChild(new cx::DataSelectWidget(testParent));//special case: Needs a SelectDataStringDataAdapterBasePtr moc object
@@ -198,18 +199,20 @@ TEST_CASE("FileWatcherWidgets are correctly constructed", "[unit][gui][widget][n
 TEST_CASE("TabbedWidgets are correctly constructed", "[unit][gui][widget][not_win32]")
 {
 	init();
+	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
 	//cxTabbedWidgets
-	testAndDeleteBaseWidgetChild(new cx::SlicePropertiesWidget(NULL));
-	testAndDeleteBaseWidgetChild(new cx::VolumePropertiesWidget(NULL));
+	testAndDeleteBaseWidgetChild(new cx::SlicePropertiesWidget(pluginContext, NULL));
+	testAndDeleteBaseWidgetChild(new cx::VolumePropertiesWidget(pluginContext, NULL));
 	shutdown();
 }
 
 TEST_CASE("InfoWidgets are correctly constructed", "[unit][gui][widget][not_win32]")
 {
 	init();
+	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
 	//cxInfoWidgets
 	testAndDeleteBaseWidgetChild(new cx::VolumeInfoWidget(NULL));
-	testAndDeleteBaseWidgetChild(new cx::MeshInfoWidget(NULL));
+	testAndDeleteBaseWidgetChild(new cx::MeshInfoWidget(pluginContext, NULL));
 	shutdown();
 }
 

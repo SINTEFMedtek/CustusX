@@ -33,96 +33,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectDataStringDataAdapter.h"
 
 #include "cxImage.h"
-#include "cxImageAlgorithms.h"
 #include "cxMesh.h"
 #include "cxDataManager.h"
 #include "cxTypeConversions.h"
+#include "cxPatientModelServiceProxy.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
 
-SelectDataStringDataAdapterBase::SelectDataStringDataAdapterBase(QString typeRegexp) :
-	mTypeRegexp(typeRegexp)
-{
-	mValueName = "Select data";
-	mHelp = mValueName;
-	connect(dataManager(), SIGNAL(dataAddedOrRemoved()),   this, SIGNAL(changed()));
-}
-
-/**
-  * Erase all data with type not conforming to input regexp.
-  */
-std::map<QString, DataPtr> SelectDataStringDataAdapterBase::filterOnType(std::map<QString, DataPtr> input, QString regexp) const
-{
-	QRegExp reg(regexp);
-
-	std::map<QString, DataPtr>::iterator iter, current;
-
-	for (iter=input.begin(); iter!=input.end(); )
-	{
-		current = iter++; // increment iterator before erasing!
-		if (!current->second->getType().contains(reg))
-			input.erase(current);
-	}
-
-	return input;
-}
-
-QStringList SelectDataStringDataAdapterBase::getValueRange() const
-{
-  std::map<QString, DataPtr> data = dataManager()->getData();
-  data = this->filterOnType(data, mTypeRegexp);
-  std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(data);
-  QStringList retval;
-  retval << "";
-  for (unsigned i=0; i<sorted.size(); ++i)
-	retval << sorted[i]->getUid();
-  return retval;
-}
-
-QString SelectDataStringDataAdapterBase::convertInternal2Display(QString internal)
-{
-  DataPtr data = dataManager()->getData(internal);
-  if (!data)
-	return "<no data>";
-  return qstring_cast(data->getName());
-}
-
-QString SelectDataStringDataAdapterBase::getHelp() const
-{
-  return mHelp;
-}
-
-QString SelectDataStringDataAdapterBase::getDisplayName() const
-{
-  return mValueName;
-}
-
-void SelectDataStringDataAdapterBase::setHelp(QString text)
-{
-	mHelp = text;
-	emit changed();
-}
-void SelectDataStringDataAdapterBase::setValueName(QString val)
-{
-  mValueName = val;
-  emit changed();
-}
-
-DataPtr SelectDataStringDataAdapterBase::getData() const
-{
-	return dataManager()->getData(this->getValue());
-}
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-ActiveImageStringDataAdapter::ActiveImageStringDataAdapter() : SelectDataStringDataAdapterBase("image")
+ActiveImageStringDataAdapter::ActiveImageStringDataAdapter(ctkPluginContext *pluginContext) :
+	SelectDataStringDataAdapterBase(pluginContext, "image")
 {
   mValueName = "Active Volume";
   mHelp = "Select the active volume";
-  connect(dataManager(), SIGNAL(activeImageChanged(QString)),      this, SIGNAL(changed()));
+	connect(mPatientModelService.get(), SIGNAL(activeImageChanged(QString)), this, SIGNAL(changed()));
 }
 
 bool ActiveImageStringDataAdapter::setValue(const QString& value)
@@ -145,7 +70,8 @@ QString ActiveImageStringDataAdapter::getValue() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-SelectImageStringDataAdapter::SelectImageStringDataAdapter() : SelectDataStringDataAdapterBase("image")
+SelectImageStringDataAdapter::SelectImageStringDataAdapter(ctkPluginContext *pluginContext) :
+	SelectDataStringDataAdapterBase(pluginContext, "image")
 {
 	mValueName = "Select volume";
 	mHelp = "Select a volume";
@@ -176,7 +102,8 @@ ImagePtr SelectImageStringDataAdapter::getImage()
 //---------------------------------------------------------
 
 
-SelectDataStringDataAdapter::SelectDataStringDataAdapter() : SelectDataStringDataAdapterBase(".*")
+SelectDataStringDataAdapter::SelectDataStringDataAdapter(ctkPluginContext *pluginContext) :
+	SelectDataStringDataAdapterBase(pluginContext, ".*")
 {
 }
 
@@ -212,8 +139,8 @@ DataPtr SelectDataStringDataAdapter::getData() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-SelectMeshStringDataAdapter::SelectMeshStringDataAdapter() :
-	SelectDataStringDataAdapterBase("mesh")
+SelectMeshStringDataAdapter::SelectMeshStringDataAdapter(ctkPluginContext *pluginContext) :
+	SelectDataStringDataAdapterBase(pluginContext, "mesh")
 {
 	mValueName = "Select mesh";
 	mHelp = "Select a mesh";

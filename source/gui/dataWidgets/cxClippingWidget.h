@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "cxViewManager.h"
 //#include "cxDataInterface.h"
 class QCheckBox;
+class ctkPluginContext;
 
 namespace cx
 {
@@ -91,7 +92,7 @@ class ClippingWidget: public BaseWidget
 Q_OBJECT
 
 public:
-	ClippingWidget(QWidget* parent);
+	ClippingWidget(ctkPluginContext *pluginContext, QWidget* parent);
 	virtual QString defaultWhatsThis() const;
 
 private:

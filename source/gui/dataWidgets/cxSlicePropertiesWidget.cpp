@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxSlicePropertiesWidget.h"
 
+#include <ctkPluginContext.h>
 #include "cxDataInterface.h"
 #include "cxVolumeInfoWidget.h"
 #include "cxSelectDataStringDataAdapter.h"
@@ -43,10 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SlicePropertiesWidget::SlicePropertiesWidget(QWidget* parent) :
+SlicePropertiesWidget::SlicePropertiesWidget(ctkPluginContext *pluginContext, QWidget* parent) :
 		TabbedWidget(parent, "SlicePropertiesWidget", "Slice Properties")
 {
-  this->insertWidgetAtTop(new DataSelectWidget(this, ActiveImageStringDataAdapter::New()));
+	this->insertWidgetAtTop(new DataSelectWidget(this, ActiveImageStringDataAdapter::New(pluginContext)));
   this->addTab(new VolumeInfoWidget(this), "Info");
   this->addTab(new ColorWidget(this), "Color");
   this->addTab(new OverlayWidget(this), "Overlay");

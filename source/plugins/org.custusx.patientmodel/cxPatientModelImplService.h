@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPatientModelService.h"
 #include "org_custusx_patientmodel_Export.h"
+class ctkPluginContext;
 
 namespace cx
 {
@@ -51,17 +52,25 @@ class org_custusx_patientmodel_EXPORT PatientModelImplService : public PatientMo
 {
 	Q_INTERFACES(cx::PatientModelService)
 public:
-	PatientModelImplService();
+	PatientModelImplService(ctkPluginContext* context);
 	virtual ~PatientModelImplService();
 
 	virtual void insertData(DataPtr data);
 	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform);
 	virtual std::map<QString, DataPtr> getData() const;
 	virtual DataPtr getData(const QString& uid) const;
-	virtual void autoSave();
+	virtual LandmarksPtr getPatientLandmarks() const;
+	virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const;
+	virtual Transform3D get_rMpr() const; ///< get the patient registration transform
 
+	virtual void autoSave();
 	virtual bool isNull();
 
+	virtual bool getDebugMode() const;
+	virtual void setDebugMode(bool on);
+
+private:
+	ctkPluginContext *mContext;
 };
 typedef boost::shared_ptr<PatientModelImplService> PatientModelImplServicePtr;
 

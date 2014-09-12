@@ -33,11 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXREGISTRATIONBASEWIDGET_H_
 
 #include "cxBaseWidget.h"
+#include <ctkPluginContext.h>
 #include "boost/shared_ptr.hpp"
+#include "cxRegistrationServiceProxy.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
 
 /**
  * \file
@@ -49,12 +50,11 @@ class RegistrationBaseWidget : public BaseWidget
 {
 //  Q_OBJECT
 public:
-	RegistrationBaseWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle);
+	RegistrationBaseWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName, QString windowTitle);
   virtual ~RegistrationBaseWidget() {}
 
 protected:
-  // manager
-  RegistrationManagerPtr mManager;
+	RegistrationServicePtr mRegistrationService;
 };
 
 /**

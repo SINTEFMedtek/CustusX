@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <map>
 #include "boost/shared_ptr.hpp"
+#include "cxTransform3D.h"
 class QDateTime;
 
 namespace cx
@@ -48,7 +49,9 @@ typedef boost::shared_ptr<class Data> DataPtr;
 namespace cx
 {
 class RegistrationTransform;
+class LandmarkProperty;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 
 /** \brief The virtual patient
  *
@@ -79,10 +82,21 @@ public:
 	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform) = 0;
 	virtual std::map<QString, DataPtr> getData() const = 0;
 	virtual DataPtr getData(const QString& uid) const = 0;
+	virtual LandmarksPtr getPatientLandmarks() const = 0;
+	virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const = 0;
+	virtual Transform3D get_rMpr() const = 0;
 	virtual void autoSave() = 0;//TODO remove, and integrate into other functions
 
 	virtual bool isNull() = 0;
 	static PatientModelServicePtr getNullObject();
+
+	virtual bool getDebugMode() const = 0;
+	virtual void setDebugMode(bool on) = 0;
+
+signals:
+	void dataAddedOrRemoved();
+	void activeImageChanged(const QString& uId);
+	void debugModeChanged(bool on);
 };
 
 } // namespace cx

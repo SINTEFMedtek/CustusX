@@ -43,11 +43,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxDataReaderWriter.h"
 #include "cxDataManager.h"
+#include "cxRegistrationServiceProxy.h"
 
 namespace cx
 {
 
-ElastixManager::ElastixManager(RegistrationManagerPtr regManager) : mRegistrationManager(regManager)
+ElastixManager::ElastixManager(ctkPluginContext *pluginContext) :
+	mRegistrationService(new RegistrationServiceProxy(pluginContext))
 {
 	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("elastix");
 
@@ -89,8 +91,8 @@ void ElastixManager::preprocessExecuter()
 
 	mExecuter->setDisplayProcessMessages(mDisplayProcessMessages->getValue());
 	mExecuter->setInput(mParameters->getActiveExecutable(),
-	         mRegistrationManager->getFixedData(),
-	         mRegistrationManager->getMovingData(),
+					 mRegistrationService->getFixedData(),
+					 mRegistrationService->getMovingData(),
 	         outDir.absolutePath(),
 	         parameterFiles);
 }
@@ -118,15 +120,15 @@ void ElastixManager::executionFinishedSlot()
 	// as the input to regmanager applyImage2ImageRegistration()
 
 	Transform3D delta_pre_rMd =
-		mRegistrationManager->getFixedData()->get_rMd()
+		mRegistrationService->getFixedData()->get_rMd()
 		* mMf.inv()
-		* mRegistrationManager->getMovingData()->get_rMd().inv();
+		* mRegistrationService->getMovingData()->get_rMd().inv();
 
 	std::cout << "ElastixManager::executionFinishedSlot(), delta_pre_rMd: \n" << delta_pre_rMd << std::endl;
-	std::cout << "ElastixManager::executionFinishedSlot(), expected new rMdm: \n" << mRegistrationManager->getFixedData()->get_rMd() * mMf.inv() << std::endl;
+	std::cout << "ElastixManager::executionFinishedSlot(), expected new rMdm: \n" << mRegistrationService->getFixedData()->get_rMd() * mMf.inv() << std::endl;
 
-//	mRegistrationManager->applyImage2ImageRegistration(mMf.inv(), desc);
-	mRegistrationManager->applyImage2ImageRegistration(delta_pre_rMd, desc);
+//	mRegistrationService->applyImage2ImageRegistration(mMf.inv(), desc);
+	mRegistrationService->applyImage2ImageRegistration(delta_pre_rMd, desc);
 
 	// add nonlinear data AFTER registering - we dont want these data to be double-registered!
 	this->addNonlinearData();
@@ -144,7 +146,7 @@ void ElastixManager::addNonlinearData()
 	if (!ok)
 		return;
 
-	ImagePtr movingImage = boost::dynamic_pointer_cast<Image>(mRegistrationManager->getMovingData());
+	ImagePtr movingImage = boost::dynamic_pointer_cast<Image>(mRegistrationService->getMovingData());
 	ImagePtr raw = boost::dynamic_pointer_cast<Image>(MetaImageReader().load(nonlinearVolumeFilename, nonlinearVolumeFilename));
 
 	QString uid = movingImage->getUid() + "_nl%1";
@@ -158,7 +160,7 @@ void ElastixManager::addNonlinearData()
 	}
 
 	// volume is resampled into the space of the fixed data:
-	nlVolume->get_rMd_History()->setRegistration(mRegistrationManager->getFixedData()->get_rMd());
+	nlVolume->get_rMd_History()->setRegistration(mRegistrationService->getFixedData()->get_rMd());
 
 	dataManager()->loadData(nlVolume);
 	dataManager()->saveImage(nlVolume, patientService()->getPatientData()->getActivePatientFolder());

@@ -56,7 +56,7 @@ class RegistrationWidget : public QTabWidget
 {
 	Q_OBJECT
 public:
-	RegistrationWidget(ctkPluginContext *context, QWidget* parent = 0);
+	RegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent = 0);
 	virtual ~RegistrationWidget();
 
 private:

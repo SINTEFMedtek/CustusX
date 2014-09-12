@@ -48,9 +48,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPatientService.h"
 #include "cxPatientData.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
+
+SmoothingImageFilter::SmoothingImageFilter(ctkPluginContext *pluginContext) :
+	FilterImpl(pluginContext)
+{
+}
 
 QString SmoothingImageFilter::getName() const
 {
@@ -89,7 +95,7 @@ void SmoothingImageFilter::createInputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New();
+	temp = SelectImageStringDataAdapter::New(mPluginContext);
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for smoothing");
 	mInputTypes.push_back(temp);
@@ -99,7 +105,7 @@ void SmoothingImageFilter::createOutputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New();
+	temp = SelectDataStringDataAdapter::New(mPluginContext);
 	temp->setValueName("Output");
 	temp->setHelp("Output smoothed image");
 	mOutputTypes.push_back(temp);

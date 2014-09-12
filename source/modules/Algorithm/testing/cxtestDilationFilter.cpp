@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "catch.hpp"
+#include <ctkPluginContext.h>
 #include "cxDilationFilter.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
@@ -38,11 +39,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxData.h"
 #include "cxImage.h"
+#include "cxLegacySingletons.h"
+#include "cxLogicManager.h"
 
 TEST_CASE("DilationFilter: execute", "[modules][Algorithm][DilationFilter]")
 {
-    // Setup filter
-	cx::DilationFilterPtr filter = cx::DilationFilterPtr(new cx::DilationFilter());
+	cx::LogicManager::initialize();
+	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
+
+	// Setup filter
+	cx::DilationFilterPtr filter = cx::DilationFilterPtr(new cx::DilationFilter(pluginContext));
 	REQUIRE(filter);
 	filter->getInputTypes();
 	filter->getOutputTypes();
@@ -96,4 +102,6 @@ TEST_CASE("DilationFilter: execute", "[modules][Algorithm][DilationFilter]")
 		INFO("Surface/contour not generated.");
 		REQUIRE(output[1]->getData());
 	}
+
+	cx::LogicManager::shutdown();
 }

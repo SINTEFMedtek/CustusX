@@ -50,6 +50,7 @@ class BinaryThinningImageFilter3DFilter : public FilterImpl
 	Q_OBJECT
 
 public:
+	BinaryThinningImageFilter3DFilter(ctkPluginContext *pluginContext);
 	virtual ~BinaryThinningImageFilter3DFilter() {}
 
 	virtual QString getType() const;

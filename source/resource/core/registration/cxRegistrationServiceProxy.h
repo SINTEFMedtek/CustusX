@@ -69,8 +69,14 @@ public:
 	virtual void setFixedData(DataPtr data);
 	virtual DataPtr getMovingData();
 	virtual DataPtr getFixedData();
+	virtual void doPatientRegistration();
+	virtual void doFastRegistration_Translation();
+	virtual void doFastRegistration_Orientation(const Transform3D& tMtm, const Transform3D &prMt);
+	virtual void doImageRegistration(bool translationOnly);
 	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
 	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description);
+	virtual void applyPatientOrientation(const Transform3D &tMtm, const Transform3D &prMt);
+
 	virtual QDateTime getLastRegistrationTime();
 	virtual void setLastRegistrationTime(QDateTime time);
 	virtual bool isNull();

@@ -45,9 +45,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientData.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxAlgorithmHelpers.h"
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
+BinaryThinningImageFilter3DFilter::BinaryThinningImageFilter3DFilter(ctkPluginContext *pluginContext) :
+	FilterImpl(pluginContext)
+{
+}
 
 QString BinaryThinningImageFilter3DFilter::getName() const
 {
@@ -104,7 +109,7 @@ void BinaryThinningImageFilter3DFilter::createInputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New();
+	temp = SelectImageStringDataAdapter::New(mPluginContext);
 	temp->setValueName("Input");
 	temp->setHelp("Select binary volume input for thinning");
 	//    connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
@@ -115,7 +120,7 @@ void BinaryThinningImageFilter3DFilter::createOutputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectMeshStringDataAdapter::New();
+	temp = SelectMeshStringDataAdapter::New((mPluginContext));
 	temp->setValueName("Output");
 	temp->setHelp("Output centerline model");
 	mOutputTypes.push_back(temp);

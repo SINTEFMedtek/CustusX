@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxClippingWidget.h"
 
+#include <ctkPluginContext.h>
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QCheckBox>
@@ -43,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataManager.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxImage.h"
+#include "cxLegacySingletons.h"
 namespace cx
 {
 
@@ -86,13 +88,13 @@ QStringList ClipPlaneStringDataAdapter::getValueRange() const
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-ClippingWidget::ClippingWidget(QWidget* parent) :
+ClippingWidget::ClippingWidget(ctkPluginContext *pluginContext, QWidget* parent) :
 	BaseWidget(parent, "ClippingWidget", "Clip")
 {
 	mInteractiveClipper = viewManager()->getClipper();
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));
 
-	mImageAdapter = SelectImageStringDataAdapter::New();
+	mImageAdapter = SelectImageStringDataAdapter::New(pluginContext);
 	LabeledComboBoxWidget* imageCombo = new LabeledComboBoxWidget(this, mImageAdapter);
 	connect(mImageAdapter.get(), SIGNAL(changed()), this, SLOT(imageChangedSlot()));
 

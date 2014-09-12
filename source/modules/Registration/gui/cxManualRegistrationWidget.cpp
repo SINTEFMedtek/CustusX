@@ -41,8 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ManualImageRegistrationWidget::ManualImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-				RegistrationBaseWidget(regManager, parent, "ManualImageRegistrationWidget",
+ManualImageRegistrationWidget::ManualImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
+				RegistrationBaseWidget(pluginContext, parent, "ManualImageRegistrationWidget",
 								"Manual Image Registration"), mVerticalLayout(new QVBoxLayout(this))
 {
 	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(logicManager()->getPluginContext()));
@@ -59,7 +59,7 @@ ManualImageRegistrationWidget::ManualImageRegistrationWidget(RegistrationManager
 
 	mVerticalLayout->addStretch();
 
-	connect(mManager.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingDataChanged()));
+	connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingDataChanged()));
 }
 
 void ManualImageRegistrationWidget::showEvent(QShowEvent* event)
@@ -76,7 +76,7 @@ void ManualImageRegistrationWidget::movingDataChanged()
 	if (mConnectedMovingImage)
 		disconnect(mConnectedMovingImage.get(), SIGNAL(transformChanged()), this, SLOT(imageMatrixChanged()));
 
-	mConnectedMovingImage = mManager->getMovingData();
+	mConnectedMovingImage = mRegistrationService->getMovingData();
 
 	if (mConnectedMovingImage)
 		connect(mConnectedMovingImage.get(), SIGNAL(transformChanged()), this, SLOT(imageMatrixChanged()));
@@ -130,7 +130,7 @@ QString ManualImage2ImageRegistrationWidget::getDescription()
 
 bool ManualImage2ImageRegistrationWidget::isValid() const
 {
-	return mManager->getMovingData() && mManager->getFixedData();
+	return mRegistrationService->getMovingData() && mRegistrationService->getFixedData();
 }
 
 Transform3D ManualImage2ImageRegistrationWidget::getMatrixFromBackend()
@@ -138,8 +138,8 @@ Transform3D ManualImage2ImageRegistrationWidget::getMatrixFromBackend()
 	if (!this->isValid())
 		return Transform3D::Identity();
 
-	Transform3D rMm = mManager->getMovingData()->get_rMd();
-	Transform3D rMf = mManager->getFixedData()->get_rMd();
+	Transform3D rMm = mRegistrationService->getMovingData()->get_rMd();
+	Transform3D rMf = mRegistrationService->getFixedData()->get_rMd();
 	Transform3D fMm = rMf.inv() * rMm;
 	return fMm;
 }
@@ -149,8 +149,8 @@ void ManualImage2ImageRegistrationWidget::setMatrixFromWidget(Transform3D M)
 	if (!this->isValid())
 		return;
 
-	Transform3D rMm = mManager->getMovingData()->get_rMd();
-	Transform3D rMf = mManager->getFixedData()->get_rMd();
+	Transform3D rMm = mRegistrationService->getMovingData()->get_rMd();
+	Transform3D rMf = mRegistrationService->getFixedData()->get_rMd();
 	Transform3D fQm = M; // the modified fMm matrix
 
 	// start with
@@ -159,7 +159,7 @@ void ManualImage2ImageRegistrationWidget::setMatrixFromWidget(Transform3D M)
 	//                fQm = fMr * delta * rMm
 	Transform3D delta = rMf * fQm * rMm.inv();
 
-	mManager->applyImage2ImageRegistration(delta, "Manual Image");
+	mRegistrationService->applyImage2ImageRegistration(delta, "Manual Image");
 }
 
 // --------------------------------------------------------
@@ -185,15 +185,15 @@ void ManualImageTransformRegistrationWidget::setMatrixFromWidget(Transform3D M)
 	Transform3D rMMd = M;
 
 	Transform3D delta_pre_rMd = rMMd * rMd.inv(); // gives delta on the r (left) side.
-	mManager->applyImage2ImageRegistration(delta_pre_rMd, "Manual Image rMd");
+	mRegistrationService->applyImage2ImageRegistration(delta_pre_rMd, "Manual Image rMd");
 }
 
 // --------------------------------------------------------
 // --------------------------------------------------------
 // --------------------------------------------------------
 
-ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-				RegistrationBaseWidget(regManager, parent, "ManualPatientRegistrationWidget",
+ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
+				RegistrationBaseWidget(pluginContext, parent, "ManualPatientRegistrationWidget",
 								"Manual Patient Registration"), mVerticalLayout(new QVBoxLayout(this))
 {
 	mVerticalLayout->addWidget(new QLabel("<b>Patient Registration matrix rMpr</b>"));
@@ -216,7 +216,7 @@ ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(RegistrationMan
 void ManualPatientRegistrationWidget::matrixWidgetChanged()
 {
 	Transform3D rMpr = mMatrixWidget->getMatrix();
-	mManager->applyPatientRegistration(rMpr, "Manual Patient");
+	mRegistrationService->applyPatientRegistration(rMpr, "Manual Patient");
 }
 
 /**Called when moving image has changed.

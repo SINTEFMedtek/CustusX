@@ -46,9 +46,9 @@ namespace cx
 {
 
 
-RegisterI2IWidget::RegisterI2IWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-    RegistrationBaseWidget(regManager, parent, "RegisterI2IWidget", "Register Image2Image"),
-    mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(regManager, this))
+RegisterI2IWidget::RegisterI2IWidget(ctkPluginContext *pluginContext, QWidget* parent) :
+		RegistrationBaseWidget(pluginContext, parent, "RegisterI2IWidget", "Register Image2Image"),
+		mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(pluginContext, this))
 {
 //  connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
 //  connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));
