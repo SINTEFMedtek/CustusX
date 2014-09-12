@@ -42,8 +42,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-AudioInternal::AudioInternal(QObject* parent) : QObject(parent)
+AudioInternal::AudioInternal(QObject* parent) : QObject(parent), mLastPlayTimeMutex(QMutex::Recursive)
 {
+	mLastPlayTime = QDateTime::fromMSecsSinceEpoch(0);
+	mMinTimeBetweenEachSound = 500;
 	connect(this, SIGNAL(playSoundInternalSignal(QString)), this, SLOT(playSoundSlot(QString)));
 }
 
@@ -52,8 +54,23 @@ void AudioInternal::playSound(QString file)
 	emit playSoundInternalSignal(file);
 }
 
+bool AudioInternal::checkValidTime()
+{
+	QDateTime now = QDateTime::currentDateTime();
+
+	QMutexLocker sentry(&mLastPlayTimeMutex);
+	bool valid = mLastPlayTime.msecsTo(now) > mMinTimeBetweenEachSound;
+	if (!valid)
+		return false;
+	mLastPlayTime = now;
+	return true;
+}
+
 void AudioInternal::playSoundSlot(QString file)
 {
+	if (!this->checkValidTime())
+		return;
+
 	if (!QFileInfo(file).isAbsolute())
 		file = QString("%1/%2").arg(DataLocations::getAudioConfigFilePath()).arg(file);
 

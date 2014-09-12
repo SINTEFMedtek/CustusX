@@ -36,10 +36,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAudio.h"
 #include <QObject>
 #include <QString>
+#include <QDateTime>
+#include <QMutex>
 
 namespace cx {
 
 /**Helper class for playing sounds in the main thread even if calls are made from other threads.
+ *
+ * Play requests too close to the last play is ignored. mMinTimeBetweenEachSound limits this.
+ *
  * \ingroup cx_gui
  *
  */
@@ -53,6 +58,11 @@ signals:
 	void playSoundInternalSignal(QString file);
 private slots:
 	void playSoundSlot(QString file);
+private:
+	QMutex mLastPlayTimeMutex;
+	int mMinTimeBetweenEachSound;
+	QDateTime mLastPlayTime;
+	bool checkValidTime();
 };
 
 
