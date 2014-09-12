@@ -11,6 +11,7 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/resource/core/utilities
     ${CustusX_SOURCE_DIR}/source/resource/core/logger
     ${CustusX_SOURCE_DIR}/source/resource/core
+    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
 #TODO: Remove these dependencies
     ${CustusX_SOURCE_DIR}/source/service/patient
     ${CustusX_SOURCE_DIR}/source/logic

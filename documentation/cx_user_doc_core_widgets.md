@@ -56,17 +56,3 @@ Volume Information {#core_widgets_volume_information}
 
 Displays information about a selected volume.
 
-SomePageY {#somepageY}
-========================
-
-this is the way to go when referring from qt app
-\addindex subtitle_identifier 
-
-Some more text without stars.
-Here is a link to [myclass].
-Here is a link to #ssc_section_spaces_notation
-
-Next link: [Link text](@ref ssc_section_spaces_notation).
-
-[myclass]: @ref ssc_section_spaces_notation "My class"
-

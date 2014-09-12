@@ -146,8 +146,7 @@ HelpWidget::HelpWidget(QWidget* parent) :
 			SIGNAL(requestShowLink(const QUrl &)),
 			helpBrowser, SLOT(setSource(const QUrl &)));
 
-	helpBrowser->showHelpForKeyword("Coordinate Systems");
-	helpBrowser->showHelpForKeyword("subtitle_identifier");
+	helpBrowser->showHelpForKeyword("core_widgets_volume_shading");
 
 //  //layout
 //  mVerticalLayout->addLayout(buttonLayout);

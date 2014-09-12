@@ -82,6 +82,8 @@ cx_add_class_qt_moc(cxResource_SOURCE
 
 	registration/cxRegistrationService
 	registration/cxRegistrationServiceNull
+	
+	help/cxHelpService.h
 	)
 
      
@@ -245,6 +247,7 @@ set(CX_RESOURCE_INCLUDE_DIRECTORIES
     ${CustusX_SOURCE_DIR}/source/resource/core/algorithms
     ${CustusX_SOURCE_DIR}/source/resource/core/settings
     ${CustusX_SOURCE_DIR}/source/resource/core/utilities
+    ${CustusX_SOURCE_DIR}/source/resource/core/help
     ${CustusX_SOURCE_DIR}/source/ThirdParty
     ${CustusX_SOURCE_DIR}/source/ThirdParty/iir1
     

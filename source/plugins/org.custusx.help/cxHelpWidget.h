@@ -68,7 +68,7 @@ class HelpWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  HelpWidget(QWidget* parent);
+  explicit HelpWidget(QWidget* parent = NULL);
   virtual ~HelpWidget();
 
   virtual QString defaultWhatsThis() const;
