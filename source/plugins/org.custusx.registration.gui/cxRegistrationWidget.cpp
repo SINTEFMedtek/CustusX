@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/bind.hpp>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QGroupBox>
 #include <QStackedWidget>
 #include <QComboBox>
 #include <QStringList>
@@ -78,27 +79,46 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 		QComboBox *methodSelector = new QComboBox(registrationTypeWidget );
 		mMethodsSelectorMap[mRegistrationTypes[i]] = methodSelector;
 
-		QVBoxLayout *layout = new QVBoxLayout(widget);
-		layouts[i] = layout;
+//		QVBoxLayout *layout = new QVBoxLayout(widget);
+//		layouts[i] = layout;
+		QGroupBox	*groupBox = new QGroupBox(registrationTypeWidget);
 
-		layout->addWidget(methodSelector);
-		layout->addWidget(registrationTypeWidget);
+		QVBoxLayout *layoutV = new QVBoxLayout(widget);
+		QVBoxLayout *layoutGroupBox = new QVBoxLayout(groupBox);
+		QHBoxLayout *layoutH = new QHBoxLayout(widget);
+
+		layoutH->addWidget(methodSelector);
+		layoutH->addStretch();
+
+		layoutV->addLayout(layoutH);
+		layoutV->addWidget(groupBox);
+
+		layoutGroupBox->addWidget(registrationTypeWidget);
+
+		layouts[i] = layoutGroupBox;
 		mVerticalLayout->addWidget(widget);
 		this->addTab(widget, mRegistrationTypes[i]);
 	}
 
+	this->insertImageComboBoxes(layouts);
+}
 
+void RegistrationWidget::insertImageComboBoxes(std::vector<QVBoxLayout*> layouts)
+{
 	StringDataAdapterPtr fixedImage(new RegistrationFixedImageStringDataAdapter(mPluginContext));
 	StringDataAdapterPtr movingImage(new RegistrationMovingImageStringDataAdapter(mPluginContext));
-	LabeledComboBoxWidget* fixedImageCombo = new LabeledComboBoxWidget(this, fixedImage);
-	LabeledComboBoxWidget* movingImageCombo = new LabeledComboBoxWidget(this, movingImage);
 
-	layouts[0]->insertWidget(1, fixedImageCombo);
-	layouts[0]->insertWidget(2, movingImageCombo);
-	movingImageCombo = new LabeledComboBoxWidget(this, movingImage);
-	layouts[1]->insertWidget(1, movingImageCombo);
-//	layouts[2]->insertWidget(1, movingImageCombo);
+	this->insertImageComboInLayout(fixedImage, layouts[0], 0);
+	this->insertImageComboInLayout(movingImage, layouts[0], 1);
+	this->insertImageComboInLayout(movingImage, layouts[1], 0);
 }
+
+void RegistrationWidget::insertImageComboInLayout(StringDataAdapterPtr adapter, QVBoxLayout *layout, int position)
+{
+	LabeledComboBoxWidget* imageCombo = new LabeledComboBoxWidget(this, adapter);
+	layout->insertWidget(position, imageCombo);
+}
+
 
 void RegistrationWidget::initServiceListener()
 {

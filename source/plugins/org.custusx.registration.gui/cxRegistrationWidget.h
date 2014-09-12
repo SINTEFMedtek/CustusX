@@ -43,6 +43,8 @@ class QStackedWidget;
 namespace cx
 {
 
+typedef boost::shared_ptr<class StringDataAdapter> StringDataAdapterPtr;
+
 /**
  * Widget for use in the Registration GUI plugin
  *
@@ -68,6 +70,7 @@ private:
 	void onServiceRemoved(RegistrationMethodService *service);
 //	QStackedWidget *findMethodWidget(QString registrationMethod);
 //	QStackedWidget *createMethodWidget(QString registrationMethod);
+	void insertImageComboInLayout(StringDataAdapterPtr adapter, QVBoxLayout *layout, int position);
 
 	ctkPluginContext* mPluginContext;
 	QVBoxLayout*  mVerticalLayout;
@@ -80,6 +83,7 @@ private:
 	std::map<QString, QStackedWidget*> mRegistrationTypeMap;
 	QStringList mRegistrationTypes;
 
+	void insertImageComboBoxes(std::vector<QVBoxLayout *> layouts);
 };
 
 } /* namespace cx */
