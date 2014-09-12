@@ -1,3 +1,8 @@
+cx_create_export_header("cxGUIExtenderService" OUT_EXPORT_HEADER)
+
+include_directories(
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
 
 cx_add_class_qt_moc(GUIExtender_FILES
     cxGUIExtenderService

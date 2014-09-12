@@ -388,6 +388,7 @@ class CustusX(CppComponent):
         add('IGSTK_DIR:PATH', self._createSibling(IGSTK).configPath())
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
         add('OpenCV_DIR:PATH', self._createSibling(OpenCV).configPath())
+        add('CTK_SOURCE_DIR:PATH', self._createSibling(CTK).sourcePath())
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
         add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).configPath())
         add('Level-Set-Segmentation_DIR:PATH', self._createSibling(LevelSetSegmentation).configPath())

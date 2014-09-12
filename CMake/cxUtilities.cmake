@@ -461,3 +461,23 @@ function(cx_print_variables REGEX_TO_MATCH)
         endif()
     endforeach()
 endfunction()
+
+
+###############################################################################
+#
+# Creates a export header.
+#
+# MY_LIBRARY_NAME: Prefix for the export header name
+# OUT_EXPORT_HEADER: Path to the prefix header
+#
+###############################################################################
+macro(cx_create_export_header MY_LIBRARY_NAME OUT_EXPORT_HEADER)
+    set(MY_EXPORT_HEADER_PREFIX ${MY_LIBRARY_NAME})
+    set(MY_LIBRARY_EXPORT_DIRECTIVE ${MY_LIBRARY_NAME}_EXPORT)
+    set(MY_LIBNAME ${MY_LIBRARY_NAME})
+    configure_file(
+        ${CTK_SOURCE_DIR}/Libs/ctkExport.h.in
+        ${CMAKE_CURRENT_BINARY_DIR}/${MY_LIBRARY_NAME}Export.h
+    )
+    set(OUT_EXPORT_HEADER ${CMAKE_CURRENT_BINARY_DIR}/${MY_LIBRARY_NAME}Export.h)
+endmacro()
