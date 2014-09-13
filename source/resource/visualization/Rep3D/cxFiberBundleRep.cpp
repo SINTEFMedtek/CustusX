@@ -51,8 +51,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 /** Constructor */
-FiberBundleRep::FiberBundleRep(const QString& uid, const QString& name)
-	: RepImpl(uid, name), mFiberWidth(.5)
+FiberBundleRep::FiberBundleRep()
+	: RepImpl(), mFiberWidth(.5)
 {
 	mPolyDataMapper = vtkPolyDataMapperPtr::New();
 	mProperty = vtkPropertyPtr::New();
@@ -68,11 +68,9 @@ FiberBundleRep::FiberBundleRep(const QString& uid, const QString& name)
 /**
  * Creates a new smart pointer object of this rep
  */
-FiberBundleRepPtr FiberBundleRep::New(const QString& uid, const QString& name)
+FiberBundleRepPtr FiberBundleRep::New(const QString& uid)
 {
-	FiberBundleRepPtr retval(new FiberBundleRep(uid, name));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new FiberBundleRep(), uid);
 }
 
 /** Return type as string */
@@ -95,7 +93,6 @@ void FiberBundleRep::setBundle(MeshPtr bundle)
 	{
 		disconnect(mBundle.get(), SIGNAL(transformChanged()), this, SLOT(bundleTransformChanged()));
 		disconnect(mBundle.get(), SIGNAL(meshChanged()), this, SLOT(bundleChanged()));
-		mBundle->disconnectFromRep(mSelf);
 	}
 
 	mBundle = bundle;
@@ -104,7 +101,6 @@ void FiberBundleRep::setBundle(MeshPtr bundle)
 	{
 		connect(mBundle.get(), SIGNAL(transformChanged()), this, SLOT(bundleTransformChanged()));
 		connect(mBundle.get(), SIGNAL(meshChanged()), this, SLOT(bundleChanged()));
-		mBundle->connectToRep(mSelf);
 	}
 
 	bundleChanged();
@@ -114,7 +110,7 @@ void FiberBundleRep::setBundle(MeshPtr bundle)
 /**
  * Adds rep assigned actors to the active renderer
  */
-void FiberBundleRep::addRepActorsToViewRenderer(View *view)
+void FiberBundleRep::addRepActorsToViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->AddActor(mActor);
 
@@ -125,7 +121,7 @@ void FiberBundleRep::addRepActorsToViewRenderer(View *view)
 /**
  * Removes rep assigned actors from the rendering pipeline
  */
-void FiberBundleRep::removeRepActorsFromViewRenderer(View *view)
+void FiberBundleRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->RemoveActor(mActor);
 

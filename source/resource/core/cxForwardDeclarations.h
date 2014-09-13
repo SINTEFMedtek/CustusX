@@ -52,8 +52,6 @@ typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
 
 class View;
 class ViewItem;
-class ViewWidget;
-typedef QPointer<ViewWidget> ViewWidgetQPtr;
 
 // KEEP SORTED AND UNIQUE!
 

@@ -71,7 +71,7 @@ class ToolRep3D : public RepImpl
 {
 	Q_OBJECT
 public:
-	static ToolRep3DPtr New(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name="");
+	static ToolRep3DPtr New(SpaceProviderPtr spaceProvider, const QString& uid="");
 	virtual ~ToolRep3D();
 	virtual QString getType() const;
 
@@ -92,9 +92,9 @@ public:
 	void setSphereRadiusInNormalizedViewport(bool on);
 
 protected:
-	ToolRep3D(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name="");
-	virtual void addRepActorsToViewRenderer(View *view);
-	virtual void removeRepActorsFromViewRenderer(View *view);
+	ToolRep3D(SpaceProviderPtr spaceProvider);
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 	bool showProbe();
 	virtual void onModifiedStartRender();
 

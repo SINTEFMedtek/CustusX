@@ -64,6 +64,7 @@ typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
 typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
 typedef boost::shared_ptr<class Navigation> NavigationPtr;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
+typedef QPointer<class ViewWidget> ViewWidgetQPtr;
 
 /**
  * \file
@@ -128,7 +129,7 @@ public:
 	static VisualizationServicePtr create(VisualizationServiceBackendPtr backend);
 	virtual ~ViewManager();
 
-	ViewWidgetQPtr get3DView(int group = 0, int index = 0);
+	ViewPtr get3DView(int group = 0, int index = 0);
 	std::vector<ViewGroupPtr> getViewGroups() { return mViewGroups; }
 
 	LayoutData getLayoutData(const QString uid) const; ///< get data for given layout
@@ -196,7 +197,7 @@ protected:
 
 	void syncOrientationMode(SyncedValuePtr val);
 
-	void activateView(LayoutWidget* widget, ViewWrapperPtr wrapper, int group, LayoutRegion region);
+	void activateView(LayoutWidget* widget, ViewWidget* viewWidget, ViewWrapperPtr wrapper, int group, LayoutRegion region);
 	void activate2DView(LayoutWidget *widget, int group, PLANE_TYPE plane, LayoutRegion region);
 	void activate3DView(LayoutWidget *widget, int group, LayoutRegion region);
 	void activateRTStreamView(LayoutWidget *widget, int group, LayoutRegion region);

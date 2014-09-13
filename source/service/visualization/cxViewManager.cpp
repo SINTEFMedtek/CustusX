@@ -76,6 +76,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxXMLNodeWrapper.h"
 #include "cxCameraControl.h"
 #include "cxNavigation.h"
+#include "cxViewWidget.h"
+
 
 namespace cx
 {
@@ -361,10 +363,10 @@ void ViewManager::clear()
 
 /**Look for the index'th 3DView in given group.
  */
-ViewWidgetQPtr ViewManager::get3DView(int group, int index)
+ViewPtr ViewManager::get3DView(int group, int index)
 {
 	int count = 0;
-	std::vector<ViewWidgetQPtr> views = mViewGroups[group]->getViews();
+	std::vector<ViewPtr> views = mViewGroups[group]->getViews();
 	for (unsigned i = 0; i < views.size(); ++i)
 	{
 		if(!views[i])
@@ -374,7 +376,7 @@ ViewWidgetQPtr ViewManager::get3DView(int group, int index)
 		if (index == count++)
 			return views[i];
 	}
-	return ViewWidgetQPtr();
+	return ViewPtr();
 }
 
 
@@ -448,7 +450,7 @@ void ViewManager::setSlicePlanesProxyInViewsUpTo2DViewgroup()
 		for (unsigned j = 0; j < wrappers.size(); ++j)
 		{
 			wrappers[j]->setSlicePlanesProxy(mSlicePlanesProxy);
-			foundSlice = foundSlice || wrappers[j]->getView()->getType() == ViewWidget::VIEW_2D;
+			foundSlice = foundSlice || wrappers[j]->getView()->getType() == View::VIEW_2D;
 		}
 		if (foundSlice)
 			break;
@@ -468,9 +470,9 @@ void ViewManager::activateViews(LayoutWidget *widget, LayoutData next)
 
 		if (view.mPlane == ptNOPLANE || view.mPlane == ptCOUNT)
 		{
-			if (view.mType == ViewWidget::VIEW_3D)
+			if (view.mType == View::VIEW_3D)
 				this->activate3DView(widget, view.mGroup, view.mRegion);
-			else if (view.mType == ViewWidget::VIEW_REAL_TIME)
+			else if (view.mType == View::VIEW_REAL_TIME)
 				this->activateRTStreamView(widget, view.mGroup, view.mRegion);
 		}
 		else
@@ -485,14 +487,14 @@ void ViewManager::setRenderingInterval(int interval)
 	mRenderLoop->setRenderingInterval(interval);
 }
 
-void ViewManager::activateView(LayoutWidget* widget, ViewWrapperPtr wrapper, int group, LayoutRegion region)
+void ViewManager::activateView(LayoutWidget* widget, ViewWidget* viewWidget, ViewWrapperPtr wrapper, int group, LayoutRegion region)
 {
-	ViewWidget* view = wrapper->getView();
+	ViewPtr view = wrapper->getView();
 	mRenderLoop->addView(view);
 	mViewGroups[group]->addView(wrapper);
-	widget->addView(view, region);
+	widget->addView(viewWidget, region);
 
-	view->show();
+	viewWidget->show();
 }
 
 void ViewManager::activate2DView(LayoutWidget* widget, int group, PLANE_TYPE plane, LayoutRegion region)
@@ -500,30 +502,30 @@ void ViewManager::activate2DView(LayoutWidget* widget, int group, PLANE_TYPE pla
 	ViewWidget* view = widget->mViewCache2D->retrieveView();
 	view->setType(View::VIEW_2D);
 
-	ViewWrapper2DPtr wrapper(new ViewWrapper2D(view, mBackend));
+	ViewWrapper2DPtr wrapper(new ViewWrapper2D(view->getView(), mBackend));
 	wrapper->initializePlane(plane);
-	this->activateView(widget, wrapper, group, region);
+	this->activateView(widget, view, wrapper, group, region);
 }
 
 void ViewManager::activate3DView(LayoutWidget* widget, int group, LayoutRegion region)
 {
 	ViewWidget* view = widget->mViewCache3D->retrieveView();
 	view->setType(View::VIEW_3D);
-	ViewWrapper3DPtr wrapper(new ViewWrapper3D(group + 1, view, mBackend));
+	ViewWrapper3DPtr wrapper(new ViewWrapper3D(group + 1, view->getView(), mBackend));
 	if (group == 0)
 	{
-		mInteractiveCropper->setView(view);
+		mInteractiveCropper->setView(view->getView());
 	}
 
-	this->activateView(widget, wrapper, group, region);
+	this->activateView(widget, view, wrapper, group, region);
 }
 
 void ViewManager::activateRTStreamView(LayoutWidget *widget, int group, LayoutRegion region)
 {
 	ViewWidget* view = widget->mViewCacheRT->retrieveView();
 	view->setType(View::VIEW_REAL_TIME);
-	ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view, mBackend));
-	this->activateView(widget, wrapper, group, region);
+	ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view->getView(), mBackend));
+	this->activateView(widget, view, wrapper, group, region);
 }
 
 LayoutData ViewManager::getLayoutData(const QString uid) const

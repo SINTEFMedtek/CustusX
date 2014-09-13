@@ -223,9 +223,9 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
 }
 
 
-void ViewWrapper::connectContextMenu(ViewWidget* view)
+void ViewWrapper::connectContextMenu(ViewPtr view)
 {
-	connect(view, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(contextMenuSlot(const QPoint &)));
+	connect(view.get(), SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(contextMenuSlot(const QPoint &)));
 }
 
 QStringList ViewWrapper::getAllDataNames(DataViewProperties properties) const

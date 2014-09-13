@@ -50,14 +50,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SphereMetricRepPtr SphereMetricRep::New(const QString& uid, const QString& name)
+SphereMetricRepPtr SphereMetricRep::New(const QString& uid)
 {
-	SphereMetricRepPtr retval(new SphereMetricRep(uid, name));
-	return retval;
+	return wrap_new(new SphereMetricRep(), uid);
 }
 
-SphereMetricRep::SphereMetricRep(const QString& uid, const QString& name) :
-				DataMetricRep(uid, name)
+SphereMetricRep::SphereMetricRep()
 {
 }
 
@@ -77,8 +75,8 @@ void SphereMetricRep::onModifiedStartRender()
 	if (!mMetric)
 		return;
 
-	if (!mGraphicalPoint && mView && mMetric)
-		mGraphicalPoint.reset(new GraphicalPoint3D(mView->getRenderer()));
+	if (!mGraphicalPoint && this->getView() && mMetric)
+		mGraphicalPoint.reset(new GraphicalPoint3D(this->getRenderer()));
 
 	if (!mGraphicalPoint)
 		return;

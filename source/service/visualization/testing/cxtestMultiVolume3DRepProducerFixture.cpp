@@ -48,7 +48,6 @@ MultiVolume3DRepProducerFixture::~MultiVolume3DRepProducerFixture()
 
 void MultiVolume3DRepProducerFixture::initializeVisualizerAndImages(QString type, int imageCount)
 {
-//	mBase.setView(new ViewWidget());
 	mBase.setVisualizerType(type);
 	for (unsigned i=0; i<imageCount; ++i)
 	{

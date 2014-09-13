@@ -57,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTool.h"
 #include "cxRegistrationTransform.h"
 #include "cxGeometricRep.h"
+#include <vtkRenderWindowInteractor.h>
 
 #include "vtkVolumePicker.h"
 
@@ -71,14 +72,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-PickerRepPtr PickerRep::New(DataServicePtr dataManager, const QString& uid, const QString& name)
+PickerRepPtr PickerRep::New(DataServicePtr dataManager, const QString& uid)
 {
-	PickerRepPtr retval(new PickerRep(dataManager, uid, name));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new PickerRep(dataManager), uid);
 }
-PickerRep::PickerRep(DataServicePtr dataManager, const QString& uid, const QString& name) :
-	RepImpl(uid, name),
+PickerRep::PickerRep(DataServicePtr dataManager) :
+	RepImpl(),
 	mDataManager(dataManager),
 	mPickedPoint(), mSphereRadius(2) //, mConnections(vtkEventQtSlotConnectPtr::New())
 {
@@ -90,7 +89,6 @@ PickerRep::PickerRep(DataServicePtr dataManager, const QString& uid, const QStri
 	this->mCallbackCommand->SetClientData(this);
 	this->mCallbackCommand->SetCallback(PickerRep::ProcessEvents);
 
-	mView = NULL;
 	mEnabled = true;
 	mConnected = false;
 	mSnapToSurface = false;
@@ -150,9 +148,9 @@ void PickerRep::setGlyph(MeshPtr glyph)
 	 if (!mGlyphRep)
 	 {
 		 mGlyphRep = GeometricRep::New("PickerGlyphRep");
-		 if (mView)
+		 if (this->getView())
 		 {
-			 mView->addRep(mGlyphRep);
+			 this->getView()->addRep(mGlyphRep);
 		 }
 	 }
 
@@ -313,7 +311,7 @@ void PickerRep::ProcessEvents(vtkObject* vtkNotUsed(object), unsigned long event
 Vector3D PickerRep::ComputeDisplayToWorld(Vector3D p_d)
 {
 	double worldPt[4];
-	vtkRendererPtr ren = mView->getRenderer();
+	vtkRendererPtr ren = this->getRenderer();
 	ren->SetDisplayPoint(p_d.data());
 	ren->DisplayToWorld();
 	ren->GetWorldPoint(worldPt);
@@ -326,7 +324,7 @@ Vector3D PickerRep::ComputeDisplayToWorld(Vector3D p_d)
 Vector3D PickerRep::ComputeWorldToDisplay(Vector3D p_w)
 {
 	Vector3D p_d;
-	vtkRendererPtr ren = mView->getRenderer();
+	vtkRendererPtr ren = this->getRenderer();
 	ren->SetWorldPoint(p_w[0], p_w[1], p_w[2], 1.0);
 	ren->WorldToDisplay();
 	ren->GetDisplayPoint(p_d.data());
@@ -337,7 +335,7 @@ Vector3D PickerRep::ComputeWorldToDisplay(Vector3D p_w)
  */
 Vector3D PickerRep::getDisplacement()
 {
-	vtkRenderWindowInteractorPtr interactor = mView->getRenderWindow()->GetInteractor();
+	vtkRenderWindowInteractorPtr interactor = this->getView()->getRenderWindow()->GetInteractor();
 
 //	// find previous pos in world and display:
 	Vector3D p_prev_w = mClickedPoint;
@@ -359,7 +357,7 @@ Vector3D PickerRep::getDisplacement()
 
 void PickerRep::OnLeftButtonDown()
 {
-	this->pickLandmarkSlot(mView->getRenderWindow()->GetInteractor());
+	this->pickLandmarkSlot(this->getView()->getRenderWindow()->GetInteractor());
 }
 
 void PickerRep::OnMouseMove()
@@ -398,12 +396,12 @@ void PickerRep::OnLeftButtonUp()
 
 void PickerRep::connectInteractor()
 {
-	if (!mView)
+	if (!this->getView())
 		return;
 	if (mConnected)
 		return;
 
-	vtkRenderWindowInteractorPtr i = mView->getRenderWindow()->GetInteractor();
+	vtkRenderWindowInteractorPtr i = this->getView()->getRenderWindow()->GetInteractor();
 	i->AddObserver(vtkCommand::MouseMoveEvent, this->mCallbackCommand, 1.0);
 	i->AddObserver(vtkCommand::LeftButtonPressEvent, this->mCallbackCommand, 1.0);
 	i->AddObserver(vtkCommand::LeftButtonReleaseEvent, this->mCallbackCommand, 1.0);
@@ -413,18 +411,18 @@ void PickerRep::connectInteractor()
 
 void PickerRep::disconnectInteractor()
 {
-	if (!mView)
+	if (!this->getView())
 		return;
 	if (!mConnected)
 		return;
 
 	// don't listen for events any more
-	mView->getRenderWindow()->GetInteractor()->RemoveObserver(this->mCallbackCommand);
+	this->getView()->getRenderWindow()->GetInteractor()->RemoveObserver(this->mCallbackCommand);
 
 	mConnected = false;
 }
 
-void PickerRep::addRepActorsToViewRenderer(View *view)
+void PickerRep::addRepActorsToViewRenderer(ViewPtr view)
 {
 	if (view == NULL)
 	{
@@ -432,11 +430,9 @@ void PickerRep::addRepActorsToViewRenderer(View *view)
 		return;
 	}
 
-	mView = view;
-
 	this->connectInteractor();
 
-	mGraphicalPoint.reset(new GraphicalPoint3D(mView->getRenderer()));
+	mGraphicalPoint.reset(new GraphicalPoint3D(this->getRenderer()));
 	mGraphicalPoint->setColor(QColor(Qt::blue));
 	mGraphicalPoint->setRadius(mSphereRadius);
 	mGraphicalPoint->getActor()->SetVisibility(mSnapToSurface);
@@ -444,14 +440,14 @@ void PickerRep::addRepActorsToViewRenderer(View *view)
 	// show even if disabled
 	if (mGlyphRep)
 	{
-		mView->addRep(mGlyphRep);
+		this->getView()->addRep(mGlyphRep);
 	}
 
-	mViewportListener->startListen(mView->getRenderer());
+	mViewportListener->startListen(this->getRenderer());
 	this->scaleSphere();
 }
 
-void PickerRep::removeRepActorsFromViewRenderer(View *view)
+void PickerRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	if (view == NULL)
 		return;
@@ -462,8 +458,6 @@ void PickerRep::removeRepActorsFromViewRenderer(View *view)
 
 	if (mGlyphRep)
 		view->removeRep(mGlyphRep);
-
-	mView = NULL;
 }
 
 Vector3D PickerRep::getPosition() const

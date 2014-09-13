@@ -76,10 +76,10 @@ class ViewWrapper2D: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapper2D(ViewWidget* view, VisualizationServiceBackendPtr backend);
+	ViewWrapper2D(ViewPtr view, VisualizationServiceBackendPtr backend);
 	virtual ~ViewWrapper2D();
 	virtual void initializePlane(PLANE_TYPE plane);
-	virtual ViewWidget* getView();
+	virtual ViewPtr getView();
 	virtual void setOrientationMode(SyncedValuePtr value);
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy);
 	virtual void setViewGroup(ViewGroupDataPtr group);
@@ -93,9 +93,9 @@ private slots:
 	void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
 	void viewportChanged();
 	void showSlot();
-	void mousePressSlot(QMouseEvent* event);
-	void mouseMoveSlot(QMouseEvent* event);
-	void mouseWheelSlot(QWheelEvent* event);
+	void mousePressSlot(int x, int y, Qt::MouseButtons buttons);
+	void mouseMoveSlot(int x, int y, Qt::MouseButtons buttons);
+	void mouseWheelSlot(int x, int y, int delta, int orientation, Qt::MouseButtons buttons);
 	void orientationActionSlot();
 	void orientationModeChanged();
 	void settingsChangedSlot(QString key);
@@ -119,11 +119,7 @@ private:
 	Vector3D viewToDisplay(Vector3D p_v) const;
 
 	virtual void imageAdded(ImagePtr image);
-//	virtual void meshAdded(MeshPtr mesh);
 	virtual void imageRemoved(const QString& uid);
-//	virtual void meshRemoved(const QString& uid);
-//	virtual void pointMetricAdded(PointMetricPtr mesh);
-//	virtual void pointMetricRemoved(const QString& uid);
 
 	virtual void dataAdded(DataPtr data);
 	virtual void dataRemoved(const QString& uid);
@@ -135,20 +131,16 @@ private:
 	GeometricRep2DPtr mPickerGlyphRep;
 	SliceProxyPtr mSliceProxy;
 	SliceRepSWPtr mSliceRep;
-//	std::map<QString, GeometricRep2DPtr> mGeometricRep;
-//	std::map<QString, PointMetricRep2DPtr> mPointMetricRep;
 	ToolRep2DPtr mToolRep2D;
-//  OrientationAnnotationSmartRepPtr mOrientationAnnotationRep;
 	OrientationAnnotationSmartRepPtr mOrientationAnnotationRep;
 	DisplayTextRepPtr mPlaneTypeText;
 	DisplayTextRepPtr mDataNameText;
 	SlicePlanes3DMarkerIn2DRepPtr mSlicePlanes3DMarker;
-	QPointer<ViewWidget> mView;
+	ViewPtr mView;
 	ViewFollowerPtr mViewFollower;
 
 
 	// synchronized data
-//	SyncedValuePtr mZoom2D;
 	Zoom2DHandlerPtr mZoom2D;
 
 	SyncedValuePtr mOrientationMode;

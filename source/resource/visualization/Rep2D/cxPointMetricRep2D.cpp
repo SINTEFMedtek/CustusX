@@ -49,14 +49,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-PointMetricRep2DPtr PointMetricRep2D::New(const QString& uid, const QString& name)
+PointMetricRep2DPtr PointMetricRep2D::New(const QString& uid)
 {
-	PointMetricRep2DPtr retval(new PointMetricRep2D(uid, name));
-	return retval;
+	return wrap_new(new PointMetricRep2D(), uid);
 }
 
-PointMetricRep2D::PointMetricRep2D(const QString& uid, const QString& name) :
-	DataMetricRep(uid, name)
+PointMetricRep2D::PointMetricRep2D()
 {	
 }
 
@@ -73,14 +71,14 @@ void PointMetricRep2D::setDynamicSize(bool on)
 	}
 }
 
-void PointMetricRep2D::addRepActorsToViewRenderer(View* view)
+void PointMetricRep2D::addRepActorsToViewRenderer(ViewPtr view)
 {
     if (mViewportListener)
         mViewportListener->startListen(view->getRenderer());
     DataMetricRep::addRepActorsToViewRenderer(view);
 }
 
-void PointMetricRep2D::removeRepActorsFromViewRenderer(View* view)
+void PointMetricRep2D::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	mDisk.reset();
 
@@ -99,7 +97,7 @@ void PointMetricRep2D::onModifiedStartRender()
 	if (!mMetric)
 		return;
 
-	if (!mDisk && mView && mMetric && mSliceProxy)
+	if (!mDisk && this->getView() && mMetric && mSliceProxy)
 	{
 		mDisk.reset(new GraphicalDisk());
 		mDisk->setRenderer(this->getRenderer());

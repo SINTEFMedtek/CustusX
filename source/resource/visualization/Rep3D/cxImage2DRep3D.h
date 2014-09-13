@@ -114,11 +114,10 @@ public:
 
 protected:
 	Image2DRep3D();
-	virtual void addRepActorsToViewRenderer(View *view);
-	virtual void removeRepActorsFromViewRenderer(View *view);
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
 private:
-	View *mView;
 	Image2DProxyPtr mProxy;
 };
 //---------------------------------------------------------

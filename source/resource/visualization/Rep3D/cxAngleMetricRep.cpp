@@ -51,14 +51,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-AngleMetricRepPtr AngleMetricRep::New(const QString& uid, const QString& name)
+AngleMetricRepPtr AngleMetricRep::New(const QString& uid)
 {
-	AngleMetricRepPtr retval(new AngleMetricRep(uid, name));
-	return retval;
+	return wrap_new(new AngleMetricRep(), uid);
 }
 
-AngleMetricRep::AngleMetricRep(const QString& uid, const QString& name) :
-                DataMetricRep(uid, name)
+AngleMetricRep::AngleMetricRep()
 {
 }
 
@@ -83,7 +81,7 @@ void AngleMetricRep::onModifiedStartRender()
 		return;
 	if (!mMetric)
 		return;
-	if (!mView)
+	if (!this->getView())
 		return;
 
     std::vector<Vector3D> p = angleMetric->getEndpoints();
@@ -97,7 +95,7 @@ void AngleMetricRep::onModifiedStartRender()
 	{
 		if (!mLine0)
 		{
-			mLine0.reset(new GraphicalLine3D(mView->getRenderer()));
+			mLine0.reset(new GraphicalLine3D(this->getRenderer()));
 		}
 		mLine0->setColor(mMetric->getColor());
 		mLine0->setStipple(0x0F0F);
@@ -105,7 +103,7 @@ void AngleMetricRep::onModifiedStartRender()
 
 		if (!mLine1)
 		{
-			mLine1.reset(new GraphicalLine3D(mView->getRenderer()));
+			mLine1.reset(new GraphicalLine3D(this->getRenderer()));
 		}
 		mLine1->setColor(mMetric->getColor());
 		mLine1->setStipple(0x0F0F);
@@ -114,7 +112,7 @@ void AngleMetricRep::onModifiedStartRender()
 
 	if (!mArc)
 	{
-		mArc.reset(new GraphicalArc3D(mView->getRenderer()));
+		mArc.reset(new GraphicalArc3D(this->getRenderer()));
 	}
 	mArc->setColor(mMetric->getColor());
 	mArc->setStipple(0xF0FF);

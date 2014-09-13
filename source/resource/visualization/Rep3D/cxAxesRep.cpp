@@ -51,13 +51,11 @@ namespace cx
 
 AxesRepPtr AxesRep::New(const QString& uid)
 {
-    AxesRepPtr retval(new AxesRep(uid));
-    retval->mSelf = retval;
-    return retval;
+	return wrap_new(new AxesRep(), uid);
 }
 
-AxesRep::AxesRep(const QString& uid) :
-	RepImpl(uid)
+AxesRep::AxesRep() :
+	RepImpl()
 {
     mAxes.reset(new GraphicalAxes3D());
 	this->setAxisLength(0.2);
@@ -69,12 +67,12 @@ AxesRep::~AxesRep()
 {
 }
 
-void AxesRep::addRepActorsToViewRenderer(View *view)
+void AxesRep::addRepActorsToViewRenderer(ViewPtr view)
 {
     mAxes->setRenderer(view->getRenderer());
 }
 
-void AxesRep::removeRepActorsFromViewRenderer(View *view)
+void AxesRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
     mAxes->setRenderer(NULL);
 }

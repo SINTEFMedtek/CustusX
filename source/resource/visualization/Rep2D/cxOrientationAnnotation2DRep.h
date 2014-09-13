@@ -62,7 +62,7 @@ class OrientationAnnotationSmartRep: public RepImpl
 {
 Q_OBJECT
 public:
-	static OrientationAnnotationSmartRepPtr New(const QString& uid, const QString& name);
+	static OrientationAnnotationSmartRepPtr New(const QString& uid="");
 	virtual ~OrientationAnnotationSmartRep();
 	virtual QString getType() const	{ return "vm::OrientationAnnotationSmartRep"; }
 
@@ -77,9 +77,9 @@ public:
 private slots:
 	void transformChangedSlot();
 protected:
-	OrientationAnnotationSmartRep(const QString& uid, const QString& name);
-	virtual void addRepActorsToViewRenderer(View* view);
-	virtual void removeRepActorsFromViewRenderer(View* view);
+	OrientationAnnotationSmartRep();
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
 	QString determineAnnotation(Vector3D planeDir_s, Transform3D rMs);
 	void createAnnotation();

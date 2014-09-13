@@ -132,7 +132,7 @@ class SlicePlanes3DRep : public RepImpl
 {
 	Q_OBJECT
 public:
-	static SlicePlanes3DRepPtr New(const QString& uid, const QString& name="");
+	static SlicePlanes3DRepPtr New(const QString& uid="");
 	virtual ~SlicePlanes3DRep();
 	virtual QString getType() const { return "SlicePlanes3DRep"; }
 	void setProxy(SlicePlanesProxyPtr proxy);
@@ -140,8 +140,8 @@ public:
 	void setDynamicLabelSize(bool on);
 
 protected:
-	virtual void addRepActorsToViewRenderer(View *view);
-	virtual void removeRepActorsFromViewRenderer(View *view);
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
 private slots:
 	void changedSlot();
@@ -157,10 +157,9 @@ private:
 	typedef std::map<PLANE_TYPE, DataType> DataMap;
 	DataMap mData;
 
-	SlicePlanes3DRep(const QString& uid, const QString& name = "");
+	SlicePlanes3DRep();
 	void clearActors();
 	SlicePlanesProxyPtr mProxy;
-	View *mView;
 	ViewportListenerPtr mViewportListener;
 	void rescale();
 };
@@ -183,19 +182,19 @@ class SlicePlanes3DMarkerIn2DRep : public RepImpl
 {
 	Q_OBJECT
 public:
-	static SlicePlanes3DMarkerIn2DRepPtr New(const QString& uid, const QString& name="");
+	static SlicePlanes3DMarkerIn2DRepPtr New(const QString& uid="");
 	virtual ~SlicePlanes3DMarkerIn2DRep();
 	virtual QString getType() const { return "SlicePlanes3DMarkerIn2DRep"; }
 	void setProxy(PLANE_TYPE type, SlicePlanesProxyPtr proxy);
 	SlicePlanesProxyPtr getProxy() { return mProxy; }
 
 protected:
-	virtual void addRepActorsToViewRenderer(View *view);
-	virtual void removeRepActorsFromViewRenderer(View *view);
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 private slots:
 	void changedSlot();
 private:
-	SlicePlanes3DMarkerIn2DRep(const QString& uid, const QString& name="");
+	SlicePlanes3DMarkerIn2DRep();
 	SlicePlanesProxyPtr mProxy;
 	TextDisplayPtr mText;
 	PLANE_TYPE mType;

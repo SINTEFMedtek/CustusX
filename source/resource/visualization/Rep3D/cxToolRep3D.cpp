@@ -55,8 +55,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ToolRep3D::ToolRep3D(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name) :
-	RepImpl(uid, name),
+ToolRep3D::ToolRep3D(SpaceProviderPtr spaceProvider) :
+	RepImpl(),
 	mSpaceProvider(spaceProvider),
 	mSphereRadiusInNormalizedViewport(false),
 	mTooltipPointColor(QColor::fromRgbF(1.0, 0.8, 0.0)),
@@ -94,11 +94,9 @@ ToolTracerPtr ToolRep3D::getTracer()
 	return mTracer;
 }
 
-ToolRep3DPtr ToolRep3D::New(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name)
+ToolRep3DPtr ToolRep3D::New(SpaceProviderPtr spaceProvider, const QString& uid)
 {
-	ToolRep3DPtr retval(new ToolRep3D(spaceProvider, uid, name));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new ToolRep3D(spaceProvider), uid);
 }
 
 QString ToolRep3D::getType() const
@@ -225,7 +223,7 @@ void ToolRep3D::setSphereRadiusInNormalizedViewport(bool on)
 	}
 }
 
-void ToolRep3D::addRepActorsToViewRenderer(View *view)
+void ToolRep3D::addRepActorsToViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->AddActor(mTracer->getActor());
 
@@ -255,7 +253,7 @@ void ToolRep3D::addRepActorsToViewRenderer(View *view)
 		view->getRenderer()->AddActor(mRTStream->getActor());
 }
 
-void ToolRep3D::removeRepActorsFromViewRenderer(View *view)
+void ToolRep3D::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->RemoveActor(mTracer->getActor());
 	view->getRenderer()->RemoveActor(mToolActor);

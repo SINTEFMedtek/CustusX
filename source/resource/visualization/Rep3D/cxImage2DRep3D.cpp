@@ -140,34 +140,25 @@ Image2DRep3D::Image2DRep3D() :
 	RepImpl("")
 {
 	mProxy = Image2DProxy::New();
-	mView = NULL;
 }
 
 Image2DRep3D::~Image2DRep3D()
 {
 }
 
-
-//Image2DRep3DPtr Image2DRep3D::New(QString uid)
-//{
-//	return RepImpl::wrap(new Image2DRep3D(), uid);
-//}
-
 void Image2DRep3D::setImage(ImagePtr image)
 {
 	mProxy->setImage(image);
 }
 
-void Image2DRep3D::addRepActorsToViewRenderer(View *view)
+void Image2DRep3D::addRepActorsToViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->AddActor(mProxy->getActor());
-	mView = view;
 }
 
-void Image2DRep3D::removeRepActorsFromViewRenderer(View *view)
+void Image2DRep3D::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->RemoveActor(mProxy->getActor());
-	mView = NULL;
 }
 
 

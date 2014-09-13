@@ -215,17 +215,17 @@ public:
 		MeshPtr lines(new Mesh("v2vreg_lines", "v2vreg_lines", mPolyLines));
 		lines->setColor(QColor("cornflowerblue"));
 
-		View* view = viewManager()->get3DView();
+		ViewPtr view = viewManager()->get3DView();
 
-		m_mRep = GeometricRep::New(moving->getUid(), moving->getName());
+		m_mRep = GeometricRep::New();
 		m_mRep->setMesh(moving);
 		view->addRep(m_mRep);
 
-		m_fRep = GeometricRep::New(fixed->getUid(), fixed->getName());
+		m_fRep = GeometricRep::New();
 		m_fRep->setMesh(fixed);
 		view->addRep(m_fRep);
 
-		m_lineRep = GeometricRep::New(lines->getUid(), lines->getName());
+		m_lineRep = GeometricRep::New();
 		m_lineRep->setMesh(lines);
 		view->addRep(m_lineRep);
 
@@ -235,7 +235,7 @@ public:
 	}
 	~SeansVesselRegistrationDebugger()
 	{
-		View* view = viewManager()->get3DView();
+		ViewPtr view = viewManager()->get3DView();
 		view->removeRep(m_mRep);
 		view->removeRep(m_fRep);
 		view->removeRep(m_lineRep);

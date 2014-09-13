@@ -67,7 +67,7 @@ class ToolRep2D : public RepImpl
 {
 	Q_OBJECT
 	public:
-		static ToolRep2DPtr New(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name="");
+		static ToolRep2DPtr New(SpaceProviderPtr spaceProvider, const QString& uid="");
 		~ToolRep2D();
 		virtual QString getType() const;
 
@@ -95,12 +95,12 @@ class ToolRep2D : public RepImpl
 		bool showProbe();
 		bool showOffset();
 
-		virtual void addRepActorsToViewRenderer(View *view);
-		virtual void removeRepActorsFromViewRenderer(View *view);
+		virtual void addRepActorsToViewRenderer(ViewPtr view);
+		virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 		virtual void onModifiedStartRender();
 
 	private:
-		ToolRep2D(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name="");
+		ToolRep2D(SpaceProviderPtr spaceProvider);
 
 		void setProbeSector(ProbeData data);
 		double getOffset();

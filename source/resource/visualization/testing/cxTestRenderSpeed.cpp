@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxReporter.h"
 #include "vtkRenderWindowInteractor.h"
-//#include "cxForwardDeclarations.h"
 
 namespace cxtest
 {

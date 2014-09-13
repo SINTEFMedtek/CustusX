@@ -61,7 +61,7 @@ typedef boost::shared_ptr<class DisplayTextRep> DisplayTextRepPtr;
 class DisplayTextRep : public RepImpl
 {
 public:
-	static DisplayTextRepPtr New(const QString& uid, const QString& name);
+	static DisplayTextRepPtr New(const QString& uid="");
 	virtual QString getType() const{ return "vm::DisplayTextRep";}
 	TextDisplayPtr addText(const QColor& color, const QString& text, const Vector3D& pos, int maxWidth=0, vtkViewport *vp=NULL);
 	void setText(unsigned i, const QString& text);
@@ -70,9 +70,9 @@ public:
 	virtual ~DisplayTextRep();
 
 protected:
-	DisplayTextRep(const QString& uid, const QString& name);
-	virtual void addRepActorsToViewRenderer(View *view);
-	virtual void removeRepActorsFromViewRenderer(View *view);
+	DisplayTextRep();
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
 	std::vector<TextDisplayPtr> mDisplayText;
 };

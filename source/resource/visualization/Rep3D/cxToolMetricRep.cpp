@@ -39,14 +39,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ToolMetricRepPtr ToolMetricRep::New(const QString& uid, const QString& name)
+ToolMetricRepPtr ToolMetricRep::New(const QString& uid)
 {
-	ToolMetricRepPtr retval(new ToolMetricRep(uid, name));
-	return retval;
+	return wrap_new(new ToolMetricRep(), uid);
 }
 
-ToolMetricRep::ToolMetricRep(const QString& uid, const QString& name) :
-				DataMetricRep(uid, name)
+ToolMetricRep::ToolMetricRep()
 {
 	mViewportListener.reset(new ViewportListener);
 	mViewportListener->setCallback(boost::bind(&ToolMetricRep::rescale, this));
@@ -61,13 +59,13 @@ void ToolMetricRep::clear()
 	DataMetricRep::clear();
 }
 
-void ToolMetricRep::addRepActorsToViewRenderer(View *view)
+void ToolMetricRep::addRepActorsToViewRenderer(ViewPtr view)
 {
 	mViewportListener->startListen(view->getRenderer());
 	DataMetricRep::addRepActorsToViewRenderer(view);
 }
 
-void ToolMetricRep::removeRepActorsFromViewRenderer(View *view)
+void ToolMetricRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	DataMetricRep::removeRepActorsFromViewRenderer(view);
 	mViewportListener->stopListen();
@@ -82,21 +80,21 @@ void ToolMetricRep::onModifiedStartRender()
 {
 	ToolMetricPtr metric = this->getToolMetric();
 
-	if (!metric || !metric->isValid() || !mView)
+	if (!metric || !metric->isValid() || !this->getView())
 		return;
 
 	if (!mAxes || !mToolTip || !mToolOffset)
 	{
 		mAxes.reset(new GraphicalAxes3D());
-		mToolTip.reset(new GraphicalPoint3D(mView->getRenderer()));
-		mToolOffset.reset(new GraphicalLine3D(mView->getRenderer()));
+		mToolTip.reset(new GraphicalPoint3D(this->getRenderer()));
+		mToolOffset.reset(new GraphicalLine3D(this->getRenderer()));
 	}
 
 	mAxes->setFontSize(0.04);
 	mAxes->setAxisLength(0.05);
 //	mAxes->setAxisLength(0.2);
 	mAxes->setShowAxesLabels(false);
-	mAxes->setRenderer(mView->getRenderer());
+	mAxes->setRenderer(this->getRenderer());
 
 	Vector3D p0_r = mMetric->getRefCoord();
 	Transform3D rMt = metric->getRefFrame();

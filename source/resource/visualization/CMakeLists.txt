@@ -6,6 +6,8 @@ include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 
 cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	cxView
+	View/cxViewLinkingViewWidget
+	View/cxViewWidget
     
 	Rep/cxRep.h
 	Rep/cxRepImpl
@@ -125,7 +127,8 @@ set(CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES
     ${CustusX_SOURCE_DIR}/source/resource/visualization/Rep3D
     ${CustusX_SOURCE_DIR}/source/resource/visualization/RepVideo
     ${CustusX_SOURCE_DIR}/source/resource/visualization/Primitives
-    CACHE INTERNAL "Include directories for resource visualization library")
+	${CustusX_SOURCE_DIR}/source/resource/visualization/View
+	CACHE INTERNAL "Include directories for resource visualization library")
 
 include_directories(${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/ThirdParty/VTKMultiVolume

@@ -70,10 +70,10 @@ public:
     DataMetricPtr getDataMetric();
 
 protected:
-	DataMetricRep(const QString& uid, const QString& name);
+	DataMetricRep();
 
-    void addRepActorsToViewRenderer(View *view);
-    void removeRepActorsFromViewRenderer(View *view);
+	void addRepActorsToViewRenderer(ViewPtr view);
+	void removeRepActorsFromViewRenderer(ViewPtr view);
     void drawText();
     virtual void clear(); // reset all internals
     virtual QString getText();
@@ -85,7 +85,6 @@ protected:
 	Vector3D getColorAsVector3D() const;
 
     DataMetricPtr mMetric;
-//    View *mView;
 
 private:
 	CaptionText3DPtr mText;

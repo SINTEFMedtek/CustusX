@@ -59,7 +59,7 @@ class DonutMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:
-	static DonutMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
+	static DonutMetricRepPtr New(const QString& uid = ""); ///constructor
 	virtual ~DonutMetricRep() {}
 
 	virtual QString getType() const { return "DonutMetricRep"; }
@@ -69,8 +69,7 @@ protected:
 	virtual void onModifiedStartRender();
 
 private:
-	DonutMetricRep(const QString& uid, const QString& name = "");
-	DonutMetricRep(); ///< not implemented
+	DonutMetricRep();
 	DonutMetricPtr getDonutMetric();
 	void updateTorus();
 	void updateDisc();

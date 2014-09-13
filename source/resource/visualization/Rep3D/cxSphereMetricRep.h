@@ -63,7 +63,7 @@ class SphereMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:
-	static SphereMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
+	static SphereMetricRepPtr New(const QString& uid = ""); ///constructor
 	virtual ~SphereMetricRep() {}
 
 	virtual QString getType() const { return "SphereMetricRep"; }
@@ -73,8 +73,7 @@ protected:
 	virtual void onModifiedStartRender();
 
 private:
-	SphereMetricRep(const QString& uid, const QString& name = "");
-	SphereMetricRep(); ///< not implemented
+	SphereMetricRep();
 	SphereMetricPtr getSphereMetric();
 
 	GraphicalPoint3DPtr mGraphicalPoint;

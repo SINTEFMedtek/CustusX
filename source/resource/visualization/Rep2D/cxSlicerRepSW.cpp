@@ -46,8 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SliceRepSW::SliceRepSW(const QString& uid) :
-	RepImpl(uid)
+SliceRepSW::SliceRepSW() :
+	RepImpl()
 {
 	mImageSlicer.reset(new SlicedImageProxy());
 	mImageActor = vtkImageActorPtr::New();
@@ -61,9 +61,7 @@ SliceRepSW::~SliceRepSW()
 
 SliceRepSWPtr SliceRepSW::New(const QString& uid)
 {
-	SliceRepSWPtr retval(new SliceRepSW(uid));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new SliceRepSW(), uid);
 }
 
 ImagePtr SliceRepSW::getImage() 
@@ -83,15 +81,7 @@ void SliceRepSW::setImage( ImagePtr image )
 {
 	if (image == getImage())
 		return;
-	if (getImage())
-	{
-		getImage()->disconnectFromRep(mSelf);
-	}
 	mImageSlicer->setImage(image);
-	if (getImage())
-	{
-		getImage()->connectToRep(mSelf);
-	}
 }
 
 QString SliceRepSW::getImageUid()const
@@ -104,12 +94,12 @@ void SliceRepSW::setSliceProxy(SliceProxyInterfacePtr slicer)
 	mImageSlicer->setSliceProxy(slicer);
 }
 
-void SliceRepSW::addRepActorsToViewRenderer(View *view)
+void SliceRepSW::addRepActorsToViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->AddActor(mImageActor);
 }
 
-void SliceRepSW::removeRepActorsFromViewRenderer(View *view)
+void SliceRepSW::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->RemoveActor(mImageActor);
 }

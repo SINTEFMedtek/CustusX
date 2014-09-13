@@ -94,7 +94,7 @@ void RenderLoop::clearViews()
 	mViews.clear();
 }
 
-void RenderLoop::addView(ViewWidget* view)
+void RenderLoop::addView(ViewPtr view)
 {
 	mViews.insert(view);
 }
@@ -129,18 +129,18 @@ void RenderLoop::renderViews()
 {
 	bool smart = this->pollForSmartRenderingThisCycle();
 
-	for (ViewWidgetSet::iterator iter = mViews.begin(); iter != mViews.end(); ++iter)
+	for (ViewSet::iterator iter = mViews.begin(); iter != mViews.end(); ++iter)
 	{
-		ViewWidget* current = *iter;
-		if (current->isVisible())
-		{
+		ViewPtr current = *iter;
+//		if (current->isVisible())
+//		{
 			if (smart)
-				dynamic_cast<View*>(current)->render(); // render only changed scenegraph (shaky but smooth)
+				current->render(); // render only changed scenegraph (shaky but smooth)
 			else
 				current->getRenderWindow()->Render(); // previous version: renders even when nothing is changed
 
 			report_gl_error_text(cstring_cast(QString("During rendering of view: ") + current->getName()));
-		}
+//		}
 	}
 	mCyclicLogger->time("render");
 }

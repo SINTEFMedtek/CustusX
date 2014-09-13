@@ -38,6 +38,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitions.h"
 #include <vector>
 
+namespace cx
+{
+typedef QPointer<class ViewWidget> ViewWidgetQPtr;
+}
+
 namespace cxtest
 {
 typedef boost::shared_ptr<class RenderTester> RenderTesterPtr;

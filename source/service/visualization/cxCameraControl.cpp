@@ -183,7 +183,7 @@ QAction* CameraControl::addStandard3DViewAction(QString caption, QString help, V
 	return action;
 }
 
-void CameraControl::setView(ViewWidgetQPtr view)
+void CameraControl::setView(ViewPtr view)
 {
 	mView = view;
 }

@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 #include <QString>
 #include "cxRep.h"
+#include "cxView.h"
+#include "cxViewWidget.h"
 
 typedef vtkSmartPointer<class vtkProp> vtkPropPtr;
 
@@ -60,7 +62,6 @@ public:
 	RenderTester();
 	RenderTester(vtkRenderWindowPtr renderWindow);
 	RenderTester(cx::RepPtr rep, const unsigned int viewAxisSize);
-//	ViewWidget* getView();
 	void addProp(vtkPropPtr prop);
 	void renderToFile(QString filename);
 

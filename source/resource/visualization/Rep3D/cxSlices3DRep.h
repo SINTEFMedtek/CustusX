@@ -86,12 +86,11 @@ public:
 	void setTool(ToolPtr tool);
 
 protected:
-	Slices3DRep(const QString& uid);
-	virtual void addRepActorsToViewRenderer(View *view);
-	virtual void removeRepActorsFromViewRenderer(View *view);
+	Slices3DRep();
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
 private:
-	View *mView;
 	std::vector<Texture3DSlicerProxyPtr> mProxy;
 };
 //---------------------------------------------------------

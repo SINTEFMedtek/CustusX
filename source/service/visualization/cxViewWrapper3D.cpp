@@ -106,7 +106,7 @@ namespace cx
 
 
 
-ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServiceBackendPtr backend) :
+ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisualizationServiceBackendPtr backend):
 	ViewWrapper(backend)
 {
 	view->getRenderer()->GetActiveCamera()->SetClippingRange(1, 2000);
@@ -125,11 +125,11 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServ
 
 	this->initializeMultiVolume3DRepProducer();
 
-	mLandmarkRep = LandmarkRep::New(mBackend->getDataManager(), "LandmarkRep_" + index);
+	mLandmarkRep = LandmarkRep::New(mBackend->getDataManager());
 	mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
 	mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 
-	mPickerRep = PickerRep::New(mBackend->getDataManager(), "PickerRep_" + index, "PickerRep_" + index);
+	mPickerRep = PickerRep::New(mBackend->getDataManager());
 
 	connect(mPickerRep.get(), SIGNAL(pointPicked(Vector3D)), this, SLOT(PickerRepPointPickedSlot(Vector3D)));
 	connect(mPickerRep.get(), SIGNAL(dataPicked(QString)), this, SLOT(PickerRepDataPickedSlot(QString)));
@@ -140,12 +140,12 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServ
 	this->dominantToolChangedSlot();
 
 	// plane type text rep
-	mPlaneTypeText = DisplayTextRep::New("planeTypeRep_" + mView->getName(), "");
+	mPlaneTypeText = DisplayTextRep::New();
 	mPlaneTypeText->addText(QColor(Qt::green), "3D", Vector3D(0.98, 0.02, 0.0));
 	mView->addRep(mPlaneTypeText);
 
 	//data name text rep
-	mDataNameText = DisplayTextRep::New("dataNameText_" + mView->getName(), "");
+	mDataNameText = DisplayTextRep::New();
 	mDataNameText->addText(QColor(Qt::green), "not initialized", Vector3D(0.02, 0.02, 0.0));
 	mView->addRep(mDataNameText);
 
@@ -157,7 +157,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServ
 	connect(mBackend->getDataManager().get(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
 	this->toolsAvailableSlot();
 
-	mAnnotationMarker = RepManager::getInstance()->getCachedRep<OrientationAnnotation3DRep>("annotation_" + mView->getName());
+	mAnnotationMarker = RepManager::getInstance()->getCachedRep<OrientationAnnotation3DRep>();
 	this->settingsChangedSlot("View3D/annotationModel");
 	this->settingsChangedSlot("View3D/annotationModelSize");
 	mView->addRep(mAnnotationMarker);
@@ -257,7 +257,7 @@ void ViewWrapper3D::updateMetricNamesRep()
 	{
 		if (!mMetricNames)
 		{
-			mMetricNames = MetricNamesRep::New("metricsNames_" + mView->getName(), "");
+			mMetricNames = MetricNamesRep::New();
 			mView->addRep(mMetricNames);
 		}
 
@@ -624,7 +624,7 @@ RepPtr ViewWrapper3D::createDataRep3D(DataPtr data)
 {
 	if (boost::dynamic_pointer_cast<Mesh>(data))
 	{
-		GeometricRepPtr rep = GeometricRep::New(data->getUid() + "_geom3D_rep");
+		GeometricRepPtr rep = GeometricRep::New();
 		rep->setMesh(boost::dynamic_pointer_cast<Mesh>(data));
 		return rep;
 	}
@@ -643,21 +643,21 @@ DataMetricRepPtr ViewWrapper3D::createDataMetricRep3D(DataPtr data)
     DataMetricRepPtr rep;
 
     if (boost::dynamic_pointer_cast<PointMetric>(data))
-        rep = PointMetricRep::New(data->getUid() + "_3D_rep");
+		rep = PointMetricRep::New();
     else if (boost::dynamic_pointer_cast<FrameMetric>(data))
-        rep = FrameMetricRep::New(data->getUid() + "_3D_rep");
+		rep = FrameMetricRep::New();
 	else if (boost::dynamic_pointer_cast<ToolMetric>(data))
-		rep = ToolMetricRep::New(data->getUid() + "_3D_rep");
+		rep = ToolMetricRep::New();
 	else if (boost::dynamic_pointer_cast<DistanceMetric>(data))
-        rep = DistanceMetricRep::New(data->getUid() + "_3D_rep");
+		rep = DistanceMetricRep::New();
     else if (boost::dynamic_pointer_cast<AngleMetric>(data))
-        rep = AngleMetricRep::New(data->getUid() + "_3D_rep");
+		rep = AngleMetricRep::New();
     else if (boost::dynamic_pointer_cast<PlaneMetric>(data))
-        rep = PlaneMetricRep::New(data->getUid() + "_3D_rep");
+		rep = PlaneMetricRep::New();
 	else if (boost::dynamic_pointer_cast<DonutMetric>(data))
-		rep = DonutMetricRep::New(data->getUid() + "_3D_rep");
+		rep = DonutMetricRep::New();
 	else if (boost::dynamic_pointer_cast<SphereMetric>(data))
-		rep = SphereMetricRep::New(data->getUid() + "_3D_rep");
+		rep = SphereMetricRep::New();
 
     if (rep)
     {
@@ -758,7 +758,7 @@ void ViewWrapper3D::updateSlices()
 	mView->addRep(mSlices3DRep);
 }
 
-ViewWidget* ViewWrapper3D::getView()
+ViewPtr ViewWrapper3D::getView()
 {
 	return mView;
 }

@@ -34,7 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXTESTRENDERSPEED_H_
 
 #include "cxView.h"
+#include "cxViewWidget.h"
 class QGridLayout;
+class QLayout;
 
 typedef vtkSmartPointer<class vtkRenderWindow> vtkRenderWindowPtr;
 typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;

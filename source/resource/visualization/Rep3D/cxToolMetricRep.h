@@ -60,14 +60,14 @@ class ToolMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:
-	static ToolMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
+	static ToolMetricRepPtr New(const QString& uid = ""); ///constructor
 	virtual ~ToolMetricRep() {}
 	virtual QString getType() const { return "ToolMetricRep"; }
 
 protected:
 	virtual void clear();
-	void addRepActorsToViewRenderer(View *view);
-	void removeRepActorsFromViewRenderer(View *view);
+	void addRepActorsToViewRenderer(ViewPtr view);
+	void removeRepActorsFromViewRenderer(ViewPtr view);
 	virtual void onModifiedStartRender();
 
 private:

@@ -65,6 +65,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVector3D.h"
 #include "cxView.h"
 #include "cxTypeConversions.h"
+#include "cxForwardDeclarations.h"
+#include <vtkRenderWindowInteractor.h>
 
 typedef vtkSmartPointer<vtkAxesActor> vtkAxesActorPtr;
 typedef vtkSmartPointer<vtkTextProperty> vtkTextPropertyPtr;
@@ -79,17 +81,15 @@ namespace cx
 //std::pair<QString, vtkPropPtr> OrientationAnnotation3DRep::mMarkerCache;
 ////---------------------------------------------------------
 
-OrientationAnnotation3DRep::OrientationAnnotation3DRep(const QString& uid, const QString& name) :
-				RepImpl(uid, name), mSize(0.2), mColor(1, 0.5, 0.5)
+OrientationAnnotation3DRep::OrientationAnnotation3DRep() :
+				RepImpl(), mSize(0.2), mColor(1, 0.5, 0.5)
 {
 	this->rebuild(NULL);
 }
 
-OrientationAnnotation3DRepPtr OrientationAnnotation3DRep::New(const QString& uid, const QString& name)
+OrientationAnnotation3DRepPtr OrientationAnnotation3DRep::New(const QString& uid)
 {
-	OrientationAnnotation3DRepPtr retval(new OrientationAnnotation3DRep(uid, name));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new OrientationAnnotation3DRep(), uid);
 }
 
 OrientationAnnotation3DRep::~OrientationAnnotation3DRep()
@@ -97,12 +97,12 @@ OrientationAnnotation3DRep::~OrientationAnnotation3DRep()
 
 }
 
-void OrientationAnnotation3DRep::addRepActorsToViewRenderer(View* view)
+void OrientationAnnotation3DRep::addRepActorsToViewRenderer(ViewPtr view)
 {
 	this->rebuild(view->getRenderWindow()->GetInteractor());
 }
 
-void OrientationAnnotation3DRep::removeRepActorsFromViewRenderer(View* view)
+void OrientationAnnotation3DRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	mMarker->SetInteractor(NULL);
 }

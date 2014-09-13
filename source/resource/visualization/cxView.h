@@ -30,16 +30,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
 #ifndef CXVIEW_H_
 #define CXVIEW_H_
+
 #include "sscConfig.h"
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 #include "vtkForwardDeclarations.h"
 #include "cxIndent.h"
+#include <QSize>
 class QColor;
-
-#include "QVTKWidget.h"
 
 #include "cxTransform3D.h"
 
@@ -63,94 +63,38 @@ typedef boost::shared_ptr<class Rep> RepPtr;
  *
  * \ingroup cx_resource_visualization
  */
-class View
+class View : public QObject
 {
+	Q_OBJECT
 public:
 	/// type describing the view
 	enum Type
 	{
 		VIEW, VIEW_2D, VIEW_3D, VIEW_REAL_TIME
 	};
-	View(QWidget *parent, QSize size, const QString& uid = "", const QString& name = "");
-	virtual ~View();
-	/// \return the View type, indicating display dimension.
-	virtual Type getType() const
-	{
-		return mType;
-	}
-	virtual void setType(Type type)
-	{
-		mType = type;
-	}
-	QString getTypeString() const;
-	virtual QString getUid(); ///< Get a views unique id
-	virtual QString getName(); ///< Get a views name
-	virtual vtkRendererPtr getRenderer() const; ///< Get the renderer used by this \a View.
-	virtual void addRep(const RepPtr& rep); ///< Adds and connects a rep to the view
-	virtual void setRep(const RepPtr& rep); ///< Remove all other \a Rep objects from this \a View and add the provided Rep to this \a View.
-	virtual void removeRep(const RepPtr& rep); ///< Removes and disconnects the rep from the view
-	virtual bool hasRep(const RepPtr& rep) const; ///< Checks if the view already have the rep
-	virtual std::vector<RepPtr> getReps(); ///< Returns all reps in the view
-	virtual void removeReps(); ///< Removes all reps in the view
-	virtual void setBackgroundColor(QColor color);
-	virtual void render(); ///< render the view contents if vtk-MTimes are changed
-
+	virtual ~View() {}
+	virtual Type getType() const = 0;
+	virtual QString getTypeString() const = 0;
+	virtual QString getUid() = 0; ///< Get a views unique id
+	virtual QString getName() = 0; ///< Get a views name
+	virtual vtkRendererPtr getRenderer() const = 0; ///< Get the renderer used by this \a View.
+	virtual void addRep(const RepPtr& rep) = 0; ///< Adds and connects a rep to the view
+	virtual void setRep(const RepPtr& rep) = 0; ///< Remove all other \a Rep objects from this \a View and add the provided Rep to this \a View.
+	virtual void removeRep(const RepPtr& rep) = 0; ///< Removes and disconnects the rep from the view
+	virtual bool hasRep(const RepPtr& rep) const = 0; ///< Checks if the view already have the rep
+	virtual std::vector<RepPtr> getReps() = 0; ///< Returns all reps in the view
+	virtual void removeReps() = 0; ///< Removes all reps in the view
+	virtual void setBackgroundColor(QColor color) = 0;
+	virtual void render() = 0; ///< render the view contents if vtk-MTimes are changed
 	virtual vtkRenderWindowPtr getRenderWindow() const = 0;
 	virtual QSize size() const = 0;
-
-	/**
-	 * Return the geometry of the view in screen coordinates
-	 */
-	virtual QRect screenGeometry() const = 0;
-
 	virtual void setZoomFactor(double factor) = 0;
-	double getZoomFactor() const;
-	Transform3D get_vpMs() const;
-	double mmPerPix() const;
-	DoubleBoundingBox3D getViewport() const;
-	DoubleBoundingBox3D getViewport_s() const;
-
-	QWidget *widget() const { return mParent; }
-	void forceUpdate() { mMTimeHash = 0; }
-
-protected:
-	QSize mSize;
-	double mZoomFactor; ///< zoom factor for this view. 1 means that 1m on screen is 1m
-	QColor mBackgroundColor;
-	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
-	QString mUid; ///< The view's unique id
-	QString mName; ///< The view's name
-	vtkRendererPtr mRenderer;
-	std::vector<RepPtr> mReps; ///< Storage for internal reps.
-	typedef std::vector<RepPtr>::iterator RepsIter; ///< Iterator typedef for the internal rep vector.
-	QWidget *mParent;
-	Type mType;
-};
-typedef boost::shared_ptr<View> ViewPtr;
-
-/** Simple 1:1 conflation of SSC Views and Qt Widgets
-  *
- * \ingroup cx_resource_visualization
-  */
-class ViewWidget : public QVTKWidget, public View
-{
-Q_OBJECT
-	typedef QVTKWidget widget;
-
-public:
-	ViewWidget(QWidget *parent = NULL, Qt::WindowFlags f = 0);
-	ViewWidget(const QString& uid, const QString& name = "", QWidget *parent = NULL, Qt::WindowFlags f = 0); ///< constructor
-	virtual ~ViewWidget();
-
-	void print(std::ostream& os);
-	virtual void printSelf(std::ostream & os, Indent indent);
-	virtual void clear(); ///< Removes everything in the view, inluding reps.
-
-	// Implement pure virtuals in base class
-	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; } ///< Get the vtkRenderWindow used by this \a View.
-	virtual QSize size() const { return widget::size(); }
-	virtual void setZoomFactor(double factor);
-	virtual QRect screenGeometry() const;
+	virtual double getZoomFactor() const = 0;
+	virtual Transform3D get_vpMs() const = 0;
+//	virtual double heightMM() const = 0;
+	virtual DoubleBoundingBox3D getViewport() const = 0;
+	virtual DoubleBoundingBox3D getViewport_s() const = 0;
+	virtual void forceUpdate() = 0;
 
 signals:
 	void resized(QSize size);
@@ -160,29 +104,12 @@ signals:
 	void mouseWheel(int x, int y, int delta, int orientation, Qt::MouseButtons buttons);
 	void shown();
 	void focusChange(bool gotFocus, Qt::FocusReason reason);
+	void customContextMenuRequested(const QPoint&);
 
-// old, deprecated signals that pass event objects; this is UNSAFE over thread boundaries!
-signals:
-	void mouseMoveSignal(QMouseEvent* event);
-	void mousePressSignal(QMouseEvent* event);
-	void mouseReleaseSignal(QMouseEvent* event);
-	void mouseWheelSignal(QWheelEvent*);
-	void showSignal(QShowEvent* event);
-	void focusInSignal(QFocusEvent* event);
-
-protected:
-	vtkRenderWindowPtr mRenderWindow;
-
-private:
-	virtual void showEvent(QShowEvent* event);
-	virtual void wheelEvent(QWheelEvent*);
-	virtual void mouseMoveEvent(QMouseEvent *event);
-	virtual void mousePressEvent(QMouseEvent *event);
-	virtual void mouseReleaseEvent(QMouseEvent *event);
-	virtual void focusInEvent(QFocusEvent* event);
-	virtual void resizeEvent(QResizeEvent *event);
-	virtual void paintEvent(QPaintEvent *event);
 };
+typedef boost::shared_ptr<View> ViewPtr;
+
+
 typedef boost::shared_ptr<View> ViewPtr;
 
 } // namespace cx

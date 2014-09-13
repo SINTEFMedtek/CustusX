@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxView.h"
 #include "cxLayoutData.h"
 #include "cxViewCache.h"
+#include "cxViewWidget.h"
+
 
 class QGridLayout;
 

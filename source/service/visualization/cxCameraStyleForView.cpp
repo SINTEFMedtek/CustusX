@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisualizationServiceBackend.h"
 #include "cxViewportListener.h"
 #include "cxLogger.h"
+#include <vtkRenderWindowInteractor.h>
 
 SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, CAMERA_STYLE_TYPE, cstCOUNT)
 {
@@ -74,7 +75,7 @@ CameraStyleForView::CameraStyleForView(VisualizationServiceBackendPtr backend) :
 	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 }
 
-void CameraStyleForView::setView(ViewWidgetQPtr widget)
+void CameraStyleForView::setView(ViewPtr widget)
 {
 	this->disconnectTool();
 	mView = widget;
@@ -82,7 +83,7 @@ void CameraStyleForView::setView(ViewWidgetQPtr widget)
 }
 
 
-ViewWidgetQPtr CameraStyleForView::getView() const
+ViewPtr CameraStyleForView::getView() const
 {
 	return mView;
 }
@@ -261,7 +262,7 @@ void CameraStyleForView::setCameraStyle(CAMERA_STYLE_TYPE style)
 
 	this->disconnectTool();
 
-	ViewWidget* view = this->getView();
+	ViewPtr view = this->getView();
 	if (!view)
 		return;
 	vtkRenderWindowInteractor* interactor = view->getRenderWindow()->GetInteractor();

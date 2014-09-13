@@ -40,14 +40,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-PointMetricRepPtr PointMetricRep::New(const QString& uid, const QString& name)
+PointMetricRepPtr PointMetricRep::New(const QString& uid)
 {
-	PointMetricRepPtr retval(new PointMetricRep(uid, name));
-	return retval;
+	return wrap_new(new PointMetricRep(), uid);
 }
 
-PointMetricRep::PointMetricRep(const QString& uid, const QString& name) :
-                DataMetricRep(uid, name)
+PointMetricRep::PointMetricRep()
 {
 	mViewportListener.reset(new ViewportListener);
 	mViewportListener->setCallback(boost::bind(&PointMetricRep::rescale, this));
@@ -59,13 +57,13 @@ void PointMetricRep::clear()
     mGraphicalPoint.reset();
 }
 
-void PointMetricRep::addRepActorsToViewRenderer(View *view)
+void PointMetricRep::addRepActorsToViewRenderer(ViewPtr view)
 {
     mViewportListener->startListen(view->getRenderer());
     DataMetricRep::addRepActorsToViewRenderer(view);
 }
 
-void PointMetricRep::removeRepActorsFromViewRenderer(View *view)
+void PointMetricRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
     DataMetricRep::removeRepActorsFromViewRenderer(view);
     mViewportListener->stopListen();
@@ -76,8 +74,8 @@ void PointMetricRep::onModifiedStartRender()
     if (!mMetric)
 		return;
 
-	if (!mGraphicalPoint && mView && mMetric)
-		mGraphicalPoint.reset(new GraphicalPoint3D(mView->getRenderer()));
+	if (!mGraphicalPoint && this->getView() && mMetric)
+		mGraphicalPoint.reset(new GraphicalPoint3D(this->getRenderer()));
 
 	if (!mGraphicalPoint)
 		return;

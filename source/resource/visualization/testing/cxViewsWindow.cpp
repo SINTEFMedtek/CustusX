@@ -110,9 +110,9 @@ void ViewsWindow::insertView(cx::ViewWidget *view, const QString& uid, const QSt
 	layout->addWidget(new QLabel(uid+" "+volume, this));
 }
 
-cx::View* ViewsWindow::getView(int index)
+cx::ViewPtr ViewsWindow::getView(int index)
 {
-	return mLayouts[index];
+	return mLayouts[index]->getView();
 }
 
 bool ViewsWindow::quickRunWidget()
@@ -125,9 +125,9 @@ bool ViewsWindow::quickRunWidget()
 
 void ViewsWindow::updateRender()
 {
-	for (std::vector<cx::View *>::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
+	for (std::vector<cx::ViewWidget* >::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
 	{
-		this->prettyZoom(*iter);
+		this->prettyZoom((*iter)->getView());
 	}
 
 	for (unsigned i=0; i<mLayouts.size(); ++i)
@@ -136,7 +136,7 @@ void ViewsWindow::updateRender()
 	}
 }
 
-void ViewsWindow::prettyZoom(cx::View *view)
+void ViewsWindow::prettyZoom(cx::ViewPtr view)
 {
 	if (view->getZoomFactor()<0)
 	{
