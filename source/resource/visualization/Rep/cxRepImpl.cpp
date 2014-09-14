@@ -85,11 +85,12 @@ void RepImpl::connectToView(ViewPtr theView)
 
 void RepImpl::disconnectFromView(ViewPtr theView)
 {
-//	mViews.erase(theView);
 	vtkRendererPtr renderer = this->getRenderer();
-	renderer->RemoveObserver(this->mCallbackCommand);
-
-	this->removeRepActorsFromViewRenderer(theView);
+	if (renderer)
+	{
+		renderer->RemoveObserver(this->mCallbackCommand);
+		this->removeRepActorsFromViewRenderer(theView);
+	}
 	mView.reset();
 }
 

@@ -78,7 +78,6 @@ public:
 	virtual QString getName(); ///< Get a views name
 	virtual vtkRendererPtr getRenderer() const; ///< Get the renderer used by this \a View.
 	virtual void addRep(const RepPtr& rep); ///< Adds and connects a rep to the view
-	virtual void setRep(const RepPtr& rep); ///< Remove all other \a Rep objects from this \a View and add the provided Rep to this \a View.
 	virtual void removeRep(const RepPtr& rep); ///< Removes and disconnects the rep from the view
 	virtual bool hasRep(const RepPtr& rep) const; ///< Checks if the view already have the rep
 	virtual std::vector<RepPtr> getReps(); ///< Returns all reps in the view

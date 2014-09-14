@@ -92,7 +92,8 @@ TEST_CASE("Visual rendering: Empty view",
 	cxtest::ViewsFixture fixture;
 
 	cx::ViewWidget* view = fixture.addView("empty", 0, 0);
-	REQUIRE(fixture.quickRunWidget());
+//fixture.runWidget();
+		REQUIRE(fixture.quickRunWidget());
 
 	fixture.dumpDebugViewToDisk("emptyview", 0);
 	REQUIRE(fixture.getFractionOfBrightPixelsInView(0,0) == Approx(0));

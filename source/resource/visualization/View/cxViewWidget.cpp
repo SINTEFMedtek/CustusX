@@ -81,7 +81,6 @@ ViewWidget::ViewWidget(QWidget *parent, Qt::WindowFlags f) :
 {
 	mMTimeHash = 0;
 	mBackgroundColor = QColor("black");
-//	mParent = parent;
 	mUid = "";
 	mName = "";
 	mType = View::VIEW;
@@ -162,12 +161,6 @@ void ViewWidget::addRep(const RepPtr& rep)
 
 	rep->connectToView(this->getView());
 	mReps.push_back(rep);
-}
-
-void ViewWidget::setRep(const RepPtr& rep)
-{
-	removeReps();
-	addRep(rep);
 }
 
 void ViewWidget::setBackgroundColor(QColor color)
@@ -329,6 +322,13 @@ void ViewWidget::paintEvent(QPaintEvent* event)
 
 void ViewWidget::render()
 {
+//	std::cout << "ViewWidget::render(QW) " << size().width() << "," << size().height() << std::endl;
+//	std::cout << "ViewWidget::render(RW) " << this->getRenderWindow()->GetSize()[0] << "," << this->getRenderWindow()->GetSize()[1] << std::endl;
+//	Eigen::Array4d vp(this->getRenderer()->GetViewport());
+//	std::cout << "ViewWidget::render(VP) " << vp << std::endl;
+//	this->getRenderWindow()->Render();
+//	return; //HACHACKHACK
+
 	// Render is called only when mtime is changed.
 	// At least on MaxOS, this is not done automatically.
 	unsigned long hash = 0;

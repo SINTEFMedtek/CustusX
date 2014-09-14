@@ -85,7 +85,7 @@ public:
 	virtual QString getName()  { ViewLinkingViewWidget_GET_CHECK(getName, ""); }
 	virtual vtkRendererPtr getRenderer() const  { ViewLinkingViewWidget_GET_CHECK(getRenderer, vtkRendererPtr()); }
 	virtual void addRep(const RepPtr& rep)  { ViewLinkingViewWidget_SET_1_CHECK(addRep, rep); }
-	virtual void setRep(const RepPtr& rep)  { ViewLinkingViewWidget_SET_1_CHECK(setRep, rep); }
+//	virtual void setRep(const RepPtr& rep)  { ViewLinkingViewWidget_SET_1_CHECK(setRep, rep); }
 	virtual void removeRep(const RepPtr& rep)  { ViewLinkingViewWidget_SET_1_CHECK(removeRep, rep); }
 	virtual bool hasRep(const RepPtr& rep) const  { ViewLinkingViewWidget_GET_1_CHECK(hasRep, false, rep); }
 	virtual std::vector<RepPtr> getReps() { ViewLinkingViewWidget_GET_CHECK(getReps, std::vector<RepPtr>()); }

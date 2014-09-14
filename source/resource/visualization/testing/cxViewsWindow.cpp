@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDesktopWidget>
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QScreen>
 
 namespace cxtest
 {
@@ -51,7 +52,14 @@ ViewsWindow::ViewsWindow()
 {
 	mZoomFactor = 1;
 	QDesktopWidget* desktop = dynamic_cast<QApplication*>(QApplication::instance())->desktop();
+
+	 QScreen* screen__ = qApp->screens()[0];
+//	 std::cout << "dpr " << screen__->devicePixelRatio() << std::endl;
+
+
+
 	QRect screen = desktop->screenGeometry(desktop->primaryScreen());
+//	std::cout << "screen: w=" << screen.width() << ", h=" << screen.height() << std::endl;
 	screen.adjust(screen.width()*0.15, screen.height()*0.15, -screen.width()*0.15, -screen.height()*0.15);
 	this->setGeometry(screen);
 	this->setCentralWidget( new QWidget(this) );
@@ -132,7 +140,8 @@ void ViewsWindow::updateRender()
 
 	for (unsigned i=0; i<mLayouts.size(); ++i)
 	{
-		mLayouts[i]->getRenderWindow()->Render();
+//		mLayouts[i]->getRenderWindow()->Render();
+		mLayouts[i]->render();
 	}
 }
 
