@@ -57,17 +57,18 @@ class LayoutWidget : public QWidget
 public:
 	LayoutWidget();
 	~LayoutWidget();
-	/** Set the stretch factors of columns and rows in mLayout.
-	 */
-	void setStretchFactors(LayoutRegion region, int stretchFactor);
-	void addView(ViewWidget* view, LayoutRegion region);
+
+	ViewPtr addView(View::Type type, LayoutRegion region);
+	void showViews();
+	void setStretchFactors(LayoutRegion region, int stretchFactor); ///< Set the stretch factors of columns and rows in mLayout.
 	void clearViews();
+
+private:
+	void addView(ViewWidget* view, LayoutRegion region);
 
 	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache2D;
 	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache3D;
 	boost::shared_ptr<ViewCache<ViewWidget> > mViewCacheRT;
-
-private:
 	QGridLayout* mLayout; ///< the layout
 	std::vector<ViewWidget*> mViews;
 };

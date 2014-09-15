@@ -112,7 +112,7 @@ void LayoutEditorWidget::contextMenuSlot(const QPoint& point)
   QPoint pointGlobal = this->mapToGlobal(point);
   QMenu menu(this);
 
-  LayoutData::ViewData viewData = this->getViewData(point);
+  LayoutViewData viewData = this->getViewData(point);
 
   QAction* mergeAction = new QAction("merge view", &menu);
   mergeAction->setEnabled(this->getSelectedViews().size()>1);
@@ -231,8 +231,8 @@ void LayoutEditorWidget::mouseMoveEvent(QMouseEvent* event)
 
 void LayoutEditorWidget::updateSelection(QPoint pos)
 {
-  LayoutData::ViewData start = this->getViewData(mClickPos);
-  LayoutData::ViewData stop = this->getViewData(pos);
+  LayoutViewData start = this->getViewData(mClickPos);
+  LayoutViewData stop = this->getViewData(pos);
   mSelection = merge(start.mRegion, stop.mRegion);
   this->colorRegion(mSelection, "dimgrey", "lightgrey");
 }
@@ -288,7 +288,7 @@ void LayoutEditorWidget::colorRegion(LayoutRegion region, QString selectColor, Q
 /** Find view data for the frame under point pt
  *
  */
-LayoutData::ViewData LayoutEditorWidget::getViewData(QPoint pt)
+LayoutViewData LayoutEditorWidget::getViewData(QPoint pt)
 {
   for (LayoutData::iterator iter=mViewData.begin(); iter!=mViewData.end(); ++iter)
   {
@@ -299,7 +299,7 @@ LayoutData::ViewData LayoutEditorWidget::getViewData(QPoint pt)
     return *iter;
   }
 
-  return LayoutData::ViewData();
+  return LayoutViewData();
 }
 
 /**called when row/column text boxes changed. Update model.
@@ -312,7 +312,7 @@ void LayoutEditorWidget::rowsColumnsChangedSlot()
   this->updateGrid();
 }
 
-QString LayoutEditorWidget::getViewName(LayoutData::ViewData data) const
+QString LayoutEditorWidget::getViewName(LayoutViewData data) const
 {
   for (unsigned i=0; i<mViewNames.size(); ++i)
   {

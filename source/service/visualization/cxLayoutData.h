@@ -79,29 +79,30 @@ struct LayoutRegion
 
 LayoutRegion merge(LayoutRegion a, LayoutRegion b);
 
+/** Describes the layout and content of one view.
+ */
+struct LayoutViewData
+{
+	LayoutViewData() : mGroup(-1), mPlane(ptCOUNT), mType(View::VIEW), mRegion(-1, -1, 1, 1) {}
+	LayoutViewData(int row, int col, int rowSpan = 1, int colSpan = 1) :
+		mGroup(-1), mPlane(ptCOUNT), mType(View::VIEW), mRegion(row, col, rowSpan, colSpan) {}
+	int mGroup; ///< what group to connect to. -1 means not set.
+	PLANE_TYPE mPlane; ///< ptNOPLANE means 3D
+	View::Type mType;
+	LayoutRegion mRegion;
+
+	void addXml(QDomNode node) const; ///< save state to xml
+	void parseXml(QDomNode node);///< load state from xml
+	bool isValid() const { return (( mGroup>=0 )&&( mPlane!=ptCOUNT )); }
+};
+
 /** Represents one specific layout of the views, and what kind of information they contain,
  *  i.e 3D/2D, slice plane definition, image group.
  */
 class LayoutData
 {
 public:
-	/** Describes the layout and content of one view.
-	 */
-	struct ViewData
-	{
-		ViewData() : mGroup(-1), mPlane(ptCOUNT), mType(View::VIEW), mRegion(-1, -1, 1, 1) {}
-		ViewData(int row, int col, int rowSpan = 1, int colSpan = 1) :
-			mGroup(-1), mPlane(ptCOUNT), mType(View::VIEW), mRegion(row, col, rowSpan, colSpan) {}
-		int mGroup; ///< what group to connect to. -1 means not set.
-		PLANE_TYPE mPlane; ///< ptNOPLANE means 3D
-		View::Type mType;
-		LayoutRegion mRegion;
-
-		void addXml(QDomNode node) const; ///< save state to xml
-		void parseXml(QDomNode node);///< load state from xml
-	};
-
-	typedef std::vector<ViewData> ViewDataContainer;
+	typedef std::vector<LayoutViewData> ViewDataContainer;
 	typedef ViewDataContainer::iterator iterator;
 	typedef ViewDataContainer::const_iterator const_iterator;
 
@@ -115,7 +116,7 @@ public:
 	void resetUid(const QString& uid);
 	void setView(int group, PLANE_TYPE type, LayoutRegion region);
 	void setView(int group, View::Type type, LayoutRegion region);
-	ViewData& get(LayoutPosition pos);
+	LayoutViewData& get(LayoutPosition pos);
 	iterator begin() { return mView.begin(); }
 	iterator end() { return mView.end(); }
 	const_iterator begin() const { return mView.begin(); }
@@ -136,7 +137,7 @@ private:
 	QString mUid;
 	QString mName;
 	LayoutPosition mSize;
-	std::vector<ViewData> mView;
+	std::vector<LayoutViewData> mView;
 };
 
 /**

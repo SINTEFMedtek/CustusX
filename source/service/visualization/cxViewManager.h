@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
+//#include "cxLayoutData.h"
 
 class QActionGroup;
 class QAction;
@@ -51,6 +52,7 @@ class QTime;
 namespace cx
 {
 class LayoutData;
+class LayoutViewData;
 struct LayoutRegion;
 class LayoutWidget;
 class ViewWrapper;
@@ -64,7 +66,6 @@ typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
 typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
 typedef boost::shared_ptr<class Navigation> NavigationPtr;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
-typedef QPointer<class ViewWidget> ViewWidgetQPtr;
 
 /**
  * \file
@@ -142,10 +143,6 @@ public:
 	NavigationPtr getNavigation();
 	int findGroupContaining3DViewGivenGuess(int preferredGroup);
 
-//	static ViewManager* createInstance(VisualizationServiceBackendPtr backend); ///< create the instance
-//	static ViewManager* getInstance(); ///< returns the only instance of this class, NULL unless createInstance has been called.
-//	static void destroyInstance(); ///< destroys the only instance of this class
-
 	/** Initialize the widget and fill with the default view layout.
 	  * Return the top widget, it should be added to the calling gui.
 	  */
@@ -164,7 +161,7 @@ public:
 	InteractiveClipperPtr getClipper();
 	InteractiveCropperPtr getCropper();
 
-	CyclicActionLoggerPtr getRenderTimer();// { return mRenderTimer; }
+	CyclicActionLoggerPtr getRenderTimer();
 
 	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
 	void autoShowData(DataPtr data);
@@ -182,25 +179,18 @@ signals:
 protected slots:
 	void settingsChangedSlot(QString key);
 
-//	void clearSlot();
-//	void duringSavePatientSlot();
-//	void duringLoadPatientSlot();
 	void updateViews();
 	void updateCameraStyleActions();
-//	void globalCenterChangedSlot();
 	void setActiveView(QString viewUid);
 
 protected:
 	ViewManager(VisualizationServiceBackendPtr backend);
 
-	ViewWidget* getView(const QString& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
-
 	void syncOrientationMode(SyncedValuePtr val);
 
-	void activateView(LayoutWidget* widget, ViewWidget* viewWidget, ViewWrapperPtr wrapper, int group, LayoutRegion region);
-	void activate2DView(LayoutWidget *widget, int group, PLANE_TYPE plane, LayoutRegion region);
-	void activate3DView(LayoutWidget *widget, int group, LayoutRegion region);
-	void activateRTStreamView(LayoutWidget *widget, int group, LayoutRegion region);
+	void activateView(LayoutWidget* widget, LayoutViewData viewData);
+	ViewWrapperPtr createViewWrapper(ViewPtr view, LayoutViewData viewData);
+
 	void setRenderingInterval(int interval);
 	void setSlicePlanesProxyInViewsUpTo2DViewgroup();
 
@@ -211,12 +201,9 @@ protected:
 	void initializeGlobal2DZoom();
 	void initializeActiveView();
 
-//	static ViewManager* mTheInstance; ///< the only instance of this class
-
 	LayoutRepositoryPtr mLayoutRepository;
 	std::vector<QPointer<LayoutWidget> > mLayoutWidgets;
 	QStringList mActiveLayout; ///< the active layout (type)
-//	QString mActiveView; ///< the active view
 	SyncedValuePtr mActiveView;
 	RenderLoopPtr mRenderLoop;
 	std::vector<ViewGroupPtr> mViewGroups;
@@ -229,7 +216,6 @@ protected:
 	InteractiveCropperPtr mInteractiveCropper;
 	SlicePlanesProxyPtr mSlicePlanesProxy;
 
-//	CameraStylePtr mCameraStyle;
 	CameraStyleInteractorPtr mCameraStyleInteractor;
 	VisualizationServiceBackendPtr mBackend;
 
@@ -237,9 +223,6 @@ private:
 	ViewManager(ViewManager const&);
 	ViewManager& operator=(ViewManager const&);
 };
-///**Shortcut for accessing the viewmanager instance.
-// */
-//ViewManager* viewManager();
 
 /**
  * @}

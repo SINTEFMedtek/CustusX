@@ -127,6 +127,7 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisualizationServiceBackendPtr backen
 	connect(mView.get(), SIGNAL(mouseMove(int, int, Qt::MouseButtons)), this, SLOT(mouseMoveSlot(int, int, Qt::MouseButtons)));
 	connect(mView.get(), SIGNAL(mouseWheel(int, int, int, int, Qt::MouseButtons)), this, SLOT(mouseWheelSlot(int, int, int, int, Qt::MouseButtons)));
 
+	this->dominantToolChangedSlot();
 	this->updateView();
 }
 

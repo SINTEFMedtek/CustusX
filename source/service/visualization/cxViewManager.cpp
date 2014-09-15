@@ -462,24 +462,7 @@ void ViewManager::activateViews(LayoutWidget *widget, LayoutData next)
 		return;
 
 	for (LayoutData::iterator iter = next.begin(); iter != next.end(); ++iter)
-	{
-		LayoutData::ViewData view = *iter;
-
-		if (view.mGroup < 0 || view.mPlane == ptCOUNT)
-			continue;
-
-		if (view.mPlane == ptNOPLANE || view.mPlane == ptCOUNT)
-		{
-			if (view.mType == View::VIEW_3D)
-				this->activate3DView(widget, view.mGroup, view.mRegion);
-			else if (view.mType == View::VIEW_REAL_TIME)
-				this->activateRTStreamView(widget, view.mGroup, view.mRegion);
-		}
-		else
-		{
-			this->activate2DView(widget, view.mGroup, view.mPlane, view.mRegion);
-		}
-	}
+		this->activateView(widget, *iter);
 }
 
 void ViewManager::setRenderingInterval(int interval)
@@ -487,45 +470,45 @@ void ViewManager::setRenderingInterval(int interval)
 	mRenderLoop->setRenderingInterval(interval);
 }
 
-void ViewManager::activateView(LayoutWidget* widget, ViewWidget* viewWidget, ViewWrapperPtr wrapper, int group, LayoutRegion region)
+void ViewManager::activateView(LayoutWidget* widget, LayoutViewData viewData)
 {
-	ViewPtr view = wrapper->getView();
+	if (!viewData.isValid())
+		return;
+
+	ViewPtr view = widget->addView(viewData.mType, viewData.mRegion);
 	mRenderLoop->addView(view);
-	mViewGroups[group]->addView(wrapper);
-	widget->addView(viewWidget, region);
-
-	viewWidget->show();
+	ViewWrapperPtr wrapper = this->createViewWrapper(view, viewData);
+	mViewGroups[viewData.mGroup]->addView(wrapper);
+	widget->showViews();
 }
 
-void ViewManager::activate2DView(LayoutWidget* widget, int group, PLANE_TYPE plane, LayoutRegion region)
+ViewWrapperPtr ViewManager::createViewWrapper(ViewPtr view, LayoutViewData viewData)
 {
-	ViewWidget* view = widget->mViewCache2D->retrieveView();
-	view->setType(View::VIEW_2D);
-
-	ViewWrapper2DPtr wrapper(new ViewWrapper2D(view->getView(), mBackend));
-	wrapper->initializePlane(plane);
-	this->activateView(widget, view, wrapper, group, region);
-}
-
-void ViewManager::activate3DView(LayoutWidget* widget, int group, LayoutRegion region)
-{
-	ViewWidget* view = widget->mViewCache3D->retrieveView();
-	view->setType(View::VIEW_3D);
-	ViewWrapper3DPtr wrapper(new ViewWrapper3D(group + 1, view->getView(), mBackend));
-	if (group == 0)
+	if (viewData.mType == View::VIEW_2D)
 	{
-		mInteractiveCropper->setView(view->getView());
+		ViewWrapper2DPtr wrapper(new ViewWrapper2D(view, mBackend));
+		wrapper->initializePlane(viewData.mPlane);
+		return wrapper;
+	}
+	else if (viewData.mType == View::VIEW_3D)
+	{
+
+		ViewWrapper3DPtr wrapper(new ViewWrapper3D(viewData.mGroup + 1, view, mBackend));
+		if (viewData.mGroup == 0)
+			mInteractiveCropper->setView(view);
+		return wrapper;
+	}
+	else if (viewData.mType == View::VIEW_REAL_TIME)
+	{
+		ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view, mBackend));
+		return wrapper;
+	}
+	else
+	{
+		reportError(QString("Unknown view type %1").arg(qstring_cast(viewData.mType)));
 	}
 
-	this->activateView(widget, view, wrapper, group, region);
-}
-
-void ViewManager::activateRTStreamView(LayoutWidget *widget, int group, LayoutRegion region)
-{
-	ViewWidget* view = widget->mViewCacheRT->retrieveView();
-	view->setType(View::VIEW_REAL_TIME);
-	ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view->getView(), mBackend));
-	this->activateView(widget, view, wrapper, group, region);
+	return ViewWrapperPtr();
 }
 
 LayoutData ViewManager::getLayoutData(const QString uid) const

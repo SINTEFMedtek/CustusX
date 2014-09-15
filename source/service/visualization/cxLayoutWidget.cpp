@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLayoutWidget.h"
 #include <QGridLayout>
 #include "cxLogger.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -54,6 +57,38 @@ LayoutWidget::~LayoutWidget()
 {
 }
 
+ViewPtr LayoutWidget::addView(View::Type type, LayoutRegion region)
+{
+	ViewWidget* view = NULL;
+	if (type == View::VIEW_2D)
+	{
+		view = this->mViewCache2D->retrieveView();
+	}
+	else if (type == View::VIEW_3D)
+	{
+		view = this->mViewCache3D->retrieveView();
+	}
+	else if (type == View::VIEW_REAL_TIME)
+	{
+		view = this->mViewCacheRT->retrieveView();
+	}
+	else
+	{
+		reportError(QString("Unknown view type %1").arg(qstring_cast(type)));
+		return ViewPtr();
+	}
+
+	view->setType(type);
+	this->addView(view, region);
+	return view->getView();
+}
+
+void LayoutWidget::showViews()
+{
+	for (unsigned i=0; i<mViews.size(); ++i)
+		mViews[i]->show();
+}
+
 void LayoutWidget::setStretchFactors(LayoutRegion region, int stretchFactor)
 {
 	// set stretch factors for the affected cols to 1 in order to get even distribution
@@ -72,7 +107,7 @@ void LayoutWidget::addView(ViewWidget* view, LayoutRegion region)
 {
 	mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col);
 	this->setStretchFactors(region, 1);
-	view->show();
+//	view->show();
 	mViews.push_back(view);
 }
 
