@@ -55,10 +55,9 @@ public:
 	struct CategorizedWidget
 	{
 		CategorizedWidget() {}
-        CategorizedWidget(QWidget* widget, QString category, QString subCategory="") : mWidget(widget), mCategory(category), mSubCategory(subCategory) {}
+		CategorizedWidget(QWidget* widget, QString category) : mWidget(widget), mCategory(category) {}
 		QWidget* mWidget;
 		QString mCategory;
-        QString mSubCategory;
 	};
 	virtual ~GUIExtenderService() {}
 

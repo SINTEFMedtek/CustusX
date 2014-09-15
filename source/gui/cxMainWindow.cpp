@@ -213,64 +213,8 @@ void MainWindow::addGUIExtender(GUIExtenderService* service)
 QWidget *MainWindow::addCategorizedWidget(GUIExtenderService::CategorizedWidget categorizedWidget)
 {
 	QWidget* retval;
-	if(!categorizedWidget.mSubCategory.isEmpty())
-	{
-        std::cout << "mSubCategory: " << categorizedWidget.mSubCategory << std::endl;
-        retval = this->addCategorizedWidgetToDockWidget(categorizedWidget);
-    }
-	else
-	{
-        std::cout << "mCategory: " << categorizedWidget.mCategory << std::endl;
-		retval = this->addAsDockWidget(categorizedWidget.mWidget, categorizedWidget.mCategory);
-	}
+	retval = this->addAsDockWidget(categorizedWidget.mWidget, categorizedWidget.mCategory);
 	return retval;
-}
-
-QWidget *MainWindow::addCategorizedWidgetToDockWidget(GUIExtenderService::CategorizedWidget categorizedWidget)
-{
-    QWidget *retval = NULL;
-
-		//Category
-    QTabWidget *categoryWidget = NULL;
-    if (mCategoryWidgetsMap.find(categorizedWidget.mCategory) != mCategoryWidgetsMap.end())
-    {
-				std::cout << "found categoryWidget: " << categorizedWidget.mCategory << std::endl;
-        retval = mCategorizedDockWidgets.at(categorizedWidget.mCategory);
-        categoryWidget = mCategoryWidgetsMap.at(categorizedWidget.mCategory);
-    }
-    else
-    {
-				std::cout << "create categoryWidget: " << categorizedWidget.mCategory << std::endl;
-				categoryWidget = this->createCategoryWidget(categorizedWidget.mCategory);
-        retval = this->addAsDockWidget(categoryWidget, categorizedWidget.mCategory);
-        mCategorizedDockWidgets[categorizedWidget.mCategory] = retval;
-    }
-
-		//SubCategory
-		QTabWidget *subCategoryWidget = NULL;
-		if (mCategoryWidgetsMap.find(categorizedWidget.mSubCategory) != mCategoryWidgetsMap.end())
-		{
-			std::cout << "found subCategoryWidget: " << categorizedWidget.mSubCategory << std::endl;
-			subCategoryWidget = mCategoryWidgetsMap.at(categorizedWidget.mSubCategory);
-		}
-		else
-		{
-			std::cout << "create subCategoryWidget: " << categorizedWidget.mSubCategory << std::endl;
-			subCategoryWidget = this->createCategoryWidget(categorizedWidget.mSubCategory);
-			categoryWidget->addTab(subCategoryWidget, categorizedWidget.mSubCategory);
-		}
-
-		subCategoryWidget->addTab(categorizedWidget.mWidget, categorizedWidget.mWidget->windowTitle());
-    return retval;
-}
-
-QTabWidget *MainWindow::createCategoryWidget(QString category)
-{
-    QTabWidget *categoryWidget = new QTabWidget(this);
-		categoryWidget->setWindowTitle(category);
-		categoryWidget->setObjectName(category);
-		mCategoryWidgetsMap[category] = categoryWidget;
-    return categoryWidget;
 }
 
 void MainWindow::removeGUIExtender(GUIExtenderService* service)
