@@ -71,6 +71,7 @@ private:
 //	QStackedWidget *findMethodWidget(QString registrationMethod);
 //	QStackedWidget *createMethodWidget(QString registrationMethod);
 	void insertImageComboInLayout(StringDataAdapterPtr adapter, QVBoxLayout *layout, int position);
+	void insertImageComboBoxes(std::vector<QVBoxLayout *> layouts);
 
 	ctkPluginContext* mPluginContext;
 	QVBoxLayout*  mVerticalLayout;
@@ -83,7 +84,6 @@ private:
 	std::map<QString, QStackedWidget*> mRegistrationTypeMap;
 	QStringList mRegistrationTypes;
 
-	void insertImageComboBoxes(std::vector<QVBoxLayout *> layouts);
 };
 
 } /* namespace cx */

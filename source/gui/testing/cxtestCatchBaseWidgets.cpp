@@ -117,13 +117,17 @@ namespace cxtest
 
 namespace
 {
-void testAndDeleteBaseWidgetChild(cx::BaseWidget* widget)
+void testBaseWidgetChild(cx::BaseWidget* widget)
 {
 	REQUIRE(widget);
 	CHECK_THAT(widget->objectName().toStdString(), EndsWith("Widget"));
 	CHECK_FALSE(widget->windowTitle().isEmpty());
 	CHECK_THAT(widget->defaultWhatsThis().toStdString(), StartsWith("<html>"));
+}
 
+void testAndDeleteBaseWidgetChild(cx::BaseWidget* widget)
+{
+	testBaseWidgetChild(widget);
 	delete widget;
 }
 
@@ -183,8 +187,11 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 TEST_CASE("VideoConnectionWidget is correctly constructed", "[unit][gui][widget][not_win32]")
 {
 	init();
-	testAndDeleteBaseWidgetChild(new cx::VideoConnectionWidget(NULL));
+//	testAndDeleteBaseWidgetChild(new cx::VideoConnectionWidget(NULL));
+	cx::VideoConnectionWidget *widget = new cx::VideoConnectionWidget(NULL);
+	testBaseWidgetChild(widget);
 	shutdown();
+	delete widget;
 }
 
 TEST_CASE("FileWatcherWidgets are correctly constructed", "[unit][gui][widget][not_win32]")

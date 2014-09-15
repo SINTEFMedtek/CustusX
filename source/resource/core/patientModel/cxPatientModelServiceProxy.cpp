@@ -50,7 +50,7 @@ PatientModelServiceProxy::PatientModelServiceProxy(ctkPluginContext *context) :
 
 PatientModelServiceProxy::~PatientModelServiceProxy()
 {
-	mServiceListener.reset();//Needed?
+//	mServiceListener.reset();//Needed?
 }
 
 void PatientModelServiceProxy::initServiceListener()

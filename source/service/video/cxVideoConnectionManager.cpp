@@ -78,7 +78,8 @@ VideoConnectionManager::VideoConnectionManager(VideoServiceBackendPtr backend)
 													 mBackend->getPluginContext(),
 													 boost::bind(&VideoConnectionManager::onServiceAdded, this, _1),
 													 boost::function<void (StreamerService*)>(),
-													 boost::bind(&VideoConnectionManager::onServiceRemoved, this, _1)
+													 boost::bind(&VideoConnectionManager::onServiceRemoved, this, _1),
+													 backend->getPluginFramework()
 													 ));
 	mServiceListener->open();
 }
@@ -86,7 +87,7 @@ VideoConnectionManager::VideoConnectionManager(VideoServiceBackendPtr backend)
 VideoConnectionManager::~VideoConnectionManager()
 {
 //	std::cout << "VideoConnectionManager destructor" << std::endl;
-	mServiceListener.reset();//needed?
+//	mServiceListener.reset();//needed?
 	mVideoConnection->disconnectServer();
 }
 

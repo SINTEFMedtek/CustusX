@@ -33,13 +33,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSERVICETRACKERLISTENER_H_
 #define CXSERVICETRACKERLISTENER_H_
 
+#include <QSharedDataPointer>
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include "ctkServiceTracker.h"
 #include "ctkServiceTrackerCustomizer.h"
 #include "ctkPluginContext.h"
-//#include "cxPluginFramework.h"
+#include <ctkPluginFramework.h>
 #include "cxServiceTrackerCustomizer.h"
+
 
 namespace cx
 {
@@ -68,10 +70,13 @@ class ServiceTrackerListener
 {
 
 public:
-	ServiceTrackerListener(ctkPluginContext* context,//PluginFrameworkManagerPtr pluginFramework,
+	// pluginFrameWork is needed if ServiceTrackerListener is to be used outside of a plugin. (Like in the old ReconstructionManager and VideoConnectionManager, and MainWindow)
+	ServiceTrackerListener(ctkPluginContext* context,
 						   boost::function<void (T*)> serviceAdded,
 						   boost::function<void (T*)> serviceModified,
-						   boost::function<void (T*)> serviceRemoved)
+							 boost::function<void (T*)> serviceRemoved,
+							 QSharedPointer<ctkPluginFramework> pluginFrameWork = QSharedPointer<ctkPluginFramework>()) :
+		mPluginFrameWork(pluginFrameWork)
 	{
 		boost::shared_ptr<ServiceTrackerCustomizer<T> > customizer(new ServiceTrackerCustomizer<T>);
 		mServiceTrackerCustomizer = customizer;
@@ -83,7 +88,8 @@ public:
 
 	~ServiceTrackerListener()
 	{
-		mServiceTracker->close();
+		if(this->validPluginFramework())
+			mServiceTracker->close();
 	}
 
 	void open()
@@ -107,9 +113,20 @@ public:
 		return service;
 	}
 
+	bool validPluginFramework()
+	{
+		if(!mPluginFrameWork)// Only check for validity if ServiceTrackerListener is initialized with a plugin framework
+			return true;
+		else if(mPluginFrameWork->getState() == ctkPlugin::ACTIVE)//Maybe also allow STARTING and STOPPING?
+			return true;
+		else
+			return false;
+	}
+
 private:
 	boost::shared_ptr<ServiceTrackerCustomizer<T> > mServiceTrackerCustomizer;
 	boost::shared_ptr<ctkServiceTracker<T*> > mServiceTracker;
+	QSharedPointer<ctkPluginFramework> mPluginFrameWork;
 };
 }//namespace cx
 

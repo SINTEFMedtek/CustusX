@@ -85,7 +85,6 @@ DataManagerImpl::DataManagerImpl() :
 
 DataManagerImpl::~DataManagerImpl()
 {
-	std::cout << "DataManagerImpl destr" << std::endl;
 }
 
 void DataManagerImpl::setSpaceProvider(SpaceProviderPtr spaceProvider)

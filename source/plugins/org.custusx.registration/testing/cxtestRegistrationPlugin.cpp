@@ -81,6 +81,7 @@ TEST_CASE("RegistrationPlugin: Check empty RegistrationImplService", "[unit][plu
 	REQUIRE_FALSE(service->getFixedData());
 	REQUIRE_FALSE(service->getMovingData());
 	REQUIRE_FALSE(service->isNull());
+	service.reset();
 	shutdown();
 }
 

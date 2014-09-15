@@ -72,7 +72,8 @@ ReconstructionManager::ReconstructionManager(XmlOptionFile settings, QString sha
 					LogicManager::getInstance()->getPluginContext(),//Should get pluginContext in constructor to make it independant of LogicManager
 	        boost::bind(&ReconstructionManager::onServiceAdded, this, _1),
 	        boost::bind(&ReconstructionManager::onServiceModified, this, _1),
-	        boost::bind(&ReconstructionManager::onServiceRemoved, this, _1)
+					boost::bind(&ReconstructionManager::onServiceRemoved, this, _1),
+					LogicManager::getInstance()->getPluginFramework()->getPluginFramework()
 	));
 
 	mServiceListener->open();

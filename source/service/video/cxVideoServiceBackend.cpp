@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxVideoServiceBackend.h"
 
+#include <ctkPluginFramework.h>
 #include "cxDataManager.h"
 #include "cxToolManager.h"
 #include "cxSpaceProvider.h"
@@ -41,18 +42,18 @@ namespace cx
 
 VideoServiceBackendPtr VideoServiceBackend::create(DataServicePtr dataManager,
 							TrackingServicePtr toolManager,
-							SpaceProviderPtr spaceProvider, ctkPluginContext *pluginContext)
+							SpaceProviderPtr spaceProvider, QSharedPointer<ctkPluginFramework> pluginFrameWork)
 {
-	return VideoServiceBackendPtr(new VideoServiceBackend(dataManager, toolManager, spaceProvider, pluginContext));
+	return VideoServiceBackendPtr(new VideoServiceBackend(dataManager, toolManager, spaceProvider, pluginFrameWork));
 }
 
 VideoServiceBackend::VideoServiceBackend(DataServicePtr dataManager,
 							TrackingServicePtr toolManager,
-							SpaceProviderPtr spaceProvider, ctkPluginContext *pluginContext) :
+							SpaceProviderPtr spaceProvider, QSharedPointer<ctkPluginFramework> pluginFrameWork) :
 	mDataManager(dataManager),
 	mToolManager(toolManager),
 	mSpaceProvider(spaceProvider),
-	mPluginContext(pluginContext)
+	mPluginFrameWork(pluginFrameWork)
 {
 
 }
@@ -74,7 +75,12 @@ SpaceProviderPtr VideoServiceBackend::getSpaceProvider()
 
 ctkPluginContext* VideoServiceBackend::getPluginContext()
 {
-	return mPluginContext;
+	return mPluginFrameWork->getPluginContext();
+}
+
+QSharedPointer<ctkPluginFramework> VideoServiceBackend::getPluginFramework()
+{
+	return mPluginFrameWork;
 }
 
 } // namespace cx

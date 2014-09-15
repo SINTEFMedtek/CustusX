@@ -223,7 +223,7 @@ void LogicManager::createVideoService()
 	VideoServiceBackendPtr videoBackend;
 	videoBackend = VideoServiceBackend::create(mDataService,
 											   mTrackingService,
-												 mSpaceProvider, mPluginFramework->getPluginContext());
+												 mSpaceProvider, mPluginFramework->getPluginFramework());
 	mVideoService = VideoService::create(videoBackend);
 	LegacySingletons::mVideoService = mVideoService;
 }
@@ -343,18 +343,7 @@ ctkPluginContext* LogicManager::getPluginContext()
 
 void LogicManager::shutdownServices()
 {
-	// gui layer
-	// already destroyed by mainwindow
-
-//	this->resetService(mStateService);
-//	this->resetService(mVisualizationService);
-//	this->resetService(mVideoService);
-//	this->resetService(mSpaceProvider);
-//	this->resetService(mDataFactory);
-//	this->resetService(mPatientService);
-//	this->resetService(mTrackingService);
-
-	this->shutdownPluginFramework();
+	mPluginFramework->stop();
 
 	this->shutdownStateService();
 	this->shutdownVisualizationService();
@@ -363,16 +352,7 @@ void LogicManager::shutdownServices()
 	this->shutdownInterconnectedDataAndSpace();
 	this->shutdownTrackingService();
 
-//	// old stuff - high level
-//	StateService::destroyInstance();
-//	ViewManager::destroyInstance();
-//	RepManager::destroyInstance();
-
-//	// service layer
-//	cx::VideoService::shutdown();
-//	cx::cxToolManager::shutdown();
-//	cx::cxDataManager::shutdown();
-//	cx::PatientService::shutdown();
+	this->shutdownPluginFramework();
 
 	GPUImageBufferRepository::shutdown();
 	Reporter::shutdown();
