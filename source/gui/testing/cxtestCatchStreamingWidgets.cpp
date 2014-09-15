@@ -64,8 +64,8 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][st
 //	REQUIRE(widget->canStream(filename, "SimulatedImageStreamer"));
 
 	ts.reset();
-	cx::LogicManager::shutdown();
 	delete widget;
+	cx::LogicManager::shutdown();
 }
 
 } //namespace cxtest

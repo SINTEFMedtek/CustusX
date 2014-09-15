@@ -112,7 +112,9 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 }
 
 VideoConnectionWidget::~VideoConnectionWidget()
-{}
+{
+	mServiceListener.reset();
+}
 
 void VideoConnectionWidget::onServiceAdded(StreamerService* service)
 {

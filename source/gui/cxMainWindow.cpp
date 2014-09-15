@@ -282,6 +282,7 @@ void MainWindow::addToWidgetGroupMap(QAction* action, QString groupname)
 
 MainWindow::~MainWindow()
 {
+	mServiceListener.reset();
 }
 
 QMenu* MainWindow::createPopupMenu()

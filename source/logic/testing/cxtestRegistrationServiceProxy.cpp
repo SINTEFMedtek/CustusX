@@ -66,6 +66,7 @@ TEST_CASE("RegistrationServiceProxy works", "[unit][resource][core]")
 	registrationService.reset(new cx::RegistrationServiceProxy(context));
 	REQUIRE(registrationService);
 	REQUIRE_FALSE(registrationService->isNull());
+	registrationService.reset();
 	shutdown();
 }
 
