@@ -73,7 +73,7 @@ public:
 		connect(base, SIGNAL(mouseWheel(int, int, int, int, Qt::MouseButtons)), this, SIGNAL(mouseWheel(int, int, int, int, Qt::MouseButtons)));
 		connect(base, SIGNAL(shown()), this, SIGNAL(shown()));
 		connect(base, SIGNAL(focusChange(bool, Qt::FocusReason)), this, SIGNAL(focusChange(bool, Qt::FocusReason)));
-		connect(base, SIGNAL(customContextMenuRequested(const QPoint &)), this, SIGNAL(customContextMenuRequested(const QPoint &)));
+		connect(base, SIGNAL(customContextMenuRequestedInGlobalPos(const QPoint &)), this, SIGNAL(customContextMenuRequested(const QPoint &)));
 
 	}
 

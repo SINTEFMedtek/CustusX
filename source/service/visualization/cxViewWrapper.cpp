@@ -210,16 +210,11 @@ void ViewWrapper::dataViewPropertiesChangedSlot(QString uid)
 
 void ViewWrapper::contextMenuSlot(const QPoint& point)
 {
-	QWidget* sender = dynamic_cast<QWidget*>(this->sender());
-	QPoint pointGlobal = sender->mapToGlobal(point);
-	QMenu contextMenu(sender);
-
+	QMenu contextMenu;
 	mDataViewPropertiesInteractor->addDataActions(&contextMenu);
-
 	//append specific info from derived classes
 	this->appendToContextMenu(contextMenu);
-
-	contextMenu.exec(pointGlobal);
+	contextMenu.exec(point);
 }
 
 

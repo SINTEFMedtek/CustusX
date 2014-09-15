@@ -76,8 +76,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxXMLNodeWrapper.h"
 #include "cxCameraControl.h"
 #include "cxNavigation.h"
-#include "cxViewWidget.h"
-
 
 namespace cx
 {

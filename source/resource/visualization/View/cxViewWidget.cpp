@@ -85,6 +85,7 @@ ViewWidget::ViewWidget(QWidget *parent, Qt::WindowFlags f) :
 	mName = "";
 	mType = View::VIEW;
 
+	connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequestedSlot(const QPoint &)));
 	this->SetRenderWindow(mRenderWindow);
 	clear();
 }
@@ -101,8 +102,16 @@ ViewWidget::ViewWidget(const QString& uid, const QString& name, QWidget *parent,
 	mName = name;
 	mType = View::VIEW;
 
+	connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequestedSlot(const QPoint &)));
 	this->SetRenderWindow(mRenderWindow);
 	clear();
+}
+
+void ViewWidget::customContextMenuRequestedSlot(const QPoint& point)
+{
+	QWidget* sender = dynamic_cast<QWidget*>(this->sender());
+	QPoint pointGlobal = sender->mapToGlobal(point);
+	emit customContextMenuRequestedInGlobalPos(pointGlobal);
 }
 
 ViewPtr ViewWidget::getView()

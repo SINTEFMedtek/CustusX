@@ -100,7 +100,10 @@ signals:
 	void mouseWheel(int x, int y, int delta, int orientation, Qt::MouseButtons buttons);
 	void shown();
 	void focusChange(bool gotFocus, Qt::FocusReason reason);
+	void customContextMenuRequestedInGlobalPos(const QPoint&);
 
+private slots:
+	void customContextMenuRequestedSlot(const QPoint& point);
 private:
 	virtual void showEvent(QShowEvent* event);
 	virtual void wheelEvent(QWheelEvent*);
