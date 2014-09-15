@@ -187,11 +187,8 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 TEST_CASE("VideoConnectionWidget is correctly constructed", "[unit][gui][widget][not_win32]")
 {
 	init();
-//	testAndDeleteBaseWidgetChild(new cx::VideoConnectionWidget(NULL));
-	cx::VideoConnectionWidget *widget = new cx::VideoConnectionWidget(NULL);
-	testBaseWidgetChild(widget);
+	testAndDeleteBaseWidgetChild(new cx::VideoConnectionWidget(NULL));
 	shutdown();
-	delete widget;
 }
 
 TEST_CASE("FileWatcherWidgets are correctly constructed", "[unit][gui][widget][not_win32]")
