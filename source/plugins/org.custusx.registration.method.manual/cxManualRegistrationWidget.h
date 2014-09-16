@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransform3DWidget.h"
 #include "cxData.h"
 #include "cxRegistrationService.h"
+#include "cxPatientModelService.h"
+
 class ctkPluginContext;
 
 namespace cx
@@ -138,26 +140,36 @@ public:
  *  \date Feb 16, 2012
  *  \author Christian Askeland, SINTEF
  *  \author Ole Vegard Solberg, SINTEF
+ *  \author Geir Arne Tangen, SINTEF
  */
-//class ManualPatientRegistrationWidget: public BaseWidget
-//{
-//Q_OBJECT
-//public:
-//ManualPatientRegistrationWidget(ctkPluginContext *context, QWidget* parent);
-//	virtual ~ManualPatientRegistrationWidget()
-//	{
-//	}
-//	virtual QString defaultWhatsThis() const;
+class ManualPatientRegistrationWidget: public BaseWidget
+{
+Q_OBJECT
+public:
+ManualPatientRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent);
+	 ~ManualPatientRegistrationWidget()
+	{
+	}
+	 QString defaultWhatsThis() const;
+protected:
+	void showEvent(QShowEvent *event);
+	RegistrationServicePtr mRegistrationService;
+	PatientModelServicePtr mPatientModelService;
 
-//private slots:
-//	void matrixWidgetChanged();
-//	void patientMatrixChanged();
+private slots:
+	void matrixWidgetChanged();
+	void patientMatrixChanged();
 
-//private:
-//	QVBoxLayout* mVerticalLayout;
-//	Transform3DWidget* mMatrixWidget;
-//	ctkPluginContext *mPluginContext;
-//};
+private:
+	QString getDescription();
+	bool	isValid() const;
+	Transform3D getMatrixFromBackend();
+	void setMatrixFromWidget(Transform3D M);
+
+	QVBoxLayout*		mVerticalLayout;
+	QLabel*				mLabel;
+	Transform3DWidget*	mMatrixWidget;
+};
 
 } /* namespace cx */
 #endif /* CXMANUALREGISTRATIONWIDGET_H_ */

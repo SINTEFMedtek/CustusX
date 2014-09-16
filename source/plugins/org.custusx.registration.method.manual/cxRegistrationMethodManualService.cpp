@@ -73,10 +73,10 @@ QWidget* RegistrationMethodManualImageToImageService::getWidget()
 
 QWidget* RegistrationMethodManualImageToPatientService::getWidget()
 {
-	QWidget* example = new ExampleWidget();
-	return example;
-//	QWidget *retval = new ManualPatientRegistrationWidget(mContext, NULL);
-//	return retval;
+//	QWidget* example = new ExampleWidget();
+//	return example;
+	QWidget *retval = new ManualPatientRegistrationWidget(mContext, NULL);
+	return retval;
 
 }
 

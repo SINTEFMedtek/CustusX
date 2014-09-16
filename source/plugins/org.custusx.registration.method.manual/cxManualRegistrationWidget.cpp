@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "cxDataManager.h"
 #include "cxReporter.h"
 #include "cxRegistrationServiceProxy.h"
+#include "cxPatientModelServiceProxy.h"
 
 namespace cx
 {
@@ -199,50 +200,68 @@ void ManualImageTransformRegistrationWidget::setMatrixFromWidget(Transform3D M)
 // --------------------------------------------------------
 // --------------------------------------------------------
 
-//ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(ctkPluginContext *context, QWidget* parent) :
-//				BaseWidget(parent, "ManualPatientRegistrationWidget",
-//								"Manual Patient Registration"),
-//				mVerticalLayout(new QVBoxLayout(this)),
-//				mPluginContext(context)
-//{
-//	mVerticalLayout->addWidget(new QLabel("<b>Patient Registration matrix rMpr</b>"));
-//	mMatrixWidget = new Transform3DWidget(this);
-//	mVerticalLayout->addWidget(mMatrixWidget);
-//	connect(mMatrixWidget, SIGNAL(changed()), this, SLOT(matrixWidgetChanged()));
-//	mMatrixWidget->setEditable(true);
+ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
+				BaseWidget(parent, "ManualPatientRegistrationWidget",
+								"Manual Patient Registration"),
+				mVerticalLayout(new QVBoxLayout(this)),
+				mRegistrationService(new cx::RegistrationServiceProxy(pluginContext)),
+				mPatientModelService(new cx::PatientModelServiceProxy(pluginContext))
+{
+	mLabel = new QLabel("Patient Registration matrix rMpr");
+	mVerticalLayout->addWidget(mLabel);
+	mMatrixWidget = new Transform3DWidget(this);
+	mVerticalLayout->addWidget(mMatrixWidget);
+	connect(mMatrixWidget, SIGNAL(changed()), this, SLOT(matrixWidgetChanged()));
+	mMatrixWidget->setEditable(true);
 
-//	mVerticalLayout->addStretch();
+	mVerticalLayout->addStretch();
 
-//	//TODO: Need to use org.custusx.patientmodel: Create needed signal
-//	connect(dataManager(), SIGNAL(rMprChanged()), this, SLOT(patientMatrixChanged()));
+}
 
-//	this->patientMatrixChanged();
-//}
+
+void ManualPatientRegistrationWidget::showEvent(QShowEvent* event)
+{
+	this->patientMatrixChanged();
+}
 
 ///** Called when the matrix in the widget has changed.
 // *  Perform registration.
 // *
 // */
-//void ManualPatientRegistrationWidget::matrixWidgetChanged()
-//{
-//	Transform3D rMpr = mMatrixWidget->getMatrix();
-//	mRegistrationService->applyPatientRegistration(rMpr, "Manual Patient");
-//}
+void ManualPatientRegistrationWidget::matrixWidgetChanged()
+{
+	Transform3D rMpr = mMatrixWidget->getMatrix();
+	mRegistrationService->applyPatientRegistration(rMpr, "Manual Patient");
+}
 
-///**Called when moving image has changed.
-// * Updates the displayed matrix.
+///** Called when the valid patient registration matrix in the system has changed.
+// *  Perform registration.
+// *
 // */
-//void ManualPatientRegistrationWidget::patientMatrixChanged()
-//{
-//	mMatrixWidget->blockSignals(true);
-//	mMatrixWidget->setMatrix(dataManager()->get_rMpr());
-//	mMatrixWidget->blockSignals(false);
-//}
+void ManualPatientRegistrationWidget::patientMatrixChanged()
+{
+	mLabel->setText(this->getDescription());
+	mMatrixWidget->blockSignals(true);
+	mMatrixWidget->setMatrix(mPatientModelService->get_rMpr());
+	mMatrixWidget->blockSignals(false);
+}
 
-//QString ManualPatientRegistrationWidget::defaultWhatsThis() const
-//{
-//	return QString();
-//}
+QString ManualPatientRegistrationWidget::defaultWhatsThis() const
+{
+	return QString();
+}
 
+bool ManualPatientRegistrationWidget::isValid() const
+{
+	return true;
+}
+
+QString ManualPatientRegistrationWidget::getDescription()
+{
+	if (this->isValid())
+		return QString("<b>Patient Registration matrix rMpr</b>");
+	else
+		return "<Invalid matrix>";
+}
 
 } /* namespace cx */

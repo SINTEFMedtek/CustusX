@@ -111,7 +111,7 @@ void RegistrationWidget::insertImageComboBoxes(std::vector<QVBoxLayout*> layouts
 
 	this->insertImageComboInLayout(fixedImage, layouts[0], 0);
 	this->insertImageComboInLayout(movingImage, layouts[0], 1);
-	this->insertImageComboInLayout(movingImage, layouts[1], 0);
+//	this->insertImageComboInLayout(movingImage, layouts[1], 0);
 }
 
 void RegistrationWidget::insertImageComboInLayout(StringDataAdapterPtr adapter, QVBoxLayout *layout, int position)
