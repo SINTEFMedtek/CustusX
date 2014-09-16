@@ -29,29 +29,9 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#include "catch.hpp"
 
-#include "cxExampleGUIExtenderService.h"
-#include "ctkPluginContext.h"
-#include "cxExampleWidget.h"
-
-namespace cx
+TEST_CASE("RegistrationMethodManual: Check nothing", "[unit][plugins][org.custusx.registration.method.manual][hide]")
 {
-
-ExampleGUIExtenderService::ExampleGUIExtenderService(ctkPluginContext *context) :
-  mContext(context)
-{
+	CHECK(true);
 }
-
-std::vector<GUIExtenderService::CategorizedWidget> ExampleGUIExtenderService::createWidgets() const
-{
-	std::vector<CategorizedWidget> retval;
-
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new ExampleWidget(),
-			"Plugins"));
-
-	return retval;
-}
-
-
-} /* namespace cx */

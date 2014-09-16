@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
 
-TEST_CASE("ExamplePlugin: Check nothing", "[unit][plugins][org.custusx.example][hide]")
+TEST_CASE("RegistrationMethodModelToUS: Check nothing", "[unit][plugins][org.custusx.registration.method.modelTOUS][hide]")
 {
 	CHECK(true);
 }

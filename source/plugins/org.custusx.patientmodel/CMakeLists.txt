@@ -34,6 +34,7 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}   
     cxResource
     cxLogicManager
+    cxPluginUtilities
     )
 
 ctkMacroBuildPlugin(

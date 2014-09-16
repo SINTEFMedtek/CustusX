@@ -2,7 +2,7 @@ project(org_custusx_registration_method_manual)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-message(STATUS "===================================== parsing example")
+message(STATUS "===================================== parsing org_custusx_registration_method_manual")
 
 include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
@@ -14,7 +14,6 @@ include_directories(
 set(PLUGIN_SRCS
   cxRegistrationMethodManualPluginActivator.cpp
   cxRegistrationMethodManualService.cpp
-  cxExampleWidget.cpp
   cxManualRegistrationWidget.cpp
 )
 
@@ -22,7 +21,6 @@ set(PLUGIN_SRCS
 set(PLUGIN_MOC_SRCS
   cxRegistrationMethodManualPluginActivator.h
   cxRegistrationMethodManualService.h
-  cxExampleWidget.h
   cxManualRegistrationWidget.h
 )
 
@@ -39,8 +37,8 @@ set(PLUGIN_resources
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}
-    cxLogicManager
     cxResourceWidgets
+    cxPluginUtilities
 )
 
 ctkMacroBuildPlugin(

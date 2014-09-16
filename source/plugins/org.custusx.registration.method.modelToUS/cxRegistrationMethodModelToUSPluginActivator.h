@@ -30,36 +30,43 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxExampleWidget.h"
-#include <QLabel>
-#include <QVBoxLayout>
+#ifndef CXREGISTRATIONMETHODMODELTOUSPLUGINACTIVATOR_H_
+#define CXREGISTRATIONMETHODMODELTOUSPLUGINACTIVATOR_H_
+
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
 
 namespace cx
 {
 
-ExampleWidget::ExampleWidget(QWidget* parent) :
-    QWidget(parent),
-    mVerticalLayout(new QVBoxLayout(this))
+typedef boost::shared_ptr<class ExampleGUIExtenderService> ExampleGUIExtenderServicePtr;
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+
+/**
+ * Activator for the registration method: model to US plugin
+ *
+ * \ingroup org_custusx_registration_method_modelToUS
+ *
+ * \date Sep 16, 2014
+ * \author Ole Vegard Solberg, SINTEF
+ */
+class ExamplePluginActivator :  public QObject, public ctkPluginActivator
 {
-    this->setObjectName("ExampleWidget");
-    this->setWindowTitle("Example");
-    this->setWhatsThis(this->defaultWhatsThis());
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
 
-    mVerticalLayout->addWidget(new QLabel("Hello Plugin!"));
-}
+public:
 
-ExampleWidget::~ExampleWidget()
-{
-}
+  ExamplePluginActivator();
+  ~ExamplePluginActivator();
 
-QString ExampleWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Example plugin.</h3>"
-      "<p>Used for developers as a starting points for developing a new plugin</p>"
-      "</html>";
-}
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
 
+private:
+  RegisteredServicePtr mRegistration;
+};
 
+} // namespace cx
 
-} /* namespace cx */
+#endif /* CXREGISTRATIONMETHODMODELTOUSPLUGINACTIVATOR_H_ */

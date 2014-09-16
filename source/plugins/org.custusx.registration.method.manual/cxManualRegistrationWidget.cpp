@@ -51,13 +51,6 @@ ManualImageRegistrationWidget::ManualImageRegistrationWidget(ctkPluginContext *p
 	mVerticalLayout(new QVBoxLayout(this)),
 	mRegistrationService(new cx::RegistrationServiceProxy(pluginContext))
 {
-	//TODO: Need to create/add these comboboxes from RegistrationService functions
-
-//	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(regManager));
-//	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedImage));
-//	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(regManager));
-//	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mMovingImage));
-
 	mLabel = new QLabel("Data matrix rMd");
 	mVerticalLayout->addWidget(mLabel);
 	mMatrixWidget = new Transform3DWidget(this);

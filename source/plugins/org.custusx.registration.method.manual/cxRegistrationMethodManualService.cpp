@@ -32,14 +32,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegistrationMethodManualService.h"
 #include "ctkPluginContext.h"
-#include "cxExampleWidget.h"
 #include "cxManualRegistrationWidget.h"
 
 namespace cx
 {
 
 RegistrationMethodManualService::RegistrationMethodManualService(ctkPluginContext *context) :
-	mContext(context)
+	mPluginContext(context)
 {
 }
 
@@ -65,26 +64,19 @@ RegistrationMethodManualImageTransformService::RegistrationMethodManualImageTran
 
 QWidget* RegistrationMethodManualImageToImageService::getWidget()
 {
-//	QWidget* example = new ExampleWidget();
-//	return example;
-	QWidget* retval = new ManualImage2ImageRegistrationWidget(mContext, NULL);
+	QWidget* retval = new ManualImage2ImageRegistrationWidget(mPluginContext, NULL);
 	return retval;
 }
 
 QWidget* RegistrationMethodManualImageToPatientService::getWidget()
 {
-//	QWidget* example = new ExampleWidget();
-//	return example;
-	QWidget *retval = new ManualPatientRegistrationWidget(mContext, NULL);
+	QWidget *retval = new ManualPatientRegistrationWidget(mPluginContext, NULL);
 	return retval;
-
 }
 
 QWidget* RegistrationMethodManualImageTransformService::getWidget()
 {
-//	QWidget* example = new ExampleWidget();
-//	return example;
-	QWidget *retval = new ManualImageTransformRegistrationWidget(mContext, NULL);
+	QWidget *retval = new ManualImageTransformRegistrationWidget(mPluginContext, NULL);
 	return retval;
 }
 
