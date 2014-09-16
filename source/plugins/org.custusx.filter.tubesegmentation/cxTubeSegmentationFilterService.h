@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 
 #include "parameters.hpp"
+#include "cxPatientModelService.h"
 class TSFOutput;
 
 #include "cxStringDataAdapterXml.h"
@@ -69,7 +70,7 @@ class org_custusx_filter_tubesegmentation_EXPORT TubeSegmentationFilter : public
 	Q_INTERFACES(cx::Filter)
 
 public:
-	TubeSegmentationFilter();
+	TubeSegmentationFilter(ctkPluginContext *pluginContext);
 	virtual ~TubeSegmentationFilter(); 
 
 	virtual QString getType() const;

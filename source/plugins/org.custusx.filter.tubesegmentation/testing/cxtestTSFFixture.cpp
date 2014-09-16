@@ -172,7 +172,7 @@ paramList TestTubeSegmentationFramework::loadPreset(QString preset)
 void TestTubeSegmentationFramework::runFilter(QString preset)
 {
 	//setup filter
-	cx::TubeSegmentationFilterPtr tsf = cx::TubeSegmentationFilterPtr(new cx::TubeSegmentationFilter());
+	cx::TubeSegmentationFilterPtr tsf = cx::TubeSegmentationFilterPtr(new cx::TubeSegmentationFilter(cx::logicManager()->getPluginContext()));
 	REQUIRE(tsf);
 	tsf->getInputTypes();
 	tsf->getOutputTypes();

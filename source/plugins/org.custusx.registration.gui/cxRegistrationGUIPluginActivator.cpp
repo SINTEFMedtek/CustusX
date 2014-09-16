@@ -43,11 +43,11 @@ namespace cx
 
 RegistrationGUIPluginActivator::RegistrationGUIPluginActivator()
 {
-	std::cout << "Created ExamplePluginActivator" << std::endl;
 }
 
 RegistrationGUIPluginActivator::~RegistrationGUIPluginActivator()
-{}
+{
+}
 
 void RegistrationGUIPluginActivator::start(ctkPluginContext* context)
 {
@@ -57,7 +57,7 @@ void RegistrationGUIPluginActivator::start(ctkPluginContext* context)
 void RegistrationGUIPluginActivator::stop(ctkPluginContext* context)
 {
   mRegistration.reset();
-    Q_UNUSED(context);
+	Q_UNUSED(context);
 }
 
 } // namespace cx

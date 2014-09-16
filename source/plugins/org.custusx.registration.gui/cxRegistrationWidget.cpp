@@ -91,6 +91,7 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 		layoutH->addStretch();
 
 		layoutV->addLayout(layoutH);
+//		layoutV->addWidget(groupBox);
 		layoutV->addWidget(groupBox);
 
 		layoutGroupBox->addWidget(registrationTypeWidget);
