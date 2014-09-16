@@ -68,17 +68,13 @@ private:
 
 	void onServiceAdded(RegistrationMethodService *service);
 	void onServiceRemoved(RegistrationMethodService *service);
-//	QStackedWidget *findMethodWidget(QString registrationMethod);
-//	QStackedWidget *createMethodWidget(QString registrationMethod);
 	void insertImageComboInLayout(StringDataAdapterPtr adapter, QVBoxLayout *layout, int position);
 	void insertImageComboBoxes(std::vector<QVBoxLayout *> layouts);
+	bool knownType(QString registrationType);
 
 	ctkPluginContext* mPluginContext;
 	QVBoxLayout*  mVerticalLayout;
 	boost::shared_ptr<ServiceTrackerListener<RegistrationMethodService> > mServiceListener;
-
-	std::map<QString, QStackedWidget*> mMethodsWidgetsMap; ///< map containing groups
-	std::map<QString, QWidget*> mCategorizedWidgets;
 
 	std::map<QString, QComboBox*> mMethodsSelectorMap;
 	std::map<QString, QStackedWidget*> mRegistrationTypeMap;

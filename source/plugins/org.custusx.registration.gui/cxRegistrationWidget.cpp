@@ -131,59 +131,32 @@ void RegistrationWidget::initServiceListener()
 
 void RegistrationWidget::onServiceAdded(RegistrationMethodService* service)
 {
-	QWidget* widget = service->getWidget();
-	QString registrationType = service->getRegistrationType();
-	QString registrationMethod = service->getRegistrationMethod();
+	if(!this->knownType(service->getRegistrationType()))
+			return;
 
-//	QStackedWidget *typeWidget = this->findMethodWidget(registrationMethod);
-//	typeWidget->addWidget(widget);
+	QComboBox *comboBox = mMethodsSelectorMap[service->getRegistrationType()];
+	QStackedWidget *stackedWidget = mRegistrationTypeMap[service->getRegistrationType()];
 
+	stackedWidget->addWidget(service->getWidget());
+	comboBox->addItem(service->getRegistrationMethod());
+
+	connect(comboBox, SIGNAL(activated(int)),stackedWidget,SLOT(setCurrentIndex(int)));
+}
+
+bool RegistrationWidget::knownType(QString registrationType)
+{
 	if(!mRegistrationTypes.contains(registrationType))
 	{
-		reportError("Unknown registrationType : " + service->getRegistrationType());
-		return;
+		reportError("Unknown registrationType : " + registrationType);
+		return false;
 	}
-
-	mRegistrationTypeMap[registrationType]->addWidget(widget);
-	mMethodsSelectorMap[registrationType]->addItem(registrationMethod);
+	return true;
 }
 
 void RegistrationWidget::onServiceRemoved(RegistrationMethodService *service)
 {
 
 }
-
-/*QStackedWidget *RegistrationWidget::findMethodWidget(QString registrationMethod)
-{
-	QStackedWidget *methodWidget = NULL;
-	if (mMethodsWidgetsMap.find(registrationMethod) != mMethodsWidgetsMap.end())
-	{
-			std::cout << "found typeWidget: " << registrationMethod << std::endl;
-//			retval = mCategorizedWidgets.at(registrationType);
-			methodWidget = mMethodsWidgetsMap.at(registrationMethod);
-	}
-	else
-	{
-			std::cout << "create typeWidget: " << registrationMethod << std::endl;
-			methodWidget = this->createMethodWidget(registrationMethod);
-//      retval = this->addAsDockWidget(categoryWidget, registrationType);
-			mCategorizedWidgets[registrationMethod] = methodWidget;
-	}
-	return methodWidget;
-}
-
-QStackedWidget *RegistrationWidget::createMethodWidget(QString registrationMethod)
-{
-		QStackedWidget *categoryWidget = new QStackedWidget(this);
-		categoryWidget->setWindowTitle(registrationMethod);
-		categoryWidget->setObjectName(registrationMethod);
-		mMethodsWidgetsMap[registrationMethod] = categoryWidget;
-		QComboBox *methodsSelector = new QComboBox(this);
-		mMethodsSelectorMap[registrationMethod] = methodsSelector;
-		connect(methodsSelector, SIGNAL(activated(int)),methodsSelector,SLOT(setCurrentIndex(int)));
-		mVerticalLayout->addWidget(categoryWidget);
-		return categoryWidget;
-}*/
 
 QString RegistrationWidget::defaultWhatsThis() const
 {
