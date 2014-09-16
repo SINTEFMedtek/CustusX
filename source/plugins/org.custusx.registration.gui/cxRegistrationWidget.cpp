@@ -79,19 +79,16 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 		QComboBox *methodSelector = new QComboBox(registrationTypeWidget );
 		mMethodsSelectorMap[mRegistrationTypes[i]] = methodSelector;
 
-//		QVBoxLayout *layout = new QVBoxLayout(widget);
-//		layouts[i] = layout;
 		QGroupBox	*groupBox = new QGroupBox(registrationTypeWidget);
 
 		QVBoxLayout *layoutV = new QVBoxLayout(widget);
 		QVBoxLayout *layoutGroupBox = new QVBoxLayout(groupBox);
-		QHBoxLayout *layoutH = new QHBoxLayout(widget);
+		QHBoxLayout *layoutH = new QHBoxLayout();
 
 		layoutH->addWidget(methodSelector);
 		layoutH->addStretch();
 
 		layoutV->addLayout(layoutH);
-//		layoutV->addWidget(groupBox);
 		layoutV->addWidget(groupBox);
 
 		layoutGroupBox->addWidget(registrationTypeWidget);
