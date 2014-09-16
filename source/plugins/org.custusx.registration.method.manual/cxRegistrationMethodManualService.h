@@ -56,7 +56,7 @@ class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualServ
 public:
 	RegistrationMethodManualService(ctkPluginContext *context);
 protected:
-	ctkPluginContext* mContext;
+	ctkPluginContext* mPluginContext;
 };
 
 /**
@@ -77,9 +77,6 @@ public:
 	virtual QString getRegistrationType() {return QString("ImageToImage");}
 	virtual QString getRegistrationMethod() {return QString("Manual");}
 	virtual QWidget* getWidget();
-private:
-//  ctkPluginContext* mContext;
-
 };
 //typedef boost::shared_ptr<RegistrationMethodManualService> RegistrationMethodManualServicePtr;
 
@@ -93,10 +90,6 @@ public:
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}
 	virtual QString getRegistrationMethod() {return QString("Manual");}
 	virtual QWidget* getWidget();
-
-private:
-//  ctkPluginContext* mContext;
-
 };
 //typedef boost::shared_ptr<RegistrationMethodManualService> RegistrationMethodManualServicePtr;
 
@@ -110,10 +103,6 @@ public:
 	virtual QString getRegistrationType() {return QString("ImageTransform");}
 	virtual QString getRegistrationMethod() {return QString("Manual");}
 	virtual QWidget* getWidget();
-
-private:
-//  ctkPluginContext* mContext;
-
 };
 //typedef boost::shared_ptr<RegistrationMethodManualService> RegistrationMethodManualServicePtr;
 

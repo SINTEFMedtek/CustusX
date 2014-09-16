@@ -38,8 +38,8 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
     cxGUIExtenderService
-    cxLogicManager
     cxResourceWidgets
+    cxPluginUtilities
     )
 
 ctkMacroBuildPlugin(

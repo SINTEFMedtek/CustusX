@@ -8,7 +8,7 @@ if (BUILD_TESTING)
     )
         set(CX_TEST_CATCH_ORG_CUSTUSX_REGISTRATION_METHOD_MANUAL_SOURCE_FILES
                 ${CX_TEST_CATCH_ORG_CUSTUSX_REGISTRATION_METHOD_MANUAL_MOC_SOURCE_FILES}
-		cxtestExamplePlugin.cpp
+                cxtestRegistrationMethodManual.cpp
 		)
 
     cx_catch_add_lib_and_exe(org_custusx_registration_method_manual

@@ -30,28 +30,37 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxExampleGUIExtenderService.h"
-#include "ctkPluginContext.h"
-#include "cxExampleWidget.h"
+#ifndef CXREGISTRATIONMETHODMODELTOUSSERVICE_H_
+#define CXREGISTRATIONMETHODMODELTOUSSERVICE_H_
+
+#include "cxRegistrationMethodService.h"
+#include "org_custusx_registration_method_modelToUS_Export.h"
+class ctkPluginContext;
 
 namespace cx
 {
 
-ExampleGUIExtenderService::ExampleGUIExtenderService(ctkPluginContext *context) :
-  mContext(context)
+/**
+ * Registration method model to US service interface.
+ *
+ * \ingroup org_custusx_registration_method_modelToUS
+ *
+ * \date Sep 16, 2014
+ * \author Ole Vegard Solberg, SINTEF
+ */
+class org_custusx_registration_method_modelToUS_EXPORT RegistrationMethodModelToUSService : public RegistrationMethodService
 {
-}
-
-std::vector<GUIExtenderService::CategorizedWidget> ExampleGUIExtenderService::createWidgets() const
-{
-	std::vector<CategorizedWidget> retval;
-
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new ExampleWidget(),
-			"Plugins"));
-
-	return retval;
-}
-
+public:
+	RegistrationMethodModelToUSService(ctkPluginContext *context);
+	virtual ~RegistrationMethodModelToUSService() {};
+	virtual QString getRegistrationType() {return QString("ImageToImage");}
+	virtual QString getRegistrationMethod() {return QString("ModelToUS");}
+	virtual QWidget* getWidget();
+private:
+	ctkPluginContext* mPluginContext;
+};
 
 } /* namespace cx */
+
+#endif /* CXREGISTRATIONMETHODMODELTOUSSERVICE_H_ */
+

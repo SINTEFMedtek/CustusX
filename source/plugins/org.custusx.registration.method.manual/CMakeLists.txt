@@ -2,7 +2,7 @@ project(org_custusx_registration_method_manual)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-message(STATUS "===================================== parsing example")
+message(STATUS "===================================== parsing org_custusx_registration_method_manual")
 
 include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
@@ -37,8 +37,8 @@ set(PLUGIN_resources
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}
-    cxLogicManager
     cxResourceWidgets
+    cxPluginUtilities
 )
 
 ctkMacroBuildPlugin(

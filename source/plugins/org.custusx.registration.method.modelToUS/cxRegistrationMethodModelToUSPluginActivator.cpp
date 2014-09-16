@@ -30,28 +30,38 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxExampleGUIExtenderService.h"
-#include "ctkPluginContext.h"
-#include "cxExampleWidget.h"
+#include "cxRegistrationMethodModelToUSPluginActivator.h"
+
+#include <QtPlugin>
+#include <iostream>
+
+#include "cxRegistrationMethodModelToUSService.h"
+#include "cxRegisteredService.h"
 
 namespace cx
 {
 
-ExampleGUIExtenderService::ExampleGUIExtenderService(ctkPluginContext *context) :
-  mContext(context)
+ExamplePluginActivator::ExamplePluginActivator()
 {
+	std::cout << "Created ExamplePluginActivator" << std::endl;
 }
 
-std::vector<GUIExtenderService::CategorizedWidget> ExampleGUIExtenderService::createWidgets() const
+ExamplePluginActivator::~ExamplePluginActivator()
+{}
+
+void ExamplePluginActivator::start(ctkPluginContext* context)
 {
-	std::vector<CategorizedWidget> retval;
-
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new ExampleWidget(),
-			"Plugins"));
-
-	return retval;
+	mRegistration = RegisteredService::create<RegistrationMethodModelToUSService>(context, RegistrationMethodService_iid);
 }
 
+void ExamplePluginActivator::stop(ctkPluginContext* context)
+{
+  mRegistration.reset();
+    Q_UNUSED(context);
+}
 
-} /* namespace cx */
+} // namespace cx
+
+Q_EXPORT_PLUGIN2(ExamplePluginActivator_irrelevant_string, cx::ExamplePluginActivator)
+
+

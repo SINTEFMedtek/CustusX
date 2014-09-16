@@ -30,28 +30,36 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxExampleGUIExtenderService.h"
-#include "ctkPluginContext.h"
-#include "cxExampleWidget.h"
+#include "cxRegistrationMethodModelToUSWidget.h"
+#include <ctkPluginContext.h>
+#include <QLabel>
+#include <QVBoxLayout>
+#include "cxRegistrationServiceProxy.h"
 
 namespace cx
 {
 
-ExampleGUIExtenderService::ExampleGUIExtenderService(ctkPluginContext *context) :
-  mContext(context)
+RegistrationMethodModelToUSWidget::RegistrationMethodModelToUSWidget(ctkPluginContext *pluginContext, QWidget* parent) :
+	BaseWidget(parent, "RegistrationMethodModelToUSWidget",
+						 "Model to US Registration"),
+	mVerticalLayout(new QVBoxLayout(this)),
+	mRegistrationService(new cx::RegistrationServiceProxy(pluginContext))
+{
+	mVerticalLayout->addWidget(new QLabel("Hello Plugin!"));
+}
+
+RegistrationMethodModelToUSWidget::~RegistrationMethodModelToUSWidget()
 {
 }
 
-std::vector<GUIExtenderService::CategorizedWidget> ExampleGUIExtenderService::createWidgets() const
+QString RegistrationMethodModelToUSWidget::defaultWhatsThis() const
 {
-	std::vector<CategorizedWidget> retval;
-
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new ExampleWidget(),
-			"Plugins"));
-
-	return retval;
+  return "<html>"
+      "<h3>Example plugin.</h3>"
+      "<p>Used for developers as a starting points for developing a new plugin</p>"
+      "</html>";
 }
+
 
 
 } /* namespace cx */

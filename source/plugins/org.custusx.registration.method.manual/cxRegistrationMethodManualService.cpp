@@ -38,7 +38,7 @@ namespace cx
 {
 
 RegistrationMethodManualService::RegistrationMethodManualService(ctkPluginContext *context) :
-	mContext(context)
+	mPluginContext(context)
 {
 }
 
@@ -64,7 +64,7 @@ RegistrationMethodManualImageTransformService::RegistrationMethodManualImageTran
 
 QWidget* RegistrationMethodManualImageToImageService::getWidget()
 {
-	QWidget* retval = new ManualImage2ImageRegistrationWidget(mContext, NULL);
+	QWidget* retval = new ManualImage2ImageRegistrationWidget(mPluginContext, NULL);
 	return retval;
 }
 
@@ -76,7 +76,7 @@ QWidget* RegistrationMethodManualImageToPatientService::getWidget()
 
 QWidget* RegistrationMethodManualImageTransformService::getWidget()
 {
-	QWidget *retval = new ManualImageTransformRegistrationWidget(mContext, NULL);
+	QWidget *retval = new ManualImageTransformRegistrationWidget(mPluginContext, NULL);
 	return retval;
 }
 

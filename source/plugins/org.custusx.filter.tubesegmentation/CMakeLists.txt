@@ -22,7 +22,6 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
-    #${CustusX_SOURCE_DIR}/source/ThirdParty
     ${CustusX_SOURCE_DIR}/source/service/patient
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
     ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
@@ -65,6 +64,7 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}   
     cxPluginAlgorithm
     LINK_PRIVATE tubeSegmentationLib
+    cxPluginUtilities
     )    
 
 if (CX_USE_OPENCL_UTILITY)

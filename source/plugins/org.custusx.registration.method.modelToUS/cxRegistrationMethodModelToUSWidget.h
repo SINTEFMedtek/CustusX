@@ -30,28 +30,38 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxExampleGUIExtenderService.h"
-#include "ctkPluginContext.h"
-#include "cxExampleWidget.h"
+#ifndef CXREGISTRATIONMETHODMODELTOUSWIDGET_H_
+#define CXREGISTRATIONMETHODMODELTOUSWIDGET_H_
+
+#include "cxBaseWidget.h"
+#include "cxRegistrationService.h"
+class QVBoxLayout;
+class ctkPluginContext;
 
 namespace cx
 {
 
-ExampleGUIExtenderService::ExampleGUIExtenderService(ctkPluginContext *context) :
-  mContext(context)
+/**
+ * Widget for the registration method: model to US
+ *
+ * \ingroup org_custusx_registration_method_modelToUS
+ *
+ * \date Sep 16, 2014
+ * \author Ole Vegard Solberg, SINTEF
+ */
+class RegistrationMethodModelToUSWidget : public BaseWidget
 {
-}
+	Q_OBJECT
+public:
+	RegistrationMethodModelToUSWidget(ctkPluginContext *pluginContext, QWidget* parent);
+	virtual ~RegistrationMethodModelToUSWidget();
 
-std::vector<GUIExtenderService::CategorizedWidget> ExampleGUIExtenderService::createWidgets() const
-{
-	std::vector<CategorizedWidget> retval;
-
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new ExampleWidget(),
-			"Plugins"));
-
-	return retval;
-}
-
+private:
+	QString defaultWhatsThis() const;
+	QVBoxLayout*  mVerticalLayout;
+	RegistrationServicePtr mRegistrationService;
+};
 
 } /* namespace cx */
+
+#endif /* CXREGISTRATIONMETHODMODELTOUSWIDGET_H_ */

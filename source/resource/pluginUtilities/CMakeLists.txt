@@ -8,32 +8,18 @@ SET( CX_QT_MOC_HEADER_FILES
 SET (cxPluginUtilities_SOURCE
     cxServiceTrackerCustomizer.h
     cxServiceTrackerListener.h
+    cxRegisteredService.h
+    cxRegisteredService.cpp
 )
 
-#include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
-include_directories(
-    #${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
-    #.
-    #${CustusX_SOURCE_DIR}/source/service/patient     
-    #${CustusX_SOURCE_DIR}/source/service/tracking     
-    #${CustusX_SOURCE_DIR}/source/service/visualization
-    #${CustusX_SOURCE_DIR}/source/service/video
-    #${CustusX_SOURCE_DIR}/source/service/state
+include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
+
+QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
+
+ADD_LIBRARY ( cxPluginUtilities ${cxPluginUtilities_SOURCE} ${MOC_HEADER_FILES} )
+
+target_link_libraries(cxPluginUtilities
+    cxResource
     )
-
-
-#QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
-
-#ADD_LIBRARY ( cxPluginUtilities ${cxPluginUtilities_SOURCE} ${MOC_HEADER_FILES} )
-
-#target_link_libraries(cxPluginUtilities
-    #CTKPluginFramework
-    #cxResource
-    #cxPatientService
-    #cxTrackingService
-    #cxVisualizationService
-    #cxVideoService
-    #cxStateService
-#    )
 
 

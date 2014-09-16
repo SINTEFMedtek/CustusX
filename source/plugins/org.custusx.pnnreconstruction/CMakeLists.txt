@@ -3,17 +3,9 @@ project(org_custusx_pnnreconstruction)
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 include_directories(
-    #${CustusX_BINARY_DIR}/source/modules/UsReconstruction/logic
+    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/logic
-    ${CustusX_SOURCE_DIR}/source/resource/core
-    ${CustusX_SOURCE_DIR}/source/resource/core/utilities
-    ${CustusX_SOURCE_DIR}/source/resource/core/Math
-    ${CustusX_SOURCE_DIR}/source/resource/core/dataAdapters
-    ${CustusX_SOURCE_DIR}/source/resource/core/Tool
-    ${CustusX_SOURCE_DIR}/source/resource/core/Data
-    ${CustusX_SOURCE_DIR}/source/resource/core/logger
     ${CustusX_SOURCE_DIR}/source/resource/usReconstructionTypes
-    ${CustusX_SOURCE_DIR}/source/ThirdParty
     ${CustusX_SOURCE_DIR}/source/logic
     )
 
@@ -41,6 +33,7 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
     cxPluginUSReconstruction
+    cxPluginUtilities
     )
 
 ctkMacroBuildPlugin(

@@ -30,35 +30,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXEXAMPLEWIDGET_H_
-#define CXEXAMPLEWIDGET_H_
-
-#include <QWidget>
-class QVBoxLayout;
+#include "cxRegistrationMethodModelToUSService.h"
+#include "ctkPluginContext.h"
+#include "cxRegistrationMethodModelToUSWidget.h"
 
 namespace cx
 {
 
-/**
- * Widget for use in the plugin example
- *
- * \ingroup org_custusx_example
- *
- * \date 2014-05-02
- * \author Christian Askeland
- */
-class ExampleWidget : public QWidget
+RegistrationMethodModelToUSService::RegistrationMethodModelToUSService(ctkPluginContext *context) :
+	mPluginContext(context)
 {
-	Q_OBJECT
-public:
-	ExampleWidget(QWidget* parent = 0);
-	virtual ~ExampleWidget();
-
-private:
-	QString defaultWhatsThis() const;
-	QVBoxLayout*  mVerticalLayout;
-};
+}
+QWidget* RegistrationMethodModelToUSService::getWidget()
+{
+	QWidget* retval = new RegistrationMethodModelToUSWidget(mPluginContext, NULL);
+	return retval;
+}
 
 } /* namespace cx */
-
-#endif /* CXEXAMPLEWIDGET_H_ */
