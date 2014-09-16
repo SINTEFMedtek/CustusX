@@ -14,7 +14,6 @@ include_directories(
 set(PLUGIN_SRCS
   cxRegistrationMethodManualPluginActivator.cpp
   cxRegistrationMethodManualService.cpp
-  cxExampleWidget.cpp
   cxManualRegistrationWidget.cpp
 )
 
@@ -22,7 +21,6 @@ set(PLUGIN_SRCS
 set(PLUGIN_MOC_SRCS
   cxRegistrationMethodManualPluginActivator.h
   cxRegistrationMethodManualService.h
-  cxExampleWidget.h
   cxManualRegistrationWidget.h
 )
 
