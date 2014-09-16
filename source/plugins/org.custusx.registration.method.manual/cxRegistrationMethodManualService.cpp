@@ -70,8 +70,8 @@ QWidget* RegistrationMethodManualImageToImageService::getWidget()
 
 QWidget* RegistrationMethodManualImageToPatientService::getWidget()
 {
-	QWidget* example = new QWidget();
-	return example;
+	QWidget *retval = new ManualPatientRegistrationWidget(mPluginContext, NULL);
+	return retval;
 }
 
 QWidget* RegistrationMethodManualImageTransformService::getWidget()
