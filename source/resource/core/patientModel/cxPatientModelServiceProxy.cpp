@@ -70,6 +70,7 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 	connect(service, SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
 	connect(service, SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
 	connect(service, SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
+	connect(service, SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
 	if(mPatientModelService->isNull())
 		reportWarning("PatientModelServiceProxy::onServiceAdded mPatientModelService->isNull()");
 }
@@ -79,6 +80,7 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 	disconnect(service, SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
 	disconnect(service, SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
 	disconnect(service, SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
+	disconnect(service, SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
 	mPatientModelService = PatientModelService::getNullObject();
 }
 

@@ -97,6 +97,7 @@ signals:
 	void dataAddedOrRemoved();
 	void activeImageChanged(const QString& uId);
 	void debugModeChanged(bool on);
+	void rMprChanged();
 };
 
 } // namespace cx
