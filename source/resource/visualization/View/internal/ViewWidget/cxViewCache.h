@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLayout>
 #include <vector>
 #include "cxTypeConversions.h"
-#include "cxSettings.h"
+//#include "cxSettings.h"
 
 namespace cx
 {
@@ -82,16 +82,16 @@ public:
 					.arg(mNameGenerator++)
 					.arg(reinterpret_cast<long>(this));
 			VIEW_TYPE* view = new VIEW_TYPE(uid, uid, mCentralWidget);
-			view->setContextMenuPolicy(Qt::CustomContextMenu);
-			view->hide();
-			//Turn off rendering in vtkRenderWindowInteractor
-			view->getRenderWindow()->GetInteractor()->EnableRenderOff();
-			//Increase the StillUpdateRate in the vtkRenderWindowInteractor (default is 0.0001 images per second)
-			double rate = settings()->value("stillUpdateRate").value<double>();
-			view->getRenderWindow()->GetInteractor()->SetStillUpdateRate(rate);
-			// Set the same value when moving (seems counterintuitive, but for us, moving isnt really special.
-			// The real challenge is updating while the tracking is active, and this uses the still update rate.
-			view->getRenderWindow()->GetInteractor()->SetDesiredUpdateRate(rate);
+//			view->setContextMenuPolicy(Qt::CustomContextMenu);
+//			view->hide();
+//			//Turn off rendering in vtkRenderWindowInteractor
+//			view->getRenderWindow()->GetInteractor()->EnableRenderOff();
+//			//Increase the StillUpdateRate in the vtkRenderWindowInteractor (default is 0.0001 images per second)
+//			double rate = settings()->value("stillUpdateRate").value<double>();
+//			view->getRenderWindow()->GetInteractor()->SetStillUpdateRate(rate);
+//			// Set the same value when moving (seems counterintuitive, but for us, moving isnt really special.
+//			// The real challenge is updating while the tracking is active, and this uses the still update rate.
+//			view->getRenderWindow()->GetInteractor()->SetDesiredUpdateRate(rate);
 			mCached.push_back(view);
 		}
 

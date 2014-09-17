@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewWidget.h"
 #include <QPointer>
 #include "cxBoundingBox3D.h"
+#include "cxViewRepCollection.h"
 
 namespace cx
 {
@@ -59,10 +60,17 @@ namespace cx
 	if (mBase)                                               \
 		mBase->METHOD_NAME(arg0);
 
-class ViewLinkingViewWidget : public View
+class ViewLinkingViewWidget : public ViewRepCollection
 {
 public:
-	ViewLinkingViewWidget(ViewWidget* base)
+	static ViewRepCollectionPtr create(ViewWidget* base, vtkRenderWindowPtr renderWindow)
+	{
+		boost::shared_ptr<ViewLinkingViewWidget> retval(new ViewLinkingViewWidget(base, renderWindow));
+		retval->mSelf = retval;
+		return retval;
+	}
+
+	ViewLinkingViewWidget(ViewWidget* base, vtkRenderWindowPtr renderWindow) : ViewRepCollection(renderWindow, "")
 	{
 		mBase = base;
 
@@ -78,32 +86,26 @@ public:
 	}
 
 	virtual ~ViewLinkingViewWidget() {}
-	virtual Type getType() const { ViewLinkingViewWidget_GET_CHECK(getType, VIEW);  }
-//	virtual void setType(Type type) { ViewLinkingViewWidget_SET_1_CHECK(setType, type); }
-	virtual QString getTypeString() const { ViewLinkingViewWidget_GET_CHECK(getTypeString, ""); }
-	virtual QString getUid() { ViewLinkingViewWidget_GET_CHECK(getUid, ""); }
-	virtual QString getName()  { ViewLinkingViewWidget_GET_CHECK(getName, ""); }
-	virtual vtkRendererPtr getRenderer() const  { ViewLinkingViewWidget_GET_CHECK(getRenderer, vtkRendererPtr()); }
-	virtual void addRep(const RepPtr& rep)  { ViewLinkingViewWidget_SET_1_CHECK(addRep, rep); }
-//	virtual void setRep(const RepPtr& rep)  { ViewLinkingViewWidget_SET_1_CHECK(setRep, rep); }
-	virtual void removeRep(const RepPtr& rep)  { ViewLinkingViewWidget_SET_1_CHECK(removeRep, rep); }
-	virtual bool hasRep(const RepPtr& rep) const  { ViewLinkingViewWidget_GET_1_CHECK(hasRep, false, rep); }
-	virtual std::vector<RepPtr> getReps() { ViewLinkingViewWidget_GET_CHECK(getReps, std::vector<RepPtr>()); }
-	virtual void removeReps() { ViewLinkingViewWidget_VOID_CHECK(removeReps); }
-	virtual void setBackgroundColor(QColor color) { ViewLinkingViewWidget_SET_1_CHECK(setBackgroundColor, color); }
-	virtual void render() { ViewLinkingViewWidget_VOID_CHECK(render); }
-	virtual vtkRenderWindowPtr getRenderWindow() const { ViewLinkingViewWidget_GET_CHECK(getRenderWindow, vtkRenderWindowPtr()); }
+//	virtual Type getType() const { ViewLinkingViewWidget_GET_CHECK(getType, VIEW);  }
+//	virtual QString getTypeString() const { ViewLinkingViewWidget_GET_CHECK(getTypeString, ""); }
+//	virtual QString getUid() { ViewLinkingViewWidget_GET_CHECK(getUid, ""); }
+//	virtual QString getName()  { ViewLinkingViewWidget_GET_CHECK(getName, ""); }
+//	virtual vtkRendererPtr getRenderer() const  { ViewLinkingViewWidget_GET_CHECK(getRenderer, vtkRendererPtr()); }
+//	virtual void addRep(const RepPtr& rep)  { ViewLinkingViewWidget_SET_1_CHECK(addRep, rep); }
+//	virtual void removeRep(const RepPtr& rep)  { ViewLinkingViewWidget_SET_1_CHECK(removeRep, rep); }
+//	virtual bool hasRep(const RepPtr& rep) const  { ViewLinkingViewWidget_GET_1_CHECK(hasRep, false, rep); }
+//	virtual std::vector<RepPtr> getReps() { ViewLinkingViewWidget_GET_CHECK(getReps, std::vector<RepPtr>()); }
+//	virtual void removeReps() { ViewLinkingViewWidget_VOID_CHECK(removeReps); }
+//	virtual void setBackgroundColor(QColor color) { ViewLinkingViewWidget_SET_1_CHECK(setBackgroundColor, color); }
+//	virtual void render() { ViewLinkingViewWidget_VOID_CHECK(render); }
+//	virtual vtkRenderWindowPtr getRenderWindow() const { ViewLinkingViewWidget_GET_CHECK(getRenderWindow, vtkRenderWindowPtr()); }
 	virtual QSize size() const { ViewLinkingViewWidget_GET_CHECK(size, QSize(0,0)); }
-//	virtual QRect screenGeometry() const{ ViewLinkingViewWidget_GET_CHECK(screenGeometry, QRect()); }
 	virtual void setZoomFactor(double factor)  { ViewLinkingViewWidget_SET_1_CHECK(setZoomFactor, factor); }
 	virtual double getZoomFactor() const { ViewLinkingViewWidget_GET_CHECK(getZoomFactor, 0); }
 	virtual Transform3D get_vpMs() const { ViewLinkingViewWidget_GET_CHECK(get_vpMs, Transform3D::Identity()); }
-//	virtual double mmPerPix() const { ViewLinkingViewWidget_GET_CHECK(mmPerPix, 0); }
-//	virtual double heightMM() const { ViewLinkingViewWidget_GET_CHECK(heightMM, 0); }
 	virtual DoubleBoundingBox3D getViewport() const { ViewLinkingViewWidget_GET_CHECK(getViewport, DoubleBoundingBox3D::zero()); }
 	virtual DoubleBoundingBox3D getViewport_s() const { ViewLinkingViewWidget_GET_CHECK(getViewport_s, DoubleBoundingBox3D::zero()); }
-//	virtual QWidget *widget() const   { return mBase; }
-	virtual void forceUpdate()  { ViewLinkingViewWidget_VOID_CHECK(forceUpdate); }
+//	virtual void forceUpdate()  { ViewLinkingViewWidget_VOID_CHECK(forceUpdate); }
 
 private:
 	QPointer<ViewWidget> mBase;

@@ -34,7 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXTESTRENDERSPEED_H_
 
 #include "cxView.h"
-#include "cxViewWidget.h"
+#include <QTime>
+#include "cxLayoutWidget.h"
+
 class QGridLayout;
 class QLayout;
 
@@ -44,6 +46,32 @@ typedef vtkSmartPointer<class vtkRenderWindowInteractor> vtkRenderWindowInteract
 
 namespace cxtest
 {
+
+class RenderSpeedCounter
+{
+public:
+	RenderSpeedCounter();
+
+	void setName(QString name) { mName = name; }
+	void printResult();
+	int getRenderFPS();
+
+	void startRender(int numRender, int numViews);
+	void stopRender();
+
+private:
+	int getTotalRenderTimeInMs();
+	void setTotalRenderTimeInMs(int time);
+	double getAverageRenderTimeInMs();
+
+	int mNumRenderings;
+	int mNumViews;
+	int mRenderTimeInMs;
+	QTime mClock;
+	QString mName;
+
+};
+
 /*
  * \class TestRenderSpeed
  *
@@ -60,34 +88,50 @@ public:
 	void testSingleView();
 	void testSeveralViews();
 	void testLotsOfViews();
+	int getRenderFPS() { return mCounter.getRenderFPS(); }
+
+	void showViews();
+	void renderNumTimes(int num);
+//	void renderViewNum(int viewNum);
+	void createViews(int num);
+
+//	void addViewsToLayout(QLayout* layout);
+//	void addViewsToGridLayout(QGridLayout* layout);
+//	int getNumViews();
+//	void create3Dviews(int num);
+//	void create2Dviews(int num);
+
+
+	std::vector<cx::ViewPtr> mViews;
+	boost::shared_ptr<cx::LayoutWidget> mMainWidget;
+	RenderSpeedCounter mCounter;
+};
+
+/*
+ * \class TestRenderSpeed
+ *
+ * \Brief Helper class for testing view render speed
+ *
+ *  \date May 27, 2013
+ *  \author Ole Vegard Solberg, SINTEF
+ */
+class TestRenderWindowSpeed
+{
+public:
+	TestRenderWindowSpeed();
+	~TestRenderWindowSpeed();
 	void testVtkRenderWindow();
 	void testSeveralVtkRenderWindows();
 
-	void printResult();
-	int getRenderFPS();
+	void createVtkRenderWindows(int num);
+	void showViews();
+	void renderNumTimes(int num);
+//	int getNumViews();
+	int getRenderFPS() { return mCounter.getRenderFPS(); }
 
-//private:
-    void createVtkRenderWindows(int num);
-    void create3Dviews(int num);
-    void create2Dviews(int num);
-    void showViews();
-		void renderNumTimes(int num);
-		void renderViewNum(int viewNum);
-    void addViewsToLayout(QLayout* layout);
-    void addViewsToGridLayout(QGridLayout* layout);
-		const char* getViewName();
-		void setTotalRenderTimeInMs(int time);
-		int getTotalRenderTimeInMs();
-		double getAverageRenderTimeInMs();
-    int getNumViews();
 
-	std::vector<cx::ViewWidget*> mViews;
-//	std::vector<vtkRenderWindowPtr> mVtkRenderWindows;
-	boost::shared_ptr<QWidget> mMainWidget;
-	int mNumRenderings;
-	int mRenderTimeInMs;
-	int mNumViews;
-
+//	boost::shared_ptr<QWidget> mMainWidget;
+	RenderSpeedCounter mCounter;
 	std::vector<vtkRenderWindowInteractorPtr> mInteractors;
 };
 

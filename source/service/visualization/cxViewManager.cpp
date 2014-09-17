@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtCore>
 #include <qtextstream.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkImageData.h>
 #include "cxViewWrapper2D.h"
 #include "vtkRenderer.h"
@@ -175,7 +176,7 @@ QWidget *ViewManager::getLayoutWidget(int index)
 	SSC_ASSERT(index < mLayoutWidgets.size());
 	if (!mLayoutWidgets[index])
 	{
-		mLayoutWidgets[index] = new LayoutWidget;
+		mLayoutWidgets[index] = LayoutWidget::createViewWidgetLayout();
 		this->rebuildLayouts();
 	}
 	return mLayoutWidgets[index];
@@ -474,6 +475,17 @@ void ViewManager::activateView(LayoutWidget* widget, LayoutViewData viewData)
 		return;
 
 	ViewPtr view = widget->addView(viewData.mType, viewData.mRegion);
+
+	vtkRenderWindowInteractorPtr interactor = view->getRenderWindow()->GetInteractor();
+	//Turn off rendering in vtkRenderWindowInteractor
+	interactor->EnableRenderOff();
+	//Increase the StillUpdateRate in the vtkRenderWindowInteractor (default is 0.0001 images per second)
+	double rate = settings()->value("stillUpdateRate").value<double>();
+	interactor->SetStillUpdateRate(rate);
+	// Set the same value when moving (seems counterintuitive, but for us, moving isnt really special.
+	// The real challenge is updating while the tracking is active, and this uses the still update rate.
+	interactor->SetDesiredUpdateRate(rate);
+
 	mRenderLoop->addView(view);
 	ViewWrapperPtr wrapper = this->createViewWrapper(view, viewData);
 	mViewGroups[viewData.mGroup]->addView(wrapper);

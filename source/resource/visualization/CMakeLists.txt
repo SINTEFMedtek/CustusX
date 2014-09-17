@@ -5,9 +5,17 @@
 include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 
 cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
-	cxView
-	View/cxViewLinkingViewWidget
-	View/cxViewWidget
+	View/cxView
+	View/cxLayoutWidget
+
+	View/internal/cxViewRepCollection
+	View/internal/ViewWidget/cxViewLinkingViewWidget
+	View/internal/ViewWidget/cxViewWidget
+	View/internal/ViewWidget/cxViewWidgetLayout
+	View/internal/ViewContainer/cxViewContainerItem
+	View/internal/ViewContainer/cxViewContainer	
+	View/internal/ViewContainer/cxViewLinkingViewContainerItem
+	View/internal/ViewContainer/cxViewCollectionLayout	
     
 	Rep/cxRep.h
 	Rep/cxRepImpl
@@ -62,6 +70,8 @@ if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
 endif()
 
 cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
+	View/cxLayoutData
+	View/internal/ViewWidget/cxViewCache.h
 	Primitives/cxDepthPeeling
 	Primitives/cxGraphicalTorus3D
 	Primitives/cxVtkHelperClasses
@@ -132,6 +142,9 @@ set(CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES
 
 include_directories(${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/ThirdParty/VTKMultiVolume
+	View/internal
+	View/internal/ViewWidget
+	View/internal/ViewContainer
     )
 
 QT5_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

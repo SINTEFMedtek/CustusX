@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include "cxRep.h"
 #include "cxView.h"
-#include "cxViewWidget.h"
+#include "cxLayoutWidget.h"
 
 typedef vtkSmartPointer<class vtkProp> vtkPropPtr;
 
@@ -88,7 +88,8 @@ private:
 	vtkImageDataPtr convertToColorImage(vtkImageDataPtr image);
 	bool equalNumberOfComponents(vtkImageDataPtr image1, vtkImageDataPtr image2);
 
-	boost::shared_ptr<cx::ViewWidget> mView;
+	boost::shared_ptr<cx::LayoutWidget> mLayoutWidget;
+	cx::ViewPtr mView;
 	vtkRenderWindowPtr mRenderWindow;
 	vtkRendererPtr mRenderer;
 	double mImageErrorThreshold;

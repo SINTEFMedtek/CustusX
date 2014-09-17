@@ -64,6 +64,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxImageLUT2D.h"
 
+#include "QVTKWidget.h"
+#include "vtkRendererCollection.h"
+
 using cx::Vector3D;
 using cx::Transform3D;
 
@@ -86,17 +89,64 @@ TEST_CASE("Visual rendering: Init view",
 	REQUIRE(true);
 }
 
+TEST_CASE("Visual rendering: Empty QVTKWidget",
+		  "[unit][resource][visualization][hide]")
+{
+	QWidget mainWidget;
+	QGridLayout* layout = new QGridLayout;
+	layout->setSpacing(2);
+	layout->setMargin(10);
+	mainWidget.setLayout(layout);
+	mainWidget.setGeometry(150,150,400,400);
+
+	QVTKWidget* vtkWidget = new QVTKWidget();
+	//	viewWidget clear
+//  set custom renderwindow
+//	viewWidget clear
+
+	vtkWidget->GetRenderWindow()->GetInteractor()->EnableRenderOff();
+	vtkWidget->GetRenderWindow()->GetInteractor()->Disable();
+//	std::cout << "renderer count = " << vtkWidget->GetRenderWindow()->GetRenderers()->GetNumberOfItems() << std::endl;
+//	vtkWidget->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->Render();
+	vtkRendererPtr renderer = vtkRendererPtr::New();
+	renderer->SetBackground(0,0,0);
+	vtkWidget->GetRenderWindow()->AddRenderer(renderer);
+	// dette bomber visualizeringa
+//	vtkWidget->GetRenderWindow()->Render();
+
+//	setstretchfactors
+	layout->addWidget(vtkWidget, 0,0, 1,1);
+//	main show
+//	prettyzoom
+//	render
+
+	mainWidget.show();
+	// did not work
+//	QSize size = vtkWidget->size();
+//	double factor = 2;
+//	vtkWidget->GetRenderWindow()->SetSize(size.width()*factor, size.height()*factor);
+	vtkWidget->GetRenderWindow()->Render();
+
+//	sleep(3);
+
+	CHECK(true);
+	sleep(3);
+}
+
 TEST_CASE("Visual rendering: Empty view",
 		  "[unit][resource][visualization]")
 {
 	cxtest::ViewsFixture fixture;
 
-	cx::ViewWidget* view = fixture.addView("empty", 0, 0);
+	cx::ViewPtr view = fixture.addView(0, 0);
 //fixture.runWidget();
 		REQUIRE(fixture.quickRunWidget());
 
 	fixture.dumpDebugViewToDisk("emptyview", 0);
 	REQUIRE(fixture.getFractionOfBrightPixelsInView(0,0) == Approx(0));
+
+	sleep(3);
+
 }
 
 TEST_CASE("Visual rendering: Several empty views in a sequence.",
@@ -107,7 +157,7 @@ TEST_CASE("Visual rendering: Several empty views in a sequence.",
 	{
 		cxtest::ViewsFixture fixture;
 
-		cx::ViewWidget* view = fixture.addView("empty", 0, 0);
+		cx::ViewPtr view = fixture.addView(0, 0);
 		REQUIRE(fixture.quickRunWidget());
 
 		fixture.dumpDebugViewToDisk("emptyview", 0);

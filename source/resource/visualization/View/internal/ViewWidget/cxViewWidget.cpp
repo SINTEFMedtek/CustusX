@@ -52,21 +52,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoundingBox3D.h"
 #include "cxTransform3D.h"
 #include "cxViewLinkingViewWidget.h"
-/* Copy/pasted from qitemdelegate.cpp
- \internal
-
- Note that on Mac, if /usr/include/AssertMacros.h is included prior
- to QItemDelegate, and the application is building in debug mode, the
- check(assertion) will conflict with QItemDelegate::check.
-
- To avoid this problem, add
-
- #ifdef check
- #undef check
- #endif
-
- after including AssertMacros.h
- */
 
 namespace cx
 {
@@ -74,37 +59,15 @@ namespace cx
 
 ///--------------------------------------------------------
 
-ViewWidget::ViewWidget(QWidget *parent, Qt::WindowFlags f) :
-	inherited(parent, f),
-//	View(this, this->size()),
-	mRenderWindow(vtkRenderWindowPtr::New())
-{
-	mMTimeHash = 0;
-	mBackgroundColor = QColor("black");
-	mUid = "";
-	mName = "";
-	mType = View::VIEW;
-
-	connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequestedSlot(const QPoint &)));
-	this->SetRenderWindow(mRenderWindow);
-	clear();
-}
-
 ViewWidget::ViewWidget(const QString& uid, const QString& name, QWidget *parent, Qt::WindowFlags f) :
-	inherited(parent, f),
-//	View(this, this->size(), uid, name),
-	mRenderWindow(vtkRenderWindowPtr::New())
+	inherited(parent, f)
 {
-	mMTimeHash = 0;
-	mBackgroundColor = QColor("black");
-//	mParent = parent;
-	mUid = uid;
-	mName = name;
-	mType = View::VIEW;
-
+	this->setContextMenuPolicy(Qt::CustomContextMenu);
+	mZoomFactor = -1.0;
+	mView = ViewLinkingViewWidget::create(this, vtkRenderWindowPtr::New());
 	connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequestedSlot(const QPoint &)));
-	this->SetRenderWindow(mRenderWindow);
-	clear();
+	this->SetRenderWindow(mView->getRenderWindow());
+	mView->clear();
 }
 
 void ViewWidget::customContextMenuRequestedSlot(const QPoint& point)
@@ -114,171 +77,29 @@ void ViewWidget::customContextMenuRequestedSlot(const QPoint& point)
 	emit customContextMenuRequestedInGlobalPos(pointGlobal);
 }
 
-ViewPtr ViewWidget::getView()
+ViewRepCollectionPtr ViewWidget::getView()
 {
-	ViewPtr retval = mView.lock();
-	if (!retval)
-	{
-		retval.reset(new ViewLinkingViewWidget(this));
-		mView = retval;
-	}
-	return retval;
+	return mView;
 }
 
 ViewWidget::~ViewWidget()
 {
-	this->clear();
+	this->getView()->clear();
 }
 
-QString ViewWidget::getTypeString() const
+vtkRendererPtr ViewWidget::getRenderer()
 {
-	switch (this->getType())
-	{
-	case View::VIEW:
-		return "View";
-	case View::VIEW_2D:
-		return "View2D";
-	case View::VIEW_3D:
-		return "View3D";
-	case View::VIEW_REAL_TIME:
-		return "ViewRealTime";
-	}
-	return "";
-}
-
-QString ViewWidget::getUid()
-{
-	return mUid;
-}
-
-QString ViewWidget::getName()
-{
-	return mName;
-}
-
-vtkRendererPtr ViewWidget::getRenderer() const
-{
-	return mRenderer;
-}
-
-void ViewWidget::addRep(const RepPtr& rep)
-{
-	if (hasRep(rep))
-	{
-		return;
-	}
-
-	rep->connectToView(this->getView());
-	mReps.push_back(rep);
-}
-
-void ViewWidget::setBackgroundColor(QColor color)
-{
-	mBackgroundColor = color;
-	if (mRenderer)
-	{
-		mRenderer->SetBackground(mBackgroundColor.redF(), mBackgroundColor.greenF(), mBackgroundColor.blueF());
-	}
-}
-
-/**clear all content of the view. This ensures that props added from
- * outside the rep system also is cleared, and data not cleared with
- * RemoveAllViewProps() (added to fix problem in snw ultrasound rep,
- * data was not cleared, dont know why).
- */
-void ViewWidget::clear()
-{
-	removeReps();
-
-	if (mRenderer)
-		mRenderWindow->RemoveRenderer(mRenderer);
-	mRenderer = vtkRendererPtr::New();
-	mRenderer->SetBackground(mBackgroundColor.redF(), mBackgroundColor.greenF(), mBackgroundColor.blueF());
-	mRenderWindow->AddRenderer(mRenderer);
-}
-
-void ViewWidget::removeReps()
-{
-	for (RepsIter it = mReps.begin(); it != mReps.end(); ++it)
-	{
-		(*it)->disconnectFromView(this->getView());
-	}
-	mReps.clear();
-}
-
-void ViewWidget::removeRep(const RepPtr& rep)
-{
-	RepsIter it = std::find(mReps.begin(), mReps.end(), rep);
-
-	if (it == mReps.end())
-	{
-		return;
-	}
-
-	rep->disconnectFromView(this->getView());
-	mReps.erase(it);
-}
-
-std::vector<RepPtr> ViewWidget::getReps()
-{
-	return mReps;
-}
-
-bool ViewWidget::hasRep(const RepPtr& rep) const
-{
-	return std::count(mReps.begin(), mReps.end(), rep);
+	return this->getView()->getRenderer();
 }
 
 void ViewWidget::resizeEvent(QResizeEvent * event)
 {
 	inherited::resizeEvent(event);
 	QSize size = event->size();
-	vtkRenderWindowInteractor* iren = mRenderWindow->GetInteractor();
+	vtkRenderWindowInteractor* iren = mView->getRenderWindow()->GetInteractor();
 	if (iren != NULL)
 		iren->UpdateSize(size.width(), size.height());
 	emit resized(size);
-}
-
-void ViewWidget::print(std::ostream& os)
-{
-	Indent ind;
-	printSelf(os, ind);
-}
-
-void ViewWidget::printSelf(std::ostream & os, Indent indent)
-{
-	os << indent << "mUid: " << mUid << std::endl;
-	os << indent << "mName: " << mName << std::endl;
-	os << indent << "NumberOfReps: " << mReps.size() << std::endl;
-
-	for (unsigned i = 0; i < mReps.size(); ++i)
-	{
-		os << indent << "<Rep child " << i << ">" << std::endl;
-		mReps[i]->printSelf(os, indent.stepDown());
-		os << indent << "</Rep child " << i << ">" << std::endl;
-	}
-
-	if (indent.includeDetails())
-	{
-		os << indent << "<RenderWindow>" << std::endl;
-		mRenderWindow->PrintSelf(os, indent.getVtkIndent().GetNextIndent());
-		os << indent << "</RenderWindow>" << std::endl;
-		os << indent << "<Renderer>" << std::endl;
-		mRenderer->PrintSelf(os, indent.getVtkIndent().GetNextIndent());
-		os << indent << "</Renderer>" << std::endl;
-		os << indent << "<Props>" << std::endl;
-		vtkPropCollection* collection = mRenderer->GetViewProps();
-		collection->InitTraversal();
-		vtkProp* prop = collection->GetNextProp();
-		while (prop)
-		{
-			os << indent << indent << "<Prop>" << std::endl;
-			prop->PrintSelf(os, indent.getVtkIndent().GetNextIndent().GetNextIndent());
-			os << indent << indent << "</Prop>" << std::endl;
-			prop = collection->GetNextProp();
-		}
-		os << indent << "</Props>" << std::endl;
-	}
 }
 
 void ViewWidget::mouseMoveEvent(QMouseEvent* event)
@@ -325,42 +146,8 @@ void ViewWidget::showEvent(QShowEvent* event)
 
 void ViewWidget::paintEvent(QPaintEvent* event)
 {
-	mMTimeHash = 0;
+	mView->setModified();
 	inherited::paintEvent(event);
-}
-
-void ViewWidget::render()
-{
-//	std::cout << "ViewWidget::render(QW) " << size().width() << "," << size().height() << std::endl;
-//	std::cout << "ViewWidget::render(RW) " << this->getRenderWindow()->GetSize()[0] << "," << this->getRenderWindow()->GetSize()[1] << std::endl;
-//	Eigen::Array4d vp(this->getRenderer()->GetViewport());
-//	std::cout << "ViewWidget::render(VP) " << vp << std::endl;
-//	this->getRenderWindow()->Render();
-//	return; //HACHACKHACK
-
-	// Render is called only when mtime is changed.
-	// At least on MaxOS, this is not done automatically.
-	unsigned long hash = 0;
-
-	hash += this->getRenderer()->GetMTime();
-	hash += this->getRenderWindow()->GetMTime();
-	vtkPropCollection* props = this->getRenderer()->GetViewProps();
-	props->InitTraversal();
-	for (vtkProp* prop = props->GetNextProp(); prop != NULL; prop = props->GetNextProp())
-	{
-		vtkImageActor* imageActor = vtkImageActor::SafeDownCast(prop);
-		if (imageActor && imageActor->GetInput())
-		{
-			hash += imageActor->GetInput()->GetMTime();
-		}
-		hash += prop->GetMTime();
-		hash += prop->GetRedrawMTime();
-	}
-	if (hash != mMTimeHash)
-	{
-		this->getRenderWindow()->Render();
-		mMTimeHash = hash;
-	}
 }
 
 void ViewWidget::setZoomFactor(double factor)

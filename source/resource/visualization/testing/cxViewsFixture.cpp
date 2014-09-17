@@ -93,9 +93,9 @@ cx::DummyToolPtr ViewsFixture::dummyTool()
 	return boost::dynamic_pointer_cast<cx::DummyTool>(mServices->trackingService()->getDominantTool());
 }
 
-cx::ViewWidget* ViewsFixture::addView(QString caption, int row, int col)
+cx::ViewPtr ViewsFixture::addView(int row, int col)
 {
-	return mWindow->addView(caption, row, col);
+	return mWindow->addView(cx::View::VIEW, row, col);
 }
 
 bool ViewsFixture::defineGPUSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
@@ -108,7 +108,7 @@ bool ViewsFixture::defineGPUSlice(const QString& uid, const QString& imageFilena
 
 bool ViewsFixture::defineGPUSlice(const QString& uid, const std::vector<cx::ImagePtr> images, cx::PLANE_TYPE plane, int r, int c)
 {
-	cx::ViewWidget* view = mWindow->add2DView("several images", r, c);
+	cx::ViewPtr view = mWindow->add2DView(r, c);
 
 	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
 	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(uid);
@@ -122,7 +122,7 @@ bool ViewsFixture::defineGPUSlice(const QString& uid, const std::vector<cx::Imag
 
 void ViewsFixture::defineSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
 {
-	cx::ViewWidget* view = mWindow->add2DView(imageFilename, r, c);
+	cx::ViewPtr view = mWindow->add2DView(r, c);
 	cx::ImagePtr image = loadImage(imageFilename);
 
 	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
@@ -170,7 +170,7 @@ void ViewsFixture::fixToolToCenter()
 
 void ViewsFixture::define3D(const QString& imageFilename, const ImageParameters* parameters, int r, int c)
 {
-	cx::ViewWidget* view = mWindow->addView("3D "+imageFilename, r, c);
+	cx::ViewPtr view = mWindow->addView(cx::View::VIEW_3D, r, c);
 
 	cx::ImagePtr image = loadImage(imageFilename);
 	this->applyParameters(image, parameters);

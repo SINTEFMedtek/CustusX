@@ -35,8 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxView.h"
 #include "cxLayoutData.h"
-#include "cxViewCache.h"
-#include "cxViewWidget.h"
+#include <QWidget>
 
 
 class QGridLayout;
@@ -55,22 +54,17 @@ class LayoutWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	LayoutWidget();
-	~LayoutWidget();
+	static QPointer<LayoutWidget> createViewWidgetLayout();
+	static QPointer<LayoutWidget> createViewCollectionLayout();
 
-	ViewPtr addView(View::Type type, LayoutRegion region);
-	void showViews();
-	void setStretchFactors(LayoutRegion region, int stretchFactor); ///< Set the stretch factors of columns and rows in mLayout.
-	void clearViews();
+	virtual ~LayoutWidget() {}
 
-private:
-	void addView(ViewWidget* view, LayoutRegion region);
+	virtual ViewPtr addView(View::Type type, LayoutRegion region) = 0;
+	virtual void showViews() = 0;
+	virtual void clearViews() = 0;
 
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache2D;
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache3D;
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCacheRT;
-	QGridLayout* mLayout; ///< the layout
-	std::vector<ViewWidget*> mViews;
+protected:
+	LayoutWidget() {}
 };
 
 

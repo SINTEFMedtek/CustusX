@@ -30,34 +30,30 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "catch.hpp"
-#include "cxTestRenderSpeed.h"
-#include "cxtestJenkinsMeasurement.h"
+#include "cxLayoutWidget.h"
+#include <QGridLayout>
+#include "cxLogger.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
+#include "cxReporter.h"
 
-namespace cxtest
+#include "cxViewWidgetLayout.h"
+#include "cxViewCollectionLayout.h"
+
+#include "cxViewContainer.h"
+
+namespace cx
 {
 
-TEST_CASE("Speed: Render 10 empty viewWidgets", "[speed][gui][integration]")
+QPointer<LayoutWidget> LayoutWidget::createViewWidgetLayout()
 {
-    TestRenderSpeed helper;
-    helper.testSeveralViews();
-
-    REQUIRE(helper.getRenderFPS() > 10);
-
-	JenkinsMeasurement jenkins;
-    jenkins.createOutput("FPS", QString::number(helper.getRenderFPS()));
-//    helper.printResult();
+	return new LayoutWidgetUsingViewWidgets();
 }
 
-TEST_CASE("Speed: Render 10 empty vtkRenderWindows", "[speed][gui][integration]")
+QPointer<LayoutWidget> LayoutWidget::createViewCollectionLayout()
 {
-	TestRenderWindowSpeed helper;
-	helper.testSeveralVtkRenderWindows();
-
-	REQUIRE(helper.getRenderFPS() > 10);
-
-	JenkinsMeasurement jenkins;
-	jenkins.createOutput("FPS", QString::number(helper.getRenderFPS()));
+	return new LayoutWidgetUsingViewCollection();
 }
 
-} //namespace cxtest
+} // namespace cx
+

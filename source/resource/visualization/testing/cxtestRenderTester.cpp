@@ -127,15 +127,16 @@ RenderTester::RenderTester(cx::RepPtr rep, const unsigned int viewAxisSize) :
 	mImageErrorThreshold(100.0),
 	mBorderOffset(2)
 {
-	mView.reset(new cx::ViewWidget());
+	mLayoutWidget.reset(cx::LayoutWidget::createViewWidgetLayout().data());
+	mView = mLayoutWidget->addView(cx::View::VIEW, cx::LayoutRegion(0,0));
 	mView->addRep(rep);
-	mView->resize(viewAxisSize,viewAxisSize);
-	mView->show();
+	mLayoutWidget->resize(viewAxisSize,viewAxisSize);
+	mLayoutWidget->show();
 
 	mRenderWindow = mView->getRenderWindow();
-	mRenderer = mRenderWindow->GetRenderers()->GetFirstRenderer();
+	mRenderer = mView->getRenderer();
 
-	mRenderWindow->SetSize(viewAxisSize,viewAxisSize);
+//??	mRenderWindow->SetSize(viewAxisSize,viewAxisSize);
 
 }
 

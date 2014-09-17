@@ -38,11 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitions.h"
 #include <vector>
 
-namespace cx
-{
-typedef QPointer<class ViewWidget> ViewWidgetQPtr;
-}
-
 namespace cxtest
 {
 typedef boost::shared_ptr<class RenderTester> RenderTesterPtr;
@@ -81,7 +76,7 @@ public:
 	bool defineGPUSlice(const QString& uid, const QString&    imageFilename, cx::PLANE_TYPE plane, int r, int c);
 	bool defineGPUSlice(const QString& uid, const std::vector<cx::ImagePtr> images, cx::PLANE_TYPE plane, int r, int c);
 
-	cx::ViewWidget* addView(QString caption, int row, int col);
+	cx::ViewPtr addView(int row, int col);
 
 	bool quickRunWidget();
 	bool runWidget();

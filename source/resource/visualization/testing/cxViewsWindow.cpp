@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <vtkRenderer.h>
+#include <vtkRenderWindowInteractor.h>
 #include "vtkRenderWindow.h"
 #include "vtkCamera.h"
 #include "cxBoundingBox3D.h"
@@ -51,30 +52,27 @@ namespace cxtest
 ViewsWindow::ViewsWindow()
 {
 	mZoomFactor = 1;
-	QDesktopWidget* desktop = dynamic_cast<QApplication*>(QApplication::instance())->desktop();
 
-	 QScreen* screen__ = qApp->screens()[0];
-//	 std::cout << "dpr " << screen__->devicePixelRatio() << std::endl;
+	this->setNiceSize();
 
-
-
-	QRect screen = desktop->screenGeometry(desktop->primaryScreen());
-//	std::cout << "screen: w=" << screen.width() << ", h=" << screen.height() << std::endl;
-	screen.adjust(screen.width()*0.15, screen.height()*0.15, -screen.width()*0.15, -screen.height()*0.15);
-	this->setGeometry(screen);
-	this->setCentralWidget( new QWidget(this) );
-
-	//gui controll
-	QVBoxLayout *mainLayout = new QVBoxLayout;
-	this->centralWidget()->setLayout(mainLayout);
-
-	mSliceLayout = new QGridLayout;
-
-	mainLayout->addLayout(mSliceLayout);//Slice layout
+	mLayoutWidget = cx::LayoutWidget::createViewWidgetLayout();
+	this->setCentralWidget(mLayoutWidget);
 
 	mRenderingTimer = new QTimer(this);
 	mRenderingTimer->start(33);
 	connect(mRenderingTimer, SIGNAL(timeout()), this, SLOT(updateRender()));
+}
+
+
+void ViewsWindow::setNiceSize()
+{
+	QDesktopWidget* desktop = dynamic_cast<QApplication*>(QApplication::instance())->desktop();
+	 QScreen* screen__ = qApp->screens()[0];
+	//	 std::cout << "dpr " << screen__->devicePixelRatio() << std::endl;
+	QRect screen = desktop->screenGeometry(desktop->primaryScreen());
+	//	std::cout << "screen: w=" << screen.width() << ", h=" << screen.height() << std::endl;
+	screen.adjust(screen.width()*0.15, screen.height()*0.15, -screen.width()*0.15, -screen.height()*0.15);
+	this->setGeometry(screen);
 }
 
 void ViewsWindow::setDescription(const QString& desc)
@@ -87,44 +85,49 @@ ViewsWindow::~ViewsWindow()
 	mRenderingTimer->stop();
 }
 
-cx::ViewWidget* ViewsWindow::addView(QString caption, int r, int c)
+cx::ViewPtr ViewsWindow::addView(cx::View::Type type, int r, int c)
 {
-	cx::ViewWidget* view = new cx::ViewWidget(this->centralWidget());
-	this->insertView(view, caption, "", r, c);
+	cx::ViewPtr view = mLayoutWidget->addView(type, cx::LayoutRegion(r,c));
+	mViews.push_back(view);
 	return view;
+//	cx::ViewWidget* view = new cx::ViewWidget("","",this->centralWidget());
+//	this->insertView(view, caption, "", r, c);
+//	return view;
 }
 
-cx::ViewWidget* ViewsWindow::add2DView(QString caption, int r, int c)
+cx::ViewPtr ViewsWindow::add2DView(int r, int c)
 {
-	cx::ViewWidget* view = this->addView(caption, r, c);
+	cx::ViewPtr view = this->addView(cx::View::VIEW_2D, r,c);
+//	cx::ViewWidget* view = this->addView(caption, r, c);
 
 	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
-	view->GetRenderWindow()->GetInteractor()->Disable();
+	view->getRenderWindow()->GetInteractor()->Disable();
 	view->setZoomFactor(mZoomFactor);
 
 	return view;
 }
 
-void ViewsWindow::insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c)
-{
-//	view->GetRenderWindow()->SetErase(false);
-//	view->GetRenderWindow()->SetDoubleBuffer(false);
+//void ViewsWindow::insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c)
+//{
+////	view->GetRenderWindow()->SetErase(false);
+////	view->GetRenderWindow()->SetDoubleBuffer(false);
 
-	QVBoxLayout *layout = new QVBoxLayout;
-	mSliceLayout->addLayout(layout, r,c);
+//	QVBoxLayout *layout = new QVBoxLayout;
+//	mSliceLayout->addLayout(layout, r,c);
 
-	mLayouts.push_back(view);
-	layout->addWidget(view);
-	layout->addWidget(new QLabel(uid+" "+volume, this));
-}
+//	mLayouts.push_back(view);
+//	layout->addWidget(view);
+//	layout->addWidget(new QLabel(uid+" "+volume, this));
+//}
 
 cx::ViewPtr ViewsWindow::getView(int index)
 {
-	return mLayouts[index]->getView();
+	return mViews[index];
 }
 
 bool ViewsWindow::quickRunWidget()
 {
+	mLayoutWidget->showViews();
 	this->show();
 	this->updateRender();
 
@@ -133,15 +136,14 @@ bool ViewsWindow::quickRunWidget()
 
 void ViewsWindow::updateRender()
 {
-	for (std::vector<cx::ViewWidget* >::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
+	for (unsigned i=0; i<mViews.size(); ++i)
 	{
-		this->prettyZoom((*iter)->getView());
+		this->prettyZoom(mViews[i]);
 	}
 
-	for (unsigned i=0; i<mLayouts.size(); ++i)
+	for (unsigned i=0; i<mViews.size(); ++i)
 	{
-//		mLayouts[i]->getRenderWindow()->Render();
-		mLayouts[i]->render();
+		mViews[i]->render();
 	}
 }
 

@@ -30,31 +30,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVIEWWIDGET_H_
-#define CXVIEWWIDGET_H_
+#ifndef CXVIEWREPCOLLECTION_H
+#define CXVIEWREPCOLLECTION_H
 
-#include "QVTKWidget.h"
-
-#include "cxTransform3D.h"
+#include <QObject>
+#include "cxForwardDeclarations.h"
 #include "cxView.h"
+#include <QColor>
 
 namespace cx
 {
 
-/** Simple 1:1 conflation of SSC Views and Qt Widgets
-  *
- * \ingroup cx_resource_visualization
-  */
-class ViewWidget : public QVTKWidget
+typedef boost::shared_ptr<class ViewRepCollection> ViewRepCollectionPtr;
+
+class ViewRepCollection : public View
 {
 Q_OBJECT
-	typedef QVTKWidget inherited;
 
 public:
-	ViewPtr getView();
-	ViewWidget(QWidget *parent = NULL, Qt::WindowFlags f = 0);
-	ViewWidget(const QString& uid, const QString& name = "", QWidget *parent = NULL, Qt::WindowFlags f = 0); ///< constructor
-	virtual ~ViewWidget();
+	ViewRepCollection(vtkRenderWindowPtr renderWindow, const QString& uid, const QString& name = ""); ///< constructor
+	virtual ~ViewRepCollection();
 
 	void print(std::ostream& os);
 	virtual void printSelf(std::ostream & os, Indent indent);
@@ -62,8 +57,6 @@ public:
 
 	// Implement pure virtuals in base class
 	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; } ///< Get the vtkRenderWindow used by this \a View.
-	virtual QSize size() const { return inherited::size(); }
-	virtual void setZoomFactor(double factor);
 
 	virtual View::Type getType() const
 	{
@@ -84,37 +77,14 @@ public:
 	virtual void removeReps(); ///< Removes all reps in the view
 	virtual void setBackgroundColor(QColor color);
 	virtual void render(); ///< render the view contents if vtk-MTimes are changed
-	virtual double getZoomFactor() const;
-	virtual Transform3D get_vpMs() const;
-	virtual double mmPerPix() const;
-	virtual DoubleBoundingBox3D getViewport() const;
-	virtual DoubleBoundingBox3D getViewport_s() const;
 
 	virtual void forceUpdate() { mMTimeHash = 0; }
 
-signals:
-	void resized(QSize size);
-	void mouseMove(int x, int y, Qt::MouseButtons buttons);
-	void mousePress(int x, int y, Qt::MouseButtons buttons);
-	void mouseRelease(int x, int y, Qt::MouseButtons buttons);
-	void mouseWheel(int x, int y, int delta, int orientation, Qt::MouseButtons buttons);
-	void shown();
-	void focusChange(bool gotFocus, Qt::FocusReason reason);
-	void customContextMenuRequestedInGlobalPos(const QPoint&);
+	void setModified()
+	{
+		mMTimeHash = 0;
+	}
 
-private slots:
-	void customContextMenuRequestedSlot(const QPoint& point);
-private:
-	virtual void showEvent(QShowEvent* event);
-	virtual void wheelEvent(QWheelEvent*);
-	virtual void mouseMoveEvent(QMouseEvent *event);
-	virtual void mousePressEvent(QMouseEvent *event);
-	virtual void mouseReleaseEvent(QMouseEvent *event);
-	virtual void focusInEvent(QFocusEvent* event);
-	virtual void resizeEvent(QResizeEvent *event);
-	virtual void paintEvent(QPaintEvent *event);
-
-	double mZoomFactor; ///< zoom factor for this view. 1 means that 1m on screen is 1m
 	QColor mBackgroundColor;
 	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
 	QString mUid; ///< The view's unique id
@@ -124,9 +94,9 @@ private:
 	std::vector<RepPtr> mReps; ///< Storage for internal reps.
 	typedef std::vector<RepPtr>::iterator RepsIter; ///< Iterator typedef for the internal rep vector.
 	View::Type mType;
-	boost::weak_ptr<class View> mView;
+	boost::weak_ptr<class View> mSelf;
 };
 
 } // namespace cx
 
-#endif /* CXVIEWWIDGET_H_ */
+#endif // CXVIEWREPCOLLECTION_H
