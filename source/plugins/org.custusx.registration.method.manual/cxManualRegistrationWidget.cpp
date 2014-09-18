@@ -42,8 +42,7 @@ namespace cx
 {
 
 ManualImageRegistrationWidget::ManualImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName, QString windowTitle) :
-	BaseWidget(parent, "ManualPatientRegistrationWidget",
-						 "Manual Patient Registration"),
+	BaseWidget(parent, objectName, windowTitle),
 	mVerticalLayout(new QVBoxLayout(this)),
 	mRegistrationService(new cx::RegistrationServiceProxy(pluginContext))
 {
@@ -189,9 +188,8 @@ void ManualImageTransformRegistrationWidget::setMatrixFromWidget(Transform3D M)
 // --------------------------------------------------------
 // --------------------------------------------------------
 
-ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
-				BaseWidget(parent, "ManualPatientRegistrationWidget",
-								"Manual Patient Registration"),
+ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName) :
+				BaseWidget(parent, objectName, "Manual Patient Registration"),
 				mVerticalLayout(new QVBoxLayout(this)),
 				mPatientModelService(new cx::PatientModelServiceProxy(pluginContext))
 {

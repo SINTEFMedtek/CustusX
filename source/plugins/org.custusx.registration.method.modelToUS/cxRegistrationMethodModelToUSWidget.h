@@ -53,7 +53,7 @@ class RegistrationMethodModelToUSWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	RegistrationMethodModelToUSWidget(ctkPluginContext *pluginContext, QWidget* parent);
+	RegistrationMethodModelToUSWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName);
 	virtual ~RegistrationMethodModelToUSWidget();
 
 private:

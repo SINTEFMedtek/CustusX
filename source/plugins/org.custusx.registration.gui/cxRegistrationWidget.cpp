@@ -162,18 +162,29 @@ bool RegistrationWidget::knownType(QString registrationType)
 
 void RegistrationWidget::onServiceRemoved(RegistrationMethodService *service)
 {
-	std::cout << "RegistrationWidget::onServiceRemoved " << std::endl;
-	QComboBox *comboBox = mMethodsSelectorMap[service->getRegistrationType()];
 	QStackedWidget *stackedWidget = mRegistrationTypeMap[service->getRegistrationType()];
+	this->removeWidgetFromStackedWidget(service->getWidgetName(), stackedWidget);
 
-//	stackedWidget->removeWidget(service->getWidget());
-
+	QComboBox *comboBox = mMethodsSelectorMap[service->getRegistrationType()];
 	int comboBoxPosition = comboBox->findText(service->getRegistrationMethod());
 	if(comboBoxPosition != -1)
 		comboBox->removeItem(comboBoxPosition);
 	else
 	{
 		reportWarning("RegistrationWidget::onServiceRemoved: Cannot find and remove service from combobox: "+ service->getRegistrationMethod());
+	}
+}
+
+void RegistrationWidget::removeWidgetFromStackedWidget(QString widgetName, QStackedWidget *stackedWidget)
+{
+	for(int i = 0; i < stackedWidget->count(); ++i)
+	{
+		QWidget* widget = stackedWidget->widget(i);
+		if(widget->objectName() == widgetName)
+		{
+			stackedWidget->removeWidget(widget);
+			delete widget;
+		}
 	}
 }
 

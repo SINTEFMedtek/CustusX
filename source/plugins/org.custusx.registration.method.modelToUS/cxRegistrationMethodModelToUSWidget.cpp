@@ -39,9 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-RegistrationMethodModelToUSWidget::RegistrationMethodModelToUSWidget(ctkPluginContext *pluginContext, QWidget* parent) :
-	BaseWidget(parent, "RegistrationMethodModelToUSWidget",
-						 "Model to US Registration"),
+RegistrationMethodModelToUSWidget::RegistrationMethodModelToUSWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName) :
+	BaseWidget(parent, objectName, "Model to US Registration"),
 	mVerticalLayout(new QVBoxLayout(this)),
 	mRegistrationService(new cx::RegistrationServiceProxy(pluginContext))
 {

@@ -55,10 +55,13 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 
 PatientModelImplService::~PatientModelImplService()
 {
-	disconnect(dataService().get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
-	disconnect(dataService().get(), SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
-	disconnect(dataService().get(), SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
-	disconnect(dataService().get(), SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
+	if(dataService())
+	{
+		disconnect(dataService().get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
+		disconnect(dataService().get(), SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
+		disconnect(dataService().get(), SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
+		disconnect(dataService().get(), SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
+	}
 }
 
 void PatientModelImplService::insertData(DataPtr data)

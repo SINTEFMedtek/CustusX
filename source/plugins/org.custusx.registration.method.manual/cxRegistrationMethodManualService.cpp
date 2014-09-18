@@ -64,19 +64,19 @@ RegistrationMethodManualImageTransformService::RegistrationMethodManualImageTran
 
 QWidget* RegistrationMethodManualImageToImageService::createWidget()
 {
-	QWidget* retval = new ManualImage2ImageRegistrationWidget(mPluginContext, NULL);
+	QWidget* retval = new ManualImage2ImageRegistrationWidget(mPluginContext, NULL, this->getWidgetName());
 	return retval;
 }
 
 QWidget* RegistrationMethodManualImageToPatientService::createWidget()
 {
-	QWidget *retval = new ManualPatientRegistrationWidget(mPluginContext, NULL);
+	QWidget *retval = new ManualPatientRegistrationWidget(mPluginContext, NULL, this->getWidgetName());
 	return retval;
 }
 
 QWidget* RegistrationMethodManualImageTransformService::createWidget()
 {
-	QWidget *retval = new ManualImageTransformRegistrationWidget(mPluginContext, NULL);
+	QWidget *retval = new ManualImageTransformRegistrationWidget(mPluginContext, NULL, this->getWidgetName());
 	return retval;
 }
 

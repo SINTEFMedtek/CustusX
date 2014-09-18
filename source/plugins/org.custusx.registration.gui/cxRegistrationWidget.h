@@ -71,6 +71,7 @@ private:
 	void insertImageComboInLayout(StringDataAdapterPtr adapter, QVBoxLayout *layout, int position);
 	void insertImageComboBoxes(std::vector<QVBoxLayout *> layouts);
 	bool knownType(QString registrationType);
+	void removeWidgetFromStackedWidget(QString widgetName, QStackedWidget *stackedWidget);
 
 	ctkPluginContext* mPluginContext;
 	QVBoxLayout*  mVerticalLayout;
@@ -79,7 +80,6 @@ private:
 	std::map<QString, QComboBox*> mMethodsSelectorMap;
 	std::map<QString, QStackedWidget*> mRegistrationTypeMap;
 	QStringList mRegistrationTypes;
-
 };
 
 } /* namespace cx */

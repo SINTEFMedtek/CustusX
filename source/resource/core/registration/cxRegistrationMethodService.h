@@ -58,6 +58,7 @@ public:
     virtual ~RegistrationMethodService() {}
 
 	virtual QWidget* createWidget() = 0;
+	virtual QString getWidgetName() = 0;
 	virtual QString getRegistrationType() = 0;
 	virtual QString getRegistrationMethod() = 0;
 

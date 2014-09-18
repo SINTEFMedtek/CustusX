@@ -56,6 +56,7 @@ public:
 	virtual QString getRegistrationType() {return QString("ImageToImage");}
 	virtual QString getRegistrationMethod() {return QString("ModelToUS");}
 	virtual QWidget* createWidget();
+	virtual QString getWidgetName() {return QString("ModelToUSRegistrationWidget");}
 private:
 	ctkPluginContext* mPluginContext;
 };
