@@ -200,6 +200,7 @@ ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(ctkPluginContex
 	mMatrixWidget = new Transform3DWidget(this);
 	mVerticalLayout->addWidget(mMatrixWidget);
 	connect(mMatrixWidget, SIGNAL(changed()), this, SLOT(matrixWidgetChanged()));
+	connect(mPatientModelService.get(), SIGNAL(rMprChanged()), this, SLOT(patientMatrixChanged()));
 	mMatrixWidget->setEditable(true);
 
 	mVerticalLayout->addStretch();
