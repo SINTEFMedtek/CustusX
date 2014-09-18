@@ -51,6 +51,9 @@ namespace cx
  * Usage example:
  * For listening to ReconstructionServices being added and removed, but ignoring if they are modified
  *
+ * NB: This class can only be used with a valid plugin context.
+ * And plugin contexts are only valid when the plugin framework is in one of these states: ACTIVE, STARTING and STOPPING
+ *
  *  boost::shared_ptr<ServiceTrackerListener<ReconstructionService> > mServiceListener;
  *  mServiceListener.reset(new ServiceTrackerListener<ReconstructionService>(
  *          LogicManager::getInstance()->getPluginFramework(),
@@ -70,13 +73,10 @@ class ServiceTrackerListener
 {
 
 public:
-	// pluginFrameWork is needed if ServiceTrackerListener is to be used outside of a plugin. (Like in the old ReconstructionManager and VideoConnectionManager, and MainWindow)
 	ServiceTrackerListener(ctkPluginContext* context,
 						   boost::function<void (T*)> serviceAdded,
 						   boost::function<void (T*)> serviceModified,
-							 boost::function<void (T*)> serviceRemoved,
-							 QSharedPointer<ctkPluginFramework> pluginFrameWork = QSharedPointer<ctkPluginFramework>()) :
-		mPluginFrameWork(pluginFrameWork)
+							 boost::function<void (T*)> serviceRemoved)
 	{
 		boost::shared_ptr<ServiceTrackerCustomizer<T> > customizer(new ServiceTrackerCustomizer<T>);
 		mServiceTrackerCustomizer = customizer;
@@ -88,8 +88,9 @@ public:
 
 	~ServiceTrackerListener()
 	{
-		if(this->validPluginFramework())
-			mServiceTracker->close();
+//		mServiceTracker->close();//For some reason this causes a crash if a service (that uses another service with a ServiceTrackerListener) have been removed
+		//If close is needed: A possible workasround may be to clear all functions in mServiceTrackerCustomizer?
+//		mServiceTracker.reset();
 	}
 
 	void open()
@@ -113,20 +114,9 @@ public:
 		return service;
 	}
 
-	bool validPluginFramework()
-	{
-		if(!mPluginFrameWork)// Only check for validity if ServiceTrackerListener is initialized with a plugin framework
-			return true;
-		else if(mPluginFrameWork->getState() == ctkPlugin::ACTIVE)//Maybe also allow STARTING and STOPPING?
-			return true;
-		else
-			return false;
-	}
-
 private:
 	boost::shared_ptr<ServiceTrackerCustomizer<T> > mServiceTrackerCustomizer;
 	boost::shared_ptr<ctkServiceTracker<T*> > mServiceTracker;
-	QSharedPointer<ctkPluginFramework> mPluginFrameWork;
 };
 }//namespace cx
 

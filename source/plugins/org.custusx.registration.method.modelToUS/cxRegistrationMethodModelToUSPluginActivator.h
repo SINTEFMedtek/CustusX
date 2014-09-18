@@ -50,15 +50,15 @@ typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
  * \date Sep 16, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class ExamplePluginActivator :  public QObject, public ctkPluginActivator
+class RegistrationMethodModelToUSPluginActivator :  public QObject, public ctkPluginActivator
 {
   Q_OBJECT
   Q_INTERFACES(ctkPluginActivator)
 
 public:
 
-  ExamplePluginActivator();
-  ~ExamplePluginActivator();
+	RegistrationMethodModelToUSPluginActivator();
+	~RegistrationMethodModelToUSPluginActivator();
 
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);

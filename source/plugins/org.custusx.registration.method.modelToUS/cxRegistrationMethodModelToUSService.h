@@ -52,10 +52,10 @@ class org_custusx_registration_method_modelToUS_EXPORT RegistrationMethodModelTo
 {
 public:
 	RegistrationMethodModelToUSService(ctkPluginContext *context);
-	virtual ~RegistrationMethodModelToUSService() {};
+	virtual ~RegistrationMethodModelToUSService() {}
 	virtual QString getRegistrationType() {return QString("ImageToImage");}
 	virtual QString getRegistrationMethod() {return QString("ModelToUS");}
-	virtual QWidget* getWidget();
+	virtual QWidget* createWidget();
 private:
 	ctkPluginContext* mPluginContext;
 };

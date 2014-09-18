@@ -41,7 +41,7 @@ RegistrationMethodModelToUSService::RegistrationMethodModelToUSService(ctkPlugin
 	mPluginContext(context)
 {
 }
-QWidget* RegistrationMethodModelToUSService::getWidget()
+QWidget* RegistrationMethodModelToUSService::createWidget()
 {
 	QWidget* retval = new RegistrationMethodModelToUSWidget(mPluginContext, NULL);
 	return retval;

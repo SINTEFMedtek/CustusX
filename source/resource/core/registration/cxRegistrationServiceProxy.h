@@ -64,6 +64,7 @@ class RegistrationServiceProxy : public RegistrationService
 	Q_OBJECT
 public:
 	RegistrationServiceProxy(ctkPluginContext *context);
+	~RegistrationServiceProxy() {}
 
 	virtual void setMovingData(DataPtr data);
 	virtual void setFixedData(DataPtr data);

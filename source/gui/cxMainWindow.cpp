@@ -194,8 +194,7 @@ void MainWindow::setupGUIExtenders()
 								 LogicManager::getInstance()->getPluginContext(),
 							   boost::bind(&MainWindow::onPluginBaseAdded, this, _1),
 							   boost::bind(&MainWindow::onPluginBaseModified, this, _1),
-								 boost::bind(&MainWindow::onPluginBaseRemoved, this, _1),
-								 LogicManager::getInstance()->getPluginFramework()->getPluginFramework()
+								 boost::bind(&MainWindow::onPluginBaseRemoved, this, _1)
 							   ));
 	mServiceListener->open();
 }

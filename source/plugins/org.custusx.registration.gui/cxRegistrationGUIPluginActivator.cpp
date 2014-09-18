@@ -62,6 +62,6 @@ void RegistrationGUIPluginActivator::stop(ctkPluginContext* context)
 
 } // namespace cx
 
-Q_EXPORT_PLUGIN2(ExamplePluginActivator_irrelevant_string, cx::RegistrationGUIPluginActivator)
+Q_EXPORT_PLUGIN2(RegistrationGUIPluginActivator_irrelevant_string, cx::RegistrationGUIPluginActivator)
 
 

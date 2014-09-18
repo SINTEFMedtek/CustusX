@@ -41,20 +41,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ExamplePluginActivator::ExamplePluginActivator()
+RegistrationMethodModelToUSPluginActivator::RegistrationMethodModelToUSPluginActivator()
 {
 	std::cout << "Created ExamplePluginActivator" << std::endl;
 }
 
-ExamplePluginActivator::~ExamplePluginActivator()
-{}
+RegistrationMethodModelToUSPluginActivator::~RegistrationMethodModelToUSPluginActivator()
+{
+	std::cout << "RegistrationMethodModelToUSPluginActivator destr" << std::endl;
+}
 
-void ExamplePluginActivator::start(ctkPluginContext* context)
+void RegistrationMethodModelToUSPluginActivator::start(ctkPluginContext* context)
 {
 	mRegistration = RegisteredService::create<RegistrationMethodModelToUSService>(context, RegistrationMethodService_iid);
 }
 
-void ExamplePluginActivator::stop(ctkPluginContext* context)
+void RegistrationMethodModelToUSPluginActivator::stop(ctkPluginContext* context)
 {
   mRegistration.reset();
     Q_UNUSED(context);
@@ -62,6 +64,6 @@ void ExamplePluginActivator::stop(ctkPluginContext* context)
 
 } // namespace cx
 
-Q_EXPORT_PLUGIN2(ExamplePluginActivator_irrelevant_string, cx::ExamplePluginActivator)
+Q_EXPORT_PLUGIN2(RegistrationMethodModelToUSPluginActivator_irrelevant_string, cx::RegistrationMethodModelToUSPluginActivator)
 
 

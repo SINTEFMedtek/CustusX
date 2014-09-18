@@ -57,7 +57,7 @@ class RegistrationMethodService : public QObject
 public:
     virtual ~RegistrationMethodService() {}
 
-	virtual QWidget* getWidget() = 0;
+	virtual QWidget* createWidget() = 0;
 	virtual QString getRegistrationType() = 0;
 	virtual QString getRegistrationMethod() = 0;
 

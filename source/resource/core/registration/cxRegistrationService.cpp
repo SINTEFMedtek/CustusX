@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegistrationService.h"
 #include "cxRegistrationServiceNull.h"
+#include "cxNullDeleter.h"
 
 namespace cx
 {
@@ -39,7 +40,8 @@ RegistrationServicePtr RegistrationService::getNullObject()
 {
 	static RegistrationServicePtr mNull;
 	if (!mNull)
-		mNull.reset(new RegistrationServiceNull);
+		mNull.reset(new RegistrationServiceNull, null_deleter());
 	return mNull;
+//	return RegistrationServicePtr(new RegistrationServiceNull);
 }
 }

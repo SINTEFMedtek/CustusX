@@ -50,6 +50,7 @@ RegistrationMethodModelToUSWidget::RegistrationMethodModelToUSWidget(ctkPluginCo
 
 RegistrationMethodModelToUSWidget::~RegistrationMethodModelToUSWidget()
 {
+//	mRegistrationService.reset();
 }
 
 QString RegistrationMethodModelToUSWidget::defaultWhatsThis() const

@@ -76,7 +76,7 @@ public:
 	virtual ~RegistrationMethodManualImageToImageService() {}
 	virtual QString getRegistrationType() {return QString("ImageToImage");}
 	virtual QString getRegistrationMethod() {return QString("Manual");}
-	virtual QWidget* getWidget();
+	virtual QWidget* createWidget();
 };
 //typedef boost::shared_ptr<RegistrationMethodManualService> RegistrationMethodManualServicePtr;
 
@@ -89,7 +89,7 @@ public:
 	virtual ~RegistrationMethodManualImageToPatientService() {}
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}
 	virtual QString getRegistrationMethod() {return QString("Manual");}
-	virtual QWidget* getWidget();
+	virtual QWidget* createWidget();
 };
 //typedef boost::shared_ptr<RegistrationMethodManualService> RegistrationMethodManualServicePtr;
 
@@ -102,7 +102,7 @@ public:
 	virtual ~RegistrationMethodManualImageTransformService() {}
 	virtual QString getRegistrationType() {return QString("ImageTransform");}
 	virtual QString getRegistrationMethod() {return QString("Manual");}
-	virtual QWidget* getWidget();
+	virtual QWidget* createWidget();
 };
 //typedef boost::shared_ptr<RegistrationMethodManualService> RegistrationMethodManualServicePtr;
 

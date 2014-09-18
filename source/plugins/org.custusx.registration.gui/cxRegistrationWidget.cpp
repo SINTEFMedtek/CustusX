@@ -64,6 +64,13 @@ RegistrationWidget::RegistrationWidget(ctkPluginContext *pluginContext, QWidget*
 
 RegistrationWidget::~RegistrationWidget()
 {
+//	mServiceListener.reset();
+	for(int i = 0; i < mRegistrationTypes.count(); ++i)
+	{
+		QComboBox *comboBox = mMethodsSelectorMap[mRegistrationTypes[i]];
+		QStackedWidget *stackedWidget = mRegistrationTypeMap[mRegistrationTypes[i]];
+		disconnect(comboBox, SIGNAL(activated(int)),stackedWidget,SLOT(setCurrentIndex(int)));
+	}
 }
 
 void RegistrationWidget::initRegistrationTypesWidgets()
@@ -78,6 +85,8 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 
 		QComboBox *methodSelector = new QComboBox(registrationTypeWidget );
 		mMethodsSelectorMap[mRegistrationTypes[i]] = methodSelector;
+
+		connect(methodSelector, SIGNAL(activated(int)),registrationTypeWidget,SLOT(setCurrentIndex(int)));
 
 		QGroupBox	*groupBox = new QGroupBox(registrationTypeWidget);
 
@@ -137,10 +146,8 @@ void RegistrationWidget::onServiceAdded(RegistrationMethodService* service)
 	QComboBox *comboBox = mMethodsSelectorMap[service->getRegistrationType()];
 	QStackedWidget *stackedWidget = mRegistrationTypeMap[service->getRegistrationType()];
 
-	stackedWidget->addWidget(service->getWidget());
+	stackedWidget->addWidget(service->createWidget());
 	comboBox->addItem(service->getRegistrationMethod());
-
-	connect(comboBox, SIGNAL(activated(int)),stackedWidget,SLOT(setCurrentIndex(int)));
 }
 
 bool RegistrationWidget::knownType(QString registrationType)
@@ -155,7 +162,19 @@ bool RegistrationWidget::knownType(QString registrationType)
 
 void RegistrationWidget::onServiceRemoved(RegistrationMethodService *service)
 {
+	std::cout << "RegistrationWidget::onServiceRemoved " << std::endl;
+	QComboBox *comboBox = mMethodsSelectorMap[service->getRegistrationType()];
+	QStackedWidget *stackedWidget = mRegistrationTypeMap[service->getRegistrationType()];
 
+//	stackedWidget->removeWidget(service->getWidget());
+
+	int comboBoxPosition = comboBox->findText(service->getRegistrationMethod());
+	if(comboBoxPosition != -1)
+		comboBox->removeItem(comboBoxPosition);
+	else
+	{
+		reportWarning("RegistrationWidget::onServiceRemoved: Cannot find and remove service from combobox: "+ service->getRegistrationMethod());
+	}
 }
 
 QString RegistrationWidget::defaultWhatsThis() const

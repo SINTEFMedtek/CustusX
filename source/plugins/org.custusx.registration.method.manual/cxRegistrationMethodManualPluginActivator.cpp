@@ -43,7 +43,7 @@ namespace cx
 
 RegistrationMethodManualPluginActivator::RegistrationMethodManualPluginActivator()
 {
-    std::cout << "Created RegistrationMethodManualPluginActivator" << std::endl;
+//    std::cout << "Created RegistrationMethodManualPluginActivator" << std::endl;
 }
 
 RegistrationMethodManualPluginActivator::~RegistrationMethodManualPluginActivator()

@@ -34,10 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/bind.hpp>
 #include <ctkPluginContext.h>
 #include "cxLabeledComboBoxWidget.h"
-//#include "cxRegistrationDataAdapters.h"
-//#include "cxRegistrationManager.h"
-//#include "cxToolManager.h"
-//#include "cxDataManager.h"
 #include "cxReporter.h"
 #include "cxRegistrationServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
@@ -45,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ManualImageRegistrationWidget::ManualImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
+ManualImageRegistrationWidget::ManualImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName, QString windowTitle) :
 	BaseWidget(parent, "ManualPatientRegistrationWidget",
 						 "Manual Patient Registration"),
 	mVerticalLayout(new QVBoxLayout(this)),
@@ -197,7 +193,6 @@ ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(ctkPluginContex
 				BaseWidget(parent, "ManualPatientRegistrationWidget",
 								"Manual Patient Registration"),
 				mVerticalLayout(new QVBoxLayout(this)),
-				mRegistrationService(new cx::RegistrationServiceProxy(pluginContext)),
 				mPatientModelService(new cx::PatientModelServiceProxy(pluginContext))
 {
 	mLabel = new QLabel("Patient Registration matrix rMpr");
