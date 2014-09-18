@@ -56,12 +56,6 @@ RegistrationMethodManualImageTransformService::RegistrationMethodManualImageTran
 {
 }
 
-
-//ManualRegistrationsWidget* manRegWidget = new ManualRegistrationsWidget(this, "ManualRegistrationWidget", "Manual Registrations");
-//ManualImage2ImageRegistrationWidget* manImage2ImageRegWidget = new ManualImage2ImageRegistrationWidget(regManager, manRegWidget);
-//ManualImageTransformRegistrationWidget* manImageTransformRegWidget = new ManualImageTransformRegistrationWidget(regManager, manRegWidget);
-//ManualPatientRegistrationWidget* manPatientRegWidget = new ManualPatientRegistrationWidget(regManager, manRegWidget);
-
 QWidget* RegistrationMethodManualImageToImageService::createWidget()
 {
 	QWidget* retval = new ManualImage2ImageRegistrationWidget(mPluginContext, NULL, this->getWidgetName());

@@ -56,15 +56,12 @@ RegistrationWidget::RegistrationWidget(ctkPluginContext *pluginContext, QWidget*
 	this->setWindowTitle("Registration");
 	this->setWhatsThis(this->defaultWhatsThis());
 
-//	mVerticalLayout->addWidget(new QLabel("Registration Plugin!"));
-
 	this->initRegistrationTypesWidgets();
 	this->initServiceListener();
 }
 
 RegistrationWidget::~RegistrationWidget()
 {
-//	mServiceListener.reset();
 	for(int i = 0; i < mRegistrationTypes.count(); ++i)
 	{
 		QComboBox *comboBox = mMethodsSelectorMap[mRegistrationTypes[i]];
