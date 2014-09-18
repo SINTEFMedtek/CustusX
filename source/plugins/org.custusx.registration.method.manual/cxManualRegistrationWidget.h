@@ -33,12 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMANUALREGISTRATIONWIDGET_H_
 #define CXMANUALREGISTRATIONWIDGET_H_
 
-//#include "cxRegistrationBaseWidget.h"
 #include "cxStringDataAdapter.h"
 #include "cxTransform3DWidget.h"
 #include "cxData.h"
 #include "cxRegistrationService.h"
-#include "cxPatientModelService.h"
 
 class ctkPluginContext;
 
@@ -89,87 +87,6 @@ private:
 //	StringDataAdapterPtr mFixedImage;
 //	StringDataAdapterPtr mMovingImage;
 	Transform3DWidget* mMatrixWidget;
-};
-
-/**\brief Direct setting of image registration
- *
- * The matrix is the fMm transform, i.e. from moving to fixed image
- *
- *  \date 2014-06-13
- *  \author Christian Askeland, SINTEF
- *  \author Ole Vegard Solberg, SINTEF
- */
-class ManualImage2ImageRegistrationWidget : public ManualImageRegistrationWidget
-{
-public:
-	ManualImage2ImageRegistrationWidget(ctkPluginContext *context, QWidget* parent, QString objectName) :
-		ManualImageRegistrationWidget(context, parent, objectName, "Manual Image to Image Registration") {}
-	virtual QString getDescription();
-	virtual Transform3D getMatrixFromBackend();
-	virtual void setMatrixFromWidget(Transform3D M);
-
-	bool isValid() const;
-
-};
-
-/**\brief Direct setting of image registration
- *
- * Manipulate the image matrix rMd via a matrix
- * or xyz+angles. The writing of the matrix is handled
- * exactly like an image registration.
- *
- *  \date Feb 16, 2012
- *  \author Christian Askeland, SINTEF
- *  \author Ole Vegard Solberg, SINTEF
- */
-class ManualImageTransformRegistrationWidget : public ManualImageRegistrationWidget
-{
-public:
-	ManualImageTransformRegistrationWidget(ctkPluginContext *context, QWidget* parent, QString objectName) :
-		ManualImageRegistrationWidget(context, parent, objectName, "Manual Image Transform Registration") {}
-	virtual QString getDescription();
-	virtual Transform3D getMatrixFromBackend();
-	virtual void setMatrixFromWidget(Transform3D M);
-};
-
-/**\brief Direct setting of patient registration
- *
- * Manipulate the image matrix rMpr via a matrix
- * or xyz+angles. The writing of the matrix is handled
- * exactly like an image registration.
- *
- *  \date Feb 16, 2012
- *  \author Christian Askeland, SINTEF
- *  \author Ole Vegard Solberg, SINTEF
- *  \author Geir Arne Tangen, SINTEF
- */
-class ManualPatientRegistrationWidget: public BaseWidget
-{
-Q_OBJECT
-public:
-ManualPatientRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName);
-	 ~ManualPatientRegistrationWidget()
-	{
-	}
-	 QString defaultWhatsThis() const;
-protected:
-	void showEvent(QShowEvent *event);
-	RegistrationServicePtr mRegistrationService;
-	PatientModelServicePtr mPatientModelService;
-
-private slots:
-	void matrixWidgetChanged();
-	void patientMatrixChanged();
-
-private:
-	QString getDescription();
-	bool	isValid() const;
-	Transform3D getMatrixFromBackend();
-	void setMatrixFromWidget(Transform3D M);
-
-	QVBoxLayout*		mVerticalLayout;
-	QLabel*				mLabel;
-	Transform3DWidget*	mMatrixWidget;
 };
 
 } /* namespace cx */

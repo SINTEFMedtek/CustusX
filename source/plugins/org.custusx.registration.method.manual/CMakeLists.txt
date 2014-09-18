@@ -15,6 +15,12 @@ set(PLUGIN_SRCS
   cxRegistrationMethodManualPluginActivator.cpp
   cxRegistrationMethodManualService.cpp
   cxManualRegistrationWidget.cpp
+  cxRegistrationMethodManualImageToImageService.cpp
+  cxRegistrationMethodManualImageToPatientService.cpp
+  cxRegistrationMethodManualImageTransformService.cpp
+  cxManualImage2ImageRegistrationWidget.cpp
+  cxManualImageTransformRegistrationWidget.cpp
+  cxManualPatientRegistrationWidget.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -22,6 +28,12 @@ set(PLUGIN_MOC_SRCS
   cxRegistrationMethodManualPluginActivator.h
   cxRegistrationMethodManualService.h
   cxManualRegistrationWidget.h
+  cxRegistrationMethodManualImageToImageService.h
+  cxRegistrationMethodManualImageToPatientService.h
+  cxRegistrationMethodManualImageTransformService.h
+  cxManualImage2ImageRegistrationWidget.h
+  cxManualImageTransformRegistrationWidget.h
+  cxManualPatientRegistrationWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic

@@ -35,7 +35,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtPlugin>
 #include <iostream>
 
-#include "cxRegistrationMethodManualService.h"
+//#include "cxRegistrationMethodManualService.h"
+#include "cxRegistrationMethodManualImageToImageService.h"
+#include "cxRegistrationMethodManualImageToPatientService.h"
+#include "cxRegistrationMethodManualImageTransformService.h"
 #include "cxRegisteredService.h"
 
 namespace cx

@@ -59,56 +59,6 @@ protected:
 	ctkPluginContext* mPluginContext;
 };
 
-/**
- * Implementation of registration method manual service.
- *
- * \ingroup org_custusx_registration_method_manual
- *
- * \date Sep 08, 2014
- * \author Ole Vegard Solberg, SINTEF
- * \author Geir Arne Tangen, SINTEF
- */
-class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualImageToImageService : public RegistrationMethodManualService
-{
-	Q_INTERFACES(cx::RegistrationMethodService)
-public:
-	RegistrationMethodManualImageToImageService(ctkPluginContext *context);
-	virtual ~RegistrationMethodManualImageToImageService() {}
-	virtual QString getRegistrationType() {return QString("ImageToImage");}
-	virtual QString getRegistrationMethod() {return QString("Manual");}
-	virtual QWidget* createWidget();
-	virtual QString getWidgetName() {return QString("ManualImage2ImageRegistrationWidget");}
-};
-//typedef boost::shared_ptr<RegistrationMethodManualService> RegistrationMethodManualServicePtr;
-
-
-class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualImageToPatientService : public RegistrationMethodManualService
-{
-	Q_INTERFACES(cx::RegistrationMethodService)
-public:
-	RegistrationMethodManualImageToPatientService(ctkPluginContext *context);
-	virtual ~RegistrationMethodManualImageToPatientService() {}
-	virtual QString getRegistrationType() {return QString("ImageToPatient");}
-	virtual QString getRegistrationMethod() {return QString("Manual");}
-	virtual QWidget* createWidget();
-	virtual QString getWidgetName() {return QString("ManualPatientRegistrationWidget");}
-};
-//typedef boost::shared_ptr<RegistrationMethodManualService> RegistrationMethodManualServicePtr;
-
-
-class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualImageTransformService : public RegistrationMethodManualService
-{
-	Q_INTERFACES(cx::RegistrationMethodService)
-public:
-	RegistrationMethodManualImageTransformService(ctkPluginContext *context);
-	virtual ~RegistrationMethodManualImageTransformService() {}
-	virtual QString getRegistrationType() {return QString("ImageTransform");}
-	virtual QString getRegistrationMethod() {return QString("Manual");}
-	virtual QWidget* createWidget();
-	virtual QString getWidgetName() {return QString("ManualImageTransformRegistrationWidget");}
-};
-//typedef boost::shared_ptr<RegistrationMethodManualService> RegistrationMethodManualServicePtr;
-
 } /* namespace cx */
 
 #endif /* CXREGISTRATIONMETHODMANUALSERVICE_H_ */

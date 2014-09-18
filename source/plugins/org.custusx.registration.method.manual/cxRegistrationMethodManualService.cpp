@@ -42,36 +42,4 @@ RegistrationMethodManualService::RegistrationMethodManualService(ctkPluginContex
 {
 }
 
-RegistrationMethodManualImageToImageService::RegistrationMethodManualImageToImageService(ctkPluginContext *context) :
-	RegistrationMethodManualService(context)
-{
-}
-
-RegistrationMethodManualImageToPatientService::RegistrationMethodManualImageToPatientService(ctkPluginContext *context) :
-	RegistrationMethodManualService(context)
-{
-}
-RegistrationMethodManualImageTransformService::RegistrationMethodManualImageTransformService(ctkPluginContext *context) :
-	RegistrationMethodManualService(context)
-{
-}
-
-QWidget* RegistrationMethodManualImageToImageService::createWidget()
-{
-	QWidget* retval = new ManualImage2ImageRegistrationWidget(mPluginContext, NULL, this->getWidgetName());
-	return retval;
-}
-
-QWidget* RegistrationMethodManualImageToPatientService::createWidget()
-{
-	QWidget *retval = new ManualPatientRegistrationWidget(mPluginContext, NULL, this->getWidgetName());
-	return retval;
-}
-
-QWidget* RegistrationMethodManualImageTransformService::createWidget()
-{
-	QWidget *retval = new ManualImageTransformRegistrationWidget(mPluginContext, NULL, this->getWidgetName());
-	return retval;
-}
-
 } /* namespace cx */
