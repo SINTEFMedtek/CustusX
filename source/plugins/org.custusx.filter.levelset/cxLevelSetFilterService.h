@@ -47,6 +47,7 @@ class org_custusx_filter_levelset_EXPORT LevelSetFilter: public FilterImpl
 Q_OBJECT
 
 public:
+	LevelSetFilter(ctkPluginContext *pluginContext);
 	virtual ~LevelSetFilter()
 	{
 	}

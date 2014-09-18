@@ -60,7 +60,7 @@ public:
   FilterLevelSetPluginActivator();
   ~FilterLevelSetPluginActivator();
 
-  void start(ctkPluginContext* context);
+  void start(ctkPluginContext* pluginContext);
   void stop(ctkPluginContext* context);
 
 private:

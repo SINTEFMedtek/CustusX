@@ -68,6 +68,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+LevelSetFilter::LevelSetFilter(ctkPluginContext *pluginContext) :
+	FilterImpl(pluginContext)
+{
+}
+
 QString LevelSetFilter::getName() const
 {
 	return "Level Set Segmentation";
@@ -315,7 +320,7 @@ void LevelSetFilter::createInputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New();
+	temp = SelectImageStringDataAdapter::New(mPluginContext);
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for thresholding");
 	mInputTypes.push_back(temp);
@@ -325,12 +330,12 @@ void LevelSetFilter::createOutputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New();
+	temp = SelectDataStringDataAdapter::New(mPluginContext);
 	temp->setValueName("Output");
 	temp->setHelp("Output segmented binary image");
 	mOutputTypes.push_back(temp);
 
-	temp = SelectDataStringDataAdapter::New();
+	temp = SelectDataStringDataAdapter::New(mPluginContext);
 	temp->setValueName("Contour");
 	temp->setHelp("Output contour generated from thresholded binary image.");
 	mOutputTypes.push_back(temp);
