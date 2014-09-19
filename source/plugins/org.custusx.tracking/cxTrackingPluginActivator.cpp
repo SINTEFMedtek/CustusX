@@ -30,50 +30,38 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxDominantToolProxy.h"
-#include "cxToolManager.h"
+#include "cxTrackingPluginActivator.h"
+
+#include <QtPlugin>
+#include <iostream>
+
+#include "cxTrackingImplService.h"
+#include "cxRegisteredService.h"
 
 namespace cx
 {
 
-DominantToolProxy::DominantToolProxy(TrackingServiceOldPtr toolManager) :
-	mToolManager(toolManager)
+TrackingPluginActivator::TrackingPluginActivator()
 {
-	connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this,
-					SLOT(dominantToolChangedSlot(const QString&)));
-	connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this,
-					SIGNAL(dominantToolChanged(const QString&)));
-
-	if (mToolManager->getDominantTool())
-		this->dominantToolChangedSlot(mToolManager->getDominantTool()->getUid());
 }
 
-void DominantToolProxy::dominantToolChangedSlot(const QString& uid)
+TrackingPluginActivator::~TrackingPluginActivator()
 {
-	if (mTool && mTool->getUid() == uid)
-		return;
-
-	if (mTool)
-	{
-		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
-						SIGNAL(toolTransformAndTimestamp(Transform3D, double)));
-		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SIGNAL(toolVisible(bool)));
-		disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
-		disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
-		disconnect(mTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
-	}
-
-	mTool = mToolManager->getDominantTool();
-
-	if (mTool)
-	{
-		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
-						SIGNAL(toolTransformAndTimestamp(Transform3D, double)));
-		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SIGNAL(toolVisible(bool)));
-		connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
-		connect(mTool.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
-		connect(mTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
-	}
 }
 
+void TrackingPluginActivator::start(ctkPluginContext* context)
+{
+	mRegistration = RegisteredService::create<TrackingImplService>(context, TrackingService_iid);
 }
+
+void TrackingPluginActivator::stop(ctkPluginContext* context)
+{
+	mRegistration.reset();
+	Q_UNUSED(context);
+}
+
+} // namespace cx
+
+Q_EXPORT_PLUGIN2(TrackingPluginActivator_irrelevant_string, cx::TrackingPluginActivator)
+
+

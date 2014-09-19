@@ -94,7 +94,7 @@ public:
 	virtual ~ToolManagerUsingIGSTK();
 
 //	static void initializeObject();
-//	static cxTrackingServicePtr getInstance();
+//	static cxTrackingServiceOldPtr getInstance();
 
 	virtual QStringList getSupportedTrackingSystems();
 

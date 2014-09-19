@@ -56,20 +56,20 @@ class StateServiceBackend
 {
 public:
 	StateServiceBackend(DataServicePtr dataManager,
-								TrackingServicePtr toolManager,
+								TrackingServiceOldPtr toolManager,
 								VideoServicePtr videoService,
 								SpaceProviderPtr spaceProvider,
 						PatientServicePtr patientService);
 
 	DataServicePtr getDataManager();
-	TrackingServicePtr getToolManager();
+	TrackingServiceOldPtr getToolManager();
 	VideoServicePtr getVideoService();
 	SpaceProviderPtr getSpaceProvider();
 	PatientServicePtr getPatientService();
 
 private:
 	DataServicePtr mDataManager;
-	TrackingServicePtr mToolManager;
+	TrackingServiceOldPtr mToolManager;
 	SpaceProviderPtr mSpaceProvider;
 	VideoServicePtr mVideoService;
 	PatientServicePtr mPatientService;

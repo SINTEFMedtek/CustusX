@@ -57,21 +57,21 @@ class VideoServiceBackend
 {
 public:
 	static VideoServiceBackendPtr create(DataServicePtr dataManager,
-								TrackingServicePtr toolManager,
+								TrackingServiceOldPtr toolManager,
 								SpaceProviderPtr spaceProvider, QSharedPointer<ctkPluginFramework> pluginFrameWork);
 	VideoServiceBackend(DataServicePtr dataManager,
-								TrackingServicePtr toolManager,
+								TrackingServiceOldPtr toolManager,
 								SpaceProviderPtr spaceProvider, QSharedPointer<ctkPluginFramework> pluginFrameWork);
 
 	DataServicePtr getDataManager();
-	TrackingServicePtr getToolManager();
+	TrackingServiceOldPtr getToolManager();
 	SpaceProviderPtr getSpaceProvider();
 	ctkPluginContext* getPluginContext();
 	QSharedPointer<ctkPluginFramework> getPluginFramework();
 
 private:
 	DataServicePtr mDataManager;
-	TrackingServicePtr mToolManager;
+	TrackingServiceOldPtr mToolManager;
 	SpaceProviderPtr mSpaceProvider;
 	QSharedPointer<ctkPluginFramework> mPluginFrameWork;
 };

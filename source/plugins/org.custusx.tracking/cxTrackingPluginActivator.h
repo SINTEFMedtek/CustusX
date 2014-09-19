@@ -30,50 +30,41 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxDominantToolProxy.h"
-#include "cxToolManager.h"
+#ifndef CXTRACKINGPLUGINACTIVATOR_H_
+#define CXTRACKINGPLUGINACTIVATOR_H_
+
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
 
 namespace cx
 {
 
-DominantToolProxy::DominantToolProxy(TrackingServiceOldPtr toolManager) :
-	mToolManager(toolManager)
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+
+/**
+ * Activator for the Tracking plugin
+ *
+ * \ingroup org_custusx_tracking
+ * \date 2014-09-19
+ * \author Ole Vegard Solberg
+ */
+class TrackingPluginActivator :  public QObject, public ctkPluginActivator
 {
-	connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this,
-					SLOT(dominantToolChangedSlot(const QString&)));
-	connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this,
-					SIGNAL(dominantToolChanged(const QString&)));
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
 
-	if (mToolManager->getDominantTool())
-		this->dominantToolChangedSlot(mToolManager->getDominantTool()->getUid());
-}
+public:
 
-void DominantToolProxy::dominantToolChangedSlot(const QString& uid)
-{
-	if (mTool && mTool->getUid() == uid)
-		return;
+  TrackingPluginActivator();
+  ~TrackingPluginActivator();
 
-	if (mTool)
-	{
-		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
-						SIGNAL(toolTransformAndTimestamp(Transform3D, double)));
-		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SIGNAL(toolVisible(bool)));
-		disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
-		disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
-		disconnect(mTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
-	}
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
 
-	mTool = mToolManager->getDominantTool();
+private:
+	RegisteredServicePtr mRegistration;
+};
 
-	if (mTool)
-	{
-		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
-						SIGNAL(toolTransformAndTimestamp(Transform3D, double)));
-		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SIGNAL(toolVisible(bool)));
-		connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
-		connect(mTool.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
-		connect(mTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
-	}
-}
+} // namespace cx
 
-}
+#endif /* CXTRACKINGPLUGINACTIVATOR_H_ */

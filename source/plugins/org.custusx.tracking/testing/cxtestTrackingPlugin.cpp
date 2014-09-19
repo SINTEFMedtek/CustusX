@@ -30,50 +30,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxDominantToolProxy.h"
-#include "cxToolManager.h"
+#include "catch.hpp"
 
-namespace cx
+TEST_CASE("TrackingPlugin: Check nothing", "[unit][plugins][org.custusx.tracking][hide]")
 {
-
-DominantToolProxy::DominantToolProxy(TrackingServiceOldPtr toolManager) :
-	mToolManager(toolManager)
-{
-	connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this,
-					SLOT(dominantToolChangedSlot(const QString&)));
-	connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this,
-					SIGNAL(dominantToolChanged(const QString&)));
-
-	if (mToolManager->getDominantTool())
-		this->dominantToolChangedSlot(mToolManager->getDominantTool()->getUid());
-}
-
-void DominantToolProxy::dominantToolChangedSlot(const QString& uid)
-{
-	if (mTool && mTool->getUid() == uid)
-		return;
-
-	if (mTool)
-	{
-		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
-						SIGNAL(toolTransformAndTimestamp(Transform3D, double)));
-		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SIGNAL(toolVisible(bool)));
-		disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
-		disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
-		disconnect(mTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
-	}
-
-	mTool = mToolManager->getDominantTool();
-
-	if (mTool)
-	{
-		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
-						SIGNAL(toolTransformAndTimestamp(Transform3D, double)));
-		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SIGNAL(toolVisible(bool)));
-		connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
-		connect(mTool.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
-		connect(mTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
-	}
-}
-
+	CHECK(true);
 }

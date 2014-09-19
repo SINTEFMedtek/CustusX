@@ -44,7 +44,7 @@ struct TestServicesType
 	cx::DataFactoryPtr mDataFactory;
 	cx::DataServicePtr mDataService;
 	cx::SpaceProviderPtr mSpaceProvider;
-	cx::TrackingServicePtr mTrackingService;
+	cx::TrackingServiceOldPtr mTrackingService;
 };
 
 /** Create a dummy DataService that is not using a toolmanager internally
@@ -67,7 +67,7 @@ public:
 	cx::DataFactoryPtr dataFactory() { return mDataFactory; }
 	cx::DataServicePtr dataService() { return mDataService; }
 	cx::SpaceProviderPtr spaceProvider() { return mSpaceProvider; }
-	cx::TrackingServicePtr trackingService() { return mTrackingService; }
+	cx::TrackingServiceOldPtr trackingService() { return mTrackingService; }
 
 private:
 	TestServices();

@@ -57,7 +57,7 @@ namespace cx
 
 struct LegacySingletons
 {
-	static TrackingServicePtr mToolManager;
+	static TrackingServiceOldPtr mToolManager;
 	static DataServicePtr mDataManager;
 	static SpaceProviderPtr mSpaceProvider;
 	static PatientServicePtr mPatientService;
@@ -66,7 +66,7 @@ struct LegacySingletons
 	static StateServicePtr mStateService;
 };
 
-TrackingServicePtr LegacySingletons::mToolManager;
+TrackingServiceOldPtr LegacySingletons::mToolManager;
 DataServicePtr LegacySingletons::mDataManager;
 SpaceProviderPtr LegacySingletons::mSpaceProvider;
 PatientServicePtr LegacySingletons::mPatientService;
@@ -87,7 +87,7 @@ ViewManager* viewManager()
 	return LegacySingletons::mVisualizationService.get();
 }
 
-TrackingServicePtr trackingService()
+TrackingServiceOldPtr trackingService()
 {
 	return LegacySingletons::mToolManager;
 }
@@ -294,7 +294,7 @@ PatientServicePtr LogicManager::getPatientService()
 	return mPatientService;
 }
 
-TrackingServicePtr LogicManager::getTrackingService()
+TrackingServiceOldPtr LogicManager::getTrackingService()
 {
 	if (!mTrackingService)
 		this->createTrackingService();

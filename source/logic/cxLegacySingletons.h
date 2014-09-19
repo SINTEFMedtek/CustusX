@@ -40,7 +40,7 @@ class DataManager;
 class ToolManager;
 class ViewManager;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class ToolManager> TrackingServicePtr;
+typedef boost::shared_ptr<class ToolManager> TrackingServiceOldPtr;
 typedef boost::shared_ptr<class PatientService> PatientServicePtr;
 typedef boost::shared_ptr<class DataManager> DataServicePtr;
 typedef boost::shared_ptr<class VideoService> VideoServicePtr;
@@ -61,7 +61,7 @@ ToolManager* toolManager();
 ViewManager* viewManager();
 // access to new shared ptrs:
 SpaceProviderPtr spaceProvider();
-TrackingServicePtr trackingService();
+TrackingServiceOldPtr trackingService();
 DataServicePtr dataService();
 PatientServicePtr patientService();
 VideoServicePtr videoService();

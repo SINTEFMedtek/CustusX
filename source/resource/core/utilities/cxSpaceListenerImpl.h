@@ -51,7 +51,7 @@ class SpaceListenerImpl: public SpaceListener
 Q_OBJECT
 
 public:
-	SpaceListenerImpl(TrackingServicePtr toolManager, DataServicePtr dataManager);
+	SpaceListenerImpl(TrackingServiceOldPtr toolManager, DataServicePtr dataManager);
 //	SpaceListenerImpl(CoordinateSystem space);
 	virtual ~SpaceListenerImpl();
 	void setSpace(CoordinateSystem space);
@@ -65,7 +65,7 @@ private:
 	void doDisconnect();
 	CoordinateSystem mSpace;
 
-	TrackingServicePtr mToolManager;
+	TrackingServiceOldPtr mToolManager;
 	DataServicePtr mDataManager;
 };
 

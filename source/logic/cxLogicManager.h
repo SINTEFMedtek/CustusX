@@ -78,7 +78,7 @@ public:
 
   DataFactoryPtr getDataFactory();
   DataServicePtr getDataService();
-  TrackingServicePtr getTrackingService();
+  TrackingServiceOldPtr getTrackingService();
   SpaceProviderPtr getSpaceProvider();
   PatientServicePtr getPatientService();
   VideoServicePtr getVideoService();
@@ -134,7 +134,7 @@ private:
 	DataFactoryPtr mDataFactory;
 
 	PatientServicePtr mPatientService;
-	TrackingServicePtr mTrackingService;
+	TrackingServiceOldPtr mTrackingService;
 	VideoServicePtr mVideoService;
 	VisualizationServiceOldPtr mVisualizationService;
 	StateServicePtr mStateService;
