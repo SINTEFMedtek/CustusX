@@ -35,8 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegistrationMethodService.h"
 #include "org_custusx_registration_method_manual_Export.h"
-//#include "org_custusx_registration_method_manual_ImageToPatient_Export.h"
-//#include "org_custusx_registration_method_manual_ImageTransform_Export.h"
 class ctkPluginContext;
 
 namespace cx

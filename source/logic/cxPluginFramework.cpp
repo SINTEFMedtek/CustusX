@@ -282,13 +282,11 @@ bool PluginFrameworkManager::stop()
 {
 	this->saveState();
 
-	ctkPluginContext* pc = this->getPluginContext();
 	// stop the framework
-	QSharedPointer<ctkPluginFramework> fw = qSharedPointerCast<ctkPluginFramework>(pc->getPlugin(0));
 	try
 	{
-		fw->stop();
-		ctkPluginFrameworkEvent fe = fw->waitForStop(5000);
+		mFramework->stop();
+		ctkPluginFrameworkEvent fe = mFramework->waitForStop(5000);
 		if (fe.getType() == ctkPluginFrameworkEvent::FRAMEWORK_WAIT_TIMEDOUT)
 		{
 			reportWarning("Stopping the plugin framework timed out");
