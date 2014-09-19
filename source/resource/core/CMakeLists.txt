@@ -78,7 +78,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	utilities/cxProcessReporter
 	utilities/cxVLCRecorder
 	utilities/cxSpaceProvider
-	utilities/cxSpaceProviderImpl
 	utilities/cxSpaceListener
 	utilities/cxSpaceListenerImpl
 
@@ -153,6 +152,7 @@ cx_add_class(cxResource_SOURCE
 	utilities/cxPlaneTypeCollection
 	utilities/cxSharedPointerChecker
 	utilities/cxNullDeleter.h
+	utilities/cxSpaceProviderImpl
 
 	logger/cxAudio.h
 	logger/cxLogger
