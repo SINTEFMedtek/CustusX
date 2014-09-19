@@ -62,7 +62,7 @@ struct LegacySingletons
 	static SpaceProviderPtr mSpaceProvider;
 	static PatientServicePtr mPatientService;
 	static VideoServicePtr mVideoService;
-	static VisualizationServicePtr mVisualizationService;
+	static VisualizationServiceOldPtr mVisualizationService;
 	static StateServicePtr mStateService;
 };
 
@@ -71,7 +71,7 @@ DataServicePtr LegacySingletons::mDataManager;
 SpaceProviderPtr LegacySingletons::mSpaceProvider;
 PatientServicePtr LegacySingletons::mPatientService;
 VideoServicePtr LegacySingletons::mVideoService;
-VisualizationServicePtr LegacySingletons::mVisualizationService;
+VisualizationServiceOldPtr LegacySingletons::mVisualizationService;
 StateServicePtr LegacySingletons::mStateService;
 
 ToolManager* toolManager()
@@ -107,7 +107,7 @@ VideoServicePtr videoService()
 {
 	return LegacySingletons::mVideoService;
 }
-VisualizationServicePtr visualizationService()
+VisualizationServiceOldPtr visualizationService()
 {
 	return LegacySingletons::mVisualizationService;
 }
@@ -315,7 +315,7 @@ StateServicePtr LogicManager::getStateService()
 	return mStateService;
 }
 
-VisualizationServicePtr LogicManager::getVisualizationService()
+VisualizationServiceOldPtr LogicManager::getVisualizationService()
 {
 	if (!mVisualizationService)
 		this->createVisualizationService();

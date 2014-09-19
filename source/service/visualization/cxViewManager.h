@@ -125,7 +125,7 @@ class ViewManager: public QObject
 {
 Q_OBJECT
 public:
-	static VisualizationServicePtr create(VisualizationServiceBackendPtr backend);
+	static VisualizationServiceOldPtr create(VisualizationServiceBackendPtr backend);
 	virtual ~ViewManager();
 
 	ViewWidgetQPtr get3DView(int group = 0, int index = 0);

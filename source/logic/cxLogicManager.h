@@ -82,7 +82,7 @@ public:
   SpaceProviderPtr getSpaceProvider();
   PatientServicePtr getPatientService();
   VideoServicePtr getVideoService();
-  VisualizationServicePtr getVisualizationService();
+  VisualizationServiceOldPtr getVisualizationService();
 	StateServicePtr getStateService();
 
 private:
@@ -136,7 +136,7 @@ private:
 	PatientServicePtr mPatientService;
 	TrackingServicePtr mTrackingService;
 	VideoServicePtr mVideoService;
-	VisualizationServicePtr mVisualizationService;
+	VisualizationServiceOldPtr mVisualizationService;
 	StateServicePtr mStateService;
 	DataManagerImplPtr mDataService;
 

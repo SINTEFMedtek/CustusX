@@ -274,6 +274,7 @@ set(CX_RESOURCE_INCLUDE_DIRECTORIES
     ${CustusX_SOURCE_DIR}/source/resource/core/utilities
     ${CustusX_SOURCE_DIR}/source/resource/core/registration
     ${CustusX_SOURCE_DIR}/source/resource/core/patientModel
+	${CustusX_SOURCE_DIR}/source/resource/core/visualization
     ${CustusX_SOURCE_DIR}/source/resource/core
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     ${CustusX_SOURCE_DIR}/source/ThirdParty

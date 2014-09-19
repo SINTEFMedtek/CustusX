@@ -29,45 +29,42 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXLEGACYSINGLETONS_H
-#define CXLEGACYSINGLETONS_H
 
+#ifndef CXVISUALIZATIONPLUGINACTIVATOR_H_
+#define CXVISUALIZATIONPLUGINACTIVATOR_H_
+
+#include <ctkPluginActivator.h>
 #include "boost/shared_ptr.hpp"
 
 namespace cx
 {
-class DataManager;
-class ToolManager;
-class ViewManager;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class ToolManager> TrackingServicePtr;
-typedef boost::shared_ptr<class PatientService> PatientServicePtr;
-typedef boost::shared_ptr<class DataManager> DataServicePtr;
-typedef boost::shared_ptr<class VideoService> VideoServicePtr;
-typedef boost::shared_ptr<class ViewManager> VisualizationServiceOldPtr;
-typedef boost::shared_ptr<class StateService> StateServicePtr;
 
-/** 
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+
+/**
+ * Activator for the Visualization plugin
  *
- *
- * \ingroup cx
- * \date 23.02.2014, 2014
- * \author christiana
+ * \ingroup org_custusx_visualization
+ * \date 2014-09-19
+ * \author Ole Vegard Solberg
  */
+class VisualizationPluginActivator :  public QObject, public ctkPluginActivator
+{
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
 
-// old style singleton accessors:
-DataManager* dataManager();
-ToolManager* toolManager();
-ViewManager* viewManager();
-// access to new shared ptrs:
-SpaceProviderPtr spaceProvider();
-TrackingServicePtr trackingService();
-DataServicePtr dataService();
-PatientServicePtr patientService();
-VideoServicePtr videoService();
-StateServicePtr stateService();
+public:
+
+  VisualizationPluginActivator();
+  ~VisualizationPluginActivator();
+
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
+
+private:
+	RegisteredServicePtr mRegistration;
+};
 
 } // namespace cx
 
-
-#endif // CXLEGACYSINGLETONS_H
+#endif /* CXVISUALIZATIONPLUGINACTIVATOR_H_ */

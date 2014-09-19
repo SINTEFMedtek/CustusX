@@ -29,45 +29,40 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXLEGACYSINGLETONS_H
-#define CXLEGACYSINGLETONS_H
 
-#include "boost/shared_ptr.hpp"
+#ifndef CXVISUALIZATIONIMPLSERVICE_H_
+#define CXVISUALIZATIONIMPLSERVICE_H_
+
+#include "cxVisualizationService.h"
+#include "org_custusx_visualization_Export.h"
+class ctkPluginContext;
 
 namespace cx
 {
-class DataManager;
-class ToolManager;
-class ViewManager;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class ToolManager> TrackingServicePtr;
-typedef boost::shared_ptr<class PatientService> PatientServicePtr;
-typedef boost::shared_ptr<class DataManager> DataServicePtr;
-typedef boost::shared_ptr<class VideoService> VideoServicePtr;
-typedef boost::shared_ptr<class ViewManager> VisualizationServiceOldPtr;
-typedef boost::shared_ptr<class StateService> StateServicePtr;
 
-/** 
+/**
+ * Implementation of VisualizationService.
  *
+ * \ingroup org_custusx_visualization
  *
- * \ingroup cx
- * \date 23.02.2014, 2014
- * \author christiana
+ * \date 2014-09-19
+ * \author Ole Vegard Solberg
  */
+class org_custusx_visualization_EXPORT VisualizationImplService : public VisualizationService
+{
+	Q_INTERFACES(cx::VisualizationService)
+public:
+	VisualizationImplService(ctkPluginContext* context);
+	virtual ~VisualizationImplService();
 
-// old style singleton accessors:
-DataManager* dataManager();
-ToolManager* toolManager();
-ViewManager* viewManager();
-// access to new shared ptrs:
-SpaceProviderPtr spaceProvider();
-TrackingServicePtr trackingService();
-DataServicePtr dataService();
-PatientServicePtr patientService();
-VideoServicePtr videoService();
-StateServicePtr stateService();
+	virtual bool isNull();
 
-} // namespace cx
+private:
+	ctkPluginContext *mContext;
+};
+typedef boost::shared_ptr<VisualizationImplService> VisualizationImplServicePtr;
 
+} /* namespace cx */
 
-#endif // CXLEGACYSINGLETONS_H
+#endif /* CXVISUALIZATIONIMPLSERVICE_H_ */
+

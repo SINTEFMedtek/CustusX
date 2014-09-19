@@ -50,6 +50,9 @@ set(CX_PLUGINS
   org.custusx.registration.gui:ON
   org.custusx.registration.method.manual:ON
   org.custusx.registration.method.modelToUS:ON
+  org.custusx.visualization:ON
+#  org.custusx.tracking:ON
+#  org.custusx.video:ON
 )
 
 #foreach(var ${CX_PLUGINS})

@@ -132,7 +132,7 @@ typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
 typedef boost::shared_ptr<class PatientService> PatientServicePtr;
 typedef boost::shared_ptr<class ToolManager> TrackingServicePtr;
 typedef boost::shared_ptr<class VideoService> VideoServicePtr;
-typedef boost::shared_ptr<class ViewManager> VisualizationServicePtr;
+typedef boost::shared_ptr<class ViewManager> VisualizationServiceOldPtr;
 typedef boost::shared_ptr<class StateService> StateServicePtr;
 typedef boost::shared_ptr<class DataManager> DataServicePtr;
 
