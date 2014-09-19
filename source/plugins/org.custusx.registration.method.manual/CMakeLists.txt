@@ -21,6 +21,11 @@ set(PLUGIN_SRCS
   cxManualImage2ImageRegistrationWidget.cpp
   cxManualImageTransformRegistrationWidget.cpp
   cxManualPatientRegistrationWidget.cpp
+  cxRegistrationMethodManualImageToImageService.h
+  cxRegistrationMethodManualImageToPatientService.h
+  cxRegistrationMethodManualImageTransformService.h
+  cxManualImage2ImageRegistrationWidget.h
+  cxManualImageTransformRegistrationWidget.h
 )
 
 # Files which should be processed by Qts moc
@@ -28,11 +33,6 @@ set(PLUGIN_MOC_SRCS
   cxRegistrationMethodManualPluginActivator.h
   cxRegistrationMethodManualService.h
   cxManualRegistrationWidget.h
-  cxRegistrationMethodManualImageToImageService.h
-  cxRegistrationMethodManualImageToPatientService.h
-  cxRegistrationMethodManualImageTransformService.h
-  cxManualImage2ImageRegistrationWidget.h
-  cxManualImageTransformRegistrationWidget.h
   cxManualPatientRegistrationWidget.h
 )
 
