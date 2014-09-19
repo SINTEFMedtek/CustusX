@@ -49,7 +49,7 @@ class RegistrationServiceNull : public RegistrationService
 
 public:
 	RegistrationServiceNull();
-	~RegistrationServiceNull() {std::cout << "RegistrationServiceNull destr" << std::endl;}
+	~RegistrationServiceNull() {}
 	virtual void setMovingData(DataPtr data);
 	virtual void setFixedData(DataPtr data);
 	virtual DataPtr getMovingData();

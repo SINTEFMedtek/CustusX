@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxVideoConnectionManager.h"
 #include "cxToolManagerWidget.h"
-#include "cxVideoService.h"
+#include "cxVideoServiceOld.h"
 #include "cxExportDataDialog.h"
 #include "cxGPUImageBuffer.h"
 #include "cxData.h"

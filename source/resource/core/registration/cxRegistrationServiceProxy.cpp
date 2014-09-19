@@ -63,7 +63,7 @@ void RegistrationServiceProxy::onServiceAdded(RegistrationService* service)
 	connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
 	connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
 	if(mRegistrationService->isNull())
-		reportWarning("ManualImageRegistrationWidget::onServiceAdded mRegistrationService->isNull()");
+		reportWarning("RegistrationServiceProxy::onServiceAdded mRegistrationService->isNull()");
 }
 
 void RegistrationServiceProxy::onServiceRemoved(RegistrationService *service)

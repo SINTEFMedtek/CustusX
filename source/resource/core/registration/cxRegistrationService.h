@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXREGISTRATIONSERVICE_H
 
 #include <QObject>
-#include "boost/shared_ptr.hpp"
+#include <boost/shared_ptr.hpp>
 #include "cxTransform3D.h"
 
 class QDateTime;

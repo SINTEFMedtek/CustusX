@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxVector3D.h"
 #include "cxCyclicActionLogger.h"
-#include "cxVideoService.h"
+#include "cxVideoServiceOld.h"
 
 namespace cx
 {

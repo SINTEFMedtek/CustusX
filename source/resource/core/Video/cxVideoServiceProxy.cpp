@@ -30,17 +30,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxRegistrationService.h"
-#include "cxRegistrationServiceNull.h"
+#include "cxVideoServiceProxy.h"
+
+#include <boost/bind.hpp>
+#include <ctkPluginContext.h>
 #include "cxNullDeleter.h"
+#include "cxReporter.h"
 
 namespace cx
 {
-RegistrationServicePtr RegistrationService::getNullObject()
+
+VideoServiceProxy::VideoServiceProxy(ctkPluginContext *pluginContext) :
+	mPluginContext(pluginContext),
+	mVideoService(VideoService::getNullObject())
 {
-	static RegistrationServicePtr mNull;
-	if (!mNull)
-		mNull.reset(new RegistrationServiceNull, null_deleter());
-	return mNull;
+	this->initServiceListener();
 }
+
+void VideoServiceProxy::initServiceListener()
+{
+	mServiceListener.reset(new ServiceTrackerListener<VideoService>(
+								 mPluginContext,
+								 boost::bind(&VideoServiceProxy::onServiceAdded, this, _1),
+								 boost::function<void (VideoService*)>(),
+								 boost::bind(&VideoServiceProxy::onServiceRemoved, this, _1)
+								 ));
+	mServiceListener->open();
 }
+void VideoServiceProxy::onServiceAdded(VideoService* service)
+{
+	mVideoService.reset(service, null_deleter());
+//	connect(mVideoService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
+//	connect(mVideoService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+	if(mVideoService->isNull())
+		reportWarning("VideoServiceProxy::onServiceAdded mVideoService->isNull()");
+}
+
+void VideoServiceProxy::onServiceRemoved(VideoService *service)
+{
+//	disconnect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
+//	disconnect(service, SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+	mVideoService = VideoService::getNullObject();
+}
+
+bool VideoServiceProxy::isNull()
+{
+	return mVideoService->isNull();
+}
+} //cx

@@ -34,6 +34,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Video/cxVideoRecorder
 	Video/cxVideoSourceSHM
 	Video/cxTestVideoSource
+#	Video/cxVideoService
         
 	Tool/cxToolManager
 	Tool/cxTool.h
@@ -81,14 +82,13 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	utilities/cxSpaceListenerImpl
 
 	registration/cxRegistrationService
-        registration/cxRegistrationMethodService.h
-        registration/cxRegistrationServiceNull
-        registration/cxRegistrationServiceProxy
-        registration/cxRegistrationDataAdapters
+	registration/cxRegistrationServiceProxy
+	registration/cxRegistrationMethodService.h
+	registration/cxRegistrationDataAdapters
+	registration/cxRegistrationMethodService.h
+	registration/cxRegistrationDataAdapters
 
 	patientModel/cxPatientModelService
-	patientModel/cxPatientModelServiceNull
-	patientModel/cxPatientModelServiceProxy
 	)
 
      
@@ -96,7 +96,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 cx_add_class(cxResource_SOURCE
 	cxForwardDeclarations.h
 	vtkForwardDeclarations.h
-	
+
 	Tool/cxProbeSector
 	Tool/cxProbeData
 	Tool/ProbeXmlConfigParser.h
@@ -172,6 +172,12 @@ cx_add_class(cxResource_SOURCE
 	vesselReg/SeansVesselReg.cxx
 	vesselReg/SeansVesselReg.hxx
 	vesselReg/HackTPSTransform.hxx
+
+	patientModel/cxPatientModelServiceNull
+	patientModel/cxPatientModelServiceProxy
+	registration/cxRegistrationServiceNull
+#	Video/cxVideoServiceNull
+#	Video/cxVideoServiceProxy
 	
 	${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/Butterworth.cpp
 	${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/Cascade.cpp

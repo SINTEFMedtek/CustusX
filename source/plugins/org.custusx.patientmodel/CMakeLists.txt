@@ -11,12 +11,12 @@ include_directories(
 set(PLUGIN_SRCS
   cxPatientModelPluginActivator.cpp
   cxPatientModelImplService.cpp
+  cxPatientModelImplService.h
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxPatientModelPluginActivator.h
-  cxPatientModelImplService.h
 )
 
 # Qt Designer files which should be processed by Qts uic
