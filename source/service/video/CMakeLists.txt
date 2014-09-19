@@ -18,7 +18,7 @@
 
 SET( CX_QT_MOC_HEADER_FILES
     cxBasicVideoSource.h
-    cxVideoService.h
+	cxVideoServiceOld.h
     cxVideoConnectionManager.h
     cxVideoConnection.h
     cxPlaybackUSAcquisitionVideo.h
@@ -30,9 +30,8 @@ SET( CX_QT_MOC_HEADER_FILES
 
 SET (cxVideoService_SOURCE
     cxBasicVideoSource.h
-    cxBasicVideoSource.cpp
-    cxVideoService.h
-    cxVideoService.cpp
+	cxBasicVideoSource.cpp
+	cxVideoServiceOld.cpp
     cxVideoConnectionManager.cpp
     cxVideoConnectionManager.h
     cxVideoConnection.h

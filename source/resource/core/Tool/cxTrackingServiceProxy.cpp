@@ -30,17 +30,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxRegistrationService.h"
-#include "cxRegistrationServiceNull.h"
+#include "cxTrackingServiceProxy.h"
+
+#include <boost/bind.hpp>
+#include <ctkPluginContext.h>
 #include "cxNullDeleter.h"
+#include "cxReporter.h"
 
 namespace cx
 {
-RegistrationServicePtr RegistrationService::getNullObject()
+
+TrackingServiceProxy::TrackingServiceProxy(ctkPluginContext *pluginContext) :
+	mPluginContext(pluginContext),
+	mTrackingService(TrackingService::getNullObject())
 {
-	static RegistrationServicePtr mNull;
-	if (!mNull)
-		mNull.reset(new RegistrationServiceNull, null_deleter());
-	return mNull;
+	this->initServiceListener();
 }
+
+void TrackingServiceProxy::initServiceListener()
+{
+	mServiceListener.reset(new ServiceTrackerListener<TrackingService>(
+								 mPluginContext,
+								 boost::bind(&TrackingServiceProxy::onServiceAdded, this, _1),
+								 boost::function<void (TrackingService*)>(),
+								 boost::bind(&TrackingServiceProxy::onServiceRemoved, this, _1)
+								 ));
+	mServiceListener->open();
 }
+void TrackingServiceProxy::onServiceAdded(TrackingService* service)
+{
+	mTrackingService.reset(service, null_deleter());
+//	connect(mVideoService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
+//	connect(mVideoService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+	if(mTrackingService->isNull())
+		reportWarning("VideoServiceProxy::onServiceAdded mVideoService->isNull()");
+}
+
+void TrackingServiceProxy::onServiceRemoved(TrackingService *service)
+{
+//	disconnect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
+//	disconnect(service, SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+	mTrackingService = TrackingService::getNullObject();
+}
+
+bool TrackingServiceProxy::isNull()
+{
+	return mTrackingService->isNull();
+}
+} //cx

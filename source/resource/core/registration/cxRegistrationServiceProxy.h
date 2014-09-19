@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXREGISTRATIONSERVICEADAPTER_H
 
 #include "cxRegistrationService.h"
-#include <boost/shared_ptr.hpp>
 #include <QObject>
 #include "cxServiceTrackerListener.h"
 #include "cxTransform3D.h"

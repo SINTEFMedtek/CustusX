@@ -30,17 +30,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxRegistrationService.h"
-#include "cxRegistrationServiceNull.h"
-#include "cxNullDeleter.h"
+#ifndef CXTRACKINGSERVICENULL_H
+#define CXTRACKINGSERVICENULL_H
+
+#include "cxTrackingService.h"
 
 namespace cx
 {
-RegistrationServicePtr RegistrationService::getNullObject()
+class TrackingServiceNull : public TrackingService
 {
-	static RegistrationServicePtr mNull;
-	if (!mNull)
-		mNull.reset(new RegistrationServiceNull, null_deleter());
-	return mNull;
-}
-}
+public:
+	TrackingServiceNull();
+
+	virtual bool isNull();
+private:
+	void printWarning();
+};
+} //cx
+#endif // CXTRACKINGSERVICENULL_H

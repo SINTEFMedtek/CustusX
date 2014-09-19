@@ -30,17 +30,31 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxRegistrationService.h"
-#include "cxRegistrationServiceNull.h"
-#include "cxNullDeleter.h"
+#ifndef CXVISUALIZATIONSERVICEPROXY_H
+#define CXVISUALIZATIONSERVICEPROXY_H
+
+#include "cxVisualizationService.h"
+#include "cxServiceTrackerListener.h"
+class ctkPluginContext;
 
 namespace cx
 {
-RegistrationServicePtr RegistrationService::getNullObject()
+
+class VisualizationServiceProxy : public VisualizationService
 {
-	static RegistrationServicePtr mNull;
-	if (!mNull)
-		mNull.reset(new RegistrationServiceNull, null_deleter());
-	return mNull;
-}
-}
+public:
+	VisualizationServiceProxy(ctkPluginContext *pluginContext);
+
+	bool isNull();
+
+private:
+	void initServiceListener();
+	void onServiceAdded(VisualizationService* service);
+	void onServiceRemoved(VisualizationService *service);
+
+	ctkPluginContext *mPluginContext;
+	VisualizationServicePtr mVisualizationService;
+	boost::shared_ptr<ServiceTrackerListener<VisualizationService> > mServiceListener;
+};
+} //cx
+#endif // CXVISUALIZATIONSERVICEPROXY_H

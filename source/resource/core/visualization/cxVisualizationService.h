@@ -30,17 +30,40 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxRegistrationService.h"
-#include "cxRegistrationServiceNull.h"
-#include "cxNullDeleter.h"
+#ifndef CXVISUALIZATIONSERVICE_H
+#define CXVISUALIZATIONSERVICE_H
+
+#include <QObject>
+#include <boost/shared_ptr.hpp>
+
+#define VisualizationService_iid "cx::VisualizationService"
 
 namespace cx
 {
-RegistrationServicePtr RegistrationService::getNullObject()
+
+typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
+
+/** \brief Visualization services
+ *
+ *  \ingroup cx_resource_core_visualization
+ *  \date 2014-09-19
+ *  \author Ole Vegard Solberg, SINTEF
+ */
+class VisualizationService : public QObject
 {
-	static RegistrationServicePtr mNull;
-	if (!mNull)
-		mNull.reset(new RegistrationServiceNull, null_deleter());
-	return mNull;
-}
-}
+	Q_OBJECT
+public:
+
+	virtual bool isNull() = 0;
+	static VisualizationServicePtr getNullObject();
+
+signals:
+
+public slots:
+
+};
+
+} //cx
+Q_DECLARE_INTERFACE(cx::VisualizationService, VisualizationService_iid)
+
+#endif // CXVISUALIZATIONSERVICE_H

@@ -30,17 +30,31 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxRegistrationService.h"
-#include "cxRegistrationServiceNull.h"
-#include "cxNullDeleter.h"
+#ifndef CXVIDEOSERVICEPROXY_H
+#define CXVIDEOSERVICEPROXY_H
+
+#include "cxVideoService.h"
+#include "cxServiceTrackerListener.h"
+class ctkPluginContext;
 
 namespace cx
 {
-RegistrationServicePtr RegistrationService::getNullObject()
+
+class VideoServiceProxy : public VideoService
 {
-	static RegistrationServicePtr mNull;
-	if (!mNull)
-		mNull.reset(new RegistrationServiceNull, null_deleter());
-	return mNull;
-}
-}
+public:
+	VideoServiceProxy(ctkPluginContext *pluginContext);
+
+	bool isNull();
+
+private:
+	void initServiceListener();
+	void onServiceAdded(VideoService* service);
+	void onServiceRemoved(VideoService *service);
+
+	ctkPluginContext *mPluginContext;
+	VideoServicePtr mVideoService;
+	boost::shared_ptr<ServiceTrackerListener<VideoService> > mServiceListener;
+};
+} //cx
+#endif // CXVIDEOSERVICEPROXY_H

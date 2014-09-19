@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *      \author christiana
  */
 
-#include "cxVideoService.h"
+#include "cxVideoServiceOld.h"
 
 #include "ctkPluginContext.h"
 

@@ -30,17 +30,40 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxRegistrationService.h"
-#include "cxRegistrationServiceNull.h"
-#include "cxNullDeleter.h"
+#ifndef CXVIDEOSERVICE_H
+#define CXVIDEOSERVICE_H
+
+#include <QObject>
+#include <boost/shared_ptr.hpp>
+
+#define VideoService_iid "cx::VideoService"
 
 namespace cx
 {
-RegistrationServicePtr RegistrationService::getNullObject()
+
+typedef boost::shared_ptr<class VideoService> VideoServicePtr;
+
+/** \brief Video services
+ *
+ *  \ingroup cx_resource_video
+ *  \date 2014-09-19
+ *  \author Ole Vegard Solberg, SINTEF
+ */
+class VideoService : public QObject
 {
-	static RegistrationServicePtr mNull;
-	if (!mNull)
-		mNull.reset(new RegistrationServiceNull, null_deleter());
-	return mNull;
-}
-}
+	Q_OBJECT
+public:
+
+	virtual bool isNull() = 0;
+	static VideoServicePtr getNullObject();
+
+signals:
+
+public slots:
+
+};
+
+} //cx
+Q_DECLARE_INTERFACE(cx::VideoService, VideoService_iid)
+
+#endif // CXVIDEOSERVICE_H

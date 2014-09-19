@@ -18,8 +18,13 @@ set(PLUGIN_SRCS
   cxRegistrationMethodManualImageToImageService.cpp
   cxRegistrationMethodManualImageToPatientService.cpp
   cxRegistrationMethodManualImageTransformService.cpp
+  cxRegistrationMethodManualImageToImageService.h
+  cxRegistrationMethodManualImageToPatientService.h
+  cxRegistrationMethodManualImageTransformService.h
   cxManualImage2ImageRegistrationWidget.cpp
+  cxManualImage2ImageRegistrationWidget.h
   cxManualImageTransformRegistrationWidget.cpp
+  cxManualImageTransformRegistrationWidget.h
   cxManualPatientRegistrationWidget.cpp
   cxRegistrationMethodManualImageToImageService.h
   cxRegistrationMethodManualImageToPatientService.h

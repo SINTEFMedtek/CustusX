@@ -30,17 +30,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxRegistrationService.h"
-#include "cxRegistrationServiceNull.h"
+#include "cxVisualizationServiceProxy.h"
+
+#include <boost/bind.hpp>
+#include <ctkPluginContext.h>
 #include "cxNullDeleter.h"
+#include "cxReporter.h"
 
 namespace cx
 {
-RegistrationServicePtr RegistrationService::getNullObject()
+
+VisualizationServiceProxy::VisualizationServiceProxy(ctkPluginContext *pluginContext) :
+	mPluginContext(pluginContext),
+	mVisualizationService(VisualizationService::getNullObject())
 {
-	static RegistrationServicePtr mNull;
-	if (!mNull)
-		mNull.reset(new RegistrationServiceNull, null_deleter());
-	return mNull;
+	this->initServiceListener();
 }
+
+void VisualizationServiceProxy::initServiceListener()
+{
+	mServiceListener.reset(new ServiceTrackerListener<VisualizationService>(
+								 mPluginContext,
+								 boost::bind(&VisualizationServiceProxy::onServiceAdded, this, _1),
+								 boost::function<void (VisualizationService*)>(),
+								 boost::bind(&VisualizationServiceProxy::onServiceRemoved, this, _1)
+								 ));
+	mServiceListener->open();
 }
+void VisualizationServiceProxy::onServiceAdded(VisualizationService* service)
+{
+	mVisualizationService.reset(service, null_deleter());
+//	connect(mVideoService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
+//	connect(mVideoService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+	if(mVisualizationService->isNull())
+		reportWarning("VideoServiceProxy::onServiceAdded mVideoService->isNull()");
+}
+
+void VisualizationServiceProxy::onServiceRemoved(VisualizationService *service)
+{
+//	disconnect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
+//	disconnect(service, SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+	mVisualizationService = VisualizationService::getNullObject();
+}
+
+bool VisualizationServiceProxy::isNull()
+{
+	return mVisualizationService->isNull();
+}
+} //cx

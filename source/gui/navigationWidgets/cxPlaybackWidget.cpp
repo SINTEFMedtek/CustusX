@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataManager.h"
 #include "cxData.h"
 #include "cxRegistrationTransform.h"
-#include "cxVideoService.h"
+#include "cxVideoServiceOld.h"
 #include "cxPlaybackUSAcquisitionVideo.h"
 #include "cxSettings.h"
 

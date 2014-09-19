@@ -30,17 +30,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxRegistrationService.h"
-#include "cxRegistrationServiceNull.h"
+#include "cxVisualizationService.h"
+#include "cxVisualizationServiceNull.h"
 #include "cxNullDeleter.h"
 
 namespace cx
 {
-RegistrationServicePtr RegistrationService::getNullObject()
+VisualizationServicePtr VisualizationService::getNullObject()
 {
-	static RegistrationServicePtr mNull;
+	static VisualizationServicePtr mNull;
 	if (!mNull)
-		mNull.reset(new RegistrationServiceNull, null_deleter());
+		mNull.reset(new VisualizationServiceNull, null_deleter());
 	return mNull;
 }
-}
+} //cx

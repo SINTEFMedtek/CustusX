@@ -30,17 +30,31 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxRegistrationService.h"
-#include "cxRegistrationServiceNull.h"
-#include "cxNullDeleter.h"
+#ifndef CXTRACKINGSERVICEPROXY_H
+#define CXTRACKINGSERVICEPROXY_H
+
+#include "cxTrackingService.h"
+#include "cxServiceTrackerListener.h"
+class ctkPluginContext;
 
 namespace cx
 {
-RegistrationServicePtr RegistrationService::getNullObject()
+
+class TrackingServiceProxy : public TrackingService
 {
-	static RegistrationServicePtr mNull;
-	if (!mNull)
-		mNull.reset(new RegistrationServiceNull, null_deleter());
-	return mNull;
-}
-}
+public:
+	TrackingServiceProxy(ctkPluginContext *pluginContext);
+
+	bool isNull();
+
+private:
+	void initServiceListener();
+	void onServiceAdded(TrackingService* service);
+	void onServiceRemoved(TrackingService *service);
+
+	ctkPluginContext *mPluginContext;
+	TrackingServicePtr mTrackingService;
+	boost::shared_ptr<ServiceTrackerListener<TrackingService> > mServiceListener;
+};
+} //cx
+#endif // CXTRACKINGSERVICEPROXY_H

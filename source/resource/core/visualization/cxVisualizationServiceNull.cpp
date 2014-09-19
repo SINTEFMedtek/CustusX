@@ -30,17 +30,22 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxRegistrationService.h"
-#include "cxRegistrationServiceNull.h"
-#include "cxNullDeleter.h"
+#include "cxVisualizationServiceNull.h"
+#include "cxReporter.h"
 
 namespace cx
 {
-RegistrationServicePtr RegistrationService::getNullObject()
+VisualizationServiceNull::VisualizationServiceNull()
 {
-	static RegistrationServicePtr mNull;
-	if (!mNull)
-		mNull.reset(new RegistrationServiceNull, null_deleter());
-	return mNull;
 }
+bool VisualizationServiceNull::isNull()
+{
+	return true;
 }
+
+void VisualizationServiceNull::printWarning()
+{
+	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.video) disabled?");
+}
+
+} //cx
