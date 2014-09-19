@@ -61,6 +61,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	dataAdapters/cxDoublePairDataAdapter.h
 	dataAdapters/cxDoublePairDataAdapterXml
 	dataAdapters/cxSelectDataStringDataAdapterBase
+	dataAdapters/cxSelectDataStringDataAdapter
 
 	logger/cxReporter
 	logger/cxMessageListener
@@ -87,7 +88,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
         registration/cxRegistrationDataAdapters
 
 	patientModel/cxPatientModelService
-	patientModel/cxPatientModelServiceNull
 	patientModel/cxPatientModelServiceProxy
 	)
 
@@ -172,6 +172,8 @@ cx_add_class(cxResource_SOURCE
 	vesselReg/SeansVesselReg.cxx
 	vesselReg/SeansVesselReg.hxx
 	vesselReg/HackTPSTransform.hxx
+
+	patientModel/cxPatientModelServiceNull
 	
 	${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/Butterworth.cpp
 	${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/Cascade.cpp

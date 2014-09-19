@@ -126,4 +126,14 @@ void PatientModelImplService::setDebugMode(bool on)
 	dataService()->setDebugMode(on);
 }
 
+ImagePtr PatientModelImplService::getActiveImage() const
+{
+	return dataService()->getActiveImage();
+}
+
+void PatientModelImplService::setActiveImage(ImagePtr activeImage)
+{
+	dataService()->setActiveImage(activeImage);
+}
+
 } /* namespace cx */

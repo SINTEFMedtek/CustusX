@@ -119,6 +119,16 @@ Transform3D PatientModelServiceProxy::get_rMpr() const
 	return mPatientModelService->get_rMpr();
 }
 
+ImagePtr PatientModelServiceProxy::getActiveImage() const
+{
+	return mPatientModelService->getActiveImage();
+}
+
+void PatientModelServiceProxy::setActiveImage(ImagePtr activeImage)
+{
+	mPatientModelService->setActiveImage(activeImage);
+}
+
 void PatientModelServiceProxy::autoSave()
 {
 	mPatientModelService->autoSave();

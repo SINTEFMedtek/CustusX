@@ -42,6 +42,7 @@ class QDateTime;
 namespace cx
 {
 typedef boost::shared_ptr<class Data> DataPtr;
+typedef boost::shared_ptr<class Image> ImagePtr;
 }
 
 #define PatientModelService_iid "cx::PatientModelService"
@@ -85,8 +86,10 @@ public:
 	virtual LandmarksPtr getPatientLandmarks() const = 0;
 	virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const = 0;
 	virtual Transform3D get_rMpr() const = 0;
-	virtual void autoSave() = 0;//TODO remove, and integrate into other functions
+	virtual ImagePtr getActiveImage() const = 0; ///< used for system state
+	virtual void setActiveImage(ImagePtr activeImage) = 0; ///< used for system state
 
+	virtual void autoSave() = 0;//TODO remove, and integrate into other functions
 	virtual bool isNull() = 0;
 	static PatientModelServicePtr getNullObject();
 

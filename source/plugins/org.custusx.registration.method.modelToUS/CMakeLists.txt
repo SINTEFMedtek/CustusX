@@ -9,6 +9,7 @@ include_directories(
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
     ${CustusX_SOURCE_DIR}/source/logic
+    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
 )
 
 set(PLUGIN_SRCS

@@ -34,10 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxImage.h"
 #include "cxMesh.h"
-#include "cxDataManager.h"
 #include "cxTypeConversions.h"
 #include "cxPatientModelServiceProxy.h"
-#include "cxLegacySingletons.h"
+#include "cxPatientModelServiceProxy.h"
 
 namespace cx
 {
@@ -52,18 +51,19 @@ ActiveImageStringDataAdapter::ActiveImageStringDataAdapter(ctkPluginContext *plu
 
 bool ActiveImageStringDataAdapter::setValue(const QString& value)
 {
-  ImagePtr newImage = dataManager()->getImage(value);
-  if (newImage==dataManager()->getActiveImage())
-	return false;
-  dataManager()->setActiveImage(newImage);
-  return true;
+//  ImagePtr newImage = dataManager()->getImage(value);
+	ImagePtr newImage = boost::dynamic_pointer_cast<Image>(mPatientModelService->getData(value));
+	if (newImage == mPatientModelService->getActiveImage())
+		return false;
+	mPatientModelService->setActiveImage(newImage);
+	return true;
 }
 
 QString ActiveImageStringDataAdapter::getValue() const
 {
-  if (!dataManager()->getActiveImage())
-	return "";
-  return qstring_cast(dataManager()->getActiveImage()->getUid());
+	if (!mPatientModelService->getActiveImage())
+		return "";
+	return qstring_cast(mPatientModelService->getActiveImage()->getUid());
 }
 
 //---------------------------------------------------------
@@ -94,7 +94,7 @@ QString SelectImageStringDataAdapter::getValue() const
 
 ImagePtr SelectImageStringDataAdapter::getImage()
 {
-  return dataManager()->getImage(mImageUid);
+	return boost::dynamic_pointer_cast<Image>(mPatientModelService->getData(mImageUid));
 }
 
 //---------------------------------------------------------
@@ -113,7 +113,7 @@ bool SelectDataStringDataAdapter::setValue(const QString& value)
 	return false;
 
   mUid = "";
-  if (dataManager()->getData(value))
+	if (mPatientModelService->getData(value))
 	  mUid = value;
 
   emit changed();
@@ -124,15 +124,11 @@ bool SelectDataStringDataAdapter::setValue(const QString& value)
 QString SelectDataStringDataAdapter::getValue() const
 {
 	return mUid;
-//  if(!mData)
-//    return "<no data>";
-//  return mData->getUid();
 }
 
 DataPtr SelectDataStringDataAdapter::getData() const
 {
-	return dataManager()->getData(mUid);
-//  return mData;
+	return mPatientModelService->getData(mUid);
 }
 
 //---------------------------------------------------------
@@ -163,7 +159,7 @@ QString SelectMeshStringDataAdapter::getValue() const
 
 MeshPtr SelectMeshStringDataAdapter::getMesh()
 {
-  return dataManager()->getMesh(mMeshUid);
+	return boost::dynamic_pointer_cast<Mesh>(mPatientModelService->getData(mMeshUid));
 }
 
 //---------------------------------------------------------

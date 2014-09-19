@@ -41,6 +41,8 @@ class ctkPluginContext;
 namespace cx
 {
 
+typedef boost::shared_ptr<class Pipeline> PipelinePtr;
+
 /**
  * Widget for the registration method: model to US
  *
@@ -60,6 +62,7 @@ private:
 	QString defaultWhatsThis() const;
 	QVBoxLayout*  mVerticalLayout;
 	RegistrationServicePtr mRegistrationService;
+	PipelinePtr mPipeline;
 };
 
 } /* namespace cx */

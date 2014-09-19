@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPatientModelServiceNull.h"
 #include <map>
-#include "cxData.h"
+#include "cxImage.h"
 #include "cxReporter.h"
 #include "cxLandmark.h"
 
@@ -77,6 +77,16 @@ std::map<QString, LandmarkProperty> PatientModelServiceNull::getLandmarkProperti
 Transform3D PatientModelServiceNull::get_rMpr() const
 {
 	return Transform3D();
+}
+
+ImagePtr PatientModelServiceNull::getActiveImage() const
+{
+	return ImagePtr();
+}
+
+void PatientModelServiceNull::setActiveImage(ImagePtr activeImage)
+{
+	printWarning();
 }
 
 void PatientModelServiceNull::autoSave()

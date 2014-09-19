@@ -35,6 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QVBoxLayout>
 #include "cxRegistrationServiceProxy.h"
+#include "cxPipeline.h"
+#include "cxFilter.h"
+//#include "cxPipelineWidget.h"
 
 namespace cx
 {
@@ -44,7 +47,19 @@ RegistrationMethodModelToUSWidget::RegistrationMethodModelToUSWidget(ctkPluginCo
 	mVerticalLayout(new QVBoxLayout(this)),
 	mRegistrationService(new cx::RegistrationServiceProxy(pluginContext))
 {
-	mVerticalLayout->addWidget(new QLabel("Hello Plugin!"));
+//	mVerticalLayout->addWidget(new QLabel("Hello Plugin!"));
+
+	//Prepare step
+
+//	mPipeline.reset(new Pipeline(pluginContext));
+//	FilterGroupPtr filters(new FilterGroup(options.descend("pipeline")));
+
+//	filters->append(FilterPtr(new BinaryThresholdImageFilter(pluginContext)));
+
+//	mPipeline->initialize(filters);
+//	PipelineWidget* mPipelineWidget = new PipelineWidget(NULL, mPipeline);
+//	mVerticalLayout->addWidget(mPipelineWidget);
+
 }
 
 RegistrationMethodModelToUSWidget::~RegistrationMethodModelToUSWidget()

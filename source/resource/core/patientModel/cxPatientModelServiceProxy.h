@@ -67,6 +67,8 @@ public:
 	virtual LandmarksPtr getPatientLandmarks() const;
 	virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const;
 	virtual Transform3D get_rMpr() const;
+	virtual ImagePtr getActiveImage() const;
+	virtual void setActiveImage(ImagePtr activeImage);
 
 	virtual void autoSave();
 	virtual bool isNull();
