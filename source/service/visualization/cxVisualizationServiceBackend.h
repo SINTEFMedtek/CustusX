@@ -53,18 +53,18 @@ class VisualizationServiceBackend
 {
 public:
 	VisualizationServiceBackend(DataServicePtr dataManager,
-								TrackingServicePtr toolManager,
+								TrackingServiceOldPtr toolManager,
 								VideoServicePtr videoService,
 								SpaceProviderPtr spaceProvider);
 
 	DataServicePtr getDataManager();
-	TrackingServicePtr getToolManager();
+	TrackingServiceOldPtr getToolManager();
 	VideoServicePtr getVideoService();
 	SpaceProviderPtr getSpaceProvider();
 
 private:
 	DataServicePtr mDataManager;
-	TrackingServicePtr mToolManager;
+	TrackingServiceOldPtr mToolManager;
 	SpaceProviderPtr mSpaceProvider;
 	VideoServicePtr mVideoService;
 };

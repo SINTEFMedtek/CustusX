@@ -59,7 +59,7 @@ class ManualTool : public ToolImpl
 	Q_OBJECT
 public:
 
-	explicit ManualTool(TrackingServicePtr manager, const QString& uid, const QString& name ="");
+	explicit ManualTool(TrackingServiceOldPtr manager, const QString& uid, const QString& name ="");
 	virtual ~ManualTool();
 	virtual std::set<Type> getTypes() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;

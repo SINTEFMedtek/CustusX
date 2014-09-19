@@ -146,7 +146,7 @@ signals:
 
 struct DummyToolTestUtilities
 {
-	static DummyToolPtr createDummyTool(ProbeDefinition probeData = ProbeDefinition(), TrackingServicePtr manager = TrackingServicePtr());
+	static DummyToolPtr createDummyTool(ProbeDefinition probeData = ProbeDefinition(), TrackingServiceOldPtr manager = TrackingServiceOldPtr());
 	static ProbeDefinition createProbeDataLinear(double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
 	static ProbeDefinition createProbeData(ProbeDefinition::TYPE, double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
 };
@@ -164,7 +164,7 @@ class DummyTool : public ToolImpl
 {
 	Q_OBJECT
 public:
-	explicit DummyTool(TrackingServicePtr manager, const QString& uid="dummytool");
+	explicit DummyTool(TrackingServiceOldPtr manager, const QString& uid="dummytool");
 	~DummyTool();
 	virtual std::set<Type> getTypes() const;
 	virtual void setType(Type);

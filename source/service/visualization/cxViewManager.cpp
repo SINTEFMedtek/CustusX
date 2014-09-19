@@ -80,9 +80,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-VisualizationServicePtr ViewManager::create(VisualizationServiceBackendPtr backend)
+VisualizationServiceOldPtr ViewManager::create(VisualizationServiceBackendPtr backend)
 {
-	VisualizationServicePtr retval;
+	VisualizationServiceOldPtr retval;
 	retval.reset(new ViewManager(backend));
 	return retval;
 }

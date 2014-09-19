@@ -40,7 +40,7 @@ TEST_CASE("DummyToolManager setup/shutdown works multiple times", "[unit]")
 {
     for (unsigned i=0; i<2; ++i)
     {
-		cx::TrackingServicePtr service = cx::DummyToolManager::create();
+		cx::TrackingServiceOldPtr service = cx::DummyToolManager::create();
 		REQUIRE(service);
 		CHECK(service.unique());
 		service.reset();

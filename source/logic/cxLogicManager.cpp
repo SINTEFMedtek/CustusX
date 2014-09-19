@@ -57,21 +57,21 @@ namespace cx
 
 struct LegacySingletons
 {
-	static TrackingServicePtr mToolManager;
+	static TrackingServiceOldPtr mToolManager;
 	static DataServicePtr mDataManager;
 	static SpaceProviderPtr mSpaceProvider;
 	static PatientServicePtr mPatientService;
 	static VideoServicePtr mVideoService;
-	static VisualizationServicePtr mVisualizationService;
+	static VisualizationServiceOldPtr mVisualizationService;
 	static StateServicePtr mStateService;
 };
 
-TrackingServicePtr LegacySingletons::mToolManager;
+TrackingServiceOldPtr LegacySingletons::mToolManager;
 DataServicePtr LegacySingletons::mDataManager;
 SpaceProviderPtr LegacySingletons::mSpaceProvider;
 PatientServicePtr LegacySingletons::mPatientService;
 VideoServicePtr LegacySingletons::mVideoService;
-VisualizationServicePtr LegacySingletons::mVisualizationService;
+VisualizationServiceOldPtr LegacySingletons::mVisualizationService;
 StateServicePtr LegacySingletons::mStateService;
 
 ToolManager* toolManager()
@@ -87,7 +87,7 @@ ViewManager* viewManager()
 	return LegacySingletons::mVisualizationService.get();
 }
 
-TrackingServicePtr trackingService()
+TrackingServiceOldPtr trackingService()
 {
 	return LegacySingletons::mToolManager;
 }
@@ -107,7 +107,7 @@ VideoServicePtr videoService()
 {
 	return LegacySingletons::mVideoService;
 }
-VisualizationServicePtr visualizationService()
+VisualizationServiceOldPtr visualizationService()
 {
 	return LegacySingletons::mVisualizationService;
 }
@@ -294,7 +294,7 @@ PatientServicePtr LogicManager::getPatientService()
 	return mPatientService;
 }
 
-TrackingServicePtr LogicManager::getTrackingService()
+TrackingServiceOldPtr LogicManager::getTrackingService()
 {
 	if (!mTrackingService)
 		this->createTrackingService();
@@ -315,7 +315,7 @@ StateServicePtr LogicManager::getStateService()
 	return mStateService;
 }
 
-VisualizationServicePtr LogicManager::getVisualizationService()
+VisualizationServiceOldPtr LogicManager::getVisualizationService()
 {
 	if (!mVisualizationService)
 		this->createVisualizationService();

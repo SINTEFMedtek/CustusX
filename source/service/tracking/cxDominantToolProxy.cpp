@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-DominantToolProxy::DominantToolProxy(TrackingServicePtr toolManager) :
+DominantToolProxy::DominantToolProxy(TrackingServiceOldPtr toolManager) :
 	mToolManager(toolManager)
 {
 	connect(mToolManager.get(), SIGNAL(dominantToolChanged(const QString&)), this,

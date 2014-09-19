@@ -79,7 +79,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	utilities/cxProcessReporter
 	utilities/cxVLCRecorder
 	utilities/cxSpaceProvider
-	utilities/cxSpaceProviderImpl
 	utilities/cxSpaceListener
 	utilities/cxSpaceListenerImpl
 
@@ -154,6 +153,7 @@ cx_add_class(cxResource_SOURCE
 	utilities/cxPlaneTypeCollection
 	utilities/cxSharedPointerChecker
 	utilities/cxNullDeleter.h
+	utilities/cxSpaceProviderImpl
 
 	logger/cxAudio.h
 	logger/cxLogger
@@ -275,6 +275,7 @@ set(CX_RESOURCE_INCLUDE_DIRECTORIES
     ${CustusX_SOURCE_DIR}/source/resource/core/utilities
     ${CustusX_SOURCE_DIR}/source/resource/core/registration
     ${CustusX_SOURCE_DIR}/source/resource/core/patientModel
+	${CustusX_SOURCE_DIR}/source/resource/core/visualization
     ${CustusX_SOURCE_DIR}/source/resource/core
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     ${CustusX_SOURCE_DIR}/source/ThirdParty

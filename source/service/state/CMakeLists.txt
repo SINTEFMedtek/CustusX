@@ -12,7 +12,6 @@ SET( CX_QT_MOC_HEADER_FILES
 	cxApplicationStateMachine.h
 	cxApplicationState.h
 	cxStateService.h
-	cxStateServiceBackend.h
 )
 
 SET ( cxStateService_SOURCE
@@ -27,6 +26,7 @@ SET ( cxStateService_SOURCE
 	cxApplicationState.cpp
 	cxRequestEnterStateTransition.h
 	cxStateServiceBackend.cpp
+	cxStateServiceBackend.h
 )
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-PlaybackTool::PlaybackTool(TrackingServicePtr manager, ToolPtr base, PlaybackTimePtr time) :
+PlaybackTool::PlaybackTool(TrackingServiceOldPtr manager, ToolPtr base, PlaybackTimePtr time) :
 	ToolImpl(manager, "playback_"+base->getUid(), "playback "+base->getName()), mBase(base),
     mTime(time),
     mVisible(false)
