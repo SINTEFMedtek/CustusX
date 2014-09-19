@@ -34,7 +34,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Video/cxVideoRecorder
 	Video/cxVideoSourceSHM
 	Video/cxTestVideoSource
-#	Video/cxVideoService
+	Video/cxVideoService
         
 	Tool/cxToolManager
 	Tool/cxTool.h
@@ -46,6 +46,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Tool/cxSliceProxy
 	Tool/cxSlicedImageProxy
 	Tool/cxToolImpl
+	Tool/cxTrackingService
 
 	dataAdapters/cxDataAdapter
 	dataAdapters/cxDoubleDataAdapter.h
@@ -176,8 +177,10 @@ cx_add_class(cxResource_SOURCE
 	patientModel/cxPatientModelServiceNull
 	patientModel/cxPatientModelServiceProxy
 	registration/cxRegistrationServiceNull
-#	Video/cxVideoServiceNull
-#	Video/cxVideoServiceProxy
+	Video/cxVideoServiceNull
+	Video/cxVideoServiceProxy
+	Tool/cxTrackingServiceNull
+	Tool/cxTrackingServiceProxy
 	
 	${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/Butterworth.cpp
 	${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/Cascade.cpp
