@@ -90,7 +90,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	registration/cxRegistrationDataAdapters
 
 	patientModel/cxPatientModelService
-	patientModel/cxPatientModelServiceProxy
 	visualization/cxVisualizationService
 	)
 
