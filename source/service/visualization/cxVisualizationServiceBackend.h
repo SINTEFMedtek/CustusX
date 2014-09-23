@@ -39,7 +39,7 @@ namespace cx
 {
 class DataManager;
 class ToolManager;
-class VideoService;
+class VideoServiceOld;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
 typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
@@ -54,19 +54,19 @@ class VisualizationServiceBackend
 public:
 	VisualizationServiceBackend(DataServicePtr dataManager,
 								TrackingServiceOldPtr toolManager,
-								VideoServicePtr videoService,
+								VideoServiceOldPtr videoService,
 								SpaceProviderPtr spaceProvider);
 
 	DataServicePtr getDataManager();
 	TrackingServiceOldPtr getToolManager();
-	VideoServicePtr getVideoService();
+	VideoServiceOldPtr getVideoServiceOld();
 	SpaceProviderPtr getSpaceProvider();
 
 private:
 	DataServicePtr mDataManager;
 	TrackingServiceOldPtr mToolManager;
 	SpaceProviderPtr mSpaceProvider;
-	VideoServicePtr mVideoService;
+	VideoServiceOldPtr mVideoServiceOld;
 };
 
 

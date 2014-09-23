@@ -81,7 +81,7 @@ public:
   TrackingServiceOldPtr getTrackingService();
   SpaceProviderPtr getSpaceProvider();
   PatientServicePtr getPatientService();
-  VideoServicePtr getVideoService();
+	VideoServiceOldPtr getVideoServiceOld();
   VisualizationServiceOldPtr getVisualizationService();
 	StateServicePtr getStateService();
 
@@ -103,7 +103,7 @@ private:
   void createDataService();
   void createDataFactory();
   void createSpaceProvider();
-  void createVideoService();
+	void createVideoServiceOld();
   void createVisualizationService();
   void createStateService();
   void createPluginFramework();
@@ -112,7 +112,7 @@ private:
 
   void shutdownStateService();
   void shutdownVisualizationService();
-  void shutdownVideoService();
+	void shutdownVideoServiceOld();
   void shutdownPatientService();
   void shutdownInterconnectedDataAndSpace();
   void shutdownTrackingService();
@@ -135,7 +135,7 @@ private:
 
 	PatientServicePtr mPatientService;
 	TrackingServiceOldPtr mTrackingService;
-	VideoServicePtr mVideoService;
+	VideoServiceOldPtr mVideoServiceOld;
 	VisualizationServiceOldPtr mVisualizationService;
 	StateServicePtr mStateService;
 	DataManagerImplPtr mDataService;

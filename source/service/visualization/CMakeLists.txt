@@ -49,7 +49,7 @@ include_directories(
 
 set(cxVisualizationService_LIBS
     cxResourceVisualization
-    cxVideoService
+    cxVideoServiceOld
     cxPatientService
     cxTrackingService
     )

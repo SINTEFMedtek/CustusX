@@ -37,8 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *      \author christiana
  */
 
-#ifndef CXVIDEOSERVICE_H_
-#define CXVIDEOSERVICE_H_
+#ifndef CXVIDEOSERVICEOLD_H_
+#define CXVIDEOSERVICEOLD_H_
 
 #include <QObject>
 
@@ -98,12 +98,12 @@ typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
  *
  *
  */
-class VideoService: public QObject
+class VideoServiceOld: public QObject
 {
 Q_OBJECT
 public:
-	static VideoServicePtr create(VideoServiceBackendPtr backend);
-	virtual ~VideoService();
+	static VideoServiceOldPtr create(VideoServiceBackendPtr backend);
+	virtual ~VideoServiceOld();
 
 	VideoConnectionManagerPtr getVideoConnection();
 	USAcquisitionVideoPlaybackPtr getUSAcquisitionVideoPlayback();
@@ -135,10 +135,10 @@ private slots:
 
 private:
 
-	VideoService(VideoServiceBackendPtr videoBackend);
+	VideoServiceOld(VideoServiceBackendPtr videoBackend);
 
-	VideoService(VideoService const&); // not implemented
-	VideoService& operator=(VideoService const&); // not implemented
+	VideoServiceOld(VideoServiceOld const&); // not implemented
+	VideoServiceOld& operator=(VideoServiceOld const&); // not implemented
 
 	/** Find the best guess for active VideoSource
 	  *
@@ -169,4 +169,4 @@ private:
  */
 }
 
-#endif /* CXVIDEOSERVICE_H_ */
+#endif /* CXVIDEOSERVICEOLD_H_ */

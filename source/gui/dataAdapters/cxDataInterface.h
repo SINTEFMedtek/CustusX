@@ -219,7 +219,7 @@ private:
 
 typedef boost::shared_ptr<class ActiveVideoSourceStringDataAdapter> ActiveVideoSourceStringDataAdapterPtr;
 /**
- * \brief Adapter for controlling the active video source in cx::VideoService
+ * \brief Adapter for controlling the active video source in cx::VideoServiceOld
  */
 class ActiveVideoSourceStringDataAdapter : public StringDataAdapter
 {
