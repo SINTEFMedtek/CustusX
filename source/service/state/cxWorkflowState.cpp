@@ -103,7 +103,7 @@ void WorkflowState::autoStartHardware()
 	if (settings()->value("Automation/autoStartTracking").toBool())
 		mBackend->getToolManager()->startTracking();
 	if (settings()->value("Automation/autoStartStreaming").toBool())
-		mBackend->getVideoService()->getVideoConnection()->launchAndConnectServer();
+		mBackend->getVideoServiceOld()->getVideoConnection()->launchAndConnectServer();
 }
 
 // --------------------------------------------------------

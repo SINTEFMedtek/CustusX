@@ -41,12 +41,12 @@ namespace cx
 
 VisualizationServiceBackend::VisualizationServiceBackend(DataServicePtr dataManager,
 														 TrackingServiceOldPtr toolManager,
-														 VideoServicePtr videoService,
+														 VideoServiceOldPtr videoService,
 														 SpaceProviderPtr spaceProvider) :
 	mDataManager(dataManager),
 	mToolManager(toolManager),
 	mSpaceProvider(spaceProvider),
-  mVideoService(videoService)
+  mVideoServiceOld(videoService)
 {
 
 }
@@ -61,9 +61,9 @@ TrackingServiceOldPtr VisualizationServiceBackend::getToolManager()
 	return mToolManager;
 }
 
-VideoServicePtr VisualizationServiceBackend::getVideoService()
+VideoServiceOldPtr VisualizationServiceBackend::getVideoServiceOld()
 {
-	return mVideoService;
+	return mVideoServiceOld;
 }
 
 SpaceProviderPtr VisualizationServiceBackend::getSpaceProvider()

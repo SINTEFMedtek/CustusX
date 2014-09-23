@@ -18,7 +18,7 @@
 
 SET( CX_QT_MOC_HEADER_FILES
     cxBasicVideoSource.h
-	cxVideoServiceOld.h
+        cxVideoServiceOld.h
     cxVideoConnectionManager.h
     cxVideoConnection.h
     cxPlaybackUSAcquisitionVideo.h
@@ -28,7 +28,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxStreamerService.h
 )
 
-SET (cxVideoService_SOURCE
+SET (cxVideoServiceOld_SOURCE
     cxBasicVideoSource.h
 	cxBasicVideoSource.cpp
 	cxVideoServiceOld.cpp
@@ -75,8 +75,8 @@ include_directories(
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
-ADD_LIBRARY ( cxVideoService ${cxVideoService_SOURCE} ${MOC_HEADER_FILES} )
-target_link_libraries(cxVideoService cxResource cxResourceUsReconstructionTypes OpenIGTLink cxTrackingService cxGrabber CTKPluginFramework)
+ADD_LIBRARY ( cxVideoServiceOld ${cxVideoServiceOld_SOURCE} ${MOC_HEADER_FILES} )
+target_link_libraries(cxVideoServiceOld cxResource cxResourceUsReconstructionTypes OpenIGTLink cxTrackingService cxGrabber CTKPluginFramework)
 
 add_subdirectory(testing)
 

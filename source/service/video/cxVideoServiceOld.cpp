@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 /*
- * cxVideoService.cpp
+ * cxVideoServiceOld.cpp
  *
  *  \date May 31, 2011
  *      \author christiana
@@ -54,38 +54,38 @@ namespace cx
 {
 
 //// --------------------------------------------------------
-//VideoServicePtr VideoService::mInstance = NULL; ///< static member
+//VideoServiceOldPtr VideoServiceOld::mInstance = NULL; ///< static member
 //// --------------------------------------------------------
 
-VideoServicePtr VideoService::create(VideoServiceBackendPtr backend)
+VideoServiceOldPtr VideoServiceOld::create(VideoServiceBackendPtr backend)
 {
-	VideoServicePtr retval;
-	retval.reset(new VideoService(backend));
+	VideoServiceOldPtr retval;
+	retval.reset(new VideoServiceOld(backend));
 	return retval;
 }
 
-//void VideoService::initialize(VideoServiceBackendPtr videoBackend)
+//void VideoServiceOld::initialize(VideoServiceBackendPtr videoBackend)
 //{
-//	VideoService::setInstance(new VideoService(videoBackend));
-//	VideoService::getInstance();
+//	VideoServiceOld::setInstance(new VideoServiceOld(videoBackend));
+//	VideoServiceOld::getInstance();
 //}
 
-//void VideoService::shutdown()
+//void VideoServiceOld::shutdown()
 //{
 //  delete mInstance;
 //  mInstance = NULL;
 //}
 
-//VideoServicePtr VideoService::getInstance()
+//VideoServiceOldPtr VideoServiceOld::getInstance()
 //{
 //	if (!mInstance)
 //	{
-//		VideoService::setInstance(new VideoService(VideoServiceBackendPtr()));
+//		VideoServiceOld::setInstance(new VideoServiceOld(VideoServiceBackendPtr()));
 //	}
 //	return mInstance;
 //}
 
-//void VideoService::setInstance(VideoServicePtr instance)
+//void VideoServiceOld::setInstance(VideoServiceOldPtr instance)
 //{
 //	if (mInstance)
 //	{
@@ -94,7 +94,7 @@ VideoServicePtr VideoService::create(VideoServiceBackendPtr backend)
 //	mInstance = instance;
 //}
 
-VideoService::VideoService(VideoServiceBackendPtr videoBackend)
+VideoServiceOld::VideoServiceOld(VideoServiceBackendPtr videoBackend)
 {
 	mBackend = videoBackend;
 	mEmptyVideoSource.reset(new BasicVideoSource());
@@ -108,21 +108,21 @@ VideoService::VideoService(VideoServiceBackendPtr videoBackend)
 	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(QString)), this, SLOT(autoSelectActiveVideoSource()));
 }
 
-VideoService::~VideoService()
+VideoServiceOld::~VideoServiceOld()
 {
 	disconnect(mVideoConnection.get(), SIGNAL(connected(bool)), this, SLOT(autoSelectActiveVideoSource()));
 	disconnect(mVideoConnection.get(), SIGNAL(videoSourcesChanged()), this, SLOT(autoSelectActiveVideoSource()));
 	mVideoConnection.reset();
 }
 
-void VideoService::autoSelectActiveVideoSource()
+void VideoServiceOld::autoSelectActiveVideoSource()
 {
 	VideoSourcePtr suggestion = this->getGuessForActiveVideoSource(mActiveVideoSource);
-//	std::cout << "VideoService::autoSelectActiveVideoSource() " << suggestion->getUid() << std::endl;
+//	std::cout << "VideoServiceOld::autoSelectActiveVideoSource() " << suggestion->getUid() << std::endl;
 	this->setActiveVideoSource(suggestion->getUid());
 }
 
-void VideoService::setActiveVideoSource(QString uid)
+void VideoServiceOld::setActiveVideoSource(QString uid)
 {
 	mActiveVideoSource = mEmptyVideoSource;
 
@@ -131,7 +131,7 @@ void VideoService::setActiveVideoSource(QString uid)
 		if (sources[i]->getUid()==uid)
 			mActiveVideoSource = sources[i];
 
-//	std::cout << "VideoService::setActiveVideoSource() " << mActiveVideoSource->getUid() << std::endl;
+//	std::cout << "VideoServiceOld::setActiveVideoSource() " << mActiveVideoSource->getUid() << std::endl;
 
 	// set active stream in all probes if stream is present:
 	ToolManager::ToolMap tools = mBackend->getToolManager()->getTools();
@@ -148,7 +148,7 @@ void VideoService::setActiveVideoSource(QString uid)
 	emit activeVideoSourceChanged();
 }
 
-VideoSourcePtr VideoService::getGuessForActiveVideoSource(VideoSourcePtr old)
+VideoSourcePtr VideoServiceOld::getGuessForActiveVideoSource(VideoSourcePtr old)
 {
 	// ask for playback stream:
 	if (mUSAcquisitionVideoPlayback->isActive())
@@ -183,27 +183,27 @@ VideoSourcePtr VideoService::getGuessForActiveVideoSource(VideoSourcePtr old)
 	return mEmptyVideoSource;
 }
 
-USAcquisitionVideoPlaybackPtr VideoService::getUSAcquisitionVideoPlayback()
+USAcquisitionVideoPlaybackPtr VideoServiceOld::getUSAcquisitionVideoPlayback()
 {
 	return mUSAcquisitionVideoPlayback;
 }
 
-VideoConnectionManagerPtr VideoService::getVideoConnection()
+VideoConnectionManagerPtr VideoServiceOld::getVideoConnection()
 {
 	return mVideoConnection;
 }
 
-VideoSourcePtr VideoService::getActiveVideoSource()
+VideoSourcePtr VideoServiceOld::getActiveVideoSource()
 {
 	return mActiveVideoSource;
 }
 
-ctkPluginContext* VideoService::getPluginContext()
+ctkPluginContext* VideoServiceOld::getPluginContext()
 {
 	return mBackend->getPluginContext();
 }
 
-void VideoService::setPlaybackMode(PlaybackTimePtr controller)
+void VideoServiceOld::setPlaybackMode(PlaybackTimePtr controller)
 {
 	mUSAcquisitionVideoPlayback->setTime(controller);
 	this->autoSelectActiveVideoSource();
@@ -226,7 +226,7 @@ void VideoService::setPlaybackMode(PlaybackTimePtr controller)
 		this->autoSelectActiveVideoSource();
 }
 
-std::vector<VideoSourcePtr> VideoService::getVideoSources()
+std::vector<VideoSourcePtr> VideoServiceOld::getVideoSources()
 {
 	std::vector<VideoSourcePtr> retval = mVideoConnection->getVideoSources();
 	if (mUSAcquisitionVideoPlayback->isActive())
@@ -234,13 +234,13 @@ std::vector<VideoSourcePtr> VideoService::getVideoSources()
 	return retval;
 }
 
-void VideoService::fpsSlot(QString source, int val)
+void VideoServiceOld::fpsSlot(QString source, int val)
 {
 	if (source==mActiveVideoSource->getUid())
 		emit fps(val);
 }
 
-VideoServiceBackendPtr VideoService::getBackend()
+VideoServiceBackendPtr VideoServiceOld::getBackend()
 {
 	return mBackend;
 }

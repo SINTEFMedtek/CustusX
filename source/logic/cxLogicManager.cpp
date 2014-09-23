@@ -61,7 +61,7 @@ struct LegacySingletons
 	static DataServicePtr mDataManager;
 	static SpaceProviderPtr mSpaceProvider;
 	static PatientServicePtr mPatientService;
-	static VideoServicePtr mVideoService;
+	static VideoServiceOldPtr mVideoServiceOld;
 	static VisualizationServiceOldPtr mVisualizationService;
 	static StateServicePtr mStateService;
 };
@@ -70,7 +70,7 @@ TrackingServiceOldPtr LegacySingletons::mToolManager;
 DataServicePtr LegacySingletons::mDataManager;
 SpaceProviderPtr LegacySingletons::mSpaceProvider;
 PatientServicePtr LegacySingletons::mPatientService;
-VideoServicePtr LegacySingletons::mVideoService;
+VideoServiceOldPtr LegacySingletons::mVideoServiceOld;
 VisualizationServiceOldPtr LegacySingletons::mVisualizationService;
 StateServicePtr LegacySingletons::mStateService;
 
@@ -103,9 +103,9 @@ DataServicePtr dataService()
 {
 	return LegacySingletons::mDataManager;
 }
-VideoServicePtr videoService()
+VideoServiceOldPtr videoService()
 {
-	return LegacySingletons::mVideoService;
+	return LegacySingletons::mVideoServiceOld;
 }
 VisualizationServiceOldPtr visualizationService()
 {
@@ -149,7 +149,7 @@ void LogicManager::initializeServices()
 	// services layer
 	this->getPatientService();
 	this->getTrackingService();
-	this->getVideoService();
+	this->getVideoServiceOld();
 	this->getStateService();
 	this->getVisualizationService();
 	this->getSpaceProvider();
@@ -211,7 +211,7 @@ void LogicManager::createPatientService()
 	LegacySingletons::mPatientService = mPatientService;
 }
 
-void LogicManager::createVideoService()
+void LogicManager::createVideoServiceOld()
 {
 	// prerequisites:
 	this->getTrackingService();
@@ -224,8 +224,8 @@ void LogicManager::createVideoService()
 	videoBackend = VideoServiceBackend::create(mDataService,
 											   mTrackingService,
 												 mSpaceProvider, mPluginFramework->getPluginFramework());
-	mVideoService = VideoService::create(videoBackend);
-	LegacySingletons::mVideoService = mVideoService;
+	mVideoServiceOld = VideoServiceOld::create(videoBackend);
+	LegacySingletons::mVideoServiceOld = mVideoServiceOld;
 }
 
 void LogicManager::createVisualizationService()
@@ -233,14 +233,14 @@ void LogicManager::createVisualizationService()
 	// prerequisites:
 	this->getTrackingService();
 	this->getDataService();
-	this->getVideoService();
+	this->getVideoServiceOld();
 	this->getSpaceProvider();
 
 	// build object(s):
 	VisualizationServiceBackendPtr backend;
 	backend.reset(new VisualizationServiceBackend(mDataService,
 												  mTrackingService,
-												  mVideoService,
+													mVideoServiceOld,
 												  mSpaceProvider));
 	mVisualizationService = ViewManager::create(backend);
 	LegacySingletons::mVisualizationService = mVisualizationService;
@@ -252,14 +252,14 @@ void LogicManager::createStateService()
 	this->getTrackingService();
 	this->getDataService();
 	this->getPatientService();
-	this->getVideoService();
+	this->getVideoServiceOld();
 	this->getSpaceProvider();
 
 	// build object(s):
 	StateServiceBackendPtr backend;
 	backend.reset(new StateServiceBackend(mDataService,
 										  mTrackingService,
-										  mVideoService,
+											mVideoServiceOld,
 										  mSpaceProvider,
 										  mPatientService));
 	mStateService = StateService::create(backend);
@@ -301,11 +301,11 @@ TrackingServiceOldPtr LogicManager::getTrackingService()
 	return mTrackingService;
 }
 
-VideoServicePtr LogicManager::getVideoService()
+VideoServiceOldPtr LogicManager::getVideoServiceOld()
 {
-	if (!mVideoService)
-		this->createVideoService();
-	return mVideoService;
+	if (!mVideoServiceOld)
+		this->createVideoServiceOld();
+	return mVideoServiceOld;
 }
 
 StateServicePtr LogicManager::getStateService()
@@ -345,7 +345,7 @@ void LogicManager::shutdownServices()
 {
 	this->shutdownStateService();
 	this->shutdownVisualizationService();
-	this->shutdownVideoService();
+	this->shutdownVideoServiceOld();
 	this->shutdownPatientService();
 	this->shutdownInterconnectedDataAndSpace();
 	this->shutdownTrackingService();
@@ -372,11 +372,11 @@ void LogicManager::shutdownVisualizationService()
 }
 
 
-void LogicManager::shutdownVideoService()
+void LogicManager::shutdownVideoServiceOld()
 {
-	LegacySingletons::mVideoService.reset();
-	requireUnique(mVideoService, "VideoService");
-	mVideoService.reset();
+	LegacySingletons::mVideoServiceOld.reset();
+	requireUnique(mVideoServiceOld, "VideoServiceOld");
+	mVideoServiceOld.reset();
 }
 
 void LogicManager::shutdownPatientService()

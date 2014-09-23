@@ -45,7 +45,7 @@ target_link_libraries(cxLogicManager
     cxPatientService
     cxTrackingService
     cxVisualizationService
-    cxVideoService
+    cxVideoServiceOld
 	cxStateService
     )
 
