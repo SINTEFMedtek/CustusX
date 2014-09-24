@@ -108,6 +108,7 @@ class CppBuilder:
         self._changeDirToSource()
         #if branch contains only '' set as empty .... todo
 
+        runShell('git fetch')
 	# if the branch doesnt exist, this might be ok: only a subset of the repos need have the branch defined.
         runShell('git checkout %s' % branch, ignoreFailure=True)
         runShell('git pull origin %s' % branch, ignoreFailure=True)

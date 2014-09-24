@@ -29,42 +29,45 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXREGISTRATIONSERVICENULL_H
-#define CXREGISTRATIONSERVICENULL_H
 
-#include "cxRegistrationService.h"
+#ifndef CXREGISTRATIONMETHODSERVICE_H
+#define CXREGISTRATIONMETHODSERVICE_H
+
+#include <QObject>
+
+//class QDateTime;
+
+#define RegistrationMethodService_iid "cx::RegistrationMethodService"
 
 namespace cx
 {
 
-/** \brief Null Object Pattern for Registration service
+/** \brief Registration Method services
  *
+ * This class defines the common interface towards the registration methods plugins.
  *
  *  \ingroup cx_resource_core_registration
- *  \date 2014-08-28
+ *  \date 2014-09-02
  *  \author Ole Vegard Solberg, SINTEF
+ *  \author Geir Arne Tangen, SINTEF
  */
-class RegistrationServiceNull : public RegistrationService
+class RegistrationMethodService : public QObject
 {
-
+	Q_OBJECT
 public:
-	RegistrationServiceNull();
-	virtual void setMovingData(DataPtr data);
-	virtual void setFixedData(DataPtr data);
-	virtual DataPtr getMovingData();
-	virtual DataPtr getFixedData();
+    virtual ~RegistrationMethodService() {}
 
-	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
-	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description);
+    virtual void showPatientRegistrationGUI(/*parent widget reference*/) = 0;
+    virtual void showImage2ImageRegistrationGUI(/*parent widget reference*/) = 0;
+    virtual void showImageTransformGUI(/*parent widget reference*/) = 0;
 
-	virtual QDateTime getLastRegistrationTime();
-	virtual void setLastRegistrationTime(QDateTime time);
+//    virtual QDateTime getLastRegistrationTime() = 0;
+//    virtual void setLastRegistrationTime(QDateTime time) = 0;
 
-	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame);
-
-	virtual bool isNull();
-private:
-	void printWarning();
 };
-} // namespace cx
-#endif // CXREGISTRATIONSERVICENULL_H
+
+} //namespace cx
+Q_DECLARE_INTERFACE(cx::RegistrationMethodService, RegistrationMethodService_iid)
+
+
+#endif // CXREGISTRATIONMETHODSERVICE_H
