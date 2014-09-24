@@ -170,7 +170,7 @@ void PatientModelImplService::saveMesh(MeshPtr mesh, const QString &basePath)
 
 std::map<QString, VideoSourcePtr> PatientModelImplService::getStreams() const
 {
-	dataService()->getStreams();
+	return dataService()->getStreams();
 }
 
 QString PatientModelImplService::getActivePatientFolder() const
