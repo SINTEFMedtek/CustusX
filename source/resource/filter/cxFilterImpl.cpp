@@ -33,12 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFilterImpl.h"
 
 #include "cxImage.h"
-#include "cxDataManager.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxDoubleDataAdapterXml.h"
 #include "cxDoublePairDataAdapterXml.h"
 #include "cxStringDataAdapterXml.h"
-#include "cxLegacySingletons.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -126,7 +125,7 @@ ImagePtr FilterImpl::getCopiedInputImage(int index)
 
 void FilterImpl::updateThresholdFromImageChange(QString uid, DoubleDataAdapterXmlPtr threshold)
 {
-	ImagePtr image = dataManager()->getImage(uid);
+	ImagePtr image = mPatientModelService->getImage(uid);
 	if(!image)
 		return;
 	threshold->setValueRange(DoubleRange(image->getMin(), image->getMax(), 1));
@@ -144,7 +143,7 @@ void FilterImpl::updateThresholdFromImageChange(QString uid, DoubleDataAdapterXm
 
 void FilterImpl::updateThresholdPairFromImageChange(QString uid, DoublePairDataAdapterXmlPtr threshold)
 {
-	ImagePtr image = dataManager()->getImage(uid);
+	ImagePtr image = mPatientModelService->getImage(uid);
 	if(!image)
 		return;
 	threshold->setValueRange(DoubleRange(image->getMin(), image->getMax(), 1));

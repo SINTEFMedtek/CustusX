@@ -13,8 +13,8 @@
 ###########################################################
 
 SET( MOC_HEADER_FILES
-	logic/cxFilter.h
-	logic/cxFilterImpl.h
+#	logic/cxFilter.h
+#	logic/cxFilterImpl.h
 	logic/cxFilterTimedAlgorithm.h
 	logic/cxDummyFilter.h
 	logic/cxPipeline.h
@@ -40,10 +40,10 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 # library
 SET( SOURCE_FILES
     ${MOC_HEADER_FILES}
-	logic/cxFilter.h
-	logic/cxFilter.cpp
-	logic/cxFilterImpl.h
-	logic/cxFilterImpl.cpp
+#	logic/cxFilter.h
+#	logic/cxFilter.cpp
+#	logic/cxFilterImpl.h
+#	logic/cxFilterImpl.cpp
 	logic/cxFilterTimedAlgorithm.h
 	logic/cxFilterTimedAlgorithm.cpp
 	logic/cxDummyFilter.h
@@ -103,9 +103,10 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/gui/utilities
     ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
 	${CustusX_SOURCE_DIR}/source/gui/dataWidgets
+	${CustusX_SOURCE_DIR}/source/resource/filter
 	)
 
-set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui cxGUIExtenderService)
+set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui cxGUIExtenderService cxResourceFilter)
 
 
 

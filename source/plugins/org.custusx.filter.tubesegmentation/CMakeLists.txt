@@ -26,6 +26,7 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
     ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
 	${CustusX_SOURCE_DIR}/source/logic
+	${CustusX_SOURCE_DIR}/source/resource/filter
     )
 
 set(PLUGIN_SRCS
@@ -65,6 +66,7 @@ set(PLUGIN_target_libraries
     cxPluginAlgorithm
     LINK_PRIVATE tubeSegmentationLib
     cxPluginUtilities
+	cxResourceFilter
     )    
 
 if (CX_USE_OPENCL_UTILITY)
