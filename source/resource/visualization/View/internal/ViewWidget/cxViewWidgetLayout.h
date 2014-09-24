@@ -59,12 +59,13 @@ public:
 	~LayoutWidgetUsingViewWidgets();
 
 	ViewPtr addView(View::Type type, LayoutRegion region);
-	void showViews();
+//	void showViews();
 	void clearViews();
 
 private:
 	void setStretchFactors(LayoutRegion region, int stretchFactor); ///< Set the stretch factors of columns and rows in mLayout.
-	void addView(ViewWidget* view, LayoutRegion region);
+//	void addView(ViewWidget* view, LayoutRegion region);
+	ViewWidget* retrieveView(View::Type type);
 
 	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache2D;
 	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache3D;

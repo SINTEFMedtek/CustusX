@@ -38,11 +38,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageData.h>
 #include "cxVector3D.h"
 #include "vtkRenderWindow.h"
-//#include "sscViewRenderWindow.h"
 #include "vtkRenderer.h"
-#ifdef check
-#undef check
-#endif
+//#ifdef check
+//#undef check
+//#endif
 
 #include "cxRep.h"
 #include "cxTypeConversions.h"
@@ -63,9 +62,7 @@ ViewContainer::ViewContainer(QWidget *parent, Qt::WindowFlags f) :
 	connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequestedSlot(const QPoint &)));
 	mMTimeHash = 0;
 	mMouseEventTarget = NULL;
-//	mRenderWindow = vtkRenderWindowPtr::New();
 	this->setLayout(new QGridLayout);
-//	this->SetRenderWindow(mRenderWindow);
 	std::cout << "create ViewContainer::ViewContainer with rw=" << mRenderWindow.GetPointer() << std::endl;
 }
 
@@ -83,10 +80,6 @@ void ViewContainer::clear()
 	{
 		ViewItem* viewItem = dynamic_cast<ViewItem*>(item);
 		delete viewItem;
-//		dynamic_cast<ViewItem*>(item)->removeReps();
-
-//		mRenderWindow->RemoveRenderer(dynamic_cast<ViewItem*>(item)->getRenderer());
-//		delete dynamic_cast<ViewItem*>(item);
 	}
 	this->clearBackground();
 	mMouseEventTarget = NULL;
@@ -94,22 +87,7 @@ void ViewContainer::clear()
 
 void ViewContainer::clearBackground()
 {
-	return; // TODO: this crashes on mac - find out why
-
-
-
-
-	if (mRenderWindow) // TODO - remove this if
-	{
-		vtkRendererPtr renderer = vtkRendererPtr::New();
-		mRenderWindow->AddRenderer(renderer);
-		renderer->SetViewport(0,0,1,1);
-		renderer->Clear();
-		QColor background = palette().color(QPalette::Background);
-		renderer->SetBackground(background.redF(), background.greenF(), background.blueF());
-		renderer->Render();
-		mRenderWindow->RemoveRenderer(renderer);
-	}
+	std::cout << "ViewContainer::clearBackground() mRenderWindow " << mRenderWindow.GetPointer() << std::endl;
 }
 
 /**
@@ -144,33 +122,44 @@ ViewItem* ViewContainer::getViewItem(int index)
 	return dynamic_cast<ViewItem*>(this->getGridLayout()->itemAt(index));
 }
 
-
 /**
   * Creates and adds a view to this container.
   * Returns a pointer to the created view item that the container owns.
   */
 ViewItem *ViewContainer::addView(QString uid, int row, int col, int rowSpan, int colSpan, QString name)
 {
-	if (!mRenderWindow)
-	{
-		mRenderWindow = vtkRenderWindowPtr::New();
-		this->SetRenderWindow(mRenderWindow);
-	}
+	this->initializeRenderWindow();
+
 	// Create a viewItem for this view
 	ViewItem *item = new ViewItem(uid, name, this, mRenderWindow, QRect());
 	if (getGridLayout())
-	{
 		getGridLayout()->addItem(item, row, col, rowSpan, colSpan);
-
-		// already done in ViewItem constructor
-//		// Create and add view renderer
-//		vtkRendererPtr renderer = vtkRendererPtr::New();
-//		// All views' renderer viewport will to be calculated on resize - just add for now
-//		mRenderWindow->AddRenderer(renderer);
-//		item->setRenderer(renderer);
-	}
-
 	return item;
+}
+
+void ViewContainer::initializeRenderWindow()
+{
+	if (mRenderWindow)
+		return;
+
+	mRenderWindow = vtkRenderWindowPtr::New();
+	this->SetRenderWindow(mRenderWindow);
+
+	this->addBackgroundRenderer();
+}
+
+void ViewContainer::addBackgroundRenderer()
+{
+	vtkRendererPtr renderer = vtkRendererPtr::New();
+	mRenderWindow->AddRenderer(renderer);
+	renderer->SetViewport(0,0,1,1);
+	//		renderer->Clear();
+	QColor background = palette().color(QPalette::Background);
+	std::cout << "background: " << background.red() << " " << background.green() << " " << background.blue()  << std::endl;
+	renderer->SetBackground(background.redF(), background.greenF(), background.blueF());
+	//		renderer->Render();
+	//		mRenderWindow->Render();
+	//		mRenderWindow->RemoveRenderer(renderer);
 }
 
 void ViewContainer::customContextMenuRequestedSlot(const QPoint& point)

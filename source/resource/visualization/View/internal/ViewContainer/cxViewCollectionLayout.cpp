@@ -25,6 +25,8 @@ LayoutWidgetUsingViewCollection::LayoutWidgetUsingViewCollection()
 	layout->setSpacing(0);
 	layout->setMargin(0);
 	mViewContainer = new ViewContainer;
+	mViewContainer->getGridLayout()->setSpacing(2);
+	mViewContainer->getGridLayout()->setMargin(4);
 	layout->addWidget(mViewContainer);
 }
 
@@ -48,10 +50,6 @@ ViewPtr LayoutWidgetUsingViewCollection::addView(View::Type type, LayoutRegion r
 	viewItem->getView()->setType(type);
 	mViews.push_back(view);
 	return view;
-}
-
-void LayoutWidgetUsingViewCollection::showViews()
-{
 }
 
 void LayoutWidgetUsingViewCollection::clearViews()

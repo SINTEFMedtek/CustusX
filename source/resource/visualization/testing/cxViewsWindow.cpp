@@ -127,7 +127,7 @@ cx::ViewPtr ViewsWindow::getView(int index)
 
 bool ViewsWindow::quickRunWidget()
 {
-	mLayoutWidget->showViews();
+//	mLayoutWidget->showViews();
 	this->show();
 	this->updateRender();
 

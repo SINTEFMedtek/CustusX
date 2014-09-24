@@ -489,7 +489,7 @@ void ViewManager::activateView(LayoutWidget* widget, LayoutViewData viewData)
 	mRenderLoop->addView(view);
 	ViewWrapperPtr wrapper = this->createViewWrapper(view, viewData);
 	mViewGroups[viewData.mGroup]->addView(wrapper);
-	widget->showViews();
+//	widget->showViews();
 }
 
 ViewWrapperPtr ViewManager::createViewWrapper(ViewPtr view, LayoutViewData viewData)

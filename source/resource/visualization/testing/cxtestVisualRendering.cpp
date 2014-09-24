@@ -145,7 +145,7 @@ TEST_CASE("Visual rendering: Empty view",
 	fixture.dumpDebugViewToDisk("emptyview", 0);
 	REQUIRE(fixture.getFractionOfBrightPixelsInView(0,0) == Approx(0));
 
-	sleep(3);
+//	sleep(3);
 
 }
 

@@ -47,6 +47,7 @@ namespace cx
 
 QPointer<LayoutWidget> LayoutWidget::createViewWidgetLayout()
 {
+//	return new LayoutWidgetUsingViewCollection(); // testing
 	return new LayoutWidgetUsingViewWidgets();
 }
 

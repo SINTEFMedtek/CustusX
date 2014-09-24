@@ -63,34 +63,35 @@ LayoutWidgetUsingViewWidgets::~LayoutWidgetUsingViewWidgets()
 
 ViewPtr LayoutWidgetUsingViewWidgets::addView(View::Type type, LayoutRegion region)
 {
-	ViewWidget* view = NULL;
-	if (type == View::VIEW_2D)
-	{
-		view = this->mViewCache2D->retrieveView();
-	}
-	else if (type == View::VIEW_3D)
-	{
-		view = this->mViewCache3D->retrieveView();
-	}
-	else if (type == View::VIEW_REAL_TIME)
-	{
-		view = this->mViewCacheRT->retrieveView();
-	}
-	else
-	{
-		view = this->mViewCache->retrieveView();
-	}
+	ViewWidget* view = this->retrieveView(type);
 
 	view->getView()->setType(type);
-	this->addView(view, region);
+
+	mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col);
+	this->setStretchFactors(region, 1);
+	view->show();
+
+	mViews.push_back(view);
+
 	return view->getView();
 }
 
-void LayoutWidgetUsingViewWidgets::showViews()
+ViewWidget* LayoutWidgetUsingViewWidgets::retrieveView(View::Type type)
 {
-	for (unsigned i=0; i<mViews.size(); ++i)
-		mViews[i]->show();
+	if (type == View::VIEW_2D)
+		return this->mViewCache2D->retrieveView();
+	else if (type == View::VIEW_3D)
+		return this->mViewCache3D->retrieveView();
+	else if (type == View::VIEW_REAL_TIME)
+		return this->mViewCacheRT->retrieveView();
+	return this->mViewCache->retrieveView();
 }
+
+//void LayoutWidgetUsingViewWidgets::showViews()
+//{
+////	for (unsigned i=0; i<mViews.size(); ++i)
+////		mViews[i]->show();
+//}
 
 void LayoutWidgetUsingViewWidgets::setStretchFactors(LayoutRegion region, int stretchFactor)
 {
@@ -106,13 +107,13 @@ void LayoutWidgetUsingViewWidgets::setStretchFactors(LayoutRegion region, int st
 	}
 }
 
-void LayoutWidgetUsingViewWidgets::addView(ViewWidget* view, LayoutRegion region)
-{
-	mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col);
-	this->setStretchFactors(region, 1);
+//void LayoutWidgetUsingViewWidgets::addView(ViewWidget* view, LayoutRegion region)
+//{
+//	mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col);
+//	this->setStretchFactors(region, 1);
 //	view->show();
-	mViews.push_back(view);
-}
+//	mViews.push_back(view);
+//}
 
 void LayoutWidgetUsingViewWidgets::clearViews()
 {

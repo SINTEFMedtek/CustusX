@@ -53,7 +53,6 @@ public:
 	~LayoutWidgetUsingViewCollection();
 
 	ViewPtr addView(View::Type type, LayoutRegion region);
-	void showViews();
 	void clearViews();
 
 private:

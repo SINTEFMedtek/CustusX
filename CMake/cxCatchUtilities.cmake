@@ -120,7 +120,7 @@ function(_cx_catch_generate_master_catch_using_libs EXE_NAME PATH_TO_MAIN)
     endforeach()
     
     cx_catch__private_define_platform_specific_linker_options()
-    add_executable(${EXE_NAME} ${PATH_TO_MAIN} )
+	add_executable(${EXE_NAME} MACOSX_BUNDLE ${PATH_TO_MAIN} )
     target_link_libraries(${EXE_NAME} ${CX_CATCH_PRE_WHOLE_ARCHIVE} ${CX_TEST_CATCH_GENERATED_LIBRARIES} cxtestUtilities ${CX_CATCH_POST_WHOLE_ARCHIVE}  )
 endfunction()
 

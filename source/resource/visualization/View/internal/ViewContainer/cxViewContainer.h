@@ -93,6 +93,8 @@ protected:
 
 private:
 	virtual void resizeEvent( QResizeEvent *event);
+	void initializeRenderWindow();
+	void addBackgroundRenderer();
 };
 typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
 
