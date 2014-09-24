@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPatientModelServiceNull.h"
 #include <map>
-#include "cxData.h"
+#include "cxImage.h"
 #include "cxReporter.h"
 #include "cxLandmark.h"
 
@@ -54,29 +54,45 @@ void PatientModelServiceNull::updateRegistration_rMpr(const QDateTime& oldTime, 
 
 std::map<QString, DataPtr> PatientModelServiceNull::getData() const
 {
+	printWarning();
 	std::map<QString, DataPtr> retval;
 	return retval;
 }
 
 DataPtr PatientModelServiceNull::getData(const QString& uid) const
 {
+	printWarning();
 	return DataPtr();
 }
 
 LandmarksPtr PatientModelServiceNull::getPatientLandmarks() const
 {
+	printWarning();
 	return boost::shared_ptr<Landmarks>();
 }
 
 
 std::map<QString, LandmarkProperty> PatientModelServiceNull::getLandmarkProperties() const
 {
+	printWarning();
 	return std::map<QString, LandmarkProperty>();
 }
 
 Transform3D PatientModelServiceNull::get_rMpr() const
 {
+	printWarning();
 	return Transform3D();
+}
+
+ImagePtr PatientModelServiceNull::getActiveImage() const
+{
+	printWarning();
+	return ImagePtr();
+}
+
+void PatientModelServiceNull::setActiveImage(ImagePtr activeImage)
+{
+	printWarning();
 }
 
 void PatientModelServiceNull::autoSave()
@@ -86,6 +102,7 @@ void PatientModelServiceNull::autoSave()
 
 bool PatientModelServiceNull::isNull()
 {
+	printWarning();
 	return true;
 }
 
@@ -99,7 +116,51 @@ void PatientModelServiceNull::setDebugMode(bool on)
 	printWarning();
 }
 
-void PatientModelServiceNull::printWarning()
+cx::ImagePtr cx::PatientModelServiceNull::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, cx::ImagePtr parentImage, QString filePath)
+{
+	printWarning();
+	return ImagePtr();
+}
+
+MeshPtr PatientModelServiceNull::createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath)
+{
+	printWarning();
+	return MeshPtr();
+}
+
+void PatientModelServiceNull::loadData(DataPtr data)
+{
+	printWarning();
+}
+
+void PatientModelServiceNull::saveData(DataPtr data, const QString &basePath)
+{
+	printWarning();
+}
+
+void PatientModelServiceNull::saveImage(ImagePtr image, const QString &basePath)
+{
+	printWarning();
+}
+
+void PatientModelServiceNull::saveMesh(MeshPtr mesh, const QString &basePath)
+{
+	printWarning();
+}
+
+std::map<QString, VideoSourcePtr> PatientModelServiceNull::getStreams() const
+{
+	printWarning();
+	return std::map<QString, VideoSourcePtr>();
+}
+
+QString PatientModelServiceNull::getActivePatientFolder() const
+{
+	printWarning();
+	return QString();
+}
+
+void PatientModelServiceNull::printWarning() const
 {
 	reportWarning("Trying to use PatientModelServiceNull. Is PatientModelService (org.custusx.patiemtmodel) disabled?");
 }

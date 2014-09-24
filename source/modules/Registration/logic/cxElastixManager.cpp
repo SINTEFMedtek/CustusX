@@ -48,8 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ElastixManager::ElastixManager(ctkPluginContext *pluginContext) :
-	mRegistrationService(new RegistrationServiceProxy(pluginContext))
+ElastixManager::ElastixManager(RegistrationServicePtr registrationService) :
+	mRegistrationService(registrationService)
 {
 	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("elastix");
 

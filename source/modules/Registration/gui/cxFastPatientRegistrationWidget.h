@@ -55,7 +55,7 @@ namespace cx
 class FastPatientRegistrationWidget : public LandmarkPatientRegistrationWidget
 {
 public:
-  FastPatientRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent);
+  FastPatientRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~FastPatientRegistrationWidget();
   virtual QString defaultWhatsThis() const;
 

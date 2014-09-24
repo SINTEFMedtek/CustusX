@@ -59,7 +59,7 @@ class BronchoscopyRegistrationWidget: public RegistrationBaseWidget
 {
 	Q_OBJECT
 public:
-	BronchoscopyRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent);
+	BronchoscopyRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
 	virtual ~BronchoscopyRegistrationWidget()
 	{
 	}

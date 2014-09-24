@@ -60,7 +60,7 @@ class PlateRegistrationWidget : public RegistrationBaseWidget
 {
   Q_OBJECT
 public:
-	PlateRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent);
+	PlateRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~PlateRegistrationWidget();
   virtual QString defaultWhatsThis() const;
 

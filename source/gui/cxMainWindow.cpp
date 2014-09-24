@@ -95,6 +95,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPluginFramework.h"
 #include "ctkPluginContext.h"
 #include "cxDockWidgets.h"
+#include "cxPatientModelServiceProxy.h"
 
 namespace cx
 {
@@ -131,13 +132,15 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 
 	ctkPluginContext *pluginContext = LogicManager::getInstance()->getPluginContext();
 
+	PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(pluginContext));
+
 	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
 	this->addAsDockWidget(new VideoConnectionWidget(this), "Utility");
 	this->addAsDockWidget(new EraserWidget(this), "Properties");
 	this->addAsDockWidget(new MetricWidget(this), "Utility");
-	this->addAsDockWidget(new SlicePropertiesWidget(pluginContext, this), "Properties");
-	this->addAsDockWidget(new VolumePropertiesWidget(pluginContext, this), "Properties");
-	this->addAsDockWidget(new MeshInfoWidget(pluginContext, this), "Properties");
+	this->addAsDockWidget(new SlicePropertiesWidget(patientModelService, this), "Properties");
+	this->addAsDockWidget(new VolumePropertiesWidget(patientModelService, this), "Properties");
+	this->addAsDockWidget(new MeshInfoWidget(patientModelService, this), "Properties");
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
 	this->addAsDockWidget(new ToolPropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new NavigationWidget(this), "Properties");

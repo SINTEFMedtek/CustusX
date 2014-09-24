@@ -43,6 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxRegistrationDataAdapters.h"
 #include "cxLabeledComboBoxWidget.h"
+#include "cxRegistrationServiceProxy.h"
+#include "cxPatientModelServiceProxy.h"
 
 namespace cx
 {
@@ -109,8 +111,10 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 
 void RegistrationWidget::insertImageComboBoxes(std::vector<QVBoxLayout*> layouts)
 {
-	StringDataAdapterPtr fixedImage(new RegistrationFixedImageStringDataAdapter(mPluginContext));
-	StringDataAdapterPtr movingImage(new RegistrationMovingImageStringDataAdapter(mPluginContext));
+	PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(mPluginContext));
+	RegistrationServicePtr registrationService = RegistrationServicePtr(new RegistrationServiceProxy(mPluginContext));
+	StringDataAdapterPtr fixedImage(new RegistrationFixedImageStringDataAdapter(registrationService, patientModelService));
+	StringDataAdapterPtr movingImage(new RegistrationMovingImageStringDataAdapter(registrationService, patientModelService));
 
 	this->insertImageComboInLayout(fixedImage, layouts[0], 0);
 	this->insertImageComboInLayout(movingImage, layouts[0], 1);

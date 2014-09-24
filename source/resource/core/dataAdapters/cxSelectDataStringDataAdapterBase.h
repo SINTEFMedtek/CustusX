@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxStringDataAdapter.h"
 #include "cxForwardDeclarations.h"
-class ctkPluginContext;
 
 namespace cx
 {
@@ -75,7 +74,7 @@ protected:
 	/** Construct base with a filter that determined allowed Data types based
 		* on their getType() return value. The default of ".*" means any type.
 		*/
-	explicit SelectDataStringDataAdapterBase(ctkPluginContext *pluginContext, QString typeRegexp = ".*");
+	explicit SelectDataStringDataAdapterBase(PatientModelServicePtr patientModelService, QString typeRegexp = ".*");
 	std::map<QString, DataPtr> filterOnType(std::map<QString, DataPtr> input, QString regexp) const;
 	QString mTypeRegexp;
 	QString mValueName;

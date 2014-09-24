@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolButton>
 #include <QAction>
 #include <iostream>
+#include <boost/shared_ptr.hpp>
 #include "cxOptimizedUpdateWidget.h"
 
 /**
@@ -90,6 +91,7 @@ public:
 
 namespace cx
 {
+typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 /**
  * \class BaseWidget
  *

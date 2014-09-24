@@ -64,7 +64,7 @@ class SeansVesselRegistrationWidget : public RegistrationBaseWidget
 {
   Q_OBJECT
 public:
-	SeansVesselRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent);
+	SeansVesselRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~SeansVesselRegistrationWidget();
   virtual QString defaultWhatsThis() const;
 
@@ -90,7 +90,6 @@ private:
 
   StringDataAdapterPtr mFixedImage;
   StringDataAdapterPtr mMovingImage;
-	ctkPluginContext *mPluginContext;
 };
 
 /**

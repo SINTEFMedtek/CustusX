@@ -58,9 +58,9 @@ namespace cx
 {
 
 
-RegistrationManager::RegistrationManager(AcquisitionDataPtr acquisitionData, ctkPluginContext* pluginContext) :
+RegistrationManager::RegistrationManager(RegistrationServicePtr registrationService, AcquisitionDataPtr acquisitionData) :
 		mAcquisitionData(acquisitionData),
-		mRegistrationService(new cx::RegistrationServiceProxy(pluginContext))
+		mRegistrationService(registrationService)
 {
 	connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
 	connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));

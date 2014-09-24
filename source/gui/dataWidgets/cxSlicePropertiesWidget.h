@@ -35,10 +35,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <QtGui>
 #include "cxTabbedWidget.h"
-class ctkPluginContext;
 
 namespace cx
 {
+
 /**
  * \file
  * \addtogroup cx_gui
@@ -57,7 +57,7 @@ class SlicePropertiesWidget : public TabbedWidget
   Q_OBJECT
 
 public:
-	SlicePropertiesWidget(ctkPluginContext *pluginContext, QWidget* parent);
+	SlicePropertiesWidget(cx::PatientModelServicePtr patientModelService, QWidget* parent);
 	virtual ~SlicePropertiesWidget();
   virtual QString defaultWhatsThis() const;
 

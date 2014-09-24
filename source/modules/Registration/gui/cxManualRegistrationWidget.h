@@ -59,7 +59,7 @@ class ManualImageRegistrationWidget: public RegistrationBaseWidget
 {
 Q_OBJECT
 public:
-	ManualImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent);
+	ManualImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
 	virtual ~ManualImageRegistrationWidget()
 	{
 	}
@@ -97,8 +97,8 @@ private:
 class ManualImage2ImageRegistrationWidget : public ManualImageRegistrationWidget
 {
 public:
-	ManualImage2ImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
-		ManualImageRegistrationWidget(pluginContext, parent) {}
+	ManualImage2ImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+		ManualImageRegistrationWidget(registrationService, patientModelService, parent) {}
 	virtual QString getDescription();
 	virtual Transform3D getMatrixFromBackend();
 	virtual void setMatrixFromWidget(Transform3D M);
@@ -119,8 +119,8 @@ public:
 class ManualImageTransformRegistrationWidget : public ManualImageRegistrationWidget
 {
 public:
-	ManualImageTransformRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
-		ManualImageRegistrationWidget(pluginContext, parent) {}
+	ManualImageTransformRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+		ManualImageRegistrationWidget(registrationService, patientModelService, parent) {}
 	virtual QString getDescription();
 	virtual Transform3D getMatrixFromBackend();
 	virtual void setMatrixFromWidget(Transform3D M);
@@ -139,7 +139,7 @@ class ManualPatientRegistrationWidget: public RegistrationBaseWidget
 {
 Q_OBJECT
 public:
-ManualPatientRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent);
+ManualPatientRegistrationWidget(RegistrationServicePtr registrationService, QWidget* parent);
 	virtual ~ManualPatientRegistrationWidget()
 	{
 	}

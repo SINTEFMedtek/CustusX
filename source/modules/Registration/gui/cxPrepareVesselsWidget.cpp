@@ -55,17 +55,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 //------------------------------------------------------------------------------
-PrepareVesselsWidget::PrepareVesselsWidget(ctkPluginContext *pluginContext, QWidget* parent) :
-		RegistrationBaseWidget(pluginContext, parent, "PrepareVesselsWidget", "PrepareVesselsWidget")
+PrepareVesselsWidget::PrepareVesselsWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+		RegistrationBaseWidget(registrationService, parent, "PrepareVesselsWidget", "PrepareVesselsWidget")
 {  
     XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("registration").descend("PrepareVesselsWidget");
   // fill the pipeline with filters:
-	mPipeline.reset(new Pipeline(pluginContext));
+	mPipeline.reset(new Pipeline(patientModelService));
   FilterGroupPtr filters(new FilterGroup(options.descend("pipeline")));
-	filters->append(FilterPtr(new ResampleImageFilter(pluginContext)));
-	filters->append(FilterPtr(new SmoothingImageFilter(pluginContext)));
-	filters->append(FilterPtr(new BinaryThresholdImageFilter(pluginContext)));
-	filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(pluginContext)));
+	filters->append(FilterPtr(new ResampleImageFilter(patientModelService)));
+	filters->append(FilterPtr(new SmoothingImageFilter(patientModelService)));
+	filters->append(FilterPtr(new BinaryThresholdImageFilter(patientModelService)));
+	filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(patientModelService)));
   mPipeline->initialize(filters);
 
 //  mPipeline->getNodes()[0]->setValueName("US Image:");

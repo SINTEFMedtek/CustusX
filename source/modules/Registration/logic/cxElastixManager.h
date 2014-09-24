@@ -60,7 +60,7 @@ class ElastixManager : public QObject
 {
 	Q_OBJECT
 public:
-	ElastixManager(ctkPluginContext *pluginContext);
+	ElastixManager(RegistrationServicePtr registrationService);
 	virtual ~ElastixManager();
 
 	BoolDataAdapterXmlPtr getDisplayProcessMessages() { return mDisplayProcessMessages; }

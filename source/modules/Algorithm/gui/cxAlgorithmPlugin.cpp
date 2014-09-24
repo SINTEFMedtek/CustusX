@@ -45,8 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-AlgorithmPlugin::AlgorithmPlugin(ctkPluginContext *pluginContext) :
-	mPluginContext(pluginContext)
+AlgorithmPlugin::AlgorithmPlugin(PatientModelServicePtr patientModelService) :
+	mPatientModelService(patientModelService)
 {}
 
 AlgorithmPlugin::~AlgorithmPlugin()
@@ -57,7 +57,7 @@ std::vector<GUIExtenderService::CategorizedWidget> AlgorithmPlugin::createWidget
 	std::vector<CategorizedWidget> retval;
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-											 new AllFiltersWidget(mPluginContext, NULL),
+											 new AllFiltersWidget(mPatientModelService, NULL),
 	                     "Algorithms"));
 
 	return retval;

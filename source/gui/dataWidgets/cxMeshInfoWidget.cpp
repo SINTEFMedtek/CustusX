@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxMeshInfoWidget.h"
 
-#include <ctkPluginContext.h>
 #include <QVBoxLayout>
 #include "cxImage.h"
 #include "cxReporter.h"
@@ -47,16 +46,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxLogger.h"
+#include "cxPatientModelService.h"
 
 
 namespace cx
 {
 
 
-MeshInfoWidget::MeshInfoWidget(ctkPluginContext *pluginContext, QWidget* parent) :
+MeshInfoWidget::MeshInfoWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
 		InfoWidget(parent, "MeshInfoWidget", "Mesh Properties")//, mMeshPropertiesGroupBox(new QGroupBox(this))
 {
-	this->addWidgets(pluginContext);
+	this->addWidgets(patientModelService);
 	this->meshSelectedSlot();
 }
 
@@ -142,9 +142,9 @@ void MeshInfoWidget::hideEvent(QCloseEvent* event)
   QWidget::closeEvent(event);
 }
 
-void MeshInfoWidget::addWidgets(ctkPluginContext *pluginContext)
+void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 {
-	mSelectMeshWidget = SelectMeshStringDataAdapter::New(pluginContext);
+	mSelectMeshWidget = SelectMeshStringDataAdapter::New(patientModelService);
 	mSelectMeshWidget->setValueName("Surface: ");
 	connect(mSelectMeshWidget.get(), SIGNAL(changed()), this, SLOT(meshSelectedSlot()));
 

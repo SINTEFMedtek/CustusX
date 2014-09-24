@@ -69,19 +69,19 @@ namespace cx
 {
 
 
-WirePhantomWidget::WirePhantomWidget(ctkPluginContext *pluginContext, AcquisitionDataPtr aquisitionData, QWidget* parent) :
-				RegistrationBaseWidget(pluginContext, parent, "WirePhantomWidget", "Wire Phantom Test"),
+WirePhantomWidget::WirePhantomWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, AcquisitionDataPtr aquisitionData, QWidget* parent) :
+				RegistrationBaseWidget(registrationService, parent, "WirePhantomWidget", "Wire Phantom Test"),
 				mAquisitionData(aquisitionData)
 {
     mLastRegistration = Transform3D::Identity();
 
     // fill the pipeline with filters:
-		mPipeline.reset(new Pipeline(pluginContext));
+		mPipeline.reset(new Pipeline(patientModelService));
     XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("registration").descend("WirePhantomWidget");
     FilterGroupPtr filters(new FilterGroup(options));
-		filters->append(FilterPtr(new SmoothingImageFilter(pluginContext)));
-		filters->append(FilterPtr(new BinaryThresholdImageFilter(pluginContext)));
-		filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(pluginContext)));
+		filters->append(FilterPtr(new SmoothingImageFilter(patientModelService)));
+		filters->append(FilterPtr(new BinaryThresholdImageFilter(patientModelService)));
+		filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(patientModelService)));
     mPipeline->initialize(filters);
 
     mPipeline->getNodes()[0]->setValueName("US Image:");

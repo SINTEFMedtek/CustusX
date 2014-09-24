@@ -73,7 +73,7 @@ class LandmarkPatientRegistrationWidget: public LandmarkRegistrationWidget
 Q_OBJECT
 
 public:
-	LandmarkPatientRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName,
+	LandmarkPatientRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName,
 		QString windowTitle); ///< sets up layout and connects signals and slots
 	virtual ~LandmarkPatientRegistrationWidget(); ///< empty
 	virtual QString defaultWhatsThis() const;

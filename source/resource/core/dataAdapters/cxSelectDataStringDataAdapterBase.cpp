@@ -31,17 +31,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxSelectDataStringDataAdapterBase.h"
-#include <ctkPluginContext.h>
-#include "cxPatientModelServiceProxy.h"
+#include "cxPatientModelService.h"
 #include "cxData.h"
 #include "cxImageAlgorithms.h"
 
 namespace cx
 {
 
-SelectDataStringDataAdapterBase::SelectDataStringDataAdapterBase(ctkPluginContext *pluginContext, QString typeRegexp) :
+SelectDataStringDataAdapterBase::SelectDataStringDataAdapterBase(PatientModelServicePtr patientModelService, QString typeRegexp) :
 	mTypeRegexp(typeRegexp),
-	mPatientModelService(new cx::PatientModelServiceProxy(pluginContext))
+	mPatientModelService(patientModelService)
 {
 	mValueName = "Select data";
 	mHelp = mValueName;

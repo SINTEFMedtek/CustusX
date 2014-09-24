@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QPushButton;
 class QGroupBox;
 class QLineEdit;
-class ctkPluginContext;
 
 namespace cx
 {
@@ -61,7 +60,7 @@ class ToolTipSampleWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  ToolTipSampleWidget(ctkPluginContext *pluginContext, QWidget* parent);
+  ToolTipSampleWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   ~ToolTipSampleWidget();
   virtual QString defaultWhatsThis() const;
 

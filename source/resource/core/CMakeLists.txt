@@ -63,6 +63,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	dataAdapters/cxDoublePairDataAdapter.h
 	dataAdapters/cxDoublePairDataAdapterXml
 	dataAdapters/cxSelectDataStringDataAdapterBase
+	dataAdapters/cxSelectDataStringDataAdapter
 
 	logger/cxReporter
 	logger/cxMessageListener

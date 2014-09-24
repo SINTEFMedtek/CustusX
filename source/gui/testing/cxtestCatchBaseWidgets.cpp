@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 
 #include "cxLogicManager.h"
+#include "cxPatientModelService.h"
 
 //cxBaseWidget children in alphabetical order
 #include "cxActiveToolWidget.h"
@@ -147,11 +148,12 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 {
 	init();
 	QWidget* testParent = new QWidget();
-	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
+//	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
+	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject(); //moc PatientModelService with the null object
 
 	testAndDeleteBaseWidgetChild(new cx::ActiveToolWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::ActiveVolumeWidget(pluginContext, testParent));
-	testAndDeleteBaseWidgetChild(new cx::ClippingWidget(pluginContext, testParent));
+	testAndDeleteBaseWidgetChild(new cx::ActiveVolumeWidget(patientModelService, testParent));
+	testAndDeleteBaseWidgetChild(new cx::ClippingWidget(patientModelService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::ColorWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::CroppingWidget(testParent));
 //	testAndDeleteBaseWidgetChild(new cx::DataSelectWidget(testParent));//special case: Needs a SelectDataStringDataAdapterBasePtr moc object
@@ -203,20 +205,22 @@ TEST_CASE("FileWatcherWidgets are correctly constructed", "[unit][gui][widget][n
 TEST_CASE("TabbedWidgets are correctly constructed", "[unit][gui][widget][not_win32]")
 {
 	init();
-	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
+//	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
+	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject(); //moc PatientModelService with null object
 	//cxTabbedWidgets
-	testAndDeleteBaseWidgetChild(new cx::SlicePropertiesWidget(pluginContext, NULL));
-	testAndDeleteBaseWidgetChild(new cx::VolumePropertiesWidget(pluginContext, NULL));
+	testAndDeleteBaseWidgetChild(new cx::SlicePropertiesWidget(patientModelService, NULL));
+	testAndDeleteBaseWidgetChild(new cx::VolumePropertiesWidget(patientModelService, NULL));
 	shutdown();
 }
 
 TEST_CASE("InfoWidgets are correctly constructed", "[unit][gui][widget][not_win32]")
 {
 	init();
-	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
+//	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
+	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject(); //moc PatientModelService with null object
 	//cxInfoWidgets
 	testAndDeleteBaseWidgetChild(new cx::VolumeInfoWidget(NULL));
-	testAndDeleteBaseWidgetChild(new cx::MeshInfoWidget(pluginContext, NULL));
+	testAndDeleteBaseWidgetChild(new cx::MeshInfoWidget(patientModelService, NULL));
 	shutdown();
 }
 

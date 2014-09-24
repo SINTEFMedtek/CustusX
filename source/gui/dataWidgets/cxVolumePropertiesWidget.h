@@ -36,8 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTabbedWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxDataInterface.h"
-#include "cxActiveImageProxy.h"
-class ctkPluginContext;
 
 namespace cx
 {
@@ -52,7 +50,7 @@ class ActiveVolumeWidget : public BaseWidget
 {
   Q_OBJECT
 public:
-	ActiveVolumeWidget(ctkPluginContext *pluginContext, QWidget* parent);
+	ActiveVolumeWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   ~ActiveVolumeWidget() {}
 
   virtual QString defaultWhatsThis() const;
@@ -70,7 +68,7 @@ class VolumePropertiesWidget : public TabbedWidget
 {
   Q_OBJECT
 public:
-	VolumePropertiesWidget(ctkPluginContext *pluginContext, QWidget* parent);
+	VolumePropertiesWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~VolumePropertiesWidget(){};
 
   virtual QString defaultWhatsThis() const;

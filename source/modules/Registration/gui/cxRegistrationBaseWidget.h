@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXREGISTRATIONBASEWIDGET_H_
 
 #include "cxBaseWidget.h"
-#include <ctkPluginContext.h>
-#include "boost/shared_ptr.hpp"
 #include "cxRegistrationServiceProxy.h"
 
 namespace cx
@@ -50,7 +48,7 @@ class RegistrationBaseWidget : public BaseWidget
 {
 //  Q_OBJECT
 public:
-	RegistrationBaseWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName, QString windowTitle);
+	RegistrationBaseWidget(RegistrationServicePtr registrationService, QWidget *parent, QString objectName, QString windowTitle);
   virtual ~RegistrationBaseWidget() {}
 
 protected:

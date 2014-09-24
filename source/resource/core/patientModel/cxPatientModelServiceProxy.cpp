@@ -71,6 +71,7 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 	connect(service, SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
 	connect(service, SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
 	connect(service, SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
+	connect(service, SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
 	if(mPatientModelService->isNull())
 		reportWarning("PatientModelServiceProxy::onServiceAdded mPatientModelService->isNull()");
 }
@@ -81,6 +82,7 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 	disconnect(service, SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
 	disconnect(service, SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
 	disconnect(service, SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
+	disconnect(service, SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
 	mPatientModelService = PatientModelService::getNullObject();
 }
 
@@ -119,6 +121,16 @@ Transform3D PatientModelServiceProxy::get_rMpr() const
 	return mPatientModelService->get_rMpr();
 }
 
+ImagePtr PatientModelServiceProxy::getActiveImage() const
+{
+	return mPatientModelService->getActiveImage();
+}
+
+void PatientModelServiceProxy::setActiveImage(ImagePtr activeImage)
+{
+	mPatientModelService->setActiveImage(activeImage);
+}
+
 void PatientModelServiceProxy::autoSave()
 {
 	mPatientModelService->autoSave();
@@ -137,6 +149,46 @@ bool PatientModelServiceProxy::getDebugMode() const
 void PatientModelServiceProxy::setDebugMode(bool on)
 {
 	mPatientModelService->setDebugMode(on);
+}
+
+cx::ImagePtr cx::PatientModelServiceProxy::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, cx::ImagePtr parentImage, QString filePath)
+{
+	return mPatientModelService->createDerivedImage(data, uid, name, parentImage, filePath);
+}
+
+MeshPtr PatientModelServiceProxy::createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath)
+{
+	return mPatientModelService->createMesh(data, uidBase, nameBase, filePath);
+}
+
+void PatientModelServiceProxy::loadData(DataPtr data)
+{
+	mPatientModelService->loadData(data);
+}
+
+void PatientModelServiceProxy::saveData(DataPtr data, const QString &basePath)
+{
+	mPatientModelService->saveData(data, basePath);
+}
+
+void PatientModelServiceProxy::saveImage(ImagePtr image, const QString &basePath)
+{
+	mPatientModelService->saveImage(image, basePath);
+}
+
+void PatientModelServiceProxy::saveMesh(MeshPtr mesh, const QString &basePath)
+{
+	mPatientModelService->saveMesh(mesh, basePath);
+}
+
+std::map<QString, VideoSourcePtr> PatientModelServiceProxy::getStreams() const
+{
+	return mPatientModelService->getStreams();
+}
+
+QString PatientModelServiceProxy::getActivePatientFolder() const
+{
+	return mPatientModelService->getActivePatientFolder();
 }
 
 } //cx

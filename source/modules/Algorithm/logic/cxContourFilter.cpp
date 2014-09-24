@@ -59,8 +59,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ContourFilter::ContourFilter(ctkPluginContext *pluginContext) :
-	FilterImpl(pluginContext)
+ContourFilter::ContourFilter(PatientModelServicePtr patientModelService) :
+	FilterImpl(patientModelService)
 {
 }
 
@@ -149,7 +149,7 @@ void ContourFilter::createInputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New(mPluginContext);
+	temp = SelectImageStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for contouring");
 	connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
@@ -160,7 +160,7 @@ void ContourFilter::createOutputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectMeshStringDataAdapter::New(mPluginContext);
+	temp = SelectMeshStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Output");
 	temp->setHelp("Output contour");
 	mOutputTypes.push_back(temp);

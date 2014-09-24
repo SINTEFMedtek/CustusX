@@ -41,13 +41,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ManualImageRegistrationWidget::ManualImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
-				RegistrationBaseWidget(pluginContext, parent, "ManualImageRegistrationWidget",
+ManualImageRegistrationWidget::ManualImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+				RegistrationBaseWidget(registrationService, parent, "ManualImageRegistrationWidget",
 								"Manual Image Registration"), mVerticalLayout(new QVBoxLayout(this))
 {
-	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(logicManager()->getPluginContext()));
+	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(registrationService, patientModelService));
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedImage));
-	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(logicManager()->getPluginContext()));
+	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(registrationService, patientModelService));
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mMovingImage));
 
 	mLabel = new QLabel("Data matrix rMd");
@@ -192,8 +192,8 @@ void ManualImageTransformRegistrationWidget::setMatrixFromWidget(Transform3D M)
 // --------------------------------------------------------
 // --------------------------------------------------------
 
-ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
-				RegistrationBaseWidget(pluginContext, parent, "ManualPatientRegistrationWidget",
+ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(RegistrationServicePtr registrationService, QWidget* parent) :
+				RegistrationBaseWidget(registrationService, parent, "ManualPatientRegistrationWidget",
 								"Manual Patient Registration"), mVerticalLayout(new QVBoxLayout(this))
 {
 	mVerticalLayout->addWidget(new QLabel("<b>Patient Registration matrix rMpr</b>"));

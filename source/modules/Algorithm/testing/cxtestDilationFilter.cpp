@@ -40,15 +40,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include "cxImage.h"
 #include "cxLegacySingletons.h"
-#include "cxLogicManager.h"
+#include "cxPatientModelService.h"
 
 TEST_CASE("DilationFilter: execute", "[modules][Algorithm][DilationFilter]")
 {
-	cx::LogicManager::initialize();
-	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
+//	cx::LogicManager::initialize();
+//	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
+	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject();//moc PatientModelService
 
 	// Setup filter
-	cx::DilationFilterPtr filter = cx::DilationFilterPtr(new cx::DilationFilter(pluginContext));
+	cx::DilationFilterPtr filter = cx::DilationFilterPtr(new cx::DilationFilter(patientModelService));
 	REQUIRE(filter);
 	filter->getInputTypes();
 	filter->getOutputTypes();
@@ -103,5 +104,5 @@ TEST_CASE("DilationFilter: execute", "[modules][Algorithm][DilationFilter]")
 		REQUIRE(output[1]->getData());
 	}
 
-	cx::LogicManager::shutdown();
+//	cx::LogicManager::shutdown();
 }

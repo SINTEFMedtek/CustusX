@@ -57,13 +57,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(ctkPluginContext *pluginContext,
+LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService,
 	QWidget* parent, QString objectName, QString windowTitle) :
-	LandmarkRegistrationWidget(pluginContext, parent, objectName, windowTitle), mToolSampleButton(new QPushButton(
+	LandmarkRegistrationWidget(registrationService, parent, objectName, windowTitle), mToolSampleButton(new QPushButton(
 		"Sample Tool", this))
 {
 	mImageLandmarkSource = ImageLandmarksSource::New();
-	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(logicManager()->getPluginContext()));
+	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(registrationService, patientModelService));
 	connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedDataChanged()));
 	connect(dataManager(), SIGNAL(rMprChanged()), this, SLOT(setModified()));
 

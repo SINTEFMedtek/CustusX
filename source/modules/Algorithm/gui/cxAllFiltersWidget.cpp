@@ -56,17 +56,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-AllFiltersWidget::AllFiltersWidget(ctkPluginContext *pluginContext, QWidget* parent) :
+AllFiltersWidget::AllFiltersWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
     BaseWidget(parent, "FilterWidget", "Configurable Filter")
 {
 	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("filterwidget");
 	mFilters.reset(new FilterGroup(options));
-	mFilters->append(FilterPtr(new BinaryThresholdImageFilter(pluginContext)));
-	mFilters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(pluginContext)));
-	mFilters->append(FilterPtr(new ContourFilter(pluginContext)));
-	mFilters->append(FilterPtr(new SmoothingImageFilter(pluginContext)));
-	mFilters->append(FilterPtr(new ResampleImageFilter(pluginContext)));
-	mFilters->append(FilterPtr(new DilationFilter(pluginContext)));
+	mFilters->append(FilterPtr(new BinaryThresholdImageFilter(patientModelService)));
+	mFilters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(patientModelService)));
+	mFilters->append(FilterPtr(new ContourFilter(patientModelService)));
+	mFilters->append(FilterPtr(new SmoothingImageFilter(patientModelService)));
+	mFilters->append(FilterPtr(new ResampleImageFilter(patientModelService)));
+	mFilters->append(FilterPtr(new DilationFilter(patientModelService)));
 
 	mServiceListener.reset(
 			new ServiceTrackerListener<Filter>(

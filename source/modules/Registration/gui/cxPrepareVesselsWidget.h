@@ -62,7 +62,7 @@ class PrepareVesselsWidget : public RegistrationBaseWidget
   Q_OBJECT
 
 public:
-	PrepareVesselsWidget(ctkPluginContext *pluginContext, QWidget* parent);
+	PrepareVesselsWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~PrepareVesselsWidget();
   virtual QString defaultWhatsThis() const;
 

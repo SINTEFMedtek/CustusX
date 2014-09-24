@@ -43,11 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-PlateRegistrationWidget::PlateRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
-		RegistrationBaseWidget(pluginContext, parent, "PlateRegistrationWidget", "Plate Registration"),
+PlateRegistrationWidget::PlateRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+		RegistrationBaseWidget(registrationService, parent, "PlateRegistrationWidget", "Plate Registration"),
     mPlateRegistrationButton(new QPushButton("Load registration points", this)),
 		mReferenceToolInfoLabel(new QLabel("", this)),
-		mPatientModelService(new PatientModelServiceProxy(pluginContext))
+		mPatientModelService(patientModelService)
 {
   connect(mPlateRegistrationButton, SIGNAL(clicked()), this, SLOT(plateRegistrationSlot()));
   connect(toolManager(), SIGNAL(configured()), this, SLOT(internalUpdate()));

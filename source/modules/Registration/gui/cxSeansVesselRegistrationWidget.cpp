@@ -57,11 +57,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
-	RegistrationBaseWidget(pluginContext, parent, "SeansVesselRegistrationWidget", "Seans Vessel Registration"),
+SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+	RegistrationBaseWidget(registrationService, parent, "SeansVesselRegistrationWidget", "Seans Vessel Registration"),
 		mLTSRatioSpinBox(new QSpinBox()), mLinearCheckBox(new QCheckBox()), mAutoLTSCheckBox(new QCheckBox()),
-		mRegisterButton(new QPushButton("Register")),
-		mPluginContext(pluginContext)
+		mRegisterButton(new QPushButton("Register"))
 {
 	mRegisterButton->setEnabled(false);
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
@@ -85,9 +84,9 @@ SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(ctkPluginContext *p
 	QGridLayout* entryLayout = new QGridLayout;
 	entryLayout->setColumnStretch(1, 1);
 
-	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(logicManager()->getPluginContext()));
+	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(registrationService, patientModelService));
 	new LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
-	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(logicManager()->getPluginContext()));
+	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(registrationService, patientModelService));
 	new LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
 
 	layout->addLayout(entryLayout, 0, 0, 2, 2);
@@ -195,8 +194,8 @@ void SeansVesselRegistrationWidget::registerSlot()
 class SeansVesselRegistrationDebugger
 {
 public:
-	SeansVesselRegistrationDebugger(ctkPluginContext *pluginContext, double ltsRatio, bool linear) :
-		mRegistrationService(new RegistrationServiceProxy(pluginContext))
+	SeansVesselRegistrationDebugger(RegistrationServicePtr registrationService, double ltsRatio, bool linear) :
+		mRegistrationService(registrationService)
 	{
 		mRegistrator.mt_doOnlyLinear = linear;
 		mRegistrator.mt_ltsRatio = ltsRatio;
@@ -331,7 +330,7 @@ private:
 
 void SeansVesselRegistrationWidget::debugInit()
 {
-	mDebugger.reset(new SeansVesselRegistrationDebugger(mPluginContext, mLTSRatioSpinBox->value(),
+	mDebugger.reset(new SeansVesselRegistrationDebugger(mRegistrationService, mLTSRatioSpinBox->value(),
 		mLinearCheckBox->isChecked()));
 }
 void SeansVesselRegistrationWidget::debugRunOneLinearStep()

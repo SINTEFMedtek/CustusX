@@ -58,10 +58,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ElastixWidget::ElastixWidget(ctkPluginContext *pluginContext, QWidget* parent) :
-				RegistrationBaseWidget(pluginContext, parent, "ElastiXWidget", "ElastiX Registration")
+ElastixWidget::ElastixWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+				RegistrationBaseWidget(registrationService, parent, "ElastiXWidget", "ElastiX Registration")
 {
-	mElastixManager.reset(new ElastixManager(pluginContext));
+	mElastixManager.reset(new ElastixManager(registrationService));
 	connect(mElastixManager.get(), SIGNAL(elastixChanged()), this, SLOT(elastixChangedSlot()));
 
 	mRegisterButton = new QPushButton("Register");
@@ -79,9 +79,9 @@ ElastixWidget::ElastixWidget(ctkPluginContext *pluginContext, QWidget* parent) :
 	QGridLayout* entryLayout = new QGridLayout;
 	entryLayout->setColumnStretch(1, 1);
 
-	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(logicManager()->getPluginContext()));
+	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(registrationService, patientModelService));
 	new LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
-	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(logicManager()->getPluginContext()));
+	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(registrationService, patientModelService));
 	new LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
 
 //	StringDataAdapterXmlPtr mSettings;

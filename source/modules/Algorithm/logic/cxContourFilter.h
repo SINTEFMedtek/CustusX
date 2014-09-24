@@ -51,7 +51,7 @@ class ContourFilter : public FilterImpl
 	Q_OBJECT
 
 public:
-	ContourFilter(ctkPluginContext *pluginContext);
+	ContourFilter(PatientModelServicePtr patientModelService);
 	virtual ~ContourFilter() {}
 
 	virtual QString getType() const;

@@ -139,34 +139,34 @@ QString ManualRegistrationsWidget::defaultWhatsThis() const
 
 //------------------------------------------------------------------------------
 
-RegistrationMethodsWidget::RegistrationMethodsWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName, QString windowTitle) :
+RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle) :
   TabbedWidget(parent, objectName, windowTitle)
 {
 
 
   //landmark
   LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(this, "LandmarkRegistrationWidget", "Landmark Registrations");
-	LandmarkImageRegistrationWidget* imageRegistrationWidget = new LandmarkImageRegistrationWidget(pluginContext, landmarkRegistrationsWidget, "LMImageRegistrationWidget", "Image Registration");
-	LandmarkPatientRegistrationWidget* patientRegistrationWidget = new LandmarkPatientRegistrationWidget(pluginContext, landmarkRegistrationsWidget, "LMPatientRegistrationWidget", "Patient Registration");
-	LandmarkImage2ImageRegistrationWidget* image2imageRegistrationWidget = new LandmarkImage2ImageRegistrationWidget(pluginContext, landmarkRegistrationsWidget, "LMImage2ImageRegistrationWidget", "Image2Image Registration");
+	LandmarkImageRegistrationWidget* imageRegistrationWidget = new LandmarkImageRegistrationWidget(registrationService, patientModelService, landmarkRegistrationsWidget, "LMImageRegistrationWidget", "Image Registration");
+	LandmarkPatientRegistrationWidget* patientRegistrationWidget = new LandmarkPatientRegistrationWidget(registrationService, patientModelService, landmarkRegistrationsWidget, "LMPatientRegistrationWidget", "Patient Registration");
+	LandmarkImage2ImageRegistrationWidget* image2imageRegistrationWidget = new LandmarkImage2ImageRegistrationWidget(registrationService, patientModelService, landmarkRegistrationsWidget, "LMImage2ImageRegistrationWidget", "Image2Image Registration");
   landmarkRegistrationsWidget->addTab(imageRegistrationWidget, "Image");
   landmarkRegistrationsWidget->addTab(patientRegistrationWidget, "Image2Patient");
   landmarkRegistrationsWidget->addTab(image2imageRegistrationWidget, "Image2Image");
 
   //fast
   FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget(this, "FastRegistrationWidget", "Fast Registrations");
-	FastOrientationRegistrationWidget* fastOrientationRegistrationWidget = new FastOrientationRegistrationWidget(pluginContext, fastRegistrationsWidget);
-	FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(pluginContext, fastRegistrationsWidget, "FastImageRegistrationWidget", "Fast Image Registration");
-	FastPatientRegistrationWidget* fastPatientRegistrationWidget = new FastPatientRegistrationWidget(pluginContext, fastRegistrationsWidget);
+	FastOrientationRegistrationWidget* fastOrientationRegistrationWidget = new FastOrientationRegistrationWidget(registrationService, fastRegistrationsWidget);
+	FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(registrationService, patientModelService, fastRegistrationsWidget, "FastImageRegistrationWidget", "Fast Image Registration");
+	FastPatientRegistrationWidget* fastPatientRegistrationWidget = new FastPatientRegistrationWidget(registrationService, patientModelService, fastRegistrationsWidget);
   fastRegistrationsWidget->addTab(fastOrientationRegistrationWidget, "Orientation");
   fastRegistrationsWidget->addTab(fastImageRegistrationWidget, "Image");
   fastRegistrationsWidget->addTab(fastPatientRegistrationWidget, "Image2Patient");
 
   //fast
   ManualRegistrationsWidget* manRegWidget = new ManualRegistrationsWidget(this, "ManualRegistrationWidget", "Manual Registrations");
-	ManualImage2ImageRegistrationWidget* manImage2ImageRegWidget = new ManualImage2ImageRegistrationWidget(pluginContext, manRegWidget);
-	ManualImageTransformRegistrationWidget* manImageTransformRegWidget = new ManualImageTransformRegistrationWidget(pluginContext, manRegWidget);
-	ManualPatientRegistrationWidget* manPatientRegWidget = new ManualPatientRegistrationWidget(pluginContext, manRegWidget);
+	ManualImage2ImageRegistrationWidget* manImage2ImageRegWidget = new ManualImage2ImageRegistrationWidget(registrationService, patientModelService, manRegWidget);
+	ManualImageTransformRegistrationWidget* manImageTransformRegWidget = new ManualImageTransformRegistrationWidget(registrationService, patientModelService, manRegWidget);
+	ManualPatientRegistrationWidget* manPatientRegWidget = new ManualPatientRegistrationWidget(registrationService, manRegWidget);
   manRegWidget->addTab(manImage2ImageRegWidget, "Image2Image");
   manRegWidget->addTab(manImageTransformRegWidget, "Image Transform");
   manRegWidget->addTab(manPatientRegWidget, "Patient");
@@ -175,29 +175,29 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(ctkPluginContext *pluginCon
   //vessel based image to image
   Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(this, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
 
-	PrepareVesselsWidget* prepareRegistrationWidget = new PrepareVesselsWidget(pluginContext, image2imageWidget);
+	PrepareVesselsWidget* prepareRegistrationWidget = new PrepareVesselsWidget(registrationService, patientModelService, image2imageWidget);
 
   image2imageWidget->addTab(prepareRegistrationWidget, "Prepare"); //should be application specific
-	image2imageWidget->addTab(new RegisterI2IWidget(pluginContext, image2imageWidget),"Register");
+	image2imageWidget->addTab(new RegisterI2IWidget(registrationService, patientModelService, image2imageWidget),"Register");
 
   //patient orientation
-	PatientOrientationWidget* patientOrientationWidget = new PatientOrientationWidget(pluginContext, this);
+	PatientOrientationWidget* patientOrientationWidget = new PatientOrientationWidget(registrationService, patientModelService, this);
 
   //plate
-  Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget(this, "PlateRegistrationWidget", "Plate");
-	PlateImageRegistrationWidget* platesImageRegistrationWidget = new PlateImageRegistrationWidget(pluginContext, imageAndPlateRegistrationWidget);
-	PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(pluginContext, imageAndPlateRegistrationWidget);
+	Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget(this, "PlateRegistrationWidget", "Plate");
+	PlateImageRegistrationWidget* platesImageRegistrationWidget = new PlateImageRegistrationWidget(registrationService, patientModelService, imageAndPlateRegistrationWidget);
+	PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(registrationService, patientModelService, imageAndPlateRegistrationWidget);
   imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
   imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");
 
   this->addTab(landmarkRegistrationsWidget, "Landmark");
   this->addTab(fastRegistrationsWidget, "Fast");
   this->addTab(manRegWidget, "Manual");
-	this->addTab(new ElastixWidget(pluginContext, this), "ElastiX");
+	this->addTab(new ElastixWidget(registrationService, patientModelService, this), "ElastiX");
   this->addTab(image2imageWidget, "Vessel");
   this->addTab(patientOrientationWidget, "Patient Orientation");
   this->addTab(imageAndPlateRegistrationWidget, "Plate");
-	this->addTab(new BronchoscopyRegistrationWidget(pluginContext, this), "Bronchoscopy");
+	this->addTab(new BronchoscopyRegistrationWidget(registrationService, patientModelService, this), "Bronchoscopy");
 
   connect(mTabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChangedSlot(int)));
   mTabWidget->setCurrentIndex(settings()->value("registration/tabIndex").toInt());

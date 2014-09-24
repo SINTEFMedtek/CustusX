@@ -55,11 +55,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
-	RegistrationBaseWidget(pluginContext, parent, "BronchoscopyRegistrationWidget",
+BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+	RegistrationBaseWidget(registrationService, parent, "BronchoscopyRegistrationWidget",
 						   "Bronchoscopy Registration"), mVerticalLayout(new QVBoxLayout(this))
 {
-	mSelectMeshWidget = SelectMeshStringDataAdapter::New(pluginContext);
+	mSelectMeshWidget = SelectMeshStringDataAdapter::New(patientModelService);
 	mSelectMeshWidget->setValueName("Centerline: ");
 
 	mRegisterButton = new QPushButton("Register");

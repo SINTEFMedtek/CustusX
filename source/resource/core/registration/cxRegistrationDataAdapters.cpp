@@ -30,20 +30,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "cxRegistrationDataAdapters.h"
-#include <ctkPluginContext.h>
 #include "cxTypeConversions.h"
-#include "cxRegistrationServiceProxy.h"
-#include "cxPatientModelServiceProxy.h"
+#include "cxRegistrationService.h"
+#include "cxPatientModelService.h"
 #include "cxData.h"
 
 namespace cx
 {
 
 
-RegistrationFixedImageStringDataAdapter::RegistrationFixedImageStringDataAdapter(ctkPluginContext *pluginContext) :
-	SelectDataStringDataAdapterBase(pluginContext),
-	mRegistrationService(new cx::RegistrationServiceProxy(pluginContext)),
-	mPatientModelService(new cx::PatientModelServiceProxy(pluginContext))
+RegistrationFixedImageStringDataAdapter::RegistrationFixedImageStringDataAdapter(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService) :
+	SelectDataStringDataAdapterBase(patientModelService),
+	mRegistrationService(registrationService),
+	mPatientModelService(patientModelService)
 {
   mValueName = "Fixed Volume";
   mHelp = "Select the fixed registration data";
@@ -70,10 +69,10 @@ QString RegistrationFixedImageStringDataAdapter::getValue() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-RegistrationMovingImageStringDataAdapter::RegistrationMovingImageStringDataAdapter(ctkPluginContext *pluginContext) :
-	SelectDataStringDataAdapterBase(pluginContext),
-	mRegistrationService(new cx::RegistrationServiceProxy(pluginContext)),
-	mPatientModelService(new cx::PatientModelServiceProxy(pluginContext))
+RegistrationMovingImageStringDataAdapter::RegistrationMovingImageStringDataAdapter(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService) :
+	SelectDataStringDataAdapterBase(patientModelService),
+	mRegistrationService(registrationService),
+	mPatientModelService(patientModelService)
 {
 	mValueName = "Moving Volume";
 	mHelp = "Select the moving registration data";

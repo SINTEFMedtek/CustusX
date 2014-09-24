@@ -36,10 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxStringDataAdapter.h"
-//#include "cxViewManager.h"
-//#include "cxDataInterface.h"
 class QCheckBox;
-class ctkPluginContext;
 
 namespace cx
 {
@@ -92,7 +89,7 @@ class ClippingWidget: public BaseWidget
 Q_OBJECT
 
 public:
-	ClippingWidget(ctkPluginContext *pluginContext, QWidget* parent);
+	ClippingWidget(cx::PatientModelServicePtr patientModelService, QWidget* parent);
 	virtual QString defaultWhatsThis() const;
 
 private:
@@ -102,6 +99,7 @@ private:
 	QCheckBox* mInvertPlaneCheckBox;
 	StringDataAdapterPtr mPlaneAdapter;
 	SelectImageStringDataAdapterPtr mImageAdapter;
+	PatientModelServicePtr mPatientModelService;
 private slots:
 	void clipperChangedSlot();
 	void clearButtonClickedSlot();

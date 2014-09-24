@@ -58,11 +58,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent,
+LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent,
 	QString objectName, QString windowTitle) :
-	LandmarkRegistrationWidget(pluginContext, parent, objectName, windowTitle)
+	LandmarkRegistrationWidget(registrationService, parent, objectName, windowTitle)
 {
-	mCurrentDataAdapter = SelectDataStringDataAdapter::New(pluginContext);
+	mCurrentDataAdapter = SelectDataStringDataAdapter::New(patientModelService);
 	connect(mCurrentDataAdapter.get(), SIGNAL(changed()), this, SLOT(onCurrentImageChanged()));
 	mImageLandmarkSource = ImageLandmarksSource::New();
 

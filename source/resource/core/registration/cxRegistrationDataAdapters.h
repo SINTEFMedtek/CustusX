@@ -32,9 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONDATAADAPTERS_H_
 #define CXREGISTRATIONDATAADAPTERS_H_
 
-//#include "cxDataInterface.h"
 #include "cxSelectDataStringDataAdapterBase.h"
-class ctkPluginContext;
 
 namespace cx
 {
@@ -54,7 +52,7 @@ class RegistrationFixedImageStringDataAdapter : public SelectDataStringDataAdapt
 {
   Q_OBJECT
 public:
-	RegistrationFixedImageStringDataAdapter(ctkPluginContext *pluginContext);
+	RegistrationFixedImageStringDataAdapter(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService);
   virtual ~RegistrationFixedImageStringDataAdapter() {}
 
 public: // basic methods
@@ -74,7 +72,7 @@ class RegistrationMovingImageStringDataAdapter : public SelectDataStringDataAdap
 {
   Q_OBJECT
 public:
-	RegistrationMovingImageStringDataAdapter(ctkPluginContext *pluginContext);
+	RegistrationMovingImageStringDataAdapter(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService);
   virtual ~RegistrationMovingImageStringDataAdapter() {}
 
 public: // basic methods

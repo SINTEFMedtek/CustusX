@@ -59,8 +59,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-BinaryThresholdImageFilter::BinaryThresholdImageFilter(ctkPluginContext *pluginContext) :
-	FilterImpl(pluginContext)
+BinaryThresholdImageFilter::BinaryThresholdImageFilter(PatientModelServicePtr patientModelService) :
+	FilterImpl(patientModelService)
 {
 }
 
@@ -122,7 +122,7 @@ void BinaryThresholdImageFilter::createInputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New(mPluginContext);
+	temp = SelectImageStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for thresholding");
 	connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
@@ -133,12 +133,12 @@ void BinaryThresholdImageFilter::createOutputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New(mPluginContext);
+	temp = SelectDataStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Output");
 	temp->setHelp("Output thresholded binary image");
 	mOutputTypes.push_back(temp);
 
-	temp = SelectDataStringDataAdapter::New(mPluginContext);
+	temp = SelectDataStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Contour");
 	temp->setHelp("Output contour generated from thresholded binary image.");
 	mOutputTypes.push_back(temp);

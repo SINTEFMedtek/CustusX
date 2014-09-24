@@ -53,8 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SmoothingImageFilter::SmoothingImageFilter(ctkPluginContext *pluginContext) :
-	FilterImpl(pluginContext)
+SmoothingImageFilter::SmoothingImageFilter(PatientModelServicePtr patientModelService) :
+	FilterImpl(patientModelService)
 {
 }
 
@@ -95,7 +95,7 @@ void SmoothingImageFilter::createInputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New(mPluginContext);
+	temp = SelectImageStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select image input for smoothing");
 	mInputTypes.push_back(temp);
@@ -105,7 +105,7 @@ void SmoothingImageFilter::createOutputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New(mPluginContext);
+	temp = SelectDataStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Output");
 	temp->setHelp("Output smoothed image");
 	mOutputTypes.push_back(temp);

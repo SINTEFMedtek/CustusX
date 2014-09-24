@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPatientModelService.h"
 #include "cxPatientModelServiceNull.h"
+#include "cxImage.h"
+#include "cxMesh.h"
 
 namespace cx
 {
@@ -42,4 +44,38 @@ PatientModelServicePtr PatientModelService::getNullObject()
 		mNull.reset(new PatientModelServiceNull);
 	return mNull;
 }
+
+ImagePtr PatientModelService::getImage(const QString& uid) const
+{
+	return boost::dynamic_pointer_cast<Image>(this->getData(uid));
+}
+
+cx::MeshPtr cx::PatientModelService::getMesh(const QString &uid) const
+{
+	return boost::dynamic_pointer_cast<Mesh>(this->getData(uid));
+}
+
+VideoSourcePtr PatientModelService::getStream(const QString& uid) const
+{
+	std::map<QString, VideoSourcePtr> streams = this->getStreams();
+	if (streams.count(uid))
+		return streams.find(uid)->second;
+	return VideoSourcePtr();
+}
+
+void PatientModelService::saveData(DataPtr data)
+{
+	this->saveData(data, this->getActivePatientFolder());
+}
+
+void PatientModelService::saveImage(ImagePtr image)
+{
+	this->saveImage(image, this->getActivePatientFolder());
+}
+
+void PatientModelService::saveMesh(MeshPtr mesh)
+{
+	this->saveMesh(mesh, this->getActivePatientFolder());
+}
+
 } //cx

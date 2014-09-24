@@ -56,7 +56,7 @@ class AllFiltersWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	AllFiltersWidget(ctkPluginContext *pluginContext, QWidget* parent);
+	AllFiltersWidget(PatientModelServicePtr patientModelService, QWidget* parent);
 	QString defaultWhatsThis() const;
 
 private slots:

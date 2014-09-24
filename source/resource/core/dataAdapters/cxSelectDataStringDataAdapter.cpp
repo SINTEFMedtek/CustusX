@@ -34,44 +34,42 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxImage.h"
 #include "cxMesh.h"
-#include "cxDataManager.h"
 #include "cxTypeConversions.h"
 #include "cxPatientModelServiceProxy.h"
-#include "cxLegacySingletons.h"
 
 namespace cx
 {
 
-ActiveImageStringDataAdapter::ActiveImageStringDataAdapter(ctkPluginContext *pluginContext) :
-	SelectDataStringDataAdapterBase(pluginContext, "image")
+ActiveImageStringDataAdapter::ActiveImageStringDataAdapter(PatientModelServicePtr patientModelService) :
+	SelectDataStringDataAdapterBase(patientModelService, "image")
 {
-  mValueName = "Active Volume";
-  mHelp = "Select the active volume";
+	mValueName = "Active Volume";
+	mHelp = "Select the active volume";
 	connect(mPatientModelService.get(), SIGNAL(activeImageChanged(QString)), this, SIGNAL(changed()));
 }
 
 bool ActiveImageStringDataAdapter::setValue(const QString& value)
 {
-  ImagePtr newImage = dataManager()->getImage(value);
-  if (newImage==dataManager()->getActiveImage())
+  ImagePtr newImage = mPatientModelService->getImage(value);
+  if (newImage==mPatientModelService->getActiveImage())
 	return false;
-  dataManager()->setActiveImage(newImage);
+  mPatientModelService->setActiveImage(newImage);
   return true;
 }
 
 QString ActiveImageStringDataAdapter::getValue() const
 {
-  if (!dataManager()->getActiveImage())
+  if (!mPatientModelService->getActiveImage())
 	return "";
-  return qstring_cast(dataManager()->getActiveImage()->getUid());
+  return qstring_cast(mPatientModelService->getActiveImage()->getUid());
 }
 
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-SelectImageStringDataAdapter::SelectImageStringDataAdapter(ctkPluginContext *pluginContext) :
-	SelectDataStringDataAdapterBase(pluginContext, "image")
+SelectImageStringDataAdapter::SelectImageStringDataAdapter(PatientModelServicePtr patientModelService) :
+	SelectDataStringDataAdapterBase(patientModelService, "image")
 {
 	mValueName = "Select volume";
 	mHelp = "Select a volume";
@@ -94,7 +92,7 @@ QString SelectImageStringDataAdapter::getValue() const
 
 ImagePtr SelectImageStringDataAdapter::getImage()
 {
-  return dataManager()->getImage(mImageUid);
+  return mPatientModelService->getImage(mImageUid);
 }
 
 //---------------------------------------------------------
@@ -102,8 +100,8 @@ ImagePtr SelectImageStringDataAdapter::getImage()
 //---------------------------------------------------------
 
 
-SelectDataStringDataAdapter::SelectDataStringDataAdapter(ctkPluginContext *pluginContext) :
-	SelectDataStringDataAdapterBase(pluginContext, ".*")
+SelectDataStringDataAdapter::SelectDataStringDataAdapter(PatientModelServicePtr patientModelService) :
+	SelectDataStringDataAdapterBase(patientModelService, ".*")
 {
 }
 
@@ -113,7 +111,7 @@ bool SelectDataStringDataAdapter::setValue(const QString& value)
 	return false;
 
   mUid = "";
-  if (dataManager()->getData(value))
+  if (mPatientModelService->getData(value))
 	  mUid = value;
 
   emit changed();
@@ -131,7 +129,7 @@ QString SelectDataStringDataAdapter::getValue() const
 
 DataPtr SelectDataStringDataAdapter::getData() const
 {
-	return dataManager()->getData(mUid);
+	return mPatientModelService->getData(mUid);
 //  return mData;
 }
 
@@ -139,8 +137,8 @@ DataPtr SelectDataStringDataAdapter::getData() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-SelectMeshStringDataAdapter::SelectMeshStringDataAdapter(ctkPluginContext *pluginContext) :
-	SelectDataStringDataAdapterBase(pluginContext, "mesh")
+SelectMeshStringDataAdapter::SelectMeshStringDataAdapter(PatientModelServicePtr patientModelService) :
+	SelectDataStringDataAdapterBase(patientModelService, "mesh")
 {
 	mValueName = "Select mesh";
 	mHelp = "Select a mesh";
@@ -163,7 +161,7 @@ QString SelectMeshStringDataAdapter::getValue() const
 
 MeshPtr SelectMeshStringDataAdapter::getMesh()
 {
-  return dataManager()->getMesh(mMeshUid);
+  return mPatientModelService->getMesh(mMeshUid);
 }
 
 //---------------------------------------------------------

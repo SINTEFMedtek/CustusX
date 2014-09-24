@@ -49,11 +49,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
-ToolTipSampleWidget::ToolTipSampleWidget(ctkPluginContext *pluginContext, QWidget* parent) :
+ToolTipSampleWidget::ToolTipSampleWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
     BaseWidget(parent, "ToolTipSampleWidget", "ToolTip Sample"),
     mSampleButton(new QPushButton("Sample")),
     mSaveToFileNameLabel(new QLabel("<font color=red> No file selected </font>")),
@@ -64,7 +65,7 @@ ToolTipSampleWidget::ToolTipSampleWidget(ctkPluginContext *pluginContext, QWidge
 
   mCoordinateSystems = SelectCoordinateSystemStringDataAdapter::New();
   mTools = SelectToolStringDataAdapter::New();
-	mData = SelectDataStringDataAdapter::New(pluginContext);
+	mData = SelectDataStringDataAdapter::New(patientModelService);
 
   mCoordinateSystemComboBox = new LabeledComboBoxWidget(this, mCoordinateSystems);
   mToolComboBox = new LabeledComboBoxWidget(this, mTools);

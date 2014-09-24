@@ -34,9 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-RegistrationBaseWidget::RegistrationBaseWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName, QString windowTitle) :
+RegistrationBaseWidget::RegistrationBaseWidget(RegistrationServicePtr registrationService, QWidget* parent, QString objectName, QString windowTitle) :
   BaseWidget(parent, objectName, windowTitle),
-	mRegistrationService(new RegistrationServiceProxy(pluginContext))
+	mRegistrationService(registrationService)
 {
 }
 

@@ -54,9 +54,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(ctkPluginContext *pluginContext,
+LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService,
 	QWidget* parent, QString objectName, QString windowTitle) :
-	LandmarkRegistrationWidget(pluginContext, parent, objectName, windowTitle)
+	LandmarkRegistrationWidget(registrationService, parent, objectName, windowTitle)
 {
 	mLandmarkTableWidget->hide();
 
@@ -66,8 +66,8 @@ LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(ctk
 	connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(updateRep()));
 	connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(updateRep()));
 
-	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(logicManager()->getPluginContext()));
-	mMovingDataAdapter.reset(new RegistrationMovingImageStringDataAdapter(logicManager()->getPluginContext()));
+	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(registrationService, patientModelService));
+	mMovingDataAdapter.reset(new RegistrationMovingImageStringDataAdapter(registrationService, patientModelService));
 
 	mTranslationCheckBox = new QCheckBox("Translation only", this);
 	mTranslationCheckBox->setChecked(settings()->value("registration/I2ILandmarkTranslation", false).toBool());

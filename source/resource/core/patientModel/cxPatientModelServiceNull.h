@@ -56,6 +56,17 @@ public:
 	virtual LandmarksPtr getPatientLandmarks() const;
 	virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const;
 	virtual Transform3D get_rMpr() const;
+	virtual ImagePtr getActiveImage() const;
+	virtual void setActiveImage(ImagePtr activeImage);
+	virtual ImagePtr createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath);
+	virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath);
+	virtual void loadData(DataPtr data);
+	virtual void saveData(DataPtr data, const QString& basePath); ///< Save data to file
+	virtual void saveImage(ImagePtr image, const QString& basePath);
+	virtual void saveMesh(MeshPtr mesh, const QString& basePath);
+	virtual std::map<QString, cx::VideoSourcePtr> getStreams() const;
+
+	virtual QString getActivePatientFolder() const;
 
 	virtual void autoSave();
 	virtual bool isNull();
@@ -63,7 +74,7 @@ public:
 	virtual bool getDebugMode() const;
 	virtual void setDebugMode(bool on);
 private:
-	void printWarning();
+	void printWarning() const;
 };
 
 } //cx

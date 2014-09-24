@@ -51,6 +51,7 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 	connect(dataService().get(), SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
 	connect(dataService().get(), SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
 	connect(dataService().get(), SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
+	connect(dataService().get(), SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
 }
 
 PatientModelImplService::~PatientModelImplService()
@@ -61,6 +62,7 @@ PatientModelImplService::~PatientModelImplService()
 		disconnect(dataService().get(), SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
 		disconnect(dataService().get(), SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
 		disconnect(dataService().get(), SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
+		disconnect(dataService().get(), SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
 	}
 }
 
@@ -124,6 +126,56 @@ bool PatientModelImplService::getDebugMode() const
 void PatientModelImplService::setDebugMode(bool on)
 {
 	dataService()->setDebugMode(on);
+}
+
+ImagePtr PatientModelImplService::getActiveImage() const
+{
+	return dataService()->getActiveImage();
+}
+
+void PatientModelImplService::setActiveImage(ImagePtr activeImage)
+{
+	dataService()->setActiveImage(activeImage);
+}
+
+cx::ImagePtr cx::PatientModelImplService::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, cx::ImagePtr parentImage, QString filePath)
+{
+	return dataService()->createDerivedImage(data, uid, name, parentImage, filePath);
+}
+
+MeshPtr PatientModelImplService::createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath)
+{
+	return dataService()->createMesh(data, uidBase, nameBase, filePath);
+}
+
+void PatientModelImplService::loadData(DataPtr data)
+{
+	dataService()->loadData(data);
+}
+
+void PatientModelImplService::saveData(DataPtr data, const QString &basePath)
+{
+	dataService()->saveData(data, basePath);
+}
+
+void PatientModelImplService::saveImage(ImagePtr image, const QString &basePath)
+{
+	dataService()->saveImage(image, basePath);
+}
+
+void PatientModelImplService::saveMesh(MeshPtr mesh, const QString &basePath)
+{
+	dataService()->saveMesh(mesh, basePath);
+}
+
+std::map<QString, VideoSourcePtr> PatientModelImplService::getStreams() const
+{
+	dataService()->getStreams();
+}
+
+QString PatientModelImplService::getActivePatientFolder() const
+{
+	return patientService()->getPatientData()->getActivePatientFolder();
 }
 
 } /* namespace cx */

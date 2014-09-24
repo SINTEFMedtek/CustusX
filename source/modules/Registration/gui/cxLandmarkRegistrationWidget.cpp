@@ -52,9 +52,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-LandmarkRegistrationWidget::LandmarkRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent,
+LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegistrationServicePtr registrationService, QWidget* parent,
 	QString objectName, QString windowTitle) :
-	RegistrationBaseWidget(pluginContext, parent, objectName, windowTitle), mVerticalLayout(new QVBoxLayout(this)),
+	RegistrationBaseWidget(registrationService, parent, objectName, windowTitle), mVerticalLayout(new QVBoxLayout(this)),
 		mLandmarkTableWidget(new QTableWidget(this)), mAvarageAccuracyLabel(new QLabel(QString(" "), this))
 {
 	//table widget

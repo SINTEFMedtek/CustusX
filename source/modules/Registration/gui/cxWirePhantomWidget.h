@@ -61,7 +61,7 @@ class WirePhantomWidget: public RegistrationBaseWidget
 Q_OBJECT
 
 public:
-	WirePhantomWidget(ctkPluginContext *pluginContext, AcquisitionDataPtr aquisitionData, QWidget* parent);
+	WirePhantomWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, AcquisitionDataPtr aquisitionData, QWidget* parent);
 	virtual ~WirePhantomWidget();
 	virtual QString defaultWhatsThis() const;
 

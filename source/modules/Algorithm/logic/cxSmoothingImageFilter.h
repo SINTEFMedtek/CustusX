@@ -49,7 +49,7 @@ class SmoothingImageFilter : public FilterImpl
 	Q_OBJECT
 
 public:
-	SmoothingImageFilter(ctkPluginContext *pluginContext);
+	SmoothingImageFilter(PatientModelServicePtr patientModelService);
 	virtual ~SmoothingImageFilter() {}
 
 	virtual QString getType() const;

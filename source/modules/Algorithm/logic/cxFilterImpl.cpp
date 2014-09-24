@@ -43,8 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-FilterImpl::FilterImpl(ctkPluginContext *pluginContext) :
-	mActive(false), mPluginContext(pluginContext)
+FilterImpl::FilterImpl(PatientModelServicePtr patientModelService) :
+	mActive(false), mPatientModelService(patientModelService)
 {
 }
 

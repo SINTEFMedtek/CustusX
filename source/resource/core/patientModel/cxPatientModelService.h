@@ -37,11 +37,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include "boost/shared_ptr.hpp"
 #include "cxTransform3D.h"
+#include "cxForwardDeclarations.h"
+#include "vtkForwardDeclarations.h"
 class QDateTime;
 
 namespace cx
 {
 typedef boost::shared_ptr<class Data> DataPtr;
+typedef boost::shared_ptr<class Image> ImagePtr;
 }
 
 #define PatientModelService_iid "cx::PatientModelService"
@@ -76,7 +79,7 @@ class PatientModelService : public QObject
 {
 	Q_OBJECT
 public:
-	virtual ~PatientModelService() {};
+	virtual ~PatientModelService() {}
 
 	virtual void insertData(DataPtr data) = 0;
 	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform) = 0;
@@ -85,19 +88,38 @@ public:
 	virtual LandmarksPtr getPatientLandmarks() const = 0;
 	virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const = 0;
 	virtual Transform3D get_rMpr() const = 0;
-	virtual void autoSave() = 0;//TODO remove, and integrate into other functions
+	virtual ImagePtr getActiveImage() const = 0; ///< used for system state
+	virtual void setActiveImage(ImagePtr activeImage) = 0; ///< used for system state
+	virtual ImagePtr createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath = "Images") = 0;
+	virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath) = 0;
+	virtual void loadData(DataPtr data) = 0;
+	virtual void saveData(DataPtr data, const QString& basePath) = 0; ///< Save data to file
+	virtual void saveImage(ImagePtr image, const QString& basePath) = 0;///< Save image to file \param image Image to save \param basePath Absolute path to patient data folder
+	virtual void saveMesh(MeshPtr mesh, const QString& basePath) = 0;///< Save mesh to file \param mesh to save \param basePath Absolute path to patient data folder
+	virtual std::map<QString, VideoSourcePtr> getStreams() const = 0;
 
+	virtual QString getActivePatientFolder() const = 0;
+
+	virtual void autoSave() = 0;//TODO remove, and integrate into other functions
 	virtual bool isNull() = 0;
-	static PatientModelServicePtr getNullObject();
 
 	virtual bool getDebugMode() const = 0;
 	virtual void setDebugMode(bool on) = 0;
 
+	static PatientModelServicePtr getNullObject();
+
+	ImagePtr getImage(const QString& uid) const; ///< Convenience function casting from Data to Image
+	MeshPtr getMesh(const QString& uid) const;  ///< Convenience function casting from Data to Mesh
+	VideoSourcePtr getStream(const QString &uid) const; ///< Convenience function getting a specified stream
+	void saveData(DataPtr data); ///< Convenience funciton for saving data to avtive patient folder
+	void saveImage(ImagePtr image); ///< Convenience funciton for saving image to avtive patient folder
+	void saveMesh(MeshPtr mesh);  ///< Convenience funciton for saving mesh to avtive patient folder
 signals:
 	void dataAddedOrRemoved();
 	void activeImageChanged(const QString& uId);
 	void debugModeChanged(bool on);
 	void rMprChanged();
+	void streamLoaded();
 };
 
 } // namespace cx

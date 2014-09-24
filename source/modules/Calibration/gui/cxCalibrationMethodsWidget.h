@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTabbedWidget.h"
 
 #include "cxAcquisitionData.h"
-class ctkPluginContext;
 
 namespace cx
 {
@@ -48,7 +47,7 @@ namespace cx
 class CalibrationMethodsWidget : public TabbedWidget
 {
 public:
-  CalibrationMethodsWidget(ctkPluginContext *pluginContext, AcquisitionDataPtr acquisitionData,
+  CalibrationMethodsWidget(PatientModelServicePtr patientModelService, AcquisitionDataPtr acquisitionData,
   		QWidget* parent, QString objectName, QString windowTitle);
   virtual ~CalibrationMethodsWidget(){};
   virtual QString defaultWhatsThis() const;

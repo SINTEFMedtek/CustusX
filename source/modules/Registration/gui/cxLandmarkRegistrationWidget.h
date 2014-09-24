@@ -66,7 +66,7 @@ class LandmarkRegistrationWidget: public RegistrationBaseWidget
 Q_OBJECT
 
 public:
-	LandmarkRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName,
+	LandmarkRegistrationWidget(RegistrationServicePtr registrationService, QWidget* parent, QString objectName,
 		QString windowTitle);
 	virtual ~LandmarkRegistrationWidget();
 

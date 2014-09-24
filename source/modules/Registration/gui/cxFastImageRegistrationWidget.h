@@ -56,7 +56,7 @@ class FastImageRegistrationWidget : public LandmarkImageRegistrationWidget
 {
 	Q_OBJECT
 public:
-  FastImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName, QString windowTitle);
+  FastImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle);
  virtual ~FastImageRegistrationWidget();
  virtual QString defaultWhatsThis() const;
 
@@ -68,7 +68,7 @@ class PlateImageRegistrationWidget : public FastImageRegistrationWidget
 {
 	Q_OBJECT
 public:
-	PlateImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent);
+	PlateImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
  virtual ~PlateImageRegistrationWidget();
  virtual QString defaultWhatsThis() const;
 

@@ -44,6 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogicManager.h"
 #include "cxApplication.h"
 #include "cxPluginFramework.h"
+#include "cxPatientModelServiceProxy.h"
+#include "cxRegistrationServiceProxy.h"
 
 
 #include <langinfo.h>
@@ -89,11 +91,15 @@ int main(int argc, char *argv[])
 
 	std::vector<cx::GUIExtenderServicePtr> plugins;
 
+
+	cx::PatientModelServicePtr patientModelService = cx::PatientModelServicePtr(new cx::PatientModelServiceProxy(cx::LogicManager::getInstance()->getPluginContext()));
+	cx::RegistrationServicePtr registrationService = cx::RegistrationServicePtr(new cx::RegistrationServiceProxy(cx::LogicManager::getInstance()->getPluginContext()));
+
 	cx::UsReconstructionPluginPtr reconstructionPlugin(new cx::UsReconstructionPlugin());
 	cx::AcquisitionPluginPtr acquisitionPlugin(new cx::AcquisitionPlugin(reconstructionPlugin->getReconstructer()));
-	cx::CalibrationPluginPtr calibrationPlugin(new cx::CalibrationPlugin(cx::LogicManager::getInstance()->getPluginContext(), acquisitionPlugin->getAcquisitionData()));
-	cx::AlgorithmPluginPtr algorithmPlugin(new cx::AlgorithmPlugin(cx::LogicManager::getInstance()->getPluginContext()));
-	cx::RegistrationPluginPtr registrationPlugin(new cx::RegistrationPlugin(acquisitionPlugin->getAcquisitionData(), cx::LogicManager::getInstance()->getPluginContext()));
+	cx::CalibrationPluginPtr calibrationPlugin(new cx::CalibrationPlugin(patientModelService, acquisitionPlugin->getAcquisitionData()));
+	cx::AlgorithmPluginPtr algorithmPlugin(new cx::AlgorithmPlugin(patientModelService));
+	cx::RegistrationPluginPtr registrationPlugin(new cx::RegistrationPlugin(registrationService, patientModelService, acquisitionPlugin->getAcquisitionData()));
 
 	plugins.push_back(reconstructionPlugin);
 	plugins.push_back(acquisitionPlugin);

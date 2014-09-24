@@ -47,8 +47,8 @@ class ActiveImageStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
-	static ActiveImageStringDataAdapterPtr New(ctkPluginContext *pluginContext) { return ActiveImageStringDataAdapterPtr(new ActiveImageStringDataAdapter(pluginContext)); }
-	ActiveImageStringDataAdapter(ctkPluginContext *pluginContext);
+	static ActiveImageStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return ActiveImageStringDataAdapterPtr(new ActiveImageStringDataAdapter(patientModelService)); }
+	ActiveImageStringDataAdapter(PatientModelServicePtr patientModelService);
   virtual ~ActiveImageStringDataAdapter() {}
 
 public: // basic methods
@@ -66,7 +66,7 @@ class SelectImageStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
-	static SelectImageStringDataAdapterPtr New(ctkPluginContext *pluginContext) { return SelectImageStringDataAdapterPtr(new SelectImageStringDataAdapter(pluginContext)); }
+	static SelectImageStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return SelectImageStringDataAdapterPtr(new SelectImageStringDataAdapter(patientModelService)); }
   virtual ~SelectImageStringDataAdapter() {}
 
 public: // basic methods
@@ -77,7 +77,7 @@ public: // interface extension
   ImagePtr getImage();
 
 protected:
-	SelectImageStringDataAdapter(ctkPluginContext *pluginContext);
+	SelectImageStringDataAdapter(PatientModelServicePtr patientModelService);
 private:
   QString mImageUid;
 };
@@ -91,7 +91,7 @@ class SelectDataStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
-	static SelectDataStringDataAdapterPtr New(ctkPluginContext *pluginContext) { return SelectDataStringDataAdapterPtr(new SelectDataStringDataAdapter(pluginContext)); }
+	static SelectDataStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return SelectDataStringDataAdapterPtr(new SelectDataStringDataAdapter(patientModelService)); }
   virtual ~SelectDataStringDataAdapter() {}
 
 public: // basic methods
@@ -102,7 +102,7 @@ public: // interface extension
   virtual DataPtr getData() const;
 
 protected:
-	SelectDataStringDataAdapter(ctkPluginContext *pluginContext);
+	SelectDataStringDataAdapter(PatientModelServicePtr patientModelService);
 private:
 //  DataPtr mData;
   QString mUid;
@@ -118,7 +118,7 @@ class SelectMeshStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
-	static SelectMeshStringDataAdapterPtr New(ctkPluginContext *pluginContext) { return SelectMeshStringDataAdapterPtr(new SelectMeshStringDataAdapter(pluginContext)); }
+	static SelectMeshStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return SelectMeshStringDataAdapterPtr(new SelectMeshStringDataAdapter(patientModelService)); }
   virtual ~SelectMeshStringDataAdapter() {}
 
 public: // basic methods
@@ -129,7 +129,7 @@ public: // interface extension
   MeshPtr getMesh();
 
 protected:
-	SelectMeshStringDataAdapter(ctkPluginContext *pluginContext);
+	SelectMeshStringDataAdapter(PatientModelServicePtr patientModelService);
 private:
   QString mMeshUid;
 };

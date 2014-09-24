@@ -49,8 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-BinaryThinningImageFilter3DFilter::BinaryThinningImageFilter3DFilter(ctkPluginContext *pluginContext) :
-	FilterImpl(pluginContext)
+BinaryThinningImageFilter3DFilter::BinaryThinningImageFilter3DFilter(PatientModelServicePtr patientModelService) :
+	FilterImpl(patientModelService)
 {
 }
 
@@ -109,7 +109,7 @@ void BinaryThinningImageFilter3DFilter::createInputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New(mPluginContext);
+	temp = SelectImageStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select binary volume input for thinning");
 	//    connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
@@ -120,7 +120,7 @@ void BinaryThinningImageFilter3DFilter::createOutputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectMeshStringDataAdapter::New((mPluginContext));
+	temp = SelectMeshStringDataAdapter::New((mPatientModelService));
 	temp->setValueName("Output");
 	temp->setHelp("Output centerline model");
 	mOutputTypes.push_back(temp);

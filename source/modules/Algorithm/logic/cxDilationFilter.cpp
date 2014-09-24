@@ -54,8 +54,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-DilationFilter::DilationFilter(ctkPluginContext *pluginContext) :
-	FilterImpl(pluginContext)
+DilationFilter::DilationFilter(PatientModelServicePtr patientModelService) :
+	FilterImpl(patientModelService)
 {
 }
 
@@ -114,7 +114,7 @@ void DilationFilter::createInputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New(mPluginContext);
+	temp = SelectImageStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select segmentation input for dilation");
 	mInputTypes.push_back(temp);
@@ -124,12 +124,12 @@ void DilationFilter::createOutputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New(mPluginContext);
+	temp = SelectDataStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Output");
 	temp->setHelp("Dilated segmentation image");
 	mOutputTypes.push_back(temp);
 
-	temp = SelectDataStringDataAdapter::New(mPluginContext);
+	temp = SelectDataStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Contour");
 	temp->setHelp("Output contour generated from dilated segmentation image.");
 	mOutputTypes.push_back(temp);

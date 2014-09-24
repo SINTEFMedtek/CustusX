@@ -39,8 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-FastImageRegistrationWidget::FastImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName, QString windowTitle) :
-		LandmarkImageRegistrationWidget(pluginContext, parent, objectName, windowTitle)
+FastImageRegistrationWidget::FastImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle) :
+		LandmarkImageRegistrationWidget(registrationService, patientModelService, parent, objectName, windowTitle)
 {
 }
 
@@ -68,8 +68,8 @@ void FastImageRegistrationWidget::performRegistration()
   this->updateAvarageAccuracyLabel();
 }
 //------------------------------------------------------------------------------
-PlateImageRegistrationWidget::PlateImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
-		FastImageRegistrationWidget(pluginContext, parent, "PlateImageRegistrationWidget", "Plate Image Registration")
+PlateImageRegistrationWidget::PlateImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+		FastImageRegistrationWidget(registrationService, patientModelService, parent, "PlateImageRegistrationWidget", "Plate Image Registration")
 {
 }
 

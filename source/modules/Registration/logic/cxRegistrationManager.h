@@ -70,7 +70,7 @@ class RegistrationManager : public QObject
   Q_OBJECT
 
 public:
-	RegistrationManager(AcquisitionDataPtr acquisitionData, ctkPluginContext* pluginContext); ///< use getInstance instead
+	RegistrationManager(RegistrationServicePtr registrationService, AcquisitionDataPtr acquisitionData); ///< use getInstance instead
   virtual ~RegistrationManager() {} ///< destructor
 
   typedef std::pair<QString, bool> StringBoolPair; ///< name and if the point is active or not

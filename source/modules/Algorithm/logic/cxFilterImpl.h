@@ -37,10 +37,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "cxFilter.h"
 #include <QDomElement>
-#include <ctkPluginContext.h>
+#include <boost/shared_ptr.hpp>
 
 namespace cx
 {
+typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 
 /** Helper implementation for Filter.
  *
@@ -73,7 +74,7 @@ public slots:
 	virtual void requestSetPresetSlot(QString name){};
 
 protected:
-	explicit FilterImpl(ctkPluginContext *pluginContext);
+	explicit FilterImpl(PatientModelServicePtr patientModelService);
 
 	/** Helper: Return the index'th input type as an image.
 	  * Return zero if not available (as image). */
@@ -97,7 +98,7 @@ protected:
 	std::vector<DataPtr> mCopiedInput;
 	QDomElement mCopiedOptions;
 	bool mActive;
-	ctkPluginContext *mPluginContext;
+	PatientModelServicePtr mPatientModelService;
 
 private:
 	QString mUid;

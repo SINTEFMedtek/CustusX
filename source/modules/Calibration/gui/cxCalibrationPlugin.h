@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXCALIBRATIONPLUGIN_H_
 
 #include "cxGUIExtenderService.h"
-#include <ctkPluginContext.h>
 
 /**
  * \defgroup cx_module_calibration Calibration Plugin
@@ -63,7 +62,7 @@ class CalibrationPlugin : public GUIExtenderService
 {
 	Q_OBJECT
 public:
-	CalibrationPlugin(ctkPluginContext *pluginContext, AcquisitionDataPtr mAcquisitionData);
+	CalibrationPlugin(cx::PatientModelServicePtr patientModelService, AcquisitionDataPtr mAcquisitionData);
 	virtual ~CalibrationPlugin();
 
 //  AcquisitionDataPtr getAcquisitionData() { return mAcquisitionData; }
@@ -75,7 +74,7 @@ private slots:
 
 private:
 	AcquisitionDataPtr mAcquisitionData;
-	ctkPluginContext *mPluginContext;
+	PatientModelServicePtr mPatientModelService;
 };
 
 /**

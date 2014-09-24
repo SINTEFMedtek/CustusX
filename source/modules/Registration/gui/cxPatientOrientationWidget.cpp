@@ -43,11 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-PatientOrientationWidget::PatientOrientationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
-		RegistrationBaseWidget(pluginContext, parent, "PatientOrientationWidget", "Patient Orientation"),
-    mPatientOrientationButton(new QPushButton("Patient Orientation")),
-		mInvertButton(new QCheckBox("Back face")),
-		mPatientModelService(new PatientModelServiceProxy(pluginContext))
+PatientOrientationWidget::PatientOrientationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+	RegistrationBaseWidget(registrationService, parent, "PatientOrientationWidget", "Patient Orientation"),
+	mPatientOrientationButton(new QPushButton("Patient Orientation")),
+	mInvertButton(new QCheckBox("Back face")),
+	mPatientModelService(patientModelService)
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->addWidget(mInvertButton);

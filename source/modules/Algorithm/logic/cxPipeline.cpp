@@ -50,18 +50,18 @@ namespace cx
 {
 
 
-FusedInputOutputSelectDataStringDataAdapterPtr FusedInputOutputSelectDataStringDataAdapter::create(ctkPluginContext *pluginContext,
-																																																	 SelectDataStringDataAdapterBasePtr base,
-																																																	 SelectDataStringDataAdapterBasePtr input)
+FusedInputOutputSelectDataStringDataAdapterPtr FusedInputOutputSelectDataStringDataAdapter::create(PatientModelServicePtr patientModelService,
+																								   SelectDataStringDataAdapterBasePtr base,
+																								   SelectDataStringDataAdapterBasePtr input)
 {
-	FusedInputOutputSelectDataStringDataAdapterPtr retval(new FusedInputOutputSelectDataStringDataAdapter(pluginContext, base, input));
+	FusedInputOutputSelectDataStringDataAdapterPtr retval(new FusedInputOutputSelectDataStringDataAdapter(patientModelService, base, input));
 	return retval;
 }
 
-FusedInputOutputSelectDataStringDataAdapter::FusedInputOutputSelectDataStringDataAdapter(ctkPluginContext *pluginContext,
-																																												 SelectDataStringDataAdapterBasePtr base,
-																																												 SelectDataStringDataAdapterBasePtr input) :
-	SelectDataStringDataAdapterBase(pluginContext)
+FusedInputOutputSelectDataStringDataAdapter::FusedInputOutputSelectDataStringDataAdapter(PatientModelServicePtr patientModelService,
+																						 SelectDataStringDataAdapterBasePtr base,
+																						 SelectDataStringDataAdapterBasePtr input) :
+	SelectDataStringDataAdapterBase(patientModelService)
 {
 	mBase = base;
 	mInput = input;
@@ -151,9 +151,9 @@ void FusedInputOutputSelectDataStringDataAdapter::inputDataChangedSlot()
 ///--------------------------------------------------------
 
 
-Pipeline::Pipeline(ctkPluginContext *pluginContext, QObject *parent) :
+Pipeline::Pipeline(PatientModelServicePtr patientModelService, QObject *parent) :
 		QObject(parent),
-		mPluginContext(pluginContext)
+		mPatientModelService(patientModelService)
 {
 	mCompositeTimedAlgorithm.reset(new CompositeSerialTimedAlgorithm("Pipeline"));
 }
@@ -264,7 +264,7 @@ std::vector<SelectDataStringDataAdapterBasePtr> Pipeline::createNodes()
 		SelectDataStringDataAdapterBasePtr output = mFilters->get(i-1)->getOutputTypes()[0];
 		SelectDataStringDataAdapterBasePtr base  = mFilters->get(i)->getInputTypes()[0];
 		FusedInputOutputSelectDataStringDataAdapterPtr node;
-		node = FusedInputOutputSelectDataStringDataAdapter::create(mPluginContext, base, output);
+		node = FusedInputOutputSelectDataStringDataAdapter::create(mPatientModelService, base, output);
 		node->setValueName(QString("Node %1").arg(i));
 		retval.push_back(node);
 	}

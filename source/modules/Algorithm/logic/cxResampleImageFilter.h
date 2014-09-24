@@ -50,7 +50,7 @@ class ResampleImageFilter : public FilterImpl
 	Q_OBJECT
 
 public:
-	ResampleImageFilter(ctkPluginContext *pluginContext);
+	ResampleImageFilter(PatientModelServicePtr patientModelService);
 	virtual ~ResampleImageFilter() {}
 
 	virtual QString getType() const;

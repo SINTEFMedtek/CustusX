@@ -34,10 +34,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXALGORITHMPLUGIN_H_
 
 #include "cxGUIExtenderService.h"
-class ctkPluginContext;
 
 namespace cx
 {
+
 /**
  * \defgroup cx_module_algorithm Algorithm Plugin
  * \ingroup cx_modules
@@ -63,12 +63,12 @@ class AlgorithmPlugin : public GUIExtenderService
 {
 	Q_OBJECT
 public:
-	AlgorithmPlugin(ctkPluginContext *pluginContext);
+	AlgorithmPlugin(PatientModelServicePtr patientModelService);
 	virtual ~AlgorithmPlugin();
 
 	virtual std::vector<CategorizedWidget> createWidgets() const;
 private:
-	ctkPluginContext *mPluginContext;
+	PatientModelServicePtr mPatientModelService;
 };
 typedef boost::shared_ptr<class AlgorithmPlugin> AlgorithmPluginPtr;
 

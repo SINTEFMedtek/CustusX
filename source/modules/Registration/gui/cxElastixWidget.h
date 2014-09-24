@@ -65,7 +65,7 @@ class ElastixWidget: public RegistrationBaseWidget
 {
 Q_OBJECT
 public:
-	ElastixWidget(ctkPluginContext *pluginContext, QWidget* parent = NULL);
+	ElastixWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent = NULL);
 	virtual ~ElastixWidget();
 	virtual QString defaultWhatsThis() const;
 
