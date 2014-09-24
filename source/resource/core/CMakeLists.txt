@@ -89,8 +89,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	registration/cxRegistrationDataAdapters
 
 	patientModel/cxPatientModelService
-
-	visualization/cxVisualizationService
 	)
 
      
@@ -183,8 +181,6 @@ cx_add_class(cxResource_SOURCE
 	Video/cxVideoServiceProxy
 	Tool/cxTrackingServiceNull
 	Tool/cxTrackingServiceProxy
-	visualization/cxVisualizationServiceNull
-	visualization/cxVisualizationServiceProxy
 	
 	${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/Butterworth.cpp
 	${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/Cascade.cpp
@@ -273,8 +269,7 @@ set(CX_RESOURCE_INCLUDE_DIRECTORIES
     ${CustusX_SOURCE_DIR}/source/resource/core/settings
     ${CustusX_SOURCE_DIR}/source/resource/core/utilities
     ${CustusX_SOURCE_DIR}/source/resource/core/registration
-    ${CustusX_SOURCE_DIR}/source/resource/core/patientModel
-	${CustusX_SOURCE_DIR}/source/resource/core/visualization
+	${CustusX_SOURCE_DIR}/source/resource/core/patientModel
     ${CustusX_SOURCE_DIR}/source/resource/core
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     ${CustusX_SOURCE_DIR}/source/ThirdParty

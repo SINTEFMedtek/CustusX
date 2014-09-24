@@ -3,7 +3,8 @@ project(org_custusx_visualization)
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 include_directories(
-    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
+	${CX_RESOURCE_INCLUDE_DIRECTORIES}
+	${CustusX_SOURCE_DIR}/source/resource/visualization
     ${CustusX_SOURCE_DIR}/source/logic
     ${CustusX_SOURCE_DIR}/source/service/patient
     )

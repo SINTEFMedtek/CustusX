@@ -6,6 +6,7 @@ include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 
 cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	cxView
+	cxVisualizationService
     
 	Rep/cxRep.h
 	Rep/cxRepImpl
@@ -60,6 +61,8 @@ if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
 endif()
 
 cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
+	cxVisualizationServiceNull
+	cxVisualizationServiceProxy
 	Primitives/cxDepthPeeling
 	Primitives/cxGraphicalTorus3D
 	Primitives/cxVtkHelperClasses
