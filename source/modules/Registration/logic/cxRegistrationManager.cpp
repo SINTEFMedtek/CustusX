@@ -46,12 +46,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolManager.h"
 #include "cxDataManager.h"
 #include "cxLandmarkTranslationRegistration.h"
-#include "cxFrameForest.h"
 #include "vesselReg/SeansVesselReg.hxx"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxPluginFramework.h"
 #include "cxNullDeleter.h"
+#include "cxTypeConversions.h"
 
 namespace cx
 {

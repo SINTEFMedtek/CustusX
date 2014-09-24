@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPatientModelImplService.h"
 
-#include <QDateTime>
 #include "cxData.h"
 #include "cxReporter.h"
 #include "cxLogicManager.h"
@@ -64,6 +63,16 @@ void PatientModelImplService::insertData(DataPtr data)
 void PatientModelImplService::updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform)
 {
 	dataService()->get_rMpr_History()->updateRegistration(oldTime, newTransform);
+	patientService()->getPatientData()->autoSave();
+}
+
+std::map<QString, DataPtr> PatientModelImplService::getData() const
+{
+	return dataService()->getData();
+}
+
+void PatientModelImplService::autoSave()
+{
 	patientService()->getPatientData()->autoSave();
 }
 
