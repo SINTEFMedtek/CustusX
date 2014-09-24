@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATAMETRICWRAPPERS_H_
 #define CXDATAMETRICWRAPPERS_H_
 
+#include "cxGuiExport.h"
+
 #include <vector>
 #include <QtWidgets>
 
@@ -63,7 +65,7 @@ namespace cx
 
 typedef boost::shared_ptr<class MetricBase> MetricBasePtr;
 
-class MetricBase : public QObject
+class cxGui_EXPORT MetricBase : public QObject
 {
   Q_OBJECT
 public:
@@ -95,7 +97,7 @@ protected:
 /**
   *
   */
-class MetricReferenceArgumentListGui : public QObject
+class cxGui_EXPORT MetricReferenceArgumentListGui : public QObject
 {
 	Q_OBJECT
 public:
@@ -117,7 +119,7 @@ private:
 	void getAvailableArgumentMetrics(QStringList* uid, std::map<QString,QString>* namemap);
 };
 
-class PointMetricWrapper : public MetricBase
+class cxGui_EXPORT PointMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
@@ -144,7 +146,7 @@ private:
   bool mInternalUpdate;
 };
 
-class PlaneMetricWrapper : public MetricBase
+class cxGui_EXPORT PlaneMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
@@ -164,7 +166,7 @@ private:
   bool mInternalUpdate;
 };
 
-class DistanceMetricWrapper : public MetricBase
+class cxGui_EXPORT DistanceMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
@@ -185,7 +187,7 @@ private:
   MetricReferenceArgumentListGui mArguments;
 };
 
-class AngleMetricWrapper : public MetricBase
+class cxGui_EXPORT AngleMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
@@ -211,7 +213,7 @@ private:
 
 };
 
-class DonutMetricWrapper : public MetricBase
+class cxGui_EXPORT DonutMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
@@ -244,7 +246,7 @@ private:
 
 };
 
-class SphereMetricWrapper : public MetricBase
+class cxGui_EXPORT SphereMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:

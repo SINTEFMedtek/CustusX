@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIDEOSERVICEBACKEND_H
 #define CXVIDEOSERVICEBACKEND_H
 
+#include "cxVideoServiceExport.h"
+
 #include "boost/shared_ptr.hpp"
 #include "ctkPluginContext.h"
 #include "cxForwardDeclarations.h"
@@ -51,7 +53,7 @@ typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
  * \date 25.02.2014, 2014
  * \author christiana
  */
-class VideoServiceBackend
+class cxVideoService_EXPORT VideoServiceBackend
 {
 public:
 	static VideoServiceBackendPtr create(DataServicePtr dataManager,

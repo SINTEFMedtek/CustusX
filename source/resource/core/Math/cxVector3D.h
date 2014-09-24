@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVECTOR3D_H_
 #define CXVECTOR3D_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 
 #include "cxMathBase.h"
 class QString;
@@ -46,7 +49,7 @@ namespace cx
  */
 
 
-bool similar(double a, double b, double tol = 1.0E-6); ///< check for equality with a tolerance: |b-a|<tol
+cxResource_EXPORT bool similar(double a, double b, double tol = 1.0E-6); ///< check for equality with a tolerance: |b-a|<tol
 
 /**\brief Vector3D is a representation of a point or vector in 3D.
  *
@@ -60,23 +63,23 @@ bool similar(double a, double b, double tol = 1.0E-6); ///< check for equality w
 typedef Eigen::Vector3d Vector3D;
 typedef boost::shared_ptr<Vector3D> Vector3DPtr;
 
-Vector3D multiply_elems(const Vector3D& a, const Vector3D& b); ///< perform element-wise multiplication of a and b.
-Vector3D divide_elems(const Vector3D& a, const Vector3D& b); ///< perform element-wise division of a and b.
-Vector3D cross(const Vector3D& a, const Vector3D& b); ///< compute cross product of a and b.
-double dot(const Vector3D& a, const Vector3D& b); ///< compute inner product (or dot product) of a and b.
-bool similar(const Vector3D& a, const Vector3D& b, double tol = 1.0E-6); ///< check for equality with a tolerance: |b-a|<tol
-Vector3D unitVector(double thetaXY, double thetaZ = 0.0); ///< compute a unit vector given angles xy in the xy plane and z meaning the elevation from the xy plane.
-double getThetaXY(Vector3D v); ///< get thetaXY, meaning the angle of v projected onto the xy plane
-double getThetaZ(Vector3D v); ///< get thetaZ, z meaning the elevation from the xy plane
+cxResource_EXPORT Vector3D multiply_elems(const Vector3D& a, const Vector3D& b); ///< perform element-wise multiplication of a and b.
+cxResource_EXPORT Vector3D divide_elems(const Vector3D& a, const Vector3D& b); ///< perform element-wise division of a and b.
+cxResource_EXPORT Vector3D cross(const Vector3D& a, const Vector3D& b); ///< compute cross product of a and b.
+cxResource_EXPORT double dot(const Vector3D& a, const Vector3D& b); ///< compute inner product (or dot product) of a and b.
+cxResource_EXPORT bool similar(const Vector3D& a, const Vector3D& b, double tol = 1.0E-6); ///< check for equality with a tolerance: |b-a|<tol
+cxResource_EXPORT Vector3D unitVector(double thetaXY, double thetaZ = 0.0); ///< compute a unit vector given angles xy in the xy plane and z meaning the elevation from the xy plane.
+cxResource_EXPORT double getThetaXY(Vector3D v); ///< get thetaXY, meaning the angle of v projected onto the xy plane
+cxResource_EXPORT double getThetaZ(Vector3D v); ///< get thetaZ, z meaning the elevation from the xy plane
 
-Vector3D round(const Vector3D& a);
-Vector3D ceil(const Vector3D& a);
+cxResource_EXPORT Vector3D round(const Vector3D& a);
+cxResource_EXPORT Vector3D ceil(const Vector3D& a);
 
-bool similar(const Eigen::Array3i& a, const Eigen::Array3i& b); ///< identical to the equality operator, exists for symmetry with Vector3D.
+cxResource_EXPORT bool similar(const Eigen::Array3i& a, const Eigen::Array3i& b); ///< identical to the equality operator, exists for symmetry with Vector3D.
 
-QString prettyFormat(Vector3D val, int decimals=1, int fieldWidth=3);
+cxResource_EXPORT QString prettyFormat(Vector3D val, int decimals=1, int fieldWidth=3);
 
-Eigen::Vector2d fromString(const QString& text);
+cxResource_EXPORT Eigen::Vector2d fromString(const QString& text);
 
 /**
  * @}

@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef CXVIEW_H_
 #define CXVIEW_H_
+
+#include "cxResourceVisualizationExport.h"
+
 #include "sscConfig.h"
 #include <boost/shared_ptr.hpp>
 #include "vtkForwardDeclarations.h"
@@ -63,7 +66,7 @@ typedef boost::shared_ptr<class Rep> RepPtr;
  *
  * \ingroup cx_resource_visualization
  */
-class View
+class cxResourceVisualization_EXPORT View
 {
 public:
 	/// type describing the view
@@ -132,7 +135,7 @@ typedef boost::shared_ptr<View> ViewPtr;
   *
  * \ingroup cx_resource_visualization
   */
-class ViewWidget : public QVTKWidget, public View
+class cxResourceVisualization_EXPORT ViewWidget : public QVTKWidget, public View
 {
 Q_OBJECT
 	typedef QVTKWidget widget;

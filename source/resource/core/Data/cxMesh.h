@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SSCMESH_
 #define SSCMESH_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include <set>
 #include <boost/shared_ptr.hpp>
 
@@ -55,7 +58,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_data
  */
-class Mesh: public Data
+class cxResource_EXPORT Mesh: public Data
 {
 Q_OBJECT
 public:

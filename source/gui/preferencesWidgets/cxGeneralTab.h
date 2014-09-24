@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXGENERALTAB_H_
 #define CXGENERALTAB_H_
 
+#include "cxGuiExport.h"
+
 #include <QComboBox>
 #include "cxPreferenceTab.h"
 #include "cxBoolDataAdapterXml.h"
@@ -51,7 +53,7 @@ namespace cx
  * \author Ole Vegard Solberg, SINTEF
  * \author Frank Lindseth, SINTEF
  */
-class GeneralTab : public PreferenceTab
+class cxGui_EXPORT GeneralTab : public PreferenceTab
 {
   Q_OBJECT
 

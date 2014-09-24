@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFILEHELPERS_H
 #define CXFILEHELPERS_H
 
+#include "cxResourceExport.h"
+
 #include <QString>
 #include <QDir>
 
@@ -52,11 +54,11 @@ namespace cx
  * \date jan 26, 2013
  * \author christiana
  */
-bool removeNonemptyDirRecursively(const QString& dirName);
+cxResource_EXPORT bool removeNonemptyDirRecursively(const QString& dirName);
 
-QFileInfoList getDirs(QString path);
-QStringList getAbsolutePathToFiles(QString path, QStringList nameFilters, bool includeSubDirs = false);
-QStringList getAbsolutePathToXmlFiles(QString path, bool includeSubDirs = false);
+cxResource_EXPORT QFileInfoList getDirs(QString path);
+cxResource_EXPORT QStringList getAbsolutePathToFiles(QString path, QStringList nameFilters, bool includeSubDirs = false);
+cxResource_EXPORT QStringList getAbsolutePathToXmlFiles(QString path, bool includeSubDirs = false);
 
 /**
  * @\}

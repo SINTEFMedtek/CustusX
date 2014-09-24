@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPICKERREP_H_
 #define CXPICKERREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxRepImpl.h"
 #include "cxTransform3D.h"
 #include "vtkForwardDeclarations.h"
@@ -66,7 +68,7 @@ typedef boost::shared_ptr<class Tool> ToolPtr;
  * \ingroup cx_resource_visualization
  * \ingroup cx_resource_visualization_rep3D
  */
-class PickerRep: public RepImpl
+class cxResourceVisualization_EXPORT PickerRep: public RepImpl
 {
 Q_OBJECT
 

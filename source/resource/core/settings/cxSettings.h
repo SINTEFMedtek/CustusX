@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSETTINGS_H_
 #define CXSETTINGS_H_
 
+#include "cxResourceExport.h"
+
 #include "boost/shared_ptr.hpp"
 #include <QObject>
 #include <QSettings>
@@ -53,7 +55,7 @@ typedef boost::shared_ptr<class QSettings> QSettingsPtr;
  * \date Apr 6, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class Settings : public QObject
+class cxResource_EXPORT Settings : public QObject
 {
   Q_OBJECT
 
@@ -87,7 +89,7 @@ private:
 };
 
 /**\brief Shortcut for accessing the settings instance.*/
-Settings* settings();
+cxResource_EXPORT Settings* settings();
 
 /**
 * @}

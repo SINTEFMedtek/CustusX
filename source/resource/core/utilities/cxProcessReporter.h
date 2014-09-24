@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPROCESSREPORTER_H_
 #define CXPROCESSREPORTER_H_
 
+#include "cxResourceExport.h"
+
 #include "boost/shared_ptr.hpp"
 #include <QProcess>
 #include <QString>
@@ -49,7 +51,7 @@ typedef boost::shared_ptr<class ProcessReporter> ProcessReporterPtr;
  * \date Oct 22 2013
  * \author Janne Beate Bakeng, SINTEF
  */
-class ProcessReporter : QObject
+class cxResource_EXPORT ProcessReporter : QObject
 {
 	Q_OBJECT
 

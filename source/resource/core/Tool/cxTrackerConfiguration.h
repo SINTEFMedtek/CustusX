@@ -33,12 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRACKERCONFIGURATION_H
 #define CXTRACKERCONFIGURATION_H
 
+#include "cxResourceExport.h"
+
 #include "boost/shared_ptr.hpp"
 #include <QStringList>
 
 namespace cx
 {
-typedef boost::shared_ptr<class TrackerConfiguration> TrackerConfigurationPtr;
 
 /** Tracker and Tool configuration info
  *
@@ -47,7 +48,7 @@ typedef boost::shared_ptr<class TrackerConfiguration> TrackerConfigurationPtr;
  *
  * \ingroup cx_resource_core_tool
  */
-class TrackerConfiguration
+class cxResource_EXPORT TrackerConfiguration
 {
 public:
 	struct Configuration
@@ -84,6 +85,7 @@ public:
 	virtual Tool getTool(QString uid) = 0;
 	virtual bool verifyTool(QString uid) = 0;
 };
+typedef boost::shared_ptr<TrackerConfiguration> TrackerConfigurationPtr;
 
 } // namespace cx
 

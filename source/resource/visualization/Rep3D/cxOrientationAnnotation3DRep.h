@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXORIENTATIONANNOTATION3DREP_H_
 #define CXORIENTATIONANNOTATION3DREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxRepImpl.h"
 #include "cxDefinitions.h"
 #include "vtkForwardDeclarations.h"
@@ -58,7 +60,7 @@ typedef boost::shared_ptr<class OrientationAnnotation3DRep> OrientationAnnotatio
  * \ingroup cx_resource_visualization
  *
  */
-class OrientationAnnotation3DRep: public RepImpl
+class cxResourceVisualization_EXPORT OrientationAnnotation3DRep: public RepImpl
 {
 Q_OBJECT
 public:

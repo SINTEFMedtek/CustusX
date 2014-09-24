@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVECTOR3DDATAADAPTERXML_H_
 #define CXVECTOR3DDATAADAPTERXML_H_
 
+#include "cxResourceExport.h"
+
 #include <QDomElement>
 #include <QStringList>
 #include "cxDoubleRange.h"
@@ -63,7 +65,7 @@ typedef boost::shared_ptr<class Vector3DDataAdapterXml> Vector3DDataAdapterXmlPt
  *
  * \ingroup cx_resource_core_dataadapters
  */
-class Vector3DDataAdapterXml: public Vector3DDataAdapter
+class cxResource_EXPORT Vector3DDataAdapterXml: public Vector3DDataAdapter
 {
 Q_OBJECT
 public:

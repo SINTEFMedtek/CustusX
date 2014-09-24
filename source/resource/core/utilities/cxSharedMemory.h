@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSHAREDMEMORY_H_
 #define CXSHAREDMEMORY_H_
 
+#include "cxResourceExport.h"
+
 #include <QSharedMemory>
 #include <QDateTime>
 
@@ -56,7 +58,7 @@ namespace cx
  * \sa SharedMemoryClient
  * \ingroup cx_resource_core_utilities
  */
-class SharedMemoryServer
+class cxResource_EXPORT SharedMemoryServer
 {
 private:
 	QSharedMemory mBuffer;
@@ -100,7 +102,7 @@ private:
  * \sa SharedMemoryServer
  * \ingroup cx_resource_core_utilities
  */
-class SharedMemoryClient
+class cxResource_EXPORT SharedMemoryClient
 {
 private:
 	QSharedMemory mBuffer;

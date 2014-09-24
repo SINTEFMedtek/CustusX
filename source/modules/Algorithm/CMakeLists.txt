@@ -35,6 +35,7 @@ SET( MOC_HEADER_FILES
 	gui/cxCompactFilterSetupWidget.h
 	)
 
+cx_remove_duplicate_include_directories()
 QT5_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
 # library
@@ -94,15 +95,22 @@ include_directories(
     ./logic
     ./gui
 	${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
+	${CustusX_BINARY_DIR}/source/resource/widgets
+	${CustusX_BINARY_DIR}/source/resource/service
 	${CustusX_SOURCE_DIR}/source/service/patient
+	${CustusX_BINARY_DIR}/source/service/patient
     ${CustusX_SOURCE_DIR}/source/service/tracking
     ${CustusX_SOURCE_DIR}/source/service/visualization
+    ${CustusX_BINARY_DIR}/source/service/visualization
 	${CustusX_SOURCE_DIR}/source/logic
+	${CustusX_BINARY_DIR}/source/logic
 
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
+    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
     ${CustusX_SOURCE_DIR}/source/gui/utilities
     ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
 	${CustusX_SOURCE_DIR}/source/gui/dataWidgets
+	${CustusX_BINARY_DIR}/source/gui
 	)
 
 set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui cxGUIExtenderService)
@@ -111,6 +119,9 @@ set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui c
 
 
 # =========================================================
+cx_remove_duplicate_include_directories()
+cx_create_export_header("cxPluginAlgorithm")
+
 # create the target
 add_library( cxPluginAlgorithm ${SOURCE_FILES} )
 target_link_libraries( cxPluginAlgorithm ${CX_ALGORITHM_LIBRARIES})

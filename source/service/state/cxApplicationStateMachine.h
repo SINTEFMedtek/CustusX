@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXAPPLICATIONSTATEMACHINE_H_
 #define CXAPPLICATIONSTATEMACHINE_H_
 
+#include "cxStateServiceExport.h"
+
 #include <QStateMachine>
 #include <QActionGroup>
 #include "cxForwardDeclarations.h"
@@ -59,7 +61,7 @@ class ApplicationState;
  *  \date Aug 17, 2010
  *  \author christiana
  */
-class ApplicationStateMachine: public QStateMachine
+class cxStateService_EXPORT ApplicationStateMachine: public QStateMachine
 {
 Q_OBJECT
 public:

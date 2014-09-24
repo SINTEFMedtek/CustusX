@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLANDMARKIMAGEREGISTRATIONWIDGET_H_
 #define CXLANDMARKIMAGEREGISTRATIONWIDGET_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include "cxLandmarkRegistrationWidget.h"
 #include "cxRegistrationDataAdapters.h"
 #include "cxDominantToolProxy.h"
@@ -60,7 +62,7 @@ namespace cx
  * \date Jan 27, 2009
  * \\author Janne Beate Bakeng, SINTEF
  */
-class LandmarkImageRegistrationWidget: public LandmarkRegistrationWidget
+class cxPluginRegistration_EXPORT LandmarkImageRegistrationWidget: public LandmarkRegistrationWidget
 {
 Q_OBJECT
 

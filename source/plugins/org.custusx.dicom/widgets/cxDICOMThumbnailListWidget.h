@@ -21,6 +21,8 @@
 #ifndef __ctkDICOMThumbnailListWidget_h
 #define __ctkDICOMThumbnailListWidget_h
 
+#include "org_custusx_dicom_Export.h"
+
 #include "ctkDICOMWidgetsExport.h"
 #include "ctkThumbnailListWidget.h"
 
@@ -40,7 +42,7 @@ class DICOMThumbnailListWidgetPrivate;
  * \date 2014-05-27
  * \author Christian Askeland
  */
-class DICOMThumbnailListWidget : public ctkThumbnailListWidget
+class org_custusx_dicom_EXPORT DICOMThumbnailListWidget : public ctkThumbnailListWidget
 {
   Q_OBJECT
 public:

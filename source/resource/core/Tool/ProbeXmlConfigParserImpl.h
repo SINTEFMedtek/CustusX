@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PROBEXMLCONFIGPARSERIMPL_H_
 #define PROBEXMLCONFIGPARSERIMPL_H_
 
+#include "cxResourceExport.h"
+
 #include <ProbeXmlConfigParser.h>
 
 /*
@@ -46,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  \author Ole Vegard Solberg, SINTEF
  *  \author jbake
  */
-class ProbeXmlConfigParserImpl : public ProbeXmlConfigParser
+class cxResource_EXPORT ProbeXmlConfigParserImpl : public ProbeXmlConfigParser
 {
 public:
 	ProbeXmlConfigParserImpl(QString& pathToXml); ///< opens the file and reads it onto the QDomDocument
@@ -89,7 +91,7 @@ basically, algo normalises the input into the [0, 2pi] space and it would be nat
 */
 
 //------------------------------------------------------------------------------
-class Angular_less
+class cxResource_EXPORT Angular_less
 {
 public:
   Angular_less(ProbeXmlConfigParser::ColRowPair center) : mCenter(center)

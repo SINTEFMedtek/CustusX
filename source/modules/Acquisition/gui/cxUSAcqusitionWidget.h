@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXUSACQUSITIONWIDGET_H_
 #define CXUSACQUSITIONWIDGET_H_
 
+#include "cxPluginAcquisitionExport.h"
+
 #include "cxRecordBaseWidget.h"
 #include "cxUSAcquisition.h"
 
@@ -60,7 +62,7 @@ class DisplayTimerWidget;
  * \date Dec 9, 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class USAcqusitionWidget : public RecordBaseWidget
+class cxPluginAcquisition_EXPORT USAcqusitionWidget : public RecordBaseWidget
 {
 	Q_OBJECT
 public:

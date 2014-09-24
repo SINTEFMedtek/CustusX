@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONPLUGIN_H_
 #define CXREGISTRATIONPLUGIN_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include "cxGUIExtenderService.h"
 #include <ctkPluginContext.h>
 
@@ -62,7 +64,7 @@ typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
  *  \date Jun 16, 2011
  *  \author christiana
  */
-class RegistrationPlugin : public GUIExtenderService
+class cxPluginRegistration_EXPORT RegistrationPlugin : public GUIExtenderService
 {
 	Q_OBJECT
 public:

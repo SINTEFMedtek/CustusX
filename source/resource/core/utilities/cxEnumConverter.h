@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXENUMCONVERTER_H_
 #define CXENUMCONVERTER_H_
 
+#include "cxResourceExport.h"
+
 #include <string>
 #include <boost/array.hpp>
 #include <boost/algorithm/string.hpp>
@@ -158,12 +160,12 @@ QString enum2string(const ENUM& val);
 #define SNW_DECLARE_ENUM_STRING_CONVERTERS(NS, ENUM_NAME)            \
 namespace NS                                                         \
 {                                                                    \
-	std::ostream& operator<<(std::ostream& s, const ENUM_NAME& val); \
+	cxResource_EXPORT std::ostream& operator<<(std::ostream& s, const ENUM_NAME& val); \
 }                                                                    \
 template<>                                                           \
-QString enum2string<NS::ENUM_NAME>(const NS::ENUM_NAME& val);    \
+cxResource_EXPORT QString enum2string<NS::ENUM_NAME>(const NS::ENUM_NAME& val);    \
 template<>                                                           \
-NS::ENUM_NAME string2enum<NS::ENUM_NAME>(const QString& val);    \
+cxResource_EXPORT NS::ENUM_NAME string2enum<NS::ENUM_NAME>(const QString& val);    \
 //-----------------------------------------------------------------
 
 /**Use these macros to generate string<-->enum converter functions 

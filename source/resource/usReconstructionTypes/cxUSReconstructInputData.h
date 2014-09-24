@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXUSRECONSTRUCTINPUTDATA_H
 #define CXUSRECONSTRUCTINPUTDATA_H
 
+#include "cxResourceUsReconstructionTypesExport.h"
+
 #include <vector>
 #include "cxProbeSector.h"
 
@@ -50,18 +52,18 @@ typedef boost::shared_ptr<class TimedPosition> TimedPositionPtr;
 
 /** \brief One position with timestamp
  */
-class TimedPosition
+class cxResourceUsReconstructionTypes_EXPORT TimedPosition
 {
 public:
 	double mTime;// Should always be in ms
 	Transform3D mPos;
 };
-inline bool operator<(const TimedPosition& lhs, const TimedPosition& rhs)
+cxResourceUsReconstructionTypes_EXPORT inline bool operator<(const TimedPosition& lhs, const TimedPosition& rhs)
 {
 	return lhs.mTime < rhs.mTime;
 }
 
-struct USReconstructInputData
+struct cxResourceUsReconstructionTypes_EXPORT USReconstructInputData
 {
 	QString mFilename; ///< filename used for current data read
 

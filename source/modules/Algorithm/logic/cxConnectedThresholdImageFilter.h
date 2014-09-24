@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCONNECTEDTHRESHOLDIMAGEFILTER_H_
 #define CXCONNECTEDTHRESHOLDIMAGEFILTER_H_
 
+#include "cxPluginAlgorithmExport.h"
+
 #include "cxThreadedTimedAlgorithm.h"
 #include "cxAlgorithmHelpers.h"
 #include "cxLegacySingletons.h"
@@ -55,7 +57,7 @@ namespace cx
  * \date Apr 26, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class ConnectedThresholdImageFilter : public ThreadedTimedAlgorithm<vtkImageDataPtr>
+class cxPluginAlgorithm_EXPORT ConnectedThresholdImageFilter : public ThreadedTimedAlgorithm<vtkImageDataPtr>
 {
 	Q_OBJECT
 

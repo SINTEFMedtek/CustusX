@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRACKPADWIDGET_H_
 #define CXTRACKPADWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 
 #include <vector>
@@ -64,7 +66,7 @@ typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
  * \date Oct 7, 2010
  * \author Christian Askeland, SINTEF
  */
-class TrackPadWidget : public BaseWidget
+class cxGui_EXPORT TrackPadWidget : public BaseWidget
 {
   Q_OBJECT
 

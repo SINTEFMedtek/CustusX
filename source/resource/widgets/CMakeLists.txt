@@ -53,6 +53,8 @@ set(CX_RESOURCE_WIDGETS_LIBRARIES
     cxResource
     )
 
+cx_create_export_header("cxResourceWidgets")
+
 add_library( cxResourceWidgets ${CX_RESOURCE_WIDGETS_FILES})
 target_link_libraries(cxResourceWidgets ${CX_RESOURCE_WIDGETS_LIBRARIES} )
 

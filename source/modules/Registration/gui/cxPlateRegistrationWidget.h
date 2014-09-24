@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPLATEREGISTRATIONWIDGET_H_
 #define CXPLATEREGISTRATIONWIDGET_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include "cxRegistrationBaseWidget.h"
 
 class QPushButton;
@@ -55,7 +57,7 @@ namespace cx
  * \date 10. nov. 2010
  * \\author Janne Beate Bakeng, SINTEF
  */
-class PlateRegistrationWidget : public RegistrationBaseWidget
+class cxPluginRegistration_EXPORT PlateRegistrationWidget : public RegistrationBaseWidget
 {
   Q_OBJECT
 public:

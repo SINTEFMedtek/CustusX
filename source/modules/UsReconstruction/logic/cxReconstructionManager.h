@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRECONSTRUCTIONMANAGER_H_
 #define CXRECONSTRUCTIONMANAGER_H_
 
+#include "cxPluginUSReconstructionExport.h"
+
 #include <set>
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
@@ -84,7 +86,7 @@ typedef boost::shared_ptr<class ReconstructionExecuter> ReconstructionExecuterPt
  * \author Janne Beate Bakeng
  * \date May 4, 2010
  */
-class ReconstructionManager : public QObject
+class cxPluginUSReconstruction_EXPORT ReconstructionManager : public QObject
 {
 Q_OBJECT
 

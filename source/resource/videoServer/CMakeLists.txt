@@ -6,6 +6,7 @@ include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 include_directories(
         ${Boost_INCLUDE_DIRS}
      	${CustusX_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
+     	${CustusX_BINARY_DIR}/source/resource/OpenIGTLinkUtilities
         )
 
 #-------------------------------
@@ -65,6 +66,7 @@ SET( CX_QT_MOC_HEADER_FILES
 		cxtestSender.h
 )
 
+cx_remove_duplicate_include_directories()
 if(CX_WINDOWS)
 	QT5_WRAP_CPP(MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} OPTIONS "-D_WINDOWS")
 else()
@@ -106,6 +108,8 @@ SET ( cxOpenIGTLinkServer_FILES
 
 )
 
+cx_create_export_header("cxGrabber")
+cx_remove_duplicate_include_directories()
 add_library( cxGrabber
     ${cxOpenIGTLinkServer_FILES} 
     ${MOC_HEADER_FILES} 

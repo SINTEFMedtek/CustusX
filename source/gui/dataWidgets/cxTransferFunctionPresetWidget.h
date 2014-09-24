@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRANSFERFUNCTIONPRESETWIDGET_H_
 #define CXTRANSFERFUNCTIONPRESETWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxPresetWidget.h"
 
 #include "cxTransferFunctions3DPresets.h"
@@ -48,7 +50,7 @@ namespace cx {
  * \date Mar 8, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
-class TransferFunctionPresetWidget: public PresetWidget
+class cxGui_EXPORT TransferFunctionPresetWidget: public PresetWidget
 {
 
 	Q_OBJECT

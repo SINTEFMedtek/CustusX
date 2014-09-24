@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATALOCATIONS_H_
 #define CXDATALOCATIONS_H_
 
+#include "cxResourceExport.h"
+
 #include <QString>
 
 namespace cx
@@ -43,7 +45,7 @@ namespace cx
  *  \author christiana
  *
  */
-class DataLocations
+class cxResource_EXPORT DataLocations
 {
 public:
   static QString getBundlePath(); ///< return the folder where the bundle or executable are located.

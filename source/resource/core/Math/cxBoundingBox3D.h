@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXBOUNDINGBOX3D_H_
 #define CXBOUNDINGBOX3D_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include "boost/array.hpp"
 #include "cxVector3D.h"
 #include <vector>
@@ -53,7 +56,7 @@ namespace cx
  *  The data are stored as {xmin,xmax,ymin,ymax,zmin,zmax}, 
  *  in order to simplify communication with vtk.  
  */
-class IntBoundingBox3D: public boost::array<int, 6>
+class cxResource_EXPORT IntBoundingBox3D: public boost::array<int, 6>
 {
 public:
 	IntBoundingBox3D();
@@ -72,13 +75,13 @@ public:
 };
 // --------------------------------------------------------
 
-std::ostream& operator<<(std::ostream& s, const IntBoundingBox3D& data);
+cxResource_EXPORT std::ostream& operator<<(std::ostream& s, const IntBoundingBox3D& data);
 
 /** \brief Representation of a floating-point bounding box in 3D.
  *  The data are stored as {xmin,xmax,ymin,ymax,zmin,zmax}, 
  *  in order to simplify communication with vtk.  
  */
-class DoubleBoundingBox3D: public boost::array<double, 6>
+class cxResource_EXPORT DoubleBoundingBox3D: public boost::array<double, 6>
 {
 public:
 	DoubleBoundingBox3D();
@@ -102,9 +105,9 @@ public:
 };
 // --------------------------------------------------------
 
-bool similar(const DoubleBoundingBox3D& a, const DoubleBoundingBox3D& b, double tol = 1.0E-6);
+cxResource_EXPORT bool similar(const DoubleBoundingBox3D& a, const DoubleBoundingBox3D& b, double tol = 1.0E-6);
 
-std::ostream& operator<<(std::ostream& s, const DoubleBoundingBox3D& data);
+cxResource_EXPORT std::ostream& operator<<(std::ostream& s, const DoubleBoundingBox3D& data);
 
 /**
  * @}

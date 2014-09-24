@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCHECKBOXWIDGET_H_
 #define CXCHECKBOXWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include "cxBoolDataAdapter.h"
 
 #include <QWidget>
@@ -57,7 +59,7 @@ namespace cx
  *
  * \ingroup cx_resource_widgets
  */
-class CheckBoxWidget: public OptimizedUpdateWidget
+class cxResourceWidgets_EXPORT CheckBoxWidget: public OptimizedUpdateWidget
 {
 Q_OBJECT
 public:

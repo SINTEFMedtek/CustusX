@@ -19,10 +19,15 @@ if (BUILD_TESTING)
 		cxtestVNNclReconstructionService.cpp
 		)
 
+    #cx_catch_add_lib_and_exe(org_custusx_vnnclreconstruction
+    #    "${CX_TEST_CATCH_ORG_CUSTUSX_VNNCLRECONSTRUCTION_SOURCE_FILES}"
+    #    "${CX_TEST_CATCH_ORG_CUSTUSX_VNNCLRECONSTRUCTION_MOC_SOURCE_FILES}"
+    #    cxtestCatchcxPluginUSReconstruction #TODO remove...
+    #    )
+
     cx_catch_add_lib_and_exe(org_custusx_vnnclreconstruction
-        "${CX_TEST_CATCH_ORG_CUSTUSX_VNNCLRECONSTRUCTION_SOURCE_FILES}" 
-        "${CX_TEST_CATCH_ORG_CUSTUSX_VNNCLRECONSTRUCTION_MOC_SOURCE_FILES}"        
-        cxtestCatchcxPluginUSReconstruction #TODO remove...
+        "${CX_TEST_CATCH_ORG_CUSTUSX_VNNCLRECONSTRUCTION_SOURCE_FILES}"
+        "${CX_TEST_CATCH_ORG_CUSTUSX_VNNCLRECONSTRUCTION_MOC_SOURCE_FILES}"
         )
 
 endif (BUILD_TESTING)

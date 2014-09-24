@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPATIENTSERVICE_H_
 #define CXPATIENTSERVICE_H_
 
+#include "cxPatientServiceExport.h"
+
 #include <QObject>
 #include "boost/shared_ptr.hpp"
 #include "cxForwardDeclarations.h"
@@ -63,7 +65,7 @@ typedef boost::shared_ptr<class PatientData> PatientDataPtr;
  *  \author christiana
  *
  */
-class PatientService: public QObject
+class cxPatientService_EXPORT PatientService: public QObject
 {
 Q_OBJECT
 public:

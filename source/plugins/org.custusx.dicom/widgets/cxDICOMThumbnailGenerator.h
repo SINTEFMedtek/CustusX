@@ -22,6 +22,8 @@
 #ifndef __ctkDICOMThumbnailGenerator_h
 #define __ctkDICOMThumbnailGenerator_h
 
+#include "org_custusx_dicom_Export.h"
+
 // CTK includes
 #include "ctkDICOMWidgetsExport.h"
 #include "ctkDICOMAbstractThumbnailGenerator.h"
@@ -36,7 +38,7 @@ class ctkDICOMThumbnailGeneratorPrivate;
 ///
 /// \brief  thumbnail generator class
 ///
-class CTK_DICOM_WIDGETS_EXPORT ctkDICOMThumbnailGenerator : public ctkDICOMAbstractThumbnailGenerator
+class org_custusx_dicom_EXPORT ctkDICOMThumbnailGenerator : public ctkDICOMAbstractThumbnailGenerator
 {
   Q_OBJECT
 public:

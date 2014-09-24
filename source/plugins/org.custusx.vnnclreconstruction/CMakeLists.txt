@@ -4,6 +4,17 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 include_directories(
     ${CustusX_BINARY_DIR}/source/modules/UsReconstruction/logic
+    ${CustusX_BINARY_DIR}/source/modules/UsReconstruction
+    ${CustusX_BINARY_DIR}/source/modules/UsReconstruction/logic
+    ${CustusX_BINARY_DIR}/source/resource/core
+    ${CustusX_BINARY_DIR}/source/resource/core/utilities
+    ${CustusX_BINARY_DIR}/source/resource/core/Math
+    ${CustusX_BINARY_DIR}/source/resource/core/dataAdapters
+    ${CustusX_BINARY_DIR}/source/resource/core/Tool
+    ${CustusX_BINARY_DIR}/source/resource/core/logger
+    ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
+    ${CustusX_BINARY_DIR}/source/ThirdParty
+    
     ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/logic
     ${CustusX_SOURCE_DIR}/source/resource/core
     ${CustusX_SOURCE_DIR}/source/resource/core/utilities

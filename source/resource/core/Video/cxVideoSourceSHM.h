@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIDEOSOURCESHM_H_
 #define CXVIDEOSOURCESHM_H_
 
+#include "cxResourceExport.h"
+
 #include <map>
 #include <stdint.h>
 
@@ -68,7 +70,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_video
  */
-class VideoSourceSHM : public VideoSource
+class cxResource_EXPORT VideoSourceSHM : public VideoSource
 {
 	Q_OBJECT
 

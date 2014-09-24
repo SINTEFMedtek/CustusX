@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIDEOSOURCEGRAPHICS_H_
 #define CXVIDEOSOURCEGRAPHICS_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxForwardDeclarations.h"
 #include "cxProbeSector.h"
 
@@ -53,7 +55,7 @@ typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
  * \date april 26, 2013
  * \author Christian Askeland, SINTEF
  */
-class VideoSourceGraphics : public QObject
+class cxResourceVisualization_EXPORT VideoSourceGraphics : public QObject
 {
 	Q_OBJECT
 public:

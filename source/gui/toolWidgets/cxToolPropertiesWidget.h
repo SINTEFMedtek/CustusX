@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLPROPERTIESWIDGET_H_
 #define CXTOOLPROPERTIESWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 
 #include <vector>
@@ -59,7 +61,7 @@ class LabeledComboBoxWidget;
  * \date 2010.04.22
  * \\author Christian Askeland, SINTEF
  */
-class ToolPropertiesWidget : public BaseWidget
+class cxGui_EXPORT ToolPropertiesWidget : public BaseWidget
 {
   Q_OBJECT
 

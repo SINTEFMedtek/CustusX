@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXELASTIXPARAMETERS_H
 #define CXELASTIXPARAMETERS_H
 
+#include "cxPluginRegistrationExport.h"
+
 #include <QObject>
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
@@ -51,7 +53,7 @@ namespace cx
  * \date Apr 10, 2013
  * \author Christian Askeland, SINTEF
  */
-class ElastixParameters : public QObject
+class cxPluginRegistration_EXPORT ElastixParameters : public QObject
 {
     Q_OBJECT
 public:

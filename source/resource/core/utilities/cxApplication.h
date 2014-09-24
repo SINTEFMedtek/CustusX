@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXAPPLICATION_H_
 #define CXAPPLICATION_H_
 
+#include "cxResourceExport.h"
+
 #include <QApplication>
 
 namespace cx
@@ -48,7 +50,7 @@ namespace cx
  * \date March 6, 2013
  * \author christiana
  */
-class Application : public QApplication
+class cxResource_EXPORT Application : public QApplication
 {
 public:
 	Application(int& argc, char** argv);

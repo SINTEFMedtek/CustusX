@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLMETRIC_H_
 #define CXTOOLMETRIC_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include "cxFrameMetricBase.h"
 #include "cxPointMetric.h"
 
@@ -52,7 +55,7 @@ typedef boost::shared_ptr<class ToolMetric> ToolMetricPtr;
  * \author Ole Vegard Solberg, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class ToolMetric: public cx::FrameMetricBase
+class cxResource_EXPORT ToolMetric: public cx::FrameMetricBase
 {
 Q_OBJECT
 public:

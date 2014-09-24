@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSLICEPROXY_H_
 #define CXSLICEPROXY_H_
 
+#include "cxResourceExport.h"
+
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 #include "cxDefinitions.h"
@@ -57,7 +59,7 @@ typedef boost::shared_ptr<class SliceProxyInterface> SliceProxyInterfacePtr;
 */
 
 
-class SliceProxyInterface : public QObject
+class cxResource_EXPORT SliceProxyInterface : public QObject
 {
 	Q_OBJECT
 public:
@@ -74,7 +76,7 @@ signals:
 	void transformChanged(Transform3D sMr); ///< emitted when transform is changed.
 };
 
-class SimpleSliceProxy : public SliceProxyInterface
+class cxResource_EXPORT SimpleSliceProxy : public SliceProxyInterface
 {
 	Q_OBJECT
 public:
@@ -98,7 +100,7 @@ typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
  * Used as the slicer in CustusX.
  *
  */
-class SliceProxy : public SliceProxyInterface
+class cxResource_EXPORT SliceProxy : public SliceProxyInterface
 {
 	Q_OBJECT
 public:

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXGRAPHICALPRIMITIVES_H_
 #define CXGRAPHICALPRIMITIVES_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include <boost/shared_ptr.hpp>
 #include "vtkForwardDeclarations.h"
 #include "cxTransform3D.h"
@@ -54,7 +56,7 @@ namespace cx
 
 /** \brief Helper for rendering a a polydata in 3D
  */
-class GraphicalPolyData3D
+class cxResourceVisualization_EXPORT GraphicalPolyData3D
 {
 public:
 	GraphicalPolyData3D(
@@ -84,7 +86,7 @@ typedef boost::shared_ptr<GraphicalPolyData3D> GraphicalPolyData3DPtr;
 
 /** \brief Helper for rendering a point in 3D
  */
-class GraphicalPoint3D
+class cxResourceVisualization_EXPORT GraphicalPoint3D
 {
 	public:
 		GraphicalPoint3D(vtkRendererPtr renderer = vtkRendererPtr());
@@ -108,7 +110,7 @@ typedef boost::shared_ptr<GraphicalPoint3D> GraphicalPoint3DPtr;
 
 /** \brief Helper for rendering a line in 3D
  */
-class GraphicalLine3D
+class cxResourceVisualization_EXPORT GraphicalLine3D
 {
 	public:
 		GraphicalLine3D(vtkRendererPtr renderer = vtkRendererPtr());
@@ -129,7 +131,7 @@ typedef boost::shared_ptr<GraphicalLine3D> GraphicalLine3DPtr;
 
 /** \brief Helper for rendering a line in 3D
  */
-class GraphicalArc3D
+class cxResourceVisualization_EXPORT GraphicalArc3D
 {
   public:
   GraphicalArc3D(vtkRendererPtr renderer = vtkRendererPtr());
@@ -149,7 +151,7 @@ typedef boost::shared_ptr<GraphicalArc3D> GraphicalArc3DPtr;
 
 /** \brief Helper for rendering an arrow in 3D
  */
-class GraphicalArrow3D
+class cxResourceVisualization_EXPORT GraphicalArrow3D
 {
   public:
 	GraphicalArrow3D(vtkRendererPtr renderer = vtkRendererPtr());
@@ -167,7 +169,7 @@ typedef boost::shared_ptr<GraphicalArrow3D> GraphicalArrow3DPtr;
 
 /**\brief Helper for drawing a rectangle in 3D.
  */
-class Rect3D
+class cxResourceVisualization_EXPORT Rect3D
 {
 public:
   Rect3D(vtkRendererPtr renderer, QColor color);
@@ -190,7 +192,7 @@ typedef boost::shared_ptr<class Rect3D> Rect3DPtr;
 /** \brief Helper for rendering 3D text that faces the camera and
  *  has a constant viewed size.
  */
-class FollowerText3D
+class cxResourceVisualization_EXPORT FollowerText3D
 {
   public:
 	FollowerText3D(vtkRendererPtr renderer = vtkRendererPtr());
@@ -220,7 +222,7 @@ typedef boost::shared_ptr<FollowerText3D> FollowerText3DPtr;
 /** \brief Helper for rendering 3D text that faces the camera and
  *  has a constant viewed size, always on top.
  */
-class CaptionText3D
+class cxResourceVisualization_EXPORT CaptionText3D
 {
 public:
 	CaptionText3D(vtkRendererPtr renderer = vtkRendererPtr());

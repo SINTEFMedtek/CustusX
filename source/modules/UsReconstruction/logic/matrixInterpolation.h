@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MATRIXINTERPOLATION_H_
 #define MATRIXINTERPOLATION_H_
 
+#include "cxPluginUSReconstructionExport.h"
+
 #include <vector>
 #include "vnl/vnl_matrix.h"
 #include "vnl/vnl_vector.h"
@@ -56,7 +58,7 @@ typedef vnl_matrix<double> vnl_matrix_double;
 //
 // Trondheim, 12.01.09.
 // Lars Eirik B�  <larseirik.bo@sintef.no>, SINTEF Technology and Society.
-std::vector<vnl_matrix_double> matrixInterpolation(
+cxPluginUSReconstruction_EXPORT  std::vector<vnl_matrix_double> matrixInterpolation(
                        vnl_vector<double> DataPoints,
                        std::vector<vnl_matrix_double> DataValues,
                        vnl_vector<double> InterpolationPoints,

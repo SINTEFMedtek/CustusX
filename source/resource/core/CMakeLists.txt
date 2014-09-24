@@ -97,7 +97,7 @@ cx_add_class(cxResource_SOURCE
 	Tool/ProbeXmlConfigParserMock
 	Tool/cxCreateProbeDataFromConfiguration
 	Tool/cxTrackingPositionFilter
-	Tool/cxTrackerConfiguration.h
+	Tool/cxTrackerConfiguration
 
 	Data/cxDataMetric
 	Data/cxDataReaderWriter
@@ -282,7 +282,12 @@ endif ()
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 
-add_library (cxResource ${cxResource_SOURCE})
+cx_create_export_header("cxResource")
+cx_remove_duplicate_include_directories()
+
+ADD_MSVC_PRECOMPILED_HEADER("cxPrecompiledHeader.h" "cxPrecompiledHeader.cpp" cxResource_SOURCE)
+
+add_library(cxResource ${cxResource_SOURCE})
 target_link_libraries(cxResource ${CX_RESOURCE_LIBRARIES} )
 
 add_subdirectory(testing)

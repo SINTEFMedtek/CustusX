@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDEPTHPEELING_H_
 #define CXDEPTHPEELING_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include <vtkSphereSource.h>
 #include <vtkSmartPointer.h>
 #include <vtkAppendPolyData.h>
@@ -46,17 +48,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkTransform.h>
 #include <vtkDepthSortPolyData.h>
 
-vtkSmartPointer<vtkAppendPolyData> GenerateOverlappingBunchOfSpheres(int theta, int phi);
+cxResourceVisualization_EXPORT vtkSmartPointer<vtkAppendPolyData> GenerateOverlappingBunchOfSpheres(int theta, int phi);
 
-bool SetupEnvironmentForDepthPeeling(vtkSmartPointer<vtkRenderWindow> renderWindow,
+cxResourceVisualization_EXPORT bool SetupEnvironmentForDepthPeeling(vtkSmartPointer<vtkRenderWindow> renderWindow,
 		vtkSmartPointer<vtkRenderer> renderer, int maxNoOfPeels,
 		double occlusionRatio);
 
-bool TurnOffDepthPeeling(
+cxResourceVisualization_EXPORT bool TurnOffDepthPeeling(
 		vtkSmartPointer<vtkRenderWindow> renderWindow,
 		vtkSmartPointer<vtkRenderer> renderer);///< Turn off depth peeling
 
-bool IsDepthPeelingSupported(vtkSmartPointer<vtkRenderWindow> renderWindow,
+cxResourceVisualization_EXPORT bool IsDepthPeelingSupported(vtkSmartPointer<vtkRenderWindow> renderWindow,
 		vtkSmartPointer<vtkRenderer> renderer,
 		bool doItOffScreen);
 

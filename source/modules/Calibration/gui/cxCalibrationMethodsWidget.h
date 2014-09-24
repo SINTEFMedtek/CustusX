@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCALIBRATIONMETHODSWIDGET_H_
 #define CXCALIBRATIONMETHODSWIDGET_H_
 
+#include "cxPluginCalibrationExport.h"
+
 #include "cxTabbedWidget.h"
 
 #include "cxAcquisitionData.h"
@@ -44,7 +46,7 @@ namespace cx
  * @{
  */
 
-class CalibrationMethodsWidget : public TabbedWidget
+class cxPluginCalibration_EXPORT CalibrationMethodsWidget : public TabbedWidget
 {
 public:
   CalibrationMethodsWidget(AcquisitionDataPtr acquisitionData,

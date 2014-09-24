@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXOPTIMIZEDUPDATEWIDGET_H_
 #define CXOPTIMIZEDUPDATEWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QWidget>
 
 namespace cx
@@ -57,7 +59,7 @@ namespace cx
  *   \author christiana
  *   \date Nov 15, 2012
  */
-class OptimizedUpdateWidget: public QWidget
+class cxResourceWidgets_EXPORT OptimizedUpdateWidget: public QWidget
 {
 Q_OBJECT
 public:

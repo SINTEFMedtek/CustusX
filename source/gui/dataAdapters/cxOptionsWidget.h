@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXOPTIONSWIDGET_H_
 #define CXOPTIONSWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include <QStackedLayout>
 #include "cxDataAdapter.h"
 #include "cxSelectDataStringDataAdapter.h"
@@ -47,7 +49,7 @@ namespace cx {
  * \author Christian Askeland, SINTEF
  * \author Janne Beate Bakeng, SINTEF
  */
-class OptionsWidget : public QWidget
+class cxGui_EXPORT OptionsWidget : public QWidget
 {
 	Q_OBJECT
 public:

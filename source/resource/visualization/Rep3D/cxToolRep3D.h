@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLREP3D_H_
 #define CXTOOLREP3D_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxRepImpl.h"
 #include "cxTransform3D.h"
 
@@ -67,7 +69,7 @@ typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
  * \ingroup cx_resource_visualization
  * \ingroup cx_resource_visualization_rep3D
  */
-class ToolRep3D : public RepImpl
+class cxResourceVisualization_EXPORT ToolRep3D : public RepImpl
 {
 	Q_OBJECT
 public:

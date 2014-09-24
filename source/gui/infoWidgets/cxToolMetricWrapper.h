@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLMETRICWRAPPER_H
 #define CXTOOLMETRICWRAPPER_H
 
+#include "cxGuiExport.h"
+
 #include "cxToolMetric.h"
 #include "cxDataMetricWrappers.h"
 #include "cxTransform3DWidget.h"
@@ -44,7 +46,7 @@ namespace cx {
  * \author Ole Vegard Solberg, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class ToolMetricWrapper : public MetricBase
+class cxGui_EXPORT ToolMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:

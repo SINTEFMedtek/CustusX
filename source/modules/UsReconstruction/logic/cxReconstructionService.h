@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRECONSTRUCTIONSERVICE_H_
 #define CXRECONSTRUCTIONSERVICE_H_
 
+#include "cxPluginUSReconstructionExport.h"
+
 #include <vector>
 #include <QObject>
 #include <vtkSmartPointer.h>
@@ -70,7 +72,7 @@ typedef class ReconstructionService* ReconstructionServicePtr;
  *  \author Ole Vegard Solberg
  *  \author Janne Beate Bakeng
  */
-class ReconstructionService : public QObject
+class cxPluginUSReconstruction_EXPORT ReconstructionService : public QObject
 {
     Q_OBJECT
 public:

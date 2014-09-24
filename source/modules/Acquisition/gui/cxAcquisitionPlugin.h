@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXACQUISITIONPLUGIN_H_
 #define CXACQUISITIONPLUGIN_H_
 
+#include "cxPluginAcquisitionExport.h"
+
 #include "cxGUIExtenderService.h"
 class QDomNode;
 
@@ -65,7 +67,7 @@ typedef boost::shared_ptr<class AcquisitionPlugin> AcquisitionPluginPtr;
 /**
  *
  */
-class AcquisitionPlugin: public GUIExtenderService
+class cxPluginAcquisition_EXPORT  AcquisitionPlugin: public GUIExtenderService
 {
 Q_OBJECT
 public:

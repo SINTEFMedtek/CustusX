@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPREFERENCETAB_H_
 #define CXPREFERENCETAB_H_
 
+#include "cxGuiExport.h"
+
 #include "cxDoubleDataAdapterXml.h"
 #include "cxStringDataAdapterXml.h"
 
@@ -45,7 +47,7 @@ class QVBoxLayout;
 namespace cx
 {
 
-class PreferenceTab : public QWidget
+class cxGui_EXPORT PreferenceTab : public QWidget
 {
   Q_OBJECT
 public:
@@ -71,7 +73,7 @@ protected:
  * \date Mar 8, 2010
  * \author Ole Vegard Solberg, SINTEF
  */
-class PerformanceTab : public PreferenceTab
+class cxGui_EXPORT PerformanceTab : public PreferenceTab
 {
     Q_OBJECT
 

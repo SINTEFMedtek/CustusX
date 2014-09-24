@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRANSFERFUNCTIONWIDGET_H_
 #define CXTRANSFERFUNCTIONWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 #include <QCheckBox>
 #include <QDomElement>
@@ -60,7 +62,7 @@ class TransferFunctionColorWidget;
 
 /** Superclass for all doubles interacting with a ImageTFData.
  */
-class DoubleDataAdapterImageTFDataBase : public DoubleDataAdapter
+class cxGui_EXPORT DoubleDataAdapterImageTFDataBase : public DoubleDataAdapter
 {
   Q_OBJECT
 public:
@@ -83,7 +85,7 @@ typedef boost::shared_ptr<DoubleDataAdapterImageTFDataBase> DoubleDataAdapterIma
 
 /**DataInterface implementation for the tf window value
  */
-class DoubleDataAdapterImageTFDataWindow : public DoubleDataAdapterImageTFDataBase
+class cxGui_EXPORT DoubleDataAdapterImageTFDataWindow : public DoubleDataAdapterImageTFDataBase
 {
 public:
   virtual ~DoubleDataAdapterImageTFDataWindow() {}
@@ -95,7 +97,7 @@ public:
 
 /**DataInterface implementation for the tf level value
  */
-class DoubleDataAdapterImageTFDataLevel : public DoubleDataAdapterImageTFDataBase
+class cxGui_EXPORT DoubleDataAdapterImageTFDataLevel : public DoubleDataAdapterImageTFDataBase
 {
   Q_OBJECT
 public:
@@ -108,7 +110,7 @@ public:
 
 /**DataInterface implementation for the tf llr value
  */
-class DoubleDataAdapterImageTFDataLLR : public DoubleDataAdapterImageTFDataBase
+class cxGui_EXPORT DoubleDataAdapterImageTFDataLLR : public DoubleDataAdapterImageTFDataBase
 {
   Q_OBJECT
 public:
@@ -121,7 +123,7 @@ public:
 
 /**DataInterface implementation for the tf alpha value
  */
-class DoubleDataAdapterImageTFDataAlpha : public DoubleDataAdapterImageTFDataBase
+class cxGui_EXPORT DoubleDataAdapterImageTFDataAlpha : public DoubleDataAdapterImageTFDataBase
 {
   Q_OBJECT
 public:
@@ -132,7 +134,7 @@ public:
   virtual DoubleRange getValueRange() const;
 };
 
-class TransferFunction3DWidget : public BaseWidget
+class cxGui_EXPORT TransferFunction3DWidget : public BaseWidget
 {
   Q_OBJECT
 
@@ -153,7 +155,7 @@ protected:
   ActiveImageProxyPtr mActiveImageProxy;
 };
 
-class TransferFunction2DWidget : public BaseWidget
+class cxGui_EXPORT TransferFunction2DWidget : public BaseWidget
 {
   Q_OBJECT
 
@@ -184,7 +186,7 @@ protected:
  * \\author Janne Beate Bakeng, SINTEF
  * \\author Ole Vegard Solberg, SINTEF
  */
-class TransferFunctionWidget : public BaseWidget
+class cxGui_EXPORT TransferFunctionWidget : public BaseWidget
 {
   Q_OBJECT
 

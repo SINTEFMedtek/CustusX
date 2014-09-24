@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXXMLNODEWRAPPER_H
 #define CXXMLNODEWRAPPER_H
 
+#include "cxResourceExport.h"
+
 #include <QDomNode>
 #include <QStringList>
 #include <vector>
@@ -50,7 +52,7 @@ namespace cx
  * \date 2014-02-27
  * \author christiana
  */
-class XMLNodeAdder
+class cxResource_EXPORT XMLNodeAdder
 {
 public:
 	XMLNodeAdder(QDomNode node);
@@ -76,7 +78,7 @@ private:
  * \date 2014-02-27
  * \author christiana
  */
-class XMLNodeParser
+class cxResource_EXPORT XMLNodeParser
 {
 public:
 	XMLNodeParser(QDomNode node);

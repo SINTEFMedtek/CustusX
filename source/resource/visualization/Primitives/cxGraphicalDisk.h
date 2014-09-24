@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXGRAPHICALDISK_H
 #define CXGRAPHICALDISK_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include <boost/shared_ptr.hpp>
 #include "vtkForwardDeclarations.h"
 #include "cxVector3D.h"
@@ -48,7 +50,7 @@ namespace cx
  * \date 2014-02-25
  * \author christiana
  */
-class GraphicalDisk
+class cxResourceVisualization_EXPORT GraphicalDisk
 {
 public:
 	GraphicalDisk();

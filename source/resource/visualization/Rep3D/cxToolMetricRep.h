@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLMETRICREP_H
 #define CXTOOLMETRICREP_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxDataMetricRep.h"
 #include "cxGraphicalPrimitives.h"
 #include "cxToolMetric.h"
@@ -56,7 +58,7 @@ typedef boost::shared_ptr<class ToolMetricRep> ToolMetricRepPtr;
  * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF
  */
-class ToolMetricRep: public DataMetricRep
+class cxResourceVisualization_EXPORT ToolMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:

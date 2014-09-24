@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMHDIMAGESTREAMER_H_
 #define CXMHDIMAGESTREAMER_H_
 
+#include "cxGrabberExport.h"
+
 #include "boost/shared_ptr.hpp"
 #include "cxStreamer.h"
 
@@ -53,7 +55,7 @@ vtkImageDataPtr convertToTestColorImage(vtkImageDataPtr image);
  * \author Janne Beate Bakeng, SINTEF
  * \date May 16, 2013
  */
-class ImageTestData
+class cxGrabber_EXPORT ImageTestData
 {
 public:
 	static ImageTestData initializePrimaryData(vtkImageDataPtr source, QString filename);
@@ -76,7 +78,7 @@ typedef boost::shared_ptr<class ImageTestData> ImageTestDataPtr;
  * \author Christian Askeland, SINTEF
  * \date Jun 21, 2011
  */
-class DummyImageStreamer: public Streamer
+class cxGrabber_EXPORT DummyImageStreamer: public Streamer
 {
 Q_OBJECT
 

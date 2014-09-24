@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGETF3D_H_
 #define CXIMAGETF3D_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 #include "vtkForwardDeclarations.h"
@@ -66,7 +69,7 @@ typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
  *  Created on: Jan 9, 2009
  *      Author: christiana
  */
-class ImageTF3D: public ImageTFData
+class cxResource_EXPORT ImageTF3D: public ImageTFData
 {
 Q_OBJECT
 public:

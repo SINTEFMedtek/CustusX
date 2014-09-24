@@ -55,6 +55,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CTKPLUGINTABLEMODEL_H
 #define CTKPLUGINTABLEMODEL_H
 
+#include "cxGuiExport.h"
+
 #include <QAbstractTableModel>
 
 #include <QList>
@@ -68,7 +70,7 @@ class ctkPluginContext;
 namespace cx
 {
 
-class ctkPluginTableModel : public QAbstractTableModel
+class cxGui_EXPORT ctkPluginTableModel : public QAbstractTableModel
 {
 
   Q_OBJECT

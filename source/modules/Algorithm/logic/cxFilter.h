@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFILTER_H
 #define CXFILTER_H
 
+#include "cxPluginAlgorithmExport.h"
+
 #include <vector>
 #include <QObject>
 #include "cxXmlOptionItem.h"
@@ -65,7 +67,7 @@ typedef boost::shared_ptr<class Filter> FilterPtr;
  * \date Nov 16, 2012
  * \author christiana
  */
-class Filter : public QObject
+class cxPluginAlgorithm_EXPORT Filter : public QObject
 {
 	Q_OBJECT
 
@@ -185,7 +187,7 @@ signals:
   * Connects them by giving them unique id's.
   *
   */
-class FilterGroup
+class cxPluginAlgorithm_EXPORT FilterGroup
 {
 public:
 	FilterGroup(XmlOptionFile options);

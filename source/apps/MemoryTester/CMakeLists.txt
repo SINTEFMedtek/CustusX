@@ -15,7 +15,7 @@ SET( SOURCE_FILES
 	
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 
-
+cx_remove_duplicate_include_directories()
 QT5_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 	
 QT5_ADD_RESOURCES( QT_RESOURCE_FILES resource.qrc )

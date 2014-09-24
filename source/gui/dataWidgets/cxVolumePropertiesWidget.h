@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVOLUMEPROPERTIESWIDGET_H_
 #define CXVOLUMEPROPERTIESWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxTabbedWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxDataInterface.h"
@@ -47,7 +49,7 @@ namespace cx
  * \date Aug 20, 2010
  * \author Christian Askeland, SINTEF
  */
-class ActiveVolumeWidget : public BaseWidget
+class cxGui_EXPORT ActiveVolumeWidget : public BaseWidget
 {
   Q_OBJECT
 public:
@@ -65,7 +67,7 @@ public:
  * \date Aug 20, 2010
  * \author christiana
  */
-class VolumePropertiesWidget : public TabbedWidget
+class cxGui_EXPORT VolumePropertiesWidget : public TabbedWidget
 {
   Q_OBJECT
 public:

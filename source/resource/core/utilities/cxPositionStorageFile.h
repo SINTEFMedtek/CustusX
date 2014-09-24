@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPOSITIONSTORAGEFILE_H_
 #define CXPOSITIONSTORAGEFILE_H_
 
+#include "cxResourceExport.h"
+
 #include <QString>
 #include <QFile>
 #include <QDataStream>
@@ -73,7 +75,7 @@ namespace cx {
  * \sa PositionStorageWriter
  * \ingroup cx_resource_core_utilities
  */
-class PositionStorageReader
+class cxResource_EXPORT PositionStorageReader
 {
 public:
 	PositionStorageReader(QString filename);
@@ -105,7 +107,7 @@ typedef boost::shared_ptr<PositionStorageReader> PositionStorageReaderPtr;
  * \sa PositionStorageReader
  * \ingroup sscUtility
  */
-class PositionStorageWriter
+class cxResource_EXPORT PositionStorageWriter
 {
 public:
 	PositionStorageWriter(QString filename);

@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTERI2IWIDGET_H_
 #define CXREGISTERI2IWIDGET_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include <vector>
 #include <QtWidgets>
 
@@ -60,7 +62,7 @@ class SeansVesselRegistrationWidget;
  * \date 13. okt. 2010
  * \\author Janne Beate Bakeng
  */
-class RegisterI2IWidget : public RegistrationBaseWidget
+class cxPluginRegistration_EXPORT RegisterI2IWidget : public RegistrationBaseWidget
 {
   Q_OBJECT
 

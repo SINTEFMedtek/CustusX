@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSELECTRECORDSESSIONSTRINGDATAADAPTER_H_
 #define CXSELECTRECORDSESSIONSTRINGDATAADAPTER_H_
 
+#include "cxPluginAcquisitionExport.h"
+
 #include "cxDataInterface.h"
 #include "cxRecordSession.h"
 #include "cxAcquisitionData.h"
@@ -46,7 +48,7 @@ namespace cx
 
 /** Base class for all DataAdapters that selects a record session.
  */
-class SelectRecordSessionStringDataAdapterBase : public StringDataAdapter
+class cxPluginAcquisition_EXPORT  SelectRecordSessionStringDataAdapterBase : public StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -72,7 +74,7 @@ typedef boost::shared_ptr<class SelectRecordSessionStringDataAdapter> SelectReco
  * Use setValue/getValue plus changed() to access it.
  *
  */
-class SelectRecordSessionStringDataAdapter : public SelectRecordSessionStringDataAdapterBase
+class cxPluginAcquisition_EXPORT  SelectRecordSessionStringDataAdapter : public SelectRecordSessionStringDataAdapterBase
 {
   Q_OBJECT
 public:

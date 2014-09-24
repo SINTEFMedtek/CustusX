@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFRAMEMETRICBASE_H_
 #define CXFRAMEMETRICBASE_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include "cxDataMetric.h"
 #include "cxCoordinateSystemHelpers.h"
 
@@ -45,7 +48,7 @@ namespace cx {
  * \date Sep 2, 2013
  * \author Ole Vegard Solberg, SINTEF
  */
-class FrameMetricBase: public DataMetric
+class cxResource_EXPORT FrameMetricBase: public DataMetric
 {
 	Q_OBJECT
 public:

@@ -32,8 +32,7 @@ if (BUILD_TESTING)
 
 	cx_catch_add_lib_and_exe(cxVisualizationService
 		"${CX_CPPUNIT_VISUALIZATIONSERVICE_SOURCES}"
-		"${CXTEST_SOURCES_TO_MOC}"
-		"cxResourceVisualizationTestUtilities")
+		"${CXTEST_SOURCES_TO_MOC}")
 
 
 

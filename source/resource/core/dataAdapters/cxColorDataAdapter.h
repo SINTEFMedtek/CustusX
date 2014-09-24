@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCOLORDATAADAPTER_H_
 #define CXCOLORDATAADAPTER_H_
 
+#include "cxResourceExport.h"
+
 #include <QColor>
 #include "cxDataAdapter.h"
 
@@ -47,7 +49,7 @@ namespace cx
  * \date Nov 22, 2012
  * \author christiana
  */
-class ColorDataAdapter: public DataAdapter
+class cxResource_EXPORT ColorDataAdapter: public DataAdapter
 {
 Q_OBJECT
 public:

@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATASELECTWIDGET_H
 #define CXDATASELECTWIDGET_H
 
+#include "cxGuiExport.h"
+
 #include "boost/shared_ptr.hpp"
 #include "cxBaseWidget.h"
 #include <QMouseEvent>
@@ -52,7 +54,7 @@ typedef boost::shared_ptr<class SelectDataStringDataAdapterBase> SelectDataStrin
   * \date Nov 25, 2012
   * \author christiana
   */
-class DataSelectWidget : public BaseWidget
+class cxGui_EXPORT DataSelectWidget : public BaseWidget
 {
     Q_OBJECT
 public:
@@ -88,7 +90,7 @@ private:
   * \date Nov 25, 2012
   * \author christiana
   */
-class EraseDataToolButton : public CXSmallToolButton
+class cxGui_EXPORT EraseDataToolButton : public CXSmallToolButton
 {
     Q_OBJECT
 public:

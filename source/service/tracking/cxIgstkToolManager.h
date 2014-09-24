@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIGSTKTOOLMANAGER_H_
 #define CXIGSTKTOOLMANAGER_H_
 
+#include "cxTrackingServiceExport.h"
+
 #include <map>
 #include <vector>
 #include <QThread>
@@ -60,7 +62,7 @@ namespace cx
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class IgstkToolManager: public QObject
+class cxTrackingService_EXPORT IgstkToolManager: public QObject
 {
 Q_OBJECT
 

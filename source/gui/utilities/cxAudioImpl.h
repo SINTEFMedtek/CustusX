@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXAUDIOIMPL_H_
 #define CXAUDIOIMPL_H_
 
+#include "cxGuiExport.h"
+
 #include "cxAudio.h"
 #include <QObject>
 #include <QString>
@@ -43,7 +45,7 @@ namespace cx {
  * \ingroup cx_gui
  *
  */
-class AudioInternal : public QObject
+class cxGui_EXPORT AudioInternal : public QObject
 {
 	Q_OBJECT
 public:
@@ -64,7 +66,7 @@ private slots:
  * \date Mar 4, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class AudioImpl : public Audio
+class cxGui_EXPORT AudioImpl : public Audio
 {
 public:
   AudioImpl();

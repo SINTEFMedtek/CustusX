@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGEPROPERTIESWIDGET_H
 #define CXIMAGEPROPERTIESWIDGET_H
 
+#include "cxGuiExport.h"
+
 #include <QtWidgets>
 
 #include "cxBaseWidget.h"
@@ -43,7 +45,7 @@ class QComboBox;
 namespace cx
 {
 
-class ImagePropertiesWidget : public BaseWidget
+class cxGui_EXPORT ImagePropertiesWidget : public BaseWidget
 {
 	Q_OBJECT
 

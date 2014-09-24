@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRECONSTRUCTPREPROCESSOR_H_
 #define CXRECONSTRUCTPREPROCESSOR_H_
 
+#include "cxPluginUSReconstructionExport.h"
 
 #include "cxBoundingBox3D.h"
 #include "cxReconstructedOutputVolumeParams.h"
@@ -50,7 +51,7 @@ typedef boost::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessor
  *  \date Oct 29, 2012
  *  \author christiana
  */
-class ReconstructPreprocessor
+class cxPluginUSReconstruction_EXPORT ReconstructPreprocessor
 {
 public:
     ReconstructPreprocessor();

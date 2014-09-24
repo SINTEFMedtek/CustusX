@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXExportDataDialog_H_
 #define CXExportDataDialog_H_
 
+#include "cxGuiExport.h"
+
 #include <QDialog>
 #include "cxDataInterface.h"
 class QPushButton;
@@ -50,7 +52,7 @@ namespace cx
  * \date Oct 03, 2012
  *\author christiana
  */
-class ExportDataDialog : public QDialog
+class cxGui_EXPORT ExportDataDialog : public QDialog
 {
   Q_OBJECT
 public:

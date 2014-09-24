@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREPIMPL_H_
 #define CXREPIMPL_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include <set>
 #include "cxRep.h"
 #include "cxIndent.h"
@@ -57,7 +59,7 @@ namespace cx
  *
  * \ingroup cx_resource_visualization
  */
-class RepImpl : public Rep
+class cxResourceVisualization_EXPORT RepImpl : public Rep
 {
 	Q_OBJECT
 public:

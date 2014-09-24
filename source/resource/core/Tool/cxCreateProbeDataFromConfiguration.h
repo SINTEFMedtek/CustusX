@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCREATEPROBEDATAFROMCONFIGURATION_H_
 #define CXCREATEPROBEDATAFROMCONFIGURATION_H_
 
+#include "cxResourceExport.h"
+
 #include "cxProbeData.h"
 #include "ProbeXmlConfigParser.h"
 
@@ -102,13 +104,13 @@ namespace cx
  *
  * \sa ProbeXmlConfigParser
  */
-ProbeDefinition createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config);
+cxResource_EXPORT ProbeDefinition createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config);
 
 /**
  * \sa ProbeXmlConfigParser
  * \sa createConfigurationFromProbeData()
  */
-ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlConfigParser::Configuration basis, ProbeDefinition data);
+cxResource_EXPORT ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlConfigParser::Configuration basis, ProbeDefinition data);
 
 } // namespace cx
 

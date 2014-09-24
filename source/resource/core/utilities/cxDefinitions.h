@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDEFINITIONS_H_
 #define CXDEFINITIONS_H_
 
+#include "cxResourceExport.h"
+
 namespace cx
 {
 
@@ -41,13 +43,13 @@ namespace cx
  * @{
  */
 
-	enum ORIENTATION_TYPE
+	cxResource_EXPORT enum ORIENTATION_TYPE
 	{
 		otOBLIQUE,   ///< orient planes relative to the tool space
 		otORTHOGONAL, ///< orient planes relative to the image/reference space.
 		otCOUNT
 	};
-	enum PLANE_TYPE
+	cxResource_EXPORT enum PLANE_TYPE
 	{
 		ptNOPLANE,     ///< a initial plane, if no yet set
 		ptSAGITTAL,   ///< a slice seen from the side of the patient
@@ -58,7 +60,7 @@ namespace cx
 		ptRADIALPLANE, ///< y-rotated 90* relative to anyplane (bird's view)
 		ptCOUNT
 	};
-	enum FOLLOW_TYPE
+	cxResource_EXPORT enum FOLLOW_TYPE
 	{
 		ftFOLLOW_TOOL, ///< center follows tool
 		ftFIXED_CENTER, ///< center is set.
@@ -67,7 +69,7 @@ namespace cx
 	/**Determines the clinical application where the system is to be used.
 	 * Use this to adapt components to that clinical application� terminology/habits.
 	 */
-	enum CLINICAL_APPLICATION
+	cxResource_EXPORT enum CLINICAL_APPLICATION
 	{
 		mdLABORATORY,
 		mdNEUROLOGY,
@@ -77,7 +79,7 @@ namespace cx
 		mdCOUNT
 	};
 
-	enum MESSAGE_LEVEL
+	cxResource_EXPORT enum MESSAGE_LEVEL
 	{
 		mlINFO,
 		mlWARNING,
@@ -91,7 +93,7 @@ namespace cx
 		mlCOUNT
 	};
 
-	enum COORDINATE_SYSTEM
+	cxResource_EXPORT enum COORDINATE_SYSTEM
 	{
 		csREF, ///< the data reference space (r)
 		csDATA, ///< a datas space (d)
@@ -103,7 +105,7 @@ namespace cx
 		csCOUNT
 	};
 
-	enum TRACKING_SYSTEM
+	cxResource_EXPORT enum TRACKING_SYSTEM
 	{
 		tsNONE,             ///< Not specified
 		tsPOLARIS,          ///< NDIs Polaris tracker

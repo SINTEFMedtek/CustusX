@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRECONSTRUCTPARAMS_H_
 #define CXRECONSTRUCTPARAMS_H_
 
+#include "cxPluginUSReconstructionExport.h"
+
 #include "cxXmlOptionItem.h"
 #include "cxForwardDeclarations.h"
 #include "cxLegacySingletons.h"
@@ -51,7 +53,7 @@ namespace cx
  * These parameters are used by the ReconstructionManager, the core reconstruction
  * use the ReconstructCore::InputParams instead.
  */
-class ReconstructParams : public QObject
+class cxPluginUSReconstruction_EXPORT ReconstructParams : public QObject
 {
 	Q_OBJECT
 

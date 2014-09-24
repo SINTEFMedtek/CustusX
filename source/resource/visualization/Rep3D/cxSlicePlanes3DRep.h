@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSLICEPLANES3DREP_H_
 #define CXSLICEPLANES3DREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include <map>
 #include "cxRepImpl.h"
 #include "cxBoundingBox3D.h"
@@ -59,7 +61,7 @@ class DataManager;
  *
  * \ingroup cx_resource_visualization
  */
-class SlicePlanesProxy : public QObject
+class cxResourceVisualization_EXPORT SlicePlanesProxy : public QObject
 {
 	Q_OBJECT
 public:
@@ -128,7 +130,7 @@ typedef boost::shared_ptr<class SlicePlanes3DRep> SlicePlanes3DRepPtr;
 
  * \ingroup cx_resource_visualization_rep3D
  */
-class SlicePlanes3DRep : public RepImpl
+class cxResourceVisualization_EXPORT SlicePlanes3DRep : public RepImpl
 {
 	Q_OBJECT
 public:
@@ -179,7 +181,7 @@ typedef boost::shared_ptr<class SlicePlanes3DMarkerIn2DRep> SlicePlanes3DMarkerI
 
  * \ingroup cx_resource_visualization_rep2D
  */
-class SlicePlanes3DMarkerIn2DRep : public RepImpl
+class cxResourceVisualization_EXPORT SlicePlanes3DMarkerIn2DRep : public RepImpl
 {
 	Q_OBJECT
 public:

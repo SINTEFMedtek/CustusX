@@ -47,9 +47,12 @@ SET ( cxTrackingService_SOURCE
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES} ${IGSTK_LIBRARY_DIRS})
 
+cx_remove_duplicate_include_directories()
 QT5_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
-ADD_LIBRARY ( cxTrackingService ${cxTrackingService_SOURCE} ${MOC_HEADER_FILES})
+cx_create_export_header("cxTrackingService")
+
+add_library( cxTrackingService ${cxTrackingService_SOURCE} ${MOC_HEADER_FILES})
 target_link_libraries(cxTrackingService LINK_PUBLIC cxResource LINK_PRIVATE IGSTK)
 
 ADD_SUBDIRECTORY( testing )

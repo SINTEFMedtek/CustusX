@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPLAYBACKTIME_H_
 #define CXPLAYBACKTIME_H_
 
+#include "cxResourceExport.h"
+
 #include <QObject>
 #include <QDateTime>
 #include <QColor>
@@ -54,7 +56,7 @@ namespace cx
  * \date Mar 29, 2012
  * \author Christian Askeland, SINTEF
  */
-class PlaybackTime : public QObject
+class cxResource_EXPORT PlaybackTime : public QObject
 {
 	Q_OBJECT
 public:
@@ -108,7 +110,7 @@ typedef boost::shared_ptr<PlaybackTime> PlaybackTimePtr;
  *
  * \sa PlaybackTime
  */
-class TimelineEvent
+class cxResource_EXPORT TimelineEvent
 {
 public:
 	TimelineEvent() : mStartTime(0), mEndTime(0), mColor("black") {}

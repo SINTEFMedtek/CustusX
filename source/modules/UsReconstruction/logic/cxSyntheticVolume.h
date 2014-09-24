@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SYNTHETIC_VOLUME_HPP
 #define SYNTHETIC_VOLUME_HPP
 
+#include "cxPluginUSReconstructionExport.h"
+
 #include "cxUSFrameData.h"
 #include <vector>
 #include "cxMathBase.h"
@@ -52,7 +54,7 @@ namespace cx {
  *      from this class.
  */
 
-class cxSyntheticVolume {
+class cxPluginUSReconstruction_EXPORT cxSyntheticVolume {
 public:
 
 	cxSyntheticVolume(Vector3D bounds)
@@ -135,9 +137,9 @@ protected:
 
 typedef boost::shared_ptr<cxSyntheticVolume> cxSyntheticVolumePtr;
 
-double calculateRMSError(vtkImageDataPtr a, vtkImageDataPtr b);
-cx::Vector3D calculateCentroid(cx::ImagePtr image);
-double calculateMass(cx::ImagePtr image);
+cxPluginUSReconstruction_EXPORT double calculateRMSError(vtkImageDataPtr a, vtkImageDataPtr b);
+cxPluginUSReconstruction_EXPORT cx::Vector3D calculateCentroid(cx::ImagePtr image);
+cxPluginUSReconstruction_EXPORT double calculateMass(cx::ImagePtr image);
 
 }
 #endif

@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATA_H_
 #define CXDATA_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include <string>
 #include <set>
 
@@ -58,7 +61,7 @@ typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 /**Denotes the various states
  * of registration an object is in.
  */
-enum REGISTRATION_STATUS
+cxResource_EXPORT enum REGISTRATION_STATUS
 {
 	rsNOT_REGISTRATED, rsIMAGE_REGISTRATED, rsPATIENT_REGISTRATED
 };
@@ -69,7 +72,7 @@ enum REGISTRATION_STATUS
  *
  * \ingroup cx_resource_core_data
  */
-class Data: public QObject
+class cxResource_EXPORT Data: public QObject
 {
 Q_OBJECT
 public:

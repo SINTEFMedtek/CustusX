@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATAREPCONTAINER_H
 #define CXDATAREPCONTAINER_H
 
+#include "cxVisualizationServiceExport.h"
+
 #include "cxForwardDeclarations.h"
 #include "cxSettings.h"
 
@@ -51,7 +53,7 @@ typedef boost::shared_ptr<class DataRepContainer> DataRepContainerPtr;
 /** Creates and manages a list of reps based on input Data objects.
   *
   */
-class DataRepContainer
+class cxVisualizationService_EXPORT DataRepContainer
 {
 public:
 	void setSliceProxy(SliceProxyPtr sliceProxy);

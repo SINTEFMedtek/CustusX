@@ -32,6 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGEPARAMETERS_H
 #define CXIMAGEPARAMETERS_H
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include "cxVector3D.h"
 #include "cxTransform3D.h"
 
@@ -45,7 +48,7 @@ namespace cx
  * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF
  */
-class ImageParameters
+class cxResource_EXPORT ImageParameters
 {
 public:
 	ImageParameters();

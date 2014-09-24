@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMOUSEPADWIDGET_H_
 #define CXMOUSEPADWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QFrame>
 
 namespace cx
@@ -51,7 +53,7 @@ namespace cx
  *
  * \ingroup cx_resource_widgets
  */
-class MousePadWidgetInternal: public QFrame
+class cxResourceWidgets_EXPORT MousePadWidgetInternal: public QFrame
 {
 Q_OBJECT
 
@@ -86,7 +88,7 @@ private:
  *
  * \ingroup cx_resource_widgets
  */
-class MousePadWidget: public QFrame
+class cxResourceWidgets_EXPORT MousePadWidget: public QFrame
 {
 Q_OBJECT
 

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSTREAMERSERVICEUTILITIES_H_
 #define CXSTREAMERSERVICEUTILITIES_H_
 
+#include "cxVideoServiceExport.h"
+
 #include <QString>
 #include <ctkPluginContext.h>
 #include "cxStreamerService.h"
@@ -46,7 +48,7 @@ namespace cx
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class StreamerServiceUtilities
+class cxVideoService_EXPORT StreamerServiceUtilities
 {
 public:
 	static StreamerService* getStreamerService(QString name, ctkPluginContext* context);

@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRANSFORM3D_H_
 #define CXTRANSFORM3D_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include <boost/array.hpp>
 #include <boost/shared_ptr.hpp>
 #include <QString>
@@ -44,13 +47,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 namespace cx_transform3D_internal
 {
-boost::array<double, 16> flatten(const Eigen::Affine3d* self);
-void fill(Eigen::Affine3d* self, vtkMatrix4x4Ptr m);
-void fill(Eigen::Affine3d* self, const double* raw);
-vtkMatrix4x4Ptr getVtkMatrix(const Eigen::Affine3d* self);
-std::ostream& put(const Eigen::Affine3d* self, std::ostream& s, int indent, char newline);
-Eigen::Affine3d fromString(const QString& text, bool* _ok);
-vtkTransformPtr getVtkTransform(const Eigen::Affine3d* self);
+cxResource_EXPORT boost::array<double, 16> flatten(const Eigen::Affine3d* self);
+cxResource_EXPORT void fill(Eigen::Affine3d* self, vtkMatrix4x4Ptr m);
+cxResource_EXPORT void fill(Eigen::Affine3d* self, const double* raw);
+cxResource_EXPORT vtkMatrix4x4Ptr getVtkMatrix(const Eigen::Affine3d* self);
+cxResource_EXPORT std::ostream& put(const Eigen::Affine3d* self, std::ostream& s, int indent, char newline);
+cxResource_EXPORT Eigen::Affine3d fromString(const QString& text, bool* _ok);
+cxResource_EXPORT vtkTransformPtr getVtkTransform(const Eigen::Affine3d* self);
 }
 
 namespace Eigen
@@ -162,18 +165,18 @@ class DoubleBoundingBox3D;
  */
 typedef Eigen::Affine3d Transform3D;
 
-bool similar(const Transform3D& a, const Transform3D& b, double tol = 1.0E-4);
+cxResource_EXPORT bool similar(const Transform3D& a, const Transform3D& b, double tol = 1.0E-4);
 
-DoubleBoundingBox3D transform(const Transform3D& m, const DoubleBoundingBox3D& bb);
+cxResource_EXPORT DoubleBoundingBox3D transform(const Transform3D& m, const DoubleBoundingBox3D& bb);
 
-Transform3D createTransformNormalize(const DoubleBoundingBox3D& in, const DoubleBoundingBox3D& out);
-Transform3D createTransformScale(const Vector3D& scale);
-Transform3D createTransformTranslate(const Vector3D& translation);
-Transform3D createTransformRotateX(const double angle);
-Transform3D createTransformRotateY(const double angle);
-Transform3D createTransformRotateZ(const double angle);
-Transform3D createTransformIJC(const Vector3D& ivec, const Vector3D& jvec, const Vector3D& center);
-Transform3D createTransformRotationBetweenVectors(Vector3D from, Vector3D to);
+cxResource_EXPORT Transform3D createTransformNormalize(const DoubleBoundingBox3D& in, const DoubleBoundingBox3D& out);
+cxResource_EXPORT Transform3D createTransformScale(const Vector3D& scale);
+cxResource_EXPORT Transform3D createTransformTranslate(const Vector3D& translation);
+cxResource_EXPORT Transform3D createTransformRotateX(const double angle);
+cxResource_EXPORT Transform3D createTransformRotateY(const double angle);
+cxResource_EXPORT Transform3D createTransformRotateZ(const double angle);
+cxResource_EXPORT Transform3D createTransformIJC(const Vector3D& ivec, const Vector3D& jvec, const Vector3D& center);
+cxResource_EXPORT Transform3D createTransformRotationBetweenVectors(Vector3D from, Vector3D to);
 
 // --------------------------------------------------------
 typedef boost::shared_ptr<Transform3D> Transform3DPtr;

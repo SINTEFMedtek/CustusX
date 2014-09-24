@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLAYOUTEDITORWIDGET_H_
 #define CXLAYOUTEDITORWIDGET_H_
 
+#include "cxGuiExport.h"
 
 #include <map>
 #include <set>
@@ -53,7 +54,7 @@ namespace cx
 /**A QLineEdit
  * \ingroup cx_gui
  */
-class SmallLineEdit : public QLineEdit
+class cxGui_EXPORT SmallLineEdit : public QLineEdit
 {
 public:
   SmallLineEdit(QWidget* parent = 0) : QLineEdit(parent) {}
@@ -69,7 +70,7 @@ public:
  * \ingroup cx_gui
  *
  */
-class LayoutEditorWidget : public QWidget
+class cxGui_EXPORT LayoutEditorWidget : public QWidget
 {
   Q_OBJECT
 public:

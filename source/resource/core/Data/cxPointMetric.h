@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPOINTMETRIC_H_
 #define CXPOINTMETRIC_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include "cxDataMetric.h"
 #include "cxOptionalValue.h"
 #include "cxCoordinateSystemHelpers.h"
@@ -57,7 +60,7 @@ typedef boost::shared_ptr<class PointMetric> PointMetricPtr;
  * \date Jul 4, 2011
  * \author Christian Askeland, SINTEF
  */
-class PointMetric: public DataMetric
+class cxResource_EXPORT PointMetric: public DataMetric
 {
 Q_OBJECT
 public:

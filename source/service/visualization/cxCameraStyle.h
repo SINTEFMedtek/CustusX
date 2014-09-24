@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCAMERASTYLE_H_
 #define CXCAMERASTYLE_H_
 
+#include "cxVisualizationServiceExport.h"
+
 #include <QPointer>
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
@@ -72,7 +74,7 @@ typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServic
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class CameraStyle: public QObject
+class cxVisualizationService_EXPORT CameraStyle: public QObject
 {
 Q_OBJECT
 public:
@@ -101,7 +103,7 @@ private:
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class CameraStyleInteractor: public QObject
+class cxVisualizationService_EXPORT CameraStyleInteractor: public QObject
 {
 Q_OBJECT
 public:

@@ -71,7 +71,7 @@ if(NOT QT_QMAKE_EXECUTABLE)
     get_target_property(QT_QMAKE_EXECUTABLE Qt5::qmake LOCATION)
 endif(NOT QT_QMAKE_EXECUTABLE)
 ######
-
+cx_remove_duplicate_include_directories()
 ctkMacroSetupPlugins(
     ${CX_PLUGINS} 
     BUILD_OPTION_PREFIX ${PLUGIN_BUILD_OPTION_PREFIX})

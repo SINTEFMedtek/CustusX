@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXNAVIGATIONWIDGET_H_
 #define CXNAVIGATIONWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 
 class QGroupBox;
@@ -55,7 +57,7 @@ namespace cx
  * \date 22. feb. 2010
  * \\author Janne Beate Bakeng, SINTEF
  */
-class NavigationWidget : public BaseWidget
+class cxGui_EXPORT NavigationWidget : public BaseWidget
 {
   Q_OBJECT
 

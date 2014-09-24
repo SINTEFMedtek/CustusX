@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCALIBRATIONPLUGIN_H_
 #define CXCALIBRATIONPLUGIN_H_
 
+#include "cxPluginCalibrationExport.h"
+
 #include "cxGUIExtenderService.h"
 
 /**
@@ -58,7 +60,7 @@ typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 /**
  *
  */
-class CalibrationPlugin : public GUIExtenderService
+class cxPluginCalibration_EXPORT CalibrationPlugin : public GUIExtenderService
 {
 	Q_OBJECT
 public:

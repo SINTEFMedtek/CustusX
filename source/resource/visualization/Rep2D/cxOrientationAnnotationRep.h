@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXORIENTATIONANNOTATIONREP_H_
 #define CXORIENTATIONANNOTATIONREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxRepImpl.h"
 #include "cxDefinitions.h"
 #include "vtkForwardDeclarations.h"
@@ -44,7 +46,7 @@ namespace cx
 {
 class DataManager;
 
-class OrientationAnnotation : public vtkCornerAnnotation
+class cxResourceVisualization_EXPORT OrientationAnnotation : public vtkCornerAnnotation
 {
 	vtkTypeMacro(OrientationAnnotation, vtkCornerAnnotation);
 public:
@@ -69,7 +71,7 @@ typedef vtkSmartPointer<class OrientationAnnotation> OrientationAnnotationPtr;
  * \ingroup cx_resource_visualization
  * \ingroup cx_resource_visualization_rep2D
  */
-class OrientationAnnotationRep : public RepImpl
+class cxResourceVisualization_EXPORT OrientationAnnotationRep : public RepImpl
 {
 	Q_OBJECT
 public:

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVECTOR3DCOMPONENTDATAADAPTER_H_
 #define CXVECTOR3DCOMPONENTDATAADAPTER_H_
 
+#include "cxResourceExport.h"
+
 #include "cxDoubleDataAdapter.h"
 #include "cxVector3DDataAdapter.h"
 
@@ -48,7 +50,7 @@ namespace cx
  * Useful for displaying widgets for vector components.
  *
  */
-class Vector3DComponentDataAdapter : public DoubleDataAdapter
+class cxResource_EXPORT Vector3DComponentDataAdapter : public DoubleDataAdapter
 {
   Q_OBJECT
 public:

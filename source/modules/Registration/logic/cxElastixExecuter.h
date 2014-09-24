@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXELASTIXEXECUTER_H_
 #define CXELASTIXEXECUTER_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include <QString>
 #include "cxForwardDeclarations.h"
 #include "cxTransform3D.h"
@@ -67,7 +69,7 @@ namespace cx
  * \date Feb 4, 2012
  * \author Christian Askeland, SINTEF
  */
-class ElastixExecuter : public TimedBaseAlgorithm
+class cxPluginRegistration_EXPORT ElastixExecuter : public TimedBaseAlgorithm
 {
 	Q_OBJECT
 public:
@@ -149,7 +151,7 @@ private:
 /**Reader class for an Elastix-style parameter file.
  *
  */
-class ElastixParameterFile
+class cxPluginRegistration_EXPORT ElastixParameterFile
 {
 public:
 	ElastixParameterFile(QString filename);
@@ -173,7 +175,7 @@ private:
  * between the ElastiX "EulerTransform" representation
  * and the Transform3D representation.
  */
-class ElastixEulerTransform
+class cxPluginRegistration_EXPORT ElastixEulerTransform
 {
 public:
 	Vector3D mAngles_xyz;

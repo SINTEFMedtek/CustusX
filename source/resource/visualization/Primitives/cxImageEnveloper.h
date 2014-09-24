@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMULTIVOLUMEBOUNDINGBOX_H
 #define CXMULTIVOLUMEBOUNDINGBOX_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxForwardDeclarations.h"
 #include "cxVector3D.h"
 #include "cxTransform3D.h"
@@ -52,7 +54,7 @@ typedef boost::shared_ptr<class ImageEnveloper> ImageEnveloperPtr;
  * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF
  */
-class ImageEnveloper
+class cxResourceVisualization_EXPORT ImageEnveloper
 {
 public:
 	static ImageEnveloperPtr create();

@@ -30,22 +30,52 @@ if (BUILD_TESTING)
         # link statically on linux, see explanation in cx_catch__private_define_platform_specific_linker_options
 #        cx_catch__private_define_platform_specific_linker_options()
 
-        cx_add_class_qt_moc( CX_TESTUTILITIES_SOURCE_FILES
-            cxtestQueuedSignalListener
-            cxtestDirectSignalListener
-            )
-        cx_add_class(CX_TESTUTILITIES_SOURCE_FILES
-            cxtestUtilities
-            cxtestCatchImpl
-	    cxtestCatchExamples.cpp
-            cxtestJenkinsMeasurement
-    		cxtestDummyDataManager
-            )
+        #cx_add_class_qt_moc( CX_TESTUTILITIES_SOURCE_FILES
+        #    cxtestQueuedSignalListener
+        #    cxtestDirectSignalListener
+        #    )
+        #cx_add_class(CX_TESTUTILITIES_SOURCE_FILES
+        #    cxtestUtilities
+        #    cxtestCatchImpl
+        #    cxtestCatchExamples.cpp
+        #    cxtestJenkinsMeasurement
+        #	cxtestDummyDataManager
+        #    )
 	include_directories(
 	    .
 	    ${CustusX_SOURCE_DIR}/source/ThirdParty/catch
 	    )
+
+        set(CX_TESTUTILITIES_FILES_TO_MOC
+            cxtestQueuedSignalListener.h
+            cxtestDirectSignalListener.h
+        )
+
+        set(CX_TESTUTILITIES_SOURCE_FILES
+            cxtestUtilities.h
+            cxtestUtilities.cpp
+            cxtestCatchImpl.h
+            cxtestCatchImpl.cpp
+            cxtestJenkinsMeasurement.h
+            cxtestJenkinsMeasurement.cpp
+            cxtestDummyDataManager.h
+            cxtestDummyDataManager.cpp
+            cxtestQueuedSignalListener.cpp
+            cxtestDirectSignalListener.cpp
+        )
+
+        set(DEPENDENT_ON_LIBS
+            Qt5::Test
+            cxResource
+        )
+
+        cx_remove_duplicate_include_directories()
+        #cx_create_export_header("cxtestUtilities")
 #        add_library( cxtestUtilities ${CX_CATCH_SHARED_LIB_TYPE} ${CX_TESTUTILITIES_SOURCE_FILES} )
-        cx_add_test_library(cxtestUtilities ${CX_TESTUTILITIES_SOURCE_FILES})
-        target_link_libraries(cxtestUtilities Qt5::Test cxResource)
+        #cx_add_test_library(cxtestUtilities ${CX_TESTUTILITIES_SOURCE_FILES})
+        cx_catch_add_lib_and_exe(""
+                "${CX_TESTUTILITIES_SOURCE_FILES}"
+                "${CX_TESTUTILITIES_FILES_TO_MOC}"
+                "${DEPENDENT_ON_LIBS}")
+        #target_link_libraries(cxtestUtilities Qt5::Test cxResource)
 endif (BUILD_TESTING)

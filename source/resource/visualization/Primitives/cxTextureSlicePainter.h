@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTEXTURESLICEPAINTER_H_
 #define CXTEXTURESLICEPAINTER_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include <boost/shared_ptr.hpp>
 #include <vtkOpenGLRepresentationPainter.h>
 #include <QString>
@@ -55,7 +57,7 @@ namespace cx
 
 #ifndef WIN32
 
-class SingleVolumePainterHelper
+class cxResourceVisualization_EXPORT SingleVolumePainterHelper
 {
 	GPUImageDataBufferPtr mVolumeBuffer;
 	GPUImageLutBufferPtr mLutBuffer;
@@ -87,7 +89,7 @@ public:
  *
  * \ingroup cx_resource_visualization
  */
-class TextureSlicePainter : public vtkOpenGLRepresentationPainter
+class cxResourceVisualization_EXPORT TextureSlicePainter : public vtkOpenGLRepresentationPainter
 {
 public:
 	static TextureSlicePainter* New();

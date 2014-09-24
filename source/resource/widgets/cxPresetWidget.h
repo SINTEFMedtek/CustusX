@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPRESETWIDGET_H_
 #define CXPRESETWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include "cxBaseWidget.h"
 #include "cxPresets.h"
 
@@ -50,7 +52,7 @@ namespace cx {
  * \date Mar 8, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
-class PresetWidget : public BaseWidget
+class cxResourceWidgets_EXPORT PresetWidget : public BaseWidget
 {
 	  Q_OBJECT
 

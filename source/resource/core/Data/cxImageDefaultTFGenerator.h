@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGEDEFAULTTFGENERATOR_H
 #define CXIMAGEDEFAULTTFGENERATOR_H
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include "cxForwardDeclarations.h"
 
 namespace cx
@@ -49,7 +52,7 @@ typedef std::pair<double,double> double_pair;
  * \date 2014-02-10
  * \author christiana
  */
-class ImageDefaultTFGenerator
+class cxResource_EXPORT ImageDefaultTFGenerator
 {
 public:
 	ImageDefaultTFGenerator(ImagePtr image);

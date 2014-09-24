@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDICOMMODELNODE_H
 #define CXDICOMMODELNODE_H
 
+#include "org_custusx_dicom_Export.h"
+
 #include "boost/shared_ptr.hpp"
 #include <vector>
 #include "cxDICOMModel.h"
@@ -54,7 +56,7 @@ typedef boost::shared_ptr<class DicomModelNode> NodePtr;
   * \date 2014-05-27
   * \author Christian Askeland
   */
-class DicomModelNode
+class org_custusx_dicom_EXPORT DicomModelNode
 {
 public:
 	static NodePtr createNode(int row, DicomModelNode* parent, QSharedPointer<ctkDICOMDatabase> dataBase);
@@ -108,7 +110,7 @@ protected:
 /**
   *
   */
-class NullDicomModelNode : public DicomModelNode
+class org_custusx_dicom_EXPORT NullDicomModelNode : public DicomModelNode
 {
 public:
 	NullDicomModelNode() {}
@@ -121,7 +123,7 @@ public:
 /**
   *
   */
-class RootDicomModelNode : public DicomModelNode
+class org_custusx_dicom_EXPORT RootDicomModelNode : public DicomModelNode
 {
 public:
 	RootDicomModelNode() {}
@@ -135,7 +137,7 @@ public:
 /**
   *
   */
-class PatientDicomModelNode : public DicomModelNode
+class org_custusx_dicom_EXPORT PatientDicomModelNode : public DicomModelNode
 {
 public:
 	PatientDicomModelNode() {}
@@ -151,7 +153,7 @@ public:
 /**
   *
   */
-class StudyDicomModelNode : public DicomModelNode
+class org_custusx_dicom_EXPORT StudyDicomModelNode : public DicomModelNode
 {
 public:
 	StudyDicomModelNode() {}
@@ -167,7 +169,7 @@ public:
 /**
   *
   */
-class SeriesDicomModelNode : public DicomModelNode
+class org_custusx_dicom_EXPORT SeriesDicomModelNode : public DicomModelNode
 {
 public:
 	SeriesDicomModelNode() {}

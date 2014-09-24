@@ -2,7 +2,6 @@
 ##               Gui library
 ###########################################################
 
-
 cx_add_class_qt_moc(cxGui_SRCS
 	#----------------------
 	dataAdapters/cxDataInterface
@@ -81,12 +80,8 @@ cx_add_class_qt_moc(cxGui_SRCS
 )
 
 
-# generate rules for building source files from the resources
-QT5_ADD_RESOURCES(cxGui_SRCS cxResources.qrc)
-
 cx_add_class(cxGui_SRCS
 	${cxGui_SRCS}
-	${cxGui_RCC_SRCS}
 	dataAdapters/cxDataAdapterHelper
 	)
 
@@ -121,15 +116,40 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/service/visualization
     ${CustusX_SOURCE_DIR}/source/service/video
     ${CustusX_SOURCE_DIR}/source/service/state
-    
     ${CustusX_SOURCE_DIR}/source/logic
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
+    
+    ${CustusX_BINARY_DIR}/source/resource/widgets
+    ${CustusX_BINARY_DIR}/source/resource/visualization
+    ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
+    ${CustusX_BINARY_DIR}/source/resource/videoServer
+    ${CustusX_BINARY_DIR}/source/resource/OpenIGTLinkUtilities
+    ${CustusX_BINARY_DIR}/source/service/patient     
+    ${CustusX_BINARY_DIR}/source/service/tracking     
+    ${CustusX_BINARY_DIR}/source/service/visualization
+    ${CustusX_BINARY_DIR}/source/service/video
+    ${CustusX_BINARY_DIR}/source/service/state
+    ${CustusX_BINARY_DIR}/source/logic
+    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
+    ${CustusX_BINARY_DIR}/source/resource/pluginUtilities
     )
     
 set(CX_GUI_LIBRARIES cxLogicManager cxStateService cxResourceWidgets)
-    
-add_library( cxGui ${cxGui_SRCS} )
+
+cx_create_export_header("cxGui")
+
+# generate rules for building source files from the resources
+QT5_ADD_RESOURCES(cxResources cxResources.qrc)
+if(CX_WINDOWS)
+    set(cxResources
+        ${cxResources}
+        cxResources.h
+    )
+endif()
+
+cx_remove_duplicate_include_directories()
+add_library( cxGui ${cxGui_SRCS} ${cxResources})
 target_link_libraries( cxGui ${CX_GUI_LIBRARIES} )
 
 add_subdirectory(testing)

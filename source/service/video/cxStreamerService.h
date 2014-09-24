@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGESTREAMERINTERFACE_H
 #define CXIMAGESTREAMERINTERFACE_H
 
+#include "cxVideoServiceExport.h"
+
 #include "boost/shared_ptr.hpp"
 #include <QObject>
 #include <QDomElement>
@@ -58,7 +60,7 @@ typedef boost::shared_ptr<class Streamer> StreamerPtr;
  * \date May 20, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class StreamerService : public QObject
+class cxVideoService_EXPORT StreamerService : public QObject
 {
 	Q_OBJECT
 public:

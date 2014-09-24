@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATAADAPTER_H_
 #define CXDATAADAPTER_H_
 
+#include "cxResourceExport.h"
+
 #include <boost/shared_ptr.hpp>
 #include <vector>
 #include <QString>
@@ -56,7 +58,7 @@ typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
  *
  */
 
-class DataAdapter: public QObject
+class cxResource_EXPORT DataAdapter: public QObject
 {
 	Q_OBJECT
 

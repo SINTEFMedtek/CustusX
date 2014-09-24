@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDONUTMETRICREP_H
 #define CXDONUTMETRICREP_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxDataMetricRep.h"
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
@@ -55,7 +57,7 @@ typedef boost::shared_ptr<class GraphicalDisk> GraphicalDiskPtr;
  * \date 2014-02-11
  * \author Christian Askeland, SINTEF
  */
-class DonutMetricRep: public DataMetricRep
+class cxResourceVisualization_EXPORT DonutMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTIMEKEEPER_H_
 #define CXTIMEKEEPER_H_
 
+#include "cxResourceExport.h"
+
 #include <QDateTime>
 #include <QString>
 
@@ -46,7 +48,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_utilities
  */
-class TimeKeeper
+class cxResource_EXPORT TimeKeeper
 {
 public:
     TimeKeeper();

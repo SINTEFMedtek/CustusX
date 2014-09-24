@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFILTERWIDGET_H
 #define CXFILTERWIDGET_H
 
+#include "cxPluginAlgorithmExport.h"
+
 #include "cxBaseWidget.h"
 #include "cxFilter.h"
 #include "cxFilterTimedAlgorithm.h"
@@ -51,7 +53,7 @@ class FilterPresetWidget;
  * \author Christian Askeland, SINTEF
  * \author Janne Beate Bakeng, SINTEF
  */
-class FilterSetupWidget : public BaseWidget
+class cxPluginAlgorithm_EXPORT FilterSetupWidget : public BaseWidget
 {
 	Q_OBJECT
 public:

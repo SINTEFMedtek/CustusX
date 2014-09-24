@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDUMMYTOOL_H_
 #define CXDUMMYTOOL_H_
 
+#include "cxResourceExport.h"
+
 #include "cxToolImpl.h"
 #include <vector>
 #include <QThread>
@@ -54,7 +56,7 @@ class ToolManager;
   *
  * \ingroup cx_resource_core_tool
   */
-class DummyProbe: public Probe
+class cxResource_EXPORT DummyProbe: public Probe
 {
 	Q_OBJECT
 public:
@@ -119,7 +121,7 @@ private:
 /**Helper class for emitting signals at a constant rate in a separate thread.
  *
  */
-class DummyToolThread : public QThread
+class cxResource_EXPORT DummyToolThread : public QThread
 {
 	Q_OBJECT
 public:
@@ -144,7 +146,7 @@ signals:
 	void ping();
 };
 
-struct DummyToolTestUtilities
+struct cxResource_EXPORT DummyToolTestUtilities
 {
 	static DummyToolPtr createDummyTool(ProbeDefinition probeData = ProbeDefinition(), TrackingServicePtr manager = TrackingServicePtr());
 	static ProbeDefinition createProbeDataLinear(double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
@@ -160,7 +162,7 @@ struct DummyToolTestUtilities
  *
  * \ingroup sscTool
  */
-class DummyTool : public ToolImpl
+class cxResource_EXPORT DummyTool : public ToolImpl
 {
 	Q_OBJECT
 public:

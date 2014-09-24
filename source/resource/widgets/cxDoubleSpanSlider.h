@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDOUBLESPANSLIDER_H_
 #define CXDOUBLESPANSLIDER_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QWidget>
 #include "cxDoubleRange.h"
 #include "qxtspanslider.h"
@@ -48,7 +50,7 @@ namespace cx
  *
  * Use the double-named methods instead of qslider's int-based ones.
  */
-class DoubleSpanSlider : public QxtSpanSlider
+class cxResourceWidgets_EXPORT DoubleSpanSlider : public QxtSpanSlider
 {
   Q_OBJECT
 
@@ -107,7 +109,7 @@ private:
  * \ingroup cx_guisource_widgets
  *
  */
-class SliderRangeGroupWidget : public OptimizedUpdateWidget
+class cxResourceWidgets_EXPORT SliderRangeGroupWidget : public OptimizedUpdateWidget
 {
   Q_OBJECT
 public:

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXINDENT_H_
 #define CXINDENT_H_
 
+#include "cxResourceExport.h"
+
 #include <vtkIndent.h>
 
 namespace cx
@@ -44,7 +46,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_utilities
  */
-class Indent// : public vtkIndent
+class cxResource_EXPORT Indent// : public vtkIndent
 {
 public:
 	enum DETAIL { 
@@ -68,7 +70,7 @@ public:
 	int mIndent;
 };
 
-ostream& operator<<(ostream &os, const Indent &val);
+cxResource_EXPORT ostream& operator<<(ostream &os, const Indent &val);
 
 
 }

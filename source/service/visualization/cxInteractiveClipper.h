@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXINTERACTIVECLIPPER_H_
 #define CXINTERACTIVECLIPPER_H_
 
+#include "cxVisualizationServiceExport.h"
+
 #include <vector>
 #include <QObject>
 #include "cxDefinitions.h"
@@ -53,7 +55,7 @@ typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServic
  *  \date Aug 24, 2010
  *  \author christiana
  */
-class InteractiveClipper: public QObject
+class cxVisualizationService_EXPORT InteractiveClipper: public QObject
 {
 Q_OBJECT
 public:

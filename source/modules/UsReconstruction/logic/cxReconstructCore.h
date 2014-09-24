@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRECONSTRUCTCORE_H_
 #define CXRECONSTRUCTCORE_H_
 
+#include "cxPluginUSReconstructionExport.h"
+
 //#include "cxReconstructionService.h"
 #include "cxBoundingBox3D.h"
 #include "cxForwardDeclarations.h"
@@ -52,7 +54,7 @@ typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
  *  \date Oct 29, 2012
  *  \author christiana
  */
-class ReconstructCore
+class cxPluginUSReconstruction_EXPORT ReconstructCore
 {
 public:
 	/**All parameters required to control the reconstruction

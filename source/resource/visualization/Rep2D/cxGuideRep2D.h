@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXGUIDEREP2D_H_
 #define CXGUIDEREP2D_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxDataMetricRep.h"
 #include "cxGraphicalPrimitives.h"
 #include "cxPointMetric.h"
@@ -52,7 +54,7 @@ typedef boost::shared_ptr<class GuideRep2D> GuideRep2DPtr;
  * \date Jun 14, 2012
  * \author Sigmund Augdal, SonoWand AS
  */
-class GuideRep2D: public DataMetricRep
+class cxResourceVisualization_EXPORT GuideRep2D: public DataMetricRep
 {
 Q_OBJECT
 public:

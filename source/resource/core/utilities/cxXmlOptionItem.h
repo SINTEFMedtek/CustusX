@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXXMLOPTIONITEM_H_
 #define CXXMLOPTIONITEM_H_
 
+#include "cxResourceExport.h"
+
 #include <QString>
 #include <QDomElement>
 
@@ -53,7 +55,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_utilities
  */
-class XmlOptionItem
+class cxResource_EXPORT XmlOptionItem
 {
 public:
 	XmlOptionItem()
@@ -86,7 +88,7 @@ private:
  *
  * \ingroup cx_resource_core_utilities
  */
-class XmlOptionFile
+class cxResource_EXPORT XmlOptionFile
 {
 public:
 	static XmlOptionFile createNull(); ///< create an empty document

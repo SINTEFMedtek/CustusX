@@ -56,6 +56,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPLUGINBROWSER_H
 #define CXPLUGINBROWSER_H
 
+#include "cxGuiExport.h"
+
 #include <QMainWindow>
 
 #include <ctkServiceEvent.h>
@@ -74,7 +76,7 @@ namespace cx
 {
 class ctkPluginTableModel;
 
-class ctkPluginBrowser : public QMainWindow
+class cxGui_EXPORT ctkPluginBrowser : public QMainWindow
 {
   Q_OBJECT
 

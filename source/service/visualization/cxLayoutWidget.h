@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLAYOUTWIDGET_H
 #define CXLAYOUTWIDGET_H
 
+#include "cxVisualizationServiceExport.h"
+
 #include "cxView.h"
 #include "cxLayoutData.h"
 #include "cxViewCache.h"
@@ -49,7 +51,7 @@ namespace cx
  * \date 05.11.2013
  * \author christiana
  */
-class LayoutWidget : public QWidget
+class cxVisualizationService_EXPORT LayoutWidget : public QWidget
 {
 	Q_OBJECT
 public:

@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXOPENIGTLINKRTSOURCE_H_
 #define CXOPENIGTLINKRTSOURCE_H_
 
+#include "cxVideoServiceExport.h"
+
 #include <vector>
 #include <map>
 #include <boost/array.hpp>
@@ -71,7 +73,7 @@ typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
  *  \date Feb 26, 2013
  *  \author Christian Askeland, SINTEF
  */
-class VideoConnection : public QObject
+class cxVideoService_EXPORT VideoConnection : public QObject
 {
 	Q_OBJECT
 

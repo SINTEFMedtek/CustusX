@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGESENDERFACTORY_H_
 #define CXIMAGESENDERFACTORY_H_
 
+#include "cxGrabberExport.h"
+
 #include <QObject>
 #include <QStringList>
 #include <map>
@@ -45,7 +47,7 @@ namespace cx
 {
 
 typedef std::map<QString, QString> StringMap;
-StringMap extractCommandlineOptions(QStringList cmdline);
+cxGrabber_EXPORT StringMap extractCommandlineOptions(QStringList cmdline);
 
 
 /**
@@ -56,7 +58,7 @@ StringMap extractCommandlineOptions(QStringList cmdline);
  * \author Janne Beate Bakeng, SINTEF
  * \date Aug 9, 2011
  */
-class CommandlineImageStreamerFactory
+class cxGrabber_EXPORT CommandlineImageStreamerFactory
 {
 public:
 	CommandlineImageStreamerFactory();

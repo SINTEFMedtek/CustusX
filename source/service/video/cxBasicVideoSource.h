@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXBASICVIDEOSOURCE_H
 #define CXBASICVIDEOSOURCE_H
 
+#include "cxVideoServiceExport.h"
+
 #include "vtkSmartPointer.h"
 #include <stdint.h>
 #include <boost/shared_ptr.hpp>
@@ -60,7 +62,7 @@ namespace cx
  * \date April 26, 2013
  * \author Christian Askeland, SINTEF
  */
-class BasicVideoSource : public VideoSource
+class cxVideoService_EXPORT BasicVideoSource : public VideoSource
 {
 	Q_OBJECT
 

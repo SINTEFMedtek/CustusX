@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLIMAGEPREVIEWWIDGET_H_
 #define CXTOOLIMAGEPREVIEWWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxImagePreviewWidget.h"
 namespace cx
 {
@@ -44,7 +46,7 @@ namespace cx
  * \date Nov 7, 2012
  * \author Janne Beate Bakeng, SINTEF
  */
-class ToolImagePreviewWidget : public ImagePreviewWidget
+class cxGui_EXPORT ToolImagePreviewWidget : public ImagePreviewWidget
 {
 	Q_OBJECT
 

@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLABELEDCOMBOBOXWIDGET_H_
 #define CXLABELEDCOMBOBOXWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QWidget>
 #include <QSlider>
 #include <QLineEdit>
@@ -52,7 +54,7 @@ namespace cx
  *
  * \ingroup cx_resource_widgets
  */
-class LabeledComboBoxWidget: public BaseWidget
+class cxResourceWidgets_EXPORT LabeledComboBoxWidget: public BaseWidget
 {
 Q_OBJECT
 public:

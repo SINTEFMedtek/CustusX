@@ -48,7 +48,6 @@ namespace cx
 {
 
 
-
 ThreadedTimedReconstructPreprocessor::ThreadedTimedReconstructPreprocessor(ReconstructPreprocessorPtr input, std::vector<ReconstructCorePtr> cores) :
 	cx::ThreadedTimedAlgorithm<void> ("US PreReconstruction", 30)
 {

@@ -24,7 +24,7 @@ SET( MOC_HEADER_FILES
     gui/cxSelectRecordSessionStringDataAdapter.h
     gui/cxAcquisitionPlugin.h
     )
-
+cx_remove_duplicate_include_directories()
 QT5_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
 # library
@@ -68,7 +68,7 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/service/tracking
     ${CustusX_SOURCE_DIR}/source/service/video
     ${CustusX_SOURCE_DIR}/source/service/visualization
-        ${CustusX_SOURCE_DIR}/source/logic
+    ${CustusX_SOURCE_DIR}/source/logic
 
     ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/logic
     ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/logic/3DReconstruction
@@ -82,6 +82,20 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/gui/toolWidgets
 
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
+    
+    ${CustusX_BINARY_DIR}/source/service/patient
+    ${CustusX_BINARY_DIR}/source/service/video
+    ${CustusX_BINARY_DIR}/source/service/visualization
+    ${CustusX_BINARY_DIR}/source/service/tracking
+    ${CustusX_BINARY_DIR}/source/resource
+    ${CustusX_BINARY_DIR}/source/resource/widgets
+    ${CustusX_BINARY_DIR}/source/resource/visualization
+    ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
+    ${CustusX_BINARY_DIR}/source/modules/Algorithm
+    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
+    ${CustusX_BINARY_DIR}/source/modules/UsReconstruction
+    ${CustusX_BINARY_DIR}/source/gui
+    ${CustusX_BINARY_DIR}/source/logic
     )
 
 set(CX_ACQUISITION_LIBRARIES
@@ -89,6 +103,8 @@ set(CX_ACQUISITION_LIBRARIES
                         cxPluginUSReconstruction
                         cxGui)
 # =========================================================
+cx_remove_duplicate_include_directories()
+cx_create_export_header("cxPluginAcquisition")
 # create the target
 add_library( cxPluginAcquisition ${SOURCE_FILES} )
 target_link_libraries( cxPluginAcquisition ${CX_ACQUISITION_LIBRARIES} )

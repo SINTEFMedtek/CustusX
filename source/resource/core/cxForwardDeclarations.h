@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CX_FORWARDDECLARARATIONS_H_
 #define CX_FORWARDDECLARARATIONS_H_
 
+#include "cxPrecompiledHeader.h"
+
 #include <vector>
 #include <map>
 

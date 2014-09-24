@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSPACEPROVIDER_H
 #define CXSPACEPROVIDER_H
 
+#include "cxResourceExport.h"
+
 #include "cxTransform3D.h"
 #include "cxCoordinateSystemHelpers.h"
 
@@ -47,7 +49,7 @@ typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
  * \date 2014-02-21
  * \author christiana
  */
-class SpaceProvider
+class cxResource_EXPORT SpaceProvider
 {
 public:
 	virtual ~SpaceProvider() {}

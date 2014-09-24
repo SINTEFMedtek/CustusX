@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLANDMARK_H_
 #define CXLANDMARK_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include <string>
 #include <map>
 #include <QObject>
@@ -61,7 +64,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_data
  */
-class Landmark
+class cxResource_EXPORT Landmark
 {
 public:
 	explicit Landmark(QString uid = "", Vector3D coord = Vector3D(0, 0, 0));
@@ -81,12 +84,12 @@ private:
 };
 typedef std::map<QString, Landmark> LandmarkMap;
 
-bool operator<(const Landmark& lhs, const Landmark& rhs);
+cxResource_EXPORT bool operator<(const Landmark& lhs, const Landmark& rhs);
 
 typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 /** A collection of all landmarks in a given space.
   */
-class Landmarks : public QObject
+class cxResource_EXPORT Landmarks : public QObject
 {
 	Q_OBJECT
 public:
@@ -111,7 +114,7 @@ private:
 };
 
 
-class LandmarkProperty
+class cxResource_EXPORT LandmarkProperty
 {
 public:
 	explicit LandmarkProperty(const QString& uid = "", const QString& name = "", bool active = true);

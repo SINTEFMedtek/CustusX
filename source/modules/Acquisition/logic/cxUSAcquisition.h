@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXUSACQUISITION_H_
 #define CXUSACQUISITION_H_
 
+#include "cxPluginAcquisitionExport.h"
+
 #include <vector>
 #include "cxForwardDeclarations.h"
 
@@ -68,7 +70,7 @@ typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
  *  \date May 12, 2011
  *  \author christiana
  */
-class USAcquisition : public QObject
+class cxPluginAcquisition_EXPORT USAcquisition : public QObject
 {
 	Q_OBJECT
 public:

@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPATIENTMODELSERVICE_H_
 #define CXPATIENTMODELSERVICE_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include <QObject>
 #include "boost/shared_ptr.hpp"
 class QDateTime;
@@ -67,7 +70,7 @@ typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
  *  \date 2014-05-15
  *  \author Christian Askeland
  */
-class PatientModelService : public QObject
+class cxResource_EXPORT PatientModelService : public QObject
 {
 	Q_OBJECT
 public:

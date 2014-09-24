@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLAYOUTDATA_H_
 #define CXLAYOUTDATA_H_
 
+#include "cxVisualizationServiceExport.h"
+
 #include <vector>
 class QDomNode;
 #include <QString>
@@ -55,7 +57,7 @@ namespace cx
 * @{
 */
 
-struct LayoutPosition
+struct cxVisualizationService_EXPORT LayoutPosition
 {
 	LayoutPosition() : row(0), col(0) {}
 	LayoutPosition(int r, int c) : row(r), col(c) {}
@@ -63,7 +65,7 @@ struct LayoutPosition
 	int col; ///< column
 };
 
-struct LayoutRegion
+struct cxVisualizationService_EXPORT LayoutRegion
 {
 	LayoutRegion() {}
 	LayoutRegion(int r, int c, int rSpan = 1, int cSpan = 1) :
@@ -77,12 +79,12 @@ struct LayoutRegion
 	}
 };
 
-LayoutRegion merge(LayoutRegion a, LayoutRegion b);
+cxVisualizationService_EXPORT LayoutRegion merge(LayoutRegion a, LayoutRegion b);
 
 /** Represents one specific layout of the views, and what kind of information they contain,
  *  i.e 3D/2D, slice plane definition, image group.
  */
-class LayoutData
+class cxVisualizationService_EXPORT LayoutData
 {
 public:
 	/** Describes the layout and content of one view.

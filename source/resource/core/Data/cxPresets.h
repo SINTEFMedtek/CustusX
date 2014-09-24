@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPRESETS_H_
 #define CXPRESETS_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include <QObject>
 
 #include <map>
@@ -55,7 +58,7 @@ namespace cx {
  * \date Mar 11, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
-class Presets : public QObject
+class cxResource_EXPORT Presets : public QObject
 {
 	Q_OBJECT
 

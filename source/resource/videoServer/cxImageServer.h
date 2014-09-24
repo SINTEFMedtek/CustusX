@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGESERVER_H_
 #define CXIMAGESERVER_H_
 
+#include "cxGrabberExport.h"
+
 #include <QTcpServer>
 #include <QTimer>
 #include <QPointer>
@@ -49,7 +51,7 @@ namespace cx
  * \author Christian Askeland
  */
 
-class ImageServer: public QTcpServer
+class cxGrabber_EXPORT ImageServer: public QTcpServer
 {
 	Q_OBJECT
 

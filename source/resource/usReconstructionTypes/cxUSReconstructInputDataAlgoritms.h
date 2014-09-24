@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXUSRECONSTRUCTINPUTDATAALGORITMS_H
 #define CXUSRECONSTRUCTINPUTDATAALGORITMS_H
 
+#include "cxResourceUsReconstructionTypesExport.h"
+
 #include "cxUSReconstructInputData.h"
 
 namespace cx
@@ -47,7 +49,7 @@ namespace cx
   * \date Mar 07, 2013
   * \author Christian Askeland, SINTEF
   */
-struct USReconstructInputDataAlgorithm
+struct cxResourceUsReconstructionTypes_EXPORT USReconstructInputDataAlgorithm
 {
     /**
      * Pre:  mPos is prMt

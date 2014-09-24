@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSTRINGHELPERS_H
 #define CXSTRINGHELPERS_H
 
+#include "cxResourceExport.h"
+
 class QString;
 class QStringList;
 
@@ -53,9 +55,9 @@ namespace cx
   * given a text line containing fex [alpha beta "gamm ma" delta]
   * split into a list of ["alpha", "beta" ,"gamm ma", "delta"]
   */
-QStringList splitStringContaingQuotes(QString line);
+cxResource_EXPORT QStringList splitStringContaingQuotes(QString line);
 
-int convertStringWithDefault(QString text, int def);
+cxResource_EXPORT int convertStringWithDefault(QString text, int def);
 
 } // namespace cx
 

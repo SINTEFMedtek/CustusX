@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXUSSAVINGRECORDER_H
 #define CXUSSAVINGRECORDER_H
 
+#include "cxPluginAcquisitionExport.h"
+
 #include <vector>
 #include <QFutureWatcher>
 #include "cxForwardDeclarations.h"
@@ -72,7 +74,7 @@ typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
  *  \date April 17, 2013
  *  \author christiana
  */
-class USSavingRecorder : public QObject
+class cxPluginAcquisition_EXPORT USSavingRecorder : public QObject
 {
 	Q_OBJECT
 public:

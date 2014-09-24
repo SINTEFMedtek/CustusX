@@ -45,6 +45,10 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/service/patient
     ${CustusX_SOURCE_DIR}/source/service/tracking
     ${CustusX_SOURCE_DIR}/source/service/video
+    ${CustusX_BINARY_DIR}/source/service/patient
+    ${CustusX_BINARY_DIR}/source/service/tracking
+    ${CustusX_BINARY_DIR}/source/service/video
+    ${CustusX_BINARY_DIR}/source/resource/visualization
     )
 
 set(cxVisualizationService_LIBS
@@ -54,7 +58,9 @@ set(cxVisualizationService_LIBS
     cxTrackingService
     )
 
-ADD_LIBRARY ( cxVisualizationService ${cxVisualizationService_SOURCE} ${MOC_HEADER_FILES})
+cx_create_export_header("cxVisualizationService")
+cx_remove_duplicate_include_directories()
+add_library( cxVisualizationService ${cxVisualizationService_SOURCE} ${MOC_HEADER_FILES})
 target_link_libraries(cxVisualizationService ${cxVisualizationService_LIBS})
 
 add_subdirectory(testing)

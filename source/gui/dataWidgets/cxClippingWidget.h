@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCLIPPINGWIDGET_H_
 #define CXCLIPPINGWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxStringDataAdapter.h"
@@ -54,7 +56,7 @@ typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 
 /** Adapter that connects to the current active image.
  */
-class ClipPlaneStringDataAdapter: public StringDataAdapter
+class cxGui_EXPORT ClipPlaneStringDataAdapter: public StringDataAdapter
 {
 Q_OBJECT
 public:
@@ -86,7 +88,7 @@ public:
  * \author Christian Askeland, SINTEF
  */
 
-class ClippingWidget: public BaseWidget
+class cxGui_EXPORT ClippingWidget: public BaseWidget
 {
 Q_OBJECT
 

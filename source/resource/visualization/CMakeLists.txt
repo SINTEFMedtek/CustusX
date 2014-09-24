@@ -131,6 +131,7 @@ include_directories(${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/ThirdParty/VTKMultiVolume
     )
 
+cx_remove_duplicate_include_directories()
 QT5_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 set(CX_RESOURCE_VISUALIZATION_LIBRARIES
@@ -149,7 +150,9 @@ if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
         )
 endif()
 
-ADD_LIBRARY ( cxResourceVisualization ${CX_RESOURCE_VISUALIZATION_FILES})
+cx_create_export_header("cxResourceVisualization")
+cx_remove_duplicate_include_directories()
+add_library( cxResourceVisualization ${CX_RESOURCE_VISUALIZATION_FILES})
 target_link_libraries(cxResourceVisualization ${CX_RESOURCE_VISUALIZATION_LIBRARIES} )
 
 add_subdirectory(testing)

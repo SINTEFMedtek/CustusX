@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSONIXPROBEFILEREADER_H
 #define CXSONIXPROBEFILEREADER_H
 
+#include "cxGrabberExport.h"
+
 #include <QDomDocument>
 #include <QFile>
 
@@ -46,7 +48,7 @@ namespace cx {
 * @{
 */
 
-class SonixProbeFileReader
+class cxGrabber_EXPORT SonixProbeFileReader
 {
 public:
 	SonixProbeFileReader(QString probeFile);

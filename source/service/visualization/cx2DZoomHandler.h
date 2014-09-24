@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CX2DZOOMHANDLER_H
 #define CX2DZOOMHANDLER_H
 
+#include "cxVisualizationServiceExport.h"
+
 #include "cxViewGroupData.h"
 #include <QMenu>
 
@@ -46,7 +48,7 @@ typedef boost::shared_ptr<class Zoom2DHandler> Zoom2DHandlerPtr;
  * \date 2014-02-26
  * \author christiana
  */
-class Zoom2DHandler : public QObject
+class cxVisualizationService_EXPORT Zoom2DHandler : public QObject
 {
 	Q_OBJECT
 public:

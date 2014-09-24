@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXALLFILTERSWIDGET_H_
 #define CXALLFILTERSWIDGET_H_
 
+#include "cxPluginAlgorithmExport.h"
+
 #include "cxBaseWidget.h"
 #include "cxFilter.h"
 #include "cxFilterTimedAlgorithm.h"
@@ -52,7 +54,7 @@ namespace cx {
  * \author Christian Askeland, SINTEF
  * \author Janne Beate Bakeng, SINTEF
  */
-class AllFiltersWidget : public BaseWidget
+class cxPluginAlgorithm_EXPORT AllFiltersWidget : public BaseWidget
 {
 	Q_OBJECT
 public:

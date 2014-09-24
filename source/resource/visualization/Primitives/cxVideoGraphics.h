@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIDEOGRAPHICS_H_
 #define CXVIDEOGRAPHICS_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 
@@ -57,7 +59,7 @@ typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
  * \date april 26, 2013
  * \author christiana
  */
-class VideoGraphics
+class cxResourceVisualization_EXPORT VideoGraphics
 {
 public:
 	VideoGraphics();

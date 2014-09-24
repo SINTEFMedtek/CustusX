@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATAMETRICREP_H_
 #define CXDATAMETRICREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxRepImpl.h"
 #include "cxVector3D.h"
 #include "vtkForwardDeclarations.h"
@@ -55,7 +57,7 @@ typedef boost::shared_ptr<class DataMetric> DataMetricPtr;
  * \date Jul 31, 2011
  * \author Christian Askeland, SINTEF
  */
-class DataMetricRep: public RepImpl
+class cxResourceVisualization_EXPORT DataMetricRep: public RepImpl
 {
 Q_OBJECT
 public:

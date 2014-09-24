@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIGSTKTRACKERTHREAD_H_
 #define CXIGSTKTRACKERTHREAD_H_
 
+#include "cxTrackingServiceExport.h"
+
 #include <map>
 #include <vector>
 #include <QThread>
@@ -61,7 +63,7 @@ namespace cx
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class IgstkTrackerThread: public QThread
+class cxTrackingService_EXPORT IgstkTrackerThread: public QThread
 {
 Q_OBJECT
 

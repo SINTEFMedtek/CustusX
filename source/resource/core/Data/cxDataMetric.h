@@ -35,6 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATAMETRIC_H_
 #define CXDATAMETRIC_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include "cxData.h"
 #include <QColor>
 
@@ -59,7 +62,7 @@ class DataManager;
  * \date Aug 2, 2011
  * \author Christian Askeland, SINTEF
  */
-class DataMetric: public Data
+class cxResource_EXPORT DataMetric : public Data
 {
 public:
 	DataMetric(const QString& uid, const QString& name, DataServicePtr dataManager, SpaceProviderPtr spaceProvider);

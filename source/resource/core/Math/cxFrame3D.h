@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFRAME3D_H_
 #define CXFRAME3D_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include "cxTransform3D.h"
 
 // --------------------------------------------------------
@@ -55,7 +58,7 @@ namespace cx
  * the Euler angles.
  *
  */
-class DecomposedTransform3D
+class cxResource_EXPORT DecomposedTransform3D
 {
 public:
 	DecomposedTransform3D();
@@ -84,7 +87,7 @@ private:
  *    p_B = T_B * p_B
  * 
  */
-class Frame3D
+class cxResource_EXPORT Frame3D
 {
 public:
 	static Frame3D create(const Transform3D& transform);
@@ -109,7 +112,7 @@ public:
 private:
 };
 
-std::ostream& operator<<(std::ostream& s, const Frame3D& t);
+cxResource_EXPORT std::ostream& operator<<(std::ostream& s, const Frame3D& t);
 
 /**
  * @}

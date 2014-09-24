@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVOLUMETRICREP_H_
 #define CXVOLUMETRICREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxRepImpl.h"
 
 #include "vtkForwardDeclarations.h"
@@ -58,7 +60,7 @@ namespace cx
  * \ingroup cx_resource_visualization
  * \ingroup cx_resource_visualization_rep3D
  */
-class VolumetricBaseRep : public RepImpl
+class cxResourceVisualization_EXPORT VolumetricBaseRep : public RepImpl
 {
 	Q_OBJECT
 public:
@@ -87,7 +89,7 @@ protected:
  * \ingroup cx_resource_visualization
  * \ingroup cx_resource_visualization_rep3D
  */
-class VolumetricRep : public VolumetricBaseRep
+class cxResourceVisualization_EXPORT VolumetricRep : public VolumetricBaseRep
 {
 	Q_OBJECT
 public:

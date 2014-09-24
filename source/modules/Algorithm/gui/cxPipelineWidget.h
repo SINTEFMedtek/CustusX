@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPIPELINEWIDGET_H
 #define CXPIPELINEWIDGET_H
 
+#include "cxPluginAlgorithmExport.h"
+
 #include "cxBaseWidget.h"
 #include "cxPipeline.h"
 class QButtonGroup;
@@ -45,7 +47,7 @@ namespace cx
 class TimedAlgorithmProgressBar;
 
 
-class PipelineWidgetFilterLine : public BaseWidget
+class cxPluginAlgorithm_EXPORT PipelineWidgetFilterLine : public BaseWidget
 {
 	Q_OBJECT
 public:
@@ -78,7 +80,7 @@ protected:
  * \author christiana
  * \author Janne Beate Bakeng, SINTEF
  */
-class PipelineWidget : public BaseWidget
+class cxPluginAlgorithm_EXPORT PipelineWidget : public BaseWidget
 {
 	Q_OBJECT
 public:

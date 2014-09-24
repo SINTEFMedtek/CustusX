@@ -32,6 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSHAPEDMETRIC_H
 #define CXSHAPEDMETRIC_H
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include "cxDataMetric.h"
 #include "cxPointMetric.h"
 #include "cxDataManagerImpl.h"
@@ -56,7 +59,7 @@ typedef boost::shared_ptr<class DonutMetric> DonutMetricPtr;
  * \date 2014-02-11
  * \author Christian Askeland, SINTEF
  */
-class DonutMetric: public DataMetric
+class cxResource_EXPORT DonutMetric: public DataMetric
 {
 Q_OBJECT
 public:

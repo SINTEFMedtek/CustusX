@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIDEOCONNECTION_H_
 #define CXVIDEOCONNECTION_H_
 
+#include "cxVideoServiceExport.h"
+
 #include <vector>
 #include <QObject>
 #include <QProcess>
@@ -60,7 +62,7 @@ typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
  *  \date Jan 25, 2011
  *  \author Christian Askeland, SINTEF
  */
-class VideoConnectionManager: public QObject
+class cxVideoService_EXPORT VideoConnectionManager: public QObject
 {
 Q_OBJECT
 public:

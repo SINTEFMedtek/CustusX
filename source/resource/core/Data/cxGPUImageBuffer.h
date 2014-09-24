@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXGPUIMAGEBUFFER_H_
 #define CXGPUIMAGEBUFFER_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 #include <map>
@@ -54,7 +57,7 @@ namespace cx
  * This one stores 3D volume texture in the form of a vtkImageDataPtr
  *
  */
-class GPUImageDataBuffer
+class cxResource_EXPORT GPUImageDataBuffer
 {
 public:
 	virtual ~GPUImageDataBuffer() {}
@@ -86,14 +89,14 @@ public:
 typedef boost::shared_ptr<GPUImageDataBuffer> GPUImageDataBufferPtr;
 typedef boost::weak_ptr<GPUImageDataBuffer> GPUImageDataBufferWeakPtr;
 
-GPUImageDataBufferPtr createGPUImageDataBuffer(vtkImageDataPtr volume);
+cxResource_EXPORT GPUImageDataBufferPtr createGPUImageDataBuffer(vtkImageDataPtr volume);
 
 /**\brief Helper class for sharing GPU memory over several Views (GL contexts).
  *
  * This one stores lut in the form of a vtkUnsignedCharArrayPtr
  *
  */
-class GPUImageLutBuffer
+class cxResource_EXPORT GPUImageLutBuffer
 {
 public:
 	virtual ~GPUImageLutBuffer() {}
@@ -119,15 +122,15 @@ public:
 typedef boost::shared_ptr<GPUImageLutBuffer> GPUImageLutBufferPtr;
 typedef boost::weak_ptr<GPUImageLutBuffer> GPUImageLutBufferWeakPtr;
 
-GPUImageDataBufferPtr createGPUImageDataBuffer(vtkImageDataPtr volume);
-GPUImageLutBufferPtr createGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut);
+cxResource_EXPORT GPUImageDataBufferPtr createGPUImageDataBuffer(vtkImageDataPtr volume);
+cxResource_EXPORT GPUImageLutBufferPtr createGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut);
 
 /**\brief Repository for GPU buffers
  *
  * Use this repository for avoiding multiple allocations of buffer data. *
  *
  */
-class GPUImageBufferRepository
+class cxResource_EXPORT GPUImageBufferRepository
 {
 public:
 	static GPUImageBufferRepository* getInstance();

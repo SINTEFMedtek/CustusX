@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCameraStyleForViewFORVIEW_H
 #define CXCameraStyleForViewFORVIEW_H
 
+#include "cxVisualizationServiceExport.h"
+
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
 #include "cxEnumConverter.h"
@@ -55,7 +57,7 @@ using cx::Transform3D;
  */
 
 
-enum CAMERA_STYLE_TYPE
+cxVisualizationService_EXPORT enum CAMERA_STYLE_TYPE
 {
 	cstDEFAULT_STYLE, cstTOOL_STYLE, cstANGLED_TOOL_STYLE, cstUNICAM_STYLE, cstCOUNT
 };
@@ -72,7 +74,7 @@ enum CAMERA_STYLE_TYPE
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class CameraStyleForView: public QObject
+class cxVisualizationService_EXPORT CameraStyleForView: public QObject
 {
 Q_OBJECT
 public:

@@ -33,10 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CX_DILATION_FILTER_H
 #define CX_DILATION_FILTER_H
 
+#include "cxPluginAlgorithmExport.h"
+
 #include "cxFilterImpl.h"
 
 namespace cx {
-class DilationFilter : public FilterImpl
+class cxPluginAlgorithm_EXPORT DilationFilter : public FilterImpl
 {
 	Q_OBJECT
 

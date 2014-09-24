@@ -91,13 +91,19 @@ void force_C_locale_decimalseparator()
 }
 #endif
 
+
 #ifdef WIN32
-int __stdcall WinMain(int argc, char *argv[])
+int WinMain(int argc, char *argv[])
 #else
 int main(int argc, char *argv[])
 #endif
 {
+
+#if !defined(WIN32)
+  //for some reason this does not work with dynamic linking on windows
+  //instead we solve the problem by adding a handmade header for the cxResources.qrc file
   Q_INIT_RESOURCE(cxResources);
+#endif
   
   cx::Application app(argc, argv);
   app.setOrganizationName("SINTEF");

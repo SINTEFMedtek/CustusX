@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLFILTERWIDGET_H_
 #define CXTOOLFILTERWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include <QGroupBox>
 #include "cxDefinitions.h"
 #include "cxLegacySingletons.h"
@@ -58,7 +60,7 @@ class FilteringToolListWidget;
  * \date Mar 30, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class ToolFilterGroupBox : public QGroupBox
+class cxGui_EXPORT ToolFilterGroupBox : public QGroupBox
 {
   Q_OBJECT
 

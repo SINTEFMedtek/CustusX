@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSTATUSBAR_H_
 #define CXSTATUSBAR_H_
 
+#include "cxGuiExport.h"
+
 #include <QStatusBar>
 #include <map>
 #include "cxReporter.h"
@@ -56,7 +58,7 @@ namespace cx
  * \date Jan 21, 2009
  * \author Janne Beate Bakeng, SINTEF
  */
-class StatusBar: public QStatusBar
+class cxGui_EXPORT StatusBar: public QStatusBar
 {
   Q_OBJECT
 

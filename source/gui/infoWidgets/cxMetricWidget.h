@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMETRICWIDGET_H_
 #define CXMETRICWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 
 #include <vector>
@@ -66,7 +68,7 @@ class QPushButton;
   * \date 2014-04-25
   * \author Christian Askeland, SINTEF
   */
-class CXNoBorderToolButton : public QToolButton
+class cxGui_EXPORT CXNoBorderToolButton : public QToolButton
 {
 	Q_OBJECT
 public:
@@ -82,7 +84,7 @@ typedef boost::shared_ptr<class MetricManager> MetricManagerPtr;
  * \ingroup cx_gui
  *
  */
-class MetricWidget : public BaseWidget
+class cxGui_EXPORT MetricWidget : public BaseWidget
 {
   Q_OBJECT
 

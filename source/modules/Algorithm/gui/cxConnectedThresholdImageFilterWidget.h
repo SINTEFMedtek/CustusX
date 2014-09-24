@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCONNECTEDTHRESHOLDIMAGEFILTERWIDGET_H_
 #define CXCONNECTEDTHRESHOLDIMAGEFILTERWIDGET_H_
 
+#include "cxPluginAlgorithmExport.h"
+
 #include "cxBaseWidget.h"
 #include "cxConnectedThresholdImageFilter.h"
 
@@ -55,7 +57,7 @@ namespace cx
  * \date Apr 26, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class ConnectedThresholdImageFilterWidget : public BaseWidget
+class cxPluginAlgorithm_EXPORT ConnectedThresholdImageFilterWidget : public BaseWidget
 {
   Q_OBJECT
 

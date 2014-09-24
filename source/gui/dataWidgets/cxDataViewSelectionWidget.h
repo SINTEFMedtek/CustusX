@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATAVIEWSELECTIONWIDGET_H_
 #define CXDATAVIEWSELECTIONWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include <QListWidget>
 #include "cxForwardDeclarations.h"
 #include "cxLegacySingletons.h"
@@ -48,7 +50,7 @@ namespace cx
 /**
  * Base class for displaying Data items.
  */
-class DataListWidget : public QListWidget
+class cxGui_EXPORT DataListWidget : public QListWidget
 {
   Q_OBJECT
 
@@ -71,7 +73,7 @@ private slots:
 
 //---------------------------------------------------------------------------------------------------------------------
 
-class AllDataListWidget : public DataListWidget
+class cxGui_EXPORT AllDataListWidget : public DataListWidget
 {
   Q_OBJECT
 
@@ -92,7 +94,7 @@ private:
 
 //---------------------------------------------------------------------------------------------------------------------
 
-class SelectedDataListWidget : public DataListWidget
+class cxGui_EXPORT SelectedDataListWidget : public DataListWidget
 {
   Q_OBJECT
 
@@ -127,7 +129,7 @@ private:
  * and how to order them.
  *
  */
-class DataViewSelectionWidget : public QWidget
+class cxGui_EXPORT DataViewSelectionWidget : public QWidget
 {
   Q_OBJECT
 public:

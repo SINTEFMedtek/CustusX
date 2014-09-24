@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLLISTWIDGET_H_
 #define CXTOOLLISTWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include <QListWidget>
 
 //#include "cxIgstkTool.h"
@@ -52,7 +54,7 @@ namespace cx
  * \date Mar 30, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class ToolListWidget : public QListWidget
+class cxGui_EXPORT ToolListWidget : public QListWidget
 {
   Q_OBJECT
 
@@ -84,7 +86,7 @@ private slots:
  * Used inside ToolFilterGroupBox.
  *
  */
-class FilteringToolListWidget : public ToolListWidget
+class cxGui_EXPORT FilteringToolListWidget : public ToolListWidget
 {
   Q_OBJECT
 
@@ -115,7 +117,7 @@ private:
  * Used inside ToolConfigureGroupBox.
  *
  */
-class ConfigToolListWidget : public ToolListWidget
+class cxGui_EXPORT ConfigToolListWidget : public ToolListWidget
 {
   Q_OBJECT
 

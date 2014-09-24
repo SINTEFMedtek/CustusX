@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFILESELECTWIDGET_H_
 #define CXFILESELECTWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QWidget>
 #include <QStringList>
 
@@ -61,7 +63,7 @@ namespace cx
  *
  * \ingroup cx_resource_widgets
  */
-class FileSelectWidget: public QWidget
+class cxResourceWidgets_EXPORT FileSelectWidget: public QWidget
 {
 Q_OBJECT
 

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXERASERWIDGET_H_
 #define CXERASERWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 
 #include "cxVector3D.h"
@@ -58,7 +60,7 @@ namespace cx
  * \date Mar 30, 2012
  * \author Christian Askeland, SINTEF
  */
-class EraserWidget: public BaseWidget
+class cxGui_EXPORT EraserWidget: public BaseWidget
 {
 Q_OBJECT
 

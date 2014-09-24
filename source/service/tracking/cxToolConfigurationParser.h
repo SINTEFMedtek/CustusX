@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLCONFIGURATIONPARSER_H_
 #define CXTOOLCONFIGURATIONPARSER_H_
 
+#include "cxTrackingServiceExport.h"
+
 #include <utility>
 #include <map>
 #include <vector>
@@ -53,7 +55,7 @@ namespace cx
  * \date 21. march 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class ConfigurationFileParser
+class cxTrackingService_EXPORT ConfigurationFileParser
 {
 public:
 	typedef std::pair<QString, bool> ToolFileAndReference;
@@ -103,7 +105,7 @@ private:
  * \date 21. march 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class ToolFileParser
+class cxTrackingService_EXPORT ToolFileParser
 {
 public:
 	ToolFileParser(QString absoluteToolFilePath, QString loggingFolder = "");

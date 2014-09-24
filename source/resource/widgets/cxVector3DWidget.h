@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVECTOR3DWIDGET_H_
 #define CXVECTOR3DWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include "cxVector3D.h"
 #include <QWidget>
 class QBoxLayout;
@@ -48,7 +50,7 @@ namespace cx
  * \ingroup cx_resource_widgets
  *
  */
-class Vector3DWidget: public QWidget
+class cxResourceWidgets_EXPORT Vector3DWidget: public QWidget
 {
 Q_OBJECT
 public:

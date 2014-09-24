@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SONIXHELPER_H_
 #define SONIXHELPER_H_
 
+#include "cxGrabberExport.h"
+
 
 #include <QObject>
 #include "cxFrame.h"
@@ -52,7 +54,7 @@ typedef cx::Frame Frame;
  * \date 21. jun. 2011
  * \\author Ole Vegard Solberg, SINTEF
  */
-class SonixHelper : public QObject
+class cxGrabber_EXPORT SonixHelper : public QObject
 {
   Q_OBJECT
 

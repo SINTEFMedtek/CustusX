@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSlicePropertiesWidget_H_
 #define CXSlicePropertiesWidget_H_
 
+#include "cxGuiExport.h"
+
 #include <vector>
 #include <QtWidgets>
 
@@ -52,7 +54,7 @@ namespace cx
  * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF
  */
-class SlicePropertiesWidget : public TabbedWidget
+class cxGui_EXPORT SlicePropertiesWidget : public TabbedWidget
 {
   Q_OBJECT
 

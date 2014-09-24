@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXELASTIXMANAGER_H_
 #define CXELASTIXMANAGER_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include <QObject>
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
@@ -56,7 +58,7 @@ typedef boost::shared_ptr<class ElastixExecuter> ElastixExecuterPtr;
  * \date Feb 4, 2012
  * \author Christian Askeland, SINTEF
  */
-class ElastixManager : public QObject
+class cxPluginRegistration_EXPORT ElastixManager : public QObject
 {
 	Q_OBJECT
 public:

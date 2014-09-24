@@ -51,6 +51,8 @@ mapped onto this polygon.
 #ifndef __UltrasoundSectorSource_h
 #define __UltrasoundSectorSource_h
 
+#include "cxResourceVisualizationExport.h"
+
 #include "vtkPolyDataAlgorithm.h"
 #include "vtkPolyData.h"
 #include "vtkSmartPointer.h"
@@ -68,7 +70,7 @@ typedef vtkSmartPointer<vtkPolyData> vtkPolyDataPtr;
  *
  * \ingroup cx_resource_visualization
  */
-class UltrasoundSectorSource : public vtkPolyDataAlgorithm
+class cxResourceVisualization_EXPORT UltrasoundSectorSource : public vtkPolyDataAlgorithm
 {
 public:
 	static UltrasoundSectorSource *New();

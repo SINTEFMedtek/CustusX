@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFILEPREVIEWWIDGET_H_
 #define CXFILEPREVIEWWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include "cxFileWatcherWidget.h"
 class QTextDocument;
 class QTextEdit;
@@ -52,7 +54,7 @@ namespace cx
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class FilePreviewWidget: public FileWatcherWidget
+class cxResourceWidgets_EXPORT FilePreviewWidget: public FileWatcherWidget
 {
 	Q_OBJECT
 

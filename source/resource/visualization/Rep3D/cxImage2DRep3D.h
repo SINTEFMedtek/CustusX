@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGE2DREP3D_H_
 #define CXIMAGE2DREP3D_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxRepImpl.h"
 #include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
@@ -60,7 +62,7 @@ typedef boost::shared_ptr<class Image2DProxy> Image2DProxyPtr;
  *
  * \ingroup cx_resource_visualization
  */
-class Image2DProxy: public QObject
+class cxResourceVisualization_EXPORT Image2DProxy : public QObject
 {
 Q_OBJECT
 public:
@@ -102,7 +104,7 @@ typedef boost::shared_ptr<class Image2DRep3D> Image2DRep3DPtr;
  * \date March 12, 2013
  * \author christiana
  */
-class Image2DRep3D: public RepImpl
+class cxResourceVisualization_EXPORT Image2DRep3D: public RepImpl
 {
 Q_OBJECT
 public:

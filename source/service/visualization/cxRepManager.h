@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREPMANAGER_H_
 #define CXREPMANAGER_H_
 
+#include "cxVisualizationServiceExport.h"
+
 #include <QObject>
 #include <map>
 #include <vector>
@@ -68,7 +70,7 @@ class Reporter;
  * \\author Janne Beate Bakeng, SINTEF
  * \\author Christian Askeland, SINTEF
  */
-class RepManager: public QObject
+class cxVisualizationService_EXPORT RepManager: public QObject
 {
 Q_OBJECT
 

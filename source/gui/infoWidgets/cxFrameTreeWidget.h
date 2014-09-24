@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFRAMETREEWIDGET_H_
 #define CXFRAMETREEWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 
 #include <map>
@@ -56,7 +58,7 @@ namespace cx
  *\date Sep 23, 2010
  *\\author Christian Askeland, SINTEF
  */
-class FrameTreeWidget : public BaseWidget
+class cxGui_EXPORT FrameTreeWidget : public BaseWidget
 {
   Q_OBJECT
 public:

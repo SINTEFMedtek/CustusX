@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRANSFERFUNCTIONS3DPRESETS_H_
 #define CXTRANSFERFUNCTIONS3DPRESETS_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include <QDomElement>
 #include "cxPresets.h"
 #include "cxImage.h"
@@ -57,7 +60,7 @@ typedef boost::shared_ptr<class TransferFunctions3DPresets> TransferFunctions3DP
  *
  * \ingroup cx_resource_core_data
  */
-class TransferFunctions3DPresets : public Presets
+class cxResource_EXPORT TransferFunctions3DPresets : public Presets
 {
 	Q_OBJECT
 public:

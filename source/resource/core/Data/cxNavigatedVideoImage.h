@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXNAVIGATEDVIDEOIMAGE_H_
 #define CXNAVIGATEDVIDEOIMAGE_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include "cxImage.h"
 
 namespace cx
@@ -50,7 +53,7 @@ namespace cx
  * \ingroup cx_resource_core_data
  *
  */
-class NavigatedVideoImage: public Image
+class cxResource_EXPORT NavigatedVideoImage: public Image
 {
 	Q_OBJECT;
 public:

@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWWRAPPER2D_H_
 #define CXVIEWWRAPPER2D_H_
 
+#include "cxVisualizationServiceExport.h"
+
 #include <vector>
 #include <QPointer>
 #include "cxForwardDeclarations.h"
@@ -72,7 +74,7 @@ namespace cx
  *  Handles the connections between specific reps and the view.
  *
  */
-class ViewWrapper2D: public ViewWrapper
+class cxVisualizationService_EXPORT ViewWrapper2D: public ViewWrapper
 {
 Q_OBJECT
 public:

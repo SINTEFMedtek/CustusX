@@ -47,7 +47,7 @@ namespace cx
  * \date Nov 7, 2012
  * \author Janne Beate Bakeng, SINTEF
  */
-class ImagePreviewWidget : public FileWatcherWidget
+class cxResourceWidgets_EXPORT ImagePreviewWidget : public FileWatcherWidget
 {
 	Q_OBJECT
 

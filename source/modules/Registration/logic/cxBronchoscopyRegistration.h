@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef BRONCHOSCOPYREGISTRATION_H_
 #define BRONCHOSCOPYREGISTRATION_H_
 
+#include "cxPluginRegistrationExport.h"
+
 //#include "PositionData.h"
 #include "cxBranchList.h"
 #include <vector>
@@ -46,7 +48,7 @@ namespace cx
 
 typedef std::map<double, Transform3D> TimedTransformMap;
 
-class BronchoscopyRegistration
+class cxPluginRegistration_EXPORT BronchoscopyRegistration
 {
 public:
 	BronchoscopyRegistration();

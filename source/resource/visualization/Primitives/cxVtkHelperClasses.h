@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVTKHELPERCLASSES_H_
 #define CXVTKHELPERCLASSES_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxTransform3D.h"
 #include "cxGraphicalPrimitives.h"
 
@@ -57,7 +59,7 @@ Vector3D getColorAsVector3D(QColor color) ;
  *
  * \ingroup cx_resource_visualization
  */
-class RGBColor : public boost::array<double,3>
+class cxResourceVisualization_EXPORT RGBColor : public boost::array<double,3>
 {
 public:
 	RGBColor();
@@ -74,7 +76,7 @@ public:
  *
  * \ingroup cx_resource_visualization
  */
-class OffsetPoint
+class cxResourceVisualization_EXPORT OffsetPoint
 {
 	public:
 		OffsetPoint( vtkRendererPtr renderer );
@@ -96,7 +98,7 @@ typedef boost::shared_ptr<OffsetPoint> OffsetPointPtr;
  *
  * \ingroup cx_resource_visualization
  */
-class LineSegment
+class cxResourceVisualization_EXPORT LineSegment
 {
 	public:
 		LineSegment(vtkRendererPtr renderer);
@@ -120,7 +122,7 @@ class LineSegment
  *
  * \ingroup cx_resource_visualization
  */
-class TextDisplay
+class cxResourceVisualization_EXPORT TextDisplay
 {
 	public:
 		TextDisplay(const QString& text, const QColor& color, int fontsize);
@@ -156,7 +158,7 @@ typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
  *
  * \ingroup cx_resource_visualization
  */
-class CrossHair2D
+class cxResourceVisualization_EXPORT CrossHair2D
 {
 	public:
 		CrossHair2D( vtkRendererPtr renderer);
@@ -181,7 +183,7 @@ typedef boost::shared_ptr<class CrossHair2D> CrossHair2DPtr;
  *
  * \ingroup cx_resource_visualization
  */
-class Axes3D
+class cxResourceVisualization_EXPORT Axes3D
 {
 public:
 	Axes3D(vtkRendererPtr renderer = vtkRendererPtr());

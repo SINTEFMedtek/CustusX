@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXALGORITHMPLUGIN_H_
 #define CXALGORITHMPLUGIN_H_
 
+#include "cxPluginAlgorithmExport.h"
+
 #include "cxGUIExtenderService.h"
 
 namespace cx
@@ -58,7 +60,7 @@ namespace cx
  * \date Jun 15, 2011
  * \author christiana
  */
-class AlgorithmPlugin : public GUIExtenderService
+class cxPluginAlgorithm_EXPORT AlgorithmPlugin : public GUIExtenderService
 {
 	Q_OBJECT
 public:

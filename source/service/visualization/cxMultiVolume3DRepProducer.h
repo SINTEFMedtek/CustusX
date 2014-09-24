@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMULTIVOLUME3DREPPRODUCER_H
 #define CXMULTIVOLUME3DREPPRODUCER_H
 
+#include "cxVisualizationServiceExport.h"
+
 #include <QObject>
 #include <QPointer>
 #include <boost/shared_ptr.hpp>
@@ -51,7 +53,7 @@ typedef boost::shared_ptr<class MultiVolume3DRepProducer> MultiVolume3DVisualize
  * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF
  */
-class MultiVolume3DRepProducer : public QObject
+class cxVisualizationService_EXPORT MultiVolume3DRepProducer : public QObject
 {
 	Q_OBJECT
 public:

@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPROBE_H_
 #define CXPROBE_H_
 
+#include "cxResourceExport.h"
+
 #include <QObject>
 #include <boost/weak_ptr.hpp>
 #include "cxProbeData.h"
@@ -48,7 +50,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_tool
  */
-class Probe: public QObject
+class cxResource_EXPORT Probe: public QObject
 {
 	Q_OBJECT
 public:

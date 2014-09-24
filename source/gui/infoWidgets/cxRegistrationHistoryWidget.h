@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONHISTORYWIDGET_H_
 #define CXREGISTRATIONHISTORYWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include <vector>
 #include <QtWidgets>
 
@@ -57,7 +59,7 @@ namespace cx
  * \date 2010.03.17
  * \\author Christian Askeland, SINTEF
  */
-class RegistrationHistoryWidget : public BaseWidget
+class cxGui_EXPORT RegistrationHistoryWidget : public BaseWidget
 {
   Q_OBJECT
 

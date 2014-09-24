@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRENDERLOOP_H
 #define CXRENDERLOOP_H
 
+#include "cxVisualizationServiceExport.h"
+
 #include <QObject>
 #include "cxForwardDeclarations.h"
 class QTimer;
@@ -51,7 +53,7 @@ typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
  * \date 2014-02-06
  * \author christiana
  */
-class RenderLoop : public QObject
+class cxVisualizationService_EXPORT RenderLoop : public QObject
 {
 	Q_OBJECT
 public:

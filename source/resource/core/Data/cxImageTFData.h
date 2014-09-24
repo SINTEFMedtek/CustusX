@@ -39,6 +39,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGETFDATA_H_
 #define CXIMAGETFDATA_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include <map>
 #include <boost/shared_ptr.hpp>
 #include <QObject>
@@ -91,7 +94,7 @@ typedef boost::shared_ptr<class ImageTFData> ImageTFDataPtr;
  *
  * \ingroup cx_resource_core_data
  */
-class ImageTFData: public QObject
+class cxResource_EXPORT ImageTFData: public QObject
 {
 Q_OBJECT
 public:

@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSPACELISTENER_H
 #define CXSPACELISTENER_H
 
+#include "cxResourceExport.h"
+
 #include "cxCoordinateSystemHelpers.h"
 #include <QObject>
 
@@ -46,7 +48,7 @@ namespace cx
  * \date 21.02.2014, 2014
  * \author christiana
  */
-class SpaceListener: public QObject
+class cxResource_EXPORT SpaceListener: public QObject
 {
 Q_OBJECT
 

@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXINTERACTIVECROPPER_H_
 #define CXINTERACTIVECROPPER_H_
 
+#include "cxVisualizationServiceExport.h"
+
 #include <QObject>
 #include <QPointer>
 #include <vtkSmartPointer.h>
@@ -66,7 +68,7 @@ typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServic
  * The bounding box can be set either explicitly or using
  * a vtkBoxWidget.
  */
-class InteractiveCropper: public QObject
+class cxVisualizationService_EXPORT InteractiveCropper: public QObject
 {
 Q_OBJECT
 public:

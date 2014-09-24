@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLMANAGERWIDGET_H_
 #define CXTOOLMANAGERWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 #include "cxLegacySingletons.h"
 
@@ -50,7 +52,7 @@ namespace cx
  * \date May 25, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class ToolManagerWidget : public BaseWidget
+class cxGui_EXPORT ToolManagerWidget : public BaseWidget
 {
   Q_OBJECT
 

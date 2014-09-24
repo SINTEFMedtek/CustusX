@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDOUBLEWIDGETS_H_
 #define CXDOUBLEWIDGETS_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QWidget>
 #include <QSlider>
 #include <QLineEdit>
@@ -56,7 +58,7 @@ class MousePadWidget;
  *
  * \ingroup cx_resource_widgets
  */
-class DoubleSlider: public QSlider
+class cxResourceWidgets_EXPORT DoubleSlider: public QSlider
 {
 Q_OBJECT
 
@@ -108,7 +110,7 @@ private:
  *
  * \ingroup sscWidget
  */
-class DoubleLineEdit: public QLineEdit
+class cxResourceWidgets_EXPORT DoubleLineEdit: public QLineEdit
 {
 public:
 	DoubleLineEdit(QWidget* parent = 0) :
@@ -142,7 +144,7 @@ public:
  *
  * \ingroup cx_resource_widgets
  */
-class ScalarInteractionWidget: public OptimizedUpdateWidget
+class cxResourceWidgets_EXPORT ScalarInteractionWidget: public OptimizedUpdateWidget
 {
 Q_OBJECT
 public:
@@ -188,7 +190,7 @@ private:
  *
  * \ingroup cx_resource_widgets
  */
-class SliderGroupWidget: public ScalarInteractionWidget
+class cxResourceWidgets_EXPORT SliderGroupWidget: public ScalarInteractionWidget
 {
 Q_OBJECT
 public:
@@ -204,7 +206,7 @@ public:
  *
  * \ingroup cx_resource_widgets
  */
-class SpinBoxGroupWidget: public ScalarInteractionWidget
+class cxResourceWidgets_EXPORT SpinBoxGroupWidget: public ScalarInteractionWidget
 {
 Q_OBJECT
 public:
@@ -220,7 +222,7 @@ public:
  *
  * \ingroup cx_resource_widgets
  */
-class SpinBoxAndSliderGroupWidget: public ScalarInteractionWidget
+class cxResourceWidgets_EXPORT SpinBoxAndSliderGroupWidget: public ScalarInteractionWidget
 {
 Q_OBJECT
 public:
@@ -237,7 +239,7 @@ typedef boost::shared_ptr<SpinBoxAndSliderGroupWidget> SpinBoxAndSliderGroupWidg
  *
  * \ingroup cx_resource_widgets
  */
-class SpinBoxAndDialGroupWidget: public ScalarInteractionWidget
+class cxResourceWidgets_EXPORT SpinBoxAndDialGroupWidget: public ScalarInteractionWidget
 {
 Q_OBJECT
 public:
@@ -255,7 +257,7 @@ typedef boost::shared_ptr<SpinBoxAndDialGroupWidget> SpinBoxAndDialGroupWidgetPt
  *
  * \ingroup cx_resource_widgets
  */
-class SpinBoxInfiniteSliderGroupWidget: public ScalarInteractionWidget
+class cxResourceWidgets_EXPORT SpinBoxInfiniteSliderGroupWidget: public ScalarInteractionWidget
 {
 Q_OBJECT
 public:

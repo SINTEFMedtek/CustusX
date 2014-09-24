@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRACKINGDATATOVOLUME_H_
 #define CXTRACKINGDATATOVOLUME_H_
 
+#include "cxPluginAlgorithmExport.h"
+
 #include "cxImage.h"
 #include "cxTool.h"
 #include "cxVector3D.h"
@@ -57,7 +59,7 @@ namespace cx
  * \author Ole Vegard Solberg, SINTEF
  * \author Janne Beate Bakeng, SINTEF
  */
-class TrackingDataToVolume
+class cxPluginAlgorithm_EXPORT TrackingDataToVolume
 {
 public:
   TrackingDataToVolume();

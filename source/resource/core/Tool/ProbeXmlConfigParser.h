@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PROBEXMLCONFIGPARSER_H_
 #define PROBEXMLCONFIGPARSER_H_
 
+#include "cxResourceExport.h"
+
 #include <math.h>
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -47,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * \author jbake
  * \author Ole Vegard Solberg, SINTEF
  */
-class ProbeXmlConfigParser
+class cxResource_EXPORT ProbeXmlConfigParser
 {
 public:
   typedef std::pair<double,double> ColRowPair;

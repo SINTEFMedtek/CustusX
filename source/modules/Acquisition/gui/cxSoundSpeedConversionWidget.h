@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSOUNDSPEEDCONVERSIONWIDGET_H_
 #define CXSOUNDSPEEDCONVERSIONWIDGET_H_
 
+#include "cxPluginAcquisitionExport.h"
+
 #include "cxBaseWidget.h"
 #include "cxTool.h"
 #include "cxLegacySingletons.h"
@@ -56,7 +58,7 @@ namespace cx
  * \date Feb 11, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class SoundSpeedConverterWidget : public BaseWidget
+class cxPluginAcquisition_EXPORT  SoundSpeedConverterWidget : public BaseWidget
 {
   Q_OBJECT
 

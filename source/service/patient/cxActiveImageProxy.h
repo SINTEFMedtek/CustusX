@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXACTIVEIMAGEPROXY_H_
 #define CXACTIVEIMAGEPROXY_H_
 
+#include "cxPatientServiceExport.h"
+
 #include <QObject>
 #include "cxForwardDeclarations.h"
 
@@ -57,7 +59,7 @@ typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
  *  \author olevs
  *
  */
-class ActiveImageProxy: public QObject
+class cxPatientService_EXPORT ActiveImageProxy: public QObject
 {
 Q_OBJECT
 public:

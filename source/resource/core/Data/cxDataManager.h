@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATAMANAGER_H_
 #define CXDATAMANAGER_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -62,7 +65,7 @@ typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
  *
  * \ingroup cx_resource_core_data
  */
-class DataManager: public QObject
+class cxResource_EXPORT DataManager: public QObject
 {
 Q_OBJECT
 public:

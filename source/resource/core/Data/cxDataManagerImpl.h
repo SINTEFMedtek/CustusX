@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATAMANAGERIMPL_H_
 #define CXDATAMANAGERIMPL_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include <map>
 #include <set>
 #include <string>
@@ -60,7 +63,7 @@ typedef boost::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
  * \date Jan 6, 2009
  * \author christiana
  */
-class DataManagerImpl: public DataManager
+class cxResource_EXPORT DataManagerImpl: public DataManager
 {
 Q_OBJECT
 public:

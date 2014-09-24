@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRECONSTRUCTEDOUTPUTVOLUMEPARAMS_H_
 #define CXRECONSTRUCTEDOUTPUTVOLUMEPARAMS_H_
 
+#include "cxPluginUSReconstructionExport.h"
+
 #include "cxTransform3D.h"
 #include "cxReporter.h"
 #include "cxXmlOptionItem.h"
@@ -55,7 +57,7 @@ namespace cx
  * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF
  */
-class OutputVolumeParams
+class cxPluginUSReconstruction_EXPORT OutputVolumeParams
 {
 public:
 	OutputVolumeParams();

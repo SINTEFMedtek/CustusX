@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDISTANCEMETRICREP_H_
 #define CXDISTANCEMETRICREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxDataMetricRep.h"
 #include "cxGraphicalPrimitives.h"
 #include "cxDistanceMetric.h"
@@ -56,7 +58,7 @@ typedef boost::shared_ptr<class DistanceMetricRep> DistanceMetricRepPtr;
  * \date Jul 5, 2011
  * \author Christian Askeland, SINTEF
  */
-class DistanceMetricRep: public DataMetricRep
+class cxResourceVisualization_EXPORT DistanceMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:

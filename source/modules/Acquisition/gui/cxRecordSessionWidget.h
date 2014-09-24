@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRECORDSESSIONWIDGET_H_
 #define CXRECORDSESSIONWIDGET_H_
 
+#include "cxPluginAcquisitionExport.h"
+
 #include "cxBaseWidget.h"
 #include "cxAcquisitionData.h"
 
@@ -58,7 +60,7 @@ typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
  * \date Dec 8, 2010
  * \author Janne Beate Bakeng
  */
-class RecordSessionWidget : public BaseWidget
+class cxPluginAcquisition_EXPORT  RecordSessionWidget : public BaseWidget
 {
   Q_OBJECT
 

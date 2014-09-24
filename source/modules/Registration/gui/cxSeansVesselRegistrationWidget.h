@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSEANSVESSELREGISTRATIONWIDGET_H_
 #define CXSEANSVESSELREGISTRATIONWIDGET_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include "cxRegistrationBaseWidget.h"
 #include "cxStringDataAdapter.h"
 
@@ -60,7 +62,7 @@ typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegi
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class SeansVesselRegistrationWidget : public RegistrationBaseWidget
+class cxPluginRegistration_EXPORT SeansVesselRegistrationWidget : public RegistrationBaseWidget
 {
   Q_OBJECT
 public:

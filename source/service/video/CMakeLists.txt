@@ -69,14 +69,21 @@ include_directories(
     #${CustusX_SOURCE_DIR}/source/resource/widgets
     #${CustusX_SOURCE_DIR}/source/logic
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
+ 	${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
+ 	${CustusX_BINARY_DIR}/source/resource/videoServer
+ 	${CustusX_BINARY_DIR}/source/resource/OpenIGTLinkUtilities
+ 	${CustusX_BINARY_DIR}/source/service/tracking
 
 #cxResourceWidgets
     )
 
 
+cx_remove_duplicate_include_directories()
 QT5_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
-ADD_LIBRARY ( cxVideoService ${cxVideoService_SOURCE} ${MOC_HEADER_FILES} )
+cx_create_export_header("cxVideoService")
+
+add_library( cxVideoService ${cxVideoService_SOURCE} ${MOC_HEADER_FILES} )
 target_link_libraries(cxVideoService cxResource cxResourceUsReconstructionTypes OpenIGTLink cxTrackingService cxGrabber CTKPluginFramework)
 
 add_subdirectory(testing)

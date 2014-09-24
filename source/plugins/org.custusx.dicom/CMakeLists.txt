@@ -5,6 +5,8 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 include_directories(
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
+    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
+    ${CustusX_BINARY_DIR}/source/resource/widgets
     ./core
     ./widgets
     )

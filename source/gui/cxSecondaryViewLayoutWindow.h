@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSECONDARYVIEWLAYOUTWINDOW_H
 #define CXSECONDARYVIEWLAYOUTWINDOW_H
 
+#include "cxGuiExport.h"
+
 #include <QMainWindow>
 
 namespace cx
@@ -50,7 +52,7 @@ namespace cx
  * \date 05.11.2013
  * \author christiana
  */
-class SecondaryViewLayoutWindow: public QMainWindow
+class cxGui_EXPORT SecondaryViewLayoutWindow: public QMainWindow
 {
 Q_OBJECT
 

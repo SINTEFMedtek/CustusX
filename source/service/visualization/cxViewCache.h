@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWCACHE_H_
 #define CXVIEWCACHE_H_
 
+#include "cxVisualizationServiceExport.h"
+
 #include <QWidget>
 #include <QLayout>
 #include <vector>
@@ -63,7 +65,7 @@ namespace cx
  *
  */
 template<class VIEW_TYPE>
-class ViewCache
+class cxVisualizationService_EXPORT ViewCache
 {
 public:
 	ViewCache(QWidget* widget, QString typeText) :

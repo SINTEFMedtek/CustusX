@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDICOMPLUGINACTIVATOR_H_
 #define CXDICOMPLUGINACTIVATOR_H_
 
+#include "org_custusx_dicom_Export.h"
+
 #include <ctkPluginActivator.h>
 #include "boost/shared_ptr.hpp"
 
@@ -49,7 +51,7 @@ typedef boost::shared_ptr<class DicomGUIExtenderService> DicomGUIExtenderService
  * \date 2014-04-15
  * \author Christian Askeland
  */
-class DicomPluginActivator :  public QObject, public ctkPluginActivator
+class org_custusx_dicom_EXPORT DicomPluginActivator :  public QObject, public ctkPluginActivator
 {
   Q_OBJECT
   Q_INTERFACES(ctkPluginActivator)

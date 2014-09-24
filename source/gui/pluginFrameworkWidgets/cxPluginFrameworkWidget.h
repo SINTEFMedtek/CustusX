@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPLUGINFRAMEWORKWIDGET_H_
 #define CXPLUGINFRAMEWORKWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 
 namespace cx
@@ -46,7 +48,7 @@ namespace cx
  * \date 2014-04-30
  * \author Christian Askeland
  */
-class PluginFrameworkWidget : public BaseWidget
+class cxGui_EXPORT PluginFrameworkWidget : public BaseWidget
 {
 	Q_OBJECT
 public:

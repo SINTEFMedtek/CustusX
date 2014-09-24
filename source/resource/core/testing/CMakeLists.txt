@@ -40,8 +40,13 @@ if (BUILD_TESTING)
             ${OpenCLUtilityLibrary_SOURCE_DIR}/testing/tests.cpp
             ${OpenCLUtilityLibrary_SOURCE_DIR}/testing/histogramPyramidTests.cpp
             )	
-        cx_catch_add_lib_and_exe(OpenCLUtilityLibrary "${OUL_RESOURCE_TEST_CATCH_SOURCE_FILES}" "" "TestOpenCLUtilityLibrary")
+            cx_catch_add_lib_and_exe(OpenCLUtilityLibrary "${OUL_RESOURCE_TEST_CATCH_SOURCE_FILES}" "" "TestOpenCLUtilityLibrary")
 	endif(CX_USE_OPENCL_UTILITY)
+
+    include_directories(
+        .
+        ${CustusX_BINARY_DIR}/source/resource/testUtilities
+    )
 
     cx_catch_add_lib_and_exe(cxResource "${RESOURCE_TEST_CATCH_SOURCE_FILES}" "${CXTEST_SOURCES_TO_MOC}")
 

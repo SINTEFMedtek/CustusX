@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSHADINGWIDGET_H_
 #define CXSHADINGWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include <QWidget>
 #include <QCheckBox>
 #include <QDomElement>
@@ -58,7 +60,7 @@ namespace cx
 /**
  * \ingroup cx_gui
  */
-class ShadingWidget : public BaseWidget
+class cxGui_EXPORT ShadingWidget : public BaseWidget
 {
   Q_OBJECT
 

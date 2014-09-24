@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef WIN32
 
+#include "cxResourceVisualizationTestUtilitiesExport.h"
+
 #include <cppunit/extensions/TestFactoryRegistry.h> 
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/extensions/HelperMacros.h>
@@ -42,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "sscGPURayCastVolumeRep.h"
 /**Unit tests for class GPURayCasterVolumeRep
  */
-class TestGPURayCaster : public CppUnit::TestFixture
+class cxResourceVisualizationTestUtilities_EXPORT TestGPURayCaster : public CppUnit::TestFixture
 {
 public:
 	void setUp();

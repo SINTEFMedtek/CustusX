@@ -21,6 +21,8 @@
 #ifndef __DICOMModel_h
 #define __DICOMModel_h
 
+#include "org_custusx_dicom_Export.h"
+
 // Qt includes 
 #include <QAbstractItemModel>
 #include <QMetaType>
@@ -34,7 +36,7 @@ namespace cx
 class DICOMModelPrivate;
 
 /// \ingroup DICOM_Core
-class DICOMModel
+class org_custusx_dicom_EXPORT DICOMModel
 //  : public QStandardItemModel
   : public QAbstractItemModel
 {

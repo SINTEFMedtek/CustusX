@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLANDMARKREGISTRATIONWIDGET_H_
 #define CXLANDMARKREGISTRATIONWIDGET_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include <map>
 //#include "cxVolumetricRep.h"
 #include "cxLandmark.h"
@@ -61,7 +63,7 @@ typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
  * \class LandmarkRegistrationWidget
  * Superclass for Image Registration and Patient Registration
  */
-class LandmarkRegistrationWidget: public RegistrationBaseWidget
+class cxPluginRegistration_EXPORT LandmarkRegistrationWidget: public RegistrationBaseWidget
 {
 Q_OBJECT
 

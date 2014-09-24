@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIDEOSERVICE_H_
 #define CXVIDEOSERVICE_H_
 
+#include "cxVideoServiceExport.h"
+
 #include <QObject>
 
 #include <vector>
@@ -98,7 +100,7 @@ typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
  *
  *
  */
-class VideoService: public QObject
+class cxVideoService_EXPORT VideoService: public QObject
 {
 Q_OBJECT
 public:

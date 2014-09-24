@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SNWSYNTAXHIGHLIGHTER_H_
 #define SNWSYNTAXHIGHLIGHTER_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QSyntaxHighlighter>
 
 namespace snw
@@ -44,7 +46,7 @@ namespace snw
  *
  * \ingroup cx_resource_widgets
  */
-class SyntaxHighlighter : public QSyntaxHighlighter
+class cxResourceWidgets_EXPORT SyntaxHighlighter : public QSyntaxHighlighter
 {
 public:
 	SyntaxHighlighter(QTextDocument* parent);

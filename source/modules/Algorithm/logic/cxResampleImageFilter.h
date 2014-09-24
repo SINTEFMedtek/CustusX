@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRESAMPLEIMAGEFILTER_H
 #define CXRESAMPLEIMAGEFILTER_H
 
+#include "cxPluginAlgorithmExport.h"
+
 #include "cxFilterImpl.h"
 #include "cxLegacySingletons.h"
 
@@ -45,7 +47,7 @@ namespace cx
  * \date Nov 26, 2012
  * \author christiana
  */
-class ResampleImageFilter : public FilterImpl
+class cxPluginAlgorithm_EXPORT ResampleImageFilter : public FilterImpl
 {
 	Q_OBJECT
 

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTIMEDALGORITHMPROGRESSBAR_H_
 #define CXTIMEDALGORITHMPROGRESSBAR_H_
 
+#include "cxPluginAlgorithmExport.h"
+
 #include <boost/shared_ptr.hpp>
 #include <set>
 #include <QWidget>
@@ -67,7 +69,7 @@ class DisplayTimerWidget;
  *  \date Jan 27, 2012
  *  \author christiana
  */
-class TimedAlgorithmProgressBar : public QWidget
+class cxPluginAlgorithm_EXPORT TimedAlgorithmProgressBar : public QWidget
 {
 	Q_OBJECT
 public:

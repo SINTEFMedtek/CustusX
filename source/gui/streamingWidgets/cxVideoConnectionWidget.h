@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIGTLINKWIDGET_H_
 #define CXIGTLINKWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 
 #include <vector>
@@ -76,7 +78,7 @@ class FileInputWidget;
  * \author Janne Beate Bakeng, SINTEF
  *
  */
-class VideoConnectionWidget : public BaseWidget
+class cxGui_EXPORT VideoConnectionWidget : public BaseWidget
 {
   Q_OBJECT
 

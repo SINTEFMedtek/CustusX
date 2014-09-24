@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTVIDEOSOURCE_H_
 #define CXTESTVIDEOSOURCE_H_
 
+#include "cxResourceExport.h"
+
 #include "vtkSmartPointer.h"
 #include <stdint.h>
 #include <boost/shared_ptr.hpp>
@@ -57,7 +59,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_video
  */
-class TestVideoSource : public VideoSource
+class cxResource_EXPORT TestVideoSource : public VideoSource
 {
 	Q_OBJECT
 

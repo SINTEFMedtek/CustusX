@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMANUALTOOLADAPTER_H_
 #define CXMANUALTOOLADAPTER_H_
 
+#include "cxTrackingServiceExport.h"
+
 #include "cxManualTool.h"
 
 namespace cx
@@ -55,7 +57,7 @@ namespace cx
  *  \date Feb 14, 2011
  *  \author christiana
  */
-class ManualToolAdapter : public ManualTool
+class cxTrackingService_EXPORT ManualToolAdapter : public ManualTool
 {
 	Q_OBJECT
 public:

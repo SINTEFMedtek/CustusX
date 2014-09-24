@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSELECTIONGROUPBOX_H_
 #define CXSELECTIONGROUPBOX_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QGroupBox>
 
 class QButtonGroup;
@@ -47,7 +49,7 @@ namespace cx
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class SelectionGroupBox : public QGroupBox
+class cxResourceWidgets_EXPORT SelectionGroupBox : public QGroupBox
 {
   Q_OBJECT
 

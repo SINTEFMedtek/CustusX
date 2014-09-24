@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMETRICREFERENCEARGUMENTLIST_H
 #define CXMETRICREFERENCEARGUMENTLIST_H
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include "cxForwardDeclarations.h"
 #include <vector>
 #include <map>
@@ -50,7 +53,7 @@ typedef boost::shared_ptr<class MetricReferenceArgumentList> MetricReferenceArgu
  * \date 2014-02-11
  * \author Christian Askeland, SINTEF
  */
-class MetricReferenceArgumentList : public QObject
+class cxResource_EXPORT MetricReferenceArgumentList : public QObject
 {
 	Q_OBJECT
 public:

@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef BRANCHLIST_H_
 #define BRANCHLIST_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include "cxBranch.h"
 #include "cxDataManager.h"
 #include "cxMesh.h"
@@ -44,7 +46,7 @@ namespace cx
 
 typedef std::vector< Eigen::Matrix4d > M4Vector;
 
-class BranchList
+class cxPluginRegistration_EXPORT BranchList
 {
 	std::vector<Branch*> Branches;
 public:

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXBRONCHOSCOPYREGISTRATIONWIDGET_H
 #define CXBRONCHOSCOPYREGISTRATIONWIDGET_H
 
+#include "cxPluginRegistrationExport.h"
+
 #include <QPushButton>
 #include "cxRegistrationBaseWidget.h"
 //#include "cxStringDataAdapter.h"
@@ -55,7 +57,7 @@ typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
  * \author Ole Vegard Solberg
  * \author Erlend Hofstad
  */
-class BronchoscopyRegistrationWidget: public RegistrationBaseWidget
+class cxPluginRegistration_EXPORT BronchoscopyRegistrationWidget: public RegistrationBaseWidget
 {
 	Q_OBJECT
 public:

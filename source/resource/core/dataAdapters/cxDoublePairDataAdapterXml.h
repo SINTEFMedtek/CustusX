@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDOUBLEPAIRDATAADAPTERXML_H
 #define CXDOUBLEPAIRDATAADAPTERXML_H
 
+#include "cxResourceExport.h"
+
 #include "cxDoublePairDataAdapter.h"
 #include "cxXmlOptionItem.h"
 
@@ -56,7 +58,7 @@ typedef boost::shared_ptr<class DoublePairDataAdapterXml> DoublePairDataAdapterX
  * \date Juli 31, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class DoublePairDataAdapterXml : public DoublePairDataAdapter
+class cxResource_EXPORT DoublePairDataAdapterXml : public DoublePairDataAdapter
 {
 Q_OBJECT
 public:

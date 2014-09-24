@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDUMMYFILTER_H
 #define CXDUMMYFILTER_H
 
+#include "cxPluginAlgorithmExport.h"
+
 #include "cxFilterImpl.h"
 
 namespace cx
@@ -44,7 +46,7 @@ namespace cx
  * \date Nov 17, 2012
  * \author christiana
  */
-class DummyFilter : public FilterImpl
+class cxPluginAlgorithm_EXPORT DummyFilter : public FilterImpl
 {
 	Q_OBJECT
 

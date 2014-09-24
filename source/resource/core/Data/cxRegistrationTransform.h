@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONTRANSFORM_H_
 #define CXREGISTRATIONTRANSFORM_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -54,7 +57,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_data
  */
-class RegistrationTransform
+class cxResource_EXPORT RegistrationTransform
 {
 public:
 	Transform3D mValue;///< value of transform
@@ -71,8 +74,8 @@ public:
 	void parseXml(QDomNode& dataNode);///< read internal state from node
 };
 
-bool operator<(const RegistrationTransform& lhs, const RegistrationTransform& rhs);
-bool operator==(const RegistrationTransform& lhs, const RegistrationTransform& rhs);
+cxResource_EXPORT bool operator<(const RegistrationTransform& lhs, const RegistrationTransform& rhs);
+cxResource_EXPORT bool operator==(const RegistrationTransform& lhs, const RegistrationTransform& rhs);
 
 /**\brief Definition of a parent space event.
  *
@@ -83,7 +86,7 @@ bool operator==(const RegistrationTransform& lhs, const RegistrationTransform& r
  *
  * \ingroup sscData
  */
-class ParentSpace
+class cxResource_EXPORT ParentSpace
 {
 public:
 	QString mValue;///< parent frame uid
@@ -97,8 +100,8 @@ public:
 	void parseXml(QDomNode& dataNode);///< read internal state from node
 };
 
-bool operator<(const ParentSpace& lhs, const ParentSpace& rhs);
-bool operator==(const ParentSpace& lhs, const ParentSpace& rhs);
+cxResource_EXPORT bool operator<(const ParentSpace& lhs, const ParentSpace& rhs);
+cxResource_EXPORT bool operator==(const ParentSpace& lhs, const ParentSpace& rhs);
 
 typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 
@@ -110,7 +113,7 @@ typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
  *
  * \ingroup sscData
  */
-class RegistrationHistory: public QObject
+class cxResource_EXPORT RegistrationHistory: public QObject
 {
 Q_OBJECT
 public:

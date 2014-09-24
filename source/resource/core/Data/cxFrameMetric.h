@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTFRAMEMETRIC_H_
 #define CXTFRAMEMETRIC_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include "cxFrameMetricBase.h"
 
 namespace cx
@@ -48,7 +51,7 @@ typedef boost::shared_ptr<class FrameMetric> FrameMetricPtr;
  * \date Aug 25, 2013
  * \author Ole Vegard Solberg, SINTEF
  */
-class FrameMetric: public cx::FrameMetricBase
+class cxResource_EXPORT FrameMetric: public cx::FrameMetricBase
 {
 Q_OBJECT
 public:

@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPLANEMETRICREP_H_
 #define CXPLANEMETRICREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxDataMetricRep.h"
 #include "cxGraphicalPrimitives.h"
 #include "cxPlaneMetric.h"
@@ -52,7 +54,7 @@ typedef boost::shared_ptr<class PlaneMetricRep> PlaneMetricRepPtr;
  * \date Jul 27, 2011
  * \author Christian Askeland, SINTEF
  */
-class PlaneMetricRep: public DataMetricRep
+class cxResourceVisualization_EXPORT PlaneMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:

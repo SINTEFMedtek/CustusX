@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPROBEADAPTERRTSOURCE_H_
 #define CXPROBEADAPTERRTSOURCE_H_
 
+#include "cxResourceExport.h"
+
 #include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
 #include "cxVideoSource.h"
@@ -56,7 +58,7 @@ namespace cx
  * \date Feb 11, 2011
  * \author: Christian Askeland, SINTEF
  */
-class ProbeAdapterRTSource: public VideoSource
+class cxResource_EXPORT ProbeAdapterRTSource: public VideoSource
 {
 	Q_OBJECT
 

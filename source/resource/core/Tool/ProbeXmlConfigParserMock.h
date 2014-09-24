@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PROBEXMLCONFIGPARSERMOC_H_
 #define PROBEXMLCONFIGPARSERMOC_H_
 
+#include "cxResourceExport.h"
+
 #include <ProbeXmlConfigParser.h>
 
 #include <QString>
@@ -47,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *  \date Jun 4, 2013
  *  \author Ole Vegard Solberg, SINTEF
  */
-class ProbeXmlConfigParserMock : public ProbeXmlConfigParser
+class cxResource_EXPORT ProbeXmlConfigParserMock : public ProbeXmlConfigParser
 {
 public:
 	ProbeXmlConfigParserMock(QString& pathToXml);

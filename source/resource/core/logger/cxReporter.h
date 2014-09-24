@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREPORTER_H_
 #define CXREPORTER_H_
 
+#include "cxResourceExport.h"
+
 //#define SSC_PRINT_CALLER_INFO
 
 #include <QMetaType>
@@ -66,7 +68,7 @@ namespace cx
  * \sa Reporter
  * \addtogroup cx_resource_core_logger
  */
-class Message
+class cxResource_EXPORT Message
 {
 public:
   Message(QString text ="", MESSAGE_LEVEL messageLevel=mlDEBUG, int timeoutTime=0, QString sourceLocation="");
@@ -100,7 +102,7 @@ private:
  *
  * \addtogroup cx_resource_core_logger
  */
-class Reporter : public QObject
+class cxResource_EXPORT Reporter : public QObject
 {
   Q_OBJECT
 
@@ -196,7 +198,7 @@ private:
 
 /**Shortcut for accessing the message manager instance.
  */
-Reporter* reporter();
+cxResource_EXPORT Reporter* reporter();
 
 //#define reportMessage(msg, level)    \
 //{                                    \

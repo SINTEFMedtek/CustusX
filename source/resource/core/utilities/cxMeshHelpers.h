@@ -30,6 +30,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
+#ifndef CXMESHHELPERS_H_
+#define CXMESHHELPERS_H_
+
+#include "cxResourceExport.h"
+
 #include <vtkPolyData.h>
 
 #include "cxTool.h"
@@ -51,17 +56,19 @@ class DataManager;
  * \{
  */
 
-vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt, Transform3D rMpr);
-void loadMeshFromToolTransforms(DataServicePtr dataManager, TimedTransformMap transforms_prMt);
+cxResource_EXPORT vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt, Transform3D rMpr);
+cxResource_EXPORT void loadMeshFromToolTransforms(DataServicePtr dataManager, TimedTransformMap transforms_prMt);
 
 /**
  * Get information about a ssc mesh.
  */
-std::map<std::string, std::string> getDisplayFriendlyInfo(MeshPtr mesh);
+cxResource_EXPORT std::map<std::string, std::string> getDisplayFriendlyInfo(MeshPtr mesh);
 
 /**
  * \}
  */
 
 }//namespace cx
+
+#endif //CXMESHHELPERS_H_
 

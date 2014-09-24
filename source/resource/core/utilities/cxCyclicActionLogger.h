@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCYCLICACTIONLOGGER_H_
 #define CXCYCLICACTIONLOGGER_H_
 
+#include "cxResourceExport.h"
+
 #include "boost/shared_ptr.hpp"
 #include <QTime>
 #include <vector>
@@ -54,7 +56,7 @@ typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
  *  \date Oct 16, 2012
  *  \author christiana
  */
-class CyclicActionLogger
+class cxResource_EXPORT CyclicActionLogger
 {
 public:
 	CyclicActionLogger();

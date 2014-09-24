@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFRAMEMETRICREP_H
 #define CXFRAMEMETRICREP_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxDataMetricRep.h"
 #include "cxGraphicalPrimitives.h"
 #include "cxFrameMetric.h"
@@ -55,7 +57,7 @@ typedef boost::shared_ptr<class FrameMetricRep> FrameMetricRepPtr;
  * \date Aug 26, 2013
  * \author Christian Askeland, SINTEF
  */
-class FrameMetricRep: public DataMetricRep
+class cxResourceVisualization_EXPORT FrameMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:
