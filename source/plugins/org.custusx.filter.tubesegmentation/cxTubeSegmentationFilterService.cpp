@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
 #include <vtkImageShiftScale.h>
+#include <ctkPluginContext.h>
 
 #include "cxTime.h"
 #include "cxTypeConversions.h"
@@ -63,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx {
 
 TubeSegmentationFilter::TubeSegmentationFilter(ctkPluginContext *pluginContext) :
-	FilterImpl(pluginContext), mOutput(NULL)
+	FilterImpl(PatientModelServicePtr(new PatientModelServiceProxy(pluginContext))), mOutput(NULL)
 {
 	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 	mPresets = this->populatePresets();
@@ -377,7 +378,7 @@ void TubeSegmentationFilter::createInputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New(mPluginContext);
+	temp = SelectImageStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select input to run Tube segmentation on.");
 	mInputTypes.push_back(temp);
@@ -391,31 +392,31 @@ void TubeSegmentationFilter::createOutputTypes()
 	SelectMeshStringDataAdapterPtr tempMeshStringAdapter;
 
 	//0
-	tempDataStringAdapter = SelectDataStringDataAdapter::New(mPluginContext);
+	tempDataStringAdapter = SelectDataStringDataAdapter::New(mPatientModelService);
 	tempDataStringAdapter->setValueName("Centerline volume");
 	tempDataStringAdapter->setHelp("Generated centerline volume.");
 	mOutputTypes.push_back(tempDataStringAdapter);
 
 	//1
-	tempMeshStringAdapter = SelectMeshStringDataAdapter::New(mPluginContext);
+	tempMeshStringAdapter = SelectMeshStringDataAdapter::New(mPatientModelService);
 	tempMeshStringAdapter->setValueName("Centerline mesh");
 	tempMeshStringAdapter->setHelp("Generated centerline mesh (vtk-format).");
 	mOutputTypes.push_back(tempMeshStringAdapter);
 
 	//2
-	tempDataStringAdapter = SelectDataStringDataAdapter::New(mPluginContext);
+	tempDataStringAdapter = SelectDataStringDataAdapter::New(mPatientModelService);
 	tempDataStringAdapter->setValueName("Segmented centerline");
 	tempDataStringAdapter->setHelp("Grown segmentation from the centerline.");
 	mOutputTypes.push_back(tempDataStringAdapter);
 
 	//3
-	tempMeshStringAdapter = SelectMeshStringDataAdapter::New(mPluginContext);
+	tempMeshStringAdapter = SelectMeshStringDataAdapter::New(mPatientModelService);
 	tempMeshStringAdapter->setValueName("Segmented centerlines surface");
 	tempMeshStringAdapter->setHelp("Generated surface of the segmented volume.");
 	mOutputTypes.push_back(tempMeshStringAdapter);
 
 	//4
-	tempDataStringAdapter = SelectDataStringDataAdapter::New(mPluginContext);
+	tempDataStringAdapter = SelectDataStringDataAdapter::New(mPatientModelService);
 	tempDataStringAdapter->setValueName("TDF volume");
 	tempDataStringAdapter->setHelp("Volume showing the probability of a voxel being part of a tubular structure.");
 	mOutputTypes.push_back(tempDataStringAdapter);

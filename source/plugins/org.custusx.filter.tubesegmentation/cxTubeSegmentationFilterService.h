@@ -45,6 +45,7 @@ class TSFOutput;
 #include "cxStringDataAdapterXml.h"
 #include "cxBoolDataAdapterXml.h"
 #include "org_custusx_filter_tubesegmentation_Export.h"
+class ctkPluginContext;
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
