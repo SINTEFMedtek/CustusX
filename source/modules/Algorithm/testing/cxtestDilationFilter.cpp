@@ -44,9 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 TEST_CASE("DilationFilter: execute", "[modules][Algorithm][DilationFilter]")
 {
-//	cx::LogicManager::initialize();
-//	ctkPluginContext *pluginContext = cx::LogicManager::getInstance()->getPluginContext();
-	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject();//moc PatientModelService
+	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject();//mock PatientModelService
 
 	// Setup filter
 	cx::DilationFilterPtr filter = cx::DilationFilterPtr(new cx::DilationFilter(patientModelService));
@@ -103,6 +101,4 @@ TEST_CASE("DilationFilter: execute", "[modules][Algorithm][DilationFilter]")
 		INFO("Surface/contour not generated.");
 		REQUIRE(output[1]->getData());
 	}
-
-//	cx::LogicManager::shutdown();
 }

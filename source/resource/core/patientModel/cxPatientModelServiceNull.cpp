@@ -160,6 +160,12 @@ QString PatientModelServiceNull::getActivePatientFolder() const
 	return QString();
 }
 
+bool PatientModelServiceNull::isPatientValid() const
+{
+	printWarning();
+	return false;
+}
+
 void PatientModelServiceNull::printWarning() const
 {
 	reportWarning("Trying to use PatientModelServiceNull. Is PatientModelService (org.custusx.patiemtmodel) disabled?");

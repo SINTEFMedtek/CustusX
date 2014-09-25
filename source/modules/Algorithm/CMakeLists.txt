@@ -13,8 +13,6 @@
 ###########################################################
 
 SET( MOC_HEADER_FILES
-#	logic/cxFilter.h
-#	logic/cxFilterImpl.h
 	logic/cxFilterTimedAlgorithm.h
 	logic/cxDummyFilter.h
 	logic/cxPipeline.h
@@ -39,11 +37,7 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
 # library
 SET( SOURCE_FILES
-    ${MOC_HEADER_FILES}
-#	logic/cxFilter.h
-#	logic/cxFilter.cpp
-#	logic/cxFilterImpl.h
-#	logic/cxFilterImpl.cpp
+	${MOC_HEADER_FILES}
 	logic/cxFilterTimedAlgorithm.h
 	logic/cxFilterTimedAlgorithm.cpp
 	logic/cxDummyFilter.h

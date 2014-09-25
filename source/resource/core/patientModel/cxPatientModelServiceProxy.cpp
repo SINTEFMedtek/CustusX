@@ -191,4 +191,9 @@ QString PatientModelServiceProxy::getActivePatientFolder() const
 	return mPatientModelService->getActivePatientFolder();
 }
 
+bool PatientModelServiceProxy::isPatientValid() const
+{
+	return mPatientModelService->isPatientValid();
+}
+
 } //cx

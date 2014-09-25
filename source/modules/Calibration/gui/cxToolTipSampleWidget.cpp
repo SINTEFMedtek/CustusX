@@ -31,23 +31,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include <cxToolTipSampleWidget.h>
 
-#include <ctkPluginContext.h>
 #include <QPushButton>
 #include <QTextStream>
 #include <QFileDialog>
 #include <QMessageBox>
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
-#include "cxToolManager.h"
-#include "cxDataManager.h"
 #include "cxVector3D.h"
 #include "cxDefinitionStrings.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
-#include "cxPatientData.h"
-#include "cxPatientService.h"
 #include "cxSelectDataStringDataAdapter.h"
-#include "cxLegacySingletons.h"
+//#include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 #include "cxPatientModelService.h"
 
@@ -59,7 +54,8 @@ ToolTipSampleWidget::ToolTipSampleWidget(PatientModelServicePtr patientModelServ
     mSampleButton(new QPushButton("Sample")),
     mSaveToFileNameLabel(new QLabel("<font color=red> No file selected </font>")),
     mSaveFileButton(new QPushButton("Save to...")),
-    mTruncateFile(false)
+	mTruncateFile(false),
+	mPatientModelService(patientModelService)
 {
   QVBoxLayout* toplayout = new QVBoxLayout(this);
 
@@ -104,8 +100,8 @@ QString ToolTipSampleWidget::defaultWhatsThis() const
 void ToolTipSampleWidget::saveFileSlot()
 {
   QString configPath = DataLocations::getRootConfigPath();
-  if(patientService()->getPatientData()->isPatientValid())
-    configPath = patientService()->getPatientData()->getActivePatientFolder();
+  if(mPatientModelService->isPatientValid())
+	configPath = mPatientModelService->getActivePatientFolder();
 
   QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
                              configPath+"/SampledPoints.txt",

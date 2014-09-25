@@ -99,6 +99,7 @@ public:
 	virtual std::map<QString, VideoSourcePtr> getStreams() const = 0;
 
 	virtual QString getActivePatientFolder() const = 0;
+	virtual bool isPatientValid() const = 0;
 
 	virtual void autoSave() = 0;//TODO remove, and integrate into other functions
 	virtual bool isNull() = 0;

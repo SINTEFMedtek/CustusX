@@ -78,6 +78,7 @@ public:
 	virtual std::map<QString, VideoSourcePtr> getStreams() const;
 
 	virtual QString getActivePatientFolder() const;
+	virtual bool isPatientValid() const;
 
 	virtual void autoSave();
 	virtual bool isNull();

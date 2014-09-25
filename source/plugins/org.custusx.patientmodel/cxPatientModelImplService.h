@@ -72,7 +72,8 @@ public:
 	virtual void saveMesh(MeshPtr mesh, const QString& basePath);///< Save mesh to file \param mesh to save \param basePath Absolute path to patient data folder
 	virtual std::map<QString, VideoSourcePtr> getStreams() const;
 
-	QString getActivePatientFolder() const;
+	virtual QString getActivePatientFolder() const;
+	virtual bool isPatientValid() const;
 
 	virtual void autoSave();
 	virtual bool isNull();

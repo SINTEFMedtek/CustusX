@@ -178,4 +178,9 @@ QString PatientModelImplService::getActivePatientFolder() const
 	return patientService()->getPatientData()->getActivePatientFolder();
 }
 
+bool PatientModelImplService::isPatientValid() const
+{
+	return patientService()->getPatientData()->isPatientValid();
+}
+
 } /* namespace cx */

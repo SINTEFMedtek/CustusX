@@ -82,6 +82,7 @@ private:
   LabeledComboBoxWidget* mToolComboBox;
   LabeledComboBoxWidget* mDataComboBox;
   bool mTruncateFile;
+  PatientModelServicePtr mPatientModelService;
 };
 
 
