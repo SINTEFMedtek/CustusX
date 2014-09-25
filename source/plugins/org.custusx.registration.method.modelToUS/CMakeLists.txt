@@ -9,6 +9,10 @@ include_directories(
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
     ${CustusX_SOURCE_DIR}/source/logic
+    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
+    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
+    ${CustusX_SOURCE_DIR}/source/resource/filter
+    ${CustusX_SOURCE_DIR}/source/gui/dataadapters
 )
 
 set(PLUGIN_SRCS
@@ -39,6 +43,8 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}
     cxResourceWidgets
     cxPluginUtilities
+    cxPluginAlgorithm
+    cxResourceFilter
     )
 
 ctkMacroBuildPlugin(
