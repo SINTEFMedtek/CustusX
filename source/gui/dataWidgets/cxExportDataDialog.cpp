@@ -45,19 +45,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxTypeConversions.h"
 #include "cxData.h"
-#include "cxDataManager.h"
 #include "cxRegistrationTransform.h"
 #include "cxImageAlgorithms.h"
 #include "cxImage.h"
 #include "cxStateService.h"
-#include "cxPatientData.h"
-#include "cxPatientService.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
-ExportDataDialog::ExportDataDialog(QWidget* parent) :
-    QDialog(parent)
+ExportDataDialog::ExportDataDialog(PatientModelServicePtr patientModelService, QWidget* parent) :
+	QDialog(parent),
+	mPatientModelService(patientModelService)
 {
   this->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -92,7 +91,7 @@ ExportDataDialog::~ExportDataDialog()
 
 void ExportDataDialog::acceptedSlot()
 {
-	patientService()->getPatientData()->exportPatient(mNiftiFormatCheckBox->isChecked());
+	mPatientModelService->exportPatient(mNiftiFormatCheckBox->isChecked());
 }
 
 }//namespace cx

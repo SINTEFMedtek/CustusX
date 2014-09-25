@@ -43,6 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientService.h"
 #include "cxTypeConversions.h"
 
+//TODO: remove
+#include "cxLegacySingletons.h"
+
 namespace cx
 {
 

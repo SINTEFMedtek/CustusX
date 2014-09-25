@@ -166,6 +166,17 @@ bool PatientModelServiceNull::isPatientValid() const
 	return false;
 }
 
+DataPtr PatientModelServiceNull::importData(QString fileName, QString &infoText)
+{
+	printWarning();
+	return DataPtr();
+}
+
+void PatientModelServiceNull::exportPatient(bool niftiFormat)
+{
+	printWarning();
+}
+
 PresetTransferFunctions3DPtr PatientModelServiceNull::getPresetTransferFunctions3D() const
 {
 	printWarning();

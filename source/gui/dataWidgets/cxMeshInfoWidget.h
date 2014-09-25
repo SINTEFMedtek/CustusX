@@ -83,6 +83,7 @@ private:
   ColorDataAdapterXmlPtr mColorAdapter;
   QCheckBox* mBackfaceCullingCheckBox;
   QCheckBox* mFrontfaceCullingCheckBox;
+  PatientModelServicePtr mPatientModelService;
   
   MeshInfoWidget();
 };

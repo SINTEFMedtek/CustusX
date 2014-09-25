@@ -132,15 +132,15 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 
 	ctkPluginContext *pluginContext = LogicManager::getInstance()->getPluginContext();
 
-	PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(pluginContext));
+	mPatientModelService = PatientModelServicePtr(new PatientModelServiceProxy(pluginContext));
 
 	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
 	this->addAsDockWidget(new VideoConnectionWidget(this), "Utility");
 	this->addAsDockWidget(new EraserWidget(this), "Properties");
 	this->addAsDockWidget(new MetricWidget(this), "Utility");
-	this->addAsDockWidget(new SlicePropertiesWidget(patientModelService, this), "Properties");
-	this->addAsDockWidget(new VolumePropertiesWidget(patientModelService, this), "Properties");
-	this->addAsDockWidget(new MeshInfoWidget(patientModelService, this), "Properties");
+	this->addAsDockWidget(new SlicePropertiesWidget(mPatientModelService, this), "Properties");
+	this->addAsDockWidget(new VolumePropertiesWidget(mPatientModelService, this), "Properties");
+	this->addAsDockWidget(new MeshInfoWidget(mPatientModelService, this), "Properties");
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
 	this->addAsDockWidget(new ToolPropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new NavigationWidget(this), "Properties");
@@ -736,7 +736,7 @@ void MainWindow::exportDataSlot()
 {
 	this->savePatientFileSlot();
 
-	ExportDataDialog* wizard = new ExportDataDialog(this);
+	ExportDataDialog* wizard = new ExportDataDialog(mPatientModelService, this);
 	wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
 }
 
@@ -760,7 +760,7 @@ void MainWindow::importDataSlot()
 
 	for (int i=0; i<fileName.size(); ++i)
 	{
-		ImportDataDialog* wizard = new ImportDataDialog(fileName[i], this);
+		ImportDataDialog* wizard = new ImportDataDialog(mPatientModelService, fileName[i], this);
 		wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
 	}
 }

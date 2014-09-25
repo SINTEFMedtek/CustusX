@@ -54,7 +54,8 @@ namespace cx
 
 
 MeshInfoWidget::MeshInfoWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
-		InfoWidget(parent, "MeshInfoWidget", "Mesh Properties")//, mMeshPropertiesGroupBox(new QGroupBox(this))
+	InfoWidget(parent, "MeshInfoWidget", "Mesh Properties"),
+	mPatientModelService(patientModelService)
 {
 	this->addWidgets(patientModelService);
 	this->meshSelectedSlot();
@@ -118,7 +119,7 @@ void MeshInfoWidget::importTransformSlot()
 {
   if(!mMesh)
     return;
-  DataPtr parent = dataManager()->getData(mMesh->getParentSpace());
+  DataPtr parent = mPatientModelService->getData(mMesh->getParentSpace());
   if (!parent)
     return;
   mMesh->get_rMd_History()->setRegistration(parent->get_rMd());

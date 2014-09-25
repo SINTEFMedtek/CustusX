@@ -35,6 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataInterface.h"
 #include "cxHelperWidgets.h"
 
+//TODO: remove
+#include "cxLegacySingletons.h"
+
 namespace cx
 {
 

@@ -183,6 +183,16 @@ bool PatientModelImplService::isPatientValid() const
 	return patientService()->getPatientData()->isPatientValid();
 }
 
+DataPtr PatientModelImplService::importData(QString fileName, QString &infoText)
+{
+	return patientService()->getPatientData()->importData(fileName, infoText);
+}
+
+void PatientModelImplService::exportPatient(bool niftiFormat)
+{
+	patientService()->getPatientData()->exportPatient(niftiFormat);
+}
+
 PresetTransferFunctions3DPtr PatientModelImplService::getPresetTransferFunctions3D() const
 {
 	return dataService()->getPresetTransferFunctions3D();

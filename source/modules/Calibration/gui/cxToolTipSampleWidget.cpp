@@ -42,9 +42,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
 #include "cxSelectDataStringDataAdapter.h"
-//#include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 #include "cxPatientModelService.h"
+
+//TODO: remove
+#include "cxLegacySingletons.h"
 
 namespace cx
 {

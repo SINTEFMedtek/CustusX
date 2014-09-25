@@ -38,8 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxCoordinateSystemHelpers.h"
 
-#include "cxLegacySingletons.h"
-
 /**
  * \file
  * \addtogroup cx_gui

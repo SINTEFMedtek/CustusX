@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
 #include "cxToolManager.h"
-#include "cxDataManager.h"
 #include "cxVector3D.h"
 #include "cxDefinitionStrings.h"
 #include "cxLabeledComboBoxWidget.h"
@@ -50,6 +49,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientData.h"
 #include <cxActiveToolWidget.h>
 #include "cxDoubleWidgets.h"
+
+//TODO: remove
+#include "cxLegacySingletons.h"
 
 namespace cx
 {

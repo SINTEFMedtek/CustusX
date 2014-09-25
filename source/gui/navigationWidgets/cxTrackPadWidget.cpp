@@ -46,6 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoundingBox3D.h"
 #include "cxView.h"
 
+//TODO: remove
+#include "cxLegacySingletons.h"
+
 namespace cx
 {
 

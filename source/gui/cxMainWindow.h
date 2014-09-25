@@ -234,6 +234,8 @@ private:
 	CameraControlPtr mCameraControl;
 
 	DockWidgets* mDockWidgets;
+
+	PatientModelServicePtr mPatientModelService;
 };
 
 }//namespace cx

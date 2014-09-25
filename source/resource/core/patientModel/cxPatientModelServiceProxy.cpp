@@ -196,6 +196,16 @@ bool PatientModelServiceProxy::isPatientValid() const
 	return mPatientModelService->isPatientValid();
 }
 
+DataPtr PatientModelServiceProxy::importData(QString fileName, QString &infoText)
+{
+	return mPatientModelService->importData(fileName, infoText);
+}
+
+void PatientModelServiceProxy::exportPatient(bool niftiFormat)
+{
+	return mPatientModelService->exportPatient(niftiFormat);
+}
+
 PresetTransferFunctions3DPtr PatientModelServiceProxy::getPresetTransferFunctions3D() const
 {
 	return mPatientModelService->getPresetTransferFunctions3D();

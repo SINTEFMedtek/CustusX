@@ -74,6 +74,8 @@ public:
 
 	virtual QString getActivePatientFolder() const;
 	virtual bool isPatientValid() const;
+	virtual DataPtr importData(QString fileName, QString &infoText);
+	virtual void exportPatient(bool niftiFormat);
 
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 

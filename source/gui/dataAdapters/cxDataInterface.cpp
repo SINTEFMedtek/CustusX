@@ -49,6 +49,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoServiceOld.h"
 #include "cxPatientModelService.h"
 
+//TODO: remove
+#include "cxLegacySingletons.h"
+
 namespace cx
 {
 DoubleDataAdapterActiveToolOffset::DoubleDataAdapterActiveToolOffset()
