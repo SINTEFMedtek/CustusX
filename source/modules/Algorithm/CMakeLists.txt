@@ -13,7 +13,7 @@
 ###########################################################
 
 SET( MOC_HEADER_FILES
-	logic/cxFilterTimedAlgorithm.h
+#	logic/cxFilterTimedAlgorithm.h
 	logic/cxDummyFilter.h
 	logic/cxPipeline.h
     logic/cxBinaryThresholdImageFilter.h
@@ -28,7 +28,6 @@ SET( MOC_HEADER_FILES
     gui/cxTimedAlgorithmProgressBar.h
 	gui/cxFilterWidget.h
 	gui/cxPipelineWidget.h
-	gui/cxFilterPresetWidget.h
 	gui/cxAllFiltersWidget.h
 	gui/cxCompactFilterSetupWidget.h
 	)
@@ -38,8 +37,8 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 # library
 SET( SOURCE_FILES
 	${MOC_HEADER_FILES}
-	logic/cxFilterTimedAlgorithm.h
-	logic/cxFilterTimedAlgorithm.cpp
+#	logic/cxFilterTimedAlgorithm.h
+#	logic/cxFilterTimedAlgorithm.cpp
 	logic/cxDummyFilter.h
 	logic/cxDummyFilter.cpp
 	logic/cxDilationFilter.h
@@ -70,8 +69,6 @@ SET( SOURCE_FILES
 	gui/cxFilterWidget.cpp
 	gui/cxPipelineWidget.h
 	gui/cxPipelineWidget.cpp
-	gui/cxFilterPresetWidget.h
-	gui/cxFilterPresetWidget.cpp
 	gui/cxAllFiltersWidget.h
 	gui/cxAllFiltersWidget.cpp
 	gui/cxCompactFilterSetupWidget.h

@@ -5,7 +5,7 @@
 cx_add_class_qt_moc(CX_RESOURCE_FILTER_FILES
 	cxFilter
 	cxFilterImpl
-#	cxFilterTimedAlgorithm
+	cxFilterTimedAlgorithm
 #	cxDummyFilter
 #	cxPipeline
 #	cxBinaryThresholdImageFilter

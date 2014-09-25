@@ -72,7 +72,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 
 	algorithms/cxTimedAlgorithm.h
     algorithms/cxThreadedTimedAlgorithm.h
-    algorithms/cxCompositeTimedAlgorithm.h
+	algorithms/cxCompositeTimedAlgorithm.h
 
     utilities/cxPlaybackTime.h
     utilities/cxProcessWrapper.h
