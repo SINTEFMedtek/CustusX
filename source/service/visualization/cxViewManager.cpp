@@ -80,14 +80,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-VisualizationServiceOldPtr ViewManager::create(VisualizationServiceBackendPtr backend)
+VisualizationServiceOldPtr ViewManager::create(PatientModelServicePtr patientModelService, VisualizationServiceBackendPtr backend)
 {
 	VisualizationServiceOldPtr retval;
-	retval.reset(new ViewManager(backend));
+	retval.reset(new ViewManager(patientModelService, backend));
 	return retval;
 }
 
-ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
+ViewManager::ViewManager(PatientModelServicePtr patientModelService, VisualizationServiceBackendPtr backend) :
 				mGlobalObliqueOrientation(false)
 {
 	mBackend = backend;
@@ -125,7 +125,7 @@ ViewManager::ViewManager(VisualizationServiceBackendPtr backend) :
 	mActiveLayout = QStringList() << "" << "";
 	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
 
-	mInteractiveCropper.reset(new InteractiveCropper(mBackend));
+	mInteractiveCropper.reset(new InteractiveCropper(patientModelService));
 	mInteractiveClipper.reset(new InteractiveClipper(mBackend));
 	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
 	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));

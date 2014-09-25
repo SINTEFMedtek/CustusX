@@ -39,12 +39,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-OverlayWidget::OverlayWidget(QWidget* parent) :
+OverlayWidget::OverlayWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
 		BaseWidget(parent, "OverlayWidget", "Overlay")
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
-	layout->addWidget(new TransferFunction2DOpacityWidget(this), 0);
+	layout->addWidget(new TransferFunction2DOpacityWidget(patientModelService, this), 0);
 	layout->addWidget(new DataViewSelectionWidget(this), 1);
 	this->setEnabled(ViewWrapper2D::overlayIsEnabled());
 }

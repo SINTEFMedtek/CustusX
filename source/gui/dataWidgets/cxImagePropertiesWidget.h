@@ -47,7 +47,7 @@ class ImagePropertiesWidget : public BaseWidget
 	Q_OBJECT
 
 public:
-	ImagePropertiesWidget(QWidget* parent);
+	ImagePropertiesWidget(PatientModelServicePtr patientModelService, QWidget* parent);
 
 public slots:
 	virtual QString defaultWhatsThis() const;
@@ -59,6 +59,7 @@ private slots:
 private:
 	QComboBox* mInterpolationType;
 	ActiveImageProxyPtr mActiveImageProxy;
+	PatientModelServicePtr mPatientModelService;
 };
 
 }//end namespace cx

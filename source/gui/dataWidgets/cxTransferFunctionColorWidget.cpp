@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QColorDialog>
 #include <QMenu>
 #include <QTimer>
-#include "cxDataManager.h"
 #include "cxImageTF3D.h"
 #include "cxImageTFData.h"
 #include "cxUtilHelpers.h"
@@ -53,13 +52,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-TransferFunctionColorWidget::TransferFunctionColorWidget(QWidget* parent) :
+TransferFunctionColorWidget::TransferFunctionColorWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
   BaseWidget(parent, "TransferFunctionColorWidget", "Color Transfer Function"),
 	mCurrentClickPos(INT_MIN,INT_MIN),
   mBorder(5)
 {
   this->setFocusPolicy(Qt::StrongFocus);
-	mActiveImageProxy = ActiveImageProxy::New(dataService());
+	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageTransferFunctionsChangedSlot()));
 
   mSelectedPoint.reset();

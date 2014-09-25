@@ -48,9 +48,9 @@ SlicePropertiesWidget::SlicePropertiesWidget(PatientModelServicePtr patientModel
 		TabbedWidget(parent, "SlicePropertiesWidget", "Slice Properties")
 {
 	this->insertWidgetAtTop(new DataSelectWidget(this, ActiveImageStringDataAdapter::New(patientModelService)));
-  this->addTab(new VolumeInfoWidget(this), "Info");
-  this->addTab(new ColorWidget(this), "Color");
-  this->addTab(new OverlayWidget(this), "Overlay");
+  this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");
+  this->addTab(new ColorWidget(patientModelService, this), "Color");
+  this->addTab(new OverlayWidget(patientModelService, this), "Overlay");
 }
 
 SlicePropertiesWidget::~SlicePropertiesWidget()

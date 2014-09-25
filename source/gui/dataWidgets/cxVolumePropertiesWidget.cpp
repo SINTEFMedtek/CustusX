@@ -83,9 +83,9 @@ VolumePropertiesWidget::VolumePropertiesWidget(PatientModelServicePtr patientMod
 {
 	this->insertWidgetAtTop(new ActiveVolumeWidget(patientModelService, this));
 
-	this->addTab(new VolumeInfoWidget(this), "Info");
-	this->addTab(new TransferFunctionWidget(this), QString("Transfer Functions"));
-	this->addTab(new ShadingWidget(this), "Shading");
+	this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");
+	this->addTab(new TransferFunctionWidget(patientModelService, this), QString("Transfer Functions"));
+	this->addTab(new ShadingWidget(patientModelService, this), "Shading");
 	this->addTab(new CroppingWidget(this), "Crop");
 	this->addTab(new ClippingWidget(patientModelService, this), "Clip");
 }

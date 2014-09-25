@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-class DataManager;
 /**
  * \file
  * \addtogroup cx_service_patient
@@ -51,21 +50,22 @@ typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
  * \ingroup cx_service_patient
  *
  * By listening to this class, you will always listen
- * to the active tool.
+ * to the active image.
  *
  *  \date Oct 18, 2011
- *  \author olevs
+ *  \author Ole Vegard Solberg, SINTEF
  *
  */
 class ActiveImageProxy: public QObject
 {
 Q_OBJECT
 public:
-	static ActiveImageProxyPtr New(DataServicePtr dataManager)
+	static ActiveImageProxyPtr New(PatientModelServicePtr patientModelService)
 	{
-		return ActiveImageProxyPtr(new ActiveImageProxy(dataManager));
+		return ActiveImageProxyPtr(new ActiveImageProxy(patientModelService));
 	}
-	ActiveImageProxy(DataServicePtr dataManager);
+	ActiveImageProxy(PatientModelServicePtr patientModelService);
+	~ActiveImageProxy();
 
 signals:
 	void activeImageChanged(const QString& uid); ///< The original image changed signal from DataManager
@@ -84,7 +84,7 @@ private slots:
 	void activeImageChangedSlot(const QString&);
 private:
 	ImagePtr mImage;
-	DataServicePtr mDataManager;
+	PatientModelServicePtr mPatientModelService;
 };
 
 /**

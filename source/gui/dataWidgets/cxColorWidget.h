@@ -53,7 +53,7 @@ class ColorWidget : public BaseWidget
 	Q_OBJECT
 
 public:
-	ColorWidget(QWidget* parent);
+	ColorWidget(PatientModelServicePtr patientModelService, QWidget* parent);
 	virtual QString defaultWhatsThis() const;
 };
 

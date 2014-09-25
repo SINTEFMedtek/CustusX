@@ -54,7 +54,7 @@ class TransferFunctionPresetWidget: public PresetWidget
 	Q_OBJECT
 
 public:
-	TransferFunctionPresetWidget(QWidget* parent, bool is3D);
+	TransferFunctionPresetWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool is3D);
 	virtual ~TransferFunctionPresetWidget() {
 	}
 	virtual QString defaultWhatsThis() const;

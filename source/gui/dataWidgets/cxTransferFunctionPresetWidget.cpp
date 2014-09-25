@@ -38,13 +38,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataManager.h"
 #include "cxSettings.h"
 #include "cxActiveImageProxy.h"
+#include "cxPatientModelService.h"
 
 namespace cx {
 
-TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent, bool is3D) :
+TransferFunctionPresetWidget::TransferFunctionPresetWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool is3D) :
 		PresetWidget(parent), mIs3D(is3D)
 {
-	this->setPresets(dataManager()->getPresetTransferFunctions3D());
+	this->setPresets(patientModelService->getPresetTransferFunctions3D());
 	QString toggleText = "Toggle between apply presets,\neither on %1\nor both 2D and 3D\ntransfer functions.";
 	if (is3D)
 		toggleText = toggleText.arg("3D");
@@ -59,7 +60,7 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent, bool
 	mApplyToAll = settings()->value("applyTransferFunctionPresetsToAll").toBool();
 	this->updateToggles();
 
-	mActiveImageProxy = ActiveImageProxy::New(dataService());
+	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this,
 			SLOT(populatePresetListSlot()));
 	connect(mActiveImageProxy.get(), SIGNAL(propertiesChanged()), this,

@@ -125,7 +125,7 @@ class ViewManager: public QObject
 {
 Q_OBJECT
 public:
-	static VisualizationServiceOldPtr create(VisualizationServiceBackendPtr backend);
+	static VisualizationServiceOldPtr create(PatientModelServicePtr patientModelService, VisualizationServiceBackendPtr backend);
 	virtual ~ViewManager();
 
 	ViewWidgetQPtr get3DView(int group = 0, int index = 0);
@@ -190,7 +190,7 @@ protected slots:
 	void setActiveView(QString viewUid);
 
 protected:
-	ViewManager(VisualizationServiceBackendPtr backend);
+	ViewManager(PatientModelServicePtr patientModelService, VisualizationServiceBackendPtr backend);
 
 	ViewWidget* getView(const QString& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
 

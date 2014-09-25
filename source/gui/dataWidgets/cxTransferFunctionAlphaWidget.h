@@ -59,7 +59,7 @@ class TransferFunctionAlphaWidget : public BaseWidget
   Q_OBJECT
   
 public:
-  TransferFunctionAlphaWidget(QWidget* parent);
+  TransferFunctionAlphaWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~TransferFunctionAlphaWidget();
   virtual QString defaultWhatsThis() const;
 

@@ -63,7 +63,7 @@ class ShadingWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  ShadingWidget(QWidget* parent);
+  ShadingWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   ~ShadingWidget();
 
 public slots:
@@ -80,6 +80,7 @@ protected:
   //ImagePtr mCurrentImage;
   bool mInitialized;///< Is TransferFunctionWidget initialized
   ActiveImageProxyPtr mActiveImageProxy;
+  PatientModelServicePtr mPatientModelService;
 };
 }
 

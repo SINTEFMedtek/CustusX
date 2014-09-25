@@ -183,4 +183,9 @@ bool PatientModelImplService::isPatientValid() const
 	return patientService()->getPatientData()->isPatientValid();
 }
 
+PresetTransferFunctions3DPtr PatientModelImplService::getPresetTransferFunctions3D() const
+{
+	return dataService()->getPresetTransferFunctions3D();
+}
+
 } /* namespace cx */

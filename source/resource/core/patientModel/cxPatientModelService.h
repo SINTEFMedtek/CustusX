@@ -55,6 +55,7 @@ class RegistrationTransform;
 class LandmarkProperty;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
+typedef boost::shared_ptr<class TransferFunctions3DPresets> PresetTransferFunctions3DPtr;
 
 /** \brief The virtual patient
  *
@@ -100,6 +101,8 @@ public:
 
 	virtual QString getActivePatientFolder() const = 0;
 	virtual bool isPatientValid() const = 0;
+
+	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const = 0;
 
 	virtual void autoSave() = 0;//TODO remove, and integrate into other functions
 	virtual bool isNull() = 0;

@@ -87,7 +87,7 @@ class DoubleDataAdapterActiveImageBase : public DoubleDataAdapter
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterActiveImageBase();
+  DoubleDataAdapterActiveImageBase(PatientModelServicePtr patientModelService);
   virtual ~DoubleDataAdapterActiveImageBase() {}
   virtual double getValue() const;
   virtual bool setValue(double val);
@@ -100,6 +100,7 @@ protected:
 
   ImagePtr mImage;
   ActiveImageProxyPtr mActiveImageProxy;
+  PatientModelServicePtr mPatientModelService;
 };
 
 /**

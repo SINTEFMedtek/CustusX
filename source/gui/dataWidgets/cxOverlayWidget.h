@@ -53,7 +53,7 @@ class OverlayWidget : public BaseWidget
 	Q_OBJECT
 
 public:
-	OverlayWidget(QWidget* parent);
+	OverlayWidget(PatientModelServicePtr patientModelService, QWidget* parent);
 	virtual QString defaultWhatsThis() const;
 };
 

@@ -59,7 +59,7 @@ class TransferFunctionColorWidget : public BaseWidget
   Q_OBJECT
   
 public:
-  TransferFunctionColorWidget(QWidget* parent);
+  TransferFunctionColorWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~TransferFunctionColorWidget();
   virtual QString defaultWhatsThis() const;
   

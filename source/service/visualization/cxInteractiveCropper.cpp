@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include <vtkTransform.h>
-//#include <vtkPolyData.h>
 #include <vtkAbstractVolumeMapper.h>
 #include <vtkVolumeMapper.h>
 #include <vtkRenderWindow.h>
@@ -50,7 +49,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageData.h>
 #include "cxTypeConversions.h"
 #include "cxRepManager.h"
-#include "cxDataManager.h"
 #include <vtkBoxWidget2.h>
 #include <vtkBoxWidget.h>
 #include "cxBoundingBox3D.h"
@@ -59,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumetricRep.h"
 #include "cxActiveImageProxy.h"
 #include "cxVisualizationServiceBackend.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -114,10 +113,10 @@ public:
 //---------------------------------------------------------
 
 
-InteractiveCropper::InteractiveCropper(VisualizationServiceBackendPtr backend) :
-	mBackend(backend)
+InteractiveCropper::InteractiveCropper(PatientModelServicePtr patientModelService) :
+	mPatientModelService(patientModelService)
 {
-	mActiveImageProxy = ActiveImageProxy::New(mBackend->getDataManager());
+	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(imageChangedSlot()));
 	connect(mActiveImageProxy.get(), SIGNAL(cropBoxChanged()), this, SLOT(imageCropChangedSlot()));
 }
@@ -239,7 +238,7 @@ void InteractiveCropper::resetBoundingBox()
 
 void InteractiveCropper::imageChangedSlot()
 {
-	mImage = mBackend->getDataManager()->getActiveImage();
+	mImage = mPatientModelService->getActiveImage();
 
 	this->imageCropChangedSlot();
 	emit changed();

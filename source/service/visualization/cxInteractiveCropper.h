@@ -70,7 +70,7 @@ class InteractiveCropper: public QObject
 {
 Q_OBJECT
 public:
-	explicit InteractiveCropper(VisualizationServiceBackendPtr backend);
+	explicit InteractiveCropper(PatientModelServicePtr patientModelService);
 	void setView(ViewWidget* view); ///< adds an interactive box widget to the view. Press 'I' to show
 	DoubleBoundingBox3D getBoundingBox(); ///< get BB in data space
 	void setBoundingBox(const DoubleBoundingBox3D& bb_d); ///< set BB in reference space
@@ -106,7 +106,7 @@ private:
 	CropBoxEnableCallbackPtr mCropBoxDisableCallback;
 	bool mShowBoxWidget;
 	ActiveImageProxyPtr mActiveImageProxy;
-	VisualizationServiceBackendPtr mBackend;
+	PatientModelServicePtr mPatientModelService;
 };
 
 typedef boost::shared_ptr<InteractiveCropper> InteractiveCropperPtr;

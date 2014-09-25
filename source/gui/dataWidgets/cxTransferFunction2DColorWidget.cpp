@@ -32,25 +32,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTransferFunction2DColorWidget.h"
 #include "cxDoubleWidgets.h"
-#include "cxDataManager.h"
 #include "cxImageLUT2D.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
-TransferFunction2DColorWidget::TransferFunction2DColorWidget(QWidget* parent) :
-  BaseWidget(parent, "TransferFunction2DColorWidget", "2D Color")
+TransferFunction2DColorWidget::TransferFunction2DColorWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+  BaseWidget(parent, "TransferFunction2DColorWidget", "2D Color"),
+  mPatientModelService(patientModelService)
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
 
-  mTransferFunctionColorWidget = new TransferFunctionColorWidget(this);
-  mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
+  mTransferFunctionColorWidget = new TransferFunctionColorWidget(patientModelService, this);
+  mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(patientModelService, this);
   mTransferFunctionAlphaWidget->setReadOnly(true);
 
   mDataWindow.reset(new DoubleDataAdapterImageTFDataWindow);
   mDataLevel.reset(new DoubleDataAdapterImageTFDataLevel);
 
-  mActiveImageProxy = ActiveImageProxy::New(dataService());
+  mActiveImageProxy = ActiveImageProxy::New(patientModelService);
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
@@ -82,7 +83,7 @@ QString TransferFunction2DColorWidget::defaultWhatsThis() const
 
 void TransferFunction2DColorWidget::activeImageChangedSlot()
 {
-  ImagePtr image = dataManager()->getActiveImage();
+  ImagePtr image = mPatientModelService->getActiveImage();
   ImageTFDataPtr tf;
   if (image)
     tf = image->getLookupTable2D();

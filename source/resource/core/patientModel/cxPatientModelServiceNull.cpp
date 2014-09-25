@@ -166,6 +166,12 @@ bool PatientModelServiceNull::isPatientValid() const
 	return false;
 }
 
+PresetTransferFunctions3DPtr PatientModelServiceNull::getPresetTransferFunctions3D() const
+{
+	printWarning();
+	return PresetTransferFunctions3DPtr();
+}
+
 void PatientModelServiceNull::printWarning() const
 {
 	reportWarning("Trying to use PatientModelServiceNull. Is PatientModelService (org.custusx.patiemtmodel) disabled?");

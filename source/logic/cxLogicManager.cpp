@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include <cxLogicManager.h>
 
+#include <ctkPluginContext.h>
 #include "cxServiceController.h"
 #include "cxReporter.h"
 #include "cxPatientService.h"
@@ -50,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxSharedPointerChecker.h"
 #include "cxPluginFramework.h"
-#include "ctkPluginContext.h"
+#include "cxPatientModelServiceProxy.h"
 
 namespace cx
 {
@@ -242,7 +243,8 @@ void LogicManager::createVisualizationService()
 												  mTrackingService,
 													mVideoServiceOld,
 												  mSpaceProvider));
-	mVisualizationService = ViewManager::create(backend);
+	PatientModelServicePtr patientModelService(new PatientModelServiceProxy(getPluginContext()));
+	mVisualizationService = ViewManager::create(patientModelService, backend);
 	LegacySingletons::mVisualizationService = mVisualizationService;
 }
 

@@ -196,4 +196,9 @@ bool PatientModelServiceProxy::isPatientValid() const
 	return mPatientModelService->isPatientValid();
 }
 
+PresetTransferFunctions3DPtr PatientModelServiceProxy::getPresetTransferFunctions3D() const
+{
+	return mPatientModelService->getPresetTransferFunctions3D();
+}
+
 } //cx

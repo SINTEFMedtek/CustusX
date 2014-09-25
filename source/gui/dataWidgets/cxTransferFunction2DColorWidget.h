@@ -58,7 +58,7 @@ class TransferFunction2DColorWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  TransferFunction2DColorWidget(QWidget* parent);
+  TransferFunction2DColorWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~TransferFunction2DColorWidget() {}
   virtual QString defaultWhatsThis() const;
 
@@ -70,6 +70,7 @@ protected:
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
   DoubleDataAdapterImageTFDataBasePtr mDataWindow, mDataLevel;
   ActiveImageProxyPtr mActiveImageProxy;
+  PatientModelServicePtr mPatientModelService;
 };
 
 /**

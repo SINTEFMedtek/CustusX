@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxActiveImageProxy.h"
 #include "cxVideoSource.h"
 #include "cxVideoServiceOld.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -98,15 +99,16 @@ DoubleRange DoubleDataAdapterActiveToolOffset::getValueRange() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-DoubleDataAdapterActiveImageBase::DoubleDataAdapterActiveImageBase()
+DoubleDataAdapterActiveImageBase::DoubleDataAdapterActiveImageBase(PatientModelServicePtr patientModelService) :
+	mPatientModelService(patientModelService)
 {
-	mActiveImageProxy = ActiveImageProxy::New(dataService());
+	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChanged()));
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
 }
 void DoubleDataAdapterActiveImageBase::activeImageChanged()
 {
-  mImage = dataManager()->getActiveImage();
+  mImage = mPatientModelService->getActiveImage();
   emit changed();
 }
 double DoubleDataAdapterActiveImageBase::getValue() const

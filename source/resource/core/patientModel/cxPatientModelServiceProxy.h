@@ -80,6 +80,8 @@ public:
 	virtual QString getActivePatientFolder() const;
 	virtual bool isPatientValid() const;
 
+	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
+
 	virtual void autoSave();
 	virtual bool isNull();
 
