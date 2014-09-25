@@ -12,7 +12,7 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
     ${CustusX_SOURCE_DIR}/source/resource/filter
-    ${CustusX_SOURCE_DIR}/source/gui/dataadapters
+	${CustusX_SOURCE_DIR}/source/gui/dataAdapters
 )
 
 set(PLUGIN_SRCS
