@@ -53,13 +53,13 @@ class RegistrationMethodModelToUSWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	RegistrationMethodModelToUSWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName);
+	RegistrationMethodModelToUSWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget *parent, QString objectName);
 	virtual ~RegistrationMethodModelToUSWidget();
 
 private:
 	QString defaultWhatsThis() const;
 	QVBoxLayout*  mVerticalLayout;
-	RegistrationServicePtr mRegistrationService;
+	//RegistrationServicePtr mRegistrationService;
 };
 
 } /* namespace cx */

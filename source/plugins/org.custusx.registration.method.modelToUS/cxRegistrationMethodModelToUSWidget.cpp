@@ -34,17 +34,45 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctkPluginContext.h>
 #include <QLabel>
 #include <QVBoxLayout>
-#include "cxRegistrationServiceProxy.h"
+#include "cxRegistrationService.h"
+#include "cxPatientModelService.h"
+#include "cxPipeline.h"
+#include "cxFilter.h"
+#include "cxBinaryThresholdImageFilter.h"
+#include "cxPipelineWidget.h"
+//#include "cxResampleImageFilter.h"
+//#include "cxSmoothingImageFilter.h"
+
+//To be removed
+#include "cxDataLocations.h"
 
 namespace cx
 {
 
-RegistrationMethodModelToUSWidget::RegistrationMethodModelToUSWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName) :
+RegistrationMethodModelToUSWidget::RegistrationMethodModelToUSWidget(RegistrationServicePtr registrationService,
+																	 PatientModelServicePtr patientModelService,
+																	 QWidget* parent, QString objectName) :
 	BaseWidget(parent, objectName, "Model to US Registration"),
-	mVerticalLayout(new QVBoxLayout(this)),
-	mRegistrationService(new cx::RegistrationServiceProxy(pluginContext))
+	mVerticalLayout(new QVBoxLayout(this))
 {
-	mVerticalLayout->addWidget(new QLabel("Hello Plugin!"));
+	//mVerticalLayout->addWidget(new QLabel("Hello Plugin!"));
+
+	//prepare
+	//Copied from PrepareVesselsWidget
+	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("registration").descend("PrepareVesselsWidget");
+	// fill the pipeline with filters:
+	PipelinePtr mPipeline;
+	mPipeline.reset(new Pipeline(patientModelService));
+	FilterGroupPtr filters(new FilterGroup(options.descend("pipeline")));
+	//filters->append(FilterPtr(new ResampleImageFilter(patientModelService)));
+	//filters->append(FilterPtr(new SmoothingImageFilter(patientModelService)));
+	filters->append(FilterPtr(new BinaryThresholdImageFilter(patientModelService)));
+	//filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(patientModelService)));
+	mPipeline->initialize(filters);
+
+	PipelineWidget *mPipelineWidget = new PipelineWidget(NULL, mPipeline);
+	mVerticalLayout->addWidget(mPipelineWidget);
+
 }
 
 RegistrationMethodModelToUSWidget::~RegistrationMethodModelToUSWidget()

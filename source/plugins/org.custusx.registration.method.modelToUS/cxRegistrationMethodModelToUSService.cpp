@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationMethodModelToUSService.h"
 #include "ctkPluginContext.h"
 #include "cxRegistrationMethodModelToUSWidget.h"
+#include "cxRegistrationServiceProxy.h"
+#include "cxPatientModelServiceProxy.h"
 
 namespace cx
 {
@@ -43,7 +45,11 @@ RegistrationMethodModelToUSService::RegistrationMethodModelToUSService(ctkPlugin
 }
 QWidget* RegistrationMethodModelToUSService::createWidget()
 {
-	QWidget* retval = new RegistrationMethodModelToUSWidget(mPluginContext, NULL, this->getWidgetName());
+
+	RegistrationServicePtr registrationService(new RegistrationServiceProxy(mPluginContext));
+	PatientModelServicePtr patientModelService(new PatientModelServiceProxy(mPluginContext));
+
+	QWidget* retval = new RegistrationMethodModelToUSWidget(registrationService, patientModelService, NULL, this->getWidgetName());
 	return retval;
 }
 
