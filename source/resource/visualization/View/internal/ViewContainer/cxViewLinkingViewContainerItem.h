@@ -55,7 +55,6 @@ public:
 	virtual Transform3D get_vpMs() const;
 	virtual DoubleBoundingBox3D getViewport() const;
 	virtual DoubleBoundingBox3D getViewport_s() const;
-//	virtual void forceUpdate();
 
 private:
 	QPointer<ViewItem> mBase;

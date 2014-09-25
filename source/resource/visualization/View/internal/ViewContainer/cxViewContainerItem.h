@@ -70,7 +70,7 @@ public:
 	virtual Transform3D get_vpMs() const;
 	virtual DoubleBoundingBox3D getViewport() const;
 	virtual DoubleBoundingBox3D getViewport_s() const;
-	virtual void forceUpdate() { return this->getView()->forceUpdate(); }
+	virtual void setModified() { return this->getView()->setModified(); }
 
 
 	// Implementing QLayoutItem's pure virtuals

@@ -94,7 +94,7 @@ public:
 //	virtual double heightMM() const = 0;
 	virtual DoubleBoundingBox3D getViewport() const = 0;
 	virtual DoubleBoundingBox3D getViewport_s() const = 0;
-	virtual void forceUpdate() = 0;
+	virtual void setModified() = 0;
 
 signals:
 	void resized(QSize size);

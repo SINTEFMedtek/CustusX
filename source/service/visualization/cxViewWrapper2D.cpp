@@ -278,25 +278,6 @@ void ViewWrapper2D::resetMultiSlicer()
 	this->viewportChanged();
 }
 
-Vector3D ViewWrapper2D::viewToDisplay(Vector3D p_v) const
-{
-	vtkRendererPtr renderer = mView->getRenderer();
-	renderer->SetViewPoint(p_v.begin());
-	renderer->ViewToDisplay(); ///pang
-	Vector3D p_d(renderer->GetDisplayPoint());
-	return p_d;
-}
-
-Vector3D ViewWrapper2D::displayToWorld(Vector3D p_d) const
-{
-	vtkRendererPtr renderer = mView->getRenderer();
-	renderer->SetDisplayPoint(p_d.begin());
-	renderer->DisplayToWorld();
-	double* p_wH = renderer->GetWorldPoint();
-	Vector3D p_w = Vector3D(p_wH) / p_wH[3]; // convert from homogenous to cartesan coords
-	return p_w;
-}
-
 /**Call when viewport size or zoom has changed.
  * Recompute camera zoom and  reps requiring vpMs.
  */
@@ -323,7 +304,7 @@ void ViewWrapper2D::viewportChanged()
 	mSliceProxy->initializeFromPlane(mSliceProxy->getComputer().getPlaneType(), false, Vector3D(0, 0, 1), true, viewHeight, anyplaneViewOffset, true);
 
 	DoubleBoundingBox3D BB_vp = getViewport();
-	Transform3D vpMs = get_vpMs();
+	Transform3D vpMs = mView->get_vpMs();
 	DoubleBoundingBox3D BB_s = transform(vpMs.inv(), BB_vp);
 	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
 
@@ -345,31 +326,6 @@ DoubleBoundingBox3D ViewWrapper2D::getViewport() const
 	Vector3D p1_d(size.width(), size.height(), 0);
 	DoubleBoundingBox3D BB_vp(p0_d, p1_d);
 	return BB_vp;
-}
-
-/**Compute transform from slice space (vtk world/ssc after slicing) to vtk viewport.
- */
-Transform3D ViewWrapper2D::get_vpMs() const
-{
-	// world == slice
-	// display == vp
-
-	QSize size = mView->size();
-
-	Vector3D p0_d(0, 0, 0);
-	Vector3D p1_d(size.width(), size.height(), 1);
-
-	Vector3D p0_w = displayToWorld(p0_d);
-	Vector3D p1_w = displayToWorld(p1_d);
-
-	p0_w[2] = 0;
-	p1_w[2] = 1;
-
-	DoubleBoundingBox3D BB_vp(p0_d, p1_d);
-	DoubleBoundingBox3D BB_s(p0_w, p1_w);
-
-	Transform3D vpMs = createTransformNormalize(BB_s, BB_vp);
-	return vpMs;
 }
 
 void ViewWrapper2D::showSlot()
@@ -634,7 +590,9 @@ void ViewWrapper2D::mouseWheelSlot(int x, int y, int delta, int orientation, Qt:
 Vector3D ViewWrapper2D::qvp2vp(QPoint pos_qvp)
 {
 	QSize size = mView->size();
+	std::cout << "ViewWrapper2D::qvp2vp input=" << pos_qvp.x() << ", " << pos_qvp.y() << std::endl;
 	Vector3D pos_vp(pos_qvp.x(), size.height() - pos_qvp.y(), 0.0); // convert from left-handed qt space to vtk space display/viewport
+	std::cout << "ViewWrapper2D::qvp2vp output=" << pos_vp.x() << ", " << pos_vp.y() << std::endl;
 	return pos_vp;
 }
 
@@ -649,7 +607,8 @@ void ViewWrapper2D::shiftAxisPos(Vector3D delta_vp)
 	Transform3D sMr = mSliceProxy->get_sMr();
 	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
-	Vector3D delta_s = get_vpMs().inv().vector(delta_vp);
+	Transform3D vpMs = mView->get_vpMs();
+	Vector3D delta_s = vpMs.inv().vector(delta_vp);
 
 	Vector3D delta_pr = (rMpr.inv() * sMr.inv()).vector(delta_s);
 
@@ -675,7 +634,10 @@ void ViewWrapper2D::setAxisPos(Vector3D click_vp)
 	Vector3D tool_s = (sMr * rMpr * prMt).coord(tool_t);
 
 	// find click position in s.
-	Vector3D click_s = get_vpMs().inv().coord(click_vp);
+	Transform3D vpMs = mView->get_vpMs();
+	Vector3D click_s = vpMs.inv().coord(click_vp);
+	std::cout << "click_vp: " << click_vp << std::endl;
+	std::cout << "click_s: " << click_s << std::endl;
 
 	// compute the new tool position in slice space as a synthesis of the plane part of click and the z part of original.
 	Vector3D cross_s(click_s[0], click_s[1], tool_s[2]);
@@ -696,7 +658,7 @@ void ViewWrapper2D::setSlicePlanesProxy(SlicePlanesProxyPtr proxy)
 	mSlicePlanes3DMarker->setProxy(plane, proxy);
 
 	DoubleBoundingBox3D BB_vp = getViewport();
-	Transform3D vpMs = get_vpMs();
+	Transform3D vpMs = mView->get_vpMs();
 	mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, transform(vpMs.inv(), BB_vp));
 
 	mView->addRep(mSlicePlanes3DMarker);

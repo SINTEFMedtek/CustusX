@@ -78,12 +78,8 @@ public:
 	virtual void setBackgroundColor(QColor color);
 	virtual void render(); ///< render the view contents if vtk-MTimes are changed
 
-	virtual void forceUpdate() { mMTimeHash = 0; }
-
-	void setModified()
-	{
-		mMTimeHash = 0;
-	}
+	virtual void setModified() { mMTimeHash = 0; }
+	int computeTotalMTime();
 
 	QColor mBackgroundColor;
 	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered

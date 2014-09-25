@@ -36,8 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "cxReporter.h"
-
-
+#include "cxGLHelpers.h"
 #include "cxViewContainer.h"
 
 namespace cx
@@ -87,12 +86,6 @@ ViewWidget* LayoutWidgetUsingViewWidgets::retrieveView(View::Type type)
 	return this->mViewCache->retrieveView();
 }
 
-//void LayoutWidgetUsingViewWidgets::showViews()
-//{
-////	for (unsigned i=0; i<mViews.size(); ++i)
-////		mViews[i]->show();
-//}
-
 void LayoutWidgetUsingViewWidgets::setStretchFactors(LayoutRegion region, int stretchFactor)
 {
 	// set stretch factors for the affected cols to 1 in order to get even distribution
@@ -106,14 +99,6 @@ void LayoutWidgetUsingViewWidgets::setStretchFactors(LayoutRegion region, int st
 		mLayout->setRowStretch(i, stretchFactor);
 	}
 }
-
-//void LayoutWidgetUsingViewWidgets::addView(ViewWidget* view, LayoutRegion region)
-//{
-//	mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col);
-//	this->setStretchFactors(region, 1);
-//	view->show();
-//	mViews.push_back(view);
-//}
 
 void LayoutWidgetUsingViewWidgets::clearViews()
 {
@@ -129,6 +114,25 @@ void LayoutWidgetUsingViewWidgets::clearViews()
 	mViews.clear();
 
 	this->setStretchFactors(LayoutRegion(0, 0, 10, 10), 0);
+}
+
+void LayoutWidgetUsingViewWidgets::setModified()
+{
+	for (unsigned i=0; i<mViews.size(); ++i)
+	{
+		ViewWidget* current = mViews[i];
+		current->setModified();
+	}
+}
+
+void LayoutWidgetUsingViewWidgets::render()
+{
+	for (unsigned i=0; i<mViews.size(); ++i)
+	{
+		ViewWidget* current = mViews[i];
+		current->getView()->render(); // render only changed scenegraph (shaky but smooth)
+		report_gl_error_text(cstring_cast(QString("During rendering of view: ") + current->getView()->getName()));
+	}
 }
 
 } // cx

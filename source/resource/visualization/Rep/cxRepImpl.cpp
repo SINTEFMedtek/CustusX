@@ -133,7 +133,7 @@ void RepImpl::setModified()
 {
 	mModified = true;
 	if (this->getView())
-		this->getView()->forceUpdate();
+		this->getView()->setModified();
 }
 
 

@@ -36,8 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxView.h"
 #include "vtkRenderWindow.h"
 #include "cxTypeConversions.h"
-#include "cxGLHelpers.h"
+//#include "cxGLHelpers.h"
 #include "cxReporter.h"
+#include "cxLayoutWidget.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -50,6 +52,7 @@ RenderLoop::RenderLoop() :
 	mLogging(false),
 	mBaseRenderInterval(40)
 {
+	mLastFullRender = QDateTime::currentDateTime();
 	mCyclicLogger.reset(new CyclicActionLogger("Main Render timer"));
 }
 
@@ -89,14 +92,15 @@ void RenderLoop::sendRenderIntervalToTimer(int interval)
 	mTimer->start(interval);
 }
 
-void RenderLoop::clearViews()
+void RenderLoop::addLayout(LayoutWidget* layout)
 {
-	mViews.clear();
+	mLayoutWidgets.push_back(layout);
 }
 
-void RenderLoop::addView(ViewPtr view)
+
+void RenderLoop::clearViews()
 {
-	mViews.insert(view);
+	mLayoutWidgets.clear();
 }
 
 void RenderLoop::timeoutSlot()
@@ -129,19 +133,16 @@ void RenderLoop::renderViews()
 {
 	bool smart = this->pollForSmartRenderingThisCycle();
 
-	for (ViewSet::iterator iter = mViews.begin(); iter != mViews.end(); ++iter)
+	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
 	{
-		ViewPtr current = *iter;
-//		if (current->isVisible())
-//		{
-			if (smart)
-				current->render(); // render only changed scenegraph (shaky but smooth)
-			else
-				current->getRenderWindow()->Render(); // previous version: renders even when nothing is changed
-
-			report_gl_error_text(cstring_cast(QString("During rendering of view: ") + current->getName()));
-//		}
+		if (mLayoutWidgets[i])
+		{
+			if (!smart)
+				mLayoutWidgets[i]->setModified();
+			mLayoutWidgets[i]->render();
+		}
 	}
+
 	mCyclicLogger->time("render");
 }
 
@@ -151,7 +152,9 @@ bool RenderLoop::pollForSmartRenderingThisCycle()
 	// occational effects that the smart render is too dumb to see.
 	bool smart = mSmartRender;
 	int smartInterval = mTimer->interval() * 40;
-	if (mLastFullRender.time().msecsTo(QDateTime::currentDateTime().time()) > smartInterval)
+	int passed = mLastFullRender.time().msecsTo(QDateTime::currentDateTime().time());
+
+	if (passed > smartInterval)
 		smart = false;
 	if (!smart)
 		mLastFullRender = QDateTime::currentDateTime();

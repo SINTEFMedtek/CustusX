@@ -54,6 +54,8 @@ public:
 
 	ViewPtr addView(View::Type type, LayoutRegion region);
 	void clearViews();
+	virtual void setModified();
+	virtual void render();
 
 private:
 	std::vector<ViewPtr> mViews;

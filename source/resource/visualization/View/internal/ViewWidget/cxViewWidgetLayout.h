@@ -58,9 +58,12 @@ public:
 	LayoutWidgetUsingViewWidgets();
 	~LayoutWidgetUsingViewWidgets();
 
-	ViewPtr addView(View::Type type, LayoutRegion region);
+	virtual ViewPtr addView(View::Type type, LayoutRegion region);
 //	void showViews();
-	void clearViews();
+	virtual void clearViews();
+	virtual void setModified();
+	virtual void render();
+
 
 private:
 	void setStretchFactors(LayoutRegion region, int stretchFactor); ///< Set the stretch factors of columns and rows in mLayout.

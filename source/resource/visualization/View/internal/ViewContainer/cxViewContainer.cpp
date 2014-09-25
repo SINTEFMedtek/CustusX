@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoundingBox3D.h"
 #include "cxTransform3D.h"
 #include <QGridLayout>
-
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -63,7 +63,6 @@ ViewContainer::ViewContainer(QWidget *parent, Qt::WindowFlags f) :
 	mMTimeHash = 0;
 	mMouseEventTarget = NULL;
 	this->setLayout(new QGridLayout);
-	std::cout << "create ViewContainer::ViewContainer with rw=" << mRenderWindow.GetPointer() << std::endl;
 }
 
 ViewContainer::~ViewContainer()
@@ -81,13 +80,9 @@ void ViewContainer::clear()
 		ViewItem* viewItem = dynamic_cast<ViewItem*>(item);
 		delete viewItem;
 	}
-	this->clearBackground();
+	this->setStretchFactors(LayoutRegion(0, 0, 10, 10), 0);
+	this->setModified();
 	mMouseEventTarget = NULL;
-}
-
-void ViewContainer::clearBackground()
-{
-	std::cout << "ViewContainer::clearBackground() mRenderWindow " << mRenderWindow.GetPointer() << std::endl;
 }
 
 /**
@@ -101,17 +96,16 @@ QGridLayout* ViewContainer::getGridLayout()
 void ViewContainer::paintEvent(QPaintEvent* event)
 {
 	inherited_widget::paintEvent(event);
-	this->forcedUpdate();
+	this->setModified();
 }
 
-void ViewContainer::forcedUpdate()
+void ViewContainer::setModified()
 {
-	this->clearBackground();
 	if (this->getGridLayout())
 	{
 		for (int i = 0; i < this->getGridLayout()->count(); ++i)
 		{
-			this->getViewItem(i)->getView()->forceUpdate();
+			this->getViewItem(i)->getView()->setModified();
 		}
 	}
 	mMTimeHash = 0;
@@ -126,15 +120,33 @@ ViewItem* ViewContainer::getViewItem(int index)
   * Creates and adds a view to this container.
   * Returns a pointer to the created view item that the container owns.
   */
-ViewItem *ViewContainer::addView(QString uid, int row, int col, int rowSpan, int colSpan, QString name)
+ViewItem *ViewContainer::addView(QString uid, LayoutRegion region, QString name)
 {
 	this->initializeRenderWindow();
 
 	// Create a viewItem for this view
 	ViewItem *item = new ViewItem(uid, name, this, mRenderWindow, QRect());
 	if (getGridLayout())
-		getGridLayout()->addItem(item, row, col, rowSpan, colSpan);
+		getGridLayout()->addItem(item,
+								 region.pos.row, region.pos.col,
+								 region.span.row, region.span.col);
+	this->setStretchFactors(region, 1);
+
 	return item;
+}
+
+void ViewContainer::setStretchFactors(LayoutRegion region, int stretchFactor)
+{
+	// set stretch factors for the affected cols to 1 in order to get even distribution
+	for (int i = region.pos.col; i < region.pos.col + region.span.col; ++i)
+	{
+		getGridLayout()->setColumnStretch(i, stretchFactor);
+	}
+	// set stretch factors for the affected rows to 1 in order to get even distribution
+	for (int i = region.pos.row; i < region.pos.row + region.span.row; ++i)
+	{
+		getGridLayout()->setRowStretch(i, stretchFactor);
+	}
 }
 
 void ViewContainer::initializeRenderWindow()
@@ -153,27 +165,22 @@ void ViewContainer::addBackgroundRenderer()
 	vtkRendererPtr renderer = vtkRendererPtr::New();
 	mRenderWindow->AddRenderer(renderer);
 	renderer->SetViewport(0,0,1,1);
-	//		renderer->Clear();
 	QColor background = palette().color(QPalette::Background);
-	std::cout << "background: " << background.red() << " " << background.green() << " " << background.blue()  << std::endl;
 	renderer->SetBackground(background.redF(), background.greenF(), background.blueF());
-	//		renderer->Render();
-	//		mRenderWindow->Render();
-	//		mRenderWindow->RemoveRenderer(renderer);
 }
 
 void ViewContainer::customContextMenuRequestedSlot(const QPoint& point)
 {
+	SSC_LOG("");
+
+	ViewItem* item = this->findViewItem(point);
+	if (!item)
+		return;
+
 	QWidget* sender = dynamic_cast<QWidget*>(this->sender());
 	QPoint pointGlobal = sender->mapToGlobal(point);
-//	emit customContextMenuRequestedInGlobalPos(pointGlobal);
 
-	if (mMouseEventTarget)
-	{
-//		QRect r = mMouseEventTarget->geometry();
-//		QPoint p = pos;
-		mMouseEventTarget->customContextMenuRequestedGlobalSlot(pointGlobal);
-	}
+	item->customContextMenuRequestedGlobalSlot(pointGlobal);
 }
 
 void ViewContainer::mouseMoveEvent(QMouseEvent* event)
@@ -194,31 +201,68 @@ void ViewContainer::handleMouseMove(const QPoint &pos, const Qt::MouseButtons &b
 
 void ViewContainer::mousePressEvent(QMouseEvent* event)
 {
+//	SSC_LOG("");
 	// special case for CustusX: when context menu is opened, mousereleaseevent is never called.
 	// this sets the render interactor in a zoom state after each menu call. This hack prevents
 	// the mouse press event in this case.
+	// NOTE: this doesnt seem to be the case in this class - investigate
 	if ((this->contextMenuPolicy() == Qt::CustomContextMenu) && event->buttons().testFlag(Qt::RightButton))
 		return;
+	SSC_LOG("");
 
 	inherited_widget::mousePressEvent(event);
-	this->handleMousePress(event->pos(), event->buttons());
+//	this->handleMousePress(event->pos(), event->buttons());
+
+	mMouseEventTarget = this->findViewItem(event->pos());
+	if (!mMouseEventTarget)
+		return;
+	QPoint pos_t = this->convertToItemSpace(event->pos(), mMouseEventTarget);
+	mMouseEventTarget->mousePressSlot(pos_t.x(), pos_t.y(), event->buttons());
 }
-void ViewContainer::handleMousePress(const QPoint &pos, const Qt::MouseButtons & buttons)
+
+//void ViewContainer::handleMousePress(const QPoint &pos, const Qt::MouseButtons & buttons)
+//{
+//	mMouseEventTarget = this->findViewItem(pos);
+//	if (!mMouseEventTarget)
+//		return;
+//	QPoint pos_t = this->convertToItemSpace(pos, mMouseEventTarget);
+//	mMouseEventTarget->mousePressSlot(pos_t.x(), pos_t.y(), buttons);
+
+////	for (int i = 0; getGridLayout() && i < getGridLayout()->count(); ++i)
+////	{
+////		ViewItem *item = this->getViewItem(i);
+////		QRect r = item->geometry();
+////		if (r.contains(pos))
+////		{
+////			mMouseEventTarget = item;
+////			item->mousePressSlot(pos.x() - r.left(), pos.y() - r.top(), buttons);
+////		}
+////	}
+//}
+
+QPoint ViewContainer::convertToItemSpace(const QPoint &pos, ViewItem* item) const
+{
+	QRect r = item->geometry();
+	QPoint retval(pos.x() - r.left(), pos.y() - r.top());
+	return retval;
+}
+
+ViewItem* ViewContainer::findViewItem(const QPoint &pos)
 {
 	for (int i = 0; getGridLayout() && i < getGridLayout()->count(); ++i)
 	{
 		ViewItem *item = this->getViewItem(i);
 		QRect r = item->geometry();
 		if (r.contains(pos))
-		{
-			mMouseEventTarget = item;
-			item->mousePressSlot(pos.x() - r.left(), pos.y() - r.top(), buttons);
-		}
+			return item;
 	}
+	return NULL;
 }
 
 void ViewContainer::mouseReleaseEvent(QMouseEvent* event)
 {
+	SSC_LOG("");
+
 	inherited_widget::mouseReleaseEvent(event);
 	this->handleMouseRelease(event->pos(), event->buttons());
 }
@@ -262,30 +306,16 @@ void ViewContainer::showEvent(QShowEvent* event)
 void ViewContainer::renderAll()
 {
 	// First, calculate if anything has changed
-	unsigned long hash = 0;
+	long hash = 0;
 	for (int i = 0; getGridLayout() && i < getGridLayout()->count(); ++i)
 	{
 		ViewItem *item = this->getViewItem(i);
-
-		hash += item->getRenderer()->GetMTime();
-		hash += this->getRenderWindow()->GetMTime();
-		vtkPropCollection *props = item->getRenderer()->GetViewProps();
-		props->InitTraversal();
-		for (vtkProp* prop = props->GetNextProp(); prop != NULL; prop = props->GetNextProp())
-		{
-			vtkImageActor *imageActor = vtkImageActor::SafeDownCast(prop);
-			if (imageActor && imageActor->GetInput())
-			{
-				hash += imageActor->GetInput()->GetMTime();
-			}
-			hash += prop->GetMTime();
-			hash += prop->GetRedrawMTime();
-		}
+		hash += item->getView()->computeTotalMTime();
 	}
 	// Then, if anything has changed, render everything anew
 	if (hash != mMTimeHash)
 	{
-		doRender();
+		this->doRender();
 		mMTimeHash = hash;
 	}
 }
@@ -298,7 +328,7 @@ void ViewContainer::doRender()
 void ViewContainer::resizeEvent( QResizeEvent *event)
 {
 	inherited_widget::resizeEvent(event);
-	this->clearBackground();
+	this->setModified();
 	this->getGridLayout()->update();
 }
 

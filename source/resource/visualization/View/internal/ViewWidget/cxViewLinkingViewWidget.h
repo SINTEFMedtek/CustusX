@@ -42,24 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-#define ViewLinkingViewWidget_GET_CHECK(METHOD_NAME, defVal) \
-	if (mBase)                                               \
-		return mBase->METHOD_NAME();                         \
-	return defVal;
-
-#define ViewLinkingViewWidget_GET_1_CHECK(METHOD_NAME, defVal, arg0) \
-	if (mBase)                                               \
-		return mBase->METHOD_NAME(arg0);                         \
-	return defVal;
-
-#define ViewLinkingViewWidget_VOID_CHECK(METHOD_NAME)        \
-	if (mBase)                                               \
-		mBase->METHOD_NAME();
-
-#define ViewLinkingViewWidget_SET_1_CHECK(METHOD_NAME, arg0) \
-	if (mBase)                                               \
-		mBase->METHOD_NAME(arg0);
-
 class ViewLinkingViewWidget : public ViewRepCollection
 {
 public:
@@ -86,26 +68,41 @@ public:
 	}
 
 	virtual ~ViewLinkingViewWidget() {}
-//	virtual Type getType() const { ViewLinkingViewWidget_GET_CHECK(getType, VIEW);  }
-//	virtual QString getTypeString() const { ViewLinkingViewWidget_GET_CHECK(getTypeString, ""); }
-//	virtual QString getUid() { ViewLinkingViewWidget_GET_CHECK(getUid, ""); }
-//	virtual QString getName()  { ViewLinkingViewWidget_GET_CHECK(getName, ""); }
-//	virtual vtkRendererPtr getRenderer() const  { ViewLinkingViewWidget_GET_CHECK(getRenderer, vtkRendererPtr()); }
-//	virtual void addRep(const RepPtr& rep)  { ViewLinkingViewWidget_SET_1_CHECK(addRep, rep); }
-//	virtual void removeRep(const RepPtr& rep)  { ViewLinkingViewWidget_SET_1_CHECK(removeRep, rep); }
-//	virtual bool hasRep(const RepPtr& rep) const  { ViewLinkingViewWidget_GET_1_CHECK(hasRep, false, rep); }
-//	virtual std::vector<RepPtr> getReps() { ViewLinkingViewWidget_GET_CHECK(getReps, std::vector<RepPtr>()); }
-//	virtual void removeReps() { ViewLinkingViewWidget_VOID_CHECK(removeReps); }
-//	virtual void setBackgroundColor(QColor color) { ViewLinkingViewWidget_SET_1_CHECK(setBackgroundColor, color); }
-//	virtual void render() { ViewLinkingViewWidget_VOID_CHECK(render); }
-//	virtual vtkRenderWindowPtr getRenderWindow() const { ViewLinkingViewWidget_GET_CHECK(getRenderWindow, vtkRenderWindowPtr()); }
-	virtual QSize size() const { ViewLinkingViewWidget_GET_CHECK(size, QSize(0,0)); }
-	virtual void setZoomFactor(double factor)  { ViewLinkingViewWidget_SET_1_CHECK(setZoomFactor, factor); }
-	virtual double getZoomFactor() const { ViewLinkingViewWidget_GET_CHECK(getZoomFactor, 0); }
-	virtual Transform3D get_vpMs() const { ViewLinkingViewWidget_GET_CHECK(get_vpMs, Transform3D::Identity()); }
-	virtual DoubleBoundingBox3D getViewport() const { ViewLinkingViewWidget_GET_CHECK(getViewport, DoubleBoundingBox3D::zero()); }
-	virtual DoubleBoundingBox3D getViewport_s() const { ViewLinkingViewWidget_GET_CHECK(getViewport_s, DoubleBoundingBox3D::zero()); }
-//	virtual void forceUpdate()  { ViewLinkingViewWidget_VOID_CHECK(forceUpdate); }
+	virtual QSize size() const
+	{
+		if (mBase)
+			return mBase->size();
+		return QSize(0,0);
+	}
+	virtual void setZoomFactor(double factor)
+	{
+		if (mBase)
+			mBase->setZoomFactor(factor);
+	}
+	virtual double getZoomFactor() const
+	{
+		if (mBase)
+			return mBase->getZoomFactor();
+		return 0;
+	}
+	virtual Transform3D get_vpMs() const
+	{
+		if (mBase)
+			return mBase->get_vpMs();
+		return Transform3D::Identity();
+	}
+	virtual DoubleBoundingBox3D getViewport() const
+	{
+		if (mBase)
+			return mBase->getViewport();
+		return DoubleBoundingBox3D::zero();
+	}
+	virtual DoubleBoundingBox3D getViewport_s() const
+	{
+		if (mBase)
+			return mBase->getViewport_s();
+		return DoubleBoundingBox3D::zero();
+	}
 
 private:
 	QPointer<ViewWidget> mBase;

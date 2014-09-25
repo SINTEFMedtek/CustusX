@@ -64,7 +64,11 @@ ViewRepCollection::ViewRepCollection(vtkRenderWindowPtr renderWindow, const QStr
 
 ViewRepCollection::~ViewRepCollection()
 {
-	this->clear();
+	removeReps();
+
+	if (mRenderer)
+		mRenderWindow->RemoveRenderer(mRenderer);
+//	this->clear();
 }
 
 QString ViewRepCollection::getTypeString() const
@@ -129,6 +133,7 @@ void ViewRepCollection::clear()
 
 	if (mRenderer)
 		mRenderWindow->RemoveRenderer(mRenderer);
+
 	mRenderer = vtkRendererPtr::New();
 	mRenderer->SetBackground(mBackgroundColor.redF(), mBackgroundColor.greenF(), mBackgroundColor.blueF());
 	mRenderWindow->AddRenderer(mRenderer);
@@ -212,6 +217,17 @@ void ViewRepCollection::render()
 {
 	// Render is called only when mtime is changed.
 	// At least on MaxOS, this is not done automatically.
+	unsigned long hash = this->computeTotalMTime();
+
+	if (hash != mMTimeHash)
+	{
+		this->getRenderWindow()->Render();
+		mMTimeHash = hash;
+	}
+}
+
+int ViewRepCollection::computeTotalMTime()
+{
 	unsigned long hash = 0;
 
 	hash += this->getRenderer()->GetMTime();
@@ -228,11 +244,8 @@ void ViewRepCollection::render()
 		hash += prop->GetMTime();
 		hash += prop->GetRedrawMTime();
 	}
-	if (hash != mMTimeHash)
-	{
-		this->getRenderWindow()->Render();
-		mMTimeHash = hash;
-	}
+
+	return hash;
 }
 
 } // namespace cx

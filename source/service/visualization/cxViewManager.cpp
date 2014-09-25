@@ -177,6 +177,8 @@ QWidget *ViewManager::getLayoutWidget(int index)
 	if (!mLayoutWidgets[index])
 	{
 		mLayoutWidgets[index] = LayoutWidget::createViewWidgetLayout();
+		mRenderLoop->addLayout(mLayoutWidgets[index]);
+
 		this->rebuildLayouts();
 	}
 	return mLayoutWidgets[index];
@@ -383,8 +385,6 @@ ViewPtr ViewManager::get3DView(int group, int index)
  */
 void ViewManager::deactivateCurrentLayout()
 {
-	mRenderLoop->clearViews();
-
 	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
 	{
 		if (mLayoutWidgets[i])
@@ -486,7 +486,7 @@ void ViewManager::activateView(LayoutWidget* widget, LayoutViewData viewData)
 	// The real challenge is updating while the tracking is active, and this uses the still update rate.
 	interactor->SetDesiredUpdateRate(rate);
 
-	mRenderLoop->addView(view);
+//	mRenderLoop->addView(view);
 	ViewWrapperPtr wrapper = this->createViewWrapper(view, viewData);
 	mViewGroups[viewData.mGroup]->addView(wrapper);
 //	widget->showViews();

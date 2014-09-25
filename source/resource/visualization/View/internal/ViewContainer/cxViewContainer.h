@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKWidget.h"
 #include "cxViewContainerItem.h"
 #include "cxTransform3D.h"
+#include "cxLayoutData.h"
 
 // Forward declarations
 class QGridLayout;
@@ -59,17 +60,18 @@ public:
 	ViewContainer(QWidget *parent = NULL, Qt::WindowFlags f = 0);
 	virtual ~ViewContainer();
 
-	ViewItem *addView(QString uid, int row, int col, int rowSpan = 1, int colSpan = 1, QString name = "");
+	ViewItem *addView(QString uid, LayoutRegion region, QString name = "");
 	virtual void clear();
 	void renderAll(); ///< Use this function to render all views at once. Do not call render on each view.
 
 	vtkRenderWindowPtr getRenderWindow() { return mRenderWindow; }
-	virtual void forcedUpdate();
+	virtual void setModified();
 
 	virtual QGridLayout *getGridLayout();
 
 private:
-	void handleMousePress(const QPoint &pos, const Qt::MouseButtons &buttons);
+	void setStretchFactors(LayoutRegion region, int stretchFactor);
+//	void handleMousePress(const QPoint &pos, const Qt::MouseButtons &buttons);
 	void handleMouseRelease(const QPoint &pos, const Qt::MouseButtons &buttons);
 	void handleMouseMove(const QPoint &pos, const Qt::MouseButtons &buttons);
 
@@ -87,7 +89,6 @@ protected:
 	ViewItem *mMouseEventTarget;
 	vtkRenderWindowPtr mRenderWindow;
 	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
-	virtual void clearBackground();
 	virtual void doRender();
 	ViewItem* getViewItem(int index);
 
@@ -95,6 +96,8 @@ private:
 	virtual void resizeEvent( QResizeEvent *event);
 	void initializeRenderWindow();
 	void addBackgroundRenderer();
+	QPoint convertToItemSpace(const QPoint &pos, ViewItem* item) const;
+	ViewItem* findViewItem(const QPoint &pos);
 };
 typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
 

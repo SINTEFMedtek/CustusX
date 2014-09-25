@@ -41,6 +41,7 @@ class QTimer;
 namespace cx
 {
 typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
+class LayoutWidget;
 
 /** Render a set of Views in a loop.
  *
@@ -63,7 +64,8 @@ public:
 	void setLogging(bool on);
 
 	void clearViews();
-	void addView(ViewPtr view);
+//	void addView(ViewPtr view);
+	void addLayout(LayoutWidget* layout);
 
 	CyclicActionLoggerPtr getRenderTimer() { return mCyclicLogger; }
 
@@ -97,8 +99,9 @@ private:
 	int mBaseRenderInterval;
 	bool mLogging;
 
-	typedef std::set<ViewPtr> ViewSet;
-	ViewSet mViews;
+//	typedef std::set<ViewPtr> ViewSet;
+//	ViewSet mViews;
+	std::vector<QPointer<LayoutWidget> > mLayoutWidgets;
 };
 
 typedef boost::shared_ptr<RenderLoop> RenderLoopPtr;

@@ -107,16 +107,12 @@ private:
 	virtual void appendToContextMenu(QMenu& contextMenu);
 	void addReps();
 	DoubleBoundingBox3D getViewport() const;
-	Transform3D get_vpMs() const;
 	Vector3D qvp2vp(QPoint pos_qvp);
 	void setAxisPos(Vector3D click_vp);
 	void shiftAxisPos(Vector3D delta_vp);
 
 	ORIENTATION_TYPE getOrientationType() const;
 	void changeOrientationType(ORIENTATION_TYPE type);
-
-	Vector3D displayToWorld(Vector3D p_d) const;
-	Vector3D viewToDisplay(Vector3D p_v) const;
 
 	virtual void imageAdded(ImagePtr image);
 	virtual void imageRemoved(const QString& uid);
@@ -147,8 +143,6 @@ private:
 	Vector3D mClickPos;
 
 	QActionGroup* mOrientationActionGroup;
-//	QActionGroup* m2DZoomConnectivityActionGroup;
-
 };
 typedef boost::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;
 

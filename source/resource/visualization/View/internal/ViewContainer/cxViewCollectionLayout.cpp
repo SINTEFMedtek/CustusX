@@ -41,10 +41,7 @@ ViewPtr LayoutWidgetUsingViewCollection::addView(View::Type type, LayoutRegion r
 			.arg(nameGenerator++)
 			.arg(reinterpret_cast<long>(this));
 
-	ViewItem* viewItem = mViewContainer->addView(uid,
-											 region.pos.row, region.pos.col,
-											 region.span.row, region.span.col,
-											 uid);
+	ViewItem* viewItem = mViewContainer->addView(uid, region, uid);
 	ViewPtr view = viewItem->getView();
 
 	viewItem->getView()->setType(type);
@@ -56,6 +53,16 @@ void LayoutWidgetUsingViewCollection::clearViews()
 {
 	mViews.clear();
 	mViewContainer->clear();
+}
+
+void LayoutWidgetUsingViewCollection::setModified()
+{
+	mViewContainer->setModified();
+}
+
+void LayoutWidgetUsingViewCollection::render()
+{
+	mViewContainer->renderAll();
 }
 
 

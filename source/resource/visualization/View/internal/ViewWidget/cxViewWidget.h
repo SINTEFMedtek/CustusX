@@ -67,7 +67,7 @@ public:
 	virtual DoubleBoundingBox3D getViewport() const;
 	virtual DoubleBoundingBox3D getViewport_s() const;
 
-	virtual void forceUpdate() { mView->setModified(); }
+	virtual void setModified() { mView->setModified(); }
 
 signals:
 	void resized(QSize size);

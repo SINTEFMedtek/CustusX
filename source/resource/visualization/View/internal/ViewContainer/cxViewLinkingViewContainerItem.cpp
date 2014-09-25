@@ -94,10 +94,5 @@ DoubleBoundingBox3D ViewLinkingViewContainerItem::getViewport_s() const
 		return mBase->getViewport_s();
 	return DoubleBoundingBox3D::zero();
 }
-//void ViewLinkingViewContainerItem::forceUpdate()
-//{
-//	if (mBase)
-//		mBase->forceUpdate();
-//}
 
 } /* namespace cx */
