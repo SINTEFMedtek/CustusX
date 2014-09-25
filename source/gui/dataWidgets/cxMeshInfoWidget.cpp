@@ -167,7 +167,7 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 
 	mUidAdapter = DataUidEditableStringDataAdapter::New();
 	mNameAdapter = DataNameEditableStringDataAdapter::New();
-	mParentFrameAdapter = ParentFrameStringDataAdapter::New();
+	mParentFrameAdapter = ParentFrameStringDataAdapter::New(mPatientModelService);
 
 	QWidget* optionsWidget = new QWidget(this);
 	QHBoxLayout* optionsLayout = new QHBoxLayout(optionsWidget);

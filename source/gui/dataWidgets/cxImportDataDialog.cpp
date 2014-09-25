@@ -80,15 +80,15 @@ ImportDataDialog::ImportDataDialog(PatientModelServicePtr patientModelService, Q
   layout->addWidget(mUidLabel);
   layout->addWidget(mNameLabel);
 
-  mModalityAdapter = DataModalityStringDataAdapter::New();
+  mModalityAdapter = DataModalityStringDataAdapter::New(mPatientModelService);
   mModalityCombo = new LabeledComboBoxWidget(this, mModalityAdapter);
   layout->addWidget(mModalityCombo);
 
-  mImageTypeAdapter = ImageTypeStringDataAdapter::New();
+  mImageTypeAdapter = ImageTypeStringDataAdapter::New(mPatientModelService);
   mImageTypeCombo = new LabeledComboBoxWidget(this, mImageTypeAdapter);
   layout->addWidget(mImageTypeCombo);
 
-  mParentFrameAdapter = SetParentFrameStringDataAdapter::New();
+  mParentFrameAdapter = SetParentFrameStringDataAdapter::New(mPatientModelService);
   mParentFrameCombo = new LabeledComboBoxWidget(this, mParentFrameAdapter);
   layout->addWidget(mParentFrameCombo);
 

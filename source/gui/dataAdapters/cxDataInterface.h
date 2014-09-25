@@ -135,12 +135,15 @@ class SelectRTSourceStringDataAdapterBase : public StringDataAdapter
 {
   Q_OBJECT
 public:
-  SelectRTSourceStringDataAdapterBase();
-  virtual ~SelectRTSourceStringDataAdapterBase() {}
+  SelectRTSourceStringDataAdapterBase(PatientModelServicePtr patientModelService);
+  virtual ~SelectRTSourceStringDataAdapterBase();
 
 public: // optional methods
   virtual QStringList getValueRange() const;
   virtual QString convertInternal2Display(QString internal);
+
+protected:
+  PatientModelServicePtr mPatientModelService;
 };
 typedef boost::shared_ptr<class SelectRTSourceStringDataAdapterBase> SelectRTSourceStringDataAdapterBasePtr;
 
@@ -192,8 +195,8 @@ class SelectRTSourceStringDataAdapter : public SelectRTSourceStringDataAdapterBa
 {
   Q_OBJECT
 public:
-  static SelectRTSourceStringDataAdapterPtr New() { return SelectRTSourceStringDataAdapterPtr(new SelectRTSourceStringDataAdapter()); }
-  SelectRTSourceStringDataAdapter();
+  static SelectRTSourceStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return SelectRTSourceStringDataAdapterPtr(new SelectRTSourceStringDataAdapter(patientModelService)); }
+  SelectRTSourceStringDataAdapter(PatientModelServicePtr patientModelService);
   virtual ~SelectRTSourceStringDataAdapter() {}
 
 public: // basic methods
@@ -318,10 +321,10 @@ class ParentFrameStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
-  static ParentFrameStringDataAdapterPtr New() { return ParentFrameStringDataAdapterPtr(new ParentFrameStringDataAdapter()); }
-  ParentFrameStringDataAdapter();
+  static ParentFrameStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return ParentFrameStringDataAdapterPtr(new ParentFrameStringDataAdapter(patientModelService)); }
+  ParentFrameStringDataAdapter(PatientModelServicePtr patientModelService);
   void setData(DataPtr data);
-  virtual ~ParentFrameStringDataAdapter() {}
+  virtual ~ParentFrameStringDataAdapter();
 
 public: // basic methods
   virtual QString getDisplayName() const;
@@ -335,6 +338,7 @@ public: // optional methods
 
 protected:
   DataPtr mData;
+  PatientModelServicePtr mPatientModelService;
 };
 
 typedef boost::shared_ptr<class SetParentFrameStringDataAdapter> SetParentFrameStringDataAdapterPtr;
@@ -347,7 +351,8 @@ class SetParentFrameStringDataAdapter : public ParentFrameStringDataAdapter
 {
   Q_OBJECT
 public:
-  static SetParentFrameStringDataAdapterPtr New() { return SetParentFrameStringDataAdapterPtr(new SetParentFrameStringDataAdapter()); }
+  static SetParentFrameStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return SetParentFrameStringDataAdapterPtr(new SetParentFrameStringDataAdapter(patientModelService)); }
+  SetParentFrameStringDataAdapter(PatientModelServicePtr patientModelService);
   virtual ~SetParentFrameStringDataAdapter() {}
 public: // basic methods
   virtual bool setValue(const QString& value);
@@ -415,10 +420,10 @@ class DataModalityStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
-  static DataModalityStringDataAdapterPtr New() { return DataModalityStringDataAdapterPtr(new DataModalityStringDataAdapter()); }
-  DataModalityStringDataAdapter();
+  static DataModalityStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return DataModalityStringDataAdapterPtr(new DataModalityStringDataAdapter(patientModelService)); }
+  DataModalityStringDataAdapter(PatientModelServicePtr patientModelService);
+  virtual ~DataModalityStringDataAdapter();
   void setData(ImagePtr data);
-  virtual ~DataModalityStringDataAdapter() {}
 
 public: // basic methods
   virtual QString getDisplayName() const;
@@ -431,6 +436,7 @@ public: // optional methods
 
 protected:
   ImagePtr mData;
+  PatientModelServicePtr mPatientModelService;
 };
 
 typedef boost::shared_ptr<class ImageTypeStringDataAdapter> ImageTypeStringDataAdapterPtr;
@@ -442,10 +448,10 @@ class ImageTypeStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
-  static ImageTypeStringDataAdapterPtr New() { return ImageTypeStringDataAdapterPtr(new ImageTypeStringDataAdapter()); }
-  ImageTypeStringDataAdapter();
+  static ImageTypeStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return ImageTypeStringDataAdapterPtr(new ImageTypeStringDataAdapter(patientModelService)); }
+  ImageTypeStringDataAdapter(PatientModelServicePtr patientModelService);
   void setData(ImagePtr data);
-  virtual ~ImageTypeStringDataAdapter() {}
+  virtual ~ImageTypeStringDataAdapter();
 
 public: // basic methods
   virtual QString getDisplayName() const;
@@ -458,6 +464,7 @@ public: // optional methods
 
 protected:
   ImagePtr mData;
+  PatientModelServicePtr mPatientModelService;
 };
 
 } // namespace cx
