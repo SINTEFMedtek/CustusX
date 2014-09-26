@@ -34,26 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QApplication>
 #include <QDesktopWidget>
-
-//#include "sscViewContainer.h"
-#include <QtGui>
-#include <vtkImageActor.h>
-#include <vtkImageData.h>
-#include "cxVector3D.h"
-#include "vtkRenderWindow.h"
-//#include "cxViewRenderWindow.h"
 #include "vtkRenderer.h"
-//#ifdef check
-//#undef check
-//#endif
-
-#include "cxRep.h"
-#include "cxTypeConversions.h"
-#include "cxReporter.h"
 #include "cxBoundingBox3D.h"
-#include "cxTransform3D.h"
 #include "cxViewLinkingViewContainerItem.h"
-
 
 namespace cx
 {
@@ -64,17 +47,12 @@ ViewItem::ViewItem(QString uid, QString name, QWidget *parent, vtkRenderWindowPt
 	mParent(parent)
 {
 	mZoomFactor = -1.0;
-//	std::cout << "create ViewItem::ViewItem with rw=" << renderWindow.GetPointer() << std::endl;
 	mView = ViewLinkingViewContainerItem::create(this, renderWindow);
-//	connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequestedSlot(const QPoint &)));
 	mView->clear();
 }
 
 ViewItem::~ViewItem()
 {
-//	ViewRepCollectionPtr view = this->getView();
-//	view->removeReps();
-//	view->getRenderWindow()->RemoveRenderer(view->getRenderer());
 }
 
 void ViewItem::setZoomFactor(double factor)
@@ -96,7 +74,6 @@ void ViewItem::setGeometry(const QRect &r)
 	double yMin = (parentSize.height() - r.bottom() - 1) / (double)parentSize.height();
 	double yMax = (parentSize.height() - r.top()) / (double)parentSize.height();
 	this->getView()->getRenderer()->SetViewport(xMin, yMin, xMax, yMax);
-//	std::cout << "ViewItem set geom " << this->getView()->getRenderer().GetPointer() << std::endl;
 	emit resized(r.size());
 }
 

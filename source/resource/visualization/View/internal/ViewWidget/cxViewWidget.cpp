@@ -30,34 +30,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
 #include "cxViewWidget.h"
-#include <QtWidgets>
 
+#include <QResizeEvent>
 #include <QApplication>
 #include <QDesktopWidget>
-#include <vtkImageActor.h>
-#include <vtkImageData.h>
-#include "cxVector3D.h"
 #include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
-#include "cxLogger.h"
-#ifdef check
-#undef check
-#endif
-
-#include "cxRep.h"
-#include "cxTypeConversions.h"
-#include "cxReporter.h"
 #include "cxBoundingBox3D.h"
-#include "cxTransform3D.h"
 #include "cxViewLinkingViewWidget.h"
 
 namespace cx
 {
-
-
-///--------------------------------------------------------
 
 ViewWidget::ViewWidget(const QString& uid, const QString& name, QWidget *parent, Qt::WindowFlags f) :
 	inherited(parent, f)

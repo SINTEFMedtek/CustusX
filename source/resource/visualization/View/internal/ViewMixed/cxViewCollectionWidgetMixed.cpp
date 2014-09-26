@@ -32,11 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxViewCollectionWidgetMixed.h"
 #include <QGridLayout>
-#include "cxLogger.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
-#include "cxReporter.h"
-#include <QLabel>
 #include "cxViewCollectionWidgetUsingViewContainer.h"
 #include "cxViewCollectionWidgetUsingViewWidgets.h"
 #include "cxViewUtilities.h"

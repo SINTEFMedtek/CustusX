@@ -34,16 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkImageActor.h>
 #include <vtkImageData.h>
-#include "cxVector3D.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
-#include "cxLogger.h"
 
 #include "cxRep.h"
 #include "cxTypeConversions.h"
-#include "cxReporter.h"
-#include "cxBoundingBox3D.h"
-#include "cxTransform3D.h"
 
 namespace cx
 {
@@ -58,8 +53,7 @@ ViewRepCollection::ViewRepCollection(vtkRenderWindowPtr renderWindow, const QStr
 	mName = name;
 	mType = View::VIEW;
 
-//	this->SetRenderWindow(mRenderWindow);
-	clear();
+	this->clear();
 }
 
 ViewRepCollection::~ViewRepCollection()
@@ -68,7 +62,6 @@ ViewRepCollection::~ViewRepCollection()
 
 	if (mRenderer)
 		mRenderWindow->RemoveRenderer(mRenderer);
-//	this->clear();
 }
 
 QString ViewRepCollection::getTypeString() const

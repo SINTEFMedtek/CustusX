@@ -31,15 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxViewCollectionWidgetUsingViewWidgets.h"
-#include <QGridLayout>
-#include "cxLogger.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
-#include "cxReporter.h"
 #include "cxGLHelpers.h"
-#include "cxViewContainer.h"
 #include "cxViewUtilities.h"
-
 
 namespace cx
 {

@@ -32,26 +32,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxViewContainer.h"
 
-//#include "sscViewContainer.h"
-#include <QtGui>
-#include <vtkImageActor.h>
-#include <vtkImageData.h>
-#include "cxVector3D.h"
+#include <QResizeEvent>
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
-//#ifdef check
-//#undef check
-//#endif
-
-#include "cxRep.h"
-#include "cxTypeConversions.h"
-#include "cxReporter.h"
-#include "cxBoundingBox3D.h"
-#include "cxTransform3D.h"
 #include <QGridLayout>
-#include "cxLogger.h"
 #include "cxViewUtilities.h"
-
+#include "cxViewContainerItem.h"
 
 namespace cx
 {

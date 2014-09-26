@@ -34,10 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QGridLayout>
 #include "cxLogger.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
-#include "cxReporter.h"
-
+#include "cxViewContainerItem.h"
 #include "cxViewContainer.h"
 
 namespace cx

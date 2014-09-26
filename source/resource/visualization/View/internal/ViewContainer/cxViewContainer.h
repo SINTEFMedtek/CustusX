@@ -36,19 +36,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxConfig.h"
 #include <boost/shared_ptr.hpp>
 #include "vtkForwardDeclarations.h"
-#include "cxIndent.h"
-#include <QLayoutItem>
-
 #include "QVTKWidget.h"
-#include "cxViewContainerItem.h"
-#include "cxTransform3D.h"
 #include "cxLayoutData.h"
 
-// Forward declarations
 class QGridLayout;
 
 namespace cx
 {
+class ViewItem;
 
 /**
  * More advanced N:1 combination of SSC Views and Qt Widgets

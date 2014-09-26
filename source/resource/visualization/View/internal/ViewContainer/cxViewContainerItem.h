@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransform3D.h"
 #include "cxViewRepCollection.h"
 
-// Forward declarations
 class QGridLayout;
 
 namespace cx
@@ -71,14 +70,12 @@ public:
 	virtual vtkRendererPtr getRenderer()  { return this->getView()->getRenderer(); }
 	virtual QSize size() const { return mGeometry.size(); }
 	virtual void setZoomFactor(double factor);
-//	virtual void setSize(QSize size) { mGeometry.setSize(size); emit resized(size); }
 
 	virtual double getZoomFactor() const { return mZoomFactor; }
 	virtual Transform3D get_vpMs() const;
 	virtual DoubleBoundingBox3D getViewport() const;
 	virtual DoubleBoundingBox3D getViewport_s() const;
 	virtual void setModified() { return this->getView()->setModified(); }
-
 
 	// Implementing QLayoutItem's pure virtuals
 	virtual Qt::Orientations expandingDirections() const { return Qt::Vertical | Qt::Horizontal; }
@@ -98,7 +95,6 @@ public:
 	void resizedSlot(QSize size) { emit resized(size); }
 	void customContextMenuRequestedGlobalSlot(const QPoint& point) { emit customContextMenuRequestedInGlobalPos(point); }
 
-
 signals:
 	void resized(QSize size);
 	void mouseMove(int x, int y, Qt::MouseButtons buttons);
@@ -117,8 +113,6 @@ private:
 	double mZoomFactor; ///< zoom factor for this view. 1 means that 1m on screen is 1m
 	boost::shared_ptr<class ViewRepCollection> mView;
 };
-//typedef boost::shared_ptr<ViewItem> ViewItemPtr;
-
 
 } /* namespace cx */
 #endif /* CXVIEWCONTAINERITEM_H_ */
