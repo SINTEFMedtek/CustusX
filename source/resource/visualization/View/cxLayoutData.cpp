@@ -49,6 +49,11 @@ namespace cx
 
 LayoutRegion merge(LayoutRegion a, LayoutRegion b)
 {
+	if (a.pos.col<0 || a.pos.row<0)
+		return b;
+	if (b.pos.col<0 || b.pos.row<0)
+		return a;
+
 	int r1 = std::min(a.pos.row, b.pos.row);
 	int c1 = std::min(a.pos.col, b.pos.col);
 	int r2 = std::max(a.pos.row + a.span.row - 1, b.pos.row + b.span.row - 1);

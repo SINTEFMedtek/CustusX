@@ -57,11 +57,13 @@ class RenderTester
 public:
 	static RenderTesterPtr create();
 	static RenderTesterPtr create(vtkRenderWindowPtr renderWindow);
-	static RenderTesterPtr create(cx::RepPtr rep, const unsigned int viewAxisSize);
+	static RenderTesterPtr create(vtkRenderWindowPtr renderWindow, vtkRendererPtr renderer);
+//	static RenderTesterPtr create(cx::RepPtr rep, const unsigned int viewAxisSize);
 
 	RenderTester();
 	RenderTester(vtkRenderWindowPtr renderWindow);
-	RenderTester(cx::RepPtr rep, const unsigned int viewAxisSize);
+	RenderTester(vtkRenderWindowPtr renderWindow, vtkRendererPtr renderer);
+//	RenderTester(cx::RepPtr rep, const unsigned int viewAxisSize);
 	void addProp(vtkPropPtr prop);
 	void renderToFile(QString filename);
 
@@ -88,8 +90,8 @@ private:
 	vtkImageDataPtr convertToColorImage(vtkImageDataPtr image);
 	bool equalNumberOfComponents(vtkImageDataPtr image1, vtkImageDataPtr image2);
 
-	boost::shared_ptr<cx::LayoutWidget> mLayoutWidget;
-	cx::ViewPtr mView;
+//	boost::shared_ptr<cx::LayoutWidget> mLayoutWidget;
+//	cx::ViewPtr mView;
 	vtkRenderWindowPtr mRenderWindow;
 	vtkRendererPtr mRenderer;
 	double mImageErrorThreshold;

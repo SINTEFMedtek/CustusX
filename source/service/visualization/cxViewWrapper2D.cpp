@@ -366,9 +366,6 @@ ORIENTATION_TYPE ViewWrapper2D::getOrientationType() const
  */
 void ViewWrapper2D::orientationModeChanged()
 {
-//  changeOrientationType(static_cast<ORIENTATION_TYPE>(mOrientationMode->get().toInt()));
-//std::cout << "mOrientationModeChanbgedslot" << std::endl;
-
 	ORIENTATION_TYPE type = static_cast<ORIENTATION_TYPE>(mOrientationMode->get().toInt());
 
 if	(type == this->getOrientationType())
@@ -578,7 +575,6 @@ void ViewWrapper2D::mouseWheelSlot(int x, int y, int delta, int orientation, Qt:
 	val += delta / 120.0 / 20.0; // 120 is normal scroll resolution, x is zoom resolution
 	double newZoom = pow(10.0, val);
 
-//	this->setZoomFactor2D(newZoom);
 	mZoom2D->setFactor(newZoom);
 
 	Navigation(mBackend).centerToTooltip(); // side effect: center on tool
@@ -590,9 +586,7 @@ void ViewWrapper2D::mouseWheelSlot(int x, int y, int delta, int orientation, Qt:
 Vector3D ViewWrapper2D::qvp2vp(QPoint pos_qvp)
 {
 	QSize size = mView->size();
-	std::cout << "ViewWrapper2D::qvp2vp input=" << pos_qvp.x() << ", " << pos_qvp.y() << std::endl;
 	Vector3D pos_vp(pos_qvp.x(), size.height() - pos_qvp.y(), 0.0); // convert from left-handed qt space to vtk space display/viewport
-	std::cout << "ViewWrapper2D::qvp2vp output=" << pos_vp.x() << ", " << pos_vp.y() << std::endl;
 	return pos_vp;
 }
 
@@ -636,8 +630,6 @@ void ViewWrapper2D::setAxisPos(Vector3D click_vp)
 	// find click position in s.
 	Transform3D vpMs = mView->get_vpMs();
 	Vector3D click_s = vpMs.inv().coord(click_vp);
-	std::cout << "click_vp: " << click_vp << std::endl;
-	std::cout << "click_s: " << click_s << std::endl;
 
 	// compute the new tool position in slice space as a synthesis of the plane part of click and the z part of original.
 	Vector3D cross_s(click_s[0], click_s[1], tool_s[2]);

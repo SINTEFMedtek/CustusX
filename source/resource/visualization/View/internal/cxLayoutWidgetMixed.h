@@ -30,75 +30,64 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVIEWCONTAINER_H_
-#define CXVIEWCONTAINER_H_
+#ifndef CXLAYOUTWIDGETMIXED_H
+#define CXLAYOUTWIDGETMIXED_H
 
-#include "cxConfig.h"
-#include <boost/shared_ptr.hpp>
-#include "vtkForwardDeclarations.h"
-#include "cxIndent.h"
-#include <QLayoutItem>
-
-#include "QVTKWidget.h"
-#include "cxViewContainerItem.h"
-#include "cxTransform3D.h"
+#include "cxView.h"
 #include "cxLayoutData.h"
+#include "cxViewCache.h"
+#include "cxViewWidget.h"
+#include "cxLayoutWidget.h"
 
-// Forward declarations
 class QGridLayout;
 
 namespace cx
 {
+class LayoutWidgetUsingViewCollection;
+class LayoutWidgetUsingViewWidgets;
 
-/// More advanced N:1 combination of SSC Views and Qt Widgets
-class ViewContainer : public QVTKWidget
+/**
+ * Widget for displaying Views, minimizing number of renderwindows but keeping
+ * the 3D views in separate renderwindows.
+ *
+ * The rationale behind this class is:
+ *  - The cost of rendering several vtkRenderWindows is high, especially on new
+ *    Linux NVidia cards/drivers. I.e. try to reduce the number using
+ *    LayoutWidgetUsingViewCollection.
+ *  - vtkRenderWindowInteractor is connected to a vtkRenderWindow, and this is
+ *    used in 3D views, thus we need unique vtkRenderWindows for each 3D View.
+ *
+ * The solution here is to use a LayoutWidgetUsingViewCollection as basis, then
+ * adding LayoutWidgetUsingViewWidgets each containing one 3D view, and placing
+ * these on top of the basis in the QGridLayout.
+ */
+class LayoutWidgetMixed : public LayoutWidget
 {
 	Q_OBJECT
-	typedef QVTKWidget inherited_widget;
-
 public:
-	ViewContainer(QWidget *parent = NULL, Qt::WindowFlags f = 0);
-	virtual ~ViewContainer();
+	LayoutWidgetMixed();
+	~LayoutWidgetMixed();
 
-	ViewItem *addView(QString uid, LayoutRegion region, QString name = "");
-	virtual void clear();
-	void renderAll(); ///< Use this function to render all views at once. Do not call render on each view.
-
-	vtkRenderWindowPtr getRenderWindow() { return mRenderWindow; }
+	ViewPtr addView(View::Type type, LayoutRegion region);
+	void clearViews();
 	virtual void setModified();
-
-	virtual QGridLayout *getGridLayout();
+	virtual void render();
+	virtual void setGridSpacing(int val);
+	virtual void setGridMargin(int val);
 
 private:
+	void addWidgetToLayout(QGridLayout* layout, QWidget* widget, LayoutRegion region);
 	void setStretchFactors(LayoutRegion region, int stretchFactor);
-
-	virtual void paintEvent(QPaintEvent *event);
-	virtual void showEvent(QShowEvent* event);
-	virtual void wheelEvent(QWheelEvent*);
-	virtual void mouseMoveEvent(QMouseEvent *event);
-	virtual void mousePressEvent(QMouseEvent *event);
-	virtual void mouseReleaseEvent(QMouseEvent *event);
-	virtual void focusInEvent(QFocusEvent* event);
-private slots:
-	void customContextMenuRequestedSlot(const QPoint& point);
-
-protected:
-	ViewItem *mMouseEventTarget;
-	vtkRenderWindowPtr mRenderWindow;
-	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
-	virtual void doRender();
-	ViewItem* getViewItem(int index);
-
-private:
-	virtual void resizeEvent( QResizeEvent *event);
-	void initializeRenderWindow();
-	void addBackgroundRenderer();
-	QPoint convertToItemSpace(const QPoint &pos, ViewItem* item) const;
-	ViewItem* findViewItem(const QPoint &pos);
+	LayoutRegion mBaseRegion;
+	LayoutRegion mTotalRegion;
+	QGridLayout* mLayout;
+	LayoutWidgetUsingViewCollection* mBaseLayout;
+	std::vector<LayoutRegion> mOverlayRegions;
+	std::vector<LayoutWidgetUsingViewWidgets*> mOverlays;
 };
-typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
 
 
-} /* namespace cx */
 
-#endif /* CXVIEWCONTAINER_H_ */
+} // namespace cx
+
+#endif // CXLAYOUTWIDGETMIXED_H

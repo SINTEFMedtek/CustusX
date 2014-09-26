@@ -9,6 +9,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	View/cxLayoutWidget
 
 	View/internal/cxViewRepCollection
+	View/internal/cxLayoutWidgetMixed
 	View/internal/ViewWidget/cxViewLinkingViewWidget
 	View/internal/ViewWidget/cxViewWidget
 	View/internal/ViewWidget/cxViewWidgetLayout

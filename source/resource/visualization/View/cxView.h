@@ -85,7 +85,7 @@ public:
 	virtual std::vector<RepPtr> getReps() = 0; ///< Returns all reps in the view
 	virtual void removeReps() = 0; ///< Removes all reps in the view
 	virtual void setBackgroundColor(QColor color) = 0;
-	virtual void render() = 0; ///< render the view contents if vtk-MTimes are changed
+//	virtual void render() = 0; ///< render the view contents if vtk-MTimes are changed
 	virtual vtkRenderWindowPtr getRenderWindow() const = 0;
 	virtual QSize size() const = 0;
 	virtual void setZoomFactor(double factor) = 0;

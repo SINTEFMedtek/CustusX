@@ -156,6 +156,7 @@ void ViewContainer::initializeRenderWindow()
 
 	mRenderWindow = vtkRenderWindowPtr::New();
 	this->SetRenderWindow(mRenderWindow);
+	mRenderWindow->GetInteractor()->EnableRenderOff();
 
 	this->addBackgroundRenderer();
 }
@@ -171,8 +172,6 @@ void ViewContainer::addBackgroundRenderer()
 
 void ViewContainer::customContextMenuRequestedSlot(const QPoint& point)
 {
-	SSC_LOG("");
-
 	ViewItem* item = this->findViewItem(point);
 	if (!item)
 		return;
@@ -186,59 +185,32 @@ void ViewContainer::customContextMenuRequestedSlot(const QPoint& point)
 void ViewContainer::mouseMoveEvent(QMouseEvent* event)
 {
 	inherited_widget::mouseMoveEvent(event);
-	this->handleMouseMove(event->pos(), event->buttons());
-}
 
-void ViewContainer::handleMouseMove(const QPoint &pos, const Qt::MouseButtons &buttons)
-{
 	if (mMouseEventTarget)
 	{
-		QRect r = mMouseEventTarget->geometry();
-		QPoint p = pos;
-		mMouseEventTarget->mouseMoveSlot(p.x() - r.left(), p.y() - r.top(), buttons);
+		QPoint p = this->convertToItemSpace(event->pos(), mMouseEventTarget);
+		mMouseEventTarget->mouseMoveSlot(p.x(), p.y(), event->buttons());
 	}
 }
 
 void ViewContainer::mousePressEvent(QMouseEvent* event)
 {
-//	SSC_LOG("");
 	// special case for CustusX: when context menu is opened, mousereleaseevent is never called.
 	// this sets the render interactor in a zoom state after each menu call. This hack prevents
 	// the mouse press event in this case.
 	// NOTE: this doesnt seem to be the case in this class - investigate
 	if ((this->contextMenuPolicy() == Qt::CustomContextMenu) && event->buttons().testFlag(Qt::RightButton))
 		return;
-	SSC_LOG("");
 
 	inherited_widget::mousePressEvent(event);
-//	this->handleMousePress(event->pos(), event->buttons());
 
 	mMouseEventTarget = this->findViewItem(event->pos());
-	if (!mMouseEventTarget)
-		return;
-	QPoint pos_t = this->convertToItemSpace(event->pos(), mMouseEventTarget);
-	mMouseEventTarget->mousePressSlot(pos_t.x(), pos_t.y(), event->buttons());
+	if (mMouseEventTarget)
+	{
+		QPoint p = this->convertToItemSpace(event->pos(), mMouseEventTarget);
+		mMouseEventTarget->mousePressSlot(p.x(), p.y(), event->buttons());
+	}
 }
-
-//void ViewContainer::handleMousePress(const QPoint &pos, const Qt::MouseButtons & buttons)
-//{
-//	mMouseEventTarget = this->findViewItem(pos);
-//	if (!mMouseEventTarget)
-//		return;
-//	QPoint pos_t = this->convertToItemSpace(pos, mMouseEventTarget);
-//	mMouseEventTarget->mousePressSlot(pos_t.x(), pos_t.y(), buttons);
-
-////	for (int i = 0; getGridLayout() && i < getGridLayout()->count(); ++i)
-////	{
-////		ViewItem *item = this->getViewItem(i);
-////		QRect r = item->geometry();
-////		if (r.contains(pos))
-////		{
-////			mMouseEventTarget = item;
-////			item->mousePressSlot(pos.x() - r.left(), pos.y() - r.top(), buttons);
-////		}
-////	}
-//}
 
 QPoint ViewContainer::convertToItemSpace(const QPoint &pos, ViewItem* item) const
 {
@@ -261,19 +233,12 @@ ViewItem* ViewContainer::findViewItem(const QPoint &pos)
 
 void ViewContainer::mouseReleaseEvent(QMouseEvent* event)
 {
-	SSC_LOG("");
-
 	inherited_widget::mouseReleaseEvent(event);
-	this->handleMouseRelease(event->pos(), event->buttons());
-}
 
-void ViewContainer::handleMouseRelease(const QPoint &pos, const Qt::MouseButtons &buttons)
-{
 	if (mMouseEventTarget)
 	{
-		QRect r = mMouseEventTarget->geometry();
-		QPoint p = pos;
-		mMouseEventTarget->mouseReleaseSlot(p.x() - r.left(), p.y() - r.top(), buttons);
+		QPoint p = this->convertToItemSpace(event->pos(), mMouseEventTarget);
+		mMouseEventTarget->mouseReleaseSlot(p.x(), p.y(), event->buttons());
 		mMouseEventTarget = NULL;
 	}
 }
@@ -286,15 +251,13 @@ void ViewContainer::focusInEvent(QFocusEvent* event)
 void ViewContainer::wheelEvent(QWheelEvent* event)
 {
 	inherited_widget::wheelEvent(event);
-	for (int i = 0; layout() && i < layout()->count(); ++i)
+
+	ViewItem *item = this->findViewItem(event->pos());
+	if (item)
 	{
-		ViewItem *item = dynamic_cast<ViewItem*>(layout()->itemAt(i));
-		QRect r = item->geometry();
-		QPoint p = event->pos();
-		if (r.contains(p))
-		{
-			item->mouseWheelSlot(p.x() - r.left(), p.y() - r.top(), event->delta(), event->orientation(), event->buttons());
-		}
+		QPoint p = this->convertToItemSpace(event->pos(), item);
+		item->mouseWheelSlot(p.x(), p.y(),
+							 event->delta(), event->orientation(), event->buttons());
 	}
 }
 

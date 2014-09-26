@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxViewWidgetLayout.h"
 #include "cxViewCollectionLayout.h"
+#include "cxLayoutWidgetMixed.h"
 
 #include "cxViewContainer.h"
 
@@ -47,8 +48,9 @@ namespace cx
 
 QPointer<LayoutWidget> LayoutWidget::createViewWidgetLayout()
 {
-	return new LayoutWidgetUsingViewCollection(); // testing
+//	return new LayoutWidgetUsingViewCollection(); // testing
 //	return new LayoutWidgetUsingViewWidgets();
+	return new LayoutWidgetMixed();
 }
 
 QPointer<LayoutWidget> LayoutWidget::createViewCollectionLayout()

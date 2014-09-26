@@ -45,6 +45,11 @@ class QGridLayout;
 namespace cx
 {
 
+/**
+ * Widget for displaying Views, using only a single QVTKWidget/vtkRenderWindow,
+ * but one vtkRenderer for each View inside.
+ *
+ */
 class LayoutWidgetUsingViewCollection : public LayoutWidget
 {
 	Q_OBJECT
@@ -56,6 +61,8 @@ public:
 	void clearViews();
 	virtual void setModified();
 	virtual void render();
+	virtual void setGridSpacing(int val);
+	virtual void setGridMargin(int val);
 
 private:
 	std::vector<ViewPtr> mViews;

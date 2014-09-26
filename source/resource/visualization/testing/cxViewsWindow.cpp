@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QScreen>
+#include "cxLogger.h"
 
 namespace cxtest
 {
@@ -63,6 +64,10 @@ ViewsWindow::ViewsWindow()
 	connect(mRenderingTimer, SIGNAL(timeout()), this, SLOT(updateRender()));
 }
 
+void ViewsWindow::clearLayoutWidget()
+{
+	mLayoutWidget->clearViews();
+}
 
 void ViewsWindow::setNiceSize()
 {
@@ -90,15 +95,11 @@ cx::ViewPtr ViewsWindow::addView(cx::View::Type type, int r, int c)
 	cx::ViewPtr view = mLayoutWidget->addView(type, cx::LayoutRegion(r,c));
 	mViews.push_back(view);
 	return view;
-//	cx::ViewWidget* view = new cx::ViewWidget("","",this->centralWidget());
-//	this->insertView(view, caption, "", r, c);
-//	return view;
 }
 
 cx::ViewPtr ViewsWindow::add2DView(int r, int c)
 {
 	cx::ViewPtr view = this->addView(cx::View::VIEW_2D, r,c);
-//	cx::ViewWidget* view = this->addView(caption, r, c);
 
 	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
 	view->getRenderWindow()->GetInteractor()->Disable();
@@ -107,19 +108,6 @@ cx::ViewPtr ViewsWindow::add2DView(int r, int c)
 	return view;
 }
 
-//void ViewsWindow::insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c)
-//{
-////	view->GetRenderWindow()->SetErase(false);
-////	view->GetRenderWindow()->SetDoubleBuffer(false);
-
-//	QVBoxLayout *layout = new QVBoxLayout;
-//	mSliceLayout->addLayout(layout, r,c);
-
-//	mLayouts.push_back(view);
-//	layout->addWidget(view);
-//	layout->addWidget(new QLabel(uid+" "+volume, this));
-//}
-
 cx::ViewPtr ViewsWindow::getView(int index)
 {
 	return mViews[index];
@@ -127,24 +115,17 @@ cx::ViewPtr ViewsWindow::getView(int index)
 
 bool ViewsWindow::quickRunWidget()
 {
-//	mLayoutWidget->showViews();
 	this->show();
 	this->updateRender();
-
 	return true;
 }
 
 void ViewsWindow::updateRender()
 {
 	for (unsigned i=0; i<mViews.size(); ++i)
-	{
 		this->prettyZoom(mViews[i]);
-	}
 
-	for (unsigned i=0; i<mViews.size(); ++i)
-	{
-		mViews[i]->render();
-	}
+	mLayoutWidget->render();
 }
 
 void ViewsWindow::prettyZoom(cx::ViewPtr view)

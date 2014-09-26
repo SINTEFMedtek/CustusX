@@ -67,6 +67,7 @@ ViewWidget::ViewWidget(const QString& uid, const QString& name, QWidget *parent,
 	mView = ViewLinkingViewWidget::create(this, vtkRenderWindowPtr::New());
 	connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequestedSlot(const QPoint &)));
 	this->SetRenderWindow(mView->getRenderWindow());
+	mView->getRenderWindow()->GetInteractor()->EnableRenderOff();
 	mView->clear();
 }
 

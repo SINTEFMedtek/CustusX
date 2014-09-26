@@ -57,6 +57,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDummyTool.h"
 #include "cxSliceProxy.h"
 #include "cxSlicerRepSW.h"
+#include "cxLogger.h"
+
 
 #include "cxViewsFixture.h"
 #include "catch.hpp"
@@ -87,6 +89,35 @@ TEST_CASE("Visual rendering: Init view",
 {
 	cxtest::ViewsFixture fixture;
 	REQUIRE(true);
+}
+
+TEST_CASE("Visual rendering: Overlapping gridlayout",
+		  "[unit][resource][visualization][hide]")
+{
+	QWidget widget;
+	QGridLayout* layout = new QGridLayout(&widget);
+	widget.setLayout(layout);
+	layout->setSpacing(0);
+	layout->setMargin(0);
+
+	QTextEdit* edit = new QTextEdit;
+	edit->setText("Visual rendering: Overlapping gridlayout");
+	layout->addWidget(edit, 0,0, 2,2);
+
+	QLabel* label = new QLabel("Hello Mixed!");
+	layout->addWidget(label, 2,0, 1,1);
+
+	QLabel* label2 = new QLabel("Hello Quixed!");
+	layout->addWidget(label2, 1,1, 1,1);
+
+	for (unsigned i=0; i<3; ++i)
+	{
+		layout->setColumnStretch(i, 1);
+		layout->setRowStretch(i, 1);
+	}
+
+	widget.show();
+	qApp->exec();
 }
 
 TEST_CASE("Visual rendering: Empty QVTKWidget",
@@ -202,6 +233,34 @@ TEST_CASE("Visual rendering: Show ACS+3D, centered hidden tool",
 	CHECK(fixture.getFractionOfBrightPixelsInView(3,20) > 0.02);
 }
 
+TEST_CASE("Visual rendering: Show layout, clear, show new layout",
+		  "[unit][resource][visualization][not_win32][not_win64]")
+{
+	cxtest::ViewsFixture fixture;
+	ImageTestList imagenames;
+
+	fixture.define3D(imagenames.image[0], NULL, 1, 1);
+	fixture.defineSlice("A", imagenames.image[0], cx::ptAXIAL, 0, 0);
+	fixture.defineSlice("C", imagenames.image[0], cx::ptCORONAL, 1, 0);
+	fixture.defineSlice("S", imagenames.image[0], cx::ptSAGITTAL, 0, 1);
+	REQUIRE(fixture.quickRunWidget());
+//	sleep(1);
+
+	fixture.clear();
+
+	fixture.define3D(imagenames.image[0], NULL, 0, 2);
+	fixture.defineSlice("Any", imagenames.image[0], cx::ptANYPLANE, 0, 0);
+	fixture.defineSlice("Dua", imagenames.image[0], cx::ptSIDEPLANE, 0, 1);
+
+	REQUIRE(fixture.quickRunWidget());
+//	REQUIRE(fixture.runWidget());
+//	sleep(1);
+
+	CHECK(fixture.getFractionOfBrightPixelsInView(0,0) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInView(1,20) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInView(2,20) > 0.02);
+}
+
 TEST_CASE("Visual rendering: Show AnyDual+3D, centered hidden tool",
 		  "[unit][resource][visualization][not_win32][not_win64]")
 {
@@ -211,6 +270,25 @@ TEST_CASE("Visual rendering: Show AnyDual+3D, centered hidden tool",
 	fixture.define3D(imagenames.image[0], NULL, 0, 2);
 	fixture.defineSlice("Any", imagenames.image[0], cx::ptANYPLANE, 0, 0);
 	fixture.defineSlice("Dua", imagenames.image[0], cx::ptSIDEPLANE, 0, 1);
+	REQUIRE(fixture.quickRunWidget());
+
+	fixture.dumpDebugViewToDisk("anydual3d0", 0);
+	fixture.dumpDebugViewToDisk("anydual3d1", 1);
+	fixture.dumpDebugViewToDisk("anydual3d2", 2);
+	CHECK(fixture.getFractionOfBrightPixelsInView(0,0) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInView(1,20) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInView(2,20) > 0.02);
+}
+
+TEST_CASE("Visual rendering: Show 3D+AnyDual, centered hidden tool",
+		  "[unit][resource][visualization][not_win32][not_win64]")
+{
+	cxtest::ViewsFixture fixture;
+	ImageTestList imagenames;
+
+	fixture.define3D(imagenames.image[0], NULL, 0, 0);
+	fixture.defineSlice("Any", imagenames.image[0], cx::ptANYPLANE, 0, 1);
+	fixture.defineSlice("Dua", imagenames.image[0], cx::ptSIDEPLANE, 0, 2);
 	REQUIRE(fixture.quickRunWidget());
 
 	fixture.dumpDebugViewToDisk("anydual3d0", 0);

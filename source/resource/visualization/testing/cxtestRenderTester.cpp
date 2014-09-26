@@ -87,10 +87,15 @@ RenderTesterPtr RenderTester::create(vtkRenderWindowPtr renderWindow)
 	return RenderTesterPtr(new RenderTester(renderWindow));
 }
 
-RenderTesterPtr RenderTester::create(cx::RepPtr rep, const unsigned int viewAxisSize)
+RenderTesterPtr RenderTester::create(vtkRenderWindowPtr renderWindow, vtkRendererPtr renderer)
 {
-	return RenderTesterPtr(new RenderTester(rep, viewAxisSize));
+	return RenderTesterPtr(new RenderTester(renderWindow, renderer));
 }
+
+//RenderTesterPtr RenderTester::create(cx::RepPtr rep, const unsigned int viewAxisSize)
+//{
+//	return RenderTesterPtr(new RenderTester(rep, viewAxisSize));
+//}
 
 RenderTester::RenderTester() :
 	mImageErrorThreshold(100.0),
@@ -123,22 +128,30 @@ RenderTester::RenderTester(vtkRenderWindowPtr renderWindow) :
 	SSC_ASSERT(renderWindow->GetRenderers()->GetNumberOfItems()==1);
 }
 
-RenderTester::RenderTester(cx::RepPtr rep, const unsigned int viewAxisSize) :
+RenderTester::RenderTester(vtkRenderWindowPtr renderWindow, vtkRendererPtr renderer) :
+	mRenderWindow(renderWindow),
+	mRenderer(renderer),
 	mImageErrorThreshold(100.0),
 	mBorderOffset(2)
 {
-	mLayoutWidget.reset(cx::LayoutWidget::createViewWidgetLayout().data());
-	mView = mLayoutWidget->addView(cx::View::VIEW, cx::LayoutRegion(0,0));
-	mView->addRep(rep);
-	mLayoutWidget->resize(viewAxisSize,viewAxisSize);
-	mLayoutWidget->show();
-
-	mRenderWindow = mView->getRenderWindow();
-	mRenderer = mView->getRenderer();
-
-//??	mRenderWindow->SetSize(viewAxisSize,viewAxisSize);
-
 }
+
+//RenderTester::RenderTester(cx::RepPtr rep, const unsigned int viewAxisSize) :
+//	mImageErrorThreshold(100.0),
+//	mBorderOffset(2)
+//{
+//	mLayoutWidget.reset(cx::LayoutWidget::createViewWidgetLayout().data());
+//	mView = mLayoutWidget->addView(cx::View::VIEW, cx::LayoutRegion(0,0));
+//	mView->addRep(rep);
+//	mLayoutWidget->resize(viewAxisSize,viewAxisSize);
+//	mLayoutWidget->show();
+
+//	mRenderWindow = mView->getRenderWindow();
+//	mRenderer = mView->getRenderer();
+
+////??	mRenderWindow->SetSize(viewAxisSize,viewAxisSize);
+
+//}
 
 void RenderTester::setImageErrorThreshold(double value)
 {

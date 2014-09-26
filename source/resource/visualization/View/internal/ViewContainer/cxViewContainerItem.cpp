@@ -64,7 +64,7 @@ ViewItem::ViewItem(QString uid, QString name, QWidget *parent, vtkRenderWindowPt
 	mParent(parent)
 {
 	mZoomFactor = -1.0;
-	std::cout << "create ViewItem::ViewItem with rw=" << renderWindow.GetPointer() << std::endl;
+//	std::cout << "create ViewItem::ViewItem with rw=" << renderWindow.GetPointer() << std::endl;
 	mView = ViewLinkingViewContainerItem::create(this, renderWindow);
 //	connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequestedSlot(const QPoint &)));
 	mView->clear();

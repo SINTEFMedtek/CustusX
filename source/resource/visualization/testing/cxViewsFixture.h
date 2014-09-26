@@ -80,6 +80,7 @@ public:
 
 	bool quickRunWidget();
 	bool runWidget();
+	void clear();
 
 	double getFractionOfBrightPixelsInView(int viewIndex, int threshold, int component=0);
 	void dumpDebugViewToDisk(QString text, int viewIndex);

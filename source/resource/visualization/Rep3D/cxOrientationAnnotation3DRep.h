@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include "cxVector3D.h"
-#include "cxTransform3D.h"
 
 typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWidgetPtr;
 typedef vtkSmartPointer<class vtkAnnotatedCubeActor> vtkAnnotatedCubeActorPtr;
@@ -73,7 +72,6 @@ public:
 	void setSize(double size); ///< fraction of viewport to use
 
 private slots:
-	void rebuild();
 protected:
 	OrientationAnnotation3DRep();
 	virtual void addRepActorsToViewRenderer(ViewPtr view);
@@ -85,7 +83,7 @@ private:
 	Vector3D mColor;
 	std::pair<QString, vtkPropPtr> mMarkerCache; ///< cache all loaded markers in order to save load time. (not really necessary, leftover from when this was a static cache.)
 
-	Transform3D get_renwinMren();
+	void rebuild(vtkRenderWindowInteractorPtr interactor);
 	vtkAxesActorPtr createAxes();
 	vtkAnnotatedCubeActorPtr createCube();
 	vtkPropPtr readMarkerFromFile(const QString filename);

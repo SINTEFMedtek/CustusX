@@ -61,13 +61,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkDecimatePro.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkQuadricDecimation.h>
-#include <vtkRenderer.h>
+
 #include "cxVector3D.h"
 #include "cxView.h"
 #include "cxTypeConversions.h"
 #include "cxForwardDeclarations.h"
 #include <vtkRenderWindowInteractor.h>
-#include "cxBoundingBox3D.h"
 
 typedef vtkSmartPointer<vtkAxesActor> vtkAxesActorPtr;
 typedef vtkSmartPointer<vtkTextProperty> vtkTextPropertyPtr;
@@ -85,7 +84,7 @@ namespace cx
 OrientationAnnotation3DRep::OrientationAnnotation3DRep() :
 				RepImpl(), mSize(0.2), mColor(1, 0.5, 0.5)
 {
-	this->rebuild();
+	this->rebuild(NULL);
 }
 
 OrientationAnnotation3DRepPtr OrientationAnnotation3DRep::New(const QString& uid)
@@ -100,14 +99,11 @@ OrientationAnnotation3DRep::~OrientationAnnotation3DRep()
 
 void OrientationAnnotation3DRep::addRepActorsToViewRenderer(ViewPtr view)
 {
-	connect(this->getView().get(), SIGNAL(resized(QSize)), this, SLOT(rebuild()));
-
-	this->rebuild();
+	this->rebuild(view->getRenderWindow()->GetInteractor());
 }
 
 void OrientationAnnotation3DRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
-	disconnect(this->getView().get(), SIGNAL(resized(QSize)), this, SLOT(rebuild()));
 	mMarker->SetInteractor(NULL);
 }
 
@@ -124,21 +120,10 @@ void OrientationAnnotation3DRep::setVisible(bool on)
 void OrientationAnnotation3DRep::setSize(double size)
 {
 	mSize = size;
-	this->rebuild();
+	this->rebuild(mMarker->GetInteractor());
 }
 
-Transform3D OrientationAnnotation3DRep::get_renwinMren()
-{
-//	std::cout << "OrientationAnnotation3DRep::get_renwinMren() " << this->getView()->getRenderer().GetPointer() << std::endl;
-
-	Eigen::Array4d vp(this->getView()->getRenderer()->GetViewport());
-//	std::cout << "renderer vp: " << vp << std::endl;
-	Transform3D S = createTransformScale(Vector3D(vp[2]-vp[0], vp[3]-vp[1], 1.0));
-	Transform3D T = createTransformTranslate(Vector3D(vp[0], vp[1], 0));
-	return T*S;
-}
-
-void OrientationAnnotation3DRep::rebuild()
+void OrientationAnnotation3DRep::rebuild(vtkRenderWindowInteractorPtr interactor)
 {
 	bool enable = true;
 	if (mMarker)
@@ -149,32 +134,17 @@ void OrientationAnnotation3DRep::rebuild()
 
 	mMarker = vtkOrientationMarkerWidgetPtr::New();
 	mMarker->SetOutlineColor(mColor[0], mColor[1], mColor[2]);
-
-
-//	mMarker->SetViewport(0.0, 1.0 - mSize, mSize, 1.0);
+	mMarker->SetViewport(0.0, 1.0 - mSize, mSize, 1.0);
 	mMarker->SetOrientationMarker(mMarkerCache.second);
 
-	if (!this->getView())
-		return;
-
-	DoubleBoundingBox3D vp_ren(1.0 - mSize, 1.0, 0.0, mSize, 0, 0);
-	Transform3D renwinMren = this->get_renwinMren();
-//	std::cout << "vp_ren: " << vp_ren << std::endl;
-	DoubleBoundingBox3D vp_renwin = transform(renwinMren, vp_ren);
-//	std::cout << "renwinMren: \n" << renwinMren << std::endl;
-//	std::cout << "vp_renwin: " << vp_renwin << std::endl;
-	mMarker->SetViewport(vp_renwin[0], vp_renwin[2], vp_renwin[1], vp_renwin[3]);
-	//		std::cout << "view OK" << std::endl;
-//		mMarker->SetDefaultRenderer(this->getView()->getRenderer());
-//		mMarker->SetViewport(1.0 - mSize, 0.0, 1.0, mSize);
-
-	vtkRenderWindowInteractorPtr interactor = this->getView()->getRenderWindow()->GetInteractor();
-
-	mMarker->KeyPressActivationOff();
-	mMarker->SetInteractor(interactor);
-	mMarker->SetEnabled(true);
-	mMarker->InteractiveOff();//This line prints a VTK warning if enabled is false
-	mMarker->SetEnabled(enable);
+	if (interactor)
+	{
+		mMarker->KeyPressActivationOff();
+		mMarker->SetInteractor(interactor);
+		mMarker->SetEnabled(true);
+		mMarker->InteractiveOff();//This line prints a VTK warning if enabled is false
+		mMarker->SetEnabled(enable);
+	}
 }
 
 void OrientationAnnotation3DRep::setMarkerFilename(const QString filename)
@@ -187,7 +157,7 @@ void OrientationAnnotation3DRep::setMarkerFilename(const QString filename)
 		mMarkerCache.second = this->readMarkerFromFile(filename);
 	}
 
-	this->rebuild();
+	this->rebuild(mMarker->GetInteractor());
 }
 
 vtkPropPtr OrientationAnnotation3DRep::readMarkerFromFile(const QString filename)

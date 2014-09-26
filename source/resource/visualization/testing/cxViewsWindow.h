@@ -58,17 +58,16 @@ public:
 	cx::ViewPtr addView(cx::View::Type type, int r, int c);
 	cx::ViewPtr add2DView(int r, int c);
 	bool quickRunWidget();
+	void clearLayoutWidget();
 
 	cx::ViewPtr getView(int index);
 
 private:
 	void prettyZoom(cx::ViewPtr view);
-//	void insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c);
 	void setNiceSize();
 
 	std::vector<cx::ViewPtr > mViews;
 	cx::LayoutWidget* mLayoutWidget;
-//	QString mDisplayText;
 
 	double mZoomFactor;
 	QTimer* mRenderingTimer;

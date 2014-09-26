@@ -48,6 +48,10 @@ LayoutWidgetUsingViewWidgets::LayoutWidgetUsingViewWidgets()
 
 	mLayout->setSpacing(2);
 	mLayout->setMargin(4);
+
+//	mLayout->setSpacing(0);
+//	mLayout->setMargin(0);
+
 	this->setLayout(mLayout);
 
 	mViewCache2D.reset(new ViewCache<ViewWidget>(this,	"View2D"));
@@ -133,6 +137,16 @@ void LayoutWidgetUsingViewWidgets::render()
 		current->getView()->render(); // render only changed scenegraph (shaky but smooth)
 		report_gl_error_text(cstring_cast(QString("During rendering of view: ") + current->getView()->getName()));
 	}
+}
+
+void LayoutWidgetUsingViewWidgets::setGridSpacing(int val)
+{
+	mLayout->setSpacing(val);
+}
+
+void LayoutWidgetUsingViewWidgets::setGridMargin(int val)
+{
+	mLayout->setMargin(val);
 }
 
 } // cx
