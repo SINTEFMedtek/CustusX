@@ -30,28 +30,49 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVIEWUTILITIES_H_
-#define CXVIEWUTILITIES_H_
+#ifndef CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_
+#define CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_
 
+#include "cxView.h"
 #include "cxLayoutData.h"
+#include "cxViewCache.h"
+#include "cxViewWidget.h"
+#include "cxViewCollectionWidget.h"
+
+
 class QGridLayout;
 
 namespace cx
 {
-/**
-* \file
-* \addtogroup cx_resource_visualization_internal
-* @{
-*/
 
-namespace view_utils
+/**
+ * Widget for displaying Views, using only a single QVTKWidget/vtkRenderWindow,
+ * but one vtkRenderer for each View inside.
+ *
+ * \date 2014-09-26
+ * \author Christian Askeland
+ * \ingroup cx_resource_visualization_internal
+ */
+class ViewCollectionWidgetUsingViewContainer : public ViewCollectionWidget
 {
+	Q_OBJECT
+public:
+	ViewCollectionWidgetUsingViewContainer();
+	~ViewCollectionWidgetUsingViewContainer();
 
-void setStretchFactors(QGridLayout* layout, LayoutRegion region, int stretchFactor);
-}
+	ViewPtr addView(View::Type type, LayoutRegion region);
+	void clearViews();
+	virtual void setModified();
+	virtual void render();
+	virtual void setGridSpacing(int val);
+	virtual void setGridMargin(int val);
 
-/**
-* @}
-*/
-} /* namespace cx */
-#endif /* CXVIEWUTILITIES_H_ */
+private:
+	std::vector<ViewPtr> mViews;
+	class ViewContainer* mViewContainer;
+};
+
+
+
+} // namespace cx
+#endif /* CXVIEWCOLLECTIONWIDGETUSINGVIEWCONTAINER_H_ */

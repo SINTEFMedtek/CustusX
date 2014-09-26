@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxView.h"
 #include <QTime>
-#include "cxLayoutWidget.h"
+#include "cxViewCollectionWidget.h"
 
 class QGridLayout;
 class QLayout;

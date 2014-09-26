@@ -50,6 +50,13 @@ namespace cx
 class DoubleBoundingBox3D;
 typedef boost::shared_ptr<class Rep> RepPtr;
 
+/**
+ * Adapted from SSC class provided by Sonowand
+ *
+ * \date 2014-09-26
+ * \author Christian Askeland
+ * \ingroup cx_resource_visualization_internal
+ */
 class ViewItem : public QObject, public QLayoutItem
 {
 Q_OBJECT

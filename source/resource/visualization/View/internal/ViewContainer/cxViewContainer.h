@@ -50,7 +50,14 @@ class QGridLayout;
 namespace cx
 {
 
-/// More advanced N:1 combination of SSC Views and Qt Widgets
+/**
+ * More advanced N:1 combination of SSC Views and Qt Widgets
+ * Adapted from SSC class provided by Sonowand
+ *
+ * \date 2014-09-26
+ * \author Christian Askeland
+ * \ingroup cx_resource_visualization_internal
+ */
 class ViewContainer : public QVTKWidget
 {
 	Q_OBJECT

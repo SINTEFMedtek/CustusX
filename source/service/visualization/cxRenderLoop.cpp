@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 //#include "cxGLHelpers.h"
 #include "cxReporter.h"
-#include "cxLayoutWidget.h"
+#include "cxViewCollectionWidget.h"
 #include "cxLogger.h"
 
 namespace cx

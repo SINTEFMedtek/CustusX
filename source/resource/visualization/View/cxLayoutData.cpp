@@ -30,12 +30,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-/*
- * cxLayoutData.cpp
- *
- *  \date Jul 27, 2010
- *      \author christiana
- */
 #include "cxLayoutData.h"
 #include <iostream>
 #include <QDomElement>

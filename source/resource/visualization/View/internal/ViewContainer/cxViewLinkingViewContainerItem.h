@@ -43,6 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+/**
+ * \date 2014-09-26
+ * \author Christian Askeland
+ * \ingroup cx_resource_visualization_internal
+ */
 class ViewLinkingViewContainerItem : public ViewRepCollection
 {
 public:

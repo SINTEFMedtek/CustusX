@@ -30,13 +30,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-/*
- * cxLayoutData.h
- *
- *  \date Jul 27, 2010
- *      \author christiana
- */
-
 #ifndef CXLAYOUTDATA_H_
 #define CXLAYOUTDATA_H_
 
@@ -51,7 +44,7 @@ namespace cx
 {
 /**
 * \file
-* \addtogroup cx_service_visualization
+* \addtogroup cx_resource_visualization
 * @{
 */
 

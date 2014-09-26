@@ -48,18 +48,20 @@ namespace cx
 class DoubleBoundingBox3D;
 typedef boost::shared_ptr<class Rep> RepPtr;
 
-/**\brief Base widget for displaying lists of Rep.
+/**
+ * Base widget for displaying representations (Rep).
  *
- * View inherits from QWidget and thus can be added to a QLayout.
- * It wraps vtkRenderer and vtkRenderWindow, and visualizes a scene
- * with one camera. Add reps to the View in order to visualize them.
- * Although any Rep can be added to a View, it makes most sense
- * dedicate each view for either 2D, 3D or Video display. Most Reps
- * are specialized to one of these three modes.
+ * Use a ViewCollectionWidget to create Views.
  *
- * Note: Some special hacks has been introduced in order to share
- * GPU memory between GL contexts (i.e. Views). This is described
- * in the vtkMods folder.
+ * A View represents one visualization scene, wrapping a
+ * vtkRenderer, vtkCamera and a vtkRenderWindow. The vtkRenderWindow
+ * might be shared with other Views.
+ *
+ * Add reps to the View in order to visualize them. Although any Rep
+ * can be added to a View, it makes most sense to dedicate each view
+ * for either 2D, 3D or Video display. Most Reps are specialized to
+ * one of these three modes.
+ *
  *
  * \ingroup cx_resource_visualization
  */
@@ -67,34 +69,34 @@ class View : public QObject
 {
 	Q_OBJECT
 public:
-	/// type describing the view
 	enum Type
 	{
 		VIEW, VIEW_2D, VIEW_3D, VIEW_REAL_TIME
 	};
+
 	virtual ~View() {}
+
 	virtual Type getType() const = 0;
 	virtual QString getTypeString() const = 0;
 	virtual QString getUid() = 0; ///< Get a views unique id
 	virtual QString getName() = 0; ///< Get a views name
-	virtual vtkRendererPtr getRenderer() const = 0; ///< Get the renderer used by this \a View.
+
 	virtual void addRep(const RepPtr& rep) = 0; ///< Adds and connects a rep to the view
-//	virtual void setRep(const RepPtr& rep) = 0; ///< Remove all other \a Rep objects from this \a View and add the provided Rep to this \a View.
 	virtual void removeRep(const RepPtr& rep) = 0; ///< Removes and disconnects the rep from the view
 	virtual bool hasRep(const RepPtr& rep) const = 0; ///< Checks if the view already have the rep
 	virtual std::vector<RepPtr> getReps() = 0; ///< Returns all reps in the view
 	virtual void removeReps() = 0; ///< Removes all reps in the view
-	virtual void setBackgroundColor(QColor color) = 0;
-//	virtual void render() = 0; ///< render the view contents if vtk-MTimes are changed
+
+	virtual vtkRendererPtr getRenderer() const = 0; ///< Get the renderer used by this \a View.
 	virtual vtkRenderWindowPtr getRenderWindow() const = 0;
+	virtual void setModified() = 0;
+	virtual void setBackgroundColor(QColor color) = 0;
 	virtual QSize size() const = 0;
 	virtual void setZoomFactor(double factor) = 0;
 	virtual double getZoomFactor() const = 0;
 	virtual Transform3D get_vpMs() const = 0;
-//	virtual double heightMM() const = 0;
 	virtual DoubleBoundingBox3D getViewport() const = 0;
 	virtual DoubleBoundingBox3D getViewport_s() const = 0;
-	virtual void setModified() = 0;
 
 signals:
 	void resized(QSize size);
@@ -105,11 +107,7 @@ signals:
 	void shown();
 	void focusChange(bool gotFocus, Qt::FocusReason reason);
 	void customContextMenuRequested(const QPoint&);
-
 };
-typedef boost::shared_ptr<View> ViewPtr;
-
-
 typedef boost::shared_ptr<View> ViewPtr;
 
 } // namespace cx

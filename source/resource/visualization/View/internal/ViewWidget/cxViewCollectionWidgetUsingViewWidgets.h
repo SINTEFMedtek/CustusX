@@ -30,75 +30,54 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxViewCollectionLayout.h"
+#ifndef CXVIEWCOLLECTIONWIDGETUSINGVIEWWIDGETS_H_
+#define CXVIEWCOLLECTIONWIDGETUSINGVIEWWIDGETS_H_
 
-#include <QGridLayout>
-#include "cxLogger.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
-#include "cxReporter.h"
+#include "cxView.h"
+#include "cxLayoutData.h"
+#include "cxViewCache.h"
+#include "cxViewWidget.h"
+#include "cxViewCollectionWidget.h"
 
-#include "cxViewContainer.h"
+class QGridLayout;
 
 namespace cx
 {
 
-ViewCollectionWidgetUsingViewCollection::ViewCollectionWidgetUsingViewCollection()
+/**
+ * Widget for displaying Views, Containing a QGridLayout of QVTKWidgets,
+ * one for each view.
+ *
+ * \ingroup cx_resource_visualization_internal
+ * \date 2013-11-05
+ * \author Christian Askeland
+ */
+class LayoutWidgetUsingViewWidgets : public ViewCollectionWidget
 {
-	QVBoxLayout* layout = new QVBoxLayout(this);
-	this->setLayout(layout);
-	layout->setSpacing(0);
-	layout->setMargin(0);
-	mViewContainer = new ViewContainer;
-	mViewContainer->getGridLayout()->setSpacing(2);
-	mViewContainer->getGridLayout()->setMargin(4);
-	layout->addWidget(mViewContainer);
-}
+	Q_OBJECT
+public:
+	LayoutWidgetUsingViewWidgets();
+	~LayoutWidgetUsingViewWidgets();
 
-ViewCollectionWidgetUsingViewCollection::~ViewCollectionWidgetUsingViewCollection()
-{
-}
+	virtual ViewPtr addView(View::Type type, LayoutRegion region);
+	virtual void clearViews();
+	virtual void setModified();
+	virtual void render();
+	virtual void setGridSpacing(int val);
+	virtual void setGridMargin(int val);
 
-ViewPtr ViewCollectionWidgetUsingViewCollection::addView(View::Type type, LayoutRegion region)
-{
-	static int nameGenerator = 0;
-	QString uid = QString("view-%1-%2")
-			.arg(nameGenerator++)
-			.arg(reinterpret_cast<long>(this));
+private:
+	ViewWidget* retrieveView(View::Type type);
 
-	ViewItem* viewItem = mViewContainer->addView(uid, region, uid);
-	ViewPtr view = viewItem->getView();
-
-	viewItem->getView()->setType(type);
-	mViews.push_back(view);
-	return view;
-}
-
-void ViewCollectionWidgetUsingViewCollection::clearViews()
-{
-	mViews.clear();
-	mViewContainer->clear();
-}
-
-void ViewCollectionWidgetUsingViewCollection::setModified()
-{
-	mViewContainer->setModified();
-}
-
-void ViewCollectionWidgetUsingViewCollection::render()
-{
-	mViewContainer->renderAll();
-}
-
-void ViewCollectionWidgetUsingViewCollection::setGridSpacing(int val)
-{
-	mViewContainer->getGridLayout()->setSpacing(val);
-}
-
-void ViewCollectionWidgetUsingViewCollection::setGridMargin(int val)
-{
-	mViewContainer->getGridLayout()->setMargin(val);
-}
+	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache2D;
+	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache3D;
+	boost::shared_ptr<ViewCache<ViewWidget> > mViewCacheRT;
+	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache;
+	QGridLayout* mLayout; ///< the layout
+	std::vector<ViewWidget*> mViews;
+};
 
 
-} /* namespace cx */
+} // namespace cx
+
+#endif /* CXVIEWCOLLECTIONWIDGETUSINGVIEWWIDGETS_H_ */

@@ -30,46 +30,75 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVIEWCOLLECTIONLAYOUT_H_
-#define CXVIEWCOLLECTIONLAYOUT_H_
+#include "cxViewCollectionWidgetUsingViewContainer.h"
 
-#include "cxView.h"
-#include "cxLayoutData.h"
-#include "cxViewCache.h"
-#include "cxViewWidget.h"
-#include "cxLayoutWidget.h"
+#include <QGridLayout>
+#include "cxLogger.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
+#include "cxReporter.h"
 
-
-class QGridLayout;
+#include "cxViewContainer.h"
 
 namespace cx
 {
 
-/**
- * Widget for displaying Views, using only a single QVTKWidget/vtkRenderWindow,
- * but one vtkRenderer for each View inside.
- *
- */
-class ViewCollectionWidgetUsingViewCollection : public ViewCollectionWidget
+ViewCollectionWidgetUsingViewContainer::ViewCollectionWidgetUsingViewContainer()
 {
-	Q_OBJECT
-public:
-	ViewCollectionWidgetUsingViewCollection();
-	~ViewCollectionWidgetUsingViewCollection();
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	this->setLayout(layout);
+	layout->setSpacing(0);
+	layout->setMargin(0);
+	mViewContainer = new ViewContainer;
+	mViewContainer->getGridLayout()->setSpacing(2);
+	mViewContainer->getGridLayout()->setMargin(4);
+	layout->addWidget(mViewContainer);
+}
 
-	ViewPtr addView(View::Type type, LayoutRegion region);
-	void clearViews();
-	virtual void setModified();
-	virtual void render();
-	virtual void setGridSpacing(int val);
-	virtual void setGridMargin(int val);
+ViewCollectionWidgetUsingViewContainer::~ViewCollectionWidgetUsingViewContainer()
+{
+}
 
-private:
-	std::vector<ViewPtr> mViews;
-	class ViewContainer* mViewContainer;
-};
+ViewPtr ViewCollectionWidgetUsingViewContainer::addView(View::Type type, LayoutRegion region)
+{
+	static int nameGenerator = 0;
+	QString uid = QString("view-%1-%2")
+			.arg(nameGenerator++)
+			.arg(reinterpret_cast<long>(this));
+
+	ViewItem* viewItem = mViewContainer->addView(uid, region, uid);
+	ViewPtr view = viewItem->getView();
+
+	viewItem->getView()->setType(type);
+	mViews.push_back(view);
+	return view;
+}
+
+void ViewCollectionWidgetUsingViewContainer::clearViews()
+{
+	mViews.clear();
+	mViewContainer->clear();
+}
+
+void ViewCollectionWidgetUsingViewContainer::setModified()
+{
+	mViewContainer->setModified();
+}
+
+void ViewCollectionWidgetUsingViewContainer::render()
+{
+	mViewContainer->renderAll();
+}
+
+void ViewCollectionWidgetUsingViewContainer::setGridSpacing(int val)
+{
+	mViewContainer->getGridLayout()->setSpacing(val);
+}
+
+void ViewCollectionWidgetUsingViewContainer::setGridMargin(int val)
+{
+	mViewContainer->getGridLayout()->setMargin(val);
+}
 
 
-
-} // namespace cx
-#endif /* CXVIEWCOLLECTIONLAYOUT_H_ */
+} /* namespace cx */

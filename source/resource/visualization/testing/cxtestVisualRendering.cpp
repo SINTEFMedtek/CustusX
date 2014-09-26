@@ -117,7 +117,7 @@ TEST_CASE("Visual rendering: Overlapping gridlayout",
 	}
 
 	widget.show();
-	qApp->exec();
+//	qApp->exec();
 }
 
 TEST_CASE("Visual rendering: Empty QVTKWidget",

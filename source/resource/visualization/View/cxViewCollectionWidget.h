@@ -30,33 +30,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxLayoutWidget.h"
-#include <QGridLayout>
-#include "cxLogger.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
-#include "cxReporter.h"
+#ifndef CXVIEWCOLLECTIONWIDGET_H_
+#define CXVIEWCOLLECTIONWIDGET_H_
 
-#include "cxViewWidgetLayout.h"
-#include "cxViewCollectionLayout.h"
-#include "cxLayoutWidgetMixed.h"
+#include "cxView.h"
+#include "cxLayoutData.h"
+#include <QWidget>
 
-#include "cxViewContainer.h"
+
+class QGridLayout;
 
 namespace cx
 {
 
-QPointer<ViewCollectionWidget> ViewCollectionWidget::createViewWidgetLayout()
+/**
+ * Widget for displaying Views.
+ *
+ * This is the main class for displaying visualizations.
+ * Add Views using addView(), then add Reps to the Views.
+ *
+ * \ingroup cx_resource_visualization
+ * \date 2013-11-05
+ * \date 2014-09-26
+ * \author christiana
+ */
+class ViewCollectionWidget : public QWidget
 {
-//	return new LayoutWidgetUsingViewCollection(); // testing
-//	return new LayoutWidgetUsingViewWidgets();
-	return new ViewCollectionWidgetMixed();
-}
+	Q_OBJECT
+public:
+	static QPointer<ViewCollectionWidget> createViewWidgetLayout();
+	static QPointer<ViewCollectionWidget> createOptimizedLayout();
 
-QPointer<ViewCollectionWidget> ViewCollectionWidget::createViewCollectionLayout()
-{
-	return new ViewCollectionWidgetUsingViewCollection();
-}
+	virtual ~ViewCollectionWidget() {}
+
+	virtual ViewPtr addView(View::Type type, LayoutRegion region) = 0;
+	virtual void clearViews() = 0;
+	virtual void setModified() = 0;
+	virtual void render() = 0;
+	virtual void setGridSpacing(int val) = 0;
+	virtual void setGridMargin(int val) = 0;
+
+protected:
+	ViewCollectionWidget() {}
+};
+
 
 } // namespace cx
 
+#endif // CXVIEWCOLLECTIONWIDGET_H_

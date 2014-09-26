@@ -69,7 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxCameraStyle.h"
 #include "cxCyclicActionLogger.h"
-#include "cxLayoutWidget.h"
+#include "cxViewCollectionWidget.h"
 #include "cxRenderLoop.h"
 #include "cxLayoutRepository.h"
 #include "cxLogger.h"

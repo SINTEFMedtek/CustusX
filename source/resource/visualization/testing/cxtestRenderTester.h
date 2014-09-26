@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include "cxRep.h"
 #include "cxView.h"
-#include "cxLayoutWidget.h"
+#include "cxViewCollectionWidget.h"
 
 typedef vtkSmartPointer<class vtkProp> vtkPropPtr;
 

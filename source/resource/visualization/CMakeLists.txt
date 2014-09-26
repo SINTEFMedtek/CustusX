@@ -6,18 +6,15 @@ include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 
 cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	View/cxView
-	View/cxLayoutWidget
+	View/cxViewCollectionWidget
 
-	View/internal/cxViewUtilities
 	View/internal/cxViewRepCollection
-	View/internal/ViewMixed/cxLayoutWidgetMixed
-	View/internal/ViewWidget/cxViewLinkingViewWidget
+	View/internal/ViewMixed/cxViewCollectionWidgetMixed
 	View/internal/ViewWidget/cxViewWidget
-	View/internal/ViewWidget/cxViewWidgetLayout
+	View/internal/ViewWidget/cxViewCollectionWidgetUsingViewWidgets
 	View/internal/ViewContainer/cxViewContainerItem
 	View/internal/ViewContainer/cxViewContainer	
-	View/internal/ViewContainer/cxViewLinkingViewContainerItem
-	View/internal/ViewContainer/cxViewCollectionLayout	
+	View/internal/ViewContainer/cxViewCollectionWidgetUsingViewContainer	
     
 	Rep/cxRep.h
 	Rep/cxRepImpl
@@ -73,7 +70,10 @@ endif()
 
 cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
 	View/cxLayoutData
+	View/internal/cxViewUtilities
 	View/internal/ViewWidget/cxViewCache.h
+	View/internal/ViewWidget/cxViewLinkingViewWidget
+	View/internal/ViewContainer/cxViewLinkingViewContainerItem
 	Primitives/cxDepthPeeling
 	Primitives/cxGraphicalTorus3D
 	Primitives/cxVtkHelperClasses

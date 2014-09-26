@@ -43,6 +43,11 @@ namespace cx
 
 typedef boost::shared_ptr<class ViewRepCollection> ViewRepCollectionPtr;
 
+/**
+ * \ingroup cx_resource_visualization_internal
+ * \date 2014-09-26
+ * \author Christian Askeland
+ */
 class ViewRepCollection : public View
 {
 Q_OBJECT
