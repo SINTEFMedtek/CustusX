@@ -49,15 +49,12 @@ LayoutWidgetMixed::LayoutWidgetMixed()
 	this->setLayout(mLayout);
 
 	mBaseLayout = new LayoutWidgetUsingViewCollection();
+	this->addWidgetToLayout(mLayout, mBaseLayout, LayoutRegion(0,0));
 	mBaseRegion = LayoutRegion(-1,-1);
 	mTotalRegion = LayoutRegion(-1,-1);
-//	mLayout->addWidget(mBaseLayout, 0, 0, 2, 2);
-//	mLayout->addWidget(mBaseLayout, 0, 0, mRegion.span.row, mRegion.span.col);
 
 	this->setGridMargin(4);
 	this->setGridSpacing(2);
-
-//	this->setStretchFactors(mRegion, 1);
 }
 
 LayoutWidgetMixed::~LayoutWidgetMixed()
@@ -104,7 +101,16 @@ void LayoutWidgetMixed::clearViews()
 	for (unsigned i=0; i<mOverlays.size(); ++i)
 		mOverlays[i]->clearViews();
 	this->setStretchFactors(mTotalRegion, 0);
-// TODO: remove layouts
+
+	this->addWidgetToLayout(mLayout, mBaseLayout, LayoutRegion(0,0));
+
+	for (unsigned i=0; i<mOverlays.size(); ++i)
+	{
+		mLayout->removeWidget(mOverlays[i]);
+		delete mOverlays[i];
+	}
+	mOverlays.clear();
+
 	mBaseRegion = LayoutRegion(-1,-1);
 	mTotalRegion = LayoutRegion(-1,-1);
 }
