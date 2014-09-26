@@ -37,8 +37,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-FilterSetupWidget::FilterSetupWidget(QWidget* parent, XmlOptionFile options, bool addFrame) :
-    BaseWidget(parent, "FilterSetupWidget", "FilterSetup")
+FilterSetupWidget::FilterSetupWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, XmlOptionFile options, bool addFrame) :
+	BaseWidget(parent, "FilterSetupWidget", "FilterSetup"),
+	mVisualizationService(visualizationService),
+	mPatientModelService(patientModelService)
 {
 	mFrame = NULL;
 
@@ -64,9 +66,9 @@ FilterSetupWidget::FilterSetupWidget(QWidget* parent, XmlOptionFile options, boo
 
 	mOptions = options;
 
-	mInputsWidget = new OptionsWidget(this);
-	mOutputsWidget = new OptionsWidget(this);
-	mOptionsWidget = new OptionsWidget(this);
+	mInputsWidget = new OptionsWidget(mVisualizationService, mPatientModelService, this);
+	mOutputsWidget = new OptionsWidget(mVisualizationService, mPatientModelService, this);
+	mOptionsWidget = new OptionsWidget(mVisualizationService, mPatientModelService, this);
 	mPresetWidget = new FilterPresetWidget(this);
 	mAdvancedButton = new QCheckBox("Show &advanced options", this);
 	connect(mAdvancedButton, SIGNAL(stateChanged(int)), this, SLOT(showAdvancedOptions(int)));

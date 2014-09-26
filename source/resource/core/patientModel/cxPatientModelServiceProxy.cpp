@@ -206,6 +206,11 @@ void PatientModelServiceProxy::exportPatient(bool niftiFormat)
 	return mPatientModelService->exportPatient(niftiFormat);
 }
 
+void PatientModelServiceProxy::removePatientData(QString uid)
+{
+	return mPatientModelService->removePatientData(uid);
+}
+
 PresetTransferFunctions3DPtr PatientModelServiceProxy::getPresetTransferFunctions3D() const
 {
 	return mPatientModelService->getPresetTransferFunctions3D();

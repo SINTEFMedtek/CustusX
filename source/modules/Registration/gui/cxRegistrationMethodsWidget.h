@@ -89,7 +89,7 @@ class RegistrationMethodsWidget : public TabbedWidget
 {
 	Q_OBJECT
 public:
-	RegistrationMethodsWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle);
+	RegistrationMethodsWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle);
   virtual ~RegistrationMethodsWidget(){};
   virtual QString defaultWhatsThis() const;
 private slots:

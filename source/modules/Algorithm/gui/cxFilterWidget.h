@@ -55,7 +55,7 @@ class FilterSetupWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	FilterSetupWidget(QWidget* parent, XmlOptionFile options, bool addFrame);
+	FilterSetupWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, XmlOptionFile options, bool addFrame);
 	void setFilter(FilterPtr filter);
 	QString defaultWhatsThis() const;
 	/** Compact Mode: one group, hide main input/output
@@ -81,6 +81,8 @@ private:
 	QCheckBox*	   mAdvancedButton;
 	QGroupBox* 	   mFrame;
 	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
+	VisualizationServicePtr mVisualizationService;
+	PatientModelServicePtr mPatientModelService;
 };
 
 }

@@ -236,6 +236,7 @@ private:
 	DockWidgets* mDockWidgets;
 
 	PatientModelServicePtr mPatientModelService;
+	VisualizationServicePtr mVisualizationService;
 };
 
 }//namespace cx

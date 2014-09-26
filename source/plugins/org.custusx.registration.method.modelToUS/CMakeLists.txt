@@ -12,19 +12,20 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
     ${CustusX_SOURCE_DIR}/source/resource/filter
+	${CustusX_SOURCE_DIR}/source/resource/visualization
 	${CustusX_SOURCE_DIR}/source/gui/dataAdapters
 )
 
 set(PLUGIN_SRCS
   cxRegistrationMethodModelToUSPluginActivator.cpp
   cxRegistrationMethodModelToUSService.cpp
+  cxRegistrationMethodModelToUSService.h
   cxRegistrationMethodModelToUSWidget.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxRegistrationMethodModelToUSPluginActivator.h
-  cxRegistrationMethodModelToUSService.h
   cxRegistrationMethodModelToUSWidget.h
 )
 

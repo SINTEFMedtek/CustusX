@@ -50,7 +50,7 @@ class ActiveVolumeWidget : public BaseWidget
 {
   Q_OBJECT
 public:
-	ActiveVolumeWidget(PatientModelServicePtr patientModelService, QWidget* parent);
+	ActiveVolumeWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent);
   ~ActiveVolumeWidget() {}
 
   virtual QString defaultWhatsThis() const;
@@ -68,7 +68,7 @@ class VolumePropertiesWidget : public TabbedWidget
 {
   Q_OBJECT
 public:
-	VolumePropertiesWidget(PatientModelServicePtr patientModelService, QWidget* parent);
+	VolumePropertiesWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent);
   virtual ~VolumePropertiesWidget(){};
 
   virtual QString defaultWhatsThis() const;

@@ -12,12 +12,12 @@ include_directories(
 set(PLUGIN_SRCS
   cxPNNReconstructionPluginActivator.cpp
   cxPNNReconstructionService.cpp
+  cxPNNReconstructionService.h
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxPNNReconstructionPluginActivator.h
-  cxPNNReconstructionService.h
 )
 
 set(PLUGIN_UI_FORMS

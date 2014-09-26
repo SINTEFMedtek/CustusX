@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 //------------------------------------------------------------------------------
-PrepareVesselsWidget::PrepareVesselsWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+PrepareVesselsWidget::PrepareVesselsWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent) :
 		RegistrationBaseWidget(registrationService, parent, "PrepareVesselsWidget", "PrepareVesselsWidget")
 {  
     XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("registration").descend("PrepareVesselsWidget");
@@ -74,7 +74,7 @@ PrepareVesselsWidget::PrepareVesselsWidget(RegistrationServicePtr registrationSe
 
   mLayout = new QVBoxLayout(this);
 
-  mPipelineWidget = new PipelineWidget(NULL, mPipeline);
+  mPipelineWidget = new PipelineWidget(visualizationService, patientModelService, NULL, mPipeline);
   mLayout->addWidget(mPipelineWidget);
 
   mColorDataAdapter = ColorDataAdapterXml::initialize("Color", "",

@@ -44,6 +44,8 @@ class VisualizationServiceProxy : public VisualizationService
 {
 public:
 	VisualizationServiceProxy(ctkPluginContext *pluginContext);
+	virtual int getActiveViewGroup() const;
+	virtual ViewGroupDataPtr getViewGroupData(int groupIdx);
 
 	bool isNull();
 

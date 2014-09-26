@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-AllFiltersWidget::AllFiltersWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+AllFiltersWidget::AllFiltersWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent) :
     BaseWidget(parent, "FilterWidget", "Configurable Filter")
 {
 	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("filterwidget");
@@ -128,7 +128,7 @@ AllFiltersWidget::AllFiltersWidget(PatientModelServicePtr patientModelService, Q
 	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
 	topLayout->addWidget(mTimedAlgorithmProgressBar);
 
-	mSetupWidget = new FilterSetupWidget(this, options, false);
+	mSetupWidget = new FilterSetupWidget(visualizationService, patientModelService, this, options, false);
 	topLayout->addWidget(mSetupWidget);
 
 	topLayout->addStretch();

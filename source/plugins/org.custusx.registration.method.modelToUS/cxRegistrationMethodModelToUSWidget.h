@@ -53,7 +53,7 @@ class RegistrationMethodModelToUSWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	RegistrationMethodModelToUSWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget *parent, QString objectName);
+	RegistrationMethodModelToUSWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent, QString objectName);
 	virtual ~RegistrationMethodModelToUSWidget();
 
 private:

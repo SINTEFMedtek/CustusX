@@ -38,6 +38,8 @@ class QWidget;
 class QGridLayout;
 
 namespace cx {
+typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
 
 /**\brief Create a widget capable of displaying the input data.
  *
@@ -46,7 +48,7 @@ namespace cx {
  *
  * \ingroup cx_gui
  */
-QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
+QWidget* createDataWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, cx::DataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
 
 } /* namespace cx */
 #endif /* CXDATAADAPTERHELPER_H_ */

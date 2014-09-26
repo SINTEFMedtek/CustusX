@@ -66,29 +66,22 @@ class MetricBase : public QObject
 {
   Q_OBJECT
 public:
-	MetricBase();
-  virtual ~MetricBase() {}
-  virtual QWidget* createWidget() = 0;
-  virtual QString getValue() const;
-  virtual DataMetricPtr getData() const = 0;
-  virtual QString getArguments() const = 0;
-  virtual QString getType() const = 0;
+	MetricBase(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService);
+	virtual ~MetricBase() {}
+	virtual QWidget* createWidget() = 0;
+	virtual QString getValue() const;
+	virtual DataMetricPtr getData() const = 0;
+	virtual QString getArguments() const = 0;
+	virtual QString getType() const = 0;
 	virtual void update() = 0;
-//	{
-//		if (!mModified)
-//			return;
-//		this->repaint();
-//		mModified = false;
-//	}
 
 private slots:
   void colorSelected();
 protected:
-//  void setModified() { mModified = true; }
-//  virtual void repaint() = 0;
-//  bool mModified;
   ColorDataAdapterXmlPtr mColorSelector;
   void addColorWidget(QVBoxLayout* layout);
+  VisualizationServicePtr mVisualizationService;
+  PatientModelServicePtr mPatientModelService;
 };
 
 /**
@@ -120,8 +113,8 @@ class PointMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit PointMetricWrapper(PointMetricPtr data);
-  virtual ~PointMetricWrapper() {}
+  explicit PointMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, PointMetricPtr data);
+  virtual ~PointMetricWrapper();
   virtual QWidget* createWidget();
   virtual DataMetricPtr getData() const;
   virtual QString getArguments() const;
@@ -147,8 +140,8 @@ class PlaneMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit PlaneMetricWrapper(PlaneMetricPtr data);
-  virtual ~PlaneMetricWrapper() {}
+  explicit PlaneMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, PlaneMetricPtr data);
+  virtual ~PlaneMetricWrapper();
   virtual QWidget* createWidget();
   virtual DataMetricPtr getData() const;
   virtual QString getArguments() const;
@@ -167,7 +160,7 @@ class DistanceMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit DistanceMetricWrapper(DistanceMetricPtr data);
+  explicit DistanceMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, DistanceMetricPtr data);
   virtual ~DistanceMetricWrapper() {}
   virtual QWidget* createWidget();
   virtual DataMetricPtr getData() const;
@@ -188,10 +181,9 @@ class AngleMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit AngleMetricWrapper(AngleMetricPtr data);
-  virtual ~AngleMetricWrapper() {}
+  explicit AngleMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, AngleMetricPtr data);
+  virtual ~AngleMetricWrapper();
   virtual QWidget* createWidget();
-//  virtual QString getValue() const;
   virtual DataMetricPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
@@ -214,7 +206,7 @@ class DonutMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit DonutMetricWrapper(DonutMetricPtr data);
+  explicit DonutMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, DonutMetricPtr data);
   virtual ~DonutMetricWrapper() {}
   virtual QWidget* createWidget();
 //  virtual QString getValue() const;
@@ -247,7 +239,7 @@ class SphereMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit SphereMetricWrapper(SphereMetricPtr data);
+  explicit SphereMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, SphereMetricPtr data);
   virtual ~SphereMetricWrapper() {}
   virtual QWidget* createWidget();
 //  virtual QString getValue() const;

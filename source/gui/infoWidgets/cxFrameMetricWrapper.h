@@ -49,8 +49,8 @@ class FrameMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit FrameMetricWrapper(cx::FrameMetricPtr data);
-  virtual ~FrameMetricWrapper() {}
+  explicit FrameMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, cx::FrameMetricPtr data);
+  virtual ~FrameMetricWrapper();
   virtual QWidget* createWidget();
   virtual QString getValue() const;
   virtual DataMetricPtr getData() const;

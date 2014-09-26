@@ -44,10 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SlicePropertiesWidget::SlicePropertiesWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+SlicePropertiesWidget::SlicePropertiesWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
 		TabbedWidget(parent, "SlicePropertiesWidget", "Slice Properties")
 {
-	this->insertWidgetAtTop(new DataSelectWidget(this, ActiveImageStringDataAdapter::New(patientModelService)));
+	this->insertWidgetAtTop(new DataSelectWidget(visualizationService, patientModelService, this, ActiveImageStringDataAdapter::New(patientModelService)));
   this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");
   this->addTab(new ColorWidget(patientModelService, this), "Color");
   this->addTab(new OverlayWidget(patientModelService, this), "Overlay");

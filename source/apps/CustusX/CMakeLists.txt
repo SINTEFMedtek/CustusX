@@ -24,6 +24,7 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
     ${CustusX_SOURCE_DIR}/source/modules/Registration/gui
 	${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
+	${CustusX_SOURCE_DIR}/source/resource/visualization
 	)
 
 #------------------------------------------------------------------------------

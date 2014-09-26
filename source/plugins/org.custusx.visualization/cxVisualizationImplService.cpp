@@ -33,13 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisualizationImplService.h"
 
 #include <ctkPluginContext.h>
-#include "cxData.h"
-#include "cxReporter.h"
-#include "cxLogicManager.h"
-#include "cxDataManager.h"
-#include "cxPatientData.h"
-#include "cxPatientService.h"
-#include "cxRegistrationTransform.h"
+#include "cxViewManager.h"
+#include "cxLegacySingletons.h"
+#include "cxViewGroup.h"
 
 namespace cx
 {
@@ -47,10 +43,28 @@ namespace cx
 VisualizationImplService::VisualizationImplService(ctkPluginContext *context) :
 	mContext(context )
 {
+	connect(viewManager(), SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
 }
 
 VisualizationImplService::~VisualizationImplService()
 {
+	if(viewManager())
+	{
+		disconnect(viewManager(), SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
+	}
+}
+
+int VisualizationImplService::getActiveViewGroup() const
+{
+	return viewManager()->getActiveViewGroup();
+}
+ViewGroupDataPtr VisualizationImplService::getViewGroupData(int groupIdx)
+{
+	std::vector<ViewGroupPtr> viewGroups = viewManager()->getViewGroups();
+	if (!viewGroups.empty())
+		return viewGroups[groupIdx]->getData();
+	else
+		return ViewGroupDataPtr();
 }
 
 bool VisualizationImplService::isNull()

@@ -86,7 +86,7 @@ class MetricWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  MetricWidget(QWidget* parent);
+  MetricWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~MetricWidget();
 
   virtual QString defaultWhatsThis() const;
@@ -121,13 +121,15 @@ protected:
   QAction* mFrameMetricAction;
   QAction* mToolMetricAction;
   QAction* mExportFramesAction;
+  PatientModelServicePtr mPatientModelService;
+  VisualizationServicePtr mVisualizationService;
 
 private:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event);
   void enablebuttons();
-  MetricBasePtr createMetricWrapper(DataPtr data);
-  std::vector<MetricBasePtr> createMetricWrappers();
+  MetricBasePtr createMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, DataPtr data);
+  std::vector<MetricBasePtr> createMetricWrappers(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService);
   virtual void prePaintEvent();
   std::set<QString> getSelectedUids();
   void createActions(QActionGroup* group);

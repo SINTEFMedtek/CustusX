@@ -47,6 +47,16 @@ VisualizationServiceProxy::VisualizationServiceProxy(ctkPluginContext *pluginCon
 	this->initServiceListener();
 }
 
+int VisualizationServiceProxy::getActiveViewGroup() const
+{
+	return mVisualizationService->getActiveViewGroup();
+}
+
+ViewGroupDataPtr VisualizationServiceProxy::getViewGroupData(int groupIdx)
+{
+	return mVisualizationService->getViewGroupData(groupIdx);
+}
+
 void VisualizationServiceProxy::initServiceListener()
 {
 	mServiceListener.reset(new ServiceTrackerListener<VisualizationService>(
@@ -60,16 +70,16 @@ void VisualizationServiceProxy::initServiceListener()
 void VisualizationServiceProxy::onServiceAdded(VisualizationService* service)
 {
 	mVisualizationService.reset(service, null_deleter());
-//	connect(mVideoService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
-//	connect(mVideoService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
+	connect(service, SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
+//	connect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
 	if(mVisualizationService->isNull())
 		reportWarning("VideoServiceProxy::onServiceAdded mVideoService->isNull()");
 }
 
 void VisualizationServiceProxy::onServiceRemoved(VisualizationService *service)
 {
+	disconnect(service, SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
 //	disconnect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
-//	disconnect(service, SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
 	mVisualizationService = VisualizationService::getNullObject();
 }
 

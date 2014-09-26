@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPluginFramework.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxRegistrationServiceProxy.h"
-
+#include "cxVisualizationServiceProxy.h"
 
 #include <langinfo.h>
 #include <locale>
@@ -94,12 +94,13 @@ int main(int argc, char *argv[])
 
 	cx::PatientModelServicePtr patientModelService = cx::PatientModelServicePtr(new cx::PatientModelServiceProxy(cx::LogicManager::getInstance()->getPluginContext()));
 	cx::RegistrationServicePtr registrationService = cx::RegistrationServicePtr(new cx::RegistrationServiceProxy(cx::LogicManager::getInstance()->getPluginContext()));
+	cx::VisualizationServicePtr visualizationService = cx::VisualizationServicePtr(new cx::VisualizationServiceProxy(cx::LogicManager::getInstance()->getPluginContext()));
 
 	cx::UsReconstructionPluginPtr reconstructionPlugin(new cx::UsReconstructionPlugin());
 	cx::AcquisitionPluginPtr acquisitionPlugin(new cx::AcquisitionPlugin(reconstructionPlugin->getReconstructer()));
 	cx::CalibrationPluginPtr calibrationPlugin(new cx::CalibrationPlugin(patientModelService, acquisitionPlugin->getAcquisitionData()));
-	cx::AlgorithmPluginPtr algorithmPlugin(new cx::AlgorithmPlugin(patientModelService));
-	cx::RegistrationPluginPtr registrationPlugin(new cx::RegistrationPlugin(registrationService, patientModelService, acquisitionPlugin->getAcquisitionData()));
+	cx::AlgorithmPluginPtr algorithmPlugin(new cx::AlgorithmPlugin(visualizationService, patientModelService));
+	cx::RegistrationPluginPtr registrationPlugin(new cx::RegistrationPlugin(registrationService, visualizationService, patientModelService, acquisitionPlugin->getAcquisitionData()));
 
 	plugins.push_back(reconstructionPlugin);
 	plugins.push_back(acquisitionPlugin);

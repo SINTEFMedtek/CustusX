@@ -53,9 +53,10 @@ namespace cx
 {
 
 
-MeshInfoWidget::MeshInfoWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+MeshInfoWidget::MeshInfoWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
 	InfoWidget(parent, "MeshInfoWidget", "Mesh Properties"),
-	mPatientModelService(patientModelService)
+	mPatientModelService(patientModelService),
+	mVisualizationService(visualizationService)
 {
 	this->addWidgets(patientModelService);
 	this->meshSelectedSlot();
@@ -182,7 +183,7 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 
 	int gridLayoutRow = 1;
 
-	gridLayout->addWidget(new DataSelectWidget(this, mSelectMeshWidget), gridLayoutRow++, 0, 1, 2);
+	gridLayout->addWidget(new DataSelectWidget(mVisualizationService, mPatientModelService, this, mSelectMeshWidget), gridLayoutRow++, 0, 1, 2);
 	new LabeledLineEditWidget(this, mUidAdapter, gridLayout, gridLayoutRow++);
 	new LabeledLineEditWidget(this, mNameAdapter, gridLayout, gridLayoutRow++);
 	new LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, gridLayoutRow++);

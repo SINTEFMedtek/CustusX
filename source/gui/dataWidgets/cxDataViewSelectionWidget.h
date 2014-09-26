@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QListWidget>
 #include "cxForwardDeclarations.h"
-#include "cxLegacySingletons.h"
 class QLabel;
 
 namespace cx

@@ -193,6 +193,11 @@ void PatientModelImplService::exportPatient(bool niftiFormat)
 	patientService()->getPatientData()->exportPatient(niftiFormat);
 }
 
+void PatientModelImplService::removePatientData(QString uid)
+{
+	patientService()->getPatientData()->removeData(uid);
+}
+
 PresetTransferFunctions3DPtr PatientModelImplService::getPresetTransferFunctions3D() const
 {
 	return dataService()->getPresetTransferFunctions3D();

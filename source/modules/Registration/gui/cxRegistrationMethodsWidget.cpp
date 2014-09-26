@@ -139,7 +139,7 @@ QString ManualRegistrationsWidget::defaultWhatsThis() const
 
 //------------------------------------------------------------------------------
 
-RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle) :
+RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle) :
   TabbedWidget(parent, objectName, windowTitle)
 {
 
@@ -175,7 +175,7 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationServicePtr regi
   //vessel based image to image
   Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(this, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
 
-	PrepareVesselsWidget* prepareRegistrationWidget = new PrepareVesselsWidget(registrationService, patientModelService, image2imageWidget);
+  PrepareVesselsWidget* prepareRegistrationWidget = new PrepareVesselsWidget(registrationService, visualizationService, patientModelService, image2imageWidget);
 
   image2imageWidget->addTab(prepareRegistrationWidget, "Prepare"); //should be application specific
 	image2imageWidget->addTab(new RegisterI2IWidget(registrationService, patientModelService, image2imageWidget),"Register");
@@ -197,7 +197,7 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationServicePtr regi
   this->addTab(image2imageWidget, "Vessel");
   this->addTab(patientOrientationWidget, "Patient Orientation");
   this->addTab(imageAndPlateRegistrationWidget, "Plate");
-	this->addTab(new BronchoscopyRegistrationWidget(registrationService, patientModelService, this), "Bronchoscopy");
+  this->addTab(new BronchoscopyRegistrationWidget(registrationService, visualizationService, patientModelService, this), "Bronchoscopy");
 
   connect(mTabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChangedSlot(int)));
   mTabWidget->setCurrentIndex(settings()->value("registration/tabIndex").toInt());

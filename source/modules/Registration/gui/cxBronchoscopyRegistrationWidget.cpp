@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent) :
 	RegistrationBaseWidget(registrationService, parent, "BronchoscopyRegistrationWidget",
 						   "Bronchoscopy Registration"), mVerticalLayout(new QVBoxLayout(this))
 {
@@ -80,7 +80,7 @@ BronchoscopyRegistrationWidget::BronchoscopyRegistrationWidget(RegistrationServi
 
     mRecordSessionWidget.reset(new RecordSessionWidget(mAquisition, this, "Bronchoscope path"));
 
-	mVerticalLayout->addWidget(new DataSelectWidget(this, mSelectMeshWidget));
+	mVerticalLayout->addWidget(new DataSelectWidget(visualizationService, patientModelService, this, mSelectMeshWidget));
 //    mVerticalLayout->addWidget(mTrackedCenterLine);
     mVerticalLayout->addWidget(mRecordSessionWidget.get());
 	mVerticalLayout->addWidget(mRegisterButton);

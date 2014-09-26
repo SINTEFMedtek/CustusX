@@ -63,12 +63,13 @@ class AlgorithmPlugin : public GUIExtenderService
 {
 	Q_OBJECT
 public:
-	AlgorithmPlugin(PatientModelServicePtr patientModelService);
+	AlgorithmPlugin(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService);
 	virtual ~AlgorithmPlugin();
 
 	virtual std::vector<CategorizedWidget> createWidgets() const;
 private:
 	PatientModelServicePtr mPatientModelService;
+	VisualizationServicePtr mVisualizationService;
 };
 typedef boost::shared_ptr<class AlgorithmPlugin> AlgorithmPluginPtr;
 

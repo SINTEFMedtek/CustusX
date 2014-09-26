@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDummyToolManager.h"
 #include "cxLogicManager.h"
+#include "cxPatientModelService.h"
+#include "cxVisualizationService.h"
 
 namespace cxtest
 {
@@ -59,7 +61,11 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][st
 	QString filename = cx::DataLocations::getTestDataPath() + "/testing/TubeSegmentationFramework/Default.mhd";
 	REQUIRE(QFile::exists(filename));
 
-	TestVideoConnectionWidget* widget = new TestVideoConnectionWidget();
+	//Mock with null objects
+	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject();
+	cx::VisualizationServicePtr visualizationService = cx::VisualizationService::getNullObject();
+
+	TestVideoConnectionWidget* widget = new TestVideoConnectionWidget(visualizationService, patientModelService);
 	REQUIRE(widget->canStream(filename, "MHDFile"));
 //	REQUIRE(widget->canStream(filename, "SimulatedImageStreamer"));
 

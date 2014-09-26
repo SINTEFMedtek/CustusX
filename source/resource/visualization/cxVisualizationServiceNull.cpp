@@ -38,12 +38,24 @@ namespace cx
 VisualizationServiceNull::VisualizationServiceNull()
 {
 }
+
+int VisualizationServiceNull::getActiveViewGroup() const
+{
+	printWarning();
+	return -1;
+}
+
+ViewGroupDataPtr VisualizationServiceNull::getViewGroupData(int groupIdx)
+{
+	printWarning();
+	return ViewGroupDataPtr();
+}
 bool VisualizationServiceNull::isNull()
 {
 	return true;
 }
 
-void VisualizationServiceNull::printWarning()
+void VisualizationServiceNull::printWarning() const
 {
 	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.video) disabled?");
 }

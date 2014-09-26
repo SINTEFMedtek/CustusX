@@ -52,7 +52,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientData.h"
 #include "cxDataLocations.h"
 #include "cxMeshInfoWidget.h"
-//#include "cxLayoutEditorWidget.h"
 #include "cxFrameForest.h"
 #include "cxFrameTreeWidget.h"
 #include "cxImportDataDialog.h"
@@ -96,6 +95,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ctkPluginContext.h"
 #include "cxDockWidgets.h"
 #include "cxPatientModelServiceProxy.h"
+#include "cxVisualizationServiceProxy.h"
 
 namespace cx
 {
@@ -133,14 +133,15 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	ctkPluginContext *pluginContext = LogicManager::getInstance()->getPluginContext();
 
 	mPatientModelService = PatientModelServicePtr(new PatientModelServiceProxy(pluginContext));
+	mVisualizationService = VisualizationServicePtr(new VisualizationServiceProxy(pluginContext));
 
 	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
-	this->addAsDockWidget(new VideoConnectionWidget(this), "Utility");
+	this->addAsDockWidget(new VideoConnectionWidget(mVisualizationService, mPatientModelService, this), "Utility");
 	this->addAsDockWidget(new EraserWidget(this), "Properties");
-	this->addAsDockWidget(new MetricWidget(this), "Utility");
-	this->addAsDockWidget(new SlicePropertiesWidget(mPatientModelService, this), "Properties");
-	this->addAsDockWidget(new VolumePropertiesWidget(mPatientModelService, this), "Properties");
-	this->addAsDockWidget(new MeshInfoWidget(mPatientModelService, this), "Properties");
+	this->addAsDockWidget(new MetricWidget(mVisualizationService, mPatientModelService, this), "Utility");
+	this->addAsDockWidget(new SlicePropertiesWidget(mPatientModelService, mVisualizationService, this), "Properties");
+	this->addAsDockWidget(new VolumePropertiesWidget(mPatientModelService, mVisualizationService, this), "Properties");
+	this->addAsDockWidget(new MeshInfoWidget(mPatientModelService, mVisualizationService, this), "Properties");
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
 	this->addAsDockWidget(new ToolPropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new NavigationWidget(this), "Properties");
@@ -397,7 +398,7 @@ void MainWindow::createActions()
 	mShowPointPickerAction->setToolTip("Activate the 3D Point Picker Probe");
 	mShowPointPickerAction->setIcon(QIcon(":/icons/point_picker.png"));
 	connect(mShowPointPickerAction, SIGNAL(triggered()), this, SLOT(togglePointPickerActionSlot()));
-	connect(viewManager()->getViewGroups()[0]->getData().get(), SIGNAL(optionsChanged()), this,
+	connect(mVisualizationService->getViewGroupData(0).get(), SIGNAL(optionsChanged()), this,
 		SLOT(updatePointPickerActionSlot()));
 	this->updatePointPickerActionSlot();
 
@@ -535,7 +536,7 @@ void MainWindow::centerToImageCenterSlot()
 	if (dataManager()->getActiveImage())
 		nav->centerToData(dataManager()->getActiveImage());
 	else if (!viewManager()->getViewGroups().empty())
-		nav->centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
+		nav->centerToView(mVisualizationService->getViewGroupData(0)->getData());
 	else
 		nav->centerToGlobalDataCenter();
 }
@@ -548,14 +549,14 @@ void MainWindow::centerToTooltipSlot()
 
 void MainWindow::togglePointPickerActionSlot()
 {
-	ViewGroupDataPtr data = viewManager()->getViewGroups()[0]->getData();
+	ViewGroupDataPtr data = mVisualizationService->getViewGroupData(0);
 	ViewGroupData::Options options = data->getOptions();
 	options.mShowPointPickerProbe = !options.mShowPointPickerProbe;
 	data->setOptions(options);
 }
 void MainWindow::updatePointPickerActionSlot()
 {
-	bool show = viewManager()->getViewGroups()[0]->getData()->getOptions().mShowPointPickerProbe;
+	bool show = mVisualizationService->getViewGroupData(0)->getOptions().mShowPointPickerProbe;
 	mShowPointPickerAction->setChecked(show);
 }
 
@@ -908,7 +909,7 @@ void MainWindow::createToolBars()
 
 	QToolBar* toolOffsetToolBar = addToolBar("Tool Offset");
 	toolOffsetToolBar->setObjectName("ToolOffsetToolBar");
-	toolOffsetToolBar->addWidget(createDataWidget(this, DoubleDataAdapterActiveToolOffset::create()));
+	toolOffsetToolBar->addWidget(createDataWidget(mVisualizationService, mPatientModelService, this, DoubleDataAdapterActiveToolOffset::create()));
 	this->registerToolBar(toolOffsetToolBar, "Toolbar");
 
 	QToolBar* registrationHistoryToolBar = addToolBar("Registration History");
@@ -955,7 +956,7 @@ void MainWindow::aboutSlot()
 
 void MainWindow::preferencesSlot()
 {
-	PreferencesDialog prefDialog(this);
+	PreferencesDialog prefDialog(mVisualizationService, mPatientModelService, this);
 	prefDialog.exec();
 }
 
@@ -981,7 +982,7 @@ void MainWindow::deleteDataSlot()
 	QString text = QString("Do you really want to delete data %1?").arg(dataManager()->getActiveImage()->getName());
 	if (QMessageBox::question(this, "Data delete", text, QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel))!=QMessageBox::Ok)
 		return;
-	patientService()->getPatientData()->removeData(dataManager()->getActiveImage()->getUid());
+	mPatientModelService->removePatientData(dataManager()->getActiveImage()->getUid());
 }
 
 void MainWindow::configureSlot()

@@ -81,7 +81,7 @@ class VideoConnectionWidget : public BaseWidget
   Q_OBJECT
 
 public:
-	VideoConnectionWidget(QWidget* parent);
+	VideoConnectionWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent);
 	virtual ~VideoConnectionWidget();
 	virtual QString defaultWhatsThis() const;
 
@@ -133,6 +133,8 @@ protected:
 	FileInputWidget* mLocalServerFile;
 	XmlOptionFile mOptions;
 	DetailedLabeledComboBoxWidget* mConnectionSelectionWidget;
+	VisualizationServicePtr mVisualizationService;
+	PatientModelServicePtr mPatientModelService;
 
 private:
 	QWidget* createStreamerWidget(StreamerService* service);

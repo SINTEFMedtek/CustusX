@@ -56,7 +56,7 @@ class GeneralTab : public PreferenceTab
   Q_OBJECT
 
 public:
-  GeneralTab(QWidget *parent = 0);
+  GeneralTab(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent = 0);
   virtual ~GeneralTab();
   void init();
 
@@ -84,6 +84,8 @@ private:
 
   QString mGlobalPatientDataFolder;
   QString mVLCPath;
+  VisualizationServicePtr mVisualizationService;
+  PatientModelServicePtr mPatientModelService;
 };
 } /* namespace cx */
 #endif /* CXGENERALTAB_H_ */

@@ -40,8 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFilter.h"
 #include "cxBinaryThresholdImageFilter.h"
 #include "cxPipelineWidget.h"
-//#include "cxResampleImageFilter.h"
-//#include "cxSmoothingImageFilter.h"
 
 //To be removed
 #include "cxDataLocations.h"
@@ -50,6 +48,7 @@ namespace cx
 {
 
 RegistrationMethodModelToUSWidget::RegistrationMethodModelToUSWidget(RegistrationServicePtr registrationService,
+																	 VisualizationServicePtr visualizationService,
 																	 PatientModelServicePtr patientModelService,
 																	 QWidget* parent, QString objectName) :
 	BaseWidget(parent, objectName, "Model to US Registration"),
@@ -70,7 +69,7 @@ RegistrationMethodModelToUSWidget::RegistrationMethodModelToUSWidget(Registratio
 	//filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(patientModelService)));
 	mPipeline->initialize(filters);
 
-	PipelineWidget *mPipelineWidget = new PipelineWidget(NULL, mPipeline);
+	PipelineWidget *mPipelineWidget = new PipelineWidget(visualizationService, patientModelService, NULL, mPipeline);
 	mVerticalLayout->addWidget(mPipelineWidget);
 
 }

@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include <boost/shared_ptr.hpp>
+#include <vector>
 
 #define VisualizationService_iid "cx::VisualizationService"
 
@@ -42,6 +43,8 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
+typedef boost::shared_ptr<class ViewGroup> ViewGroupPtr;
+typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 
 /** \brief Visualization services
  *
@@ -53,11 +56,15 @@ class VisualizationService : public QObject
 {
 	Q_OBJECT
 public:
+	virtual int getActiveViewGroup() const = 0;
+//	virtual std::vector<ViewGroupPtr> getViewGroups() = 0;
+	virtual ViewGroupDataPtr getViewGroupData(int groupIdx) = 0;
 
 	virtual bool isNull() = 0;
 	static VisualizationServicePtr getNullObject();
 
 signals:
+	void activeViewChanged(); ///< emitted when the active view changes
 
 public slots:
 

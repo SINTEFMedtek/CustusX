@@ -41,10 +41,12 @@ class VisualizationServiceNull : public VisualizationService
 {
 public:
 	VisualizationServiceNull();
+	virtual int getActiveViewGroup() const;
+	virtual ViewGroupDataPtr getViewGroupData(int groupIdx);
 
 	virtual bool isNull();
 private:
-	void printWarning();
+	void printWarning() const;
 };
 } //cx
 #endif // CXVISUALIZATIONSERVICENULL_H

@@ -55,6 +55,10 @@ public:
 	VisualizationImplService(ctkPluginContext* context);
 	virtual ~VisualizationImplService();
 
+	virtual int getActiveViewGroup() const;
+//	virtual std::vector<ViewGroupPtr> getViewGroups();
+	virtual ViewGroupDataPtr getViewGroupData(int groupIdx);
+
 	virtual bool isNull();
 
 private:

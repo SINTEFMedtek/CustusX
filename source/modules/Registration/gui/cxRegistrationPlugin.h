@@ -65,7 +65,7 @@ class RegistrationPlugin : public GUIExtenderService
 {
 	Q_OBJECT
 public:
-	RegistrationPlugin(cx::RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, AcquisitionDataPtr acquisitionData);
+	RegistrationPlugin(cx::RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, AcquisitionDataPtr acquisitionData);
 	virtual ~RegistrationPlugin() {}
 
 	virtual std::vector<CategorizedWidget> createWidgets() const;
@@ -77,6 +77,7 @@ private:
 	RegistrationManagerPtr mRegistrationManager;
 	AcquisitionDataPtr mAquisitionData;
 	RegistrationServicePtr mRegistrationService;
+	VisualizationServicePtr mVisualizationService;
 	PatientModelServicePtr mPatientModelService;
 };
 

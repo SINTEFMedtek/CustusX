@@ -45,9 +45,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-RegistrationPlugin::RegistrationPlugin(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, AcquisitionDataPtr acquisitionData) :
+RegistrationPlugin::RegistrationPlugin(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, AcquisitionDataPtr acquisitionData) :
 	mAquisitionData(acquisitionData),
 	mRegistrationService(registrationService),
+	mVisualizationService(visualizationService),
 	mPatientModelService(patientModelService)
 {
 	mRegistrationManager.reset(new RegistrationManager(registrationService, acquisitionData));
@@ -61,10 +62,10 @@ std::vector<GUIExtenderService::CategorizedWidget> RegistrationPlugin::createWid
 			new RegistrationHistoryWidget(NULL),
 			"Browsing"));
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new RegistrationMethodsWidget(mRegistrationService, mPatientModelService, NULL, "RegistrationMethodsWidget", "Registration Methods"),
+			new RegistrationMethodsWidget(mRegistrationService, mVisualizationService, mPatientModelService, NULL, "RegistrationMethodsWidget", "Registration Methods"),
 			"Algorithms"));
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new WirePhantomWidget(mRegistrationService, mPatientModelService, mAquisitionData, NULL),
+			new WirePhantomWidget(mRegistrationService, mVisualizationService, mPatientModelService, mAquisitionData, NULL),
 			"Algorithms"));
 
 	return retval;

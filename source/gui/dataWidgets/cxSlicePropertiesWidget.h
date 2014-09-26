@@ -57,7 +57,7 @@ class SlicePropertiesWidget : public TabbedWidget
   Q_OBJECT
 
 public:
-	SlicePropertiesWidget(cx::PatientModelServicePtr patientModelService, QWidget* parent);
+	SlicePropertiesWidget(cx::PatientModelServicePtr patientModelService, cx::VisualizationServicePtr visualizationService, QWidget* parent);
 	virtual ~SlicePropertiesWidget();
   virtual QString defaultWhatsThis() const;
 

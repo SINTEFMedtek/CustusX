@@ -70,8 +70,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
-		BaseWidget(parent, "IGTLinkWidget", "Video Connection")
+VideoConnectionWidget::VideoConnectionWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+	BaseWidget(parent, "IGTLinkWidget", "Video Connection"),
+	mVisualizationService(visualizationService),
+	mPatientModelService(patientModelService)
 {
 	mInitScriptWidget=NULL;
 
@@ -136,7 +138,7 @@ QWidget* VideoConnectionWidget::createStreamerWidget(StreamerService* service)
 	QDomElement element = mOptions.getElement("video");
 	std::vector<DataAdapterPtr> adapters = service->getSettings(element);
 
-	OptionsWidget* widget = new OptionsWidget(this);
+	OptionsWidget* widget = new OptionsWidget(mVisualizationService, mPatientModelService, this);
 	widget->setOptions(serviceName, adapters, false);
 
 	connect(mConnectionSelectionWidget, SIGNAL(detailsTriggered()), widget, SLOT(toggleAdvanced()));

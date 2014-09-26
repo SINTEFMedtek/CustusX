@@ -59,12 +59,11 @@ class BronchoscopyRegistrationWidget: public RegistrationBaseWidget
 {
 	Q_OBJECT
 public:
-	BronchoscopyRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
+	BronchoscopyRegistrationWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent);
 	virtual ~BronchoscopyRegistrationWidget()
 	{
 	}
 	virtual QString defaultWhatsThis() const;
-
 private slots:
 	void registerSlot();
 	void acquisitionStarted();

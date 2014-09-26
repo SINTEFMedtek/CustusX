@@ -45,8 +45,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-GeneralTab::GeneralTab(QWidget *parent) :
-		PreferenceTab(parent), mVLCPath("")
+GeneralTab::GeneralTab(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent) :
+	PreferenceTab(parent), mVLCPath(""),
+	mVisualizationService(visualizationService),
+	mPatientModelService(patientModelService)
 {
 	mPatientDataFolderComboBox = NULL;
 	mVLCPathComboBox = NULL;
@@ -106,7 +108,7 @@ void GeneralTab::init()
   mainLayout->addWidget(mVLCPathComboBox, 2, 1);
   mainLayout->addWidget(browseVLCPathButton, 2, 2);
 
-  createDataWidget(this, mFilterToolPositions, mainLayout, 3);
+  createDataWidget(mVisualizationService, mPatientModelService, this, mFilterToolPositions, mainLayout, 3);
 //  mainLayout->addWidget(createDataWidget(this, mFilterToolPositions ));
 
   mTopLayout->addLayout(mainLayout);

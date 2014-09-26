@@ -58,7 +58,7 @@ class MeshInfoWidget : public InfoWidget
   Q_OBJECT
 
 public:
-	MeshInfoWidget(PatientModelServicePtr patientModelService, QWidget* parent);
+	MeshInfoWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent);
   virtual ~MeshInfoWidget();
 
 protected slots:
@@ -84,6 +84,7 @@ private:
   QCheckBox* mBackfaceCullingCheckBox;
   QCheckBox* mFrontfaceCullingCheckBox;
   PatientModelServicePtr mPatientModelService;
+  VisualizationServicePtr mVisualizationService;
   
   MeshInfoWidget();
 };

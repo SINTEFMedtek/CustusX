@@ -177,6 +177,11 @@ void PatientModelServiceNull::exportPatient(bool niftiFormat)
 	printWarning();
 }
 
+void PatientModelServiceNull::removePatientData(QString uid)
+{
+	printWarning();
+}
+
 PresetTransferFunctions3DPtr PatientModelServiceNull::getPresetTransferFunctions3D() const
 {
 	printWarning();

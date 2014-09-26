@@ -54,9 +54,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxHelperWidgets.h"
 #include "cxApplicationStateMachine.h"
 #include "cxMultiVolume3DRepProducer.h"
-
-#include "cxDataManager.h"
 #include "cxDummyTool.h"
+
+//TODO: remove
+#include "cxDataManager.h"
 
 namespace cx
 {
@@ -475,7 +476,7 @@ void ToolConfigTab::globalConfigurationFileChangedSlot(QString key)
 // PreferencesDialog
 //------------------------------------------------------------------------------
 
-PreferencesDialog::PreferencesDialog(QWidget *parent) :
+PreferencesDialog::PreferencesDialog(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent) :
   QDialog(parent)
 {
   mActionGroup = new QActionGroup(this);
@@ -486,7 +487,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
 
   mButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel);
 
-  this->addTab(new GeneralTab, tr("General"));
+  this->addTab(new GeneralTab(visualizationService, patientModelService), tr("General"));
   this->addTab(new PerformanceTab, tr("Performance"));
   this->addTab(new AutomationTab, tr("Automation"));
   this->addTab(new VisualizationTab, tr("Visualization"));

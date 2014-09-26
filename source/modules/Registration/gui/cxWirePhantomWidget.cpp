@@ -56,22 +56,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPipelineWidget.h"
 #include "cxDataReaderWriter.h"
 #include "cxDataFactory.h"
-
 #include "cxSmoothingImageFilter.h"
 #include "cxBinaryThinningImageFilter3DFilter.h"
 #include "cxBinaryThresholdImageFilter.h"
-
-#include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 #include "cxReporter.h"
+#include "cxVisualizationService.h"
 
 namespace cx
 {
 
 
-WirePhantomWidget::WirePhantomWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, AcquisitionDataPtr aquisitionData, QWidget* parent) :
-				RegistrationBaseWidget(registrationService, parent, "WirePhantomWidget", "Wire Phantom Test"),
-				mAquisitionData(aquisitionData)
+WirePhantomWidget::WirePhantomWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, AcquisitionDataPtr aquisitionData, QWidget* parent) :
+	RegistrationBaseWidget(registrationService, parent, "WirePhantomWidget", "Wire Phantom Test"),
+	mAquisitionData(aquisitionData),
+	mVisualizationService(visualizationService)
 {
     mLastRegistration = Transform3D::Identity();
 
@@ -90,7 +89,7 @@ WirePhantomWidget::WirePhantomWidget(RegistrationServicePtr registrationService,
 
     mLayout = new QVBoxLayout(this);
 
-    mPipelineWidget = new PipelineWidget(NULL, mPipeline);
+	mPipelineWidget = new PipelineWidget(visualizationService, patientModelService, NULL, mPipeline);
 
     QPushButton* showCrossButton = new QPushButton("Show Cross");
     showCrossButton->setToolTip("Load the centerline description of the wire cross");
@@ -166,7 +165,7 @@ MeshPtr WirePhantomWidget::loadNominalCross()
 
 void WirePhantomWidget::showData(DataPtr data)
 {
-	viewManager()->getViewGroups()[0]->getData()->addData(data);
+	mVisualizationService->getViewGroupData(0)->addData(data);
 }
 
 void WirePhantomWidget::measureSlot()

@@ -57,12 +57,12 @@ namespace cx
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
-ActiveVolumeWidget::ActiveVolumeWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+ActiveVolumeWidget::ActiveVolumeWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
   BaseWidget(parent, "ActiveVolumeWidget", "Active Volume")
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setMargin(0);
-	layout->addWidget(new DataSelectWidget(this, ActiveImageStringDataAdapter::New(patientModelService)));
+	layout->addWidget(new DataSelectWidget(visualizationService, patientModelService, this, ActiveImageStringDataAdapter::New(patientModelService)));
 }
 
 QString ActiveVolumeWidget::defaultWhatsThis() const
@@ -78,10 +78,10 @@ QString ActiveVolumeWidget::defaultWhatsThis() const
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
-VolumePropertiesWidget::VolumePropertiesWidget(PatientModelServicePtr patientModelService, QWidget *parent) :
+VolumePropertiesWidget::VolumePropertiesWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget *parent) :
 		TabbedWidget(parent, "VolumePropertiesWidget", "Volume Properties")
 {
-	this->insertWidgetAtTop(new ActiveVolumeWidget(patientModelService, this));
+	this->insertWidgetAtTop(new ActiveVolumeWidget(patientModelService, visualizationService, this));
 
 	this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");
 	this->addTab(new TransferFunctionWidget(patientModelService, this), QString("Transfer Functions"));

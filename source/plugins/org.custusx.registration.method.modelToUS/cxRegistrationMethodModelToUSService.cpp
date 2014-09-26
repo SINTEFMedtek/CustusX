@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationMethodModelToUSWidget.h"
 #include "cxRegistrationServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
+#include "cxVisualizationServiceProxy.h"
 
 namespace cx
 {
@@ -47,9 +48,10 @@ QWidget* RegistrationMethodModelToUSService::createWidget()
 {
 
 	RegistrationServicePtr registrationService(new RegistrationServiceProxy(mPluginContext));
+	VisualizationServicePtr visualizationService(new VisualizationServiceProxy(mPluginContext));
 	PatientModelServicePtr patientModelService(new PatientModelServiceProxy(mPluginContext));
 
-	QWidget* retval = new RegistrationMethodModelToUSWidget(registrationService, patientModelService, NULL, this->getWidgetName());
+	QWidget* retval = new RegistrationMethodModelToUSWidget(registrationService, visualizationService, patientModelService, NULL, this->getWidgetName());
 	return retval;
 }
 

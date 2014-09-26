@@ -14,6 +14,7 @@ set(PLUGIN_SRCS
   cxRegistrationPluginActivator.cpp
   cxRegistrationPluginActivator.h
   cxRegistrationImplService.cpp
+  cxRegistrationImplService.h
   cxRegistrationApplicator.cpp
   cxRegistrationApplicator.h
   cxLandmarkTranslationRegistration.cpp
@@ -23,7 +24,6 @@ set(PLUGIN_SRCS
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxRegistrationPluginActivator.h
-  cxRegistrationImplService.h
 )
 
 # Qt Designer files which should be processed by Qts uic

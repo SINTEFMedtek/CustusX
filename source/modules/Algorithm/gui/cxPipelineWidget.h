@@ -82,7 +82,7 @@ class PipelineWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	PipelineWidget(QWidget* parent, PipelinePtr pipeline);
+	PipelineWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, PipelinePtr pipeline);
 	QString defaultWhatsThis() const;
 private slots:
 	void runFilterSlot();

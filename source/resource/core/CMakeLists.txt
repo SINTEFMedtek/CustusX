@@ -28,7 +28,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Data/cxSphereMetric
 	Data/cxMetricReferenceArgumentList
 	Data/cxLandmark
-	Data/cxDataFactory
 
 	Video/cxVideoSource.h
 	Video/cxVideoRecorder
@@ -78,7 +77,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
     utilities/cxProcessWrapper.h
 	utilities/cxProcessReporter
 	utilities/cxVLCRecorder
-	utilities/cxSpaceProvider
 	utilities/cxSpaceListener
 	utilities/cxSpaceListenerImpl
 
@@ -113,6 +111,7 @@ cx_add_class(cxResource_SOURCE
 	Data/cxImageDefaultTFGenerator
 	Data/cxImageParameters
 	Data/cxFrameForest
+	Data/cxDataFactory
 
 	Math/cxBoundingBox3D
 	Math/cxVector3D
@@ -151,6 +150,7 @@ cx_add_class(cxResource_SOURCE
 	utilities/cxPlaneTypeCollection
 	utilities/cxSharedPointerChecker
 	utilities/cxNullDeleter.h
+	utilities/cxSpaceProvider
 	utilities/cxSpaceProviderImpl
 
 	logger/cxAudio.h
