@@ -398,7 +398,9 @@ void MainWindow::createActions()
 	mShowPointPickerAction->setToolTip("Activate the 3D Point Picker Probe");
 	mShowPointPickerAction->setIcon(QIcon(":/icons/point_picker.png"));
 	connect(mShowPointPickerAction, SIGNAL(triggered()), this, SLOT(togglePointPickerActionSlot()));
-	connect(mVisualizationService->getViewGroupData(0).get(), SIGNAL(optionsChanged()), this,
+
+	connect(viewManager()->getViewGroups()[0]->getData().get(), SIGNAL(optionsChanged()), this,
+//	connect(mVisualizationService->getViewGroupData(0).get(), SIGNAL(optionsChanged()), this, //Too early?
 		SLOT(updatePointPickerActionSlot()));
 	this->updatePointPickerActionSlot();
 
@@ -536,7 +538,8 @@ void MainWindow::centerToImageCenterSlot()
 	if (dataManager()->getActiveImage())
 		nav->centerToData(dataManager()->getActiveImage());
 	else if (!viewManager()->getViewGroups().empty())
-		nav->centerToView(mVisualizationService->getViewGroupData(0)->getData());
+		nav->centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
+//		nav->centerToView(mVisualizationService->getViewGroupData(0)->getData());//Too early?
 	else
 		nav->centerToGlobalDataCenter();
 }
@@ -549,14 +552,16 @@ void MainWindow::centerToTooltipSlot()
 
 void MainWindow::togglePointPickerActionSlot()
 {
-	ViewGroupDataPtr data = mVisualizationService->getViewGroupData(0);
+	ViewGroupDataPtr data = viewManager()->getViewGroups()[0]->getData();
+//	ViewGroupDataPtr data = mVisualizationService->getViewGroupData(0); //Too early?
 	ViewGroupData::Options options = data->getOptions();
 	options.mShowPointPickerProbe = !options.mShowPointPickerProbe;
 	data->setOptions(options);
 }
 void MainWindow::updatePointPickerActionSlot()
 {
-	bool show = mVisualizationService->getViewGroupData(0)->getOptions().mShowPointPickerProbe;
+	bool show = viewManager()->getViewGroups()[0]->getData()->getOptions().mShowPointPickerProbe;
+//	bool show = mVisualizationService->getViewGroupData(0)->getOptions().mShowPointPickerProbe;//TOO early?
 	mShowPointPickerAction->setChecked(show);
 }
 
