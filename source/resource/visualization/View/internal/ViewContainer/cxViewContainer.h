@@ -70,8 +70,6 @@ public:
 	virtual QGridLayout *getGridLayout();
 
 private:
-	void setStretchFactors(LayoutRegion region, int stretchFactor);
-
 	virtual void paintEvent(QPaintEvent *event);
 	virtual void showEvent(QShowEvent* event);
 	virtual void wheelEvent(QWheelEvent*);

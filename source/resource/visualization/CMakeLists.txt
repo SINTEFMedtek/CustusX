@@ -8,8 +8,9 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	View/cxView
 	View/cxLayoutWidget
 
+	View/internal/cxViewUtilities
 	View/internal/cxViewRepCollection
-	View/internal/cxLayoutWidgetMixed
+	View/internal/ViewMixed/cxLayoutWidgetMixed
 	View/internal/ViewWidget/cxViewLinkingViewWidget
 	View/internal/ViewWidget/cxViewWidget
 	View/internal/ViewWidget/cxViewWidgetLayout
@@ -146,6 +147,7 @@ include_directories(${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
 	View/internal
 	View/internal/ViewWidget
 	View/internal/ViewContainer
+	View/internal/ViewMixed
     )
 
 QT5_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

@@ -56,7 +56,7 @@ ViewsWindow::ViewsWindow()
 
 	this->setNiceSize();
 
-	mLayoutWidget = cx::LayoutWidget::createViewWidgetLayout();
+	mLayoutWidget = cx::ViewCollectionWidget::createViewWidgetLayout();
 	this->setCentralWidget(mLayoutWidget);
 
 	mRenderingTimer = new QTimer(this);

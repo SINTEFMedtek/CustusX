@@ -111,7 +111,7 @@ TestRenderSpeed::TestRenderSpeed()
 {
 	mCounter.setName("cxView");
 	cx::reporter()->initialize();
-	mMainWidget.reset(cx::LayoutWidget::createViewWidgetLayout().data());
+	mMainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout().data());
 }
 
 TestRenderSpeed::~TestRenderSpeed()

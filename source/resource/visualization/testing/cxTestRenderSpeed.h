@@ -103,7 +103,7 @@ public:
 
 
 	std::vector<cx::ViewPtr> mViews;
-	boost::shared_ptr<cx::LayoutWidget> mMainWidget;
+	boost::shared_ptr<cx::ViewCollectionWidget> mMainWidget;
 	RenderSpeedCounter mCounter;
 };
 

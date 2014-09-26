@@ -67,7 +67,7 @@ private:
 	void setNiceSize();
 
 	std::vector<cx::ViewPtr > mViews;
-	cx::LayoutWidget* mLayoutWidget;
+	cx::ViewCollectionWidget* mLayoutWidget;
 
 	double mZoomFactor;
 	QTimer* mRenderingTimer;

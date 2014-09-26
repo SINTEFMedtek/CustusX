@@ -50,14 +50,14 @@ namespace cx
  * \date 05.11.2013
  * \author christiana
  */
-class LayoutWidget : public QWidget
+class ViewCollectionWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	static QPointer<LayoutWidget> createViewWidgetLayout();
-	static QPointer<LayoutWidget> createViewCollectionLayout();
+	static QPointer<ViewCollectionWidget> createViewWidgetLayout();
+	static QPointer<ViewCollectionWidget> createViewCollectionLayout();
 
-	virtual ~LayoutWidget() {}
+	virtual ~ViewCollectionWidget() {}
 
 	virtual ViewPtr addView(View::Type type, LayoutRegion region) = 0;
 	virtual void clearViews() = 0;
@@ -67,7 +67,7 @@ public:
 	virtual void setGridMargin(int val) = 0;
 
 protected:
-	LayoutWidget() {}
+	ViewCollectionWidget() {}
 };
 
 

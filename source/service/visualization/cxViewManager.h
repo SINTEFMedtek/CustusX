@@ -54,7 +54,7 @@ namespace cx
 class LayoutData;
 class LayoutViewData;
 struct LayoutRegion;
-class LayoutWidget;
+class ViewCollectionWidget;
 class ViewWrapper;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
@@ -188,7 +188,7 @@ protected:
 
 	void syncOrientationMode(SyncedValuePtr val);
 
-	void activateView(LayoutWidget* widget, LayoutViewData viewData);
+	void activateView(ViewCollectionWidget* widget, LayoutViewData viewData);
 	ViewWrapperPtr createViewWrapper(ViewPtr view, LayoutViewData viewData);
 
 	void setRenderingInterval(int interval);
@@ -196,13 +196,13 @@ protected:
 
 	void loadGlobalSettings();
 	void saveGlobalSettings();
-	void activateViews(LayoutWidget *widget, LayoutData next);
+	void activateViews(ViewCollectionWidget *widget, LayoutData next);
 	void rebuildLayouts();
 	void initializeGlobal2DZoom();
 	void initializeActiveView();
 
 	LayoutRepositoryPtr mLayoutRepository;
-	std::vector<QPointer<LayoutWidget> > mLayoutWidgets;
+	std::vector<QPointer<ViewCollectionWidget> > mLayoutWidgets;
 	QStringList mActiveLayout; ///< the active layout (type)
 	SyncedValuePtr mActiveView;
 	RenderLoopPtr mRenderLoop;

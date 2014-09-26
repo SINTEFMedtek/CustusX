@@ -50,12 +50,12 @@ namespace cx
  * but one vtkRenderer for each View inside.
  *
  */
-class LayoutWidgetUsingViewCollection : public LayoutWidget
+class ViewCollectionWidgetUsingViewCollection : public ViewCollectionWidget
 {
 	Q_OBJECT
 public:
-	LayoutWidgetUsingViewCollection();
-	~LayoutWidgetUsingViewCollection();
+	ViewCollectionWidgetUsingViewCollection();
+	~ViewCollectionWidgetUsingViewCollection();
 
 	ViewPtr addView(View::Type type, LayoutRegion region);
 	void clearViews();

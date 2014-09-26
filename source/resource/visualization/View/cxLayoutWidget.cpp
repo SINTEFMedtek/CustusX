@@ -46,16 +46,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-QPointer<LayoutWidget> LayoutWidget::createViewWidgetLayout()
+QPointer<ViewCollectionWidget> ViewCollectionWidget::createViewWidgetLayout()
 {
 //	return new LayoutWidgetUsingViewCollection(); // testing
 //	return new LayoutWidgetUsingViewWidgets();
-	return new LayoutWidgetMixed();
+	return new ViewCollectionWidgetMixed();
 }
 
-QPointer<LayoutWidget> LayoutWidget::createViewCollectionLayout()
+QPointer<ViewCollectionWidget> ViewCollectionWidget::createViewCollectionLayout()
 {
-	return new LayoutWidgetUsingViewCollection();
+	return new ViewCollectionWidgetUsingViewCollection();
 }
 
 } // namespace cx

@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxGLHelpers.h"
 #include "cxViewContainer.h"
+#include "cxViewUtilities.h"
+
 
 namespace cx
 {
@@ -68,7 +70,7 @@ ViewPtr LayoutWidgetUsingViewWidgets::addView(View::Type type, LayoutRegion regi
 	view->getView()->setType(type);
 
 	mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col);
-	this->setStretchFactors(region, 1);
+	view_utils::setStretchFactors(mLayout, region, 1);
 	view->show();
 
 	mViews.push_back(view);
@@ -87,20 +89,6 @@ ViewWidget* LayoutWidgetUsingViewWidgets::retrieveView(View::Type type)
 	return this->mViewCache->retrieveView();
 }
 
-void LayoutWidgetUsingViewWidgets::setStretchFactors(LayoutRegion region, int stretchFactor)
-{
-	// set stretch factors for the affected cols to 1 in order to get even distribution
-	for (int i = region.pos.col; i < region.pos.col + region.span.col; ++i)
-	{
-		mLayout->setColumnStretch(i, stretchFactor);
-	}
-	// set stretch factors for the affected rows to 1 in order to get even distribution
-	for (int i = region.pos.row; i < region.pos.row + region.span.row; ++i)
-	{
-		mLayout->setRowStretch(i, stretchFactor);
-	}
-}
-
 void LayoutWidgetUsingViewWidgets::clearViews()
 {
 	mViewCache2D->clearUsedViews();
@@ -114,7 +102,7 @@ void LayoutWidgetUsingViewWidgets::clearViews()
 	}
 	mViews.clear();
 
-	this->setStretchFactors(LayoutRegion(0, 0, 10, 10), 0);
+	view_utils::setStretchFactors(mLayout, LayoutRegion(0, 0, 10, 10), 0);
 }
 
 void LayoutWidgetUsingViewWidgets::setModified()

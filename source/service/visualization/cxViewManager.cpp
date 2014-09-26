@@ -176,7 +176,7 @@ QWidget *ViewManager::getLayoutWidget(int index)
 	SSC_ASSERT(index < mLayoutWidgets.size());
 	if (!mLayoutWidgets[index])
 	{
-		mLayoutWidgets[index] = LayoutWidget::createViewWidgetLayout();
+		mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout();
 		mRenderLoop->addLayout(mLayoutWidgets[index]);
 
 		this->rebuildLayouts();
@@ -455,7 +455,7 @@ void ViewManager::setSlicePlanesProxyInViewsUpTo2DViewgroup()
 			break;
 	}
 }
-void ViewManager::activateViews(LayoutWidget *widget, LayoutData next)
+void ViewManager::activateViews(ViewCollectionWidget *widget, LayoutData next)
 {
 	if (!widget)
 		return;
@@ -469,7 +469,7 @@ void ViewManager::setRenderingInterval(int interval)
 	mRenderLoop->setRenderingInterval(interval);
 }
 
-void ViewManager::activateView(LayoutWidget* widget, LayoutViewData viewData)
+void ViewManager::activateView(ViewCollectionWidget* widget, LayoutViewData viewData)
 {
 	if (!viewData.isValid())
 		return;

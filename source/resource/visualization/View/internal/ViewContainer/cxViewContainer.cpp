@@ -50,6 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransform3D.h"
 #include <QGridLayout>
 #include "cxLogger.h"
+#include "cxViewUtilities.h"
+
 
 namespace cx
 {
@@ -80,7 +82,7 @@ void ViewContainer::clear()
 		ViewItem* viewItem = dynamic_cast<ViewItem*>(item);
 		delete viewItem;
 	}
-	this->setStretchFactors(LayoutRegion(0, 0, 10, 10), 0);
+	view_utils::setStretchFactors(this->getGridLayout(), LayoutRegion(0, 0, 10, 10), 0);
 	this->setModified();
 	mMouseEventTarget = NULL;
 }
@@ -130,23 +132,9 @@ ViewItem *ViewContainer::addView(QString uid, LayoutRegion region, QString name)
 		getGridLayout()->addItem(item,
 								 region.pos.row, region.pos.col,
 								 region.span.row, region.span.col);
-	this->setStretchFactors(region, 1);
+	view_utils::setStretchFactors(this->getGridLayout(), region, 1);
 
 	return item;
-}
-
-void ViewContainer::setStretchFactors(LayoutRegion region, int stretchFactor)
-{
-	// set stretch factors for the affected cols to 1 in order to get even distribution
-	for (int i = region.pos.col; i < region.pos.col + region.span.col; ++i)
-	{
-		getGridLayout()->setColumnStretch(i, stretchFactor);
-	}
-	// set stretch factors for the affected rows to 1 in order to get even distribution
-	for (int i = region.pos.row; i < region.pos.row + region.span.row; ++i)
-	{
-		getGridLayout()->setRowStretch(i, stretchFactor);
-	}
 }
 
 void ViewContainer::initializeRenderWindow()

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-LayoutWidgetUsingViewCollection::LayoutWidgetUsingViewCollection()
+ViewCollectionWidgetUsingViewCollection::ViewCollectionWidgetUsingViewCollection()
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	this->setLayout(layout);
@@ -55,11 +55,11 @@ LayoutWidgetUsingViewCollection::LayoutWidgetUsingViewCollection()
 	layout->addWidget(mViewContainer);
 }
 
-LayoutWidgetUsingViewCollection::~LayoutWidgetUsingViewCollection()
+ViewCollectionWidgetUsingViewCollection::~ViewCollectionWidgetUsingViewCollection()
 {
 }
 
-ViewPtr LayoutWidgetUsingViewCollection::addView(View::Type type, LayoutRegion region)
+ViewPtr ViewCollectionWidgetUsingViewCollection::addView(View::Type type, LayoutRegion region)
 {
 	static int nameGenerator = 0;
 	QString uid = QString("view-%1-%2")
@@ -74,28 +74,28 @@ ViewPtr LayoutWidgetUsingViewCollection::addView(View::Type type, LayoutRegion r
 	return view;
 }
 
-void LayoutWidgetUsingViewCollection::clearViews()
+void ViewCollectionWidgetUsingViewCollection::clearViews()
 {
 	mViews.clear();
 	mViewContainer->clear();
 }
 
-void LayoutWidgetUsingViewCollection::setModified()
+void ViewCollectionWidgetUsingViewCollection::setModified()
 {
 	mViewContainer->setModified();
 }
 
-void LayoutWidgetUsingViewCollection::render()
+void ViewCollectionWidgetUsingViewCollection::render()
 {
 	mViewContainer->renderAll();
 }
 
-void LayoutWidgetUsingViewCollection::setGridSpacing(int val)
+void ViewCollectionWidgetUsingViewCollection::setGridSpacing(int val)
 {
 	mViewContainer->getGridLayout()->setSpacing(val);
 }
 
-void LayoutWidgetUsingViewCollection::setGridMargin(int val)
+void ViewCollectionWidgetUsingViewCollection::setGridMargin(int val)
 {
 	mViewContainer->getGridLayout()->setMargin(val);
 }

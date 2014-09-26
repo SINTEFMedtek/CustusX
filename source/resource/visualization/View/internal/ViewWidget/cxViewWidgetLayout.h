@@ -52,7 +52,7 @@ namespace cx
  * \date 05.11.2013
  * \author christiana
  */
-class LayoutWidgetUsingViewWidgets : public LayoutWidget
+class LayoutWidgetUsingViewWidgets : public ViewCollectionWidget
 {
 	Q_OBJECT
 public:
@@ -60,7 +60,6 @@ public:
 	~LayoutWidgetUsingViewWidgets();
 
 	virtual ViewPtr addView(View::Type type, LayoutRegion region);
-//	void showViews();
 	virtual void clearViews();
 	virtual void setModified();
 	virtual void render();
@@ -68,8 +67,6 @@ public:
 	virtual void setGridMargin(int val);
 
 private:
-	void setStretchFactors(LayoutRegion region, int stretchFactor); ///< Set the stretch factors of columns and rows in mLayout.
-//	void addView(ViewWidget* view, LayoutRegion region);
 	ViewWidget* retrieveView(View::Type type);
 
 	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache2D;

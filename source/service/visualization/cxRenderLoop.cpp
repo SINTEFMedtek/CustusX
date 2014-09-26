@@ -92,7 +92,7 @@ void RenderLoop::sendRenderIntervalToTimer(int interval)
 	mTimer->start(interval);
 }
 
-void RenderLoop::addLayout(LayoutWidget* layout)
+void RenderLoop::addLayout(ViewCollectionWidget* layout)
 {
 	mLayoutWidgets.push_back(layout);
 }
