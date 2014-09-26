@@ -14,13 +14,13 @@ include_directories(
 set(PLUGIN_SRCS
   cxRegistrationGUIPluginActivator.cpp
   cxRegistrationGUIExtenderService.cpp
+  cxRegistrationGUIExtenderService.h
   cxRegistrationWidget.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxRegistrationGUIPluginActivator.h
-  cxRegistrationGUIExtenderService.h
   cxRegistrationWidget.h
 )
 

@@ -10,10 +10,11 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
     ${CustusX_SOURCE_DIR}/source/logic
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
-    ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
+	${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
     ${CustusX_SOURCE_DIR}/source/resource/filter
 	${CustusX_SOURCE_DIR}/source/resource/visualization
 	${CustusX_SOURCE_DIR}/source/gui/dataAdapters
+	${CustusX_SOURCE_DIR}/source/modules/Registration/gui
 )
 
 set(PLUGIN_SRCS
@@ -21,6 +22,8 @@ set(PLUGIN_SRCS
   cxRegistrationMethodModelToUSService.cpp
   cxRegistrationMethodModelToUSService.h
   cxRegistrationMethodModelToUSWidget.cpp
+  cxRegistrationMethodToUSPrepareWidget.cpp
+  cxRegistrationMethodToUSPrepareWidget.h
 )
 
 # Files which should be processed by Qts moc
@@ -46,6 +49,7 @@ set(PLUGIN_target_libraries
     cxPluginUtilities
     cxPluginAlgorithm
     cxResourceFilter
+	cxPluginRegistration
     )
 
 ctkMacroBuildPlugin(

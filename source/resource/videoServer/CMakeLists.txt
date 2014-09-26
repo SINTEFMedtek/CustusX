@@ -62,7 +62,6 @@ endif()
 SET( CX_QT_MOC_HEADER_FILES
 		cxImageServer.h
 		cxMHDImageStreamer.h
-		cxImageStreamerSonix.h
 		cxImageStreamerOpenCV.h
 		cxStreamer.h
 		cxSender.h

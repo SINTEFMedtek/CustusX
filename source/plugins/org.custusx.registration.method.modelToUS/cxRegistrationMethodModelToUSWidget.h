@@ -33,7 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONMETHODMODELTOUSWIDGET_H_
 #define CXREGISTRATIONMETHODMODELTOUSWIDGET_H_
 
-#include "cxBaseWidget.h"
+//#include "cxBaseWidget.h"
+#include "cxTabbedWidget.h"
 #include "cxRegistrationService.h"
 class QVBoxLayout;
 class ctkPluginContext;
@@ -49,7 +50,7 @@ namespace cx
  * \date Sep 16, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class RegistrationMethodModelToUSWidget : public BaseWidget
+class RegistrationMethodModelToUSWidget : public TabbedWidget
 {
 	Q_OBJECT
 public:

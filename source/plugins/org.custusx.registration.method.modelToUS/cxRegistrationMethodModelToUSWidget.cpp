@@ -36,13 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include "cxRegistrationService.h"
 #include "cxPatientModelService.h"
-#include "cxPipeline.h"
-#include "cxFilter.h"
-#include "cxBinaryThresholdImageFilter.h"
-#include "cxPipelineWidget.h"
+#include "cxRegistrationMethodToUSPrepareWidget.h"
+#include "cxRegistrationMethodsWidget.h"
+#include "cxRegisterI2IWidget.h"
 
-//To be removed
-#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -51,27 +48,17 @@ RegistrationMethodModelToUSWidget::RegistrationMethodModelToUSWidget(Registratio
 																	 VisualizationServicePtr visualizationService,
 																	 PatientModelServicePtr patientModelService,
 																	 QWidget* parent, QString objectName) :
-	BaseWidget(parent, objectName, "Model to US Registration"),
+	TabbedWidget(parent, objectName, "Model to US Registration"),
 	mVerticalLayout(new QVBoxLayout(this))
 {
 	//mVerticalLayout->addWidget(new QLabel("Hello Plugin!"));
 
-	//prepare
-	//Copied from PrepareVesselsWidget
-	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("registration").descend("PrepareVesselsWidget");
-	// fill the pipeline with filters:
-	PipelinePtr mPipeline;
-	mPipeline.reset(new Pipeline(patientModelService));
-	FilterGroupPtr filters(new FilterGroup(options.descend("pipeline")));
-	//filters->append(FilterPtr(new ResampleImageFilter(patientModelService)));
-	//filters->append(FilterPtr(new SmoothingImageFilter(patientModelService)));
-	filters->append(FilterPtr(new BinaryThresholdImageFilter(patientModelService)));
-	//filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(patientModelService)));
-	mPipeline->initialize(filters);
+	RegistrationMethodToUSPrepareWidget* prepareWidget = new RegistrationMethodToUSPrepareWidget(visualizationService, patientModelService, this, "PrepareModelToUSRegistrationWidget");
+	this->addTab(prepareWidget, "Prepare");
 
-	PipelineWidget *mPipelineWidget = new PipelineWidget(visualizationService, patientModelService, NULL, mPipeline);
-	mVerticalLayout->addWidget(mPipelineWidget);
-
+	//Try to reuse existing widget
+	Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(this, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
+	this->addTab(new RegisterI2IWidget(registrationService, patientModelService, image2imageWidget),"Register");
 }
 
 RegistrationMethodModelToUSWidget::~RegistrationMethodModelToUSWidget()
@@ -81,8 +68,8 @@ RegistrationMethodModelToUSWidget::~RegistrationMethodModelToUSWidget()
 QString RegistrationMethodModelToUSWidget::defaultWhatsThis() const
 {
   return "<html>"
-      "<h3>Example plugin.</h3>"
-      "<p>Used for developers as a starting points for developing a new plugin</p>"
+	  "<h3>Model to US registration.</h3>"
+	  "<p>Register a surface model of a vessel to a 3D/4D ultrasound volume</p>"
       "</html>";
 }
 
