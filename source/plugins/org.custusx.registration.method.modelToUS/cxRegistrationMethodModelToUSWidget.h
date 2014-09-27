@@ -59,7 +59,6 @@ public:
 
 private:
 	QString defaultWhatsThis() const;
-	QVBoxLayout*  mVerticalLayout;
 	//RegistrationServicePtr mRegistrationService;
 };
 

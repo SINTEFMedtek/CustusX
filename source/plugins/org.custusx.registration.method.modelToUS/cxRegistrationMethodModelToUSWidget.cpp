@@ -48,16 +48,15 @@ RegistrationMethodModelToUSWidget::RegistrationMethodModelToUSWidget(Registratio
 																	 VisualizationServicePtr visualizationService,
 																	 PatientModelServicePtr patientModelService,
 																	 QWidget* parent, QString objectName) :
-	TabbedWidget(parent, objectName, "Model to US Registration"),
-	mVerticalLayout(new QVBoxLayout(this))
+	TabbedWidget(parent, objectName, "Model to US Registration")
 {
 	//mVerticalLayout->addWidget(new QLabel("Hello Plugin!"));
 
-	RegistrationMethodToUSPrepareWidget* prepareWidget = new RegistrationMethodToUSPrepareWidget(visualizationService, patientModelService, this, "PrepareModelToUSRegistrationWidget");
+	RegistrationMethodToUSPrepareWidget* prepareWidget = new RegistrationMethodToUSPrepareWidget(visualizationService, patientModelService, NULL, "PrepareModelToUSRegistrationWidget");
 	this->addTab(prepareWidget, "Prepare");
 
 	//Try to reuse existing widget
-	Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(this, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
+	Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(NULL, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
 	this->addTab(new RegisterI2IWidget(registrationService, patientModelService, image2imageWidget),"Register");
 }
 
