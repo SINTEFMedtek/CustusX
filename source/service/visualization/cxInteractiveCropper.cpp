@@ -55,9 +55,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxTransform3D.h"
 #include "cxVolumetricRep.h"
-#include "cxActiveImageProxy.h"
 #include "cxVisualizationServiceBackend.h"
 #include "cxPatientModelService.h"
+
+//TODO: Use ActiveImageProxy when possible, and use patientModelService instead of VisualizationServiceBackend
+#include "cxActiveImageProxyOld.h"
+#include "cxDataManager.h"
 
 namespace cx
 {
@@ -113,10 +116,11 @@ public:
 //---------------------------------------------------------
 
 
-InteractiveCropper::InteractiveCropper(PatientModelServicePtr patientModelService) :
-	mPatientModelService(patientModelService)
+InteractiveCropper::InteractiveCropper(VisualizationServiceBackendPtr backend/*PatientModelServicePtr patientModelService*/) :
+	mBackend(backend)
+//	mPatientModelService(patientModelService)
 {
-	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
+	mActiveImageProxy = ActiveImageProxyOld::New(mBackend->getDataManager());
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(imageChangedSlot()));
 	connect(mActiveImageProxy.get(), SIGNAL(cropBoxChanged()), this, SLOT(imageCropChangedSlot()));
 }
@@ -238,7 +242,8 @@ void InteractiveCropper::resetBoundingBox()
 
 void InteractiveCropper::imageChangedSlot()
 {
-	mImage = mPatientModelService->getActiveImage();
+//	mImage = mPatientModelService->getActiveImage();
+	mImage = mBackend->getDataManager()->getActiveImage();
 
 	this->imageCropChangedSlot();
 	emit changed();
