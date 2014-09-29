@@ -44,17 +44,20 @@ class VideoServiceProxy : public VideoService
 {
 public:
 	VideoServiceProxy(ctkPluginContext *pluginContext);
-
 	bool isNull();
 
+	virtual StreamerService *getStreamerService(QString service);
 private:
 	void initServiceListener();
-	void onServiceAdded(VideoService* service);
-	void onServiceRemoved(VideoService *service);
+	void onVideoServiceAdded(VideoService* service);
+	void onVideoServiceRemoved(VideoService *service);
+	void onStreamerServiceAdded(StreamerService *service);
+	void onStreamerServiceRemoved(StreamerService *service);
 
 	ctkPluginContext *mPluginContext;
 	VideoServicePtr mVideoService;
-	boost::shared_ptr<ServiceTrackerListener<VideoService> > mServiceListener;
+	boost::shared_ptr<ServiceTrackerListener<VideoService> > mVideoServiceListener;
+	boost::shared_ptr<ServiceTrackerListener<StreamerService> > mStreamerServiceListener;
 };
 } //cx
 #endif // CXVIDEOSERVICEPROXY_H

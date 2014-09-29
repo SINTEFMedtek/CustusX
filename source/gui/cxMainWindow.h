@@ -237,6 +237,7 @@ private:
 
 	PatientModelServicePtr mPatientModelService;
 	VisualizationServicePtr mVisualizationService;
+	VideoServicePtr mVideoService;
 };
 
 }//namespace cx

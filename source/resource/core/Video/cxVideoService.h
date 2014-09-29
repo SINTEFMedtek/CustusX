@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+class StreamerService;
 
 typedef boost::shared_ptr<class VideoService> VideoServicePtr;
 
@@ -53,6 +54,7 @@ class VideoService : public QObject
 {
 	Q_OBJECT
 public:
+	virtual StreamerService *getStreamerService(QString service) = 0;
 
 	virtual bool isNull() = 0;
 	static VideoServicePtr getNullObject();

@@ -41,6 +41,7 @@ class VideoServiceNull : public VideoService
 {
 public:
 	VideoServiceNull();
+	virtual StreamerService *getStreamerService(QString service);
 
 	virtual bool isNull();
 private:

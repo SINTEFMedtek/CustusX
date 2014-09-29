@@ -136,7 +136,7 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	mVisualizationService = VisualizationServicePtr(new VisualizationServiceProxy(pluginContext));
 
 	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
-	this->addAsDockWidget(new VideoConnectionWidget(mVisualizationService, mPatientModelService, this), "Utility");
+	this->addAsDockWidget(new VideoConnectionWidget(mVisualizationService, mPatientModelService, mVideoService, this), "Utility");
 	this->addAsDockWidget(new EraserWidget(this), "Properties");
 	this->addAsDockWidget(new MetricWidget(mVisualizationService, mPatientModelService, this), "Utility");
 	this->addAsDockWidget(new SlicePropertiesWidget(mPatientModelService, mVisualizationService, this), "Properties");
@@ -514,7 +514,7 @@ void MainWindow::toggleStreamingSlot()
 	if (videoService()->getVideoConnection()->isConnected())
 		videoService()->getVideoConnection()->disconnectServer();
 	else
-		videoService()->getVideoConnection()->launchAndConnectServer();
+		videoService()->getVideoConnection()->launchAndConnectServer(mVideoService);
 }
 
 void MainWindow::updateStreamingActionSlot()

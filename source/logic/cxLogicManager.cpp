@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSharedPointerChecker.h"
 #include "cxPluginFramework.h"
 #include "cxPatientModelServiceProxy.h"
+#include "cxVideoServiceProxy.h"
 
 namespace cx
 {
@@ -223,7 +224,7 @@ void LogicManager::createVideoServiceOld()
 	VideoServiceBackendPtr videoBackend;
 	videoBackend = VideoServiceBackend::create(mDataService,
 											   mTrackingService,
-												 mSpaceProvider, getPluginFramework()->getPluginFramework());
+												 mSpaceProvider);
 	mVideoServiceOld = VideoServiceOld::create(videoBackend);
 	LegacySingletons::mVideoServiceOld = mVideoServiceOld;
 }
@@ -263,7 +264,8 @@ void LogicManager::createStateService()
 											mVideoServiceOld,
 										  mSpaceProvider,
 										  mPatientService));
-	mStateService = StateService::create(backend);
+	VideoServicePtr videoService(new VideoServiceProxy(getPluginContext()));
+	mStateService = StateService::create(videoService, backend);
 	LegacySingletons::mStateService = mStateService;
 }
 

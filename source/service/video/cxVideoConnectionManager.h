@@ -90,8 +90,8 @@ public:
 	QString getInitScript();
 
 	void launchServer();
-	void launchAndConnectServer(QString connectionMethod);
-	void launchAndConnectServer();
+	void launchAndConnectServer(VideoServicePtr videoService, QString connectionMethod);
+	void launchAndConnectServer(VideoServicePtr videoService);
 	void disconnectServer();
 
 	QProcess* getLocalVideoServerProcess();
@@ -112,14 +112,12 @@ public slots:
 	void serverProcessStateChanged(QProcess::ProcessState newState);
 
 private:
-	void onServiceAdded(StreamerService* service);
-	void onServiceRemoved(StreamerService *service);
 	void delayedAutoConnectServer();
 	void runScript();
 	bool localVideoServerIsRunning();
 	void setupAndRunDirectLinkClient();
 	void launchAndConnectUsingLocalServer();
-	bool connectToService();
+	bool connectToService(VideoServicePtr videoService);
 
 	QString mConnectionMethod;
 	VideoConnectionPtr mVideoConnection;
@@ -129,8 +127,6 @@ private:
 	ProcessWrapperPtr mIniScriptProcess;
 
 	VideoServiceBackendPtr mBackend;
-
-	boost::shared_ptr<ServiceTrackerListener<StreamerService> > mServiceListener;
 
 };
 typedef boost::shared_ptr<VideoConnectionManager> VideoConnectionManagerPtr;

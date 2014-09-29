@@ -162,11 +162,11 @@ private:
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
-StateServicePtr StateService::create(StateServiceBackendPtr backend)
+StateServicePtr StateService::create(VideoServicePtr videoService, StateServiceBackendPtr backend)
 {
 	StateServicePtr retval;
 	retval.reset(new StateService());
-	retval->initialize(backend);
+	retval->initialize(videoService, backend);
 	return retval;
 }
 
@@ -179,7 +179,7 @@ StateService::~StateService()
 {
 }
 
-void StateService::initialize(StateServiceBackendPtr backend)
+void StateService::initialize(VideoServicePtr videoService, StateServiceBackendPtr backend)
 {
 	mBackend = backend;
 	this->fillDefaultSettings();
@@ -187,7 +187,7 @@ void StateService::initialize(StateServiceBackendPtr backend)
 	mApplicationStateMachine.reset(new ApplicationStateMachine(mBackend));
 	mApplicationStateMachine->start();
 
-	mWorkflowStateMachine.reset(new WorkflowStateMachine(mBackend));
+	mWorkflowStateMachine.reset(new WorkflowStateMachine(videoService, mBackend));
 	mWorkflowStateMachine->start();
 }
 

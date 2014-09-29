@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogicManager.h"
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
+#include "cxVideoService.h"
 
 namespace cxtest
 {
@@ -64,8 +65,9 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][st
 	//Mock with null objects
 	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject();
 	cx::VisualizationServicePtr visualizationService = cx::VisualizationService::getNullObject();
+	cx::VideoServicePtr videoService = cx::VideoService::getNullObject();
 
-	TestVideoConnectionWidget* widget = new TestVideoConnectionWidget(visualizationService, patientModelService);
+	TestVideoConnectionWidget* widget = new TestVideoConnectionWidget(visualizationService, patientModelService, videoService);
 	REQUIRE(widget->canStream(filename, "MHDFile"));
 //	REQUIRE(widget->canStream(filename, "SimulatedImageStreamer"));
 

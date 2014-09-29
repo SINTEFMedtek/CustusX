@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogicManager.h"
 #include "cxPatientModelService.h"
 #include "cxVisualizationService.h"
+#include "cxVideoService.h"
 
 //cxBaseWidget children in alphabetical order
 #include "cxActiveToolWidget.h"
@@ -195,7 +196,8 @@ TEST_CASE("VideoConnectionWidget is correctly constructed", "[unit][gui][widget]
 	init();
 	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject(); //mock
 	cx::VisualizationServicePtr visualizationService = cx::VisualizationService::getNullObject(); //mock
-	testAndDeleteBaseWidgetChild(new cx::VideoConnectionWidget(visualizationService, patientModelService, NULL));
+	cx::VideoServicePtr videoService = cx::VideoService::getNullObject(); //mock
+	testAndDeleteBaseWidgetChild(new cx::VideoConnectionWidget(visualizationService, patientModelService, videoService, NULL));
 	shutdown();
 }
 

@@ -71,10 +71,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-VideoConnectionWidget::VideoConnectionWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+VideoConnectionWidget::VideoConnectionWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, VideoServicePtr videoService, QWidget* parent) :
 	BaseWidget(parent, "IGTLinkWidget", "Video Connection"),
 	mVisualizationService(visualizationService),
-	mPatientModelService(patientModelService)
+	mPatientModelService(patientModelService),
+	mVideoService(videoService)
 {
 	mInitScriptWidget=NULL;
 
@@ -106,6 +107,7 @@ VideoConnectionWidget::VideoConnectionWidget(VisualizationServicePtr visualizati
 	mToptopLayout->addWidget(sscCreateDataWidget(this, mActiveVideoSourceSelector));
 	mToptopLayout->addStretch();
 
+	//TODO: Use StreamerServerListener in VideoService
 	mServiceListener.reset(new ServiceTrackerListener<StreamerService>(
 													 cx::LogicManager::getInstance()->getPluginContext(),
 													 boost::bind(&VideoConnectionWidget::onServiceAdded, this, _1),
@@ -445,7 +447,7 @@ void VideoConnectionWidget::connectServer()
 	if (!this->getVideoConnectionManager()->isConnected())
 	{
 		this->writeSettings();
-		this->getVideoConnectionManager()->launchAndConnectServer(mConnectionSelector->getValue());
+		this->getVideoConnectionManager()->launchAndConnectServer(mVideoService, mConnectionSelector->getValue());
 	}
 }
 

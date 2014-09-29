@@ -50,8 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-TestVideoConnectionWidget::TestVideoConnectionWidget(cx::VisualizationServicePtr visualizationService, cx::PatientModelServicePtr patientModelService) :
-	VideoConnectionWidget(visualizationService, patientModelService, NULL)
+TestVideoConnectionWidget::TestVideoConnectionWidget(cx::VisualizationServicePtr visualizationService, cx::PatientModelServicePtr patientModelService, cx::VideoServicePtr videoService) :
+	VideoConnectionWidget(visualizationService, patientModelService, videoService, NULL)
 {
 }
 

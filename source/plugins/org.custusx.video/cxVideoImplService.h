@@ -54,6 +54,7 @@ class org_custusx_video_EXPORT VideoImplService : public VideoService
 public:
 	VideoImplService(ctkPluginContext* context);
 	virtual ~VideoImplService();
+	virtual StreamerService *getStreamerService(QString service);
 
 	virtual bool isNull();
 

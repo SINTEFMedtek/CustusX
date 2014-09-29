@@ -32,11 +32,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxVideoServiceNull.h"
 #include "cxReporter.h"
+#include "cxStreamerService.h"
 
 namespace cx
 {
 VideoServiceNull::VideoServiceNull()
 {
+}
+
+StreamerService *VideoServiceNull::getStreamerService(QString service)
+{
+	printWarning();
+	return NULL;
 }
 bool VideoServiceNull::isNull()
 {

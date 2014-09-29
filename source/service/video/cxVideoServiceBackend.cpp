@@ -42,18 +42,17 @@ namespace cx
 
 VideoServiceBackendPtr VideoServiceBackend::create(DataServicePtr dataManager,
 							TrackingServiceOldPtr toolManager,
-							SpaceProviderPtr spaceProvider, QSharedPointer<ctkPluginFramework> pluginFrameWork)
+							SpaceProviderPtr spaceProvider)
 {
-	return VideoServiceBackendPtr(new VideoServiceBackend(dataManager, toolManager, spaceProvider, pluginFrameWork));
+	return VideoServiceBackendPtr(new VideoServiceBackend(dataManager, toolManager, spaceProvider));
 }
 
 VideoServiceBackend::VideoServiceBackend(DataServicePtr dataManager,
 							TrackingServiceOldPtr toolManager,
-							SpaceProviderPtr spaceProvider, QSharedPointer<ctkPluginFramework> pluginFrameWork) :
+							SpaceProviderPtr spaceProvider) :
 	mDataManager(dataManager),
 	mToolManager(toolManager),
-	mSpaceProvider(spaceProvider),
-	mPluginFrameWork(pluginFrameWork)
+	mSpaceProvider(spaceProvider)
 {
 
 }
@@ -71,16 +70,6 @@ TrackingServiceOldPtr VideoServiceBackend::getToolManager()
 SpaceProviderPtr VideoServiceBackend::getSpaceProvider()
 {
 	return mSpaceProvider;
-}
-
-ctkPluginContext* VideoServiceBackend::getPluginContext()
-{
-	return mPluginFrameWork->getPluginContext();
-}
-
-QSharedPointer<ctkPluginFramework> VideoServiceBackend::getPluginFramework()
-{
-	return mPluginFrameWork;
 }
 
 } // namespace cx

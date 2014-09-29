@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctkPluginContext.h>
 #include "cxNullDeleter.h"
 #include "cxReporter.h"
+#include "cxStreamerService.h"
 
 namespace cx
 {
@@ -49,32 +50,57 @@ VideoServiceProxy::VideoServiceProxy(ctkPluginContext *pluginContext) :
 
 void VideoServiceProxy::initServiceListener()
 {
-	mServiceListener.reset(new ServiceTrackerListener<VideoService>(
+	mVideoServiceListener.reset(new ServiceTrackerListener<VideoService>(
 								 mPluginContext,
-								 boost::bind(&VideoServiceProxy::onServiceAdded, this, _1),
+								 boost::bind(&VideoServiceProxy::onVideoServiceAdded, this, _1),
 								 boost::function<void (VideoService*)>(),
-								 boost::bind(&VideoServiceProxy::onServiceRemoved, this, _1)
+								 boost::bind(&VideoServiceProxy::onVideoServiceRemoved, this, _1)
 								 ));
-	mServiceListener->open();
+	mVideoServiceListener->open();
+
+	mStreamerServiceListener.reset(new ServiceTrackerListener<StreamerService>(
+							   mPluginContext,
+							   boost::bind(&VideoServiceProxy::onStreamerServiceAdded, this, _1),
+							   boost::function<void (StreamerService*)>(),
+							   boost::bind(&VideoServiceProxy::onStreamerServiceRemoved, this, _1)
+							   ));
+	mStreamerServiceListener->open();
+
 }
-void VideoServiceProxy::onServiceAdded(VideoService* service)
+void VideoServiceProxy::onVideoServiceAdded(VideoService* service)
 {
 	mVideoService.reset(service, null_deleter());
 //	connect(mVideoService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
 //	connect(mVideoService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
 	if(mVideoService->isNull())
-		reportWarning("VideoServiceProxy::onServiceAdded mVideoService->isNull()");
+		reportWarning("VideoServiceProxy::onVideoServiceAdded mVideoService->isNull()");
 }
 
-void VideoServiceProxy::onServiceRemoved(VideoService *service)
+void VideoServiceProxy::onVideoServiceRemoved(VideoService *service)
 {
 //	disconnect(service, SIGNAL(fixedDataChanged(QString)), this, SIGNAL(fixedDataChanged(QString)));
 //	disconnect(service, SIGNAL(movingDataChanged(QString)), this, SIGNAL(movingDataChanged(QString)));
 	mVideoService = VideoService::getNullObject();
 }
 
+void VideoServiceProxy::onStreamerServiceAdded(StreamerService* service)
+{
+//	std::cout << "VideoServiceProxy:: Streamer Service added!!! " << service->getName() << std::endl;
+}
+
+void VideoServiceProxy::onStreamerServiceRemoved(StreamerService *service)
+{
+//	std::cout << "VideoServiceProxy:: Streamer Service removed!!! " << service->getName() << std::endl;
+}
+
 bool VideoServiceProxy::isNull()
 {
 	return mVideoService->isNull();
 }
+
+StreamerService *VideoServiceProxy::getStreamerService(QString service)
+{
+	return mStreamerServiceListener->getService(service);
+}
+
 } //cx
