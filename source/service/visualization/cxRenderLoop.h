@@ -41,9 +41,9 @@ class QTimer;
 namespace cx
 {
 typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
+class ViewCollectionWidget;
 
-
-/** Render a set of ViewWidgets in a loop.
+/** Render a set of Views in a loop.
  *
  * This is the main render loop in Custus.
  *
@@ -64,7 +64,8 @@ public:
 	void setLogging(bool on);
 
 	void clearViews();
-	void addView(ViewWidget* view);
+//	void addView(ViewPtr view);
+	void addLayout(ViewCollectionWidget* layout);
 
 	CyclicActionLoggerPtr getRenderTimer() { return mCyclicLogger; }
 
@@ -98,8 +99,9 @@ private:
 	int mBaseRenderInterval;
 	bool mLogging;
 
-	typedef std::set<QPointer<ViewWidget> > ViewWidgetSet;
-	ViewWidgetSet mViews;
+//	typedef std::set<ViewPtr> ViewSet;
+//	ViewSet mViews;
+	std::vector<QPointer<ViewCollectionWidget> > mLayoutWidgets;
 };
 
 typedef boost::shared_ptr<RenderLoop> RenderLoopPtr;

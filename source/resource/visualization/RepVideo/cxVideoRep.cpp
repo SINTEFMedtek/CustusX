@@ -196,9 +196,8 @@ void VideoFixedPlaneRep::setCamera()
 }
 
 
-void VideoFixedPlaneRep::addRepActorsToViewRenderer(View* view)
+void VideoFixedPlaneRep::addRepActorsToViewRenderer(ViewPtr view)
 {
-	mView = view;
 	mRenderer = view->getRenderer();
 	mViewportListener->startListen(mRenderer);
 
@@ -212,7 +211,7 @@ void VideoFixedPlaneRep::addRepActorsToViewRenderer(View* view)
 	mProbeSector->setRenderer(view->getRenderer());
 }
 
-void VideoFixedPlaneRep::removeRepActorsFromViewRenderer(View* view)
+void VideoFixedPlaneRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	mRenderer = vtkRendererPtr();
 	view->getRenderer()->RemoveActor(mRTGraphics->getActor());

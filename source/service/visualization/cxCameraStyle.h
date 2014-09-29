@@ -80,7 +80,7 @@ public:
 	void setCameraStyle(CAMERA_STYLE_TYPE style); ///< Select tool style. This replaces the vtkInteractor Style.
 	CAMERA_STYLE_TYPE getCameraStyle() const;
 
-	void addView(ViewWidgetQPtr view);
+	void addView(ViewPtr view);
 	void clearViews();
 
 signals:

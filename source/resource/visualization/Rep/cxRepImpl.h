@@ -44,6 +44,7 @@ typedef vtkSmartPointer<class vtkCallbackCommand> vtkCallbackCommandPtr;
 
 namespace cx
 {
+typedef boost::weak_ptr<class View> ViewWeakPtr;
 
 /**\brief Default implementation of Rep.
  *
@@ -64,9 +65,9 @@ public:
 	explicit RepImpl(const QString& uid="", const QString& name="");
 	virtual ~RepImpl();
 	virtual QString getType() const = 0;
-	virtual void connectToView(View *theView);
-	virtual void disconnectFromView(View *theView);
-	virtual bool isConnectedToView(View *theView) const;
+	virtual void connectToView(ViewPtr theView);
+	virtual void disconnectFromView(ViewPtr theView);
+	virtual bool isConnectedToView(ViewPtr theView) const;
 	void setName(QString name);
 	QString getName() const; ///< \return a reps name
 	QString getUid() const; ///< \return a reps unique id
@@ -92,17 +93,14 @@ protected slots:
 	void setModified(); // set flag to get onModifiedStartRender() called before next render
 
 protected:
-	View* getView();
+	ViewPtr getView() const;
 	vtkRendererPtr getRenderer();
+	RepPtr getSelf() { return mSelf.lock(); }
 
-	View* mView;
-	QString mName;
-	QString mUid;
-	RepWeakPtr mSelf;
 
 	virtual void onModifiedStartRender() {}
-	virtual void addRepActorsToViewRenderer(View *view) = 0;
-	virtual void removeRepActorsFromViewRenderer(View *view) = 0;
+	virtual void addRepActorsToViewRenderer(ViewPtr view) = 0;
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view) = 0;
 
 private:
 //	RepImpl(); ///< not implemented
@@ -113,6 +111,10 @@ private:
 	bool mModified;
 	vtkCallbackCommandPtr mCallbackCommand;
 	void onStartRenderPrivate();
+	ViewWeakPtr mView;
+	QString mName;
+	QString mUid;
+	RepWeakPtr mSelf;
 
 };
 

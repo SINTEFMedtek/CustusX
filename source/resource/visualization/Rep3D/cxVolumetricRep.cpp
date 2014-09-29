@@ -77,12 +77,12 @@ VolumetricRep::~VolumetricRep()
 
 void VolumetricRep::setUseGPUVolumeRayCastMapper()
 {
-#if (( VTK_MINOR_VERSION >= 6 )||( VTK_MAJOR_VERSION >5 ))
+//#if (( VTK_MINOR_VERSION >= 6 )||( VTK_MAJOR_VERSION >5 ))
 	vtkGPUVolumeRayCastMapperPtr mapper = vtkGPUVolumeRayCastMapperPtr::New();
 	mMapper = mapper;
 	mMapper->SetBlendModeToComposite();
 	mVolume->SetMapper( mMapper );
-#endif
+//#endif
 }
 
 void VolumetricRep::setUseVolumeTextureMapper()
@@ -97,12 +97,12 @@ void VolumetricRep::setUseVolumeTextureMapper()
 	mVolume->SetMapper( mMapper );
 }
 
-void VolumetricRep::addRepActorsToViewRenderer(View *view)
+void VolumetricRep::addRepActorsToViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->AddVolume(mVolume);
 }
 
-void VolumetricRep::removeRepActorsFromViewRenderer(View *view)
+void VolumetricRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->RemoveVolume(mVolume);
 }
@@ -122,7 +122,7 @@ void VolumetricRep::setImage(ImagePtr image)
 	if (mImage)
 	{
 		mVolumeProperty->setImage(ImagePtr());
-		mImage->disconnectFromRep(mSelf);
+//		mImage->disconnectFromRep(this->getSelf());
 		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		mMonitor.reset();
@@ -133,7 +133,6 @@ void VolumetricRep::setImage(ImagePtr image)
 
 	if (mImage)
 	{
-		mImage->connectToRep(mSelf);
 		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		mVolumeProperty->setImage(mImage);

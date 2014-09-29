@@ -75,7 +75,7 @@ public:
 	void removeViews();
 	ViewWrapperPtr getViewWrapperFromViewUid(QString viewUid);
 	std::vector<ViewWrapperPtr> getWrappers() const { return mViewWrappers; }
-	std::vector<ViewWidgetQPtr> getViews() const;
+	std::vector<ViewPtr> getViews() const;
 	ViewGroupDataPtr getData() { return mViewGroupData; }
 	virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
 	virtual void parseXml(QDomNode dataNode); ///< load internal state info from dataNode
@@ -91,7 +91,7 @@ private slots:
 	void mouseClickInViewGroupSlot();
 
 protected:
-	std::vector<ViewWidgetQPtr> mViews;
+	std::vector<ViewPtr> mViews;
 
 	ViewGroupDataPtr mViewGroupData;
 	std::vector<ViewWrapperPtr> mViewWrappers;

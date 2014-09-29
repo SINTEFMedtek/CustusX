@@ -77,7 +77,7 @@ class CameraStyleForView: public QObject
 Q_OBJECT
 public:
 	explicit CameraStyleForView(VisualizationServiceBackendPtr backend);
-	void setView(ViewWidgetQPtr widget);
+	void setView(ViewPtr widget);
 
 	/** Select tool style. This replaces the vtkInteractor Style.
 	  */
@@ -88,7 +88,7 @@ private slots:
 	void dominantToolChangedSlot();
 
 private:
-	ViewWidgetQPtr getView() const;
+	ViewPtr getView() const;
 	vtkRendererPtr getRenderer() const;
 	vtkCameraPtr getCamera() const;
 	ToolRep3DPtr getToolRep() const;
@@ -107,7 +107,7 @@ private:
 	ViewportPreRenderListenerPtr mPreRenderListener;
 	bool mBlockCameraUpdate; ///< for breaking a camera update loop
 
-	ViewWidgetQPtr mView;
+	ViewPtr mView;
 	VisualizationServiceBackendPtr mBackend;
 };
 

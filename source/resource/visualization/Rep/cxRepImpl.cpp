@@ -43,8 +43,6 @@ namespace cx
 RepImpl::RepImpl(const QString& uid, const QString& name) :
 	mName(name), mUid(uid)
 {
-	mView = NULL;
-
 	mModified = true;
 	this->mCallbackCommand = vtkCallbackCommandPtr::New();
 	this->mCallbackCommand->SetClientData(this);
@@ -70,29 +68,30 @@ QString RepImpl::getUid() const
 	return mUid;
 }
 
-bool RepImpl::isConnectedToView(View *theView) const
+bool RepImpl::isConnectedToView(ViewPtr theView) const
 {
-	return mView==theView;
+	return this->getView()==theView;
 }
 
-void RepImpl::connectToView(View *theView)
+void RepImpl::connectToView(ViewPtr theView)
 {
 	mView = theView;
 
-	vtkRendererPtr renderer = mView->getRenderer();
+	vtkRendererPtr renderer = this->getView()->getRenderer();
 	renderer->AddObserver(vtkCommand::StartEvent, this->mCallbackCommand, 1.0);
 
 	this->addRepActorsToViewRenderer(theView);
 }
 
-void RepImpl::disconnectFromView(View *theView)
+void RepImpl::disconnectFromView(ViewPtr theView)
 {
-//	mViews.erase(theView);
-	vtkRendererPtr renderer = mView->getRenderer();
-	renderer->RemoveObserver(this->mCallbackCommand);
-
-	this->removeRepActorsFromViewRenderer(theView);
-	mView = NULL;
+	vtkRendererPtr renderer = this->getRenderer();
+	if (renderer)
+	{
+		renderer->RemoveObserver(this->mCallbackCommand);
+		this->removeRepActorsFromViewRenderer(theView);
+	}
+	mView.reset();
 }
 
 void RepImpl::printSelf(std::ostream & os, Indent indent)
@@ -102,14 +101,14 @@ void RepImpl::printSelf(std::ostream & os, Indent indent)
 	os << indent << "Type: " << getType() << std::endl;
 }
 
-View* RepImpl::getView()
+ViewPtr RepImpl::getView() const
 {
-	return mView;
+	return mView.lock();
 }
 
 vtkRendererPtr RepImpl::getRenderer()
 {
-	if (!mView)
+	if (!this->getView())
 		return vtkRendererPtr();
 	return this->getView()->getRenderer();
 }
@@ -133,8 +132,8 @@ void RepImpl::onStartRenderPrivate()
 void RepImpl::setModified()
 {
 	mModified = true;
-	if (mView)
-		mView->forceUpdate();
+	if (this->getView())
+		this->getView()->setModified();
 }
 
 

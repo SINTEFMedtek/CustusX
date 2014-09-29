@@ -53,14 +53,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-DonutMetricRepPtr DonutMetricRep::New(const QString& uid, const QString& name)
+DonutMetricRepPtr DonutMetricRep::New(const QString& uid)
 {
-	DonutMetricRepPtr retval(new DonutMetricRep(uid, name));
-	return retval;
+	return wrap_new(new DonutMetricRep(), uid);
 }
 
-DonutMetricRep::DonutMetricRep(const QString& uid, const QString& name) :
-				DataMetricRep(uid, name)
+DonutMetricRep::DonutMetricRep()
 {
 }
 
@@ -100,8 +98,8 @@ void DonutMetricRep::updateTorus()
 		return;
 	}
 
-	if (!mTorus && mView && mMetric)
-		mTorus.reset(new GraphicalTorus3D(mView->getRenderer()));
+	if (!mTorus && this->getView() && mMetric)
+		mTorus.reset(new GraphicalTorus3D(this->getRenderer()));
 
 	if (!mTorus)
 		return;
@@ -126,7 +124,7 @@ void DonutMetricRep::updateDisc()
 		return;
 	}
 
-	if (!mDisk && mView && mMetric)
+	if (!mDisk && this->getView() && mMetric)
 	{
 		mDisk.reset(new GraphicalDisk());
 		mDisk->setRenderer(this->getRenderer());

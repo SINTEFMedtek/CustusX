@@ -129,7 +129,7 @@ public:
 	 * Otherwise, a new rep will be created and returned.
 	 */
 	template<class REP>
-	boost::shared_ptr<REP> getCachedRep(QString uid = "", QString name = "USE_UID")
+	boost::shared_ptr<REP> getCachedRep(QString uid = "")
 	{
 		// look for existing value:
 		for (RepMultiMap::iterator iter = mRepCache.begin(); iter != mRepCache.end(); ++iter)
@@ -144,11 +144,8 @@ public:
 			}
 		}
 
-		if (name == "USE_UID")
-			name = uid;
-
 		// create new value, store and return:
-		boost::shared_ptr<REP> retval = REP::New(uid, name);
+		boost::shared_ptr<REP> retval = REP::New(uid);
 		mRepCache.insert(std::make_pair(uid, retval));
 
 		return retval;

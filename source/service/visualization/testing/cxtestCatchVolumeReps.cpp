@@ -114,7 +114,7 @@ public:
 	{
 		mImages = cxtest::Utilities::create3DImages(mImageCount, Eigen::Array3i(mAxisSize,mAxisSize,mAxisSize), 200);
 
-		mRep = cx::MehdiGPURayCastMultiVolumeRep::New("");
+		mRep = cx::MehdiGPURayCastMultiVolumeRep::New();
 		mRep->setImages(mImages);
 	}
 
@@ -257,7 +257,7 @@ TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 small volum
 {
 	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(3,3,3), 200);
 
-	cx::VolumetricRepPtr rep = cx::VolumetricRep::New("");
+	cx::VolumetricRepPtr rep = cx::VolumetricRep::New();
 	REQUIRE(rep);
 	rep->setImage(image);
 
@@ -270,7 +270,7 @@ TEST_CASE("VolumetricRep using vtkVolumeTextureMapper3D can render 1 large volum
 {
 	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(300,300,300), 200);
 
-	cx::VolumetricRepPtr rep = cx::VolumetricRep::New("");
+	cx::VolumetricRepPtr rep = cx::VolumetricRep::New();
 	REQUIRE(rep);
 	rep->setImage(image);
 
@@ -283,7 +283,7 @@ TEST_CASE("VolumetricRep using vtkGPUVolumeRayCastMapper can render 1 small volu
 {
 	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(3,3,3), 200);
 
-	cx::VolumetricRepPtr rep = cx::VolumetricRep::New("");
+	cx::VolumetricRepPtr rep = cx::VolumetricRep::New();
 	REQUIRE(rep);
 	rep->setUseGPUVolumeRayCastMapper();
 	rep->setImage(image);

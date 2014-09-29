@@ -30,12 +30,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-/*
- * cxLayoutData.cpp
- *
- *  \date Jul 27, 2010
- *      \author christiana
- */
 #include "cxLayoutData.h"
 #include <iostream>
 #include <QDomElement>
@@ -49,6 +43,11 @@ namespace cx
 
 LayoutRegion merge(LayoutRegion a, LayoutRegion b)
 {
+	if (a.pos.col<0 || a.pos.row<0)
+		return b;
+	if (b.pos.col<0 || b.pos.row<0)
+		return a;
+
 	int r1 = std::min(a.pos.row, b.pos.row);
 	int c1 = std::min(a.pos.col, b.pos.col);
 	int r2 = std::max(a.pos.row + a.span.row - 1, b.pos.row + b.span.row - 1);
@@ -56,7 +55,7 @@ LayoutRegion merge(LayoutRegion a, LayoutRegion b)
 	return LayoutRegion(r1, c1, r2 - r1 + 1, c2 - c1 + 1);
 }
 
-void LayoutData::ViewData::addXml(QDomNode node) const
+void LayoutViewData::addXml(QDomNode node) const
 {
 	QDomElement elem = node.toElement();
 	elem.setAttribute("group", qstring_cast(mGroup));
@@ -68,7 +67,7 @@ void LayoutData::ViewData::addXml(QDomNode node) const
 	elem.setAttribute("colSpan", qstring_cast(mRegion.span.col));
 }
 
-void LayoutData::ViewData::parseXml(QDomNode node)
+void LayoutViewData::parseXml(QDomNode node)
 {
 	QDomElement elem = node.toElement();
 	mGroup = elem.attribute("group").toInt();
@@ -115,7 +114,7 @@ void LayoutData::setView(int group, PLANE_TYPE type, LayoutRegion region)
 {
 	if (!this->merge(region))
 		return;
-	ViewData& view = get(region.pos);
+	LayoutViewData& view = get(region.pos);
 	view.mGroup = group;
 	view.mPlane = type;
 	view.mType = View::VIEW_2D;
@@ -125,7 +124,7 @@ void LayoutData::setView(int group, View::Type type, LayoutRegion region)
 {
 	if (!this->merge(region))
 		return;
-	ViewData& view = get(region.pos);
+	LayoutViewData& view = get(region.pos);
 	view.mGroup = group;
 	view.mPlane = ptNOPLANE;
 	view.mType = type;
@@ -148,7 +147,7 @@ bool LayoutData::merge(LayoutRegion region)
 	this->split(region); // split all existing merges in order to keep consistency
 
 	// create new merged view based on the ul corner view.
-	ViewData current = this->get(region.pos);
+	LayoutViewData current = this->get(region.pos);
 	current.mRegion = region;
 
 	// erase all views within region (all should now be 1x1)
@@ -193,7 +192,7 @@ void LayoutData::split(iterator iter)
 	if (iter->mRegion.span.row == 1 && iter->mRegion.span.col == 1)
 		return; // nothing to split
 
-	ViewData newView = *iter;
+	LayoutViewData newView = *iter;
 	LayoutRegion region = iter->mRegion;
 
 	// erase old region
@@ -244,7 +243,7 @@ void LayoutData::resize(int rows, int cols)
 		{
 			if (this->find(LayoutPosition(r, c)) == this->end())
 			{
-				mView.push_back(ViewData(r, c, 1, 1));
+				mView.push_back(LayoutViewData(r, c, 1, 1));
 			}
 		}
 	}
@@ -255,7 +254,7 @@ void LayoutData::resize(int rows, int cols)
 //  return *(this->find(pos));
 //}
 
-LayoutData::ViewData& LayoutData::get(LayoutPosition pos)
+LayoutViewData& LayoutData::get(LayoutPosition pos)
 {
 	return *(this->find(pos));
 }
@@ -310,7 +309,7 @@ void LayoutData::parseXml(QDomNode node)
 	QDomElement currentElem = elem.firstChildElement("view");
 	for (; !currentElem.isNull(); currentElem = currentElem.nextSiblingElement("view"))
 	{
-		ViewData viewData;
+		LayoutViewData viewData;
 		viewData.parseXml(currentElem);
 		mView.push_back(viewData);
 	}

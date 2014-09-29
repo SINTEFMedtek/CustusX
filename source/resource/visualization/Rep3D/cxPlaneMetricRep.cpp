@@ -41,14 +41,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-PlaneMetricRepPtr PlaneMetricRep::New(const QString& uid, const QString& name)
+PlaneMetricRepPtr PlaneMetricRep::New(const QString& uid)
 {
-	PlaneMetricRepPtr retval(new PlaneMetricRep(uid, name));
-	return retval;
+	return wrap_new(new PlaneMetricRep(), uid);
 }
 
-PlaneMetricRep::PlaneMetricRep(const QString& uid, const QString& name) :
-                DataMetricRep(uid, name)
+PlaneMetricRep::PlaneMetricRep()
 {
 	mViewportListener.reset(new ViewportListener);
 	mViewportListener->setCallback(boost::bind(&PlaneMetricRep::rescale, this));
@@ -60,13 +58,13 @@ void PlaneMetricRep::clear()
     mNormal.reset();
 }
 
-void PlaneMetricRep::addRepActorsToViewRenderer(View *view)
+void PlaneMetricRep::addRepActorsToViewRenderer(ViewPtr view)
 {
     mViewportListener->startListen(view->getRenderer());
     DataMetricRep::addRepActorsToViewRenderer(view);
 }
 
-void PlaneMetricRep::removeRepActorsFromViewRenderer(View *view)
+void PlaneMetricRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	mViewportListener->stopListen();
     DataMetricRep::removeRepActorsFromViewRenderer(view);
@@ -83,11 +81,11 @@ void PlaneMetricRep::onModifiedStartRender()
 	if (!planeMetric)
 		return;
 
-	if (!mGraphicalPoint && mView && mMetric)
+	if (!mGraphicalPoint && this->getView() && mMetric)
 	{
-		mGraphicalPoint.reset(new GraphicalPoint3D(mView->getRenderer()));
-		mNormal.reset(new GraphicalArrow3D(mView->getRenderer()));
-		mRect.reset(new Rect3D(mView->getRenderer(), mMetric->getColor()));
+		mGraphicalPoint.reset(new GraphicalPoint3D(this->getRenderer()));
+		mNormal.reset(new GraphicalArrow3D(this->getRenderer()));
+		mRect.reset(new Rect3D(this->getRenderer(), mMetric->getColor()));
 		mRect->setLine(true, 1);
 	}
 

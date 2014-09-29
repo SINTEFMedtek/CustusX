@@ -49,11 +49,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolManager.h"
 #include "cxVideoService.h"
 #include "cxVisualizationServiceBackend.h"
+#include "vtkRenderWindowInteractor.h"
 
 namespace cx
 {
 
-ViewWrapperVideo::ViewWrapperVideo(ViewWidget* view, VisualizationServiceBackendPtr backend) :
+ViewWrapperVideo::ViewWrapperVideo(ViewPtr view, VisualizationServiceBackendPtr backend) :
 	ViewWrapper(backend)
 {
 	mView = view;
@@ -80,7 +81,7 @@ ViewWrapperVideo::~ViewWrapperVideo()
 		mView->removeReps();
 }
 
-ViewWidget* ViewWrapperVideo::getView()
+ViewPtr ViewWrapperVideo::getView()
 {
 	return mView;
 }
@@ -252,12 +253,12 @@ void ViewWrapperVideo::updateSlot()
 void ViewWrapperVideo::addReps()
 {
 	// plane type text rep
-	mPlaneTypeText = DisplayTextRep::New("planeTypeRep_" + mView->getName(), "");
+	mPlaneTypeText = DisplayTextRep::New();
 	mPlaneTypeText->addText(QColor(Qt::green), "RT", Vector3D(0.98, 0.02, 0.0));
 	mView->addRep(mPlaneTypeText);
 
 	//data name text rep
-	mDataNameText = DisplayTextRep::New("dataNameText_" + mView->getName(), "");
+	mDataNameText = DisplayTextRep::New();
 	mDataNameText->addText(QColor(Qt::green), "not initialized", Vector3D(0.02, 0.02, 0.0));
 	mView->addRep(mDataNameText);
 }

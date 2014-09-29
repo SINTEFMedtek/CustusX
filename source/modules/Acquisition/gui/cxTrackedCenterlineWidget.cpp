@@ -157,7 +157,7 @@ void TrackedCenterlineWidget::startedSlot(QString sessionId)
   ToolManager::ToolMap tools = toolManager()->getTools();
   ToolManager::ToolMap::iterator toolIt = tools.begin();
 
-  ViewWidgetQPtr view = viewManager()->get3DView(0,0);
+  ViewPtr view = viewManager()->get3DView(0,0);
   ToolRep3DPtr activeRep3D;
   for(; toolIt != tools.end(); ++toolIt)
   {
@@ -175,7 +175,7 @@ void TrackedCenterlineWidget::stoppedSlot(bool)
   ToolManager::ToolMap tools = toolManager()->getTools();
   ToolManager::ToolMap::iterator toolIt = tools.begin();
 
-  ViewWidgetQPtr view = viewManager()->get3DView(0,0);
+  ViewPtr view = viewManager()->get3DView(0,0);
   ToolRep3DPtr activeRep3D;
   for(; toolIt != tools.end(); ++toolIt)
   {

@@ -39,14 +39,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-FrameMetricRepPtr FrameMetricRep::New(const QString& uid, const QString& name)
+FrameMetricRepPtr FrameMetricRep::New(const QString& uid)
 {
-	FrameMetricRepPtr retval(new FrameMetricRep(uid, name));
-	return retval;
+	return wrap_new(new FrameMetricRep(), uid);
 }
 
-FrameMetricRep::FrameMetricRep(const QString& uid, const QString& name) :
-                DataMetricRep(uid, name)
+FrameMetricRep::FrameMetricRep()
 {
 }
 
@@ -65,7 +63,7 @@ void FrameMetricRep::onModifiedStartRender()
 {
     FrameMetricPtr metric = this->getFrameMetric();
 
-    if (!metric || !metric->isValid() || !mView)
+	if (!metric || !metric->isValid() || !this->getView())
         return;
 
     if (!mAxes)
@@ -74,7 +72,7 @@ void FrameMetricRep::onModifiedStartRender()
         mAxes->setFontSize(0.04);
         mAxes->setAxisLength(0.05);
         mAxes->setShowAxesLabels(false);
-        mAxes->setRenderer(mView->getRenderer());
+		mAxes->setRenderer(this->getRenderer());
     }
 
     mAxes->setTransform(metric->getRefFrame());

@@ -46,14 +46,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-DistanceMetricRepPtr DistanceMetricRep::New(const QString& uid, const QString& name)
+DistanceMetricRepPtr DistanceMetricRep::New(const QString& uid)
 {
-	DistanceMetricRepPtr retval(new DistanceMetricRep(uid, name));
-	return retval;
+	return wrap_new(new DistanceMetricRep(), uid);
 }
 
-DistanceMetricRep::DistanceMetricRep(const QString& uid, const QString& name) :
-                DataMetricRep(uid, name)
+DistanceMetricRep::DistanceMetricRep()
 {
 }
 
@@ -78,9 +76,9 @@ void DistanceMetricRep::onModifiedStartRender()
 	if (!mMetric->isValid())
 		return;
 
-	if (!mGraphicalLine && mView)
+	if (!mGraphicalLine && this->getView())
 	{
-		mGraphicalLine.reset(new GraphicalLine3D(mView->getRenderer()));
+		mGraphicalLine.reset(new GraphicalLine3D(this->getRenderer()));
 	}
 
 	if (mGraphicalLine)

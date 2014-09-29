@@ -45,8 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-MetricNamesRep::MetricNamesRep(const QString& uid, const QString& name=""):
-	RepImpl(uid,name)
+MetricNamesRep::MetricNamesRep():
+	RepImpl()
 {
 	mFontSize = 20;
 }
@@ -55,14 +55,12 @@ MetricNamesRep::~MetricNamesRep()
 {
 }
 
-MetricNamesRepPtr MetricNamesRep::New(const QString& uid, const QString& name="")
+MetricNamesRepPtr MetricNamesRep::New(const QString& uid)
 {
-	MetricNamesRepPtr retval(new MetricNamesRep(uid, name));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new MetricNamesRep(), uid);
 }
 
-void MetricNamesRep::addRepActorsToViewRenderer(View *view)
+void MetricNamesRep::addRepActorsToViewRenderer(ViewPtr view)
 {
 	for(unsigned i =0; i<mDisplayText.size(); ++i)
 	{
@@ -70,7 +68,7 @@ void MetricNamesRep::addRepActorsToViewRenderer(View *view)
 	}
 }
 
-void MetricNamesRep::removeRepActorsFromViewRenderer(View *view)
+void MetricNamesRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	for(unsigned i =0; i<mDisplayText.size(); ++i)
 	{

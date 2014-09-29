@@ -30,67 +30,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxLayoutWidget.h"
-#include <QGridLayout>
-#include "cxLogger.h"
+#ifndef CXVIEWCOLLECTIONWIDGET_H_
+#define CXVIEWCOLLECTIONWIDGET_H_
+
+#include "cxView.h"
+#include "cxLayoutData.h"
+#include <QWidget>
+
+
+class QGridLayout;
 
 namespace cx
 {
 
-LayoutWidget::LayoutWidget()
+/**
+ * Widget for displaying Views.
+ *
+ * This is the main class for displaying visualizations.
+ * Add Views using addView(), then add Reps to the Views.
+ *
+ * \ingroup cx_resource_visualization
+ * \date 2013-11-05
+ * \date 2014-09-26
+ * \author christiana
+ */
+class ViewCollectionWidget : public QWidget
 {
-	mLayout = new QGridLayout;
+	Q_OBJECT
+public:
+	static QPointer<ViewCollectionWidget> createViewWidgetLayout();
+	static QPointer<ViewCollectionWidget> createOptimizedLayout();
 
-	mLayout->setSpacing(2);
-	mLayout->setMargin(4);
-	this->setLayout(mLayout);
+	virtual ~ViewCollectionWidget() {}
 
-	mViewCache2D.reset(new ViewCache<ViewWidget>(this,	"View2D"));
-	mViewCache3D.reset(new ViewCache<ViewWidget>(this, "View3D"));
-	mViewCacheRT.reset(new ViewCache<ViewWidget>(this, "ViewRT"));
-}
+	virtual ViewPtr addView(View::Type type, LayoutRegion region) = 0;
+	virtual void clearViews() = 0;
+	virtual void setModified() = 0;
+	virtual void render() = 0;
+	virtual void setGridSpacing(int val) = 0;
+	virtual void setGridMargin(int val) = 0;
 
-LayoutWidget::~LayoutWidget()
-{
-}
+protected:
+	ViewCollectionWidget() {}
+};
 
-void LayoutWidget::setStretchFactors(LayoutRegion region, int stretchFactor)
-{
-	// set stretch factors for the affected cols to 1 in order to get even distribution
-	for (int i = region.pos.col; i < region.pos.col + region.span.col; ++i)
-	{
-		mLayout->setColumnStretch(i, stretchFactor);
-	}
-	// set stretch factors for the affected rows to 1 in order to get even distribution
-	for (int i = region.pos.row; i < region.pos.row + region.span.row; ++i)
-	{
-		mLayout->setRowStretch(i, stretchFactor);
-	}
-}
-
-void LayoutWidget::addView(ViewWidget* view, LayoutRegion region)
-{
-	mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col);
-	this->setStretchFactors(region, 1);
-	view->show();
-	mViews.push_back(view);
-}
-
-void LayoutWidget::clearViews()
-{
-	mViewCache2D->clearUsedViews();
-	mViewCache3D->clearUsedViews();
-	mViewCacheRT->clearUsedViews();
-
-	for (unsigned i=0; i<mViews.size(); ++i)
-	{
-		mViews[i]->hide();
-		mLayout->removeWidget(mViews[i]);
-	}
-	mViews.clear();
-
-	this->setStretchFactors(LayoutRegion(0, 0, 10, 10), 0);
-}
 
 } // namespace cx
 
+#endif // CXVIEWCOLLECTIONWIDGET_H_

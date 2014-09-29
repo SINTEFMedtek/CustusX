@@ -59,12 +59,12 @@ void ElastixParameters::addDefaultPresets()
 	foreach (QString root, DataLocations::getRootConfigPaths())
 	{
 		QString path = root + "/" + pathRelativeToConfigRoot + "/" + filename;
-		std::cout << "+++ ELASTIX: attempting: " << path << std::endl;
-		std::cout << "+++ ELASTIX:  exists:" << QFileInfo(path).exists() << std::endl;
+//		std::cout << "+++ ELASTIX: attempting: " << path << std::endl;
+//		std::cout << "+++ ELASTIX:  exists:" << QFileInfo(path).exists() << std::endl;
 	}
 
 	QString defaultExecutable = cx::DataLocations::getExistingConfigPath("/elastix/bin", "", "run_elastix.sh");
-	std::cout << "+++ ELASTIX:  defaultExecutable:" << defaultExecutable << std::endl;
+//	std::cout << "+++ ELASTIX:  defaultExecutable:" << defaultExecutable << std::endl;
 
     this->addDefaultPreset("elastix/p_Rigid", defaultExecutable, QStringList() << "p_Rigid.txt");
 }

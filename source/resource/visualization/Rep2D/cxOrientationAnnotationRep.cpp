@@ -104,19 +104,17 @@ void OrientationAnnotation::SetTextActorsJustification()
 //---------------------------------------------------------
 
 
-OrientationAnnotationRep::OrientationAnnotationRep(DataServicePtr dataManager, const QString& uid, const QString& name) :
-	RepImpl(uid, name),
+OrientationAnnotationRep::OrientationAnnotationRep(DataServicePtr dataManager) :
+	RepImpl(),
 	mDataManager(dataManager)
 {
 	mPlane = ptCOUNT;
 	connect(mDataManager.get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
 }
 
-OrientationAnnotationRepPtr OrientationAnnotationRep::New(DataServicePtr dataManager, const QString& uid,const QString& name)
+OrientationAnnotationRepPtr OrientationAnnotationRep::New(DataServicePtr dataManager, const QString& uid)
 {
-	OrientationAnnotationRepPtr retval(new OrientationAnnotationRep(dataManager, uid,name));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new OrientationAnnotationRep(dataManager), uid);
 }
 
 OrientationAnnotationRep::~OrientationAnnotationRep()
@@ -235,13 +233,13 @@ void OrientationAnnotationRep::setPlaneTypeRadiology(PLANE_TYPE type)
 	}
 }
 
-void OrientationAnnotationRep::addRepActorsToViewRenderer(View *view)
+void OrientationAnnotationRep::addRepActorsToViewRenderer(ViewPtr view)
 {
 	createAnnotation();
 	view->getRenderer()->AddActor(mOrientation);
 }
 
-void OrientationAnnotationRep::removeRepActorsFromViewRenderer(View *view)
+void OrientationAnnotationRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->RemoveActor(mOrientation);
 }

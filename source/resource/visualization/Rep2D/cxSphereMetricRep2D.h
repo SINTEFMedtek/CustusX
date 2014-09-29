@@ -55,22 +55,21 @@ class SphereMetricRep2D: public DataMetricRep
 {
 Q_OBJECT
 public:
-	static SphereMetricRep2DPtr New(const QString& uid, const QString& name = ""); ///constructor
+	static SphereMetricRep2DPtr New(const QString& uid=""); ///constructor
 	virtual ~SphereMetricRep2D() {}
 
 	virtual QString getType() const { return "SphereMetricRep2D"; }
 	void setSliceProxy(SliceProxyPtr slicer);
 
 protected:
-	virtual void addRepActorsToViewRenderer(View* view);
-	virtual void removeRepActorsFromViewRenderer(View* view);
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
 	virtual void clear();
 	virtual void onModifiedStartRender();
 
 private:
-	SphereMetricRep2D(const QString& uid, const QString& name = "");
-	SphereMetricRep2D(); ///< not implemented
+	SphereMetricRep2D();
 
 	SphereMetricPtr getSphereMetric();
 

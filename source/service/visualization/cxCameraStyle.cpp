@@ -46,7 +46,7 @@ CameraStyle::CameraStyle(VisualizationServiceBackendPtr backend) :
 {
 }
 
-void CameraStyle::addView(ViewWidgetQPtr view)
+void CameraStyle::addView(ViewPtr view)
 {
 	if (!view || view->getType()!=View::VIEW_3D)
 		return;

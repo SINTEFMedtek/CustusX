@@ -47,8 +47,7 @@ typedef boost::shared_ptr<class Rep> RepPtr;
 typedef boost::weak_ptr<class Rep> RepWeakPtr;
 
 class Indent;
-class View;
-class ViewWidget;
+typedef boost::shared_ptr<class View> ViewPtr;
 
 /**\brief Abstract interface for entities that can be added to a View.
  *
@@ -79,7 +78,7 @@ public:
 	 * \param theView The view to add this representation to.
 	 * \return
 	 */
-	virtual void connectToView(View *theView) = 0;
+	virtual void connectToView(ViewPtr theView) = 0;
 
 	/**
 	 * Do not use this method! It is only used by View to tear down an
@@ -88,7 +87,7 @@ public:
 	 * \param theView The view to disconnect from.
 	 * \return
 	 */
-	virtual void disconnectFromView(View *theView) = 0;
+	virtual void disconnectFromView(ViewPtr theView) = 0;
 
 	/**
 	 * Traverse the vector of views to see if this Representation is connected to
@@ -98,7 +97,7 @@ public:
 	 * \return True if \a theView was found in the internal vector of \a View pointers.
 	 * false otherwise.
 	 */
-	virtual bool isConnectedToView(View *theView) const = 0;
+	virtual bool isConnectedToView(ViewPtr theView) const = 0;
 	/** Set the name of this Rep. This is useful for context-menus in
 	 * Views and other user interaction constructs.
 	 *

@@ -83,13 +83,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cx2DZoomHandler.h"
 #include "cxNavigation.h"
 #include "cxDataRepContainer.h"
+#include "vtkRenderWindowInteractor.h"
 
 namespace cx
 {
 
-ViewWrapper2D::ViewWrapper2D(ViewWidget* view, VisualizationServiceBackendPtr backend) :
+ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisualizationServiceBackendPtr backend) :
 	ViewWrapper(backend),
-	mOrientationActionGroup(new QActionGroup(view))
+	mOrientationActionGroup(new QActionGroup(view.get()))
 {
 	mView = view;
 	this->connectContextMenu(mView);
@@ -120,12 +121,13 @@ ViewWrapper2D::ViewWrapper2D(ViewWidget* view, VisualizationServiceBackendPtr ba
 	setOrientationMode(SyncedValue::create(0)); // must set after addreps()
 
 	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
-	connect(mView, SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
-	connect(mView, SIGNAL(showSignal(QShowEvent*)), this, SLOT(showSlot()));
-	connect(mView, SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mousePressSlot(QMouseEvent*)));
-	connect(mView, SIGNAL(mouseMoveSignal(QMouseEvent*)), this, SLOT(mouseMoveSlot(QMouseEvent*)));
-	connect(mView, SIGNAL(mouseWheelSignal(QWheelEvent*)), this, SLOT(mouseWheelSlot(QWheelEvent*)));
+	connect(mView.get(), SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
+	connect(mView.get(), SIGNAL(shown()), this, SLOT(showSlot()));
+	connect(mView.get(), SIGNAL(mousePress(int, int, Qt::MouseButtons)), this, SLOT(mousePressSlot(int, int, Qt::MouseButtons)));
+	connect(mView.get(), SIGNAL(mouseMove(int, int, Qt::MouseButtons)), this, SLOT(mouseMoveSlot(int, int, Qt::MouseButtons)));
+	connect(mView.get(), SIGNAL(mouseWheel(int, int, int, int, Qt::MouseButtons)), this, SLOT(mouseWheelSlot(int, int, int, int, Qt::MouseButtons)));
 
+	this->dominantToolChangedSlot();
 	this->updateView();
 }
 
@@ -196,17 +198,16 @@ void ViewWrapper2D::orientationActionSlot()
 void ViewWrapper2D::addReps()
 {
 	// annotation rep
-	mOrientationAnnotationRep = OrientationAnnotationSmartRep::New("annotationRep_" + mView->getName(),
-					"annotationRep_" + mView->getName());
+	mOrientationAnnotationRep = OrientationAnnotationSmartRep::New();
 	mView->addRep(mOrientationAnnotationRep);
 
 	// plane type text rep
-	mPlaneTypeText = DisplayTextRep::New("planeTypeRep_" + mView->getName(), "");
+	mPlaneTypeText = DisplayTextRep::New();
 	mPlaneTypeText->addText(QColor(Qt::green), "not initialized", Vector3D(0.98, 0.02, 0.0));
 	mView->addRep(mPlaneTypeText);
 
 	//data name text rep
-	mDataNameText = DisplayTextRep::New("dataNameText_" + mView->getName(), "");
+	mDataNameText = DisplayTextRep::New();
 	mDataNameText->addText(QColor(Qt::green), "not initialized", Vector3D(0.02, 0.02, 0.0));
 	mView->addRep(mDataNameText);
 
@@ -268,32 +269,13 @@ void ViewWrapper2D::resetMultiSlicer()
 		return;
 
 //	std::cout << "using gpu multislicer" << std::endl;
-	mMultiSliceRep = Texture3DSlicerRep::New("MultiSliceRep_" + mView->getName());
+	mMultiSliceRep = Texture3DSlicerRep::New();
 	mMultiSliceRep->setShaderPath(DataLocations::getShaderPath());
 	mMultiSliceRep->setSliceProxy(mSliceProxy);
 	mView->addRep(mMultiSliceRep);
 	if (mGroupData)
 		mMultiSliceRep->setImages(mGroupData->getImages(DataViewProperties::createSlice2D()));
 	this->viewportChanged();
-}
-
-Vector3D ViewWrapper2D::viewToDisplay(Vector3D p_v) const
-{
-	vtkRendererPtr renderer = mView->getRenderer();
-	renderer->SetViewPoint(p_v.begin());
-	renderer->ViewToDisplay(); ///pang
-	Vector3D p_d(renderer->GetDisplayPoint());
-	return p_d;
-}
-
-Vector3D ViewWrapper2D::displayToWorld(Vector3D p_d) const
-{
-	vtkRendererPtr renderer = mView->getRenderer();
-	renderer->SetDisplayPoint(p_d.begin());
-	renderer->DisplayToWorld();
-	double* p_wH = renderer->GetWorldPoint();
-	Vector3D p_w = Vector3D(p_wH) / p_wH[3]; // convert from homogenous to cartesan coords
-	return p_w;
 }
 
 /**Call when viewport size or zoom has changed.
@@ -306,10 +288,8 @@ void ViewWrapper2D::viewportChanged()
 
 	mView->setZoomFactor(mZoom2D->getFactor());
 
-	double viewHeight = mView->heightMM() / mZoom2D->getFactor();
-//  double parallelScale = mView->heightMM() / 2.0 / getZoomFactor2D();
+	double viewHeight = mView->getViewport_s().range()[1];
 	mView->getRenderer()->GetActiveCamera()->SetParallelScale(viewHeight / 2);
-
 
 	// Heuristic guess for a good clip depth. The point is to show 3D data clipped in 2D
 	// with a suitable thickness projected onto the plane.
@@ -318,15 +298,13 @@ void ViewWrapper2D::viewportChanged()
 	clipDepth = viewHeight/120 + 1.5;
 	mView->getRenderer()->GetActiveCamera()->SetPosition(0,0,length);
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(length-clipDepth, length+0.1);
-//	std::cout << "height: " << viewHeight << ", d=" << clipDepth << std::endl;
 
 	mSliceProxy->setToolViewportHeight(viewHeight);
 	double anyplaneViewOffset = settings()->value("Navigation/anyplaneViewOffset").toDouble();
 	mSliceProxy->initializeFromPlane(mSliceProxy->getComputer().getPlaneType(), false, Vector3D(0, 0, 1), true, viewHeight, anyplaneViewOffset, true);
-//	mSliceProxy->setToolViewOffset(mSliceProxy->getComputer().get, viewHeight, anyplaneViewOffset, true);
 
 	DoubleBoundingBox3D BB_vp = getViewport();
-	Transform3D vpMs = get_vpMs();
+	Transform3D vpMs = mView->get_vpMs();
 	DoubleBoundingBox3D BB_s = transform(vpMs.inv(), BB_vp);
 	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
 
@@ -350,31 +328,6 @@ DoubleBoundingBox3D ViewWrapper2D::getViewport() const
 	return BB_vp;
 }
 
-/**Compute transform from slice space (vtk world/ssc after slicing) to vtk viewport.
- */
-Transform3D ViewWrapper2D::get_vpMs() const
-{
-	// world == slice
-	// display == vp
-
-	QSize size = mView->size();
-
-	Vector3D p0_d(0, 0, 0);
-	Vector3D p1_d(size.width(), size.height(), 1);
-
-	Vector3D p0_w = displayToWorld(p0_d);
-	Vector3D p1_w = displayToWorld(p1_d);
-
-	p0_w[2] = 0;
-	p1_w[2] = 1;
-
-	DoubleBoundingBox3D BB_vp(p0_d, p1_d);
-	DoubleBoundingBox3D BB_s(p0_w, p1_w);
-
-	Transform3D vpMs = createTransformNormalize(BB_s, BB_vp);
-	return vpMs;
-}
-
 void ViewWrapper2D::showSlot()
 {
 	dominantToolChangedSlot();
@@ -385,7 +338,8 @@ void ViewWrapper2D::initializePlane(PLANE_TYPE plane)
 {
 //  mOrientationAnnotationRep->setPlaneType(plane);
 	mPlaneTypeText->setText(0, qstring_cast(plane));
-	double viewHeight = mView->heightMM() / mZoom2D->getFactor();
+//	double viewHeight = mView->heightMM() / mZoom2D->getFactor();
+	double viewHeight = mView->getViewport_s().range()[1];
 	mSliceProxy->initializeFromPlane(plane, false, Vector3D(0, 0, 1), true, viewHeight, 0.25);
 //	double anyplaneViewOffset = settings()->value("Navigation/anyplaneViewOffset").toDouble();
 //	mSliceProxy->initializeFromPlane(plane, false, Vector3D(0, 0, 1), true, 1, 0);
@@ -412,9 +366,6 @@ ORIENTATION_TYPE ViewWrapper2D::getOrientationType() const
  */
 void ViewWrapper2D::orientationModeChanged()
 {
-//  changeOrientationType(static_cast<ORIENTATION_TYPE>(mOrientationMode->get().toInt()));
-//std::cout << "mOrientationModeChanbgedslot" << std::endl;
-
 	ORIENTATION_TYPE type = static_cast<ORIENTATION_TYPE>(mOrientationMode->get().toInt());
 
 if	(type == this->getOrientationType())
@@ -438,7 +389,7 @@ void ViewWrapper2D::changeOrientationType(ORIENTATION_TYPE type)
 	mOrientationMode->set(type);
 }
 
-ViewWidget* ViewWrapper2D::getView()
+ViewPtr ViewWrapper2D::getView()
 {
 	return mView;
 }
@@ -576,17 +527,17 @@ void ViewWrapper2D::setOrientationMode(SyncedValuePtr value)
  * Move manual tool tip when mouse pressed
  *
  */
-void ViewWrapper2D::mousePressSlot(QMouseEvent* event)
+void ViewWrapper2D::mousePressSlot(int x, int y, Qt::MouseButtons buttons)
 {
-	if (event->buttons() & Qt::LeftButton)
+	if (buttons & Qt::LeftButton)
 	{
 		if (this->getOrientationType() == otORTHOGONAL)
 		{
-			setAxisPos(qvp2vp(event->pos()));
+			setAxisPos(qvp2vp(QPoint(x,y)));
 		}
 		else
 		{
-			mClickPos = qvp2vp(event->pos());
+			mClickPos = qvp2vp(QPoint(x,y));
 			this->shiftAxisPos(Vector3D(0,0,0)); // signal the maual tool that something is happening (important for playback tool)
 		}
 	}
@@ -596,17 +547,17 @@ void ViewWrapper2D::mousePressSlot(QMouseEvent* event)
  * Move manual tool tip when mouse pressed
  *
  */
-void ViewWrapper2D::mouseMoveSlot(QMouseEvent* event)
+void ViewWrapper2D::mouseMoveSlot(int x, int y, Qt::MouseButtons buttons)
 {
-	if (event->buttons() & Qt::LeftButton)
+	if (buttons & Qt::LeftButton)
 	{
 		if (this->getOrientationType() == otORTHOGONAL)
 		{
-			setAxisPos(qvp2vp(event->pos()));
+			setAxisPos(qvp2vp(QPoint(x,y)));
 		}
 		else
 		{
-			Vector3D p = qvp2vp(event->pos());
+			Vector3D p = qvp2vp(QPoint(x,y));
 			this->shiftAxisPos(p - mClickPos);
 			mClickPos = p;
 		}
@@ -617,14 +568,13 @@ void ViewWrapper2D::mouseMoveSlot(QMouseEvent* event)
 /**Part of the mouse interactor:
  * Interpret mouse wheel as a zoom operation.
  */
-void ViewWrapper2D::mouseWheelSlot(QWheelEvent* event)
+void ViewWrapper2D::mouseWheelSlot(int x, int y, int delta, int orientation, Qt::MouseButtons buttons)
 {
 	// scale zoom in log space
 	double val = log10(mZoom2D->getFactor());
-	val += event->delta() / 120.0 / 20.0; // 120 is normal scroll resolution, x is zoom resolution
+	val += delta / 120.0 / 20.0; // 120 is normal scroll resolution, x is zoom resolution
 	double newZoom = pow(10.0, val);
 
-//	this->setZoomFactor2D(newZoom);
 	mZoom2D->setFactor(newZoom);
 
 	Navigation(mBackend).centerToTooltip(); // side effect: center on tool
@@ -651,7 +601,8 @@ void ViewWrapper2D::shiftAxisPos(Vector3D delta_vp)
 	Transform3D sMr = mSliceProxy->get_sMr();
 	Transform3D rMpr = mBackend->getDataManager()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
-	Vector3D delta_s = get_vpMs().inv().vector(delta_vp);
+	Transform3D vpMs = mView->get_vpMs();
+	Vector3D delta_s = vpMs.inv().vector(delta_vp);
 
 	Vector3D delta_pr = (rMpr.inv() * sMr.inv()).vector(delta_s);
 
@@ -677,7 +628,8 @@ void ViewWrapper2D::setAxisPos(Vector3D click_vp)
 	Vector3D tool_s = (sMr * rMpr * prMt).coord(tool_t);
 
 	// find click position in s.
-	Vector3D click_s = get_vpMs().inv().coord(click_vp);
+	Transform3D vpMs = mView->get_vpMs();
+	Vector3D click_s = vpMs.inv().coord(click_vp);
 
 	// compute the new tool position in slice space as a synthesis of the plane part of click and the z part of original.
 	Vector3D cross_s(click_s[0], click_s[1], tool_s[2]);
@@ -698,7 +650,7 @@ void ViewWrapper2D::setSlicePlanesProxy(SlicePlanesProxyPtr proxy)
 	mSlicePlanes3DMarker->setProxy(plane, proxy);
 
 	DoubleBoundingBox3D BB_vp = getViewport();
-	Transform3D vpMs = get_vpMs();
+	Transform3D vpMs = mView->get_vpMs();
 	mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, transform(vpMs.inv(), BB_vp));
 
 	mView->addRep(mSlicePlanes3DMarker);

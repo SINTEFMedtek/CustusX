@@ -58,7 +58,7 @@ public:
 	MultiVolume3DRepProducer();
 	~MultiVolume3DRepProducer();
 
-	void setView(View* view);
+	void setView(ViewPtr view);
 	void setMaxRenderSize(int voxels);
 	int getMaxRenderSize() const;
 	void setVisualizerType(QString type);
@@ -81,7 +81,7 @@ private:
 	std::vector<ImagePtr> m3DImages;
 	std::vector<RepPtr> mReps;
 	int mMaxRenderSize;
-	View* mView;
+	ViewPtr mView;
 
 	void updateRepsInView();
 	void fillReps();

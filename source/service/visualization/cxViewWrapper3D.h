@@ -90,9 +90,9 @@ class ViewWrapper3D: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapper3D(int startIndex, ViewWidget* view, VisualizationServiceBackendPtr backend);
+	ViewWrapper3D(int startIndex, ViewPtr view, VisualizationServiceBackendPtr backend);
 	virtual ~ViewWrapper3D();
-	virtual ViewWidget* getView();
+	virtual ViewPtr getView();
 	virtual double getZoom2D() { return -1.0; }
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy);
 	virtual void setViewGroup(ViewGroupDataPtr group);
@@ -140,8 +140,6 @@ private:
 
 	RepPtr createDataRep3D(DataPtr data);
     DataMetricRepPtr createDataMetricRep3D(DataPtr data);
-//    virtual void dataAdded(DataPtr data);
-//	virtual void dataRemoved(const QString& uid);
 
 	void addVolumeDataRep(DataPtr data);
 	void removeVolumeDataRep(QString uid);
@@ -157,9 +155,7 @@ private:
 	PickerRepPtr mPickerRep;
 	DisplayTextRepPtr mPlaneTypeText;
 	DisplayTextRepPtr mDataNameText;
-//	DisplayTextRepPtr mMetricsText;
 	MetricNamesRepPtr mMetricNames;
-//	QString mShowSlicesMode;
 	std::vector<AxisConnectorPtr> mAxis;
 
 	bool mShowAxes; ///< show 3D axes reps for all tools and ref space
@@ -167,7 +163,7 @@ private:
 	SlicePlanes3DRepPtr mSlicePlanes3DRep;
 	OrientationAnnotation3DRepPtr mAnnotationMarker;
 
-	QPointer<ViewWidget> mView;
+	ViewPtr mView;
 };
 typedef boost::shared_ptr<ViewWrapper3D> ViewWrapper3DPtr;
 

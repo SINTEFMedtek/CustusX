@@ -50,8 +50,8 @@ namespace cx
 // --------------------------------------------------------
 {
 
-OrientationAnnotationSmartRep::OrientationAnnotationSmartRep(const QString& uid, const QString& name) :
-	RepImpl(uid, name)
+OrientationAnnotationSmartRep::OrientationAnnotationSmartRep() :
+	RepImpl()
 {
 	mAngle = M_PI*60/180;
 	mOrientation = OrientationAnnotationPtr::New();
@@ -74,11 +74,9 @@ OrientationAnnotationSmartRep::OrientationAnnotationSmartRep(const QString& uid,
 
 
 
-OrientationAnnotationSmartRepPtr OrientationAnnotationSmartRep::New(const QString& uid, const QString& name)
+OrientationAnnotationSmartRepPtr OrientationAnnotationSmartRep::New(const QString& uid)
 {
-	OrientationAnnotationSmartRepPtr retval(new OrientationAnnotationSmartRep(uid, name));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new OrientationAnnotationSmartRep(), uid);
 }
 
 OrientationAnnotationSmartRep::~OrientationAnnotationSmartRep()
@@ -129,13 +127,13 @@ QString OrientationAnnotationSmartRep::determineAnnotation(Vector3D planeDir_s, 
 //	return "test_"+qstring_cast(planeDir_s);
 }
 
-void OrientationAnnotationSmartRep::addRepActorsToViewRenderer(View* view)
+void OrientationAnnotationSmartRep::addRepActorsToViewRenderer(ViewPtr view)
 {
 	this->transformChangedSlot();
 	view->getRenderer()->AddActor(mOrientation);
 }
 
-void OrientationAnnotationSmartRep::removeRepActorsFromViewRenderer(View* view)
+void OrientationAnnotationSmartRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->RemoveActor(mOrientation);
 }

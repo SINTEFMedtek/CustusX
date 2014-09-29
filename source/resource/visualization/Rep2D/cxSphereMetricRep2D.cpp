@@ -49,23 +49,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SphereMetricRep2DPtr SphereMetricRep2D::New(const QString& uid, const QString& name)
+SphereMetricRep2DPtr SphereMetricRep2D::New(const QString& uid)
 {
-	SphereMetricRep2DPtr retval(new SphereMetricRep2D(uid, name));
-	return retval;
+	return wrap_new(new SphereMetricRep2D(), uid);
 }
 
-SphereMetricRep2D::SphereMetricRep2D(const QString& uid, const QString& name) :
-	DataMetricRep(uid, name)
+SphereMetricRep2D::SphereMetricRep2D()
 {
 }
 
-void SphereMetricRep2D::addRepActorsToViewRenderer(View* view)
+void SphereMetricRep2D::addRepActorsToViewRenderer(ViewPtr view)
 {
 	DataMetricRep::addRepActorsToViewRenderer(view);
 }
 
-void SphereMetricRep2D::removeRepActorsFromViewRenderer(View* view)
+void SphereMetricRep2D::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	mDisk.reset();
 	DataMetricRep::removeRepActorsFromViewRenderer(view);
@@ -88,7 +86,7 @@ void SphereMetricRep2D::onModifiedStartRender()
 	if (!metric)
 		return;
 
-	if (!mDisk && mView && metric && mSliceProxy)
+	if (!mDisk && this->getView() && metric && mSliceProxy)
 	{
 		mDisk.reset(new GraphicalDisk());
 		mDisk->setRenderer(this->getRenderer());

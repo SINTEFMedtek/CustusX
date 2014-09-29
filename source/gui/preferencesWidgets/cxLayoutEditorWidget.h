@@ -96,7 +96,7 @@ private:
   void initCache();
   void clearDisplay();
   void updateGrid();
-  LayoutData::ViewData getViewData(QPoint pt);
+  LayoutViewData getViewData(QPoint pt);
   void colorRegion(LayoutRegion region, QString selectColor, QString backColor);
   std::set<LayoutData::iterator> getSelectedViews();
   void updateSelection(QPoint pos);
@@ -124,7 +124,7 @@ private:
     QString mName;
   };
   std::vector<ViewNamesType> mViewNames;
-  QString getViewName(LayoutData::ViewData data) const;
+  QString getViewName(LayoutViewData data) const;
 
   virtual void mouseMoveEvent(QMouseEvent* event);
   virtual void mousePressEvent(QMouseEvent* event);

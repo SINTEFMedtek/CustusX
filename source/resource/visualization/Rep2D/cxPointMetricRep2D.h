@@ -57,7 +57,7 @@ class PointMetricRep2D: public DataMetricRep
 {
 Q_OBJECT
 public:
-	static PointMetricRep2DPtr New(const QString& uid, const QString& name = ""); ///constructor
+	static PointMetricRep2DPtr New(const QString& uid=""); ///constructor
 	virtual ~PointMetricRep2D() {}
 
 	virtual QString getType() const { return "PointMetricRep2D"; }
@@ -65,8 +65,8 @@ public:
 	void setDynamicSize(bool on);
 
 protected:
-	virtual void addRepActorsToViewRenderer(View* view);
-	virtual void removeRepActorsFromViewRenderer(View* view);
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
     virtual void clear();
     virtual void rescale();

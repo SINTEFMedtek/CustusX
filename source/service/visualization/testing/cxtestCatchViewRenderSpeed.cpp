@@ -51,7 +51,7 @@ TEST_CASE("Speed: Render 10 empty viewWidgets", "[speed][gui][integration]")
 
 TEST_CASE("Speed: Render 10 empty vtkRenderWindows", "[speed][gui][integration]")
 {
-	TestRenderSpeed helper;
+	TestRenderWindowSpeed helper;
 	helper.testSeveralVtkRenderWindows();
 
 	REQUIRE(helper.getRenderFPS() > 10);
