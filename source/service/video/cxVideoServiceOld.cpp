@@ -64,36 +64,6 @@ VideoServiceOldPtr VideoServiceOld::create(VideoServiceBackendPtr backend)
 	return retval;
 }
 
-//void VideoServiceOld::initialize(VideoServiceBackendPtr videoBackend)
-//{
-//	VideoServiceOld::setInstance(new VideoServiceOld(videoBackend));
-//	VideoServiceOld::getInstance();
-//}
-
-//void VideoServiceOld::shutdown()
-//{
-//  delete mInstance;
-//  mInstance = NULL;
-//}
-
-//VideoServiceOldPtr VideoServiceOld::getInstance()
-//{
-//	if (!mInstance)
-//	{
-//		VideoServiceOld::setInstance(new VideoServiceOld(VideoServiceBackendPtr()));
-//	}
-//	return mInstance;
-//}
-
-//void VideoServiceOld::setInstance(VideoServiceOldPtr instance)
-//{
-//	if (mInstance)
-//	{
-//		delete mInstance;
-//	}
-//	mInstance = instance;
-//}
-
 VideoServiceOld::VideoServiceOld(VideoServiceBackendPtr videoBackend)
 {
 	mBackend = videoBackend;
@@ -196,11 +166,6 @@ VideoConnectionManagerPtr VideoServiceOld::getVideoConnection()
 VideoSourcePtr VideoServiceOld::getActiveVideoSource()
 {
 	return mActiveVideoSource;
-}
-
-ctkPluginContext* VideoServiceOld::getPluginContext()
-{
-	return mBackend->getPluginContext();
 }
 
 void VideoServiceOld::setPlaybackMode(PlaybackTimePtr controller)

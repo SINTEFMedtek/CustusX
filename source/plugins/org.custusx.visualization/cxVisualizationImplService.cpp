@@ -43,6 +43,8 @@ namespace cx
 VisualizationImplService::VisualizationImplService(ctkPluginContext *context) :
 	mContext(context )
 {
+	if(!viewManager())
+		std::cout << "VisualizationImplService got no viewManager" << std::endl;
 	connect(viewManager(), SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
 }
 

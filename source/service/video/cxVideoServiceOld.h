@@ -113,7 +113,6 @@ public:
 	/** Get all existing video sources.
 	  */
 	std::vector<VideoSourcePtr> getVideoSources();
-	ctkPluginContext* getPluginContext();
 	VideoServiceBackendPtr getBackend();
 
 signals:

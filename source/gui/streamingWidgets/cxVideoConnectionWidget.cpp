@@ -66,6 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //TODO: remove
 #include "cxLegacySingletons.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -106,7 +107,7 @@ VideoConnectionWidget::VideoConnectionWidget(VisualizationServicePtr visualizati
 	mToptopLayout->addStretch();
 
 	mServiceListener.reset(new ServiceTrackerListener<StreamerService>(
-													 videoService()->getPluginContext(),
+													 cx::LogicManager::getInstance()->getPluginContext(),
 													 boost::bind(&VideoConnectionWidget::onServiceAdded, this, _1),
 													 boost::function<void (StreamerService*)>(),
 													 boost::bind(&VideoConnectionWidget::onServiceRemoved, this, _1)

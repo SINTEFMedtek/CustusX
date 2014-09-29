@@ -150,7 +150,7 @@ void LogicManager::initializeServices()
 	// services layer
 	this->getPatientService();
 	this->getTrackingService();
-	this->getVideoServiceOld();
+	this->getVideoServiceOld();//Triggers plugin framework construction, creating problems for plugin services using managers (e.g. VisualizationImplService)
 	this->getStateService();
 	this->getVisualizationService();
 	this->getSpaceProvider();
@@ -218,13 +218,12 @@ void LogicManager::createVideoServiceOld()
 	this->getTrackingService();
 	this->getDataService();
 	this->getSpaceProvider();
-	this->getPluginFramework();
 
 	// build object(s):
 	VideoServiceBackendPtr videoBackend;
 	videoBackend = VideoServiceBackend::create(mDataService,
 											   mTrackingService,
-												 mSpaceProvider, mPluginFramework->getPluginFramework());
+												 mSpaceProvider, getPluginFramework()->getPluginFramework());
 	mVideoServiceOld = VideoServiceOld::create(videoBackend);
 	LegacySingletons::mVideoServiceOld = mVideoServiceOld;
 }
