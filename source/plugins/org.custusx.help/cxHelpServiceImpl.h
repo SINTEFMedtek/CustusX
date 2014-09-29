@@ -39,6 +39,7 @@ class ctkPluginContext;
 
 namespace cx
 {
+typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
 
 /**
  * Implementation of Example service.
@@ -52,12 +53,13 @@ class org_custusx_help_EXPORT HelpServiceImpl : public HelpService
 {
 	Q_INTERFACES(cx::HelpService)
 public:
-	HelpServiceImpl(ctkPluginContext *context);
+	HelpServiceImpl(ctkPluginContext *context, HelpEnginePtr engine);
 	virtual ~HelpServiceImpl();
 	virtual void registerWidget(QWidget* widget, QString keyword);
 
 private:
   ctkPluginContext* mContext;
+  HelpEnginePtr mEngine;
 
 };
 typedef boost::shared_ptr<HelpServiceImpl> HelpServiceImplPtr;

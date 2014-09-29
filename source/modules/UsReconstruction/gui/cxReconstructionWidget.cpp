@@ -46,7 +46,7 @@ namespace cx
 {
 
 ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructionManagerPtr reconstructer) :
-	BaseWidget(parent, "", "US Reconstruction"), mReconstructer(reconstructer)
+	BaseWidget(parent, "USReconstruction", "US Reconstruction"), mReconstructer(reconstructer)
 {
 	connect(mReconstructer.get(), SIGNAL(reconstructAboutToStart()), this, SLOT(reconstructAboutToStartSlot()));
 	connect(mReconstructer.get(), SIGNAL(reconstructStarted()), this, SLOT(reconstructStartedSlot()));

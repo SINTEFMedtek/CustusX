@@ -40,6 +40,7 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
 
 /**
  * Activator for the help plugin
@@ -66,6 +67,7 @@ public:
 private:
   RegisteredServicePtr mHelp;
   RegisteredServicePtr mGUIExtender;
+  HelpEnginePtr mEngine;
 };
 
 } // namespace cx

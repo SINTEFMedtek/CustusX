@@ -47,33 +47,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include "cxTypeConversions.h"
 #include <QFileInfo>
+#include "cxHelpEngine.h"
 
 namespace cx
 {
-HelpBrowser::HelpBrowser(QWidget *parent, QHelpEngineCore* helpEngine)
-	: QTextBrowser(parent), m_helpEngine(helpEngine)
+HelpBrowser::HelpBrowser(QWidget *parent, HelpEnginePtr engine)
+	: QTextBrowser(parent), mEngine(engine)
 {
-	std::cout << "HelpBrowser " << std::endl;
-//	QString collectionFile = QLibraryInfo::location(QLibraryInfo::ExamplesPath)
-//        + QLatin1String("/help/contextsensitivehelp/docs/wateringmachine.qhc");
-
-//QString collectionFile = "/Users/christiana/Qt/Examples/Qt-5.3/help/contextsensitivehelp/docs/wateringmachine.qhc";
-//	        std::cout << "HelpBrowser: " << collectionFile.toStdString() << std::endl;
-
-//    m_helpEngine = new QHelpEngineCore(collectionFile, this);
-//    if (!m_helpEngine->setupData()) {
-//		std::cout << "FAILED" << std::endl;
-//		delete m_helpEngine;
-//        m_helpEngine = 0;
-//    }
+	connect(mEngine.get(), SIGNAL(keywordActivated(QString)), this, SLOT(showHelpForKeyword(const QString&)));
 }
 
 void HelpBrowser::showHelpForKeyword(const QString &id)
 {
-	std::cout << "m_helpEngine " << m_helpEngine << std::endl;
-	if (m_helpEngine) {
-		QMap<QString, QUrl> links = m_helpEngine->linksForIdentifier(id);
-		std::cout << "[links]" << links.size() << std::endl;
+	if (mEngine->engine())
+	{
+		QMap<QString, QUrl> links = mEngine->engine()->linksForIdentifier(id);
+//		std::cout << "[links]" << links.size() << std::endl;
 		if (links.count())
 		{
 			setSource(links.constBegin().value());
@@ -84,11 +73,11 @@ void HelpBrowser::showHelpForKeyword(const QString &id)
 QVariant HelpBrowser::loadResource(int type, const QUrl &name)
 {
 	QByteArray ba;
-	if (type < 4 && m_helpEngine) {
+	if (type < 4 && mEngine->engine()) {
 		QUrl url(name);
 		if (name.isRelative())
 			url = source().resolved(url);
-		ba = m_helpEngine->fileData(url);
+		ba = mEngine->engine()->fileData(url);
 	}
 	return ba;
 }
@@ -100,19 +89,23 @@ QVariant HelpBrowser::loadResource(int type, const QUrl &name)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-HelpWidget::HelpWidget(QWidget* parent) :
+HelpWidget::HelpWidget(HelpEnginePtr engine, QWidget* parent) :
   BaseWidget(parent, "HelpWidget", "Help"),
   mVerticalLayout(new QVBoxLayout(this))
 {
+//	std::cout <<"*************** " <<  engine.get() << std::endl;
+
   this->setLayout(mVerticalLayout);
 
-//	helpEngine = new QHelpEngine(DataLocations::getDocPath()+"/wateringmachine.qhc", this);
-	QString helpFile = DataLocations::getDocPath()+"/cx_user_doc.qhc";
-//	QString helpFile = DataLocations::getDocPath()+"/doxygen/cx_user_doc.qch"; // virker med QtAssistant
-//	QString helpFile;
-	std::cout << "helpFile " << helpFile << " -- " << QFileInfo(helpFile).exists() << std::endl;
-	helpEngine = new QHelpEngine(helpFile, this);
-	helpSearchEngine = new QHelpSearchEngine(helpEngine);
+	mEngine = engine;
+
+////	helpEngine = new QHelpEngine(DataLocations::getDocPath()+"/wateringmachine.qhc", this);
+//	QString helpFile = DataLocations::getDocPath()+"/cx_user_doc.qhc";
+////	QString helpFile = DataLocations::getDocPath()+"/doxygen/cx_user_doc.qch"; // virker med QtAssistant
+////	QString helpFile;
+//	std::cout << "helpFile " << helpFile << " -- " << QFileInfo(helpFile).exists() << std::endl;
+//	helpEngine = new QHelpEngine(helpFile, this);
+	helpSearchEngine = new QHelpSearchEngine(mEngine->engine());
 	connect(helpSearchEngine, SIGNAL(indexingStarted()), this, SLOT(indexingStarted()));
 	connect(helpSearchEngine, SIGNAL(indexingFinished()), this, SLOT(indexingFinished()));
 	connect(helpSearchEngine, SIGNAL(searchingStarted()), this, SLOT(searchingIsStarted()));
@@ -120,25 +113,25 @@ HelpWidget::HelpWidget(QWidget* parent) :
 
 
 	QSplitter *helpPanel = new QSplitter(Qt::Horizontal);
-	HelpBrowser *helpBrowser = new HelpBrowser(this, helpEngine);
+	HelpBrowser *helpBrowser = new HelpBrowser(this, mEngine);
 
-	helpPanel->insertWidget(0, helpEngine->contentWidget());
+	helpPanel->insertWidget(0, mEngine->engine()->contentWidget());
 	helpPanel->insertWidget(1, helpBrowser);
 	helpPanel->setStretchFactor(1, 1);
 	mVerticalLayout->addWidget(helpPanel);
 	mVerticalLayout->addWidget(helpSearchEngine->queryWidget());
 	mVerticalLayout->addWidget(helpSearchEngine->resultWidget());
-	mVerticalLayout->addWidget(helpEngine->indexWidget());
+	mVerticalLayout->addWidget(mEngine->engine()->indexWidget());
 
 	connect(helpSearchEngine->queryWidget(), SIGNAL(search()), this, SLOT(search()));
 
-	bool success = helpEngine->setupData();
-	std::cout << "help engine setup success: " << success << std::endl;
+	bool success = mEngine->engine()->setupData();
+//	std::cout << "help engine setup success: " << success << std::endl;
 
 	helpSearchEngine->reindexDocumentation();
 
 
-	connect(helpEngine->contentWidget(),
+	connect(mEngine->engine()->contentWidget(),
 			SIGNAL(linkActivated(const QUrl &)),
 			helpBrowser, SLOT(setSource(const QUrl &)));
 

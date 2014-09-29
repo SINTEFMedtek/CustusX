@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxHelpServiceImpl.h"
 #include "cxHelpGUIExtenderService.h"
 #include "cxRegisteredService.h"
+#include "cxHelpEngine.h"
 
 namespace cx
 {
@@ -52,13 +53,20 @@ HelpPluginActivator::~HelpPluginActivator()
 
 void HelpPluginActivator::start(ctkPluginContext* context)
 {
-  mHelp = RegisteredService::create<HelpServiceImpl>(context, HelpService_iid);
-  mGUIExtender = RegisteredService::create<HelpGUIExtenderService>(context, GUIExtenderService_iid);
+	mEngine.reset(new HelpEngine);
+
+	HelpServiceImpl* helpService = new HelpServiceImpl(context, mEngine);
+	mHelp = RegisteredService::create<HelpServiceImpl>(context, helpService, HelpService_iid);
+
+	HelpGUIExtenderService* guiExtender = new HelpGUIExtenderService(context, mEngine);
+	mGUIExtender = RegisteredService::create<HelpGUIExtenderService>(context, guiExtender, GUIExtenderService_iid);
 }
 
 void HelpPluginActivator::stop(ctkPluginContext* context)
 {
 	mHelp.reset();
+	mGUIExtender.reset();
+	mEngine.reset();
     Q_UNUSED(context);
 }
 

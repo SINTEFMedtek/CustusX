@@ -92,7 +92,9 @@ cx_add_class_qt_moc(cxResource_SOURCE
 cx_add_class(cxResource_SOURCE
 	cxForwardDeclarations.h
 	vtkForwardDeclarations.h
-	
+	help/cxHelpServiceNull
+	help/cxHelpServiceProxy
+
 	Tool/cxProbeSector
 	Tool/cxProbeData
 	Tool/ProbeXmlConfigParser.h
@@ -278,6 +280,7 @@ set (CX_RESOURCE_LIBRARIES
     Qt5::Sql
     ${Boost_LIBRARIES}
     ${ITK_LIBRARIES}
+	CTKPluginFramework
     )
     
 if (CX_USE_OPENCL_UTILITY)

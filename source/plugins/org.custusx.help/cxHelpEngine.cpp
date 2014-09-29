@@ -30,28 +30,68 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxHelpServiceImpl.h"
-#include "ctkPluginContext.h"
 #include "cxHelpEngine.h"
+#include <QHelpEngine>
+#include "cxDataLocations.h"
+#include <iostream>
+#include "cxTypeConversions.h"
+#include <QFileInfo>
+#include <QApplication>
+#include <QWidget>
 
 namespace cx
 {
 
-
-HelpServiceImpl::HelpServiceImpl(ctkPluginContext *context, HelpEnginePtr engine) :
-  mContext(context),
-  mEngine(engine)
+HelpEngine::HelpEngine()
 {
+	//	helpEngine = new QHelpEngine(DataLocations::getDocPath()+"/wateringmachine.qhc", this);
+		QString helpFile = DataLocations::getDocPath()+"/cx_user_doc.qhc";
+	//	QString helpFile = DataLocations::getDocPath()+"/doxygen/cx_user_doc.qch"; // virker med QtAssistant
+	//	QString helpFile;
+		std::cout << "helpFile " << helpFile << " -- " << QFileInfo(helpFile).exists() << std::endl;
+		helpEngine = new QHelpEngine(helpFile, NULL);
+
+		connect(qApp, SIGNAL(focusObjectChanged(QObject*)), this, SLOT(focusObjectChanged(QObject*)));
+		connect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(focusChanged(QWidget*, QWidget*)));
 }
 
-HelpServiceImpl::~HelpServiceImpl()
+void HelpEngine::focusChanged(QWidget * old, QWidget * now)
 {
+	if (!now)
+		return;
+//	std::cout << "new widget focus: " << now->objectName() << std::endl;
+
 }
 
-void HelpServiceImpl::registerWidget(QWidget* widget, QString keyword)
+void HelpEngine::focusObjectChanged(QObject* newFocus)
 {
-	mEngine->registerWidget(widget, keyword);
+	if (!newFocus)
+		return;
+	std::cout << "HelpEngine::focusObjectChanged " << newFocus->objectName() << std::endl;
+//	newFocus
+	QString keyword = this->findBestMatchingKeyword(newFocus);
+	if (!keyword.isEmpty())
+	{
+		std::cout << "******** keyword: " << keyword << std::endl;
+		emit keywordActivated(keyword);
+	}
 }
 
+QString HelpEngine::findBestMatchingKeyword(QObject* object)
+{
+	while (object)
+	{
+//		std::cout << "    examining " << object->objectName() << std::endl;
+		if (mKeywords.count(object))
+			return mKeywords[object];
+		object = object->parent();
+	}
+	return "";
+}
 
-} /* namespace cx */
+void HelpEngine::registerWidget(QWidget* widget, QString keyword)
+{
+	mKeywords[widget] = keyword;
+}
+
+}

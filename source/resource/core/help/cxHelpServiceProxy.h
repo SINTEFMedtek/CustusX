@@ -30,28 +30,52 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxHelpServiceImpl.h"
-#include "ctkPluginContext.h"
-#include "cxHelpEngine.h"
+#ifndef CXHELPSERVICEPROXY_H
+#define CXHELPSERVICEPROXY_H
+
+#include "cxHelpService.h"
+//#include "cxServiceTrackerListener.h"
+#include "ctkServiceTracker.h"
+
 
 namespace cx
 {
 
+/**
+ * Get a HelpService, call always succeeds by returning NULL object if no help found.
+ *
+ * This is a quick fix: A full-fledged object can be returned instead by writing out the Proxy code.
+ */
+HelpService* HelpServiceProxy(ctkPluginContext* context);
 
-HelpServiceImpl::HelpServiceImpl(ctkPluginContext *context, HelpEnginePtr engine) :
-  mContext(context),
-  mEngine(engine)
-{
+//class HelpServiceProxy : public HelpService
+//public:
+//	HelpServiceProxy(ctkPluginContext* context)
+//	{
+//		  mListener.reset(new ServiceTrackerListener<HelpService>(
+//				  context,
+//				  boost::bind(&HelpServiceProxy::onServiceAdded, this, _1),
+//				  boost::bind(&HelpServiceProxy::onServiceModified, this, _1),
+//				  boost::bind(&HelpServiceProxy::onServiceRemoved, this, _1)
+//		  ));
+//		  mListener->open();
+//	}
+
+//private:
+//	HelpService* mBase;
+//	ServiceTrackerListener<HelpService> mListener;
+//	void onServiceAdded(HelpService* service)
+//	{
+
+//	}
+//	void onServiceModified(HelpService* service) {}
+//	void onServiceRemoved(HelpService* service)
+//	{
+
+//	}
+
+//};
+
 }
 
-HelpServiceImpl::~HelpServiceImpl()
-{
-}
-
-void HelpServiceImpl::registerWidget(QWidget* widget, QString keyword)
-{
-	mEngine->registerWidget(widget, keyword);
-}
-
-
-} /* namespace cx */
+#endif // CXHELPSERVICEPROXY_H

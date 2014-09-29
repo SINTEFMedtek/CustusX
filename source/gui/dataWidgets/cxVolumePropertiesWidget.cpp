@@ -50,6 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumeInfoWidget.h"
 #include "cxVolumeHelpers.h"
 #include "cxTypeConversions.h"
+#include "cxHelpServiceProxy.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -83,6 +85,7 @@ VolumePropertiesWidget::VolumePropertiesWidget(QWidget* parent) :
 		TabbedWidget(parent, "VolumePropertiesWidget", "Volume Properties")
 {
 	this->insertWidgetAtTop(new ActiveVolumeWidget(this));
+	HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "core_widgets_volume");
 
 	this->addTab(new VolumeInfoWidget(this), "Info");
 	this->addTab(new TransferFunctionWidget(this), QString("Transfer Functions"));
@@ -93,11 +96,12 @@ VolumePropertiesWidget::VolumePropertiesWidget(QWidget* parent) :
 
 QString VolumePropertiesWidget::defaultWhatsThis() const
 {
-  return "<html>"
-      "<h3>Volume properties</h3>"
-      "<p>Displays and adjusts information about a selected volume.</p>"
-      "<p><i>Click the tabs to see what properties can be changed.</i></p>"
-      "</html>";
+	return "";
+//  return "<html>"
+//      "<h3>Volume properties</h3>"
+//      "<p>Displays and adjusts information about a selected volume.</p>"
+//      "<p><i>Click the tabs to see what properties can be changed.</i></p>"
+//      "</html>";
 }
 
 }//namespace

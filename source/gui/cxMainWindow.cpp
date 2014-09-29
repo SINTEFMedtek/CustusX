@@ -149,6 +149,7 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
 
 	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
+	connect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(focusChanged(QWidget*, QWidget*)));
 
 	// insert all widgets from all guiExtenders
 	for (unsigned i = 0; i < guiExtenders.size(); ++i)
@@ -270,6 +271,8 @@ QWidget* MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
 	QDockWidget* dockWidget = new QDockWidget(widget->windowTitle(), this);
 	dockWidget->setObjectName(widget->objectName() + "DockWidget");
 	dockWidget->setWidget(scroller);
+	dockWidget->setFocusPolicy(Qt::StrongFocus); // we really want to focus on the embedded widget, see focusInsideDockWidget()
+	connect(dockWidget, SIGNAL(visibilityChanged(bool)), this, SLOT(dockWidgetVisibilityChanged(bool)));
 
 	QMainWindow::addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
 
@@ -292,6 +295,37 @@ QWidget* MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
 
 	return dockWidget;
 }
+
+void MainWindow::dockWidgetVisibilityChanged(bool val)
+{
+//	std::cout << "  MainWindow::dockWidgetVisibilityChanged: " << val << " " << sender()->objectName() << std::endl;
+	if (val)
+		this->focusInsideDockWidget(sender());
+}
+
+void MainWindow::focusChanged(QWidget * old, QWidget * now)
+{
+//	std::cout << "  MainWindow::focusChanged: " << now->objectName() << std::endl;
+	this->focusInsideDockWidget(now);
+}
+
+void MainWindow::focusInsideDockWidget(QObject *dockWidget)
+{
+	// Assume structure: QDockWidget->QScrollArea->QWidget,
+	// as defined in MainWindow::addAsDockWidget()
+	QDockWidget* dw = dynamic_cast<QDockWidget*>(dockWidget);
+	if (!dw)
+		return;
+	if (dw->parent()!=this) // avoid events from other mainwindows
+		return;
+	QScrollArea* sa = dynamic_cast<QScrollArea*>(dw->widget());
+	if (!sa)
+		return;
+	QTimer::singleShot(0, sa->widget(), SLOT(setFocus())); // avoid loops etc by send async event.
+
+//	std::cout << "**** new widget focus: " << sa->widget()->objectName() << std::endl;
+}
+
 
 void MainWindow::addToWidgetGroupMap(QAction* action, QString groupname)
 {

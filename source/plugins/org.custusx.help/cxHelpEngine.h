@@ -30,28 +30,43 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxHelpServiceImpl.h"
-#include "ctkPluginContext.h"
-#include "cxHelpEngine.h"
+#ifndef CXHELPENGINE_H
+#define CXHELPENGINE_H
+
+#include <map>
+#include "boost/shared_ptr.hpp"
+
+#include <QString>
+#include <QObject>
+
+class QWidget;
+class QHelpEngineCore;
+class QHelpEngine;
+class QHelpSearchEngine;
 
 namespace cx
 {
 
-
-HelpServiceImpl::HelpServiceImpl(ctkPluginContext *context, HelpEnginePtr engine) :
-  mContext(context),
-  mEngine(engine)
+class HelpEngine : public QObject
 {
+	Q_OBJECT
+public:
+	HelpEngine();
+	QHelpEngine* engine() { return helpEngine; }
+	void registerWidget(QWidget* widget, QString keyword);
+signals:
+	void keywordActivated(QString);
+private slots:
+	void focusObjectChanged(QObject* newFocus);
+	void focusChanged(QWidget * old, QWidget * now);
+private:
+	QString findBestMatchingKeyword(QObject* object);
+	QHelpEngine* helpEngine;
+	std::map<QObject*, QString> mKeywords;
+
+};
+typedef boost::shared_ptr<HelpEngine> HelpEnginePtr;
+
 }
 
-HelpServiceImpl::~HelpServiceImpl()
-{
-}
-
-void HelpServiceImpl::registerWidget(QWidget* widget, QString keyword)
-{
-	mEngine->registerWidget(widget, keyword);
-}
-
-
-} /* namespace cx */
+#endif // CXHELPENGINE_H

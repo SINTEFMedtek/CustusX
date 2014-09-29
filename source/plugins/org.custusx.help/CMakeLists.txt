@@ -15,6 +15,7 @@ set(PLUGIN_SRCS
   cxHelpGUIExtenderService.cpp
   cxHelpWidget.cpp
   cxHelpServiceImpl.cpp
+  cxHelpEngine.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -23,6 +24,7 @@ set(PLUGIN_MOC_SRCS
   cxHelpGUIExtenderService.h
   cxHelpWidget.h
   cxHelpServiceImpl.h
+  cxHelpEngine.h
 )
 
 # Qt Designer files which should be processed by Qts uic

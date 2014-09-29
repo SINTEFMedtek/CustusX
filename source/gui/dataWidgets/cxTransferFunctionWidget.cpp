@@ -54,6 +54,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataViewSelectionWidget.h"
 #include "cxShadingParamsInterfaces.h"
 #include "cxSettings.h"
+#include "cxLogicManager.h"
+#include "cxHelpServiceProxy.h"
 
 namespace cx
 {
@@ -190,6 +192,8 @@ TransferFunction3DWidget::TransferFunction3DWidget(QWidget* parent) :
   BaseWidget(parent, "TransferFunction3DWidget", "3D"),
   mLayout(new QVBoxLayout(this))
 {
+	HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "core_widgets_volume_transfer_function_3D");
+
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(this);
 
@@ -255,6 +259,7 @@ TransferFunction2DWidget::TransferFunction2DWidget(QWidget* parent) :
   BaseWidget(parent, "TransferFunction2DWidget", "2D"),
   mLayout(new QVBoxLayout(this))
 {
+	HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "core_widgets_volume_transfer_function_2D");
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
   mTransferFunctionAlphaWidget->setReadOnly(true);
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(this);
@@ -323,6 +328,7 @@ TransferFunctionWidget::TransferFunctionWidget(QWidget* parent) :
 {
   QVBoxLayout* mLayout = new QVBoxLayout(this);
 
+  HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "core_widgets_volume_transfer_function");
   mLayout->setMargin(0);
   mLayout->addWidget(new TransferFunction3DWidget(this));
   mLayout->addWidget(new TransferFunctionPresetWidget(this, true));

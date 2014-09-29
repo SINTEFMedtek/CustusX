@@ -2,6 +2,7 @@ Core Widgets {#core_widgets}
 ===========================================================
 
 
+\addindex core_widgets_volume
 Volume manipulation {#core_widgets_volume}
 ===========================================================
 
@@ -39,6 +40,7 @@ Volume Shading {#core_widgets_volume_shading}
  
 Set volume shading properties.
 
+\addindex core_widgets_volume_transfer_function
 Volume Transfer Function {#core_widgets_volume_transfer_function}
 -----------------------------------------------------------
 

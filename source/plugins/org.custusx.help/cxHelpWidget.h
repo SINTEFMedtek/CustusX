@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXHELPWIDGET_H
 
 #include "cxBaseWidget.h"
-
+#include "boost/shared_ptr.hpp"
 #include <QTextBrowser>
 
 QT_BEGIN_NAMESPACE
@@ -44,19 +44,21 @@ QT_END_NAMESPACE;
 
 namespace cx
 {
+typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
 
 class HelpBrowser : public QTextBrowser
 {
 	Q_OBJECT
 
 public:
-	HelpBrowser(QWidget *parent, QHelpEngineCore *helpEngine);
+	HelpBrowser(QWidget *parent, HelpEnginePtr engine);
+public slots:
 	void showHelpForKeyword(const QString &id);
 
 private:
 	QVariant loadResource(int type, const QUrl &name);
 
-	QHelpEngineCore *m_helpEngine;
+	HelpEnginePtr mEngine;
 };
 
 /**
@@ -68,7 +70,7 @@ class HelpWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  explicit HelpWidget(QWidget* parent = NULL);
+  explicit HelpWidget(HelpEnginePtr engine, QWidget* parent = NULL);
   virtual ~HelpWidget();
 
   virtual QString defaultWhatsThis() const;
@@ -91,7 +93,8 @@ private:
   virtual void prePaintEvent();
 
   QVBoxLayout* mVerticalLayout;
-  QHelpEngine* helpEngine;
+//  QHelpEngine* helpEngine;
+  HelpEnginePtr mEngine;
   QHelpSearchEngine* helpSearchEngine;
 };
 

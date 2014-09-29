@@ -43,6 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataManager.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxImage.h"
+#include "cxHelpServiceProxy.h"
+#include "cxLogicManager.h"
+
 namespace cx
 {
 
@@ -89,6 +92,8 @@ QStringList ClipPlaneStringDataAdapter::getValueRange() const
 ClippingWidget::ClippingWidget(QWidget* parent) :
 	BaseWidget(parent, "ClippingWidget", "Clip")
 {
+	HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "core_widgets_volume_clipping");
+
 	mInteractiveClipper = viewManager()->getClipper();
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));
 

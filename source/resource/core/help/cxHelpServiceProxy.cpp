@@ -30,28 +30,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxHelpServiceImpl.h"
-#include "ctkPluginContext.h"
-#include "cxHelpEngine.h"
+#include "cxHelpServiceProxy.h"
+#include "cxHelpServiceNull.h"
 
 namespace cx
 {
 
-
-HelpServiceImpl::HelpServiceImpl(ctkPluginContext *context, HelpEnginePtr engine) :
-  mContext(context),
-  mEngine(engine)
+HelpService* HelpServiceProxy(ctkPluginContext* context)
 {
-}
-
-HelpServiceImpl::~HelpServiceImpl()
-{
-}
-
-void HelpServiceImpl::registerWidget(QWidget* widget, QString keyword)
-{
-	mEngine->registerWidget(widget, keyword);
+	ctkServiceTracker<HelpService*> tracker(context);
+	tracker.open();
+	HelpService* service = tracker.getService(); // get arbitrary instance of this type
+	if (service)
+		return service;
+	return HelpServiceNull::getInstance();
 }
 
 
-} /* namespace cx */
+}

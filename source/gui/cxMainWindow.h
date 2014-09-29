@@ -129,8 +129,9 @@ protected slots:
 	void shootWindow();
 	void recordFullscreen();
 
-	//debug mode
 	void toggleDebugModeSlot(bool checked);
+	void dockWidgetVisibilityChanged(bool val);
+	void focusChanged(QWidget * old, QWidget * now);
 
 	void startupLoadPatient();
 
@@ -142,6 +143,7 @@ protected:
 	void changeEvent(QEvent * event);
 
 private:
+	void focusInsideDockWidget(QObject* dockWidget);
 	LayoutInteractorPtr mLayoutInteractor;
 	void saveScreenShot(QPixmap pixmap, QString id="");
 	void saveScreenShotThreaded(QImage pixmap, QString filename);

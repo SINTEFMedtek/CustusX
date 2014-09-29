@@ -58,9 +58,16 @@ public:
 	{
 		return RegisteredServicePtr(new RegisteredService(context, new SERVICE_TYPE(context), iid));
 	}
+	template <class SERVICE_TYPE>
+	static RegisteredServicePtr create(ctkPluginContext* context, SERVICE_TYPE* service, QString iid)
+	{
+		return RegisteredServicePtr(new RegisteredService(context, service, iid));
+	}
 
 	explicit RegisteredService(ctkPluginContext* context, QObject* instance, QString iid);
 	~RegisteredService();
+	template<class SERVICE_TYPE>
+	SERVICE_TYPE* get() const { return dynamic_cast<SERVICE_TYPE*>(mService.get()); }
 	QObjectPtr mService;
 	ctkServiceRegistration mReference;
 };

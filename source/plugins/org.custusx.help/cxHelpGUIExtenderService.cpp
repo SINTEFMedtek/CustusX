@@ -38,8 +38,9 @@ namespace cx
 {
 
 
-HelpGUIExtenderService::HelpGUIExtenderService(ctkPluginContext *context) :
-  mContext(context)
+HelpGUIExtenderService::HelpGUIExtenderService(ctkPluginContext *context, HelpEnginePtr engine) :
+  mContext(context),
+  mEngine(engine)
 {
 }
 
@@ -52,7 +53,7 @@ std::vector<GUIExtenderService::CategorizedWidget> HelpGUIExtenderService::creat
 	std::vector<CategorizedWidget> retval;
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new HelpWidget(),
+			new HelpWidget(mEngine),
 			"Plugins"));
 
 	return retval;

@@ -52,6 +52,7 @@ namespace cx
 
 class TabbedWidget : public BaseWidget
 {
+	Q_OBJECT
 public:
   TabbedWidget(QWidget* parent, QString objectName, QString windowTitle);
   virtual ~TabbedWidget();
@@ -59,6 +60,9 @@ public:
   void addTab(BaseWidget* newTab, QString newTabName);
   void insertWidgetAtTop(QWidget* newWidget);
   virtual QString defaultWhatsThis() const;
+
+private slots:
+  void tabChanged(const int &index);
 
 protected:
   QTabWidget* mTabWidget;

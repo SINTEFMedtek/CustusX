@@ -30,28 +30,20 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxHelpServiceImpl.h"
-#include "ctkPluginContext.h"
-#include "cxHelpEngine.h"
-
+#include "cxHelpServiceNull.h"
 namespace cx
 {
+//--------------------------------------------------------
+HelpServiceNull* HelpServiceNull::mInstance = NULL;
+//--------------------------------------------------------
 
-
-HelpServiceImpl::HelpServiceImpl(ctkPluginContext *context, HelpEnginePtr engine) :
-  mContext(context),
-  mEngine(engine)
+HelpServiceNull* HelpServiceNull::getInstance()
 {
+	if (!mInstance)
+	{
+		mInstance = new HelpServiceNull;
+	}
+	return mInstance;
 }
 
-HelpServiceImpl::~HelpServiceImpl()
-{
 }
-
-void HelpServiceImpl::registerWidget(QWidget* widget, QString keyword)
-{
-	mEngine->registerWidget(widget, keyword);
-}
-
-
-} /* namespace cx */
