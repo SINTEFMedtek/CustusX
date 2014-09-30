@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHeaderView>
 #include <QLabel>
 #include <QSlider>
+#include <QCheckBox>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
 #include "cxReporter.h"

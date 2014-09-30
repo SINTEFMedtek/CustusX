@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledComboBoxWidget.h"
 #include "cxReporter.h"
 #include "cxRegistrationServiceProxy.h"
+#include "cxData.h"
 
 namespace cx
 {

@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxCompactFilterSetupWidget.h"
 
+#include <QGroupBox>
 #include "cxThresholdPreview.h"
 #include "cxSelectDataStringDataAdapter.h"
 

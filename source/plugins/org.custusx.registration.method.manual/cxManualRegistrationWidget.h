@@ -35,13 +35,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxStringDataAdapter.h"
 #include "cxTransform3DWidget.h"
-#include "cxData.h"
-#include "cxRegistrationService.h"
 
 class ctkPluginContext;
 
 namespace cx
 {
+typedef boost::shared_ptr<class Data> DataPtr;
+typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
 
 //typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
 

@@ -35,6 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QLabel>
 #include <QSpinBox>
+#include <QCheckBox>
+#include <QGroupBox>
+#include <vtkCellArray.h>
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
 #include "cxRegistrationManager.h"
@@ -49,7 +52,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxView.h"
 #include "cxGeometricRep.h"
-#include <vtkCellArray.h>
 #include "cxGraphicalPrimitives.h"
 #include "cxLogicManager.h"
 #include "cxRegistrationServiceProxy.h"
