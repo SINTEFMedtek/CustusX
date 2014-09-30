@@ -45,12 +45,11 @@ namespace cx
 {
 
 HelpSearchWidget::HelpSearchWidget(HelpEnginePtr engine, QWidget* parent) :
-  QWidget(parent),
-  mVerticalLayout(new QVBoxLayout(this))
+	QWidget(parent),
+	mVerticalLayout(new QVBoxLayout(this)),
+	mEngine(engine)
 {
 	this->setLayout(mVerticalLayout);
-
-	mEngine = engine;
 
 	helpSearchEngine = new QHelpSearchEngine(mEngine->engine());
 	connect(helpSearchEngine, SIGNAL(indexingStarted()), this, SLOT(indexingStarted()));

@@ -36,10 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/shared_ptr.hpp"
 class QTabWidget;
 class QAction;
+class QSplitter;
 
 namespace cx
 {
 typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
+class HelpSearchWidget;
 
 /**
  * Top-level help widget
@@ -51,27 +53,43 @@ typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
  */
 class HelpWidget : public BaseWidget
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  explicit HelpWidget(HelpEnginePtr engine, QWidget* parent = NULL);
-  virtual ~HelpWidget();
+	explicit HelpWidget(HelpEnginePtr engine, QWidget* parent = NULL);
+	virtual ~HelpWidget();
 
-  virtual QString defaultWhatsThis() const;
+	virtual QString defaultWhatsThis() const;
+
+signals:
+	void requestShowLink(const QUrl&);
 
 private slots:
 	void toggleShowSearchHelp();
+	void toggleShowContentsHelp();
 private:
-  virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
-  virtual void hideEvent(QHideEvent* event);
-  virtual void prePaintEvent();
+	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
+	virtual void hideEvent(QHideEvent* event);
+	virtual void prePaintEvent();
+	void setup();
+	void addSearchWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayout);
+	void addIndexWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayout);
+	void addContentWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayout);
+	void toggleTabItemVisibility(QWidget* widget);
+	void hideTabItem(QWidget* widget);
+	void showTabItem(QWidget* widget);
 
-  QVBoxLayout* mVerticalLayout;
-  QTabWidget* mTabWidget;
+	QVBoxLayout* mVerticalLayout;
+	QTabWidget* mTabWidget;
+	HelpEnginePtr mEngine;
 
-  HelpEnginePtr mEngine;
-  QAction* mShowSearchAction;
-  class HelpSearchWidget* mSearchWidget;
+	HelpSearchWidget* mSearchWidget;
+
+	QAction* mShowSearchAction;
+	QAction* mShowContentsAction;
+	QWidget* mDummyDeclaration;
+	QSplitter* mSplitter;
+
 };
 
 }//end namespace cx

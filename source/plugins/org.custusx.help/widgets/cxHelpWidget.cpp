@@ -50,52 +50,48 @@ namespace cx
 
 HelpWidget::HelpWidget(HelpEnginePtr engine, QWidget* parent) :
 	BaseWidget(parent, "HelpWidget", "Help"),
-	mVerticalLayout(new QVBoxLayout(this)),
-	mTabWidget(new QTabWidget(this))
+	mVerticalLayout(NULL),
+	mTabWidget(NULL),
+	mEngine(engine)
 {
+}
+
+void HelpWidget::setup()
+{
+	if (mVerticalLayout)
+		return;
+
+	mVerticalLayout = new QVBoxLayout(this);
+	mVerticalLayout->setMargin(0);
+	mVerticalLayout->setSpacing(0);
 	this->setLayout(mVerticalLayout);
+	mTabWidget = new QTabWidget(this);
 	mTabWidget->setElideMode(Qt::ElideRight);
 
-	mEngine = engine;
+	QSplitter *splitter = new QSplitter(Qt::Horizontal);
+	mSplitter = splitter;
 
-	mSearchWidget = new HelpSearchWidget(mEngine, this);
+	HelpBrowser *browser = new HelpBrowser(this, mEngine);
+	connect(this, &HelpWidget::requestShowLink,
+			browser, &HelpBrowser::setSource);
 
-	QSplitter *helpPanel = new QSplitter(Qt::Horizontal);
-	HelpBrowser *helpBrowser = new HelpBrowser(this, mEngine);
-	QHelpContentWidget* contentWidget = mEngine->engine()->contentWidget();
+	QHBoxLayout* buttonLayout = new QHBoxLayout;
+	//	buttonLayout->setMargin(0);
+	mVerticalLayout->addLayout(buttonLayout);
 
-//	mShowSearchAction = this->createAction(this,
-//					QIcon(":/icons/open_icon_library/eye.png.png"),
-//					"Toggle show search help", "",
-//					SLOT(toggleShowSearchHelp()),
-//					NULL);
-//	mShowSearchAction->setCheckable(true);
-//	CXSmallToolButton* toggleShowSearchButton = new CXSmallToolButton();
-//	toggleShowSearchButton->setDefaultAction(mShowSearchAction);
+	splitter->insertWidget(0, mTabWidget);
+	splitter->insertWidget(1, browser);
+	splitter->setStretchFactor(1, 1);
+	mVerticalLayout->addWidget(splitter);
 
-	helpPanel->insertWidget(0, mTabWidget);
-	helpPanel->insertWidget(1, helpBrowser);
-	helpPanel->setStretchFactor(1, 1);
-	mVerticalLayout->addWidget(helpPanel);
+	this->addContentWidget(mTabWidget, buttonLayout);
+//	this->addSearchWidget(mTabWidget, buttonLayout);
+//	this->addIndexWidget(mTabWidget, buttonLayout);
+	buttonLayout->addStretch();
 
-	mTabWidget->addTab(contentWidget, "contents");
-	mTabWidget->addTab(mSearchWidget, "search");
-	mTabWidget->addTab(mEngine->engine()->indexWidget(), "index");
+	browser->showHelpForKeyword("mainpage_overview");
 
-	boost::function<void()> f = boost::bind(&QHelpContentWidget::expandToDepth, contentWidget, 2);
-	connect(mEngine->engine()->contentModel(), &QHelpContentModel::contentsCreated, f);
-
-	connect(mEngine->engine()->contentWidget(), &QHelpContentWidget::linkActivated,
-			helpBrowser, &HelpBrowser::setSource);
-	connect(mSearchWidget, &HelpSearchWidget::requestShowLink,
-			helpBrowser, &HelpBrowser::setSource);
-
-	helpBrowser->showHelpForKeyword("mainpage_overview");
-
-	//  //layout
-	//  mVerticalLayout->addLayout(buttonLayout);
-	//  mVerticalLayout->addWidget(mTable, 1);
-	//  mVerticalLayout->addWidget(mEditWidgets, 0);
+	this->hideTabItem(mEngine->engine()->contentWidget());
 }
 
 HelpWidget::~HelpWidget()
@@ -108,6 +104,54 @@ QString HelpWidget::defaultWhatsThis() const
 			"<p></p>"
 			"<p><i></i></p>"
 			"</html>";
+}
+
+void HelpWidget::addContentWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayout)
+{
+	QHelpContentWidget* contentWidget = mEngine->engine()->contentWidget();
+	tabWidget->addTab(contentWidget, "contents");
+
+	boost::function<void()> f = boost::bind(&QHelpContentWidget::expandToDepth, contentWidget, 2);
+	connect(mEngine->engine()->contentModel(), &QHelpContentModel::contentsCreated, f);
+	contentWidget->expandToDepth(2); // in case contents have been created
+
+	connect(mEngine->engine()->contentWidget(), &QHelpContentWidget::linkActivated,
+			this, &HelpWidget::requestShowLink);
+
+
+	QAction* action = this->createAction(this,
+										   QIcon(":/icons/open_icon_library/view-list-tree.png"),
+										   "Toggle show help contents", "",
+										   SLOT(toggleShowContentsHelp()),
+										   NULL);
+	action->setCheckable(true);
+	CXSmallToolButton* button = new CXSmallToolButton();
+	button->setDefaultAction(action);
+	buttonLayout->addWidget(button);
+	mShowContentsAction = action;
+}
+
+void HelpWidget::addIndexWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayout)
+{
+	tabWidget->addTab(mEngine->engine()->indexWidget(), "index");
+}
+
+void HelpWidget::addSearchWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayout)
+{
+	mSearchWidget = new HelpSearchWidget(mEngine, this);
+	tabWidget->addTab(mSearchWidget, "search");
+	connect(mSearchWidget, &HelpSearchWidget::requestShowLink,
+			this, &HelpWidget::requestShowLink);
+
+	mShowSearchAction = this->createAction(this,
+										   QIcon(":/icons/open_icon_library/eye.png.png"),
+										   "Toggle show search help", "",
+										   SLOT(toggleShowSearchHelp()),
+										   NULL);
+	mShowSearchAction->setCheckable(true);
+	CXSmallToolButton* button = new CXSmallToolButton();
+	button->setDefaultAction(mShowSearchAction);
+	buttonLayout->addWidget(button);
 }
 
 void HelpWidget::showEvent(QShowEvent* event)
@@ -123,14 +167,50 @@ void HelpWidget::hideEvent(QHideEvent* event)
 
 void HelpWidget::prePaintEvent()
 {
+	this->setup();
+}
+
+void HelpWidget::toggleShowContentsHelp()
+{
+	QHelpContentWidget* widget = mEngine->engine()->contentWidget();
+	this->toggleTabItemVisibility(widget);
 }
 
 void HelpWidget::toggleShowSearchHelp()
 {
-	if (mSearchWidget->isVisible())
-		mSearchWidget->hide();
+	this->toggleTabItemVisibility(mSearchWidget);
+}
+
+void HelpWidget::toggleTabItemVisibility(QWidget* widget)
+{
+	if (widget->isVisible())
+		this->hideTabItem(widget);
 	else
-		mSearchWidget->show();
+		this->showTabItem(widget);
+}
+
+void HelpWidget::showTabItem(QWidget* widget)
+{
+	QList<int> sizes = mSplitter->sizes();
+	if (sizes[0]==0)
+	{
+		sizes[0] = sizes[1]*1/3;
+		sizes[1] = sizes[1]*2/3;
+		mSplitter->setSizes(sizes);
+	}
+	mTabWidget->show();
+	widget->show();
+}
+
+void HelpWidget::hideTabItem(QWidget* widget)
+{
+	widget->hide();
+
+	bool anyVisible = false;
+	for (int i=0; i<mTabWidget->count(); ++i)
+		mTabWidget->widget(i)->isVisible() || anyVisible;
+	if (!anyVisible)
+		mTabWidget->hide();
 }
 
 }//end namespace cx
