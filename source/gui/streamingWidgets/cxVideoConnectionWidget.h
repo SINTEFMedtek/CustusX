@@ -94,6 +94,8 @@ protected slots:
 	void importStreamImageSlot();
 	void selectGuiForConnectionMethodSlot();
 	void initScriptSelected(QString filename);
+	void onServiceAdded(StreamerService *service);
+	void onServiceRemoved(StreamerService *service);
 
 protected:
 	void connectServer();
@@ -139,13 +141,10 @@ protected:
 
 private:
 	QWidget* createStreamerWidget(StreamerService* service);
-	void onServiceAdded(StreamerService *service);
-	void onServiceRemoved(StreamerService *service);
 	void addServiceToSelector(QString name);
 	void removeServiceFromSelector(QString name);
 	void removeServiceWidget(QString name);
 
-	boost::shared_ptr<ServiceTrackerListener<StreamerService> > mServiceListener;
 	std::map<QString, QWidget*> mStreamerServiceWidgets;
 };
 

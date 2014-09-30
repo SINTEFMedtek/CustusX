@@ -128,6 +128,12 @@ MeshPtr PatientModelServiceNull::createMesh(vtkPolyDataPtr data, QString uidBase
 	return MeshPtr();
 }
 
+ImagePtr PatientModelServiceNull::createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath)
+{
+	printWarning();
+	return ImagePtr();
+}
+
 void PatientModelServiceNull::loadData(DataPtr data)
 {
 	printWarning();

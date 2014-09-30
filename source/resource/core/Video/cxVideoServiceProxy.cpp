@@ -86,11 +86,13 @@ void VideoServiceProxy::onVideoServiceRemoved(VideoService *service)
 void VideoServiceProxy::onStreamerServiceAdded(StreamerService* service)
 {
 //	std::cout << "VideoServiceProxy:: Streamer Service added!!! " << service->getName() << std::endl;
+	emit StreamerServiceAdded(service);
 }
 
 void VideoServiceProxy::onStreamerServiceRemoved(StreamerService *service)
 {
 //	std::cout << "VideoServiceProxy:: Streamer Service removed!!! " << service->getName() << std::endl;
+	emit StreamerServiceRemoved(service);
 }
 
 bool VideoServiceProxy::isNull()

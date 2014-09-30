@@ -60,6 +60,8 @@ public:
 	static VideoServicePtr getNullObject();
 
 signals:
+	void StreamerServiceAdded(StreamerService* service);
+	void StreamerServiceRemoved(StreamerService* service);
 
 public slots:
 

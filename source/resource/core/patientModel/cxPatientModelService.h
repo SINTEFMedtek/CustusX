@@ -91,8 +91,11 @@ public:
 	virtual Transform3D get_rMpr() const = 0;
 	virtual ImagePtr getActiveImage() const = 0; ///< used for system state
 	virtual void setActiveImage(ImagePtr activeImage) = 0; ///< used for system state
+
 	virtual ImagePtr createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath = "Images") = 0;
 	virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath) = 0;
+	virtual ImagePtr createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath = "Images") = 0;
+
 	virtual void loadData(DataPtr data) = 0;
 	virtual void saveData(DataPtr data, const QString& basePath) = 0; ///< Save data to file
 	virtual void saveImage(ImagePtr image, const QString& basePath) = 0;///< Save image to file \param image Image to save \param basePath Absolute path to patient data folder

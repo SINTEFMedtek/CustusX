@@ -148,6 +148,11 @@ MeshPtr PatientModelImplService::createMesh(vtkPolyDataPtr data, QString uidBase
 	return dataService()->createMesh(data, uidBase, nameBase, filePath);
 }
 
+ImagePtr PatientModelImplService::createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath)
+{
+	return dataService()->createImage(data, uidBase, nameBase, filePath);
+}
+
 void PatientModelImplService::loadData(DataPtr data)
 {
 	dataService()->loadData(data);

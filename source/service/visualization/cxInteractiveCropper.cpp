@@ -58,6 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisualizationServiceBackend.h"
 #include "cxPatientModelService.h"
 
+// This class is used from ViewManager constructor, so patientModelService can't be used
 //TODO: Use ActiveImageProxy when possible, and use patientModelService instead of VisualizationServiceBackend
 #include "cxActiveImageProxyOld.h"
 #include "cxDataManager.h"

@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 
 #include "cxFileSelectWidget.h"
-#include "cxDataManager.h"
 #include "cxTime.h"
 #include "cxReporter.h"
 #include "cxProbeSector.h"
@@ -61,8 +60,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxFileInputWidget.h"
 #include "cxLogger.h"
-
 #include "cxOptionsWidget.h"
+#include "cxVideoService.h"
+#include "cxPatientModelService.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"
@@ -107,21 +107,14 @@ VideoConnectionWidget::VideoConnectionWidget(VisualizationServicePtr visualizati
 	mToptopLayout->addWidget(sscCreateDataWidget(this, mActiveVideoSourceSelector));
 	mToptopLayout->addStretch();
 
-	//TODO: Use StreamerServerListener in VideoService
-	mServiceListener.reset(new ServiceTrackerListener<StreamerService>(
-													 cx::LogicManager::getInstance()->getPluginContext(),
-													 boost::bind(&VideoConnectionWidget::onServiceAdded, this, _1),
-													 boost::function<void (StreamerService*)>(),
-													 boost::bind(&VideoConnectionWidget::onServiceRemoved, this, _1)
-													 ));
-	mServiceListener->open();
+	connect(videoService.get(), SIGNAL(StreamerServiceAdded(StreamerService *service)), this, SLOT(onServiceAdded(StreamerService *service)));
+	connect(videoService.get(), SIGNAL(StreamerServiceRemoved(StreamerService *service)), this, SLOT(onServiceRemoved(StreamerService *service)));
 
 	this->selectGuiForConnectionMethodSlot();
 }
 
 VideoConnectionWidget::~VideoConnectionWidget()
 {
-	mServiceListener.reset();
 }
 
 void VideoConnectionWidget::onServiceAdded(StreamerService* service)
@@ -133,7 +126,6 @@ void VideoConnectionWidget::onServiceAdded(StreamerService* service)
 
 	this->addServiceToSelector(service->getName());
 }
-
 
 QWidget* VideoConnectionWidget::createStreamerWidget(StreamerService* service)
 {
@@ -517,7 +509,7 @@ void VideoConnectionWidget::importStreamImageSlot()
 Transform3D VideoConnectionWidget::calculate_rMd_ForAProbeImage(ToolPtr probe)
 {
 	Transform3D rMd = Transform3D::Identity();
-	Transform3D rMpr = dataManager()->get_rMpr();
+	Transform3D rMpr = mPatientModelService->get_rMpr();
 	Transform3D prMt = probe->get_prMt();
 	Transform3D tMu = probe->getProbe()->getSector()->get_tMu();
 	Transform3D uMv = probe->getProbe()->getSector()->get_uMv();
@@ -544,11 +536,11 @@ void VideoConnectionWidget::saveAndImportSnapshot(vtkImageDataPtr input, QString
 {
 	vtkImageDataPtr copiedImage = vtkImageDataPtr::New();
 	copiedImage->DeepCopy(input);
-	ImagePtr output = dataManager()->createImage(copiedImage, filename, filename);
+	ImagePtr output = mPatientModelService->createImage(copiedImage, filename, filename);
 	output->get_rMd_History()->setRegistration(rMd);
 	QString folder = patientService()->getPatientData()->getActivePatientFolder();
-	dataManager()->loadData(output);
-	dataManager()->saveImage(output, folder);
+	mPatientModelService->loadData(output);
+	mPatientModelService->saveImage(output, folder);
 	viewManager()->autoShowData(output);
 	report(QString("Saved snapshot %1 from active video source").arg(output->getName()));
 }

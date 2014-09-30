@@ -58,8 +58,11 @@ public:
 	virtual Transform3D get_rMpr() const;
 	virtual ImagePtr getActiveImage() const;
 	virtual void setActiveImage(ImagePtr activeImage);
+
 	virtual ImagePtr createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath);
 	virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath);
+	virtual ImagePtr createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath);
+
 	virtual void loadData(DataPtr data);
 	virtual void saveData(DataPtr data, const QString& basePath); ///< Save data to file
 	virtual void saveImage(ImagePtr image, const QString& basePath);

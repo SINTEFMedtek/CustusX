@@ -161,6 +161,11 @@ MeshPtr PatientModelServiceProxy::createMesh(vtkPolyDataPtr data, QString uidBas
 	return mPatientModelService->createMesh(data, uidBase, nameBase, filePath);
 }
 
+ImagePtr PatientModelServiceProxy::createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath)
+{
+	return mPatientModelService->createImage(data, uidBase, nameBase, filePath);
+}
+
 void PatientModelServiceProxy::loadData(DataPtr data)
 {
 	mPatientModelService->loadData(data);
