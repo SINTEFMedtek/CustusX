@@ -33,11 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXLANDMARKREGISTRATIONWIDGET_H_
 
 #include <map>
-//#include "cxVolumetricRep.h"
-#include "cxLandmark.h"
 #include "cxTransform3D.h"
 #include "cxRegistrationBaseWidget.h"
-#include "cxActiveImageProxy.h"
 
 
 class QVBoxLayout;
@@ -49,6 +46,7 @@ class QSlider;
 
 namespace cx
 {
+typedef std::map<QString, class Landmark> LandmarkMap;
 typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
 
 /**

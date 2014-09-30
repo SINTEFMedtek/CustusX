@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXLANDMARKIMAGE2IMAGEREGISTRATIONWIDGET_H_
 
 #include "cxLandmarkRegistrationWidget.h"
-#include "cxRegistrationDataAdapters.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -44,6 +43,10 @@ class QSlider;
 
 namespace cx
 {
+typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
+typedef boost::shared_ptr<class RegistrationFixedImageStringDataAdapter> RegistrationFixedImageStringDataAdapterPtr;
+typedef boost::shared_ptr<class RegistrationMovingImageStringDataAdapter> RegistrationMovingImageStringDataAdapterPtr;
+
 /**
  * \file
  * \addtogroup cx_module_registration
