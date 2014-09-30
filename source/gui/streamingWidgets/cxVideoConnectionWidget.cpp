@@ -63,6 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOptionsWidget.h"
 #include "cxVideoService.h"
 #include "cxPatientModelService.h"
+#include "cxDetailedLabeledComboBoxWidget.h"
 
 //TODO: remove
 #include "cxLegacySingletons.h"

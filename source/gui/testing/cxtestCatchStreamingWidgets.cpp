@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QTimer>
 #include <QApplication>
+#include <QFile>
 #include "cxtestTestVideoConnectionWidget.h"
 #include "cxtestQueuedSignalListener.h"
 #include "cxDataLocations.h"

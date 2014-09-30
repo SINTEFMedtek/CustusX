@@ -40,10 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QProcess>
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
-#include "cxServiceTrackerListener.h"
-#include "cxStreamerService.h"
 #include "cxXmlOptionItem.h"
-#include "cxDetailedLabeledComboBoxWidget.h"
 
 class QPushButton;
 class QComboBox;
@@ -53,18 +50,16 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
 namespace cx
 {
-	class FileSelectWidget;
-	typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
-	typedef boost::shared_ptr<class Tool> ToolPtr;
-}
-
-namespace cx
-{
-typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
-typedef boost::shared_ptr<class ActiveVideoSourceStringDataAdapter> ActiveVideoSourceStringDataAdapterPtr;
-
+class FileSelectWidget;
 class SimulateUSWidget;
 class FileInputWidget;
+class StreamerService;
+class XmlOptionFile;
+class DetailedLabeledComboBoxWidget;
+typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
+typedef boost::shared_ptr<class ActiveVideoSourceStringDataAdapter> ActiveVideoSourceStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
+typedef boost::shared_ptr<class Tool> ToolPtr;
 
 /**
  * \brief GUI for setting up a connection to a video stream
