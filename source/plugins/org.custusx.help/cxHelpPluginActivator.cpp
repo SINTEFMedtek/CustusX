@@ -55,8 +55,8 @@ void HelpPluginActivator::start(ctkPluginContext* context)
 {
 	mEngine.reset(new HelpEngine);
 
-//	HelpServiceImpl* helpService = new HelpServiceImpl(context, mEngine);
-//	mHelp = RegisteredService::create<HelpServiceImpl>(context, helpService, HelpService_iid);
+	HelpServiceImpl* helpService = new HelpServiceImpl(context, mEngine);
+	mHelp = RegisteredService::create<HelpServiceImpl>(context, helpService, HelpService_iid);
 
 	HelpGUIExtenderService* guiExtender = new HelpGUIExtenderService(context, mEngine);
 	mGUIExtender = RegisteredService::create<HelpGUIExtenderService>(context, guiExtender, GUIExtenderService_iid);
