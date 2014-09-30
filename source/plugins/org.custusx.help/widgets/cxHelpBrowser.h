@@ -30,51 +30,38 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXHELPENGINE_H
-#define CXHELPENGINE_H
+#ifndef CXHELPBROWSER_H
+#define CXHELPBROWSER_H
 
-#include <map>
 #include "boost/shared_ptr.hpp"
-
-#include <QString>
-#include <QObject>
-
-class QWidget;
-class QHelpEngineCore;
-class QHelpEngine;
-class QHelpSearchEngine;
+#include <QTextBrowser>
 
 namespace cx
 {
+typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
 
 /**
- * Core functionality and shared resource for help plugin.
  *
  * \ingroup org_custusx_help
  *
  * \date 2014-09-30
  * \author Christian Askeland
  */
-class HelpEngine : public QObject
+class HelpBrowser : public QTextBrowser
 {
 	Q_OBJECT
+
 public:
-	HelpEngine();
-	QHelpEngine* engine() { return helpEngine; }
-	void registerWidget(QWidget* widget, QString keyword);
-signals:
-	void keywordActivated(QString);
-private slots:
-	void focusObjectChanged(QObject* newFocus);
-	void focusChanged(QWidget * old, QWidget * now);
+	HelpBrowser(QWidget *parent, HelpEnginePtr engine);
+public slots:
+	void showHelpForKeyword(const QString &id);
+
 private:
-	QString findBestMatchingKeyword(QObject* object);
-	QHelpEngine* helpEngine;
-	std::map<QObject*, QString> mKeywords;
-
+	QVariant loadResource(int type, const QUrl &name);
+	HelpEnginePtr mEngine;
 };
-typedef boost::shared_ptr<HelpEngine> HelpEnginePtr;
 
-}
 
-#endif // CXHELPENGINE_H
+}//end namespace cx
+
+#endif // CXHELPBROWSER_H

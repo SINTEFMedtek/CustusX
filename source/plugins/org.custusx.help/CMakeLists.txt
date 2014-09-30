@@ -8,12 +8,17 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
-    )
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}/widgets
+	${CMAKE_CURRENT_SOURCE_DIR}/core
+	)
 
 set(PLUGIN_SRCS
   cxHelpPluginActivator.cpp
   cxHelpGUIExtenderService.cpp
-  cxHelpWidget.cpp
+  widgets/cxHelpWidget.cpp
+  widgets/cxHelpSearchWidget.cpp
+  widgets/cxHelpBrowser.cpp
   cxHelpServiceImpl.cpp
   cxHelpEngine.cpp
 )
@@ -22,7 +27,9 @@ set(PLUGIN_SRCS
 set(PLUGIN_MOC_SRCS
   cxHelpPluginActivator.h
   cxHelpGUIExtenderService.h
-  cxHelpWidget.h
+  widgets/cxHelpWidget.h
+  widgets/cxHelpSearchWidget.h
+  widgets/cxHelpBrowser.h
   cxHelpServiceImpl.h
   cxHelpEngine.h
 )

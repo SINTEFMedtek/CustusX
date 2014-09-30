@@ -34,36 +34,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBaseWidget.h"
 #include "boost/shared_ptr.hpp"
-#include <QTextBrowser>
-
-QT_BEGIN_NAMESPACE
-class QHelpEngineCore;
-class QHelpEngine;
-class QHelpSearchEngine;
-QT_END_NAMESPACE;
+class QTabWidget;
+class QAction;
 
 namespace cx
 {
 typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
 
-class HelpBrowser : public QTextBrowser
-{
-	Q_OBJECT
-
-public:
-	HelpBrowser(QWidget *parent, HelpEnginePtr engine);
-public slots:
-	void showHelpForKeyword(const QString &id);
-
-private:
-	QVariant loadResource(int type, const QUrl &name);
-
-	HelpEnginePtr mEngine;
-};
-
 /**
- * \ingroup cx_gui
+ * Top-level help widget
  *
+ * \ingroup org_custusx_help
+ *
+ * \date 2014-09-30
+ * \author Christian Askeland
  */
 class HelpWidget : public BaseWidget
 {
@@ -75,27 +59,19 @@ public:
 
   virtual QString defaultWhatsThis() const;
 
-signals:
-
- public slots:
-//  virtual void setModified();
-
-protected slots:
-  void indexingStarted();
-  void indexingFinished();
-  void searchingIsStarted();
-  void searchingIsFinished(int val);
-  void search();
-protected:
+private slots:
+	void toggleShowSearchHelp();
 private:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event);
   virtual void prePaintEvent();
 
   QVBoxLayout* mVerticalLayout;
-//  QHelpEngine* helpEngine;
+  QTabWidget* mTabWidget;
+
   HelpEnginePtr mEngine;
-  QHelpSearchEngine* helpSearchEngine;
+  QAction* mShowSearchAction;
+  class HelpSearchWidget* mSearchWidget;
 };
 
 }//end namespace cx

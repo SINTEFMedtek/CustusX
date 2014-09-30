@@ -30,70 +30,69 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxHelpEngine.h"
+#include "cxHelpSearchWidget.h"
 
+#include <QVBoxLayout>
 #include <QHelpEngine>
-#include "cxDataLocations.h"
+#include <QHelpSearchEngine>
+#include <QHelpSearchQueryWidget>
+#include <QHelpSearchResultWidget>
 #include <iostream>
 #include "cxTypeConversions.h"
-#include <QFileInfo>
-#include <QApplication>
-#include <QWidget>
+#include "cxHelpEngine.h"
 
 namespace cx
 {
 
-HelpEngine::HelpEngine()
+HelpSearchWidget::HelpSearchWidget(HelpEnginePtr engine, QWidget* parent) :
+  QWidget(parent),
+  mVerticalLayout(new QVBoxLayout(this))
 {
-	//	helpEngine = new QHelpEngine(DataLocations::getDocPath()+"/wateringmachine.qhc", this);
-		QString helpFile = DataLocations::getDocPath()+"/cx_user_doc.qhc";
-	//	QString helpFile = DataLocations::getDocPath()+"/doxygen/cx_user_doc.qch"; // virker med QtAssistant
-	//	QString helpFile;
-		std::cout << "helpFile " << helpFile << " -- " << QFileInfo(helpFile).exists() << std::endl;
-		helpEngine = new QHelpEngine(helpFile, NULL);
-		helpEngine->setupData();
+	this->setLayout(mVerticalLayout);
 
-		connect(qApp, SIGNAL(focusObjectChanged(QObject*)), this, SLOT(focusObjectChanged(QObject*)));
-		connect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(focusChanged(QWidget*, QWidget*)));
+	mEngine = engine;
+
+	helpSearchEngine = new QHelpSearchEngine(mEngine->engine());
+	connect(helpSearchEngine, SIGNAL(indexingStarted()), this, SLOT(indexingStarted()));
+	connect(helpSearchEngine, SIGNAL(indexingFinished()), this, SLOT(indexingFinished()));
+	connect(helpSearchEngine, SIGNAL(searchingStarted()), this, SLOT(searchingIsStarted()));
+	connect(helpSearchEngine, SIGNAL(searchingFinished(int)), this, SLOT(searchingIsFinished(int)));
+
+	mVerticalLayout->addWidget(helpSearchEngine->queryWidget());
+	mVerticalLayout->addWidget(helpSearchEngine->resultWidget());
+
+	connect(helpSearchEngine->queryWidget(), SIGNAL(search()), this, SLOT(search()));
+
+	helpSearchEngine->reindexDocumentation();
+
+	connect(helpSearchEngine->resultWidget(),
+			SIGNAL(requestShowLink(const QUrl&)),
+			this, SIGNAL(requestShowLink(const QUrl&)));
 }
 
-void HelpEngine::focusChanged(QWidget * old, QWidget * now)
+void HelpSearchWidget::search()
 {
-	if (!now)
-		return;
-//	std::cout << "new widget focus: " << now->objectName() << std::endl;
-
+	QList<QHelpSearchQuery> query = helpSearchEngine->queryWidget()->query();
+	helpSearchEngine->search(query);
 }
 
-void HelpEngine::focusObjectChanged(QObject* newFocus)
+void HelpSearchWidget::indexingStarted()
 {
-	if (!newFocus)
-		return;
-	std::cout << "HelpEngine::focusObjectChanged " << newFocus->objectName() << std::endl;
-//	newFocus
-	QString keyword = this->findBestMatchingKeyword(newFocus);
-	if (!keyword.isEmpty())
-	{
-		std::cout << "******** keyword: " << keyword << std::endl;
-		emit keywordActivated(keyword);
-	}
+	std::cout << "start indexing: "  << std::endl;
 }
 
-QString HelpEngine::findBestMatchingKeyword(QObject* object)
+void HelpSearchWidget::indexingFinished()
 {
-	while (object)
-	{
-//		std::cout << "    examining " << object->objectName() << std::endl;
-		if (mKeywords.count(object))
-			return mKeywords[object];
-		object = object->parent();
-	}
-	return "";
+	std::cout << "stop indexing: "  << std::endl;
 }
 
-void HelpEngine::registerWidget(QWidget* widget, QString keyword)
+void HelpSearchWidget::searchingIsStarted()
 {
-	mKeywords[widget] = keyword;
+	std::cout << "started search: "  << std::endl;
+}
+void HelpSearchWidget::searchingIsFinished(int i)
+{
+	std::cout << "finished search: " << i << std::endl;
 }
 
-}
+}//end namespace cx

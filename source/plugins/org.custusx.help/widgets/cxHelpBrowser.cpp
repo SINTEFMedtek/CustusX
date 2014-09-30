@@ -30,51 +30,42 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXHELPENGINE_H
-#define CXHELPENGINE_H
+#include "cxHelpBrowser.h"
 
-#include <map>
-#include "boost/shared_ptr.hpp"
-
-#include <QString>
-#include <QObject>
-
-class QWidget;
-class QHelpEngineCore;
-class QHelpEngine;
-class QHelpSearchEngine;
+#include <QHelpEngine>
+#include "cxHelpEngine.h"
 
 namespace cx
 {
-
-/**
- * Core functionality and shared resource for help plugin.
- *
- * \ingroup org_custusx_help
- *
- * \date 2014-09-30
- * \author Christian Askeland
- */
-class HelpEngine : public QObject
+HelpBrowser::HelpBrowser(QWidget *parent, HelpEnginePtr engine)
+	: QTextBrowser(parent), mEngine(engine)
 {
-	Q_OBJECT
-public:
-	HelpEngine();
-	QHelpEngine* engine() { return helpEngine; }
-	void registerWidget(QWidget* widget, QString keyword);
-signals:
-	void keywordActivated(QString);
-private slots:
-	void focusObjectChanged(QObject* newFocus);
-	void focusChanged(QWidget * old, QWidget * now);
-private:
-	QString findBestMatchingKeyword(QObject* object);
-	QHelpEngine* helpEngine;
-	std::map<QObject*, QString> mKeywords;
-
-};
-typedef boost::shared_ptr<HelpEngine> HelpEnginePtr;
-
+	connect(mEngine.get(), SIGNAL(keywordActivated(QString)), this, SLOT(showHelpForKeyword(const QString&)));
 }
 
-#endif // CXHELPENGINE_H
+void HelpBrowser::showHelpForKeyword(const QString &id)
+{
+	if (mEngine->engine())
+	{
+		QMap<QString, QUrl> links = mEngine->engine()->linksForIdentifier(id);
+//		std::cout << "[links]" << links.size() << std::endl;
+		if (links.count())
+		{
+			setSource(links.constBegin().value());
+		}
+	}
+}
+
+QVariant HelpBrowser::loadResource(int type, const QUrl &name)
+{
+	QByteArray ba;
+	if (type < 4 && mEngine->engine()) {
+		QUrl url(name);
+		if (name.isRelative())
+			url = source().resolved(url);
+		ba = mEngine->engine()->fileData(url);
+	}
+	return ba;
+}
+
+}//end namespace cx

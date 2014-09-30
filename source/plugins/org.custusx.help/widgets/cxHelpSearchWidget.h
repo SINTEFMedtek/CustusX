@@ -29,52 +29,49 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXHELPSEARCHWIDGET_H
+#define CXHELPSEARCHWIDGET_H
 
-#ifndef CXHELPENGINE_H
-#define CXHELPENGINE_H
-
-#include <map>
+#include <QWidget>
 #include "boost/shared_ptr.hpp"
 
-#include <QString>
-#include <QObject>
-
-class QWidget;
-class QHelpEngineCore;
-class QHelpEngine;
+QT_BEGIN_NAMESPACE
 class QHelpSearchEngine;
+class QVBoxLayout;
+QT_END_NAMESPACE;
 
 namespace cx
 {
+typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
 
 /**
- * Core functionality and shared resource for help plugin.
  *
  * \ingroup org_custusx_help
  *
  * \date 2014-09-30
  * \author Christian Askeland
  */
-class HelpEngine : public QObject
+class HelpSearchWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	HelpEngine();
-	QHelpEngine* engine() { return helpEngine; }
-	void registerWidget(QWidget* widget, QString keyword);
+	HelpSearchWidget(HelpEnginePtr engine, QWidget* parent = NULL);
+
 signals:
-	void keywordActivated(QString);
-private slots:
-	void focusObjectChanged(QObject* newFocus);
-	void focusChanged(QWidget * old, QWidget * now);
+	void requestShowLink(const QUrl&);
+
+protected slots:
+  void indexingStarted();
+  void indexingFinished();
+  void searchingIsStarted();
+  void searchingIsFinished(int val);
+  void search();
 private:
-	QString findBestMatchingKeyword(QObject* object);
-	QHelpEngine* helpEngine;
-	std::map<QObject*, QString> mKeywords;
-
+  QVBoxLayout* mVerticalLayout;
+  HelpEnginePtr mEngine;
+  QHelpSearchEngine* helpSearchEngine;
 };
-typedef boost::shared_ptr<HelpEngine> HelpEnginePtr;
 
-}
+}//end namespace cx
 
-#endif // CXHELPENGINE_H
+#endif // CXHELPSEARCHWIDGET_H

@@ -1,7 +1,7 @@
 CustusX Overview {#mainpage}
 ========================
 
-
+\addindex mainpage_overview 
 Overview {#mainpage_overview}
 ========================
 

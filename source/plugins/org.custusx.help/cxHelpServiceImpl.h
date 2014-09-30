@@ -42,11 +42,10 @@ namespace cx
 typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
 
 /**
- * Implementation of Example service.
  *
- * \ingroup org_custusx_example
+ * \ingroup org_custusx_help
  *
- * \date 2014-04-01
+ * \date 2014-09-11
  * \author Christian Askeland
  */
 class org_custusx_help_EXPORT HelpServiceImpl : public HelpService
