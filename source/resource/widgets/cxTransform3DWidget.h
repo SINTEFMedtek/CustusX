@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXTRANSFORM3DWIDGET_H_
 
 #include "cxBaseWidget.h"
-#include "cxDoubleDataAdapterXml.h"
 #include "cxTransform3D.h"
 #include "cxFrame3D.h"
 
@@ -46,6 +45,7 @@ namespace cx
 {
 
 class MatrixTextEdit;
+typedef boost::shared_ptr<class DoubleDataAdapterXml> DoubleDataAdapterXmlPtr;
 
 /**
  * \brief Widget for displaying and manipulating an affine matrix,

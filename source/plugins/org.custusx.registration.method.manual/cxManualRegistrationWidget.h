@@ -33,13 +33,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMANUALREGISTRATIONWIDGET_H_
 #define CXMANUALREGISTRATIONWIDGET_H_
 
-#include "cxStringDataAdapter.h"
-#include "cxTransform3DWidget.h"
+#include "cxBaseWidget.h"
+#include "cxTransform3D.h"
 
 class ctkPluginContext;
 
 namespace cx
 {
+class Transform3DWidget;
 typedef boost::shared_ptr<class Data> DataPtr;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
@@ -85,8 +86,6 @@ private:
 	QVBoxLayout* mVerticalLayout;
 	QLabel* mLabel;
 
-//	StringDataAdapterPtr mFixedImage;
-//	StringDataAdapterPtr mMovingImage;
 	Transform3DWidget* mMatrixWidget;
 };
 

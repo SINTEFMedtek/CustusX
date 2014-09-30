@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include "cxPatientModelServiceProxy.h"
 #include "cxRegistrationService.h"
+#include "cxTransform3DWidget.h"
 
 namespace cx
 {
