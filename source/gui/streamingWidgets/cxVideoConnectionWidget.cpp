@@ -107,8 +107,8 @@ VideoConnectionWidget::VideoConnectionWidget(VisualizationServicePtr visualizati
 	mToptopLayout->addWidget(sscCreateDataWidget(this, mActiveVideoSourceSelector));
 	mToptopLayout->addStretch();
 
-	connect(videoService.get(), SIGNAL(StreamerServiceAdded(StreamerService *service)), this, SLOT(onServiceAdded(StreamerService *service)));
-	connect(videoService.get(), SIGNAL(StreamerServiceRemoved(StreamerService *service)), this, SLOT(onServiceRemoved(StreamerService *service)));
+	connect(videoService.get(), SIGNAL(StreamerServiceAdded(StreamerService*)), this, SLOT(onServiceAdded(StreamerService*)));
+	connect(videoService.get(), SIGNAL(StreamerServiceRemoved(StreamerService*)), this, SLOT(onServiceRemoved(StreamerService*)));
 
 	this->selectGuiForConnectionMethodSlot();
 }

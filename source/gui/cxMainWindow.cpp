@@ -96,6 +96,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDockWidgets.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxVisualizationServiceProxy.h"
+#include "cxVideoServiceProxy.h"
 
 namespace cx
 {
@@ -134,6 +135,7 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 
 	mPatientModelService = PatientModelServicePtr(new PatientModelServiceProxy(pluginContext));
 	mVisualizationService = VisualizationServicePtr(new VisualizationServiceProxy(pluginContext));
+	mVideoService = VideoServicePtr(new VideoServiceProxy(pluginContext));
 
 	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
 	this->addAsDockWidget(new VideoConnectionWidget(mVisualizationService, mPatientModelService, mVideoService, this), "Utility");
