@@ -37,6 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegistrationMethodModelToUSService.h"
 #include "cxRegisteredService.h"
+#include "cxRegistrationServiceProxy.h"
+#include "cxPatientModelServiceProxy.h"
+#include "cxVisualizationServiceProxy.h"
 
 namespace cx
 {
@@ -53,7 +56,11 @@ RegistrationMethodModelToUSPluginActivator::~RegistrationMethodModelToUSPluginAc
 
 void RegistrationMethodModelToUSPluginActivator::start(ctkPluginContext* context)
 {
-	mRegistration = RegisteredService::create<RegistrationMethodModelToUSService>(context, RegistrationMethodService_iid);
+	RegistrationServicePtr registrationService(new RegistrationServiceProxy(context));
+	VisualizationServicePtr visualizationService(new VisualizationServiceProxy(context));
+	PatientModelServicePtr patientModelService(new PatientModelServiceProxy(context));
+
+	mRegistration = RegisteredServicePtr(new RegisteredService(context, new RegistrationMethodModelToUSService(registrationService, visualizationService, patientModelService), RegistrationMethodService_iid));
 }
 
 void RegistrationMethodModelToUSPluginActivator::stop(ctkPluginContext* context)

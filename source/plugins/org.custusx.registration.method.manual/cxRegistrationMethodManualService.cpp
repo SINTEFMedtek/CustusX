@@ -37,7 +37,7 @@ namespace cx
 {
 
 RegistrationMethodManualService::RegistrationMethodManualService(RegistrationServicePtr registrationService) :
-	mRegistrationService(registrationService)
+	RegistrationMethodService(registrationService)
 {
 }
 

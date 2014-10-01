@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegistrationMethodService.h"
 #include "org_custusx_registration_method_modelToUS_Export.h"
-class ctkPluginContext;
 
 namespace cx
 {
@@ -51,14 +50,15 @@ namespace cx
 class org_custusx_registration_method_modelToUS_EXPORT RegistrationMethodModelToUSService : public RegistrationMethodService
 {
 public:
-	RegistrationMethodModelToUSService(ctkPluginContext *context);
+	RegistrationMethodModelToUSService(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService);
 	virtual ~RegistrationMethodModelToUSService() {}
 	virtual QString getRegistrationType() {return QString("ImageToImage");}
 	virtual QString getRegistrationMethod() {return QString("ModelToUS");}
 	virtual QWidget* createWidget();
 	virtual QString getWidgetName() {return QString("ModelToUSRegistrationWidget");}
 private:
-	ctkPluginContext* mPluginContext;
+	VisualizationServicePtr mVisualizationService;
+	PatientModelServicePtr mPatientModelService;
 };
 
 } /* namespace cx */

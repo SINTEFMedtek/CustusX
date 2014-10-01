@@ -35,13 +35,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegistrationMethodService.h"
 
-#include <boost/shared_ptr.hpp>
 #include "org_custusx_registration_method_manual_Export.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
 
 /**
  * Registration method manual service interface.
@@ -56,8 +53,6 @@ class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualServ
 	Q_OBJECT
 public:
 	RegistrationMethodManualService(RegistrationServicePtr registrationService);
-protected:
-	RegistrationServicePtr mRegistrationService;
 };
 
 } /* namespace cx */
