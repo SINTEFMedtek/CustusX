@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationMethodManualImageToPatientService.h"
 #include "cxRegistrationMethodManualImageTransformService.h"
 #include "cxRegisteredService.h"
+#include "cxPatientModelServiceProxy.h"
+#include "cxRegistrationServiceProxy.h"
 
 namespace cx
 {
@@ -54,9 +56,12 @@ RegistrationMethodManualPluginActivator::~RegistrationMethodManualPluginActivato
 
 void RegistrationMethodManualPluginActivator::start(ctkPluginContext* context)
 {
-	mRegistrationImageToImage = RegisteredService::create<RegistrationMethodManualImageToImageService>(context, RegistrationMethodService_iid);
-	mRegistrationImageToPatient = RegisteredService::create<RegistrationMethodManualImageToPatientService>(context, RegistrationMethodService_iid);
-	mRegistrationImageTransform = RegisteredService::create<RegistrationMethodManualImageTransformService>(context, RegistrationMethodService_iid);
+	PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
+	RegistrationServicePtr registrationService = RegistrationServicePtr(new RegistrationServiceProxy(context));
+
+	mRegistrationImageToImage	= RegisteredServicePtr(new RegisteredService(context, new RegistrationMethodManualImageToImageService(registrationService), RegistrationMethodService_iid));
+	mRegistrationImageToPatient = RegisteredServicePtr(new RegisteredService(context, new RegistrationMethodManualImageToPatientService(registrationService, patientModelService), RegistrationMethodService_iid));
+	mRegistrationImageTransform = RegisteredServicePtr(new RegisteredService(context, new RegistrationMethodManualImageTransformService(registrationService) , RegistrationMethodService_iid));
 }
 
 void RegistrationMethodManualPluginActivator::stop(ctkPluginContext* context)

@@ -36,14 +36,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-RegistrationMethodManualImageTransformService::RegistrationMethodManualImageTransformService(ctkPluginContext *context) :
-	RegistrationMethodManualService(context)
+RegistrationMethodManualImageTransformService::RegistrationMethodManualImageTransformService(RegistrationServicePtr registrationService) :
+	RegistrationMethodManualService(registrationService)
 {
 }
 
 QWidget* RegistrationMethodManualImageTransformService::createWidget()
 {
-	QWidget *retval = new ManualImageTransformRegistrationWidget(mPluginContext, NULL, this->getWidgetName());
+	QWidget *retval = new ManualImageTransformRegistrationWidget(mRegistrationService, NULL, this->getWidgetName());
 	return retval;
 }
 

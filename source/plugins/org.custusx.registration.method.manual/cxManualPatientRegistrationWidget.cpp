@@ -33,17 +33,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxManualPatientRegistrationWidget.h"
 
 #include <QLabel>
-#include "cxPatientModelServiceProxy.h"
+#include "cxPatientModelService.h"
 #include "cxRegistrationService.h"
 #include "cxTransform3DWidget.h"
 
 namespace cx
 {
 
-ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName) :
+ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName) :
 				BaseWidget(parent, objectName, "Manual Patient Registration"),
 				mVerticalLayout(new QVBoxLayout(this)),
-				mPatientModelService(new cx::PatientModelServiceProxy(pluginContext))
+				mRegistrationService(registrationService),
+				mPatientModelService(patientModelService)
 {
 	mLabel = new QLabel("Patient Registration matrix rMpr");
 	mVerticalLayout->addWidget(mLabel);

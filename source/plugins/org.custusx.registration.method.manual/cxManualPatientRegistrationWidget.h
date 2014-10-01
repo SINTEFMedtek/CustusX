@@ -54,7 +54,7 @@ class ManualPatientRegistrationWidget: public BaseWidget
 {
 Q_OBJECT
 public:
-ManualPatientRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName);
+ManualPatientRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName);
 	 ~ManualPatientRegistrationWidget()
 	{
 	}

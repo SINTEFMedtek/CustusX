@@ -5,14 +5,14 @@
 namespace cx
 {
 
-RegistrationMethodManualImageToImageService::RegistrationMethodManualImageToImageService(ctkPluginContext *context) :
-	RegistrationMethodManualService(context)
+RegistrationMethodManualImageToImageService::RegistrationMethodManualImageToImageService(RegistrationServicePtr registrationService) :
+	RegistrationMethodManualService(registrationService)
 {
 }
 
 QWidget* RegistrationMethodManualImageToImageService::createWidget()
 {
-	QWidget* retval = new ManualImage2ImageRegistrationWidget(mPluginContext, NULL, this->getWidgetName());
+	QWidget* retval = new ManualImage2ImageRegistrationWidget(mRegistrationService, NULL, this->getWidgetName());
 	return retval;
 }
 

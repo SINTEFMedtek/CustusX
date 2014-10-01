@@ -35,17 +35,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctkPluginContext.h>
 #include "cxLabeledComboBoxWidget.h"
 #include "cxReporter.h"
-#include "cxRegistrationServiceProxy.h"
+#include "cxRegistrationService.h"
 #include "cxData.h"
 #include "cxTransform3DWidget.h"
 
 namespace cx
 {
 
-ManualImageRegistrationWidget::ManualImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName, QString windowTitle) :
+ManualImageRegistrationWidget::ManualImageRegistrationWidget(RegistrationServicePtr registrationService, QWidget* parent, QString objectName, QString windowTitle) :
 	BaseWidget(parent, objectName, windowTitle),
 	mVerticalLayout(new QVBoxLayout(this)),
-	mRegistrationService(new cx::RegistrationServiceProxy(pluginContext))
+	mRegistrationService(registrationService)
 {
 	mLabel = new QLabel("Data matrix rMd");
 	mVerticalLayout->addWidget(mLabel);

@@ -61,7 +61,7 @@ class ManualImageRegistrationWidget: public BaseWidget
 {
 Q_OBJECT
 public:
-	ManualImageRegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent, QString objectName, QString windowTitle);
+	ManualImageRegistrationWidget(RegistrationServicePtr registrationService, QWidget* parent, QString objectName, QString windowTitle);
 	virtual ~ManualImageRegistrationWidget()
 	{
 //		mRegistrationService.reset();

@@ -36,14 +36,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-RegistrationMethodManualImageToPatientService::RegistrationMethodManualImageToPatientService(ctkPluginContext *context) :
-	RegistrationMethodManualService(context)
+RegistrationMethodManualImageToPatientService::RegistrationMethodManualImageToPatientService(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService) :
+	RegistrationMethodManualService(registrationService),
+	mPatientModelService(patientModelService)
 {
 }
 
 QWidget* RegistrationMethodManualImageToPatientService::createWidget()
 {
-	QWidget *retval = new ManualPatientRegistrationWidget(mPluginContext, NULL, this->getWidgetName());
+	QWidget *retval = new ManualPatientRegistrationWidget(mRegistrationService, mPatientModelService, NULL, this->getWidgetName());
 	return retval;
 }
 

@@ -31,14 +31,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxRegistrationMethodManualService.h"
-#include "ctkPluginContext.h"
 #include "cxManualRegistrationWidget.h"
 
 namespace cx
 {
 
-RegistrationMethodManualService::RegistrationMethodManualService(ctkPluginContext *context) :
-	mPluginContext(context)
+RegistrationMethodManualService::RegistrationMethodManualService(RegistrationServicePtr registrationService) :
+	mRegistrationService(registrationService)
 {
 }
 
