@@ -55,6 +55,7 @@ class VideoService : public QObject
 	Q_OBJECT
 public:
 	virtual StreamerService *getStreamerService(QString service) = 0;
+	virtual QList<StreamerService *> getStreamerServices() = 0;
 
 	virtual bool isNull() = 0;
 	static VideoServicePtr getNullObject();

@@ -72,11 +72,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-VideoConnectionWidget::VideoConnectionWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, VideoServicePtr videoService, QWidget* parent) :
+VideoConnectionWidget::VideoConnectionWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, VideoServicePtr newVideoService, QWidget* parent) :
 	BaseWidget(parent, "IGTLinkWidget", "Video Connection"),
 	mVisualizationService(visualizationService),
 	mPatientModelService(patientModelService),
-	mVideoService(videoService)
+	mVideoService(newVideoService)
 {
 	mInitScriptWidget=NULL;
 
@@ -108,14 +108,30 @@ VideoConnectionWidget::VideoConnectionWidget(VisualizationServicePtr visualizati
 	mToptopLayout->addWidget(sscCreateDataWidget(this, mActiveVideoSourceSelector));
 	mToptopLayout->addStretch();
 
-	connect(videoService.get(), SIGNAL(StreamerServiceAdded(StreamerService*)), this, SLOT(onServiceAdded(StreamerService*)));
-	connect(videoService.get(), SIGNAL(StreamerServiceRemoved(StreamerService*)), this, SLOT(onServiceRemoved(StreamerService*)));
+	connect(mVideoService.get(), SIGNAL(StreamerServiceAdded(StreamerService*)), this, SLOT(onServiceAdded(StreamerService*)));
+	connect(mVideoService.get(), SIGNAL(StreamerServiceRemoved(StreamerService*)), this, SLOT(onServiceRemoved(StreamerService*)));
+
+	this->addExistingStreamerServices(); //Need to add StreamerServices already existing at this point, since we will only get signals when new Services are added
 
 	this->selectGuiForConnectionMethodSlot();
 }
 
 VideoConnectionWidget::~VideoConnectionWidget()
 {
+	if (mVideoService)
+	{
+		disconnect(mVideoService.get(), SIGNAL(StreamerServiceAdded(StreamerService*)), this, SLOT(onServiceAdded(StreamerService*)));
+		disconnect(mVideoService.get(), SIGNAL(StreamerServiceRemoved(StreamerService*)), this, SLOT(onServiceRemoved(StreamerService*)));
+	}
+}
+
+void VideoConnectionWidget::addExistingStreamerServices()
+{
+	QList<StreamerService *> services = mVideoService->getStreamerServices();
+	foreach(StreamerService* service, services)
+	{
+		this->onServiceAdded(service);
+	}
 }
 
 void VideoConnectionWidget::onServiceAdded(StreamerService* service)

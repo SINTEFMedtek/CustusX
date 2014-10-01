@@ -47,6 +47,7 @@ public:
 	bool isNull();
 
 	virtual StreamerService *getStreamerService(QString service);
+	virtual QList<StreamerService *> getStreamerServices();
 private:
 	void initServiceListener();
 	void onVideoServiceAdded(VideoService* service);

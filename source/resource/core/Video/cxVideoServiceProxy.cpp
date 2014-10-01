@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxNullDeleter.h"
 #include "cxReporter.h"
 #include "cxStreamerService.h"
+//#include "cxTypeConversions.h"
 
 namespace cx
 {
@@ -104,5 +105,11 @@ StreamerService *VideoServiceProxy::getStreamerService(QString service)
 {
 	return mStreamerServiceListener->getService(service);
 }
+
+QList<StreamerService*> VideoServiceProxy::getStreamerServices()
+{
+	return mStreamerServiceListener->getServices();
+}
+
 
 } //cx

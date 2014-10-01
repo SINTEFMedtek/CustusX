@@ -55,6 +55,7 @@ public:
 	VideoImplService(ctkPluginContext* context);
 	virtual ~VideoImplService();
 	virtual StreamerService *getStreamerService(QString service);
+	virtual QList<StreamerService *> getStreamerServices();
 
 	virtual bool isNull();
 

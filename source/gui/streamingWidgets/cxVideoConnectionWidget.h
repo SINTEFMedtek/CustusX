@@ -76,7 +76,7 @@ class VideoConnectionWidget : public BaseWidget
   Q_OBJECT
 
 public:
-	VideoConnectionWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, VideoServicePtr videoService, QWidget* parent);
+	VideoConnectionWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, VideoServicePtr newVideoService, QWidget* parent);
 	virtual ~VideoConnectionWidget();
 	virtual QString defaultWhatsThis() const;
 
@@ -139,6 +139,7 @@ private:
 	void addServiceToSelector(QString name);
 	void removeServiceFromSelector(QString name);
 	void removeServiceWidget(QString name);
+	void addExistingStreamerServices();
 
 	std::map<QString, QWidget*> mStreamerServiceWidgets;
 };

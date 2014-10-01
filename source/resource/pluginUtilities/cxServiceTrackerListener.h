@@ -114,6 +114,11 @@ public:
 		return service;
 	}
 
+	QList<T*> getServices()
+	{
+		return mServiceTracker->getServices();
+	}
+
 private:
 	boost::shared_ptr<ServiceTrackerCustomizer<T> > mServiceTrackerCustomizer;
 	boost::shared_ptr<ctkServiceTracker<T*> > mServiceTracker;

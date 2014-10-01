@@ -45,6 +45,12 @@ StreamerService *VideoServiceNull::getStreamerService(QString service)
 	printWarning();
 	return NULL;
 }
+
+QList<StreamerService *> VideoServiceNull::getStreamerServices()
+{
+	printWarning();
+	return QList<StreamerService *>();
+}
 bool VideoServiceNull::isNull()
 {
 	return true;

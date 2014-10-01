@@ -58,6 +58,11 @@ StreamerService *VideoImplService::getStreamerService(QString service)
 	return NULL;//Let the proxy object handle the plugin framework
 }
 
+QList<StreamerService *> VideoImplService::getStreamerServices()
+{
+	return QList<StreamerService *>();//Let the proxy object handle the plugin framework
+}
+
 bool VideoImplService::isNull()
 {
 	return false;
