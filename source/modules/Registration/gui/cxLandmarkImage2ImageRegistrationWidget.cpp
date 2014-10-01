@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxRepManager.h"
-#include "cxRegistrationManager.h"
 #include "cxViewManager.h"
 #include "cxSettings.h"
 #include "cxLandmarkRep.h"

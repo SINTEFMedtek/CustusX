@@ -93,8 +93,10 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 		QVBoxLayout *layoutGroupBox = new QVBoxLayout(groupBox);
 		QHBoxLayout *layoutH = new QHBoxLayout();
 
-		layoutH->addWidget(methodSelector);
-		layoutH->addStretch();
+		QLabel *methodSelectorLabel = new QLabel("Method");
+		layoutH->addWidget(methodSelectorLabel);
+		layoutH->addWidget(methodSelector, 1);
+//		layoutH->addStretch();
 
 		layoutV->addLayout(layoutH);
 		layoutV->addWidget(groupBox);
