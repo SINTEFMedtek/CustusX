@@ -31,6 +31,8 @@ IF (CX_BUILD_USER_DOCUMENTATION)
 #    SET(CX_DOXYGEN_QHG_LOCATION "qhelpgenerator") # check if this is the correct help generator.
      
      # tweaks that make pages more fitting in the internal help system
+    SET(CX_DOXYGEN_HTML_HEADER ${CX_DOC_INPUT_DIRECTORY}/doxy_header_empty.html)
+    SET(CX_DOXYGEN_HTML_FOOTER ${CX_DOC_INPUT_DIRECTORY}/doxy_footer_empty.html)
     SET(CX_DOXYGEN_DISABLE_INDEX YES)
     SET(CX_DOXYGEN_GENERATE_TREEVIEW NO)
     SET(CX_DOXYGEN_SEARCHENGINE NO)
@@ -77,6 +79,8 @@ IF (CX_BUILD_USER_DOCUMENTATION)
     SET(CX_DOXYGEN_GENERATE_TREEVIEW YES)
     SET(CX_DOXYGEN_SEARCHENGINE YES)
     SET(CX_DOXYGEN_ALPHABETICAL_INDEX YES)
+    SET(CX_DOXYGEN_HTML_HEADER "")
+    SET(CX_DOXYGEN_HTML_FOOTER "")
     
     CONFIGURE_FILE(
         ${CX_DOC_INPUT_DIRECTORY}/cx_doxyfile.dox.in
