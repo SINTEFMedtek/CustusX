@@ -30,69 +30,42 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxHelpSearchWidget.h"
+#include "cxHelpIndexWidget.h"
 
 #include <QVBoxLayout>
 #include <QHelpEngine>
-#include <QHelpSearchEngine>
-#include <QHelpSearchQueryWidget>
-#include <QHelpSearchResultWidget>
-#include <iostream>
+#include <QHelpIndexWidget>
+#include <QLineEdit>
+#include <QLabel>
+
 #include "cxTypeConversions.h"
 #include "cxHelpEngine.h"
 
 namespace cx
 {
 
-HelpSearchWidget::HelpSearchWidget(HelpEnginePtr engine, QWidget* parent) :
+HelpIndexWidget::HelpIndexWidget(HelpEnginePtr engine, QWidget* parent) :
 	QWidget(parent),
-	mVerticalLayout(new QVBoxLayout(this)),
 	mEngine(engine)
 {
-	this->setLayout(mVerticalLayout);
-	mVerticalLayout->setMargin(0);
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	layout->setMargin(0);
+	this->setLayout(layout);
 
-	helpSearchEngine = new QHelpSearchEngine(mEngine->engine());
-	connect(helpSearchEngine, SIGNAL(indexingStarted()), this, SLOT(indexingStarted()));
-	connect(helpSearchEngine, SIGNAL(indexingFinished()), this, SLOT(indexingFinished()));
-	connect(helpSearchEngine, SIGNAL(searchingStarted()), this, SLOT(searchingIsStarted()));
-	connect(helpSearchEngine, SIGNAL(searchingFinished(int)), this, SLOT(searchingIsFinished(int)));
+	mFilterEdit = new QLineEdit;
+	connect(mFilterEdit, &QLineEdit::textChanged, this, &HelpIndexWidget::filterChanged);
 
-	mVerticalLayout->addWidget(helpSearchEngine->queryWidget());
-	mVerticalLayout->addWidget(helpSearchEngine->resultWidget());
+	layout->addWidget(new QLabel("Look for:"));
+	layout->addWidget(mFilterEdit);
+	layout->addWidget(mEngine->engine()->indexWidget());
 
-	connect(helpSearchEngine->queryWidget(), SIGNAL(search()), this, SLOT(search()));
-
-	helpSearchEngine->reindexDocumentation();
-
-	connect(helpSearchEngine->resultWidget(),
-			SIGNAL(requestShowLink(const QUrl&)),
-			this, SIGNAL(requestShowLink(const QUrl&)));
+	connect(mEngine->engine()->indexWidget(), &QHelpIndexWidget::linkActivated,
+			this, &HelpIndexWidget::requestShowLink);
 }
 
-void HelpSearchWidget::search()
+void HelpIndexWidget::filterChanged()
 {
-	QList<QHelpSearchQuery> query = helpSearchEngine->queryWidget()->query();
-	helpSearchEngine->search(query);
-}
-
-void HelpSearchWidget::indexingStarted()
-{
-//	std::cout << "start indexing: "  << std::endl;
-}
-
-void HelpSearchWidget::indexingFinished()
-{
-//	std::cout << "stop indexing: "  << std::endl;
-}
-
-void HelpSearchWidget::searchingIsStarted()
-{
-//	std::cout << "started search: "  << std::endl;
-}
-void HelpSearchWidget::searchingIsFinished(int i)
-{
-//	std::cout << "finished search: " << i << std::endl;
+	mEngine->engine()->indexWidget()->filterIndices(mFilterEdit->text());
 }
 
 }//end namespace cx

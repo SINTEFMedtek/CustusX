@@ -29,66 +29,43 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXHELPWIDGET_H
-#define CXHELPWIDGET_H
+#ifndef CXHELPINDEXWIDGET_H
+#define CXHELPINDEXWIDGET_H
 
-#include "cxBaseWidget.h"
+#include <QWidget>
 #include "boost/shared_ptr.hpp"
-class QTabWidget;
-class QAction;
-class QSplitter;
+class QLineEdit;
 
 namespace cx
 {
 typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
-class HelpSearchWidget;
-class HelpIndexWidget;
 
 /**
- * Top-level help widget
  *
  * \ingroup org_custusx_help
  *
  * \date 2014-09-30
  * \author Christian Askeland
  */
-class HelpWidget : public BaseWidget
+class HelpIndexWidget : public QWidget
 {
 	Q_OBJECT
 
 public:
-	explicit HelpWidget(HelpEnginePtr engine, QWidget* parent = NULL);
-	virtual ~HelpWidget();
-
-	virtual QString defaultWhatsThis() const;
+	explicit HelpIndexWidget(HelpEnginePtr engine, QWidget* parent = NULL);
+	virtual ~HelpIndexWidget() {}
 
 signals:
 	void requestShowLink(const QUrl&);
 
 private slots:
-	void toggleShowNavigationControls();
+	void filterChanged();
+
 private:
-	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
-	virtual void hideEvent(QHideEvent* event);
-	virtual void prePaintEvent();
-	void setup();
-	void addSearchWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayout);
-	void addIndexWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayout);
-	void addContentWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayout);
-	void addToggleTabWidgetButton(QBoxLayout* buttonLayout);
-
-	QVBoxLayout* mVerticalLayout;
-	QTabWidget* mTabWidget;
 	HelpEnginePtr mEngine;
-
-	HelpSearchWidget* mSearchWidget;
-	HelpIndexWidget* mIndexWidget;
-
-	QAction* mShowNavigationControlsAction;
-	QSplitter* mSplitter;
-
+	QLineEdit* mFilterEdit;
 };
 
 }//end namespace cx
 
-#endif // CXHELPWIDGET_H
+#endif // CXHELPINDEXWIDGET_H

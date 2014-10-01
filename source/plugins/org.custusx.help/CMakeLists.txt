@@ -17,6 +17,7 @@ set(PLUGIN_SRCS
   cxHelpPluginActivator.cpp
   cxHelpGUIExtenderService.cpp
   widgets/cxHelpWidget.cpp
+  widgets/cxHelpIndexWidget.cpp
   widgets/cxHelpSearchWidget.cpp
   widgets/cxHelpBrowser.cpp
   cxHelpServiceImpl.cpp
@@ -28,6 +29,7 @@ set(PLUGIN_MOC_SRCS
   cxHelpPluginActivator.h
   cxHelpGUIExtenderService.h
   widgets/cxHelpWidget.h
+  widgets/cxHelpIndexWidget.h
   widgets/cxHelpSearchWidget.h
   widgets/cxHelpBrowser.h
   cxHelpServiceImpl.h

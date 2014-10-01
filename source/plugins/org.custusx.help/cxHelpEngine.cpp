@@ -69,7 +69,7 @@ void HelpEngine::focusObjectChanged(QObject* newFocus)
 {
 	if (!newFocus)
 		return;
-	std::cout << "HelpEngine::focusObjectChanged " << newFocus->objectName() << std::endl;
+//	std::cout << "HelpEngine::focusObjectChanged " << newFocus->objectName() << " -- " << dynamic_cast<QWidget*>(newFocus)->windowTitle() << std::endl;
 //	newFocus
 	QString keyword = this->findBestMatchingKeyword(newFocus);
 	if (!keyword.isEmpty())

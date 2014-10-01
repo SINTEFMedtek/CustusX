@@ -44,6 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxHelpEngine.h"
 #include "cxHelpBrowser.h"
 #include "cxHelpSearchWidget.h"
+#include "cxHelpIndexWidget.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -85,13 +87,17 @@ void HelpWidget::setup()
 	mVerticalLayout->addWidget(splitter);
 
 	this->addContentWidget(mTabWidget, buttonLayout);
-//	this->addSearchWidget(mTabWidget, buttonLayout);
-//	this->addIndexWidget(mTabWidget, buttonLayout);
+	this->addSearchWidget(mTabWidget, buttonLayout);
+	this->addIndexWidget(mTabWidget, buttonLayout);
+
+	this->addToggleTabWidgetButton(buttonLayout);
 	buttonLayout->addStretch();
 
 	browser->showHelpForKeyword("mainpage_overview");
 
-	this->hideTabItem(mEngine->engine()->contentWidget());
+	bool navVis = settings()->value("org.custusx.help/navigationVisible").toBool();
+//	mTabWidget->hide();
+	mTabWidget->setVisible(navVis);
 }
 
 HelpWidget::~HelpWidget()
@@ -117,23 +123,29 @@ void HelpWidget::addContentWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayou
 
 	connect(mEngine->engine()->contentWidget(), &QHelpContentWidget::linkActivated,
 			this, &HelpWidget::requestShowLink);
+}
 
-
+void HelpWidget::addToggleTabWidgetButton(QBoxLayout* buttonLayout)
+{
 	QAction* action = this->createAction(this,
 										   QIcon(":/icons/open_icon_library/view-list-tree.png"),
-										   "Toggle show help contents", "",
-										   SLOT(toggleShowContentsHelp()),
+										   "Toggle show navigation controls", "",
+										   SLOT(toggleShowNavigationControls()),
 										   NULL);
 	action->setCheckable(true);
 	CXSmallToolButton* button = new CXSmallToolButton();
 	button->setDefaultAction(action);
 	buttonLayout->addWidget(button);
-	mShowContentsAction = action;
+	mShowNavigationControlsAction = action;
 }
 
 void HelpWidget::addIndexWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayout)
 {
-	tabWidget->addTab(mEngine->engine()->indexWidget(), "index");
+	mIndexWidget = new HelpIndexWidget(mEngine, this);
+	tabWidget->addTab(mIndexWidget, "index");
+
+	connect(mIndexWidget, &HelpIndexWidget::requestShowLink,
+			this, &HelpWidget::requestShowLink);
 }
 
 void HelpWidget::addSearchWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayout)
@@ -142,16 +154,6 @@ void HelpWidget::addSearchWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayout
 	tabWidget->addTab(mSearchWidget, "search");
 	connect(mSearchWidget, &HelpSearchWidget::requestShowLink,
 			this, &HelpWidget::requestShowLink);
-
-	mShowSearchAction = this->createAction(this,
-										   QIcon(":/icons/open_icon_library/eye.png.png"),
-										   "Toggle show search help", "",
-										   SLOT(toggleShowSearchHelp()),
-										   NULL);
-	mShowSearchAction->setCheckable(true);
-	CXSmallToolButton* button = new CXSmallToolButton();
-	button->setDefaultAction(mShowSearchAction);
-	buttonLayout->addWidget(button);
 }
 
 void HelpWidget::showEvent(QShowEvent* event)
@@ -170,47 +172,24 @@ void HelpWidget::prePaintEvent()
 	this->setup();
 }
 
-void HelpWidget::toggleShowContentsHelp()
+void HelpWidget::toggleShowNavigationControls()
 {
-	QHelpContentWidget* widget = mEngine->engine()->contentWidget();
-	this->toggleTabItemVisibility(widget);
-}
-
-void HelpWidget::toggleShowSearchHelp()
-{
-	this->toggleTabItemVisibility(mSearchWidget);
-}
-
-void HelpWidget::toggleTabItemVisibility(QWidget* widget)
-{
-	if (widget->isVisible())
-		this->hideTabItem(widget);
-	else
-		this->showTabItem(widget);
-}
-
-void HelpWidget::showTabItem(QWidget* widget)
-{
-	QList<int> sizes = mSplitter->sizes();
-	if (sizes[0]==0)
-	{
-		sizes[0] = sizes[1]*1/3;
-		sizes[1] = sizes[1]*2/3;
-		mSplitter->setSizes(sizes);
-	}
-	mTabWidget->show();
-	widget->show();
-}
-
-void HelpWidget::hideTabItem(QWidget* widget)
-{
-	widget->hide();
-
-	bool anyVisible = false;
-	for (int i=0; i<mTabWidget->count(); ++i)
-		mTabWidget->widget(i)->isVisible() || anyVisible;
-	if (!anyVisible)
+	if (mTabWidget->isVisible())
 		mTabWidget->hide();
+	else
+	{
+		mTabWidget->show();
+
+		QList<int> sizes = mSplitter->sizes();
+		if (sizes[0]==0)
+		{
+			sizes[0] = sizes[1]*1/3;
+			sizes[1] = sizes[1]*2/3;
+			mSplitter->setSizes(sizes);
+		}
+
+	}
+	settings()->setValue("org.custusx.help/navigationVisible", mTabWidget->isVisible());
 }
 
 }//end namespace cx
