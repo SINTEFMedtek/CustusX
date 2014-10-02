@@ -75,7 +75,6 @@ RegistrationWidget::~RegistrationWidget()
 void RegistrationWidget::initRegistrationTypesWidgets()
 {
 	mRegistrationTypes << "ImageToImage" << "ImageToPatient" << "ImageTransform";
-	std::vector<QVBoxLayout*> layouts (3);
 	for(int i = 0; i < mRegistrationTypes.count(); ++i)
 	{
 		QWidget *widget = new QWidget(this);
@@ -87,48 +86,21 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 
 		connect(methodSelector, SIGNAL(activated(int)),registrationTypeWidget,SLOT(setCurrentIndex(int)));
 
-		QGroupBox	*groupBox = new QGroupBox(registrationTypeWidget);
-
 		QVBoxLayout *layoutV = new QVBoxLayout(widget);
-		QVBoxLayout *layoutGroupBox = new QVBoxLayout(groupBox);
 		QHBoxLayout *layoutH = new QHBoxLayout();
 
 		QLabel *methodSelectorLabel = new QLabel("Method");
 		layoutH->addWidget(methodSelectorLabel);
 		layoutH->addWidget(methodSelector, 1);
-//		layoutH->addStretch();
 
 		layoutV->addLayout(layoutH);
-		layoutV->addWidget(groupBox);
 
-		layoutGroupBox->addWidget(registrationTypeWidget);
+		layoutV->addWidget(registrationTypeWidget);
 
-		layouts[i] = layoutGroupBox;
 		mVerticalLayout->addWidget(widget);
 		this->addTab(widget, mRegistrationTypes[i]);
 	}
-
-//	this->insertImageComboBoxes(layouts);
 }
-
-void RegistrationWidget::insertImageComboBoxes(std::vector<QVBoxLayout*> layouts)
-{
-	PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(mPluginContext));
-	RegistrationServicePtr registrationService = RegistrationServicePtr(new RegistrationServiceProxy(mPluginContext));
-	StringDataAdapterPtr fixedImage(new RegistrationFixedImageStringDataAdapter(registrationService, patientModelService));
-	StringDataAdapterPtr movingImage(new RegistrationMovingImageStringDataAdapter(registrationService, patientModelService));
-
-	this->insertImageComboInLayout(fixedImage, layouts[0], 0);
-	this->insertImageComboInLayout(movingImage, layouts[0], 1);
-//	this->insertImageComboInLayout(movingImage, layouts[1], 0);
-}
-
-void RegistrationWidget::insertImageComboInLayout(StringDataAdapterPtr adapter, QVBoxLayout *layout, int position)
-{
-	LabeledComboBoxWidget* imageCombo = new LabeledComboBoxWidget(this, adapter);
-	layout->insertWidget(position, imageCombo);
-}
-
 
 void RegistrationWidget::initServiceListener()
 {

@@ -68,8 +68,6 @@ private:
 
 	void onServiceAdded(RegistrationMethodService *service);
 	void onServiceRemoved(RegistrationMethodService *service);
-	void insertImageComboInLayout(StringDataAdapterPtr adapter, QVBoxLayout *layout, int position);
-	void insertImageComboBoxes(std::vector<QVBoxLayout *> layouts);
 	bool knownType(QString registrationType);
 	void removeWidgetFromStackedWidget(QString widgetName, QStackedWidget *stackedWidget);
 
