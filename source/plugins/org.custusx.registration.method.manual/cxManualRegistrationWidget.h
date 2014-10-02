@@ -72,6 +72,7 @@ protected:
 	virtual void showEvent(QShowEvent* event);
 	DataPtr mConnectedMovingImage;
 	RegistrationServicePtr mRegistrationService;
+	QVBoxLayout* mVerticalLayout;
 
 private slots:
 	void matrixWidgetChanged();
@@ -83,7 +84,6 @@ private:
 	virtual Transform3D getMatrixFromBackend() = 0;
 	virtual void setMatrixFromWidget(Transform3D M) = 0;
 
-	QVBoxLayout* mVerticalLayout;
 	QLabel* mLabel;
 
 	Transform3DWidget* mMatrixWidget;

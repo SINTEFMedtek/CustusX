@@ -48,7 +48,7 @@ namespace cx
 
 RegistrationMethodManualPluginActivator::RegistrationMethodManualPluginActivator()
 {
-//    std::cout << "Created RegistrationMethodManualPluginActivator" << std::endl;
+//	std::cout << "Created RegistrationMethodManualPluginActivator" << std::endl;
 }
 
 RegistrationMethodManualPluginActivator::~RegistrationMethodManualPluginActivator()
@@ -59,9 +59,13 @@ void RegistrationMethodManualPluginActivator::start(ctkPluginContext* context)
 	PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
 	RegistrationServicePtr registrationService = RegistrationServicePtr(new RegistrationServiceProxy(context));
 
-	mRegistrationImageToImage	= RegisteredServicePtr(new RegisteredService(context, new RegistrationMethodManualImageToImageService(registrationService), RegistrationMethodService_iid));
-	mRegistrationImageToPatient = RegisteredServicePtr(new RegisteredService(context, new RegistrationMethodManualImageToPatientService(registrationService, patientModelService), RegistrationMethodService_iid));
-	mRegistrationImageTransform = RegisteredServicePtr(new RegisteredService(context, new RegistrationMethodManualImageTransformService(registrationService) , RegistrationMethodService_iid));
+	RegistrationMethodManualImageToImageService *i2i = new RegistrationMethodManualImageToImageService(registrationService, patientModelService);
+	RegistrationMethodManualImageToPatientService *i2p = new RegistrationMethodManualImageToPatientService(registrationService, patientModelService);
+	RegistrationMethodManualImageTransformService *iTransform = new RegistrationMethodManualImageTransformService(registrationService) ;
+
+	mRegistrationImageToImage = RegisteredServicePtr(new RegisteredService(context, i2i, RegistrationMethodService_iid));
+	mRegistrationImageToPatient = RegisteredServicePtr(new RegisteredService(context, i2p, RegistrationMethodService_iid));
+	mRegistrationImageTransform = RegisteredServicePtr(new RegisteredService(context, iTransform, RegistrationMethodService_iid));
 }
 
 void RegistrationMethodManualPluginActivator::stop(ctkPluginContext* context)

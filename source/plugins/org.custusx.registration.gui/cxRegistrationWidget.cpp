@@ -108,7 +108,7 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 		this->addTab(widget, mRegistrationTypes[i]);
 	}
 
-	this->insertImageComboBoxes(layouts);
+//	this->insertImageComboBoxes(layouts);
 }
 
 void RegistrationWidget::insertImageComboBoxes(std::vector<QVBoxLayout*> layouts)

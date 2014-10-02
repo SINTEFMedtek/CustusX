@@ -50,12 +50,14 @@ class org_custusx_registration_method_manual_EXPORT RegistrationMethodManualImag
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodManualImageToImageService(RegistrationServicePtr registrationService);
+	RegistrationMethodManualImageToImageService(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService);
 	virtual ~RegistrationMethodManualImageToImageService() {}
 	virtual QString getRegistrationType() {return QString("ImageToImage");}
 	virtual QString getRegistrationMethod() {return QString("Manual");}
 	virtual QWidget* createWidget();
 	virtual QString getWidgetName() {return QString("ManualImage2ImageRegistrationWidget");}
+private:
+	PatientModelServicePtr mPatientModelService;
 };
 } //cx
 #endif // CXREGISTRATIONMETHODMANUALIMAGETOIMAGESERVICE_H

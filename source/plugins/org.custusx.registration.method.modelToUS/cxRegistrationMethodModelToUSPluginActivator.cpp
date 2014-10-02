@@ -46,7 +46,7 @@ namespace cx
 
 RegistrationMethodModelToUSPluginActivator::RegistrationMethodModelToUSPluginActivator()
 {
-	std::cout << "Created ExamplePluginActivator" << std::endl;
+//	std::cout << "Created RegistrationMethodModelToUSPluginActivator" << std::endl;
 }
 
 RegistrationMethodModelToUSPluginActivator::~RegistrationMethodModelToUSPluginActivator()
