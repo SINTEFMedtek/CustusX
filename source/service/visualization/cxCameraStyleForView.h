@@ -57,7 +57,7 @@ using cx::Transform3D;
  */
 
 
-cxVisualizationService_EXPORT enum CAMERA_STYLE_TYPE
+enum cxVisualizationService_EXPORT CAMERA_STYLE_TYPE
 {
 	cstDEFAULT_STYLE, cstTOOL_STYLE, cstANGLED_TOOL_STYLE, cstUNICAM_STYLE, cstCOUNT
 };

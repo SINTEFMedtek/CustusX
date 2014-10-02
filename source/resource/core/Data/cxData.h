@@ -61,7 +61,7 @@ typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 /**Denotes the various states
  * of registration an object is in.
  */
-cxResource_EXPORT enum REGISTRATION_STATUS
+enum cxResource_EXPORT REGISTRATION_STATUS
 {
 	rsNOT_REGISTRATED, rsIMAGE_REGISTRATED, rsPATIENT_REGISTRATED
 };

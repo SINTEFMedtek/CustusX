@@ -78,7 +78,7 @@ typedef boost::shared_ptr<class AxisConnector> AxisConnectorPtr;
 
 typedef boost::shared_ptr<class ToolAxisConnector> ToolAxisConnectorPtr;
 
-cxVisualizationService_EXPORT enum STEREOTYPE
+enum cxVisualizationService_EXPORT STEREOTYPE
 {
 	stFRAME_SEQUENTIAL, stINTERLACED, stDRESDEN, stRED_BLUE
 };

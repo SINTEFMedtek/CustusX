@@ -108,14 +108,9 @@ private:
   QFutureWatcher<T> mWatcher;
 };
 
-cxResource_EXPORT void ThreadedTimedAlgorithm<void>::getResult()
-{
-	return;
-}
-
-
-template cxResource_EXPORT class ThreadedTimedAlgorithm<void>;
-template cxResource_EXPORT class ThreadedTimedAlgorithm<bool>;
+//template specicalizations
+template<>
+cxResource_EXPORT void ThreadedTimedAlgorithm<void>::getResult();
 
 //---------------------------------------------------------------------------------------------------------------------
 /**

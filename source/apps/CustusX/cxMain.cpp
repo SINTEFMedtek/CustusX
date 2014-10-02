@@ -116,19 +116,6 @@ int main(int argc, char *argv[])
   force_C_locale_decimalseparator();
 #endif
 
-//  std::cout << "native lang: " <<  QLocale::system().nativeLanguageName() << std::endl;
-//  std::cout << "native sep: " <<  QLocale::system().decimalPoint() << std::endl;
-//  std::cout << "native lang: " <<  QLocale::c().nativeLanguageName() << std::endl;
-//  std::cout << "native sep: " <<  QLocale::c().decimalPoint() << std::endl;
-
-//  std::cout << "**change locale: " << std::endl;
-//  setlocale(LC_ALL,"C");
-
-//  std::cout << "native lang: " <<  QLocale::system().nativeLanguageName() << std::endl;
-//  std::cout << "native sep: " <<  QLocale::system().decimalPoint() << std::endl;
-//  std::cout << "native lang: " <<  QLocale::c().nativeLanguageName() << std::endl;
-//  std::cout << "native sep: " <<  QLocale::c().decimalPoint() << std::endl;
-
   cx::LogicManager::initialize();
 
 	std::vector<cx::GUIExtenderServicePtr> plugins;

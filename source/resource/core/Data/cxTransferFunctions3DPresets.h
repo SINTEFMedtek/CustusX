@@ -67,7 +67,7 @@ public:
 	TransferFunctions3DPresets(XmlOptionFile presetFile, XmlOptionFile customFile);
 	virtual ~TransferFunctions3DPresets(){};
 
-	void save(QString name, ImagePtr image, bool _2D=true, bool _3D=true);
+	virtual void save(QString name, ImagePtr image, bool _2D=true, bool _3D=true);
 	void load(QString name, ImagePtr image, bool _2D=true, bool _3D=true);
 
 	void save2D(QString name, ImagePtr image);

@@ -49,6 +49,13 @@ template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //centerline
 template class ThreadedTimedAlgorithm<ImagePtr>; //resample
 //template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //BinaryThresholdImageFilter
 template class ThreadedTimedAlgorithm<vtkPolyDataPtr>; //contour
+template class cxResource_EXPORT ThreadedTimedAlgorithm<void>;
+
+template<>
+cxResource_EXPORT void ThreadedTimedAlgorithm<void>::getResult()
+{
+	return;
+}
 
 
 //---------------------------------------------------------------------------------------------------------------------

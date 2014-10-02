@@ -102,7 +102,7 @@ private:
  * \date Jan 27, 2012
  * \author Christian Askeland, SINTEF
  */
-template cxPluginUSReconstruction_EXPORT class ThreadedTimedAlgorithm<void>;
+template class cxPluginUSReconstruction_EXPORT ThreadedTimedAlgorithm<void>;
 class cxPluginUSReconstruction_EXPORT ThreadedTimedReconstructCore: public cx::ThreadedTimedAlgorithm<void>
 {
 Q_OBJECT
