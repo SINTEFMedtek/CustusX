@@ -73,7 +73,7 @@ class cxResourceVisualization_EXPORT PickerRep: public RepImpl
 Q_OBJECT
 
 public:
-	static PickerRepPtr New(DataServicePtr dataManager, const QString& uid, const QString& name = ""); ///< for creating new instances
+	static PickerRepPtr New(DataServicePtr dataManager, const QString& uid=""); ///< for creating new instances
 	virtual ~PickerRep(); ///<empty
 
 	virtual QString getType() const; ///< returns a string identifying this class type
@@ -95,9 +95,9 @@ public slots:
 	void pickLandmarkSlot(vtkObject* renderWindowInteractor); ///< When you use the renderwindowinteractor
 
 protected:
-	PickerRep(DataServicePtr dataManager, const QString& uid, const QString &name); ///< use New instead
-	virtual void addRepActorsToViewRenderer(View *view); ///< connects to the renderwindowinteractor
-	virtual void removeRepActorsFromViewRenderer(View *view); ///< disconnects from the renderwindowinteractor
+	PickerRep(DataServicePtr dataManager); ///< use New instead
+	virtual void addRepActorsToViewRenderer(ViewPtr view); ///< connects to the renderwindowinteractor
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view); ///< disconnects from the renderwindowinteractor
 	void connectInteractor();
 	void disconnectInteractor();
 	void scaleSphere();
@@ -115,7 +115,6 @@ protected:
 	Vector3D ComputeWorldToDisplay(Vector3D p_w);
 	void setGlyphCenter(Vector3D pos);
 
-	View *mView;
 	bool mEnabled;
 	bool mConnected; ///< Interactor connected
 	ToolPtr mTool; ///< the connected tool

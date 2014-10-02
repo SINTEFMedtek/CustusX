@@ -197,13 +197,13 @@ void LayoutRepository::addDefaults()
 	{
 		// 3D only
 		LayoutData layout = LayoutData::create("LAYOUT_3D", "3D", 1, 1);
-		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0));
+		layout.setView(0, View::VIEW_3D, LayoutRegion(0, 0));
 		this->addDefault(layout);
 	}
 	{
 		// 3D ACS
 		LayoutData layout = LayoutData::create("LAYOUT_3D_ACS", "3D ACS", 3, 4);
-		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0, 3, 3));
+		layout.setView(0, View::VIEW_3D, LayoutRegion(0, 0, 3, 3));
 		layout.setView(1, ptAXIAL, LayoutRegion(0, 3));
 		layout.setView(1, ptCORONAL, LayoutRegion(1, 3));
 		layout.setView(1, ptSAGITTAL, LayoutRegion(2, 3));
@@ -212,7 +212,7 @@ void LayoutRepository::addDefaults()
 	{
 		// 3D Any
 		LayoutData layout = LayoutData::create("LAYOUT_3D_AD", "3D AnyDual", 2, 4);
-		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0, 2, 3));
+		layout.setView(0, View::VIEW_3D, LayoutRegion(0, 0, 2, 3));
 		layout.setView(1, ptANYPLANE, LayoutRegion(0, 3));
 		layout.setView(1, ptSIDEPLANE, LayoutRegion(1, 3));
 		this->addDefault(layout);
@@ -220,7 +220,7 @@ void LayoutRepository::addDefaults()
 	{
 		// 3D ACS in a single view group
 		LayoutData layout = LayoutData::create("LAYOUT_3D_ACS_SINGLE", "3D ACS Connected", 3, 4);
-		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0, 3, 3));
+		layout.setView(0, View::VIEW_3D, LayoutRegion(0, 0, 3, 3));
 		layout.setView(0, ptAXIAL, LayoutRegion(0, 3));
 		layout.setView(0, ptCORONAL, LayoutRegion(1, 3));
 		layout.setView(0, ptSAGITTAL, LayoutRegion(2, 3));
@@ -229,7 +229,7 @@ void LayoutRepository::addDefaults()
 	{
 		// 3D Any in a single view group
 		LayoutData layout = LayoutData::create("LAYOUT_3D_AD_SINGLE", "3D AnyDual Connected", 2, 4);
-		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0, 2, 3));
+		layout.setView(0, View::VIEW_3D, LayoutRegion(0, 0, 2, 3));
 		layout.setView(0, ptANYPLANE, LayoutRegion(0, 3));
 		layout.setView(0, ptSIDEPLANE, LayoutRegion(1, 3));
 		this->addDefault(layout);
@@ -241,14 +241,14 @@ void LayoutRepository::addDefaults()
 	this->addDefault(LayoutData::createHeader("LAYOUT_GROUP_Oblique", "Oblique"));
 	{
 		LayoutData layout = LayoutData::create("LAYOUT_OBLIQUE_3DAnyDual_x1", "3D Any Dual x1", 1, 3);
-		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0));
+		layout.setView(0, View::VIEW_3D, LayoutRegion(0, 0));
 		layout.setView(1, ptANYPLANE, LayoutRegion(0, 1));
 		layout.setView(1, ptSIDEPLANE, LayoutRegion(0, 2));
 		this->addDefault(layout);
 	}
 	{
 		LayoutData layout = LayoutData::create("LAYOUT_OBLIQUE_3DAnyDual_x2", "3D Any Dual x2", 2, 3);
-		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0, 2, 1));
+		layout.setView(0, View::VIEW_3D, LayoutRegion(0, 0, 2, 1));
 		layout.setView(1, ptANYPLANE, LayoutRegion(0, 1));
 		layout.setView(1, ptSIDEPLANE, LayoutRegion(1, 1));
 		layout.setView(2, ptANYPLANE, LayoutRegion(0, 2));
@@ -272,7 +272,7 @@ void LayoutRepository::addDefaults()
 	this->addDefault(LayoutData::createHeader("LAYOUT_GROUP_Orthogonal", "Orthogonal"));
 	{
 		LayoutData layout = LayoutData::create("LAYOUT_ORTHOGONAL_3DACS_x1", "3D ACS x1", 2, 2);
-		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0));
+		layout.setView(0, View::VIEW_3D, LayoutRegion(0, 0));
 		layout.setView(1, ptAXIAL, LayoutRegion(0, 1));
 		layout.setView(1, ptCORONAL, LayoutRegion(1, 0));
 		layout.setView(1, ptSAGITTAL, LayoutRegion(1, 1));
@@ -280,7 +280,7 @@ void LayoutRepository::addDefaults()
 	}
 	{
 		LayoutData layout = LayoutData::create("LAYOUT_ORTHOGONAL_3DACS_x2", "3D ACS x2", 3, 3);
-		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 0, 3, 1));
+		layout.setView(0, View::VIEW_3D, LayoutRegion(0, 0, 3, 1));
 		layout.setView(1, ptAXIAL, LayoutRegion(0, 1));
 		layout.setView(1, ptCORONAL, LayoutRegion(1, 1));
 		layout.setView(1, ptSAGITTAL, LayoutRegion(2, 1));
@@ -309,14 +309,14 @@ void LayoutRepository::addDefaults()
 	this->addDefault(LayoutData::createHeader("LAYOUT_GROUP_RT", "Realtime Source"));
 	{
 		LayoutData layout = LayoutData::create("LAYOUT_RT_1X1", "RT", 1, 1);
-		layout.setView(0, ViewWidget::VIEW_REAL_TIME, LayoutRegion(0, 0));
+		layout.setView(0, View::VIEW_REAL_TIME, LayoutRegion(0, 0));
 		this->addDefault(layout);
 	}
 	{
 		LayoutData layout = LayoutData::create("LAYOUT_US_Acquisition", "US Acquisition", 2, 3);
 		layout.setView(0, ptANYPLANE, LayoutRegion(1, 2, 1, 1));
-		layout.setView(0, ViewWidget::VIEW_3D, LayoutRegion(0, 2, 1, 1));
-		layout.setView(0, ViewWidget::VIEW_REAL_TIME, LayoutRegion(0, 0, 2, 2));
+		layout.setView(0, View::VIEW_3D, LayoutRegion(0, 2, 1, 1));
+		layout.setView(0, View::VIEW_REAL_TIME, LayoutRegion(0, 0, 2, 2));
 		this->addDefault(layout);
 	}
 }

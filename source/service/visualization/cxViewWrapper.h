@@ -122,7 +122,7 @@ Q_OBJECT
 public:
 	virtual ~ViewWrapper() {}
 	virtual void initializePlane(PLANE_TYPE plane) {}
-	virtual ViewWidget* getView() = 0;
+	virtual ViewPtr getView() = 0;
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) = 0;
 	virtual void setViewGroup(ViewGroupDataPtr group);
 
@@ -147,7 +147,7 @@ protected:
 //	virtual void dataAdded(DataPtr data) = 0;
 //	virtual void dataRemoved(const QString& uid) = 0;
 
-	void connectContextMenu(ViewWidget* view);
+	void connectContextMenu(ViewPtr view);
 	virtual void appendToContextMenu(QMenu& contextMenu) = 0;
 	QStringList getAllDataNames(DataViewProperties properties) const;
 

@@ -59,7 +59,7 @@ class cxResourceVisualization_EXPORT AxesRep: public RepImpl
 public:
 	virtual ~AxesRep();
 
-	static AxesRepPtr New(const QString& uid);
+	static AxesRepPtr New(const QString& uid="");
 
 	virtual QString getType() const { return "AxesRep"; }
 	void setTransform(Transform3D rMt);
@@ -70,9 +70,9 @@ public:
 	void setCaption(const QString& caption, const Vector3D& color);
 
 protected:
-	AxesRep(const QString& uid);
-	virtual void addRepActorsToViewRenderer(View *view);
-	virtual void removeRepActorsFromViewRenderer(View *view);
+	AxesRep();
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
     GraphicalAxes3DPtr mAxes;
 };
 

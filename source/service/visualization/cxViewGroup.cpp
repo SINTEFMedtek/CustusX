@@ -83,10 +83,11 @@ void ViewGroup::addView(ViewWrapperPtr wrapper)
 	wrapper->setViewGroup(mViewGroupData);
 	mCameraStyle->addView(wrapper->getView());
 
+	View* view = wrapper->getView().get();
 	// connect signals
-	connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(activateManualToolSlot()));
-	connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mouseClickInViewGroupSlot()));
-	connect(wrapper->getView(), SIGNAL(focusInSignal(QFocusEvent*)), this, SLOT(mouseClickInViewGroupSlot()));
+	connect(view, SIGNAL(mousePress(int, int, Qt::MouseButtons)), this, SLOT(activateManualToolSlot()));
+	connect(view, SIGNAL(mousePress(int, int, Qt::MouseButtons)), this, SLOT(mouseClickInViewGroupSlot()));
+	connect(view, SIGNAL(focusChange(bool, Qt::FocusReason)), this, SLOT(mouseClickInViewGroupSlot()));
 }
 
 void ViewGroup::removeViews()
@@ -94,10 +95,11 @@ void ViewGroup::removeViews()
 	for (unsigned i = 0; i < mViewWrappers.size(); ++i)
 	{
 		ViewWrapperPtr wrapper = mViewWrappers[i];
+		View* view = wrapper->getView().get();
 
-		disconnect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(activateManualToolSlot()));
-		disconnect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mouseClickInViewGroupSlot()));
-		disconnect(wrapper->getView(), SIGNAL(focusInSignal(QFocusEvent*)), this, SLOT(mouseClickInViewGroupSlot()));
+		disconnect(view, SIGNAL(mousePress(int, int, Qt::MouseButtons)), this, SLOT(activateManualToolSlot()));
+		disconnect(view, SIGNAL(mousePress(int, int, Qt::MouseButtons)), this, SLOT(mouseClickInViewGroupSlot()));
+		disconnect(view, SIGNAL(focusChange(bool, Qt::FocusReason)), this, SLOT(mouseClickInViewGroupSlot()));
 	}
 
 	mViews.clear();
@@ -134,12 +136,12 @@ void ViewGroup::mouseClickInViewGroupSlot()
 		}
 	}
 
-	ViewWidgetQPtr view = static_cast<ViewWidget*>(this->sender());
+	View* view = static_cast<View*>(this->sender());
 	if (view && mActiveView)
 		mActiveView->set(view->getUid());
 }
 
-std::vector<ViewWidgetQPtr> ViewGroup::getViews() const
+std::vector<ViewPtr> ViewGroup::getViews() const
 {
 	return mViews;
 }

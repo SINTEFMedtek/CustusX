@@ -51,7 +51,7 @@ void DataRepContainer::setSliceProxy(SliceProxyPtr sliceProxy)
 	mSliceProxy = sliceProxy;
 }
 
-void DataRepContainer::setView(QPointer<ViewWidget> view)
+void DataRepContainer::setView(ViewPtr view)
 {
 	mView = view;
 }

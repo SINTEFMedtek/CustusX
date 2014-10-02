@@ -65,10 +65,9 @@ namespace cx
 {
 //---------------------------------------------------------
 
-Slices3DRep::Slices3DRep(const QString& uid) :
-	RepImpl(uid)
+Slices3DRep::Slices3DRep() :
+	RepImpl()
 {
-	mView = NULL;
 }
 
 Slices3DRep::~Slices3DRep()
@@ -77,9 +76,7 @@ Slices3DRep::~Slices3DRep()
 
 Slices3DRepPtr Slices3DRep::New(const QString& uid)
 {
-	Slices3DRepPtr retval(new Slices3DRep(uid));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new Slices3DRep(), uid);
 }
 
 void Slices3DRep::setShaderPath(QString path)
@@ -121,22 +118,16 @@ void Slices3DRep::setTool(ToolPtr tool)
 		mProxy[i]->getSliceProxy()->setTool(tool);
 }
 
-void Slices3DRep::addRepActorsToViewRenderer(View *view)
+void Slices3DRep::addRepActorsToViewRenderer(ViewPtr view)
 {
 	for (unsigned i=0; i<mProxy.size(); ++i)
-	{
 		view->getRenderer()->AddActor(mProxy[i]->getActor());
-	}
-	mView = view;
 }
 
-void Slices3DRep::removeRepActorsFromViewRenderer(View *view)
+void Slices3DRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	for (unsigned i=0; i<mProxy.size(); ++i)
-	{
 		view->getRenderer()->RemoveActor(mProxy[i]->getActor());
-	}
-	mView = NULL;
 }
 
 //---------------------------------------------------------

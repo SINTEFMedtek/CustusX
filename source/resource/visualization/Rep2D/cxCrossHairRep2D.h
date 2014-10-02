@@ -66,7 +66,7 @@ class cxResourceVisualization_EXPORT CrossHairRep2D : public RepImpl
 {
 	Q_OBJECT
 public:
-	static CrossHairRep2DPtr New(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name="");
+	static CrossHairRep2DPtr New(SpaceProviderPtr spaceProvider, const QString& uid="");
 	virtual ~CrossHairRep2D();
 	virtual QString getType() const;
 
@@ -79,9 +79,9 @@ private slots:
 	void toolVisibleSlot(bool visible); 
 
 protected:
-	CrossHairRep2D(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name="");
-	virtual void addRepActorsToViewRenderer(View *view);
-	virtual void removeRepActorsFromViewRenderer(View *view);
+	CrossHairRep2D(SpaceProviderPtr spaceProvider);
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
 private:
 	void update();

@@ -95,7 +95,7 @@ public:
 	CameraControl(QObject* parent = NULL);
 	virtual ~CameraControl();
 
-	void setView(ViewWidgetQPtr view);
+	void setView(ViewPtr view);
 	QActionGroup* createStandard3DViewActions();
 	void translateByFocusTo(Vector3D p_r);
 
@@ -109,7 +109,7 @@ private:
 	vtkCameraPtr getCamera() const;
 	void defineRotateLayout();
 	void definePanLayout();
-	ViewWidgetQPtr mView;
+	ViewPtr mView;
 
 	QAction* addStandard3DViewAction(QString caption, QString help, Vector3D viewDirection, QActionGroup* group);
 };

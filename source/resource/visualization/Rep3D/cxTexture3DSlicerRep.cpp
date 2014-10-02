@@ -61,11 +61,10 @@ void Texture3DSlicerRep::setTargetSpaceToR()
 	mProxy->setTargetSpaceToR();
 }
 
-Texture3DSlicerRep::Texture3DSlicerRep(const QString& uid) :
-	RepImpl(uid)
+Texture3DSlicerRep::Texture3DSlicerRep() :
+	RepImpl()
 {
 	mProxy = Texture3DSlicerProxy::New();
-	mView = NULL;
 }
 
 Texture3DSlicerRep::~Texture3DSlicerRep()
@@ -74,9 +73,7 @@ Texture3DSlicerRep::~Texture3DSlicerRep()
 
 Texture3DSlicerRepPtr Texture3DSlicerRep::New(const QString& uid)
 {
-	Texture3DSlicerRepPtr retval(new Texture3DSlicerRep(uid));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new Texture3DSlicerRep(), uid);
 }
 
 void Texture3DSlicerRep::setShaderPath(QString path)
@@ -86,11 +83,11 @@ void Texture3DSlicerRep::setShaderPath(QString path)
 
 void Texture3DSlicerRep::viewChanged()
 {
-	if (!mView)
+	if (!this->getView())
 		return;
-	if (mView->getZoomFactor() < 0)
+	if (this->getView()->getZoomFactor() < 0)
 		return; // ignore if zoom is invalid
-	mProxy->setViewportData(mView->get_vpMs(), mView->getViewport());
+	mProxy->setViewportData(this->getView()->get_vpMs(), this->getView()->getViewport());
 }
 
 void Texture3DSlicerRep::setImages(std::vector<ImagePtr> images)
@@ -108,19 +105,17 @@ void Texture3DSlicerRep::setSliceProxy(SliceProxyPtr slicer)
 	mProxy->setSliceProxy(slicer);
 }
 
-void Texture3DSlicerRep::addRepActorsToViewRenderer(View *view)
+void Texture3DSlicerRep::addRepActorsToViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->AddActor(mProxy->getActor());
-	mView = view;
-	connect(dynamic_cast<QObject *>(view), SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
+	connect(view.get(), SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
 	this->viewChanged();
 }
 
-void Texture3DSlicerRep::removeRepActorsFromViewRenderer(View *view)
+void Texture3DSlicerRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->RemoveActor(mProxy->getActor());
-	disconnect(dynamic_cast<QObject *>(view), SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
-	mView = NULL;
+	disconnect(view.get(), SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
 }
 
 void Texture3DSlicerRep::update()

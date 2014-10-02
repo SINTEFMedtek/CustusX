@@ -5,7 +5,16 @@
 include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 
 cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
-	cxView
+	View/cxView
+	View/cxViewCollectionWidget
+
+	View/internal/cxViewRepCollection
+	View/internal/ViewMixed/cxViewCollectionWidgetMixed
+	View/internal/ViewWidget/cxViewWidget
+	View/internal/ViewWidget/cxViewCollectionWidgetUsingViewWidgets
+	View/internal/ViewContainer/cxViewContainerItem
+	View/internal/ViewContainer/cxViewContainer	
+	View/internal/ViewContainer/cxViewCollectionWidgetUsingViewContainer	
     
 	Rep/cxRep.h
 	Rep/cxRepImpl
@@ -60,6 +69,11 @@ if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
 endif()
 
 cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
+	View/cxLayoutData
+	View/internal/cxViewUtilities
+	View/internal/ViewWidget/cxViewCache.h
+	View/internal/ViewWidget/cxViewLinkingViewWidget
+	View/internal/ViewContainer/cxViewLinkingViewContainerItem
 	Primitives/cxDepthPeeling
 	Primitives/cxGraphicalTorus3D
 	Primitives/cxVtkHelperClasses
@@ -119,16 +133,22 @@ configure_file(Rep/Shaders/glsl/raycasting_shader.vert Rep COPYONLY)
 unset(CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES)
 set(CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
+    ${CustusX_BINARY_DIR}/source/resource/visualization
     ${CustusX_SOURCE_DIR}/source/resource/visualization
     ${CustusX_SOURCE_DIR}/source/resource/visualization/Rep
     ${CustusX_SOURCE_DIR}/source/resource/visualization/Rep2D
     ${CustusX_SOURCE_DIR}/source/resource/visualization/Rep3D
     ${CustusX_SOURCE_DIR}/source/resource/visualization/RepVideo
     ${CustusX_SOURCE_DIR}/source/resource/visualization/Primitives
-    CACHE INTERNAL "Include directories for resource visualization library")
+	${CustusX_SOURCE_DIR}/source/resource/visualization/View
+	CACHE INTERNAL "Include directories for resource visualization library")
 
 include_directories(${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/ThirdParty/VTKMultiVolume
+	View/internal
+	View/internal/ViewWidget
+	View/internal/ViewContainer
+	View/internal/ViewMixed
     )
 
 cx_remove_duplicate_include_directories()

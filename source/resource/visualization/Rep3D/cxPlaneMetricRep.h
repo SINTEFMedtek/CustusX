@@ -58,20 +58,19 @@ class cxResourceVisualization_EXPORT PlaneMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:
-	static PlaneMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
+	static PlaneMetricRepPtr New(const QString& uid = ""); ///constructor
 	virtual ~PlaneMetricRep() {}
 
 	virtual QString getType() const { return "PlaneMetricRep"; }
 
 protected:
-	virtual void addRepActorsToViewRenderer(View *view);
-	virtual void removeRepActorsFromViewRenderer(View *view);
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
     virtual void clear();
 	virtual void onModifiedStartRender();
 
 private:
-	PlaneMetricRep(const QString& uid, const QString& name = "");
-	PlaneMetricRep(); ///< not implemented
+	PlaneMetricRep();
 
 	void rescale();
 	PlaneMetricPtr getPlaneMetric();

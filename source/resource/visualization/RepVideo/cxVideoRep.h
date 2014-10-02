@@ -77,8 +77,8 @@ public:
 	bool getShowSector() const;
 
 protected:
-	virtual void addRepActorsToViewRenderer(View* view);
-	virtual void removeRepActorsFromViewRenderer(View* view);
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 	private slots:
 	void newDataSlot();
 
@@ -102,7 +102,6 @@ private:
 	GraphicalPolyData3DPtr mProbeClipRect;
 
 	vtkRendererPtr mRenderer;
-	View* mView;
 	ViewportListenerPtr mViewportListener;
 };
 

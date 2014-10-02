@@ -123,7 +123,6 @@ private slots:
 	void transformChangedSlot();
 	void updateColorAttributeSlot();
 	void imageChanged();
-//	void viewChanged();
 private:
 	void resetGeometryPlane();
 	void updateCoordinates(int index);
@@ -132,7 +131,6 @@ private:
 	DoubleBoundingBox3D mBB_s;
 	std::vector<ImagePtr> mImages;
 	SliceProxyPtr mSliceProxy;
-//	View* mView;
 	bool mTargetSpaceIsR;
 
 	TextureSlicePainterPtr mPainter;

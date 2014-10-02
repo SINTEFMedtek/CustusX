@@ -57,7 +57,7 @@ class cxVisualizationService_EXPORT DataRepContainer
 {
 public:
 	void setSliceProxy(SliceProxyPtr sliceProxy);
-	void setView(QPointer<ViewWidget> view);
+	void setView(ViewPtr view);
 
 	void updateSettings();
 
@@ -70,7 +70,7 @@ private:
 	void sphereMetricAdded(SphereMetricPtr mesh);
 
 	SliceProxyPtr mSliceProxy;
-	QPointer<ViewWidget> mView;
+	ViewPtr mView;
 
 	typedef std::map<QString, RepPtr> RepMap;
 	RepMap mDataReps;

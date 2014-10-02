@@ -75,46 +75,64 @@ class CppBuilder:
         runShell('git submodule sync') # from tsf 
         runShell('git submodule update --init --recursive')                    
 
-    def gitUpdate(self, branch='master', tag=None, submodules=False):
+    def gitCheckoutDefaultBranch(self, submodules=False):
+        '''
+        checkout the default branch as set by default or user.
+        '''
+        #self.gitCheckoutBranch(self.main_branch, submodules)
+        tag = self.controlData.getGitTag()
+        branch = self.controlData.main_branch
+        if (tag==None) or (tag=="\"\""):
+            self.gitCheckoutBranch(branch, submodules)
+        else:
+            self.gitCheckoutTag(tag, submodules=submodules)
+
+#    def gitUpdate(self, branch='master', tag=None, submodules=False):
+#        '''
+#        pull latest version of branch, include submodules if asked.
+#        '''
+#        if tag!=None:
+#            print "--------- gitUpdate tag [%s], length=%i" % (tag, len(tag))
+#        else:
+#            print "--------- gitUpdate tag None"
+#
+#        if (tag==None) or (tag=="\"\""):
+#            self.gitCheckoutBranch(self, branch, submodules)
+#        else:
+#            self.gitCheckoutTag(tag, submodules=submodules)
+
+    def gitCheckoutBranch(self, branch, submodules=False):
         '''
         pull latest version of branch, include submodules if asked.
         '''
-        if tag!=None:
-            print "--------- gitUpdate tag [%s], length=%i" % (tag, len(tag))
-        else:
-            print "--------- gitUpdate tag None"
-        if (tag!=None) and (tag!="\"\""):
-            self.gitCheckout(tag, submodules=submodules)
-            return
-        
         self._changeDirToSource()
+        #if branch contains only '' set as empty .... todo
 
-        runShell('git checkout %s' % branch)
-        runShell('git pull origin %s' % branch)
+        runShell('git fetch')
+	# if the branch doesnt exist, this might be ok: only a subset of the repos need have the branch defined.
+        runShell('git checkout %s' % branch, ignoreFailure=True)
+        runShell('git pull origin %s' % branch, ignoreFailure=True)
         if submodules:
             self._gitSubmoduleUpdate()
-        
-    def gitCheckout(self, tag, patch=None, submodules=False):
+
+    def gitCheckoutTag(self, tag, submodules=False):
         '''
         Update git to the given tag.
         Skip if HEAD already is at tag.
-        If patch is given, apply the patch after updating to tag.
         '''
         self._changeDirToSource()
-
-        checklatest = tag
-        if patch:
-            checklatest = patch
-        if self._checkGitIsAtTag(checklatest):
+        if self._checkGitIsAtTag(tag):
             return        
-
         runShell('git fetch')
         runShell('git checkout %s' % tag)
         if submodules:
             self._gitSubmoduleUpdate()
         
-        if patch:       
-            self._gitApplyPatch(patch)     
+    def gitCheckout(self, tag, submodules=False):
+        '''
+        Backwards compatibility
+        '''
+        self.gitCheckoutTag(tag, submodules)
 
     def _checkGitIsAtTag(self, tag):
         output = shell.evaluate('git describe --tags --exact-match')
@@ -124,28 +142,7 @@ class CppBuilder:
             print "Skipping git update: Tag %s already at HEAD in %s" % (tag, self.mSourcePath)
             return True
         return False
-            
-    def _gitApplyPatch(self, patchFile):
-        '''
-            Howto create a patch using git:
-            Branch is created like this:
-            git checkout v5.8.0
-            git branch VTK-5-8-0.patch_branch
-            git checkout VTK-5-8-0.patch_branch
-            ... make you modifications ...
-            git commit -am "message"
-            git format-patch master --stdout > VTK-5-8-0.patch
-        '''
-        self._changeDirToSource()
-        branchName = patchFile + "_branch"
-        shell.run('git branch -D %s' % branchName, ignoreFailure=True)
-        shell.run('git checkout -B %s' % branchName)
-        #TODO this can be a bug, if CustusX is not checked out yet, this will not work!!! 
-        # (i.e. if patch file is not found in expected position)
-        patchPath = self._getPathToModule() + "/.."
-        runShell('git am --whitespace=fix --signoff < %s/%s' % (patchPath, patchFile))
-        runShell('git tag -f %s' % patchFile) # need this tag to check for change during next update
-        
+                    
     def _getPathToModule(self):
         # alternatively use  sys.argv[0] ?? 
         moduleFile = os.path.realpath(__file__)

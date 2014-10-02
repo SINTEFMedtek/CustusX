@@ -63,7 +63,7 @@ class cxResourceVisualization_EXPORT GeometricRep2D : public RepImpl
 public:
 	virtual ~GeometricRep2D();
 
-	static GeometricRep2DPtr New(const QString& uid, const QString& name="");
+	static GeometricRep2DPtr New(const QString& uid="");
 
 	virtual QString getType() const { return "GeometricRep2D"; } ///< gives this reps type
 	void setMesh(MeshPtr mesh); ///< sets this reps mesh
@@ -72,9 +72,9 @@ public:
 	void setSliceProxy(SliceProxyPtr slicer);
 
 protected:
-	GeometricRep2D(const QString& uid, const QString& name);
-	virtual void addRepActorsToViewRenderer(View *view);
-	virtual void removeRepActorsFromViewRenderer(View *view);
+	GeometricRep2D();
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
 	vtkPolyDataMapperPtr mMapper;
 	vtkPropertyPtr mProperty;

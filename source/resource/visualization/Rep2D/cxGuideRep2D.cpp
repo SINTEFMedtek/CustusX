@@ -49,14 +49,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-GuideRep2DPtr GuideRep2D::New(DataServicePtr dataManager, const QString& uid, const QString& name)
+GuideRep2DPtr GuideRep2D::New(DataServicePtr dataManager, const QString& uid)
 {
-	GuideRep2DPtr retval(new GuideRep2D(dataManager, uid, name));
-	return retval;
+	return wrap_new(new GuideRep2D(dataManager), uid);
 }
 
-GuideRep2D::GuideRep2D(DataServicePtr dataManager, const QString& uid, const QString& name) :
-    DataMetricRep(uid, name),
+GuideRep2D::GuideRep2D(DataServicePtr dataManager) :
 	mDataManager(dataManager),
 	mOutlineWidth(1),
 	mRequestedAccuracy(1)
@@ -66,8 +64,8 @@ GuideRep2D::GuideRep2D(DataServicePtr dataManager, const QString& uid, const QSt
 
 void GuideRep2D::clear()
 {
-    if (mView)
-        mView->getRenderer()->RemoveActor(mCircleActor);
+	if (this->getView())
+		this->getView()->getRenderer()->RemoveActor(mCircleActor);
 }
 
 void GuideRep2D::onModifiedStartRender()
@@ -75,7 +73,7 @@ void GuideRep2D::onModifiedStartRender()
 	if (!mMetric)
 		return;
 
-	if (!mCircleActor && mView && mMetric && mSliceProxy)
+	if (!mCircleActor && this->getView() && mMetric && mSliceProxy)
 	{
 		mCircleSource = vtkSectorSource::New();
 		mCircleSource->SetOuterRadius(mGraphicsSize);
@@ -89,7 +87,7 @@ void GuideRep2D::onModifiedStartRender()
 		mCircleActor = vtkActor::New();
 		mCircleActor->SetMapper(mapper);
 		mCircleActor->GetProperty()->LightingOff();
-		mView->getRenderer()->AddActor(mCircleActor);
+		this->getRenderer()->AddActor(mCircleActor);
 
 	}
 

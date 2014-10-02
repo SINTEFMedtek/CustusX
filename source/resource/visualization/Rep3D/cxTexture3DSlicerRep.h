@@ -97,7 +97,7 @@ class cxResourceVisualization_EXPORT Texture3DSlicerRep: public RepImpl
 {
 Q_OBJECT
 public:
-	static Texture3DSlicerRepPtr New(const QString& uid);
+	static Texture3DSlicerRepPtr New(const QString& uid="");
 	virtual ~Texture3DSlicerRep();
 	virtual QString getType() const
 	{
@@ -114,14 +114,13 @@ public:
 	static bool isSupported(vtkRenderWindowPtr window);
 
 protected:
-	Texture3DSlicerRep(const QString& uid);
-	virtual void addRepActorsToViewRenderer(View *view);
-	virtual void removeRepActorsFromViewRenderer(View *view);
+	Texture3DSlicerRep();
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
 private slots:
 	void viewChanged();
 private:
-	View *mView;
 	Texture3DSlicerProxyPtr mProxy;
 };
 //---------------------------------------------------------

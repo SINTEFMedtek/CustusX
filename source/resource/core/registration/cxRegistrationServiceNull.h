@@ -65,6 +65,8 @@ public:
 	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame);
 
 	virtual bool isNull();
+private:
+	void printWarning();
 };
 } // namespace cx
 #endif // CXREGISTRATIONSERVICENULL_H

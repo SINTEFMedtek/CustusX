@@ -61,7 +61,7 @@ class cxResourceVisualization_EXPORT FrameMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:
-	static FrameMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
+	static FrameMetricRepPtr New(const QString& uid=""); ///constructor
 	virtual ~FrameMetricRep() {}
 	virtual QString getType() const { return "FrameMetricRep"; }
 
@@ -70,7 +70,6 @@ protected:
 	virtual void onModifiedStartRender();
 
 private:
-	FrameMetricRep(const QString& uid, const QString& name = "");
 	FrameMetricRep(); ///< not implemented
     FrameMetricPtr getFrameMetric();
 

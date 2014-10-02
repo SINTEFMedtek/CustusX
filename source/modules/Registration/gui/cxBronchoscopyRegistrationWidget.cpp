@@ -177,7 +177,7 @@ void BronchoscopyRegistrationWidget::acquisitionStopped()
 
 ToolRep3DPtr BronchoscopyRegistrationWidget::getToolRepIn3DView(ToolPtr tool)
 {
-	ViewWidgetQPtr view = viewManager()->get3DView();
+	ViewPtr view = viewManager()->get3DView();
     ToolRep3DPtr retval = RepManager::findFirstRep<ToolRep3D>(view->getReps(),tool);
 	return retval;
 }

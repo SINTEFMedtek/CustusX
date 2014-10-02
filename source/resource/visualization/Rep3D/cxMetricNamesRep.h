@@ -65,7 +65,7 @@ class cxResourceVisualization_EXPORT MetricNamesRep : public RepImpl
 {
 	Q_OBJECT
 public:
-	static MetricNamesRepPtr New(const QString& uid, const QString& name);
+	static MetricNamesRepPtr New(const QString& uid="");
 	virtual ~MetricNamesRep();
 
 	virtual QString getType() const{ return "MetricNamesRep";}
@@ -74,9 +74,9 @@ public:
 
 
 protected:
-	MetricNamesRep(const QString& uid, const QString& name);
-	virtual void addRepActorsToViewRenderer(View *view);
-	virtual void removeRepActorsFromViewRenderer(View *view);
+	MetricNamesRep();
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 	virtual void onModifiedStartRender();
 
 	/** Add a list of colored strings at pos.

@@ -65,6 +65,7 @@ set(PLUGIN_target_libraries
     cxGUIExtenderService
     cxResourceWidgets
     CTKDICOMWidgets
+    CTKDICOMCore
     )
 
 ctkMacroBuildPlugin(

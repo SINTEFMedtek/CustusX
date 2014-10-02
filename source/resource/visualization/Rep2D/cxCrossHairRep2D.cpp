@@ -53,8 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-CrossHairRep2D::CrossHairRep2D(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name) :
-	RepImpl(uid, name),
+CrossHairRep2D::CrossHairRep2D(SpaceProviderPtr spaceProvider) :
+	RepImpl(),
 	m_vpMs(Transform3D::Identity()),
 	mSpaceProvider(spaceProvider)
 {
@@ -64,11 +64,9 @@ CrossHairRep2D::~CrossHairRep2D()
 {
 }
 
-CrossHairRep2DPtr CrossHairRep2D::New(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name)
+CrossHairRep2DPtr CrossHairRep2D::New(SpaceProviderPtr spaceProvider, const QString& uid)
 {
-	CrossHairRep2DPtr retval(new CrossHairRep2D(spaceProvider, uid, name));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new CrossHairRep2D(spaceProvider), uid);
 }
 
 QString CrossHairRep2D::getType() const
@@ -100,7 +98,7 @@ void CrossHairRep2D::setSliceProxy(SliceProxyPtr slicer)
 	update();
 }
 
-void CrossHairRep2D::addRepActorsToViewRenderer(View *view)
+void CrossHairRep2D::addRepActorsToViewRenderer(ViewPtr view)
 {
 	mCursor.reset( new CrossHair2D(view->getRenderer()) ) ;
 	double bordarOffset = 150.0;
@@ -109,7 +107,7 @@ void CrossHairRep2D::addRepActorsToViewRenderer(View *view)
 	update();
 }
 
-void CrossHairRep2D::removeRepActorsFromViewRenderer(View *view)
+void CrossHairRep2D::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	mCursor.reset();
 }

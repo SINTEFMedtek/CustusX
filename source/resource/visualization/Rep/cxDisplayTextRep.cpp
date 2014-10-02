@@ -45,8 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-DisplayTextRep::DisplayTextRep(const QString& uid, const QString& name=""):
-	RepImpl(uid,name)
+DisplayTextRep::DisplayTextRep():
+	RepImpl("")
 {
 }
 
@@ -54,28 +54,20 @@ DisplayTextRep::~DisplayTextRep()
 {
 
 }
-DisplayTextRepPtr DisplayTextRep::New(const QString& uid, const QString& name="")
+DisplayTextRepPtr DisplayTextRep::New(const QString& uid)
 {
-	DisplayTextRepPtr retval(new DisplayTextRep(uid, name));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new DisplayTextRep(), uid);
 }
-void DisplayTextRep::addRepActorsToViewRenderer(View *view)
+void DisplayTextRep::addRepActorsToViewRenderer(ViewPtr view)
 {
 	for(unsigned i =0; i<mDisplayText.size(); ++i)
-	{
 		mDisplayText[i]->setRenderer(view->getRenderer());
-//		view->getRenderer()->AddActor( mDisplayText.at(i)->getActor() );
-	}
 }
 
-void DisplayTextRep::removeRepActorsFromViewRenderer(View *view)
+void DisplayTextRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	for(unsigned i =0; i<mDisplayText.size(); ++i)
-	{
 		mDisplayText[i]->setRenderer(NULL);
-//		view->getRenderer()->RemoveActor(mDisplayText.at(i)->getActor() );
-	}
 }
 
 /**Add a text with give RGB color at pos.

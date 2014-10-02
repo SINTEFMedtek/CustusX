@@ -42,14 +42,76 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxReporter.h"
 #include "vtkRenderWindowInteractor.h"
-//#include "cxForwardDeclarations.h"
+#include "cxTypeConversions.h"
 
 namespace cxtest
 {
-TestRenderSpeed::TestRenderSpeed():
-		mNumViews(0)
+
+RenderSpeedCounter::RenderSpeedCounter() :
+	mNumViews(0),
+	mNumRenderings(0)
 {
+}
+
+void RenderSpeedCounter::printResult()
+{
+	std::cout << "Render time:\t" << mNumViews << " " << mName;
+	if (mNumViews == 1)
+		std::cout << " ";
+	else
+		std::cout << "s";
+	std::cout << "\tTotal: " << this->getTotalRenderTimeInMs() << "ms";
+	std::cout << "\tAverage: " << this->getAverageRenderTimeInMs() << "ms";
+	std::cout << "\t(FPS=" << this->getRenderFPS() << ")" << std::endl;
+}
+
+void RenderSpeedCounter::startRender(int numRender, int numViews)
+{
+	mNumRenderings = numRender;
+	mNumViews = numViews;
+	mClock.start();
+}
+void RenderSpeedCounter::stopRender()
+{
+	this->setTotalRenderTimeInMs(mClock.elapsed());
+}
+
+int RenderSpeedCounter::getTotalRenderTimeInMs()
+{
+	return mRenderTimeInMs;
+}
+
+
+void RenderSpeedCounter::setTotalRenderTimeInMs(int time)
+{
+	mRenderTimeInMs = time;
+}
+
+double RenderSpeedCounter::getAverageRenderTimeInMs()
+{
+	if (mNumRenderings==0)
+		return 1000000;
+	double time = mRenderTimeInMs / (double)mNumRenderings;
+	return time;
+}
+
+int RenderSpeedCounter::getRenderFPS()
+{
+	return 1000 / this->getAverageRenderTimeInMs();
+}
+
+
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+
+TestRenderSpeed::TestRenderSpeed()
+{
+	mCounter.setName("cxView");
 	cx::reporter()->initialize();
+	mMainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout().data());
 }
 
 TestRenderSpeed::~TestRenderSpeed()
@@ -59,42 +121,134 @@ TestRenderSpeed::~TestRenderSpeed()
 
 void TestRenderSpeed::testSingleView()
 {
-	this->create3Dviews(1);
+	this->createViews(1);
 	this->showViews();
 	this->renderNumTimes(100);
 }
 
 void TestRenderSpeed::testSeveralViews()
 {
-	this->create3Dviews(2);
-	this->create2Dviews(8);
+	this->createViews(10);
 	this->showViews();
 	this->renderNumTimes(100);
 }
 
 void TestRenderSpeed::testLotsOfViews()
 {
-	this->create3Dviews(20);
-	this->create2Dviews(80);
+	this->createViews(100);
 	this->showViews();
 	this->renderNumTimes(10);
 }
 
-void TestRenderSpeed::testVtkRenderWindow()
+void TestRenderSpeed::createViews(int num)
+{
+//	mNumViews += num;
+	for(int i = 0; i < num; ++i)
+	{
+		int v = num;
+		int rmax = sqrt(v);
+		cx::LayoutRegion region(v%rmax, v/rmax);
+		cx::ViewPtr view = mMainWidget->addView(cx::View::VIEW, region);
+
+//		cx::ViewWidget* view = new cx::ViewWidget("testView3D", "testView3D", NULL);
+		mViews.push_back(view);
+	}
+}
+
+//void TestRenderSpeed::create2Dviews(int num)
+//{
+//	mNumViews += num;
+//	for(int i = 0; i < num; ++i)
+//	{
+//		cx::ViewWidget* view = new cx::ViewWidget("testView2D", "testView2D", NULL);
+//		mViews.push_back(view);
+//	}
+//}
+
+void TestRenderSpeed::showViews()
+{
+	SSC_ASSERT(!mMainWidget);
+
+//	mMainWidget.reset(new QWidget);
+	mMainWidget->resize(1000,500);
+//	QGridLayout* layout = new QGridLayout();
+//	mMainWidget->setLayout(layout);
+//	this->addViewsToGridLayout(layout);
+	mMainWidget->show();
+}
+
+void TestRenderSpeed::renderNumTimes(int num)
+{
+	mCounter.startRender(num, mViews.size());
+//	mNumRenderings = num;
+//	QTime clock;
+//	clock.start();
+	for(int i = 0; i < num; ++i)
+		for(int v = 0; v < mViews.size(); v++)
+			mViews[v]->getRenderWindow()->Render();
+//	this->setTotalRenderTimeInMs(clock.elapsed());
+	mCounter.stopRender();
+}
+
+//void TestRenderSpeed::renderViewNum(int viewNum)
+//{
+//	if(mViews.size() != 0)
+//		mViews[viewNum]->getView()->getRenderWindow()->Render();
+//	else if(mInteractors.size() != 0)
+//		mInteractors[viewNum]->GetRenderWindow()->Render();
+//}
+
+
+//void TestRenderSpeed::addViewsToLayout(QLayout* layout)
+//{
+//	std::vector<cx::ViewWidget*>::iterator iter;
+//	for (iter = mViews.begin(); iter != mViews.end(); ++iter)
+//		layout->addWidget(*iter);
+//}
+
+//void TestRenderSpeed::addViewsToGridLayout(QGridLayout* layout)
+//{
+//	int squareNumViews = sqrt((double)this->getNumViews());
+//	for (int i = 0; i < this->getNumViews(); i++)
+//		layout->addWidget(mViews[i], i / squareNumViews, i % squareNumViews);
+//}
+
+//int TestRenderSpeed::getNumViews()
+//{
+//	return mNumViews;
+//}
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+
+
+TestRenderWindowSpeed::TestRenderWindowSpeed()
+{
+	mCounter.setName("vtkRenderWindow");
+	cx::reporter()->initialize();
+}
+
+TestRenderWindowSpeed::~TestRenderWindowSpeed()
+{
+	cx::Reporter::shutdown();
+}
+
+void TestRenderWindowSpeed::testVtkRenderWindow()
 {
 	createVtkRenderWindows(1);
 	this->renderNumTimes(100);
 }
 
-void TestRenderSpeed::testSeveralVtkRenderWindows()
+void TestRenderWindowSpeed::testSeveralVtkRenderWindows()
 {
 	createVtkRenderWindows(10);
 	this->renderNumTimes(100);
 }
 
-void TestRenderSpeed::createVtkRenderWindows(int num)
+void TestRenderWindowSpeed::createVtkRenderWindows(int num)
 {
-	mNumViews += num;
 	for(int i = 0; i < num; ++i)
 	{
 		vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
@@ -104,119 +258,18 @@ void TestRenderSpeed::createVtkRenderWindows(int num)
 	}
 }
 
-
-void TestRenderSpeed::create3Dviews(int num)
+void TestRenderWindowSpeed::renderNumTimes(int num)
 {
-	mNumViews += num;
+	mCounter.startRender(num, mInteractors.size());
 	for(int i = 0; i < num; ++i)
-	{
-		cx::ViewWidget* view = new cx::ViewWidget("testView3D", "testView3D", NULL);
-		mViews.push_back(view);
-	}
+		for(int v = 0; v < mInteractors.size(); v++)
+			mInteractors[v]->GetRenderWindow()->Render();
+	mCounter.stopRender();
 }
 
-void TestRenderSpeed::create2Dviews(int num)
-{
-	mNumViews += num;
-	for(int i = 0; i < num; ++i)
-	{
-		cx::ViewWidget* view = new cx::ViewWidget("testView2D", "testView2D", NULL);
-		mViews.push_back(view);
-	}
-}
-
-void TestRenderSpeed::showViews()
-{
-	SSC_ASSERT(!mMainWidget);
-
-	mMainWidget.reset(new QWidget);
-	mMainWidget->resize(1000,500);
-	QGridLayout* layout = new QGridLayout();
-	mMainWidget->setLayout(layout);
-	this->addViewsToGridLayout(layout);
-	mMainWidget->show();
-}
-
-void TestRenderSpeed::renderNumTimes(int num)
-{
-	mNumRenderings = num;
-	QTime clock;
-	clock.start();
-	for(int i = 0; i < mNumRenderings; ++i)
-		for(int v = 0; v < this->getNumViews(); v++)
-			this->renderViewNum(v);
-	this->setTotalRenderTimeInMs(clock.elapsed());
-}
-
-void TestRenderSpeed::renderViewNum(int viewNum)
-{
-	if(mViews.size() != 0)
-		mViews[viewNum]->getRenderWindow()->Render();
-	else if(mInteractors.size() != 0)
-		mInteractors[viewNum]->GetRenderWindow()->Render();
-}
-
-void TestRenderSpeed::printResult()
-{
-	std::cout << "Render time:\t" << this->getNumViews() << " " << this->getViewName();
-	if (this->getNumViews() == 1)
-		std::cout << " ";
-	else
-		std::cout << "s";
-	std::cout << "\tTotal: " << this->getTotalRenderTimeInMs() << "ms";
-	std::cout << "\tAverage: " << this->getAverageRenderTimeInMs() << "ms";
-	std::cout << "\t(FPS=" << this->getRenderFPS() << ")" << std::endl;
-}
-
-void TestRenderSpeed::addViewsToLayout(QLayout* layout)
-{
-	std::vector<cx::ViewWidget*>::iterator iter;
-	for (iter = mViews.begin(); iter != mViews.end(); ++iter)
-		layout->addWidget(*iter);
-}
-
-void TestRenderSpeed::addViewsToGridLayout(QGridLayout* layout)
-{
-	int squareNumViews = sqrt((double)this->getNumViews());
-	for (int i = 0; i < this->getNumViews(); i++)
-		layout->addWidget(mViews[i], i / squareNumViews, i % squareNumViews);
-}
-
-const char* TestRenderSpeed::getViewName()
-{
-	if (mViews.size() != 0)
-		return "cxView";
-	else
-		return "vtkRenderWindow";
-}
-
-int TestRenderSpeed::getTotalRenderTimeInMs()
-{
-	return mRenderTimeInMs;
-}
-
-
-void TestRenderSpeed::setTotalRenderTimeInMs(int time)
-{
-	mRenderTimeInMs = time;
-}
-
-double TestRenderSpeed::getAverageRenderTimeInMs()
-{
-	if (mNumRenderings==0)
-		return 1000000;
-	double time = mRenderTimeInMs / (double)mNumRenderings;
-	return time;
-}
-
-int TestRenderSpeed::getRenderFPS()
-{
-	return 1000 / this->getAverageRenderTimeInMs();
-}
-
-int TestRenderSpeed::getNumViews()
-{
-	return mNumViews;
-}
+//int TestRenderWindowSpeed::getNumViews()
+//{
+//	return mNumViews;
+//}
 
 } //namespace cxtest

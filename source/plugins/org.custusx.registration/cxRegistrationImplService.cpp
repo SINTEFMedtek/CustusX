@@ -41,13 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxFrameForest.h"
 #include "cxPatientModelService.h"
-
- //TODO: Remove these by moving functionality to PatientModelService
-#include "cxLogicManager.h"
-#include "cxPatientService.h"
-#include "cxDataManager.h"
-#include "cxLegacySingletons.h"
-#include "cxPatientData.h"
 #include "cxRegistrationApplicator.h"
 
 namespace cx
@@ -106,12 +99,11 @@ void RegistrationImplService::applyImage2ImageRegistration(Transform3D delta_pre
 	RegistrationTransform regTrans(delta_pre_rMd, QDateTime::currentDateTime(), description);
 	regTrans.mFixed = mFixedData ? mFixedData->getUid() : "";
 	regTrans.mMoving = mMovingData ? mMovingData->getUid() : "";
-	this->updateRegistration(mLastRegistrationTime, regTrans, mMovingData, regTrans.mFixed);
+
+	this->updateRegistration(mLastRegistrationTime, regTrans, mMovingData);
+
 	mLastRegistrationTime = regTrans.mTimestamp;
 	reportSuccess(QString("Image registration [%1] has been performed on %2").arg(description).arg(regTrans.mMoving) );
-//	patientService()->getPatientData()->autoSave();
-
-	cx::logicManager()->getPatientService()->getPatientData()->autoSave();//TODO
 }
 
 PatientModelService* RegistrationImplService::getPatientModelService()
@@ -128,7 +120,9 @@ void RegistrationImplService::applyPatientRegistration(Transform3D rMpr_new, QSt
 {
 	RegistrationTransform regTrans(rMpr_new, QDateTime::currentDateTime(), description);
 	regTrans.mFixed = mFixedData ? mFixedData->getUid() : "";
+
 	this->getPatientModelService()->updateRegistration_rMpr(mLastRegistrationTime, regTrans);
+
 	mLastRegistrationTime = regTrans.mTimestamp;
 	reportSuccess(QString("Patient registration [%1] has been performed.").arg(description));
 }
@@ -138,10 +132,11 @@ void RegistrationImplService::applyPatientRegistration(Transform3D rMpr_new, QSt
  * Registration is done relative to masterFrame, i.e. data is moved relative to the masterFrame.
  *
  */
-void RegistrationImplService::updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrameUid)
+void RegistrationImplService::updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data)
 {
-	RegistrationApplicator applicator(dataService()->getData());
+	RegistrationApplicator applicator(getPatientModelService()->getData());
 	applicator.updateRegistration(oldTime, deltaTransform, data);
+	getPatientModelService()->autoSave();
 }
 
 bool RegistrationImplService::isNull()

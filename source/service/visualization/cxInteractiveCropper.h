@@ -73,7 +73,7 @@ class cxVisualizationService_EXPORT InteractiveCropper: public QObject
 Q_OBJECT
 public:
 	explicit InteractiveCropper(VisualizationServiceBackendPtr backend);
-	void setView(ViewWidget* view); ///< adds an interactive box widget to the view. Press 'I' to show
+	void setView(ViewPtr view); ///< adds an interactive box widget to the view. Press 'I' to show
 	DoubleBoundingBox3D getBoundingBox(); ///< get BB in data space
 	void setBoundingBox(const DoubleBoundingBox3D& bb_d); ///< set BB in reference space
 	void resetBoundingBox(); ///< set bounding box back to initial size (entire volume)
@@ -101,7 +101,7 @@ private:
 	void initialize();
 
 	ImagePtr mImage;
-	QPointer<ViewWidget> mView;
+	ViewPtr mView;
 	vtkBoxWidgetPtr mBoxWidget;
 	CropBoxCallbackPtr mCropBoxCallback;
 	CropBoxEnableCallbackPtr mCropBoxEnableCallback;

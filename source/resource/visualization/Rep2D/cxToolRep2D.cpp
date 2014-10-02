@@ -52,8 +52,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ToolRep2D::ToolRep2D(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name) :
-	RepImpl(uid, name),
+ToolRep2D::ToolRep2D(SpaceProviderPtr spaceProvider) :
+	RepImpl(),
 	mSpaceProvider(spaceProvider),
 	m_vpMs(Transform3D::Identity()),
 	mBB_vp(0, 1, 0, 1, 0, 1),
@@ -77,11 +77,9 @@ ToolRep2D::~ToolRep2D()
 {
 }
 
-ToolRep2DPtr ToolRep2D::New(SpaceProviderPtr spaceProvider, const QString& uid, const QString& name)
+ToolRep2DPtr ToolRep2D::New(SpaceProviderPtr spaceProvider, const QString& uid)
 {
-	ToolRep2DPtr retval(new ToolRep2D(spaceProvider, uid, name));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new ToolRep2D(spaceProvider), uid);
 }
 
 QString ToolRep2D::getType() const
@@ -168,7 +166,7 @@ void ToolRep2D::setMergeOffsetAndToolLine(bool on)
 	setVisibility();
 }
 
-void ToolRep2D::addRepActorsToViewRenderer(View *view)
+void ToolRep2D::addRepActorsToViewRenderer(ViewPtr view)
 {
 	createToolLine(view->getRenderer(), Vector3D(0,0,0));
 	createCrossHair(view->getRenderer() );
@@ -178,7 +176,7 @@ void ToolRep2D::addRepActorsToViewRenderer(View *view)
 	this->setModified();
 }
 
-void ToolRep2D::removeRepActorsFromViewRenderer(View *view)
+void ToolRep2D::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	cursor.reset();
 	center2Tool.reset();

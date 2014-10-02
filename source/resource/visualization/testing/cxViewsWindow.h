@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QMainWindow>
 #include "cxView.h"
+#include "cxViewCollectionWidget.h"
+
 class QGridLayout;
 
 namespace cxtest
@@ -53,19 +55,19 @@ public:
 	void setDescription(const QString& desc);
 
 	// setup views
-	cx::ViewWidget* addView(QString caption, int r, int c);
-	cx::ViewWidget* add2DView(QString caption, int r, int c);
+	cx::ViewPtr addView(cx::View::Type type, int r, int c);
+	cx::ViewPtr add2DView(int r, int c);
 	bool quickRunWidget();
+	void clearLayoutWidget();
 
-	cx::View* getView(int index);
+	cx::ViewPtr getView(int index);
 
 private:
-	void prettyZoom(cx::View *view);
-	void insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c);
+	void prettyZoom(cx::ViewPtr view);
+	void setNiceSize();
 
-	std::vector<cx::View *> mLayouts;
-	QGridLayout* mSliceLayout;
-	QString mDisplayText;
+	std::vector<cx::ViewPtr > mViews;
+	cx::ViewCollectionWidget* mLayoutWidget;
 
 	double mZoomFactor;
 	QTimer* mRenderingTimer;

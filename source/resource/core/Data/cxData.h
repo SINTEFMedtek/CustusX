@@ -110,8 +110,8 @@ public:
 	virtual QString getParentSpace();
 	virtual DoubleBoundingBox3D boundingBox() const = 0;
 
-	void connectToRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
-	void disconnectFromRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
+//	void connectToRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
+//	void disconnectFromRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
 
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
@@ -139,7 +139,7 @@ protected:
 	REGISTRATION_STATUS mRegistrationStatus;
 	RegistrationHistoryPtr m_rMd_History;
 
-	std::set<RepWeakPtr> mReps; ///< links to Rep users.
+//	std::set<RepWeakPtr> mReps; ///< links to Rep users.
 
 private:
 	Data(const Data& other);

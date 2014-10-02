@@ -83,7 +83,7 @@ TEST_CASE("OpenCL and OpenGl: Show a cx::ViewWidget (OpenGL) and init OpenCL", "
 
 TEST_CASE("OpenCL and OpenGl: Show a vtkRenderWindow (OpenGL) and init OpenCL", "[unit][OpenCL][OpenGL][gui][hide][segmentation_fault]")
 {
-		TestRenderSpeed helper;
+		TestRenderWindowSpeed helper;
 		helper.testVtkRenderWindow();
 
 	cx::OpenCLPrinter::printPlatformAndDeviceInfo();

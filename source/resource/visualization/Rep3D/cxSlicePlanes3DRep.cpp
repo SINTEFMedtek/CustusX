@@ -160,17 +160,14 @@ SlicePlanesProxy::DataMap SlicePlanesProxy::getData()
 ///--------------------------------------------------------
 
 
-SlicePlanes3DRepPtr SlicePlanes3DRep::New(const QString& uid, const QString& name)
+SlicePlanes3DRepPtr SlicePlanes3DRep::New(const QString& uid)
 {
-	SlicePlanes3DRepPtr retval(new SlicePlanes3DRep(uid, name));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new SlicePlanes3DRep(), uid);
 }
 
-SlicePlanes3DRep::SlicePlanes3DRep(const QString& uid, const QString& name) :
-	RepImpl(uid, name), mView(NULL)
+SlicePlanes3DRep::SlicePlanes3DRep() :
+	RepImpl()
 {
-//	this->setDynamicLabelSize(true);
 }
 
 SlicePlanes3DRep::~SlicePlanes3DRep()
@@ -196,30 +193,28 @@ void SlicePlanes3DRep::setDynamicLabelSize(bool on)
 	}
 }
 
-void SlicePlanes3DRep::addRepActorsToViewRenderer(View* view)
+void SlicePlanes3DRep::addRepActorsToViewRenderer(ViewPtr view)
 {
-	mView = view;
 	this->changedSlot();
 	if (mViewportListener)
 		mViewportListener->startListen(view->getRenderer());
 }
 
-void SlicePlanes3DRep::removeRepActorsFromViewRenderer(View *view)
+void SlicePlanes3DRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	if (mViewportListener)
 		mViewportListener->stopListen();
 	this->clearActors();
-	mView = NULL;
 }
 
 void SlicePlanes3DRep::clearActors()
 {
-	if (!mView)
+	if (!this->getView())
 		return;
 
 	for (DataMap::iterator i = mData.begin(); i != mData.end(); ++i)
 	{
-		mView->getRenderer()->RemoveActor(i->second.mText);
+		this->getRenderer()->RemoveActor(i->second.mText);
 		i->second.mPoint.reset();
 		i->second.mRect.reset();
 		i->second.mAxes.reset();
@@ -234,7 +229,7 @@ void SlicePlanes3DRep::rescale()
 
 void SlicePlanes3DRep::changedSlot()
 {
-	if (!mView)
+	if (!this->getView())
 		return;
 
 	if (!mProxy->getVisible())
@@ -260,11 +255,11 @@ void SlicePlanes3DRep::changedSlot()
 			data.mText->GetTextProperty()->SetVerticalJustificationToBottom();
 			data.mText->GetTextProperty()->SetJustificationToLeft();
 			data.mText->GetTextProperty()->ShadowOff();
-			mView->getRenderer()->AddActor(data.mText);
+			this->getRenderer()->AddActor(data.mText);
 		}
 		if (!data.mRect)
 		{
-			data.mRect.reset(new Rect3D(mView->getRenderer(), base.mColor));
+			data.mRect.reset(new Rect3D(this->getRenderer(), base.mColor));
 		}
 
 		Transform3D rMs = base.mSliceProxy->get_sMr().inv();
@@ -325,15 +320,13 @@ void SlicePlanes3DRep::setProxy(SlicePlanesProxyPtr proxy)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-SlicePlanes3DMarkerIn2DRepPtr SlicePlanes3DMarkerIn2DRep::New(const QString& uid, const QString& name)
+SlicePlanes3DMarkerIn2DRepPtr SlicePlanes3DMarkerIn2DRep::New(const QString& uid)
 {
-	SlicePlanes3DMarkerIn2DRepPtr retval(new SlicePlanes3DMarkerIn2DRep(uid, name));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new SlicePlanes3DMarkerIn2DRep(), uid);
 }
 
-SlicePlanes3DMarkerIn2DRep::SlicePlanes3DMarkerIn2DRep(const QString& uid, const QString& name) :
-	RepImpl(uid, name)
+SlicePlanes3DMarkerIn2DRep::SlicePlanes3DMarkerIn2DRep() :
+	RepImpl()
 {
 }
 
@@ -341,7 +334,7 @@ SlicePlanes3DMarkerIn2DRep::~SlicePlanes3DMarkerIn2DRep()
 {
 }
 
-void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(View *view)
+void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(ViewPtr view)
 {
 	SlicePlanesProxy::DataType baseData = mProxy->getData()[mType];
 
@@ -355,7 +348,7 @@ void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(View *view)
 	this->changedSlot();
 }
 
-void SlicePlanes3DMarkerIn2DRep::removeRepActorsFromViewRenderer(View *view)
+void SlicePlanes3DMarkerIn2DRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->RemoveActor(mText->getActor());
 	mText.reset();

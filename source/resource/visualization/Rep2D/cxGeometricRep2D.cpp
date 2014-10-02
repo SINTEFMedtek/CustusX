@@ -54,8 +54,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-GeometricRep2D::GeometricRep2D(const QString& uid, const QString& name) :
-	RepImpl(uid, name)
+GeometricRep2D::GeometricRep2D() :
+	RepImpl()
 {
 	mMapper = vtkPolyDataMapperPtr::New();
 	mProperty = vtkPropertyPtr::New();
@@ -68,19 +68,17 @@ GeometricRep2D::~GeometricRep2D()
 {
 }
 
-GeometricRep2DPtr GeometricRep2D::New(const QString& uid, const QString& name)
+GeometricRep2DPtr GeometricRep2D::New(const QString& uid)
 {
-	GeometricRep2DPtr retval(new GeometricRep2D(uid, name));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new GeometricRep2D(), uid);
 }
 
-void GeometricRep2D::addRepActorsToViewRenderer(View *view)
+void GeometricRep2D::addRepActorsToViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->AddActor(mActor);
 }
 
-void GeometricRep2D::removeRepActorsFromViewRenderer(View *view)
+void GeometricRep2D::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->RemoveActor(mActor);
 }
@@ -129,8 +127,6 @@ void GeometricRep2D::setSliceProxy(SliceProxyPtr slicer)
 
 void GeometricRep2D::meshChangedSlot()
 {
-	mMesh->connectToRep(mSelf);
-
 	mMapper->SetInputData(mMesh->getVtkPolyData()); // original - show-all method
 	mMapper->ScalarVisibilityOff();//Don't use the LUT from the VtkPolyData
 	//mNormals->SetInputConnection(mMesh->getVtkPolyData()->Get);

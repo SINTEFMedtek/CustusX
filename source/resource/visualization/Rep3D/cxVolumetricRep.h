@@ -107,8 +107,8 @@ public:
 
 protected:
 	VolumetricRep();
-	virtual void addRepActorsToViewRenderer(View *view);
-	virtual void removeRepActorsFromViewRenderer(View *view);
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
 	cx::VolumePropertyPtr mVolumeProperty;
 	vtkVolumeMapperPtr mMapper;

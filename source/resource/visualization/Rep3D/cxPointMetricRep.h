@@ -58,7 +58,7 @@ class cxResourceVisualization_EXPORT PointMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:
-	static PointMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
+	static PointMetricRepPtr New(const QString& uid=""); ///constructor
 	virtual ~PointMetricRep() {}
 
 	void setPointMetric(PointMetricPtr point);
@@ -66,16 +66,15 @@ public:
 	virtual QString getType() const { return "PointMetricRep"; }
 
 protected:
-	virtual void addRepActorsToViewRenderer(View *view);
-	virtual void removeRepActorsFromViewRenderer(View *view);
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
     virtual void clear();
     virtual void rescale();
 	virtual void onModifiedStartRender();
 
 private:
-	PointMetricRep(const QString& uid, const QString& name = "");
-	PointMetricRep(); ///< not implemented
+	PointMetricRep();
 
 	GraphicalPoint3DPtr mGraphicalPoint;
 //	PointMetricPtr mMetric;

@@ -61,9 +61,9 @@ class cxVisualizationService_EXPORT ViewWrapperVideo: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapperVideo(ViewWidget* view, VisualizationServiceBackendPtr backend);
+	ViewWrapperVideo(ViewPtr view, VisualizationServiceBackendPtr backend);
 	virtual ~ViewWrapperVideo();
-	virtual ViewWidget* getView();
+	virtual ViewPtr getView();
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) {}
 	virtual void updateView() {}
 	virtual void setViewGroup(ViewGroupDataPtr group);
@@ -93,7 +93,7 @@ private:
 	VideoSourcePtr mSource;
 	DisplayTextRepPtr mPlaneTypeText;
 	DisplayTextRepPtr mDataNameText;
-	QPointer<ViewWidget> mView;
+	ViewPtr mView;
 	ToolPtr mTool;
 };
 typedef boost::shared_ptr<ViewWrapperVideo> ViewWrapperVideoPtr;

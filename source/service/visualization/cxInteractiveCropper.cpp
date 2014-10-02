@@ -59,6 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumetricRep.h"
 #include "cxActiveImageProxy.h"
 #include "cxVisualizationServiceBackend.h"
+#include <vtkCommand.h>
 
 namespace cx
 {
@@ -146,7 +147,7 @@ void InteractiveCropper::initialize()
 	mBoxWidget->SetEnabled(false);
 }
 
-void InteractiveCropper::setView(ViewWidget* view)
+void InteractiveCropper::setView(ViewPtr view)
 {
 	mView = view;
 	this->updateBoxWidgetInteractor();

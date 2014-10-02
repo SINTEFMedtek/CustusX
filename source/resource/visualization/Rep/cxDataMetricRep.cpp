@@ -43,8 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-DataMetricRep::DataMetricRep(const QString& uid, const QString& name) :
-	RepImpl(uid, name),
+DataMetricRep::DataMetricRep() :
+	RepImpl(),
 	mGraphicsSize(1),
 	mShowLabel(false),
 	mLabelSize(2.5),
@@ -107,7 +107,7 @@ void DataMetricRep::clear()
     mText.reset();
 }
 
-void DataMetricRep::addRepActorsToViewRenderer(View *view)
+void DataMetricRep::addRepActorsToViewRenderer(ViewPtr view)
 {
 //    mView = view;
 
@@ -118,7 +118,7 @@ void DataMetricRep::addRepActorsToViewRenderer(View *view)
 	this->setModified();
 }
 
-void DataMetricRep::removeRepActorsFromViewRenderer(View *view)
+void DataMetricRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 //	vtkRendererPtr renderer = mView->getRenderer();
 //	renderer->RemoveObserver(this->mCallbackCommand);

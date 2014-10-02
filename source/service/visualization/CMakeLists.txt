@@ -26,13 +26,13 @@ cx_add_class_qt_moc(cxVisualizationService_SOURCE
     cxMultiVolume3DRepProducer
     cxViewGroupData
     cxAxisConnector
-	cxLayoutWidget
+#	cxViewCollectionWidget
 	cxRenderLoop
 	cx2DZoomHandler
 	)
 
 cx_add_class(cxVisualizationService_SOURCE
-    cxLayoutData
+#    cxLayoutData
 	cxLayoutRepository
 	cxVisualizationServiceBackend
 	cxNavigation
@@ -49,7 +49,9 @@ include_directories(
     ${CustusX_BINARY_DIR}/source/service/tracking
     ${CustusX_BINARY_DIR}/source/service/video
     ${CustusX_BINARY_DIR}/source/resource/visualization
-    )
+	${CustusX_SOURCE_DIR}/source/resource/visualization/ViewContainer
+	${CustusX_SOURCE_DIR}/source/resource/visualization/View
+	)
 
 set(cxVisualizationService_LIBS
     cxResourceVisualization

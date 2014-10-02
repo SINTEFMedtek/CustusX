@@ -145,7 +145,7 @@ protected:
 
 private:
 	LayoutInteractorPtr mLayoutInteractor;
-	void saveScreenShot(QPixmap pixmap);
+	void saveScreenShot(QPixmap pixmap, QString id="");
 	void saveScreenShotThreaded(QImage pixmap, QString filename);
 	void updateWindowTitle();
 	void createActions(); ///< creates and connects (gui-)actions

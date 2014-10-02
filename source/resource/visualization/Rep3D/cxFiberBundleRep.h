@@ -62,7 +62,7 @@ class cxResourceVisualization_EXPORT FiberBundleRep : public RepImpl
 	Q_OBJECT
 
 public:
-	static FiberBundleRepPtr New(const QString& uid, const QString& name = "");
+	static FiberBundleRepPtr New(const QString& uid="");
 	virtual ~FiberBundleRep() {}
 
 	/** Return rep type description */
@@ -75,9 +75,9 @@ public:
 	virtual MeshPtr getBundle() { return mBundle; }
 
 protected:
-	FiberBundleRep(const QString& uid, const QString& name = "");
-	virtual void addRepActorsToViewRenderer(View *view);
-	virtual void removeRepActorsFromViewRenderer(View *view);
+	FiberBundleRep();
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
 private:
 	double  mFiberWidth;

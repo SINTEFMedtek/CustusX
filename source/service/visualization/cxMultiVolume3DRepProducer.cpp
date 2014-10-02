@@ -50,7 +50,6 @@ namespace cx
 
 MultiVolume3DRepProducer::MultiVolume3DRepProducer()
 {
-	mView = NULL;
 	mMaxRenderSize = 10 * pow(10.0,6);
 }
 
@@ -58,7 +57,7 @@ MultiVolume3DRepProducer::~MultiVolume3DRepProducer()
 {
 }
 
-void MultiVolume3DRepProducer::setView(View* view)
+void MultiVolume3DRepProducer::setView(ViewPtr view)
 {
 	if (view==mView)
 		return;

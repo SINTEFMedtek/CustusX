@@ -138,15 +138,13 @@ Vector3D ImageLandmarksSource::getTextPos(Vector3D p_l) const
 // --------------------------------------------------------
 // --------------------------------------------------------
 
-LandmarkRepPtr LandmarkRep::New(DataServicePtr dataManager, const QString& uid, const QString& name)
+LandmarkRepPtr LandmarkRep::New(DataServicePtr dataManager, const QString& uid)
 {
-	LandmarkRepPtr retval(new LandmarkRep(dataManager, uid, name));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new LandmarkRep(dataManager), uid);
 }
 
-LandmarkRep::LandmarkRep(DataServicePtr dataManager, const QString& uid, const QString& name) :
-	RepImpl(uid, name),
+LandmarkRep::LandmarkRep(DataServicePtr dataManager) :
+	RepImpl(),
 	mDataManager(dataManager),
 	mInactiveColor(QColor::fromRgbF(0.5,0.5,0.5)),
 	mColor(QColor(Qt::green)),
@@ -259,7 +257,7 @@ void LandmarkRep::clearAll()
 	mGraphics.clear();
 }
 
-void LandmarkRep::addRepActorsToViewRenderer(View* view)
+void LandmarkRep::addRepActorsToViewRenderer(ViewPtr view)
 {
 	if (!view || !view->getRenderer())
 		return;
@@ -268,7 +266,7 @@ void LandmarkRep::addRepActorsToViewRenderer(View* view)
 	mViewportListener->startListen(view->getRenderer());
 }
 
-void LandmarkRep::removeRepActorsFromViewRenderer(View* view)
+void LandmarkRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	this->clearAll();
 	mViewportListener->stopListen();

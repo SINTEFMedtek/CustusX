@@ -58,11 +58,9 @@ class cxResourceVisualization_EXPORT GuideRep2D: public DataMetricRep
 {
 Q_OBJECT
 public:
-	static GuideRep2DPtr New(DataServicePtr dataManager, const QString& uid, const QString& name = ""); ///constructor
+	static GuideRep2DPtr New(DataServicePtr dataManager, const QString& uid="");
 	virtual ~GuideRep2D() {}
 
-//	void setPointMetric(PointMetricPtr point);
-//	PointMetricPtr getPointMetric();
 	virtual QString getType() const { return "GuideRep2D"; }
 	void setSliceProxy(SliceProxyPtr slicer);
 	/**
@@ -73,16 +71,13 @@ public:
 	void setRequestedAccuracy(double accuracy);
 
 protected:
-//	virtual void addRepActorsToViewRenderer(View* view);
-//	virtual void removeRepActorsFromViewRenderer(View* view);
     virtual void clear();
 	virtual void onModifiedStartRender();
 
 private:
-	GuideRep2D(DataServicePtr dataManager, const QString& uid, const QString& name = "");
+	GuideRep2D(DataServicePtr dataManager);
 	GuideRep2D(); ///< not implemented
 
-//	PointMetricPtr mMetric;
 	DataServicePtr mDataManager;
 	SliceProxyPtr mSliceProxy;
 	vtkActorPtr mCircleActor;

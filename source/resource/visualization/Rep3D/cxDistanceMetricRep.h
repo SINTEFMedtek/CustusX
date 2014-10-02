@@ -62,7 +62,7 @@ class cxResourceVisualization_EXPORT DistanceMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:
-	static DistanceMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
+	static DistanceMetricRepPtr New(const QString& uid=""); ///constructor
 	virtual ~DistanceMetricRep() {}
 
 	virtual QString getType() const { return "DistanceMetricRep"; }
@@ -72,8 +72,7 @@ protected:
 	virtual void onModifiedStartRender();
 
 private:
-	DistanceMetricRep(const QString& uid, const QString& name = "");
-	DistanceMetricRep(); ///< not implemented
+	DistanceMetricRep();
     DistanceMetricPtr getDistanceMetric();
 
 	GraphicalLine3DPtr mGraphicalLine;

@@ -48,8 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-GeometricRep::GeometricRep(const QString& uid, const QString& name) :
-	RepImpl(uid, name)
+GeometricRep::GeometricRep() :
+	RepImpl()
 {
 	mMapper = vtkPolyDataMapperPtr::New();
 	mProperty = vtkPropertyPtr::New();
@@ -62,19 +62,17 @@ GeometricRep::GeometricRep(const QString& uid, const QString& name) :
 GeometricRep::~GeometricRep()
 {
 }
-GeometricRepPtr GeometricRep::New(const QString& uid, const QString& name)
+GeometricRepPtr GeometricRep::New(const QString& uid)
 {
-	GeometricRepPtr retval(new GeometricRep(uid, name));
-	retval->mSelf = retval;
-	return retval;
+	return wrap_new(new GeometricRep(), uid);
 }
 
-void GeometricRep::addRepActorsToViewRenderer(View *view)
+void GeometricRep::addRepActorsToViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->AddActor(mActor);
 }
 
-void GeometricRep::removeRepActorsFromViewRenderer(View *view)
+void GeometricRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->RemoveActor(mActor);
 }
@@ -110,7 +108,7 @@ bool GeometricRep::hasMesh(MeshPtr mesh) const
 void GeometricRep::meshChangedSlot()
 {
 //	std::cout << "GeometricRep::meshChangedSlot()" << std::endl;
-	mMesh->connectToRep(mSelf);
+//	mMesh->connectToRep(mSelf);
 
 	mMapper->SetInputData(mMesh->getVtkPolyData());
 	mMapper->ScalarVisibilityOff();//Don't use the LUT from the VtkPolyData

@@ -30,42 +30,38 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-/*
- * cxViewCache.h
- *
- *  \date Jul 29, 2010
- *      \author christiana
- */
-
 #ifndef CXVIEWCACHE_H_
 #define CXVIEWCACHE_H_
 
-#include "cxVisualizationServiceExport.h"
+#include "cxResourceVisualizationExport.h"
 
 #include <QWidget>
 #include <QLayout>
 #include <vector>
 #include "cxTypeConversions.h"
-#include "cxSettings.h"
 
 namespace cx
 {
 /**
  * \file
- * \addtogroup cx_service_visualization
+ * \ingroup cx_resource_visualization_internal
  * @{
  */
 
-/**Cache for reuse of Views.
+/**
+ * Cache for reuse of Views.
  * Use the retrieve*() method to get views that can be used
  * in layouts. You will get unique views for each call.
  * When rebuilding the gui, remove all views from their layouts,
  * and call clearUsedViews(). The cache will assume all views now
  * are free and ready for reuse.
  *
+ * \date 2010-07-29
+ * \author christiana
+ * \ingroup cx_resource_visualization_internal
  */
 template<class VIEW_TYPE>
-class cxVisualizationService_EXPORT ViewCache
+class cxResourceVisualization_EXPORT ViewCache
 {
 public:
 	ViewCache(QWidget* widget, QString typeText) :
@@ -76,7 +72,6 @@ public:
 	 */
 	VIEW_TYPE* retrieveView()
 	{
-//    mCached.clear();
 		if (mCached.empty())
 		{
 			QString uid = QString("%1-%2-%3")
@@ -84,16 +79,6 @@ public:
 					.arg(mNameGenerator++)
 					.arg(reinterpret_cast<long>(this));
 			VIEW_TYPE* view = new VIEW_TYPE(uid, uid, mCentralWidget);
-			view->setContextMenuPolicy(Qt::CustomContextMenu);
-			view->hide();
-			//Turn off rendering in vtkRenderWindowInteractor
-			view->getRenderWindow()->GetInteractor()->EnableRenderOff();
-			//Increase the StillUpdateRate in the vtkRenderWindowInteractor (default is 0.0001 images per second)
-			double rate = settings()->value("stillUpdateRate").value<double>();
-			view->getRenderWindow()->GetInteractor()->SetStillUpdateRate(rate);
-			// Set the same value when moving (seems counterintuitive, but for us, moving isnt really special.
-			// The real challenge is updating while the tracking is active, and this uses the still update rate.
-			view->getRenderWindow()->GetInteractor()->SetDesiredUpdateRate(rate);
 			mCached.push_back(view);
 		}
 
@@ -107,12 +92,6 @@ public:
 	 */
 	void clearUsedViews()
 	{
-//		for (unsigned i = 0; i < mUsed.size(); ++i)
-//		{
-//			mUsed[i]->hide();
-//			mCentralWidget->layout()->removeWidget(mUsed[i]);
-//		}
-
 		std::copy(mUsed.begin(), mUsed.end(), back_inserter(mCached));
 		mUsed.clear();
 	}

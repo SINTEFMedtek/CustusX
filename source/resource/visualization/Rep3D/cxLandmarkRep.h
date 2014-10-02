@@ -121,7 +121,7 @@ class cxResourceVisualization_EXPORT LandmarkRep: public RepImpl
 {
 Q_OBJECT
 public:
-	static LandmarkRepPtr New(DataServicePtr dataManager, const QString& uid, const QString& name = "");
+	static LandmarkRepPtr New(DataServicePtr dataManager, const QString& uid = "");
 	virtual ~LandmarkRep();
 
 	void setColor(QColor color); ///< sets the reps color
@@ -135,9 +135,9 @@ public:
 	void setSecondarySource(LandmarksSourcePtr secondary);
 
 protected:
-	LandmarkRep(DataServicePtr dataManager, const QString& uid, const QString& name = ""); ///< sets default text scaling to 20
-	virtual void addRepActorsToViewRenderer(View* view);
-	virtual void removeRepActorsFromViewRenderer(View* view);
+	LandmarkRep(DataServicePtr dataManager); ///< sets default text scaling to 20
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 	void clearAll();
 	void addAll();
 	void addLandmark(QString uid);

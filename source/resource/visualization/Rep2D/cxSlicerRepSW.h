@@ -62,7 +62,7 @@ class cxResourceVisualization_EXPORT SliceRepSW : public RepImpl
 {
 	Q_OBJECT
 public:
-	static SliceRepSWPtr New(const QString& uid);
+	static SliceRepSWPtr New(const QString& uid="");
 	virtual ~SliceRepSW();
 	virtual QString getType() const { return "SliceRepSW"; };
 	bool hasImage(ImagePtr image) const;
@@ -75,9 +75,9 @@ public:
 	virtual void printSelf(std::ostream & os, Indent indent);
 
 protected:
-	SliceRepSW(const QString& uid);
-	virtual void addRepActorsToViewRenderer(View* view) ;
-	virtual void removeRepActorsFromViewRenderer(View *view) ;
+	SliceRepSW();
+	virtual void addRepActorsToViewRenderer(ViewPtr view) ;
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view) ;
 
 private:
 	SlicedImageProxyPtr mImageSlicer;

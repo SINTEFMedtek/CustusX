@@ -288,15 +288,6 @@ void Texture3DSlicerProxyImpl::setSliceProxy(SliceProxyPtr slicer)
 	}
 }
 
-//void Texture3DSlicerProxyImpl::addRepActorsToViewRenderer(View* view)
-//{
-////  std::cout << "void Texture3DSlicerRep::addRepActorsToViewRenderer(View* view)" << std::endl;
-//    view->getRenderer()->AddActor(mActor);
-//    mView = view;
-//    connect(view, SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
-//    this->viewChanged();
-//}
-
 QString Texture3DSlicerProxyImpl::getTCoordName(int index)
 {
 	return  "texture"+qstring_cast(index);
@@ -366,18 +357,6 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 
 	mPolyData->Modified();
 }
-
-//void Texture3DSlicerProxyImpl::removeRepActorsFromViewRenderer(View* view)
-//{
-//	view->getRenderer()->RemoveActor(mActor);
-//	disconnect(view, SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
-//	mView = NULL;
-//}
-
-//void Texture3DSlicerProxyImpl::printSelf(std::ostream & os, Indent indent)
-//{
-//    //mImageSlicer->printSelf(os, indent);
-//}
 
 void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 {

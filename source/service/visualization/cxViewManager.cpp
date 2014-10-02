@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtCore>
 #include <qtextstream.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkImageData.h>
 #include "cxViewWrapper2D.h"
 #include "vtkRenderer.h"
@@ -68,7 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxCameraStyle.h"
 #include "cxCyclicActionLogger.h"
-#include "cxLayoutWidget.h"
+#include "cxViewCollectionWidget.h"
 #include "cxRenderLoop.h"
 #include "cxLayoutRepository.h"
 #include "cxLogger.h"
@@ -175,7 +176,9 @@ QWidget *ViewManager::getLayoutWidget(int index)
 	SSC_ASSERT(index < mLayoutWidgets.size());
 	if (!mLayoutWidgets[index])
 	{
-		mLayoutWidgets[index] = new LayoutWidget;
+		mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout();
+		mRenderLoop->addLayout(mLayoutWidgets[index]);
+
 		this->rebuildLayouts();
 	}
 	return mLayoutWidgets[index];
@@ -361,10 +364,10 @@ void ViewManager::clear()
 
 /**Look for the index'th 3DView in given group.
  */
-ViewWidgetQPtr ViewManager::get3DView(int group, int index)
+ViewPtr ViewManager::get3DView(int group, int index)
 {
 	int count = 0;
-	std::vector<ViewWidgetQPtr> views = mViewGroups[group]->getViews();
+	std::vector<ViewPtr> views = mViewGroups[group]->getViews();
 	for (unsigned i = 0; i < views.size(); ++i)
 	{
 		if(!views[i])
@@ -374,7 +377,7 @@ ViewWidgetQPtr ViewManager::get3DView(int group, int index)
 		if (index == count++)
 			return views[i];
 	}
-	return ViewWidgetQPtr();
+	return ViewPtr();
 }
 
 
@@ -382,8 +385,6 @@ ViewWidgetQPtr ViewManager::get3DView(int group, int index)
  */
 void ViewManager::deactivateCurrentLayout()
 {
-	mRenderLoop->clearViews();
-
 	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
 	{
 		if (mLayoutWidgets[i])
@@ -448,36 +449,19 @@ void ViewManager::setSlicePlanesProxyInViewsUpTo2DViewgroup()
 		for (unsigned j = 0; j < wrappers.size(); ++j)
 		{
 			wrappers[j]->setSlicePlanesProxy(mSlicePlanesProxy);
-			foundSlice = foundSlice || wrappers[j]->getView()->getType() == ViewWidget::VIEW_2D;
+			foundSlice = foundSlice || wrappers[j]->getView()->getType() == View::VIEW_2D;
 		}
 		if (foundSlice)
 			break;
 	}
 }
-void ViewManager::activateViews(LayoutWidget *widget, LayoutData next)
+void ViewManager::activateViews(ViewCollectionWidget *widget, LayoutData next)
 {
 	if (!widget)
 		return;
 
 	for (LayoutData::iterator iter = next.begin(); iter != next.end(); ++iter)
-	{
-		LayoutData::ViewData view = *iter;
-
-		if (view.mGroup < 0 || view.mPlane == ptCOUNT)
-			continue;
-
-		if (view.mPlane == ptNOPLANE || view.mPlane == ptCOUNT)
-		{
-			if (view.mType == ViewWidget::VIEW_3D)
-				this->activate3DView(widget, view.mGroup, view.mRegion);
-			else if (view.mType == ViewWidget::VIEW_REAL_TIME)
-				this->activateRTStreamView(widget, view.mGroup, view.mRegion);
-		}
-		else
-		{
-			this->activate2DView(widget, view.mGroup, view.mPlane, view.mRegion);
-		}
-	}
+		this->activateView(widget, *iter);
 }
 
 void ViewManager::setRenderingInterval(int interval)
@@ -485,45 +469,56 @@ void ViewManager::setRenderingInterval(int interval)
 	mRenderLoop->setRenderingInterval(interval);
 }
 
-void ViewManager::activateView(LayoutWidget* widget, ViewWrapperPtr wrapper, int group, LayoutRegion region)
+void ViewManager::activateView(ViewCollectionWidget* widget, LayoutViewData viewData)
 {
-	ViewWidget* view = wrapper->getView();
-	mRenderLoop->addView(view);
-	mViewGroups[group]->addView(wrapper);
-	widget->addView(view, region);
+	if (!viewData.isValid())
+		return;
 
-	view->show();
+	ViewPtr view = widget->addView(viewData.mType, viewData.mRegion);
+
+	vtkRenderWindowInteractorPtr interactor = view->getRenderWindow()->GetInteractor();
+	//Turn off rendering in vtkRenderWindowInteractor
+	interactor->EnableRenderOff();
+	//Increase the StillUpdateRate in the vtkRenderWindowInteractor (default is 0.0001 images per second)
+	double rate = settings()->value("stillUpdateRate").value<double>();
+	interactor->SetStillUpdateRate(rate);
+	// Set the same value when moving (seems counterintuitive, but for us, moving isnt really special.
+	// The real challenge is updating while the tracking is active, and this uses the still update rate.
+	interactor->SetDesiredUpdateRate(rate);
+
+//	mRenderLoop->addView(view);
+	ViewWrapperPtr wrapper = this->createViewWrapper(view, viewData);
+	mViewGroups[viewData.mGroup]->addView(wrapper);
+//	widget->showViews();
 }
 
-void ViewManager::activate2DView(LayoutWidget* widget, int group, PLANE_TYPE plane, LayoutRegion region)
+ViewWrapperPtr ViewManager::createViewWrapper(ViewPtr view, LayoutViewData viewData)
 {
-	ViewWidget* view = widget->mViewCache2D->retrieveView();
-	view->setType(View::VIEW_2D);
-
-	ViewWrapper2DPtr wrapper(new ViewWrapper2D(view, mBackend));
-	wrapper->initializePlane(plane);
-	this->activateView(widget, wrapper, group, region);
-}
-
-void ViewManager::activate3DView(LayoutWidget* widget, int group, LayoutRegion region)
-{
-	ViewWidget* view = widget->mViewCache3D->retrieveView();
-	view->setType(View::VIEW_3D);
-	ViewWrapper3DPtr wrapper(new ViewWrapper3D(group + 1, view, mBackend));
-	if (group == 0)
+	if (viewData.mType == View::VIEW_2D)
 	{
-		mInteractiveCropper->setView(view);
+		ViewWrapper2DPtr wrapper(new ViewWrapper2D(view, mBackend));
+		wrapper->initializePlane(viewData.mPlane);
+		return wrapper;
+	}
+	else if (viewData.mType == View::VIEW_3D)
+	{
+
+		ViewWrapper3DPtr wrapper(new ViewWrapper3D(viewData.mGroup + 1, view, mBackend));
+		if (viewData.mGroup == 0)
+			mInteractiveCropper->setView(view);
+		return wrapper;
+	}
+	else if (viewData.mType == View::VIEW_REAL_TIME)
+	{
+		ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view, mBackend));
+		return wrapper;
+	}
+	else
+	{
+		reportError(QString("Unknown view type %1").arg(qstring_cast(viewData.mType)));
 	}
 
-	this->activateView(widget, wrapper, group, region);
-}
-
-void ViewManager::activateRTStreamView(LayoutWidget *widget, int group, LayoutRegion region)
-{
-	ViewWidget* view = widget->mViewCacheRT->retrieveView();
-	view->setType(View::VIEW_REAL_TIME);
-	ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view, mBackend));
-	this->activateView(widget, wrapper, group, region);
+	return ViewWrapperPtr();
 }
 
 LayoutData ViewManager::getLayoutData(const QString uid) const

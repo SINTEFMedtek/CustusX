@@ -64,7 +64,7 @@ class cxResourceVisualization_EXPORT OrientationAnnotation3DRep: public RepImpl
 {
 Q_OBJECT
 public:
-	static OrientationAnnotation3DRepPtr New(const QString& uid, const QString& name);
+	static OrientationAnnotation3DRepPtr New(const QString& uid="");
 	virtual ~OrientationAnnotation3DRep();
 	virtual QString getType() const { return "OrientationAnnotation3DRep"; }
 
@@ -75,9 +75,9 @@ public:
 
 private slots:
 protected:
-	OrientationAnnotation3DRep(const QString& uid, const QString& name);
-	virtual void addRepActorsToViewRenderer(View* view);
-	virtual void removeRepActorsFromViewRenderer(View* view);
+	OrientationAnnotation3DRep();
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
 private:
 	vtkOrientationMarkerWidgetPtr mMarker;

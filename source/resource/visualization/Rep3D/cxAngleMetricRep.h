@@ -66,7 +66,7 @@ class cxResourceVisualization_EXPORT AngleMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:
-	static AngleMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
+	static AngleMetricRepPtr New(const QString& uid = ""); ///constructor
 	virtual ~AngleMetricRep() {}
 
 	virtual QString getType() const { return "AngleMetricRep"; }

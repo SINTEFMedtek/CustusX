@@ -60,34 +60,15 @@ void force_C_locale_decimalseparator()
 	{
 		setlocale(LC_NUMERIC,"C");
 
-		cx::reportWarning(QString("Detected non-standard decimal separator [%1], changing to standard [%1].")
+		std::cout << QString("Detected non-standard decimal separator [%1], changing to standard [%2].")
 				.arg(radixChar)
-				.arg(C_radixChar));
+				.arg(C_radixChar)
+				<< std::endl;
 
 		QString number = QString("%1").arg(0.5);
-//		QString setRadixChar = nl_langinfo(RADIXCHAR);
-//		if (setRadixChar!=C_radicChar)
 		if (!number.contains(C_radixChar))
-			cx::reportError(QString("Failed to set decimal separator."));
+			std::cout << "Failed to set decimal separator." << std::endl;
 	}
-
-//	std::cout << "locale: " << QLocale::system().nativeLanguageName() << std::endl;
-//	std::cout << "locale radix: " << QLocale::system().decimalPoint() << std::endl;
-//	std::cout << "RADIXCHAR " << std::string(nl_langinfo(RADIXCHAR)) << std::endl;
-//	std::cout << "___________ " << std::endl;
-//	std::cout << "c locale: " << QLocale::c().nativeLanguageName() << std::endl;
-//	std::cout << "clocale radix: " << QLocale::c().decimalPoint() << std::endl;
-//	std::cout << "formatted double: " << 2.5 << std::endl;
-
-//	std::cout << std::endl << "change locale: " << std::endl;
-//	//  setlocale(LC_NUMERIC,"C");
-//	//  QLocale::setDefault(QLocale::c());
-
-//	std::cout << "locale: " << QLocale::system().nativeLanguageName() << std::endl;
-//	std::cout << "locale radix: " << QLocale::system().decimalPoint() << std::endl;
-//	std::cout << "RADIXCHAR " << std::string(nl_langinfo(RADIXCHAR)) << std::endl;
-//	std::cout << "formatted double: " << 2.5 << std::endl;
-
 }
 #endif
 

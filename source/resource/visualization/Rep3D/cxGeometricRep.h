@@ -61,7 +61,7 @@ class cxResourceVisualization_EXPORT GeometricRep : public RepImpl
 public:
 	virtual ~GeometricRep();
 
-	static GeometricRepPtr New(const QString& uid, const QString& name="");
+	static GeometricRepPtr New(const QString& uid="");
 
 	virtual QString getType() const { return "GeometricRep"; } ///< gives this reps type
 	void setMesh(MeshPtr mesh); ///< sets this reps mesh
@@ -69,9 +69,9 @@ public:
 	bool hasMesh(MeshPtr mesh) const; ///< checks if this rep has the give mesh
 
 protected:
-	GeometricRep(const QString& uid, const QString& name);
-	virtual void addRepActorsToViewRenderer(View *view);
-	virtual void removeRepActorsFromViewRenderer(View *view);
+	GeometricRep();
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
 	vtkPolyDataMapperPtr mMapper;
 	vtkPropertyPtr mProperty;
