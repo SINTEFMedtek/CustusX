@@ -30,59 +30,44 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXREGISTRATIONWIDGET_H_
-#define CXREGISTRATIONWIDGET_H_
+#ifndef CXREGISTRATIONMETHODLANDMARKPLUGINACTIVATOR_H_
+#define CXREGISTRATIONMETHODLANDMARKPLUGINACTIVATOR_H_
 
-#include <QTabWidget>
-#include "cxServiceTrackerListener.h"
-#include "cxRegistrationMethodService.h"
-#include "cxForwardDeclarations.h"
-#include "cxXmlOptionItem.h"
-class QVBoxLayout;
-class QComboBox;
-class QStackedWidget;
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringDataAdapter> StringDataAdapterPtr;
+
+//typedef boost::shared_ptr<class RegistrationMethodLandmarkService> RegistrationMethodLandmarkServicePtr;
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
- * Widget for use in the Registration GUI plugin
+ * Activator for Registration method landmark service
  *
- * \ingroup org_custusx_registration_gui
+ * \ingroup org_custusx_registration_method_landmark
  *
- * \date Sep 08 2014
+ * \date 2014-10-01
  * \author Ole Vegard Solberg, SINTEF
- * \author Geir Arne Tangen, SINTEF
  */
-class RegistrationWidget : public QTabWidget
+class RegistrationMethodLandmarkPluginActivator :  public QObject, public ctkPluginActivator
 {
-	Q_OBJECT
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
+
 public:
-	RegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent = 0);
-	virtual ~RegistrationWidget();
+
+  RegistrationMethodLandmarkPluginActivator();
+  ~RegistrationMethodLandmarkPluginActivator();
+
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
 
 private:
-	void initRegistrationTypesWidgets();
-	void initServiceListener();
-	QString defaultWhatsThis() const;
-
-	void onServiceAdded(RegistrationMethodService *service);
-	void onServiceRemoved(RegistrationMethodService *service);
-	bool knownType(QString registrationType);
-	void removeWidgetFromStackedWidget(QString widgetName, QStackedWidget *stackedWidget);
-
-	ctkPluginContext* mPluginContext;
-	QVBoxLayout*  mVerticalLayout;
-	boost::shared_ptr<ServiceTrackerListener<RegistrationMethodService> > mServiceListener;
-
-//	std::map<QString, QComboBox*> mMethodsSelectorMap;
-	std::map<QString, StringDataAdapterXmlPtr> mMethodsSelectorMap;
-	std::map<QString, QStackedWidget*> mRegistrationTypeMap;
-	QStringList mRegistrationTypes;
-//	XmlOptionFile mOptions;
+  RegisteredServicePtr mRegistrationImageToImage;
+  RegisteredServicePtr mRegistrationImageToPatient;
 };
 
-} /* namespace cx */
+} // namespace cx
 
-#endif /* CXREGISTRATIONWIDGET_H_ */
+#endif /* CXREGISTRATIONMETHODLANDMARKPLUGINACTIVATOR_H_ */
