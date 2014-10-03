@@ -91,7 +91,7 @@ class XmlOptionFile
 public:
 	static XmlOptionFile createNull(); ///< create an empty document
 
-	explicit XmlOptionFile(QString filename, QString name = ""); ///< create from filename, create trivial document of type name and root node if no file exists.
+	explicit XmlOptionFile(QString filename); ///< create from filename, create trivial document of type name and root node if no file exists.
 	XmlOptionFile();
 	~XmlOptionFile();
 

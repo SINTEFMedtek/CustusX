@@ -76,11 +76,10 @@ private:
 	QVBoxLayout*  mVerticalLayout;
 	boost::shared_ptr<ServiceTrackerListener<RegistrationMethodService> > mServiceListener;
 
-//	std::map<QString, QComboBox*> mMethodsSelectorMap;
 	std::map<QString, StringDataAdapterXmlPtr> mMethodsSelectorMap;
 	std::map<QString, QStackedWidget*> mRegistrationTypeMap;
 	QStringList mRegistrationTypes;
-//	XmlOptionFile mOptions;
+	XmlOptionFile mOptions;
 };
 
 } /* namespace cx */

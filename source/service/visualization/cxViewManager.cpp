@@ -574,13 +574,13 @@ bool ViewManager::isCustomLayout(const QString& uid) const
 
 void ViewManager::loadGlobalSettings()
 {
-	XmlOptionFile file = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("viewmanager");
+	XmlOptionFile file = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("viewmanager");
 	mLayoutRepository->load(file);
 }
 
 void ViewManager::saveGlobalSettings()
 {
-	XmlOptionFile file = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("viewmanager");
+	XmlOptionFile file = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("viewmanager");
 	mLayoutRepository->save(file);
 	file.save();
 }

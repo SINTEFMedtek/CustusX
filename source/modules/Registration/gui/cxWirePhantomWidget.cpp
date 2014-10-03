@@ -76,7 +76,7 @@ WirePhantomWidget::WirePhantomWidget(RegistrationServicePtr registrationService,
 
     // fill the pipeline with filters:
 		mPipeline.reset(new Pipeline(patientModelService));
-    XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("registration").descend("WirePhantomWidget");
+	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("registration").descend("WirePhantomWidget");
     FilterGroupPtr filters(new FilterGroup(options));
 		filters->append(FilterPtr(new SmoothingImageFilter(patientModelService)));
 		filters->append(FilterPtr(new BinaryThresholdImageFilter(patientModelService)));

@@ -76,7 +76,7 @@ cx::ProbeDefinition VideoGraphicsFixture::readProbeData(QString filename)
 	QString probeDataFilename = cx::changeExtension(path, "probedata.xml");
 
 	cx::ProbeDefinition retval;
-	cx::XmlOptionFile file = cx::XmlOptionFile(probeDataFilename, "navnet");
+	cx::XmlOptionFile file = cx::XmlOptionFile(probeDataFilename);
 	retval.parseXml(file.getElement("configuration"));
 
 	return retval;

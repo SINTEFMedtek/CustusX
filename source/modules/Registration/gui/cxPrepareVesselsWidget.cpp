@@ -58,7 +58,7 @@ namespace cx
 PrepareVesselsWidget::PrepareVesselsWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent) :
 		RegistrationBaseWidget(registrationService, parent, "PrepareVesselsWidget", "PrepareVesselsWidget")
 {  
-    XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("registration").descend("PrepareVesselsWidget");
+	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("registration").descend("PrepareVesselsWidget");
   // fill the pipeline with filters:
 	mPipeline.reset(new Pipeline(patientModelService));
   FilterGroupPtr filters(new FilterGroup(options.descend("pipeline")));

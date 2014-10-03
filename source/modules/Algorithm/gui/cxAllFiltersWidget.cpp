@@ -59,7 +59,7 @@ namespace cx {
 AllFiltersWidget::AllFiltersWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent) :
     BaseWidget(parent, "FilterWidget", "Configurable Filter")
 {
-	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("filterwidget");
+	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("filterwidget");
 	mFilters.reset(new FilterGroup(options));
 	mFilters->append(FilterPtr(new BinaryThresholdImageFilter(patientModelService)));
 	mFilters->append(FilterPtr(new BinaryThinningImageFilter3DFilter(patientModelService)));

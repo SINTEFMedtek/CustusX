@@ -51,7 +51,7 @@ namespace cx
 ElastixManager::ElastixManager(RegistrationServicePtr registrationService) :
 	mRegistrationService(registrationService)
 {
-	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("elastix");
+	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("elastix");
 
 	mParameters.reset(new ElastixParameters(mOptions));
 	connect(mParameters.get(), SIGNAL(elastixParametersChanged()), this, SIGNAL(elastixChanged()));

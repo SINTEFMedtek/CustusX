@@ -80,7 +80,7 @@ VideoConnectionWidget::VideoConnectionWidget(VisualizationServicePtr visualizati
 {
 	mInitScriptWidget=NULL;
 
-	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("video");
+	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("video");
 
 	QStringList connectionOptions;
 	QString defaultConnection = this->getVideoConnectionManager()->getConnectionMethod();

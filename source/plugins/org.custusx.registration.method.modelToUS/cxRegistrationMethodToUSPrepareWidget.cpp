@@ -46,7 +46,7 @@ RegistrationMethodToUSPrepareWidget::RegistrationMethodToUSPrepareWidget(Visuali
 	mVerticalLayout(new QVBoxLayout(this))
 {
 	//Copied from PrepareVesselsWidget
-	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("registration").descend("PrepareVesselsWidget");
+	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("registration").descend("PrepareVesselsWidget");
 	// fill the pipeline with filters:
 	PipelinePtr mPipeline;
 	mPipeline.reset(new Pipeline(patientModelService));

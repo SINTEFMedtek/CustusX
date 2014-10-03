@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxStringDataAdapterXml.h"
-//#include "cxDataLocations.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -54,7 +54,8 @@ namespace cx
 RegistrationWidget::RegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent) :
 	mPluginContext(pluginContext),
 	QTabWidget(parent),
-	mVerticalLayout(new QVBoxLayout(this))
+	mVerticalLayout(new QVBoxLayout(this)),
+	mOptions(XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("RegistrationWidget"))
 {
 	this->setObjectName("RegistrationWidget");
 	this->setWindowTitle("Registration");
@@ -62,8 +63,6 @@ RegistrationWidget::RegistrationWidget(ctkPluginContext *pluginContext, QWidget*
 
 	this->initRegistrationTypesWidgets();
 	this->initServiceListener();
-
-//	XmlOptionFile mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("RegistrationWidget");
 }
 
 RegistrationWidget::~RegistrationWidget()
@@ -87,16 +86,12 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 
 		QVBoxLayout *layoutV = new QVBoxLayout(widget);
 
-//		QString value = XmlOptionItem(mRegistrationTypes[i], mOptions.getElement().toElement()).readValue("");
-//		std::cout << "init type: " << mRegistrationTypes[i] << " value: " << value << std::endl;
-
 		StringDataAdapterXmlPtr methodSelector = StringDataAdapterXml::initialize(mRegistrationTypes[i],
 																				  "Method",
 																				  "Select registration method",
 																				  "",
 																				  QStringList(),
-																				  QDomNode());
-//																				  mOptions.getElement());
+																				  mOptions.getElement());
 		mMethodsSelectorMap[mRegistrationTypes[i]] = methodSelector;
 		connect(methodSelector.get(), SIGNAL(valueWasSet(int)), registrationTypeWidget, SLOT(setCurrentIndex(int)));
 
@@ -175,10 +170,8 @@ QString RegistrationWidget::defaultWhatsThis() const
 {
   return "<html>"
       "<h3>Example plugin.</h3>"
-      "<p>Used for developers as a starting points for developing a new plugin</p>"
+	  "<p>Collection of all registration methods</p>"
       "</html>";
 }
-
-
 
 } /* namespace cx */

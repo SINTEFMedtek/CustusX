@@ -761,8 +761,8 @@ PresetTransferFunctions3DPtr DataManagerImpl::getPresetTransferFunctions3D() con
 {
 	///< create from filename, create trivial document of type name and root node if no file exists.
 	XmlOptionFile preset = XmlOptionFile(
-					DataLocations::getRootConfigPath() + "/transferFunctions/presets.xml", "transferFunctions");
-	XmlOptionFile custom = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend(
+					DataLocations::getRootConfigPath() + "/transferFunctions/presets.xml");
+	XmlOptionFile custom = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend(
 					"presetTransferFunctions");
 
 	if (!mPresetTransferFunctions3D)
