@@ -22,7 +22,7 @@ IF (CX_BUILD_USER_DOCUMENTATION)
     SET(CX_DOXYGEN_INPUT ${CX_DOC_INPUT_DIRECTORY})
     SET(CX_DOXYGEN_EXCLUDE )
     SET(CX_DOXYGEN_EXCLUDE_PATTERNS */.git/* */testing/*)   
-    SET(CX_DOXYGEN_IMAGE_PATH ${CustusX_SOURCE_DIR}/doc/doxygen/images)
+    SET(CX_DOXYGEN_IMAGE_PATH "${CustusX_SOURCE_DIR}/doc/doxygen/images ${CustusX_SOURCE_DIR}/documentation/images")
     SET(CX_DOXYGEN_HTML_EXTRA_FILES ${CustusX_SOURCE_DIR}/doc/cx_code_standard.pdf)
     SET(CX_DOXYGEN_GENERATE_QHP YES)
 #    SET(CX_DOXYGEN_QCH_FILE ../cx_user_doc.qch) # relative to html dir
