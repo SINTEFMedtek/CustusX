@@ -9,6 +9,8 @@ include_directories(
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
     ${CustusX_SOURCE_DIR}/source/logic
+	${CustusX_SOURCE_DIR}/source/modules/Registration/gui
+	${CustusX_SOURCE_DIR}/source/service/tracking
 )
 
 set(PLUGIN_SRCS
@@ -26,6 +28,8 @@ set(PLUGIN_SRCS
   cxManualImageTransformRegistrationWidget.cpp
   cxManualImageTransformRegistrationWidget.h
   cxManualPatientRegistrationWidget.cpp
+  cxRegistrationMethodManualPatientOrientationService.h
+  cxRegistrationMethodManualPatientOrientationService.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -51,6 +55,8 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}
     cxResourceWidgets
     cxPluginUtilities
+	cxPluginRegistration
+	cxTrackingService
 )
 
 ctkMacroBuildPlugin(

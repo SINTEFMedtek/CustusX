@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationMethodManualImageToImageService.h"
 #include "cxRegistrationMethodManualImageToPatientService.h"
 #include "cxRegistrationMethodManualImageTransformService.h"
+#include "cxRegistrationMethodManualPatientOrientationService.h"
 #include "cxRegisteredService.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxRegistrationServiceProxy.h"
@@ -61,11 +62,13 @@ void RegistrationMethodManualPluginActivator::start(ctkPluginContext* context)
 
 	RegistrationMethodManualImageToImageService *i2i = new RegistrationMethodManualImageToImageService(registrationService, patientModelService);
 	RegistrationMethodManualImageToPatientService *i2p = new RegistrationMethodManualImageToPatientService(registrationService, patientModelService);
-	RegistrationMethodManualImageTransformService *iTransform = new RegistrationMethodManualImageTransformService(registrationService) ;
+	RegistrationMethodManualImageTransformService *iTransform = new RegistrationMethodManualImageTransformService(registrationService);
+	RegistrationMethodManualPatientOrientationService *patientOrientation = new RegistrationMethodManualPatientOrientationService(registrationService, patientModelService);
 
 	mRegistrationImageToImage = RegisteredServicePtr(new RegisteredService(context, i2i, RegistrationMethodService_iid));
 	mRegistrationImageToPatient = RegisteredServicePtr(new RegisteredService(context, i2p, RegistrationMethodService_iid));
 	mRegistrationImageTransform = RegisteredServicePtr(new RegisteredService(context, iTransform, RegistrationMethodService_iid));
+	mRegistrationPatientOrientation = RegisteredServicePtr(new RegisteredService(context, patientOrientation, RegistrationMethodService_iid));
 }
 
 void RegistrationMethodManualPluginActivator::stop(ctkPluginContext* context)
@@ -73,6 +76,7 @@ void RegistrationMethodManualPluginActivator::stop(ctkPluginContext* context)
 	mRegistrationImageToImage.reset();
 	mRegistrationImageToPatient.reset();
 	mRegistrationImageTransform.reset();
+	mRegistrationPatientOrientation.reset();
 	Q_UNUSED(context);
 }
 

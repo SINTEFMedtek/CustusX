@@ -181,7 +181,7 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationServicePtr regi
 	image2imageWidget->addTab(new RegisterI2IWidget(registrationService, patientModelService, image2imageWidget),"Register");
 
   //patient orientation
-	PatientOrientationWidget* patientOrientationWidget = new PatientOrientationWidget(registrationService, patientModelService, this);
+	PatientOrientationWidget* patientOrientationWidget = new PatientOrientationWidget(registrationService, patientModelService, this, "PatientOrientationWidget", "Patient Orientation");
 
   //plate
 	Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget(this, "PlateRegistrationWidget", "Plate");

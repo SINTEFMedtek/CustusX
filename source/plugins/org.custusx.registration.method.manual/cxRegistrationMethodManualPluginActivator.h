@@ -67,6 +67,7 @@ private:
   RegisteredServicePtr mRegistrationImageToImage;
   RegisteredServicePtr mRegistrationImageToPatient;
   RegisteredServicePtr mRegistrationImageTransform;
+  RegisteredServicePtr mRegistrationPatientOrientation;
 };
 
 } // namespace cx

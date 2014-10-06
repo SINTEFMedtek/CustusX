@@ -45,7 +45,7 @@ public:
 	RegistrationMethodManualImageTransformService(RegistrationServicePtr registrationService);
 	virtual ~RegistrationMethodManualImageTransformService() {}
 	virtual QString getRegistrationType() {return QString("ImageTransform");}
-	virtual QString getRegistrationMethod() {return QString("Manual");}
+	virtual QString getRegistrationMethod() {return QString("Manual Image Transform");}
 	virtual QWidget* createWidget();
 	virtual QString getWidgetName() {return QString("ManualImageTransformRegistrationWidget");}
 };

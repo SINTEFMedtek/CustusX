@@ -43,8 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-PatientOrientationWidget::PatientOrientationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
-	RegistrationBaseWidget(registrationService, parent, "PatientOrientationWidget", "Patient Orientation"),
+PatientOrientationWidget::PatientOrientationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle) :
+	RegistrationBaseWidget(registrationService, parent, objectName, windowTitle),
 	mPatientOrientationButton(new QPushButton("Patient Orientation")),
 	mInvertButton(new QCheckBox("Back face")),
 	mPatientModelService(patientModelService)

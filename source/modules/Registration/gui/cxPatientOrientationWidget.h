@@ -65,7 +65,7 @@ class PatientOrientationWidget : public RegistrationBaseWidget
   Q_OBJECT
 
 public:
-	PatientOrientationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
+	PatientOrientationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle);
   ~PatientOrientationWidget();
   virtual QString defaultWhatsThis() const;
 
