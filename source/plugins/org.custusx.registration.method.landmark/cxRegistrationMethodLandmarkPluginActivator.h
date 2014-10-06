@@ -66,6 +66,7 @@ public:
 private:
   RegisteredServicePtr mRegistrationImageToImage;
   RegisteredServicePtr mRegistrationImageToPatient;
+  RegisteredServicePtr mRegistrationFastImageToPatient;
 };
 
 } // namespace cx

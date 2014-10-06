@@ -51,7 +51,9 @@ class org_custusx_registration_method_landmark_EXPORT RegistrationMethodLandmark
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodLandmarkImageToImageService(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService);
+	RegistrationMethodLandmarkImageToImageService(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService) :
+		RegistrationMethodService(registrationService),
+		mPatientModelService(patientModelService) {}
 	virtual ~RegistrationMethodLandmarkImageToImageService() {}
 	virtual QString getRegistrationType() {return QString("ImageToImage");}
 	virtual QString getRegistrationMethod() {return QString("Landmark");}
@@ -74,7 +76,9 @@ class org_custusx_registration_method_landmark_EXPORT RegistrationMethodLandmark
 {
 	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	RegistrationMethodLandmarkImageToPatientService(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService);
+	RegistrationMethodLandmarkImageToPatientService(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService) :
+		RegistrationMethodService(registrationService),
+		mPatientModelService(patientModelService) {}
 	virtual ~RegistrationMethodLandmarkImageToPatientService() {}
 	virtual QString getRegistrationType() {return QString("ImageToPatient");}
 	virtual QString getRegistrationMethod() {return QString("Landmark");}
@@ -85,9 +89,30 @@ private:
 	PatientModelServicePtr mPatientModelService;
 };
 
+/**
+ * Registration method: Fast Landmark image to patient service implementation
+ *
+ * \ingroup org_custusx_registration_method_landmark
+ *
+ * \date 2014-10-06
+ * \author Ole Vegard Solberg, SINTEF
+ */
+class org_custusx_registration_method_landmark_EXPORT RegistrationMethodFastLandmarkImageToPatientService : public RegistrationMethodService
+{
+	Q_INTERFACES(cx::RegistrationMethodService)
+public:
+	RegistrationMethodFastLandmarkImageToPatientService(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService) :
+		RegistrationMethodService(registrationService),
+		mPatientModelService(patientModelService) {}
+	virtual ~RegistrationMethodFastLandmarkImageToPatientService() {}
+	virtual QString getRegistrationType() {return QString("ImageToPatient");}
+	virtual QString getRegistrationMethod() {return QString("Fast Landmark");}
+	virtual QString getWidgetName() {return QString("FastLandmarkImage2PatientRegistrationWidget");}
+	virtual QWidget* createWidget();
 
-
-//typedef boost::shared_ptr<RegistrationMethodLandmarkService> RegistrationMethodLandmarkServicePtr;
+private:
+	PatientModelServicePtr mPatientModelService;
+};
 
 } /* namespace cx */
 
