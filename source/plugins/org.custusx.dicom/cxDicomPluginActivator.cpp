@@ -11,11 +11,11 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
@@ -37,49 +37,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDicomGUIExtenderService.h"
 #include "cxReporter.h"
+#include "cxRegisteredService.h"
+
 
 namespace cx
 {
 
 DicomPluginActivator::DicomPluginActivator()
-	: mContext(0)
 {
 //	std::cout << "Created DicomPluginActivator" << std::endl;
 }
 
 DicomPluginActivator::~DicomPluginActivator()
 {
-
 }
 
 void DicomPluginActivator::start(ctkPluginContext* context)
 {
-	//	std::cout << "Started DicomPluginActivator" << std::endl;
-	this->mContext = context;
-
-	mDicomPlugin.reset(new DicomGUIExtenderService(context));
-	//  std::cout << "created dicomplugin service" << std::endl;
-	try
-	{
-		context->registerService(QStringList(GUIExtenderService_iid), mDicomPlugin.get());
-	}
-	catch(ctkRuntimeException& e)
-	{
-		reportError(QString(e.what()));
-		mDicomPlugin.reset();
-	}
-	//  std::cout << "registered dicomplugin service" << std::endl;
+//	std::cout << "Starting DicomPluginActivator" << std::endl;
+	mRegistration = RegisteredService::create<DicomGUIExtenderService>(context, GUIExtenderService_iid);
 }
 
 void DicomPluginActivator::stop(ctkPluginContext* context)
 {
-	mDicomPlugin.reset();
+	mRegistration.reset();
 	//	std::cout << "Stopped DicomPluginActivator" << std::endl;
 	Q_UNUSED(context)
 }
 
 } // namespace cx
-
-//Q_EXPORT_PLUGIN2(DicomPluginActivator_irrelevant_string, cx::DicomPluginActivator)
 
 

@@ -49,7 +49,8 @@ set(CX_ALL_LIBRARY_DIRS
     ${OpenIGTLink_LIBRARY_DIRS}
     ${VTK_DIR}/lib
     ${CTK_DIR}/CTK-build/bin
-    ${CTK_DIR}/DCMTK-build/lib
+	${CTK_DIR}/DCMTK-build/lib # remove?
+	${CTK_DCMTK_DIR}/lib
     ${ITK_DIR}/lib
     ${Level-Set-Segmentation_LIBRARY_DIRS}
     ${Tube-Segmentation-Framework_LIBRARY_DIRS}

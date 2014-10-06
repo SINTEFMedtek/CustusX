@@ -5,7 +5,8 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 include_directories(
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
-    ./core
+	${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
+	./core
     ./widgets
     )
 
@@ -49,16 +50,32 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
+#find_package(CTKDICOMCore)
+#message(STATUS "**** IMPORTED_LINK_INTERFACE_LIBRARIES_${CMAKE_BUILD_TYPE}" )
+set(CX_IMPORT_PROPERTY IMPORTED_LINK_INTERFACE_LIBRARIES_${CMAKE_BUILD_TYPE})
+string(TOUPPER ${CX_IMPORT_PROPERTY} CX_IMPORT_PROPERTY)
+get_target_property(TEST_VALUE CTKDICOMCore ${CX_IMPORT_PROPERTY})
+
+message(STATUS "IMPORTED_LINK_INTERFACE_LIBRARIES_RELEASE: ${TEST_VALUE}")
+foreach (var ${TEST_VALUE})
+	message(STATUS "    " ${var})
+endforeach()
+#IMPORTED_LOCATION_RELEASE
+
+set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${CTK_DCMTK_DIR}/lib)
 
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
     cxGUIExtenderService
-    cxResourceWidgets
-    CTKDICOMWidgets
-    CTKDICOMCore
-    )
+	cxResourceWidgets
+	CTKDICOMWidgets
+	CTKDICOMCore
+	cxPluginUtilities
+#	${TEST_VALUE}
+${CTK_EXTERNAL_LIBRARIES}
+	)
 
 ctkMacroBuildPlugin(
   NAME ${PROJECT_NAME}
