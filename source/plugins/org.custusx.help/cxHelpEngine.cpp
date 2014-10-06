@@ -74,7 +74,7 @@ void HelpEngine::focusObjectChanged(QObject* newFocus)
 	QString keyword = this->findBestMatchingKeyword(newFocus);
 	if (!keyword.isEmpty())
 	{
-		std::cout << "******** keyword: " << keyword << std::endl;
+//		std::cout << "******** keyword: " << keyword << std::endl;
 		emit keywordActivated(keyword);
 	}
 }

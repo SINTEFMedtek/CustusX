@@ -92,7 +92,7 @@ QStringList ClipPlaneStringDataAdapter::getValueRange() const
 ClippingWidget::ClippingWidget(QWidget* parent) :
 	BaseWidget(parent, "ClippingWidget", "Clip")
 {
-	HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "core_widgets_volume_clipping");
+	HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "property_widgets_volume_clipping");
 
 	mInteractiveClipper = viewManager()->getClipper();
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));

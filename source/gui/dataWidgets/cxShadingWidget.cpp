@@ -70,7 +70,7 @@ void ShadingWidget::init()
 //  mLayout->addWidget(mShadingCheckBox);
 //  mShadingCheckBox->setEnabled(true);
 //
-  HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "core_widgets_volume_shading");
+  HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "property_widgets_volume_shading");
 
   connect(mShadingCheckBox, SIGNAL(toggled(bool)), this, SLOT(shadingToggledSlot(bool)));
 

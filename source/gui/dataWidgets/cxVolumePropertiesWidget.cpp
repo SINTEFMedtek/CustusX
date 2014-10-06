@@ -85,7 +85,7 @@ VolumePropertiesWidget::VolumePropertiesWidget(QWidget* parent) :
 		TabbedWidget(parent, "VolumePropertiesWidget", "Volume Properties")
 {
 	this->insertWidgetAtTop(new ActiveVolumeWidget(this));
-	HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "core_widgets_volume");
+	HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "property_widgets_volume");
 
 	this->addTab(new VolumeInfoWidget(this), "Info");
 	this->addTab(new TransferFunctionWidget(this), QString("Transfer Functions"));

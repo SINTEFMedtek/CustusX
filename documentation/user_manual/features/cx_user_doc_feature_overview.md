@@ -50,7 +50,15 @@ Show a Widget by selecting `Menu->Window`, or simply right-clicking on the title
 Widget.
 
 All specific widgets are described here:
-- \subpage core_widgets
+- \subpage property_widgets
+- \subpage utility_widgets
+- \subpage browsing_widgets
+- \subpage algorithms_widgets
+
+
+
+
+
 
 
 Workflow Steps {#feature_overview_workflow_steps}

@@ -60,7 +60,7 @@ CroppingWidget::CroppingWidget(QWidget* parent) :
 {
   mInteractiveCropper = viewManager()->getCropper();
   connect(mInteractiveCropper.get(), SIGNAL(changed()), this, SLOT(cropperChangedSlot()));
-  HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "core_widgets_volume_cropping");
+  HelpServiceProxy(LogicManager::getInstance()->getPluginContext())->registerWidget(this, "property_widgets_volume_cropping");
 
   QVBoxLayout* layout = new QVBoxLayout(this);
 
