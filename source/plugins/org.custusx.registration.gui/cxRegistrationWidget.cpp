@@ -117,7 +117,7 @@ void RegistrationWidget::initServiceListener()
 void RegistrationWidget::onServiceAdded(RegistrationMethodService* service)
 {
 	if(!this->knownType(service->getRegistrationType()))
-			return;
+		return;
 
 	StringDataAdapterXmlPtr comboBox = mMethodsSelectorMap[service->getRegistrationType()];
 	QStackedWidget *stackedWidget = mRegistrationTypeMap[service->getRegistrationType()];

@@ -30,61 +30,23 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXBRONCHOSCOPYREGISTRATIONWIDGET_H
-#define CXBRONCHOSCOPYREGISTRATIONWIDGET_H
-
-#include <QPushButton>
-#include "cxRegistrationBaseWidget.h"
-#include "cxTrackedCenterlineWidget.h"
+#include "cxRegistrationMethodVesselService.h"
+#include "cxRegistrationMethodsWidget.h"
+#include "cxRegisterI2IWidget.h"
+#include "cxPrepareVesselsWidget.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
-typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
-typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
-typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
+QWidget *RegistrationMethodVesselImageToImageService::createWidget()
+{	
+	Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(NULL, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
+	PrepareVesselsWidget* prepareRegistrationWidget = new PrepareVesselsWidget(mRegistrationService, mVisualizationService, mPatientModelService, image2imageWidget);
 
-/**
- * BronchoscopyRegistrationWidget
- *
- * \brief Register tracked bronchostopy tool path to lung centerline data (from CT)
- *
- * \date Oct 10, 2013
- * \author Ole Vegard Solberg
- * \author Erlend Hofstad
- */
-class BronchoscopyRegistrationWidget: public RegistrationBaseWidget
-{
-	Q_OBJECT
-public:
-	BronchoscopyRegistrationWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent);
-	virtual ~BronchoscopyRegistrationWidget()
-	{
-	}
-	virtual QString defaultWhatsThis() const;
-private slots:
-	void registerSlot();
-	void acquisitionStarted();
-	void acquisitionStopped();
-    void obscuredSlot(bool obscured);
+	image2imageWidget->addTab(prepareRegistrationWidget, "Prepare"); //should be application specific
+	image2imageWidget->addTab(new RegisterI2IWidget(mRegistrationService, mPatientModelService, image2imageWidget),"Register");
 
-private:
-	QVBoxLayout* mVerticalLayout;
-	QLabel* mLabel;
+	return image2imageWidget;
+}
 
-
-	AcquisitionPtr mAquisition;
-	RecordSessionWidgetPtr mRecordSessionWidget;
-	SelectMeshStringDataAdapterPtr mSelectMeshWidget;
-	QPushButton* mRegisterButton;
-    ToolPtr mTool;
-//    TrackedCenterlineWidget* mTrackedCenterLine;
-
-    ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
-
-};
-
-} //namespace cx
-
-#endif // CXBRONCHOSCOPYREGISTRATIONWIDGET_H
+} /* namespace cx */

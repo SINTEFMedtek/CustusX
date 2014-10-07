@@ -30,61 +30,47 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXBRONCHOSCOPYREGISTRATIONWIDGET_H
-#define CXBRONCHOSCOPYREGISTRATIONWIDGET_H
+#include "cxRegistrationMethodVesselPluginActivator.h"
 
-#include <QPushButton>
-#include "cxRegistrationBaseWidget.h"
-#include "cxTrackedCenterlineWidget.h"
+#include <QtPlugin>
+#include <iostream>
+
+#include "cxRegistrationMethodVesselService.h"
+#include "cxRegisteredService.h"
+#include "cxRegistrationServiceProxy.h"
+#include "cxPatientModelServiceProxy.h"
+#include "cxVisualizationServiceProxy.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
-typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
-typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
-typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
-
-/**
- * BronchoscopyRegistrationWidget
- *
- * \brief Register tracked bronchostopy tool path to lung centerline data (from CT)
- *
- * \date Oct 10, 2013
- * \author Ole Vegard Solberg
- * \author Erlend Hofstad
- */
-class BronchoscopyRegistrationWidget: public RegistrationBaseWidget
+RegistrationMethodVesselPluginActivator::RegistrationMethodVesselPluginActivator()
 {
-	Q_OBJECT
-public:
-	BronchoscopyRegistrationWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent);
-	virtual ~BronchoscopyRegistrationWidget()
-	{
-	}
-	virtual QString defaultWhatsThis() const;
-private slots:
-	void registerSlot();
-	void acquisitionStarted();
-	void acquisitionStopped();
-    void obscuredSlot(bool obscured);
+//	std::cout << "Created RegistrationMethodVesselPluginActivator" << std::endl;
+}
 
-private:
-	QVBoxLayout* mVerticalLayout;
-	QLabel* mLabel;
+RegistrationMethodVesselPluginActivator::~RegistrationMethodVesselPluginActivator()
+{}
+
+void RegistrationMethodVesselPluginActivator::start(ctkPluginContext* context)
+{
+	RegistrationServicePtr registrationService(new RegistrationServiceProxy(context));
+	PatientModelServicePtr patientModelService(new PatientModelServiceProxy(context));
+	VisualizationServicePtr visualizationService(new VisualizationServiceProxy(context));
+
+	RegistrationMethodVesselImageToImageService* image2imageService = new RegistrationMethodVesselImageToImageService(registrationService, visualizationService, patientModelService);
+
+	mRegistrationImageToImage = RegisteredServicePtr(new RegisteredService(context, image2imageService, RegistrationMethodService_iid));
+}
+
+void RegistrationMethodVesselPluginActivator::stop(ctkPluginContext* context)
+{
+	mRegistrationImageToImage.reset();
+	Q_UNUSED(context);
+}
+
+} // namespace cx
+
+Q_EXPORT_PLUGIN2(RegistrationMethodVesselPluginActivator_irrelevant_string, cx::RegistrationMethodVesselPluginActivator)
 
 
-	AcquisitionPtr mAquisition;
-	RecordSessionWidgetPtr mRecordSessionWidget;
-	SelectMeshStringDataAdapterPtr mSelectMeshWidget;
-	QPushButton* mRegisterButton;
-    ToolPtr mTool;
-//    TrackedCenterlineWidget* mTrackedCenterLine;
-
-    ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
-
-};
-
-} //namespace cx
-
-#endif // CXBRONCHOSCOPYREGISTRATIONWIDGET_H

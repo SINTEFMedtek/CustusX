@@ -30,61 +30,42 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXBRONCHOSCOPYREGISTRATIONWIDGET_H
-#define CXBRONCHOSCOPYREGISTRATIONWIDGET_H
+#ifndef CXREGISTRATIONMETHODVESSELPLUGINACTIVATOR_H_
+#define CXREGISTRATIONMETHODVESSELPLUGINACTIVATOR_H_
 
-#include <QPushButton>
-#include "cxRegistrationBaseWidget.h"
-#include "cxTrackedCenterlineWidget.h"
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
-typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
-typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
-typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
- * BronchoscopyRegistrationWidget
+ * Activator for Registration method Vessel service
  *
- * \brief Register tracked bronchostopy tool path to lung centerline data (from CT)
+ * \ingroup org_custusx_registration_method_Vessel
  *
- * \date Oct 10, 2013
- * \author Ole Vegard Solberg
- * \author Erlend Hofstad
+ * \date 2014-10-01
+ * \author Ole Vegard Solberg, SINTEF
  */
-class BronchoscopyRegistrationWidget: public RegistrationBaseWidget
+class RegistrationMethodVesselPluginActivator :  public QObject, public ctkPluginActivator
 {
-	Q_OBJECT
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
+
 public:
-	BronchoscopyRegistrationWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent);
-	virtual ~BronchoscopyRegistrationWidget()
-	{
-	}
-	virtual QString defaultWhatsThis() const;
-private slots:
-	void registerSlot();
-	void acquisitionStarted();
-	void acquisitionStopped();
-    void obscuredSlot(bool obscured);
+
+  RegistrationMethodVesselPluginActivator();
+  ~RegistrationMethodVesselPluginActivator();
+
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
 
 private:
-	QVBoxLayout* mVerticalLayout;
-	QLabel* mLabel;
-
-
-	AcquisitionPtr mAquisition;
-	RecordSessionWidgetPtr mRecordSessionWidget;
-	SelectMeshStringDataAdapterPtr mSelectMeshWidget;
-	QPushButton* mRegisterButton;
-    ToolPtr mTool;
-//    TrackedCenterlineWidget* mTrackedCenterLine;
-
-    ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
-
+  RegisteredServicePtr mRegistrationImageToImage;
 };
 
-} //namespace cx
+} // namespace cx
 
-#endif // CXBRONCHOSCOPYREGISTRATIONWIDGET_H
+#endif /* CXREGISTRATIONMETHODVESSELPLUGINACTIVATOR_H_ */

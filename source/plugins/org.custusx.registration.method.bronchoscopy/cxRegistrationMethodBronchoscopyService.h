@@ -30,61 +30,43 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXBRONCHOSCOPYREGISTRATIONWIDGET_H
-#define CXBRONCHOSCOPYREGISTRATIONWIDGET_H
+#ifndef CXREGISTRATIONMETHODBRONCHOSCOPYSERVICE_H_
+#define CXREGISTRATIONMETHODBRONCHOSCOPYSERVICE_H_
 
-#include <QPushButton>
-#include "cxRegistrationBaseWidget.h"
-#include "cxTrackedCenterlineWidget.h"
+#include "cxRegistrationMethodService.h"
+#include "org_custusx_registration_method_bronchoscopy_Export.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
-typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
-typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
-typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
-
 /**
- * BronchoscopyRegistrationWidget
+ * Registration method: Bronchoscopy image to patient service implementation
  *
- * \brief Register tracked bronchostopy tool path to lung centerline data (from CT)
+ * \ingroup org_custusx_registration_method_bronchoscopy
  *
- * \date Oct 10, 2013
- * \author Ole Vegard Solberg
- * \author Erlend Hofstad
+ * \date 2014-10-07
+ * \author Ole Vegard Solberg, SINTEF
  */
-class BronchoscopyRegistrationWidget: public RegistrationBaseWidget
+class org_custusx_registration_method_bronchoscopy_EXPORT RegistrationMethodBronchoscopyImageToPatientService : public RegistrationMethodService
 {
-	Q_OBJECT
+	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-	BronchoscopyRegistrationWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent);
-	virtual ~BronchoscopyRegistrationWidget()
-	{
-	}
-	virtual QString defaultWhatsThis() const;
-private slots:
-	void registerSlot();
-	void acquisitionStarted();
-	void acquisitionStopped();
-    void obscuredSlot(bool obscured);
+	RegistrationMethodBronchoscopyImageToPatientService(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService) :
+		RegistrationMethodService(registrationService),
+		mPatientModelService(patientModelService),
+		mVisualizationService(visualizationService) {}
+	virtual ~RegistrationMethodBronchoscopyImageToPatientService() {}
+	virtual QString getRegistrationType() {return QString("ImageToPatient");}
+	virtual QString getRegistrationMethod() {return QString("Bronchoscopy");}
+	virtual QString getWidgetName() {return QString("BronchoscopyImage2PatientRegistrationWidget");}
+	virtual QWidget* createWidget();
 
 private:
-	QVBoxLayout* mVerticalLayout;
-	QLabel* mLabel;
-
-
-	AcquisitionPtr mAquisition;
-	RecordSessionWidgetPtr mRecordSessionWidget;
-	SelectMeshStringDataAdapterPtr mSelectMeshWidget;
-	QPushButton* mRegisterButton;
-    ToolPtr mTool;
-//    TrackedCenterlineWidget* mTrackedCenterLine;
-
-    ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
-
+	PatientModelServicePtr mPatientModelService;
+	VisualizationServicePtr mVisualizationService;
 };
 
-} //namespace cx
+} /* namespace cx */
 
-#endif // CXBRONCHOSCOPYREGISTRATIONWIDGET_H
+#endif /* CXREGISTRATIONMETHODBRONCHOSCOPYSERVICE_H_ */
+
