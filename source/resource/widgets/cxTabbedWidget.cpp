@@ -63,9 +63,12 @@ TabbedWidget::TabbedWidget(QWidget* parent, QString objectName, QString windowTi
     mTabWidget(new QTabWidget(this))
 {
 	mTabWidget->setElideMode(Qt::ElideRight);
+//	mTabWidget->setFocusPolicy(Qt::StrongFocus);
 	mLayout = new QVBoxLayout(this);
 	mLayout->addWidget(mTabWidget);
 	mLayout->setMargin(2); // lots of tabbed widgets in layers use up the desktop. Must reduce.
+
+	connect(mTabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(const int &)));
 }
 
 TabbedWidget::~TabbedWidget()
@@ -83,6 +86,25 @@ void TabbedWidget::insertWidgetAtTop(QWidget* newWidget)
 {
 	mLayout->insertWidget(0, newWidget);
 }
+
+void TabbedWidget::tabChanged(const int &index)
+{
+	// A new tab has been selected, so give the focus to its widget
+	QWidget* widget = mTabWidget->widget(index);
+	if (widget)
+		widget->setFocus();
+}
+
+//void TabbedWidget::focusInEvent(QFocusEvent *pEvent)
+//{
+//	// Default handling of the event
+//	QTabWidget::focusInEvent(pEvent);
+
+//	// Activate the widget of the given tab index
+//	QWidget *crtWidget = this->currentWidget();
+//	if (crtWidget)
+//		crtWidget->setFocus();
+//}
 
 QString TabbedWidget::defaultWhatsThis() const
 {

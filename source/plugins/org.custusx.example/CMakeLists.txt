@@ -6,8 +6,13 @@ message(STATUS "===================================== parsing example")
 
 include_directories(
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
+<<<<<<< HEAD
     ${CustusX_SOURCE_DIR}/source/logic
 )
+=======
+	${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
+	)
+>>>>>>> user_help
 
 set(PLUGIN_SRCS
   cxExamplePluginActivator.cpp
@@ -36,8 +41,13 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
     cxGUIExtenderService
+<<<<<<< HEAD
     #cxLogicManager
     cxPluginUtilities
+=======
+	Qt5::Widgets
+	cxPluginUtilities
+>>>>>>> user_help
     )
 
 ctkMacroBuildPlugin(
