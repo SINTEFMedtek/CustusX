@@ -33,8 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTQUEUEDSIGNALLISTENER_H_
 #define CXTESTQUEUEDSIGNALLISTENER_H_
 
-#include "cxtestUtilitiesExport.h"
-
 #include <QObject>
 
 class QTimer;
@@ -43,7 +41,7 @@ class QEventLoop;
 namespace cxtest
 {
 
-cxtestUtilities_EXPORT bool waitForQueuedSignal(QObject* object, const char* signal, int maxWaitMilliSeconds = 100, bool silentAtArrive = false);
+bool waitForQueuedSignal(QObject* object, const char* signal, int maxWaitMilliSeconds = 100, bool silentAtArrive = false);
 
 /**
  * \brief Object that waits for a signal to arrive from a given QObject. If
