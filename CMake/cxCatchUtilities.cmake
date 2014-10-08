@@ -58,11 +58,11 @@ function(cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES)
 	set(ADDITIONAL_LIBS ${ARGV3}) # emulating optional argument
 #message(STATUS "========= " ${ADDITIONAL_LIBS} )
 
-    if(CX_WINDOWS)
+#    if(CX_WINDOWS)
                 _cx_catch_save_info_in_globals("${LIB_TO_TEST}" "${SOURCES}" "${MOC_SOURCES}" "${ADDITIONAL_LIBS}")
-    else()
-                _cx_catch_add_lib_and_exe("${LIB_TO_TEST}" "${SOURCES}" "${MOC_SOURCES}" "${ADDITIONAL_LIBS}")
-    endif()
+#    else()
+#                _cx_catch_add_lib_and_exe("${LIB_TO_TEST}" "${SOURCES}" "${MOC_SOURCES}" "${ADDITIONAL_LIBS}")
+#    endif()
 
 endfunction()
 
@@ -82,11 +82,11 @@ function(cx_catch_add_master_exe)
     set(TEST_EXE_NAME "Catch")
     set(cxtest_MAIN ${CustusX_SOURCE_DIR}/source/resource/testUtilities/cxtestCatchMain.cpp)
 
-    if(CX_WINDOWS)
+#    if(CX_WINDOWS)
 		_cx_catch_generate_master_catch_using_sources(${TEST_EXE_NAME} ${cxtest_MAIN})
-    else()
-        _cx_catch_generate_master_catch_using_libs(${TEST_EXE_NAME} ${cxtest_MAIN})
-    endif()
+#    else()
+#        _cx_catch_generate_master_catch_using_libs(${TEST_EXE_NAME} ${cxtest_MAIN})
+#    endif()
     
     cx_install_target(${TEST_EXE_NAME})
 
