@@ -174,7 +174,7 @@ void SoundSpeedConverterWidget::setWaterDegree(double degree)
 
 void SoundSpeedConverterWidget::updateButtons()
 {
-  mApplyButton->setEnabled(mProbe);
+  mApplyButton->setEnabled(mProbe ? true : false);
   mResetButton->setEnabled(true);
 }
 

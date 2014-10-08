@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDICOMIMPORTER_H
 #define CXDICOMIMPORTER_H
 
+#include "org_custusx_dicom_Export.h"
+
 // Qt includes
 #include <QString>
 #include <QObject>
@@ -53,7 +55,7 @@ namespace cx
  * \date 2014-05-21
  * \author Christian Askeland
  */
-class DicomImporter : public QObject
+class org_custusx_dicom_EXPORT DicomImporter : public QObject
 {
 	Q_OBJECT
 public:

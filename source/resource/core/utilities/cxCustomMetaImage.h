@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCUSTOMMETAIMAGE_H_
 #define CXCUSTOMMETAIMAGE_H_
 
+#include "cxResourceExport.h"
+
 #include <QString>
 #include "cxTransform3D.h"
 
@@ -47,7 +49,7 @@ typedef boost::shared_ptr<class CustomMetaImage> CustomMetaImagePtr;
  *
  * \ingroup cx_resource_core_utilities
  */
-class CustomMetaImage
+class cxResource_EXPORT CustomMetaImage
 {
 public:
   static CustomMetaImagePtr create(QString filename) { return CustomMetaImagePtr(new CustomMetaImage(filename)); }

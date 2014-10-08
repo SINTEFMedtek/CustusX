@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDOUBLEDATAADAPTER_H_
 #define CXDOUBLEDATAADAPTER_H_
 
+#include "cxResourceExport.h"
+
 #include <boost/shared_ptr.hpp>
 #include <QString>
 #include <QObject>
@@ -86,7 +88,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_dataadapters
  */
-class DoubleDataAdapter: public DataAdapter
+class cxResource_EXPORT DoubleDataAdapter: public DataAdapter
 {
 Q_OBJECT
 public:
@@ -142,7 +144,7 @@ protected:
 typedef boost::shared_ptr<DoubleDataAdapter> DoubleDataAdapterPtr;
 
 /** Dummy implementation */
-class DoubleDataAdapterNull: public DoubleDataAdapter
+class cxResource_EXPORT DoubleDataAdapterNull: public DoubleDataAdapter
 {
 Q_OBJECT
 

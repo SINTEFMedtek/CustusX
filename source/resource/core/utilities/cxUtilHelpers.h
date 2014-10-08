@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXUTILHELPERS_H_
 #define CXUTILHELPERS_H_
 
+#include "cxResourceExport.h"
+
 #include <sstream>
 #include <iomanip>
 #include <QString>
@@ -67,10 +69,10 @@ template<class ITER> std::ostream& stream_range(std::ostream& s, ITER begin, ITE
 }
 // --------------------------------------------------------
 
-double constrainValue(double val, double min, double max);
-int sign(double x);
-QString changeExtension(QString name, QString ext);
-void sleep_ms(int ms);
+cxResource_EXPORT double constrainValue(double val, double min, double max);
+cxResource_EXPORT int sign(double x);
+cxResource_EXPORT QString changeExtension(QString name, QString ext);
+cxResource_EXPORT void sleep_ms(int ms);
 
 /**
  * \}

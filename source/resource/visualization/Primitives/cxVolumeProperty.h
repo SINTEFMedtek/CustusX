@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVOLUMEPROPERTY_H
 #define CXVOLUMEPROPERTY_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include <QObject>
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
@@ -50,7 +52,7 @@ typedef boost::shared_ptr<class VolumeProperty> VolumePropertyPtr;
   * \author Christian Askeland, SINTEF
   * \author Ole Vegard Solberg, SINTEF
   */
-class VolumeProperty : public QObject
+class cxResourceVisualization_EXPORT VolumeProperty : public QObject
 {
 	Q_OBJECT
 public:

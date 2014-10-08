@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLANDMARKTRANSLATIONREGISTRATION_H_
 #define CXLANDMARKTRANSLATIONREGISTRATION_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include <vector>
 #include "cxTransform3D.h"
 
@@ -48,7 +50,7 @@ namespace cx
  * Code is based on  itk/Examples/Registration/IterativeClosestPoint1.cxx
  *
  */
-class LandmarkTranslationRegistration
+class cxPluginRegistration_EXPORT LandmarkTranslationRegistration
 {
 public:
   Transform3D registerPoints(std::vector<Vector3D> ref, std::vector<Vector3D> target, bool* ok);

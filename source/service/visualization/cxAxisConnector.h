@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXAXISCONNECTOR_H
 #define CXAXISCONNECTOR_H
 
+#include "cxVisualizationServiceExport.h"
+
 #include <QObject>
 #include "cxForwardDeclarations.h"
 #include "cxCoordinateSystemHelpers.h"
@@ -49,7 +51,7 @@ typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
  * \date 5 Sep 2013, 2013
  * \author christiana
  */
-class AxisConnector : public QObject
+class cxVisualizationService_EXPORT AxisConnector : public QObject
 {
 	Q_OBJECT
 	public:

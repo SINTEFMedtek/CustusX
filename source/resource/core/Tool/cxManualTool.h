@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMANUALTOOL_H_
 #define CXMANUALTOOL_H_
 
+#include "cxResourceExport.h"
+
 #include <QMutex>
 #include "cxToolImpl.h"
 #include "vtkForwardDeclarations.h"
@@ -54,7 +56,7 @@ class ToolManager;
  *
  * \ingroup cx_resource_core_tool
  */
-class ManualTool : public ToolImpl
+class cxResource_EXPORT ManualTool : public ToolImpl
 {
 	Q_OBJECT
 public:

@@ -30,27 +30,24 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxDicomWidget.h"
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QDir>
+#undef REGISTERED
+#include "ctkServiceTracker.h"
 #include "ctkDICOMBrowser.h"
 #include "ctkDICOMAppWidget.h"
 #include "cxDICOMAppWidget.h"
-#include "cxDataLocations.h"
-#include <QDir>
 #include "ctkDICOMTableManager.h"
 #include "ctkDICOMObjectListWidget.h"
+#include "ctkPluginContext.h"
+#include "cxDicomWidget.h"
+#include "cxDataLocations.h"
 #include "cxTypeConversions.h"
 #include "cxDicomConverter.h"
 #include "cxReporter.h"
-//#include "cxLegacySingletons.h"
-//#include "cxDataManager.h"
 #include "cxLogger.h"
-
 #include "cxPatientModelService.h"
-
-#include "ctkPluginContext.h"
-#include "ctkServiceTracker.h"
-#include <QApplication>
-#include <QDesktopWidget>
 #include "cxDicomImageReader.h"
 
 namespace cx

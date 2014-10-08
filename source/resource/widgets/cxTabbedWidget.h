@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTABBEDWIDGET_H_
 #define CXTABBEDWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QString>
 #include "cxBaseWidget.h"
 
@@ -50,7 +52,7 @@ namespace cx
  * \\author Janne Beate Bakeng
  */
 
-class TabbedWidget : public BaseWidget
+class cxResourceWidgets_EXPORT TabbedWidget : public BaseWidget
 {
 public:
   TabbedWidget(QWidget* parent, QString objectName, QString windowTitle);

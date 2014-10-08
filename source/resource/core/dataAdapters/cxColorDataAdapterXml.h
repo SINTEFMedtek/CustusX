@@ -33,13 +33,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCOLORDATAADAPTERXML_H_
 #define CXCOLORDATAADAPTERXML_H_
 
+#include "cxResourceExport.h"
+
 #include "cxColorDataAdapter.h"
 #include "cxXmlOptionItem.h"
 
 
 namespace cx
 {
-typedef boost::shared_ptr<class ColorDataAdapterXml> ColorDataAdapterXmlPtr;
+typedef boost::shared_ptr<class cxResource_EXPORT ColorDataAdapterXml> ColorDataAdapterXmlPtr;
 
 /** DataAdapter for QColor values.
  *
@@ -48,7 +50,7 @@ typedef boost::shared_ptr<class ColorDataAdapterXml> ColorDataAdapterXmlPtr;
  * \date Nov 22, 2012
  * \author christiana
  */
-class ColorDataAdapterXml: public ColorDataAdapter
+class cxResource_EXPORT ColorDataAdapterXml: public ColorDataAdapter
 {
 Q_OBJECT
 public:

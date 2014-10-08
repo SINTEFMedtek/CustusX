@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATAINTERFACE_H_
 #define CXDATAINTERFACE_H_
 
+#include "cxGuiExport.h"
 
 #include "cxDoubleDataAdapter.h"
 #include "cxStringDataAdapter.h"
@@ -53,7 +54,7 @@ typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
 /**
  * \brief Interface to the tool offset of the dominant tool
  */
-class DoubleDataAdapterActiveToolOffset : public DoubleDataAdapter
+class cxGui_EXPORT DoubleDataAdapterActiveToolOffset : public DoubleDataAdapter
 {
   Q_OBJECT
 public:
@@ -83,7 +84,7 @@ protected:
 /**
  * \brief Superclass for all doubles interacting with the active image.
  */
-class DoubleDataAdapterActiveImageBase : public DoubleDataAdapter
+class cxGui_EXPORT DoubleDataAdapterActiveImageBase : public DoubleDataAdapter
 {
   Q_OBJECT
 public:
@@ -105,7 +106,7 @@ protected:
 /**
  * \brief DataInterface implementation for the LUT 2D window value
  */
-class DoubleDataAdapter2DWindow : public DoubleDataAdapterActiveImageBase
+class cxGui_EXPORT DoubleDataAdapter2DWindow : public DoubleDataAdapterActiveImageBase
 {
 public:
   virtual ~DoubleDataAdapter2DWindow() {}
@@ -118,7 +119,7 @@ public:
 /**
  * \brief DataInterface implementation for the LUT 2D level value
  */
-class DoubleDataAdapter2DLevel : public DoubleDataAdapterActiveImageBase
+class cxGui_EXPORT DoubleDataAdapter2DLevel : public DoubleDataAdapterActiveImageBase
 {
   Q_OBJECT
 public:
@@ -132,7 +133,7 @@ public:
 /**
  * \brief Base class for all DataAdapters that selects a real time source.
  */
-class SelectRTSourceStringDataAdapterBase : public StringDataAdapter
+class cxGui_EXPORT SelectRTSourceStringDataAdapterBase : public StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -148,7 +149,7 @@ typedef boost::shared_ptr<class SelectRTSourceStringDataAdapterBase> SelectRTSou
 /**
  * \brief Base class for all DataAdapters that selects a tool.
  */
-class SelectToolStringDataAdapterBase : public StringDataAdapter
+class cxGui_EXPORT SelectToolStringDataAdapterBase : public StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -166,7 +167,7 @@ typedef boost::shared_ptr<class SelectToolStringDataAdapterBase> SelectToolStrin
 
 /** Base class for all DataAdapters that selects a coordinatesystem.
  */
-class SelectCoordinateSystemStringDataAdapterBase : public StringDataAdapter
+class cxGui_EXPORT SelectCoordinateSystemStringDataAdapterBase : public StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -189,7 +190,7 @@ typedef boost::shared_ptr<class SelectRTSourceStringDataAdapter> SelectRTSourceS
  * The rtsource is stored internally in the adapter.
  * Use setValue/getValue plus changed() to access it.
  */
-class SelectRTSourceStringDataAdapter : public SelectRTSourceStringDataAdapterBase
+class cxGui_EXPORT SelectRTSourceStringDataAdapter : public SelectRTSourceStringDataAdapterBase
 {
   Q_OBJECT
 public:
@@ -221,7 +222,7 @@ typedef boost::shared_ptr<class ActiveVideoSourceStringDataAdapter> ActiveVideoS
 /**
  * \brief Adapter for controlling the active video source in cx::VideoService
  */
-class ActiveVideoSourceStringDataAdapter : public StringDataAdapter
+class cxGui_EXPORT ActiveVideoSourceStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -246,7 +247,7 @@ typedef boost::shared_ptr<class SelectCoordinateSystemStringDataAdapter> SelectC
  *
  * Class reacts to toolmanagers configurerd signal and automatically sets patientref as default
  */
-class SelectCoordinateSystemStringDataAdapter : public SelectCoordinateSystemStringDataAdapterBase
+class cxGui_EXPORT SelectCoordinateSystemStringDataAdapter : public SelectCoordinateSystemStringDataAdapterBase
 {
   Q_OBJECT
 public:
@@ -281,7 +282,7 @@ typedef boost::shared_ptr<class SelectToolStringDataAdapter> SelectToolStringDat
  * Use setValue/getValue plus changed() to access it.
  *
  */
-class SelectToolStringDataAdapter : public SelectToolStringDataAdapterBase
+class cxGui_EXPORT SelectToolStringDataAdapter : public SelectToolStringDataAdapterBase
 {
   Q_OBJECT
 public:
@@ -315,7 +316,7 @@ typedef boost::shared_ptr<class ParentFrameStringDataAdapter> ParentFrameStringD
 /**
  * \brief Adapter that selects the parent frame of the given Data.
  */
-class ParentFrameStringDataAdapter : public StringDataAdapter
+class cxGui_EXPORT ParentFrameStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -344,7 +345,7 @@ typedef boost::shared_ptr<class SetParentFrameStringDataAdapter> SetParentFrameS
  * \brief Adapter that force sets the parent frame of the given Data,
  * i.e. overwriting history. Nice for initial definition
  */
-class SetParentFrameStringDataAdapter : public ParentFrameStringDataAdapter
+class cxGui_EXPORT SetParentFrameStringDataAdapter : public ParentFrameStringDataAdapter
 {
   Q_OBJECT
 public:
@@ -360,7 +361,7 @@ typedef boost::shared_ptr<class DataNameEditableStringDataAdapter> DataNameEdita
 /**
  * \brief Adapter for displaying and changing name of a Data.
  */
-class DataNameEditableStringDataAdapter : public StringDataAdapter
+class cxGui_EXPORT DataNameEditableStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -387,7 +388,7 @@ typedef boost::shared_ptr<class DataUidEditableStringDataAdapter> DataUidEditabl
 /**
  * \brief Adapter for displaying and changing name of a Data.
  */
-class DataUidEditableStringDataAdapter : public StringDataAdapter
+class cxGui_EXPORT DataUidEditableStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -412,7 +413,7 @@ typedef boost::shared_ptr<class DataModalityStringDataAdapter> DataModalityStrin
 /**
  * \brief Adapter that selects the modality of the given Data.
  */
-class DataModalityStringDataAdapter : public StringDataAdapter
+class cxGui_EXPORT DataModalityStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -439,7 +440,7 @@ typedef boost::shared_ptr<class ImageTypeStringDataAdapter> ImageTypeStringDataA
 /**
  * \brief Adapter that selects the image type of the given Data.
  */
-class ImageTypeStringDataAdapter : public StringDataAdapter
+class cxGui_EXPORT ImageTypeStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRecordSession_H_
 #define CXRecordSession_H_
 
+#include "cxPluginAcquisitionExport.h"
+
 #include <QString>
 #include <map>
 #include "boost/shared_ptr.hpp"
@@ -61,7 +63,7 @@ typedef std::map<double, Transform3D> TimedTransformMap;
  * \date Dec 8, 2010
  * \author Janne Beate Bakeng
  */
-class RecordSession
+class cxPluginAcquisition_EXPORT RecordSession
 {
 public:
 	RecordSession(QString uid, double startTime, double stopTime, QString description);

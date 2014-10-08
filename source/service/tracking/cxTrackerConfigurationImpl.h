@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRACKERCONFIGURATIONIMPL_H
 #define CXTRACKERCONFIGURATIONIMPL_H
 
+#include "cxTrackingServiceExport.h"
+
 #include "cxTrackerConfiguration.h"
 #include "cxIgstkTool.h"
 #include <QDir>
@@ -39,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-class TrackerConfigurationImpl : public TrackerConfiguration
+class cxTrackingService_EXPORT TrackerConfigurationImpl : public TrackerConfiguration
 {
 public:
 	virtual ~TrackerConfigurationImpl() {}

@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXBOOLDATAADAPTER_H_
 #define CXBOOLDATAADAPTER_H_
 
+#include "cxResourceExport.h"
+
 #include "cxDataAdapter.h"
 
 namespace cx
@@ -50,7 +52,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_dataadapters
  */
-class BoolDataAdapter: public DataAdapter
+class cxResource_EXPORT BoolDataAdapter: public DataAdapter
 {
 Q_OBJECT
 public:

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRANSFORMFILE_H_
 #define CXTRANSFORMFILE_H_
 
+#include "cxResourceExport.h"
+
 #include "cxTransform3D.h"
 
 namespace cx
@@ -53,7 +55,7 @@ namespace cx
  * \date Feb 28, 2012
  * \author Christian Askeland, SINTEF
  */
-class TransformFile
+class cxResource_EXPORT TransformFile
 {
 public:
 	TransformFile(QString fileName ="");

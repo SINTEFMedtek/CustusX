@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONSERVICENULL_H
 #define CXREGISTRATIONSERVICENULL_H
 
+#include "cxResourceExport.h"
+
 #include "cxRegistrationService.h"
 
 namespace cx
@@ -44,7 +46,7 @@ namespace cx
  *  \date 2014-08-28
  *  \author Ole Vegard Solberg, SINTEF
  */
-class RegistrationServiceNull : public RegistrationService
+class cxResource_EXPORT RegistrationServiceNull : public RegistrationService
 {
 
 public:

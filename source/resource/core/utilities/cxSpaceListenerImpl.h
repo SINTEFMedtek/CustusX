@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSPACELISTENERIMPL_H
 #define CXSPACELISTENERIMPL_H
 
+#include "cxResourceExport.h"
+
 #include "cxSpaceListener.h"
 
 namespace cx
@@ -46,7 +48,7 @@ class DataManager;
  * \date Jul 4, 2011
  * \author Christian Askeland, SINTEF
  */
-class SpaceListenerImpl: public SpaceListener
+class cxResource_EXPORT SpaceListenerImpl: public SpaceListener
 {
 Q_OBJECT
 

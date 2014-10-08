@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXGEOMETRICREP_H_
 #define CXGEOMETRICREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "vtkForwardDeclarations.h"
 #include "cxRepImpl.h"
 #include "cxVector3D.h"
@@ -53,7 +55,7 @@ typedef boost::shared_ptr<class GeometricRep> GeometricRepPtr;
  * \ingroup cx_resource_visualization
  * \ingroup cx_resource_visualization_rep3D
  */
-class GeometricRep : public RepImpl
+class cxResourceVisualization_EXPORT GeometricRep : public RepImpl
 {
 	Q_OBJECT
 public:

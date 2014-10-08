@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMESSAGELISTENER_H
 #define CXMESSAGELISTENER_H
 
+#include "cxResourceExport.h"
+
 #include "cxReporter.h"
 #include <vector>
 #include <QPointer>
@@ -48,7 +50,7 @@ typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
   * \date 2014-03-09
   * \author christiana
   */
-class MessageListener : public QObject
+class cxResource_EXPORT MessageListener : public QObject
 {
 	Q_OBJECT
 public:

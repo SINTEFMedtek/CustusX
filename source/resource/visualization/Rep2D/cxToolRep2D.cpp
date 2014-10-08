@@ -269,7 +269,7 @@ bool ToolRep2D::showOffset()
 void ToolRep2D::setVisibility()
 {
 //	Logger::log("vm.log", "ToolRep2D::setVisibility(), offset=" + string_cast(showOffset()));
-	bool hasTool = mSlicer->getTool();
+	bool hasTool = mSlicer->getTool() ? true : false;
 
 	if (cursor)
 		cursor->getActor()->SetVisibility(mUseCrosshair && hasTool);

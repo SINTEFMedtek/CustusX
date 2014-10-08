@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVLCPROCESS_H_
 #define CXVLCPROCESS_H_
 
+#include "cxResourceExport.h"
+
 #include <QString>
 #include "cxProcessWrapper.h"
 
@@ -58,7 +60,7 @@ typedef boost::shared_ptr<class VLCRecorder> VLCRecorderPtr;
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class VLCRecorder: public QObject
+class cxResource_EXPORT VLCRecorder: public QObject
 {
 	Q_OBJECT
 
@@ -98,7 +100,7 @@ private:
 	static VLCRecorder* mTheInstance;
 };
 
-VLCRecorder* vlc(); ///< Shortcut for accessing the vlc recorder
+cxResource_EXPORT VLCRecorder* vlc(); ///< Shortcut for accessing the vlc recorder
 
 /**
  * @}

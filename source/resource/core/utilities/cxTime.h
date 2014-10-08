@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTIME_H_
 #define CXTIME_H_
 
+#include "cxResourceExport.h"
+
 #include <QString>
 
 namespace cx
@@ -49,23 +51,23 @@ namespace cx
  *    QDateTime().toString(timestampSecondsFormat());
  *    QDateTime().fromString(text, timestampSecondsFormat())
  */
-QString timestampSecondsFormat();
+cxResource_EXPORT QString timestampSecondsFormat();
 
 /** A more human-readable version of the above formatter.
  */
-QString timestampSecondsFormatNice();
+cxResource_EXPORT QString timestampSecondsFormatNice();
 
-QString timestampMilliSecondsFormat();
-QString timestampMilliSecondsFormatNice();
+cxResource_EXPORT QString timestampMilliSecondsFormat();
+cxResource_EXPORT QString timestampMilliSecondsFormatNice();
 
 
 /** Microseconds since epoch (1970)
  */
-double getMicroSecondsSinceEpoch();
+cxResource_EXPORT double getMicroSecondsSinceEpoch();
 
 /** Milliseconds since epoch (1970)
  */
-double getMilliSecondsSinceEpoch();
+cxResource_EXPORT double getMilliSecondsSinceEpoch();
 
 /**
  * \}

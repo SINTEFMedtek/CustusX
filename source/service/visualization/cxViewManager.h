@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWMANAGER_H_
 #define CXVIEWMANAGER_H_
 
+#include "cxVisualizationServiceExport.h"
+
 #include <map>
 #include <vector>
 #include <QObject>
@@ -123,7 +125,7 @@ typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class ViewManager: public QObject
+class cxVisualizationService_EXPORT ViewManager: public QObject
 {
 Q_OBJECT
 public:

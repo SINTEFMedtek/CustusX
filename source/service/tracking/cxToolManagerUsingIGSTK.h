@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLMANAGERUSINGIGSTK_H_
 #define CXTOOLMANAGERUSINGIGSTK_H_
 
+#include "cxTrackingServiceExport.h"
+
 #include "cxToolManager.h"
 #include "vtkForwardDeclarations.h"
 
@@ -83,7 +85,7 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class ToolManagerUsingIGSTK: public ToolManager
+class cxTrackingService_EXPORT ToolManagerUsingIGSTK: public ToolManager
 {
 Q_OBJECT
 

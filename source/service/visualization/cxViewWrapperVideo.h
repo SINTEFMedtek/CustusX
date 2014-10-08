@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWWRAPPERRTSTREAM_H_
 #define CXVIEWWRAPPERRTSTREAM_H_
 
+#include "cxVisualizationServiceExport.h"
+
 #include <vector>
 #include <QPointer>
 #include "cxForwardDeclarations.h"
@@ -55,7 +57,7 @@ namespace cx
  *  whats available.
  *
  */
-class ViewWrapperVideo: public ViewWrapper
+class cxVisualizationService_EXPORT ViewWrapperVideo: public ViewWrapper
 {
 Q_OBJECT
 public:

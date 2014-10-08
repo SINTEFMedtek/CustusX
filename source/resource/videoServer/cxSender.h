@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSender_H_
 #define CXSender_H_
 
+#include "cxGrabberExport.h"
+
 #include <QObject>
 #include <boost/shared_ptr.hpp>
 #include <qtcpsocket.h>
@@ -68,7 +70,7 @@ typedef boost::shared_ptr<Package> PackagePtr;
  * \author Christian Askeland, SINTEF
  * \date Oct 11, 2012
  */
-class Sender : public QObject
+class cxGrabber_EXPORT Sender : public QObject
 {
 	Q_OBJECT
 public:
@@ -85,7 +87,7 @@ public:
 };
 typedef boost::shared_ptr<Sender> SenderPtr;
 
-class SenderImpl : public Sender
+class cxGrabber_EXPORT SenderImpl : public Sender
 {
 public:
 	SenderImpl() {}
@@ -113,7 +115,7 @@ protected:
 	virtual void send(ProbeDefinitionPtr msg) = 0;
 };
 
-class GrabberSenderQTcpSocket : public SenderImpl
+class cxGrabber_EXPORT GrabberSenderQTcpSocket : public SenderImpl
 {
 public:
 	explicit GrabberSenderQTcpSocket(QTcpSocket* socket);

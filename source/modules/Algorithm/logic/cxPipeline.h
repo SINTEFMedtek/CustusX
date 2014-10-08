@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPIPELINE_H
 #define CXPIPELINE_H
 
+#include "cxPluginAlgorithmExport.h"
+
 //#include <QObject>
 #include "cxFilter.h"
 #include "cxXmlOptionItem.h"
@@ -52,7 +54,7 @@ typedef boost::shared_ptr<class FusedInputOutputSelectDataStringDataAdapter> Fus
   *
   *
   */
-class FusedInputOutputSelectDataStringDataAdapter : public SelectDataStringDataAdapterBase
+class cxPluginAlgorithm_EXPORT FusedInputOutputSelectDataStringDataAdapter : public SelectDataStringDataAdapterBase
 {
 	Q_OBJECT
 public:
@@ -94,7 +96,7 @@ protected:
  * \author christiana
  * \author Janne Beate Bakeng, SINTEF
  */
-class Pipeline : public QObject
+class cxPluginAlgorithm_EXPORT Pipeline : public QObject
 {
 	Q_OBJECT
 public:

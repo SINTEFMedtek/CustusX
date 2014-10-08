@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLAYOUTINTERACTOR_H
 #define CXLAYOUTINTERACTOR_H
 
+#include "cxGuiExport.h"
+
 #include <QObject>
 #include <QAction>
 #include <QActionGroup>
@@ -50,7 +52,7 @@ namespace cx
  * \date 2014-02-05
  * \author christiana
  */
-class LayoutInteractor : public QObject
+class cxGui_EXPORT LayoutInteractor : public QObject
 {
 	Q_OBJECT
 public:

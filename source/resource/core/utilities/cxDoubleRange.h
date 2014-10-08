@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDOUBLERANGE_H_
 #define CXDOUBLERANGE_H_
 
+#include "cxResourceExport.h"
+
 namespace cx
 {
 
@@ -48,7 +50,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_utilities
  */
-struct DoubleRange
+struct cxResource_EXPORT DoubleRange
 {
 	DoubleRange() :
 		mMin(0), mMax(1), mStep(0.1)

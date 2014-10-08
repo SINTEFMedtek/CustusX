@@ -15,15 +15,24 @@ include_directories( ${CX_RESOURCE_INCLUDE_DIRECTORIES} )
 include_directories(
     .
     ${CustusX_SOURCE_DIR}/source/gui
+    ${CustusX_BINARY_DIR}/source/gui
     ${CustusX_SOURCE_DIR}/source/gui/utilities
     ${CustusX_SOURCE_DIR}/source/logic
+    ${CustusX_BINARY_DIR}/source/logic
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
+    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
     ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/gui
+    ${CustusX_BINARY_DIR}/source/modules/UsReconstruction
     ${CustusX_SOURCE_DIR}/source/modules/Acquisition/gui
+    ${CustusX_BINARY_DIR}/source/modules/Acquisition
     ${CustusX_SOURCE_DIR}/source/modules/Calibration/gui
+    ${CustusX_BINARY_DIR}/source/modules/Calibration
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
+    ${CustusX_BINARY_DIR}/source/modules/Algorithm
     ${CustusX_SOURCE_DIR}/source/modules/Registration/gui
+    ${CustusX_BINARY_DIR}/source/modules/Registration
 	${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
+	${CustusX_BINARY_DIR}/source/resource
 	)
 
 #------------------------------------------------------------------------------
@@ -45,6 +54,7 @@ endif(APPLE)
 #------------------------------------------------------------------------------
 # Executable
 #-----------------------------------------------------------------------------
+cx_remove_duplicate_include_directories()
 if (APPLE)
     add_executable(CustusX MACOSX_BUNDLE ${SOURCES} )
 else (APPLE)

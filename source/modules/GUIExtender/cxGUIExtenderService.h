@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXGUIEXTENDERSERVICE_H_
 #define CXGUIEXTENDERSERVICE_H_
 
+#include "cxGUIExtenderServiceExport.h"
+
 #include <QObject>
 #include "boost/shared_ptr.hpp"
 class QWidget;
@@ -48,7 +50,7 @@ typedef boost::shared_ptr<class GUIExtenderService> GUIExtenderServicePtr;
 /** Interface for service that extends the user interface with more widgets.
  *
  */
-class GUIExtenderService : public QObject
+class cxGUIExtenderService_EXPORT GUIExtenderService : public QObject
 {
 	Q_OBJECT
 public:

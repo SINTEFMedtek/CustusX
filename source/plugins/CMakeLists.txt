@@ -47,7 +47,6 @@ set(CX_PLUGINS
   org.custusx.patientmodel:ON
 #  org.custusx.filter.tubesegmentation:OFF
   org.custusx.registration:ON
-#  org.custusx.registration.ctus:ON
 )
 
 #foreach(var ${CX_PLUGINS})
@@ -64,6 +63,14 @@ foreach (_var IN LISTS matchedVars)
     cx_insert_plugin_if_not_in_list(CX_PLUGINS ${plugin_name} "OFF" ${PLUGIN_BUILD_OPTION_PREFIX})
 endforeach()
 
+######
+# CTK requires QT_QMAKE_EXECUTABLE to be set on Windows.
+######
+if(NOT QT_QMAKE_EXECUTABLE)
+    get_target_property(QT_QMAKE_EXECUTABLE Qt5::qmake LOCATION)
+endif(NOT QT_QMAKE_EXECUTABLE)
+######
+cx_remove_duplicate_include_directories()
 ctkMacroSetupPlugins(
     ${CX_PLUGINS} 
     BUILD_OPTION_PREFIX ${PLUGIN_BUILD_OPTION_PREFIX})

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPOINTSAMPLINGWIDGET_H_
 #define CXPOINTSAMPLINGWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 
 #include <vector>
@@ -61,7 +63,7 @@ namespace cx
  * \date 2010.05.05
  * \author Christian Askeland, SINTEF
  */
-class PointSamplingWidget : public BaseWidget
+class cxGui_EXPORT PointSamplingWidget : public BaseWidget
 {
   Q_OBJECT
 

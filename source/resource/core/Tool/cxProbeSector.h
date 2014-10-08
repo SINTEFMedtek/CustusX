@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPROBESECTOR_H_
 #define CXPROBESECTOR_H_
 
+#include "cxResourceExport.h"
+
 #include <boost/shared_ptr.hpp>
 #include <QSize>
 #include "vtkSmartPointer.h"
@@ -54,7 +56,7 @@ typedef boost::shared_ptr<class ProbeSector> ProbeSectorPtr;
  *
  * \ingroup cx_resource_core_tool
  */
-class ProbeSector
+class cxResource_EXPORT ProbeSector
 {
 public:
 	ProbeSector();

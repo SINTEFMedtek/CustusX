@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXAPPLICATIONSTATE_H_
 #define CXAPPLICATIONSTATE_H_
 
+#include "cxStateServiceExport.h"
+
 #include <iostream>
 #include <QState>
 #include <QStateMachine>
@@ -61,7 +63,7 @@ typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
  *  \date Aug 17, 2010
  *  \author christiana
  */
-class ApplicationState: public QState
+class cxStateService_EXPORT ApplicationState: public QState
 {
 Q_OBJECT
 public:
@@ -85,7 +87,7 @@ protected:
 	StateServiceBackendPtr mBackend;
 };
 
-class ParentApplicationState: public ApplicationState
+class cxStateService_EXPORT ParentApplicationState: public ApplicationState
 {
 Q_OBJECT
 public:
@@ -99,7 +101,7 @@ public:
 	virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdCOUNT; }
 };
 
-class LaboratoryApplicationState: public ApplicationState
+class cxStateService_EXPORT LaboratoryApplicationState: public ApplicationState
 {
 Q_OBJECT
 public:
@@ -110,7 +112,7 @@ public:
 	virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdLABORATORY; }
 };
 
-class BronchoscopyApplicationState: public ApplicationState
+class cxStateService_EXPORT BronchoscopyApplicationState: public ApplicationState
 {
 Q_OBJECT
 public:
@@ -121,7 +123,7 @@ public:
 	virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdBRONCHOSCOPY; }
 };
 
-class NeurologyApplicationState: public ApplicationState
+class cxStateService_EXPORT NeurologyApplicationState: public ApplicationState
 {
 Q_OBJECT
 public:
@@ -132,7 +134,7 @@ public:
 	virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdNEUROLOGY; }
 };
 
-class LaparoscopyApplicationState: public ApplicationState
+class cxStateService_EXPORT LaparoscopyApplicationState: public ApplicationState
 {
 Q_OBJECT
 public:
@@ -143,7 +145,7 @@ public:
 	virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdLAPAROSCOPY; }
 };
 
-class EndovascularApplicationState: public ApplicationState
+class cxStateService_EXPORT EndovascularApplicationState: public ApplicationState
 {
 Q_OBJECT
 public:

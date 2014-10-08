@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxDataReaderWriter.h"
 #include <QDir>
+#include <QString>
+#include "cxTypeConversions.h"
 
 namespace cxtest
 {

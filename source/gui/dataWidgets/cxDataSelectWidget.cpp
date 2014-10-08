@@ -134,7 +134,7 @@ void DataSelectWidget::viewGroupChangedSlot()
 void DataSelectWidget::updateDataVisibility()
 {
     mToggleShowAction->setEnabled(mData->getData() && (mCurrentViewGroup!=0));
-    mRemoveAction->setEnabled(mData->getData());
+    mRemoveAction->setEnabled(mData->getData() ? true : false);
 
     bool visible = false;
     if (mData->getData())

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLANDMARKREP_H_
 #define CXLANDMARKREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxRepImpl.h"
 
 #include <map>
@@ -58,7 +60,7 @@ typedef boost::shared_ptr<class LandmarkRep> LandmarkRepPtr;
  * @{
  */
 
-class LandmarksSource: public QObject
+class cxResourceVisualization_EXPORT LandmarksSource: public QObject
 {
 Q_OBJECT
 public:
@@ -72,7 +74,7 @@ typedef boost::shared_ptr<LandmarksSource> LandmarksSourcePtr;
 
 typedef boost::shared_ptr<class PatientLandmarksSource> PatientLandmarksSourcePtr;
 
-class PatientLandmarksSource: public LandmarksSource
+class cxResourceVisualization_EXPORT PatientLandmarksSource: public LandmarksSource
 {
 public:
 	static PatientLandmarksSourcePtr New(DataServicePtr dataManager) { return PatientLandmarksSourcePtr(new PatientLandmarksSource(dataManager)); }
@@ -87,7 +89,7 @@ private:
 
 typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
 
-class ImageLandmarksSource: public LandmarksSource
+class cxResourceVisualization_EXPORT ImageLandmarksSource: public LandmarksSource
 {
 public:
 	static ImageLandmarksSourcePtr New()
@@ -115,7 +117,7 @@ private:
  * \\author Janne Beate Bakeng, SINTEF
  * \\author Christian Askeland, SINTEF
  */
-class LandmarkRep: public RepImpl
+class cxResourceVisualization_EXPORT LandmarkRep: public RepImpl
 {
 Q_OBJECT
 public:

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGEALGORITHMS_H_
 #define CXIMAGEALGORITHMS_H_
 
+#include "cxResourceExport.h"
+
 #include <map>
 #include <vector>
 #include <QDateTime>
@@ -58,15 +60,15 @@ class DataManager;
 * @{
 */
 
-ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, const Vector3D spacing, QString uid="", QString name="");
-ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, Transform3D refMi);
-vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox);
-ImagePtr cropImage(DataServicePtr dataManager, ImagePtr image);
-ImagePtr duplicateImage(DataServicePtr dataManager, ImagePtr image);
+cxResource_EXPORT ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, const Vector3D spacing, QString uid="", QString name="");
+cxResource_EXPORT ImagePtr resampleImage(DataServicePtr dataManager, ImagePtr image, Transform3D refMi);
+cxResource_EXPORT vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox);
+cxResource_EXPORT ImagePtr cropImage(DataServicePtr dataManager, ImagePtr image);
+cxResource_EXPORT ImagePtr duplicateImage(DataServicePtr dataManager, ImagePtr image);
 
 /**
  */
-QDateTime extractTimestamp(QString text);
+cxResource_EXPORT QDateTime extractTimestamp(QString text);
 
 /**Assume T is DataPtr or a derived class.
  *

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXGRAPHICALAXES3D_H
 #define CXGRAPHICALAXES3D_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include <vector>
 #include "cxRepImpl.h"
 #include "cxTransform3D.h"
@@ -54,7 +56,7 @@ namespace cx
  * \ingroup cx_resource_visualization
  * \ingroup cx_resource_visualization_rep3D
  */
-class GraphicalAxes3D
+class cxResourceVisualization_EXPORT GraphicalAxes3D
 {
 public:
     GraphicalAxes3D(vtkRendererPtr renderer = vtkRendererPtr());

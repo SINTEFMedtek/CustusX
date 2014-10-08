@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXORIENTATIONANNOTATION2DREP_H_
 #define CXORIENTATIONANNOTATION2DREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxRepImpl.h"
 #include "cxDefinitions.h"
 #include "vtkForwardDeclarations.h"
@@ -58,7 +60,7 @@ typedef vtkSmartPointer<class OrientationAnnotation> OrientationAnnotationPtr;
  *  Superior - Inferior
  * are used. Combinations of the letters are used for oblique angles.
  */
-class OrientationAnnotationSmartRep: public RepImpl
+class cxResourceVisualization_EXPORT OrientationAnnotationSmartRep: public RepImpl
 {
 Q_OBJECT
 public:

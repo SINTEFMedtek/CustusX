@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOL_H_
 #define CXTOOL_H_
 
+#include "cxResourceExport.h"
+
 #include <string>
 #include <map>
 #include <set>
@@ -63,7 +65,7 @@ typedef boost::shared_ptr<TimedTransformMap> TimedTransformMapPtr;
  *
  * \ingroup cx_resource_core_tool
  */
-class Tool: public QObject
+class cxResource_EXPORT Tool: public QObject
 {
 	Q_OBJECT
 public:

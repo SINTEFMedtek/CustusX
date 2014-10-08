@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTIMELINEWIDGET_H_
 #define CXTIMELINEWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QWidget>
 
 #include "vtkForwardDeclarations.h"
@@ -54,7 +56,7 @@ namespace cx
  * \date Mar 29, 2012
  * \author Christian Askeland, SINTEF
  */
-class TimelineWidget : public QWidget
+class cxResourceWidgets_EXPORT TimelineWidget : public QWidget
 {
 Q_OBJECT
 

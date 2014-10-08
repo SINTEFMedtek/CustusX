@@ -76,8 +76,7 @@ class Common(object):
         self.jom = False
         self.eclipse_version = '3.6'
         if platform.system() == 'Windows':
-            self.static = True
-            self.jom = True
+            self.jom = False
         self.setBuildType("Debug") 
         self.threads = 1
         self.xcode = False

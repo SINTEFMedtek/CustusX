@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFRAMEMETRICWRAPPER_H_
 #define CXFRAMEMETRICWRAPPER_H_
 
+#include "cxGuiExport.h"
+
 #include "cxFrameMetric.h"
 #include "cxDataMetricWrappers.h"
 #include "cxTransform3DWidget.h"
@@ -45,7 +47,7 @@ namespace cx {
  * \date Aug 23, 2013
  * \author Ole Vegard Solberg, SINTEF
  */
-class FrameMetricWrapper : public MetricBase
+class cxGui_EXPORT FrameMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:

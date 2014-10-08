@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef CX_WIN32
 
+#include "cxGrabberExport.h"
+
 #include "boost/shared_ptr.hpp"
 #include <QTcpSocket>
 #include <QStringList>
@@ -66,7 +68,7 @@ namespace cx
  *
  * This version uses openCV to grab images from the Ultrasonix scanner
  */
-class ImageStreamerSonix : public CommandLineStreamer
+class cxGrabber_EXPORT ImageStreamerSonix : public CommandLineStreamer
 {
   Q_OBJECT
 

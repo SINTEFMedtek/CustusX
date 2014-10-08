@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFIBERBUNDLEREP_H_
 #define CXFIBERBUNDLEREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "vtkForwardDeclarations.h"
 
 #include "cxRepImpl.h"
@@ -55,7 +57,7 @@ namespace cx
  * \ingroup cx_resource_visualization
  * \ingroup cx_resource_visualization_rep3D
  */
-class FiberBundleRep : public RepImpl
+class cxResourceVisualization_EXPORT FiberBundleRep : public RepImpl
 {
 	Q_OBJECT
 

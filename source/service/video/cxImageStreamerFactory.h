@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGESTREAMERFACTORY_H
 #define CXIMAGESTREAMERFACTORY_H
 
+#include "cxVideoServiceExport.h"
+
 #include <map>
 #include <QString>
 #include "cxStreamerService.h"
@@ -48,7 +50,7 @@ typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
  * \date May 20, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class ImageStreamerFactory
+class cxVideoService_EXPORT ImageStreamerFactory
 {
 public:
 	ImageStreamerFactory();

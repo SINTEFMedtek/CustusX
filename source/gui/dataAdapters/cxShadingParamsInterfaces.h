@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSHADINGPARAMSINTERFACES_H_
 #define CXSHADINGPARAMSINTERFACES_H_
 
+#include "cxGuiExport.h"
+
 #include "cxDoubleRange.h"
 #include "cxDoubleWidgets.h"
 #include "cxForwardDeclarations.h"
@@ -49,7 +51,7 @@ namespace cx
 
 /** Superclass for all shading parameters
  */
-class DoubleDataAdapterShadingBase : public DoubleDataAdapter
+class cxGui_EXPORT DoubleDataAdapterShadingBase : public DoubleDataAdapter
 {
   Q_OBJECT 
 public:
@@ -67,7 +69,7 @@ protected:
   
 /** Interface for setting the ambient parameter for the shading.
  */
-class DoubleDataAdapterShadingAmbient : public DoubleDataAdapterShadingBase
+class cxGui_EXPORT DoubleDataAdapterShadingAmbient : public DoubleDataAdapterShadingBase
 {
   Q_OBJECT
 public:
@@ -81,7 +83,7 @@ public:
 
 /** Interface for setting the diffuse parameter for the shading.
  */
-class DoubleDataAdapterShadingDiffuse : public DoubleDataAdapterShadingBase
+class cxGui_EXPORT DoubleDataAdapterShadingDiffuse : public DoubleDataAdapterShadingBase
 {
   Q_OBJECT
 public:
@@ -95,7 +97,7 @@ public:
 
 /** Interface for setting the specular parameter for the shading.
  */
-class DoubleDataAdapterShadingSpecular : public DoubleDataAdapterShadingBase
+class cxGui_EXPORT DoubleDataAdapterShadingSpecular : public DoubleDataAdapterShadingBase
 {
   Q_OBJECT
 public:
@@ -109,7 +111,7 @@ public:
 
 /** Interface for setting the specular power parameter for the shading.
   */
-class DoubleDataAdapterShadingSpecularPower : public DoubleDataAdapterShadingBase
+class cxGui_EXPORT DoubleDataAdapterShadingSpecularPower : public DoubleDataAdapterShadingBase
 {
   Q_OBJECT
 public:

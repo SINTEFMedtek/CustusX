@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXAUDIO_H_
 #define CXAUDIO_H_
 
+#include "cxResourceExport.h"
+
 #include "boost/shared_ptr.hpp"
 
 namespace cx
@@ -45,7 +47,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_logger
  */
-class Audio
+class cxResource_EXPORT Audio
 {
 public:
 	Audio(){};

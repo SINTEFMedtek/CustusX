@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCROPPINGWIDGET_H_
 #define CXCROPPINGWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxForwardDeclarations.h"
 #include "cxStringDataAdapter.h"
 #include "cxViewManager.h"
@@ -59,7 +61,7 @@ namespace cx
  * \date  Aug 20, 2010
  * \author Christian Askeland, SINTEF
  */
-class CroppingWidget : public BaseWidget
+class cxGui_EXPORT CroppingWidget : public BaseWidget
 {
   Q_OBJECT
 

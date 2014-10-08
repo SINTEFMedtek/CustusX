@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCOLORSELECTBUTTON_H_
 #define CXCOLORSELECTBUTTON_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QToolButton>
 #include <QColor>
 
@@ -45,7 +47,7 @@ namespace cx
  *
  * \ingroup cx_resource_widgets
  */
-class ColorSelectButton : public QToolButton
+class cxResourceWidgets_EXPORT ColorSelectButton : public QToolButton
 {
   Q_OBJECT
 public:

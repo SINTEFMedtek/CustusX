@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWCONTAINER_H_
 #define CXVIEWCONTAINER_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxConfig.h"
 #include <boost/shared_ptr.hpp>
 #include "vtkForwardDeclarations.h"
@@ -53,7 +55,7 @@ class ViewItem;
  * \author Christian Askeland
  * \ingroup cx_resource_visualization_internal
  */
-class ViewContainer : public QVTKWidget
+class cxResourceVisualization_EXPORT ViewContainer : public QVTKWidget
 {
 	Q_OBJECT
 	typedef QVTKWidget inherited_widget;

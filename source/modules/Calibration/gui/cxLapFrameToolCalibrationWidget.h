@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLAPFRAMETOOLCALIBRATIONWIDGET_H_
 #define CXLAPFRAMETOOLCALIBRATIONWIDGET_H_
 
+#include "cxPluginCalibrationExport.h"
+
 #include "cxTransform3D.h"
 #include "cxVector3D.h"
 #include "cxBaseWidget.h"
@@ -60,7 +62,7 @@ namespace cx
  * \date Feb 8, 2012
  * \author Christian Askeland, SINTEF
  */
-class LapFrameToolCalibrationWidget : public BaseWidget
+class cxPluginCalibration_EXPORT LapFrameToolCalibrationWidget : public BaseWidget
 {
   Q_OBJECT
 
@@ -96,7 +98,7 @@ private:
  *  - q: Position (matrix) of calibration position on the calibration frame.
  *  - pr: patient reference
  */
-class LapFrameToolCalibrationCalculator
+class cxPluginCalibration_EXPORT LapFrameToolCalibrationCalculator
 {
 public:
   LapFrameToolCalibrationCalculator(ToolPtr tool, ToolPtr calRef, double cameraAngle);

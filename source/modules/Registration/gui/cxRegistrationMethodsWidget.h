@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONMETHODSWIDGET_H_
 #define CXREGISTRATIONMETHODSWIDGET_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include "cxTabbedWidget.h"
 #include "cxRegistrationBaseWidget.h"
 
@@ -43,7 +45,7 @@ namespace cx
  * @{
  */
 
-class LandmarkRegistrationsWidget : public TabbedWidget
+class cxPluginRegistration_EXPORT LandmarkRegistrationsWidget : public TabbedWidget
 {
 public:
   LandmarkRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle);
@@ -51,7 +53,7 @@ public:
   virtual QString defaultWhatsThis() const;
 };
 //------------------------------------------------------------------------------
-class FastRegistrationsWidget : public TabbedWidget
+class cxPluginRegistration_EXPORT FastRegistrationsWidget : public TabbedWidget
 {
 public:
   FastRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle);
@@ -59,7 +61,7 @@ public:
   virtual QString defaultWhatsThis() const;
 };
 //------------------------------------------------------------------------------
-class Image2ImageRegistrationWidget : public TabbedWidget
+class cxPluginRegistration_EXPORT Image2ImageRegistrationWidget : public TabbedWidget
 {
 public:
   Image2ImageRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle);
@@ -67,7 +69,7 @@ public:
   virtual QString defaultWhatsThis() const;
 };
 //------------------------------------------------------------------------------
-class Image2PlateRegistrationWidget : public TabbedWidget
+class cxPluginRegistration_EXPORT Image2PlateRegistrationWidget : public TabbedWidget
 {
 public:
   Image2PlateRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle);
@@ -76,7 +78,7 @@ public:
 };
 //------------------------------------------------------------------------------
 
-class ManualRegistrationsWidget : public TabbedWidget
+class cxPluginRegistration_EXPORT ManualRegistrationsWidget : public TabbedWidget
 {
 public:
 	ManualRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle);
@@ -85,7 +87,7 @@ public:
 };
 //------------------------------------------------------------------------------
 
-class RegistrationMethodsWidget : public TabbedWidget
+class cxPluginRegistration_EXPORT RegistrationMethodsWidget : public TabbedWidget
 {
 	Q_OBJECT
 public:

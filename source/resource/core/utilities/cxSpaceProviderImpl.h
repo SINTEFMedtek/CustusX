@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSPACEPROVIDERIMPL_H
 #define CXSPACEPROVIDERIMPL_H
 
+#include "cxResourceExport.h"
+
 #include "cxSpaceProvider.h"
 #include "cxForwardDeclarations.h"
 
@@ -47,7 +49,7 @@ class DataManager;
  * \date 2014-02-21
  * \author christiana
  */
-class SpaceProviderImpl : public SpaceProvider
+class cxResource_EXPORT SpaceProviderImpl : public SpaceProvider
 {
 public:
 	SpaceProviderImpl(TrackingServicePtr toolManager, DataServicePtr dataManager);

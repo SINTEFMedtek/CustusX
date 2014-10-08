@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFILEWATCHERWIDGET_H_
 #define CXFILEWATCHERWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include "cxBaseWidget.h"
 #include "boost/shared_ptr.hpp"
 
@@ -51,7 +53,7 @@ namespace cx
  * \date Nov 7, 2012
  * \author Janne Beate Bakeng, SINTEF
  */
-class FileWatcherWidget : public BaseWidget
+class cxResourceWidgets_EXPORT FileWatcherWidget : public BaseWidget
 {
 	Q_OBJECT
 

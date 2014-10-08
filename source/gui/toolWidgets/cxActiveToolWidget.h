@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXACTIVETOOLWIDGET_H_
 #define CXACTIVETOOLWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 
 namespace cx
@@ -46,7 +48,7 @@ namespace cx
  * \date May 4, 2011
  * \author Christian Askeland, SINTEF
  */
-class ActiveToolWidget : public BaseWidget
+class cxGui_EXPORT ActiveToolWidget : public BaseWidget
 {
   Q_OBJECT
 public:

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXBINARYTHINNINGIMAGEFILTER3DFILTER_H
 #define CXBINARYTHINNINGIMAGEFILTER3DFILTER_H
 
+#include "cxPluginAlgorithmExport.h"
+
 #include "cxFilterImpl.h"
 
 namespace cx
@@ -45,7 +47,7 @@ namespace cx
  * \date 11 22, 2012
  * \author christiana
  */
-class BinaryThinningImageFilter3DFilter : public FilterImpl
+class cxPluginAlgorithm_EXPORT BinaryThinningImageFilter3DFilter : public FilterImpl
 {
 	Q_OBJECT
 

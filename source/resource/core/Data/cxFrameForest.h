@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFRAMEFOREST_H_
 #define CXFRAMEFOREST_H_
 
+#include "cxResourceExport.h"
+
 #include "cxForwardDeclarations.h"
 
 #include <QDomDocument>
@@ -81,7 +83,7 @@ class DataManager;
  *  \date   Sep 23, 2010
  *  \author christiana
  */
-class FrameForest
+class cxResource_EXPORT FrameForest
 {
 public:
 	explicit FrameForest(const std::map<QString, DataPtr>& source);

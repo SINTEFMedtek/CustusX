@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSAMPLERWIDGET_H
 #define CXSAMPLERWIDGET_H
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 
 #include "cxStringDataAdapterXml.h"
@@ -50,7 +52,7 @@ namespace cx
  * \date feb 1, 2013, 2013
  * \author christiana
  */
-class SamplerWidget : public BaseWidget
+class cxGui_EXPORT SamplerWidget : public BaseWidget
 {
 	Q_OBJECT
 public:

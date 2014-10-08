@@ -19,6 +19,7 @@ SET( MOC_HEADER_FILES
    gui/cxUsReconstructionPlugin.h
     )
 
+cx_remove_duplicate_include_directories()
 QT5_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
 # library
@@ -40,6 +41,7 @@ SET( SOURCE_FILES
     logic/cxSyntheticVolume.h
     logic/cxSyntheticVolume.cpp
     logic/cxSimpleSyntheticVolume.h
+    logic/cxSimpleSyntheticVolume.cpp
     gui/cxReconstructionWidget.cpp
     gui/cxReconstructOutputValueParamsInterfaces.cpp
     gui/cxReconstructOutputValueParamsInterfaces.h
@@ -73,6 +75,13 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
     ${CustusX_SOURCE_DIR}/source/gui/utilities
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
+    ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
+    ${CustusX_BINARY_DIR}/source/logic
+    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
+    ${CustusX_BINARY_DIR}/source/service/patient
+    ${CustusX_BINARY_DIR}/source/service/visualization
+    ${CustusX_BINARY_DIR}/source/resource/widgets
+    ${CustusX_BINARY_DIR}/source/modules/Algorithm
     )
 
 SET( cxPluginUSReconstruction_LIB_FILES
@@ -94,6 +103,8 @@ if( CX_USE_OPENCL_UTILITY )
 endif()
 
 # =========================================================
+cx_create_export_header("cxPluginUSReconstruction")
+
 # create the target
 add_library( cxPluginUSReconstruction ${SOURCE_FILES} )
 target_link_libraries( cxPluginUSReconstruction ${cxPluginUSReconstruction_LIB_FILES})

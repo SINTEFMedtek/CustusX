@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDUMMYTOOLMANAGER_H_
 #define CXDUMMYTOOLMANAGER_H_
 
+#include "cxResourceExport.h"
+
 #include "cxToolManager.h"
 #include "cxDummyTool.h"
 
@@ -47,7 +49,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_tool
  */
-class DummyToolManager : public ToolManager
+class cxResource_EXPORT DummyToolManager : public ToolManager
 {
 	Q_OBJECT
 

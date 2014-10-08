@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCOLORSELECTWIDGET_H_
 #define CXCOLORSELECTWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QWidget>
 #include <QCheckBox>
 #include <QLabel>
@@ -49,7 +51,7 @@ namespace cx
  * \date 11/22/2012, 2012
  * \author christiana
  */
-class ColorSelectWidget: public OptimizedUpdateWidget
+class cxResourceWidgets_EXPORT ColorSelectWidget: public OptimizedUpdateWidget
 {
 Q_OBJECT
 public:

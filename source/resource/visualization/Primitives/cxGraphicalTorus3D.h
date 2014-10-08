@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXGRAPHICALTORUS3D_H
 #define CXGRAPHICALTORUS3D_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include "cxVector3D.h"
@@ -49,7 +51,7 @@ namespace cx
  * \date 12.02.2014-02-12
  * \author christiana
  */
-class GraphicalTorus3D
+class cxResourceVisualization_EXPORT GraphicalTorus3D
 {
 	public:
 		GraphicalTorus3D(vtkRendererPtr renderer = vtkRendererPtr());

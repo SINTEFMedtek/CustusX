@@ -3,7 +3,7 @@
 
 #include "vtkThinPlateSplineTransform.h"
 
-class HackTPSTransform: vtkThinPlateSplineTransform
+class HackTPSTransform : vtkThinPlateSplineTransform
 {
   
 public:

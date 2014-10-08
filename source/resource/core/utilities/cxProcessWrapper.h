@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPROCESSWRAPPER_H_
 #define CXPROCESSWRAPPER_H_
 
+#include "cxResourceExport.h"
+
 #include <QObject>
 #include "boost/shared_ptr.hpp"
 #include <QStringList>
@@ -58,7 +60,7 @@ typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
  *  \author Christian Askeland, SINTEF
  *  \author Janne Beate Bakeng, SINTEF
  */
-class ProcessWrapper : public QObject
+class cxResource_EXPORT ProcessWrapper : public QObject
 {
 	Q_OBJECT
 public:

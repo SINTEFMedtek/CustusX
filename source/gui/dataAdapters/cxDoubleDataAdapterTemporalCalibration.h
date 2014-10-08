@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDOUBLEDATAADAPTERTEMPORALCALIBRATION_H_
 #define CXDOUBLEDATAADAPTERTEMPORALCALIBRATION_H_
 
+#include "cxGuiExport.h"
+
 #include "cxDoubleDataAdapter.h"
 #include "cxForwardDeclarations.h"
 #include "cxLegacySingletons.h"
@@ -46,7 +48,7 @@ namespace cx
 
 /** Interface to the tool offset of the dominant tool
  */
-class DoubleDataAdapterTimeCalibration : public DoubleDataAdapter
+class cxGui_EXPORT DoubleDataAdapterTimeCalibration : public DoubleDataAdapter
 {
   Q_OBJECT
 public:

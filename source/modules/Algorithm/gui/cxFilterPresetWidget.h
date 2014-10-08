@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFILTERPRESETWIDGET_H_
 #define CXFILTERPRESETWIDGET_H_
 
+#include "cxPluginAlgorithmExport.h"
+
 #include "cxPresetWidget.h"
 
 #include "cxForwardDeclarations.h"
@@ -49,7 +51,7 @@ namespace cx {
  * \date Mar 18, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
-class FilterPresetWidget : public PresetWidget
+class cxPluginAlgorithm_EXPORT FilterPresetWidget : public PresetWidget
 {
 	Q_OBJECT
 

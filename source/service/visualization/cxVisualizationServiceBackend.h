@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVISUALIZATIONSERVICEBACKEND_H
 #define CXVISUALIZATIONSERVICEBACKEND_H
 
+#include "cxVisualizationServiceExport.h"
+
 #include "boost/shared_ptr.hpp"
 #include "cxForwardDeclarations.h"
 
@@ -49,7 +51,7 @@ typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServic
  * \date 2014-02-23
  * \author christiana
  */
-class VisualizationServiceBackend
+class cxVisualizationService_EXPORT VisualizationServiceBackend
 {
 public:
 	VisualizationServiceBackend(DataServicePtr dataManager,

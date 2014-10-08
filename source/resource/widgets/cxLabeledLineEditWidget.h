@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLABELEDLINEEDITWIDGET_H_
 #define CXLABELEDLINEEDITWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QWidget>
 #include <QSlider>
 #include <QLineEdit>
@@ -51,7 +53,7 @@ namespace cx
  *
  * \ingroup cx_resource_widgets
  */
-class LabeledLineEditWidget: public OptimizedUpdateWidget
+class cxResourceWidgets_EXPORT LabeledLineEditWidget: public OptimizedUpdateWidget
 {
 Q_OBJECT
 public:

@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGEMAPPERMONITOR_H
 #define CXIMAGEMAPPERMONITOR_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include <set>
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -52,7 +54,7 @@ typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
  * \ingroup cx_resource_visualization
  * \author christiana
  */
-class ImageMapperMonitor : public QObject
+class cxResourceVisualization_EXPORT ImageMapperMonitor : public QObject
 {
 	Q_OBJECT
 public:

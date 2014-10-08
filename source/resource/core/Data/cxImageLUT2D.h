@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGELUT2D_H_
 #define CXIMAGELUT2D_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 class QDomElement;
 class QDomNode;
 
@@ -62,7 +65,7 @@ typedef boost::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
  *  Created on: Jan 9, 2009
  *      Author: christiana
  */
-class ImageLUT2D: public ImageTFData
+class cxResource_EXPORT ImageLUT2D: public ImageTFData
 {
 Q_OBJECT
 public:

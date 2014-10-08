@@ -32,6 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATAFACTORY_H
 #define CXDATAFACTORY_H
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include "cxForwardDeclarations.h"
 
 namespace cx
@@ -47,7 +50,7 @@ class DataManager;
  * \date 2014-02-22
  * \author christiana
  */
-class DataFactory
+class cxResource_EXPORT DataFactory
 {
 public:
 	explicit DataFactory(DataServicePtr dataManager, SpaceProviderPtr spaceProvider);

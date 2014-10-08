@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDICOMWIDGET_H_
 #define CXDICOMWIDGET_H_
 
+#include "org_custusx_dicom_Export.h"
+
 #include "cxBaseWidget.h"
 #include "boost/shared_ptr.hpp"
 class QItemSelection;
@@ -44,7 +46,7 @@ class ctkDICOMDatabase;
 namespace cx
 {
 class DICOMAppWidget;
-	typedef boost::shared_ptr<class Image> ImagePtr;
+typedef boost::shared_ptr<class Image> ImagePtr;
 
 /**
  * Widget for dicom interaction
@@ -54,7 +56,7 @@ class DICOMAppWidget;
  * \date 2014-05-02
  * \author Christian Askeland
  */
-class DicomWidget : public BaseWidget
+class org_custusx_dicom_EXPORT DicomWidget : public BaseWidget
 {
 	Q_OBJECT
 public:

@@ -35,6 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXANGLEMETRIC_H_
 #define CXANGLEMETRIC_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include "cxDataMetric.h"
 #include "cxPointMetric.h"
 #include "cxDataManagerImpl.h"
@@ -62,7 +65,7 @@ typedef boost::shared_ptr<class AngleMetric> AngleMetricPtr;
  * \date Jul 27, 2011
  * \author Christian Askeland, SINTEF
  */
-class AngleMetric: public DataMetric
+class cxResource_EXPORT AngleMetric : public DataMetric
 {
 Q_OBJECT
 public:

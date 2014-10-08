@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTYPECONVERSIONS_H_
 #define CXTYPECONVERSIONS_H_
 
+#include "cxResourceExport.h"
+
 #include <string>
 #include <vector>
 #include <QString>
@@ -61,14 +63,15 @@ std::string string_cast(const T& val)
 /**Convenience function that converts a type to its 
  * QString representation, provided it has defined operator <<.
  */
-template<class T> QString qstring_cast(const T& val)
+template<class T>
+QString qstring_cast(const T& val)
 {
 	return QString::fromStdString(string_cast(val));
 }
 
 /**utitity class for the cstring_cast function
  */
-class cstring_cast_Placeholder
+class cxResource_EXPORT cstring_cast_Placeholder
 {
 public:
 	explicit cstring_cast_Placeholder(const QString& val) : mData(val.toStdString()) {}
@@ -83,21 +86,22 @@ private:
  * char* representation, provided it has defined operator <<
  * or is QString or QVariant
  */
-template<class T> cstring_cast_Placeholder cstring_cast(const T& val)
+template<class T>
+cstring_cast_Placeholder cstring_cast(const T& val)
 {
 	return cstring_cast_Placeholder(string_cast(val));
 }
-template<> cstring_cast_Placeholder cstring_cast<QString>(const QString& val);
-template<> cstring_cast_Placeholder cstring_cast<QVariant>(const QVariant& val);
+template<> cxResource_EXPORT cstring_cast_Placeholder cstring_cast<QString>(const QString& val);
+template<> cxResource_EXPORT cstring_cast_Placeholder cstring_cast<QVariant>(const QVariant& val);
 
 /** Helper function overload for streaming a QString to std::cout.
  */
-std::ostream& operator<<(std::ostream& str, const QString& qstring);
+cxResource_EXPORT std::ostream& operator<<(std::ostream& str, const QString& qstring);
 
 /** Helper function for converting a QString to a list of doubles.
  *  Useful for reading vectors/matrices.
  */
-std::vector<double> convertQString2DoubleVector(const QString& input, bool* ok=0);
+cxResource_EXPORT std::vector<double> convertQString2DoubleVector(const QString& input, bool* ok=0);
 
 /** Helper function template for streaming an object to string.
  *  The streamed object must support the method void addXml(QDomNode).
@@ -112,9 +116,10 @@ QString streamXml2String(T& val)
 	val.addXml(root);
 	return doc.toString();
 }
+template<> cxResource_EXPORT QString streamXml2String(QString& val);
 
-QString color2string(QColor color);
-QColor string2color(QString input, QColor defaultValue=QColor("green"));
+cxResource_EXPORT QString color2string(QColor color);
+cxResource_EXPORT QColor string2color(QString input, QColor defaultValue=QColor("green"));
 
 /**
  * \}

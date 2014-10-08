@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDICOMIMAGEREADER_H
 #define CXDICOMIMAGEREADER_H
 
+#include "org_custusx_dicom_Export.h"
+
 #include "ctkDICOMDatabase.h"
 #include "cxTypeConversions.h"
 #include "cxTime.h"
@@ -60,7 +62,7 @@ typedef boost::shared_ptr<class DicomImageReader> DicomImageReaderPtr;
  * \date 2014-05-13
  * \author christiana
  */
-class DicomImageReader
+class org_custusx_dicom_EXPORT DicomImageReader
 {
 public:
 	struct WindowLevel

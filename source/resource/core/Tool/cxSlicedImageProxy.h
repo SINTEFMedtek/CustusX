@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSLICEDIMAGEPROXY_H_
 #define CXSLICEDIMAGEPROXY_H_
 
+#include "cxResourceExport.h"
+
 #include "cxIndent.h"
 #include "cxTransform3D.h"
 #include "vtkForwardDeclarations.h"
@@ -63,7 +65,7 @@ typedef boost::shared_ptr<class ApplyLUTToImage2DProxy> ApplyLUTToImage2DProxyPt
  *
  * \ingroup cx_resource_core_tool
  */
-class ApplyLUTToImage2DProxy : public QObject
+class cxResource_EXPORT ApplyLUTToImage2DProxy : public QObject
 {
 Q_OBJECT
 public:
@@ -91,7 +93,7 @@ private:
  *
  * \ingroup cx_resource_visualization
  */
-class SlicedImageProxy : public QObject
+class cxResource_EXPORT SlicedImageProxy : public QObject
 {
 Q_OBJECT
 public:

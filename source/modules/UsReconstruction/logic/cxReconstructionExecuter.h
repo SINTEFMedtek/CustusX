@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRECONSTRUCTIONEXECUTER_H_
 #define CXRECONSTRUCTIONEXECUTER_H_
 
+#include "cxPluginUSReconstructionExport.h"
+
 #include "boost/shared_ptr.hpp"
 #include <QObject>
 #include <set>
@@ -47,7 +49,7 @@ namespace cx
 typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
 typedef boost::shared_ptr<class ReconstructionExecuter> ReconstructionExecuterPtr;
 
-class ReconstructionExecuter : public QObject
+class cxPluginUSReconstruction_EXPORT ReconstructionExecuter : public QObject
 {
 	Q_OBJECT
 public:

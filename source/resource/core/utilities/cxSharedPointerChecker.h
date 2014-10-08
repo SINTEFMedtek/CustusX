@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSHAREDPOINTERCHECKER_H
 #define CXSHAREDPOINTERCHECKER_H
 
+#include "cxResourceExport.h"
+
 #include "boost/shared_ptr.hpp"
 #include <QString>
 
@@ -44,7 +46,7 @@ namespace cx
 * @{
 */
 
-void requireUnique(int use_count, QString objectName);
+cxResource_EXPORT void requireUnique(int use_count, QString objectName);
 
 /** Utility for checking the usage count of share_ptr's
   * and reporting it.

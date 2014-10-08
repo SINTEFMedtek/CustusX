@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLAYOUTREPOSITORY_H
 #define CXLAYOUTREPOSITORY_H
 
+#include "cxVisualizationServiceExport.h"
+
 #include "cxForwardDeclarations.h"
 #include <vector>
 #include "cxXmlOptionItem.h"
@@ -49,7 +51,7 @@ class LayoutData;
  * \date 2014-02-07
  * \author christiana
  */
-class LayoutRepository
+class cxVisualizationService_EXPORT LayoutRepository
 {
 public:
 	LayoutRepository();

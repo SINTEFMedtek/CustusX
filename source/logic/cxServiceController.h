@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSERVICECONTROLLER_H_
 #define CXSERVICECONTROLLER_H_
 
+#include "cxLogicManagerExport.h"
+
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 #include "cxForwardDeclarations.h"
@@ -50,7 +52,7 @@ namespace cx
  *
  * Owned by the LogicManager.
  */
-class ServiceController: public QObject
+class cxLogicManager_EXPORT ServiceController: public QObject
 {
 Q_OBJECT
 

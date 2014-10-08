@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCOORDINATESYSTEMHELPERS_H_
 #define CXCOORDINATESYSTEMHELPERS_H_
 
+#include "cxResourceExport.h"
+
 //#include "cxTransform3D.h"
 #include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
@@ -48,7 +50,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_utilities
  */
-struct CoordinateSystem
+struct cxResource_EXPORT CoordinateSystem
 {
     CoordinateSystem() : mId(csCOUNT) {}
 	explicit CoordinateSystem(COORDINATE_SYSTEM id, QString ref="") : mId(id), mRefObject(ref) {}
@@ -61,7 +63,7 @@ struct CoordinateSystem
 	static CoordinateSystem fromString(QString text);
 
 };
-bool operator==(const CoordinateSystem& lhs, const CoordinateSystem& rhs);
+cxResource_EXPORT bool operator==(const CoordinateSystem& lhs, const CoordinateSystem& rhs);
 typedef CoordinateSystem Space;
 
 }//namespace cx

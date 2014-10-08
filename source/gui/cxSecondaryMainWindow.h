@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSECONDARYMAINWINDOW_H_
 #define CXSECONDARYMAINWINDOW_H_
 
+#include "cxGuiExport.h"
+
 #include <QMainWindow>
 
 namespace cx
@@ -46,7 +48,7 @@ namespace cx
  * CustusX scene.
  *
  */
-class SecondaryMainWindow: public QMainWindow
+class cxGui_EXPORT SecondaryMainWindow: public QMainWindow
 {
 Q_OBJECT
 

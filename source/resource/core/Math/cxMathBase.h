@@ -49,6 +49,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMATHBASE_H_
 #define CXMATHBASE_H_
 
+#include "cxPrecompiledHeader.h"
+
+
 // necessary includes for the addons
 #include <boost/array.hpp>
 class QString;

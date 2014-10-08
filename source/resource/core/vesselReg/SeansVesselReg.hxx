@@ -1,6 +1,8 @@
 #ifndef SeansVesselSegmentation_hxx
 #define SeansVesselSegmentation_hxx
 
+#include "cxResourceExport.h"
+
 #include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
 #include "cxTransform3D.h"
@@ -25,13 +27,13 @@ namespace cx
  *  Sean (get full name) - refactored code.
  *
  */
-class SeansVesselReg
+class cxResource_EXPORT SeansVesselReg
 {
 public:
 	/**Helper for storing all running data
 	 * related to the v2v algorithm in one place.
 	 */
-	struct Context
+	struct cxResource_EXPORT Context
 	{
 		vtkCellLocatorPtr mTargetPointLocator; ///< input: target data wrapped in a locator
 		vtkPolyDataPtr mTargetPoints; ///< input: target data

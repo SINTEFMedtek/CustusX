@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFILTERTIMEDALGORITHM_H
 #define CXFILTERTIMEDALGORITHM_H
 
+#include "cxPluginAlgorithmExport.h"
+
 #include "cxThreadedTimedAlgorithm.h"
 
 namespace cx
@@ -46,7 +48,7 @@ typedef boost::shared_ptr<class Filter> FilterPtr;
  * \date Nov 16, 2012
  * \author christiana
  */
-class FilterTimedAlgorithm : public ThreadedTimedAlgorithm<bool>
+class cxPluginAlgorithm_EXPORT FilterTimedAlgorithm : public ThreadedTimedAlgorithm<bool>
 {
 	Q_OBJECT
 

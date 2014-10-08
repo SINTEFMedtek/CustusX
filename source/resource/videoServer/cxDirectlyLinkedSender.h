@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDirectlyLinkedSender_H_
 #define CXDirectlyLinkedSender_H_
 
+#include "cxGrabberExport.h"
+
 #include "cxSender.h"
 
 #include <QObject>
@@ -49,7 +51,7 @@ namespace cx
  * \ingroup cx_resource_videoserver
  *
  */
-class DirectlyLinkedSender : public SenderImpl
+class cxGrabber_EXPORT DirectlyLinkedSender : public SenderImpl
 {
 	Q_OBJECT
 

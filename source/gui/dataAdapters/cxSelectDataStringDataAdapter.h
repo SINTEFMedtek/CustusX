@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSELECTDATASTRINGDATAADAPTER_H
 #define CXSELECTDATASTRINGDATAADAPTER_H
 
+#include "cxGuiExport.h"
+
 #include "cxStringDataAdapter.h"
 #include "cxForwardDeclarations.h"
 #include "cxLegacySingletons.h"
@@ -41,7 +43,7 @@ namespace cx
 
 /** Base class for all DataAdapters that selects a Data or descendants.
  */
-class SelectDataStringDataAdapterBase : public StringDataAdapter
+class cxGui_EXPORT SelectDataStringDataAdapterBase : public StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -81,7 +83,7 @@ typedef boost::shared_ptr<class ActiveImageStringDataAdapter> ActiveImageStringD
  * where active image is the value
  * and DataName is taken from the valuerange
  */
-class ActiveImageStringDataAdapter : public SelectDataStringDataAdapterBase
+class cxGui_EXPORT ActiveImageStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
@@ -100,7 +102,7 @@ typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringD
  * The image is stored internally in the adapter.
  * Use setValue/getValue plus changed() to access it.
  */
-class SelectImageStringDataAdapter : public SelectDataStringDataAdapterBase
+class cxGui_EXPORT SelectImageStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
@@ -125,7 +127,7 @@ typedef boost::shared_ptr<class SelectDataStringDataAdapter> SelectDataStringDat
  * The data is stored internally in the adapter.
  * Use setValue/getValue plus changed() to access it.
  */
-class SelectDataStringDataAdapter : public SelectDataStringDataAdapterBase
+class cxGui_EXPORT SelectDataStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
@@ -152,7 +154,7 @@ typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDat
  * The image is stored internally in the adapter.
  * Use setValue/getValue plus changed() to access it.
  */
-class SelectMeshStringDataAdapter : public SelectDataStringDataAdapterBase
+class cxGui_EXPORT SelectMeshStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:

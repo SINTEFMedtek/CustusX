@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXALGORITHMHELPERS_H_
 #define CXALGORITHMHELPERS_H_
 
+#include "cxResourceExport.h"
+
 #include "ItkVtkGlue/itkImageToVTKImageFilter.h"
 #include "ItkVtkGlue/itkVTKImageToImageFilter.h"
 #include <itkImage.h>
@@ -58,7 +60,7 @@ typedef itk::VTKImageToImageFilter<itkImageType> itkVTKImageToImageFilterType;
  * \date Feb 16, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class AlgorithmHelper
+class cxResource_EXPORT AlgorithmHelper
 {
 public:
   static itkImageType::ConstPointer getITKfromSSCImage(ImagePtr image);

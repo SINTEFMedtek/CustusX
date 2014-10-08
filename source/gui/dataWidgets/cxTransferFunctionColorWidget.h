@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRANSFERFUNCTIONCOLORWIDGET_H_
 #define CXTRANSFERFUNCTIONCOLORWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 
 #include "cxImage.h"
@@ -54,7 +56,7 @@ namespace cx
  * \date Apr 01, 2009
  * \\author Ole Vegard Solberg, SINTEF
  */
-class TransferFunctionColorWidget : public BaseWidget
+class cxGui_EXPORT TransferFunctionColorWidget : public BaseWidget
 {
   Q_OBJECT
   

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIGSTKTOOL_H_
 #define CXIGSTKTOOL_H_
 
+#include "cxTrackingServiceExport.h"
+
 #include <QObject>
 #include "cxToolUsingIGSTK.h"
 
@@ -67,7 +69,7 @@ typedef boost::weak_ptr<IgstkTool> IgstkToolWeakPtr;
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class IgstkTool: public QObject
+class cxTrackingService_EXPORT IgstkTool: public QObject
 {
 Q_OBJECT
 

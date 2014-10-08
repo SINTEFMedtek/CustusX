@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLOGICMANAGER_H_
 #define CXLOGICMANAGER_H_
 
+#include "cxLogicManagerExport.h"
+
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 #include "cxForwardDeclarations.h"
@@ -58,7 +60,7 @@ typedef boost::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
  * The service layer are managed via the ServiceController aggregate member.
  *
  */
-class LogicManager : public QObject
+class cxLogicManager_EXPORT LogicManager : public QObject
 {
 	Q_OBJECT
 public:
@@ -143,7 +145,7 @@ private:
 	PluginFrameworkManagerPtr mPluginFramework;
 };
 
-LogicManager* logicManager(); // if necessary
+cxLogicManager_EXPORT LogicManager* logicManager(); // if necessary
 
 /**
 * @}

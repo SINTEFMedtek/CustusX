@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGEDATACONTAINER_H
 #define CXIMAGEDATACONTAINER_H
 
+#include "cxResourceExport.h"
+
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include <vector>
@@ -50,7 +52,7 @@ namespace cx
  * \date Dec 04 2012
  * \author christiana
  */
-class CachedImageData
+class cxResource_EXPORT CachedImageData
 {
 public:
 	/**
@@ -81,7 +83,7 @@ typedef boost::shared_ptr<CachedImageData> CachedImageDataPtr;
  * \date Dec 04 2012
  * \author christiana
  */
-class ImageDataContainer
+class cxResource_EXPORT ImageDataContainer
 {
 public:
 	virtual ~ImageDataContainer() {}
@@ -99,7 +101,7 @@ typedef boost::shared_ptr<ImageDataContainer> ImageDataContainerPtr;
  * \date Dec 04 2012
  * \author christiana
  */
-class CachedImageDataContainer : public ImageDataContainer
+class cxResource_EXPORT CachedImageDataContainer : public ImageDataContainer
 {
 public:
 	CachedImageDataContainer();
@@ -128,7 +130,7 @@ typedef boost::shared_ptr<CachedImageDataContainer> CachedImageDataContainerPtr;
  * \date Dec 04 2012
  * \author christiana
  */
-class SplitFramesContainer : public ImageDataContainer
+class cxResource_EXPORT SplitFramesContainer : public ImageDataContainer
 {
 public:
 	SplitFramesContainer(vtkImageDataPtr image3D);
@@ -146,7 +148,7 @@ private:
  * \date Nov 28 2013
  * \author christiana
  */
-class FramesDataContainer : public ImageDataContainer
+class cxResource_EXPORT FramesDataContainer : public ImageDataContainer
 {
 public:
 	FramesDataContainer(std::vector<vtkImageDataPtr> images);

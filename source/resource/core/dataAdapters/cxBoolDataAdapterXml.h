@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXBOOLDATAADAPTERXML_H_
 #define CXBOOLDATAADAPTERXML_H_
 
+#include "cxResourceExport.h"
+
 #include <QDomElement>
 
 #include "cxBoolDataAdapter.h"
@@ -56,7 +58,7 @@ typedef boost::shared_ptr<class BoolDataAdapterXml> BoolDataAdapterXmlPtr;
  *
  * \ingroup cx_resource_core_dataadapters
  */
-class BoolDataAdapterXml: public BoolDataAdapter
+class cxResource_EXPORT BoolDataAdapterXml: public BoolDataAdapter
 {
 Q_OBJECT
 public:

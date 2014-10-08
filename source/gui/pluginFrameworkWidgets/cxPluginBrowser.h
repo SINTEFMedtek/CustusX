@@ -53,27 +53,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#ifndef CTKPLUGINBROWSER_H
-#define CTKPLUGINBROWSER_H
+#ifndef CXPLUGINBROWSER_H
+#define CXPLUGINBROWSER_H
+
+#include "cxGuiExport.h"
 
 #include <QMainWindow>
 
+#include <ctkServiceEvent.h>
 #include <ctkPluginEvent.h>
 #include <ctkPluginFrameworkEvent.h>
 #include <ctkPlugin.h>
-#include <ctkServiceEvent.h>
 #include <QModelIndex>
 #include "cxPluginFramework.h"
 #include "cxMultiFileInputWidget.h"
 
 class QTableView;
 class ctkPluginFramework;
+class cxtServiceEvent;
 
 namespace cx
 {
 class ctkPluginTableModel;
 
-class ctkPluginBrowser : public QMainWindow
+class cxGui_EXPORT ctkPluginBrowser : public QMainWindow
 {
   Q_OBJECT
 
@@ -129,7 +132,7 @@ private:
 
 };
 
-}
+} //namespace cx
 
 
-#endif // CTKPLUGINBROWSER_H
+#endif // CXPLUGINBROWSER_H

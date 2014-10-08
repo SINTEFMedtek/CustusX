@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSLICECOMPUTER_H_
 #define CXSLICECOMPUTER_H_
 
+#include "cxResourceExport.h"
+
 #include "cxTransform3D.h"
 #include "cxDefinitions.h"
 
@@ -44,7 +46,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_utilities
  */
-class SlicePlane
+class cxResource_EXPORT SlicePlane
 {
 public:
 	SlicePlane() {}
@@ -54,8 +56,8 @@ public:
 	Vector3D j; ///< defines the second axis of the plane. unit vector
 };
 
-std::ostream& operator<<(std::ostream& s, const SlicePlane& val);
-bool similar(const SlicePlane& a, const SlicePlane& b);
+cxResource_EXPORT std::ostream& operator<<(std::ostream& s, const SlicePlane& val);
+cxResource_EXPORT bool similar(const SlicePlane& a, const SlicePlane& b);
 
 
 /**\brief Calculates a slice plane given a definition.
@@ -69,7 +71,7 @@ bool similar(const SlicePlane& a, const SlicePlane& b);
  *
  * \ingroup cx_resource_core_utilities
  */
-class SliceComputer
+class cxResource_EXPORT SliceComputer
 {
 public:
 	SliceComputer();

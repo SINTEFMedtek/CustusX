@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTEMPORALCALIBRATIONWIDGET_H_
 #define CXTEMPORALCALIBRATIONWIDGET_H_
 
+#include "cxPluginCalibrationExport.h"
+
 #include "cxBaseWidget.h"
 #include "cxRecordSessionWidget.h"
 #include <QFuture>
@@ -51,7 +53,7 @@ namespace cx
 /** GUI for performing temporal calibration
  *
  */
-class TemporalCalibrationWidget : public BaseWidget
+class cxPluginCalibration_EXPORT TemporalCalibrationWidget : public BaseWidget
 {
   Q_OBJECT
 public:

@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCAMERACONTROL_H_
 #define CXCAMERACONTROL_H_
 
+#include "cxVisualizationServiceExport.h"
+
 #include <vector>
 #include "cxVector3D.h"
 //#include "cxDoubleWidgets.h"
@@ -63,7 +65,7 @@ typedef boost::shared_ptr<class CameraData> CameraDataPtr;
 
 /** Class encapsulating the view transform of a camera. Use with vtkCamera
  */
-class CameraData
+class cxVisualizationService_EXPORT CameraData
 {
 public:
 	CameraData();
@@ -85,7 +87,7 @@ private:
 /**Utility class for 3D camera control.
  *
  */
-class CameraControl: public QObject
+class cxVisualizationService_EXPORT CameraControl: public QObject
 {
 Q_OBJECT
 

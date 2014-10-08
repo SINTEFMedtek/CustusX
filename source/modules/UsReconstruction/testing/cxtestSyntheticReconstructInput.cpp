@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDummyTool.h"
 #include "cxSimpleSyntheticVolume.h"
 #include "cxtestSphereSyntheticVolume.h"
+#include "cxTypeConversions.h"
 
 namespace cxtest
 {

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLDATAADAPTERS_H_
 #define CXTOOLDATAADAPTERS_H_
 
+#include "cxGuiExport.h"
+
 #include "cxStringDataAdapter.h"
 #include "cxTool.h"
 #include "cxLegacySingletons.h"
@@ -48,7 +50,7 @@ namespace cx
 
 /** Adapter that connects to the current active tool.
  */
-class ActiveToolStringDataAdapter : public StringDataAdapter
+class cxGui_EXPORT ActiveToolStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -74,7 +76,7 @@ typedef boost::shared_ptr<class ActiveProbeConfigurationStringDataAdapter> Activ
  *  It will stick to the probe as much as possible,
  *  i.e. ignore hiding and showing of other non-probes.
  */
-class ActiveProbeConfigurationStringDataAdapter : public StringDataAdapter
+class cxGui_EXPORT ActiveProbeConfigurationStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:

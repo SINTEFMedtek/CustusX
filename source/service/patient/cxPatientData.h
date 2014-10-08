@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPATIENTDATA_H_
 #define CXPATIENTDATA_H_
 
+#include "cxPatientServiceExport.h"
+
 #include "boost/shared_ptr.hpp"
 #include <QString>
 #include <QObject>
@@ -59,7 +61,7 @@ class DataManager;
  * necessary.
  *
  */
-QDomElement getElementForced(QDomNode root, QString path);
+cxPatientService_EXPORT QDomElement getElementForced(QDomNode root, QString path);
 
 /**
  * \brief Functionality for storing patient data in a folder on the disk
@@ -74,7 +76,7 @@ QDomElement getElementForced(QDomNode root, QString path);
  *   \author christiana
  *
  */
-class PatientData: public QObject
+class cxPatientService_EXPORT PatientData: public QObject
 {
 Q_OBJECT
 public:

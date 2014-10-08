@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSLICERREPSW_H_
 #define CXSLICERREPSW_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxRepImpl.h"
 
 #include "cxForwardDeclarations.h"
@@ -56,7 +58,7 @@ typedef boost::shared_ptr<class SliceProxyInterface> SliceProxyInterfacePtr;
  * \ingroup cx_resource_visualization
  * \ingroup cx_resource_visualization_rep2D
  */
-class SliceRepSW : public RepImpl
+class cxResourceVisualization_EXPORT SliceRepSW : public RepImpl
 {
 	Q_OBJECT
 public:

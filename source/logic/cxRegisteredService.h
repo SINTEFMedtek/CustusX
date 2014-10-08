@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTEREDSERVICE_H
 #define CXREGISTEREDSERVICE_H
 
+#include "cxLogicManagerExport.h"
+
 #include "boost/shared_ptr.hpp"
 #include <ctkPluginActivator.h>
 
@@ -50,7 +52,7 @@ namespace cx
  *  \author Ole Vegard Solberg, SINTEF
  *  \author Christian Askeland, SINTEF
  */
-class RegisteredService
+class cxLogicManager_EXPORT RegisteredService
 {
 public:
 	template <class SERVICE_TYPE>

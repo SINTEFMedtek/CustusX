@@ -23,9 +23,12 @@ include_directories(
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
     )
 
+cx_remove_duplicate_include_directories()
 QT5_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
-ADD_LIBRARY ( cxPatientService ${cxPatientService_SOURCE} ${MOC_HEADER_FILES})
+cx_create_export_header("cxPatientService")
+
+add_library( cxPatientService ${cxPatientService_SOURCE} ${MOC_HEADER_FILES})
 target_link_libraries(cxPatientService cxResource)
 
 add_subdirectory(testing)

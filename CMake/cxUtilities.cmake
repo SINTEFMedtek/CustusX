@@ -344,6 +344,7 @@ function(cx_add_class_qt_moc SOURCE_FILES_ARGUMENT)
 	endforeach()
 	
 	# optimized: QT5_WRAP_CPP has large overhead: call once.
+        cx_remove_duplicate_include_directories()
 	QT5_WRAP_CPP( RESULT_add_class_qt_moc ${HEADER_NAMES} )
 
     set(${SOURCE_FILES_ARGUMENT} ${${SOURCE_FILES_ARGUMENT}} ${RESULT_add_class_qt_moc} PARENT_SCOPE)
@@ -476,3 +477,78 @@ function(cx_insert_undefined_plugins PLUGINS_VARIABLE PLUGIN_BUILD_OPTION_PREFIX
     set(${PLUGINS_VARIABLE} ${plugins_list} PARENT_SCOPE)
 endfunction()
 
+###############################################################################
+#
+# Utility funciton for printing all variables known to CMake at a given point.
+#
+###############################################################################
+function(cx_print_variables REGEX_TO_MATCH)
+    get_cmake_property(_variableNames VARIABLES)
+    foreach (_variableName ${_variableNames})
+        if(_variableName MATCHES ${REGEX_TO_MATCH})
+            message(STATUS "${_variableName}=${${_variableName}}")
+        endif()
+    endforeach()
+endfunction()
+
+
+###############################################################################
+#
+# Creates a export header.
+#
+# MY_LIBRARY_NAME: Prefix for the export header name
+# OUT_EXPORT_HEADER: Path to the prefix header
+#
+###############################################################################
+macro(cx_create_export_header MY_LIBRARY_NAME)
+    set(MY_EXPORT_HEADER_PREFIX ${MY_LIBRARY_NAME})
+    set(MY_LIBRARY_EXPORT_DIRECTIVE ${MY_LIBRARY_NAME}_EXPORT)
+    set(MY_LIBNAME ${MY_LIBRARY_NAME})
+    configure_file(
+        ${CTK_SOURCE_DIR}/Libs/ctkExport.h.in
+        ${CMAKE_CURRENT_BINARY_DIR}/${MY_LIBRARY_NAME}Export.h
+    )
+    include_directories(
+        ${CMAKE_CURRENT_BINARY_DIR}
+    )
+endmacro()
+
+###############################################################################
+#
+# Removes duplicate include directories.
+#
+# Confirmed on Windows:
+# 1. Speeds up the configuration step significantly when generating a target.
+# 2. Slightly speeds up mocing if used before QT5_WRAP_CPP, because duplicate include
+# directories are removed and thus not added to moc_<filename>.cpp_parameters (the -IC: tags)
+#
+###############################################################################
+macro(cx_remove_duplicate_include_directories)
+    get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+    list(REMOVE_DUPLICATES dirs)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES ${dirs})
+endmacro()
+
+
+###############################################################################
+#
+# http://stackoverflow.com/questions/148570/using-pre-compiled-headers-with-cmake
+#
+###############################################################################
+MACRO(ADD_MSVC_PRECOMPILED_HEADER PrecompiledHeader PrecompiledSource SourcesVar)
+  IF(MSVC)
+    MESSAGE(STATUS "Generating precompiled headers.")
+    GET_FILENAME_COMPONENT(PrecompiledBasename ${PrecompiledHeader} NAME_WE)
+    SET(PrecompiledBinary "${CMAKE_CURRENT_BINARY_DIR}/${PrecompiledBasename}.pch")
+    SET(Sources ${${SourcesVar}})
+
+    SET_SOURCE_FILES_PROPERTIES(${PrecompiledSource}
+                                PROPERTIES COMPILE_FLAGS "/Yc\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
+                                           OBJECT_OUTPUTS "${PrecompiledBinary}")
+    SET_SOURCE_FILES_PROPERTIES(${Sources}
+                                PROPERTIES COMPILE_FLAGS "/Yu\"${PrecompiledHeader}\" /FI\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
+                                           OBJECT_DEPENDS "${PrecompiledBinary}")
+    # Add precompiled header to SourcesVar
+    LIST(APPEND ${SourcesVar} ${PrecompiledSource})
+  ENDIF(MSVC)
+ENDMACRO(ADD_MSVC_PRECOMPILED_HEADER)

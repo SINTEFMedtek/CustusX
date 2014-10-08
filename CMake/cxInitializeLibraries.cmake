@@ -180,6 +180,7 @@ macro(cx_initialize_QT)
     find_package(Qt5Network REQUIRED)
     find_package(Qt5Concurrent REQUIRED) # attempt to remove warning in cmake
     find_package(Qt5Multimedia REQUIRED)
+    find_package(Qt5OpenGL REQUIRED)
 endmacro()
 
 ###############################################################################

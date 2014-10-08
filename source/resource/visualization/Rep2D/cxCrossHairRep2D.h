@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCROSSHAIRREP2D_H_
 #define CXCROSSHAIRREP2D_H_
 
+#include "cxResourceVisualizationExport.h"
+
 //#include <vtkSmartPointer.h>
 #include "cxRepImpl.h"
 #include "cxTransform3D.h"
@@ -60,7 +62,7 @@ typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
  * \ingroup cx_resource_visualization
  * \ingroup cx_resource_visualization_rep2D
  */
-class CrossHairRep2D : public RepImpl
+class cxResourceVisualization_EXPORT CrossHairRep2D : public RepImpl
 {
 	Q_OBJECT
 public:

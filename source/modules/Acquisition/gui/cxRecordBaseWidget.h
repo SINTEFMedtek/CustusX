@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRECORDBASEWIDGET_H_
 #define CXRECORDBASEWIDGET_H_
 
+#include "cxPluginAcquisitionExport.h"
+
 #include <QWidget>
 #include "cxBaseWidget.h"
 #include "cxTool.h"
@@ -63,7 +65,7 @@ class RecordSessionWidget;
  * \date Dec 9, 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class RecordBaseWidget : public BaseWidget
+class cxPluginAcquisition_EXPORT  RecordBaseWidget : public BaseWidget
 {
   Q_OBJECT
 
@@ -87,7 +89,7 @@ protected:
  * \date Dec 17, 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class TrackedRecordWidget : public RecordBaseWidget
+class cxPluginAcquisition_EXPORT  TrackedRecordWidget : public RecordBaseWidget
 {
   Q_OBJECT
 public:

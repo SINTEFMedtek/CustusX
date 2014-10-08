@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLEGACYSINGLETONS_H
 #define CXLEGACYSINGLETONS_H
 
+#include "cxLogicManagerExport.h"
+
 #include "boost/shared_ptr.hpp"
 
 namespace cx
@@ -56,16 +58,16 @@ typedef boost::shared_ptr<class StateService> StateServicePtr;
  */
 
 // old style singleton accessors:
-DataManager* dataManager();
-ToolManager* toolManager();
-ViewManager* viewManager();
+cxLogicManager_EXPORT DataManager* dataManager();
+cxLogicManager_EXPORT ToolManager* toolManager();
+cxLogicManager_EXPORT ViewManager* viewManager();
 // access to new shared ptrs:
-SpaceProviderPtr spaceProvider();
-TrackingServicePtr trackingService();
-DataServicePtr dataService();
-PatientServicePtr patientService();
-VideoServicePtr videoService();
-StateServicePtr stateService();
+cxLogicManager_EXPORT SpaceProviderPtr spaceProvider();
+cxLogicManager_EXPORT TrackingServicePtr trackingService();
+cxLogicManager_EXPORT DataServicePtr dataService();
+cxLogicManager_EXPORT PatientServicePtr patientService();
+cxLogicManager_EXPORT VideoServicePtr videoService();
+cxLogicManager_EXPORT StateServicePtr stateService();
 
 } // namespace cx
 

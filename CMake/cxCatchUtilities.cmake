@@ -58,11 +58,11 @@ function(cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES)
 	set(ADDITIONAL_LIBS ${ARGV3}) # emulating optional argument
 #message(STATUS "========= " ${ADDITIONAL_LIBS} )
 
-    if(CX_WINDOWS)
-		_cx_catch_save_info_in_globals(${LIB_TO_TEST} "${SOURCES}" "${MOC_SOURCES}" "${ADDITIONAL_LIBS}")
-    else()
-		_cx_catch_add_lib_and_exe(${LIB_TO_TEST} "${SOURCES}" "${MOC_SOURCES}" "${ADDITIONAL_LIBS}")
-    endif()
+#    if(CX_WINDOWS)
+                _cx_catch_save_info_in_globals("${LIB_TO_TEST}" "${SOURCES}" "${MOC_SOURCES}" "${ADDITIONAL_LIBS}")
+#    else()
+#                _cx_catch_add_lib_and_exe("${LIB_TO_TEST}" "${SOURCES}" "${MOC_SOURCES}" "${ADDITIONAL_LIBS}")
+#    endif()
 
 endfunction()
 
@@ -82,11 +82,11 @@ function(cx_catch_add_master_exe)
     set(TEST_EXE_NAME "Catch")
     set(cxtest_MAIN ${CustusX_SOURCE_DIR}/source/resource/testUtilities/cxtestCatchMain.cpp)
 
-    if(CX_WINDOWS)
+#    if(CX_WINDOWS)
 		_cx_catch_generate_master_catch_using_sources(${TEST_EXE_NAME} ${cxtest_MAIN})
-    else()
-        _cx_catch_generate_master_catch_using_libs(${TEST_EXE_NAME} ${cxtest_MAIN})
-    endif()
+#    else()
+#        _cx_catch_generate_master_catch_using_libs(${TEST_EXE_NAME} ${cxtest_MAIN})
+#    endif()
     
     cx_install_target(${TEST_EXE_NAME})
 
@@ -101,11 +101,21 @@ function(_cx_catch_generate_master_catch_using_sources EXE_NAME PATH_TO_MAIN)
     include_directories(
         ${CX_TEST_CATCH_INCLUDE_DIRS}
     )
-    
+
+    cx_remove_duplicate_include_directories()
+
+    # needed on windows to where <windows.h> is included
+    # http://qt-project.org/forums/viewthread/22133
+    if(WIN32)
+        add_definitions(-DNOMINMAX)
+        #add_definitions(-DcxResourceVisualizationTestUtilities_EXPORTS)
+    endif(WIN32)
+
     QT5_WRAP_CPP(MOCCED ${CX_TEST_CATCH_MOC_SOURCES})
-    
+
     add_executable(${EXE_NAME} ${PATH_TO_MAIN} ${CX_TEST_CATCH_SOURCES} ${MOCCED})
-    target_link_libraries(${EXE_NAME} ${CX_TEST_CATCH_LINKER_LIBS} cxtestUtilities)
+    target_link_libraries(${EXE_NAME} ${CX_TEST_CATCH_LINKER_LIBS})
+    #target_link_libraries(${EXE_NAME} ${CX_TEST_CATCH_LINKER_LIBS} cxtestUtilities)
     
 endfunction()
 
@@ -130,6 +140,7 @@ endfunction()
 # a master Catch.
 ###############################################################################
 function(_cx_catch_save_info_in_globals LIB_TO_TEST SOURCES MOC_SOURCES ADDITIONAL_LIBS)
+    message(STATUS "Saving globals: " ${LIB_TO_TEST})
     foreach( SOURCE_FILE ${MOC_SOURCES})
         cx_make_path_absolute(${SOURCE_FILE} RESULT)
         set(ABS_MOC_SOURCES
@@ -206,6 +217,7 @@ function(_cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES MOC_SOURCES ADDITIONAL_LI
 
     cx_catch__private_define_platform_specific_linker_options()
 
+    cx_remove_duplicate_include_directories()
     QT5_WRAP_CPP(MOCCED ${MOC_SOURCES})
 
 

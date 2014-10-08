@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREP_H_
 #define CXREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include <string>
 
 #include <boost/shared_ptr.hpp>
@@ -59,7 +61,7 @@ typedef boost::shared_ptr<class View> ViewPtr;
  *
  * \ingroup cx_resource_visualization
  */
-class Rep :public QObject
+class cxResourceVisualization_EXPORT Rep :public QObject
 {
 	Q_OBJECT
 public:

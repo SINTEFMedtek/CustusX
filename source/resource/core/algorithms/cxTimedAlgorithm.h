@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTIMEDALGORITHM_H_
 #define CXTIMEDALGORITHM_H_
 
+#include "cxResourceExport.h"
+
 //#include <QtWidgets>
 
 
@@ -56,7 +58,7 @@ namespace cx
  * \date Feb 16, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class TimedBaseAlgorithm : public QObject
+class cxResource_EXPORT TimedBaseAlgorithm : public QObject
 {
   Q_OBJECT
 

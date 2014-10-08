@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXBASEWIDGET_H_
 #define CXBASEWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QWidget>
 #include <QTabWidget>
 #include <QGroupBox>
@@ -55,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   * \date Nov 25, 2012
   * \author Christian Askeland, SINTEF
   */
-class CXFrame : public QFrame
+class cxResourceWidgets_EXPORT CXFrame : public QFrame
 {
     Q_OBJECT
 public:
@@ -68,7 +70,7 @@ public:
   * \date Feb 4, 2014
   * \author Christian Askeland, SINTEF
   */
-class CXToolButton : public QToolButton
+class cxResourceWidgets_EXPORT CXToolButton : public QToolButton
 {
 	Q_OBJECT
 public:
@@ -80,7 +82,7 @@ public:
   * \date Nov 25, 2012
   * \author Christian Askeland, SINTEF
   */
-class CXSmallToolButton : public CXToolButton
+class cxResourceWidgets_EXPORT CXSmallToolButton : public CXToolButton
 {
     Q_OBJECT
 public:
@@ -99,7 +101,7 @@ namespace cx
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class BaseWidget: public OptimizedUpdateWidget
+class cxResourceWidgets_EXPORT BaseWidget: public OptimizedUpdateWidget
 {
 	Q_OBJECT
 

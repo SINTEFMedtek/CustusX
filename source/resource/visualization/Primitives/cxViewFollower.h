@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWFOLLOWER_H
 #define CXVIEWFOLLOWER_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include <QObject>
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
@@ -49,7 +51,7 @@ class DataManager;
  * \date 2014-01-14
  * \author christiana
  */
-class ViewFollower : public QObject
+class cxResourceVisualization_EXPORT ViewFollower : public QObject
 {
 	Q_OBJECT
 public:

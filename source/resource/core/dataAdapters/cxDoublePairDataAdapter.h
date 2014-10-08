@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDOUBLESPANSLIDERADAPTER_H
 #define CXDOUBLESPANSLIDERADAPTER_H
 
+#include "cxResourceExport.h"
+
 #include "cxDataAdapter.h"
 #include "cxDoubleRange.h"
 #include "cxMathBase.h"
@@ -47,7 +49,7 @@ namespace cx
  * \date Juli 31, 2014
  * \author Ole Vegard Solberg, SINTEF
  */
-class DoublePairDataAdapter : public DataAdapter
+class cxResource_EXPORT DoublePairDataAdapter : public DataAdapter
 {
 Q_OBJECT
 public:
@@ -91,7 +93,7 @@ public:
 typedef boost::shared_ptr<DoublePairDataAdapter> DoublePairDataAdapterPtr;
 
 /** Dummy implementation */
-class DoubleSpanSliderAdapterNull: public DoublePairDataAdapter
+class cxResource_EXPORT DoubleSpanSliderAdapterNull: public DoublePairDataAdapter
 {
 Q_OBJECT
 

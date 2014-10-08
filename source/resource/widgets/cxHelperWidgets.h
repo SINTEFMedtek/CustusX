@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXHELPERWIDGETS_H_
 #define CXHELPERWIDGETS_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QWidget>
 #include "cxDataAdapter.h"
 class QGridLayout;
@@ -52,7 +54,7 @@ namespace cx
 /**\brief A widget that floats above the other windows. Used as basis for the floating controls.
  *
  */
-class sscFloatingWidget: public QWidget
+class cxResourceWidgets_EXPORT sscFloatingWidget: public QWidget
 {
 Q_OBJECT
 
@@ -85,13 +87,13 @@ public:
   *   \author christiana
   *   \date Nov 25, 2012
   */
-QHBoxLayout* mergeWidgetsIntoHBoxLayout(QWidget* first, QWidget* second);
+cxResourceWidgets_EXPORT QHBoxLayout* mergeWidgetsIntoHBoxLayout(QWidget* first, QWidget* second);
 /** Add on hack for mergeWidgetsIntoHBoxLayout(),
   * create a small extent for the widget so that is has a visible region
   *   \author christiana
   *   \date Dec 5, 2012
   */
-QWidget* addDummyMargin(QWidget* widget);
+cxResourceWidgets_EXPORT QWidget* addDummyMargin(QWidget* widget);
 
 /**\brief Create a widget capable of displaying the input data.
  *
@@ -99,7 +101,7 @@ QWidget* addDummyMargin(QWidget* widget);
  * into a row in that layout
  *
  */
-QWidget* sscCreateDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
+cxResourceWidgets_EXPORT QWidget* sscCreateDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
 }
 
 /**

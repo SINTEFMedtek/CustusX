@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXACQUISITIONDATA_H_
 #define CXACQUISITIONDATA_H_
 
+#include "cxPluginAcquisitionExport.h"
+
 #include <QObject>
 class QDomNode;
 #include <vector>
@@ -58,7 +60,7 @@ namespace cx
  *  \date Jun 9, 2011
  *  \author christiana
  */
-class AcquisitionData : public QObject
+class cxPluginAcquisition_EXPORT AcquisitionData : public QObject
 {
 	Q_OBJECT
 
@@ -95,7 +97,7 @@ typedef boost::shared_ptr<AcquisitionData> AcquisitionDataPtr;
 /**Shared Data and resources for the Acquisition Plugin
  *
  */
-class Acquisition : public QObject
+class cxPluginAcquisition_EXPORT Acquisition : public QObject
 {
 	Q_OBJECT
 

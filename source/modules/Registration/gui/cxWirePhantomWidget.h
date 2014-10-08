@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXWIREPHANTOMWIDGET_H_
 #define CXWIREPHANTOMWIDGET_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include "cxRegistrationBaseWidget.h"
 #include "cxPipeline.h"
 #include "cxFilter.h"
@@ -56,7 +58,7 @@ namespace cx
  *  \date Nov 28, 2012
  *  \author christiana
  */
-class WirePhantomWidget: public RegistrationBaseWidget
+class cxPluginRegistration_EXPORT WirePhantomWidget: public RegistrationBaseWidget
 {
 Q_OBJECT
 

@@ -315,7 +315,7 @@ void Reporter::setAudioSource(AudioPtr audioSource)
 
 bool Reporter::hasAudioSource() const
 {
-  return mAudioSource;
+  return mAudioSource ? true : false;
 }
 
 #ifndef SSC_PRINT_CALLER_INFO

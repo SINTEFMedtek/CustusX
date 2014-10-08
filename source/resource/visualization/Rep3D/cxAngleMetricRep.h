@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXANGLEMETRICREP_H_
 #define CXANGLEMETRICREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxDataMetricRep.h"
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
@@ -60,7 +62,7 @@ typedef boost::shared_ptr<class AngleMetric> AngleMetricPtr;
  * \date Jul 27, 2011
  * \author Christian Askeland, SINTEF
  */
-class AngleMetricRep: public DataMetricRep
+class cxResourceVisualization_EXPORT AngleMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:

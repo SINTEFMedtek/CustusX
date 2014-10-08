@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPROBEDATA_H_
 #define CXPROBEDATA_H_
 
+#include "cxResourceExport.h"
+
 #include <QSize>
 class QDomNode;
 #include "cxVector3D.h"
@@ -113,7 +115,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_tool
  */
-class ProbeDefinition
+class cxResource_EXPORT ProbeDefinition
 {
 public: 
 	enum TYPE { tNONE=0,   ///< undefined

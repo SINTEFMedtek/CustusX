@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSTREAMER_H_
 #define CXSTREAMER_H_
 
+#include "cxGrabberExport.h"
+
 #include <QObject>
 #include <QString>
 #include <QStringList>
@@ -54,7 +56,7 @@ typedef boost::shared_ptr<class Streamer> StreamerPtr;
  * \date May 22, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
-class Streamer : public QObject
+class cxGrabber_EXPORT Streamer : public QObject
 {
 	Q_OBJECT
 
@@ -96,7 +98,7 @@ typedef std::map<QString, QString> StringMap;
  * \date May 22, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
-class CommandLineStreamer : public Streamer
+class cxGrabber_EXPORT CommandLineStreamer : public Streamer
 {
 	Q_OBJECT
 

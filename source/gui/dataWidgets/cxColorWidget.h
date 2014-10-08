@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCOLORWIDGET_H_
 #define CXCOLORWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 
 namespace cx {
@@ -48,7 +50,7 @@ namespace cx {
  *  \data Jul 18, 2013
  *  \author Ole Vegard Solberg, SINTEF
  */
-class ColorWidget : public BaseWidget
+class cxGui_EXPORT ColorWidget : public BaseWidget
 {
 	Q_OBJECT
 

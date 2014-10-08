@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSMOOTHINGIMAGEFILTER_H
 #define CXSMOOTHINGIMAGEFILTER_H
 
+#include "cxPluginAlgorithmExport.h"
+
 #include "cxFilterImpl.h"
 
 namespace cx
@@ -44,7 +46,7 @@ namespace cx
  * \date Nov 26, 2012
  * \author christiana
  */
-class SmoothingImageFilter : public FilterImpl
+class cxPluginAlgorithm_EXPORT SmoothingImageFilter : public FilterImpl
 {
 	Q_OBJECT
 

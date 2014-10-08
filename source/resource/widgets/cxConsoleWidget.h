@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCONSOLEWIDGET_H_
 #define CXCONSOLEWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QTextBrowser>
 #include <QTextCharFormat>
 #include "cxReporter.h"
@@ -50,7 +52,7 @@ namespace cx
  *
  * \ingroup cx_resource_widgets
  */
-class ConsoleWidget: public QTextBrowser
+class cxResourceWidgets_EXPORT ConsoleWidget: public QTextBrowser
 {
 Q_OBJECT
 

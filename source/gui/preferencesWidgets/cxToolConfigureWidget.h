@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLCONFIGUREWIDGET_H_
 #define CXTOOLCONFIGUREWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include <QGroupBox>
 
 #include "cxDefinitions.h"
@@ -64,7 +66,7 @@ class ConfigToolListWidget;
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class ToolConfigureGroupBox : public QGroupBox
+class cxGui_EXPORT ToolConfigureGroupBox : public QGroupBox
 {
   Q_OBJECT
 

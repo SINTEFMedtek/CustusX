@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRECONSTRUCTIONWIDGET_H_
 #define CXRECONSTRUCTIONWIDGET_H_
 
+#include "cxPluginUSReconstructionExport.h"
+
 #include <QtWidgets>
 
 #include "cxReconstructionManager.h"
@@ -61,7 +63,7 @@ namespace cx
  *  Created by Ole Vegard Solberg on 5/4/10.
  *
  */
-class ReconstructionWidget: public BaseWidget
+class cxPluginUSReconstruction_EXPORT ReconstructionWidget: public BaseWidget
 {
 Q_OBJECT
 public:

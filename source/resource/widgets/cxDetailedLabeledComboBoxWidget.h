@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDETAILEDLABELEDCOMBOBOXWIDGET_H_
 #define CXDETAILEDLABELEDCOMBOBOXWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include "cxLabeledComboBoxWidget.h"
 
 namespace cx
@@ -43,7 +45,7 @@ namespace cx
  *
  * \ingroup cx_resource_widgets
  */
-class DetailedLabeledComboBoxWidget : public LabeledComboBoxWidget
+class cxResourceWidgets_EXPORT DetailedLabeledComboBoxWidget : public LabeledComboBoxWidget
 {
 	Q_OBJECT
 

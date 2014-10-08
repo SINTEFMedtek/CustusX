@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPLAYBACKWIDGET_H_
 #define CXPLAYBACKWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 #include "cxDoubleDataAdapterXml.h"
 #include "vtkForwardDeclarations.h"
@@ -54,7 +56,7 @@ class TimelineWidget;
  * \date Mar 29, 2012
  * \author Christian Askeland, SINTEF
  */
-class PlaybackWidget : public BaseWidget
+class cxGui_EXPORT PlaybackWidget : public BaseWidget
 {
 	Q_OBJECT
 public:

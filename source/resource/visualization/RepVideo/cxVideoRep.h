@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIDEOREP_H_
 #define CXVIDEOREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxRepImpl.h"
 #include "cxVtkHelperClasses.h"
 #include "cxForwardDeclarations.h"
@@ -61,7 +63,7 @@ typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
  * \date Oct 31, 2010
  * \author christiana
  */
-class VideoFixedPlaneRep : public RepImpl
+class cxResourceVisualization_EXPORT VideoFixedPlaneRep : public RepImpl
 {
 	Q_OBJECT
 public:

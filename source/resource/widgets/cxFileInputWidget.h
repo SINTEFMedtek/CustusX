@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFILEINPUTWIDGET_H
 #define CXFILEINPUTWIDGET_H
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QWidget>
 class QLabel;
 class QLineEdit;
@@ -50,7 +52,7 @@ namespace cx
  * \date 28 Oct 2013, 2013
  * \author christiana
  */
-class FileInputWidget : public QWidget
+class cxResourceWidgets_EXPORT FileInputWidget : public QWidget
 {
 	Q_OBJECT
 public:

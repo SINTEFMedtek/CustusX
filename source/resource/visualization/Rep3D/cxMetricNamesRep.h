@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMETRICNAMESREP_H
 #define CXMETRICNAMESREP_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include <vector>
 #include "cxRepImpl.h"
 #include "cxVector3D.h"
@@ -59,7 +61,7 @@ typedef boost::shared_ptr<class DataMetric> DataMetricPtr;
  * \date 2014-02-13
  * \author christiana
  */
-class MetricNamesRep : public RepImpl
+class cxResourceVisualization_EXPORT MetricNamesRep : public RepImpl
 {
 	Q_OBJECT
 public:

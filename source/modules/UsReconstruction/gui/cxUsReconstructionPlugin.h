@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXUSRECONSTRUCTIONPLUGIN_H_
 #define CXUSRECONSTRUCTIONPLUGIN_H_
 
+#include "cxPluginUSReconstructionExport.h"
+
 #include "cxGUIExtenderService.h"
 
 namespace cx
@@ -57,7 +59,7 @@ namespace cx
  * @{
  */
 
-class UsReconstructionPlugin : public GUIExtenderService
+class cxPluginUSReconstruction_EXPORT UsReconstructionPlugin : public GUIExtenderService
 {
 	Q_OBJECT
 public:

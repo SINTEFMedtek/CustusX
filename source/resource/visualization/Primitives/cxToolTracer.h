@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLTRACER_H_
 #define CXTOOLTRACER_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include <QObject>
 #include <QSize>
 #include "vtkSmartPointer.h"
@@ -63,7 +65,7 @@ typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
  *
  * \ingroup cx_resource_visualization
  */
-class ToolTracer : QObject
+class cxResourceVisualization_EXPORT ToolTracer : QObject
 {
 	Q_OBJECT
 public:

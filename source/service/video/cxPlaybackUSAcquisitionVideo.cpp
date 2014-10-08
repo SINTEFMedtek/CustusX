@@ -77,7 +77,7 @@ VideoSourcePtr USAcquisitionVideoPlayback::getVideoSource()
 
 bool USAcquisitionVideoPlayback::isActive() const
 {
-	return mTimer;
+	return mTimer ? true : false;
 }
 
 void USAcquisitionVideoPlayback::setTime(PlaybackTimePtr controller)

@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPLANEMETRIC_H_
 #define CXPLANEMETRIC_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include "cxDataMetric.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxDataManagerImpl.h"
@@ -64,7 +67,7 @@ typedef boost::shared_ptr<class PlaneMetric> PlaneMetricPtr;
  * \date Jul 27, 2011
  * \author Christian Askeland, SINTEF
  */
-class PlaneMetric: public DataMetric
+class cxResource_EXPORT PlaneMetric: public DataMetric
 {
 Q_OBJECT
 public:

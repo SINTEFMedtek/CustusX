@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLTIPSAMPLEWIDGET_H_
 #define CXTOOLTIPSAMPLEWIDGET_H_
 
+#include "cxPluginCalibrationExport.h"
+
 #include "cxBaseWidget.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxForwardDeclarations.h"
@@ -55,7 +57,7 @@ class LabeledComboBoxWidget;
 /**
  * Class for sampling points in a chosable coordinate system and then saving them to file.
  */
-class ToolTipSampleWidget : public BaseWidget
+class cxPluginCalibration_EXPORT ToolTipSampleWidget : public BaseWidget
 {
   Q_OBJECT
 

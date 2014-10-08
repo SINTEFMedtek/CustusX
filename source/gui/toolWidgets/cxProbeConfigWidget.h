@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPROBECONFIGWIDGET_H_
 #define CXPROBECONFIGWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 #include "cxBoundingBoxWidget.h"
 #include "cxToolDataAdapters.h"
@@ -50,7 +52,7 @@ namespace cx
  * \date Mar 16, 2012
  * \author Christian Askeland, SINTEF
  */
-class ProbeConfigWidget : public BaseWidget
+class cxGui_EXPORT ProbeConfigWidget : public BaseWidget
 {
 	Q_OBJECT
 public:

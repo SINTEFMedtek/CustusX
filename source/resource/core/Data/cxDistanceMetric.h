@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDISTANCEMETRIC_H_
 #define CXDISTANCEMETRIC_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include "cxDataMetric.h"
 #include "cxMetricReferenceArgumentList.h"
 #include "cxOptionalValue.h"
@@ -54,7 +57,7 @@ typedef boost::shared_ptr<class DistanceMetric> DistanceMetricPtr;
  * \date Jul 4, 2011
  * \author Christian Askeland, SINTEF
  */
-class DistanceMetric: public DataMetric
+class cxResource_EXPORT DistanceMetric: public DataMetric
 {
 Q_OBJECT
 public:

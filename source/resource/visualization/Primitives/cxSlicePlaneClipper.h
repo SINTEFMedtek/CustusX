@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSLICEPLANECLIPPER_H_
 #define CXSLICEPLANECLIPPER_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include <set>
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -60,7 +62,7 @@ typedef boost::shared_ptr<class SlicePlaneClipper> SlicePlaneClipperPtr;
  * \ingroup cx_resource_visualization
 
  */
-class SlicePlaneClipper : public QObject
+class cxResourceVisualization_EXPORT SlicePlaneClipper : public QObject
 {
 	Q_OBJECT
 public:

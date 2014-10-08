@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWPORTLISTENER_H_
 #define CXVIEWPORTLISTENER_H_
 
+#include "cxResourceExport.h"
+
 #include <boost/function.hpp>
 #include "vtkForwardDeclarations.h"
 
@@ -46,7 +48,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_utilities
  */
-class ViewportListenerBase
+class cxResource_EXPORT ViewportListenerBase
 {
 public:
 		ViewportListenerBase();
@@ -81,7 +83,7 @@ private:
  *
  * \ingroup cx_resource_core_utilities
  */
-class ViewportListener : public ViewportListenerBase
+class cxResource_EXPORT ViewportListener : public ViewportListenerBase
 {
 public:
 		ViewportListener() {}
@@ -105,7 +107,7 @@ typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
  *
  * \ingroup cx_resource_core_utilities
  */
-class ViewportPreRenderListener : public ViewportListenerBase
+class cxResource_EXPORT ViewportPreRenderListener : public ViewportListenerBase
 {
 public:
 		ViewportPreRenderListener();

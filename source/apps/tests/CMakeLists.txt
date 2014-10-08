@@ -8,6 +8,7 @@ IF(BUILD_TESTING)
 
 	set(TARGET_LIBRARIES vtkFiltersHybrid cxResource)
 
+        cx_remove_duplicate_include_directories()
 	ADD_EXECUTABLE(CorrectlyRenderTranslucentGeometry CorrectlyRenderTranslucentGeometry.cxx)
 	TARGET_LINK_LIBRARIES(CorrectlyRenderTranslucentGeometry ${TARGET_LIBRARIES})
 

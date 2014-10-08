@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMANUALREGISTRATIONWIDGET_H_
 #define CXMANUALREGISTRATIONWIDGET_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include "cxRegistrationBaseWidget.h"
 #include "cxStringDataAdapter.h"
 #include "cxTransform3DWidget.h"
@@ -55,7 +57,7 @@ namespace cx
  *  \date Feb 16, 2012
  *  \author christiana
  */
-class ManualImageRegistrationWidget: public RegistrationBaseWidget
+class cxPluginRegistration_EXPORT ManualImageRegistrationWidget: public RegistrationBaseWidget
 {
 Q_OBJECT
 public:
@@ -94,7 +96,7 @@ private:
  *  \date 2014-06-13
  *  \author christiana
  */
-class ManualImage2ImageRegistrationWidget : public ManualImageRegistrationWidget
+class cxPluginRegistration_EXPORT ManualImage2ImageRegistrationWidget : public ManualImageRegistrationWidget
 {
 public:
 	ManualImage2ImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
@@ -116,7 +118,7 @@ public:
  *  \date Feb 16, 2012
  *  \author christiana
  */
-class ManualImageTransformRegistrationWidget : public ManualImageRegistrationWidget
+class cxPluginRegistration_EXPORT ManualImageTransformRegistrationWidget : public ManualImageRegistrationWidget
 {
 public:
 	ManualImageTransformRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
@@ -135,7 +137,7 @@ public:
  *  \date Feb 16, 2012
  *  \author christiana
  */
-class ManualPatientRegistrationWidget: public RegistrationBaseWidget
+class cxPluginRegistration_EXPORT ManualPatientRegistrationWidget: public RegistrationBaseWidget
 {
 Q_OBJECT
 public:

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCOMPOSITETIMEDALGORITHM_H_
 #define CXCOMPOSITETIMEDALGORITHM_H_
 
+#include "cxResourceExport.h"
+
 #include "cxTimedAlgorithm.h"
 
 #include <boost/function.hpp>
@@ -43,7 +45,7 @@ namespace cx
 /**
  *  \ingroup cx_resource_core_algorithms
  */
-class CompositeTimedAlgorithm : public TimedBaseAlgorithm
+class cxResource_EXPORT CompositeTimedAlgorithm : public TimedBaseAlgorithm
 {
 public:
 	CompositeTimedAlgorithm(QString name);
@@ -67,7 +69,7 @@ typedef boost::shared_ptr<CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
  * \date Jun 27, 2012
  * \author Christian Askeland
  */
-class CompositeSerialTimedAlgorithm : public CompositeTimedAlgorithm
+class cxResource_EXPORT CompositeSerialTimedAlgorithm : public CompositeTimedAlgorithm
 {
 	Q_OBJECT
 
@@ -99,7 +101,7 @@ typedef boost::shared_ptr<CompositeSerialTimedAlgorithm> CompositeSerialTimedAlg
  * \date Nov 06, 2012
  * \author Christian Askeland
  */
-class CompositeParallelTimedAlgorithm : public CompositeTimedAlgorithm
+class cxResource_EXPORT CompositeParallelTimedAlgorithm : public CompositeTimedAlgorithm
 {
 	Q_OBJECT
 

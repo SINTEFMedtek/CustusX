@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWGROUPDATA_H
 #define CXVIEWGROUPDATA_H
 
+#include "cxVisualizationServiceExport.h"
+
 #include <vector>
 #include <QVariant>
 #include <QObject>
@@ -58,18 +60,18 @@ typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServic
 /**Define a priority for the input data.
  * High means display on top, low means in the back.
  */
-int getPriority(DataPtr data);
+cxVisualizationService_EXPORT  int getPriority(DataPtr data);
 
 /**Sorts DataPtr in default display ordering, using getPriority().
  */
-bool dataTypeSort(const DataPtr data1, const DataPtr data2);
+cxVisualizationService_EXPORT bool dataTypeSort(const DataPtr data1, const DataPtr data2);
 
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 
 /** Stores how a Data should be visualized in 2D and 3D views.
   */
-class DataViewProperties
+class cxVisualizationService_EXPORT DataViewProperties
 {
 public:
 	DataViewProperties() : mVolume3D(false), mSlice3D(false), mSlice2D(false) {}
@@ -98,7 +100,7 @@ private:
 
 /** \brief Container for data shared between all members of a view group
  */
-class ViewGroupData: public QObject
+class cxVisualizationService_EXPORT ViewGroupData: public QObject
 {
 Q_OBJECT
 public:

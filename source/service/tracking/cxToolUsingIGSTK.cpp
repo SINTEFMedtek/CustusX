@@ -58,7 +58,7 @@ ToolUsingIGSTK::ToolUsingIGSTK(TrackingServicePtr manager, IgstkToolPtr igstkToo
 {
 	Tool::mUid = mTool->getInternalStructure().mUid;
 	Tool::mName = mTool->getInternalStructure().mName;
-	mValid = igstkTool->isValid();
+    mValid = igstkTool->isValid();
 
 	this->createPolyData();
 

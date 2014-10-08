@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWGROUP_H_
 #define CXVIEWGROUP_H_
 
+#include "cxVisualizationServiceExport.h"
+
 #include <vector>
 #include <QObject>
 #include <QDomDocument>
@@ -64,7 +66,7 @@ typedef boost::shared_ptr<class Navigation> NavigationPtr;
  * \date 18. mars 2010
  * \\author jbake
  */
-class ViewGroup: public QObject
+class cxVisualizationService_EXPORT ViewGroup: public QObject
 {
 Q_OBJECT
 public:

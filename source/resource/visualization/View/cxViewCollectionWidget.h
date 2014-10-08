@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWCOLLECTIONWIDGET_H_
 #define CXVIEWCOLLECTIONWIDGET_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxView.h"
 #include "cxLayoutData.h"
 #include <QWidget>
@@ -54,7 +56,8 @@ namespace cx
  * \date 2014-09-26
  * \author christiana
  */
-class ViewCollectionWidget : public QWidget
+
+class cxResourceVisualization_EXPORT ViewCollectionWidget : public QWidget
 {
 	Q_OBJECT
 public:

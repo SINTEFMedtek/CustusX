@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMETRICMANAGER_H
 #define CXMETRICMANAGER_H
 
+#include "cxGuiExport.h"
+
 #include "cxForwardDeclarations.h"
 #include "cxDataMetric.h"
 #include "cxDefinitions.h"
@@ -51,7 +53,7 @@ typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
  * \date 2014-02-17
  * \author christiana
  */
-class MetricManager : public QObject
+class cxGui_EXPORT MetricManager : public QObject
 {
 	Q_OBJECT
 public:

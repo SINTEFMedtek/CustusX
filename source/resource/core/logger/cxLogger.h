@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLOGGER_H_
 #define CXLOGGER_H_
 
+#include "cxResourceExport.h"
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -74,9 +76,9 @@ extern "C"
 * @}
 */
 
-void SSC_Log( const char *file, int line, const char *function, const char *format, ... ); ///< internal function. use SSC_LOG
-void SSC_Error( const char *file, int line, const char *function, const char *format, ...); ///< internal function. use SSC_ERROR
-void SSC_Warning( const char *file, int line, const char *function, const char *format, ...); ///< internal function. use SSC_WARNING
+cxResource_EXPORT void SSC_Log( const char *file, int line, const char *function, const char *format, ... ); ///< internal function. use SSC_LOG
+cxResource_EXPORT void SSC_Error( const char *file, int line, const char *function, const char *format, ...); ///< internal function. use SSC_ERROR
+cxResource_EXPORT void SSC_Warning( const char *file, int line, const char *function, const char *format, ...); ///< internal function. use SSC_WARNING
 
 #ifdef __cplusplus
 }

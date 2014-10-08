@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPLANETYPECOLLECTION_H
 #define CXPLANETYPECOLLECTION_H
 
+#include "cxResourceExport.h"
+
 #include "cxDefinitions.h"
 #include <vector>
 #include <QStringList>
@@ -45,7 +47,7 @@ namespace cx
  * \date 2014-03-04
  * \author Christian Askeland, SINTEF
  */
-class PlaneTypeCollection
+class cxResource_EXPORT PlaneTypeCollection
 {
 public:
 

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXINFOWIDGET_H_
 #define CXINFOWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
 
@@ -50,7 +52,7 @@ namespace cx {
  * \date Apr 26, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
-class InfoWidget : public BaseWidget
+class cxGui_EXPORT InfoWidget : public BaseWidget
 {
 	Q_OBJECT
 

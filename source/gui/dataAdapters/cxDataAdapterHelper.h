@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATAADAPTERHELPER_H_
 #define CXDATAADAPTERHELPER_H_
 
+#include "cxGuiExport.h"
+
 #include "cxDataAdapter.h"
 
 class QWidget;
@@ -46,7 +48,7 @@ namespace cx {
  *
  * \ingroup cx_gui
  */
-QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
+cxGui_EXPORT QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
 
 } /* namespace cx */
 #endif /* CXDATAADAPTERHELPER_H_ */

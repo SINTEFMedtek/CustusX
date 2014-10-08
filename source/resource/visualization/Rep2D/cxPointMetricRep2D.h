@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPOINTMETRICREP2D_H_
 #define CXPOINTMETRICREP2D_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxDataMetricRep.h"
 #include "cxGraphicalPrimitives.h"
 #include "cxPointMetric.h"
@@ -53,7 +55,7 @@ typedef boost::shared_ptr<class PointMetricRep2D> PointMetricRep2DPtr;
  * \date Jun 14, 2012
  * \author Sigmund Augdal, SonoWand AS
  */
-class PointMetricRep2D: public DataMetricRep
+class cxResourceVisualization_EXPORT PointMetricRep2D: public DataMetricRep
 {
 Q_OBJECT
 public:

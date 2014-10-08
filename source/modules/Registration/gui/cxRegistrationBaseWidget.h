@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONBASEWIDGET_H_
 #define CXREGISTRATIONBASEWIDGET_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include "cxBaseWidget.h"
 #include "boost/shared_ptr.hpp"
 
@@ -45,7 +47,7 @@ typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
  * @{
  */
 
-class RegistrationBaseWidget : public BaseWidget
+class cxPluginRegistration_EXPORT RegistrationBaseWidget : public BaseWidget
 {
 //  Q_OBJECT
 public:

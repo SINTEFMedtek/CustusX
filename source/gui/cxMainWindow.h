@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMAINWINDOW_H_
 #define CXMAINWINDOW_H_
 
+#include "cxGuiExport.h"
+
 #include <QMainWindow>
 #include <map>
 #include <set>
@@ -69,7 +71,7 @@ typedef boost::shared_ptr<class LayoutInteractor> LayoutInteractorPtr;
  * \author Ole Vegard Solberg, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class MainWindow: public QMainWindow
+class cxGui_EXPORT MainWindow: public QMainWindow
 {
 	Q_OBJECT
 

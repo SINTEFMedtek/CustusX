@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWWRAPPER3D_H_
 #define CXVIEWWRAPPER3D_H_
 
+#include "cxVisualizationServiceExport.h"
+
 #include <vector>
 #include <QPointer>
 #include <QObject>
@@ -76,7 +78,7 @@ typedef boost::shared_ptr<class AxisConnector> AxisConnectorPtr;
 
 typedef boost::shared_ptr<class ToolAxisConnector> ToolAxisConnectorPtr;
 
-enum STEREOTYPE
+enum cxVisualizationService_EXPORT STEREOTYPE
 {
 	stFRAME_SEQUENTIAL, stINTERLACED, stDRESDEN, stRED_BLUE
 };
@@ -86,7 +88,7 @@ enum STEREOTYPE
  *  Handles the connections between specific reps and the view.
  *
  */
-class ViewWrapper3D: public ViewWrapper
+class cxVisualizationService_EXPORT ViewWrapper3D: public ViewWrapper
 {
 Q_OBJECT
 public:

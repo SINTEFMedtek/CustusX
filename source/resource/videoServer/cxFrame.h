@@ -33,13 +33,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFRAME_H_
 #define CXFRAME_H_
 
+#include "cxGrabberExport.h"
+
 namespace cx
 {
 
 /**
  * \ingroup cx_resource_videoserver
  */
-class Frame
+class cxGrabber_EXPORT Frame
 {
 public:
   bool mNewStatus;

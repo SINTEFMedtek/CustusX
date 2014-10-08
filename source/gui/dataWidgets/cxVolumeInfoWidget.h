@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVOLUMEINFOWIDGET_H_
 #define CXVOLUMEINFOWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxInfoWidget.h"
 
 #include "cxForwardDeclarations.h"
@@ -50,7 +52,7 @@ namespace cx
  * \author Christian Askeland, SINTEF
  * \author Janne Beate Bakeng, SINTEF
  */
-class VolumeInfoWidget : public InfoWidget
+class cxGui_EXPORT VolumeInfoWidget : public InfoWidget
 {
   Q_OBJECT
 

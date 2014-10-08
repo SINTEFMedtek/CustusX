@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXNAVIGATION_H
 #define CXNAVIGATION_H
 
+#include "cxVisualizationServiceExport.h"
+
 #include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
 #include "cxVector3D.h"
@@ -45,7 +47,7 @@ typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
  *
  * \ingroup cx_service_visualization
  */
-class Navigation
+class cxVisualizationService_EXPORT Navigation
 {
 public:
 	enum VIEW_TYPE { v2D = 0x01, v3D=0x02, vBOTH=0x03 };

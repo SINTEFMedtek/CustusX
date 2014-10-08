@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRANSFERFUNCTIONALPHAWIDGET_H_
 #define CXTRANSFERFUNCTIONALPHAWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include "cxBaseWidget.h"
 
 #include <limits.h>
@@ -54,7 +56,7 @@ namespace cx
  * \\author Janne Beate Bakeng, SINTEF
  * \\author Ole Vegard Solberg, SINTEF
  */
-class TransferFunctionAlphaWidget : public BaseWidget
+class cxGui_EXPORT TransferFunctionAlphaWidget : public BaseWidget
 {    
   Q_OBJECT
   

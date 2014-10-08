@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPREPAREVESSELSWIDGET_H
 #define CXPREPAREVESSELSWIDGET_H
 
+#include "cxPluginRegistrationExport.h"
+
 #include "cxRegistrationBaseWidget.h"
 #include "cxColorDataAdapter.h"
 #include "cxPipeline.h"
@@ -57,7 +59,7 @@ namespace cx
  * \author Janne Beate Bakeng
  * \author Christian Askeland
  */
-class PrepareVesselsWidget : public RegistrationBaseWidget
+class cxPluginRegistration_EXPORT PrepareVesselsWidget : public RegistrationBaseWidget
 {
   Q_OBJECT
 

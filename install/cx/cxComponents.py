@@ -346,9 +346,9 @@ class IGSTK(CppComponent):
         # this fix should rebase repo from the original Kitware/IGSTK to our own fork on GitHub.
         repo = 'git@github.com:SINTEFMedisinskTeknologi/IGSTK'
         branch = 'IGSTK-CX-modifications'
-        tag = 'IGSTK-5-2.cx_patch_3-6-0'
+        #tag = 'IGSTK-5-2.cx_patch_3-6-0'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
-        self._getBuilder().gitCheckout(tag)
+        self._getBuilder().gitCheckoutBranch(branch)
     def configure(self):        
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -389,6 +389,7 @@ class CustusX(CppComponent):
         add('IGSTK_DIR:PATH', self._createSibling(IGSTK).configPath())
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
         add('OpenCV_DIR:PATH', self._createSibling(OpenCV).configPath())
+        add('CTK_SOURCE_DIR:PATH', self._createSibling(CTK).sourcePath())
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
         add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).configPath())
         add('Level-Set-Segmentation_DIR:PATH', self._createSibling(LevelSetSegmentation).configPath())

@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLMANAGER_H_
 #define CXTOOLMANAGER_H_
 
+#include "cxResourceExport.h"
+
 #include <map>
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -64,7 +66,7 @@ typedef boost::shared_ptr<class TrackerConfiguration> TrackerConfigurationPtr;
  *
  * \ingroup cx_resource_core_tool
  */
-class ToolManager: public QObject
+class cxResource_EXPORT ToolManager: public QObject
 {
 Q_OBJECT
 public:

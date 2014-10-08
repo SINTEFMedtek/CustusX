@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXWORKFLOWSTATE_H_
 #define CXWORKFLOWSTATE_H_
 
+#include "cxStateServiceExport.h"
+
 #include <iostream>
 #include <QState>
 #include <QStateMachine>
@@ -57,7 +59,7 @@ typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
  * \date 4. aug. 2010
  * \author jbake
  */
-class WorkflowState: public QState
+class cxStateService_EXPORT WorkflowState: public QState
 {
 Q_OBJECT
 
@@ -99,7 +101,7 @@ protected:
 	StateServiceBackendPtr mBackend;
 };
 
-class ParentWorkflowState: public WorkflowState
+class cxStateService_EXPORT ParentWorkflowState: public WorkflowState
 {
 Q_OBJECT
 public:
@@ -112,7 +114,7 @@ public:
 	virtual QIcon getIcon() const { return QIcon(""); }
 };
 
-class PatientDataWorkflowState: public WorkflowState
+class cxStateService_EXPORT PatientDataWorkflowState: public WorkflowState
 {
 Q_OBJECT
 
@@ -126,7 +128,7 @@ public:
 	virtual bool canEnter() const { return true; }
 };
 
-class NavigationWorkflowState: public WorkflowState
+class cxStateService_EXPORT NavigationWorkflowState: public WorkflowState
 {
 Q_OBJECT
 
@@ -141,7 +143,7 @@ public:
 	virtual bool canEnter() const;
 };
 
-class RegistrationWorkflowState: public WorkflowState
+class cxStateService_EXPORT RegistrationWorkflowState: public WorkflowState
 {
 Q_OBJECT
 
@@ -157,7 +159,7 @@ public:
 	virtual bool canEnter() const;
 };
 
-class PreOpPlanningWorkflowState: public WorkflowState
+class cxStateService_EXPORT PreOpPlanningWorkflowState: public WorkflowState
 {
 Q_OBJECT
 
@@ -174,7 +176,7 @@ public:
 	virtual bool canEnter() const;
 };
 
-class IntraOpImagingWorkflowState: public WorkflowState
+class cxStateService_EXPORT IntraOpImagingWorkflowState: public WorkflowState
 {
 Q_OBJECT
 
@@ -191,7 +193,7 @@ public:
 	virtual bool canEnter() const;
 };
 
-class PostOpControllWorkflowState: public WorkflowState
+class cxStateService_EXPORT PostOpControllWorkflowState: public WorkflowState
 {
 Q_OBJECT
 

@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTEXTURE3DSLICERREP_H_
 #define CXTEXTURE3DSLICERREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxRepImpl.h"
 #include <vector>
 #include "cxTransform3D.h"
@@ -91,7 +93,7 @@ typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
  * \ingroup cx_resource_visualization
  * \ingroup cx_resource_visualization_rep2D
  */
-class Texture3DSlicerRep: public RepImpl
+class cxResourceVisualization_EXPORT Texture3DSlicerRep: public RepImpl
 {
 Q_OBJECT
 public:

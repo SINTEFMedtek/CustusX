@@ -5,6 +5,8 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 include_directories(
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
+    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
+    ${CustusX_BINARY_DIR}/source/resource/widgets
     ./core
     ./widgets
     )
@@ -48,6 +50,12 @@ set(PLUGIN_UI_FORMS
 # QRC Files which should be compiled into the plugin
 set(PLUGIN_resources
 )
+
+# needed on windows to where <windows.h> is included
+# http://qt-project.org/forums/viewthread/22133
+if(WIN32)
+    add_definitions(-DNOMINMAX)
+endif(WIN32)
 
 
 #Compute the plugin dependencies

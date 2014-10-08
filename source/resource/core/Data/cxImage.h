@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGE_H_
 #define CXIMAGE_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include <map>
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -59,7 +62,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_data
  */
-class Image : public Data
+class cxResource_EXPORT Image : public Data
 {
 Q_OBJECT
 

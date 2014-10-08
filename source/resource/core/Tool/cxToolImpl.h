@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLIMPL_H
 #define CXTOOLIMPL_H
 
+#include "cxResourceExport.h"
+
 #include "cxTool.h"
 
 namespace cx
@@ -46,7 +48,7 @@ typedef boost::shared_ptr<class TrackingPositionFilter> TrackingPositionFilterPt
  * \date 2014-02-21
  * \author christiana
  */
-class ToolImpl : public Tool
+class cxResource_EXPORT ToolImpl : public Tool
 {
 	Q_OBJECT
 public:

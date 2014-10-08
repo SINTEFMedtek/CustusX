@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCONTOURFILTER_H
 #define CXCONTOURFILTER_H
 
+#include "cxPluginAlgorithmExport.h"
+
 #include "cxFilterImpl.h"
 class QColor;
 
@@ -46,7 +48,7 @@ namespace cx
  * \date Nov 25, 2012
  * \author christiana
  */
-class ContourFilter : public FilterImpl
+class cxPluginAlgorithm_EXPORT ContourFilter : public FilterImpl
 {
 	Q_OBJECT
 

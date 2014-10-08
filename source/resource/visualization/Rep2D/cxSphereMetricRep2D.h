@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSPHEREMETRICREP2D_H
 #define CXSPHEREMETRICREP2D_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxDataMetricRep.h"
 #include "cxGraphicalPrimitives.h"
 #include "cxPointMetric.h"
@@ -51,7 +53,7 @@ typedef boost::shared_ptr<class SphereMetric> SphereMetricPtr;
  * \date 2014-03-27
  * \author christiana
  */
-class SphereMetricRep2D: public DataMetricRep
+class cxResourceVisualization_EXPORT SphereMetricRep2D: public DataMetricRep
 {
 Q_OBJECT
 public:

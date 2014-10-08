@@ -33,8 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPATIENTMODELIMPLSERVICE_H_
 #define CXPATIENTMODELIMPLSERVICE_H_
 
-#include "cxPatientModelService.h"
 #include "org_custusx_patientmodel_Export.h"
+
+#include "cxPatientModelService.h"
 
 namespace cx
 {

@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONDATAADAPTERS_H_
 #define CXREGISTRATIONDATAADAPTERS_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include "cxDataInterface.h"
 #include "cxSelectDataStringDataAdapter.h"
 
@@ -48,7 +50,7 @@ typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
 typedef boost::shared_ptr<class RegistrationFixedImageStringDataAdapter> RegistrationFixedImageStringDataAdapterPtr;
 /** Adapter that connects to the fixed image in the registration manager.
  */
-class RegistrationFixedImageStringDataAdapter : public SelectDataStringDataAdapterBase
+class cxPluginRegistration_EXPORT RegistrationFixedImageStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
@@ -67,7 +69,7 @@ private:
 typedef boost::shared_ptr<class RegistrationMovingImageStringDataAdapter> RegistrationMovingImageStringDataAdapterPtr;
 /** Adapter that connects to the fixed image in the registration manager.
  */
-class RegistrationMovingImageStringDataAdapter : public SelectDataStringDataAdapterBase
+class cxPluginRegistration_EXPORT RegistrationMovingImageStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:

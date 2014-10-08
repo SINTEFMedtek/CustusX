@@ -46,9 +46,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPluginFramework.h"
 
 
+#if !defined(WIN32)
 #include <langinfo.h>
 #include <locale>
 #include "cxReporter.h"
+
 void force_C_locale_decimalseparator()
 {
 	QString radixChar = nl_langinfo(RADIXCHAR);
@@ -68,14 +70,21 @@ void force_C_locale_decimalseparator()
 			std::cout << "Failed to set decimal separator." << std::endl;
 	}
 }
+#endif
+
 
 #ifdef WIN32
-int __stdcall WinMain(int argc, char *argv[])
+int WinMain(int argc, char *argv[])
 #else
 int main(int argc, char *argv[])
 #endif
 {
+
+#if !defined(WIN32)
+  //for some reason this does not work with dynamic linking on windows
+  //instead we solve the problem by adding a handmade header for the cxResources.qrc file
   Q_INIT_RESOURCE(cxResources);
+#endif
   
   cx::Application app(argc, argv);
   app.setOrganizationName("SINTEF");
@@ -84,7 +93,10 @@ int main(int argc, char *argv[])
   app.setWindowIcon(QIcon(":/icons/CustusX.png"));
   app.setAttribute(Qt::AA_DontShowIconsInMenus, false);
 
+#if !defined(WIN32)
   force_C_locale_decimalseparator();
+#endif
+
   cx::LogicManager::initialize();
 
 	std::vector<cx::GUIExtenderServicePtr> plugins;

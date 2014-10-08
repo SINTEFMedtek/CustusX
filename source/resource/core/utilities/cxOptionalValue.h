@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXOPTIONALVALUE_H
 #define CXOPTIONALVALUE_H
 
+#include "cxResourceExport.h"
+
 namespace cx
 {
 
@@ -42,7 +44,7 @@ namespace cx
  * \date 2014-03-27
  * \author christiana
  */
-template<class T> class OptionalValue
+template<class T> class cxResource_EXPORT OptionalValue
 {
 public:
 	OptionalValue() : mValid(false) {}

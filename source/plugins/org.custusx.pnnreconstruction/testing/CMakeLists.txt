@@ -19,10 +19,15 @@ if (BUILD_TESTING)
 		cxtestPNNPlugin.cpp
 		)
 
-    cx_catch_add_lib_and_exe(org_custusx_pnnreconstruction 
-        "${CX_TEST_CATCH_ORG_CUSTUSX_PNNRECONSTRUCTION_SOURCE_FILES}" 
+    #cx_catch_add_lib_and_exe(org_custusx_pnnreconstruction
+    #    "${CX_TEST_CATCH_ORG_CUSTUSX_PNNRECONSTRUCTION_SOURCE_FILES}"
+    #    "${CX_TEST_CATCH_ORG_CUSTUSX_PNNRECONSTRUCTION_MOC_SOURCE_FILES}"
+    #    cxtestCatchcxPluginUSReconstruction #TODO remove...
+    #    )
+
+    cx_catch_add_lib_and_exe(org_custusx_pnnreconstruction
+        "${CX_TEST_CATCH_ORG_CUSTUSX_PNNRECONSTRUCTION_SOURCE_FILES}"
         "${CX_TEST_CATCH_ORG_CUSTUSX_PNNRECONSTRUCTION_MOC_SOURCE_FILES}"
-        cxtestCatchcxPluginUSReconstruction #TODO remove...
         )
 
 endif (BUILD_TESTING)

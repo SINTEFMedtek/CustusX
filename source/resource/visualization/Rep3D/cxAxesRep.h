@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXAXESREP_H_
 #define CXAXESREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include <vector>
 #include "cxRepImpl.h"
 #include "cxTransform3D.h"
@@ -52,7 +54,7 @@ typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
  * \ingroup cx_resource_visualization
  * \ingroup cx_resource_visualization_rep3D
  */
-class AxesRep: public RepImpl
+class cxResourceVisualization_EXPORT AxesRep: public RepImpl
 {
 public:
 	virtual ~AxesRep();

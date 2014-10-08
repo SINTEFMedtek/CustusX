@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXBOUNDINGBOXWIDGET_H_
 #define CXBOUNDINGBOXWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include "cxForwardDeclarations.h"
 #include "cxBoundingBox3D.h"
 #include <QWidget>
@@ -49,7 +51,7 @@ class SliderRangeGroupWidget;
  * \date Mar 16, 2012
  * \author Christian Askeland, SINTEF
  */
-class BoundingBoxWidget: public QWidget
+class cxResourceWidgets_EXPORT BoundingBoxWidget: public QWidget
 {
 Q_OBJECT
 public:

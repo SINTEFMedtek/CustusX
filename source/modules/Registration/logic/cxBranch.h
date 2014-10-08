@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef BRANCH_H_
 #define BRANCH_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include <vector>
 #include "cxDataManager.h"
 #include "cxMesh.h"
@@ -47,7 +49,7 @@ namespace cx
 class Branch;
 typedef std::vector<Branch*> branchVector;
 
-class Branch
+class cxPluginRegistration_EXPORT Branch
 {
 	Eigen::MatrixXd positions;
 	Eigen::MatrixXd orientations;

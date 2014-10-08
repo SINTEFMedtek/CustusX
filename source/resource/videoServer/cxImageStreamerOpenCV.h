@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIMAGESTREAMEROPENCV_H_
 #define CXIMAGESTREAMEROPENCV_H_
 
+#include "cxGrabberExport.h"
+
 #include <QObject> //needed for the mocer when OpenCv is not used...
 #include "cxConfig.h"
 
@@ -70,7 +72,7 @@ typedef boost::shared_ptr<cv::VideoCapture> VideoCapturePtr;
  *
  * This version uses openCV to grab images from a video file or camera
  */
-class ImageStreamerOpenCV: public CommandLineStreamer
+class cxGrabber_EXPORT ImageStreamerOpenCV: public CommandLineStreamer
 {
 Q_OBJECT
 

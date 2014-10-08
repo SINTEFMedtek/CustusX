@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRECONSTRUCTTHREADS_H_
 #define CXRECONSTRUCTTHREADS_H_
 
+#include "cxPluginUSReconstructionExport.h"
+
 #include <QObject>
 #include <QThread>
 #include <math.h>
@@ -66,7 +68,7 @@ typedef boost::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedRecon
  * \date Jan 27, 2012
  * \author Christian Askeland, SINTEF
  */
-class ThreadedTimedReconstructPreprocessor: public cx::ThreadedTimedAlgorithm<void>
+class cxPluginUSReconstruction_EXPORT ThreadedTimedReconstructPreprocessor: public cx::ThreadedTimedAlgorithm<void>
 {
 Q_OBJECT
 public:
@@ -100,7 +102,8 @@ private:
  * \date Jan 27, 2012
  * \author Christian Askeland, SINTEF
  */
-class ThreadedTimedReconstructCore: public cx::ThreadedTimedAlgorithm<void>
+template class cxPluginUSReconstruction_EXPORT ThreadedTimedAlgorithm<void>;
+class cxPluginUSReconstruction_EXPORT ThreadedTimedReconstructCore: public cx::ThreadedTimedAlgorithm<void>
 {
 Q_OBJECT
 public:

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSTATESERVICE_H_
 #define CXSTATESERVICE_H_
 
+#include "cxStateServiceExport.h"
+
 #include <QDomNode>
 
 #include "cxForwardDeclarations.h"
@@ -59,7 +61,7 @@ typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
  * \sa StateService
  *
  */
-struct Desktop
+struct cxStateService_EXPORT Desktop
 {
 	Desktop();
 	Desktop(QString layout, QByteArray mainwindowstate);
@@ -131,7 +133,7 @@ struct Desktop
  * \date 4. aug. 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class StateService: public QObject
+class cxStateService_EXPORT StateService: public QObject
 {
 Q_OBJECT
 

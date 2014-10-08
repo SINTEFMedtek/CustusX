@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDISPLAYTIMERWIDGET_H_
 #define CXDISPLAYTIMERWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QWidget>
 #include <QDateTime>
 class QTimer;
@@ -49,7 +51,7 @@ namespace cx
  * \date Jan 27, 2012
  * \author Christian Askeland, SINTEF
  */
-class DisplayTimerWidget : public QWidget
+class cxResourceWidgets_EXPORT DisplayTimerWidget : public QWidget
 {
 	Q_OBJECT
 public:

@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONMANAGER_H_
 #define CXREGISTRATIONMANAGER_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include <map>
 #include <vector>
 #include <QObject>
@@ -65,7 +67,7 @@ typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
  * \date Feb 4, 2009
  * \\author Janne Beate Bakeng, SINTEF
  */
-class RegistrationManager : public QObject
+class cxPluginRegistration_EXPORT RegistrationManager : public QObject
 {
   Q_OBJECT
 

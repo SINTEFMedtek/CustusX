@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRECONSTRUCTOUTPUTVALUEPARAMSINTERFACES_H_
 #define CXRECONSTRUCTOUTPUTVALUEPARAMSINTERFACES_H_
 
+#include "cxPluginUSReconstructionExport.h"
+
 #include "cxDoubleDataAdapter.h"
 #include "cxReconstructionManager.h"
 
@@ -50,7 +52,7 @@ class OutputVolumeParams;
 /** Abstract interface to setting one of the values in class OutputValueParams.
  *  Sublass to get a concrete class.
  */
-class DoubleDataAdapterOutputValueParams : public DoubleDataAdapter
+class cxPluginUSReconstruction_EXPORT DoubleDataAdapterOutputValueParams : public DoubleDataAdapter
 {
   Q_OBJECT
 public:
@@ -71,7 +73,7 @@ protected:
 
 /** Interface to setting spacing in output volume
  */
-class DoubleDataAdapterSpacing : public DoubleDataAdapterOutputValueParams
+class cxPluginUSReconstruction_EXPORT DoubleDataAdapterSpacing : public DoubleDataAdapterOutputValueParams
 {
   Q_OBJECT
 public:
@@ -89,7 +91,7 @@ protected:
 
 /** Interface to setting dim in output volume
  */
-class DoubleDataAdapterXDim : public DoubleDataAdapterOutputValueParams
+class cxPluginUSReconstruction_EXPORT DoubleDataAdapterXDim : public DoubleDataAdapterOutputValueParams
 {
   Q_OBJECT
 public:
@@ -104,7 +106,7 @@ protected:
 };
 /** Interface to setting dim in output volume
  */
-class DoubleDataAdapterYDim : public DoubleDataAdapterOutputValueParams
+class cxPluginUSReconstruction_EXPORT DoubleDataAdapterYDim : public DoubleDataAdapterOutputValueParams
 {
   Q_OBJECT
 public:
@@ -119,7 +121,7 @@ protected:
 };
 /** Interface to setting dim in output volume
  */
-class DoubleDataAdapterZDim : public DoubleDataAdapterOutputValueParams
+class cxPluginUSReconstruction_EXPORT DoubleDataAdapterZDim : public DoubleDataAdapterOutputValueParams
 {
   Q_OBJECT
 public:

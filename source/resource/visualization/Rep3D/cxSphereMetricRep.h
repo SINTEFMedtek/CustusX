@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSPHEREMETRICREP_H
 #define CXSPHEREMETRICREP_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxDataMetricRep.h"
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
@@ -59,7 +61,7 @@ typedef boost::shared_ptr<class SphereMetric> SphereMetricPtr;
  * \date 2014-02-11
  * \author Christian Askeland, SINTEF
  */
-class SphereMetricRep: public DataMetricRep
+class cxResourceVisualization_EXPORT SphereMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:

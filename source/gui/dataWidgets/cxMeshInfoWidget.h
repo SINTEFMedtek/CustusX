@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMESHINFOWIDGET_H_
 #define CXMESHINFOWIDGET_H_
 
+#include "cxGuiExport.h"
+
 #include <vector>
 #include <QtWidgets>
 
@@ -54,7 +56,7 @@ typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDat
  * \author Ole Vegard Solberg, SINTEF
  * \author Janne Beate Bakeng, SINTEF
  */
-class MeshInfoWidget : public InfoWidget
+class cxGui_EXPORT MeshInfoWidget : public InfoWidget
 {
   Q_OBJECT
 

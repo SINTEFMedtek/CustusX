@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRACKINGPOSITIONFILTER_H
 #define CXTRACKINGPOSITIONFILTER_H
 
+#include "cxResourceExport.h"
+
 #include "cxTransform3D.h"
 #include <map>
 #include <boost/shared_ptr.hpp>
@@ -47,7 +49,7 @@ namespace cx
  * \date 2014-03-06
  * \author christiana
  */
-class TrackingPositionFilter
+class cxResource_EXPORT TrackingPositionFilter
 {
 public:
 	TrackingPositionFilter();

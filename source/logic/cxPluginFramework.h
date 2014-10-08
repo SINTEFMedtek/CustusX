@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPLUGINFRAMEWORK_H_
 #define CXPLUGINFRAMEWORK_H_
 
+#include "cxLogicManagerExport.h"
+
 #include <QString>
 #include <QObject>
 #include <boost/shared_ptr.hpp>
@@ -55,7 +57,7 @@ typedef boost::shared_ptr<class PluginFrameworkManager> PluginFrameworkManagerPt
  * This is a customized version of the ctk singleton ctkPluginFrameworkLauncher.
  *
  */
-class PluginFrameworkManager : public QObject
+class cxLogicManager_EXPORT PluginFrameworkManager : public QObject
 {
 	Q_OBJECT
 public:

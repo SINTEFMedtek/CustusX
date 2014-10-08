@@ -33,6 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDATAREADERWRITER_H_
 #define CXDATAREADERWRITER_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include <map>
 #include <set>
 #include <string>
@@ -65,7 +68,7 @@ typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
   *
   * Note: Googling indicates that VTK in general is threadUNsafe.
   */
-class StaticMutexVtkLocker
+class cxResource_EXPORT StaticMutexVtkLocker
 {
 public:
 	StaticMutexVtkLocker();
@@ -78,7 +81,7 @@ private:
 /**\brief Interface for Data file readers.
  *
  */
-class DataReader
+class cxResource_EXPORT DataReader
 {
 public:
 	virtual ~DataReader()
@@ -97,7 +100,7 @@ typedef boost::shared_ptr<DataReader> DataReaderPtr;
 /**\brief Reader for metaheader .mhd files.
  *
  */
-class MetaImageReader: public DataReader
+class cxResource_EXPORT MetaImageReader: public DataReader
 {
 public:
 	virtual ~MetaImageReader()
@@ -120,7 +123,7 @@ public:
 /**\brief Reader for portable network graphics .png files.
  *
  */
-class PNGImageReader: public DataReader
+class cxResource_EXPORT PNGImageReader: public DataReader
 {
 public:
 	virtual ~PNGImageReader() {}
@@ -140,7 +143,7 @@ public:
 /**\brief Reader for .vtk files.
  *
  */
-class PolyDataMeshReader: public DataReader
+class cxResource_EXPORT PolyDataMeshReader: public DataReader
 {
 public:
 	virtual ~PolyDataMeshReader()
@@ -162,7 +165,7 @@ public:
 /**\brief Reader for STL files.
  *
  */
-class StlMeshReader: public DataReader
+class cxResource_EXPORT StlMeshReader: public DataReader
 {
 public:
 	virtual ~StlMeshReader()
@@ -185,7 +188,7 @@ public:
  * \date May 2, 2013
  * \author christiana
  */
-class DataReaderWriter
+class cxResource_EXPORT DataReaderWriter
 {
 public:
 	explicit DataReaderWriter();

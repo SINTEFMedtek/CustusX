@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXCOMPACTFILTERSETUPWIDGET_H_
 #define CXCOMPACTFILTERSETUPWIDGET_H_
 
+#include "cxPluginAlgorithmExport.h"
+
 #include "cxBaseWidget.h"
 #include "cxFilterWidget.h"
 #include "cxFilter.h"
@@ -47,7 +49,7 @@ namespace cx {
  * \date Dec 13, 2012
  * \author Christian Askeland, SINTEF
  */
-class CompactFilterSetupWidget : public BaseWidget
+class cxPluginAlgorithm_EXPORT CompactFilterSetupWidget : public BaseWidget
 {
 	Q_OBJECT
 

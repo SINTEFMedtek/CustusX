@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSTRINGDATAADAPTERXML_H_
 #define CXSTRINGDATAADAPTERXML_H_
 
+#include "cxResourceExport.h"
+
 #include <QDomElement>
 #include <QStringList>
 #include "cxStringDataAdapter.h"
@@ -61,7 +63,7 @@ typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
  *
  * \ingroup cx_resource_core_dataadapters
  */
-class StringDataAdapterXml: public StringDataAdapter
+class cxResource_EXPORT StringDataAdapterXml: public StringDataAdapter
 {
 Q_OBJECT
 public:

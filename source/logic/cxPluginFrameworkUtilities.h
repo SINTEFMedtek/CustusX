@@ -33,14 +33,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPLUGINFRAMEWORKUTILITIES_H_
 #define CXPLUGINFRAMEWORKUTILITIES_H_
 
+#include "cxLogicManagerExport.h"
+
 #include <ctkPlugin.h>
 
 namespace cx
 {
 
 
-QString getStringForctkPluginState(const ctkPlugin::State state);
-ctkPlugin::State getctkPluginStateForString(QString text);
+cxLogicManager_EXPORT QString getStringForctkPluginState(const ctkPlugin::State state);
+cxLogicManager_EXPORT ctkPlugin::State getctkPluginStateForString(QString text);
 
 } /* namespace cx */
 #endif /* CXPLUGINFRAMEWORKUTILITIES_H_ */

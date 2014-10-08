@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXUNSIGNEDDERIVEDIMAGE_H_
 #define CXUNSIGNEDDERIVEDIMAGE_H_
 
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+
 #include "cxImage.h"
 
 #define CALL_IN_WEAK_PTR(weak_base, func, defarg)       \
@@ -58,7 +61,7 @@ struct CoordinateSystem;
  *   \date Feb 21, 2013
  *   \author christiana
  */
-class UnsignedDerivedImage : public Image
+class cxResource_EXPORT UnsignedDerivedImage : public Image
 {
     Q_OBJECT
 public:

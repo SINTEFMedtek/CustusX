@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRANSFORM3DWIDGET_H_
 #define CXTRANSFORM3DWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include "cxBaseWidget.h"
 #include "cxDoubleDataAdapterXml.h"
 #include "cxTransform3D.h"
@@ -54,7 +56,7 @@ class MatrixTextEdit;
  * \ingroup cx_resource_widgets
  *
  */
-class Transform3DWidget : public BaseWidget
+class cxResourceWidgets_EXPORT Transform3DWidget : public BaseWidget
 {
   Q_OBJECT
 public:

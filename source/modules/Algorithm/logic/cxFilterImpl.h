@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFILTERIMPL_H
 #define CXFILTERIMPL_H
 
+#include "cxPluginAlgorithmExport.h"
+
 #include <vector>
 #include <QObject>
 #include "cxFilter.h"
@@ -50,7 +52,7 @@ namespace cx
  * \date Nov 21, 2012
  * \author Christian Askeland, SINTEF
  */
-class FilterImpl : public Filter
+class cxPluginAlgorithm_EXPORT FilterImpl : public Filter
 {
 	Q_OBJECT
 

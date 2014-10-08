@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPREFERANCESDIALOG_H_
 #define CXPREFERANCESDIALOG_H_
 
+#include "cxGuiExport.h"
+
 #include "cxPreferenceTab.h"
 #include "cxGeneralTab.h"
 #include <QDialog>
@@ -72,7 +74,7 @@ class ToolConfigureGroupBox;
  * @{
  */
 
-class VisualizationTab : public PreferenceTab
+class cxGui_EXPORT VisualizationTab : public PreferenceTab
 {
     Q_OBJECT
 public:
@@ -124,7 +126,7 @@ private slots:
  * \date Jan 27, 2011
  * \author Christian Askeland, SINTEF
  */
-class AutomationTab : public PreferenceTab
+class cxGui_EXPORT AutomationTab : public PreferenceTab
 {
   Q_OBJECT
 
@@ -156,7 +158,7 @@ protected:
  * \date Jan 27, 2011
  * \author Christian Askeland, SINTEF
  */
-class VideoTab : public PreferenceTab
+class cxGui_EXPORT VideoTab : public PreferenceTab
 {
   Q_OBJECT
 
@@ -202,7 +204,7 @@ protected:
  * \date Mar 22, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class ToolConfigTab : public PreferenceTab
+class cxGui_EXPORT ToolConfigTab : public PreferenceTab
 {
   Q_OBJECT
 
@@ -234,7 +236,7 @@ private:
  * \author Frank Lindseth, SINTEF
  * \author Ole Vegard Solberg, SINTEF
  */
-class PreferencesDialog : public QDialog
+class cxGui_EXPORT PreferencesDialog : public QDialog
 {
     Q_OBJECT
 
@@ -264,7 +266,7 @@ protected:
  * \date Jan 24, 2012
  * \author Christian Askeland, SINTEF
  */
-class DebugTab : public PreferenceTab
+class cxGui_EXPORT DebugTab : public PreferenceTab
 {
   Q_OBJECT
 

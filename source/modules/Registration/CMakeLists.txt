@@ -37,6 +37,7 @@ SET( MOC_HEADER_FILES
     gui/cxBronchoscopyRegistrationWidget.h
     )
 
+cx_remove_duplicate_include_directories()
 QT5_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
 # library
@@ -117,26 +118,41 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/service/tracking
     ${CustusX_SOURCE_DIR}/source/service/visualization
 	${CustusX_SOURCE_DIR}/source/logic
+	${CustusX_BINARY_DIR}/source/logic
+	${CustusX_BINARY_DIR}/source/service/patient
+    ${CustusX_BINARY_DIR}/source/service/tracking
+    ${CustusX_BINARY_DIR}/source/service/visualization
 
     ${CustusX_SOURCE_DIR}/source/modules/GUIExtender
+    ${CustusX_BINARY_DIR}/source/modules/GUIExtender
     ${CustusX_SOURCE_DIR}/source/modules/Acquisition/gui
     ${CustusX_SOURCE_DIR}/source/modules/Acquisition/logic
+    ${CustusX_BINARY_DIR}/source/modules/Acquisition
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/gui
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
+    ${CustusX_BINARY_DIR}/source/modules/Algorithm
     ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/logic
     ${CustusX_SOURCE_DIR}/source/modules/UsReconstruction/logic/3DReconstruction
+    ${CustusX_BINARY_DIR}/source/modules/UsReconstruction
 
     ${CustusX_SOURCE_DIR}/source/gui/utilities
     ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
     ${CustusX_SOURCE_DIR}/source/gui/infoWidgets
     ${CustusX_SOURCE_DIR}/source/gui/dataWidgets
+    ${CustusX_BINARY_DIR}/source/gui
 
     ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     ${CustusX_SOURCE_DIR}/source/resource/core/registration
+    ${CustusX_BINARY_DIR}/source/resource/widgets
+    ${CustusX_BINARY_DIR}/source/resource/visualization
+    ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
     )
 
 
 # =========================================================
+cx_remove_duplicate_include_directories()
+cx_create_export_header("cxPluginRegistration")
+
 # create the target
 add_library( cxPluginRegistration ${SOURCE_FILES} )
 set(LINK_LIBRARIES cxPluginAcquisition cxPluginAlgorithm)

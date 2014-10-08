@@ -133,6 +133,7 @@ configure_file(Rep/Shaders/glsl/raycasting_shader.vert Rep COPYONLY)
 unset(CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES)
 set(CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES
     ${CX_RESOURCE_INCLUDE_DIRECTORIES}
+    ${CustusX_BINARY_DIR}/source/resource/visualization
     ${CustusX_SOURCE_DIR}/source/resource/visualization
     ${CustusX_SOURCE_DIR}/source/resource/visualization/Rep
     ${CustusX_SOURCE_DIR}/source/resource/visualization/Rep2D
@@ -150,6 +151,7 @@ include_directories(${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}
 	View/internal/ViewMixed
     )
 
+cx_remove_duplicate_include_directories()
 QT5_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 set(CX_RESOURCE_VISUALIZATION_LIBRARIES
@@ -168,7 +170,9 @@ if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
         )
 endif()
 
-ADD_LIBRARY ( cxResourceVisualization ${CX_RESOURCE_VISUALIZATION_FILES})
+cx_create_export_header("cxResourceVisualization")
+cx_remove_duplicate_include_directories()
+add_library( cxResourceVisualization ${CX_RESOURCE_VISUALIZATION_FILES})
 target_link_libraries(cxResourceVisualization ${CX_RESOURCE_VISUALIZATION_LIBRARIES} )
 
 add_subdirectory(testing)

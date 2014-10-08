@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTHRESHOLDPREVIEW_H_
 #define CXTHRESHOLDPREVIEW_H_
 
+#include "cxVisualizationServiceExport.h"
+
 #include <QObject>
 class QTimer;
 #include "cxForwardDeclarations.h"
@@ -53,7 +55,7 @@ typedef boost::shared_ptr<class ThresholdPreview> ThresholdPreviewPtr;
   * This hack solves the issue of tabbed widgets no receiving hide() events,
   * or being !visible at all.
   */
-class WidgetObscuredListener : public QObject
+class cxVisualizationService_EXPORT WidgetObscuredListener : public QObject
 {
     Q_OBJECT
 public:
@@ -77,7 +79,7 @@ private:
  * \date 12. okt. 2011
  * \author Ole Vegard Solberg, SINTEF
  */
-class ThresholdPreview: public QObject
+class cxVisualizationService_EXPORT ThresholdPreview: public QObject
 {
 Q_OBJECT
 public:

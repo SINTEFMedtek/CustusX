@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLMANUALCALIBRATIONWIDGET_H_
 #define CXTOOLMANUALCALIBRATIONWIDGET_H_
 
+#include "cxPluginCalibrationExport.h"
+
 #include "cxBaseWidget.h"
 #include "cxTransform3DWidget.h"
 
@@ -47,7 +49,7 @@ typedef boost::shared_ptr<class SelectToolStringDataAdapter> SelectToolStringDat
 /**Widget for manually changing the tool calibration matrix sMt.
  *
  */
-class ToolManualCalibrationWidget : public BaseWidget
+class cxPluginCalibration_EXPORT ToolManualCalibrationWidget : public BaseWidget
 {
   Q_OBJECT
 

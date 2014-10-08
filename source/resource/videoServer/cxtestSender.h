@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTESTSENDER_H_
 #define CXTESTSENDER_H_
 
+#include "cxGrabberExport.h"
+
 #include "cxSender.h"
 #include <boost/shared_ptr.hpp>
 
@@ -47,7 +49,7 @@ namespace cxtest {
  * \date May 13, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
-class TestSender : public cx::Sender
+class cxGrabber_EXPORT TestSender : public cx::Sender
 {
 	Q_OBJECT
 public:

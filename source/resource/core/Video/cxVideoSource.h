@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIDEOSOURCE_H_
 #define CXVIDEOSOURCE_H_
 
+#include "cxResourceExport.h"
+
 #include "vtkSmartPointer.h"
 #include <boost/shared_ptr.hpp>
 #include <QObject>
@@ -58,7 +60,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_video
  */
-class VideoSource : public QObject
+class cxResource_EXPORT VideoSource : public QObject
 {
 	Q_OBJECT
 

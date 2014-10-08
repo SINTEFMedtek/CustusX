@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXWORKFLOWSTATEMACHINE_H_
 #define CXWORKFLOWSTATEMACHINE_H_
 
+#include "cxStateServiceExport.h"
+
 #include <QStateMachine>
 #include <QActionGroup>
 #include "cxForwardDeclarations.h"
@@ -60,7 +62,7 @@ class WorkflowState;
  * \date 4. aug. 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class WorkflowStateMachine: public QStateMachine
+class cxStateService_EXPORT WorkflowStateMachine: public QStateMachine
 {
 Q_OBJECT
 public:

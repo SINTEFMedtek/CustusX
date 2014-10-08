@@ -21,6 +21,8 @@ set(CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES
     CACHE INTERNAL "Include directories for resource US Reconstruction Types library")
 include_directories(${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES} )
 
+cx_create_export_header("cxResourceUsReconstructionTypes")
+cx_remove_duplicate_include_directories()
 add_library( cxResourceUsReconstructionTypes ${CX_RESOURCE_USRECONSTRUCTIONTYPES_FILES})
 target_link_libraries(cxResourceUsReconstructionTypes cxResource )
 

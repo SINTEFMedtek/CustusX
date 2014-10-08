@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIDEORECORDER_H_
 #define CXVIDEORECORDER_H_
 
+#include "cxResourceExport.h"
+
 #include "vtkSmartPointer.h"
 #include <boost/shared_ptr.hpp>
 #include <QObject>
@@ -62,7 +64,7 @@ namespace cx
  *
  * \ingroup cx_resource_core_video
  */
-class VideoRecorder : public QObject
+class cxResource_EXPORT VideoRecorder : public QObject
 {
 	Q_OBJECT
 public:

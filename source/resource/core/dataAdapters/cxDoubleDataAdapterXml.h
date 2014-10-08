@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDOUBLEDATAADAPTERXML_H_
 #define CXDOUBLEDATAADAPTERXML_H_
 
+#include "cxResourceExport.h"
+
 #include <QDomElement>
 #include <QStringList>
 #include "cxDoubleRange.h"
@@ -64,7 +66,7 @@ typedef boost::shared_ptr<class DoubleDataAdapterXml> DoubleDataAdapterXmlPtr;
  *
  * \ingroup cx_resource_core_dataadapters
  */
-class DoubleDataAdapterXml: public DoubleDataAdapter
+class cxResource_EXPORT DoubleDataAdapterXml: public DoubleDataAdapter
 {
 
 	Q_OBJECT

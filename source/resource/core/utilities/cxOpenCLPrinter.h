@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXOPENCLPRINTER_H_
 #define CXOPENCLPRINTER_H_
 
+#include "cxResourceExport.h"
+
 #include <string>
 #include "OpenCLManager.hpp"
 class QString;
@@ -49,7 +51,7 @@ namespace cx
  * \date Dec 9, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
-class OpenCLPrinter
+class cxResource_EXPORT OpenCLPrinter
 {
 public:
 	static void printPlatformAndDeviceInfo();

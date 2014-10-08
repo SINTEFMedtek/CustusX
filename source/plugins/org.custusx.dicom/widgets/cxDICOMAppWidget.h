@@ -21,6 +21,8 @@
 #ifndef __cxDICOMAppWidget_h
 #define __cxDICOMAppWidget_h
 
+#include "org_custusx_dicom_Export.h"
+
 // Qt includes 
 #include <QWidget>
 
@@ -42,7 +44,7 @@ class DICOMAppWidgetPrivate;
  * \date 2014-05-20
  * \author Christian Askeland
  */
-class DICOMAppWidget : public QWidget
+class org_custusx_dicom_EXPORT DICOMAppWidget : public QWidget
 {
   Q_OBJECT
 

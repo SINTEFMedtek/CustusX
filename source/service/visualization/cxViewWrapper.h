@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWWRAPPER_H_
 #define CXVIEWWRAPPER_H_
 
+#include "cxVisualizationServiceExport.h"
+
 #include <vector>
 #include <QVariant>
 #include <QObject>
@@ -68,7 +70,7 @@ typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServic
 
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 
-class SyncedValue: public QObject
+class cxVisualizationService_EXPORT SyncedValue: public QObject
 {
 Q_OBJECT
 public:
@@ -88,7 +90,7 @@ typedef boost::shared_ptr<class DataViewPropertiesInteractor> DataViewProperties
 /** Provide an action list for showing data in views.
   *
   */
-class DataViewPropertiesInteractor : public QObject
+class cxVisualizationService_EXPORT DataViewPropertiesInteractor : public QObject
 {
 	Q_OBJECT
 public:
@@ -114,7 +116,7 @@ private:
  * \date 6. apr. 2010
  * \\author jbake
  */
-class ViewWrapper: public QObject
+class cxVisualizationService_EXPORT ViewWrapper: public QObject
 {
 Q_OBJECT
 public:

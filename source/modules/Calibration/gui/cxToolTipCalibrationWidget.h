@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTOOLTIPCALIBRATIONWIDGET_H_
 #define CXTOOLTIPCALIBRATIONWIDGET_H_
 
+#include "cxPluginCalibrationExport.h"
+
 #include "cxTransform3D.h"
 #include "cxVector3D.h"
 #include "cxBaseWidget.h"
@@ -60,7 +62,7 @@ class LabeledComboBoxWidget;
  * \date 3. nov. 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class ToolTipCalibrateWidget : public BaseWidget
+class cxPluginCalibration_EXPORT ToolTipCalibrateWidget : public BaseWidget
 {
   Q_OBJECT
 
@@ -88,7 +90,7 @@ private:
 /**
  * Class that calibrates the tool using a reference point in ref.
  */
-class ToolTipCalibrationCalculator
+class cxPluginCalibration_EXPORT ToolTipCalibrationCalculator
 {
 public:
   ToolTipCalibrationCalculator(ToolPtr tool, ToolPtr ref, Vector3D p_t = Vector3D());

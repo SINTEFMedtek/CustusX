@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXDISPLAYTEXTREP_H_
 #define CXDISPLAYTEXTREP_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include <vector>
 #include "cxRepImpl.h"
 #include "cxVector3D.h"
@@ -58,7 +60,7 @@ typedef boost::shared_ptr<class DisplayTextRep> DisplayTextRepPtr;
  * \ingroup cx_resource_visualization_rep3D
  * \ingroup cx_resource_visualization_repvideo
  */
-class DisplayTextRep : public RepImpl
+class cxResourceVisualization_EXPORT DisplayTextRep : public RepImpl
 {
 public:
 	static DisplayTextRepPtr New(const QString& uid="");

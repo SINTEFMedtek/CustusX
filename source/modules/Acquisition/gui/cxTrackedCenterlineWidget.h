@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTRACKEDCENTERLINEWIDGET_H_
 #define CXTRACKEDCENTERLINEWIDGET_H_
 
+#include "cxPluginAcquisitionExport.h"
+
 #include "cxRecordBaseWidget.h"
 #include "cxTool.h"
 
@@ -52,7 +54,7 @@ namespace cx
  * \date Dec 9, 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class TrackedCenterlineWidget : public TrackedRecordWidget
+class cxPluginAcquisition_EXPORT  TrackedCenterlineWidget : public TrackedRecordWidget
 {
   Q_OBJECT
 public:

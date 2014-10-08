@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXIGTLINKCONVERSION_H_
 #define CXIGTLINKCONVERSION_H_
 
+#include "cxOpenIGTLinkUtilitiesExport.h"
+
 #include "cxImage.h"
 #include "cxTool.h"
 #include "cxIGTLinkImageMessage.h"
@@ -50,7 +52,7 @@ namespace cx
  * \author olevs
  * \author christiana
  */
-class IGTLinkConversion
+class cxOpenIGTLinkUtilities_EXPORT IGTLinkConversion
 {
 public:
 	IGTLinkConversion();

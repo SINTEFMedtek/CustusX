@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXFASTIMAGEREGISTRATIONWIDGET_H_
 #define CXFASTIMAGEREGISTRATIONWIDGET_H_
 
+#include "cxPluginRegistrationExport.h"
+
 #include "cxLandmarkImageRegistrationWidget.h"
 
 namespace cx
@@ -52,7 +54,7 @@ namespace cx
  * \date 27. sep. 2010
  * \\author Janne Beate Bakeng
  */
-class FastImageRegistrationWidget : public LandmarkImageRegistrationWidget
+class cxPluginRegistration_EXPORT FastImageRegistrationWidget : public LandmarkImageRegistrationWidget
 {
 	Q_OBJECT
 public:
@@ -64,7 +66,7 @@ protected:
   virtual void performRegistration();
 };
 
-class PlateImageRegistrationWidget : public FastImageRegistrationWidget
+class cxPluginRegistration_EXPORT PlateImageRegistrationWidget : public FastImageRegistrationWidget
 {
 	Q_OBJECT
 public:

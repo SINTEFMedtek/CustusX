@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMEHDIGPURAYCASTMULTIVOLUMEREP_H
 #define CXMEHDIGPURAYCASTMULTIVOLUMEREP_H
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxRepImpl.h"
 #include "cxForwardDeclarations.h"
 #include <vector>
@@ -53,7 +55,7 @@ typedef boost::shared_ptr<class MehdiGPURayCastMultiVolumeRep> MehdiGPURayCastMu
 typedef boost::shared_ptr<class VolumeProperty> VolumePropertyPtr;
 typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
 
-class MehdiGPURayCastMultiVolumeRepImageMapperMonitor : public ImageMapperMonitor
+class cxResourceVisualization_EXPORT MehdiGPURayCastMultiVolumeRepImageMapperMonitor : public ImageMapperMonitor
 {
 public:
 	static ImageMapperMonitorPtr create(vtkVolumePtr volume, ImagePtr image, int volumeIndex);
@@ -75,7 +77,7 @@ private:
   * The CX_BUILD_MEHDI_VTKMULTIVOLUME define is not handled correctly by moc.
   *
   */
-class MehdiGPURayCastMultiVolumeRepBase: public RepImpl
+class cxResourceVisualization_EXPORT MehdiGPURayCastMultiVolumeRepBase: public RepImpl
 {
 Q_OBJECT
 public:
@@ -101,7 +103,7 @@ private slots:
  * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF
  */
-class MehdiGPURayCastMultiVolumeRep: public MehdiGPURayCastMultiVolumeRepBase
+class cxResourceVisualization_EXPORT MehdiGPURayCastMultiVolumeRep: public MehdiGPURayCastMultiVolumeRepBase
 {
 	Q_OBJECT
 public:

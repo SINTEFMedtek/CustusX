@@ -68,6 +68,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QVTKWidget.h"
 #include "vtkRendererCollection.h"
+#include "cxtestUtilities.h"
+
 
 using cx::Vector3D;
 using cx::Transform3D;
@@ -161,7 +163,8 @@ TEST_CASE("Visual rendering: Empty QVTKWidget",
 //	sleep(3);
 
 	CHECK(true);
-	sleep(3);
+    //sleep(3);
+    cxtest::Utilities::sleep_sec(3);
 }
 
 TEST_CASE("Visual rendering: Empty view",

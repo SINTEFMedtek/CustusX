@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMULTIFILEINPUTWIDGET_H_
 #define CXMULTIFILEINPUTWIDGET_H_
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QWidget>
 class QLabel;
 class QLineEdit;
@@ -51,7 +53,7 @@ namespace cx
  * \date 2014-04-17
  * \author christiana
  */
-class MultiFileInputWidget : public QWidget
+class cxResourceWidgets_EXPORT MultiFileInputWidget : public QWidget
 {
 	Q_OBJECT
 public:

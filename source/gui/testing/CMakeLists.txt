@@ -43,10 +43,14 @@ include_directories(
 		cxtestOpenCLAndGui.cpp
 	    )
 
-	cx_catch_add_lib_and_exe(cxGui
-		"${CXTEST_GUI_SOURCES}"
-		"${CXTEST_SOURCES_TO_MOC}"
-		"cxResourceVisualizationTestUtilities")
+        #cx_catch_add_lib_and_exe(cxGui
+        #	"${CXTEST_GUI_SOURCES}"
+        #	"${CXTEST_SOURCES_TO_MOC}"
+        #      "cxResourceVisualizationTestUtilities")
+
+        cx_catch_add_lib_and_exe(cxGui
+                "${CXTEST_GUI_SOURCES}"
+                "${CXTEST_SOURCES_TO_MOC}")
 
 
 endif (BUILD_TESTING)

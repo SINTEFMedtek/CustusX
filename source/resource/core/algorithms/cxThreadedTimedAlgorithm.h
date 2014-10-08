@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXTHREADEDTIMEDALGORITHM_H_
 #define CXTHREADEDTIMEDALGORITHM_H_
 
+#include "cxResourceExport.h"
+
 #include <QFutureWatcher>
 #include <QtConcurrent/QtConcurrentRun>
 
@@ -53,7 +55,7 @@ namespace cx
  * \author Janne Beate Bakeng, SINTEF
  */
 template <class T>
-class ThreadedTimedAlgorithm : public TimedBaseAlgorithm
+class cxResource_EXPORT ThreadedTimedAlgorithm : public TimedBaseAlgorithm
 {
 public:
   ThreadedTimedAlgorithm(QString product, int secondsBetweenAnnounce) :
@@ -105,6 +107,10 @@ private:
   QFuture<T> mFutureResult;
   QFutureWatcher<T> mWatcher;
 };
+
+//template specicalizations
+template<>
+cxResource_EXPORT void ThreadedTimedAlgorithm<void>::getResult();
 
 //---------------------------------------------------------------------------------------------------------------------
 /**
