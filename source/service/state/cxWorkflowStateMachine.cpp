@@ -42,20 +42,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-WorkflowStateMachine::WorkflowStateMachine(StateServiceBackendPtr backend) : mBackend(backend)
+WorkflowStateMachine::WorkflowStateMachine(VideoServicePtr videoService, StateServiceBackendPtr backend) : mBackend(backend)
 {
 	mStarted = false;
 	connect(this, SIGNAL(started()), this, SLOT(startedSlot()));
 	mActionGroup = new QActionGroup(this);
 
-	mParentState = new ParentWorkflowState(this, mBackend);
+	mParentState = new ParentWorkflowState(videoService, this, mBackend);
 
-	WorkflowState* patientData = this->newState(new PatientDataWorkflowState(mParentState, mBackend));
-	this->newState(new RegistrationWorkflowState(mParentState, mBackend));
-	this->newState(new PreOpPlanningWorkflowState(mParentState, mBackend));
-	this->newState(new NavigationWorkflowState(mParentState, mBackend));
-	this->newState(new IntraOpImagingWorkflowState(mParentState, mBackend));
-	this->newState(new PostOpControllWorkflowState(mParentState, mBackend));
+	WorkflowState* patientData = this->newState(new PatientDataWorkflowState(videoService, mParentState, mBackend));
+	this->newState(new RegistrationWorkflowState(videoService, mParentState, mBackend));
+	this->newState(new PreOpPlanningWorkflowState(videoService, mParentState, mBackend));
+	this->newState(new NavigationWorkflowState(videoService, mParentState, mBackend));
+	this->newState(new IntraOpImagingWorkflowState(videoService, mParentState, mBackend));
+	this->newState(new PostOpControllWorkflowState(videoService, mParentState, mBackend));
 
 	//set initial state on all levels
 	this->setInitialState(mParentState);

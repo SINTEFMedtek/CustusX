@@ -49,7 +49,7 @@ namespace cx
 class cxPluginCalibration_EXPORT CalibrationMethodsWidget : public TabbedWidget
 {
 public:
-  CalibrationMethodsWidget(AcquisitionDataPtr acquisitionData,
+  CalibrationMethodsWidget(PatientModelServicePtr patientModelService, AcquisitionDataPtr acquisitionData,
   		QWidget* parent, QString objectName, QString windowTitle);
   virtual ~CalibrationMethodsWidget(){};
   virtual QString defaultWhatsThis() const;

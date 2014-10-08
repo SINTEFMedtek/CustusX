@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "cxRegistrationImplService.h"
-#include "cxRegistrationServiceNull.h"
 #include "cxRegisteredService.h"
 
 namespace cx
@@ -44,11 +43,11 @@ namespace cx
 
 RegistrationPluginActivator::RegistrationPluginActivator()
 {
-	std::cout << "Created RegistrationPluginActivator" << std::endl;
 }
 
 RegistrationPluginActivator::~RegistrationPluginActivator()
-{}
+{
+}
 
 void RegistrationPluginActivator::start(ctkPluginContext* context)
 {

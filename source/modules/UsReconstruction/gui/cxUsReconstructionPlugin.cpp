@@ -44,7 +44,7 @@ namespace cx
 
 UsReconstructionPlugin::UsReconstructionPlugin()
 {
-  XmlOptionFile xmlFile = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction");
+  XmlOptionFile xmlFile = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("usReconstruction");
   mReconstructer.reset(new ReconstructionManager(xmlFile, DataLocations::getShaderPath()));
   //mReconstructer->init();
 

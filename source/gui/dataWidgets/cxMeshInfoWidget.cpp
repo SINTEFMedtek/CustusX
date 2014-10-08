@@ -46,16 +46,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxLogger.h"
+#include "cxPatientModelService.h"
 
 
 namespace cx
 {
 
 
-MeshInfoWidget::MeshInfoWidget(QWidget* parent) :
-		InfoWidget(parent, "MeshInfoWidget", "Mesh Properties")//, mMeshPropertiesGroupBox(new QGroupBox(this))
+MeshInfoWidget::MeshInfoWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
+	InfoWidget(parent, "MeshInfoWidget", "Mesh Properties"),
+	mPatientModelService(patientModelService),
+	mVisualizationService(visualizationService)
 {
-	this->addWidgets();
+	this->addWidgets(patientModelService);
 	this->meshSelectedSlot();
 }
 
@@ -117,7 +120,7 @@ void MeshInfoWidget::importTransformSlot()
 {
   if(!mMesh)
     return;
-  DataPtr parent = dataManager()->getData(mMesh->getParentSpace());
+  DataPtr parent = mPatientModelService->getData(mMesh->getParentSpace());
   if (!parent)
     return;
   mMesh->get_rMd_History()->setRegistration(parent->get_rMd());
@@ -141,13 +144,13 @@ void MeshInfoWidget::hideEvent(QCloseEvent* event)
   QWidget::closeEvent(event);
 }
 
-void MeshInfoWidget::addWidgets()
+void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 {
-	mSelectMeshWidget = SelectMeshStringDataAdapter::New();
+	mSelectMeshWidget = SelectMeshStringDataAdapter::New(patientModelService);
 	mSelectMeshWidget->setValueName("Surface: ");
 	connect(mSelectMeshWidget.get(), SIGNAL(changed()), this, SLOT(meshSelectedSlot()));
 
-	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("MeshInfoWidget");
+	XmlOptionFile options = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("MeshInfoWidget");
 	QString uid("Color");
 	QString name("");
 	QString help("Color of the mesh.");
@@ -165,7 +168,7 @@ void MeshInfoWidget::addWidgets()
 
 	mUidAdapter = DataUidEditableStringDataAdapter::New();
 	mNameAdapter = DataNameEditableStringDataAdapter::New();
-	mParentFrameAdapter = ParentFrameStringDataAdapter::New();
+	mParentFrameAdapter = ParentFrameStringDataAdapter::New(mPatientModelService);
 
 	QWidget* optionsWidget = new QWidget(this);
 	QHBoxLayout* optionsLayout = new QHBoxLayout(optionsWidget);
@@ -180,7 +183,7 @@ void MeshInfoWidget::addWidgets()
 
 	int gridLayoutRow = 1;
 
-	gridLayout->addWidget(new DataSelectWidget(this, mSelectMeshWidget), gridLayoutRow++, 0, 1, 2);
+	gridLayout->addWidget(new DataSelectWidget(mVisualizationService, mPatientModelService, this, mSelectMeshWidget), gridLayoutRow++, 0, 1, 2);
 	new LabeledLineEditWidget(this, mUidAdapter, gridLayout, gridLayoutRow++);
 	new LabeledLineEditWidget(this, mNameAdapter, gridLayout, gridLayoutRow++);
 	new LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, gridLayoutRow++);

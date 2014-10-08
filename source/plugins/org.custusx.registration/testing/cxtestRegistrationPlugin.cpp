@@ -76,11 +76,12 @@ TEST_CASE("RegistrationPlugin: Check empty RegistrationImplService", "[unit][plu
 {
 	init();
 	cx::RegistrationServicePtr service = cx::RegistrationService::getNullObject();
-    service.reset(new cx::RegistrationImplService(getPluginContext()));
-    REQUIRE(service);
-    REQUIRE_FALSE(service->getFixedData());
-    REQUIRE_FALSE(service->getMovingData());
-    REQUIRE_FALSE(service->isNull());
+	service.reset(new cx::RegistrationImplService(getPluginContext()));
+	REQUIRE(service);
+	REQUIRE_FALSE(service->getFixedData());
+	REQUIRE_FALSE(service->getMovingData());
+	REQUIRE_FALSE(service->isNull());
+	service.reset();
 	shutdown();
 }
 

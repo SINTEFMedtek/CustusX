@@ -42,10 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QProcess>
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
-#include "cxServiceTrackerListener.h"
-#include "cxStreamerService.h"
 #include "cxXmlOptionItem.h"
-#include "cxDetailedLabeledComboBoxWidget.h"
 
 class QPushButton;
 class QComboBox;
@@ -55,18 +52,16 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
 namespace cx
 {
-	class FileSelectWidget;
-	typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
-	typedef boost::shared_ptr<class Tool> ToolPtr;
-}
-
-namespace cx
-{
-typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
-typedef boost::shared_ptr<class ActiveVideoSourceStringDataAdapter> ActiveVideoSourceStringDataAdapterPtr;
-
+class FileSelectWidget;
 class SimulateUSWidget;
 class FileInputWidget;
+class StreamerService;
+class XmlOptionFile;
+class DetailedLabeledComboBoxWidget;
+typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
+typedef boost::shared_ptr<class ActiveVideoSourceStringDataAdapter> ActiveVideoSourceStringDataAdapterPtr;
+typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
+typedef boost::shared_ptr<class Tool> ToolPtr;
 
 /**
  * \brief GUI for setting up a connection to a video stream
@@ -83,7 +78,7 @@ class cxGui_EXPORT VideoConnectionWidget : public BaseWidget
   Q_OBJECT
 
 public:
-	VideoConnectionWidget(QWidget* parent);
+	VideoConnectionWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, VideoServicePtr newVideoService, QWidget* parent);
 	virtual ~VideoConnectionWidget();
 	virtual QString defaultWhatsThis() const;
 
@@ -96,6 +91,8 @@ protected slots:
 	void importStreamImageSlot();
 	void selectGuiForConnectionMethodSlot();
 	void initScriptSelected(QString filename);
+	void onServiceAdded(StreamerService *service);
+	void onServiceRemoved(StreamerService *service);
 
 protected:
 	void connectServer();
@@ -135,16 +132,17 @@ protected:
 	FileInputWidget* mLocalServerFile;
 	XmlOptionFile mOptions;
 	DetailedLabeledComboBoxWidget* mConnectionSelectionWidget;
+	VisualizationServicePtr mVisualizationService;
+	PatientModelServicePtr mPatientModelService;
+	VideoServicePtr mVideoService;
 
 private:
 	QWidget* createStreamerWidget(StreamerService* service);
-	void onServiceAdded(StreamerService *service);
-	void onServiceRemoved(StreamerService *service);
 	void addServiceToSelector(QString name);
 	void removeServiceFromSelector(QString name);
 	void removeServiceWidget(QString name);
+	void addExistingStreamerServices();
 
-	boost::shared_ptr<ServiceTrackerListener<StreamerService> > mServiceListener;
 	std::map<QString, QWidget*> mStreamerServiceWidgets;
 };
 

@@ -53,7 +53,7 @@ class org_custusx_example_EXPORT ExampleGUIExtenderService : public GUIExtenderS
 	Q_INTERFACES(cx::GUIExtenderService)
 public:
 	ExampleGUIExtenderService(ctkPluginContext *context);
-	virtual ~ExampleGUIExtenderService();
+	virtual ~ExampleGUIExtenderService() {};
 
 	std::vector<CategorizedWidget> createWidgets() const;
 

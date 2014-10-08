@@ -33,9 +33,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMainWindow.h"
 
 #include <QtWidgets>
-
 #include <QtConcurrent>
 #include <QWhatsThis>
+#include <QDesktopWidget>
 #include "boost/scoped_ptr.hpp"
 #include "boost/bind.hpp"
 #include "cxTime.h"
@@ -55,7 +55,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientData.h"
 #include "cxDataLocations.h"
 #include "cxMeshInfoWidget.h"
-//#include "cxLayoutEditorWidget.h"
 #include "cxFrameForest.h"
 #include "cxFrameTreeWidget.h"
 #include "cxImportDataDialog.h"
@@ -67,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxVideoConnectionManager.h"
 #include "cxToolManagerWidget.h"
-#include "cxVideoService.h"
+#include "cxVideoServiceOld.h"
 #include "cxExportDataDialog.h"
 #include "cxGPUImageBuffer.h"
 #include "cxData.h"
@@ -97,13 +96,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogicManager.h"
 #include "cxPluginFramework.h"
 #include "ctkPluginContext.h"
-#include <QDesktopWidget>
+#include "cxDockWidgets.h"
+#include "cxPatientModelServiceProxy.h"
+#include "cxVisualizationServiceProxy.h"
+#include "cxVideoServiceProxy.h"
 
 namespace cx
 {
 
 MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
-	mFullScreenAction(NULL), mStandard3DViewActions(NULL), mControlPanel(NULL)
+	mFullScreenAction(NULL), mStandard3DViewActions(NULL), mControlPanel(NULL), mDockWidgets(new DockWidgets(this))
 {
 	QFile stylesheet(":/cxStyleSheet.ss");
 	stylesheet.open(QIODevice::ReadOnly);
@@ -132,13 +134,19 @@ MainWindow::MainWindow(std::vector<GUIExtenderServicePtr> guiExtenders) :
 
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
+	ctkPluginContext *pluginContext = LogicManager::getInstance()->getPluginContext();
+
+	mPatientModelService = PatientModelServicePtr(new PatientModelServiceProxy(pluginContext));
+	mVisualizationService = VisualizationServicePtr(new VisualizationServiceProxy(pluginContext));
+	mVideoService = VideoServicePtr(new VideoServiceProxy(pluginContext));
+
 	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
-	this->addAsDockWidget(new VideoConnectionWidget(this), "Utility");
+	this->addAsDockWidget(new VideoConnectionWidget(mVisualizationService, mPatientModelService, mVideoService, this), "Utility");
 	this->addAsDockWidget(new EraserWidget(this), "Properties");
-	this->addAsDockWidget(new MetricWidget(this), "Utility");
-	this->addAsDockWidget(new SlicePropertiesWidget(this), "Properties");
-	this->addAsDockWidget(new VolumePropertiesWidget(this), "Properties");
-	this->addAsDockWidget(new MeshInfoWidget(this), "Properties");
+	this->addAsDockWidget(new MetricWidget(mVisualizationService, mPatientModelService, this), "Utility");
+	this->addAsDockWidget(new SlicePropertiesWidget(mPatientModelService, mVisualizationService, this), "Properties");
+	this->addAsDockWidget(new VolumePropertiesWidget(mPatientModelService, mVisualizationService, this), "Properties");
+	this->addAsDockWidget(new MeshInfoWidget(mPatientModelService, mVisualizationService, this), "Properties");
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
 	this->addAsDockWidget(new ToolPropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new NavigationWidget(this), "Properties");
@@ -195,7 +203,7 @@ void MainWindow::setupGUIExtenders()
 								 LogicManager::getInstance()->getPluginContext(),
 							   boost::bind(&MainWindow::onPluginBaseAdded, this, _1),
 							   boost::bind(&MainWindow::onPluginBaseModified, this, _1),
-							   boost::bind(&MainWindow::onPluginBaseRemoved, this, _1)
+								 boost::bind(&MainWindow::onPluginBaseRemoved, this, _1)
 							   ));
 	mServiceListener->open();
 }
@@ -203,13 +211,19 @@ void MainWindow::setupGUIExtenders()
 void MainWindow::addGUIExtender(GUIExtenderService* service)
 {
 	std::vector<GUIExtenderService::CategorizedWidget> widgets = service->createWidgets();
-    for (unsigned j = 0; j < widgets.size(); ++j)
-    {
-        QWidget* widget = this->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory);
-        mWidgetsByPlugin[service].push_back(widget);
-    }
+	for (unsigned j = 0; j < widgets.size(); ++j)
+	{
+		QWidget* widget = this->addCategorizedWidget(widgets[j]);
+		mWidgetsByPlugin[service].push_back(widget);
+	}
 }
 
+QWidget *MainWindow::addCategorizedWidget(GUIExtenderService::CategorizedWidget categorizedWidget)
+{
+	QWidget* retval;
+	retval = this->addAsDockWidget(categorizedWidget.mWidget, categorizedWidget.mCategory);
+	return retval;
+}
 
 void MainWindow::removeGUIExtender(GUIExtenderService* service)
 {
@@ -222,7 +236,7 @@ void MainWindow::removeGUIExtender(GUIExtenderService* service)
 		QDockWidget* dockWidget = dynamic_cast<QDockWidget*>(widget);
 		this->removeDockWidget(dockWidget);
 
-		mDockWidgets.erase(dockWidget);
+		mDockWidgets->erase(dockWidget);
 
 		if (dockWidget)
 		{
@@ -255,42 +269,6 @@ void MainWindow::startupLoadPatient()
 	patientService()->getPatientData()->startupLoadPatient();
 }
 
-QWidget* MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
-{
-	// add a scroller to allow for very large widgets in the vertical direction
-	QScrollArea* scroller = new QScrollArea(NULL);
-	scroller->setWidget(widget);
-	scroller->setWidgetResizable(true);
-	scroller->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	QSizePolicy policy = scroller->sizePolicy();
-	policy.setHorizontalPolicy(QSizePolicy::Minimum);
-	scroller->setSizePolicy(policy);
-
-	QDockWidget* dockWidget = new QDockWidget(widget->windowTitle(), this);
-	dockWidget->setObjectName(widget->objectName() + "DockWidget");
-	dockWidget->setWidget(scroller);
-
-	QMainWindow::addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
-
-	// tabify the widget onto one of the left widgets.
-	for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter != mDockWidgets.end(); ++iter)
-	{
-		if (this->dockWidgetArea(*iter) == Qt::LeftDockWidgetArea)
-		{
-			this->tabifyDockWidget(*iter, dockWidget);
-			break;
-		}
-	}
-
-
-	mDockWidgets.insert(dockWidget);
-	dockWidget->setVisible(false); // default visibility
-	this->restoreDockWidget(dockWidget); // restore if added after construction
-
-	this->addToWidgetGroupMap(dockWidget->toggleViewAction(), groupname);
-
-	return dockWidget;
-}
 
 void MainWindow::addToWidgetGroupMap(QAction* action, QString groupname)
 {
@@ -312,6 +290,7 @@ void MainWindow::addToWidgetGroupMap(QAction* action, QString groupname)
 
 MainWindow::~MainWindow()
 {
+	mServiceListener.reset();
 }
 
 QMenu* MainWindow::createPopupMenu()
@@ -424,7 +403,9 @@ void MainWindow::createActions()
 	mShowPointPickerAction->setToolTip("Activate the 3D Point Picker Probe");
 	mShowPointPickerAction->setIcon(QIcon(":/icons/point_picker.png"));
 	connect(mShowPointPickerAction, SIGNAL(triggered()), this, SLOT(togglePointPickerActionSlot()));
+
 	connect(viewManager()->getViewGroups()[0]->getData().get(), SIGNAL(optionsChanged()), this,
+//	connect(mVisualizationService->getViewGroupData(0).get(), SIGNAL(optionsChanged()), this, //Too early?
 		SLOT(updatePointPickerActionSlot()));
 	this->updatePointPickerActionSlot();
 
@@ -529,14 +510,7 @@ void MainWindow::toggleDebugModeSlot(bool checked)
 	foreach(action, debugActions)
 		{
 			action->setVisible(checked);
-			for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter != mDockWidgets.end(); ++iter)
-			{
-				if (action == (*iter)->toggleViewAction())
-				{
-					if (!checked)
-						(*iter)->hide();
-				}
-			}
+			this->mDockWidgets->toggleDebug(action, checked);
 		}
 }
 void MainWindow::saveScreenShot(QPixmap pixmap, QString id)
@@ -563,7 +537,7 @@ void MainWindow::toggleStreamingSlot()
 	if (videoService()->getVideoConnection()->isConnected())
 		videoService()->getVideoConnection()->disconnectServer();
 	else
-		videoService()->getVideoConnection()->launchAndConnectServer();
+		videoService()->getVideoConnection()->launchAndConnectServer(mVideoService);
 }
 
 void MainWindow::updateStreamingActionSlot()
@@ -588,6 +562,7 @@ void MainWindow::centerToImageCenterSlot()
 		nav->centerToData(dataManager()->getActiveImage());
 	else if (!viewManager()->getViewGroups().empty())
 		nav->centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
+//		nav->centerToView(mVisualizationService->getViewGroupData(0)->getData());//Too early?
 	else
 		nav->centerToGlobalDataCenter();
 }
@@ -601,6 +576,7 @@ void MainWindow::centerToTooltipSlot()
 void MainWindow::togglePointPickerActionSlot()
 {
 	ViewGroupDataPtr data = viewManager()->getViewGroups()[0]->getData();
+//	ViewGroupDataPtr data = mVisualizationService->getViewGroupData(0); //Too early?
 	ViewGroupData::Options options = data->getOptions();
 	options.mShowPointPickerProbe = !options.mShowPointPickerProbe;
 	data->setOptions(options);
@@ -608,6 +584,7 @@ void MainWindow::togglePointPickerActionSlot()
 void MainWindow::updatePointPickerActionSlot()
 {
 	bool show = viewManager()->getViewGroups()[0]->getData()->getOptions().mShowPointPickerProbe;
+//	bool show = mVisualizationService->getViewGroupData(0)->getOptions().mShowPointPickerProbe;//TOO early?
 	mShowPointPickerAction->setChecked(show);
 }
 
@@ -727,8 +704,7 @@ void MainWindow::onWorkflowStateChangedSlot()
 {
 	Desktop desktop = stateService()->getActiveDesktop();
 
-	for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter != mDockWidgets.end(); ++iter)
-		(*iter)->hide();
+	this->mDockWidgets->hideAll();
 
 	viewManager()->setActiveLayout(desktop.mLayoutUid, 0);
 	viewManager()->setActiveLayout(desktop.mSecondaryLayoutUid, 1);
@@ -789,7 +765,7 @@ void MainWindow::exportDataSlot()
 {
 	this->savePatientFileSlot();
 
-	ExportDataDialog* wizard = new ExportDataDialog(this);
+	ExportDataDialog* wizard = new ExportDataDialog(mPatientModelService, this);
 	wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
 }
 
@@ -813,7 +789,7 @@ void MainWindow::importDataSlot()
 
 	for (int i=0; i<fileName.size(); ++i)
 	{
-		ImportDataDialog* wizard = new ImportDataDialog(fileName[i], this);
+		ImportDataDialog* wizard = new ImportDataDialog(mPatientModelService, fileName[i], this);
 		wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
 	}
 }
@@ -961,7 +937,7 @@ void MainWindow::createToolBars()
 
 	QToolBar* toolOffsetToolBar = addToolBar("Tool Offset");
 	toolOffsetToolBar->setObjectName("ToolOffsetToolBar");
-	toolOffsetToolBar->addWidget(createDataWidget(this, DoubleDataAdapterActiveToolOffset::create()));
+	toolOffsetToolBar->addWidget(createDataWidget(mVisualizationService, mPatientModelService, this, DoubleDataAdapterActiveToolOffset::create()));
 	this->registerToolBar(toolOffsetToolBar, "Toolbar");
 
 	QToolBar* registrationHistoryToolBar = addToolBar("Registration History");
@@ -1008,7 +984,7 @@ void MainWindow::aboutSlot()
 
 void MainWindow::preferencesSlot()
 {
-	PreferencesDialog prefDialog(this);
+	PreferencesDialog prefDialog(mVisualizationService, mPatientModelService, this);
 	prefDialog.exec();
 }
 
@@ -1034,7 +1010,7 @@ void MainWindow::deleteDataSlot()
 	QString text = QString("Do you really want to delete data %1?").arg(dataManager()->getActiveImage()->getName());
 	if (QMessageBox::question(this, "Data delete", text, QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel))!=QMessageBox::Ok)
 		return;
-	patientService()->getPatientData()->removeData(dataManager()->getActiveImage()->getUid());
+	mPatientModelService->removePatientData(dataManager()->getActiveImage()->getUid());
 }
 
 void MainWindow::configureSlot()
@@ -1047,4 +1023,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	QMainWindow::closeEvent(event);
 	this->quitSlot();
 }
+
+QDockWidget* MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
+{
+	QDockWidget* dockWidget = mDockWidgets->addAsDockWidget(widget, groupname);
+	this->addToWidgetGroupMap(dockWidget->toggleViewAction(), groupname);
+	QMainWindow::addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
+	this->restoreDockWidget(dockWidget); // restore if added after construction
+	return dockWidget;
+}
+
 }//namespace cx

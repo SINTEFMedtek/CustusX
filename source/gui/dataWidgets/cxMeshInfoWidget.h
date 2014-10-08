@@ -61,7 +61,7 @@ class cxGui_EXPORT MeshInfoWidget : public InfoWidget
   Q_OBJECT
 
 public:
-  MeshInfoWidget(QWidget* parent);
+	MeshInfoWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent);
   virtual ~MeshInfoWidget();
 
 protected slots:
@@ -76,7 +76,7 @@ protected:
   virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
 
 private:
-  void addWidgets();
+	void addWidgets(cx::PatientModelServicePtr patientModelService);
 
   MeshPtr mMesh;
   ParentFrameStringDataAdapterPtr mParentFrameAdapter;
@@ -86,6 +86,8 @@ private:
   ColorDataAdapterXmlPtr mColorAdapter;
   QCheckBox* mBackfaceCullingCheckBox;
   QCheckBox* mFrontfaceCullingCheckBox;
+  PatientModelServicePtr mPatientModelService;
+  VisualizationServicePtr mVisualizationService;
   
   MeshInfoWidget();
 };

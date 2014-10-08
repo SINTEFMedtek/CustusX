@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QColor>
 #include <QBrush>
 #include <QMouseEvent>
-#include "cxDataManager.h"
 #include "cxImageTF3D.h"
 #include "cxImageTFData.h"
 #include "cxReporter.h"
@@ -51,14 +50,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(QWidget* parent) :
+TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
   BaseWidget(parent, "TransferFunctionAlphaWidget", "Alpha Transfer Function"),
   mBorder(5),
   mReadOnly(false)
 {
 	this->setFocusPolicy(Qt::StrongFocus);
 
-	mActiveImageProxy = ActiveImageProxy::New(dataService());
+	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
   connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageTransferFunctionsChangedSlot()));
 
   mSelectedAlphaPoint.reset();

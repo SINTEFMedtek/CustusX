@@ -37,13 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-
 ExampleGUIExtenderService::ExampleGUIExtenderService(ctkPluginContext *context) :
   mContext(context)
-{
-}
-
-ExampleGUIExtenderService::~ExampleGUIExtenderService()
 {
 }
 

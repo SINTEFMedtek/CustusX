@@ -58,7 +58,7 @@ class cxGui_EXPORT TransferFunction2DOpacityWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  TransferFunction2DOpacityWidget(QWidget* parent);
+  TransferFunction2DOpacityWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~TransferFunction2DOpacityWidget() {}
   virtual QString defaultWhatsThis() const;
 
@@ -69,6 +69,7 @@ protected:
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   DoubleDataAdapterImageTFDataBasePtr mDataAlpha, mDataLLR;
   ActiveImageProxyPtr mActiveImageProxy;
+  PatientModelServicePtr mPatientModelService;
 };
 
 /**

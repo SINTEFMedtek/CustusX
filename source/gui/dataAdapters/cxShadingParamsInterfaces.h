@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleWidgets.h"
 #include "cxForwardDeclarations.h"
 #include "cxActiveImageProxy.h"
-#include "cxLegacySingletons.h"
 
 namespace cx
 {
@@ -55,7 +54,7 @@ class cxGui_EXPORT DoubleDataAdapterShadingBase : public DoubleDataAdapter
 {
   Q_OBJECT 
 public:
-  DoubleDataAdapterShadingBase();
+  DoubleDataAdapterShadingBase(PatientModelServicePtr patientModelService);
   virtual ~DoubleDataAdapterShadingBase() {}
   //virtual double getValue() const;
   //virtual bool setValue(double val);
@@ -65,6 +64,7 @@ private slots:
 protected:
   ImagePtr mImage;
   ActiveImageProxyPtr mActiveImageProxy;
+  PatientModelServicePtr mPatientModelService;
 };
   
 /** Interface for setting the ambient parameter for the shading.
@@ -73,7 +73,7 @@ class cxGui_EXPORT DoubleDataAdapterShadingAmbient : public DoubleDataAdapterSha
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterShadingAmbient() {}
+  DoubleDataAdapterShadingAmbient(PatientModelServicePtr patientModelService);
   virtual ~DoubleDataAdapterShadingAmbient() {}
   virtual QString getDisplayName() const { return "Ambient"; }
   DoubleRange getValueRange() const  { return DoubleRange(0.0, 1.0, 0.01); }
@@ -87,7 +87,7 @@ class cxGui_EXPORT DoubleDataAdapterShadingDiffuse : public DoubleDataAdapterSha
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterShadingDiffuse() {}
+  DoubleDataAdapterShadingDiffuse(PatientModelServicePtr patientModelService);
   virtual ~DoubleDataAdapterShadingDiffuse() {}
   virtual QString getDisplayName() const { return "Diffuse"; }
   DoubleRange getValueRange() const  { return DoubleRange(0.0, 1.0, 0.01); }
@@ -101,7 +101,7 @@ class cxGui_EXPORT DoubleDataAdapterShadingSpecular : public DoubleDataAdapterSh
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterShadingSpecular() {}
+  DoubleDataAdapterShadingSpecular(PatientModelServicePtr patientModelService);
   virtual ~DoubleDataAdapterShadingSpecular() {}
   virtual QString getDisplayName() const { return "Specular"; }
   DoubleRange getValueRange() const  { return DoubleRange(0.0, 4.0, 0.01); }
@@ -115,7 +115,7 @@ class cxGui_EXPORT DoubleDataAdapterShadingSpecularPower : public DoubleDataAdap
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterShadingSpecularPower() {}
+  DoubleDataAdapterShadingSpecularPower(PatientModelServicePtr patientModelService);
   virtual ~DoubleDataAdapterShadingSpecularPower() {}
   virtual QString getDisplayName() const { return "Specular Power"; }
   DoubleRange getValueRange() const  { return DoubleRange(0.0, 50.0, 0.01); }

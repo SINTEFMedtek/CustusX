@@ -39,17 +39,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxColorWidget.h"
 #include "cxTransferFunction2DOpacityWidget.h"
 #include "cxTransferFunction2DColorWidget.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
-SlicePropertiesWidget::SlicePropertiesWidget(QWidget* parent) :
+SlicePropertiesWidget::SlicePropertiesWidget(PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
 		TabbedWidget(parent, "SlicePropertiesWidget", "Slice Properties")
 {
-  this->insertWidgetAtTop(new DataSelectWidget(this, ActiveImageStringDataAdapter::New()));
-  this->addTab(new VolumeInfoWidget(this), "Info");
-  this->addTab(new ColorWidget(this), "Color");
-  this->addTab(new OverlayWidget(this), "Overlay");
+	this->insertWidgetAtTop(new DataSelectWidget(visualizationService, patientModelService, this, ActiveImageStringDataAdapter::New(patientModelService)));
+  this->addTab(new VolumeInfoWidget(patientModelService, this), "Info");
+  this->addTab(new ColorWidget(patientModelService, this), "Color");
+  this->addTab(new OverlayWidget(patientModelService, this), "Overlay");
 }
 
 SlicePropertiesWidget::~SlicePropertiesWidget()

@@ -19,6 +19,7 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/modules/Algorithm/logic
     ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
 	${CustusX_SOURCE_DIR}/source/logic
+	${CustusX_SOURCE_DIR}/source/resource/filter
     )
 
 set(PLUGIN_SRCS
@@ -45,6 +46,7 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}   
     cxPluginAlgorithm
     levelSetSegLib
+    cxResourceFilter
     )
 
 if (CX_USE_OPENCL_UTILITY)

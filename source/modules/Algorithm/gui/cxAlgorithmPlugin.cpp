@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxAlgorithmPlugin.h"
 
+#include <ctkPluginContext.h>
 #include <vector>
 #include "cxFilterWidget.h"
 #include "cxPipeline.h"
@@ -44,7 +45,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-AlgorithmPlugin::AlgorithmPlugin()
+AlgorithmPlugin::AlgorithmPlugin(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService) :
+	mPatientModelService(patientModelService),
+	mVisualizationService(visualizationService)
 {}
 
 AlgorithmPlugin::~AlgorithmPlugin()
@@ -55,7 +58,7 @@ std::vector<GUIExtenderService::CategorizedWidget> AlgorithmPlugin::createWidget
 	std::vector<CategorizedWidget> retval;
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-	                     new AllFiltersWidget(NULL),
+						 new AllFiltersWidget(mVisualizationService,  mPatientModelService, NULL),
 	                     "Algorithms"));
 
 	return retval;

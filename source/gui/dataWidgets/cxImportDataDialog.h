@@ -56,7 +56,7 @@ class cxGui_EXPORT ImportDataDialog : public QDialog
 {
   Q_OBJECT
 public:
-  ImportDataDialog(QString filename, QWidget* parent=NULL);
+  ImportDataDialog(PatientModelServicePtr patientModelService, QString filename, QWidget* parent=NULL);
   virtual ~ImportDataDialog();
 
 public:
@@ -82,6 +82,7 @@ private:
   QCheckBox* mNiftiFormatCheckBox;
   QCheckBox* mTransformFromParentFrameCheckBox;
   QCheckBox* mConvertToUnsignedCheckBox;
+  PatientModelServicePtr mPatientModelService;
 
   void convertFromNifti1Coordinates();
   void importParentTransform();

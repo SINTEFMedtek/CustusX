@@ -34,17 +34,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXBASEWIDGET_H_
 
 #include "cxResourceWidgetsExport.h"
-
-#include <QWidget>
-#include <QTabWidget>
-#include <QGroupBox>
-#include <QVBoxLayout>
-#include <QCheckBox>
-#include <QLabel>
+#include <QFrame>
 #include <QToolButton>
 #include <QAction>
+#include <QLayout>
 #include <iostream>
+#include <boost/shared_ptr.hpp>
 #include "cxOptimizedUpdateWidget.h"
+
+class QWidget;
+class QGroupBox;
+class QCheckBox;
+class QLabel;
 
 /**
 * \file
@@ -92,6 +93,8 @@ public:
 
 namespace cx
 {
+typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
 /**
  * \class BaseWidget
  *

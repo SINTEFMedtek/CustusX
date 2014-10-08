@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ToolImpl::ToolImpl(TrackingServicePtr manager, const QString& uid, const QString& name) :
+ToolImpl::ToolImpl(TrackingServiceOldPtr manager, const QString& uid, const QString& name) :
 	Tool(uid, name),
 	mPositionHistory(new TimedTransformMap()),
 	m_prMt(Transform3D::Identity()),
@@ -50,11 +50,11 @@ ToolImpl::~ToolImpl()
 
 }
 
-TrackingServicePtr ToolImpl::getTrackingService()
+TrackingServiceOldPtr ToolImpl::getTrackingService()
 {
 	return mManager.lock();
 }
-TrackingServicePtr ToolImpl::getTrackingService() const
+TrackingServiceOldPtr ToolImpl::getTrackingService() const
 {
 	return mManager.lock();
 }

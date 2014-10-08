@@ -15,6 +15,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
 	View/internal/ViewContainer/cxViewContainerItem
 	View/internal/ViewContainer/cxViewContainer	
 	View/internal/ViewContainer/cxViewCollectionWidgetUsingViewContainer	
+	cxVisualizationService
     
 	Rep/cxRep.h
 	Rep/cxRepImpl
@@ -74,6 +75,8 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
 	View/internal/ViewWidget/cxViewCache.h
 	View/internal/ViewWidget/cxViewLinkingViewWidget
 	View/internal/ViewContainer/cxViewLinkingViewContainerItem
+	cxVisualizationServiceNull
+	cxVisualizationServiceProxy
 	Primitives/cxDepthPeeling
 	Primitives/cxGraphicalTorus3D
 	Primitives/cxVtkHelperClasses
@@ -141,6 +144,8 @@ set(CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES
     ${CustusX_SOURCE_DIR}/source/resource/visualization/RepVideo
     ${CustusX_SOURCE_DIR}/source/resource/visualization/Primitives
 	${CustusX_SOURCE_DIR}/source/resource/visualization/View
+
+	${CustusX_BINARY_DIR}/source/service/visualization
 	CACHE INTERNAL "Include directories for resource visualization library")
 
 include_directories(${CX_RESOURCE_VISUALIZATION_INCLUDE_DIRECTORIES}

@@ -46,6 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+ResampleImageFilter::ResampleImageFilter(PatientModelServicePtr patientModelService) :
+	FilterImpl(patientModelService)
+{
+}
 
 QString ResampleImageFilter::getName() const
 {
@@ -81,12 +85,12 @@ void ResampleImageFilter::createInputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New();
+	temp = SelectImageStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select input to be resampled");
 	mInputTypes.push_back(temp);
 
-	temp = SelectImageStringDataAdapter::New();
+	temp = SelectImageStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Reference");
 	temp->setHelp("Select reference. Resample input into this coordinate system and bounding box");
 	mInputTypes.push_back(temp);
@@ -96,7 +100,7 @@ void ResampleImageFilter::createOutputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New();
+	temp = SelectDataStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Output");
 	temp->setHelp("Output thresholded binary image");
 	mOutputTypes.push_back(temp);

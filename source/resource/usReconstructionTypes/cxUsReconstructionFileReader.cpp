@@ -235,7 +235,7 @@ std::pair<QString, ProbeDefinition> UsReconstructionFileReader::readProbeDataFro
 		return retval;
 	}
 
-	XmlOptionFile file = XmlOptionFile(filename, "navnet");
+	XmlOptionFile file = XmlOptionFile(filename);
 	retval.second.parseXml(file.getElement("configuration"));
 
 	retval.first = file.getElement("tool").toElement().attribute("toolID");

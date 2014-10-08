@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxConnectedThresholdImageFilterWidget.h"
 
 #include <QPushButton>
+#include <QLabel>
+#include <QGroupBox>
 
 #include "cxDataManager.h"
 #include "cxPatientData.h"

@@ -6,30 +6,30 @@ if (BUILD_TESTING)
 
     set(RESOURCE_TEST_CATCH_SOURCE_FILES
         cxtestCatchStringHelpers.cpp
-		cxtestCatchSliceComputer.cpp
-		cxtestCatchBoundingBox3D.cpp
-		cxtestCatchFrame.cpp
-		cxtestCatchSharedMemory.cpp
-		cxtestCatchTransform3D.cpp
-		cxtestCatchVector3D.cpp
+        cxtestCatchSliceComputer.cpp
+        cxtestCatchBoundingBox3D.cpp
+        cxtestCatchFrame.cpp
+        cxtestCatchSharedMemory.cpp
+        cxtestCatchTransform3D.cpp
+        cxtestCatchVector3D.cpp
         cxtestImageParameters.cpp
-		cxtestCatchImageAlgorithms.cpp
-		cxtestCatchProcessWrapper.cpp
-		cxtestProcessWrapperFixture.h
-		cxtestProcessWrapperFixture.cpp
-		cxtestCatchVLCRecorder.cpp
-		cxtestVLCRecorderFixture.h
-		cxtestVLCRecorderFixture.cpp
-		cxtestProbeDefinition.cpp
-		cxtestSpaceProviderMock.h
-		cxtestSpaceProviderMock.cpp
-		cxtestSpaceListenerMock.h
-		cxtestSpaceListenerMock.cpp
-		cxtestTrackingPositionFilter.cpp
-		cxtestCoreServices.cpp
-		cxtestReporter.cpp
-		cxtestImage.cpp
-		)
+        cxtestCatchImageAlgorithms.cpp
+        cxtestCatchProcessWrapper.cpp
+        cxtestProcessWrapperFixture.h
+        cxtestProcessWrapperFixture.cpp
+        cxtestCatchVLCRecorder.cpp
+        cxtestVLCRecorderFixture.h
+        cxtestVLCRecorderFixture.cpp
+        cxtestProbeDefinition.cpp
+        cxtestSpaceProviderMock.h
+        cxtestSpaceProviderMock.cpp
+        cxtestSpaceListenerMock.h
+        cxtestSpaceListenerMock.cpp
+        cxtestTrackingPositionFilter.cpp
+        cxtestCoreServices.cpp
+        cxtestReporter.cpp
+        cxtestImage.cpp
+        )
 	if (CX_USE_OPENCL_UTILITY)
 	   	set(RESOURCE_TEST_CATCH_SOURCE_FILES
 	   	    ${RESOURCE_TEST_CATCH_SOURCE_FILES}

@@ -56,6 +56,7 @@ class cxPluginAlgorithm_EXPORT BinaryThresholdImageFilter : public FilterImpl
 	Q_OBJECT
 
 public:
+	BinaryThresholdImageFilter(PatientModelServicePtr patientModelService);
 	virtual ~BinaryThresholdImageFilter() {}
 
 	virtual QString getType() const;

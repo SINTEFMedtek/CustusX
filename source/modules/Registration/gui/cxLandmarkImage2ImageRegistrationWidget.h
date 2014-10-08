@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPluginRegistrationExport.h"
 
 #include "cxLandmarkRegistrationWidget.h"
-#include "cxRegistrationDataAdapters.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -46,6 +45,10 @@ class QSlider;
 
 namespace cx
 {
+typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
+typedef boost::shared_ptr<class RegistrationFixedImageStringDataAdapter> RegistrationFixedImageStringDataAdapterPtr;
+typedef boost::shared_ptr<class RegistrationMovingImageStringDataAdapter> RegistrationMovingImageStringDataAdapterPtr;
+
 /**
  * \file
  * \addtogroup cx_module_registration
@@ -62,7 +65,7 @@ Q_OBJECT
 
 public:
 
-	LandmarkImage2ImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName,
+	LandmarkImage2ImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName,
 		QString windowTitle); ///< sets up layout and connects signals and slots
 	virtual ~LandmarkImage2ImageRegistrationWidget(); ///< empty
 	virtual QString defaultWhatsThis() const;

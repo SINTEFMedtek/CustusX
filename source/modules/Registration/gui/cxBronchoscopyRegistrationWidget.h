@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPushButton>
 #include "cxRegistrationBaseWidget.h"
-//#include "cxStringDataAdapter.h"
 #include "cxTrackedCenterlineWidget.h"
 
 namespace cx
@@ -61,12 +60,11 @@ class cxPluginRegistration_EXPORT BronchoscopyRegistrationWidget: public Registr
 {
 	Q_OBJECT
 public:
-	BronchoscopyRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent);
+	BronchoscopyRegistrationWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget *parent);
 	virtual ~BronchoscopyRegistrationWidget()
 	{
 	}
 	virtual QString defaultWhatsThis() const;
-
 private slots:
 	void registerSlot();
 	void acquisitionStarted();

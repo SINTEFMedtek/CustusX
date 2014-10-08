@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxTransform3D.h"
 #include "cxDominantToolProxy.h"
+#include "cxPatientModelServiceProxy.h"
 
 class QPushButton;
 class QCheckBox;
@@ -66,7 +67,7 @@ class cxPluginRegistration_EXPORT PatientOrientationWidget : public Registration
   Q_OBJECT
 
 public:
-  PatientOrientationWidget(RegistrationManagerPtr regManager, QWidget* parent);
+	PatientOrientationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle);
   ~PatientOrientationWidget();
   virtual QString defaultWhatsThis() const;
 
@@ -80,6 +81,7 @@ private:
   QCheckBox* mInvertButton;
 
   DominantToolProxyPtr mDominantToolProxy;
+	PatientModelServicePtr mPatientModelService;
 };
 
 /**

@@ -57,7 +57,7 @@ class cxGui_EXPORT VolumeInfoWidget : public InfoWidget
   Q_OBJECT
 
 public:
-  VolumeInfoWidget(QWidget* parent);
+  VolumeInfoWidget(PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~VolumeInfoWidget();
 
   virtual QString defaultWhatsThis() const;
@@ -74,6 +74,7 @@ private:
   DataModalityStringDataAdapterPtr mModalityAdapter;
   ImageTypeStringDataAdapterPtr mImageTypeAdapter;
   ActiveImageProxyPtr mActiveImageProxy;
+  PatientModelServicePtr mPatientModelService;
 };
 
 }//namespace cx

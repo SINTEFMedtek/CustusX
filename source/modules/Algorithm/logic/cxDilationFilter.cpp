@@ -50,8 +50,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataManager.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
+#include "cxLegacySingletons.h"
 
 namespace cx {
+
+DilationFilter::DilationFilter(PatientModelServicePtr patientModelService) :
+	FilterImpl(patientModelService)
+{
+}
 
 QString DilationFilter::getName() const
 {
@@ -108,7 +114,7 @@ void DilationFilter::createInputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectImageStringDataAdapter::New();
+	temp = SelectImageStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Input");
 	temp->setHelp("Select segmentation input for dilation");
 	mInputTypes.push_back(temp);
@@ -118,12 +124,12 @@ void DilationFilter::createOutputTypes()
 {
 	SelectDataStringDataAdapterBasePtr temp;
 
-	temp = SelectDataStringDataAdapter::New();
+	temp = SelectDataStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Output");
 	temp->setHelp("Dilated segmentation image");
 	mOutputTypes.push_back(temp);
 
-	temp = SelectDataStringDataAdapter::New();
+	temp = SelectDataStringDataAdapter::New(mPatientModelService);
 	temp->setValueName("Contour");
 	temp->setHelp("Output contour generated from dilated segmentation image.");
 	mOutputTypes.push_back(temp);

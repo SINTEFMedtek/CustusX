@@ -52,6 +52,7 @@ class cxPluginAlgorithm_EXPORT ResampleImageFilter : public FilterImpl
 	Q_OBJECT
 
 public:
+	ResampleImageFilter(PatientModelServicePtr patientModelService);
 	virtual ~ResampleImageFilter() {}
 
 	virtual QString getType() const;

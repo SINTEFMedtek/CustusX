@@ -31,20 +31,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxActiveImageProxy.h"
-#include "cxDataManager.h"
 #include "cxImage.h"
+#include "cxPatientModelService.h"
+#include "cxLandmark.h"
 
 namespace cx
 {
 
-ActiveImageProxy::ActiveImageProxy(DataServicePtr dataManager) :
-	mDataManager(dataManager)
+ActiveImageProxy::ActiveImageProxy(PatientModelServicePtr patientModelService) :
+	mPatientModelService(patientModelService)
 {
-	connect(mDataManager.get(), SIGNAL(activeImageChanged(const QString&)), this,
-					SLOT(activeImageChangedSlot(const QString&)));
-	connect(mDataManager.get(), SIGNAL(activeImageChanged(const QString&)), this,
-					SIGNAL(activeImageChanged(const QString&)));
+	connect(mPatientModelService.get(), SIGNAL(activeImageChanged(const QString&)), this,
+			SLOT(activeImageChangedSlot(const QString&)));
+	connect(mPatientModelService.get(), SIGNAL(activeImageChanged(const QString&)), this,
+			SIGNAL(activeImageChanged(const QString&)));
+}
 
+
+ActiveImageProxy::~ActiveImageProxy()
+{
+	disconnect(mPatientModelService.get(), SIGNAL(activeImageChanged(const QString&)), this,
+			   SLOT(activeImageChangedSlot(const QString&)));
+	disconnect(mPatientModelService.get(), SIGNAL(activeImageChanged(const QString&)), this,
+			   SIGNAL(activeImageChanged(const QString&)));
 }
 
 void ActiveImageProxy::activeImageChangedSlot(const QString& uid)
@@ -63,7 +72,7 @@ void ActiveImageProxy::activeImageChangedSlot(const QString& uid)
 		disconnect(mImage.get(), SIGNAL(clipPlanesChanged()), this, SIGNAL(clipPlanesChanged()));
 		disconnect(mImage.get(), SIGNAL(cropBoxChanged()), this, SIGNAL(cropBoxChanged()));
 	}
-	mImage = mDataManager->getActiveImage();
+	mImage = mPatientModelService->getActiveImage();
 	if (mImage)
 	{
 		connect(mImage.get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));

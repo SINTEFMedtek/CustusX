@@ -35,12 +35,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 
-//class QDateTime;
+#include <boost/shared_ptr.hpp>
 
 #define RegistrationMethodService_iid "cx::RegistrationMethodService"
 
 namespace cx
 {
+typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
+typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
 
 /** \brief Registration Method services
  *
@@ -55,15 +58,16 @@ class RegistrationMethodService : public QObject
 {
 	Q_OBJECT
 public:
+	RegistrationMethodService(RegistrationServicePtr registrationService) : mRegistrationService(registrationService) {}
     virtual ~RegistrationMethodService() {}
 
-    virtual void showPatientRegistrationGUI(/*parent widget reference*/) = 0;
-    virtual void showImage2ImageRegistrationGUI(/*parent widget reference*/) = 0;
-    virtual void showImageTransformGUI(/*parent widget reference*/) = 0;
+	virtual QWidget* createWidget() = 0;
+	virtual QString getWidgetName() = 0;
+	virtual QString getRegistrationType() = 0;
+	virtual QString getRegistrationMethod() = 0;
 
-//    virtual QDateTime getLastRegistrationTime() = 0;
-//    virtual void setLastRegistrationTime(QDateTime time) = 0;
-
+protected:
+	RegistrationServicePtr mRegistrationService;
 };
 
 } //namespace cx

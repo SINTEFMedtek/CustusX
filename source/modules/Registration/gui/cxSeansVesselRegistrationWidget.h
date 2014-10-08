@@ -66,7 +66,7 @@ class cxPluginRegistration_EXPORT SeansVesselRegistrationWidget : public Registr
 {
   Q_OBJECT
 public:
-  SeansVesselRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent);
+	SeansVesselRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~SeansVesselRegistrationWidget();
   virtual QString defaultWhatsThis() const;
 

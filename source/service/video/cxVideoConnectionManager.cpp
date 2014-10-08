@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStreamer.h"
 #include "cxCommandlineImageStreamerFactory.h"
 #include "cxVideoServiceBackend.h"
+#include "cxVideoService.h"
 
 //#include "cxSimulatedImageStreamerService.h"
 
@@ -73,30 +74,12 @@ VideoConnectionManager::VideoConnectionManager(VideoServiceBackendPtr backend)
 	connect(mVideoConnection.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
 	connect(mVideoConnection.get(), SIGNAL(fps(QString, int)), this, SIGNAL(fps(QString, int)));
 	connect(mVideoConnection.get(), SIGNAL(videoSourcesChanged()), this, SIGNAL(videoSourcesChanged()));
-
-	mServiceListener.reset(new ServiceTrackerListener<StreamerService>(
-													 mBackend->getPluginContext(),
-													 boost::bind(&VideoConnectionManager::onServiceAdded, this, _1),
-													 boost::function<void (StreamerService*)>(),
-													 boost::bind(&VideoConnectionManager::onServiceRemoved, this, _1)
-													 ));
-	mServiceListener->open();
 }
 
 VideoConnectionManager::~VideoConnectionManager()
 {
+//	std::cout << "VideoConnectionManager destructor" << std::endl;
 	mVideoConnection->disconnectServer();
-}
-
-void VideoConnectionManager::onServiceAdded(StreamerService* service)
-{
-//	std::cout << "VideoConnectionManager:: Service added!!!" << std::endl;
-}
-
-void VideoConnectionManager::onServiceRemoved(StreamerService *service)
-{
-//	std::cout << "VideoConnectionManager::Service removed!!!" << std::endl;
-	this->disconnectServer();//Disconnect to be safe. Can be improved by only disconneting if the removed service is running
 }
 
 QString VideoConnectionManager::getConnectionMethod()
@@ -257,13 +240,13 @@ void VideoConnectionManager::delayedAutoConnectServer()
 	}
 }
 
-void VideoConnectionManager::launchAndConnectServer(QString connectionMethod)
+void VideoConnectionManager::launchAndConnectServer(VideoServicePtr videoService, QString connectionMethod)
 {
 	mConnectionMethod = connectionMethod;
-	this->launchAndConnectServer();
+	this->launchAndConnectServer(videoService);
 }
 
-void VideoConnectionManager::launchAndConnectServer()
+void VideoConnectionManager::launchAndConnectServer(VideoServicePtr videoService)
 {
 	if (mVideoConnection->isConnected())
 		return;
@@ -276,13 +259,13 @@ void VideoConnectionManager::launchAndConnectServer()
 		this->launchAndConnectUsingLocalServer();
 	else if (useRemoteServer())
 		this->connectServer();
-	else if(!this->connectToService())
+	else if(!this->connectToService(videoService))
 		reportError("Could not determine which server to launch.");
 }
 
-bool VideoConnectionManager::connectToService()
+bool VideoConnectionManager::connectToService(VideoServicePtr videoService)
 {
-	StreamerService* service = mServiceListener->getService(mConnectionMethod);
+	StreamerService* service = videoService->getStreamerService(mConnectionMethod);
 	if (!service)
 		return false;
 

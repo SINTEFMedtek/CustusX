@@ -33,12 +33,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxCalibrationMethodsWidget.h"
 #include "cxAcquisitionData.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
-CalibrationPlugin::CalibrationPlugin(AcquisitionDataPtr acquisitionData) :
-		mAcquisitionData(acquisitionData)
+CalibrationPlugin::CalibrationPlugin(PatientModelServicePtr patientModelService, AcquisitionDataPtr acquisitionData) :
+		mAcquisitionData(acquisitionData),
+		mPatientModelService(patientModelService)
 {
 }
 
@@ -52,7 +54,7 @@ std::vector<GUIExtenderService::CategorizedWidget> CalibrationPlugin::createWidg
 	std::vector<CategorizedWidget> retval;
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new CalibrationMethodsWidget(mAcquisitionData, NULL, "CalibrationMethodsWidget", "Calibration Methods"),
+			new CalibrationMethodsWidget(mPatientModelService, mAcquisitionData, NULL, "CalibrationMethodsWidget", "Calibration Methods"),
 			"Algorithms"));
 
 	return retval;

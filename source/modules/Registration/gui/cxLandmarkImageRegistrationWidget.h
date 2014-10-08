@@ -68,7 +68,7 @@ Q_OBJECT
 
 public:
 
-	LandmarkImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName,
+	LandmarkImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName,
 		QString windowTitle); ///< sets up layout and connects signals and slots
 	virtual ~LandmarkImageRegistrationWidget(); ///< empty
 	virtual QString defaultWhatsThis() const;

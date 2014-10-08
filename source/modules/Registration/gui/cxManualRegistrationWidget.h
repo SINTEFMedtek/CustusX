@@ -61,7 +61,7 @@ class cxPluginRegistration_EXPORT ManualImageRegistrationWidget: public Registra
 {
 Q_OBJECT
 public:
-	ManualImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent);
+	ManualImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
 	virtual ~ManualImageRegistrationWidget()
 	{
 	}
@@ -99,8 +99,8 @@ private:
 class cxPluginRegistration_EXPORT ManualImage2ImageRegistrationWidget : public ManualImageRegistrationWidget
 {
 public:
-	ManualImage2ImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-		ManualImageRegistrationWidget(regManager, parent) {}
+	ManualImage2ImageRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+		ManualImageRegistrationWidget(registrationService, patientModelService, parent) {}
 	virtual QString getDescription();
 	virtual Transform3D getMatrixFromBackend();
 	virtual void setMatrixFromWidget(Transform3D M);
@@ -121,8 +121,8 @@ public:
 class cxPluginRegistration_EXPORT ManualImageTransformRegistrationWidget : public ManualImageRegistrationWidget
 {
 public:
-	ManualImageTransformRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-		ManualImageRegistrationWidget(regManager, parent) {}
+	ManualImageTransformRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+		ManualImageRegistrationWidget(registrationService, patientModelService, parent) {}
 	virtual QString getDescription();
 	virtual Transform3D getMatrixFromBackend();
 	virtual void setMatrixFromWidget(Transform3D M);
@@ -141,7 +141,7 @@ class cxPluginRegistration_EXPORT ManualPatientRegistrationWidget: public Regist
 {
 Q_OBJECT
 public:
-ManualPatientRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent);
+ManualPatientRegistrationWidget(RegistrationServicePtr registrationService, QWidget* parent);
 	virtual ~ManualPatientRegistrationWidget()
 	{
 	}

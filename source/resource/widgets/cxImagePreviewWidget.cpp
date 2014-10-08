@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFile>
 #include <QPicture>
 #include <QVBoxLayout>
+#include <QLabel>
 #include "cxReporter.h"
 
 namespace cx

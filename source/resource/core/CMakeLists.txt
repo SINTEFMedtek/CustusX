@@ -28,13 +28,13 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Data/cxSphereMetric
 	Data/cxMetricReferenceArgumentList
 	Data/cxLandmark
-	Data/cxDataFactory
-	Data/cxPatientModelService
 
 	Video/cxVideoSource.h
 	Video/cxVideoRecorder
 	Video/cxVideoSourceSHM
 	Video/cxTestVideoSource
+	Video/cxVideoService
+	Video/cxStreamerService
         
 	Tool/cxToolManager
 	Tool/cxTool.h
@@ -46,6 +46,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	Tool/cxSliceProxy
 	Tool/cxSlicedImageProxy
 	Tool/cxToolImpl
+	Tool/cxTrackingService
 
 	dataAdapters/cxDataAdapter
 	dataAdapters/cxDoubleDataAdapter.h
@@ -61,6 +62,8 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	dataAdapters/cxVector3DComponentDataAdapter
 	dataAdapters/cxDoublePairDataAdapter.h
 	dataAdapters/cxDoublePairDataAdapterXml
+	dataAdapters/cxSelectDataStringDataAdapterBase
+	dataAdapters/cxSelectDataStringDataAdapter
 
 	logger/cxReporter
 	logger/cxMessageListener
@@ -69,20 +72,23 @@ cx_add_class_qt_moc(cxResource_SOURCE
 
 	algorithms/cxTimedAlgorithm.h
     algorithms/cxThreadedTimedAlgorithm.h
-    algorithms/cxCompositeTimedAlgorithm.h
+	algorithms/cxCompositeTimedAlgorithm.h
 
     utilities/cxPlaybackTime.h
     utilities/cxProcessWrapper.h
 	utilities/cxProcessReporter
 	utilities/cxVLCRecorder
-	utilities/cxSpaceProvider
-	utilities/cxSpaceProviderImpl
 	utilities/cxSpaceListener
 	utilities/cxSpaceListenerImpl
 
 	registration/cxRegistrationService
-        registration/cxRegistrationMethodService
-	registration/cxRegistrationServiceNull
+	registration/cxRegistrationServiceProxy
+	registration/cxRegistrationMethodService.h
+	registration/cxRegistrationDataAdapters
+	registration/cxRegistrationMethodService.h
+	registration/cxRegistrationDataAdapters
+
+	patientModel/cxPatientModelService
 	)
 
      
@@ -90,7 +96,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
 cx_add_class(cxResource_SOURCE
 	cxForwardDeclarations.h
 	vtkForwardDeclarations.h
-	
+
 	Tool/cxProbeSector
 	Tool/cxProbeData
 	Tool/ProbeXmlConfigParser.h
@@ -106,6 +112,7 @@ cx_add_class(cxResource_SOURCE
 	Data/cxImageDefaultTFGenerator
 	Data/cxImageParameters
 	Data/cxFrameForest
+	Data/cxDataFactory
 
 	Math/cxBoundingBox3D
 	Math/cxVector3D
@@ -144,6 +151,8 @@ cx_add_class(cxResource_SOURCE
 	utilities/cxPlaneTypeCollection
 	utilities/cxSharedPointerChecker
 	utilities/cxNullDeleter.h
+	utilities/cxSpaceProvider
+	utilities/cxSpaceProviderImpl
 
 	logger/cxAudio.h
 	logger/cxLogger
@@ -166,6 +175,14 @@ cx_add_class(cxResource_SOURCE
 	vesselReg/SeansVesselReg.cxx
 	vesselReg/SeansVesselReg.hxx
 	vesselReg/HackTPSTransform.hxx
+
+	patientModel/cxPatientModelServiceNull
+	patientModel/cxPatientModelServiceProxy
+	registration/cxRegistrationServiceNull
+	Video/cxVideoServiceNull
+	Video/cxVideoServiceProxy
+	Tool/cxTrackingServiceNull
+	Tool/cxTrackingServiceProxy
 	
 	${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/Butterworth.cpp
 	${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/Cascade.cpp
@@ -244,7 +261,6 @@ add_subdirectory(settings)
 unset(CX_RESOURCE_INCLUDE_DIRECTORIES)
 
 set(CX_RESOURCE_INCLUDE_DIRECTORIES
-    ${CustusX_SOURCE_DIR}/source/resource/core
     ${CustusX_SOURCE_DIR}/source/resource/core/logger
     ${CustusX_SOURCE_DIR}/source/resource/core/Math
     ${CustusX_SOURCE_DIR}/source/resource/core/Data
@@ -254,12 +270,17 @@ set(CX_RESOURCE_INCLUDE_DIRECTORIES
     ${CustusX_SOURCE_DIR}/source/resource/core/algorithms
     ${CustusX_SOURCE_DIR}/source/resource/core/settings
     ${CustusX_SOURCE_DIR}/source/resource/core/utilities
+    ${CustusX_SOURCE_DIR}/source/resource/core/registration
+	${CustusX_SOURCE_DIR}/source/resource/core/patientModel
+    ${CustusX_SOURCE_DIR}/source/resource/core
+    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
     ${CustusX_SOURCE_DIR}/source/ThirdParty
     ${CustusX_SOURCE_DIR}/source/ThirdParty/iir1
     
     ${CustusX_BINARY_DIR}/source/resource/core
     ${CustusX_BINARY_DIR}/source/resource/core/utilities
     ${CustusX_BINARY_DIR}/source/resource/core/settings
+    ${CustusX_BINARY_DIR}/source/resource/pluginUtilities
     CACHE INTERNAL "Include directories for resource libraries")
 
 
@@ -276,6 +297,7 @@ set (CX_RESOURCE_LIBRARIES
     Qt5::Concurrent
     ${Boost_LIBRARIES}
     ${ITK_LIBRARIES}
+    CTKPluginFramework
     )
     
 if (CX_USE_OPENCL_UTILITY)

@@ -41,14 +41,14 @@ namespace cx
 {
 
 StateServiceBackend::StateServiceBackend(DataServicePtr dataManager,
-										 TrackingServicePtr toolManager,
-										 VideoServicePtr videoService,
+										 TrackingServiceOldPtr toolManager,
+										 VideoServiceOldPtr videoService,
 										 SpaceProviderPtr spaceProvider,
 										 PatientServicePtr patientService) :
 	mDataManager(dataManager),
 	mToolManager(toolManager),
 	mSpaceProvider(spaceProvider),
-	mVideoService(videoService),
+	mVideoServiceOld(videoService),
 	mPatientService(patientService)
 {
 
@@ -59,14 +59,14 @@ DataServicePtr StateServiceBackend::getDataManager()
 	return mDataManager;
 }
 
-TrackingServicePtr StateServiceBackend::getToolManager()
+TrackingServiceOldPtr StateServiceBackend::getToolManager()
 {
 	return mToolManager;
 }
 
-VideoServicePtr StateServiceBackend::getVideoService()
+VideoServiceOldPtr StateServiceBackend::getVideoServiceOld()
 {
-	return mVideoService;
+	return mVideoServiceOld;
 }
 
 SpaceProviderPtr StateServiceBackend::getSpaceProvider()

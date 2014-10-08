@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxPatientModelImplService.h"
 
+#include <ctkPluginContext.h>
 #include "cxData.h"
 #include "cxReporter.h"
 #include "cxLogicManager.h"
@@ -43,13 +44,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-
-PatientModelImplService::PatientModelImplService()
+PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
+	mContext(context )
 {
+	connect(dataService().get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
+	connect(dataService().get(), SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
+	connect(dataService().get(), SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
+	connect(dataService().get(), SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
+	connect(dataService().get(), SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
 }
 
 PatientModelImplService::~PatientModelImplService()
 {
+	if(dataService())
+	{
+		disconnect(dataService().get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(dataAddedOrRemoved()));
+		disconnect(dataService().get(), SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(activeImageChanged(const QString&)));
+		disconnect(dataService().get(), SIGNAL(debugModeChanged(bool)), this, SIGNAL(debugModeChanged(bool)));
+		disconnect(dataService().get(), SIGNAL(rMprChanged()), this, SIGNAL(rMprChanged()));
+		disconnect(dataService().get(), SIGNAL(streamLoaded()), this, SIGNAL(streamLoaded()));
+	}
 }
 
 void PatientModelImplService::insertData(DataPtr data)
@@ -71,9 +85,127 @@ std::map<QString, DataPtr> PatientModelImplService::getData() const
 	return dataService()->getData();
 }
 
+DataPtr PatientModelImplService::getData(const QString& uid) const
+{
+	std::map<QString, DataPtr> dataMap = this->getData();
+	std::map<QString, DataPtr>::const_iterator iter = dataMap.find(uid);
+	if (iter == dataMap.end())
+		return DataPtr();
+	return iter->second;
+}
+
+LandmarksPtr PatientModelImplService::getPatientLandmarks() const
+{
+	return dataService()->getPatientLandmarks();
+}
+
+std::map<QString, LandmarkProperty> PatientModelImplService::getLandmarkProperties() const
+{
+	return dataService()->getLandmarkProperties();
+}
+
+Transform3D PatientModelImplService::get_rMpr() const
+{
+	return dataService()->get_rMpr();
+}
+
 void PatientModelImplService::autoSave()
 {
 	patientService()->getPatientData()->autoSave();
+}
+
+bool PatientModelImplService::isNull()
+{
+	return false;
+}
+
+bool PatientModelImplService::getDebugMode() const
+{
+	return dataService()->getDebugMode();
+}
+void PatientModelImplService::setDebugMode(bool on)
+{
+	dataService()->setDebugMode(on);
+}
+
+ImagePtr PatientModelImplService::getActiveImage() const
+{
+	return dataService()->getActiveImage();
+}
+
+void PatientModelImplService::setActiveImage(ImagePtr activeImage)
+{
+	dataService()->setActiveImage(activeImage);
+}
+
+cx::ImagePtr cx::PatientModelImplService::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, cx::ImagePtr parentImage, QString filePath)
+{
+	return dataService()->createDerivedImage(data, uid, name, parentImage, filePath);
+}
+
+MeshPtr PatientModelImplService::createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath)
+{
+	return dataService()->createMesh(data, uidBase, nameBase, filePath);
+}
+
+ImagePtr PatientModelImplService::createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath)
+{
+	return dataService()->createImage(data, uidBase, nameBase, filePath);
+}
+
+void PatientModelImplService::loadData(DataPtr data)
+{
+	dataService()->loadData(data);
+}
+
+void PatientModelImplService::saveData(DataPtr data, const QString &basePath)
+{
+	dataService()->saveData(data, basePath);
+}
+
+void PatientModelImplService::saveImage(ImagePtr image, const QString &basePath)
+{
+	dataService()->saveImage(image, basePath);
+}
+
+void PatientModelImplService::saveMesh(MeshPtr mesh, const QString &basePath)
+{
+	dataService()->saveMesh(mesh, basePath);
+}
+
+std::map<QString, VideoSourcePtr> PatientModelImplService::getStreams() const
+{
+	return dataService()->getStreams();
+}
+
+QString PatientModelImplService::getActivePatientFolder() const
+{
+	return patientService()->getPatientData()->getActivePatientFolder();
+}
+
+bool PatientModelImplService::isPatientValid() const
+{
+	return patientService()->getPatientData()->isPatientValid();
+}
+
+DataPtr PatientModelImplService::importData(QString fileName, QString &infoText)
+{
+	return patientService()->getPatientData()->importData(fileName, infoText);
+}
+
+void PatientModelImplService::exportPatient(bool niftiFormat)
+{
+	patientService()->getPatientData()->exportPatient(niftiFormat);
+}
+
+void PatientModelImplService::removePatientData(QString uid)
+{
+	patientService()->getPatientData()->removeData(uid);
+}
+
+PresetTransferFunctions3DPtr PatientModelImplService::getPresetTransferFunctions3D() const
+{
+	return dataService()->getPresetTransferFunctions3D();
 }
 
 } /* namespace cx */

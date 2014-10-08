@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPluginRegistrationExport.h"
 
 #include "cxRegistrationBaseWidget.h"
+#include "cxPatientModelServiceProxy.h"
 
 class QPushButton;
 class QLabel;
@@ -61,7 +62,7 @@ class cxPluginRegistration_EXPORT PlateRegistrationWidget : public RegistrationB
 {
   Q_OBJECT
 public:
-  PlateRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent);
+	PlateRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~PlateRegistrationWidget();
   virtual QString defaultWhatsThis() const;
 
@@ -75,6 +76,7 @@ private slots:
 private:
    QPushButton* mPlateRegistrationButton;
    QLabel*      mReferenceToolInfoLabel;
+	 PatientModelServicePtr mPatientModelService;
 };
 
 /**

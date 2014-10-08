@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "catch.hpp"
+#include <ctkPluginContext.h>
 #include "cxDilationFilter.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
@@ -38,11 +39,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxData.h"
 #include "cxImage.h"
+#include "cxLegacySingletons.h"
+#include "cxPatientModelService.h"
 
 TEST_CASE("DilationFilter: execute", "[modules][Algorithm][DilationFilter]")
 {
-    // Setup filter
-	cx::DilationFilterPtr filter = cx::DilationFilterPtr(new cx::DilationFilter());
+	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject();//mock PatientModelService
+
+	// Setup filter
+	cx::DilationFilterPtr filter = cx::DilationFilterPtr(new cx::DilationFilter(patientModelService));
 	REQUIRE(filter);
 	filter->getInputTypes();
 	filter->getOutputTypes();

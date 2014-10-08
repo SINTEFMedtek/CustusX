@@ -69,7 +69,7 @@ TEST_CASE("Sonowand intraop navigator STL file are readable", "[unit][tool]")
 
 TEST_CASE("Tool xml files use tracking systems supported by ToolManagerUsingIGSTK", "[unit][tool][xml]")
 {
-	cx::TrackingServicePtr trackingService = cx::ToolManagerUsingIGSTK::create();
+	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
 	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
 	QStringList trackingSystems = trackingService->getSupportedTrackingSystems();
 
@@ -86,7 +86,7 @@ TEST_CASE("Tool xml files use tracking systems supported by ToolManagerUsingIGST
 
 TEST_CASE("Tool configuration files", "[unit][tool][xml]")
 {
-	cx::TrackingServicePtr trackingService = cx::ToolManagerUsingIGSTK::create();
+	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
 	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
 
 	QStringList configurations = config->getAllConfigurations();
@@ -109,7 +109,7 @@ TEST_CASE("Tool configuration files", "[unit][tool][xml]")
 
 TEST_CASE("Tool xml files got existing image files", "[unit][tool][xml]")
 {
-	cx::TrackingServicePtr trackingService = cx::ToolManagerUsingIGSTK::create();
+	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
 	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
 
 	foreach(QString filename, config->getAllTools())
@@ -127,7 +127,7 @@ TEST_CASE("Tool xml files got existing image files", "[unit][tool][xml]")
 
 TEST_CASE("Verify tool xml files", "[unit][tool][xml]")
 {
-	cx::TrackingServicePtr trackingService = cx::ToolManagerUsingIGSTK::create();
+	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
 	cx::TrackerConfigurationPtr config = trackingService->getConfiguration();
 
 	foreach(QString filename, config->getAllTools())

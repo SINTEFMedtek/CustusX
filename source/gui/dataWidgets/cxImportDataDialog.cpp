@@ -56,13 +56,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumeHelpers.h"
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
+#include "cxPatientModelService.h"
+
+//TODO: remove
+#include "cxLegacySingletons.h"
 
 namespace cx
 {
 
-ImportDataDialog::ImportDataDialog(QString filename, QWidget* parent) :
+ImportDataDialog::ImportDataDialog(PatientModelServicePtr patientModelService, QString filename, QWidget* parent) :
     QDialog(parent),
-    mFilename(filename)
+	mFilename(filename),
+	mPatientModelService(patientModelService)
 {
   this->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -75,15 +80,15 @@ ImportDataDialog::ImportDataDialog(QString filename, QWidget* parent) :
   layout->addWidget(mUidLabel);
   layout->addWidget(mNameLabel);
 
-  mModalityAdapter = DataModalityStringDataAdapter::New();
+  mModalityAdapter = DataModalityStringDataAdapter::New(mPatientModelService);
   mModalityCombo = new LabeledComboBoxWidget(this, mModalityAdapter);
   layout->addWidget(mModalityCombo);
 
-  mImageTypeAdapter = ImageTypeStringDataAdapter::New();
+  mImageTypeAdapter = ImageTypeStringDataAdapter::New(mPatientModelService);
   mImageTypeCombo = new LabeledComboBoxWidget(this, mImageTypeAdapter);
   layout->addWidget(mImageTypeCombo);
 
-  mParentFrameAdapter = SetParentFrameStringDataAdapter::New();
+  mParentFrameAdapter = SetParentFrameStringDataAdapter::New(mPatientModelService);
   mParentFrameCombo = new LabeledComboBoxWidget(this, mParentFrameAdapter);
   layout->addWidget(mParentFrameCombo);
 
@@ -141,7 +146,7 @@ void ImportDataDialog::showEvent(QShowEvent* event)
 void ImportDataDialog::importDataSlot()
 {
   QString infoText;
-  mData = patientService()->getPatientData()->importData(mFilename, infoText);
+  mData = mPatientModelService->importData(mFilename, infoText);
   if (!infoText.isEmpty())
   {
 	  infoText += "<font color=red><br>If these warnings are not expected the import have probably failed.</font>";
@@ -169,10 +174,10 @@ void ImportDataDialog::importDataSlot()
 
   this->setInitialGuessForParentFrame();
   mParentFrameAdapter->setData(mData);
-  mParentFrameCombo->setEnabled(dataManager()->getData().size()>1);
+  mParentFrameCombo->setEnabled(mPatientModelService->getData().size()>1);
 
   // enable nifti imiport only for meshes. (as this is the only case we have seen)
-  mNiftiFormatCheckBox->setEnabled(dataManager()->getMesh(mData->getUid())!=0);
+  mNiftiFormatCheckBox->setEnabled(mPatientModelService->getMesh(mData->getUid())!=0);
 
   mConvertToUnsignedCheckBox->setEnabled(false);
 //  ImagePtr image = boost::dynamic_pointer_cast<Image>(mData);
@@ -203,7 +208,7 @@ void ImportDataDialog::setInitialGuessForParentFrame()
 
   QString base = qstring_cast(mData->getName()).split(".")[0];
 
-  std::map<QString, DataPtr> all = dataManager()->getData();
+  std::map<QString, DataPtr> all = mPatientModelService->getData();
   for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
   {
     if (iter->second==mData)
@@ -220,18 +225,18 @@ void ImportDataDialog::setInitialGuessForParentFrame()
 
 void ImportDataDialog::updateImportTransformButton()
 {
-  DataPtr parent = dataManager()->getData(mParentFrameAdapter->getValue());
+  DataPtr parent = mPatientModelService->getData(mParentFrameAdapter->getValue());
   bool enabled = bool(parent);
   mTransformFromParentFrameCheckBox->setEnabled(enabled);
 }
 
 void ImportDataDialog::acceptedSlot()
 {
-  this->importParentTransform();
-  this->convertFromNifti1Coordinates();
-  this->convertToUnsigned();
+	this->importParentTransform();
+	this->convertFromNifti1Coordinates();
+	this->convertToUnsigned();
 
-	patientService()->getPatientData()->autoSave();
+	mPatientModelService->autoSave();
 	viewManager()->autoShowData(mData);
 }
 
@@ -263,7 +268,7 @@ void ImportDataDialog::importParentTransform()
     return;
   if(!mData)
     return;
-  DataPtr parent = dataManager()->getData(mData->getParentSpace());
+  DataPtr parent = mPatientModelService->getData(mData->getParentSpace());
   if (!parent)
     return;
   mData->get_rMd_History()->setRegistration(parent->get_rMd());

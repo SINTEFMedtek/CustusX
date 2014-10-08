@@ -85,12 +85,11 @@ include_directories(
     
     ${CustusX_BINARY_DIR}/source/service/patient
     ${CustusX_BINARY_DIR}/source/service/video
-    ${CustusX_BINARY_DIR}/source/service/visualization
     ${CustusX_BINARY_DIR}/source/service/tracking
     ${CustusX_BINARY_DIR}/source/resource
-    ${CustusX_BINARY_DIR}/source/resource/widgets
+#    ${CustusX_BINARY_DIR}/source/resource/widgets
     ${CustusX_BINARY_DIR}/source/resource/visualization
-    ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
+#    ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
     ${CustusX_BINARY_DIR}/source/modules/Algorithm
     ${CustusX_BINARY_DIR}/source/modules/GUIExtender
     ${CustusX_BINARY_DIR}/source/modules/UsReconstruction

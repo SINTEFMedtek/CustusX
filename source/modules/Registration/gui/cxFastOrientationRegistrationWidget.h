@@ -65,7 +65,7 @@ class cxPluginRegistration_EXPORT FastOrientationRegistrationWidget : public Reg
   Q_OBJECT
 
 public:
-  FastOrientationRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent);
+	FastOrientationRegistrationWidget(RegistrationServicePtr registrationService, QWidget* parent);
   ~FastOrientationRegistrationWidget();
   virtual QString defaultWhatsThis() const;
 

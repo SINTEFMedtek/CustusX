@@ -56,7 +56,7 @@ void DirectlyLinkedImageReceiverThread::run()
 {
 	report("Starting direct link grabber.");
 
-	XmlOptionFile xmlFile = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("video");
+	XmlOptionFile xmlFile = XmlOptionFile(DataLocations::getXmlSettingsFile()).descend("video");
 	QDomElement element = xmlFile.getElement("video");
 	mImageStreamer = mStreamerInterface->createStreamer(element);
 

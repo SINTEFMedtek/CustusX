@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSERVICETRACKERLISTENER_H_
 #define CXSERVICETRACKERLISTENER_H_
 
+#include <QSharedDataPointer>
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #undef REGISTERED //Needed on windows to avoid compiler error. Not sure why.
@@ -40,8 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ctkServiceTracker.h"
 #include "ctkServiceTrackerCustomizer.h"
 #include "ctkPluginContext.h"
-//#include "cxPluginFramework.h"
+#include <ctkPluginFramework.h>
 #include "cxServiceTrackerCustomizer.h"
+
 
 namespace cx
 {
@@ -50,6 +52,9 @@ namespace cx
  *
  * Usage example:
  * For listening to ReconstructionServices being added and removed, but ignoring if they are modified
+ *
+ * NB: This class can only be used with a valid plugin context.
+ * And plugin contexts are only valid when the plugin framework is in one of these states: ACTIVE, STARTING and STOPPING
  *
  *  boost::shared_ptr<ServiceTrackerListener<ReconstructionService> > mServiceListener;
  *  mServiceListener.reset(new ServiceTrackerListener<ReconstructionService>(
@@ -70,10 +75,10 @@ class ServiceTrackerListener
 {
 
 public:
-	ServiceTrackerListener(ctkPluginContext* context,//PluginFrameworkManagerPtr pluginFramework,
+	ServiceTrackerListener(ctkPluginContext* context,
 						   boost::function<void (T*)> serviceAdded,
 						   boost::function<void (T*)> serviceModified,
-						   boost::function<void (T*)> serviceRemoved)
+							 boost::function<void (T*)> serviceRemoved)
 	{
 		boost::shared_ptr<ServiceTrackerCustomizer<T> > customizer(new ServiceTrackerCustomizer<T>);
 		mServiceTrackerCustomizer = customizer;
@@ -81,6 +86,13 @@ public:
 		mServiceTrackerCustomizer->setServiceModifiedCallback(serviceModified);
 		mServiceTrackerCustomizer->setServiceRemovedCallback(serviceRemoved);
 		mServiceTracker.reset(new ctkServiceTracker<T*>(context, mServiceTrackerCustomizer.get()));
+	}
+
+	~ServiceTrackerListener()
+	{
+//		mServiceTracker->close();//For some reason this causes a crash if a service (that uses another service with a ServiceTrackerListener) have been removed
+		//If close is needed: A possible workasround may be to clear all functions in mServiceTrackerCustomizer?
+//		mServiceTracker.reset();
 	}
 
 	void open()
@@ -102,6 +114,11 @@ public:
 			}
 		}
 		return service;
+	}
+
+	QList<T*> getServices()
+	{
+		return mServiceTracker->getServices();
 	}
 
 private:

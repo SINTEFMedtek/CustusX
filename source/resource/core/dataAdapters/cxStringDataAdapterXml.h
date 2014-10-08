@@ -95,7 +95,7 @@ public:
 
 
 signals:
-	void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
+	void valueWasSet(int pos); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
 
 private:
 	StringDataAdapterXml();

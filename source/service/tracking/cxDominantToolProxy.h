@@ -64,7 +64,7 @@ class cxTrackingService_EXPORT DominantToolProxy: public QObject
 Q_OBJECT
 
 public:
-	static DominantToolProxyPtr New(TrackingServicePtr toolManager)
+	static DominantToolProxyPtr New(TrackingServiceOldPtr toolManager)
 	{
 		return DominantToolProxyPtr(new DominantToolProxy(toolManager));
 	}
@@ -84,9 +84,9 @@ signals:
 private slots:
 	void dominantToolChangedSlot(const QString&);
 private:
-	DominantToolProxy(TrackingServicePtr toolManager);
+	DominantToolProxy(TrackingServiceOldPtr toolManager);
 	ToolPtr mTool;
-	TrackingServicePtr mToolManager;
+	TrackingServiceOldPtr mToolManager;
 };
 
 /**

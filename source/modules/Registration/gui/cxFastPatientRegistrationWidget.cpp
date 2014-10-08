@@ -37,8 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-FastPatientRegistrationWidget::FastPatientRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-    LandmarkPatientRegistrationWidget(regManager, parent, "FastPatientRegistrationWidget", "Fast Patient Registration")
+FastPatientRegistrationWidget::FastPatientRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+		LandmarkPatientRegistrationWidget(registrationService, patientModelService, parent, "FastPatientRegistrationWidget", "Fast Patient Registration")
 {
 }
 
@@ -57,7 +57,7 @@ QString FastPatientRegistrationWidget::defaultWhatsThis() const
 
 void FastPatientRegistrationWidget::performRegistration()
 {
-  mManager->doFastRegistration_Translation();
+	mRegistrationService->doFastRegistration_Translation();
   this->updateAvarageAccuracyLabel();
 }
 

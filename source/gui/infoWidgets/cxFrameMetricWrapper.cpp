@@ -36,14 +36,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledComboBoxWidget.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
+#include "cxPatientModelService.h"
 
 namespace cx {
 
-FrameMetricWrapper::FrameMetricWrapper(cx::FrameMetricPtr data) : mData(data)
+FrameMetricWrapper::FrameMetricWrapper(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, cx::FrameMetricPtr data) :
+	MetricBase(visualizationService, patientModelService),
+	mData(data)
 {
 	mInternalUpdate = false;
 	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-	connect(dataManager(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
+	connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
+}
+
+FrameMetricWrapper::~FrameMetricWrapper()
+{
+	disconnect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* FrameMetricWrapper::createWidget()

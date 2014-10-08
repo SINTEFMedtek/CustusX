@@ -75,7 +75,7 @@ void DicomPluginActivator::stop(ctkPluginContext* context)
 {
 	mDicomPlugin.reset();
 	//	std::cout << "Stopped DicomPluginActivator" << std::endl;
-	Q_UNUSED(context)
+	Q_UNUSED(context);
 }
 
 } // namespace cx

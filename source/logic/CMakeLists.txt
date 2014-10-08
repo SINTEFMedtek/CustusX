@@ -21,8 +21,6 @@ SET (cxLogicManager_SOURCE
     cxPluginFramework.cpp
     cxPluginFrameworkUtilities.h
     cxPluginFrameworkUtilities.cpp
-    cxRegisteredService.h
-    cxRegisteredService.cpp
 )
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
@@ -34,12 +32,12 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/service/visualization
     ${CustusX_SOURCE_DIR}/source/service/video
     ${CustusX_SOURCE_DIR}/source/service/state
+
     ${CustusX_BINARY_DIR}/source/service/patient     
     ${CustusX_BINARY_DIR}/source/service/tracking     
     ${CustusX_BINARY_DIR}/source/service/visualization
     ${CustusX_BINARY_DIR}/source/service/video
     ${CustusX_BINARY_DIR}/source/service/state
-    ${CustusX_BINARY_DIR}/source/resource/usReconstructionTypes
     )
 
 
@@ -56,7 +54,7 @@ target_link_libraries(cxLogicManager
     cxPatientService
     cxTrackingService
     cxVisualizationService
-    cxVideoService
+    cxVideoServiceOld
 	cxStateService
     )
 

@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReconstructionService.h"
 #include "org_custusx_pnnreconstruction_Export.h"
 #include "cxTransform3D.h"
+class ctkPluginContext;
 
 namespace cx
 {
@@ -55,9 +56,9 @@ class org_custusx_pnnreconstruction_EXPORT PNNReconstructionService : public Rec
 {
 	Q_INTERFACES(cx::ReconstructionService)
 public:
-	static ReconstructionServicePtr create() { return ReconstructionServicePtr(new PNNReconstructionService()); }
+	static ReconstructionServicePtr create(ctkPluginContext* context) { return ReconstructionServicePtr(new PNNReconstructionService(context)); }
 
-	PNNReconstructionService();
+	PNNReconstructionService(ctkPluginContext* context);
 	virtual ~PNNReconstructionService();
 
 	virtual QString getName() const;

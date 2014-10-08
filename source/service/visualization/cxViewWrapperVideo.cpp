@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSettings.h"
 #include "cxToolManager.h"
-#include "cxVideoService.h"
+#include "cxVideoServiceOld.h"
 #include "cxVisualizationServiceBackend.h"
 #include "vtkRenderWindowInteractor.h"
 
@@ -67,7 +67,7 @@ ViewWrapperVideo::ViewWrapperVideo(ViewPtr view, VisualizationServiceBackendPtr 
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth / 2.0, clipDepth / 2.0);
 
 	connect(mBackend->getToolManager().get(), SIGNAL(configured()), this, SLOT(connectStream()));
-	connect(mBackend->getVideoService().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(connectStream()));
+	connect(mBackend->getVideoServiceOld().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(connectStream()));
 	connect(mBackend->getToolManager().get(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectStream()));
 
 	addReps();
@@ -104,7 +104,7 @@ void ViewWrapperVideo::appendToContextMenu(QMenu& contextMenu)
 
 //	QActionGroup sourceGroup = new QActionGroup(&contextMenu);
 	QMenu* sourceMenu = new QMenu("Video Source", &contextMenu);
-	std::vector<VideoSourcePtr> sources = mBackend->getVideoService()->getVideoSources();
+	std::vector<VideoSourcePtr> sources = mBackend->getVideoServiceOld()->getVideoSources();
 	this->addStreamAction("active", sourceMenu);
 	for (unsigned i=0; i<sources.size(); ++i)
 		this->addStreamAction(sources[i]->getUid(), sourceMenu);
@@ -193,9 +193,9 @@ void ViewWrapperVideo::connectStream()
 VideoSourcePtr ViewWrapperVideo::getSourceFromService(QString uid)
 {
 	if (uid=="active")
-		return mBackend->getVideoService()->getActiveVideoSource();
+		return mBackend->getVideoServiceOld()->getActiveVideoSource();
 
-	std::vector<VideoSourcePtr> source = mBackend->getVideoService()->getVideoSources();
+	std::vector<VideoSourcePtr> source = mBackend->getVideoServiceOld()->getVideoSources();
 
 	for (unsigned i=0; i< source.size(); ++i)
 	{

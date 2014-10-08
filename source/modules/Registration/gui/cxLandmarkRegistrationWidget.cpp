@@ -52,9 +52,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent,
+LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegistrationServicePtr registrationService, QWidget* parent,
 	QString objectName, QString windowTitle) :
-	RegistrationBaseWidget(regManager, parent, objectName, windowTitle), mVerticalLayout(new QVBoxLayout(this)),
+	RegistrationBaseWidget(registrationService, parent, objectName, windowTitle), mVerticalLayout(new QVBoxLayout(this)),
 		mLandmarkTableWidget(new QTableWidget(this)), mAvarageAccuracyLabel(new QLabel(QString(" "), this))
 {
 	//table widget
@@ -121,8 +121,9 @@ void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 	QWidget::showEvent(event);
 	connect(dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(landmarkUpdatedSlot()));
 
-	mManager->restart();
-    this->setModified();
+//	mManager->restart();
+	mRegistrationService->setLastRegistrationTime(QDateTime::currentDateTime());
+	this->setModified();
 }
 
 void LandmarkRegistrationWidget::hideEvent(QHideEvent* event)
@@ -137,7 +138,7 @@ void LandmarkRegistrationWidget::prePaintEvent()
 	mLandmarkTableWidget->clear();
 
 	QString fixedName;
-	DataPtr fixedData = boost::dynamic_pointer_cast<Data>(mManager->getFixedData());
+	DataPtr fixedData = boost::dynamic_pointer_cast<Data>(mRegistrationService->getFixedData());
 	if (fixedData)
 		fixedName = fixedData->getName();
 
@@ -292,7 +293,7 @@ void LandmarkRegistrationWidget::landmarkUpdatedSlot()
 void LandmarkRegistrationWidget::updateAvarageAccuracyLabel()
 {
 	QString fixedName;
-	DataPtr fixedData = boost::dynamic_pointer_cast<Data>(mManager->getFixedData());
+	DataPtr fixedData = boost::dynamic_pointer_cast<Data>(mRegistrationService->getFixedData());
 	if (fixedData)
 		fixedName = fixedData->getName();
 
@@ -326,7 +327,7 @@ double LandmarkRegistrationWidget::getAvarageAccuracy()
 
 double LandmarkRegistrationWidget::getAccuracy(QString uid)
 {
-	DataPtr fixedData = mManager->getFixedData();
+	DataPtr fixedData = mRegistrationService->getFixedData();
 	if (!fixedData)
 		return 1000.0;
 

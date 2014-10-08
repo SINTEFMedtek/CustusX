@@ -39,8 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxCoordinateSystemHelpers.h"
 
-#include "cxLegacySingletons.h"
-
 /**
  * \file
  * \addtogroup cx_gui
@@ -88,7 +86,7 @@ class cxGui_EXPORT DoubleDataAdapterActiveImageBase : public DoubleDataAdapter
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterActiveImageBase();
+  DoubleDataAdapterActiveImageBase(PatientModelServicePtr patientModelService);
   virtual ~DoubleDataAdapterActiveImageBase() {}
   virtual double getValue() const;
   virtual bool setValue(double val);
@@ -101,6 +99,7 @@ protected:
 
   ImagePtr mImage;
   ActiveImageProxyPtr mActiveImageProxy;
+  PatientModelServicePtr mPatientModelService;
 };
 
 /**
@@ -137,12 +136,15 @@ class cxGui_EXPORT SelectRTSourceStringDataAdapterBase : public StringDataAdapte
 {
   Q_OBJECT
 public:
-  SelectRTSourceStringDataAdapterBase();
-  virtual ~SelectRTSourceStringDataAdapterBase() {}
+  SelectRTSourceStringDataAdapterBase(PatientModelServicePtr patientModelService);
+  virtual ~SelectRTSourceStringDataAdapterBase();
 
 public: // optional methods
   virtual QStringList getValueRange() const;
   virtual QString convertInternal2Display(QString internal);
+
+protected:
+  PatientModelServicePtr mPatientModelService;
 };
 typedef boost::shared_ptr<class SelectRTSourceStringDataAdapterBase> SelectRTSourceStringDataAdapterBasePtr;
 
@@ -194,8 +196,8 @@ class cxGui_EXPORT SelectRTSourceStringDataAdapter : public SelectRTSourceString
 {
   Q_OBJECT
 public:
-  static SelectRTSourceStringDataAdapterPtr New() { return SelectRTSourceStringDataAdapterPtr(new SelectRTSourceStringDataAdapter()); }
-  SelectRTSourceStringDataAdapter();
+  static SelectRTSourceStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return SelectRTSourceStringDataAdapterPtr(new SelectRTSourceStringDataAdapter(patientModelService)); }
+  SelectRTSourceStringDataAdapter(PatientModelServicePtr patientModelService);
   virtual ~SelectRTSourceStringDataAdapter() {}
 
 public: // basic methods
@@ -220,7 +222,7 @@ private:
 
 typedef boost::shared_ptr<class ActiveVideoSourceStringDataAdapter> ActiveVideoSourceStringDataAdapterPtr;
 /**
- * \brief Adapter for controlling the active video source in cx::VideoService
+ * \brief Adapter for controlling the active video source in cx::VideoServiceOld
  */
 class cxGui_EXPORT ActiveVideoSourceStringDataAdapter : public StringDataAdapter
 {
@@ -320,10 +322,10 @@ class cxGui_EXPORT ParentFrameStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
-  static ParentFrameStringDataAdapterPtr New() { return ParentFrameStringDataAdapterPtr(new ParentFrameStringDataAdapter()); }
-  ParentFrameStringDataAdapter();
+  static ParentFrameStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return ParentFrameStringDataAdapterPtr(new ParentFrameStringDataAdapter(patientModelService)); }
+  ParentFrameStringDataAdapter(PatientModelServicePtr patientModelService);
   void setData(DataPtr data);
-  virtual ~ParentFrameStringDataAdapter() {}
+  virtual ~ParentFrameStringDataAdapter();
 
 public: // basic methods
   virtual QString getDisplayName() const;
@@ -337,6 +339,7 @@ public: // optional methods
 
 protected:
   DataPtr mData;
+  PatientModelServicePtr mPatientModelService;
 };
 
 typedef boost::shared_ptr<class SetParentFrameStringDataAdapter> SetParentFrameStringDataAdapterPtr;
@@ -349,7 +352,8 @@ class cxGui_EXPORT SetParentFrameStringDataAdapter : public ParentFrameStringDat
 {
   Q_OBJECT
 public:
-  static SetParentFrameStringDataAdapterPtr New() { return SetParentFrameStringDataAdapterPtr(new SetParentFrameStringDataAdapter()); }
+  static SetParentFrameStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return SetParentFrameStringDataAdapterPtr(new SetParentFrameStringDataAdapter(patientModelService)); }
+  SetParentFrameStringDataAdapter(PatientModelServicePtr patientModelService);
   virtual ~SetParentFrameStringDataAdapter() {}
 public: // basic methods
   virtual bool setValue(const QString& value);
@@ -417,10 +421,10 @@ class cxGui_EXPORT DataModalityStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
-  static DataModalityStringDataAdapterPtr New() { return DataModalityStringDataAdapterPtr(new DataModalityStringDataAdapter()); }
-  DataModalityStringDataAdapter();
+  static DataModalityStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return DataModalityStringDataAdapterPtr(new DataModalityStringDataAdapter(patientModelService)); }
+  DataModalityStringDataAdapter(PatientModelServicePtr patientModelService);
+  virtual ~DataModalityStringDataAdapter();
   void setData(ImagePtr data);
-  virtual ~DataModalityStringDataAdapter() {}
 
 public: // basic methods
   virtual QString getDisplayName() const;
@@ -433,6 +437,7 @@ public: // optional methods
 
 protected:
   ImagePtr mData;
+  PatientModelServicePtr mPatientModelService;
 };
 
 typedef boost::shared_ptr<class ImageTypeStringDataAdapter> ImageTypeStringDataAdapterPtr;
@@ -444,10 +449,10 @@ class cxGui_EXPORT ImageTypeStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
-  static ImageTypeStringDataAdapterPtr New() { return ImageTypeStringDataAdapterPtr(new ImageTypeStringDataAdapter()); }
-  ImageTypeStringDataAdapter();
+  static ImageTypeStringDataAdapterPtr New(PatientModelServicePtr patientModelService) { return ImageTypeStringDataAdapterPtr(new ImageTypeStringDataAdapter(patientModelService)); }
+  ImageTypeStringDataAdapter(PatientModelServicePtr patientModelService);
   void setData(ImagePtr data);
-  virtual ~ImageTypeStringDataAdapter() {}
+  virtual ~ImageTypeStringDataAdapter();
 
 public: // basic methods
   virtual QString getDisplayName() const;
@@ -460,6 +465,7 @@ public: // optional methods
 
 protected:
   ImagePtr mData;
+  PatientModelServicePtr mPatientModelService;
 };
 
 } // namespace cx

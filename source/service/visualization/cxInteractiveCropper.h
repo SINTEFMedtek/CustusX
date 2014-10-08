@@ -54,7 +54,7 @@ namespace cx
 {
 typedef vtkSmartPointer<class CropBoxCallback> CropBoxCallbackPtr;
 typedef vtkSmartPointer<class CropBoxEnableCallback> CropBoxEnableCallbackPtr;
-typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
+typedef boost::shared_ptr<class ActiveImageProxyOld> ActiveImageProxyOldPtr;
 typedef boost::shared_ptr<class VisualizationServiceBackend> VisualizationServiceBackendPtr;
 
 /**
@@ -107,7 +107,8 @@ private:
 	CropBoxEnableCallbackPtr mCropBoxEnableCallback;
 	CropBoxEnableCallbackPtr mCropBoxDisableCallback;
 	bool mShowBoxWidget;
-	ActiveImageProxyPtr mActiveImageProxy;
+	ActiveImageProxyOldPtr mActiveImageProxy;
+//	PatientModelServicePtr mPatientModelService;
 	VisualizationServiceBackendPtr mBackend;
 };
 

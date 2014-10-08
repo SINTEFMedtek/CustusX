@@ -43,10 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-PatientOrientationWidget::PatientOrientationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-    RegistrationBaseWidget(regManager, parent, "PatientOrientationWidget", "Patient Orientation"),
-    mPatientOrientationButton(new QPushButton("Patient Orientation")),
-    mInvertButton(new QCheckBox("Back face"))
+PatientOrientationWidget::PatientOrientationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent, QString objectName, QString windowTitle) :
+	RegistrationBaseWidget(registrationService, parent, objectName, windowTitle),
+	mPatientOrientationButton(new QPushButton("Patient Orientation")),
+	mInvertButton(new QCheckBox("Back face")),
+	mPatientModelService(patientModelService)
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->addWidget(mInvertButton);
@@ -99,7 +100,8 @@ Transform3D PatientOrientationWidget::get_tMtm() const
 
 void PatientOrientationWidget::setPatientOrientationSlot()
 {
-  mManager->applyPatientOrientation(this->get_tMtm());
+	Transform3D prMt = toolManager()->getDominantTool()->get_prMt();
+	mRegistrationService->applyPatientOrientation(this->get_tMtm(), prMt);
 }
 
 void PatientOrientationWidget::enableToolSampleButtonSlot()

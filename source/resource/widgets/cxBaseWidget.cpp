@@ -33,6 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBaseWidget.h"
 #include "cxTypeConversions.h"
 
+#include <QVBoxLayout>
+#include <QGroupBox>
+#include <QCheckBox>
+#include <QLabel>
+
 namespace cx
 {
 
@@ -116,7 +121,6 @@ void BaseWidget::showEvent(QShowEvent* event)
     this->setWhatsThis(this->defaultWhatsThis());
     QWidget::showEvent(event);
 }
-
 
 }
 

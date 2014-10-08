@@ -35,6 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QLabel>
 #include <QSpinBox>
+#include <QCheckBox>
+#include <QGroupBox>
+#include <vtkCellArray.h>
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
 #include "cxRegistrationManager.h"
@@ -49,22 +52,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxView.h"
 #include "cxGeometricRep.h"
-#include <vtkCellArray.h>
 #include "cxGraphicalPrimitives.h"
+#include "cxLogicManager.h"
+#include "cxRegistrationServiceProxy.h"
 
 namespace cx
 {
 
-SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-	RegistrationBaseWidget(regManager, parent, "SeansVesselRegistrationWidget", "Seans Vessel Registration"),
+SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
+	RegistrationBaseWidget(registrationService, parent, "SeansVesselRegistrationWidget", "Seans Vessel Registration"),
 		mLTSRatioSpinBox(new QSpinBox()), mLinearCheckBox(new QCheckBox()), mAutoLTSCheckBox(new QCheckBox()),
 		mRegisterButton(new QPushButton("Register"))
 {
 	mRegisterButton->setEnabled(false);
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
-	connect(mManager.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(inputChanged()));
-	connect(mManager.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(inputChanged()));
+	connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(inputChanged()));
+	connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(inputChanged()));
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 	QGridLayout* layout = new QGridLayout();
@@ -82,9 +86,9 @@ SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegistrationManager
 	QGridLayout* entryLayout = new QGridLayout;
 	entryLayout->setColumnStretch(1, 1);
 
-	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(regManager));
+	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(registrationService, patientModelService));
 	new LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
-	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(regManager));
+	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(registrationService, patientModelService));
 	new LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
 
 	layout->addLayout(entryLayout, 0, 0, 2, 2);
@@ -108,7 +112,7 @@ QString SeansVesselRegistrationWidget::defaultWhatsThis() const
 
 void SeansVesselRegistrationWidget::inputChanged()
 {
-	if(mManager->getMovingData() && mManager->getFixedData())
+	if(mRegistrationService->getMovingData() && mRegistrationService->getFixedData())
 	{
 		mRegisterButton->setEnabled(true);
 		mVesselRegOptionsButton->setEnabled(true);
@@ -135,7 +139,7 @@ void SeansVesselRegistrationWidget::registerSlot()
 
 	QString logPath = patientService()->getPatientData()->getActivePatientFolder() + "/Logs/";
 
-//	mManager->doVesselRegistration(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose,
+//	mRegistrationService->doVesselRegistration(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose,
 //		logPath);
 
 	SeansVesselReg vesselReg;
@@ -153,18 +157,18 @@ void SeansVesselRegistrationWidget::registerSlot()
 		reporter()->sendDebug("Using lts_ratio: " + qstring_cast(vesselReg.mt_ltsRatio));
 	}
 
-	if(!mManager->getMovingData())
+	if(!mRegistrationService->getMovingData())
 	{
 		reportWarning("Moving volume not set.");
 		return;
 	}
-	else if(!mManager->getFixedData())
+	else if(!mRegistrationService->getFixedData())
 	{
 		reportWarning("Fixed volume not set.");
 		return;
 	}
 
-	bool success = vesselReg.execute(mManager->getMovingData(), mManager->getFixedData(), logPath);
+	bool success = vesselReg.execute(mRegistrationService->getMovingData(), mRegistrationService->getFixedData(), logPath);
 	if (!success)
 	{
 		reportWarning("Vessel registration failed.");
@@ -182,7 +186,7 @@ void SeansVesselRegistrationWidget::registerSlot()
 	// Delta is thus equal to Q:
 	Transform3D delta = linearTransform.inv();
 	//std::cout << "delta:\n" << delta << std::endl;
-	mManager->applyImage2ImageRegistration(delta, "Vessel based");
+	mRegistrationService->applyImage2ImageRegistration(delta, "Vessel based");
 }
 
 /**Utililty class for debugging the SeansVesselRegistration class interactively.
@@ -192,14 +196,14 @@ void SeansVesselRegistrationWidget::registerSlot()
 class SeansVesselRegistrationDebugger
 {
 public:
-	SeansVesselRegistrationDebugger(RegistrationManagerPtr manager, double ltsRatio, bool linear)
+	SeansVesselRegistrationDebugger(RegistrationServicePtr registrationService, double ltsRatio, bool linear) :
+		mRegistrationService(registrationService)
 	{
 		mRegistrator.mt_doOnlyLinear = linear;
 		mRegistrator.mt_ltsRatio = ltsRatio;
 		mRegistrator.mt_auto_lts = false;
 
-		mManager = manager;
-		mContext = mRegistrator.createContext(mManager->getMovingData(), mManager->getFixedData());
+		mContext = mRegistrator.createContext(mRegistrationService->getMovingData(), mRegistrationService->getFixedData());
 
 		//mMovingData = mRegistrator.convertToPolyData(mContext->mSourcePoints);
 		mMovingData = mContext->getMovingPoints();
@@ -267,7 +271,7 @@ public:
 
 		mRegistrator.checkQuality(linearTransform);
 		Transform3D delta = linearTransform.inv();
-		mManager->applyImage2ImageRegistration(delta, "Vessel based");
+		mRegistrationService->applyImage2ImageRegistration(delta, "Vessel based");
 
 		report(QString("Applied linear registration from debug iteration."));
 	}
@@ -319,7 +323,7 @@ public:
 private:
 	SeansVesselReg mRegistrator;
 	SeansVesselReg::ContextPtr mContext;
-	RegistrationManagerPtr mManager;
+	RegistrationServicePtr mRegistrationService;
 	vtkPolyDataPtr mMovingData, mFixedData;
 	vtkPolyDataPtr mPolyLines;
 	GeometricRepPtr m_mRep, m_fRep, m_lineRep;
@@ -328,7 +332,7 @@ private:
 
 void SeansVesselRegistrationWidget::debugInit()
 {
-	mDebugger.reset(new SeansVesselRegistrationDebugger(mManager, mLTSRatioSpinBox->value(),
+	mDebugger.reset(new SeansVesselRegistrationDebugger(mRegistrationService, mLTSRatioSpinBox->value(),
 		mLinearCheckBox->isChecked()));
 }
 void SeansVesselRegistrationWidget::debugRunOneLinearStep()

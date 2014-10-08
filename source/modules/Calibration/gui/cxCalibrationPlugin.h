@@ -64,7 +64,7 @@ class cxPluginCalibration_EXPORT CalibrationPlugin : public GUIExtenderService
 {
 	Q_OBJECT
 public:
-	CalibrationPlugin(AcquisitionDataPtr mAcquisitionData);
+	CalibrationPlugin(cx::PatientModelServicePtr patientModelService, AcquisitionDataPtr mAcquisitionData);
 	virtual ~CalibrationPlugin();
 
 //  AcquisitionDataPtr getAcquisitionData() { return mAcquisitionData; }
@@ -76,6 +76,7 @@ private slots:
 
 private:
 	AcquisitionDataPtr mAcquisitionData;
+	PatientModelServicePtr mPatientModelService;
 };
 
 /**

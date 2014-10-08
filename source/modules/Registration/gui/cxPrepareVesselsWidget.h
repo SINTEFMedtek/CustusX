@@ -64,7 +64,7 @@ class cxPluginRegistration_EXPORT PrepareVesselsWidget : public RegistrationBase
   Q_OBJECT
 
 public:
-  PrepareVesselsWidget(RegistrationManagerPtr regManager, QWidget* parent);
+	PrepareVesselsWidget(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent);
   virtual ~PrepareVesselsWidget();
   virtual QString defaultWhatsThis() const;
 

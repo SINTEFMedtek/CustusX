@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXPATIENTMODELIMPLSERVICE_H_
 
 #include "org_custusx_patientmodel_Export.h"
+class ctkPluginContext;
 
 #include "cxPatientModelService.h"
 
@@ -52,14 +53,45 @@ class org_custusx_patientmodel_EXPORT PatientModelImplService : public PatientMo
 {
 	Q_INTERFACES(cx::PatientModelService)
 public:
-	PatientModelImplService();
+	PatientModelImplService(ctkPluginContext* context);
 	virtual ~PatientModelImplService();
 
 	virtual void insertData(DataPtr data);
 	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform);
 	virtual std::map<QString, DataPtr> getData() const;
-	virtual void autoSave();
+	virtual DataPtr getData(const QString& uid) const;
+	virtual LandmarksPtr getPatientLandmarks() const;
+	virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const;
+	virtual Transform3D get_rMpr() const; ///< get the patient registration transform
+	virtual ImagePtr getActiveImage() const; ///< used for system state
+	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
 
+	virtual ImagePtr createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath);
+	virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath);
+	virtual ImagePtr createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath);
+
+	virtual void loadData(DataPtr data);
+	virtual void saveData(DataPtr data, const QString& basePath); ///< Save data to file
+	virtual void saveImage(ImagePtr image, const QString& basePath);///< Save image to file \param image Image to save \param basePath Absolute path to patient data folder
+	virtual void saveMesh(MeshPtr mesh, const QString& basePath);///< Save mesh to file \param mesh to save \param basePath Absolute path to patient data folder
+	virtual std::map<QString, VideoSourcePtr> getStreams() const;
+
+	virtual QString getActivePatientFolder() const;
+	virtual bool isPatientValid() const;
+	virtual DataPtr importData(QString fileName, QString &infoText);
+	virtual void exportPatient(bool niftiFormat);
+	virtual void removePatientData(QString uid);
+
+	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
+
+	virtual void autoSave();
+	virtual bool isNull();
+
+	virtual bool getDebugMode() const;
+	virtual void setDebugMode(bool on);
+
+private:
+	ctkPluginContext *mContext;
 };
 typedef boost::shared_ptr<PatientModelImplService> PatientModelImplServicePtr;
 

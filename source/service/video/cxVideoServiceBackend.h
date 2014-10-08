@@ -34,10 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXVIDEOSERVICEBACKEND_H
 
 #include "cxVideoServiceExport.h"
-
+#include <QSharedPointer>
 #include "boost/shared_ptr.hpp"
-#include "ctkPluginContext.h"
 #include "cxForwardDeclarations.h"
+class ctkPluginFramework;
+class ctkPluginContext;
 
 namespace cx
 {
@@ -57,22 +58,20 @@ class cxVideoService_EXPORT VideoServiceBackend
 {
 public:
 	static VideoServiceBackendPtr create(DataServicePtr dataManager,
-								TrackingServicePtr toolManager,
-								SpaceProviderPtr spaceProvider, ctkPluginContext *pluginContext);
+								TrackingServiceOldPtr toolManager,
+								SpaceProviderPtr spaceProvider);
 	VideoServiceBackend(DataServicePtr dataManager,
-								TrackingServicePtr toolManager,
-								SpaceProviderPtr spaceProvider, ctkPluginContext *pluginContext);
+								TrackingServiceOldPtr toolManager,
+								SpaceProviderPtr spaceProvider);
 
 	DataServicePtr getDataManager();
-	TrackingServicePtr getToolManager();
+	TrackingServiceOldPtr getToolManager();
 	SpaceProviderPtr getSpaceProvider();
-	ctkPluginContext* getPluginContext();
 
 private:
 	DataServicePtr mDataManager;
-	TrackingServicePtr mToolManager;
+	TrackingServiceOldPtr mToolManager;
 	SpaceProviderPtr mSpaceProvider;
-	ctkPluginContext* mPluginContext;
 };
 
 } // namespace cx

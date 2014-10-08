@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientData.h"
 #include "cxSettings.h"
 #include "cxPatientService.h"
-#include "cxVideoService.h"
+#include "cxVideoServiceOld.h"
 #include "cxVideoConnectionManager.h"
 #include "cxToolManager.h"
 #include "cxUSSavingRecorder.h"

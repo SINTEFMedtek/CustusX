@@ -60,7 +60,7 @@ TEST_CASE("StreamerService: Service available", "[streaming][service][unit]")
 	QList<cx::StreamerService*> serviceList = tracker.getServices();
 	REQUIRE(serviceList.size() > 0);
 
-	cx::XmlOptionFile options = cx::XmlOptionFile(cx::DataLocations::getXmlSettingsFile(), "CustusX").descend("video");
+	cx::XmlOptionFile options = cx::XmlOptionFile(cx::DataLocations::getXmlSettingsFile()).descend("video");
 
 	for(int i = 0; i < serviceList.size(); ++i)
 	{

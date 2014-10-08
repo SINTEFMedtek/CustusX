@@ -46,6 +46,10 @@ class QToolBar;
 namespace cx
 {
 typedef boost::shared_ptr<class GUIExtenderService> GUIExtenderServicePtr;
+typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
+typedef boost::shared_ptr<class VisualizationService> VisualizationServicePtr;
+typedef boost::shared_ptr<class VideoService> VideoServicePtr;
 
 /** Interface for service that extends the user interface with more widgets.
  *

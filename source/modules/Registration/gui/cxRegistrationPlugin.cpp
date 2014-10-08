@@ -39,13 +39,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationMethodsWidget.h"
 #include "cxWirePhantomWidget.h"
 #include "cxPatientOrientationWidget.h"
+#include "cxRegistrationService.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
-RegistrationPlugin::RegistrationPlugin(AcquisitionDataPtr acquisitionData, ctkPluginContext* pluginContext)
+RegistrationPlugin::RegistrationPlugin(RegistrationServicePtr registrationService, VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, AcquisitionDataPtr acquisitionData) :
+	mAquisitionData(acquisitionData),
+	mRegistrationService(registrationService),
+	mVisualizationService(visualizationService),
+	mPatientModelService(patientModelService)
 {
-	mRegistrationManager.reset(new RegistrationManager(acquisitionData, pluginContext));
+	mRegistrationManager.reset(new RegistrationManager(registrationService, acquisitionData));
 }
 
 std::vector<GUIExtenderService::CategorizedWidget> RegistrationPlugin::createWidgets() const
@@ -56,10 +62,10 @@ std::vector<GUIExtenderService::CategorizedWidget> RegistrationPlugin::createWid
 			new RegistrationHistoryWidget(NULL),
 			"Browsing"));
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new RegistrationMethodsWidget(mRegistrationManager, NULL, "RegistrationMethodsWidget", "Registration Methods"),
+			new RegistrationMethodsWidget(mRegistrationService, mVisualizationService, mPatientModelService, NULL, "RegistrationMethodsWidget", "Registration Methods"),
 			"Algorithms"));
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new WirePhantomWidget(mRegistrationManager, NULL),
+			new WirePhantomWidget(mRegistrationService, mVisualizationService, mPatientModelService, mAquisitionData, NULL),
 			"Algorithms"));
 
 	return retval;

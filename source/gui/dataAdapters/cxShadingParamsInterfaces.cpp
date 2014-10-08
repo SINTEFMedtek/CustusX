@@ -31,22 +31,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxShadingParamsInterfaces.h"
-#include "cxDataManager.h"
 #include "cxImage.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
-DoubleDataAdapterShadingBase::DoubleDataAdapterShadingBase()
+DoubleDataAdapterShadingBase::DoubleDataAdapterShadingBase(PatientModelServicePtr patientModelService) :
+	mPatientModelService(patientModelService)
 {
-	mActiveImageProxy = ActiveImageProxy::New(dataService());
-  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChanged()));
-  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
-
+	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
+	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChanged()));
+	connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
 }
+
 void DoubleDataAdapterShadingBase::activeImageChanged()
 {  
-  mImage = dataManager()->getActiveImage();
+  mImage = mPatientModelService->getActiveImage();
   emit changed();
+}
+
+DoubleDataAdapterShadingAmbient::DoubleDataAdapterShadingAmbient(PatientModelServicePtr patientModelService) :
+	DoubleDataAdapterShadingBase(patientModelService)
+{
 }
 
 double DoubleDataAdapterShadingAmbient::getValue() const
@@ -67,6 +73,12 @@ bool DoubleDataAdapterShadingAmbient::setValue(double val)
 }
 
 
+DoubleDataAdapterShadingDiffuse::DoubleDataAdapterShadingDiffuse(PatientModelServicePtr patientModelService) :
+	DoubleDataAdapterShadingBase(patientModelService)
+{
+
+}
+
 double DoubleDataAdapterShadingDiffuse::getValue() const
 {
   if (!mImage)
@@ -84,7 +96,13 @@ bool DoubleDataAdapterShadingDiffuse::setValue(double val)
 }
 
 
-double DoubleDataAdapterShadingSpecular::getValue() const 
+DoubleDataAdapterShadingSpecular::DoubleDataAdapterShadingSpecular(PatientModelServicePtr patientModelService) :
+	DoubleDataAdapterShadingBase(patientModelService)
+{
+
+}
+
+double DoubleDataAdapterShadingSpecular::getValue() const
 { 
   if (!mImage)
     return 0.0;
@@ -101,7 +119,12 @@ bool DoubleDataAdapterShadingSpecular::setValue(double val)
 }
 
 
-double DoubleDataAdapterShadingSpecularPower::getValue() const 
+DoubleDataAdapterShadingSpecularPower::DoubleDataAdapterShadingSpecularPower(PatientModelServicePtr patientModelService) :
+	DoubleDataAdapterShadingBase(patientModelService)
+{
+}
+
+double DoubleDataAdapterShadingSpecularPower::getValue() const
 { 
   if (!mImage)
     return 0.0;

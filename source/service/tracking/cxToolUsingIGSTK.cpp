@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ToolUsingIGSTK::ToolUsingIGSTK(TrackingServicePtr manager, IgstkToolPtr igstkTool) :
+ToolUsingIGSTK::ToolUsingIGSTK(TrackingServiceOldPtr manager, IgstkToolPtr igstkTool) :
 	ToolImpl(manager, ""),
 				mTool(igstkTool), mPolyData(NULL),
 				mValid(false), mConfigured(false), mTracked(false)

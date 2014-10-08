@@ -33,20 +33,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumeInfoWidget.h"
 
 #include <QPushButton>
-#include "cxDataManager.h"
 #include "cxImage.h"
 #include "cxLabeledLineEditWidget.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxVolumeHelpers.h"
 #include "cxActiveImageProxy.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
-VolumeInfoWidget::VolumeInfoWidget(QWidget* parent) :
-  InfoWidget(parent, "VolumeInfoWidget", "Volume Info")
+VolumeInfoWidget::VolumeInfoWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
+  InfoWidget(parent, "VolumeInfoWidget", "Volume Info"),
+  mPatientModelService(patientModelService)
 {
-	mActiveImageProxy = ActiveImageProxy::New(dataService());
+	mActiveImageProxy = ActiveImageProxy::New(patientModelService);
 	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(updateSlot()));
 
 	this->addWidgets();
@@ -55,15 +56,17 @@ VolumeInfoWidget::VolumeInfoWidget(QWidget* parent) :
 }
 
 VolumeInfoWidget::~VolumeInfoWidget()
-{}
+{
+	disconnect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(updateSlot()));
+}
 
 void VolumeInfoWidget::addWidgets()
 {
-	mParentFrameAdapter = ParentFrameStringDataAdapter::New();
+	mParentFrameAdapter = ParentFrameStringDataAdapter::New(mPatientModelService);
 	mNameAdapter = DataNameEditableStringDataAdapter::New();
 	mUidAdapter = DataUidEditableStringDataAdapter::New();
-	mModalityAdapter = DataModalityStringDataAdapter::New();
-	mImageTypeAdapter = ImageTypeStringDataAdapter::New();
+	mModalityAdapter = DataModalityStringDataAdapter::New(mPatientModelService);
+	mImageTypeAdapter = ImageTypeStringDataAdapter::New(mPatientModelService);
 
 	int i=0;
 	new LabeledLineEditWidget(this, mUidAdapter, gridLayout, i++);
@@ -86,7 +89,7 @@ QString VolumeInfoWidget::defaultWhatsThis() const
 
 void VolumeInfoWidget::updateSlot()
 {
-	ImagePtr image = dataManager()->getActiveImage();
+	ImagePtr image = mPatientModelService->getActiveImage();
 	mParentFrameAdapter->setData(image);
 	mNameAdapter->setData(image);
 	mUidAdapter->setData(image);

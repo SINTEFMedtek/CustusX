@@ -46,7 +46,7 @@ class TestTransferFunctionColorWidget : public cx::TransferFunctionColorWidget
 {
 	Q_OBJECT
 public:
-	TestTransferFunctionColorWidget();
+	TestTransferFunctionColorWidget(cx::PatientModelServicePtr patientModelService);
 
 	void initWithTestData();
 	void setPlotArea(QRect plotArea);

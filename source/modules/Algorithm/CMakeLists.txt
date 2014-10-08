@@ -13,11 +13,7 @@
 ###########################################################
 
 SET( MOC_HEADER_FILES
-	logic/cxFilter.h
-	logic/cxFilterImpl.h
-	logic/cxFilterTimedAlgorithm.h
 	logic/cxDummyFilter.h
-	logic/cxPipeline.h
     logic/cxBinaryThresholdImageFilter.h
     logic/cxConnectedThresholdImageFilter.h
 	logic/cxContourFilter.h
@@ -30,7 +26,6 @@ SET( MOC_HEADER_FILES
     gui/cxTimedAlgorithmProgressBar.h
 	gui/cxFilterWidget.h
 	gui/cxPipelineWidget.h
-	gui/cxFilterPresetWidget.h
 	gui/cxAllFiltersWidget.h
 	gui/cxCompactFilterSetupWidget.h
 	)
@@ -40,19 +35,11 @@ QT5_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
 # library
 SET( SOURCE_FILES
-    ${MOC_HEADER_FILES}
-	logic/cxFilter.h
-	logic/cxFilter.cpp
-	logic/cxFilterImpl.h
-	logic/cxFilterImpl.cpp
-	logic/cxFilterTimedAlgorithm.h
-	logic/cxFilterTimedAlgorithm.cpp
+	${MOC_HEADER_FILES}
 	logic/cxDummyFilter.h
 	logic/cxDummyFilter.cpp
 	logic/cxDilationFilter.h
 	logic/cxDilationFilter.cpp
-	logic/cxPipeline.h
-	logic/cxPipeline.cpp
 	logic/cxTrackingDataToVolume.h
     logic/cxTrackingDataToVolume.cpp
     logic/cxBinaryThresholdImageFilter.h
@@ -77,8 +64,6 @@ SET( SOURCE_FILES
 	gui/cxFilterWidget.cpp
 	gui/cxPipelineWidget.h
 	gui/cxPipelineWidget.cpp
-	gui/cxFilterPresetWidget.h
-	gui/cxFilterPresetWidget.cpp
 	gui/cxAllFiltersWidget.h
 	gui/cxAllFiltersWidget.cpp
 	gui/cxCompactFilterSetupWidget.h
@@ -111,9 +96,10 @@ include_directories(
     ${CustusX_SOURCE_DIR}/source/gui/dataAdapters
 	${CustusX_SOURCE_DIR}/source/gui/dataWidgets
 	${CustusX_BINARY_DIR}/source/gui
+	${CustusX_SOURCE_DIR}/source/resource/filter
 	)
 
-set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui cxGUIExtenderService)
+set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui cxGUIExtenderService cxResourceFilter)
 
 
 

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ManualTool::ManualTool(TrackingServicePtr manager, const QString& uid, const QString& name) :
+ManualTool::ManualTool(TrackingServiceOldPtr manager, const QString& uid, const QString& name) :
 	ToolImpl(manager, uid, name)
 {
 	mTimestamp = 0;

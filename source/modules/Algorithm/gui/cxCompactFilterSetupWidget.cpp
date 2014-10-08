@@ -32,12 +32,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxCompactFilterSetupWidget.h"
 
+#include <QGroupBox>
 #include "cxThresholdPreview.h"
 #include "cxSelectDataStringDataAdapter.h"
 
 namespace cx {
 
-CompactFilterSetupWidget::CompactFilterSetupWidget(QWidget* parent, XmlOptionFile options, bool addFrame) :
+CompactFilterSetupWidget::CompactFilterSetupWidget(VisualizationServicePtr visualizationService, PatientModelServicePtr patientModelService, QWidget* parent, XmlOptionFile options, bool addFrame) :
     BaseWidget(parent, "FilterSetupWidget", "FilterSetup")
 {
 	mFrame = NULL;
@@ -45,7 +46,7 @@ CompactFilterSetupWidget::CompactFilterSetupWidget(QWidget* parent, XmlOptionFil
 	QVBoxLayout* toptopLayout = new QVBoxLayout(this);
 	toptopLayout->setMargin(0);
 
-	mOptionsWidget = new OptionsWidget(this);
+	mOptionsWidget = new OptionsWidget(visualizationService, patientModelService, this);
 
 	if (addFrame)
 	{

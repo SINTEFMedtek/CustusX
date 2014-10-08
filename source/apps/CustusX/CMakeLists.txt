@@ -31,8 +31,9 @@ include_directories(
     ${CustusX_BINARY_DIR}/source/modules/Algorithm
     ${CustusX_SOURCE_DIR}/source/modules/Registration/gui
     ${CustusX_BINARY_DIR}/source/modules/Registration
-	${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
+    ${CustusX_SOURCE_DIR}/source/resource/pluginUtilities
 	${CustusX_BINARY_DIR}/source/resource
+	${CustusX_SOURCE_DIR}/source/resource/visualization
 	)
 
 #------------------------------------------------------------------------------

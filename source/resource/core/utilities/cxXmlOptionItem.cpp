@@ -196,7 +196,7 @@ XmlOptionFile::XmlOptionFile()
 	mCurrentElement = mDocument.documentElement();
 }
 
-XmlOptionFile::XmlOptionFile(QString filename, QString name) :
+XmlOptionFile::XmlOptionFile(QString filename) :
 	mFilename(filename)
 {
 	mDocument = SharedDocuments::getInstance()->loadDocument(filename);
@@ -367,7 +367,10 @@ void XmlOptionFile::deleteNode()
 void XmlOptionFile::save()
 {
 	if (mFilename.isEmpty())
+	{
+		reportWarning("XmlOptionFile::save() No file name");
 		return; //Don't do anything if on filename isn't supplied
+	}
 
 	QFile file(mFilename);
 	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate))
