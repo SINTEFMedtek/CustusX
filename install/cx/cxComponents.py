@@ -229,12 +229,16 @@ class CTK(CppComponent):
 #        return self.buildPath() + "/CTK-build/"
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
+    def _getRepo(self):
+        return 'git@github.com:SINTEFMedisinskTeknologi/CTK.git'
     def _rawCheckout(self):
-        self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/CTK.git')
+        self._getBuilder().gitClone(self._getRepo())
     def update(self):
+        repo = self._getRepo()
+        branch = 'CTK-CX-modifications'
+        self._getBuilder().gitSetRemoteURL(repo, branch=branch)
         #latestTestedSHA = '3fe3cdbe9d0ef95b3810a12484f035ae1f66524c'
-        modBranch = 'CTK-CX-modifications'
-        self._getBuilder().gitCheckoutBranch(modBranch)
+        self._getBuilder().gitCheckoutBranch(branch)
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
