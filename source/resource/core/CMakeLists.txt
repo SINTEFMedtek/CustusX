@@ -273,6 +273,7 @@ set (CX_RESOURCE_LIBRARIES
     Qt5::Xml
     Qt5::Multimedia
     Qt5::Sql
+    Qt5::Concurrent
     ${Boost_LIBRARIES}
     ${ITK_LIBRARIES}
     )
