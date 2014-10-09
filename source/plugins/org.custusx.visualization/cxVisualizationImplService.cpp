@@ -74,4 +74,9 @@ bool VisualizationImplService::isNull()
 	return false;
 }
 
+void cx::VisualizationImplService::setRegistrationMode(cx::REGISTRATION_STATUS mode)
+{
+	viewManager()->setRegistrationMode(mode);
+}
+
 } /* namespace cx */

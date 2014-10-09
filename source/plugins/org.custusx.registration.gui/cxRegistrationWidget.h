@@ -71,6 +71,7 @@ private:
 	void onServiceRemoved(RegistrationMethodService *service);
 	bool knownType(QString registrationType);
 	void removeWidgetFromStackedWidget(QString widgetName, QStackedWidget *stackedWidget);
+	void indexChanged(QString registrationType);
 
 	ctkPluginContext* mPluginContext;
 	QVBoxLayout*  mVerticalLayout;

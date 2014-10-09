@@ -87,4 +87,10 @@ bool VisualizationServiceProxy::isNull()
 {
 	return mVisualizationService->isNull();
 }
+
+void VisualizationServiceProxy::setRegistrationMode(cx::REGISTRATION_STATUS mode)
+{
+	mVisualizationService->setRegistrationMode(mode);
+}
+
 } //cx

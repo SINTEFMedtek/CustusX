@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegistrationWidget.h"
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QGroupBox>
@@ -67,12 +68,12 @@ RegistrationWidget::RegistrationWidget(ctkPluginContext *pluginContext, QWidget*
 
 RegistrationWidget::~RegistrationWidget()
 {
-	for(int i = 0; i < mRegistrationTypes.count(); ++i)
-	{
-		StringDataAdapterXmlPtr comboBox = mMethodsSelectorMap[mRegistrationTypes[i]];
-		QStackedWidget *stackedWidget = mRegistrationTypeMap[mRegistrationTypes[i]];
-		disconnect(comboBox.get(), SIGNAL(valueWasSet(int)), stackedWidget, SLOT(setCurrentIndex(int)));
-	}
+//	for(int i = 0; i < mRegistrationTypes.count(); ++i)
+//	{
+//		StringDataAdapterXmlPtr comboBox = mMethodsSelectorMap[mRegistrationTypes[i]];
+//		QStackedWidget *stackedWidget = mRegistrationTypeMap[mRegistrationTypes[i]];
+//		disconnect(comboBox.get(), SIGNAL(valueWasSet(int)), stackedWidget, SLOT(setCurrentIndex(int)));
+//	}
 }
 
 void RegistrationWidget::initRegistrationTypesWidgets()
@@ -93,7 +94,8 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 																				  QStringList(),
 																				  mOptions.getElement());
 		mMethodsSelectorMap[mRegistrationTypes[i]] = methodSelector;
-		connect(methodSelector.get(), SIGNAL(valueWasSet(int)), registrationTypeWidget, SLOT(setCurrentIndex(int)));
+		boost::function<void()> f = boost::bind(&RegistrationWidget::indexChanged, this, mRegistrationTypes[i]);
+		connect(methodSelector.get(), &StringDataAdapterXml::valueWasSet, f);
 
 		layoutV->addWidget(new LabeledComboBoxWidget(this, methodSelector));
 		layoutV->addWidget(registrationTypeWidget);
@@ -101,6 +103,14 @@ void RegistrationWidget::initRegistrationTypesWidgets()
 		mVerticalLayout->addWidget(widget);
 		this->addTab(widget, mRegistrationTypes[i]);
 	}
+}
+
+void RegistrationWidget::indexChanged(QString registrationType)
+{
+	StringDataAdapterXmlPtr comboBox = mMethodsSelectorMap[registrationType];
+	QStackedWidget *stackedWidget = mRegistrationTypeMap[registrationType];
+	int pos = comboBox->getValueRange().indexOf(registrationType);
+	stackedWidget->setCurrentIndex(pos);
 }
 
 void RegistrationWidget::initServiceListener()

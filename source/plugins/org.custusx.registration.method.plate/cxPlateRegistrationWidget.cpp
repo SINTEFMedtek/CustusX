@@ -38,26 +38,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolManager.h"
 #include "cxReporter.h"
 #include "cxDataManager.h"
-#include "cxRegistrationManager.h"
-#include "cxViewManager.h"
+//#include "cxRegistrationManager.h"
+//#include "cxViewManager.h"
+#include "cxLegacySingletons.h"
+#include "cxVisualizationService.h"
 
 namespace cx
 {
-PlateRegistrationWidget::PlateRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent) :
-		RegistrationBaseWidget(registrationService, parent, "PlateRegistrationWidget", "Plate Registration"),
-    mPlateRegistrationButton(new QPushButton("Load registration points", this)),
-		mReferenceToolInfoLabel(new QLabel("", this)),
-		mPatientModelService(patientModelService)
+PlateRegistrationWidget::PlateRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent) :
+	RegistrationBaseWidget(registrationService, parent, "PlateRegistrationWidget", "Plate Registration"),
+	mPlateRegistrationButton(new QPushButton("Load registration points", this)),
+	mReferenceToolInfoLabel(new QLabel("", this)),
+	mPatientModelService(patientModelService),
+	mVisualizationService(visualizationService)
 {
-  connect(mPlateRegistrationButton, SIGNAL(clicked()), this, SLOT(plateRegistrationSlot()));
-  connect(toolManager(), SIGNAL(configured()), this, SLOT(internalUpdate()));
+	connect(mPlateRegistrationButton, SIGNAL(clicked()), this, SLOT(plateRegistrationSlot()));
+	connect(toolManager(), SIGNAL(configured()), this, SLOT(internalUpdate()));
 
-  QVBoxLayout* toptopLayout = new QVBoxLayout(this);
-  toptopLayout->addWidget(mReferenceToolInfoLabel);
-  toptopLayout->addWidget(mPlateRegistrationButton);
-  toptopLayout->addStretch();
+	QVBoxLayout* toptopLayout = new QVBoxLayout(this);
+	toptopLayout->addWidget(mReferenceToolInfoLabel);
+	toptopLayout->addWidget(mPlateRegistrationButton);
+	toptopLayout->addStretch();
 
-  this->internalUpdate();
+	this->internalUpdate();
 }
 
 PlateRegistrationWidget::~PlateRegistrationWidget()
@@ -67,29 +70,33 @@ PlateRegistrationWidget::~PlateRegistrationWidget()
 
 QString PlateRegistrationWidget::defaultWhatsThis() const
 {
-  return "<html>"
-      "<h3>Plate registration.</h3>"
-      "<p>Internally register the reference plates reference points as landmarks.</p>"
-      "<p><i>Click the button to load landmarks.</i></p>"
-      "</html>";
+	return "<html>"
+		   "<h3>Plate registration.</h3>"
+		   "<p>Internally register the reference plates reference points as landmarks.</p>"
+		   "<p><i>Click the button to load landmarks.</i></p>"
+		   "</html>";
 }
 
 void PlateRegistrationWidget::showEvent(QShowEvent* event)
 {
   BaseWidget::showEvent(event);
-  connect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
-  connect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
+  connect(mPatientModelService->getPatientLandmarks().get(), &Landmarks::landmarkAdded,
+		  this, &PlateRegistrationWidget::landmarkUpdatedSlot);
+  connect(mPatientModelService->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
+		  this, &PlateRegistrationWidget::landmarkUpdatedSlot);
 
-  viewManager()->setRegistrationMode(rsPATIENT_REGISTRATED);
+  mVisualizationService->setRegistrationMode(rsPATIENT_REGISTRATED);
 }
 
 void PlateRegistrationWidget::hideEvent(QHideEvent* event)
 {
   BaseWidget::hideEvent(event);
-  disconnect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
-  disconnect(dataManager()->getPatientLandmarks().get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
+  disconnect(mPatientModelService->getPatientLandmarks().get(), &Landmarks::landmarkAdded,
+			 this, &PlateRegistrationWidget::landmarkUpdatedSlot);
+  disconnect(mPatientModelService->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
+			 this, &PlateRegistrationWidget::landmarkUpdatedSlot);
 
-  viewManager()->setRegistrationMode(rsNOT_REGISTRATED);
+  mVisualizationService->setRegistrationMode(rsNOT_REGISTRATED);
 }
 
 void PlateRegistrationWidget::landmarkUpdatedSlot()

@@ -42,7 +42,7 @@ QWidget *RegistrationMethodPlateImageToPatientService::createWidget()
 {
 	Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget(NULL, "PlateRegistrationWidget", "Plate");
 	PlateImageRegistrationWidget* platesImageRegistrationWidget = new PlateImageRegistrationWidget(mRegistrationService, mPatientModelService, imageAndPlateRegistrationWidget);
-	PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(mRegistrationService, mPatientModelService, imageAndPlateRegistrationWidget);
+	PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(mRegistrationService, mPatientModelService, mVisualizationService, imageAndPlateRegistrationWidget);
 
 	imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
 	imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");

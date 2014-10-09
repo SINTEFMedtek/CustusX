@@ -60,4 +60,9 @@ void VisualizationServiceNull::printWarning() const
 	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.video) disabled?");
 }
 
+void VisualizationServiceNull::setRegistrationMode(cx::REGISTRATION_STATUS mode)
+{
+	printWarning();
+}
+
 } //cx

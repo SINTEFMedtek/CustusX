@@ -47,6 +47,8 @@ public:
 	virtual int getActiveViewGroup() const;
 	virtual ViewGroupDataPtr getViewGroupData(int groupIdx);
 
+	virtual void setRegistrationMode(REGISTRATION_STATUS mode);
+
 	bool isNull();
 
 private:

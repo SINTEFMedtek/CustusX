@@ -56,8 +56,9 @@ public:
 	virtual ~VisualizationImplService();
 
 	virtual int getActiveViewGroup() const;
-//	virtual std::vector<ViewGroupPtr> getViewGroups();
 	virtual ViewGroupDataPtr getViewGroupData(int groupIdx);
+
+	virtual void setRegistrationMode(REGISTRATION_STATUS mode);
 
 	virtual bool isNull();
 

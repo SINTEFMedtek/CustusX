@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLandmarkPatientRegistrationWidget.h"
 #include "cxFastPatientRegistrationWidget.h"
 #include "cxFastOrientationRegistrationWidget.h"
-#include "cxPlateRegistrationWidget.h"
+//#include "cxPlateRegistrationWidget.h"
 #include "cxRegisterI2IWidget.h"
 //#include "cxElastixWidget.h"
 #include "cxManualRegistrationWidget.h"

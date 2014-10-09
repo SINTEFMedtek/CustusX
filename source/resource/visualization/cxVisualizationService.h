@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <boost/shared_ptr.hpp>
 #include <vector>
+#include "cxData.h"
 
 #define VisualizationService_iid "cx::VisualizationService"
 
@@ -57,8 +58,9 @@ class VisualizationService : public QObject
 	Q_OBJECT
 public:
 	virtual int getActiveViewGroup() const = 0;
-//	virtual std::vector<ViewGroupPtr> getViewGroups() = 0;
 	virtual ViewGroupDataPtr getViewGroupData(int groupIdx) = 0;
+
+	virtual void setRegistrationMode(REGISTRATION_STATUS mode) = 0;
 
 	virtual bool isNull() = 0;
 	static VisualizationServicePtr getNullObject();

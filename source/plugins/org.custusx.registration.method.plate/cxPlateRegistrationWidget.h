@@ -60,23 +60,24 @@ namespace cx
  */
 class cxPluginRegistration_EXPORT PlateRegistrationWidget : public RegistrationBaseWidget
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-	PlateRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, QWidget* parent);
-  virtual ~PlateRegistrationWidget();
-  virtual QString defaultWhatsThis() const;
+	PlateRegistrationWidget(RegistrationServicePtr registrationService, PatientModelServicePtr patientModelService, VisualizationServicePtr visualizationService, QWidget* parent);
+	virtual ~PlateRegistrationWidget();
+	virtual QString defaultWhatsThis() const;
 
 private slots:
-  virtual void showEvent(QShowEvent* event);
-  virtual void hideEvent(QHideEvent* event);
-  void landmarkUpdatedSlot();
-  void plateRegistrationSlot();
-  void internalUpdate();
+	virtual void showEvent(QShowEvent* event);
+	virtual void hideEvent(QHideEvent* event);
+	void landmarkUpdatedSlot();
+	void plateRegistrationSlot();
+	void internalUpdate();
 
 private:
-   QPushButton* mPlateRegistrationButton;
-   QLabel*      mReferenceToolInfoLabel;
-	 PatientModelServicePtr mPatientModelService;
+	QPushButton* mPlateRegistrationButton;
+	QLabel*      mReferenceToolInfoLabel;
+	PatientModelServicePtr mPatientModelService;
+	VisualizationServicePtr mVisualizationService;
 };
 
 /**

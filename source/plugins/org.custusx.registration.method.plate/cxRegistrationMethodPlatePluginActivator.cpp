@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegisteredService.h"
 #include "cxRegistrationServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
+#include "cxVisualizationServiceProxy.h"
 
 namespace cx
 {
@@ -55,8 +56,9 @@ void RegistrationMethodPlatePluginActivator::start(ctkPluginContext* context)
 {
 	RegistrationServicePtr registrationService(new RegistrationServiceProxy(context));
 	PatientModelServicePtr patientModelService(new PatientModelServiceProxy(context));
+	VisualizationServicePtr visualizationService(new VisualizationServiceProxy(context));
 
-	RegistrationMethodPlateImageToPatientService* image2patientService = new RegistrationMethodPlateImageToPatientService(registrationService, patientModelService);
+	RegistrationMethodPlateImageToPatientService* image2patientService = new RegistrationMethodPlateImageToPatientService(registrationService, patientModelService, visualizationService);
 
 	mRegistrationImageToPatient = RegisteredServicePtr(new RegisteredService(context, image2patientService, RegistrationMethodService_iid));
 }
