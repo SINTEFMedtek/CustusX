@@ -68,12 +68,6 @@ RegistrationWidget::RegistrationWidget(ctkPluginContext *pluginContext, QWidget*
 
 RegistrationWidget::~RegistrationWidget()
 {
-//	for(int i = 0; i < mRegistrationTypes.count(); ++i)
-//	{
-//		StringDataAdapterXmlPtr comboBox = mMethodsSelectorMap[mRegistrationTypes[i]];
-//		QStackedWidget *stackedWidget = mRegistrationTypeMap[mRegistrationTypes[i]];
-//		disconnect(comboBox.get(), SIGNAL(valueWasSet(int)), stackedWidget, SLOT(setCurrentIndex(int)));
-//	}
 }
 
 void RegistrationWidget::initRegistrationTypesWidgets()

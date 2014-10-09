@@ -91,7 +91,8 @@ AllFiltersWidget::AllFiltersWidget(VisualizationServicePtr visualizationService,
 	                                                        availableFilters,
 	                                                        options.getElement());
 	mFilterSelector->setDisplayNames(names);
-	connect(mFilterSelector.get(), SIGNAL(valueWasSet(int)), this, SLOT(filterChangedSlot()));
+	connect(mFilterSelector.get(), &StringDataAdapterXml::valueWasSet,
+			this, &AllFiltersWidget::filterChangedSlot);
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 

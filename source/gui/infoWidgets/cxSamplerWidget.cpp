@@ -83,8 +83,10 @@ SamplerWidget::SamplerWidget(QWidget* parent) :
 	    "",
 		QStringList(),
         QDomNode());
-	connect(mSpaceSelector.get(), SIGNAL(valueWasSet(int)), this, SLOT(spacesChangedSlot()));
-	connect(mSpaceSelector.get(), SIGNAL(valueWasSet(int)), this, SLOT(setModified()));
+	connect(mSpaceSelector.get(), &StringDataAdapterXml::valueWasSet,
+			this, &SamplerWidget::spacesChangedSlot);
+	connect(mSpaceSelector.get(), &StringDataAdapterXml::valueWasSet,
+			this, &SamplerWidget::setModified);
 	QString space = settings()->value("sampler/Space", Space(csREF).toString()).toString();
 	mSpaceSelector->setValue(space);
 	LabeledComboBoxWidget* spaceSelectorWidget = new LabeledComboBoxWidget(this, mSpaceSelector);

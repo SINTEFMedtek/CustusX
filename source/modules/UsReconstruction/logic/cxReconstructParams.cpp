@@ -56,21 +56,20 @@ ReconstructParams::ReconstructParams(XmlOptionFile settings)
 		"Algorithm to use for output volume orientation", "MiddleFrame",
 		QString("PatientReference MiddleFrame").split(" "),
 		mSettings.getElement());
-	connect(mOrientationAdapter.get(), SIGNAL(valueWasSet(int)), this, SIGNAL(changedInputSettings()));
+	connect(mOrientationAdapter.get(), &StringDataAdapterXml::valueWasSet, this, &ReconstructParams::changedInputSettings);
 
 	PresetTransferFunctions3DPtr presets = dataManager()->getPresetTransferFunctions3D();
 	mPresetTFAdapter = StringDataAdapterXml::initialize("Preset", "",
 		"Preset transfer function to apply to the reconstructed volume", "US B-Mode", presets->getPresetList("US"),
 		mSettings.getElement());
 
-	connect(mPresetTFAdapter.get(), SIGNAL(valueWasSet(int)), this, SIGNAL(transferFunctionChanged()));
-	//connect(mPresetTFAdapter.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
+	connect(mPresetTFAdapter.get(), &StringDataAdapterXml::valueWasSet, this, &ReconstructParams::transferFunctionChanged);
 
 	mMaskReduce = StringDataAdapterXml::initialize("Reduce mask (% in 1D)", "",
 		"Speedup by reducing mask size", "3",
 		QString("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15").split(" "),
 		mSettings.getElement());
-	connect(mMaskReduce.get(), SIGNAL(valueWasSet(int)), this, SIGNAL(changedInputSettings()));
+	connect(mMaskReduce.get(), &StringDataAdapterXml::valueWasSet, this, &ReconstructParams::changedInputSettings);
 
 	mAlignTimestamps = BoolDataAdapterXml::initialize("Align timestamps", "",
 		"Align the first of tracker and frame timestamps, ignoring lags.", false,
@@ -103,7 +102,7 @@ ReconstructParams::ReconstructParams(XmlOptionFile settings)
 
 	mAlgorithmAdapter = StringDataAdapterXml::initialize("Algorithm", "", "Choose algorithm to use for reconstruction",
 			QString(), QStringList(), mSettings.getElement());
-	connect(mAlgorithmAdapter.get(), SIGNAL(valueWasSet(int)), this, SIGNAL(changedInputSettings()));
+	connect(mAlgorithmAdapter.get(), &StringDataAdapterXml::valueWasSet, this, &ReconstructParams::changedInputSettings);
 }
 
 ReconstructParams::~ReconstructParams()

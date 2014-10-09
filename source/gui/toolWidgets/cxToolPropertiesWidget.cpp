@@ -106,8 +106,8 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
       "",
 	  QStringList(),
       QDomNode());
-  connect(mSpaceSelector.get(), SIGNAL(valueWasSet(int)), this, SLOT(spacesChangedSlot()));
-  connect(mSpaceSelector.get(), SIGNAL(valueWasSet(int)), this, SLOT(setModified()));
+  connect(mSpaceSelector.get(), &StringDataAdapterXml::valueWasSet, this, &ToolPropertiesWidget::spacesChangedSlot);
+  connect(mSpaceSelector.get(), &StringDataAdapterXml::valueWasSet, this, &ToolPropertiesWidget::setModified);
   mSpaceSelector->setValue(spaceProvider()->getPr().toString());
   manualGroupLayout->addWidget(new LabeledComboBoxWidget(this, mSpaceSelector));
 
