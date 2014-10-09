@@ -70,7 +70,3 @@ void RegistrationMethodModelToUSPluginActivator::stop(ctkPluginContext* context)
 }
 
 } // namespace cx
-
-Q_EXPORT_PLUGIN2(RegistrationMethodModelToUSPluginActivator_irrelevant_string, cx::RegistrationMethodModelToUSPluginActivator)
-
-
