@@ -107,7 +107,6 @@ include_directories(
     ${CX_RESOURCE_WIDGETS_INCLUDE_DIRECTORIES}
     ${CX_RESOURCE_USRECONSTRUCTIONTYPES_INCLUDE_DIRECTORIES}
     .
-#    ${CustusX_BINARY_DIR}/source/modules/Registration
     ./logic
     ./gui
 
